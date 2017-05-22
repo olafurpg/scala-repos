@@ -25,19 +25,17 @@ import java.util.concurrent.TimeUnit
     "This class has been deprecated and will be removed in a future release.",
     "0.10.0.0")
 @threadsafe
-class ProducerTopicMetrics(metricId: ClientIdTopic) extends KafkaMetricsGroup {
-  val tags = metricId match {
+class ProducerTopicMetrics(metricId: ClientIdTopic) extends KafkaMetricsGroup
+  val tags = metricId match
     case ClientIdAndTopic(clientId, topic) =>
       Map("clientId" -> clientId, "topic" -> topic)
     case ClientIdAllTopics(clientId) => Map("clientId" -> clientId)
-  }
 
   val messageRate = newMeter(
       "MessagesPerSec", "messages", TimeUnit.SECONDS, tags)
   val byteRate = newMeter("BytesPerSec", "bytes", TimeUnit.SECONDS, tags)
   val droppedMessageRate = newMeter(
       "DroppedMessagesPerSec", "drops", TimeUnit.SECONDS, tags)
-}
 
 /**
   * Tracks metrics for each topic the given producer client has produced data to.
@@ -46,7 +44,7 @@ class ProducerTopicMetrics(metricId: ClientIdTopic) extends KafkaMetricsGroup {
 @deprecated(
     "This class has been deprecated and will be removed in a future release.",
     "0.10.0.0")
-class ProducerTopicStats(clientId: String) {
+class ProducerTopicStats(clientId: String)
   private val valueFactory = (k: ClientIdTopic) => new ProducerTopicMetrics(k)
   private val stats =
     new Pool[ClientIdTopic, ProducerTopicMetrics](Some(valueFactory))
@@ -55,10 +53,8 @@ class ProducerTopicStats(clientId: String) {
 
   def getProducerAllTopicsStats(): ProducerTopicMetrics = allTopicsStats
 
-  def getProducerTopicStats(topic: String): ProducerTopicMetrics = {
+  def getProducerTopicStats(topic: String): ProducerTopicMetrics =
     stats.getAndMaybePut(new ClientIdAndTopic(clientId, topic))
-  }
-}
 
 /**
   * Stores the topic stats information of each producer client in a (clientId -> ProducerTopicStats) map.
@@ -66,16 +62,13 @@ class ProducerTopicStats(clientId: String) {
 @deprecated(
     "This object has been deprecated and will be removed in a future release.",
     "0.10.0.0")
-object ProducerTopicStatsRegistry {
+object ProducerTopicStatsRegistry
   private val valueFactory = (k: String) => new ProducerTopicStats(k)
   private val globalStats =
     new Pool[String, ProducerTopicStats](Some(valueFactory))
 
-  def getProducerTopicStats(clientId: String) = {
+  def getProducerTopicStats(clientId: String) =
     globalStats.getAndMaybePut(clientId)
-  }
 
-  def removeProducerTopicStats(clientId: String) {
+  def removeProducerTopicStats(clientId: String)
     globalStats.remove(clientId)
-  }
-}

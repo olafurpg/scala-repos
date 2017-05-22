@@ -1,4 +1,4 @@
-object SCL8317 {
+object SCL8317
   def foo(x: Boolean): Int = 1
 
   def foo(s: String): String = null
@@ -7,5 +7,4 @@ object SCL8317 {
 
   /*start*/
   foo() /*end*/
-}
 //Int

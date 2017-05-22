@@ -1,7 +1,7 @@
 package spire
 package math
 
-object NumberTag {
+object NumberTag
 
   def apply[A](implicit ev: NumberTag[A]): NumberTag[A] = ev
 
@@ -10,7 +10,7 @@ object NumberTag {
   case object Approximate extends Resolution
   case object Exact extends Resolution
 
-  class BuiltinIntTag[A](zero: A, min: A, max: A) extends NumberTag[A] {
+  class BuiltinIntTag[A](zero: A, min: A, max: A) extends NumberTag[A]
     def resolution: Resolution = Integral
 
     val hasZero: Option[A] = Some(zero)
@@ -26,9 +26,8 @@ object NumberTag {
 
     def isInfinite(a: A): Boolean = false
     def isNaN(a: A): Boolean = false
-  }
 
-  class UnsignedIntTag[A](zero: A, max: A) extends NumberTag[A] {
+  class UnsignedIntTag[A](zero: A, max: A) extends NumberTag[A]
     def resolution: Resolution = Integral
 
     val hasZero: Option[A] = Some(zero)
@@ -44,11 +43,10 @@ object NumberTag {
 
     def isInfinite(a: A): Boolean = false
     def isNaN(a: A): Boolean = false
-  }
 
   abstract class BuiltinFloatTag[A](
       zero: A, min: A, max: A, nan: A, posInf: A, negInf: A)
-      extends NumberTag[A] {
+      extends NumberTag[A]
     def resolution: Resolution = Approximate
 
     val hasZero: Option[A] = Some(zero)
@@ -61,9 +59,8 @@ object NumberTag {
 
     def overflows: Boolean = false
     def isSigned: Boolean = true
-  }
 
-  class LargeTag[A](val resolution: Resolution, zero: A) extends NumberTag[A] {
+  class LargeTag[A](val resolution: Resolution, zero: A) extends NumberTag[A]
     val hasZero: Option[A] = Some(zero)
     def hasMinValue: Option[A] = None
     def hasMaxValue: Option[A] = None
@@ -77,7 +74,6 @@ object NumberTag {
 
     def isInfinite(a: A): Boolean = false
     def isNaN(a: A): Boolean = false
-  }
 
   class CustomTag[A](val resolution: Resolution,
                      val hasZero: Option[A],
@@ -85,14 +81,12 @@ object NumberTag {
                      val hasMaxValue: Option[A],
                      val overflows: Boolean,
                      val isSigned: Boolean)
-      extends NumberTag[A] {
+      extends NumberTag[A]
     def hasNaN: Option[A] = None
     def hasPositiveInfinity: Option[A] = None
     def hasNegativeInfinity: Option[A] = None
     def isInfinite(a: A): Boolean = false
     def isNaN(a: A): Boolean = false
-  }
-}
 
 /**
   * A `NumberTag` provides information about important implementations details
@@ -101,7 +95,7 @@ object NumberTag {
   * number if they exist, whether it is an approximate or exact number type,
   * etc.
   */
-trait NumberTag[A] {
+trait NumberTag[A]
 
   /**
     * Returns the resolution of this number.
@@ -193,4 +187,3 @@ trait NumberTag[A] {
     * invalid).
     */
   def isFinite(a: A): Boolean = !(isInfinite(a) || isNaN(a))
-}

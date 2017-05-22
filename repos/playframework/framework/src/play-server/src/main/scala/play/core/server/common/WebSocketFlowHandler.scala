@@ -11,16 +11,16 @@ import akka.util.ByteString
 import play.api.Logger
 import play.api.http.websocket._
 
-object WebSocketFlowHandler {
+object WebSocketFlowHandler
 
   /**
     * Implements the WebSocket protocol, including correctly handling the closing of the WebSocket, as well as
     * other control frames like ping/pong.
     */
   def webSocketProtocol(bufferLimit: Int)
-    : BidiFlow[RawMessage, Message, Message, Message, NotUsed] = {
+    : BidiFlow[RawMessage, Message, Message, Message, NotUsed] =
     BidiFlow.fromGraph(
-        new GraphStage[BidiShape[RawMessage, Message, Message, Message]] {
+        new GraphStage[BidiShape[RawMessage, Message, Message, Message]]
       // The stream of incoming messages from the websocket connection
       val remoteIn = Inlet[RawMessage]("WebSocketIn")
       // The stream of websocket messages going to the application
@@ -35,7 +35,7 @@ object WebSocketFlowHandler {
 
       override def createLogic(
           inheritedAttributes: Attributes): GraphStageLogic =
-        new GraphStageLogic(shape) {
+        new GraphStageLogic(shape)
 
           var state: State = Open
           var pongToSend: Message = null
@@ -62,44 +62,38 @@ object WebSocketFlowHandler {
           // cancel appIn. So server messages cannot starve server initiated close from being sent.
           // The lowest priority is pong messages.
 
-          def serverInitiatedClose(close: CloseMessage) = {
+          def serverInitiatedClose(close: CloseMessage) =
             // Cancel appIn, because we must not send any more messages once we initiate a close.
             cancel(appIn)
 
-            if (state == Open || state.isInstanceOf[ServerInitiatingClose]) {
-              if (isAvailable(remoteOut)) {
+            if (state == Open || state.isInstanceOf[ServerInitiatingClose])
+              if (isAvailable(remoteOut))
                 state = ServerInitiatedClose
                 push(remoteOut, close)
                 // If appOut is closed, then we may need to do our own pull so that we can get the ack
                 if (isClosed(appOut) && !isClosed(remoteIn) &&
-                    !hasBeenPulled(remoteIn)) {
+                    !hasBeenPulled(remoteIn))
                   pull(remoteIn)
-                }
-              } else {
+              else
                 state = ServerInitiatingClose(close)
-              }
-            } else {
+            else
               // Initiating close when we've already sent a close message means we must have encountered an error in
               // processing the handshake, just complete.
               completeStage()
-            }
-          }
 
           def toMessage(
-              messageType: MessageType.Type, data: ByteString): Message = {
-            messageType match {
+              messageType: MessageType.Type, data: ByteString): Message =
+            messageType match
               case MessageType.Text => TextMessage(data.utf8String)
               case MessageType.Binary => BinaryMessage(data)
               case MessageType.Ping => PingMessage(data)
               case MessageType.Pong => PongMessage(data)
               case MessageType.Close => parseCloseMessage(data)
-            }
-          }
 
-          def consumeMessage(): Message = {
+          def consumeMessage(): Message =
             val read = grab(remoteIn)
 
-            read.messageType match {
+            read.messageType match
               case MessageType.Continuation if currentPartialMessage == null =>
                 serverInitiatedClose(
                     CloseMessage(CloseCodes.ProtocolError,
@@ -133,61 +127,52 @@ object WebSocketFlowHandler {
               case start =>
                 currentPartialMessage = read
                 null
-            }
-          }
 
-          setHandler(appOut, new OutHandler {
-            override def onPull() = {
+          setHandler(appOut, new OutHandler
+            override def onPull() =
               // We always pull from the remote in when the app pulls, even if closing, since if we get a message from
               // the client and we're still open, we still want to send it.
-              if (!hasBeenPulled(remoteIn)) {
+              if (!hasBeenPulled(remoteIn))
                 pull(remoteIn)
-              }
-            }
 
-            override def onDownstreamFinish() = {
-              if (state == Open) {
+            override def onDownstreamFinish() =
+              if (state == Open)
                 serverInitiatedClose(CloseMessage(Some(CloseCodes.Regular)))
-              }
-            }
-          })
+          )
 
-          setHandler(remoteIn, new InHandler {
-            override def onPush() = {
+          setHandler(remoteIn, new InHandler
+            override def onPush() =
               val message = consumeMessage()
 
-              if (message != null) {
-                state match {
+              if (message != null)
+                state match
                   case ClientInitiatedClose(_) =>
                     // Client illegally sent a message after sending a close, just terminate
                     completeStage()
                   case ServerInitiatedClose | ServerInitiatingClose(_) =>
                     // Server has initiated the close, if this is a close ack from the client, close the connection,
                     // otherwise, forward it down to the appIn if it's still listening
-                    message match {
+                    message match
                       case close: CloseMessage =>
                         completeStage()
                       case other =>
-                        if (!isClosed(appOut)) {
+                        if (!isClosed(appOut))
                           push(appOut, other)
-                        } else {
+                        else
                           // appIn is closed, we're ignoring the message and it's not going to pull, so we need to pull
                           pull(remoteIn)
-                        }
-                    }
                   case Open =>
-                    message match {
+                    message match
                       case ping @ PingMessage(data) =>
                         // Forward down to app
                         push(appOut, ping)
                         // Return to client
-                        if (isAvailable(remoteOut)) {
+                        if (isAvailable(remoteOut))
                           // Send immediately
                           push(remoteOut, PongMessage(data))
-                        } else {
+                        else
                           // Store to send later
                           pongToSend = PongMessage(data)
-                        }
 
                       case close: CloseMessage =>
                         // Forward down to app
@@ -197,104 +182,83 @@ object WebSocketFlowHandler {
                         cancel(appIn)
 
                         // This is a client initiated close, so send back
-                        if (isAvailable(remoteOut)) {
+                        if (isAvailable(remoteOut))
                           // We can send, send immediately then terminate the connection
                           push(remoteOut, close)
                           completeStage()
-                        } else {
+                        else
                           // Store so we can send later
                           state = ClientInitiatedClose(close)
-                        }
 
                       case other =>
                         // Forward down to app
                         push(appOut, other)
-                    }
-                }
-              } else {
-                if (!isClosed(remoteIn)) {
+              else
+                if (!isClosed(remoteIn))
                   pull(remoteIn)
-                }
-              }
-            }
-          })
+          )
 
-          setHandler(appIn, new InHandler {
-            override def onPush() = {
-              if (state == Open) {
-                grab(appIn) match {
+          setHandler(appIn, new InHandler
+            override def onPush() =
+              if (state == Open)
+                grab(appIn) match
                   case close: CloseMessage =>
                     serverInitiatedClose(close)
                     cancel(appIn)
                   case other =>
-                    if (isAvailable(remoteOut)) {
+                    if (isAvailable(remoteOut))
                       push(remoteOut, other)
-                    } else {
+                    else
                       messageToSend = other
-                    }
-                }
-              } else {
+              else
                 // We're closed, ignore
-              }
-            }
 
-            override def onUpstreamFinish() = {
-              if (state == Open) {
+            override def onUpstreamFinish() =
+              if (state == Open)
                 serverInitiatedClose(CloseMessage(Some(CloseCodes.Regular)))
-              }
-            }
 
-            override def onUpstreamFailure(ex: Throwable) = {
-              if (state == Open) {
+            override def onUpstreamFailure(ex: Throwable) =
+              if (state == Open)
                 serverInitiatedClose(
                     CloseMessage(Some(CloseCodes.UnexpectedCondition)))
                 logger.error("WebSocket flow threw exception", ex)
-              } else {
+              else
                 logger.debug(
                     "WebSocket flow threw exception after the WebSocket was closed",
                     ex)
-              }
-            }
-          })
+          )
 
-          setHandler(remoteOut, new OutHandler {
-            override def onPull() = {
-              state match {
+          setHandler(remoteOut, new OutHandler
+            override def onPull() =
+              state match
                 case ClientInitiatedClose(close) =>
                   // Acknowledge the client close, and then complete
                   push(remoteOut, close)
                   completeStage()
                 case ServerInitiatingClose(close) =>
                   // If there is a buffered message, send that first
-                  if (messageToSend != null) {
+                  if (messageToSend != null)
                     push(remoteOut, messageToSend)
                     messageToSend = null
-                  } else {
+                  else
                     serverInitiatedClose(close)
-                  }
                 case ServerInitiatedClose =>
                 // Ignore, we've sent a close message, we're not allowed to send anything else
                 case Open =>
-                  if (messageToSend != null) {
+                  if (messageToSend != null)
                     // We have a message stored up that we didn't manage to send before, send it
                     push(remoteOut, messageToSend)
                     messageToSend = null
-                  } else if (pongToSend != null) {
+                  else if (pongToSend != null)
                     // We have a pong to send
                     push(remoteOut, pongToSend)
                     pongToSend = null
-                  } else {
+                  else
                     // Nothing to send, pull from app if not already pulled
-                    if (!hasBeenPulled(appIn)) {
+                    if (!hasBeenPulled(appIn))
                       pull(appIn)
-                    }
-                  }
-              }
-            }
-          })
-        }
-    })
-  }
+          )
+    )
 
   private sealed trait State
   private case object Open extends State
@@ -307,24 +271,20 @@ object WebSocketFlowHandler {
   // Low level API for raw, possibly fragmented messages
   case class RawMessage(
       messageType: MessageType.Type, data: ByteString, isFinal: Boolean)
-  object MessageType extends Enumeration {
+  object MessageType extends Enumeration
     type Type = Value
     val Ping, Pong, Text, Binary, Continuation, Close = Value
-  }
 
-  def parseCloseMessage(data: ByteString): CloseMessage = {
+  def parseCloseMessage(data: ByteString): CloseMessage =
     def invalid(reason: String) =
       CloseMessage(Some(CloseCodes.ProtocolError),
                    s"Peer sent illegal close frame ($reason).")
 
-    if (data.length >= 2) {
+    if (data.length >= 2)
       val code = ((data(0) & 0xff) << 8) | (data(1) & 0xff)
       val message = data.drop(2).utf8String
       CloseMessage(Some(code), message)
-    } else if (data.length == 1) {
+    else if (data.length == 1)
       invalid("close code must be length 2 but was 1")
-    } else {
+    else
       CloseMessage()
-    }
-  }
-}

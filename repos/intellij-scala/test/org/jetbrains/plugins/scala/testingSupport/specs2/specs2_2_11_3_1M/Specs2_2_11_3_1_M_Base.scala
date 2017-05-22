@@ -7,12 +7,12 @@ import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
   * @author Roman.Shein
   * @since 11.01.2015.
   */
-trait Specs2_2_11_3_1_M_Base extends Specs2TestCase {
+trait Specs2_2_11_3_1_M_Base extends Specs2TestCase
 
   /**
     * Intended for loading libraries different from scala-compiler.
     */
-  override protected def addOtherLibraries(): Unit = {
+  override protected def addOtherLibraries(): Unit =
     addIvyCacheLibrary("specs2-common",
                        "org.specs2/specs2-common_2.11/jars",
                        "specs2-common_2.11-3.0.1.jar")
@@ -46,7 +46,5 @@ trait Specs2_2_11_3_1_M_Base extends Specs2TestCase {
     addIvyCacheLibrary("scodec-core",
                        "org.typelevel/scodec-core_2.11/bundles",
                        "scodec-core_2.11-1.7.0-SNAPSHOT.jar")
-  }
 
   override protected val scalaSdkVersion = ScalaSdkVersion._2_11
-}

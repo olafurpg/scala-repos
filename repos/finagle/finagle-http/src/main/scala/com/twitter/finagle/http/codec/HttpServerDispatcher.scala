@@ -17,7 +17,7 @@ import org.jboss.netty.handler.codec.http.{HttpRequest, HttpResponse}
 class HttpServerDispatcher(trans: Transport[Any, Any],
                            service: Service[Request, Response],
                            stats: StatsReceiver)
-    extends GenSerialServerDispatcher[Request, Response, Any, Any](trans) {
+    extends GenSerialServerDispatcher[Request, Response, Any, Any](trans)
 
   def this(trans: Transport[Any, Any], service: Service[Request, Response]) =
     this(trans, service, DefaultStatsReceiver)
@@ -27,15 +27,14 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
 
   import ReaderUtils.{readChunk, streamChunks}
 
-  trans.onClose ensure {
+  trans.onClose ensure
     service.close()
-  }
 
   protected def dispatch(m: Any, eos: Promise[Unit]): Future[Response] =
-    m match {
+    m match
       case badReq: BadHttpRequest =>
         eos.setDone()
-        val response = badReq.exception match {
+        val response = badReq.exception match
           case ex: TooLongFrameException =>
             // this is very brittle :(
             if (ex.getMessage().startsWith("An HTTP line is larger than "))
@@ -45,7 +44,6 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
                   from(badReq.httpVersion), Status.RequestHeaderFieldsTooLarge)
           case _ =>
             Response(from(badReq.httpVersion), Status.BadRequest)
-        }
         // The connection in unusable so we close it here.
         // Note that state != Idle while inside dispatch
         // so state will be set to Closed but trans.close
@@ -58,34 +56,30 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
 
       case reqIn: HttpRequest =>
         val reader =
-          if (reqIn.isChunked) {
+          if (reqIn.isChunked)
             val coll = Transport.collate(trans, readChunk)
             coll.proxyTo(eos)
             coll: Reader
-          } else {
+          else
             eos.setDone()
             BufReader(ChannelBufferBuf.Owned(reqIn.getContent))
-          }
 
-        val addr = trans.remoteAddress match {
+        val addr = trans.remoteAddress match
           case ia: InetSocketAddress => ia
           case _ => new InetSocketAddress(0)
-        }
 
         val req = Request(reqIn, reader, addr)
-        service(req).handle {
+        service(req).handle
           case _ => Response(req.version, Status.InternalServerError)
-        }
 
       case invalid =>
         eos.setDone()
         Future.exception(
             new IllegalArgumentException("Invalid message " + invalid))
-    }
 
-  protected def handle(rep: Response): Future[Unit] = {
+  protected def handle(rep: Response): Future[Unit] =
     setKeepAlive(rep, !isClosing)
-    if (rep.isChunked) {
+    if (rep.isChunked)
       // We remove content length here in case the content is later
       // compressed. This is a pretty bad violation of modularity:
       // this is likely an issue with the Netty content
@@ -101,43 +95,34 @@ class HttpServerDispatcher(trans: Transport[Any, Any],
       // This awkwardness is unfortunate but necessary for now as you may be
       // interrupted in the middle of a write, or when there otherwise isn’t
       // an outstanding read (e.g. read-write race).
-      f.onFailure { t =>
+      f.onFailure  t =>
         Logger
           .get(this.getClass.getName)
           .debug(
               t, "Failed mid-stream. Terminating stream, closing connection")
         failureReceiver.counter(Throwables.mkString(t): _*).incr()
         rep.reader.discard()
-      }
-      p.setInterruptHandler {
+      p.setInterruptHandler
         case intr =>
           rep.reader.discard()
           f.raise(intr)
-      }
       p
-    } else {
+    else
       // Ensure Content-Length is set if not chunked
       if (!rep.headers.contains(Fields.ContentLength))
         rep.contentLength = rep.content.length
 
       trans.write(from[Response, HttpResponse](rep))
-    }
-  }
 
-  protected def setKeepAlive(rep: Response, keepAlive: Boolean): Unit = {
-    rep.version match {
+  protected def setKeepAlive(rep: Response, keepAlive: Boolean): Unit =
+    rep.version match
       case Version.Http10 =>
-        if (keepAlive) {
+        if (keepAlive)
           rep.headers.set(Fields.Connection, "keep-alive")
-        } else {
+        else
           rep.headers.remove(Fields.Connection)
-        }
       case Version.Http11 =>
-        if (keepAlive) {
+        if (keepAlive)
           rep.headers.remove(Fields.Connection)
-        } else {
+        else
           rep.headers.set(Fields.Connection, "close")
-        }
-    }
-  }
-}

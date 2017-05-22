@@ -20,16 +20,15 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
-class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
+class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper
 
   import IntegralLiteralTestUtils._
 
-  test("BitwiseNOT") {
-    def check(input: Any, expected: Any): Unit = {
+  test("BitwiseNOT")
+    def check(input: Any, expected: Any): Unit =
       val expr = BitwiseNot(Literal(input))
       assert(expr.dataType === Literal(input).dataType)
       checkEvaluation(expr, expected)
-    }
 
     // Need the extra toByte even though IntelliJ thought it's not needed.
     check(1.toByte, (~1.toByte).toByte)
@@ -45,17 +44,14 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseNot(positiveLongLit), ~positiveLong)
     checkEvaluation(BitwiseNot(negativeLongLit), ~negativeLong)
 
-    DataTypeTestUtils.integralType.foreach { dt =>
+    DataTypeTestUtils.integralType.foreach  dt =>
       checkConsistencyBetweenInterpretedAndCodegen(BitwiseNot, dt)
-    }
-  }
 
-  test("BitwiseAnd") {
-    def check(input1: Any, input2: Any, expected: Any): Unit = {
+  test("BitwiseAnd")
+    def check(input1: Any, input2: Any, expected: Any): Unit =
       val expr = BitwiseAnd(Literal(input1), Literal(input2))
       assert(expr.dataType === Literal(input1).dataType)
       checkEvaluation(expr, expected)
-    }
 
     // Need the extra toByte even though IntelliJ thought it's not needed.
     check(1.toByte, 2.toByte, (1.toByte & 2.toByte).toByte)
@@ -74,17 +70,14 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseAnd(positiveLongLit, negativeLongLit),
                     positiveLong & negativeLong)
 
-    DataTypeTestUtils.integralType.foreach { dt =>
+    DataTypeTestUtils.integralType.foreach  dt =>
       checkConsistencyBetweenInterpretedAndCodegen(BitwiseAnd, dt, dt)
-    }
-  }
 
-  test("BitwiseOr") {
-    def check(input1: Any, input2: Any, expected: Any): Unit = {
+  test("BitwiseOr")
+    def check(input1: Any, input2: Any, expected: Any): Unit =
       val expr = BitwiseOr(Literal(input1), Literal(input2))
       assert(expr.dataType === Literal(input1).dataType)
       checkEvaluation(expr, expected)
-    }
 
     // Need the extra toByte even though IntelliJ thought it's not needed.
     check(1.toByte, 2.toByte, (1.toByte | 2.toByte).toByte)
@@ -103,17 +96,14 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseOr(positiveLongLit, negativeLongLit),
                     positiveLong | negativeLong)
 
-    DataTypeTestUtils.integralType.foreach { dt =>
+    DataTypeTestUtils.integralType.foreach  dt =>
       checkConsistencyBetweenInterpretedAndCodegen(BitwiseOr, dt, dt)
-    }
-  }
 
-  test("BitwiseXor") {
-    def check(input1: Any, input2: Any, expected: Any): Unit = {
+  test("BitwiseXor")
+    def check(input1: Any, input2: Any, expected: Any): Unit =
       val expr = BitwiseXor(Literal(input1), Literal(input2))
       assert(expr.dataType === Literal(input1).dataType)
       checkEvaluation(expr, expected)
-    }
 
     // Need the extra toByte even though IntelliJ thought it's not needed.
     check(1.toByte, 2.toByte, (1.toByte ^ 2.toByte).toByte)
@@ -132,8 +122,5 @@ class BitwiseFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(BitwiseXor(positiveLongLit, negativeLongLit),
                     positiveLong ^ negativeLong)
 
-    DataTypeTestUtils.integralType.foreach { dt =>
+    DataTypeTestUtils.integralType.foreach  dt =>
       checkConsistencyBetweenInterpretedAndCodegen(BitwiseXor, dt, dt)
-    }
-  }
-}

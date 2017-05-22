@@ -1,6 +1,6 @@
 import scala.tools.partest.SessionTest
 
-object Test extends SessionTest {
+object Test extends SessionTest
 
   override def stripMargins = false
 
@@ -51,4 +51,3 @@ have same type after erasure: (a: Function0)Int
              ^
 
 scala> :quit"""
-}

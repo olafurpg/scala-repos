@@ -14,11 +14,11 @@ import org.junit.Assert._
 
 import scala.reflect.ClassTag
 
-trait SortedMapTest extends MapTest {
+trait SortedMapTest extends MapTest
 
   def factory: SortedMapFactory
 
-  def testSortedMapApi(): Unit = {
+  def testSortedMapApi(): Unit =
     testMapApi()
     should_always_be_sorted()
     should_return_the_firstKey()
@@ -26,7 +26,6 @@ trait SortedMapTest extends MapTest {
     should_return_a_proper_headMap()
     should_return_a_proper_tailMap()
     should_return_a_proper_subMap()
-  }
 
   // TODO: implement tests (when we port the first SortedMap)
 
@@ -41,12 +40,9 @@ trait SortedMapTest extends MapTest {
   @Test def should_return_a_proper_tailMap(): Unit = {}
 
   @Test def should_return_a_proper_subMap(): Unit = {}
-}
 
-object SortedMapFactory {
+object SortedMapFactory
   def allFactories: Iterator[SortedMapFactory] = Iterator.empty
-}
 
-trait SortedMapFactory extends MapFactory {
+trait SortedMapFactory extends MapFactory
   def empty[K : ClassTag, V : ClassTag]: ju.SortedMap[K, V]
-}

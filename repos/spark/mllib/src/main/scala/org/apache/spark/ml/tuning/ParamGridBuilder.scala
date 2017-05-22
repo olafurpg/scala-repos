@@ -29,7 +29,7 @@ import org.apache.spark.ml.param._
   */
 @Since("1.2.0")
 @Experimental
-class ParamGridBuilder @Since("1.2.0") {
+class ParamGridBuilder @Since("1.2.0")
 
   private val paramGrid = mutable.Map.empty[Param[_], Iterable[_]]
 
@@ -37,31 +37,27 @@ class ParamGridBuilder @Since("1.2.0") {
     * Sets the given parameters in this grid to fixed values.
     */
   @Since("1.2.0")
-  def baseOn(paramMap: ParamMap): this.type = {
+  def baseOn(paramMap: ParamMap): this.type =
     baseOn(paramMap.toSeq: _*)
     this
-  }
 
   /**
     * Sets the given parameters in this grid to fixed values.
     */
   @Since("1.2.0")
   @varargs
-  def baseOn(paramPairs: ParamPair[_]*): this.type = {
-    paramPairs.foreach { p =>
+  def baseOn(paramPairs: ParamPair[_]*): this.type =
+    paramPairs.foreach  p =>
       addGrid(p.param.asInstanceOf[Param[Any]], Seq(p.value))
-    }
     this
-  }
 
   /**
     * Adds a param with multiple values (overwrites if the input param exists).
     */
   @Since("1.2.0")
-  def addGrid[T](param: Param[T], values: Iterable[T]): this.type = {
+  def addGrid[T](param: Param[T], values: Iterable[T]): this.type =
     paramGrid.put(param, values)
     this
-  }
 
   // specialized versions of addGrid for Java.
 
@@ -69,55 +65,46 @@ class ParamGridBuilder @Since("1.2.0") {
     * Adds a double param with multiple values.
     */
   @Since("1.2.0")
-  def addGrid(param: DoubleParam, values: Array[Double]): this.type = {
+  def addGrid(param: DoubleParam, values: Array[Double]): this.type =
     addGrid[Double](param, values)
-  }
 
   /**
     * Adds a int param with multiple values.
     */
   @Since("1.2.0")
-  def addGrid(param: IntParam, values: Array[Int]): this.type = {
+  def addGrid(param: IntParam, values: Array[Int]): this.type =
     addGrid[Int](param, values)
-  }
 
   /**
     * Adds a float param with multiple values.
     */
   @Since("1.2.0")
-  def addGrid(param: FloatParam, values: Array[Float]): this.type = {
+  def addGrid(param: FloatParam, values: Array[Float]): this.type =
     addGrid[Float](param, values)
-  }
 
   /**
     * Adds a long param with multiple values.
     */
   @Since("1.2.0")
-  def addGrid(param: LongParam, values: Array[Long]): this.type = {
+  def addGrid(param: LongParam, values: Array[Long]): this.type =
     addGrid[Long](param, values)
-  }
 
   /**
     * Adds a boolean param with true and false.
     */
   @Since("1.2.0")
-  def addGrid(param: BooleanParam): this.type = {
+  def addGrid(param: BooleanParam): this.type =
     addGrid[Boolean](param, Array(true, false))
-  }
 
   /**
     * Builds and returns all combinations of parameters specified by the param grid.
     */
   @Since("1.2.0")
-  def build(): Array[ParamMap] = {
+  def build(): Array[ParamMap] =
     var paramMaps = Array(new ParamMap)
-    paramGrid.foreach {
+    paramGrid.foreach
       case (param, values) =>
-        val newParamMaps = values.flatMap { v =>
+        val newParamMaps = values.flatMap  v =>
           paramMaps.map(_.copy.put(param.asInstanceOf[Param[Any]], v))
-        }
         paramMaps = newParamMaps.toArray
-    }
     paramMaps
-  }
-}

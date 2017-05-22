@@ -28,7 +28,7 @@ import _root_.java.io.FileOutputStream
   *
   * @group Helper
   */
-object Utils {
+object Utils
 
   /** Default JSON4S serializers for PredictionIO controllers. */
   val json4sDefaultFormats = DefaultFormats.lossless ++ JodaTimeSerializers.all
@@ -40,7 +40,7 @@ object Utils {
     * @param id Used as the filename of the file.
     * @param model Model object.
     */
-  def save(id: String, model: Any): Unit = {
+  def save(id: String, model: Any): Unit =
     val tmpdir =
       sys.env.getOrElse("PIO_FS_TMPDIR", System.getProperty("java.io.tmpdir"))
     val modelFile = tmpdir + File.separator + id
@@ -49,7 +49,6 @@ object Utils {
     val kryo = KryoInstantiator.newKryoInjection
     fos.write(kryo(model))
     fos.close
-  }
 
   /** Load a model object from a file in a temporary location on local
     * filesystem. It will first try to use the location indicated by the
@@ -58,7 +57,7 @@ object Utils {
     *
     * @param id Used as the filename of the file.
     */
-  def load(id: String): Any = {
+  def load(id: String): Any =
     val tmpdir =
       sys.env.getOrElse("PIO_FS_TMPDIR", System.getProperty("java.io.tmpdir"))
     val modelFile = tmpdir + File.separator + id
@@ -67,5 +66,3 @@ object Utils {
     val m = kryo.invert(src.map(_.toByte).toArray).get
     src.close
     m
-  }
-}

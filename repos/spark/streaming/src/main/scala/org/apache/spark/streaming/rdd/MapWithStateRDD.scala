@@ -35,7 +35,7 @@ import org.apache.spark.util.Utils
 private[streaming] case class MapWithStateRDDRecord[K, S, E](
     var stateMap: StateMap[K, S], var mappedData: Seq[E])
 
-private[streaming] object MapWithStateRDDRecord {
+private[streaming] object MapWithStateRDDRecord
   def updateRecordWithData[
       K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
       prevRecord: Option[MapWithStateRDDRecord[K, S, E]],
@@ -44,46 +44,39 @@ private[streaming] object MapWithStateRDDRecord {
       batchTime: Time,
       timeoutThresholdTime: Option[Long],
       removeTimedoutData: Boolean
-  ): MapWithStateRDDRecord[K, S, E] = {
+  ): MapWithStateRDDRecord[K, S, E] =
     // Create a new state map by cloning the previous one (if it exists) or by creating an empty one
-    val newStateMap = prevRecord.map { _.stateMap.copy() }.getOrElse {
+    val newStateMap = prevRecord.map { _.stateMap.copy() }.getOrElse
       new EmptyStateMap[K, S]()
-    }
 
     val mappedData = new ArrayBuffer[E]
     val wrappedState = new StateImpl[S]()
 
     // Call the mapping function on each record in the data iterator, and accordingly
     // update the states touched, and collect the data returned by the mapping function
-    dataIterator.foreach {
+    dataIterator.foreach
       case (key, value) =>
         wrappedState.wrap(newStateMap.get(key))
         val returned =
           mappingFunction(batchTime, key, Some(value), wrappedState)
-        if (wrappedState.isRemoved) {
+        if (wrappedState.isRemoved)
           newStateMap.remove(key)
-        } else if (wrappedState.isUpdated ||
-                   (wrappedState.exists && timeoutThresholdTime.isDefined)) {
+        else if (wrappedState.isUpdated ||
+                   (wrappedState.exists && timeoutThresholdTime.isDefined))
           newStateMap.put(key, wrappedState.get(), batchTime.milliseconds)
-        }
         mappedData ++= returned
-    }
 
     // Get the timed out state records, call the mapping function on each and collect the
     // data returned
-    if (removeTimedoutData && timeoutThresholdTime.isDefined) {
-      newStateMap.getByTime(timeoutThresholdTime.get).foreach {
+    if (removeTimedoutData && timeoutThresholdTime.isDefined)
+      newStateMap.getByTime(timeoutThresholdTime.get).foreach
         case (key, state, _) =>
           wrappedState.wrapTimingOutState(state)
           val returned = mappingFunction(batchTime, key, None, wrappedState)
           mappedData ++= returned
           newStateMap.remove(key)
-      }
-    }
 
     MapWithStateRDDRecord(newStateMap, mappedData)
-  }
-}
 
 /**
   * Partition of the [[MapWithStateRDD]], which depends on corresponding partitions of prev state
@@ -93,7 +86,7 @@ private[streaming] class MapWithStateRDDPartition(
     idx: Int,
     @transient private var prevStateRDD: RDD[_],
     @transient private var partitionedDataRDD: RDD[_])
-    extends Partition {
+    extends Partition
 
   private[rdd] var previousSessionRDDPartition: Partition = null
   private[rdd] var partitionedDataRDDPartition: Partition = null
@@ -103,13 +96,11 @@ private[streaming] class MapWithStateRDDPartition(
 
   @throws(classOf[IOException])
   private def writeObject(oos: ObjectOutputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       // Update the reference to parent split at the time of task serialization
       previousSessionRDDPartition = prevStateRDD.partitions(index)
       partitionedDataRDDPartition = partitionedDataRDD.partitions(index)
       oos.defaultWriteObject()
-    }
-}
 
 /**
   * RDD storing the keyed states of `mapWithState` operation and corresponding mapped data.
@@ -137,7 +128,7 @@ private[streaming] class MapWithStateRDD[
         List(new OneToOneDependency[MapWithStateRDDRecord[K, S, E]](
                  prevStateRDD),
              new OneToOneDependency(partitionedDataRDD))
-    ) {
+    )
 
   @volatile private var doFullScan = false
 
@@ -146,14 +137,13 @@ private[streaming] class MapWithStateRDD[
 
   override val partitioner = prevStateRDD.partitioner
 
-  override def checkpoint(): Unit = {
+  override def checkpoint(): Unit =
     super.checkpoint()
     doFullScan = true
-  }
 
   override def compute(
       partition: Partition,
-      context: TaskContext): Iterator[MapWithStateRDDRecord[K, S, E]] = {
+      context: TaskContext): Iterator[MapWithStateRDDRecord[K, S, E]] =
 
     val stateRDDPartition = partition.asInstanceOf[MapWithStateRDDPartition]
     val prevStateRDDIterator = prevStateRDD.iterator(
@@ -173,43 +163,36 @@ private[streaming] class MapWithStateRDD[
         removeTimedoutData = doFullScan // remove timedout data only when full scan is enabled
     )
     Iterator(newRecord)
-  }
 
-  override protected def getPartitions: Array[Partition] = {
-    Array.tabulate(prevStateRDD.partitions.length) { i =>
+  override protected def getPartitions: Array[Partition] =
+    Array.tabulate(prevStateRDD.partitions.length)  i =>
       new MapWithStateRDDPartition(i, prevStateRDD, partitionedDataRDD)
-    }
-  }
 
-  override def clearDependencies(): Unit = {
+  override def clearDependencies(): Unit =
     super.clearDependencies()
     prevStateRDD = null
     partitionedDataRDD = null
-  }
 
-  def setFullScan(): Unit = {
+  def setFullScan(): Unit =
     doFullScan = true
-  }
-}
 
-private[streaming] object MapWithStateRDD {
+private[streaming] object MapWithStateRDD
 
   def createFromPairRDD[
       K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
       pairRDD: RDD[(K, S)],
       partitioner: Partitioner,
-      updateTime: Time): MapWithStateRDD[K, V, S, E] = {
+      updateTime: Time): MapWithStateRDD[K, V, S, E] =
 
     val stateRDD = pairRDD
       .partitionBy(partitioner)
-      .mapPartitions({ iterator =>
+      .mapPartitions( iterator =>
         val stateMap = StateMap.create[K, S](SparkEnv.get.conf)
-        iterator.foreach {
+        iterator.foreach
           case (key, state) =>
             stateMap.put(key, state, updateTime.milliseconds)
-        }
         Iterator(MapWithStateRDDRecord(stateMap, Seq.empty[E]))
-      }, preservesPartitioning = true)
+      , preservesPartitioning = true)
 
     val emptyDataRDD =
       pairRDD.sparkContext.emptyRDD[(K, V)].partitionBy(partitioner)
@@ -219,26 +202,23 @@ private[streaming] object MapWithStateRDD {
 
     new MapWithStateRDD[K, V, S, E](
         stateRDD, emptyDataRDD, noOpFunc, updateTime, None)
-  }
 
   def createFromRDD[K : ClassTag, V : ClassTag, S : ClassTag, E : ClassTag](
       rdd: RDD[(K, S, Long)],
       partitioner: Partitioner,
-      updateTime: Time): MapWithStateRDD[K, V, S, E] = {
+      updateTime: Time): MapWithStateRDD[K, V, S, E] =
 
-    val pairRDD = rdd.map { x =>
+    val pairRDD = rdd.map  x =>
       (x._1, (x._2, x._3))
-    }
     val stateRDD = pairRDD
       .partitionBy(partitioner)
-      .mapPartitions({ iterator =>
+      .mapPartitions( iterator =>
         val stateMap = StateMap.create[K, S](SparkEnv.get.conf)
-        iterator.foreach {
+        iterator.foreach
           case (key, (state, updateTime)) =>
             stateMap.put(key, state, updateTime)
-        }
         Iterator(MapWithStateRDDRecord(stateMap, Seq.empty[E]))
-      }, preservesPartitioning = true)
+      , preservesPartitioning = true)
 
     val emptyDataRDD =
       pairRDD.sparkContext.emptyRDD[(K, V)].partitionBy(partitioner)
@@ -248,5 +228,3 @@ private[streaming] object MapWithStateRDD {
 
     new MapWithStateRDD[K, V, S, E](
         stateRDD, emptyDataRDD, noOpFunc, updateTime, None)
-  }
-}

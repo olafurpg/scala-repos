@@ -3,7 +3,7 @@
 package org.ensime
 package config
 
-object Environment {
+object Environment
   def info: Seq[String] = Seq(
       "Environment:",
       s"  OS : $osVersion",
@@ -19,7 +19,7 @@ object Environment {
   private def osVersion: String =
     System.getProperty("os.name")
 
-  private def javaVersion: String = {
+  private def javaVersion: String =
     val vmInfo =
       System.getProperty("java.vm.name") + " " + System.getProperty(
           "java.vm.version")
@@ -27,7 +27,6 @@ object Environment {
       System.getProperty("java.runtime.name") + " " + System.getProperty(
           "java.runtime.version")
     vmInfo + ", " + rtInfo
-  }
 
   private def scalaVersion: String =
     scala.util.Properties.versionString
@@ -35,7 +34,5 @@ object Environment {
   private def ensimeVersion: String =
     BuildInfo.version
 
-  def shutdownOnDisconnectFlag: Boolean = {
+  def shutdownOnDisconnectFlag: Boolean =
     Option(System.getProperty("ensime.explode.on.disconnect")).isDefined
-  }
-}

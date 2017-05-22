@@ -5,8 +5,8 @@ package lang.completeStatement
   * @author Ksenia.Sautina
   * @since 2/25/13
   */
-class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
-  def testIfCondition1() {
+class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase
+  def testIfCondition1()
     val fileText = """
         |class B {
         |  def method() {
@@ -25,9 +25,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testIfCondition2() {
+  def testIfCondition2()
     val fileText = """
         |class B {
         |  def method() {
@@ -46,9 +45,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testIfCondition3() {
+  def testIfCondition3()
     val fileText = """
         |class B {
         |  def method() {
@@ -67,9 +65,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testIfCondition4() {
+  def testIfCondition4()
     val fileText = """
         |class B {
         |  def method() {
@@ -89,9 +86,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testIfCondition5() {
+  def testIfCondition5()
     val fileText = """
         |class B {
         |  def method() {
@@ -110,9 +106,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testIfCondition6() {
+  def testIfCondition6()
     val fileText = """
         |class B {
         |  def method() {
@@ -134,9 +129,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testIfCondition7() {
+  def testIfCondition7()
     val fileText = """
         |class B {
         |  def method() {
@@ -155,9 +149,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testIfConditionJava() {
+  def testIfConditionJava()
     //WHAT THE _?!
     val fileText = """
         |class B {
@@ -176,9 +169,8 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkJavaFileByText(fileText, resultText)
-  }
 
-  def testIfCondition2Java() {
+  def testIfCondition2Java()
     val fileText = """
         |class B {
         |    public static void main(String[] args) {
@@ -196,5 +188,3 @@ class ScalaCompleteIfConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkJavaFileByText(fileText, resultText)
-  }
-}

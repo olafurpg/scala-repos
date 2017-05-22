@@ -12,6 +12,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * Date: 06.03.2008
   */
 class ScFinallyBlockImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScFinallyBlock {
+    extends ScalaPsiElementImpl(node) with ScFinallyBlock
   override def toString: String = "FinallyBlock"
-}

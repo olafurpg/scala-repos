@@ -23,7 +23,7 @@ import scala.util.matching.Regex
 /**
   * Holds some coversion functions for dealing with strings as RichDate objects
   */
-object DateOps extends java.io.Serializable {
+object DateOps extends java.io.Serializable
   val PACIFIC = TimeZone.getTimeZone("America/Los_Angeles")
   val UTC = TimeZone.getTimeZone("UTC")
 
@@ -38,11 +38,10 @@ object DateOps extends java.io.Serializable {
   val DATETIME_HMSM_WITH_DASH = "yyyy-MM-dd HH:mm:ss.SSS"
 
   private[scalding] sealed abstract class Format(
-      val pattern: String, val validator: Regex) {
+      val pattern: String, val validator: Regex)
     def matches(s: String): Boolean = validator.findFirstIn(s).isDefined
-  }
 
-  private[scalding] object Format {
+  private[scalding] object Format
     private val date = """\d{4}-\d{2}-\d{2}"""
     private val sep = """(T?|\s*)"""
     private val emptyBegin = """^\s*"""
@@ -80,18 +79,16 @@ object DateOps extends java.io.Serializable {
         extends Format(DateOps.DATETIME_HMSM_WITH_DASH,
                        new Regex(emptyBegin + date + sep +
                            """\d\d:\d\d:\d\d\.\d{1,3}""" + emptyEnd))
-  }
 
-  private val prepare: String => String = { (str: String) =>
+  private val prepare: String => String =  (str: String) =>
     str
       .replace("T", " ") //We allow T to separate dates and times, just remove it and then validate
       .replaceAll("[/_]", "-") // Allow for slashes and underscores
-  }
 
   /**
     * Return the guessed format for this datestring
     */
-  private[scalding] def getFormatObject(s: String): Option[Format] = {
+  private[scalding] def getFormatObject(s: String): Option[Format] =
     val formats: List[Format] = List(Format.DATE_WITH_DASH,
                                      Format.DATEHOUR_WITH_DASH,
                                      Format.DATETIME_WITH_DASH,
@@ -103,7 +100,6 @@ object DateOps extends java.io.Serializable {
                                      Format.DATETIME_HMS_WITHOUT_DASH)
 
     formats.find { _.matches(prepare(s)) }
-  }
 
   /**
     * Return the guessed format for this datestring
@@ -115,7 +111,5 @@ object DateOps extends java.io.Serializable {
     * Do not share the result across threads.
     */
   def getDateParser(s: String): Option[DateParser] =
-    getFormat(s).map { fmt =>
+    getFormat(s).map  fmt =>
       DateParser.from(new SimpleDateFormat(fmt)).contramap(prepare)
-    }
-}

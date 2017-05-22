@@ -38,7 +38,7 @@ object EventIncludes extends EventIncludes
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/event/package-summary.html `javafx.event`]]
   * Classes to their ScalaFX counterparts.
   */
-trait EventIncludes {
+trait EventIncludes
 
   /**
     * Converts a
@@ -115,11 +115,9 @@ trait EventIncludes {
     * @param handler code executed when event is handled.
     * @return JavaFX EventHandler which will wrap the input code `handler`.
     */
-  def handle[J <: jfxe.Event, R](handler: => R) = new jfxe.EventHandler[J] {
-    def handle(event: J) {
+  def handle[J <: jfxe.Event, R](handler: => R) = new jfxe.EventHandler[J]
+    def handle(event: J)
       handler
-    }
-  }
 
   /**
     * Converts a closure to a JavaFX EventHandler. It is used when information about event is not be used.
@@ -138,11 +136,9 @@ trait EventIncludes {
     */
   implicit def eventClosureWrapperWithZeroParam[T <: jfxe.Event, R](
       handler: () => R): jfxe.EventHandler[T] =
-    new jfxe.EventHandler[T] {
-      def handle(event: T) {
+    new jfxe.EventHandler[T]
+      def handle(event: T)
         handler()
-      }
-    }
 
   /**
     * Converts a closure to a JavaFX EventHandler. It is used when the event properties ''will be used''.
@@ -162,9 +158,6 @@ trait EventIncludes {
   implicit def eventClosureWrapperWithParam[
       J <: jfxe.Event, S <: SFXDelegate[J], R](handler: (S) => R)(
       implicit jfx2sfx: J => S): jfxe.EventHandler[J] =
-    new jfxe.EventHandler[J] {
-      def handle(event: J) {
+    new jfxe.EventHandler[J]
+      def handle(event: J)
         handler(event)
-      }
-    }
-}

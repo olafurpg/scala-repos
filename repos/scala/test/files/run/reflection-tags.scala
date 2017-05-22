@@ -1,7 +1,7 @@
 import scala.reflect.runtime.universe._
 import scala.reflect.ClassTag
 
-object Test extends App {
+object Test extends App
   var typeMembers = typeOf[scala.reflect.api.Universe].members
     .filter(sym => sym.isType && !sym.isClass)
     .toList
@@ -20,10 +20,9 @@ object Test extends App {
   val outliers = typeMembers.filter(
       tm =>
         !tags.exists(tag =>
-              tag.info match {
+              tag.info match
         case NullaryMethodType(TypeRef(_, sym, targ :: Nil)) =>
           sym == typeOf[ClassTag[_]].typeSymbol && targ.typeSymbol == tm
         case _ => false
-    }))
+    ))
   println(outliers)
-}

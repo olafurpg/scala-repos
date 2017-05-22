@@ -19,7 +19,7 @@ import scala.collection.{Seq, Iterator}
   *  @since 2.9
   *  @author Aleksandar Prokopec
   */
-trait Splitter[+T] extends Iterator[T] {
+trait Splitter[+T] extends Iterator[T]
 
   /** Splits the iterator into a sequence of disjunct views.
     *
@@ -48,12 +48,9 @@ trait Splitter[+T] extends Iterator[T] {
  *  The rationale behind this is best given by the following example:
  *  try splitting an iterator over a linear hash table.
  */
-}
 
-object Splitter {
-  def empty[T]: Splitter[T] = new Splitter[T] {
+object Splitter
+  def empty[T]: Splitter[T] = new Splitter[T]
     def hasNext = false
     def next = Iterator.empty.next()
     def split = Seq(this)
-  }
-}

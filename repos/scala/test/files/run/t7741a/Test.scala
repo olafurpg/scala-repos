@@ -5,20 +5,19 @@ import java.io.File
 
 import scala.tools.partest.DirectTest
 
-object Test extends DirectTest {
+object Test extends DirectTest
 
   def code = ""
 
-  override def show(): Unit = {
+  override def show(): Unit =
 
     val class1: Array[Byte] = GroovyInterfaceDump.dump()
     val class2: Array[Byte] = GroovyInterface$1Dump.dump()
-    def writeFile(contents: Array[Byte], f: java.io.File): Unit = {
+    def writeFile(contents: Array[Byte], f: java.io.File): Unit =
       val out = new BufferedOutputStream(new FileOutputStream(f))
-      try {
+      try
         out.write(contents)
-      } finally out.close()
-    }
+      finally out.close()
 
     val outdir = testOutput.jfile
 
@@ -40,12 +39,9 @@ object Test extends DirectTest {
     writeFile(GroovyInterface$1Dump.dump(),
               new File(outdir, "GroovyInterface$1.class"))
     compileCode("object Test { def foo(g: GroovyInterface) = g.toString }")
-  }
 
-  def compileCode(code: String) = {
+  def compileCode(code: String) =
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(code)
-  }
-}

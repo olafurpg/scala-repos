@@ -12,15 +12,14 @@ package api
   * @contentDiagram hideNodes "*Api"
   * @group ReflectionAPI
   */
-trait Positions { self: Universe =>
+trait Positions  self: Universe =>
 
   /** Defines a universe-specific notion of positions.
     *  The main documentation entry about positions is located at [[scala.reflect.api.Position]].
     *  @group Positions
     */
-  type Position >: Null <: AnyRef with scala.reflect.api.Position {
+  type Position >: Null <: AnyRef with scala.reflect.api.Position
     type Pos = Position
-  }
 
   /** A special "missing" position.
     *  @group Positions
@@ -47,4 +46,3 @@ trait Positions { self: Universe =>
     *  @group Positions
     */
   def wrappingPos(trees: List[Tree]): Position
-}

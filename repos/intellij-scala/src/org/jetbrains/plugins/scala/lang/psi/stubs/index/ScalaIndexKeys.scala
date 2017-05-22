@@ -17,7 +17,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScMember, ScOb
 /**
   * @author ilyas
   */
-object ScalaIndexKeys {
+object ScalaIndexKeys
   val ALL_CLASS_NAMES: StubIndexKey[String, PsiClass] =
     StubIndexKey.createIndexKey("sc.all.class.names")
   val SHORT_NAME_KEY: StubIndexKey[String, PsiClass] =
@@ -58,4 +58,3 @@ object ScalaIndexKeys {
     StubIndexKey.createIndexKey("sc.self.type.class.name.key")
   val IMPLICITS_KEY: StubIndexKey[String, ScMember] =
     StubIndexKey.createIndexKey("sc.implicit.function.name")
-}

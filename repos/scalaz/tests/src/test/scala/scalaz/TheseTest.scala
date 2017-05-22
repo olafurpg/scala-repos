@@ -7,7 +7,7 @@ import \&/._
 import syntax.contravariant._
 import org.scalacheck.Prop.forAll
 
-object TheseTest extends SpecLite {
+object TheseTest extends SpecLite
   type TheseInt[a] = Int \&/ a
 
   checkAll(bindRec.laws[TheseInt])
@@ -21,26 +21,20 @@ object TheseTest extends SpecLite {
   implicit def ephemeralStreamShow[A : Show]: Show[EphemeralStream[A]] =
     Show[List[A]].contramap(_.toList)
 
-  "align unalign" should {
-    "List" ! forAll { (a: List[Int], b: List[Int]) =>
+  "align unalign" should
+    "List" ! forAll  (a: List[Int], b: List[Int]) =>
       unalignList(Align[List].align(a, b)) must_=== ((a, b))
-    }
-    "EphemeralStream" ! forAll {
+    "EphemeralStream" ! forAll
       (a: EphemeralStream[Int], b: EphemeralStream[Int]) =>
         unalignStream(Align[EphemeralStream].align(a, b)) must_=== ((a, b))
-    }
-  }
 
-  "onlyThisOrThat" should {
-    "be invertible" ! forAll { ab: Int \/ String =>
+  "onlyThisOrThat" should
+    "be invertible" ! forAll  ab: Int \/ String =>
       ab.toThese.onlyThisOrThat must_=== Some(ab)
-    }
-    "handle both" ! forAll { (a: Int, b: String) =>
+    "handle both" ! forAll  (a: Int, b: String) =>
       \&/.Both(a, b).onlyThisOrThat must_=== None
-    }
-  }
 
-  object instances {
+  object instances
     def equal[A : Equal, B : Equal] = Equal[A \&/ B]
     def order[A : Order, B : Order] = Order[A \&/ B]
     def functor[L] = Functor[L \&/ ?]
@@ -59,5 +53,3 @@ object TheseTest extends SpecLite {
     // checking absence of ambiguity
     def functor[L : Semigroup] = Functor[L \&/ ?]
     def equal[A : Order, B : Order] = Equal[A \&/ B]
-  }
-}

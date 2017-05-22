@@ -11,12 +11,9 @@ import org.jetbrains.plugins.scala.lang.resolve.{ResolveTargets, ScalaResolveRes
   */
 class VariablesCompletionProcessor(
     override val kinds: Set[ResolveTargets.Value])
-    extends BaseProcessor(kinds) {
-  def execute(element: PsiElement, state: ResolveState): Boolean = {
+    extends BaseProcessor(kinds)
+  def execute(element: PsiElement, state: ResolveState): Boolean =
     val named = element.asInstanceOf[PsiNamedElement]
-    if (kindMatches(element)) {
+    if (kindMatches(element))
       candidatesSet += new ScalaResolveResult(named)
-    }
     true
-  }
-}

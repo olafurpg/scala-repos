@@ -22,8 +22,8 @@ import java.io.File
 import org.apache.spark.{SecurityManager, SparkConf, SparkFunSuite}
 import org.apache.spark.deploy.{ApplicationDescription, Command, ExecutorState}
 
-class ExecutorRunnerTest extends SparkFunSuite {
-  test("command includes appId") {
+class ExecutorRunnerTest extends SparkFunSuite
+  test("command includes appId")
     val appId = "12345-worker321-9876"
     val conf = new SparkConf
     val sparkHome = sys.props.getOrElse(
@@ -57,5 +57,3 @@ class ExecutorRunnerTest extends SparkFunSuite {
                                                    er.substituteVariables)
     val builderCommand = builder.command()
     assert(builderCommand.get(builderCommand.size() - 1) === appId)
-  }
-}

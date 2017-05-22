@@ -47,13 +47,12 @@ import scalafx.util.StringConverter
 abstract class StringConverterDelegate[
     J <: java.lang.Object, S <: Any, C <: jfxu.StringConverter[J]] protected (
     override val delegate: C)
-    extends StringConverter[S] with SFXDelegate[C] {
+    extends StringConverter[S] with SFXDelegate[C]
 
   def fromString(string: String): S =
     delegate.fromString(string).asInstanceOf[S]
 
   def toString(s: S): String = delegate.toString(s.asInstanceOf[J])
-}
 
 /**
   * Class responsible for wrap a StringConverter from and to a Java type(eg: java.util.Date or

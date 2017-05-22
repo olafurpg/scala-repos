@@ -11,17 +11,16 @@ import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
   * Nikolay.Tropin
   * 2014-10-24
   */
-case class ScalaBoxingEvaluator(evaluator: Evaluator) extends Evaluator {
+case class ScalaBoxingEvaluator(evaluator: Evaluator) extends Evaluator
 
   override def evaluate(context: EvaluationContextImpl): AnyRef =
     ScalaBoxingEvaluator.box(evaluator.evaluate(context), context)
 
   override def getModifier: Modifier = null
-}
 
-object ScalaBoxingEvaluator {
-  def box(x: AnyRef, context: EvaluationContextImpl): AnyRef = {
-    x match {
+object ScalaBoxingEvaluator
+  def box(x: AnyRef, context: EvaluationContextImpl): AnyRef =
+    x match
       case null => null
       case DebuggerUtil.scalaRuntimeRefTo(value: Value) =>
         new BoxingEvaluator(new IdentityEvaluator(value)).evaluate(context)
@@ -30,6 +29,3 @@ object ScalaBoxingEvaluator {
       case result =>
         throw EvaluationException(
             s"Cannot perform boxing conversion for $result")
-    }
-  }
-}

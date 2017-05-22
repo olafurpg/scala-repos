@@ -9,75 +9,59 @@ import net.liftweb.json._
 
 import net.liftweb.http._
 
-object RestHelperSpecBoot {
-  def boot() {
+object RestHelperSpecBoot
+  def boot()
     LiftRules.dispatch.append(RestHelperSpecRest)
-  }
-}
 
-class RestHelperSpec extends WebSpec(RestHelperSpecBoot.boot _) {
+class RestHelperSpec extends WebSpec(RestHelperSpecBoot.boot _)
   sequential // This is important for using SessionVars, etc.
 
-  "RestHelper" should {
+  "RestHelper" should
     val testOptionsUrl = "http://foo.com/api/info"
     val testFutureUrl = "http://foo.com/api/futured"
 
-    val testOptionsReq = new MockHttpServletRequest(testOptionsUrl) {
+    val testOptionsReq = new MockHttpServletRequest(testOptionsUrl)
       method = "OPTIONS"
-    }
 
-    val testFutureReq = new MockHttpServletRequest(testFutureUrl) {
+    val testFutureReq = new MockHttpServletRequest(testFutureUrl)
       method = "GET"
-    }
 
-    "set OPTIONS method" withReqFor testOptionsReq in { req =>
+    "set OPTIONS method" withReqFor testOptionsReq in  req =>
       req.options_? must_== true
-    }
 
-    "give the correct response" withReqFor testOptionsReq in { req =>
-      RestHelperSpecRest(req)() must beLike {
+    "give the correct response" withReqFor testOptionsReq in  req =>
+      RestHelperSpecRest(req)() must beLike
         case Full(OkResponse()) => ok
-      }
-    }
 
-    "respond async with something that CanResolveAsync" withReqFor testFutureReq in {
+    "respond async with something that CanResolveAsync" withReqFor testFutureReq in
       req =>
         val helper = FutureRestSpecHelper()
 
-        try {
+        try
           helper(req)()
 
           failure("Failed to respond asynchronously.")
-        } catch {
+        catch
           case ContinuationException(_, _, resolverFunction) =>
             val result = new LAFuture[LiftResponse]
 
-            resolverFunction({ response =>
+            resolverFunction( response =>
               result.satisfy(response)
-            })
+            )
 
             helper.future.satisfy(JObject(Nil))
 
-            result.get must beLike {
+            result.get must beLike
               case JsonResponse(_, _, _, code) =>
                 code must_== 200
-            }
-        }
-    }
-  }
-}
 
-object RestHelperSpecRest extends RestHelper {
-  serve {
+object RestHelperSpecRest extends RestHelper
+  serve
     case "api" :: "info" :: Nil Options req => OkResponse()
-  }
-}
 
-case class FutureRestSpecHelper() extends RestHelper {
+case class FutureRestSpecHelper() extends RestHelper
   val future = new LAFuture[JValue]
 
-  serve {
+  serve
     case "api" :: "futured" :: Nil Get _ =>
       future
-  }
-}

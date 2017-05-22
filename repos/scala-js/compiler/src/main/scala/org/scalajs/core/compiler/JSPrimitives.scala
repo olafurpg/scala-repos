@@ -13,12 +13,11 @@ import scala.collection.mutable
   *
   *  @author Sébastie Doeraene
   */
-abstract class JSPrimitives {
+abstract class JSPrimitives
   val global: Global
 
-  type ThisJSGlobalAddons = JSGlobalAddons {
+  type ThisJSGlobalAddons = JSGlobalAddons
     val global: JSPrimitives.this.global.type
-  }
 
   val jsAddons: ThisJSGlobalAddons
 
@@ -56,10 +55,9 @@ abstract class JSPrimitives {
   def init(): Unit = initWithPrimitives(addPrimitive)
 
   /** Init the map of primitive methods for Scala.js (for PrepJSInterop) */
-  def initPrepJSPrimitives(): Unit = {
+  def initPrepJSPrimitives(): Unit =
     scalaJSPrimitives.clear()
     initWithPrimitives(scalaJSPrimitives.put)
-  }
 
   /** Only call from PrepJSInterop. In GenJSCode, use
     *  scalaPrimitives.isPrimitive instead
@@ -68,19 +66,17 @@ abstract class JSPrimitives {
     scalaJSPrimitives.contains(sym)
 
   /** For a primitive, is it one for which we should emit its body anyway? */
-  def shouldEmitPrimitiveBody(sym: Symbol): Boolean = {
+  def shouldEmitPrimitiveBody(sym: Symbol): Boolean =
     /* No @switch because some Scala 2.11 versions erroneously report a
      * warning for switch matches with less than 3 non-default cases.
      */
-    scalaPrimitives.getPrimitive(sym) match {
+    scalaPrimitives.getPrimitive(sym) match
       case F2JS | F2JSTHIS => true
       case _ => false
-    }
-  }
 
   private val scalaJSPrimitives = mutable.Map.empty[Symbol, Int]
 
-  private def initWithPrimitives(addPrimitive: (Symbol, Int) => Unit): Unit = {
+  private def initWithPrimitives(addPrimitive: (Symbol, Int) => Unit): Unit =
     for (i <- 0 to 22) addPrimitive(JSAny_fromFunction(i), F2JS)
     for (i <- 1 to 22) addPrimitive(JSThisFunction_fromFunction(i), F2JSTHIS)
 
@@ -104,8 +100,6 @@ abstract class JSPrimitives {
 
     addPrimitive(Runtime_constructorOf, CONSTRUCTOROF)
     addPrimitive(Runtime_linkingInfo, LINKING_INFO)
-  }
 
   def isJavaScriptPrimitive(code: Int): Boolean =
     code >= 300 && code < 360
-}

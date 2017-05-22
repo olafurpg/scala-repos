@@ -26,7 +26,7 @@ import org.apache.spark.sql.catalyst.expressions.aggregate._
 import org.apache.spark.sql.catalyst.plans.logical.LocalRelation
 import org.apache.spark.sql.types.{LongType, StringType, TypeCollection}
 
-class ExpressionTypeCheckingSuite extends SparkFunSuite {
+class ExpressionTypeCheckingSuite extends SparkFunSuite
 
   val testRelation = LocalRelation('intField.int,
                                    'stringField.string,
@@ -35,32 +35,27 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
                                    'arrayField.array(StringType),
                                    'mapField.map(StringType, LongType))
 
-  def assertError(expr: Expression, errorMessage: String): Unit = {
-    val e = intercept[AnalysisException] {
+  def assertError(expr: Expression, errorMessage: String): Unit =
+    val e = intercept[AnalysisException]
       assertSuccess(expr)
-    }
     assert(
         e.getMessage.contains(
             s"cannot resolve '${expr.sql}' due to data type mismatch:"))
     assert(e.getMessage.contains(errorMessage))
-  }
 
-  def assertSuccess(expr: Expression): Unit = {
+  def assertSuccess(expr: Expression): Unit =
     val analyzed = testRelation.select(expr.as("c")).analyze
     SimpleAnalyzer.checkAnalysis(analyzed)
-  }
 
-  def assertErrorForDifferingTypes(expr: Expression): Unit = {
+  def assertErrorForDifferingTypes(expr: Expression): Unit =
     assertError(expr, s"differing types in '${expr.sql}'")
-  }
 
-  test("check types for unary arithmetic") {
+  test("check types for unary arithmetic")
     assertError(UnaryMinus('stringField), "(numeric or calendarinterval) type")
     assertError(Abs('stringField), "requires numeric type")
     assertError(BitwiseNot('stringField), "requires integral type")
-  }
 
-  test("check types for binary arithmetic") {
+  test("check types for binary arithmetic")
     // We will cast String to Double for binary arithmetic
     assertSuccess(Add('intField, 'stringField))
     assertSuccess(Subtract('intField, 'stringField))
@@ -101,9 +96,8 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
                 s"requires ${TypeCollection.Ordered.simpleString} type")
     assertError(MinOf('mapField, 'mapField),
                 s"requires ${TypeCollection.Ordered.simpleString} type")
-  }
 
-  test("check types for predicates") {
+  test("check types for predicates")
     // We will cast String to Double for binary comparison
     assertSuccess(EqualTo('intField, 'stringField))
     assertSuccess(EqualNullSafe('intField, 'stringField))
@@ -147,9 +141,8 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
     assertError(CaseWhen(Seq(('booleanField.attr, 'intField.attr),
                              ('intField.attr, 'intField.attr))),
                 "WHEN expressions in CaseWhen should all be boolean type")
-  }
 
-  test("check types for aggregates") {
+  test("check types for aggregates")
     // We use AggregateFunction directly at here because the error will be thrown from it
     // instead of from AggregateExpression, which is the wrapper of an AggregateFunction.
 
@@ -163,9 +156,8 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
     assertError(Sum('booleanField), "function sum requires numeric type")
     assertError(
         Average('booleanField), "function average requires numeric type")
-  }
 
-  test("check types for others") {
+  test("check types for others")
     assertError(CreateArray(Seq('intField, 'booleanField)),
                 "input to function array should all be the same type")
     assertError(Coalesce(Seq('intField, 'booleanField)),
@@ -175,9 +167,8 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
         new Murmur3Hash(Nil), "function hash requires at least one argument")
     assertError(Explode('intField),
                 "input to function explode should be array or map type")
-  }
 
-  test("check types for CreateNamedStruct") {
+  test("check types for CreateNamedStruct")
     assertError(
         CreateNamedStruct(Seq("a", "b", 2.0)), "even number of arguments")
     assertError(
@@ -188,9 +179,8 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
         "Only foldable StringType expressions are allowed to appear at odd position")
     assertError(CreateNamedStruct(Seq(Literal.create(null, StringType), "a")),
                 "Field name should not be null")
-  }
 
-  test("check types for ROUND") {
+  test("check types for ROUND")
     assertSuccess(Round(Literal(null), Literal(null)))
     assertSuccess(Round('intField, Literal(1)))
 
@@ -199,10 +189,9 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
     assertError(Round('intField, 'booleanField), "requires int type")
     assertError(Round('intField, 'mapField), "requires int type")
     assertError(Round('booleanField, 'intField), "requires numeric type")
-  }
 
-  test("check types for Greatest/Least") {
-    for (operator <- Seq[(Seq[Expression] => Expression)](Greatest, Least)) {
+  test("check types for Greatest/Least")
+    for (operator <- Seq[(Seq[Expression] => Expression)](Greatest, Least))
       assertError(
           operator(Seq('booleanField)), "requires at least 2 arguments")
       assertError(operator(Seq('intField, 'stringField)),
@@ -211,6 +200,3 @@ class ExpressionTypeCheckingSuite extends SparkFunSuite {
                   "should all have the same type")
       assertError(
           operator(Seq('mapField, 'mapField)), "does not support ordering")
-    }
-  }
-}

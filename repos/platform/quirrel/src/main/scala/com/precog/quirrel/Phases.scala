@@ -21,7 +21,7 @@ package com.precog.quirrel
 
 import com.precog.util.BitSet
 
-trait Phases {
+trait Phases
   type Expr
   type Formal
   type Error
@@ -36,13 +36,12 @@ trait Phases {
   // if `indices(i)(j)` is set, then there is a graph arrow from `nodes(i)` to `nodes(j)`
   case class Trace(nodes: Array[(Sigma, Expr)], indices: Array[BitSet])
 
-  object Trace {
+  object Trace
     val empty = Trace(Array.empty[(Sigma, Expr)], Array.empty[BitSet])
 
     def safeCopy(trace: Trace, node: (Sigma, Expr), indices: BitSet) =
       trace.copy(
           nodes = trace.nodes :+ node, indices = trace.indices :+ indices)
-  }
 
   private val Phases: List[Phase] =
     bindNames _ :: checkProvenance _ :: inferBuckets _ :: Nil
@@ -65,8 +64,6 @@ trait Phases {
 
   def showError(error: Error): String
 
-  trait ErrorCompanion {
+  trait ErrorCompanion
     def apply(node: Expr, tp: ErrorType): Error
     def unapply(err: Error): Option[ErrorType]
-  }
-}

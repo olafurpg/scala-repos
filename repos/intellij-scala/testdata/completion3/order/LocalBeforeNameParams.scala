@@ -1,10 +1,7 @@
-object LocalBeforeNamedParams {
-  def foo = {
+object LocalBeforeNamedParams
+  def foo =
     val namelocal = "sdfsd"
-    def printName(nameParam: String = "Unknown") {
+    def printName(nameParam: String = "Unknown")
       print(nameParam)
-    }
 
     printName(name < caret >)
-  }
-}

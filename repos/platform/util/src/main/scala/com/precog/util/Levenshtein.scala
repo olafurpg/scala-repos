@@ -21,7 +21,7 @@ package com.precog.util
 
 import scala.math.{max, min}
 
-object Levenshtein {
+object Levenshtein
 
   /**
     * Return the Levenshtein distance between s and t.
@@ -34,7 +34,7 @@ object Levenshtein {
     * The edit distance finds the smallest number of these operations
     * to get from s to t.
     */
-  def distance(s: String, t: String): Int = {
+  def distance(s: String, t: String): Int =
     // handle some degenerate cases: strings are equal, or empty
     if (s == t) return 0
     val n = s.length
@@ -49,10 +49,10 @@ object Levenshtein {
     var arr1 = new Array[Int](m + 1)
 
     var col = 0
-    while (col < n) {
+    while (col < n)
       arr1(0) = col + 1
       var row = 0
-      while (row < m) {
+      while (row < m)
         val cost = if (s.charAt(col) == t.charAt(row)) 0 else 1
 
         val north = arr1(row) + 1
@@ -61,18 +61,15 @@ object Levenshtein {
         arr1(row + 1) = min(min(north, west), northwest)
 
         row += 1
-      }
       col += 1
 
       // swap our previous and current rows
       val tmp = arr0
       arr0 = arr1
       arr1 = tmp
-    }
 
     // the last column of the final row has our result
     arr0(m)
-  }
 
   /**
     * Return the normalized Levenshtein distance between s and t.
@@ -83,7 +80,5 @@ object Levenshtein {
     * the rest) we can just normalize the absolute distance by this
     * maximum value, which is the maximum of s.length and t.length.
     */
-  def normalized(s: String, t: String): Double = {
+  def normalized(s: String, t: String): Double =
     distance(s, t).toDouble / max(s.length, t.length).toDouble
-  }
-}

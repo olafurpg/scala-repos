@@ -1,4 +1,4 @@
-class Ping {
+class Ping
 
   val pong = new Pong(this)
 
@@ -9,13 +9,11 @@ class Ping {
   def poke /*?*/ { pong. /*!*/ poke() }
 
   override def toString = name
-}
 
-class Pong(ping: Ping) {
+class Pong(ping: Ping)
 
   val name /*?*/ = "pong"
 
   def poke() { ping. /*!*/ poke() }
 
   override def toString = name
-}

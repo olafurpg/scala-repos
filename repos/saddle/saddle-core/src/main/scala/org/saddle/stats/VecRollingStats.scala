@@ -28,7 +28,7 @@ import org.saddle.scalar._
   */
 class VecRollingStats[
     @spec(Int, Long, Double) A : ST : Vec2Stats : AddOp : SubOp : NUM](
-    v: Vec[A]) {
+    v: Vec[A])
 
   /**
     * Rolling count; compute count of number of elements in Vec over a sliding window, ignoring
@@ -60,32 +60,28 @@ class VecRollingStats[
     */
   def rollingMedian(winSz: Int): Vec[Double] =
     new RollingMedian[A](winSz, v).evaluate
-}
 
 class RollingCount[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM]
-    extends Function1[Vec[A], Int] {
+    extends Function1[Vec[A], Int]
   var i = 0
   var s = 0
   val sa = implicitly[ST[A]]
   var p = Scalar(sa.zero)
 
-  def apply(v: Vec[A]): Int = {
-    if (i == 0) {
+  def apply(v: Vec[A]): Int =
+    if (i == 0)
       s = v.count
       i += 1
       if (v.length > 0) p = v.first
-    } else {
+    else
       if (!p.isNA) s -= 1
       if (!v.last.isNA) s += 1
       p = v.first
-    }
     s
-  }
-}
 
 class RollingSum[
     @spec(Int, Long, Double) A : ST : AddOp : SubOp : Vec2Stats : NUM]
-    extends Function1[Vec[A], A] {
+    extends Function1[Vec[A], A]
   var i = 0
   val sa = implicitly[ST[A]]
   val add = implicitly[AddOp[A]]
@@ -93,81 +89,68 @@ class RollingSum[
   var s = sa.zero
   var p = Scalar(sa.zero)
 
-  def apply(v: Vec[A]): A = {
-    if (i == 0) {
+  def apply(v: Vec[A]): A =
+    if (i == 0)
       s = v.sum
       i += 1
       if (v.length > 0) p = v.first
-    } else {
+    else
       if (!p.isNA) s = sub(s, p.get)
       if (!v.last.isNA) s = add(s, v.last.get)
       p = v.first
-    }
     s
-  }
-}
 
 class RollingMean[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM]
-    extends Function1[Vec[A], Double] {
+    extends Function1[Vec[A], Double]
   var i = 0
   var s = 0d
   var c = 0
   val sa = implicitly[ST[A]]
   var p = Scalar(sa.zero)
 
-  def apply(v: Vec[A]): Double = {
-    if (i == 0) {
+  def apply(v: Vec[A]): Double =
+    if (i == 0)
       s = sa.toDouble(v.sum)
       c = v.count
       i += 1
       if (v.length > 0) p = v.first
-    } else {
-      if (!p.isNA) {
+    else
+      if (!p.isNA)
         s -= sa.toDouble(p.get)
         c -= 1
-      }
-      if (!v.last.isNA) {
+      if (!v.last.isNA)
         s += sa.toDouble(v.last.get)
         c += 1
-      }
       p = v.first
-    }
     s / c
-  }
-}
 
 class RollingMedian[@spec(Int, Long, Double) A : ST : Vec2Stats : NUM](
-    winSz: Int, origv: Vec[A]) {
+    winSz: Int, origv: Vec[A])
   val sa = implicitly[ST[A]]
 
   val len = origv.length
   val win = if (winSz > len) len else winSz
 
-  def evaluate: Vec[Double] = {
+  def evaluate: Vec[Double] =
     if (len == 0 || winSz <= 0) Vec.empty
-    else {
+    else
       val m = new Mediator(win)
       val r = Array.ofDim[Double](len - win + 1)
 
       var i = 0
-      while (i < win) {
+      while (i < win)
         val v = sa.toDouble(origv.raw(i))
         m.push(v)
         i += 1
-      }
 
       r(0) = m.median
 
       var j = 1
-      while (i < len) {
+      while (i < len)
         val v = sa.toDouble(origv.raw(i))
         m.push(v)
         i += 1
         r(j) = m.median
         j += 1
-      }
 
       Vec(r)
-    }
-  }
-}

@@ -1,5 +1,5 @@
 // a quickly assembled test of equality.  Needs work.
-object Test {
+object Test
   import scala.runtime.ScalaRunTime.hash
 
   def makeFromInt(x: Int) =
@@ -23,29 +23,24 @@ object Test {
       BigDecimal(x)
   )
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     var xs = makeFromInt(5)
-    for (x <- xs; y <- xs) {
+    for (x <- xs; y <- xs)
       assert(x == y, x + " == " + y)
       assert(hash(x) == hash(y), "hash(%s) == hash(%s)".format(x, y))
-    }
 
     xs = makeFromInt(-5)
-    for (x <- xs; y <- xs) {
+    for (x <- xs; y <- xs)
       assert(x == y, x + " == " + y)
       assert(hash(x) == hash(y), "hash(%s) == hash(%s)".format(x, y))
-    }
 
     xs = makeFromDouble(500.0)
-    for (x <- xs; y <- xs) {
+    for (x <- xs; y <- xs)
       assert(x == y, x + " == " + y)
       assert(hash(x) == hash(y), "hash(%s) == hash(%s)".format(x, y))
-    }
 
     // negatives
     val bigLong = new java.util.concurrent.atomic.AtomicLong(Long.MaxValue)
     assert(-1 != bigLong && bigLong != -1) // bigLong.intValue() == -1
     assert(BigDecimal(1.1) != 1L)
     assert(1L != BigDecimal(1.1))
-  }
-}

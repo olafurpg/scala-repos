@@ -46,7 +46,7 @@ import generic._
 class DoubleLinkedList[A]()
     extends AbstractSeq[A] with LinearSeq[A]
     with GenericTraversableTemplate[A, DoubleLinkedList]
-    with DoubleLinkedListLike[A, DoubleLinkedList[A]] with Serializable {
+    with DoubleLinkedListLike[A, DoubleLinkedList[A]] with Serializable
   next = this
 
   /** Creates a node for the double linked list.
@@ -54,49 +54,42 @@ class DoubleLinkedList[A]()
     *  @param elem    the element this node contains.
     *  @param next    the next node in the double linked list.
     */
-  def this(elem: A, next: DoubleLinkedList[A]) {
+  def this(elem: A, next: DoubleLinkedList[A])
     this()
-    if (next != null) {
+    if (next != null)
       this.elem = elem
       this.next = next
       this.next.prev = this
-    }
-  }
 
   override def companion: GenericCompanion[DoubleLinkedList] = DoubleLinkedList
 
   // Accurately clone this collection.  See SI-6296
-  override def clone(): DoubleLinkedList[A] = {
+  override def clone(): DoubleLinkedList[A] =
     val builder = newBuilder
     builder ++= this
     builder.result()
-  }
-}
 
 /** $factoryInfo
   *  @define coll double linked list
   *  @define Coll `DoubleLinkedList`
   */
 @deprecated("Low-level linked lists are deprecated.", "2.11.0")
-object DoubleLinkedList extends SeqFactory[DoubleLinkedList] {
+object DoubleLinkedList extends SeqFactory[DoubleLinkedList]
 
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, DoubleLinkedList[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
   def newBuilder[A]: Builder[A, DoubleLinkedList[A]] =
-    new Builder[A, DoubleLinkedList[A]] {
+    new Builder[A, DoubleLinkedList[A]]
       def emptyList() = new DoubleLinkedList[A]()
       var current = emptyList()
 
-      def +=(elem: A): this.type = {
+      def +=(elem: A): this.type =
         if (current.isEmpty) current = new DoubleLinkedList(elem, emptyList())
         else current append new DoubleLinkedList(elem, emptyList())
 
         this
-      }
 
       def clear(): Unit = current = emptyList()
       def result() = current
-    }
-}

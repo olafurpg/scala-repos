@@ -25,36 +25,32 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScTypeAliasStub
 class ScTypeAliasDefinitionImpl private (
     stub: StubElement[ScTypeAlias], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScTypeAliasDefinition {
+    with ScTypeAliasDefinition
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScTypeAliasStub) = {
+  def this(stub: ScTypeAliasStub) =
     this(stub, ScalaElementTypes.TYPE_DEFINITION, null)
-  }
 
-  def nameId = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match {
+  def nameId = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match
     case null =>
       val name = getStub.asInstanceOf[ScTypeAliasStub].getName
       val id = ScalaPsiElementFactory.createIdentifier(name, getManager)
-      if (id == null) {
+      if (id == null)
         assert(
             assertion = false,
             s"Id is null. Name: $name. Text: $getText. Parent text: ${getParent.getText}.")
-      }
       id.getPsi
     case n => n
-  }
 
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
-  override def navigate(requestFocus: Boolean) {
+  override def navigate(requestFocus: Boolean)
     val descriptor = EditSourceUtil.getDescriptor(nameId);
     if (descriptor != null) descriptor.navigate(requestFocus)
-  }
 
   override def toString: String = "ScTypeAliasDefinition: " + name
 
-  override def getPresentation: ItemPresentation = {
-    new ItemPresentation() {
+  override def getPresentation: ItemPresentation =
+    new ItemPresentation()
       def getPresentableText = name
       def getTextAttributesKey: TextAttributesKey = null
       def getLocationString: String =
@@ -62,20 +58,14 @@ class ScTypeAliasDefinitionImpl private (
         ")"
       override def getIcon(open: Boolean) =
         ScTypeAliasDefinitionImpl.this.getIcon(0)
-    }
-  }
 
   override def getOriginalElement: PsiElement =
     super [ScTypeAliasDefinition].getOriginalElement
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitTypeAliasDefinition(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitTypeAliasDefinition(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

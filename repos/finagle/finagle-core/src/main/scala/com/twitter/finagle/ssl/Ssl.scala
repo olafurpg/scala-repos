@@ -7,7 +7,7 @@ import javax.net.ssl._
  * SSL helper object, capable of creating cached SSLEngine instances
  * backed by both the native APR/OpenSSL bindings, or pure Java JSSE.
  */
-object Ssl {
+object Ssl
   private[this] val log = Logger.getLogger(getClass.getName)
   private[this] val cacheContexts = true
 
@@ -29,7 +29,7 @@ object Ssl {
       caCertPath: String,
       ciphers: String,
       nextProtos: String
-  ): Engine = {
+  ): Engine =
     val nativeInstance = OpenSSL.server(
         certificatePath,
         keyPath,
@@ -39,7 +39,7 @@ object Ssl {
         cacheContexts
     )
 
-    nativeInstance.getOrElse {
+    nativeInstance.getOrElse
       require(ciphers == null,
               "'Ciphers' parameter unsupported with JSSE SSL provider")
       require(nextProtos == null,
@@ -55,8 +55,6 @@ object Ssl {
       require(jsseInstance.isDefined, "Could not create an SSLEngine")
 
       jsseInstance.get
-    }
-  }
 
   /**
     * Get a client engine
@@ -96,4 +94,3 @@ object Ssl {
   def clientWithoutCertificateValidation(
       peerHost: String, peerPort: Int): Engine =
     JSSE.clientWithoutCertificateValidation(peerHost, peerPort)
-}

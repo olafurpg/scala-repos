@@ -5,8 +5,8 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class FlagsTest extends FunSuite {
-  test("set flag and return it") {
+class FlagsTest extends FunSuite
+  test("set flag and return it")
     val flags = Flags()
     assert(!flags.isFlagSet(Flags.Debug))
 
@@ -15,9 +15,8 @@ class FlagsTest extends FunSuite {
     assert(changed.toLong == Flags.Debug)
 
     assert(!flags.isFlagSet(Flags.Debug))
-  }
 
-  test("set multiple flag and return it") {
+  test("set multiple flag and return it")
     val flags = Flags()
     assert(!flags.isFlagSet(1L))
     assert(!flags.isFlagSet(2L))
@@ -29,5 +28,3 @@ class FlagsTest extends FunSuite {
 
     assert(!flags.isFlagSet(1L))
     assert(!flags.isFlagSet(2L))
-  }
-}

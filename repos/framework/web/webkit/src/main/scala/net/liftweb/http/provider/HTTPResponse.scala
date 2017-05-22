@@ -23,7 +23,7 @@ import java.io.{OutputStream}
 /**
   * Represents the HTTP response that will be send to the client
   */
-trait HTTPResponse {
+trait HTTPResponse
 
   /**
     * Add cookies to the response
@@ -72,4 +72,3 @@ trait HTTPResponse {
     * @return - the OutputStream that can be used to send down o the client the response body.
     */
   def outputStream: OutputStream
-}

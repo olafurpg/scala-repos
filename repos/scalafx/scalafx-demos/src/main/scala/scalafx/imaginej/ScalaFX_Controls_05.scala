@@ -49,7 +49,7 @@ import scalafx.application.JFXApp
   *         http://docs.oracle.com/javafx/2.0/ui_controls/checkbox.htm#CHDFEJCD
   *
   */
-object ScalaFX_Controls_05 extends JFXApp {
+object ScalaFX_Controls_05 extends JFXApp
 
   //  val priorityLabel = new Label {
   //    text = "Priority:"
@@ -129,4 +129,3 @@ object ScalaFX_Controls_05 extends JFXApp {
   //      content = vBox
   //    }
   //  }
-}

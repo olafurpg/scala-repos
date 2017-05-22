@@ -13,7 +13,7 @@ case class Pairing(id: String, // game Id
                    winner: Option[String],
                    turns: Option[Int],
                    berserk1: Int,
-                   berserk2: Int) {
+                   berserk2: Int)
 
   def gameId = id
 
@@ -56,9 +56,8 @@ case class Pairing(id: String, // game Id
     colorOf(userId) map { PovRef(gameId, _) }
 
   def similar(other: Pairing) = other.contains(user1, user2)
-}
 
-private[tournament] object Pairing {
+private[tournament] object Pairing
 
   case class LastOpponents(hash: Map[String, String])
 
@@ -73,11 +72,10 @@ private[tournament] object Pairing {
                 berserk1 = 0,
                 berserk2 = 0)
 
-  case class Prep(tourId: String, user1: String, user2: String) {
+  case class Prep(tourId: String, user1: String, user2: String)
     def toPairing(firstGetsWhite: Boolean) =
       if (firstGetsWhite) Pairing(tourId, user1, user2)
       else Pairing(tourId, user2, user1)
-  }
 
   def prep(tour: Tournament, ps: (Player, Player)) =
     Pairing.Prep(tour.id, ps._1.userId, ps._2.userId)
@@ -85,4 +83,3 @@ private[tournament] object Pairing {
     Pairing.Prep(tour.id, u1, u2)
   def prep(tour: Tournament, p1: Player, p2: Player) =
     Pairing.Prep(tour.id, p1.userId, p2.userId)
-}

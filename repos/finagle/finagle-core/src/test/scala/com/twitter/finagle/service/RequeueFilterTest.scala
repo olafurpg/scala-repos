@@ -10,9 +10,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class RequeueFilterTest extends FunSuite {
+class RequeueFilterTest extends FunSuite
 
-  test("respects maxRetriesPerReq") {
+  test("respects maxRetriesPerReq")
     val stats = new InMemoryStatsReceiver()
 
     val minRetries = 10
@@ -27,9 +27,8 @@ class RequeueFilterTest extends FunSuite {
 
     val svc = filter.andThen(Service.mk(Future.exception))
 
-    intercept[FailedFastException] {
+    intercept[FailedFastException]
       Await.result(svc(new FailedFastException("lolll")), 5.seconds)
-    }
 
     assert(minRetries * percentRequeues == stats.counter("requeues")())
     assert(Seq(minRetries * percentRequeues) == stats.stat(
@@ -37,9 +36,8 @@ class RequeueFilterTest extends FunSuite {
     // the budget is not considered exhausted if we only used
     // our maxRetriesPerReq
     assert(0 == stats.counter("budget_exhausted")())
-  }
 
-  test("exhausts budget") {
+  test("exhausts budget")
     // this is a bit odd to test without multiple clients,
     // we force it by allowing 200% of the budget to be used
     val stats = new InMemoryStatsReceiver()
@@ -56,16 +54,14 @@ class RequeueFilterTest extends FunSuite {
 
     val svc = filter.andThen(Service.mk(Future.exception))
 
-    intercept[FailedFastException] {
+    intercept[FailedFastException]
       Await.result(svc(new FailedFastException("lolll")), 5.seconds)
-    }
 
     assert(minRetries == stats.counter("requeues")())
     assert(Seq(minRetries) == stats.stat("requeues_per_request")())
     assert(1 == stats.counter("budget_exhausted")())
-  }
 
-  test("tracks requeues_per_request") {
+  test("tracks requeues_per_request")
     val stats = new InMemoryStatsReceiver()
     def perReqRequeues: Seq[Float] =
       stats.stat("requeues_per_request")()
@@ -84,16 +80,15 @@ class RequeueFilterTest extends FunSuite {
 
     var numNos = 0
     val svc = filter.andThen(
-        Service.mk { s: String =>
-      if (s == "no" && numNos == 0) {
+        Service.mk  s: String =>
+      if (s == "no" && numNos == 0)
         numNos += 1
         Future.exception(new FailedFastException(s))
-      } else if (s == "fail") {
+      else if (s == "fail")
         Future.exception(new FailedFastException(s))
-      } else {
+      else
         Future.value(s.length)
-      }
-    })
+    )
 
     // a successful request
     Await.ready(svc("hi"), 5.seconds)
@@ -110,10 +105,9 @@ class RequeueFilterTest extends FunSuite {
     // then we get 50% of that, which is 5.
     assert(Seq(0, 1, 5) == perReqRequeues)
     assert(1 == stats.counter("request_limit")())
-  }
 
-  test("applies delay") {
-    Time.withCurrentTimeFrozen { timeControl =>
+  test("applies delay")
+    Time.withCurrentTimeFrozen  timeControl =>
       val timer = new MockTimer()
       val stats = new InMemoryStatsReceiver()
       val minDelay = 1.second
@@ -133,7 +127,7 @@ class RequeueFilterTest extends FunSuite {
 
       var expectedDelay = minDelay
 
-      1.to(scheduleLength).foreach { attempt =>
+      1.to(scheduleLength).foreach  attempt =>
         assert(!response.isDefined)
 
         // trigger the next retry by advancing past the delay
@@ -144,13 +138,8 @@ class RequeueFilterTest extends FunSuite {
         expectedDelay *= 2
 
         assert(attempt == stats.counter("requeues")())
-      }
 
       // at this point we should have exhausted our budget
       assert(1 == stats.counter("budget_exhausted")())
-      intercept[FailedFastException] {
+      intercept[FailedFastException]
         Await.result(response, 1.second)
-      }
-    }
-  }
-}

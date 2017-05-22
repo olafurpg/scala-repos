@@ -35,7 +35,7 @@ object TimeHelpers extends TimeHelpers with ControlHelpers with ClassHelpers
   * The TimeHelpers trait provide functions to create TimeSpans (an object representing duration in milliseconds),
   * to manage date formats or general utility functions (get the date for today, get year/month/day number,...)
   */
-trait TimeHelpers { self: ControlHelpers =>
+trait TimeHelpers  self: ControlHelpers =>
   // Logger must be lazy, since we cannot instantiate until after boot is complete
   private lazy val logger = Logger(classOf[TimeHelpers])
 
@@ -60,7 +60,7 @@ trait TimeHelpers { self: ControlHelpers =>
   implicit def intToTimeSpan(in: Int): TimeSpan = TimeSpan(in)
 
   /** class building TimeSpans given an amount (len) and a method specify the time unit  */
-  case class TimeSpanBuilder(len: Long) {
+  case class TimeSpanBuilder(len: Long)
     def seconds = new TimeSpan(Left(Duration.standardSeconds(len)))
     def second = seconds
     def minutes = new TimeSpan(Left(Duration.standardMinutes(len)))
@@ -87,7 +87,6 @@ trait TimeHelpers { self: ControlHelpers =>
         "This builder will be removed due to its unclear behavior; use Joda-Time `Period.years` and convert to `TimeSpan` manually instead.",
         "3.0.0")
     def year = years
-  }
 
   /**
     * The `TimeSpan` class represents a duration of time in milliseconds. In this
@@ -115,7 +114,7 @@ trait TimeHelpers { self: ControlHelpers =>
     * field values. Then it could be used only in to-period implicit conversion.
     */
   class TimeSpan(private val dt: Either[Duration, Period])
-      extends ConvertableToDate {
+      extends ConvertableToDate
 
     def this(ms: Long) =
       this(Left(new Duration(ms)))
@@ -149,11 +148,10 @@ trait TimeHelpers { self: ControlHelpers =>
     @deprecated(
         "TimeSpan will not support operations on Joda-Time `Period`s in the future; use new Period(timeSpan.millis) instead.",
         "3.0.0")
-    private[util] def toPeriod: Period = dt match {
+    private[util] def toPeriod: Period = dt match
       // package protected because of view bound usage in tsToPeriod
       case Left(duration) => duration.toPeriod
       case Right(period) => period
-    }
 
     /**
       * @return The amount of milliseconds this `TimeSpan` represents.
@@ -170,11 +168,10 @@ trait TimeHelpers { self: ControlHelpers =>
       *     month and year lengths in milliseconds are only defined with respect to a reference point,
       *     since the length of a month or year can vary).
       */
-    def millis = dt match {
+    def millis = dt match
       case Left(duration) => duration.getMillis
       case Right(period) =>
         period.toStandardDuration.getMillis // will throw exception because it holds month or year
-    }
 
     // TODO If we choose to move away from TimeSpan, we'll need to take into
     // TODO account the fact that this method can take anything convertible to
@@ -205,14 +202,13 @@ trait TimeHelpers { self: ControlHelpers =>
       *          since the length of a month or year can vary)
       */
     def +[B](in: B)(implicit f: B => TimeSpan): TimeSpan =
-      (this.dt, f(in).dt) match {
+      (this.dt, f(in).dt) match
         case (Right(p1), Right(p2)) => new TimeSpan(Right(p1.plus(p2)))
         case (Left(duration), Right(period)) =>
           new TimeSpan(Left(duration.plus(period.toStandardDuration)))
         case (Right(period), Left(duration)) =>
           new TimeSpan(Left(period.toStandardDuration.plus(duration)))
         case (Left(d1), Left(d2)) => new TimeSpan(Left(d1.plus(d2)))
-      }
 
     /**
       * Alias for `[[+]]`.
@@ -249,14 +245,13 @@ trait TimeHelpers { self: ControlHelpers =>
       *          since the length of a month or year can vary)
       */
     def -[B](in: B)(implicit f: B => TimeSpan): TimeSpan =
-      (this.dt, f(in).dt) match {
+      (this.dt, f(in).dt) match
         case (Right(p1), Right(p2)) => new TimeSpan(Right(p1.minus(p2)))
         case (Left(duration), Right(period)) =>
           new TimeSpan(Left(duration.minus(period.toStandardDuration)))
         case (Right(period), Left(duration)) =>
           new TimeSpan(Left(period.toStandardDuration.minus(duration)))
         case (Left(d1), Left(d2)) => new TimeSpan(Left(d1.minus(d2)))
-      }
 
     /**
       * Override the equals method so that `TimeSpan`s can be compared to long, int,
@@ -265,30 +260,27 @@ trait TimeHelpers { self: ControlHelpers =>
       * @note Comparing to a Joda-Time `Period` is also done correctly, but is
       *       deprecated.
       */
-    override def equals(cmp: Any) = {
-      cmp match {
+    override def equals(cmp: Any) =
+      cmp match
         case lo: Long => lo == this.millis
         case i: Int => i == this.millis
         case ti: TimeSpan => ti.dt == this.dt
         case dur: Duration => Left(dur) == this.dt
         case period: Period => Right(period) == this.dt
         case _ => false
-      }
-    }
 
     /**
       * Override the toString method to display a readable amount of time using
       * `[[TimeSpan.format]]``
       */
     override def toString = TimeSpan.format(millis)
-  }
 
   /**
     * The TimeSpan object provides class represents an amount of time.
     * It can be translated to a date with the date method. In that case, the number of millis seconds will be used to create a Date
     * object starting from the Epoch time (see the documentation for java.util.Date)
     */
-  object TimeSpan {
+  object TimeSpan
 
     /** time units and values used when converting a total number of millis to those units (see the format function)  */
     val scales = List((1000L, "milli"),
@@ -304,23 +296,20 @@ trait TimeHelpers { self: ControlHelpers =>
     /**
       * Formats a number of millis to a string representing the number of weeks, days, hours, minutes, seconds, millis
       */
-    def format(millis: Long): String = {
+    def format(millis: Long): String =
       def divideInUnits(millis: Long) =
         scales
-          .foldLeft[(Long, List[(Long, String)])]((millis, Nil)) {
+          .foldLeft[(Long, List[(Long, String)])]((millis, Nil))
             (total, div) =>
               (total._1 / div._1, (total._1 % div._1, div._2) :: total._2)
-          }
           ._2
-      def formatAmount(amountUnit: (Long, String)) = amountUnit match {
+      def formatAmount(amountUnit: (Long, String)) = amountUnit match
         case (amount, unit) if (amount == 1) => amount + " " + unit
         case (amount, unit) => amount + " " + unit + "s"
-      }
       divideInUnits(millis)
         .filter(_._1 > 0)
         .map(formatAmount(_))
         .mkString(", ")
-    }
 
     /**
       * Convert a Date to a TimeSpan
@@ -362,7 +351,6 @@ trait TimeHelpers { self: ControlHelpers =>
         "3.0.0")
     implicit def dateTimeToTS(in: DateTime): TimeSpan =
       new TimeSpan(Left(new Duration(in.getMillis)))
-  }
 
   /** @return the current System.nanoTime() */
   def nano = System.nanoTime()
@@ -389,10 +377,10 @@ trait TimeHelpers { self: ControlHelpers =>
   implicit def toDateExtension(d: Date) = new DateExtension(d)
 
   /** This class adds a noTime method the Date class, in order to get at Date object starting at 00:00 */
-  class DateExtension(date: Date) {
+  class DateExtension(date: Date)
 
     /** @return a Date object starting at 00:00 from date */
-    def noTime = {
+    def noTime =
       val calendar = Calendar.getInstance
       calendar.setTime(date)
       calendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -400,18 +388,15 @@ trait TimeHelpers { self: ControlHelpers =>
       calendar.set(Calendar.SECOND, 0)
       calendar.set(Calendar.MILLISECOND, 0)
       calendar.getTime
-    }
-  }
 
-  implicit class DateTimeExtension(dateTime: DateTime) {
+  implicit class DateTimeExtension(dateTime: DateTime)
     def noTime = dateTime.withTimeAtStartOfDay()
-  }
 
   /** implicit def used to add the setXXX methods to the Calendar class */
   implicit def toCalendarExtension(c: Calendar) = new CalendarExtension(c)
 
   /** This class adds the setXXX methods to the Calendar class. Each setter returns the updated Calendar */
-  class CalendarExtension(c: Calendar) {
+  class CalendarExtension(c: Calendar)
 
     /** set the day of the month (1 based) and return the calendar */
     def setDay(d: Int) = { c.set(Calendar.DAY_OF_MONTH, d); c }
@@ -427,7 +412,6 @@ trait TimeHelpers { self: ControlHelpers =>
 
     /** set the time to 00:00:00.000 and return the calendar */
     def noTime = { c.setTime(c.getTime.noTime); c }
-  }
 
   /** @return the date object for now */
   def now = new Date
@@ -442,25 +426,22 @@ trait TimeHelpers { self: ControlHelpers =>
   def time(when: Long) = new Date(when)
 
   /** @return the month corresponding to today (0 based, relative to UTC) */
-  def month(in: Date): Int = {
+  def month(in: Date): Int =
     val cal = Calendar.getInstance(utc)
     cal.setTimeInMillis(in.getTime)
     cal.get(Calendar.MONTH)
-  }
 
   /** @return the year corresponding to today (relative to UTC) */
-  def year(in: Date): Int = {
+  def year(in: Date): Int =
     val cal = Calendar.getInstance(utc)
     cal.setTimeInMillis(in.getTime)
     cal.get(Calendar.YEAR)
-  }
 
   /** @return the day of month corresponding to the input date (1 based) */
-  def day(in: Date): Int = {
+  def day(in: Date): Int =
     val cal = Calendar.getInstance(utc)
     cal.setTimeInMillis(in.getTime)
     cal.get(Calendar.DAY_OF_MONTH)
-  }
 
   /** The UTC TimeZone */
   val utc = TimeZone.getTimeZone("UTC")
@@ -472,32 +453,29 @@ trait TimeHelpers { self: ControlHelpers =>
   def daysSinceEpoch: Long = millisToDays(millis)
 
   /** @return the time taken to evaluate f in millis and the result */
-  def calcTime[T](f: => T): (Long, T) = {
+  def calcTime[T](f: => T): (Long, T) =
     val start = millis
     val result = f
     (millis - start, result)
-  }
 
   /**
     * Log a message with the time taken in millis to do something and return the result
     * @return the result
     */
-  def logTime[T](msg: String)(f: => T): T = {
+  def logTime[T](msg: String)(f: => T): T =
     val (time, ret) = calcTime(f)
     logger.info(msg + " took " + time + " Milliseconds")
     ret
-  }
 
   /**
     * Call f and log the string returned together with the time taken in millis.
     * @return the second result from f
     */
-  def logTime[T](f: => (String, T)): T = {
+  def logTime[T](f: => (String, T)): T =
     val (time, fret) = calcTime(f)
     val (msg, ret) = fret
     logger.info(msg + " took " + time + " Milliseconds")
     ret
-  }
 
   /**
     * @return a standard format HH:mm:ss
@@ -523,22 +501,20 @@ trait TimeHelpers { self: ControlHelpers =>
 
   /** @return a formatter for internet dates (RFC822/1123) including:
     *  the day of week, the month, day of month, time and time zone */
-  def internetDateFormatter = {
+  def internetDateFormatter =
     val ret = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss 'GMT'", Locale.US)
     ret.setTimeZone(utc)
     ret
-  }
 
   /** @return a Box[date] from a string using the internet format. */
-  def boxParseInternetDate(dateString: String): Box[Date] = tryo {
+  def boxParseInternetDate(dateString: String): Box[Date] = tryo
     internetDateFormatter.parse(dateString)
-  }
 
   /** @return a date from a string using the internet format. Return the Epoch date if the parse is unsuccesful */
   def parseInternetDate(dateString: String): Date =
-    tryo {
+    tryo
       internetDateFormatter.parse(dateString)
-    } openOr new Date(0L)
+    openOr new Date(0L)
 
   /** @return a date formatted with the internet format */
   def toInternetDate(in: Date): String = internetDateFormatter.format(in)
@@ -551,9 +527,9 @@ trait TimeHelpers { self: ControlHelpers =>
   def nowAsInternetDate: String = toInternetDate(millis)
 
   /** @return a Full(date) or a failure if the input couldn't be translated to date (or Empty if the input is null)*/
-  def toDate(in: Any): Box[Date] = {
-    try {
-      in match {
+  def toDate(in: Any): Box[Date] =
+    try
+      in match
         case null => Empty
         case d: Date => Full(d)
         case lng: Long => Full(new Date(lng))
@@ -565,29 +541,22 @@ trait TimeHelpers { self: ControlHelpers =>
         case s: String =>
           tryo(internetDateFormatter.parse(s)) or tryo(dateFormatter.parse(s))
         case o => toDate(o.toString)
-      }
-    } catch {
+    catch
       case e: Exception =>
         logger.debug("Error parsing date " + in, e);
         Failure("Bad date: " + in, Full(e), Empty)
-    }
-  }
 
-  implicit class PeriodExtension[P <% Period](period: P) {
+  implicit class PeriodExtension[P <% Period](period: P)
     def later: DateTime = new DateTime(millis).plus(period)
 
     def ago: DateTime = new DateTime(millis).minus(period)
-  }
-}
 
-trait ConvertableToDate {
+trait ConvertableToDate
   def toDate: Date
   def toDateTime: DateTime
   def millis: Long
-}
 
-object ConvertableToDate {
+object ConvertableToDate
   implicit def toDate(in: ConvertableToDate): Date = in.toDate
   implicit def toDateTime(in: ConvertableToDate): DateTime = in.toDateTime
   implicit def toMillis(in: ConvertableToDate): Long = in.millis
-}

@@ -26,34 +26,29 @@ import cascading.tuple.{Tuple => CTuple}
   * from the scalding DSL's point of view. The latter will flatten the (Int, Int), but the former
   * won't.
   */
-trait TupleSetter[T] extends java.io.Serializable with TupleArity { self =>
+trait TupleSetter[T] extends java.io.Serializable with TupleArity  self =>
   def apply(arg: T): CTuple
 
   def contraMap[U](fn: U => T): TupleSetter[U] =
-    new TupleSetter[U] {
+    new TupleSetter[U]
       def apply(arg: U) = self.apply(fn(arg))
       def arity = self.arity
-    }
-}
 
-trait LowPriorityTupleSetters extends java.io.Serializable {
+trait LowPriorityTupleSetters extends java.io.Serializable
 
   /**
     * If it is not a scala Tuple, and not any defined in the object TupleSetter
     * we just assume it is a single entry in the tuple
     * For some reason, putting a val TupleSetter[Any] here messes up implicit resolution
     */
-  implicit def singleSetter[A]: TupleSetter[A] = new TupleSetter[A] {
-    override def apply(arg: A) = {
+  implicit def singleSetter[A]: TupleSetter[A] = new TupleSetter[A]
+    override def apply(arg: A) =
       val tup = CTuple.size(1)
       tup.set(0, arg)
       tup
-    }
     override def arity = 1
-  }
-}
 
-object TupleSetter extends GeneratedTupleSetters {
+object TupleSetter extends GeneratedTupleSetters
 
   /**
     * Treat this TupleSetter as one for a subclass
@@ -69,25 +64,20 @@ object TupleSetter extends GeneratedTupleSetters {
 
   //This is here for handling functions that return cascading tuples:
   implicit lazy val CTupleSetter: TupleSetter[CTuple] =
-    new TupleSetter[CTuple] {
+    new TupleSetter[CTuple]
       override def apply(arg: CTuple) = new CTuple(arg)
       //We return an invalid value here, so we must check returns
       override def arity = -1
-    }
 
   //Unit is like a Tuple0. It corresponds to Tuple.NULL
-  implicit lazy val UnitSetter: TupleSetter[Unit] = new TupleSetter[Unit] {
+  implicit lazy val UnitSetter: TupleSetter[Unit] = new TupleSetter[Unit]
     override def apply(arg: Unit) = CTuple.NULL
     override def arity = 0
-  }
 
   // Doesn't seem safe to make this implicit by default:
-  lazy val ProductSetter: TupleSetter[Product] = new TupleSetter[Product] {
-    def apply(in: Product) = {
+  lazy val ProductSetter: TupleSetter[Product] = new TupleSetter[Product]
+    def apply(in: Product) =
       val t = new CTuple
       in.productIterator.foreach(t.add(_))
       t
-    }
     def arity = -1
-  }
-}

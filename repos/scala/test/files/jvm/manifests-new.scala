@@ -1,15 +1,14 @@
 import scala.reflect.runtime.universe._
 import scala.reflect.{ClassTag, classTag}
 
-object Test extends App {
+object Test extends App
   Test1
   Test2
-}
 
 class Foo[T](x: T)
 trait Bar[T] { def f: T }
 
-object Test1 extends TestUtil {
+object Test1 extends TestUtil
   print(())
   print(true)
   print('a')
@@ -53,9 +52,8 @@ object Test1 extends TestUtil {
   print(new Bar[String] { def f = "abc" });
   { print(new Bar[String] { def f = "abc" }) }
   println()
-}
 
-object Test2 {
+object Test2
   import Marshal._
   println("()=" + load[Unit](dump(())))
   println("true=" + load[Boolean](dump(true)))
@@ -88,54 +86,47 @@ object Test2 {
   println("Array(Array(1), Array(2))=" +
       loadArray[Array[Int]](dump(Array(Array(1), Array(2)))))
   println()
-}
 
-object Marshal {
+object Marshal
   import java.io._
   import scala.reflect.ClassTag
 
-  def dump[A](o: A)(implicit t: ClassTag[A]): Array[Byte] = {
+  def dump[A](o: A)(implicit t: ClassTag[A]): Array[Byte] =
     val ba = new ByteArrayOutputStream(512)
     val out = new ObjectOutputStream(ba)
     out.writeObject(t)
     out.writeObject(o)
     out.close()
     ba.toByteArray()
-  }
 
   @throws(classOf[IOException])
   @throws(classOf[ClassCastException])
   @throws(classOf[ClassNotFoundException])
-  def load[A](buffer: Array[Byte])(implicit expected: ClassTag[A]): A = {
+  def load[A](buffer: Array[Byte])(implicit expected: ClassTag[A]): A =
     val in = new ObjectInputStream(new ByteArrayInputStream(buffer))
     val found = in.readObject.asInstanceOf[ClassTag[_]]
-    try {
+    try
       found.runtimeClass.asSubclass(expected.runtimeClass)
       in.readObject.asInstanceOf[A]
-    } catch {
+    catch
       case _: ClassCastException =>
         in.close()
         throw new ClassCastException(
             "type mismatch;" + "\n found : " + found + "\n required: " +
             expected)
-    }
-  }
-}
 
-trait TestUtil {
+trait TestUtil
   import java.io._
-  def write[A](o: A): Array[Byte] = {
+  def write[A](o: A): Array[Byte] =
     val ba = new ByteArrayOutputStream(512)
     val out = new ObjectOutputStream(ba)
     out.writeObject(o)
     out.close()
     ba.toByteArray()
-  }
-  def read[A](buffer: Array[Byte]): A = {
+  def read[A](buffer: Array[Byte]): A =
     val in = new ObjectInputStream(new ByteArrayInputStream(buffer))
     in.readObject().asInstanceOf[A]
-  }
-  def print[T](x: T)(implicit t: TypeTag[T]) {
+  def print[T](x: T)(implicit t: TypeTag[T])
     // todo. type tags are not yet serializable
 //    val t1: TypeTag[T] = read(write(t))
     val t1: TypeTag[T] = t
@@ -144,5 +135,3 @@ trait TestUtil {
         "x=" + x1 + ", t=" + t1 + ", k=" +
         t1.tpe.asInstanceOf[Product].productPrefix + ", s=" +
         t1.tpe.typeSymbol.toString)
-  }
-}

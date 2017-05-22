@@ -48,14 +48,13 @@ import org.apache.spark.sql.AnalysisException
   * back for Hive to execute natively.  Will be replaced with a native command that contains the
   * cmd string.
   */
-private[hive] case object NativePlaceholder extends LogicalPlan {
+private[hive] case object NativePlaceholder extends LogicalPlan
   override def children: Seq[LogicalPlan] = Seq.empty
   override def output: Seq[Attribute] = Seq.empty
-}
 
 private[hive] case class CreateTableAsSelect(
     tableDesc: CatalogTable, child: LogicalPlan, allowExisting: Boolean)
-    extends UnaryNode with Command {
+    extends UnaryNode with Command
 
   override def output: Seq[Attribute] = Seq.empty[Attribute]
   override lazy val resolved: Boolean =
@@ -63,21 +62,19 @@ private[hive] case class CreateTableAsSelect(
     tableDesc.storage.serde.isDefined &&
     tableDesc.storage.inputFormat.isDefined &&
     tableDesc.storage.outputFormat.isDefined && childrenResolved
-}
 
 private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
                                             child: LogicalPlan,
                                             allowExisting: Boolean,
                                             replace: Boolean,
                                             sql: String)
-    extends UnaryNode with Command {
+    extends UnaryNode with Command
   override def output: Seq[Attribute] = Seq.empty[Attribute]
   override lazy val resolved: Boolean = false
-}
 
 /** Provides a mapping from HiveQL statements to catalyst logical plans and expression trees. */
 private[hive] class HiveQl(conf: ParserConf)
-    extends SparkQl(conf) with Logging {
+    extends SparkQl(conf) with Logging
   import ParseUtils._
   import ParserUtils._
 
@@ -143,28 +140,24 @@ private[hive] class HiveQl(conf: ParserConf)
   /**
     * Returns the HiveConf
     */
-  private[this] def hiveConf: HiveConf = {
+  private[this] def hiveConf: HiveConf =
     var ss = SessionState.get()
     // SessionState is lazy initialization, it can be null here
-    if (ss == null) {
+    if (ss == null)
       val original = Thread.currentThread().getContextClassLoader
       val conf = new HiveConf(classOf[SessionState])
       conf.setClassLoader(original)
       ss = new SessionState(conf)
       SessionState.start(ss)
-    }
     ss.getConf
-  }
 
   protected def getProperties(node: ASTNode): Seq[(String, String)] =
-    node match {
+    node match
       case Token("TOK_TABLEPROPLIST", list) =>
-        list.map {
+        list.map
           case Token("TOK_TABLEPROPERTY",
                      Token(key, Nil) :: Token(value, Nil) :: Nil) =>
             unquoteString(key) -> unquoteString(value)
-        }
-    }
 
   private def createView(view: ASTNode,
                          viewNameParts: ASTNode,
@@ -172,7 +165,7 @@ private[hive] class HiveQl(conf: ParserConf)
                          schema: Seq[CatalogColumn],
                          properties: Map[String, String],
                          allowExist: Boolean,
-                         replace: Boolean): CreateViewAsSelect = {
+                         replace: Boolean): CreateViewAsSelect =
     val tableIdentifier = extractTableIdent(viewNameParts)
     val originalText = query.source
     val tableDesc = CatalogTable(
@@ -195,27 +188,22 @@ private[hive] class HiveQl(conf: ParserConf)
     // We can remove this when parser is configurable(can access SQLConf) in the future.
     val sql = view.source
     CreateViewAsSelect(tableDesc, nodeToPlan(query), allowExist, replace, sql)
-  }
 
   /** Creates LogicalPlan for a given SQL string. */
-  override def parsePlan(sql: String): LogicalPlan = {
-    safeParse(sql, ParseDriver.parsePlan(sql, conf)) { ast =>
-      if (nativeCommands.contains(ast.text)) {
+  override def parsePlan(sql: String): LogicalPlan =
+    safeParse(sql, ParseDriver.parsePlan(sql, conf))  ast =>
+      if (nativeCommands.contains(ast.text))
         HiveNativeCommand(sql)
-      } else {
-        nodeToPlan(ast) match {
+      else
+        nodeToPlan(ast) match
           case NativePlaceholder => HiveNativeCommand(sql)
           case plan => plan
-        }
-      }
-    }
-  }
 
   protected override def isNoExplainCommand(command: String): Boolean =
     noExplainCommands.contains(command)
 
-  protected override def nodeToPlan(node: ASTNode): LogicalPlan = {
-    node match {
+  protected override def nodeToPlan(node: ASTNode): LogicalPlan =
+    node match
       case Token("TOK_DFS", Nil) =>
         HiveNativeCommand(node.source + " " + node.remainder)
 
@@ -240,17 +228,16 @@ private[hive] class HiveQl(conf: ParserConf)
           Token("TOK_TABNAME", tableNameParts) :: partitionSpec) :: isNoscan) =>
         // Reference:
         // https://cwiki.apache.org/confluence/display/Hive/StatsDev#StatsDev-ExistingTables
-        if (partitionSpec.nonEmpty) {
+        if (partitionSpec.nonEmpty)
           // Analyze partitions will be treated as a Hive native command.
           NativePlaceholder
-        } else if (isNoscan.isEmpty) {
+        else if (isNoscan.isEmpty)
           // If users do not specify "noscan", it will be treated as a Hive native command.
           NativePlaceholder
-        } else {
+        else
           val tableName = tableNameParts.map { case Token(p, Nil) => p }
             .mkString(".")
           AnalyzeTable(tableName)
-        }
 
       case view @ Token("TOK_ALTERVIEW", children) =>
         val Some(nameParts) :: maybeQuery :: _ = getClauses(
@@ -263,7 +250,7 @@ private[hive] class HiveQl(conf: ParserConf)
             children)
 
         // if ALTER VIEW doesn't have query part, let hive to handle it.
-        maybeQuery.map { query =>
+        maybeQuery.map  query =>
           createView(view,
                      nameParts,
                      query,
@@ -271,11 +258,11 @@ private[hive] class HiveQl(conf: ParserConf)
                      Map(),
                      allowExist = false,
                      replace = true)
-        }.getOrElse(NativePlaceholder)
+        .getOrElse(NativePlaceholder)
 
-      case view @ Token("TOK_CREATEVIEW", children) if children.collect {
+      case view @ Token("TOK_CREATEVIEW", children) if children.collect
             case t @ Token("TOK_QUERY", _) => t
-          }.nonEmpty =>
+          .nonEmpty =>
         val Seq(
         Some(viewNameParts),
         Some(query),
@@ -296,29 +283,26 @@ private[hive] class HiveQl(conf: ParserConf)
                        children)
 
         // If the view is partitioned, we let hive handle it.
-        if (maybePartCols.isDefined) {
+        if (maybePartCols.isDefined)
           NativePlaceholder
-        } else {
-          val schema = maybeColumns.map { cols =>
+        else
+          val schema = maybeColumns.map  cols =>
             // We can't specify column types when create view, so fill it with null first, and
             // update it after the schema has been resolved later.
             nodeToColumns(cols, lowerCase = true).map(_.copy(dataType = null))
-          }.getOrElse(Seq.empty[CatalogColumn])
+          .getOrElse(Seq.empty[CatalogColumn])
 
           val properties = scala.collection.mutable.Map.empty[String, String]
 
-          maybeProperties.foreach {
+          maybeProperties.foreach
             case Token("TOK_TABLEPROPERTIES", list :: Nil) =>
               properties ++= getProperties(list)
-          }
 
-          maybeComment.foreach {
+          maybeComment.foreach
             case Token("TOK_TABLECOMMENT", child :: Nil) =>
               val comment = unescapeSQLString(child.text)
-              if (comment ne null) {
+              if (comment ne null)
                 properties += ("comment" -> comment)
-              }
-          }
 
           createView(view,
                      viewNameParts,
@@ -327,11 +311,10 @@ private[hive] class HiveQl(conf: ParserConf)
                      properties.toMap,
                      allowExisting.isDefined,
                      replace.isDefined)
-        }
 
-      case Token("TOK_CREATETABLE", children) if children.collect {
+      case Token("TOK_CREATETABLE", children) if children.collect
             case t @ Token("TOK_QUERY", _) => t
-          }.nonEmpty =>
+          .nonEmpty =>
         // Reference: https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DDL
         val (Some(tableNameParts) :: _ /* likeTable */ :: externalTable :: Some(
         query) :: allowExisting +: _) = getClauses(
@@ -358,11 +341,11 @@ private[hive] class HiveQl(conf: ParserConf)
         // TODO add bucket support
         var tableDesc: CatalogTable = CatalogTable(
             name = tableIdentifier,
-            tableType = if (externalTable.isDefined) {
+            tableType = if (externalTable.isDefined)
               CatalogTableType.EXTERNAL_TABLE
-            } else {
+            else
               CatalogTableType.MANAGED_TABLE
-            },
+            ,
             storage = CatalogStorageFormat(
                   locationUri = None,
                   inputFormat = None,
@@ -377,13 +360,12 @@ private[hive] class HiveQl(conf: ParserConf)
           hiveConf.getVar(HiveConf.ConfVars.HIVEDEFAULTFILEFORMAT)
         // handle the default format for the storage type abbreviation
         val hiveSerDe =
-          HiveSerDe.sourceToSerDe(defaultStorageType, hiveConf).getOrElse {
+          HiveSerDe.sourceToSerDe(defaultStorageType, hiveConf).getOrElse
             HiveSerDe(
                 inputFormat = Option(
                       "org.apache.hadoop.mapred.TextInputFormat"),
                 outputFormat = Option(
                       "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat"))
-          }
 
         tableDesc = tableDesc.withNewStorage(
             inputFormat = hiveSerDe.inputFormat
@@ -392,12 +374,11 @@ private[hive] class HiveQl(conf: ParserConf)
                   tableDesc.storage.outputFormat),
             serde = hiveSerDe.serde.orElse(tableDesc.storage.serde))
 
-        children.collect {
+        children.collect
           case list @ Token("TOK_TABCOLLIST", _) =>
             val cols = nodeToColumns(list, lowerCase = true)
-            if (cols != null) {
+            if (cols != null)
               tableDesc = tableDesc.copy(schema = cols)
-            }
           case Token("TOK_TABLECOMMENT", child :: Nil) =>
             val comment = unescapeSQLString(child.text)
             // TODO support the sql text
@@ -405,22 +386,20 @@ private[hive] class HiveQl(conf: ParserConf)
           case Token(
               "TOK_TABLEPARTCOLS", list @ Token("TOK_TABCOLLIST", _) :: Nil) =>
             val cols = nodeToColumns(list.head, lowerCase = false)
-            if (cols != null) {
+            if (cols != null)
               tableDesc = tableDesc.copy(partitionColumns = cols)
-            }
           case Token("TOK_TABLEROWFORMAT",
                      Token("TOK_SERDEPROPS", child :: Nil) :: Nil) =>
             val serdeParams = new java.util.HashMap[String, String]()
-            child match {
+            child match
               case Token("TOK_TABLEROWFORMATFIELD", rowChild1 :: rowChild2) =>
                 val fieldDelim = unescapeSQLString(rowChild1.text)
                 serdeParams.put(serdeConstants.FIELD_DELIM, fieldDelim)
                 serdeParams.put(
                     serdeConstants.SERIALIZATION_FORMAT, fieldDelim)
-                if (rowChild2.length > 1) {
+                if (rowChild2.length > 1)
                   val fieldEscape = unescapeSQLString(rowChild2.head.text)
                   serdeParams.put(serdeConstants.ESCAPE_CHAR, fieldEscape)
-                }
               case Token("TOK_TABLEROWFORMATCOLLITEMS", rowChild :: Nil) =>
                 val collItemDelim = unescapeSQLString(rowChild.text)
                 serdeParams.put(serdeConstants.COLLECTION_DELIM, collItemDelim)
@@ -429,16 +408,14 @@ private[hive] class HiveQl(conf: ParserConf)
                 serdeParams.put(serdeConstants.MAPKEY_DELIM, mapKeyDelim)
               case Token("TOK_TABLEROWFORMATLINES", rowChild :: Nil) =>
                 val lineDelim = unescapeSQLString(rowChild.text)
-                if (!(lineDelim == "\n") && !(lineDelim == "10")) {
+                if (!(lineDelim == "\n") && !(lineDelim == "10"))
                   throw new AnalysisException(
                       s"LINES TERMINATED BY only supports newline '\\n' right now: $rowChild")
-                }
                 serdeParams.put(serdeConstants.LINE_DELIM, lineDelim)
               case Token("TOK_TABLEROWFORMATNULL", rowChild :: Nil) =>
                 val nullFormat = unescapeSQLString(rowChild.text)
               // TODO support the nullFormat
               case _ => assert(false)
-            }
             tableDesc = tableDesc.withNewStorage(
                 serdeProperties = tableDesc.storage.serdeProperties ++ serdeParams.asScala)
           case Token("TOK_TABLELOCATION", child :: Nil) =>
@@ -449,7 +426,7 @@ private[hive] class HiveQl(conf: ParserConf)
           case Token("TOK_TABLESERIALIZER", child :: Nil) =>
             tableDesc = tableDesc.withNewStorage(
                 serde = Option(unescapeSQLString(child.children.head.text)))
-            if (child.numChildren == 2) {
+            if (child.numChildren == 2)
               // This is based on the readProps(..) method in
               // ql/src/java/org/apache/hadoop/hive/ql/parse/BaseSemanticAnalyzer.java:
               val serdeParams = child
@@ -457,30 +434,27 @@ private[hive] class HiveQl(conf: ParserConf)
                 .children
                 .head
                 .children
-                .map {
+                .map
                   case Token(_, Token(prop, Nil) :: valueNode) =>
                     val value = valueNode.headOption
                       .map(_.text)
                       .map(unescapeSQLString)
                       .orNull
                       (unescapeSQLString(prop), value)
-                }
                 .toMap
               tableDesc = tableDesc.withNewStorage(
                   serdeProperties = tableDesc.storage.serdeProperties ++ serdeParams)
-            }
           case Token("TOK_FILEFORMAT_GENERIC", child :: Nil) =>
-            child.text.toLowerCase(Locale.ENGLISH) match {
+            child.text.toLowerCase(Locale.ENGLISH) match
               case "orc" =>
                 tableDesc = tableDesc.withNewStorage(
                     inputFormat = Option(
                           "org.apache.hadoop.hive.ql.io.orc.OrcInputFormat"),
                     outputFormat = Option(
                           "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat"))
-                if (tableDesc.storage.serde.isEmpty) {
+                if (tableDesc.storage.serde.isEmpty)
                   tableDesc = tableDesc.withNewStorage(serde = Option(
                             "org.apache.hadoop.hive.ql.io.orc.OrcSerde"))
-                }
 
               case "parquet" =>
                 tableDesc = tableDesc.withNewStorage(
@@ -488,10 +462,9 @@ private[hive] class HiveQl(conf: ParserConf)
                           "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"),
                     outputFormat = Option(
                           "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"))
-                if (tableDesc.storage.serde.isEmpty) {
+                if (tableDesc.storage.serde.isEmpty)
                   tableDesc = tableDesc.withNewStorage(serde = Option(
                             "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"))
-                }
 
               case "rcfile" =>
                 tableDesc = tableDesc.withNewStorage(
@@ -499,10 +472,9 @@ private[hive] class HiveQl(conf: ParserConf)
                           "org.apache.hadoop.hive.ql.io.RCFileInputFormat"),
                     outputFormat = Option(
                           "org.apache.hadoop.hive.ql.io.RCFileOutputFormat"))
-                if (tableDesc.storage.serde.isEmpty) {
+                if (tableDesc.storage.serde.isEmpty)
                   tableDesc = tableDesc.withNewStorage(serde = Option(
                             "org.apache.hadoop.hive.serde2.columnar.LazyBinaryColumnarSerDe"))
-                }
 
               case "textfile" =>
                 tableDesc = tableDesc.withNewStorage(
@@ -524,15 +496,13 @@ private[hive] class HiveQl(conf: ParserConf)
                           "org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat"),
                     outputFormat = Option(
                           "org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat"))
-                if (tableDesc.storage.serde.isEmpty) {
+                if (tableDesc.storage.serde.isEmpty)
                   tableDesc = tableDesc.withNewStorage(serde = Option(
                             "org.apache.hadoop.hive.serde2.avro.AvroSerDe"))
-                }
 
               case _ =>
                 throw new AnalysisException(
                     s"Unrecognized file format in STORED AS clause: ${child.text}")
-            }
 
           case Token("TOK_TABLESERIALIZER",
                      Token("TOK_SERDENAME",
@@ -540,13 +510,12 @@ private[hive] class HiveQl(conf: ParserConf)
             tableDesc = tableDesc.withNewStorage(
                 serde = Option(unquoteString(serdeName)))
 
-            otherProps match {
+            otherProps match
               case Token("TOK_TABLEPROPERTIES", list :: Nil) :: Nil =>
                 tableDesc = tableDesc.withNewStorage(
                     serdeProperties = tableDesc.storage.serdeProperties ++ getProperties(
                           list))
               case _ =>
-            }
 
           case Token("TOK_TABLEPROPERTIES", list :: Nil) =>
             tableDesc = tableDesc.copy(
@@ -561,7 +530,6 @@ private[hive] class HiveQl(conf: ParserConf)
             throw new AnalysisException(
                 "CREATE TABLE AS SELECT cannot be used for a non-native table")
           case _ => // Unsupported features
-        }
 
         CreateTableAsSelect(
             tableDesc, nodeToPlan(query), allowExisting.isDefined)
@@ -577,15 +545,13 @@ private[hive] class HiveQl(conf: ParserConf)
 
       case _ =>
         super.nodeToPlan(node)
-    }
-  }
 
   protected override def nodeToDescribeFallback(node: ASTNode): LogicalPlan =
     NativePlaceholder
 
   protected override def nodeToTransformation(
       node: ASTNode,
-      child: LogicalPlan): Option[logical.ScriptTransformation] = node match {
+      child: LogicalPlan): Option[logical.ScriptTransformation] = node match
     case Token(
         "TOK_SELEXPR",
         Token(
@@ -596,25 +562,24 @@ private[hive] class HiveQl(conf: ParserConf)
         // TODO: Need to support other types of (in/out)put
         Token(script, Nil) :: Token("TOK_SERDE", outputSerdeClause) :: Token(
         "TOK_RECORDREADER", readerClause) :: outputClause) :: Nil) =>
-      val (output, schemaLess) = outputClause match {
+      val (output, schemaLess) = outputClause match
         case Token("TOK_ALIASLIST", aliases) :: Nil =>
-          (aliases.map {
+          (aliases.map
             case Token(name, Nil) =>
               AttributeReference(cleanIdentifier(name), StringType)()
-          }, false)
+          , false)
         case Token("TOK_TABCOLLIST", attributes) :: Nil =>
-          (attributes.map {
+          (attributes.map
             case Token("TOK_TABCOL", Token(name, Nil) :: dataType :: Nil) =>
               AttributeReference(cleanIdentifier(name),
                                  nodeToDataType(dataType))()
-          }, false)
+          , false)
         case Nil =>
           (List(AttributeReference("key", StringType)(),
                 AttributeReference("value", StringType)()),
            true)
         case _ =>
           noParseRule("Transform", node)
-      }
 
       type SerDeInfo = (Seq[(String, String)], // Input row format information
       Option[String], // Optional input SerDe class
@@ -622,11 +587,10 @@ private[hive] class HiveQl(conf: ParserConf)
       Boolean // Whether to use default record reader/writer
       )
 
-      def matchSerDe(clause: Seq[ASTNode]): SerDeInfo = clause match {
+      def matchSerDe(clause: Seq[ASTNode]): SerDeInfo = clause match
         case Token("TOK_SERDEPROPS", propsClause) :: Nil =>
-          val rowFormat = propsClause.map {
+          val rowFormat = propsClause.map
             case Token(name, Token(value, Nil) :: Nil) => (name, value)
-          }
           (rowFormat, None, Nil, false)
 
         case Token("TOK_SERDENAME", Token(serdeClass, Nil) :: Nil) :: Nil =>
@@ -637,11 +601,10 @@ private[hive] class HiveQl(conf: ParserConf)
             Token(serdeClass, Nil) :: Token(
             "TOK_TABLEPROPERTIES",
             Token("TOK_TABLEPROPLIST", propsClause) :: Nil) :: Nil) :: Nil =>
-          val serdeProps = propsClause.map {
+          val serdeProps = propsClause.map
             case Token("TOK_TABLEPROPERTY",
                        Token(name, Nil) :: Token(value, Nil) :: Nil) =>
               (unescapeSQLString(name), unescapeSQLString(value))
-          }
 
           // SPARK-10310: Special cases LazySimpleSerDe
           // TODO Fully supports user-defined record reader/writer classes
@@ -660,7 +623,6 @@ private[hive] class HiveQl(conf: ParserConf)
            Option(hiveConf.getVar(ConfVars.HIVESCRIPTSERDE)),
            serdeProps,
            true)
-      }
 
       val (inRowFormat, inSerdeClass, inSerdeProps, useDefaultRecordReader) =
         matchSerDe(inputSerdeClause)
@@ -672,18 +634,16 @@ private[hive] class HiveQl(conf: ParserConf)
 
       // TODO Adds support for user-defined record reader/writer classes
       val recordReaderClass =
-        if (useDefaultRecordReader) {
+        if (useDefaultRecordReader)
           Option(hiveConf.getVar(ConfVars.HIVESCRIPTRECORDREADER))
-        } else {
+        else
           None
-        }
 
       val recordWriterClass =
-        if (useDefaultRecordWriter) {
+        if (useDefaultRecordWriter)
           Option(hiveConf.getVar(ConfVars.HIVESCRIPTRECORDWRITER))
-        } else {
+        else
           None
-        }
 
       val schema = HiveScriptIOSchema(inRowFormat,
                                       outRowFormat,
@@ -702,10 +662,9 @@ private[hive] class HiveQl(conf: ParserConf)
                                        child,
                                        schema))
     case _ => None
-  }
 
   protected override def nodeToGenerator(node: ASTNode): Generator =
-    node match {
+    node match
       case Token("TOK_FUNCTION", Token(functionName, Nil) :: children) =>
         val functionInfo: FunctionInfo =
           Option(FunctionRegistry.getFunctionInfo(functionName.toLowerCase))
@@ -715,21 +674,18 @@ private[hive] class HiveQl(conf: ParserConf)
                         new HiveFunctionWrapper(functionClassName),
                         children.map(nodeToExpr))
       case other => super.nodeToGenerator(node)
-    }
 
   // This is based the getColumns methods in
   // ql/src/java/org/apache/hadoop/hive/ql/parse/BaseSemanticAnalyzer.java
   protected def nodeToColumns(
-      node: ASTNode, lowerCase: Boolean): Seq[CatalogColumn] = {
-    node.children.map(_.children).collect {
+      node: ASTNode, lowerCase: Boolean): Seq[CatalogColumn] =
+    node.children.map(_.children).collect
       case Token(rawColName, Nil) :: colTypeNode :: comment =>
         val colName = if (!lowerCase) rawColName else rawColName.toLowerCase
         CatalogColumn(name = cleanIdentifier(colName),
                       dataType = nodeToTypeString(colTypeNode),
                       nullable = true,
                       comment.headOption.map(n => unescapeSQLString(n.text)))
-    }
-  }
 
   // This is based on the following methods in
   // ql/src/java/org/apache/hadoop/hive/ql/parse/BaseSemanticAnalyzer.java:
@@ -737,7 +693,7 @@ private[hive] class HiveQl(conf: ParserConf)
   //  getStructTypeStringFromAST
   //  getUnionTypeStringFromAST
   protected def nodeToTypeString(node: ASTNode): String =
-    node.tokenType match {
+    node.tokenType match
       case SparkSqlParser.TOK_LIST =>
         val listType :: Nil = node.children
         val listTypeString = nodeToTypeString(listType)
@@ -753,10 +709,9 @@ private[hive] class HiveQl(conf: ParserConf)
         val typeNode = node.children.head
         require(typeNode.children.nonEmpty,
                 "Struct must have one or more columns.")
-        val structColStrings = typeNode.children.map { columnNode =>
+        val structColStrings = typeNode.children.map  columnNode =>
           val Token(colName, Nil) :: colTypeNode :: Nil = columnNode.children
           cleanIdentifier(colName) + ":" + nodeToTypeString(colTypeNode)
-        }
         s"${serdeConstants.STRUCT_TYPE_NAME}<${structColStrings.mkString(",")}>"
 
       case SparkSqlParser.TOK_UNIONTYPE =>
@@ -774,7 +729,7 @@ private[hive] class HiveQl(conf: ParserConf)
         s"${serdeConstants.VARCHAR_TYPE_NAME}($size)"
 
       case SparkSqlParser.TOK_DECIMAL =>
-        val precisionAndScale = node.children match {
+        val precisionAndScale = node.children match
           case Token(precision, Nil) :: Token(scale, Nil) :: Nil =>
             precision + "," + scale
           case Token(precision, Nil) :: Nil =>
@@ -784,7 +739,6 @@ private[hive] class HiveQl(conf: ParserConf)
             HiveDecimal.USER_DEFAULT_SCALE
           case _ =>
             noParseRule("Decimal", node)
-        }
         s"${serdeConstants.DECIMAL_TYPE_NAME}($precisionAndScale)"
 
       // Simple data types.
@@ -805,5 +759,3 @@ private[hive] class HiveQl(conf: ParserConf)
         serdeConstants.INTERVAL_DAY_TIME_TYPE_NAME
       case SparkSqlParser.TOK_DATETIME => serdeConstants.DATETIME_TYPE_NAME
       case _ => null
-    }
-}

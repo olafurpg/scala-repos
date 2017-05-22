@@ -20,7 +20,7 @@ import akka.remote.testconductor.RoleName
 import akka.actor.Identify
 import scala.concurrent.Await
 
-object RemoteGatePiercingSpec extends MultiNodeConfig {
+object RemoteGatePiercingSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -38,70 +38,58 @@ object RemoteGatePiercingSpec extends MultiNodeConfig {
 
   testTransport(on = true)
 
-  class Subject extends Actor {
-    def receive = {
+  class Subject extends Actor
+    def receive =
       case "shutdown" ⇒ context.system.terminate()
-    }
-  }
-}
 
 class RemoteGatePiercingSpecMultiJvmNode1 extends RemoteGatePiercingSpec
 class RemoteGatePiercingSpecMultiJvmNode2 extends RemoteGatePiercingSpec
 
 abstract class RemoteGatePiercingSpec
     extends MultiNodeSpec(RemoteGatePiercingSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import RemoteGatePiercingSpec._
 
   override def initialParticipants = 2
 
-  def identify(role: RoleName, actorName: String): ActorRef = {
+  def identify(role: RoleName, actorName: String): ActorRef =
     system.actorSelection(node(role) / "user" / actorName) ! Identify(
         actorName)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  "RemoteGatePiercing" must {
+  "RemoteGatePiercing" must
 
-    "allow restarted node to pass through gate" taggedAs LongRunningTest in {
+    "allow restarted node to pass through gate" taggedAs LongRunningTest in
       system.actorOf(Props[Subject], "subject")
       enterBarrier("actors-started")
 
-      runOn(first) {
+      runOn(first)
         identify(second, "subject")
 
         enterBarrier("actors-communicate")
 
         EventFilter
           .warning(pattern = "address is now gated", occurrences = 1)
-          .intercept {
+          .intercept
             Await.result(
                 RARP(system).provider.transport.managementCommand(
                     ForceDisassociateExplicitly(node(second).address,
                                                 AssociationHandle.Unknown)),
                 3.seconds)
-          }
 
         enterBarrier("gated")
 
         enterBarrier("gate-pierced")
-      }
 
-      runOn(second) {
+      runOn(second)
         enterBarrier("actors-communicate")
 
         enterBarrier("gated")
 
         // Pierce the gate
-        within(30.seconds) {
-          awaitAssert {
+        within(30.seconds)
+          awaitAssert
             identify(first, "subject")
-          }
-        }
 
         enterBarrier("gate-pierced")
-      }
-    }
-  }
-}

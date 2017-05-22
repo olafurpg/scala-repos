@@ -20,7 +20,7 @@ package scala.scalajs.js
   * MDN
   */
 @native
-object JSON extends Object {
+object JSON extends Object
 
   /**
     * Parse a string as JSON, optionally transforming the value produced by parsing.
@@ -52,4 +52,3 @@ object JSON extends Object {
                 space: Any = ???): String = native
   def stringify(value: Any, replacer: Array[Any]): String = native
   def stringify(value: Any, replacer: Array[Any], space: Any): String = native
-}

@@ -1,15 +1,14 @@
 package java.lang
 
 class StringBuffer(private var content: String)
-    extends CharSequence with Appendable with java.io.Serializable {
+    extends CharSequence with Appendable with java.io.Serializable
   def this() = this("")
   def this(initialCapacity: Int) = this("")
   def this(csq: CharSequence) = this(csq.toString)
 
-  def append(s: String): StringBuffer = {
+  def append(s: String): StringBuffer =
     content += { if (s == null) "null" else s }
     this
-  }
 
   def append(b: scala.Boolean): StringBuffer = append(b.toString())
   def append(c: scala.Char): StringBuffer = append(c.toString())
@@ -17,14 +16,12 @@ class StringBuffer(private var content: String)
   def append(str: Array[scala.Char]): StringBuffer =
     append(str, 0, str.length)
 
-  def append(str: Array[scala.Char], offset: Int, len: Int): StringBuffer = {
+  def append(str: Array[scala.Char], offset: Int, len: Int): StringBuffer =
     var i = 0
-    while (i < len) {
+    while (i < len)
       content += str(i + offset)
       i += 1
-    }
     this
-  }
 
   def append(b: scala.Byte): StringBuffer = append(b.toString())
   def append(s: scala.Short): StringBuffer = append(s.toString())
@@ -33,16 +30,14 @@ class StringBuffer(private var content: String)
   def append(f: scala.Float): StringBuffer = append(f.toString())
   def append(d: scala.Double): StringBuffer = append(d.toString())
 
-  def append(obj: AnyRef): StringBuffer = {
+  def append(obj: AnyRef): StringBuffer =
     if (obj == null) append(null: String)
     else append(obj.toString())
-  }
 
   def append(csq: CharSequence): StringBuffer = append(csq: AnyRef)
-  def append(csq: CharSequence, start: Int, end: Int): StringBuffer = {
+  def append(csq: CharSequence, start: Int, end: Int): StringBuffer =
     if (csq == null) append("null", start, end)
     else append(csq.subSequence(start, end).toString())
-  }
 
   def appendCodePoint(codePoint: Int): StringBuffer =
     append(Character.toChars(codePoint))
@@ -68,22 +63,19 @@ class StringBuffer(private var content: String)
   def substring(start: Int): String = content.substring(start)
   def substring(start: Int, end: Int): String = content.substring(start, end)
 
-  def reverse(): StringBuffer = {
+  def reverse(): StringBuffer =
     content = new StringBuilder(content).reverse().toString()
     this
-  }
 
-  def deleteCharAt(index: Int): StringBuffer = {
+  def deleteCharAt(index: Int): StringBuffer =
     if (index < 0 || index >= content.length)
       throw new StringIndexOutOfBoundsException(
           "String index out of range: " + index)
     content = content.substring(0, index) + content.substring(index + 1)
     this
-  }
 
-  def ensureCapacity(minimumCapacity: Int): Unit = {
+  def ensureCapacity(minimumCapacity: Int): Unit =
     // Do nothing
-  }
 
   /**
     * @param start The beginning index, inclusive.
@@ -91,41 +83,35 @@ class StringBuffer(private var content: String)
     * @param str String that will replace previous contents.
     * @return This StringBuilder.
     */
-  def replace(start: Int, end: Int, str: String): StringBuffer = {
+  def replace(start: Int, end: Int, str: String): StringBuffer =
     val length = content.length
-    if (start < 0 || start > end || start > length) {
+    if (start < 0 || start > end || start > length)
       throw new StringIndexOutOfBoundsException(
           s"Illegal to replace substring at [$start - $end] in string of length $length")
-    }
 
     val realEnd = if (end > length) length else end // java api convention
     content = content.substring(0, start) + str + content.substring(realEnd)
     this
-  }
 
-  def setCharAt(index: Int, ch: scala.Char): Unit = {
+  def setCharAt(index: Int, ch: scala.Char): Unit =
     if (index < 0 || index >= content.length)
       throw new IndexOutOfBoundsException(
           "String index out of range: " + index)
     content = content.substring(0, index) + ch + content.substring(index + 1)
-  }
 
-  def setLength(newLength: Int): Unit = {
+  def setLength(newLength: Int): Unit =
     if (newLength < 0)
       throw new IndexOutOfBoundsException(
           "String index out of range: " + newLength)
 
     val len = length()
-    if (len == newLength) {} else if (len < newLength) {
+    if (len == newLength) {} else if (len < newLength)
       var index = len
-      while (index < newLength) {
+      while (index < newLength)
         append("\u0000")
         index += 1
-      }
-    } else {
+    else
       content = substring(0, newLength)
-    }
-  }
 
   def insert(index: Int, b: scala.Boolean): StringBuffer =
     insert(index, b.toString)
@@ -160,17 +146,15 @@ class StringBuffer(private var content: String)
   def insert(index: Int,
              arr: Array[scala.Char],
              offset: Int,
-             len: Int): StringBuffer = {
+             len: Int): StringBuffer =
     var str = ""
     var i = 0
-    while (i < len) {
+    while (i < len)
       str += arr(i + offset)
       i += 1
-    }
     insert(index, str)
-  }
 
-  def insert(index: Int, str: String): StringBuffer = {
+  def insert(index: Int, str: String): StringBuffer =
     val thisLength = length()
     if (index < 0 || index > thisLength)
       throw new StringIndexOutOfBoundsException(index)
@@ -179,5 +163,3 @@ class StringBuffer(private var content: String)
       content = content.substring(0, index) + Option(str).getOrElse("null") +
       content.substring(index)
     this
-  }
-}

@@ -37,7 +37,7 @@ object TransformationIncludes extends TransformationIncludes
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/transformation/package-summary.html javafx.collections.transformation]]
   * Classes to their ScalaFX counterparts.
   */
-trait TransformationIncludes {
+trait TransformationIncludes
 
   implicit def sortedList2SortedBuffer[T](
       ol: jfxct.SortedList[T]): SortedBuffer[T] =
@@ -48,4 +48,3 @@ trait TransformationIncludes {
       ol: jfxct.FilteredList[T]): FilteredBuffer[T] =
     if (ol != null) new FilteredBuffer[T](ol)
     else null
-}

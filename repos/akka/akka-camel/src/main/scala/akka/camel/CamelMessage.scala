@@ -19,7 +19,7 @@ import akka.dispatch.Mapper
 class CamelMessage(val body: Any,
                    val headers: Map[String, Any],
                    val attachments: Map[String, DataHandler])
-    extends Serializable with Product {
+    extends Serializable with Product
   def this(body: Any, headers: JMap[String, Any]) =
     this(body, headers.toMap, Map.empty[String, DataHandler]) //Java
   def this(body: Any,
@@ -123,22 +123,20 @@ class CamelMessage(val body: Any,
     * The CamelContext is accessible in a [[akka.camel.javaapi.UntypedConsumerActor]] and [[akka.camel.javaapi.UntypedProducerActor]]
     * using the `getCamelContext` method, and is available on the [[akka.camel.CamelExtension]].
     */
-  def getBodyAs[T](clazz: Class[T], camelContext: CamelContext): T = {
+  def getBodyAs[T](clazz: Class[T], camelContext: CamelContext): T =
     val result =
       camelContext.getTypeConverter.mandatoryConvertTo[T](clazz, body)
     // to be able to re-read a StreamCache we must "undo" the side effect by resetting the StreamCache
     resetStreamCache()
     result
-  }
 
   /**
     * Reset StreamCache body. Nothing is done if the body is not a StreamCache.
     * See http://camel.apache.org/stream-caching.html
     */
-  def resetStreamCache(): Unit = body match {
+  def resetStreamCache(): Unit = body match
     case stream: StreamCache ⇒ stream.reset
     case _ ⇒
-  }
 
   /**
     * Java API: Returns a new CamelMessage with a new body, while keeping the same headers.
@@ -201,12 +199,11 @@ class CamelMessage(val body: Any,
     * Indicates whether some other object is "equal to" this one.
     */
   override def equals(that: Any): Boolean =
-    that match {
+    that match
       case that: CamelMessage if canEqual(that) ⇒
         this.body == that.body && this.headers == that.headers &&
         this.attachments == that.attachments
       case _ ⇒ false
-    }
 
   /**
     * Returns a hash code value for the object.
@@ -216,11 +213,10 @@ class CamelMessage(val body: Any,
   /**
     * Returns the n-th element of this product, 0-based.
     */
-  override def productElement(n: Int): Any = n match {
+  override def productElement(n: Int): Any = n match
     case 0 ⇒ body
     case 1 ⇒ headers
     case 2 ⇒ attachments
-  }
 
   /**
     * Returns the size of this product.
@@ -231,16 +227,14 @@ class CamelMessage(val body: Any,
     * Indicates if some other object can be compared (based on type).
     * This method should be called from every well-designed equals method that is open to be overridden in a subclass.
     */
-  override def canEqual(that: Any): Boolean = that match {
+  override def canEqual(that: Any): Boolean = that match
     case _: CamelMessage ⇒ true
     case _ ⇒ false
-  }
-}
 
 /**
   * Companion object of CamelMessage class.
   */
-object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage) {
+object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage)
 
   /**
     * Returns a new CamelMessage based on the <code>body</code> and <code>headers</code>.
@@ -276,10 +270,9 @@ object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage) {
     * CamelMessage then <code>msg</code> is returned, otherwise <code>msg</code> is set as body of a
     * newly created CamelMessage object.
     */
-  private[camel] def canonicalize(msg: Any) = msg match {
+  private[camel] def canonicalize(msg: Any) = msg match
     case mobj: CamelMessage ⇒ mobj
     case body ⇒ CamelMessage(body, Map.empty[String, Any])
-  }
 
   /**
     * Creates a new CamelMessage object from the Camel message.
@@ -313,23 +306,20 @@ object CamelMessage extends ((Any, Map[String, Any]) ⇒ CamelMessage) {
     * INTERNAL API
     * copies the content of this CamelMessageWithAttachments to an Apache Camel Message.
     */
-  private[camel] def copyContent(from: CamelMessage, to: JCamelMessage): Unit = {
+  private[camel] def copyContent(from: CamelMessage, to: JCamelMessage): Unit =
     to.setBody(from.body)
     for ((name, value) ← from.headers) to.getHeaders.put(
         name, value.asInstanceOf[AnyRef])
     to.getAttachments.putAll(from.getAttachments)
-  }
-}
 
 /**
   * Positive acknowledgement message (used for application-acknowledged message receipts).
   * When `autoAck` is set to false in the [[akka.camel.Consumer]], you can send an `Ack` to the sender of the CamelMessage.
   */
-case object Ack {
+case object Ack
 
   /** Java API to get the Ack singleton */
   def getInstance = this
-}
 
 /**
   * An exception indicating that the exchange to the camel endpoint failed.
@@ -338,6 +328,5 @@ case object Ack {
   */
 class AkkaCamelException private[akka](
     cause: Throwable, val headers: Map[String, Any])
-    extends AkkaException(cause.getMessage, cause) {
+    extends AkkaException(cause.getMessage, cause)
   def this(cause: Throwable) = this(cause, Map.empty)
-}

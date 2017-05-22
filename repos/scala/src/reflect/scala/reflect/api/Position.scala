@@ -51,7 +51,7 @@ import scala.reflect.macros.Attachments
   *  @groupname Common   Commonly used methods
   *  @group ReflectionAPI
   */
-trait Position extends Attachments {
+trait Position extends Attachments
 
   /** @inheritdoc */
   type Pos >: Null <: AnyRef with Position
@@ -220,4 +220,3 @@ trait Position extends Attachments {
     */
   @deprecated("Use `universe.show(position)` instead", "2.11.0")
   def show: String
-}

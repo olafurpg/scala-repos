@@ -24,63 +24,56 @@ import org.apache.spark.ui.SparkUI
 import org.apache.spark.ui.storage.StorageListener
 
 @Produces(Array(MediaType.APPLICATION_JSON))
-private[v1] class AllRDDResource(ui: SparkUI) {
+private[v1] class AllRDDResource(ui: SparkUI)
 
   @GET
-  def rddList(): Seq[RDDStorageInfo] = {
+  def rddList(): Seq[RDDStorageInfo] =
     val storageStatusList = ui.storageListener.activeStorageStatusList
     val rddInfos = ui.storageListener.rddInfoList
-    rddInfos.map { rddInfo =>
+    rddInfos.map  rddInfo =>
       AllRDDResource.getRDDStorageInfo(
           rddInfo.id, rddInfo, storageStatusList, includeDetails = false)
-    }
-  }
-}
 
-private[spark] object AllRDDResource {
+private[spark] object AllRDDResource
 
   def getRDDStorageInfo(rddId: Int,
                         listener: StorageListener,
-                        includeDetails: Boolean): Option[RDDStorageInfo] = {
+                        includeDetails: Boolean): Option[RDDStorageInfo] =
     val storageStatusList = listener.activeStorageStatusList
-    listener.rddInfoList.find { _.id == rddId }.map { rddInfo =>
+    listener.rddInfoList.find { _.id == rddId }.map  rddInfo =>
       getRDDStorageInfo(rddId, rddInfo, storageStatusList, includeDetails)
-    }
-  }
 
   def getRDDStorageInfo(rddId: Int,
                         rddInfo: RDDInfo,
                         storageStatusList: Seq[StorageStatus],
-                        includeDetails: Boolean): RDDStorageInfo = {
+                        includeDetails: Boolean): RDDStorageInfo =
     val workers = storageStatusList.map { (rddId, _) }
     val blockLocations =
       StorageUtils.getRddBlockLocations(rddId, storageStatusList)
-    val blocks = storageStatusList.flatMap { _.rddBlocksById(rddId) }.sortWith {
+    val blocks = storageStatusList.flatMap { _.rddBlocksById(rddId) }.sortWith
       _._1.name < _._1.name
-    }.map {
+    .map
       case (blockId, status) =>
         (blockId,
          status,
          blockLocations.getOrElse(blockId, Seq[String]("Unknown")))
-    }
 
     val dataDistribution =
-      if (includeDetails) {
+      if (includeDetails)
         Some(
-            storageStatusList.map { status =>
+            storageStatusList.map  status =>
           new RDDDataDistribution(
               address = status.blockManagerId.hostPort,
               memoryUsed = status.memUsedByRdd(rddId),
               memoryRemaining = status.memRemaining,
               diskUsed = status.diskUsedByRdd(rddId)
           )
-        })
-      } else {
+        )
+      else
         None
-      }
     val partitions =
-      if (includeDetails) {
-        Some(blocks.map {
+      if (includeDetails)
+        Some(blocks.map
           case (id, block, locations) =>
             new RDDPartitionInfo(
                 blockName = id.name,
@@ -89,10 +82,9 @@ private[spark] object AllRDDResource {
                 diskUsed = block.diskSize,
                 executors = locations
             )
-        })
-      } else {
+        )
+      else
         None
-      }
 
     new RDDStorageInfo(
         id = rddId,
@@ -105,5 +97,3 @@ private[spark] object AllRDDResource {
         dataDistribution = dataDistribution,
         partitions = partitions
     )
-  }
-}

@@ -41,7 +41,7 @@ import scala.tools.nsc.util.InterruptReq
   *  action is aborted. If there's an outstanding response, it will be set to
   *  a Right value with a FreshRunReq exception.
   */
-trait CompilerControl { self: Global =>
+trait CompilerControl  self: Global =>
 
   type Response[T] = scala.tools.nsc.interactive.Response[T]
 
@@ -65,25 +65,22 @@ trait CompilerControl { self: Global =>
   /** Removes the CompilationUnit corresponding to the given SourceFile
     *  from consideration for recompilation.
     */
-  def removeUnitOf(s: SourceFile): Option[RichCompilationUnit] = {
+  def removeUnitOf(s: SourceFile): Option[RichCompilationUnit] =
     toBeRemoved += s.file; unitOfFile get s.file
-  }
 
   /** Returns the top level classes and objects that were deleted
     * in the editor since last time recentlyDeleted() was called.
     */
-  def recentlyDeleted(): List[Symbol] = deletedTopLevelSyms.synchronized {
+  def recentlyDeleted(): List[Symbol] = deletedTopLevelSyms.synchronized
     val result = deletedTopLevelSyms
     deletedTopLevelSyms.clear()
     result.toList
-  }
 
   /** Locate smallest tree that encloses position
     *  @pre Position must be loaded
     */
-  def locateTree(pos: Position): Tree = onUnitOf(pos.source) { unit =>
+  def locateTree(pos: Position): Tree = onUnitOf(pos.source)  unit =>
     new Locator(pos) locateIn unit.body
-  }
 
   /** Locates smallest context that encloses position as an optional value.
     */
@@ -93,9 +90,8 @@ trait CompilerControl { self: Global =>
 
   /** Returns the smallest context that contains given `pos`, throws FatalError if none exists.
     */
-  def doLocateContext(pos: Position): Context = locateContext(pos) getOrElse {
+  def doLocateContext(pos: Position): Context = locateContext(pos) getOrElse
     throw new FatalError("no context found for " + pos)
-  }
 
   private def postWorkItem(item: WorkItem) =
     if (item.onCompilerThread) item() else scheduler.postWorkItem(item)
@@ -105,21 +101,18 @@ trait CompilerControl { self: Global =>
     *  Afterwards a new background compiler run is started with
     *  the given sources at the head of the list of to-be-compiled sources.
     */
-  def askReload(sources: List[SourceFile], response: Response[Unit]) = {
-    val superseeded = scheduler.dequeueAll {
+  def askReload(sources: List[SourceFile], response: Response[Unit]) =
+    val superseeded = scheduler.dequeueAll
       case ri: ReloadItem if ri.sources == sources => Some(ri)
       case _ => None
-    }
     superseeded.foreach(_.response.set(()))
     postWorkItem(new ReloadItem(sources, response))
-  }
 
   /** Removes source files and toplevel symbols, and issues a new typer run.
     *  Returns () to syncvar `response` on completion.
     */
-  def askFilesDeleted(sources: List[SourceFile], response: Response[Unit]) = {
+  def askFilesDeleted(sources: List[SourceFile], response: Response[Unit]) =
     postWorkItem(new FilesDeletedItem(sources, response))
-  }
 
   /** Sets sync var `response` to the smallest fully attributed tree that encloses position `pos`.
     *  Note: Unlike for most other ask... operations, the source file belonging to `pos` needs not be loaded.
@@ -226,12 +219,10 @@ trait CompilerControl { self: Global =>
     *  @param keepSrcLoaded If set to `true`, source file will be kept as a loaded unit afterwards.
     */
   def askStructure(keepSrcLoaded: Boolean)(
-      source: SourceFile, response: Response[Tree]) = {
-    getUnit(source) match {
+      source: SourceFile, response: Response[Tree]) =
+    getUnit(source) match
       case Some(_) => askLoadedTyped(source, keepSrcLoaded, response)
       case None => askParsedEntered(source, keepSrcLoaded, response)
-    }
-  }
 
   /** Set sync var `response` to the parse tree of `source` with all top-level symbols entered.
     *  @param source       The source file to be analyzed
@@ -257,9 +248,8 @@ trait CompilerControl { self: Global =>
     *  This method is thread-safe and as such can safely run outside of the presentation
     *  compiler thread.
     */
-  def parseTree(source: SourceFile): Tree = {
+  def parseTree(source: SourceFile): Tree =
     newUnitParser(new CompilationUnit(source)).parse()
-  }
 
   /** Asks for a computation to be done quickly on the presentation compiler thread */
   def ask[A](op: () => A): A =
@@ -268,26 +258,23 @@ trait CompilerControl { self: Global =>
   /** Asks for a computation to be done on presentation compiler thread, returning
     *  a response with the result or an exception
     */
-  def askForResponse[A](op: () => A): Response[A] = {
+  def askForResponse[A](op: () => A): Response[A] =
     val r = new Response[A]
-    if (self.onCompilerThread) {
+    if (self.onCompilerThread)
       try { r set op() } catch { case exc: Throwable => r raise exc }
       r
-    } else {
+    else
       val ir = scheduler askDoQuickly op
-      ir onComplete {
+      ir onComplete
         case Left(result) => r set result
         case Right(exc) => r raise exc
-      }
       r
-    }
-  }
 
   def onCompilerThread = Thread.currentThread == compileRunner
 
   /** Info given for every member found by completion
     */
-  abstract class Member {
+  abstract class Member
     def prefix: Type
     val sym: Symbol
     val tpe: Type
@@ -296,125 +283,111 @@ trait CompilerControl { self: Global =>
     def symNameDropLocal: Name = sym.name.dropLocal
 
     private def accessible_s = if (accessible) "" else "[inaccessible] "
-    def forceInfoString = {
+    def forceInfoString =
       definitions.fullyInitializeSymbol(sym)
       definitions.fullyInitializeType(tpe)
       infoString
-    }
     def infoString = s"$accessible_s${sym.defStringSeenAs(tpe)}"
-  }
 
   case class TypeMember(sym: Symbol,
                         tpe: Type,
                         accessible: Boolean,
                         inherited: Boolean,
                         viaView: Symbol)
-      extends Member {
+      extends Member
     // should be a case class parameter, but added as a var instead to preserve compatibility with the IDE
     var prefix: Type = NoType
     override def implicitlyAdded = viaView != NoSymbol
-  }
 
   case class ScopeMember(
       sym: Symbol, tpe: Type, accessible: Boolean, viaImport: Tree)
-      extends Member {
+      extends Member
     // should be a case class parameter, but added as a var instead to preserve compatibility with the IDE
     var prefix: Type = NoType
-  }
 
   // items that get sent to scheduler
 
-  abstract class WorkItem extends (() => Unit) {
+  abstract class WorkItem extends (() => Unit)
     val onCompilerThread = self.onCompilerThread
 
     /** Raise a MissingResponse, if the work item carries a response. */
     def raiseMissing(): Unit
-  }
 
   case class ReloadItem(sources: List[SourceFile], response: Response[Unit])
-      extends WorkItem {
+      extends WorkItem
     def apply() = reload(sources, response)
     override def toString = "reload " + sources
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class FilesDeletedItem(
       sources: List[SourceFile], response: Response[Unit])
-      extends WorkItem {
+      extends WorkItem
     def apply() = filesDeleted(sources, response)
     override def toString = "files deleted " + sources
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class AskTypeAtItem(pos: Position, response: Response[Tree])
-      extends WorkItem {
+      extends WorkItem
     def apply() = self.getTypedTreeAt(pos, response)
     override def toString = "typeat " + pos.source + " " + pos.show
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class AskTypeItem(
       source: SourceFile, forceReload: Boolean, response: Response[Tree])
-      extends WorkItem {
+      extends WorkItem
     def apply() = self.getTypedTree(source, forceReload, response)
     override def toString = "typecheck"
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class AskTypeCompletionItem(
       pos: Position, response: Response[List[Member]])
-      extends WorkItem {
+      extends WorkItem
     def apply() = self.getTypeCompletion(pos, response)
     override def toString = "type completion " + pos.source + " " + pos.show
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class AskScopeCompletionItem(
       pos: Position, response: Response[List[Member]])
-      extends WorkItem {
+      extends WorkItem
     def apply() = self.getScopeCompletion(pos, response)
     override def toString = "scope completion " + pos.source + " " + pos.show
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
-  class AskToDoFirstItem(val source: SourceFile) extends WorkItem {
-    def apply() = {
+  class AskToDoFirstItem(val source: SourceFile) extends WorkItem
+    def apply() =
       moveToFront(List(source))
       enableIgnoredFile(source.file)
-    }
     override def toString = "dofirst " + source
 
     def raiseMissing() = ()
-  }
 
   case class AskLinkPosItem(
       sym: Symbol, source: SourceFile, response: Response[Position])
-      extends WorkItem {
+      extends WorkItem
     def apply() = self.getLinkPos(sym, source, response)
     override def toString = "linkpos " + sym + " in " + source
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class AskDocCommentItem(sym: Symbol,
                                source: SourceFile,
                                site: Symbol,
                                fragments: List[(Symbol, SourceFile)],
                                response: Response[(String, String, Position)])
-      extends WorkItem {
+      extends WorkItem
     def apply() = self.getDocComment(sym, source, site, fragments, response)
     override def toString =
       "doc comment " + sym + " in " + source + " with fragments:" +
@@ -422,22 +395,20 @@ trait CompilerControl { self: Global =>
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class AskLoadedTypedItem(
       source: SourceFile, keepLoaded: Boolean, response: Response[Tree])
-      extends WorkItem {
+      extends WorkItem
     def apply() =
       self.waitLoadedTyped(source, response, keepLoaded, this.onCompilerThread)
     override def toString = "wait loaded & typed " + source
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   case class AskParsedEnteredItem(
       source: SourceFile, keepLoaded: Boolean, response: Response[Tree])
-      extends WorkItem {
+      extends WorkItem
     def apply() =
       self.getParsedEntered(
           source, keepLoaded, response, this.onCompilerThread)
@@ -446,38 +417,30 @@ trait CompilerControl { self: Global =>
 
     def raiseMissing() =
       response raise new MissingResponse
-  }
 
   /** A do-nothing work scheduler that responds immediately with MissingResponse.
     *
     *  Used during compiler shutdown.
     */
-  class NoWorkScheduler extends WorkScheduler {
+  class NoWorkScheduler extends WorkScheduler
 
-    override def postWorkItem(action: Action) = synchronized {
-      action match {
+    override def postWorkItem(action: Action) = synchronized
+      action match
         case w: WorkItem => w.raiseMissing()
         case e: EmptyAction => // do nothing
         case _ => println("don't know what to do with this " + action.getClass)
-      }
-    }
 
-    override def doQuickly[A](op: () => A): A = {
+    override def doQuickly[A](op: () => A): A =
       throw new FailedInterrupt(
           new Exception(
               "Posted a work item to a compiler that's shutting down"))
-    }
 
-    override def askDoQuickly[A](op: () => A): InterruptReq { type R = A } = {
-      val ir = new InterruptReq {
+    override def askDoQuickly[A](op: () => A): InterruptReq { type R = A } =
+      val ir = new InterruptReq
         type R = A
         val todo = () => throw new MissingResponse
-      }
       ir.execute()
       ir
-    }
-  }
-}
 
 // ---------------- Interpreted exceptions -------------------
 

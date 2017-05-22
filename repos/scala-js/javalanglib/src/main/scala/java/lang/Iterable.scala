@@ -2,6 +2,5 @@ package java.lang
 
 import java.util.Iterator
 
-trait Iterable[T] {
+trait Iterable[T]
   def iterator(): Iterator[T]
-}

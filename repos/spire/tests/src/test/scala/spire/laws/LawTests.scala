@@ -18,16 +18,14 @@ import org.scalatest.FunSuite
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 
-class LawTests extends FunSuite with Discipline {
+class LawTests extends FunSuite with Discipline
 
   def fuzzyEq[@sp(Float, Double) A : Ring : Signed : Order](eps: A): Eq[A] =
-    new Eq[A] {
-      def eqv(x: A, y: A): Boolean = {
+    new Eq[A]
+      def eqv(x: A, y: A): Boolean =
         val delta = Order[A].max(x.abs, y.abs) * eps
         println("d = %f, (x - y).abs = %f" format (delta, (x - y).abs))
         (x - y).abs < delta
-      }
-    }
 
   // Float and Double fail these tests
   checkAll("Int", RingLaws[Int].euclideanRing)
@@ -89,22 +87,19 @@ class LawTests extends FunSuite with Discipline {
   checkAll("Sign", ActionLaws[Sign, Int].multiplicativeMonoidAction)
 
   implicit def eqFreeMonoid[A : Monoid : Eq]: Eq[FreeMonoid[A]] =
-    new Eq[FreeMonoid[A]] {
+    new Eq[FreeMonoid[A]]
       def eqv(x: FreeMonoid[A], y: FreeMonoid[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
-    }
 
   implicit def eqFreeGroup[A : Group : Eq]: Eq[FreeGroup[A]] =
-    new Eq[FreeGroup[A]] {
+    new Eq[FreeGroup[A]]
       def eqv(x: FreeGroup[A], y: FreeGroup[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
-    }
 
   implicit def eqFreeAbGroup[A : AbGroup : Eq]: Eq[FreeAbGroup[A]] =
-    new Eq[FreeAbGroup[A]] {
+    new Eq[FreeAbGroup[A]]
       def eqv(x: FreeAbGroup[A], y: FreeAbGroup[A]): Boolean =
         Eq[A].eqv(x.run(n => n), y.run(n => n))
-    }
 
   checkAll("FreeMonoid", GroupLaws[FreeMonoid[String]].monoid)
   checkAll("D3", GroupLaws[D3].group)
@@ -119,10 +114,9 @@ class LawTests extends FunSuite with Discipline {
 
   object intMinMaxLattice
       extends MinMaxLattice[Int] with BoundedLattice[Int]
-      with spire.std.IntOrder {
+      with spire.std.IntOrder
     def zero = Int.MinValue
     def one = Int.MaxValue
-  }
 
   checkAll("Order[Int]", OrderLaws[Int].order)
   checkAll("Order[BigInteger]", OrderLaws[BigInteger].order)
@@ -140,4 +134,3 @@ class LawTests extends FunSuite with Discipline {
                                         implicitly,
                                         implicitly)
         .groupPartialAction)
-}

@@ -28,7 +28,7 @@ import org.apache.spark.util.Utils
 
 class SparkContextSchedulerCreationSuite
     extends SparkFunSuite with LocalSparkContext with PrivateMethodTester
-    with Logging {
+    with Logging
 
   def createTaskScheduler(master: String): TaskSchedulerImpl =
     createTaskScheduler(master, "client")
@@ -39,7 +39,7 @@ class SparkContextSchedulerCreationSuite
 
   def createTaskScheduler(master: String,
                           deployMode: String,
-                          conf: SparkConf): TaskSchedulerImpl = {
+                          conf: SparkConf): TaskSchedulerImpl =
     // Create local SparkContext to setup a SparkEnv. We don't actually want to start() the
     // real schedulers, so we don't want to create a full SparkContext with the desired scheduler.
     sc = new SparkContext("local", "test", conf)
@@ -50,150 +50,118 @@ class SparkContextSchedulerCreationSuite
       SparkContext invokePrivate createTaskSchedulerMethod(
           sc, master, deployMode)
     sched.asInstanceOf[TaskSchedulerImpl]
-  }
 
-  test("bad-master") {
-    val e = intercept[SparkException] {
+  test("bad-master")
+    val e = intercept[SparkException]
       createTaskScheduler("localhost:1234")
-    }
     assert(e.getMessage.contains("Could not parse Master URL"))
-  }
 
-  test("local") {
+  test("local")
     val sched = createTaskScheduler("local")
-    sched.backend match {
+    sched.backend match
       case s: LocalBackend => assert(s.totalCores === 1)
       case _ => fail()
-    }
-  }
 
-  test("local-*") {
+  test("local-*")
     val sched = createTaskScheduler("local[*]")
-    sched.backend match {
+    sched.backend match
       case s: LocalBackend =>
         assert(s.totalCores === Runtime.getRuntime.availableProcessors())
       case _ => fail()
-    }
-  }
 
-  test("local-n") {
+  test("local-n")
     val sched = createTaskScheduler("local[5]")
     assert(sched.maxTaskFailures === 1)
-    sched.backend match {
+    sched.backend match
       case s: LocalBackend => assert(s.totalCores === 5)
       case _ => fail()
-    }
-  }
 
-  test("local-*-n-failures") {
+  test("local-*-n-failures")
     val sched = createTaskScheduler("local[* ,2]")
     assert(sched.maxTaskFailures === 2)
-    sched.backend match {
+    sched.backend match
       case s: LocalBackend =>
         assert(s.totalCores === Runtime.getRuntime.availableProcessors())
       case _ => fail()
-    }
-  }
 
-  test("local-n-failures") {
+  test("local-n-failures")
     val sched = createTaskScheduler("local[4, 2]")
     assert(sched.maxTaskFailures === 2)
-    sched.backend match {
+    sched.backend match
       case s: LocalBackend => assert(s.totalCores === 4)
       case _ => fail()
-    }
-  }
 
-  test("bad-local-n") {
-    val e = intercept[SparkException] {
+  test("bad-local-n")
+    val e = intercept[SparkException]
       createTaskScheduler("local[2*]")
-    }
     assert(e.getMessage.contains("Could not parse Master URL"))
-  }
 
-  test("bad-local-n-failures") {
-    val e = intercept[SparkException] {
+  test("bad-local-n-failures")
+    val e = intercept[SparkException]
       createTaskScheduler("local[2*,4]")
-    }
     assert(e.getMessage.contains("Could not parse Master URL"))
-  }
 
-  test("local-default-parallelism") {
+  test("local-default-parallelism")
     val conf = new SparkConf().set("spark.default.parallelism", "16")
     val sched = createTaskScheduler("local", "client", conf)
 
-    sched.backend match {
+    sched.backend match
       case s: LocalBackend => assert(s.defaultParallelism() === 16)
       case _ => fail()
-    }
-  }
 
-  test("local-cluster") {
-    createTaskScheduler("local-cluster[3, 14, 1024]").backend match {
+  test("local-cluster")
+    createTaskScheduler("local-cluster[3, 14, 1024]").backend match
       case s: SparkDeploySchedulerBackend => // OK
       case _ => fail()
-    }
-  }
 
-  def testYarn(master: String, deployMode: String, expectedClassName: String) {
-    try {
+  def testYarn(master: String, deployMode: String, expectedClassName: String)
+    try
       val sched = createTaskScheduler(master, deployMode)
       assert(sched.getClass === Utils.classForName(expectedClassName))
-    } catch {
+    catch
       case e: SparkException =>
         assert(e.getMessage.contains("YARN mode not available"))
         logWarning(
             "YARN not available, could not test actual YARN scheduler creation")
       case e: Throwable => fail(e)
-    }
-  }
 
-  test("yarn-cluster") {
+  test("yarn-cluster")
     testYarn("yarn",
              "cluster",
              "org.apache.spark.scheduler.cluster.YarnClusterScheduler")
-  }
 
-  test("yarn-client") {
+  test("yarn-client")
     testYarn(
         "yarn", "client", "org.apache.spark.scheduler.cluster.YarnScheduler")
-  }
 
-  def testMesos(master: String, expectedClass: Class[_], coarse: Boolean) {
+  def testMesos(master: String, expectedClass: Class[_], coarse: Boolean)
     val conf = new SparkConf().set("spark.mesos.coarse", coarse.toString)
-    try {
+    try
       val sched = createTaskScheduler(master, "client", conf)
       assert(sched.backend.getClass === expectedClass)
-    } catch {
+    catch
       case e: UnsatisfiedLinkError =>
         assert(e.getMessage.contains("mesos"))
         logWarning(
             "Mesos not available, could not test actual Mesos scheduler creation")
       case e: Throwable => fail(e)
-    }
-  }
 
-  test("mesos fine-grained") {
+  test("mesos fine-grained")
     testMesos("mesos://localhost:1234",
               classOf[MesosSchedulerBackend],
               coarse = false)
-  }
 
-  test("mesos coarse-grained") {
+  test("mesos coarse-grained")
     testMesos("mesos://localhost:1234",
               classOf[CoarseMesosSchedulerBackend],
               coarse = true)
-  }
 
-  test("mesos with zookeeper") {
+  test("mesos with zookeeper")
     testMesos("mesos://zk://localhost:1234,localhost:2345",
               classOf[MesosSchedulerBackend],
               coarse = false)
-  }
 
-  test("mesos with zookeeper and Master URL starting with zk://") {
+  test("mesos with zookeeper and Master URL starting with zk://")
     testMesos("zk://localhost:1234,localhost:2345",
               classOf[MesosSchedulerBackend],
               coarse = false)
-  }
-}

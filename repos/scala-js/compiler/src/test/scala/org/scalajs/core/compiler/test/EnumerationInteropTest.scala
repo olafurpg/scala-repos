@@ -4,10 +4,10 @@ import org.scalajs.core.compiler.test.util._
 
 import org.junit.Test
 
-class EnumerationInteropTest extends DirectTest with TestHelpers {
+class EnumerationInteropTest extends DirectTest with TestHelpers
 
   @Test
-  def warnIfUnableToTransformValue: Unit = {
+  def warnIfUnableToTransformValue: Unit =
 
     """
     class A extends Enumeration {
@@ -32,10 +32,9 @@ class EnumerationInteropTest extends DirectTest with TestHelpers {
       |        Value(4)
       |             ^
     """
-  }
 
   @Test
-  def warnIfNoNameVal: Unit = {
+  def warnIfNoNameVal: Unit =
 
     """
     class A extends Enumeration {
@@ -54,10 +53,9 @@ class EnumerationInteropTest extends DirectTest with TestHelpers {
       |      val b = new Val(10)
       |              ^
     """
-  }
 
   @Test
-  def warnIfNullValue: Unit = {
+  def warnIfNullValue: Unit =
 
     """
     class A extends Enumeration {
@@ -76,10 +74,9 @@ class EnumerationInteropTest extends DirectTest with TestHelpers {
       |      val b = Value(10, null)
       |                   ^
     """
-  }
 
   @Test
-  def warnIfNullNewVal: Unit = {
+  def warnIfNullNewVal: Unit =
 
     """
     class A extends Enumeration {
@@ -98,10 +95,9 @@ class EnumerationInteropTest extends DirectTest with TestHelpers {
       |      val b = new Val(10, null)
       |              ^
     """
-  }
 
   @Test
-  def warnIfExtNoNameVal: Unit = {
+  def warnIfExtNoNameVal: Unit =
 
     """
     class A extends Enumeration {
@@ -109,10 +105,9 @@ class EnumerationInteropTest extends DirectTest with TestHelpers {
       protected class Val2 extends Val(1)
     }
     """ warns () // no message checking: position differs in 2.10 and 2.11
-  }
 
   @Test
-  def warnIfExtNullNameVal: Unit = {
+  def warnIfExtNullNameVal: Unit =
 
     """
     class A extends Enumeration {
@@ -120,5 +115,3 @@ class EnumerationInteropTest extends DirectTest with TestHelpers {
       protected class Val2 extends Val(1,null)
     }
     """ warns () // no message checking: position differs in 2.10 and 2.11
-  }
-}

@@ -12,7 +12,7 @@ package play.api.data.validation
   * @param f the validation function
   */
 case class Constraint[-T](name: Option[String], args: Seq[Any])(
-    f: (T => ValidationResult)) {
+    f: (T => ValidationResult))
 
   /**
     * Run the constraint validation.
@@ -21,7 +21,6 @@ case class Constraint[-T](name: Option[String], args: Seq[Any])(
     * @return the validation result
     */
   def apply(t: T): ValidationResult = f(t)
-}
 
 /**
   * This object provides helpers for creating `Constraint` values.
@@ -34,7 +33,7 @@ case class Constraint[-T](name: Option[String], args: Seq[Any])(
   *   }
   * }}}
   */
-object Constraint {
+object Constraint
 
   /**
     * Creates a new anonymous constraint from a validation function.
@@ -55,7 +54,6 @@ object Constraint {
   def apply[T](name: String, args: Any*)(
       f: (T => ValidationResult)): Constraint[T] =
     apply(Some(name), args.toSeq)(f)
-}
 
 /**
   * Defines a set of built-in constraints.
@@ -65,7 +63,7 @@ object Constraints extends Constraints
 /**
   * Defines a set of built-in constraints.
   */
-trait Constraints {
+trait Constraints
 
   /**
     * Defines an ‘emailAddress’ constraint for `String` values which will validate email addresses.
@@ -76,7 +74,7 @@ trait Constraints {
   private val emailRegex =
     """^[a-zA-Z0-9\.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$""".r
   def emailAddress: Constraint[String] =
-    Constraint[String]("constraint.email") { e =>
+    Constraint[String]("constraint.email")  e =>
       if (e == null) Invalid(ValidationError("error.email"))
       else if (e.trim.isEmpty) Invalid(ValidationError("error.email"))
       else
@@ -84,7 +82,6 @@ trait Constraints {
           .findFirstMatchIn(e)
           .map(_ => Valid)
           .getOrElse(Invalid(ValidationError("error.email")))
-    }
 
   /**
     * Defines a ‘required’ constraint for `String` values, i.e. one in which empty strings are invalid.
@@ -93,11 +90,10 @@ trait Constraints {
     * '''error'''[error.required]
     */
   def nonEmpty: Constraint[String] =
-    Constraint[String]("constraint.required") { o =>
+    Constraint[String]("constraint.required")  o =>
       if (o == null) Invalid(ValidationError("error.required"))
       else if (o.trim.isEmpty) Invalid(ValidationError("error.required"))
       else Valid
-    }
 
   /**
     * Defines a minimum value for `Ordered` values, by default the value must be greater than or equal to the constraint parameter
@@ -107,14 +103,12 @@ trait Constraints {
     */
   def min[T](minValue: T, strict: Boolean = false)(
       implicit ordering: scala.math.Ordering[T]): Constraint[T] =
-    Constraint[T]("constraint.min", minValue) { o =>
-      (ordering.compare(o, minValue).signum, strict) match {
+    Constraint[T]("constraint.min", minValue)  o =>
+      (ordering.compare(o, minValue).signum, strict) match
         case (1, _) | (0, false) => Valid
         case (_, false) => Invalid(ValidationError("error.min", minValue))
         case (_, true) =>
           Invalid(ValidationError("error.min.strict", minValue))
-      }
-    }
 
   /**
     * Defines a maximum value for `Ordered` values, by default the value must be less than or equal to the constraint parameter
@@ -124,14 +118,12 @@ trait Constraints {
     */
   def max[T](maxValue: T, strict: Boolean = false)(
       implicit ordering: scala.math.Ordering[T]): Constraint[T] =
-    Constraint[T]("constraint.max", maxValue) { o =>
-      (ordering.compare(o, maxValue).signum, strict) match {
+    Constraint[T]("constraint.max", maxValue)  o =>
+      (ordering.compare(o, maxValue).signum, strict) match
         case (-1, _) | (0, false) => Valid
         case (_, false) => Invalid(ValidationError("error.max", maxValue))
         case (_, true) =>
           Invalid(ValidationError("error.max.strict", maxValue))
-      }
-    }
 
   /**
     * Defines a minimum length constraint for `String` values, i.e. the string’s length must be greater than or equal to the constraint parameter
@@ -140,12 +132,11 @@ trait Constraints {
     * '''error'''[error.minLength(length)]
     */
   def minLength(length: Int): Constraint[String] =
-    Constraint[String]("constraint.minLength", length) { o =>
+    Constraint[String]("constraint.minLength", length)  o =>
       require(length >= 0, "string minLength must not be negative")
       if (o == null) Invalid(ValidationError("error.minLength", length))
       else if (o.size >= length) Valid
       else Invalid(ValidationError("error.minLength", length))
-    }
 
   /**
     * Defines a maximum length constraint for `String` values, i.e. the string’s length must be less than or equal to the constraint parameter
@@ -154,12 +145,11 @@ trait Constraints {
     * '''error'''[error.maxLength(length)]
     */
   def maxLength(length: Int): Constraint[String] =
-    Constraint[String]("constraint.maxLength", length) { o =>
+    Constraint[String]("constraint.maxLength", length)  o =>
       require(length >= 0, "string maxLength must not be negative")
       if (o == null) Invalid(ValidationError("error.maxLength", length))
       else if (o.size <= length) Valid
       else Invalid(ValidationError("error.maxLength", length))
-    }
 
   /**
     * Defines a regular expression constraint for `String` values, i.e. the string must match the regular expression pattern
@@ -170,7 +160,7 @@ trait Constraints {
   def pattern(regex: => scala.util.matching.Regex,
               name: String = "constraint.pattern",
               error: String = "error.pattern"): Constraint[String] =
-    Constraint[String](name, () => regex) { o =>
+    Constraint[String](name, () => regex)  o =>
       require(regex != null, "regex must not be null")
       require(name != null, "name must not be null")
       require(error != null, "error must not be null")
@@ -181,8 +171,6 @@ trait Constraints {
           .unapplySeq(o)
           .map(_ => Valid)
           .getOrElse(Invalid(ValidationError(error, regex)))
-    }
-}
 
 /**
   * A validation result.
@@ -199,7 +187,7 @@ case object Valid extends ValidationResult
   *
   * @param errors the resulting errors
   */
-case class Invalid(errors: Seq[ValidationError]) extends ValidationResult {
+case class Invalid(errors: Seq[ValidationError]) extends ValidationResult
 
   /**
     * Combines these validation errors with another validation failure.
@@ -208,12 +196,11 @@ case class Invalid(errors: Seq[ValidationError]) extends ValidationResult {
     * @return a new merged `Invalid`
     */
   def ++(other: Invalid): Invalid = Invalid(this.errors ++ other.errors)
-}
 
 /**
   * This object provides helper methods to construct `Invalid` values.
   */
-object Invalid {
+object Invalid
 
   /**
     * Creates an `Invalid` value with a single error.
@@ -232,25 +219,18 @@ object Invalid {
     */
   def apply(error: String, args: Any*): Invalid =
     Invalid(Seq(ValidationError(error, args: _*)))
-}
 
-object ParameterValidator {
+object ParameterValidator
   def apply[T](
       constraints: Iterable[Constraint[T]], optionalParam: Option[T]*) =
-    optionalParam.flatMap {
-      _.map { param =>
-        constraints.flatMap {
-          _ (param) match {
+    optionalParam.flatMap
+      _.map  param =>
+        constraints.flatMap
+          _ (param) match
             case i: Invalid => Some(i)
             case _ => None
-          }
-        }
-      }
-    }.flatten match {
+    .flatten match
       case Nil => Valid
       case invalids =>
-        invalids.reduceLeft { (a, b) =>
+        invalids.reduceLeft  (a, b) =>
           a ++ b
-        }
-    }
-}

@@ -49,7 +49,7 @@ class StreamingLogisticRegressionWithSGD private[mllib](
     private var miniBatchFraction: Double,
     private var regParam: Double)
     extends StreamingLinearAlgorithm[
-        LogisticRegressionModel, LogisticRegressionWithSGD] with Serializable {
+        LogisticRegressionModel, LogisticRegressionWithSGD] with Serializable
 
   /**
     * Construct a StreamingLogisticRegression object with default parameters:
@@ -67,36 +67,30 @@ class StreamingLogisticRegressionWithSGD private[mllib](
 
   /** Set the step size for gradient descent. Default: 0.1. */
   @Since("1.3.0")
-  def setStepSize(stepSize: Double): this.type = {
+  def setStepSize(stepSize: Double): this.type =
     this.algorithm.optimizer.setStepSize(stepSize)
     this
-  }
 
   /** Set the number of iterations of gradient descent to run per update. Default: 50. */
   @Since("1.3.0")
-  def setNumIterations(numIterations: Int): this.type = {
+  def setNumIterations(numIterations: Int): this.type =
     this.algorithm.optimizer.setNumIterations(numIterations)
     this
-  }
 
   /** Set the fraction of each batch to use for updates. Default: 1.0. */
   @Since("1.3.0")
-  def setMiniBatchFraction(miniBatchFraction: Double): this.type = {
+  def setMiniBatchFraction(miniBatchFraction: Double): this.type =
     this.algorithm.optimizer.setMiniBatchFraction(miniBatchFraction)
     this
-  }
 
   /** Set the regularization parameter. Default: 0.0. */
   @Since("1.3.0")
-  def setRegParam(regParam: Double): this.type = {
+  def setRegParam(regParam: Double): this.type =
     this.algorithm.optimizer.setRegParam(regParam)
     this
-  }
 
   /** Set the initial weights. Default: [0.0, 0.0]. */
   @Since("1.3.0")
-  def setInitialWeights(initialWeights: Vector): this.type = {
+  def setInitialWeights(initialWeights: Vector): this.type =
     this.model = Some(algorithm.createModel(initialWeights, 0.0))
     this
-  }
-}

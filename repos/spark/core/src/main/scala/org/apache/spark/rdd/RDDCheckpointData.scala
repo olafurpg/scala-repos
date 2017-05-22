@@ -25,10 +25,9 @@ import org.apache.spark.Partition
   * Enumeration to manage state transitions of an RDD through checkpointing
   * [ Initialized --> checkpointing in progress --> checkpointed ].
   */
-private[spark] object CheckpointState extends Enumeration {
+private[spark] object CheckpointState extends Enumeration
   type CheckpointState = Value
   val Initialized, CheckpointingInProgress, Checkpointed = Value
-}
 
 /**
   * This class contains all the information related to RDD checkpointing. Each instance of this
@@ -38,7 +37,7 @@ private[spark] object CheckpointState extends Enumeration {
   */
 private[spark] abstract class RDDCheckpointData[T : ClassTag](
     @transient private val rdd: RDD[T])
-    extends Serializable {
+    extends Serializable
 
   import CheckpointState._
 
@@ -53,34 +52,29 @@ private[spark] abstract class RDDCheckpointData[T : ClassTag](
   /**
     * Return whether the checkpoint data for this RDD is already persisted.
     */
-  def isCheckpointed: Boolean = RDDCheckpointData.synchronized {
+  def isCheckpointed: Boolean = RDDCheckpointData.synchronized
     cpState == Checkpointed
-  }
 
   /**
     * Materialize this RDD and persist its content.
     * This is called immediately after the first action invoked on this RDD has completed.
     */
-  final def checkpoint(): Unit = {
+  final def checkpoint(): Unit =
     // Guard against multiple threads checkpointing the same RDD by
     // atomically flipping the state of this RDDCheckpointData
-    RDDCheckpointData.synchronized {
-      if (cpState == Initialized) {
+    RDDCheckpointData.synchronized
+      if (cpState == Initialized)
         cpState = CheckpointingInProgress
-      } else {
+      else
         return
-      }
-    }
 
     val newRDD = doCheckpoint()
 
     // Update our state and truncate the RDD lineage
-    RDDCheckpointData.synchronized {
+    RDDCheckpointData.synchronized
       cpRDD = Some(newRDD)
       cpState = Checkpointed
       rdd.markCheckpointed()
-    }
-  }
 
   /**
     * Materialize this RDD and persist its content.
@@ -101,10 +95,8 @@ private[spark] abstract class RDDCheckpointData[T : ClassTag](
     * Return the partitions of the resulting checkpoint RDD.
     * For tests only.
     */
-  def getPartitions: Array[Partition] = RDDCheckpointData.synchronized {
+  def getPartitions: Array[Partition] = RDDCheckpointData.synchronized
     cpRDD.map(_.partitions).getOrElse { Array.empty }
-  }
-}
 
 /**
   * Global lock for synchronizing checkpoint operations.

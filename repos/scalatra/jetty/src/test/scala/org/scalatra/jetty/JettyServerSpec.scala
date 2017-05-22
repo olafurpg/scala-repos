@@ -10,23 +10,19 @@ import org.scalatra.{LifeCycle, ScalatraServlet}
 
 import scala.io.Source
 
-object JettyServerSpec {
-  class HelloServlet extends ScalatraServlet {
+object JettyServerSpec
+  class HelloServlet extends ScalatraServlet
     get("/") { "hello" }
-  }
 
-  class ScalatraBootstrap extends LifeCycle {
-    override def init(context: ServletContext): Unit = {
+  class ScalatraBootstrap extends LifeCycle
+    override def init(context: ServletContext): Unit =
       context.mount(new HelloServlet, "/*")
-    }
-  }
-}
 
-class JettyServerSpec extends WordSpec with BeforeAndAfterAll {
+class JettyServerSpec extends WordSpec with BeforeAndAfterAll
   var jetty: JettyServer = _
   var port: Int = _
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit =
     super.beforeAll()
     jetty = new JettyServer(InetSocketAddress.createUnresolved("localhost", 0))
     jetty.context.setInitParameter(
@@ -36,22 +32,16 @@ class JettyServerSpec extends WordSpec with BeforeAndAfterAll {
     port = jetty.server.getConnectors.head
       .asInstanceOf[ServerConnector]
       .getLocalPort
-  }
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     jetty.stop()
     super.afterAll()
-  }
 
-  "A JettyServer" should {
-    "return hello" in {
+  "A JettyServer" should
+    "return hello" in
       val stream = Source.fromInputStream(
           new URL("http://localhost:" + port + "/").openStream())
-      try {
+      try
         assert(stream.getLines().mkString === "hello")
-      } finally {
+      finally
         stream.close()
-      }
-    }
-  }
-}

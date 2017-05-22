@@ -25,7 +25,7 @@ import org.apache.spark.memory.TaskMemoryManager
 import org.apache.spark.metrics.source.Source
 import org.apache.spark.util.{TaskCompletionListener, TaskFailureListener}
 
-object TaskContext {
+object TaskContext
 
   /**
     * Return the currently active TaskContext. This can be called inside of
@@ -37,14 +37,12 @@ object TaskContext {
     * Returns the partition id of currently active TaskContext. It will return 0
     * if there is no active TaskContext for cases like local execution.
     */
-  def getPartitionId(): Int = {
+  def getPartitionId(): Int =
     val tc = taskContext.get()
-    if (tc eq null) {
+    if (tc eq null)
       0
-    } else {
+    else
       tc.partitionId()
-    }
-  }
 
   private[this] val taskContext: ThreadLocal[TaskContext] =
     new ThreadLocal[TaskContext]
@@ -65,10 +63,8 @@ object TaskContext {
   /**
     * An empty task context that does not represent an actual task.
     */
-  private[spark] def empty(): TaskContextImpl = {
+  private[spark] def empty(): TaskContextImpl =
     new TaskContextImpl(0, 0, 0, 0, null, null)
-  }
-}
 
 /**
   * Contextual information about a task which can be read or mutated during
@@ -77,7 +73,7 @@ object TaskContext {
   *   org.apache.spark.TaskContext.get()
   * }}}
   */
-abstract class TaskContext extends Serializable {
+abstract class TaskContext extends Serializable
   // Note: TaskContext must NOT define a get method. Otherwise it will prevent the Scala compiler
   // from generating a static get method (based on the companion object's get method).
 
@@ -119,12 +115,11 @@ abstract class TaskContext extends Serializable {
     *
     * Exceptions thrown by the listener will result in failure of the task.
     */
-  def addTaskCompletionListener(f: (TaskContext) => Unit): TaskContext = {
+  def addTaskCompletionListener(f: (TaskContext) => Unit): TaskContext =
     addTaskCompletionListener(
-        new TaskCompletionListener {
+        new TaskCompletionListener
       override def onTaskCompletion(context: TaskContext): Unit = f(context)
-    })
-  }
+    )
 
   /**
     * Adds a listener to be executed on task failure.
@@ -137,13 +132,12 @@ abstract class TaskContext extends Serializable {
     * Operations defined here must be idempotent, as `onTaskFailure` can be called multiple times.
     */
   def addTaskFailureListener(
-      f: (TaskContext, Throwable) => Unit): TaskContext = {
+      f: (TaskContext, Throwable) => Unit): TaskContext =
     addTaskFailureListener(
-        new TaskFailureListener {
+        new TaskFailureListener
       override def onTaskFailure(
           context: TaskContext, error: Throwable): Unit = f(context, error)
-    })
-  }
+    )
 
   /**
     * The ID of the stage that this task belong to.
@@ -188,4 +182,3 @@ abstract class TaskContext extends Serializable {
     * deserializing in executors.
     */
   private[spark] def registerAccumulator(a: Accumulable[_, _]): Unit
-}

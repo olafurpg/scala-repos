@@ -1,6 +1,4 @@
-class App(arg: String) {
+class App(arg: String)
   @deprecated("..")
-  def this() {
+  def this()
     this("foo")
-  }
-}

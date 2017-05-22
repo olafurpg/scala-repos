@@ -1,11 +1,10 @@
-class SCL6478 {
+class SCL6478
   trait A
   trait B
   class C extends A with B
 
-  class G {
+  class G
     def foo = 1
-  }
 
   val c = new C
 
@@ -15,4 +14,3 @@ class SCL6478 {
   implicit def a2b(a: A): B = new B {}
 
   c. /* resolved: false */ foo
-}

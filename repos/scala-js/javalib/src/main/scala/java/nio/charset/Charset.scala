@@ -6,13 +6,12 @@ import scala.scalajs.js
 
 abstract class Charset protected (
     canonicalName: String, aliases: Array[String])
-    extends AnyRef with Comparable[Charset] {
+    extends AnyRef with Comparable[Charset]
   final def name(): String = canonicalName
 
-  override final def equals(that: Any): Boolean = that match {
+  override final def equals(that: Any): Boolean = that match
     case that: Charset => this.name == that.name
     case _ => false
-  }
 
   override final def toString(): String = name()
 
@@ -28,19 +27,17 @@ abstract class Charset protected (
 
   def canEncode(): Boolean = true
 
-  private lazy val cachedDecoder = {
+  private lazy val cachedDecoder =
     this
       .newDecoder()
       .onMalformedInput(CodingErrorAction.REPLACE)
       .onUnmappableCharacter(CodingErrorAction.REPLACE)
-  }
 
-  private lazy val cachedEncoder = {
+  private lazy val cachedEncoder =
     this
       .newEncoder()
       .onMalformedInput(CodingErrorAction.REPLACE)
       .onUnmappableCharacter(CodingErrorAction.REPLACE)
-  }
 
   final def decode(bb: ByteBuffer): CharBuffer =
     cachedDecoder.decode(bb)
@@ -52,9 +49,8 @@ abstract class Charset protected (
     encode(CharBuffer.wrap(str))
 
   def displayName(): String = name
-}
 
-object Charset {
+object Charset
   import StandardCharsets._
 
   def defaultCharset(): Charset =
@@ -67,7 +63,7 @@ object Charset {
   def isSupported(charsetName: String): Boolean =
     CharsetMap.contains(charsetName.toLowerCase)
 
-  private lazy val CharsetMap = {
+  private lazy val CharsetMap =
     val m = js.Dictionary.empty[Charset]
 
     // All these lists where obtained by experimentation on the JDK
@@ -119,5 +115,3 @@ object Charset {
     for (s <- Seq("utf-16", "utf_16", "unicode", "unicodebig")) m(s) = UTF_16
 
     m
-  }
-}

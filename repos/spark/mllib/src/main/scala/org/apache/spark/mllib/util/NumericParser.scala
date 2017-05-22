@@ -30,94 +30,78 @@ import org.apache.spark.SparkException
   *  - array: an array of numbers stored as `[v0,v1,...,vn]`
   *  - tuple: a list of numbers, arrays, or tuples stored as `(...)`
   */
-private[mllib] object NumericParser {
+private[mllib] object NumericParser
 
   /** Parses a string into a Double, an Array[Double], or a Seq[Any]. */
-  def parse(s: String): Any = {
+  def parse(s: String): Any =
     val tokenizer = new StringTokenizer(s, "()[],", true)
-    if (tokenizer.hasMoreTokens()) {
+    if (tokenizer.hasMoreTokens())
       val token = tokenizer.nextToken()
-      if (token == "(") {
+      if (token == "(")
         parseTuple(tokenizer)
-      } else if (token == "[") {
+      else if (token == "[")
         parseArray(tokenizer)
-      } else {
+      else
         // expecting a number
         parseDouble(token)
-      }
-    } else {
+    else
       throw new SparkException(s"Cannot find any token from the input string.")
-    }
-  }
 
-  private def parseArray(tokenizer: StringTokenizer): Array[Double] = {
+  private def parseArray(tokenizer: StringTokenizer): Array[Double] =
     val values = ArrayBuilder.make[Double]
     var parsing = true
     var allowComma = false
     var token: String = null
-    while (parsing && tokenizer.hasMoreTokens()) {
+    while (parsing && tokenizer.hasMoreTokens())
       token = tokenizer.nextToken()
-      if (token == "]") {
+      if (token == "]")
         parsing = false
-      } else if (token == ",") {
-        if (allowComma) {
+      else if (token == ",")
+        if (allowComma)
           allowComma = false
-        } else {
+        else
           throw new SparkException("Found a ',' at a wrong position.")
-        }
-      } else {
+      else
         // expecting a number
         values += parseDouble(token)
         allowComma = true
-      }
-    }
-    if (parsing) {
+    if (parsing)
       throw new SparkException(s"An array must end with ']'.")
-    }
     values.result()
-  }
 
-  private def parseTuple(tokenizer: StringTokenizer): Seq[_] = {
+  private def parseTuple(tokenizer: StringTokenizer): Seq[_] =
     val items = ListBuffer.empty[Any]
     var parsing = true
     var allowComma = false
     var token: String = null
-    while (parsing && tokenizer.hasMoreTokens()) {
+    while (parsing && tokenizer.hasMoreTokens())
       token = tokenizer.nextToken()
-      if (token == "(") {
+      if (token == "(")
         items.append(parseTuple(tokenizer))
         allowComma = true
-      } else if (token == "[") {
+      else if (token == "[")
         items.append(parseArray(tokenizer))
         allowComma = true
-      } else if (token == ",") {
-        if (allowComma) {
+      else if (token == ",")
+        if (allowComma)
           allowComma = false
-        } else {
+        else
           throw new SparkException("Found a ',' at a wrong position.")
-        }
-      } else if (token == ")") {
+      else if (token == ")")
         parsing = false
-      } else if (token.trim.isEmpty) {
+      else if (token.trim.isEmpty)
         // ignore whitespaces between delim chars, e.g. ", ["
-      } else {
+      else
         // expecting a number
         items.append(parseDouble(token))
         allowComma = true
-      }
-    }
-    if (parsing) {
+    if (parsing)
       throw new SparkException(s"A tuple must end with ')'.")
-    }
     items
-  }
 
-  private def parseDouble(s: String): Double = {
-    try {
+  private def parseDouble(s: String): Double =
+    try
       java.lang.Double.parseDouble(s)
-    } catch {
+    catch
       case e: NumberFormatException =>
         throw new SparkException(s"Cannot parse a double from: $s", e)
-    }
-  }
-}

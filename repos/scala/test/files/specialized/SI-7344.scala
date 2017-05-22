@@ -3,9 +3,9 @@
  * for the specialized method should not be different depending on the
  * outside method/class' specialization. */
 
-class Test[@specialized(Int, Double) X](val x: X) {
+class Test[@specialized(Int, Double) X](val x: X)
 
-  def checkSpecialization[Y](@specialized(Int, Double) y: Y): X = {
+  def checkSpecialization[Y](@specialized(Int, Double) y: Y): X =
 
     // checking the specialization using the method name, which we can
     // extract from an exception's stack trace. We can match just the
@@ -20,17 +20,14 @@ class Test[@specialized(Int, Double) X](val x: X) {
     specMe(1.3, new { override def toString = "specMe$mDc$sp" })
 
     x
-  }
 
   // name matching:
-  private[this] def checkNameStartsWith(prefix: String): Unit = {
+  private[this] def checkNameStartsWith(prefix: String): Unit =
     val method = (new Exception).getStackTrace()(1).getMethodName()
     assert(method.startsWith(prefix),
            method + ".startsWith(" + prefix + ") should be true")
-  }
-}
 
-object Test extends App {
+object Test extends App
   val t1 = new Test("x")
   val t2 = new Test(123)
   val t3 = new Test(1.3)
@@ -52,4 +49,3 @@ object Test extends App {
   // t3.checkSpecialization("x")
   // t3.checkSpecialization(123)
   // t3.checkSpecialization(1.3)
-}

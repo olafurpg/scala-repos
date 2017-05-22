@@ -11,7 +11,7 @@ class Test
 /**
   * TestA class
   */
-class Trac4452 extends Test {
+class Trac4452 extends Test
 
   /** $MacroWithNewLine */
   def a = 1
@@ -28,4 +28,3 @@ class Trac4452 extends Test {
     * $MacroWithoutNewLine
     */
   def d = 4
-}

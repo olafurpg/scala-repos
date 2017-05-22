@@ -1,6 +1,5 @@
 package macros
 
-object Client {
+object Client
   val a = 1
   def test = Foo.bar(a)
-}

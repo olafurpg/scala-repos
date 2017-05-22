@@ -42,11 +42,11 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PhongMaterialSpec
     extends SimpleSFXDelegateSpec[jfxsp.PhongMaterial, PhongMaterial](
-        classOf[jfxsp.PhongMaterial], classOf[PhongMaterial]) {
+        classOf[jfxsp.PhongMaterial], classOf[PhongMaterial])
 
   override protected def getJavaClassInstance = new jfxsp.PhongMaterial()
 
-  it should "support assignment of specularPower value - issue 71 " in {
+  it should "support assignment of specularPower value - issue 71 " in
     val material = new PhongMaterial()
     val default: Double = material.specularPower()
     val expected: Double = default - 0.1
@@ -54,5 +54,3 @@ class PhongMaterialSpec
     //    "error: value specularPower_= is not a member of scalafx.scene.paint.PhongMaterial"
     material.specularPower = expected
     assert(expected === material.specularPower())
-  }
-}

@@ -15,7 +15,7 @@ import sbtrelease._
 import ReleasePlugin._
 import ReleaseStateTransformations._
 
-object MarathonBuild extends Build {
+object MarathonBuild extends Build
   lazy val pluginInterface: Project = Project(
       id = "plugin-interface",
       base = file("plugin-interface"),
@@ -83,12 +83,12 @@ object MarathonBuild extends Build {
 
   lazy val scalaStyleSettings =
     styleSettings ++ Seq(
-        testScalaStyle := {
+        testScalaStyle :=
           org.scalastyle.sbt.ScalastylePlugin.scalastyle
             .in(Compile)
             .toTask("")
             .value
-        },
+        ,
         (test in Test) <<= (test in Test) dependsOn testScalaStyle
     )
 
@@ -131,8 +131,7 @@ object MarathonBuild extends Build {
 
   lazy val asmSettings =
     assemblySettings ++ Seq(
-        mergeStrategy in assembly <<= (mergeStrategy in assembly) { old =>
-          {
+        mergeStrategy in assembly <<= (mergeStrategy in assembly)  old =>
             case "application.conf" => MergeStrategy.concat
             case "META-INF/jersey-module-version" => MergeStrategy.first
             case "org/apache/hadoop/yarn/util/package-info.class" =>
@@ -142,9 +141,8 @@ object MarathonBuild extends Build {
             case "org/apache/hadoop/yarn/factory/providers/package-info.class" =>
               MergeStrategy.first
             case x => old(x)
-          }
-        },
-        excludedJars in assembly <<= (fullClasspath in assembly) map { cp =>
+        ,
+        excludedJars in assembly <<= (fullClasspath in assembly) map  cp =>
           val exclude = Set(
               "commons-beanutils-1.7.0.jar",
               "stax-api-1.0.1.jar",
@@ -152,10 +150,8 @@ object MarathonBuild extends Build {
               "servlet-api-2.5.jar",
               "jsp-api-2.1.jar"
           )
-          cp filter { x =>
+          cp filter  x =>
             exclude(x.data.getName)
-          }
-        }
     )
 
   lazy val formatSettings =
@@ -205,23 +201,20 @@ object MarathonBuild extends Build {
     * See: https://confluence.jetbrains.com/display/TCD8/Build+Script+Interaction+with+TeamCity
     */
   lazy val teamCitySetEnvSettings = Seq(
-      onLoad in Global := {
-        sys.env.get("TEAMCITY_VERSION") match {
+      onLoad in Global :=
+        sys.env.get("TEAMCITY_VERSION") match
           case None => // no-op
           case Some(teamcityVersion) =>
-            def reportParameter(key: String, value: String): Unit = {
+            def reportParameter(key: String, value: String): Unit =
               //env parameters will be made available as environment variables
               println(
                   s"##teamcity[setParameter name='env.SBT_$key' value='$value']")
               //system parameters will be made available as teamcity build parameters
               println(
                   s"##teamcity[setParameter name='system.sbt.$key' value='$value']")
-            }
             reportParameter("SCALA_VERSION", scalaVersion.value)
             reportParameter("PROJECT_VERSION", version.value)
-        }
         (onLoad in Global).value
-      }
   )
 
   lazy val publishSettings =
@@ -232,9 +225,8 @@ object MarathonBuild extends Build {
             )),
         SbtS3Resolver.s3credentials := new InstanceProfileCredentialsProvider()
     )
-}
 
-object Dependencies {
+object Dependencies
   import Dependency._
 
   val pluginInterface = Seq(
@@ -285,10 +277,9 @@ object Dependencies {
   ).map(_.excludeAll(excludeSlf4jLog4j12)
         .excludeAll(excludeLog4j)
         .excludeAll(excludeJCL))
-}
 
-object Dependency {
-  object V {
+object Dependency
+  object V
     // runtime deps versions
     val Chaos = "0.8.4"
     val Guava = "18.0"
@@ -320,7 +311,6 @@ object Dependency {
     // test deps versions
     val Mockito = "1.9.5"
     val ScalaTest = "2.1.7"
-  }
 
   val excludeMortbayJetty = ExclusionRule(organization = "org.mortbay.jetty")
   val excludeJavaxServlet = ExclusionRule(organization = "javax.servlet")
@@ -369,10 +359,8 @@ object Dependency {
     ("ch.qos.logback", "logback-classic")
   val wixAccord = "com.wix" %% "accord-core" % V.WixAccord
 
-  object Test {
+  object Test
     val scalatest = "org.scalatest" %% "scalatest" % V.ScalaTest
     val mockito = "org.mockito" % "mockito-all" % V.Mockito
     val akkaTestKit = "com.typesafe.akka" %% "akka-testkit" % V.Akka
     val diffson = "org.gnieh" %% "diffson" % V.Diffson
-  }
-}

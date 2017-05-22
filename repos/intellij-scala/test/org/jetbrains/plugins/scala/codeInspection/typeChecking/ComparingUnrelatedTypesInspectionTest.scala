@@ -9,13 +9,13 @@ import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTes
   * 9/26/13
   */
 class ComparingUnrelatedTypesInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
   protected def classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[ComparingUnrelatedTypesInspection]
   protected val annotation: String =
     ComparingUnrelatedTypesInspection.inspectionName
 
-  def testWeakConformance() {
+  def testWeakConformance()
     val text1 = s"""val a = 0
                  |val b: Short = 1
                  |${START}b == a$END"""
@@ -30,9 +30,8 @@ class ComparingUnrelatedTypesInspectionTest
     checkTextHasNoErrors(text2)
     checkTextHasNoErrors(text3)
     checkTextHasNoErrors(text4)
-  }
 
-  def testValueTypes() {
+  def testValueTypes()
     val text1 = s"""val a = true
                  |val b = 1
                  |${START}b == a$END"""
@@ -45,9 +44,8 @@ class ComparingUnrelatedTypesInspectionTest
     checkTextHasError(text2)
     checkTextHasError(text3)
     checkTextHasError(text4)
-  }
 
-  def testString() {
+  def testString()
     val text1 = s"""val a = "a"
                  |val b = Array('a')
                  |${START}b == a$END"""
@@ -63,9 +61,8 @@ class ComparingUnrelatedTypesInspectionTest
     checkTextHasError(text2)
     checkTextHasError(text3)
     checkTextHasNoErrors(text4)
-  }
 
-  def testInheritors() {
+  def testInheritors()
     val text1 = s"""val a = scala.collection.Iterable(1)
                  |val b = List(0)
                  |${START}b == a$END"""
@@ -80,9 +77,8 @@ class ComparingUnrelatedTypesInspectionTest
     checkTextHasNoErrors(text1)
     checkTextHasNoErrors(text2)
     checkTextHasNoErrors(text3)
-  }
 
-  def testFinal() {
+  def testFinal()
     val text1 = s"""case class A(i: Int)
                    |class B extends A(1)
                    |val a: A = A(0)
@@ -100,18 +96,16 @@ class ComparingUnrelatedTypesInspectionTest
     checkTextHasNoErrors(text1)
     checkTextHasError(text2)
     checkTextHasError(text3)
-  }
 
-  def testTraits() {
+  def testTraits()
     val text1 = s"""trait A
                   |trait B
                   |val a: A = _
                   |val b: B = _
                   |${START}a == b$END"""
     checkTextHasNoErrors(text1)
-  }
 
-  def testObject() {
+  def testObject()
     val text1 = s"""trait A
                   |object B extends A
                   |val a: A = _
@@ -129,9 +123,8 @@ class ComparingUnrelatedTypesInspectionTest
     checkTextHasNoErrors(text1)
     checkTextHasError(text2)
     checkTextHasNoErrors(text3)
-  }
 
-  def testBoxedTypes() {
+  def testBoxedTypes()
     val text1 = """val i = new java.lang.Integer(0)
                   |i == 100"""
     val text2 = """val b = new java.lang.Boolean(false)
@@ -140,24 +133,21 @@ class ComparingUnrelatedTypesInspectionTest
     checkTextHasNoErrors(text1)
     checkTextHasNoErrors(text2)
     checkTextHasNoErrors(text3)
-  }
 
-  def testExistential(): Unit = {
+  def testExistential(): Unit =
     checkTextHasNoErrors("Seq(1).isInstanceOf[List[_])")
     checkTextHasError(s"${START}Some(1).isInstanceOf[List[_]]$END")
     checkTextHasNoErrors("def foo(x: Some[_]) { x == Some(1) }")
     checkTextHasError(s"def foo(x: Some[_]) { ${START}x == Seq(1)$END }")
-  }
 
-  def testNumeric(): Unit = {
+  def testNumeric(): Unit =
     checkTextHasNoErrors("BigInt(1) == 1")
     checkTextHasNoErrors("BigInt(1) == 1L")
     checkTextHasNoErrors("BigInt(1) == new java.lang.Integer(1)")
     checkTextHasError(s"${START}BigInt(1) == true$END")
     checkTextHasError(s"${START}BigInt(1) == 1.toString$END")
-  }
 
-  def testTypeAlias(): Unit = {
+  def testTypeAlias(): Unit =
     checkTextHasNoErrors("""
         |object A {
         |  type Coord = Float
@@ -185,9 +175,8 @@ class ComparingUnrelatedTypesInspectionTest
         |  }
         |}
       """.stripMargin)
-  }
 
-  def testOverridenMethods(): Unit = {
+  def testOverridenMethods(): Unit =
     checkTextHasNoErrors("""
         |case class Dummy(v: Int) {
         |  def ==(value: Int): String = v + " == " + value
@@ -208,9 +197,8 @@ class ComparingUnrelatedTypesInspectionTest
         |object Test {
         |  val b: Boolean = ${START}Dummy(5) eq 10$END
         |}""".stripMargin)
-  }
 
-  def testOverridenWithImplicitParam(): Unit = {
+  def testOverridenWithImplicitParam(): Unit =
     checkTextHasError(
         s"""
         |class Store(val foo: Int, val bar: String)
@@ -235,9 +223,8 @@ class ComparingUnrelatedTypesInspectionTest
         |}
       """.stripMargin
     )
-  }
 
-  def testOverridenEquals(): Unit = {
+  def testOverridenEquals(): Unit =
     checkTextHasError(s"""
          |case class Dummy(v: Int) {
          |  override def equals(other: Any): Boolean = other match {
@@ -261,5 +248,3 @@ class ComparingUnrelatedTypesInspectionTest
            |object Test {
          |  val b: Boolean = ${START}Dummy(5) == 10$END
          |}""".stripMargin)
-  }
-}

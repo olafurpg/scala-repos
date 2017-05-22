@@ -11,18 +11,17 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class DelayedReleaseServiceTest extends FunSuite with MockitoSugar {
+class DelayedReleaseServiceTest extends FunSuite with MockitoSugar
 
-  test("close closes underlying") {
+  test("close closes underlying")
     val service = mock[Service[Request, Response]]
     val proxy = new DelayedReleaseService(service)
     stub(service.close()).toReturn(Future.Done)
 
     proxy.close()
     verify(service).close()
-  }
 
-  test("close waits for response completion") {
+  test("close waits for response completion")
     val request = Request()
     request.response.setChunked(true)
 
@@ -33,16 +32,14 @@ class DelayedReleaseServiceTest extends FunSuite with MockitoSugar {
     val proxy = new DelayedReleaseService(service)
 
     val f =
-      proxy(request) flatMap { response =>
+      proxy(request) flatMap  response =>
         proxy.close()
         verify(service, never).close()
         Reader.readAll(response.reader)
-      }
     request.response.close() // EOF
     verify(service).close()
-  }
 
-  test("inner service failure") {
+  test("inner service failure")
     val service = mock[Service[Request, Response]]
     val proxy = new DelayedReleaseService(service)
     stub(service.close()).toReturn(Future.Done)
@@ -53,5 +50,3 @@ class DelayedReleaseServiceTest extends FunSuite with MockitoSugar {
     proxy(request)
     proxy.close()
     verify(service).close()
-  }
-}

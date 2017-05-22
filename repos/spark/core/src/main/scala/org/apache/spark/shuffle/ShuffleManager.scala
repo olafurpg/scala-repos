@@ -27,7 +27,7 @@ import org.apache.spark.{ShuffleDependency, TaskContext}
   * NOTE: this will be instantiated by SparkEnv so its constructor can take a SparkConf and
   * boolean isDriver as parameters.
   */
-private[spark] trait ShuffleManager {
+private[spark] trait ShuffleManager
 
   /** Return short name for the ShuffleManager */
   val shortName: String
@@ -67,4 +67,3 @@ private[spark] trait ShuffleManager {
 
   /** Shut down this ShuffleManager. */
   def stop(): Unit
-}

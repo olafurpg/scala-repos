@@ -13,17 +13,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 6/6/12
   */
-object SplitElseIfIntention {
+object SplitElseIfIntention
   def familyName = "Split Else If"
-}
 
-class SplitElseIfIntention extends PsiElementBaseIntentionAction {
+class SplitElseIfIntention extends PsiElementBaseIntentionAction
   def getFamilyName = SplitElseIfIntention.familyName
 
   override def getText: String = "Split 'else if'"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -37,14 +36,12 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
             offset <= elseBranch.getTextRange.getStartOffset)) return false
 
     val elseIfExpr = ifStmt.elseBranch.orNull
-    if (elseIfExpr != null && elseIfExpr.isInstanceOf[ScIfStmt]) {
+    if (elseIfExpr != null && elseIfExpr.isInstanceOf[ScIfStmt])
       return true
-    }
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null || !ifStmt.isValid) return
@@ -79,12 +76,9 @@ class SplitElseIfIntention extends PsiElementBaseIntentionAction {
       newIfStmt.asInstanceOf[ScIfStmt].thenBranch.get.getTextRange.getEndOffset -
       newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       ifStmt.replaceExpression(newIfStmt, true)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

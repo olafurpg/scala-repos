@@ -20,25 +20,23 @@ package org.apache.spark.scheduler
 import org.apache.spark._
 import org.apache.spark.internal.Logging
 
-class FakeSchedulerBackend extends SchedulerBackend {
+class FakeSchedulerBackend extends SchedulerBackend
   def start() {}
   def stop() {}
   def reviveOffers() {}
   def defaultParallelism(): Int = 1
-}
 
 class TaskSchedulerImplSuite
-    extends SparkFunSuite with LocalSparkContext with Logging {
+    extends SparkFunSuite with LocalSparkContext with Logging
 
-  test("Scheduler does not always schedule tasks on the same workers") {
+  test("Scheduler does not always schedule tasks on the same workers")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
     // Need to initialize a DAGScheduler for the taskScheduler to use for callbacks.
-    new DAGScheduler(sc, taskScheduler) {
+    new DAGScheduler(sc, taskScheduler)
       override def taskStarted(task: Task[_], taskInfo: TaskInfo) {}
       override def executorAdded(execId: String, host: String) {}
-    }
 
     val numFreeCores = 1
     val workerOffers = Seq(new WorkerOffer("executor0", "host0", numFreeCores),
@@ -49,19 +47,17 @@ class TaskSchedulerImplSuite
     // probability of that happening is 2^-1000 (so sufficiently small to be considered
     // negligible).
     val numTrials = 1000
-    val selectedExecutorIds = 1.to(numTrials).map { _ =>
+    val selectedExecutorIds = 1.to(numTrials).map  _ =>
       val taskSet = FakeTask.createTaskSet(1)
       taskScheduler.submitTasks(taskSet)
       val taskDescriptions = taskScheduler.resourceOffers(workerOffers).flatten
       assert(1 === taskDescriptions.length)
       taskDescriptions(0).executorId
-    }
     val count = selectedExecutorIds.count(_ == workerOffers(0).executorId)
     assert(count > 0)
     assert(count < numTrials)
-  }
 
-  test("Scheduler correctly accounts for multiple CPUs per task") {
+  test("Scheduler correctly accounts for multiple CPUs per task")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskCpus = 2
 
@@ -69,10 +65,9 @@ class TaskSchedulerImplSuite
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
     // Need to initialize a DAGScheduler for the taskScheduler to use for callbacks.
-    new DAGScheduler(sc, taskScheduler) {
+    new DAGScheduler(sc, taskScheduler)
       override def taskStarted(task: Task[_], taskInfo: TaskInfo) {}
       override def executorAdded(execId: String, host: String) {}
-    }
     // Give zero core offers. Should not generate any tasks
     val zeroCoreWorkerOffers = Seq(new WorkerOffer("executor0", "host0", 0),
                                    new WorkerOffer("executor1", "host1", 0))
@@ -104,9 +99,8 @@ class TaskSchedulerImplSuite
       .flatten
     assert(1 === taskDescriptions.length)
     assert("executor0" === taskDescriptions(0).executorId)
-  }
 
-  test("Scheduler does not crash when tasks are not serializable") {
+  test("Scheduler does not crash when tasks are not serializable")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskCpus = 2
 
@@ -114,10 +108,9 @@ class TaskSchedulerImplSuite
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
     // Need to initialize a DAGScheduler for the taskScheduler to use for callbacks.
-    val dagScheduler = new DAGScheduler(sc, taskScheduler) {
+    val dagScheduler = new DAGScheduler(sc, taskScheduler)
       override def taskStarted(task: Task[_], taskInfo: TaskInfo) {}
       override def executorAdded(execId: String, host: String) {}
-    }
     val numFreeCores = 1
     taskScheduler.setDAGScheduler(dagScheduler)
     val taskSet = new TaskSet(Array(new NotSerializableFakeTask(1, 0),
@@ -143,18 +136,16 @@ class TaskSchedulerImplSuite
       .resourceOffers(multiCoreWorkerOffers)
       .flatten
     assert(taskDescriptions.map(_.executorId) === Seq("executor0"))
-  }
 
   test(
-      "refuse to schedule concurrent attempts for the same stage (SPARK-8103)") {
+      "refuse to schedule concurrent attempts for the same stage (SPARK-8103)")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
     // Need to initialize a DAGScheduler for the taskScheduler to use for callbacks.
-    val dagScheduler = new DAGScheduler(sc, taskScheduler) {
+    val dagScheduler = new DAGScheduler(sc, taskScheduler)
       override def taskStarted(task: Task[_], taskInfo: TaskInfo) {}
       override def executorAdded(execId: String, host: String) {}
-    }
     taskScheduler.setDAGScheduler(dagScheduler)
     val attempt1 = FakeTask.createTaskSet(1, 0)
     val attempt2 = FakeTask.createTaskSet(1, 1)
@@ -174,17 +165,15 @@ class TaskSchedulerImplSuite
       .get
       .isZombie = true
     taskScheduler.submitTasks(attempt3)
-  }
 
-  test("don't schedule more tasks after a taskset is zombie") {
+  test("don't schedule more tasks after a taskset is zombie")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
     // Need to initialize a DAGScheduler for the taskScheduler to use for callbacks.
-    new DAGScheduler(sc, taskScheduler) {
+    new DAGScheduler(sc, taskScheduler)
       override def taskStarted(task: Task[_], taskInfo: TaskInfo) {}
       override def executorAdded(execId: String, host: String) {}
-    }
 
     val numFreeCores = 1
     val workerOffers = Seq(new WorkerOffer("executor0", "host0", numFreeCores))
@@ -215,18 +204,16 @@ class TaskSchedulerImplSuite
     val mgr =
       taskScheduler.taskIdToTaskSetManager.get(taskDescriptions3(0).taskId).get
     assert(mgr.taskSet.stageAttemptId === 1)
-  }
 
   test(
-      "if a zombie attempt finishes, continue scheduling tasks for non-zombie attempts") {
+      "if a zombie attempt finishes, continue scheduling tasks for non-zombie attempts")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
     // Need to initialize a DAGScheduler for the taskScheduler to use for callbacks.
-    new DAGScheduler(sc, taskScheduler) {
+    new DAGScheduler(sc, taskScheduler)
       override def taskStarted(task: Task[_], taskInfo: TaskInfo) {}
       override def executorAdded(execId: String, host: String) {}
-    }
 
     val numFreeCores = 10
     val workerOffers = Seq(new WorkerOffer("executor0", "host0", numFreeCores))
@@ -259,21 +246,18 @@ class TaskSchedulerImplSuite
     val taskDescriptions3 = taskScheduler.resourceOffers(workerOffers).flatten
     assert(10 === taskDescriptions3.length)
 
-    taskDescriptions3.foreach { task =>
+    taskDescriptions3.foreach  task =>
       val mgr = taskScheduler.taskIdToTaskSetManager.get(task.taskId).get
       assert(mgr.taskSet.stageAttemptId === 1)
-    }
-  }
 
-  test("tasks are not re-scheduled while executor loss reason is pending") {
+  test("tasks are not re-scheduled while executor loss reason is pending")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
     taskScheduler.initialize(new FakeSchedulerBackend)
     // Need to initialize a DAGScheduler for the taskScheduler to use for callbacks.
-    new DAGScheduler(sc, taskScheduler) {
+    new DAGScheduler(sc, taskScheduler)
       override def taskStarted(task: Task[_], taskInfo: TaskInfo) {}
       override def executorAdded(execId: String, host: String) {}
-    }
 
     val e0Offers = Seq(new WorkerOffer("executor0", "host0", 1))
     val e1Offers = Seq(new WorkerOffer("executor1", "host0", 1))
@@ -299,5 +283,3 @@ class TaskSchedulerImplSuite
     val taskDescriptions3 = taskScheduler.resourceOffers(e1Offers).flatten
     assert(1 === taskDescriptions3.length)
     assert("executor1" === taskDescriptions3(0).executorId)
-  }
-}

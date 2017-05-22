@@ -15,7 +15,7 @@ import org.ensime.util.file._
   * Provides a fixture for tests to have access to a cloned project,
   * based on an example project that will be untouched.
   */
-trait EnsimeConfigFixture {
+trait EnsimeConfigFixture
 
   /** The definition of the original project to clone for testing. */
   def original: EnsimeConfig
@@ -26,28 +26,26 @@ trait EnsimeConfigFixture {
 
   // convenience method
   def main(lang: String)(implicit config: EnsimeConfig): File =
-    config.subprojects.head.sourceRoots.filter { dir =>
+    config.subprojects.head.sourceRoots.filter  dir =>
       val sep = JFile.separator
       dir.getPath.endsWith(s"${sep}main$sep$lang")
-    }.head
+    .head
   def scalaMain(implicit config: EnsimeConfig): File = main("scala")
   def javaMain(implicit config: EnsimeConfig): File = main("java")
 
   def mainTarget(implicit config: EnsimeConfig): File =
     config.subprojects.head.targets.head
-}
 
-object EnsimeConfigFixture {
+object EnsimeConfigFixture
 
   lazy val dotEnsime = File("../.ensime")
-  if (!dotEnsime.exists) {
+  if (!dotEnsime.exists)
     System.err.println(
         "The .ensime file must exist to run the integration tests." +
         " Type 'sbt gen-ensime' to create it"
     )
     System.err.flush()
     sys.exit(1)
-  }
   lazy val dotEnsimeCache = File("../.ensime_cache")
   dotEnsimeCache.mkdirs()
 
@@ -100,9 +98,9 @@ object EnsimeConfigFixture {
       source: EnsimeConfig,
       target: File,
       copyTargets: Boolean
-  ): EnsimeConfig = {
+  ): EnsimeConfig =
 
-    def rename(from: File): File = {
+    def rename(from: File): File =
       val toPath = from.getAbsolutePath.replace(
           source.root.getAbsolutePath,
           target.getAbsolutePath
@@ -111,14 +109,12 @@ object EnsimeConfigFixture {
           toPath != from.getAbsolutePath,
           s"${source.root.getAbsolutePath} ${target.getAbsolutePath} in ${from.getAbsolutePath}")
       File(toPath)
-    }
 
-    def renameAndCopy(from: File): File = {
+    def renameAndCopy(from: File): File =
       val to = rename(from)
       if (!to.isJar) copyDirectory(from, to)
       else copyFile(from, to)
       to
-    }
 
     def renameAndCopyTarget(from: File): File =
       if (copyTargets) renameAndCopy(from)
@@ -145,13 +141,10 @@ object EnsimeConfigFixture {
 
     // HACK: we must force OS line endings on sources or the tests
     // (which have fixed points within the file) will fail on Windows
-    config.scalaSourceFiles.foreach { file =>
+    config.scalaSourceFiles.foreach  file =>
       file.writeLines(file.readLines())
-    }
 
     config
-  }
-}
 
 /**
   * Provides the basic building blocks to build custom fixtures around
@@ -162,39 +155,34 @@ object EnsimeConfigFixture {
   * parameters to the bare minimal (e.g. remove JRE and dependencies to
   * index if not needed).
   */
-trait IsolatedEnsimeConfigFixture extends Suite with EnsimeConfigFixture {
+trait IsolatedEnsimeConfigFixture extends Suite with EnsimeConfigFixture
   //running in parallel actually slows things down
   //with ParallelTestExecution {
   import EnsimeConfigFixture._
 
   override def withEnsimeConfig(testCode: EnsimeConfig => Any): Any =
-    withTempDir { dir =>
+    withTempDir  dir =>
       testCode(cloneForTesting(original, dir, copyTargets))
-    }
-}
 
 /**
   * Provides the basic building blocks to build custom fixtures around
   * a project that is cloned once for the test suite.
   */
 trait SharedEnsimeConfigFixture
-    extends Suite with EnsimeConfigFixture with BeforeAndAfterAll {
+    extends Suite with EnsimeConfigFixture with BeforeAndAfterAll
   import EnsimeConfigFixture._
 
   private val tmpDir = Files.createTempDir()
 
   private[fixture] var _config: EnsimeConfig = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     _config = cloneForTesting(original, tmpDir, copyTargets)
-  }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     super.afterAll()
     tmpDir.tree.reverse.foreach(_.delete())
-  }
 
   override def withEnsimeConfig(testCode: EnsimeConfig => Any): Any =
     testCode(_config)
-}

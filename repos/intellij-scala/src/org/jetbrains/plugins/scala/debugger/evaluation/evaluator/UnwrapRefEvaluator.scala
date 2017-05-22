@@ -9,12 +9,10 @@ import org.jetbrains.plugins.scala.debugger.evaluation.util.DebuggerUtil
   * Nikolay.Tropin
   * 2014-10-16
   */
-class UnwrapRefEvaluator(parent: Evaluator) extends Evaluator {
+class UnwrapRefEvaluator(parent: Evaluator) extends Evaluator
 
-  override def evaluate(context: EvaluationContextImpl): AnyRef = {
+  override def evaluate(context: EvaluationContextImpl): AnyRef =
     val value = parent.evaluate(context)
     DebuggerUtil.unwrapScalaRuntimeRef(value)
-  }
 
   override def getModifier: Modifier = null
-}

@@ -34,17 +34,16 @@ import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Insets
 import scalafx.scene.image.Image
 
-object BorderImage {
+object BorderImage
   implicit def sfxBackground2jfx(v: BorderImage): jfxsl.BorderImage =
     if (v != null) v.delegate else null
-}
 
 /**
   * Defines properties describing how to render an image as the background to some
   * [[scalafx.scene.layout.Region]].
   */
 class BorderImage(override val delegate: jfxsl.BorderImage)
-    extends SFXDelegate[jfxsl.BorderImage] {
+    extends SFXDelegate[jfxsl.BorderImage]
 
   /**
     * Creates a new BackgroundImage.Defines properties describing how to render an image as
@@ -93,4 +92,3 @@ class BorderImage(override val delegate: jfxsl.BorderImage)
     * The widths of the border on each side.
     */
   def widths: BorderWidths = delegate.getWidths
-}

@@ -29,7 +29,7 @@ import util.FieldError
 /**
   * A trait that defines foreign key references
   */
-trait BaseForeignKey extends BaseMappedField {
+trait BaseForeignKey extends BaseMappedField
 
   type KeyType
   type KeyedForeignType <: KeyedMapper[KeyType, KeyedForeignType]
@@ -57,20 +57,18 @@ trait BaseForeignKey extends BaseMappedField {
     * is done with the schemification.
     */
   def dbAddedForeignKey: Box[() => Unit]
-}
 
-object MappedForeignKey {
+object MappedForeignKey
   implicit def getObj[KeyType, MyOwner <: Mapper[MyOwner], Other <: KeyedMapper[
           KeyType, Other]](
       in: MappedForeignKey[KeyType, MyOwner, Other]): Box[Other] = in.obj
-}
 
 /**
   * The Trait that defines a field that is mapped to a foreign key
   */
 trait MappedForeignKey[
     KeyType, MyOwner <: Mapper[MyOwner], Other <: KeyedMapper[KeyType, Other]]
-    extends MappedField[KeyType, MyOwner] with LifecycleCallbacks {
+    extends MappedField[KeyType, MyOwner] with LifecycleCallbacks
   type FieldType <: KeyType
   // type ForeignType <: KeyedMapper[KeyType, Other]
 
@@ -86,11 +84,10 @@ trait MappedForeignKey[
   private def checkTypes(km: KeyedMapper[KeyType, _]): Boolean =
     km.getSingleton eq foreignMeta
 
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case km: KeyedMapper[KeyType, Other] if checkTypes(km) =>
       this.get == km.primaryKeyField.get
     case _ => super.equals(other)
-  }
 
   def dbKeyToTable: KeyedMetaMapper[KeyType, Other]
 
@@ -100,12 +97,12 @@ trait MappedForeignKey[
 
   override def _toForm: Box[Elem] =
     Full(
-        validSelectValues.flatMap {
+        validSelectValues.flatMap
       case Nil => Empty
 
       case xs =>
         Full(SHtml.selectObj(xs, Full(this.get), this.set))
-    }.openOr(<span>{immutableMsg}</span>))
+    .openOr(<span>{immutableMsg}</span>))
 
   /**
     * Is the key defined
@@ -117,19 +114,17 @@ trait MappedForeignKey[
     */
   def cached_? : Boolean = synchronized { _calcedObj }
 
-  override protected def dirty_?(b: Boolean) = synchronized {
+  override protected def dirty_?(b: Boolean) = synchronized
     // issue 165
     // invalidate if the primary key has changed Issue 370
     if (_obj.isEmpty ||
         (_calcedObj && _obj.isDefined && _obj
               .openOrThrowException("_obj was just checked as full.")
               .primaryKeyField
-              .get != this.i_is_!)) {
+              .get != this.i_is_!))
       _obj = Empty
       _calcedObj = false
-    }
     super.dirty_?(b)
-  }
 
   /**
     * Some people prefer the name foreign to materialize the
@@ -140,13 +135,11 @@ trait MappedForeignKey[
   /**
     * Load and cache the record that this field references
     */
-  def obj: Box[Other] = synchronized {
-    if (!_calcedObj) {
+  def obj: Box[Other] = synchronized
+    if (!_calcedObj)
       _calcedObj = true
       this._obj = if (defined_?) dbKeyToTable.find(i_is_!) else Empty
-    }
     _obj
-  }
 
   private[mapper] def _primeObj(obj: Box[Any]) =
     primeObj(obj.asInstanceOf[Box[Other]])
@@ -154,10 +147,9 @@ trait MappedForeignKey[
   /**
     * Prime the reference of this FK reference
     */
-  def primeObj(obj: Box[Other]) = synchronized {
+  def primeObj(obj: Box[Other]) = synchronized
     _obj = obj
     _calcedObj = true
-  }
 
   private var _obj: Box[Other] = Empty
   private var _calcedObj = false
@@ -168,32 +160,29 @@ trait MappedForeignKey[
     * If v is Empty, set the value to defaultValue (-1)
     * @return the Mapper containing this field
     */
-  def apply(v: Box[Other]): MyOwner = {
+  def apply(v: Box[Other]): MyOwner =
     apply(v.dmap(defaultValue)(_.primaryKeyField.get))
     primeObj(v)
     fieldOwner
-  }
 
   /**
     * Set the value from an instance of the foreign mapper class.
     * obj will be set to Full(v)
     * @return the Mapper containing this field
     */
-  def apply(v: Other): MyOwner = {
+  def apply(v: Other): MyOwner =
     apply(v.primaryKeyField.get)
     primeObj(Full(v))
     fieldOwner
-  }
 
   /**
     * This method, which gets called when the mapper class is going to be saved,
     * sets the field's value from obj if it's set to the default (!defined_?).
     * Overrides LifecycleCallbacks.beforeSave
     */
-  override def beforeSave {
+  override def beforeSave
     if (!defined_?) for (o <- obj) set(o.primaryKeyField.get)
     super.beforeSave
-  }
 
   /**
     * A validation function that checks that obj is nonempty
@@ -202,12 +191,11 @@ trait MappedForeignKey[
     if (obj.isEmpty)
       List(FieldError(this, scala.xml.Text("Required field: " + name)))
     else Nil
-}
 
 abstract class MappedLongForeignKey[T <: Mapper[T], O <: KeyedMapper[Long, O]](
     theOwner: T, _foreignMeta: => KeyedMetaMapper[Long, O])
     extends MappedLong[T](theOwner) with MappedForeignKey[Long, T, O]
-    with BaseForeignKey {
+    with BaseForeignKey
   def defined_? = i_is_! > 0L
 
   def foreignMeta = _foreignMeta
@@ -240,11 +228,10 @@ abstract class MappedLongForeignKey[T <: Mapper[T], O <: KeyedMapper[Long, O]](
     if (defined_?) super.asJsonValue else Full(JsonAST.JNull)
 
   override def setFromAny(in: Any): Long =
-    in match {
+    in match
       case JsonAST.JNull => this.set(0L)
       case JsonAST.JInt(bigint) => this.set(bigint.longValue)
       case o => super.setFromAny(o)
-    }
 
   /**
     * Called when Schemifier adds a foreign key.  Return a function that will be called when Schemifier
@@ -268,7 +255,6 @@ abstract class MappedLongForeignKey[T <: Mapper[T], O <: KeyedMapper[Long, O]](
   override def fieldCreatorString(
       dbType: DriverType, colName: String): String =
     colName + " " + dbType.longForeignKeyColumnType + notNullAppender()
-}
 
 abstract class MappedStringForeignKey[
     T <: Mapper[T], O <: KeyedMapper[String, O]](
@@ -276,7 +262,7 @@ abstract class MappedStringForeignKey[
     foreign: => KeyedMetaMapper[String, O],
     override val maxLen: Int)
     extends MappedString[T](fieldOwner, maxLen)
-    with MappedForeignKey[String, T, O] with BaseForeignKey {
+    with MappedForeignKey[String, T, O] with BaseForeignKey
   def defined_? = i_is_! ne null
 
   type KeyType = String
@@ -304,14 +290,12 @@ abstract class MappedStringForeignKey[
 
   override def toString = if (defined_?) super.toString else "NULL"
 
-  def set(v: Box[O]): T = {
-    val toSet: String = v match {
+  def set(v: Box[O]): T =
+    val toSet: String = v match
       case Full(i) => i.primaryKeyField.get
       case _ => null
-    }
 
     this(toSet)
-  }
 
   def findFor(key: KeyType): List[OwnerType] =
     fieldOwner.getSingleton.findAll(By(this, key))
@@ -323,4 +307,3 @@ abstract class MappedStringForeignKey[
     * Given the driver type, return the string required to create the column in the database
     */
   // defect 79 override def fieldCreatorString(dbType: DriverType, colName: String): String = colName + " " + dbType.longForeignKeyColumnType
-}

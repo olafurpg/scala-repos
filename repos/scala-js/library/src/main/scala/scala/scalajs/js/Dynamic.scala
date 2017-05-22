@@ -24,7 +24,7 @@ import annotation.{JSBracketAccess, JSBracketCall}
   *  apply any JavaScript operator to values of this type.
   */
 @native
-sealed trait Dynamic extends Any with scala.Dynamic {
+sealed trait Dynamic extends Any with scala.Dynamic
 
   /** Calls a method of this object. */
   @JSBracketCall
@@ -70,10 +70,9 @@ sealed trait Dynamic extends Any with scala.Dynamic {
   // Work around the annoying implicits in Predef in Scala 2.10.
   def x: Dynamic = native
   def x_=(value: Any): Unit = native
-}
 
 /** Factory for dynamically typed JavaScript values. */
-object Dynamic {
+object Dynamic
 
   /** Dynamic view of the global scope. */
   @inline def global: Dynamic = scala.scalajs.runtime.environmentInfo.global
@@ -89,7 +88,7 @@ object Dynamic {
     *  returns the JavaScript object
     *    {foo: 3, bar: "foobar"}
     */
-  object literal extends scala.Dynamic {
+  object literal extends scala.Dynamic
     // scalastyle:ignore
     /** literal creation like this:
       *  js.Dynamic.literal(name1 = "value", name2 = "value")
@@ -106,5 +105,3 @@ object Dynamic {
       */
     def applyDynamic(name: String)(
         fields: (String, Any)*): Object with Dynamic = sys.error("stub")
-  }
-}

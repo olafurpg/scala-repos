@@ -4,39 +4,36 @@ import java.io.UnsupportedEncodingException
 import java.nio.{CharBuffer, ByteBuffer}
 import java.nio.charset.{Charset, MalformedInputException}
 
-object URLDecoder {
+object URLDecoder
 
   @Deprecated
   def decode(s: String): String = decodeImpl(s, Charset.defaultCharset)
 
-  def decode(s: String, enc: String): String = {
+  def decode(s: String, enc: String): String =
     /* An exception is thrown only if the
      * character encoding needs to be consulted
      */
-    lazy val charset = {
+    lazy val charset =
       if (!Charset.isSupported(enc))
         throw new UnsupportedEncodingException(enc)
       else Charset.forName(enc)
-    }
 
     decodeImpl(s, charset)
-  }
 
-  private def decodeImpl(s: String, charset: => Charset): String = {
+  private def decodeImpl(s: String, charset: => Charset): String =
     val len = s.length
     lazy val charsetDecoder = charset.newDecoder()
 
     lazy val byteBuffer = ByteBuffer.allocate(len / 3)
     val charBuffer = CharBuffer.allocate(len)
 
-    def throwIllegalHex() = {
+    def throwIllegalHex() =
       throw new IllegalArgumentException(
           "URLDecoder: Illegal hex characters in escape (%) pattern")
-    }
 
     var i = 0
-    while (i < len) {
-      s.charAt(i) match {
+    while (i < len)
+      s.charAt(i) match
         case '+' =>
           charBuffer.append(' ')
           i += 1
@@ -50,7 +47,7 @@ object URLDecoder {
           buffer.clear()
           decoder.reset()
 
-          while (i + 3 <= len && s.charAt(i) == '%') {
+          while (i + 3 <= len && s.charAt(i) == '%')
             val c1 = Character.digit(s.charAt(i + 1), 16)
             val c2 = Character.digit(s.charAt(i + 2), 16)
 
@@ -58,7 +55,6 @@ object URLDecoder {
 
             buffer.put(((c1 << 4) + c2).toByte)
             i += 3
-          }
 
           buffer.flip()
           val decodeResult = decoder.decode(buffer, charBuffer, true)
@@ -69,10 +65,6 @@ object URLDecoder {
         case c =>
           charBuffer.append(c)
           i += 1
-      }
-    }
 
     charBuffer.flip()
     charBuffer.toString
-  }
-}

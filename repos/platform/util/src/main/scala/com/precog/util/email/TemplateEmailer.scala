@@ -46,13 +46,12 @@ import org.fusesource.scalate._
   */
 abstract class TemplateEmailer(defaultParameters: Map[String, String],
                                javaMailProps: Option[Properties],
-                               workDir: Option[File]) {
+                               workDir: Option[File])
   val engine = new TemplateEngine
-  workDir.foreach { dir =>
+  workDir.foreach  dir =>
     engine.workingDirectory = dir
-  }
 
-  private val mailProps = javaMailProps.getOrElse {
+  private val mailProps = javaMailProps.getOrElse
     val props = new Properties
     val sysProps = System.getProperties
 
@@ -63,11 +62,9 @@ abstract class TemplateEmailer(defaultParameters: Map[String, String],
         "mail.smtp.port",
         Option(sysProps.getProperty("mail.smtp.host")).getOrElse("25"))
     props
-  }
 
-  def withSession[T](f: Session => T): T = {
+  def withSession[T](f: Session => T): T =
     f(Session.getInstance(mailProps))
-  }
 
   protected def source(name: String): TemplateSource
 
@@ -79,61 +76,52 @@ abstract class TemplateEmailer(defaultParameters: Map[String, String],
                 subjectTemplate: String,
                 bodyTemplates: Seq[(String, String)],
                 parameters: Map[String, String],
-                from: Option[String] = None): PrecogUnit = withSession {
+                from: Option[String] = None): PrecogUnit = withSession
     session =>
       val msg = new MimeMessage(session)
       msg.addRecipients(
           Message.RecipientType.TO,
           recipients.map(new InternetAddress(_).asInstanceOf[Address]).toArray)
-      from.foreach { fa =>
+      from.foreach  fa =>
         msg.setFrom(new InternetAddress(fa))
-      }
 
       val templateParams = defaultParameters ++ parameters
 
       // Process the templates and insert values
       msg.setSubject(engine.layout(source(subjectTemplate), templateParams))
 
-      val transformed = bodyTemplates.map {
+      val transformed = bodyTemplates.map
         case (template, mimetype) =>
           (engine.layout(source(template), templateParams),
            mimetype + "; charset=utf-8")
-      }
 
-      if (transformed.size > 1) {
+      if (transformed.size > 1)
         val multi = new MimeMultipart("alternative")
-        transformed.foreach {
+        transformed.foreach
           case (content, mimetype) =>
             val bodyPart = new MimeBodyPart
             bodyPart.setContent(content, mimetype)
             multi.addBodyPart(bodyPart)
-        }
         msg.setContent(multi)
-      } else {
-        transformed.foreach {
+      else
+        transformed.foreach
           case (content, mimetype) => msg.setContent(content, mimetype)
-        }
-      }
 
       Transport.send(msg)
 
       PrecogUnit
-  }
-}
 
 class DirectoryTemplateEmailer(templateDir: File,
                                defaultParameters: Map[String, String],
                                javaMailProps: Option[Properties] = None,
                                workDir: Option[File] = None)
-    extends TemplateEmailer(defaultParameters, javaMailProps, workDir) {
+    extends TemplateEmailer(defaultParameters, javaMailProps, workDir)
   protected def source(name: String) =
     TemplateSource.fromFile(new File(templateDir, name))
-}
 
 class ClassLoaderTemplateEmailer(defaultParameters: Map[String, String],
                                  javaMailProps: Option[Properties] = None,
                                  workDir: Option[File] = None)
-    extends TemplateEmailer(defaultParameters, javaMailProps, workDir) {
+    extends TemplateEmailer(defaultParameters, javaMailProps, workDir)
   protected def source(name: String) =
     TemplateSource.fromURL(this.getClass.getClassLoader.getResource(name))
-}

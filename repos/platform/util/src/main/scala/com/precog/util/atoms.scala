@@ -25,17 +25,15 @@ import java.util.concurrent.locks.ReentrantLock
 
 import scala.collection.generic.CanBuildFrom
 
-trait Source[+A] {
+trait Source[+A]
   def apply(): A
   def into(sink: Sink[A])
-}
 
-trait Sink[-A] {
+trait Sink[-A]
   def update(a: A)
   def from(src: Source[A])
-}
 
-class Atom[A] extends Source[A] with Sink[A] {
+class Atom[A] extends Source[A] with Sink[A]
 
   @volatile
   private var value: A = null.asInstanceOf[A]
@@ -55,218 +53,173 @@ class Atom[A] extends Source[A] with Sink[A] {
   private val lock = new ReentrantLock
   private val semaphore = new AnyRef
 
-  protected def populate() {
+  protected def populate()
     sys.error("Cannot self-populate atom")
-  }
 
-  def update(a: A) {
+  def update(a: A)
     lock.lock()
-    try {
-      if (!isSet || !isForced) {
+    try
+      if (!isSet || !isForced)
         value = a
         isSet = true
 
-        semaphore synchronized {
+        semaphore synchronized
           semaphore.notifyAll()
-        }
-      }
-    } finally {
+    finally
       lock.unlock()
-    }
-  }
 
   def +=[B](b: B)(implicit cbf: CanBuildFrom[A, B, A],
-                  evidence: A <:< TraversableOnce[B]) {
-    if (!isForced || setterThread != null) {
+                  evidence: A <:< TraversableOnce[B])
+    if (!isForced || setterThread != null)
       lock.lock()
-      try {
-        if (!isForced || setterThread != null) {
+      try
+        if (!isForced || setterThread != null)
           val builder =
-            if (value == null) {
+            if (value == null)
               // TODO gross!
               cbf()
-            } else {
+            else
               val back = cbf(value)
               back ++= value
               back
-            }
 
           builder += b
 
           value = builder.result()
 
-          if (setterThread != null) {
+          if (setterThread != null)
             isSet = true
-          }
-        }
-      } finally {
+      finally
         lock.unlock()
-      }
-    }
-  }
 
   def ++=[E](c: A)(implicit unpack: Unpack[A, E],
                    cbf: CanBuildFrom[A, E, A],
-                   evidence2: A <:< TraversableOnce[E]) {
-    if (!isForced || setterThread != null) {
+                   evidence2: A <:< TraversableOnce[E])
+    if (!isForced || setterThread != null)
       lock.lock()
-      try {
-        if (!isForced || setterThread != null) {
+      try
+        if (!isForced || setterThread != null)
           val builder =
-            if (value == null) {
+            if (value == null)
               // TODO gross!
               cbf()
-            } else {
+            else
               val back = cbf(value)
               back ++= value
               back
-            }
 
           builder ++= evidence2(c)
 
           value = builder.result()
 
-          if (setterThread != null) {
+          if (setterThread != null)
             isSet = true
-          }
-        }
-      } finally {
+      finally
         lock.unlock()
-      }
-    }
-  }
 
   def appendFrom[E, Coll[_]](a: Atom[Coll[E]])(
       implicit cbf: CanBuildFrom[Coll[E], E, A],
       evidence: A =:= Coll[E],
-      evidence2: Coll[E] <:< TraversableOnce[E]) {
-    if (!isForced || setterThread != null) {
+      evidence2: Coll[E] <:< TraversableOnce[E])
+    if (!isForced || setterThread != null)
       lock.lock()
-      try {
-        if (!isForced || setterThread != null) {
+      try
+        if (!isForced || setterThread != null)
           val builder =
-            if (value == null) {
+            if (value == null)
               // TODO gross!
               cbf()
-            } else {
+            else
               val current = evidence(value)
               val back = cbf(current)
               back ++= current
               back
-            }
 
           // not thread safe, basically horrible
-          if (a.value != null) {
+          if (a.value != null)
             builder ++= evidence2(a.value)
-          }
 
           value = builder.result()
 
-          if (setterThread != null) {
+          if (setterThread != null)
             isSet = true
-          }
-        }
-      } finally {
+      finally
         lock.unlock()
-      }
-    }
-  }
 
-  def from(source: Source[A]) {
+  def from(source: Source[A])
     source.into(this)
-  }
 
-  def into(sink: Sink[A]) {
-    if (isSet) {
+  def into(sink: Sink[A])
+    if (isSet)
       sink() = value
-    } else {
+    else
       lock.lock()
-      if (isSet) {
+      if (isSet)
         sink() = value
-      } else {
-        try {
+      else
+        try
           targets += sink
-        } finally {
+        finally
           lock.unlock()
-        }
-      }
-    }
-  }
 
   // TODO should force source atom (if any) at this point
-  def apply(): A = {
+  def apply(): A =
     isForced = true
 
-    if (isSet) {
+    if (isSet)
       value
-    } else {
+    else
       lock.lock()
-      try {
-        if (isSet) {
+      try
+        if (isSet)
           value
-        } else if (setterThread != null) {
-          if (setterThread == Thread.currentThread) {
+        else if (setterThread != null)
+          if (setterThread == Thread.currentThread)
             sys.error("Recursive atom definition detected")
-          } else {
+          else
             lock.unlock()
-            try {
-              semaphore synchronized {
+            try
+              semaphore synchronized
                 semaphore.wait()
-              }
-            } finally {
+            finally
               lock.lock()
-            }
             value
-          }
-        } else {
+        else
           setterThread = Thread.currentThread
           lock.unlock()
-          try {
+          try
             populate()
 
-            if (!isSet) {
+            if (!isSet)
               sys.error(
                   "Unable to self-populate atom (value not set following attempted population)")
-            }
-          } finally {
+          finally
             lock.lock()
             setterThread = null
-          }
 
           value
-        }
-      } finally {
+      finally
         lock.unlock()
-      }
-    }
 
-    if (!targets.isEmpty) {
+    if (!targets.isEmpty)
       lock.lock()
-      try {
+      try
         targets foreach { _ () = value }
         targets = Set()
-      } finally {
+      finally
         lock.unlock()
-      }
-    }
 
     value
-  }
-}
 
-object Atom {
-  def atom[A](f: => Unit): Atom[A] = new Atom[A] {
-    override def populate() = {
+object Atom
+  def atom[A](f: => Unit): Atom[A] = new Atom[A]
+    override def populate() =
       f
-    }
-  }
 
   def atom[A]: Atom[A] = new Atom[A]
-}
 
 class Unpack[C, E]
 
-object Unpack {
+object Unpack
   implicit def unpack1[CC[_], T] = new Unpack[CC[T], T]
   implicit def unpack2[CC[_, _], T, U] = new Unpack[CC[T, U], (T, U)]
-}

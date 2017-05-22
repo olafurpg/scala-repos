@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.macroAnnotations.{CachedWithRecursionGuard, M
 /**
   * @author Alexander Podkhalyuzin
   */
-trait ScTypeElement extends ScalaPsiElement with TypingContextOwner {
+trait ScTypeElement extends ScalaPsiElement with TypingContextOwner
   @CachedWithRecursionGuard[ScTypeElement](
       this,
       Failure("Recursive type of type element", Some(this)),
@@ -35,14 +35,12 @@ trait ScTypeElement extends ScalaPsiElement with TypingContextOwner {
   def calcType: ScType = getType(TypingContext.empty).getOrAny
 
   /** Link from a view or context bound to the type element of the corresponding synthetic parameter. */
-  def analog: Option[ScTypeElement] = {
+  def analog: Option[ScTypeElement] =
     refreshAnalog()
     _analog
-  }
 
-  def analog_=(te: ScTypeElement) {
+  def analog_=(te: ScTypeElement)
     _analog = Some(te)
-  }
 
   /**
     * If the reference is in a type parameter, first compute the effective parameters clauses
@@ -53,18 +51,14 @@ trait ScTypeElement extends ScalaPsiElement with TypingContextOwner {
     *
     * This in turn is used in the `treeWalkUp` in [[org.jetbrains.plugins.scala.lang.resolve.ResolvableStableCodeReferenceElement.processQualifier]]
     */
-  private def refreshAnalog() {
-    ScalaPsiUtil.getParentOfType(this, classOf[ScTypeParam]) match {
+  private def refreshAnalog()
+    ScalaPsiUtil.getParentOfType(this, classOf[ScTypeParam]) match
       case tp: ScTypeParam =>
-        ScalaPsiUtil.getParentOfType(tp, classOf[ScMethodLike]) match {
+        ScalaPsiUtil.getParentOfType(tp, classOf[ScMethodLike]) match
           case ml: ScMethodLike =>
             ml.effectiveParameterClauses
           case _ =>
-        }
       case _ =>
-    }
-  }
 
   @volatile
   private[this] var _analog: Option[ScTypeElement] = None
-}

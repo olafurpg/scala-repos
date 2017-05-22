@@ -11,7 +11,7 @@ import language.existentials
 
 /** Settings influencing the printing of warnings.
   */
-trait Warnings { self: MutableSettings =>
+trait Warnings  self: MutableSettings =>
 
   // Warning semantics.
   val fatalWarnings = BooleanSetting(
@@ -38,17 +38,16 @@ trait Warnings { self: MutableSettings =>
   // They are not activated by -Xlint and can't be enabled on the command line because they are not
   // created using the standard factory methods.
 
-  val warnValueOverrides = {
+  val warnValueOverrides =
     val flag = new BooleanSetting(
         "value-overrides",
         "Generated value class method overrides an implementation.")
     flag.value = false
     flag
-  }
 
   // Lint warnings
 
-  object LintWarnings extends MultiChoiceEnumeration {
+  object LintWarnings extends MultiChoiceEnumeration
     class LintWarning(name: String, help: String, val yAliased: Boolean)
         extends Choice(name, help)
     def LintWarning(name: String, help: String, yAliased: Boolean = false) =
@@ -104,7 +103,6 @@ trait Warnings { self: MutableSettings =>
         "Pattern sequence wildcard must align with sequence component.")
 
     def allLintWarnings = values.toSeq.asInstanceOf[Seq[LintWarning]]
-  }
   import LintWarnings._
 
   def warnAdaptedArgs = lint contains AdaptedArgs
@@ -143,13 +141,12 @@ trait Warnings { self: MutableSettings =>
                                 domain = LintWarnings,
                                 default = Some(List("_")))
 
-  allLintWarnings foreach {
+  allLintWarnings foreach
     case w if w.yAliased =>
-      BooleanSetting(s"-Ywarn-${w.name}", { w.help }) withPostSetHook { s =>
+      BooleanSetting(s"-Ywarn-${w.name}", { w.help }) withPostSetHook  s =>
         lint.add(if (s) w.name else s"-${w.name}")
-      } // withDeprecationMessage s"Enable -Xlint:${c._1}"
+      // withDeprecationMessage s"Enable -Xlint:${c._1}"
     case _ =>
-  }
 
   private lazy val warnSelectNullable = BooleanSetting(
       "-Xcheck-null", "This option is obsolete and does nothing.")
@@ -161,4 +158,3 @@ trait Warnings { self: MutableSettings =>
   def Xchecknull = warnSelectNullable // used by ide
   @deprecated("Use warnDeadCode", "2.11.0")
   def Ywarndeadcode = warnDeadCode // used by ide
-}

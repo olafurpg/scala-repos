@@ -28,7 +28,7 @@ import scala.collection.generic.CanCombineFrom
   */
 trait ParMap[K, +V]
     extends GenMap[K, V] with GenericParMapTemplate[K, V, ParMap]
-    with ParIterable[(K, V)] with ParMapLike[K, V, ParMap[K, V], Map[K, V]] {
+    with ParIterable[(K, V)] with ParMapLike[K, V, ParMap[K, V], Map[K, V]]
   self =>
 
   def mapCompanion: GenericParMapCompanion[ParMap] = ParMap
@@ -43,9 +43,8 @@ trait ParMap[K, +V]
     this + ((key, value))
 
   def +[U >: V](kv: (K, U)): ParMap[K, U]
-}
 
-object ParMap extends ParMapFactory[ParMap] {
+object ParMap extends ParMapFactory[ParMap]
   def empty[K, V]: ParMap[K, V] = new mutable.ParHashMap[K, V]
 
   def newCombiner[K, V]: Combiner[(K, V), ParMap[K, V]] =
@@ -58,10 +57,8 @@ object ParMap extends ParMapFactory[ParMap] {
     *  because of variance issues.
     */
   abstract class WithDefault[A, +B](underlying: ParMap[A, B], d: A => B)
-      extends ParMap[A, B] {
+      extends ParMap[A, B]
     override def size = underlying.size
     def get(key: A) = underlying.get(key)
     def splitter = underlying.splitter
     override def default(key: A): B = d(key)
-  }
-}

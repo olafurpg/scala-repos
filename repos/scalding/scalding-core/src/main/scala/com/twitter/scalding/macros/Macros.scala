@@ -22,7 +22,7 @@ import com.twitter.scalding.macros.impl._
 import cascading.tuple.Fields
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object Macros {
+object Macros
 
   // There is two flavors of the below functions, the pure vs withUnknown.
   // In both cases recursive case classes, primitive types, and options are flattened down onto cascading tuples.
@@ -55,4 +55,3 @@ object Macros {
     .caseClassTypeDescriptorImpl[T]
   def caseClassTypeDescriptorWithUnknown[T]: TypeDescriptor[T] = macro TypeDescriptorProviderImpl
     .caseClassTypeDescriptorWithUnknownImpl[T]
-}

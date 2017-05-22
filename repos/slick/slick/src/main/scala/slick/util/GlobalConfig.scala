@@ -13,7 +13,7 @@ import java.util.Properties
   * In addition to being listed in reference.conf, all essential config options also have their
   * default values hardcoded here because we cannot rely on getting reference.conf on the classpath
   * in all cases (e.g. the `tsql` macro). */
-object GlobalConfig {
+object GlobalConfig
   import ConfigExtensionMethods._
 
   private[this] val config = ConfigFactory.load()
@@ -42,14 +42,12 @@ object GlobalConfig {
     profileConfig("slick.driver." + name)
 
   /** Get a `Config` object for a Slick profile */
-  def profileConfig(path: String): Config = {
+  def profileConfig(path: String): Config =
     if (config.hasPath(path)) config.getConfig(path)
     else ConfigFactory.empty()
-  }
-}
 
 /** Extension methods to make Typesafe Config easier to use */
-class ConfigExtensionMethods(val c: Config) extends AnyVal {
+class ConfigExtensionMethods(val c: Config) extends AnyVal
   import scala.collection.JavaConverters._
 
   def getBooleanOr(path: String, default: => Boolean = false) =
@@ -75,10 +73,10 @@ class ConfigExtensionMethods(val c: Config) extends AnyVal {
     if (c.hasPath(path))
       new ConfigExtensionMethods(c.getConfig(path)).toProperties else default
 
-  def toProperties: Properties = {
-    def toProps(m: mutable.Map[String, ConfigValue]): Properties = {
+  def toProperties: Properties =
+    def toProps(m: mutable.Map[String, ConfigValue]): Properties =
       val props = new Properties(null)
-      m.foreach {
+      m.foreach
         case (k, cv) =>
           val v =
             if (cv.valueType() == ConfigValueType.OBJECT)
@@ -86,11 +84,8 @@ class ConfigExtensionMethods(val c: Config) extends AnyVal {
             else if (cv.unwrapped eq null) null
             else cv.unwrapped.toString
           if (v ne null) props.put(k, v)
-      }
       props
-    }
     toProps(c.root.asScala)
-  }
 
   def getBooleanOpt(path: String): Option[Boolean] =
     if (c.hasPath(path)) Some(c.getBoolean(path)) else None
@@ -98,9 +93,7 @@ class ConfigExtensionMethods(val c: Config) extends AnyVal {
     if (c.hasPath(path)) Some(c.getInt(path)) else None
   def getStringOpt(path: String) = Option(getStringOr(path))
   def getPropertiesOpt(path: String) = Option(getPropertiesOr(path))
-}
 
-object ConfigExtensionMethods {
+object ConfigExtensionMethods
   @inline implicit def configExtensionMethods(
       c: Config): ConfigExtensionMethods = new ConfigExtensionMethods(c)
-}

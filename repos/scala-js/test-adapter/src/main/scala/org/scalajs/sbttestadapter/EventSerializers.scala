@@ -17,13 +17,13 @@ import SelectorSerializers._
 
 import language.implicitConversions
 
-private[testadapter] object EventSerializers {
+private[testadapter] object EventSerializers
 
-  implicit object EventDeserializer extends JSONDeserializer[Event] {
+  implicit object EventDeserializer extends JSONDeserializer[Event]
     private implicit def optT2optT(x: Option[Throwable]): OptionalThrowable =
       x.fold(new OptionalThrowable)(t => new OptionalThrowable(t))
 
-    def deserialize(x: JSON): Event = {
+    def deserialize(x: JSON): Event =
       val obj = new JSONObjExtractor(x)
 
       new DeserializedEvent(obj.fld[String]("fullyQualifiedName"),
@@ -33,8 +33,6 @@ private[testadapter] object EventSerializers {
                             obj.opt[RemoteException]("throwable"),
                             (obj.fld[Int]("durationMS").toLong << 32) |
                             (obj.fld[Int]("durationLS").toLong & 0xffffffffL))
-    }
-  }
 
   final class DeserializedEvent(
       val fullyQualifiedName: String,
@@ -45,4 +43,3 @@ private[testadapter] object EventSerializers {
       val duration: Long
   )
       extends Event
-}

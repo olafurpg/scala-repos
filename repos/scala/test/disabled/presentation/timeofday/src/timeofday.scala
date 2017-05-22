@@ -1,10 +1,10 @@
-object timeofday {
+object timeofday
   class DateError extends Exception
 
   /** Simulating properties in Scala 
     *  (example 4.2.1 in the Scala Language Specification)
     */
-  class TimeOfDayVar {
+  class TimeOfDayVar
     private var h, m, s: Int = 0
 
     def hours = h
@@ -25,11 +25,8 @@ object timeofday {
     def seconds_=(s: Int) =
       if (0 <= s && s < 60) this. /*!*/ s = s
       else throw new DateError()
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val d = new TimeOfDayVar
     d.hours = 8; d. /*!*/ minutes = 30; d.seconds = 0
     d.hours /*#*/ = 25 // throws a DateError exception
-  }
-}

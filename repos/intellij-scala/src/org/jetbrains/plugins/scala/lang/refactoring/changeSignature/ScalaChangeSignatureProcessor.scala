@@ -12,26 +12,22 @@ import org.jetbrains.plugins.scala.lang.refactoring.changeSignature.changeInfo.S
   */
 class ScalaChangeSignatureProcessor(
     project: Project, changeInfo: ScalaChangeInfo)
-    extends ChangeSignatureProcessorBase(project, changeInfo) {
+    extends ChangeSignatureProcessorBase(project, changeInfo)
 
   override def createUsageViewDescriptor(
       usages: Array[UsageInfo]): UsageViewDescriptor =
     new ChangeSignatureViewDescriptor(changeInfo.getMethod)
 
-  override def performRefactoring(usages: Array[UsageInfo]): Unit = {
-    changeInfo.newParams.flatten.zipWithIndex.foreach {
+  override def performRefactoring(usages: Array[UsageInfo]): Unit =
+    changeInfo.newParams.flatten.zipWithIndex.foreach
       case (p, idx) =>
         p.defaultForJava = changeInfo.defaultParameterForJava(p, idx)
-    }
 
-    val sortedUsages = usages.sortBy {
+    val sortedUsages = usages.sortBy
       case _: ParameterUsageInfo => 0
       case _: MethodUsageInfo => 1
       case _: AnonFunUsageInfo => 1
       case _: ScalaNamedElementUsageInfo => 2
       case _ => 3
-    }
 
     super.performRefactoring(sortedUsages)
-  }
-}

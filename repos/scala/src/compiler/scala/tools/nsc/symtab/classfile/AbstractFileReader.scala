@@ -18,7 +18,7 @@ import scala.tools.nsc.io.AbstractFile
   * @author Philippe Altherr
   * @version 1.0, 23/03/2004
   */
-class AbstractFileReader(val file: AbstractFile) {
+class AbstractFileReader(val file: AbstractFile)
 
   /** the buffer containing the file
     */
@@ -31,19 +31,17 @@ class AbstractFileReader(val file: AbstractFile) {
   /** read a byte
     */
   @throws(classOf[IndexOutOfBoundsException])
-  def nextByte: Byte = {
+  def nextByte: Byte =
     val b = buf(bp)
     bp += 1
     b
-  }
 
   /** read some bytes
     */
-  def nextBytes(len: Int): Array[Byte] = {
+  def nextBytes(len: Int): Array[Byte] =
     // used in ide
     bp += len
     buf.slice(bp - len, bp)
-  }
 
   /** read a character
     */
@@ -83,4 +81,3 @@ class AbstractFileReader(val file: AbstractFile) {
   /** skip next 'n' bytes
     */
   def skip(n: Int) { bp += n }
-}

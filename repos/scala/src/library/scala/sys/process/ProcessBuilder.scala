@@ -138,7 +138,7 @@ import ProcessBuilder._
   * Process("find src -name *.scala -exec grep null {} ;") #| Process("xargs test -z") #&& Process("echo null-free") #|| Process("echo null detected") !
   * }}}
   */
-trait ProcessBuilder extends Source with Sink {
+trait ProcessBuilder extends Source with Sink
 
   /** Starts the process represented by this builder, blocks until it exits, and
     * returns the output as a String.  Standard error is sent to the console.  If
@@ -295,10 +295,9 @@ trait ProcessBuilder extends Source with Sink {
     * useful process error codes.
     */
   def hasExitValue: Boolean
-}
 
 /** This object contains traits used to describe input and output sources. */
-object ProcessBuilder extends ProcessBuilderImpl {
+object ProcessBuilder extends ProcessBuilderImpl
 
   /** Used when creating [[scala.sys.process.ProcessBuilder.Source]] from an URL. */
   trait URLBuilder extends Source {}
@@ -306,7 +305,7 @@ object ProcessBuilder extends ProcessBuilderImpl {
   /** Used when creating [[scala.sys.process.ProcessBuilder.Source]] and/or
     * [[scala.sys.process.ProcessBuilder.Sink]] from a file.
     */
-  trait FileBuilder extends Sink with Source {
+  trait FileBuilder extends Sink with Source
 
     /** Append the contents of a `java.io.File` to this file */
     def #<<(f: File): ProcessBuilder
@@ -319,12 +318,11 @@ object ProcessBuilder extends ProcessBuilderImpl {
 
     /** Append the contents of a [[scala.sys.process.ProcessBuilder]] to this file */
     def #<<(p: ProcessBuilder): ProcessBuilder
-  }
 
   /** Represents everything that can be used as an input to a
     * [[scala.sys.process.ProcessBuilder]].
     */
-  trait Source {
+  trait Source
     protected def toSource: ProcessBuilder
 
     /** Writes the output stream of this process to the given file. */
@@ -348,12 +346,11 @@ object ProcessBuilder extends ProcessBuilderImpl {
     def cat = toSource
     private def toFile(f: File, append: Boolean) =
       #>(new FileOutput(f, append))
-  }
 
   /** Represents everything that can receive an output from a
     * [[scala.sys.process.ProcessBuilder]].
     */
-  trait Sink {
+  trait Sink
     protected def toSink: ProcessBuilder
 
     /** Reads the given file into the input stream of this process. */
@@ -372,5 +369,3 @@ object ProcessBuilder extends ProcessBuilderImpl {
     /** Reads the output of a [[scala.sys.process.ProcessBuilder]] into the input stream of this process. */
     def #<(b: ProcessBuilder): ProcessBuilder =
       new PipedBuilder(b, toSink, false)
-  }
-}

@@ -1,6 +1,6 @@
 package java.util
 
-trait Collection[E] extends java.lang.Iterable[E] {
+trait Collection[E] extends java.lang.Iterable[E]
   def size(): Int
   def isEmpty(): Boolean
   def contains(o: Any): Boolean
@@ -16,4 +16,3 @@ trait Collection[E] extends java.lang.Iterable[E] {
   def clear(): Unit
   def equals(o: Any): Boolean
   def hashCode(): Int
-}

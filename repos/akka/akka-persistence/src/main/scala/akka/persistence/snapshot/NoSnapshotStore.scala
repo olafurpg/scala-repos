@@ -15,7 +15,7 @@ import scala.concurrent.Future
   * and at the same time does not configure a specific snapshot-store to be used *and* no default snapshot-store
   * is available, then the `NoSnapshotStore` will be used to signal a snapshot store failure.
   */
-final class NoSnapshotStore extends SnapshotStore {
+final class NoSnapshotStore extends SnapshotStore
 
   final class NoSnapshotStoreException
       extends RuntimeException("No snapshot store configured!")
@@ -40,4 +40,3 @@ final class NoSnapshotStore extends SnapshotStore {
   override def deleteAsync(persistenceId: String,
                            criteria: SnapshotSelectionCriteria): Future[Unit] =
     flop
-}

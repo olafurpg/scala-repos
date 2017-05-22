@@ -28,7 +28,7 @@ import org.apache.spark.sql.execution.{SparkPlan, SparkPlanTest, UnaryNode}
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.types.StringType
 
-class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
+class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton
   import hiveContext.implicits._
 
   private val noSerdeIOSchema = HiveScriptIOSchema(
@@ -48,7 +48,7 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
       outputSerdeClass = Some(classOf[LazySimpleSerDe].getCanonicalName)
   )
 
-  test("cat without SerDe") {
+  test("cat without SerDe")
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
     checkAnswer(rowsDf,
                 (child: SparkPlan) =>
@@ -60,9 +60,8 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                       ioschema = noSerdeIOSchema
                   )(hiveContext),
                 rowsDf.collect())
-  }
 
-  test("cat with LazySimpleSerDe") {
+  test("cat with LazySimpleSerDe")
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
     checkAnswer(rowsDf,
                 (child: SparkPlan) =>
@@ -74,12 +73,11 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                       ioschema = serdeIOSchema
                   )(hiveContext),
                 rowsDf.collect())
-  }
 
   test(
-      "script transformation should not swallow errors from upstream operators (no serde)") {
+      "script transformation should not swallow errors from upstream operators (no serde)")
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
-    val e = intercept[TestFailedException] {
+    val e = intercept[TestFailedException]
       checkAnswer(rowsDf,
                   (child: SparkPlan) =>
                     new ScriptTransformation(
@@ -90,14 +88,12 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                         ioschema = noSerdeIOSchema
                     )(hiveContext),
                   rowsDf.collect())
-    }
     assert(e.getMessage().contains("intentional exception"))
-  }
 
   test(
-      "script transformation should not swallow errors from upstream operators (with serde)") {
+      "script transformation should not swallow errors from upstream operators (with serde)")
     val rowsDf = Seq("a", "b", "c").map(Tuple1.apply).toDF("a")
-    val e = intercept[TestFailedException] {
+    val e = intercept[TestFailedException]
       checkAnswer(rowsDf,
                   (child: SparkPlan) =>
                     new ScriptTransformation(
@@ -108,19 +104,13 @@ class ScriptTransformationSuite extends SparkPlanTest with TestHiveSingleton {
                         ioschema = serdeIOSchema
                     )(hiveContext),
                   rowsDf.collect())
-    }
     assert(e.getMessage().contains("intentional exception"))
-  }
-}
 
 private case class ExceptionInjectingOperator(child: SparkPlan)
-    extends UnaryNode {
-  override protected def doExecute(): RDD[InternalRow] = {
-    child.execute().map { x =>
+    extends UnaryNode
+  override protected def doExecute(): RDD[InternalRow] =
+    child.execute().map  x =>
       assert(TaskContext.get() != null) // Make sure that TaskContext is defined.
       Thread.sleep(1000) // This sleep gives the external process time to start.
       throw new IllegalArgumentException("intentional exception")
-    }
-  }
   override def output: Seq[Attribute] = child.output
-}

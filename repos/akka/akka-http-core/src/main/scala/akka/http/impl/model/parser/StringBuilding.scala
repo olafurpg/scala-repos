@@ -23,7 +23,7 @@ import akka.parboiled2._
   *
   * Mixing this trait into your parser gives you a simple facility to support this.
   */
-private[parser] trait StringBuilding {
+private[parser] trait StringBuilding
   this: Parser ⇒
   protected val sb = new java.lang.StringBuilder
 
@@ -47,22 +47,18 @@ private[parser] trait StringBuilding {
 
   def setSB(s: String): Rule0 = rule { run(doSet(s)) }
 
-  private def doPrepend(c: Char): Unit = {
+  private def doPrepend(c: Char): Unit =
     val saved = sb.toString
     sb.setLength(0)
     sb.append(c)
     sb.append(saved)
-  }
 
-  private def doPrepend(s: String): Unit = {
+  private def doPrepend(s: String): Unit =
     val saved = sb.toString
     sb.setLength(0)
     sb.append(s)
     sb.append(saved)
-  }
 
-  private def doSet(s: String): Unit = {
+  private def doSet(s: String): Unit =
     sb.setLength(0)
     sb.append(s)
-  }
-}

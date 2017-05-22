@@ -10,7 +10,7 @@ import org.scalatest.junit.JUnitRunner
 import java.util.concurrent.atomic.AtomicReference
 
 @RunWith(classOf[JUnitRunner])
-class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
+class HealthStabilizerTest extends FunSuite with BeforeAndAfter
 
   val healthy = Var.value[ClientHealth](ClientHealth.Healthy)
   val unhealthy = Var.value[ClientHealth](ClientHealth.Unhealthy)
@@ -20,16 +20,14 @@ class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
   var closeMe = Closable.nop
   val stats = new InMemoryStatsReceiver()
 
-  after {
+  after
     closeMe.close()
-  }
 
-  def stabilize(va: Var[ClientHealth]): AtomicReference[ClientHealth] = {
+  def stabilize(va: Var[ClientHealth]): AtomicReference[ClientHealth] =
     val ref = new AtomicReference[ClientHealth](ClientHealth.Healthy)
     closeMe = HealthStabilizer(va, limboEpoch, stats).changes
       .register(Witness { ref })
     ref
-  }
 
   def assertGauge(expected: Float): Unit =
     assert(stats.gauges(Seq("zkHealth"))() == expected)
@@ -38,16 +36,15 @@ class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
   def assertGaugeUnhealthy() = assertGauge(2f)
   def assertGaugeProbation() = assertGauge(3f)
 
-  test("Stabilizer always reports initial state correctly") {
+  test("Stabilizer always reports initial state correctly")
     val stHealth = stabilize(healthy)
     assert(stHealth.get() == ClientHealth.Healthy)
 
     val stUnhealthy = stabilize(unhealthy)
     assert(stUnhealthy.get() == ClientHealth.Unhealthy)
     assertGaugeUnhealthy()
-  }
 
-  test("Stabilizer immediately changes unhealthy to healthy") {
+  test("Stabilizer immediately changes unhealthy to healthy")
     val underlying = Event[ClientHealth]()
     val stabilized =
       stabilize(Var[ClientHealth](ClientHealth.Unhealthy, underlying))
@@ -57,11 +54,10 @@ class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
     underlying.notify(ClientHealth.Healthy)
     assert(stabilized.get() == ClientHealth.Healthy)
     assertHealthyCounter()
-  }
 
   test(
-      "Stabilizer doesn't change from healthy to unhealthy until the epoch turns") {
-    Time.withCurrentTimeFrozen { tc =>
+      "Stabilizer doesn't change from healthy to unhealthy until the epoch turns")
+    Time.withCurrentTimeFrozen  tc =>
       val underlying = Event[ClientHealth]()
       val underlyingVar = Var[ClientHealth](ClientHealth.Healthy, underlying)
       val stabilized = stabilize(underlyingVar)
@@ -76,11 +72,9 @@ class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
       timer.tick()
       assert(stabilized.get() == ClientHealth.Unhealthy)
       assertGaugeUnhealthy()
-    }
-  }
 
-  test("Stabilizer resets from limbo to healthy") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("Stabilizer resets from limbo to healthy")
+    Time.withCurrentTimeFrozen  tc =>
       val underlying = Event[ClientHealth]()
       val underlyingVar = Var[ClientHealth](ClientHealth.Healthy, underlying)
       val stabilized = stabilize(underlyingVar)
@@ -101,6 +95,3 @@ class HealthStabilizerTest extends FunSuite with BeforeAndAfter {
       tc.advance(limboEpoch.period / 2)
       timer.tick()
       assert(stabilized.get() == ClientHealth.Healthy)
-    }
-  }
-}

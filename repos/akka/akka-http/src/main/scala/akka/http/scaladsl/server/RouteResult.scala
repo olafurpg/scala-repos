@@ -20,7 +20,7 @@ import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
   */
 sealed trait RouteResult
 
-object RouteResult {
+object RouteResult
   final case class Complete(response: HttpResponse) extends RouteResult
   final case class Rejected(rejections: immutable.Seq[Rejection])
       extends RouteResult
@@ -35,4 +35,3 @@ object RouteResult {
       exceptionHandler: ExceptionHandler = null)
     : Flow[HttpRequest, HttpResponse, NotUsed] =
     Route.handlerFlow(route)
-}

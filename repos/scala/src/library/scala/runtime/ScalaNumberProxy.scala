@@ -23,7 +23,7 @@ import Proxy.Typed
   */
 trait ScalaNumberProxy[T]
     extends Any with ScalaNumericAnyConversions
-    with Typed[T] with OrderedProxy[T] {
+    with Typed[T] with OrderedProxy[T]
   protected implicit def num: Numeric[T]
 
   def underlying() = self.asInstanceOf[AnyRef]
@@ -45,12 +45,10 @@ trait ScalaNumberProxy[T]
 
   /** Returns the signum of `'''this'''`. */
   def signum = num.signum(self)
-}
-trait ScalaWholeNumberProxy[T] extends Any with ScalaNumberProxy[T] {
+trait ScalaWholeNumberProxy[T] extends Any with ScalaNumberProxy[T]
   def isWhole() = true
-}
 trait IntegralProxy[T]
-    extends Any with ScalaWholeNumberProxy[T] with RangedProxy[T] {
+    extends Any with ScalaWholeNumberProxy[T] with RangedProxy[T]
   protected implicit def num: Integral[T]
   type ResultWithoutStep = NumericRange[T]
 
@@ -62,9 +60,8 @@ trait IntegralProxy[T]
     NumericRange.inclusive(self, end, num.one)
   def to(end: T, step: T): NumericRange.Inclusive[T] =
     NumericRange.inclusive(self, end, step)
-}
 trait FractionalProxy[T]
-    extends Any with ScalaNumberProxy[T] with RangedProxy[T] {
+    extends Any with ScalaNumberProxy[T] with RangedProxy[T]
   protected implicit def num: Fractional[T]
   protected implicit def integralNum: Integral[T]
 
@@ -83,18 +80,15 @@ trait FractionalProxy[T]
     new Range.Partial(NumericRange.inclusive(self, end, _))
   def to(end: T, step: T): NumericRange.Inclusive[T] =
     NumericRange.inclusive(self, end, step)
-}
 
-trait OrderedProxy[T] extends Any with Ordered[T] with Typed[T] {
+trait OrderedProxy[T] extends Any with Ordered[T] with Typed[T]
   protected def ord: Ordering[T]
 
   def compare(y: T) = ord.compare(self, y)
-}
-trait RangedProxy[T] extends Any with Typed[T] {
+trait RangedProxy[T] extends Any with Typed[T]
   type ResultWithoutStep
 
   def until(end: T): ResultWithoutStep
   def until(end: T, step: T): immutable.IndexedSeq[T]
   def to(end: T): ResultWithoutStep
   def to(end: T, step: T): immutable.IndexedSeq[T]
-}

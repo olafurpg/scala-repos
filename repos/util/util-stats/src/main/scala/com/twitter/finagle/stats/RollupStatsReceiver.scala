@@ -11,40 +11,34 @@ package com.twitter.finagle.stats
   * - "/errors/clientErrors/java_net_ConnectException"
   */
 class RollupStatsReceiver(val self: StatsReceiver)
-    extends StatsReceiver with Proxy {
+    extends StatsReceiver with Proxy
   val repr = self.repr
 
-  private[this] def tails[A](s: Seq[A]): Seq[Seq[A]] = {
-    s match {
+  private[this] def tails[A](s: Seq[A]): Seq[Seq[A]] =
+    s match
       case s @ Seq(_) =>
         Seq(s)
 
       case Seq(hd, tl @ _ *) =>
         Seq(Seq(hd)) ++
-        (tails(tl) map { t =>
+        (tails(tl) map  t =>
               Seq(hd) ++ t
-            })
-    }
-  }
+            )
 
   override def toString(): String = self.toString
 
-  def counter(names: String*): Counter = new Counter {
+  def counter(names: String*): Counter = new Counter
     private[this] val allCounters = BroadcastCounter(
         tails(names) map (self.counter(_: _*))
     )
     def incr(delta: Int) = allCounters.incr(delta)
-  }
 
-  def stat(names: String*): Stat = new Stat {
+  def stat(names: String*): Stat = new Stat
     private[this] val allStats = BroadcastStat(
         tails(names) map (self.stat(_: _*))
     )
     def add(value: Float) = allStats.add(value)
-  }
 
-  def addGauge(names: String*)(f: => Float): Gauge = new Gauge {
+  def addGauge(names: String*)(f: => Float): Gauge = new Gauge
     private[this] val underlying = tails(names) map { self.addGauge(_: _*)(f) }
     def remove() = underlying foreach { _.remove() }
-  }
-}

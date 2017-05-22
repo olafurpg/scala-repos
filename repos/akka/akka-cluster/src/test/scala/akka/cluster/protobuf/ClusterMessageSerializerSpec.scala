@@ -13,15 +13,15 @@ import akka.testkit.AkkaSpec
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ClusterMessageSerializerSpec
     extends AkkaSpec(
-        "akka.actor.provider = akka.cluster.ClusterActorRefProvider") {
+        "akka.actor.provider = akka.cluster.ClusterActorRefProvider")
 
   val serializer = new ClusterMessageSerializer(
       system.asInstanceOf[ExtendedActorSystem])
 
-  def checkSerialization(obj: AnyRef): Unit = {
+  def checkSerialization(obj: AnyRef): Unit =
     val blob = serializer.toBinary(obj)
     val ref = serializer.fromBinary(blob, obj.getClass)
-    obj match {
+    obj match
       case env: GossipEnvelope ⇒
         val env2 = obj.asInstanceOf[GossipEnvelope]
         env2.from should ===(env.from)
@@ -29,8 +29,6 @@ class ClusterMessageSerializerSpec
         env2.gossip should ===(env.gossip)
       case _ ⇒
         ref should ===(obj)
-    }
-  }
 
   import MemberStatus._
 
@@ -45,9 +43,9 @@ class ClusterMessageSerializerSpec
   val f1 = TestMember(
       Address("akka.tcp", "sys", "f", 2552), Removed, Set("r2", "r3"))
 
-  "ClusterMessages" must {
+  "ClusterMessages" must
 
-    "be serializable" in {
+    "be serializable" in
       val address = Address("akka.tcp", "system", "some.host.org", 4711)
       val uniqueAddress = UniqueAddress(address, 17)
       val address2 = Address("akka.tcp", "system", "other.host.org", 4711)
@@ -100,6 +98,3 @@ class ClusterMessageSerializerSpec
                               Metric("bar4", Long.MaxValue, None),
                               Metric("bar5", BigInt(Long.MaxValue), None)))))
       checkSerialization(MetricsGossipEnvelope(a1.address, mg, true))
-    }
-  }
-}

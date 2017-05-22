@@ -1,5 +1,4 @@
 package my.scala.stuff
 
-abstract class Main {
+abstract class Main
   val l = new scala.< ref > List
-}

@@ -11,7 +11,7 @@ import scala.tools.testing.AssertUtil.assertThrows
 import scala.tools.nsc.symtab.SymbolTableForUnitTesting
 
 @RunWith(classOf[JUnit4])
-class ScopeTest {
+class ScopeTest
   object symbolTable extends SymbolTableForUnitTesting
 
   import symbolTable._
@@ -21,7 +21,7 @@ class ScopeTest {
   @Test
   def testNestedScopeLarge(): Unit = testNestedScope(64) // exceeding MIN_HASH
 
-  private def testNestedScope(initSize: Int) {
+  private def testNestedScope(initSize: Int)
     def sym(termName: String): Symbol = NoSymbol.newValue(TermName(termName))
     val foo = sym("foo")
     val bar = sym("bar")
@@ -50,5 +50,3 @@ class ScopeTest {
     nested.unlink(bar)
     assert(!nested.containsName(bar.name))
     assert(outer.containsName(bar.name))
-  }
-}

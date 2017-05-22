@@ -46,7 +46,7 @@ import scalafx.scene.shape.Rectangle
   * In example here we have to use JavaFX `Color` as value type for `ObjectProperty` to able to bind it
   * to `Rectangle#fill`.
   */
-object ChangeFillExample extends JFXApp {
+object ChangeFillExample extends JFXApp
 
   // NOTE: We use here `ObjectProperty` factory method rather than constructor to indirectly create
   // an `ObjectProperty` that has JFX rather than SFX value type.
@@ -61,27 +61,20 @@ object ChangeFillExample extends JFXApp {
   val Light = Color.LightGray
   val Dark = Color.Gray
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Change Fill Example"
-    scene = new Scene {
-      root = new BorderPane {
+    scene = new Scene
+      root = new BorderPane
         padding = Insets(10)
-        center = new Rectangle {
+        center = new Rectangle
           width = 200
           height = 200
           // Binding here fails to compile if `ObjectProperty` value type is ScalaFX color.
           fill <== fillPaint
-        }
-        bottom = new HBox {
+        bottom = new HBox
           padding = Insets(10)
           alignmentInParent = Pos.Center
-          children = new Button {
+          children = new Button
             text = "Change Fill"
             onAction = (ae: ActionEvent) =>
               fillPaint() = if (Light == fillPaint()) Dark else Light
-          }
-        }
-      }
-    }
-  }
-}

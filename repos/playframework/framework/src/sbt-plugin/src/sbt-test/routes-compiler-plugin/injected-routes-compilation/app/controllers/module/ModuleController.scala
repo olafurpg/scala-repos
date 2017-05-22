@@ -5,8 +5,6 @@ package controllers.module
 
 import play.api.mvc._
 
-class ModuleController extends Controller {
-  def index = Action {
+class ModuleController extends Controller
+  def index = Action
     Ok
-  }
-}

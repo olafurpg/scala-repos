@@ -15,7 +15,7 @@ import ir.{Definitions, Types}
   *
   *  @author Sébastien Doeraene
   */
-trait TypeKinds extends SubComponent {
+trait TypeKinds extends SubComponent
   this: GenJSCode =>
   import global._
   import jsAddons._
@@ -34,7 +34,7 @@ trait TypeKinds extends SubComponent {
   lazy val DoubleKind = FLOAT(DoubleClass)
 
   /** TypeKinds for Scala primitive types. */
-  lazy val primitiveTypeMap: Map[Symbol, TypeKind] = {
+  lazy val primitiveTypeMap: Map[Symbol, TypeKind] =
     import definitions._
     Map(
         UnitClass -> VoidKind,
@@ -47,37 +47,33 @@ trait TypeKinds extends SubComponent {
         FloatClass -> FloatKind,
         DoubleClass -> DoubleKind
     )
-  }
 
   /** Glue representation of types as seen from the IR but still with a
     *  reference to the Symbols.
     */
-  sealed abstract class TypeKind {
+  sealed abstract class TypeKind
     def isReferenceType: Boolean = false
     def isArrayType: Boolean = false
     def isValueType: Boolean = false
 
     def toIRType: Types.Type
     def toReferenceType: Types.ReferenceType
-  }
 
-  sealed abstract class TypeKindButArray extends TypeKind {
+  sealed abstract class TypeKindButArray extends TypeKind
     protected def typeSymbol: Symbol
 
     override def toReferenceType: Types.ClassType =
       Types.ClassType(encodeClassFullName(typeSymbol))
-  }
 
   /** The void, for trees that can only appear in statement position. */
-  case object VOID extends TypeKindButArray {
+  case object VOID extends TypeKindButArray
     protected def typeSymbol: Symbol = UnitClass
     def toIRType: Types.NoType.type = Types.NoType
-  }
 
-  sealed abstract class ValueTypeKind extends TypeKindButArray {
+  sealed abstract class ValueTypeKind extends TypeKindButArray
     override def isValueType: Boolean = true
 
-    val primitiveCharCode: Char = typeSymbol match {
+    val primitiveCharCode: Char = typeSymbol match
       case BooleanClass => 'Z'
       case CharClass => 'C'
       case ByteClass => 'B'
@@ -87,81 +83,68 @@ trait TypeKinds extends SubComponent {
       case FloatClass => 'F'
       case DoubleClass => 'D'
       case x => abort("Unknown primitive type: " + x.fullName)
-    }
-  }
 
   /** Integer number (Byte, Short, Char or Int). */
-  case class INT private[TypeKinds](typeSymbol: Symbol) extends ValueTypeKind {
+  case class INT private[TypeKinds](typeSymbol: Symbol) extends ValueTypeKind
     def toIRType: Types.IntType.type = Types.IntType
-  }
 
   /** Long */
-  case object LONG extends ValueTypeKind {
+  case object LONG extends ValueTypeKind
     protected def typeSymbol = definitions.LongClass
     def toIRType: Types.LongType.type = Types.LongType
-  }
 
   /** Floating-point number (Float or Double). */
   case class FLOAT private[TypeKinds](typeSymbol: Symbol)
-      extends ValueTypeKind {
+      extends ValueTypeKind
     def toIRType: Types.Type =
       if (typeSymbol == FloatClass) Types.FloatType
       else Types.DoubleType
-  }
 
   /** Boolean */
-  case object BOOL extends ValueTypeKind {
+  case object BOOL extends ValueTypeKind
     protected def typeSymbol = definitions.BooleanClass
     def toIRType: Types.BooleanType.type = Types.BooleanType
-  }
 
   /** Nothing */
-  case object NOTHING extends TypeKindButArray {
+  case object NOTHING extends TypeKindButArray
     protected def typeSymbol: Symbol = definitions.NothingClass
     def toIRType: Types.NothingType.type = Types.NothingType
     override def toReferenceType: Types.ClassType =
       Types.ClassType(Definitions.RuntimeNothingClass)
-  }
 
   /** Null */
-  case object NULL extends TypeKindButArray {
+  case object NULL extends TypeKindButArray
     protected def typeSymbol: Symbol = definitions.NullClass
     def toIRType: Types.NullType.type = Types.NullType
     override def toReferenceType: Types.ClassType =
       Types.ClassType(Definitions.RuntimeNullClass)
-  }
 
   /** An object */
   case class REFERENCE private[TypeKinds](typeSymbol: Symbol)
-      extends TypeKindButArray {
+      extends TypeKindButArray
     override def toString(): String = "REFERENCE(" + typeSymbol.fullName + ")"
     override def isReferenceType: Boolean = true
 
     def toIRType: Types.Type = encodeClassType(typeSymbol)
-  }
 
   /** An array */
-  case class ARRAY private[TypeKinds](elem: TypeKind) extends TypeKind {
+  case class ARRAY private[TypeKinds](elem: TypeKind) extends TypeKind
     override def toString(): String = "ARRAY[" + elem + "]"
     override def isArrayType: Boolean = true
 
-    def dimensions: Int = elem match {
+    def dimensions: Int = elem match
       case a: ARRAY => a.dimensions + 1
       case _ => 1
-    }
 
     override def toIRType: Types.ArrayType = toReferenceType
 
-    override def toReferenceType: Types.ArrayType = {
+    override def toReferenceType: Types.ArrayType =
       Types.ArrayType(elementKind.toReferenceType.className, dimensions)
-    }
 
     /** The ultimate element type of this array. */
-    def elementKind: TypeKindButArray = elem match {
+    def elementKind: TypeKindButArray = elem match
       case a: ARRAY => a.elementKind
       case k: TypeKindButArray => k
-    }
-  }
 
   ////////////////// Conversions //////////////////////////////
 
@@ -178,7 +161,7 @@ trait TypeKinds extends SubComponent {
     *  Call to .normalize fixes #3003 (follow type aliases). Otherwise,
     *  arrayOrClassType below would return ObjectReference.
     */
-  def toTypeKind(t: Type): TypeKind = t.normalize match {
+  def toTypeKind(t: Type): TypeKind = t.normalize match
     case ThisType(ArrayClass) => ObjectReference
     case ThisType(sym) => newReference(sym)
     case SingleType(_, sym) => primitiveOrRefType(sym)
@@ -217,41 +200,36 @@ trait TypeKinds extends SubComponent {
               t.isInstanceOf[TypeRef]
           )
       )
-  }
 
   /** Return the type kind of a class, possibly an array type.
     */
-  private def arrayOrClassType(sym: Symbol, targs: List[Type]) = sym match {
+  private def arrayOrClassType(sym: Symbol, targs: List[Type]) = sym match
     case ArrayClass => ARRAY(toTypeKind(targs.head))
     case _ if sym.isClass => newReference(sym)
     case _ =>
       assert(sym.isType, sym) // it must be compiling Array[a]
       ObjectReference
-  }
 
   /** Interfaces have to be handled delicately to avoid introducing
     *  spurious errors, but if we treat them all as AnyRef we lose too
     *  much information.
     */
-  private def newReference(sym: Symbol): TypeKind = sym match {
+  private def newReference(sym: Symbol): TypeKind = sym match
     case NothingClass => NOTHING
     case NullClass => NULL
     case _ =>
       // Can't call .toInterface (at this phase) or we trip an assertion.
       // See PackratParser#grow for a method which fails with an apparent mismatch
       // between "object PackratParsers$class" and "trait PackratParsers"
-      if (sym.isImplClass) {
+      if (sym.isImplClass)
         // pos/spec-List.scala is the sole failure if we don't check for NoSymbol
         val traitSym = sym.owner.info.decl(tpnme.interfaceName(sym.name))
         if (traitSym != NoSymbol) REFERENCE(traitSym)
         else REFERENCE(sym)
-      } else {
+      else
         REFERENCE(sym)
-      }
-  }
 
   private def primitiveOrRefType(sym: Symbol) =
     primitiveTypeMap.getOrElse(sym, newReference(sym))
   private def primitiveOrClassType(sym: Symbol, targs: List[Type]) =
     primitiveTypeMap.getOrElse(sym, arrayOrClassType(sym, targs))
-}

@@ -31,7 +31,7 @@ private final case class SchedulerException(msg: String)
   *  2) a akka.event.LoggingAdapter
   *  3) a java.util.concurrent.ThreadFactory
   */
-trait Scheduler {
+trait Scheduler
 
   /**
     * Schedules a message to be sent repeatedly with an initial delay and
@@ -47,13 +47,12 @@ trait Scheduler {
       receiver: ActorRef,
       message: Any)(implicit executor: ExecutionContext,
                     sender: ActorRef = Actor.noSender): Cancellable =
-    schedule(initialDelay, interval, new Runnable {
-      def run = {
+    schedule(initialDelay, interval, new Runnable
+      def run =
         receiver ! message
         if (receiver.isTerminated)
           throw new SchedulerException("timer active for terminated actor")
-      }
-    })
+    )
 
   /**
     * Schedules a function to be run repeatedly with an initial delay and a
@@ -105,9 +104,9 @@ trait Scheduler {
       delay: FiniteDuration, receiver: ActorRef, message: Any)(
       implicit executor: ExecutionContext,
       sender: ActorRef = Actor.noSender): Cancellable =
-    scheduleOnce(delay, new Runnable {
+    scheduleOnce(delay, new Runnable
       override def run = receiver ! message
-    })
+    )
 
   /**
     * Schedules a function to be run once with a delay, i.e. a time period that has
@@ -133,7 +132,6 @@ trait Scheduler {
     * of the minimum time interval between executions of a recurring task, in Hz.
     */
   def maxFrequency: Double
-}
 //#scheduler
 
 // this one is just here so we can present a nice AbstractScheduler for Java
@@ -145,7 +143,7 @@ abstract class AbstractSchedulerBase extends Scheduler
   * There is no strict guarantee that the implementation is thread-safe,
   * but it should be good practice to make it so.
   */
-trait Cancellable {
+trait Cancellable
 
   /**
     * Cancels this Cancellable and returns true if that was successful.
@@ -162,5 +160,4 @@ trait Cancellable {
     * Java & Scala API
     */
   def isCancelled: Boolean
-}
 //#cancellable

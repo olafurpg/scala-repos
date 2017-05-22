@@ -25,11 +25,11 @@ import org.apache.spark.sql.{Row, SQLContext}
 
 class QuantileDiscretizerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   import org.apache.spark.ml.feature.QuantileDiscretizerSuite._
 
-  test("Test quantile discretizer") {
+  test("Test quantile discretizer")
     checkDiscretizedData(
         sc,
         Array[Double](1, 2, 3, 3, 3, 3, 3, 3, 3),
@@ -55,9 +55,8 @@ class QuantileDiscretizerSuite
                          2,
                          Array[Double](0, 1, 1, 1, 1, 1, 1, 1, 1),
                          Array("-Infinity, 2.0", "2.0, Infinity"))
-  }
 
-  test("Test getting splits") {
+  test("Test getting splits")
     val splitTestPoints = Array(
         Array[Double]() -> Array(Double.NegativeInfinity,
                                  0,
@@ -77,13 +76,11 @@ class QuantileDiscretizerSuite
         Array(0.0, 1.0) -> Array(
             Double.NegativeInfinity, 0, 1, Double.PositiveInfinity)
     )
-    for ((ori, res) <- splitTestPoints) {
+    for ((ori, res) <- splitTestPoints)
       assert(QuantileDiscretizer.getSplits(ori) === res,
              "Returned splits are invalid.")
-    }
-  }
 
-  test("Test splits on dataset larger than minSamplesRequired") {
+  test("Test splits on dataset larger than minSamplesRequired")
     val sqlCtx = SQLContext.getOrCreate(sc)
     import sqlCtx.implicits._
 
@@ -104,24 +101,21 @@ class QuantileDiscretizerSuite
     assert(
         observedNumBuckets === numBuckets,
         "Observed number of buckets does not equal expected number of buckets.")
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new QuantileDiscretizer()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setNumBuckets(6)
     testDefaultReadWrite(t)
-  }
-}
 
-private object QuantileDiscretizerSuite extends SparkFunSuite {
+private object QuantileDiscretizerSuite extends SparkFunSuite
 
   def checkDiscretizedData(sc: SparkContext,
                            data: Array[Double],
                            numBucket: Int,
                            expectedResult: Array[Double],
-                           expectedAttrs: Array[String]): Unit = {
+                           expectedAttrs: Array[String]): Unit =
     val sqlCtx = SQLContext.getOrCreate(sc)
     import sqlCtx.implicits._
 
@@ -135,9 +129,8 @@ private object QuantileDiscretizerSuite extends SparkFunSuite {
     assert(model.hasParent)
     val result = model.transform(df)
 
-    val transformedFeatures = result.select("result").collect().map {
+    val transformedFeatures = result.select("result").collect().map
       case Row(transformedFeature: Double) => transformedFeature
-    }
     val transformedAttrs = Attribute
       .fromStructField(result.schema("result"))
       .asInstanceOf[NominalAttribute]
@@ -148,5 +141,3 @@ private object QuantileDiscretizerSuite extends SparkFunSuite {
            "Transformed features do not equal expected features.")
     assert(transformedAttrs === expectedAttrs,
            "Transformed attributes do not equal expected attributes.")
-  }
-}

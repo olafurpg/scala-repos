@@ -78,7 +78,7 @@ object CalculatorApi extends XmlApiHelper {
 </pre>
   * 
   */
-trait XMLApiHelper {
+trait XMLApiHelper
 
   /**
     * Converts a boolean into a response of a root element with
@@ -95,10 +95,10 @@ trait XMLApiHelper {
     * of the root element will be set to the Failure's msg value.
     */
   implicit def canBoolToResponse(in: Box[Boolean]): LiftResponse =
-    buildResponse(in openOr false, in match {
+    buildResponse(in openOr false, in match
       case Failure(msg, _, _) => Full(Text(msg))
       case _ => Empty
-    }, <xml:group/>)
+    , <xml:group/>)
 
   /**
     * Converts a boxed Seq[Node] into a response. If the Box is a Full,
@@ -109,11 +109,10 @@ trait XMLApiHelper {
     * element is returned with no contents and the "success" attribute set to
     * "false".
     */
-  implicit def canNodeToResponse(in: Box[Seq[Node]]): LiftResponse = in match {
+  implicit def canNodeToResponse(in: Box[Seq[Node]]): LiftResponse = in match
     case Full(n) => buildResponse(true, Empty, n)
     case Failure(msg, _, _) => buildResponse(false, Full(Text(msg)), Text(""))
     case _ => buildResponse(false, Empty, Text(""))
-  }
 
   /**
     * Converts a Seq[Node] into a root element with the "success" attribute
@@ -142,10 +141,10 @@ trait XMLApiHelper {
     */
   protected def operation: Option[NodeSeq] =
     (for (req <- S.request) yield
-      req.path.partPath match {
+      req.path.partPath match
         case _ :: name :: _ => name
         case _ => ""
-      }).map(Text(_))
+      ).map(Text(_))
 
   /**
     * The method that wraps the outer-most tag around the body. The success,
@@ -178,4 +177,3 @@ trait XMLApiHelper {
         createTag(body) % (successAttrName -> success) %
         (new UnprefixedAttribute(operationAttrName, operation, Null)) %
         (new UnprefixedAttribute(msgAttrName, msg, Null)))
-}

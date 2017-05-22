@@ -56,7 +56,7 @@ import scala.collection.JavaConverters._
 trait StandaloneQueryExecutorConfig
     extends BaseConfig with ColumnarTableModuleConfig
     with BlockStoreColumnarTableModuleConfig with ShardQueryExecutorConfig
-    with IdSourceConfig with ManagedQueryModuleConfig with ShardConfig {
+    with IdSourceConfig with ManagedQueryModuleConfig with ShardConfig
   def maxSliceSize = config[Int]("engine.max_slice_size", 10000)
   def smallSliceSize = config[Int]("engine.small_slice_size", 8)
 
@@ -75,11 +75,10 @@ trait StandaloneQueryExecutorConfig
   val clock = blueeyes.util.Clock.System
 
   val ingestConfig = None
-}
 
 trait StandaloneQueryExecutor
     extends ManagedPlatform with ShardQueryExecutorPlatform[Future]
-    with Logging {
+    with Logging
   platform =>
 
   type YggConfig <: StandaloneQueryExecutorConfig
@@ -89,51 +88,44 @@ trait StandaloneQueryExecutor
   override def defaultTimeout = yggConfig.maxEvalDuration
 
   implicit val nt = NaturalTransformation.refl[Future]
-  def executor = new ShardQueryExecutor[Future](M) {
+  def executor = new ShardQueryExecutor[Future](M)
     val M = platform.M
     type YggConfig = platform.YggConfig
     val yggConfig = platform.yggConfig
     val queryReport = LoggingQueryLogger[Future](M)
     def freshIdScanner = platform.freshIdScanner
-  }
 
   protected def executor(implicit shardQueryMonad: JobQueryTFMonad)
-    : QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] = {
-    implicit val mn = new (Future ~> JobQueryTF) {
+    : QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] =
+    implicit val mn = new (Future ~> JobQueryTF)
       def apply[A](fut: Future[A]) = fut.liftM[JobQueryT]
-    }
 
-    new ShardQueryExecutor[JobQueryTF](shardQueryMonad) {
+    new ShardQueryExecutor[JobQueryTF](shardQueryMonad)
       val M = platform.M
       type YggConfig = platform.YggConfig
       val yggConfig = platform.yggConfig
       val queryReport = errorReport[Option[FaultPosition]](
           shardQueryMonad, implicitly[Decomposer[Option[FaultPosition]]])
       def freshIdScanner = platform.freshIdScanner
-    } map {
+    map
       case (faults, result) =>
         result
-    }
-  }
 
   def asyncExecutorFor(apiKey: APIKey)
-    : Future[Validation[String, QueryExecutor[Future, JobId]]] = {
+    : Future[Validation[String, QueryExecutor[Future, JobId]]] =
     logger.debug("Creating new async executor for %s => %s".format(
             apiKey, executionContext))
     Promise.successful(
-        Success(new AsyncQueryExecutor {
+        Success(new AsyncQueryExecutor
       def executionContext: ExecutionContext = platform.executionContext
-    }))
-  }
+    ))
 
   def syncExecutorFor(apiKey: APIKey): Future[Validation[
           String,
-          QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]]] = {
+          QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]]] =
     logger.debug("Creating new sync executor for %s => %s".format(
             apiKey, executionContext))
     Promise.successful(
-        Success(new SyncQueryExecutor {
+        Success(new SyncQueryExecutor
       def executionContext: ExecutionContext = platform.executionContext
-    }))
-  }
-}
+    ))

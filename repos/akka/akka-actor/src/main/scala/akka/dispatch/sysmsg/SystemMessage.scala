@@ -13,7 +13,7 @@ import akka.actor.DeadLetterSuppression
   * Helper companion object for [[akka.dispatch.sysmsg.LatestFirstSystemMessageList]] and
   * [[akka.dispatch.sysmsg.EarliestFirstSystemMessageList]]
   */
-private[akka] object SystemMessageList {
+private[akka] object SystemMessageList
   final val LNil: LatestFirstSystemMessageList =
     new LatestFirstSystemMessageList(null)
   final val ENil: EarliestFirstSystemMessageList =
@@ -25,15 +25,12 @@ private[akka] object SystemMessageList {
 
   @tailrec
   private[sysmsg] def reverseInner(
-      head: SystemMessage, acc: SystemMessage): SystemMessage = {
+      head: SystemMessage, acc: SystemMessage): SystemMessage =
     if (head eq null) acc
-    else {
+    else
       val next = head.next
       head.next = acc
       reverseInner(next, head)
-    }
-  }
-}
 
 /**
   *
@@ -51,7 +48,7 @@ private[akka] object SystemMessageList {
   *
   */
 private[akka] class LatestFirstSystemMessageList(val head: SystemMessage)
-    extends AnyVal {
+    extends AnyVal
   import SystemMessageList._
 
   /**
@@ -91,12 +88,10 @@ private[akka] class LatestFirstSystemMessageList(val head: SystemMessage)
   /**
     * Attaches a message to the current head of the list. This operation has constant cost.
     */
-  final def ::(msg: SystemMessage): LatestFirstSystemMessageList = {
+  final def ::(msg: SystemMessage): LatestFirstSystemMessageList =
     assert(msg ne null)
     msg.next = head
     new LatestFirstSystemMessageList(msg)
-  }
-}
 
 /**
   *
@@ -114,7 +109,7 @@ private[akka] class LatestFirstSystemMessageList(val head: SystemMessage)
   *
   */
 private[akka] class EarliestFirstSystemMessageList(val head: SystemMessage)
-    extends AnyVal {
+    extends AnyVal
   import SystemMessageList._
 
   /**
@@ -154,11 +149,10 @@ private[akka] class EarliestFirstSystemMessageList(val head: SystemMessage)
   /**
     * Attaches a message to the current head of the list. This operation has constant cost.
     */
-  final def ::(msg: SystemMessage): EarliestFirstSystemMessageList = {
+  final def ::(msg: SystemMessage): EarliestFirstSystemMessageList =
     assert(msg ne null)
     msg.next = head
     new EarliestFirstSystemMessageList(msg)
-  }
 
   /**
     * Prepends a list in a reversed order to the head of this list. The prepended list will be reversed during the process.
@@ -168,17 +162,14 @@ private[akka] class EarliestFirstSystemMessageList(val head: SystemMessage)
     * The cost of this operation is linear in the size of the list that is to be prepended.
     */
   final def reverse_:::(
-      other: LatestFirstSystemMessageList): EarliestFirstSystemMessageList = {
+      other: LatestFirstSystemMessageList): EarliestFirstSystemMessageList =
     var remaining = other
     var result = this
-    while (remaining.nonEmpty) {
+    while (remaining.nonEmpty)
       val msg = remaining.head
       remaining = remaining.tail
       result ::= msg
-    }
     result
-  }
-}
 
 /**
   * System messages are handled specially: they form their own queue within
@@ -195,7 +186,7 @@ private[akka] class EarliestFirstSystemMessageList(val head: SystemMessage)
   * <b>NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS</b>
   */
 private[akka] sealed trait SystemMessage
-    extends PossiblyHarmful with Serializable {
+    extends PossiblyHarmful with Serializable
   // Next fields are only modifiable via the SystemMessageList value class
   @transient
   private[sysmsg] var next: SystemMessage = _
@@ -203,7 +194,6 @@ private[akka] sealed trait SystemMessage
   def unlink(): Unit = next = null
 
   def unlinked: Boolean = next eq null
-}
 
 /**
   * INTERNAL API

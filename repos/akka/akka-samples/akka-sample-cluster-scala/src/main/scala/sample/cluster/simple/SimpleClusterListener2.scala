@@ -5,19 +5,18 @@ import akka.cluster.ClusterEvent._
 import akka.actor.ActorLogging
 import akka.actor.Actor
 
-class SimpleClusterListener2 extends Actor with ActorLogging {
+class SimpleClusterListener2 extends Actor with ActorLogging
 
   val cluster = Cluster(context.system)
 
   // subscribe to cluster changes, re-subscribe when restart 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     //#subscribe
     cluster.subscribe(self, classOf[MemberEvent], classOf[UnreachableMember])
     //#subscribe
-  }
   override def postStop(): Unit = cluster.unsubscribe(self)
 
-  def receive = {
+  def receive =
     case state: CurrentClusterState =>
       log.info("Current members: {}", state.members.mkString(", "))
     case MemberUp(member) =>
@@ -28,5 +27,3 @@ class SimpleClusterListener2 extends Actor with ActorLogging {
       log.info(
           "Member is Removed: {} after {}", member.address, previousStatus)
     case _: MemberEvent => // ignore
-  }
-}

@@ -7,7 +7,7 @@ import scala.collection.mutable
 
 @RunWith(classOf[JUnit4])
 /* Test for SI-8014 and ++ in general  */
-class VectorTest {
+class VectorTest
   val noVec = Vector.empty[Int]
   val smallVec = Vector.range(0, 3)
   val bigVec = Vector.range(0, 64)
@@ -26,22 +26,18 @@ class VectorTest {
   )
 
   @Test
-  def vectorCat() {
+  def vectorCat()
     val cats = vecs.map(a => vecs.map(a ++ _))
     assert(cats == ans)
-  }
 
   @Test
-  def iteratorCat() {
+  def iteratorCat()
     def its = vecs.map(_.toList.toIterator)
     val cats = vecs.map(a => its.map(a ++ _))
     assert(cats == ans)
-  }
 
   @Test
-  def arrayCat() {
+  def arrayCat()
     val ars = vecs.map(_.toArray)
     val cats = vecs.map(a => ars.map(a ++ _))
     assert(cats == ans)
-  }
-}

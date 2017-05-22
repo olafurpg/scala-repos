@@ -29,7 +29,7 @@ import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 
 class ClientServerSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
+    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loggers = ["akka.testkit.TestEventListener"]
@@ -49,9 +49,9 @@ class ClientServerSpec
   val system2 = ActorSystem(getClass.getSimpleName, testConf2)
   val materializer2 = ActorMaterializer.create(system2)
 
-  "The low-level HTTP infrastructure" should {
+  "The low-level HTTP infrastructure" should
 
-    "properly bind a server" in {
+    "properly bind a server" in
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
       val probe = TestSubscriber.manualProbe[Http.IncomingConnection]()
       val binding = Http()
@@ -61,10 +61,9 @@ class ClientServerSpec
       val sub = probe.expectSubscription() // if we get it we are bound
       val address = Await.result(binding, 1.second).localAddress
       sub.cancel()
-    }
 
     "report failure if bind fails" in EventFilter[BindException](
-        occurrences = 2).intercept {
+        occurrences = 2).intercept
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
       val binding = Http().bind(hostname, port)
       val probe1 = TestSubscriber.manualProbe[Http.IncomingConnection]()
@@ -74,22 +73,20 @@ class ClientServerSpec
       probe1.expectSubscription()
 
       val probe2 = TestSubscriber.manualProbe[Http.IncomingConnection]()
-      an[BindFailedException] shouldBe thrownBy {
+      an[BindFailedException] shouldBe thrownBy
         Await.result(binding.to(Sink.fromSubscriber(probe2)).run(), 3.seconds)
-      }
       probe2.expectSubscriptionAndError()
 
       val probe3 = TestSubscriber.manualProbe[Http.IncomingConnection]()
-      an[BindFailedException] shouldBe thrownBy {
+      an[BindFailedException] shouldBe thrownBy
         Await.result(binding.to(Sink.fromSubscriber(probe3)).run(), 3.seconds)
-      }
       probe3.expectSubscriptionAndError()
 
       // Now unbind the first
       Await.result(b1.unbind(), 1.second)
       probe1.expectComplete()
 
-      if (!akka.util.Helpers.isWindows) {
+      if (!akka.util.Helpers.isWindows)
         val probe4 = TestSubscriber.manualProbe[Http.IncomingConnection]()
         // Bind succeeded, we have a local address
         val b2 = Await.result(binding.to(Sink.fromSubscriber(probe4)).run(),
@@ -98,11 +95,9 @@ class ClientServerSpec
 
         // clean up
         Await.result(b2.unbind(), 1.second)
-      }
-    }
 
-    "properly terminate client when server is not running" in Utils.assertAllStagesStopped {
-      for (i ← 1 to 10) withClue(s"iterator $i: ") {
+    "properly terminate client when server is not running" in Utils.assertAllStagesStopped
+      for (i ← 1 to 10) withClue(s"iterator $i: ")
         Source
           .single(HttpRequest(HttpMethods.POST,
                               "/test",
@@ -114,10 +109,8 @@ class ClientServerSpec
           .runWith(Sink.head)
           .failed
           .futureValue shouldBe a[StreamTcpException]
-      }
-    }
 
-    "run with bindAndHandleSync" in {
+    "run with bindAndHandleSync" in
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
       val binding =
         Http().bindAndHandleSync(_ ⇒ HttpResponse(), hostname, port)
@@ -129,17 +122,16 @@ class ClientServerSpec
 
       Await.result(f, 1.second)
       Await.result(b1.unbind(), 1.second)
-    }
 
-    "prevent more than the configured number of max-connections with bindAndHandle" in {
+    "prevent more than the configured number of max-connections with bindAndHandle" in
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
       val settings = ServerSettings(system).withMaxConnections(1)
 
       val receivedSlow = Promise[Long]()
       val receivedFast = Promise[Long]()
 
-      def handle(req: HttpRequest): Future[HttpResponse] = {
-        req.uri.path.toString match {
+      def handle(req: HttpRequest): Future[HttpResponse] =
+        req.uri.path.toString match
           case "/slow" ⇒
             receivedSlow.complete(Success(System.nanoTime()))
             akka.pattern.after(1.seconds, system.scheduler)(
@@ -147,8 +139,6 @@ class ClientServerSpec
           case "/fast" ⇒
             receivedFast.complete(Success(System.nanoTime()))
             Future.successful(HttpResponse())
-        }
-      }
 
       val binding =
         Http().bindAndHandleAsync(handle, hostname, port, settings = settings)
@@ -172,39 +162,36 @@ class ClientServerSpec
       diff should be > 1000000000L // the diff must be at least the time to complete the first request and to close the first connection
 
       Await.result(b1.unbind(), 1.second)
-    }
 
-    "timeouts" should {
+    "timeouts" should
       def bindServer(
           hostname: String,
           port: Int,
-          serverTimeout: FiniteDuration): (Promise[Long], ServerBinding) = {
+          serverTimeout: FiniteDuration): (Promise[Long], ServerBinding) =
         val s = ServerSettings(system)
         val settings =
           s.withTimeouts(s.timeouts.withIdleTimeout(serverTimeout))
 
         val receivedRequest = Promise[Long]()
 
-        def handle(req: HttpRequest): Future[HttpResponse] = {
+        def handle(req: HttpRequest): Future[HttpResponse] =
           receivedRequest.complete(Success(System.nanoTime()))
           Promise().future // never complete the request with a response; we're waiting for the timeout to happen, nothing else
-        }
 
         val binding = Http().bindAndHandleAsync(
             handle, hostname, port, settings = settings)
         val b1 = Await.result(binding, 3.seconds)
         (receivedRequest, b1)
-      }
 
-      "support server timeouts" should {
-        "close connection with idle client after idleTimeout" in {
+      "support server timeouts" should
+        "close connection with idle client after idleTimeout" in
           val serverTimeout = 300.millis
           val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
           val (receivedRequest: Promise[Long], b1: ServerBinding) =
             bindServer(hostname, port, serverTimeout)
 
-          try {
-            def runIdleRequest(uri: Uri): Future[HttpResponse] = {
+          try
+            def runIdleRequest(uri: Uri): Future[HttpResponse] =
               val itNeverEnds =
                 Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
                                  Source.maybe[ByteString])
@@ -214,7 +201,6 @@ class ClientServerSpec
                     Source.single(HttpRequest(PUT, uri, entity = itNeverEnds)),
                     Sink.head)
                 ._2
-            }
 
             val clientsResponseFuture = runIdleRequest("/")
 
@@ -223,18 +209,15 @@ class ClientServerSpec
               Await.result(receivedRequest.future, 2.seconds)
 
             // waiting for the timeout to happen on the client
-            intercept[StreamTcpException] {
+            intercept[StreamTcpException]
               Await.result(clientsResponseFuture, 2.second)
-            }
 
             (System.nanoTime() -
                 serverReceivedRequestAtNanos).millis should be >= serverTimeout
-          } finally Await.result(b1.unbind(), 1.second)
-        }
-      }
+          finally Await.result(b1.unbind(), 1.second)
 
-      "support client timeouts" should {
-        "close connection with idle server after idleTimeout (using connection level client API)" in {
+      "support client timeouts" should
+        "close connection with idle server after idleTimeout (using connection level client API)" in
           val serverTimeout = 10.seconds
 
           val cs = ClientConnectionSettings(system)
@@ -245,8 +228,8 @@ class ClientServerSpec
           val (receivedRequest: Promise[Long], b1: ServerBinding) =
             bindServer(hostname, port, serverTimeout)
 
-          try {
-            def runRequest(uri: Uri): Future[HttpResponse] = {
+          try
+            def runRequest(uri: Uri): Future[HttpResponse] =
               val itNeverSends =
                 Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
                                  Source.maybe[ByteString])
@@ -256,7 +239,6 @@ class ClientServerSpec
                              HttpRequest(POST, uri, entity = itNeverSends)),
                          Sink.head)
                 ._2
-            }
 
             val clientsResponseFuture = runRequest("/")
 
@@ -265,17 +247,15 @@ class ClientServerSpec
               Await.result(receivedRequest.future, 2.seconds)
 
             // waiting for the timeout to happen on the client
-            intercept[TimeoutException] {
+            intercept[TimeoutException]
               Await.result(clientsResponseFuture, 2.second)
-            }
             val actualTimeout =
               System.nanoTime() - serverReceivedRequestAtNanos
             actualTimeout.nanos should be >= clientTimeout
             actualTimeout.nanos should be < serverTimeout
-          } finally Await.result(b1.unbind(), 1.second)
-        }
+          finally Await.result(b1.unbind(), 1.second)
 
-        "close connection with idle server after idleTimeout (using pool level client API)" in {
+        "close connection with idle server after idleTimeout (using pool level client API)" in
           val serverTimeout = 10.seconds
 
           val cs = ConnectionPoolSettings(system)
@@ -286,12 +266,12 @@ class ClientServerSpec
           val (receivedRequest: Promise[Long], b1: ServerBinding) =
             bindServer(hostname, port, serverTimeout)
 
-          try {
+          try
             val pool = Http().cachedHostConnectionPool[Int](hostname,
                                                             port,
                                                             clientPoolSettings)
 
-            def runRequest(uri: Uri): Future[(Try[HttpResponse], Int)] = {
+            def runRequest(uri: Uri): Future[(Try[HttpResponse], Int)] =
               val itNeverSends =
                 Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
                                  Source.maybe[ByteString])
@@ -299,7 +279,6 @@ class ClientServerSpec
                 .single(HttpRequest(POST, uri, entity = itNeverSends) -> 1)
                 .via(pool)
                 .runWith(Sink.head)
-            }
 
             val clientsResponseFuture = runRequest("/")
 
@@ -308,17 +287,15 @@ class ClientServerSpec
               Await.result(receivedRequest.future, 2.seconds)
 
             // waiting for the timeout to happen on the client
-            intercept[TimeoutException] {
+            intercept[TimeoutException]
               Await.result(clientsResponseFuture, 2.second)
-            }
             val actualTimeout =
               System.nanoTime() - serverReceivedRequestAtNanos
             actualTimeout.nanos should be >= clientTimeout
             actualTimeout.nanos should be < serverTimeout
-          } finally Await.result(b1.unbind(), 1.second)
-        }
+          finally Await.result(b1.unbind(), 1.second)
 
-        "close connection with idle server after idleTimeout (using request level client API)" in {
+        "close connection with idle server after idleTimeout (using request level client API)" in
           val serverTimeout = 10.seconds
 
           val cs = ConnectionPoolSettings(system)
@@ -329,8 +306,8 @@ class ClientServerSpec
           val (receivedRequest: Promise[Long], b1: ServerBinding) =
             bindServer(hostname, port, serverTimeout)
 
-          try {
-            def runRequest(uri: Uri): Future[HttpResponse] = {
+          try
+            def runRequest(uri: Uri): Future[HttpResponse] =
               val itNeverSends =
                 Chunked.fromData(ContentTypes.`text/plain(UTF-8)`,
                                  Source.maybe[ByteString])
@@ -338,7 +315,6 @@ class ClientServerSpec
                                                uri,
                                                entity = itNeverSends),
                                    settings = clientPoolSettings)
-            }
 
             val clientsResponseFuture = runRequest(s"http://$hostname:$port/")
 
@@ -347,21 +323,17 @@ class ClientServerSpec
               Await.result(receivedRequest.future, 2.seconds)
 
             // waiting for the timeout to happen on the client
-            intercept[TimeoutException] {
+            intercept[TimeoutException]
               Await.result(clientsResponseFuture, 3.second)
-            }
             val actualTimeout =
               System.nanoTime() - serverReceivedRequestAtNanos
             actualTimeout.nanos should be >= clientTimeout
             actualTimeout.nanos should be < serverTimeout
-          } finally Await.result(b1.unbind(), 1.second)
-        }
-      }
-    }
+          finally Await.result(b1.unbind(), 1.second)
 
-    "log materialization errors in `bindAndHandle`" which {
+    "log materialization errors in `bindAndHandle`" which
 
-      "are triggered in `transform`" in Utils.assertAllStagesStopped {
+      "are triggered in `transform`" in Utils.assertAllStagesStopped
         // FIXME racy feature, needs https://github.com/akka/akka/issues/17849 to be fixed
         pending
         val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
@@ -371,21 +343,20 @@ class ClientServerSpec
           Http(system2).bindAndHandle(flow, hostname, port)(materializer2)
         val b1 = Await.result(binding, 3.seconds)
 
-        EventFilter[RuntimeException](message = "BOOM", occurrences = 1).intercept {
+        EventFilter[RuntimeException](message = "BOOM", occurrences = 1).intercept
           val (_, responseFuture) = Http(system2)
             .outgoingConnection(hostname, port)
             .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
           try Await.result(responseFuture, 5.second).status should ===(
-              StatusCodes.InternalServerError) catch {
+              StatusCodes.InternalServerError) catch
             case _: StreamTcpException ⇒
             // Also fine, depends on the race between abort and 500, caused by materialization panic which
             // tries to tear down everything, but the order is nondeterministic
-          }
-        }(system2)
+        (system2)
         Await.result(b1.unbind(), 1.second)
-      }(materializer2)
+      (materializer2)
 
-      "are triggered in `mapMaterialized`" in Utils.assertAllStagesStopped {
+      "are triggered in `mapMaterialized`" in Utils.assertAllStagesStopped
         // FIXME racy feature, needs https://github.com/akka/akka/issues/17849 to be fixed
         pending
         val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
@@ -396,23 +367,21 @@ class ClientServerSpec
           Http(system2).bindAndHandle(flow, hostname, port)(materializer2)
         val b1 = Await.result(binding, 1.seconds)
 
-        EventFilter[RuntimeException](message = "BOOM", occurrences = 1).intercept {
+        EventFilter[RuntimeException](message = "BOOM", occurrences = 1).intercept
           val (_, responseFuture) = Http(system2)
             .outgoingConnection(hostname, port)
             .runWith(Source.single(HttpRequest()), Sink.head)(materializer2)
           try Await.result(responseFuture, 5.seconds).status should ===(
-              StatusCodes.InternalServerError) catch {
+              StatusCodes.InternalServerError) catch
             case _: StreamTcpException ⇒
             // Also fine, depends on the race between abort and 500, caused by materialization panic which
             // tries to tear down everything, but the order is nondeterministic
-          }
-        }(system2)
+        (system2)
         Await.result(b1.unbind(), 1.second)
-      }(materializer2)
-    }
+      (materializer2)
 
-    "properly complete a simple request/response cycle" in Utils.assertAllStagesStopped {
-      new TestSetup {
+    "properly complete a simple request/response cycle" in Utils.assertAllStagesStopped
+      new TestSetup
         val (clientOut, clientIn) = openNewClientConnection()
         val (serverIn, serverOut) = acceptConnection()
 
@@ -440,11 +409,9 @@ class ClientServerSpec
         clientIn.expectComplete()
 
         binding.foreach(_.unbind())
-      }
-    }
 
-    "properly complete a chunked request/response cycle" in Utils.assertAllStagesStopped {
-      new TestSetup {
+    "properly complete a chunked request/response cycle" in Utils.assertAllStagesStopped
+      new TestSetup
         val (clientOut, clientIn) = openNewClientConnection()
         val (serverIn, serverOut) = acceptConnection()
 
@@ -492,11 +459,9 @@ class ClientServerSpec
         clientIn.expectComplete()
 
         connSourceSub.cancel()
-      }
-    }
 
-    "be able to deal with eager closing of the request stream on the client side" in Utils.assertAllStagesStopped {
-      new TestSetup {
+    "be able to deal with eager closing of the request stream on the client side" in Utils.assertAllStagesStopped
+      new TestSetup
         val (clientOut, clientIn) = openNewClientConnection()
         val (serverIn, serverOut) = acceptConnection()
 
@@ -524,21 +489,17 @@ class ClientServerSpec
         clientIn.expectComplete()
 
         connSourceSub.cancel()
-      }
-    }
-  }
 
-  override def afterAll() = {
+  override def afterAll() =
     system.terminate()
     system2.shutdown()
-  }
 
-  class TestSetup {
+  class TestSetup
     val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
     def configOverrides = ""
 
     // automatically bind a server
-    val (connSource, binding: Future[ServerBinding]) = {
+    val (connSource, binding: Future[ServerBinding]) =
       val settings = configOverrides.toOption.fold(ServerSettings(system))(
           ServerSettings(_))
       val connections = Http().bind(hostname, port, settings = settings)
@@ -547,11 +508,10 @@ class ClientServerSpec
         .toMat(Sink.fromSubscriber(probe))(Keep.left)
         .run()
         (probe, binding)
-    }
     val connSourceSub = connSource.expectSubscription()
 
     def openNewClientConnection(
-        settings: ClientConnectionSettings = ClientConnectionSettings(system)) = {
+        settings: ClientConnectionSettings = ClientConnectionSettings(system)) =
       val requestPublisherProbe = TestPublisher.manualProbe[HttpRequest]()
       val responseSubscriberProbe = TestSubscriber.manualProbe[HttpResponse]()
 
@@ -567,10 +527,9 @@ class ClientServerSpec
       connection.remoteAddress.getHostName shouldEqual hostname
       connection.remoteAddress.getPort shouldEqual port
       requestPublisherProbe -> responseSubscriberProbe
-    }
 
     def acceptConnection(): (TestSubscriber.ManualProbe[HttpRequest],
-    TestPublisher.ManualProbe[HttpResponse]) = {
+    TestPublisher.ManualProbe[HttpResponse]) =
       connSourceSub.request(1)
       val incomingConnection = connSource.expectNext()
       val sink = Sink.asPublisher[HttpRequest](false)
@@ -585,32 +544,26 @@ class ClientServerSpec
       pub.subscribe(requestSubscriberProbe)
       responsePublisherProbe.subscribe(sub)
       requestSubscriberProbe -> responsePublisherProbe
-    }
 
     def openClientSocket() = new Socket(hostname, port)
 
-    def write(socket: Socket, data: String) = {
+    def write(socket: Socket, data: String) =
       val writer = new BufferedWriter(
           new OutputStreamWriter(socket.getOutputStream))
       writer.write(data)
       writer.flush()
       writer
-    }
 
     def readAll(socket: Socket)(
         reader: BufferedReader = new BufferedReader(new InputStreamReader(
-                  socket.getInputStream))): (String, BufferedReader) = {
+                  socket.getInputStream))): (String, BufferedReader) =
       val sb = new java.lang.StringBuilder
       val cbuf = new Array[Char](256)
       @tailrec def drain(): (String, BufferedReader) =
-        reader.read(cbuf) match {
+        reader.read(cbuf) match
           case -1 ⇒ sb.toString -> reader
           case n ⇒ sb.append(cbuf, 0, n); drain()
-        }
       drain()
-    }
-  }
 
   def toStrict(entity: HttpEntity): HttpEntity.Strict =
     Await.result(entity.toStrict(500.millis), 1.second)
-}

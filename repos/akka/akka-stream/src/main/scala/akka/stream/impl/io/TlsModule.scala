@@ -21,7 +21,7 @@ private[akka] final case class TlsModule(plainIn: Inlet[SslTlsOutbound],
                                          role: TLSRole,
                                          closing: TLSClosing,
                                          hostInfo: Option[(String, Int)])
-    extends AtomicModule {
+    extends AtomicModule
 
   override def withAttributes(att: Attributes): TlsModule =
     copy(attributes = att)
@@ -29,25 +29,24 @@ private[akka] final case class TlsModule(plainIn: Inlet[SslTlsOutbound],
     TlsModule(attributes, sslContext, firstSession, role, closing, hostInfo)
 
   override def replaceShape(s: Shape) =
-    if (s != shape) {
+    if (s != shape)
       shape.requireSamePortsAs(s)
       CompositeModule(this, s)
-    } else this
+    else this
 
   override def toString: String =
     f"TlsModule($firstSession, $role, $closing, $hostInfo) [${System.identityHashCode(this)}%08x]"
-}
 
 /**
   * INTERNAL API.
   */
-private[akka] object TlsModule {
+private[akka] object TlsModule
   def apply(attributes: Attributes,
             sslContext: SSLContext,
             firstSession: NegotiateNewSession,
             role: TLSRole,
             closing: TLSClosing,
-            hostInfo: Option[(String, Int)]): TlsModule = {
+            hostInfo: Option[(String, Int)]): TlsModule =
     val name = attributes.nameOrDefault(s"StreamTls($role)")
     val cipherIn = Inlet[ByteString](s"$name.cipherIn")
     val cipherOut = Outlet[ByteString](s"$name.cipherOut")
@@ -65,5 +64,3 @@ private[akka] object TlsModule {
               role,
               closing,
               hostInfo)
-  }
-}

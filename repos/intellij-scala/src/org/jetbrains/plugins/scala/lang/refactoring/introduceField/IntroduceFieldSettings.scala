@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
   * Nikolay.Tropin
   * 7/16/13
   */
-class IntroduceFieldSettings[T <: PsiElement](ifc: IntroduceFieldContext[T]) {
+class IntroduceFieldSettings[T <: PsiElement](ifc: IntroduceFieldContext[T])
   private val scalaSettings = ScalaApplicationSettings.getInstance()
   private[this] var isVar = scalaSettings.INTRODUCE_FIELD_IS_VAR
   private[this] var replAll = scalaSettings.INTRODUCE_FIELD_REPLACE_ALL
@@ -37,19 +37,16 @@ class IntroduceFieldSettings[T <: PsiElement](ifc: IntroduceFieldContext[T]) {
   def setName(s: String) { name = s }
   def setType(t: ScType) { scType = t }
 
-  if (!canBeInitLocally) {
+  if (!canBeInitLocally)
     initLocallyEnabled = false
     initInDeclaration = true
-  }
 
-  if (!canBeInitInDeclaration) {
+  if (!canBeInitInDeclaration)
     initInDeclarationEnabled = false
     initInDeclaration = false
-    if (!canBeInitLocalIfReplaceAll) {
+    if (!canBeInitLocalIfReplaceAll)
       replaceAllChbEnabled = false
       replaceAll = false
-    }
-  }
 
   if (initInDeclarationEnabled && initLocallyEnabled)
     initInDeclaration = scalaSettings.INTRODUCE_FIELD_INITIALIZE_IN_DECLARATION
@@ -59,56 +56,44 @@ class IntroduceFieldSettings[T <: PsiElement](ifc: IntroduceFieldContext[T]) {
   def setDefineVar(value: Boolean) { defineVar = value }
 
   def replaceAll = replAll
-  def replaceAll_=(value: Boolean) {
+  def replaceAll_=(value: Boolean)
     replAll = value
     initLocallyEnabled = replaceAll && canBeInitLocalIfReplaceAll ||
     !replaceAll && canBeInitLocalOneOccurrence
-  }
   def setReplaceAll(value: Boolean) { replaceAll = value }
 
   def visibilityLevel = visLevel
-  def visibilityLevel_=(value: ScalaApplicationSettings.VisibilityLevel) {
+  def visibilityLevel_=(value: ScalaApplicationSettings.VisibilityLevel)
     visLevel = value
-  }
-  def setVisibilityLelel(value: ScalaApplicationSettings.VisibilityLevel) {
+  def setVisibilityLelel(value: ScalaApplicationSettings.VisibilityLevel)
     visibilityLevel = value
-  }
 
   def explicitType = explType
   def explicitType_=(value: Boolean) { explType = value }
   def setExplicitType(value: Boolean) { explicitType = value }
 
   def initInDeclaration = initInDecl
-  def initInDeclaration_=(value: Boolean) {
-    if (value && initInDeclarationEnabled || !value && initLocallyEnabled) {
+  def initInDeclaration_=(value: Boolean)
+    if (value && initInDeclarationEnabled || !value && initLocallyEnabled)
       initInDecl = value
-      if (!initInDecl) {
+      if (!initInDecl)
         defineVar = true
         explicitType = true
-      }
       defineVarChbEnabled = value
       explicitTypeChbEnabled = value
-    }
-  }
   def setInitInDeclaration(value: Boolean) { initInDeclaration = value }
 
   def initInDeclarationEnabled = initInDeclEn
-  def initInDeclarationEnabled_=(value: Boolean) {
+  def initInDeclarationEnabled_=(value: Boolean)
     initInDeclEn = value
-    if (!initInDeclarationEnabled) {
+    if (!initInDeclarationEnabled)
       initInDeclaration = false
-      if (!canBeInitLocalIfReplaceAll) {
+      if (!canBeInitLocalIfReplaceAll)
         replaceAll = false
         replaceAllChbEnabled = false
-      }
-    }
-  }
 
   def initLocallyEnabled = initLocEn
-  def initLocallyEnabled_=(value: Boolean) {
+  def initLocallyEnabled_=(value: Boolean)
     initLocEn = value
-    if (!initLocallyEnabled) {
+    if (!initLocallyEnabled)
       initInDeclaration = true
-    }
-  }
-}

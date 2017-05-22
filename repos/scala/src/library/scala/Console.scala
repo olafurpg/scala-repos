@@ -19,7 +19,7 @@ import scala.util.DynamicVariable
   *  @author  Matthias Zenger
   *  @version 1.0, 03/09/2003
   */
-object Console extends DeprecatedConsole with AnsiColor {
+object Console extends DeprecatedConsole with AnsiColor
   private val outVar = new DynamicVariable[PrintStream](java.lang.System.out)
   private val errVar = new DynamicVariable[PrintStream](java.lang.System.err)
   private val inVar = new DynamicVariable[BufferedReader](
@@ -129,9 +129,8 @@ object Console extends DeprecatedConsole with AnsiColor {
     *
     *  @param obj the object to print; may be null.
     */
-  def print(obj: Any) {
+  def print(obj: Any)
     out.print(if (null == obj) "null" else obj.toString())
-  }
 
   /** Flushes the output stream. This function is required when partial
     *  output (i.e. output not terminated by a newline character) has
@@ -161,9 +160,8 @@ object Console extends DeprecatedConsole with AnsiColor {
     *  @throws java.lang.IllegalArgumentException if there was a problem with the format string or arguments
     */
   def printf(text: String, args: Any*) { out.print(text format (args: _*)) }
-}
 
-private[scala] abstract class DeprecatedConsole { self: Console.type =>
+private[scala] abstract class DeprecatedConsole  self: Console.type =>
 
   /** Internal usage only. */
   protected def setOutDirect(out: PrintStream): Unit
@@ -242,4 +240,3 @@ private[scala] abstract class DeprecatedConsole { self: Console.type =>
   @deprecated("Use withIn", "2.11.0")
   def setIn(in: InputStream): Unit =
     setInDirect(new BufferedReader(new InputStreamReader(in)))
-}

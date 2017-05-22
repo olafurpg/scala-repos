@@ -29,7 +29,7 @@ import net.liftweb.http.provider.servlet._
 import net.liftweb.util._
 import Helpers._
 
-object Jetty6AsyncProvider extends AsyncProviderMeta {
+object Jetty6AsyncProvider extends AsyncProviderMeta
   // contSupport below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
@@ -40,8 +40,8 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
                     setObject,
                     suspendMeth,
                     resumeMeth,
-                    isPending) = {
-    try {
+                    isPending) =
+    try
       val cc = Class.forName("org.mortbay.util.ajax.ContinuationSupport")
       val meth = cc.getMethod(
           "getContinuation", classOf[HttpServletRequest], classOf[AnyRef])
@@ -52,10 +52,8 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
       val resume = cci.getMethod("resume")
       val isPending = cci.getMethod("isPending")
       (true, (cc), (meth), (getObj), (setObj), (suspend), resume, isPending)
-    } catch {
+    catch
       case e: Exception => (false, null, null, null, null, null, null, null)
-    }
-  }
 
   def suspendResumeSupport_? : Boolean = hasContinuations_?
 
@@ -65,7 +63,6 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
     Full(req => new Jetty6AsyncProvider(req))
       .filter(i => suspendResumeSupport_?)
-}
 
 /**
   * Jetty6AsyncProvider
@@ -74,7 +71,7 @@ object Jetty6AsyncProvider extends AsyncProviderMeta {
   *
   */
 class Jetty6AsyncProvider(req: HTTPRequest)
-    extends ServletAsyncProvider with Loggable {
+    extends ServletAsyncProvider with Loggable
 
   import Jetty6AsyncProvider._
 
@@ -85,45 +82,36 @@ class Jetty6AsyncProvider(req: HTTPRequest)
   def resumeInfo: Option[(Req, LiftResponse)] =
     if (!hasContinuations_?) None
     else if (Props.inGAE) None
-    else {
+    else
       val cont = getContinuation.invoke(contSupport, servletReq, LiftRules)
       val ret = getObject.invoke(cont)
-      try {
+      try
         setObject.invoke(cont, null)
-        ret match {
+        ret match
           case (r: Req, lr: LiftResponse) => Some(r -> lr)
           case _ => None
-        }
-      } catch {
+      catch
         case e: Exception => None
-      }
-    }
 
-  def suspend(timeout: Long): RetryState.Value = {
-    try {
+  def suspend(timeout: Long): RetryState.Value =
+    try
       val cont = getContinuation.invoke(contSupport, servletReq, LiftRules)
       logger.trace("About to suspend continuation")
       val b = suspendMeth
         .invoke(cont, new java.lang.Long(timeout))
         .asInstanceOf[Boolean]
       if (!b) RetryState.TIMED_OUT else RetryState.RESUMED
-    } catch {
+    catch
       case e: java.lang.reflect.InvocationTargetException
           if e.getCause.getClass.getName.endsWith("RetryRequest") =>
         throw e.getCause
-    }
-  }
 
-  def resume(what: (Req, LiftResponse)): Boolean = {
+  def resume(what: (Req, LiftResponse)): Boolean =
     val cont = getContinuation.invoke(contSupport, servletReq, LiftRules)
-    cont.synchronized {
+    cont.synchronized
       logger.trace("In resume on Jetty 6")
       val pending = isPending.invoke(cont).asInstanceOf[Boolean]
-      if (pending) {
+      if (pending)
         setObject.invoke(cont, what)
         resumeMeth.invoke(cont)
-      }
       pending
-    }
-  }
-}

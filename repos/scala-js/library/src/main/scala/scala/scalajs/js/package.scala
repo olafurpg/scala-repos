@@ -60,7 +60,7 @@ package scala.scalajs
   *  [[| A | B]] is an unboxed pseudo-union type, suitable to type values that
   *  admit several unrelated types in facade types.
   */
-package object js {
+package object js
 
   /** The undefined value. */
   @inline def undefined: js.UndefOr[Nothing] =
@@ -234,4 +234,3 @@ package object js {
     *    restriction).
     */
   def use[A](x: A): Using[A] = new Using[A](x)
-}

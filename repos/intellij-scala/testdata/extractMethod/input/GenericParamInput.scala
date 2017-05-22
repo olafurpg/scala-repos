@@ -1,14 +1,12 @@
-abstract class GenericParamInput[T] {
+abstract class GenericParamInput[T]
   val x: T
 
-  def foo {
+  def foo
 
     val y = x
     /*start*/
     println(y)
 /*end*/
-  }
-}
 /*
 abstract class GenericParamInput[T] {
   val x: T

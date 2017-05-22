@@ -19,9 +19,9 @@ package org.apache.spark.ml.attribute
 
 import org.apache.spark.SparkFunSuite
 
-class AttributeGroupSuite extends SparkFunSuite {
+class AttributeGroupSuite extends SparkFunSuite
 
-  test("attribute group") {
+  test("attribute group")
     val attrs =
       Array(NumericAttribute.defaultAttr,
             NominalAttribute.defaultAttr,
@@ -44,15 +44,13 @@ class AttributeGroupSuite extends SparkFunSuite {
     assert(group.indexOf("size") === 4)
     assert(group.indexOf("clicked") === 5)
     assert(!group.hasAttr("abc"))
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       group("abc")
-    }
     assert(group === AttributeGroup.fromMetadata(group.toMetadataImpl,
                                                  group.name))
     assert(group === AttributeGroup.fromStructField(group.toStructField()))
-  }
 
-  test("attribute group without attributes") {
+  test("attribute group without attributes")
     val group0 = new AttributeGroup("user", 10)
     assert(group0.name === "user")
     assert(group0.numAttributes === Some(10))
@@ -67,5 +65,3 @@ class AttributeGroupSuite extends SparkFunSuite {
     assert(group1.numAttributes.isEmpty)
     assert(group1.attributes.isEmpty)
     assert(group1.size === -1)
-  }
-}

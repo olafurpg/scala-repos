@@ -20,18 +20,17 @@ import scala.collection.JavaConverters._
   * Common adapter for legacy interface implementations.
   */
 abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
-    extends CopyPastePostProcessor[T] {
+    extends CopyPastePostProcessor[T]
   @NotNull
   override final def collectTransferableData(file: PsiFile,
                                              editor: Editor,
                                              startOffsets: Array[Int],
-                                             endOffsets: Array[Int]) = {
+                                             endOffsets: Array[Int]) =
 
     val result = collectTransferableData0(
         file, editor, startOffsets, endOffsets)
 
     if (result == null) emptyList() else singletonList(result)
-  }
 
   @Nullable
   protected def collectTransferableData0(file: PsiFile,
@@ -40,11 +39,10 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
                                          endOffsets: Array[Int]): T
 
   @NotNull
-  override final def extractTransferableData(content: Transferable) = {
+  override final def extractTransferableData(content: Transferable) =
     val result = extractTransferableData0(content)
 
     if (result == null) emptyList() else singletonList(result)
-  }
 
   @Nullable
   protected def extractTransferableData0(content: Transferable): T
@@ -54,13 +52,11 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
                                              bounds: RangeMarker,
                                              caretOffset: Int,
                                              ref: Ref[lang.Boolean],
-                                             values: util.List[T]) {
+                                             values: util.List[T])
 
-    values.asScala.foreach { value =>
+    values.asScala.foreach  value =>
       processTransferableData0(
           project, editor, bounds, caretOffset, ref, value)
-    }
-  }
 
   protected def processTransferableData0(project: Project,
                                          editor: Editor,
@@ -68,4 +64,3 @@ abstract class SingularCopyPastePostProcessor[T <: TextBlockTransferableData]
                                          caretOffset: Int,
                                          ref: Ref[lang.Boolean],
                                          value: T)
-}

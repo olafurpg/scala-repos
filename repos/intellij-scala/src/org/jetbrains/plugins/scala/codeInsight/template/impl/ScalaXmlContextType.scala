@@ -12,9 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.ScXmlExpr
   */
 class ScalaXmlContextType
     extends TemplateContextType(
-        "SCALA_XML", "XML", classOf[ScalaLiveTemplateContextType]) {
-  def isInContext(file: PsiFile, offset: Int): Boolean = {
+        "SCALA_XML", "XML", classOf[ScalaLiveTemplateContextType])
+  def isInContext(file: PsiFile, offset: Int): Boolean =
     val element = file.findElementAt(offset)
     PsiTreeUtil.getParentOfType(element, classOf[ScXmlExpr]) != null
-  }
-}

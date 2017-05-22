@@ -31,7 +31,7 @@ import slick.util.Logging
   */
 class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
     implicit ec: ExecutionContext)
-    extends Logging {
+    extends Logging
 
   ////////////////////////////////////////////////////////////////////// Actions for reading the required JDBC metadata
 
@@ -50,15 +50,14 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         _.filter(fk => tableNamersByQName.isDefinedAt(fk.pkTable))
           .groupBy(fk => (fk.pkTable, fk.fkName, fk.pkName, fk.fkTable))
           .toSeq
-          .sortBy {
+          .sortBy
             case (key, _) => (key._1.name, key._2, key._3, key._4.name)
-          }
           .map(_._2.sortBy(_.keySeq)) // respect order
     )
 
   /** Read the index metadata grouped by name and in ordinal position order */
   def readIndices(t: MTable): DBIO[Seq[Seq[MIndexInfo]]] =
-    t.getIndexInfo().asTry.map {
+    t.getIndexInfo().asTry.map
       case Success(iis) =>
         iis
           .groupBy(_.indexName)
@@ -71,7 +70,6 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
             e.getMessage.trim)
         Seq()
       case Failure(e) => throw e
-    }
 
   ///////////////////////////////////////////////////////////////////////////////////////////// Builder factory methods
 
@@ -104,21 +102,21 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
   /** Table model builder factory. Override for customization.
     * @group Basic customization overrides */
   def createTableBuilder(namer: TableNamer): DBIO[TableBuilder] =
-    for {
+    for
       cs <- readColumns(namer.meta)
       pks <- readPrimaryKeys(namer.meta)
       fks <- readForeignKeys(namer.meta)
       idxs <- readIndices(namer.meta)
-    } yield new TableBuilder(namer.meta, namer, cs, pks, fks, idxs)
+    yield new TableBuilder(namer.meta, namer, cs, pks, fks, idxs)
 
   /** Creates a Slick data model from jdbc meta data. Foreign keys pointing out of the given tables
     * are not included. */
   def buildModel: DBIO[m.Model] =
-    for {
+    for
       ts <- DBIO.sequence(tableNamers.map(createTableBuilder))
       tablesByQName = ts.map(t => t.meta.name -> t).toMap
       builders = createBuilders(tablesByQName)
-    } yield m.Model(ts.sortBy(_.meta.name.name).map(_.buildModel(builders)))
+    yield m.Model(ts.sortBy(_.meta.name.name).map(_.buildModel(builders)))
 
   def createBuilders(tablesByQName: Map[MQName, TableBuilder]) =
     new Builders(tablesByQName)
@@ -126,12 +124,12 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
   class Builders(val tablesByQName: Map[MQName, TableBuilder])
 
   /** Converts from java.sql.Types w/ type name to the corresponding Java class name (with fully qualified path). */
-  def jdbcTypeToScala(jdbcType: Int, typeName: String = ""): ClassTag[_] = {
+  def jdbcTypeToScala(jdbcType: Int, typeName: String = ""): ClassTag[_] =
     import java.sql.Types._
     import scala.reflect.classTag
     // see TABLE B-1 of JSR-000221 JBDCTM API Specification 4.1 Maintenance Release
     // Mapping to corresponding Scala types where applicable
-    jdbcType match {
+    jdbcType match
       case CHAR | VARCHAR | LONGVARCHAR | NCHAR | NVARCHAR | LONGNVARCHAR =>
         classTag[String]
       case NUMERIC | DECIMAL => classTag[BigDecimal]
@@ -163,12 +161,10 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
         logger.warn(
             s"Found unknown jdbc type $t. Assuming String. This may be wrong. You can override ModelBuilder#Table#Column#tpe to fix this.");
         classTag[String] // FIXME
-    }
-  }
 
   ///////////////////////////////////////////////////////////////////////////////////////////// Builder implementations
 
-  class TableNamer(val meta: MTable) {
+  class TableNamer(val meta: MTable)
 
     /** Table name */
     def name: String = meta.name.name
@@ -183,7 +179,6 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
 
     /** Fully qualified table name */
     final lazy val qualifiedName = m.QualifiedName(name, schema, catalog)
-  }
 
   /** Table model builder
     * @group Basic customization overrides */
@@ -192,7 +187,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                      val mColumns: Seq[MColumn],
                      val mPrimaryKeys: Seq[MPrimaryKey],
                      val mForeignKeys: Seq[Seq[MForeignKey]],
-                     val mIndices: Seq[Seq[MIndexInfo]]) { table =>
+                     val mIndices: Seq[Seq[MIndexInfo]])  table =>
 
     // models
     def buildModel(builders: Builders) =
@@ -223,20 +218,18 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
     /** Index models by ordinal position order */
     final lazy val indices: Seq[m.Index] =
       mIndices.map(mi => createIndexBuilder(this, mi).model).flatten
-  }
 
   /** Column model builder.
     * @group Basic customization overrides */
-  class ColumnBuilder(tableBuilder: TableBuilder, meta: MColumn) {
+  class ColumnBuilder(tableBuilder: TableBuilder, meta: MColumn)
 
     /** Regex matcher to extract string out ouf surrounding '' */
     final val StringPattern = """^'(.*)'$""".r
 
     /** Scala type this column is mapped to */
-    def tpe = jdbcTypeToScala(meta.sqlType, meta.typeName).toString match {
+    def tpe = jdbcTypeToScala(meta.sqlType, meta.typeName).toString match
       case "java.lang.String" => if (meta.size == Some(1)) "Char" else "String"
       case t => t
-    }
     def name = meta.name
 
     /** Indicates whether this is a nullable column */
@@ -276,11 +269,11 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       *
       * If `ignoreInvalidDefaults = true`, Slick catches scala.MatchError and java.lang.NumberFormatException thrown by
       * this method, logs the message and treats it as no default value for convenience. */
-    def default: Option[Option[Any]] = rawDefault.map { v =>
+    def default: Option[Option[Any]] = rawDefault.map  v =>
       if (v == "NULL") None
-      else {
+      else
         // NOTE: When extending this list, please also extend the code generator accordingly
-        Some((v, tpe) match {
+        Some((v, tpe) match
           case (v, "Byte") => v.toByte
           case (v, "Short") => v.toShort
           case (v, "Int") => v.toInt
@@ -288,10 +281,9 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
           case (v, "Double") => v.toDouble
           case (v, "Float") => v.toFloat
           case (v, "Char") =>
-            v.length match {
+            v.length match
               case 1 => v(0)
               case 3 => v(1) // quoted character
-            }
           case (v, "String") if meta.typeName == "CHAR" =>
             v.head // FIXME: check length
           case (v, "scala.math.BigDecimal") =>
@@ -299,9 +291,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
           case (StringPattern(str), "String") => str
           case ("TRUE", "Boolean") => true
           case ("FALSE", "Boolean") => false
-        })
-      }
-    }
+        )
 
     private def formatDefault(v: Any) =
       s" default value $v for column ${tableBuilder.namer.qualifiedName.asString}.$name of type $tpe, meta data: " +
@@ -318,15 +308,14 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
     def defaultColumnOption: Option[RelationalProfile.ColumnOption.Default[_]] =
       rawDefault
         .map(v => (v, tpe))
-        .collect {
+        .collect
           case (v, _)
               if Seq(
                   "NOW", "CURRENT_TIMESTAMP", "CURRENT_DATE", "CURRENT_TIME")
                 .contains(v.stripSuffix("()").toUpperCase) =>
             logger.debug(s"Ignoring" + formatDefault(v))
             None
-        }
-        .getOrElse {
+        .getOrElse
           default.map(
               d =>
                 RelationalProfile.ColumnOption.Default(
@@ -336,22 +325,20 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                               s"Invalid default value $d for non-nullable column ${tableBuilder.namer.qualifiedName.asString}.$name of type $tpe, meta data: " +
                               meta.toString))
               ))
-        }
 
     private def convenientDefault: Option[
         RelationalProfile.ColumnOption.Default[_]] =
-      try defaultColumnOption catch {
+      try defaultColumnOption catch
         case e: java.lang.NumberFormatException if ignoreInvalidDefaults =>
           logger.debug(s"NumberFormatException: Could not parse" +
               formatDefault(rawDefault))
           None
         case e: scala.MatchError =>
           val msg = "Could not parse" + formatDefault(rawDefault)
-          if (ignoreInvalidDefaults) {
+          if (ignoreInvalidDefaults)
             logger.debug(s"SlickException: $msg")
             None
-          } else throw new SlickException(msg, e)
-      }
+          else throw new SlickException(msg, e)
 
     def model =
       m.Column(
@@ -365,9 +352,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
              else None) ++ length.map(RelationalProfile.ColumnOption.Length
                   .apply(_, varying = varying)) ++
             (if (!autoInc) convenientDefault else None))
-  }
 
-  class PrimaryKeyBuilder(tableBuilder: TableBuilder, meta: Seq[MPrimaryKey]) {
+  class PrimaryKeyBuilder(tableBuilder: TableBuilder, meta: Seq[MPrimaryKey])
 
     /** Indicates wether a primary key should be generated. Disabled by default for single column primary keys in favor
       * of ColumnOption PrimaryKey via Column#createPrimaryKeyColumnOption. */
@@ -383,9 +369,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                          tableBuilder.namer.qualifiedName,
                          columns.map(tableBuilder.columnsByName))
         )
-  }
 
-  class ForeignKeyBuilder(tableBuilder: TableBuilder, meta: Seq[MForeignKey]) {
+  class ForeignKeyBuilder(tableBuilder: TableBuilder, meta: Seq[MForeignKey])
     private val fk = meta.head
     def enabled: Boolean = true
     def name: Option[String] = fk.fkName.filter(_ != "")
@@ -395,7 +380,7 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
     def updateRule: m.ForeignKeyAction = fk.updateRule
     def deleteRule: m.ForeignKeyAction = fk.deleteRule
 
-    final def buildModel(builders: Builders): Option[m.ForeignKey] = {
+    final def buildModel(builders: Builders): Option[m.ForeignKey] =
       assert(meta.size >= 1)
       assert(
           tableBuilder.namer.qualifiedName == tableNamersByQName(fk.fkTable).qualifiedName)
@@ -412,10 +397,8 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                 updateRule,
                 deleteRule
             ))
-    }
-  }
 
-  class IndexBuilder(tableBuilder: TableBuilder, meta: Seq[MIndexInfo]) {
+  class IndexBuilder(tableBuilder: TableBuilder, meta: Seq[MIndexInfo])
     private val idx = meta.head
     assert(meta.size >= 1)
     assert(meta.forall(_.indexName == idx.indexName))
@@ -448,5 +431,3 @@ class JdbcModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
                     tableBuilder.namer.qualifiedName,
                     columns.map(tableBuilder.columnsByName),
                     unique))
-  }
-}

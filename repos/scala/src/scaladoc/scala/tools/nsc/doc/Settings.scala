@@ -14,7 +14,7 @@ import scala.language.postfixOps
   * @param printMsg A function that prints the string, without any extra boilerplate of error */
 class Settings(
     error: String => Unit, val printMsg: String => Unit = println(_))
-    extends scala.tools.nsc.Settings(error) {
+    extends scala.tools.nsc.Settings(error)
 
   // TODO 2.13 Remove
   private def removalIn213 =
@@ -62,11 +62,10 @@ class Settings(
       ""
   )
 
-  lazy val uncompilableFiles = docUncompilable.value match {
+  lazy val uncompilableFiles = docUncompilable.value match
     case "" => Nil
     case path =>
       io.Directory(path).deepFiles filter (_ hasExtension "scala") toList
-  }
 
   /** A setting that defines a URL to be concatenated with source locations and show a link to source files.
     * If needed the sourcepath option can be used to exclude undesired initial part of the link to sources */
@@ -264,37 +263,34 @@ class Settings(
   def skipPackage(qname: String) =
     skipPackageNames(qname.toLowerCase)
 
-  lazy val hiddenImplicits: Set[String] = {
+  lazy val hiddenImplicits: Set[String] =
     if (docImplicitsHide.value.isEmpty) hardcoded.commonConversionTargets
     else
-      docImplicitsHide.value.toSet flatMap { name: String =>
+      docImplicitsHide.value.toSet flatMap  name: String =>
         if (name == ".") hardcoded.commonConversionTargets
         else Set(name)
-      }
-  }
 
   def appendIndex(url: String): String =
     url.stripSuffix("index.html").stripSuffix("/") + "/index.html"
 
-  lazy val extUrlMapping: Map[String, String] = docExternalDoc.value flatMap {
+  lazy val extUrlMapping: Map[String, String] = docExternalDoc.value flatMap
     s =>
       val idx = s.indexOf("#")
-      if (idx > 0) {
+      if (idx > 0)
         val (first, last) = s.splitAt(idx)
         Some(
             new File(first).getCanonicalPath -> appendIndex(last.substring(1)))
-      } else {
+      else
         error(
             s"Illegal -doc-external-doc option; expected a pair with '#' separator, found: '$s'")
         None
-      }
-  } toMap
+  toMap
 
   /**
     *  This is the hardcoded area of Scaladoc. This is where "undesirable" stuff gets eliminated. I know it's not pretty,
     *  but ultimately scaladoc has to be useful. :)
     */
-  object hardcoded {
+  object hardcoded
 
     /** The common context bounds and some humanly explanations. Feel free to add more explanations
       *  `<root>.scala.package.Numeric` is the type class
@@ -366,10 +362,9 @@ class Settings(
       * Set of classes to exclude from index and diagrams
       * TODO: Should be configurable
       */
-    def isExcluded(qname: String) = {
+    def isExcluded(qname: String) =
       excludedClassnamePatterns.exists(_.findFirstMatchIn(qname).isDefined) &&
       !notExcludedClasses(qname)
-    }
 
     /** Common conversion targets that affect any class in Scala */
     val commonConversionTargets = Set(
@@ -396,7 +391,7 @@ class Settings(
     /** Dirty, dirty, dirty hack: the value params conversions can all kick in -- and they are disambiguated by priority
       *  but showing priority in scaladoc would make no sense -- so we have to manually remove the conversions that we
       *  know will never get a chance to kick in. Anyway, DIRTY DIRTY DIRTY! */
-    def valueClassFilter(value: String, conversionName: String): Boolean = {
+    def valueClassFilter(value: String, conversionName: String): Boolean =
       val valueName = value.toLowerCase
       val otherValues = valueClassList.filterNot(_ == valueName)
 
@@ -407,6 +402,3 @@ class Settings(
           return false
 
       true
-    }
-  }
-}

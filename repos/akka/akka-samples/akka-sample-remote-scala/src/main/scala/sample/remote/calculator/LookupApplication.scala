@@ -6,22 +6,20 @@ import com.typesafe.config.ConfigFactory
 import akka.actor.ActorSystem
 import akka.actor.Props
 
-object LookupApplication {
-  def main(args: Array[String]): Unit = {
+object LookupApplication
+  def main(args: Array[String]): Unit =
     if (args.isEmpty || args.head == "Calculator")
       startRemoteCalculatorSystem()
     if (args.isEmpty || args.head == "Lookup") startRemoteLookupSystem()
-  }
 
-  def startRemoteCalculatorSystem(): Unit = {
+  def startRemoteCalculatorSystem(): Unit =
     val system = ActorSystem(
         "CalculatorSystem", ConfigFactory.load("calculator"))
     system.actorOf(Props[CalculatorActor], "calculator")
 
     println("Started CalculatorSystem - waiting for messages")
-  }
 
-  def startRemoteLookupSystem(): Unit = {
+  def startRemoteLookupSystem(): Unit =
     val system = ActorSystem(
         "LookupSystem", ConfigFactory.load("remotelookup"))
     val remotePath =
@@ -31,10 +29,7 @@ object LookupApplication {
 
     println("Started LookupSystem")
     import system.dispatcher
-    system.scheduler.schedule(1.second, 1.second) {
+    system.scheduler.schedule(1.second, 1.second)
       if (Random.nextInt(100) % 2 == 0)
         actor ! Add(Random.nextInt(100), Random.nextInt(100))
       else actor ! Subtract(Random.nextInt(100), Random.nextInt(100))
-    }
-  }
-}

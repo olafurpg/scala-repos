@@ -15,9 +15,9 @@ class ScalaIntorduceVariablePostfixTemplate
     extends PostfixTemplateWithExpressionSelector(
         "var",
         "val name = expr",
-        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All))
   override def expandForChooseExpression(
-      expression: PsiElement, editor: Editor): Unit = {
+      expression: PsiElement, editor: Editor): Unit =
     val range = expression.getTextRange
     editor.getSelectionModel.setSelection(
         range.getStartOffset, range.getEndOffset)
@@ -27,5 +27,3 @@ class ScalaIntorduceVariablePostfixTemplate
         expression.getContainingFile,
         expression.getTextRange.getStartOffset,
         expression.getTextRange.getEndOffset)
-  }
-}

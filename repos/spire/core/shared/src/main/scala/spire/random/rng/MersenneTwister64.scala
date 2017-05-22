@@ -37,7 +37,7 @@ import java.util.Arrays
   */
 final class MersenneTwister64 protected[random](
     mt: Array[Long], mti0: Int = 313)
-    extends LongBasedGenerator {
+    extends LongBasedGenerator
   // N + 1 = 313
 
   import MersenneTwister64.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
@@ -46,50 +46,43 @@ final class MersenneTwister64 protected[random](
 
   def copyInit: MersenneTwister64 = new MersenneTwister64(mt.clone, mti)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes(): Array[Byte] =
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
-    cfor(0)(_ < N, _ + 1) { i =>
+    cfor(0)(_ < N, _ + 1)  i =>
       bb.putLong(mt(i))
-    }
     bb.putInt(mti)
     bytes
-  }
 
-  def setSeedBytes(bytes: Array[Byte]): Unit = {
+  def setSeedBytes(bytes: Array[Byte]): Unit =
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    cfor(0)(_ < N, _ + 1) { i =>
+    cfor(0)(_ < N, _ + 1)  i =>
       mt(i) = bb.getLong()
-    }
     mti = bb.getInt
-  }
 
   // Generates the next random long in the sequence
-  override def nextLong(): Long = {
+  override def nextLong(): Long =
     var x = 0L
 
-    if (mti >= N) {
+    if (mti >= N)
       var kk = 0
 
-      while (kk < N_M) {
+      while (kk < N_M)
         x = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
         mt(kk) = mt(kk + M) ^ (x >>> 1) ^ mag01(x)
         kk += 1
-      }
 
-      while (kk < N_1) {
+      while (kk < N_1)
         x = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
         mt(kk) = mt(kk + (M_N)) ^ (x >>> 1) ^ mag01(x)
         kk += 1
-      }
 
       x = (mt(N_1) & UpperMask) | (mt(0) & LowerMask)
       mt(N_1) = mt(M_1) ^ (x >>> 1) ^ mag01(x)
 
       mti = 0
-    }
 
     x = mt(mti)
     mti += 1
@@ -101,11 +94,9 @@ final class MersenneTwister64 protected[random](
     x ^= (x >>> 43)
 
     x
-  }
-}
 
 object MersenneTwister64
-    extends GeneratorCompanion[MersenneTwister64, (Array[Long], Int)] {
+    extends GeneratorCompanion[MersenneTwister64, (Array[Long], Int)]
 
   @inline private val UpperMask =
     0xFFFFFFFF80000000L // = 0xFFFFFFFFFFFFFFFFL ^ Int.MinValue
@@ -129,11 +120,10 @@ object MersenneTwister64
     (Utils.seedFromLong(N, Utils.longFromTime()), N + 1)
 
   def fromSeed(seed: (Array[Long], Int)): MersenneTwister64 =
-    seed match {
+    seed match
       case (mt, mti) =>
         assert(mt.length == N)
         new MersenneTwister64(mt, mti)
-    }
 
   def fromArray(arr: Array[Long]): MersenneTwister64 =
     fromSeed((Utils.seedFromArray(N, arr), N + 1))
@@ -143,4 +133,3 @@ object MersenneTwister64
 
   def fromTime(time: Long = System.nanoTime): MersenneTwister64 =
     fromSeed((Utils.seedFromLong(N, Utils.longFromTime(time)), N + 1))
-}

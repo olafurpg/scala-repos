@@ -23,9 +23,8 @@ import org.apache.spark.annotation.Since
   * Enum to describe whether a feature is "continuous" or "categorical"
   */
 @Since("1.0.0")
-object FeatureType extends Enumeration {
+object FeatureType extends Enumeration
   @Since("1.0.0")
   type FeatureType = Value
   @Since("1.0.0")
   val Continuous, Categorical = Value
-}

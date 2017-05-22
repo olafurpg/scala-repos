@@ -10,7 +10,7 @@ import scala.language.postfixOps
   *  the table, then uses that to create an instance of Table by
   *  passing in a sequence of rows.
   */
-class TableDef[T](_cols: Column[T]*) {
+class TableDef[T](_cols: Column[T]*)
   // These operators are about all there is to it.
   /** Appends a column to the table. */
   def ~(next: Column[T]) = retThis(cols :+= next)
@@ -27,7 +27,7 @@ class TableDef[T](_cols: Column[T]*) {
   def colApply(el: T) = colFunctions map (f => f(el))
   def retThis(body: => Unit): this.type = { body; this }
 
-  class Table(val rows: Seq[T]) extends Seq[T] {
+  class Table(val rows: Seq[T]) extends Seq[T]
     def iterator = rows.iterator
     def apply(index: Int) = rows(index)
     def length = rows.length
@@ -53,26 +53,20 @@ class TableDef[T](_cols: Column[T]*) {
     def allToSeq = headers ++ toFormattedSeq
 
     override def toString = allToSeq mkString "\n"
-  }
 
   def table(rows: Seq[T]) = new Table(rows)
 
   override def toString = cols.mkString("TableDef(", ", ", ")")
-}
 
-object TableDef {
-  case class Column[-T](name: String, f: T => Any, left: Boolean) {
+object TableDef
+  case class Column[-T](name: String, f: T => Any, left: Boolean)
     def maxWidth(elems: Seq[T]): Int =
       name +: (elems map f) map (_.toString.length) max
-    def formatSpec(elems: Seq[T]): String = {
+    def formatSpec(elems: Seq[T]): String =
       val justify = if (left) "-" else ""
       "%" + justify + maxWidth(elems) + "s"
-    }
-    override def toString = {
+    override def toString =
       val justify = if (left) "<<" else ">>"
       justify + "(" + name + ")"
-    }
-  }
 
   def apply[T](cols: Column[T]*) = new TableDef[T](cols: _*)
-}

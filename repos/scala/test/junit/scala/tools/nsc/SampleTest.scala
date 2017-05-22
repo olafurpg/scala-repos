@@ -8,9 +8,7 @@ import org.junit.runners.JUnit4
 /** Sample JUnit test that shows that all pieces
     of JUnit infrastructure work correctly */
 @RunWith(classOf[JUnit4])
-class SampleTest {
+class SampleTest
   @Test
-  def testMath: Unit = {
+  def testMath: Unit =
     assertTrue("you didn't get the math right fellow", 2 + 2 == 4)
-  }
-}

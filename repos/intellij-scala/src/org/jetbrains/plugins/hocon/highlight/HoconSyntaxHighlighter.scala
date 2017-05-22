@@ -10,12 +10,11 @@ import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.hocon.highlight.{HoconHighlighterColors => HHC}
 import org.jetbrains.plugins.hocon.lexer.HoconLexer
 
-class HoconSyntaxHighlighterFactory extends SyntaxHighlighterFactory {
+class HoconSyntaxHighlighterFactory extends SyntaxHighlighterFactory
   def getSyntaxHighlighter(project: Project, virtualFile: VirtualFile) =
     HoconSyntaxHighlighter
-}
 
-object HoconSyntaxHighlighter extends SyntaxHighlighter {
+object HoconSyntaxHighlighter extends SyntaxHighlighter
 
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
 
@@ -50,9 +49,7 @@ object HoconSyntaxHighlighter extends SyntaxHighlighter {
   def getTokenHighlights(tokenType: IElementType) =
     tokenHighlights.getOrElse(tokenType, Array.empty)
 
-  def getHighlightingLexer = new LayeredLexer(new HoconLexer) {
+  def getHighlightingLexer = new LayeredLexer(new HoconLexer)
     registerSelfStoppingLayer(new StringLiteralLexer('\"', QuotedString),
                               Array(QuotedString),
                               IElementType.EMPTY_ARRAY)
-  }
-}

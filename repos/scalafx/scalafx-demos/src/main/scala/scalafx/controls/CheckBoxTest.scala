@@ -38,65 +38,52 @@ import scalafx.scene.control.{Button, CheckBox, Label, TextField, ToggleButton}
 import scalafx.scene.layout.{BorderPane, Priority, VBox}
 import scalafx.scene.paint.Color
 
-object CheckBoxTest extends JFXApp {
+object CheckBoxTest extends JFXApp
 
-  val check = new CheckBox {
+  val check = new CheckBox
     text = "CheckBox"
-  }
 
-  val controlsPane = new VBox {
+  val controlsPane = new VBox
     spacing = 5
     fillWidth = true
     alignment = Pos.Center
     hgrow = Priority.Never
     children = List(new CheckBoxControls(check), new ControlControls(check))
-  }
 
-  val mainPane = new BorderPane {
+  val mainPane = new BorderPane
     top = check
     center = controlsPane
     vgrow = Priority.Always
     hgrow = Priority.Always
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "CheckBox Test"
     width = 300
     height = 500
-    scene = new Scene {
+    scene = new Scene
       fill = Color.LightGray
       content = mainPane
-    }
-  }
-}
 
 class CheckBoxControls(check: CheckBox)
-    extends PropertiesNodes[CheckBox](check, "CheckBox Properties") {
+    extends PropertiesNodes[CheckBox](check, "CheckBox Properties")
 
-  val lblSelected = new Label {
+  val lblSelected = new Label
     text = check.selected().toString
-  }
   check.onAction = (event: ActionEvent) =>
-    {
       lblSelected.text = if (check.indeterminate()) "Indeterminate"
       else check.selected().toString
-  }
 
-  val btnAllowIndeterminate = new ToggleButton {
+  val btnAllowIndeterminate = new ToggleButton
     text = "Allow Indeterminate"
     selected <==> check.allowIndeterminate
-  }
 
-  val btnFire = new Button {
+  val btnFire = new Button
     text = "Fire!"
     onAction = handle { check.fire() }
-  }
 
-  val txfText = new TextField {
+  val txfText = new TextField
     text <==> check.text
-  }
 
   super.addNode("Selected", lblSelected)
   super.addNodes(btnAllowIndeterminate, btnFire)
   super.addNode("Text", txfText)
-}

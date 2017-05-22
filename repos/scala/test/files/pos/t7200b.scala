@@ -1,19 +1,15 @@
 import language.higherKinds
 
-trait T {
+trait T
   def t = 0
-}
-trait Foo {
+trait Foo
   def coflatMap[A <: T](f: A): A
-}
 
-object O extends Foo {
-  def coflatMap[A <: T](f: A) = {
+object O extends Foo
+  def coflatMap[A <: T](f: A) =
     val f2 = coflatMap(f) // inferred in 2.9.2 / 2.10.0 as [Nothing]
     f2.t // so this fails to type check.
     f2
-  }
-}
 
 // Why? When a return type is inherited, the derived method
 // symbol first gets a preliminary type assigned, based on the

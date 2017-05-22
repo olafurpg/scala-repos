@@ -1,7 +1,7 @@
 package lila.tournament
 
 private[tournament] sealed abstract class Status(val id: Int)
-    extends Ordered[Status] {
+    extends Ordered[Status]
 
   def compare(other: Status) = id compare other.id
 
@@ -9,9 +9,8 @@ private[tournament] sealed abstract class Status(val id: Int)
 
   def is(s: Status): Boolean = this == s
   def is(f: Status.type => Status): Boolean = is(f(Status))
-}
 
-private[tournament] object Status {
+private[tournament] object Status
 
   case object Created extends Status(10)
   case object Started extends Status(20)
@@ -19,9 +18,8 @@ private[tournament] object Status {
 
   val all = List(Created, Started, Finished)
 
-  val byId = all map { v =>
+  val byId = all map  v =>
     (v.id, v)
-  } toMap
+  toMap
 
   def apply(id: Int): Option[Status] = byId get id
-}

@@ -29,8 +29,8 @@ import yggdrasil.table._
 import TransSpecModule._
 
 trait MathLibModule[M[+ _]]
-    extends ColumnarTableLibModule[M] with InfixLibModule[M] {
-  trait MathLib extends ColumnarTableLib with InfixLib {
+    extends ColumnarTableLibModule[M] with InfixLibModule[M]
+  trait MathLib extends ColumnarTableLib with InfixLib
     import trans._
 
     val MathNamespace = Vector("std", "math")
@@ -78,20 +78,17 @@ trait MathLibModule[M[+ _]]
     import StdLib.{DoubleFrom, doubleIsDefined}
     import java.lang.Math
 
-    object pow extends Op2F2(MathNamespace, "pow") with Infix.Power {
+    object pow extends Op2F2(MathNamespace, "pow") with Infix.Power
       val cf2pName = "builtin::math::op2dd::pow"
-    }
 
     abstract class Op1DD(
         name: String, defined: Double => Boolean, f: Double => Double)
-        extends Op1F1(MathNamespace, name) {
+        extends Op1F1(MathNamespace, name)
       val tpe = UnaryOperationType(JNumberT, JNumberT)
-      def f1(ctx: MorphContext): F1 = CF1P("builtin::math::op1dd::" + name) {
+      def f1(ctx: MorphContext): F1 = CF1P("builtin::math::op1dd::" + name)
         case c: DoubleColumn => new DoubleFrom.D(c, defined, f)
         case c: LongColumn => new DoubleFrom.L(c, defined, f)
         case c: NumColumn => new DoubleFrom.N(c, defined, f)
-      }
-    }
 
     object sinh extends Op1DD("sinh", doubleIsDefined, Math.sinh)
 
@@ -167,9 +164,9 @@ trait MathLibModule[M[+ _]]
     abstract class Op2DDD(name: String,
                           defined: (Double, Double) => Boolean,
                           f: (Double, Double) => Double)
-        extends Op2F2(MathNamespace, name) {
+        extends Op2F2(MathNamespace, name)
       val tpe = BinaryOperationType(JNumberT, JNumberT, JNumberT)
-      def f2(ctx: MorphContext): F2 = CF2P("builtin::math::op2dd::" + name) {
+      def f2(ctx: MorphContext): F2 = CF2P("builtin::math::op2dd::" + name)
         case (c1: DoubleColumn, c2: DoubleColumn) =>
           new DoubleFrom.DD(c1, c2, defined, f)
 
@@ -196,25 +193,21 @@ trait MathLibModule[M[+ _]]
 
         case (c1: NumColumn, c2: NumColumn) =>
           new DoubleFrom.NN(c1, c2, defined, f)
-      }
-    }
 
     def bothDefined(x: Double, y: Double) =
       doubleIsDefined(x) && doubleIsDefined(y)
 
     object minOf extends Op2DDD("minOf", bothDefined, Math.min)
 
-    object min extends Op2DDD("min", bothDefined, Math.min) {
+    object min extends Op2DDD("min", bothDefined, Math.min)
       override val deprecation = Some("use minOf instead")
-    }
 
     object hypot extends Op2DDD("hypot", bothDefined, Math.hypot)
 
     object maxOf extends Op2DDD("maxOf", bothDefined, Math.max)
 
-    object max extends Op2DDD("max", bothDefined, Math.max) {
+    object max extends Op2DDD("max", bothDefined, Math.max)
       override val deprecation = Some("use maxOf instead")
-    }
 
     object atan2 extends Op2DDD("atan2", bothDefined, Math.atan2)
 
@@ -224,13 +217,11 @@ trait MathLibModule[M[+ _]]
         extends Op2DDD("IEEEremainder", bothDefined, Math.IEEEremainder)
 
     object roundTo
-        extends Op2DDD("roundTo", bothDefined, { (n, digits) =>
+        extends Op2DDD("roundTo", bothDefined,  (n, digits) =>
           val adjusted = n * math.pow(10, digits)
           val rounded =
             if (Math.abs(n) >= 4503599627370496.0) adjusted
             else Math.round(adjusted)
 
           rounded / math.pow(10, digits)
-        })
-  }
-}
+        )

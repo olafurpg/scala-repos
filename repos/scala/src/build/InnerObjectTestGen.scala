@@ -1,12 +1,11 @@
 import scala.collection.mutable
 
 /** All contexts where objects can be embedded. */
-object Contexts extends Enumeration {
+object Contexts extends Enumeration
   val Class, Object, Trait, Method, PrivateMethod, Anonfun, ClassConstructor,
   TraitConstructor, LazyVal, Val = Value
 
   val topLevel = List(Class, Object, Trait)
-}
 
 /** Test generation of inner objects, trying to cover as many cases as possible. It proceeds
   *  by progressively adding nesting layers around a 'payload body'.
@@ -26,7 +25,7 @@ object Contexts extends Enumeration {
   *
   * @author Iulian Dragos
   */
-object TestGen {
+object TestGen
   val testFile = "object-testers-automated.scala"
 
   val payload = """      var ObjCounter = 0
@@ -110,10 +109,9 @@ object Test {
 """
 
   var counter = 0
-  def freshName(name: String) = {
+  def freshName(name: String) =
     counter += 1
     name + counter
-  }
 
   val bodies = new mutable.ListBuffer[String]
   val triggers = new mutable.ListBuffer[String]
@@ -125,7 +123,7 @@ object Test {
       trigger: String, // the code that needs to be invoked to run the test so far
       nested: List[Contexts.Value], // the path from the innermost to the outermost context
       p: List[Contexts.Value] => Boolean, // a predicate for filtering problematic cases
-      privateObj: Boolean = false) {
+      privateObj: Boolean = false)
     // are we using a private object?
 
     def shouldBeTopLevel =
@@ -135,11 +133,11 @@ object Test {
     val enums =
       if (shouldBeTopLevel) Contexts.topLevel else Contexts.values.toList
 
-    if (depth == 0) {
+    if (depth == 0)
       if (p(nested)) { bodies += body; triggers += trigger }
-    } else {
-      for (ctx <- enums) {
-        val (body1, trigger1) = ctx match {
+    else
+      for (ctx <- enums)
+        val (body1, trigger1) = ctx match
           case Class =>
             val name = freshName("Class") + "_" + depth
             ("""
@@ -243,27 +241,22 @@ object Test {
              }
            """.format(name, body, trigger),
              "(new %s {})".format(name))
-        }
         generate(depth - 1, body1, trigger1, ctx :: nested, p)
-      }
-    }
-  }
 
   /** Only allow multithreaded tests if not inside a static initializer. */
-  private def allowMT(structure: List[Contexts.Value]): Boolean = {
+  private def allowMT(structure: List[Contexts.Value]): Boolean =
     var nesting = structure
-    while ( (nesting ne Nil) && nesting.head == Object) {
+    while ( (nesting ne Nil) && nesting.head == Object)
       nesting = nesting.tail
-    }
     if (nesting ne Nil) !(nesting.head == Val)
     else true
-  } && !objectInsideLazyVal(structure)
+  && !objectInsideLazyVal(structure)
 
   /** Known bug: object inside lazyval leads to deadlock. */
   private def objectInsideLazyVal(structure: List[Contexts.Value]): Boolean =
     structure.contains(LazyVal)
 
-  def usage() {
+  def usage()
     val help =
       """
   Usage: TestGen <nr of levels>
@@ -287,9 +280,8 @@ object Test {
 
     println(help)
     System.exit(1)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     if (args.isEmpty || args.contains("-help")) usage()
 
     val depth = if (args.length < 1) 2 else args(0).toInt
@@ -311,5 +303,3 @@ object Test {
         template.format(header,
                         bodies.mkString("", "\n", ""),
                         triggers.mkString("", "\n", "")))
-  }
-}

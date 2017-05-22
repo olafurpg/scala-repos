@@ -14,15 +14,14 @@
  * of (Op[Int]): Op[Int].
  * At present it is unclear whether this problem can be solved.
  */
-object Test {
+object Test
   class Op[I];
   class IntOp extends Op[Int];
 
-  class Rich(x: Double) {
+  class Rich(x: Double)
     def +(op: IntOp): IntOp = op;
     def +[I](op: Op[I]): Op[I] = op;
     def plus[I](op: Op[I]): Op[I] = op;
-  }
 
   implicit def iToRich(x: Double) =
     new Rich(x);
@@ -41,4 +40,3 @@ object Test {
   // works as expected --
   //   problem isn't in using Rich.+[I](op : Op[I])
   val c = iToRich(1.0) + new Op[Int];
-}

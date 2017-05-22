@@ -4,8 +4,8 @@ import scala.reflect.macros.blackbox.Context
 import scala.reflect.NameTransformer
 import scala.collection.mutable.ListBuffer
 
-object MacroSupportInterpolationImpl {
-  def b(ctx: Context)(args: ctx.Expr[Any]*): ctx.Expr[Unit] = {
+object MacroSupportInterpolationImpl
+  def b(ctx: Context)(args: ctx.Expr[Any]*): ctx.Expr[Unit] =
     import ctx.universe._
 
     val nodeSymbol = ctx.mirror.staticClass("slick.ast.Node")
@@ -25,21 +25,20 @@ object MacroSupportInterpolationImpl {
     def append(t: Tree) =
       Apply(Select(sqlBuilder, TermName("+=").encodedName), List(t))
 
-    def appendString(str: String): List[Tree] = {
+    def appendString(str: String): List[Tree] =
       val exprs = new ListBuffer[Tree]
       val sb = new StringBuilder
       val len = str.length
       var pos = 0
-      def flushSB: Unit = if (!sb.isEmpty) {
+      def flushSB: Unit = if (!sb.isEmpty)
         exprs += append(Literal(Constant(sb.toString)))
         sb.clear()
-      }
-      while (pos < len) {
-        str.charAt(pos) match {
+      while (pos < len)
+        str.charAt(pos) match
           case '\\' =>
             pos += 1
-            if (pos < len) {
-              str.charAt(pos) match {
+            if (pos < len)
+              str.charAt(pos) match
                 case c2 @ ('(' | ')') => // optional parentheses
                   flushSB
                   exprs += If(
@@ -87,27 +86,22 @@ object MacroSupportInterpolationImpl {
                   ctx.abort(ctx.enclosingPosition,
                             "Invalid escaped character '" + c2 +
                             "' in literal \"" + str + "\"")
-              }
-            }
           case c => sb append c
-        }
         pos += 1
-      }
       if (!sb.isEmpty) exprs += append(Literal(Constant(sb.toString)))
       exprs.toList
-    }
 
     val Expr(Apply(_, List(Apply(_, parts)))) = ctx.prefix
     val pit = parts.map { case Literal(Constant(s: String)) => s }.iterator
     val ait = args.iterator
     val exprs = new ListBuffer[Tree]
 
-    while (ait.hasNext) {
+    while (ait.hasNext)
       val s = pit.next()
       val ae @ Expr(a) = ait.next()
       val len = s.length
       val marker = if (len == 0) '\u0000' else s.charAt(len - 1)
-      marker match {
+      marker match
         case '`' =>
           exprs ++= appendString(s.substring(0, len - 1))
           if (ae.actualType <:< stringType) exprs += append(quoteIdentifier(a))
@@ -130,11 +124,7 @@ object MacroSupportInterpolationImpl {
            else
              ctx.abort(
                  ae.tree.pos, "Unknown type. Must be Node, String or AnyVal."))
-      }
-    }
     exprs ++= appendString(pit.next())
 
     //println("### exprs: "+exprs)
     ctx.Expr[Unit](Block(exprs.toList, Literal(Constant(()))))
-  }
-}

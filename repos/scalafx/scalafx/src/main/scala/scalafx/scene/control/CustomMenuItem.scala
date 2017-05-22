@@ -39,10 +39,9 @@ import scalafx.scene.Node
 /**
   * Object companion for [[CustomMenuItem]].
   */
-object CustomMenuItem {
+object CustomMenuItem
   implicit def sfxCustomMenuItem2jfx(c: CustomMenuItem): jfxsc.CustomMenuItem =
     if (c != null) c.delegate else null
-}
 
 /**
   * A MenuItem that allows for arbitrary nodes to be embedded within it, by assigning a Node to the content property.
@@ -59,7 +58,7 @@ object CustomMenuItem {
   */
 class CustomMenuItem(
     override val delegate: jfxsc.CustomMenuItem = new jfxsc.CustomMenuItem)
-    extends MenuItem(delegate) with SFXDelegate[jfxsc.CustomMenuItem] {
+    extends MenuItem(delegate) with SFXDelegate[jfxsc.CustomMenuItem]
 
   /**
     * Constructs a CustomMenuItem and initializes its content with the node specified.
@@ -80,15 +79,12 @@ class CustomMenuItem(
     * The node to display within this CustomMenuItem.
     */
   def content: ObjectProperty[jfxs.Node] = delegate.contentProperty()
-  def content_=(value: Node): Unit = {
+  def content_=(value: Node): Unit =
     ObjectProperty.fillProperty(delegate.contentProperty, value)
-  }
 
   /**
     * If true, this menu item, and all visible menus, will be hidden when this menu item is clicked on.
     */
   def hideOnClick: BooleanProperty = delegate.hideOnClickProperty()
-  def hideOnClick_=(value: Boolean): Unit = {
+  def hideOnClick_=(value: Boolean): Unit =
     hideOnClick() = value
-  }
-}

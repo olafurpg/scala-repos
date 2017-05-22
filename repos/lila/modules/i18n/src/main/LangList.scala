@@ -1,6 +1,6 @@
 package lila.i18n
 
-object LangList {
+object LangList
 
   def name(code: String) = all get code
 
@@ -189,4 +189,3 @@ object LangList {
       "za" -> "Sawcuengh",
       // the values for 'za' (Zhang languages) are made up. Contact with a native speaker to determine their native name is necessary (won't be hard; it has many speakers)
       "zu" -> "isiZulu")
-}

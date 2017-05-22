@@ -8,7 +8,7 @@
 
 package scala.scalajs
 
-object LinkingInfo {
+object LinkingInfo
 
   import scala.scalajs.runtime.linkingInfo
 
@@ -106,4 +106,3 @@ object LinkingInfo {
   @inline
   def assumingES6: Boolean =
     linkingInfo.assumingES6
-}

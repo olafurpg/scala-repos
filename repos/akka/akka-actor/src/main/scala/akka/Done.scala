@@ -10,10 +10,9 @@ package akka
   */
 sealed abstract class Done
 
-case object Done extends Done {
+case object Done extends Done
 
   /**
     * Java API: the singleton instance
     */
   def getInstance(): Done = this
-}

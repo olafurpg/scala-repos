@@ -18,27 +18,23 @@ import org.specs2.matcher.MatchResult
 /**
   * Verifies OAuth requests
   */
-object OAuthRequestVerifier {
+object OAuthRequestVerifier
 
-  def percentDecode(input: String): String = {
-    if (input == null) {
+  def percentDecode(input: String): String =
+    if (input == null)
       ""
-    } else {
+    else
       java.net.URLDecoder.decode(input, "UTF-8")
-    }
-  }
 
-  def percentEncode(input: String): String = {
-    if (input == null) {
+  def percentEncode(input: String): String =
+    if (input == null)
       ""
-    } else {
+    else
       java.net.URLEncoder
         .encode(input, "UTF-8")
         .replace("+", "%20")
         .replace("*", "%2A")
         .replace("%7E", "~")
-    }
-  }
 
   /**
     * Verify that the given request is a valid OAuth request given the consumer key and request token
@@ -47,14 +43,14 @@ object OAuthRequestVerifier {
                     body: ByteString,
                     hostUrl: String,
                     consumerKey: ConsumerKey,
-                    requestToken: RequestToken): MatchResult[_] = {
+                    requestToken: RequestToken): MatchResult[_] =
     val method = request.method
     val baseUrl = hostUrl + request.path
 
-    request.headers.get("Authorization") must beSome.like {
+    request.headers.get("Authorization") must beSome.like
       case authorization =>
         authorization must startWith("OAuth ")
-        val oauthParams = authorization.drop(6).split(", ").map { param =>
+        val oauthParams = authorization.drop(6).split(", ").map  param =>
           val splitted = param.split("=")
           val key = percentDecode(splitted(0))
           val rawValue = splitted(1)
@@ -62,7 +58,6 @@ object OAuthRequestVerifier {
           rawValue must endWith("\"")
           val value = percentDecode(rawValue.drop(1).dropRight(1))
           key -> value
-        }
 
         val oauthParamsMap = oauthParams.toMap
         val oauthSignature = oauthParamsMap.get("oauth_signature")
@@ -75,31 +70,27 @@ object OAuthRequestVerifier {
         oauthToken must beSome(requestToken.token)
         oauthConsumerKey must beSome(consumerKey.key)
         oauthSignatureMethod must beSome("HMAC-SHA1")
-        oauthTimestamp must beSome.like {
+        oauthTimestamp must beSome.like
           case timestamp =>
             // Verify no more than 100 seconds in the past
             timestamp.toLong must beGreaterThan(
                 System.currentTimeMillis() / 1000 - 100)
-        }
 
         // Verify the signature
         val collectedParams =
-          oauthParams.filterNot(_._1 == "oauth_signature") ++ request.queryString.toSeq.flatMap {
+          oauthParams.filterNot(_._1 == "oauth_signature") ++ request.queryString.toSeq.flatMap
             case (key, values) => values.map(value => key -> value)
-          }
         // If the body is form URL encoded, must include body parameters
-        val collectedParamsWithBody = request.contentType match {
+        val collectedParamsWithBody = request.contentType match
           case Some(formUrlEncoded)
               if formUrlEncoded.startsWith(
                   "application/x-www-form-urlencoded") =>
             val form =
-              FormUrlEncodedParser.parse(body.utf8String).toSeq.flatMap {
+              FormUrlEncodedParser.parse(body.utf8String).toSeq.flatMap
                 case (key, values) => values.map(value => key -> value)
-              }
             collectedParams ++ form
           case _ => collectedParams
-        }
-        oauthSignature must beSome.like {
+        oauthSignature must beSome.like
           case signature =>
             val ourSignature = signParams(method,
                                           baseUrl,
@@ -107,23 +98,20 @@ object OAuthRequestVerifier {
                                           consumerKey.secret,
                                           requestToken.secret)
             signature must_== ourSignature
-        }
-    }
-  }
 
   def signParams(method: String,
                  baseUrl: String,
                  params: Seq[(String, String)],
                  consumerSecret: String,
-                 tokenSecret: String): String = {
+                 tokenSecret: String): String =
     // See https://dev.twitter.com/docs/auth/creating-signature
 
     // Params must be percent encoded before they are sorted
-    val parameterString = params.map {
+    val parameterString = params.map
       case (key, value) => percentEncode(key) -> percentEncode(value)
-    }.sorted.map {
+    .sorted.map
       case (key, value) => s"$key=$value"
-    }.mkString("&")
+    .mkString("&")
 
     val signatureBaseString =
       s"${method.toUpperCase(Locale.ENGLISH)}&${percentEncode(baseUrl)}&${percentEncode(parameterString)}"
@@ -137,5 +125,3 @@ object OAuthRequestVerifier {
     mac.init(keySpec)
     val signature = mac.doFinal(signatureBaseString.getBytes("US-ASCII"))
     new String(Base64.encodeBase64(signature), "US-ASCII")
-  }
-}

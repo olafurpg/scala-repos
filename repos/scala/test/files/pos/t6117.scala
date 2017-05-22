@@ -1,11 +1,10 @@
 package test
 
-trait ImportMe {
+trait ImportMe
   def foo(i: Int) = 1
   def foo(s: String) = 2
-}
 
-class Test(val importMe: ImportMe) {
+class Test(val importMe: ImportMe)
   import importMe._
   import importMe._
 
@@ -16,4 +15,3 @@ class Test(val importMe: ImportMe) {
   //   println(foo(1))
   //           ^
   println(foo(1))
-}

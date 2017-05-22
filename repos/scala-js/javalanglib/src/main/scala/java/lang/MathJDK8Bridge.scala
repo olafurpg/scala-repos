@@ -20,7 +20,7 @@
 
 package java.lang
 
-private[java] object MathJDK8Bridge {
+private[java] object MathJDK8Bridge
   def addExact(a: scala.Int, b: scala.Int): scala.Int = Math.addExact(a, b)
 
   def addExact(a: scala.Long, b: scala.Long): scala.Long = Math.addExact(a, b)
@@ -58,4 +58,3 @@ private[java] object MathJDK8Bridge {
   def floorMod(a: scala.Int, b: scala.Int): scala.Int = Math.floorMod(a, b)
 
   def floorMod(a: scala.Long, b: scala.Long): scala.Long = Math.floorMod(a, b)
-}

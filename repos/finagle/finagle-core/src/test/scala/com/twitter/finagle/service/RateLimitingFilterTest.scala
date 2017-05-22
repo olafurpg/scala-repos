@@ -12,8 +12,8 @@ import com.twitter.finagle.Service
 import com.twitter.util.{Await, Time, Future}
 
 @RunWith(classOf[JUnitRunner])
-class RateLimitingFilterTest extends FunSuite with MockitoSugar {
-  class RateLimitingFilterHelper {
+class RateLimitingFilterTest extends FunSuite with MockitoSugar
+  class RateLimitingFilterHelper
     def categorize(i: Int) = (i % 5).toString
     val strategy = new LocalRateLimitingStrategy[Int](categorize, 1.second, 5)
     val filter = new RateLimitingFilter[Int, Int](strategy)
@@ -22,51 +22,38 @@ class RateLimitingFilterTest extends FunSuite with MockitoSugar {
     when(service(Matchers.anyInt)) thenReturn Future.value(1)
 
     val rateLimitedService = filter andThen service
-  }
 
-  test("RateLimitingFilter should Execute requests below rate limit") {
+  test("RateLimitingFilter should Execute requests below rate limit")
     val h = new RateLimitingFilterHelper
     import h._
 
     var t = Time.now
-    Time.withTimeFunction(t) { _ =>
-      (1 to 5) foreach { _ =>
+    Time.withTimeFunction(t)  _ =>
+      (1 to 5) foreach  _ =>
         assert(Await.result(rateLimitedService(1)) == 1)
         t += 100.milliseconds
-      }
-    }
-  }
 
-  test("RateLimitingFilter should Refuse request if rate is above limit") {
+  test("RateLimitingFilter should Refuse request if rate is above limit")
     val h = new RateLimitingFilterHelper
     import h._
 
     var t = Time.now
-    Time.withTimeFunction(t) { _ =>
-      (1 to 5) foreach { _ =>
+    Time.withTimeFunction(t)  _ =>
+      (1 to 5) foreach  _ =>
         Await.result(rateLimitedService(1)) == 1
         t += 100.milliseconds
-      }
 
-      intercept[Exception] {
+      intercept[Exception]
         Await.result(rateLimitedService(1))
-      }
-    }
-  }
 
   test(
-      "RateLimitingFilter should Execute different categories of requests and keep a window per category") {
+      "RateLimitingFilter should Execute different categories of requests and keep a window per category")
     val h = new RateLimitingFilterHelper
     import h._
 
     var t = Time.now
-    Time.withTimeFunction(t) { _ =>
-      (1 to 5) foreach { _ =>
-        (1 to 5) foreach { i =>
+    Time.withTimeFunction(t)  _ =>
+      (1 to 5) foreach  _ =>
+        (1 to 5) foreach  i =>
           assert(Await.result(rateLimitedService(i)) == 1)
-        }
         t += 100.milliseconds
-      }
-    }
-  }
-}

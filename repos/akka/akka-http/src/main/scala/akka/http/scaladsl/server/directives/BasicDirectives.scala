@@ -15,36 +15,31 @@ import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.util.FastFuture._
 
-trait BasicDirectives {
+trait BasicDirectives
 
   def mapInnerRoute(f: Route ⇒ Route): Directive0 =
-    Directive { inner ⇒
+    Directive  inner ⇒
       f(inner(()))
-    }
 
   def mapRequestContext(f: RequestContext ⇒ RequestContext): Directive0 =
-    mapInnerRoute { inner ⇒ ctx ⇒
+    mapInnerRoute  inner ⇒ ctx ⇒
       inner(f(ctx))
-    }
 
   def mapRequest(f: HttpRequest ⇒ HttpRequest): Directive0 =
     mapRequestContext(_ mapRequest f)
 
   def mapRouteResultFuture(
       f: Future[RouteResult] ⇒ Future[RouteResult]): Directive0 =
-    Directive { inner ⇒ ctx ⇒
+    Directive  inner ⇒ ctx ⇒
       f(inner(())(ctx))
-    }
 
   def mapRouteResult(f: RouteResult ⇒ RouteResult): Directive0 =
-    Directive { inner ⇒ ctx ⇒
+    Directive  inner ⇒ ctx ⇒
       inner(())(ctx).fast.map(f)(ctx.executionContext)
-    }
 
   def mapRouteResultWith(f: RouteResult ⇒ Future[RouteResult]): Directive0 =
-    Directive { inner ⇒ ctx ⇒
+    Directive  inner ⇒ ctx ⇒
       inner(())(ctx).fast.flatMap(f)(ctx.executionContext)
-    }
 
   def mapRouteResultPF(
       f: PartialFunction[RouteResult, RouteResult]): Directive0 =
@@ -60,18 +55,16 @@ trait BasicDirectives {
 
   def recoverRejectionsWith(
       f: immutable.Seq[Rejection] ⇒ Future[RouteResult]): Directive0 =
-    mapRouteResultWithPF {
+    mapRouteResultWithPF
       case RouteResult.Rejected(rejections) ⇒ f(rejections)
-    }
 
   def mapRejections(
       f: immutable.Seq[Rejection] ⇒ immutable.Seq[Rejection]): Directive0 =
     recoverRejections(rejections ⇒ RouteResult.Rejected(f(rejections)))
 
   def mapResponse(f: HttpResponse ⇒ HttpResponse): Directive0 =
-    mapRouteResultPF {
+    mapRouteResultPF
       case RouteResult.Complete(response) ⇒ RouteResult.Complete(f(response))
-    }
 
   def mapResponseEntity(f: ResponseEntity ⇒ ResponseEntity): Directive0 =
     mapResponse(_ mapEntity f)
@@ -107,9 +100,8 @@ trait BasicDirectives {
     * Extracts a number of values using the given function.
     */
   def textract[L : Tuple](f: RequestContext ⇒ L): Directive[L] =
-    Directive { inner ⇒ ctx ⇒
+    Directive  inner ⇒ ctx ⇒
       inner(f(ctx))(ctx)
-    }
 
   /**
     * Adds a TransformationRejection cancelling all rejections equal to the given one
@@ -219,9 +211,8 @@ trait BasicDirectives {
     */
   def extractRequestContext: Directive1[RequestContext] =
     BasicDirectives._extractRequestContext
-}
 
-object BasicDirectives extends BasicDirectives {
+object BasicDirectives extends BasicDirectives
   private val _extractUnmatchedPath: Directive1[Uri.Path] = extract(
       _.unmatchedPath)
   private val _extractRequest: Directive1[HttpRequest] = extract(_.request)
@@ -237,4 +228,3 @@ object BasicDirectives extends BasicDirectives {
       _.parserSettings)
   private val _extractRequestContext: Directive1[RequestContext] = extract(
       conforms)
-}

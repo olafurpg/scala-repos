@@ -19,13 +19,13 @@ import com.wix.accord._
 
 import scala.util.Try
 
-class AppUpdateTest extends MarathonSpec {
+class AppUpdateTest extends MarathonSpec
   import Formats._
   import mesosphere.marathon.integration.setup.V2TestFormats._
 
-  test("Validation") {
+  test("Validation")
     def shouldViolate(
-        update: AppUpdate, path: String, template: String): Unit = {
+        update: AppUpdate, path: String, template: String): Unit =
       val violations = validate(update)
       assert(violations.isFailure)
       assert(
@@ -33,17 +33,15 @@ class AppUpdateTest extends MarathonSpec {
             .getAllRuleConstrains(violations)
             .exists(
                 v => v.path.getOrElse(false) == path && v.message == template))
-    }
 
     def shouldNotViolate(
-        update: AppUpdate, path: String, template: String): Unit = {
+        update: AppUpdate, path: String, template: String): Unit =
       val violations = validate(update)
       assert(
           !ValidationHelper
             .getAllRuleConstrains(violations)
             .exists(
                 v => v.path.getOrElse(false) == path && v.message == template))
-    }
 
     val update = AppUpdate()
 
@@ -81,18 +79,15 @@ class AppUpdateTest extends MarathonSpec {
     shouldViolate(update.copy(instances = Some(-3)),
                   "/instances",
                   "got -3, expected 0 or more")
-  }
 
-  private[this] def fromJsonString(json: String): AppUpdate = {
+  private[this] def fromJsonString(json: String): AppUpdate =
     Json.fromJson[AppUpdate](Json.parse(json)).get
-  }
 
-  test("SerializationRoundtrip for empty definition") {
+  test("SerializationRoundtrip for empty definition")
     val update0 = AppUpdate(container = Some(Container.Empty))
     JsonTestHelper.assertSerializationRoundtripWorks(update0)
-  }
 
-  ignore("SerializationRoundtrip for extended definition") {
+  ignore("SerializationRoundtrip for extended definition")
     val update1 = AppUpdate(
         cmd = Some("sleep 60"),
         args = None,
@@ -141,9 +136,8 @@ class AppUpdateTest extends MarathonSpec {
               ))
     )
     JsonTestHelper.assertSerializationRoundtripWorks(update1)
-  }
 
-  test("Serialization result of empty container") {
+  test("Serialization result of empty container")
     val update2 = AppUpdate(container = None)
     val json2 = """
       {
@@ -168,9 +162,8 @@ class AppUpdateTest extends MarathonSpec {
     """
     val readResult2 = fromJsonString(json2)
     assert(readResult2 == update2)
-  }
 
-  test("Serialization result of empty ipAddress") {
+  test("Serialization result of empty ipAddress")
     val update2 = AppUpdate(ipAddress = None)
     val json2 = """
       {
@@ -196,34 +189,29 @@ class AppUpdateTest extends MarathonSpec {
       """
     val readResult2 = fromJsonString(json2)
     assert(readResult2 == update2)
-  }
 
-  test("Empty json corresponds to default instance") {
+  test("Empty json corresponds to default instance")
     val update3 = AppUpdate()
     val json3 = "{}"
     val readResult3 = fromJsonString(json3)
     assert(readResult3 == update3)
-  }
 
-  test("Args are correctly read") {
+  test("Args are correctly read")
     val update4 = AppUpdate(args = Some(Seq("a", "b", "c")))
     val json4 = """{ "args": ["a", "b", "c"] }"""
     val readResult4 = fromJsonString(json4)
     assert(readResult4 == update4)
-  }
 
-  test("'version' field can only be combined with 'id'") {
+  test("'version' field can only be combined with 'id'")
     assert(AppUpdate(version = Some(Timestamp.now())).onlyVersionOrIdSet)
 
     assert(
         AppUpdate(id = Some("foo".toPath), version = Some(Timestamp.now())).onlyVersionOrIdSet)
 
-    intercept[Exception] {
+    intercept[Exception]
       AppUpdate(cmd = Some("foo"), version = Some(Timestamp.now()))
-    }
-  }
 
-  test("acceptedResourceRoles of update is only applied when != None") {
+  test("acceptedResourceRoles of update is only applied when != None")
     val app = AppDefinition(id = PathId("withAcceptedRoles"),
                             acceptedResourceRoles = Some(Set("a")))
 
@@ -234,9 +222,8 @@ class AppUpdateTest extends MarathonSpec {
       .apply(app)
       .copy(versionInfo = app.versionInfo)
     assert(changed == app.copy(acceptedResourceRoles = Some(Set("b"))))
-  }
 
-  test("AppUpdate does not change existing versionInfo") {
+  test("AppUpdate does not change existing versionInfo")
     val app = AppDefinition(
         id = PathId("test"),
         cmd = Some("sleep 1"),
@@ -245,18 +232,16 @@ class AppUpdateTest extends MarathonSpec {
 
     val updateCmd = AppUpdate(cmd = Some("sleep 2"))
     assert(updateCmd(app) == app)
-  }
 
-  test("AppUpdate with a version and other changes are not allowed") {
+  test("AppUpdate with a version and other changes are not allowed")
     val attempt = Try(
         AppUpdate(id = Some(PathId("/test")),
                   cmd = Some("sleep 2"),
                   version = Some(Timestamp(2))))
     assert(attempt.failed.get.getMessage.contains(
             "The 'version' field may only be combined with the 'id' field."))
-  }
 
-  test("update may not have both uris and fetch") {
+  test("update may not have both uris and fetch")
     val json = """
       {
         "id": "app-with-network-isolation",
@@ -269,9 +254,8 @@ class AppUpdateTest extends MarathonSpec {
     val result = Json.fromJson[AppUpdate](Json.parse(json))
     assert(result == JsError(
             ValidationError("You cannot specify both uris and fetch fields")))
-  }
 
-  test("update may not have both ports and portDefinitions") {
+  test("update may not have both ports and portDefinitions")
     val json = """
       {
         "id": "app",
@@ -284,9 +268,8 @@ class AppUpdateTest extends MarathonSpec {
     val result = Json.fromJson[AppUpdate](Json.parse(json))
     assert(result == JsError(ValidationError(
                 "You cannot specify both ports and port definitions")))
-  }
 
-  test("update may not have duplicated ports") {
+  test("update may not have duplicated ports")
     val json = """
       {
         "id": "app",
@@ -298,5 +281,3 @@ class AppUpdateTest extends MarathonSpec {
     val result = Json.fromJson[AppUpdate](Json.parse(json))
     assert(result == JsError(JsPath \ "ports",
                              ValidationError("Ports must be unique.")))
-  }
-}

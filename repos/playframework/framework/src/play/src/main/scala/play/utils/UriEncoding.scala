@@ -12,7 +12,7 @@ import java.io.ByteArrayOutputStream
   * @see http://www.ietf.org/rfc/rfc3986.txt
   * @define javadoc http://docs.oracle.com/javase/8/docs/api
   */
-object UriEncoding {
+object UriEncoding
 
   /**
     * Encode a string so that it can be used safely in the "path segment"
@@ -43,21 +43,18 @@ object UriEncoding {
     *     The string `s` will be converted to octets (bytes) using this character encoding.
     * @return An encoded string in the US-ASCII character set.
     */
-  def encodePathSegment(s: String, inputCharset: String): String = {
+  def encodePathSegment(s: String, inputCharset: String): String =
     val in = s.getBytes(inputCharset)
     val out = new ByteArrayOutputStream()
-    for (b <- in) {
+    for (b <- in)
       val allowed = segmentChars.get(b & 0xFF)
-      if (allowed) {
+      if (allowed)
         out.write(b)
-      } else {
+      else
         out.write('%')
         out.write(upperHex((b >> 4) & 0xF))
         out.write(upperHex(b & 0xF))
-      }
-    }
     out.toString("US-ASCII")
-  }
 
   /**
     * Decode a string according to the rules for the "path segment"
@@ -87,18 +84,17 @@ object UriEncoding {
     * @throws play.utils.InvalidEncodingException If the input is not a valid encoded path segment.
     * @return A decoded string in the `outputCharset` character set.
     */
-  def decodePathSegment(s: String, outputCharset: String): String = {
+  def decodePathSegment(s: String, outputCharset: String): String =
     val in = s.getBytes("US-ASCII")
     val out = new ByteArrayOutputStream()
     var inPos = 0
-    def next(): Int = {
+    def next(): Int =
       val b = in(inPos) & 0xFF
       inPos += 1
       b
-    }
-    while (inPos < in.length) {
+    while (inPos < in.length)
       val b = next()
-      if (b == '%') {
+      if (b == '%')
         // Read high digit
         if (inPos >= in.length)
           throw new InvalidUriEncodingException(
@@ -117,16 +113,13 @@ object UriEncoding {
               s"Cannot decode $s: expected hex digit at position $inPos.")
         // Write decoded byte
         out.write((high << 4) + low)
-      } else if (segmentChars.get(b)) {
+      else if (segmentChars.get(b))
         // This character is allowed
         out.write(b)
-      } else {
+      else
         throw new InvalidUriEncodingException(
             s"Cannot decode $s: illegal character at position $inPos.")
-      }
-    }
     out.toString(outputCharset)
-  }
 
   /**
     * Decode the path path of a URI. Each path segment will be decoded
@@ -143,12 +136,11 @@ object UriEncoding {
     * @throws play.utils.InvalidEncodingException If the input is not a valid encoded path.
     * @return A decoded string in the `outputCharset` character set.
     */
-  def decodePath(s: String, outputCharset: String): String = {
+  def decodePath(s: String, outputCharset: String): String =
     // Note: Could easily expose a method to return the decoded path as a Seq[String].
     // This would allow better handling of paths segments with encoded slashes in them.
     // However, there is no need for this yet, so the method hasn't been added yet.
     splitString(s, '/').map(decodePathSegment(_, outputCharset)).mkString("/")
-  }
 
   // RFC 3986, 3.3. Path
   // segment       = *pchar
@@ -159,7 +151,7 @@ object UriEncoding {
   private val segmentChars: BitSet = membershipTable(pchar)
 
   /** The characters allowed in a path segment; defined in RFC 3986 */
-  private def pchar: Seq[Char] = {
+  private def pchar: Seq[Char] =
     // RFC 3986, 2.3. Unreserved Characters
     // unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
     val alphaDigit = for ((min, max) <- Seq(
@@ -174,39 +166,34 @@ object UriEncoding {
     // RFC 3986, 3.3. Path
     // pchar         = unreserved / pct-encoded / sub-delims / ":" / "@"
     unreserved ++ subDelims ++ Seq(':', '@')
-  }
 
   /** Create a BitSet to act as a membership lookup table for the given characters. */
-  private def membershipTable(chars: Seq[Char]): BitSet = {
+  private def membershipTable(chars: Seq[Char]): BitSet =
     val bits = new BitSet(256)
     for (c <- chars) { bits.set(c.toInt) }
     bits
-  }
 
   /**
     * Given a number from 0 to 16, return the ASCII character code corresponding
     * to its uppercase hexadecimal representation.
     */
-  private def upperHex(x: Int): Int = {
+  private def upperHex(x: Int): Int =
     // Assume 0 <= x < 16
     if (x < 10) (x + '0') else (x - 10 + 'A')
-  }
 
   /**
     * Given the ASCII value of a character, return its value as a hex digit.
     * If the character isn't a valid hex digit, return -1 instead.
     */
-  private def fromHex(b: Int): Int = {
-    if (b >= '0' && b <= '9') {
+  private def fromHex(b: Int): Int =
+    if (b >= '0' && b <= '9')
       b - '0'
-    } else if (b >= 'A' && b <= 'Z') {
+    else if (b >= 'A' && b <= 'Z')
       10 + b - 'A'
-    } else if (b >= 'a' && b <= 'z') {
+    else if (b >= 'a' && b <= 'z')
       10 + b - 'a'
-    } else {
+    else
       -1
-    }
-  }
 
   /**
     * Split a string on a character. Similar to `String.split` except, for this method,
@@ -218,26 +205,22 @@ object UriEncoding {
     * String.split("//a//", '/') == Seq("", "", "a")
     * }}}
     */
-  private[utils] def splitString(s: String, c: Char): Seq[String] = {
+  private[utils] def splitString(s: String, c: Char): Seq[String] =
     val result = scala.collection.mutable.ListBuffer.empty[String]
     import scala.annotation.tailrec
     @tailrec
     def splitLoop(start: Int): Unit =
-      if (start < s.length) {
+      if (start < s.length)
         var end = s.indexOf(c, start)
-        if (end == -1) {
+        if (end == -1)
           result += s.substring(start)
-        } else {
+        else
           result += s.substring(start, end)
           splitLoop(end + 1)
-        }
-      } else if (start == s.length) {
+      else if (start == s.length)
         result += ""
-      }
     splitLoop(0)
     result
-  }
-}
 
 /**
   * An error caused by processing a value that isn't encoded correctly.

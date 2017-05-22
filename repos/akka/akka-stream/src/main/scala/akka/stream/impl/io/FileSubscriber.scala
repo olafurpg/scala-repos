@@ -18,23 +18,21 @@ import scala.concurrent.Promise
 import scala.util.{Failure, Success}
 
 /** INTERNAL API */
-private[akka] object FileSubscriber {
+private[akka] object FileSubscriber
   def props(f: File,
             completionPromise: Promise[IOResult],
             bufSize: Int,
-            openOptions: Set[StandardOpenOption]) = {
+            openOptions: Set[StandardOpenOption]) =
     require(bufSize > 0, "buffer size must be > 0")
     Props(classOf[FileSubscriber], f, completionPromise, bufSize, openOptions)
       .withDeploy(Deploy.local)
-  }
-}
 
 /** INTERNAL API */
 private[akka] class FileSubscriber(f: File,
                                    completionPromise: Promise[IOResult],
                                    bufSize: Int,
                                    openOptions: Set[StandardOpenOption])
-    extends akka.stream.actor.ActorSubscriber with ActorLogging {
+    extends akka.stream.actor.ActorSubscriber with ActorLogging
 
   override protected val requestStrategy = WatermarkRequestStrategy(
       highWatermark = bufSize)
@@ -44,25 +42,23 @@ private[akka] class FileSubscriber(f: File,
   private var bytesWritten: Long = 0
 
   override def preStart(): Unit =
-    try {
+    try
       chan = FileChannel.open(f.toPath, openOptions.asJava)
 
       super.preStart()
-    } catch {
+    catch
       case ex: Exception ⇒
         closeAndComplete(IOResult(bytesWritten, Failure(ex)))
         cancel()
-    }
 
-  def receive = {
+  def receive =
     case ActorSubscriberMessage.OnNext(bytes: ByteString) ⇒
-      try {
+      try
         bytesWritten += chan.write(bytes.asByteBuffer)
-      } catch {
+      catch
         case ex: Exception ⇒
           closeAndComplete(IOResult(bytesWritten, Failure(ex)))
           cancel()
-      }
 
     case ActorSubscriberMessage.OnError(ex) ⇒
       log.error(ex,
@@ -72,30 +68,24 @@ private[akka] class FileSubscriber(f: File,
       context.stop(self)
 
     case ActorSubscriberMessage.OnComplete ⇒
-      try {
+      try
         chan.force(true)
-      } catch {
+      catch
         case ex: Exception ⇒
           closeAndComplete(IOResult(bytesWritten, Failure(ex)))
-      }
       context.stop(self)
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     closeAndComplete(IOResult(bytesWritten, Success(Done)))
     super.postStop()
-  }
 
-  private def closeAndComplete(result: IOResult): Unit = {
-    try {
+  private def closeAndComplete(result: IOResult): Unit =
+    try
       // close the channel/file before completing the promise, allowing the
       // file to be deleted, which would not work (on some systems) if the
       // file is still open for writing
       if (chan ne null) chan.close()
       completionPromise.trySuccess(result)
-    } catch {
+    catch
       case ex: Exception ⇒
         completionPromise.trySuccess(IOResult(bytesWritten, Failure(ex)))
-    }
-  }
-}

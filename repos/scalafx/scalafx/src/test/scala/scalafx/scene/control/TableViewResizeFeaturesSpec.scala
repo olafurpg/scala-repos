@@ -42,8 +42,7 @@ class TableViewResizeFeaturesSpec[S]
     extends SimpleSFXDelegateSpec[
         jfxsc.TableView.ResizeFeatures[S], TableView.ResizeFeatures[S]](
         classOf[jfxsc.TableView.ResizeFeatures[S]],
-        classOf[TableView.ResizeFeatures[S]]) {
+        classOf[TableView.ResizeFeatures[S]])
 
   override def getJavaClassInstance =
     new jfxsc.TableView.ResizeFeatures(null, null, 0)
-}

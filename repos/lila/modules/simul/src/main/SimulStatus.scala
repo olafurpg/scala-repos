@@ -1,7 +1,7 @@
 package lila.simul
 
 private[simul] sealed abstract class SimulStatus(val id: Int)
-    extends Ordered[SimulStatus] {
+    extends Ordered[SimulStatus]
 
   def compare(other: SimulStatus) = id compare other.id
 
@@ -9,9 +9,8 @@ private[simul] sealed abstract class SimulStatus(val id: Int)
 
   def is(s: SimulStatus): Boolean = this == s
   def is(f: SimulStatus.type => SimulStatus): Boolean = is(f(SimulStatus))
-}
 
-private[simul] object SimulStatus {
+private[simul] object SimulStatus
 
   case object Created extends SimulStatus(10)
   case object Started extends SimulStatus(20)
@@ -19,9 +18,8 @@ private[simul] object SimulStatus {
 
   val all = List(Created, Started, Finished)
 
-  val byId = all map { v =>
+  val byId = all map  v =>
     (v.id, v)
-  } toMap
+  toMap
 
   def apply(id: Int): Option[SimulStatus] = byId get id
-}

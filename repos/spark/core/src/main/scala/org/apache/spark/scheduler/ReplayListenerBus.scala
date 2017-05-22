@@ -30,7 +30,7 @@ import org.apache.spark.util.JsonProtocol
 /**
   * A SparkListenerBus that can be used to replay events from serialized event data.
   */
-private[spark] class ReplayListenerBus extends SparkListenerBus with Logging {
+private[spark] class ReplayListenerBus extends SparkListenerBus with Logging
 
   /**
     * Replay each event in the order maintained in the given stream. The stream is expected to
@@ -46,34 +46,28 @@ private[spark] class ReplayListenerBus extends SparkListenerBus with Logging {
     */
   def replay(logData: InputStream,
              sourceName: String,
-             maybeTruncated: Boolean = false): Unit = {
+             maybeTruncated: Boolean = false): Unit =
     var currentLine: String = null
     var lineNumber: Int = 1
-    try {
+    try
       val lines = Source.fromInputStream(logData).getLines()
-      while (lines.hasNext) {
+      while (lines.hasNext)
         currentLine = lines.next()
-        try {
+        try
           postToAll(JsonProtocol.sparkEventFromJson(parse(currentLine)))
-        } catch {
+        catch
           case jpe: JsonParseException =>
             // We can only ignore exception from last line of the file that might be truncated
-            if (!maybeTruncated || lines.hasNext) {
+            if (!maybeTruncated || lines.hasNext)
               throw jpe
-            } else {
+            else
               logWarning(
                   s"Got JsonParseException from log file $sourceName" +
                   s" at line $lineNumber, the file might not have finished writing cleanly.")
-            }
-        }
         lineNumber += 1
-      }
-    } catch {
+    catch
       case ioe: IOException =>
         throw ioe
       case e: Exception =>
         logError(s"Exception parsing Spark event log: $sourceName", e)
         logError(s"Malformed line #$lineNumber: $currentLine\n")
-    }
-  }
-}

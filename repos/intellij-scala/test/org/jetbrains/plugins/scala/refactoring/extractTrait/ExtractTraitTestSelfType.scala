@@ -5,9 +5,9 @@ package refactoring.extractTrait
   * Nikolay.Tropin
   * 2014-06-02
   */
-class ExtractTraitTestSelfType extends ExtractTraitTestBase {
+class ExtractTraitTestSelfType extends ExtractTraitTestBase
 
-  def testMethodFromClassItself() {
+  def testMethodFromClassItself()
     val text = """
         |class A {<caret>
         |
@@ -47,9 +47,8 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
       """.stripMargin
 
     checkResult(text, result2, onlyDeclarations = true, onlyFirstMember = true)
-  }
 
-  def testMembersFromAncestor() {
+  def testMembersFromAncestor()
     val text = """
         |class A extends AA {<caret>
         |  def foo() = bar()
@@ -92,9 +91,8 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
       """.stripMargin
 
     checkResult(text, result2, onlyDeclarations = true)
-  }
 
-  def testMembersFromTwoAncestors() {
+  def testMembersFromTwoAncestors()
     val text = """
         |class A extends AA with BB {<caret>
         |  val foo = bar() + x
@@ -128,9 +126,8 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
       """.stripMargin
 
     checkResult(text, result, onlyDeclarations = false)
-  }
 
-  def testMembersFromTwoAncestors2() {
+  def testMembersFromTwoAncestors2()
     val text = """
         |class A extends AA {<caret>
         |  val foo = bar() + x
@@ -164,9 +161,8 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
       """.stripMargin
 
     checkResult(text, result, onlyDeclarations = false)
-  }
 
-  def testMemberFromObject() {
+  def testMemberFromObject()
     val text = """
         |object A {
         |
@@ -189,5 +185,3 @@ class ExtractTraitTestSelfType extends ExtractTraitTestBase {
         |}
       """.stripMargin
     checkResult(text, result, onlyDeclarations = false, onlyFirstMember = true)
-  }
-}

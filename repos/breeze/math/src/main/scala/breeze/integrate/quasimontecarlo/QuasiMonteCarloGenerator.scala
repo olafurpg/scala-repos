@@ -16,7 +16,7 @@ package breeze.integrate.quasimontecarlo
  limitations under the License.
  */
 
-trait QuasiMonteCarloGenerator {
+trait QuasiMonteCarloGenerator
   /*
    * Mutable class that generates a sequence of quasi-random variables.
    */
@@ -41,4 +41,3 @@ trait QuasiMonteCarloGenerator {
     java.lang.System.arraycopy(getNextUnsafe, 0, to, 0, dimension)
 
   def numGenerated: Long
-}

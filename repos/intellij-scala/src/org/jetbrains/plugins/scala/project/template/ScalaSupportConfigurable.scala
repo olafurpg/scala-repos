@@ -8,7 +8,7 @@ import com.intellij.openapi.roots.{ModifiableModelsProvider, ModifiableRootModel
 /**
   * @author Pavel Fatin
   */
-class ScalaSupportConfigurable extends FrameworkSupportInModuleConfigurable {
+class ScalaSupportConfigurable extends FrameworkSupportInModuleConfigurable
   override def createComponent() = null
 
   override def createLibraryDescription() = ScalaLibraryDescription
@@ -19,4 +19,3 @@ class ScalaSupportConfigurable extends FrameworkSupportInModuleConfigurable {
       module: Module,
       rootModel: ModifiableRootModel,
       modifiableModelsProvider: ModifiableModelsProvider) {}
-}

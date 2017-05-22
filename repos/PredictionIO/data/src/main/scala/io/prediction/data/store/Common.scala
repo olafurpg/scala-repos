@@ -17,7 +17,7 @@ package io.prediction.data.store
 import io.prediction.data.storage.Storage
 import grizzled.slf4j.Logger
 
-private[prediction] object Common {
+private[prediction] object Common
 
   @transient lazy val logger = Logger[this.type]
   @transient lazy private val appsDb = Storage.getMetaDataApps()
@@ -25,26 +25,21 @@ private[prediction] object Common {
 
   /* throw exception if invalid app name or channel name */
   def appNameToId(
-      appName: String, channelName: Option[String]): (Int, Option[Int]) = {
+      appName: String, channelName: Option[String]): (Int, Option[Int]) =
     val appOpt = appsDb.getByName(appName)
 
-    appOpt.map { app =>
+    appOpt.map  app =>
       val channelMap: Map[String, Int] =
         channelsDb.getByAppid(app.id).map(c => (c.name, c.id)).toMap
 
-      val channelId: Option[Int] = channelName.map { ch =>
-        if (channelMap.contains(ch)) {
+      val channelId: Option[Int] = channelName.map  ch =>
+        if (channelMap.contains(ch))
           channelMap(ch)
-        } else {
+        else
           logger.error(s"Invalid channel name ${ch}.")
           throw new IllegalArgumentException(s"Invalid channel name ${ch}.")
-        }
-      }
 
       (app.id, channelId)
-    }.getOrElse {
+    .getOrElse
       logger.error(s"Invalid app name ${appName}")
       throw new IllegalArgumentException(s"Invalid app name ${appName}")
-    }
-  }
-}

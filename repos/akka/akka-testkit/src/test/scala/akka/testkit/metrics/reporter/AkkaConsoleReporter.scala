@@ -20,7 +20,7 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
                               "akka-console-reporter",
                               MetricFilter.ALL,
                               TimeUnit.SECONDS,
-                              TimeUnit.NANOSECONDS) {
+                              TimeUnit.NANOSECONDS)
 
   private final val ConsoleWidth = 80
 
@@ -28,7 +28,7 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
                       counters: util.SortedMap[String, Counter],
                       histograms: util.SortedMap[String, Histogram],
                       meters: util.SortedMap[String, Meter],
-                      timers: util.SortedMap[String, Timer]) {
+                      timers: util.SortedMap[String, Timer])
     import collection.JavaConverters._
 
     // default Metrics types
@@ -46,22 +46,18 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
 
     output.println()
     output.flush()
-  }
 
   def printMetrics[T <: Metric](
       metrics: Iterable[(String, T)], printer: T ⇒ Unit)(
-      implicit clazz: ClassTag[T]) {
-    if (!metrics.isEmpty) {
+      implicit clazz: ClassTag[T])
+    if (!metrics.isEmpty)
       printWithBanner(s"-- ${simpleName(metrics.head._2.getClass)}", '-')
-      for ((key, metric) ← metrics) {
+      for ((key, metric) ← metrics)
         output.println("  " + key)
         printer(metric)
-      }
       output.println()
-    }
-  }
 
-  private def printMeter(meter: Meter) {
+  private def printMeter(meter: Meter)
     output.print("             count = %d%n".format(meter.getCount))
     output.print("         mean rate = %2.2f events/%s%n".format(
             convertRate(meter.getMeanRate), getRateUnit))
@@ -71,17 +67,14 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
             convertRate(meter.getFiveMinuteRate), getRateUnit))
     output.print("    15-minute rate = %2.2f events/%s%n".format(
             convertRate(meter.getFifteenMinuteRate), getRateUnit))
-  }
 
-  private def printCounter(entry: Counter) {
+  private def printCounter(entry: Counter)
     output.print("             count = %d%n".format(entry.getCount))
-  }
 
-  private def printGauge(entry: Gauge[_]) {
+  private def printGauge(entry: Gauge[_])
     output.print("             value = %s%n".format(entry.getValue))
-  }
 
-  private def printHistogram(histogram: Histogram) {
+  private def printHistogram(histogram: Histogram)
     val snapshot = histogram.getSnapshot
     output.print("             count = %d%n".format(histogram.getCount))
     output.print("               min = %d%n".format(snapshot.getMin))
@@ -99,9 +92,8 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
         "              99%% <= %2.2f%n".format(snapshot.get99thPercentile))
     output.print(
         "            99.9%% <= %2.2f%n".format(snapshot.get999thPercentile))
-  }
 
-  private def printTimer(timer: Timer) {
+  private def printTimer(timer: Timer)
     val snapshot = timer.getSnapshot
     output.print("             count = %d%n".format(timer.getCount))
     output.print("         mean rate = %2.2f calls/%s%n".format(
@@ -132,10 +124,9 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
             convertDuration(snapshot.get99thPercentile), getDurationUnit))
     output.print("            99.9%% <= %2.2f %s%n".format(
             convertDuration(snapshot.get999thPercentile), getDurationUnit))
-  }
 
   private def printKnownOpsInTimespanCounter(
-      counter: KnownOpsInTimespanTimer) {
+      counter: KnownOpsInTimespanTimer)
     import concurrent.duration._
     import akka.util.PrettyDuration._
     output.print("               ops = %d%n".format(counter.getCount))
@@ -144,9 +135,8 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
     output.print("             ops/s = %2.2f%n".format(counter.opsPerSecond))
     output.print(
         "               avg = %s%n".format(counter.avgDuration.nanos.pretty))
-  }
 
-  private def printHdrHistogram(hist: HdrHistogram) {
+  private def printHdrHistogram(hist: HdrHistogram)
     val data = hist.getData
     val unit = hist.unit
     output.print("               min = %d %s%n".format(data.getMinValue, unit))
@@ -165,27 +155,21 @@ class AkkaConsoleReporter(registry: AkkaMetricRegistry,
             data.getValueAtPercentile(99.9), unit))
 
     if (verbose) data.outputPercentileDistribution(output, 1)
-  }
 
-  private def printAveragingGauge(gauge: AveragingGauge) {
+  private def printAveragingGauge(gauge: AveragingGauge)
     output.print("                avg = %2.2f%n".format(gauge.getValue))
-  }
 
-  private def printWithBanner(s: String, c: Char) {
+  private def printWithBanner(s: String, c: Char)
     output.print(s)
     output.print(' ')
     var i: Int = 0
-    while (i < (ConsoleWidth - s.length - 1)) {
+    while (i < (ConsoleWidth - s.length - 1))
       output.print(c)
       i += 1
-    }
     output.println()
-  }
 
   /** Required for getting simple names of refined instances */
-  private def simpleName(clazz: Class[_]): String = {
+  private def simpleName(clazz: Class[_]): String =
     val n = clazz.getName
     val i = n.lastIndexOf('.')
     n.substring(i + 1)
-  }
-}

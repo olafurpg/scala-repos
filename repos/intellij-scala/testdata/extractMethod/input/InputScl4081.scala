@@ -1,11 +1,9 @@
-class InputScl4081 {
-  def foo {
+class InputScl4081
+  def foo
     val validations = List(0)
     val bar = 1
     val as = /*start*/ validations.size + bar /*end*/
     as
-  }
-}
 /*
 class InputScl4081 {
   def foo {

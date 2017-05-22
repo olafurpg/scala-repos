@@ -27,7 +27,7 @@ import kafka.zk.ZooKeeperTestHarness
 import org.apache.kafka.common.security.auth.KafkaPrincipal
 import org.junit.Test
 
-class AclCommandTest extends ZooKeeperTestHarness with Logging {
+class AclCommandTest extends ZooKeeperTestHarness with Logging
 
   private val Users = Set(
       KafkaPrincipal.fromString(
@@ -84,95 +84,78 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
       Array[String], Map[Set[Resource], Set[Acl]]](
       Array[String]("--producer") -> ProducerResourceToAcls,
       Array[String]("--consumer") -> ConsumerResourceToAcls,
-      Array[String]("--producer", "--consumer") -> ConsumerResourceToAcls.map {
+      Array[String]("--producer", "--consumer") -> ConsumerResourceToAcls.map
         case (k, v) =>
           k -> (v ++ ProducerResourceToAcls.getOrElse(k, Set.empty[Acl]))
-      }
   )
 
   @Test
-  def testAclCli() {
+  def testAclCli()
     val brokerProps = TestUtils.createBrokerConfig(0, zkConnect)
     brokerProps.put(KafkaConfig.AuthorizerClassNameProp,
                     "kafka.security.auth.SimpleAclAuthorizer")
     val args = Array(
         "--authorizer-properties", "zookeeper.connect=" + zkConnect)
 
-    for ((resources, resourceCmd) <- ResourceToCommand) {
-      for (permissionType <- PermissionType.values) {
+    for ((resources, resourceCmd) <- ResourceToCommand)
+      for (permissionType <- PermissionType.values)
         val operationToCmd = ResourceToOperations(resources)
         val (acls, cmd) = getAclToCommand(permissionType, operationToCmd._1)
         AclCommand.main(
             args ++ cmd ++ resourceCmd ++ operationToCmd._2 :+ "--add")
-        for (resource <- resources) {
-          withAuthorizer(brokerProps) { authorizer =>
+        for (resource <- resources)
+          withAuthorizer(brokerProps)  authorizer =>
             TestUtils.waitAndVerifyAcls(acls, authorizer, resource)
-          }
-        }
 
         testRemove(resources, resourceCmd, args, brokerProps)
-      }
-    }
-  }
 
   @Test
-  def testProducerConsumerCli() {
+  def testProducerConsumerCli()
     val brokerProps = TestUtils.createBrokerConfig(0, zkConnect)
     brokerProps.put(KafkaConfig.AuthorizerClassNameProp,
                     "kafka.security.auth.SimpleAclAuthorizer")
     val args = Array(
         "--authorizer-properties", "zookeeper.connect=" + zkConnect)
 
-    for ((cmd, resourcesToAcls) <- CmdToResourcesToAcl) {
+    for ((cmd, resourcesToAcls) <- CmdToResourcesToAcl)
       val resourceCommand: Array[String] = resourcesToAcls.keys
         .map(ResourceToCommand)
         .foldLeft(Array[String]())(_ ++ _)
       AclCommand.main(
           args ++ getCmd(Allow) ++ resourceCommand ++ cmd :+ "--add")
-      for ((resources, acls) <- resourcesToAcls) {
-        for (resource <- resources) {
-          withAuthorizer(brokerProps) { authorizer =>
+      for ((resources, acls) <- resourcesToAcls)
+        for (resource <- resources)
+          withAuthorizer(brokerProps)  authorizer =>
             TestUtils.waitAndVerifyAcls(acls, authorizer, resource)
-          }
-        }
-      }
       testRemove(resourcesToAcls.keys.flatten.toSet,
                  resourceCommand,
                  args,
                  brokerProps)
-    }
-  }
 
   @Test(expected = classOf[IllegalArgumentException])
-  def testInvalidAuthorizerProperty() {
+  def testInvalidAuthorizerProperty()
     val args = Array(
         "--authorizer-properties", "zookeeper.connect " + zkConnect)
     AclCommand.withAuthorizer(new AclCommandOptions(args))(null)
-  }
 
   private def testRemove(resources: Set[Resource],
                          resourceCmd: Array[String],
                          args: Array[String],
-                         brokerProps: Properties) {
-    for (resource <- resources) {
+                         brokerProps: Properties)
+    for (resource <- resources)
       Console.withIn(
-          new StringReader(s"y${AclCommand.Newline}" * resources.size)) {
+          new StringReader(s"y${AclCommand.Newline}" * resources.size))
         AclCommand.main(args ++ resourceCmd :+ "--remove")
-        withAuthorizer(brokerProps) { authorizer =>
+        withAuthorizer(brokerProps)  authorizer =>
           TestUtils.waitAndVerifyAcls(Set.empty[Acl], authorizer, resource)
-        }
-      }
-    }
-  }
 
   private def getAclToCommand(
       permissionType: PermissionType,
-      operations: Set[Operation]): (Set[Acl], Array[String]) = {
+      operations: Set[Operation]): (Set[Acl], Array[String]) =
     (AclCommand.getAcls(Users, permissionType, operations, Hosts),
      getCmd(permissionType))
-  }
 
-  private def getCmd(permissionType: PermissionType): Array[String] = {
+  private def getCmd(permissionType: PermissionType): Array[String] =
     val principalCmd =
       if (permissionType == Allow) "--allow-principal" else "--deny-principal"
     val cmd =
@@ -180,14 +163,11 @@ class AclCommandTest extends ZooKeeperTestHarness with Logging {
 
     Users.foldLeft(cmd)(
         (cmd, user) => cmd ++ Array(principalCmd, user.toString))
-  }
 
-  def withAuthorizer(props: Properties)(f: Authorizer => Unit) {
+  def withAuthorizer(props: Properties)(f: Authorizer => Unit)
     val kafkaConfig = KafkaConfig.fromProps(props, doLog = false)
     val authZ = new SimpleAclAuthorizer
-    try {
+    try
       authZ.configure(kafkaConfig.originals)
       f(authZ)
-    } finally authZ.close()
-  }
-}
+    finally authZ.close()

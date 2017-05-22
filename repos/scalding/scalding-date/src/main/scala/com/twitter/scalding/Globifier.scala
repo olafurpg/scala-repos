@@ -30,7 +30,7 @@ class BaseGlobifier(dur: Duration,
                     pattern: String,
                     tz: TimeZone,
                     child: Option[BaseGlobifier])
-    extends java.io.Serializable {
+    extends java.io.Serializable
   import DateOps._
   // result <= rd
   private def greatestLowerBound(rd: RichDate) = dur.floorOf(rd)
@@ -41,27 +41,24 @@ class BaseGlobifier(dur: Duration,
   def format(rd: RichDate) = rd.format(pattern)(tz)
 
   // Generate a lazy list of all children
-  final def children: Stream[BaseGlobifier] = child match {
+  final def children: Stream[BaseGlobifier] = child match
     case Some(c) => Stream.cons(c, c.children)
     case None => Stream.empty
-  }
 
-  final def asteriskChildren(rd: RichDate): String = {
-    val childStarPattern = children.foldLeft(pattern) { (this_pat, child) =>
+  final def asteriskChildren(rd: RichDate): String =
+    val childStarPattern = children.foldLeft(pattern)  (this_pat, child) =>
       this_pat.replaceAll(Pattern.quote(child.sym), "*")
-    }
     rd.format(childStarPattern)(tz)
-  }
 
   // Handles the case of zero interior boundaries
   // with potential boundaries only at the end points.
-  private def simpleCase(dr: DateRange): List[String] = {
+  private def simpleCase(dr: DateRange): List[String] =
     val sstr = format(dr.start)
     val estr = format(dr.end)
-    if (dr.end < dr.start) {
+    if (dr.end < dr.start)
       Nil
-    } else {
-      child match {
+    else
+      child match
         case None =>
           //There is only one block:
           assert(sstr == estr, "Malformed hierarchy" + sstr + " != " + estr)
@@ -78,16 +75,12 @@ class BaseGlobifier(dur: Duration,
           val fillsleft =
             format(greatestLowerBound(dr.start)) == format(
                 bottom.greatestLowerBound(dr.start))
-          if (fillsright && fillsleft) {
+          if (fillsright && fillsleft)
             List(asteriskChildren(dr.start))
-          } else {
+          else
             c.globify(dr)
-          }
-      }
-    }
-  }
 
-  def globify(dr: DateRange): List[String] = {
+  def globify(dr: DateRange): List[String] =
     /* We know:
      * start <= end : by assumption
      * mid1 - start < delta : mid1 is least upper bound
@@ -101,28 +94,25 @@ class BaseGlobifier(dur: Duration,
     //Imprecise patterns may not need to drill down, let's see if we can stop early:
     val sstr = format(dr.start)
     val estr = format(dr.end)
-    if (sstr == estr) {
+    if (sstr == estr)
       List(sstr)
-    } else if (dr.end < dr.start) {
+    else if (dr.end < dr.start)
       //This is nonsense:
       Nil
-    } else if (mid2 < mid1) {
+    else if (mid2 < mid1)
       //We do not contain a boundary point:
       simpleCase(dr)
-    } // otherwise we contain one or more than one boundary points
-    else if (mid1 == mid2) {
+    // otherwise we contain one or more than one boundary points
+    else if (mid1 == mid2)
       //we contain exactly one boundary point:
       simpleCase(DateRange(dr.start, mid1 - Millisecs(1))) ++ simpleCase(
           DateRange(mid1, dr.end))
-    } else {
+    else
       //We contain 2 or more boundary points:
       // [start <= mid1 < mid2 <= end]
       // First check to see if we even need to check our children:
       simpleCase(DateRange(dr.start, mid1 - Millisecs(1))) ++
       (asteriskChildren(mid1) :: globify(DateRange(mid1 + dur, dr.end)))
-    }
-  }
-}
 
 case class HourGlob(pat: String)(implicit tz: TimeZone)
     extends BaseGlobifier(Hours(1), "%1$tH", pat, tz, None)

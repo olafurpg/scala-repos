@@ -15,18 +15,16 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScParameterStubImpl
   * Date: 19.10.2008
   */
 abstract class ScParamElementType[Param <: ScParameter](debugName: String)
-    extends ScStubElementType[ScParameterStub, ScParameter](debugName) {
+    extends ScStubElementType[ScParameterStub, ScParameter](debugName)
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScParameter,
-      parentStub: StubElement[ParentPsi]): ScParameterStub = {
-    val typeText: String = psi.typeElement match {
+      parentStub: StubElement[ParentPsi]): ScParameterStub =
+    val typeText: String = psi.typeElement match
       case Some(t) => t.getText
       case None => ""
-    }
-    val (isVal, isVar) = psi match {
+    val (isVal, isVar) = psi match
       case c: ScClassParameter => (c.isVal, c.isVar)
       case _ => (false, false)
-    }
     val isCallByName = psi.isCallByNameParameter
     val defaultExprText = psi.getActualDefaultExpression.map(_.getText)
     val deprecatedName = psi.deprecatedName
@@ -42,9 +40,8 @@ abstract class ScParamElementType[Param <: ScParameter](debugName: String)
                                        isCallByName,
                                        defaultExprText,
                                        deprecatedName)
-  }
 
-  def serialize(stub: ScParameterStub, dataStream: StubOutputStream) {
+  def serialize(stub: ScParameterStub, dataStream: StubOutputStream)
     dataStream.writeName(stub.getName)
     dataStream.writeName(stub.getTypeText)
     dataStream.writeBoolean(stub.isStable)
@@ -53,23 +50,20 @@ abstract class ScParamElementType[Param <: ScParameter](debugName: String)
     dataStream.writeBoolean(stub.isVal)
     dataStream.writeBoolean(stub.isVar)
     dataStream.writeBoolean(stub.isCallByNameParameter)
-    stub.getDefaultExprText match {
+    stub.getDefaultExprText match
       case None =>
         dataStream.writeBoolean(false)
       case Some(str) =>
         dataStream.writeBoolean(true)
         dataStream.writeName(str)
-    }
-    stub.deprecatedName match {
+    stub.deprecatedName match
       case None => dataStream.writeBoolean(false)
       case Some(name) =>
         dataStream.writeBoolean(true)
         dataStream.writeName(name)
-    }
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScParameterStub = {
+      dataStream: StubInputStream, parentStub: Any): ScParameterStub =
     val name = dataStream.readName
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]
     val typeText = dataStream.readName
@@ -97,7 +91,5 @@ abstract class ScParamElementType[Param <: ScParameter](debugName: String)
                             isCallByName,
                             defaultExpr,
                             deprecatedName)
-  }
 
   def indexStub(stub: ScParameterStub, sink: IndexSink) {}
-}

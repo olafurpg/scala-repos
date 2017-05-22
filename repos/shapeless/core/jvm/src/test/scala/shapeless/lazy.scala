@@ -21,24 +21,21 @@ import scala.language.reflectiveCalls
 import org.junit.Test
 import org.junit.Assert._
 
-class LazyStrictTestsJVM {
+class LazyStrictTestsJVM
 
   case class CC(l: List[CC])
 
-  trait TC[T] {
+  trait TC[T]
     def repr(depth: Int): String
-  }
 
-  object TC {
+  object TC
     def apply[T](implicit tc: TC[T]): TC[T] = tc
 
     def instance[T](repr0: Int => String): TC[T] =
-      new TC[T] {
+      new TC[T]
         def repr(depth: Int) =
           if (depth < 0) "…"
           else repr0(depth)
-      }
-  }
 
   object TC0 extends TCImplicits[Lazy, Strict, Strict]
   object TC1 extends TCImplicits[Strict, Lazy, Strict]
@@ -47,7 +44,7 @@ class LazyStrictTestsJVM {
 
   trait TCImplicits[A[T] <: { def value: T },
                     B[T] <: { def value: T },
-                    C[T] <: { def value: T }] {
+                    C[T] <: { def value: T }]
     implicit def listTC[T](implicit underlying: A[TC[T]]): TC[List[T]] =
       TC.instance(depth => s"List(${underlying.value.repr(depth - 1)})")
 
@@ -62,27 +59,23 @@ class LazyStrictTestsJVM {
     implicit def genericTC[F, G](
         implicit gen: Generic.Aux[F, G], underlying: C[TC[G]]): TC[F] =
       TC.instance(depth => s"Generic(${underlying.value.repr(depth - 1)})")
-  }
 
   /** Illustrates that a single `Lazy` is enough to break a cycle */
   @Test
-  def testCycle {
-    val (ccTC0, genTC0, listTC0) = {
+  def testCycle
+    val (ccTC0, genTC0, listTC0) =
       import TC0._
       (TC[CC], TC[List[CC] :: HNil], TC[List[CC]])
-    }
 
-    val (ccTC1, genTC1, listTC1) = {
+    val (ccTC1, genTC1, listTC1) =
       import TC1._
       (TC[CC], TC[List[CC] :: HNil], TC[List[CC]])
-    }
 
-    val (ccTC2, genTC2, listTC2) = {
+    val (ccTC2, genTC2, listTC2) =
       import TC2._
       (TC[CC], TC[List[CC] :: HNil], TC[List[CC]])
-    }
 
-    val (ccTC3SO, genTC3SO, listTC3SO) = {
+    val (ccTC3SO, genTC3SO, listTC3SO) =
       import TC3._
       def throwsStackOverflow[T](f: => T): Boolean =
         try { f; false } catch { case _: StackOverflowError => true }
@@ -90,7 +83,6 @@ class LazyStrictTestsJVM {
       (throwsStackOverflow(TC[CC]),
        throwsStackOverflow(TC[List[CC] :: HNil]),
        throwsStackOverflow(TC[List[CC]]))
-    }
 
     val expectedCCRepr =
       "Generic(List(Generic(List(Generic(… :: HNil)) :: HNil)) :: HNil)"
@@ -114,5 +106,3 @@ class LazyStrictTestsJVM {
     assert(ccTC3SO)
     assert(genTC3SO)
     assert(listTC3SO)
-  }
-}

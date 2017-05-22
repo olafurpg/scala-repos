@@ -3,45 +3,38 @@ package std
 
 import cats.syntax.eq._
 
-trait MapInstances extends algebra.std.MapInstances {
+trait MapInstances extends algebra.std.MapInstances
 
   implicit def MapEq[A, B : Eq]: Eq[Map[A, B]] =
-    new Eq[Map[A, B]] {
-      def eqv(lhs: Map[A, B], rhs: Map[A, B]): Boolean = {
+    new Eq[Map[A, B]]
+      def eqv(lhs: Map[A, B], rhs: Map[A, B]): Boolean =
         def checkKeys: Boolean =
-          lhs.forall {
+          lhs.forall
             case (k, v1) =>
-              rhs.get(k) match {
+              rhs.get(k) match
                 case Some(v2) => v1 === v2
                 case None => false
-              }
-          }
         (lhs eq rhs) || (lhs.size == rhs.size && checkKeys)
-      }
-    }
 
   implicit def MapShow[A, B](
       implicit showA: Show[A], showB: Show[B]): Show[Map[A, B]] =
-    Show.show[Map[A, B]] { m =>
-      val body = m.map {
+    Show.show[Map[A, B]]  m =>
+      val body = m.map
         case (a, b) =>
           s"${showA.show(a)} -> ${showB.show(b)})"
-      }.mkString(",")
+      .mkString(",")
       s"Map($body)"
-    }
 
   implicit def mapInstance[K]: Traverse[Map[K, ?]] with FlatMap[Map[K, ?]] =
-    new Traverse[Map[K, ?]] with FlatMap[Map[K, ?]] {
+    new Traverse[Map[K, ?]] with FlatMap[Map[K, ?]]
 
       def traverse[G[_]: Applicative, A, B](fa: Map[K, A])(
-          f: (A) => G[B]): G[Map[K, B]] = {
+          f: (A) => G[B]): G[Map[K, B]] =
         val G = Applicative[G]
         val gba = G.pure(Map.empty[K, B])
-        val gbb = fa.foldLeft(gba) { (buf, a) =>
+        val gbb = fa.foldLeft(gba)  (buf, a) =>
           G.map2(buf, f(a._2))({ case (x, y) => x + (a._1 -> y) })
-        }
         G.map(gbb)(_.toMap)
-      }
 
       override def map[A, B](fa: Map[K, A])(f: A => B): Map[K, B] =
         fa.map { case (k, a) => (k, f(a)) }
@@ -55,10 +48,9 @@ trait MapInstances extends algebra.std.MapInstances {
 
       override def ap2[A, B, Z](f: Map[K, (A, B) => Z])(
           fa: Map[K, A], fb: Map[K, B]): Map[K, Z] =
-        f.flatMap {
+        f.flatMap
           case (k, f) =>
             for { a <- fa.get(k); b <- fb.get(k) } yield (k, f(a, b))
-        }
 
       def flatMap[A, B](fa: Map[K, A])(f: (A) => Map[K, B]): Map[K, B] =
         fa.flatMap { case (k, a) => f(a).get(k).map((k, _)) }
@@ -71,5 +63,3 @@ trait MapInstances extends algebra.std.MapInstances {
         Foldable.iterateRight(fa.values.iterator, lb)(f)
 
       override def isEmpty[A](fa: Map[K, A]): Boolean = fa.isEmpty
-    }
-}

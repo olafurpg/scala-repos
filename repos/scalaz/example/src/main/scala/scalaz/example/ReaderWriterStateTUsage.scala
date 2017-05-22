@@ -26,19 +26,16 @@ case object C extends Token
 case object A extends Token
 case object B extends Token
 
-object Token {
+object Token
 
   implicit val euqalsRef: Equal[Token] = Equal.equalRef
-  implicit val showTok: Show[Token] = new Show[Token] {
-    override def show(t: Token) = t match {
+  implicit val showTok: Show[Token] = new Show[Token]
+    override def show(t: Token) = t match
       case A => Cord("A")
       case B => Cord("B")
       case C => Cord("C")
-    }
-  }
-}
 
-object CABRunLengthEncoder {
+object CABRunLengthEncoder
   /*
     A run-length encoder for CAB, a token T can be prefixed by a number N to stand for "N Ts in a row":
 
@@ -58,15 +55,13 @@ object CABRunLengthEncoder {
       lastToken: Option[Token], // what is the last char we've seen
       length: Int, // how many of that char have we seen
       input: List[Token] // remaining input
-  ) {
+  )
     def incLength = this.copy(length = length + 1)
     def newToken(t: Token) = RunLengthState(Some(t), 0, input)
     def uncons: (Token, RunLengthState) =
       (input.head, this.copy(input = input.tail))
-  }
-  object RunLengthState {
+  object RunLengthState
     def initial(input: List[Token]) = RunLengthState(None, 0, input)
-  }
 
   /**
     * the configuration of our encoder, this will be used in the
@@ -91,11 +86,10 @@ object CABRunLengthEncoder {
   /**
     *  read a token from the input
     */
-  val readToken: RunLength[Token] = ReaderWriterStateT {
+  val readToken: RunLength[Token] = ReaderWriterStateT
     (config: RunLengthConfig, oldState: RunLengthState) =>
       val (nextTok, newState) = oldState.uncons
       Applicative[Trampoline].point((Monoid[Cord].zero, nextTok, newState))
-  }
 
   // Bring the RWST syntax into scope.
   // This will bring into scope methods which return things of type RunLength[_].
@@ -113,26 +107,25 @@ object CABRunLengthEncoder {
     * with the above syntax imported, we can perform the same
     * computation as above, but use a for comprehension
     */
-  val readToken2: RunLength[Token] = for {
+  val readToken2: RunLength[Token] = for
     oldState <- get // fetch the current state
 
     // take a token off the input, getting
     // a token and a new state
     (nextTok, newState) = oldState.uncons
     _ <- put(newState) // store the new state
-  } yield nextTok // return the token
+  yield nextTok // return the token
 
   /**
     have we exhausted the input?
     */
   def done: RunLength[Boolean] =
-    get flatMap { state =>
+    get flatMap  state =>
       if (state.input.isEmpty)
         // we have, better emit whatever tokens are stored in the
         // current state
         emit as true
       else point(false)
-    }
 
   /**
     * put output on the writer
@@ -145,22 +138,22 @@ object CABRunLengthEncoder {
     emit the lastToken
     */
   def emit: RunLength[Unit] =
-    for {
+    for
       state <- get
       config <- ask
       _ <- state.lastToken.cata(
           none = point(()), // nothing to emit
           some = writeOutput(_, state.length, config.minRun))
-    } yield ()
+    yield ()
 
   /**
     emit tokens if the next input token is different than the last
     */
   def maybeEmit: RunLength[Unit] =
-    for {
+    for
       state <- get
       next <- readToken
-      _ <- {
+      _ <-
         if (state.lastToken.map(_ == next) getOrElse (false))
           // Same token as last, so we just increment our counter 
           modify(_.incLength)
@@ -170,22 +163,18 @@ object CABRunLengthEncoder {
           // *> here chains two actions, ignoring the output of
           // the first (which is unit in this case)
           emit *> put(state.newToken(next))
-      }
-    } yield ()
+    yield ()
 
-  def encode(minRun: Int, input: List[Token]): String = {
+  def encode(minRun: Int, input: List[Token]): String =
     val config = RunLengthConfig(minRun)
     val initialState = RunLengthState.initial(input)
     val (output, result, finalState) =
       untilM_(maybeEmit, done).run(config, initialState).run
     output.shows
-  }
-}
 
-object ReaderWriterStateTUsage extends App {
+object ReaderWriterStateTUsage extends App
 
   val inputTokens = List(A, B, C, A, A, B, B, B, B, C, A, A, A, C, C, C, C, B)
   val encoded = CABRunLengthEncoder.encode(2, inputTokens)
 
   println("encoded " + inputTokens.mkString + " as " + encoded)
-}

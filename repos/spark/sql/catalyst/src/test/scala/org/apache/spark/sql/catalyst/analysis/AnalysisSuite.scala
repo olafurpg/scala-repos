@@ -25,22 +25,20 @@ import org.apache.spark.sql.catalyst.plans.Inner
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.types._
 
-class AnalysisSuite extends AnalysisTest {
+class AnalysisSuite extends AnalysisTest
   import org.apache.spark.sql.catalyst.analysis.TestRelations._
 
-  test("union project *") {
+  test("union project *")
     val plan =
-      (1 to 100).map(_ => testRelation).fold[LogicalPlan](testRelation) {
+      (1 to 100).map(_ => testRelation).fold[LogicalPlan](testRelation)
         (a, b) =>
           a.select(UnresolvedStar(None))
             .select('a)
             .unionAll(b.select(UnresolvedStar(None)))
-      }
 
     assertAnalysisSuccess(plan)
-  }
 
-  test("check project's resolved") {
+  test("check project's resolved")
     assert(Project(testRelation.output, testRelation).resolved)
 
     assert(!Project(Seq(UnresolvedAttribute("a")), testRelation).resolved)
@@ -51,9 +49,8 @@ class AnalysisSuite extends AnalysisTest {
 
     assert(
         !Project(Seq(Alias(count(Literal(1)), "count")()), testRelation).resolved)
-  }
 
-  test("analyze project") {
+  test("analyze project")
     checkAnalysis(Project(Seq(UnresolvedAttribute("a")), testRelation),
                   Project(testRelation.output, testRelation))
 
@@ -78,9 +75,8 @@ class AnalysisSuite extends AnalysisTest {
                 UnresolvedRelation(TableIdentifier("TaBlE"), Some("TbL"))),
         Project(testRelation.output, testRelation),
         caseSensitive = false)
-  }
 
-  test("resolve sort references - filter/limit") {
+  test("resolve sort references - filter/limit")
     val a = testRelation2.output(0)
     val b = testRelation2.output(1)
     val c = testRelation2.output(2)
@@ -116,9 +112,8 @@ class AnalysisSuite extends AnalysisTest {
       .sortBy(b.asc, c.desc)
       .select(a)
     checkAnalysis(plan2, expected2)
-  }
 
-  test("resolve sort references - join") {
+  test("resolve sort references - join")
     val a = testRelation2.output(0)
     val b = testRelation2.output(1)
     val c = testRelation2.output(2)
@@ -137,9 +132,8 @@ class AnalysisSuite extends AnalysisTest {
       .sortBy(c.desc, h.asc)
       .select(a, b)
     checkAnalysis(plan, expected)
-  }
 
-  test("resolve sort references - aggregate") {
+  test("resolve sort references - aggregate")
     val a = testRelation2.output(0)
     val b = testRelation2.output(1)
     val c = testRelation2.output(2)
@@ -173,9 +167,8 @@ class AnalysisSuite extends AnalysisTest {
       .select(a, c, alias_a3.toAttribute)
 
     checkAnalysis(plan2, expected2)
-  }
 
-  test("resolve relations") {
+  test("resolve relations")
     assertAnalysisError(UnresolvedRelation(TableIdentifier("tAbLe"), None),
                         Seq("Table not found: tAbLe"))
 
@@ -189,9 +182,8 @@ class AnalysisSuite extends AnalysisTest {
     checkAnalysis(UnresolvedRelation(TableIdentifier("TaBlE"), None),
                   testRelation,
                   caseSensitive = false)
-  }
 
-  test("divide should be casted into fractional types") {
+  test("divide should be casted into fractional types")
     val plan = caseInsensitiveAnalyzer.execute(
         testRelation2.select('a / Literal(2) as 'div1,
                              'a / 'b as 'div2,
@@ -206,9 +198,8 @@ class AnalysisSuite extends AnalysisTest {
     // StringType will be promoted into Decimal(38, 18)
     assert(pl(3).dataType == DecimalType(38, 22))
     assert(pl(4).dataType == DoubleType)
-  }
 
-  test("pull out nondeterministic expressions from RepartitionByExpression") {
+  test("pull out nondeterministic expressions from RepartitionByExpression")
     val plan = RepartitionByExpression(Seq(Rand(33)), testRelation)
     val projected = Alias(Rand(33), "_nondeterministic")()
     val expected =
@@ -217,9 +208,8 @@ class AnalysisSuite extends AnalysisTest {
                                       Project(testRelation.output :+ projected,
                                               testRelation)))
     checkAnalysis(plan, expected)
-  }
 
-  test("pull out nondeterministic expressions from Sort") {
+  test("pull out nondeterministic expressions from Sort")
     val plan = Sort(Seq(SortOrder(Rand(33), Ascending)), false, testRelation)
     val projected = Alias(Rand(33), "_nondeterministic")()
     val expected =
@@ -228,9 +218,8 @@ class AnalysisSuite extends AnalysisTest {
                    false,
                    Project(testRelation.output :+ projected, testRelation)))
     checkAnalysis(plan, expected)
-  }
 
-  test("SPARK-9634: cleanup unnecessary Aliases in LogicalPlan") {
+  test("SPARK-9634: cleanup unnecessary Aliases in LogicalPlan")
     val a = testRelation.output.head
     var plan = testRelation.select(((a + 1).as("a+1") + 2).as("col"))
     var expected = testRelation.select((a + 1 + 2).as("col"))
@@ -248,9 +237,8 @@ class AnalysisSuite extends AnalysisTest {
     plan = testRelation.select(
         CreateStructUnsafe(Seq(a, (a + 1).as("a+1"))).as("col"))
     checkAnalysis(plan, plan)
-  }
 
-  test("SPARK-10534: resolve attribute references in order by clause") {
+  test("SPARK-10534: resolve attribute references in order by clause")
     val a = testRelation2.output(0)
     val c = testRelation2.output(2)
 
@@ -261,49 +249,43 @@ class AnalysisSuite extends AnalysisTest {
       .select(c)
 
     checkAnalysis(plan, expected)
-  }
 
-  test("self intersect should resolve duplicate expression IDs") {
+  test("self intersect should resolve duplicate expression IDs")
     val plan = testRelation.intersect(testRelation)
     assertAnalysisSuccess(plan)
-  }
 
-  test("SPARK-8654: invalid CAST in NULL IN(...) expression") {
+  test("SPARK-8654: invalid CAST in NULL IN(...) expression")
     val plan = Project(
         Alias(In(Literal(null), Seq(Literal(1), Literal(2))), "a")() :: Nil,
         LocalRelation())
     assertAnalysisSuccess(plan)
-  }
 
   test(
-      "SPARK-8654: different types in inlist but can be converted to a common type") {
+      "SPARK-8654: different types in inlist but can be converted to a common type")
     val plan = Project(Alias(In(Literal(null),
                                 Seq(Literal(1), Literal(1.2345))),
                              "a")() :: Nil,
                        LocalRelation())
     assertAnalysisSuccess(plan)
-  }
 
-  test("SPARK-8654: check type compatibility error") {
+  test("SPARK-8654: check type compatibility error")
     val plan = Project(
         Alias(In(Literal(null), Seq(Literal(true), Literal(1))), "a")() :: Nil,
         LocalRelation())
     assertAnalysisError(
         plan, Seq("data type mismatch: Arguments must be same type"))
-  }
 
-  test("SPARK-11725: correctly handle null inputs for ScalaUDF") {
+  test("SPARK-11725: correctly handle null inputs for ScalaUDF")
     val string = testRelation2.output(0)
     val double = testRelation2.output(2)
     val short = testRelation2.output(4)
     val nullResult = Literal.create(null, StringType)
 
-    def checkUDF(udf: Expression, transformed: Expression): Unit = {
+    def checkUDF(udf: Expression, transformed: Expression): Unit =
       checkAnalysis(
           Project(Alias(udf, "")() :: Nil, testRelation2),
           Project(Alias(transformed, "")() :: Nil, testRelation2)
       )
-    }
 
     // non-primitive parameters do not need special null handling
     val udf1 = ScalaUDF((s: String) => "x", StringType, string :: Nil)
@@ -329,10 +311,9 @@ class AnalysisSuite extends AnalysisTest {
                         short :: double.withNullability(false) :: Nil)
     val expected4 = If(IsNull(short), nullResult, udf4)
     // checkUDF(udf4, expected4)
-  }
 
   test(
-      "SPARK-11863 mixture of aliases and real columns in order by clause - tpcds 19,55,71") {
+      "SPARK-11863 mixture of aliases and real columns in order by clause - tpcds 19,55,71")
     val a = testRelation2.output(0)
     val c = testRelation2.output(2)
     val alias1 = a.as("a1")
@@ -348,23 +329,20 @@ class AnalysisSuite extends AnalysisTest {
       .orderBy(alias1.toAttribute.asc, alias2.toAttribute.asc)
       .select(alias1.toAttribute, alias2.toAttribute, alias3.toAttribute)
     checkAnalysis(plan, expected)
-  }
 
-  test("Eliminate the unnecessary union") {
+  test("Eliminate the unnecessary union")
     val plan = Union(testRelation :: Nil)
     val expected = testRelation
     checkAnalysis(plan, expected)
-  }
 
-  test("SPARK-12102: Ignore nullablity when comparing two sides of case") {
+  test("SPARK-12102: Ignore nullablity when comparing two sides of case")
     val relation = LocalRelation(
         'a.struct('x.int), 'b.struct('x.int.withNullability(false)))
     val plan =
       relation.select(CaseWhen(Seq((Literal(true), 'a.attr)), 'b).as("val"))
     assertAnalysisSuccess(plan)
-  }
 
-  test("Keep attribute qualifiers after dedup") {
+  test("Keep attribute qualifiers after dedup")
     val input = LocalRelation('key.int, 'value.string)
 
     val query = Project(Seq($"x.key", $"y.key"),
@@ -374,5 +352,3 @@ class AnalysisSuite extends AnalysisTest {
                              None))
 
     assertAnalysisSuccess(query)
-  }
-}

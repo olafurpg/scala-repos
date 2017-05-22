@@ -18,7 +18,7 @@ import User.{LightPerf, LightCount}
 final class Cached(nbTtl: FiniteDuration,
                    onlineUserIdMemo: ExpireSetMemo,
                    mongoCache: MongoCache.Builder,
-                   rankingApi: RankingApi) {
+                   rankingApi: RankingApi)
 
   private def oneWeekAgo = DateTime.now minusWeeks 1
   private def oneMonthAgo = DateTime.now minusMonths 1
@@ -38,7 +38,7 @@ final class Cached(nbTtl: FiniteDuration,
     reactivemongo.bson.Macros.handler[LightCount]
 
   def leaderboards: Fu[Perfs.Leaderboards] =
-    for {
+    for
       bullet ← top10Perf(PerfType.Bullet.id)
       blitz ← top10Perf(PerfType.Blitz.id)
       classical ← top10Perf(PerfType.Classical.id)
@@ -50,7 +50,7 @@ final class Cached(nbTtl: FiniteDuration,
       horde <- top10Perf(PerfType.Horde.id)
       racingKings <- top10Perf(PerfType.RacingKings.id)
       crazyhouse <- top10Perf(PerfType.Crazyhouse.id)
-    } yield
+    yield
       Perfs.Leaderboards(bullet = bullet,
                          blitz = blitz,
                          classical = classical,
@@ -74,9 +74,9 @@ final class Cached(nbTtl: FiniteDuration,
       timeToLive = 10 minutes)
 
   private val topWeekCache = mongoCache.single[List[User.LightPerf]](
-      prefix = "user:top:week", f = PerfType.leaderboardable.map { perf =>
+      prefix = "user:top:week", f = PerfType.leaderboardable.map  perf =>
     rankingApi.topPerf(perf.id, 1)
-  }.sequenceFu.map(_.flatten), timeToLive = 9 minutes)
+  .sequenceFu.map(_.flatten), timeToLive = 9 minutes)
 
   def topWeek = topWeekCache.apply _
 
@@ -89,14 +89,11 @@ final class Cached(nbTtl: FiniteDuration,
       f = UserRepo.byIdsSortRating(onlineUserIdMemo.keys, 50),
       timeToLive = 10 seconds)
 
-  object ranking {
+  object ranking
 
     def getAll(userId: User.ID): Fu[Map[Perf.Key, Int]] =
       rankingApi.weeklyStableRanking of userId
-  }
 
-  object ratingDistribution {
+  object ratingDistribution
 
     def apply(perf: PerfType) = rankingApi.weeklyRatingDistribution(perf)
-  }
-}

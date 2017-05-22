@@ -1,6 +1,6 @@
 import java.util.ArrayList
 
-object Convert2 {
+object Convert2
   implicit def convert[T](p: ArrayList[T]) = new ArrayList[Int](3)
   implicit def convert[T](p: T) = new String
 
@@ -9,11 +9,9 @@ object Convert2 {
   def m2(p: String) {}
   def m2(p: Boolean) {}
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     m1(new ArrayList[Boolean](2))
     m2( /*start*/ 123 /*end*/ )
-  }
-}
 /*
 Seq(any2ArrowAssoc,
     any2Ensuring,

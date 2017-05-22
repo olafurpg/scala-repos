@@ -3,6 +3,5 @@
  */
 package play.api.libs.openid
 
-trait RichUrl[A] {
+trait RichUrl[A]
   def hostAndPath: String
-}

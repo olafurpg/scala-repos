@@ -7,9 +7,9 @@ package docs.http.scaladsl
 import akka.stream.{Materializer, ActorMaterializer}
 import akka.testkit.AkkaSpec
 
-class UnmarshalSpec extends AkkaSpec {
+class UnmarshalSpec extends AkkaSpec
 
-  "use unmarshal" in {
+  "use unmarshal" in
     import akka.http.scaladsl.unmarshalling.Unmarshal
     import system.dispatcher // ExecutionContext
     implicit val materializer: Materializer = ActorMaterializer()
@@ -26,5 +26,3 @@ class UnmarshalSpec extends AkkaSpec {
     val bool =
       Await.result(boolFuture, 1.second) // don't block in non-test code!
     bool shouldBe false
-  }
-}

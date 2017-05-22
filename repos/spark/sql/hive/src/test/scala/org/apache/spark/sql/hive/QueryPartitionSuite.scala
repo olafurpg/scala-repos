@@ -26,11 +26,11 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.util.Utils
 
 class QueryPartitionSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest with SQLTestUtils with TestHiveSingleton
   import hiveContext.implicits._
 
-  test("SPARK-5068: query data when path doesn't exist") {
-    withSQLConf((SQLConf.HIVE_VERIFY_PARTITION_PATH.key, "true")) {
+  test("SPARK-5068: query data when path doesn't exist")
+    withSQLConf((SQLConf.HIVE_VERIFY_PARTITION_PATH.key, "true"))
       val testData = sparkContext
         .parallelize((1 to 10).map(i => TestData(i, i.toString)))
         .toDF()
@@ -55,11 +55,10 @@ class QueryPartitionSuite
           testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect ++ testData.toDF.collect)
 
       // delete the path of one partition
-      tmpDir.listFiles.find { f =>
+      tmpDir.listFiles.find  f =>
         f.isDirectory && f.getName().startsWith("ds=")
-      }.foreach { f =>
+      .foreach  f =>
         Utils.deleteRecursively(f)
-      }
 
       // test for after delete the path
       checkAnswer(
@@ -68,6 +67,3 @@ class QueryPartitionSuite
 
       sql("DROP TABLE table_with_partition")
       sql("DROP TABLE createAndInsertTest")
-    }
-  }
-}

@@ -13,7 +13,7 @@ import com.twitter.scalding.mathematics.Matrix
  *
  */
 
-class GraphOutDegreeJob(args: Args) extends Job(args) {
+class GraphOutDegreeJob(args: Args) extends Job(args)
 
   import Matrix._
 
@@ -23,4 +23,3 @@ class GraphOutDegreeJob(args: Args) extends Job(args) {
   // each row i represents all of the outgoing edges from i
   // by summing out all of the columns we get the outdegree of i
   adjacencyMatrix.sumColVectors.write(Tsv(args("output")))
-}

@@ -33,13 +33,12 @@ import scalafx.Includes._
 import scalafx.delegate.{FireDelegate, SFXDelegate}
 import scalafx.scene.Node
 
-object Mnemonic {
+object Mnemonic
   implicit def sfxMnemonic2jfx(m: Mnemonic): jfxsi.Mnemonic =
     if (m != null) m.delegate else null
-}
 
 class Mnemonic(override val delegate: jfxsi.Mnemonic)
-    extends FireDelegate[jfxsi.Mnemonic] with SFXDelegate[jfxsi.Mnemonic] {
+    extends FireDelegate[jfxsi.Mnemonic] with SFXDelegate[jfxsi.Mnemonic]
 
   /**
     * Constructs a Mnemonic with the specified target Node and trigger KeyCombination.
@@ -51,15 +50,12 @@ class Mnemonic(override val delegate: jfxsi.Mnemonic)
     * The KeyCombination
     */
   def keyCombination = delegate.getKeyCombination
-  def keyCombination_=(v: KeyCombination) {
+  def keyCombination_=(v: KeyCombination)
     delegate.setKeyCombination(v)
-  }
 
   /**
     * Returns the Node
     */
   def node: Node = delegate.getNode
-  def node_=(n: Node) {
+  def node_=(n: Node)
     delegate.setNode(n)
-  }
-}

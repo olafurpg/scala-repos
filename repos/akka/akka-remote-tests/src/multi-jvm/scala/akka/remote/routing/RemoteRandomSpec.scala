@@ -15,13 +15,11 @@ import akka.routing.RandomPool
 import akka.routing.RoutedActorRef
 import akka.testkit._
 
-object RemoteRandomMultiJvmSpec extends MultiNodeConfig {
+object RemoteRandomMultiJvmSpec extends MultiNodeConfig
 
-  class SomeActor extends Actor {
-    def receive = {
+  class SomeActor extends Actor
+    def receive =
       case "hit" ⇒ sender() ! self
-    }
-  }
 
   val first = role("first")
   val second = role("second")
@@ -37,7 +35,6 @@ object RemoteRandomMultiJvmSpec extends MultiNodeConfig {
         target.nodes = ["@first@", "@second@", "@third@"]
       }
     """)
-}
 
 class RemoteRandomMultiJvmNode1 extends RemoteRandomSpec
 class RemoteRandomMultiJvmNode2 extends RemoteRandomSpec
@@ -46,19 +43,18 @@ class RemoteRandomMultiJvmNode4 extends RemoteRandomSpec
 
 class RemoteRandomSpec
     extends MultiNodeSpec(RemoteRandomMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    with ImplicitSender with DefaultTimeout
   import RemoteRandomMultiJvmSpec._
 
   def initialParticipants = roles.size
 
-  "A remote random pool" must {
-    "be locally instantiated on a remote node and be able to communicate through its RemoteActorRef" taggedAs LongRunningTest in {
+  "A remote random pool" must
+    "be locally instantiated on a remote node and be able to communicate through its RemoteActorRef" taggedAs LongRunningTest in
 
-      runOn(first, second, third) {
+      runOn(first, second, third)
         enterBarrier("start", "broadcast-end", "end", "done")
-      }
 
-      runOn(fourth) {
+      runOn(fourth)
         enterBarrier("start")
         val actor =
           system.actorOf(RandomPool(nrOfInstances = 0).props(Props[SomeActor]),
@@ -68,19 +64,17 @@ class RemoteRandomSpec
         val connectionCount = 3
         val iterationCount = 100
 
-        for (i ← 0 until iterationCount; k ← 0 until connectionCount) {
+        for (i ← 0 until iterationCount; k ← 0 until connectionCount)
           actor ! "hit"
-        }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5.seconds, messages = connectionCount * iterationCount) {
+            5.seconds, messages = connectionCount * iterationCount)
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0,
+        ).foldLeft(Map(node(first).address -> 0,
                         node(second).address -> 0,
-                        node(third).address -> 0)) {
+                        node(third).address -> 0))
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
-        }
 
         enterBarrier("broadcast-end")
         actor ! Broadcast(PoisonPill)
@@ -94,7 +88,3 @@ class RemoteRandomSpec
         // "Terminate" to a shut down node
         system.stop(actor)
         enterBarrier("done")
-      }
-    }
-  }
-}

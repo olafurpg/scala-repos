@@ -19,7 +19,7 @@ import akka.actor.Deploy
   * Read view of cluster state, updated via subscription of
   * cluster events published on the event bus.
   */
-private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
+private[akka] class ClusterReadView(cluster: Cluster) extends Closeable
 
   /**
     * Current state
@@ -46,17 +46,17 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
   val selfAddress = cluster.selfAddress
 
   // create actor that subscribes to the cluster eventBus to update current read view state
-  private val eventBusListener: ActorRef = {
+  private val eventBusListener: ActorRef =
     cluster.system.systemActorOf(
         Props(new Actor
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+            with RequiresMessageQueue[UnboundedMessageQueueSemantics]
           override def preStart(): Unit =
             cluster.subscribe(self, classOf[ClusterDomainEvent])
           override def postStop(): Unit = cluster.unsubscribe(self)
 
-          def receive = {
+          def receive =
             case e: ClusterDomainEvent ⇒
-              e match {
+              e match
                 case SeenChanged(convergence, seenBy) ⇒
                   _state = _state.copy(seenBy = seenBy)
                 case ReachabilityChanged(reachability) ⇒
@@ -89,23 +89,19 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
                 case stats: CurrentInternalStats ⇒ _latestStats = stats
                 case ClusterMetricsChanged(nodes) ⇒ _clusterMetrics = nodes
                 case ClusterShuttingDown ⇒
-              }
             case s: CurrentClusterState ⇒ _state = s
-          }
-        }).withDispatcher(cluster.settings.UseDispatcher)
+        ).withDispatcher(cluster.settings.UseDispatcher)
           .withDeploy(Deploy.local),
         name = "clusterEventBusListener")
-  }
 
   def state: CurrentClusterState = _state
 
-  def self: Member = {
+  def self: Member =
     import cluster.selfUniqueAddress
     state.members
       .find(_.uniqueAddress == selfUniqueAddress)
       .getOrElse(Member(selfUniqueAddress, cluster.selfRoles)
             .copy(status = MemberStatus.Removed))
-  }
 
   /**
     * Returns true if this cluster instance has be shutdown.
@@ -150,11 +146,10 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
     * Returns true if the node is not unreachable and not `Down`
     * and not `Removed`.
     */
-  def isAvailable: Boolean = {
+  def isAvailable: Boolean =
     val myself = self
     !unreachableMembers.contains(myself) &&
     myself.status != MemberStatus.Down && myself.status != MemberStatus.Removed
-  }
 
   def reachability: Reachability = _reachability
 
@@ -185,4 +180,3 @@ private[akka] class ClusterReadView(cluster: Cluster) extends Closeable {
     */
   def close(): Unit =
     if (!eventBusListener.isTerminated) eventBusListener ! PoisonPill
-}

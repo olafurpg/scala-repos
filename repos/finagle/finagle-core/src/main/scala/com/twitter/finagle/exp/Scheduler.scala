@@ -15,32 +15,27 @@ object scheduler
         "<local> | <lifo> | <bridged>[:<num workers>] | <forkjoin>[:<num workers>]"
     )
 
-private[finagle] object FinagleScheduler {
+private[finagle] object FinagleScheduler
   private val log = DefaultLogger
 
-  private object Integer {
-    def unapply(str: String): Option[Int] = {
-      try {
+  private object Integer
+    def unapply(str: String): Option[Int] =
+      try
         Some(str.toInt)
-      } catch {
+      catch
         case _: java.lang.NumberFormatException => None
-      }
-    }
-  }
 
-  private def switchToBridged(numWorkers: Int) {
+  private def switchToBridged(numWorkers: Int)
     val queue = try Class
       .forName(
           "java.util.concurrent.LinkedTransferQueue"
       )
       .newInstance
-      .asInstanceOf[BlockingQueue[Runnable]] catch {
-      case _: ClassNotFoundException => {
+      .asInstanceOf[BlockingQueue[Runnable]] catch
+      case _: ClassNotFoundException =>
           log.info(
               "bridged scheduler is not available on pre java 7, using local instead")
           return
-        }
-    }
 
     Scheduler.setUnsafe(
         new BridgedThreadPoolScheduler(
@@ -54,16 +49,14 @@ private[finagle] object FinagleScheduler {
                                      threadFactory)))
 
     log.info("Using bridged scheduler with %d workers".format(numWorkers))
-  }
 
-  private def switchToForkJoin(numWorkers: Int) {
+  private def switchToForkJoin(numWorkers: Int)
     log.info("Using forkjoin scheduler with %d workers".format(numWorkers))
     Scheduler.setUnsafe(new ForkJoinScheduler(
             numWorkers, DefaultStatsReceiver.scope("forkjoin")))
-  }
 
-  def init() {
-    scheduler().split(":").toList match {
+  def init()
+    scheduler().split(":").toList match
       case "bridged" :: Integer(numWorkers) :: Nil =>
         switchToBridged(numWorkers)
       case "bridged" :: Nil => switchToBridged(numProcs().ceil.toInt)
@@ -80,6 +73,3 @@ private[finagle] object FinagleScheduler {
       case _ =>
         throw new IllegalArgumentException(
             "Wrong scheduler config: %s".format(scheduler()))
-    }
-  }
-}

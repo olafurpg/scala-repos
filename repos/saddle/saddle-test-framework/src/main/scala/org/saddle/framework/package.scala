@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 import org.saddle.scalar.ScalarTag
 import org.scalacheck._
 
-package object framework {
+package object framework
   /* Implicit generators for factories needing Double and DateTime generation. */
   implicit def double = boundedDouble
   implicit def dt = dateTimeEpochToNow
@@ -51,10 +51,10 @@ package object framework {
   /** A generator for Series of an arbitrary size. */
   def genSeriesOfN[X : Gen : Ordering : ScalarTag, S : Gen : ScalarTag](
       size: Int): Gen[Series[X, S]] =
-    for {
+    for
       dateTime <- Gen.listOfN(size, implicitly[Gen[X]])
       value <- Gen.listOfN(size, implicitly[Gen[S]])
-    } yield Series(dateTime.zip(value): _*)
+    yield Series(dateTime.zip(value): _*)
 
   /** A generator for FrameS of an arbitrary size. */
   def genFrameOfN[X : Gen : Ordering : ScalarTag, S : Gen : ScalarTag](
@@ -79,4 +79,3 @@ package object framework {
   def arbFrameOfN[X : Gen : Ordering : ClassManifest, S : ClassManifest : Gen](
       cols: Int, rows: Int): Arbitrary[Frame[X, Int, S]] =
     Arbitrary(genFrameOfN[X, S](cols, rows))
-}

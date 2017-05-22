@@ -1,7 +1,7 @@
 import scala.tools.partest._
 import java.io.{Console => _, _}
 
-object Test extends DirectTest {
+object Test extends DirectTest
 
   override def extraSettings: String =
     "-usejavacp -Xprint:uncurry -Ydelambdafy:inline -d " + testOutput.path
@@ -13,9 +13,6 @@ object Test extends DirectTest {
                         |}
                         |""".stripMargin.trim
 
-  override def show(): Unit = {
-    Console.withErr(System.out) {
+  override def show(): Unit =
+    Console.withErr(System.out)
       compile()
-    }
-  }
-}

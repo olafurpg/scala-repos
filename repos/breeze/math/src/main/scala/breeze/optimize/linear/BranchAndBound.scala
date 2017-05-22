@@ -8,7 +8,7 @@ import breeze.linalg.{DenseVector, DenseMatrix}
   * @see http://www.ee.ucla.edu/ee236a/lectures/intlp.pdf
   * @author dlwh
   */
-object BranchAndBound {
+object BranchAndBound
 
   private case class State(lp_value: Double, remaining: Seq[Int])
 
@@ -17,4 +17,3 @@ object BranchAndBound {
                c: DenseVector[Double],
                x0: DenseVector[Double],
                integers: Seq[Int]) = {}
-}

@@ -8,7 +8,7 @@ import scala.concurrent.ExecutionContextExecutor
   * Enables the use of Futures/Promises
   * @author Tobias Schlatter
   */
-object JSExecutionContext {
+object JSExecutionContext
 
   /** Execution context that runs immediately.
     *
@@ -25,11 +25,9 @@ object JSExecutionContext {
     */
   val queue: ExecutionContextExecutor = QueueExecutionContext()
 
-  object Implicits {
+  object Implicits
     @deprecated(
         "Not asynchronous. Use JSExecutionContext.Implicits.queue instead.",
         "0.6.6")
     implicit val runNow: ExecutionContextExecutor = RunNowExecutionContext
     implicit val queue: ExecutionContextExecutor = JSExecutionContext.queue
-  }
-}

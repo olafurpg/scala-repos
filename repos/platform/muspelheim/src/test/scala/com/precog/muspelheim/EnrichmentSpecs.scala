@@ -23,9 +23,9 @@ import com.precog.yggdrasil._
 import com.precog.yggdrasil.execution.EvaluationContext
 import com.precog.common._
 
-trait EnrichmentSpecs extends EvalStackSpecs {
-  "enrichment" should {
-    "enrich data" in {
+trait EnrichmentSpecs extends EvalStackSpecs
+  "enrichment" should
+    "enrich data" in
       val input = """
           medals := //summer_games/london_medals
           precog::enrichment(medals, {
@@ -47,9 +47,8 @@ trait EnrichmentSpecs extends EvalStackSpecs {
 
       data must haveSize(1019)
       data must_== data2
-    }
 
-    "enriched data is related to original data" in {
+    "enriched data is related to original data" in
       val input = """
           medals := //summer_games/london_medals
           medals' := precog::enrichment(medals.Age, {
@@ -62,33 +61,29 @@ trait EnrichmentSpecs extends EvalStackSpecs {
       val results = stack.evalE(input)
 
       results must haveSize(1019)
-    }
 
-    "server error causes enrichment to fail" in {
+    "server error causes enrichment to fail" in
       val input = """
           medals := //summer_games/london_medals
           precog::enrichment(medals, { url: "http://server-error" })
         """.stripMargin
       stack.evalE(input) must throwA[Throwable]
-    }
 
-    "misbehaving enricher causes enrichment to fail" in {
+    "misbehaving enricher causes enrichment to fail" in
       val input = """
           medals := //summer_games/london_medals
           precog::enrichment(medals, { url: "http://misbehave" })
         """.stripMargin
       stack.evalE(input) must throwA[Throwable]
-    }
 
-    "empty response causes enrichment to fail" in {
+    "empty response causes enrichment to fail" in
       val input = """
           medals := //summer_games/london_medals
           precog::enrichment(medals, { url: "http://empty" })
         """.stripMargin
       stack.evalE(input) must throwA[Throwable]
-    }
 
-    "options are passed through to enricher" in {
+    "options are passed through to enricher" in
       val input = """
           data := "Monkey"
           precog::enrichment(data, {
@@ -116,9 +111,8 @@ trait EnrichmentSpecs extends EvalStackSpecs {
               "status" -> SFalse))
 
       actual must_== expected
-    }
 
-    "email/accountId cannot be overriden in options" in {
+    "email/accountId cannot be overriden in options" in
       val input = """
           data := "Monkey"
           precog::enrichment(data, {
@@ -139,6 +133,3 @@ trait EnrichmentSpecs extends EvalStackSpecs {
                                  "accountId" -> SString("dummyAccount")))
 
       actual must_== expected
-    }
-  }
-}

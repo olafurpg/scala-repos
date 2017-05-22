@@ -32,25 +32,24 @@ import org.apache.kafka.common.utils.Utils
 
 import scala.collection.mutable
 
-object ByteBufferMessageSet {
+object ByteBufferMessageSet
 
   private def create(offsetAssigner: OffsetAssigner,
                      compressionCodec: CompressionCodec,
                      wrapperMessageTimestamp: Option[Long],
                      timestampType: TimestampType,
-                     messages: Message*): ByteBuffer = {
+                     messages: Message*): ByteBuffer =
     if (messages.isEmpty) MessageSet.Empty.buffer
-    else if (compressionCodec == NoCompressionCodec) {
+    else if (compressionCodec == NoCompressionCodec)
       val buffer = ByteBuffer.allocate(MessageSet.messageSetSize(messages))
       for (message <- messages) writeMessage(
           buffer, message, offsetAssigner.nextAbsoluteOffset())
       buffer.rewind()
       buffer
-    } else {
-      val magicAndTimestamp = wrapperMessageTimestamp match {
+    else
+      val magicAndTimestamp = wrapperMessageTimestamp match
         case Some(ts) => MagicAndTimestamp(messages.head.magic, ts)
         case None => MessageSet.magicAndLargestTimestamp(messages)
-      }
       var offset = -1L
       val messageWriter = new MessageWriter(
           math.min(math.max(MessageSet.messageSetSize(messages) / 2, 1024),
@@ -58,12 +57,12 @@ object ByteBufferMessageSet {
       messageWriter.write(codec = compressionCodec,
                           timestamp = magicAndTimestamp.timestamp,
                           timestampType = timestampType,
-                          magicValue = magicAndTimestamp.magic) {
+                          magicValue = magicAndTimestamp.magic)
         outputStream =>
           val output = new DataOutputStream(
               CompressionFactory(compressionCodec, outputStream))
-          try {
-            for (message <- messages) {
+          try
+            for (message <- messages)
               offset = offsetAssigner.nextAbsoluteOffset()
               if (message.magic != magicAndTimestamp.magic)
                 throw new IllegalArgumentException(
@@ -76,26 +75,21 @@ object ByteBufferMessageSet {
               output.write(message.buffer.array,
                            message.buffer.arrayOffset,
                            message.buffer.limit)
-            }
-          } finally {
+          finally
             output.close()
-          }
-      }
       val buffer =
         ByteBuffer.allocate(messageWriter.size + MessageSet.LogOverhead)
       writeMessage(buffer, messageWriter, offset)
       buffer.rewind()
       buffer
-    }
-  }
 
   /** Deep iterator that decompresses the message sets and adjusts timestamp and offset if needed. */
   def deepIterator(wrapperMessageAndOffset: MessageAndOffset)
-    : Iterator[MessageAndOffset] = {
+    : Iterator[MessageAndOffset] =
 
     import Message._
 
-    new IteratorTemplate[MessageAndOffset] {
+    new IteratorTemplate[MessageAndOffset]
 
       val MessageAndOffset(wrapperMessage, wrapperMessageOffset) =
         wrapperMessageAndOffset
@@ -113,20 +107,19 @@ object ByteBufferMessageSet {
       var lastInnerOffset = -1L
 
       val messageAndOffsets =
-        if (wrapperMessageAndOffset.message.magic > MagicValue_V0) {
+        if (wrapperMessageAndOffset.message.magic > MagicValue_V0)
           val innerMessageAndOffsets = new ArrayDeque[MessageAndOffset]()
-          try {
+          try
             while (true) innerMessageAndOffsets.add(readMessageFromStream())
-          } catch {
+          catch
             case eofe: EOFException =>
               compressed.close()
             case ioe: IOException =>
               throw new KafkaException(ioe)
-          }
           Some(innerMessageAndOffsets)
-        } else None
+        else None
 
-      private def readMessageFromStream(): MessageAndOffset = {
+      private def readMessageFromStream(): MessageAndOffset =
         val innerOffset = compressed.readLong()
         val recordSize = compressed.readInt()
 
@@ -150,66 +143,53 @@ object ByteBufferMessageSet {
               s"but inner message has magic value ${newMessage.magic}")
         lastInnerOffset = innerOffset
         new MessageAndOffset(newMessage, innerOffset)
-      }
 
-      override def makeNext(): MessageAndOffset = {
-        messageAndOffsets match {
+      override def makeNext(): MessageAndOffset =
+        messageAndOffsets match
           // Using inner offset and timestamps
           case Some(innerMessageAndOffsets) =>
-            innerMessageAndOffsets.pollFirst() match {
+            innerMessageAndOffsets.pollFirst() match
               case null => allDone()
               case MessageAndOffset(message, offset) =>
                 val relativeOffset = offset - lastInnerOffset
                 val absoluteOffset = wrapperMessageOffset + relativeOffset
                 new MessageAndOffset(message, absoluteOffset)
-            }
           // Not using inner offset and timestamps
           case None =>
-            try readMessageFromStream() catch {
+            try readMessageFromStream() catch
               case eofe: EOFException =>
                 compressed.close()
                 allDone()
               case ioe: IOException =>
                 throw new KafkaException(ioe)
-            }
-        }
-      }
-    }
-  }
 
   private[kafka] def writeMessage(
-      buffer: ByteBuffer, message: Message, offset: Long) {
+      buffer: ByteBuffer, message: Message, offset: Long)
     buffer.putLong(offset)
     buffer.putInt(message.size)
     buffer.put(message.buffer)
     message.buffer.rewind()
-  }
 
   private[kafka] def writeMessage(
-      buffer: ByteBuffer, messageWriter: MessageWriter, offset: Long) {
+      buffer: ByteBuffer, messageWriter: MessageWriter, offset: Long)
     buffer.putLong(offset)
     buffer.putInt(messageWriter.size)
     messageWriter.writeTo(buffer)
-  }
-}
 
-private object OffsetAssigner {
+private object OffsetAssigner
 
   def apply(offsetCounter: LongRef, size: Int): OffsetAssigner =
     new OffsetAssigner(offsetCounter.value to offsetCounter.addAndGet(size))
-}
 
-private class OffsetAssigner(offsets: Seq[Long]) {
+private class OffsetAssigner(offsets: Seq[Long])
   private var index = 0
 
-  def nextAbsoluteOffset(): Long = {
+  def nextAbsoluteOffset(): Long =
     val result = offsets(index)
     index += 1
     result
-  }
 
   def toInnerOffset(offset: Long): Long = offset - offsets.head
-}
 
 /**
   * A sequence of messages stored in a byte buffer
@@ -269,14 +249,14 @@ private class OffsetAssigner(offsets: Seq[Long]) {
   *
   */
 class ByteBufferMessageSet(val buffer: ByteBuffer)
-    extends MessageSet with Logging {
+    extends MessageSet with Logging
   private var shallowValidByteCount = -1
 
   private[kafka] def this(compressionCodec: CompressionCodec,
                           offsetCounter: LongRef,
                           wrapperMessageTimestamp: Option[Long],
                           timestampType: TimestampType,
-                          messages: Message*) {
+                          messages: Message*)
     this(
         ByteBufferMessageSet.create(
             OffsetAssigner(offsetCounter, messages.size),
@@ -284,68 +264,57 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
             wrapperMessageTimestamp,
             timestampType,
             messages: _*))
-  }
 
   def this(compressionCodec: CompressionCodec,
            offsetCounter: LongRef,
-           messages: Message*) {
+           messages: Message*)
     this(compressionCodec,
          offsetCounter,
          None,
          TimestampType.CREATE_TIME,
          messages: _*)
-  }
 
   def this(compressionCodec: CompressionCodec,
            offsetSeq: Seq[Long],
-           messages: Message*) {
+           messages: Message*)
     this(
         ByteBufferMessageSet.create(new OffsetAssigner(offsetSeq),
                                     compressionCodec,
                                     None,
                                     TimestampType.CREATE_TIME,
                                     messages: _*))
-  }
 
-  def this(compressionCodec: CompressionCodec, messages: Message*) {
+  def this(compressionCodec: CompressionCodec, messages: Message*)
     this(compressionCodec, new LongRef(0L), messages: _*)
-  }
 
-  def this(messages: Message*) {
+  def this(messages: Message*)
     this(NoCompressionCodec, messages: _*)
-  }
 
   def getBuffer = buffer
 
-  private def shallowValidBytes: Int = {
-    if (shallowValidByteCount < 0) {
+  private def shallowValidBytes: Int =
+    if (shallowValidByteCount < 0)
       this.shallowValidByteCount = this
         .internalIterator(isShallow = true)
-        .map { messageAndOffset =>
+        .map  messageAndOffset =>
           MessageSet.entrySize(messageAndOffset.message)
-        }
         .sum
-    }
     shallowValidByteCount
-  }
 
   /** Write the messages in this set to the given channel */
-  def writeTo(channel: GatheringByteChannel, offset: Long, size: Int): Int = {
+  def writeTo(channel: GatheringByteChannel, offset: Long, size: Int): Int =
     // Ignore offset and size from input. We just want to write the whole buffer to the channel.
     buffer.mark()
     var written = 0
     while (written < sizeInBytes) written += channel.write(buffer)
     buffer.reset()
     written
-  }
 
   override def isMagicValueInAllWrapperMessages(
-      expectedMagicValue: Byte): Boolean = {
-    for (messageAndOffset <- shallowIterator) {
+      expectedMagicValue: Byte): Boolean =
+    for (messageAndOffset <- shallowIterator)
       if (messageAndOffset.message.magic != expectedMagicValue) return false
-    }
     true
-  }
 
   /** default iterator that iterates over decompressed messages */
   override def iterator: Iterator[MessageAndOffset] = internalIterator()
@@ -355,14 +324,14 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
 
   /** When flag isShallow is set to be true, we do a shallow iteration: just traverse the first level of messages. **/
   private def internalIterator(
-      isShallow: Boolean = false): Iterator[MessageAndOffset] = {
-    new IteratorTemplate[MessageAndOffset] {
+      isShallow: Boolean = false): Iterator[MessageAndOffset] =
+    new IteratorTemplate[MessageAndOffset]
       var topIter = buffer.slice()
       var innerIter: Iterator[MessageAndOffset] = null
 
       def innerDone(): Boolean = (innerIter == null || !innerIter.hasNext)
 
-      def makeNextOuter: MessageAndOffset = {
+      def makeNextOuter: MessageAndOffset =
         // if there isn't at least an offset and size, we are done
         if (topIter.remaining < 12) return allDone()
         val offset = topIter.getLong()
@@ -380,10 +349,10 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
         message.limit(size)
         topIter.position(topIter.position + size)
         val newMessage = new Message(message)
-        if (isShallow) {
+        if (isShallow)
           new MessageAndOffset(newMessage, offset)
-        } else {
-          newMessage.compressionCodec match {
+        else
+          newMessage.compressionCodec match
             case NoCompressionCodec =>
               innerIter = null
               new MessageAndOffset(newMessage, offset)
@@ -392,20 +361,13 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
                   new MessageAndOffset(newMessage, offset))
               if (!innerIter.hasNext) innerIter = null
               makeNext()
-          }
-        }
-      }
 
-      override def makeNext(): MessageAndOffset = {
-        if (isShallow) {
+      override def makeNext(): MessageAndOffset =
+        if (isShallow)
           makeNextOuter
-        } else {
+        else
           if (innerDone()) makeNextOuter
           else innerIter.next()
-        }
-      }
-    }
-  }
 
   /**
     * Update the offsets for this message set and do further validation on messages including:
@@ -431,11 +393,11 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
       compactedTopic: Boolean = false,
       messageFormatVersion: Byte = Message.CurrentMagicValue,
       messageTimestampType: TimestampType,
-      messageTimestampDiffMaxMs: Long): (ByteBufferMessageSet, Boolean) = {
+      messageTimestampDiffMaxMs: Long): (ByteBufferMessageSet, Boolean) =
     if (sourceCodec == NoCompressionCodec &&
-        targetCodec == NoCompressionCodec) {
+        targetCodec == NoCompressionCodec)
       // check the magic value
-      if (!isMagicValueInAllWrapperMessages(messageFormatVersion)) {
+      if (!isMagicValueInAllWrapperMessages(messageFormatVersion))
         // Message format conversion
         (convertNonCompressedMessages(offsetCounter,
                                       compactedTopic,
@@ -444,7 +406,7 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
                                       messageTimestampDiffMaxMs,
                                       messageFormatVersion),
          true)
-      } else {
+      else
         // Do in-place validation, offset assignment and maybe set timestamp
         (validateNonCompressedMessagesAndAssignOffsetInPlace(
              offsetCounter,
@@ -453,8 +415,7 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
              messageTimestampType,
              messageTimestampDiffMaxMs),
          false)
-      }
-    } else {
+    else
       // Deal with compressed messages
       // We cannot do in place assignment in one of the following situations:
       // 1. Source and target compression codec are different
@@ -470,12 +431,12 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
       var maxTimestamp = Message.NoTimestamp
       val expectedInnerOffset = new LongRef(0)
       val validatedMessages = new mutable.ArrayBuffer[Message]
-      this.internalIterator(isShallow = false).foreach { messageAndOffset =>
+      this.internalIterator(isShallow = false).foreach  messageAndOffset =>
         val message = messageAndOffset.message
         validateMessageKey(message, compactedTopic)
 
         if (message.magic > Message.MagicValue_V0 &&
-            messageFormatVersion > Message.MagicValue_V0) {
+            messageFormatVersion > Message.MagicValue_V0)
           // No in place assignment situation 3
           // Validate the timestamp
           validateTimestamp(
@@ -484,7 +445,6 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
           if (messageAndOffset.offset != expectedInnerOffset.getAndIncrement())
             inPlaceAssignment = false
           maxTimestamp = math.max(maxTimestamp, message.timestamp)
-        }
 
         if (sourceCodec != NoCompressionCodec &&
             message.compressionCodec != NoCompressionCodec)
@@ -496,11 +456,10 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
         if (message.magic != messageFormatVersion) inPlaceAssignment = false
 
         validatedMessages += message.toFormatVersion(messageFormatVersion)
-      }
 
-      if (!inPlaceAssignment) {
+      if (!inPlaceAssignment)
         // Cannot do in place assignment.
-        val wrapperMessageTimestamp = {
+        val wrapperMessageTimestamp =
           if (messageFormatVersion == Message.MagicValue_V0)
             Some(Message.NoTimestamp)
           else if (messageFormatVersion > Message.MagicValue_V0 &&
@@ -509,7 +468,6 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
           else
             // Log append time
             Some(now)
-        }
 
         (new ByteBufferMessageSet(
              compressionCodec = targetCodec,
@@ -518,7 +476,7 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
              timestampType = messageTimestampType,
              messages = validatedMessages: _*),
          true)
-      } else {
+      else
         // Do not do re-compression but simply update the offset, timestamp and attributes field of the wrapper message.
         buffer.putLong(0, offsetCounter.addAndGet(validatedMessages.size) - 1)
         // validate the messages
@@ -533,26 +491,21 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
             timestamp == maxTimestamp)
           // We don't need to recompute crc if the timestamp is not updated.
           crcUpdateNeeded = false
-        else if (messageTimestampType == TimestampType.LOG_APPEND_TIME) {
+        else if (messageTimestampType == TimestampType.LOG_APPEND_TIME)
           // Set timestamp type and timestamp
           buffer.putLong(timestampOffset, now)
           buffer.put(attributeOffset,
                      messageTimestampType.updateAttributes(attributes))
-        }
 
-        if (crcUpdateNeeded) {
+        if (crcUpdateNeeded)
           // need to recompute the crc value
           buffer.position(MessageSet.LogOverhead)
           val wrapperMessage = new Message(buffer.slice())
           Utils.writeUnsignedInt(buffer,
                                  MessageSet.LogOverhead + Message.CrcOffset,
                                  wrapperMessage.computeChecksum)
-        }
         buffer.rewind()
         (this, false)
-      }
-    }
-  }
 
   // We create this method to avoid a memory copy. It reads from the original message set and directly
   // writes the converted messages into new message set buffer. Hence we don't need to allocate memory for each
@@ -563,17 +516,16 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
       now: Long,
       timestampType: TimestampType,
       messageTimestampDiffMaxMs: Long,
-      toMagicValue: Byte): ByteBufferMessageSet = {
+      toMagicValue: Byte): ByteBufferMessageSet =
     val sizeInBytesAfterConversion =
       shallowValidBytes + this
         .internalIterator(isShallow = true)
-        .map { messageAndOffset =>
+        .map  messageAndOffset =>
           Message.headerSizeDiff(messageAndOffset.message.magic, toMagicValue)
-        }
         .sum
     val newBuffer = ByteBuffer.allocate(sizeInBytesAfterConversion)
     var newMessagePosition = 0
-    this.internalIterator(isShallow = true).foreach {
+    this.internalIterator(isShallow = true).foreach
       case MessageAndOffset(message, _) =>
         validateMessageKey(message, compactedTopic)
         validateTimestamp(
@@ -589,21 +541,19 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
             toMagicValue, newMessageBuffer, now, timestampType)
 
         newMessagePosition += MessageSet.LogOverhead + newMessageSize
-    }
     newBuffer.rewind()
     new ByteBufferMessageSet(newBuffer)
-  }
 
   private def validateNonCompressedMessagesAndAssignOffsetInPlace(
       offsetCounter: LongRef,
       now: Long,
       compactedTopic: Boolean,
       timestampType: TimestampType,
-      timestampDiffMaxMs: Long): ByteBufferMessageSet = {
+      timestampDiffMaxMs: Long): ByteBufferMessageSet =
     // do in-place validation and offset assignment
     var messagePosition = 0
     buffer.mark()
-    while (messagePosition < sizeInBytes - MessageSet.LogOverhead) {
+    while (messagePosition < sizeInBytes - MessageSet.LogOverhead)
       buffer.position(messagePosition)
       buffer.putLong(offsetCounter.getAndIncrement())
       val messageSize = buffer.getInt()
@@ -611,28 +561,23 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
       messageBuffer.limit(messageSize)
       val message = new Message(messageBuffer)
       validateMessageKey(message, compactedTopic)
-      if (message.magic > Message.MagicValue_V0) {
+      if (message.magic > Message.MagicValue_V0)
         validateTimestamp(message, now, timestampType, timestampDiffMaxMs)
-        if (timestampType == TimestampType.LOG_APPEND_TIME) {
+        if (timestampType == TimestampType.LOG_APPEND_TIME)
           message.buffer.putLong(Message.TimestampOffset, now)
           message.buffer.put(
               Message.AttributesOffset,
               timestampType.updateAttributes(message.attributes))
           Utils.writeUnsignedInt(
               message.buffer, Message.CrcOffset, message.computeChecksum)
-        }
-      }
       messagePosition += MessageSet.LogOverhead + messageSize
-    }
     buffer.reset()
     this
-  }
 
-  private def validateMessageKey(message: Message, compactedTopic: Boolean) {
+  private def validateMessageKey(message: Message, compactedTopic: Boolean)
     if (compactedTopic && !message.hasKey)
       throw new InvalidMessageException(
           "Compacted topic cannot accept message without key.")
-  }
 
   /**
     * This method validates the timestamps of a message.
@@ -641,7 +586,7 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
   private def validateTimestamp(message: Message,
                                 now: Long,
                                 timestampType: TimestampType,
-                                timestampDiffMaxMs: Long) {
+                                timestampDiffMaxMs: Long)
     if (timestampType == TimestampType.CREATE_TIME &&
         math.abs(message.timestamp - now) > timestampDiffMaxMs)
       throw new InvalidTimestampException(
@@ -651,7 +596,6 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
       throw new InvalidTimestampException(
           s"Invalid timestamp type in message $message. Producer should not set " +
           s"timestamp type to LogAppendTime.")
-  }
 
   /**
     * The total number of bytes in this message set, including any partial trailing messages
@@ -666,13 +610,10 @@ class ByteBufferMessageSet(val buffer: ByteBuffer)
   /**
     * Two message sets are equal if their respective byte buffers are equal
     */
-  override def equals(other: Any): Boolean = {
-    other match {
+  override def equals(other: Any): Boolean =
+    other match
       case that: ByteBufferMessageSet =>
         buffer.equals(that.buffer)
       case _ => false
-    }
-  }
 
   override def hashCode: Int = buffer.hashCode
-}

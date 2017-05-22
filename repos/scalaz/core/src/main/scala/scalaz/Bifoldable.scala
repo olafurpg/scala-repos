@@ -5,7 +5,7 @@ package scalaz
   * A type giving rise to two unrelated [[scalaz.Foldable]]s.
   */
 ////
-trait Bifoldable[F[_, _]] { self =>
+trait Bifoldable[F[_, _]]  self =>
   ////
 
   /** Accumulate `A`s and `B`s */
@@ -22,35 +22,31 @@ trait Bifoldable[F[_, _]] { self =>
 
   /** `bifoldRight`, but defined to run in the opposite direction. */
   def bifoldLeft[A, B, C](fa: F[A, B], z: C)(f: (C, A) => C)(
-      g: (C, B) => C): C = {
+      g: (C, B) => C): C =
     import Dual._, Endo._, syntax.std.all._
     Tag.unwrap(
         bifoldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))((b: B) =>
               Dual(Endo.endo(g.flip.curried(b))))(dualMonoid[Endo[C]])) apply z
-  }
 
   /**The composition of Bifoldables `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifoldable */
   def compose[G[_, _]](implicit G0: Bifoldable[G])
     : Bifoldable[λ[(α, β) => F[G[α, β], G[α, β]]]] =
-    new CompositionBifoldable[F, G] {
+    new CompositionBifoldable[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /**The product of Bifoldables `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifoldable */
   def product[G[_, _]](implicit G0: Bifoldable[G])
     : Bifoldable[λ[(α, β) => (F[α, β], G[α, β])]] =
-    new ProductBifoldable[F, G] {
+    new ProductBifoldable[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   // derived functions
   def bifoldMap1[A, B, M](fa: F[A, B])(f: A => M)(g: B => M)(
-      implicit F: Semigroup[M]): Option[M] = {
+      implicit F: Semigroup[M]): Option[M] =
     import std.option._
     bifoldMap(fa)(a => some(f(a)))(b => some(g(b)))
-  }
 
   /**Curried version of `bifoldRight` */
   final def bifoldR[A, B, C](fa: F[A, B], z: => C)(f: A => (=> C) => C)(
@@ -78,11 +74,10 @@ trait Bifoldable[F[_, _]] { self =>
   def embed[G[_], H[_]](
       implicit G0: Foldable[G],
       H0: Foldable[H]): Bifoldable[λ[(α, β) => F[G[α], H[β]]]] =
-    new CompositionBifoldableFoldables[F, G, H] {
+    new CompositionBifoldableFoldables[F, G, H]
       def F = self
       def G = G0
       def H = H0
-    }
 
   /** Embed one Foldable to the left of this Bifoldable .*/
   def embedLeft[G[_]](
@@ -94,7 +89,7 @@ trait Bifoldable[F[_, _]] { self =>
       implicit H0: Foldable[H]): Bifoldable[λ[(α, β) => F[α, H[β]]]] =
     embed[Id.Id, H]
 
-  trait BifoldableLaw {
+  trait BifoldableLaw
     import std.vector._
 
     def leftFMConsistent[A : Equal, B : Equal](fa: F[A, B]): Boolean =
@@ -108,38 +103,32 @@ trait Bifoldable[F[_, _]] { self =>
           bifoldMap[A, B, Vector[B \/ A]](fa)(a => Vector(\/-(a)))(
               b => Vector(-\/(b))),
           bifoldRight(fa, Vector.empty[B \/ A])(\/-(_) +: _)(-\/(_) +: _))
-  }
 
   def bifoldableLaw = new BifoldableLaw {}
   ////
-  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F] {
+  val bifoldableSyntax = new scalaz.syntax.BifoldableSyntax[F]
     def F = Bifoldable.this
-  }
-}
 
-object Bifoldable {
+object Bifoldable
   @inline def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
 
   ////
   /**
     * Template trait to define `Bifoldable` in terms of `bifoldMap`.
     */
-  trait FromBifoldMap[F[_, _]] extends Bifoldable[F] {
+  trait FromBifoldMap[F[_, _]] extends Bifoldable[F]
     override def bifoldRight[A, B, C](fa: F[A, B], z: => C)(
         f: (A, => C) => C)(g: (B, => C) => C) =
       bifoldMap(fa)((a: A) => (Endo.endo(f(a, _: C))))(
           (b: B) => (Endo.endo(g(b, _: C)))) apply z
-  }
 
   /**
     * Template trait to define `Bifoldable` in terms of `bifoldR`
     */
-  trait FromBifoldr[F[_, _]] extends Bifoldable[F] {
+  trait FromBifoldr[F[_, _]] extends Bifoldable[F]
     override def bifoldMap[A, B, M](fa: F[A, B])(f: A => M)(
         g: B => M)(implicit F: Monoid[M]) =
       bifoldR(fa, F.zero)(x => y => F.append(f(x), y))(
           x => y => F.append(g(x), y))
-  }
 
   ////
-}

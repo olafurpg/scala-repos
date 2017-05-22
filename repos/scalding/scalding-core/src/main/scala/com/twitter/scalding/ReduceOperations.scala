@@ -36,7 +36,7 @@ import Dsl._ //Get the conversion implicits
   * in each operation.
   */
 trait ReduceOperations[+Self <: ReduceOperations[Self]]
-    extends java.io.Serializable {
+    extends java.io.Serializable
 
   /**
     * Type T is the type of the input field (input to map, T => X)
@@ -76,9 +76,9 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * <a href="http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm">http://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Parallel_algorithm</a>
     */
   def average(f: (Fields, Fields)) =
-    mapPlusMap(f) { (x: Double) =>
+    mapPlusMap(f)  (x: Double) =>
       AveragedValue(1L, x)
-    } { _.value }
+    { _.value }
   def average(f: Symbol): Self = average(f -> f)
 
   /**
@@ -99,41 +99,35 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * }}}
     */
   def approximateUniqueCount[T <% Array[Byte]: TupleConverter](
-      f: (Fields, Fields), errPercent: Double = 1.0) = {
+      f: (Fields, Fields), errPercent: Double = 1.0) =
     hyperLogLogMap[T, Double](f, errPercent) { _.estimatedSize }
-  }
 
   def hyperLogLog[T <% Array[Byte]: TupleConverter](
-      f: (Fields, Fields), errPercent: Double = 1.0) = {
-    hyperLogLogMap[T, HLL](f, errPercent) { hll =>
+      f: (Fields, Fields), errPercent: Double = 1.0) =
+    hyperLogLogMap[T, HLL](f, errPercent)  hll =>
       hll
-    }
-  }
 
   private[this] def hyperLogLogMap[
       T <% Array[Byte]: TupleConverter, U : TupleSetter](
-      f: (Fields, Fields), errPercent: Double = 1.0)(fn: HLL => U) = {
+      f: (Fields, Fields), errPercent: Double = 1.0)(fn: HLL => U) =
     //bits = log(m) == 2 *log(104/errPercent) = 2log(104) - 2*log(errPercent)
     def log2(x: Double) = scala.math.log(x) / scala.math.log(2.0)
     val bits = 2 * scala.math.ceil(log2(104) - log2(errPercent)).toInt
     implicit val hmm = new HyperLogLogMonoid(bits)
-    mapPlusMap(f) { (t: T) =>
+    mapPlusMap(f)  (t: T) =>
       hmm(t)
-    }(fn)
-  }
+    (fn)
 
   /**
     * This is count with a predicate: only counts the tuples for which
     * `fn(tuple)` is true
     */
   def count[T : TupleConverter](fieldDef: (Fields, Fields))(
-      fn: T => Boolean): Self = {
-    mapPlusMap(fieldDef) { (arg: T) =>
+      fn: T => Boolean): Self =
+    mapPlusMap(fieldDef)  (arg: T) =>
       if (fn(arg)) 1L else 0L
-    } { s =>
+     s =>
       s
-    }
-  }
 
   /**
     * Opposite of RichPipe.unpivot.  See SQL/Excel for more on this function
@@ -170,72 +164,62 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * }
     * }}}
     */
-  def pivot(fieldDef: (Fields, Fields), defaultVal: Any = null): Self = {
+  def pivot(fieldDef: (Fields, Fields), defaultVal: Any = null): Self =
     // Make sure the fields are strings:
-    mapList[(String, AnyRef), CTuple](fieldDef) { outputList =>
+    mapList[(String, AnyRef), CTuple](fieldDef)  outputList =>
       val asMap = outputList.toMap
       assert(asMap.size == outputList.size,
              "Repeated pivot key fields: " + outputList.toString)
       val values = fieldDef._2.iterator.asScala
       // Look up this key:
-      .map { fname =>
+      .map  fname =>
         asMap.getOrElse(fname.asInstanceOf[String],
                         defaultVal.asInstanceOf[AnyRef])
-      }
       // Create the cascading tuple
       new CTuple(values.toSeq: _*)
-    }
-  }
 
   /**
     * Compute the count, ave and standard deviation in one pass
     * example: g.sizeAveStdev('x -> ('cntx, 'avex, 'stdevx))
     */
-  def sizeAveStdev(fieldDef: (Fields, Fields)) = {
-    mapPlusMap(fieldDef) { (x: Double) =>
+  def sizeAveStdev(fieldDef: (Fields, Fields)) =
+    mapPlusMap(fieldDef)  (x: Double) =>
       Moments(x)
-    } { (mom: Moments) =>
+     (mom: Moments) =>
       (mom.count, mom.mean, mom.stddev)
-    }
-  }
 
   /*
    * check if a predicate is satisfied for all in the values for this key
    */
   def forall[T : TupleConverter](fieldDef: (Fields, Fields))(
-      fn: (T) => Boolean): Self = {
-    mapReduceMap(fieldDef)(fn)({ (x: Boolean, y: Boolean) =>
+      fn: (T) => Boolean): Self =
+    mapReduceMap(fieldDef)(fn)( (x: Boolean, y: Boolean) =>
       x && y
-    })({ x =>
+    )( x =>
       x
-    })
-  }
+    )
 
   /**
     * Return the first, useful probably only for sorted case.
     */
-  def head(fd: (Fields, Fields)): Self = {
+  def head(fd: (Fields, Fields)): Self =
     //CTuple's have unknown arity so we have to put them into a Tuple1 in the middle phase:
-    mapReduceMap(fd) { ctuple: CTuple =>
+    mapReduceMap(fd)  ctuple: CTuple =>
       Tuple1(ctuple)
-    } { (oldVal, newVal) =>
+     (oldVal, newVal) =>
       oldVal
-    } { result =>
+     result =>
       result._1
-    }
-  }
   def head(f: Symbol*): Self = head(f -> f)
 
-  def last(fd: (Fields, Fields)) = {
+  def last(fd: (Fields, Fields)) =
     //CTuple's have unknown arity so we have to put them into a Tuple1 in the middle phase:
-    mapReduceMap(fd) { ctuple: CTuple =>
+    mapReduceMap(fd)  ctuple: CTuple =>
       Tuple1(ctuple)
-    } { (oldVal, newVal) =>
+     (oldVal, newVal) =>
       newVal
-    } { result =>
+     result =>
       result._1
-    }
-  }
   def last(f: Symbol*): Self = last(f -> f)
 
   /**
@@ -247,52 +231,45 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * STRONGLY PREFER TO AVOID THIS. Try reduce or plus and an O(1) memory algorithm.
     */
   def mapList[T, R](fieldDef: (Fields, Fields))(fn: (List[T]) => R)(
-      implicit conv: TupleConverter[T], setter: TupleSetter[R]): Self = {
+      implicit conv: TupleConverter[T], setter: TupleSetter[R]): Self =
     val midset = implicitly[TupleSetter[List[T]]]
     val midconv = implicitly[TupleConverter[List[T]]]
 
-    mapReduceMap[T, List[T], R](fieldDef) {
+    mapReduceMap[T, List[T], R](fieldDef)
       //Map
       x =>
         List(x)
-    } {
+    
       //Reduce, note the bigger list is likely on the left, so concat into it:
       (prev, current) =>
         current ++ prev
-    } { fn(_) }(conv, midset, midconv, setter)
-  }
+    { fn(_) }(conv, midset, midconv, setter)
 
   def mapPlusMap[T, X, U](fieldDef: (Fields, Fields))(
       mapfn: T => X)(mapfn2: X => U)(implicit startConv: TupleConverter[T],
                                      middleSetter: TupleSetter[X],
                                      middleConv: TupleConverter[X],
                                      endSetter: TupleSetter[U],
-                                     sgX: Semigroup[X]): Self = {
+                                     sgX: Semigroup[X]): Self =
     mapReduceMap[T, X, U](fieldDef)(mapfn)((x, y) => sgX.plus(x, y))(mapfn2)(
         startConv, middleSetter, middleConv, endSetter)
-  }
 
-  private def extremum(max: Boolean, fieldDef: (Fields, Fields)): Self = {
+  private def extremum(max: Boolean, fieldDef: (Fields, Fields)): Self =
     //CTuple's have unknown arity so we have to put them into a Tuple1 in the middle phase:
     val select =
-      if (max) {
-        { (a: CTuple, b: CTuple) =>
+      if (max)
+        (a: CTuple, b: CTuple) =>
           (a.compareTo(b) >= 0)
-        }
-      } else {
-        { (a: CTuple, b: CTuple) =>
+      else
+        (a: CTuple, b: CTuple) =>
           (a.compareTo(b) <= 0)
-        }
-      }
 
-    mapReduceMap(fieldDef) { ctuple: CTuple =>
+    mapReduceMap(fieldDef)  ctuple: CTuple =>
       Tuple1(ctuple)
-    } { (oldVal, newVal) =>
+     (oldVal, newVal) =>
       if (select(oldVal._1, newVal._1)) oldVal else newVal
-    } { result =>
+     result =>
       result._1
-    }
-  }
   def max(fieldDef: (Fields, Fields)) = extremum(true, fieldDef)
   def max(f: Symbol*) = extremum(true, (f -> f))
   def min(fieldDef: (Fields, Fields)) = extremum(false, fieldDef)
@@ -307,9 +284,8 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
   def mkString(fieldDef: (Fields, Fields),
                start: String,
                sep: String,
-               end: String): Self = {
+               end: String): Self =
     mapList[String, String](fieldDef) { _.mkString(start, sep, end) }
-  }
   def mkString(fieldDef: (Fields, Fields), sep: String): Self =
     mkString(fieldDef, "", sep, "")
   def mkString(fieldDef: (Fields, Fields)): Self =
@@ -320,10 +296,9 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * column
     */
   def mkString(
-      fieldDef: Symbol, start: String, sep: String, end: String): Self = {
+      fieldDef: Symbol, start: String, sep: String, end: String): Self =
     val f: Fields = fieldDef
     mkString((f, f), start, sep, end)
-  }
   def mkString(fieldDef: Symbol, sep: String): Self =
     mkString(fieldDef, "", sep, "")
   def mkString(fieldDef: Symbol): Self = mkString(fieldDef, "", "", "")
@@ -346,18 +321,16 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * so if your operation is faster for the accumulator to be on one side, be aware.
     */
   def reduce[T](fieldDef: (Fields, Fields))(fn: (T, T) => T)(
-      implicit setter: TupleSetter[T], conv: TupleConverter[T]): Self = {
-    mapReduceMap[T, T, T](fieldDef)({ t =>
+      implicit setter: TupleSetter[T], conv: TupleConverter[T]): Self =
+    mapReduceMap[T, T, T](fieldDef)( t =>
       t
-    })(fn)({ t =>
+    )(fn)( t =>
       t
-    })(conv, setter, conv, setter)
-  }
+    )(conv, setter, conv, setter)
   //Same as reduce(f->f)
   def reduce[T](fieldDef: Symbol*)(fn: (T, T) => T)(
-      implicit setter: TupleSetter[T], conv: TupleConverter[T]): Self = {
+      implicit setter: TupleSetter[T], conv: TupleConverter[T]): Self =
     reduce(fieldDef -> fieldDef)(fn)(setter, conv)
-  }
 
   // Abstract algebra reductions (sum, times, dot):
 
@@ -369,13 +342,12 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     */
   def sum[T](fd: (Fields, Fields))(implicit sg: Semigroup[T],
                                    tconv: TupleConverter[T],
-                                   tset: TupleSetter[T]): Self = {
+                                   tset: TupleSetter[T]): Self =
     // We reverse the order because the left is the old value in reduce, and for list concat
     // we are much better off concatenating into the bigger list
-    reduce[T](fd)({ (left, right) =>
+    reduce[T](fd)( (left, right) =>
       sg.plus(right, left)
-    })(tset, tconv)
-  }
+    )(tset, tconv)
 
   /**
     * The same as `sum(fs -> fs)`
@@ -391,35 +363,30 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     */
   def times[T](fd: (Fields, Fields))(implicit ring: Ring[T],
                                      tconv: TupleConverter[T],
-                                     tset: TupleSetter[T]): Self = {
+                                     tset: TupleSetter[T]): Self =
     // We reverse the order because the left is the old value in reduce, and for list concat
     // we are much better off concatenating into the bigger list
-    reduce[T](fd)({ (left, right) =>
+    reduce[T](fd)( (left, right) =>
       ring.times(right, left)
-    })(tset, tconv)
-  }
+    )(tset, tconv)
 
   /**
     * The same as `times(fs -> fs)`
     */
   def times[T](fs: Symbol*)(implicit ring: Ring[T],
                             tconv: TupleConverter[T],
-                            tset: TupleSetter[T]): Self = {
+                            tset: TupleSetter[T]): Self =
     times[T](fs -> fs)(ring, tconv, tset)
-  }
 
   /**
     * Convert a subset of fields into a list of Tuples. Need to provide the types of the tuple fields.
     */
   def toList[T](fieldDef: (Fields, Fields))(
-      implicit conv: TupleConverter[T]): Self = {
+      implicit conv: TupleConverter[T]): Self =
     // TODO(POB) this is jank in my opinion. Nulls should be filter by the user if they want
-    mapList[T, List[T]](fieldDef) {
-      _.filter { t =>
+    mapList[T, List[T]](fieldDef)
+      _.filter  t =>
         t != null
-      }
-    }
-  }
 
   /**
     * First do "times" on each pair, then "plus" them all together.
@@ -433,28 +400,24 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
       implicit ttconv: TupleConverter[Tuple2[T, T]],
       ring: Ring[T],
       tconv: TupleConverter[T],
-      tset: TupleSetter[T]): Self = {
-    mapReduceMap[(T, T), T, T](Fields.merge(left, right) -> result) {
+      tset: TupleSetter[T]): Self =
+    mapReduceMap[(T, T), T, T](Fields.merge(left, right) -> result)
       init: (T, T) =>
         ring.times(init._1, init._2)
-    } { (left: T, right: T) =>
+     (left: T, right: T) =>
       ring.plus(left, right)
-    } { result =>
+     result =>
       result
-    }
-  }
 
   /**
     * How many values are there for this key
     */
   def size: Self = size('size)
-  def size(thisF: Fields): Self = {
-    mapPlusMap(() -> thisF) { (u: Unit) =>
+  def size(thisF: Fields): Self =
+    mapPlusMap(() -> thisF)  (u: Unit) =>
       1L
-    } { s =>
+     s =>
       s
-    }
-  }
 
   /**
     * Equivalent to sorting by a comparison function
@@ -470,39 +433,32 @@ trait ReduceOperations[+Self <: ReduceOperations[Self]]
     * topClicks will be a List[(Long,Long)]
     */
   def sortWithTake[T : TupleConverter](f: (Fields, Fields), k: Int)(
-      lt: (T, T) => Boolean): Self = {
+      lt: (T, T) => Boolean): Self =
     val ord = Ordering.fromLessThan(lt);
     sortedTake(f, k)(implicitly[TupleConverter[T]], ord)
-  }
 
   /**
     * Reverse of above when the implicit ordering makes sense.
     */
   def sortedReverseTake[T](f: (Fields, Fields), k: Int)(
-      implicit conv: TupleConverter[T], ord: Ordering[T]): Self = {
+      implicit conv: TupleConverter[T], ord: Ordering[T]): Self =
     sortedTake[T](f, k)(conv, ord.reverse)
-  }
 
   /**
     * Same as above but useful when the implicit ordering makes sense.
     */
   def sortedTake[T](f: (Fields, Fields), k: Int)(
-      implicit conv: TupleConverter[T], ord: Ordering[T]): Self = {
+      implicit conv: TupleConverter[T], ord: Ordering[T]): Self =
 
     assert(f._2.size == 1, "output field size must be 1")
     implicit val mon = new PriorityQueueMonoid[T](k)
-    mapPlusMap(f) { (tup: T) =>
+    mapPlusMap(f)  (tup: T) =>
       mon.build(tup)
-    } { (lout: PriorityQueue[T]) =>
+     (lout: PriorityQueue[T]) =>
       lout.iterator.asScala.toList.sorted
-    }
-  }
 
-  def histogram(f: (Fields, Fields), binWidth: Double = 1.0) = {
-    mapPlusMap(f) { x: Double =>
+  def histogram(f: (Fields, Fields), binWidth: Double = 1.0) =
+    mapPlusMap(f)  x: Double =>
       Map((math.floor(x / binWidth) * binWidth) -> 1L)
-    } { map =>
+     map =>
       new mathematics.Histogram(map, binWidth)
-    }
-  }
-}

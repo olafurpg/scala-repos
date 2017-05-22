@@ -40,8 +40,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class SortEventSpec[C]
     extends SimpleSFXDelegateSpec[jfxsc.SortEvent[C], SortEvent[C]](
-        classOf[jfxsc.SortEvent[C]], classOf[SortEvent[C]]) {
+        classOf[jfxsc.SortEvent[C]], classOf[SortEvent[C]])
 
   override def getJavaClassInstance =
     new jfxsc.SortEvent[C](null.asInstanceOf[C], null)
-}

@@ -1,7 +1,6 @@
 // CC#9248 is conspicuously absent from the printed trees at every phase.
-class A {
+class A
   def f[A, CC[X] <: Traversable[X]](): Unit = ()
-}
 
 // % work/check all -uniqid -Xprint:typer work/fail2.scala 
 //

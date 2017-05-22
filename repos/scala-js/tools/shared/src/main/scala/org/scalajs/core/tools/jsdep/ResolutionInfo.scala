@@ -13,12 +13,12 @@ final class ResolutionInfo(val relPath: String,
                            val dependencies: Set[String],
                            val origins: List[Origin],
                            val commonJSName: Option[String],
-                           val relPathMinified: Option[String]) {
+                           val relPathMinified: Option[String])
 
   require(commonJSName.forall(isValidIdentifier),
           "commonJSName must be a valid JavaScript identifier")
 
-  override def toString(): String = {
+  override def toString(): String =
     val b = new StringBuilder
     b ++= s"ResolutionInfo(relPath=$relPath"
     if (dependencies.nonEmpty) b ++= s", dependencies=$dependencies"
@@ -27,5 +27,3 @@ final class ResolutionInfo(val relPath: String,
     if (relPathMinified.nonEmpty) b ++= s", relPathMinified=$relPathMinified"
     b ++= ")"
     b.result()
-  }
-}

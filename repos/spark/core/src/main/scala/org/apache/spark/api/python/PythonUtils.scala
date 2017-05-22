@@ -26,55 +26,46 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.spark.SparkContext
 import org.apache.spark.api.java.{JavaRDD, JavaSparkContext}
 
-private[spark] object PythonUtils {
+private[spark] object PythonUtils
 
   /** Get the PYTHONPATH for PySpark, either from SPARK_HOME, if it is set, or from our JAR */
-  def sparkPythonPath: String = {
+  def sparkPythonPath: String =
     val pythonPath = new ArrayBuffer[String]
-    for (sparkHome <- sys.env.get("SPARK_HOME")) {
+    for (sparkHome <- sys.env.get("SPARK_HOME"))
       pythonPath +=
         Seq(sparkHome, "python", "lib", "pyspark.zip").mkString(File.separator)
       pythonPath += Seq(sparkHome, "python", "lib", "py4j-0.9.2-src.zip")
         .mkString(File.separator)
-    }
     pythonPath ++= SparkContext.jarOfObject(this)
     pythonPath.mkString(File.pathSeparator)
-  }
 
   /** Merge PYTHONPATHS with the appropriate separator. Ignores blank strings. */
-  def mergePythonPaths(paths: String*): String = {
+  def mergePythonPaths(paths: String*): String =
     paths.filter(_ != "").mkString(File.pathSeparator)
-  }
 
-  def generateRDDWithNull(sc: JavaSparkContext): JavaRDD[String] = {
+  def generateRDDWithNull(sc: JavaSparkContext): JavaRDD[String] =
     sc.parallelize(List("a", null, "b"))
-  }
 
   /**
     * Convert list of T into seq of T (for calling API with varargs)
     */
-  def toSeq[T](vs: JList[T]): Seq[T] = {
+  def toSeq[T](vs: JList[T]): Seq[T] =
     vs.asScala
-  }
 
   /**
     * Convert list of T into a (Scala) List of T
     */
-  def toList[T](vs: JList[T]): List[T] = {
+  def toList[T](vs: JList[T]): List[T] =
     vs.asScala.toList
-  }
 
   /**
     * Convert list of T into array of T (for calling API with array)
     */
-  def toArray[T](vs: JList[T]): Array[T] = {
+  def toArray[T](vs: JList[T]): Array[T] =
     vs.toArray().asInstanceOf[Array[T]]
-  }
 
   /**
     * Convert java map of K, V into Map of K, V (for calling API with varargs)
     */
-  def toScalaMap[K, V](jm: java.util.Map[K, V]): Map[K, V] = {
+  def toScalaMap[K, V](jm: java.util.Map[K, V]): Map[K, V] =
     jm.asScala.toMap
-  }
-}

@@ -5,45 +5,40 @@ import scala.language.implicitConversions
 
 package object json extends JsonFormats {}
 
-package json {
+package json
   import scala.reflect.runtime.universe._
   import definitions._
   import scala.util.parsing.json._
   import scala.collection.mutable.{StringBuilder, Stack}
 
-  trait JsonFormats {
+  trait JsonFormats
     implicit val pickleFormat: JSONPickleFormat = new JSONPickleFormat
     implicit def toJSONPickle(value: String): JSONPickle = JSONPickle(value)
     implicit def jsonPickleToUnpickleOps(value: String): UnpickleOps =
       new UnpickleOps(JSONPickle(value))
-  }
 
-  case class JSONPickle(value: String) extends Pickle {
+  case class JSONPickle(value: String) extends Pickle
     type ValueType = String
     type PickleFormatType = JSONPickleFormat
-  }
 
-  class JSONPickleFormat extends PickleFormat {
+  class JSONPickleFormat extends PickleFormat
     type PickleType = JSONPickle
     type OutputType = Output[String]
     def createBuilder() = new JSONPickleBuilder(this, new StringOutput)
     def createBuilder(out: Output[String]): PBuilder =
       new JSONPickleBuilder(this, out)
-    def createReader(pickle: JSONPickle) = {
+    def createReader(pickle: JSONPickle) =
       // TODO - Raw strings, null, etc. should be valid JSON.
       if (pickle.value == "null") new JSONPickleReader(null, this)
       else
-        JSON.parseRaw(pickle.value) match {
+        JSON.parseRaw(pickle.value) match
           case Some(raw) => new JSONPickleReader(raw, this)
           case None =>
             throw new PicklingException(
                 "failed to parse \"" + pickle.value + "\" as JSON")
-        }
-    }
-  }
 
   class JSONPickleBuilder(format: JSONPickleFormat, buf: Output[String])
-      extends PBuilder with PickleTools {
+      extends PBuilder with PickleTools
     // private val buf = new StringBuilder()
     private var nindent = 0
     private def indent() = nindent += 1
@@ -52,38 +47,33 @@ package json {
     private var lastIsBrace = false
     private var lastIsBracket = false
     private var isIgnoringFields = false
-    private def append(s: String) = {
+    private def append(s: String) =
       val sindent = if (pendingIndent) "  " * nindent else ""
       buf.put(sindent + s)
       pendingIndent = false
       val trimmed = s.trim
-      if (trimmed.nonEmpty) {
+      if (trimmed.nonEmpty)
         val lastChar = trimmed.last
         lastIsBrace = lastChar == '{'
         lastIsBracket = lastChar == '['
-      }
-    }
-    private def appendLine(s: String = "") = {
+    private def appendLine(s: String = "") =
       append(s + "\n")
       pendingIndent = true
-    }
     private val tags = new Stack[FastTypeTag[_]]()
-    private def pickleArray(arr: Array[_], tag: FastTypeTag[_]) = {
+    private def pickleArray(arr: Array[_], tag: FastTypeTag[_]) =
       unindent()
       appendLine("[")
       pushHints()
       hintElidedType(tag)
       pinHints()
       var i = 0
-      while (i < arr.length) {
+      while (i < arr.length)
         putElement(b => b.beginEntry(arr(i), tag).endEntry())
         i += 1
-      }
       popHints()
       appendLine("")
       append("]")
       indent()
-    }
     private val primitives = Map[String, Any => Unit](
         FastTypeTag.Unit.key -> ((picklee: Any) => append("\"()\"")),
         FastTypeTag.Null.key -> ((picklee: Any) => append("null")),
@@ -138,23 +128,23 @@ package json {
                           FastTypeTag.Double))
     )
     override def beginEntry(picklee: Any, tag: FastTypeTag[_]): PBuilder =
-      withHints { hints =>
+      withHints  hints =>
         indent()
         // We add special support here for null
         val realTag =
           if (null == picklee) FastTypeTag.Null
           else tag
-        if (hints.isSharedReference) {
+        if (hints.isSharedReference)
           tags.push(FastTypeTag.Ref)
           append("{ \"$ref\": " + hints.oid + " }")
           isIgnoringFields = true
-        } else {
+        else
           tags.push(realTag)
-          if (primitives.contains(realTag.key)) {
+          if (primitives.contains(realTag.key))
             // Null always goes out raw.
             if (hints.isElidedType || realTag.key == FastTypeTag.Null.key)
               primitives(realTag.key)(picklee)
-            else {
+            else
               appendLine("{")
               appendLine("\"$type\": \"" + tag.key + "\",")
               append("\"value\": ")
@@ -165,65 +155,53 @@ package json {
               unindent()
               append("}")
               indent()
-            }
-          } else {
+          else
             appendLine("{")
-            if (!hints.isElidedType) {
+            if (!hints.isElidedType)
               // quickly decide whether we should use picklee.getClass instead
               val ts =
                 if (tag.key.contains("anonfun$")) picklee.getClass.getName
                 else tag.key
               append("\"$type\": \"" + ts + "\"")
-            }
-          }
-        }
         this
-      }
     private def ignoringSharedRef(action: => PBuilder): PBuilder =
       if (isIgnoringFields) this
       else action
     def putField(name: String, pickler: PBuilder => Unit): PBuilder =
-      ignoringSharedRef {
+      ignoringSharedRef
         // assert(!primitives.contains(tags.top.key), tags.top)
         if (!lastIsBrace)
           appendLine(",") // TODO: very inefficient, but here we don't care much about performance
         append("\"" + name + "\": ")
         pickler(this)
         this
-      }
-    def endEntry(): Unit = {
+    def endEntry(): Unit =
       unindent()
       if (primitives.contains(tags.pop().key)) () // do nothing
       else { appendLine(); append("}") }
       // Always undo this state.
       isIgnoringFields = false
-    }
-    def beginCollection(length: Int): PBuilder = ignoringSharedRef {
+    def beginCollection(length: Int): PBuilder = ignoringSharedRef
       putField("elems", b => ())
       appendLine("[")
       // indent()
       this
-    }
-    def putElement(pickler: PBuilder => Unit): PBuilder = ignoringSharedRef {
+    def putElement(pickler: PBuilder => Unit): PBuilder = ignoringSharedRef
       if (!lastIsBracket)
         appendLine(",") // TODO: very inefficient, but here we don't care much about performance
       pickler(this)
       this
-    }
-    def endCollection(): Unit = ignoringSharedRef {
+    def endCollection(): Unit = ignoringSharedRef
       appendLine()
       append("]")
       // unindent()
       this
-    }
-    def result(): JSONPickle = {
+    def result(): JSONPickle =
       assert(tags.isEmpty, tags)
       JSONPickle(buf.toString)
-    }
-  }
 
   class JSONPickleReader(var datum: Any, format: JSONPickleFormat)
-      extends PReader with PickleTools {
+      extends PReader with PickleTools
     private var lastReadTag: String = null
     private val primitives = Map[String, () => Any](
         FastTypeTag.Unit.key -> (() => ()),
@@ -302,26 +280,23 @@ package json {
                 .map(el => el.asInstanceOf[Double])
                 .toArray)
       )
-    private def mkNestedReader(datum: Any) = {
+    private def mkNestedReader(datum: Any) =
       val nested = new JSONPickleReader(datum, format)
-      if (this.areHintsPinned) {
+      if (this.areHintsPinned)
         nested.pinHints()
         nested.hints = hints
         nested.lastReadTag = lastReadTag
-      }
       nested
-    }
-    def beginEntry(): String = withHints { hints =>
-      lastReadTag = {
+    def beginEntry(): String = withHints  hints =>
+      lastReadTag =
         if (datum == null) FastTypeTag.Null.key
-        else if (hints.isElidedType) {
-          datum match {
+        else if (hints.isElidedType)
+          datum match
             case JSONObject(fields) if fields.contains("$ref") =>
               FastTypeTag.Ref.key
             case _ => hints.elidedType.get.key
-          }
-        } else {
-          datum match {
+        else
+          datum match
             case JSONObject(fields) if fields.contains("$ref") =>
               FastTypeTag.Ref.key
             case JSONObject(fields) if fields.contains("$type") =>
@@ -332,14 +307,10 @@ package json {
             case value =>
               throw new PicklingException(
                   s"Logic pickling error:  Could not find a type tag on primitive, and no elided type was hinted: $value")
-          }
-        }
-      }
       lastReadTag
-    }
     def atPrimitive: Boolean = primitives.contains(lastReadTag)
-    def readPrimitive(): Any = {
-      datum match {
+    def readPrimitive(): Any =
+      datum match
         case JSONArray(list)
             if lastReadTag != FastTypeTag.ArrayByte.key &&
             lastReadTag != FastTypeTag.ArrayShort.key &&
@@ -357,36 +328,25 @@ package json {
           mkNestedReader(fields("value")).primitives(lastReadTag)()
         case _ =>
           primitives(lastReadTag)()
-      }
-    }
     def atObject: Boolean = datum.isInstanceOf[JSONObject]
-    def readField(name: String): JSONPickleReader = {
-      datum match {
+    def readField(name: String): JSONPickleReader =
+      datum match
         case JSONObject(fields) =>
           mkNestedReader(
               fields
                 .get(name)
                 .getOrElse(throw PicklingException(
                         s"No field '$name' when unpickling, tag $lastReadTag, fields were $fields")))
-      }
-    }
     def endEntry(): Unit = {}
     def beginCollection(): PReader = readField("elems")
-    def readLength(): Int = {
-      datum match {
+    def readLength(): Int =
+      datum match
         case JSONArray(list) => list.length
-      }
-    }
     private var i = 0
-    def readElement(): PReader = {
-      val reader = {
-        datum match {
+    def readElement(): PReader =
+      val reader =
+        datum match
           case JSONArray(list) => mkNestedReader(list(i))
-        }
-      }
       i += 1
       reader
-    }
     def endCollection(): Unit = {}
-  }
-}

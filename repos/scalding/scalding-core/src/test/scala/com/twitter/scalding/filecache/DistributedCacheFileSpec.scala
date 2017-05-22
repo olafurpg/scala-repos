@@ -24,7 +24,7 @@ import org.scalatest.{Matchers, WordSpec}
 import scala.collection.mutable
 
 // TODO: fix? is it worth having the dep on mockito just for this?
-class DistributedCacheFileSpec extends WordSpec with Matchers {
+class DistributedCacheFileSpec extends WordSpec with Matchers
   case class UnknownMode(buffers: Map[Source, mutable.Buffer[Tuple]])
       extends TestMode with CascadingLocal
   /*
@@ -51,11 +51,9 @@ class DistributedCacheFileSpec extends WordSpec with Matchers {
   val hashHex = URIHasher(uri)
   val hashedFilename = hashHex + "-thefilename.blah"
 
-  "DistributedCacheFile" should {
-    "symlinkNameFor must return a hashed name" in {
+  "DistributedCacheFile" should
+    "symlinkNameFor must return a hashed name" in
       DistributedCacheFile.symlinkNameFor(uri) shouldBe hashedFilename
-    }
-  }
 
   /*
   "UncachedFile.add" should {
@@ -84,4 +82,3 @@ class DistributedCacheFileSpec extends WordSpec with Matchers {
     }
   }
  */
-}

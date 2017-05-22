@@ -24,59 +24,51 @@ case class Span(traceId: TraceId,
                 _name: Option[String],
                 annotations: Seq[ZipkinAnnotation],
                 bAnnotations: Seq[BinaryAnnotation],
-                endpoint: Endpoint) {
+                endpoint: Endpoint)
   val serviceName = _serviceName getOrElse "Unknown"
   val name = _name getOrElse "Unknown"
 
   /**
     * @return a pretty string for this span ID.
     */
-  def idString = {
+  def idString =
     val spanString = traceId.spanId.toString
     val parentSpanString = traceId._parentId map (_.toString)
 
-    parentSpanString match {
+    parentSpanString match
       case Some(parentSpanString) =>
         "%s<:%s".format(spanString, parentSpanString)
       case None => spanString
-    }
-  }
 
-  def toThrift: thrift.Span = {
+  def toThrift: thrift.Span =
     val span = new thrift.Span
 
     span.setId(traceId.spanId.toLong)
-    traceId._parentId match {
+    traceId._parentId match
       case Some(id) => span.setParent_id(id.toLong)
       case None => ()
-    }
     span.setTrace_id(traceId.traceId.toLong)
     span.setName(name)
     span.setDebug(traceId.flags.isDebug)
 
     // fill in the host/service data for all the annotations
-    annotations foreach { ann =>
+    annotations foreach  ann =>
       val a = ann.toThrift
       val ep =
         if (a.isSetHost) a.getHost() else endpoint.boundEndpoint.toThrift
       ep.setService_name(serviceName)
       a.setHost(ep)
       span.addToAnnotations(a)
-    }
 
-    bAnnotations foreach { ann =>
+    bAnnotations foreach  ann =>
       val a = ann.toThrift
       val ep =
         if (a.isSetHost) a.getHost() else endpoint.boundEndpoint.toThrift
       ep.setService_name(serviceName)
       a.setHost(ep)
       span.addToBinary_annotations(a)
-    }
     span
-  }
-}
 
-object Span {
+object Span
   def apply(traceId: TraceId): Span =
     Span(traceId, None, None, Nil, Nil, Endpoint.Unknown)
-}

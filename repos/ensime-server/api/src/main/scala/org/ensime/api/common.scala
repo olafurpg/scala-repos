@@ -6,7 +6,7 @@ import java.io.File
 
 sealed abstract class DeclaredAs(val symbol: scala.Symbol)
 
-object DeclaredAs {
+object DeclaredAs
   case object Method extends DeclaredAs('method)
   case object Trait extends DeclaredAs('trait)
   case object Interface extends DeclaredAs('interface)
@@ -17,9 +17,8 @@ object DeclaredAs {
 
   def allDeclarations =
     Seq(Method, Trait, Interface, Object, Class, Field, Nil)
-}
 
-sealed trait FileEdit extends Ordered[FileEdit] {
+sealed trait FileEdit extends Ordered[FileEdit]
   def file: File
   def text: String
   def from: Int
@@ -32,7 +31,6 @@ sealed trait FileEdit extends Ordered[FileEdit] {
   def compare(that: FileEdit): Int =
     (this.file, this.from, this.to, this.text)
       .compare((that.file, that.from, that.to, that.text))
-}
 
 case class TextEdit(file: File, from: Int, to: Int, text: String)
     extends FileEdit
@@ -40,33 +38,29 @@ case class TextEdit(file: File, from: Int, to: Int, text: String)
 // the next case classes have weird fields because we need the values in the protocol
 case class NewFile(file: File, from: Int, to: Int, text: String)
     extends FileEdit
-object NewFile {
+object NewFile
   def apply(file: File, text: String): NewFile =
     new NewFile(file, 0, text.length - 1, text)
-}
 
 case class DeleteFile(file: File, from: Int, to: Int, text: String)
     extends FileEdit
-object DeleteFile {
+object DeleteFile
   def apply(file: File, text: String): DeleteFile =
     new DeleteFile(file, 0, text.length - 1, text)
-}
 
 sealed trait NoteSeverity
 case object NoteError extends NoteSeverity
 case object NoteWarn extends NoteSeverity
 case object NoteInfo extends NoteSeverity
-object NoteSeverity {
-  def apply(severity: Int) = severity match {
+object NoteSeverity
+  def apply(severity: Int) = severity match
     case 2 => NoteError
     case 1 => NoteWarn
     case 0 => NoteInfo
-  }
-}
 
 sealed abstract class RefactorLocation(val symbol: Symbol)
 
-object RefactorLocation {
+object RefactorLocation
   case object QualifiedName extends RefactorLocation('qualifiedName)
   case object File extends RefactorLocation('file)
   case object NewName extends RefactorLocation('newName)
@@ -74,11 +68,10 @@ object RefactorLocation {
   case object Start extends RefactorLocation('start)
   case object End extends RefactorLocation('end)
   case object MethodName extends RefactorLocation('methodName)
-}
 
 sealed abstract class RefactorType(val symbol: Symbol)
 
-object RefactorType {
+object RefactorType
   case object Rename extends RefactorType('rename)
   case object ExtractMethod extends RefactorType('extractMethod)
   case object ExtractLocal extends RefactorType('extractLocal)
@@ -93,14 +86,12 @@ object RefactorType {
         InlineLocal,
         OrganizeImports,
         AddImport)
-}
 
 case class SourceFileInfo(
     file: File,
     contents: Option[String] = None,
     contentsIn: Option[File] = None
-) {
+)
   // keep the log file sane for unsaved files
   override def toString =
     s"SourceFileInfo($file,${contents.map(_ => "...")},$contentsIn)"
-}

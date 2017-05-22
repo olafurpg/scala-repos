@@ -35,7 +35,7 @@ import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Insets
 import scalafx.scene.paint.Paint
 
-object BorderStroke {
+object BorderStroke
   implicit def sfxBorderStroke2jfx(v: BorderStroke): jfxsl.BorderStroke =
     if (v != null) v.delegate else null
 
@@ -58,14 +58,13 @@ object BorderStroke {
     * The default insets when "thin" is specified.
     */
   val Thin: BorderWidths = jfxsl.BorderStroke.THIN
-}
 
 /**
   *
   * Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/BorderStroke.html javafx.scene.layout.BorderStroke]].
   */
 class BorderStroke(override val delegate: jfxsl.BorderStroke)
-    extends SFXDelegate[jfxsl.BorderStroke] {
+    extends SFXDelegate[jfxsl.BorderStroke]
 
   /**
     * Creates a new BorderStroke.
@@ -157,4 +156,3 @@ class BorderStroke(override val delegate: jfxsl.BorderStroke)
     * Defines the thickness of each side of the BorderStroke.
     */
   def widths: BorderWidths = delegate.getWidths
-}

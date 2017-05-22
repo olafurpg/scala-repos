@@ -12,21 +12,16 @@ import scala.reflect.internal.util.Position
 /**
   * This class implements a Reporter that stores its reports in the set `infos`.
   */
-class StoreReporter extends Reporter {
-  case class Info(pos: Position, msg: String, severity: Severity) {
+class StoreReporter extends Reporter
+  case class Info(pos: Position, msg: String, severity: Severity)
     override def toString() = "pos: " + pos + " " + msg + " " + severity
-  }
   val infos = new mutable.LinkedHashSet[Info]
   protected def info0(
-      pos: Position, msg: String, severity: Severity, force: Boolean) {
-    if (!force) {
+      pos: Position, msg: String, severity: Severity, force: Boolean)
+    if (!force)
       infos += new Info(pos, msg, severity)
       severity.count += 1
-    }
-  }
 
-  override def reset() {
+  override def reset()
     super.reset()
     infos.clear()
-  }
-}

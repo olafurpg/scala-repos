@@ -32,9 +32,9 @@ import org.apache.spark.sql.SQLContext
   * bin/run-example ml.TrainValidationSplitExample
   * }}}
   */
-object TrainValidationSplitExample {
+object TrainValidationSplitExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("TrainValidationSplitExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -74,5 +74,3 @@ object TrainValidationSplitExample {
     model.transform(test).select("features", "label", "prediction").show()
 
     sc.stop()
-  }
-}

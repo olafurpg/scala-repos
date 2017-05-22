@@ -26,7 +26,7 @@ import org.specs2.mutable._
 import com.precog.yggdrasil._
 
 object CrossOrderingSpecs
-    extends Specification with CrossOrdering with FNDummyModule {
+    extends Specification with CrossOrdering with FNDummyModule
   import instructions._
   import dag._
   import TableModule.CrossOrder._
@@ -34,9 +34,9 @@ object CrossOrderingSpecs
   type Lib = RandomLibrary
   object library extends RandomLibrary
 
-  "cross ordering" should {
-    "order in the appropriate direction when one side is singleton" >> {
-      "left" >> {
+  "cross ordering" should
+    "order in the appropriate direction when one side is singleton" >>
+      "left" >>
         val line = Line(1, 1, "")
 
         val left = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -46,9 +46,8 @@ object CrossOrderingSpecs
         val expected = Join(Eq, Cross(Some(CrossLeft)), left, right)(line)
 
         orderCrosses(input) mustEqual expected
-      }
 
-      "right" >> {
+      "right" >>
         val line = Line(1, 1, "")
 
         val left = Const(CLong(42))(line)
@@ -58,10 +57,8 @@ object CrossOrderingSpecs
         val expected = Join(Eq, Cross(Some(CrossRight)), left, right)(line)
 
         orderCrosses(input) mustEqual expected
-      }
-    }
 
-    "refrain from sorting when sets are already aligned in match" in {
+    "refrain from sorting when sets are already aligned in match" in
       val line = Line(1, 1, "")
 
       val left = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -77,9 +74,8 @@ object CrossOrderingSpecs
                           left)(line)
 
       orderCrosses(input) mustEqual expected
-    }
 
-    "refrain from sorting when sets are already aligned in filter" in {
+    "refrain from sorting when sets are already aligned in filter" in
       val line = Line(1, 1, "")
 
       val left = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -94,9 +90,8 @@ object CrossOrderingSpecs
                left)(line)
 
       orderCrosses(input) mustEqual expected
-    }
 
-    "memoize RHS of cross when it is not a forcing point" in {
+    "memoize RHS of cross when it is not a forcing point" in
       val line = Line(1, 1, "")
 
       val foo = dag.AbsoluteLoad(Const(CString("/foo"))(line), JTextT)(line)
@@ -109,9 +104,8 @@ object CrossOrderingSpecs
       val expected = Join(Add, Cross(None), foo, Memoize(barAdd, 100))(line)
 
       orderCrosses(input) mustEqual expected
-    }
 
-    "refrain from memoizing RHS of cross when it is a forcing point" in {
+    "refrain from memoizing RHS of cross when it is a forcing point" in
       val line = Line(1, 1, "")
 
       val foo = dag.AbsoluteLoad(Const(CString("/foo"))(line), JTextT)(line)
@@ -120,9 +114,8 @@ object CrossOrderingSpecs
       val input = Join(Add, Cross(None), foo, bar)(line)
 
       orderCrosses(input) mustEqual input
-    }
 
-    "refrain from resorting by identity when cogrouping after an ordered cross" in {
+    "refrain from resorting by identity when cogrouping after an ordered cross" in
       val line = Line(1, 1, "")
 
       val foo = dag.AbsoluteLoad(Const(CString("/foo"))(line), JTextT)(line)
@@ -134,9 +127,8 @@ object CrossOrderingSpecs
           foo)(line)
 
       orderCrosses(input) mustEqual input
-    }
 
-    "refrain from resorting by value when cogrouping after an ordered cross" in {
+    "refrain from resorting by value when cogrouping after an ordered cross" in
       val line = Line(1, 1, "")
 
       val foo = dag.AbsoluteLoad(Const(CString("/foo"))(line), JTextT)(line)
@@ -150,6 +142,3 @@ object CrossOrderingSpecs
                        AddSortKey(foo, "a", "b", 0))(line)
 
       orderCrosses(input) mustEqual input
-    }
-  }
-}

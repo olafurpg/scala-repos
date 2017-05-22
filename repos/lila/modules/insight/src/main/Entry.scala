@@ -23,16 +23,15 @@ case class Entry(id: String, // gameId + w/b
                  ratingDiff: Int,
                  analysed: Boolean,
                  provisional: Boolean,
-                 date: DateTime) {
+                 date: DateTime)
 
   def gameId = id take Game.gameIdSize
-}
 
-case object Entry {
+case object Entry
 
   def povToId(pov: Pov) = pov.game.id + pov.color.letter
 
-  object BSONFields {
+  object BSONFields
     val id = "_id"
     val number = "n"
     val userId = "u"
@@ -52,8 +51,6 @@ case object Entry {
     val analysed = "a"
     val provisional = "pr"
     val date = "d"
-  }
-}
 
 case class Move(
     phase: Phase,
@@ -67,7 +64,7 @@ case class Move(
     luck: Option[Boolean])
 
 sealed abstract class Termination(val id: Int, val name: String)
-object Termination {
+object Termination
   case object ClockFlag extends Termination(1, "Clock flag")
   case object Disconnect extends Termination(2, "Disconnect")
   case object Resignation extends Termination(3, "Resignation")
@@ -77,13 +74,13 @@ object Termination {
 
   val all = List(
       ClockFlag, Disconnect, Resignation, Draw, Stalemate, Checkmate)
-  val byId = all map { p =>
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
+  toMap
 
   import chess.{Status => S}
 
-  def fromStatus(s: chess.Status) = s match {
+  def fromStatus(s: chess.Status) = s match
     case S.Timeout => Disconnect
     case S.Outoftime => ClockFlag
     case S.Resign => Resignation
@@ -94,88 +91,77 @@ object Termination {
     case S.Created | S.Started | S.Aborted | S.NoStart | S.UnknownFinish =>
       logger.error("Unfinished game in the insight indexer")
       Resignation
-  }
-}
 
 sealed abstract class Result(val id: Int, val name: String)
-object Result {
+object Result
   case object Win extends Result(1, "Victory")
   case object Draw extends Result(2, "Draw")
   case object Loss extends Result(3, "Defeat")
   val all = List(Win, Draw, Loss)
-  val byId = all map { p =>
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
+  toMap
   val idList = all.map(_.id)
-}
 
 sealed abstract class Phase(val id: Int, val name: String)
-object Phase {
+object Phase
   case object Opening extends Phase(1, "Opening")
   case object Middle extends Phase(2, "Middlegame")
   case object End extends Phase(3, "Endgame")
   val all = List(Opening, Middle, End)
-  val byId = all map { p =>
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
+  toMap
   def of(div: chess.Division, ply: Int): Phase =
-    div.middle.fold[Phase](Opening) {
+    div.middle.fold[Phase](Opening)
       case m if m > ply => Opening
       case m =>
-        div.end.fold[Phase](Middle) {
+        div.end.fold[Phase](Middle)
           case e if e > ply => Middle
           case _ => End
-        }
-    }
-}
 
 sealed abstract class Castling(val id: Int, val name: String)
-object Castling {
+object Castling
   object Kingside extends Castling(1, "Kingside castling")
   object Queenside extends Castling(2, "Queenside castling")
   object None extends Castling(3, "No castling")
   val all = List(Kingside, Queenside, None)
-  val byId = all map { p =>
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
-  def fromMoves(moves: List[String]) = moves.find(_ startsWith "O") match {
+  toMap
+  def fromMoves(moves: List[String]) = moves.find(_ startsWith "O") match
     case Some("O-O") => Kingside
     case Some("O-O-O") => Queenside
     case _ => None
-  }
-}
 
 sealed abstract class QueenTrade(val id: Boolean, val name: String)
-object QueenTrade {
+object QueenTrade
   object Yes extends QueenTrade(true, "Queen trade")
   object No extends QueenTrade(false, "No queen trade")
   val all = List(Yes, No)
   def apply(v: Boolean): QueenTrade = if (v) Yes else No
-}
 
 sealed abstract class RelativeStrength(val id: Int, val name: String)
-object RelativeStrength {
+object RelativeStrength
   case object MuchWeaker extends RelativeStrength(10, "Much weaker")
   case object Weaker extends RelativeStrength(20, "Weaker")
   case object Similar extends RelativeStrength(30, "Similar")
   case object Stronger extends RelativeStrength(40, "Stronger")
   case object MuchStronger extends RelativeStrength(50, "Much stronger")
   val all = List(MuchWeaker, Weaker, Similar, Stronger, MuchStronger)
-  val byId = all map { p =>
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
-  def apply(diff: Int) = diff match {
+  toMap
+  def apply(diff: Int) = diff match
     case d if d < -200 => MuchWeaker
     case d if d < -100 => Weaker
     case d if d > 200 => MuchStronger
     case d if d > 100 => Stronger
     case _ => Similar
-  }
-}
 
 sealed abstract class MovetimeRange(
     val id: Int, val name: String, val tenths: NonEmptyList[Int])
-object MovetimeRange {
+object MovetimeRange
   case object MTR1
       extends MovetimeRange(1, "0 to 1 second", NonEmptyList(1, 5, 10))
   case object MTR3
@@ -191,16 +177,14 @@ object MovetimeRange {
       extends MovetimeRange(60, "More than 30 seconds", NonEmptyList(400, 600))
   val all = List(MTR1, MTR3, MTR5, MTR10, MTR30, MTRInf)
   def reversedNoInf = all.reverse drop 1
-  val byId = all map { p =>
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
-}
+  toMap
 
 sealed abstract class MaterialRange(
-    val id: Int, val name: String, val imbalance: Int) {
+    val id: Int, val name: String, val imbalance: Int)
   def negative = imbalance <= 0
-}
-object MaterialRange {
+object MaterialRange
   case object Down4 extends MaterialRange(1, "Less than -6", -6)
   case object Down3 extends MaterialRange(2, "-3 to -6", -3)
   case object Down2 extends MaterialRange(3, "-1 to -3", -1)
@@ -212,7 +196,6 @@ object MaterialRange {
   case object Up4 extends MaterialRange(9, "More than +6", Int.MaxValue)
   val all = List(Down4, Down3, Down2, Down1, Equal, Up1, Up2, Up3, Up4)
   def reversedButEqualAndLast = all.diff(List(Equal, Up4)).reverse
-  val byId = all map { p =>
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
-}
+  toMap

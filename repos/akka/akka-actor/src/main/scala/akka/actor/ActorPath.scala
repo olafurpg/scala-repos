@@ -11,7 +11,7 @@ import java.lang.{StringBuilder ⇒ JStringBuilder}
 /**
   * Java API
   */
-object ActorPaths {
+object ActorPaths
   // static forwarders to `object ActorPath`, since `trait ActorPath`
   // could not be changed to `abstract ActorPath` in a binary compatible way
 
@@ -48,17 +48,15 @@ object ActorPaths {
     */
   final def isValidPathElement(s: String): Boolean =
     ActorPath.isValidPathElement(s)
-}
 
-object ActorPath {
+object ActorPath
 
   /**
     * Parse string as actor path; throws java.net.MalformedURLException if unable to do so.
     */
-  def fromString(s: String): ActorPath = s match {
+  def fromString(s: String): ActorPath = s match
     case ActorPathExtractor(addr, elems) ⇒ RootActorPath(addr) / elems
     case _ ⇒ throw new MalformedURLException("cannot parse as ActorPath: " + s)
-  }
 
   @deprecated("Use `isValidPathElement` instead", since = "2.3.8")
   val ElementRegex =
@@ -85,11 +83,11 @@ object ActorPath {
     * @param element actor path element to be validated
     * @param fullPath optional fullPath element that may be included for better error messages; null if not given
     */
-  final def validatePathElement(element: String, fullPath: String): Unit = {
+  final def validatePathElement(element: String, fullPath: String): Unit =
     def fullPathMsg =
       if (fullPath ne null) s""" (in path [$fullPath])""" else ""
 
-    (findInvalidPathElementCharPosition(element): @switch) match {
+    (findInvalidPathElementCharPosition(element): @switch) match
       case ValidPathCode ⇒
       // valid
       case EmptyPathCode ⇒
@@ -97,12 +95,10 @@ object ActorPath {
             s"Actor path element must not be empty $fullPathMsg")
       case invalidAt ⇒
         throw new InvalidActorNameException(
-            s"""Invalid actor path element [$element]$fullPathMsg, illegal character [${element(
-            invalidAt)}] at position: $invalidAt. """ +
+            s"""Invalid actor path element [$element]$fullPathMsg, illegal character [$element(
+            invalidAt)] at position: $invalidAt. """ +
             """Actor paths MUST: """ + """not start with `$`, """ +
             s"""include only ASCII letters and can only contain these special characters: ${ActorPath.ValidSymbols}.""")
-    }
-  }
 
   /**
     * This method is used to validate a path element (Actor Name).
@@ -116,7 +112,7 @@ object ActorPath {
 
   private final def findInvalidPathElementCharPosition(s: String): Int =
     if (s.isEmpty) EmptyPathCode
-    else {
+    else
       def isValidChar(c: Char): Boolean =
         (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
         (c >= '0' && c <= '9') || (ValidSymbols.indexOf(c) != -1)
@@ -128,20 +124,18 @@ object ActorPath {
       val len = s.length
       def validate(pos: Int): Int =
         if (pos < len)
-          s.charAt(pos) match {
+          s.charAt(pos) match
             case c if isValidChar(c) ⇒ validate(pos + 1)
             case '%'
                 if pos + 2 < len && isHexChar(s.charAt(pos + 1)) &&
                 isHexChar(s.charAt(pos + 2)) ⇒
               validate(pos + 3)
             case _ ⇒ pos
-          } else ValidPathCode
+          else ValidPathCode
 
       if (len > 0 && s.charAt(0) != '$') validate(0) else 0
-    }
 
   private[akka] final val emptyActorPath: immutable.Iterable[String] = List("")
-}
 
 /**
   * Actor path is a unique path to an actor that shows the creation path
@@ -161,7 +155,7 @@ object ActorPath {
   * when comparing actor paths.
   */
 @SerialVersionUID(1L)
-sealed trait ActorPath extends Comparable[ActorPath] with Serializable {
+sealed trait ActorPath extends Comparable[ActorPath] with Serializable
 
   /**
     * The Address under which this path can be reached; walks up the tree to
@@ -260,7 +254,6 @@ sealed trait ActorPath extends Comparable[ActorPath] with Serializable {
     * Creates a new ActorPath with same elements but with the specified `uid`.
     */
   private[akka] def withUid(uid: Int): ActorPath
-}
 
 /**
   * Root of the hierarchy of ActorPaths. There is exactly root per ActorSystem
@@ -268,7 +261,7 @@ sealed trait ActorPath extends Comparable[ActorPath] with Serializable {
   */
 @SerialVersionUID(1L)
 final case class RootActorPath(address: Address, name: String = "/")
-    extends ActorPath {
+    extends ActorPath
   require(
       name.length == 1 || name.indexOf('/', 1) == -1,
       "/ may only exist at the beginning of the root actors name, " +
@@ -281,10 +274,9 @@ final case class RootActorPath(address: Address, name: String = "/")
 
   override def root: RootActorPath = this
 
-  override def /(child: String): ActorPath = {
+  override def /(child: String): ActorPath =
     val (childName, uid) = ActorCell.splitNameAndUid(child)
     new ChildActorPath(this, childName, uid)
-  }
 
   override def elements: immutable.Iterable[String] = ActorPath.emptyActorPath
 
@@ -299,11 +291,10 @@ final case class RootActorPath(address: Address, name: String = "/")
   override def toSerializationFormatWithAddress(addr: Address): String =
     toStringWithAddress(addr)
 
-  override def compareTo(other: ActorPath): Int = other match {
+  override def compareTo(other: ActorPath): Int = other match
     case r: RootActorPath ⇒
       toString compareTo r.toString // FIXME make this cheaper by comparing address and name in isolation
     case c: ChildActorPath ⇒ 1
-  }
 
   /**
     * INTERNAL API
@@ -318,13 +309,12 @@ final case class RootActorPath(address: Address, name: String = "/")
     else
       throw new IllegalStateException(
           s"RootActorPath must have undefinedUid, [$uid != ${ActorCell.undefinedUid}")
-}
 
 @SerialVersionUID(1L)
 final class ChildActorPath private[akka](val parent: ActorPath,
                                          val name: String,
                                          override private[akka] val uid: Int)
-    extends ActorPath {
+    extends ActorPath
   if (name.indexOf('/') != -1)
     throw new IllegalArgumentException(
         "/ is a path separator and is not legal in ActorPath names: [%s]" format name)
@@ -337,29 +327,24 @@ final class ChildActorPath private[akka](val parent: ActorPath,
 
   override def address: Address = root.address
 
-  override def /(child: String): ActorPath = {
+  override def /(child: String): ActorPath =
     val (childName, uid) = ActorCell.splitNameAndUid(child)
     new ChildActorPath(this, childName, uid)
-  }
 
-  override def elements: immutable.Iterable[String] = {
+  override def elements: immutable.Iterable[String] =
     @tailrec
     def rec(p: ActorPath, acc: List[String]): immutable.Iterable[String] =
-      p match {
+      p match
         case r: RootActorPath ⇒ acc
         case _ ⇒ rec(p.parent, p.name :: acc)
-      }
     rec(this, Nil)
-  }
 
-  override def root: RootActorPath = {
+  override def root: RootActorPath =
     @tailrec
-    def rec(p: ActorPath): RootActorPath = p match {
+    def rec(p: ActorPath): RootActorPath = p match
       case r: RootActorPath ⇒ r
       case _ ⇒ rec(p.parent)
-    }
     rec(this)
-  }
 
   /**
     * INTERNAL API
@@ -368,35 +353,31 @@ final class ChildActorPath private[akka](val parent: ActorPath,
     if (uid == this.uid) this
     else new ChildActorPath(parent, name, uid)
 
-  override def toString: String = {
+  override def toString: String =
     val length = toStringLength
     buildToString(new JStringBuilder(length), length, 0, _.toString).toString
-  }
 
-  override def toSerializationFormat: String = {
+  override def toSerializationFormat: String =
     val length = toStringLength
     val sb = buildToString(
         new JStringBuilder(length + 12), length, 0, _.toString)
     appendUidFragment(sb).toString
-  }
 
   private def toStringLength: Int = toStringOffset + name.length
 
-  private val toStringOffset: Int = parent match {
+  private val toStringOffset: Int = parent match
     case r: RootActorPath ⇒ r.address.toString.length + r.name.length
     case c: ChildActorPath ⇒ c.toStringLength + 1
-  }
 
-  override def toStringWithAddress(addr: Address): String = {
+  override def toStringWithAddress(addr: Address): String =
     val diff = addressStringLengthDiff(addr)
     val length = toStringLength + diff
     buildToString(new JStringBuilder(length),
                   length,
                   diff,
                   _.toStringWithAddress(addr)).toString
-  }
 
-  override def toSerializationFormatWithAddress(addr: Address): String = {
+  override def toSerializationFormatWithAddress(addr: Address): String =
     val diff = addressStringLengthDiff(addr)
     val length = toStringLength + diff
     val sb = buildToString(new JStringBuilder(length + 12),
@@ -404,13 +385,11 @@ final class ChildActorPath private[akka](val parent: ActorPath,
                            diff,
                            _.toStringWithAddress(addr))
     appendUidFragment(sb).toString
-  }
 
-  private def addressStringLengthDiff(addr: Address): Int = {
+  private def addressStringLengthDiff(addr: Address): Int =
     val r = root
     if (r.address.host.isDefined) 0
     else (addr.toString.length - r.address.toString.length)
-  }
 
   /**
     * Optimized toString construction. Used by `toString`, `toSerializationFormat`,
@@ -426,9 +405,9 @@ final class ChildActorPath private[akka](val parent: ActorPath,
       sb: JStringBuilder,
       length: Int,
       diff: Int,
-      rootString: RootActorPath ⇒ String): JStringBuilder = {
+      rootString: RootActorPath ⇒ String): JStringBuilder =
     @tailrec
-    def rec(p: ActorPath): JStringBuilder = p match {
+    def rec(p: ActorPath): JStringBuilder = p match
       case r: RootActorPath ⇒
         val rootStr = rootString(r)
         sb.replace(0, rootStr.length, rootStr)
@@ -438,18 +417,15 @@ final class ChildActorPath private[akka](val parent: ActorPath,
         sb.replace(start, end, c.name)
         if (c ne this) sb.replace(end, end + 1, "/")
         rec(c.parent)
-    }
 
     sb.setLength(length)
     rec(this)
-  }
 
-  private def appendUidFragment(sb: JStringBuilder): JStringBuilder = {
+  private def appendUidFragment(sb: JStringBuilder): JStringBuilder =
     if (uid == ActorCell.undefinedUid) sb
     else sb.append("#").append(uid)
-  }
 
-  override def equals(other: Any): Boolean = {
+  override def equals(other: Any): Boolean =
     @tailrec
     def rec(left: ActorPath, right: ActorPath): Boolean =
       if (left eq right) true
@@ -457,41 +433,34 @@ final class ChildActorPath private[akka](val parent: ActorPath,
       else if (right.isInstanceOf[RootActorPath]) right equals left
       else left.name == right.name && rec(left.parent, right.parent)
 
-    other match {
+    other match
       case p: ActorPath ⇒ rec(this, p)
       case _ ⇒ false
-    }
-  }
 
   // TODO RK investigate Phil’s hash from scala.collection.mutable.HashTable.improve
-  override def hashCode: Int = {
+  override def hashCode: Int =
     import akka.routing.MurmurHash._
 
     @tailrec
-    def rec(p: ActorPath, h: Int, c: Int, k: Int): Int = p match {
+    def rec(p: ActorPath, h: Int, c: Int, k: Int): Int = p match
       case r: RootActorPath ⇒ extendHash(h, r.##, c, k)
       case _ ⇒
         rec(p.parent,
             extendHash(h, stringHash(name), c, k),
             nextMagicA(c),
             nextMagicB(k))
-    }
 
     finalizeHash(rec(this, startHash(42), startMagicA, startMagicB))
-  }
 
-  override def compareTo(other: ActorPath): Int = {
+  override def compareTo(other: ActorPath): Int =
     @tailrec
     def rec(left: ActorPath, right: ActorPath): Int =
       if (left eq right) 0
       else if (left.isInstanceOf[RootActorPath]) left compareTo right
       else if (right.isInstanceOf[RootActorPath]) -(right compareTo left)
-      else {
+      else
         val x = left.name compareTo right.name
         if (x == 0) rec(left.parent, right.parent)
         else x
-      }
 
     rec(this, other)
-  }
-}

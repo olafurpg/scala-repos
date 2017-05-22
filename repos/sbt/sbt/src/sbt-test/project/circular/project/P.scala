@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object Build extends Build {
+object Build extends Build
 
   lazy val root: Project = Project(
       "root",
@@ -15,4 +15,3 @@ object Build extends Build {
       file("sub"),
       dependencies = Seq(root)
   )
-}

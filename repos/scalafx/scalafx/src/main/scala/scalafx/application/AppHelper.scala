@@ -26,17 +26,13 @@
  */
 package scalafx.application
 
-private[application] class AppHelper extends javafx.application.Application {
-  def start(stage: javafx.stage.Stage) {
+private[application] class AppHelper extends javafx.application.Application
+  def start(stage: javafx.stage.Stage)
     JFXApp.ActiveJFXApp = this
     JFXApp.Stage = stage
     JFXApp.ActiveApp.init()
-    if (JFXApp.AutoShow) {
+    if (JFXApp.AutoShow)
       JFXApp.Stage.show()
-    }
-  }
 
-  override def stop() {
+  override def stop()
     JFXApp.ActiveApp.stopApp()
-  }
-}

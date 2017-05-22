@@ -7,32 +7,26 @@ import scala.language.reflectiveCalls
 /**
   * Provides control facilities.
   */
-object ControlUtil {
+object ControlUtil
 
   def defining[A, B](value: A)(f: A => B): B = f(value)
 
   def using[A <% { def close(): Unit }, B](resource: A)(f: A => B): B =
-    try f(resource) finally {
-      if (resource != null) {
-        ignoring(classOf[Throwable]) {
+    try f(resource) finally
+      if (resource != null)
+        ignoring(classOf[Throwable])
           resource.close()
-        }
-      }
-    }
 
   def using[T](git: Git)(f: Git => T): T =
     try f(git) finally git.getRepository.close()
 
   def using[T](git1: Git, git2: Git)(f: (Git, Git) => T): T =
-    try f(git1, git2) finally {
+    try f(git1, git2) finally
       git1.getRepository.close()
       git2.getRepository.close()
-    }
 
   def ignore[T](f: => Unit): Unit =
-    try {
+    try
       f
-    } catch {
+    catch
       case e: Exception => ()
-    }
-}

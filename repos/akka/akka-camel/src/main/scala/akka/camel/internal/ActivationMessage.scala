@@ -5,7 +5,7 @@ package akka.camel.internal
 
 import akka.actor.ActorRef
 
-private[camel] object ActivationProtocol {
+private[camel] object ActivationProtocol
 
   /**
     * Super class of all activation messages. Registration of the Camel [[akka.camel.Consumer]]s and [[akka.camel.Producer]]s
@@ -22,9 +22,8 @@ private[camel] object ActivationProtocol {
     * INTERNAL API
     *  companion object of <code>ActivationMessage</code>
     */
-  private[camel] object ActivationMessage {
+  private[camel] object ActivationMessage
     def unapply(msg: ActivationMessage): Option[ActorRef] = Option(msg.actor)
-  }
 
   /**
     * INTERNAL API
@@ -73,4 +72,3 @@ private[camel] object ActivationProtocol {
   final case class EndpointFailedToDeActivate(
       actorRef: ActorRef, cause: Throwable)
       extends ActivationMessage(actorRef)
-}

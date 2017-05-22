@@ -99,20 +99,17 @@ import org.apache.spark.sql.types.IntegerType
   * we could improve this in the current rule by applying more advanced expression canonicalization
   * techniques.
   */
-object DistinctAggregationRewriter extends Rule[LogicalPlan] {
+object DistinctAggregationRewriter extends Rule[LogicalPlan]
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan transformUp {
+  def apply(plan: LogicalPlan): LogicalPlan = plan transformUp
     case a: Aggregate => rewrite(a)
-  }
 
-  def rewrite(a: Aggregate): Aggregate = {
+  def rewrite(a: Aggregate): Aggregate =
 
     // Collect all aggregate expressions.
-    val aggExpressions = a.aggregateExpressions.flatMap { e =>
-      e.collect {
+    val aggExpressions = a.aggregateExpressions.flatMap  e =>
+      e.collect
         case ae: AggregateExpression => ae
-      }
-    }
 
     // Extract distinct aggregate expressions.
     val distinctAggGroups = aggExpressions
@@ -120,26 +117,24 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
       .groupBy(_.aggregateFunction.children.toSet)
 
     // Aggregation strategy can handle the query with single distinct
-    if (distinctAggGroups.size > 1) {
+    if (distinctAggGroups.size > 1)
       // Create the attributes for the grouping id and the group by clause.
       val gid =
         new AttributeReference("gid", IntegerType, false)(isGenerated = true)
-      val groupByMap = a.groupingExpressions.collect {
+      val groupByMap = a.groupingExpressions.collect
         case ne: NamedExpression => ne -> ne.toAttribute
         case e => e -> new AttributeReference(e.sql, e.dataType, e.nullable)()
-      }
       val groupByAttrs = groupByMap.map(_._2)
 
       // Functions used to modify aggregate functions and their inputs.
       def evalWithinGroup(id: Literal, e: Expression) =
         If(EqualTo(gid, id), e, nullify(e))
       def patchAggregateFunctionChildren(af: AggregateFunction)(
-          attrs: Expression => Expression): AggregateFunction = {
-        af.withNewChildren(af.children.map {
+          attrs: Expression => Expression): AggregateFunction =
+        af.withNewChildren(af.children.map
             case afc => attrs(afc)
-          })
+          )
           .asInstanceOf[AggregateFunction]
-      }
 
       // Setup unique distinct aggregate children.
       val distinctAggChildren = distinctAggGroups.keySet.flatten.toSeq.distinct
@@ -149,28 +144,25 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
 
       // Setup expand & aggregate operators for distinct aggregate expressions.
       val distinctAggChildAttrLookup = distinctAggChildAttrMap.toMap
-      val distinctAggOperatorMap = distinctAggGroups.toSeq.zipWithIndex.map {
+      val distinctAggOperatorMap = distinctAggGroups.toSeq.zipWithIndex.map
         case ((group, expressions), i) =>
           val id = Literal(i + 1)
 
           // Expand projection
           val projection =
-            distinctAggChildren.map {
+            distinctAggChildren.map
               case e if group.contains(e) => e
               case e => nullify(e)
-            } :+ id
+            :+ id
 
           // Final aggregate
-          val operators = expressions.map { e =>
+          val operators = expressions.map  e =>
             val af = e.aggregateFunction
-            val naf = patchAggregateFunctionChildren(af) { x =>
+            val naf = patchAggregateFunctionChildren(af)  x =>
               evalWithinGroup(id, distinctAggChildAttrLookup(x))
-            }
             (e, e.copy(aggregateFunction = naf, isDistinct = false))
-          }
 
           (projection, operators)
-      }
 
       // Setup expand for the 'regular' aggregate expressions.
       val regularAggExprs = aggExpressions.filter(!_.isDistinct)
@@ -182,7 +174,7 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
       // Setup aggregates for 'regular' aggregate expressions.
       val regularGroupId = Literal(0)
       val regularAggChildAttrLookup = regularAggChildAttrMap.toMap
-      val regularAggOperatorMap = regularAggExprs.map { e =>
+      val regularAggOperatorMap = regularAggExprs.map  e =>
         // Perform the actual aggregation in the initial aggregate.
         val af = patchAggregateFunctionChildren(e.aggregateFunction)(
             regularAggChildAttrLookup)
@@ -198,33 +190,29 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
 
         // Some aggregate functions (COUNT) have the special property that they can return a
         // non-null result without any input. We need to make sure we return a result in this case.
-        val resultWithDefault = af.defaultResult match {
+        val resultWithDefault = af.defaultResult match
           case Some(lit) => Coalesce(Seq(result, lit))
           case None => result
-        }
 
         // Return a Tuple3 containing:
         // i. The original aggregate expression (used for look ups).
         // ii. The actual aggregation operator (used in the first aggregate).
         // iii. The operator that selects and returns the result (used in the second aggregate).
         (e, operator, resultWithDefault)
-      }
 
       // Construct the regular aggregate input projection only if we need one.
       val regularAggProjection =
-        if (regularAggExprs.nonEmpty) {
+        if (regularAggExprs.nonEmpty)
           Seq(a.groupingExpressions ++ distinctAggChildren.map(nullify) ++ Seq(
                   regularGroupId) ++ regularAggChildren)
-        } else {
+        else
           Seq.empty[Seq[Expression]]
-        }
 
       // Construct the distinct aggregate input projections.
       val regularAggNulls = regularAggChildren.map(nullify)
-      val distinctAggProjections = distinctAggOperatorMap.map {
+      val distinctAggProjections = distinctAggOperatorMap.map
         case (projection, _) =>
           a.groupingExpressions ++ projection ++ regularAggNulls
-      }
 
       // Construct the expand operator.
       val expand = Expand(
@@ -246,8 +234,8 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
         (distinctAggOperatorMap.flatMap(_._2) ++ regularAggOperatorMap.map(
                 e => (e._1, e._3))).toMap
 
-      val patchedAggExpressions = a.aggregateExpressions.map { e =>
-        e.transformDown {
+      val patchedAggExpressions = a.aggregateExpressions.map  e =>
+        e.transformDown
           case e: Expression =>
             // The same GROUP BY clauses can have different forms (different names for instance) in
             // the groupBy and aggregate expressions of an aggregate. This makes a map lookup
@@ -256,13 +244,10 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
               .find(ge => e.semanticEquals(ge._1))
               .map(_._2)
               .getOrElse(transformations.getOrElse(e, e))
-        }.asInstanceOf[NamedExpression]
-      }
+        .asInstanceOf[NamedExpression]
       Aggregate(groupByAttrs, patchedAggExpressions, firstAggregate)
-    } else {
+    else
       a
-    }
-  }
 
   private def nullify(e: Expression) = Literal.create(null, e.dataType)
 
@@ -272,4 +257,3 @@ object DistinctAggregationRewriter extends Rule[LogicalPlan] {
     // children, in this case attribute reuse causes the input of the regular aggregate to bound to
     // the (nulled out) input of the distinct aggregate.
     e -> new AttributeReference(e.sql, e.dataType, true)()
-}

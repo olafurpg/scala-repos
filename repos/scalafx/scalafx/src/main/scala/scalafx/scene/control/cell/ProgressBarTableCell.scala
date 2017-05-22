@@ -39,7 +39,7 @@ import scalafx.scene.control.{TableCell, TableColumn}
   * @define PBTC `ProgressBarTableCell`
   *
   */
-object ProgressBarTableCell {
+object ProgressBarTableCell
 
   /**
     * Converts a ScalaFX $PBTC to its JavaFX counterpart.
@@ -61,7 +61,6 @@ object ProgressBarTableCell {
       ): (TableColumn[S, java.lang.Double] => TableCell[S, java.lang.Double]) =
     (view: TableColumn[S, java.lang.Double]) =>
       jfxscc.ProgressBarTableCell.forTableColumn[S]().call(view)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ProgressBarTableCell.html $PBTC]]

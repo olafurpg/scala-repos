@@ -4,9 +4,9 @@ import gitbucket.core.model._
 import gitbucket.core.service.IssuesService._
 import org.scalatest.FunSuite
 
-class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
-  test("getCommitStatues") {
-    withTestDB { implicit session =>
+class IssuesServiceSpec extends FunSuite with ServiceSpecBase
+  test("getCommitStatues")
+    withTestDB  implicit session =>
       val user1 = generateNewUserWithDBRepository("user1", "repo1")
 
       def getCommitStatues =
@@ -86,6 +86,3 @@ class IssuesServiceSpec extends FunSuite with ServiceSpecBase {
                                                 user1)
       assert(getCommitStatues == Map(("user1", "repo1", 2) -> CommitStatusInfo(
                   2, 1, None, None, None, None)))
-    }
-  }
-}

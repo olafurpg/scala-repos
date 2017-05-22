@@ -20,18 +20,15 @@ package com.twitter.summingbird.batch
   * Job state models the memory of when the next job should
   * try to cover
   */
-trait WaitingState[T] {
+trait WaitingState[T]
   // Record that you are running, and get the starting time:
   def begin: PrepareState[T]
-}
 
-trait PrepareState[T] {
+trait PrepareState[T]
   def requested: T
   def willAccept(available: T): Either[WaitingState[T], RunningState[T]]
   def fail(err: Throwable): WaitingState[T]
-}
 
-trait RunningState[T] {
+trait RunningState[T]
   def succeed: WaitingState[T]
   def fail(err: Throwable): WaitingState[T]
-}

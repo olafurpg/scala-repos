@@ -1,14 +1,12 @@
-object StringPlusMethod {
-  def error(message: String) = {
+object StringPlusMethod
+  def error(message: String) =
     val kind = "error: "
     /*start*/
     println(kind + message) /*end*/
-  }
 
   def warning(message: String) = println("warning: " + message)
 
   def info(message: String) = println("info: " + message)
-}
 /*
 object StringPlusMethod {
   def error(message: String) = {

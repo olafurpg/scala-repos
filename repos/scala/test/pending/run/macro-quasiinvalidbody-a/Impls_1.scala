@@ -1,5 +1,4 @@
 import scala.reflect.macros.blackbox.Context
 
-trait Impls {
+trait Impls
   def impl(c: Context)(x: c.Expr[Any]) = x
-}

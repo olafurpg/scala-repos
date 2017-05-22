@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.QuantileDiscretizer
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object QuantileDiscretizerExample {
-  def main(args: Array[String]) {
+object QuantileDiscretizerExample
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("QuantileDiscretizerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -44,6 +44,4 @@ object QuantileDiscretizerExample {
     result.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

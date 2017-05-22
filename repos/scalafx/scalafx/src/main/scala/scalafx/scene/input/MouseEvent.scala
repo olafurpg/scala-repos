@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventType
 
-object MouseEvent {
+object MouseEvent
   implicit def sfxMouseEvent2jfx(me: MouseEvent): jfxsi.MouseEvent =
     if (me != null) me.delegate else null
 
@@ -66,10 +66,9 @@ object MouseEvent {
 
   val MouseReleased: EventType[jfxsi.MouseEvent] =
     jfxsi.MouseEvent.MOUSE_RELEASED
-}
 
 class MouseEvent(override val delegate: jfxsi.MouseEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.MouseEvent] {
+    extends InputEvent(delegate) with SFXDelegate[jfxsi.MouseEvent]
 
   /**
     * Which, if any, of the mouse buttons is responsible for this event.
@@ -121,9 +120,8 @@ class MouseEvent(override val delegate: jfxsi.MouseEvent)
   /**
     * Augments drag detection behavior.
     */
-  def dragDetect_=(detected: Boolean) {
+  def dragDetect_=(detected: Boolean)
     delegate.setDragDetect(detected)
-  }
 
   /**
     * Whether or not the Meta modifier is down on this event.
@@ -165,4 +163,3 @@ class MouseEvent(override val delegate: jfxsi.MouseEvent)
 
   /** Indicates whether this event is synthesized from using a touch screen instead of usual mouse event source devices like mouse or track pad. */
   def synthesized: Boolean = delegate.isSynthesized
-}

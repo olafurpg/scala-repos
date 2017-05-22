@@ -5,18 +5,17 @@ package codeInsight.generation
   * Nikolay.Tropin
   * 8/23/13
   */
-class GenerateCompanionObjectTest extends ScalaGenerateTestBase {
+class GenerateCompanionObjectTest extends ScalaGenerateTestBase
   val handler = new ScalaGenerateCompanionObjectHandler
 
-  def testInCaseClass() {
+  def testInCaseClass()
     val text = s"""case class A(x: Int, s: String) {
                  |  def foo() {}
                  |  $CARET_MARKER
                  |}"""
     checkIsNotAvailable(text)
-  }
 
-  def testCompanionObjectExist() {
+  def testCompanionObjectExist()
     val text = s"""class A(x: Int, s: String) {
                  |  def foo() {}
                  |  $CARET_MARKER
@@ -25,26 +24,23 @@ class GenerateCompanionObjectTest extends ScalaGenerateTestBase {
                  |object A {}
                  |"""
     checkIsNotAvailable(text)
-  }
 
-  def testInObject() {
+  def testInObject()
     val text = s"""object A { $CARET_MARKER
                  |  def foo() {}
                  |  val bar = 1
                  |}"""
     checkIsNotAvailable(text)
-  }
 
-  def testInAnonymous() {
+  def testInAnonymous()
     val text = s"""object A {
                  |  val runnable = new Runnable {
                  |    def run() {} $CARET_MARKER
                  |  }
                  |}"""
     checkIsNotAvailable(text)
-  }
 
-  def testClass() {
+  def testClass()
     val text = s"""class A(x: Int, s: String) {
                  |  def foo() {}
                  |$CARET_MARKER
@@ -60,9 +56,8 @@ class GenerateCompanionObjectTest extends ScalaGenerateTestBase {
                    |}"""
     checkIsAvailable(text)
     testInvoke(text, result, checkCaret = true)
-  }
 
-  def testTrait() {
+  def testTrait()
     val text = s"""trait A {
                  |  def foo() {$CARET_MARKER}
                  |
@@ -78,9 +73,8 @@ class GenerateCompanionObjectTest extends ScalaGenerateTestBase {
                    |}"""
     checkIsAvailable(text)
     testInvoke(text, result, checkCaret = true)
-  }
 
-  def testInnerClass() {
+  def testInnerClass()
     val text = s"""trait A {
                  |  def foo()
                  |  class B {
@@ -100,5 +94,3 @@ class GenerateCompanionObjectTest extends ScalaGenerateTestBase {
                    |}"""
     checkIsAvailable(text)
     testInvoke(text, result, checkCaret = true)
-  }
-}

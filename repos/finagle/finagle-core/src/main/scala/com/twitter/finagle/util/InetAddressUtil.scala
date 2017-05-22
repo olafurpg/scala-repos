@@ -3,11 +3,11 @@ package com.twitter.finagle.core.util
 import com.twitter.util.{NetUtil => UtilNetUtil}
 import java.net.{InetAddress, Inet4Address}
 
-object InetAddressUtil {
+object InetAddressUtil
 
   /** Check if string is an IPv4 private address. */
   def isPrivateAddress(ip: InetAddress): Boolean =
-    ip match {
+    ip match
       case ip: Inet4Address =>
         val addr = ip.getAddress
         if (addr(0) == 10.toByte) // 10/8
@@ -19,14 +19,13 @@ object InetAddressUtil {
         else false
       case _ =>
         false
-    }
 
   /**
     * Faster InetAddress.getByName that uses NetUtil to parse the address instead
     * of regular expressions.
     */
-  def getByName(host: String): InetAddress = {
-    UtilNetUtil.ipToOptionInt(host) match {
+  def getByName(host: String): InetAddress =
+    UtilNetUtil.ipToOptionInt(host) match
       case Some(i) =>
         val bytes = Array[Byte](((i & 0xff000000) >> 24).toByte,
                                 ((i & 0x00ff0000) >> 16).toByte,
@@ -35,6 +34,3 @@ object InetAddressUtil {
         InetAddress.getByAddress(host, bytes)
       case None =>
         InetAddress.getByName(host)
-    }
-  }
-}

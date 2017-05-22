@@ -2,24 +2,21 @@ package com.twitter.logging
 
 import com.twitter.app.{App, Flaggable}
 
-object Logging {
-  implicit object LevelFlaggable extends Flaggable[Level] {
+object Logging
+  implicit object LevelFlaggable extends Flaggable[Level]
     def parse(s: String) =
       if (Logger.levelNames contains s) Logger.levelNames(s)
       else throw new Exception("Invalid log level: " + s)
-  }
 
-  implicit object PolicyFlaggable extends Flaggable[Policy] {
+  implicit object PolicyFlaggable extends Flaggable[Policy]
     def parse(s: String) = Policy.parse(s)
-  }
-}
 
 /**
   * A [[com.twitter.app.App]] mixin to use for logging. Defines flags
   * to configure the (default) logger setup.  When adding logging to a
   * twitter-server, mix in a trait that extends Logging but overrides factories.
   */
-trait Logging { self: App =>
+trait Logging  self: App =>
   import Logging._
 
   lazy val log = Logger(name)
@@ -65,7 +62,7 @@ trait Logging { self: App =>
     * [[com.twitter.logging.Handler]] which is configured via command line flags.
     * You can override this method to add additional handlers.
     */
-  def handlers: List[() => Handler] = {
+  def handlers: List[() => Handler] =
     val output = outputFlag()
     val level = Some(levelFlag())
     val handler =
@@ -85,17 +82,13 @@ trait Logging { self: App =>
           QueueingHandler(handler, asyncMaxSizeFlag(), inferClassNamesFlag())
         else handler
     )
-  }
 
-  def loggerFactories: List[LoggerFactory] = {
+  def loggerFactories: List[LoggerFactory] =
     LoggerFactory(
         node = "",
         level = Some(levelFlag()),
         handlers = handlers
     ) :: Nil
-  }
 
-  premain {
+  premain
     Logger.configure(loggerFactories)
-  }
-}

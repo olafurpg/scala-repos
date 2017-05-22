@@ -60,7 +60,7 @@ import scala.language.implicitConversions
   * @author based on Twitter's original implementation in com.twitter.util.
   * @since 2.10
   */
-sealed abstract class Try[+T] extends Product with Serializable {
+sealed abstract class Try[+T] extends Product with Serializable
 
   /** Returns `true` if the `Try` is a `Failure`, `false` otherwise.
     */
@@ -135,13 +135,12 @@ sealed abstract class Try[+T] extends Product with Serializable {
     */
   @deprecatedInheritance(
       "You were never supposed to be able to extend this class.", "2.12")
-  class WithFilter(p: T => Boolean) {
+  class WithFilter(p: T => Boolean)
     def map[U](f: T => U): Try[U] = Try.this filter p map f
     def flatMap[U](f: T => Try[U]): Try[U] = Try.this filter p flatMap f
     def foreach[U](f: T => U): Unit = Try.this filter p foreach f
     def withFilter(q: T => Boolean): WithFilter =
       new WithFilter(x => p(x) && q(x))
-  }
 
   /**
     * Applies the given function `f` if this is a `Failure`, otherwise returns this if this is a `Success`.
@@ -202,21 +201,18 @@ sealed abstract class Try[+T] extends Product with Serializable {
     * @return the results of applying the function
     */
   def fold[U](fa: Throwable => U, fb: T => U): U
-}
 
-object Try {
+object Try
 
   /** Constructs a `Try` using the by-name parameter.  This
     * method will ensure any non-fatal exception is caught and a
     * `Failure` object is returned.
     */
   def apply[T](r: => T): Try[T] =
-    try Success(r) catch {
+    try Success(r) catch
       case NonFatal(e) => Failure(e)
-    }
-}
 
-final case class Failure[+T](exception: Throwable) extends Try[T] {
+final case class Failure[+T](exception: Throwable) extends Try[T]
   override def isFailure: Boolean = true
   override def isSuccess: Boolean = false
   override def get: T = throw exception
@@ -236,21 +232,18 @@ final case class Failure[+T](exception: Throwable) extends Try[T] {
   override def recover[U >: T](
       @deprecatedName('rescueException) pf: PartialFunction[Throwable, U])
     : Try[U] =
-    try { if (pf isDefinedAt exception) Success(pf(exception)) else this } catch {
+    try { if (pf isDefinedAt exception) Success(pf(exception)) else this } catch
       case NonFatal(e) => Failure(e)
-    }
   override def recoverWith[U >: T](
       @deprecatedName('f) pf: PartialFunction[Throwable, Try[U]]): Try[U] =
-    try { if (pf isDefinedAt exception) pf(exception) else this } catch {
+    try { if (pf isDefinedAt exception) pf(exception) else this } catch
       case NonFatal(e) => Failure(e)
-    }
   override def failed: Try[Throwable] = Success(exception)
   override def toOption: Option[T] = None
   override def toEither: Either[Throwable, T] = Left(exception)
   override def fold[U](fa: Throwable => U, fb: T => U): U = fa(exception)
-}
 
-final case class Success[+T](value: T) extends Try[T] {
+final case class Success[+T](value: T) extends Try[T]
   override def isFailure: Boolean = false
   override def isSuccess: Boolean = true
   override def get = value
@@ -264,19 +257,19 @@ final case class Success[+T](value: T) extends Try[T] {
     this flatMap s
   override def map[U](f: T => U): Try[U] = Try[U](f(value))
   override def collect[U](pf: PartialFunction[T, U]): Try[U] =
-    try {
+    try
       if (pf isDefinedAt value) Success(pf(value))
       else
         Failure(
             new NoSuchElementException("Predicate does not hold for " + value))
-    } catch { case NonFatal(e) => Failure(e) }
+    catch { case NonFatal(e) => Failure(e) }
   override def filter(p: T => Boolean): Try[T] =
-    try {
+    try
       if (p(value)) this
       else
         Failure(
             new NoSuchElementException("Predicate does not hold for " + value))
-    } catch { case NonFatal(e) => Failure(e) }
+    catch { case NonFatal(e) => Failure(e) }
   override def recover[U >: T](
       @deprecatedName('rescueException) pf: PartialFunction[Throwable, U])
     : Try[U] = this
@@ -289,4 +282,3 @@ final case class Success[+T](value: T) extends Try[T] {
   override def toEither: Either[Throwable, T] = Right(value)
   override def fold[U](fa: Throwable => U, fb: T => U): U =
     try { fb(value) } catch { case NonFatal(e) => fa(e) }
-}

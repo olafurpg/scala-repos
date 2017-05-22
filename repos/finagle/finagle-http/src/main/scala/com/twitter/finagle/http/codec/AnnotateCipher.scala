@@ -9,16 +9,13 @@ import org.jboss.netty.handler.ssl.SslHandler
   * request befor sending it upstream.
   */
 private[http] class AnnotateCipher(headerName: String)
-    extends SimpleChannelHandler {
-  override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
-    (e.getMessage, ctx.getPipeline.get(classOf[SslHandler])) match {
+    extends SimpleChannelHandler
+  override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent)
+    (e.getMessage, ctx.getPipeline.get(classOf[SslHandler])) match
       case (req: HttpRequest, ssl: SslHandler) =>
         req.headers.set(
             headerName, ssl.getEngine().getSession().getCipherSuite())
       case _ =>
         ()
-    }
 
     super.messageReceived(ctx, e)
-  }
-}

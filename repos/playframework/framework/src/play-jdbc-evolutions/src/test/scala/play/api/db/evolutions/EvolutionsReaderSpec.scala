@@ -7,11 +7,11 @@ import java.io.File
 import org.specs2.mutable.Specification
 import play.api.{Environment, Mode}
 
-object EvolutionsReaderSpec extends Specification {
+object EvolutionsReaderSpec extends Specification
 
-  "EnvironmentEvolutionsReader" should {
+  "EnvironmentEvolutionsReader" should
 
-    "read evolution files from classpath" in {
+    "read evolution files from classpath" in
       val environment =
         Environment(new File("."), getClass.getClassLoader, Mode.Test)
       val reader = new EnvironmentEvolutionsReader(environment)
@@ -31,6 +31,3 @@ object EvolutionsReaderSpec extends Specification {
               ""),
           Evolution(4, "", "")
       )
-    }
-  }
-}

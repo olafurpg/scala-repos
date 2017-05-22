@@ -16,16 +16,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingCont
   * @author ilyas, Alexander Podkhalyuzin
   */
 class ScParenthesisedPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScParenthesisedPattern {
-  override def accept(visitor: PsiElementVisitor): Unit = {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScParenthesisedPattern
+  override def accept(visitor: PsiElementVisitor): Unit =
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   override def toString: String = "PatternInParenthesis"
 
   override def getType(ctx: TypingContext): TypeResult[ScType] =
     wrap(subpattern) flatMap { _.getType(ctx) }
-}

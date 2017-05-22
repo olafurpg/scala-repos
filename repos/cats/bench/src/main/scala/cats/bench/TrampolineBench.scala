@@ -7,7 +7,7 @@ import cats.implicits._
 import cats.free.Trampoline
 
 @State(Scope.Benchmark)
-class TrampolineBench {
+class TrampolineBench
 
   val N = 15
 
@@ -17,10 +17,10 @@ class TrampolineBench {
   def evalFib(n: Int): Eval[Int] =
     if (n < 2) Eval.now(n)
     else
-      for {
+      for
         x <- Eval.defer(evalFib(n - 1))
         y <- Eval.defer(evalFib(n - 2))
-      } yield x + y
+      yield x + y
 
   @Benchmark
   def trampoline(): Int = trampolineFib(N).run
@@ -28,10 +28,10 @@ class TrampolineBench {
   def trampolineFib(n: Int): Trampoline[Int] =
     if (n < 2) Trampoline.done(n)
     else
-      for {
+      for
         x <- Trampoline.suspend(trampolineFib(n - 1))
         y <- Trampoline.suspend(trampolineFib(n - 2))
-      } yield x + y
+      yield x + y
 
   // TailRec[A] only has .flatMap in 2.11.
 
@@ -43,4 +43,3 @@ class TrampolineBench {
   //     x <- TailCalls.tailcall(stdlibFib(n - 1))
   //     y <- TailCalls.tailcall(stdlibFib(n - 2))
   //   } yield x + y
-}

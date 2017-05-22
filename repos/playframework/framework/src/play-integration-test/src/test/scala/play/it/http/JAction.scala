@@ -25,20 +25,17 @@ import play.mvc.{Http, Result}
   *   }
   * }}}
   */
-object JAction {
-  def apply(app: Application, c: AbstractMockController): EssentialAction = {
+object JAction
+  def apply(app: Application, c: AbstractMockController): EssentialAction =
     val components = app.injector.instanceOf[JavaHandlerComponents]
-    new JavaAction(components) {
+    new JavaAction(components)
       val annotations = new JavaActionAnnotations(
           c.getClass, c.getClass.getMethod("action"))
       val parser = HandlerInvokerFactory.javaBodyParserToScala(
           components.getBodyParser(annotations.parser))
       def invocation = c.invocation
-    }
-  }
-}
 
-trait AbstractMockController {
+trait AbstractMockController
   def invocation: CompletionStage[Result]
 
   def ctx = Http.Context.current()
@@ -46,15 +43,12 @@ trait AbstractMockController {
   def request = ctx.request()
   def session = ctx.session()
   def flash = ctx.flash()
-}
 
-abstract class MockController extends AbstractMockController {
+abstract class MockController extends AbstractMockController
   def action: Result
   def invocation: CompletionStage[Result] =
     CompletableFuture.completedFuture(action)
-}
 
-abstract class AsyncMockController extends AbstractMockController {
+abstract class AsyncMockController extends AbstractMockController
   def action: CompletionStage[Result]
   def invocation: CompletionStage[Result] = action
-}

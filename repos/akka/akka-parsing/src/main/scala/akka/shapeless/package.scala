@@ -17,13 +17,11 @@
 package akka.shapeless
 
 /** Dependent unary function type. */
-trait DepFn1[T] {
+trait DepFn1[T]
   type Out
   def apply(t: T): Out
-}
 
 /** Dependent binary function type. */
-trait DepFn2[T, U] {
+trait DepFn2[T, U]
   type Out
   def apply(t: T, u: U): Out
-}

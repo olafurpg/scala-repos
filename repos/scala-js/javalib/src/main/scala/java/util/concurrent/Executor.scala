@@ -1,5 +1,4 @@
 package java.util.concurrent
 
-trait Executor {
+trait Executor
   def execute(command: Runnable): Unit
-}

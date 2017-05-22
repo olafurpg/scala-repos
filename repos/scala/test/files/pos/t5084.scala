@@ -1,5 +1,4 @@
 case class Search(tpe: Search.Value)
 
-object Search {
+object Search
   type Value = String
-}

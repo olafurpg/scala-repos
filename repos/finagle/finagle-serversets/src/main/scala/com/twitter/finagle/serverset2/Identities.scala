@@ -24,11 +24,10 @@ import com.twitter.finagle.util.LoadService
   * [[http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html ServiceLoader]]
   * documentation for further details.
   */
-trait Identity {
+trait Identity
   val scheme: String
   val id: Option[String]
   val priority: Int
-}
 
 /**
   * Identity that represents the user a process is running as.
@@ -37,29 +36,25 @@ trait Identity {
   * `id`: Some(username) if available
   * `priority`: 99
   */
-class UserIdentity extends Identity {
+class UserIdentity extends Identity
   val scheme = "user"
   val id = Some(System.getProperty("user.name"))
   val priority = 99
-}
 
 /**
   * Access all available Identities
   *
   * Identities are formatted as "/scheme/id".
   */
-private[finagle] object Identities {
-  private def filter(c: Identity): Option[String] = c.id match {
+private[finagle] object Identities
+  private def filter(c: Identity): Option[String] = c.id match
     case Some(id) => Some("/%s/%s".format(c.scheme, id))
     case _ => None
-  }
 
   /**
     * Return all available Identities
     *
     * @return a Sequence of Identities presented as "/scheme/id"
     */
-  def get(): Seq[String] = {
+  def get(): Seq[String] =
     LoadService[Identity]().sortBy(_.priority).flatMap(filter)
-  }
-}

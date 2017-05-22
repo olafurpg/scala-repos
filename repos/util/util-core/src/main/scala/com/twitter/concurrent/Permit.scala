@@ -1,5 +1,4 @@
 package com.twitter.concurrent
 
-trait Permit {
+trait Permit
   def release()
-}

@@ -22,7 +22,7 @@ import scala.collection.JavaConverters._
   * @author Pavel Fatin
   */
 class ScalaGradleDataService
-    extends AbstractDataService[ScalaModelData, Library](ScalaModelData.KEY) {
+    extends AbstractDataService[ScalaModelData, Library](ScalaModelData.KEY)
   override def createImporter(
       toImport: Seq[DataNode[ScalaModelData]],
       projectData: ProjectData,
@@ -30,41 +30,38 @@ class ScalaGradleDataService
       modelsProvider: IdeModifiableModelsProvider): Importer[ScalaModelData] =
     new ScalaGradleDataService.Importer(
         toImport, projectData, project, modelsProvider)
-}
 
-private object ScalaGradleDataService {
+private object ScalaGradleDataService
 
   private class Importer(dataToImport: Seq[DataNode[ScalaModelData]],
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
       extends AbstractImporter[ScalaModelData](
-          dataToImport, projectData, project, modelsProvider) {
+          dataToImport, projectData, project, modelsProvider)
 
     override def importData(): Unit =
       dataToImport.foreach(doImport)
 
     private def doImport(scalaNode: DataNode[ScalaModelData]): Unit =
-      for {
+      for
         module <- getIdeModuleByNode(scalaNode)
         compilerOptions = compilerOptionsFrom(scalaNode.getData)
         compilerClasspath = scalaNode.getData.getScalaClasspath.asScala.toSeq
-      } {
+      
         module.configureScalaCompilerSettingsFrom("Gradle", compilerOptions)
         configureScalaSdk(module, compilerClasspath)
-      }
 
     private def configureScalaSdk(
-        module: Module, compilerClasspath: Seq[File]): Unit = {
+        module: Module, compilerClasspath: Seq[File]): Unit =
       val compilerVersionOption =
         findScalaLibraryIn(compilerClasspath).flatMap(getVersionFromJar)
-      if (compilerVersionOption.isEmpty) {
+      if (compilerVersionOption.isEmpty)
         showWarning(
             ScalaBundle.message(
                 "gradle.dataService.scalaVersionCantBeDetected",
                 module.getName))
         return
-      }
       val compilerVersion = compilerVersionOption.get
 
       val scalaLibraries = getScalaLibraries
@@ -72,21 +69,18 @@ private object ScalaGradleDataService {
 
       val scalaLibraryOption =
         scalaLibraries.find(_.scalaVersion.contains(compilerVersion))
-      if (scalaLibraryOption.isEmpty) {
+      if (scalaLibraryOption.isEmpty)
         showWarning(
             ScalaBundle.message("gradle.dataService.scalaLibraryIsNotFound",
                                 compilerVersion.number,
                                 module.getName))
         return
-      }
       val scalaLibrary = scalaLibraryOption.get
 
-      if (!scalaLibrary.isScalaSdk) {
+      if (!scalaLibrary.isScalaSdk)
         val languageLevel =
           scalaLibrary.scalaLanguageLevel.getOrElse(ScalaLanguageLevel.Default)
         convertToScalaSdk(scalaLibrary, languageLevel, compilerClasspath)
-      }
-    }
 
     private def findScalaLibraryIn(classpath: Seq[File]): Option[File] =
       classpath.find(_.getName.startsWith(ScalaLibraryName))
@@ -95,7 +89,7 @@ private object ScalaGradleDataService {
       JarVersion.findFirstIn(scalaLibrary.getName).map(Version(_))
 
     private def compilerOptionsFrom(data: ScalaModelData): Seq[String] =
-      Option(data.getScalaCompileOptions).toSeq.flatMap { options =>
+      Option(data.getScalaCompileOptions).toSeq.flatMap  options =>
         val presentations = Seq(
             options.isDeprecation -> "-deprecation",
             options.isUnchecked -> "-unchecked",
@@ -112,14 +106,13 @@ private object ScalaGradleDataService {
             options.getAdditionalParameters.asScala else Seq.empty
 
         presentations.flatMap((include _).tupled) ++ additionalOptions
-      }
 
     private def isEmpty(s: String) = s == null || s.isEmpty
 
     private def include(b: Boolean, s: String): Seq[String] =
       if (b) Seq(s) else Seq.empty
 
-    private def showWarning(message: String): Unit = {
+    private def showWarning(message: String): Unit =
       val notification = new NotificationData("Gradle Sync",
                                               message,
                                               NotificationCategory.WARNING,
@@ -127,6 +120,3 @@ private object ScalaGradleDataService {
       ExternalSystemNotificationManager
         .getInstance(project)
         .showNotification(GradleConstants.SYSTEM_ID, notification);
-    }
-  }
-}

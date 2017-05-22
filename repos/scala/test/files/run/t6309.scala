@@ -1,17 +1,13 @@
-trait A {
+trait A
   def a: Int
-}
 
-object Test {
+object Test
   def f(a: Int) =
-    new {
+    new
       //private val b = a
       private[this] val b = a // crashes, sorry scalac
-    } with A {
+    with A
       def a = b
-    }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     println(f(7).a)
-  }
-}

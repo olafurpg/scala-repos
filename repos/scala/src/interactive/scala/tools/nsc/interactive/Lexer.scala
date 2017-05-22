@@ -5,7 +5,7 @@ import java.io.Reader
 /** Companion object of class `Lexer` which defines tokens and some utility concepts
   *  used for tokens and lexers
   */
-object Lexer {
+object Lexer
 
   /** An exception raised if an input does not correspond to what's expected
     *  @param   rdr   the lexer from which the bad input is read
@@ -17,9 +17,8 @@ object Lexer {
   /** The class of tokens, i.e. descriptions of input words (or: lexemes).
     *  @param str    the characters making up this token
     */
-  class Token(val str: String) {
+  class Token(val str: String)
     override def toString = str
-  }
 
   /** A subclass of `Token` representing single-character delimiters
     *  @param char the delimiter character making up this token
@@ -33,9 +32,8 @@ object Lexer {
   case class FloatLit(override val str: String) extends Token(str)
 
   /** A subclass of token representing string literals */
-  case class StringLit(override val str: String) extends Token(str) {
+  case class StringLit(override val str: String) extends Token(str)
     override def toString = quoted(str)
-  }
 
   /** The `true` token */
   val TrueLit = new Token("true")
@@ -73,13 +71,12 @@ object Lexer {
   /** The token representing end of input */
   val EOF = new Token("<end of input>")
 
-  private def toUDigit(ch: Int): Char = {
+  private def toUDigit(ch: Int): Char =
     val d = ch & 0xF
     (if (d < 10) d + '0' else d - 10 + 'A').toChar
-  }
 
-  private def addToStr(buf: StringBuilder, ch: Char) {
-    ch match {
+  private def addToStr(buf: StringBuilder, ch: Char)
+    ch match
       case '"' => buf ++= "\\\""
       case '\b' => buf ++= "\\b"
       case '\f' => buf ++= "\\f"
@@ -92,8 +89,6 @@ object Lexer {
         else
           buf ++= "\\u" += toUDigit(ch >>> 12) += toUDigit(ch >>> 8) +=
             toUDigit(ch >>> 4) += toUDigit(ch.toInt)
-    }
-  }
 
   /** Returns given string enclosed in `"`-quotes with all string characters escaped
     *  so that they correspond to the JSON standard.
@@ -102,15 +97,13 @@ object Lexer {
     *  escaped as a four hex-digit unicode character of the form `\ u x x x x`.
     *  @param   str   the string to be quoted
     */
-  def quoted(str: String): String = {
+  def quoted(str: String): String =
     val buf = new StringBuilder += '\"'
     str foreach (addToStr(buf, _))
     buf += '\"'
     buf.toString
-  }
 
   private val BUF_SIZE = 2 << 16
-}
 
 import Lexer._
 
@@ -126,7 +119,7 @@ import Lexer._
   *
   * @param rd   the reader from which characters are read.
   */
-class Lexer(rd: Reader) {
+class Lexer(rd: Reader)
 
   /** The last-read character */
   var ch: Char = 0
@@ -146,17 +139,15 @@ class Lexer(rd: Reader) {
   private var bp = 0
 
   /** Reads next character into `ch` */
-  def nextChar() {
+  def nextChar()
     assert(!atEOF)
-    if (bp == nread) {
+    if (bp == nread)
       nread = rd.read(buf)
       bp = 0
       if (nread <= 0) { ch = 0; atEOF = true; return }
-    }
     ch = buf(bp)
     bp += 1
     pos += 1
-  }
 
   /** If last-read character equals given character, reads next character,
     *  otherwise raises an error
@@ -168,25 +159,23 @@ class Lexer(rd: Reader) {
 
   private val sb = new StringBuilder
 
-  private def putChar() {
+  private def putChar()
     sb += ch; nextChar()
-  }
 
-  private def putAcceptString(str: String) {
+  private def putAcceptString(str: String)
     str foreach acceptChar
     sb ++= str
-  }
 
   /** Skips whitespace and reads next lexeme into `token`
     *  @throws  MalformedInput if lexeme not recognized as a valid token
     */
-  def nextToken() {
+  def nextToken()
     sb.clear()
     while (!atEOF && ch <= ' ') nextChar()
     tokenPos = pos - 1
     if (atEOF) token = EOF
     else
-      ch match {
+      ch match
         case '(' => putChar(); token = LParen
         case ')' => putChar(); token = RParen
         case '{' => putChar(); token = LBrace
@@ -202,28 +191,25 @@ class Lexer(rd: Reader) {
         case '-' | '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' =>
           getNumber()
         case _ => error("unrecognized start of token: '" + ch + "'")
-      }
     //println("["+token+"]")
-  }
 
   /** Reads a string literal, and forms a `StringLit` token from it.
     *  Last-read input character `ch` must be opening `"`-quote.
     *  @throws  MalformedInput if lexeme not recognized as a string literal.
     */
-  def getString() {
-    def udigit() = {
+  def getString()
+    def udigit() =
       nextChar()
       if ('0' <= ch && ch <= '9') ch - '9'
       else if ('A' <= ch && ch <= 'F') ch - 'A' + 10
       else if ('a' <= ch && ch <= 'f') ch - 'a' + 10
       else error("illegal unicode escape character: '" + ch + "'")
-    }
     val delim = ch
     nextChar()
-    while (ch != delim && ch >= ' ') {
-      if (ch == '\\') {
+    while (ch != delim && ch >= ' ')
+      if (ch == '\\')
         nextChar()
-        ch match {
+        ch match
           case '\'' => sb += '\''
           case '"' => sb += '"'
           case '\\' => sb += '\\'
@@ -236,21 +222,17 @@ class Lexer(rd: Reader) {
           case 'u' =>
             sb += (udigit() << 12 | udigit() << 8 | udigit() << 4 | udigit()).toChar
           case _ => error("illegal escape character: '" + ch + "'")
-        }
         nextChar()
-      } else {
+      else
         putChar()
-      }
-    }
     acceptChar(delim)
     token = StringLit(sb.toString)
-  }
 
   /** Reads a numeric literal, and forms an `IntLit` or `FloatLit` token from it.
     *  Last-read input character `ch` must be either `-` or a digit.
     *  @throws  MalformedInput if lexeme not recognized as a numeric literal.
     */
-  def getNumber() {
+  def getNumber()
     def digit() =
       if ('0' <= ch && ch <= '9') putChar()
       else error("<digit> expected")
@@ -260,28 +242,24 @@ class Lexer(rd: Reader) {
     if (ch == '-') putChar()
     if (ch == '0') digit()
     else digits()
-    if (ch == '.') {
+    if (ch == '.')
       isFloating = true
       putChar()
       digits()
-    }
-    if (ch == 'e' || ch == 'E') {
+    if (ch == 'e' || ch == 'E')
       isFloating = true
       putChar()
       if (ch == '+' || ch == '-') putChar()
       digits()
-    }
     token = if (isFloating) FloatLit(sb.toString) else IntLit(sb.toString)
-  }
 
   /** If current token equals given token, reads next token, otherwise raises an error.
     *  @param  t   the given token to compare current token with
     *  @throws MalformedInput  if the two tokens do not match.
     */
-  def accept(t: Token) {
+  def accept(t: Token)
     if (token == t) nextToken()
     else error(t + " expected, but " + token + " found")
-  }
 
   /** The current token is a delimiter consisting of given character, reads next token,
     *  otherwise raises an error.
@@ -289,12 +267,10 @@ class Lexer(rd: Reader) {
     *  @throws MalformedInput  if the current token `token` is not a delimiter, or
     *                          consists of a character different from `c`.
     */
-  def accept(ch: Char) {
-    token match {
+  def accept(ch: Char)
+    token match
       case Delim(`ch`) => nextToken()
       case _ => accept(Delim(ch))
-    }
-  }
 
   /** Always throws a `MalformedInput` exception with given error message.
     *  @param msg  the error message
@@ -303,4 +279,3 @@ class Lexer(rd: Reader) {
 
   nextChar()
   nextToken()
-}

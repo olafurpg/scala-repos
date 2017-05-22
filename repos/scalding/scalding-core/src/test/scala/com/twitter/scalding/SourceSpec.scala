@@ -21,11 +21,11 @@ import cascading.pipe.Pipe
 import cascading.tuple.Fields
 import com.twitter.scalding.source._
 
-class SourceSpec extends WordSpec with Matchers {
+class SourceSpec extends WordSpec with Matchers
   import Dsl._
 
-  "A case class Source" should {
-    "inherit equality properly from TimePathedSource" in {
+  "A case class Source" should
+    "inherit equality properly from TimePathedSource" in
       implicit val tz = DateOps.UTC
       implicit val parser = DateParser.default
 
@@ -45,31 +45,24 @@ class SourceSpec extends WordSpec with Matchers {
       b should not be c
       a should not be d
       a shouldBe e
-    }
-  }
 
   class DailySuffixTsvSecond(prefix: String, fs: Fields = Fields.ALL)(
       override implicit val dateRange: DateRange)
-      extends DailySuffixSource(prefix, dateRange) with DelimitedScheme {
+      extends DailySuffixSource(prefix, dateRange) with DelimitedScheme
     override val fields = fs
-  }
 
-  "A Source with overriden transformForRead and transformForWrite" should {
-    "respect these overrides even for tests" in {
+  "A Source with overriden transformForRead and transformForWrite" should
+    "respect these overrides even for tests" in
       JobTest(new AddRemoveOneJob(_))
         .source(AddOneTsv("input"), List((0, "0"), (1, "1")))
-        .sink[(String, String)](RemoveOneTsv("output")) { buf =>
+        .sink[(String, String)](RemoveOneTsv("output"))  buf =>
           buf.toSet shouldBe Set(("0", "0"), ("1", "1"))
-        }
         .run
         .finish
-    }
-  }
-}
 
 case class AddOneTsv(p: String)
     extends FixedPathSource(p) with DelimitedScheme
-    with Mappable[(Int, String, String)] {
+    with Mappable[(Int, String, String)]
   import Dsl._
   import TDsl._
   override val transformInTest = true
@@ -77,35 +70,27 @@ case class AddOneTsv(p: String)
   override def converter[U >: (Int, String, String)] =
     TupleConverter.asSuperConverter[(Int, String, String), U](
         implicitly[TupleConverter[(Int, String, String)]])
-  override def transformForRead(p: Pipe) = {
-    p.mapTo((0, 1) -> ('one, 'two, 'three)) { t: (Int, String) =>
+  override def transformForRead(p: Pipe) =
+    p.mapTo((0, 1) -> ('one, 'two, 'three))  t: (Int, String) =>
       t :+ "1"
-    }
-  }
-}
 
 case class RemoveOneTsv(p: String)
     extends FixedPathSource(p) with DelimitedScheme
-    with Mappable[(Int, String, String)] {
+    with Mappable[(Int, String, String)]
   override val transformInTest = true
   import Dsl._
   override val sourceFields = new Fields("one", "two", "three")
   override def converter[U >: (Int, String, String)] =
     TupleConverter.asSuperConverter[(Int, String, String), U](
         implicitly[TupleConverter[(Int, String, String)]])
-  override def transformForWrite(p: Pipe) = {
-    p.mapTo(('one, 'two, 'three) -> (0, 1)) { t: (Int, String, String) =>
+  override def transformForWrite(p: Pipe) =
+    p.mapTo(('one, 'two, 'three) -> (0, 1))  t: (Int, String, String) =>
       (t._1, t._2)
-    }
-  }
-}
 
-class AddRemoveOneJob(args: Args) extends Job(args) {
+class AddRemoveOneJob(args: Args) extends Job(args)
   AddOneTsv("input").read
 
   //just for fun lets just switch all 1s with 2s
-    .map('three -> 'three) { s: String =>
+    .map('three -> 'three)  s: String =>
       "2"
-    }
     .write(RemoveOneTsv("output"))
-}

@@ -27,6 +27,5 @@ import org.apache.kafka.common.errors.CorruptRecordException
   * InvalidMessageException extend CorruptRecordException allows us to change server code without affecting the client.
   */
 class InvalidMessageException(message: String)
-    extends CorruptRecordException(message) {
+    extends CorruptRecordException(message)
   def this() = this(null)
-}

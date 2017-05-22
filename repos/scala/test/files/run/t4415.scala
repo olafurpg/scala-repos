@@ -10,14 +10,13 @@
   * fatal error (server aborted): not enough arguments for method body%3: (val p: MyProp[java.lang.String])MyProp[_33].
   * Unspecified value parameter p.
   */
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     convert(new SubclassProperty)
-  }
 
-  def convert(prop: TopProperty): MyProp[_] = {
-    prop match {
+  def convert(prop: TopProperty): MyProp[_] =
+    prop match
 
       ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
       //case SubclassSecondMatch(p) => p // if these lines are present, the compiler crashes. If commented, unsafe byte
@@ -26,9 +25,6 @@ object Test {
 
       case SubclassMatch(p) => p
       case StandardMatch(p) => p
-    }
-  }
-}
 
 class TopProperty
 
@@ -41,46 +37,34 @@ class SubclassSecondProperty extends StandardProperty
 trait MyProp[T]
 case class MyPropImpl[T]() extends MyProp[T]
 
-object SubclassMatch {
+object SubclassMatch
 
-  def unapply(prop: SubclassProperty): Option[MyProp[String]] = {
+  def unapply(prop: SubclassProperty): Option[MyProp[String]] =
     Some(new MyPropImpl)
-  }
 
-  def apply(prop: MyProp[String]): SubclassProperty = {
+  def apply(prop: MyProp[String]): SubclassProperty =
     new SubclassProperty()
-  }
-}
 
-object StandardMatch {
+object StandardMatch
 
-  def unapply(prop: StandardProperty): Option[MyProp[String]] = {
+  def unapply(prop: StandardProperty): Option[MyProp[String]] =
     Some(new MyPropImpl)
-  }
 
-  def apply(prop: MyProp[String]): StandardProperty = {
+  def apply(prop: MyProp[String]): StandardProperty =
     new StandardProperty()
-  }
-}
 
-object SubclassSecondMatch {
+object SubclassSecondMatch
 
-  def unapply(prop: SubclassSecondProperty): Option[MyProp[BigInt]] = {
+  def unapply(prop: SubclassSecondProperty): Option[MyProp[BigInt]] =
     Some(new MyPropImpl)
-  }
 
-  def apply(prop: MyProp[String]): SubclassSecondProperty = {
+  def apply(prop: MyProp[String]): SubclassSecondProperty =
     new SubclassSecondProperty()
-  }
-}
 
-object SecondMatch {
+object SecondMatch
 
-  def unapply(prop: SecondProperty): Option[MyProp[BigInt]] = {
+  def unapply(prop: SecondProperty): Option[MyProp[BigInt]] =
     Some(new MyPropImpl)
-  }
 
-  def apply(prop: MyProp[String]): SecondProperty = {
+  def apply(prop: MyProp[String]): SecondProperty =
     new SecondProperty()
-  }
-}

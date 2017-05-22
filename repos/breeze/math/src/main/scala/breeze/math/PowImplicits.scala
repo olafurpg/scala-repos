@@ -7,22 +7,17 @@ import breeze.numerics.IntMath
   *
   * @author dlwh
   **/
-object PowImplicits {
+object PowImplicits
   // just to make some unrolling less terrible
   // TODO: move this somewhere sensible
-  implicit class DoublePow(x: Double) {
+  implicit class DoublePow(x: Double)
     def pow(y: Double) = math.pow(x, y)
-  }
 
-  implicit class FloatPow(x: Float) {
+  implicit class FloatPow(x: Float)
     def pow(y: Float) = math.pow(x, y).toFloat
-  }
 
-  implicit class IntPow(x: Int) {
+  implicit class IntPow(x: Int)
     def pow(y: Int) = IntMath.ipow(x, y)
-  }
 
-  implicit class LongPow(x: Long) {
+  implicit class LongPow(x: Long)
     def pow(y: Long) = IntMath.ipow(x, y)
-  }
-}

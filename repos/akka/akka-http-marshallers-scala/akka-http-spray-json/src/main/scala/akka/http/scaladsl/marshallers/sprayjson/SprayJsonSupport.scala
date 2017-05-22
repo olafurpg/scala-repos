@@ -14,7 +14,7 @@ import spray.json._
 /**
   * A trait providing automatic to and from JSON marshalling/unmarshalling using an in-scope *spray-json* protocol.
   */
-trait SprayJsonSupport {
+trait SprayJsonSupport
   implicit def sprayJsonUnmarshallerConverter[T](
       reader: RootJsonReader[T]): FromEntityUnmarshaller[T] =
     sprayJsonUnmarshaller(reader)
@@ -24,12 +24,11 @@ trait SprayJsonSupport {
   implicit def sprayJsValueUnmarshaller: FromEntityUnmarshaller[JsValue] =
     Unmarshaller.byteStringUnmarshaller
       .forContentTypes(`application/json`)
-      .mapWithCharset { (data, charset) ⇒
+      .mapWithCharset  (data, charset) ⇒
         val input =
           if (charset == HttpCharsets.`UTF-8`) ParserInput(data.toArray)
           else ParserInput(data.decodeString(charset.nioCharset.name)) // FIXME: identify charset by instance, not by name!
         JsonParser(input)
-      }
 
   implicit def sprayJsonMarshallerConverter[T](writer: RootJsonWriter[T])(
       implicit printer: JsonPrinter = PrettyPrinter): ToEntityMarshaller[T] =
@@ -42,5 +41,4 @@ trait SprayJsonSupport {
       implicit printer: JsonPrinter = PrettyPrinter)
     : ToEntityMarshaller[JsValue] =
     Marshaller.StringMarshaller.wrap(MediaTypes.`application/json`)(printer)
-}
 object SprayJsonSupport extends SprayJsonSupport

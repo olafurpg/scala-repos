@@ -36,12 +36,11 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 import scalafx.scene.layout.Pane
 
-object TextFlow {
+object TextFlow
   implicit def sfxTextFlow2jfx(v: TextFlow): jfxst.TextFlow =
     if (v != null) v.delegate else null
 
   def classCssMetaData = jfxst.TextFlow.getClassCssMetaData
-}
 
 /**
   * TextFlow is special layout designed to lay out rich text. It can be used to layout several
@@ -53,7 +52,7 @@ object TextFlow {
   * Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/text/TextFlow.html]]
   */
 class TextFlow(override val delegate: jfxst.TextFlow = new jfxst.TextFlow)
-    extends Pane(delegate) with SFXDelegate[jfxst.TextFlow] {
+    extends Pane(delegate) with SFXDelegate[jfxst.TextFlow]
 
   /**
     * Defines horizontal text alignment.
@@ -65,18 +64,16 @@ class TextFlow(override val delegate: jfxst.TextFlow = new jfxst.TextFlow)
     * Defines the vertical space in pixel between lines.
     */
   def lineSpacing: DoubleProperty = delegate.lineSpacingProperty
-  def lineSpacing_=(v: Double) {
+  def lineSpacing_=(v: Double)
     lineSpacing() = v
-  }
 
   /**
     * Defines horizontal text alignment.
     */
   def textAlignment: ObjectProperty[jfxst.TextAlignment] =
     delegate.textAlignmentProperty
-  def textAlignment_=(v: TextAlignment) {
+  def textAlignment_=(v: TextAlignment)
     textAlignment() = v
-  }
 
   /**
     * Calculates the baseline offset based on the first managed child.
@@ -86,7 +83,5 @@ class TextFlow(override val delegate: jfxst.TextFlow = new jfxst.TextFlow)
   /**
     * Requests a layout pass to be performed before the next scene is rendered.
     */
-  def requestLayout() {
+  def requestLayout()
     delegate.requestLayout()
-  }
-}

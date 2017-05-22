@@ -1,6 +1,6 @@
 package spire
 
-package object syntax {
+package object syntax
   object cfor extends CforSyntax
   object literals extends LiteralsSyntax
 
@@ -61,4 +61,3 @@ package object syntax {
   object unbound extends UnboundSyntax
 
   object interval extends IntervalSyntax
-}

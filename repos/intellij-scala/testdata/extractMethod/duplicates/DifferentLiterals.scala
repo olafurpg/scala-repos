@@ -1,7 +1,7 @@
-object DifferentLiterals {
+object DifferentLiterals
 
-  def log(message: String, level: Int) {
-    level match {
+  def log(message: String, level: Int)
+    level match
       case 0 =>
         /*start*/
         println("info: ")
@@ -9,9 +9,6 @@ object DifferentLiterals {
       case 1 =>
         println("warning: ")
         println(message)
-    }
-  }
-}
 /*
 object DifferentLiterals {
 

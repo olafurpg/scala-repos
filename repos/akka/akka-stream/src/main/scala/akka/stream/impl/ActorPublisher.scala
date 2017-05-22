@@ -14,7 +14,7 @@ import org.reactivestreams.Subscription
 /**
   * INTERNAL API
   */
-private[akka] object ActorPublisher {
+private[akka] object ActorPublisher
   val NormalShutdownReasonMessage = "Cannot subscribe to shut-down Publisher"
   class NormalShutdownException
       extends IllegalStateException(NormalShutdownReasonMessage)
@@ -22,13 +22,11 @@ private[akka] object ActorPublisher {
   val NormalShutdownReason: Throwable = new NormalShutdownException
   val SomeNormalShutdownReason: Some[Throwable] = Some(NormalShutdownReason)
 
-  def apply[T](impl: ActorRef): ActorPublisher[T] = {
+  def apply[T](impl: ActorRef): ActorPublisher[T] =
     val a = new ActorPublisher[T](impl)
     // Resolve cyclic dependency with actor. This MUST be the first message no matter what.
     impl ! ExposedPublisher(a.asInstanceOf[ActorPublisher[Any]])
     a
-  }
-}
 
 /**
   * INTERNAL API
@@ -37,7 +35,7 @@ private[akka] object ActorPublisher {
   * ActorRef! If you don't need to subclass, prefer the apply() method on the companion object which takes care of this.
   */
 private[akka] class ActorPublisher[T](val impl: ActorRef)
-    extends Publisher[T] {
+    extends Publisher[T]
   import ReactiveStreamsCompliance._
 
   // The subscriber of an subscription attempt is first placed in this list of pending subscribers.
@@ -50,38 +48,32 @@ private[akka] class ActorPublisher[T](val impl: ActorRef)
 
   protected val wakeUpMsg: Any = SubscribePending
 
-  override def subscribe(subscriber: Subscriber[_ >: T]): Unit = {
+  override def subscribe(subscriber: Subscriber[_ >: T]): Unit =
     requireNonNullSubscriber(subscriber)
-    @tailrec def doSubscribe(): Unit = {
+    @tailrec def doSubscribe(): Unit =
       val current = pendingSubscribers.get
       if (current eq null) reportSubscribeFailure(subscriber)
-      else {
+      else
         if (pendingSubscribers.compareAndSet(current, subscriber +: current))
           impl ! wakeUpMsg
         else doSubscribe() // CAS retry
-      }
-    }
 
     doSubscribe()
-  }
 
-  def takePendingSubscribers(): immutable.Seq[Subscriber[_ >: T]] = {
+  def takePendingSubscribers(): immutable.Seq[Subscriber[_ >: T]] =
     val pending = pendingSubscribers.getAndSet(Nil)
     if (pending eq null) Nil else pending.reverse
-  }
 
-  def shutdown(reason: Option[Throwable]): Unit = {
+  def shutdown(reason: Option[Throwable]): Unit =
     shutdownReason = reason
-    pendingSubscribers.getAndSet(null) match {
+    pendingSubscribers.getAndSet(null) match
       case null ⇒ // already called earlier
       case pending ⇒ pending foreach reportSubscribeFailure
-    }
-  }
 
   @volatile private var shutdownReason: Option[Throwable] = None
 
   private def reportSubscribeFailure(subscriber: Subscriber[_ >: T]): Unit =
-    try shutdownReason match {
+    try shutdownReason match
       case Some(e: SpecViolation) ⇒ // ok, not allowed to call onError
       case Some(e) ⇒
         tryOnSubscribe(subscriber, CancelledSubscription)
@@ -89,21 +81,18 @@ private[akka] class ActorPublisher[T](val impl: ActorRef)
       case None ⇒
         tryOnSubscribe(subscriber, CancelledSubscription)
         tryOnComplete(subscriber)
-    } catch {
+    catch
       case _: SpecViolation ⇒ // nothing to do
-    }
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class ActorSubscription[T](
     final val impl: ActorRef, final val subscriber: Subscriber[_ >: T])
-    extends Subscription {
+    extends Subscription
   override def request(elements: Long): Unit =
     impl ! RequestMore(this, elements)
   override def cancel(): Unit = impl ! Cancel(this)
-}
 
 /**
   * INTERNAL API
@@ -116,18 +105,14 @@ private[akka] class ActorSubscriptionWithCursor[T](
 /**
   * INTERNAL API
   */
-private[akka] trait SoftShutdown {
+private[akka] trait SoftShutdown
   this: Actor ⇒
-  def softShutdown(): Unit = {
+  def softShutdown(): Unit =
     val children = context.children
-    if (children.isEmpty) {
+    if (children.isEmpty)
       context.stop(self)
-    } else {
+    else
       context.children foreach context.watch
-      context.become {
+      context.become
         case Terminated(_) ⇒ if (context.children.isEmpty) context.stop(self)
         case _ ⇒ // ignore all the rest, we’re practically dead
-      }
-    }
-  }
-}

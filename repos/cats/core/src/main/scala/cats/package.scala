@@ -1,7 +1,7 @@
 /**
   * Symbolic aliases for various types are defined here.
   */
-package object cats {
+package object cats
 
   type ~>[F[_], G[_]] = arrow.NaturalTransformation[F, G]
   type <~[F[_], G[_]] = arrow.NaturalTransformation[G, F]
@@ -26,7 +26,7 @@ package object cats {
     */
   type Id[A] = A
   implicit val Id: Bimonad[Id] with Traverse[Id] = new Bimonad[Id]
-  with Traverse[Id] {
+  with Traverse[Id]
     def pure[A](a: A): A = a
     def extract[A](a: A): A = a
     def flatMap[A, B](a: A)(f: A => B): B = f(a)
@@ -44,7 +44,6 @@ package object cats {
     def traverse[G[_], A, B](a: A)(f: A => G[B])(
         implicit G: Applicative[G]): G[B] =
       f(a)
-  }
 
   type Eq[A] = algebra.Eq[A]
   type PartialOrder[A] = algebra.PartialOrder[A]
@@ -59,4 +58,3 @@ package object cats {
   val Semigroup = algebra.Semigroup
   val Monoid = algebra.Monoid
   val Group = algebra.Group
-}

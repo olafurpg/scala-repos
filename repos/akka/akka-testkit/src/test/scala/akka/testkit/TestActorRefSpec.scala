@@ -15,99 +15,82 @@ import akka.dispatch.Dispatcher
 /**
   * Test whether TestActorRef behaves as an ActorRef should, besides its own spec.
   */
-object TestActorRefSpec {
+object TestActorRefSpec
 
   var counter = 4
   val thread = Thread.currentThread
   var otherthread: Thread = null
 
-  trait TActor extends Actor {
-    def receive = new Receive {
+  trait TActor extends Actor
+    def receive = new Receive
       val recv = receiveT
       def isDefinedAt(o: Any) = recv.isDefinedAt(o)
-      def apply(o: Any) {
+      def apply(o: Any)
         if (Thread.currentThread ne thread) otherthread = Thread.currentThread
         recv(o)
-      }
-    }
     def receiveT: Receive
-  }
 
-  class ReplyActor extends TActor {
+  class ReplyActor extends TActor
     import context.system
     var replyTo: ActorRef = null
 
-    def receiveT = {
-      case "complexRequest" ⇒ {
+    def receiveT =
+      case "complexRequest" ⇒
           replyTo = sender()
           val worker = TestActorRef(Props[WorkerActor])
           worker ! "work"
-        }
       case "complexRequest2" ⇒
         val worker = TestActorRef(Props[WorkerActor])
         worker ! sender()
       case "workDone" ⇒ replyTo ! "complexReply"
       case "simpleRequest" ⇒ sender() ! "simpleReply"
-    }
-  }
 
-  class WorkerActor() extends TActor {
-    def receiveT = {
+  class WorkerActor() extends TActor
+    def receiveT =
       case "work" ⇒
         sender() ! "workDone"
         context stop self
       case replyTo: Promise[_] ⇒
         replyTo.asInstanceOf[Promise[Any]].success("complexReply")
       case replyTo: ActorRef ⇒ replyTo ! "complexReply"
-    }
 
     val supervisor = context.parent
     val name = context.self.path.name
-  }
 
-  class SenderActor(replyActor: ActorRef) extends TActor {
+  class SenderActor(replyActor: ActorRef) extends TActor
 
-    def receiveT = {
+    def receiveT =
       case "complex" ⇒ replyActor ! "complexRequest"
       case "complex2" ⇒ replyActor ! "complexRequest2"
       case "simple" ⇒ replyActor ! "simpleRequest"
-      case "complexReply" ⇒ {
+      case "complexReply" ⇒
           counter -= 1
-        }
-      case "simpleReply" ⇒ {
+      case "simpleReply" ⇒
           counter -= 1
-        }
-    }
-  }
 
-  class Logger extends Actor {
+  class Logger extends Actor
     var count = 0
     var msg: String = _
-    def receive = {
+    def receive =
       case Warning(_, _, m: String) ⇒ count += 1; msg = m
-    }
-  }
 
-  class ReceiveTimeoutActor(target: ActorRef) extends Actor {
+  class ReceiveTimeoutActor(target: ActorRef) extends Actor
     context setReceiveTimeout 1.second
-    def receive = {
+    def receive =
       case ReceiveTimeout ⇒
         target ! "timeout"
         context stop self
-    }
-  }
 
   /**
     * Forwarding `Terminated` to non-watching testActor is not possible,
     * and therefore the `Terminated` message is wrapped.
     */
   final case class WrappedTerminated(t: Terminated)
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TestActorRefSpec
     extends AkkaSpec("disp1.type=Dispatcher") with BeforeAndAfterEach
-    with DefaultTimeout {
+    with DefaultTimeout
 
   import TestActorRefSpec._
 
@@ -116,38 +99,35 @@ class TestActorRefSpec
   private def assertThread(): Unit =
     otherthread should (be(null) or equal(thread))
 
-  "A TestActorRef should be an ActorRef, hence it" must {
+  "A TestActorRef should be an ActorRef, hence it" must
 
-    "support nested Actor creation" when {
+    "support nested Actor creation" when
 
-      "used with TestActorRef" in {
-        val a = TestActorRef(Props(new Actor {
+      "used with TestActorRef" in
+        val a = TestActorRef(Props(new Actor
           val nested =
             TestActorRef(Props(new Actor { def receive = { case _ ⇒ } }))
           def receive = { case _ ⇒ sender() ! nested }
-        }))
+        ))
         a should not be (null)
         val nested =
           Await.result((a ? "any").mapTo[ActorRef], timeout.duration)
         nested should not be (null)
         a should not be theSameInstanceAs(nested)
-      }
 
-      "used with ActorRef" in {
-        val a = TestActorRef(Props(new Actor {
+      "used with ActorRef" in
+        val a = TestActorRef(Props(new Actor
           val nested =
             context.actorOf(Props(new Actor { def receive = { case _ ⇒ } }))
           def receive = { case _ ⇒ sender() ! nested }
-        }))
+        ))
         a should not be (null)
         val nested =
           Await.result((a ? "any").mapTo[ActorRef], timeout.duration)
         nested should not be (null)
         a should not be theSameInstanceAs(nested)
-      }
-    }
 
-    "support reply via sender()" in {
+    "support reply via sender()" in
       val serverRef = TestActorRef(Props[ReplyActor])
       val clientRef = TestActorRef(Props(classOf[SenderActor], serverRef))
 
@@ -170,164 +150,134 @@ class TestActorRefSpec
       counter should ===(0)
 
       assertThread()
-    }
 
-    "stop when sent a poison pill" in {
-      EventFilter[ActorKilledException]() intercept {
+    "stop when sent a poison pill" in
+      EventFilter[ActorKilledException]() intercept
         val a = TestActorRef(Props[WorkerActor])
         val forwarder = system.actorOf(
-            Props(new Actor {
+            Props(new Actor
           context.watch(a)
-          def receive = {
+          def receive =
             case t: Terminated ⇒ testActor forward WrappedTerminated(t)
             case x ⇒ testActor forward x
-          }
-        }))
+        ))
         a.!(PoisonPill)(testActor)
-        expectMsgPF(5 seconds) {
+        expectMsgPF(5 seconds)
           case WrappedTerminated(Terminated(`a`)) ⇒ true
-        }
         a.isTerminated should ===(true)
         assertThread()
-      }
-    }
 
-    "restart when Kill:ed" in {
-      EventFilter[ActorKilledException]() intercept {
+    "restart when Kill:ed" in
+      EventFilter[ActorKilledException]() intercept
         counter = 2
 
-        val boss = TestActorRef(Props(new TActor {
-          val ref = TestActorRef(Props(new TActor {
+        val boss = TestActorRef(Props(new TActor
+          val ref = TestActorRef(Props(new TActor
             def receiveT = { case _ ⇒ }
-            override def preRestart(reason: Throwable, msg: Option[Any]) {
+            override def preRestart(reason: Throwable, msg: Option[Any])
               counter -= 1
-            }
             override def postRestart(reason: Throwable) { counter -= 1 }
-          }), self, "child")
+          ), self, "child")
 
           override def supervisorStrategy =
             OneForOneStrategy(maxNrOfRetries = 5, withinTimeRange = 1 second)(
                 List(classOf[ActorKilledException]))
 
           def receiveT = { case "sendKill" ⇒ ref ! Kill }
-        }))
+        ))
 
         boss ! "sendKill"
 
         counter should ===(0)
         assertThread()
-      }
-    }
 
-    "support futures" in {
+    "support futures" in
       val a = TestActorRef[WorkerActor]
       val f = a ? "work"
       // CallingThreadDispatcher means that there is no delay
       f should be('completed)
       Await.result(f, timeout.duration) should ===("workDone")
-    }
 
-    "support receive timeout" in {
+    "support receive timeout" in
       val a = TestActorRef(new ReceiveTimeoutActor(testActor))
       expectMsg("timeout")
-    }
-  }
 
-  "A TestActorRef" must {
+  "A TestActorRef" must
 
-    "allow access to internals" in {
-      class TA extends TActor {
+    "allow access to internals" in
+      class TA extends TActor
         var s: String = _
-        def receiveT = {
+        def receiveT =
           case x: String ⇒ s = x
-        }
-      }
       val ref = TestActorRef(new TA)
       ref ! "hallo"
       val actor = ref.underlyingActor
       actor.s should ===("hallo")
-    }
 
-    "set receiveTimeout to None" in {
+    "set receiveTimeout to None" in
       val a = TestActorRef[WorkerActor]
       a.underlyingActor.context.receiveTimeout should be theSameInstanceAs Duration.Undefined
-    }
 
-    "set CallingThreadDispatcher" in {
+    "set CallingThreadDispatcher" in
       val a = TestActorRef[WorkerActor]
       a.underlying.dispatcher.getClass should ===(
           classOf[CallingThreadDispatcher])
-    }
 
-    "allow override of dispatcher" in {
+    "allow override of dispatcher" in
       val a = TestActorRef(Props[WorkerActor].withDispatcher("disp1"))
       a.underlying.dispatcher.getClass should ===(classOf[Dispatcher])
-    }
 
-    "proxy receive for the underlying actor without sender()" in {
+    "proxy receive for the underlying actor without sender()" in
       val ref = TestActorRef[WorkerActor]
       ref.receive("work")
       ref.isTerminated should ===(true)
-    }
 
-    "proxy receive for the underlying actor with sender()" in {
+    "proxy receive for the underlying actor with sender()" in
       val ref = TestActorRef[WorkerActor]
       ref.receive("work", testActor)
       ref.isTerminated should ===(true)
       expectMsg("workDone")
-    }
-  }
 
-  "A TestActorRef Companion Object" must {
+  "A TestActorRef Companion Object" must
 
-    "allow creation of a TestActorRef with a default supervisor" in {
+    "allow creation of a TestActorRef with a default supervisor" in
       val ref = TestActorRef[WorkerActor]
       ref.underlyingActor.supervisor should be(
           system.asInstanceOf[ActorSystemImpl].guardian)
-    }
 
-    "allow creation of a TestActorRef with a default supervisor and specified name" in {
+    "allow creation of a TestActorRef with a default supervisor and specified name" in
       val ref = TestActorRef[WorkerActor]("specificActor")
       ref.underlyingActor.name should be("specificActor")
-    }
 
-    "allow creation of a TestActorRef with a specified supervisor" in {
+    "allow creation of a TestActorRef with a specified supervisor" in
       val parent = TestActorRef[ReplyActor]
       val ref = TestActorRef[WorkerActor](parent)
       ref.underlyingActor.supervisor should be(parent)
-    }
 
-    "allow creation of a TestActorRef with a specified supervisor and specified name" in {
+    "allow creation of a TestActorRef with a specified supervisor and specified name" in
       val parent = TestActorRef[ReplyActor]
       val ref = TestActorRef[WorkerActor](parent, "specificSupervisedActor")
       ref.underlyingActor.name should be("specificSupervisedActor")
       ref.underlyingActor.supervisor should be(parent)
-    }
 
-    "allow creation of a TestActorRef with a default supervisor with Props" in {
+    "allow creation of a TestActorRef with a default supervisor with Props" in
       val ref = TestActorRef[WorkerActor](Props[WorkerActor])
       ref.underlyingActor.supervisor should be(
           system.asInstanceOf[ActorSystemImpl].guardian)
-    }
 
-    "allow creation of a TestActorRef with a default supervisor and specified name with Props" in {
+    "allow creation of a TestActorRef with a default supervisor and specified name with Props" in
       val ref =
         TestActorRef[WorkerActor](Props[WorkerActor], "specificPropsActor")
       ref.underlyingActor.name should be("specificPropsActor")
-    }
 
-    "allow creation of a TestActorRef with a specified supervisor with Props" in {
+    "allow creation of a TestActorRef with a specified supervisor with Props" in
       val parent = TestActorRef[ReplyActor]
       val ref = TestActorRef[WorkerActor](Props[WorkerActor], parent)
       ref.underlyingActor.supervisor should be(parent)
-    }
 
-    "allow creation of a TestActorRef with a specified supervisor and specified name with Props" in {
+    "allow creation of a TestActorRef with a specified supervisor and specified name with Props" in
       val parent = TestActorRef[ReplyActor]
       val ref = TestActorRef[WorkerActor](
           Props[WorkerActor], parent, "specificSupervisedPropsActor")
       ref.underlyingActor.name should be("specificSupervisedPropsActor")
       ref.underlyingActor.supervisor should be(parent)
-    }
-  }
-}

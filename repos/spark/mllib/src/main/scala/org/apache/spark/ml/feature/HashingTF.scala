@@ -35,7 +35,7 @@ import org.apache.spark.sql.types.{ArrayType, StructType}
 @Experimental
 class HashingTF(override val uid: String)
     extends Transformer with HasInputCol with HasOutputCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("hashingTF"))
 
@@ -61,30 +61,25 @@ class HashingTF(override val uid: String)
   /** @group setParam */
   def setNumFeatures(value: Int): this.type = set(numFeatures, value)
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val outputSchema = transformSchema(dataset.schema)
     val hashingTF = new feature.HashingTF($(numFeatures))
-    val t = udf { terms: Seq[_] =>
+    val t = udf  terms: Seq[_] =>
       hashingTF.transform(terms)
-    }
     val metadata = outputSchema($(outputCol)).metadata
     dataset.select(col("*"), t(col($(inputCol))).as($(outputCol), metadata))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val inputType = schema($(inputCol)).dataType
     require(inputType.isInstanceOf[ArrayType],
             s"The input column must be ArrayType, but got $inputType.")
     val attrGroup = new AttributeGroup($(outputCol), $(numFeatures))
     SchemaUtils.appendColumn(schema, attrGroup.toStructField())
-  }
 
   override def copy(extra: ParamMap): HashingTF = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object HashingTF extends DefaultParamsReadable[HashingTF] {
+object HashingTF extends DefaultParamsReadable[HashingTF]
 
   @Since("1.6.0")
   override def load(path: String): HashingTF = super.load(path)
-}

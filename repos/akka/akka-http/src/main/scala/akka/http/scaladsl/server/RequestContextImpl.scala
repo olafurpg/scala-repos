@@ -24,7 +24,7 @@ private[http] class RequestContextImpl(
     val log: LoggingAdapter,
     val settings: RoutingSettings,
     val parserSettings: ParserSettings)
-    extends RequestContext {
+    extends RequestContext
 
   def this(request: HttpRequest,
            log: LoggingAdapter,
@@ -63,13 +63,13 @@ private[http] class RequestContextImpl(
     trm(request)(executionContext).fast
       .map(res ⇒ RouteResult.Complete(res))(executionContext)
       .fast
-      .recoverWith {
+      .recoverWith
         case Marshal.UnacceptableResponseContentTypeException(supported) ⇒
           attemptRecoveryFromUnacceptableResponseContentTypeException(
               trm, supported)
         case RejectionError(rej) ⇒
           Future.successful(RouteResult.Rejected(rej :: Nil))
-      }(executionContext)
+      (executionContext)
 
   override def reject(rejections: Rejection*): Future[RouteResult] =
     FastFuture.successful(RouteResult.Rejected(rejections.toList))
@@ -112,9 +112,9 @@ private[http] class RequestContextImpl(
     copy(unmatchedPath = f(unmatchedPath))
 
   override def withAcceptAll: RequestContext =
-    request.header[headers.Accept] match {
+    request.header[headers.Accept] match
       case Some(accept @ headers.Accept(ranges)) if !accept.acceptsAll ⇒
-        mapRequest(_.mapHeaders(_.map {
+        mapRequest(_.mapHeaders(_.map
           case `accept` ⇒
             val acceptAll =
               if (ranges.exists(_.isWildcard))
@@ -123,21 +123,19 @@ private[http] class RequestContextImpl(
               else ranges :+ MediaRanges.`*/*;q=MIN`
             accept.copy(mediaRanges = acceptAll)
           case x ⇒ x
-        }))
+        ))
       case _ ⇒ this
-    }
 
   /** Attempts recovering from the special case when non-2xx response is sent, yet content negotiation was unable to find a match. */
   private def attemptRecoveryFromUnacceptableResponseContentTypeException(
       trm: ToResponseMarshallable,
       supported: Set[ContentNegotiator.Alternative]): Future[RouteResult] =
-    trm.value match {
+    trm.value match
       case (status: StatusCode, value) if !status.isSuccess ⇒
         this.withAcceptAll.complete(trm) // retry giving up content negotiation
       case _ ⇒
         Future.successful(RouteResult.Rejected(
                 UnacceptedResponseContentTypeRejection(supported) :: Nil))
-    }
 
   private def copy(
       request: HttpRequest = request,
@@ -154,4 +152,3 @@ private[http] class RequestContextImpl(
                            log,
                            routingSettings,
                            parserSettings)
-}

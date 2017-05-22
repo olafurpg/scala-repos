@@ -1,10 +1,8 @@
-package p1 {
-  package p2 {
+package p1
+  package p2
     case class Foo
-  }
-}
 
-class C {
+class C
   import p1._
 
   println( /* */ p1. /* */ p2. /* */ Foo.getClass)
@@ -15,4 +13,3 @@ class C {
 
   println( /* resolved: false */ Foo.getClass)
   println(classOf[ /* resolved: false */ Foo])
-}

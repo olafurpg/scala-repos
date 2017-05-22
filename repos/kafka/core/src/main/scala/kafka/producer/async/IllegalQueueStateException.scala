@@ -23,6 +23,5 @@ package kafka.producer.async
     "This class has been deprecated and will be removed in a future release.",
     "0.10.0.0")
 class IllegalQueueStateException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

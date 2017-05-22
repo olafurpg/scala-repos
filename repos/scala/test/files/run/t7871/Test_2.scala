@@ -1,6 +1,4 @@
-object Test extends App {
+object Test extends App
   import NewQuasiquotes._
-  SomeTree match {
+  SomeTree match
     case nq"$x + $y" => println((x, y))
-  }
-}

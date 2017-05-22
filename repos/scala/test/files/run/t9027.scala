@@ -1,5 +1,5 @@
 // used to be parsed as .println
-object Test extends App {
+object Test extends App
   import reflect.runtime._, universe._
 
   val trees = List(
@@ -11,4 +11,3 @@ object Test extends App {
       println("hello, world.")"""
   )
   trees foreach println
-}

@@ -51,13 +51,12 @@ private[spark] class ResultTask[T, U](
     val outputId: Int,
     _initialAccums: Seq[Accumulator[_]] = InternalAccumulator.createAll())
     extends Task[U](stageId, stageAttemptId, partition.index, _initialAccums)
-    with Serializable {
+    with Serializable
 
-  @transient private[this] val preferredLocs: Seq[TaskLocation] = {
+  @transient private[this] val preferredLocs: Seq[TaskLocation] =
     if (locs == null) Nil else locs.toSet.toSeq
-  }
 
-  override def runTask(context: TaskContext): U = {
+  override def runTask(context: TaskContext): U =
     // Deserialize the RDD and the func using the broadcast variables.
     val deserializeStartTime = System.currentTimeMillis()
     val ser = SparkEnv.get.closureSerializer.newInstance()
@@ -70,11 +69,9 @@ private[spark] class ResultTask[T, U](
 
     metrics = Some(context.taskMetrics)
     func(context, rdd.iterator(partition, context))
-  }
 
   // This is only callable on the driver side.
   override def preferredLocations: Seq[TaskLocation] = preferredLocs
 
   override def toString: String =
     "ResultTask(" + stageId + ", " + partitionId + ")"
-}

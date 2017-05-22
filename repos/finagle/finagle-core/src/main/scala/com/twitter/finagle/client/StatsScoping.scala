@@ -11,7 +11,7 @@ import com.twitter.util.Duration
   * per-endpoint basis.  For instance, if a client has endpoints in multiple
   * zones, a scoper might add a per-zone scope.
   */
-object StatsScoping {
+object StatsScoping
   object Role extends Stack.Role("StatsScoping")
 
   type ScoperFunction = (StatsReceiver, Addr.Metadata) => StatsReceiver
@@ -20,17 +20,15 @@ object StatsScoping {
     * A Scoper is a function that takes an existing StatsReceiver and an
     * arbitrary address metadata map and computes a new StatsReceiver.
     */
-  case class Scoper(scoper: ScoperFunction) {
+  case class Scoper(scoper: ScoperFunction)
     def mk(): (Scoper, Stack.Param[Scoper]) = (this, Scoper.param)
-  }
-  object Scoper {
-    implicit val param = Stack.Param(Scoper { (stats, _) =>
+  object Scoper
+    implicit val param = Stack.Param(Scoper  (stats, _) =>
       stats
-    })
-  }
+    )
 
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module[ServiceFactory[Req, Rep]] {
+    new Stack.Module[ServiceFactory[Req, Rep]]
       val role = Role
       val description =
         "May modify stats scoping based on the destination address"
@@ -38,7 +36,7 @@ object StatsScoping {
                            implicitly[Stack.Param[Scoper]],
                            implicitly[Stack.Param[Stats]])
 
-      def make(params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
+      def make(params: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) =
         val AddrMetadata(metadata) = params[AddrMetadata]
         val Stats(stats) = params[Stats]
         val Scoper(scoper) = params[Scoper]
@@ -46,6 +44,3 @@ object StatsScoping {
         val scoped = scoper(stats, metadata)
         val stack = next.make(params + Stats(scoped))
         Stack.Leaf(this, stack)
-      }
-    }
-}

@@ -1,7 +1,7 @@
 /*
  * filter: inliner warnings; re-run with
  */
-object Test {
+object Test
   def x =
     BigInt(
         "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
@@ -12,7 +12,7 @@ object Test {
   def l1 = Int.MaxValue.toLong + 1
   def l2 = Int.MinValue.toLong - 1
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 //    assert(x.isWhole, x)
     assert(!x.isValidDouble, x)
     assert(!x.isValidFloat, x)
@@ -49,9 +49,8 @@ object Test {
     testBigInts()
     testNonWholeDoubles()
     testNaNs()
-  }
 
-  def testBigInts() {
+  def testBigInts()
     def biExp2(e: Int) = BigInt(1) << e
     def checkBigInt2(bi: BigInt) { checkBigInt(-bi); checkBigInt(bi) }
 
@@ -136,18 +135,16 @@ object Test {
     checkBigInt2(biExp2(1024) - biExp2(1024 - pd))
     checkBigInt2(biExp2(1024) - biExp2(1024 - pd - 1))
     checkBigInt2(biExp2(1024))
-  }
 
-  def testNonWholeDoubles() {
+  def testNonWholeDoubles()
     checkNonWholeDouble(0.5)
     checkNonWholeDouble(-math.E)
     checkNonWholeDouble((1L << 51).toDouble + 0.5)
     checkNonWholeDouble((1L << 23).toDouble + 0.5)
     checkNonWholeDouble(Double.PositiveInfinity)
     checkNonWholeDouble(Double.NegativeInfinity)
-  }
 
-  def testNaNs() {
+  def testNaNs()
     assert(!Double.NaN.isWhole, Double.NaN)
 //    assert(!Double.NaN.isValidDouble, Double.NaN)
 //    assert(!Double.NaN.isValidFloat, Double.NaN)
@@ -165,13 +162,12 @@ object Test {
     assert(!Float.NaN.isValidChar, Float.NaN)
     assert(!Float.NaN.isValidShort, Float.NaN)
     assert(!Float.NaN.isValidByte, Float.NaN)
-  }
 
-  def checkNonWholeDouble(d: Double) {
+  def checkNonWholeDouble(d: Double)
     val f = d.toFloat
     val isFloat = f == d
 
-    if (!d.isInfinity) {
+    if (!d.isInfinity)
       val bd = BigDecimal(new java.math.BigDecimal(d))
 //      assert(!bd.isWhole, bd)
       assert(bd.isExactDouble, bd)
@@ -181,7 +177,6 @@ object Test {
       assert(!bd.isValidChar, bd)
       assert(!bd.isValidShort, bd)
       assert(!bd.isValidByte, bd)
-    }
 
     assert(!d.isWhole, d)
 //    assert(d.isValidDouble, d)
@@ -192,7 +187,7 @@ object Test {
     assert(!d.isValidShort, d)
     assert(!d.isValidByte, d)
 
-    if (isFloat) {
+    if (isFloat)
       assert(!f.isWhole, f)
 //      assert(f.isValidDouble, f)
 //      assert(f.isValidFloat == isFloat, f)
@@ -201,10 +196,8 @@ object Test {
       assert(!f.isValidChar, f)
       assert(!f.isValidShort, f)
       assert(!f.isValidByte, f)
-    }
-  }
 
-  def checkBigInt(bi: BigInt) {
+  def checkBigInt(bi: BigInt)
     val bd = BigDecimal(bi, java.math.MathContext.UNLIMITED)
     val isByte = bi >= Byte.MinValue && bi <= Byte.MaxValue
     val isShort = bi >= Short.MinValue && bi <= Short.MaxValue
@@ -236,7 +229,7 @@ object Test {
     assert(bi.isValidShort == isShort, bi)
     assert(bi.isValidByte == isByte, bi)
 
-    if (isDouble) {
+    if (isDouble)
       val d = bi.toDouble
       assert(d.isWhole, d)
 //      assert(d.isValidDouble == isDouble, d)
@@ -246,9 +239,8 @@ object Test {
       assert(d.isValidChar == isChar, d)
       assert(d.isValidShort == isShort, d)
       assert(d.isValidByte == isByte, d)
-    }
 
-    if (isFloat) {
+    if (isFloat)
       val f = bi.toFloat
       assert(f.isWhole, f)
 //      assert(f.isValidDouble == isDouble, f)
@@ -258,9 +250,8 @@ object Test {
       assert(f.isValidChar == isChar, f)
       assert(f.isValidShort == isShort, f)
       assert(f.isValidByte == isByte, f)
-    }
 
-    if (isLong) {
+    if (isLong)
       val l = bi.toLong
       assert(l.isWhole, l)
 //      assert(l.isValidDouble == isDouble, l)
@@ -270,9 +261,8 @@ object Test {
       assert(l.isValidChar == isChar, l)
       assert(l.isValidShort == isShort, l)
       assert(l.isValidByte == isByte, l)
-    }
 
-    if (isInt) {
+    if (isInt)
       val i = bi.toInt
       assert(i.isWhole, i)
 //      assert(i.isValidDouble == isDouble, i)
@@ -282,9 +272,8 @@ object Test {
       assert(i.isValidChar == isChar, i)
       assert(i.isValidShort == isShort, i)
       assert(i.isValidByte == isByte, i)
-    }
 
-    if (isChar) {
+    if (isChar)
       val c = bi.toChar
       assert(c.isWhole, c)
 //      assert(c.isValidDouble == isDouble, c)
@@ -294,9 +283,8 @@ object Test {
       assert(c.isValidChar == isChar, c)
       assert(c.isValidShort == isShort, c)
       assert(c.isValidByte == isByte, c)
-    }
 
-    if (isShort) {
+    if (isShort)
       val s = bi.toShort
       assert(s.isWhole, s)
 //      assert(s.isValidDouble == isDouble, s)
@@ -306,9 +294,8 @@ object Test {
       assert(s.isValidChar == isChar, s)
       assert(s.isValidShort == isShort, s)
       assert(s.isValidByte == isByte, s)
-    }
 
-    if (isByte) {
+    if (isByte)
       val b = bi.toByte
       assert(b.isWhole, b)
 //      assert(b.isValidDouble == isDouble, b)
@@ -318,6 +305,3 @@ object Test {
       assert(b.isValidChar == isChar, b)
       assert(b.isValidShort == isShort, b)
       assert(b.isValidByte == isByte, b)
-    }
-  }
-}

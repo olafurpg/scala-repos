@@ -16,7 +16,7 @@ import scala.concurrent.Future
 import java.util.concurrent.CompletionStage
 import scala.compat.java8.FutureConverters._
 
-abstract class BasicDirectives extends BasicDirectivesBase {
+abstract class BasicDirectives extends BasicDirectivesBase
 
   /**
     * Tries the given route alternatives in sequence until the first one matches.
@@ -29,44 +29,39 @@ abstract class BasicDirectives extends BasicDirectivesBase {
     * A route that completes the request with a static text
     */
   def complete(text: String): Route =
-    new OpaqueRoute() {
+    new OpaqueRoute()
       def handle(ctx: RequestContext): RouteResult = ctx.complete(text)
-    }
 
   /**
     * A route that completes the request with a static text
     */
   def complete(contentType: ContentType.NonBinary, text: String): Route =
-    new OpaqueRoute() {
+    new OpaqueRoute()
       def handle(ctx: RequestContext): RouteResult =
         ctx.complete(contentType, text)
-    }
 
   /**
     * A route that completes the request with a static text
     */
   def complete(response: HttpResponse): Route =
-    new OpaqueRoute() {
+    new OpaqueRoute()
       def handle(ctx: RequestContext): RouteResult = ctx.complete(response)
-    }
 
   /**
     * A route that completes the request with a status code.
     */
   def completeWithStatus(code: StatusCode): Route =
-    new OpaqueRoute() {
+    new OpaqueRoute()
       def handle(ctx: RequestContext): RouteResult =
         ctx.completeWithStatus(code)
-    }
 
   /**
     * A route that completes the request using the given marshaller and value.
     */
   def completeAs[T](marshaller: Marshaller[T], value: T): Route =
-    new OpaqueRoute() {
+    new OpaqueRoute()
       def handle(ctx: RequestContext): RouteResult =
         ctx.completeAs(marshaller, value)
-    }
 
   /**
     * Completes the request with redirection response of the given type to the given URI.
@@ -93,16 +88,13 @@ abstract class BasicDirectives extends BasicDirectivesBase {
                 _.asInstanceOf[StandaloneExtractionImpl[_ <: AnyRef]])))
 
   private[http] def handle(extractions: RequestVal[_]*)(
-      f: RequestContext ⇒ RouteResult): Route = {
-    val route = new OpaqueRoute() {
+      f: RequestContext ⇒ RouteResult): Route =
+    val route = new OpaqueRoute()
       def handle(ctx: RequestContext): RouteResult = f(ctx)
-    }
-    val saExtractions = extractions.collect {
+    val saExtractions = extractions.collect
       case sa: StandaloneExtractionImpl[_] ⇒ sa
-    }
     if (saExtractions.isEmpty) route
     else extractHere(saExtractions: _*).route(route)
-  }
 
   /**
     * Handles the route by reflectively calling the instance method specified by `instance`, and `methodName`.
@@ -145,15 +137,15 @@ abstract class BasicDirectives extends BasicDirectivesBase {
   def handleReflectively(clazz: Class[_],
                          instance: AnyRef,
                          methodName: String,
-                         extractions: RequestVal[_]*): Route = {
+                         extractions: RequestVal[_]*): Route =
     def chooseOverload(
-        methods: Seq[Method]): (RequestContext, Seq[Any]) ⇒ RouteResult = {
+        methods: Seq[Method]): (RequestContext, Seq[Any]) ⇒ RouteResult =
       val extractionTypes = extractions.map(_.resultClass).toList
       val RequestContextClass = classOf[RequestContext]
 
       import java.{lang ⇒ jl}
       def paramMatches(expected: Class[_], actual: Class[_]): Boolean =
-        expected match {
+        expected match
           case e if e isAssignableFrom actual ⇒ true
           case jl.Long.TYPE if actual == classOf[jl.Long] ⇒ true
           case jl.Integer.TYPE if actual == classOf[jl.Integer] ⇒ true
@@ -163,14 +155,12 @@ abstract class BasicDirectives extends BasicDirectivesBase {
           case jl.Double.TYPE if actual == classOf[jl.Double] ⇒ true
           case jl.Float.TYPE if actual == classOf[jl.Float] ⇒ true
           case _ ⇒ false
-        }
-      def paramsMatch(params: Seq[Class[_]]): Boolean = {
+      def paramsMatch(params: Seq[Class[_]]): Boolean =
         val res =
           params.size == extractionTypes.size &&
           (params, extractionTypes).zipped.forall(paramMatches)
 
         res
-      }
       def returnTypeMatches(method: Method): Boolean =
         method.getReturnType == classOf[RouteResult] ||
         returnsFuture(method) || returnsCompletionStage(method)
@@ -203,7 +193,7 @@ abstract class BasicDirectives extends BasicDirectivesBase {
       def methodInvocator(
           method: Method,
           adaptParams: (RequestContext,
-          Seq[Any]) ⇒ Seq[Any]): (RequestContext, Seq[Any]) ⇒ RouteResult = {
+          Seq[Any]) ⇒ Seq[Any]): (RequestContext, Seq[Any]) ⇒ RouteResult =
         val resultAdaptor = adaptResult(method)
         if (!method.isAccessible) method.setAccessible(true)
         if (adaptParams == IdentityAdaptor)
@@ -218,31 +208,24 @@ abstract class BasicDirectives extends BasicDirectivesBase {
                           method.invoke(instance,
                                         adaptParams(ctx, params).toArray
                                           .asInstanceOf[Array[AnyRef]]: _*))
-      }
 
-      object ParameterTypes {
+      object ParameterTypes
         def unapply(method: Method): Option[List[Class[_]]] =
           Some(method.getParameterTypes.toList)
-      }
 
       methods
         .filter(returnTypeMatches)
-        .collectFirst {
+        .collectFirst
           case method @ ParameterTypes(RequestContextClass :: rest)
               if paramsMatch(rest) ⇒
             methodInvocator(method, _ +: _)
           case method @ ParameterTypes(rest) if paramsMatch(rest) ⇒
             methodInvocator(method, IdentityAdaptor)
-        }
         .getOrElse(throw new RuntimeException("No suitable method found"))
-    }
-    def lookupMethod() = {
+    def lookupMethod() =
       val candidateMethods = clazz.getMethods.filter(_.getName == methodName)
       chooseOverload(candidateMethods)
-    }
 
     val method = lookupMethod()
 
     handle(extractions: _*)(ctx ⇒ method(ctx, extractions.map(_.get(ctx))))
-  }
-}

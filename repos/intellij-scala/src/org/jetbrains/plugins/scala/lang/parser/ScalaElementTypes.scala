@@ -20,7 +20,7 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.signatures.{ScClassPa
   * Date: 02.10.2006
   *
   */
-object ScalaElementTypes {
+object ScalaElementTypes
 
   val DUMMY_ELEMENT = new ScalaElementType("Dummy Elemnet")
 
@@ -276,18 +276,16 @@ object ScalaElementTypes {
   class ScCodeBlockElementType()
       extends IErrorCounterReparseableElementType(
           "block of expressions", ScalaFileType.SCALA_LANGUAGE)
-      with ICompositeElementType {
+      with ICompositeElementType
 
-    override def createNode(text: CharSequence): ASTNode = {
+    override def createNode(text: CharSequence): ASTNode =
       new ScBlockExprImpl(text)
-    }
 
-    @NotNull def createCompositeNode: ASTNode = {
+    @NotNull def createCompositeNode: ASTNode =
       new ScBlockExprImpl(null)
-    }
 
     def getErrorsCount(
-        seq: CharSequence, fileLanguage: Language, project: Project): Int = {
+        seq: CharSequence, fileLanguage: Language, project: Project): Int =
       import com.intellij.psi.tree.IErrorCounterReparseableElementType._
       val lexer: Lexer = new ScalaLexer
       lexer.start(seq)
@@ -295,18 +293,13 @@ object ScalaElementTypes {
       lexer.advance()
       var balance: Int = 1
       var flag = false
-      while (!flag) {
+      while (!flag)
         val tp: IElementType = lexer.getTokenType
         if (tp == null) flag = true
         else if (balance == 0) return FATAL_ERROR
-        else if (tp == ScalaTokenTypes.tLBRACE) {
+        else if (tp == ScalaTokenTypes.tLBRACE)
           balance += 1
-        } else if (tp == ScalaTokenTypes.tRBRACE) {
+        else if (tp == ScalaTokenTypes.tRBRACE)
           balance -= 1
-        }
         lexer.advance()
-      }
       balance
-    }
-  }
-}

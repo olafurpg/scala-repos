@@ -16,7 +16,7 @@ import mutable.Builder
 /** Equivalent of scm.ArrayOps for js.Array */
 @inline
 final class ArrayOps[A](private[this] val array: Array[A])
-    extends mutable.ArrayLike[A, Array[A]] with Builder[A, Array[A]] {
+    extends mutable.ArrayLike[A, Array[A]] with Builder[A, Array[A]]
 
   import ArrayOps._
 
@@ -43,10 +43,9 @@ final class ArrayOps[A](private[this] val array: Array[A])
 
   // Implementation of Builder
 
-  @inline def +=(elem: A): this.type = {
+  @inline def +=(elem: A): this.type =
     array.push(elem)
     this
-  }
 
   @inline def clear(): Unit =
     array.length = 0
@@ -60,7 +59,7 @@ final class ArrayOps[A](private[this] val array: Array[A])
 
   // Methods whose inherited implementations do not play nice with the optimizer
 
-  override def reduceLeft[B >: A](op: (B, A) => B): B = {
+  override def reduceLeft[B >: A](op: (B, A) => B): B =
     val length = this.length
     if (length <= 0) throwUnsupported("empty.reduceLeft")
 
@@ -71,9 +70,8 @@ final class ArrayOps[A](private[this] val array: Array[A])
       else loop(start + 1, op(z, this(start)))
 
     loop(1, this(0))
-  }
 
-  override def reduceRight[B >: A](op: (A, B) => B): B = {
+  override def reduceRight[B >: A](op: (A, B) => B): B =
     val length = this.length
     if (length <= 0) throwUnsupported("empty.reduceRight")
 
@@ -84,17 +82,15 @@ final class ArrayOps[A](private[this] val array: Array[A])
       else loop(end - 1, op(this(end - 1), z))
 
     loop(length - 1, this(length - 1))
-  }
-}
 
-object ArrayOps {
+object ArrayOps
 
   /** Extract the throw in a separate, non-inlineable method. */
   private def throwUnsupported(msg: String): Nothing =
     throw new UnsupportedOperationException(msg)
 
   /** Non-inlined implementation of [[ArrayOps.++]]. */
-  private def concat[A](left: Array[_ <: A], right: Array[_ <: A]): Array[A] = {
+  private def concat[A](left: Array[_ <: A], right: Array[_ <: A]): Array[A] =
     val leftLength = left.length
     val rightLength = right.length
     val result = new Array[A](leftLength + rightLength)
@@ -102,13 +98,10 @@ object ArrayOps {
     @inline
     @tailrec
     def loop(src: Array[_ <: A], i: Int, len: Int, offset: Int): Unit =
-      if (i != len) {
+      if (i != len)
         result(i + offset) = src(i)
         loop(src, i + 1, len, offset)
-      }
 
     loop(left, 0, leftLength, 0)
     loop(right, 0, rightLength, leftLength)
     result
-  }
-}

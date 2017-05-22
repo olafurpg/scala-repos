@@ -1,15 +1,12 @@
-package a {
+package a
   class A
-}
 
-package b {
+package b
   import a.A
 
   case class B(x: A)
 
-  object Main {
+  object Main
     /*start*/
     B.unapply(new B(new A)) /*end*/
-  }
-}
 //Option[A]

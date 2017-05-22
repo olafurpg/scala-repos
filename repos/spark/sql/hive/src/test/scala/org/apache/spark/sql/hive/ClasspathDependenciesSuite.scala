@@ -28,70 +28,57 @@ import org.apache.spark.SparkFunSuite
   * This is used to detect classpath and shading conflict, especially between
   * Spark's required Kryo version and that which can be found in some Hive versions.
   */
-class ClasspathDependenciesSuite extends SparkFunSuite {
+class ClasspathDependenciesSuite extends SparkFunSuite
   private val classloader = this.getClass.getClassLoader
 
-  private def assertLoads(classname: String): Unit = {
-    val resourceURL: URL = Option(findResource(classname)).getOrElse {
+  private def assertLoads(classname: String): Unit =
+    val resourceURL: URL = Option(findResource(classname)).getOrElse
       fail(s"Class $classname not found as ${resourceName(classname)}")
-    }
 
     logInfo(s"Class $classname at $resourceURL")
     classloader.loadClass(classname)
-  }
 
-  private def assertLoads(classes: String*): Unit = {
+  private def assertLoads(classes: String*): Unit =
     classes.foreach(assertLoads)
-  }
 
-  private def findResource(classname: String): URL = {
+  private def findResource(classname: String): URL =
     val resource = resourceName(classname)
     classloader.getResource(resource)
-  }
 
-  private def resourceName(classname: String): String = {
+  private def resourceName(classname: String): String =
     classname.replace(".", "/") + ".class"
-  }
 
-  private def assertClassNotFound(classname: String): Unit = {
-    Option(findResource(classname)).foreach { resourceURL =>
+  private def assertClassNotFound(classname: String): Unit =
+    Option(findResource(classname)).foreach  resourceURL =>
       fail(s"Class $classname found at $resourceURL")
-    }
 
-    intercept[ClassNotFoundException] {
+    intercept[ClassNotFoundException]
       classloader.loadClass(classname)
-    }
-  }
 
-  private def assertClassNotFound(classes: String*): Unit = {
+  private def assertClassNotFound(classes: String*): Unit =
     classes.foreach(assertClassNotFound)
-  }
 
   private val KRYO = "com.esotericsoftware.kryo.Kryo"
 
   private val SPARK_HIVE = "org.apache.hive."
   private val SPARK_SHADED = "org.spark-project.hive.shaded."
 
-  test("shaded Protobuf") {
+  test("shaded Protobuf")
     assertLoads(SPARK_SHADED + "com.google.protobuf.ServiceException")
-  }
 
-  test("hive-common") {
+  test("hive-common")
     assertLoads("org.apache.hadoop.hive.conf.HiveConf")
-  }
 
-  test("hive-exec") {
+  test("hive-exec")
     assertLoads("org.apache.hadoop.hive.ql.CommandNeedRetryException")
-  }
 
   private val STD_INSTANTIATOR =
     "org.objenesis.strategy.StdInstantiatorStrategy"
 
-  test("unshaded kryo") {
+  test("unshaded kryo")
     assertLoads(KRYO, STD_INSTANTIATOR)
-  }
 
-  test("Forbidden Dependencies") {
+  test("Forbidden Dependencies")
     assertClassNotFound(
         SPARK_HIVE + KRYO,
         SPARK_SHADED + KRYO,
@@ -100,12 +87,9 @@ class ClasspathDependenciesSuite extends SparkFunSuite {
         SPARK_HIVE + "com.esotericsoftware.shaded." + STD_INSTANTIATOR,
         "org.apache.hive.com.esotericsoftware.shaded." + STD_INSTANTIATOR
     )
-  }
 
-  test("parquet-hadoop-bundle") {
+  test("parquet-hadoop-bundle")
     assertLoads(
         "parquet.hadoop.ParquetOutputFormat",
         "parquet.hadoop.ParquetInputFormat"
     )
-  }
-}

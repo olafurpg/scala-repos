@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-object Developers {
+object Developers
   lazy val members = Map(
       "andreak" -> "Andreas Joseph Krogh",
       "bwmcadams" -> "Brendan W. McAdams",
@@ -51,12 +51,11 @@ object Developers {
 
   def toXml =
     <developers>
-      {members map { m =>
+      members map  m =>
         <developer>
           <id>{m._1}</id>
           <name>{m._2}</name>
           <url>http://github.com/{m._1}</url>
         </developer>
-      }}
+      
     </developers>
-}

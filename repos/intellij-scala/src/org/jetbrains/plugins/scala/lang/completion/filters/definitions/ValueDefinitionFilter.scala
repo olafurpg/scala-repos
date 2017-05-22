@@ -16,14 +16,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
-class ValueDefinitionFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class ValueDefinitionFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
-    if (leaf != null) {
+    if (leaf != null)
       val parent = leaf.getParent
 
-      parent.getParent match {
+      parent.getParent match
         case _: ScGenerator | _: ScEnumerator | _: ScExistentialClause =>
           if ((leaf.getPrevSibling == null ||
                   leaf.getPrevSibling.getPrevSibling == null ||
@@ -34,17 +34,11 @@ class ValueDefinitionFilter extends ElementFilter {
                       !parent.getPrevSibling.getPrevSibling.getLastChild
                         .isInstanceOf[PsiErrorElement]))) return true
         case _ =>
-      }
-    }
     false
-  }
 
-  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = {
+  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean =
     true
-  }
 
   @NonNls
-  override def toString: String = {
+  override def toString: String =
     "val keyword filter"
-  }
-}

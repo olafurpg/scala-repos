@@ -7,11 +7,11 @@ import scala.concurrent.duration._
 import akka.testkit.TestLatch
 import scala.concurrent.Await
 
-class RecipeSimpleDrop extends RecipeSpec {
+class RecipeSimpleDrop extends RecipeSpec
 
-  "Recipe for simply dropping elements for a faster stream" must {
+  "Recipe for simply dropping elements for a faster stream" must
 
-    "work" in {
+    "work" in
 
       //#simple-drop
       val droppyStream: Flow[Message, Message, NotUsed] =
@@ -43,6 +43,3 @@ class RecipeSimpleDrop extends RecipeSpec {
       pub.sendComplete()
       subscription.request(1)
       sub.expectComplete()
-    }
-  }
-}

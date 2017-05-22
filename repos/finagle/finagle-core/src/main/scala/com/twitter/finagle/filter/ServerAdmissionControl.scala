@@ -19,7 +19,7 @@ import scala.collection.JavaConverters._
   * [[ServerAdmissionControl.Param]]. Each filter should provide its own mechanism
   * for enabling, disabling and configuration.
   */
-private[twitter] object ServerAdmissionControl {
+private[twitter] object ServerAdmissionControl
   // a map of admission control filters, key by name
   private[this] val acs: ConcurrentMap[String, TypeAgnostic] =
     new ConcurrentHashMap()
@@ -32,11 +32,9 @@ private[twitter] object ServerAdmissionControl {
     * @see [[com.twitter.finagle.filter.ServerAdmissionControl]]
     */
   case class Param(enabled: Boolean)
-  object Param {
-    implicit val param = new Stack.Param[Param] {
+  object Param
+    implicit val param = new Stack.Param[Param]
       lazy val default = Param(true)
-    }
-  }
 
   /**
     * Add a filter to the list of admission control filters. If a controller
@@ -52,10 +50,9 @@ private[twitter] object ServerAdmissionControl {
     * be called before the server construction to take effect.
     */
   def register(pairs: (String, TypeAgnostic)*): Unit =
-    pairs.foreach {
+    pairs.foreach
       case (name, filter) =>
         acs.putIfAbsent(name, filter)
-    }
 
   /**
     * Remove a filter from the list of admission control filters. If the map
@@ -69,29 +66,23 @@ private[twitter] object ServerAdmissionControl {
     */
   def unregisterAll(): Unit = acs.clear()
 
-  def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] = {
-    new Stack.Module1[Param, ServiceFactory[Req, Rep]] {
+  def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
+    new Stack.Module1[Param, ServiceFactory[Req, Rep]]
       val role = ServerAdmissionControl.role
       val description =
         "Proactively reject requests when the server operates beyond its capacity"
       def make(
           _enabled: Param,
           next: ServiceFactory[Req, Rep]
-      ): ServiceFactory[Req, Rep] = {
+      ): ServiceFactory[Req, Rep] =
         val Param(enabled) = _enabled
 
-        if (!enabled || acs.isEmpty) {
+        if (!enabled || acs.isEmpty)
           next
-        } else {
+        else
           // assume the order of filters doesn't matter
           val typeAgnosticFilters =
-            acs.values.asScala.foldLeft(Filter.TypeAgnostic.Identity) {
+            acs.values.asScala.foldLeft(Filter.TypeAgnostic.Identity)
               case (sum, f) =>
                 f.andThen(sum)
-            }
           typeAgnosticFilters.toFilter.andThen(next)
-        }
-      }
-    }
-  }
-}

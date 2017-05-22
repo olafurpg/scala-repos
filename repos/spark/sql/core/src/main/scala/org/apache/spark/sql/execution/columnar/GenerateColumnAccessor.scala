@@ -26,11 +26,10 @@ import org.apache.spark.sql.types._
 /**
   * An Iterator to walk through the InternalRows from a CachedBatch
   */
-abstract class ColumnarIterator extends Iterator[InternalRow] {
+abstract class ColumnarIterator extends Iterator[InternalRow]
   def initialize(input: Iterator[CachedBatch],
                  columnTypes: Array[DataType],
                  columnIndexes: Array[Int]): Unit
-}
 
 /**
   * An helper class to update the fields of UnsafeRow, used by ColumnAccessor
@@ -38,7 +37,7 @@ abstract class ColumnarIterator extends Iterator[InternalRow] {
   * WARNING: These setter MUST be called in increasing order of ordinals.
   */
 class MutableUnsafeRow(val writer: UnsafeRowWriter)
-    extends GenericMutableRow(null) {
+    extends GenericMutableRow(null)
 
   override def isNullAt(i: Int): Boolean = writer.isNullAt(i)
   override def setNullAt(i: Int): Unit = writer.setNullAt(i)
@@ -58,25 +57,24 @@ class MutableUnsafeRow(val writer: UnsafeRowWriter)
     throw new UnsupportedOperationException
 
   // all other methods inherited from GenericMutableRow are not need
-}
 
 /**
   * Generates bytecode for an [[ColumnarIterator]] for columnar cache.
   */
 object GenerateColumnAccessor
-    extends CodeGenerator[Seq[DataType], ColumnarIterator] with Logging {
+    extends CodeGenerator[Seq[DataType], ColumnarIterator] with Logging
 
   protected def canonicalize(in: Seq[DataType]): Seq[DataType] = in
   protected def bind(
       in: Seq[DataType], inputSchema: Seq[Attribute]): Seq[DataType] = in
 
-  protected def create(columnTypes: Seq[DataType]): ColumnarIterator = {
+  protected def create(columnTypes: Seq[DataType]): ColumnarIterator =
     val ctx = newCodeGenContext()
     val numFields = columnTypes.size
-    val (initializeAccessors, extractors) = columnTypes.zipWithIndex.map {
+    val (initializeAccessors, extractors) = columnTypes.zipWithIndex.map
       case (dt, index) =>
         val accessorName = ctx.freshName("accessor")
-        val accessorCls = dt match {
+        val accessorCls = dt match
           case NullType => classOf[NullColumnAccessor].getName
           case BooleanType => classOf[BooleanColumnAccessor].getName
           case ByteType => classOf[ByteColumnAccessor].getName
@@ -93,11 +91,10 @@ object GenerateColumnAccessor
           case struct: StructType => classOf[StructColumnAccessor].getName
           case array: ArrayType => classOf[ArrayColumnAccessor].getName
           case t: MapType => classOf[MapColumnAccessor].getName
-        }
         ctx.addMutableState(
             accessorCls, accessorName, s"$accessorName = null;")
 
-        val createCode = dt match {
+        val createCode = dt match
           case t if ctx.isPrimitiveType(dt) =>
             s"$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder));"
           case NullType | StringType | BinaryType =>
@@ -105,10 +102,9 @@ object GenerateColumnAccessor
           case other =>
             s"""$accessorName = new $accessorCls(ByteBuffer.wrap(buffers[$index]).order(nativeOrder),
              (${dt.getClass.getName}) columnTypes[$index]);"""
-        }
 
         val extract = s"$accessorName.extractTo(mutableRow, $index);"
-        val patch = dt match {
+        val patch = dt match
           case DecimalType.Fixed(p, s) if p > Decimal.MAX_LONG_DIGITS =>
             // For large Decimal, it should have 16 bytes for future update even it's null now.
             s"""
@@ -117,9 +113,8 @@ object GenerateColumnAccessor
             }
            """
           case other => ""
-        }
         (createCode, extract + patch)
-    }.unzip
+    .unzip
 
     val code = s"""
       import java.nio.ByteBuffer;
@@ -201,5 +196,3 @@ object GenerateColumnAccessor
       .compile(code)
       .generate(Array.empty)
       .asInstanceOf[ColumnarIterator]
-  }
-}

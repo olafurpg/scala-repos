@@ -24,9 +24,8 @@ import org.apache.spark.util.Utils
 
 private[spark] class ZippedWithIndexRDDPartition(
     val prev: Partition, val startIndex: Long)
-    extends Partition with Serializable {
+    extends Partition with Serializable
   override val index: Int = prev.index
-}
 
 /**
   * Represents a RDD zipped with its element indices. The ordering is first based on the partition
@@ -37,16 +36,16 @@ private[spark] class ZippedWithIndexRDDPartition(
   * @tparam T parent RDD item type
   */
 private[spark] class ZippedWithIndexRDD[T : ClassTag](prev: RDD[T])
-    extends RDD[(T, Long)](prev) {
+    extends RDD[(T, Long)](prev)
 
   /** The start index of each partition. */
-  @transient private val startIndices: Array[Long] = {
+  @transient private val startIndices: Array[Long] =
     val n = prev.partitions.length
-    if (n == 0) {
+    if (n == 0)
       Array[Long]()
-    } else if (n == 1) {
+    else if (n == 1)
       Array(0L)
-    } else {
+    else
       prev.context
         .runJob(
             prev,
@@ -54,23 +53,17 @@ private[spark] class ZippedWithIndexRDD[T : ClassTag](prev: RDD[T])
             0 until n - 1 // do not need to count the last partition
         )
         .scanLeft(0L)(_ + _)
-    }
-  }
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     firstParent[T].partitions
       .map(x => new ZippedWithIndexRDDPartition(x, startIndices(x.index)))
-  }
 
   override def getPreferredLocations(split: Partition): Seq[String] =
     firstParent[T].preferredLocations(
         split.asInstanceOf[ZippedWithIndexRDDPartition].prev)
 
   override def compute(
-      splitIn: Partition, context: TaskContext): Iterator[(T, Long)] = {
+      splitIn: Partition, context: TaskContext): Iterator[(T, Long)] =
     val split = splitIn.asInstanceOf[ZippedWithIndexRDDPartition]
-    firstParent[T].iterator(split.prev, context).zipWithIndex.map { x =>
+    firstParent[T].iterator(split.prev, context).zipWithIndex.map  x =>
       (x._1, split.startIndex + x._2)
-    }
-  }
-}

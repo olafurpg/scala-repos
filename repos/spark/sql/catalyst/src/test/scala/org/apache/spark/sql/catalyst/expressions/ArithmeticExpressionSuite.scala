@@ -22,7 +22,7 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.types._
 
 class ArithmeticExpressionSuite
-    extends SparkFunSuite with ExpressionEvalHelper {
+    extends SparkFunSuite with ExpressionEvalHelper
 
   import IntegralLiteralTestUtils._
 
@@ -32,7 +32,7 @@ class ArithmeticExpressionSuite
     * @param testFunc a test function that accepts a conversion function to convert an integer
     *                 into another data type.
     */
-  private def testNumericDataTypes(testFunc: (Int => Any) => Unit): Unit = {
+  private def testNumericDataTypes(testFunc: (Int => Any) => Unit): Unit =
     testFunc(_.toByte)
     testFunc(_.toShort)
     testFunc(identity)
@@ -40,32 +40,27 @@ class ArithmeticExpressionSuite
     testFunc(_.toFloat)
     testFunc(_.toDouble)
     testFunc(Decimal(_))
-  }
 
-  test("+ (Add)") {
-    testNumericDataTypes { convert =>
+  test("+ (Add)")
+    testNumericDataTypes  convert =>
       val left = Literal(convert(1))
       val right = Literal(convert(2))
       checkEvaluation(Add(left, right), convert(3))
       checkEvaluation(Add(Literal.create(null, left.dataType), right), null)
       checkEvaluation(Add(left, Literal.create(null, right.dataType)), null)
-    }
     checkEvaluation(Add(positiveShortLit, negativeShortLit), -1.toShort)
     checkEvaluation(Add(positiveIntLit, negativeIntLit), -1)
     checkEvaluation(Add(positiveLongLit, negativeLongLit), -1L)
 
-    DataTypeTestUtils.numericAndInterval.foreach { tpe =>
+    DataTypeTestUtils.numericAndInterval.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(Add, tpe, tpe)
-    }
-  }
 
-  test("- (UnaryMinus)") {
-    testNumericDataTypes { convert =>
+  test("- (UnaryMinus)")
+    testNumericDataTypes  convert =>
       val input = Literal(convert(1))
       val dataType = input.dataType
       checkEvaluation(UnaryMinus(input), convert(-1))
       checkEvaluation(UnaryMinus(Literal.create(null, dataType)), null)
-    }
     checkEvaluation(UnaryMinus(Literal(Long.MinValue)), Long.MinValue)
     checkEvaluation(UnaryMinus(Literal(Int.MinValue)), Int.MinValue)
     checkEvaluation(UnaryMinus(Literal(Short.MinValue)), Short.MinValue)
@@ -77,13 +72,11 @@ class ArithmeticExpressionSuite
     checkEvaluation(UnaryMinus(positiveLongLit), -positiveLong)
     checkEvaluation(UnaryMinus(negativeLongLit), -negativeLong)
 
-    DataTypeTestUtils.numericAndInterval.foreach { tpe =>
+    DataTypeTestUtils.numericAndInterval.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(UnaryMinus, tpe)
-    }
-  }
 
-  test("- (Minus)") {
-    testNumericDataTypes { convert =>
+  test("- (Minus)")
+    testNumericDataTypes  convert =>
       val left = Literal(convert(1))
       val right = Literal(convert(2))
       checkEvaluation(Subtract(left, right), convert(-1))
@@ -91,7 +84,6 @@ class ArithmeticExpressionSuite
                       null)
       checkEvaluation(Subtract(left, Literal.create(null, right.dataType)),
                       null)
-    }
     checkEvaluation(Subtract(positiveShortLit, negativeShortLit),
                     (positiveShort - negativeShort).toShort)
     checkEvaluation(
@@ -99,13 +91,11 @@ class ArithmeticExpressionSuite
     checkEvaluation(Subtract(positiveLongLit, negativeLongLit),
                     positiveLong - negativeLong)
 
-    DataTypeTestUtils.numericAndInterval.foreach { tpe =>
+    DataTypeTestUtils.numericAndInterval.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(Subtract, tpe, tpe)
-    }
-  }
 
-  test("* (Multiply)") {
-    testNumericDataTypes { convert =>
+  test("* (Multiply)")
+    testNumericDataTypes  convert =>
       val left = Literal(convert(1))
       val right = Literal(convert(2))
       checkEvaluation(Multiply(left, right), convert(2))
@@ -113,7 +103,6 @@ class ArithmeticExpressionSuite
                       null)
       checkEvaluation(Multiply(left, Literal.create(null, right.dataType)),
                       null)
-    }
     checkEvaluation(Multiply(positiveShortLit, negativeShortLit),
                     (positiveShort * negativeShort).toShort)
     checkEvaluation(
@@ -121,13 +110,11 @@ class ArithmeticExpressionSuite
     checkEvaluation(Multiply(positiveLongLit, negativeLongLit),
                     positiveLong * negativeLong)
 
-    DataTypeTestUtils.numericTypeWithoutDecimal.foreach { tpe =>
+    DataTypeTestUtils.numericTypeWithoutDecimal.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(Multiply, tpe, tpe)
-    }
-  }
 
-  test("/ (Divide) basic") {
-    testNumericDataTypes { convert =>
+  test("/ (Divide) basic")
+    testNumericDataTypes  convert =>
       val left = Literal(convert(2))
       val right = Literal(convert(1))
       val dataType = left.dataType
@@ -135,14 +122,11 @@ class ArithmeticExpressionSuite
       checkEvaluation(Divide(Literal.create(null, dataType), right), null)
       checkEvaluation(Divide(left, Literal.create(null, right.dataType)), null)
       checkEvaluation(Divide(left, Literal(convert(0))), null) // divide by zero
-    }
 
-    DataTypeTestUtils.numericTypeWithoutDecimal.foreach { tpe =>
+    DataTypeTestUtils.numericTypeWithoutDecimal.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(Divide, tpe, tpe)
-    }
-  }
 
-  test("/ (Divide) for integral type") {
+  test("/ (Divide) for integral type")
     checkEvaluation(Divide(Literal(1.toByte), Literal(2.toByte)), 0.toByte)
     checkEvaluation(Divide(Literal(1.toShort), Literal(2.toShort)), 0.toShort)
     checkEvaluation(Divide(Literal(1), Literal(2)), 0)
@@ -150,17 +134,15 @@ class ArithmeticExpressionSuite
     checkEvaluation(Divide(positiveShortLit, negativeShortLit), 0.toShort)
     checkEvaluation(Divide(positiveIntLit, negativeIntLit), 0)
     checkEvaluation(Divide(positiveLongLit, negativeLongLit), 0L)
-  }
 
-  test("/ (Divide) for floating point") {
+  test("/ (Divide) for floating point")
     checkEvaluation(Divide(Literal(1.0f), Literal(2.0f)), 0.5f)
     checkEvaluation(Divide(Literal(1.0), Literal(2.0)), 0.5)
     checkEvaluation(
         Divide(Literal(Decimal(1.0)), Literal(Decimal(2.0))), Decimal(0.5))
-  }
 
-  test("% (Remainder)") {
-    testNumericDataTypes { convert =>
+  test("% (Remainder)")
+    testNumericDataTypes  convert =>
       val left = Literal(convert(1))
       val right = Literal(convert(2))
       checkEvaluation(Remainder(left, right), convert(1))
@@ -169,7 +151,6 @@ class ArithmeticExpressionSuite
       checkEvaluation(Remainder(left, Literal.create(null, right.dataType)),
                       null)
       checkEvaluation(Remainder(left, Literal(convert(0))), null) // mod by 0
-    }
     checkEvaluation(Remainder(positiveShortLit, positiveShortLit), 0.toShort)
     checkEvaluation(Remainder(negativeShortLit, negativeShortLit), 0.toShort)
     checkEvaluation(Remainder(positiveIntLit, positiveIntLit), 0)
@@ -182,17 +163,15 @@ class ArithmeticExpressionSuite
     // DataTypeTestUtils.numericTypeWithoutDecimal.foreach { tpe =>
     //  checkConsistencyBetweenInterpretedAndCodegen(Remainder, tpe, tpe)
     // }
-  }
 
-  test("Abs") {
-    testNumericDataTypes { convert =>
+  test("Abs")
+    testNumericDataTypes  convert =>
       val input = Literal(convert(1))
       val dataType = input.dataType
       checkEvaluation(Abs(Literal(convert(0))), convert(0))
       checkEvaluation(Abs(Literal(convert(1))), convert(1))
       checkEvaluation(Abs(Literal(convert(-1))), convert(1))
       checkEvaluation(Abs(Literal.create(null, dataType)), null)
-    }
     checkEvaluation(Abs(positiveShortLit), positiveShort)
     checkEvaluation(Abs(negativeShortLit), (-negativeShort).toShort)
     checkEvaluation(Abs(positiveIntLit), positiveInt)
@@ -200,13 +179,11 @@ class ArithmeticExpressionSuite
     checkEvaluation(Abs(positiveLongLit), positiveLong)
     checkEvaluation(Abs(negativeLongLit), -negativeLong)
 
-    DataTypeTestUtils.numericTypeWithoutDecimal.foreach { tpe =>
+    DataTypeTestUtils.numericTypeWithoutDecimal.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(Abs, tpe)
-    }
-  }
 
-  test("MaxOf basic") {
-    testNumericDataTypes { convert =>
+  test("MaxOf basic")
+    testNumericDataTypes  convert =>
       val small = Literal(convert(1))
       val large = Literal(convert(2))
       checkEvaluation(MaxOf(small, large), convert(2))
@@ -215,27 +192,23 @@ class ArithmeticExpressionSuite
                       convert(2))
       checkEvaluation(MaxOf(large, Literal.create(null, small.dataType)),
                       convert(2))
-    }
     checkEvaluation(
         MaxOf(positiveShortLit, negativeShortLit), (positiveShort).toShort)
     checkEvaluation(MaxOf(positiveIntLit, negativeIntLit), positiveInt)
     checkEvaluation(MaxOf(positiveLongLit, negativeLongLit), positiveLong)
 
-    DataTypeTestUtils.ordered.foreach { tpe =>
+    DataTypeTestUtils.ordered.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(MaxOf, tpe, tpe)
-    }
-  }
 
-  test("MaxOf for atomic type") {
+  test("MaxOf for atomic type")
     checkEvaluation(MaxOf(true, false), true)
     checkEvaluation(MaxOf("abc", "bcd"), "bcd")
     checkEvaluation(
         MaxOf(Array(1.toByte, 2.toByte), Array(1.toByte, 3.toByte)),
         Array(1.toByte, 3.toByte))
-  }
 
-  test("MinOf basic") {
-    testNumericDataTypes { convert =>
+  test("MinOf basic")
+    testNumericDataTypes  convert =>
       val small = Literal(convert(1))
       val large = Literal(convert(2))
       checkEvaluation(MinOf(small, large), convert(1))
@@ -244,34 +217,29 @@ class ArithmeticExpressionSuite
                       convert(2))
       checkEvaluation(MinOf(small, Literal.create(null, small.dataType)),
                       convert(1))
-    }
     checkEvaluation(
         MinOf(positiveShortLit, negativeShortLit), (negativeShort).toShort)
     checkEvaluation(MinOf(positiveIntLit, negativeIntLit), negativeInt)
     checkEvaluation(MinOf(positiveLongLit, negativeLongLit), negativeLong)
 
-    DataTypeTestUtils.ordered.foreach { tpe =>
+    DataTypeTestUtils.ordered.foreach  tpe =>
       checkConsistencyBetweenInterpretedAndCodegen(MinOf, tpe, tpe)
-    }
-  }
 
-  test("MinOf for atomic type") {
+  test("MinOf for atomic type")
     checkEvaluation(MinOf(true, false), false)
     checkEvaluation(MinOf("abc", "bcd"), "abc")
     checkEvaluation(
         MinOf(Array(1.toByte, 2.toByte), Array(1.toByte, 3.toByte)),
         Array(1.toByte, 2.toByte))
-  }
 
-  test("pmod") {
-    testNumericDataTypes { convert =>
+  test("pmod")
+    testNumericDataTypes  convert =>
       val left = Literal(convert(7))
       val right = Literal(convert(3))
       checkEvaluation(Pmod(left, right), convert(1))
       checkEvaluation(Pmod(Literal.create(null, left.dataType), right), null)
       checkEvaluation(Pmod(left, Literal.create(null, right.dataType)), null)
       checkEvaluation(Remainder(left, Literal(convert(0))), null) // mod by 0
-    }
     checkEvaluation(Pmod(Literal(-7), Literal(3)), 2)
     checkEvaluation(Pmod(Literal(7.2D), Literal(4.1D)), 3.1000000000000005)
     checkEvaluation(
@@ -280,9 +248,6 @@ class ArithmeticExpressionSuite
     checkEvaluation(Pmod(positiveShort, negativeShort), positiveShort.toShort)
     checkEvaluation(Pmod(positiveInt, negativeInt), positiveInt)
     checkEvaluation(Pmod(positiveLong, negativeLong), positiveLong)
-  }
 
-  DataTypeTestUtils.numericTypeWithoutDecimal.foreach { tpe =>
+  DataTypeTestUtils.numericTypeWithoutDecimal.foreach  tpe =>
     checkConsistencyBetweenInterpretedAndCodegen(MinOf, tpe, tpe)
-  }
-}

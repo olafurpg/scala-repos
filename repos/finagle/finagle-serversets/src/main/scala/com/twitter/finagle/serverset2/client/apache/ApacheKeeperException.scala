@@ -2,7 +2,7 @@ package com.twitter.finagle.serverset2.client.apache
 
 import com.twitter.finagle.serverset2.client.KeeperException
 
-private[serverset2] object ApacheKeeperException {
+private[serverset2] object ApacheKeeperException
 
   /**
     * Transform ZooKeeper Error Codes to KeeperExceptions
@@ -12,7 +12,7 @@ private[serverset2] object ApacheKeeperException {
     * @return Some(KeeperException) or None if no error is raised (OK)
     */
   def apply(err: Int, path: Option[String]): Option[KeeperException] =
-    err match {
+    err match
       case 0 => None
       case -1 => Some(KeeperException.SystemError(path))
       case -2 => Some(KeeperException.RuntimeInconsistency(path))
@@ -40,5 +40,3 @@ private[serverset2] object ApacheKeeperException {
       case -122 => Some(KeeperException.EphemeralOnLocalSession(path))
       case -123 => Some(KeeperException.NoWatcher(path))
       case _ => Some(KeeperException.UnknownError(path))
-    }
-}

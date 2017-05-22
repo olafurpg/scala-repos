@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
 /**
   * @author Alexander Podkhalyuzin, ilyas
   */
-trait ScFunctionExpr extends ScExpression with ScControlFlowOwner {
+trait ScFunctionExpr extends ScExpression with ScControlFlowOwner
 
   def parameters: Seq[ScParameter]
 
@@ -19,10 +19,8 @@ trait ScFunctionExpr extends ScExpression with ScControlFlowOwner {
 
   override def accept(visitor: ScalaElementVisitor) =
     visitor.visitFunctionExpression(this)
-}
 
-object ScFunctionExpr {
+object ScFunctionExpr
   def unapply(
       it: ScFunctionExpr): Some[(Seq[ScParameter], Option[ScExpression])] =
     Some(it.parameters, it.result)
-}

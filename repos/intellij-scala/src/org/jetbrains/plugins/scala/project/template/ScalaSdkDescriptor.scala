@@ -18,7 +18,7 @@ case class ScalaSdkDescriptor(version: Option[Version],
                               libraryFiles: Seq[File],
                               sourceFiles: Seq[File],
                               docFiles: Seq[File])
-    extends SdkDescriptor {
+    extends SdkDescriptor
   override protected val languageName = "scala"
 
   override protected val libraryType: LibraryType[ScalaLibraryProperties] =
@@ -27,7 +27,7 @@ case class ScalaSdkDescriptor(version: Option[Version],
   override protected val libraryName: String =
     s"$languageName-sdk-" + version.map(_.number).getOrElse("Unknown")
 
-  override protected def libraryProperties: ScalaLibraryProperties = {
+  override protected def libraryProperties: ScalaLibraryProperties =
     val properties = new ScalaLibraryProperties()
 
     properties.languageLevel = version
@@ -35,10 +35,8 @@ case class ScalaSdkDescriptor(version: Option[Version],
       .getOrElse(ScalaLanguageLevel.Default)
     properties.compilerClasspath = compilerFiles
     properties
-  }
-}
 
-trait SdkDescriptor {
+trait SdkDescriptor
   val version: Option[Version]
   val compilerFiles: Seq[File]
   val libraryFiles: Seq[File]
@@ -53,9 +51,9 @@ trait SdkDescriptor {
 
   protected def libraryProperties: ScalaLibraryProperties
 
-  def createNewLibraryConfiguration() = {
-    new NewLibraryConfiguration(libraryName, libraryType, libraryProperties) {
-      override def addRoots(editor: LibraryEditor): Unit = {
+  def createNewLibraryConfiguration() =
+    new NewLibraryConfiguration(libraryName, libraryType, libraryProperties)
+      override def addRoots(editor: LibraryEditor): Unit =
         libraryFiles
           .map(_.toLibraryRootURL)
           .foreach(editor.addRoot(_, OrderRootType.CLASSES))
@@ -66,16 +64,11 @@ trait SdkDescriptor {
           .map(_.toLibraryRootURL)
           .foreach(editor.addRoot(_, JavadocOrderRootType.getInstance))
 
-        if (sourceFiles.isEmpty && docFiles.isEmpty) {
+        if (sourceFiles.isEmpty && docFiles.isEmpty)
           editor.addRoot(ScalaSdk.documentationUrlFor(version),
                          JavadocOrderRootType.getInstance)
-        }
-      }
-    }
-  }
-}
 
-object ScalaSdkDescriptor extends SdkDescriptorCompanion {
+object ScalaSdkDescriptor extends SdkDescriptorCompanion
   override protected val requiredBinaries: Set[Artifact] = Set()
 
   override protected val libraryArtifacts =
@@ -85,13 +78,11 @@ object ScalaSdkDescriptor extends SdkDescriptorCompanion {
                                              compilerFiles: Seq[File],
                                              libraryFiles: Seq[File],
                                              sourceFiles: Seq[File],
-                                             docFiles: Seq[File]) = {
+                                             docFiles: Seq[File]) =
     ScalaSdkDescriptor(
         version, compilerFiles, libraryFiles, sourceFiles, docFiles)
-  }
-}
 
-trait SdkDescriptorCompanion {
+trait SdkDescriptorCompanion
   protected val requiredBinaries: Set[Artifact]
 
   protected val libraryArtifacts: Set[Artifact]
@@ -102,20 +93,17 @@ trait SdkDescriptorCompanion {
                                     sourceFiles: Seq[File],
                                     docFiles: Seq[File]): SdkDescriptor
 
-  def from(components: Seq[Component]): Either[String, SdkDescriptor] = {
-    val (binaryComponents, sourceComponents, docComponents) = {
+  def from(components: Seq[Component]): Either[String, SdkDescriptor] =
+    val (binaryComponents, sourceComponents, docComponents) =
       val componentsByKind = components.groupBy(_.kind)
 
       (componentsByKind.getOrElse(Kind.Binaries, Seq.empty),
        componentsByKind.getOrElse(Kind.Sources, Seq.empty),
        componentsByKind.getOrElse(Kind.Docs, Seq.empty))
-    }
 
-    val reflectRequired = binaryComponents.exists {
-      _.version.exists {
+    val reflectRequired = binaryComponents.exists
+      _.version.exists
         _.toLanguageLevel.exists(_ >= Scala_2_10)
-      }
-    }
 
     val requiredBinaryArtifacts =
       Set(Artifact.ScalaLibrary, Artifact.ScalaCompiler) ++ requiredBinaries ++
@@ -127,7 +115,7 @@ trait SdkDescriptorCompanion {
     val missingBinaryArtifacts =
       requiredBinaryArtifacts -- existingBinaryArtifacts
 
-    if (missingBinaryArtifacts.isEmpty) {
+    if (missingBinaryArtifacts.isEmpty)
       val compilerBinaries = binaryComponents.filter(
           it => requiredBinaryArtifacts.contains(it.artifact))
 
@@ -148,8 +136,5 @@ trait SdkDescriptorCompanion {
                                            libraryDocs.map(_.file))
 
       Right(descriptor)
-    } else {
+    else
       Left("Not found: " + missingBinaryArtifacts.map(_.title).mkString(", "))
-    }
-  }
-}

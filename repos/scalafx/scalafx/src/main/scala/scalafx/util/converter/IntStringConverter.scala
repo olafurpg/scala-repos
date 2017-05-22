@@ -30,11 +30,10 @@ import javafx.util.{converter => jfxuc}
 
 import scala.language.implicitConversions
 
-object IntStringConverter {
+object IntStringConverter
   implicit def sfxIntStringConverter2jfx(
       c: IntStringConverter): jfxuc.IntegerStringConverter =
     if (c != null) c.delegate else null
-}
 
 class IntStringConverter(
     delegate: jfxuc.IntegerStringConverter = new jfxuc.IntegerStringConverter)

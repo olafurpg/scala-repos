@@ -5,10 +5,10 @@ import com.twitter.scalding.parquet.tuple.scheme.ParquetWriteSupport
 
 import scala.reflect.macros.Context
 
-object WriteSupportProvider {
+object WriteSupportProvider
 
   def toWriteSupportImpl[T](ctx: Context)(
-      implicit T: ctx.WeakTypeTag[T]): ctx.Expr[ParquetWriteSupport[T]] = {
+      implicit T: ctx.WeakTypeTag[T]): ctx.Expr[ParquetWriteSupport[T]] =
     import ctx.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(ctx)(T.tpe))
@@ -20,7 +20,7 @@ object WriteSupportProvider {
     def matchField(idx: Int,
                    fieldType: Type,
                    fValue: Tree,
-                   groupName: TermName): (Int, Tree) = {
+                   groupName: TermName): (Int, Tree) =
       def writePrimitiveField(wTree: Tree) =
         (idx + 1,
          q"""rc.startField($groupName.getFieldName($idx), $idx)
@@ -41,7 +41,7 @@ object WriteSupportProvider {
                             }
                          """)
 
-      fieldType match {
+      fieldType match
         case tpe if tpe =:= typeOf[String] =>
           writePrimitiveField(
               q"rc.addBinary(_root_.org.apache.parquet.io.api.Binary.fromString($fValue))")
@@ -113,14 +113,12 @@ object WriteSupportProvider {
         case _ =>
           ctx.abort(ctx.enclosingPosition,
                     s"Case class $T has unsupported field type : $fieldType")
-      }
-    }
 
     def expandMethod(
-        outerTpe: Type, pValueTree: Tree, groupName: TermName): (Int, Tree) = {
-      outerTpe.declarations.collect {
+        outerTpe: Type, pValueTree: Tree, groupName: TermName): (Int, Tree) =
+      outerTpe.declarations.collect
         case m: MethodSymbol if m.isCaseAccessor => m
-      }.foldLeft((0, q"")) {
+      .foldLeft((0, q""))
         case ((idx, existingTree), getter) =>
           val (newIdx, subTree) = matchField(
               idx, getter.returnType, q"$pValueTree.$getter", groupName)
@@ -129,8 +127,6 @@ object WriteSupportProvider {
                       $existingTree
                       $subTree
                     """)
-      }
-    }
 
     def createGroupName(): TermName = newTermName(ctx.fresh("group"))
 
@@ -155,5 +151,3 @@ object WriteSupportProvider {
       }
       """
     ctx.Expr[ParquetWriteSupport[T]](writeSupport)
-  }
-}

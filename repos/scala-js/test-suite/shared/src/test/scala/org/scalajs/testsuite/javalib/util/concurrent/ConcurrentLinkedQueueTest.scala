@@ -18,12 +18,12 @@ import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
+class ConcurrentLinkedQueueTest extends AbstractCollectionTest
 
   override def factory: ConcurrentLinkedQueueFactory =
     new ConcurrentLinkedQueueFactory
 
-  @Test def should_store_and_remove_ordered_integers(): Unit = {
+  @Test def should_store_and_remove_ordered_integers(): Unit =
     val pq = factory.empty[Int]
 
     assertEquals(0, pq.size())
@@ -39,9 +39,8 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     assertTrue(pq.remove(222))
     assertTrue(pq.remove(222))
     assertFalse(pq.remove(222))
-  }
 
-  @Test def should_store_and_remove_strings(): Unit = {
+  @Test def should_store_and_remove_strings(): Unit =
     val pq = factory.empty[String]
 
     assertEquals(0, pq.size())
@@ -58,9 +57,8 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     assertTrue(pq.remove("bbb"))
     assertFalse(pq.remove("bbb"))
     assertNull(pq.poll())
-  }
 
-  @Test def should_store_Double_even_in_corner_cases(): Unit = {
+  @Test def should_store_Double_even_in_corner_cases(): Unit =
     val pq = factory.empty[Double]
 
     assertTrue(pq.add(1.0))
@@ -79,29 +77,25 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     assertTrue(pq.remove(Double.NaN))
 
     assertTrue(pq.isEmpty)
-  }
 
-  @Test def could_be_instantiated_with_a_prepopulated_Collection(): Unit = {
+  @Test def could_be_instantiated_with_a_prepopulated_Collection(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val pq = factory.newFrom(l)
 
     assertEquals(5, pq.size())
-    for (i <- l) {
+    for (i <- l)
       assertEquals(i, pq.poll())
-    }
     assertTrue(pq.isEmpty)
-  }
 
-  @Test def should_be_cleared_in_a_single_operation(): Unit = {
+  @Test def should_be_cleared_in_a_single_operation(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val pq = factory.newFrom(l)
 
     assertEquals(5, pq.size())
     pq.clear()
     assertEquals(0, pq.size())
-  }
 
-  @Test def should_add_multiple_elemnt_in_one_operation(): Unit = {
+  @Test def should_add_multiple_elemnt_in_one_operation(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val pq = factory.empty[Int]
 
@@ -110,9 +104,8 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     assertEquals(5, pq.size())
     pq.add(6)
     assertEquals(6, pq.size())
-  }
 
-  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit = {
+  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit =
     val pq = factory.empty[Double]
 
     assertTrue(pq.add(11111.0))
@@ -145,9 +138,8 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     assertTrue(pq.contains(Double.NaN))
     assertTrue(pq.contains(+0.0))
     assertTrue(pq.contains(-0.0))
-  }
 
-  @Test def should_provide_a_weakly_consistent_iterator(): Unit = {
+  @Test def should_provide_a_weakly_consistent_iterator(): Unit =
     val queue = factory.empty[Int]
     queue.add(1)
     queue.add(2)
@@ -168,10 +160,8 @@ class ConcurrentLinkedQueueTest extends AbstractCollectionTest {
     iter2.remove()
     assertEquals(2, iter2.next())
     assertEquals(3, iter2.next())
-  }
-}
 
-class ConcurrentLinkedQueueFactory extends AbstractCollectionFactory {
+class ConcurrentLinkedQueueFactory extends AbstractCollectionFactory
   override def implementationName: String =
     "java.util.concurrent.ConcurrentLinkedQueue"
 
@@ -180,4 +170,3 @@ class ConcurrentLinkedQueueFactory extends AbstractCollectionFactory {
 
   def newFrom[E](coll: ju.Collection[E]): ConcurrentLinkedQueue[E] =
     new ConcurrentLinkedQueue[E](coll)
-}

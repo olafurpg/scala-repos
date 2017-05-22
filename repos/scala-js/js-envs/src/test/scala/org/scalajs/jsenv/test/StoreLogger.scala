@@ -4,7 +4,7 @@ import org.scalajs.core.tools.logging._
 
 import scala.collection.mutable.ListBuffer
 
-class StoreLogger extends Logger {
+class StoreLogger extends Logger
   import StoreLogger._
 
   private[this] val buf = new ListBuffer[LogElem]
@@ -17,12 +17,10 @@ class StoreLogger extends Logger {
     buf += Trace(t)
 
   def getLog: List[LogElem] = buf.toList
-}
 
-object StoreLogger {
+object StoreLogger
 
   sealed trait LogElem
   final case class Log(level: Level, message: String) extends LogElem
   final case class Success(message: String) extends LogElem
   final case class Trace(t: Throwable) extends LogElem
-}

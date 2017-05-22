@@ -1,4 +1,4 @@
-object Test extends Application {
+object Test extends Application
   class A
   class B extends A
   def foo(x: A, y: B) = print(1)
@@ -6,4 +6,3 @@ object Test extends Application {
 
   /* line: 4 */
   foo(new B, new B)
-}

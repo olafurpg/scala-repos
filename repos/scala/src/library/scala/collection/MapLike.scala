@@ -57,7 +57,7 @@ import parallel.ParMap
 trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     extends PartialFunction[A, B] with IterableLike[(A, B), This]
     with GenMapLike[A, B, This]
-    with Subtractable[A, This] with Parallelizable[(A, B), ParMap[A, B]] {
+    with Subtractable[A, This] with Parallelizable[(A, B), ParMap[A, B]]
   self =>
 
   /** The empty map of the same type as this map
@@ -121,10 +121,9 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *   @usecase def getOrElse(key: A, default: => B): B
     *     @inheritdoc
     */
-  def getOrElse[B1 >: B](key: A, default: => B1): B1 = get(key) match {
+  def getOrElse[B1 >: B](key: A, default: => B1): B1 = get(key) match
     case Some(v) => v
     case None => default
-  }
 
   /** Retrieves the value which is associated with the given key. This
     *  method invokes the `default` method of the map if there is no mapping
@@ -135,10 +134,9 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return     the value associated with the given key, or the result of the
     *              map's `default` method, if none exists.
     */
-  def apply(key: A): B = get(key) match {
+  def apply(key: A): B = get(key) match
     case None => default(key)
     case Some(value) => value
-  }
 
   /** Tests whether this map contains a binding for a key.
     *
@@ -164,7 +162,7 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   /** The implementation class of the set returned by `keySet`.
     */
   protected class DefaultKeySet
-      extends AbstractSet[A] with Set[A] with Serializable {
+      extends AbstractSet[A] with Set[A] with Serializable
     def contains(key: A) = self.contains(key)
     def iterator = keysIterator
     def +(elem: A): Set[A] =
@@ -173,17 +171,15 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
       (Set[A]() ++ this - elem).asInstanceOf[Set[A]] // !!! concrete overrides abstract problem
     override def size = self.size
     override def foreach[U](f: A => U) = self.keysIterator foreach f
-  }
 
   /** Creates an iterator for all keys.
     *
     *  @return an iterator over all keys.
     */
-  def keysIterator: Iterator[A] = new AbstractIterator[A] {
+  def keysIterator: Iterator[A] = new AbstractIterator[A]
     val iter = self.iterator
     def hasNext = iter.hasNext
     def next() = iter.next()._1
-  }
 
   /** Collects all keys of this map in an iterable collection.
     *
@@ -204,21 +200,19 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   /** The implementation class of the iterable returned by `values`.
     */
   protected class DefaultValuesIterable
-      extends AbstractIterable[B] with Iterable[B] with Serializable {
+      extends AbstractIterable[B] with Iterable[B] with Serializable
     def iterator = valuesIterator
     override def size = self.size
     override def foreach[U](f: B => U) = self.valuesIterator foreach f
-  }
 
   /** Creates an iterator for all values in this map.
     *
     *  @return an iterator over all values that are associated with some key in this map.
     */
-  def valuesIterator: Iterator[B] = new AbstractIterator[B] {
+  def valuesIterator: Iterator[B] = new AbstractIterator[B]
     val iter = self.iterator
     def hasNext = iter.hasNext
     def next() = iter.next()._2
-  }
 
   /** Defines the default value computation for the map,
     *  returned when a key is not found
@@ -232,13 +226,12 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     throw new NoSuchElementException("key not found: " + key)
 
   protected class FilteredKeys(p: A => Boolean)
-      extends AbstractMap[A, B] with DefaultMap[A, B] {
+      extends AbstractMap[A, B] with DefaultMap[A, B]
     override def foreach[U](f: ((A, B)) => U): Unit =
       for (kv <- self) if (p(kv._1)) f(kv)
     def iterator = self.iterator.filter(kv => p(kv._1))
     override def contains(key: A) = p(key) && self.contains(key)
     def get(key: A) = if (!p(key)) None else self.get(key)
-  }
 
   /** Filters this map by retaining only keys satisfying a predicate.
     *
@@ -252,14 +245,13 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   def filterKeys(p: A => Boolean): Map[A, B] = new FilteredKeys(p)
 
   protected class MappedValues[C](f: B => C)
-      extends AbstractMap[A, C] with DefaultMap[A, C] {
+      extends AbstractMap[A, C] with DefaultMap[A, C]
     override def foreach[U](g: ((A, C)) => U): Unit =
       for ((k, v) <- self) g((k, f(v)))
     def iterator = for ((k, v) <- self.iterator) yield (k, f(v))
     override def size = self.size
     override def contains(key: A) = self.contains(key)
     def get(key: A) = self.get(key).map(f)
-  }
 
   /** Transforms this map by applying a function to every retrieved value.
     *  @param  f   the function used to transform values of this map.
@@ -324,29 +316,25 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @param p    A predicate over key-value pairs
     *  @return     A new map containing elements not satisfying the predicate.
     */
-  override def filterNot(p: ((A, B)) => Boolean): This = {
+  override def filterNot(p: ((A, B)) => Boolean): This =
     var res: This = repr
     for (kv <- this) if (p(kv))
       res = (res - kv._1).asInstanceOf[This] // !!! concrete overrides abstract problem
     res
-  }
 
-  override def toSeq: Seq[(A, B)] = {
+  override def toSeq: Seq[(A, B)] =
     if (isEmpty) Vector.empty[(A, B)]
-    else {
+    else
       // Default appropriate for immutable collections; mutable collections override this
       val vb = Vector.newBuilder[(A, B)]
       foreach(vb += _)
       vb.result
-    }
-  }
 
-  override def toBuffer[C >: (A, B)]: mutable.Buffer[C] = {
+  override def toBuffer[C >: (A, B)]: mutable.Buffer[C] =
     val result = new mutable.ArrayBuffer[C](size)
     // Faster to let the map iterate itself than to defer through copyToBuffer
     foreach(result += _)
     result
-  }
 
   protected[this] override def parCombiner = ParMap.newCombiner[A, B]
 
@@ -376,4 +364,3 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
 
   override /*PartialFunction*/
   def toString = super [IterableLike].toString
-}

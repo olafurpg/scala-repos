@@ -31,7 +31,7 @@ import javafx.beans.{property => jfxbp}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object LongProperty {
+object LongProperty
   implicit def sfxLongProperty2jfx(lp: LongProperty): jfxbp.LongProperty =
     if (lp != null) lp.delegate else null
 
@@ -43,12 +43,11 @@ object LongProperty {
     */
   def apply(value: Long) =
     new LongProperty(new jfxbp.SimpleLongProperty(value))
-}
 
 class LongProperty(
     override val delegate: jfxbp.LongProperty = new jfxbp.SimpleLongProperty)
     extends ReadOnlyLongProperty(delegate) with Property[Long, Number]
-    with SFXDelegate[jfxbp.LongProperty] {
+    with SFXDelegate[jfxbp.LongProperty]
 
   def this(bean: Object, name: String) =
     this(new jfxbp.SimpleLongProperty(bean, name))
@@ -56,10 +55,7 @@ class LongProperty(
   def this(bean: Object, name: String, initialValue: Long) =
     this(new jfxbp.SimpleLongProperty(bean, name, initialValue))
 
-  def value_=(v: Long) {
+  def value_=(v: Long)
     delegate.set(v)
-  }
-  def value_=(v: Number) {
+  def value_=(v: Number)
     delegate.set(v.longValue)
-  }
-}

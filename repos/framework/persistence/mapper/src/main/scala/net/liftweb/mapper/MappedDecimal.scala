@@ -51,7 +51,7 @@ import xml.{Text, NodeSeq}
   */
 abstract class MappedDecimal[T <: Mapper[T]](
     val fieldOwner: T, val context: MathContext, val scale: Int)
-    extends MappedField[BigDecimal, T] {
+    extends MappedField[BigDecimal, T]
 
   /**
     * Constructs a MappedDecimal with the specified initial value and context.
@@ -61,10 +61,9 @@ abstract class MappedDecimal[T <: Mapper[T]](
     * @param value The initial value
     * @param context The MathContext that controls precision and rounding
     */
-  def this(fieldOwner: T, value: BigDecimal, context: MathContext) = {
+  def this(fieldOwner: T, value: BigDecimal, context: MathContext) =
     this(fieldOwner, context, value.scale)
     wholeSet(coerce(value))
-  }
 
   /**
     * Constructs a MappedDecimal with the specified initial value. The context
@@ -74,10 +73,9 @@ abstract class MappedDecimal[T <: Mapper[T]](
     * @param fieldOwner The Mapper that owns this field
     * @param value The initial value
     */
-  def this(fieldOwner: T, value: BigDecimal) = {
+  def this(fieldOwner: T, value: BigDecimal) =
     this(fieldOwner, MathContext.UNLIMITED, value.scale)
     wholeSet(coerce(value))
-  }
 
   private val zero = BigDecimal("0")
 
@@ -88,10 +86,9 @@ abstract class MappedDecimal[T <: Mapper[T]](
   private var data: BigDecimal = defaultValue
   private var orgData: BigDecimal = defaultValue
 
-  private def wholeSet(in: BigDecimal) = {
+  private def wholeSet(in: BigDecimal) =
     data = in
     orgData = in
-  }
 
   import scala.reflect.runtime.universe._
   def manifest: TypeTag[BigDecimal] = typeTag[BigDecimal]
@@ -101,7 +98,7 @@ abstract class MappedDecimal[T <: Mapper[T]](
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = BigDecimal } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(name, manifest, new FieldConverter
 
       /**
         * The type of the field
@@ -136,33 +133,30 @@ abstract class MappedDecimal[T <: Mapper[T]](
         * @return the field as a sequence of SourceFields
         */
       def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+    )
 
   protected def i_is_! = data
   protected def i_was_! = orgData
 
-  override def doneWithSave() {
+  override def doneWithSave()
     orgData = data
-  }
 
   override def readPermission_? = true
   override def writePermission_? = true
 
   protected def i_obscure_!(in: BigDecimal) = defaultValue
 
-  protected def real_i_set_!(value: BigDecimal): BigDecimal = {
-    if (value != data) {
+  protected def real_i_set_!(value: BigDecimal): BigDecimal =
+    if (value != data)
       data = value
       dirty_?(true)
-    }
     data
-  }
 
   def asJsExp: JsExp = JE.Num(get)
   def asJsonValue: Box[JsonAST.JValue] = Full(JsonAST.JDouble(get.doubleValue))
 
   def setFromAny(in: Any): BigDecimal =
-    in match {
+    in match
       // FIXME set for big decimal
       // case JsonAST.JDouble(db) => MappedDecimal.this.setAll(java.math.BigDecimal.valueOf(db))
       // case JsonAST.JInt(bi) => MappedDecimal.this.set(new java.math.BigDecimal(bi.bigInteger))
@@ -172,12 +166,10 @@ abstract class MappedDecimal[T <: Mapper[T]](
       case Full(n) => setFromString(n.toString)
       case None | Empty | Failure(_, _, _) | null => setFromString("0")
       case n => setFromString(n.toString)
-    }
 
-  def setFromString(in: String): BigDecimal = {
+  def setFromString(in: String): BigDecimal =
     this.setAll(BigDecimal(in))
     data
-  }
 
   /** Set the value along with proper scale, precision, and rounding */
   protected def setAll(in: BigDecimal) = this.set(coerce(in))
@@ -199,50 +191,47 @@ abstract class MappedDecimal[T <: Mapper[T]](
   def buildSetDateValue(
       accessor: Method, columnName: String): (T, Date) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedDecimal[T] =>
           f.wholeSet(
               if (v == null) defaultValue else coerce(BigDecimal(v.getTime)))
-      })
+      )
 
   def buildSetStringValue(
       accessor: Method, columnName: String): (T, String) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedDecimal[T] =>
           f.wholeSet(if (v == null) defaultValue else coerce(BigDecimal(v)))
-      })
+      )
 
   def buildSetLongValue(
       accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedDecimal[T] =>
           f.wholeSet(if (isNull) defaultValue else coerce(BigDecimal(v)))
-      })
+      )
 
   def buildSetActualValue(accessor: Method,
                           data: AnyRef,
                           columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedDecimal[T] =>
           f.wholeSet(
               if (v == null) defaultValue else coerce(BigDecimal(v.toString)))
-      })
+      )
 
   /**
     * Returns the SQL creation string for this field. See the note at the
     * top of the page concerning default precision.
     */
-  def fieldCreatorString(dbType: DriverType, colName: String): String = {
+  def fieldCreatorString(dbType: DriverType, colName: String): String =
     val suffix =
-      if (context.getPrecision == 0) {
+      if (context.getPrecision == 0)
         ""
-      } else {
+      else
         "(" + context.getPrecision + "," + scale + ")"
-      }
 
     colName + " DECIMAL" + suffix + notNullAppender()
-  }
-}

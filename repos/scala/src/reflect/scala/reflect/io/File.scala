@@ -17,7 +17,7 @@ import scala.io.Codec
 /**
   * ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-object File {
+object File
   def pathSeparator = java.io.File.pathSeparator
   def separator = java.io.File.separator
   def apply(path: Path)(implicit codec: Codec) = new File(path.jfile)(codec)
@@ -25,12 +25,10 @@ object File {
   // Create a temporary file, which will be deleted upon jvm exit.
   def makeTemp(prefix: String = Path.randomPrefix,
                suffix: String = null,
-               dir: JFile = null) = {
+               dir: JFile = null) =
     val jfile = java.io.File.createTempFile(prefix, suffix, dir)
     jfile.deleteOnExit()
     apply(jfile)
-  }
-}
 
 /** An abstraction for files.  For character data, a Codec
   *  can be supplied at either creation time or when a method
@@ -44,7 +42,7 @@ object File {
   *  ''Note:  This is library is considered experimental and should not be used unless you know what you are doing.''
   */
 class File(jfile: JFile)(implicit constructorCodec: Codec)
-    extends Path(jfile) with Streamable.Chars {
+    extends Path(jfile) with Streamable.Chars
   override val creationCodec = constructorCodec
 
   override def addExtension(ext: String): File = super.addExtension(ext).toFile
@@ -84,37 +82,31 @@ class File(jfile: JFile)(implicit constructorCodec: Codec)
   def printWriter(): PrintWriter = new PrintWriter(bufferedWriter(), true)
 
   /** Creates a new file and writes all the Strings to it. */
-  def writeAll(strings: String*): Unit = {
+  def writeAll(strings: String*): Unit =
     val out = bufferedWriter()
     try strings foreach (out write _) finally out.close()
-  }
 
-  def appendAll(strings: String*): Unit = {
+  def appendAll(strings: String*): Unit =
     val out = bufferedWriter(append = true)
     try strings foreach (out write _) finally out.close()
-  }
 
   /** Calls println on each string (so it adds a newline in the PrintWriter fashion.) */
-  def printlnAll(strings: String*): Unit = {
+  def printlnAll(strings: String*): Unit =
     val out = printWriter()
     try strings foreach (out println _) finally out.close()
-  }
 
   def safeSlurp(): Option[String] =
     try Some(slurp()) catch { case _: IOException => None }
 
   /** Reflection since we're into the java 6+ API.
     */
-  def setExecutable(executable: Boolean, ownerOnly: Boolean = true): Boolean = {
+  def setExecutable(executable: Boolean, ownerOnly: Boolean = true): Boolean =
     type JBoolean = java.lang.Boolean
     val method = try classOf[JFile].getMethod(
-        "setExecutable", classOf[Boolean], classOf[Boolean]) catch {
+        "setExecutable", classOf[Boolean], classOf[Boolean]) catch
       case _: NoSuchMethodException => return false
-    }
 
     try method
       .invoke(jfile, executable: JBoolean, ownerOnly: JBoolean)
       .asInstanceOf[JBoolean]
       .booleanValue catch { case _: Exception => false }
-  }
-}

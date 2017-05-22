@@ -2,8 +2,6 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.sexp.util
 
-trait ThreadLocalSupport {
-  protected def local[T](t: => T) = new ThreadLocal[T] {
+trait ThreadLocalSupport
+  protected def local[T](t: => T) = new ThreadLocal[T]
     override def initialValue = t
-  }
-}

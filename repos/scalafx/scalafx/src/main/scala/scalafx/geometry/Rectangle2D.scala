@@ -31,7 +31,7 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Rectangle2D {
+object Rectangle2D
   implicit def sfxRectangle2D2jfx(r: Rectangle2D): jfxg.Rectangle2D =
     if (r != null) r.delegate else null
 
@@ -39,10 +39,9 @@ object Rectangle2D {
     * An empty Rectangle2D instance (with all coordinates equal to zero).
     */
   val Empty = jfxg.Rectangle2D.EMPTY
-}
 
 class Rectangle2D(override val delegate: jfxg.Rectangle2D)
-    extends SFXDelegate[jfxg.Rectangle2D] {
+    extends SFXDelegate[jfxg.Rectangle2D]
 
   def this(minX: Double, minY: Double, width: Double, height: Double) =
     this(new jfxg.Rectangle2D(minX, minY, width, height))
@@ -108,4 +107,3 @@ class Rectangle2D(override val delegate: jfxg.Rectangle2D)
     * The width of this Rectangle2D.
     */
   def width = delegate.getWidth
-}

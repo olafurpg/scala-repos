@@ -32,7 +32,7 @@ import org.junit.{After, Before, Test}
 
 import scala.collection.mutable
 
-class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
+class ControllerFailoverTest extends KafkaServerTestHarness with Logging
   val log = Logger.getLogger(classOf[ControllerFailoverTest])
   val numNodes = 2
   val numParts = 1
@@ -48,42 +48,37 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
       .map(KafkaConfig.fromProps(_, overridingProps))
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     super.tearDown()
     this.metrics.close()
-  }
 
   /**
     * See @link{https://issues.apache.org/jira/browse/KAFKA-2300}
     * for the background of this test case
     */
   @Test
-  def testMetadataUpdate() {
+  def testMetadataUpdate()
     log.setLevel(Level.INFO)
     var controller: KafkaServer = this.servers.head;
     // Find the current controller
     val epochMap: mutable.Map[Int, Int] = mutable.Map.empty
-    for (server <- this.servers) {
+    for (server <- this.servers)
       epochMap += (server.config.brokerId -> server.kafkaController.epoch)
-      if (server.kafkaController.isActive()) {
+      if (server.kafkaController.isActive())
         controller = server
-      }
-    }
     // Create topic with one partition
     kafka.admin.AdminUtils.createTopic(controller.zkUtils, topic, 1, 1)
     val topicPartition = TopicAndPartition("topic1", 0)
     var partitions = controller.kafkaController.partitionStateMachine
       .partitionsInState(OnlinePartition)
-    while (!partitions.contains(topicPartition)) {
+    while (!partitions.contains(topicPartition))
       partitions = controller.kafkaController.partitionStateMachine
         .partitionsInState(OnlinePartition)
       Thread.sleep(100)
-    }
     // Replace channel manager with our mock manager
     controller.kafkaController.controllerContext.controllerChannelManager
       .shutdown()
@@ -97,9 +92,9 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
     channelManager.stopSendThread(0)
     // Spawn a new thread to block on the outgoing channel
     // queue
-    val thread = new Thread(new Runnable {
-      def run() {
-        try {
+    val thread = new Thread(new Runnable
+      def run()
+        try
           controller.kafkaController.sendUpdateMetadataRequest(
               Seq(0), Set(topicPartition))
           log.info("Queue state %d %d".format(channelManager.queueCapacity(0),
@@ -108,18 +103,14 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
               Seq(0), Set(topicPartition))
           log.info("Queue state %d %d".format(channelManager.queueCapacity(0),
                                               channelManager.queueSize(0)))
-        } catch {
-          case e: Exception => {
+        catch
+          case e: Exception =>
               log.info("Thread interrupted")
-            }
-        }
-      }
-    })
+    )
     thread.setName("mythread")
     thread.start()
-    while (thread.getState() != Thread.State.WAITING) {
+    while (thread.getState() != Thread.State.WAITING)
       Thread.sleep(100)
-    }
     // Assume that the thread is WAITING because it is
     // blocked on the queue, so interrupt and move forward
     thread.interrupt()
@@ -128,69 +119,54 @@ class ControllerFailoverTest extends KafkaServerTestHarness with Logging {
     // Wait and find current controller
     var found = false
     var counter = 0
-    while (!found && counter < 10) {
-      for (server <- this.servers) {
-        val previousEpoch = (epochMap get server.config.brokerId) match {
+    while (!found && counter < 10)
+      for (server <- this.servers)
+        val previousEpoch = (epochMap get server.config.brokerId) match
           case Some(epoch) =>
             epoch
           case None =>
             val msg = String.format(
                 "Missing element in epoch map %s", epochMap.mkString(", "))
             throw new IllegalStateException(msg)
-        }
 
         if (server.kafkaController.isActive &&
-            (previousEpoch) < server.kafkaController.epoch) {
+            (previousEpoch) < server.kafkaController.epoch)
           controller = server
           found = true
-        }
-      }
-      if (!found) {
+      if (!found)
         Thread.sleep(100)
         counter += 1
-      }
-    }
     // Give it a shot to make sure that sending isn't blocking
-    try {
+    try
       controller.kafkaController.sendUpdateMetadataRequest(
           Seq(0), Set(topicPartition))
-    } catch {
-      case e: Throwable => {
+    catch
+      case e: Throwable =>
           fail(e)
-        }
-    }
-  }
-}
 
 class MockChannelManager(private val controllerContext: ControllerContext,
                          config: KafkaConfig,
                          metrics: Metrics)
     extends ControllerChannelManager(
-        controllerContext, config, new SystemTime, metrics) {
+        controllerContext, config, new SystemTime, metrics)
 
-  def stopSendThread(brokerId: Int) {
+  def stopSendThread(brokerId: Int)
     val requestThread = brokerStateInfo(brokerId).requestSendThread
     requestThread.isRunning.set(false)
     requestThread.interrupt
     requestThread.join
-  }
 
-  def shrinkBlockingQueue(brokerId: Int) {
+  def shrinkBlockingQueue(brokerId: Int)
     val messageQueue = new LinkedBlockingQueue[QueueItem](1)
     val brokerInfo = this.brokerStateInfo(brokerId)
     this.brokerStateInfo
       .put(brokerId, brokerInfo.copy(messageQueue = messageQueue))
-  }
 
-  def resumeSendThread(brokerId: Int) {
+  def resumeSendThread(brokerId: Int)
     this.startRequestSendThread(0)
-  }
 
-  def queueCapacity(brokerId: Int): Int = {
+  def queueCapacity(brokerId: Int): Int =
     this.brokerStateInfo(brokerId).messageQueue.remainingCapacity
-  }
 
-  def queueSize(brokerId: Int): Int = {
+  def queueSize(brokerId: Int): Int =
     this.brokerStateInfo(brokerId).messageQueue.size
-  }
-}

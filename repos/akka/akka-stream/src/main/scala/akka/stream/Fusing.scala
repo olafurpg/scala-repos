@@ -24,7 +24,7 @@ import scala.annotation.unchecked.uncheckedVariance
   * attribute can be used to declare subgraph boundaries across which the graph
   * shall not be fused.
   */
-object Fusing {
+object Fusing
 
   /**
     * Fuse all operations where this is technically possible (i.e. all
@@ -42,19 +42,16 @@ object Fusing {
   case class FusedGraph[+S <: Shape @uncheckedVariance, +M](
       override val module: FusedModule,
       override val shape: S)
-      extends Graph[S, M] {
+      extends Graph[S, M]
     // the @uncheckedVariance look like a compiler bug ... why does it work in Graph but not here?
     override def withAttributes(attr: Attributes) =
       copy(module = module.withAttributes(attr))
-  }
 
-  object FusedGraph {
+  object FusedGraph
     def unapply[S <: Shape, M](g: Graph[S, M]): Option[(FusedModule, S)] =
-      g.module match {
+      g.module match
         case f: FusedModule => Some((f, g.shape))
         case _ => None
-      }
-  }
 
   /**
     * When fusing a [[Graph]] a part of the internal stage wirings are hidden within
@@ -68,4 +65,3 @@ object Fusing {
                                   inOwners: immutable.Map[InPort, Module],
                                   outOwners: immutable.Map[OutPort, Module],
                                   allModules: Set[Module])
-}

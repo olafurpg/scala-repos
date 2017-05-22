@@ -5,10 +5,10 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, 
 /**
   * utility methods for tests
   */
-object Serde {
+object Serde
 
   /** provides a deep copy of this input object by serializing and deserializing it*/
-  def serializedCopy[T](input: T): T = {
+  def serializedCopy[T](input: T): T =
 
     val baos = new ByteArrayOutputStream()
     val oos = new ObjectOutputStream(baos)
@@ -19,5 +19,3 @@ object Serde {
     val bais = new ObjectInputStream(
         new ByteArrayInputStream(baos.toByteArray))
     bais.readObject().asInstanceOf[T]
-  }
-}

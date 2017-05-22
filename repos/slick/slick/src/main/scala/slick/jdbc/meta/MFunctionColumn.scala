@@ -18,22 +18,20 @@ case class MFunctionColumn(function: MQName,
                            charOctetLength: Option[Int],
                            ordinalPosition: Int,
                            isNullable: Option[Boolean],
-                           specificName: String) {
+                           specificName: String)
 
   def sqlTypeName = JdbcTypesComponent.typeNames.get(sqlType)
-}
 
-object MFunctionColumn {
+object MFunctionColumn
   def getFunctionColumns(
-      functionPattern: MQName, columnNamePattern: String = "%") = {
-    ResultSetAction[MFunctionColumn] { s =>
+      functionPattern: MQName, columnNamePattern: String = "%") =
+    ResultSetAction[MFunctionColumn]  s =>
       try s.metaData.getFunctionColumns(functionPattern.catalog_?,
                                         functionPattern.schema_?,
                                         functionPattern.name,
-                                        columnNamePattern) catch {
+                                        columnNamePattern) catch
         case _: AbstractMethodError => null
-      }
-    } { r =>
+     r =>
       MFunctionColumn(MQName.from(r),
                       r.<<,
                       r.<<,
@@ -43,16 +41,13 @@ object MFunctionColumn {
                       r.<<,
                       r.<<,
                       r.<<,
-                      r.nextShort match {
+                      r.nextShort match
                         case DatabaseMetaData.functionNoNulls => Some(false)
                         case DatabaseMetaData.functionNullable => Some(true)
                         case _ => None
-                      },
+                      ,
                       r.<<,
                       r.<<,
                       r.<<,
                       DatabaseMeta.yesNoOpt(r),
                       r.<<)
-    }
-  }
-}

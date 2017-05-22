@@ -22,7 +22,6 @@ package kafka.common
   * to just the in sync replicas depending upon whether unclean leader election is allowed to occur.
   */
 class NoReplicaOnlineException(message: String, cause: Throwable)
-    extends RuntimeException(message, cause) {
+    extends RuntimeException(message, cause)
   def this(message: String) = this(message, null)
   def this() = this(null, null)
-}

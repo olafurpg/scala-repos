@@ -24,9 +24,9 @@ import org.apache.spark.deploy.Command
 import org.apache.spark.util.Utils
 
 class CommandUtilsSuite
-    extends SparkFunSuite with Matchers with PrivateMethodTester {
+    extends SparkFunSuite with Matchers with PrivateMethodTester
 
-  test("set libraryPath correctly") {
+  test("set libraryPath correctly")
     val appId = "12345-worker321-9876"
     val sparkHome = sys.props.getOrElse(
         "spark.test.home", fail("spark.test.home is not set!"))
@@ -38,9 +38,8 @@ class CommandUtilsSuite
     val env = builder.environment
     env.keySet should contain(libraryPath)
     assert(env.get(libraryPath).startsWith("libraryPathToB"))
-  }
 
-  test("auth secret shouldn't appear in java opts") {
+  test("auth secret shouldn't appear in java opts")
     val buildLocalCommand = PrivateMethod[Command]('buildLocalCommand)
     val conf = new SparkConf
     val secret = "This is the secret sauce"
@@ -77,5 +76,3 @@ class CommandUtilsSuite
     assert(!cmd.javaOpts.exists(
             _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))
     assert(cmd.environment(SecurityManager.ENV_AUTH_SECRET) === secret)
-  }
-}

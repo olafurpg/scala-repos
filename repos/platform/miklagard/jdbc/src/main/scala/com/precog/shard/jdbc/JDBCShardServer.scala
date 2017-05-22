@@ -33,7 +33,7 @@ import com.precog.common.jobs.JobManager
 import com.precog.common.security.APIKeyFinder
 import com.precog.standalone.StandaloneShardServer
 
-object JDBCShardServer extends StandaloneShardServer {
+object JDBCShardServer extends StandaloneShardServer
   val caveatMessage =
     Some("""
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -64,4 +64,3 @@ Please note that path globs are not yet supported in Precog for PostgreSQL
          jobManager,
          actorSystem),
      Stoppable.fromFuture(Future(())))
-}

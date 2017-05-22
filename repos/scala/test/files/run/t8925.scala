@@ -1,31 +1,25 @@
-object Ex {
+object Ex
   def unapply(t: Throwable): Option[Throwable] = Some(t)
-}
 
-class A {
+class A
   var x = ""
 
   def bar =
-    try {
+    try
       "bar"
-    } finally {
-      try {
+    finally
+      try
         x += "a"
-      } finally {
+      finally
         x += "b"
-        try {
+        try
           x += "c"
           throw null
-        } catch {
+        catch
           case Ex(_) =>
             x += "d"
-        }
-      }
-    }
-}
 
-object Test extends App {
+object Test extends App
   val a = new A
   println(a.bar)
   println(a.x)
-}

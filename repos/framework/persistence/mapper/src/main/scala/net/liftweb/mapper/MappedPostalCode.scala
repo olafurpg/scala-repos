@@ -26,7 +26,7 @@ import util._
 import Helpers._
 import http.{S, SHtml}
 
-object Countries extends Enumeration(1) {
+object Countries extends Enumeration(1)
 
   val C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, C11, C12, C13, C14, C15, C16,
   C17, C18, C19, C20, C21, C22, C23, C24, C25, C26, C27, C28, C29, C30, C31,
@@ -60,21 +60,18 @@ object Countries extends Enumeration(1) {
 
   def I18NCountry = new I18NCountry
 
-  class I18NCountry extends Val {
+  class I18NCountry extends Val
     override def toString() =
       S.?("country_" + id)
-  }
-}
 
 abstract class MappedLocale[T <: Mapper[T]](owner: T)
-    extends MappedString[T](owner, 16) {
+    extends MappedString[T](owner, 16)
   override def defaultValue = Locale.getDefault.toString
 
   def isAsLocale: Locale =
-    Locale.getAvailableLocales.filter(_.toString == get).toList match {
+    Locale.getAvailableLocales.filter(_.toString == get).toList match
       case Nil => Locale.getDefault
       case x :: xs => x
-    }
 
   override def _toForm: Box[Elem] =
     Full(
@@ -83,60 +80,52 @@ abstract class MappedLocale[T <: Mapper[T]](owner: T)
                        .map(lo => (lo.toString, lo.getDisplayName)),
                      Full(this.get),
                      set) % ("id" -> fieldId))
-}
 
 abstract class MappedTimeZone[T <: Mapper[T]](owner: T)
-    extends MappedString[T](owner, 32) {
+    extends MappedString[T](owner, 32)
   override def defaultValue = TimeZone.getDefault.getID
 
-  def isAsTimeZone: TimeZone = TimeZone.getTimeZone(get) match {
+  def isAsTimeZone: TimeZone = TimeZone.getTimeZone(get) match
     case null => TimeZone.getDefault
     case x => x
-  }
 
   override def _toForm: Box[Elem] =
     Full(
         SHtml.select(MappedTimeZone.timeZoneList, Full(this.get), set) %
         ("id" -> fieldId))
-}
 
-object MappedTimeZone {
+object MappedTimeZone
   lazy val timeZoneList = TimeZone.getAvailableIDs.toList
     .filter(!_.startsWith("SystemV/"))
     .filter(!_.startsWith("Etc/"))
     .filter(_.length > 3)
     .sortWith(_ < _)
     .map(tz => (tz, tz))
-}
 
 abstract class MappedCountry[T <: Mapper[T]](owner: T)
-    extends MappedEnum[T, Countries.type](owner, Countries) {
+    extends MappedEnum[T, Countries.type](owner, Countries)
 
-  override def buildDisplayList: List[(Int, String)] = {
+  override def buildDisplayList: List[(Int, String)] =
     val collator = java.text.Collator.getInstance(S.locale)
 
     super.buildDisplayList
       .sortWith((s1, s2) => collator.compare(s1._2, s2._2) < 0)
-  }
-}
 
 abstract class MappedPostalCode[T <: Mapper[T]](
     owner: T, country: MappedCountry[T])
-    extends MappedString[T](owner, 32) {
+    extends MappedString[T](owner, 32)
   override def setFilter = notNull _ :: toUpper _ :: trim _ :: super.setFilter
 
-  private def genericCheck(zip: String): List[FieldError] = {
-    zip match {
+  private def genericCheck(zip: String): List[FieldError] =
+    zip match
       case null => List(FieldError(this, Text(S.?("invalid.postal.code"))))
       case s if s.length < 3 =>
         List(FieldError(this, Text(S.?("invalid.postal.code"))))
       case _ => Nil
-    }
-  }
 
   import java.util.regex.{Pattern => REPat}
 
-  override def validations = country.get match {
+  override def validations = country.get match
     case Countries.USA =>
       valRegex(REPat.compile("[0-9]{5}(\\-[0-9]{4})?"),
                S.?("invalid.zip.code")) _ :: super.validations
@@ -163,5 +152,3 @@ abstract class MappedPostalCode[T <: Mapper[T]](
           S.?("invalid.postal.code")) _ :: super.validations
 
     case _ => genericCheck _ :: super.validations
-  }
-}

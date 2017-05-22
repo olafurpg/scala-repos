@@ -1,10 +1,7 @@
-object Test {
+object Test
   @annotation.tailrec
-  def bar: Nothing = {
-    try {
+  def bar: Nothing =
+    try
       throw new RuntimeException
-    } catch {
+    catch
       case _: Throwable => bar
-    }
-  }
-}

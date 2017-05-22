@@ -5,7 +5,7 @@ package refactoring.extractMethod
   * Nikolay.Tropin
   * 2014-04-21
   */
-class ScalaExtractMethodOutputTest extends ScalaExtractMethodTestBase {
+class ScalaExtractMethodOutputTest extends ScalaExtractMethodTestBase
   override def folderPath: String = super.folderPath + "output/"
 
   def testNoReturnNoOutput() = doTest()
@@ -29,4 +29,3 @@ class ScalaExtractMethodOutputTest extends ScalaExtractMethodTestBase {
   def testUnitReturnSeveralOutput1() = doTest()
 
   def testUnitReturnSeveralOutput2() = doTest()
-}

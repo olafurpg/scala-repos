@@ -24,7 +24,7 @@ import org.apache.spark.sql.execution.columnar.ColumnBuilder._
 import org.apache.spark.sql.execution.columnar.compression.{AllCompressionSchemes, CompressibleColumnBuilder}
 import org.apache.spark.sql.types._
 
-private[columnar] trait ColumnBuilder {
+private[columnar] trait ColumnBuilder
 
   /**
     * Initializes with an approximate lower bound on the expected number of elements in this column.
@@ -47,11 +47,10 @@ private[columnar] trait ColumnBuilder {
     * Returns the final columnar byte buffer.
     */
   def build(): ByteBuffer
-}
 
 private[columnar] class BasicColumnBuilder[JvmType](
     val columnStats: ColumnStats, val columnType: ColumnType[JvmType])
-    extends ColumnBuilder {
+    extends ColumnBuilder
 
   protected var columnName: String = _
 
@@ -59,7 +58,7 @@ private[columnar] class BasicColumnBuilder[JvmType](
 
   override def initialize(initialSize: Int,
                           columnName: String = "",
-                          useCompression: Boolean = false): Unit = {
+                          useCompression: Boolean = false): Unit =
 
     val size =
       if (initialSize == 0) DEFAULT_INITIAL_BUFFER_SIZE else initialSize
@@ -67,24 +66,19 @@ private[columnar] class BasicColumnBuilder[JvmType](
 
     buffer = ByteBuffer.allocate(size * columnType.defaultSize)
     buffer.order(ByteOrder.nativeOrder())
-  }
 
-  override def appendFrom(row: InternalRow, ordinal: Int): Unit = {
+  override def appendFrom(row: InternalRow, ordinal: Int): Unit =
     buffer = ensureFreeSpace(buffer, columnType.actualSize(row, ordinal))
     columnType.append(row, ordinal, buffer)
-  }
 
-  override def build(): ByteBuffer = {
-    if (buffer.capacity() > buffer.position() * 1.1) {
+  override def build(): ByteBuffer =
+    if (buffer.capacity() > buffer.position() * 1.1)
       // trim the buffer
       buffer = ByteBuffer
         .allocate(buffer.position())
         .order(ByteOrder.nativeOrder())
         .put(buffer.array(), 0, buffer.position())
-    }
     buffer.flip().asInstanceOf[ByteBuffer]
-  }
-}
 
 private[columnar] class NullColumnBuilder
     extends BasicColumnBuilder[Any](new ObjectColumnStats(NullType), NULL)
@@ -149,14 +143,14 @@ private[columnar] class MapColumnBuilder(dataType: MapType)
     extends ComplexColumnBuilder(
         new ObjectColumnStats(dataType), MAP(dataType))
 
-private[columnar] object ColumnBuilder {
+private[columnar] object ColumnBuilder
   val DEFAULT_INITIAL_BUFFER_SIZE = 128 * 1024
   val MAX_BATCH_SIZE_IN_BYTE = 4 * 1024 * 1024L
 
-  private[columnar] def ensureFreeSpace(orig: ByteBuffer, size: Int) = {
-    if (orig.remaining >= size) {
+  private[columnar] def ensureFreeSpace(orig: ByteBuffer, size: Int) =
+    if (orig.remaining >= size)
       orig
-    } else {
+    else
       // grow in steps of initial size
       val capacity = orig.capacity()
       val newSize = capacity + size.max(capacity)
@@ -166,14 +160,12 @@ private[columnar] object ColumnBuilder {
         .allocate(newSize)
         .order(ByteOrder.nativeOrder())
         .put(orig.array(), 0, pos)
-    }
-  }
 
   def apply(dataType: DataType,
             initialSize: Int = 0,
             columnName: String = "",
-            useCompression: Boolean = false): ColumnBuilder = {
-    val builder: ColumnBuilder = dataType match {
+            useCompression: Boolean = false): ColumnBuilder =
+    val builder: ColumnBuilder = dataType match
       case NullType => new NullColumnBuilder
       case BooleanType => new BooleanColumnBuilder
       case ByteType => new ByteColumnBuilder
@@ -194,9 +186,6 @@ private[columnar] object ColumnBuilder {
         return apply(udt.sqlType, initialSize, columnName, useCompression)
       case other =>
         throw new Exception(s"not suppported type: $other")
-    }
 
     builder.initialize(initialSize, columnName, useCompression)
     builder
-  }
-}

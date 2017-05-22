@@ -1,6 +1,6 @@
 package java.nio
 
-object LongBuffer {
+object LongBuffer
   private final val HashSeed = -1709696158 // "java.nio.LongBuffer".##
 
   def allocate(capacity: Int): LongBuffer =
@@ -11,12 +11,11 @@ object LongBuffer {
 
   def wrap(array: Array[Long]): LongBuffer =
     wrap(array, 0, array.length)
-}
 
 abstract class LongBuffer private[nio](_capacity: Int,
                                        private[nio] val _array: Array[Long],
                                        private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[LongBuffer] {
+    extends Buffer(_capacity) with Comparable[LongBuffer]
 
   private[nio] type ElementType = Long
   private[nio] type BufferType = LongBuffer
@@ -75,10 +74,9 @@ abstract class LongBuffer private[nio](_capacity: Int,
   override def hashCode(): Int =
     GenBuffer(this).generic_hashCode(LongBuffer.HashSeed)
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: LongBuffer => compareTo(that) == 0
     case _ => false
-  }
 
   @noinline
   def compareTo(that: LongBuffer): Int =
@@ -101,4 +99,3 @@ abstract class LongBuffer private[nio](_capacity: Int,
   private[nio] def store(
       startIndex: Int, src: Array[Long], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}

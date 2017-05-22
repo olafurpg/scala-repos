@@ -24,7 +24,7 @@ import Series.Vec2ExpandingStats
   * window.
   */
 class SeriesExpandingStats[X : ST : ORD, T : Vec2ExpandingStats : ST](
-    s: Series[X, T]) {
+    s: Series[X, T])
   protected val ev = implicitly[Vec2ExpandingStats[T]]
 
   /**
@@ -56,9 +56,8 @@ class SeriesExpandingStats[X : ST : ORD, T : Vec2ExpandingStats : ST](
     * product from the initial element, ignoring NAs.
     */
   def cumProd: Series[X, T] = Series(ev(s.values).cumProd, s.index)
-}
 
-object SeriesExpandingStats {
+object SeriesExpandingStats
 
   /**
     * Factory method for creating an enriched Series object containing statistical functions;
@@ -70,4 +69,3 @@ object SeriesExpandingStats {
     */
   def apply[X : ST : ORD, T : Vec2ExpandingStats : ST](s: Series[X, T]) =
     new SeriesExpandingStats(s)
-}

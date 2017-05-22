@@ -14,7 +14,7 @@ import com.twitter.scalding.mathematics.Matrix
  *
  */
 
-class TfIdfJob(args: Args) extends Job(args) {
+class TfIdfJob(args: Args) extends Job(args)
 
   import Matrix._
 
@@ -39,4 +39,3 @@ class TfIdfJob(args: Args) extends Job(args) {
     .write(Tsv(args("output")))
 
   def log2(x: Double) = scala.math.log(x) / scala.math.log(2.0)
-}

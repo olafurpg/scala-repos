@@ -25,7 +25,7 @@ import scala.Predef._
 /**
   * A bi-directional mapping between error codes and exceptions
   */
-object ErrorMapping {
+object ErrorMapping
   val EmptyByteBuffer = ByteBuffer.allocate(0)
 
   val UnknownCode: Short = -1
@@ -105,4 +105,3 @@ object ErrorMapping {
     codeToException(code).newInstance()
 
   def exceptionNameFor(code: Short): String = codeToException(code).getName()
-}

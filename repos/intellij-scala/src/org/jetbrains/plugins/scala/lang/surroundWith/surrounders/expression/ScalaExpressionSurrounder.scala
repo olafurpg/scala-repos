@@ -24,58 +24,48 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 /*
  * Surrounds an expression and return an expression
  */
-abstract class ScalaExpressionSurrounder extends Surrounder {
-  def isApplicable(element: PsiElement): Boolean = {
-    element match {
+abstract class ScalaExpressionSurrounder extends Surrounder
+  def isApplicable(element: PsiElement): Boolean =
+    element match
       case _: ScExpression | _: PsiWhiteSpace | _: ScValue | _: ScVariable |
-          _: ScFunction | _: ScTypeAlias => {
+          _: ScFunction | _: ScTypeAlias =>
           true
-        }
-      case e => {
+      case e =>
           if (ScalaPsiUtil.isLineTerminator(e)) true
           else if (e.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) true
           else if (ScalaTokenTypes.COMMENTS_TOKEN_SET contains e.getNode.getElementType)
             true
           else false
-        }
-    }
-  }
 
-  def needParenthesis(elements: Array[PsiElement]): Boolean = {
+  def needParenthesis(elements: Array[PsiElement]): Boolean =
     if (elements.length > 1) return false
     val element = elements(0)
     val parent = element.getParent
-    parent match {
+    parent match
       case _: ScInfixExpr => true
       case _: ScReferenceExpression => true
       case _: ScPrefixExpr => true
       case _: ScPostfixExpr => true
       case _ => false
-    }
-  }
 
-  override def isApplicable(elements: Array[PsiElement]): Boolean = {
+  override def isApplicable(elements: Array[PsiElement]): Boolean =
     for (element <- elements) if (!isApplicable(element)) return false
     true
-  }
 
   override def surroundElements(project: Project,
                                 editor: Editor,
-                                elements: Array[PsiElement]): TextRange = {
+                                elements: Array[PsiElement]): TextRange =
     val newNode = surroundPsi(elements).getNode
     var childNode: ASTNode = null
 
-    for (child <- elements) {
-      if (childNode == null) {
+    for (child <- elements)
+      if (childNode == null)
         childNode = child.getNode
         childNode.getTreeParent.replaceChild(childNode, newNode)
-      } else {
+      else
         childNode = child.getNode
         childNode.getTreeParent.removeChild(childNode)
-      }
-    }
     getSurroundSelectionRange(newNode)
-  }
 
   def surroundPsi(elements: Array[PsiElement]): PsiElement =
     ScalaPsiElementFactory.createExpressionFromText(
@@ -85,13 +75,10 @@ abstract class ScalaExpressionSurrounder extends Surrounder {
         elements(0).getManager
     )
 
-  def getTemplateAsString(elements: Array[PsiElement]): String = {
+  def getTemplateAsString(elements: Array[PsiElement]): String =
     var s: String = ""
-    for (element <- elements) {
+    for (element <- elements)
       s = s + element.getNode.getText
-    }
     s
-  }
 
   def getSurroundSelectionRange(node: ASTNode): TextRange
-}

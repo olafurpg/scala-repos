@@ -30,7 +30,7 @@ class MarathonHealthCheckManager @Inject()(
     taskTracker: TaskTracker,
     appRepository: AppRepository,
     zkConf: ZookeeperConf)
-    extends HealthCheckManager {
+    extends HealthCheckManager
 
   protected[this] case class ActiveHealthCheck(
       healthCheck: HealthCheck, actor: ActorRef)
@@ -44,29 +44,27 @@ class MarathonHealthCheckManager @Inject()(
     listActive(appId).map(_.healthCheck)
 
   protected[this] def listActive(appId: PathId): Set[ActiveHealthCheck] =
-    appHealthChecks.readLock { ahcs =>
+    appHealthChecks.readLock  ahcs =>
       ahcs(appId).values.flatten.toSet
-    }
 
   protected[this] def listActive(
       appId: PathId, appVersion: Timestamp): Set[ActiveHealthCheck] =
-    appHealthChecks.readLock { ahcs =>
+    appHealthChecks.readLock  ahcs =>
       ahcs(appId)(appVersion)
-    }
 
   override def add(
       appId: PathId, appVersion: Timestamp, healthCheck: HealthCheck): Unit =
-    appHealthChecks.writeLock { ahcs =>
+    appHealthChecks.writeLock  ahcs =>
       val healthChecksForApp = listActive(appId, appVersion)
 
       if (healthChecksForApp.exists(_.healthCheck == healthCheck))
         log.debug(
             s"Not adding duplicate health check for app [$appId] and version [$appVersion]: [$healthCheck]")
-      else {
+      else
         log.info(
             s"Adding health check for app [$appId] and version [$appVersion]: [$healthCheck]")
         Await.result(appRepository.app(appId, appVersion),
-                     zkConf.zkTimeoutDuration) match {
+                     zkConf.zkTimeoutDuration) match
           case Some(app: AppDefinition) =>
             val ref = system.actorOf(
                 Props(classOf[HealthCheckActor],
@@ -86,57 +84,48 @@ class MarathonHealthCheckManager @Inject()(
           case None =>
             log.warn(
                 s"Couldn't add health check for app [$appId] and version [$appVersion] - app definition not found")
-        }
-      }
-    }
 
   override def addAllFor(app: AppDefinition): Unit =
-    appHealthChecks.writeLock { _ =>
+    appHealthChecks.writeLock  _ =>
       // atomically add all checks
       app.healthChecks.foreach(add(app.id, app.version, _))
-    }
 
   override def remove(
       appId: PathId, appVersion: Timestamp, healthCheck: HealthCheck): Unit =
-    appHealthChecks.writeLock { ahcs =>
+    appHealthChecks.writeLock  ahcs =>
       val healthChecksForVersion: Set[ActiveHealthCheck] =
         listActive(appId, appVersion)
       val toRemove: Set[ActiveHealthCheck] =
         healthChecksForVersion.filter(_.healthCheck == healthCheck)
-      for (ahc <- toRemove) {
+      for (ahc <- toRemove)
         log.info(
             s"Removing health check for app [$appId] and version [$appVersion]: [$healthCheck]")
         deactivate(ahc)
         eventBus.publish(RemoveHealthCheck(appId))
-      }
       val newHealthChecksForVersion = healthChecksForVersion -- toRemove
       val currentHealthChecksForApp = ahcs(appId)
       val newHealthChecksForApp =
-        if (newHealthChecksForVersion.isEmpty) {
+        if (newHealthChecksForVersion.isEmpty)
           currentHealthChecksForApp - appVersion
-        } else {
+        else
           currentHealthChecksForApp + (appVersion -> newHealthChecksForVersion)
-        }
 
       if (newHealthChecksForApp.isEmpty) ahcs -= appId
       else ahcs += (appId -> newHealthChecksForApp)
-    }
 
   override def removeAll(): Unit =
     appHealthChecks.writeLock { _.keys foreach removeAllFor }
 
   override def removeAllFor(appId: PathId): Unit =
-    appHealthChecks.writeLock { ahcs =>
-      for {
+    appHealthChecks.writeLock  ahcs =>
+      for
         (version, activeHealthChecks) <- ahcs(appId)
         activeHealthCheck <- activeHealthChecks
-      } {
+      
         remove(appId, version, activeHealthCheck.healthCheck)
-      }
-    }
 
   override def reconcileWith(appId: PathId): Future[Unit] =
-    appRepository.currentVersion(appId) flatMap {
+    appRepository.currentVersion(appId) flatMap
       case None => Future(())
       case Some(app) =>
         log.info(s"reconcile [$appId] with latest version [${app.version}]")
@@ -147,27 +136,26 @@ class MarathonHealthCheckManager @Inject()(
           app.version
 
         val healthCheckAppVersions: Set[Timestamp] =
-          appHealthChecks.writeLock { ahcs =>
+          appHealthChecks.writeLock  ahcs =>
             // remove health checks for which the app version is not current and no tasks remain
             // since only current version tasks are launched.
-            for {
+            for
               (version, activeHealthChecks) <- ahcs(appId)
                                                   if version != app.version &&
                                               !activeAppVersions.contains(
                                                   version)
               activeHealthCheck <- activeHealthChecks
-            } remove(appId, version, activeHealthCheck.healthCheck)
+            remove(appId, version, activeHealthCheck.healthCheck)
 
             ahcs(appId).iterator.map(_._1).toSet
-          }
 
         // add missing health checks for the current
         // reconcile all running versions of the current app
         val appVersionsWithoutHealthChecks: Set[Timestamp] =
           activeAppVersions -- healthCheckAppVersions
         val res: Iterator[Future[Unit]] =
-          appVersionsWithoutHealthChecks.iterator map { version =>
-            appRepository.app(app.id, version) map {
+          appVersionsWithoutHealthChecks.iterator map  version =>
+            appRepository.app(app.id, version) map
               case None =>
                 // FIXME: If the app version of the task is not available anymore, no health check is started.
                 // We generated a new app version for every scale change. If maxVersions is configured, we
@@ -179,93 +167,77 @@ class MarathonHealthCheckManager @Inject()(
               case Some(appVersion) =>
                 log.info(s"addAllFor [$appId] version [$version]")
                 addAllFor(appVersion)
-            }
-          }
-        Future.sequence(res) map { _ =>
+        Future.sequence(res) map  _ =>
           ()
-        }
-    }
 
   override def update(taskStatus: TaskStatus, version: Timestamp): Unit =
-    appHealthChecks.readLock { ahcs =>
+    appHealthChecks.readLock  ahcs =>
       // construct a health result from the incoming task status
       val taskId = Task.Id(taskStatus.getTaskId.getValue)
       val maybeResult: Option[HealthResult] =
-        if (taskStatus.hasHealthy) {
+        if (taskStatus.hasHealthy)
           val healthy = taskStatus.getHealthy
           log.info(
               s"Received status for $taskId with version [$version] and healthy [$healthy]")
           Some(if (healthy) Healthy(taskId, version)
               else Unhealthy(taskId, version, ""))
-        } else {
+        else
           log.debug(s"Ignoring status for $taskId with no health information")
           None
-        }
 
       // compute the app ID for the incoming task status
       val appId = Task.Id(taskStatus.getTaskId).appId
 
       // collect health check actors for the associated app's command checks.
       val healthCheckActors: Iterable[ActorRef] =
-        listActive(appId, version).collect {
+        listActive(appId, version).collect
           case ActiveHealthCheck(hc, ref) if hc.protocol == Protocol.COMMAND =>
             ref
-        }
 
       // send the result to each health check actor
-      for {
+      for
         result <- maybeResult
         ref <- healthCheckActors
-      } {
+      
         log.info(
             s"Forwarding health result [$result] to health check actor [$ref]")
         ref ! result
-      }
-    }
 
-  override def status(appId: PathId, taskId: Task.Id): Future[Seq[Health]] = {
+  override def status(appId: PathId, taskId: Task.Id): Future[Seq[Health]] =
     import mesosphere.marathon.health.HealthCheckActor.GetTaskHealth
     implicit val timeout: Timeout = Timeout(2, SECONDS)
 
-    val futureAppVersion: Future[Option[Timestamp]] = for {
+    val futureAppVersion: Future[Option[Timestamp]] = for
       maybeTaskState <- taskTracker.task(taskId)
-    } yield maybeTaskState.flatMap(_.launched).map(_.appVersion)
+    yield maybeTaskState.flatMap(_.launched).map(_.appVersion)
 
-    futureAppVersion.flatMap {
+    futureAppVersion.flatMap
       case None => Future.successful(Nil)
       case Some(appVersion) =>
         Future.sequence(
-            listActive(appId, appVersion).iterator.collect {
+            listActive(appId, appVersion).iterator.collect
               case ActiveHealthCheck(_, actor) =>
                 (actor ? GetTaskHealth(taskId)).mapTo[Health]
-            }.to[Seq]
+            .to[Seq]
         )
-    }
-  }
 
   override def statuses(appId: PathId): Future[Map[Task.Id, Seq[Health]]] =
-    appHealthChecks.readLock { ahcs =>
+    appHealthChecks.readLock  ahcs =>
       implicit val timeout: Timeout = Timeout(2, SECONDS)
-      val futureHealths = for {
+      val futureHealths = for
         ActiveHealthCheck(_, actor) <- ahcs(appId).values.iterator.flatten.toVector
-      } yield (actor ? GetAppHealth).mapTo[AppHealth]
+      yield (actor ? GetAppHealth).mapTo[AppHealth]
 
-      Future.sequence(futureHealths) flatMap { healths =>
+      Future.sequence(futureHealths) flatMap  healths =>
         val groupedHealth = healths.flatMap(_.health).groupBy(_.taskId)
 
-        taskTracker.appTasks(appId).map { appTasks =>
-          appTasks.iterator.map { task =>
-            groupedHealth.get(task.taskId) match {
+        taskTracker.appTasks(appId).map  appTasks =>
+          appTasks.iterator.map  task =>
+            groupedHealth.get(task.taskId) match
               case Some(xs) => task.taskId -> xs.toSeq
               case None => task.taskId -> Nil
-            }
-          }.toMap
-        }
-      }
-    }
+          .toMap
 
   protected[this] def deactivate(healthCheck: ActiveHealthCheck): Unit =
-    appHealthChecks.writeLock { _ =>
+    appHealthChecks.writeLock  _ =>
       system stop healthCheck.actor
-    }
-}

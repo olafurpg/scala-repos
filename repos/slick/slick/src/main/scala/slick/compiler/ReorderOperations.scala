@@ -6,7 +6,7 @@ import slick.ast.TypeUtil._
 import slick.util.{ConstArray, Ellipsis, ??}
 
 /** Reorder certain stream operations for more efficient merging in `mergeToComprehensions`. */
-class ReorderOperations extends Phase {
+class ReorderOperations extends Phase
   val name = "reorderOperations"
 
   def apply(state: CompilerState) = state.map(convert)
@@ -14,7 +14,7 @@ class ReorderOperations extends Phase {
   def convert(tree: Node): Node =
     tree.replace({ case n => convert1(n) }, keepType = true, bottomUp = true)
 
-  def convert1(tree: Node): Node = tree match {
+  def convert1(tree: Node): Node = tree match
     // Push Bind into Union
     case n @ Bind(s1, Union(l1, r1, all), sel) =>
       logger.debug("Pushing Bind into both sides of a Union",
@@ -74,10 +74,10 @@ class ReorderOperations extends Phase {
         sq @ Subquery(bind @ Bind(bs1, from1, Pure(StructNode(defs1), ts1)),
                       Subquery.AboveRownum),
         Apply(Library.<= | Library.<, ConstArray(Select(Ref(rs), f1), v1)))
-        if rs == s1 && defs1.find {
+        if rs == s1 && defs1.find
           case (f, n) if f == f1 => isRownumCalculation(n)
           case _ => false
-        }.isDefined =>
+        .isDefined =>
       sq.copy(child = filter.copy(from = bind)).infer()
 
     // Push a BelowRowNumber boundary into SortBy
@@ -89,33 +89,27 @@ class ReorderOperations extends Phase {
       n.copy(from = convert1(sq.copy(child = n.from))).infer()
 
     case n => n
-  }
 
   def isAliasingOrLiteral(
-      base: TermSymbol, defs: ConstArray[(TermSymbol, Node)]) = {
-    val r = defs.iterator.map(_._2).forall {
+      base: TermSymbol, defs: ConstArray[(TermSymbol, Node)]) =
+    val r = defs.iterator.map(_._2).forall
       case FwdPath(s :: _) if s == base => true
       case _: LiteralNode => true
       case _: QueryParameter => true
       case _ => false
-    }
     logger.debug("Bind from " + base + " is aliasing / literal: " + r)
     r
-  }
 
   def isDistinctnessPreserving(
-      base: TermSymbol, defs: ConstArray[(TermSymbol, Node)], tpe: Type) = {
+      base: TermSymbol, defs: ConstArray[(TermSymbol, Node)], tpe: Type) =
     val usedFields = defs.flatMap(
-        _._2.collect[TermSymbol] {
+        _._2.collect[TermSymbol]
       case Select(Ref(s), f) if s == base => f
-    })
+    )
     val StructType(tDefs) = tpe.structural
     (tDefs.map(_._1).toSet -- usedFields.toSeq).isEmpty
-  }
 
-  def isRownumCalculation(n: Node): Boolean = n match {
+  def isRownumCalculation(n: Node): Boolean = n match
     case Apply(Library.+ | Library.-, ch) => ch.exists(isRownumCalculation)
     case _: RowNumber => true
     case _ => false
-  }
-}

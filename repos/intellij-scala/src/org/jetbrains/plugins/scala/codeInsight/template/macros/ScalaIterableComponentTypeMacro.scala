@@ -11,27 +11,24 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * @author Roman.Shein
   * @since 25.09.2015.
   */
-class ScalaIterableComponentTypeMacro extends Macro {
+class ScalaIterableComponentTypeMacro extends Macro
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+      params: Array[Expression], context: ExpressionContext): Result =
     if (params.length != 1) return null
     Option(params(0).calculateResult(context))
       .flatMap(MacroUtil.resultToScExpr(_, context))
-      .flatMap(_.getType().toOption.flatMap { exprType =>
-        MacroUtil.getComponentFromArrayType(exprType) match {
+      .flatMap(_.getType().toOption.flatMap  exprType =>
+        MacroUtil.getComponentFromArrayType(exprType) match
           case Some(arrComponentType) => Some(arrComponentType)
           case None =>
-            ScType.extractClass(exprType, Some(context.getProject)) match {
+            ScType.extractClass(exprType, Some(context.getProject)) match
               case Some(x: ScTypeDefinition)
                   if x.functionsByName("foreach").nonEmpty =>
                 Some(exprType)
               case _ => None
-            }
-        }
-      })
+      )
       .map(new ScalaTypeResult(_))
       .orNull
-  }
 
   override def getName: String =
     MacroUtil.scalaIdPrefix + "iterableComponentType"
@@ -48,4 +45,3 @@ class ScalaIterableComponentTypeMacro extends Macro {
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]
-}

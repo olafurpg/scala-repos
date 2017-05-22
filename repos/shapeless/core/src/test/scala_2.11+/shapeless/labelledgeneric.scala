@@ -21,26 +21,24 @@ import org.junit.Assert._
 
 import record._
 
-object ShapelessTaggedAux {
+object ShapelessTaggedAux
   import tag.@@
 
   trait CustomTag
   case class Dummy(i: Int @@ CustomTag)
-}
 
-class LabelledGeneric211Tests {
+class LabelledGeneric211Tests
 
   @Test
-  def testShapelessTagged {
+  def testShapelessTagged
     import ShapelessTaggedAux._
 
     val lgen = LabelledGeneric[Dummy]
     val s = s"${lgen from Record(i = tag[CustomTag](0))}"
     assertEquals(s, "Dummy(0)")
-  }
 
   @Test
-  def testScalazTagged {
+  def testScalazTagged
     import ScalazTaggedAux._
 
     type R = Record.`'i -> Int @@ CustomTag`.T
@@ -52,5 +50,3 @@ class LabelledGeneric211Tests {
     val lgent = LabelledGeneric[DummyTagged]
     implicitly[lgent.Repr =:= RT]
     implicitly[TC[RT]]
-  }
-}

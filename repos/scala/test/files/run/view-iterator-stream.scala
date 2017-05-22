@@ -3,13 +3,13 @@ import scala.language.postfixOps
 import scala.collection.{mutable, immutable, generic}
 import collection.TraversableView
 
-object Test {
+object Test
   type PerturberFn[T] = TraversableOnce[T] => TraversableOnce[T]
   lazy val Id = new Perturber(Nil, identity[TraversableOnce[Int]] _) {}
   class Perturber(val labels: List[String], val f: PerturberFn[Int])
-      extends PerturberFn[Int] {
+      extends PerturberFn[Int]
     def apply(xs: TraversableOnce[Int]): TraversableOnce[Int] = f(xs)
-    def show(xs: TraversableOnce[Int]): String = {
+    def show(xs: TraversableOnce[Int]): String =
       val res = f(xs)
       val resString = "" + res
       val rest = res.toTraversable
@@ -17,16 +17,13 @@ object Test {
 
       "%-45s %-30s %s".format(
           toString, resString, if (failed) "<failed>" else rest.mkString(" "))
-    }
     def and(g: Perturber): Perturber =
       new Perturber(this.labels ++ g.labels, f andThen g.f)
 
     override def toString = labels mkString " -> "
-  }
-  object Perturber {
+  object Perturber
     def apply(label: String, f: PerturberFn[Int]) =
       new Perturber(List(label), f)
-  }
 
   def naturals = Stream from 1
   val toV: Perturber = Perturber("view", _.toTraversable.view)
@@ -53,20 +50,15 @@ object Test {
 
   val transforms = (fns.permutations map (xs => p(xs take 3: _*))).toList.distinct
   def mkOps(n: Int) = List[Perturber](tds(n), dts(n), sdt(n), std(n))
-  def runOps(n: Int) = {
+  def runOps(n: Int) =
     val xs: List[(String, List[String])] =
-      mkOps(n) map { op =>
+      mkOps(n) map  op =>
         ("" + op, transforms map (_ show op(naturals)) sorted)
-      }
-    for ((k, v) <- xs) {
+    for ((k, v) <- xs)
       println("\n** " + k + " **\n")
       println("-------------------")
       v foreach println
-    }
     ()
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     runOps(20)
-  }
-}

@@ -19,25 +19,21 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
   * Date: 22.07.2008
   */
 class ScDocTagImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDocTag {
+    extends ScalaPsiElementImpl(node) with ScDocTag
   override def toString: String = "DocTag"
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => accept(s)
       case _ => super.accept(visitor)
-    }
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitTag(this)
-  }
 
   def getContainingComment: PsiDocComment =
-    getParent match {
+    getParent match
       case docComment: PsiDocComment => docComment
       case _ => null
-    }
 
   def getNameElement: PsiElement =
     findChildByType[PsiElement](ScalaDocTokenType.DOC_TAG_NAME)
@@ -48,20 +44,17 @@ class ScDocTagImpl(node: ASTNode)
     findChildByClass(classOf[PsiDocTagValue])
 
   override def getName: String =
-    if (getNameElement != null) {
+    if (getNameElement != null)
       getNameElement.getText
-    } else {
+    else
       null
-    }
 
-  def setName(name: String): PsiElement = {
-    if (findChildByType[PsiElement](ScalaDocTokenType.DOC_TAG_NAME) != null) {
+  def setName(name: String): PsiElement =
+    if (findChildByType[PsiElement](ScalaDocTokenType.DOC_TAG_NAME) != null)
       findChildByType[PsiElement](ScalaDocTokenType.DOC_TAG_NAME)
         .replace(ScalaPsiElementFactory.createDocTagName(name, getManager))
-    }
 
     this
-  }
 
   override def getCommentDataText(): String =
     getNode
@@ -74,8 +67,6 @@ class ScDocTagImpl(node: ASTNode)
       .getChildren(
           TokenSet.orSet(TokenSet.create(ScalaDocTokenType.DOC_COMMENT_DATA),
                          ScalaDocTokenType.ALL_SCALADOC_SYNTAX_ELEMENTS))
-      .map {
+      .map
         case nd => handler(nd.getPsi)
-      }
       .mkString(" ")
-}

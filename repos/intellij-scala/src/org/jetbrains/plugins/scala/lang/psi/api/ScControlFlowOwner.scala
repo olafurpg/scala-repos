@@ -12,34 +12,29 @@ import scala.collection.mutable
   * Represents elements with control flow cached
   * @author ilyas
   */
-trait ScControlFlowOwner extends ScalaPsiElement {
+trait ScControlFlowOwner extends ScalaPsiElement
 
   private val myControlFlowCache =
     mutable.Map[ScControlFlowPolicy, ControlFlowCacheProvider]()
 
   private def buildControlFlow(
-      policy: ScControlFlowPolicy = AllVariablesControlFlowPolicy) = {
+      policy: ScControlFlowPolicy = AllVariablesControlFlowPolicy) =
     val builder = new ScalaControlFlowBuilder(null, null, policy)
-    controlFlowScope match {
+    controlFlowScope match
       case Some(elem) => builder.buildControlflow(elem)
       case None => Seq.empty
-    }
-  }
 
   def getControlFlow(
       policy: ScControlFlowPolicy = AllVariablesControlFlowPolicy)
-    : Seq[Instruction] = {
+    : Seq[Instruction] =
     val provider = myControlFlowCache.getOrElseUpdate(
         policy, new ControlFlowCacheProvider(policy))
     provider.compute().getValue
-  }
 
   def controlFlowScope: Option[ScalaPsiElement]
 
   private class ControlFlowCacheProvider(policy: ScControlFlowPolicy)
-      extends CachedValueProvider[Seq[Instruction]] {
+      extends CachedValueProvider[Seq[Instruction]]
 
     override def compute(): Result[Seq[Instruction]] =
       Result.create(buildControlFlow(policy), ScControlFlowOwner.this)
-  }
-}

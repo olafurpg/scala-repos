@@ -8,7 +8,7 @@ import org.scalacheck.Prop
 import Prop._
 import org.typelevel.discipline.Laws
 
-trait ProfunctorTests[F[_, _]] extends Laws {
+trait ProfunctorTests[F[_, _]] extends Laws
   def laws: ProfunctorLaws[F]
 
   def profunctor[A : Arbitrary,
@@ -35,9 +35,7 @@ trait ProfunctorTests[F[_, _]] extends Laws {
             laws.profunctorLmapComposition[A, B, C, D] _),
         "profunctor rmap composition" -> forAll(
             laws.profunctorRmapComposition[A, D, C, B] _))
-}
 
-object ProfunctorTests {
+object ProfunctorTests
   def apply[F[_, _]: Profunctor]: ProfunctorTests[F] =
     new ProfunctorTests[F] { def laws: ProfunctorLaws[F] = ProfunctorLaws[F] }
-}

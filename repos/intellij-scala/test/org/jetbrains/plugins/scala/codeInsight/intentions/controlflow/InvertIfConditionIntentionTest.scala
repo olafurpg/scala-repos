@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 6/6/12
   */
-class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
+class InvertIfConditionIntentionTest extends ScalaIntentionTestBase
   val familyName = InvertIfConditionIntention.familyName
 
-  def testInvertIf() {
+  def testInvertIf()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -31,9 +31,8 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testInvertIf2() {
+  def testInvertIf2()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -58,9 +57,8 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testInvertIf3() {
+  def testInvertIf3()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -85,9 +83,8 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testInvertIf4() {
+  def testInvertIf4()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -108,9 +105,8 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testInvertIf5() {
+  def testInvertIf5()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -131,9 +127,8 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testInvertIf6() {
+  def testInvertIf6()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -154,9 +149,8 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testInvertIf7() {
+  def testInvertIf7()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -181,9 +175,8 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testInvertIf8() {
+  def testInvertIf8()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -208,5 +201,3 @@ class InvertIfConditionIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

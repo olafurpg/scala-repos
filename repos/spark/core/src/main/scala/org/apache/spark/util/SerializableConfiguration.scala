@@ -22,16 +22,13 @@ import org.apache.hadoop.conf.Configuration
 
 private[spark] class SerializableConfiguration(
     @transient var value: Configuration)
-    extends Serializable {
+    extends Serializable
   private def writeObject(out: ObjectOutputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       out.defaultWriteObject()
       value.write(out)
-    }
 
   private def readObject(in: ObjectInputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       value = new Configuration(false)
       value.readFields(in)
-    }
-}

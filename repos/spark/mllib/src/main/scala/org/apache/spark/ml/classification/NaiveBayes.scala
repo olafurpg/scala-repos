@@ -34,7 +34,7 @@ import org.apache.spark.sql.DataFrame
 /**
   * Params for Naive Bayes Classifiers.
   */
-private[ml] trait NaiveBayesParams extends PredictorParams {
+private[ml] trait NaiveBayesParams extends PredictorParams
 
   /**
     * The smoothing parameter.
@@ -63,7 +63,6 @@ private[ml] trait NaiveBayesParams extends PredictorParams {
 
   /** @group getParam */
   final def getModelType: String = $(modelType)
-}
 
 /**
   * :: Experimental ::
@@ -80,7 +79,7 @@ private[ml] trait NaiveBayesParams extends PredictorParams {
 @Experimental
 class NaiveBayes @Since("1.5.0")(@Since("1.5.0") override val uid: String)
     extends ProbabilisticClassifier[Vector, NaiveBayes, NaiveBayesModel]
-    with NaiveBayesParams with DefaultParamsWritable {
+    with NaiveBayesParams with DefaultParamsWritable
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("nb"))
@@ -104,22 +103,19 @@ class NaiveBayes @Since("1.5.0")(@Since("1.5.0") override val uid: String)
   def setModelType(value: String): this.type = set(modelType, value)
   setDefault(modelType -> OldNaiveBayes.Multinomial)
 
-  override protected def train(dataset: DataFrame): NaiveBayesModel = {
+  override protected def train(dataset: DataFrame): NaiveBayesModel =
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
     val oldModel = OldNaiveBayes.train(oldDataset, $(smoothing), $(modelType))
     NaiveBayesModel.fromOld(oldModel, this)
-  }
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): NaiveBayes = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object NaiveBayes extends DefaultParamsReadable[NaiveBayes] {
+object NaiveBayes extends DefaultParamsReadable[NaiveBayes]
 
   @Since("1.6.0")
   override def load(path: String): NaiveBayes = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -134,7 +130,7 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
                                   @Since("1.5.0") val pi: Vector,
                                   @Since("1.5.0") val theta: Matrix)
     extends ProbabilisticClassificationModel[Vector, NaiveBayesModel]
-    with NaiveBayesParams with MLWritable {
+    with NaiveBayesParams with MLWritable
 
   import OldNaiveBayes.{Bernoulli, Multinomial}
 
@@ -143,19 +139,17 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
     * This precomputes log(1.0 - exp(theta)) and its sum which are used for the linear algebra
     * application of this condition (in predict function).
     */
-  private lazy val (thetaMinusNegTheta, negThetaSum) = $(modelType) match {
+  private lazy val (thetaMinusNegTheta, negThetaSum) = $(modelType) match
     case Multinomial => (None, None)
     case Bernoulli =>
       val negTheta = theta.map(value => math.log(1.0 - math.exp(value)))
       val ones = new DenseVector(Array.fill(theta.numCols) { 1.0 })
-      val thetaMinusNegTheta = theta.map { value =>
+      val thetaMinusNegTheta = theta.map  value =>
         value - math.log(1.0 - math.exp(value))
-      }
       (Option(thetaMinusNegTheta), Option(negTheta.multiply(ones)))
     case _ =>
       // This should never happen.
       throw new UnknownError(s"Invalid modelType: ${$(modelType)}.")
-  }
 
   @Since("1.6.0")
   override val numFeatures: Int = theta.numCols
@@ -163,27 +157,25 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
   @Since("1.5.0")
   override val numClasses: Int = pi.size
 
-  private def multinomialCalculation(features: Vector) = {
+  private def multinomialCalculation(features: Vector) =
     val prob = theta.multiply(features)
     BLAS.axpy(1.0, pi, prob)
     prob
-  }
 
-  private def bernoulliCalculation(features: Vector) = {
+  private def bernoulliCalculation(features: Vector) =
     features.foreachActive(
         (_, value) =>
-          if (value != 0.0 && value != 1.0) {
+          if (value != 0.0 && value != 1.0)
         throw new SparkException(
             s"Bernoulli naive Bayes requires 0 or 1 feature values but found $features.")
-    })
+    )
     val prob = thetaMinusNegTheta.get.multiply(features)
     BLAS.axpy(1.0, pi, prob)
     BLAS.axpy(1.0, negThetaSum.get, prob)
     prob
-  }
 
-  override protected def predictRaw(features: Vector): Vector = {
-    $(modelType) match {
+  override protected def predictRaw(features: Vector): Vector =
+    $(modelType) match
       case Multinomial =>
         multinomialCalculation(features)
       case Bernoulli =>
@@ -191,55 +183,46 @@ class NaiveBayesModel private[ml](@Since("1.5.0") override val uid: String,
       case _ =>
         // This should never happen.
         throw new UnknownError(s"Invalid modelType: ${$(modelType)}.")
-    }
-  }
 
   override protected def raw2probabilityInPlace(
-      rawPrediction: Vector): Vector = {
-    rawPrediction match {
+      rawPrediction: Vector): Vector =
+    rawPrediction match
       case dv: DenseVector =>
         var i = 0
         val size = dv.size
         val maxLog = dv.values.max
-        while (i < size) {
+        while (i < size)
           dv.values(i) = math.exp(dv.values(i) - maxLog)
           i += 1
-        }
         val probSum = dv.values.sum
         i = 0
-        while (i < size) {
+        while (i < size)
           dv.values(i) = dv.values(i) / probSum
           i += 1
-        }
         dv
       case sv: SparseVector =>
         throw new RuntimeException("Unexpected error in NaiveBayesModel:" +
             " raw2probabilityInPlace encountered SparseVector")
-    }
-  }
 
   @Since("1.5.0")
-  override def copy(extra: ParamMap): NaiveBayesModel = {
+  override def copy(extra: ParamMap): NaiveBayesModel =
     copyValues(
         new NaiveBayesModel(uid, pi, theta).setParent(this.parent), extra)
-  }
 
   @Since("1.5.0")
-  override def toString: String = {
+  override def toString: String =
     s"NaiveBayesModel (uid=$uid) with ${pi.size} classes"
-  }
 
   @Since("1.6.0")
   override def write: MLWriter =
     new NaiveBayesModel.NaiveBayesModelWriter(this)
-}
 
 @Since("1.6.0")
-object NaiveBayesModel extends MLReadable[NaiveBayesModel] {
+object NaiveBayesModel extends MLReadable[NaiveBayesModel]
 
   /** Convert a model from the old API */
   private[ml] def fromOld(
-      oldModel: OldNaiveBayesModel, parent: NaiveBayes): NaiveBayesModel = {
+      oldModel: OldNaiveBayesModel, parent: NaiveBayes): NaiveBayesModel =
     val uid = if (parent != null) parent.uid else Identifiable.randomUID("nb")
     val labels = Vectors.dense(oldModel.labels)
     val pi = Vectors.dense(oldModel.pi)
@@ -248,7 +231,6 @@ object NaiveBayesModel extends MLReadable[NaiveBayesModel] {
                                 oldModel.theta.flatten,
                                 true)
     new NaiveBayesModel(uid, pi, theta)
-  }
 
   @Since("1.6.0")
   override def read: MLReader[NaiveBayesModel] = new NaiveBayesModelReader
@@ -259,11 +241,11 @@ object NaiveBayesModel extends MLReadable[NaiveBayesModel] {
   /** [[MLWriter]] instance for [[NaiveBayesModel]] */
   private[NaiveBayesModel] class NaiveBayesModelWriter(
       instance: NaiveBayesModel)
-      extends MLWriter {
+      extends MLWriter
 
     private case class Data(pi: Vector, theta: Matrix)
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       // Save metadata and Params
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       // Save model data: pi, theta
@@ -274,15 +256,13 @@ object NaiveBayesModel extends MLReadable[NaiveBayesModel] {
         .repartition(1)
         .write
         .parquet(dataPath)
-    }
-  }
 
-  private class NaiveBayesModelReader extends MLReader[NaiveBayesModel] {
+  private class NaiveBayesModelReader extends MLReader[NaiveBayesModel]
 
     /** Checked against metadata when loading model */
     private val className = classOf[NaiveBayesModel].getName
 
-    override def load(path: String): NaiveBayesModel = {
+    override def load(path: String): NaiveBayesModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
 
       val dataPath = new Path(path, "data").toString
@@ -293,6 +273,3 @@ object NaiveBayesModel extends MLReadable[NaiveBayesModel] {
 
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
-}

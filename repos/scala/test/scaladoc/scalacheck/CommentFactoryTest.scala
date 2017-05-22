@@ -8,15 +8,13 @@ import scala.tools.nsc.doc.model._
 import scala.tools.nsc.doc.model.diagram._
 
 class Factory(val g: Global, val s: doc.Settings)
-    extends doc.model.ModelFactory(g, s) {
+    extends doc.model.ModelFactory(g, s)
   thisFactory: Factory with ModelFactoryImplicitSupport with ModelFactoryTypeSupport with DiagramFactory with CommentFactory with doc.model.TreeFactory with MemberLookup =>
 
-  def strip(c: Comment): Option[Inline] = {
-    c.body match {
+  def strip(c: Comment): Option[Inline] =
+    c.body match
       case Body(List(Paragraph(Chain(List(Summary(inner)))))) => Some(inner)
       case _ => None
-    }
-  }
 
   def getComment(s: String): Comment =
     parse(s, "", scala.tools.nsc.util.NoPosition, null)
@@ -26,26 +24,22 @@ class Factory(val g: Global, val s: doc.Settings)
 
   def createBody(s: String) =
     parse(s, "", scala.tools.nsc.util.NoPosition, null).body
-}
 
-object Test extends Properties("CommentFactory") {
-  val factory = {
+object Test extends Properties("CommentFactory")
+  val factory =
     val settings = new doc.Settings((str: String) => {})
     val reporter = new scala.tools.nsc.reporters.ConsoleReporter(settings)
     val g = new Global(settings, reporter)
     (new Factory(g, settings) with ModelFactoryImplicitSupport
     with ModelFactoryTypeSupport with DiagramFactory with CommentFactory
     with doc.model.TreeFactory with MemberLookup)
-  }
 
-  def parse(src: String, dst: Inline): Boolean = {
-    factory.parseComment(src) match {
+  def parse(src: String, dst: Inline): Boolean =
+    factory.parseComment(src) match
       case Some(inline) =>
         inline == dst
       case _ =>
         false
-    }
-  }
 
   property("parse") = parse(
       "/** One two three */",
@@ -107,7 +101,7 @@ object Test extends Properties("CommentFactory") {
       Chain(List(Text(""), Text("\n"), HtmlTag("<pre>\nhello ^world\n</pre>")))
   )
 
-  property("Trac #4366 - body") = {
+  property("Trac #4366 - body") =
     val body = factory.createBody(
         """
  /**
@@ -121,9 +115,8 @@ object Test extends Properties("CommentFactory") {
                                            Text("\n"),
                                            Text(""))))
                     )))))
-  }
 
-  property("Trac #4366 - summary") = {
+  property("Trac #4366 - summary") =
     val body = factory.createBody(
         """
  /**
@@ -136,9 +129,8 @@ object Test extends Properties("CommentFactory") {
             List(HtmlTag("<strong><code>foo</code> has been deprecated and will be removed in a future version. Please call <code>bar</code> instead.</strong>"),
                  Text("\n"),
                  Text(""))))
-  }
 
-  property("Trac #4358 - body") = {
+  property("Trac #4358 - body") =
     factory.createBody(
         """
  /**
@@ -146,7 +138,7 @@ object Test extends Properties("CommentFactory") {
    * static <code>expect</code> method in Java class <code>org.easymock.EasyMock</code>).
   */
       """
-    ) match {
+    ) match
       case Body(
           List(Paragraph(Chain(List(
           Summary(Chain(List(Chain(List(
@@ -165,25 +157,19 @@ object Test extends Properties("CommentFactory") {
                              Text(".")))),
           Text("\n")))))) =>
         true
-      case other => {
+      case other =>
           println(other)
           false
-        }
-    }
-  }
 
-  property("Empty parameter text should be empty") = {
+  property("Empty parameter text should be empty") =
     // used to fail with
     // body == Body(List(Paragraph(Chain(List(Summary(Text('\n')))))))
     factory.getComment("""
 /**
   * @deprecated
   */
-      """).deprecated match {
+      """).deprecated match
       case Some(Body(l)) if l.isEmpty => true
       case other =>
         println(other)
         false
-    }
-  }
-}

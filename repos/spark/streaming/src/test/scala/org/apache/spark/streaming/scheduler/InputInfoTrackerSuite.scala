@@ -22,26 +22,22 @@ import org.scalatest.BeforeAndAfter
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.streaming.{Duration, StreamingContext, Time}
 
-class InputInfoTrackerSuite extends SparkFunSuite with BeforeAndAfter {
+class InputInfoTrackerSuite extends SparkFunSuite with BeforeAndAfter
 
   private var ssc: StreamingContext = _
 
-  before {
+  before
     val conf =
       new SparkConf().setMaster("local[2]").setAppName("DirectStreamTacker")
-    if (ssc == null) {
+    if (ssc == null)
       ssc = new StreamingContext(conf, Duration(1000))
-    }
-  }
 
-  after {
-    if (ssc != null) {
+  after
+    if (ssc != null)
       ssc.stop()
       ssc = null
-    }
-  }
 
-  test("test report and get InputInfo from InputInfoTracker") {
+  test("test report and get InputInfo from InputInfoTracker")
     val inputInfoTracker = new InputInfoTracker(ssc)
 
     val streamId1 = 0
@@ -58,9 +54,8 @@ class InputInfoTrackerSuite extends SparkFunSuite with BeforeAndAfter {
     assert(batchTimeToInputInfos(streamId1) === inputInfo1)
     assert(batchTimeToInputInfos(streamId2) === inputInfo2)
     assert(inputInfoTracker.getInfo(time)(streamId1) === inputInfo1)
-  }
 
-  test("test cleanup InputInfo from InputInfoTracker") {
+  test("test cleanup InputInfo from InputInfoTracker")
     val inputInfoTracker = new InputInfoTracker(ssc)
 
     val streamId1 = 0
@@ -76,5 +71,3 @@ class InputInfoTrackerSuite extends SparkFunSuite with BeforeAndAfter {
     inputInfoTracker.cleanup(Time(1))
     assert(inputInfoTracker.getInfo(Time(0)).get(streamId1) === None)
     assert(inputInfoTracker.getInfo(Time(1))(streamId1) === inputInfo2)
-  }
-}

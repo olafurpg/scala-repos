@@ -10,7 +10,7 @@ import akka.remote.{RARP, EndpointException}
 import akka.remote.transport.FailureInjectorTransportAdapter.{One, Drop}
 import scala.concurrent.Await
 
-object AkkaProtocolStressTest {
+object AkkaProtocolStressTest
   val configA: Config =
     ConfigFactory parseString
     ("""
@@ -42,7 +42,7 @@ object AkkaProtocolStressTest {
   object ResendFinal
 
   class SequenceVerifier(remote: ActorRef, controller: ActorRef)
-      extends Actor {
+      extends Actor
     import context.dispatcher
 
     val limit = 100000
@@ -50,64 +50,55 @@ object AkkaProtocolStressTest {
     var maxSeq = -1
     var losses = 0
 
-    def receive = {
+    def receive =
       case "start" ⇒ self ! "sendNext"
       case "sendNext" ⇒
-        if (nextSeq < limit) {
+        if (nextSeq < limit)
           remote ! nextSeq
           nextSeq += 1
           if (nextSeq % 2000 == 0)
             context.system.scheduler
               .scheduleOnce(500.milliseconds, self, "sendNext")
           else self ! "sendNext"
-        }
       case seq: Int ⇒
-        if (seq > maxSeq) {
+        if (seq > maxSeq)
           losses += seq - maxSeq - 1
           maxSeq = seq
           // Due to the (bursty) lossyness of gate, we are happy with receiving at least one message from the upper
           // half (> 50000). Since messages are sent in bursts of 2000 0.5 seconds apart, this is reasonable.
           // The purpose of this test is not reliable delivery (there is a gremlin with 30% loss anyway) but respecting
           // the proper ordering.
-          if (seq > limit * 0.5) {
+          if (seq > limit * 0.5)
             controller ! ((maxSeq, losses))
             context.system.scheduler
               .schedule(1.second, 1.second, self, ResendFinal)
             context.become(done)
-          }
-        } else {
+        else
           controller ! s"Received out of order message. Previous: ${maxSeq} Received: ${seq}"
-        }
-    }
 
     // Make sure the other side eventually "gets the message"
-    def done: Receive = {
+    def done: Receive =
       case ResendFinal ⇒
         controller ! ((maxSeq, losses))
-    }
-  }
-}
 
 class AkkaProtocolStressTest
-    extends AkkaSpec(configA) with ImplicitSender with DefaultTimeout {
+    extends AkkaSpec(configA) with ImplicitSender with DefaultTimeout
 
   val systemB = ActorSystem("systemB", system.settings.config)
-  val remote = systemB.actorOf(Props(new Actor {
-    def receive = {
+  val remote = systemB.actorOf(Props(new Actor
+    def receive =
       case seq: Int ⇒ sender() ! seq
-    }
-  }), "echo")
+  ), "echo")
 
   val addressB =
     systemB.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
   val rootB = RootActorPath(addressB)
-  val here = {
+  val here =
     val path = system.actorSelection(rootB / "user" / "echo") ! Identify(None)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  "AkkaProtocolTransport" must {
-    "guarantee at-most-once delivery and message ordering despite packet loss" taggedAs TimingTest in {
+  "AkkaProtocolTransport" must
+    "guarantee at-most-once delivery and message ordering despite packet loss" taggedAs TimingTest in
       system.eventStream.publish(TestEvent.Mute(DeadLettersFilter[Any]))
       systemB.eventStream.publish(TestEvent.Mute(DeadLettersFilter[Any]))
       Await.result(RARP(system).provider.transport
@@ -117,15 +108,12 @@ class AkkaProtocolStressTest
       val tester =
         system.actorOf(Props(classOf[SequenceVerifier], here, self)) ! "start"
 
-      expectMsgPF(60.seconds) {
+      expectMsgPF(60.seconds)
         case (received: Int, lost: Int) ⇒
           log.debug(
               s" ######## Received ${received - lost} messages from ${received} ########")
-      }
-    }
-  }
 
-  override def beforeTermination() {
+  override def beforeTermination()
     system.eventStream.publish(
         TestEvent.Mute(
             EventFilter.warning(
@@ -139,7 +127,5 @@ class AkkaProtocolStressTest
             EventFilter.error(start = "AssociationError"),
             EventFilter.warning(
                 pattern = "received dead letter.*(InboundPayload|Disassociate)")))
-  }
 
   override def afterTermination(): Unit = shutdown(systemB)
-}

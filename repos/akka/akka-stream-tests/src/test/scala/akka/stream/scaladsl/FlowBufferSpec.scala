@@ -12,33 +12,31 @@ import akka.stream.testkit.scaladsl._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
 
-class FlowBufferSpec extends AkkaSpec {
+class FlowBufferSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 1, maxSize = 1)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "Buffer" must {
+  "Buffer" must
 
-    "pass elements through normally in backpressured mode" in {
+    "pass elements through normally in backpressured mode" in
       val future: Future[Seq[Int]] = Source(1 to 1000)
         .buffer(100, overflowStrategy = OverflowStrategy.backpressure)
         .grouped(1001)
         .runWith(Sink.head)
       Await.result(future, 3.seconds) should be(1 to 1000)
-    }
 
-    "pass elements through normally in backpressured mode with buffer size one" in {
+    "pass elements through normally in backpressured mode with buffer size one" in
       val futureSink = Sink.head[Seq[Int]]
       val future = Source(1 to 1000)
         .buffer(1, overflowStrategy = OverflowStrategy.backpressure)
         .grouped(1001)
         .runWith(Sink.head)
       Await.result(future, 3.seconds) should be(1 to 1000)
-    }
 
-    "pass elements through a chain of backpressured buffers of different size" in assertAllStagesStopped {
+    "pass elements through a chain of backpressured buffers of different size" in assertAllStagesStopped
       val future = Source(1 to 1000)
         .buffer(1, overflowStrategy = OverflowStrategy.backpressure)
         .buffer(10, overflowStrategy = OverflowStrategy.backpressure)
@@ -49,9 +47,8 @@ class FlowBufferSpec extends AkkaSpec {
         .grouped(1001)
         .runWith(Sink.head)
       Await.result(future, 3.seconds) should be(1 to 1000)
-    }
 
-    "accept elements that fit in the buffer while downstream is silent" in {
+    "accept elements that fit in the buffer while downstream is silent" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -66,14 +63,12 @@ class FlowBufferSpec extends AkkaSpec {
       for (i ← 1 to 100) publisher.sendNext(i)
 
       // drain
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         sub.request(1)
         subscriber.expectNext(i)
-      }
       sub.cancel()
-    }
 
-    "drop head elements if buffer is full and configured so" in {
+    "drop head elements if buffer is full and configured so" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -91,10 +86,9 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectNoMsg(500.millis)
 
       // drain
-      for (i ← 101 to 200) {
+      for (i ← 101 to 200)
         sub.request(1)
         subscriber.expectNext(i)
-      }
 
       sub.request(1)
       subscriber.expectNoMsg(1.seconds)
@@ -104,9 +98,8 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectNext(-1)
 
       sub.cancel()
-    }
 
-    "drop tail elements if buffer is full and configured so" in {
+    "drop tail elements if buffer is full and configured so" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -124,10 +117,9 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectNoMsg(500.millis)
 
       // drain
-      for (i ← 1 to 99) {
+      for (i ← 1 to 99)
         sub.request(1)
         subscriber.expectNext(i)
-      }
 
       sub.request(1)
       subscriber.expectNext(200)
@@ -140,9 +132,8 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectNext(-1)
 
       sub.cancel()
-    }
 
-    "drop all elements if buffer is full and configured so" in {
+    "drop all elements if buffer is full and configured so" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -160,10 +151,9 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectNoMsg(500.millis)
 
       // drain
-      for (i ← 101 to 150) {
+      for (i ← 101 to 150)
         sub.request(1)
         subscriber.expectNext(i)
-      }
 
       sub.request(1)
       subscriber.expectNoMsg(1.seconds)
@@ -173,9 +163,8 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectNext(-1)
 
       sub.cancel()
-    }
 
-    "drop new elements if buffer is full and configured so" in {
+    "drop new elements if buffer is full and configured so" in
       val (publisher, subscriber) = TestSource
         .probe[Int]
         .buffer(100, overflowStrategy = OverflowStrategy.dropNew)
@@ -191,9 +180,8 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.expectNoMsg(500.millis)
 
       // drain
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         subscriber.requestNext(i)
-      }
 
       subscriber.request(1)
       subscriber.expectNoMsg(1.seconds)
@@ -202,9 +190,8 @@ class FlowBufferSpec extends AkkaSpec {
       subscriber.requestNext(-1)
 
       subscriber.cancel()
-    }
 
-    "fail upstream if buffer is full and configured so" in assertAllStagesStopped {
+    "fail upstream if buffer is full and configured so" in assertAllStagesStopped
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -219,10 +206,9 @@ class FlowBufferSpec extends AkkaSpec {
       for (i ← 1 to 100) publisher.sendNext(i)
 
       // drain
-      for (i ← 1 to 10) {
+      for (i ← 1 to 10)
         sub.request(1)
         subscriber.expectNext(i)
-      }
 
       // overflow the buffer
       for (i ← 101 to 111) publisher.sendNext(i)
@@ -231,13 +217,12 @@ class FlowBufferSpec extends AkkaSpec {
       val error =
         new BufferOverflowException("Buffer overflow (max capacity was: 100)!")
       subscriber.expectError(error)
-    }
 
     for (strategy ← List(OverflowStrategy.dropHead,
                          OverflowStrategy.dropTail,
-                         OverflowStrategy.dropBuffer)) {
+                         OverflowStrategy.dropBuffer))
 
-      s"work with $strategy if buffer size of one" in {
+      s"work with $strategy if buffer size of one" in
 
         val publisher = TestPublisher.probe[Int]()
         val subscriber = TestSubscriber.manualProbe[Int]()
@@ -265,7 +250,3 @@ class FlowBufferSpec extends AkkaSpec {
         subscriber.expectNext(-1)
 
         sub.cancel()
-      }
-    }
-  }
-}

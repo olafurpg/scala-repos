@@ -33,7 +33,7 @@ import org.apache.spark.sql.types.{IntegerType, StructType}
   */
 private[clustering] trait BisectingKMeansParams
     extends Params with HasMaxIter with HasFeaturesCol with HasSeed
-    with HasPredictionCol {
+    with HasPredictionCol
 
   /**
     * Set the number of clusters to create (k). Must be > 1. Default: 2.
@@ -64,11 +64,9 @@ private[clustering] trait BisectingKMeansParams
     * @param schema input schema
     * @return output schema
     */
-  protected def validateAndTransformSchema(schema: StructType): StructType = {
+  protected def validateAndTransformSchema(schema: StructType): StructType =
     SchemaUtils.checkColumnType(schema, $(featuresCol), new VectorUDT)
     SchemaUtils.appendColumn(schema, $(predictionCol), IntegerType)
-  }
-}
 
 /**
   * :: Experimental ::
@@ -82,24 +80,21 @@ class BisectingKMeansModel private[ml](
     @Since("2.0.0") override val uid: String,
     private val parentModel: MLlibBisectingKMeansModel
 )
-    extends Model[BisectingKMeansModel] with BisectingKMeansParams {
+    extends Model[BisectingKMeansModel] with BisectingKMeansParams
 
   @Since("2.0.0")
-  override def copy(extra: ParamMap): BisectingKMeansModel = {
+  override def copy(extra: ParamMap): BisectingKMeansModel =
     val copied = new BisectingKMeansModel(uid, parentModel)
     copyValues(copied, extra)
-  }
 
   @Since("2.0.0")
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val predictUDF = udf((vector: Vector) => predict(vector))
     dataset.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
-  }
 
   @Since("2.0.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
   private[clustering] def predict(features: Vector): Int =
     parentModel.predict(features)
@@ -112,14 +107,11 @@ class BisectingKMeansModel private[ml](
     * centers.
     */
   @Since("2.0.0")
-  def computeCost(dataset: DataFrame): Double = {
+  def computeCost(dataset: DataFrame): Double =
     SchemaUtils.checkColumnType(dataset.schema, $(featuresCol), new VectorUDT)
-    val data = dataset.select(col($(featuresCol))).rdd.map {
+    val data = dataset.select(col($(featuresCol))).rdd.map
       case Row(point: Vector) => point
-    }
     parentModel.computeCost(data)
-  }
-}
 
 /**
   * :: Experimental ::
@@ -140,7 +132,7 @@ class BisectingKMeansModel private[ml](
 @Since("2.0.0")
 @Experimental
 class BisectingKMeans @Since("2.0.0")(@Since("2.0.0") override val uid: String)
-    extends Estimator[BisectingKMeansModel] with BisectingKMeansParams {
+    extends Estimator[BisectingKMeansModel] with BisectingKMeansParams
 
   setDefault(k -> 4, maxIter -> 20, minDivisibleClusterSize -> 1.0)
 
@@ -176,10 +168,9 @@ class BisectingKMeans @Since("2.0.0")(@Since("2.0.0") override val uid: String)
     set(minDivisibleClusterSize, value)
 
   @Since("2.0.0")
-  override def fit(dataset: DataFrame): BisectingKMeansModel = {
-    val rdd = dataset.select(col($(featuresCol))).rdd.map {
+  override def fit(dataset: DataFrame): BisectingKMeansModel =
+    val rdd = dataset.select(col($(featuresCol))).rdd.map
       case Row(point: Vector) => point
-    }
 
     val bkm = new MLlibBisectingKMeans()
       .setK($(k))
@@ -189,10 +180,7 @@ class BisectingKMeans @Since("2.0.0")(@Since("2.0.0") override val uid: String)
     val parentModel = bkm.run(rdd)
     val model = new BisectingKMeansModel(uid, parentModel)
     copyValues(model.setParent(this))
-  }
 
   @Since("2.0.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
-}

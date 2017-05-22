@@ -28,7 +28,7 @@ import scala.io.{Codec, Source}
 /**
   * Utilities for simplifying use of named HTML symbols.
   */
-object HtmlEntities {
+object HtmlEntities
 
   /**
     * A list of tuples which match named HTML symbols to their character codes.
@@ -290,45 +290,40 @@ object HtmlEntities {
   val revMap: Map[Char, String] = Map(
       entList.map { case (name, value) => (value.toChar, name) }: _*)
 
-  val entities = entList.map {
+  val entities = entList.map
     case (name, value) =>
       (name, new ParsedEntityDecl(name, new IntDef(value.toChar.toString)))
-  }
 
   def apply() = entities
-}
 
 /**
   * Extends the Markup Parser to do the right thing (tm) with PCData blocks
   */
 trait PCDataMarkupParser[PCM <: MarkupParser with MarkupHandler]
-    extends MarkupParser { self: PCM =>
+    extends MarkupParser  self: PCM =>
 
   /** '&lt;! CharData ::= [CDATA[ ( {char} - {char}"]]&gt;"{char} ) ']]&gt;'
     *
     * see [15]
     */
-  override def xCharData: NodeSeq = {
+  override def xCharData: NodeSeq =
     xToken("[CDATA[")
     val pos1 = pos
     val sb: StringBuilder = new StringBuilder()
-    while (true) {
-      if (ch == ']' && { sb.append(ch); nextch; ch == ']' } && {
+    while (true)
+      if (ch == ']' && { sb.append(ch); nextch; ch == ']' } &&
             sb.append(ch); nextch; ch == '>'
-          }) {
+          )
         sb.setLength(sb.length - 2);
         nextch;
         return PCData(sb.toString)
-      } else sb.append(ch);
+      else sb.append(ch);
       nextch;
-    }
     throw FatalError("this cannot happen");
-  }
-}
 
 class PCDataXmlParser(val input: Source)
     extends ConstructingHandler with PCDataMarkupParser[PCDataXmlParser]
-    with ExternalSources {
+    with ExternalSources
   val preserveWS = true
   ent ++= HtmlEntities()
   import scala.xml._
@@ -337,17 +332,17 @@ class PCDataXmlParser(val input: Source)
     *  [41] Attributes    ::= { S Name Eq AttValue }
     */
   override def xAttributes(
-      pscope: NamespaceBinding): (MetaData, NamespaceBinding) = {
+      pscope: NamespaceBinding): (MetaData, NamespaceBinding) =
     var scope: NamespaceBinding = pscope
     var aMap: MetaData = Null
-    while (isNameStart(ch)) {
+    while (isNameStart(ch))
       val pos = this.pos
 
       val qname = xName
       val _ = xEQ
       val value = xAttributeValue()
 
-      Utility.prefix(qname) match {
+      Utility.prefix(qname) match
         case Some("xmlns") =>
           val prefix = qname.substring(6 /* xmlns: */, qname.length);
           scope = new NamespaceBinding(prefix, value, scope);
@@ -360,12 +355,10 @@ class PCDataXmlParser(val input: Source)
           if (qname == "xmlns")
             scope = new NamespaceBinding(null, value, scope);
           else aMap = new UnprefixedAttribute(qname, Text(value), aMap);
-      }
 
       if ((ch != '/') && (ch != '>') && ('?' != ch)) xSpace;
-    }
 
-    def findIt(base: MetaData, what: MetaData): MetaData = (base, what) match {
+    def findIt(base: MetaData, what: MetaData): MetaData = (base, what) match
       case (_, Null) => Null
       case (upb: UnprefixedAttribute, upn: UnprefixedAttribute)
           if upb.key == upn.key =>
@@ -374,21 +367,17 @@ class PCDataXmlParser(val input: Source)
           if pb.key == pn.key && pb.pre == pn.key =>
         pn
       case _ => findIt(base, what.next)
-    }
 
-    if (!aMap.wellformed(scope)) {
-      if (findIt(aMap, aMap.next) != Null) {
+    if (!aMap.wellformed(scope))
+      if (findIt(aMap, aMap.next) != Null)
         reportSyntaxError("double attribute")
-      }
-    }
 
     (aMap, scope)
-  }
 
   /**
     * report a syntax error
     */
-  override def reportSyntaxError(pos: Int, msg: String) {
+  override def reportSyntaxError(pos: Int, msg: String)
 
     //error("MarkupParser::synerr") // DEBUG
     import scala.io._
@@ -397,79 +386,66 @@ class PCDataXmlParser(val input: Source)
     val col = ScalaPosition.column(pos)
     val report = curInput.descr + ":" + line + ":" + col + ": " + msg
     System.err.println(report)
-    try {
+    try
       System.err.println(curInput.getLines().toIndexedSeq(line))
-    } catch {
+    catch
       case e: Exception => // ignore
-    }
     var i = 1
-    while (i < col) {
+    while (i < col)
       System.err.print(' ')
       i += 1
-    }
     System.err.println('^')
     throw new ValidationException(report)
-  }
-}
 
-object PCDataXmlParser {
+object PCDataXmlParser
   import Helpers._
 
-  def apply(in: InputStream): Box[NodeSeq] = {
-    for {
+  def apply(in: InputStream): Box[NodeSeq] =
+    for
       ba <- tryo(Helpers.readWholeStream(in))
       ret <- apply(new String(ba, "UTF-8"))
-    } yield ret
-  }
+    yield ret
 
-  private def apply(source: Source): Box[NodeSeq] = {
-    for {
+  private def apply(source: Source): Box[NodeSeq] =
+    for
       p <- tryo { new PCDataXmlParser(source) }
       _ = while (p.ch != '<' &&
       p.curInput.hasNext) p.nextch // side effects, baby
       bd <- tryo(p.document)
       doc <- Box !! bd
-    } yield (doc.children: NodeSeq)
-  }
+    yield (doc.children: NodeSeq)
 
-  def apply(in: String): Box[NodeSeq] = {
+  def apply(in: String): Box[NodeSeq] =
     var pos = 0
     val len = in.length
-    def moveToLT() {
-      while (pos < len && in.charAt(pos) != '<') {
+    def moveToLT()
+      while (pos < len && in.charAt(pos) != '<')
         pos += 1
-      }
-    }
 
     moveToLT()
 
     // scan past <? ... ?>
-    if (pos + 1 < len && in.charAt(pos + 1) == '?') {
+    if (pos + 1 < len && in.charAt(pos + 1) == '?')
       pos += 1
       moveToLT()
-    }
 
     // scan past <!DOCTYPE ....>
-    if (pos + 1 < len && in.charAt(pos + 1) == '!') {
+    if (pos + 1 < len && in.charAt(pos + 1) == '!')
       pos += 1
       moveToLT()
-    }
 
     apply(Source.fromString(in.substring(pos)))
-  }
-}
 
-case class PCData(_data: String) extends Atom[String](_data) {
+case class PCData(_data: String) extends Atom[String](_data)
   /* The following code is a derivative work of scala.xml.Text */
   if (null == data)
     throw new java.lang.NullPointerException(
         "tried to construct Text with null")
 
-  final override def equals(x: Any) = x match {
+  final override def equals(x: Any) = x match
     case s: String => s.equals(data.toString())
     case s: Atom[_] => data == s.data
     case _ => false
-  }
 
   /** Returns text, with some characters escaped according to the XML
     *  specification.
@@ -477,14 +453,12 @@ case class PCData(_data: String) extends Atom[String](_data) {
     *  @param  sb ...
     *  @return ...
     */
-  override def buildString(sb: StringBuilder) = {
+  override def buildString(sb: StringBuilder) =
     sb.append("<![CDATA[")
     sb.append(data)
     sb.append("]]>")
-  }
-}
 
-object AltXML {
+object AltXML
   val ieBadTags: Set[String] = Set("br", "hr")
 
   val inlineTags: Set[String] = Set("base",
@@ -501,17 +475,15 @@ object AltXML {
   def toXML(n: Node,
             stripComment: Boolean,
             convertAmp: Boolean,
-            legacyIeCompatibilityMode: Boolean): String = {
+            legacyIeCompatibilityMode: Boolean): String =
     val sb = new StringBuilder(50000)
     toXML(n, TopScope, sb, stripComment, convertAmp, legacyIeCompatibilityMode)
     sb.toString()
-  }
 
-  def toXML(n: Node, stripComment: Boolean, convertAmp: Boolean): String = {
+  def toXML(n: Node, stripComment: Boolean, convertAmp: Boolean): String =
     val sb = new StringBuilder(50000)
     toXML(n, TopScope, sb, stripComment, convertAmp)
     sb.toString()
-  }
 
   /**
     * Appends a tree to the given stringbuffer within given namespace scope.
@@ -526,7 +498,7 @@ object AltXML {
             sb: StringBuilder,
             stripComment: Boolean,
             convertAmp: Boolean): Unit =
-    x match {
+    x match
       case Text(str) => escape(str, sb, !convertAmp)
 
       case c: PCData => c.buildString(sb)
@@ -542,10 +514,9 @@ object AltXML {
         c.buildString(sb)
 
       case er: EntityRef if convertAmp =>
-        HtmlEntities.entMap.get(er.entityName) match {
+        HtmlEntities.entMap.get(er.entityName) match
           case Some(chr) if chr.toInt >= 128 => sb.append(chr)
           case _ => er.buildString(sb)
-        }
 
       case x: SpecialNode =>
         x.buildString(sb)
@@ -573,13 +544,12 @@ object AltXML {
         sb.append('>')
 
       case _ => // dunno what it is, but ignore it
-    }
 
-  private def escape(str: String, sb: StringBuilder, reverse: Boolean) {
+  private def escape(str: String, sb: StringBuilder, reverse: Boolean)
     val len = str.length
     var pos = 0
-    while (pos < len) {
-      str.charAt(pos) match {
+    while (pos < len)
+      str.charAt(pos) match
         case '<' => sb.append("&lt;")
         case '>' => sb.append("&gt;")
         case '&' => sb.append("&amp;")
@@ -588,8 +558,8 @@ object AltXML {
         case '\r' => sb.append('\r')
         case '\t' => sb.append('\t')
         case c =>
-          if (reverse) {
-            HtmlEntities.revMap.get(c) match {
+          if (reverse)
+            HtmlEntities.revMap.get(c) match
               case Some(str) =>
                 sb.append('&')
                 sb.append(str)
@@ -597,14 +567,10 @@ object AltXML {
               case _ =>
                 if (c >= ' ' && c != '\u0085' &&
                     !(c >= '\u007f' && c <= '\u0095')) sb.append(c)
-            }
-          } else if (c >= ' ' && c != '\u0085' &&
+          else if (c >= ' ' && c != '\u0085' &&
                      !(c >= '\u007f' && c <= '\u0095')) sb.append(c)
-      }
 
       pos += 1
-    }
-  }
 
   /**
     * Appends a tree to the given stringbuffer within given namespace scope.
@@ -620,7 +586,7 @@ object AltXML {
             stripComment: Boolean,
             convertAmp: Boolean,
             legacyIeCompatibilityMode: Boolean): Unit =
-    x match {
+    x match
       case Text(str) => escape(str, sb, !convertAmp)
 
       case c: PCData => c.buildString(sb)
@@ -636,10 +602,9 @@ object AltXML {
         c.buildString(sb)
 
       case er: EntityRef if convertAmp =>
-        HtmlEntities.entMap.get(er.entityName) match {
+        HtmlEntities.entMap.get(er.entityName) match
           case Some(chr) if chr.toInt >= 128 => sb.append(chr)
           case _ => er.buildString(sb)
-        }
 
       case x: SpecialNode =>
         x.buildString(sb)
@@ -690,7 +655,6 @@ object AltXML {
         sb.append('>')
 
       case _ => // dunno what it is, but ignore it
-    }
 
   /**
     * @param children     ...
@@ -703,17 +667,15 @@ object AltXML {
                     sb: StringBuilder,
                     stripComment: Boolean,
                     convertAmp: Boolean,
-                    legacyIeCompatibilityMode: Boolean): Unit = {
+                    legacyIeCompatibilityMode: Boolean): Unit =
     val it = children.iterator
-    while (it.hasNext) {
+    while (it.hasNext)
       toXML(it.next,
             pscope,
             sb,
             stripComment,
             convertAmp,
             legacyIeCompatibilityMode)
-    }
-  }
 
   /**
     * @param children     ...
@@ -725,10 +687,7 @@ object AltXML {
                     pscope: NamespaceBinding,
                     sb: StringBuilder,
                     stripComment: Boolean,
-                    convertAmp: Boolean): Unit = {
+                    convertAmp: Boolean): Unit =
     val it = children.iterator
-    while (it.hasNext) {
+    while (it.hasNext)
       toXML(it.next, pscope, sb, stripComment, convertAmp)
-    }
-  }
-}

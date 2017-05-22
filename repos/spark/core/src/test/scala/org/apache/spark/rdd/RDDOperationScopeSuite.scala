@@ -24,34 +24,30 @@ import org.apache.spark.{Partition, SparkContext, SparkFunSuite, TaskContext}
 /**
   * Tests whether scopes are passed from the RDD operation to the RDDs correctly.
   */
-class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
+class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter
   private var sc: SparkContext = null
   private val scope1 = new RDDOperationScope("scope1")
   private val scope2 = new RDDOperationScope("scope2", Some(scope1))
   private val scope3 = new RDDOperationScope("scope3", Some(scope2))
 
-  before {
+  before
     sc = new SparkContext("local", "test")
-  }
 
-  after {
+  after
     sc.stop()
-  }
 
-  test("equals and hashCode") {
+  test("equals and hashCode")
     val opScope1 = new RDDOperationScope("scope1", id = "1")
     val opScope2 = new RDDOperationScope("scope1", id = "1")
     assert(opScope1 === opScope2)
     assert(opScope1.hashCode() === opScope2.hashCode())
-  }
 
-  test("getAllScopes") {
+  test("getAllScopes")
     assert(scope1.getAllScopes === Seq(scope1))
     assert(scope2.getAllScopes === Seq(scope1, scope2))
     assert(scope3.getAllScopes === Seq(scope1, scope2, scope3))
-  }
 
-  test("json de/serialization") {
+  test("json de/serialization")
     val scope1Json = scope1.toJson
     val scope2Json = scope2.toJson
     val scope3Json = scope3.toJson
@@ -63,27 +59,23 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     assert(RDDOperationScope.fromJson(scope1Json) === scope1)
     assert(RDDOperationScope.fromJson(scope2Json) === scope2)
     assert(RDDOperationScope.fromJson(scope3Json) === scope3)
-  }
 
-  test("withScope") {
+  test("withScope")
     val rdd0: MyCoolRDD = new MyCoolRDD(sc)
     var rdd1: MyCoolRDD = null
     var rdd2: MyCoolRDD = null
     var rdd3: MyCoolRDD = null
     RDDOperationScope.withScope(
-        sc, "scope1", allowNesting = false, ignoreParent = false) {
+        sc, "scope1", allowNesting = false, ignoreParent = false)
       rdd1 = new MyCoolRDD(sc)
       RDDOperationScope.withScope(
-          sc, "scope2", allowNesting = false, ignoreParent = false) {
+          sc, "scope2", allowNesting = false, ignoreParent = false)
         rdd2 = new MyCoolRDD(sc)
         RDDOperationScope.withScope(sc,
                                     "scope3",
                                     allowNesting = false,
-                                    ignoreParent = false) {
+                                    ignoreParent = false)
           rdd3 = new MyCoolRDD(sc)
-        }
-      }
-    }
     assert(rdd0.scope.isEmpty)
     assert(rdd1.scope.isDefined)
     assert(rdd2.scope.isDefined)
@@ -91,29 +83,25 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     assert(rdd1.scope.get.getAllScopes.map(_.name) === Seq("scope1"))
     assert(rdd2.scope.get.getAllScopes.map(_.name) === Seq("scope1"))
     assert(rdd3.scope.get.getAllScopes.map(_.name) === Seq("scope1"))
-  }
 
-  test("withScope with partial nesting") {
+  test("withScope with partial nesting")
     val rdd0: MyCoolRDD = new MyCoolRDD(sc)
     var rdd1: MyCoolRDD = null
     var rdd2: MyCoolRDD = null
     var rdd3: MyCoolRDD = null
     // allow nesting here
     RDDOperationScope.withScope(
-        sc, "scope1", allowNesting = true, ignoreParent = false) {
+        sc, "scope1", allowNesting = true, ignoreParent = false)
       rdd1 = new MyCoolRDD(sc)
       // stop nesting here
       RDDOperationScope.withScope(
-          sc, "scope2", allowNesting = false, ignoreParent = false) {
+          sc, "scope2", allowNesting = false, ignoreParent = false)
         rdd2 = new MyCoolRDD(sc)
         RDDOperationScope.withScope(sc,
                                     "scope3",
                                     allowNesting = false,
-                                    ignoreParent = false) {
+                                    ignoreParent = false)
           rdd3 = new MyCoolRDD(sc)
-        }
-      }
-    }
     assert(rdd0.scope.isEmpty)
     assert(rdd1.scope.isDefined)
     assert(rdd2.scope.isDefined)
@@ -121,27 +109,23 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     assert(rdd1.scope.get.getAllScopes.map(_.name) === Seq("scope1"))
     assert(rdd2.scope.get.getAllScopes.map(_.name) === Seq("scope1", "scope2"))
     assert(rdd3.scope.get.getAllScopes.map(_.name) === Seq("scope1", "scope2"))
-  }
 
-  test("withScope with multiple layers of nesting") {
+  test("withScope with multiple layers of nesting")
     val rdd0: MyCoolRDD = new MyCoolRDD(sc)
     var rdd1: MyCoolRDD = null
     var rdd2: MyCoolRDD = null
     var rdd3: MyCoolRDD = null
     RDDOperationScope.withScope(
-        sc, "scope1", allowNesting = true, ignoreParent = false) {
+        sc, "scope1", allowNesting = true, ignoreParent = false)
       rdd1 = new MyCoolRDD(sc)
       RDDOperationScope.withScope(
-          sc, "scope2", allowNesting = true, ignoreParent = false) {
+          sc, "scope2", allowNesting = true, ignoreParent = false)
         rdd2 = new MyCoolRDD(sc)
         RDDOperationScope.withScope(sc,
                                     "scope3",
                                     allowNesting = true,
-                                    ignoreParent = false) {
+                                    ignoreParent = false)
           rdd3 = new MyCoolRDD(sc)
-        }
-      }
-    }
     assert(rdd0.scope.isEmpty)
     assert(rdd1.scope.isDefined)
     assert(rdd2.scope.isDefined)
@@ -150,12 +134,8 @@ class RDDOperationScopeSuite extends SparkFunSuite with BeforeAndAfter {
     assert(rdd2.scope.get.getAllScopes.map(_.name) === Seq("scope1", "scope2"))
     assert(rdd3.scope.get.getAllScopes.map(_.name) === Seq(
             "scope1", "scope2", "scope3"))
-  }
-}
 
-private class MyCoolRDD(sc: SparkContext) extends RDD[Int](sc, Nil) {
+private class MyCoolRDD(sc: SparkContext) extends RDD[Int](sc, Nil)
   override def getPartitions: Array[Partition] = Array.empty
-  override def compute(p: Partition, context: TaskContext): Iterator[Int] = {
+  override def compute(p: Partition, context: TaskContext): Iterator[Int] =
     Nil.toIterator
-  }
-}

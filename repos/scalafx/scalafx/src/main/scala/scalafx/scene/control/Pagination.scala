@@ -36,7 +36,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object Pagination {
+object Pagination
   implicit def sfxPagination2jfx(p: Pagination): jfxsc.Pagination =
     if (p != null) p.delegate else null
 
@@ -57,14 +57,13 @@ object Pagination {
       "Use Indeterminate; INDETERMINATE will be removed in a future release",
       "8.0.60-R10")
   val INDETERMINATE = Indeterminate
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Pagination.html]]
   */
 class Pagination(
     override val delegate: jfxsc.Pagination = new jfxsc.Pagination)
-    extends Control(delegate) with SFXDelegate[jfxsc.Pagination] {
+    extends Control(delegate) with SFXDelegate[jfxsc.Pagination]
 
   /**
     * Constructs a new Pagination control with the specified page count.
@@ -81,37 +80,31 @@ class Pagination(
     * The current page index to display for this pagination control.
     */
   def currentPageIndex: IntegerProperty = delegate.currentPageIndexProperty
-  def currentPageIndex_=(value: Int) {
+  def currentPageIndex_=(value: Int)
     currentPageIndex() = value
-  }
 
   /**
     * The maximum number of page indicators to use for this pagination control.
     */
   def maxPageIndicatorCount: IntegerProperty =
     delegate.maxPageIndicatorCountProperty
-  def maxPageIndicatorCount_=(value: Int) {
+  def maxPageIndicatorCount_=(value: Int)
     maxPageIndicatorCount() = value
-  }
 
   /**
     * The number of pages for this pagination control.
     */
   def pageCount: IntegerProperty = delegate.pageCountProperty
-  def pageCount_=(value: Int) {
+  def pageCount_=(value: Int)
     pageCount() = value
-  }
 
   /**
     * The pageFactory callback function that is called when a page has been selected by the application or the user.
     */
   def pageFactory: ObjectProperty[Int => Node] =
     ObjectProperty((page: Int) => delegate.pageFactoryProperty.get.call(page))
-  def pageFactory_=(callback: Int => Node) {
-    val jCallback = new jfxu.Callback[java.lang.Integer, jfxs.Node] {
+  def pageFactory_=(callback: Int => Node)
+    val jCallback = new jfxu.Callback[java.lang.Integer, jfxs.Node]
       def call(pageIndex: java.lang.Integer) = callback(pageIndex).delegate
-    }
 
     delegate.setPageFactory(jCallback)
-  }
-}

@@ -23,9 +23,9 @@ import scala.collection.mutable
   * @since 03.03.14
   */
 class ScalaApplicationUsagesCollector
-    extends AbstractApplicationUsagesCollector {
-  override def getProjectUsages(project: Project): util.Set[UsageDescriptor] = {
-    extensions.inReadAction {
+    extends AbstractApplicationUsagesCollector
+  override def getProjectUsages(project: Project): util.Set[UsageDescriptor] =
+    extensions.inReadAction
       val set: mutable.HashSet[UsageDescriptor] =
         new mutable.HashSet[UsageDescriptor]
 
@@ -35,31 +35,25 @@ class ScalaApplicationUsagesCollector
       //collecting Scala version
       var scala_version: Option[String] = None
       var java_version: Option[String] = None
-      for (module <- ModuleManager.getInstance(project).getModules) {
-        module.scalaSdk.flatMap(_.compilerVersion).foreach { version =>
+      for (module <- ModuleManager.getInstance(project).getModules)
+        module.scalaSdk.flatMap(_.compilerVersion).foreach  version =>
           scala_version = Some(version)
-        }
 
-        ModuleRootManager.getInstance(module).getSdk match {
+        ModuleRootManager.getInstance(module).getSdk match
           case jsdk: JavaSdk => java_version = Option(jsdk.getVersionString)
           case _ =>
-        }
-      }
 
-      scala_version.foreach {
+      scala_version.foreach
         case version: String =>
           set += new UsageDescriptor(s"Scala: $version", 1)
-      }
 
-      def checkLibrary(qual: String, library: String) {
-        if (JavaPsiFacade.getInstance(project).findPackage(qual) != null) {
+      def checkLibrary(qual: String, library: String)
+        if (JavaPsiFacade.getInstance(project).findPackage(qual) != null)
           set += new UsageDescriptor("Library: " + library, 1)
-        }
-      }
 
       val isPlayInstalled = PlatformUtils.isIdeaUltimate
 
-      if (scala_version.isDefined) {
+      if (scala_version.isDefined)
         checkLibrary("org.apache.spark", "Spark")
         checkLibrary("io.predition", "PredictionIO")
         checkLibrary("com.stratio.sparkta", "Sparkta")
@@ -102,19 +96,14 @@ class ScalaApplicationUsagesCollector
         checkLibrary("spray", "Spray")
         checkLibrary("monocle", "Monocle")
 
-        java_version.foreach {
+        java_version.foreach
           case version: String =>
             set += new UsageDescriptor(s"Java version: $version", 1)
-        }
-      } else {
+      else
         checkLibrary("play.api.mvc", s"Play2 for Java|$isPlayInstalled")
         checkLibrary("akka.actor", "Akka for Java")
-      }
 
       import scala.collection.JavaConversions._
       set
-    }
-  }
 
   override def getGroupId: GroupDescriptor = GroupDescriptor.create("Scala")
-}

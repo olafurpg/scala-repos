@@ -1,6 +1,6 @@
 import scala.tools.partest.ParserTest
 
-object Test extends ParserTest {
+object Test extends ParserTest
 
   override def code =
     """
@@ -22,4 +22,3 @@ object Test extends ParserTest {
 
   // default coalescing behavior, whatever that is today.
   //override def extraSettings = s"${super.extraSettings} -Xxml:coalescing"
-}

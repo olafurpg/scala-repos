@@ -21,6 +21,5 @@ package kafka.common
   * exist.
   */
 class NoBrokersForPartitionException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

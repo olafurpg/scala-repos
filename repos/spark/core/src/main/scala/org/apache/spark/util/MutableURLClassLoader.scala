@@ -28,16 +28,13 @@ import scala.collection.JavaConverters._
   */
 private[spark] class MutableURLClassLoader(
     urls: Array[URL], parent: ClassLoader)
-    extends URLClassLoader(urls, parent) {
+    extends URLClassLoader(urls, parent)
 
-  override def addURL(url: URL): Unit = {
+  override def addURL(url: URL): Unit =
     super.addURL(url)
-  }
 
-  override def getURLs(): Array[URL] = {
+  override def getURLs(): Array[URL] =
     super.getURLs()
-  }
-}
 
 /**
   * A mutable class loader that gives preference to its own URLs over the parent class loader
@@ -45,7 +42,7 @@ private[spark] class MutableURLClassLoader(
   */
 private[spark] class ChildFirstURLClassLoader(
     urls: Array[URL], parent: ClassLoader)
-    extends MutableURLClassLoader(urls, null) {
+    extends MutableURLClassLoader(urls, null)
 
   private val parentClassLoader = new ParentClassLoader(parent)
 
@@ -58,41 +55,32 @@ private[spark] class ChildFirstURLClassLoader(
     */
   private val locks = new ConcurrentHashMap[String, Object]()
 
-  override def loadClass(name: String, resolve: Boolean): Class[_] = {
+  override def loadClass(name: String, resolve: Boolean): Class[_] =
     var lock = locks.get(name)
-    if (lock == null) {
+    if (lock == null)
       val newLock = new Object()
       lock = locks.putIfAbsent(name, newLock)
-      if (lock == null) {
+      if (lock == null)
         lock = newLock
-      }
-    }
 
-    lock.synchronized {
-      try {
+    lock.synchronized
+      try
         super.loadClass(name, resolve)
-      } catch {
+      catch
         case e: ClassNotFoundException =>
           parentClassLoader.loadClass(name, resolve)
-      }
-    }
-  }
 
-  override def getResource(name: String): URL = {
+  override def getResource(name: String): URL =
     val url = super.findResource(name)
     val res = if (url != null) url else parentClassLoader.getResource(name)
     res
-  }
 
-  override def getResources(name: String): Enumeration[URL] = {
+  override def getResources(name: String): Enumeration[URL] =
     val childUrls = super.findResources(name).asScala
     val parentUrls = parentClassLoader
       .getResources(name)
       .asScala
       (childUrls ++ parentUrls).asJavaEnumeration
-  }
 
-  override def addURL(url: URL) {
+  override def addURL(url: URL)
     super.addURL(url)
-  }
-}

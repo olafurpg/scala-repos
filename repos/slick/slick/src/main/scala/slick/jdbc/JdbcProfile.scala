@@ -15,7 +15,7 @@ trait JdbcProfile
     extends SqlProfile with JdbcActionComponent with JdbcInvokerComponent
     with JdbcTypesComponent with JdbcModelComponent
     /* internal: */ with JdbcStatementBuilderComponent
-    with JdbcMappingCompilerComponent {
+    with JdbcMappingCompilerComponent
 
   @deprecated(
       "Use the Profile object directly instead of calling `.profile` on it",
@@ -68,13 +68,12 @@ trait JdbcProfile
   final def buildSequenceSchemaDescription(seq: Sequence[_]): DDL =
     createSequenceDDLBuilder(seq).buildDDL
 
-  trait LowPriorityAPI {
+  trait LowPriorityAPI
     implicit def queryUpdateActionExtensionMethods[U, C[_]](
         q: Query[_, U, C]): UpdateActionExtensionMethodsImpl[U] =
       createUpdateActionExtensionMethods(updateCompiler.run(q.toNode).tree, ())
-  }
 
-  trait API extends LowPriorityAPI with super.API with ImplicitColumnTypes {
+  trait API extends LowPriorityAPI with super.API with ImplicitColumnTypes
     type SimpleDBIO[+R] = SimpleJdbcAction[R]
     val SimpleDBIO = SimpleJdbcAction
 
@@ -99,20 +98,17 @@ trait JdbcProfile
     implicit def actionBasedSQLInterpolation(
         s: StringContext): ActionBasedSQLInterpolation =
       new ActionBasedSQLInterpolation(s)
-  }
 
   val api: API = new API {}
 
   def runSynchronousQuery[R](tree: Node, param: Any)(
-      implicit session: Backend#Session): R = tree match {
+      implicit session: Backend#Session): R = tree match
     case rsm @ ResultSetMapping(_, _, CompiledMapping(_, elemType)) :@ CollectionType(
         cons, el) =>
       val b = cons.createBuilder(el.classTag).asInstanceOf[Builder[Any, R]]
-      createQueryInvoker[Any](rsm, param, null).foreach({ x =>
+      createQueryInvoker[Any](rsm, param, null).foreach( x =>
         b += x
-      }, 0)(session)
+      , 0)(session)
       b.result()
     case First(rsm: ResultSetMapping) =>
       createQueryInvoker[R](rsm, param, null).first
-  }
-}

@@ -23,9 +23,9 @@ import org.jetbrains.plugins.scala.overrideImplement._
   * contibute override elements. May be called on override keyword (ove<caret>)
   * or after override element definition (override def <caret>)
   */
-class ScalaOverrideContributor extends ScalaCompletionContributor {
+class ScalaOverrideContributor extends ScalaCompletionContributor
   private def registerOverrideCompletion(
-      filter: ElementFilter, keyword: String) {
+      filter: ElementFilter, keyword: String)
     extend(CompletionType.BASIC,
            PlatformPatterns.psiElement
              .and(
@@ -36,32 +36,29 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
                        new AndFilter(new NotFilter(new LeftNeighbour(
                                              new TextFilter("."))),
                                      filter)))),
-           new CompletionProvider[CompletionParameters] {
+           new CompletionProvider[CompletionParameters]
              def addCompletions(parameters: CompletionParameters,
                                 context: ProcessingContext,
-                                resultSet: CompletionResultSet) {
+                                resultSet: CompletionResultSet)
                addCompletionsOnOverrideKeyWord(resultSet, parameters)
-             }
-           })
-  }
+           )
 
   extend(CompletionType.BASIC,
          PlatformPatterns.psiElement(),
-         new CompletionProvider[CompletionParameters] {
+         new CompletionProvider[CompletionParameters]
            def addCompletions(parameters: CompletionParameters,
                               context: ProcessingContext,
-                              resultSet: CompletionResultSet) {
+                              resultSet: CompletionResultSet)
              addCompletionsAfterOverride(resultSet, parameters)
-           }
-         })
+         )
 
   class MyElementRenderer(member: ScalaNamedMember)
-      extends LookupElementRenderer[LookupElementDecorator[LookupElement]] {
+      extends LookupElementRenderer[LookupElementDecorator[LookupElement]]
     def renderElement(element: LookupElementDecorator[LookupElement],
-                      presentation: LookupElementPresentation) = {
+                      presentation: LookupElementPresentation) =
       element.getDelegate.renderElement(presentation)
 
-      val (resultText, tailText) = member match {
+      val (resultText, tailText) = member match
         case mm: ScMethodMember =>
           (mm.text + " = {...}", mm.scType.presentableText)
         case mVal: ScValueMember =>
@@ -69,22 +66,18 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
         case mVar: ScVariableMember =>
           (mVar.getText, mVar.scType.presentableText)
         case ta: ScAliasMember =>
-          val aliasType = ta.getElement match {
+          val aliasType = ta.getElement match
             case tad: ScTypeAliasDefinition =>
               tad.aliasedTypeElement.calcType.presentableText
             case _ => ""
-          }
           (ta.getText, aliasType)
-      }
 
       presentation.setTypeText(tailText)
       presentation.setItemText(resultText)
-    }
-  }
 
   private def addCompletionsOnOverrideKeyWord(
       resultSet: CompletionResultSet,
-      parameters: CompletionParameters): Unit = {
+      parameters: CompletionParameters): Unit =
     val position = positionFromParameters(parameters)
 
     val clazz = PsiTreeUtil.getParentOfType(
@@ -99,14 +92,12 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
                   clazz,
                   (classMember,
                   clazz) => createText(classMember, clazz, full = true),
-                  resultSet) { classMember =>
+                  resultSet)  classMember =>
       new MyInsertHandler()
-    }
-  }
 
   private def addCompletionsAfterOverride(
       resultSet: CompletionResultSet,
-      parameters: CompletionParameters): Unit = {
+      parameters: CompletionParameters): Unit =
     val position = positionFromParameters(parameters)
 
     val clazz = PsiTreeUtil.getParentOfType(
@@ -123,7 +114,7 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       ScalaOIUtil.getMembersToOverride(clazz, withSelfType = true)
     if (classMembers.isEmpty) return
 
-    def membersToRender = position.getContext match {
+    def membersToRender = position.getContext match
       case m: PsiMethod => classMembers.filter(_.isInstanceOf[ScMethodMember])
       case typedDefinition: ScTypedDefinition if typedDefinition.isVal =>
         classMembers.filter(_.isInstanceOf[ScValueMember])
@@ -132,41 +123,34 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
       case typeAlis: ScTypeAlias =>
         classMembers.filter(_.isInstanceOf[ScAliasMember])
       case _ => classMembers
-    }
 
     handleMembers(membersToRender,
                   clazz,
                   (classMember, clazz) => createText(classMember, clazz),
-                  resultSet) { classMember =>
+                  resultSet)  classMember =>
       new MyInsertHandler()
-    }
-  }
 
-  class MyInsertHandler() extends InsertHandler[LookupElement] {
-    def handleInsert(context: InsertionContext, item: LookupElement) = {
-      def makeInsertion(): Unit = {
+  class MyInsertHandler() extends InsertHandler[LookupElement]
+    def handleInsert(context: InsertionContext, item: LookupElement) =
+      def makeInsertion(): Unit =
         val elementOption = Option(
             PsiTreeUtil.getContextOfType(
                 context.getFile.findElementAt(context.getStartOffset),
                 classOf[ScModifierListOwner]))
 
-        elementOption.foreach { element =>
+        elementOption.foreach  element =>
           TypeAdjuster.markToAdjust(element)
           ScalaGenerationInfo.positionCaret(
               context.getEditor, element.asInstanceOf[PsiMember])
           context.commitDocument()
-        }
-      }
 
       makeInsertion()
-    }
-  }
 
   private def createText(classMember: ClassMember,
                          td: ScTemplateDefinition,
-                         full: Boolean = false): String = {
+                         full: Boolean = false): String =
     val needsInferType = ScalaGenerationInfo.needsInferType
-    val text: String = classMember match {
+    val text: String = classMember match
       case mm: ScMethodMember =>
         val mBody =
           ScalaGenerationInfo.getMethodBody(mm, td, isImplement = false)
@@ -205,23 +189,21 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
             isVal = false,
             needsInferType = needsInferType)
       case _ => " "
-    }
 
     if (!full)
-      text.indexOf(" ", 1) match {
+      text.indexOf(" ", 1) match
         //remove val, var, def or type
         case -1 => text
         case part => text.substring(part + 1)
-      } else "override " + text
-  }
+      else "override " + text
 
   private def handleMembers(classMembers: Iterable[ClassMember],
                             td: ScTemplateDefinition,
                             name: (ClassMember,
                             ScTemplateDefinition) => String,
                             resultSet: CompletionResultSet)(
-      insertionHandler: ClassMember => InsertHandler[LookupElement]): Unit = {
-    classMembers.foreach {
+      insertionHandler: ClassMember => InsertHandler[LookupElement]): Unit =
+    classMembers.foreach
       case mm: ScalaNamedMember =>
         val lookupItem = LookupElementBuilder
           .create(mm.getElement, name(mm, td))
@@ -233,8 +215,5 @@ class ScalaOverrideContributor extends ScalaCompletionContributor {
             lookupItem, new MyElementRenderer(mm))
         resultSet.consume(renderingDecorator)
       case _ =>
-    }
-  }
 
   registerOverrideCompletion(new ModifiersFilter, "override")
-}

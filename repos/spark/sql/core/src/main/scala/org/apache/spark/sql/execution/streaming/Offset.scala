@@ -22,7 +22,7 @@ package org.apache.spark.sql.execution.streaming
   * stream. An [[Offset]] must be comparable, and the result of `compareTo` must be consistent
   * with `equals` and `hashcode`.
   */
-trait Offset extends Serializable {
+trait Offset extends Serializable
 
   /**
     * Returns a negative integer, zero, or a positive integer as this object is less than, equal to,
@@ -34,4 +34,3 @@ trait Offset extends Serializable {
   def <(other: Offset): Boolean = compareTo(other) < 0
   def <=(other: Offset): Boolean = compareTo(other) <= 0
   def >=(other: Offset): Boolean = compareTo(other) >= 0
-}

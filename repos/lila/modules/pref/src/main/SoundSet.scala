@@ -2,14 +2,13 @@ package lila.pref
 
 import scalaz.NonEmptyList
 
-sealed class SoundSet private[pref](val key: String, val name: String) {
+sealed class SoundSet private[pref](val key: String, val name: String)
 
   override def toString = key
 
   def cssClass = key
-}
 
-sealed trait SoundSetObject {
+sealed trait SoundSetObject
 
   def all: NonEmptyList[SoundSet]
 
@@ -17,18 +16,17 @@ sealed trait SoundSetObject {
 
   lazy val listString = list mkString " "
 
-  lazy val allByKey = list map { c =>
+  lazy val allByKey = list map  c =>
     c.key -> c
-  } toMap
+  toMap
 
   lazy val default = all.head
 
   def apply(key: String) = allByKey.getOrElse(key, default)
 
   def contains(key: String) = allByKey contains key
-}
 
-object SoundSet extends SoundSetObject {
+object SoundSet extends SoundSetObject
 
   val all = NonEmptyList(new SoundSet("silent", "Silent"),
                          new SoundSet("standard", "Standard"),
@@ -37,4 +35,3 @@ object SoundSet extends SoundSetObject {
                          new SoundSet("sfx", "SFX"),
                          new SoundSet("futuristic", "Futuristic"),
                          new SoundSet("robot", "Robot"))
-}

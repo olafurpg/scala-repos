@@ -17,7 +17,7 @@ import mesosphere.marathon.io.storage.StorageProvider
 @Path("v2/artifacts")
 class ArtifactsResource @Inject()(
     val config: MarathonConf, val storage: StorageProvider)
-    extends RestResource {
+    extends RestResource
 
   /**
     * Upload to root artifact store.
@@ -45,7 +45,7 @@ class ArtifactsResource @Inject()(
                      @FormParam("file") upload: InputStream): Response =
     storeFile(path, upload)
 
-  private def storeFile(path: String, upload: InputStream) = {
+  private def storeFile(path: String, upload: InputStream) =
     //scalastyle:off null
     require(upload != null, "Please use 'file' as form parameter name!")
     //scalastyle:on
@@ -53,7 +53,6 @@ class ArtifactsResource @Inject()(
     val exists = item.exists
     item.store(upload)
     if (exists) ok() else created(item.url)
-  }
 
   /**
     * Get a specific artifact.
@@ -61,18 +60,16 @@ class ArtifactsResource @Inject()(
   @GET
   @Path("{path:.+}")
   @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))
-  def get(@PathParam("path") path: String): Response = {
+  def get(@PathParam("path") path: String): Response =
     val item = storage.item(path)
-    if (!item.exists) {
+    if (!item.exists)
       notFound(s"No artifact with path $path")
-    } else {
+    else
       Response
         .ok(item.inputStream(), mediaMime(path))
         .lastModified(new Date(item.lastModified))
         .header("Content-Length", item.length)
         .build()
-    }
-  }
 
   /**
     * Delete an artifact from store.
@@ -80,14 +77,12 @@ class ArtifactsResource @Inject()(
   @DELETE
   @Path("{path:.+}")
   @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))
-  def delete(@PathParam("path") path: String): Response = {
+  def delete(@PathParam("path") path: String): Response =
     val item = storage.item(path)
     if (item.exists) item.delete()
     ok()
-  }
 
   private[this] val mimes = new MimeTypes()
   def mediaMime(path: String): String =
     Option(mimes.getMimeByExtension(path))
       .getOrElse("application/octet-stream")
-}

@@ -15,7 +15,7 @@ import org.jboss.netty.channel.{ChannelHandlerContext, ChannelStateEvent, Except
   * server in order to consolidate statistics across a number of channels.
   */
 class ChannelStatsHandler(statsReceiver: StatsReceiver)
-    extends SimpleChannelHandler {
+    extends SimpleChannelHandler
   private[this] val log = Logger.getLogger(getClass.getName)
   private[this] val connectionCount: AtomicLong = new AtomicLong()
   private[this] var elapsed: () => Duration = null
@@ -33,22 +33,20 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   private[this] val writable = statsReceiver.counter("socket_writable_ms")
   private[this] val unwritable = statsReceiver.counter("socket_unwritable_ms")
   private[this] val exceptions = statsReceiver.scope("exn")
-  private[this] val connections = statsReceiver.addGauge("connections") {
+  private[this] val connections = statsReceiver.addGauge("connections")
     connectionCount.get()
-  }
 
   override def channelOpen(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
     elapsed = Stopwatch.start()
     ctx.setAttachment(new AtomicLong(0), new AtomicLong(0))
     connects.incr()
     connectionCount.incrementAndGet()
 
     super.channelOpen(ctx, e)
-  }
 
   override def writeComplete(
-      ctx: ChannelHandlerContext, e: WriteCompletionEvent) {
+      ctx: ChannelHandlerContext, e: WriteCompletionEvent)
     val (_, channelWriteCount) =
       ctx.getAttachment().asInstanceOf[(AtomicLong, AtomicLong)]
 
@@ -56,10 +54,9 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
     sentBytes.incr(e.getWrittenAmount.toInt)
 
     super.writeComplete(ctx, e)
-  }
 
-  override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent) {
-    e.getMessage match {
+  override def messageReceived(ctx: ChannelHandlerContext, e: MessageEvent)
+    e.getMessage match
       case buffer: ChannelBuffer =>
         val (channelReadCount, _) =
           ctx.getAttachment().asInstanceOf[(AtomicLong, AtomicLong)]
@@ -68,28 +65,25 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
         receivedBytes.incr(readableBytes)
       case _ =>
         log.warning("ChannelStatsHandler received non-channelbuffer read")
-    }
 
     super.messageReceived(ctx, e)
-  }
 
   private[this] val pendingClose = new AtomicInteger(0)
   private[this] val closesCount = statsReceiver.counter("closes")
   private[this] val closedCount = statsReceiver.counter("closed")
 
   override def closeRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent)
     closesCount.incr()
     super.closeRequested(ctx, e)
-  }
 
   override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent) {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent)
     closedCount.incr()
     closeChans.incr()
 
     // guarded in case Netty calls channelClosed without calling channelOpen.
-    if (elapsed != null) {
+    if (elapsed != null)
       val (channelReadCount, channelWriteCount) =
         ctx.getAttachment().asInstanceOf[(AtomicLong, AtomicLong)]
 
@@ -98,26 +92,21 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
 
       connectionDuration.add(elapsed().inMilliseconds)
       connectionCount.decrementAndGet()
-    }
 
     super.channelClosed(ctx, e)
-  }
 
   override def exceptionCaught(
-      ctx: ChannelHandlerContext, evt: ExceptionEvent) {
+      ctx: ChannelHandlerContext, evt: ExceptionEvent)
     val m =
       if (evt.getCause != null) evt.getCause.getClass.getName else "unknown"
     exceptions.counter(m).incr()
     // If no Monitor is active, then log the exception so we don't fail silently.
-    if (!Monitor.isActive) {
-      val level = evt.getCause match {
+    if (!Monitor.isActive)
+      val level = evt.getCause match
         case t: IOException => Level.FINE
         case _ => Level.WARNING
-      }
       log.log(level, "ChannelStatsHandler caught an exception", evt.getCause)
-    }
     super.exceptionCaught(ctx, evt)
-  }
 
   private[this] var hasBeenWritable =
     true //netty channels start in writable state
@@ -126,16 +115,13 @@ class ChannelStatsHandler(statsReceiver: StatsReceiver)
   private[this] def socketDuration(now: Time): Duration = now - since
 
   override def channelInterestChanged(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
     val now = Time.now
     super.channelInterestChanged(ctx, e)
     val isWritable = ctx.getChannel.isWritable()
-    if (isWritable != hasBeenWritable) {
+    if (isWritable != hasBeenWritable)
       val stat = if (hasBeenWritable) writable else unwritable
       stat.incr(socketDuration(now).inMillis.toInt)
 
       hasBeenWritable = isWritable
       since = now
-    }
-  }
-}

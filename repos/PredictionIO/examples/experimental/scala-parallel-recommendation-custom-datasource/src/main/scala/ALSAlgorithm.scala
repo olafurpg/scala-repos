@@ -17,11 +17,11 @@ case class ALSAlgorithmParams(rank: Int, numIterations: Int, lambda: Double)
     extends Params
 
 class ALSAlgorithm(val ap: ALSAlgorithmParams)
-    extends PAlgorithm[PreparedData, ALSModel, Query, PredictedResult] {
+    extends PAlgorithm[PreparedData, ALSModel, Query, PredictedResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  def train(data: PreparedData): ALSModel = {
+  def train(data: PreparedData): ALSModel =
     // Convert user and item String IDs to Int index for MLlib
     val userStringIntMap = BiMap.stringInt(data.ratings.map(_.user))
     val itemStringIntMap = BiMap.stringInt(data.ratings.map(_.item))
@@ -35,13 +35,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                  productFeatures = m.productFeatures,
                  userStringIntMap = userStringIntMap,
                  itemStringIntMap = itemStringIntMap)
-  }
 
-  def predict(model: ALSModel, query: Query): PredictedResult = {
+  def predict(model: ALSModel, query: Query): PredictedResult =
     // Convert String ID to Int index for Mllib
     model.userStringIntMap
       .get(query.user)
-      .map { userInt =>
+      .map  userInt =>
         // create inverse view of itemStringIntMap
         val itemIntStringMap = model.itemStringIntMap.inverse
         // recommendProducts() returns Array[MLlibRating], which uses item Int
@@ -50,10 +49,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           .recommendProducts(userInt, query.num)
           .map(r => ItemScore(itemIntStringMap(r.product), r.rating))
         new PredictedResult(itemScores)
-      }
-      .getOrElse {
+      .getOrElse
         logger.info(s"No prediction for unknown user ${query.user}.")
         new PredictedResult(Array.empty)
-      }
-  }
-}

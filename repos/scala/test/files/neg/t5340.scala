@@ -1,11 +1,9 @@
-class Poly {
+class Poly
   class E
-  object E {
+  object E
     implicit def conv(value: Any): E = sys.error("")
-  }
-}
 
-object MyApp {
+object MyApp
   val r: Poly = sys.error("")
   val s: Poly = sys.error("")
   val b: r.E = sys.error("")
@@ -26,4 +24,3 @@ object MyApp {
 
   // The type error is as expected, but the `amb prefix` should be logged,
   // rather than printed to standard out.
-}

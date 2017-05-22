@@ -9,7 +9,7 @@ package scala.man1
   *  @author Stephane Micheloud
   *  @version 1.0
   */
-object scalap extends Command {
+object scalap extends Command
   import _root_.scala.tools.docutil.ManPage._
 
   protected def cn = new Error().getStackTrace()(0).getClassName()
@@ -74,7 +74,7 @@ object scalap extends Command {
           Bold("scalac") & "(1)", "scalac.html") & ", " & Link(
           Bold("scaladoc") & "(1)", "scaladoc.html"))
 
-  def manpage = new Document {
+  def manpage = new Document
     title = command
     date = "June 2006"
     author = "Stephane Micheloud"
@@ -90,5 +90,3 @@ object scalap extends Command {
                     bugs,
                     copyright,
                     seeAlso)
-  }
-}

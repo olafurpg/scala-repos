@@ -24,12 +24,11 @@ import org.apache.spark.util.Utils
 
 /** Prints out environmental information, sleeps, and then exits. Made to
   * test driver submission in the standalone scheduler. */
-object DriverSubmissionTest {
-  def main(args: Array[String]) {
-    if (args.length < 1) {
+object DriverSubmissionTest
+  def main(args: Array[String])
+    if (args.length < 1)
       println("Usage: DriverSubmissionTest <seconds-to-sleep>")
       System.exit(0)
-    }
     val numSecondsToSleep = args(0).toInt
 
     val env = System.getenv()
@@ -43,10 +42,7 @@ object DriverSubmissionTest {
     properties.filter { case (k, _) => k.toString.contains("spark.test") }
       .foreach(println)
 
-    for (i <- 1 until numSecondsToSleep) {
+    for (i <- 1 until numSecondsToSleep)
       println(s"Alive for $i out of $numSecondsToSleep seconds")
       Thread.sleep(1000)
-    }
-  }
-}
 // scalastyle:on println

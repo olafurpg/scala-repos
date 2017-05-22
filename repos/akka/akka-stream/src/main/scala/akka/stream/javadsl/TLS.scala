@@ -46,7 +46,7 @@ import scala.compat.java8.OptionConverters
   * ignoring both types of events the stage will shut down once both events have
   * been received. See also [[TLSClosing]].
   */
-object TLS {
+object TLS
 
   /**
     * Create a StreamTls [[akka.stream.javadsl.BidiFlow]] in client mode. The
@@ -94,7 +94,6 @@ object TLS {
             role,
             closing,
             OptionConverters.toScala(hostInfo).map(e ⇒ (e.first, e.second))))
-}
 
 /**
   * This object holds simple wrapping [[akka.stream.scaladsl.BidiFlow]] implementations that can
@@ -102,7 +101,7 @@ object TLS {
   * just adapt the message protocol by wrapping into [[SessionBytes]] and
   * unwrapping [[SendBytes]].
   */
-object TLSPlacebo {
+object TLSPlacebo
 
   /**
     * Returns a reusable [[BidiFlow]] instance representing a [[TLSPlacebo$]].
@@ -113,4 +112,3 @@ object TLSPlacebo {
   private val forJava: javadsl.BidiFlow[
       SslTlsOutbound, ByteString, ByteString, SessionBytes, NotUsed] =
     new javadsl.BidiFlow(scaladsl.TLSPlacebo())
-}

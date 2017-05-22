@@ -9,7 +9,7 @@ import akka.dispatch.sysmsg.SystemMessage
 import akka.event.EventStream
 import scala.util.control.NoStackTrace
 
-object UidClashTest {
+object UidClashTest
 
   class TerminatedForNonWatchedActor
       extends Exception(
@@ -22,14 +22,13 @@ object UidClashTest {
       override val provider: ActorRefProvider,
       override val path: ActorPath,
       val eventStream: EventStream)
-      extends MinimalActorRef {
+      extends MinimalActorRef
 
     //Ignore everything
     override def isTerminated: Boolean = true
     override def sendSystemMessage(message: SystemMessage): Unit = ()
     override def !(message: Any)(
         implicit sender: ActorRef = Actor.noSender): Unit = ()
-  }
 
   def createCollidingRef(system: ActorSystem): ActorRef =
     new EvilCollidingActorRef(system.asInstanceOf[ActorSystemImpl].provider,
@@ -40,9 +39,9 @@ object UidClashTest {
   case object PingMyself
   case object RestartedSafely
 
-  class RestartedActor extends Actor {
+  class RestartedActor extends Actor
 
-    def receive = {
+    def receive =
       case PleaseRestart ⇒ throw new Exception("restart")
       case Terminated(ref) ⇒ throw new TerminatedForNonWatchedActor
       // This is the tricky part to make this test a positive one (avoid expectNoMsg).
@@ -54,48 +53,40 @@ object UidClashTest {
       // 3b. otherwise only the RestartedSafely message arrives
       case PingMyself ⇒ self ! RestartedSafely
       case RestartedSafely ⇒ context.parent ! RestartedSafely
-    }
 
-    override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-      context.children foreach { child ⇒
+    override def preRestart(reason: Throwable, message: Option[Any]): Unit =
+      context.children foreach  child ⇒
         oldActor = child
         context.unwatch(child)
         context.stop(child)
-      }
-    }
 
     override def preStart(): Unit =
       context.watch(context.actorOf(Props.empty, "child"))
 
-    override def postRestart(reason: Throwable): Unit = {
+    override def postRestart(reason: Throwable): Unit =
       context.watch(createCollidingRef(context.system))
       self ! PingMyself
-    } // Simulate UID clash
-  }
+    // Simulate UID clash
 
-  class RestartingActor(probe: ActorRef) extends Actor {
+  class RestartingActor(probe: ActorRef) extends Actor
     override val supervisorStrategy =
-      OneForOneStrategy(loggingEnabled = false) {
+      OneForOneStrategy(loggingEnabled = false)
         case _: TerminatedForNonWatchedActor ⇒
           context.stop(self)
           Stop
         case _ ⇒ Restart
-      }
     val theRestartedOne =
       context.actorOf(Props[RestartedActor], "theRestartedOne")
 
-    def receive = {
+    def receive =
       case PleaseRestart ⇒ theRestartedOne ! PleaseRestart
       case RestartedSafely ⇒ probe ! RestartedSafely
-    }
-  }
-}
 
-class UidClashTest extends AkkaSpec {
+class UidClashTest extends AkkaSpec
   import UidClashTest._
 
-  "The Terminated message for an old child stopped in preRestart" should {
-    "not arrive after restart" in {
+  "The Terminated message for an old child stopped in preRestart" should
+    "not arrive after restart" in
       val watcher = TestProbe()
       val topActor =
         system.actorOf(Props(classOf[RestartingActor], watcher.ref), "top")
@@ -103,6 +94,3 @@ class UidClashTest extends AkkaSpec {
 
       topActor ! PleaseRestart
       watcher.expectMsg(RestartedSafely)
-    }
-  }
-}

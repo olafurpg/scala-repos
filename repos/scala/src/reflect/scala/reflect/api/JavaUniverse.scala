@@ -19,7 +19,7 @@ package api
   *
   *  @contentDiagram hideNodes "*Api"
   */
-trait JavaUniverse extends Universe { self =>
+trait JavaUniverse extends Universe  self =>
 
   /** In runtime reflection universes, runtime representation of a class is `java.lang.Class`.
     *  @group JavaMirrors
@@ -45,11 +45,10 @@ trait JavaUniverse extends Universe { self =>
     *  @group JavaMirrors
     */
   trait JavaMirror
-      extends scala.reflect.api.Mirror[self.type] with RuntimeMirror {
+      extends scala.reflect.api.Mirror[self.type] with RuntimeMirror
     val classLoader: ClassLoader
     override def toString =
       s"JavaMirror with ${runtime.ReflectionUtils.show(classLoader)}"
-  }
 
   /** Creates a runtime reflection mirror from a JVM classloader.
     *
@@ -59,4 +58,3 @@ trait JavaUniverse extends Universe { self =>
     *  @group JavaMirrors
     */
   def runtimeMirror(cl: ClassLoader): Mirror
-}

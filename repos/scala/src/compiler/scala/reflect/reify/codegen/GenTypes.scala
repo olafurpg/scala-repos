@@ -1,7 +1,7 @@
 package scala.reflect.reify
 package codegen
 
-trait GenTypes { self: Reifier =>
+trait GenTypes  self: Reifier =>
 
   import global._
   import definitions._
@@ -12,7 +12,7 @@ trait GenTypes { self: Reifier =>
     *  Reify a type.
     *  For internal use only, use `reified` instead.
     */
-  def reifyType(tpe: Type): Tree = {
+  def reifyType(tpe: Type): Tree =
     assert(tpe != null, "tpe is null")
 
     if (tpe.isErroneous) CannotReifyErroneousReifee(tpe)
@@ -29,7 +29,7 @@ trait GenTypes { self: Reifier =>
     if (tsym.isClass && tpe == tsym.typeConstructor && tsym.isStatic)
       Select(Select(reify(tsym), nme.asType), nme.toTypeConstructor)
     else
-      tpe match {
+      tpe match
         case tpe: NoType.type =>
           reifyMirrorObject(tpe)
         case tpe: NoPrefix.type =>
@@ -62,15 +62,13 @@ trait GenTypes { self: Reifier =>
           reifyAnnotatedType(tpe)
         case _ =>
           reifyToughType(tpe)
-      }
-  }
 
   /** Keeps track of whether this reification contains abstract type parameters */
   def reificationIsConcrete: Boolean = state.reificationIsConcrete
 
-  def spliceType(tpe: Type): Tree = {
+  def spliceType(tpe: Type): Tree =
     if (tpe.isSpliceable &&
-        !(boundSymbolsInCallstack contains tpe.typeSymbol)) {
+        !(boundSymbolsInCallstack contains tpe.typeSymbol))
       if (reifyDebug) println("splicing " + tpe)
 
       val tagFlavor =
@@ -85,19 +83,18 @@ trait GenTypes { self: Reifier =>
                                         universe.tpe,
                                         tpe,
                                         concrete = concrete,
-                                        allowMaterialization = false) match {
+                                        allowMaterialization = false) match
         case failure if failure.isEmpty =>
           if (reifyDebug) println("implicit search was fruitless")
           if (reifyDebug) println("trying to splice as manifest")
           val splicedAsManifest = spliceAsManifest(tpe)
-          if (splicedAsManifest.isEmpty) {
+          if (splicedAsManifest.isEmpty)
             if (reifyDebug) println("no manifest in scope")
             EmptyTree
-          } else {
+          else
             if (reifyDebug)
               println("successfully spliced as manifest: " + splicedAsManifest)
             splicedAsManifest
-          }
         case success =>
           if (reifyDebug)
             println("implicit search has produced a result: " + success)
@@ -105,15 +102,12 @@ trait GenTypes { self: Reifier =>
           success.tpe <:< TypeTagClass.toTypeConstructor
           Select(Apply(Select(success, nme.in), List(Ident(nme.MIRROR_SHORT))),
                  nme.tpe)
-      }
       if (result != EmptyTree) return result
       state.reificationIsConcrete = false
-    }
 
     EmptyTree
-  }
 
-  private def spliceAsManifest(tpe: Type): Tree = {
+  private def spliceAsManifest(tpe: Type): Tree =
     def isSynthetic(manifest: Tree) =
       manifest exists
       (sub =>
@@ -128,7 +122,7 @@ trait GenTypes { self: Reifier =>
           isView = false,
           context = typer.context,
           saveAmbiguousDivergent = false,
-          pos = defaultErrorPosition) match {
+          pos = defaultErrorPosition) match
         case success if !success.tree.isEmpty && !isSynthetic(success.tree) =>
           val manifestInScope = success.tree
           // todo. write a test for this
@@ -145,15 +139,12 @@ trait GenTypes { self: Reifier =>
                  nme.tpe)
         case _ =>
           EmptyTree
-      }
     val result = typer.silent(silentTyper =>
           silentTyper.context.withMacrosDisabled(
               searchForManifest(silentTyper)))
-    result match {
+    result match
       case analyzer.SilentResultValue(result) => result
       case analyzer.SilentTypeError(_) => EmptyTree
-    }
-  }
 
   /** Reify a semi-concrete type member.
     *
@@ -179,7 +170,7 @@ trait GenTypes { self: Reifier =>
     *  The type itself still remains not concrete, in the sense that we don't know its erasure.
     *  I.e. we can compile the code that involves `ru.Type`, but we cannot serialize an instance of `ru.Type`.
     */
-  private def reifySemiConcreteTypeMember(tpe: Type): Tree = tpe match {
+  private def reifySemiConcreteTypeMember(tpe: Type): Tree = tpe match
     case tpe @ TypeRef(pre @ SingleType(prepre, presym), sym, args)
         if sym.isAbstractType && !sym.isExistential =>
       mirrorBuildCall(
@@ -188,26 +179,23 @@ trait GenTypes { self: Reifier =>
           mirrorBuildCall(
               nme.selectType, reify(sym.owner), reify(sym.name.toString)),
           reify(args))
-  }
 
   /** Reify an annotated type, i.e. the one that makes us deal with AnnotationInfos */
-  private def reifyAnnotatedType(tpe: AnnotatedType): Tree = {
+  private def reifyAnnotatedType(tpe: AnnotatedType): Tree =
     val AnnotatedType(anns, underlying) = tpe
     mirrorBuildCall(nme.AnnotatedType,
                     mkList(anns map reifyAnnotationInfo),
                     reify(underlying))
-  }
 
   /** Reify a tough type, i.e. the one that leads to creation of auxiliary symbols */
-  private def reifyToughType(tpe: Type): Tree = {
+  private def reifyToughType(tpe: Type): Tree =
     if (reifyDebug) println("tough type: %s (%s)".format(tpe, tpe.kind))
 
-    def reifyScope(scope: Scope): Tree = {
+    def reifyScope(scope: Scope): Tree =
       scope foreach reifySymDef
       mirrorBuildCall(nme.newScopeWith, scope.toList map reify: _*)
-    }
 
-    tpe match {
+    tpe match
       case tpe @ RefinedType(parents, decls) =>
         reifySymDef(tpe.typeSymbol)
         mirrorBuildCall(nme.RefinedType,
@@ -232,6 +220,3 @@ trait GenTypes { self: Reifier =>
       case _ =>
         throw new Error(
             "internal error: %s (%s) is not supported".format(tpe, tpe.kind))
-    }
-  }
-}

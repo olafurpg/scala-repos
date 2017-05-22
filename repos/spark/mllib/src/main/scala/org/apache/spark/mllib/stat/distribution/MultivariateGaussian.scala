@@ -37,7 +37,7 @@ import org.apache.spark.mllib.util.MLUtils
 @DeveloperApi
 class MultivariateGaussian @Since("1.3.0")(
     @Since("1.3.0") val mu: Vector, @Since("1.3.0") val sigma: Matrix)
-    extends Serializable {
+    extends Serializable
 
   require(sigma.numCols == sigma.numRows, "Covariance matrix must be square")
   require(mu.size == sigma.numCols,
@@ -51,9 +51,8 @@ class MultivariateGaussian @Since("1.3.0")(
     * @param mu The mean vector of the distribution
     * @param sigma The covariance matrix of the distribution
     */
-  private[mllib] def this(mu: DBV[Double], sigma: DBM[Double]) = {
+  private[mllib] def this(mu: DBV[Double], sigma: DBM[Double]) =
     this(Vectors.fromBreeze(mu), Matrices.fromBreeze(sigma))
-  }
 
   /**
     * Compute distribution dependent constants:
@@ -66,28 +65,24 @@ class MultivariateGaussian @Since("1.3.0")(
   /** Returns density of this multivariate Gaussian at given point, x
     */
   @Since("1.3.0")
-  def pdf(x: Vector): Double = {
+  def pdf(x: Vector): Double =
     pdf(x.toBreeze)
-  }
 
   /** Returns the log-density of this multivariate Gaussian at given point, x
     */
   @Since("1.3.0")
-  def logpdf(x: Vector): Double = {
+  def logpdf(x: Vector): Double =
     logpdf(x.toBreeze)
-  }
 
   /** Returns density of this multivariate Gaussian at given point, x */
-  private[mllib] def pdf(x: BV[Double]): Double = {
+  private[mllib] def pdf(x: BV[Double]): Double =
     math.exp(logpdf(x))
-  }
 
   /** Returns the log-density of this multivariate Gaussian at given point, x */
-  private[mllib] def logpdf(x: BV[Double]): Double = {
+  private[mllib] def logpdf(x: BV[Double]): Double =
     val delta = x - breezeMu
     val v = rootSigmaInv * delta
     u + v.t * v * -0.5
-  }
 
   /**
     * Calculate distribution dependent components used for the density function:
@@ -117,7 +112,7 @@ class MultivariateGaussian @Since("1.3.0")(
     * to be non-zero only if they exceed a tolerance based on machine precision, matrix size, and
     * relation to the maximum singular value (same tolerance used by, e.g., Octave).
     */
-  private def calculateCovarianceConstants: (DBM[Double], Double) = {
+  private def calculateCovarianceConstants: (DBM[Double], Double) =
     val eigSym.EigSym(d, u) =
       eigSym(sigma.toBreeze.toDenseMatrix) // sigma = u * diag(d) * u.t
 
@@ -125,7 +120,7 @@ class MultivariateGaussian @Since("1.3.0")(
     // This prevents any inverted value from exceeding (eps * n * max(d))^-1
     val tol = MLUtils.EPSILON * max(d) * d.length
 
-    try {
+    try
       // log(pseudo-determinant) is sum of the logs of all non-zero singular values
       val logPseudoDetSigma =
         d.activeValuesIterator.filter(_ > tol).map(math.log).sum
@@ -137,10 +132,7 @@ class MultivariateGaussian @Since("1.3.0")(
 
       (pinvS * u.t,
        -0.5 * (mu.size * math.log(2.0 * math.Pi) + logPseudoDetSigma))
-    } catch {
+    catch
       case uex: UnsupportedOperationException =>
         throw new IllegalArgumentException(
             "Covariance matrix has no non-zero singular values")
-    }
-  }
-}

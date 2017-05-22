@@ -15,13 +15,13 @@ import org.jetbrains.plugins.scala.settings._
 /**
   * Pavel Fatin
   */
-object ByNameParameter extends AnnotatorPart[ScExpression] {
+object ByNameParameter extends AnnotatorPart[ScExpression]
   private val Foreground = new Color(128, 128, 128)
 
   def kind = classOf[ScExpression]
 
   def annotate(
-      exp: ScExpression, holder: AnnotationHolder, typeAware: Boolean) {
+      exp: ScExpression, holder: AnnotationHolder, typeAware: Boolean)
     if (!ScalaProjectSettings
           .getInstance(exp.getProject)
           .isShowArgumentsToByNameParams) return
@@ -33,7 +33,7 @@ object ByNameParameter extends AnnotatorPart[ScExpression] {
     val parameter =
       ScalaPsiUtil.parameterOf(exp) //.orElse(conversionParameterOf(exp))
 
-    parameter.filter(_.isByName).foreach { p =>
+    parameter.filter(_.isByName).foreach  p =>
       val attributes = new TextAttributes()
       attributes.setForegroundColor(Foreground)
 
@@ -42,15 +42,12 @@ object ByNameParameter extends AnnotatorPart[ScExpression] {
           Seq(exp.getTextRange)
         else nonLiteralRangesIn(exp)
 
-      ranges.foreach { r =>
+      ranges.foreach  r =>
         val annotation =
           holder.createInfoAnnotation(r, "Passed as by-name parameter")
         annotation.setEnforcedTextAttributes(attributes)
-      }
-    }
-  }
 
-  private def nonLiteralRangesIn(exp: ScExpression): Seq[TextRange] = {
+  private def nonLiteralRangesIn(exp: ScExpression): Seq[TextRange] =
     val literalRanges = exp
       .depthFirst(parent => !parent.isInstanceOf[ScLiteral])
       .filterByType(classOf[ScLiteral])
@@ -65,5 +62,3 @@ object ByNameParameter extends AnnotatorPart[ScExpression] {
       .map(it => new TextRange(it.head, it(1)))
       .filterNot(_.isEmpty)
       .toList
-  }
-}

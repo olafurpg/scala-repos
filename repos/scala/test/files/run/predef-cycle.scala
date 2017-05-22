@@ -1,25 +1,18 @@
-class Force {
-  val t1 = new Thread {
-    override def run() {
+class Force
+  val t1 = new Thread
+    override def run()
       scala.`package`
-    }
-  }
-  val t2 = new Thread {
-    override def run() {
+  val t2 = new Thread
+    override def run()
       scala.Predef
-    }
-  }
   t1.start()
   t2.start()
   t1.join()
   t2.join()
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     new Force()
-  }
-}
 
 /* Was deadlocking:
 "Thread-2" prio=5 tid=7f9637268000 nid=0x119601000 in Object.wait() [119600000]

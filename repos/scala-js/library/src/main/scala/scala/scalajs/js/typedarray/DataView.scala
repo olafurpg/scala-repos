@@ -8,7 +8,7 @@ import scala.scalajs.js
   */
 @js.native
 class DataView(buffer: ArrayBuffer, byteOffset: Int = 0, byteLength: Int = ???)
-    extends ArrayBufferView {
+    extends ArrayBufferView
 
   def getInt8(byteOffset: Int): Byte = js.native
   def getUint8(byteOffset: Int): Short = js.native
@@ -44,4 +44,3 @@ class DataView(buffer: ArrayBuffer, byteOffset: Int = 0, byteLength: Int = ???)
   def setFloat64(
       byteOffset: Int, value: Double, littleEndian: Boolean = false): Unit =
     js.native
-}

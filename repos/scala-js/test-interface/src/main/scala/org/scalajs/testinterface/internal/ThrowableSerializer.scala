@@ -6,9 +6,9 @@ import js.JSConverters._
 
 import sbt.testing._
 
-object ThrowableSerializer {
+object ThrowableSerializer
 
-  def serialize(t: Throwable): js.Dynamic = {
+  def serialize(t: Throwable): js.Dynamic =
     val res = lit(
         `class` = t.getClass().toString,
         message = t.getMessage(),
@@ -18,12 +18,9 @@ object ThrowableSerializer {
     if (t.getCause() != null) res.cause = serialize(t.getCause())
 
     res
-  }
 
-  private def serializeTraceElem(e: StackTraceElement): js.Dynamic = {
+  private def serializeTraceElem(e: StackTraceElement): js.Dynamic =
     lit(className = e.getClassName,
         methodName = e.getMethodName,
         fileName = e.getFileName,
         lineNumber = e.getLineNumber)
-  }
-}

@@ -6,7 +6,7 @@ package api
   *  Can be used for pattern matching, instance tests, serialization and the like.
   *  @group Tags
   */
-trait ImplicitTags { self: Universe =>
+trait ImplicitTags  self: Universe =>
 
   // Tags for Types.
   implicit val AnnotatedTypeTag: ClassTag[AnnotatedType]
@@ -115,4 +115,3 @@ trait ImplicitTags { self: Universe =>
   implicit val TreeCopierTag: ClassTag[TreeCopier]
   implicit val RuntimeClassTag: ClassTag[RuntimeClass]
   implicit val MirrorTag: ClassTag[Mirror]
-}

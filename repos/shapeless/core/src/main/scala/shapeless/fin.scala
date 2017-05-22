@@ -31,7 +31,7 @@ case class FinZero[N <: Succ[_]]() extends Fin[N]
   */
 case class FinSucc[N <: Succ[_], P <: Fin[N]]() extends Fin[Succ[N]]
 
-object Fin {
+object Fin
   import ops.fin._
 
   def apply[M <: Nat, N <: Succ[_]](
@@ -41,4 +41,3 @@ object Fin {
       implicit fromNat: FromNat[m.N, n.N]): fromNat.Out = fromNat()
 
   def toNat[F <: Fin[_]](f: F)(implicit toNat: ToNat[F]): toNat.Out = toNat()
-}

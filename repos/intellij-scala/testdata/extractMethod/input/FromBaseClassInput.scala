@@ -1,19 +1,14 @@
-object Bug {
+object Bug
 
-  class C {
+  class C
     val x = 1
-  }
 
-  class A {
-    class B extends C {
-      def foo() = {
+  class A
+    class B extends C
+      def foo() =
         /*start*/
         x + 1
 /*end*/
-      }
-    }
-  }
-}
 /*
 object Bug {
 

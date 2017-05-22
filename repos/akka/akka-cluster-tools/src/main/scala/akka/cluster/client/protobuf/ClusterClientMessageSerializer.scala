@@ -16,7 +16,7 @@ import akka.cluster.client.protobuf.msg.{ClusterClientMessages ⇒ cm}
   */
 private[akka] class ClusterClientMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest with BaseSerializer
   import ClusterReceptionist.Internal._
 
   private lazy val serialization = SerializationExtension(system)
@@ -30,15 +30,15 @@ private[akka] class ClusterClientMessageSerializer(
 
   private val fromBinaryMap =
     collection.immutable.HashMap[String, Array[Byte] ⇒ AnyRef](
-        ContactsManifest -> contactsFromBinary, GetContactsManifest -> { _ ⇒
+        ContactsManifest -> contactsFromBinary, GetContactsManifest ->  _ ⇒
       GetContacts
-    }, HeartbeatManifest -> { _ ⇒
+    , HeartbeatManifest ->  _ ⇒
       Heartbeat
-    }, HeartbeatRspManifest -> { _ ⇒
+    , HeartbeatRspManifest ->  _ ⇒
       HeartbeatRsp
-    })
+    )
 
-  override def manifest(obj: AnyRef): String = obj match {
+  override def manifest(obj: AnyRef): String = obj match
     case _: Contacts ⇒ ContactsManifest
     case GetContacts ⇒ GetContactsManifest
     case Heartbeat ⇒ HeartbeatManifest
@@ -46,9 +46,8 @@ private[akka] class ClusterClientMessageSerializer(
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
-  override def toBinary(obj: AnyRef): Array[Byte] = obj match {
+  override def toBinary(obj: AnyRef): Array[Byte] = obj match
     case m: Contacts ⇒ contactsToProto(m).toByteArray
     case GetContacts ⇒ emptyByteArray
     case Heartbeat ⇒ emptyByteArray
@@ -56,21 +55,17 @@ private[akka] class ClusterClientMessageSerializer(
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
-    fromBinaryMap.get(manifest) match {
+    fromBinaryMap.get(manifest) match
       case Some(f) ⇒ f(bytes)
       case None ⇒
         throw new IllegalArgumentException(
             s"Unimplemented deserialization of message with manifest [$manifest] in [${getClass.getName}]")
-    }
 
   private def contactsToProto(m: Contacts): cm.Contacts =
     cm.Contacts.newBuilder().addAllContactPoints(m.contactPoints.asJava).build()
 
-  private def contactsFromBinary(bytes: Array[Byte]): Contacts = {
+  private def contactsFromBinary(bytes: Array[Byte]): Contacts =
     val m = cm.Contacts.parseFrom(bytes)
     Contacts(m.getContactPointsList.asScala.toVector)
-  }
-}

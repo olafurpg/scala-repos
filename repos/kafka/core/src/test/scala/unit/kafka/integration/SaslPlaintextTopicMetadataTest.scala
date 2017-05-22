@@ -20,8 +20,7 @@ import kafka.api.SaslTestHarness
 import org.apache.kafka.common.protocol.SecurityProtocol
 
 class SaslPlaintextTopicMetadataTest
-    extends BaseTopicMetadataTest with SaslTestHarness {
+    extends BaseTopicMetadataTest with SaslTestHarness
   override protected val zkSaslEnabled = false
   protected def securityProtocol = SecurityProtocol.SASL_PLAINTEXT
   protected def trustStoreFile = None
-}

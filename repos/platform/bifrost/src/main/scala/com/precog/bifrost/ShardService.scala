@@ -69,10 +69,9 @@ import scalaz.syntax.monad._
 import scalaz.std.function._
 
 sealed trait ShardStateOptions
-object ShardStateOptions {
+object ShardStateOptions
   case object NoOptions extends ShardStateOptions
   case object DisableAsyncQueries extends ShardStateOptions
-}
 
 case class ShardState(
     platform: ManagedPlatform,
@@ -82,13 +81,12 @@ case class ShardState(
     jobManager: JobManager[Future],
     clock: Clock,
     stoppable: Stoppable,
-    options: ShardStateOptions = ShardStateOptions.NoOptions) {
-}
+    options: ShardStateOptions = ShardStateOptions.NoOptions)
 
 trait ShardService extends
     BlueEyesServiceBuilder with
     ShardServiceCombinators with
-    Logging {
+    Logging
 
   import ShardStateOptions.DisableAsyncQueries
 
@@ -110,143 +108,103 @@ trait ShardService extends
 
   def optionsResponse = CORSHeaders.apply[ByteChunk, Future](M)
 
-  private def queryResultToByteChunk: QueryResult => ByteChunk = {
+  private def queryResultToByteChunk: QueryResult => ByteChunk =
     val utf8 = Charset.forName("UTF-8")
-    (qr: QueryResult) => qr match {
+    (qr: QueryResult) => qr match
       case Left(jv) => Left(jv.renderCompact.getBytes(utf8))
       case Right(stream) => Right(VFSModule.bufferOutput(stream))
-    }
-  }
 
   //private def cf = implicitly[ByteChunk => Future[JValue]]
 
   def shardService[F[+_]](service: HttpService[ByteChunk, F[Future[HttpResponse[QueryResult]]]])(implicit
-      F: Functor[F]): HttpService[ByteChunk, F[Future[HttpResponse[ByteChunk]]]] = {
+      F: Functor[F]): HttpService[ByteChunk, F[Future[HttpResponse[ByteChunk]]]] =
     service map { _ map { _ map { _ map queryResultToByteChunk } } }
-  }
 
-  private def asyncHandler(state: ShardState) = {
-    path("/analytics") {
-      jsonAPIKey(state.apiKeyFinder) {
-        path("/queries") {
-          path("/'jobId") {
+  private def asyncHandler(state: ShardState) =
+    path("/analytics")
+      jsonAPIKey(state.apiKeyFinder)
+        path("/queries")
+          path("/'jobId")
             get(new AsyncQueryResultServiceHandler(state.jobManager)) ~
             delete(new QueryDeleteHandler[ByteChunk](state.jobManager, state.clock))
-          } ~
-          requireAccount(state.accountFinder) {
+          ~
+          requireAccount(state.accountFinder)
             // async handler *always* returns a JSON object containing the job ID
-            shardService[({ type λ[+α] = (((APIKey, AccountDetails)) => α) })#λ] {
+            shardService[({ type λ[+α] = (((APIKey, AccountDetails)) => α) })#λ]
               asyncQuery(post(new AsyncQueryServiceHandler(state.platform.asynchronous)))
-            }
-          }
-        }
-      }
-    }
-  }
 
-  private def syncHandler(state: ShardState) = {
+  private def syncHandler(state: ShardState) =
     val queryService = new SyncQueryServiceHandler(state.platform.synchronous, state.jobManager, SyncResultFormat.Simple)
-    jsonp {
-      jsonAPIKey(state.apiKeyFinder) {
-        requireAccount(state.accountFinder) {
-          dataPath("/analytics/fs") {
-            shardService[({ type λ[+α] = (((APIKey, AccountDetails), Path) => α) })#λ] {
-              query[QueryResult] {
-                {
+    jsonp
+      jsonAPIKey(state.apiKeyFinder)
+        requireAccount(state.accountFinder)
+          dataPath("/analytics/fs")
+            shardService[({ type λ[+α] = (((APIKey, AccountDetails), Path) => α) })#λ]
+              query[QueryResult]
                   get { queryService } ~
                   post { queryService }
-                }
-              }
-            } ~
-            options {
+            ~
+            options
               (request: HttpRequest[ByteChunk]) => (a: (APIKey, AccountDetails), p: Path) => optionsResponse
-            }
-          }
-        } ~
-        dataPath("/metadata/fs") {
-          get {
+        ~
+        dataPath("/metadata/fs")
+          get
             produce(application/json)(
               new BrowseServiceHandler[ByteChunk](state.platform.vfs) map { _ map { _ map { _ map { jvalueToChunk } } } }
             )(ResponseModifier.responseFG[({ type λ[α] = (APIKey, Path) => α })#λ, Future, ByteChunk])
-          } ~
-          options {
+          ~
+          options
             (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) => optionsResponse
-          }
-        } ~
-        dataPath("/meta/fs") {
-          get {
+        ~
+        dataPath("/meta/fs")
+          get
             produce(application/json)(
               new BrowseServiceHandler[ByteChunk](state.platform.vfs, legacy = true) map { _ map { _ map { _ map { jvalueToChunk } } } }
             )(ResponseModifier.responseFG[({ type λ[α] = (APIKey, Path) => α })#λ, Future, ByteChunk])
-          } ~
-          options {
+          ~
+          options
             (request: HttpRequest[ByteChunk]) => (a: APIKey, p: Path) => optionsResponse
-          }
-        } ~ dataHandler(state)
-      }
-    }
-  }
+        ~ dataHandler(state)
 
-  private def scheduledHandler(state: ShardState) = {
+  private def scheduledHandler(state: ShardState) =
     implicit val actTimeout = timeout
 
-    jsonp {
-      jvalue[ByteChunk] {
-        path("/scheduled/") {
-          jsonAPIKey(state.apiKeyFinder) {
+    jsonp
+      jvalue[ByteChunk]
+        path("/scheduled/")
+          jsonAPIKey(state.apiKeyFinder)
             post { new AddScheduledQueryServiceHandler(state.scheduler, state.apiKeyFinder, state.accountFinder, state.clock) }
-          } ~
-          path("'scheduleId") {
+          ~
+          path("'scheduleId")
             get { new ScheduledQueryStatusServiceHandler[Future[JValue]](state.scheduler) } ~
             delete { new DeleteScheduledQueryServiceHandler(state.scheduler) }
-          }
-        }
-      }
-    }
-  }
 
-  private def analysisHandler[A](state: ShardState) = {
-    jsonAPIKey(state.apiKeyFinder) {
-      requireAccount(state.accountFinder) {
-        dataPath("/analysis/fs") {
-          get {
-            shardService[({ type λ[+α] = ((APIKey, AccountDetails), Path) => α })#λ] {
+  private def analysisHandler[A](state: ShardState) =
+    jsonAPIKey(state.apiKeyFinder)
+      requireAccount(state.accountFinder)
+        dataPath("/analysis/fs")
+          get
+            shardService[({ type λ[+α] = ((APIKey, AccountDetails), Path) => α })#λ]
               new AnalysisServiceHandler(state.platform, state.scheduler, state.clock)
-            }
-          }
-        }
-      }
-    }
-  }
 
-  private def dataHandler[A](state: ShardState) = {
-    dataPath("/data/fs") {
-      get {
+  private def dataHandler[A](state: ShardState) =
+    dataPath("/data/fs")
+      get
         new DataServiceHandler[A](state.platform)
-      }
-    }
-  }
 
-  lazy val analyticsService = this.service("analytics", "2.0") {
-    requestLogging(timeout) {
-      healthMonitor("/health", timeout, List(eternity)) { monitor => context =>
-        startup {
+  lazy val analyticsService = this.service("analytics", "2.0")
+    requestLogging(timeout)
+      healthMonitor("/health", timeout, List(eternity))  monitor => context =>
+        startup
           logger.info("Starting bifrost with config:\n" + context.config)
           configureShardState(context.config)
-        } ->
-        request { state =>
+        ->
+        request  state =>
           import CORSHeaderHandler.allowOrigin
-          allowOrigin("*", executionContext) {
+          allowOrigin("*", executionContext)
             asyncHandler(state) ~ syncHandler(state) ~ analysisHandler(state) ~
-            ifRequest { _: HttpRequest[ByteChunk] => state.scheduler.enabled } {
+            ifRequest { _: HttpRequest[ByteChunk] => state.scheduler.enabled }
               scheduledHandler(state)
-            }
-          }
-        } ->
-        stop { state: ShardState =>
+        ->
+        stop  state: ShardState =>
           state.stoppable
-        }
-      }
-    }
-  }
-}

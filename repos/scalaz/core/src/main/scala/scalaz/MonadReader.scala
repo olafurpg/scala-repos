@@ -5,7 +5,7 @@ package scalaz
   *
   */
 ////
-trait MonadReader[F[_], S] extends Monad[F] { self =>
+trait MonadReader[F[_], S] extends Monad[F]  self =>
   ////
 
   def ask: F[S]
@@ -14,13 +14,11 @@ trait MonadReader[F[_], S] extends Monad[F] { self =>
   def asks[A](f: S => A): F[A] = map(ask)(f)
 
   ////
-}
 
-object MonadReader {
+object MonadReader
   @inline
   def apply[F[_], S](implicit F: MonadReader[F, S]): MonadReader[F, S] = F
 
   ////
 
   ////
-}

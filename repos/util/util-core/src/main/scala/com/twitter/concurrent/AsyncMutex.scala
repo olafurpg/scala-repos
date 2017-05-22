@@ -16,7 +16,7 @@ package com.twitter.concurrent
   * @see [[AsyncSemaphore]] for a semaphore version.
   */
 class AsyncMutex private (maxWaiters: Option[Int])
-    extends AsyncSemaphore(1, maxWaiters) {
+    extends AsyncSemaphore(1, maxWaiters)
 
   /**
     * Constructs a mutex with no limit on the max number
@@ -29,4 +29,3 @@ class AsyncMutex private (maxWaiters: Option[Int])
     * number of waiters for permits.
     */
   def this(maxWaiters: Int) = this(Some(maxWaiters))
-}

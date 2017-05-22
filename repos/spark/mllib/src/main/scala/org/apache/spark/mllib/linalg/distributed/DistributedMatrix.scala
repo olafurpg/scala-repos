@@ -25,7 +25,7 @@ import org.apache.spark.annotation.Since
   * Represents a distributively stored matrix backed by one or more RDDs.
   */
 @Since("1.0.0")
-trait DistributedMatrix extends Serializable {
+trait DistributedMatrix extends Serializable
 
   /** Gets or computes the number of rows. */
   @Since("1.0.0")
@@ -37,4 +37,3 @@ trait DistributedMatrix extends Serializable {
 
   /** Collects data and assembles a local dense breeze matrix (for test only). */
   private[mllib] def toBreeze(): BDM[Double]
-}

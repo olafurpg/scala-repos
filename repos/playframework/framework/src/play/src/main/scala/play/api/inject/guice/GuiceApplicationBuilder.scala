@@ -37,7 +37,7 @@ final case class GuiceApplicationBuilder(
         disabled,
         binderOptions,
         eagerly
-    ) {
+    )
 
   // extra constructor for creating from Java
   def this() = this(environment = Environment.simple())
@@ -105,20 +105,18 @@ final case class GuiceApplicationBuilder(
   /**
     * Create a new Play application Module for an Application using this configured builder.
     */
-  override def applicationModule(): GuiceModule = {
+  override def applicationModule(): GuiceModule =
     val initialConfiguration = loadConfiguration(environment)
     val appConfiguration = initialConfiguration ++ configuration
     val globalSettings =
       global.getOrElse(GlobalSettings(appConfiguration, environment))
 
-    LoggerConfigurator(environment.classLoader).foreach {
+    LoggerConfigurator(environment.classLoader).foreach
       _.configure(environment)
-    }
 
-    if (shouldDisplayLoggerDeprecationMessage(appConfiguration)) {
+    if (shouldDisplayLoggerDeprecationMessage(appConfiguration))
       Logger.warn(
           "Logger configuration in conf files is deprecated and has no effect. Use a logback configuration file instead.")
-    }
 
     val loadedModules = loadModules(environment, appConfiguration)
 
@@ -130,7 +128,6 @@ final case class GuiceApplicationBuilder(
           bind[WebCommands] to new DefaultWebCommands
       )
       .createModule()
-  }
 
   /**
     * Create a new Play Application using this configured builder.
@@ -190,7 +187,7 @@ final case class GuiceApplicationBuilder(
     * @return Returns true if one of the keys contains a deprecated value, otherwise false
     */
   def shouldDisplayLoggerDeprecationMessage(
-      appConfiguration: Configuration): Boolean = {
+      appConfiguration: Configuration): Boolean =
     import scala.collection.JavaConverters._
     import scala.collection.mutable
 
@@ -198,67 +195,56 @@ final case class GuiceApplicationBuilder(
         "DEBUG", "WARN", "ERROR", "INFO", "TRACE", "OFF")
 
     // Recursively checks each key to see if it contains a deprecated value
-    def hasDeprecatedValue(values: mutable.Map[String, AnyRef]): Boolean = {
-      values.exists {
+    def hasDeprecatedValue(values: mutable.Map[String, AnyRef]): Boolean =
+      values.exists
         case (_, value: String) if deprecatedValues.contains(value) =>
           true
         case (_, value: java.util.Map[String, AnyRef]) =>
           hasDeprecatedValue(value.asScala)
         case _ =>
           false
-      }
-    }
 
-    if (appConfiguration.underlying.hasPath("logger")) {
-      appConfiguration.underlying.getAnyRef("logger") match {
+    if (appConfiguration.underlying.hasPath("logger"))
+      appConfiguration.underlying.getAnyRef("logger") match
         case value: String =>
           hasDeprecatedValue(mutable.Map("logger" -> value))
         case value: java.util.Map[String, AnyRef] =>
           hasDeprecatedValue(value.asScala)
         case _ =>
           false
-      }
-    } else {
+    else
       false
-    }
-  }
-}
 
 private class AdditionalRouterProvider(additional: Router)
-    extends Provider[Router] {
+    extends Provider[Router]
   @Inject private var fallback: RoutesProvider = _
   lazy val get = Router.from(additional.routes.orElse(fallback.get.routes))
-}
 
 private class FakeRoutes(
     injected: PartialFunction[(String, String), Handler], fallback: Router)
-    extends Router {
+    extends Router
   def documentation = fallback.documentation
   // Use withRoutes first, then delegate to the parentRoutes if no route is defined
   val routes =
-    new AbstractPartialFunction[RequestHeader, Handler] {
+    new AbstractPartialFunction[RequestHeader, Handler]
       override def applyOrElse[A <: RequestHeader, B >: Handler](
           rh: A, default: A => B) =
         injected.applyOrElse(
             (rh.method, rh.path), (_: (String, String)) => default(rh))
       def isDefinedAt(rh: RequestHeader) =
         injected.isDefinedAt((rh.method, rh.path))
-    } orElse new AbstractPartialFunction[RequestHeader, Handler] {
+    orElse new AbstractPartialFunction[RequestHeader, Handler]
       override def applyOrElse[A <: RequestHeader, B >: Handler](
           rh: A, default: A => B) =
         fallback.routes.applyOrElse(rh, default)
       def isDefinedAt(x: RequestHeader) = fallback.routes.isDefinedAt(x)
-    }
-  def withPrefix(prefix: String) = {
+  def withPrefix(prefix: String) =
     new FakeRoutes(injected, fallback.withPrefix(prefix))
-  }
-}
 
 private case class FakeRouterConfig(
     withRoutes: PartialFunction[(String, String), Handler])
 
 private class FakeRouterProvider @Inject()(
     config: FakeRouterConfig, parent: RoutesProvider)
-    extends Provider[Router] {
+    extends Provider[Router]
   lazy val get: Router = new FakeRoutes(config.withRoutes, parent.get)
-}

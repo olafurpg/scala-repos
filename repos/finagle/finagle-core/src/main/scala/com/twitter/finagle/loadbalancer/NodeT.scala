@@ -9,7 +9,7 @@ import com.twitter.finagle.ServiceFactory
   * the next request.
   */
 protected[loadbalancer] trait NodeT[Req, Rep]
-    extends ServiceFactory[Req, Rep] {
+    extends ServiceFactory[Req, Rep]
   type This
 
   /**
@@ -32,4 +32,3 @@ protected[loadbalancer] trait NodeT[Req, Rep]
     * The underlying service factory.
     */
   def factory: ServiceFactory[Req, Rep]
-}

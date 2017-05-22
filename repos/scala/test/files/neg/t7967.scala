@@ -1,9 +1,7 @@
 trait B
-trait C { self: B =>
-}
+trait C  self: B =>
 
-object Test {
+object Test
   new C {} // fails
   type CC = C
   new CC {} // should fail, doesn't
-}

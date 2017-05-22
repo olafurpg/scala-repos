@@ -27,7 +27,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * date 19.12.14
   */
 class ScalaMacroEvaluator(project: Project)
-    extends ProjectComponent with ScalaMacroTypeable {
+    extends ProjectComponent with ScalaMacroTypeable
 
   override def projectOpened() = ()
 
@@ -45,8 +45,8 @@ class ScalaMacroEvaluator(project: Project)
       DefaultRule
   )
 
-  def isMacro(n: PsiNamedElement): Option[ScFunction] = {
-    n match {
+  def isMacro(n: PsiNamedElement): Option[ScFunction] =
+    n match
       case f: ScMacroDefinition => Some(f)
       //todo: fix decompiler to avoid this check:
       case f: ScFunction
@@ -55,38 +55,29 @@ class ScalaMacroEvaluator(project: Project)
             .isDefined =>
         Some(f)
       case _ => None
-    }
-  }
 
   override def checkMacro(
-      macros: ScFunction, context: MacroContext): Option[ScType] = {
+      macros: ScFunction, context: MacroContext): Option[ScType] =
     typingRules
       .filter(_.isApplicable(macros))
       .head
       .typeable
       .checkMacro(macros, context)
-  }
-}
 
-object ScalaMacroEvaluator {
+object ScalaMacroEvaluator
   def getInstance(project: Project) =
     ServiceManager.getService(project, classOf[ScalaMacroEvaluator])
-}
 
-trait MacroRule {
+trait MacroRule
   def isApplicable(fun: ScFunction): Boolean
   def typeable: ScalaMacroTypeable
-}
 
 case class MatchRule(name: String, clazz: String, typeable: ScalaMacroTypeable)
-    extends MacroRule {
-  def isApplicable(fun: ScFunction) = {
+    extends MacroRule
+  def isApplicable(fun: ScFunction) =
     fun.name == name && fun.containingClass.qualifiedName == clazz
-  }
-}
 
-object DefaultRule extends MacroRule {
+object DefaultRule extends MacroRule
   override def isApplicable(fun: ScFunction) = true
   override def typeable: ScalaMacroTypeable =
     ScalaMacroDummyTypeable // TODO: interpreter goes here
-}

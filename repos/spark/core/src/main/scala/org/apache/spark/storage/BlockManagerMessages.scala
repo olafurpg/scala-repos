@@ -22,7 +22,7 @@ import java.io.{Externalizable, ObjectInput, ObjectOutput}
 import org.apache.spark.rpc.RpcEndpointRef
 import org.apache.spark.util.Utils
 
-private[spark] object BlockManagerMessages {
+private[spark] object BlockManagerMessages
   //////////////////////////////////////////////////////////////////////////////////
   // Messages from the master to slaves.
   //////////////////////////////////////////////////////////////////////////////////
@@ -63,27 +63,24 @@ private[spark] object BlockManagerMessages {
                              var storageLevel: StorageLevel,
                              var memSize: Long,
                              var diskSize: Long)
-      extends ToBlockManagerMaster with Externalizable {
+      extends ToBlockManagerMaster with Externalizable
 
     def this() = this(null, null, null, 0, 0) // For deserialization only
 
     override def writeExternal(out: ObjectOutput): Unit =
-      Utils.tryOrIOException {
+      Utils.tryOrIOException
         blockManagerId.writeExternal(out)
         out.writeUTF(blockId.name)
         storageLevel.writeExternal(out)
         out.writeLong(memSize)
         out.writeLong(diskSize)
-      }
 
-    override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException {
+    override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException
       blockManagerId = BlockManagerId(in)
       blockId = BlockId(in.readUTF())
       storageLevel = StorageLevel(in)
       memSize = in.readLong()
       diskSize = in.readLong()
-    }
-  }
 
   case class GetLocations(blockId: BlockId) extends ToBlockManagerMaster
 
@@ -115,4 +112,3 @@ private[spark] object BlockManagerMessages {
       extends ToBlockManagerMaster
 
   case class HasCachedBlocks(executorId: String) extends ToBlockManagerMaster
-}

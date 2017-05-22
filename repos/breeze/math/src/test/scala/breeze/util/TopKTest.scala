@@ -22,37 +22,32 @@ import org.scalatest.prop._;
 import org.junit.runner.RunWith;
 
 @RunWith(classOf[JUnitRunner])
-class TopKTest extends FunSuite with Checkers {
+class TopKTest extends FunSuite with Checkers
 
-  test("Check that we always get the top elements: doubles") {
-    check { (values: List[Double], k: Int) =>
-      (k < 0) || (k > 30) || {
+  test("Check that we always get the top elements: doubles")
+    check  (values: List[Double], k: Int) =>
+      (k < 0) || (k > 30) ||
         val topk = TopK(k, values.iterator);
         topk.size == math.min(k, values.distinct.size) &&
         (topk.iterator zip topk.iterator.drop(1))
           .forall(tup => (tup._1 >= tup._2)) &&
-        (topk.isEmpty || {
+        (topk.isEmpty ||
               val set = topk.toSet;
               val last = topk.min;
               values.forall(n => n < last || set.contains(n))
-            })
-      }
-    };
-  }
+            )
+    ;
 
-  test("Check that we always get the top elements: ints") {
-    check { (values: List[Int], k: Int) =>
-      (k < 0) || (k > 30) || {
+  test("Check that we always get the top elements: ints")
+    check  (values: List[Int], k: Int) =>
+      (k < 0) || (k > 30) ||
         val topk = TopK(k, values.iterator);
         topk.size == math.min(k, values.distinct.size) &&
         (topk.iterator zip topk.iterator.drop(1))
           .forall(tup => (tup._1 >= tup._2)) &&
-        (topk.isEmpty || {
+        (topk.isEmpty ||
               val set = topk.toSet;
               val last = topk.min;
               values.forall(n => n < last || set.contains(n))
-            })
-      }
-    };
-  }
-}
+            )
+    ;

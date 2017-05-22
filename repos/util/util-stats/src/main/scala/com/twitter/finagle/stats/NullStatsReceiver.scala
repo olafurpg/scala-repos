@@ -1,15 +1,14 @@
 package com.twitter.finagle.stats
 
-object NullStatsReceiver extends NullStatsReceiver {
+object NullStatsReceiver extends NullStatsReceiver
   def get() = this
-}
 
 /**
   * A no-op StatsReceiver. Metrics are not recorded, making this receiver useful
   * in unit tests and as defaults in situations where metrics are not strictly
   * required.
   */
-class NullStatsReceiver extends StatsReceiver {
+class NullStatsReceiver extends StatsReceiver
   val repr = this
   override def isNull = true
 
@@ -28,4 +27,3 @@ class NullStatsReceiver extends StatsReceiver {
   override def scopeSuffix(suffix: String): StatsReceiver = this
 
   override def toString = "NullStatsReceiver"
-}

@@ -12,7 +12,7 @@ import org.scalatest.Matchers
 import org.scalatest.WordSpec
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ORSetSpec extends WordSpec with Matchers {
+class ORSetSpec extends WordSpec with Matchers
 
   val node1 = UniqueAddress(Address("akka.tcp", "Sys", "localhost", 2551), 1)
   val node2 = UniqueAddress(node1.address.copy(port = Some(2552)), 2)
@@ -31,9 +31,9 @@ class ORSetSpec extends WordSpec with Matchers {
   val user3 = """{"username":"charlie","password":"parker"}"""
   val user4 = """{"username":"charles","password":"mingus"}"""
 
-  "A ORSet" must {
+  "A ORSet" must
 
-    "be able to add user" in {
+    "be able to add user" in
       val c1 = ORSet()
 
       val c2 = c1.add(node1, user1)
@@ -46,9 +46,8 @@ class ORSetSpec extends WordSpec with Matchers {
       c5.elements should contain(user2)
       c5.elements should contain(user3)
       c5.elements should contain(user4)
-    }
 
-    "be able to remove added user" in {
+    "be able to remove added user" in
       val c1 = ORSet()
 
       val c2 = c1.add(node1, user1)
@@ -67,9 +66,8 @@ class ORSetSpec extends WordSpec with Matchers {
       val c7 = c5.merge(c3)
       c7.elements should not contain (user1)
       c7.elements should not contain (user2)
-    }
 
-    "be able to add removed" in {
+    "be able to add removed" in
       val c1 = ORSet()
       val c2 = c1.remove(node1, user1)
       val c3 = c2.add(node1, user1)
@@ -78,9 +76,8 @@ class ORSetSpec extends WordSpec with Matchers {
       c4.elements should not contain (user1)
       val c5 = c4.add(node1, user1)
       c5.elements should contain(user1)
-    }
 
-    "be able to remove and add several times" in {
+    "be able to remove and add several times" in
       val c1 = ORSet()
 
       val c2 = c1.add(node1, user1)
@@ -99,9 +96,8 @@ class ORSetSpec extends WordSpec with Matchers {
       val c9 = c8.remove(node1, user1)
       c9.elements should not contain (user1)
       c9.elements should contain(user2)
-    }
 
-    "be able to have its user set correctly merged with another ORSet with unique user sets" in {
+    "be able to have its user set correctly merged with another ORSet with unique user sets" in
       // set 1
       val c1 = ORSet().add(node1, user1).add(node1, user2)
       c1.elements should contain(user1)
@@ -125,9 +121,8 @@ class ORSetSpec extends WordSpec with Matchers {
       merged2.elements should contain(user2)
       merged2.elements should not contain (user3)
       merged2.elements should contain(user4)
-    }
 
-    "be able to have its user set correctly merged with another ORSet with overlapping user sets" in {
+    "be able to have its user set correctly merged with another ORSet with overlapping user sets" in
       // set 1
       val c1 = ORSet()
         .add(node1, user1)
@@ -165,9 +160,8 @@ class ORSetSpec extends WordSpec with Matchers {
       merged2.elements should contain(user2)
       merged2.elements should not contain (user3)
       merged2.elements should contain(user4)
-    }
 
-    "be able to have its user set correctly merged for concurrent updates" in {
+    "be able to have its user set correctly merged for concurrent updates" in
       val c1 = ORSet().add(node1, user1).add(node1, user2).add(node1, user3)
 
       c1.elements should contain(user1)
@@ -205,9 +199,8 @@ class ORSetSpec extends WordSpec with Matchers {
       merged4.elements should contain(user2)
       merged4.elements should not contain (user3)
       merged4.elements should contain(user4)
-    }
 
-    "be able to have its user set correctly merged after remove" in {
+    "be able to have its user set correctly merged after remove" in
       val c1 = ORSet().add(node1, user1).add(node1, user2)
       val c2 = c1.remove(node2, user2)
 
@@ -232,11 +225,9 @@ class ORSetSpec extends WordSpec with Matchers {
       merged4.elements should contain(user1)
       merged4.elements should not contain (user2)
       merged4.elements should contain(user3)
-    }
-  }
 
-  "ORSet unit test" must {
-    "verify subtractDots" in {
+  "ORSet unit test" must
+    "verify subtractDots" in
       val dot = VersionVector(
           TreeMap(nodeA -> 3L, nodeB -> 2L, nodeD -> 14L, nodeG -> 22L))
       val vvector = VersionVector(
@@ -248,9 +239,8 @@ class ORSetSpec extends WordSpec with Matchers {
                   nodeF -> 2L))
       val expected = VersionVector(TreeMap(nodeB -> 2L, nodeG -> 22L))
       ORSet.subtractDots(dot, vvector) should be(expected)
-    }
 
-    "verify mergeCommonKeys" in {
+    "verify mergeCommonKeys" in
       val commonKeys: Set[String] = Set("K1", "K2")
       val thisDot1 = VersionVector(TreeMap(nodeA -> 3L, nodeD -> 7L))
       val thisDot2 = VersionVector(TreeMap(nodeB -> 5L, nodeC -> 2L))
@@ -273,9 +263,8 @@ class ORSetSpec extends WordSpec with Matchers {
 
       ORSet.mergeCommonKeys(commonKeys, thisSet, thatSet) should be(
           expectedDots)
-    }
 
-    "verify mergeDisjointKeys" in {
+    "verify mergeDisjointKeys" in
       val keys: Set[Any] = Set("K3", "K4", "K5")
       val elements: Map[Any, VersionVector] =
         Map("K3" -> VersionVector(nodeA, 4L),
@@ -290,18 +279,16 @@ class ORSetSpec extends WordSpec with Matchers {
 
       ORSet.mergeDisjointKeys(keys, elements, vvector, acc) should be(
           expectedDots)
-    }
 
-    "verify disjoint merge" in {
+    "verify disjoint merge" in
       val a1 = ORSet().add(node1, "bar")
       val b1 = ORSet().add(node2, "baz")
       val c = a1.merge(b1)
       val a2 = a1.remove(node1, "bar")
       val d = a2.merge(c)
       d.elements should be(Set("baz"))
-    }
 
-    "verify removed after merge" in {
+    "verify removed after merge" in
       // Add Z at node1 replica
       val a = ORSet().add(node1, "Z")
       // Replicate it to some node3, i.e. it has dot 'Z'->{node1 -> 1}
@@ -329,9 +316,8 @@ class ORSetSpec extends WordSpec with Matchers {
       c.merge(a3).merge(b2).elements should be(Set.empty)
       b2.merge(c).merge(a3).elements should be(Set.empty)
       b2.merge(a3).merge(c).elements should be(Set.empty)
-    }
 
-    "verify removed after merge 2" in {
+    "verify removed after merge 2" in
       val a = ORSet().add(node1, "Z")
       val b = ORSet().add(node2, "Z")
       // replicate node3
@@ -352,24 +338,22 @@ class ORSetSpec extends WordSpec with Matchers {
       c.merge(a3).merge(b3).elements should be(Set.empty)
       b3.merge(c).merge(a3).elements should be(Set.empty)
       b3.merge(a3).merge(c).elements should be(Set.empty)
-    }
 
-    "have unapply extractor" in {
+    "have unapply extractor" in
       val s1 = ORSet.empty.add(node1, "a").add(node2, "b")
       val s2: ORSet[String] = s1
       val ORSet(elements1) = s1 // `unapply[A](s: ORSet[A])` is used here
       val elements2: Set[String] = elements1
 
-      Changed(ORSetKey[String]("key"))(s1) match {
+      Changed(ORSetKey[String]("key"))(s1) match
         case c @ Changed(ORSetKey("key")) ⇒
           val x: ORSet[String] = c.dataValue
           val ORSet(elements3) = c.dataValue
           val elements4: Set[String] = elements3
           elements4 should be(Set("a", "b"))
-      }
 
       val msg: Any = Changed(ORSetKey[String]("key"))(s1)
-      msg match {
+      msg match
         case c @ Changed(ORSetKey("key")) ⇒
           val ORSet(elements3) =
             c.dataValue // `unapply(a: ReplicatedData)` is used here
@@ -378,7 +362,3 @@ class ORSetSpec extends WordSpec with Matchers {
           //   but trait Set is invariant in type A. You may wish to investigate a wildcard type such as _ <: Any. (SLS 3.2.10)
           val elements4: Set[Any] = elements3
           elements4 should be(Set("a", "b"))
-      }
-    }
-  }
-}

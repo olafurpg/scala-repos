@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Monoid` */
 final class MonoidOps[F] private[syntax](
     val self: F)(implicit val F: Monoid[F])
-    extends Ops[F] {
+    extends Ops[F]
   ////
   final def multiply(n: Int): F = F.multiply(self, n)
 
@@ -19,9 +19,8 @@ final class MonoidOps[F] private[syntax](
   final def onEmpty[A](v: => A)(implicit ma: Monoid[A], e: Equal[F]): A =
     F.onEmpty(self)(v)
   ////
-}
 
-trait ToMonoidOps extends ToSemigroupOps {
+trait ToMonoidOps extends ToSemigroupOps
   implicit def ToMonoidOps[F](v: F)(implicit F0: Monoid[F]) =
     new MonoidOps[F](v)
 
@@ -30,9 +29,8 @@ trait ToMonoidOps extends ToSemigroupOps {
   def mzero[F](implicit F: Monoid[F]): F = F.zero
   def ∅[F](implicit F: Monoid[F]): F = F.zero
   ////
-}
 
-trait MonoidSyntax[F] extends SemigroupSyntax[F] {
+trait MonoidSyntax[F] extends SemigroupSyntax[F]
   implicit def ToMonoidOps(v: F): MonoidOps[F] =
     new MonoidOps[F](v)(MonoidSyntax.this.F)
 
@@ -41,4 +39,3 @@ trait MonoidSyntax[F] extends SemigroupSyntax[F] {
   def mzero(implicit F: Monoid[F]): F = F.zero
   def ∅(implicit F: Monoid[F]): F = F.zero
   ////
-}

@@ -14,10 +14,10 @@ import scala.reflect.internal.SymbolPairs
   *  Most of the logic is in SymbolPairs, which contains generic
   *  pair-oriented traversal logic.
   */
-abstract class OverridingPairs extends SymbolPairs {
+abstract class OverridingPairs extends SymbolPairs
   import global._
 
-  class Cursor(base: Symbol) extends super.Cursor(base) {
+  class Cursor(base: Symbol) extends super.Cursor(base)
     lazy val relatively = new RelativeTo(base.thisType)
 
     /** Symbols to exclude: Here these are constructors and private/artifact symbols,
@@ -41,5 +41,3 @@ abstract class OverridingPairs extends SymbolPairs {
           !exclude(lo) // this admits private, as one can't have a private member that matches a less-private member.
           &&
           relatively.matches(lo, high)) // TODO we don't call exclude(high), should we?
-  }
-}

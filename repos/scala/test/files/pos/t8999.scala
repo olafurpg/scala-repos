@@ -1,4 +1,4 @@
-object Types {
+object Types
 
   abstract sealed class Type
 
@@ -31,19 +31,17 @@ object Types {
 
   final case class RecordType(fields: List[RecordType.Field]) extends Type
 
-  object RecordType {
+  object RecordType
     final case class Field(name: String,
                            originalName: Option[String],
                            tpe: Type,
                            mutable: Boolean)
-  }
 
   case object NoType extends Type
-}
 
 sealed abstract class ClassKind
 
-object ClassKind {
+object ClassKind
 
   case object Class extends ClassKind
 
@@ -56,9 +54,8 @@ object ClassKind {
   case object HijackedClass extends ClassKind
 
   case object TraitImpl extends ClassKind
-}
 
-object Trees {
+object Trees
 
   import Types._
 
@@ -69,10 +66,9 @@ object Trees {
   sealed trait PropertyName
   case class Ident(name: String, originalName: Option[String])
       extends PropertyName
-  object Ident {
+  object Ident
     def apply(name: String): Ident =
       new Ident(name, Some(name))
-  }
 
   case class VarDef(name: Ident, vtpe: Type, mutable: Boolean, rhs: Tree)
       extends Tree
@@ -83,9 +79,8 @@ object Trees {
 
   class Block private (val stats: List[Tree]) extends Tree
 
-  object Block {
+  object Block
     def unapply(block: Block): Some[List[Tree]] = Some(block.stats)
-  }
 
   case class Labeled(label: Ident, tpe: Type, body: Tree) extends Tree
 
@@ -240,15 +235,14 @@ object Trees {
   case class ModuleExportDef(fullName: String) extends Tree
 
   final class TreeHash(val treeHash: Array[Byte], val posHash: Array[Byte])
-}
 
-object Main {
+object Main
   import Trees._
   import Types._
 
-  private def transform(tree: Tree) = {
+  private def transform(tree: Tree) =
     val ObjectClass = "O"
-    tree match {
+    tree match
       case VarDef(_, _, _, rhs) =>
       case tree: Block =>
       case Labeled(ident @ Ident(label, _), tpe, body) =>
@@ -298,6 +292,3 @@ object Main {
       case Closure(captureParams, params, body, captureValues) =>
       case _: Skip | _: Debugger | _: LoadModule | _: JSEnvInfo | _: Literal |
           EmptyTree =>
-    }
-  }
-}

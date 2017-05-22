@@ -23,34 +23,31 @@ case class PluginDescriptor(
 
 case class JarManifest(pluginDescriptors: Seq[PluginDescriptor],
                        jarPath: String,
-                       modTimeStamp: Long)(val isBlackListed: Boolean) {
-  def serialize() = {
+                       modTimeStamp: Long)(val isBlackListed: Boolean)
+  def serialize() =
     <intellij-compat>
-      {for (PluginDescriptor(since, until, injtors) <- pluginDescriptors) {
+      for (PluginDescriptor(since, until, injtors) <- pluginDescriptors)
       <scala-plugin since-version={since.toString} until-version={until.toString}>
-        {for (InjectorDescriptor(version, iface, impl, srcs) <- injtors) {
+        for (InjectorDescriptor(version, iface, impl, srcs) <- injtors)
         <psi-injector version={version.toString} ifnterface={iface} implementation={impl}>
-          {for (src <- srcs) <source>
+          for (src <- srcs) <source>
           {src}
-        </source>}
+        </source>
         </psi-injector>
-      }}
+      
       </scala-plugin>
-    }}
+    
     </intellij-compat>
-  }
-}
 
-object JarManifest {
+object JarManifest
   def deserialize(
-      f: VirtualFile, containingJar: VirtualFile = null): JarManifest = {
+      f: VirtualFile, containingJar: VirtualFile = null): JarManifest =
     val jar =
       Option(containingJar).getOrElse(VfsUtilCore.getVirtualFileForJar(f))
     deserialize(XML.load(f.getInputStream), jar)
-  }
 
-  def deserialize(elem: Elem, containingJar: VirtualFile): JarManifest = {
-    def buildInjectorDescriptor(n: Node): InjectorDescriptor = {
+  def deserialize(elem: Elem, containingJar: VirtualFile): JarManifest =
+    def buildInjectorDescriptor(n: Node): InjectorDescriptor =
       val version = (n \ "@version").headOption.map(_.text.toInt).getOrElse(0)
       val iface = (n \ "@interface").headOption
         .map(_.text)
@@ -60,8 +57,7 @@ object JarManifest {
         .getOrElse(throw new InvalidManifestException(n, "implementation"))
       val sources = (n \\ "source").map(_.text)
       InjectorDescriptor(version, iface, impl, sources)
-    }
-    def buildPluginDescriptor(n: Node): PluginDescriptor = {
+    def buildPluginDescriptor(n: Node): PluginDescriptor =
       val since = Version
         .parse((n \ "@since-version").text)
         .getOrElse(throw new InvalidManifestException(n, "since-version"))
@@ -70,8 +66,7 @@ object JarManifest {
         .getOrElse(throw new InvalidManifestException(n, "until-version"))
       val injectors = (n \\ "psi-injector").map(buildInjectorDescriptor)
       PluginDescriptor(since, until, injectors)
-    }
-    elem \\ "intellij-compat" match {
+    elem \\ "intellij-compat" match
       case NodeSeq.Empty =>
         throw new InvalidManifestException(
             elem, "<intellij-compat> with plugin descriptors")
@@ -80,6 +75,3 @@ object JarManifest {
                     containingJar.getPath.replaceAll("!/", ""),
                     new File(containingJar.getPath.replaceAll("!/", ""))
                       .lastModified())(isBlackListed = false)
-    }
-  }
-}

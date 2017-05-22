@@ -19,16 +19,15 @@ import scala.reflect.ClassTag
 /**
   * A RequestVal representing a query parameter of type T.
   */
-trait Parameter[T] extends RequestVal[T] {
+trait Parameter[T] extends RequestVal[T]
   def optional: RequestVal[Optional[T]]
   def withDefault(defaultValue: T): RequestVal[T]
-}
 
 /**
   * A collection of predefined parameters.
   * FIXME: add tests, see #16437
   */
-object Parameters {
+object Parameters
   import akka.http.scaladsl.common.ToNameReceptacleEnhancements._
 
   /**
@@ -76,8 +75,6 @@ object Parameters {
   /** Unmarshals the `name` field using the provided `convert` function. */
   def fromString[T](name: String,
                     clazz: Class[T],
-                    convert: Function[String, T]): Parameter[T] = {
+                    convert: Function[String, T]): Parameter[T] =
     implicit val tTag: ClassTag[T] = ClassTag(clazz)
     ParameterImpl(name.as(Util.fromStringUnmarshallerFromFunction(convert)))
-  }
-}

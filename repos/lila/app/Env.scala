@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 final class Env(config: Config,
                 val scheduler: lila.common.Scheduler,
                 system: ActorSystem,
-                appPath: String) {
+                appPath: String)
 
   val CliUsername = config getString "cli.username"
 
@@ -90,12 +90,10 @@ final class Env(config: Config,
   )
   play.api.Logger("boot").info("Preloading complete")
 
-  scheduler.once(5 seconds) {
+  scheduler.once(5 seconds)
     Env.slack.api.publishInfo("Lichess has restarted!")
-  }
-}
 
-object Env {
+object Env
 
   lazy val current =
     "app" boot new Env(config = lila.common.PlayApp.loadConfig,
@@ -155,4 +153,3 @@ object Env {
   def challenge = lila.challenge.Env.current
   def explorer = lila.explorer.Env.current
   def fishnet = lila.fishnet.Env.current
-}

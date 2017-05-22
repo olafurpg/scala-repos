@@ -14,9 +14,9 @@ import org.scalatest.mock.MockitoSugar
 @RunWith(classOf[JUnitRunner])
 class TimerStatsTest
     extends FunSuite with MockitoSugar with Eventually
-    with IntegrationPatience {
+    with IntegrationPatience
 
-  test("deviation") {
+  test("deviation")
     val tickDuration = 10.milliseconds
     val hwt = new netty.HashedWheelTimer(
         new NamedPoolThreadFactory(getClass.getSimpleName),
@@ -29,13 +29,11 @@ class TimerStatsTest
     TimerStats.deviation(hwt, tickDuration, sr)
 
     // assert that we capture at least 3 samples
-    eventually {
+    eventually
       assert(deviation().size >= 3)
-    }
     hwt.stop()
-  }
 
-  test("hashedWheelTimerInternals") {
+  test("hashedWheelTimerInternals")
     val tickDuration = 10.milliseconds
     val hwt = new netty.HashedWheelTimer(
         new NamedPoolThreadFactory(getClass.getSimpleName),
@@ -57,18 +55,13 @@ class TimerStatsTest
     // have the monitoring task to run quickly the first time and only once.
     var count = 0
     val nextRunAt = () =>
-      {
         count += 1
         if (count == 1) 1.millisecond else 5.minutes
-    }
     TimerStats.hashedWheelTimerInternals(hwt, nextRunAt, sr)
 
-    eventually {
+    eventually
       // we should have the nTasks tasks pending that we've scheduled
       // plus it should see the monitoring task itself which runs it.
       assert(pendingTimeouts() == Seq(nTasks + 1))
-    }
 
     hwt.stop()
-  }
-}

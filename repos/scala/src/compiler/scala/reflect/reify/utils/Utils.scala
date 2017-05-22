@@ -5,7 +5,7 @@ import scala.tools.nsc.Global
 
 trait Utils
     extends NodePrinters with Extractors with SymbolTables
-    with StdAttachments {
+    with StdAttachments
 
   val global: Global
   val typer: global.analyzer.Typer
@@ -17,4 +17,3 @@ trait Utils
   val reifyDebug = global.settings.Yreifydebug.value
   val reifyCopypaste = global.settings.Yreifycopypaste.value
   val reifyTrace = scala.tools.nsc.util.trace when reifyDebug
-}

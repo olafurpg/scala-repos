@@ -7,7 +7,7 @@ import scala.concurrent.Future
 /**
   * Process offer by matching tasks and launching them when appropriate.
   */
-trait OfferProcessor {
+trait OfferProcessor
 
   /**
     * Process offer by matching tasks and launching them when appropriate.
@@ -18,4 +18,3 @@ trait OfferProcessor {
     * @return the future indicating when the processing of the offer has finished and if there were any errors
     */
   def processOffer(offer: Offer): Future[Unit]
-}

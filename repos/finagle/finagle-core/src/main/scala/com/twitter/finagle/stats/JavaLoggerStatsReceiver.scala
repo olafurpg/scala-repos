@@ -7,7 +7,7 @@ import java.util.logging.Logger
 import scala.collection.mutable
 
 class JavaLoggerStatsReceiver(logger: Logger, timer: Timer)
-    extends StatsReceiverWithCumulativeGauges {
+    extends StatsReceiverWithCumulativeGauges
   val repr = logger
   private val timerTasks = new mutable.HashMap[Seq[String], TimerTask]
 
@@ -15,37 +15,27 @@ class JavaLoggerStatsReceiver(logger: Logger, timer: Timer)
   // is used for debugging only.
   def this(logger: Logger) = this(logger, DefaultTimer.twitter)
 
-  def stat(name: String*): Stat = new Stat {
-    def add(value: Float) {
+  def stat(name: String*): Stat = new Stat
+    def add(value: Float)
       logger.info("%s add %f".format(formatName(name), value))
-    }
-  }
 
-  def counter(name: String*): Counter = new Counter {
-    def incr(delta: Int) {
+  def counter(name: String*): Counter = new Counter
+    def incr(delta: Int)
       logger.info("%s incr %d".format(formatName(name), delta))
-    }
-  }
 
   protected[this] def registerGauge(name: Seq[String], f: => Float): Unit =
-    synchronized {
+    synchronized
       deregisterGauge(name)
 
-      timerTasks(name) = timer.schedule(10.seconds) {
+      timerTasks(name) = timer.schedule(10.seconds)
         logger.info("%s %2f".format(formatName(name), f))
-      }
-    }
 
-  protected[this] def deregisterGauge(name: Seq[String]): Unit = synchronized {
+  protected[this] def deregisterGauge(name: Seq[String]): Unit = synchronized
     timerTasks.remove(name) foreach { _.cancel() }
-  }
 
-  private[this] def formatName(description: Seq[String]) = {
+  private[this] def formatName(description: Seq[String]) =
     description mkString "/"
-  }
-}
 
-object JavaLoggerStatsReceiver {
+object JavaLoggerStatsReceiver
   def apply(): JavaLoggerStatsReceiver =
     new JavaLoggerStatsReceiver(Logger.getLogger("Finagle"))
-}

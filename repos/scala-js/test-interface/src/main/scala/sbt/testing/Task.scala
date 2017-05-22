@@ -8,7 +8,7 @@ package sbt.testing
   *  the client in the returned an array of <em>Task</em>s (which can be empty
   *  if there's no more work to do.)
   */
-trait Task {
+trait Task
 
   /** A possibly zero-length array of string tags associated with this task.
     *
@@ -49,4 +49,3 @@ trait Task {
     *          <code>Task</code>.
     */
   def taskDef(): TaskDef
-}

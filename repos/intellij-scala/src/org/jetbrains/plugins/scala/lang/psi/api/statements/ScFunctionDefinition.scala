@@ -20,7 +20,7 @@ import org.jetbrains.plugins.scala.macroAnnotations.{Cached, ModCount}
   * Date: 22.02.2008
   * Time: 9:49:36
   */
-trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
+trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner
   def body: Option[ScExpression]
 
   def hasAssign: Boolean
@@ -32,16 +32,15 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
   def returnUsages(withBooleanInfix: Boolean = false): Array[PsiElement] =
     body.fold(Array.empty[PsiElement])(
         exp =>
-          {
         (exp.depthFirst(!_.isInstanceOf[ScFunction])
               .filter(_.isInstanceOf[ScReturnStmt]) ++ exp.calculateReturns(
                 withBooleanInfix))
           .filter(_.getContainingFile == getContainingFile)
           .toArray
           .distinct
-    })
+    )
 
-  def canBeTailRecursive = getParent match {
+  def canBeTailRecursive = getParent match
     case (_: ScTemplateBody) && Parent(Parent(owner: ScTypeDefinition)) =>
       val ownerModifiers = owner.getModifierList
       val methodModifiers = getModifierList
@@ -50,7 +49,6 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
       methodModifiers.has(ScalaTokenTypes.kPRIVATE) ||
       methodModifiers.has(ScalaTokenTypes.kFINAL)
     case _ => true
-  }
 
   def hasTailRecursionAnnotation: Boolean =
     annotations.exists(
@@ -59,49 +57,41 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
           .map(_.canonicalText)
           .exists(_ == "_root_.scala.annotation.tailrec"))
 
-  def recursiveReferences: Seq[RecursiveReference] = {
+  def recursiveReferences: Seq[RecursiveReference] =
     val resultExpressions = returnUsages(withBooleanInfix = true)
 
     @scala.annotation.tailrec
     def possiblyTailRecursiveCallFor(elem: PsiElement): PsiElement =
-      elem.getParent match {
+      elem.getParent match
         case call: ScMethodCall => possiblyTailRecursiveCallFor(call)
         case call: ScGenericCall => possiblyTailRecursiveCallFor(call)
         case ret: ScReturnStmt => ret
         case _ => elem
-      }
 
-    def expandIf(elem: PsiElement): Seq[PsiElement] = {
-      elem match {
+    def expandIf(elem: PsiElement): Seq[PsiElement] =
+      elem match
         case i: ScIfStmt if i.elseBranch.isEmpty =>
-          i.thenBranch match {
+          i.thenBranch match
             case Some(thenBranch) =>
               thenBranch.calculateReturns().flatMap(expandIf) :+ elem
             case _ => Seq(elem)
-          }
         case _ => Seq(elem)
-      }
-    }
     val expressions = resultExpressions.flatMap(expandIf)
-    body match {
+    body match
       case Some(body) =>
-        for {
+        for
           ref <- body.depthFirst
                   .filterByType(classOf[ScReferenceElement])
                   .toSeq if ref.isReferenceTo(this)
-        } yield {
+        yield
           RecursiveReference(
               ref, expressions.contains(possiblyTailRecursiveCallFor(ref)))
-        }
       case None => Seq.empty
-    }
-  }
 
-  def recursionType: RecursionType = recursiveReferences match {
+  def recursionType: RecursionType = recursiveReferences match
     case Seq() => RecursionType.NoRecursion
     case seq if seq.forall(_.isTailCall) => RecursionType.TailRecursion
     case _ => RecursionType.OrdinaryRecursion
-  }
 
   override def controlFlowScope: Option[ScalaPsiElement] = body
 
@@ -109,24 +99,19 @@ trait ScFunctionDefinition extends ScFunction with ScControlFlowOwner {
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
   def getStaticTraitFunctionWrapper(
-      cClass: PsiClassWrapper): StaticTraitScFunctionWrapper = {
+      cClass: PsiClassWrapper): StaticTraitScFunctionWrapper =
     new StaticTraitScFunctionWrapper(this, cClass)
-  }
-}
 
-object ScFunctionDefinition {
-  object withBody {
+object ScFunctionDefinition
+  object withBody
     def unapply(fun: ScFunctionDefinition): Option[ScExpression] =
       Option(fun).flatMap(_.body)
-  }
-}
 
 case class RecursiveReference(element: ScReferenceElement, isTailCall: Boolean)
 
 trait RecursionType
 
-object RecursionType {
+object RecursionType
   case object NoRecursion extends RecursionType
   case object OrdinaryRecursion extends RecursionType
   case object TailRecursion extends RecursionType
-}

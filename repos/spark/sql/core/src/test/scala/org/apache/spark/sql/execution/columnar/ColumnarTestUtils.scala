@@ -26,21 +26,19 @@ import org.apache.spark.sql.catalyst.util.{ArrayBasedMapData, GenericArrayData}
 import org.apache.spark.sql.types.{AtomicType, Decimal}
 import org.apache.spark.unsafe.types.UTF8String
 
-object ColumnarTestUtils {
-  def makeNullRow(length: Int): GenericMutableRow = {
+object ColumnarTestUtils
+  def makeNullRow(length: Int): GenericMutableRow =
     val row = new GenericMutableRow(length)
     (0 until length).foreach(row.setNullAt)
     row
-  }
 
-  def makeRandomValue[JvmType](columnType: ColumnType[JvmType]): JvmType = {
-    def randomBytes(length: Int) = {
+  def makeRandomValue[JvmType](columnType: ColumnType[JvmType]): JvmType =
+    def randomBytes(length: Int) =
       val bytes = new Array[Byte](length)
       Random.nextBytes(bytes)
       bytes
-    }
 
-    (columnType match {
+    (columnType match
       case NULL => null
       case BOOLEAN => Random.nextBoolean()
       case BYTE => (Random.nextInt(Byte.MaxValue * 2) - Byte.MaxValue).toByte
@@ -68,54 +66,45 @@ object ColumnarTestUtils {
                     Random.nextString(Random.nextInt(32)))))
       case _ =>
         throw new IllegalArgumentException(s"Unknown column type $columnType")
-    }).asInstanceOf[JvmType]
-  }
+    ).asInstanceOf[JvmType]
 
   def makeRandomValues(head: ColumnType[_], tail: ColumnType[_]*): Seq[Any] =
     makeRandomValues(Seq(head) ++ tail)
 
-  def makeRandomValues(columnTypes: Seq[ColumnType[_]]): Seq[Any] = {
+  def makeRandomValues(columnTypes: Seq[ColumnType[_]]): Seq[Any] =
     columnTypes.map(makeRandomValue(_))
-  }
 
   def makeUniqueRandomValues[JvmType](
-      columnType: ColumnType[JvmType], count: Int): Seq[JvmType] = {
+      columnType: ColumnType[JvmType], count: Int): Seq[JvmType] =
 
     Iterator
-      .iterate(HashSet.empty[JvmType]) { set =>
+      .iterate(HashSet.empty[JvmType])  set =>
         set + Iterator
           .continually(makeRandomValue(columnType))
           .filterNot(set.contains)
           .next()
-      }
       .drop(count)
       .next()
       .toSeq
-  }
 
   def makeRandomRow(head: ColumnType[_], tail: ColumnType[_]*): InternalRow =
     makeRandomRow(Seq(head) ++ tail)
 
-  def makeRandomRow(columnTypes: Seq[ColumnType[_]]): InternalRow = {
+  def makeRandomRow(columnTypes: Seq[ColumnType[_]]): InternalRow =
     val row = new GenericMutableRow(columnTypes.length)
-    makeRandomValues(columnTypes).zipWithIndex.foreach {
+    makeRandomValues(columnTypes).zipWithIndex.foreach
       case (value, index) =>
         row(index) = value
-    }
     row
-  }
 
   def makeUniqueValuesAndSingleValueRows[T <: AtomicType](
       columnType: NativeColumnType[T],
-      count: Int): (Seq[T#InternalType], Seq[GenericMutableRow]) = {
+      count: Int): (Seq[T#InternalType], Seq[GenericMutableRow]) =
 
     val values = makeUniqueRandomValues(columnType, count)
-    val rows = values.map { value =>
+    val rows = values.map  value =>
       val row = new GenericMutableRow(1)
       row(0) = value
       row
-    }
 
     (values, rows)
-  }
-}

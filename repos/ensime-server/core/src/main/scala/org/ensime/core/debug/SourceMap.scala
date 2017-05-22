@@ -13,33 +13,27 @@ import scala.collection.mutable
 import org.ensime.config._
 import org.ensime.util.file._
 
-class SourceMap(config: EnsimeConfig) {
+class SourceMap(config: EnsimeConfig)
   val log = LoggerFactory.getLogger("SourceMap")
 
   private val sourceMap = mutable.HashMap[String, mutable.HashSet[File]]()
 
-  def locToPos(loc: Location): Option[LineSourcePosition] = {
-    try {
-      (for (set <- sourceMap.get(loc.sourceName())) yield {
-        if (set.size > 1) {
+  def locToPos(loc: Location): Option[LineSourcePosition] =
+    try
+      (for (set <- sourceMap.get(loc.sourceName())) yield
+        if (set.size > 1)
           log.warn(s"Warning, ambiguous source name: ${loc.sourceName()}")
-        }
         set.headOption.map(f => LineSourcePosition(f, loc.lineNumber))
-      }).getOrElse(None)
-    } catch {
+      ).getOrElse(None)
+    catch
       case e: AbsentInformationException => None
-    }
-  }
 
-  def rebuildSourceMap(): Unit = {
+  def rebuildSourceMap(): Unit =
     sourceMap.clear()
-    for (f <- config.scalaSourceFiles) {
+    for (f <- config.scalaSourceFiles)
       val set = sourceMap.getOrElse(f.getName, mutable.HashSet())
       set.add(f.canon)
       sourceMap(f.getName) = set
-    }
-  }
 
   // built on creation right now.
   rebuildSourceMap()
-}

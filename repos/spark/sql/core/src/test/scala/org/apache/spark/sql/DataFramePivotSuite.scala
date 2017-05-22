@@ -21,10 +21,10 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
 
-class DataFramePivotSuite extends QueryTest with SharedSQLContext {
+class DataFramePivotSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("pivot courses with literals") {
+  test("pivot courses with literals")
     checkAnswer(
         courseSales
           .groupBy("year")
@@ -32,9 +32,8 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
           .agg(sum($"earnings")),
         Row(2012, 15000.0, 20000.0) :: Row(2013, 48000.0, 30000.0) :: Nil
     )
-  }
 
-  test("pivot year with literals") {
+  test("pivot year with literals")
     checkAnswer(
         courseSales
           .groupBy("course")
@@ -42,9 +41,8 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
           .agg(sum($"earnings")),
         Row("dotNET", 15000.0, 48000.0) :: Row("Java", 20000.0, 30000.0) :: Nil
     )
-  }
 
-  test("pivot courses with literals and multiple aggregations") {
+  test("pivot courses with literals and multiple aggregations")
     checkAnswer(
         courseSales
           .groupBy($"year")
@@ -53,9 +51,8 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
         Row(2012, 15000.0, 7500.0, 20000.0, 20000.0) :: Row(
             2013, 48000.0, 48000.0, 30000.0, 30000.0) :: Nil
     )
-  }
 
-  test("pivot year with string values (cast)") {
+  test("pivot year with string values (cast)")
     checkAnswer(
         courseSales
           .groupBy("course")
@@ -63,9 +60,8 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
           .sum("earnings"),
         Row("dotNET", 15000.0, 48000.0) :: Row("Java", 20000.0, 30000.0) :: Nil
     )
-  }
 
-  test("pivot year with int values") {
+  test("pivot year with int values")
     checkAnswer(
         courseSales
           .groupBy("course")
@@ -73,24 +69,21 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
           .sum("earnings"),
         Row("dotNET", 15000.0, 48000.0) :: Row("Java", 20000.0, 30000.0) :: Nil
     )
-  }
 
-  test("pivot courses with no values") {
+  test("pivot courses with no values")
     // Note Java comes before dotNet in sorted order
     checkAnswer(
         courseSales.groupBy("year").pivot("course").agg(sum($"earnings")),
         Row(2012, 20000.0, 15000.0) :: Row(2013, 30000.0, 48000.0) :: Nil
     )
-  }
 
-  test("pivot year with no values") {
+  test("pivot year with no values")
     checkAnswer(
         courseSales.groupBy("course").pivot("year").agg(sum($"earnings")),
         Row("dotNET", 15000.0, 48000.0) :: Row("Java", 20000.0, 30000.0) :: Nil
     )
-  }
 
-  test("pivot max values enforced") {
+  test("pivot max values enforced")
     sqlContext.conf.setConf(SQLConf.DATAFRAME_PIVOT_MAX_VALUES, 1)
     intercept[AnalysisException](
         courseSales.groupBy("year").pivot("course")
@@ -98,9 +91,8 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
     sqlContext.conf.setConf(
         SQLConf.DATAFRAME_PIVOT_MAX_VALUES,
         SQLConf.DATAFRAME_PIVOT_MAX_VALUES.defaultValue.get)
-  }
 
-  test("pivot with UnresolvedFunction") {
+  test("pivot with UnresolvedFunction")
     checkAnswer(
         courseSales
           .groupBy("year")
@@ -108,5 +100,3 @@ class DataFramePivotSuite extends QueryTest with SharedSQLContext {
           .agg("earnings" -> "sum"),
         Row(2012, 15000.0, 20000.0) :: Row(2013, 48000.0, 30000.0) :: Nil
     )
-  }
-}

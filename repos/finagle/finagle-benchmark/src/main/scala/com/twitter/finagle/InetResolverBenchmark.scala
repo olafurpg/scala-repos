@@ -11,7 +11,7 @@ import org.openjdk.jmh.annotations._
   * so it is recommended to run with `-prof gc`.
   */
 @State(Scope.Benchmark)
-class InetResolverBenchmark extends StdBenchAnnotations {
+class InetResolverBenchmark extends StdBenchAnnotations
 
   @Param(Array("8.8.8.8"))
   var ip = ""
@@ -33,4 +33,3 @@ class InetResolverBenchmark extends StdBenchAnnotations {
   @Benchmark
   def bindHostname(): Addr =
     notPending(inetResolver.bind(hostname))
-}

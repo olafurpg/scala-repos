@@ -26,7 +26,7 @@ import io.prediction.data.storage.EvaluationInstance
 /** Collection of workflow creation methods.
   * @group Workflow
   */
-object Workflow {
+object Workflow
   // evaluator is already instantiated.
   // This is an undocumented way of using evaluator. Still experimental.
   // evaluatorParams is used to write into EngineInstance, will be shown in
@@ -81,7 +81,7 @@ object Workflow {
       engineParamsGenerator: EngineParamsGenerator,
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
       evaluationInstance: EvaluationInstance = EvaluationInstance(),
-      params: WorkflowParams = WorkflowParams()) {
+      params: WorkflowParams = WorkflowParams())
     runEvaluationTypeless(
         evaluation = evaluation,
         engine = evaluation.engine,
@@ -91,7 +91,6 @@ object Workflow {
         env = env,
         params = params
     )
-  }
 
   def runEvaluationTypeless[
       EI, Q, P, A, EEI, EQ, EP, EA, ER <: BaseEvaluatorResult](
@@ -101,7 +100,7 @@ object Workflow {
       evaluationInstance: EvaluationInstance,
       evaluator: BaseEvaluator[EEI, EQ, EP, EA, ER],
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
-      params: WorkflowParams = WorkflowParams()) {
+      params: WorkflowParams = WorkflowParams())
     runEvaluationViaCoreWorkflow(
         evaluation = evaluation,
         engine = engine,
@@ -110,7 +109,6 @@ object Workflow {
         evaluator = evaluator.asInstanceOf[BaseEvaluator[EI, Q, P, A, ER]],
         env = env,
         params = params)
-  }
 
   /** :: Experimental :: */
   @Experimental
@@ -121,7 +119,7 @@ object Workflow {
       evaluationInstance: EvaluationInstance,
       evaluator: BaseEvaluator[EI, Q, P, A, R],
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
-      params: WorkflowParams = WorkflowParams()) {
+      params: WorkflowParams = WorkflowParams())
     CoreWorkflow.runEvaluation(evaluation = evaluation,
                                engine = engine,
                                engineParamsList = engineParamsList,
@@ -129,5 +127,3 @@ object Workflow {
                                evaluator = evaluator,
                                env = env,
                                params = params)
-  }
-}

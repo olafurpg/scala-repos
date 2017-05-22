@@ -7,7 +7,7 @@ import org.scalatest.junit._
 import breeze.linalg._
 
 @RunWith(classOf[JUnitRunner])
-class PowerMethodTest extends FunSuite {
+class PowerMethodTest extends FunSuite
   val n = 5
   val gram = new DenseMatrix[Double](n,
                                      n,
@@ -39,27 +39,23 @@ class PowerMethodTest extends FunSuite {
   val init = DenseVector(0.1770, 0.2505, 1.5957, 0.7204, 0.9246)
   val eigs = eigSym(gram)
 
-  test("max eigen value from power method approximately equal to eigSym max") {
+  test("max eigen value from power method approximately equal to eigSym max")
     val eigenGold = max(eigs.eigenvalues)
     val pm = new PowerMethod()
     val eigenApprox = pm.eigen(gram, init)
     assert(abs(eigenGold - eigenApprox) < 1e-3)
-  }
 
-  test("min eigen value from power method approximately equal to eigSym min") {
+  test("min eigen value from power method approximately equal to eigSym min")
     val eigenGold = min(eigs.eigenvalues)
     val pm = new PowerMethod()
     val inverseGram = gram \ DenseMatrix.eye[Double](gram.rows)
     val eigenApprox = 1.0 / pm.eigen(inverseGram, init)
     assert(abs(eigenGold - eigenApprox) < 1e-3)
-  }
 
   test(
-      "min eigen value from inverse power method approximately equal to eigSym min") {
+      "min eigen value from inverse power method approximately equal to eigSym min")
     val eigenGold = min(eigs.eigenvalues)
     val pmInv = PowerMethod.inverse(10, 1e-5)
     val R = cholesky(gram).t
     val eigenApprox = 1.0 / pmInv.eigen(R, init)
     assert(abs(eigenGold - eigenApprox) < 1e-3)
-  }
-}

@@ -36,7 +36,7 @@ import cascading.tuple.{Fields, Tuple, TupleEntry}
   */
 trait PartitionSchemed[P, T]
     extends SchemedSource with TypedSink[(P, T)]
-    with Mappable[(P, T)] with HfsTapProvider {
+    with Mappable[(P, T)] with HfsTapProvider
   def path: String
   def template: String
   def valueSetter: TupleSetter[T]
@@ -71,27 +71,22 @@ trait PartitionSchemed[P, T]
   /** Creates the taps for local and hdfs mode.*/
   override def createTap(
       readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
-    mode match {
-      case Local(_) => {
+    mode match
+      case Local(_) =>
           val fileTap = new FileTap(localScheme, path, SinkMode.REPLACE)
           new LocalPartitionTap(
               fileTap,
               new TemplatePartition(partitionFields, template),
               SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
-      case Hdfs(_, _) => {
+      case Hdfs(_, _) =>
           val hfs = createHfsTap(hdfsScheme, path, SinkMode.REPLACE)
           new PartitionTap(hfs,
                            new TemplatePartition(partitionFields, template),
                            SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
-      case hdfsTest @ HadoopTest(_, _) => {
+      case hdfsTest @ HadoopTest(_, _) =>
           val hfs = createHfsTap(
               hdfsScheme, hdfsTest.getWritePathFor(this), SinkMode.REPLACE)
           new PartitionTap(hfs,
                            new TemplatePartition(partitionFields, template),
                            SinkMode.UPDATE).asInstanceOf[Tap[_, _, _]]
-        }
       case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
-    }
-}

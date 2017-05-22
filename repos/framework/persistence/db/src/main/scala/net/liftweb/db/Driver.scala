@@ -25,7 +25,7 @@ import net.liftweb.common._
   * class. New drivers should "register" in the companion object
   * DriverType.calcDriver method.
   */
-abstract class DriverType(val name: String) {
+abstract class DriverType(val name: String)
   def binaryColumnType: String
   def clobColumnType: String
   def varcharColumnType(len: Int): String = "VARCHAR(%d)".format(len)
@@ -88,15 +88,13 @@ abstract class DriverType(val name: String) {
       setter: PreparedStatement => Unit,
       tableName: String,
       genKeyNames: List[String])(handler: Either[ResultSet, Int] => T): T =
-    genKeyNames match {
+    genKeyNames match
       case Nil =>
-        DB.prepareStatement(query, conn) { stmt =>
+        DB.prepareStatement(query, conn)  stmt =>
           setter(stmt)
           handler(Right(stmt.executeUpdate))
-        }
       case pk =>
         performInsertWithGenKeys(conn, query, setter, tableName, pk, handler)
-    }
 
   /*
    * Subclasses should override this method if they don't have proper getGeneratedKey support (JDBC3)
@@ -108,11 +106,10 @@ abstract class DriverType(val name: String) {
       tableName: String,
       genKeyNames: List[String],
       handler: Either[ResultSet, Int] => T): T =
-    DB.prepareStatement(query, Statement.RETURN_GENERATED_KEYS, conn) { stmt =>
+    DB.prepareStatement(query, Statement.RETURN_GENERATED_KEYS, conn)  stmt =>
       setter(stmt)
       stmt.executeUpdate
       handler(Left(stmt.getGeneratedKeys))
-    }
 
   /**
     * Name of the default db schema. If not set, then the schema is assumed to
@@ -128,42 +125,37 @@ abstract class DriverType(val name: String) {
     * mapping for columns should override the customColumnTypeMap method.
     */
   def columnTypeMap: TypeMapFunc =
-    customColumnTypeMap orElse {
+    customColumnTypeMap orElse
       case x => x
-    }
 
   /**
     * Allows the Vendor-specific Driver to do custom type mapping for a particular
     * column type.
     */
-  protected def customColumnTypeMap: TypeMapFunc = new TypeMapFunc {
+  protected def customColumnTypeMap: TypeMapFunc = new TypeMapFunc
     def apply(in: Int) = -1
     def isDefinedAt(in: Int) = false
-  }
 
   /**
     * This method can be overriden by DriverType impls to allow for custom setup
     * of Primary Key Columns (creating sequeneces or special indices, for example).
     * The List of commands will be executed in order.
     */
-  def primaryKeySetup(tableName: String, columnName: String): List[String] = {
+  def primaryKeySetup(tableName: String, columnName: String): List[String] =
     List("ALTER TABLE " + tableName + " ADD CONSTRAINT " + tableName +
         "_PK PRIMARY KEY(" + columnName + ")")
-  }
 
   /** This defines the syntax for adding a column in an alter. This is
     *  used because some DBs (Oracle, for one) use slightly different syntax. */
   def alterAddColumn = "ADD COLUMN"
-}
 
-object DriverType {
+object DriverType
   var calcDriver: Connection => DriverType = conn =>
-    {
       val meta = conn.getMetaData
 
       (meta.getDatabaseProductName,
        meta.getDatabaseMajorVersion,
-       meta.getDatabaseMinorVersion) match {
+       meta.getDatabaseMinorVersion) match
         case (DerbyDriver.name, _, _) => DerbyDriver
         case (MySqlDriver.name, _, _) => MySqlDriver
         case (PostgreSqlDriver.name, major, minor)
@@ -182,11 +174,8 @@ object DriverType {
           throw new Exception(
               "Lift mapper does not support JDBC driver %s.\n".format(x) +
               "See http://wiki.liftweb.net/index.php/Category:Database for a list of supported databases.")
-      }
-  }
-}
 
-object DB2Driver extends DriverType("DB2") {
+object DB2Driver extends DriverType("DB2")
   def binaryColumnType = "LONG VARCHAR FOR BIT DATA"
   def booleanColumnType = "SMALLINT"
   def clobColumnType = "LONG VARCHAR"
@@ -209,9 +198,8 @@ object DB2Driver extends DriverType("DB2") {
 
   // This will let DB2 handle the schema name without case issues
   override def defaultSchemaName = Full(null)
-}
 
-object DerbyDriver extends DriverType("Apache Derby") {
+object DerbyDriver extends DriverType("Apache Derby")
   def binaryColumnType = "LONG VARCHAR FOR BIT DATA"
   def booleanColumnType = "SMALLINT"
   def clobColumnType = "LONG VARCHAR"
@@ -229,9 +217,8 @@ object DerbyDriver extends DriverType("Apache Derby") {
   def doubleColumnType = "DOUBLE"
 
   override def brokenLimit_? : Boolean = true
-}
 
-object MySqlDriver extends DriverType("MySQL") {
+object MySqlDriver extends DriverType("MySQL")
   def binaryColumnType = "MEDIUMBLOB"
   def clobColumnType = "LONGTEXT"
   def booleanColumnType = "BOOLEAN"
@@ -249,9 +236,8 @@ object MySqlDriver extends DriverType("MySQL") {
   def doubleColumnType = "DOUBLE"
 
   override def createTablePostpend: String = " ENGINE = InnoDB "
-}
 
-object H2Driver extends DriverType("H2") {
+object H2Driver extends DriverType("H2")
   def binaryColumnType = "BINARY"
   def clobColumnType = "LONGVARCHAR"
   def booleanColumnType = "BOOLEAN"
@@ -280,12 +266,11 @@ object H2Driver extends DriverType("H2") {
   override def supportsForeignKeys_? = true
   override def maxSelectLimit = "0";
   override def defaultSchemaName: Box[String] = Full("PUBLIC")
-}
 
 /**
   * Provides some base definitions for PostgreSql databases.
   */
-abstract class BasePostgreSQLDriver extends DriverType("PostgreSQL") {
+abstract class BasePostgreSQLDriver extends DriverType("PostgreSQL")
   def binaryColumnType = "BYTEA"
   def clobColumnType = "TEXT"
   def booleanColumnType = "BOOLEAN"
@@ -308,7 +293,6 @@ abstract class BasePostgreSQLDriver extends DriverType("PostgreSQL") {
     * so "public" is our default choice.
     */
   override def defaultSchemaName: Box[String] = Full("public")
-}
 
 /**
   * PostgreSql driver for versions 8.2 and up. Tested with:
@@ -317,7 +301,7 @@ abstract class BasePostgreSQLDriver extends DriverType("PostgreSQL") {
   *   <li>8.3</li>
   * </ul>
   */
-object PostgreSqlDriver extends BasePostgreSQLDriver {
+object PostgreSqlDriver extends BasePostgreSQLDriver
   /* PostgreSQL doesn't support generated keys via the JDBC driver. Instead, we use the RETURNING clause on the insert.
    * From: http://www.postgresql.org/docs/8.2/static/sql-insert.html
    */
@@ -329,13 +313,11 @@ object PostgreSqlDriver extends BasePostgreSQLDriver {
       genKeyNames: List[String],
       handler: Either[ResultSet, Int] => T): T =
     DB.prepareStatement(
-        query + " RETURNING " + genKeyNames.mkString(","), conn) { stmt =>
+        query + " RETURNING " + genKeyNames.mkString(","), conn)  stmt =>
       setter(stmt)
       handler(Left(stmt.executeQuery))
-    }
 
   override def supportsForeignKeys_? = true
-}
 
 /**
   * PostgreSql driver for versions 8.1 and earlier. Tested with
@@ -347,7 +329,7 @@ object PostgreSqlDriver extends BasePostgreSQLDriver {
   *
   * Successfuly use of earlier versions should be reported to liftweb@googlegroups.com.
   */
-object PostgreSqlOldDriver extends BasePostgreSQLDriver {
+object PostgreSqlOldDriver extends BasePostgreSQLDriver
   /* PostgreSQL doesn't support generated keys via the JDBC driver.
    * Instead, we use the lastval() function to get the last inserted
    * key from the DB.
@@ -358,21 +340,17 @@ object PostgreSqlOldDriver extends BasePostgreSQLDriver {
       setter: PreparedStatement => Unit,
       tableName: String,
       genKeyNames: List[String],
-      handler: Either[ResultSet, Int] => T): T = {
-    DB.prepareStatement(query, conn) { stmt =>
+      handler: Either[ResultSet, Int] => T): T =
+    DB.prepareStatement(query, conn)  stmt =>
       setter(stmt)
       stmt.executeUpdate
-    }
     val pkValueQuery = genKeyNames
       .map(String.format("currval('%s_%s_seq')", tableName, _))
       .mkString(", ")
-    DB.statement(conn) { stmt =>
+    DB.statement(conn)  stmt =>
       handler(Left(stmt.executeQuery("SELECT " + pkValueQuery)))
-    }
-  }
-}
 
-abstract class SqlServerBaseDriver extends DriverType("Microsoft SQL Server") {
+abstract class SqlServerBaseDriver extends DriverType("Microsoft SQL Server")
   def binaryColumnType = "IMAGE"
   def booleanColumnType = "BIT"
   override def varcharColumnType(len: Int): String = "NVARCHAR(%d)".format(len)
@@ -397,39 +375,35 @@ abstract class SqlServerBaseDriver extends DriverType("Microsoft SQL Server") {
   override def alterAddColumn = "ADD"
 
   override def brokenLimit_? = true
-}
 
 /**
   * Microsoft SQL Server driver for versions 2000 and below
   */
 object SqlServerPre2005Driver extends SqlServerBaseDriver
 
-object SqlServerDriver extends SqlServerBaseDriver {
+object SqlServerDriver extends SqlServerBaseDriver
   override def binaryColumnType = "VARBINARY(MAX)"
   override def clobColumnType = "NVARCHAR(MAX)"
-}
 
 /**
   * Sybase SQL Anywhere Driver. Tested against version 10.0
   */
-object SybaseSQLAnywhereDriver extends SqlServerBaseDriver {
+object SybaseSQLAnywhereDriver extends SqlServerBaseDriver
   override val name = "SQL Anywhere"
 
   // SQL Anywhere prefers the default schema name for metadata calls
   override val defaultSchemaName = Full(null)
-}
 
 /**
   * Sybase ASE Driver. Tested with ASE version 15, but should
   * work with lower versions as well.
   */
-object SybaseASEDriver extends SqlServerBaseDriver {
+object SybaseASEDriver extends SqlServerBaseDriver
   override val name = "ASE"
   override def binaryColumnType = "VARBINARY(MAX)"
   override def clobColumnType = "NVARCHAR(MAX)"
   override def brokenLimit_? = true
   override def schemifierMustAutoCommit_? = true
-}
 
 /**
   * Driver for Oracle databases. Tested with:
@@ -441,7 +415,7 @@ object SybaseASEDriver extends SqlServerBaseDriver {
   *
   * Other working install versions should be reported to liftweb@googlegroups.com.
   */
-object OracleDriver extends DriverType("Oracle") {
+object OracleDriver extends DriverType("Oracle")
   def binaryColumnType = "LONG RAW"
   def booleanColumnType = "NUMBER"
   def clobColumnType = "CLOB"
@@ -469,12 +443,11 @@ object OracleDriver extends DriverType("Oracle") {
   override def brokenLimit_? : Boolean = true
 
   import java.sql.Types
-  override def customColumnTypeMap = {
+  override def customColumnTypeMap =
     case Types.BOOLEAN => Types.INTEGER
-  }
 
   override def primaryKeySetup(
-      tableName: String, columnName: String): List[String] = {
+      tableName: String, columnName: String): List[String] =
     /*
      * This trigger and sequence setup is taken from http://www.databaseanswers.org/sql_scripts/ora_sequence.htm
      */
@@ -486,7 +459,6 @@ object OracleDriver extends DriverType("Oracle") {
         "WHEN (new." + columnName + " is null) " + "BEGIN " +
         "SELECT " + tableName + "_sequence.nextval INTO :new." + columnName +
         " FROM DUAL; " + "END;")
-  }
 
   // Oracle supports returning generated keys only if we specify the names of the column(s) to return.
   override def performInsertWithGenKeys[T](
@@ -496,19 +468,17 @@ object OracleDriver extends DriverType("Oracle") {
       tableName: String,
       genKeyNames: List[String],
       handler: Either[ResultSet, Int] => T): T =
-    DB.prepareStatement(query, genKeyNames.toArray, conn) { stmt =>
+    DB.prepareStatement(query, genKeyNames.toArray, conn)  stmt =>
       setter(stmt)
       stmt.executeUpdate
       handler(Left(stmt.getGeneratedKeys))
-    }
 
   // Oracle doesn't use "COLUMN" syntax when adding a column to a table
   override def alterAddColumn = "ADD"
 
   override def supportsForeignKeys_? = true
-}
 
-object MaxDbDriver extends DriverType("MaxDB") {
+object MaxDbDriver extends DriverType("MaxDB")
   def binaryColumnType = "BLOB"
   def booleanColumnType = "BOOLEAN"
   def clobColumnType = "CLOB"
@@ -523,4 +493,3 @@ object MaxDbDriver extends DriverType("MaxDB") {
   def enumListColumnType = "FIXED(38)"
   def longColumnType = "FIXED(38)"
   def doubleColumnType = "FLOAT(38)"
-}

@@ -2,7 +2,7 @@ package scala.reflect.reify
 
 import phases._
 
-trait Phases extends Reshape with Calculate with Metalevels with Reify {
+trait Phases extends Reshape with Calculate with Metalevels with Reify
 
   self: Reifier =>
 
@@ -11,7 +11,6 @@ trait Phases extends Reshape with Calculate with Metalevels with Reify {
   private var alreadyRun = false
 
   lazy val mkReificationPipeline: Tree => Tree = tree0 =>
-    {
       assert(!alreadyRun, "reifier instance cannot be used more than once")
       alreadyRun = true
 
@@ -42,5 +41,3 @@ trait Phases extends Reshape with Calculate with Metalevels with Reify {
       val result = reify(tree)
 
       result
-  }
-}

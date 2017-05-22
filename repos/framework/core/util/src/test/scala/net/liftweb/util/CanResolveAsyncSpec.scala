@@ -24,9 +24,9 @@ import org.specs2.mutable.Spec
 
 import actor.LAFuture
 
-object CanResolveAsyncSpec extends Spec {
-  "CanResolveAsync" should {
-    "resolve Scala Futures" in {
+object CanResolveAsyncSpec extends Spec
+  "CanResolveAsync" should
+    "resolve Scala Futures" in
       val myPromise = Promise[String]()
 
       val resolver = implicitly[CanResolveAsync[Future[String], String]]
@@ -37,9 +37,8 @@ object CanResolveAsyncSpec extends Spec {
       myPromise.success("All done!")
 
       receivedResolution.get must_== "All done!"
-    }
 
-    "resolve LAFutures" in {
+    "resolve LAFutures" in
       val myFuture = new LAFuture[String]
 
       val resolver = implicitly[CanResolveAsync[LAFuture[String], String]]
@@ -50,6 +49,3 @@ object CanResolveAsyncSpec extends Spec {
       myFuture.satisfy("Got it!")
 
       receivedResolution.get must_== "Got it!"
-    }
-  }
-}

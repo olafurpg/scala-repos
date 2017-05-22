@@ -34,7 +34,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion Object for [[scalafx.print.PaperSource]].
   */
-object PaperSource {
+object PaperSource
 
   /**
     * Converts a ScalaFX PaperSource to its JavaFX counterpart.
@@ -72,7 +72,6 @@ object PaperSource {
 
   /** Specify to select the TOP tray. */
   val Top: PaperSource = new PaperSource(jfxp.PaperSource.TOP)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PaperSource.html JavaFX PaperSource]].
@@ -83,10 +82,9 @@ object PaperSource {
   * @since 8.0
   */
 final class PaperSource(override val delegate: jfxp.PaperSource)
-    extends SFXDelegate[jfxp.PaperSource] {
+    extends SFXDelegate[jfxp.PaperSource]
 
   /**
     * The name of this paper source.
     */
   def name: String = delegate.getName
-}

@@ -11,7 +11,7 @@ import ThreadPoolExecutor.CallerRunsPolicy
 import akka.util.Duration
 import akka.event.EventHandler
 
-object ThreadPoolConfig {
+object ThreadPoolConfig
   type Bounds = Int
   type FlowHandler = Either[RejectedExecutionHandler, Bounds]
   type QueueFactory = () => BlockingQueue[Runnable]
@@ -45,12 +45,10 @@ object ThreadPoolConfig {
   def reusableQueue(queue: BlockingQueue[Runnable]): QueueFactory =
     () => queue
 
-  def reusableQueue(queueFactory: QueueFactory): QueueFactory = {
+  def reusableQueue(queueFactory: QueueFactory): QueueFactory =
     val queue = queueFactory()
     () =>
       queue
-  }
-}
 
 case class ThreadPoolConfig(
     allowCorePoolTimeout: Boolean = ThreadPoolConfig.defaultAllowCoreThreadTimeout,
@@ -59,15 +57,15 @@ case class ThreadPoolConfig(
     threadTimeout: Duration = ThreadPoolConfig.defaultTimeout,
     flowHandler: ThreadPoolConfig.FlowHandler = ThreadPoolConfig.defaultFlowHandler,
     queueFactory: ThreadPoolConfig.QueueFactory = ThreadPoolConfig
-        .linkedBlockingQueue()) {
+        .linkedBlockingQueue())
 
   final def createLazyExecutorService(
       threadFactory: ThreadFactory): ExecutorService =
     new LazyExecutorServiceWrapper(createExecutorService(threadFactory))
 
   final def createExecutorService(
-      threadFactory: ThreadFactory): ExecutorService = {
-    flowHandler match {
+      threadFactory: ThreadFactory): ExecutorService =
+    flowHandler match
       case Left(rejectHandler) =>
         val service = new ThreadPoolExecutor(corePoolSize,
                                              maxPoolSize,
@@ -87,25 +85,20 @@ case class ThreadPoolConfig(
                                              threadFactory)
         service.allowCoreThreadTimeOut(allowCorePoolTimeout)
         new BoundedExecutorDecorator(service, bounds)
-    }
-  }
-}
 
-trait DispatcherBuilder {
+trait DispatcherBuilder
   def build: MessageDispatcher
-}
 
-object ThreadPoolConfigDispatcherBuilder {
+object ThreadPoolConfigDispatcherBuilder
   def conf_?[T](opt: Option[T])(
       fun: (T) => ThreadPoolConfigDispatcherBuilder => ThreadPoolConfigDispatcherBuilder)
     : Option[(ThreadPoolConfigDispatcherBuilder) => ThreadPoolConfigDispatcherBuilder] =
     opt map fun
-}
 
 case class ThreadPoolConfigDispatcherBuilder(
     dispatcherFactory: (ThreadPoolConfig) => MessageDispatcher,
     config: ThreadPoolConfig)
-    extends DispatcherBuilder {
+    extends DispatcherBuilder
   import ThreadPoolConfig._
   def build = dispatcherFactory(config)
 
@@ -188,82 +181,71 @@ case class ThreadPoolConfigDispatcherBuilder(
                           ThreadPoolConfigDispatcherBuilder]]*)
     : ThreadPoolConfigDispatcherBuilder =
     fs.foldLeft(this)((c, f) => f.map(_ (c)).getOrElse(c))
-}
 
 /**
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-class MonitorableThreadFactory(val name: String) extends ThreadFactory {
+class MonitorableThreadFactory(val name: String) extends ThreadFactory
   protected val counter = new AtomicLong
 
   def newThread(runnable: Runnable) = new MonitorableThread(runnable, name)
-}
 
 /**
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object MonitorableThread {
+object MonitorableThread
   val DEFAULT_NAME = "MonitorableThread"
 
   // FIXME use MonitorableThread.created and MonitorableThread.alive in monitoring
   val created = new AtomicInteger
   val alive = new AtomicInteger
-}
 
 /**
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
 class MonitorableThread(runnable: Runnable, name: String)
     extends Thread(
-        runnable, name + "-" + MonitorableThread.created.incrementAndGet) {
+        runnable, name + "-" + MonitorableThread.created.incrementAndGet)
 
   setUncaughtExceptionHandler(
-      new Thread.UncaughtExceptionHandler() {
+      new Thread.UncaughtExceptionHandler()
     def uncaughtException(thread: Thread, cause: Throwable) = {}
-  })
+  )
 
-  override def run = {
-    try {
+  override def run =
+    try
       MonitorableThread.alive.incrementAndGet
       super.run
-    } finally {
+    finally
       MonitorableThread.alive.decrementAndGet
-    }
-  }
-}
 
 /**
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
 class BoundedExecutorDecorator(val executor: ExecutorService, bound: Int)
-    extends ExecutorServiceDelegate {
+    extends ExecutorServiceDelegate
   protected val semaphore = new Semaphore(bound)
 
-  override def execute(command: Runnable) = {
+  override def execute(command: Runnable) =
     semaphore.acquire
-    try {
+    try
       executor.execute(
-          new Runnable() {
-        def run = {
-          try {
+          new Runnable()
+        def run =
+          try
             command.run
-          } finally {
+          finally
             semaphore.release
-          }
-        }
-      })
-    } catch {
+      )
+    catch
       case e: RejectedExecutionException =>
         EventHandler.warning(this, e.toString)
         semaphore.release
       case e: Throwable =>
         EventHandler.error(e, this, e.getMessage)
         throw e
-    }
-  }
-}
 
-trait ExecutorServiceDelegate extends ExecutorService {
+trait ExecutorServiceDelegate extends ExecutorService
 
   def executor: ExecutorService
 
@@ -299,18 +281,14 @@ trait ExecutorServiceDelegate extends ExecutorService {
   def invokeAny[T](
       callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
     executor.invokeAny(callables, l, timeUnit)
-}
 
-trait LazyExecutorService extends ExecutorServiceDelegate {
+trait LazyExecutorService extends ExecutorServiceDelegate
 
   def createExecutor: ExecutorService
 
-  lazy val executor = {
+  lazy val executor =
     createExecutor
-  }
-}
 
 class LazyExecutorServiceWrapper(executorFactory: => ExecutorService)
-    extends LazyExecutorService {
+    extends LazyExecutorService
   def createExecutor = executorFactory
-}

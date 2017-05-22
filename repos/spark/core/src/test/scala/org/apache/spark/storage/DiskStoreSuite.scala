@@ -23,9 +23,9 @@ import java.util.Arrays
 import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.util.io.ChunkedByteBuffer
 
-class DiskStoreSuite extends SparkFunSuite {
+class DiskStoreSuite extends SparkFunSuite
 
-  test("reads of memory-mapped and non memory-mapped files are equivalent") {
+  test("reads of memory-mapped and non memory-mapped files are equivalent")
     val confKey = "spark.storage.memoryMapThreshold"
 
     // Create a non-trivial (not all zeros) byte array
@@ -55,13 +55,10 @@ class DiskStoreSuite extends SparkFunSuite {
     assert(mapped.getChunks().forall(_.isInstanceOf[MappedByteBuffer]),
            "Expected MappedByteBuffer for mapped read")
 
-    def arrayFromByteBuffer(in: ByteBuffer): Array[Byte] = {
+    def arrayFromByteBuffer(in: ByteBuffer): Array[Byte] =
       val array = new Array[Byte](in.remaining())
       in.get(array)
       array
-    }
 
     assert(Arrays.equals(mapped.toArray, bytes))
     assert(Arrays.equals(notMapped.toArray, bytes))
-  }
-}

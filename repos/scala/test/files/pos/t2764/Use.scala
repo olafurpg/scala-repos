@@ -1,6 +1,5 @@
 package bippy
 
-class Use {
+class Use
   @Ann(Enum.VALUE)
   def foo {}
-}

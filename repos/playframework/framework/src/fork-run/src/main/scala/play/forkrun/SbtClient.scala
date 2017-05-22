@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Success, Failure}
 
-object SbtClient {
+object SbtClient
   sealed trait SbtRequest
   case class Execute(input: String) extends SbtRequest
   case class Request(key: String, sendTo: ActorRef) extends SbtRequest
@@ -23,10 +23,9 @@ object SbtClient {
 
   def props(baseDirectory: File, log: Logger, logEvents: Boolean): Props =
     Props(new SbtClient(baseDirectory, log, logEvents))
-}
 
 class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
-    extends Actor {
+    extends Actor
   import SbtClient._
 
   val connector = SbtConnector("play-fork-run", "Play Fork Run", baseDirectory)
@@ -35,27 +34,24 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
 
   def receive: Receive = init
 
-  def init: Receive = {
+  def init: Receive =
     connection ! SbtConnectionProxy.NewClient(self)
     connecting()
-  }
 
   def awaitingDaemon(
-      client: ActorRef, pending: Seq[SbtRequest] = Seq.empty): Receive = {
+      client: ActorRef, pending: Seq[SbtRequest] = Seq.empty): Receive =
     case Terminated(`client`) => shutdownWithClient(client)
     case SbtClientProxy.DaemonSet =>
-      if (logEvents) {
+      if (logEvents)
         val events = context.actorOf(SbtEvents.props(log), "sbt-server-events")
         client ! SbtClientProxy.SubscribeToEvents(sendTo = events)
-      }
       pending foreach self.!
       context become active(client)
     case request: SbtRequest =>
       context become awaitingDaemon(client, pending :+ request)
     case Shutdown => shutdownWithClient(client)
-  }
 
-  def connecting(pending: Seq[SbtRequest] = Seq.empty): Receive = {
+  def connecting(pending: Seq[SbtRequest] = Seq.empty): Receive =
     case SbtConnectionProxy.NewClientResponse.Connected(client) =>
       // The SbtClientProxy will close and terminate if there is a non-recoverable error
       context.watch(client)
@@ -66,9 +62,8 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
     case request: SbtRequest =>
       context become connecting(pending :+ request)
     case Shutdown => shutdown()
-  }
 
-  def active(client: ActorRef): Receive = {
+  def active(client: ActorRef): Receive =
     case Terminated(`client`) => shutdownWithClient(client)
     case Execute(input) =>
       client ! SbtClientProxy.RequestExecution.ByCommandOrTask(
@@ -80,78 +75,62 @@ class SbtClient(baseDirectory: File, log: Logger, logEvents: Boolean)
             SbtTask.props(key, client), name)
       task ! request
     case Shutdown => shutdownWithClient(client)
-  }
 
-  def fail(error: Throwable, requests: Seq[SbtRequest]): Unit = {
-    requests foreach { request =>
-      request match {
+  def fail(error: Throwable, requests: Seq[SbtRequest]): Unit =
+    requests foreach  request =>
+      request match
         case Request(_, sendTo) => sendTo ! Failed(error)
         case _ => // ignore
-      }
-    }
     context become broken(error)
-  }
 
-  def broken(error: Throwable): Receive = {
+  def broken(error: Throwable): Receive =
     case request: Request => request.sendTo ! Failed(error)
     case Shutdown => shutdown()
-  }
 
-  def shutdownWithClient(client: ActorRef): Unit = {
+  def shutdownWithClient(client: ActorRef): Unit =
     context.unwatch(client)
     shutdown()
-  }
 
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     connection ! SbtConnectionProxy.Close(self)
     context become exiting
-  }
 
-  def exiting: Receive = {
+  def exiting: Receive =
     // can only wait so long - set up race.
     context.system.scheduler.scheduleOnce(10.seconds, self, ShutdownTimeout)
 
-    {
       case SbtConnectionProxy.Closed | ShutdownTimeout =>
         context.system.shutdown()
-    }
-  }
-}
 
-object SbtEvents {
+object SbtEvents
   def props(logger: Logger): Props = Props(new SbtEvents(logger))
-}
 
-class SbtEvents(logger: Logger) extends Actor {
+class SbtEvents(logger: Logger) extends Actor
   import sbt.protocol._
 
-  def receive = {
+  def receive =
     case TaskLogEvent(id, LogMessage(level, message)) =>
       if (accepted(message)) logger.log(level, message)
-  }
 
   // log events from sbt server currently have duplicates that are
   // taken from standard out and prefixed with "Read from stdout: "
   def accepted(message: String): Boolean =
     !(message startsWith "Read from stdout: ")
-}
 
-object SbtTask {
+object SbtTask
   def props(name: String, client: ActorRef): Props =
     Props(new SbtTask(name, client))
-}
 
-class SbtTask(name: String, client: ActorRef) extends Actor {
+class SbtTask(name: String, client: ActorRef) extends Actor
   import SbtClient.{Request, Response, Failed}
 
   def receive: Receive = init
 
-  def init: Receive = {
+  def init: Receive =
     client ! SbtClientProxy.LookupScopedKey(name, self)
     connecting()
-  }
 
-  def connecting(pending: Seq[Request] = Seq.empty): Receive = {
+  def connecting(pending: Seq[Request] = Seq.empty): Receive =
     case request: Request =>
       context become connecting(pending :+ request)
     case SbtClientProxy.LookupScopedKeyResponse(name, Success(keys)) =>
@@ -163,9 +142,8 @@ class SbtTask(name: String, client: ActorRef) extends Actor {
     case SbtClientProxy.WatchingTask(taskKey) =>
       pending foreach self.!
       context become active(taskKey.key)
-  }
 
-  def active(key: ScopedKey, requests: Seq[Request] = Seq.empty): Receive = {
+  def active(key: ScopedKey, requests: Seq[Request] = Seq.empty): Receive =
     case request: Request =>
       if (requests.isEmpty)
         client ! SbtClientProxy.RequestExecution.ByScopedKey(
@@ -177,14 +155,10 @@ class SbtTask(name: String, client: ActorRef) extends Actor {
     case SbtClientProxy.WatchEvent(key, result) =>
       requests foreach (_.sendTo ! Response(name, result))
       context become active(key)
-  }
 
-  def fail(error: Throwable, requests: Seq[Request]): Unit = {
+  def fail(error: Throwable, requests: Seq[Request]): Unit =
     requests foreach (_.sendTo ! Failed(error))
     context become broken(error)
-  }
 
-  def broken(error: Throwable): Receive = {
+  def broken(error: Throwable): Receive =
     case request: Request => request.sendTo ! Failed(error)
-  }
-}

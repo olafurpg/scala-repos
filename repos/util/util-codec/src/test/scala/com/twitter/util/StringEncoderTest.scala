@@ -23,48 +23,40 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class StringEncoderTest extends WordSpec {
+class StringEncoderTest extends WordSpec
   val longString =
     "A string that is really really really really really really long and has more than 76 characters"
   val result =
     "QSBzdHJpbmcgdGhhdCBpcyByZWFsbHkgcmVhbGx5IHJlYWxseSByZWFsbHkgcmVhbGx5IHJlYWxseSBsb25nIGFuZCBoYXMgbW9yZSB0aGFuIDc2IGNoYXJhY3RlcnM="
 
-  "strip new lines" in {
+  "strip new lines" in
     assert(Base64StringEncoder.encode(longString.getBytes) == result)
-  }
 
-  "decode value with stripped new lines" in {
+  "decode value with stripped new lines" in
     assert(new String(Base64StringEncoder.decode(result)) == longString)
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
-class Base64StringEncoderTest extends WordSpec {
+class Base64StringEncoderTest extends WordSpec
   val urlUnsafeBytes = Array(-1.toByte, -32.toByte)
   val resultUnsafe = "/+A"
   val resultSafe = "_-A"
 
-  "encode / as _ and encode + as - to maintain url safe strings" in {
+  "encode / as _ and encode + as - to maintain url safe strings" in
     assert(Base64UrlSafeStringEncoder.encode(urlUnsafeBytes) == resultSafe)
-  }
 
-  "decode url-safe strings" in {
+  "decode url-safe strings" in
     assert(Base64UrlSafeStringEncoder.decode(resultSafe) === urlUnsafeBytes)
-  }
 
-  "decode url-unsafe strings" in {
+  "decode url-unsafe strings" in
     assert(Base64UrlSafeStringEncoder.decode(resultUnsafe) === urlUnsafeBytes)
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
-class GZIPStringEncoderTest extends WordSpec {
-  "a gzip string encoder" should {
+class GZIPStringEncoderTest extends WordSpec
+  "a gzip string encoder" should
     val gse = new GZIPStringEncoder {}
-    "properly encode and decode strings" in {
-      def testCodec(str: String) {
+    "properly encode and decode strings" in
+      def testCodec(str: String)
         assert(str == gse.decodeString(gse.encodeString(str)))
-      }
 
       testCodec("a")
       testCodec(
@@ -73,11 +65,7 @@ class GZIPStringEncoderTest extends WordSpec {
 
       // build a huge string
       val sb = new StringBuilder
-      for (_ <- 1 to 10000) {
+      for (_ <- 1 to 10000)
         sb.append(
             "oasnuthoesntihosnteidosentidosentauhsnoetidosentihsoneitdsnuthsin\n")
-      }
       testCodec(sb.toString)
-    }
-  }
-}

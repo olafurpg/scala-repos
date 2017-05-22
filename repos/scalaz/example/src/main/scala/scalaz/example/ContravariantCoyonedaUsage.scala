@@ -16,7 +16,7 @@ import scalaz.syntax.traverse._
 import scalaz.syntax.std.option._
 import scalaz.syntax.std.string._
 
-object ContravariantCoyonedaUsage extends App {
+object ContravariantCoyonedaUsage extends App
   // Suppose I have some unstructured data.
   val unstructuredData: List[Vector[String]] = List(
       Vector("Zürich", "807", "383,708"),
@@ -58,13 +58,13 @@ object ContravariantCoyonedaUsage extends App {
     s.toUpperCase.toLowerCase
 
   def parseDate(s: String): (Int, Option[(Int, Int)]) \/ String =
-    (for {
+    (for
       grps <- """([0-9]+)-([0-9]+)-([0-9]+)""".r findFirstMatchIn s
       List(y, m, d) <- grps.subgroups.traverse(_.parseInt.toOption)
-    } yield (y, Some((m, d)))).orElse(for {
+    yield (y, Some((m, d)))).orElse(for
       n <- """[0-9]+""".r findFirstIn s
       yi <- n.parseInt.toOption
-    } yield (yi, None)) <\/ s
+    yield (yi, None)) <\/ s
 
   // With sort keys in hand, we can produced contramapped `Order's all
   // on the argument type, `String', that will compare two values by
@@ -148,11 +148,11 @@ object ContravariantCoyonedaUsage extends App {
   // The standard way to solve this is to fuse the sort key into its
   // result’s ordering.  That’s what happens here:
 
-  val byOrdListSorts: List[List[Vector[String]]] = for {
+  val byOrdListSorts: List[List[Vector[String]]] = for
     (ord, i) <- List((caseInsensitivelyOrd, 0),
                      (dateOrd, 1),
                      (numerically2, 2))
-  } yield unstructuredData.sortBy(v => v(i))(ord.toScalaOrdering)
+  yield unstructuredData.sortBy(v => v(i))(ord.toScalaOrdering)
 
   // We can no longer use `schwartzian', though, because there is no
   // way to separate the sort key from the underlying Order.  We could
@@ -198,18 +198,18 @@ object ContravariantCoyonedaUsage extends App {
 
   // Now we’re ready.
 
-  val bySchwartzianListSorts: List[List[Vector[String]]] = for {
+  val bySchwartzianListSorts: List[List[Vector[String]]] = for
     (ccord, i) <- decomposedSortKeys
-  } yield schwartzian(unstructuredData)(v => ccord.k(v(i)))(ccord.fi)
+  yield schwartzian(unstructuredData)(v => ccord.k(v(i)))(ccord.fi)
 
   // But we know that for each `schwartzian' call, the result type of
   // the lambda we give it changes; for `caseInsensitively', it’s
   // `String', but for `parseCommaNum', it’s `Long \/ String', and so
   // on.  So how does the `B' type argument get picked?
 
-  val bySchwartzianListSortsTP: List[List[Vector[String]]] = for {
+  val bySchwartzianListSortsTP: List[List[Vector[String]]] = for
     (ccord, i) <- decomposedSortKeys
-  } yield
+  yield
     (schwartzian[Vector[String], ccord.I](unstructuredData)(
         v => ccord.k(v(i)))(ccord.fi))
 
@@ -233,11 +233,10 @@ object ContravariantCoyonedaUsage extends App {
   // records are to be sorted.
 
   sealed abstract class SortType
-  object SortType {
+  object SortType
     case object CI extends SortType
     case object Dateish extends SortType
     case object Num extends SortType
-  }
 
   type SortSpec = List[(SortType, Int)]
 
@@ -250,11 +249,10 @@ object ContravariantCoyonedaUsage extends App {
   // It’s simple enough to “interpret” each `SortType' to a
   // contravariant co-Yoneda Order.
 
-  def sortTypeOrd(s: SortType): CtCoyo[Order, String] = s match {
+  def sortTypeOrd(s: SortType): CtCoyo[Order, String] = s match
     case SortType.CI => CCOrder(caseInsensitively)
     case SortType.Dateish => CCOrder(parseDate)
     case SortType.Num => CCOrder(parseCommaNum) // like numerically4
-  }
 
   // And then, similarly to `bySchwartzianListSorts', to combine one
   // of these `k's with a Vector lookup to produce a sort of records.
@@ -300,25 +298,22 @@ object ContravariantCoyonedaUsage extends App {
   // these functions.
 
   def ordFanout[A](l: CtCoyo[Order, A],
-                   r: CtCoyo[Order, A]): CtCoyo.Aux[Order, A, (l.I, r.I)] = {
+                   r: CtCoyo[Order, A]): CtCoyo.Aux[Order, A, (l.I, r.I)] =
     implicit val lfi: Order[l.I] = l.fi
     implicit val rfi: Order[r.I] = r.fi
     CCOrder(l.k &&& r.k)
-  }
 
   // Now we have a base case, and an induction step.  I think we’re
   // ready.
 
   def sortSpecOrd(s: SortSpec): CtCoyo[Order, Vector[String]] =
-    s.foldRight(unitOrd: CtCoyo[Order, Vector[String]]) { (sti, acc) =>
+    s.foldRight(unitOrd: CtCoyo[Order, Vector[String]])  (sti, acc) =>
       val (st, i) = sti
       ordFanout(recItemOrd(i, sortTypeOrd(st)), acc)
-    }
 
-  def sortDataBy(xs: List[Vector[String]], o: SortSpec): List[Vector[String]] = {
+  def sortDataBy(xs: List[Vector[String]], o: SortSpec): List[Vector[String]] =
     val coyo = sortSpecOrd(o)
     schwartzian(xs)(coyo.k)(coyo.fi)
-  }
 
   val sortedBySpec: List[Vector[String]] = sortDataBy(
       unstructuredData, mainLtoRsort)
@@ -381,10 +376,9 @@ object ContravariantCoyonedaUsage extends App {
   // well with a left fold.
 
   def sortSpecOrdL(s: SortSpec): CtCoyo[Order, Vector[String]] =
-    s.foldLeft(unitOrd: CtCoyo[Order, Vector[String]]) { (acc, sti) =>
+    s.foldLeft(unitOrd: CtCoyo[Order, Vector[String]])  (acc, sti) =>
       val (st, i) = sti
       ordFanout(acc, recItemOrd(i, sortTypeOrd(st)))
-    }
 
   // What does `I' look like then?  Let’s use the unsafe `toString'
   // again to see.
@@ -405,10 +399,9 @@ object ContravariantCoyonedaUsage extends App {
   // Yet, the resulting order is the same.  Compare to
   // `sortedByNonCity', which used the right-fold.
 
-  val sortedByNonCityL: List[Vector[String]] = {
+  val sortedByNonCityL: List[Vector[String]] =
     val coyo = sortSpecOrdL(mainLtoRsort.tail)
     schwartzian(unstructuredData)(coyo.k)(coyo.fi)
-  }
 
   println("sortedByNonCityL: " |+| sortedByNonCity.shows)
 
@@ -463,11 +456,10 @@ object ContravariantCoyonedaUsage extends App {
   // that this is phantom; assume that serialization and
   // deserialization methods are defined:
 
-  trait Binfmt[A] {
+  trait Binfmt[A]
     def describe: String
-  }
 
-  object Binfmt {
+  object Binfmt
     def apply[A](s: String): Binfmt[A] = new Binfmt[A] { val describe = s }
 
     implicit val descLong: Binfmt[Long] = Binfmt("<Long>")
@@ -482,7 +474,6 @@ object ContravariantCoyonedaUsage extends App {
     implicit def desc2Tuple[A, B](
         implicit a: Binfmt[A], b: Binfmt[B]): Binfmt[(A, B)] =
       Binfmt(a.describe |+| b.describe)
-  }
 
   // A bidirectional formatter, unlike `Order', does not have a
   // `Contravariant' instance.  Whether your `F' is contravariant is
@@ -503,11 +494,10 @@ object ContravariantCoyonedaUsage extends App {
       implicit b: Binfmt[B], o: Order[B]): CtCoyo.Aux[BinOrd, A, B] =
     CtCoyo[BinOrd, A, B]((b, o))(f)
 
-  def sortTypeBinOrd(s: SortType): CtCoyo[BinOrd, String] = s match {
+  def sortTypeBinOrd(s: SortType): CtCoyo[BinOrd, String] = s match
     case SortType.CI => CCBinOrd(caseInsensitively)
     case SortType.Dateish => CCBinOrd(parseDate)
     case SortType.Num => CCBinOrd(parseCommaNum)
-  }
 
   // It turns out that recItemOrd is completely abstract:
 
@@ -522,11 +512,10 @@ object ContravariantCoyonedaUsage extends App {
 
   def binOrdFanout[A](
       l: CtCoyo[BinOrd, A],
-      r: CtCoyo[BinOrd, A]): CtCoyo.Aux[BinOrd, A, (l.I, r.I)] = {
+      r: CtCoyo[BinOrd, A]): CtCoyo.Aux[BinOrd, A, (l.I, r.I)] =
     implicit val (lfb, lfo) = l.fi
     implicit val (rfb, rfo) = r.fi
     CCBinOrd(l.k &&& r.k)
-  }
 
   // I’ve chosen the `Binfmt' instances with a bit of care to preserve
   // their monoid-hood.  That isn’t a requirement for you to do this
@@ -544,10 +533,9 @@ object ContravariantCoyonedaUsage extends App {
   // useful.  Once again, an idea of a fold step that can be fused
   // with the `Order' construction safely can be abstracted out here.
 
-  val (binfmtdesc, finalsort) = {
+  val (binfmtdesc, finalsort) =
     val bo = sortSpecBinOrdF(mainLtoRsort)
     (bo.fi._1.describe, schwartzian(unstructuredData)(bo.k)(bo.fi._2))
-  }
 
   // For your edification, the binfmtdesc is:
   //
@@ -564,4 +552,3 @@ object ContravariantCoyonedaUsage extends App {
   // [2] http://failex.blogspot.com/2013/06/fake-theorems-for-free.html
   // [3] https://github.com/scodec/scodec
   // [4] https://github.com/joshcough/f0
-}

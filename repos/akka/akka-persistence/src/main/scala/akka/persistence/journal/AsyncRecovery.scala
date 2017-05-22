@@ -10,7 +10,7 @@ import akka.persistence.PersistentRepr
 /**
   * Asynchronous message replay and sequence number recovery interface.
   */
-trait AsyncRecovery {
+trait AsyncRecovery
   //#journal-plugin-api
   /**
     * Plugin API: asynchronously replays persistent messages. Implementations replay
@@ -72,4 +72,3 @@ trait AsyncRecovery {
   def asyncReadHighestSequenceNr(
       persistenceId: String, fromSequenceNr: Long): Future[Long]
   //#journal-plugin-api
-}

@@ -23,17 +23,16 @@ import org.scalatest.junit.JUnitRunner
 import com.twitter.conversions.string._
 
 @RunWith(classOf[JUnitRunner])
-class StringConversionsTest extends WordSpec {
-  "string" should {
-    "quoteC" in {
+class StringConversionsTest extends WordSpec
+  "string" should
+    "quoteC" in
       assert("nothing".quoteC == "nothing")
       assert(
           "name\tvalue\t\u20acb\u00fcllet?\u20ac".quoteC == "name\\tvalue\\t\\u20acb\\xfcllet?\\u20ac")
       assert("she said \"hello\"".quoteC == "she said \\\"hello\\\"")
       assert("\\backslash".quoteC == "\\\\backslash")
-    }
 
-    "unquoteC" in {
+    "unquoteC" in
       assert("nothing".unquoteC == "nothing")
       assert(
           "name\\tvalue\\t\\u20acb\\xfcllet?\\u20ac".unquoteC == "name\tvalue\t\u20acb\u00fcllet?\u20ac")
@@ -41,18 +40,13 @@ class StringConversionsTest extends WordSpec {
       assert("\\\\backslash".unquoteC == "\\backslash")
       assert("real\\$dollar".unquoteC == "real\\$dollar")
       assert("silly\\/quote".unquoteC == "silly/quote")
-    }
 
-    "hexlify" in {
+    "hexlify" in
       assert("hello".getBytes.slice(1, 4).hexlify == "656c6c")
       assert("hello".getBytes.hexlify == "68656c6c6f")
-    }
 
-    "unhexlify" in {
+    "unhexlify" in
       assert("656c6c".unhexlify.toList == "hello".getBytes.slice(1, 4).toList)
       assert("68656c6c6f".unhexlify.toList == "hello".getBytes.toList)
       "5".unhexlify
       assert("5".unhexlify.hexlify.toInt == 5)
-    }
-  }
-}

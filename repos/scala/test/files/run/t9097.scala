@@ -1,7 +1,7 @@
 import scala.tools.partest._
 import java.io.{Console => _, _}
 
-object Test extends StoreReporterDirectTest {
+object Test extends StoreReporterDirectTest
 
   override def extraSettings: String =
     List(
@@ -23,7 +23,7 @@ object Test extends StoreReporterDirectTest {
                         |}
                         |""".stripMargin.trim
 
-  override def show(): Unit = {
+  override def show(): Unit =
     val baos = new java.io.ByteArrayOutputStream()
     Console.withOut(baos)(Console.withErr(baos)(compile()))
     assert(!storeReporter.hasErrors,
@@ -32,5 +32,3 @@ object Test extends StoreReporterDirectTest {
     // was 2 before the fix, the two PackageDefs for a would both contain the ClassDef for the closure
     assert(out.lines.count(_ contains "def $anonfun$1(x$1: Int): String") == 1,
            out)
-  }
-}

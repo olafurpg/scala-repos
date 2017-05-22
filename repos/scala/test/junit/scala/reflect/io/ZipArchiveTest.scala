@@ -7,31 +7,26 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(classOf[JUnit4])
-class ZipArchiveTest {
+class ZipArchiveTest
 
   @Test
-  def corruptZip {
+  def corruptZip
     val f = JFile.createTempFile("test", ".jar")
     val fza = new FileZipArchive(f)
-    try {
+    try
       fza.iterator
-    } catch {
+    catch
       case x: IOException =>
         assertTrue(x.getMessage, x.getMessage.contains(f.getPath))
-    } finally {
+    finally
       f.delete()
-    }
-  }
 
   @Test
-  def missingFile {
+  def missingFile
     val f = new JFile("xxx.does.not.exist")
     val fza = new FileZipArchive(f)
-    try {
+    try
       fza.iterator
-    } catch {
+    catch
       case x: IOException =>
         assertTrue(x.getMessage, x.getMessage.contains(f.getPath))
-    }
-  }
-}

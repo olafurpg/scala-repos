@@ -25,7 +25,7 @@ class ScalaParameterTableModel(typeContext: PsiElement,
                                columnInfos: ColumnInfo[_, _]*)
     extends ParameterTableModelBase[
         ScalaParameterInfo, ScalaParameterTableModelItem](
-        typeContext, defaultValueContext, columnInfos: _*) {
+        typeContext, defaultValueContext, columnInfos: _*)
 
   val project = defaultValueContext.getProject
   val initialParams: Seq[Seq[ScalaParameterInfo]] = methodDescriptor.parameters
@@ -36,17 +36,16 @@ class ScalaParameterTableModel(typeContext: PsiElement,
 
   def this(typeContext: PsiElement,
            defaultValueContext: PsiElement,
-           methodDescriptor: ScalaMethodDescriptor) {
+           methodDescriptor: ScalaMethodDescriptor)
     this(typeContext,
          defaultValueContext,
          methodDescriptor,
          new ScalaNameColumn(typeContext.getProject),
          new ScalaTypeColumn(typeContext.getProject),
          new ScalaDefaultValueColumn(typeContext.getProject))
-  }
 
   override def createRowItem(
-      parameterInfo: ScalaParameterInfo): ScalaParameterTableModelItem = {
+      parameterInfo: ScalaParameterInfo): ScalaParameterTableModelItem =
     val info = Option(parameterInfo).getOrElse(ScalaParameterInfo(project))
 
     val paramTypeCodeFragment = new ScalaCodeFragment(project, info.typeText)
@@ -70,22 +69,18 @@ class ScalaParameterTableModel(typeContext: PsiElement,
 
     new ScalaParameterTableModelItem(
         info, paramTypeCodeFragment, defaultValueCodeFragment, startsNewClause)
-  }
 
-  def clear(): Unit = {
+  def clear(): Unit =
     codeFragments.foreach(HighlightLevelUtil.forceRootHighlighting(
             _, FileHighlightingSetting.NONE))
-  }
-}
 
-object ScalaParameterTableModel {
+object ScalaParameterTableModel
   class ScalaTypeColumn(project: Project)
       extends TypeColumn[ScalaParameterInfo, ScalaParameterTableModelItem](
-          project, ScalaFileType.SCALA_FILE_TYPE) {
+          project, ScalaFileType.SCALA_FILE_TYPE)
     override def doCreateEditor(
         o: ScalaParameterTableModelItem): TableCellEditor =
       new ScalaCodeFragmentTableCellEditor(project)
-  }
 
   class ScalaNameColumn(project: Project)
       extends NameColumn[ScalaParameterInfo, ScalaParameterTableModelItem](
@@ -94,10 +89,8 @@ object ScalaParameterTableModel {
   class ScalaDefaultValueColumn(project: Project)
       extends ParameterTableModelBase.DefaultValueColumn[
           ScalaParameterInfo, ScalaParameterTableModelItem](
-          project, ScalaFileType.SCALA_FILE_TYPE) {
+          project, ScalaFileType.SCALA_FILE_TYPE)
 
     override def doCreateEditor(
         item: ScalaParameterTableModelItem): TableCellEditor =
       new ScalaCodeFragmentTableCellEditor(project)
-  }
-}

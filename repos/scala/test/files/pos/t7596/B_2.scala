@@ -1,8 +1,6 @@
-object Test {
-  locally {
+object Test
+  locally
     Sites: Config.driver.Table
-  }
-}
 
 // Under separate compilation, the pickler is foiled by the 
 // overloaded term `Config.driver`, and results in:

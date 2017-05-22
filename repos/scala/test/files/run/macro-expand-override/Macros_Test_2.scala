@@ -1,20 +1,17 @@
-class B {
+class B
   def foo(x: String): Unit = macro Impls.fooBString
   def foo(x: Int): Unit = macro Impls.fooBInt
   def foo(x: Boolean): Unit = println("fooBBoolean")
-}
 
-class D extends B {
+class D extends B
   //override def foo(x: String): Unit = println("fooDString") => method cannot override a macro
   override def foo(x: Int): Unit = macro Impls.fooDInt
-}
 
-class Z extends D {
+class Z extends D
   override def foo(x: String): Unit = macro Impls.fooZString
   override def foo(x: Boolean): Unit = println("fooZBoolean")
-}
 
-object Test extends App {
+object Test extends App
 
   val dd: D = new D()
   dd.foo("42")
@@ -40,4 +37,3 @@ object Test extends App {
   zb.foo("42")
   zb.foo(42)
   zb.foo(true)
-}

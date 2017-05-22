@@ -45,11 +45,10 @@ class IntegerSpinnerValueFactorySpec
         SpinnerValueFactory.IntegerSpinnerValueFactory](
         classOf[jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory],
         classOf[SpinnerValueFactory.IntegerSpinnerValueFactory])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override protected def getScalaClassInstance =
     new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10)
 
   override protected def getJavaClassInstance =
     new jfxsc.SpinnerValueFactory.IntegerSpinnerValueFactory(1, 10)
-}

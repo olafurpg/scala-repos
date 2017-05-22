@@ -31,7 +31,7 @@ import org.apache.spark.sql.types.StructType
   */
 private[parquet] class CatalystRecordMaterializer(
     parquetSchema: MessageType, catalystSchema: StructType)
-    extends RecordMaterializer[InternalRow] {
+    extends RecordMaterializer[InternalRow]
 
   private val rootConverter = new CatalystRowConverter(
       parquetSchema, catalystSchema, NoopUpdater)
@@ -39,4 +39,3 @@ private[parquet] class CatalystRecordMaterializer(
   override def getCurrentRecord: InternalRow = rootConverter.currentRecord
 
   override def getRootConverter: GroupConverter = rootConverter
-}

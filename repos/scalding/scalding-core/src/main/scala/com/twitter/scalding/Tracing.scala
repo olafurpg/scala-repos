@@ -31,7 +31,7 @@ import org.slf4j.{Logger, LoggerFactory => LogManager}
   * register and unregister methods are provided for testing, but
   * should not be needed for most development
   */
-object Tracing {
+object Tracing
   private val LOG: Logger = LogManager.getLogger(this.getClass)
 
   // TODO: remove this once we no longer want backwards compatiblity
@@ -78,14 +78,14 @@ object Tracing {
     * without completely breaking
     */
   private def invokeStaticMethod(
-      clazz: String, methodName: String, args: AnyRef*) {
-    try {
+      clazz: String, methodName: String, args: AnyRef*)
+    try
       val argTypes = args map (_.getClass())
       Class
         .forName(clazz)
         .getMethod(methodName, argTypes: _*)
         .invoke(null, args: _*)
-    } catch {
+    catch
       case e @ (_: NoSuchMethodException | _: SecurityException |
           _: IllegalAccessException | _: IllegalArgumentException |
           _: InvocationTargetException | _: NullPointerException |
@@ -96,6 +96,3 @@ object Tracing {
             "user code. The most likely cause is a mismatch in Cascading library version. Upgrading the " +
             "Cascading library to at least 2.6 should fix this issue.The cause was [" +
             e + "]")
-    }
-  }
-}

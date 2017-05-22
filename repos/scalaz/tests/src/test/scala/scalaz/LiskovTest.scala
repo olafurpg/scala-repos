@@ -1,6 +1,6 @@
 package scalaz
 
-object LiskovTest extends SpecLite {
+object LiskovTest extends SpecLite
 
   trait Co1[+ _]
 
@@ -16,13 +16,12 @@ object LiskovTest extends SpecLite {
 
   import Liskov._
 
-  "apply" in {
+  "apply" in
     implicitly[String <:< AnyRef].apply(""): AnyRef
     ()
-  }
 
-  "lift" in {
-    def foo[A, B](implicit ev: A <~< B) {
+  "lift" in
+    def foo[A, B](implicit ev: A <~< B)
       Liskov.co[Co1, A, B](ev)
       Liskov.contra[Contra1, A, B](ev)
 
@@ -30,8 +29,5 @@ object LiskovTest extends SpecLite {
       Liskov.co2_2[Co2_2, B, Unit, A](ev)
       Liskov.contra1_2[Contra1_2, B, A, Unit](ev)
       Liskov.contra2_2[Contra2_2, B, Unit, A](ev)
-    }
 
     foo[String, AnyRef]
-  }
-}

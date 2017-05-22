@@ -34,30 +34,25 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.beans.property.DoubleProperty
 
 @RunWith(classOf[JUnitRunner])
-class SFXDelegateSpec extends FlatSpec {
+class SFXDelegateSpec extends FlatSpec
   val doubleProperty = new DoubleProperty(null, "double property")
   val doublePropertyWithSameName = new DoubleProperty(null, "double property")
   val doublePropertyWithDifferentName = new DoubleProperty(
       null, "double property (with different name)")
 
-  "SFXDelegate" should "delegate toString" in {
+  "SFXDelegate" should "delegate toString" in
     doubleProperty.toString should be(
         "[SFX]DoubleProperty [name: double property, value: 0.0]")
-  }
 
-  it should "delegate equals" in {
+  it should "delegate equals" in
     // NOTE JFX8: JavaFX2 defined `equals` for SimpleDoubleProperty in ReadOnlyDoubleProperty
     //            JavaFX8 does not override `equals` that is defined in `Object` so comparing two different
     //            instances of SimpleDoubleProperty will be always return `false` and following test will fail
     // doubleProperty should equal(doublePropertyWithSameName)
     doubleProperty should not(equal(doublePropertyWithDifferentName))
-  }
 
-  it should "delegate hashCode" in {
+  it should "delegate hashCode" in
     doubleProperty.hashCode should equal(doubleProperty.delegate.hashCode)
-  }
 
-  it should "have a public delegate property" in {
+  it should "have a public delegate property" in
     doubleProperty.delegate should not(be(null))
-  }
-}

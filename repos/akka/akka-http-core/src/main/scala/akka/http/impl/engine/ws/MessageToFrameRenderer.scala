@@ -16,8 +16,8 @@ import akka.http.scaladsl.model.ws._
   *
   * INTERNAL API
   */
-private[http] object MessageToFrameRenderer {
-  def create(serverSide: Boolean): Flow[Message, FrameStart, NotUsed] = {
+private[http] object MessageToFrameRenderer
+  def create(serverSide: Boolean): Flow[Message, FrameStart, NotUsed] =
     def strictFrames(opcode: Opcode, data: ByteString): Source[FrameStart, _] =
       // FIXME: fragment?
       Source.single(FrameEvent.fullFrame(opcode, None, data, fin = true))
@@ -29,7 +29,7 @@ private[http] object MessageToFrameRenderer {
           FrameEvent.fullFrame(Opcode.Continuation, None, _, fin = false)) ++ Source
         .single(FrameEvent.emptyLastContinuationFrame)
 
-    Flow[Message].flatMapConcat {
+    Flow[Message].flatMapConcat
       case BinaryMessage.Strict(data) ⇒ strictFrames(Opcode.Binary, data)
       case bm: BinaryMessage ⇒ streamedFrames(Opcode.Binary, bm.dataStream)
       case TextMessage.Strict(text) ⇒
@@ -37,6 +37,3 @@ private[http] object MessageToFrameRenderer {
       case tm: TextMessage ⇒
         streamedFrames(
             Opcode.Text, tm.textStream.transform(() ⇒ new Utf8Encoder))
-    }
-  }
-}

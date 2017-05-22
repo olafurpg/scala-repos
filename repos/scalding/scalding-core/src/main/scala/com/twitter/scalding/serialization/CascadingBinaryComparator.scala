@@ -29,22 +29,21 @@ import scala.util.{Failure, Success, Try}
   */
 class CascadingBinaryComparator[T](ob: OrderedSerialization[T])
     extends Comparator[T] with StreamComparator[InputStream] with CHasher[T]
-    with Serializable {
+    with Serializable
 
   override def compare(a: T, b: T) = ob.compare(a, b)
   override def hashCode(t: T): Int = ob.hash(t)
   override def compare(a: InputStream, b: InputStream) =
     ob.compareBinary(a, b).unsafeToInt
-}
 
-object CascadingBinaryComparator {
+object CascadingBinaryComparator
 
   /**
     * This method will walk the flowDef and make sure all the
     * groupBy/cogroups are using a CascadingBinaryComparator
     */
   private[scalding] def checkForOrderedSerialization[T](
-      flow: Flow[T]): Try[Unit] = {
+      flow: Flow[T]): Try[Unit] =
     import collection.JavaConverters._
     import cascading.pipe._
     import com.twitter.scalding.RichPipe
@@ -53,7 +52,7 @@ object CascadingBinaryComparator {
     def reduce(it: TraversableOnce[Try[Unit]]): Try[Unit] =
       it.find(_.isFailure).getOrElse(Success(()))
 
-    def check(s: Splice): Try[Unit] = {
+    def check(s: Splice): Try[Unit] =
       val m = s.getKeySelectors.asScala
       val sortingSelectors = s.getSortingSelectors.asScala
 
@@ -62,8 +61,8 @@ object CascadingBinaryComparator {
             new RuntimeException("Cannot verify OrderedSerialization: " + s))
 
       if (m.isEmpty) error(s"Splice must have KeySelectors: $s")
-      else {
-        reduce(m.map {
+      else
+        reduce(m.map
           case (pipename, fields) =>
             /*
              * Scalding typed-API ALWAYS puts the key into field position 0.
@@ -75,33 +74,28 @@ object CascadingBinaryComparator {
             else
               error(
                   s"pipe: $s, fields: $fields, comparators: ${fields.getComparators.toList}")
-        })
-      }
-    }
+        )
 
     def getDescriptionsForMissingOrdSer[U](
         bfs: BaseFlowStep[U]): Option[String] =
       // does this job have any Splices without OrderedSerialization:
-      if (bfs.getGraph.vertexSet.asScala.exists {
+      if (bfs.getGraph.vertexSet.asScala.exists
             case gb: GroupBy => check(gb).isFailure
             case cg: CoGroup => check(cg).isFailure
             case _ => false // only do sorting in groupBy/cogroupBy
-          }) {
+          )
         Some(getDesc(bfs).mkString(", "))
-      } else None
+      else None
 
     // Get all the steps that have missing OrderedSerializations
-    val missing = flow.getFlowSteps.asScala.map {
+    val missing = flow.getFlowSteps.asScala.map
       case bfs: BaseFlowStep[_] => getDescriptionsForMissingOrdSer(bfs)
-    }.collect { case Some(desc) => desc }
+    .collect { case Some(desc) => desc }
 
     if (missing.isEmpty) Success(())
-    else {
+    else
       val badSteps = missing.size
-      val msg = missing.zipWithIndex.map {
+      val msg = missing.zipWithIndex.map
         case (msg, idx) => s"<step$idx>$msg</step$idx>"
-      }.mkString
+      .mkString
       error(s"There are $badSteps missing OrderedSerializations: $msg")
-    }
-  }
-}

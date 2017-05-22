@@ -30,8 +30,8 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.StructType
 
 class TrainValidationSplitSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
-  test("train validation with logistic regression") {
+    extends SparkFunSuite with MLlibTestSparkContext
+  test("train validation with logistic regression")
     val dataset = sqlContext.createDataFrame(
         sc.parallelize(generateLogisticInput(1.0, 1.0, 100, 42), 2))
 
@@ -52,9 +52,8 @@ class TrainValidationSplitSuite
     assert(parent.getRegParam === 0.001)
     assert(parent.getMaxIter === 10)
     assert(cvModel.validationMetrics.length === lrParamMaps.length)
-  }
 
-  test("train validation with linear regression") {
+  test("train validation with linear regression")
     val dataset = sqlContext.createDataFrame(
         sc.parallelize(
             LinearDataGenerator.generateLinearInput(6.3,
@@ -89,9 +88,8 @@ class TrainValidationSplitSuite
     assert(parent2.getRegParam === 0.001)
     assert(parent2.getMaxIter === 10)
     assert(cvModel2.validationMetrics.length === lrParamMaps.length)
-  }
 
-  test("transformSchema should check estimatorParamMaps") {
+  test("transformSchema should check estimatorParamMaps")
     import TrainValidationSplitSuite._
 
     val est = new MyEstimator("est")
@@ -109,41 +107,32 @@ class TrainValidationSplitSuite
 
     val invalidParamMaps = paramMaps :+ ParamMap(est.inputCol -> "")
     cv.setEstimatorParamMaps(invalidParamMaps)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       cv.transformSchema(new StructType())
-    }
-  }
-}
 
-object TrainValidationSplitSuite {
+object TrainValidationSplitSuite
 
   abstract class MyModel extends Model[MyModel]
 
   class MyEstimator(override val uid: String)
-      extends Estimator[MyModel] with HasInputCol {
+      extends Estimator[MyModel] with HasInputCol
 
-    override def fit(dataset: DataFrame): MyModel = {
+    override def fit(dataset: DataFrame): MyModel =
       throw new UnsupportedOperationException
-    }
 
-    override def transformSchema(schema: StructType): StructType = {
+    override def transformSchema(schema: StructType): StructType =
       require($(inputCol).nonEmpty)
       schema
-    }
 
     override def copy(extra: ParamMap): MyEstimator = defaultCopy(extra)
-  }
 
-  class MyEvaluator extends Evaluator {
+  class MyEvaluator extends Evaluator
 
-    override def evaluate(dataset: DataFrame): Double = {
+    override def evaluate(dataset: DataFrame): Double =
       throw new UnsupportedOperationException
-    }
 
     override def isLargerBetter: Boolean = true
 
     override val uid: String = "eval"
 
     override def copy(extra: ParamMap): MyEvaluator = defaultCopy(extra)
-  }
-}

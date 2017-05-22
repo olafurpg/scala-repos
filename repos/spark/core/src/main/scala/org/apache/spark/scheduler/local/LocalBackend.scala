@@ -49,7 +49,7 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
                                    scheduler: TaskSchedulerImpl,
                                    executorBackend: LocalBackend,
                                    private val totalCores: Int)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint with Logging
 
   private var freeCores = totalCores
 
@@ -62,41 +62,35 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
                                       userClassPath,
                                       isLocal = true)
 
-  override def receive: PartialFunction[Any, Unit] = {
+  override def receive: PartialFunction[Any, Unit] =
     case ReviveOffers =>
       reviveOffers()
 
     case StatusUpdate(taskId, state, serializedData) =>
       scheduler.statusUpdate(taskId, state, serializedData)
-      if (TaskState.isFinished(state)) {
+      if (TaskState.isFinished(state))
         freeCores += scheduler.CPUS_PER_TASK
         reviveOffers()
-      }
 
     case KillTask(taskId, interruptThread) =>
       executor.killTask(taskId, interruptThread)
-  }
 
   override def receiveAndReply(
-      context: RpcCallContext): PartialFunction[Any, Unit] = {
+      context: RpcCallContext): PartialFunction[Any, Unit] =
     case StopExecutor =>
       executor.stop()
       context.reply(true)
-  }
 
-  def reviveOffers() {
+  def reviveOffers()
     val offers = Seq(
         new WorkerOffer(localExecutorId, localExecutorHostname, freeCores))
-    for (task <- scheduler.resourceOffers(offers).flatten) {
+    for (task <- scheduler.resourceOffers(offers).flatten)
       freeCores -= scheduler.CPUS_PER_TASK
       executor.launchTask(executorBackend,
                           taskId = task.taskId,
                           attemptNumber = task.attemptNumber,
                           task.name,
                           task.serializedTask)
-    }
-  }
-}
 
 /**
   * LocalBackend is used when running a local version of Spark where the executor, backend, and
@@ -105,33 +99,31 @@ private[spark] class LocalEndpoint(override val rpcEnv: RpcEnv,
   */
 private[spark] class LocalBackend(
     conf: SparkConf, scheduler: TaskSchedulerImpl, val totalCores: Int)
-    extends SchedulerBackend with ExecutorBackend with Logging {
+    extends SchedulerBackend with ExecutorBackend with Logging
 
   private val appId = "local-" + System.currentTimeMillis
   private var localEndpoint: RpcEndpointRef = null
   private val userClassPath = getUserClasspath(conf)
   private val listenerBus = scheduler.sc.listenerBus
-  private val launcherBackend = new LauncherBackend() {
+  private val launcherBackend = new LauncherBackend()
     override def onStopRequest(): Unit = stop(SparkAppHandle.State.KILLED)
-  }
 
   /**
     * Returns a list of URLs representing the user classpath.
     *
     * @param conf Spark configuration.
     */
-  def getUserClasspath(conf: SparkConf): Seq[URL] = {
+  def getUserClasspath(conf: SparkConf): Seq[URL] =
     val userClassPathStr = conf.getOption("spark.executor.extraClassPath")
     userClassPathStr
       .map(_.split(File.pathSeparator))
       .toSeq
       .flatten
       .map(new File(_).toURI.toURL)
-  }
 
   launcherBackend.connect()
 
-  override def start() {
+  override def start()
     val rpcEnv = SparkEnv.get.rpcEnv
     val executorEndpoint = new LocalEndpoint(
         rpcEnv, userClassPath, scheduler, this, totalCores)
@@ -146,37 +138,29 @@ private[spark] class LocalBackend(
                              Map.empty)))
     launcherBackend.setAppId(appId)
     launcherBackend.setState(SparkAppHandle.State.RUNNING)
-  }
 
-  override def stop() {
+  override def stop()
     stop(SparkAppHandle.State.FINISHED)
-  }
 
-  override def reviveOffers() {
+  override def reviveOffers()
     localEndpoint.send(ReviveOffers)
-  }
 
   override def defaultParallelism(): Int =
     scheduler.conf.getInt("spark.default.parallelism", totalCores)
 
   override def killTask(
-      taskId: Long, executorId: String, interruptThread: Boolean) {
+      taskId: Long, executorId: String, interruptThread: Boolean)
     localEndpoint.send(KillTask(taskId, interruptThread))
-  }
 
   override def statusUpdate(
-      taskId: Long, state: TaskState, serializedData: ByteBuffer) {
+      taskId: Long, state: TaskState, serializedData: ByteBuffer)
     localEndpoint.send(StatusUpdate(taskId, state, serializedData))
-  }
 
   override def applicationId(): String = appId
 
-  private def stop(finalState: SparkAppHandle.State): Unit = {
+  private def stop(finalState: SparkAppHandle.State): Unit =
     localEndpoint.ask(StopExecutor)
-    try {
+    try
       launcherBackend.setState(finalState)
-    } finally {
+    finally
       launcherBackend.close()
-    }
-  }
-}

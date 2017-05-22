@@ -38,7 +38,7 @@ private[akka] final case class ServerSettingsImpl(
     defaultHostHeader: Host,
     websocketRandomFactory: () ⇒ Random,
     parserSettings: ParserSettings)
-    extends ServerSettings {
+    extends ServerSettings
 
   require(0 < maxConnections, "max-connections must be > 0")
   require(0 < pipeliningLimit && pipeliningLimit <= 1024,
@@ -47,10 +47,9 @@ private[akka] final case class ServerSettingsImpl(
   require(0 < backlog, "backlog must be > 0")
 
   override def productPrefix = "ServerSettings"
-}
 
 object ServerSettingsImpl
-    extends SettingsCompanion[ServerSettingsImpl]("akka.http.server") {
+    extends SettingsCompanion[ServerSettingsImpl]("akka.http.server")
   implicit def timeoutsShortcut(
       s: js.ServerSettings): js.ServerSettings.Timeouts = s.getTimeouts
 
@@ -58,12 +57,11 @@ object ServerSettingsImpl
   final case class Timeouts(idleTimeout: Duration,
                             requestTimeout: Duration,
                             bindTimeout: FiniteDuration)
-      extends ServerSettings.Timeouts {
+      extends ServerSettings.Timeouts
     require(idleTimeout > Duration.Zero, "idleTimeout must be infinite or > 0")
     require(requestTimeout > Duration.Zero,
             "requestTimeout must be infinite or > 0")
     require(bindTimeout > Duration.Zero, "bindTimeout must be > 0")
-  }
 
   def fromSubConfig(root: Config, c: Config) =
     new ServerSettingsImpl(
@@ -82,16 +80,15 @@ object ServerSettingsImpl
         SocketOptionSettings.fromSubConfig(
             root, c.getConfig("socket-options")),
         defaultHostHeader = HttpHeader.parse(
-              "Host", c getString "default-host-header") match {
+              "Host", c getString "default-host-header") match
           case HttpHeader.ParsingResult.Ok(x: Host, Nil) ⇒ x
           case result ⇒
             val info = result.errors.head
               .withSummary("Configured `default-host-header` is illegal")
             throw new ConfigurationException(info.formatPretty)
-        },
+        ,
         Randoms.SecureRandomInstances, // can currently only be overridden from code
         ParserSettingsImpl.fromSubConfig(root, c.getConfig("parsing")))
 
   //  def apply(optionalSettings: Option[ServerSettings])(implicit actorRefFactory: ActorRefFactory): ServerSettings =
   //    optionalSettings getOrElse apply(actorSystem)
-}

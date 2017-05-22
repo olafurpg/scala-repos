@@ -22,7 +22,7 @@ import cascading.tap.partition.Partition
 import cascading.tuple.{Fields, Tuple, TupleEntry}
 
 /** Utility functions to assist with creating partitioned sourced. */
-object PartitionUtil {
+object PartitionUtil
   // DO NOT USE intFields, scalding / cascading Fields.merge is broken and gets called in bowels of
   // TemplateTap. See scalding/#803.
   def toFields(start: Int, end: Int): Fields =
@@ -30,11 +30,11 @@ object PartitionUtil {
 
   /** A tuple converter that splits a cascading tuple into a pair of types.*/
   def converter[P, T, U >: (P, T)](valueConverter: TupleConverter[T],
-                                   partitionConverter: TupleConverter[P]) = {
-    TupleConverter.asSuperConverter[(P, T), U](new TupleConverter[(P, T)] {
+                                   partitionConverter: TupleConverter[P]) =
+    TupleConverter.asSuperConverter[(P, T), U](new TupleConverter[(P, T)]
       val arity = valueConverter.arity + partitionConverter.arity
 
-      def apply(te: TupleEntry): (P, T) = {
+      def apply(te: TupleEntry): (P, T) =
         val value = Tuple.size(valueConverter.arity)
         val partition = Tuple.size(partitionConverter.arity)
 
@@ -48,18 +48,16 @@ object PartitionUtil {
           new TupleEntry(toFields(0, partitionConverter.arity), partition)
 
         (partitionConverter(partitionTE), valueConverter(valueTE))
-      }
-    })
-  }
+    )
 
   /** A tuple setter for a pair of types which are flattened into a cascading tuple.*/
   def setter[P, T, U <: (P, T)](
       valueSetter: TupleSetter[T],
       partitionSetter: TupleSetter[P]): TupleSetter[U] =
-    TupleSetter.asSubSetter[(P, T), U](new TupleSetter[(P, T)] {
+    TupleSetter.asSubSetter[(P, T), U](new TupleSetter[(P, T)]
       val arity = valueSetter.arity + partitionSetter.arity
 
-      def apply(in: (P, T)) = {
+      def apply(in: (P, T)) =
         val partition = partitionSetter(in._1)
         val value = valueSetter(in._2)
         val output = Tuple.size(partition.size + value.size)
@@ -70,6 +68,4 @@ object PartitionUtil {
             idx => output.set(idx + value.size, partition.getObject(idx)))
 
         output
-      }
-    })
-}
+    )

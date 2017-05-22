@@ -11,10 +11,10 @@ import play.api.libs.json.Json
 import scala.collection.immutable.Seq
 import scala.collection.JavaConverters._
 
-class ContainerTest extends MarathonSpec with Matchers {
+class ContainerTest extends MarathonSpec with Matchers
   import mesosphere.marathon.api.v2.json.Formats._
 
-  class Fixture {
+  class Fixture
     lazy val volumes = Seq(
         DockerVolume("/etc/a", "/var/data/a", mesos.Volume.Mode.RO),
         DockerVolume("/etc/b", "/var/data/b", mesos.Volume.Mode.RW)
@@ -114,11 +114,10 @@ class ContainerTest extends MarathonSpec with Matchers {
         |     }]
         |  }
         |}""".stripMargin
-  }
 
   def fixture(): Fixture = new Fixture
 
-  test("ToProto") {
+  test("ToProto")
     val f = fixture()
     val proto = ContainerSerializer.toProto(f.container)
     assert(mesos.ContainerInfo.Type.DOCKER == proto.getType)
@@ -158,9 +157,8 @@ class ContainerTest extends MarathonSpec with Matchers {
     assert(proto3.getDocker.hasForcePullImage)
     assert(
         f.container3.docker.get.forcePullImage == proto3.getDocker.getForcePullImage)
-  }
 
-  test("ToMesos") {
+  test("ToMesos")
     val f = fixture()
     val proto = ContainerSerializer.toMesos(f.container)
     assert(mesos.ContainerInfo.Type.DOCKER == proto.getType)
@@ -212,9 +210,8 @@ class ContainerTest extends MarathonSpec with Matchers {
     assert(proto3.getDocker.hasForcePullImage)
     assert(
         f.container3.docker.get.forcePullImage == proto3.getDocker.getForcePullImage)
-  }
 
-  test("ConstructFromProto") {
+  test("ConstructFromProto")
     val f = fixture()
 
     val containerInfo = Protos.ExtendedContainerInfo.newBuilder
@@ -241,23 +238,19 @@ class ContainerTest extends MarathonSpec with Matchers {
 
     val container3 = ContainerSerializer.fromProto(containerInfo3)
     assert(container3 == f.container3)
-  }
 
-  test("SerializationRoundtrip empty") {
+  test("SerializationRoundtrip empty")
     val container1 = Container(`type` = mesos.ContainerInfo.Type.DOCKER)
     JsonTestHelper.assertSerializationRoundtripWorks(container1)
-  }
 
-  test("SerializationRoundtrip with slightly more complex data") {
+  test("SerializationRoundtrip with slightly more complex data")
     val f = fixture()
     JsonTestHelper.assertSerializationRoundtripWorks(f.container)
-  }
 
-  private[this] def fromJson(json: String): Container = {
+  private[this] def fromJson(json: String): Container =
     Json.fromJson[Container](Json.parse(json)).get
-  }
 
-  test("Reading JSON with volumes") {
+  test("Reading JSON with volumes")
     val json3 = """
       {
         "type": "DOCKER",
@@ -282,8 +275,7 @@ class ContainerTest extends MarathonSpec with Matchers {
     val readResult3 = fromJson(json3)
     val f = fixture()
     assert(readResult3 == f.container)
-  }
-  test("Reading JSON with portMappings") {
+  test("Reading JSON with portMappings")
     val json4 =
       """
       {
@@ -303,13 +295,11 @@ class ContainerTest extends MarathonSpec with Matchers {
     val readResult4 = fromJson(json4)
     val f = fixture()
     assert(readResult4 == f.container2)
-  }
 
-  test("SerializationRoundTrip with privileged, networking and parameters") {
+  test("SerializationRoundTrip with privileged, networking and parameters")
     JsonTestHelper.assertSerializationRoundtripWorks(fixture().container3)
-  }
 
-  test("Reading JSON with privileged, networking and parameters") {
+  test("Reading JSON with privileged, networking and parameters")
     val json6 = """
       {
         "type": "DOCKER",
@@ -327,9 +317,8 @@ class ContainerTest extends MarathonSpec with Matchers {
 
     val readResult6 = fromJson(json6)
     assert(readResult6 == fixture().container3)
-  }
 
-  test("Reading JSON with multiple parameters with the same name") {
+  test("Reading JSON with multiple parameters with the same name")
     val json7 = """
       {
         "type": "DOCKER",
@@ -349,23 +338,19 @@ class ContainerTest extends MarathonSpec with Matchers {
 
     val readResult7 = fromJson(json7)
     assert(readResult7 == fixture().container4)
-  }
 
-  test("""FromJSON with Mesos ContainerInfo should parse successfully""") {
+  test("""FromJSON with Mesos ContainerInfo should parse successfully""")
     val f = new Fixture
     val appDef =
       Json.parse(f.mesosContainerWithPersistentVolumeJsonStr).as[AppDefinition]
     val expectedContainer = f.mesosContainerWithPersistentVolume
 
     appDef.container should equal(Some(expectedContainer))
-  }
 
-  test("""ToJson should correctly handle container type MESOS""") {
+  test("""ToJson should correctly handle container type MESOS""")
     val f = new Fixture
     val appDefinition =
       AppDefinition(id = PathId("test"),
                     container = Some(f.mesosContainerWithPersistentVolume))
     val json = Json.toJson(appDefinition)
     (json \ "container" \ "type").asOpt[String] should be(Some("MESOS"))
-  }
-}

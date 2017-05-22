@@ -18,7 +18,7 @@ import scala.scalajs.js.annotation.JSExport
 import org.scalajs.testinterface.TestUtils
 
 final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
-    extends Task {
+    extends Task
 
   def tags(): Array[String] = Array()
 
@@ -28,13 +28,13 @@ final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
 
   def execute(eventHandler: EventHandler,
               loggers: Array[Logger],
-              continuation: Array[Task] => Unit): Unit = {
+              continuation: Array[Task] => Unit): Unit =
     val doneCont = () => continuation(Array())
     val jasmine = global.jasmine
     val reporter = new JasmineTestReporter(
         taskDef, eventHandler, loggers, doneCont)
 
-    try {
+    try
       // Reset JasmineEnv
       jasmine.currentEnv_ = js.undefined
 
@@ -46,7 +46,7 @@ final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
       jasmineEnv.addReporter(reporter.asInstanceOf[js.Any])
       jasmineEnv.updateInterval = 0
       jasmineEnv.execute()
-    } catch {
+    catch
       case t: Throwable =>
         // Jasmine itself failed. Issue a failure
         eventHandler.handle(
@@ -56,15 +56,11 @@ final class JasmineTask(private val runner: JasmineRunner, _taskDef: TaskDef)
                 selector = new SuiteSelector,
                 throwable = new OptionalThrowable(t)
             ))
-        for (log <- loggers) {
+        for (log <- loggers)
           log.error("Problem executing code in tests: " + t.toString)
           log.trace(t)
-        }
 
         // We are done
         doneCont()
-    }
-  }
 
   def taskDef(): TaskDef = _taskDef
-}

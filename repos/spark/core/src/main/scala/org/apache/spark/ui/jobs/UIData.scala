@@ -25,9 +25,9 @@ import org.apache.spark.executor.TaskMetrics
 import org.apache.spark.scheduler.{AccumulableInfo, TaskInfo}
 import org.apache.spark.util.collection.OpenHashSet
 
-private[spark] object UIData {
+private[spark] object UIData
 
-  class ExecutorSummary {
+  class ExecutorSummary
     var taskTime: Long = 0
     var failedTasks: Int = 0
     var succeededTasks: Int = 0
@@ -41,7 +41,6 @@ private[spark] object UIData {
     var shuffleWriteRecords: Long = 0
     var memoryBytesSpilled: Long = 0
     var diskBytesSpilled: Long = 0
-  }
 
   class JobUIData(
       var jobId: Int = -1,
@@ -70,7 +69,7 @@ private[spark] object UIData {
       var numFailedStages: Int = 0
   )
 
-  class StageUIData {
+  class StageUIData
     var numActiveTasks: Int = _
     var numCompleteTasks: Int = _
     var completedIndices = new OpenHashSet[Int]()
@@ -102,7 +101,6 @@ private[spark] object UIData {
     def hasShuffleWrite: Boolean = shuffleWriteBytes > 0
     def hasBytesSpilled: Boolean =
       memoryBytesSpilled > 0 && diskBytesSpilled > 0
-  }
 
   /**
     * These are kept mutable and reused throughout a task's lifetime to avoid excessive reallocation.
@@ -114,4 +112,3 @@ private[spark] object UIData {
   case class ExecutorUIData(val startTime: Long,
                             var finishTime: Option[Long] = None,
                             var finishReason: Option[String] = None)
-}

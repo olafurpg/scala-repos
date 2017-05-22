@@ -40,9 +40,9 @@ import scalafx.scene.chart.XYChart
   * @see scalafx.scene.chart.NumberAxis
   * @see scalafx.scene.chart.XYChart
   */
-class EnsembleAdvancedLineChart extends EnsembleExample {
+class EnsembleAdvancedLineChart extends EnsembleExample
 
-  def getContent = {
+  def getContent =
 
     // Create sample data. Here we use a collection of (x,y) pairs
     val xyData = Seq(
@@ -54,17 +54,12 @@ class EnsembleAdvancedLineChart extends EnsembleExample {
     )
 
     // Prepare series
-    val series = new XYChart.Series[Number, Number] {
+    val series = new XYChart.Series[Number, Number]
       name = "Data Series 1"
-      data() ++= xyData.map {
+      data() ++= xyData.map
         case (x, y) => XYChart.Data[Number, Number](x, y)
-      }
-    }
 
     // setup Line chart
-    new LineChart(NumberAxis("X Axis"), NumberAxis("Y Axis")) {
+    new LineChart(NumberAxis("X Axis"), NumberAxis("Y Axis"))
       title = "Basic LineChart"
       data() += series
-    }
-  }
-}

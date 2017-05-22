@@ -1,4 +1,4 @@
-trait Universe {
+trait Universe
   type Tree
 
   type SymTree <: Tree
@@ -7,12 +7,10 @@ trait Universe {
 
   type Ident <: RefTree
   type Select <: RefTree
-}
 
-object Test extends App {
+object Test extends App
   val universe: Universe = null
   import universe._
   def select: Select = ???
   def ident: Ident = ???
   List(select, ident)
-}

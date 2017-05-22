@@ -9,7 +9,7 @@
 package org.scalajs.core.tools.logging
 
 /** Abstract logger for our tools. Designed after sbt's Loggers. */
-trait Logger {
+trait Logger
   def log(level: Level, message: => String): Unit
   def success(message: => String): Unit
   def trace(t: => Throwable): Unit
@@ -22,12 +22,10 @@ trait Logger {
   def time(title: String, nanos: Long): Unit =
     debug(s"$title: ${nanos / 1000} us")
 
-  final def time[A](title: String)(body: => A): A = {
+  final def time[A](title: String)(body: => A): A =
     val startTime = System.nanoTime()
     val result = body
     val endTime = System.nanoTime()
     val elapsedTime = endTime - startTime
     time(title, elapsedTime)
     result
-  }
-}

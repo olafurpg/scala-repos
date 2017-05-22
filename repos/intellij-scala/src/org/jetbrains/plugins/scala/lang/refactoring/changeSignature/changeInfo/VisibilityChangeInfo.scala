@@ -7,24 +7,20 @@ import com.intellij.psi.PsiModifier
   * Nikolay.Tropin
   * 2014-08-29
   */
-private[changeInfo] trait VisibilityChangeInfo {
+private[changeInfo] trait VisibilityChangeInfo
   this: ScalaChangeInfo =>
 
-  def getNewVisibility: String = {
+  def getNewVisibility: String =
     if (newVisibility != null) scalaToJavaVisibility(newVisibility)
     else oldVisibility
-  }
 
   def isVisibilityChanged: Boolean = oldVisibility != newVisibility
 
-  def oldVisibility: String = {
+  def oldVisibility: String =
     function.getModifierList.accessModifier.fold("")(_.getText)
-  }
 
-  private def scalaToJavaVisibility(scalaModifier: String): String = {
+  private def scalaToJavaVisibility(scalaModifier: String): String =
     //todo more correct transformation
     if (scalaModifier == "") PsiModifier.PUBLIC
     else if (scalaModifier.startsWith("protected")) PsiModifier.PROTECTED
     else PsiModifier.PRIVATE
-  }
-}

@@ -41,25 +41,23 @@ import scalafx.scene.control.{TableColumn, TableView}
 /**
   * Example of using `CheckBoxTableCell` in `TableView`.
   */
-object CheckBoxTableCellDemo extends JFXApp {
+object CheckBoxTableCellDemo extends JFXApp
 
-  class Item(selected_ : Boolean, name_ : String) {
+  class Item(selected_ : Boolean, name_ : String)
     val selected = new BooleanProperty(this, "selected", selected_)
     val name = new StringProperty(this, "name", name_)
-  }
 
   val data = ObservableBuffer[Item](
-      (1 to 10).map { i =>
+      (1 to 10).map  i =>
         new Item(i % 2 == 0, s"Item $i")
-      }
   )
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Example of a Table View with Check Boxes"
-    scene = new Scene {
-      root = new TableView[Item](data) {
+    scene = new Scene
+      root = new TableView[Item](data)
         columns ++= List(
-            new TableColumn[Item, java.lang.Boolean] {
+            new TableColumn[Item, java.lang.Boolean]
               text = "Selected"
               // We need to explicitly cast `_.value.selected` to modify boolean type parameters.
               // `scala.Boolean` type is different from `java.lang.Boolean`, but eventually represented the same way
@@ -70,15 +68,10 @@ object CheckBoxTableCellDemo extends JFXApp {
               cellFactory = CheckBoxTableCell.forTableColumn(this)
               editable = true
               prefWidth = 180
-            },
-            new TableColumn[Item, String] {
+            ,
+            new TableColumn[Item, String]
               text = "Name"
               cellValueFactory = { _.value.name }
               prefWidth = 180
-            }
         )
         editable = true
-      }
-    }
-  }
-}

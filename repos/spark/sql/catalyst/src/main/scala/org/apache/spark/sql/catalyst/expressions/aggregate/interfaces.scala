@@ -60,11 +60,10 @@ private[sql] case object Complete extends AggregateMode
   * A place holder expressions used in code-gen, it does not change the corresponding value
   * in the row.
   */
-private[sql] case object NoOp extends Expression with Unevaluable {
+private[sql] case object NoOp extends Expression with Unevaluable
   override def nullable: Boolean = true
   override def dataType: DataType = NullType
   override def children: Seq[Expression] = Nil
-}
 
 /**
   * A container for an [[AggregateFunction]] with its [[AggregateMode]] and a field
@@ -74,27 +73,24 @@ private[sql] case class AggregateExpression(
     aggregateFunction: AggregateFunction,
     mode: AggregateMode,
     isDistinct: Boolean)
-    extends Expression with Unevaluable {
+    extends Expression with Unevaluable
 
   override def children: Seq[Expression] = aggregateFunction :: Nil
   override def dataType: DataType = aggregateFunction.dataType
   override def foldable: Boolean = false
   override def nullable: Boolean = aggregateFunction.nullable
 
-  override def references: AttributeSet = {
-    val childReferences = mode match {
+  override def references: AttributeSet =
+    val childReferences = mode match
       case Partial | Complete => aggregateFunction.references.toSeq
       case PartialMerge | Final => aggregateFunction.aggBufferAttributes
-    }
 
     AttributeSet(childReferences)
-  }
 
   override def toString: String =
     s"($aggregateFunction,mode=$mode,isDistinct=$isDistinct)"
 
   override def sql: String = aggregateFunction.sql(isDistinct)
-}
 
 /**
   * AggregateFunction is the superclass of two aggregation function interfaces:
@@ -114,7 +110,7 @@ private[sql] case class AggregateExpression(
   * aggregate functions.
   */
 sealed abstract class AggregateFunction
-    extends Expression with ImplicitCastInputTypes {
+    extends Expression with ImplicitCastInputTypes
 
   /** An aggregate function is not foldable. */
   final override def foldable: Boolean = false
@@ -162,16 +158,13 @@ sealed abstract class AggregateFunction
     * An [[AggregateFunction]] should not be used without being wrapped in
     * an [[AggregateExpression]].
     */
-  def toAggregateExpression(isDistinct: Boolean): AggregateExpression = {
+  def toAggregateExpression(isDistinct: Boolean): AggregateExpression =
     AggregateExpression(
         aggregateFunction = this, mode = Complete, isDistinct = isDistinct)
-  }
 
-  def sql(isDistinct: Boolean): String = {
+  def sql(isDistinct: Boolean): String =
     val distinct = if (isDistinct) "DISTINCT " else ""
     s"$prettyName($distinct${children.map(_.sql).mkString(", ")})"
-  }
-}
 
 /**
   * API for aggregation functions that are expressed in terms of imperative initialize(), update(),
@@ -192,7 +185,7 @@ sealed abstract class AggregateFunction
   * and `inputAggBufferAttributes`.
   */
 abstract class ImperativeAggregate
-    extends AggregateFunction with CodegenFallback {
+    extends AggregateFunction with CodegenFallback
 
   /**
     * The offset of this function's first buffer value in the underlying shared mutable aggregation
@@ -282,7 +275,6 @@ abstract class ImperativeAggregate
     * Use `fieldNumber + inputAggBufferOffset` to access fields of `inputAggBuffer`.
     */
   def merge(mutableAggBuffer: MutableRow, inputAggBuffer: InternalRow): Unit
-}
 
 /**
   * API for aggregation functions that are expressed in terms of Catalyst expressions.
@@ -298,7 +290,7 @@ abstract class ImperativeAggregate
   * those fields `lazy val`s.
   */
 abstract class DeclarativeAggregate
-    extends AggregateFunction with Serializable with Unevaluable {
+    extends AggregateFunction with Serializable with Unevaluable
 
   /**
     * Expressions for initializing empty aggregation buffers.
@@ -338,7 +330,7 @@ abstract class DeclarativeAggregate
     * of an [[AttributeReference]] `a` has two functions `left` and `right`,
     * which represent `a` in `bufferLeft` and `bufferRight`, respectively.
     */
-  implicit class RichAttribute(a: AttributeReference) {
+  implicit class RichAttribute(a: AttributeReference)
 
     /** Represents this attribute at the mutable buffer side. */
     def left: AttributeReference = a
@@ -346,5 +338,3 @@ abstract class DeclarativeAggregate
     /** Represents this attribute at the input buffer side (the data value is read-only). */
     def right: AttributeReference =
       inputAggBufferAttributes(aggBufferAttributes.indexOf(a))
-  }
-}

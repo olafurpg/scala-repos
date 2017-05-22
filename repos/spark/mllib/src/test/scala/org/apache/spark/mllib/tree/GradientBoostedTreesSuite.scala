@@ -32,10 +32,10 @@ import org.apache.spark.util.Utils
   * Test suite for [[GradientBoostedTrees]].
   */
 class GradientBoostedTreesSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Logging {
+    extends SparkFunSuite with MLlibTestSparkContext with Logging
 
-  test("Regression with continuous features: SquaredError") {
-    GradientBoostedTreesSuite.testCombinations.foreach {
+  test("Regression with continuous features: SquaredError")
+    GradientBoostedTreesSuite.testCombinations.foreach
       case (numIterations, learningRate, subsamplingRate) =>
         val rdd = sc.parallelize(GradientBoostedTreesSuite.data, 2)
 
@@ -50,16 +50,15 @@ class GradientBoostedTreesSuite
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
-        try {
+        try
           EnsembleTestHelper.validateRegressor(
               gbt, GradientBoostedTreesSuite.data, 0.06)
-        } catch {
+        catch
           case e: java.lang.AssertionError =>
             logError(
                 s"FAILED for numIterations=$numIterations, learningRate=$learningRate," +
                 s" subsamplingRate=$subsamplingRate")
             throw e
-        }
 
         val remappedInput =
           rdd.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
@@ -67,11 +66,9 @@ class GradientBoostedTreesSuite
 
         // Make sure trees are the same.
         assert(gbt.trees.head.toString == dt.toString)
-    }
-  }
 
-  test("Regression with continuous features: Absolute Error") {
-    GradientBoostedTreesSuite.testCombinations.foreach {
+  test("Regression with continuous features: Absolute Error")
+    GradientBoostedTreesSuite.testCombinations.foreach
       case (numIterations, learningRate, subsamplingRate) =>
         val rdd = sc.parallelize(GradientBoostedTreesSuite.data, 2)
 
@@ -86,16 +83,15 @@ class GradientBoostedTreesSuite
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
-        try {
+        try
           EnsembleTestHelper.validateRegressor(
               gbt, GradientBoostedTreesSuite.data, 0.85, "mae")
-        } catch {
+        catch
           case e: java.lang.AssertionError =>
             logError(
                 s"FAILED for numIterations=$numIterations, learningRate=$learningRate," +
                 s" subsamplingRate=$subsamplingRate")
             throw e
-        }
 
         val remappedInput =
           rdd.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
@@ -103,11 +99,9 @@ class GradientBoostedTreesSuite
 
         // Make sure trees are the same.
         assert(gbt.trees.head.toString == dt.toString)
-    }
-  }
 
-  test("Binary classification with continuous features: Log Loss") {
-    GradientBoostedTreesSuite.testCombinations.foreach {
+  test("Binary classification with continuous features: Log Loss")
+    GradientBoostedTreesSuite.testCombinations.foreach
       case (numIterations, learningRate, subsamplingRate) =>
         val rdd = sc.parallelize(GradientBoostedTreesSuite.data, 2)
 
@@ -123,16 +117,15 @@ class GradientBoostedTreesSuite
         val gbt = GradientBoostedTrees.train(rdd, boostingStrategy)
 
         assert(gbt.trees.size === numIterations)
-        try {
+        try
           EnsembleTestHelper.validateClassifier(
               gbt, GradientBoostedTreesSuite.data, 0.9)
-        } catch {
+        catch
           case e: java.lang.AssertionError =>
             logError(
                 s"FAILED for numIterations=$numIterations, learningRate=$learningRate," +
                 s" subsamplingRate=$subsamplingRate")
             throw e
-        }
 
         val remappedInput =
           rdd.map(x => new LabeledPoint((x.label * 2) - 1, x.features))
@@ -143,18 +136,14 @@ class GradientBoostedTreesSuite
 
         // Make sure trees are the same.
         assert(gbt.trees.head.toString == dt.toString)
-    }
-  }
 
   test(
-      "SPARK-5496: BoostingStrategy.defaultParams should recognize Classification") {
+      "SPARK-5496: BoostingStrategy.defaultParams should recognize Classification")
     for (algo <- Seq(
-        "classification", "Classification", "regression", "Regression")) {
+        "classification", "Classification", "regression", "Regression"))
       BoostingStrategy.defaultParams(algo)
-    }
-  }
 
-  test("model save/load") {
+  test("model save/load")
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
 
@@ -162,27 +151,23 @@ class GradientBoostedTreesSuite
       Range(0, 3).map(_ => DecisionTreeSuite.createModel(Regression)).toArray
     val treeWeights = Array(0.1, 0.3, 1.1)
 
-    Array(Classification, Regression).foreach { algo =>
+    Array(Classification, Regression).foreach  algo =>
       val model = new GradientBoostedTreesModel(algo, trees, treeWeights)
 
       // Save model, load it back, and compare.
-      try {
+      try
         model.save(sc, path)
         val sameModel = GradientBoostedTreesModel.load(sc, path)
         assert(model.algo == sameModel.algo)
-        model.trees.zip(sameModel.trees).foreach {
+        model.trees.zip(sameModel.trees).foreach
           case (treeA, treeB) =>
             DecisionTreeSuite.checkEqual(treeA, treeB)
-        }
         assert(model.treeWeights === sameModel.treeWeights)
-      } finally {
+      finally
         Utils.deleteRecursively(tempDir)
-      }
-    }
-  }
 
   test(
-      "runWithValidation stops early and performs better on a validation dataset") {
+      "runWithValidation stops early and performs better on a validation dataset")
     // Set numIterations large enough so that it stops early.
     val numIterations = 20
     val trainRdd = sc.parallelize(GradientBoostedTreesSuite.trainData, 2)
@@ -190,7 +175,7 @@ class GradientBoostedTreesSuite
 
     val algos = Array(Regression, Regression, Classification)
     val losses = Array(SquaredError, AbsoluteError, LogLoss)
-    algos.zip(losses).foreach {
+    algos.zip(losses).foreach
       case (algo, loss) =>
         val treeStrategy = new Strategy(algo = algo,
                                         impurity = Variance,
@@ -205,17 +190,15 @@ class GradientBoostedTreesSuite
 
         // Test that it performs better on the validation dataset.
         val gbt = new GradientBoostedTrees(boostingStrategy).run(trainRdd)
-        val (errorWithoutValidation, errorWithValidation) = {
-          if (algo == Classification) {
+        val (errorWithoutValidation, errorWithValidation) =
+          if (algo == Classification)
             val remappedRdd = validateRdd.map(
                 x => new LabeledPoint(2 * x.label - 1, x.features))
             (loss.computeError(gbt, remappedRdd),
              loss.computeError(gbtValidate, remappedRdd))
-          } else {
+          else
             (loss.computeError(gbt, validateRdd),
              loss.computeError(gbtValidate, validateRdd))
-          }
-        }
         assert(errorWithValidation <= errorWithoutValidation)
 
         // Test that results from evaluateEachIteration comply with runWithValidation.
@@ -224,14 +207,11 @@ class GradientBoostedTreesSuite
         assert(evaluationArray.length === numIterations)
         assert(evaluationArray(numTrees) > evaluationArray(numTrees - 1))
         var i = 1
-        while (i < numTrees) {
+        while (i < numTrees)
           assert(evaluationArray(i) <= evaluationArray(i - 1))
           i += 1
-        }
-    }
-  }
 
-  test("Checkpointing") {
+  test("Checkpointing")
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
     sc.setCheckpointDir(path)
@@ -250,10 +230,8 @@ class GradientBoostedTreesSuite
 
     sc.checkpointDir = None
     Utils.deleteRecursively(tempDir)
-  }
-}
 
-private object GradientBoostedTreesSuite {
+private object GradientBoostedTreesSuite
 
   // Combinations for estimators, learning rates and subsamplingRate
   val testCombinations = Array(
@@ -265,4 +243,3 @@ private object GradientBoostedTreesSuite {
     EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 120)
   val validateData =
     EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 80)
-}

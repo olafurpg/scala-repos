@@ -2,7 +2,7 @@ package org.scalatra
 
 import org.scalatra.test.specs2.ScalatraSpec
 
-class HeadSpec extends ScalatraSpec {
+class HeadSpec extends ScalatraSpec
   def is =
     s2"""
 A HEAD request should"
@@ -13,14 +13,10 @@ A HEAD request should"
 
   def noBody = head("/") { response.body must_== "" }
 
-  def preserveHeaders = head("/") {
+  def preserveHeaders = head("/")
     header("X-Powered-By") must_== "caffeine"
-  }
-}
 
-class HeadSpecServlet extends ScalatraServlet {
-  get("/") {
+class HeadSpecServlet extends ScalatraServlet
+  get("/")
     response.addHeader("X-Powered-By", "caffeine")
     "poof -- watch me disappear"
-  }
-}

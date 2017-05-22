@@ -21,21 +21,19 @@ import kafka.server.KafkaConfig
 import kafka.utils.{TestUtils, ZkUtils}
 import org.junit.Test
 
-class ZkNodeChangeNotificationListenerTest extends KafkaServerTestHarness {
+class ZkNodeChangeNotificationListenerTest extends KafkaServerTestHarness
 
   override def generateConfigs() =
     List(KafkaConfig.fromProps(TestUtils.createBrokerConfig(0, zkConnect)))
 
   @Test
-  def testProcessNotification() {
+  def testProcessNotification()
     @volatile var notification: String = null
     @volatile var invocationCount = 0
-    val notificationHandler = new NotificationHandler {
-      override def processNotification(notificationMessage: String): Unit = {
+    val notificationHandler = new NotificationHandler
+      override def processNotification(notificationMessage: String): Unit =
         notification = notificationMessage
         invocationCount += 1
-      }
-    }
 
     val seqNodeRoot = "/root"
     val seqNodePrefix = "prefix"
@@ -67,5 +65,3 @@ class ZkNodeChangeNotificationListenerTest extends KafkaServerTestHarness {
     TestUtils.waitUntilTrue(
         () => invocationCount == 2 && notification == notificationMessage2,
         "failed to send/process notification message in the timeout period.")
-  }
-}

@@ -26,9 +26,9 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object BinaryClassificationMetricsExample {
+object BinaryClassificationMetricsExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     val conf = new SparkConf().setAppName("BinaryClassificationMetricsExample")
     val sc = new SparkContext(conf)
@@ -49,45 +49,40 @@ object BinaryClassificationMetricsExample {
     model.clearThreshold
 
     // Compute raw scores on the test set
-    val predictionAndLabels = test.map {
+    val predictionAndLabels = test.map
       case LabeledPoint(label, features) =>
         val prediction = model.predict(features)
         (prediction, label)
-    }
 
     // Instantiate metrics object
     val metrics = new BinaryClassificationMetrics(predictionAndLabels)
 
     // Precision by threshold
     val precision = metrics.precisionByThreshold
-    precision.foreach {
+    precision.foreach
       case (t, p) =>
         println(s"Threshold: $t, Precision: $p")
-    }
 
     // Recall by threshold
     val recall = metrics.recallByThreshold
-    recall.foreach {
+    recall.foreach
       case (t, r) =>
         println(s"Threshold: $t, Recall: $r")
-    }
 
     // Precision-Recall Curve
     val PRC = metrics.pr
 
     // F-measure
     val f1Score = metrics.fMeasureByThreshold
-    f1Score.foreach {
+    f1Score.foreach
       case (t, f) =>
         println(s"Threshold: $t, F-score: $f, Beta = 1")
-    }
 
     val beta = 0.5
     val fScore = metrics.fMeasureByThreshold(beta)
-    f1Score.foreach {
+    f1Score.foreach
       case (t, f) =>
         println(s"Threshold: $t, F-score: $f, Beta = 0.5")
-    }
 
     // AUPRC
     val auPRC = metrics.areaUnderPR
@@ -103,6 +98,4 @@ object BinaryClassificationMetricsExample {
     val auROC = metrics.areaUnderROC
     println("Area under ROC = " + auROC)
     // $example off$
-  }
-}
 // scalastyle:on println

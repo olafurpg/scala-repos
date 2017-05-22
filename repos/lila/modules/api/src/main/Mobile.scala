@@ -4,9 +4,9 @@ import org.joda.time.DateTime
 import play.api.http.HeaderNames
 import play.api.mvc.RequestHeader
 
-object Mobile {
+object Mobile
 
-  object Api {
+  object Api
 
     case class Old(version: Int,
                    // date when a newer version was released
@@ -26,22 +26,17 @@ object Mobile {
 
     private val PathPattern = """^.+/socket/v(\d+)$""".r
 
-    def requestVersion(req: RequestHeader): Option[Int] = {
+    def requestVersion(req: RequestHeader): Option[Int] =
       val accepts = ~req.headers.get(HeaderNames.ACCEPT)
       if (accepts contains "application/vnd.lichess.v1+json") some(1)
       else
-        req.path match {
+        req.path match
           case PathPattern(version) => parseIntOption(version)
           case _ => None
-        }
-    }
 
     def requested(req: RequestHeader) = requestVersion(req).isDefined
-  }
 
-  object App {
+  object App
 
     val currentVersion =
       lila.common.PlayApp.loadConfig getString "mobile.app.version"
-  }
-}

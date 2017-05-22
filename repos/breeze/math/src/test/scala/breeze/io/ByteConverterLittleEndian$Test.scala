@@ -7,9 +7,9 @@ import spire.math.ULong
 /**
   * Created by Kenta on 12/10/13.
   */
-class ByteConverterLittleEndian$Test extends FunSuite {
+class ByteConverterLittleEndian$Test extends FunSuite
 
-  test("Int16") {
+  test("Int16")
     var valueS: Short = -32768
     var ba = int16ToBytes(valueS)
     assert(ba.length == 2)
@@ -26,9 +26,8 @@ class ByteConverterLittleEndian$Test extends FunSuite {
 //    valueS = -32769
 //    ba = int16ToBytes( valueS )
 //    assert(valueS == bytesToInt16(ba(0), ba(1)))
-  }
 
-  test("UInt16") {
+  test("UInt16")
     var valueC: Char = 0
     var ba = uInt16ToBytes(valueC)
     assert(ba.length == 2)
@@ -45,9 +44,8 @@ class ByteConverterLittleEndian$Test extends FunSuite {
 //    valueC = 65536 //-1
 //    ba = uInt16ToBytes( valueC )
 //    assert(valueC == bytesToUInt16(ba(0), ba(1)))
-  }
 
-  test("Int32") {
+  test("Int32")
     var valueI: Int = -2147483648
     var ba = int32ToBytes(valueI)
     assert(ba.length == 4)
@@ -65,9 +63,8 @@ class ByteConverterLittleEndian$Test extends FunSuite {
 //    println(valueI)
 //    ba = int32ToBytes( valueI )
 //    assert(valueI == bytesToInt32(ba(0), ba(1), ba(2), ba(3)))
-  }
 
-  test("UInt32") {
+  test("UInt32")
     var valueL: Long = 0L
     var ba = uInt32ToBytes(valueL)
     assert(ba.length == 4)
@@ -84,9 +81,8 @@ class ByteConverterLittleEndian$Test extends FunSuite {
 //    valueL = -1 //+= 1L
 //    ba = uInt32ToBytes( valueL )
 //    assert(valueL == bytesToUInt32(ba(0), ba(1), ba(2), ba(3)))
-  }
 
-  test("Int64") {
+  test("Int64")
     var valueL: Long = 0L
     var ba = int64ToBytes(valueL)
     assert(ba.length == 8)
@@ -102,9 +98,8 @@ class ByteConverterLittleEndian$Test extends FunSuite {
     ba = int64ToBytes(valueL)
     assert(valueL == bytesToInt64(
             ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7)))
-  }
 
-  test("UInt64") {
+  test("UInt64")
     var valueL: ULong = ULong(0L)
     var ba = uInt64ToBytes(valueL)
     assert(ba.length == 8)
@@ -131,9 +126,8 @@ class ByteConverterLittleEndian$Test extends FunSuite {
     ba = uInt64ToBytes(valueL)
     assert(valueL == bytesToUInt64(
             ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7)))
-  }
 
-  test("UInt64Shifted") {
+  test("UInt64Shifted")
     var valueL: Long = 0L
     var ba = uInt64ShiftedToBytes(valueL)
     assert(ba.length == 8)
@@ -149,5 +143,3 @@ class ByteConverterLittleEndian$Test extends FunSuite {
     ba = uInt64ShiftedToBytes(valueL)
     assert(valueL == bytesToUInt64Shifted(
             ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7)))
-  }
-}

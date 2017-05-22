@@ -21,7 +21,7 @@ package org.apache.spark
   * A client that communicates with the cluster manager to request or kill executors.
   * This is currently supported only in YARN mode.
   */
-private[spark] trait ExecutorAllocationClient {
+private[spark] trait ExecutorAllocationClient
 
   /**
     * Update the cluster manager on our scheduling needs. Three bits of information are included
@@ -60,4 +60,3 @@ private[spark] trait ExecutorAllocationClient {
     */
   def killExecutor(executorId: String): Boolean =
     killExecutors(Seq(executorId))
-}

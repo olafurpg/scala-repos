@@ -3,22 +3,21 @@ import scala.reflect.runtime.{universe => ru}
 import scala.reflect.runtime.{currentMirror => cm}
 import scala.tools.reflect.{ToolBox, mkConsoleFrontEnd}
 
-object Test extends App {
+object Test extends App
   //val oldErr = Console.err;
   val baos = new java.io.ByteArrayOutputStream()
   val errs = new java.io.PrintStream(baos)
-  (Console withErr errs) {
+  (Console withErr errs)
     val toolbox =
       cm.mkToolBox(frontEnd = mkConsoleFrontEnd(), options = "-deprecation")
     toolbox.eval(
-        reify {
-      object Utils {
+        reify
+      object Utils
         @deprecated("test", "2.10.0")
         def foo { println("hello") }
-      }
 
       Utils.foo
-    }.tree)
+    .tree)
     println("============compiler console=============")
     errs.flush()
     println(baos.toString);
@@ -26,5 +25,3 @@ object Test extends App {
     println("============compiler messages============")
     toolbox.frontEnd.infos.foreach(println(_))
     println("=========================================")
-  }
-}

@@ -29,10 +29,10 @@ import cascading.tap.partition.Partition
 
 import com.twitter.scalding.{PartitionedTsv => StandardPartitionedTsv, _}
 
-object PartitionSourceTestHelpers {
+object PartitionSourceTestHelpers
   import Dsl._
 
-  class CustomPartition(val partitionFields: Fields) extends Partition {
+  class CustomPartition(val partitionFields: Fields) extends Partition
 
     def getPartitionFields(): Fields = partitionFields
     def getPathDepth(): Int = 1
@@ -43,7 +43,6 @@ object PartitionSourceTestHelpers {
 
     def toTuple(partition: String, tupleEntry: TupleEntry): Unit =
       throw new RuntimeException("toTuple for reading not implemented")
-  }
 
   // Define once, here, otherwise testMode.getWritePathFor() won't work
   val DelimitedPartitionedTsv = StandardPartitionedTsv("base", "/", 'col1)
@@ -55,49 +54,41 @@ object PartitionSourceTestHelpers {
       SinkMode.REPLACE)
   val PartialPartitionedTsv = StandardPartitionedTsv(
       "base", "/", ('col1, 'col2), false, ('col1, 'col3))
-}
 
-class DelimitedPartitionTestJob(args: Args) extends Job(args) {
+class DelimitedPartitionTestJob(args: Args) extends Job(args)
   import PartitionSourceTestHelpers._
-  try {
+  try
     Tsv("input", ('col1, 'col2)).read.write(DelimitedPartitionedTsv)
-  } catch {
+  catch
     case e: Exception => e.printStackTrace()
-  }
-}
 
-class CustomPartitionTestJob(args: Args) extends Job(args) {
+class CustomPartitionTestJob(args: Args) extends Job(args)
   import PartitionSourceTestHelpers._
-  try {
+  try
     Tsv("input", ('col1, 'col2, 'col3)).read.write(CustomPartitionedTsv)
-  } catch {
+  catch
     case e: Exception => e.printStackTrace()
-  }
-}
 
-class PartialPartitionTestJob(args: Args) extends Job(args) {
+class PartialPartitionTestJob(args: Args) extends Job(args)
   import PartitionSourceTestHelpers._
 
-  try {
+  try
     Tsv("input", ('col1, 'col2, 'col3)).read.write(PartialPartitionedTsv)
-  } catch {
+  catch
     case e: Exception => e.printStackTrace()
-  }
-}
 
-class DelimitedPartitionSourceTest extends WordSpec with Matchers {
+class DelimitedPartitionSourceTest extends WordSpec with Matchers
   import Dsl._
   import PartitionSourceTestHelpers._
-  "PartitionedTsv fed a DelimitedPartition" should {
-    "split output by the delimited path" in {
+  "PartitionedTsv fed a DelimitedPartition" should
+    "split output by the delimited path" in
       val input = Seq(("A", 1), ("A", 2), ("B", 3))
 
       // Need to save the job to allow, find the temporary directory data was written to
       var job: Job = null;
-      def buildJob(args: Args): Job = {
+      def buildJob(args: Args): Job =
         job = new DelimitedPartitionTestJob(args)
         job
-      }
 
       JobTest(buildJob(_))
         .source(Tsv("input", ('col1, 'col2)), input)
@@ -118,23 +109,19 @@ class DelimitedPartitionSourceTest extends WordSpec with Matchers {
 
       aSource.getLines.toSeq shouldBe Seq("A\t1", "A\t2")
       bSource.getLines.toSeq shouldBe Seq("B\t3")
-    }
-  }
-}
 
-class CustomPartitionSourceTest extends WordSpec with Matchers {
+class CustomPartitionSourceTest extends WordSpec with Matchers
   import Dsl._
   import PartitionSourceTestHelpers._
-  "PartitionedTsv fed a CustomPartition" should {
-    "split output by the custom path" in {
+  "PartitionedTsv fed a CustomPartition" should
+    "split output by the custom path" in
       val input = Seq(("A", "x", 1), ("A", "x", 2), ("B", "y", 3))
 
       // Need to save the job to allow, find the temporary directory data was written to
       var job: Job = null;
-      def buildJob(args: Args): Job = {
+      def buildJob(args: Args): Job =
         job = new CustomPartitionTestJob(args)
         job
-      }
 
       JobTest(buildJob(_))
         .source(Tsv("input", ('col1, 'col2, 'col3)), input)
@@ -155,24 +142,20 @@ class CustomPartitionSourceTest extends WordSpec with Matchers {
 
       aSource.getLines.toSeq shouldBe Seq("A\tx\t1", "A\tx\t2")
       bSource.getLines.toSeq shouldBe Seq("B\ty\t3")
-    }
-  }
-}
 
-class PartialPartitionSourceTest extends WordSpec with Matchers {
+class PartialPartitionSourceTest extends WordSpec with Matchers
   import Dsl._
   import PartitionSourceTestHelpers._
-  "PartitionedTsv fed a DelimitedPartition and only a subset of fields" should {
-    "split output by the delimited path, discarding the unwanted fields" in {
+  "PartitionedTsv fed a DelimitedPartition and only a subset of fields" should
+    "split output by the delimited path, discarding the unwanted fields" in
 
       val input = Seq(("A", "x", 1), ("A", "x", 2), ("B", "y", 3))
 
       // Need to save the job to allow, find the temporary directory data was written to
       var job: Job = null;
-      def buildJob(args: Args): Job = {
+      def buildJob(args: Args): Job =
         job = new PartialPartitionTestJob(args)
         job
-      }
 
       JobTest(buildJob(_))
         .source(Tsv("input", ('col1, 'col2, 'col3)), input)
@@ -192,6 +175,3 @@ class PartialPartitionSourceTest extends WordSpec with Matchers {
 
       aSource.getLines.toSeq shouldBe Seq("A\t1", "A\t2")
       bSource.getLines.toSeq shouldBe Seq("B\t3")
-    }
-  }
-}

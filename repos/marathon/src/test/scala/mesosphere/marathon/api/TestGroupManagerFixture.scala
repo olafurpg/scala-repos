@@ -13,7 +13,7 @@ import mesosphere.util.{CapConcurrentExecutions, CapConcurrentExecutionsMetrics}
 
 import scala.concurrent.duration._
 
-class TestGroupManagerFixture extends Mockito with MarathonActorSupport {
+class TestGroupManagerFixture extends Mockito with MarathonActorSupport
   val service = mock[MarathonSchedulerService]
   val appRepository = mock[AppRepository]
   val groupRepository = mock[GroupRepository]
@@ -47,4 +47,3 @@ class TestGroupManagerFixture extends Mockito with MarathonActorSupport {
       config = config,
       eventBus = eventBus
   )
-}

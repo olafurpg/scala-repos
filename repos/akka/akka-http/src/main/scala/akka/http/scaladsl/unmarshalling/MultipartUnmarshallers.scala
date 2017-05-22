@@ -24,7 +24,7 @@ import akka.stream.impl.fusing.SubSource
   * Provides [[akka.http.scaladsl.model.Multipart]] marshallers.
   * It is possible to configure the default parsing mode by providing an implicit [[akka.http.scaladsl.settings.ParserSettings]] instance.
   */
-trait MultipartUnmarshallers {
+trait MultipartUnmarshallers
 
   implicit def defaultMultipartGeneralUnmarshaller(
       implicit log: LoggingAdapter = NoLogging,
@@ -104,10 +104,10 @@ trait MultipartUnmarshallers {
       createStrict: (MediaType.Multipart, immutable.Seq[BPS]) ⇒ T)(
       implicit log: LoggingAdapter = NoLogging,
       parserSettings: ParserSettings = null): FromEntityUnmarshaller[T] =
-    Unmarshaller.withMaterializer { implicit ec ⇒ mat => entity ⇒
+    Unmarshaller.withMaterializer  implicit ec ⇒ mat => entity ⇒
       if (entity.contentType.mediaType.isMultipart &&
-          mediaRange.matches(entity.contentType.mediaType)) {
-        entity.contentType.mediaType.params.get("boundary") match {
+          mediaRange.matches(entity.contentType.mediaType))
+        entity.contentType.mediaType.params.get("boundary") match
           case None ⇒
             FastFuture.failed(new RuntimeException(
                     "Content-Type with a multipart media type must have a 'boundary' parameter"))
@@ -117,8 +117,8 @@ trait MultipartUnmarshallers {
                 ParserSettings(ActorMaterializer.downcast(mat).system))
             val parser = new BodyPartParser(
                 defaultContentType, boundary, log, effectiveParserSettings)
-            FastFuture.successful {
-              entity match {
+            FastFuture.successful
+              entity match
                 case HttpEntity.Strict(
                     ContentType(mediaType: MediaType.Multipart, _), data) ⇒
                   val builder = new VectorBuilder[BPS]()
@@ -126,22 +126,20 @@ trait MultipartUnmarshallers {
                     new IteratorInterpreter[ByteString, BodyPartParser.Output](
                         Iterator.single(data), List(parser)).iterator
                   // note that iter.next() will throw exception if stream fails
-                  iter.foreach {
+                  iter.foreach
                     case BodyPartStart(headers, createEntity) ⇒
-                      val entity = createEntity(Source.empty) match {
+                      val entity = createEntity(Source.empty) match
                         case x: HttpEntity.Strict ⇒ x
                         case x ⇒
                           throw new IllegalStateException(
                               "Unexpected entity type from strict BodyPartParser: " +
                               x)
-                      }
                       builder += createStrictBodyPart(entity, headers)
                     case ParseError(errorInfo) ⇒
                       throw ParsingException(errorInfo)
                     case x ⇒
                       throw new IllegalStateException(
                           s"Unexpected BodyPartParser result $x in strict case")
-                  }
                   createStrict(mediaType, builder.result())
                 case _ ⇒
                   val bodyParts = entity.dataBytes
@@ -149,25 +147,19 @@ trait MultipartUnmarshallers {
                     .splitWhen(_.isInstanceOf[PartStart])
                     .buffer(100, OverflowStrategy.backpressure) // FIXME remove (#19240)
                     .prefixAndTail(1)
-                    .collect {
+                    .collect
                       case (Seq(BodyPartStart(headers, createEntity)),
                             entityParts) ⇒
                         createBodyPart(createEntity(entityParts), headers)
                       case (Seq(ParseError(errorInfo)), rest) ⇒
                         SubSource.kill(rest)
                         throw ParsingException(errorInfo)
-                    }
                     .concatSubstreams
                   createStreamed(entity.contentType.mediaType
                                    .asInstanceOf[MediaType.Multipart],
                                  bodyParts)
-              }
-            }
-        }
-      } else
+      else
         FastFuture.failed(
             Unmarshaller.UnsupportedContentTypeException(mediaRange))
-    }
-}
 
 object MultipartUnmarshallers extends MultipartUnmarshallers

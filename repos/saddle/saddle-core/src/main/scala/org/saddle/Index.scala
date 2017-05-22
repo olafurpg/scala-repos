@@ -29,7 +29,7 @@ import org.saddle.time.RRule
   * Index provides a constant-time look-up of a value within array-backed storage,
   * as well as operations to support joining and slicing.
   */
-trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
+trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable
   protected def locator: Locator[T]
 
   /**
@@ -61,10 +61,9 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * Retrieve an element of the index at a particular offset
     * @param loc Offset into index
     */
-  def at(loc: Int): Scalar[T] = {
+  def at(loc: Int): Scalar[T] =
     implicit val tag = scalarTag
     raw(loc)
-  }
 
   /**
     * Retrieve several elements from the index at provided offets
@@ -84,21 +83,18 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * exist.
     * @param keys Sequence of keys to find
     */
-  def apply(keys: T*): Array[Int] = {
+  def apply(keys: T*): Array[Int] =
     val szhint = keys.length
     val result = Buffer[Int](szhint)
     var i = 0
-    while (i < szhint) {
+    while (i < szhint)
       val elems = get(keys(i))
       var k = 0
-      while (k < elems.length) {
+      while (k < elems.length)
         result.add(elems(k))
         k += 1
-      }
       i += 1
-    }
     result
-  }
 
   /**
     * Given an array of keys, return the sequence of locations in the index
@@ -169,10 +165,9 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * upper keys.
     * @param rng An instance of
     */
-  def sliceBy(rng: Slice[T]): Index[T] = {
+  def sliceBy(rng: Slice[T]): Index[T] =
     val (a, b) = rng(this)
     slice(a, b)
-  }
 
   /**
     * Returns a slice of Index between two integers, including the `from` bound,
@@ -219,49 +214,42 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * Get last integer offset of a key
     * @param key Key to find in index
     */
-  def getLast(key: T): Int = {
+  def getLast(key: T): Int =
     val loc = getFirst(key)
     if (loc == -1) -1
-    else if (isContiguous) {
+    else if (isContiguous)
       loc + locator.count(key) - 1
-    } else {
+    else
       var i = loc + 1
       var c = locator.count(key)
-      while (c > 1 && i < length) {
+      while (c > 1 && i < length)
         if (raw(i) == key) c -= 1
         i += 1
-      }
       i - 1
-    }
-  }
 
   /**
     * Get location offsets within Index given a particular key
     * @param key Key with which to search
     */
-  def get(key: T): Array[Int] = {
+  def get(key: T): Array[Int] =
     val firstLoc = locator.get(key)
     var count = 0
     if (firstLoc == -1) Array[Int]()
-    else if (isUnique || { count = locator.count(key); 1 == count }) {
+    else if (isUnique || { count = locator.count(key); 1 == count })
       Array(locator.get(key))
-    } else if (isContiguous) {
+    else if (isContiguous)
       array.range(firstLoc, firstLoc + count)
-    } else {
+    else
       val result = Array.ofDim[Int](count)
       var loc = firstLoc
       var i = 0
-      while (loc < length && count != 0) {
-        if (raw(loc) == key) {
+      while (loc < length && count != 0)
+        if (raw(loc) == key)
           result(i) = loc
           i += 1
           count -= 1
-        }
         loc += 1
-      }
       result
-    }
-  }
 
   /**
     * Returns a slice comprised of at most the first n elements of the Index
@@ -346,12 +334,11 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     *
     * @param other The other index with which to generate offsets
     */
-  def getIndexer(other: Index[T]): Option[Array[Int]] = {
+  def getIndexer(other: Index[T]): Option[Array[Int]] =
     val ixer = this.join(other, index.RightJoin)
     require(
         ixer.index.length == other.length, "Could not reindex unambiguously")
     ixer.lTake
-  }
 
   /**
     * Returns true if the index contains at least one entry equal to the provided key
@@ -415,7 +402,7 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     *
     * @param current Key value to find
     */
-  def prev(current: Scalar[T]): Scalar[T] = {
+  def prev(current: Scalar[T]): Scalar[T] =
     implicit val tag = scalarTag
 
     if (!isContiguous)
@@ -423,11 +410,9 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
           "Cannot traverse index that is not contiguous in its values")
 
     val prevSpot = locator.get(current.get) - 1
-    prevSpot match {
+    prevSpot match
       case x if x >= 0 => raw(x)
       case _ => current
-    }
-  }
 
   /**
     * Given a key, return the next value in the Index (in the natural, ie supplied,
@@ -435,7 +420,7 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     *
     * @param current Key value to find
     */
-  def next(current: Scalar[T]): Scalar[T] = {
+  def next(current: Scalar[T]): Scalar[T] =
     implicit val tag = scalarTag
 
     if (!isContiguous)
@@ -443,11 +428,9 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
           "Cannot traverse index that is not contiguous in its values")
 
     val nextSpot = locator.get(current.get) + locator.count(current.get)
-    nextSpot match {
+    nextSpot match
       case x if x < length => raw(x)
       case _ => current
-    }
-  }
 
   /**
     * Map over the elements in the Index, producing a new Index, similar to Map in the
@@ -470,27 +453,23 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
   override def hashCode(): Int = toVec.foldLeft(1)(_ * 31 + _.hashCode())
 
   /** Default equality does an iterative, element-wise equality check of all values. */
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case rv: Index[_] =>
-        (this eq rv) || (this.length == rv.length) && {
+        (this eq rv) || (this.length == rv.length) &&
           var i = 0
           var eq = true
-          while (eq && i < this.length) {
+          while (eq && i < this.length)
             eq &&= raw(i) == rv.raw(i)
             i += 1
-          }
           eq
-        }
       case _ => false
-    }
-  }
 
   /**
     * Creates a string representation of Index
     * @param len Max number of elements to include
     */
-  def stringify(len: Int = 10): String = {
+  def stringify(len: Int = 10): String =
     val half = len / 2
 
     val buf = new StringBuilder()
@@ -502,7 +481,7 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     val sm = scalarTag
 
     if (varr.length == 0) buf append "Empty Index"
-    else {
+    else
       val vlens = util
         .grab(varr, half)
         .map(sm.strList(_))
@@ -510,30 +489,25 @@ trait Index[@spec(Boolean, Int, Long, Double) T] extends Serializable {
 
       buf.append("[Index %d x 1]\n" format (length))
 
-      def createRow(r: Int) = {
+      def createRow(r: Int) =
         val lst = for ((l, v) <- (vlens zip sm.strList(raw(r)))) yield
           v.formatted("%" + l + "s")
         lst.mkString(" ") + "\n"
-      }
 
       buf append util.buildStr(len, length, createRow, " ... \n")
-    }
 
     buf.toString()
-  }
 
   /**
     * Pretty-printer for Index, which simply outputs the result of stringify.
     * @param len Number of elements to display
     */
-  def print(len: Int = 10, stream: OutputStream = System.out) {
+  def print(len: Int = 10, stream: OutputStream = System.out)
     stream.write(stringify(len).getBytes)
-  }
 
   override def toString = stringify()
-}
 
-object Index {
+object Index
 
   /**
     * Factory method to create an index from a Vec of elements
@@ -595,10 +569,9 @@ object Index {
     * @param start The earliest datetime on or after which to being the recurrence
     * @param end   The latest datetime on or before which to end the recurrence
     */
-  def make(rrule: RRule, start: DateTime, end: DateTime): Index[DateTime] = {
+  def make(rrule: RRule, start: DateTime, end: DateTime): Index[DateTime] =
     import time._
     Index((rrule.copy(count = None) withUntil end from start).toSeq: _*)
-  }
 
   /**
     * Factor method to create an empty Index
@@ -627,4 +600,3 @@ object Index {
     * @param err Error message
     */
   case class IndexException(err: String) extends RuntimeException(err)
-}

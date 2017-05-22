@@ -1,4 +1,4 @@
-trait X {
+trait X
   def f = Seq(
       f"a\10c",
       f"a\11c",
@@ -8,8 +8,6 @@ trait X {
       f"a\134c",
       f"a\15151515c"
   )
-}
 
-object Test extends App with X {
+object Test extends App with X
   f foreach println
-}

@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait ApplicativeTests[F[_]] extends ApplyTests[F] {
+trait ApplicativeTests[F[_]] extends ApplyTests[F]
   def laws: ApplicativeLaws[F]
 
   def applicative[A : Arbitrary, B : Arbitrary, C : Arbitrary](
@@ -20,7 +20,7 @@ trait ApplicativeTests[F[_]] extends ApplyTests[F] {
       EqFB: Eq[F[B]],
       EqFC: Eq[F[C]],
       EqFABC: Eq[F[(A, B, C)]],
-      iso: Isomorphisms[F]): RuleSet = {
+      iso: Isomorphisms[F]): RuleSet =
     new DefaultRuleSet(
         name = "applicative",
         parent = Some(apply[A, B, C]),
@@ -36,12 +36,8 @@ trait ApplicativeTests[F[_]] extends ApplyTests[F] {
             (fa: F[A]) => iso.leftIdentity(laws.monoidalLeftIdentity(fa))),
         "monoidal right identity" -> forAll(
             (fa: F[A]) => iso.rightIdentity(laws.monoidalRightIdentity(fa))))
-  }
-}
 
-object ApplicativeTests {
+object ApplicativeTests
   def apply[F[_]: Applicative]: ApplicativeTests[F] =
-    new ApplicativeTests[F] {
+    new ApplicativeTests[F]
       def laws: ApplicativeLaws[F] = ApplicativeLaws[F]
-    }
-}

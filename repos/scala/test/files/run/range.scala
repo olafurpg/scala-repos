@@ -1,33 +1,31 @@
 import scala.collection.immutable.{Range, NumericRange}
 
-object Test {
-  def rangeForeach(range: Range) = {
+object Test
+  def rangeForeach(range: Range) =
     val buffer = new scala.collection.mutable.ListBuffer[Int];
     range.foreach(buffer += _);
     assert(buffer.toList == range.iterator.toList,
            buffer.toList + "/" + range.iterator.toList)
-  }
 
-  def boundaryTests() = {
+  def boundaryTests() =
     // #4321
     assert((Int.MinValue to Int.MaxValue by Int.MaxValue).size == 3)
     // #4308
-    val caught = (try { (Long.MinValue to Long.MaxValue).sum; false } catch {
+    val caught = (try { (Long.MinValue to Long.MaxValue).sum; false } catch
       case _: IllegalArgumentException => true
-    })
+    )
     assert(caught)
     // #7432
-    val noElemAtMin = (try { (10 until 10).min; false } catch {
+    val noElemAtMin = (try { (10 until 10).min; false } catch
       case _: NoSuchElementException => true
-    })
+    )
     assert(noElemAtMin)
-    val noElemAtMax = (try { (10 until 10).max; false } catch {
+    val noElemAtMax = (try { (10 until 10).max; false } catch
       case _: NoSuchElementException => true
-    })
+    )
     assert(noElemAtMax)
-  }
 
-  case class GR[T](val x: T)(implicit val num: Integral[T]) {
+  case class GR[T](val x: T)(implicit val num: Integral[T])
     import num._
 
     def negated = GR[T](-x)
@@ -40,17 +38,15 @@ object Test {
     def gr6 = NumericRange.inclusive(x, x * fromInt(10), x)
     def gr7 = gr3.toList ::: negated.gr3.toList
 
-    def check = {
+    def check =
       assert(gr1.isEmpty && !gr2.isEmpty)
       assert(gr3.size == 2 && gr4.size == 2)
       assert(gr5.size == 9 && gr6.size == 10)
       assert(gr7.sum == num.zero, gr7.toString)
       assert(!(gr5 contains (x * fromInt(10))))
       assert(gr6 contains (x * fromInt(10)))
-    }
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     implicit val imp1 = Numeric.BigDecimalAsIfIntegral
     implicit val imp2 = Numeric.DoubleAsIfIntegral
 
@@ -81,5 +77,3 @@ object Test {
 
     // living on the edges
     boundaryTests()
-  }
-}

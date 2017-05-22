@@ -8,28 +8,26 @@ import fastparse.noApi._
 /**
   * Parser for Scala syntax.
   */
-object Scala extends Core with Types with Exprs with Xml {
+object Scala extends Core with Types with Exprs with Xml
   import WhitespaceApi._
 
-  val TmplBody: P0 = {
+  val TmplBody: P0 =
     val Prelude = P((Annot ~ OneNLMax).rep ~ (Mod ~/ Pass).rep)
     val TmplStat = P(Import | Prelude ~ BlockDef | StatCtx.Expr)
 
     P("{" ~/ BlockLambda.? ~ Semis.? ~ TmplStat.repX(sep = Semis) ~ Semis.? ~ `}`)
-  }
 
   val ValVarDef = P(
       BindPattern.rep(1, ",".~/) ~ (`:` ~/ Type).? ~ (`=` ~/ StatCtx.Expr).?)
 
-  val FunDef = {
+  val FunDef =
     val Body = P(
         WL ~ `=` ~/ `macro`.? ~ StatCtx.Expr | OneNLMax ~ "{" ~ Block ~ "}")
     P(FunSig ~ (`:` ~/ Type).? ~~ Body.?)
-  }
 
   val BlockDef: P0 = P(Dcl | TraitDef | ClsDef | ObjDef)
 
-  val ClsDef = {
+  val ClsDef =
     val ClsAnnot = P(`@` ~ SimpleType ~ ArgList.?)
     val Prelude = P(NotNewline ~ (ClsAnnot.rep(1) ~ AccessMod.? | AccessMod))
     val ClsArgMod = P(Mod.rep ~ (`val` | `var`))
@@ -39,7 +37,6 @@ object Scala extends Core with Types with Exprs with Xml {
     val ClsArgs = P(
         OneNLMax ~ "(" ~/ `implicit`.? ~ ClsArg.rep(sep = ",".~/) ~ ")")
     P(`case`.? ~ `class` ~/ Id ~ TypeArgList.? ~~ Prelude.? ~~ ClsArgs.repX ~ DefTmpl.?)
-  }
 
   val Constrs = P((WL ~ Constr).rep(1, `with`.~/))
   val EarlyDefTmpl = P(TmplBody ~ (`with` ~/ Constr).rep ~ TmplBody.?)
@@ -57,15 +54,12 @@ object Scala extends Core with Types with Exprs with Xml {
   val PkgObj = P(ObjDef)
   val PkgBlock = P(QualId ~/ `{` ~ TopStatSeq.? ~ `}`)
   val Pkg = P(`package` ~/ (PkgBlock | PkgObj))
-  val TopStatSeq: P0 = {
+  val TopStatSeq: P0 =
     val Tmpl = P(
         (Annot ~~ OneNLMax).rep ~ Mod.rep ~ (TraitDef | ClsDef | ObjDef))
     val TopStat = P(Pkg | Import | Tmpl)
     P(TopStat.repX(1, Semis))
-  }
   val TopPkgSeq = P(((`package` ~ QualId) ~~ !(WS ~ "{")).repX(1, Semis))
-  val CompilationUnit: P0 = {
+  val CompilationUnit: P0 =
     val Body = P(TopPkgSeq ~~ (Semis ~ TopStatSeq).? | TopStatSeq)
     P(Semis.? ~ Body.? ~~ Semis.? ~ WL ~ End)
-  }
-}

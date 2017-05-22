@@ -33,11 +33,10 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object EventDispatcher {
+object EventDispatcher
   implicit def sfxEventDispatcher2jfx(
       v: EventDispatcher): jfxe.EventDispatcher =
     if (v != null) v.delegate else null
-}
 
 /**
   * An  represents an event dispatching and processing
@@ -55,7 +54,7 @@ object EventDispatcher {
   * @define ORIGINALDOC Original Documentation]].
   */
 abstract class EventDispatcher(override val delegate: jfxe.EventDispatcher)
-    extends SFXDelegate[jfxe.EventDispatcher] {
+    extends SFXDelegate[jfxe.EventDispatcher]
 
   /**
     * Dispatches the specified event by this . Does
@@ -71,4 +70,3 @@ abstract class EventDispatcher(override val delegate: jfxe.EventDispatcher)
     */
   def dispatchEvent(event: Event, tail: EventDispatchChain): Event =
     delegate.dispatchEvent(event.delegate, tail.delegate)
-}

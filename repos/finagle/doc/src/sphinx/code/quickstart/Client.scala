@@ -2,7 +2,7 @@ import com.twitter.finagle.{Http, Service}
 import com.twitter.finagle.http
 import com.twitter.util.{Await, Future}
 
-object Client extends App {
+object Client extends App
   //#builder
   val client: Service[http.Request, http.Response] =
     Http.newService("www.scala-lang.org:80")
@@ -14,9 +14,8 @@ object Client extends App {
   //#dispatch
   //#callback
   Await.result(
-      response.onSuccess { rep: http.Response =>
+      response.onSuccess  rep: http.Response =>
     println("GET success: " + rep)
-  })
+  )
 
   //#callback
-}

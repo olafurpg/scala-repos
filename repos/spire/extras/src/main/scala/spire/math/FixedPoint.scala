@@ -13,10 +13,9 @@ import spire.algebra.{Order, Signed}
 
 class FixedPointOverflow(n: Long) extends Exception(n.toString)
 
-case class FixedScale(denom: Int) {
+case class FixedScale(denom: Int)
   if (denom < 1)
     throw new IllegalArgumentException("illegal denominator: %s" format denom)
-}
 
 /**
   * FixedPoint is a value class that provides fixed point arithmetic
@@ -36,7 +35,7 @@ case class FixedScale(denom: Int) {
   * val b = FixedPoint(Rational(2469, 200)) // fraction repr
   * val c = new FixedPoint(12345L)          // "raw" repr
   */
-class FixedPoint(val long: Long) extends AnyVal { lhs =>
+class FixedPoint(val long: Long) extends AnyVal  lhs =>
   def unary_-(): FixedPoint =
     if (long != Long.MinValue) new FixedPoint(-long)
     else throw new FixedPointOverflow(long)
@@ -63,14 +62,13 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def >(rhs: FixedPoint): Boolean = lhs.long > rhs.long
   def >=(rhs: FixedPoint): Boolean = lhs.long >= rhs.long
 
-  def +(rhs: FixedPoint): FixedPoint = {
+  def +(rhs: FixedPoint): FixedPoint =
     val n = lhs.long + rhs.long
     if ((~(lhs.long ^ rhs.long) & (lhs.long ^ n)) < 0L)
       throw new FixedPointOverflow(n)
     new FixedPoint(n)
-  }
 
-  def +(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
+  def +(rhs: Long)(implicit scale: FixedScale): FixedPoint =
     val d = scale.denom
     val p = rhs * d
     if (rhs == 0 || d == 0 ||
@@ -82,16 +80,14 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       throw new FixedPointOverflow(n.toLong)
 
     new FixedPoint(n.toLong)
-  }
 
-  def -(rhs: FixedPoint): FixedPoint = {
+  def -(rhs: FixedPoint): FixedPoint =
     val n = lhs.long - rhs.long
     if (((lhs.long ^ rhs.long) & (lhs.long ^ n)) < 0L)
       throw new FixedPointOverflow(n)
     new FixedPoint(n)
-  }
 
-  def -(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
+  def -(rhs: Long)(implicit scale: FixedScale): FixedPoint =
     val d = scale.denom
     val p = rhs * d
     if (rhs == 0 || d == 0 ||
@@ -103,37 +99,33 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
       throw new FixedPointOverflow(n.toLong)
 
     new FixedPoint(n.toLong)
-  }
 
-  def *(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
+  def *(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint =
     if (lhs.long < rhs.long) return rhs * lhs
     val d = scale.denom
     val q = lhs.long / d
     val r = lhs.long % d
     val qq = rhs * q
-    val rr = try {
+    val rr = try
       (rhs * r) / d
-    } catch {
+    catch
       case _: FixedPointOverflow =>
         val n = (SafeLong(rhs.long) * r) / d
         if (n.isValidLong) new FixedPoint(n.toLong)
         else throw new FixedPointOverflow(n.toLong)
-    }
     qq + rr
-  }
 
-  def *(rhs: Long): FixedPoint = {
+  def *(rhs: Long): FixedPoint =
     val n = lhs.long * rhs
     if (lhs.long == 0 || rhs == 0 ||
         (rhs == n / lhs.long && ((lhs.long ^ rhs ^ n) & Long.MinValue) == 0))
       new FixedPoint(n)
     else throw new FixedPointOverflow(n)
-  }
 
   def /(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint =
-    try {
+    try
       (lhs * scale.denom) / rhs.long
-    } catch {
+    catch
       case _: FixedPointOverflow =>
         // TODO: it might be nice to use something a little more
         // lightweight, but this is the least error-prone thing to
@@ -143,7 +135,6 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
           throw new FixedPointOverflow(n.toLong)
 
         new FixedPoint(n.toLong)
-    }
 
   def /(rhs: Long): FixedPoint =
     if (lhs.long == Long.MinValue && rhs == -1L)
@@ -153,23 +144,21 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def %(rhs: FixedPoint): FixedPoint =
     new FixedPoint(lhs.long % rhs.long)
 
-  def %(rhs: Long)(implicit scale: FixedScale): FixedPoint = {
+  def %(rhs: Long)(implicit scale: FixedScale): FixedPoint =
     val d = scale.denom
     val p = rhs * d
     if (rhs == 0 || d == 0 ||
         (d == p / rhs && (((rhs ^ d ^ p) & Long.MinValue) == 0)))
       new FixedPoint(lhs.long % p)
     else lhs
-  }
 
   def /~(rhs: FixedPoint)(implicit scale: FixedScale): FixedPoint =
     (lhs - lhs % rhs) / rhs
 
   def /%(rhs: FixedPoint)(
-      implicit scale: FixedScale): (FixedPoint, FixedPoint) = {
+      implicit scale: FixedScale): (FixedPoint, FixedPoint) =
     val rem = lhs % rhs
     ((lhs - rem) / rhs, rem)
-  }
 
   def isWhole(implicit scale: FixedScale): Boolean =
     long % scale.denom == 0L
@@ -184,18 +173,16 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
     else if (long > 0L) FixedPoint(long / scale.denom + 1L)
     else FixedPoint(long / scale.denom)
 
-  def round(implicit scale: FixedScale): FixedPoint = {
+  def round(implicit scale: FixedScale): FixedPoint =
     val d = scale.denom
-    if (long % d == 0L) {
+    if (long % d == 0L)
       this
-    } else if (long > 0) {
+    else if (long > 0)
       val m = (long % d)
       if (m >= (d - m)) FixedPoint(long / d + 1L) else FixedPoint(long / d)
-    } else {
+    else
       val m = -(long % d)
       if (m >= (d - m)) FixedPoint(long / d - 1L) else FixedPoint(long / d)
-    }
-  }
 
   def gcd(rhs: FixedPoint): FixedPoint =
     new FixedPoint(spire.math.gcd(lhs.long, rhs.long))
@@ -217,10 +204,10 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
 
   def **(k: Int)(implicit scale: FixedScale): FixedPoint = pow(k)
 
-  def pow(k: Int)(implicit scale: FixedScale): FixedPoint = {
+  def pow(k: Int)(implicit scale: FixedScale): FixedPoint =
     if (k < 0)
       throw new IllegalArgumentException("exponent %s not allowed" format k)
-    k match {
+    k match
       case 0 =>
         new FixedPoint(scale.denom)
       case 1 =>
@@ -235,8 +222,6 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
         else if ((long > scale.denom || long < -scale.denom) && x.toLong == 0)
           throw new FixedPointOverflow(0L)
         new FixedPoint(x.toLong)
-    }
-  }
 
   import spire.syntax.nroot._
 
@@ -246,24 +231,21 @@ class FixedPoint(val long: Long) extends AnyVal { lhs =>
   def nroot(k: Int)(implicit scale: FixedScale): FixedPoint =
     FixedPoint(toReal.nroot(k).toRational)
 
-  def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint = {
+  def fpow(k: FixedPoint)(implicit scale: FixedScale): FixedPoint =
     val r = this.toRational
     val g = k.long gcd scale.denom
     val n = (k.long / g)
     val d = (scale.denom / g)
-    if (n.isValidInt && d.isValidInt) {
+    if (n.isValidInt && d.isValidInt)
       FixedPoint(Real(r ** n.toInt).nroot(d.toInt).toRational)
-    } else {
+    else
       throw new ArithmeticException(s"exponent $r is too complex")
-    }
-  }
 
   override def toString: String = long.toString + "/?"
 
   def toString(implicit scale: FixedScale): String = toDouble.toString
-}
 
-object FixedPoint extends FixedPointInstances {
+object FixedPoint extends FixedPointInstances
 
   val zero: FixedPoint = new FixedPoint(0L)
 
@@ -275,30 +257,27 @@ object FixedPoint extends FixedPointInstances {
   def apply(n: Long)(implicit scale: FixedScale): FixedPoint =
     new FixedPoint(n) * scale.denom
 
-  def apply(n: Rational)(implicit scale: FixedScale): FixedPoint = {
+  def apply(n: Rational)(implicit scale: FixedScale): FixedPoint =
     val x = (n * scale.denom).round
     if (x < Long.MinValue || x > Long.MaxValue)
       throw new FixedPointOverflow(x.toLong)
     new FixedPoint(x.toLong)
-  }
 
   def apply(s: String)(implicit scale: FixedScale): FixedPoint =
     apply(Rational(s))
 
   def apply[@sp(Float, Double) A](a: A)(
-      implicit scale: FixedScale, fr: Fractional[A]): FixedPoint = {
+      implicit scale: FixedScale, fr: Fractional[A]): FixedPoint =
     val x = a * scale.denom
     if (x < fr.fromLong(Long.MinValue) || fr.fromLong(Long.MaxValue) < x)
       throw new FixedPointOverflow(x.toLong)
     new FixedPoint(x.toLong)
-  }
-}
 
-trait FixedPointInstances {
+trait FixedPointInstances
 
   implicit def algebra(implicit scale: FixedScale)
     : Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] =
-    new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint] {
+    new Fractional[FixedPoint] with Order[FixedPoint] with Signed[FixedPoint]
       def abs(x: FixedPoint): FixedPoint = x.abs
       def signum(x: FixedPoint): Int = x.signum
 
@@ -361,7 +340,6 @@ trait FixedPointInstances {
 
       def fromType[B](b: B)(implicit ev: ConvertableFrom[B]): FixedPoint =
         FixedPoint(ev.toRational(b))
-    }
 
   import NumberTag._
   implicit final val FixedPointTag = new CustomTag[FixedPoint](
@@ -371,4 +349,3 @@ trait FixedPointInstances {
       Some(FixedPoint.MaxValue),
       true,
       true)
-}

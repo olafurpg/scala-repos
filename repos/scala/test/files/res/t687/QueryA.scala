@@ -1,4 +1,3 @@
 package t687;
-trait Query {
+trait Query
   override def equals(o: Any) = false;
-}

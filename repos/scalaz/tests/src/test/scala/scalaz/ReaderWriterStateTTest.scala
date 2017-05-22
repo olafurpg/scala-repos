@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import std.AllInstances._
 import org.scalacheck.{Gen, Arbitrary}
 
-object ReaderWriterStateTTest extends SpecLite {
+object ReaderWriterStateTTest extends SpecLite
   type RWSOptInt[A] = RWST[Option, Int, Int, Int, A]
   implicit val RWSOptIntArb = Arbitrary(
       Gen.oneOf[RWSOptInt[Int]](
@@ -32,15 +32,14 @@ object ReaderWriterStateTTest extends SpecLite {
                     Some((s, x => x, s))))
       ))
 
-  implicit val RWSOptIntEqual = new Equal[RWSOptInt[Int]] {
+  implicit val RWSOptIntEqual = new Equal[RWSOptInt[Int]]
     def equal(a1: RWSOptInt[Int], a2: RWSOptInt[Int]) =
       a1.run(0, 0) == a2.run(0, 0)
-  }
 
   checkAll(bindRec.laws[RWSOptInt])
   checkAll(monadPlus.strongLaws[RWSOptInt])
 
-  "ReaderWriterStateT can be trampolined without stack overflow" in {
+  "ReaderWriterStateT can be trampolined without stack overflow" in
     import scalaz.Free._
     val result = (0 to 10000).toList
       .map(ii =>
@@ -50,9 +49,8 @@ object ReaderWriterStateTTest extends SpecLite {
               (_, i: Int) => Trampoline.done(("", i, i))))((a,
           b) => a.flatMap(_ => b))
     10000 must_=== result.run((), 0).run._3
-  }
 
-  object instances {
+  object instances
     def functor[F[_]: Functor, R, W, S] = Functor[RWST[F, R, W, S, ?]]
     def plus[F[_]: Plus, R, W, S1, S2] = Plus[IRWST[F, R, W, S1, S2, ?]]
     def plusEmpty[F[_]: PlusEmpty, R, W, S1, S2] =
@@ -80,5 +78,3 @@ object ReaderWriterStateTTest extends SpecLite {
     def bind[F[_]: Monad, R, W : Monoid, S] = Bind[RWST[F, R, W, S, ?]]
     def bind[F[_]: MonadPlus, R, W : Monoid, S] = Bind[RWST[F, R, W, S, ?]]
     def monad[F[_]: MonadPlus, R, W : Monoid, S] = Monad[RWST[F, R, W, S, ?]]
-  }
-}

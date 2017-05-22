@@ -33,29 +33,27 @@ import org.apache.spark.sql.execution.streaming.{MemorySink, MemoryStream, Strea
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ContinuousQueryManagerSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest with SharedSQLContext with BeforeAndAfter
 
   import AwaitTerminationTester._
   import testImplicits._
 
   override val streamingTimeout = 20.seconds
 
-  before {
+  before
     assert(sqlContext.streams.active.isEmpty)
     sqlContext.streams.resetTerminated()
-  }
 
-  after {
+  after
     assert(sqlContext.streams.active.isEmpty)
     sqlContext.streams.resetTerminated()
-  }
 
-  testQuietly("listing") {
+  testQuietly("listing")
     val (m1, ds1) = makeDataset
     val (m2, ds2) = makeDataset
     val (m3, ds3) = makeDataset
 
-    withQueriesOn(ds1, ds2, ds3) { queries =>
+    withQueriesOn(ds1, ds2, ds3)  queries =>
       require(queries.size === 3)
       assert(sqlContext.streams.active.toSet === queries.toSet)
       val (q1, q2, q3) = (queries(0), queries(1), queries(2))
@@ -63,41 +61,33 @@ class ContinuousQueryManagerSuite
       assert(sqlContext.streams.get(q1.name).eq(q1))
       assert(sqlContext.streams.get(q2.name).eq(q2))
       assert(sqlContext.streams.get(q3.name).eq(q3))
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         sqlContext.streams.get("non-existent-name")
-      }
 
       q1.stop()
 
       assert(sqlContext.streams.active.toSet === Set(q2, q3))
-      val ex1 = withClue("no error while getting non-active query") {
-        intercept[IllegalArgumentException] {
+      val ex1 = withClue("no error while getting non-active query")
+        intercept[IllegalArgumentException]
           sqlContext.streams.get(q1.name)
-        }
-      }
       assert(ex1.getMessage.contains(q1.name),
              "error does not contain name of query to be fetched")
       assert(sqlContext.streams.get(q2.name).eq(q2))
 
       m2.addData(0) // q2 should terminate with error
 
-      eventually(Timeout(streamingTimeout)) {
+      eventually(Timeout(streamingTimeout))
         require(!q2.isActive)
         require(q2.exception.isDefined)
-      }
-      withClue("no error while getting non-active query") {
-        intercept[IllegalArgumentException] {
+      withClue("no error while getting non-active query")
+        intercept[IllegalArgumentException]
           sqlContext.streams.get(q2.name).eq(q2)
-        }
-      }
 
       assert(sqlContext.streams.active.toSet === Set(q3))
-    }
-  }
 
-  testQuietly("awaitAnyTermination without timeout and resetTerminated") {
+  testQuietly("awaitAnyTermination without timeout and resetTerminated")
     val datasets = Seq.fill(5)(makeDataset._2)
-    withQueriesOn(datasets: _*) { queries =>
+    withQueriesOn(datasets: _*)  queries =>
       require(queries.size === datasets.size)
       assert(sqlContext.streams.active.toSet === queries.toSet)
 
@@ -139,12 +129,10 @@ class ContinuousQueryManagerSuite
       eventually(Timeout(streamingTimeout)) { require(!q4.isActive) }
       // After q4 terminates with exception, awaitAnyTerm should start throwing exception
       testAwaitAnyTermination(ExpectException[SparkException])
-    }
-  }
 
-  testQuietly("awaitAnyTermination with timeout and resetTerminated") {
+  testQuietly("awaitAnyTermination with timeout and resetTerminated")
     val datasets = Seq.fill(6)(makeDataset._2)
-    withQueriesOn(datasets: _*) { queries =>
+    withQueriesOn(datasets: _*)  queries =>
       require(queries.size === datasets.size)
       assert(sqlContext.streams.active.toSet === queries.toSet)
 
@@ -221,37 +209,29 @@ class ContinuousQueryManagerSuite
       // After q5 terminates with exception, awaitAnyTerm should start throwing exception
       testAwaitAnyTermination(ExpectException[SparkException],
                               awaitTimeout = 2 seconds)
-    }
-  }
 
   /** Run a body of code by defining a query each on multiple datasets */
   private def withQueriesOn(datasets: Dataset[_]*)(
-      body: Seq[ContinuousQuery] => Unit): Unit = {
-    failAfter(streamingTimeout) {
-      val queries = withClue("Error starting queries") {
-        datasets.map { ds =>
+      body: Seq[ContinuousQuery] => Unit): Unit =
+    failAfter(streamingTimeout)
+      val queries = withClue("Error starting queries")
+        datasets.map  ds =>
           @volatile var query: StreamExecution = null
-          try {
+          try
             val df = ds.toDF
             query = sqlContext.streams
               .startQuery(
                   StreamExecution.nextName, df, new MemorySink(df.schema))
               .asInstanceOf[StreamExecution]
-          } catch {
+          catch
             case NonFatal(e) =>
               if (query != null) query.stop()
               throw e
-          }
           query
-        }
-      }
-      try {
+      try
         body(queries)
-      } finally {
+      finally
         queries.foreach(_.stop())
-      }
-    }
-  }
 
   /** Test the behavior of awaitAnyTermination */
   private def testAwaitAnyTermination(
@@ -259,50 +239,41 @@ class ContinuousQueryManagerSuite
       expectedReturnedValue: Boolean = false,
       awaitTimeout: Span = null,
       testBehaviorFor: Span = 4 seconds
-  ): Unit = {
+  ): Unit =
 
-    def awaitTermFunc(): Unit = {
-      if (awaitTimeout != null && awaitTimeout.toMillis > 0) {
+    def awaitTermFunc(): Unit =
+      if (awaitTimeout != null && awaitTimeout.toMillis > 0)
         val returnedValue =
           sqlContext.streams.awaitAnyTermination(awaitTimeout.toMillis)
         assert(returnedValue === expectedReturnedValue,
                "Returned value does not match expected")
-      } else {
+      else
         sqlContext.streams.awaitAnyTermination()
-      }
-    }
 
     AwaitTerminationTester.test(
         expectedBehavior, awaitTermFunc, testBehaviorFor)
-  }
 
   /** Stop a random active query either with `stop()` or with an error */
   private def stopRandomQueryAsync(
-      stopAfter: Span, withError: Boolean): ContinuousQuery = {
+      stopAfter: Span, withError: Boolean): ContinuousQuery =
 
     import scala.concurrent.ExecutionContext.Implicits.global
 
     val activeQueries = sqlContext.streams.active
     val queryToStop = activeQueries(Random.nextInt(activeQueries.length))
-    Future {
+    Future
       Thread.sleep(stopAfter.toMillis)
-      if (withError) {
+      if (withError)
         logDebug(s"Terminating query ${queryToStop.name} with error")
-        queryToStop.asInstanceOf[StreamExecution].logicalPlan.collect {
+        queryToStop.asInstanceOf[StreamExecution].logicalPlan.collect
           case StreamingRelation(memoryStream, _) =>
             memoryStream.asInstanceOf[MemoryStream[Int]].addData(0)
-        }
-      } else {
+      else
         logDebug(s"Stopping query ${queryToStop.name}")
         queryToStop.stop()
-      }
-    }
     queryToStop
-  }
 
-  private def makeDataset: (MemoryStream[Int], Dataset[Int]) = {
+  private def makeDataset: (MemoryStream[Int], Dataset[Int]) =
     val inputData = MemoryStream[Int]
     val mapped = inputData.toDS.map(6 / _)
     (inputData, mapped)
-  }
-}

@@ -14,7 +14,7 @@ import scala.scalajs.js.annotation.JSExportDescendentObjects
 import org.scalajs.jasmine._
 
 @JSExportDescendentObjects
-class JasmineTest extends TestSuiteContext {
+class JasmineTest extends TestSuiteContext
   def jasmine: JasmineEnv = Jasmine.jasmine
   def describe(name: String)(suite: => Unit): Unit =
     Jasmine.describe(name, suite _)
@@ -32,4 +32,3 @@ class JasmineTest extends TestSuiteContext {
   def waits(timeout: Int): Unit = Jasmine.waits(timeout)
   def waitsFor(block: => Boolean, errorMsg: String, timeout: Int): Unit =
     Jasmine.waitsFor(block _, errorMsg, timeout)
-}

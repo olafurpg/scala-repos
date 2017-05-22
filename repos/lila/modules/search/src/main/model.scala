@@ -10,13 +10,11 @@ case class Size(value: Int)
 
 case class SearchResponse(ids: List[String])
 
-object SearchResponse {
+object SearchResponse
   def apply(txt: String): SearchResponse =
     SearchResponse(txt.split(',').toList)
-}
 
 case class CountResponse(count: Int)
 
-object CountResponse {
+object CountResponse
   def apply(txt: String): CountResponse = CountResponse(~parseIntOption(txt))
-}

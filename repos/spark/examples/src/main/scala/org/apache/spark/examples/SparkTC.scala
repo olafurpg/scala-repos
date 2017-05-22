@@ -26,22 +26,20 @@ import org.apache.spark.{SparkConf, SparkContext}
 /**
   * Transitive closure on a graph.
   */
-object SparkTC {
+object SparkTC
   val numEdges = 200
   val numVertices = 100
   val rand = new Random(42)
 
-  def generateGraph: Seq[(Int, Int)] = {
+  def generateGraph: Seq[(Int, Int)] =
     val edges: mutable.Set[(Int, Int)] = mutable.Set.empty
-    while (edges.size < numEdges) {
+    while (edges.size < numEdges)
       val from = rand.nextInt(numVertices)
       val to = rand.nextInt(numVertices)
       if (from != to) edges.+=((from, to))
-    }
     edges.toSeq
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val sparkConf = new SparkConf().setAppName("SparkTC")
     val spark = new SparkContext(sparkConf)
     val slices = if (args.length > 0) args(0).toInt else 2
@@ -58,7 +56,7 @@ object SparkTC {
     // This join is iterated until a fixed point is reached.
     var oldCount = 0L
     var nextCount = tc.count()
-    do {
+    do
       oldCount = nextCount
       // Perform the join, obtaining an RDD of (y, (z, x)) pairs,
       // then project the result to obtain the new (x, z) paths.
@@ -67,10 +65,8 @@ object SparkTC {
         .distinct()
         .cache()
       nextCount = tc.count()
-    } while (nextCount != oldCount)
+    while (nextCount != oldCount)
 
     println("TC has " + tc.count() + " edges.")
     spark.stop()
-  }
-}
 // scalastyle:on println

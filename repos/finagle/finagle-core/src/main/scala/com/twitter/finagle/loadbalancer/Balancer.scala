@@ -15,7 +15,7 @@ import scala.annotation.tailrec
   * example, we can specify and mix in a load metric (via a Node) and
   * a balancer (a Distributor) separately.
   */
-private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
+private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep]  self =>
 
   /**
     * The maximum number of balancing tries (yielding unavailable
@@ -73,24 +73,23 @@ private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
 
   @volatile protected var dist: Distributor = initDistributor()
 
-  protected def rebuild(): Unit = {
+  protected def rebuild(): Unit =
     updater(Rebuild(dist))
-  }
 
   // A counter that should be named "max_effort_exhausted".
   // Due to a scalac compile/runtime problem we were unable
   // to store it as a member variable on this trait.
   protected[this] def maxEffortExhausted: Counter
 
-  private[this] val gauges = Seq(statsReceiver.addGauge("available") {
+  private[this] val gauges = Seq(statsReceiver.addGauge("available")
     dist.vector.count(n => n.status == Status.Open)
-  }, statsReceiver.addGauge("busy") {
+  , statsReceiver.addGauge("busy")
     dist.vector.count(n => n.status == Status.Busy)
-  }, statsReceiver.addGauge("closed") {
+  , statsReceiver.addGauge("closed")
     dist.vector.count(n => n.status == Status.Closed)
-  }, statsReceiver.addGauge("load") {
+  , statsReceiver.addGauge("load")
     dist.vector.map(_.pending).sum
-  }, statsReceiver.addGauge("size") { dist.vector.size })
+  , statsReceiver.addGauge("size") { dist.vector.size })
 
   private[this] val adds = statsReceiver.counter("adds")
   private[this] val removes = statsReceiver.counter("removes")
@@ -102,26 +101,23 @@ private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
   protected case class Rebuild(cur: Distributor) extends Update
   protected case class Invoke(fn: Distributor => Unit) extends Update
 
-  private[this] val updater = new Updater[Update] {
-    protected def preprocess(updates: Seq[Update]): Seq[Update] = {
+  private[this] val updater = new Updater[Update]
+    protected def preprocess(updates: Seq[Update]): Seq[Update] =
       if (updates.size == 1) return updates
 
       val types = updates.reverse.groupBy(_.getClass)
 
-      val update: Seq[Update] = types.get(classOf[NewList]) match {
+      val update: Seq[Update] = types.get(classOf[NewList]) match
         case Some(Seq(last, _ *)) => Seq(last)
         case None => types.getOrElse(classOf[Rebuild], Nil).take(1)
-      }
 
       update ++ types.getOrElse(classOf[Invoke], Nil).reverse
-    }
 
-    def handle(u: Update): Unit = u match {
+    def handle(u: Update): Unit = u match
       case NewList(svcFactories) =>
         val newFactories = svcFactories.toSet
-        val (transfer, closed) = dist.vector.partition { node =>
+        val (transfer, closed) = dist.vector.partition  node =>
           newFactories.contains(node.factory)
-        }
 
         for (node <- closed) node.close()
         removes.incr(closed.size)
@@ -129,12 +125,11 @@ private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
         // we could demand that 'n' proxies hashCode, equals (i.e. is a Proxy)
         val transferNodes = transfer.map(n => n.factory -> n).toMap
         var numNew = 0
-        val newNodes = svcFactories.map {
+        val newNodes = svcFactories.map
           case f if transferNodes.contains(f) => transferNodes(f)
           case f =>
             numNew += 1
             newNode(f, statsReceiver.scope(f.toString))
-        }
 
         dist = dist.rebuild(newNodes.toVector)
         adds.incr(numNew)
@@ -145,8 +140,6 @@ private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
       case Rebuild(_stale) =>
       case Invoke(fn) =>
         fn(dist)
-    }
-  }
 
   /**
     * Update the load balancer's service list. After the update, which
@@ -160,37 +153,31 @@ private trait Balancer[Req, Rep] extends ServiceFactory[Req, Rep] { self =>
     * Invoke `fn` on the current distributor. This is done through the updater
     * and is serialized with distributor updates and other invocations.
     */
-  protected def invoke(fn: Distributor => Unit): Unit = {
+  protected def invoke(fn: Distributor => Unit): Unit =
     updater(Invoke(fn))
-  }
 
   @tailrec
-  private[this] def pick(nodes: Distributor, count: Int): Node = {
+  private[this] def pick(nodes: Distributor, count: Int): Node =
     if (count == 0) return null.asInstanceOf[Node]
 
     val n = dist.pick()
     if (n.factory.status == Status.Open) n
     else pick(nodes, count - 1)
-  }
 
-  def apply(conn: ClientConnection): Future[Service[Req, Rep]] = {
+  def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
     val d = dist
 
     var n = pick(d, maxEffort)
-    if (n == null) {
+    if (n == null)
       maxEffortExhausted.incr()
       rebuild()
       n = dist.pick()
-    }
 
     val f = n(conn)
     if (d.needsRebuild && d == dist) rebuild()
     f
-  }
 
-  def close(deadline: Time): Future[Unit] = {
+  def close(deadline: Time): Future[Unit] =
     for (gauge <- gauges) gauge.remove()
     removes.incr(dist.vector.size)
     Closable.all(dist.vector: _*).close(deadline)
-  }
-}

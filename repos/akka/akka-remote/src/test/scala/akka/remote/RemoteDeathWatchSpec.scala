@@ -28,25 +28,23 @@ akka {
         port = 0
     }
 }
-""")) with ImplicitSender with DefaultTimeout with DeathWatchSpec {
+""")) with ImplicitSender with DefaultTimeout with DeathWatchSpec
 
   val other = ActorSystem("other",
                           ConfigFactory
                             .parseString("akka.remote.netty.tcp.port=2666")
                             .withFallback(system.settings.config))
 
-  override def beforeTermination() {
+  override def beforeTermination()
     system.eventStream.publish(TestEvent.Mute(EventFilter.warning(
                 pattern = "received dead letter.*Disassociate")))
-  }
 
-  override def afterTermination() {
+  override def afterTermination()
     shutdown(other)
-  }
 
   override def expectedTestDuration: FiniteDuration = 120.seconds
 
-  "receive Terminated when system of de-serialized ActorRef is not running" in {
+  "receive Terminated when system of de-serialized ActorRef is not running" in
     val probe = TestProbe()
     system.eventStream.subscribe(probe.ref, classOf[QuarantinedEvent])
     val rarp = RARP(system).provider
@@ -56,12 +54,11 @@ akka {
     val ref = rarp.resolveActorRef(
         s"akka.tcp://OtherSystem@localhost:$port/user/foo/bar#1752527294")
     system.actorOf(
-        Props(new Actor {
+        Props(new Actor
       context.watch(ref)
-      def receive = {
+      def receive =
         case Terminated(r) ⇒ testActor ! r
-      }
-    }).withDeploy(Deploy.local))
+    ).withDeploy(Deploy.local))
 
     expectMsg(20.seconds, ref)
     // we don't expect real quarantine when the UID is unknown, i.e. QuarantinedEvent is not published 
@@ -70,29 +67,25 @@ akka {
     // It was observed as periodic logging of "address is now gated" when the gate was lifted.
     system.eventStream.subscribe(probe.ref, classOf[Warning])
     probe.expectNoMsg(rarp.remoteSettings.RetryGateClosedFor * 2)
-  }
 
-  "receive Terminated when watched node is unknown host" in {
+  "receive Terminated when watched node is unknown host" in
     val path =
       RootActorPath(Address("akka.tcp", system.name, "unknownhost", 2552)) / "user" / "subject"
-    system.actorOf(Props(new Actor {
+    system.actorOf(Props(new Actor
       context.watch(context.actorFor(path))
-      def receive = {
+      def receive =
         case t: Terminated ⇒ testActor ! t.actor.path
-      }
-    }).withDeploy(Deploy.local), name = "observer2")
+    ).withDeploy(Deploy.local), name = "observer2")
 
     expectMsg(60.seconds, path)
-  }
 
-  "receive ActorIdentity(None) when identified node is unknown host" in {
+  "receive ActorIdentity(None) when identified node is unknown host" in
     val path =
       RootActorPath(Address("akka.tcp", system.name, "unknownhost2", 2552)) / "user" / "subject"
     system.actorSelection(path) ! Identify(path)
     expectMsg(60.seconds, ActorIdentity(path, None))
-  }
 
-  "quarantine systems after unsuccessful system message delivery if have not communicated before" in {
+  "quarantine systems after unsuccessful system message delivery if have not communicated before" in
     // Synthesize an ActorRef to a remote system this one has never talked to before.
     // This forces ReliableDeliverySupervisor to start with unknown remote system UID.
     val extinctPath =
@@ -118,5 +111,3 @@ akka {
     system.eventStream.subscribe(probe.ref, classOf[Warning])
     probe.expectNoMsg(
         RARP(system).provider.remoteSettings.RetryGateClosedFor * 2)
-  }
-}

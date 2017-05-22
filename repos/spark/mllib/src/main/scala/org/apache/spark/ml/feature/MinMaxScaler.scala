@@ -34,7 +34,7 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * Params for [[MinMaxScaler]] and [[MinMaxScalerModel]].
   */
 private[feature] trait MinMaxScalerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params with HasInputCol with HasOutputCol
 
   /**
     * lower bound after transformation, shared by all features
@@ -59,7 +59,7 @@ private[feature] trait MinMaxScalerParams
   def getMax: Double = $(max)
 
   /** Validates and transforms the input schema. */
-  protected def validateAndTransformSchema(schema: StructType): StructType = {
+  protected def validateAndTransformSchema(schema: StructType): StructType =
     require(
         $(min) < $(max),
         s"The specified min(${$(min)}) is larger or equal to max(${$(max)})")
@@ -71,8 +71,6 @@ private[feature] trait MinMaxScalerParams
     val outputFields =
       schema.fields :+ StructField($(outputCol), new VectorUDT, false)
     StructType(outputFields)
-  }
-}
 
 /**
   * :: Experimental ::
@@ -89,7 +87,7 @@ private[feature] trait MinMaxScalerParams
 @Experimental
 class MinMaxScaler(override val uid: String)
     extends Estimator[MinMaxScalerModel] with MinMaxScalerParams
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("minMaxScal"))
 
@@ -107,28 +105,24 @@ class MinMaxScaler(override val uid: String)
   /** @group setParam */
   def setMax(value: Double): this.type = set(max, value)
 
-  override def fit(dataset: DataFrame): MinMaxScalerModel = {
+  override def fit(dataset: DataFrame): MinMaxScalerModel =
     transformSchema(dataset.schema, logging = true)
     val input =
       dataset.select($(inputCol)).rdd.map { case Row(v: Vector) => v }
     val summary = Statistics.colStats(input)
     copyValues(
         new MinMaxScalerModel(uid, summary.min, summary.max).setParent(this))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
   override def copy(extra: ParamMap): MinMaxScaler = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object MinMaxScaler extends DefaultParamsReadable[MinMaxScaler] {
+object MinMaxScaler extends DefaultParamsReadable[MinMaxScaler]
 
   @Since("1.6.0")
   override def load(path: String): MinMaxScaler = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -143,7 +137,7 @@ object MinMaxScaler extends DefaultParamsReadable[MinMaxScaler] {
 class MinMaxScalerModel private[ml](override val uid: String,
                                     val originalMin: Vector,
                                     val originalMax: Vector)
-    extends Model[MinMaxScalerModel] with MinMaxScalerParams with MLWritable {
+    extends Model[MinMaxScalerModel] with MinMaxScalerParams with MLWritable
 
   import MinMaxScalerModel._
 
@@ -159,53 +153,47 @@ class MinMaxScalerModel private[ml](override val uid: String,
   /** @group setParam */
   def setMax(value: Double): this.type = set(max, value)
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val originalRange = (originalMax.toBreeze - originalMin.toBreeze).toArray
     val minArray = originalMin.toArray
 
-    val reScale = udf { (vector: Vector) =>
+    val reScale = udf  (vector: Vector) =>
       val scale = $(max) - $(min)
 
       // 0 in sparse vector will probably be rescaled to non-zero
       val values = vector.toArray
       val size = values.length
       var i = 0
-      while (i < size) {
+      while (i < size)
         val raw =
           if (originalRange(i) != 0)
             (values(i) - minArray(i)) / originalRange(i) else 0.5
         values(i) = raw * scale + $(min)
         i += 1
-      }
       Vectors.dense(values)
-    }
 
     dataset.withColumn($(outputCol), reScale(col($(inputCol))))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
-  override def copy(extra: ParamMap): MinMaxScalerModel = {
+  override def copy(extra: ParamMap): MinMaxScalerModel =
     val copied = new MinMaxScalerModel(uid, originalMin, originalMax)
     copyValues(copied, extra).setParent(parent)
-  }
 
   @Since("1.6.0")
   override def write: MLWriter = new MinMaxScalerModelWriter(this)
-}
 
 @Since("1.6.0")
-object MinMaxScalerModel extends MLReadable[MinMaxScalerModel] {
+object MinMaxScalerModel extends MLReadable[MinMaxScalerModel]
 
   private[MinMaxScalerModel] class MinMaxScalerModelWriter(
       instance: MinMaxScalerModel)
-      extends MLWriter {
+      extends MLWriter
 
     private case class Data(originalMin: Vector, originalMax: Vector)
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val data = new Data(instance.originalMin, instance.originalMax)
       val dataPath = new Path(path, "data").toString
@@ -214,14 +202,12 @@ object MinMaxScalerModel extends MLReadable[MinMaxScalerModel] {
         .repartition(1)
         .write
         .parquet(dataPath)
-    }
-  }
 
-  private class MinMaxScalerModelReader extends MLReader[MinMaxScalerModel] {
+  private class MinMaxScalerModelReader extends MLReader[MinMaxScalerModel]
 
     private val className = classOf[MinMaxScalerModel].getName
 
-    override def load(path: String): MinMaxScalerModel = {
+    override def load(path: String): MinMaxScalerModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
       val Row(originalMin: Vector, originalMax: Vector) = sqlContext.read
@@ -231,12 +217,9 @@ object MinMaxScalerModel extends MLReadable[MinMaxScalerModel] {
       val model = new MinMaxScalerModel(metadata.uid, originalMin, originalMax)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
 
   @Since("1.6.0")
   override def read: MLReader[MinMaxScalerModel] = new MinMaxScalerModelReader
 
   @Since("1.6.0")
   override def load(path: String): MinMaxScalerModel = super.load(path)
-}

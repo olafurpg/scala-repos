@@ -5,7 +5,7 @@ package runtime
 import scala.collection.mutable
 import scala.reflect.internal.Flags._
 
-private[reflect] trait SymbolLoaders { self: SymbolTable =>
+private[reflect] trait SymbolLoaders  self: SymbolTable =>
 
   /** The standard completer for top-level classes
     *  @param clazz   The top-level class
@@ -15,21 +15,18 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
     *  is found, a package is created instead.
     */
   class TopClassCompleter(clazz: Symbol, module: Symbol)
-      extends SymLoader with FlagAssigningCompleter {
+      extends SymLoader with FlagAssigningCompleter
     markFlagsCompleted(clazz, module)(mask = ~TopLevelPickledFlags)
-    override def complete(sym: Symbol) = {
+    override def complete(sym: Symbol) =
       debugInfo("completing " + sym + "/" + clazz.fullName)
       assert(sym == clazz || sym == module || sym == module.moduleClass)
-      slowButSafeEnteringPhaseNotLaterThan(picklerPhase) {
+      slowButSafeEnteringPhaseNotLaterThan(picklerPhase)
         val loadingMirror = mirrorThatLoaded(sym)
         val javaClass = loadingMirror.javaClass(clazz.javaClassName)
         loadingMirror.unpickleClass(clazz, module, javaClass)
         // NOTE: can't mark as thread-safe here, because unpickleClass might decide to delegate to FromJavaClassCompleter
         // if (!isCompilerUniverse) markAllCompleted(clazz, module)
-      }
-    }
     override def load(sym: Symbol) = complete(sym)
-  }
 
   /** Create a class and a companion object, enter in enclosing scope,
     *  and initialize with a lazy type completer.
@@ -40,23 +37,20 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
   protected def initAndEnterClassAndModule(owner: Symbol,
                                            name: TypeName,
                                            completer: (Symbol,
-                                           Symbol) => LazyType) = {
+                                           Symbol) => LazyType) =
     assert(!(name.toString endsWith "[]"), name)
     val clazz = owner.newClass(name)
     val module = owner.newModule(name.toTermName)
     // without this check test/files/run/t5256g and test/files/run/t5256h will crash
     // todo. reflection meeting verdict: need to enter the symbols into the first symbol in the owner chain that has a non-empty scope
-    if (owner.info.decls != EmptyScope) {
+    if (owner.info.decls != EmptyScope)
       owner.info.decls enter clazz
       owner.info.decls enter module
-    }
     initClassAndModule(clazz, module, completer(clazz, module))
     (clazz, module)
-  }
 
-  protected def setAllInfos(clazz: Symbol, module: Symbol, info: Type) = {
+  protected def setAllInfos(clazz: Symbol, module: Symbol, info: Type) =
     List(clazz, module, module.moduleClass) foreach (_ setInfo info)
-  }
 
   protected def initClassAndModule(
       clazz: Symbol, module: Symbol, completer: LazyType) =
@@ -64,20 +58,17 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
 
   /** The type completer for packages.
     */
-  class LazyPackageType extends LazyType with FlagAgnosticCompleter {
-    override def complete(sym: Symbol) {
+  class LazyPackageType extends LazyType with FlagAgnosticCompleter
+    override def complete(sym: Symbol)
       assert(sym.isPackageClass)
       // Time travel to a phase before refchecks avoids an initialization issue. `openPackageModule`
       // creates a module symbol and invokes invokes `companionModule` while the `infos` field is
       // still null. This calls `isModuleNotMethod`, which forces the `info` if run after refchecks.
-      slowButSafeEnteringPhaseNotLaterThan(picklerPhase) {
+      slowButSafeEnteringPhaseNotLaterThan(picklerPhase)
         sym setInfo new ClassInfoType(List(), new PackageScope(sym), sym)
         // override def safeToString = pkgClass.toString
         openPackageModule(sym)
         markAllCompleted(sym)
-      }
-    }
-  }
 
   // Since runtime reflection doesn't have a luxury of enumerating all classes
   // on the classpath, it has to materialize symbols for top-level definitions
@@ -97,51 +88,48 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
   //
   // Short of significantly changing SymbolLoaders I see no other way than just
   // to slap a global lock on materialization in runtime reflection.
-  class PackageScope(pkgClass: Symbol) extends Scope with SynchronizedScope {
+  class PackageScope(pkgClass: Symbol) extends Scope with SynchronizedScope
     assert(pkgClass.isType)
 
     // materializing multiple copies of the same symbol in PackageScope is a very popular bug
     // this override does its best to guard against it
-    override def enter[T <: Symbol](sym: T): T = {
+    override def enter[T <: Symbol](sym: T): T =
       // workaround for SI-7728
       if (isCompilerUniverse) super.enter(sym)
-      else {
+      else
         val existing = super.lookupEntry(sym.name)
         def eitherIsMethod(sym1: Symbol, sym2: Symbol) =
           sym1.isMethod || sym2.isMethod
         assert(existing == null || eitherIsMethod(existing.sym, sym),
                s"pkgClass = $pkgClass, sym = $sym, existing = $existing")
         super.enter(sym)
-      }
-    }
 
-    override def enterIfNew[T <: Symbol](sym: T): T = {
+    override def enterIfNew[T <: Symbol](sym: T): T =
       val existing = super.lookupEntry(sym.name)
       if (existing == null) enter(sym)
       else existing.sym.asInstanceOf[T]
-    }
 
     // package scopes need to synchronize on the GIL
     // because lookupEntry might cause changes to the global symbol table
     override def syncLockSynchronized[T](body: => T): T = gilSynchronized(body)
     private val negatives = new mutable.HashSet[Name]
-    override def lookupEntry(name: Name): ScopeEntry = syncLockSynchronized {
+    override def lookupEntry(name: Name): ScopeEntry = syncLockSynchronized
       val e = super.lookupEntry(name)
       if (e != null) e
       else if (negatives contains name) null
-      else {
+      else
         val path =
           if (pkgClass.isEmptyPackageClass) name.toString
           else pkgClass.fullName + "." + name
         val currentMirror = mirrorThatLoaded(pkgClass)
-        currentMirror.tryJavaClass(path) match {
+        currentMirror.tryJavaClass(path) match
           case Some(cls) =>
             val loadingMirror = currentMirror.mirrorDefining(cls)
             val (_, module) =
-              if (loadingMirror eq currentMirror) {
+              if (loadingMirror eq currentMirror)
                 initAndEnterClassAndModule(
                     pkgClass, name.toTypeName, new TopClassCompleter(_, _))
-              } else {
+              else
                 val origOwner =
                   loadingMirror.packageNameToScala(pkgClass.fullName)
                 val clazz = origOwner.info decl name.toTypeName
@@ -164,26 +152,19 @@ private[reflect] trait SymbolLoaders { self: SymbolTable =>
                 enterIfNew(clazz)
                 enterIfNew(module)
                 (clazz, module)
-              }
             debugInfo(s"created $module/${module.moduleClass} in $pkgClass")
             lookupEntry(name)
           case none =>
             debugInfo("*** not found : " + path)
             negatives += name
             null
-        }
-      }
-    }
-  }
 
   /** Assert that packages have package scopes */
-  override def validateClassInfo(tp: ClassInfoType) {
+  override def validateClassInfo(tp: ClassInfoType)
     assert(
         !tp.typeSymbol.isPackageClass || tp.decls.isInstanceOf[PackageScope])
-  }
 
   override def newPackageScope(pkgClass: Symbol) = new PackageScope(pkgClass)
 
   override def scopeTransform(owner: Symbol)(op: => Scope): Scope =
     if (owner.isPackageClass) owner.info.decls else op
-}

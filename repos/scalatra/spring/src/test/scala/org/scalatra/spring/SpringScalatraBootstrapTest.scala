@@ -12,7 +12,7 @@ import org.springframework.context.ApplicationContext
 
 /** @author Stephen Samuel */
 class SpringScalatraBootstrapTest
-    extends FunSuite with OneInstancePerTest with MockitoSugar {
+    extends FunSuite with OneInstancePerTest with MockitoSugar
 
   val applicationContext = mock[ApplicationContext]
   val servletContext = mock[ServletContext]
@@ -35,18 +35,15 @@ class SpringScalatraBootstrapTest
     .when(applicationContext.getBeansWithAnnotation(classOf[Path]))
     .thenReturn(beans)
 
-  test("resource beans are registered with the servlet context") {
+  test("resource beans are registered with the servlet context")
     bootstrapper.bootstrap()
     Mockito
       .verify(servletContext)
       .addServlet(classOf[CustomerResource].getName, resource)
-  }
 
-  test("resource beans use mapping from @Path") {
+  test("resource beans use mapping from @Path")
     bootstrapper.bootstrap()
     Mockito.verify(reg).addMapping("/customer/*")
-  }
-}
 
 @Path("customer")
 class CustomerResource extends ScalatraServlet

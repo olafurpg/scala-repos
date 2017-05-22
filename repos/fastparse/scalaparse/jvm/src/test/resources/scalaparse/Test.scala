@@ -1,3 +1,2 @@
-class Baz {
+class Baz
   ba /*caret*/ r
-}

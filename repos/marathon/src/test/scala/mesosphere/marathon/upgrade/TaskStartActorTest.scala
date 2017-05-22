@@ -28,7 +28,7 @@ import scala.concurrent.{Await, Promise}
 
 class TaskStartActorTest
     extends MarathonActorSupport with FunSuiteLike with Matchers
-    with MockitoSugar with ScalaFutures with BeforeAndAfter {
+    with MockitoSugar with ScalaFutures with BeforeAndAfter
 
   var driver: SchedulerDriver = _
   var scheduler: SchedulerActions = _
@@ -37,7 +37,7 @@ class TaskStartActorTest
   var taskCreationHandler: TaskCreationHandler = _
   var metrics: Metrics = _
 
-  before {
+  before
     driver = mock[SchedulerDriver]
     scheduler = mock[SchedulerActions]
     launchQueue = mock[LaunchQueue]
@@ -48,13 +48,12 @@ class TaskStartActorTest
 
     taskCreationHandler = taskTrackerModule.taskCreationHandler
     taskTracker = spy(taskTrackerModule.taskTracker)
-  }
 
   for ((counts, description) <- Seq(
       None -> "with no item in queue",
       Some(LaunchQueueTestHelper.zeroCounts) -> "with zero count queue item"
-  )) {
-    test(s"Start success $description") {
+  ))
+    test(s"Start success $description")
       val promise = Promise[Unit]()
       val app = AppDefinition("/myApp".toPath, instances = 5)
 
@@ -88,15 +87,13 @@ class TaskStartActorTest
       Await.result(promise.future, 3.seconds) should be(())
 
       expectTerminated(ref)
-    }
-  }
 
   for ((counts, description) <- Seq(
       Some(LaunchQueueTestHelper.zeroCounts.copy(tasksLeftToLaunch = 1)) -> "with one task left to launch",
       Some(LaunchQueueTestHelper.zeroCounts.copy(taskLaunchesInFlight = 1)) -> "with one task in flight",
       Some(LaunchQueueTestHelper.zeroCounts.copy(tasksLaunched = 1)) -> "with one task already running"
-  )) {
-    test(s"Start success $description") {
+  ))
+    test(s"Start success $description")
       val promise = Promise[Unit]()
       val app = AppDefinition("/myApp".toPath, instances = 5)
 
@@ -133,10 +130,8 @@ class TaskStartActorTest
       Await.result(promise.future, 3.seconds) should be(())
 
       expectTerminated(ref)
-    }
-  }
 
-  test("Start success with existing task in task queue") {
+  test("Start success with existing task in task queue")
     val promise = Promise[Unit]()
     val app = AppDefinition("/myApp".toPath, instances = 5)
 
@@ -174,9 +169,8 @@ class TaskStartActorTest
     Await.result(promise.future, 3.seconds) should be(())
 
     expectTerminated(ref)
-  }
 
-  test("Start success with no instances to start") {
+  test("Start success with no instances to start")
     val promise = Promise[Boolean]()
     val app = AppDefinition("/myApp".toPath, instances = 0)
     when(launchQueue.get(app.id)).thenReturn(None)
@@ -197,9 +191,8 @@ class TaskStartActorTest
     Await.result(promise.future, 3.seconds) should be(())
 
     expectTerminated(ref)
-  }
 
-  test("Start with health checks") {
+  test("Start with health checks")
     val promise = Promise[Boolean]()
     val app = AppDefinition(
         "/myApp".toPath,
@@ -230,9 +223,8 @@ class TaskStartActorTest
     Await.result(promise.future, 3.seconds) should be(())
 
     expectTerminated(ref)
-  }
 
-  test("Start with health checks with no instances to start") {
+  test("Start with health checks with no instances to start")
     val promise = Promise[Boolean]()
     val app = AppDefinition(
         "/myApp".toPath,
@@ -257,9 +249,8 @@ class TaskStartActorTest
     Await.result(promise.future, 3.seconds) should be(())
 
     expectTerminated(ref)
-  }
 
-  test("Cancelled") {
+  test("Cancelled")
     val promise = Promise[Boolean]()
     val app = AppDefinition("/myApp".toPath, instances = 5)
     when(launchQueue.get(app.id)).thenReturn(None)
@@ -279,14 +270,13 @@ class TaskStartActorTest
 
     system.stop(ref)
 
-    intercept[TaskUpgradeCanceledException] {
+    intercept[TaskUpgradeCanceledException]
       Await.result(promise.future, 5.seconds)
-    }.getMessage should equal("The task upgrade has been cancelled")
+    .getMessage should equal("The task upgrade has been cancelled")
 
     expectTerminated(ref)
-  }
 
-  test("Task fails to start") {
+  test("Task fails to start")
     val promise = Promise[Unit]()
     val app = AppDefinition("/myApp".toPath, instances = 1)
 
@@ -333,10 +323,9 @@ class TaskStartActorTest
     Await.result(promise.future, 3.seconds) should be(())
 
     expectTerminated(ref)
-  }
 
   test(
-      "Start success with dying existing task, reschedules, but finishes early") {
+      "Start success with dying existing task, reschedules, but finishes early")
     val promise = Promise[Unit]()
     val app = AppDefinition("/myApp".toPath, instances = 5)
     when(launchQueue.get(app.id)).thenReturn(None)
@@ -398,7 +387,7 @@ class TaskStartActorTest
       .thenReturn(Some(LaunchQueueTestHelper.zeroCounts.copy(
                 tasksLeftToLaunch = app.instances)))
     when(taskTracker.countLaunchedAppTasksSync(app.id)).thenReturn(4)
-    List(0, 1, 2, 3) foreach { i =>
+    List(0, 1, 2, 3) foreach  i =>
       system.eventStream.publish(
           MesosStatusUpdateEvent("",
                                  Task.Id(s"task-$i"),
@@ -409,7 +398,6 @@ class TaskStartActorTest
                                  Nil,
                                  Nil,
                                  app.version.toString))
-    }
 
     // it finished early
     Await.result(promise.future, 3.seconds) should be(())
@@ -417,5 +405,3 @@ class TaskStartActorTest
     Mockito.verifyNoMoreInteractions(launchQueue)
 
     expectTerminated(ref)
-  }
-}

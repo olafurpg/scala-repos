@@ -15,31 +15,26 @@ private final class Socket(challengeId: String,
                            uidTimeout: Duration,
                            socketTimeout: Duration)
     extends SocketActor[Socket.Member](uidTimeout)
-    with Historical[Socket.Member, Unit] {
+    with Historical[Socket.Member, Unit]
 
   private val timeBomb = new TimeBomb(socketTimeout)
 
-  def receiveSpecific = {
+  def receiveSpecific =
 
     case Socket.Reload =>
-      getChallenge(challengeId) foreach {
-        _ foreach { challenge =>
+      getChallenge(challengeId) foreach
+        _ foreach  challenge =>
           notifyVersion("reload", JsNull, ())
-        }
-      }
 
-    case PingVersion(uid, v) => {
+    case PingVersion(uid, v) =>
         ping(uid)
         timeBomb.delay
-        withMember(uid) { m =>
+        withMember(uid)  m =>
           history.since(v).fold(resync(m))(_ foreach sendMessage(m))
-        }
-      }
 
-    case Broom => {
+    case Broom =>
         broom
         if (timeBomb.boom) self ! PoisonPill
-      }
 
     case GetVersion => sender ! history.version
 
@@ -50,21 +45,17 @@ private final class Socket(challengeId: String,
       sender ! Socket.Connected(enumerator, member)
 
     case Quit(uid) => quit(uid)
-  }
 
   protected def shouldSkipMessageFor(message: Message, member: Socket.Member) =
     false
-}
 
-private object Socket {
+private object Socket
 
   case class Member(channel: JsChannel, userId: Option[String], owner: Boolean)
-      extends lila.socket.SocketMember {
+      extends lila.socket.SocketMember
     val troll = false
-  }
 
   case class Join(uid: String, userId: Option[String], owner: Boolean)
   case class Connected(enumerator: JsEnumerator, member: Member)
 
   case object Reload
-}

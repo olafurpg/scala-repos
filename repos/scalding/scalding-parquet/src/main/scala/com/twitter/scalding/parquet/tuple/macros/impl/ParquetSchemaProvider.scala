@@ -4,9 +4,9 @@ import com.twitter.bijection.macros.impl.IsCaseClassImpl
 
 import scala.reflect.macros.Context
 
-object ParquetSchemaProvider {
+object ParquetSchemaProvider
   def toParquetSchemaImpl[T](c: Context)(
-      implicit T: c.WeakTypeTag[T]): c.Expr[String] = {
+      implicit T: c.WeakTypeTag[T]): c.Expr[String] =
     import c.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(c)(T.tpe))
@@ -16,7 +16,7 @@ object ParquetSchemaProvider {
         This will mean the macro is operating on a non-resolved type.""")
 
     def matchField(
-        fieldType: Type, fieldName: String, isOption: Boolean): Tree = {
+        fieldType: Type, fieldName: String, isOption: Boolean): Tree =
       val REPETITION_REQUIRED =
         q"_root_.org.apache.parquet.schema.Type.Repetition.REQUIRED"
       val REPETITION_OPTIONAL =
@@ -33,7 +33,7 @@ object ParquetSchemaProvider {
       def createListGroupType(innerFieldsType: Tree): Tree =
         q"""new _root_.org.apache.parquet.schema.GroupType($REPETITION_REPEATED, "list", $innerFieldsType)"""
 
-      fieldType match {
+      fieldType match
         case tpe if tpe =:= typeOf[String] =>
           createPrimitiveTypeField(
               q"_root_.org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName.BINARY")
@@ -74,18 +74,15 @@ object ParquetSchemaProvider {
         case _ =>
           c.abort(c.enclosingPosition,
                   s"Case class $T has unsupported field type : $fieldType ")
-      }
-    }
 
-    def expandMethod(outerTpe: Type): List[Tree] = {
-      outerTpe.declarations.collect {
+    def expandMethod(outerTpe: Type): List[Tree] =
+      outerTpe.declarations.collect
         case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
+      .map  accessorMethod =>
         val fieldName = accessorMethod.name.toTermName.toString
         val fieldType = accessorMethod.returnType
         matchField(fieldType, fieldName, isOption = false)
-      }.toList
-    }
+      .toList
 
     val expanded = expandMethod(T.tpe)
 
@@ -99,5 +96,3 @@ object ParquetSchemaProvider {
                         _root_.scala.Array.apply[_root_.org.apache.parquet.schema.Type](..$expanded):_*).toString"""
 
     c.Expr[String](schema)
-  }
-}

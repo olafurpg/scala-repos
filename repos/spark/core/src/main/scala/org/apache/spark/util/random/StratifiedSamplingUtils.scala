@@ -49,7 +49,7 @@ import org.apache.spark.rdd.RDD
   * For more theoretical background on the sampling techniques used here, please refer to
   * http://jmlr.org/proceedings/papers/v28/meng13a.html
   */
-private[spark] object StratifiedSamplingUtils extends Logging {
+private[spark] object StratifiedSamplingUtils extends Logging
 
   /**
     * Count the number of items instantly accepted and generate the waitlist for each stratum.
@@ -61,9 +61,9 @@ private[spark] object StratifiedSamplingUtils extends Logging {
       withReplacement: Boolean,
       fractions: Map[K, Double],
       counts: Option[Map[K, Long]],
-      seed: Long): mutable.Map[K, AcceptanceResult] = {
+      seed: Long): mutable.Map[K, AcceptanceResult] =
     val combOp = getCombOp[K]
-    val mappedPartitionRDD = rdd.mapPartitionsWithIndex {
+    val mappedPartitionRDD = rdd.mapPartitionsWithIndex
       case (partition, iter) =>
         val zeroU: mutable.Map[K, AcceptanceResult] =
           new mutable.HashMap[K, AcceptanceResult]()
@@ -71,9 +71,7 @@ private[spark] object StratifiedSamplingUtils extends Logging {
         rng.reSeed(seed + partition)
         val seqOp = getSeqOp(withReplacement, fractions, rng, counts)
         Iterator(iter.aggregate(zeroU)(seqOp, combOp))
-    }
     mappedPartitionRDD.reduce(combOp)
-  }
 
   /**
     * Returns the function used by aggregate to collect sampling statistics for each partition.
@@ -83,41 +81,36 @@ private[spark] object StratifiedSamplingUtils extends Logging {
       fractions: Map[K, Double],
       rng: RandomDataGenerator,
       counts: Option[Map[K, Long]]): (mutable.Map[K, AcceptanceResult], (K,
-  V)) => mutable.Map[K, AcceptanceResult] = {
+  V)) => mutable.Map[K, AcceptanceResult] =
     val delta = 5e-5
     (result: mutable.Map[K, AcceptanceResult], item: (K, V)) =>
-      {
         val key = item._1
         val fraction = fractions(key)
-        if (!result.contains(key)) {
+        if (!result.contains(key))
           result += (key -> new AcceptanceResult())
-        }
         val acceptResult = result(key)
 
-        if (withReplacement) {
+        if (withReplacement)
           // compute acceptBound and waitListBound only if they haven't been computed already
           // since they don't change from iteration to iteration.
           // TODO change this to the streaming version
-          if (acceptResult.areBoundsEmpty) {
+          if (acceptResult.areBoundsEmpty)
             val n = counts.get(key)
             val sampleSize = math.ceil(n * fraction).toLong
             val lmbd1 = PoissonBounds.getLowerBound(sampleSize)
             val lmbd2 = PoissonBounds.getUpperBound(sampleSize)
             acceptResult.acceptBound = lmbd1 / n
             acceptResult.waitListBound = (lmbd2 - lmbd1) / n
-          }
           val acceptBound = acceptResult.acceptBound
           val copiesAccepted =
             if (acceptBound == 0.0) 0L else rng.nextPoisson(acceptBound)
-          if (copiesAccepted > 0) {
+          if (copiesAccepted > 0)
             acceptResult.numAccepted += copiesAccepted
-          }
           val copiesWaitlisted = rng.nextPoisson(acceptResult.waitListBound)
-          if (copiesWaitlisted > 0) {
+          if (copiesWaitlisted > 0)
             acceptResult.waitList ++=
               ArrayBuffer.fill(copiesWaitlisted)(rng.nextUniform())
-          }
-        } else {
+        else
           // We use the streaming version of the algorithm for sampling without replacement to avoid
           // using an extra pass over the RDD for computing the count.
           // Hence, acceptBound and waitListBound change on every iteration.
@@ -127,40 +120,30 @@ private[spark] object StratifiedSamplingUtils extends Logging {
               delta, acceptResult.numItems, fraction)
 
           val x = rng.nextUniform()
-          if (x < acceptResult.acceptBound) {
+          if (x < acceptResult.acceptBound)
             acceptResult.numAccepted += 1
-          } else if (x < acceptResult.waitListBound) {
+          else if (x < acceptResult.waitListBound)
             acceptResult.waitList += x
-          }
-        }
         acceptResult.numItems += 1
         result
-      }
-  }
 
   /**
     * Returns the function used combine results returned by seqOp from different partitions.
     */
   def getCombOp[K]: (mutable.Map[K, AcceptanceResult],
-  mutable.Map[K, AcceptanceResult]) => mutable.Map[K, AcceptanceResult] = {
+  mutable.Map[K, AcceptanceResult]) => mutable.Map[K, AcceptanceResult] =
     (result1: mutable.Map[K, AcceptanceResult],
     result2: mutable.Map[K, AcceptanceResult]) =>
-      {
         // take union of both key sets in case one partition doesn't contain all keys
-        result1.keySet.union(result2.keySet).foreach { key =>
+        result1.keySet.union(result2.keySet).foreach  key =>
           // Use result2 to keep the combined result since r1 is usual empty
           val entry1 = result1.get(key)
-          if (result2.contains(key)) {
+          if (result2.contains(key))
             result2(key).merge(entry1)
-          } else {
-            if (entry1.isDefined) {
+          else
+            if (entry1.isDefined)
               result2 += (key -> entry1.get)
-            }
-          }
-        }
         result2
-      }
-  }
 
   /**
     * Given the result returned by getCounts, determine the threshold for accepting items to
@@ -176,26 +159,22 @@ private[spark] object StratifiedSamplingUtils extends Logging {
     * to be included in the sample.
     */
   def computeThresholdByKey[K](finalResult: Map[K, AcceptanceResult],
-                               fractions: Map[K, Double]): Map[K, Double] = {
+                               fractions: Map[K, Double]): Map[K, Double] =
     val thresholdByKey = new mutable.HashMap[K, Double]()
-    for ((key, acceptResult) <- finalResult) {
+    for ((key, acceptResult) <- finalResult)
       val sampleSize = math.ceil(acceptResult.numItems * fractions(key)).toLong
-      if (acceptResult.numAccepted > sampleSize) {
+      if (acceptResult.numAccepted > sampleSize)
         logWarning("Pre-accepted too many")
         thresholdByKey += (key -> acceptResult.acceptBound)
-      } else {
+      else
         val numWaitListAccepted = (sampleSize - acceptResult.numAccepted).toInt
-        if (numWaitListAccepted >= acceptResult.waitList.size) {
+        if (numWaitListAccepted >= acceptResult.waitList.size)
           logWarning("WaitList too short")
           thresholdByKey += (key -> acceptResult.waitListBound)
-        } else {
+        else
           thresholdByKey +=
           (key -> acceptResult.waitList.sorted.apply(numWaitListAccepted))
-        }
-      }
-    }
     thresholdByKey
-  }
 
   /**
     * Return the per partition sampling function used for sampling without replacement.
@@ -209,22 +188,18 @@ private[spark] object StratifiedSamplingUtils extends Logging {
       rdd: RDD[(K, V)],
       fractions: Map[K, Double],
       exact: Boolean,
-      seed: Long): (Int, Iterator[(K, V)]) => Iterator[(K, V)] = {
+      seed: Long): (Int, Iterator[(K, V)]) => Iterator[(K, V)] =
     var samplingRateByKey = fractions
-    if (exact) {
+    if (exact)
       // determine threshold for each stratum and resample
       val finalResult = getAcceptanceResults(rdd, false, fractions, None, seed)
       samplingRateByKey = computeThresholdByKey(finalResult, fractions)
-    }
     (idx: Int, iter: Iterator[(K, V)]) =>
-      {
         val rng = new RandomDataGenerator()
         rng.reSeed(seed + idx)
         // Must use the same invoke pattern on the rng as in getSeqOp for without replacement
         // in order to generate the same sequence of random numbers when creating the sample
         iter.filter(t => rng.nextUniform() < samplingRateByKey(t._1))
-      }
-  }
 
   /**
     * Return the per partition sampling function used for sampling with replacement.
@@ -240,18 +215,17 @@ private[spark] object StratifiedSamplingUtils extends Logging {
       rdd: RDD[(K, V)],
       fractions: Map[K, Double],
       exact: Boolean,
-      seed: Long): (Int, Iterator[(K, V)]) => Iterator[(K, V)] = {
+      seed: Long): (Int, Iterator[(K, V)]) => Iterator[(K, V)] =
     // TODO implement the streaming version of sampling w/ replacement that doesn't require counts
-    if (exact) {
+    if (exact)
       val counts = Some(rdd.countByKey())
       val finalResult = getAcceptanceResults(
           rdd, true, fractions, counts, seed)
       val thresholdByKey = computeThresholdByKey(finalResult, fractions)
       (idx: Int, iter: Iterator[(K, V)]) =>
-        {
           val rng = new RandomDataGenerator()
           rng.reSeed(seed + idx)
-          iter.flatMap { item =>
+          iter.flatMap  item =>
             val key = item._1
             val acceptBound = finalResult(key).acceptBound
             // Must use the same invoke pattern on the rng as in getSeqOp for with replacement
@@ -263,57 +237,43 @@ private[spark] object StratifiedSamplingUtils extends Logging {
             val copiesInSample =
               copiesAccepted + (0 until copiesWaitlisted).count(
                   i => rng.nextUniform() < thresholdByKey(key))
-            if (copiesInSample > 0) {
+            if (copiesInSample > 0)
               Iterator.fill(copiesInSample.toInt)(item)
-            } else {
+            else
               Iterator.empty
-            }
-          }
-        }
-    } else { (idx: Int, iter: Iterator[(K, V)]) =>
-      {
+    else  (idx: Int, iter: Iterator[(K, V)]) =>
         val rng = new RandomDataGenerator()
         rng.reSeed(seed + idx)
-        iter.flatMap { item =>
+        iter.flatMap  item =>
           val count = rng.nextPoisson(fractions(item._1))
-          if (count == 0) {
+          if (count == 0)
             Iterator.empty
-          } else {
+          else
             Iterator.fill(count)(item)
-          }
-        }
-      }
-    }
-  }
 
   /** A random data generator that generates both uniform values and Poisson values. */
-  private class RandomDataGenerator {
+  private class RandomDataGenerator
     val uniform = new XORShiftRandom()
     // commons-math3 doesn't have a method to generate Poisson from an arbitrary mean;
     // maintain a cache of Poisson(m) distributions for various m
     val poissonCache = mutable.Map[Double, PoissonDistribution]()
     var poissonSeed = 0L
 
-    def reSeed(seed: Long): Unit = {
+    def reSeed(seed: Long): Unit =
       uniform.setSeed(seed)
       poissonSeed = seed
       poissonCache.clear()
-    }
 
-    def nextPoisson(mean: Double): Int = {
-      val poisson = poissonCache.getOrElseUpdate(mean, {
+    def nextPoisson(mean: Double): Int =
+      val poisson = poissonCache.getOrElseUpdate(mean,
         val newPoisson = new PoissonDistribution(mean)
         newPoisson.reseedRandomGenerator(poissonSeed)
         newPoisson
-      })
+      )
       poisson.sample()
-    }
 
-    def nextUniform(): Double = {
+    def nextUniform(): Double =
       uniform.nextDouble()
-    }
-  }
-}
 
 /**
   * Object used by seqOp to keep track of the number of items accepted and items waitlisted per
@@ -323,7 +283,7 @@ private[spark] object StratifiedSamplingUtils extends Logging {
   */
 private[random] class AcceptanceResult(
     var numItems: Long = 0L, var numAccepted: Long = 0L)
-    extends Serializable {
+    extends Serializable
 
   val waitList = new ArrayBuffer[Double]
   var acceptBound: Double =
@@ -333,11 +293,8 @@ private[random] class AcceptanceResult(
 
   def areBoundsEmpty: Boolean = acceptBound.isNaN || waitListBound.isNaN
 
-  def merge(other: Option[AcceptanceResult]): Unit = {
-    if (other.isDefined) {
+  def merge(other: Option[AcceptanceResult]): Unit =
+    if (other.isDefined)
       waitList ++= other.get.waitList
       numAccepted += other.get.numAccepted
       numItems += other.get.numItems
-    }
-  }
-}

@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   val a = Array(1, 2, 3)
   println(a.deep.toString)
 
@@ -11,4 +11,3 @@ object Test extends App {
   for (i <- 0 until 3; j <- 0 until 3) aaiComplete(i)(j) = i + j
   println(aaiComplete.deep.toString)
   assert(aaiComplete.last.last == 4)
-}

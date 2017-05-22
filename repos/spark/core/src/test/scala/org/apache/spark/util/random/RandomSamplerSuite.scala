@@ -26,7 +26,7 @@ import org.scalatest.Matchers
 
 import org.apache.spark.SparkFunSuite
 
-class RandomSamplerSuite extends SparkFunSuite with Matchers {
+class RandomSamplerSuite extends SparkFunSuite with Matchers
 
   /**
     * My statistical testing methodology is to run a Kolmogorov-Smirnov (KS) test
@@ -62,45 +62,37 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
   rngSeed.setSeed(235711)
 
   // Reference implementation of sampling without replacement (bernoulli)
-  def sample[T](data: Iterator[T], f: Double): Iterator[T] = {
+  def sample[T](data: Iterator[T], f: Double): Iterator[T] =
     val rng: Random = RandomSampler.newDefaultRNG
     rng.setSeed(rngSeed.nextLong)
     data.filter(_ => (rng.nextDouble <= f))
-  }
 
   // Reference implementation of sampling with replacement
-  def sampleWR[T](data: Iterator[T], f: Double): Iterator[T] = {
+  def sampleWR[T](data: Iterator[T], f: Double): Iterator[T] =
     val rng = new PoissonDistribution(f)
     rng.reseedRandomGenerator(rngSeed.nextLong)
-    data.flatMap { v =>
-      {
+    data.flatMap  v =>
         val rep = rng.sample()
         if (rep == 0) Iterator.empty else Iterator.fill(rep)(v)
-      }
-    }
-  }
 
   // Returns iterator over gap lengths between samples.
   // This function assumes input data is integers sampled from the sequence of
   // increasing integers: {0, 1, 2, ...}.  This works because that is how I generate them,
   // and the samplers preserve their input order
-  def gaps(data: Iterator[Int]): Iterator[Int] = {
-    data.sliding(2).withPartial(false).map { x =>
+  def gaps(data: Iterator[Int]): Iterator[Int] =
+    data.sliding(2).withPartial(false).map  x =>
       x(1) - x(0)
-    }
-  }
 
   // Returns the cumulative distribution from a histogram
-  def cumulativeDist(hist: Array[Int]): Array[Double] = {
+  def cumulativeDist(hist: Array[Int]): Array[Double] =
     val n = hist.sum.toDouble
     assert(n > 0.0)
     hist.scanLeft(0)(_ + _).drop(1).map { _.toDouble / n }
-  }
 
   // Returns aligned cumulative distributions from two arrays of data
   def cumulants(d1: Array[Int],
                 d2: Array[Int],
-                ss: Int = sampleSize): (Array[Double], Array[Double]) = {
+                ss: Int = sampleSize): (Array[Double], Array[Double]) =
     assert(math.min(d1.length, d2.length) > 0)
     assert(math.min(d1.min, d2.min) >= 0)
     val m = 1 + math.max(d1.max, d2.max)
@@ -111,10 +103,9 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     assert(h1.sum == h2.sum)
     assert(h1.sum == ss)
     (cumulativeDist(h1), cumulativeDist(h2))
-  }
 
   // Computes the Kolmogorov-Smirnov 'D' statistic from two cumulative distributions
-  def KSD(cdf1: Array[Double], cdf2: Array[Double]): Double = {
+  def KSD(cdf1: Array[Double], cdf2: Array[Double]): Double =
     assert(cdf1.length == cdf2.length)
     val n = cdf1.length
     assert(n > 0)
@@ -122,27 +113,23 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     assert(cdf2(n - 1) == 1.0)
     cdf1
       .zip(cdf2)
-      .map { x =>
+      .map  x =>
         Math.abs(x._1 - x._2)
-      }
       .max
-  }
 
   // Returns the median KS 'D' statistic between two samples, over (m) sampling trials
   def medianKSD(
-      data1: => Iterator[Int], data2: => Iterator[Int], m: Int = 5): Double = {
+      data1: => Iterator[Int], data2: => Iterator[Int], m: Int = 5): Double =
     val t = Array
-      .fill[Double](m) {
+      .fill[Double](m)
         val (c1, c2) = cumulants(data1.take(sampleSize).toArray,
                                  data2.take(sampleSize).toArray)
         KSD(c1, c2)
-      }
       .sorted
     // return the median KS statistic
     t(m / 2)
-  }
 
-  test("utilities") {
+  test("utilities")
     val s1 = Array(0, 1, 1, 0, 2)
     val s2 = Array(1, 0, 3, 2, 1)
     val (c1, c2) = cumulants(s1, s2, ss = 5)
@@ -152,9 +139,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     KSD(c2, c1) should be(KSD(c1, c2))
     gaps(List(0, 1, 1, 2, 4, 11).iterator).toArray should be(
         Array(1, 0, 1, 2, 7))
-  }
 
-  test("sanity check medianKSD against references") {
+  test("sanity check medianKSD against references")
     var d: Double = 0.0
 
     // should be statistically same, i.e. fail to reject null hypothesis strongly
@@ -177,9 +163,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampleWR(Iterator.from(0), 0.5)),
                   gaps(sampleWR(Iterator.from(0), 0.6)))
     d should be > D
-  }
 
-  test("bernoulli sampling") {
+  test("bernoulli sampling")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -209,9 +194,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampler.sample(Iterator.from(0))),
                   gaps(sample(Iterator.from(0), 0.6)))
     d should be > D
-  }
 
-  test("bernoulli sampling with gap sampling optimization") {
+  test("bernoulli sampling with gap sampling optimization")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -241,9 +225,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampler.sample(Iterator.from(0))),
                   gaps(sample(Iterator.from(0), 0.4)))
     d should be > D
-  }
 
-  test("bernoulli boundary cases") {
+  test("bernoulli boundary cases")
     val data = (1 to 100).toArray
 
     var sampler = new BernoulliSampler[Int](0.0)
@@ -259,9 +242,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     sampler = new BernoulliSampler[Int](
         1.0 + (RandomSampler.roundingEpsilon / 2.0))
     sampler.sample(data.iterator).toArray should be(data)
-  }
 
-  test("bernoulli data types") {
+  test("bernoulli data types")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -292,9 +274,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
                 Iterator.from(0).take(20 * sampleSize).toList.iterator)),
         gaps(sample(Iterator.from(0), 0.1)))
     d should be < D
-  }
 
-  test("bernoulli clone") {
+  test("bernoulli clone")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -310,9 +291,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampler.sample(Iterator.from(0))),
                   gaps(sample(Iterator.from(0), 0.9)))
     d should be < D
-  }
 
-  test("bernoulli set seed") {
+  test("bernoulli set seed")
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
     var d: Double = 0.0
@@ -351,9 +331,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
                   gaps(sampler2.sample(Iterator.from(0))))
     d should be > 0.0
     d should be < D
-  }
 
-  test("replacement sampling") {
+  test("replacement sampling")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -383,9 +362,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampler.sample(Iterator.from(0))),
                   gaps(sampleWR(Iterator.from(0), 0.6)))
     d should be > D
-  }
 
-  test("replacement sampling with gap sampling") {
+  test("replacement sampling with gap sampling")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -415,9 +393,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampler.sample(Iterator.from(0))),
                   gaps(sampleWR(Iterator.from(0), 0.4)))
     d should be > D
-  }
 
-  test("replacement boundary cases") {
+  test("replacement boundary cases")
     val data = (1 to 100).toArray
 
     var sampler = new PoissonSampler[Int](0.0)
@@ -430,9 +407,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     // sampling with replacement has no upper bound on sampling fraction
     sampler = new PoissonSampler[Int](2.0)
     sampler.sample(data.iterator).length should be > (data.length)
-  }
 
-  test("replacement data types") {
+  test("replacement data types")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -463,9 +439,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
                 Iterator.from(0).take(20 * sampleSize).toList.iterator)),
         gaps(sampleWR(Iterator.from(0), 0.1)))
     d should be < D
-  }
 
-  test("replacement clone") {
+  test("replacement clone")
     // Tests expect maximum gap sampling fraction to be this value
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
@@ -481,9 +456,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampler.sample(Iterator.from(0))),
                   gaps(sampleWR(Iterator.from(0), 0.9)))
     d should be < D
-  }
 
-  test("replacement set seed") {
+  test("replacement set seed")
     RandomSampler.defaultMaxGapSamplingFraction should be(0.4)
 
     var d: Double = 0.0
@@ -522,9 +496,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
                   gaps(sampler2.sample(Iterator.from(0))))
     d should be > 0.0
     d should be < D
-  }
 
-  test("bernoulli partitioning sampling") {
+  test("bernoulli partitioning sampling")
     var d: Double = 0.0
 
     var sampler = new BernoulliCellSampler[Int](0.1, 0.2)
@@ -538,9 +511,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     d = medianKSD(gaps(sampler.sample(Iterator.from(0))),
                   gaps(sample(Iterator.from(0), 0.9)))
     d should be < D
-  }
 
-  test("bernoulli partitioning boundary cases") {
+  test("bernoulli partitioning boundary cases")
     val data = (1 to 100).toArray
     val d = RandomSampler.roundingEpsilon / 2.0
 
@@ -561,9 +533,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
 
     sampler = new BernoulliCellSampler[Int](0.5, 0.5 - d)
     sampler.sample(data.iterator).toArray should be(Array.empty[Int])
-  }
 
-  test("bernoulli partitioning data") {
+  test("bernoulli partitioning data")
     val seed = rngSeed.nextLong
     val data = (1 to 100).toArray
 
@@ -584,9 +555,8 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
 
     sampler = new BernoulliCellSampler[Int](0.5, 0.5, true)
     sampler.sample(data.iterator).toArray should be(data)
-  }
 
-  test("bernoulli partitioning clone") {
+  test("bernoulli partitioning clone")
     val seed = rngSeed.nextLong
     val data = (1 to 100).toArray
     val base = new BernoulliCellSampler[Int](0.35, 0.65)
@@ -602,5 +572,3 @@ class RandomSamplerSuite extends SparkFunSuite with Matchers {
     s2.length should be > 0
 
     (s1 ++ s2).sorted should be(data)
-  }
-}

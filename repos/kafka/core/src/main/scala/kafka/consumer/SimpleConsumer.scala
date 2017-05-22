@@ -35,7 +35,7 @@ class SimpleConsumer(val host: String,
                      val soTimeout: Int,
                      val bufferSize: Int,
                      val clientId: String)
-    extends Logging {
+    extends Logging
 
   ConsumerConfig.validateClientId(clientId)
   private val lock = new Object()
@@ -46,21 +46,18 @@ class SimpleConsumer(val host: String,
         clientId)
   private var isClosed = false
 
-  private def connect(): BlockingChannel = {
+  private def connect(): BlockingChannel =
     close
     blockingChannel.connect()
     blockingChannel
-  }
 
-  private def disconnect() = {
+  private def disconnect() =
     debug("Disconnecting from " + formatAddress(host, port))
     blockingChannel.disconnect()
-  }
 
-  private def reconnect() {
+  private def reconnect()
     disconnect()
     connect()
-  }
 
   /**
     * Unblock thread by closing channel and triggering AsynchronousCloseException if a read operation is in progress.
@@ -68,25 +65,22 @@ class SimpleConsumer(val host: String,
     * This handles a bug found in Java 1.7 and below, where interrupting a thread can not correctly unblock
     * the thread from waiting on ReadableByteChannel.read().
     */
-  def disconnectToHandleJavaIOBug() = {
+  def disconnectToHandleJavaIOBug() =
     disconnect()
-  }
 
-  def close() {
-    lock synchronized {
+  def close()
+    lock synchronized
       disconnect()
       isClosed = true
-    }
-  }
 
-  private def sendRequest(request: RequestOrResponse): NetworkReceive = {
-    lock synchronized {
+  private def sendRequest(request: RequestOrResponse): NetworkReceive =
+    lock synchronized
       var response: NetworkReceive = null
-      try {
+      try
         getOrMakeConnection()
         blockingChannel.send(request)
         response = blockingChannel.receive()
-      } catch {
+      catch
         case e: ClosedByInterruptException =>
           throw e
         // Should not observe this exception when running Kafka with Java 1.8
@@ -95,29 +89,23 @@ class SimpleConsumer(val host: String,
         case e: Throwable =>
           info("Reconnect due to error:", e)
           // retry once
-          try {
+          try
             reconnect()
             blockingChannel.send(request)
             response = blockingChannel.receive()
-          } catch {
+          catch
             case e: Throwable =>
               disconnect()
               throw e
-          }
-      }
       response
-    }
-  }
 
-  def send(request: TopicMetadataRequest): TopicMetadataResponse = {
+  def send(request: TopicMetadataRequest): TopicMetadataResponse =
     val response = sendRequest(request)
     TopicMetadataResponse.readFrom(response.payload())
-  }
 
-  def send(request: GroupCoordinatorRequest): GroupCoordinatorResponse = {
+  def send(request: GroupCoordinatorRequest): GroupCoordinatorResponse =
     val response = sendRequest(request)
     GroupCoordinatorResponse.readFrom(response.payload())
-  }
 
   /**
     *  Fetch a set of messages from a topic.
@@ -125,18 +113,16 @@ class SimpleConsumer(val host: String,
     *  @param request  specifies the topic name, topic partition, starting byte offset, maximum bytes to be fetched.
     *  @return a set of fetched messages
     */
-  def fetch(request: FetchRequest): FetchResponse = {
+  def fetch(request: FetchRequest): FetchResponse =
     var response: NetworkReceive = null
     val specificTimer = fetchRequestAndResponseStats
       .getFetchRequestAndResponseStats(host, port)
       .requestTimer
     val aggregateTimer =
       fetchRequestAndResponseStats.getFetchRequestAndResponseAllBrokersStats.requestTimer
-    aggregateTimer.time {
-      specificTimer.time {
+    aggregateTimer.time
+      specificTimer.time
         response = sendRequest(request)
-      }
-    }
     val fetchResponse =
       FetchResponse.readFrom(response.payload(), request.versionId)
     val fetchedSize = fetchResponse.sizeInBytes
@@ -153,7 +139,6 @@ class SimpleConsumer(val host: String,
     fetchRequestAndResponseStats.getFetchRequestAndResponseAllBrokersStats.throttleTimeStats
       .update(fetchResponse.throttleTimeMs, TimeUnit.MILLISECONDS)
     fetchResponse
-  }
 
   /**
     *  Get a list of valid offsets (up to maxSize) before the given time.
@@ -169,11 +154,10 @@ class SimpleConsumer(val host: String,
     * @param request a [[kafka.api.OffsetCommitRequest]] object.
     * @return a [[kafka.api.OffsetCommitResponse]] object.
     */
-  def commitOffsets(request: OffsetCommitRequest) = {
+  def commitOffsets(request: OffsetCommitRequest) =
     // TODO: With KAFKA-1012, we have to first issue a ConsumerMetadataRequest and connect to the coordinator before
     // we can commit offsets.
     OffsetCommitResponse.readFrom(sendRequest(request).payload())
-  }
 
   /**
     * Fetch offsets for a topic
@@ -184,11 +168,9 @@ class SimpleConsumer(val host: String,
   def fetchOffsets(request: OffsetFetchRequest) =
     OffsetFetchResponse.readFrom(sendRequest(request).payload())
 
-  private def getOrMakeConnection() {
-    if (!isClosed && !blockingChannel.isConnected) {
+  private def getOrMakeConnection()
+    if (!isClosed && !blockingChannel.isConnected)
       connect()
-    }
-  }
 
   /**
     * Get the earliest or latest offset of a given topic, partition.
@@ -199,7 +181,7 @@ class SimpleConsumer(val host: String,
     */
   def earliestOrLatestOffset(topicAndPartition: TopicAndPartition,
                              earliestOrLatest: Long,
-                             consumerId: Int): Long = {
+                             consumerId: Int): Long =
     val request = OffsetRequest(
         requestInfo = Map(topicAndPartition -> PartitionOffsetRequestInfo(
                   earliestOrLatest, 1)),
@@ -207,10 +189,7 @@ class SimpleConsumer(val host: String,
         replicaId = consumerId)
     val partitionErrorAndOffset =
       getOffsetsBefore(request).partitionErrorAndOffsets(topicAndPartition)
-    val offset = partitionErrorAndOffset.error match {
+    val offset = partitionErrorAndOffset.error match
       case ErrorMapping.NoError => partitionErrorAndOffset.offsets.head
       case _ => throw ErrorMapping.exceptionFor(partitionErrorAndOffset.error)
-    }
     offset
-  }
-}

@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object SitaTestSuite extends PerfTestSuite {
+object SitaTestSuite extends PerfTestSuite
   query("""
 import std::time::*
 
@@ -47,4 +47,3 @@ solve 'bin, 'id
    y: r''.y where r''.binMillis = max(r''.binMillis)
   }
     """)
-}

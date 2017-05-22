@@ -28,7 +28,7 @@ import org.apache.spark.sql.types._
   * The base class for implementing user-defined aggregate functions (UDAF).
   */
 @Experimental
-abstract class UserDefinedAggregateFunction extends Serializable {
+abstract class UserDefinedAggregateFunction extends Serializable
 
   /**
     * A [[StructType]] represents data types of input arguments of this aggregate function.
@@ -107,27 +107,24 @@ abstract class UserDefinedAggregateFunction extends Serializable {
     * Creates a [[Column]] for this UDAF using given [[Column]]s as input arguments.
     */
   @scala.annotation.varargs
-  def apply(exprs: Column*): Column = {
+  def apply(exprs: Column*): Column =
     val aggregateExpression = AggregateExpression(
         ScalaUDAF(exprs.map(_.expr), this),
         Complete,
         isDistinct = false)
     Column(aggregateExpression)
-  }
 
   /**
     * Creates a [[Column]] for this UDAF using the distinct values of the given
     * [[Column]]s as input arguments.
     */
   @scala.annotation.varargs
-  def distinct(exprs: Column*): Column = {
+  def distinct(exprs: Column*): Column =
     val aggregateExpression = AggregateExpression(
         ScalaUDAF(exprs.map(_.expr), this),
         Complete,
         isDistinct = true)
     Column(aggregateExpression)
-  }
-}
 
 /**
   * :: Experimental ::
@@ -136,8 +133,7 @@ abstract class UserDefinedAggregateFunction extends Serializable {
   * This is not meant to be extended outside of Spark.
   */
 @Experimental
-abstract class MutableAggregationBuffer extends Row {
+abstract class MutableAggregationBuffer extends Row
 
   /** Update the ith value of this buffer. */
   def update(i: Int, value: Any): Unit
-}

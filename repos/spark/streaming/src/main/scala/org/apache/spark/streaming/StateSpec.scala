@@ -69,7 +69,7 @@ import org.apache.spark.util.ClosureCleaner
   */
 @Experimental
 sealed abstract class StateSpec[KeyType, ValueType, StateType, MappedType]
-    extends Serializable {
+    extends Serializable
 
   /** Set the RDD containing the initial states that will be used by `mapWithState` */
   def initialState(rdd: RDD[(KeyType, StateType)]): this.type
@@ -96,7 +96,6 @@ sealed abstract class StateSpec[KeyType, ValueType, StateType, MappedType]
     * to `true` in that call.
     */
   def timeout(idleDuration: Duration): this.type
-}
 
 /**
   * :: Experimental ::
@@ -137,7 +136,7 @@ sealed abstract class StateSpec[KeyType, ValueType, StateType, MappedType]
   *}}}
   */
 @Experimental
-object StateSpec {
+object StateSpec
 
   /**
     * Create a [[org.apache.spark.streaming.StateSpec StateSpec]] for setting all the specifications
@@ -154,10 +153,9 @@ object StateSpec {
   def function[KeyType, ValueType, StateType, MappedType](
       mappingFunction: (Time, KeyType, Option[ValueType],
       State[StateType]) => Option[MappedType]
-  ): StateSpec[KeyType, ValueType, StateType, MappedType] = {
+  ): StateSpec[KeyType, ValueType, StateType, MappedType] =
     ClosureCleaner.clean(mappingFunction, checkSerializable = true)
     new StateSpecImpl(mappingFunction)
-  }
 
   /**
     * Create a [[org.apache.spark.streaming.StateSpec StateSpec]] for setting all the specifications
@@ -173,15 +171,12 @@ object StateSpec {
   def function[KeyType, ValueType, StateType, MappedType](
       mappingFunction: (KeyType, Option[ValueType],
       State[StateType]) => MappedType
-  ): StateSpec[KeyType, ValueType, StateType, MappedType] = {
+  ): StateSpec[KeyType, ValueType, StateType, MappedType] =
     ClosureCleaner.clean(mappingFunction, checkSerializable = true)
     val wrappedFunction = (time: Time, key: KeyType, value: Option[ValueType],
     state: State[StateType]) =>
-      {
         Some(mappingFunction(key, value, state))
-    }
     new StateSpecImpl(wrappedFunction)
-  }
 
   /**
     * Create a [[org.apache.spark.streaming.StateSpec StateSpec]] for setting all
@@ -201,19 +196,15 @@ object StateSpec {
                                   Optional[ValueType],
                                   State[StateType],
                                   Optional[MappedType]])
-    : StateSpec[KeyType, ValueType, StateType, MappedType] = {
+    : StateSpec[KeyType, ValueType, StateType, MappedType] =
     val wrappedFunc = (time: Time, k: KeyType, v: Option[ValueType],
     s: State[StateType]) =>
-      {
         val t = mappingFunction.call(time, k, JavaUtils.optionToOptional(v), s)
-        if (t.isPresent) {
+        if (t.isPresent)
           Some(t.get)
-        } else {
+        else
           None
-        }
-    }
     StateSpec.function(wrappedFunc)
-  }
 
   /**
     * Create a [[org.apache.spark.streaming.StateSpec StateSpec]] for setting all the specifications
@@ -229,20 +220,16 @@ object StateSpec {
   def function[KeyType, ValueType, StateType, MappedType](
       mappingFunction: JFunction3[
           KeyType, Optional[ValueType], State[StateType], MappedType])
-    : StateSpec[KeyType, ValueType, StateType, MappedType] = {
+    : StateSpec[KeyType, ValueType, StateType, MappedType] =
     val wrappedFunc = (k: KeyType, v: Option[ValueType],
     s: State[StateType]) =>
-      {
         mappingFunction.call(k, JavaUtils.optionToOptional(v), s)
-    }
     StateSpec.function(wrappedFunc)
-  }
-}
 
 /** Internal implementation of [[org.apache.spark.streaming.StateSpec]] interface. */
 private[streaming] case class StateSpecImpl[K, V, S, T](
     function: (Time, K, Option[V], State[S]) => Option[T])
-    extends StateSpec[K, V, S, T] {
+    extends StateSpec[K, V, S, T]
 
   require(function != null)
 
@@ -250,30 +237,25 @@ private[streaming] case class StateSpecImpl[K, V, S, T](
   @volatile private var initialStateRDD: RDD[(K, S)] = null
   @volatile private var timeoutInterval: Duration = null
 
-  override def initialState(rdd: RDD[(K, S)]): this.type = {
+  override def initialState(rdd: RDD[(K, S)]): this.type =
     this.initialStateRDD = rdd
     this
-  }
 
-  override def initialState(javaPairRDD: JavaPairRDD[K, S]): this.type = {
+  override def initialState(javaPairRDD: JavaPairRDD[K, S]): this.type =
     this.initialStateRDD = javaPairRDD.rdd
     this
-  }
 
-  override def numPartitions(numPartitions: Int): this.type = {
+  override def numPartitions(numPartitions: Int): this.type =
     this.partitioner(new HashPartitioner(numPartitions))
     this
-  }
 
-  override def partitioner(partitioner: Partitioner): this.type = {
+  override def partitioner(partitioner: Partitioner): this.type =
     this.partitioner = partitioner
     this
-  }
 
-  override def timeout(interval: Duration): this.type = {
+  override def timeout(interval: Duration): this.type =
     this.timeoutInterval = interval
     this
-  }
 
   // ================= Private Methods =================
 
@@ -288,4 +270,3 @@ private[streaming] case class StateSpecImpl[K, V, S, T](
 
   private[streaming] def getTimeoutInterval(): Option[Duration] =
     Option(timeoutInterval)
-}

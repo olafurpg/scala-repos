@@ -9,7 +9,7 @@ import com.typesafe.config.Config
 /**
   * Public API but not intended for subclassing
   */
-abstract class RoutingSettings private[akka]() { self: RoutingSettingsImpl ⇒
+abstract class RoutingSettings private[akka]()  self: RoutingSettingsImpl ⇒
   def getVerboseErrorMessages: Boolean
   def getFileGetConditional: Boolean
   def getRenderVanityFooter: Boolean
@@ -35,11 +35,9 @@ abstract class RoutingSettings private[akka]() { self: RoutingSettingsImpl ⇒
     self.copy(decodeMaxBytesPerChunk = decodeMaxBytesPerChunk)
   def withFileIODispatcher(fileIODispatcher: String): RoutingSettings =
     self.copy(fileIODispatcher = fileIODispatcher)
-}
 
-object RoutingSettings extends SettingsCompanion[RoutingSettings] {
+object RoutingSettings extends SettingsCompanion[RoutingSettings]
   override def create(config: Config): RoutingSettings =
     RoutingSettingsImpl(config)
   override def create(configOverrides: String): RoutingSettings =
     RoutingSettingsImpl(configOverrides)
-}

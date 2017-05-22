@@ -41,17 +41,16 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TableColumnSpec[S, T]
     extends SimpleSFXDelegateSpec[jfxsc.TableColumn[S, T], TableColumn[S, T]](
-        classOf[jfxsc.TableColumn[S, T]], classOf[TableColumn[S, T]]) {
+        classOf[jfxsc.TableColumn[S, T]], classOf[TableColumn[S, T]])
 
-  it should " have parametrized default constructor - Issue 40" in {
+  it should " have parametrized default constructor - Issue 40" in
     // Without correctly parametrized default constructor following line was throwing exception:
     //   error: polymorphic expression cannot be instantiated to expected type;
     //   found   : [S, T]javafx.scene.control.TableColumn[Nothing,Nothing]
     //   required: javafx.scene.control.TableColumn[String,String]
     new TableColumn[String, String]()
-  }
 
-  it should "not drop nested columns - Issue 44" in {
+  it should "not drop nested columns - Issue 44" in
     val firstTC = new TableColumn[String, String]("First")
     val lastTC = new TableColumn[String, String]("Last")
 
@@ -63,5 +62,3 @@ class TableColumnSpec[S, T]
 
     nameTC.columns.clear()
     nameTC.columns.size should (equal(0))
-  }
-}

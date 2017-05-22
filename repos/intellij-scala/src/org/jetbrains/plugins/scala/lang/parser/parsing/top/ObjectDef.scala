@@ -15,17 +15,14 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *  ObjectDef ::= id ClassTemplateOpt
  */
 
-object ObjectDef {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
-    builder.getTokenType match {
+object ObjectDef
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER =>
         builder.advanceLexer() //Ate identifier
       case _ =>
         builder error ScalaBundle.message("identifier.expected")
         return false
-    }
     //parse extends block
     ClassTemplateOpt parse builder
     return true
-  }
-}

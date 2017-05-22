@@ -1,7 +1,7 @@
 import sbt._
 import Import._
 
-object ParentTest extends Build {
+object ParentTest extends Build
   lazy val parent: Project =
     Project("Flowmodel", file(".")) aggregate (core, reporters)
   lazy val core: Project = Project(
@@ -13,4 +13,3 @@ object ParentTest extends Build {
     Project("JFreeChart-reporters",
             file("jfreechart") /*, delegates = reporters :: Nil*/ ) dependsOn
     (core)
-}

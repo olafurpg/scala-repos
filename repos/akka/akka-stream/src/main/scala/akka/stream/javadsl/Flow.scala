@@ -17,7 +17,7 @@ import java.util.Comparator
 import java.util.concurrent.CompletionStage
 import scala.compat.java8.FutureConverters._
 
-object Flow {
+object Flow
 
   private[this] val _identity = new javadsl.Flow(scaladsl.Flow[Any])
 
@@ -32,10 +32,10 @@ object Flow {
       processorFactory: function.Creator[Pair[Processor[I, O], Mat]])
     : javadsl.Flow[I, O, Mat] =
     new Flow(
-        scaladsl.Flow.fromProcessorMat { () ⇒
+        scaladsl.Flow.fromProcessorMat  () ⇒
       val javaPair = processorFactory.create()
       (javaPair.first, javaPair.second)
-    })
+    )
 
   /**
     * Creates a [Flow] which will use the given function to transform its inputs to outputs. It is equivalent
@@ -52,12 +52,11 @@ object Flow {
     * A graph with the shape of a flow logically is a flow, this method makes it so also in type.
     */
   def fromGraph[I, O, M](g: Graph[FlowShape[I, O], M]): Flow[I, O, M] =
-    g match {
+    g match
       case f: Flow[I, O, M] ⇒ f
       case f: scaladsl.Flow[I, O, M] if f.isIdentity ⇒
         _identity.asInstanceOf[Flow[I, O, M]]
       case other ⇒ new Flow(scaladsl.Flow.fromGraph(other))
-    }
 
   /**
     * Helper to create `Flow` from a `Sink`and a `Source`.
@@ -77,11 +76,10 @@ object Flow {
       combine: function.Function2[M1, M2, M]): Flow[I, O, M] =
     new Flow(scaladsl.Flow.fromSinkAndSourceMat(sink, source)(
             combinerToScala(combine)))
-}
 
 /** Create a `Flow` which can process elements of type `T`. */
 final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
-    extends Graph[FlowShape[In, Out], Mat] {
+    extends Graph[FlowShape[In, Out], Mat]
   import scala.collection.JavaConverters._
 
   override def shape: FlowShape[In, Out] = delegate.shape
@@ -279,10 +277,9 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     */
   def runWith[T, U](source: Graph[SourceShape[In], T],
                     sink: Graph[SinkShape[Out], U],
-                    materializer: Materializer): akka.japi.Pair[T, U] = {
+                    materializer: Materializer): akka.japi.Pair[T, U] =
     val (som, sim) = delegate.runWith(source, sink)(materializer)
     akka.japi.Pair(som, sim)
-  }
 
   /**
     * Transform this stream by applying the given function to each of the elements
@@ -323,9 +320,9 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
   def mapConcat[T](f: function.Function[Out, java.lang.Iterable[T]])
     : javadsl.Flow[In, T, Mat] =
     new Flow(
-        delegate.mapConcat { elem ⇒
+        delegate.mapConcat  elem ⇒
       Util.immutableSeq(f(elem))
-    })
+    )
 
   /**
     * Transform each input element into an `Iterable` of output elements that is
@@ -355,11 +352,11 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
       f: function.Creator[function.Function[Out, java.lang.Iterable[T]]])
     : javadsl.Flow[In, T, Mat] =
     new Flow(
-        delegate.statefulMapConcat { () ⇒
+        delegate.statefulMapConcat  () ⇒
       val fun = f.create()
       elem ⇒
         Util.immutableSeq(fun(elem))
-    })
+    )
 
   /**
     * Transform this stream by applying the given function to each of the elements
@@ -543,9 +540,8 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     * See also [[Flow.take]], [[Flow.takeWithin]], [[Flow.takeWhile]]
     */
   def limitWeighted(n: Long)(
-      costFn: function.Function[Out, Long]): javadsl.Flow[In, Out, Mat] = {
+      costFn: function.Function[Out, Long]): javadsl.Flow[In, Out, Mat] =
     new Flow(delegate.limitWeighted(n)(costFn.apply))
-  }
 
   /**
     * Apply a sliding window over the stream and return the windows as groups of elements, with the last group
@@ -1099,9 +1095,9 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     new Flow(
         delegate
           .prefixAndTail(n)
-          .map {
+          .map
         case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
-      })
+      )
 
   /**
     * This operation demultiplexes the incoming stream into separate output
@@ -1604,19 +1600,18 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
                                                    SourceShape[T],
                                                    FlowShape[
                                                        Out,
-                                                       Out @uncheckedVariance Pair T]] {
+                                                       Out @uncheckedVariance Pair T]]
                                              def apply(
                                                  b: GraphDSL.Builder[M],
                                                  s: SourceShape[T]): FlowShape[
                                                  Out,
-                                                 Out @uncheckedVariance Pair T] = {
+                                                 Out @uncheckedVariance Pair T] =
                                                val zip: FanInShape2[
                                                    Out, T, Out Pair T] =
                                                  b.add(Zip.create[Out, T])
                                                b.from(s).toInlet(zip.in1)
                                                FlowShape(zip.in0, zip.out)
-                                             }
-                                           })),
+                                           )),
                 matF)
 
   /**
@@ -1947,28 +1942,25 @@ final class Flow[-In, +Out, +Mat](delegate: scaladsl.Flow[In, Out, Mat])
     * @return A [[RunnableGraph]] that materializes to a Processor when run() is called on it.
     */
   def toProcessor: RunnableGraph[Processor[
-          In @uncheckedVariance, Out @uncheckedVariance]] = {
+          In @uncheckedVariance, Out @uncheckedVariance]] =
     RunnableGraph.fromGraph(delegate.toProcessor)
-  }
-}
 
-object RunnableGraph {
+object RunnableGraph
 
   /**
     * A graph with a closed shape is logically a runnable graph, this method makes
     * it so also in type.
     */
   def fromGraph[Mat](graph: Graph[ClosedShape, Mat]): RunnableGraph[Mat] =
-    graph match {
+    graph match
       case r: RunnableGraph[Mat] ⇒ r
       case other ⇒
         new RunnableGraphAdapter[Mat](scaladsl.RunnableGraph.fromGraph(graph))
-    }
 
   /** INTERNAL API */
   private final class RunnableGraphAdapter[Mat](
       runnable: scaladsl.RunnableGraph[Mat])
-      extends RunnableGraph[Mat] {
+      extends RunnableGraph[Mat]
     def shape = ClosedShape
     def module = runnable.module
 
@@ -1981,26 +1973,22 @@ object RunnableGraph {
     override def run(materializer: Materializer): Mat =
       runnable.run()(materializer)
 
-    override def withAttributes(attr: Attributes): RunnableGraphAdapter[Mat] = {
+    override def withAttributes(attr: Attributes): RunnableGraphAdapter[Mat] =
       val newRunnable = runnable.withAttributes(attr)
       if (newRunnable eq runnable) this
       else new RunnableGraphAdapter(newRunnable)
-    }
 
-    override def named(name: String): RunnableGraphAdapter[Mat] = {
+    override def named(name: String): RunnableGraphAdapter[Mat] =
       val newRunnable = runnable.named(name)
       if (newRunnable eq runnable) this
       else new RunnableGraphAdapter(newRunnable)
-    }
-  }
-}
 
 /**
   * Java API
   *
   * Flow with attached input and output, can be executed.
   */
-abstract class RunnableGraph[+Mat] extends Graph[ClosedShape, Mat] {
+abstract class RunnableGraph[+Mat] extends Graph[ClosedShape, Mat]
 
   /**
     * Run this flow and return the materialized values of the flow.
@@ -2012,4 +2000,3 @@ abstract class RunnableGraph[+Mat] extends Graph[ClosedShape, Mat] {
     */
   def mapMaterializedValue[Mat2](
       f: function.Function[Mat, Mat2]): RunnableGraph[Mat2]
-}

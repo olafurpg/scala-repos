@@ -1,5 +1,4 @@
-class H {
+class H
   object O
 
   def foo() { object O }
-}

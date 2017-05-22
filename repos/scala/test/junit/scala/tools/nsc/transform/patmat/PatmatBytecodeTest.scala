@@ -16,21 +16,20 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 import scala.tools.testing.ClearAfterClass
 
-object PatmatBytecodeTest extends ClearAfterClass.Clearable {
+object PatmatBytecodeTest extends ClearAfterClass.Clearable
   var compiler = newCompiler()
   var optCompiler = newCompiler(extraArgs = "-Yopt:l:project")
   def clear(): Unit = { compiler = null; optCompiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class PatmatBytecodeTest extends ClearAfterClass {
+class PatmatBytecodeTest extends ClearAfterClass
   ClearAfterClass.stateToClear = PatmatBytecodeTest
 
   val compiler = PatmatBytecodeTest.compiler
   val optCompiler = PatmatBytecodeTest.optCompiler
 
   @Test
-  def t6956(): Unit = {
+  def t6956(): Unit =
     val code = """class C {
         |  private[this] final val ONE = 1
         |
@@ -57,10 +56,9 @@ class PatmatBytecodeTest extends ClearAfterClass {
     assert(
         getSingleMethod(c, "s2").instructions.count(_.opcode == TABLESWITCH) == 1,
         textify(c))
-  }
 
   @Test
-  def t6955(): Unit = {
+  def t6955(): Unit =
     val code =
       """class C {
         |  type Tag = Byte
@@ -89,10 +87,9 @@ class PatmatBytecodeTest extends ClearAfterClass {
     assert(
         getSingleMethod(c, "s2").instructions.count(_.opcode == TABLESWITCH) == 1,
         textify(c))
-  }
 
   @Test
-  def optNoPrimitiveTypetest(): Unit = {
+  def optNoPrimitiveTypetest(): Unit =
     val code = """case class Foo(x: Int, y: String)
         |class C {
         |  def a = Foo(1, "a") match {
@@ -104,10 +101,9 @@ class PatmatBytecodeTest extends ClearAfterClass {
 
     assertSameSummary(getSingleMethod(c, "a"),
                       List(NEW, DUP, ICONST_1, LDC, "<init>", "y", ARETURN))
-  }
 
   @Test
-  def optNoNullCheck(): Unit = {
+  def optNoNullCheck(): Unit =
     val code = """case class Foo(x: Any)
         |class C {
         |  def a = (Foo(1): Any) match {
@@ -119,10 +115,9 @@ class PatmatBytecodeTest extends ClearAfterClass {
     assert(!getSingleMethod(c, "a").instructions
              .exists(i => i.opcode == IFNULL || i.opcode == IFNONNULL),
            textify(findAsmMethod(c, "a")))
-  }
 
   @Test
-  def optNoLoacalForUnderscore(): Unit = {
+  def optNoLoacalForUnderscore(): Unit =
     val code = """case class Foo(x: Any, y: String)
         |class C {
         |  def a = (Foo(1, "a"): @unchecked) match {
@@ -154,10 +149,9 @@ class PatmatBytecodeTest extends ClearAfterClass {
                            /*R*/ -1,
                            ALOAD /*2*/,
                            ARETURN))
-  }
 
   @Test
-  def t6941(): Unit = {
+  def t6941(): Unit =
     val code = """class C {
         |  def a(xs: List[Int]) = xs match {
         |    case x :: _ => x
@@ -191,10 +185,9 @@ class PatmatBytecodeTest extends ClearAfterClass {
 
     assertSameSummary(getSingleMethod(c, "a"), expected)
     assertSameSummary(getSingleMethod(c, "b"), expected)
-  }
 
   @Test
-  def valPatterns(): Unit = {
+  def valPatterns(): Unit =
     val code = """case class C(a: Any, b: Int) {
         |  def tplCall = ("hi", 3)
         |  @inline final def tplInline = (true, 'z')
@@ -238,5 +231,3 @@ class PatmatBytecodeTest extends ClearAfterClass {
     assertSameSummary(
         getSingleMethod(c, "t9"),
         List(NEW, DUP, LDC, BIPUSH, "<init>", "a", "toString", ARETURN))
-  }
-}

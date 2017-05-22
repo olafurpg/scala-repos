@@ -13,7 +13,7 @@ import javax.swing.{Icon, JComponent}
   * @author Pavel Fatin
   */
 class ScalaLibraryType
-    extends LibraryType[ScalaLibraryProperties](ScalaLibraryKind) {
+    extends LibraryType[ScalaLibraryProperties](ScalaLibraryKind)
   override def getIcon = Icons.SCALA_SDK
 
   override def getIcon(properties: LibraryProperties[_]): Icon =
@@ -30,13 +30,11 @@ class ScalaLibraryType
       editorComponent: LibraryEditorComponent[ScalaLibraryProperties])
     : LibraryPropertiesEditor =
     new ScalaLibraryPropertiesEditor(editorComponent)
-}
 
-object ScalaLibraryType {
+object ScalaLibraryType
   def instance: ScalaLibraryType =
     Option(
         LibraryType
           .findByKind(ScalaLibraryKind)
           .asInstanceOf[ScalaLibraryType]).getOrElse(
         throw new NoSuchElementException("Scala library type not found"))
-}

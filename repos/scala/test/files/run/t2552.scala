@@ -1,5 +1,5 @@
-object Test extends App {
-  def testTakeWhile = {
+object Test extends App
+  def testTakeWhile =
     val numbers = Iterator.range(0, 50)
     val zeroTo9 = numbers.takeWhile(x => { println("p(" + x + ")"); x < 10 })
 
@@ -15,9 +15,8 @@ object Test extends App {
     println(zeroTo1.next)
     println(zeroTo1.hasNext)
     println(zeroTo1.hasNext)
-  }
 
-  def testFilter = {
+  def testFilter =
     val predicate = (x: Int) => { println("p(" + x + ")"); x % 2 == 0 }
 
     val evens = Iterator.range(0, 10).filter(predicate)
@@ -27,8 +26,6 @@ object Test extends App {
     println(evens.next)
 
     evens.foreach(println _)
-  }
 
   testTakeWhile
   testFilter
-}

@@ -23,49 +23,40 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.DummyASTNode
   */
 class ScClassParameterImpl private (
     stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
-    extends ScParameterImpl(stub, nodeType, node) with ScClassParameter {
+    extends ScParameterImpl(stub, nodeType, node) with ScClassParameter
 
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScParameterStub) = {
+  def this(stub: ScParameterStub) =
     this(stub, ScalaElementTypes.CLASS_PARAM, null)
-  }
 
   override def toString: String = "ClassParameter: " + name
 
-  override def isVal: Boolean = {
+  override def isVal: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].isVal
-    }
     findChildByType[PsiElement](ScalaTokenTypes.kVAL) != null
-  }
-  override def isVar: Boolean = {
+  override def isVar: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].isVar
-    }
     findChildByType[PsiElement](ScalaTokenTypes.kVAR) != null
-  }
 
-  def isPrivateThis: Boolean = {
+  def isPrivateThis: Boolean =
     if (!isEffectiveVal) return true
-    getModifierList.accessModifier match {
+    getModifierList.accessModifier match
       case Some(am) =>
         am.isThis && am.isPrivate
       case _ => false
-    }
-  }
 
-  override def isStable: Boolean = {
+  override def isStable: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].isStable
-    }
     !isVar
-  }
 
-  override def getOriginalElement: PsiElement = {
+  override def getOriginalElement: PsiElement =
     val ccontainingClass = containingClass
     if (ccontainingClass == null) return this
     val originalClass: PsiClass =
@@ -74,21 +65,15 @@ class ScClassParameterImpl private (
     if (!originalClass.isInstanceOf[ScClass]) return this
     val c = originalClass.asInstanceOf[ScClass]
     val iterator = c.parameters.iterator
-    while (iterator.hasNext) {
+    while (iterator.hasNext)
       val param = iterator.next()
       if (param.name == name) return param
-    }
     this
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitClassParameter(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitClassParameter(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

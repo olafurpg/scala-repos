@@ -64,7 +64,7 @@ object PaintIncludes extends PaintIncludes
   * @define STP Stop
   * @define PNT Paint
   */
-trait PaintIncludes {
+trait PaintIncludes
 
   /**
     * $BEGINSTRING $SFX $CLR. $ENDSTRING
@@ -200,4 +200,3 @@ trait PaintIncludes {
     */
   implicit def jfxPaint2sfx(p: jfxsp.Paint): Paint =
     if (p != null) new Paint(p) {} else null
-}

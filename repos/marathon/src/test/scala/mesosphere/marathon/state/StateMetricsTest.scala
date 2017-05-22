@@ -12,11 +12,11 @@ import scala.concurrent.{Future, Promise}
 import scala.util.Try
 
 class StateMetricsTest
-    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures {
+    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures
   test("time crashing read call") { testCrashingCall(read = true) }
   test("time crashing write call") { testCrashingCall(read = false) }
 
-  private[this] def testCrashingCall(read: Boolean): Unit = {
+  private[this] def testCrashingCall(read: Boolean): Unit =
     When("doing the call (but the future is delayed)")
     val metrics = new TestableStateMetrics(0, 1.second.toNanos)
     val tested =
@@ -50,16 +50,13 @@ class StateMetricsTest
 
     And("the original failure is preserved")
     attempt.failed.get should be(failure)
-  }
 
-  test("time delayed successful read future") {
+  test("time delayed successful read future")
     testDelayedSuccesfulFuture(read = true)
-  }
-  test("time delayed successful write future") {
+  test("time delayed successful write future")
     testDelayedSuccesfulFuture(read = false)
-  }
 
-  private[this] def testDelayedSuccesfulFuture(read: Boolean): Unit = {
+  private[this] def testDelayedSuccesfulFuture(read: Boolean): Unit =
     When("doing the call (but the future is delayed)")
     val metrics = new TestableStateMetrics(0, 1.second.toNanos)
     val tested =
@@ -117,16 +114,13 @@ class StateMetricsTest
 
     And("the original result is preserved")
     result.futureValue should be(())
-  }
 
-  test("time delayed failed read future") {
+  test("time delayed failed read future")
     testDelayedFailedFuture(read = true)
-  }
-  test("time delayed failed write future") {
+  test("time delayed failed write future")
     testDelayedFailedFuture(read = false)
-  }
 
-  private[this] def testDelayedFailedFuture(read: Boolean): Unit = {
+  private[this] def testDelayedFailedFuture(read: Boolean): Unit =
     When("doing the call (but the future is delayed)")
     val metrics = new TestableStateMetrics(0, 1.second.toNanos)
     val tested =
@@ -185,10 +179,9 @@ class StateMetricsTest
 
     And("the failure should be preserved")
     result.failed.futureValue should be(failure)
-  }
 
   private[this] class TestableStateMetrics(initial: Long*)
-      extends StateMetrics {
+      extends StateMetrics
     override lazy val metrics: Metrics = new Metrics(new MetricRegistry)
 
     val readMetricsPublic: MetricTemplate = readMetrics
@@ -200,10 +193,7 @@ class StateMetricsTest
 
     var timeQueue = Queue[Long](initial: _*)
 
-    override protected def nanoTime(): Long = {
+    override protected def nanoTime(): Long =
       val (next, nextQueue) = timeQueue.dequeue
       timeQueue = nextQueue
       next
-    }
-  }
-}

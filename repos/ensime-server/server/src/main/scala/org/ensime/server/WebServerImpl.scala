@@ -19,21 +19,17 @@ class WebServerImpl(
     val mat: Materializer,
     val timeout: Timeout
 )
-    extends WebServer with DocJarReading {
+    extends WebServer with DocJarReading
   import system.dispatcher
 
-  private def handleRpc(in: Any): Future[EnsimeServerMessage] = in match {
+  private def handleRpc(in: Any): Future[EnsimeServerMessage] = in match
     case DocUriAtPointReq(_, _) | DocUriForSymbolReq(_, _, _) =>
-      (project ? Canonised(in)).flatMap {
+      (project ? Canonised(in)).flatMap
         case None => Future.successful(FalseResponse)
         case Some(sig: DocSigPair) => handleRpc(sig)
-      }
     case _ => (project ? Canonised(in)).mapTo[EnsimeServerMessage]
-  }
 
   def restHandler(in: RpcRequest): Future[EnsimeServerMessage] = handleRpc(in)
 
-  def websocketHandler(target: ActorRef): ActorRef = {
+  def websocketHandler(target: ActorRef): ActorRef =
     system.actorOf(ConnectionHandler(project, broadcaster, target))
-  }
-}

@@ -40,7 +40,7 @@ private[spark] class TreePoint(
     val label: Double, val binnedFeatures: Array[Int])
     extends Serializable {}
 
-private[spark] object TreePoint {
+private[spark] object TreePoint
 
   /**
     * Convert an input dataset into its TreePoint representation,
@@ -52,19 +52,16 @@ private[spark] object TreePoint {
     */
   def convertToTreeRDD(input: RDD[LabeledPoint],
                        bins: Array[Array[Bin]],
-                       metadata: DecisionTreeMetadata): RDD[TreePoint] = {
+                       metadata: DecisionTreeMetadata): RDD[TreePoint] =
     // Construct arrays for featureArity for efficiency in the inner loop.
     val featureArity: Array[Int] = new Array[Int](metadata.numFeatures)
     var featureIndex = 0
-    while (featureIndex < metadata.numFeatures) {
+    while (featureIndex < metadata.numFeatures)
       featureArity(featureIndex) = metadata.featureArity.getOrElse(
           featureIndex, 0)
       featureIndex += 1
-    }
-    input.map { x =>
+    input.map  x =>
       TreePoint.labeledPointToTreePoint(x, bins, featureArity)
-    }
-  }
 
   /**
     * Convert one LabeledPoint into its TreePoint representation.
@@ -74,17 +71,15 @@ private[spark] object TreePoint {
     */
   private def labeledPointToTreePoint(labeledPoint: LabeledPoint,
                                       bins: Array[Array[Bin]],
-                                      featureArity: Array[Int]): TreePoint = {
+                                      featureArity: Array[Int]): TreePoint =
     val numFeatures = labeledPoint.features.size
     val arr = new Array[Int](numFeatures)
     var featureIndex = 0
-    while (featureIndex < numFeatures) {
+    while (featureIndex < numFeatures)
       arr(featureIndex) = findBin(
           featureIndex, labeledPoint, featureArity(featureIndex), bins)
       featureIndex += 1
-    }
     new TreePoint(labeledPoint.label, arr)
-  }
 
   /**
     * Find bin for one (labeledPoint, feature).
@@ -95,54 +90,46 @@ private[spark] object TreePoint {
   private def findBin(featureIndex: Int,
                       labeledPoint: LabeledPoint,
                       featureArity: Int,
-                      bins: Array[Array[Bin]]): Int = {
+                      bins: Array[Array[Bin]]): Int =
 
     /**
       * Binary search helper method for continuous feature.
       */
-    def binarySearchForBins(): Int = {
+    def binarySearchForBins(): Int =
       val binForFeatures = bins(featureIndex)
       val feature = labeledPoint.features(featureIndex)
       var left = 0
       var right = binForFeatures.length - 1
-      while (left <= right) {
+      while (left <= right)
         val mid = left + (right - left) / 2
         val bin = binForFeatures(mid)
         val lowThreshold = bin.lowSplit.threshold
         val highThreshold = bin.highSplit.threshold
-        if ((lowThreshold < feature) && (highThreshold >= feature)) {
+        if ((lowThreshold < feature) && (highThreshold >= feature))
           return mid
-        } else if (lowThreshold >= feature) {
+        else if (lowThreshold >= feature)
           right = mid - 1
-        } else {
+        else
           left = mid + 1
-        }
-      }
       -1
-    }
 
-    if (featureArity == 0) {
+    if (featureArity == 0)
       // Perform binary search for finding bin for continuous features.
       val binIndex = binarySearchForBins()
-      if (binIndex == -1) {
+      if (binIndex == -1)
         throw new RuntimeException(
             "No bin was found for continuous feature." +
             " This error can occur when given invalid data values (such as NaN)." +
             s" Feature index: $featureIndex.  Feature value: ${labeledPoint.features(featureIndex)}")
-      }
       binIndex
-    } else {
+    else
       // Categorical feature bins are indexed by feature values.
       val featureValue = labeledPoint.features(featureIndex)
-      if (featureValue < 0 || featureValue >= featureArity) {
+      if (featureValue < 0 || featureValue >= featureArity)
         throw new IllegalArgumentException(
             s"DecisionTree given invalid data:" +
             s" Feature $featureIndex is categorical with values in" +
             s" {0,...,${featureArity - 1}," +
             s" but a data point gives it value $featureValue.\n" +
             "  Bad data point: " + labeledPoint.toString)
-      }
       featureValue.toInt
-    }
-  }
-}

@@ -36,11 +36,11 @@ import org.specs2.mutable._
 
 trait PartitionMergeSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with Specification
-    with ScalaCheck {
+    with ScalaCheck
   import SampleData._
   import trans._
 
-  def testPartitionMerge = {
+  def testPartitionMerge =
     val JArray(elements) =
       JParser.parseUnsafe("""[
       { "key": [0], "value": { "a": "0a" } },
@@ -64,24 +64,18 @@ trait PartitionMergeSpec[M[+ _]]
     ]""")
 
     val result: M[Table] =
-      tbl.partitionMerge(DerefObjectStatic(Leaf(Source), CPathField("key"))) {
+      tbl.partitionMerge(DerefObjectStatic(Leaf(Source), CPathField("key")))
         table =>
-          val reducer = new Reducer[String] {
-            def reduce(schema: CSchema, range: Range): String = {
-              schema.columns(JTextT).head match {
+          val reducer = new Reducer[String]
+            def reduce(schema: CSchema, range: Range): String =
+              schema.columns(JTextT).head match
                 case col: StrColumn => range.map(col).mkString(";")
-              }
-            }
-          }
 
           val derefed = table.transform(DerefObjectStatic(
                   DerefObjectStatic(Leaf(Source), CPathField("value")),
                   CPathField("a")))
 
           derefed.reduce(reducer).map(s => Table.constString(Set(s)))
-      }
 
     result.flatMap(_.toJson).copoint must_== expected.toStream
-  }
-}
 // vim: set ts=4 sw=4 et:

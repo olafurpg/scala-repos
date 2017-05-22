@@ -5,7 +5,7 @@ import org.junit.Assert._
 import slick.jdbc.GetResult
 import com.typesafe.slick.testkit.util.{JdbcTestDB, AsyncTest}
 
-class PlainSQLTest extends AsyncTest[JdbcTestDB] {
+class PlainSQLTest extends AsyncTest[JdbcTestDB]
   import tdb.profile.api._
 
   implicit val getUserResult = GetResult(r => new User(r.<<, r.<<))
@@ -95,7 +95,7 @@ class PlainSQLTest extends AsyncTest[JdbcTestDB] {
   }
    */
 
-  def testInterpolation = ifCap(tcap.plainSql) {
+  def testInterpolation = ifCap(tcap.plainSql)
     def userForID(id: Int) =
       sql"select id, name from USERS where id = $id".as[User]
     def userForIdAndName(id: Int, name: String) =
@@ -117,10 +117,10 @@ class PlainSQLTest extends AsyncTest[JdbcTestDB] {
     seq(
         create.map(_ shouldBe 0),
         DBIO
-          .fold((for {
+          .fold((for
             (id, name) <- List(
                 (1, "szeiger"), (0, "admin"), (2, "guest"), (3, "foo"))
-          } yield sqlu"insert into USERS values ($id, $name)"), 0)(_ + _)
+          yield sqlu"insert into USERS values ($id, $name)"), 0)(_ + _)
           .map(_ shouldBe 4),
         sql"select id from USERS"
           .as[Int]
@@ -131,5 +131,3 @@ class PlainSQLTest extends AsyncTest[JdbcTestDB] {
         userForIdAndName(2, "guest").map(_.head shouldBe User(2, "guest")), //TODO Support `head` and `headOption` in Plain SQL Actions
         userForIdAndName(2, "foo").map(_.headOption shouldBe None) //TODO Support `head` and `headOption` in Plain SQL Actions
     )
-  }
-}

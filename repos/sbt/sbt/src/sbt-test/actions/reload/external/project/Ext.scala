@@ -1,7 +1,6 @@
 import sbt._
 import Import._
 
-object Ext extends Build {
+object Ext extends Build
   lazy val root2 =
     Project("root2", file("root2")) settings (TaskKey[Unit]("g") := {})
-}

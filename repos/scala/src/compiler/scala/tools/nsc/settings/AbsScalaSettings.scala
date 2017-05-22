@@ -9,7 +9,7 @@ package settings
 
 import scala.language.higherKinds
 
-trait AbsScalaSettings { self: AbsSettings =>
+trait AbsScalaSettings  self: AbsSettings =>
 
   type MultiChoiceEnumeration <: Enumeration
 
@@ -19,9 +19,8 @@ trait AbsScalaSettings { self: AbsSettings =>
   type ChoiceSetting <: Setting { type T = String }
   type IntSetting <: Setting { type T = Int }
   type MultiStringSetting <: Setting { type T = List[String] }
-  type MultiChoiceSetting [E <: MultiChoiceEnumeration] <: Setting {
+  type MultiChoiceSetting [E <: MultiChoiceEnumeration] <: Setting
     type T <: E#ValueSet
-  }
   type PathSetting <: Setting { type T = String }
   type PhasesSetting <: Setting { type T = List[String] }
   type StringSetting <: Setting { type T = String }
@@ -63,4 +62,3 @@ trait AbsScalaSettings { self: AbsSettings =>
                     descr: String,
                     default: String): StringSetting
   def PrefixSetting(name: String, prefix: String, descr: String): PrefixSetting
-}

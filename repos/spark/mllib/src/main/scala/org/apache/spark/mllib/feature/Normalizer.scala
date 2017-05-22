@@ -31,7 +31,7 @@ import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors
   * @param p Normalization in L^p^ space, p = 2 by default.
   */
 @Since("1.1.0")
-class Normalizer @Since("1.1.0")(p: Double) extends VectorTransformer {
+class Normalizer @Since("1.1.0")(p: Double) extends VectorTransformer
 
   @Since("1.1.0")
   def this() = this(2)
@@ -45,41 +45,35 @@ class Normalizer @Since("1.1.0")(p: Double) extends VectorTransformer {
     * @return normalized vector. If the norm of the input is zero, it will return the input vector.
     */
   @Since("1.1.0")
-  override def transform(vector: Vector): Vector = {
+  override def transform(vector: Vector): Vector =
     val norm = Vectors.norm(vector, p)
 
-    if (norm != 0.0) {
+    if (norm != 0.0)
       // For dense vector, we've to allocate new memory for new output vector.
       // However, for sparse vector, the `index` array will not be changed,
       // so we can re-use it to save memory.
-      vector match {
+      vector match
         case DenseVector(vs) =>
           val values = vs.clone()
           val size = values.length
           var i = 0
-          while (i < size) {
+          while (i < size)
             values(i) /= norm
             i += 1
-          }
           Vectors.dense(values)
         case SparseVector(size, ids, vs) =>
           val values = vs.clone()
           val nnz = values.length
           var i = 0
-          while (i < nnz) {
+          while (i < nnz)
             values(i) /= norm
             i += 1
-          }
           Vectors.sparse(size, ids, values)
         case v =>
           throw new IllegalArgumentException(
               "Do not support vector type " + v.getClass)
-      }
-    } else {
+    else
       // Since the norm is zero, return the input vector object itself.
       // Note that it's safe since we always assume that the data in RDD
       // should be immutable.
       vector
-    }
-  }
-}

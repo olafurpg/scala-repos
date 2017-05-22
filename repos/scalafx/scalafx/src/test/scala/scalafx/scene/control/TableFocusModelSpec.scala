@@ -42,12 +42,12 @@ class TableFocusModelSpec[T, TC <: jfxsc.TableColumnBase[T, _]]
     extends SimpleSFXDelegateSpec[
         jfxsc.TableFocusModel[T, TC], TableFocusModel[T, TC]](
         classOf[jfxsc.TableFocusModel[T, TC]],
-        classOf[TableFocusModel[T, TC]]) {
+        classOf[TableFocusModel[T, TC]])
 
   override def getScalaClassInstance =
     new TableFocusModel[T, TC](this.getJavaClassInstance) {}
 
-  override def getJavaClassInstance = new jfxsc.TableFocusModel[T, TC] {
+  override def getJavaClassInstance = new jfxsc.TableFocusModel[T, TC]
     def getItemCount(): Int = 0
     def getModelItem(index: Int): T = null.asInstanceOf[T]
     def focus(row: Int, column: TC) {}
@@ -56,5 +56,3 @@ class TableFocusModelSpec[T, TC <: jfxsc.TableColumnBase[T, _]]
     def focusLeftCell() {}
     def focusRightCell() {}
     def isFocused(row: Int, column: TC): Boolean = false
-  }
-}

@@ -44,14 +44,12 @@ class SpinnerValueFactorySpec[Integer]
     extends SimpleSFXDelegateSpec[
         jfxsc.SpinnerValueFactory[Integer], SpinnerValueFactory[Integer]](
         classOf[jfxsc.SpinnerValueFactory[Integer]],
-        classOf[SpinnerValueFactory[Integer]]) with RunOnApplicationThread {
+        classOf[SpinnerValueFactory[Integer]]) with RunOnApplicationThread
 
   override protected def getScalaClassInstance =
     new SpinnerValueFactory[Integer](getJavaClassInstance) {}
 
   override protected def getJavaClassInstance =
-    new jfxsc.SpinnerValueFactory[Integer]() {
+    new jfxsc.SpinnerValueFactory[Integer]()
       override def decrement(steps: Int) = ???
       override def increment(steps: Int) = ???
-    }
-}

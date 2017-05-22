@@ -7,11 +7,11 @@ import org.junit.runners.JUnit4
 
 /** Tests for [[OpenHashMap]]. */
 @RunWith(classOf[JUnit4])
-class OpenHashMapTest {
+class OpenHashMapTest
 
   /** Test that an [[OpenHashMap]] correctly maintains its internal `deleted` count. */
   @Test
-  def maintainsDeletedCount {
+  def maintainsDeletedCount
     val m = OpenHashMap.empty[Int, Int]
 
     // Reflect to get the private `deleted` field's value, which should be zero.
@@ -39,5 +39,3 @@ class OpenHashMapTest {
     m.put(0, 0) // Add an entry with the same key
     // TODO assertEquals(0, fieldMirror.get.asInstanceOf[Int])
     assertEquals(0, field.getInt(m))
-  }
-}

@@ -10,9 +10,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
   * User: Alefas
   * Date: 20.10.11
   */
-class AddModifierTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+class AddModifierTest extends ScalaLightPlatformCodeInsightTestCaseAdapter
   def doTest(
-      fileText: String, result: String, modifier: String, value: Boolean) {
+      fileText: String, result: String, modifier: String, value: Boolean)
     configureFromFileTextAdapter("dummy.scala", fileText)
     val place =
       getFileAdapter.findElementAt(getEditorAdapter.getCaretModel.getOffset)
@@ -21,9 +21,8 @@ class AddModifierTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     assert(owner != null)
     inWriteAction(owner.setModifierProperty(modifier, value))
     checkResultByText(result)
-  }
 
-  def testAbstractModifier() {
+  def testAbstractModifier()
     val fileText = """
       |@Deprecated
       |class Foo<caret> extends Runnable
@@ -34,5 +33,3 @@ class AddModifierTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       |abstract class Foo<caret> extends Runnable
       """.stripMargin('|').replaceAll("\r", "").trim()
     doTest(fileText, resultText, "abstract", value = true)
-  }
-}

@@ -1,4 +1,4 @@
-class SI_4589 {
+class SI_4589
 
   /**
     * @param x012345678901234567890123456789 blah blah blah
@@ -9,4 +9,3 @@ class SI_4589 {
     * @param x0123456789 blah blah blah
     */
   def bar(x0123456789: Int) = 123
-}

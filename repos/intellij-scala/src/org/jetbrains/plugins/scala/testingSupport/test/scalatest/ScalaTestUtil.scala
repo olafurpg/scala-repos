@@ -4,7 +4,7 @@ package org.jetbrains.plugins.scala.testingSupport.test.scalatest
   * @author Roman.Shein
   * @since 10.04.2015.
   */
-object ScalaTestUtil {
+object ScalaTestUtil
   def getFunSuiteBases: List[String] =
     List("org.scalatest.FunSuite",
          "org.scalatest.FunSuiteLike",
@@ -81,4 +81,3 @@ object ScalaTestUtil {
          "org.scalatest.fixture.WordSpecLike",
          "org.scalatest.fixture.FixtureWordSpec",
          "org.scalatest.fixture.MultipleFixtureWordSpec")
-}

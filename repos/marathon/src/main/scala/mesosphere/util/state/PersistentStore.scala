@@ -5,7 +5,7 @@ import scala.concurrent.Future
 /**
   * An Entity that is provided and can be changed by the related store.
   */
-trait PersistentEntity {
+trait PersistentEntity
 
   /**
     * The identifier of this entity.
@@ -22,12 +22,11 @@ trait PersistentEntity {
     * This will create a new entity, that can be used afterwards.
     */
   def withNewContent(bytes: IndexedSeq[Byte]): PersistentEntity
-}
 
 /**
   * Store abstraction for different store implementations.
   */
-trait PersistentStore {
+trait PersistentStore
 
   type ID = String
 
@@ -76,12 +75,11 @@ trait PersistentStore {
     * @return the list of available identifier.
     */
   def allIds(): Future[Seq[ID]]
-}
 
 /**
   * Optional interface if the store also has management infrastructure.
   */
-trait PersistentStoreManagement {
+trait PersistentStoreManagement
 
   /**
     * Initialize the store.
@@ -90,4 +88,3 @@ trait PersistentStoreManagement {
     * @return A future to indicate when the initialization logic is finished.
     */
   def initialize(): Future[Unit]
-}

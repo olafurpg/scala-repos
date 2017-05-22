@@ -35,9 +35,9 @@ import scalafx.beans.property.DoubleProperty
 
 /** Verify that code causing Issue 9 behaves correctly after fix. */
 @RunWith(classOf[JUnitRunner])
-class Issue09Spec extends FlatSpec {
+class Issue09Spec extends FlatSpec
 
-  "Issue 9 fix" should "run HeronsFormulaExample without exceptions" in {
+  "Issue 9 fix" should "run HeronsFormulaExample without exceptions" in
     val a = DoubleProperty(0)
     val b = DoubleProperty(0)
     val c = DoubleProperty(0)
@@ -60,5 +60,3 @@ class Issue09Spec extends FlatSpec {
     b() = 2
     c() = 2
     assert(3 === areaSquared())
-  }
-}

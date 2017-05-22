@@ -8,7 +8,7 @@ package directives
 import akka.http.scaladsl.model._
 import headers._
 
-trait MiscDirectives {
+trait MiscDirectives
   import RouteDirectives._
 
   /**
@@ -16,9 +16,8 @@ trait MiscDirectives {
     * If the condition fails the route is rejected with a [[ValidationRejection]].
     */
   def validate(check: ⇒ Boolean, errorMsg: String): Directive0 =
-    Directive { inner ⇒
+    Directive  inner ⇒
       if (check) inner(()) else reject(ValidationRejection(errorMsg))
-    }
 
   /**
     * Extracts the client's IP from either the X-Forwarded-For, Remote-Address or X-Real-IP header
@@ -56,21 +55,19 @@ trait MiscDirectives {
     */
   def selectPreferredLanguage(
       first: Language, more: Language*): Directive1[Language] =
-    BasicDirectives.extractRequest.map { request ⇒
+    BasicDirectives.extractRequest.map  request ⇒
       LanguageNegotiator(request.headers).pickLanguage(first :: List(more: _*)) getOrElse first
-    }
-}
 
-object MiscDirectives extends MiscDirectives {
+object MiscDirectives extends MiscDirectives
   import BasicDirectives._
   import HeaderDirectives._
   import RouteDirectives._
   import RouteResult._
 
   private val _extractClientIP: Directive1[RemoteAddress] =
-    headerValuePF { case `X-Forwarded-For`(Seq(address, _ *)) ⇒ address } | headerValuePF {
+    headerValuePF { case `X-Forwarded-For`(Seq(address, _ *)) ⇒ address } | headerValuePF
       case `Remote-Address`(address) ⇒ address
-    } | headerValuePF { case `X-Real-Ip`(address) ⇒ address }
+    | headerValuePF { case `X-Real-Ip`(address) ⇒ address }
 
   private val _requestEntityEmpty: Directive0 =
     extract(_.request.entity.isKnownEmpty).flatMap(if (_) pass else reject)
@@ -78,8 +75,6 @@ object MiscDirectives extends MiscDirectives {
   private val _requestEntityPresent: Directive0 =
     extract(_.request.entity.isKnownEmpty).flatMap(if (_) reject else pass)
 
-  private val _rejectEmptyResponse: Directive0 = mapRouteResult {
+  private val _rejectEmptyResponse: Directive0 = mapRouteResult
     case Complete(response) if response.entity.isKnownEmpty ⇒ Rejected(Nil)
     case x ⇒ x
-  }
-}

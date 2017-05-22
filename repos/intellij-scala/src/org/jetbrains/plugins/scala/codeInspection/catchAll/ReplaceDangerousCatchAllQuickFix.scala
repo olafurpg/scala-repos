@@ -12,8 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScR
   */
 class ReplaceDangerousCatchAllQuickFix(caseClause: ScCaseClause)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("specify.type.of.exception"), caseClause) {
-  def doApplyFix(project: Project) {
+        ScalaBundle.message("specify.type.of.exception"), caseClause)
+  def doApplyFix(project: Project)
     val cc = getElement
     if (!cc.isValid) return
 
@@ -21,10 +21,7 @@ class ReplaceDangerousCatchAllQuickFix(caseClause: ScCaseClause)
     if (pattern == null) return
 
     val strategy = AddOnlyStrategy.withoutEditor
-    pattern match {
+    pattern match
       case p: ScWildcardPattern => strategy.addToWildcardPattern(p)
       case p: ScReferencePattern => strategy.addToPattern(p)
       //if pattern has another type - it's a bug
-    }
-  }
-}

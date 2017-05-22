@@ -8,24 +8,22 @@ import org.scalatest.FunSuite
 import scala.language.implicitConversions
 
 @RunWith(classOf[JUnitRunner])
-class ServersetNamerTest extends FunSuite with AssertionsForJUnit {
+class ServersetNamerTest extends FunSuite with AssertionsForJUnit
 
-  def mkNamer(f: String => Var[Addr]): Namer = new com.twitter.serverset {
+  def mkNamer(f: String => Var[Addr]): Namer = new com.twitter.serverset
     override protected[this] def resolve(spec: String) = f(spec)
-  }
 
-  def schemeOk(scheme: String): Unit = {
+  def schemeOk(scheme: String): Unit =
     val addr = Addr.Bound(Address(7127))
     var named = 0
-    val namer = mkNamer { spec =>
+    val namer = mkNamer  spec =>
       assert(spec == s"$scheme!hosts!/twitter/service/role/env/job!endpoint")
       named += 1
       Var.value(addr)
-    }
     assert(named == 0)
 
     val path = Path.read("/hosts/twitter/service/role/env/job:endpoint")
-    namer.bind(NameTree.Leaf(path)).sample() match {
+    namer.bind(NameTree.Leaf(path)).sample() match
       case NameTree.Leaf(bound: Name.Bound) =>
         assert(named == 1)
         assert(bound.addr.sample() == addr)
@@ -41,19 +39,14 @@ class ServersetNamerTest extends FunSuite with AssertionsForJUnit {
                                   "job:endpoint"))
 
       case _ => fail(s"invalid name: ${path.show}")
-    }
-  }
 
-  test("negative resolution") {
+  test("negative resolution")
     var named = 0
-    val namer = mkNamer { spec =>
+    val namer = mkNamer  spec =>
       assert(spec == s"zk2!hosts!/twitter/service/role/env/job:endpoint/extra")
       named += 1
       Var.value(Addr.Neg)
-    }
     assert(named == 0)
     val path = Path.read("/hosts/twitter/service/role/env/job:endpoint/extra")
     assert(namer.bind(NameTree.Leaf(path)).sample() == NameTree.Neg)
     assert(named == 1)
-  }
-}

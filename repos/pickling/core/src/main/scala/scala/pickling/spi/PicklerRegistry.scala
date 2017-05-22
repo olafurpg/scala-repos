@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe.Mirror
   *
   * All methods are threadsafe.
   */
-trait PicklerRegistry {
+trait PicklerRegistry
   // TODO(jsuereth) - We should remove the `gen` traits here and hide generation behind the lookup methods.
 
   /** Looks up the registered unpickler using the provided tagKey.
@@ -100,4 +100,3 @@ trait PicklerRegistry {
       typeConstructorKey: String,
       generator: AppliedType => (Pickler[T] with Unpickler[T])): Unit
   // TODO - Some kind of clean or inspect what we have?
-}

@@ -25,9 +25,9 @@ package example
   * @see <a href="http://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat algorithm @ Wikipedia</a>
   * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
   */
-object ZigguratGenerator {
+object ZigguratGenerator
 
-  def main(a: Array[String]) = {
+  def main(a: Array[String]) =
 
     val g: spire.random.Generator = spire.random.rng.Well512a.fromTime()
     def samples = 200000
@@ -57,5 +57,3 @@ object ZigguratGenerator {
     fexp.println("hist(rexp,x)")
     fexp.println("dfittool(rexp)")
     fexp.close()
-  }
-}

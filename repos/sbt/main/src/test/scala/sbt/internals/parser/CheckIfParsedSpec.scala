@@ -4,12 +4,12 @@ import sbt.EvaluateConfigurations
 
 abstract class CheckIfParsedSpec(
     implicit val splitter: SplitExpressions.SplitExpression = EvaluateConfigurations.splitExpressions)
-    extends AbstractSpec {
+    extends AbstractSpec
 
-  this.getClass.getName should {
+  this.getClass.getName should
 
-    "Parse sbt file " in {
-      foreach(files) {
+    "Parse sbt file " in
+      foreach(files)
         case (content, description, nonEmptyImports, nonEmptyStatements) =>
           println(s"""${getClass.getSimpleName}: "$description" """)
           val (imports, statements) = split(content)
@@ -21,16 +21,12 @@ abstract class CheckIfParsedSpec(
               s"""$description
                                |***${shouldContains(nonEmptyImports)} imports***
                                |$content """.stripMargin)
-      }
-    }
-  }
 
   private def shouldContains(b: Boolean) =
-    s"""Should ${if (b) {
+    s"""Should $if (b)
       "contain"
-    } else {
+    else
       "not contain"
-    }}"""
+    """
 
   protected val files: Seq[(String, String, Boolean, Boolean)]
-}

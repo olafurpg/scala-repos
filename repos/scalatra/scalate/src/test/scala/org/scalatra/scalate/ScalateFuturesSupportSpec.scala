@@ -9,158 +9,115 @@ import org.specs2.specification._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class DaemonThreadFactory extends ThreadFactory {
-  def newThread(r: Runnable): Thread = {
+class DaemonThreadFactory extends ThreadFactory
+  def newThread(r: Runnable): Thread =
     val thread = new Thread(r)
     thread setDaemon true
     thread
-  }
-}
 
-object DaemonThreadFactory {
+object DaemonThreadFactory
   def newPool() = Executors.newCachedThreadPool(new DaemonThreadFactory)
-}
 
 class ScalateFuturesSupportServlet(exec: ExecutorService)
     extends ScalatraServlet with ScalateSupport with ScalateUrlGeneratorSupport
-    with FlashMapSupport with FutureSupport {
+    with FlashMapSupport with FutureSupport
   protected implicit val executor = ExecutionContext.fromExecutorService(exec)
 
-  get("/barf") {
+  get("/barf")
     new AsyncResult { val is = Future { throw new RuntimeException } }
-  }
 
-  get("/happy-happy") {
+  get("/happy-happy")
     new AsyncResult { val is = Future { "puppy dogs" } }
-  }
 
-  get("/simple-template") {
+  get("/simple-template")
     new AsyncResult { val is = Future { layoutTemplate("/simple.jade") } }
-  }
 
-  get("/params") {
-    new AsyncResult {
-      val is = Future {
+  get("/params")
+    new AsyncResult
+      val is = Future
         layoutTemplate("/params.jade", "foo" -> "Configurable")
-      }
-    }
-  }
 
-  get("/jade-template") {
+  get("/jade-template")
     new AsyncResult { val is = Future { jade("simple") } }
-  }
 
-  get("/jade-params") {
-    new AsyncResult {
+  get("/jade-params")
+    new AsyncResult
       val is = Future { jade("params", "foo" -> "Configurable") }
-    }
-  }
 
-  get("/scaml-template") {
+  get("/scaml-template")
     new AsyncResult { val is = Future { scaml("simple") } }
-  }
 
-  get("/scaml-params") {
-    new AsyncResult {
+  get("/scaml-params")
+    new AsyncResult
       val is = Future { scaml("params", "foo" -> "Configurable") }
-    }
-  }
 
-  get("/ssp-template") {
+  get("/ssp-template")
     new AsyncResult { val is = Future { ssp("simple") } }
-  }
 
-  get("/ssp-params") {
-    new AsyncResult {
+  get("/ssp-params")
+    new AsyncResult
       val is = Future { ssp("params", "foo" -> "Configurable") }
-    }
-  }
 
-  get("/mustache-template") {
+  get("/mustache-template")
     new AsyncResult { val is = Future { mustache("simple") } }
-  }
 
-  get("/mustache-params") {
-    new AsyncResult {
+  get("/mustache-params")
+    new AsyncResult
       val is = Future { mustache("params", "foo" -> "Configurable") }
-    }
-  }
 
-  get("/layout-strategy") {
-    new AsyncResult {
-      val is = Future {
+  get("/layout-strategy")
+    new AsyncResult
+      val is = Future
         templateEngine.layoutStrategy
           .asInstanceOf[DefaultLayoutStrategy]
           .defaultLayouts mkString ";"
-      }
-    }
-  }
 
-  val urlGeneration = get("/url-generation") {
-    new AsyncResult {
+  val urlGeneration = get("/url-generation")
+    new AsyncResult
       val is = Future { layoutTemplate("/urlGeneration.jade") }
-    }
-  }
 
-  val urlGenerationWithParams = get("/url-generation-with-params/:a/vs/:b") {
+  val urlGenerationWithParams = get("/url-generation-with-params/:a/vs/:b")
 
-    new AsyncResult {
-      val is = Future {
+    new AsyncResult
+      val is = Future
         println("Rendering reverse routing template")
         layoutTemplate("/urlGenerationWithParams.jade",
                        ("a" -> params("a")),
                        ("b" -> params("b")))
-      }
-    }
-  }
 
-  get("/legacy-view-path") {
+  get("/legacy-view-path")
     new AsyncResult { val is = Future { jade("legacy") } }
-  }
 
-  get("/directory") {
+  get("/directory")
     new AsyncResult { val is = Future { jade("directory/index") } }
-  }
 
-  get("/bindings/*") {
-    new AsyncResult {
-      val is = Future {
+  get("/bindings/*")
+    new AsyncResult
+      val is = Future
         flash.now("message") = "flash works"
         session("message") = "session works"
         jade(requestPath)
-      }
-    }
-  }
 
-  get("/bindings/params/:foo") {
+  get("/bindings/params/:foo")
     new AsyncResult { val is = Future { jade("/bindings/params") } }
-  }
 
-  get("/bindings/multiParams/*/*") {
+  get("/bindings/multiParams/*/*")
     new AsyncResult { val is = Future { jade("/bindings/multiParams") } }
-  }
 
-  get("/template-attributes") {
-    new AsyncResult {
-      val is = Future {
+  get("/template-attributes")
+    new AsyncResult
+      val is = Future
         templateAttributes("foo") = "from attributes"
         scaml("params")
-      }
-    }
-  }
 
-  get("/render-to-string") {
-    new AsyncResult {
-      val is = Future {
+  get("/render-to-string")
+    new AsyncResult
+      val is = Future
         response.setHeader("X-Template-Output", layoutTemplate("simple"))
-      }
-    }
-  }
-}
 
-class ScalateFuturesSupportSpec extends MutableScalatraSpec {
+class ScalateFuturesSupportSpec extends MutableScalatraSpec
   sequential
-  "ScalateSupport with Futures" should {
+  "ScalateSupport with Futures" should
     "render uncaught errors with 500.scaml" in e1
     "not throw a NullPointerException for trivial requests" in e2
     "render a simple template" in e3
@@ -184,36 +141,30 @@ class ScalateFuturesSupportSpec extends MutableScalatraSpec {
     "implicitly bind multiParams" in e21
     "set templateAttributes when creating a render context" in e22
     "render to a string instead of response" in e23
-  }
 
   val pool = DaemonThreadFactory.newPool()
   addServlet(new ScalateFuturesSupportServlet(pool), "/*")
 
-  override def afterAll = {
+  override def afterAll =
     super.afterAll
     pool.shutdown()
-  }
 
-  def e1 = get("/barf") {
+  def e1 = get("/barf")
     status must_== 500
     body must contain("id=\"scalate-error\"")
-  }
 
-  def e2 = get("/happy-happy") {
+  def e2 = get("/happy-happy")
     body must_== "puppy dogs"
-  }
 
-  def e3 = get("/simple-template") {
+  def e3 = get("/simple-template")
     body must_== "<div>Jade template</div>\n"
-  }
 
-  def e4 = get("/params") {
+  def e4 = get("/params")
     body must_== "<div>Configurable template</div>\n"
-  }
 
   // Testing the default layouts is going to be hard, but we can at least
   // verify that it's looking in the right place.
-  def e5 = get("/layout-strategy") {
+  def e5 = get("/layout-strategy")
     body must_==
     (List(
             "/WEB-INF/templates/layouts/default.mustache",
@@ -229,80 +180,59 @@ class ScalateFuturesSupportSpec extends MutableScalatraSpec {
             "/WEB-INF/scalate/layouts/default.scaml",
             "/WEB-INF/scalate/layouts/default.jade"
         ) mkString ";")
-  }
 
-  def e6 = get("/url-generation") {
+  def e6 = get("/url-generation")
     body must_== "/url-generation\n"
-  }
 
-  def e7 = {
+  def e7 =
     println("reverse route params")
-    get("/url-generation-with-params/jedi/vs/sith") {
+    get("/url-generation-with-params/jedi/vs/sith")
       body must_== "/url-generation-with-params/jedi/vs/sith\n"
-    }
-  }
 
-  def e8 = get("/jade-template") {
+  def e8 = get("/jade-template")
     body must_== "<div>Jade template</div>\n"
-  }
 
-  def e9 = get("/jade-params") {
+  def e9 = get("/jade-params")
     body must_== "<div>Configurable template</div>\n"
-  }
 
-  def e10 = get("/scaml-template") {
+  def e10 = get("/scaml-template")
     body must_== "<div>Scaml template</div>\n"
-  }
 
-  def e11 = get("/scaml-params") {
+  def e11 = get("/scaml-params")
     body must_== "<div>Configurable template</div>\n"
-  }
 
-  def e12 = get("/ssp-template") {
+  def e12 = get("/ssp-template")
     body must_== "<div>SSP template</div>"
-  }
 
-  def e13 = get("/ssp-params") {
+  def e13 = get("/ssp-params")
     body must_== "<div>Configurable template</div>\n"
-  }
 
-  def e14 = get("/mustache-template") {
+  def e14 = get("/mustache-template")
     body must_== "<div>Mustache template</div>\n"
-  }
 
-  def e15 = get("/mustache-params") {
+  def e15 = get("/mustache-params")
     body must_== "<div>Configurable template</div>\n"
-  }
 
-  def e16 = get("/legacy-view-path") {
+  def e16 = get("/legacy-view-path")
     body must_== "<p>legacy</p>\n"
-  }
 
-  def e17 = get("/directory") {
+  def e17 = get("/directory")
     body must_== "<p>index</p>\n"
-  }
 
-  def e18 = get("/bindings/flash") {
+  def e18 = get("/bindings/flash")
     body must_== "<div>flash works</div>\n"
-  }
 
-  def e19 = get("/bindings/session") {
+  def e19 = get("/bindings/session")
     body must_== "<div>session works</div>\n"
-  }
 
-  def e20 = get("/bindings/params/bar") {
+  def e20 = get("/bindings/params/bar")
     body must_== "<div>bar</div>\n"
-  }
 
-  def e21 = get("/bindings/multiParams/bar/baz") {
+  def e21 = get("/bindings/multiParams/bar/baz")
     body must_== "<div>bar;baz</div>\n"
-  }
 
-  def e22 = get("/template-attributes") {
+  def e22 = get("/template-attributes")
     body must_== "<div>from attributes template</div>\n"
-  }
 
-  def e23 = get("/render-to-string") {
+  def e23 = get("/render-to-string")
     header("X-Template-Output") must_== "<div>SSP template</div>"
-  }
-}

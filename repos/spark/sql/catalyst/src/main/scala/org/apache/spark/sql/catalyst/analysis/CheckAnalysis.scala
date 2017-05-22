@@ -27,7 +27,7 @@ import org.apache.spark.sql.types._
 /**
   * Throws user facing errors when passed invalid queries that fail to analyze.
   */
-trait CheckAnalysis {
+trait CheckAnalysis
 
   /**
     * Override to provide additional checks for correct analysis.
@@ -35,40 +35,37 @@ trait CheckAnalysis {
     */
   val extendedCheckRules: Seq[LogicalPlan => Unit] = Nil
 
-  protected def failAnalysis(msg: String): Nothing = {
+  protected def failAnalysis(msg: String): Nothing =
     throw new AnalysisException(msg)
-  }
 
-  protected def containsMultipleGenerators(exprs: Seq[Expression]): Boolean = {
+  protected def containsMultipleGenerators(exprs: Seq[Expression]): Boolean =
     exprs
-      .flatMap(_.collect {
+      .flatMap(_.collect
         case e: Generator => e
-      })
+      )
       .length > 1
-  }
 
-  def checkAnalysis(plan: LogicalPlan): Unit = {
+  def checkAnalysis(plan: LogicalPlan): Unit =
     // We transform up and order the rules so as to catch the first possible failure instead
     // of the result of cascading resolution failures.
-    plan.foreachUp {
+    plan.foreachUp
       case p if p.analyzed => // Skip already analyzed sub-plans
 
       case u: UnresolvedRelation =>
         u.failAnalysis(s"Table not found: ${u.tableIdentifier}")
 
       case operator: LogicalPlan =>
-        operator transformExpressionsUp {
+        operator transformExpressionsUp
           case a: Attribute if !a.resolved =>
             val from = operator.inputSet.map(_.name).mkString(", ")
             a.failAnalysis(
                 s"cannot resolve '${a.sql}' given input columns: [$from]")
 
           case e: Expression if e.checkInputDataTypes().isFailure =>
-            e.checkInputDataTypes() match {
+            e.checkInputDataTypes() match
               case TypeCheckResult.TypeCheckFailure(message) =>
                 e.failAnalysis(
                     s"cannot resolve '${e.sql}' due to data type mismatch: $message")
-            }
 
           case c: Cast if !c.resolved =>
             failAnalysis(
@@ -98,23 +95,20 @@ trait CheckAnalysis {
           case w @ WindowExpression(e, s) =>
             // Only allow window functions with an aggregate expression or an offset window
             // function.
-            e match {
+            e match
               case _: AggregateExpression | _: OffsetWindowFunction |
                   _: AggregateWindowFunction =>
               case _ =>
                 failAnalysis(
                     s"Expression '$e' not supported within a window function.")
-            }
             // Make sure the window specification is valid.
-            s.validate match {
+            s.validate match
               case Some(m) =>
                 failAnalysis(
                     s"Window specification $s is not valid because $m")
               case None => w
-            }
-        }
 
-        operator match {
+        operator match
           case f: Filter if f.condition.dataType != BooleanType =>
             failAnalysis(s"filter expression '${f.condition.sql}' " +
                 s"of type ${f.condition.dataType.simpleString} is not a boolean.")
@@ -131,7 +125,7 @@ trait CheckAnalysis {
 
           case j @ Join(_, _, _, Some(condition)) =>
             def checkValidJoinConditionExprs(expr: Expression): Unit =
-              expr match {
+              expr match
                 case p: Predicate =>
                   p.asInstanceOf[Expression]
                     .children
@@ -145,30 +139,26 @@ trait CheckAnalysis {
                       s"map type expression ${e.sql} cannot be used " +
                       "in join conditions")
                 case _ => // OK
-              }
 
             checkValidJoinConditionExprs(condition)
 
           case Aggregate(groupingExprs, aggregateExprs, child) =>
             def checkValidAggregateExpression(expr: Expression): Unit =
-              expr match {
+              expr match
                 case aggExpr: AggregateExpression =>
-                  aggExpr.aggregateFunction.children.foreach { child =>
-                    child.foreach {
+                  aggExpr.aggregateFunction.children.foreach  child =>
+                    child.foreach
                       case agg: AggregateExpression =>
                         failAnalysis(
                             s"It is not allowed to use an aggregate function in the argument of " +
                             s"another aggregate function. Please use the inner aggregate function " +
                             s"in a sub-query.")
                       case other => // OK
-                    }
 
-                    if (!child.deterministic) {
+                    if (!child.deterministic)
                       failAnalysis(
                           s"nondeterministic expression ${expr.sql} should not " +
                           s"appear in the arguments of an aggregate function.")
-                    }
-                  }
                 case e: Attribute
                     if !groupingExprs.exists(_.semanticEquals(e)) =>
                   failAnalysis(
@@ -179,37 +169,31 @@ trait CheckAnalysis {
                 case e if groupingExprs.exists(_.semanticEquals(e)) => // OK
                 case e if e.references.isEmpty => // OK
                 case e => e.children.foreach(checkValidAggregateExpression)
-              }
 
-            def checkValidGroupingExprs(expr: Expression): Unit = {
+            def checkValidGroupingExprs(expr: Expression): Unit =
               // Check if the data type of expr is orderable.
-              if (!RowOrdering.isOrderable(expr.dataType)) {
+              if (!RowOrdering.isOrderable(expr.dataType))
                 failAnalysis(
                     s"expression ${expr.sql} cannot be used as a grouping expression " +
                     s"because its data type ${expr.dataType.simpleString} is not a orderable " +
                     s"data type.")
-              }
 
-              if (!expr.deterministic) {
+              if (!expr.deterministic)
                 // This is just a sanity check, our analysis rule PullOutNondeterministic should
                 // already pull out those nondeterministic expressions and evaluate them in
                 // a Project node.
                 failAnalysis(
                     s"nondeterministic expression ${expr.sql} should not " +
                     s"appear in grouping expression.")
-              }
-            }
 
             aggregateExprs.foreach(checkValidAggregateExpression)
             groupingExprs.foreach(checkValidGroupingExprs)
 
           case Sort(orders, _, _) =>
-            orders.foreach { order =>
-              if (!RowOrdering.isOrderable(order.dataType)) {
+            orders.foreach  order =>
+              if (!RowOrdering.isOrderable(order.dataType))
                 failAnalysis(
                     s"sorting is not supported for columns of type ${order.dataType.simpleString}")
-              }
-            }
 
           case s @ SetOperation(left, right)
               if left.output.length != right.output.length =>
@@ -230,9 +214,8 @@ trait CheckAnalysis {
                 | '${s.children.head.output.length}' columns""".stripMargin)
 
           case _ => // Fallbacks to the following checks
-        }
 
-        operator match {
+        operator match
           case o if o.children.nonEmpty && o.missingInput.nonEmpty =>
             val missingAttributes = o.missingInput.mkString(",")
             val input = o.inputSet.mkString(",")
@@ -279,10 +262,6 @@ trait CheckAnalysis {
                """.stripMargin)
 
           case _ => // Analysis successful!
-        }
-    }
     extendedCheckRules.foreach(_ (plan))
 
     plan.foreach(_.setAnalyzed())
-  }
-}

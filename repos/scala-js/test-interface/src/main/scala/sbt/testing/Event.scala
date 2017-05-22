@@ -1,7 +1,7 @@
 package sbt.testing
 
 /** An event fired by the test framework during a run. */
-trait Event {
+trait Event
 
   /** The fully qualified name of a class that can rerun the suite or test
     *  about which an event was fired.
@@ -37,4 +37,3 @@ trait Event {
     *  action reported by this event, or -1, if no duration was available.
     */
   def duration(): Long
-}

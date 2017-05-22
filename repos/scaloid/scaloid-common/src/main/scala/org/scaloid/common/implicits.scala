@@ -46,16 +46,15 @@ import org.scaloid.common.{ViewOnClickListener, RichIntent}
 import language.implicitConversions
 
 private[scaloid] class UnitConversion(val ext: Double)(
-    implicit context: Context) {
+    implicit context: Context)
   @inline private def m = context.getResources.getDisplayMetrics
   @inline def dip: Int = (ext * m.density).toInt
   @inline def sp: Int = (ext * m.scaledDensity).toInt
   @inline def px2dip: Double = ext / m.density
   @inline def px2sp: Double = ext / m.scaledDensity
-}
 
 private[scaloid] class ResourceConversion(val id: Int)(
-    implicit context: Context) {
+    implicit context: Context)
   @inline def r2Text: CharSequence = context.getText(id)
   @inline def r2TextArray: Array[CharSequence] =
     context.getResources.getTextArray(id)
@@ -72,20 +71,17 @@ private[scaloid] class ResourceConversion(val id: Int)(
   @inline def r2RawResource: java.io.InputStream =
     context.getResources.openRawResource(id)
 
-  @inline def r2Drawable(color: Int, mode: Mode = Mode.MULTIPLY): Drawable = {
+  @inline def r2Drawable(color: Int, mode: Mode = Mode.MULTIPLY): Drawable =
     val drawable = context.getResources.getDrawable(id).mutate
     drawable.setColorFilter(color, mode)
     drawable
-  }
-}
 
 private[scaloid] class StringConversion(val str: String)(
-    implicit context: Context) {
+    implicit context: Context)
   @inline def toUri: Uri = Uri.parse(str)
   @inline def toIntentFilter: IntentFilter = new IntentFilter(str)
-}
 
-trait ConversionImplicits {
+trait ConversionImplicits
   @inline implicit def Double2unitConversion(ext: Double)(
       implicit context: Context): UnitConversion =
     new UnitConversion(ext)(context)
@@ -120,94 +116,74 @@ trait ConversionImplicits {
     new IntentFilter(str)
   @inline implicit def string2StringConversion(str: String)(
       implicit context: Context): StringConversion = new StringConversion(str)
-}
 object ConversionImplicits extends ConversionImplicits
 
-trait InterfaceImplicits {
+trait InterfaceImplicits
   implicit def func2ScaloidViewOnClickListener[F](
       f: (View) => F): ViewOnClickListener =
-    new ViewOnClickListener() {
-      def func = { v =>
+    new ViewOnClickListener()
+      def func =  v =>
         f(v): Unit
-      }
       def onClickListener = func2ViewOnClickListener(f)
-    }
 
   implicit def lazy2ScaloidViewOnClickListener[F](
       f: => F): ViewOnClickListener =
-    new ViewOnClickListener() {
-      def func = { v =>
+    new ViewOnClickListener()
+      def func =  v =>
         f: Unit
-      }
       def onClickListener = lazy2ViewOnClickListener(f)
-    }
 
   implicit def func2ViewOnClickListener[F](
       f: (View) => F): View.OnClickListener =
-    new View.OnClickListener() {
-      def onClick(view: View) {
+    new View.OnClickListener()
+      def onClick(view: View)
         f(view)
-      }
-    }
 
   @deprecated(
       "Can cause confusion when this conversion is used for block of code",
       "3.6")
   implicit def lazy2ViewOnClickListener[F](f: => F): View.OnClickListener =
-    new View.OnClickListener() {
-      def onClick(view: View) {
+    new View.OnClickListener()
+      def onClick(view: View)
         f
-      }
-    }
 
   implicit def func2DialogOnClickListener[F](
       f: (DialogInterface, Int) => F): DialogInterface.OnClickListener =
-    new DialogInterface.OnClickListener {
-      def onClick(dialog: DialogInterface, which: Int) {
+    new DialogInterface.OnClickListener
+      def onClick(dialog: DialogInterface, which: Int)
         f(dialog, which)
-      }
-    }
 
   implicit def lazy2DialogOnClickListener[F](
       f: => F): DialogInterface.OnClickListener =
-    new DialogInterface.OnClickListener {
-      def onClick(dialog: DialogInterface, which: Int) {
+    new DialogInterface.OnClickListener
+      def onClick(dialog: DialogInterface, which: Int)
         f
-      }
-    }
 
   implicit def func2runnable[F](f: () => F): Runnable =
-    new Runnable() {
-      def run() {
+    new Runnable()
+      def run()
         f()
-      }
-    }
 
   @deprecated(
       "Can cause confusion when this conversion is used for block of code",
       "3.6")
   implicit def lazy2runnable[F](f: => F): Runnable =
-    new Runnable() {
-      def run() {
+    new Runnable()
+      def run()
         f
-      }
-    }
 
   implicit def intent2RichIntent(i: Intent) = new RichIntent(i)
-}
 object InterfaceImplicits extends InterfaceImplicits
 
-class RichCursor(c: Cursor) extends Iterable[Cursor] {
+class RichCursor(c: Cursor) extends Iterable[Cursor]
   def iterator = new CursorIterator
 
-  class CursorIterator extends Iterator[Cursor] {
+  class CursorIterator extends Iterator[Cursor]
     def hasNext = c.getPosition < c.getCount - 1
 
-    def next() = {
+    def next() =
       c.moveToNext()
       c
-    }
-  }
 
   def closeAfter[T](body: RichCursor => T) = try body(this) finally c.close()
 
@@ -230,11 +206,9 @@ class RichCursor(c: Cursor) extends Iterable[Cursor] {
 
   def toFloat(default: Float): Float =
     closeAfter(csr => if (c.moveToFirst()) c.getFloat(0) else default)
-}
 
-trait DatabaseImplicits {
+trait DatabaseImplicits
   implicit def cursor2RichCursor(c: Cursor) = new RichCursor(c)
-}
 
 trait Implicits
     extends ConversionImplicits with InterfaceImplicits with ViewImplicits

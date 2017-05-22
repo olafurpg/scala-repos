@@ -14,9 +14,8 @@ class ScalaMemberSelectionPanel(title: String,
                                 memberInfo: util.List[ScalaMemberInfo],
                                 abstractColumnHeader: String)
     extends ScalaMemberSelectionPanelBase[ScNamedElement, ScalaMemberInfo](
-        title, memberInfo, abstractColumnHeader) {
+        title, memberInfo, abstractColumnHeader)
 
   override def createMemberSelectionTable(
       memberInfos: util.List[ScalaMemberInfo], abstractColumnHeader: String) =
     new ScalaMemberSelectionTable(memberInfos, null, abstractColumnHeader)
-}

@@ -4,7 +4,7 @@ package tests
 import cats.laws.discipline.{MonadCombineTests, CoflatMapTests, SerializableTests, TraverseTests, CartesianTests}
 import cats.laws.discipline.eq.tuple3Eq
 
-class VectorTests extends CatsSuite {
+class VectorTests extends CatsSuite
   checkAll("Vector[Int]", CartesianTests[Vector].cartesian[Int, Int, Int])
   checkAll(
       "Cartesian[Vector]", SerializableTests.serializable(Cartesian[Vector]))
@@ -24,13 +24,10 @@ class VectorTests extends CatsSuite {
   checkAll(
       "Traverse[Vector]", SerializableTests.serializable(Traverse[Vector]))
 
-  test("show") {
+  test("show")
     Vector(1, 2, 3).show should ===("Vector(1, 2, 3)")
 
     Vector.empty[Int].show should ===("Vector()")
 
-    forAll { vec: Vector[String] =>
+    forAll  vec: Vector[String] =>
       vec.show should ===(vec.toString)
-    }
-  }
-}

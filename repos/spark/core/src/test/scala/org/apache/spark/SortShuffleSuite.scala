@@ -30,33 +30,29 @@ import org.apache.spark.serializer.{JavaSerializer, KryoSerializer}
 import org.apache.spark.shuffle.sort.SortShuffleManager
 import org.apache.spark.util.Utils
 
-class SortShuffleSuite extends ShuffleSuite with BeforeAndAfterAll {
+class SortShuffleSuite extends ShuffleSuite with BeforeAndAfterAll
 
   // This test suite should run all tests in ShuffleSuite with sort-based shuffle.
 
   private var tempDir: File = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     conf.set("spark.shuffle.manager", "sort")
-  }
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
     tempDir = Utils.createTempDir()
     conf.set("spark.local.dir", tempDir.getAbsolutePath)
-  }
 
-  override def afterEach(): Unit = {
-    try {
+  override def afterEach(): Unit =
+    try
       Utils.deleteRecursively(tempDir)
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
   test(
-      "SortShuffleManager properly cleans up files for shuffles that use the serialized path") {
+      "SortShuffleManager properly cleans up files for shuffles that use the serialized path")
     sc = new SparkContext("local", "test", conf)
     // Create a shuffled RDD and verify that it actually uses the new serialized map output path
     val rdd = sc.parallelize(1 to 10, 1).map(x => (x, x))
@@ -66,10 +62,9 @@ class SortShuffleSuite extends ShuffleSuite with BeforeAndAfterAll {
       shuffledRdd.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]]
     assert(SortShuffleManager.canUseSerializedShuffle(shuffleDep))
     ensureFilesAreCleanedUp(shuffledRdd)
-  }
 
   test(
-      "SortShuffleManager properly cleans up files for shuffles that use the deserialized path") {
+      "SortShuffleManager properly cleans up files for shuffles that use the deserialized path")
     sc = new SparkContext("local", "test", conf)
     // Create a shuffled RDD and verify that it actually uses the old deserialized map output path
     val rdd = sc.parallelize(1 to 10, 1).map(x => (x, x))
@@ -79,10 +74,9 @@ class SortShuffleSuite extends ShuffleSuite with BeforeAndAfterAll {
       shuffledRdd.dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]]
     assert(!SortShuffleManager.canUseSerializedShuffle(shuffleDep))
     ensureFilesAreCleanedUp(shuffledRdd)
-  }
 
   private def ensureFilesAreCleanedUp(
-      shuffledRdd: ShuffledRDD[_, _, _]): Unit = {
+      shuffledRdd: ShuffledRDD[_, _, _]): Unit =
     def getAllFiles: Set[File] =
       FileUtils
         .listFiles(tempDir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE)
@@ -97,8 +91,5 @@ class SortShuffleSuite extends ShuffleSuite with BeforeAndAfterAll {
     Set("shuffle_0_0_0.data", "shuffle_0_0_0.index")
     // Check that the cleanup actually removes the files
     sc.env.blockManager.master.removeShuffle(0, blocking = true)
-    for (file <- filesCreatedByShuffle) {
+    for (file <- filesCreatedByShuffle)
       assert(!file.exists(), s"Shuffle file $file was not cleaned up")
-    }
-  }
-}

@@ -1,14 +1,12 @@
-class C1 {
+class C1
   def a {}
   case class A
-}
 
-class C2 extends C1 {
+class C2 extends C1
   def b {}
   case class B
-}
 
-object O extends C2 {
+object O extends C2
   def c {}
   case class C
 
@@ -37,4 +35,3 @@ object O extends C2 {
 
   println(super. /* resolved: false */ C.getClass)
   println(classOf[super. /* resolved: false */ C])
-}

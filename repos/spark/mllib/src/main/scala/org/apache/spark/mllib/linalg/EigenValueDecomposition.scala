@@ -24,7 +24,7 @@ import org.netlib.util.{doubleW, intW}
 /**
   * Compute eigen-decomposition.
   */
-private[mllib] object EigenValueDecomposition {
+private[mllib] object EigenValueDecomposition
 
   /**
     * Compute the leading k eigenvalues and eigenvectors on a symmetric square matrix using ARPACK.
@@ -47,7 +47,7 @@ private[mllib] object EigenValueDecomposition {
                     n: Int,
                     k: Int,
                     tol: Double,
-                    maxIterations: Int): (BDV[Double], BDM[Double]) = {
+                    maxIterations: Int): (BDV[Double], BDM[Double]) =
     // TODO: remove this function and use eigs in breeze when switching breeze version
     require(
         n > k,
@@ -111,12 +111,11 @@ private[mllib] object EigenValueDecomposition {
     val w = BDV(workd)
 
     // ido = 99 : done flag in reverse communication
-    while (ido.`val` != 99) {
-      if (ido.`val` != -1 && ido.`val` != 1) {
+    while (ido.`val` != 99)
+      if (ido.`val` != -1 && ido.`val` != 1)
         throw new IllegalStateException(
             "ARPACK returns ido = " + ido.`val` +
             " This flag is not compatible with Mode 1: A*x = lambda*x, A symmetric.")
-      }
       // multiply working vector with the matrix
       val inputOffset = ipntr(0) - 1
       val outputOffset = ipntr(1) - 1
@@ -140,10 +139,9 @@ private[mllib] object EigenValueDecomposition {
                     workl,
                     workl.length,
                     info)
-    }
 
-    if (info.`val` != 0) {
-      info.`val` match {
+    if (info.`val` != 0)
+      info.`val` match
         case 1 =>
           throw new IllegalStateException(
               "ARPACK returns non-zero info = " + info.`val` +
@@ -157,8 +155,6 @@ private[mllib] object EigenValueDecomposition {
           throw new IllegalStateException(
               "ARPACK returns non-zero info = " + info.`val` +
               " Please refer ARPACK user guide for error message.")
-      }
-    }
 
     val d = new Array[Double](nev.`val`)
     val select = new Array[Boolean](ncv)
@@ -193,24 +189,19 @@ private[mllib] object EigenValueDecomposition {
     val computed = iparam(4)
 
     val eigenPairs =
-      java.util.Arrays.copyOfRange(d, 0, computed).zipWithIndex.map { r =>
+      java.util.Arrays.copyOfRange(d, 0, computed).zipWithIndex.map  r =>
         (r._1, java.util.Arrays.copyOfRange(z, r._2 * n, r._2 * n + n))
-      }
 
     // sort the eigen-pairs in descending order
     val sortedEigenPairs = eigenPairs.sortBy(-_._1)
 
     // copy eigenvectors in descending order of eigenvalues
     val sortedU = BDM.zeros[Double](n, computed)
-    sortedEigenPairs.zipWithIndex.foreach { r =>
+    sortedEigenPairs.zipWithIndex.foreach  r =>
       val b = r._2 * n
       var i = 0
-      while (i < n) {
+      while (i < n)
         sortedU.data(b + i) = r._1._2(i)
         i += 1
-      }
-    }
 
     (BDV[Double](sortedEigenPairs.map(_._1)), sortedU)
-  }
-}

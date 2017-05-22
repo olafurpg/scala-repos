@@ -27,7 +27,7 @@ import net.liftweb.util._
 import Helpers._
 import S._
 
-trait DecimalTypedField extends NumericTypedField[BigDecimal] {
+trait DecimalTypedField extends NumericTypedField[BigDecimal]
   protected val scale: Int
   protected val context: MathContext
   private val zero = BigDecimal("0")
@@ -38,12 +38,11 @@ trait DecimalTypedField extends NumericTypedField[BigDecimal] {
     setNumericFromAny(in, n => BigDecimal(n.toString))
 
   def setFromString(s: String): Box[BigDecimal] =
-    if (s == null || s.isEmpty) {
+    if (s == null || s.isEmpty)
       if (optional_?) setBox(Empty)
       else setBox(Failure(notOptionalErrorMessage))
-    } else {
+    else
       setBox(tryo(BigDecimal(s)))
-    }
 
   def set_!(in: BigDecimal): BigDecimal =
     new BigDecimal(in.bigDecimal.setScale(scale, context.getRoundingMode))
@@ -51,7 +50,6 @@ trait DecimalTypedField extends NumericTypedField[BigDecimal] {
   def asJValue: JValue = asJString(_.toString)
   def setFromJValue(jvalue: JValue) =
     setFromJString(jvalue)(s => tryo(BigDecimal(s)))
-}
 
 /**
   * <p>
@@ -76,7 +74,7 @@ trait DecimalTypedField extends NumericTypedField[BigDecimal] {
 class DecimalField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, val context: MathContext, val scale: Int)
     extends Field[BigDecimal, OwnerType] with MandatoryTypedField[BigDecimal]
-    with DecimalTypedField {
+    with DecimalTypedField
 
   /**
     * Constructs a DecimalField with the specified initial value. The context
@@ -86,10 +84,9 @@ class DecimalField[OwnerType <: Record[OwnerType]](
     * @param rec The Record that owns this field
     * @param value The initial value
     */
-  def this(rec: OwnerType, value: BigDecimal) = {
+  def this(rec: OwnerType, value: BigDecimal) =
     this(rec, MathContext.UNLIMITED, value.scale)
     set(value)
-  }
 
   /**
     * Constructs a DecimalField with the specified initial value and context.
@@ -99,13 +96,11 @@ class DecimalField[OwnerType <: Record[OwnerType]](
     * @param value The initial value
     * @param context The MathContext that controls precision and rounding
     */
-  def this(rec: OwnerType, value: BigDecimal, context: MathContext) = {
+  def this(rec: OwnerType, value: BigDecimal, context: MathContext) =
     this(rec, context, value.scale)
     set(value)
-  }
 
   def owner = rec
-}
 
 /**
   * <p>
@@ -130,7 +125,7 @@ class DecimalField[OwnerType <: Record[OwnerType]](
 class OptionalDecimalField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, val context: MathContext, val scale: Int)
     extends Field[BigDecimal, OwnerType] with OptionalTypedField[BigDecimal]
-    with DecimalTypedField {
+    with DecimalTypedField
 
   /**
     * Constructs a DecimalField with the specified initial value. The context
@@ -141,10 +136,9 @@ class OptionalDecimalField[OwnerType <: Record[OwnerType]](
     * @param value The initial value
     * @param scale the scale of the decimal field, since there might be no value
     */
-  def this(rec: OwnerType, value: Box[BigDecimal], scale: Int) = {
+  def this(rec: OwnerType, value: Box[BigDecimal], scale: Int) =
     this(rec, MathContext.UNLIMITED, scale)
     setBox(value)
-  }
 
   /**
     * Constructs a DecimalField with the specified initial value and context.
@@ -158,10 +152,8 @@ class OptionalDecimalField[OwnerType <: Record[OwnerType]](
   def this(rec: OwnerType,
            value: Box[BigDecimal],
            scale: Int,
-           context: MathContext) = {
+           context: MathContext) =
     this(rec, context, scale)
     setBox(value)
-  }
 
   def owner = rec
-}

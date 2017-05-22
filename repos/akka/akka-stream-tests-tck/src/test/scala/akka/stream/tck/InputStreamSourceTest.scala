@@ -10,21 +10,18 @@ import akka.stream.scaladsl.{Sink, StreamConverters}
 import akka.util.ByteString
 import org.reactivestreams.Publisher
 
-class InputStreamSourceTest extends AkkaPublisherVerification[ByteString] {
+class InputStreamSourceTest extends AkkaPublisherVerification[ByteString]
 
-  def createPublisher(elements: Long): Publisher[ByteString] = {
+  def createPublisher(elements: Long): Publisher[ByteString] =
     StreamConverters
       .fromInputStream(() ⇒
-            new InputStream {
+            new InputStream
           @volatile var num = 0
-          override def read(): Int = {
+          override def read(): Int =
             num += 1
             num
-          }
-      })
+      )
       .withAttributes(ActorAttributes.dispatcher(
               "akka.test.stream-dispatcher"))
       .take(elements)
       .runWith(Sink.asPublisher(false))
-  }
-}

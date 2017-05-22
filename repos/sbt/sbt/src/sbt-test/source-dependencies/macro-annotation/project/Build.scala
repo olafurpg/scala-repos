@@ -2,7 +2,7 @@ import sbt._
 import Import._
 import Keys._
 
-object BuildSettings {
+object BuildSettings
   val paradiseVersion = "2.0.1"
   val buildSettings =
     Defaults.defaultSettings ++ Seq(
@@ -15,9 +15,8 @@ object BuildSettings {
             "org.scalamacros" % "paradise" % paradiseVersion cross CrossVersion.full),
         incOptions := incOptions.value.withNameHashing(true)
     )
-}
 
-object MyBuild extends Build {
+object MyBuild extends Build
   import BuildSettings._
 
   lazy val root: Project =
@@ -48,4 +47,3 @@ object MyBuild extends Build {
         file("core"),
         settings = buildSettings
     ) dependsOn (macros)
-}

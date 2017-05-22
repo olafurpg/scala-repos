@@ -40,7 +40,7 @@ import scalaz._
   */
 sealed abstract class JobState(val isTerminal: Boolean)
 
-object JobState extends JobStateSerialization {
+object JobState extends JobStateSerialization
   case object NotStarted extends JobState(false)
   case class Started(timestamp: DateTime, prev: JobState)
       extends JobState(false)
@@ -53,7 +53,7 @@ object JobState extends JobStateSerialization {
   case class Finished(timestamp: DateTime, prev: JobState)
       extends JobState(true)
 
-  def describe(state: JobState): String = state match {
+  def describe(state: JobState): String = state match
     case NotStarted => "The job has not yet been started."
     case Started(started, _) => "The job was started at %s." format started
     case Cancelled(reason, _, _) =>
@@ -62,28 +62,25 @@ object JobState extends JobStateSerialization {
       "The job was aborted early due to '%s'." format reason
     case Expired(expiration, _) => "The job expired at %s." format expiration
     case Finished(_, _) => "The job has finished successfully."
-  }
-}
 
-trait JobStateSerialization {
+trait JobStateSerialization
   import Extractor._
   import JobState._
   import scalaz.Validation._
   import scalaz.syntax.apply._
 
-  implicit object JobStateDecomposer extends Decomposer[JobState] {
+  implicit object JobStateDecomposer extends Decomposer[JobState]
     private def base(state: String,
                      timestamp: DateTime,
                      previous: JobState,
-                     reason: Option[String] = None): JObject = {
+                     reason: Option[String] = None): JObject =
       JObject(
           jfield("state", state) :: jfield("timestamp", timestamp) :: jfield(
               "previous", decompose(previous)) ::
           (reason map { jfield("reason", _) :: Nil } getOrElse Nil)
       )
-    }
 
-    override def decompose(job: JobState): JValue = job match {
+    override def decompose(job: JobState): JValue = job match
       case NotStarted =>
         jobject(jfield("state", "not_started"))
 
@@ -101,17 +98,14 @@ trait JobStateSerialization {
 
       case Finished(ts, prev) =>
         base("finished", ts, prev)
-    }
-  }
 
-  implicit object JobStateExtractor extends Extractor[JobState] {
-    def extractBase(obj: JValue): Validation[Error, (DateTime, JobState)] = {
+  implicit object JobStateExtractor extends Extractor[JobState]
+    def extractBase(obj: JValue): Validation[Error, (DateTime, JobState)] =
       ((obj \ "timestamp").validated[DateTime] |@| (obj \ "previous")
             .validated[JobState]).tupled
-    }
 
-    override def validated(obj: JValue) = {
-      (obj \ "state").validated[String] flatMap {
+    override def validated(obj: JValue) =
+      (obj \ "state").validated[String] flatMap
         case "not_started" =>
           success[Error, JobState](NotStarted)
 
@@ -119,26 +113,19 @@ trait JobStateSerialization {
           extractBase(obj) map(Started(_, _)).tupled
 
         case "cancelled" =>
-          ((obj \ "reason").validated[String] |@| extractBase(obj)) {
+          ((obj \ "reason").validated[String] |@| extractBase(obj))
             case (reason, (timestamp, previous)) =>
               Cancelled(reason, timestamp, previous)
-          }
 
         case "aborted" =>
-          ((obj \ "reason").validated[String] |@| extractBase(obj)) {
+          ((obj \ "reason").validated[String] |@| extractBase(obj))
             case (reason, (timestamp, previous)) =>
               Aborted(reason, timestamp, previous)
-          }
 
         case "expired" =>
           extractBase(obj) map(Expired(_, _)).tupled
 
         case "finished" =>
-          extractBase(obj) flatMap {
+          extractBase(obj) flatMap
             case (timestamp, previous) =>
               success(Finished(timestamp, previous))
-          }
-      }
-    }
-  }
-}

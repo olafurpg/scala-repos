@@ -1,6 +1,6 @@
 package org.scalajs.core.ir
 
-object ScalaJSVersions {
+object ScalaJSVersions
 
   /* DO NOT MAKE THESE 'final val's!
    * When referring to these "constants" from separate libraries, if it is a
@@ -29,4 +29,3 @@ object ScalaJSVersions {
 
   // Just to be extra safe
   assert(binarySupported contains binaryEmitted)
-}

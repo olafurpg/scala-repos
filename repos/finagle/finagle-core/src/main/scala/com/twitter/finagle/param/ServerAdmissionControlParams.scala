@@ -13,7 +13,7 @@ import com.twitter.util.Duration
   * @tparam A a [[Stack.Parameterized]] server to configure
   */
 class ServerAdmissionControlParams[A <: Stack.Parameterized[A]](
-    self: Stack.Parameterized[A]) {
+    self: Stack.Parameterized[A])
 
   /**
     * Configures the requests concurrency of this server.
@@ -26,13 +26,12 @@ class ServerAdmissionControlParams[A <: Stack.Parameterized[A]](
     *
     * @see [[https://twitter.github.io/finagle/guide/Servers.html#concurrency-limit]]
     */
-  def concurrencyLimit(maxConcurrentRequests: Int, maxWaiters: Int): A = {
+  def concurrencyLimit(maxConcurrentRequests: Int, maxWaiters: Int): A =
     val semaphore =
       if (maxConcurrentRequests == Int.MaxValue) None
       else Some(new AsyncSemaphore(maxConcurrentRequests, maxWaiters))
 
     self.configured(RequestSemaphoreFilter.Param(semaphore))
-  }
 
   /**
     * Configures the request deadline `tolerance` of this server.
@@ -59,4 +58,3 @@ class ServerAdmissionControlParams[A <: Stack.Parameterized[A]](
     self.configured(self
           .params[DeadlineFilter.Param]
           .copy(maxRejectPercentage = percentage))
-}

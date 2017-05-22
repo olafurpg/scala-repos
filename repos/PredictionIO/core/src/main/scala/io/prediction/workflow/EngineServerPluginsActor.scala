@@ -19,31 +19,27 @@ import akka.event.Logging
 import io.prediction.data.storage.EngineInstance
 import org.json4s.JValue
 
-class PluginsActor(engineVariant: String) extends Actor {
+class PluginsActor(engineVariant: String) extends Actor
   implicit val system = context.system
   val log = Logging(system, this)
 
   val pluginContext = EngineServerPluginContext(log, engineVariant)
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: PartialFunction[Any, Unit] =
     case (ei: EngineInstance, q: JValue, p: JValue) =>
       pluginContext.outputSniffers.values
         .foreach(_.process(ei, q, p, pluginContext))
     case h: PluginsActor.HandleREST =>
-      try {
+      try
         sender() ! pluginContext
           .outputSniffers(h.pluginName)
           .handleREST(h.pluginArgs)
-      } catch {
+      catch
         case e: Exception =>
           sender() ! s"""{"message":"${e.getMessage}"}"""
-      }
     case _ =>
       log.error(
           "Unknown message sent to the Engine Server output sniffer plugin host.")
-  }
-}
 
-object PluginsActor {
+object PluginsActor
   case class HandleREST(pluginName: String, pluginArgs: Seq[String])
-}

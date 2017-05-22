@@ -16,25 +16,24 @@ import scala.language.implicitConversions
 import ClassFileParser._
 import scala.reflect.internal.pickling.ByteCodecs
 
-object ScalaSigParser {
+object ScalaSigParser
   import Main.{BYTES_VALUE, SCALA_LONG_SIG_ANNOTATION, SCALA_SIG, SCALA_SIG_ANNOTATION}
 
   // TODO SI-9296 duplicated code, refactor
-  def scalaSigFromAnnotation(classFile: ClassFile): Option[ScalaSig] = {
+  def scalaSigFromAnnotation(classFile: ClassFile): Option[ScalaSig] =
     import classFile._
 
     def getBytes(bytesElem: AnnotationElement): Array[Byte] =
-      bytesElem.elementValue match {
+      bytesElem.elementValue match
         case ConstValueIndex(index) => bytesForIndex(index)
         case ArrayValue(signatureParts) =>
           mergedLongSignatureBytes(signatureParts)
-      }
 
     def mergedLongSignatureBytes(
         signatureParts: Seq[ElementValue]): Array[Byte] =
-      signatureParts.flatMap {
+      signatureParts.flatMap
         case ConstValueIndex(index) => bytesForIndex(index)
-      }(collection.breakOut)
+      (collection.breakOut)
 
     def bytesForIndex(index: Int) =
       constantWrapped(index).asInstanceOf[StringBytesPair].bytes
@@ -42,7 +41,7 @@ object ScalaSigParser {
     classFile
       .annotation(SCALA_SIG_ANNOTATION)
       .orElse(classFile.annotation(SCALA_LONG_SIG_ANNOTATION))
-      .map {
+      .map
         case Annotation(_, elements) =>
           val bytesElem = elements
             .find(elem => constant(elem.elementNameIndex) == BYTES_VALUE)
@@ -51,8 +50,6 @@ object ScalaSigParser {
           val length = ByteCodecs.decode(bytes)
 
           ScalaSigAttributeParsers.parse(ByteCode(bytes.take(length)))
-      }
-  }
 
   def scalaSigFromAttribute(classFile: ClassFile): Option[ScalaSig] =
     classFile
@@ -60,40 +57,33 @@ object ScalaSigParser {
       .map(_.byteCode)
       .map(ScalaSigAttributeParsers.parse)
 
-  def parse(classFile: ClassFile): Option[ScalaSig] = {
+  def parse(classFile: ClassFile): Option[ScalaSig] =
     val scalaSig = scalaSigFromAttribute(classFile)
 
-    scalaSig match {
+    scalaSig match
       // No entries in ScalaSig attribute implies that the signature is stored in the annotation
       case Some(ScalaSig(_, _, entries)) if entries.length == 0 =>
         scalaSigFromAnnotation(classFile)
       case x => x
-    }
-  }
 
-  def parse(clazz: Class[_]): Option[ScalaSig] = {
+  def parse(clazz: Class[_]): Option[ScalaSig] =
     val byteCode = ByteCode.forClass(clazz)
     val classFile = ClassFileParser.parse(byteCode)
 
     parse(classFile)
-  }
-}
 
-object ScalaSigAttributeParsers extends ByteCodeReader {
+object ScalaSigAttributeParsers extends ByteCodeReader
   def parse(byteCode: ByteCode) = expect(scalaSig)(byteCode)
 
-  val nat = apply {
+  val nat = apply
     def natN(in: ByteCode, x: Int): Result[ByteCode, Int, Nothing] =
-      in.nextByte match {
-        case Success(out, b) => {
+      in.nextByte match
+        case Success(out, b) =>
             val y = (x << 7) + (b & 0x7f)
             if ((b & 0x80) == 0) Success(out, y) else natN(out, y)
-          }
         case _ => Failure
-      }
     in =>
       natN(in, 0)
-  }
 
   val rawBytes = nat >> bytes
   val entry = nat ~ rawBytes
@@ -102,25 +92,22 @@ object ScalaSigAttributeParsers extends ByteCodeReader {
 
   val utf8 = read(x => x.fromUTF8StringAndBytes.string)
   val longValue = read(_ toLong)
-}
 
 case class ScalaSig(
     majorVersion: Int, minorVersion: Int, table: Seq[Int ~ ByteCode])
-    extends DefaultMemoisable {
+    extends DefaultMemoisable
 
   case class Entry(index: Int, entryType: Int, byteCode: ByteCode)
-      extends DefaultMemoisable {
+      extends DefaultMemoisable
     def scalaSig = ScalaSig.this
 
     def setByteCode(byteCode: ByteCode) = Entry(index, entryType, byteCode)
-  }
 
   def hasEntry(index: Int) = table isDefinedAt index
 
-  def getEntry(index: Int) = {
+  def getEntry(index: Int) =
     val entryType ~ byteCode = table(index)
     Entry(index, entryType, byteCode)
-  }
 
   def parseEntry(index: Int) =
     applyRule(ScalaSigParsers.parseEntry(ScalaSigEntryParsers.entry)(index))
@@ -129,40 +116,35 @@ case class ScalaSig(
     ScalaSigParsers.expect(parser)(this)
 
   override def toString =
-    "ScalaSig version " + majorVersion + "." + minorVersion + {
+    "ScalaSig version " + majorVersion + "." + minorVersion +
       for (i <- 0 until table.size) yield
         i + ":\t" + parseEntry(i) // + "\n\t" + getEntry(i)
-    }.mkString("\n", "\n", "")
+    .mkString("\n", "\n", "")
 
   lazy val symbols: Seq[Symbol] = ScalaSigParsers.symbols
 
   lazy val topLevelClasses: List[ClassSymbol] = ScalaSigParsers.topLevelClasses
   lazy val topLevelObjects: List[ObjectSymbol] =
     ScalaSigParsers.topLevelObjects
-}
 
-object ScalaSigParsers extends RulesWithState with MemoisableRules {
+object ScalaSigParsers extends RulesWithState with MemoisableRules
   type S = ScalaSig
   type Parser[A] = Rule[A, String]
 
   val symTab = read(_.table)
   val size = symTab ^^ (_.size)
 
-  def entry(index: Int) = memo(("entry", index)) {
-    cond(_ hasEntry index) -~ read(_ getEntry index) >-> { entry =>
+  def entry(index: Int) = memo(("entry", index))
+    cond(_ hasEntry index) -~ read(_ getEntry index) >->  entry =>
       Success(entry, entry.entryType)
-    }
-  }
 
   def parseEntry[A](parser: ScalaSigEntryParsers.EntryParser[A])(
       index: Int): Parser[A] =
-    entry(index) -~ parser >> { a => entry =>
+    entry(index) -~ parser >>  a => entry =>
       Success(entry.scalaSig, a)
-    }
 
-  def allEntries[A](f: ScalaSigEntryParsers.EntryParser[A]) = size >> { n =>
+  def allEntries[A](f: ScalaSigEntryParsers.EntryParser[A]) = size >>  n =>
     anyOf((0 until n) map parseEntry(f))
-  }
 
   lazy val entries = allEntries(ScalaSigEntryParsers.entry) as "entries"
   lazy val symbols = allEntries(ScalaSigEntryParsers.symbol) as "symbols"
@@ -172,23 +154,20 @@ object ScalaSigParsers extends RulesWithState with MemoisableRules {
 
   lazy val topLevelClasses = allEntries(ScalaSigEntryParsers.topLevelClass)
   lazy val topLevelObjects = allEntries(ScalaSigEntryParsers.topLevelObject)
-}
 
-object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
+object ScalaSigEntryParsers extends RulesWithState with MemoisableRules
   import ScalaSigAttributeParsers.{nat, utf8, longValue}
 
   type S = ScalaSig#Entry
   type EntryParser[A] = Rule[A, String]
 
   implicit def byteCodeEntryParser[A](
-      rule: ScalaSigAttributeParsers.Parser[A]): EntryParser[A] = apply {
+      rule: ScalaSigAttributeParsers.Parser[A]): EntryParser[A] = apply
     entry =>
       rule(entry.byteCode) mapOut (entry setByteCode _)
-  }
 
-  def toEntry[A](index: Int) = apply { sigEntry =>
+  def toEntry[A](index: Int) = apply  sigEntry =>
     ScalaSigParsers.entry(index)(sigEntry.scalaSig)
-  }
 
   def parseEntry[A](parser: EntryParser[A])(index: Int) =
     (toEntry(index) -~ parser)
@@ -293,12 +272,10 @@ object ScalaSigEntryParsers extends RulesWithState with MemoisableRules {
   lazy val topLevelClass = classSymbol filter isTopLevelClass
   lazy val topLevelObject = objectSymbol filter isTopLevel
 
-  def isTopLevel(symbol: Symbol) = symbol.parent match {
+  def isTopLevel(symbol: Symbol) = symbol.parent match
     case Some(ext: ExternalSymbol) => true
     case _ => false
-  }
   def isTopLevelClass(symbol: Symbol) = !symbol.isModule && isTopLevel(symbol)
-}
 
 case class AttributeInfo(
     symbol: Symbol,

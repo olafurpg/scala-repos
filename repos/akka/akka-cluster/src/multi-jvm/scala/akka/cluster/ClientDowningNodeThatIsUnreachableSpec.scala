@@ -12,7 +12,7 @@ import scala.collection.immutable
 
 final case class ClientDowningNodeThatIsUnreachableMultiNodeConfig(
     failureDetectorPuppet: Boolean)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -20,7 +20,6 @@ final case class ClientDowningNodeThatIsUnreachableMultiNodeConfig(
 
   commonConfig(debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
-}
 
 class ClientDowningNodeThatIsUnreachableWithFailureDetectorPuppetMultiJvmNode1
     extends ClientDowningNodeThatIsUnreachableSpec(
@@ -50,7 +49,7 @@ class ClientDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode4
 
 abstract class ClientDowningNodeThatIsUnreachableSpec(
     multiNodeConfig: ClientDowningNodeThatIsUnreachableMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec
 
   def this(failureDetectorPuppet: Boolean) =
     this(
@@ -59,13 +58,13 @@ abstract class ClientDowningNodeThatIsUnreachableSpec(
 
   import multiNodeConfig._
 
-  "Client of a 4 node cluster" must {
+  "Client of a 4 node cluster" must
 
-    "be able to DOWN a node that is UNREACHABLE (killed)" taggedAs LongRunningTest in {
+    "be able to DOWN a node that is UNREACHABLE (killed)" taggedAs LongRunningTest in
       val thirdAddress = address(third)
       awaitClusterUp(first, second, third, fourth)
 
-      runOn(first) {
+      runOn(first)
         // kill 'third' node
         testConductor.exit(third, 0).await
         markNodeAsUnavailable(thirdAddress)
@@ -77,20 +76,14 @@ abstract class ClientDowningNodeThatIsUnreachableSpec(
         awaitMembersUp(numberOfMembers = 3,
                        canNotBePartOfMemberRing = Set(thirdAddress))
         clusterView.members.exists(_.address == thirdAddress) should ===(false)
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("down-third-node")
-      }
 
-      runOn(second, fourth) {
+      runOn(second, fourth)
         enterBarrier("down-third-node")
 
         awaitMembersUp(numberOfMembers = 3,
                        canNotBePartOfMemberRing = Set(thirdAddress))
-      }
 
       enterBarrier("await-completion")
-    }
-  }
-}

@@ -21,7 +21,7 @@ package mutable
   *  @version 2.8
   *  @since   2.8
   */
-trait ArrayLike[A, +Repr] extends Any with IndexedSeqOptimized[A, Repr] {
+trait ArrayLike[A, +Repr] extends Any with IndexedSeqOptimized[A, Repr]
   self =>
 
   /** Creates a possible nested `IndexedSeq` which consists of all the elements
@@ -40,12 +40,9 @@ trait ArrayLike[A, +Repr] extends Any with IndexedSeqOptimized[A, Repr] {
     */
   def deep: scala.collection.IndexedSeq[Any] =
     new scala.collection.AbstractSeq[Any]
-    with scala.collection.IndexedSeq[Any] {
+    with scala.collection.IndexedSeq[Any]
       def length = self.length
-      def apply(idx: Int): Any = self.apply(idx) match {
+      def apply(idx: Int): Any = self.apply(idx) match
         case x: AnyRef if x.getClass.isArray => WrappedArray.make(x).deep
         case x => x
-      }
       override def stringPrefix = "Array"
-    }
-}

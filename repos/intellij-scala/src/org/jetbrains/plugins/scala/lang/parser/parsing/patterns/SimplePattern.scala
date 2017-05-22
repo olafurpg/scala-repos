@@ -26,37 +26,35 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
  *                 | XmlPattern
  */
 
-object SimplePattern extends ParserNode {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object SimplePattern extends ParserNode
+  def parse(builder: ScalaPsiBuilder): Boolean =
     def isVarId =
       builder.getTokenText.substring(0, 1).toLowerCase == builder.getTokenText
         .substring(0, 1) && !(builder.getTokenText.apply(0) == '`' &&
           builder.getTokenText.apply(builder.getTokenText.length - 1) == '`')
     val simplePatternMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tUNDER =>
         builder.advanceLexer() //Ate _
-        builder.getTokenText match {
+        builder.getTokenText match
           case "*" =>
             simplePatternMarker.rollbackTo()
             return false
           case _ =>
-        }
         simplePatternMarker.done(ScalaElementTypes.WILDCARD_PATTERN)
         return true
       case ScalaTokenTypes.tLPARENTHESIS =>
         builder.advanceLexer() //Ate (
         builder.disableNewlines
-        builder.getTokenType match {
+        builder.getTokenType match
           case ScalaTokenTypes.tRPARENTHESIS =>
             builder.advanceLexer() //Ate )
             builder.restoreNewlinesState
             simplePatternMarker.done(ScalaElementTypes.TUPLE_PATTERN)
             return true
           case _ =>
-        }
-        if (Patterns parse builder) {
-          builder.getTokenType match {
+        if (Patterns parse builder)
+          builder.getTokenType match
             case ScalaTokenTypes.tRPARENTHESIS =>
               builder.advanceLexer() //Ate )
               builder.restoreNewlinesState
@@ -67,51 +65,42 @@ object SimplePattern extends ParserNode {
               builder.restoreNewlinesState
               simplePatternMarker.done(ScalaElementTypes.TUPLE_PATTERN)
               return true
-          }
-        }
-        if (Pattern parse builder) {
-          builder.getTokenType match {
+        if (Pattern parse builder)
+          builder.getTokenType match
             case ScalaTokenTypes.tRPARENTHESIS =>
               builder.advanceLexer() //Ate )
             case _ =>
               builder error ScalaBundle.message("rparenthesis.expected")
-          }
           builder.restoreNewlinesState
           simplePatternMarker.done(ScalaElementTypes.PATTERN_IN_PARENTHESIS)
           return true
-        }
       case _ =>
-    }
-    if (InterpolationPattern parse builder) {
+    if (InterpolationPattern parse builder)
       simplePatternMarker.done(ScalaElementTypes.INTERPOLATION_PATTERN)
       return true
-    }
 
-    if (Literal parse builder) {
+    if (Literal parse builder)
       simplePatternMarker.done(ScalaElementTypes.LITERAL_PATTERN)
       return true
-    }
 
-    if (XmlPattern.parse(builder)) {
+    if (XmlPattern.parse(builder))
       simplePatternMarker.drop()
       return true
-    }
     if (lookAhead(builder, ScalaTokenTypes.tIDENTIFIER) && !lookAhead(
             builder, ScalaTokenTypes.tIDENTIFIER, ScalaTokenTypes.tDOT) &&
         !lookAhead(builder,
                    ScalaTokenTypes.tIDENTIFIER,
-                   ScalaTokenTypes.tLPARENTHESIS) && isVarId) {
+                   ScalaTokenTypes.tLPARENTHESIS) && isVarId)
       val rpm = builder.mark
       builder.getTokenText
       builder.advanceLexer()
       rpm.done(ScalaElementTypes.REFERENCE_PATTERN)
       simplePatternMarker.drop()
       return true
-    }
 
     val rb1 = builder.mark
-    if (StableId parse (builder, ScalaElementTypes.REFERENCE_EXPRESSION)) {
-      builder.getTokenType match {
+    if (StableId parse (builder, ScalaElementTypes.REFERENCE_EXPRESSION))
+      builder.getTokenType match
         case ScalaTokenTypes.tLPARENTHESIS =>
           rb1.rollbackTo()
           StableId parse (builder, ScalaElementTypes.REFERENCE)
@@ -119,7 +108,7 @@ object SimplePattern extends ParserNode {
           builder.advanceLexer() //Ate (
           builder.disableNewlines
 
-          def parseSeqWildcard(withComma: Boolean): Boolean = {
+          def parseSeqWildcard(withComma: Boolean): Boolean =
             if (if (withComma)
                   lookAhead(builder,
                             ScalaTokenTypes.tCOMMA,
@@ -128,26 +117,23 @@ object SimplePattern extends ParserNode {
                 else
                   lookAhead(builder,
                             ScalaTokenTypes.tUNDER,
-                            ScalaTokenTypes.tIDENTIFIER)) {
+                            ScalaTokenTypes.tIDENTIFIER))
               val wild = builder.mark
               if (withComma) builder.advanceLexer()
               builder.getTokenType
               builder.advanceLexer()
               if (builder.getTokenType == ScalaTokenTypes.tIDENTIFIER &&
-                  "*".equals(builder.getTokenText)) {
+                  "*".equals(builder.getTokenText))
                 builder.advanceLexer()
                 wild.done(ScalaElementTypes.SEQ_WILDCARD)
                 true
-              } else {
+              else
                 wild.rollbackTo()
                 false
-              }
-            } else {
+            else
               false
-            }
-          }
 
-          def parseSeqWildcardBinding(withComma: Boolean): Boolean = {
+          def parseSeqWildcardBinding(withComma: Boolean): Boolean =
             if (if (withComma)
                   lookAhead(builder,
                             ScalaTokenTypes.tCOMMA,
@@ -171,46 +157,39 @@ object SimplePattern extends ParserNode {
                             ScalaTokenTypes.tUNDER,
                             ScalaTokenTypes.tAT,
                             ScalaTokenTypes.tUNDER,
-                            ScalaTokenTypes.tIDENTIFIER)) {
+                            ScalaTokenTypes.tIDENTIFIER))
               val wild = builder.mark
               if (withComma) builder.advanceLexer() // ,
               builder.getTokenType
-              if (isVarId) {
+              if (isVarId)
                 builder.advanceLexer() // id
-              } else {
+              else
                 wild.rollbackTo()
                 return false
-              }
               builder.getTokenType
               builder.advanceLexer() // @
               builder.getTokenType
-              if (ParserUtils.eatSeqWildcardNext(builder)) {
+              if (ParserUtils.eatSeqWildcardNext(builder))
                 wild.done(ScalaElementTypes.NAMING_PATTERN)
                 return true
-              } else {
+              else
                 wild.rollbackTo()
                 return false
-              }
-            }
             false
-          }
 
           if (!parseSeqWildcard(withComma = false) &&
               !parseSeqWildcardBinding(withComma = false) &&
-              Pattern.parse(builder)) {
-            while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
+              Pattern.parse(builder))
+            while (builder.getTokenType == ScalaTokenTypes.tCOMMA)
               builder.advanceLexer() // eat comma
               if (!parseSeqWildcard(withComma = false) &&
                   !parseSeqWildcardBinding(withComma = false))
                 Pattern.parse(builder)
-            }
-          }
-          builder.getTokenType match {
+          builder.getTokenType match
             case ScalaTokenTypes.tRPARENTHESIS =>
               builder.advanceLexer() //Ate )
             case _ =>
               builder error ErrMsg("rparenthesis.expected")
-          }
           builder.restoreNewlinesState
           args.done(ScalaElementTypes.PATTERN_ARGS)
           simplePatternMarker.done(ScalaElementTypes.CONSTRUCTOR_PATTERN)
@@ -219,9 +198,5 @@ object SimplePattern extends ParserNode {
           rb1.drop()
           simplePatternMarker.done(ScalaElementTypes.STABLE_REFERENCE_PATTERN)
           return true
-      }
-    }
     simplePatternMarker.rollbackTo()
     false
-  }
-}

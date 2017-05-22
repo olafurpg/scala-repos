@@ -28,14 +28,13 @@ class CompactHessian(M: DenseMatrix[Double],
                      S: RingBuffer[DenseVector[Double]],
                      sigma: Double,
                      m: Int)
-    extends NumericOps[CompactHessian] {
+    extends NumericOps[CompactHessian]
   def this(m: Int) = this(null, new RingBuffer(m), new RingBuffer(m), 1.0, m)
   def repr: CompactHessian = this
   implicit def collectionOfVectorsToMatrix(coll: Seq[DenseVector[Double]]) =
-    DenseMatrix.tabulate(coll.size, coll.headOption.map(_.size).getOrElse(0)) {
+    DenseMatrix.tabulate(coll.size, coll.headOption.map(_.size).getOrElse(0))
       case (i, j) => coll(i)(j)
-    }
-  def updated(y: DenseVector[Double], s: DenseVector[Double]): CompactHessian = {
+  def updated(y: DenseVector[Double], s: DenseVector[Double]): CompactHessian =
     // Compute scaling factor for initial Hessian, which we choose as
     val yTs = y.dot(s)
 
@@ -52,16 +51,14 @@ class CompactHessian(M: DenseMatrix[Double],
     // L_k is the k x k matrix with (L_k)_{i,j} = if( i > j ) s_i^T y_j else 0
     // (this is a lower triangular matrix with the diagonal set to all zeroes)
     val D = diag(
-        DenseVector.tabulate[Double](k) { i =>
+        DenseVector.tabulate[Double](k)  i =>
       S(i) dot Y(i)
-    })
-    val L = DenseMatrix.tabulate[Double](k, k) { (i, j) =>
-      if (i > j) {
+    )
+    val L = DenseMatrix.tabulate[Double](k, k)  (i, j) =>
+      if (i > j)
         S(i) dot Y(j)
-      } else {
+      else
         0.0
-      }
-    }
     val SM = collectionOfVectorsToMatrix(S)
     // S_k^T S_k is the symmetric k x k matrix with element (i,j) given by <s_i, s_j>
     val STS = (SM * SM.t) * sigma
@@ -73,20 +70,16 @@ class CompactHessian(M: DenseMatrix[Double],
 
     val newB = new CompactHessian(M, Y, S, sigma, m)
     newB
-  }
 
-  def *(v: DenseVector[Double]): DenseVector[Double] = {
-    if (Y.size == 0) {
+  def *(v: DenseVector[Double]): DenseVector[Double] =
+    if (Y.size == 0)
       v
-    } else {
+    else
       val nTv = N.t * v.toDenseMatrix.t
       val u = (N * (M \ nTv)).toDenseVector
       v * sigma - u
-    }
-  }
   lazy val N = DenseMatrix.horzcat(collectionOfVectorsToMatrix(S).t * sigma,
                                    collectionOfVectorsToMatrix(Y).t)
-}
 
 class ProjectedQuasiNewton(
     convergenceCheck: ConvergenceCheck[DenseVector[Double]],
@@ -101,7 +94,7 @@ class ProjectedQuasiNewton(
     extends FirstOrderMinimizer[
         DenseVector[Double], DiffFunction[DenseVector[Double]]](
         convergenceCheck) with Projecting[DenseVector[Double]]
-    with SerializableLogging {
+    with SerializableLogging
   type BDV = DenseVector[Double]
   def this(tolerance: Double = 1e-6,
            m: Int = 10,
@@ -136,9 +129,8 @@ class ProjectedQuasiNewton(
   type History = CompactHessian
 
   protected def initialHistory(f: DiffFunction[DenseVector[Double]],
-                               init: DenseVector[Double]): History = {
+                               init: DenseVector[Double]): History =
     new CompactHessian(m)
-  }
 
   override protected def adjust(
       newX: DenseVector[Double],
@@ -152,11 +144,11 @@ class ProjectedQuasiNewton(
 
   protected def chooseDescentDirection(
       state: State,
-      fn: DiffFunction[DenseVector[Double]]): DenseVector[Double] = {
+      fn: DiffFunction[DenseVector[Double]]): DenseVector[Double] =
     import state._
-    if (iter == 0) {
+    if (iter == 0)
       computeGradient(x, grad)
-    } else {
+    else
       // Update the limited-memory BFGS approximation to the Hessian
       //B.update(y, s)
       // Solve subproblem; we use the current iterate x as a guess
@@ -168,8 +160,6 @@ class ProjectedQuasiNewton(
           f"ProjectedQuasiNewton: outerIter ${state.iter} innerIters ${spgResult.iter}")
       spgResult.x - x
       //	time += subprob.time
-    }
-  }
 
   /**
     * Given a direction, perform a Strong Wolfe Line Search
@@ -183,7 +173,7 @@ class ProjectedQuasiNewton(
     */
   protected def determineStepSize(state: State,
                                   f: DiffFunction[DenseVector[Double]],
-                                  dir: DenseVector[Double]) = {
+                                  dir: DenseVector[Double]) =
     val x = state.x
     val grad = state.grad
 
@@ -198,34 +188,30 @@ class ProjectedQuasiNewton(
     if (alpha * norm(grad) < 1E-10) throw new StepSizeUnderflow
 
     alpha
-  }
 
   protected def takeStep(state: State,
                          dir: DenseVector[Double],
-                         stepSize: Double): DenseVector[Double] = {
+                         stepSize: Double): DenseVector[Double] =
     projection(state.x + dir * stepSize)
-  }
 
   protected def updateHistory(newX: DenseVector[Double],
                               newGrad: DenseVector[Double],
                               newVal: Double,
                               f: DiffFunction[DenseVector[Double]],
-                              oldState: State): History = {
+                              oldState: State): History =
     import oldState._
     val s = newX - x
     val y = newGrad - grad
     oldState.history.updated(y, s)
-  }
-}
 
-object ProjectedQuasiNewton extends SerializableLogging {
+object ProjectedQuasiNewton extends SerializableLogging
   // Forms a quadratic model around fun, the argmin of which is then a feasible
   // quasi-Newton descent direction
   class QuadraticSubproblem(fk: Double,
                             xk: DenseVector[Double],
                             gk: DenseVector[Double],
                             B: CompactHessian)
-      extends DiffFunction[DenseVector[Double]] {
+      extends DiffFunction[DenseVector[Double]]
 
     /**
       * Return value and gradient of the quadratic model at the current iterate:
@@ -233,12 +219,9 @@ object ProjectedQuasiNewton extends SerializableLogging {
       *  \nabla q_k(p) = g_k + B_k(p-x_k)
       */
     override def calculate(
-        x: DenseVector[Double]): (Double, DenseVector[Double]) = {
+        x: DenseVector[Double]): (Double, DenseVector[Double]) =
       val d = x - xk
       val Bd = B * d
       val f = fk + d.dot(gk) + (0.5 * d.dot(Bd))
       val g = gk + Bd
       (f, g)
-    }
-  }
-}

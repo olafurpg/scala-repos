@@ -33,7 +33,7 @@ final case class Binding[T](key: BindingKey[T],
                             target: Option[BindingTarget[T]],
                             scope: Option[Class[_ <: Annotation]],
                             eager: Boolean,
-                            source: Object) {
+                            source: Object)
 
   /**
     * Configure the scope for this binding.
@@ -52,21 +52,18 @@ final case class Binding[T](key: BindingKey[T],
     */
   def eagerly(): Binding[T] = copy(eager = true)
 
-  override def toString = {
+  override def toString =
     val eagerDesc = if (eager) " eagerly" else ""
-    s"$source:\nBinding($key to ${target.getOrElse("self")}${scope.fold("")(
-        " in " + _)}$eagerDesc)"
-  }
-}
+    s"$source:\nBinding($key to ${target.getOrElse("self")}$scope.fold("")(
+        " in " + _)$eagerDesc)"
 
 /**
   * Constructor for a binding Key that doesn't have a qualifier.
   *
   * @see The [[Module]] class for information on how to provide bindings.
   */
-object BindingKey {
+object BindingKey
   def apply[T](clazz: Class[T]): BindingKey[T] = new BindingKey(clazz)
-}
 
 /**
   * A binding key.
@@ -78,7 +75,7 @@ object BindingKey {
   * @see The [[Module]] class for information on how to provide bindings.
   */
 final case class BindingKey[T](
-    clazz: Class[T], qualifier: Option[QualifierAnnotation]) {
+    clazz: Class[T], qualifier: Option[QualifierAnnotation])
 
   def this(clazz: Class[T]) = this(clazz, None)
 
@@ -248,10 +245,8 @@ final case class BindingKey[T](
   def toSelf: Binding[T] =
     Binding(this, None, None, false, SourceLocator.source)
 
-  override def toString = {
+  override def toString =
     s"$clazz${qualifier.fold("")(" qualified with " + _)}"
-  }
-}
 
 /**
   * A binding target.
@@ -319,9 +314,8 @@ final case class QualifierInstance[T <: Annotation](instance: T)
 final case class QualifierClass[T <: Annotation](clazz: Class[T])
     extends QualifierAnnotation
 
-private object SourceLocator {
+private object SourceLocator
   val provider = SourceProvider.DEFAULT_INSTANCE.plusSkippedClasses(
       this.getClass, classOf[BindingKey[_]], classOf[Binding[_]])
 
   def source = provider.get()
-}

@@ -21,13 +21,13 @@ private[exception] class TestServiceException(
     clientAddress: Option[String] = None,
     sourceAddress: Option[String] = Some(
           InetAddress.getLoopbackAddress.getHostName),
-    cardinality: Option[Int] = None) {
+    cardinality: Option[Int] = None)
 
   private val ste = new javaSTE("badclass", "badmethod", "badfile", 42)
   val throwable = new Throwable(exceptionMessage)
   throwable.setStackTrace(Array(ste, ste))
 
-  private def constructServiceException = {
+  private def constructServiceException =
     var se = new ServiceException(serviceName,
                                   throwable,
                                   time.getOrElse(Time.now),
@@ -36,40 +36,35 @@ private[exception] class TestServiceException(
     sourceAddress foreach (sa => se = se.withSource(sa))
     cardinality foreach (c => se = se.incremented(c))
     se
-  }
 
   lazy val serviceException = constructServiceException
 
-  def verifyCompressedJSON(json: String) = {
+  def verifyCompressedJSON(json: String) =
     verifyJSON(GZIPStringEncoder.decodeString(json))
-  }
 
-  def verifyJSON(json: String) = {
+  def verifyJSON(json: String) =
     def verify[T](
-        actual: T, expected: T, message: String, previous: Boolean = false) = {
+        actual: T, expected: T, message: String, previous: Boolean = false) =
       assert(!previous, message + ": variable already set")
       assert(actual == expected, message + ": " + actual)
       true
-    }
 
     def verifyOption[T](received: T,
                         expected: Option[T],
                         fieldName: String,
                         previous: Boolean = false,
-                        enforced: Boolean = true) = {
-      if (enforced) {
+                        enforced: Boolean = true) =
+      if (enforced)
         assert(expected.isDefined,
                "received key for non-defined field: " + fieldName)
         verify(received,
                expected.get,
                "incorrect value for " + fieldName,
                previous)
-      } else true
-    }
+      else true
 
-    def fail(badKey: String, location: String) {
+    def fail(badKey: String, location: String)
       assert(false, "unknown element found in " + location + ": " + badKey)
-    }
 
     val mapper = new ObjectMapper
     val s: JsonNode = mapper.readTree(json)
@@ -86,10 +81,10 @@ private[exception] class TestServiceException(
     var hasCardinality = false
 
     assert(s.isObject)
-    s.fields.asScala foreach { mapEntry =>
+    s.fields.asScala foreach  mapEntry =>
       val jsonValue = mapEntry.getValue
 
-      mapEntry.getKey match {
+      mapEntry.getKey match
         case "name" =>
           assert(jsonValue.isTextual)
           hasName = verify(
@@ -102,15 +97,15 @@ private[exception] class TestServiceException(
           assert(jsonValue.isNumber)
           hasTimestamp = verifyOption(
               jsonValue.longValue, time, "incorrect time", hasTimestamp, false)
-        case "exceptionContents" => {
+        case "exceptionContents" =>
             assert(!hasExceptionContents, "got exception contents >1 times")
             hasExceptionContents = true
 
             assert(jsonValue.isObject)
-            jsonValue.fields.asScala foreach { contentsMapEntry =>
+            jsonValue.fields.asScala foreach  contentsMapEntry =>
               val contentsJsonValue = contentsMapEntry.getValue
 
-              contentsMapEntry.getKey match {
+              contentsMapEntry.getKey match
                 case "exceptionClass" =>
                   assert(contentsJsonValue.isTextual)
                   hasExceptionClass = verify(contentsJsonValue.textValue,
@@ -130,9 +125,6 @@ private[exception] class TestServiceException(
                                          "bad stacktrace",
                                          hasStackTrace)
                 case a => fail(a, "exception contents")
-              }
-            }
-          }
         case "peer" =>
           assert(jsonValue.isTextual)
           hasClient = verifyOption(
@@ -143,12 +135,10 @@ private[exception] class TestServiceException(
               jsonValue.textValue, sourceAddress, "source", hasSource)
         case "cardinality" =>
           assert(jsonValue.isNumber)
-          hasCardinality = verifyOption(jsonValue.intValue, cardinality map {
+          hasCardinality = verifyOption(jsonValue.intValue, cardinality map
             _ + 1
-          }, "cardinality", hasCardinality, false)
+          , "cardinality", hasCardinality, false)
         case a => fail(a, "service exception")
-      }
-    }
 
     assert(hasName, "no name")
     assert(hasTraceId, "no trace id")
@@ -158,46 +148,40 @@ private[exception] class TestServiceException(
     assert(hasMessage, "no message")
     assert(hasStackTrace, "no stacktrace")
 
-    def optionalAssertDefined(o: Option[_], defined: Boolean, msg: String) {
+    def optionalAssertDefined(o: Option[_], defined: Boolean, msg: String)
       if (o.isDefined) assert(defined, msg + " expected but not found")
-    }
 
     optionalAssertDefined(clientAddress, hasClient, "peer")
     optionalAssertDefined(sourceAddress, hasSource, "source")
     optionalAssertDefined(cardinality, hasCardinality, "cardinality")
 
     true
-  }
-}
 
-class ServiceExceptionTest extends FunSuite {
-  test("with no endpoint reporting serialize to JSON in the proper format") {
+class ServiceExceptionTest extends FunSuite
+  test("with no endpoint reporting serialize to JSON in the proper format")
     val tse = new TestServiceException(
         "service16", "my cool message", Some(Time.now), Some(124564L))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
 
   test(
-      "with no endpoint reporting with >1 cardinality serialize to JSON in the proper format") {
+      "with no endpoint reporting with >1 cardinality serialize to JSON in the proper format")
     val tse = new TestServiceException("service16",
                                        "my cool message",
                                        Some(Time.now),
                                        Some(124564L),
                                        cardinality = Some(12))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
 
-  test("with client endpoint reporting serialize to JSON in the proper format") {
+  test("with client endpoint reporting serialize to JSON in the proper format")
     val tse = new TestServiceException("service16",
                                        "my cool message",
                                        Some(Time.now),
                                        Some(124564L),
                                        clientAddress = Some("myendpoint"))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
 
   test(
-      "with client endpoint reporting with >1 cardinality serialize to JSON in the proper format") {
+      "with client endpoint reporting with >1 cardinality serialize to JSON in the proper format")
     val tse = new TestServiceException("service16",
                                        "my cool message",
                                        Some(Time.now),
@@ -205,19 +189,17 @@ class ServiceExceptionTest extends FunSuite {
                                        clientAddress = Some("myendpoint"),
                                        cardinality = Some(9))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
 
-  test("with source endpoint reporting serialize to JSON in the proper format") {
+  test("with source endpoint reporting serialize to JSON in the proper format")
     val tse = new TestServiceException("service16",
                                        "my cool message",
                                        Some(Time.now),
                                        Some(124564L),
                                        sourceAddress = Some("myendpoint"))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
 
   test(
-      "with source endpoint reporting with >1 cardinality serialize to JSON in the proper format") {
+      "with source endpoint reporting with >1 cardinality serialize to JSON in the proper format")
     val tse = new TestServiceException("service16",
                                        "my cool message",
                                        Some(Time.now),
@@ -225,10 +207,9 @@ class ServiceExceptionTest extends FunSuite {
                                        sourceAddress = Some("myendpoint"),
                                        cardinality = Some(7))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
 
   test(
-      "with both client and source endpoint reporting serialize to JSON in the proper format") {
+      "with both client and source endpoint reporting serialize to JSON in the proper format")
     val tse = new TestServiceException("service16",
                                        "my cool message",
                                        Some(Time.now),
@@ -236,10 +217,9 @@ class ServiceExceptionTest extends FunSuite {
                                        clientAddress = Some("myClientAddress"),
                                        sourceAddress = Some("mySourceAddress"))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
 
   test(
-      "with both client and source endpoint reporting with >1 cardinality serialize to JSON in the proper format") {
+      "with both client and source endpoint reporting with >1 cardinality serialize to JSON in the proper format")
     val tse = new TestServiceException("service16",
                                        "my cool message",
                                        Some(Time.now),
@@ -248,5 +228,3 @@ class ServiceExceptionTest extends FunSuite {
                                        sourceAddress = Some("mySourceAddress"),
                                        cardinality = Some(8))
     assert(tse.verifyJSON(tse.serviceException.toJson))
-  }
-}

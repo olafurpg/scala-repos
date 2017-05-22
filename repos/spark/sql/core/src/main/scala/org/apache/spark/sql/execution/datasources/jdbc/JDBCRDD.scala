@@ -39,11 +39,10 @@ import org.apache.spark.unsafe.types.UTF8String
   * Data corresponding to one partition of a JDBCRDD.
   */
 private[sql] case class JDBCPartition(whereClause: String, idx: Int)
-    extends Partition {
+    extends Partition
   override def index: Int = idx
-}
 
-private[sql] object JDBCRDD extends Logging {
+private[sql] object JDBCRDD extends Logging
 
   /**
     * Maps a JDBC type to a Catalyst type.  This function is called only when
@@ -53,8 +52,8 @@ private[sql] object JDBCRDD extends Logging {
     * @return The Catalyst type corresponding to sqlType.
     */
   private def getCatalystType(
-      sqlType: Int, precision: Int, scale: Int, signed: Boolean): DataType = {
-    val answer = sqlType match {
+      sqlType: Int, precision: Int, scale: Int, signed: Boolean): DataType =
+    val answer = sqlType match
       // scalastyle:off
       case java.sql.Types.ARRAY => null
       case java.sql.Types.BIGINT =>
@@ -100,11 +99,9 @@ private[sql] object JDBCRDD extends Logging {
       case java.sql.Types.VARCHAR => StringType
       case _ => null
       // scalastyle:on
-    }
 
     if (answer == null) throw new SQLException("Unsupported type " + sqlType)
     answer
-  }
 
   /**
     * Takes a (schema, table) specification and returns the table's Catalyst
@@ -119,19 +116,19 @@ private[sql] object JDBCRDD extends Logging {
     * @throws SQLException if the table contains an unsupported type.
     */
   def resolveTable(
-      url: String, table: String, properties: Properties): StructType = {
+      url: String, table: String, properties: Properties): StructType =
     val dialect = JdbcDialects.get(url)
     val conn: Connection = JdbcUtils.createConnectionFactory(url, properties)()
-    try {
+    try
       val statement = conn.prepareStatement(s"SELECT * FROM $table WHERE 1=0")
-      try {
+      try
         val rs = statement.executeQuery()
-        try {
+        try
           val rsmd = rs.getMetaData
           val ncols = rsmd.getColumnCount
           val fields = new Array[StructField](ncols)
           var i = 0
-          while (i < ncols) {
+          while (i < ncols)
             val columnName = rsmd.getColumnLabel(i + 1)
             val dataType = rsmd.getColumnType(i + 1)
             val typeName = rsmd.getColumnTypeName(i + 1)
@@ -150,20 +147,15 @@ private[sql] object JDBCRDD extends Logging {
             fields(i) = StructField(
                 columnName, columnType, nullable, metadata.build())
             i = i + 1
-          }
           return new StructType(fields)
-        } finally {
+        finally
           rs.close()
-        }
-      } finally {
+      finally
         statement.close()
-      }
-    } finally {
+    finally
       conn.close()
-    }
 
     throw new RuntimeException("This line is unreachable.")
-  }
 
   /**
     * Prune all but the specified columns from the specified Catalyst schema.
@@ -174,22 +166,20 @@ private[sql] object JDBCRDD extends Logging {
     * @return A Catalyst schema corresponding to columns in the given order.
     */
   private def pruneSchema(
-      schema: StructType, columns: Array[String]): StructType = {
+      schema: StructType, columns: Array[String]): StructType =
     val fieldMap = Map(
         schema.fields.map(x => x.metadata.getString("name") -> x): _*)
     new StructType(columns.map(name => fieldMap(name)))
-  }
 
   /**
     * Converts value to SQL expression.
     */
-  private def compileValue(value: Any): Any = value match {
+  private def compileValue(value: Any): Any = value match
     case stringValue: String => s"'${escapeSql(stringValue)}'"
     case timestampValue: Timestamp => "'" + timestampValue + "'"
     case dateValue: Date => "'" + dateValue + "'"
     case arrayValue: Array[Any] => arrayValue.map(compileValue).mkString(", ")
     case _ => value
-  }
 
   private def escapeSql(value: String): String =
     if (value == null) null else StringUtils.replace(value, "'", "''")
@@ -198,8 +188,8 @@ private[sql] object JDBCRDD extends Logging {
     * Turns a single Filter into a String representing a SQL expression.
     * Returns None for an unhandled filter.
     */
-  private[jdbc] def compileFilter(f: Filter): Option[String] = {
-    Option(f match {
+  private[jdbc] def compileFilter(f: Filter): Option[String] =
+    Option(f match
       case EqualTo(attr, value) => s"$attr = ${compileValue(value)}"
       case EqualNullSafe(attr, value) =>
         s"(NOT ($attr != ${compileValue(value)} OR $attr IS NULL OR " +
@@ -221,21 +211,18 @@ private[sql] object JDBCRDD extends Logging {
         // It applies too for the following And filter.
         // If we can make sure compileFilter supports all filters, we can remove this check.
         val or = Seq(f1, f2).flatMap(compileFilter(_))
-        if (or.size == 2) {
+        if (or.size == 2)
           or.map(p => s"($p)").mkString(" OR ")
-        } else {
+        else
           null
-        }
       case And(f1, f2) =>
         val and = Seq(f1, f2).flatMap(compileFilter(_))
-        if (and.size == 2) {
+        if (and.size == 2)
           and.map(p => s"($p)").mkString(" AND ")
-        } else {
+        else
           null
-        }
       case _ => null
-    })
-  }
+    )
 
   /**
     * Build and return JDBCRDD from the given information.
@@ -258,7 +245,7 @@ private[sql] object JDBCRDD extends Logging {
                 fqTable: String,
                 requiredColumns: Array[String],
                 filters: Array[Filter],
-                parts: Array[Partition]): RDD[InternalRow] = {
+                parts: Array[Partition]): RDD[InternalRow] =
     val dialect = JdbcDialects.get(url)
     val quotedColumns =
       requiredColumns.map(colName => dialect.quoteIdentifier(colName))
@@ -271,8 +258,6 @@ private[sql] object JDBCRDD extends Logging {
                 parts,
                 url,
                 properties)
-  }
-}
 
 /**
   * An RDD representing a table in a database accessed via JDBC.  Both the
@@ -288,7 +273,7 @@ private[sql] class JDBCRDD(sc: SparkContext,
                            partitions: Array[Partition],
                            url: String,
                            properties: Properties)
-    extends RDD[InternalRow](sc, Nil) {
+    extends RDD[InternalRow](sc, Nil)
 
   /**
     * Retrieve the list of partitions corresponding to this RDD.
@@ -298,11 +283,10 @@ private[sql] class JDBCRDD(sc: SparkContext,
   /**
     * `columns`, but as a String suitable for injection into a SQL query.
     */
-  private val columnList: String = {
+  private val columnList: String =
     val sb = new StringBuilder()
     columns.foreach(x => sb.append(",").append(x))
     if (sb.length == 0) "1" else sb.substring(1)
-  }
 
   /**
     * `filters`, but as a WHERE clause suitable for injection into a SQL query.
@@ -313,17 +297,15 @@ private[sql] class JDBCRDD(sc: SparkContext,
   /**
     * A WHERE clause representing both `filters`, if any, and the current partition.
     */
-  private def getWhereClause(part: JDBCPartition): String = {
-    if (part.whereClause != null && filterWhereClause.length > 0) {
+  private def getWhereClause(part: JDBCPartition): String =
+    if (part.whereClause != null && filterWhereClause.length > 0)
       "WHERE " + filterWhereClause + " AND " + part.whereClause
-    } else if (part.whereClause != null) {
+    else if (part.whereClause != null)
       "WHERE " + part.whereClause
-    } else if (filterWhereClause.length > 0) {
+    else if (filterWhereClause.length > 0)
       "WHERE " + filterWhereClause
-    } else {
+    else
       ""
-    }
-  }
 
   // Each JDBC-to-Catalyst conversion corresponds to a tag defined here so that
   // we don't have to potentially poke around in the Metadata once for every
@@ -353,7 +335,7 @@ private[sql] class JDBCRDD(sc: SparkContext,
     schema.fields.map(sf => getConversions(sf.dataType, sf.metadata))
 
   private def getConversions(
-      dt: DataType, metadata: Metadata): JDBCConversion = dt match {
+      dt: DataType, metadata: Metadata): JDBCConversion = dt match
     case BooleanType => BooleanConversion
     case DateType => DateConversion
     case DecimalType.Fixed(p, s) => DecimalConversion(p, s)
@@ -370,7 +352,6 @@ private[sql] class JDBCRDD(sc: SparkContext,
     case _ =>
       throw new IllegalArgumentException(
           s"Unsupported type ${dt.simpleString}")
-  }
 
   /**
     * Runs the SQL query against the JDBC driver.
@@ -378,15 +359,14 @@ private[sql] class JDBCRDD(sc: SparkContext,
     */
   override def compute(
       thePart: Partition, context: TaskContext): Iterator[InternalRow] =
-    new Iterator[InternalRow] {
+    new Iterator[InternalRow]
       var closed = false
       var finished = false
       var gotNext = false
       var nextValue: InternalRow = null
 
-      context.addTaskCompletionListener { context =>
+      context.addTaskCompletionListener  context =>
         close()
-      }
       val part = thePart.asInstanceOf[JDBCPartition]
       val conn = getConnection()
       val dialect = JdbcDialects.get(url)
@@ -410,22 +390,21 @@ private[sql] class JDBCRDD(sc: SparkContext,
       val mutableRow = new SpecificMutableRow(
           schema.fields.map(x => x.dataType))
 
-      def getNext(): InternalRow = {
-        if (rs.next()) {
+      def getNext(): InternalRow =
+        if (rs.next())
           var i = 0
-          while (i < conversions.length) {
+          while (i < conversions.length)
             val pos = i + 1
-            conversions(i) match {
+            conversions(i) match
               case BooleanConversion =>
                 mutableRow.setBoolean(i, rs.getBoolean(pos))
               case DateConversion =>
                 // DateTimeUtils.fromJavaDate does not handle null value, so we need to check it.
                 val dateVal = rs.getDate(pos)
-                if (dateVal != null) {
+                if (dateVal != null)
                   mutableRow.setInt(i, DateTimeUtils.fromJavaDate(dateVal))
-                } else {
+                else
                   mutableRow.update(i, null)
-                }
               // When connecting with Oracle DB through JDBC, the precision and scale of BigDecimal
               // object returned by ResultSet.getBigDecimal is not correctly matched to the table
               // schema reported by ResultSetMetaData.getPrecision and ResultSetMetaData.getScale.
@@ -436,11 +415,10 @@ private[sql] class JDBCRDD(sc: SparkContext,
               // So it is needed to set precision and scale for Decimal based on JDBC metadata.
               case DecimalConversion(p, s) =>
                 val decimalVal = rs.getBigDecimal(pos)
-                if (decimalVal == null) {
+                if (decimalVal == null)
                   mutableRow.update(i, null)
-                } else {
+                else
                   mutableRow.update(i, Decimal(decimalVal, p, s))
-                }
               case DoubleConversion =>
                 mutableRow.setDouble(i, rs.getDouble(pos))
               case FloatConversion => mutableRow.setFloat(i, rs.getFloat(pos))
@@ -451,45 +429,40 @@ private[sql] class JDBCRDD(sc: SparkContext,
                 mutableRow.update(i, UTF8String.fromString(rs.getString(pos)))
               case TimestampConversion =>
                 val t = rs.getTimestamp(pos)
-                if (t != null) {
+                if (t != null)
                   mutableRow.setLong(i, DateTimeUtils.fromJavaTimestamp(t))
-                } else {
+                else
                   mutableRow.update(i, null)
-                }
               case BinaryConversion => mutableRow.update(i, rs.getBytes(pos))
               case BinaryLongConversion =>
                 val bytes = rs.getBytes(pos)
                 var ans = 0L
                 var j = 0
-                while (j < bytes.size) {
+                while (j < bytes.size)
                   ans = 256 * ans + (255 & bytes(j))
                   j = j + 1
-                }
                 mutableRow.setLong(i, ans)
               case ArrayConversion(elementConversion) =>
                 val array = rs.getArray(pos).getArray
-                if (array != null) {
-                  val data = elementConversion match {
+                if (array != null)
+                  val data = elementConversion match
                     case TimestampConversion =>
-                      array.asInstanceOf[Array[java.sql.Timestamp]].map {
+                      array.asInstanceOf[Array[java.sql.Timestamp]].map
                         timestamp =>
                           nullSafeConvert(
                               timestamp, DateTimeUtils.fromJavaTimestamp)
-                      }
                     case StringConversion =>
                       array
                         .asInstanceOf[Array[java.lang.String]]
                         .map(UTF8String.fromString)
                     case DateConversion =>
-                      array.asInstanceOf[Array[java.sql.Date]].map { date =>
+                      array.asInstanceOf[Array[java.sql.Date]].map  date =>
                         nullSafeConvert(date, DateTimeUtils.fromJavaDate)
-                      }
                     case DecimalConversion(p, s) =>
-                      array.asInstanceOf[Array[java.math.BigDecimal]].map {
+                      array.asInstanceOf[Array[java.math.BigDecimal]].map
                         decimal =>
                           nullSafeConvert[java.math.BigDecimal](
                               decimal, d => Decimal(d, p, s))
-                      }
                     case BinaryLongConversion =>
                       throw new IllegalArgumentException(
                           s"Unsupported array element conversion $i")
@@ -497,84 +470,59 @@ private[sql] class JDBCRDD(sc: SparkContext,
                       throw new IllegalArgumentException(
                           "Nested arrays unsupported")
                     case _ => array.asInstanceOf[Array[Any]]
-                  }
                   mutableRow.update(i, new GenericArrayData(data))
-                } else {
+                else
                   mutableRow.update(i, null)
-                }
-            }
             if (rs.wasNull) mutableRow.setNullAt(i)
             i = i + 1
-          }
           mutableRow
-        } else {
+        else
           finished = true
           null.asInstanceOf[InternalRow]
-        }
-      }
 
-      def close() {
+      def close()
         if (closed) return
-        try {
-          if (null != rs) {
+        try
+          if (null != rs)
             rs.close()
-          }
-        } catch {
+        catch
           case e: Exception => logWarning("Exception closing resultset", e)
-        }
-        try {
-          if (null != stmt) {
+        try
+          if (null != stmt)
             stmt.close()
-          }
-        } catch {
+        catch
           case e: Exception => logWarning("Exception closing statement", e)
-        }
-        try {
-          if (null != conn) {
-            if (!conn.isClosed && !conn.getAutoCommit) {
-              try {
+        try
+          if (null != conn)
+            if (!conn.isClosed && !conn.getAutoCommit)
+              try
                 conn.commit()
-              } catch {
+              catch
                 case NonFatal(e) =>
                   logWarning("Exception committing transaction", e)
-              }
-            }
             conn.close()
-          }
           logInfo("closed connection")
-        } catch {
+        catch
           case e: Exception => logWarning("Exception closing connection", e)
-        }
         closed = true
-      }
 
-      override def hasNext: Boolean = {
-        if (!finished) {
-          if (!gotNext) {
+      override def hasNext: Boolean =
+        if (!finished)
+          if (!gotNext)
             nextValue = getNext()
-            if (finished) {
+            if (finished)
               close()
-            }
             gotNext = true
-          }
-        }
         !finished
-      }
 
-      override def next(): InternalRow = {
-        if (!hasNext) {
+      override def next(): InternalRow =
+        if (!hasNext)
           throw new NoSuchElementException("End of stream")
-        }
         gotNext = false
         nextValue
-      }
-    }
 
-  private def nullSafeConvert[T](input: T, f: T => Any): Any = {
-    if (input == null) {
+  private def nullSafeConvert[T](input: T, f: T => Any): Any =
+    if (input == null)
       null
-    } else {
+    else
       f(input)
-    }
-  }
-}

@@ -7,7 +7,7 @@ import reactivemongo.bson._
 import lila.db.api._
 import tube.memberTube
 
-object MemberRepo {
+object MemberRepo
 
   type ID = String
 
@@ -38,4 +38,3 @@ object MemberRepo {
   def selectId(teamId: ID, userId: ID) = $select(Member.makeId(teamId, userId))
   def teamQuery(teamId: ID) = Json.obj("team" -> teamId)
   def userQuery(userId: ID) = Json.obj("user" -> userId)
-}

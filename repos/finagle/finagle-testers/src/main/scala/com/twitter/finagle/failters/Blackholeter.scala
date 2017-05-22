@@ -14,18 +14,15 @@ import com.twitter.util.{Return, Throw, Future, Var}
 case class Blackholeter[Req, Rep](probability: Var[Double],
                                   seed: Long = Failter.DefaultSeed,
                                   stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep] with Failter
 
-  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
-    if (prob == 0.0 || rand.nextDouble() >= prob) {
+  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
+    if (prob == 0.0 || rand.nextDouble() >= prob)
       passedStat.incr()
       service(req)
-    } else {
+    else
       rejectedStat.incr()
       Future.never
-    }
-  }
-}
 
 /**
   * A blackholeter rejects/fails by returning a promise from a service which will never be fulfilled.
@@ -39,18 +36,14 @@ case class ByzantineBlackholeter[Req, Rep](
     probability: Var[Double],
     seed: Long = Failter.DefaultSeed,
     stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep] with Failter
 
-  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
-    service(req).transform { result =>
-      if (prob == 0.0 || rand.nextDouble() >= prob) {
+  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
+    service(req).transform  result =>
+      if (prob == 0.0 || rand.nextDouble() >= prob)
         passedStat.incr()
         Future.const(result)
-      } else {
+      else
         rejectedStat.incr()
         // The result is now simply discarded
         Future.never
-      }
-    }
-  }
-}

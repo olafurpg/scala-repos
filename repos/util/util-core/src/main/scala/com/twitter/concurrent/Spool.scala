@@ -39,7 +39,7 @@ import java.io.EOFException
   *
   * Note: There is a Java-friendly API for this trait: [[com.twitter.concurrent.AbstractSpool]].
   */
-sealed trait Spool[+A] {
+sealed trait Spool[+A]
   // NB: Spools are always lazy internally in order to provide the expected behavior
   // during concatenation of two Spools, regardless of how they were constructed
   import Spool.{LazyCons, empty}
@@ -74,33 +74,27 @@ sealed trait Spool[+A] {
     * {{Option}}, terminating the stream (EOF) with
     * {{None}}.
     */
-  def foreachElem[B](f: Option[A] => B): Future[Unit] = {
-    if (!isEmpty) {
-      Future { f(Some(head)) } flatMap { _ =>
-        tail transform {
+  def foreachElem[B](f: Option[A] => B): Future[Unit] =
+    if (!isEmpty)
+      Future { f(Some(head)) } flatMap  _ =>
+        tail transform
           case Return(s) => s.foreachElem(f)
           case Throw(_: EOFException) => Future { f(None) }
           case Throw(cause) => Future.exception(cause)
-        }
-      }
-    } else {
+    else
       Future { f(None) }
-    }
-  }
 
   def foldLeft[B](z: B)(f: (B, A) => B): Future[B] =
-    if (isEmpty) {
+    if (isEmpty)
       Future.value(z)
-    } else {
+    else
       tail.flatMap(s => s.foldLeft(f(z, head))(f))
-    }
 
   def reduceLeft[B >: A](f: (B, A) => B): Future[B] =
-    if (isEmpty) {
+    if (isEmpty)
       Future.exception(new UnsupportedOperationException("empty.reduceLeft"))
-    } else {
+    else
       tail.flatMap(s => s.foldLeft[B](head)(f))
-    }
 
   /**
     * Zips two [[Spool Spools]] returning a Spool of Tuple2s.
@@ -118,10 +112,9 @@ sealed trait Spool[+A] {
           (head, that.head),
           Future
             .join(tail, that.tail)
-            .map {
+            .map
               case (thisTail, thatTail) =>
                 thisTail.zip(thatTail)
-            }
         )
 
   /**
@@ -133,7 +126,7 @@ sealed trait Spool[+A] {
     */
   def collect[B](f: PartialFunction[A, B]): Future[Spool[B]] =
     if (isEmpty) Future.value(empty[B])
-    else {
+    else
       def _tail = tail flatMap (_.collect(f))
 
       // NB: we use lift instead of isDefinedAt to avoid calling isDefinedAt
@@ -144,59 +137,49 @@ sealed trait Spool[+A] {
       // and PartialFunction literals override applyOrElse to not call isDefinedAt
       // more than once, freeing us up to have if-guards or unapplies that are
       // mutating.
-      f.lift(head) match {
+      f.lift(head) match
         case Some(result) => Future.value(new LazyCons(result, _tail))
         case None => _tail
-      }
-    }
 
-  def map[B](f: A => B): Spool[B] = {
+  def map[B](f: A => B): Spool[B] =
     val s = collect { case x => f(x) }
     Await.result(s, Duration.Zero)
-  }
 
   /**
     * Applies a function that generates a Future[B] for each element of this
     * spool. The returned future is satisfied when the head of the resulting
     * spool is available.
     */
-  def mapFuture[B](f: A => Future[B]): Future[Spool[B]] = {
+  def mapFuture[B](f: A => Future[B]): Future[Spool[B]] =
     if (isEmpty) Future.value(empty[B])
-    else {
-      f(head) map { h =>
+    else
+      f(head) map  h =>
         new LazyCons(h, tail flatMap (_ mapFuture f))
-      }
-    }
-  }
 
-  def filter(f: A => Boolean): Future[Spool[A]] = collect {
+  def filter(f: A => Boolean): Future[Spool[A]] = collect
     case x if f(x) => x
-  }
 
   /**
     * Take elements from the head of the Spool (lazily), while the given condition is true.
     */
   def takeWhile(f: A => Boolean): Spool[A] =
-    if (isEmpty) {
+    if (isEmpty)
       this
-    } else if (f(head)) {
+    else if (f(head))
       new LazyCons(head, tail map (_ takeWhile f))
-    } else {
+    else
       empty[A]
-    }
 
   /**
     * Take the first n elements of the Spool as another Spool (adapted from Stream.take)
     */
-  def take(n: Int): Spool[A] = {
-    if (n <= 0 || isEmpty) {
+  def take(n: Int): Spool[A] =
+    if (n <= 0 || isEmpty)
       empty[A]
-    } else if (n == 1) {
+    else if (n == 1)
       new LazyCons(head, Future.value(empty[A]))
-    } else {
+    else
       new LazyCons(head, tail map (_ take (n - 1)))
-    }
-  }
 
   /**
     * Concatenates two spools.
@@ -219,25 +202,19 @@ sealed trait Spool[+A] {
   def distinctBy[B](fn: A => B): Spool[A] =
     if (isEmpty) this else distinctByNonEmpty(fn)
 
-  private[this] def distinctByNonEmpty[B](fn: A => B): Spool[A] = {
+  private[this] def distinctByNonEmpty[B](fn: A => B): Spool[A] =
     val set = mutable.HashSet[B]()
-    set.synchronized {
+    set.synchronized
       set += fn(head)
-    }
-    head *:: tail.flatMap { spool =>
-      spool.filter { item =>
+    head *:: tail.flatMap  spool =>
+      spool.filter  item =>
         val fned = fn(item)
-        set.synchronized {
-          fned match {
+        set.synchronized
+          fned match
             case alreadySeen if set(alreadySeen) => false
             case distinctItem =>
               set += distinctItem
               true
-          }
-        }
-      }
-    }
-  }
 
   /**
     * Concatenates two spools.
@@ -263,23 +240,19 @@ sealed trait Spool[+A] {
     * Fully buffer the spool to a {{Seq}}.  The returned future is
     * satisfied when the entire result is ready.
     */
-  def toSeq: Future[Seq[A]] = {
+  def toSeq: Future[Seq[A]] =
     val as = new ArrayBuffer[A]
-    foreach { a =>
+    foreach  a =>
       as += a
-    } map { _ =>
+    map  _ =>
       as
-    }
-  }
 
   /**
     * Eagerly executes all computation represented by this Spool (presumably for
     * side-effects), and returns a Future representing its completion.
     */
-  def force: Future[Unit] = foreach { _ =>
+  def force: Future[Unit] = foreach  _ =>
     ()
-  }
-}
 
 /**
   * Abstract `Spool` class for Java compatibility.
@@ -292,27 +265,24 @@ abstract class AbstractSpool[A] extends Spool[A]
   *
   * Note: There is a Java-friendly API for this object: [[com.twitter.concurrent.Spools]].
   */
-object Spool {
-  case class Cons[A](head: A, tail: Future[Spool[A]]) extends Spool[A] {
+object Spool
+  case class Cons[A](head: A, tail: Future[Spool[A]]) extends Spool[A]
     def isEmpty = false
     override def toString =
       "Cons(%s, %c)".format(head, if (tail.isDefined) '*' else '?')
-  }
 
   private class LazyCons[A](val head: A, next: => Future[Spool[A]])
-      extends Spool[A] {
+      extends Spool[A]
     def isEmpty = false
     lazy val tail = next
     // NB: not touching tail, to avoid forcing unnecessarily
     override def toString = "Cons(%s, ?)".format(head)
-  }
 
-  object Empty extends Spool[Nothing] {
+  object Empty extends Spool[Nothing]
     def isEmpty = true
     def head = throw new NoSuchElementException("spool is empty")
     def tail = Future.exception(new NoSuchElementException("spool is empty"))
     override def toString = "Empty"
-  }
 
   /**
     * Cons a value & tail to a new {{Spool}}. To defer the tail of the Spool, use
@@ -341,36 +311,30 @@ object Spool {
     * *:: constructs and deconstructs deferred tails
     * **:: constructs and deconstructs eager tails
     */
-  class Syntax[A](tail: => Future[Spool[A]]) {
+  class Syntax[A](tail: => Future[Spool[A]])
     def *::(head: A): Spool[A] = new LazyCons(head, tail)
-  }
 
   implicit def syntax[A](s: => Future[Spool[A]]): Syntax[A] = new Syntax[A](s)
 
-  object *:: {
-    def unapply[A](s: Spool[A]): Option[(A, Future[Spool[A]])] = {
+  object *::
+    def unapply[A](s: Spool[A]): Option[(A, Future[Spool[A]])] =
       if (s.isEmpty) None
       else Some((s.head, s.tail))
-    }
-  }
 
-  class Syntax1[A](tail: Spool[A]) {
+  class Syntax1[A](tail: Spool[A])
 
     /**
       * @deprecated Deprecated in favor of {{*::}}. This will eventually be removed.
       */
     @deprecated("Use *:: instead.", "6.14.1")
     def **::(head: A) = cons(head, tail)
-  }
 
   implicit def syntax1[A](s: Spool[A]): Syntax1[A] = new Syntax1[A](s)
 
-  object **:: {
-    def unapply[A](s: Spool[A]): Option[(A, Spool[A])] = {
+  object **::
+    def unapply[A](s: Spool[A]): Option[(A, Spool[A])] =
       if (s.isEmpty) None
       else Some((s.head, Await.result(s.tail)))
-    }
-  }
 
   /**
     * Lazily builds a Spool from a Seq.
@@ -379,23 +343,20 @@ object Spool {
     * consumes the Seq lazily, which means if used with Streams, it will
     * preserve laziness.
     */
-  def fromSeq[A](seq: Seq[A]): Spool[A] = {
+  def fromSeq[A](seq: Seq[A]): Spool[A] =
     def go(as: Seq[A]): Future[Spool[A]] =
       if (as.isEmpty) Future.value(Spool.empty)
       else Future.value(as.head *:: go(as.tail))
 
     if (seq.isEmpty) Spool.empty else seq.head *:: go(seq.tail)
-  }
 
   /**
     * Adds an implicit method to efficiently convert a Seq[A] to a Spool[A]
     */
-  class ToSpool[A](s: Seq[A]) {
+  class ToSpool[A](s: Seq[A])
     def toSpool: Spool[A] =
-      s.reverse.foldLeft(Spool.empty: Spool[A]) {
+      s.reverse.foldLeft(Spool.empty: Spool[A])
         case (tail, head) => head *:: Future.value(tail)
-      }
-  }
 
   implicit def seqToSpool[A](s: Seq[A]): ToSpool[A] = new ToSpool[A](s)
 
@@ -409,11 +370,9 @@ object Spool {
 
   private[this] def mergeNonempty[A](
       spools: Seq[Future[Spool[A]]]): Future[Spool[A]] =
-    Future.select(spools).flatMap {
+    Future.select(spools).flatMap
       case (anything, Nil) => new ConstFuture(anything)
       case (Return(Spool.Empty), rest) => merge(rest)
       case (Return(spool), rest) =>
         Future.value(new LazyCons(spool.head, merge(rest :+ spool.tail)))
       case (Throw(exc), _) => Future.exception(exc)
-    }
-}

@@ -19,12 +19,12 @@ import org.jetbrains.plugins.scala.util.{ScalaUtils, TestUtils}
   * Date: 30.09.2009
   */
 abstract class ScalaRenameTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   val caretMarker = "/*caret*/"
 
   protected def folderPath: String = TestUtils.getTestDataPath + "/rename/"
 
-  protected def doTest() {
+  protected def doTest()
     import org.junit.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val ioFile: File = new File(filePath)
@@ -48,8 +48,8 @@ abstract class ScalaRenameTestBase
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
 
     //start to inline
-    ScalaUtils.runWriteAction(new Runnable {
-      def run() {
+    ScalaUtils.runWriteAction(new Runnable
+      def run()
         val subst = RenamePsiElementProcessor
           .forElement(element)
           .substituteElementToRename(element, getEditorAdapter)
@@ -59,19 +59,15 @@ abstract class ScalaRenameTestBase
                             "NameAfterRename",
                             searchInComments,
                             false).run()
-      }
-    }, getProjectAdapter, "Test")
+    , getProjectAdapter, "Test")
     res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
 
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
         ""
-    }
     assertEquals(output, res)
-  }
-}

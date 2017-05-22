@@ -34,13 +34,12 @@ import scalafx.Includes._
 import scalafx.beans.property.{ReadOnlyIntegerProperty, ReadOnlyObjectProperty}
 import scalafx.delegate.SFXDelegate
 
-object Media {
+object Media
   implicit def sfxMedia2jfx(m: Media): jfxsm.Media =
     if (m != null) m.delegate else null
-}
 
 class Media(override val delegate: jfxsm.Media)
-    extends SFXDelegate[jfxsm.Media] {
+    extends SFXDelegate[jfxsm.Media]
 
   /**
     * Constructs a Media instance.
@@ -74,16 +73,12 @@ class Media(override val delegate: jfxsm.Media)
     * Event handler called when an error occurs.
     */
   def onError = delegate.onErrorProperty
-  def onError_=(v: Runnable) {
+  def onError_=(v: Runnable)
     onError() = v
-  }
-  def onError_=(op: => Unit) {
-    onError() = new Runnable {
-      def run() {
+  def onError_=(op: => Unit)
+    onError() = new Runnable
+      def run()
         op
-      }
-    }
-  }
 
   /**
     * Retrieve the source URI of the media.
@@ -99,4 +94,3 @@ class Media(override val delegate: jfxsm.Media)
     * The width in pixels of the source media.
     */
   def width: ReadOnlyIntegerProperty = delegate.widthProperty
-}

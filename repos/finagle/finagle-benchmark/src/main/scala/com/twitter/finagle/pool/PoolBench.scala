@@ -7,15 +7,14 @@ import com.twitter.finagle.{Service, ServiceFactory}
 import com.twitter.util.{Await, Future, Duration}
 import org.openjdk.jmh.annotations._
 
-object PoolBench {
-  val underlying = ServiceFactory.const(new Service[Int, Int] {
+object PoolBench
+  val underlying = ServiceFactory.const(new Service[Int, Int]
     def apply(i: Int) = Future.value(0)
-  })
-}
+  )
 
 @Threads(Threads.MAX)
 @State(Scope.Benchmark)
-class PoolBench extends StdBenchAnnotations {
+class PoolBench extends StdBenchAnnotations
   import PoolBench._
 
   @Param(Array("1000"))
@@ -30,7 +29,7 @@ class PoolBench extends StdBenchAnnotations {
   var composed: ServiceFactory[Int, Int] = _
 
   @Setup
-  def loadPools() {
+  def loadPools()
     watermark = new WatermarkPool(
         underlying, lowWatermark = 1, highWatermark = poolSize)
     cache = new CachingPool(
@@ -47,13 +46,11 @@ class PoolBench extends StdBenchAnnotations {
         highWatermark = poolSize
     )
 
-    for (i <- 0 until (poolSize * loadedRatio).toInt) {
+    for (i <- 0 until (poolSize * loadedRatio).toInt)
       watermark()
       cache()
       buffer()
       composed()
-    }
-  }
 
   @Benchmark
   def watermarkGetAndPut(): Unit = Await.result(watermark().flatMap(_.close()))
@@ -66,15 +63,13 @@ class PoolBench extends StdBenchAnnotations {
 
   @Benchmark
   def composedGetAndPut(): Unit = Await.result(composed().flatMap(_.close()))
-}
 
 @Threads(Threads.MAX)
 @State(Scope.Benchmark)
-class SingletonPoolBench extends StdBenchAnnotations {
+class SingletonPoolBench extends StdBenchAnnotations
   import PoolBench._
 
   val singleton = new SingletonPool(underlying, NullStatsReceiver)
 
   @Benchmark
   def getAndPut(): Unit = Await.result(singleton().flatMap(_.close()))
-}

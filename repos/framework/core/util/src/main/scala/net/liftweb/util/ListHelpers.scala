@@ -41,7 +41,7 @@ final case class InsertAfterDelta[T](item: T, after: T) extends DeltaInfo[T]
 /**
   * The ListHelpers trait provides useful functions which can be applied to Lists.<p/>
   */
-trait ListHelpers {
+trait ListHelpers
 
   /**
     * Compute the deltas between two sequences of a given type.
@@ -62,7 +62,7 @@ trait ListHelpers {
     * testing (e.g., a case class).
     */
   def delta[T, Res](old: Seq[T], newList: Seq[T])(
-      f: DeltaInfo[T] => Res): List[Res] = {
+      f: DeltaInfo[T] => Res): List[Res] =
     import scala.collection.mutable.ListBuffer
     import scala.annotation._
 
@@ -71,45 +71,36 @@ trait ListHelpers {
     var insertAfter: Box[T] = Empty
 
     @tailrec
-    def loop(o: List[T], n: List[T]) {
-      (o, n) match {
+    def loop(o: List[T], n: List[T])
+      (o, n) match
         case (o, Nil) => o.foreach(t => ret += f(RemoveDelta(t)))
-        case (Nil, n) => {
-            n.foreach { t =>
+        case (Nil, n) =>
+            n.foreach  t =>
               ret += f(
-                  insertAfter match {
+                  insertAfter match
                 case Full(x) => InsertAfterDelta(t, x)
                 case _ => AppendDelta(t)
-              })
+              )
               insertAfter = Full(t)
-            }
-          }
 
-        case (o :: or, n :: nr) if o == n => {
+        case (o :: or, n :: nr) if o == n =>
             insertAfter = Full(n)
             loop(or, nr)
-          }
 
-        case (or, n :: nr) if !or.contains(n) => {
-            insertAfter match {
+        case (or, n :: nr) if !or.contains(n) =>
+            insertAfter match
               case Full(x) => ret += f(InsertAfterDelta(n, x))
               case _ => ret += f(InsertAtStartDelta(n))
-            }
             insertAfter = Full(n)
             loop(or, nr)
-          }
 
-        case (o :: or, nr) => {
+        case (o :: or, nr) =>
             ret += f(RemoveDelta(o))
             loop(or, nr)
-          }
-      }
-    }
 
     loop(old.toList, newList.toList)
 
     ret.toList
-  }
 
   /**
     * Returns a Full Box with the first element x of the list in
@@ -136,16 +127,15 @@ trait ListHelpers {
     *
     * @return a Box containing the first Full Box or Empty if f never returns a Full Box
     */
-  def first[B, C](in: Seq[B])(_f: B => Box[C]): Box[C] = {
+  def first[B, C](in: Seq[B])(_f: B => Box[C]): Box[C] =
     val f: B => Iterable[C] = _f andThen Box.box2Iterable[C]
     // We use toStream here to avoid multiple execution of "f" for each element access (Issue #596)
     Box(in.toStream.flatMap(f).headOption)
-  }
 
   /**
     * This class add a case insensitive get to a List of Pairs of String, as if it was a Map
     */
-  class ListMapish(val theList: Seq[(String, String)]) {
+  class ListMapish(val theList: Seq[(String, String)])
 
     /**
       * Return a Box containing the second element of the first pair having key as the first element
@@ -155,17 +145,14 @@ trait ListHelpers {
       *
       * @return a Full Box containing the found value or Empty
       */
-    def ciGet(swhat: String): Box[String] = {
+    def ciGet(swhat: String): Box[String] =
       val what = swhat.toLowerCase
       def tGet(in: Seq[(String, String)]): Box[String] =
-        in match {
+        in match
           case Nil => Empty
           case x :: xs if (x._1.toLowerCase == what) => Full(x._2)
           case x :: xs => tGet(xs)
-        }
       tGet(theList)
-    }
-  }
 
   /** adds the ciGet method to a List of Pairs of Strings */
   implicit def listToListMapish(in: Seq[(String, String)]): ListMapish =
@@ -174,10 +161,9 @@ trait ListHelpers {
   /**
     * Convert a java.util.Enumeration to a List[T]
     */
-  def enumToList[T](enum: java.util.Enumeration[T]): List[T] = {
+  def enumToList[T](enum: java.util.Enumeration[T]): List[T] =
     import scala.collection.JavaConversions._
     enum.toList
-  }
 
   /**
     * Convert a java.util.Enumeration to a List[String] using the toString method on each element
@@ -202,14 +188,12 @@ trait ListHelpers {
     *
     * @return all the rotations of the list
     */
-  def rotateList[T](in: Seq[T]): List[List[T]] = {
+  def rotateList[T](in: Seq[T]): List[List[T]] =
     def doIt(in: List[T], cnt: Int): List[List[T]] =
-      ((in, cnt): @unchecked) match {
+      ((in, cnt): @unchecked) match
         case (_, 0) => Nil
         case (x :: xs, cnt) => in :: doIt(xs ::: List(x), cnt - 1)
-      }
     doIt(in.toList, in.length)
-  }
 
   /**
     * Given a list, return all the permutations of the list.
@@ -219,17 +203,16 @@ trait ListHelpers {
     * @return all the permutations of the list
     */
   def permuteList[T](in: Seq[T]): List[List[T]] =
-    (in.toList: @unchecked) match {
+    (in.toList: @unchecked) match
       case Nil => Nil
       case x :: Nil => List(List(x))
       case xs =>
         rotateList(xs).flatMap(
             x =>
-              (x: @unchecked) match {
+              (x: @unchecked) match
             case x :: xs => permuteList(xs).map(x :: _)
             case _ => Nil
-        })
-    }
+        )
 
   /**
     * Given a list, return all the permutations including the removal of items (does not return a Nil list unless in is Nil).
@@ -238,26 +221,24 @@ trait ListHelpers {
     *
     * @return all the permutations of the list including sublists, sorted in longest to shortest
     */
-  def permuteWithSublists[T](in: Seq[T]): List[List[T]] = {
-    def internal(in: List[T]): List[List[T]] = in match {
+  def permuteWithSublists[T](in: Seq[T]): List[List[T]] =
+    def internal(in: List[T]): List[List[T]] = in match
       case Nil => Nil
       case x :: Nil => List(List(x))
       case xs =>
         val rot = rotateList(xs)
         val ret = rot.flatMap(
             z =>
-              (z: @unchecked) match {
+              (z: @unchecked) match
             case x :: xs => permuteList(xs).map(x :: _)
-        })
+        )
         ret ::: rot
           .map(z => (z: @unchecked) match { case x :: xs => xs })
           .flatMap(internal(_))
-    }
     internal(in.toList).distinct.sortWith(_.length > _.length)
-  }
 
   /** Add utility methods to Lists */
-  implicit class SuperList[T](what: List[T]) extends AnyRef {
+  implicit class SuperList[T](what: List[T]) extends AnyRef
 
     /** permute the elements of a list */
     def permute = permuteList(what)
@@ -287,13 +268,9 @@ trait ListHelpers {
     def ? : Boolean = !what.isEmpty
 
     /** return a new list where the element at position pos is replaced with another element */
-    def replace(pos: Int, withWhat: T): List[T] = {
-      def repl(pos: Int, withWhat: T, rest: List[T]): List[T] = rest match {
+    def replace(pos: Int, withWhat: T): List[T] =
+      def repl(pos: Int, withWhat: T, rest: List[T]): List[T] = rest match
         case Nil => Nil
         case x :: xs if pos <= 0 => withWhat :: xs
         case x :: xs => x :: repl(pos - 1, withWhat, xs)
-      }
       repl(pos, withWhat, what)
-    }
-  }
-}

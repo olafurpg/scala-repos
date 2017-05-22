@@ -1,6 +1,6 @@
 import scala.tools.partest.SessionTest
 
-object Test extends SessionTest {
+object Test extends SessionTest
   def session =
     s"""|
     |scala> val i = 7
@@ -16,8 +16,6 @@ object Test extends SessionTest {
     |
     |scala> :quit"""
   def saveto = testOutput / "session.repl"
-  override def show() = {
+  override def show() =
     super.show()
     Console print saveto.toFile.slurp
-  }
-}

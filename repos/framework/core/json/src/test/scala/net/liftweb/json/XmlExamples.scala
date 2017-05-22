@@ -19,50 +19,44 @@ package json
 
 import org.specs2.mutable.Specification
 
-object XmlExamples extends Specification {
+object XmlExamples extends Specification
   "XML Examples".title
   import JsonDSL._
   import Xml._
   import scala.xml.{Group, Text}
 
-  "Basic conversion example" in {
+  "Basic conversion example" in
     val json = toJson(users1)
     compactRender(json) mustEqual """{"users":{"count":"2","user":[{"disabled":"true","id":"1","name":"Harry"},{"id":"2","name":"David","nickname":"Dave"}]}}"""
-  }
 
-  "Conversion transformation example 1" in {
-    val json = toJson(users1).transformField {
+  "Conversion transformation example 1" in
+    val json = toJson(users1).transformField
       case JField("id", JString(s)) => JField("id", JInt(s.toInt))
-    }
     compactRender(json) mustEqual """{"users":{"count":"2","user":[{"disabled":"true","id":1,"name":"Harry"},{"id":2,"name":"David","nickname":"Dave"}]}}"""
-  }
 
-  "Conversion transformation example 2" in {
-    val json = toJson(users2).transformField {
+  "Conversion transformation example 2" in
+    val json = toJson(users2).transformField
       case JField("id", JString(s)) => JField("id", JInt(s.toInt))
       case JField("user", x: JObject) => JField("user", JArray(x :: Nil))
-    }
     compactRender(json) mustEqual """{"users":{"user":[{"id":1,"name":"Harry"}]}}"""
-  }
 
-  "Primitive array example" in {
+  "Primitive array example" in
     val xml = <chars><char>a</char><char>b</char><char>c</char></chars>
     compactRender(toJson(xml)) mustEqual """{"chars":{"char":["a","b","c"]}}"""
-  }
 
-  "Lotto example which flattens number arrays into encoded string arrays" in {
+  "Lotto example which flattens number arrays into encoded string arrays" in
     def flattenArray(nums: List[JValue]) =
       JString(nums.map(_.values).mkString(","))
 
     val printer = new scala.xml.PrettyPrinter(100, 2)
     val lotto: JObject = LottoExample.json
     val xml = toXml(
-        lotto.transformField {
+        lotto.transformField
       case JField("winning-numbers", JArray(nums)) =>
         JField("winning-numbers", flattenArray(nums))
       case JField("numbers", JArray(nums)) =>
         JField("numbers", flattenArray(nums))
-    })
+    )
 
     printer.format(xml(0)) mustEqual printer.format(<lotto>
         <id>5</id>
@@ -76,9 +70,8 @@ object XmlExamples extends Specification {
           <numbers>52,3,12,11,18,22</numbers>
         </winners>
       </lotto>)
-  }
 
-  "Band example with namespaces" in {
+  "Band example with namespaces" in
     val json = toJson(band)
     json mustEqual parse("""{
   "b:band":{
@@ -96,7 +89,6 @@ object XmlExamples extends Specification {
     }
   }
 }""")
-  }
 
   val band = <b:band>
       <name>The Fall</name>
@@ -114,10 +106,9 @@ object XmlExamples extends Specification {
       </playlists>
     </b:band>
 
-  "Grouped text example" in {
+  "Grouped text example" in
     val json = toJson(groupedText)
     compactRender(json) mustEqual """{"g":{"group":"foobar","url":"http://example.com/test"}}"""
-  }
 
   val users1 = <users count="2">
       <user disabled="true">
@@ -150,26 +141,23 @@ object XmlExamples extends Specification {
   // { ..., "fieldName": { "attrName": f("someValue") }, ... }
   def attrToObject(fieldName: String, attrName: String, f: JString => JValue)(
       json: JValue) =
-    json.transformField {
+    json.transformField
       case JField(n, v: JString) if n == attrName =>
         JField(fieldName, JObject(JField(n, f(v)) :: Nil))
       case JField(n, JString("")) if n == fieldName => JField(n, JNothing)
-    } transformField {
+    transformField
       case JField(n, x: JObject) if n == attrName => JField(fieldName, x)
-    }
 
-  "Example with multiple attributes, multiple nested elements " in {
+  "Example with multiple attributes, multiple nested elements " in
     val a1 = attrToObject("stats", "count", s => JInt(s.s.toInt)) _
     val a2 = attrToObject("messages", "href", identity) _
     val json = a1(a2(toJson(messageXml1)))
     (json diff parse(expected1)) mustEqual Diff(JNothing, JNothing, JNothing)
-  }
 
-  "Example with one attribute, one nested element " in {
+  "Example with one attribute, one nested element " in
     val a = attrToObject("stats", "count", s => JInt(s.s.toInt)) _
     compactRender(a(toJson(messageXml2))) mustEqual expected2
     compactRender(a(toJson(messageXml3))) mustEqual expected2
-  }
 
   val messageXml1 =
     <message expiry_date="20091126" text="text" word="ant" self="me">
@@ -189,4 +177,3 @@ object XmlExamples extends Specification {
 
   val expected2 =
     """{"message":{"expiry_date":"20091126","stats":{"count":0}}}"""
-}

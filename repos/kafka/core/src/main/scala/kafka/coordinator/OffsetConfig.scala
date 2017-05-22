@@ -47,7 +47,7 @@ case class OffsetConfig(
     offsetCommitTimeoutMs: Int = OffsetConfig.DefaultOffsetCommitTimeoutMs,
     offsetCommitRequiredAcks: Short = OffsetConfig.DefaultOffsetCommitRequiredAcks)
 
-object OffsetConfig {
+object OffsetConfig
   val DefaultMaxMetadataSize = 4096
   val DefaultLoadBufferSize = 5 * 1024 * 1024
   val DefaultOffsetRetentionMs = 24 * 60 * 60 * 1000L
@@ -58,4 +58,3 @@ object OffsetConfig {
   val DefaultOffsetsTopicCompressionCodec = NoCompressionCodec
   val DefaultOffsetCommitTimeoutMs = 5000
   val DefaultOffsetCommitRequiredAcks = (-1).toShort
-}

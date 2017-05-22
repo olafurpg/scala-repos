@@ -21,21 +21,18 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.util.NumberConverter.convert
 import org.apache.spark.unsafe.types.UTF8String
 
-class NumberConverterSuite extends SparkFunSuite {
+class NumberConverterSuite extends SparkFunSuite
 
   private[this] def checkConv(
-      n: String, fromBase: Int, toBase: Int, expected: String): Unit = {
+      n: String, fromBase: Int, toBase: Int, expected: String): Unit =
     assert(
         convert(UTF8String.fromString(n).getBytes, fromBase, toBase) === UTF8String
           .fromString(expected))
-  }
 
-  test("convert") {
+  test("convert")
     checkConv("3", 10, 2, "11")
     checkConv("-15", 10, -16, "-F")
     checkConv("-15", 10, 16, "FFFFFFFFFFFFFFF1")
     checkConv("big", 36, 16, "3A48")
     checkConv("9223372036854775807", 36, 16, "FFFFFFFFFFFFFFFF")
     checkConv("11abc", 10, 16, "B")
-  }
-}

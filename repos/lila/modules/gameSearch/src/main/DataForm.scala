@@ -9,7 +9,7 @@ import play.api.data.validation.Constraints
 import lila.common.Form._
 import lila.search.Range
 
-private[gameSearch] final class DataForm {
+private[gameSearch] final class DataForm
 
   val search =
     Form(
@@ -49,15 +49,13 @@ private[gameSearch] final class DataForm {
                     "order" -> stringIn(Sorting.orders)
                 )(SearchSort.apply)(SearchSort.unapply))
         )(SearchData.apply)(SearchData.unapply)) fill SearchData()
-}
 
-private[gameSearch] object DataForm {
+private[gameSearch] object DataForm
 
   val DateDelta = """^(\d+)(\w)$""".r
   private val dateConstraint =
     Constraints.pattern(regex = DateDelta, error = "Invalid date.")
   val dateField = optional(nonEmptyText.verifying(dateConstraint))
-}
 
 private[gameSearch] case class SearchData(
     players: SearchPlayer = SearchPlayer(),
@@ -79,7 +77,7 @@ private[gameSearch] case class SearchData(
     dateMax: Option[String] = None,
     status: Option[Int] = None,
     analysed: Option[Int] = None,
-    sort: Option[SearchSort] = None) {
+    sort: Option[SearchSort] = None)
 
   def sortOrDefault = sort | SearchSort()
 
@@ -109,23 +107,21 @@ private[gameSearch] case class SearchData(
 
   import DataForm.DateDelta
 
-  private def toDate(delta: String): Option[DateTime] = delta match {
+  private def toDate(delta: String): Option[DateTime] = delta match
     case DateDelta(n, "h") => parseIntOption(n) map DateTime.now.minusHours
     case DateDelta(n, "d") => parseIntOption(n) map DateTime.now.minusDays
     case DateDelta(n, "w") => parseIntOption(n) map DateTime.now.minusWeeks
     case DateDelta(n, "m") => parseIntOption(n) map DateTime.now.minusMonths
     case DateDelta(n, "y") => parseIntOption(n) map DateTime.now.minusYears
     case _ => None
-  }
   private val dateConstraint =
     Constraints.pattern(regex = DateDelta, error = "Invalid date.")
-}
 
 private[gameSearch] case class SearchPlayer(a: Option[String] = None,
                                             b: Option[String] = None,
                                             winner: Option[String] = None,
                                             white: Option[String] = None,
-                                            black: Option[String] = None) {
+                                            black: Option[String] = None)
 
   lazy val cleanA = clean(a)
   lazy val cleanB = clean(b)
@@ -137,7 +133,6 @@ private[gameSearch] case class SearchPlayer(a: Option[String] = None,
     clean(s).filter(List(cleanA, cleanB).flatten.contains)
   private def clean(s: Option[String]) =
     s map (_.trim.toLowerCase) filter (_.nonEmpty)
-}
 
 private[gameSearch] case class SearchSort(
     field: String = Sorting.default.f, order: String = Sorting.default.order)

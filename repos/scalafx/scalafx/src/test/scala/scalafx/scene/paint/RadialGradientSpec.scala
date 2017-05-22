@@ -43,12 +43,12 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class RadialGradientSpec
     extends SimpleSFXDelegateSpec[jfxsp.RadialGradient, RadialGradient](
-        classOf[jfxsp.RadialGradient], classOf[RadialGradient]) {
+        classOf[jfxsp.RadialGradient], classOf[RadialGradient])
 
   override protected def getJavaClassInstance =
     new jfxsp.RadialGradient(0, 0, 0, 0, 0, true, CycleMethod.NoCycle, Nil)
 
-  it should "return valid instance from companion's apply(List[Stop])" in {
+  it should "return valid instance from companion's apply(List[Stop])" in
     val expected: RadialGradient =
       new RadialGradient(0, 0, 0, 0, 0, true, jfxsp.CycleMethod.NO_CYCLE, Nil)
     val radialGradient = RadialGradient(
@@ -62,9 +62,8 @@ class RadialGradientSpec
         stops = Nil
     )
     assert(radialGradient === expected)
-  }
 
-  it should "return valid instance from companion's apply(stops*)" in {
+  it should "return valid instance from companion's apply(stops*)" in
     val expected: RadialGradient = new RadialGradient(
         0,
         0,
@@ -90,5 +89,3 @@ class RadialGradientSpec
         Stop(0, Color.Black)
     )
     assert(radialGradient === expected)
-  }
-}

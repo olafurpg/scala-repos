@@ -3,14 +3,12 @@ package scala.pickling.inheritance.defaultargs
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, json._
 
-abstract class Creature {
+abstract class Creature
   val species: String
-}
 
-abstract class Person extends Creature {
+abstract class Person extends Creature
   val name: String
   val age: Int
-}
 
 case class Firefighter(val name: String,
                        val age: Int,
@@ -18,8 +16,8 @@ case class Firefighter(val name: String,
                        val species: String = "human")
     extends Person
 
-class InheritanceDefaultArgsTest extends FunSuite {
-  test("main") {
+class InheritanceDefaultArgsTest extends FunSuite
+  test("main")
     val f = new Firefighter("Muriel", 41, 30000)
 
     val pickleF = (f: Firefighter).pickle
@@ -60,5 +58,3 @@ class InheritanceDefaultArgsTest extends FunSuite {
       |}
     """.trim.stripMargin)
     assert(pickleC.unpickle[Creature] === f)
-  }
-}

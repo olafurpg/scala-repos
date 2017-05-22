@@ -1,7 +1,7 @@
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.ToolBox
 
-object Test extends App {
+object Test extends App
   val tb = runtimeMirror(getClass.getClassLoader).mkToolBox()
   val tree = tb.parse("""
     import scala.reflect.runtime.{universe => ru}
@@ -14,4 +14,3 @@ object Test extends App {
   def stabilize(s: String) = stabilizePositions(stabilizeIds(s))
   println(stabilize(showRaw(ttree)))
   println(stabilize(showRaw(ttree, printIds = true)))
-}

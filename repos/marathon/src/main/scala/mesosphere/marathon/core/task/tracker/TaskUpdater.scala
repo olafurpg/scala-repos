@@ -8,7 +8,7 @@ import scala.concurrent.Future
 /**
   * Notifies the [[TaskTracker]] of task updates.
   */
-trait TaskUpdater {
+trait TaskUpdater
 
   /**
     * Process a status update for an existing task and either updates the tasks or removes
@@ -17,4 +17,3 @@ trait TaskUpdater {
     * If the task does not exist yet, the returned Future will fail.
     */
   def statusUpdate(appId: PathId, status: TaskStatus): Future[_]
-}

@@ -25,51 +25,39 @@ import cascading.tuple.{Tuple => CTuple}
   * See the generated TupleConverters for an example of where this is used
   */
 trait TupleGetter[@specialized(Int, Long, Float, Double) T]
-    extends java.io.Serializable {
+    extends java.io.Serializable
   def get(tup: CTuple, i: Int): T
-}
 
-trait LowPriorityTupleGetter extends java.io.Serializable {
-  implicit def castingGetter[T]: TupleGetter[T] = new TupleGetter[T] {
+trait LowPriorityTupleGetter extends java.io.Serializable
+  implicit def castingGetter[T]: TupleGetter[T] = new TupleGetter[T]
     def get(tup: CTuple, i: Int) = tup.getObject(i).asInstanceOf[T]
-  }
-}
 
-object TupleGetter extends LowPriorityTupleGetter {
+object TupleGetter extends LowPriorityTupleGetter
 
   def get[T](tup: CTuple, i: Int)(implicit tg: TupleGetter[T]): T =
     tg.get(tup, i)
   def of[T](implicit tg: TupleGetter[T]): TupleGetter[T] = tg
 
-  implicit object UnitGetter extends TupleGetter[Unit] {
+  implicit object UnitGetter extends TupleGetter[Unit]
     override def get(tup: CTuple, i: Int) = ()
-  }
 
-  implicit object BooleanGetter extends TupleGetter[Boolean] {
+  implicit object BooleanGetter extends TupleGetter[Boolean]
     override def get(tup: CTuple, i: Int) = tup.getBoolean(i)
-  }
 
-  implicit object ShortGetter extends TupleGetter[Short] {
+  implicit object ShortGetter extends TupleGetter[Short]
     override def get(tup: CTuple, i: Int) = tup.getShort(i)
-  }
 
-  implicit object IntGetter extends TupleGetter[Int] {
+  implicit object IntGetter extends TupleGetter[Int]
     override def get(tup: CTuple, i: Int) = tup.getInteger(i)
-  }
 
-  implicit object LongGetter extends TupleGetter[Long] {
+  implicit object LongGetter extends TupleGetter[Long]
     override def get(tup: CTuple, i: Int) = tup.getLong(i)
-  }
 
-  implicit object FloatGetter extends TupleGetter[Float] {
+  implicit object FloatGetter extends TupleGetter[Float]
     override def get(tup: CTuple, i: Int) = tup.getFloat(i)
-  }
 
-  implicit object DoubleGetter extends TupleGetter[Double] {
+  implicit object DoubleGetter extends TupleGetter[Double]
     override def get(tup: CTuple, i: Int) = tup.getDouble(i)
-  }
 
-  implicit object StringGetter extends TupleGetter[String] {
+  implicit object StringGetter extends TupleGetter[String]
     override def get(tup: CTuple, i: Int) = tup.getString(i)
-  }
-}

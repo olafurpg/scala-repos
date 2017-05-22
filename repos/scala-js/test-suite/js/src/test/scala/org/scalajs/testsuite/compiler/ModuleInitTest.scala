@@ -13,10 +13,10 @@ import org.junit.Assume._
 
 import org.scalajs.testsuite.utils.Platform._
 
-class ModuleInitTest {
+class ModuleInitTest
   import ModuleInitTest._
 
-  @Test def should_only_execute_module_initializers_once(): Unit = {
+  @Test def should_only_execute_module_initializers_once(): Unit =
     assumeTrue(hasCompliantModule)
     val x = A.Y
     val y = A.cs.head
@@ -24,23 +24,17 @@ class ModuleInitTest {
     assertTrue(y eq null)
     assertTrue(x eq A.Y)
     assertEquals(1, Counter.c)
-  }
-}
 
-object ModuleInitTest {
+object ModuleInitTest
 
-  object Counter {
+  object Counter
     var c: Int = 0
-  }
 
-  object A {
+  object A
     private def blankSym = ""
 
     sealed abstract class C(symbol: String)
-    object Y extends C(blankSym) {
+    object Y extends C(blankSym)
       Counter.c += 1
-    }
 
     val cs = Vector[C](Y)
-  }
-}

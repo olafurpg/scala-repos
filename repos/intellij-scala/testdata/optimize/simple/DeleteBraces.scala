@@ -1,8 +1,7 @@
 import java.util.{Date, AbstractList}
 
-abstract class DeleteBraces {
+abstract class DeleteBraces
   val x: Date
-}
 /*
 import java.util.Date
 

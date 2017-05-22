@@ -1,7 +1,7 @@
 import scala.tools.partest.SessionTest
 
 // Taking unary ids as plain
-object Test extends SessionTest {
+object Test extends SessionTest
   def session =
     """Type in expressions to have them evaluated.
 Type :help for more information.
@@ -44,4 +44,3 @@ scala> X.j
 res5: Int = 35
 
 scala> :quit"""
-}

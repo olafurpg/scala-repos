@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2009-2016 Lightbend Inc. <https://www.lightbend.com>
  */
-package scalaguide.akka {
+package scalaguide.akka
 
   import akka.actor.ActorSystem
   import org.junit.runner.RunWith
@@ -13,23 +13,21 @@ package scalaguide.akka {
   import play.api.test._
   import java.io.File
 
-  class ScalaAkkaSpec extends PlaySpecification {
+  class ScalaAkkaSpec extends PlaySpecification
 
     sequential
 
-    def withActorSystem[T](block: ActorSystem => T) = {
+    def withActorSystem[T](block: ActorSystem => T) =
       val system = ActorSystem()
-      try {
+      try
         block(system)
-      } finally {
+      finally
         system.terminate()
         Await.result(system.whenTerminated, Duration.Inf)
-      }
-    }
 
-    "The Akka support" should {
+    "The Akka support" should
 
-      "allow injecting actors" in new WithApplication() {
+      "allow injecting actors" in new WithApplication()
         import controllers._
         val controller = app.injector.instanceOf[Application]
 
@@ -44,26 +42,22 @@ package scalaguide.akka {
         import akka.pattern.ask
         implicit val timeout = 5.seconds
 
-        def sayHello(name: String) = Action.async {
-          (helloActor ? SayHello(name)).mapTo[String].map { message =>
+        def sayHello(name: String) = Action.async
+          (helloActor ? SayHello(name)).mapTo[String].map  message =>
             Ok(message)
-          }
-        }
         //#ask
 
         contentAsString(sayHello("world")(FakeRequest())) must_== "Hello, world"
-      }
 
       "allow binding actors" in new WithApplication(
-          _.bindings(new modules.MyModule).configure("my.config" -> "foo")) {
+          _.bindings(new modules.MyModule).configure("my.config" -> "foo"))
         _ =>
         import injection._
         val controller = app.injector.instanceOf[Application]
         contentAsString(controller.getConfig(FakeRequest())) must_== "foo"
-      }
 
       "allow binding actor factories" in new WithApplication(_.bindings(
-              new factorymodules.MyModule).configure("my.config" -> "foo")) {
+              new factorymodules.MyModule).configure("my.config" -> "foo"))
         _ =>
         import play.api.inject.bind
         import akka.actor._
@@ -74,20 +68,19 @@ package scalaguide.akka {
 
         val actor =
           app.injector.instanceOf(bind[ActorRef].qualifiedWith("parent-actor"))
-        val futureConfig = for {
+        val futureConfig = for
           child <- (actor ? actors.ParentActor.GetChild("my.config"))
             .mapTo[ActorRef]
           config <- (child ? actors.ConfiguredChildActor.GetConfig)
             .mapTo[String]
-        } yield config
+        yield config
         await(futureConfig) must_== "foo"
-      }
 
-      "allow using the scheduler" in withActorSystem { system =>
+      "allow using the scheduler" in withActorSystem  system =>
         import akka.actor._
-        val testActor = system.actorOf(Props(new Actor() {
+        val testActor = system.actorOf(Props(new Actor()
           def receive = { case _: String => }
-        }), name = "testActor")
+        ), name = "testActor")
         //#schedule-actor
         import scala.concurrent.duration._
 
@@ -95,24 +88,19 @@ package scalaguide.akka {
             0.microseconds, 300.microseconds, testActor, "tick")
         //#schedule-actor
         ok
-      }
 
-      "actor scheduler" in withActorSystem { system =>
+      "actor scheduler" in withActorSystem  system =>
         val file = new File("/tmp/nofile")
         file.mkdirs()
         //#schedule-callback
         import play.api.libs.concurrent.Execution.Implicits.defaultContext
-        system.scheduler.scheduleOnce(10.milliseconds) {
+        system.scheduler.scheduleOnce(10.milliseconds)
           file.delete()
-        }
         //#schedule-callback
         Thread.sleep(200)
         file.exists() must beFalse
-      }
-    }
-  }
 
-  package controllers {
+  package controllers
 //#controller
     import play.api.mvc._
     import akka.actor._
@@ -121,16 +109,14 @@ package scalaguide.akka {
     import actors.HelloActor
 
     @Singleton
-    class Application @Inject()(system: ActorSystem) extends Controller {
+    class Application @Inject()(system: ActorSystem) extends Controller
 
       val helloActor = system.actorOf(HelloActor.props, "hello-actor")
 
       //...
-    }
 //#controller  
-  }
 
-  package injection {
+  package injection
 //#inject
     import play.api.mvc._
     import akka.actor._
@@ -145,68 +131,55 @@ package scalaguide.akka {
     class Application @Inject()(
         @Named("configured-actor") configuredActor: ActorRef)(
         implicit ec: ExecutionContext)
-        extends Controller {
+        extends Controller
 
       implicit val timeout: Timeout = 5.seconds
 
-      def getConfig = Action.async {
-        (configuredActor ? GetConfig).mapTo[String].map { message =>
+      def getConfig = Action.async
+        (configuredActor ? GetConfig).mapTo[String].map  message =>
           Ok(message)
-        }
-      }
-    }
 //#inject
-  }
 
-  package modules {
+  package modules
 //#binding
     import com.google.inject.AbstractModule
     import play.api.libs.concurrent.AkkaGuiceSupport
 
     import actors.ConfiguredActor
 
-    class MyModule extends AbstractModule with AkkaGuiceSupport {
-      def configure = {
+    class MyModule extends AbstractModule with AkkaGuiceSupport
+      def configure =
         bindActor[ConfiguredActor]("configured-actor")
-      }
-    }
 //#binding
-  }
 
-  package factorymodules {
+  package factorymodules
 //#factorybinding
     import com.google.inject.AbstractModule
     import play.api.libs.concurrent.AkkaGuiceSupport
 
     import actors._
 
-    class MyModule extends AbstractModule with AkkaGuiceSupport {
-      def configure = {
+    class MyModule extends AbstractModule with AkkaGuiceSupport
+      def configure =
         bindActor[ParentActor]("parent-actor")
         bindActorFactory[ConfiguredChildActor, ConfiguredChildActor.Factory]
-      }
-    }
 //#factorybinding
-  }
 
-  package actors {
+  package actors
 //#actor
     import akka.actor._
 
-    object HelloActor {
+    object HelloActor
       def props = Props[HelloActor]
 
       case class SayHello(name: String)
-    }
 
-    class HelloActor extends Actor {
+    class HelloActor extends Actor
       import HelloActor._
 
-      def receive = {
+      def receive =
         case SayHello(name: String) =>
           sender() ! "Hello, " + name
-      }
-    }
 //#actor
 
 //#injected
@@ -214,21 +187,18 @@ package scalaguide.akka {
     import javax.inject._
     import play.api.Configuration
 
-    object ConfiguredActor {
+    object ConfiguredActor
       case object GetConfig
-    }
 
     class ConfiguredActor @Inject()(configuration: Configuration)
-        extends Actor {
+        extends Actor
       import ConfiguredActor._
 
       val config = configuration.getString("my.config").getOrElse("none")
 
-      def receive = {
+      def receive =
         case GetConfig =>
           sender() ! config
-      }
-    }
 //#injected
 
 //#injectedchild
@@ -237,26 +207,22 @@ package scalaguide.akka {
     import com.google.inject.assistedinject.Assisted
     import play.api.Configuration
 
-    object ConfiguredChildActor {
+    object ConfiguredChildActor
       case object GetConfig
 
-      trait Factory {
+      trait Factory
         def apply(key: String): Actor
-      }
-    }
 
     class ConfiguredChildActor @Inject()(
         configuration: Configuration, @Assisted key: String)
-        extends Actor {
+        extends Actor
       import ConfiguredChildActor._
 
       val config = configuration.getString(key).getOrElse("none")
 
-      def receive = {
+      def receive =
         case GetConfig =>
           sender() ! config
-      }
-    }
 //#injectedchild
 
 //#injectedparent
@@ -264,22 +230,17 @@ package scalaguide.akka {
     import javax.inject._
     import play.api.libs.concurrent.InjectedActorSupport
 
-    object ParentActor {
+    object ParentActor
       case class GetChild(key: String)
-    }
 
     class ParentActor @Inject()(
         childFactory: ConfiguredChildActor.Factory
     )
-        extends Actor with InjectedActorSupport {
+        extends Actor with InjectedActorSupport
       import ParentActor._
 
-      def receive = {
+      def receive =
         case GetChild(key: String) =>
           val child: ActorRef = injectedChild(childFactory(key), key)
           sender() ! child
-      }
-    }
 //#injectedparent
-  }
-}

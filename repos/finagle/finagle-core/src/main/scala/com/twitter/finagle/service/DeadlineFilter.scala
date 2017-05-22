@@ -6,7 +6,7 @@ import com.twitter.finagle.context.Contexts
 import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.util.{Duration, Future, Stopwatch, Time, TokenBucket}
 
-object DeadlineFilter {
+object DeadlineFilter
 
   val role = new Stack.Role("DeadlineAdmissionControl")
 
@@ -32,7 +32,7 @@ object DeadlineFilter {
     * @param maxRejectPercentage Maximum percentage of requests that can be
     * rejected over `rejectPeriod`. Must be between 0.0 and 1.0.
     */
-  case class Param(tolerance: Duration, maxRejectPercentage: Double) {
+  case class Param(tolerance: Duration, maxRejectPercentage: Double)
     require(tolerance >= Duration.Zero, "tolerance must be greater than zero")
 
     require(
@@ -41,11 +41,9 @@ object DeadlineFilter {
 
     def mk(): (Param, Stack.Param[Param]) =
       (this, Param.param)
-  }
-  object Param {
+  object Param
     implicit val param =
       Stack.Param(Param(DefaultTolerance, DefaultMaxRejectPercentage))
-  }
 
   /**
     * Creates a [[com.twitter.finagle.Stackable]]
@@ -53,7 +51,7 @@ object DeadlineFilter {
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
     new Stack.Module2[
-        param.Stats, DeadlineFilter.Param, ServiceFactory[Req, Rep]] {
+        param.Stats, DeadlineFilter.Param, ServiceFactory[Req, Rep]]
       val role = DeadlineFilter.role
       val description = "Reject requests when their deadline has passed"
 
@@ -61,7 +59,7 @@ object DeadlineFilter {
           _stats: param.Stats,
           _param: DeadlineFilter.Param,
           next: ServiceFactory[Req, Rep]
-      ) = {
+      ) =
         val Param(tolerance, maxRejectPercentage) = _param
         val param.Stats(statsReceiver) = _stats
 
@@ -72,9 +70,6 @@ object DeadlineFilter {
                              maxRejectPercentage,
                              statsReceiver.scope("admission_control",
                                                  "deadline")).andThen(next)
-      }
-    }
-}
 
 /**
   * A [[com.twitter.finagle.Filter]] that rejects requests when their deadline
@@ -103,7 +98,7 @@ private[finagle] class DeadlineFilter[Req, Rep](
     maxRejectPercentage: Double,
     statsReceiver: StatsReceiver,
     nowMillis: () => Long = Stopwatch.systemMillis)
-    extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep]
 
   require(tolerance >= Duration.Zero, "tolerance must be greater than zero")
   require(rejectPeriod.inSeconds >= 1 && rejectPeriod.inSeconds <= 60,
@@ -143,7 +138,7 @@ private[finagle] class DeadlineFilter[Req, Rep](
   // Note: While in the testing stages, requests are never rejected, but
   // the admission_control/deadline/rejected stat is incremented.
   def apply(request: Req, service: Service[Req, Rep]): Future[Rep] =
-    Deadline.current match {
+    Deadline.current match
       case Some(deadline) =>
         val now = Time.now
         val remaining = deadline.deadline - now
@@ -155,19 +150,16 @@ private[finagle] class DeadlineFilter[Req, Rep](
         // Exceeded the deadline within tolerance, and there are enough
         // tokens to reject the request
         if (remaining < Duration.Zero && -remaining <= tolerance &&
-            rejectBucket.tryGet(rejectWithdrawal)) {
+            rejectBucket.tryGet(rejectWithdrawal))
           exceededStat.incr()
           rejectedStat.incr()
           service(request) // When turned on this will be Future.exception
-        } else {
+        else
           if (-remaining > tolerance) beyondToleranceStat.incr()
           else if (remaining < Duration.Zero) exceededStat.incr()
 
           rejectBucket.put(serviceDeposit)
           service(request)
-        }
       case None =>
         rejectBucket.put(serviceDeposit)
         service(request)
-    }
-}

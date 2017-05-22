@@ -26,9 +26,9 @@ import org.apache.spark.sql.{RandomDataGenerator, Row}
 import org.apache.spark.sql.catalyst.encoders.{ExamplePointUDT, RowEncoder}
 import org.apache.spark.sql.types._
 
-class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
+class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper
 
-  test("md5") {
+  test("md5")
     checkEvaluation(Md5(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
                     "902fbdd2b1df0c4f70b4a5d23525e932")
     checkEvaluation(
@@ -36,9 +36,8 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
         "6ac1e56bc78f031059be7be854522c4c")
     checkEvaluation(Md5(Literal.create(null, BinaryType)), null)
     checkConsistencyBetweenInterpretedAndCodegen(Md5, BinaryType)
-  }
 
-  test("sha1") {
+  test("sha1")
     checkEvaluation(Sha1(Literal("ABC".getBytes(StandardCharsets.UTF_8))),
                     "3c01bdbb26f358bab27f267924aa2c9a03fcfdb8")
     checkEvaluation(
@@ -48,9 +47,8 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Sha1(Literal("".getBytes(StandardCharsets.UTF_8))),
                     "da39a3ee5e6b4b0d3255bfef95601890afd80709")
     checkConsistencyBetweenInterpretedAndCodegen(Sha1, BinaryType)
-  }
 
-  test("sha2") {
+  test("sha2")
     checkEvaluation(
         Sha2(Literal("ABC".getBytes(StandardCharsets.UTF_8)), Literal(256)),
         DigestUtils.sha256Hex("ABC"))
@@ -68,9 +66,8 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(Sha2(Literal.create(null, BinaryType),
                          Literal.create(null, IntegerType)),
                     null)
-  }
 
-  test("crc32") {
+  test("crc32")
     checkEvaluation(
         Crc32(Literal("ABC".getBytes(StandardCharsets.UTF_8))), 2743272264L)
     checkEvaluation(
@@ -78,7 +75,6 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
         2180413220L)
     checkEvaluation(Crc32(Literal.create(null, BinaryType)), null)
     checkConsistencyBetweenInterpretedAndCodegen(Crc32, BinaryType)
-  }
 
   private val structOfString = new StructType().add("str", StringType)
   private val structOfUDT =
@@ -139,24 +135,19 @@ class MiscFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
                .add("map", mapOfString))
         .add("structOfUDT", structOfUDT))
 
-  private def testMurmur3Hash(inputSchema: StructType): Unit = {
+  private def testMurmur3Hash(inputSchema: StructType): Unit =
     val inputGenerator =
       RandomDataGenerator.forType(inputSchema, nullable = false).get
     val encoder = RowEncoder(inputSchema)
     val seed = scala.util.Random.nextInt()
-    test(s"murmur3 hash: ${inputSchema.simpleString}") {
-      for (_ <- 1 to 10) {
+    test(s"murmur3 hash: ${inputSchema.simpleString}")
+      for (_ <- 1 to 10)
         val input = encoder
           .toRow(inputGenerator.apply().asInstanceOf[Row])
           .asInstanceOf[UnsafeRow]
         val literals =
-          input.toSeq(inputSchema).zip(inputSchema.map(_.dataType)).map {
+          input.toSeq(inputSchema).zip(inputSchema.map(_.dataType)).map
             case (value, dt) => Literal.create(value, dt)
-          }
         // Only test the interpreted version has same result with codegen version.
         checkEvaluation(
             Murmur3Hash(literals, seed), Murmur3Hash(literals, seed).eval())
-      }
-    }
-  }
-}

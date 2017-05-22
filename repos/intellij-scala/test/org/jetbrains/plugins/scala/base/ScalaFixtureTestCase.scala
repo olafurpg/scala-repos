@@ -8,22 +8,19 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * User: Alexander Podkhalyuzin
   * Date: 03.08.2009
   */
-abstract class ScalaFixtureTestCase extends CodeInsightFixtureTestCase {
+abstract class ScalaFixtureTestCase extends CodeInsightFixtureTestCase
 
   protected def rootPath = TestUtils.getTestDataPath + "/"
 
   var libLoader: ScalaLibraryLoader = null
 
-  override protected def setUp(): Unit = {
+  override protected def setUp(): Unit =
     super.setUp()
 
     libLoader = ScalaLibraryLoader.withMockJdk(
         myFixture.getProject, myFixture.getModule, rootPath)
     libLoader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
-  }
 
-  override def tearDown(): Unit = {
+  override def tearDown(): Unit =
     libLoader.clean()
     super.tearDown()
-  }
-}

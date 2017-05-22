@@ -24,16 +24,15 @@ import java.util.Properties
     "This trait has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
-trait BaseProducer {
+trait BaseProducer
   def send(topic: String, key: Array[Byte], value: Array[Byte])
   def close()
-}
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
-class NewShinyProducer(producerProps: Properties) extends BaseProducer {
+class NewShinyProducer(producerProps: Properties) extends BaseProducer
   import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
   import org.apache.kafka.clients.producer.internals.ErrorLoggingCallback
 
@@ -42,27 +41,23 @@ class NewShinyProducer(producerProps: Properties) extends BaseProducer {
 
   val producer = new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
 
-  override def send(topic: String, key: Array[Byte], value: Array[Byte]) {
+  override def send(topic: String, key: Array[Byte], value: Array[Byte])
     val record =
       new ProducerRecord[Array[Byte], Array[Byte]](topic, key, value)
-    if (sync) {
+    if (sync)
       this.producer.send(record).get()
-    } else {
+    else
       this.producer
         .send(record, new ErrorLoggingCallback(topic, key, value, false))
-    }
-  }
 
-  override def close() {
+  override def close()
     this.producer.close()
-  }
-}
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
-class OldProducer(producerProps: Properties) extends BaseProducer {
+class OldProducer(producerProps: Properties) extends BaseProducer
 
   // default to byte array partitioner
   if (producerProps.getProperty("partitioner.class") == null)
@@ -72,12 +67,9 @@ class OldProducer(producerProps: Properties) extends BaseProducer {
   val producer = new kafka.producer.Producer[Array[Byte], Array[Byte]](
       new ProducerConfig(producerProps))
 
-  override def send(topic: String, key: Array[Byte], value: Array[Byte]) {
+  override def send(topic: String, key: Array[Byte], value: Array[Byte])
     this.producer
       .send(new KeyedMessage[Array[Byte], Array[Byte]](topic, key, value))
-  }
 
-  override def close() {
+  override def close()
     this.producer.close()
-  }
-}

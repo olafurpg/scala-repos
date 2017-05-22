@@ -20,7 +20,7 @@ import akka.remote.testconductor.RoleName
 import akka.actor.Identify
 import scala.concurrent.Await
 
-object RemoteNodeRestartGateSpec extends MultiNodeConfig {
+object RemoteNodeRestartGateSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -32,71 +32,63 @@ object RemoteNodeRestartGateSpec extends MultiNodeConfig {
 
   testTransport(on = true)
 
-  class Subject extends Actor {
-    def receive = {
+  class Subject extends Actor
+    def receive =
       case "shutdown" ⇒ context.system.terminate()
       case msg ⇒ sender() ! msg
-    }
-  }
-}
 
 class RemoteNodeRestartGateSpecMultiJvmNode1 extends RemoteNodeRestartGateSpec
 class RemoteNodeRestartGateSpecMultiJvmNode2 extends RemoteNodeRestartGateSpec
 
 abstract class RemoteNodeRestartGateSpec
     extends MultiNodeSpec(RemoteNodeRestartGateSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import RemoteNodeRestartGateSpec._
 
   override def initialParticipants = 2
 
-  def identify(role: RoleName, actorName: String): ActorRef = {
+  def identify(role: RoleName, actorName: String): ActorRef =
     system.actorSelection(node(role) / "user" / actorName) ! Identify(
         actorName)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  "RemoteNodeRestartGate" must {
+  "RemoteNodeRestartGate" must
 
-    "allow restarted node to pass through gate" taggedAs LongRunningTest in {
+    "allow restarted node to pass through gate" taggedAs LongRunningTest in
 
       system.actorOf(Props[Subject], "subject")
       enterBarrier("subject-started")
 
-      runOn(first) {
+      runOn(first)
         val secondAddress = node(second).address
 
         identify(second, "subject")
 
         EventFilter
           .warning(pattern = "address is now gated", occurrences = 1)
-          .intercept {
+          .intercept
             Await.result(
                 RARP(system).provider.transport.managementCommand(
                     ForceDisassociateExplicitly(node(second).address,
                                                 AssociationHandle.Unknown)),
                 3.seconds)
-          }
 
         enterBarrier("gated")
 
         testConductor.shutdown(second).await
 
-        within(10.seconds) {
-          awaitAssert {
+        within(10.seconds)
+          awaitAssert
             system.actorSelection(
                 RootActorPath(secondAddress) / "user" / "subject") ! Identify(
                 "subject")
             expectMsgType[ActorIdentity].ref.get
-          }
-        }
 
         system.actorSelection(
             RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
-      }
 
-      runOn(second) {
+      runOn(second)
         val addr =
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         val firstAddress = node(first).address
@@ -117,20 +109,14 @@ abstract class RemoteNodeRestartGateSpec
         val probe = TestProbe()(freshSystem)
 
         // Pierce the gate
-        within(30.seconds) {
-          awaitAssert {
+        within(30.seconds)
+          awaitAssert
             freshSystem
               .actorSelection(RootActorPath(firstAddress) / "user" / "subject")
               .tell(Identify("subject"), probe.ref)
             probe.expectMsgType[ActorIdentity].ref.get
-          }
-        }
 
         // Now the other system will be able to pass, too
         freshSystem.actorOf(Props[Subject], "subject")
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)
-      }
-    }
-  }
-}

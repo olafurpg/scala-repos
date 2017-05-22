@@ -16,7 +16,7 @@ import io.prediction.controller.EngineParams
 
 import com.github.nscala_time.time.Imports._
 
-object CommonParams {
+object CommonParams
   val DataSourceAttributeNames = AttributeNames(user = "pio_user",
                                                 item = "pio_item",
                                                 u2iActions = Set("rate"),
@@ -50,10 +50,9 @@ object CommonParams {
                 firstTrainingUntilTime = new DateTime(1998, 2, 1, 0, 0),
                 evalDuration = Duration.standardDays(7),
                 evalCount = 12)))
-}
 
-object Evaluation1 {
-  def main(args: Array[String]) {
+object Evaluation1
+  def main(args: Array[String])
     // Engine Settings
     val engine = ItemRankEngine()
 
@@ -91,11 +90,9 @@ object Evaluation1 {
         evaluatorClassOpt = Some(classOf[ItemRankDetailedEvaluator]),
         evaluatorParams = evaluatorParams
     )
-  }
-}
 
-object Evaluation2 {
-  def main(args: Array[String]) {
+object Evaluation2
+  def main(args: Array[String])
     // Engine Settings
     val engine = ItemRankEngine()
 
@@ -122,5 +119,3 @@ object Evaluation2 {
         evaluatorClassOpt = Some(classOf[ItemRankDetailedEvaluator]),
         evaluatorParams = evaluatorParams
     )
-  }
-}

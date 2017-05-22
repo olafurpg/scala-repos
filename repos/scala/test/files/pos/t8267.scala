@@ -1,6 +1,6 @@
 class Bippy { trait Foo[A] }
 
-final class RichBippy[C <: Bippy with Singleton](val c1: C) {
+final class RichBippy[C <: Bippy with Singleton](val c1: C)
   def f: Int = 1
   def f[A](x: A)(ev: c1.Foo[A]): Int = 2
 
@@ -11,9 +11,8 @@ final class RichBippy[C <: Bippy with Singleton](val c1: C) {
 
   def i(x: Nothing): Int = 1
   def i(x: AnyRef)(ev: c1.Foo[x.type]): Int = 2
-}
 
-object p {
+object p
 
   val c = new Bippy
   val d0 = new RichBippy[c.type](c)
@@ -30,4 +29,3 @@ object p {
 
   d0.i("")(null) // ok
   d1.i("")(null) // ok
-}

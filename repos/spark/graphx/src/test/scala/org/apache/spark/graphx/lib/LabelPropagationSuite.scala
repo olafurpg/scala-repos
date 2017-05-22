@@ -20,9 +20,9 @@ package org.apache.spark.graphx.lib
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.graphx._
 
-class LabelPropagationSuite extends SparkFunSuite with LocalSparkContext {
-  test("Label Propagation") {
-    withSpark { sc =>
+class LabelPropagationSuite extends SparkFunSuite with LocalSparkContext
+  test("Label Propagation")
+    withSpark  sc =>
       // Construct a graph with two cliques connected by a single edge
       val n = 5
       val clique1 = for (u <- 0L until n; v <- 0L until n) yield Edge(u, v, 1)
@@ -42,6 +42,3 @@ class LabelPropagationSuite extends SparkFunSuite with LocalSparkContext {
       assert(clique2Labels.forall(_ == clique2Labels(0)))
       // The two cliques should have different labels
       assert(clique1Labels(0) != clique2Labels(0))
-    }
-  }
-}

@@ -56,60 +56,50 @@ import scalafx.scene.layout.{HBox, VBox}
   *         http://docs.oracle.com/javafx/2.0/ui_controls/radio-button.htm
   *
   */
-object ScalaFX_Controls_03 extends JFXApp {
+object ScalaFX_Controls_03 extends JFXApp
 
   val theToggleGroup = new ToggleGroup {}
 
-  theToggleGroup.selectedToggle onChange { (_, _, _) =>
+  theToggleGroup.selectedToggle onChange  (_, _, _) =>
     val selectedToggle = theToggleGroup.getSelectedToggle
-    if (selectedToggle != null) {
+    if (selectedToggle != null)
       val userDataString = selectedToggle.getUserData.toString
       iconImageView.image = new Image(
           this, "images/" + userDataString + ".jpg")
-    }
-  }
 
-  val homeRadioButton = new RadioButton {
+  val homeRadioButton = new RadioButton
     toggleGroup = theToggleGroup
     userData = "Home"
-  }
 
-  val calendarRadioButton = new RadioButton {
+  val calendarRadioButton = new RadioButton
     toggleGroup = theToggleGroup
     userData = "Calendar"
-  }
 
-  val contactsRadioButton = new RadioButton {
+  val contactsRadioButton = new RadioButton
     toggleGroup = theToggleGroup
     userData = "Contacts"
-  }
 
-  val vBox = new VBox {
+  val vBox = new VBox
     spacing = 10
     children = List(
         homeRadioButton,
         calendarRadioButton,
         contactsRadioButton
     )
-  }
 
   val iconImageView = new ImageView {}
 
-  val hBox = new HBox {
+  val hBox = new HBox
     spacing = 50
     padding = Insets(20, 10, 10, 20)
     children = List(
         vBox,
         iconImageView
     )
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "ScalaFX Controls 03"
     width = 250
     height = 150
-    scene = new Scene {
+    scene = new Scene
       content = hBox
-    }
-  }
-}

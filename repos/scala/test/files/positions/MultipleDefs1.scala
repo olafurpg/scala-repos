@@ -1,3 +1,2 @@
-object MultipleDefs1 {
+object MultipleDefs1
   val a, b = 23
-}

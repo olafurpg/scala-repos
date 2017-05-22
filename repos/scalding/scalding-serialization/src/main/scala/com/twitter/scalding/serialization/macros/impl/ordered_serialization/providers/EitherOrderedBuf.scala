@@ -23,17 +23,16 @@ import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{Com
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object EitherOrderedBuf {
+object EitherOrderedBuf
   def dispatch(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
-    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe if tpe.erasure =:= c.universe.typeOf[Either[Any, Any]] =>
       EitherOrderedBuf(c)(buildDispatcher, tpe)
-  }
 
   def apply(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
-      outerType: c.Type): TreeOrderedBuf[c.type] = {
+      outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
     val dispatcher = buildDispatcher
@@ -43,7 +42,7 @@ object EitherOrderedBuf {
     val leftBuf: TreeOrderedBuf[c.type] = dispatcher(leftType)
     val rightBuf: TreeOrderedBuf[c.type] = dispatcher(rightType)
 
-    def genBinaryCompare(inputStreamA: TermName, inputStreamB: TermName) = {
+    def genBinaryCompare(inputStreamA: TermName, inputStreamB: TermName) =
       val valueOfA = freshT("valueOfA")
       val valueOfB = freshT("valueOfB")
       val tmpHolder = freshT("tmpHolder")
@@ -62,9 +61,8 @@ object EitherOrderedBuf {
           ${rightBuf.compareBinary(inputStreamA, inputStreamB)}
         }
       """
-    }
 
-    def genHashFn(element: TermName) = {
+    def genHashFn(element: TermName) =
       val innerValue = freshT("innerValue")
       q"""
         if($element.isLeft) {
@@ -80,19 +78,17 @@ object EitherOrderedBuf {
           (x << 19) - x
         }
       """
-    }
 
-    def genGetFn(inputStreamA: TermName) = {
+    def genGetFn(inputStreamA: TermName) =
       val tmpGetHolder = freshT("tmpGetHolder")
       q"""
         val $tmpGetHolder = $inputStreamA.readByte
-        if($tmpGetHolder == (0: _root_.scala.Byte)) Left(${leftBuf.get(
-          inputStreamA)})
+        if($tmpGetHolder == (0: _root_.scala.Byte)) Left($leftBuf.get(
+          inputStreamA))
         else Right(${rightBuf.get(inputStreamA)})
       """
-    }
 
-    def genPutFn(inputStream: TermName, element: TermName) = {
+    def genPutFn(inputStream: TermName, element: TermName) =
       val tmpPutVal = freshT("tmpPutVal")
       val innerValue = freshT("innerValue")
       q"""
@@ -106,9 +102,8 @@ object EitherOrderedBuf {
           ${leftBuf.put(inputStream, innerValue)}
         }
       """
-    }
 
-    def genCompareFn(elementA: TermName, elementB: TermName) = {
+    def genCompareFn(elementA: TermName, elementB: TermName) =
       val aIsRight = freshT("aIsRight")
       val bIsRight = freshT("bIsRight")
       val innerValueA = freshT("innerValueA")
@@ -133,9 +128,8 @@ object EitherOrderedBuf {
           }
         }
       """
-    }
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -150,7 +144,7 @@ object EitherOrderedBuf {
         genCompareFn(elementA, elementB)
       override val lazyOuterVariables: Map[String, ctx.Tree] =
         rightBuf.lazyOuterVariables ++ leftBuf.lazyOuterVariables
-      override def length(element: Tree): CompileTimeLengthTypes[c.type] = {
+      override def length(element: Tree): CompileTimeLengthTypes[c.type] =
 
         def tree(ctl: CompileTimeLengthTypes[_]): c.Tree =
           ctl.asInstanceOf[CompileTimeLengthTypes[c.type]].t
@@ -158,7 +152,7 @@ object EitherOrderedBuf {
           q"""_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen"""
 
         (leftBuf.length(q"$element.left.get"),
-         rightBuf.length(q"$element.right.get")) match {
+         rightBuf.length(q"$element.right.get")) match
           case (lconst: ConstantLengthCalculation[_],
                 rconst: ConstantLengthCalculation[_])
               if lconst.toInt == rconst.toInt =>
@@ -191,8 +185,3 @@ object EitherOrderedBuf {
             if($element.isLeft) { 1 + ${tree(left)} }
             else { 1 + ${tree(right)} }
             """)
-        }
-      }
-    }
-  }
-}

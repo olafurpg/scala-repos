@@ -38,9 +38,9 @@ import org.apache.kafka.common.security.JaasUtils
   *  log4j.logger.kafka.tools.ExportZkOffsets$=DEBUG
   *  (for eclipse debugging, copy log4j.properties to the binary directory in "core" such as core/bin)
   */
-object ExportZkOffsets extends Logging {
+object ExportZkOffsets extends Logging
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val parser = new OptionParser
 
     val zkConnectOpt = parser
@@ -64,10 +64,9 @@ object ExportZkOffsets extends Logging {
 
     val options = parser.parse(args: _*)
 
-    if (options.has("help")) {
+    if (options.has("help"))
       parser.printHelpOn(System.out)
       System.exit(0)
-    }
 
     CommandLineUtils.checkRequiredArgs(
         parser, options, zkConnectOpt, outFileOpt)
@@ -79,7 +78,7 @@ object ExportZkOffsets extends Logging {
     var zkUtils: ZkUtils = null
     val fileWriter: FileWriter = new FileWriter(outfile)
 
-    try {
+    try
       zkUtils = ZkUtils(zkConnect,
                         30000,
                         30000,
@@ -87,37 +86,30 @@ object ExportZkOffsets extends Logging {
 
       var consumerGroups: Seq[String] = null
 
-      if (groups.size == 0) {
+      if (groups.size == 0)
         consumerGroups = zkUtils.getChildren(ZkUtils.ConsumersPath).toList
-      } else {
+      else
         import scala.collection.JavaConversions._
         consumerGroups = groups
-      }
 
-      for (consumerGrp <- consumerGroups) {
+      for (consumerGrp <- consumerGroups)
         val topicsList = getTopicsList(zkUtils, consumerGrp)
 
-        for (topic <- topicsList) {
+        for (topic <- topicsList)
           val bidPidList = getBrokeridPartition(zkUtils, consumerGrp, topic)
 
-          for (bidPid <- bidPidList) {
+          for (bidPid <- bidPidList)
             val zkGrpTpDir = new ZKGroupTopicDirs(consumerGrp, topic)
             val offsetPath = zkGrpTpDir.consumerOffsetDir + "/" + bidPid
-            zkUtils.readDataMaybeNull(offsetPath)._1 match {
+            zkUtils.readDataMaybeNull(offsetPath)._1 match
               case Some(offsetVal) =>
                 fileWriter.write(offsetPath + ":" + offsetVal + "\n")
                 debug(offsetPath + " => " + offsetVal)
               case None =>
                 error("Could not retrieve offset value from " + offsetPath)
-            }
-          }
-        }
-      }
-    } finally {
+    finally
       fileWriter.flush()
       fileWriter.close()
-    }
-  }
 
   private def getBrokeridPartition(
       zkUtils: ZkUtils, consumerGroup: String, topic: String): List[String] =
@@ -129,4 +121,3 @@ object ExportZkOffsets extends Logging {
   private def getTopicsList(
       zkUtils: ZkUtils, consumerGroup: String): List[String] =
     zkUtils.getChildren("/consumers/%s/offsets".format(consumerGroup)).toList
-}

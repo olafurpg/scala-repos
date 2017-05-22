@@ -16,17 +16,15 @@ final case class SnapshotMetadata(
     persistenceId: String, sequenceNr: Long, timestamp: Long = 0L)
 //#snapshot-metadata
 
-object SnapshotMetadata {
+object SnapshotMetadata
   implicit val ordering: Ordering[SnapshotMetadata] =
-    Ordering.fromLessThan[SnapshotMetadata] { (a, b) ⇒
+    Ordering.fromLessThan[SnapshotMetadata]  (a, b) ⇒
       if (a eq b) false
       else if (a.persistenceId != b.persistenceId)
         a.persistenceId.compareTo(b.persistenceId) < 0
       else if (a.sequenceNr != b.sequenceNr) a.sequenceNr < b.sequenceNr
       else if (a.timestamp != b.timestamp) a.timestamp < b.timestamp
       else false
-    }
-}
 
 /**
   * Sent to a [[PersistentActor]] after successful saving of a snapshot.
@@ -113,7 +111,7 @@ final case class SnapshotOffer(metadata: SnapshotMetadata, snapshot: Any)
 final case class SnapshotSelectionCriteria(maxSequenceNr: Long = Long.MaxValue,
                                            maxTimestamp: Long = Long.MaxValue,
                                            minSequenceNr: Long = 0L,
-                                           minTimestamp: Long = 0L) {
+                                           minTimestamp: Long = 0L)
 
   /**
     * INTERNAL API.
@@ -130,9 +128,8 @@ final case class SnapshotSelectionCriteria(maxSequenceNr: Long = Long.MaxValue,
     metadata.sequenceNr <= maxSequenceNr &&
     metadata.timestamp <= maxTimestamp &&
     metadata.sequenceNr >= minSequenceNr && metadata.timestamp >= minTimestamp
-}
 
-object SnapshotSelectionCriteria {
+object SnapshotSelectionCriteria
 
   /**
     * The latest saved snapshot.
@@ -169,7 +166,6 @@ object SnapshotSelectionCriteria {
     * Java API.
     */
   def none() = None
-}
 
 /**
   * Plugin API: a selected snapshot matching [[SnapshotSelectionCriteria]].
@@ -179,21 +175,20 @@ object SnapshotSelectionCriteria {
   */
 final case class SelectedSnapshot(metadata: SnapshotMetadata, snapshot: Any)
 
-object SelectedSnapshot {
+object SelectedSnapshot
 
   /**
     * Java API, Plugin API.
     */
   def create(metadata: SnapshotMetadata, snapshot: Any): SelectedSnapshot =
     SelectedSnapshot(metadata, snapshot)
-}
 
 /**
   * INTERNAL API.
   *
   * Defines messages exchanged between persistent actors and a snapshot store.
   */
-private[persistence] object SnapshotProtocol {
+private[persistence] object SnapshotProtocol
 
   /** Marker trait shared by internal snapshot messages. */
   sealed trait Message extends Protocol.Message
@@ -250,4 +245,3 @@ private[persistence] object SnapshotProtocol {
   final case class DeleteSnapshots(
       persistenceId: String, criteria: SnapshotSelectionCriteria)
       extends Request
-}

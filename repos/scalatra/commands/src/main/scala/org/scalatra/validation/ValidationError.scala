@@ -39,7 +39,7 @@ case object GatewayTimeout extends ErrorCode
 /**
   * Allows for unordered building of [[org.scalatra.validation.ValidationError]]
   */
-object ValidationError {
+object ValidationError
 
   /**
     * Allows for unordered building of [[org.scalatra.validation.ValidationError]]
@@ -50,27 +50,22 @@ object ValidationError {
     * This method will create a correct ValidationError that looks like:
     * `ValidationError("the message", FieldName("email"), Some(ValidationFail), Seq())`
     */
-  def apply(msg: String, arguments: Any*): ValidationError = {
+  def apply(msg: String, arguments: Any*): ValidationError =
     val field =
-      arguments collectFirst {
+      arguments collectFirst
         case f: FieldName => f
         case Some(f: FieldName) => f
-      }
     val code =
-      arguments collectFirst {
+      arguments collectFirst
         case f: ErrorCode => f
         case Some(f: ErrorCode) => f
-      }
     val args =
-      arguments filter {
+      arguments filter
         case _: FieldName | _: ErrorCode | Some(_: FieldName) |
             Some(_: ErrorCode) =>
           false
         case _ => false
-      }
     new ValidationError(msg, field, code, args)
-  }
-}
 
 /**
   * Assumes your error codes will always be case objects.
@@ -78,26 +73,23 @@ object ValidationError {
   * @param knownCodes A list of known error codes for your system
   */
 class ErrorCodeSerializer(knownCodes: ErrorCode*)
-    extends Serializer[ErrorCode] {
+    extends Serializer[ErrorCode]
   val ecs = Map(
-      knownCodes map { c ⇒
+      knownCodes map  c ⇒
     c.getClass.getSimpleName.replaceAll("\\$$", "").toUpperCase -> c
-  }: _*)
+  : _*)
   val Class = classOf[ErrorCode]
 
   def deserialize(implicit format: Formats)
-    : PartialFunction[(TypeInfo, JValue), ErrorCode] = {
+    : PartialFunction[(TypeInfo, JValue), ErrorCode] =
     case (TypeInfo(Class, _), JString(c)) if ecs contains c.toUpperCase =>
       ecs get c.toUpperCase getOrElse UnknownError
     case (TypeInfo(Class, _), json) =>
       throw new MappingException("Can't convert " + json + " to " + Class)
-  }
 
-  def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
+  def serialize(implicit format: Formats): PartialFunction[Any, JValue] =
     case c: ErrorCode =>
       JString(c.getClass.getSimpleName.replaceAll("\\$$", ""))
-  }
-}
 
 /**
   * Serializes a validation error into a structure:
@@ -120,14 +112,14 @@ class ValidationErrorSerializer(
     includeCode: Boolean = true, includeArgs: Boolean = true)
     extends CustomSerializer[ValidationError](
         (formats: Formats) ⇒
-          ({
+          (
         case jo @ JObject(JField("message", _) :: _) ⇒
           implicit val fmts = formats
           new ValidationError((jo \ "message").extractOrElse(""),
                               (jo \ "field").extractOpt[String] map FieldName,
                               (jo \ "code").extractOpt[ErrorCode],
                               (jo \ "args").children)
-      }, {
+      ,
         case ValidationError(message, fieldName, code, args) ⇒
           implicit val fmts = formats
           val jv: JValue = ("message" -> message)
@@ -141,4 +133,4 @@ class ValidationErrorSerializer(
             if (includeArgs && args.nonEmpty)
               ("args" -> Extraction.decompose(args)(formats)) else JNothing
           jv merge wf merge ec merge arg
-      }))
+      ))

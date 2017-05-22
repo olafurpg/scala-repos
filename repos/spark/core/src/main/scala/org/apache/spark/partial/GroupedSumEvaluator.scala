@@ -31,43 +31,39 @@ import org.apache.spark.util.StatCounter
 private[spark] class GroupedSumEvaluator[T](
     totalOutputs: Int, confidence: Double)
     extends ApproximateEvaluator[
-        JHashMap[T, StatCounter], Map[T, BoundedDouble]] {
+        JHashMap[T, StatCounter], Map[T, BoundedDouble]]
 
   var outputsMerged = 0
   var sums = new JHashMap[T, StatCounter] // Sum of counts for each key
 
-  override def merge(outputId: Int, taskResult: JHashMap[T, StatCounter]) {
+  override def merge(outputId: Int, taskResult: JHashMap[T, StatCounter])
     outputsMerged += 1
     val iter = taskResult.entrySet.iterator()
-    while (iter.hasNext) {
+    while (iter.hasNext)
       val entry = iter.next()
       val old = sums.get(entry.getKey)
-      if (old != null) {
+      if (old != null)
         old.merge(entry.getValue)
-      } else {
+      else
         sums.put(entry.getKey, entry.getValue)
-      }
-    }
-  }
 
-  override def currentResult(): Map[T, BoundedDouble] = {
-    if (outputsMerged == totalOutputs) {
+  override def currentResult(): Map[T, BoundedDouble] =
+    if (outputsMerged == totalOutputs)
       val result = new JHashMap[T, BoundedDouble](sums.size)
       val iter = sums.entrySet.iterator()
-      while (iter.hasNext) {
+      while (iter.hasNext)
         val entry = iter.next()
         val sum = entry.getValue.sum
         result.put(entry.getKey, new BoundedDouble(sum, 1.0, sum, sum))
-      }
       result.asScala
-    } else if (outputsMerged == 0) {
+    else if (outputsMerged == 0)
       new HashMap[T, BoundedDouble]
-    } else {
+    else
       val p = outputsMerged.toDouble / totalOutputs
       val studentTCacher = new StudentTCacher(confidence)
       val result = new JHashMap[T, BoundedDouble](sums.size)
       val iter = sums.entrySet.iterator()
-      while (iter.hasNext) {
+      while (iter.hasNext)
         val entry = iter.next()
         val counter = entry.getValue
         val meanEstimate = counter.mean
@@ -84,8 +80,4 @@ private[spark] class GroupedSumEvaluator[T](
         val high = sumEstimate + confFactor * sumStdev
         result.put(entry.getKey,
                    new BoundedDouble(sumEstimate, confidence, low, high))
-      }
       result.asScala
-    }
-  }
-}

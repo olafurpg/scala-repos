@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import reflect.runtime._, universe._
 
   class C { def f(i: Int, j: => Int) = i + j }
@@ -8,25 +8,21 @@ object Test extends App {
 
   class E(i: Int, j: V)
 
-  locally {
+  locally
     val ms = typeOf[C].member(TermName("f")).asMethod
     val im = currentMirror reflect (new C)
     val mm = im reflectMethod ms
     assert(mm(2, 3) == 5)
-  }
-  locally {
+  locally
     val ms = typeOf[D].member(TermName("f")).asMethod
     val im = currentMirror reflect (new D)
     val mm = im reflectMethod ms
     assert(mm(2, new V(3)) == 8)
-  }
-  locally {
+  locally
     val ms = typeOf[E].typeSymbol.asClass.primaryConstructor
     val cm = currentMirror reflectClass typeOf[E].typeSymbol.asClass
     val mm = cm reflectConstructor ms.asMethod
     assert(mm(42, new V(7)).isInstanceOf[E])
-  }
-}
 
 /* Session tests without special init code should reside in simple script files.
  * Also, provide filters such as for `(bound to C@74f7d1d2)`.

@@ -36,7 +36,7 @@ package shapeless.examples
  * 
  * @author Miles Sabin
  */
-object ZipperExamples extends App {
+object ZipperExamples extends App
   import shapeless._
   import syntax.zipper._
   import test._
@@ -118,4 +118,3 @@ object ZipperExamples extends App {
   typed[D](singlePass)
   println(singlePass)
   // Dept(Employee(King Agamemnon,8000),Employee(Menelaus,3000) :: Employee(Achilles,3000) :: Employee(Odysseus,2000) :: HNil)
-}

@@ -10,13 +10,12 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import StabilizingGroup.State._
 
-class MockHealth {
+class MockHealth
   val pulse = new Broker[Health]()
   def mkHealthy() { pulse ! Healthy }
   def mkUnhealthy() { pulse ! Unhealthy }
-}
 
-class Context {
+class Context
   val sourceGroup = Group.mutable(1 to 10: _*)
   val healthStatus = new MockHealth
   val grace = 150.milliseconds
@@ -29,12 +28,11 @@ class Context {
                                      grace,
                                      statsRecv.scope("testGroup"),
                                      timer)
-}
 
 @RunWith(classOf[JUnitRunner])
-class StabilizingGroupTest extends FunSuite {
-  test("delay removals while healthy") {
-    Time.withCurrentTimeFrozen { tc =>
+class StabilizingGroupTest extends FunSuite
+  test("delay removals while healthy")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -52,11 +50,9 @@ class StabilizingGroupTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assert(stableGroup() == sourceGroup())
-    }
-  }
 
-  test("queue removals while unstable") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("queue removals while unstable")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -78,11 +74,9 @@ class StabilizingGroupTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assert(stableGroup() == sourceGroup())
-    }
-  }
 
-  test("be aware of adds while unstable") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("be aware of adds while unstable")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -105,11 +99,9 @@ class StabilizingGroupTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assert(stableGroup() == Set(1, 2, 3, 4))
-    }
-  }
 
-  test("don't skip interim adds") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("don't skip interim adds")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -121,6 +113,3 @@ class StabilizingGroupTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assert(stableGroup() == Set(5))
-    }
-  }
-}

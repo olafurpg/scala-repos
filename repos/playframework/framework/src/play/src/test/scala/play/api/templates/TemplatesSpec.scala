@@ -10,41 +10,32 @@ import play.api.mvc.Results
 import play.core.j.JavaResults
 import play.mvc.{Results => JResults}
 
-object TemplatesSpec extends Specification {
-  "toHtmlArgs" should {
-    "escape attribute values" in {
+object TemplatesSpec extends Specification
+  "toHtmlArgs" should
+    "escape attribute values" in
       PlayMagic.toHtmlArgs(Map('foo -> """bar <>&"'""")).body must_== """foo="bar &lt;&gt;&amp;&quot;&#x27;""""
-    }
-  }
 
-  "Xml" should {
+  "Xml" should
     import play.twirl.api.Xml
 
     val xml = Xml("\n\t xml")
 
-    "have body trimmed by implicit Writeable" in {
+    "have body trimmed by implicit Writeable" in
       val writeable = implicitly[Writeable[Xml]]
       string(writeable.transform(xml)) must_== "xml"
-    }
 
-    "have body trimmed by JavaResults.writeContent" in {
+    "have body trimmed by JavaResults.writeContent" in
       val writeable = JavaResults.writeContent(xml.contentType)
       string(writeable.transform(xml)) must_== "xml"
-    }
 
-    "have Scala result body trimmed" in {
+    "have Scala result body trimmed" in
       consume(Results.Ok(xml).body) must_== "xml"
-    }
 
-    "have Java result body trimmed" in {
+    "have Java result body trimmed" in
       consume(JResults.ok(xml).asScala.body) must_== "xml"
-    }
-  }
 
   def string(bytes: ByteString): String = bytes.utf8String
 
-  def consume(entity: HttpEntity): String = entity match {
+  def consume(entity: HttpEntity): String = entity match
     case HttpEntity.Strict(data, _) => string(data)
     case _ => throw new IllegalArgumentException("Expected strict body")
-  }
-}

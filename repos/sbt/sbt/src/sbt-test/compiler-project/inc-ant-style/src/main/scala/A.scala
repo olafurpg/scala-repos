@@ -1,5 +1,4 @@
 package test3
 
-trait A {
+trait A
   def foo = 1
-}

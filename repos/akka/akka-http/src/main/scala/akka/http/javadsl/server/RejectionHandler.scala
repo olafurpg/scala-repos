@@ -18,7 +18,7 @@ import akka.http.scaladsl.server.Rejection
   *
   * Default implementations pass the rejection to outer handlers.
   */
-abstract class RejectionHandler {
+abstract class RejectionHandler
 
   /**
     * Callback called to handle the empty rejection which represents the
@@ -232,4 +232,3 @@ abstract class RejectionHandler {
     * and should be passed to an outer rejection handler.
     */
   protected final def passRejection(): RouteResult = PassRejectionRouteResult
-}

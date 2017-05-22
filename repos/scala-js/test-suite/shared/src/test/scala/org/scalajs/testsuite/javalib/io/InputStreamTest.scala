@@ -16,15 +16,14 @@ import org.junit.Assert._
 
 import org.scalajs.testsuite.utils.AssertThrows._
 
-class InputStreamTest extends CommonStreamsTests {
+class InputStreamTest extends CommonStreamsTests
 
-  class DummyInputStream(val length: Int) extends InputStream {
+  class DummyInputStream(val length: Int) extends InputStream
     private var i: Int = 0
     def read(): Int = if (i < length) { i += 1; i } else -1
-  }
 
   @Test
-  def should_provide_a_default_implementation_of_read_to_an_array(): Unit = {
+  def should_provide_a_default_implementation_of_read_to_an_array(): Unit =
     val stream = new DummyInputStream(200)
 
     val buf = new Array[Byte](50)
@@ -72,9 +71,8 @@ class InputStreamTest extends CommonStreamsTests {
     assertArrayEquals(
         ((111 to 115) ++ (-95 to -56) ++ (-100 to -96)).toArray.map(_.toByte),
         buf)
-  }
 
-  @Test def should_provide_a_default_implementation_of_skip(): Unit = {
+  @Test def should_provide_a_default_implementation_of_skip(): Unit =
     val stream = new DummyInputStream(10)
 
     assertEquals(5L, stream.skip(5))
@@ -86,5 +84,3 @@ class InputStreamTest extends CommonStreamsTests {
     assertEquals(0L, stream.skip(0))
     assertEquals(10, stream.read())
     assertEquals(0L, stream.skip(10))
-  }
-}

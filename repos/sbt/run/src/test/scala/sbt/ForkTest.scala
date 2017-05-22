@@ -8,7 +8,7 @@ import java.io.File
 import sbt.internal.util.TestLogger
 import sbt.io.{IO, Path}
 
-object ForkTest extends Properties("Fork") {
+object ForkTest extends Properties("Fork")
 
   /**
     * Heuristic for limiting the length of the classpath string.
@@ -29,40 +29,33 @@ object ForkTest extends Properties("Fork") {
   lazy val mainAndArgs = "sbt.exit" :: "0" :: Nil
 
   property("Arbitrary length classpath successfully passed.") = forAllNoShrink(
-      genOptionName, genRelClasspath) {
+      genOptionName, genRelClasspath)
     (optionName: Option[String], relCP: List[String]) =>
-      IO.withTemporaryDirectory { dir =>
-        TestLogger { log =>
+      IO.withTemporaryDirectory  dir =>
+        TestLogger  log =>
           val withScala =
             requiredEntries ::: relCP.map(rel => new File(dir, rel))
           val absClasspath = trimClasspath(Path.makeString(withScala))
           val args =
             optionName.map(_ :: absClasspath :: Nil).toList.flatten ++ mainAndArgs
           val config = ForkOptions(outputStrategy = Some(LoggedOutput(log)))
-          val exitCode = try Fork.java(config, args) catch {
+          val exitCode = try Fork.java(config, args) catch
             case e: Exception => e.printStackTrace; 1
-          }
           val expectedCode = if (optionName.isEmpty) 1 else 0
-          s"temporary directory: ${dir.getAbsolutePath}" |: s"required classpath: ${requiredEntries
-            .mkString("\n\t", "\n\t", "")}" |: s"main and args: ${mainAndArgs.mkString(
-              " ")}" |: s"args length: ${args.mkString(" ").length}" |: s"exitCode: $exitCode, expected: $expectedCode" |:
+          s"temporary directory: ${dir.getAbsolutePath}" |: s"required classpath: $requiredEntries
+            .mkString("\n\t", "\n\t", "")" |: s"main and args: $mainAndArgs.mkString(
+              " ")" |: s"args length: ${args.mkString(" ").length}" |: s"exitCode: $exitCode, expected: $expectedCode" |:
           (exitCode == expectedCode)
-        }
-      }
-  }
 
   private[this] def trimClasspath(cp: String): String =
-    if (cp.length > MaximumClasspathLength) {
+    if (cp.length > MaximumClasspathLength)
       val lastEntryI =
         cp.lastIndexOf(File.pathSeparatorChar, MaximumClasspathLength)
       if (lastEntryI > 0) cp.substring(0, lastEntryI)
       else cp
-    } else cp
-}
+    else cp
 
 // Object used in the tests
-object exit {
-  def main(args: Array[String]): Unit = {
+object exit
+  def main(args: Array[String]): Unit =
     System.exit(java.lang.Integer.parseInt(args(0)))
-  }
-}

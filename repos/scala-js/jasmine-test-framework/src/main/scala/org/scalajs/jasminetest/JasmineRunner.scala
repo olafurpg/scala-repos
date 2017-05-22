@@ -19,7 +19,7 @@ final class JasmineRunner(
     val remoteArgs: Array[String],
     private[jasminetest] val classLoader: ClassLoader
 )
-    extends Runner {
+    extends Runner
 
   private[this] var isDone = false
 
@@ -27,40 +27,34 @@ final class JasmineRunner(
   // [[JasmineRunner.createStackPropertyOnThrowable]] has been called.
   JasmineRunner.handleArgs(args)
 
-  def tasks(taskDefs: Array[TaskDef]): Array[Task] = {
+  def tasks(taskDefs: Array[TaskDef]): Array[Task] =
     ensureNotDone()
     for (taskDef <- taskDefs) yield new JasmineTask(this, taskDef)
-  }
 
-  def done(): String = {
+  def done(): String =
     ensureNotDone()
     isDone = true
     framework.runnerDone()
     ""
-  }
 
   def receiveMessage(msg: String): Option[String] =
     throw new AssertionError("Received unexpected message")
 
-  def serializeTask(task: Task, serializer: TaskDef => String): String = {
+  def serializeTask(task: Task, serializer: TaskDef => String): String =
     ensureNotDone()
     serializer(task.taskDef)
-  }
 
-  def deserializeTask(task: String, deserializer: String => TaskDef): Task = {
+  def deserializeTask(task: String, deserializer: String => TaskDef): Task =
     ensureNotDone()
     new JasmineTask(this, deserializer(task))
-  }
 
-  private def ensureNotDone(): Unit = {
+  private def ensureNotDone(): Unit =
     if (isDone) throw new IllegalStateException("Runner is done")
-  }
-}
 
-object JasmineRunner {
+object JasmineRunner
   createStackPropertyOnThrowable()
 
-  private def createStackPropertyOnThrowable(): Unit = {
+  private def createStackPropertyOnThrowable(): Unit =
     /* All Jasmine cares about when looking for stack trace data is a field
      * `stack` on the error object. Our Throwables do not have a `stack` field
      * because they are not subclasses of the JavaScript class Error.
@@ -80,21 +74,17 @@ object JasmineRunner {
                                .literal(
                                    configurable = false,
                                    enumerable = false,
-                                   get = { (self: js.Dynamic) =>
+                                   get =  (self: js.Dynamic) =>
                                      self.stackdata && self.stackdata.stack
-                                   }: js.ThisFunction
+                                   : js.ThisFunction
                                )
                                .asInstanceOf[js.PropertyDescriptor])
-  }
 
-  private def handleArgs(args: Array[String]): Unit = {
-    val tags = for (arg <- args) yield {
+  private def handleArgs(args: Array[String]): Unit =
+    val tags = for (arg <- args) yield
       if (arg.startsWith("-t")) arg.stripPrefix("-t")
       else
         throw new IllegalArgumentException(
             s"Unknown argument for JasmineFramework: $arg")
-    }
 
     TestSuiteContext.setTags(tags.toSet)
-  }
-}

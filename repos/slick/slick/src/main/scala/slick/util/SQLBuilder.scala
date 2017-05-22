@@ -3,7 +3,7 @@ package slick.util
 import java.sql.PreparedStatement
 import scala.collection.mutable.ArrayBuffer
 
-final class SQLBuilder { self =>
+final class SQLBuilder  self =>
   import SQLBuilder._
 
   private val sb = new StringBuilder(128)
@@ -16,54 +16,44 @@ final class SQLBuilder { self =>
 
   def +?=(f: Setter) = { setters append f; sb append '?'; this }
 
-  def sep[T](sequence: Traversable[T], separator: String)(f: T => Unit) {
+  def sep[T](sequence: Traversable[T], separator: String)(f: T => Unit)
     var first = true
-    for (x <- sequence) {
+    for (x <- sequence)
       if (first) first = false else self += separator
       f(x)
-    }
-  }
 
-  def sep[T](sequence: ConstArray[T], separator: String)(f: T => Unit) {
+  def sep[T](sequence: ConstArray[T], separator: String)(f: T => Unit)
     var i = 0
-    while (i < sequence.length) {
+    while (i < sequence.length)
       if (i != 0) self += separator
       f(sequence(i))
       i += 1
-    }
-  }
 
   def build =
-    Result(sb.toString, { (p: PreparedStatement, idx: Int, param: Any) =>
+    Result(sb.toString,  (p: PreparedStatement, idx: Int, param: Any) =>
       var i = idx
-      for (s <- setters) {
+      for (s <- setters)
         s(p, i, param)
         i += 1
-      }
-    })
+    )
 
-  def newLineIndent(): Unit = {
+  def newLineIndent(): Unit =
     currentIndentLevel += 1
     newLine()
-  }
 
-  def newLineDedent(): Unit = {
+  def newLineDedent(): Unit =
     currentIndentLevel -= 1
     newLine()
-  }
 
   def newLineOrSpace(): Unit =
     if (GlobalConfig.sqlIndent) newLine() else this += " "
 
-  private def newLine(): Unit = if (GlobalConfig.sqlIndent) {
+  private def newLine(): Unit = if (GlobalConfig.sqlIndent)
     this += "\n"
     if (1 <= currentIndentLevel)
       1.to(currentIndentLevel).foreach(_ => this += "  ")
-  }
-}
 
-object SQLBuilder {
+object SQLBuilder
   final type Setter = ((PreparedStatement, Int, Any) => Unit)
 
   final case class Result(sql: String, setter: Setter)
-}

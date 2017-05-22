@@ -22,7 +22,7 @@ package shapeless.examples
   *
   * @author Chris Hodapp
   */
-object UnwrappedExamples {
+object UnwrappedExamples
   import shapeless._
   import shapeless.labelled._
 
@@ -41,49 +41,39 @@ object UnwrappedExamples {
   // you're using Shapeless, there's a good chance that one of the things you're
   // doing with it is writing a system to automatically generate serialization
   // codecs. For example:
-  trait Encode[-T] {
+  trait Encode[-T]
     def toJson(t: T): String =
       fields(t).map { case (k, v) => s""""$k":$v""" }.mkString("{", ",", "}")
     def fields(t: T): Map[String, String]
-  }
-  object Encode {
-    implicit def encodeHNil = new Encode[HNil] {
+  object Encode
+    implicit def encodeHNil = new Encode[HNil]
       def fields(hnil: HNil) = Map.empty
-    }
     implicit def encodeHCons[
         K <: Symbol,
         V,
         Rest <: HList
     ](implicit key: Witness.Aux[K],
       encodeV: Lazy[EncodeValue[V]],
-      encodeRest: Strict[Encode[Rest]]) = new Encode[FieldType[K, V] :: Rest] {
+      encodeRest: Strict[Encode[Rest]]) = new Encode[FieldType[K, V] :: Rest]
       def fields(hl: FieldType[K, V] :: Rest) =
         encodeRest.value.fields(hl.tail) +
         (key.value.name -> encodeV.value.toJsonFragment(hl.head))
-    }
     // the magic one!
     implicit def encodeGeneric[T, Repr](
         implicit gen: LabelledGeneric.Aux[T, Repr],
-        encodeRepr: Lazy[Encode[Repr]]) = new Encode[T] {
+        encodeRepr: Lazy[Encode[Repr]]) = new Encode[T]
       def fields(t: T) = encodeRepr.value.fields(gen.to(t))
-    }
-  }
 
-  trait EncodeValue[-T] {
+  trait EncodeValue[-T]
     def toJsonFragment(t: T): String
-  }
-  object EncodeValue {
-    implicit lazy val encodeString = new EncodeValue[String] {
+  object EncodeValue
+    implicit lazy val encodeString = new EncodeValue[String]
       def toJsonFragment(s: String) = s""""$s""""
-    }
-    implicit lazy val encodeInt = new EncodeValue[Int] {
+    implicit lazy val encodeInt = new EncodeValue[Int]
       def toJsonFragment(i: Int) = s"""$i"""
-    }
     implicit def encodeRoot[T](implicit r: Lazy[Encode[T]]) =
-      new EncodeValue[T] {
+      new EncodeValue[T]
         def toJsonFragment(t: T) = r.value.toJson(t)
-      }
-  }
 
   // OK! Yay! Let's try it out!
   val user = User(UserId(1234), UserHandle("jeffe"), Email("jeff@email.com"))
@@ -97,15 +87,13 @@ object UnwrappedExamples {
   // fine. We just need to use the Unwrapped typeclass in our serializers to cut
   // through the wrapper types:
 
-  trait Encode2[-T] {
+  trait Encode2[-T]
     def toJson(t: T): String =
       fields(t).map { case (k, v) => s""""$k":$v""" }.mkString("{", ",", "}")
     def fields(t: T): Map[String, String]
-  }
-  object Encode2 {
-    implicit def encodeHNil = new Encode2[HNil] {
+  object Encode2
+    implicit def encodeHNil = new Encode2[HNil]
       def fields(hnil: HNil) = Map.empty
-    }
     implicit def encodeHCons[
         K <: Symbol,
         V,
@@ -115,18 +103,15 @@ object UnwrappedExamples {
       uw: Strict[Unwrapped.Aux[V, U]],
       encodeV: Lazy[EncodeValue[U]],
       encodeRest: Strict[Encode2[Rest]]) =
-      new Encode2[FieldType[K, V] :: Rest] {
+      new Encode2[FieldType[K, V] :: Rest]
         def fields(hl: FieldType[K, V] :: Rest) =
           encodeRest.value.fields(hl.tail) +
           (key.value.name -> encodeV.value.toJsonFragment(
                   uw.value.unwrap(hl.head)))
-      }
     implicit def encodeGeneric[T, Repr](
         implicit gen: LabelledGeneric.Aux[T, Repr],
-        encodeRepr: Lazy[Encode2[Repr]]) = new Encode2[T] {
+        encodeRepr: Lazy[Encode2[Repr]]) = new Encode2[T]
       def fields(t: T) = encodeRepr.value.fields(gen.to(t))
-    }
-  }
   // OK! Let's try again
   val encoder2 = the[Encode2[User]]
   println(encoder2.toJson(user))
@@ -137,4 +122,3 @@ object UnwrappedExamples {
   // Note that there are a few more places you'd probably want to insert unwrapping
   // if this was a real codec generator (basically, you'd likely want to remove
   // wrappers on objects too, not just wrappers on their fields)
-}

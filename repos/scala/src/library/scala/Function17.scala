@@ -30,7 +30,7 @@ trait Function17[-T1,
                  -T16,
                  -T17,
                  +R]
-    extends AnyRef { self =>
+    extends AnyRef  self =>
 
   /** Apply the body of this function to the arguments.
     *  @return   the result of function application.
@@ -58,7 +58,7 @@ trait Function17[-T1,
     *  @return   a function `f` such that `f(x1)(x2)(x3)(x4)(x5)(x6)(x7)(x8)(x9)(x10)(x11)(x12)(x13)(x14)(x15)(x16)(x17) == apply(x1, x2, x3, x4, x5, x6, x7, x8, x9, x10, x11, x12, x13, x14, x15, x16, x17)`
     */
   @annotation.unspecialized
-  def curried: T1 => T2 => T3 => T4 => T5 => T6 => T7 => T8 => T9 => T10 => T11 => T12 => T13 => T14 => T15 => T16 => T17 => R = {
+  def curried: T1 => T2 => T3 => T4 => T5 => T6 => T7 => T8 => T9 => T10 => T11 => T12 => T13 => T14 => T15 => T16 => T17 => R =
     (x1: T1) =>
       ((x2: T2, x3: T3, x4: T4, x5: T5, x6: T6, x7: T7, x8: T8, x9: T9,
       x10: T10, x11: T11, x12: T12, x13: T13, x14: T14, x15: T15, x16: T16,
@@ -80,7 +80,6 @@ trait Function17[-T1,
                    x15,
                    x16,
                    x17)).curried
-  }
 
   /** Creates a tupled version of this function: instead of 17 arguments,
     *  it accepts a single [[scala.Tuple17]] argument.
@@ -104,7 +103,7 @@ trait Function17[-T1,
                       T14,
                       T15,
                       T16,
-                      T17] => R = {
+                      T17] => R =
     case Tuple17(x1,
                  x2,
                  x3,
@@ -139,6 +138,4 @@ trait Function17[-T1,
             x15,
             x16,
             x17)
-  }
   override def toString() = "<function17>"
-}

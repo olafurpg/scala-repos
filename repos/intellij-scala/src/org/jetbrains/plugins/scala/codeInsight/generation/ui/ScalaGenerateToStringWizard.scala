@@ -25,19 +25,17 @@ class ScalaGenerateToStringWizard(
     extends AbstractWizard[Step](
         ScalaBundle.message(
             "org.jetbrains.plugins.scala.codeInsight.generation.ui.toString.title"),
-        project) {
+        project)
 
-  override def showAndGetOk() = {
+  override def showAndGetOk() =
     val result = super.showAndGetOk()
 
-    if (this.isOK) {
+    if (this.isOK)
       val settings = ScalaProjectSettings.getInstance(project)
       settings.setGenerateToStringWithFieldNames(
           toStringPanel.checkBox.isSelected)
-    }
 
     result
-  }
 
   def getToStringFields: Seq[ScNamedElement] =
     toStringPanel.getTable.getSelectedMemberInfos.map(_.getMember).toSeq
@@ -49,7 +47,7 @@ class ScalaGenerateToStringWizard(
     */
   override def getHelpID: String = null
 
-  private lazy val toStringPanel = {
+  private lazy val toStringPanel =
     val allFields = classMembers.map(new ScalaMemberInfo(_))
     val panel = new ScalaToStringMemberSelectionPanel(
         ScalaBundle.message(
@@ -58,34 +56,29 @@ class ScalaGenerateToStringWizard(
         null)
     panel.getTable.setMemberInfoModel(new ScalaToStringMemberInfoModel)
     panel
-  }
 
-  private class ToStringTableModelListener extends TableModelListener {
+  private class ToStringTableModelListener extends TableModelListener
     def tableChanged(modelEvent: TableModelEvent) = updateButtons()
-  }
 
   private class ToStringStep(
       panel: AbstractMemberSelectionPanel[ScNamedElement, ScalaMemberInfo])
-      extends StepAdapter {
+      extends StepAdapter
     override def getComponent = panel
     override def getPreferredFocusedComponent = panel.getTable
-  }
 
-  override protected def init(): Unit = {
+  override protected def init(): Unit =
     super.init()
     updateStep()
 
     val settings = ScalaProjectSettings.getInstance(project)
     toStringPanel.checkBox.setSelected(
         settings.isGenerateToStringWithFieldNames)
-  }
 
   toStringPanel.getTable.getModel
     .addTableModelListener(new ToStringTableModelListener)
   addStep(new ToStringStep(toStringPanel))
   init()
   updateButtons()
-}
 
 private class ScalaToStringMemberInfoModel
     extends AbstractMemberInfoModel[ScNamedElement, ScalaMemberInfo]

@@ -20,16 +20,14 @@ import org.scalajs.testsuite.niobuffer.ByteBufferJSFactories._
 
 object WrappedTypedArrayDoubleBufferJSTest extends SupportsTypedArrays
 
-class WrappedTypedArrayDoubleBufferJSTest extends DoubleBufferTest {
+class WrappedTypedArrayDoubleBufferJSTest extends DoubleBufferTest
 
   val factory: DoubleBufferFactory = new WrappedTypedArrayDoubleBufferJSFactory
 
   class WrappedTypedArrayDoubleBufferJSFactory
-      extends Factory with BufferFactory.WrappedTypedArrayBufferFactory {
+      extends Factory with BufferFactory.WrappedTypedArrayBufferFactory
     def baseWrap(array: Array[Double]): DoubleBuffer =
       TypedArrayBuffer.wrap(new Float64Array(array.toJSArray))
-  }
-}
 
 // Double views of byte buffers
 

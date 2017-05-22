@@ -9,7 +9,7 @@ import org.ensime.util.EnsimeSpec
 import DynamicSynonymFilter._
 import scala.collection.mutable
 
-class DynamicSynonymFilterSpec extends EnsimeSpec {
+class DynamicSynonymFilterSpec extends EnsimeSpec
 
   val cleese = Set(
       "resting",
@@ -30,34 +30,28 @@ class DynamicSynonymFilterSpec extends EnsimeSpec {
       "run down the curtain and joined the bleedin choir invisible",
       "ex-parrot"
   )
-  val engine = new SynonymEngine {
+  val engine = new SynonymEngine
     def synonyms(term: String) =
       if (term != "dead") Set.empty
       else cleese
-  }
 
   private def applyEngineToTerm(
-      term: String, engine: SynonymEngine): List[String] = {
+      term: String, engine: SynonymEngine): List[String] =
     val reader = new StringReader(term)
     val source = new KeywordTokenizer(reader)
     val filter = new DynamicSynonymFilter(source, engine)
 
     val words: mutable.ListBuffer[String] = mutable.ListBuffer()
     filter.reset()
-    while (filter.incrementToken()) {
+    while (filter.incrementToken())
       words += source.getAttribute(classOf[CharTermAttribute]).toString
-    }
     filter.close()
     words.toList.sorted
-  }
 
-  "DynamicSynonymFilter" should "not add synonyms where there are none" in {
+  "DynamicSynonymFilter" should "not add synonyms where there are none" in
     val term = "Norwegian Blue"
     applyEngineToTerm(term, engine) should ===(List(term))
-  }
 
-  it should "report known synonyms" in {
+  it should "report known synonyms" in
     val term = "dead"
     applyEngineToTerm(term, engine) should ===((cleese + term).toList.sorted)
-  }
-}

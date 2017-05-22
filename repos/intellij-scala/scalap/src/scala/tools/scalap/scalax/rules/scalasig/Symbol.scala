@@ -5,30 +5,27 @@ package scalasig
 
 import scala.tools.scalap.scalax.rules.scalasig.ScalaSigEntryParsers._
 
-trait Symbol extends Flags {
+trait Symbol extends Flags
   def name: String
   def parent: Option[Symbol]
   def children: Seq[Symbol]
 
-  def isType = this match {
+  def isType = this match
     case _: ClassSymbol if !isModule => true
     case _: TypeSymbol => true
     case _ if isTrait => true
     case _ => false
-  }
 
   def path: String =
     parent.filterNot(_ == NoSymbol).map(_.path + ".").getOrElse("") + name
-}
 
-case object NoSymbol extends Symbol {
+case object NoSymbol extends Symbol
   def name = "<no symbol>"
   def parent = None
   def hasFlag(flag: Long) = false
   def children = Nil
-}
 
-abstract class ScalaSigSymbol extends Symbol {
+abstract class ScalaSigSymbol extends Symbol
   def applyRule[A](rule: EntryParser[A]): A = expect(rule)(entry)
   def applyScalaSigRule[A](rule: ScalaSigParsers.Parser[A]) =
     ScalaSigParsers.expect(rule)(entry.scalaSig)
@@ -38,47 +35,40 @@ abstract class ScalaSigSymbol extends Symbol {
 
   lazy val children: Seq[Symbol] =
     applyScalaSigRule(ScalaSigParsers.symbols) filter (_.parent.contains(this))
-  lazy val attributes: Seq[AttributeInfo] = {
-    applyScalaSigRule(ScalaSigParsers.attributes) filter { attr =>
-      (attr.symbol, this) match {
+  lazy val attributes: Seq[AttributeInfo] =
+    applyScalaSigRule(ScalaSigParsers.attributes) filter  attr =>
+      (attr.symbol, this) match
         case (s, t) if s == t => true
         case (MethodSymbol(info1, ref1), MethodSymbol(info2, ref2))
             if info1.name == (info2.name + " ") =>
           true
         case _ => false
-      }
-    }
-  }
-}
 
 case class ExternalSymbol(
     name: String, parent: Option[Symbol], entry: ScalaSig#Entry)
-    extends ScalaSigSymbol {
+    extends ScalaSigSymbol
   override def toString = path
   def hasFlag(flag: Long) = false
-}
 
 case class SymbolInfo(name: String,
                       owner: Symbol,
                       flags: Int,
                       privateWithin: Option[AnyRef],
                       info: Int,
-                      entry: ScalaSig#Entry) {
-  def symbolString(any: AnyRef) = any match {
+                      entry: ScalaSig#Entry)
+  def symbolString(any: AnyRef) = any match
     case sym: SymbolInfoSymbol => sym.index.toString
     case other => other.toString
-  }
 
   override def toString =
     name + ", owner=" + symbolString(owner) + ", flags=" + flags.toHexString +
     ", info=" + info +
-    (privateWithin match {
+    (privateWithin match
           case Some(any) => ", privateWithin=" + symbolString(any)
           case None => " "
-        })
-}
+        )
 
-abstract class SymbolInfoSymbol extends ScalaSigSymbol {
+abstract class SymbolInfoSymbol extends ScalaSigSymbol
   def symbolInfo: SymbolInfo
 
   def entry = symbolInfo.entry
@@ -87,21 +77,16 @@ abstract class SymbolInfoSymbol extends ScalaSigSymbol {
   def hasFlag(flag: Long) = (symbolInfo.flags & flag) != 0L
 
   lazy val infoType = applyRule(parseEntry(typeEntry)(symbolInfo.info))
-}
 
-case class TypeSymbol(symbolInfo: SymbolInfo) extends SymbolInfoSymbol {
+case class TypeSymbol(symbolInfo: SymbolInfo) extends SymbolInfoSymbol
   override def path = name
-}
 
-case class AliasSymbol(symbolInfo: SymbolInfo) extends SymbolInfoSymbol {
+case class AliasSymbol(symbolInfo: SymbolInfo) extends SymbolInfoSymbol
   override def path = name
-}
 case class ClassSymbol(symbolInfo: SymbolInfo, thisTypeRef: Option[Int])
-    extends SymbolInfoSymbol {
-  lazy val selfType = thisTypeRef.map { (x: Int) =>
+    extends SymbolInfoSymbol
+  lazy val selfType = thisTypeRef.map  (x: Int) =>
     applyRule(parseEntry(typeEntry)(x))
-  }
-}
 case class ObjectSymbol(symbolInfo: SymbolInfo) extends SymbolInfoSymbol
 case class MethodSymbol(symbolInfo: SymbolInfo, aliasRef: Option[Int])
     extends SymbolInfoSymbol

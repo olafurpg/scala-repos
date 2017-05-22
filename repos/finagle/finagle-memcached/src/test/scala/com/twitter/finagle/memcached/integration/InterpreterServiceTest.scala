@@ -14,12 +14,12 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
-class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
+class InterpreterServiceTest extends FunSuite with BeforeAndAfter
 
   var server: InProcessMemcached = null
   var client: Service[Command, Response] = null
 
-  before {
+  before
     server = new InProcessMemcached(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
     val address = server.start().boundAddress.asInstanceOf[InetSocketAddress]
@@ -28,28 +28,23 @@ class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
       .codec(new Memcached)
       .hostConnectionLimit(1)
       .build()
-  }
 
-  after {
+  after
     server.stop()
-  }
 
-  test("set & get") {
+  test("set & get")
     val key = Buf.Utf8("key")
     val value = Buf.Utf8("value")
     val zero = "0"
-    val result = for {
+    val result = for
       _ <- client(Delete(key))
       _ <- client(Set(key, 0, Time.epoch, value))
       r <- client(Get(Seq(key)))
-    } yield r
+    yield r
     assert(Await.result(result, 1.second) == Values(
             Seq(Value(key, value, None, Some(Buf.Utf8(zero))))))
     assert(client.isAvailable)
-  }
 
-  test("quit") {
+  test("quit")
     val result = client(Quit())
     assert(Await.result(result) == NoOp())
-  }
-}

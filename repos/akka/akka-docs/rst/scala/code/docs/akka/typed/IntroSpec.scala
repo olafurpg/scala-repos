@@ -14,22 +14,20 @@ import scala.concurrent.Await
 import akka.testkit.AkkaSpec
 import akka.typed.TypedSpec
 
-object IntroSpec {
+object IntroSpec
 
   //#hello-world-actor
-  object HelloWorld {
+  object HelloWorld
     final case class Greet(whom: String, replyTo: ActorRef[Greeted])
     final case class Greeted(whom: String)
 
-    val greeter = Static[Greet] { msg ⇒
+    val greeter = Static[Greet]  msg ⇒
       println(s"Hello ${msg.whom}!")
       msg.replyTo ! Greeted(msg.whom)
-    }
-  }
   //#hello-world-actor
 
   //#chatroom-actor
-  object ChatRoom {
+  object ChatRoom
     //#chatroom-protocol
     sealed trait Command
     final case class GetSession(
@@ -54,30 +52,26 @@ object IntroSpec {
     //#chatroom-protocol
     //#chatroom-behavior
 
-    val behavior: Behavior[GetSession] = ContextAware[Command] { ctx ⇒
+    val behavior: Behavior[GetSession] = ContextAware[Command]  ctx ⇒
       var sessions = List.empty[ActorRef[SessionEvent]]
 
-      Static {
+      Static
         case GetSession(screenName, client) ⇒
           sessions ::= client
-          val wrapper = ctx.spawnAdapter { p: PostMessage ⇒
+          val wrapper = ctx.spawnAdapter  p: PostMessage ⇒
             PostSessionMessage(screenName, p.message)
-          }
           client ! SessionGranted(wrapper)
         case PostSessionMessage(screenName, message) ⇒
           val mp = MessagePosted(screenName, message)
           sessions foreach (_ ! mp)
-      }
-    }.narrow // only expose GetSession to the outside
+    .narrow // only expose GetSession to the outside
     //#chatroom-behavior
-  }
   //#chatroom-actor
-}
 
-class IntroSpec extends TypedSpec {
+class IntroSpec extends TypedSpec
   import IntroSpec._
 
-  def `must say hello`(): Unit = {
+  def `must say hello`(): Unit =
     //#hello-world
     import HelloWorld._
     // using global pool since we want to run tasks after system.terminate
@@ -87,18 +81,17 @@ class IntroSpec extends TypedSpec {
 
     val future: Future[Greeted] = system ? (Greet("world", _))
 
-    for {
+    for
       greeting <- future.recover { case ex => ex.getMessage }
       done <- { println(s"result: $greeting"); system.terminate() }
-    } println("system terminated")
+    println("system terminated")
     //#hello-world
-  }
 
-  def `must chat`(): Unit = {
+  def `must chat`(): Unit =
     //#chatroom-gabbler
     import ChatRoom._
 
-    val gabbler: Behavior[SessionEvent] = Total {
+    val gabbler: Behavior[SessionEvent] = Total
       case SessionDenied(reason) ⇒
         println(s"cannot start chat room session: $reason")
         Stopped
@@ -108,11 +101,10 @@ class IntroSpec extends TypedSpec {
       case MessagePosted(screenName, message) ⇒
         println(s"message has been posted by '$screenName': $message")
         Stopped
-    }
     //#chatroom-gabbler
 
     //#chatroom-main
-    val main: Behavior[Unit] = Full {
+    val main: Behavior[Unit] = Full
       case Sig(ctx, PreStart) ⇒
         val chatRoom = ctx.spawn(Props(ChatRoom.behavior), "chatroom")
         val gabblerRef = ctx.spawn(Props(gabbler), "gabbler")
@@ -121,10 +113,7 @@ class IntroSpec extends TypedSpec {
         Same
       case Sig(_, Terminated(ref)) ⇒
         Stopped
-    }
 
     val system = ActorSystem("ChatRoomDemo", Props(main))
     Await.result(system.whenTerminated, 1.second)
     //#chatroom-main
-  }
-}

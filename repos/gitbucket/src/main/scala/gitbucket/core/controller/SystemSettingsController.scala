@@ -18,7 +18,7 @@ class SystemSettingsController
     extends SystemSettingsControllerBase with AccountService
     with RepositoryService with AdminAuthenticator
 
-trait SystemSettingsControllerBase extends AccountManagementControllerBase {
+trait SystemSettingsControllerBase extends AccountManagementControllerBase
   self: AccountService with RepositoryService with AdminAuthenticator =>
 
   private val form = mapping(
@@ -86,16 +86,15 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                                                                   optional(text(
                                                                           ))))
                                      )(Ldap.apply))
-  )(SystemSettings.apply).verifying { settings =>
+  )(SystemSettings.apply).verifying  settings =>
     Vector(
-        if (settings.ssh && settings.baseUrl.isEmpty) {
+        if (settings.ssh && settings.baseUrl.isEmpty)
           Some("baseUrl" -> "Base URL is required if SSH access is enabled.")
-        } else None,
-        if (settings.ssh && settings.sshHost.isEmpty) {
+        else None,
+        if (settings.ssh && settings.sshHost.isEmpty)
           Some("sshHost" -> "SSH host is required if SSH access is enabled.")
-        } else None
+        else None
     ).flatten
-  }
 
   private val pluginForm = mapping(
       "pluginId" -> list(trim(label("", text())))
@@ -182,48 +181,47 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
       "removed" -> trim(label("Disable", boolean()))
   )(EditGroupForm.apply)
 
-  get("/admin/system")(adminOnly {
+  get("/admin/system")(adminOnly
     html.system(flash.get("info"))
-  })
+  )
 
   post("/admin/system", form)(
-      adminOnly { form =>
+      adminOnly  form =>
     saveSystemSettings(form)
 
-    if (form.sshAddress != context.settings.sshAddress) {
+    if (form.sshAddress != context.settings.sshAddress)
       SshServer.stop()
-      for {
+      for
         sshAddress <- form.sshAddress
         baseUrl <- form.baseUrl
-      } SshServer.start(sshAddress, baseUrl)
-    }
+      SshServer.start(sshAddress, baseUrl)
 
     flash += "info" -> "System settings has been updated."
     redirect("/admin/system")
-  })
+  )
 
-  get("/admin/plugins")(adminOnly {
+  get("/admin/plugins")(adminOnly
     html.plugins(PluginRegistry().getPlugins())
-  })
+  )
 
-  get("/admin/users")(adminOnly {
+  get("/admin/users")(adminOnly
     val includeRemoved =
       params.get("includeRemoved").map(_.toBoolean).getOrElse(false)
     val users = getAllUsers(includeRemoved)
-    val members = users.collect {
+    val members = users.collect
       case account if (account.isGroupAccount) =>
         account.userName -> getGroupMembers(account.userName).map(_.userName)
-    }.toMap
+    .toMap
 
     html.userlist(users, members, includeRemoved)
-  })
+  )
 
-  get("/admin/users/_newuser")(adminOnly {
+  get("/admin/users/_newuser")(adminOnly
     html.user(None)
-  })
+  )
 
   post("/admin/users/_newuser", newUserForm)(
-      adminOnly { form =>
+      adminOnly  form =>
     createAccount(form.userName,
                   sha1(form.password),
                   form.fullName,
@@ -232,18 +230,18 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                   form.url)
     updateImage(form.userName, form.fileId, false)
     redirect("/admin/users")
-  })
+  )
 
   get("/admin/users/:userName/_edituser")(
-      adminOnly {
+      adminOnly
     val userName = params("userName")
     html.user(getAccountByUserName(userName, true))
-  })
+  )
 
-  post("/admin/users/:name/_edituser", editUserForm)(adminOnly { form =>
+  post("/admin/users/:name/_edituser", editUserForm)(adminOnly  form =>
     val userName = params("userName")
-    getAccountByUserName(userName, true).map { account =>
-      if (form.isRemoved) {
+    getAccountByUserName(userName, true).map  account =>
+      if (form.isRemoved)
         // Remove repositories
         //        getRepositoryNamesOfUser(userName).foreach { repositoryName =>
         //          deleteRepository(userName, repositoryName)
@@ -253,7 +251,6 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
         //        }
         // Remove from GROUP_MEMBER, COLLABORATOR and REPOSITORY
         removeUserRelatedData(userName)
-      }
 
       updateAccount(account.copy(
               password = form.password.map(sha1).getOrElse(account.password),
@@ -265,59 +262,54 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
 
       updateImage(userName, form.fileId, form.clearImage)
       redirect("/admin/users")
-    } getOrElse NotFound
-  })
+    getOrElse NotFound
+  )
 
-  get("/admin/users/_newgroup")(adminOnly {
+  get("/admin/users/_newgroup")(adminOnly
     html.usergroup(None, Nil)
-  })
+  )
 
   post("/admin/users/_newgroup", newGroupForm)(
-      adminOnly { form =>
+      adminOnly  form =>
     createGroup(form.groupName, form.url)
     updateGroupMembers(form.groupName,
                        form.members
                          .split(",")
-                         .map {
-                           _.split(":") match {
+                         .map
+                           _.split(":") match
                              case Array(userName, isManager) =>
                                (userName, isManager.toBoolean)
-                           }
-                         }
                          .toList)
     updateImage(form.groupName, form.fileId, false)
     redirect("/admin/users")
-  })
+  )
 
   get("/admin/users/:groupName/_editgroup")(
-      adminOnly {
-    defining(params("groupName")) { groupName =>
+      adminOnly
+    defining(params("groupName"))  groupName =>
       html.usergroup(getAccountByUserName(groupName, true),
                      getGroupMembers(groupName))
-    }
-  })
+  )
 
-  post("/admin/users/:groupName/_editgroup", editGroupForm)(adminOnly { form =>
+  post("/admin/users/:groupName/_editgroup", editGroupForm)(adminOnly  form =>
     defining(params("groupName"),
              form.members
                .split(",")
-               .map {
-                 _.split(":") match {
+               .map
+                 _.split(":") match
                    case Array(userName, isManager) =>
                      (userName, isManager.toBoolean)
-                 }
-               }
-               .toList) {
+               .toList)
       case (groupName, members) =>
-        getAccountByUserName(groupName, true).map {
+        getAccountByUserName(groupName, true).map
           account =>
             updateGroup(groupName, form.url, form.isRemoved)
 
-            if (form.isRemoved) {
+            if (form.isRemoved)
               // Remove from GROUP_MEMBER
               updateGroupMembers(form.groupName, Nil)
               // Remove repositories
-              getRepositoryNamesOfUser(form.groupName).foreach {
+              getRepositoryNamesOfUser(form.groupName).foreach
                 repositoryName =>
                   deleteRepository(groupName, repositoryName)
                   FileUtils.deleteDirectory(
@@ -326,50 +318,38 @@ trait SystemSettingsControllerBase extends AccountManagementControllerBase {
                       getWikiRepositoryDir(groupName, repositoryName))
                   FileUtils.deleteDirectory(
                       getTemporaryDir(groupName, repositoryName))
-              }
-            } else {
+            else
               // Update GROUP_MEMBER
               updateGroupMembers(form.groupName, members)
               // Update COLLABORATOR for group repositories
-              getRepositoryNamesOfUser(form.groupName).foreach {
+              getRepositoryNamesOfUser(form.groupName).foreach
                 repositoryName =>
                   removeCollaborators(form.groupName, repositoryName)
-                  members.foreach {
+                  members.foreach
                     case (userName, isManager) =>
                       addCollaborator(form.groupName, repositoryName, userName)
-                  }
-              }
-            }
 
             updateImage(form.groupName, form.fileId, form.clearImage)
             redirect("/admin/users")
-        } getOrElse NotFound
-    }
-  })
+        getOrElse NotFound
+  )
 
-  private def members: Constraint = new Constraint() {
+  private def members: Constraint = new Constraint()
     override def validate(
-        name: String, value: String, messages: Messages): Option[String] = {
+        name: String, value: String, messages: Messages): Option[String] =
       if (value
             .split(",")
-            .exists {
-              _.split(":") match {
+            .exists
+              _.split(":") match
                 case Array(userName, isManager) => isManager.toBoolean
-              }
-            }) None else Some("Must select one manager at least.")
-    }
-  }
+            ) None else Some("Must select one manager at least.")
 
   protected def disableByNotYourself(paramName: String): Constraint =
-    new Constraint() {
+    new Constraint()
       override def validate(
-          name: String, value: String, messages: Messages): Option[String] = {
-        params.get(paramName).flatMap { userName =>
+          name: String, value: String, messages: Messages): Option[String] =
+        params.get(paramName).flatMap  userName =>
           if (userName == context.loginAccount.get.userName &&
               params.get("removed") == Some("true"))
             Some("You can't disable your account yourself")
           else None
-        }
-      }
-    }
-}

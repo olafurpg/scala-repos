@@ -12,7 +12,7 @@ class ScalaThisAndSuperEvaluationTest_212
     extends ScalaThisAndSuperEvaluationTestBaseClass with ScalaVersion_2_12
 
 abstract class ScalaThisAndSuperEvaluationTestBaseClass
-    extends ScalaDebuggerTestCase {
+    extends ScalaDebuggerTestCase
   addFileWithBreakpoints("TraitThis.scala",
                          s"""
        |object TraitThis {
@@ -26,12 +26,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testTraitThis() {
-    runDebugger() {
+  def testTraitThis()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("this", "TraitThis$$anon")
-    }
-  }
 
   addFileWithBreakpoints("Base.scala",
                          s"""
@@ -51,12 +49,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testSuperInvocation() {
-    runDebugger() {
+  def testSuperInvocation()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("foo", "1")
-    }
-  }
 
   addFileWithBreakpoints("InvocationFromInner.scala",
                          s"""
@@ -71,12 +67,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testInvocationFromInner() {
-    runDebugger() {
+  def testInvocationFromInner()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("foo", "1")
-    }
-  }
 
   addFileWithBreakpoints("ThisInvocationFromInner.scala",
                          s"""
@@ -91,12 +85,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testThisInvocationFromInner() {
-    runDebugger() {
+  def testThisInvocationFromInner()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("ThisInvocationFromInner.this.foo", "1")
-    }
-  }
 
   addFileWithBreakpoints("ThisInvocationFromInnerClass.scala",
                          s"""
@@ -117,12 +109,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testThisInvocationFromInnerClass() {
-    runDebugger() {
+  def testThisInvocationFromInnerClass()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("ThisInvocationFromInnerClass.this.foo", "1")
-    }
-  }
 
   addFileWithBreakpoints("SuperInvocationFromInner.scala",
                          s"""
@@ -137,12 +127,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testSuperInvocationFromInner() {
-    runDebugger() {
+  def testSuperInvocationFromInner()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("SuperInvocationFromInner.super.foo", "1")
-    }
-  }
 
   addFileWithBreakpoints("SuperTraitInvocationFromInner.scala",
                          s"""
@@ -162,12 +150,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testSuperTraitInvocationFromInner() {
-    runDebugger() {
+  def testSuperTraitInvocationFromInner()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("SuperTraitInvocationFromInner.super.foo", "1")
-    }
-  }
 
   addFileWithBreakpoints("SuperTraitInvocation.scala",
                          s"""
@@ -177,12 +163,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testSuperTraitInvocation() {
-    runDebugger() {
+  def testSuperTraitInvocation()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("foo", "1")
-    }
-  }
 
   addFileWithBreakpoints("Sample.scala",
                          s"""
@@ -208,12 +192,10 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testOuterSuperInnerTraitInvocation() {
-    runDebugger() {
+  def testOuterSuperInnerTraitInvocation()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("E.super.ioi", "2")
-    }
-  }
 
   addFileWithBreakpoints("InnerOuterEtc.scala",
                          s"""
@@ -234,10 +216,7 @@ abstract class ScalaThisAndSuperEvaluationTestBaseClass
        |  }
        |}
       """.stripMargin.trim())
-  def testInnerOuterEtc() {
-    runDebugger() {
+  def testInnerOuterEtc()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("foo", "1")
-    }
-  }
-}

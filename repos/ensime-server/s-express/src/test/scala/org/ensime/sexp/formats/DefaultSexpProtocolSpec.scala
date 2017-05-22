@@ -6,14 +6,13 @@ import org.ensime.sexp._
 
 // these are a sort of aggregated test, investigating behaviours of
 // interactions between the different formats.
-class DefaultSexpProtocolSpec extends FormatSpec {
+class DefaultSexpProtocolSpec extends FormatSpec
 
-  "DefaultSexpProtocol" should "support String as SexpString, not via IsTraversableLike" in {
+  "DefaultSexpProtocol" should "support String as SexpString, not via IsTraversableLike" in
     import DefaultSexpProtocol._
     assertFormat("hello", SexpString("hello"))
-  }
 
-  it should "round-trip Option[List[T]]" in {
+  it should "round-trip Option[List[T]]" in
     import DefaultSexpProtocol._
 
     val none: Option[List[String]] = None
@@ -25,11 +24,10 @@ class DefaultSexpProtocolSpec extends FormatSpec {
     assertFormat(list, SexpList(SexpList(SexpString("boo"))))
     SexpNil.convertTo[Option[List[String]]] should ===(None)
     SexpNil.convertTo[List[Option[String]]] should ===(Nil)
-  }
 
   object AlternativeProtocol extends DefaultSexpProtocol with OptionAltFormat
 
-  "DefaultSexpProtocol with OptionAltFormat" should "predictably fail to round-trip Option[List[T]]" in {
+  "DefaultSexpProtocol with OptionAltFormat" should "predictably fail to round-trip Option[List[T]]" in
     import AlternativeProtocol._
 
     val none: Option[List[String]] = None
@@ -44,5 +42,3 @@ class DefaultSexpProtocolSpec extends FormatSpec {
 
     // and Lists of Options give empty lists, muahahaha
     SexpNil.convertTo[List[Option[String]]] should ===(Nil)
-  }
-}

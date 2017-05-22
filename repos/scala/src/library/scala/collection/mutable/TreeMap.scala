@@ -11,7 +11,7 @@ import scala.collection.mutable.{RedBlackTree => RB}
   * @define Coll mutable.TreeMap
   * @define coll mutable tree map
   */
-object TreeMap extends MutableSortedMapFactory[TreeMap] {
+object TreeMap extends MutableSortedMapFactory[TreeMap]
 
   def empty[A, B](implicit ord: Ordering[A]) = new TreeMap[A, B]()(ord)
 
@@ -19,7 +19,6 @@ object TreeMap extends MutableSortedMapFactory[TreeMap] {
   implicit def canBuildFrom[A, B](
       implicit ord: Ordering[A]): CanBuildFrom[Coll, (A, B), TreeMap[A, B]] =
     new SortedMapCanBuildFrom[A, B]
-}
 
 /**
   * A mutable sorted map implemented using a mutable red-black tree as underlying data structure.
@@ -40,7 +39,7 @@ sealed class TreeMap[A, B] private (
     tree: RB.Tree[A, B])(implicit val ordering: Ordering[A])
     extends AbstractSortedMap[A, B]
     with SortedMap[A, B] with MapLike[A, B, TreeMap[A, B]]
-    with SortedMapLike[A, B, TreeMap[A, B]] with Serializable {
+    with SortedMapLike[A, B, TreeMap[A, B]] with Serializable
 
   /**
     * Creates an empty `TreeMap`.
@@ -112,36 +111,33 @@ sealed class TreeMap[A, B] private (
     */
   @SerialVersionUID(2219159283273389116L)
   private[this] final class TreeMapView(from: Option[A], until: Option[A])
-      extends TreeMap[A, B](tree) {
+      extends TreeMap[A, B](tree)
 
     /**
       * Given a possible new lower bound, chooses and returns the most constraining one (the maximum).
       */
     private[this] def pickLowerBound(newFrom: Option[A]): Option[A] =
-      (from, newFrom) match {
+      (from, newFrom) match
         case (Some(fr), Some(newFr)) => Some(ordering.max(fr, newFr))
         case (None, _) => newFrom
         case _ => from
-      }
 
     /**
       * Given a possible new upper bound, chooses and returns the most constraining one (the minimum).
       */
     private[this] def pickUpperBound(newUntil: Option[A]): Option[A] =
-      (until, newUntil) match {
+      (until, newUntil) match
         case (Some(unt), Some(newUnt)) => Some(ordering.min(unt, newUnt))
         case (None, _) => newUntil
         case _ => until
-      }
 
     /**
       * Returns true if the argument is inside the view bounds (between `from` and `until`).
       */
-    private[this] def isInsideViewBounds(key: A): Boolean = {
+    private[this] def isInsideViewBounds(key: A): Boolean =
       val afterFrom = from.isEmpty || ordering.compare(from.get, key) <= 0
       val beforeUntil = until.isEmpty || ordering.compare(key, until.get) < 0
       afterFrom && beforeUntil
-    }
 
     override def rangeImpl(from: Option[A], until: Option[A]): TreeMap[A, B] =
       new TreeMapView(pickLowerBound(from), pickUpperBound(until))
@@ -163,34 +159,27 @@ sealed class TreeMap[A, B] private (
       isInsideViewBounds(key) && RB.contains(tree, key)
 
     override def head = headOption.get
-    override def headOption = {
+    override def headOption =
       val entry =
         if (from.isDefined) RB.minAfter(tree, from.get) else RB.min(tree)
-      (entry, until) match {
+      (entry, until) match
         case (Some(e), Some(unt)) if ordering.compare(e._1, unt) >= 0 => None
         case _ => entry
-      }
-    }
 
     override def last = lastOption.get
-    override def lastOption = {
+    override def lastOption =
       val entry =
         if (until.isDefined) RB.maxBefore(tree, until.get) else RB.max(tree)
-      (entry, from) match {
+      (entry, from) match
         case (Some(e), Some(fr)) if ordering.compare(e._1, fr) < 0 => None
         case _ => entry
-      }
-    }
 
     // Using the iterator should be efficient enough; if performance is deemed a problem later, specialized
     // `foreach(f, from, until)` and `transform(f, from, until)` methods can be created in `RedBlackTree`. See
     // https://github.com/scala/scala/pull/4608#discussion_r34307985 for a discussion about this.
     override def foreach[U](f: ((A, B)) => U): Unit = iterator.foreach(f)
-    override def transform(f: (A, B) => B) = {
+    override def transform(f: (A, B) => B) =
       iterator.foreach { case (key, value) => update(key, f(key, value)) }
       this
-    }
 
     override def clone() = super.clone().rangeImpl(from, until)
-  }
-}

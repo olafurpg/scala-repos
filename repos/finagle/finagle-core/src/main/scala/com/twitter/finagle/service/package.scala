@@ -1,6 +1,6 @@
 package com.twitter.finagle
 
-package object service {
+package object service
 
   /**
     * A response classifier allows developers to give Finagle the additional
@@ -61,4 +61,3 @@ package object service {
   //    original response outside of the Finagle stack would likely lead to
   //    confusion and the abstraction would leak out in places like
   //    `StatsFilter`.
-}

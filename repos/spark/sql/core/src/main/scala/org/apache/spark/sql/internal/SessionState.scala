@@ -30,7 +30,7 @@ import org.apache.spark.sql.util.ExecutionListenerManager
 /**
   * A class that holds all session-specific state in a given [[SQLContext]].
   */
-private[sql] class SessionState(ctx: SQLContext) {
+private[sql] class SessionState(ctx: SQLContext)
 
   // Note: These are all lazy vals because they depend on each other (e.g. conf) and we
   // want subclasses to override some of the fields. Otherwise, we would get a lot of NPEs.
@@ -60,15 +60,13 @@ private[sql] class SessionState(ctx: SQLContext) {
   /**
     * Logical query plan analyzer for resolving unresolved attributes and relations.
     */
-  lazy val analyzer: Analyzer = {
-    new Analyzer(catalog, functionRegistry, conf) {
+  lazy val analyzer: Analyzer =
+    new Analyzer(catalog, functionRegistry, conf)
       override val extendedResolutionRules =
         python.ExtractPythonUDFs :: PreInsertCastAndRename :: DataSourceAnalysis ::
         (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
 
       override val extendedCheckRules = Seq(datasources.PreWriteCheck(catalog))
-    }
-  }
 
   /**
     * Logical query plan optimizer.
@@ -90,14 +88,13 @@ private[sql] class SessionState(ctx: SQLContext) {
     * Prepares a planned [[SparkPlan]] for execution by inserting shuffle operations and internal
     * row format conversions as needed.
     */
-  lazy val prepareForExecution = new RuleExecutor[SparkPlan] {
+  lazy val prepareForExecution = new RuleExecutor[SparkPlan]
     override val batches: Seq[Batch] = Seq(
         Batch("Subquery", Once, PlanSubqueries(SessionState.this)),
         Batch("Add exchange", Once, EnsureRequirements(conf)),
         Batch("Whole stage codegen", Once, CollapseCodegenStages(conf)),
         Batch("Reuse duplicated exchanges", Once, ReuseExchange(conf))
     )
-  }
 
   /**
     * An interface to register custom [[org.apache.spark.sql.util.QueryExecutionListener]]s
@@ -111,4 +108,3 @@ private[sql] class SessionState(ctx: SQLContext) {
     */
   lazy val continuousQueryManager: ContinuousQueryManager =
     new ContinuousQueryManager(ctx)
-}

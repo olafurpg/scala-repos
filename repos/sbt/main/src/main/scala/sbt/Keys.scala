@@ -29,7 +29,7 @@ import sbt.internal.librarymanagement.{CompatibilityWarningOptions, DeliverConfi
 import sbt.util.{AbstractLogger, Level, Logger}
 import sbt.internal.util.SourcePosition
 
-object Keys {
+object Keys
   val TraceValues =
     "-1 to disable, 0 for up to the first sbt frame, or a positive number to set the maximum number of frames shown."
 
@@ -1132,4 +1132,3 @@ object Keys {
   def dummyTask[T](name: String): Task[T] = Def.dummyTask(name)
   @deprecated("Implementation detail.", "0.13.1")
   def isDummy(t: Task[_]): Boolean = Def.isDummy(t)
-}

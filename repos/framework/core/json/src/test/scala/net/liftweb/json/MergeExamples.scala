@@ -19,12 +19,11 @@ package json
 
 import org.specs2.mutable.Specification
 
-object MergeExamples extends Specification {
+object MergeExamples extends Specification
   "Merge Examples".title
 
-  "Merge example" in {
+  "Merge example" in
     (scala1 merge scala2) mustEqual expectedMergeResult
-  }
 
   val scala1 = parse("""
     {
@@ -61,9 +60,8 @@ object MergeExamples extends Specification {
       "compiled": true,
     }""")
 
-  "Lotto example" in {
+  "Lotto example" in
     (lotto1 merge lotto2) mustEqual mergedLottoResult
-  }
 
   val lotto1 = parse("""
     {
@@ -101,4 +99,3 @@ object MergeExamples extends Specification {
         }]
       }
     }""")
-}

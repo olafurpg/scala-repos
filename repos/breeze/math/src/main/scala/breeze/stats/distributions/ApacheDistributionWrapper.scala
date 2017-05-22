@@ -20,7 +20,7 @@ package distributions
 import org.apache.commons.math3.distribution.{AbstractIntegerDistribution => ApacheIntegerDistribution, AbstractRealDistribution => ApacheRealDistribution, FDistribution => ApacheFDistribution}
 
 trait ApacheContinuousDistribution
-    extends ContinuousDistr[Double] with HasCdf with HasInverseCdf {
+    extends ContinuousDistr[Double] with HasCdf with HasInverseCdf
   protected val inner: ApacheRealDistribution
 
   def unnormalizedLogPdf(x: Double) = math.log(inner.density(x))
@@ -34,11 +34,9 @@ trait ApacheContinuousDistribution
   def variance: Double = inner.getNumericalVariance()
 
   override def cdf(x: Double): Double = inner.cumulativeProbability(x)
-}
 
-trait ApacheDiscreteDistribution extends DiscreteDistr[Int] {
+trait ApacheDiscreteDistribution extends DiscreteDistr[Int]
   protected val inner: ApacheIntegerDistribution
   def probabilityOf(x: Int) = inner.probability(x)
   def draw() = inner.sample()
   def drawMany(n: Int): Array[Int] = inner.sample(n)
-}

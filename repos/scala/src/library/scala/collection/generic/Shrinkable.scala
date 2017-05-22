@@ -19,7 +19,7 @@ package generic
   *  @define coll shrinkable collection
   *  @define Coll `Shrinkable`
   */
-trait Shrinkable[-A] {
+trait Shrinkable[-A]
 
   /** Removes a single element from this $coll.
     *
@@ -35,11 +35,10 @@ trait Shrinkable[-A] {
     *  @param elems the remaining elements to remove.
     *  @return the $coll itself
     */
-  def -=(elem1: A, elem2: A, elems: A*): this.type = {
+  def -=(elem1: A, elem2: A, elems: A*): this.type =
     this -= elem1
     this -= elem2
     this --= elems
-  }
 
   /** Removes all elements produced by an iterator from this $coll.
     *
@@ -47,4 +46,3 @@ trait Shrinkable[-A] {
     *  @return the $coll itself
     */
   def --=(xs: TraversableOnce[A]): this.type = { xs foreach -=; this }
-}

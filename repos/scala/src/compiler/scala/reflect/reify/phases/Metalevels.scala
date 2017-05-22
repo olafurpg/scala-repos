@@ -3,7 +3,7 @@ package phases
 
 import scala.collection.{mutable}
 
-trait Metalevels { self: Reifier =>
+trait Metalevels  self: Reifier =>
 
   import global._
 
@@ -100,20 +100,19 @@ trait Metalevels { self: Reifier =>
     *  The reasoning from Example 2 still holds here - we do need to inline the freevar that refers to x.
     *  However, we must not touch anything inside the splice'd block, because it's not getting reified.
     */
-  val metalevels = new Transformer {
+  val metalevels = new Transformer
     var insideSplice = false
     val inlineableBindings = mutable.Map[TermName, Tree]()
 
-    def withinSplice[T](op: => T) = {
+    def withinSplice[T](op: => T) =
       val old = insideSplice
       insideSplice = true
       try op finally insideSplice = old
-    }
 
     // Q: here we deal with all sorts of reified trees. what about ReifiedType(_, _, _, _, _, _)?
     // A: nothing. reified trees give us problems because they sometimes create dimensional rifts as described above
     //    to the contrast, reified types (i.e. synthetic typetags materialized by Implicits.scala) always stay on the same metalevel as their enclosing code
-    override def transform(tree: Tree): Tree = tree match {
+    override def transform(tree: Tree): Tree = tree match
       case TreeSplice(
           ReifiedTree(universe, mirror, symtab, rtree, tpe, rtpe, concrete)) =>
         if (reifyDebug) println("entering inlineable splice: " + tree)
@@ -131,10 +130,9 @@ trait Metalevels { self: Reifier =>
                   inlinees.length,
                   inlinees map (inlinee => symtab.symName(inlinee)) mkString
                   (", ")))
-        withinSplice {
+        withinSplice
           super.transform(TreeSplice(ReifiedTree(
                       universe, mirror, symtab1, rtree, tpe, rtpe, concrete)))
-        }
       case TreeSplice(splicee) =>
         if (reifyDebug) println("entering splice: " + splicee)
         val breaches =
@@ -142,7 +140,7 @@ trait Metalevels { self: Reifier =>
           (sub =>
                 sub.hasSymbolField && sub.symbol != NoSymbol &&
                 sub.symbol.metalevel > 0)
-        if (!insideSplice && breaches.nonEmpty) {
+        if (!insideSplice && breaches.nonEmpty)
           // we used to convert dynamic splices into runtime evals transparently, but we no longer do that
           // why? see comments above
           // if (settings.logRuntimeSplices.value) reporter.echo(tree.pos, "this splice cannot be resolved statically")
@@ -152,9 +150,8 @@ trait Metalevels { self: Reifier =>
                 "metalevel breach in %s: %s".format(
                     tree, (breaches map (_.symbol)).distinct mkString ", "))
           CannotReifyRuntimeSplice(tree)
-        } else {
+        else
           withinSplice { super.transform(tree) }
-        }
       // todo. also inline usages of `inlineableBindings` in the symtab itself
       // e.g. a free$Foo can well use free$x, if Foo is path-dependent w.r.t x
       // FreeRef(_, _) check won't work, because metalevels of symbol table and body are different, hence, freerefs in symbol table look different from freerefs in body
@@ -167,6 +164,3 @@ trait Metalevels { self: Reifier =>
         inlined
       case _ =>
         super.transform(tree)
-    }
-  }
-}

@@ -39,7 +39,7 @@ import scalaz.Success
 
 trait JoinOptimizerSpecs[M[+ _]]
     extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
+    with LongIdMemoryDatasetConsumer[M]
   self =>
 
   import TableModule.CrossOrder._ // TODO: Move CrossOrder out somewhere else.
@@ -49,22 +49,20 @@ trait JoinOptimizerSpecs[M[+ _]]
 
   val ctx = defaultEvaluationContext
 
-  object joins extends JoinOptimizer with StdLibOpFinder {
+  object joins extends JoinOptimizer with StdLibOpFinder
     def MorphContext(ctx: EvaluationContext, node: DepGraph): MorphContext =
       new MorphContext(ctx, null)
-  }
 
   import joins._
 
-  def testEval(graph: DepGraph)(test: Set[SEvent] => Result): Result = {
-    (consumeEval(graph, defaultEvaluationContext) match {
+  def testEval(graph: DepGraph)(test: Set[SEvent] => Result): Result =
+    (consumeEval(graph, defaultEvaluationContext) match
       case Success(results) => test(results)
       case Failure(error) => throw error
-    })
-  }
+    )
 
-  "join optimization" should {
-    "fail to rewrite in presence of constant join" in {
+  "join optimization" should
+    "fail to rewrite in presence of constant join" in
       val line = Line(1, 1, "")
       val numbers =
         dag.AbsoluteLoad(Const(CString("/het/numbers"))(line))(line)
@@ -84,18 +82,16 @@ trait JoinOptimizerSpecs[M[+ _]]
       val input4 =
         makeFilter(Const(CLong(13))(line), numbers, numbers, numbers)
 
-      def testInput(input: DepGraph) = {
+      def testInput(input: DepGraph) =
         val opt = optimizeJoins(input, ctx, new IdGen)
         opt must_== input
-      }
 
       testInput(input1)
       testInput(input2)
       testInput(input3)
       testInput(input4)
-    }
 
-    "eliminate naive cartesian products in trivial object join cases" in {
+    "eliminate naive cartesian products in trivial object join cases" in
 
       val rawInput =
         """
@@ -194,9 +190,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                                        name)(line))(line))(line)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate naive cartesian products in trivial object join case with non order-preserving op in equal" in {
+    "eliminate naive cartesian products in trivial object join case with non order-preserving op in equal" in
 
       val rawInput =
         """
@@ -300,9 +295,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                                        name)(line))(line))(line)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate naive cartesian products in trivial op2 join cases" in {
+    "eliminate naive cartesian products in trivial op2 join cases" in
 
       val rawInput =
         """
@@ -379,9 +373,8 @@ trait JoinOptimizerSpecs[M[+ _]]
              Join(DerefObject, Cross(None), liftedRHS, height)(line))(line)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate naive cartesian products in object join followed by object deref" in {
+    "eliminate naive cartesian products in object join followed by object deref" in
 
       val rawInput =
         """
@@ -490,9 +483,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                                      name)(line))(line)
 
       opt must_== expectedOpt
-    }
 
-    "fail to eliminate join where lhs and rhs originate from same place" in {
+    "fail to eliminate join where lhs and rhs originate from same place" in
       val rawInput = """
         | a := //users
         | b := //heightWeight
@@ -518,9 +510,8 @@ trait JoinOptimizerSpecs[M[+ _]]
       val opt = optimizeJoins(input, ctx, new IdGen)
 
       opt must_== input
-    }
 
-    "fail to eliminate cartesian products wrapped in non row-level transformation" in {
+    "fail to eliminate cartesian products wrapped in non row-level transformation" in
 
       val rawInput =
         """
@@ -573,9 +564,8 @@ trait JoinOptimizerSpecs[M[+ _]]
       val opt = optimizeJoins(input, ctx, new IdGen)
 
       opt must_== input
-    }
 
-    "eliminate naive cartesian products in less trivial object join cases" in {
+    "eliminate naive cartesian products in less trivial object join cases" in
 
       val rawInput =
         """
@@ -680,9 +670,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                     id)(line))(line))(line)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate naive cartesian products in trivial array join cases" in {
+    "eliminate naive cartesian products in trivial array join cases" in
 
       val rawInput = """
         | a := //users
@@ -774,9 +763,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                                           name)(line))(line))(line)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate naive cartesian products in slightly less trivial cases (1)" in {
+    "eliminate naive cartesian products in slightly less trivial cases (1)" in
 
       val rawInput =
         """
@@ -872,9 +860,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                                        name)(line))(line))(line)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate naive cartesian products in slightly less trivial cases (2)" in {
+    "eliminate naive cartesian products in slightly less trivial cases (2)" in
 
       val rawInput =
         """
@@ -953,9 +940,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                         0))(line)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate cartesian with a new inside an array join" in {
+    "eliminate cartesian with a new inside an array join" in
       val query =
         """
         | medals' := //summer_games/london_medals
@@ -1049,9 +1035,8 @@ trait JoinOptimizerSpecs[M[+ _]]
       val opt = optimizeJoins(input, ctx, new IdGen)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate cartesian with a new and a filter inside an array join" in {
+    "eliminate cartesian with a new and a filter inside an array join" in
       val query =
         """
         | medals := //summer_games/london_medals
@@ -1137,9 +1122,8 @@ trait JoinOptimizerSpecs[M[+ _]]
       val opt = optimizeJoins(input, ctx, new IdGen)
 
       opt must_== expectedOpt
-    }
 
-    "eliminate cartesian in medal winners query" in {
+    "eliminate cartesian in medal winners query" in
       // note: query will not return expected results on actual data because
       // `medals.Name` and `athletes.Name` return (First Last) and (Last First), resp.
 
@@ -1267,9 +1251,8 @@ trait JoinOptimizerSpecs[M[+ _]]
                        Const(CString("Countryname"))(line))(line))(line))(line)
 
       result mustEqual expected
-    }
 
-    "produce a valid dag for a ternary object-literal cartesian" in {
+    "produce a valid dag for a ternary object-literal cartesian" in
       /*
        * clicks := //clicks
        * 
@@ -1357,9 +1340,6 @@ trait JoinOptimizerSpecs[M[+ _]]
                   makeAddSortKey(clicksPid, clicksP))(line))(line)
 
       optimizeJoins(input, ctx, new IdGen) mustEqual expected
-    }
-  }
-}
 
 object JoinOptimizerSpecs
     extends JoinOptimizerSpecs[YId] with yggdrasil.test.YIdInstances

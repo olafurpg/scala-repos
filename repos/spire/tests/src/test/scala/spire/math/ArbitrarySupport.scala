@@ -8,9 +8,9 @@ import org.scalacheck.Arbitrary._
 import org.scalacheck._
 import Arbitrary.arbitrary
 
-object ArbitrarySupport {
+object ArbitrarySupport
 
-  object Ordinal {
+  object Ordinal
     trait _0
     trait _1
     trait _2
@@ -25,11 +25,10 @@ object ArbitrarySupport {
     trait _20
     trait _50
     trait _100
-  }
 
   abstract class Size[A](val value: Int)
 
-  object Size {
+  object Size
     import Ordinal._
 
     implicit object Size0 extends Size[_0](0)
@@ -48,7 +47,6 @@ object ArbitrarySupport {
     implicit object Size100 extends Size[_100](100)
 
     def apply[A](implicit sz: Size[A]): Int = sz.value
-  }
 
   case class Sized[A, L, U](num: A)
 
@@ -82,4 +80,3 @@ object ArbitrarySupport {
       A : Signed : AdditiveGroup : Arbitrary]: Arbitrary[NonNegative[A]] =
     Arbitrary(
         arbitrary[A].map(_.abs).filter(_.signum > -1).map(NonNegative(_)))
-}

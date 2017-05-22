@@ -11,8 +11,8 @@ import com.twitter.io.{Buf, Reader}
   * disconnects.  If you start two or more of these clients simultaneously, you
   * will notice that this is also a PubSub example.
   */
-object HttpStreamingClient {
-  def main(args: Array[String]): Unit = {
+object HttpStreamingClient
+  def main(args: Array[String]): Unit =
     val username = args(0)
     val password = args(1)
     val host = args(2)
@@ -28,14 +28,14 @@ object HttpStreamingClient {
     request.headerMap.add("Host", host)
     println(request)
 
-    Await.result(client(request).flatMap {
+    Await.result(client(request).flatMap
       case response if response.status != Status.Ok =>
         println(response)
         client.close()
 
       case response =>
         var messageCount = 0 // Wait for 1000 messages then shut down.
-        fromReader(response.reader).foreach {
+        fromReader(response.reader).foreach
           case Buf.Utf8(buf) if messageCount < 1000 =>
             messageCount += 1
             println(buf)
@@ -43,13 +43,9 @@ object HttpStreamingClient {
 
           case _ =>
             client.close()
-        }
-    })
-  }
+    )
 
   def fromReader(reader: Reader): AsyncStream[Buf] =
-    AsyncStream.fromFuture(reader.read(Int.MaxValue)).flatMap {
+    AsyncStream.fromFuture(reader.read(Int.MaxValue)).flatMap
       case None => AsyncStream.empty
       case Some(a) => a +:: fromReader(reader)
-    }
-}

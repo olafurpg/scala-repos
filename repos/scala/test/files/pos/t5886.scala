@@ -1,4 +1,4 @@
-object A {
+object A
   def f0[T](x: T): T = x
   def f1[T](x: => T): T = x
   def f2[T](x: () => T): T = x()
@@ -15,4 +15,3 @@ object A {
   //   val x1 = f1(this.getClass)
   //                    ^
   // one error found
-}

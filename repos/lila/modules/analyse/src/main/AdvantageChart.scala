@@ -2,12 +2,12 @@ package lila.analyse
 
 import play.api.libs.json.Json
 
-object AdvantageChart {
+object AdvantageChart
 
   val max = Score.CEILING
   private val scale = intBox(-max to max) _
 
-  def apply(advices: InfoAdvices, moves: List[String], startPly: Int): String = {
+  def apply(advices: InfoAdvices, moves: List[String], startPly: Int): String =
 
     val pgnMoves = moves.toIndexedSeq
 
@@ -20,23 +20,17 @@ object AdvantageChart {
 
     def point(name: String, y: Int) = Json.obj("name" -> name, "y" -> scale(y))
 
-    Json stringify {
-      Json toJson {
-        advices map {
+    Json stringify
+      Json toJson
+        advices map
           case (info, advice) =>
-            (info.score, info.mate) match {
+            (info.score, info.mate) match
               case (Some(score), _) =>
                 point(move(info, advice), score.centipawns)
               case (_, Some(mate)) =>
-                point(move(info, advice), {
+                point(move(info, advice),
                   val mateDelta = math.abs(mate)
                   val whiteWins = mate > 0
                   whiteWins.fold(max - mateDelta, mateDelta - max)
-                })
+                )
               case _ => point(move(info, none), 0)
-            }
-        }
-      }
-    }
-  }
-}

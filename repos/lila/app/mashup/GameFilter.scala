@@ -12,7 +12,7 @@ import scalaz.NonEmptyList
 
 sealed abstract class GameFilter(val name: String)
 
-object GameFilter {
+object GameFilter
   case object All extends GameFilter("all")
   case object Me extends GameFilter("me")
   case object Rated extends GameFilter("rated")
@@ -23,14 +23,12 @@ object GameFilter {
   case object Bookmark extends GameFilter("bookmark")
   case object Imported extends GameFilter("import")
   case object Search extends GameFilter("search")
-}
 
-case class GameFilterMenu(all: NonEmptyList[GameFilter], current: GameFilter) {
+case class GameFilterMenu(all: NonEmptyList[GameFilter], current: GameFilter)
 
   def list = all.list
-}
 
-object GameFilterMenu {
+object GameFilterMenu
 
   import GameFilter._
   import lila.db.Implicits.docId
@@ -41,7 +39,7 @@ object GameFilterMenu {
 
   def apply(info: UserInfo,
             me: Option[User],
-            currentNameOption: Option[String]): GameFilterMenu = {
+            currentNameOption: Option[String]): GameFilterMenu =
 
     val user = info.user
 
@@ -69,14 +67,13 @@ object GameFilterMenu {
     val current = currentOf(filters, currentName)
 
     new GameFilterMenu(filters, current)
-  }
 
   def currentOf(filters: NonEmptyList[GameFilter], name: String) =
     (filters.list find (_.name == name)) | filters.head
 
   private def cachedNbOf(
       user: User, info: Option[UserInfo], filter: GameFilter): Option[Int] =
-    filter match {
+    filter match
       case Bookmark => info.map(_.nbBookmark)
       case Imported => info.map(_.nbImported)
       case All => user.count.game.some
@@ -86,7 +83,6 @@ object GameFilterMenu {
       case Draw => user.count.draw.some
       case Search => user.count.game.some
       case _ => None
-    }
 
   private def pag = Env.game.paginator
 
@@ -95,10 +91,10 @@ object GameFilterMenu {
                   info: Option[UserInfo],
                   filter: GameFilter,
                   me: Option[User],
-                  page: Int)(implicit req: Request[_]): Fu[Paginator[Game]] = {
+                  page: Int)(implicit req: Request[_]): Fu[Paginator[Game]] =
     val nb = cachedNbOf(user, info, filter)
     def std(query: JsObject) = pag.recentlyCreated(query, nb)(page)
-    filter match {
+    filter match
       case Bookmark => Env.bookmark.api.gamePaginatorByUser(user, page)
       case Imported =>
         pag.apply(selector = Query imported user.id,
@@ -113,17 +109,12 @@ object GameFilterMenu {
       case Playing =>
         pag(selector = Query nowPlaying user.id,
             sort = Seq(),
-            nb = nb)(page) addEffect { p =>
+            nb = nb)(page) addEffect  p =>
           p.currentPageResults.filter(_.finishedOrAborted) foreach GameRepo.unsetPlayingUids
-        }
       case Search => userGameSearch(user, page)
-    }
-  }
 
   def searchForm(
       userGameSearch: lila.gameSearch.UserGameSearch, filter: GameFilter)(
-      implicit req: Request[_]): play.api.data.Form[_] = filter match {
+      implicit req: Request[_]): play.api.data.Form[_] = filter match
     case Search => userGameSearch.requestForm
     case _ => userGameSearch.defaultForm
-  }
-}

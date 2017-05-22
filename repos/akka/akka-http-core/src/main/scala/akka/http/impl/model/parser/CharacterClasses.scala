@@ -6,7 +6,7 @@ package akka.http.impl.model.parser
 import akka.parboiled2.CharPredicate
 
 // efficient encoding of *7-bit* ASCII characters
-private[http] object CharacterClasses {
+private[http] object CharacterClasses
 
   // http://tools.ietf.org/html/rfc7230#section-1.2 referencing
   // http://tools.ietf.org/html/rfc5234#appendix-B.1
@@ -94,4 +94,3 @@ private[http] object CharacterClasses {
   require(`ctext-base`.isMaskBased) // would make the CharPredicate fall back to the much slower
   require(`quotable-base`.isMaskBased) // ArrayBasedPredicate or GeneralCharPredicate implementations
   require(CTL.isMaskBased)
-}

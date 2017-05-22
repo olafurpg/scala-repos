@@ -1,5 +1,4 @@
 package test
 
-object TestScriptTest {
+object TestScriptTest
   val x: Int = ""
-}

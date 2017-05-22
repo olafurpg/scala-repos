@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.PropSpecG
   * @author Roman.Shein
   * @since 20.01.2015.
   */
-trait PropSpecSingleTestTest extends PropSpecGenerator {
+trait PropSpecSingleTestTest extends PropSpecGenerator
   val propSpecTestPath = List(
       "[root]", "PropSpecTest", "Single tests should run")
 
-  def testPropSpec() {
+  def testPropSpec()
     addPropSpec()
 
     runTestByLocation(
@@ -22,5 +22,3 @@ trait PropSpecSingleTestTest extends PropSpecGenerator {
           checkResultTreeHasExactNamedPath(root, propSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "other tests should not run"),
         debug = true)
-  }
-}

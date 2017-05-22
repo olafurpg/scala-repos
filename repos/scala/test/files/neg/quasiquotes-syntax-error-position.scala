@@ -1,5 +1,5 @@
 import scala.reflect.runtime.universe._
-object test extends App {
+object test extends App
   val a = TermName("a")
   val t = TypeName("t")
   q"def $a f"
@@ -18,4 +18,3 @@ object test extends App {
   val x = q"x"
   q"val $x: $x <: $x"
   q"def f ( $x  ) . $x"
-}

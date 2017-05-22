@@ -2,64 +2,47 @@ package org.scalatra
 
 import org.scalatra.test.scalatest.ScalatraFunSuite
 
-class GetResponseStatusSupportTestServlet extends ScalatraServlet {
-  before() {
+class GetResponseStatusSupportTestServlet extends ScalatraServlet
+  before()
     session // Establish a session before we commit the response
-  }
 
-  after() {
+  after()
     session("status") = status.toString
-  }
 
-  get("/status/:status") {
+  get("/status/:status")
     response.setStatus(params("status").toInt)
     status.toString
-  }
 
-  get("/redirect") {
+  get("/redirect")
     response.sendRedirect("/")
-  }
 
-  get("/session-status") {
+  get("/session-status")
     session.getOrElse("status", "none")
-  }
 
-  get("/send-error/:status") {
+  get("/send-error/:status")
     response.sendError(params("status").toInt)
-  }
 
-  get("/send-error/:status/:msg") {
+  get("/send-error/:status/:msg")
     response.sendError(params("status").toInt, params("msg"))
-  }
-}
 
-class GetResponseStatusSupportTest extends ScalatraFunSuite {
+class GetResponseStatusSupportTest extends ScalatraFunSuite
   addServlet(classOf[GetResponseStatusSupportTestServlet], "/*")
 
-  test("remember status after setStatus") {
-    get("/status/404") {
+  test("remember status after setStatus")
+    get("/status/404")
       body should equal("404")
-    }
-  }
 
-  test("remembers status after sendRedirect") {
-    session {
+  test("remembers status after sendRedirect")
+    session
       get("/redirect") {}
       get("/session-status") { body should equal("302") }
-    }
-  }
 
-  test("remembers status after sendError without a message") {
-    session {
+  test("remembers status after sendError without a message")
+    session
       get("/send-error/500") {}
       get("/session-status") { body should equal("500") }
-    }
-  }
 
-  test("remembers status after sendError with a message") {
-    session {
+  test("remembers status after sendError with a message")
+    session
       get("/send-error/504/Gateway%20Timeout") {}
       get("/session-status") { body should equal("504") }
-    }
-  }
-}

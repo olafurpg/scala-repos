@@ -30,10 +30,9 @@ import org.apache.kafka.common.utils.Utils._
     "This object has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
-object SyncProducer {
+object SyncProducer
   val RequestKey: Short = 0
   val randomGenerator = new Random
-}
 
 /*
  * Send a message set.
@@ -43,7 +42,7 @@ object SyncProducer {
     "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
-class SyncProducer(val config: SyncProducerConfig) extends Logging {
+class SyncProducer(val config: SyncProducerConfig) extends Logging
 
   private val lock = new Object()
   @volatile private var shutdown: Boolean = false
@@ -60,54 +59,48 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
       "Instantiating Scala Sync Producer with properties: %s".format(
           config.props))
 
-  private def verifyRequest(request: RequestOrResponse) = {
+  private def verifyRequest(request: RequestOrResponse) =
 
     /**
       * This seems a little convoluted, but the idea is to turn on verification simply changing log4j settings
       * Also, when verification is turned on, care should be taken to see that the logs don't fill up with unnecessary
       * data. So, leaving the rest of the logging at TRACE, while errors should be logged at ERROR level
       */
-    if (logger.isDebugEnabled) {
+    if (logger.isDebugEnabled)
       val buffer = new RequestOrResponseSend("", request).buffer
       trace("verifying sendbuffer of size " + buffer.limit)
       val requestTypeId = buffer.getShort()
-      if (requestTypeId == ApiKeys.PRODUCE.id) {
+      if (requestTypeId == ApiKeys.PRODUCE.id)
         val request = ProducerRequest.readFrom(buffer)
         trace(request.toString)
-      }
-    }
-  }
 
   /**
     * Common functionality for the public send methods
     */
   private def doSend(request: RequestOrResponse,
-                     readResponse: Boolean = true): NetworkReceive = {
-    lock synchronized {
+                     readResponse: Boolean = true): NetworkReceive =
+    lock synchronized
       verifyRequest(request)
       getOrMakeConnection()
 
       var response: NetworkReceive = null
-      try {
+      try
         blockingChannel.send(request)
         if (readResponse) response = blockingChannel.receive()
         else trace("Skipping reading response")
-      } catch {
+      catch
         case e: java.io.IOException =>
           // no way to tell if write succeeded. Disconnect and re-throw exception to let client handle retry
           disconnect()
           throw e
         case e: Throwable => throw e
-      }
       response
-    }
-  }
 
   /**
     * Send a message. If the producerRequest had required.request.acks=0, then the
     * returned response object is null
     */
-  def send(producerRequest: ProducerRequest): ProducerResponse = {
+  def send(producerRequest: ProducerRequest): ProducerResponse =
     val requestSize = producerRequest.sizeInBytes
     producerRequestStats
       .getProducerRequestStats(config.host, config.port)
@@ -122,14 +115,12 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
       .requestTimer
     val aggregateTimer =
       producerRequestStats.getProducerRequestAllBrokersStats.requestTimer
-    aggregateTimer.time {
-      specificTimer.time {
+    aggregateTimer.time
+      specificTimer.time
         response = doSend(producerRequest,
                           if (producerRequest.requiredAcks == 0) false
                           else true)
-      }
-    }
-    if (producerRequest.requiredAcks != 0) {
+    if (producerRequest.requiredAcks != 0)
       val producerResponse = ProducerResponse.readFrom(response.payload)
       producerRequestStats
         .getProducerRequestStats(config.host, config.port)
@@ -138,56 +129,43 @@ class SyncProducer(val config: SyncProducerConfig) extends Logging {
       producerRequestStats.getProducerRequestAllBrokersStats.throttleTimeStats
         .update(producerResponse.throttleTime, TimeUnit.MILLISECONDS)
       producerResponse
-    } else null
-  }
+    else null
 
-  def send(request: TopicMetadataRequest): TopicMetadataResponse = {
+  def send(request: TopicMetadataRequest): TopicMetadataResponse =
     val response = doSend(request)
     TopicMetadataResponse.readFrom(response.payload)
-  }
 
-  def close() = {
-    lock synchronized {
+  def close() =
+    lock synchronized
       disconnect()
       shutdown = true
-    }
-  }
 
   /**
     * Disconnect from current channel, closing connection.
     * Side effect: channel field is set to null on successful disconnect
     */
-  private def disconnect() {
-    try {
+  private def disconnect()
+    try
       info("Disconnecting from " + formatAddress(config.host, config.port))
       blockingChannel.disconnect()
-    } catch {
+    catch
       case e: Exception => error("Error on disconnect: ", e)
-    }
-  }
 
-  private def connect(): BlockingChannel = {
-    if (!blockingChannel.isConnected && !shutdown) {
-      try {
+  private def connect(): BlockingChannel =
+    if (!blockingChannel.isConnected && !shutdown)
+      try
         blockingChannel.connect()
         info("Connected to " + formatAddress(config.host, config.port) +
             " for producing")
-      } catch {
-        case e: Exception => {
+      catch
+        case e: Exception =>
             disconnect()
             error("Producer connection to " +
                   formatAddress(config.host, config.port) + " unsuccessful",
                   e)
             throw e
-          }
-      }
-    }
     blockingChannel
-  }
 
-  private def getOrMakeConnection() {
-    if (!blockingChannel.isConnected) {
+  private def getOrMakeConnection()
+    if (!blockingChannel.isConnected)
       connect()
-    }
-  }
-}

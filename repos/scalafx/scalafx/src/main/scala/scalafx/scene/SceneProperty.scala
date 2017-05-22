@@ -38,14 +38,13 @@ import scalafx.delegate.SFXDelegate
 @deprecated(
     "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
     "8.0.60-R10")
-object SceneProperty {
+object SceneProperty
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   implicit def sfxSceneProperty2jfx(
       p: SceneProperty): jfxbp.ReadOnlyObjectProperty[jfxs.Scene] =
     if (p != null) p.delegate else null
-}
 
 // This particular construct enables the reading of properties of the scene that will be set into the property later on.
 @deprecated(
@@ -54,7 +53,7 @@ object SceneProperty {
 class SceneProperty(
     override val delegate: jfxbp.ReadOnlyObjectProperty[jfxs.Scene])
     extends ReadOnlyObjectProperty[jfxs.Scene](delegate)
-    with SFXDelegate[jfxbp.ReadOnlyObjectProperty[jfxs.Scene]] {
+    with SFXDelegate[jfxbp.ReadOnlyObjectProperty[jfxs.Scene]]
   @deprecated(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
@@ -366,4 +365,3 @@ class SceneProperty(
       "Use of SceneProperty can result in infinite recursion and StackOverflow errors. See discussion of [Issue #69](https://github.com/scalafx/scalafx/issues/69)",
       "8.0.60-R10")
   def y = jfxbb.Bindings.selectDouble(delegate, "y")
-}

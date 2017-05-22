@@ -29,7 +29,7 @@ import org.apache.spark.unsafe.types.UTF8String
 @ExpressionDescription(
     usage = "_FUNC_() - Returns the name of the current file being read if available",
     extended = "> SELECT _FUNC_();\n ''")
-case class InputFileName() extends LeafExpression with Nondeterministic {
+case class InputFileName() extends LeafExpression with Nondeterministic
 
   override def nullable: Boolean = true
 
@@ -39,13 +39,10 @@ case class InputFileName() extends LeafExpression with Nondeterministic {
 
   override protected def initInternal(): Unit = {}
 
-  override protected def evalInternal(input: InternalRow): UTF8String = {
+  override protected def evalInternal(input: InternalRow): UTF8String =
     SqlNewHadoopRDDState.getInputFileName()
-  }
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     ev.isNull = "false"
     s"final ${ctx.javaType(dataType)} ${ev.value} = " +
     "org.apache.spark.rdd.SqlNewHadoopRDDState.getInputFileName();"
-  }
-}

@@ -21,19 +21,17 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-object UseRoleIgnoredMultiJvmSpec extends MultiNodeConfig {
+object UseRoleIgnoredMultiJvmSpec extends MultiNodeConfig
 
-  class SomeActor(routeeType: RouteeType) extends Actor with ActorLogging {
+  class SomeActor(routeeType: RouteeType) extends Actor with ActorLogging
     log.info("Starting on {}", self.path.address)
 
     def this() = this(PoolRoutee)
 
-    def receive = {
+    def receive =
       case msg ⇒
         log.info("msg = {}", msg)
         sender() ! Reply(routeeType, self)
-    }
-  }
 
   final case class Reply(routeeType: RouteeType, ref: ActorRef)
 
@@ -52,7 +50,6 @@ object UseRoleIgnoredMultiJvmSpec extends MultiNodeConfig {
       ConfigFactory.parseString("""akka.cluster.roles =["a", "c"]"""))
   nodeConfig(second, third)(
       ConfigFactory.parseString("""akka.cluster.roles =["b", "c"]"""))
-}
 
 class UseRoleIgnoredMultiJvmNode1 extends UseRoleIgnoredSpec
 class UseRoleIgnoredMultiJvmNode2 extends UseRoleIgnoredSpec
@@ -60,28 +57,25 @@ class UseRoleIgnoredMultiJvmNode3 extends UseRoleIgnoredSpec
 
 abstract class UseRoleIgnoredSpec
     extends MultiNodeSpec(UseRoleIgnoredMultiJvmSpec) with MultiNodeClusterSpec
-    with ImplicitSender with DefaultTimeout {
+    with ImplicitSender with DefaultTimeout
   import akka.cluster.routing.UseRoleIgnoredMultiJvmSpec._
 
   def receiveReplies(
-      routeeType: RouteeType, expectedReplies: Int): Map[Address, Int] = {
+      routeeType: RouteeType, expectedReplies: Int): Map[Address, Int] =
     val zero = Map.empty[Address, Int] ++ roles.map(address(_) -> 0)
-    (receiveWhile(5 seconds, messages = expectedReplies) {
+    (receiveWhile(5 seconds, messages = expectedReplies)
       case Reply(`routeeType`, ref) ⇒ fullAddress(ref)
-    }).foldLeft(zero) {
+    ).foldLeft(zero)
       case (replyMap, address) ⇒
         replyMap + (address -> (replyMap(address) + 1))
-    }
-  }
 
   /**
     * Fills in self address for local ActorRef
     */
   private def fullAddress(actorRef: ActorRef): Address =
-    actorRef.path.address match {
+    actorRef.path.address match
       case Address(_, _, None, None) ⇒ cluster.selfAddress
       case a ⇒ a
-    }
 
   def currentRoutees(router: ActorRef) =
     Await
@@ -89,8 +83,8 @@ abstract class UseRoleIgnoredSpec
       .asInstanceOf[Routees]
       .routees
 
-  "A cluster" must {
-    "start cluster" taggedAs LongRunningTest in {
+  "A cluster" must
+    "start cluster" taggedAs LongRunningTest in
       awaitClusterUp(first, second, third)
       runOn(first) { info("first, roles: " + cluster.selfRoles) }
       runOn(second) { info("second, roles: " + cluster.selfRoles) }
@@ -101,11 +95,10 @@ abstract class UseRoleIgnoredSpec
       system.actorOf(Props(classOf[SomeActor], GroupRoutee), "bar")
 
       enterBarrier("after-1")
-    }
 
-    "pool local: off, roles: off, 6 => 0,2,2" taggedAs LongRunningTest in {
+    "pool local: off, roles: off, 6 => 0,2,2" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("b")
 
         val router = system.actorOf(
@@ -120,9 +113,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(4))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -130,14 +122,12 @@ abstract class UseRoleIgnoredSpec
         replies(second) should be > 0
         replies(third) should be > 0
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-2")
-    }
 
-    "group local: off, roles: off, 6 => 0,2,2" taggedAs LongRunningTest in {
+    "group local: off, roles: off, 6 => 0,2,2" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("b")
 
         val router = system.actorOf(
@@ -153,9 +143,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(4))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(GroupRoutee, iterationCount)
 
@@ -163,14 +152,12 @@ abstract class UseRoleIgnoredSpec
         replies(second) should be > 0
         replies(third) should be > 0
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-2b")
-    }
 
-    "pool local: on, role: b, 6 => 0,2,2" taggedAs LongRunningTest in {
+    "pool local: on, role: b, 6 => 0,2,2" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("b")
 
         val router = system.actorOf(
@@ -185,9 +172,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(4))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -195,14 +181,12 @@ abstract class UseRoleIgnoredSpec
         replies(second) should be > 0
         replies(third) should be > 0
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-3")
-    }
 
-    "group local: on, role: b, 6 => 0,2,2" taggedAs LongRunningTest in {
+    "group local: on, role: b, 6 => 0,2,2" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("b")
 
         val router = system.actorOf(
@@ -218,9 +202,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(4))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(GroupRoutee, iterationCount)
 
@@ -228,14 +211,12 @@ abstract class UseRoleIgnoredSpec
         replies(second) should be > 0
         replies(third) should be > 0
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-3b")
-    }
 
-    "pool local: on, role: a, 6 => 2,0,0" taggedAs LongRunningTest in {
+    "pool local: on, role: a, 6 => 2,0,0" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("a")
 
         val router = system.actorOf(
@@ -250,9 +231,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(2))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -260,14 +240,12 @@ abstract class UseRoleIgnoredSpec
         replies(second) should ===(0)
         replies(third) should ===(0)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-4")
-    }
 
-    "group local: on, role: a, 6 => 2,0,0" taggedAs LongRunningTest in {
+    "group local: on, role: a, 6 => 2,0,0" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("a")
 
         val router = system.actorOf(
@@ -283,9 +261,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(2))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(GroupRoutee, iterationCount)
 
@@ -293,14 +270,12 @@ abstract class UseRoleIgnoredSpec
         replies(second) should ===(0)
         replies(third) should ===(0)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-4b")
-    }
 
-    "pool local: on, role: c, 6 => 2,2,2" taggedAs LongRunningTest in {
+    "pool local: on, role: c, 6 => 2,2,2" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("c")
 
         val router = system.actorOf(
@@ -315,9 +290,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(6))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -325,14 +299,12 @@ abstract class UseRoleIgnoredSpec
         replies(second) should be > 0
         replies(third) should be > 0
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-5")
-    }
 
-    "group local: on, role: c, 6 => 2,2,2" taggedAs LongRunningTest in {
+    "group local: on, role: c, 6 => 2,2,2" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         val role = Some("c")
 
         val router = system.actorOf(
@@ -348,9 +320,8 @@ abstract class UseRoleIgnoredSpec
         awaitAssert(currentRoutees(router).size should ===(6))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router ! s"hit-$i"
-        }
 
         val replies = receiveReplies(GroupRoutee, iterationCount)
 
@@ -358,9 +329,5 @@ abstract class UseRoleIgnoredSpec
         replies(second) should be > 0
         replies(third) should be > 0
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-5b")
-    }
-  }
-}

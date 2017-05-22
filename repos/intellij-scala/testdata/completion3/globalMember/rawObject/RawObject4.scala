@@ -1,5 +1,4 @@
 package rawObject
 
-object RawObject4 {
+object RawObject4
   val patternValue, patValue = 1
-}

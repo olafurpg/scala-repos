@@ -5,11 +5,10 @@ import slick.ast.Util.nodeToNodeOps
 import slick.model.ForeignKeyAction
 
 /** A Tag marks a specific row represented by an AbstractTable instance. */
-sealed trait Tag {
+sealed trait Tag
 
   /** Return a new instance of the AbstractTable carrying this Tag, with a new path */
   def taggedAs(path: Node): AbstractTable[_]
-}
 
 /** A Tag for table instances that represent a Node */
 abstract class RefTag(val path: Node) extends Tag
@@ -21,7 +20,7 @@ trait BaseTag extends Tag
   * @tparam T Row type for this table. Make sure it matches the type of your `*` projection. */
 abstract class AbstractTable[T](
     val tableTag: Tag, val schemaName: Option[String], val tableName: String)
-    extends Rep[T] {
+    extends Rep[T]
 
   /** The client-side type of the table as defined by its * projection */
   type TableElementType
@@ -43,19 +42,18 @@ abstract class AbstractTable[T](
     * parameter. */
   def * : ProvenShape[T]
 
-  override def toNode = tableTag match {
+  override def toNode = tableTag match
     case _: BaseTag =>
       val sym = new AnonSymbol
       TableExpansion(sym, tableNode, tableTag.taggedAs(Ref(sym)).*.toNode)
     case t: RefTag => t.path
-  }
 
   def create_* : Iterable[FieldSymbol] = collectFieldSymbols(*.toNode)
 
   protected[this] def collectFieldSymbols(n: Node): Iterable[FieldSymbol] =
-    n.collect {
+    n.collect
       case Select(in, f: FieldSymbol) if in == tableNode => f
-    }.toSeq.distinct
+    .toSeq.distinct
 
   /** Define a foreign key relationship.
     *
@@ -76,7 +74,7 @@ abstract class AbstractTable[T](
       onDelete: ForeignKeyAction = ForeignKeyAction.NoAction)(
       implicit unpack: Shape[_ <: FlatShapeLevel, TT, U, _],
       unpackp: Shape[_ <: FlatShapeLevel, P, PU, _])
-    : ForeignKeyQuery[TT, U] = {
+    : ForeignKeyQuery[TT, U] =
     val targetTable: TT = targetTableQuery.shaped.value
     val q = targetTableQuery.asInstanceOf[Query[TT, U, Seq]]
     val generator = new AnonSymbol
@@ -99,7 +97,6 @@ abstract class AbstractTable[T](
                                q,
                                generator,
                                aliased.value)
-  }
 
   /** Define the primary key for this table.
     * It is usually simpler to use the `O.PrimaryKey` option on the primary
@@ -112,11 +109,11 @@ abstract class AbstractTable[T](
         name, ForeignKey.linearizeFieldRefs(shape.toNode(sourceColumns)))
 
   def tableConstraints: Iterator[Constraint] =
-    for {
+    for
       m <- getClass().getMethods.iterator if m.getParameterTypes.length == 0 &&
           classOf[Constraint].isAssignableFrom(m.getReturnType)
       q = m.invoke(this).asInstanceOf[Constraint]
-    } yield q
+    yield q
 
   final def foreignKeys: Iterable[ForeignKey] =
     tableConstraints.collect { case q: ForeignKeyQuery[_, _] => q.fks }.flatten.toIndexedSeq
@@ -133,8 +130,7 @@ abstract class AbstractTable[T](
         name, this, ForeignKey.linearizeFieldRefs(shape.toNode(on)), unique)
 
   def indexes: Iterable[Index] =
-    (for {
+    (for
       m <- getClass().getMethods.view if m.getReturnType == classOf[Index] &&
           m.getParameterTypes.length == 0
-    } yield m.invoke(this).asInstanceOf[Index]).sortBy(_.name)
-}
+    yield m.invoke(this).asInstanceOf[Index]).sortBy(_.name)

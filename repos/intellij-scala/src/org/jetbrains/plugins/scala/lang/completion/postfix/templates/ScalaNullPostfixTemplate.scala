@@ -16,16 +16,13 @@ abstract class ScalaNullPostfixTemplate(val name: String, val example: String)
         name,
         example,
         new ScalaPostfixTemplatePsiInfo,
-        new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost))
 
   override protected def getWrappedExpression(
-      expression: PsiElement): PsiElement = {
-    val (head, tail) = expression match {
+      expression: PsiElement): PsiElement =
+    val (head, tail) = expression match
       case prefix: ScInfixExpr => ("(" + getHead, ")" + getTail)
       case _ => (getHead, getTail)
-    }
     myPsiInfo.createExpression(expression, head, tail)
-  }
 
   override def getSurrounder = new ScalaWithIfConditionSurrounder
-}

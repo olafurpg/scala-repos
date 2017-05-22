@@ -41,12 +41,11 @@ import scalafx.scene.layout.{BorderPane, HBox}
 import scalafx.stage.{Modality, Stage}
 
 /** This demo shows two bar charts, when you click on a chart its data is shown as a table. */
-object BarChartWithTableViewDemo extends JFXApp {
+object BarChartWithTableViewDemo extends JFXApp
 
-  class Position(name_ : String, value_ : Int) {
+  class Position(name_ : String, value_ : Int)
     val name = new StringProperty(this, "name", name_)
     val value = new ObjectProperty[Int](this, "value", value_)
-  }
 
   val data1 = ObservableBuffer[Position](
       new Position("A", 26),
@@ -60,63 +59,51 @@ object BarChartWithTableViewDemo extends JFXApp {
       new Position("R", 78)
   )
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "BarChart with TableView"
-    scene = new Scene(600, 350) {
-      root = new BorderPane {
-        top = new Label {
+    scene = new Scene(600, 350)
+      root = new BorderPane
+        top = new Label
           text = "Click on chart to see a table view of the data"
           alignmentInParent = Pos.Center
           margin = Insets(25)
-        }
-        center = new HBox {
+        center = new HBox
           children = Seq(
               createBarChart("Speculations", data1),
               createBarChart("Predictions", data2)
           )
-        }
-      }
-    }
-  }
 
   def createBarChart(
       chartTitle: String,
       chartData: ObservableBuffer[Position]): BarChart[String, Number] =
-    new BarChart(CategoryAxis(), NumberAxis()) {
+    new BarChart(CategoryAxis(), NumberAxis())
       title = chartTitle
       data = XYChart.Series(chartData.map(
               d => XYChart.Data[String, Number](d.name(), d.value())))
       legendVisible = false
       onMouseClicked = handle { showAsTable(title(), chartData) }
-    }
 
-  private def showAsTable(name: String, data: ObservableBuffer[Position]) {
+  private def showAsTable(name: String, data: ObservableBuffer[Position])
 
-    val tableView = new TableView[Position](data) {
+    val tableView = new TableView[Position](data)
       columns ++= List(
-          new TableColumn[Position, String] {
+          new TableColumn[Position, String]
             text = "Position"
             cellValueFactory = { _.value.name }
             prefWidth = 180
-          },
-          new TableColumn[Position, Int] {
+          ,
+          new TableColumn[Position, Int]
             text = "Value"
             cellValueFactory = { _.value.value }
             prefWidth = 180
-          }
       )
-    }
 
     // Show as modal dialog
-    new Stage {
+    new Stage
       title = name
       initModality(Modality.WindowModal)
       initOwner(BarChartWithTableViewDemo.stage)
-      scene = new Scene {
-        root = new BorderPane {
+      scene = new Scene
+        root = new BorderPane
           center = tableView
-        }
-      }
-    }.showAndWait()
-  }
-}
+    .showAndWait()

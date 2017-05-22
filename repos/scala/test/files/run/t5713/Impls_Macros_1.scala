@@ -3,15 +3,13 @@ package m
 import language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
-object Level extends Enumeration {
+object Level extends Enumeration
   val Error = Value(5)
-}
 
-object Logger {
+object Logger
   def error(message: String): Unit = macro LoggerMacros.error
-}
 
-private object LoggerMacros {
+private object LoggerMacros
 
   type LoggerContext = Context { type PrefixType = Logger.type }
 
@@ -23,7 +21,5 @@ private object LoggerMacros {
 // was:    if (level.splice.id < 4) // TODO Remove hack!
     if (c.eval(level).id < 4) // TODO Remove hack!
       c.universe.reify(())
-    else {
+    else
       c.universe.reify(println(message.splice))
-    }
-}

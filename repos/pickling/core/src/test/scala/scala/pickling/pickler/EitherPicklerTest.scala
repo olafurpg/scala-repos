@@ -5,9 +5,9 @@ import org.scalatest.FunSuite
 /**
   * Tests Either picklers
   */
-class EitherPicklerTest extends FunSuite {
+class EitherPicklerTest extends FunSuite
   import scala.pickling._, Defaults._, static._, json._
-  test("pickle Left") {
+  test("pickle Left")
     val l: Left[Int, String] = Left(1)
     val up = l.pickle.unpickle[Left[Int, String]]
     assert(l == up)
@@ -17,9 +17,8 @@ class EitherPicklerTest extends FunSuite {
     assert(l2 == up2)
     val up22 = l2.pickle.unpickle[Either[Int, String]]
     assert(l2 == up22)
-  }
 
-  test("pickle Right") {
+  test("pickle Right")
     val r: Right[Int, String] = Right("hi")
     val up = r.pickle.unpickle[Right[Int, String]]
     assert(r == up)
@@ -29,5 +28,3 @@ class EitherPicklerTest extends FunSuite {
     assert(r2 == up2)
     val up22 = r2.pickle.unpickle[Either[Int, String]]
     assert(r2 == up22)
-  }
-}

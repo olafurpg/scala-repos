@@ -25,25 +25,22 @@ import kafka.utils.TestUtils
   * of testing on most machines because you can easily run into port conflicts. If you're using this class, you're almost
   * certainly doing something wrong unless you can prove that your test **cannot function** properly without it.
   */
-object FixedPortTestUtils {
-  def choosePorts(count: Int): Seq[Int] = {
-    try {
+object FixedPortTestUtils
+  def choosePorts(count: Int): Seq[Int] =
+    try
       val sockets = (0 until count).map(i => new ServerSocket(0))
       val ports = sockets.map(_.getLocalPort())
       sockets.foreach(_.close())
       ports
-    } catch {
-      case e: IOException => {
+    catch
+      case e: IOException =>
           throw new RuntimeException(e)
-        }
-    }
-  }
 
   def createBrokerConfigs(
       numConfigs: Int,
       zkConnect: String,
       enableControlledShutdown: Boolean = true,
-      enableDeleteTopic: Boolean = false): Seq[Properties] = {
+      enableDeleteTopic: Boolean = false): Seq[Properties] =
     val ports = FixedPortTestUtils.choosePorts(numConfigs)
     (0 until numConfigs).map(
         node =>
@@ -52,5 +49,3 @@ object FixedPortTestUtils {
                                        enableControlledShutdown,
                                        enableDeleteTopic,
                                        ports(node)))
-  }
-}

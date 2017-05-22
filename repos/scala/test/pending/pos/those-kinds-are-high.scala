@@ -1,4 +1,4 @@
-class A {
+class A
   trait Container[+T]
   trait Template[+CC[X] <: Container[X]]
 
@@ -51,9 +51,8 @@ class A {
 
   // nope
   def fFail = List(new C1[String], new C2[String])
-}
 
-trait Other {
+trait Other
   trait GenBar[+A]
   trait Bar[+A] extends GenBar[A]
   trait Templ[+A, +CC[X] <: GenBar[X]]
@@ -62,15 +61,14 @@ trait Other {
   abstract class CC2[+A] extends Templ[A, CC2] with Bar[A]
 
   // Compiles
-  class A1 {
+  class A1
     abstract class BarFactory[CC[X] <: Bar[X]]
 
     def f(x: Boolean) =
       if (x) (null: BarFactory[CC1]) else (null: BarFactory[CC2])
-  }
 
   // Fails - only difference is CC covariant.
-  class A2 {
+  class A2
     abstract class BarFactory[+CC[X] <: Bar[X]]
 
     def f(x: Boolean) =
@@ -81,10 +79,9 @@ trait Other {
     //   def f(x: Boolean) = if (x) (null: BarFactory[CC1]) else (null: BarFactory[CC2])
     //       ^
     // one error found
-  }
 
   // Compiles - CC contravariant.
-  class A3 {
+  class A3
     abstract class BarFactory[-CC[X] <: Bar[X]] // with Templ[X, CC]]
 
     def f(x: Boolean) =
@@ -95,5 +92,3 @@ trait Other {
     //   def f(x: Boolean) = if (x) (null: BarFactory[CC1]) else (null: BarFactory[CC2])
     //       ^
     // one error found
-  }
-}

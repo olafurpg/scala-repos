@@ -24,7 +24,7 @@ import org.apache.kafka.common.utils.Utils
 
 import scala.collection.JavaConverters._
 
-object AclCommand {
+object AclCommand
 
   val Newline = scala.util.Properties.lineSeparator
   val ResourceTypeToValidOperations = Map[ResourceType, Set[Operation]](
@@ -33,7 +33,7 @@ object AclCommand {
       Cluster -> Set(Create, ClusterAction, All)
   )
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val opts = new AclCommandOptions(args)
 
@@ -42,40 +42,36 @@ object AclCommand {
 
     opts.checkArgs()
 
-    try {
+    try
       if (opts.options.has(opts.addOpt)) addAcl(opts)
       else if (opts.options.has(opts.removeOpt)) removeAcl(opts)
       else if (opts.options.has(opts.listOpt)) listAcl(opts)
-    } catch {
+    catch
       case e: Throwable =>
         println(s"Error while executing ACL command: ${e.getMessage}")
         println(Utils.stackTrace(e))
         System.exit(-1)
-    }
-  }
 
-  def withAuthorizer(opts: AclCommandOptions)(f: Authorizer => Unit) {
+  def withAuthorizer(opts: AclCommandOptions)(f: Authorizer => Unit)
     val authorizerProperties =
-      if (opts.options.has(opts.authorizerPropertiesOpt)) {
+      if (opts.options.has(opts.authorizerPropertiesOpt))
         val authorizerProperties =
           opts.options.valuesOf(opts.authorizerPropertiesOpt).asScala
         CommandLineUtils
           .parseKeyValueArgs(authorizerProperties, acceptMissingValue = false)
           .asScala
-      } else {
+      else
         Map.empty[String, Any]
-      }
 
     val authorizerClass = opts.options.valueOf(opts.authorizerOpt)
     val authZ = CoreUtils.createObject[Authorizer](authorizerClass)
-    try {
+    try
       authZ.configure(authorizerProperties.asJava)
       f(authZ)
-    } finally CoreUtils.swallow(authZ.close())
-  }
+    finally CoreUtils.swallow(authZ.close())
 
-  private def addAcl(opts: AclCommandOptions) {
-    withAuthorizer(opts) { authorizer =>
+  private def addAcl(opts: AclCommandOptions)
+    withAuthorizer(opts)  authorizer =>
       val resourceToAcl = getResourceToAcls(opts)
 
       if (resourceToAcl.values.exists(_.isEmpty))
@@ -83,41 +79,34 @@ object AclCommand {
             opts.parser,
             "You must specify one of: --allow-principal, --deny-principal when trying to add ACLs.")
 
-      for ((resource, acls) <- resourceToAcl) {
+      for ((resource, acls) <- resourceToAcl)
         val acls = resourceToAcl(resource)
         println(
             s"Adding ACLs for resource `${resource}`: $Newline ${acls.map("\t" + _).mkString(Newline)} $Newline")
         authorizer.addAcls(acls, resource)
-      }
 
       listAcl(opts)
-    }
-  }
 
-  private def removeAcl(opts: AclCommandOptions) {
-    withAuthorizer(opts) { authorizer =>
+  private def removeAcl(opts: AclCommandOptions)
+    withAuthorizer(opts)  authorizer =>
       val resourceToAcl = getResourceToAcls(opts)
 
-      for ((resource, acls) <- resourceToAcl) {
-        if (acls.isEmpty) {
+      for ((resource, acls) <- resourceToAcl)
+        if (acls.isEmpty)
           if (confirmAction(
                   s"Are you sure you want to delete all ACLs for resource `${resource}`? (y/n)"))
             authorizer.removeAcls(resource)
-        } else {
+        else
           if (confirmAction(
-                  s"Are you sure you want to remove ACLs: $Newline ${acls
+                  s"Are you sure you want to remove ACLs: $Newline $acls
                 .map("\t" + _)
-                .mkString(Newline)} $Newline from resource `${resource}`? (y/n)"))
+                .mkString(Newline) $Newline from resource `${resource}`? (y/n)"))
             authorizer.removeAcls(acls, resource)
-        }
-      }
 
       listAcl(opts)
-    }
-  }
 
-  private def listAcl(opts: AclCommandOptions) {
-    withAuthorizer(opts) { authorizer =>
+  private def listAcl(opts: AclCommandOptions)
+    withAuthorizer(opts)  authorizer =>
       val resources = getResource(opts, dieIfNoResourceFound = false)
 
       val resourceToAcls: Iterable[(Resource, Set[Acl])] =
@@ -127,35 +116,30 @@ object AclCommand {
 
       for ((resource, acls) <- resourceToAcls) println(
           s"Current ACLs for resource `${resource}`: $Newline ${acls.map("\t" + _).mkString(Newline)} $Newline")
-    }
-  }
 
   private def getResourceToAcls(
-      opts: AclCommandOptions): Map[Resource, Set[Acl]] = {
+      opts: AclCommandOptions): Map[Resource, Set[Acl]] =
     var resourceToAcls = Map.empty[Resource, Set[Acl]]
 
     //if none of the --producer or --consumer options are specified , just construct ACLs from CLI options.
     if (!opts.options.has(opts.producerOpt) &&
-        !opts.options.has(opts.consumerOpt)) {
+        !opts.options.has(opts.consumerOpt))
       resourceToAcls ++= getCliResourceToAcls(opts)
-    }
 
     //users are allowed to specify both --producer and --consumer options in a single command.
     if (opts.options.has(opts.producerOpt))
       resourceToAcls ++= getProducerResourceToAcls(opts)
 
     if (opts.options.has(opts.consumerOpt))
-      resourceToAcls ++= getConsumerResourceToAcls(opts).map {
+      resourceToAcls ++= getConsumerResourceToAcls(opts).map
         case (k, v) => k -> (v ++ resourceToAcls.getOrElse(k, Set.empty[Acl]))
-      }
 
     validateOperation(opts, resourceToAcls)
 
     resourceToAcls
-  }
 
   private def getProducerResourceToAcls(
-      opts: AclCommandOptions): Map[Resource, Set[Acl]] = {
+      opts: AclCommandOptions): Map[Resource, Set[Acl]] =
     val topics: Set[Resource] =
       getResource(opts).filter(_.resourceType == Topic)
 
@@ -164,10 +148,9 @@ object AclCommand {
     //Write, Describe permission on topics, Create permission on cluster
     topics.map(_ -> acls).toMap[Resource, Set[Acl]] +
     (Resource.ClusterResource -> getAcl(opts, Set(Create)))
-  }
 
   private def getConsumerResourceToAcls(
-      opts: AclCommandOptions): Map[Resource, Set[Acl]] = {
+      opts: AclCommandOptions): Map[Resource, Set[Acl]] =
     val resources = getResource(opts)
 
     val topics: Set[Resource] =
@@ -181,17 +164,15 @@ object AclCommand {
     topics.map(_ -> acls).toMap[Resource, Set[Acl]] ++ groups
       .map(_ -> getAcl(opts, Set(Read)))
       .toMap[Resource, Set[Acl]]
-  }
 
   private def getCliResourceToAcls(
-      opts: AclCommandOptions): Map[Resource, Set[Acl]] = {
+      opts: AclCommandOptions): Map[Resource, Set[Acl]] =
     val acls = getAcl(opts)
     val resources = getResource(opts)
     resources.map(_ -> acls).toMap
-  }
 
   private def getAcl(
-      opts: AclCommandOptions, operations: Set[Operation]): Set[Acl] = {
+      opts: AclCommandOptions, operations: Set[Operation]): Set[Acl] =
     val allowedPrincipals = getPrincipals(opts, opts.allowPrincipalsOpt)
 
     val deniedPrincipals = getPrincipals(opts, opts.denyPrincipalsOpt)
@@ -210,44 +191,40 @@ object AclCommand {
       acls ++= getAcls(deniedPrincipals, Deny, operations, deniedHosts)
 
     acls.toSet
-  }
 
-  private def getAcl(opts: AclCommandOptions): Set[Acl] = {
+  private def getAcl(opts: AclCommandOptions): Set[Acl] =
     val operations = opts.options
       .valuesOf(opts.operationsOpt)
       .asScala
       .map(operation => Operation.fromString(operation.trim))
       .toSet
     getAcl(opts, operations)
-  }
 
   def getAcls(principals: Set[KafkaPrincipal],
               permissionType: PermissionType,
               operations: Set[Operation],
-              hosts: Set[String]): Set[Acl] = {
-    for {
+              hosts: Set[String]): Set[Acl] =
+    for
       principal <- principals
       operation <- operations
       host <- hosts
-    } yield new Acl(principal, permissionType, host, operation)
-  }
+    yield new Acl(principal, permissionType, host, operation)
 
   private def getHosts(
       opts: AclCommandOptions,
       hostOptionSpec: ArgumentAcceptingOptionSpec[String],
       principalOptionSpec: ArgumentAcceptingOptionSpec[String])
-    : Set[String] = {
+    : Set[String] =
     if (opts.options.has(hostOptionSpec))
       opts.options.valuesOf(hostOptionSpec).asScala.map(_.trim).toSet
     else if (opts.options.has(principalOptionSpec))
       Set[String](Acl.WildCardHost)
     else Set.empty[String]
-  }
 
   private def getPrincipals(
       opts: AclCommandOptions,
       principalOptionSpec: ArgumentAcceptingOptionSpec[String])
-    : Set[KafkaPrincipal] = {
+    : Set[KafkaPrincipal] =
     if (opts.options.has(principalOptionSpec))
       opts.options
         .valuesOf(principalOptionSpec)
@@ -255,11 +232,10 @@ object AclCommand {
         .map(s => KafkaPrincipal.fromString(s.trim))
         .toSet
     else Set.empty[KafkaPrincipal]
-  }
 
   private def getResource(
       opts: AclCommandOptions,
-      dieIfNoResourceFound: Boolean = true): Set[Resource] = {
+      dieIfNoResourceFound: Boolean = true): Set[Resource] =
     var resources = Set.empty[Resource]
     if (opts.options.has(opts.topicOpt))
       opts.options
@@ -282,26 +258,22 @@ object AclCommand {
           "You must provide at least one resource: --topic <topic> or --cluster or --group <group>")
 
     resources
-  }
 
-  private def confirmAction(msg: String): Boolean = {
+  private def confirmAction(msg: String): Boolean =
     println(msg)
     Console.readLine().equalsIgnoreCase("y")
-  }
 
   private def validateOperation(
-      opts: AclCommandOptions, resourceToAcls: Map[Resource, Set[Acl]]) = {
-    for ((resource, acls) <- resourceToAcls) {
+      opts: AclCommandOptions, resourceToAcls: Map[Resource, Set[Acl]]) =
+    for ((resource, acls) <- resourceToAcls)
       val validOps = ResourceTypeToValidOperations(resource.resourceType)
       if ((acls.map(_.operation) -- validOps).nonEmpty)
         CommandLineUtils.printUsageAndDie(
             opts.parser,
-            s"ResourceType ${resource.resourceType} only supports operations ${validOps
-              .mkString(",")}")
-    }
-  }
+            s"ResourceType ${resource.resourceType} only supports operations $validOps
+              .mkString(",")")
 
-  class AclCommandOptions(args: Array[String]) {
+  class AclCommandOptions(args: Array[String])
     val parser = new OptionParser
     val authorizerOpt = parser
       .accepts(
@@ -411,7 +383,7 @@ object AclCommand {
 
     val options = parser.parse(args: _*)
 
-    def checkArgs() {
+    def checkArgs()
       CommandLineUtils.checkRequiredArgs(
           parser, options, authorizerPropertiesOpt)
 
@@ -453,6 +425,3 @@ object AclCommand {
         CommandLineUtils.printUsageAndDie(
             parser,
             "With --consumer you must specify a --topic and a --group and no --cluster option should be specified.")
-    }
-  }
-}

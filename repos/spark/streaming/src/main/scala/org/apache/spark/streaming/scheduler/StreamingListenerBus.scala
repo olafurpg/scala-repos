@@ -29,27 +29,24 @@ import org.apache.spark.util.ListenerBus
 private[streaming] class StreamingListenerBus(
     sparkListenerBus: LiveListenerBus)
     extends SparkListener
-    with ListenerBus[StreamingListener, StreamingListenerEvent] {
+    with ListenerBus[StreamingListener, StreamingListenerEvent]
 
   /**
     * Post a StreamingListenerEvent to the Spark listener bus asynchronously. This event will be
     * dispatched to all StreamingListeners in the thread of the Spark listener bus.
     */
-  def post(event: StreamingListenerEvent) {
+  def post(event: StreamingListenerEvent)
     sparkListenerBus.post(new WrappedStreamingListenerEvent(event))
-  }
 
-  override def onOtherEvent(event: SparkListenerEvent): Unit = {
-    event match {
+  override def onOtherEvent(event: SparkListenerEvent): Unit =
+    event match
       case WrappedStreamingListenerEvent(e) =>
         postToAll(e)
       case _ =>
-    }
-  }
 
   protected override def doPostEvent(
-      listener: StreamingListener, event: StreamingListenerEvent): Unit = {
-    event match {
+      listener: StreamingListener, event: StreamingListenerEvent): Unit =
+    event match
       case receiverStarted: StreamingListenerReceiverStarted =>
         listener.onReceiverStarted(receiverStarted)
       case receiverError: StreamingListenerReceiverError =>
@@ -67,24 +64,20 @@ private[streaming] class StreamingListenerBus(
       case outputOperationCompleted: StreamingListenerOutputOperationCompleted =>
         listener.onOutputOperationCompleted(outputOperationCompleted)
       case _ =>
-    }
-  }
 
   /**
     * Register this one with the Spark listener bus so that it can receive Streaming events and
     * forward them to StreamingListeners.
     */
-  def start(): Unit = {
+  def start(): Unit =
     sparkListenerBus.addListener(this) // for getting callbacks on spark events
-  }
 
   /**
     * Unregister this one with the Spark listener bus and all StreamingListeners won't receive any
     * events after that.
     */
-  def stop(): Unit = {
+  def stop(): Unit =
     sparkListenerBus.removeListener(this)
-  }
 
   /**
     * Wrapper for StreamingListenerEvent as SparkListenerEvent so that it can be posted to Spark
@@ -92,10 +85,8 @@ private[streaming] class StreamingListenerBus(
     */
   private case class WrappedStreamingListenerEvent(
       streamingListenerEvent: StreamingListenerEvent)
-      extends SparkListenerEvent {
+      extends SparkListenerEvent
 
     // Do not log streaming events in event log as history server does not support streaming
     // events (SPARK-12140). TODO Once SPARK-12140 is resolved we should set it to true.
     protected[spark] override def logEvent: Boolean = false
-  }
-}

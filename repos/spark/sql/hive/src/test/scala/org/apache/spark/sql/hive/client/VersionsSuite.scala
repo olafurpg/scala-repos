@@ -40,28 +40,26 @@ import org.apache.spark.util.Utils
   * is not fully tested.
   */
 @ExtendedHiveTest
-class VersionsSuite extends SparkFunSuite with Logging {
+class VersionsSuite extends SparkFunSuite with Logging
 
   private val sparkConf = new SparkConf()
 
   // In order to speed up test execution during development or in Jenkins, you can specify the path
   // of an existing Ivy cache:
-  private val ivyPath: Option[String] = {
+  private val ivyPath: Option[String] =
     sys.env
       .get("SPARK_VERSIONS_SUITE_IVY_PATH")
       .orElse(
           Some(new File(sys.props("java.io.tmpdir"), "hive-ivy-cache").getAbsolutePath))
-  }
 
-  private def buildConf() = {
+  private def buildConf() =
     lazy val warehousePath = Utils.createTempDir()
     lazy val metastorePath = Utils.createTempDir()
     metastorePath.delete()
     Map("javax.jdo.option.ConnectionURL" -> s"jdbc:derby:;databaseName=$metastorePath;create=true",
         "hive.metastore.warehouse.dir" -> warehousePath.toString)
-  }
 
-  test("success sanity check") {
+  test("success sanity check")
     val badClient = IsolatedClientLoader
       .forVersion(hiveMetastoreVersion = HiveContext.hiveExecutionVersion,
                   hadoopVersion = VersionInfo.getVersion,
@@ -72,9 +70,8 @@ class VersionsSuite extends SparkFunSuite with Logging {
       .createClient()
     val db = new CatalogDatabase("default", "desc", "loc", Map())
     badClient.createDatabase(db, ignoreIfExists = true)
-  }
 
-  test("hadoop configuration preserved") {
+  test("hadoop configuration preserved")
     val hadoopConf = new Configuration();
     hadoopConf.set("test", "success")
     val client = IsolatedClientLoader
@@ -86,33 +83,29 @@ class VersionsSuite extends SparkFunSuite with Logging {
                   ivyPath = ivyPath)
       .createClient()
     assert("success" === client.getConf("test", null))
-  }
 
-  private def getNestedMessages(e: Throwable): String = {
+  private def getNestedMessages(e: Throwable): String =
     var causes = ""
     var lastException = e
-    while (lastException != null) {
+    while (lastException != null)
       causes += lastException.toString + "\n"
       lastException = lastException.getCause
-    }
     causes
-  }
 
   private val emptyDir = Utils.createTempDir().getCanonicalPath
 
-  private def partSpec = {
+  private def partSpec =
     val hashMap = new java.util.LinkedHashMap[String, String]
     hashMap.put("key", "1")
     hashMap
-  }
 
   // Its actually pretty easy to mess things up and have all of your tests "pass" by accidentally
   // connecting to an auto-populated, in-process metastore.  Let's make sure we are getting the
   // versions right by forcing a known compatibility failure.
   // TODO: currently only works on mysql where we manually create the schema...
-  ignore("failure sanity check") {
-    val e = intercept[Throwable] {
-      val badClient = quietly {
+  ignore("failure sanity check")
+    val e = intercept[Throwable]
+      val badClient = quietly
         IsolatedClientLoader
           .forVersion(hiveMetastoreVersion = "13",
                       hadoopVersion = VersionInfo.getVersion,
@@ -121,18 +114,15 @@ class VersionsSuite extends SparkFunSuite with Logging {
                       config = buildConf(),
                       ivyPath = ivyPath)
           .createClient()
-      }
-    }
     assert(
         getNestedMessages(e) contains "Unknown column 'A0.OWNER_NAME' in 'field list'")
-  }
 
   private val versions = Seq("12", "13", "14", "1.0.0", "1.1.0", "1.2.0")
 
   private var client: HiveClient = null
 
-  versions.foreach { version =>
-    test(s"$version: create client") {
+  versions.foreach  version =>
+    test(s"$version: create client")
       client = null
       System.gc() // Hack to avoid SEGV on some JVM versions.
       client = IsolatedClientLoader
@@ -143,14 +133,12 @@ class VersionsSuite extends SparkFunSuite with Logging {
                     config = buildConf(),
                     ivyPath = ivyPath)
         .createClient()
-    }
 
-    test(s"$version: createDatabase") {
+    test(s"$version: createDatabase")
       val db = CatalogDatabase("default", "desc", "loc", Map())
       client.createDatabase(db, ignoreIfExists = true)
-    }
 
-    test(s"$version: createTable") {
+    test(s"$version: createTable")
       val table = CatalogTable(
           name = TableIdentifier("src", Some("default")),
           tableType = CatalogTableType.MANAGED_TABLE,
@@ -169,51 +157,41 @@ class VersionsSuite extends SparkFunSuite with Logging {
             ))
 
       client.createTable(table, ignoreIfExists = false)
-    }
 
-    test(s"$version: getTable") {
+    test(s"$version: getTable")
       client.getTable("default", "src")
-    }
 
-    test(s"$version: listTables") {
+    test(s"$version: listTables")
       assert(client.listTables("default") === Seq("src"))
-    }
 
-    test(s"$version: currentDatabase") {
+    test(s"$version: currentDatabase")
       assert(client.currentDatabase === "default")
-    }
 
-    test(s"$version: getDatabase") {
+    test(s"$version: getDatabase")
       client.getDatabase("default")
-    }
 
-    test(s"$version: alterTable") {
+    test(s"$version: alterTable")
       client.alterTable(client.getTable("default", "src"))
-    }
 
-    test(s"$version: set command") {
+    test(s"$version: set command")
       client.runSqlHive("SET spark.sql.test.key=1")
-    }
 
-    test(s"$version: create partitioned table DDL") {
+    test(s"$version: create partitioned table DDL")
       client.runSqlHive(
           "CREATE TABLE src_part (value INT) PARTITIONED BY (key INT)")
       client.runSqlHive("ALTER TABLE src_part ADD PARTITION (key = '1')")
-    }
 
-    test(s"$version: getPartitions") {
+    test(s"$version: getPartitions")
       client.getAllPartitions(client.getTable("default", "src_part"))
-    }
 
-    test(s"$version: getPartitionsByFilter") {
+    test(s"$version: getPartitionsByFilter")
       client.getPartitionsByFilter(
           client.getTable("default", "src_part"),
           Seq(EqualTo(AttributeReference("key", IntegerType, false)(
                           NamedExpression.newExprId),
                       Literal(1))))
-    }
 
-    test(s"$version: loadPartition") {
+    test(s"$version: loadPartition")
       client.loadPartition(emptyDir,
                            "default.src_part",
                            partSpec,
@@ -221,13 +199,11 @@ class VersionsSuite extends SparkFunSuite with Logging {
                            false,
                            false,
                            false)
-    }
 
-    test(s"$version: loadTable") {
+    test(s"$version: loadTable")
       client.loadTable(emptyDir, "src", false, false)
-    }
 
-    test(s"$version: loadDynamicPartitions") {
+    test(s"$version: loadDynamicPartitions")
       client.loadDynamicPartitions(emptyDir,
                                    "default.src_part",
                                    partSpec,
@@ -235,13 +211,9 @@ class VersionsSuite extends SparkFunSuite with Logging {
                                    1,
                                    false,
                                    false)
-    }
 
-    test(s"$version: create index and reset") {
+    test(s"$version: create index and reset")
       client.runSqlHive("CREATE TABLE indexed_table (key INT)")
       client.runSqlHive("CREATE INDEX index_1 ON TABLE indexed_table(key) " +
           "as 'COMPACT' WITH DEFERRED REBUILD")
       client.reset()
-    }
-  }
-}

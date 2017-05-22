@@ -7,26 +7,24 @@ import com.twitter.finagle.{Service, ServiceFactory}
 import com.twitter.util.{Await, Activity, Future, Var}
 import org.openjdk.jmh.annotations._
 
-object BalancerBench {
+object BalancerBench
   val NoBrokersExc = new NoBrokersAvailableException
 
   def newFactory(): ServiceFactory[Unit, Unit] =
-    ServiceFactory.const(new Service[Unit, Unit] {
+    ServiceFactory.const(new Service[Unit, Unit]
       def apply(req: Unit) = Future.Done
-    })
+    )
 
-  def newActivity(num: Int): Activity[Set[ServiceFactory[Unit, Unit]]] = {
+  def newActivity(num: Int): Activity[Set[ServiceFactory[Unit, Unit]]] =
     val underlying = Var((0 until num).map(_ => newFactory()).toSet)
     Activity(
-        underlying.map { facs =>
+        underlying.map  facs =>
       Activity.Ok(facs)
-    })
-  }
-}
+    )
 
 @State(Scope.Benchmark)
 @Threads(Threads.MAX)
-class HeapBalancerBench extends StdBenchAnnotations {
+class HeapBalancerBench extends StdBenchAnnotations
   import BalancerBench._
 
   @Param(Array("1000"))
@@ -35,7 +33,7 @@ class HeapBalancerBench extends StdBenchAnnotations {
   var heap: ServiceFactory[Unit, Unit] = _
 
   @Setup
-  def setup() {
+  def setup()
     heap = Balancers
       .heap()
       .newBalancer(
@@ -43,15 +41,13 @@ class HeapBalancerBench extends StdBenchAnnotations {
           NullStatsReceiver,
           NoBrokersExc
       )
-  }
 
   @Benchmark
   def getAndPut(): Unit = Await.result(heap().flatMap(_.close()))
-}
 
 @State(Scope.Benchmark)
 @Threads(Threads.MAX)
-class P2CBalancerBench extends StdBenchAnnotations {
+class P2CBalancerBench extends StdBenchAnnotations
   import BalancerBench._
 
   @Param(Array("1000"))
@@ -61,7 +57,7 @@ class P2CBalancerBench extends StdBenchAnnotations {
   var p2cEwma: ServiceFactory[Unit, Unit] = _
 
   @Setup
-  def setup() {
+  def setup()
     p2c = Balancers
       .p2c()
       .newBalancer(
@@ -76,18 +72,16 @@ class P2CBalancerBench extends StdBenchAnnotations {
           NullStatsReceiver,
           NoBrokersExc
       )
-  }
 
   @Benchmark
   def leastLoadedGetAndPut(): Unit = Await.result(p2c().flatMap(_.close()))
 
   @Benchmark
   def ewmaGetAndPut(): Unit = Await.result(p2cEwma().flatMap(_.close()))
-}
 
 @State(Scope.Benchmark)
 @Threads(Threads.MAX)
-class ApertureBalancerBench extends StdBenchAnnotations {
+class ApertureBalancerBench extends StdBenchAnnotations
   import BalancerBench._
 
   @Param(Array("1000"))
@@ -96,7 +90,7 @@ class ApertureBalancerBench extends StdBenchAnnotations {
   var aperture: ServiceFactory[Unit, Unit] = _
 
   @Setup
-  def setup() {
+  def setup()
     aperture = Balancers
       .aperture()
       .newBalancer(
@@ -104,8 +98,6 @@ class ApertureBalancerBench extends StdBenchAnnotations {
           NullStatsReceiver,
           NoBrokersExc
       )
-  }
 
   @Benchmark
   def getAndPut(): Unit = Await.result(aperture().flatMap(_.close()))
-}

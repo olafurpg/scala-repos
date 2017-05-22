@@ -26,18 +26,16 @@ import org.apache.spark.scheduler.{Schedulable, StageInfo}
 import org.apache.spark.ui.UIUtils
 
 /** Table showing list of pools */
-private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab) {
+private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab)
   private val listener = parent.progressListener
 
-  def toNodeSeq: Seq[Node] = {
-    listener.synchronized {
+  def toNodeSeq: Seq[Node] =
+    listener.synchronized
       poolTable(poolRow, pools)
-    }
-  }
 
   private def poolTable(makeRow: (Schedulable,
                         HashMap[String, HashMap[Int, StageInfo]]) => Seq[Node],
-                        rows: Seq[Schedulable]): Seq[Node] = {
+                        rows: Seq[Schedulable]): Seq[Node] =
     <table class="table table-bordered table-striped table-condensed sortable table-fixed">
       <thead>
         <th>Pool Name</th>
@@ -51,16 +49,14 @@ private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab) {
         {rows.map(r => makeRow(r, listener.poolToActiveStages))}
       </tbody>
     </table>
-  }
 
   private def poolRow(
       p: Schedulable,
       poolToActiveStages: HashMap[String, HashMap[Int, StageInfo]])
-    : Seq[Node] = {
-    val activeStages = poolToActiveStages.get(p.name) match {
+    : Seq[Node] =
+    val activeStages = poolToActiveStages.get(p.name) match
       case Some(stages) => stages.size
       case None => 0
-    }
     val href = "%s/stages/pool?poolname=%s".format(
         UIUtils.prependBaseUri(parent.basePath),
         URLEncoder.encode(p.name, "UTF-8"))
@@ -74,5 +70,3 @@ private[ui] class PoolTable(pools: Seq[Schedulable], parent: StagesTab) {
       <td>{p.runningTasks}</td>
       <td>{p.schedulingMode}</td>
     </tr>
-  }
-}

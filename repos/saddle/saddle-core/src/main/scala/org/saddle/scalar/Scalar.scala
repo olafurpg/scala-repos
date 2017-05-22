@@ -23,7 +23,7 @@ import java.util.NoSuchElementException
   *
   * @tparam T The type of element wrapped
   */
-sealed abstract class Scalar[+T] {
+sealed abstract class Scalar[+T]
   def isNA: Boolean
   def get: T
 
@@ -33,12 +33,10 @@ sealed abstract class Scalar[+T] {
   @inline final def flatMap[B](f: T => Scalar[B]): Scalar[B] =
     if (isNA) NA else f(this.get)
 
-  @inline final def foreach[U](f: T => U) {
+  @inline final def foreach[U](f: T => U)
     if (!isNA) f(this.get)
-  }
-}
 
-object Scalar {
+object Scalar
 
   /** An Scalar factory which creates Value(x) when the argument is neither null nor an NA primitive;
     * otherwise produces NA.
@@ -52,14 +50,12 @@ object Scalar {
   /**
     * Provides comparisons of Scalars, where NA always evaluates as less than non-NA
     */
-  implicit def ord[T : ORD] = new ORD[Scalar[T]] {
-    def compare(x: Scalar[T], y: Scalar[T]): Int = (x, y) match {
+  implicit def ord[T : ORD] = new ORD[Scalar[T]]
+    def compare(x: Scalar[T], y: Scalar[T]): Int = (x, y) match
       case (NA, NA) => 0
       case (NA, _) => -1
       case (_, NA) => 1
       case (_, _) => implicitly[ORD[T]].compare(x.get, y.get)
-    }
-  }
 
   /**
     * Provides implicit boxing of primitive to scalar
@@ -69,16 +65,14 @@ object Scalar {
   /**
     * Provides implicit unboxing from double scalar to primitive
     */
-  implicit def scalarUnboxD(ds: Scalar[Double]): Double = {
+  implicit def scalarUnboxD(ds: Scalar[Double]): Double =
     if (ds.isNA) Double.NaN else ds.get
-  }
 
   /**
     * Provides implicit unboxing from float scalar to primitive
     */
-  implicit def scalarUnboxF(ds: Scalar[Float]): Float = {
+  implicit def scalarUnboxF(ds: Scalar[Float]): Float =
     if (ds.isNA) Float.NaN else ds.get
-  }
 
   /**
     * Scalar is isomorphic to Option
@@ -87,18 +81,15 @@ object Scalar {
     if (sc.isNA) None else Some(sc.get)
   implicit def optionToScalar[T : ST](op: Option[T]): Scalar[T] =
     op.map { Scalar(_) } getOrElse NA
-}
 
-case class Value[+T : ST](el: T) extends Scalar[T] {
+case class Value[+T : ST](el: T) extends Scalar[T]
   def isNA = implicitly[ST[T]].isMissing(el)
   def get = el
 
   override def toString = el.toString
-}
 
-case object NA extends Scalar[Nothing] {
+case object NA extends Scalar[Nothing]
   def isNA = true
   def get = throw new NoSuchElementException("NA.get")
 
   override def toString = "NA"
-}

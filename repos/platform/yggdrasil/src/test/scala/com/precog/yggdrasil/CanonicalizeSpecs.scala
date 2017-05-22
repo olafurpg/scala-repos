@@ -31,10 +31,10 @@ import org.scalacheck.Gen
 
 trait CanonicalizeSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with Specification
-    with ScalaCheck {
+    with ScalaCheck
   import SampleData._
 
-  val table = {
+  val table =
     val JArray(elements) = JParser.parse("""[
       {"foo":1},
       {"foo":2},
@@ -54,11 +54,10 @@ trait CanonicalizeSpec[M[+ _]]
 
     val sample = SampleData(elements.toStream)
     fromSample(sample)
-  }
 
-  def checkBoundedCanonicalize = {
+  def checkBoundedCanonicalize =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val table = fromSample(sample)
       val size = sample.data.size
       val minLength = Gen.choose(0, size / 2).sample.get
@@ -66,21 +65,17 @@ trait CanonicalizeSpec[M[+ _]]
 
       val canonicalizedTable = table.canonicalize(minLength, Some(maxLength))
       val slices = canonicalizedTable.slices.toStream.copoint map (_.size)
-      if (size > 0) {
-        slices.init must haveAllElementsLike {
+      if (size > 0)
+        slices.init must haveAllElementsLike
           case (sliceSize: Int) =>
             sliceSize must beBetween(minLength, maxLength)
-        }
         slices.last must be_<=(maxLength)
-      } else {
+      else
         slices must haveSize(0)
-      }
-    }
-  }
 
-  def checkCanonicalize = {
+  def checkCanonicalize =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val table = fromSample(sample)
       val size = sample.data.size
       val length = Gen.choose(1, size + 3).sample.get
@@ -89,49 +84,43 @@ trait CanonicalizeSpec[M[+ _]]
       val resultSlices = canonicalizedTable.slices.toStream.copoint
       val resultSizes = resultSlices.map(_.size)
 
-      val expected = {
+      val expected =
         val num = size / length
         val remainder = size % length
         val prefix = Stream.fill(num)(length)
         if (remainder > 0) prefix :+ remainder else prefix
-      }
 
       resultSizes mustEqual expected
-    }
-  }.set(minTestsOk -> 1000)
+  .set(minTestsOk -> 1000)
 
-  def testCanonicalize = {
+  def testCanonicalize =
     val result = table.canonicalize(3)
 
     val slices = result.slices.toStream.copoint
     val sizes = slices.map(_.size)
 
     sizes mustEqual Stream(3, 3, 3, 3, 2)
-  }
 
-  def testCanonicalizeZero = {
+  def testCanonicalizeZero =
     table.canonicalize(0) must throwA[IllegalArgumentException]
-  }
 
-  def testCanonicalizeBoundary = {
+  def testCanonicalizeBoundary =
     val result = table.canonicalize(5)
 
     val slices = result.slices.toStream.copoint
     val sizes = slices.map(_.size)
 
     sizes mustEqual Stream(5, 5, 4)
-  }
 
-  def testCanonicalizeOverBoundary = {
+  def testCanonicalizeOverBoundary =
     val result = table.canonicalize(12)
 
     val slices = result.slices.toStream.copoint
     val sizes = slices.map(_.size)
 
     sizes mustEqual Stream(12, 2)
-  }
 
-  def testCanonicalizeEmptySlices = {
+  def testCanonicalizeEmptySlices =
     def tableTakeRange(table: Table, start: Int, numToTake: Long) =
       table.takeRange(start, numToTake).slices.toStream.copoint
 
@@ -152,9 +141,8 @@ trait CanonicalizeSpec[M[+ _]]
     val resultSizes = resultSlices.map(_.size)
 
     resultSizes mustEqual Stream(4, 4, 4, 2)
-  }
 
-  def testCanonicalizeEmpty = {
+  def testCanonicalizeEmpty =
     val table = Table.empty
 
     val result = table.canonicalize(3)
@@ -163,5 +151,3 @@ trait CanonicalizeSpec[M[+ _]]
     val sizes = slices.map(_.size)
 
     sizes mustEqual Stream()
-  }
-}

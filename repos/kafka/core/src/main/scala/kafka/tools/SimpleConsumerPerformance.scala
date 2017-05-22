@@ -27,22 +27,21 @@ import kafka.common.TopicAndPartition
 /**
   * Performance test for the simple consumer
   */
-object SimpleConsumerPerformance {
+object SimpleConsumerPerformance
 
   private val logger = Logger.getLogger(getClass())
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val config = new ConsumerPerfConfig(args)
     logger.info("Starting SimpleConsumer...")
 
-    if (!config.hideHeader) {
+    if (!config.hideHeader)
       if (!config.showDetailedStats)
         println(
             "start.time, end.time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec")
       else
         println(
             "time, fetch.size, data.consumed.in.MB, MB.sec, data.consumed.in.nMsg, nMsg.sec")
-    }
 
     val consumer = new SimpleConsumer(config.url.getHost,
                                       config.url.getPort,
@@ -73,7 +72,7 @@ object SimpleConsumerPerformance {
     var lastReportTime: Long = startMs
     var lastBytesRead = 0L
     var lastMessagesRead = 0L
-    while (!done) {
+    while (!done)
       // TODO: add in the maxWait and minBytes for performance
       val request = new FetchRequestBuilder()
         .clientId(config.clientId)
@@ -84,10 +83,9 @@ object SimpleConsumerPerformance {
       var messagesRead = 0
       var bytesRead = 0
       val messageSet = fetchResponse.messageSet(config.topic, config.partition)
-      for (message <- messageSet) {
+      for (message <- messageSet)
         messagesRead += 1
         bytesRead += message.message.payloadSize
-      }
 
       if (messagesRead == 0 || totalMessagesRead > config.numMessages)
         done = true
@@ -99,8 +97,8 @@ object SimpleConsumerPerformance {
       totalMessagesRead += messagesRead
       consumedInterval += messagesRead
 
-      if (consumedInterval > config.reportingInterval) {
-        if (config.showDetailedStats) {
+      if (consumedInterval > config.reportingInterval)
+        if (config.showDetailedStats)
           val reportTime = System.currentTimeMillis
           val elapsed = (reportTime - lastReportTime) / 1000.0
           val totalMBRead =
@@ -113,17 +111,14 @@ object SimpleConsumerPerformance {
                   totalMBRead / elapsed,
                   totalMessagesRead,
                   (totalMessagesRead - lastMessagesRead) / elapsed))
-        }
         lastReportTime = SystemTime.milliseconds
         lastBytesRead = totalBytesRead
         lastMessagesRead = totalMessagesRead
         consumedInterval = 0
-      }
-    }
     val reportTime = System.currentTimeMillis
     val elapsed = (reportTime - startMs) / 1000.0
 
-    if (!config.showDetailedStats) {
+    if (!config.showDetailedStats)
       val totalMBRead = (totalBytesRead * 1.0) / (1024 * 1024)
       println(
           ("%s, %s, %d, %.4f, %.4f, %d, %.4f").format(
@@ -134,11 +129,9 @@ object SimpleConsumerPerformance {
               totalMBRead / elapsed,
               totalMessagesRead,
               totalMessagesRead / elapsed))
-    }
     System.exit(0)
-  }
 
-  class ConsumerPerfConfig(args: Array[String]) extends PerfConfig(args) {
+  class ConsumerPerfConfig(args: Array[String]) extends PerfConfig(args)
     val urlOpt = parser
       .accepts("server", "REQUIRED: The hostname of the server to connect to.")
       .withRequiredArg
@@ -189,5 +182,3 @@ object SimpleConsumerPerformance {
     val dateFormat = new SimpleDateFormat(options.valueOf(dateFormatOpt))
     val hideHeader = options.has(hideHeaderOpt)
     val clientId = options.valueOf(clientIdOpt).toString
-  }
-}

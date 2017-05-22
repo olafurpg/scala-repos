@@ -2,7 +2,7 @@ package mesosphere.marathon.core.matcher.manager
 
 import org.rogach.scallop.ScallopConf
 
-trait OfferMatcherManagerConfig extends ScallopConf {
+trait OfferMatcherManagerConfig extends ScallopConf
   //scalastyle:off magic.number
 
   lazy val maxTasksPerOffer = opt[Int](
@@ -16,4 +16,3 @@ trait OfferMatcherManagerConfig extends ScallopConf {
       default = Some(1000),
       hidden = true,
       noshort = true)
-}

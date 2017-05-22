@@ -1,4 +1,4 @@
-object SCL5247 extends App {
+object SCL5247 extends App
 
   var msg = "hello"
 
@@ -8,5 +8,4 @@ object SCL5247 extends App {
   msgUpdater("bye") /*end*/
 
   println(msg)
-}
 //Unit

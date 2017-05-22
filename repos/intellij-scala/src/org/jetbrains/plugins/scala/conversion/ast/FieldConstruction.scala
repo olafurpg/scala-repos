@@ -10,7 +10,6 @@ case class FieldConstruction(modifiers: IntermediateNode,
                              ftype: IntermediateNode,
                              isVar: Boolean,
                              initalaizer: Option[IntermediateNode])
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode with TypedElement
   override def getType: TypeConstruction =
     ftype.asInstanceOf[TypedElement].getType
-}

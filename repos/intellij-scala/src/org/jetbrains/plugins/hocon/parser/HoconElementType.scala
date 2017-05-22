@@ -6,7 +6,7 @@ import org.jetbrains.plugins.hocon.lang.HoconLanguage
 class HoconElementType(debugName: String)
     extends IElementType(debugName, HoconLanguage)
 
-object HoconElementType {
+object HoconElementType
 
   val HoconFileElementType = new IFileElementType("HOCON_FILE", HoconLanguage)
 
@@ -145,4 +145,3 @@ object HoconElementType {
     * Literal boolean value.
     */
   val Boolean = new HoconElementType("BOOLEAN")
-}

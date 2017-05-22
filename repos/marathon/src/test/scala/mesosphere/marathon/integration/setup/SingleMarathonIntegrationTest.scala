@@ -17,9 +17,8 @@ import scala.concurrent.duration.{FiniteDuration, _}
 import scala.util.Try
 
 // scalastyle:off magic.number
-object SingleMarathonIntegrationTest {
+object SingleMarathonIntegrationTest
   private val log = LoggerFactory.getLogger(getClass)
-}
 
 /**
   * Convenient trait to test against one marathon instance.
@@ -35,7 +34,7 @@ object SingleMarathonIntegrationTest {
   */
 trait SingleMarathonIntegrationTest
     extends ExternalMarathonIntegrationTest with BeforeAndAfterAllConfigMap
-    with MarathonCallbackTestSupport {
+    with MarathonCallbackTestSupport
   self: Suite =>
 
   import SingleMarathonIntegrationTest.log
@@ -55,7 +54,7 @@ trait SingleMarathonIntegrationTest
 
   def extraMarathonParameters: List[String] = List.empty[String]
 
-  lazy val marathonProxy = {
+  lazy val marathonProxy =
     startMarathon(config.marathonBasePort + 1,
                   "--master",
                   config.master,
@@ -65,25 +64,22 @@ trait SingleMarathonIntegrationTest
                          .copy(marathonBasePort = config.marathonBasePort + 1)
                          .marathonUrl,
                        testBasePath)
-  }
 
-  implicit class PathIdTestHelper(path: String) {
+  implicit class PathIdTestHelper(path: String)
     def toRootTestPath: PathId = testBasePath.append(path).canonicalPath()
     def toTestPath: PathId = testBasePath.append(path)
-  }
 
   protected def startZooKeeperProcess(port: Int = config.zkPort,
                                       path: String = "/tmp/foo/single",
-                                      wipeWorkDir: Boolean = true): Unit = {
+                                      wipeWorkDir: Boolean = true): Unit =
     ProcessKeeper.startZooKeeper(port, path, wipeWorkDir)
-  }
 
-  override protected def beforeAll(configMap: ConfigMap): Unit = {
+  override protected def beforeAll(configMap: ConfigMap): Unit =
     log.info("Setting up local mesos/marathon infrastructure...")
     configOption = Some(IntegrationTestConfig(configMap))
     super.beforeAll(configMap)
 
-    if (!config.useExternalSetup) {
+    if (!config.useExternalSetup)
       //make sure last test cleared everything
       ProcessKeeper.shutdown()
 
@@ -109,14 +105,12 @@ trait SingleMarathonIntegrationTest
 
       waitForCleanSlateInMesos()
       log.info("Setting up local mesos/marathon infrastructure: done.")
-    } else {
+    else
       log.info("Using already running Marathon at {}", config.marathonUrl)
-    }
 
     startCallbackEndpoint(config.httpPort, config.cwd)
-  }
 
-  override protected def afterAll(configMap: ConfigMap): Unit = {
+  override protected def afterAll(configMap: ConfigMap): Unit =
     super.afterAll(configMap)
     cleanUp(withSubscribers = !config.useExternalSetup)
 
@@ -128,46 +122,37 @@ trait SingleMarathonIntegrationTest
     system.shutdown()
     system.awaitTermination()
     log.info("Cleaning up local mesos/marathon structure: done.")
-  }
 
-  def cleanMarathonState() {
-    val watcher = new Watcher {
+  def cleanMarathonState()
+    val watcher = new Watcher
       override def process(event: WatchedEvent): Unit = println(event)
-    }
     val zooKeeper = new ZooKeeper(config.zkHostAndPort, 30 * 1000, watcher)
-    def deletePath(path: String) {
-      if (zooKeeper.exists(path, false) != null) {
+    def deletePath(path: String)
+      if (zooKeeper.exists(path, false) != null)
         val children = zooKeeper.getChildren(path, false)
         children.asScala.foreach(sub => deletePath(s"$path/$sub"))
         zooKeeper.delete(path, -1)
-      }
-    }
     deletePath(config.zkPath)
     zooKeeper.close()
-  }
 
   def waitForTasks(
       appId: PathId,
       num: Int,
-      maxWait: FiniteDuration = 30.seconds): List[ITEnrichedTask] = {
-    def checkTasks: Option[List[ITEnrichedTask]] = {
+      maxWait: FiniteDuration = 30.seconds): List[ITEnrichedTask] =
+    def checkTasks: Option[List[ITEnrichedTask]] =
       val tasks = Try(marathon.tasks(appId))
         .map(_.value)
         .getOrElse(Nil)
         .filter(_.launched)
       if (tasks.size == num) Some(tasks) else None
-    }
     WaitTestSupport.waitFor(s"$num tasks to launch", maxWait)(checkTasks)
-  }
 
   def waitForHealthCheck(
-      check: IntegrationHealthCheck, maxWait: FiniteDuration = 30.seconds) = {
-    WaitTestSupport.waitUntil("Health check to get queried", maxWait) {
+      check: IntegrationHealthCheck, maxWait: FiniteDuration = 30.seconds) =
+    WaitTestSupport.waitUntil("Health check to get queried", maxWait)
       check.pinged
-    }
-  }
 
-  private def appProxyMainInvocationImpl: String = {
+  private def appProxyMainInvocationImpl: String =
     val javaExecutable =
       sys.props.get("java.home").fold("java")(_ + "/bin/java")
     val classPath = sys.props
@@ -175,13 +160,12 @@ trait SingleMarathonIntegrationTest
       .replaceAll(" ", "")
     val main = classOf[AppMock].getName
     s"""$javaExecutable -Xmx64m -classpath $classPath $main"""
-  }
 
   /**
     * Writes the appProxy invocation command into a shell script -- otherwise the whole log
     * of the test is spammed by overly long classpath definitions.
     */
-  private lazy val appProxyMainInvocation: String = {
+  private lazy val appProxyMainInvocation: String =
     val file = File.createTempFile("appProxy", ".sh")
     file.deleteOnExit()
 
@@ -192,7 +176,6 @@ trait SingleMarathonIntegrationTest
     file.setExecutable(true)
 
     file.getAbsolutePath
-  }
 
   private lazy val appProxyHealthChecks = Set(
       HealthCheck(gracePeriod = 20.second,
@@ -203,7 +186,7 @@ trait SingleMarathonIntegrationTest
                      versionId: String,
                      instances: Int,
                      withHealth: Boolean = true,
-                     dependencies: Set[PathId] = Set.empty): AppDefinition = {
+                     dependencies: Set[PathId] = Set.empty): AppDefinition =
     val targetDirs = sys.env.getOrElse("TARGET_DIRS", "/marathon")
     val cmd = Some(
         s"""bash -c 'echo APP PROXY $$MESOS_TASK_ID RUNNING; $appProxyMainInvocationImpl $appId $versionId http://$$HOST:${config.httpPort}/health$appId/$versionId'""")
@@ -214,8 +197,8 @@ trait SingleMarathonIntegrationTest
               new Container(
                   docker = Some(
                         new mesosphere.marathon.state.Container.Docker(
-                            image = s"""marathon-buildbase:${sys.env.getOrElse(
-                        "BUILD_ID", "test")}""",
+                            image = s"""marathon-buildbase:$sys.env.getOrElse(
+                        "BUILD_ID", "test")""",
                             network = Some(
                                   Protos.ContainerInfo.DockerInfo.Network.HOST)
                         )),
@@ -249,13 +232,12 @@ trait SingleMarathonIntegrationTest
           else Set.empty[HealthCheck],
         dependencies = dependencies
     )
-  }
 
   def appProxy(appId: PathId,
                versionId: String,
                instances: Int,
                withHealth: Boolean = true,
-               dependencies: Set[PathId] = Set.empty): AppDefinition = {
+               dependencies: Set[PathId] = Set.empty): AppDefinition =
     val cmd = Some(
         s"""echo APP PROXY $$MESOS_TASK_ID RUNNING; $appProxyMainInvocation $appId $versionId http://localhost:${config.httpPort}/health$appId/$versionId""")
     AppDefinition(
@@ -269,11 +251,10 @@ trait SingleMarathonIntegrationTest
           else Set.empty[HealthCheck],
         dependencies = dependencies
     )
-  }
 
   def appProxyCheck(appId: PathId,
                     versionId: String,
-                    state: Boolean): IntegrationHealthCheck = {
+                    state: Boolean): IntegrationHealthCheck =
     //this is used for all instances, as long as there is no specific instance check
     //the specific instance check has also a specific port, which is assigned by mesos
     val check = new IntegrationHealthCheck(appId, versionId, 0, state)
@@ -282,36 +263,33 @@ trait SingleMarathonIntegrationTest
       .foreach(ExternalMarathonIntegrationTest.healthChecks -= _)
     ExternalMarathonIntegrationTest.healthChecks += check
     check
-  }
 
   def taskProxyChecks(appId: PathId,
                       versionId: String,
-                      state: Boolean): Seq[IntegrationHealthCheck] = {
+                      state: Boolean): Seq[IntegrationHealthCheck] =
     marathon
       .tasks(appId)
       .value
       .flatMap(_.ports)
-      .flatMap(_.map { port =>
+      .flatMap(_.map  port =>
         val check = new IntegrationHealthCheck(appId, versionId, port, state)
         ExternalMarathonIntegrationTest.healthChecks
           .filter(c => c.appId == appId && c.versionId == versionId)
           .foreach(ExternalMarathonIntegrationTest.healthChecks -= _)
         ExternalMarathonIntegrationTest.healthChecks += check
         check
-      })
-  }
+      )
 
   def cleanUp(
-      withSubscribers: Boolean = false, maxWait: FiniteDuration = 30.seconds) {
+      withSubscribers: Boolean = false, maxWait: FiniteDuration = 30.seconds)
     log.info("Starting to CLEAN UP !!!!!!!!!!")
     events.clear()
     ExternalMarathonIntegrationTest.healthChecks.clear()
 
     val deleteResult: RestResult[ITDeploymentResult] =
       marathon.deleteGroup(testBasePath, force = true)
-    if (deleteResult.code != 404) {
+    if (deleteResult.code != 404)
       waitForChange(deleteResult)
-    }
 
     waitForCleanSlateInMesos()
 
@@ -329,15 +307,14 @@ trait SingleMarathonIntegrationTest
     events.clear()
     ExternalMarathonIntegrationTest.healthChecks.clear()
     log.info("CLEAN UP finished !!!!!!!!!")
-  }
 
-  def waitForCleanSlateInMesos(): Boolean = {
+  def waitForCleanSlateInMesos(): Boolean =
     require(mesos.state.value.agents.size == 1, "one agent expected")
-    WaitTestSupport.waitUntil("clean slate in Mesos", 30.seconds) {
+    WaitTestSupport.waitUntil("clean slate in Mesos", 30.seconds)
       val agent = mesos.state.value.agents.head
       val empty =
         agent.usedResources.isEmpty && agent.reservedResourcesByRole.isEmpty
-      if (!empty) {
+      if (!empty)
         import mesosphere.marathon.integration.facades.MesosFormats._
         log.info(
             "Waiting for blank slate Mesos...\n \"used_resources\": " +
@@ -345,8 +322,4 @@ trait SingleMarathonIntegrationTest
             "\n \"reserved_resources\": " +
             Json.prettyPrint(Json.toJson(agent.reservedResourcesByRole))
         )
-      }
       empty
-    }
-  }
-}

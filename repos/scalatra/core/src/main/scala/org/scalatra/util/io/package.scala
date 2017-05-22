@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 /**
   * A collection of I/O ulility methods.
   */
-package object io {
+package object io
 
   /**
     * Copies the input stream to the output stream.
@@ -18,33 +18,26 @@ package object io {
     * @param out the output stream to write
     * @param bufferSize the size of buffer to use for each read
     */
-  def copy(in: InputStream, out: OutputStream, bufferSize: Int = 4096): Unit = {
-    using(in) { in =>
+  def copy(in: InputStream, out: OutputStream, bufferSize: Int = 4096): Unit =
+    using(in)  in =>
       val buf = new Array[Byte](bufferSize)
       @tailrec
-      def loop() {
+      def loop()
         val n = in.read(buf)
-        if (n >= 0) {
+        if (n >= 0)
           out.write(buf, 0, n)
           loop()
-        }
-      }
       loop()
-    }
-  }
 
-  def zeroCopy(in: FileInputStream, out: OutputStream): Unit = {
-    using(in.getChannel) { ch =>
+  def zeroCopy(in: FileInputStream, out: OutputStream): Unit =
+    using(in.getChannel)  ch =>
       ch.transferTo(0, ch.size, Channels.newChannel(out))
-    }
-  }
 
-  def readBytes(in: InputStream): Array[Byte] = {
+  def readBytes(in: InputStream): Array[Byte] =
     val out = new ByteArrayOutputStream()
     copy(in, out)
 
     out.toByteArray
-  }
 
   /**
     * Creates a temp file, passes it to a block, and removes the temp file on the block's completion.
@@ -60,16 +53,12 @@ package object io {
   def withTempFile[A](content: String,
                       prefix: String = "scalatra",
                       suffix: String = ".tmp",
-                      directory: Option[File] = None)(f: File => A): A = {
+                      directory: Option[File] = None)(f: File => A): A =
     val tmp = File.createTempFile(prefix, suffix, directory.getOrElse(null))
-    try {
-      using(new BufferedWriter(new FileWriter(tmp))) { out =>
+    try
+      using(new BufferedWriter(new FileWriter(tmp)))  out =>
         out.write(content)
         out.flush()
-      }
       f(tmp)
-    } finally {
+    finally
       tmp.delete()
-    }
-  }
-}

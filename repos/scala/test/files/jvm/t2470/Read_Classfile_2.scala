@@ -1,3 +1,2 @@
-class Read {
+class Read
   val t = Test
-}

@@ -1,6 +1,6 @@
 package scalaz.example
 
-object SyntaxUsage extends App {
+object SyntaxUsage extends App
 
   val o1: Option[Int] = Some(0)
   val o2: Option[Option[Int]] = Some(Some(0))
@@ -17,7 +17,7 @@ object SyntaxUsage extends App {
 
   // Use the syntax only for Monad[Option]
   // This includes the syntax for the parent type classes.
-  def syntax1() {
+  def syntax1()
     import scalaz._
 
     // Import type class instances for Option, and the
@@ -31,10 +31,9 @@ object SyntaxUsage extends App {
 
     o1 >>= (x => if (x == 0) Some(0) else None)
     o2.join
-  }
 
   // Use two different instances, and the syntax for all Monads
-  def syntax2() {
+  def syntax2()
     import scalaz._
 
     // Import type class instances for Option and List
@@ -49,9 +48,8 @@ object SyntaxUsage extends App {
     l2.join
 
     1.point[Option]
-  }
 
-  def syntax3() {
+  def syntax3()
     import scalaz._
 
     // Import all type class instances
@@ -62,9 +60,8 @@ object SyntaxUsage extends App {
     l2.join
 
     o2.tuple(o2)
-  }
 
-  def stdSyntax() {
+  def stdSyntax()
     import scalaz.Tags.Last
     import scalaz.std.anyVal._
     import scalaz.std.stream.streamSyntax._
@@ -79,9 +76,8 @@ object SyntaxUsage extends App {
 
     val lists: List[Int] = some(1).orEmpty[List]
     Last.unwrap((some(1).last |+| some(2).last)) assert_=== some(2)
-  }
 
-  def stdSyntaxUeber() {
+  def stdSyntaxUeber()
     // Scalaz 6 Style: import everything: type class instances, implicit conversions
     // to the syntax wrappers, general functions.
     import scalaz._
@@ -105,5 +101,3 @@ object SyntaxUsage extends App {
     k >>> k
 
     List(some(0)).sequence
-  }
-}

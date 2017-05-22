@@ -30,13 +30,13 @@ import net.liftweb.record.{Field, FieldHelpers, MandatoryTypedField}
 import net.liftweb.util.Helpers._
 
 class UUIDField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[UUID, OwnerType] with MandatoryTypedField[UUID] {
+    extends Field[UUID, OwnerType] with MandatoryTypedField[UUID]
 
   def owner = rec
 
   def defaultValue = UUID.randomUUID
 
-  def setFromAny(in: Any): Box[UUID] = in match {
+  def setFromAny(in: Any): Box[UUID] = in match
     case uid: UUID => setBox(Full(uid))
     case Some(uid: UUID) => setBox(Full(uid))
     case Full(uid: UUID) => setBox(Full(uid))
@@ -47,39 +47,32 @@ class UUIDField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
     case null | None | Empty => setBox(defaultValueBox)
     case f: Failure => setBox(f)
     case o => setFromString(o.toString)
-  }
 
-  def setFromJValue(jvalue: JValue): Box[UUID] = jvalue match {
+  def setFromJValue(jvalue: JValue): Box[UUID] = jvalue match
     case JNothing | JNull if optional_? => setBox(Empty)
     case JObject(JField("$uuid", JString(s)) :: Nil) => setFromString(s)
     case other => setBox(FieldHelpers.expectedA("JObject", other))
-  }
 
-  def setFromString(in: String): Box[UUID] = tryo(UUID.fromString(in)) match {
+  def setFromString(in: String): Box[UUID] = tryo(UUID.fromString(in)) match
     case Full(uid: UUID) => setBox(Full(uid))
     case f: Failure => setBox(f)
     case other => setBox(Failure("Invalid UUID string: " + in))
-  }
 
   private def elem =
-    S.fmapFunc(S.SFuncHolder(this.setFromAny(_))) { funcName =>
+    S.fmapFunc(S.SFuncHolder(this.setFromAny(_)))  funcName =>
       <input type="text"
         name={funcName}
         value={valueBox.map(v => v.toString) openOr ""}
         tabindex={tabIndex.toString}/>
-    }
 
   def toForm =
-    uniqueFieldId match {
+    uniqueFieldId match
       case Full(id) => Full(elem % ("id" -> id))
       case _ => Full(elem)
-    }
 
-  def asJs = asJValue match {
+  def asJs = asJValue match
     case JNothing => JsNull
     case jv => JsRaw(compactRender(jv))
-  }
 
   def asJValue: JValue =
     valueBox.map(v => JsonUUID(v)) openOr (JNothing: JValue)
-}

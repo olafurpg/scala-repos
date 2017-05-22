@@ -23,15 +23,14 @@ import play.utils.Reflect
   * A custom application loader can be configured using the `application.loader` configuration property.
   * Implementations must define a no-arg constructor.
   */
-trait ApplicationLoader {
+trait ApplicationLoader
 
   /**
     * Load an application given the context.
     */
   def load(context: ApplicationLoader.Context): Application
-}
 
-object ApplicationLoader {
+object ApplicationLoader
 
   /**
     * The context for loading an application.
@@ -51,14 +50,14 @@ object ApplicationLoader {
   /**
     * Locate and instantiate the ApplicationLoader.
     */
-  def apply(context: Context): ApplicationLoader = {
+  def apply(context: Context): ApplicationLoader =
     Reflect.configuredClass[
         ApplicationLoader, play.ApplicationLoader, GuiceApplicationLoader](
         context.environment,
         PlayConfig(context.initialConfiguration),
         "play.application.loader",
         classOf[GuiceApplicationLoader].getName
-    ) match {
+    ) match
       case None =>
         new GuiceApplicationLoader
       case Some(Left(scalaClass)) =>
@@ -68,16 +67,12 @@ object ApplicationLoader {
           javaClass.newInstance
         // Create an adapter from a Java to a Scala ApplicationLoader. This class is
         // effectively anonymous, but let's give it a name to make debugging easier.
-        class JavaApplicationLoaderAdapter extends ApplicationLoader {
-          override def load(context: ApplicationLoader.Context): Application = {
+        class JavaApplicationLoaderAdapter extends ApplicationLoader
+          override def load(context: ApplicationLoader.Context): Application =
             val javaContext = new play.ApplicationLoader.Context(context)
             val javaApplication = javaApplicationLoader.load(javaContext)
             javaApplication.getWrappedApplication
-          }
-        }
         new JavaApplicationLoaderAdapter
-    }
-  }
 
   /**
     * Create an application loading context.
@@ -95,19 +90,16 @@ object ApplicationLoader {
       environment: Environment,
       initialSettings: Map[String, AnyRef] = Map.empty[String, AnyRef],
       sourceMapper: Option[SourceMapper] = None,
-      webCommands: WebCommands = new DefaultWebCommands) = {
+      webCommands: WebCommands = new DefaultWebCommands) =
     val configuration = Configuration.load(environment, initialSettings)
     Context(environment, sourceMapper, webCommands, configuration)
-  }
-}
 
 /**
   * Helper that provides all the built in components dependencies from the application loader context
   */
 abstract class BuiltInComponentsFromContext(context: ApplicationLoader.Context)
-    extends BuiltInComponents {
+    extends BuiltInComponents
   lazy val environment = context.environment
   lazy val sourceMapper = context.sourceMapper
   lazy val webCommands = context.webCommands
   lazy val configuration = context.initialConfiguration
-}

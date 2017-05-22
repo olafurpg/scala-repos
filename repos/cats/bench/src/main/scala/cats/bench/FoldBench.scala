@@ -7,7 +7,7 @@ import cats.{Foldable, Traverse}
 import org.openjdk.jmh.annotations.{Benchmark, Scope, State}
 
 @State(Scope.Benchmark)
-class FoldBench {
+class FoldBench
 
   val chars: List[String] = ('a' to 'z').map(_.toString).toList
 
@@ -22,4 +22,3 @@ class FoldBench {
     Traverse[List]
       .traverse[Const[String, ?], String, String](chars)(Const(_))
       .getConst
-}

@@ -21,8 +21,8 @@ import org.scalatest.Matchers
 
 import org.apache.spark.SparkFunSuite
 
-class ClientSuite extends SparkFunSuite with Matchers {
-  test("correctly validates driver jar URL's") {
+class ClientSuite extends SparkFunSuite with Matchers
+  test("correctly validates driver jar URL's")
     ClientArguments.isValidJarUrl("http://someHost:8080/foo.jar") should be(
         true)
     ClientArguments.isValidJarUrl("https://someHost:8080/foo.jar") should be(
@@ -53,5 +53,3 @@ class ClientSuite extends SparkFunSuite with Matchers {
 
     // Invalid syntax.
     ClientArguments.isValidJarUrl("hdfs:") should be(false)
-  }
-}

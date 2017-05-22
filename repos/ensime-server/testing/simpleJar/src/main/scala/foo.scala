@@ -1,5 +1,4 @@
 package baz
 
-object Foo {
+object Foo
   def bar: String = "hello"
-}

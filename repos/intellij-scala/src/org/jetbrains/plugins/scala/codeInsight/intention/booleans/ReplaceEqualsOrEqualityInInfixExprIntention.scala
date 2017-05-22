@@ -15,16 +15,15 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 4/23/12
   */
-object ReplaceEqualsOrEqualityInInfixExprIntention {
+object ReplaceEqualsOrEqualityInInfixExprIntention
   def familyName = "Replace equals or equality in infix expression"
-}
 
 class ReplaceEqualsOrEqualityInInfixExprIntention
-    extends PsiElementBaseIntentionAction {
+    extends PsiElementBaseIntentionAction
   def getFamilyName = ReplaceEqualsOrEqualityInInfixExprIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
@@ -42,9 +41,8 @@ class ReplaceEqualsOrEqualityInInfixExprIntention
     setText("Replace '" + oper + "' with '" + replaceOper(oper) + "'")
 
     true
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null || !infixExpr.isValid) return
@@ -71,12 +69,9 @@ class ReplaceEqualsOrEqualityInInfixExprIntention
         .getTextRange
         .getStartOffset - newInfixExpr.getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       infixExpr.replace(newInfixExpr)
       editor.getCaretModel.moveToOffset(start + size)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

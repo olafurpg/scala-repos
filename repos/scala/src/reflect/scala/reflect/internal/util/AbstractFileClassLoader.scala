@@ -17,74 +17,65 @@ import java.util.{Collections => JCollections, Enumeration => JEnumeration}
   *  @author Lex Spoon
   */
 class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
-    extends ClassLoader(parent) with ScalaClassLoader {
+    extends ClassLoader(parent) with ScalaClassLoader
   protected def classNameToPath(name: String): String =
     if (name endsWith ".class") name
     else s"${name.replace('.', '/')}.class"
 
-  protected def findAbstractFile(name: String): AbstractFile = {
+  protected def findAbstractFile(name: String): AbstractFile =
     var file: AbstractFile = root
     val pathParts = name split '/'
 
-    for (dirPart <- pathParts.init) {
+    for (dirPart <- pathParts.init)
       file = file.lookupName(dirPart, directory = true)
       if (file == null) return null
-    }
 
-    file.lookupName(pathParts.last, directory = false) match {
+    file.lookupName(pathParts.last, directory = false) match
       case null => null
       case file => file
-    }
-  }
 
   protected def dirNameToPath(name: String): String =
     name.replace('.', '/')
 
-  protected def findAbstractDir(name: String): AbstractFile = {
+  protected def findAbstractDir(name: String): AbstractFile =
     var file: AbstractFile = root
     val pathParts = dirNameToPath(name) split '/'
 
-    for (dirPart <- pathParts) {
+    for (dirPart <- pathParts)
       file = file.lookupName(dirPart, directory = true)
       if (file == null) return null
-    }
 
     file
-  }
 
-  override protected def findClass(name: String): Class[_] = {
+  override protected def findClass(name: String): Class[_] =
     val bytes = classBytes(name)
     if (bytes.length == 0) throw new ClassNotFoundException(name)
     else defineClass(name, bytes, 0, bytes.length, protectionDomain)
-  }
   override protected def findResource(name: String): URL =
-    findAbstractFile(name) match {
+    findAbstractFile(name) match
       case null => null
       case file =>
-        new URL(null, s"memory:${file.path}", new URLStreamHandler {
+        new URL(null, s"memory:${file.path}", new URLStreamHandler
           override def openConnection(url: URL): URLConnection =
-            new URLConnection(url) {
+            new URLConnection(url)
               override def connect() = ()
               override def getInputStream = file.input
-            }
-        })
-    }
+        )
   override protected def findResources(name: String): JEnumeration[URL] =
-    findResource(name) match {
+    findResource(name) match
       case null =>
         JCollections.enumeration(JCollections.emptyList[URL]) //JCollections.emptyEnumeration[URL]
       case url => JCollections.enumeration(JCollections.singleton(url))
-    }
 
-  lazy val protectionDomain = {
+  lazy val protectionDomain =
     val cl = Thread.currentThread().getContextClassLoader()
     val resource = cl.getResource("scala/runtime/package.class")
     if (resource == null || resource.getProtocol != "jar") null
-    else {
+    else
       val s = resource.getPath
       val n = s.lastIndexOf('!')
       if (n < 0) null
-      else {
+      else
         val path = s.substring(0, n)
         new ProtectionDomain(
             new CodeSource(
@@ -92,9 +83,6 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
             null,
             this,
             null)
-      }
-    }
-  }
 
   private val packages = mutable.Map[String, Package]()
 
@@ -105,15 +93,14 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
                              implTitle: String,
                              implVersion: String,
                              implVendor: String,
-                             sealBase: URL): Package = {
+                             sealBase: URL): Package =
     throw new UnsupportedOperationException()
-  }
 
   override def getPackage(name: String): Package =
-    findAbstractDir(name) match {
+    findAbstractDir(name) match
       case null => super.getPackage(name)
       case file =>
-        packages.getOrElseUpdate(name, {
+        packages.getOrElseUpdate(name,
           val ctor =
             classOf[Package].getDeclaredConstructor(classOf[String],
                                                     classOf[String],
@@ -127,12 +114,10 @@ class AbstractFileClassLoader(val root: AbstractFile, parent: ClassLoader)
           ctor.setAccessible(true)
           ctor.newInstance(
               name, null, null, null, null, null, null, null, this)
-        })
-    }
+        )
 
   override def getPackages(): Array[Package] =
     root.iterator
       .filter(_.isDirectory)
       .map(dir => getPackage(dir.name))
       .toArray
-}

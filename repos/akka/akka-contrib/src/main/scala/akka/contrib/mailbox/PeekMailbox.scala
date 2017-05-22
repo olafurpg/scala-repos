@@ -11,15 +11,14 @@ import akka.actor.{ActorContext, ActorRef, ActorSystem, ExtendedActorSystem, Ext
 import akka.dispatch.{Envelope, MailboxType, MessageQueue, UnboundedQueueBasedMessageQueue}
 
 object PeekMailboxExtension
-    extends ExtensionId[PeekMailboxExtension] with ExtensionIdProvider {
+    extends ExtensionId[PeekMailboxExtension] with ExtensionIdProvider
   def lookup = this
   def createExtension(s: ExtendedActorSystem) = new PeekMailboxExtension(s)
 
   def ack()(implicit context: ActorContext): Unit =
     PeekMailboxExtension(context.system).ack()
-}
 
-class PeekMailboxExtension(val system: ExtendedActorSystem) extends Extension {
+class PeekMailboxExtension(val system: ExtendedActorSystem) extends Extension
   private val mailboxes = new ConcurrentHashMap[ActorRef, PeekMailbox]
 
   def register(actorRef: ActorRef, mailbox: PeekMailbox): Unit =
@@ -28,13 +27,11 @@ class PeekMailboxExtension(val system: ExtendedActorSystem) extends Extension {
   def unregister(actorRef: ActorRef): Unit = mailboxes.remove(actorRef)
 
   def ack()(implicit context: ActorContext): Unit =
-    mailboxes.get(context.self) match {
+    mailboxes.get(context.self) match
       case null ⇒
         throw new IllegalArgumentException(
             "Mailbox not registered for: " + context.self)
       case mailbox ⇒ mailbox.ack()
-    }
-}
 
 /**
   * configure the mailbox via dispatcher configuration:
@@ -45,9 +42,9 @@ class PeekMailboxExtension(val system: ExtendedActorSystem) extends Extension {
   * }}}
   */
 class PeekMailboxType(settings: ActorSystem.Settings, config: Config)
-    extends MailboxType {
+    extends MailboxType
   override def create(owner: Option[ActorRef], system: Option[ActorSystem]) =
-    (owner, system) match {
+    (owner, system) match
       case (Some(o), Some(s)) ⇒
         val retries = config.getInt("max-retries")
         if (retries < 1)
@@ -57,11 +54,9 @@ class PeekMailboxType(settings: ActorSystem.Settings, config: Config)
         PeekMailboxExtension(s).register(o, mailbox)
         mailbox
       case _ ⇒ throw new Exception("no mailbox owner or system given")
-    }
-}
 
 class PeekMailbox(owner: ActorRef, system: ActorSystem, maxRetries: Int)
-    extends UnboundedQueueBasedMessageQueue {
+    extends UnboundedQueueBasedMessageQueue
   final val queue = new ConcurrentLinkedQueue[Envelope]()
 
   /*
@@ -80,7 +75,7 @@ class PeekMailbox(owner: ActorRef, system: ActorSystem, maxRetries: Int)
   val Marker = maxRetries + 1
 
   // this logic does not work if maxRetries==0, but then you could also use a normal mailbox
-  override def dequeue(): Envelope = tries match {
+  override def dequeue(): Envelope = tries match
     case -1 ⇒
       queue.poll()
     case 0 | Marker ⇒
@@ -93,17 +88,13 @@ class PeekMailbox(owner: ActorRef, system: ActorSystem, maxRetries: Int)
     case n ⇒
       tries = n + 1
       queue.peek()
-  }
 
-  def ack(): Unit = {
+  def ack(): Unit =
     // do not dequeue for real if double-ack() or ack() on last try
     if (tries != 0 && tries != Marker) queue.poll()
     tries = 0
-  }
 
-  override def cleanUp(owner: ActorRef, deadLetters: MessageQueue): Unit = {
+  override def cleanUp(owner: ActorRef, deadLetters: MessageQueue): Unit =
     tries = -1 // put the queue into auto-ack mode
     super.cleanUp(owner, deadLetters)
     PeekMailboxExtension(system).unregister(owner)
-  }
-}

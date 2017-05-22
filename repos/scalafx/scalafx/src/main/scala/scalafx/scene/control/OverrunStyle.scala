@@ -32,7 +32,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[scalafx.scene.control.OverrunStyle]] */
 object OverrunStyle
-    extends SFXEnumDelegateCompanion[jfxsc.OverrunStyle, OverrunStyle] {
+    extends SFXEnumDelegateCompanion[jfxsc.OverrunStyle, OverrunStyle]
 
   val CenterEllipsis = new OverrunStyle(jfxsc.OverrunStyle.CENTER_ELLIPSIS)
   @deprecated(
@@ -78,7 +78,6 @@ object OverrunStyle
       LeadingEllipsis,
       LeadingWordEllipsis
   )
-}
 
 sealed case class OverrunStyle(override val delegate: jfxsc.OverrunStyle)
     extends SFXEnumDelegate[jfxsc.OverrunStyle]

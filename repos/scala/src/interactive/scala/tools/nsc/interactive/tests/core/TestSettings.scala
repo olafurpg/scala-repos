@@ -3,7 +3,7 @@ package scala.tools.nsc.interactive.tests.core
 import scala.tools.nsc.io.Path
 
 /** Common settings for the test. */
-private[tests] trait TestSettings {
+private[tests] trait TestSettings
   protected final val TIMEOUT = 30000 // timeout in milliseconds
 
   /** The root directory for this test suite, usually the test kind ("test/files/presentation"). */
@@ -19,4 +19,3 @@ private[tests] trait TestSettings {
   protected val sourceDir = "src"
 
   protected implicit val reporter: Reporter = ConsoleReporter
-}

@@ -12,11 +12,10 @@ case class ApiCommitListItem(sha: String,
                              author: Option[ApiUser],
                              committer: Option[ApiUser],
                              parents: Seq[Parent])(
-    repositoryName: RepositoryName) {
+    repositoryName: RepositoryName)
   val url = ApiPath(s"/api/v3/repos/${repositoryName.fullName}/commits/${sha}")
-}
 
-object ApiCommitListItem {
+object ApiCommitListItem
   def apply(
       commit: CommitInfo, repositoryName: RepositoryName): ApiCommitListItem =
     ApiCommitListItem(sha = commit.id,
@@ -30,15 +29,12 @@ object ApiCommitListItem {
                       parents = commit.parents.map(Parent(_)(repositoryName)))(
         repositoryName)
 
-  case class Parent(sha: String)(repositoryName: RepositoryName) {
+  case class Parent(sha: String)(repositoryName: RepositoryName)
     val url = ApiPath(
         s"/api/v3/repos/${repositoryName.fullName}/commits/${sha}")
-  }
 
   case class Commit(
       message: String, author: ApiPersonIdent, committer: ApiPersonIdent)(
-      sha: String, repositoryName: RepositoryName) {
+      sha: String, repositoryName: RepositoryName)
     val url = ApiPath(
         s"/api/v3/repos/${repositoryName.fullName}/git/commits/${sha}")
-  }
-}

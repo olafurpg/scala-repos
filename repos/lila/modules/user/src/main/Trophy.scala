@@ -7,7 +7,7 @@ case class Trophy(_id: String, // random
                   kind: Trophy.Kind,
                   date: DateTime)
 
-object Trophy {
+object Trophy
 
   sealed abstract class Kind(val key: String,
                              val name: String,
@@ -15,7 +15,7 @@ object Trophy {
                              val url: Option[String],
                              val klass: Option[String])
 
-  object Kind {
+  object Kind
 
     object ZugMiracle
         extends Kind(
@@ -118,11 +118,9 @@ object Trophy {
                    Moderator,
                    Streamer)
     def byKey(key: String) = all find (_.key == key)
-  }
 
   def make(userId: String, kind: Trophy.Kind) =
     Trophy(_id = ornicar.scalalib.Random nextStringUppercase 8,
            user = userId,
            kind = kind,
            date = DateTime.now)
-}

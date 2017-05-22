@@ -2,17 +2,14 @@ package org.scalatra
 
 import org.scalatra.test.specs2.ScalatraSpec
 
-class EnvironmentFilter extends ScalatraFilter {
-  get("/*/environment") {
+class EnvironmentFilter extends ScalatraFilter
+  get("/*/environment")
     environment
-  }
 
-  get("/*/is-development-mode") {
+  get("/*/is-development-mode")
     isDevelopmentMode
-  }
-}
 
-class EnvironmentFilterSpec extends ScalatraSpec {
+class EnvironmentFilterSpec extends ScalatraSpec
   def is =
     "The dev filter should" ^ "return 'development' as the environment" ! env(
         "dev", "DEVELOPMENT") ^ "be development mode" ! isDevMode(
@@ -27,12 +24,9 @@ class EnvironmentFilterSpec extends ScalatraSpec {
   prodFilterHolder.setInitParameter(EnvironmentKey, "production")
 
   def env(environment: String, expected: String) =
-    get("/%s/environment".format(environment)) {
+    get("/%s/environment".format(environment))
       body must be equalTo (expected)
-    }
 
   def isDevMode(environment: String, expected: Boolean) =
-    get("/%s/is-development-mode".format(environment)) {
+    get("/%s/is-development-mode".format(environment))
       body must be equalTo (expected.toString)
-    }
-}

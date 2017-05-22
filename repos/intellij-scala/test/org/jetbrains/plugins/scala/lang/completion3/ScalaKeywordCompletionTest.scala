@@ -8,8 +8,8 @@ import org.junit.Assert
   * User: Alexander Podkhalyuzin
   * Date: 04.01.12
   */
-class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
-  def testPrivateVal() {
+class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase
+  def testPrivateVal()
     val fileText = """
       |class A {
       |  private va<caret>
@@ -27,9 +27,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "val").get)
     checkResultByText(resultText)
-  }
 
-  def testPrivateThis() {
+  def testPrivateThis()
     val fileText = """
         |class A {
         |  pr<caret>
@@ -47,9 +46,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "private").get, '[')
     checkResultByText(resultText)
-  }
 
-  def testFirstVal() {
+  def testFirstVal()
     val fileText = """
       |class A {
       |  def foo() {
@@ -71,9 +69,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "val").get, ' ')
     checkResultByText(resultText)
-  }
 
-  def testIfAfterCase() {
+  def testIfAfterCase()
     val fileText = """
       |1 match {
       |  case a if<caret>
@@ -91,9 +88,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "if").get, ' ')
     checkResultByText(resultText)
-  }
 
-  def testValUnderCaseClause() {
+  def testValUnderCaseClause()
     val fileText = """
       |1 match {
       |  case 1 =>
@@ -113,9 +109,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "val").get, ' ')
     checkResultByText(resultText)
-  }
 
-  def testDefUnderCaseClause() {
+  def testDefUnderCaseClause()
     val fileText = """
       |1 match {
       |  case 1 =>
@@ -135,9 +130,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "def").get, ' ')
     checkResultByText(resultText)
-  }
 
-  def testIfParentheses() {
+  def testIfParentheses()
     val fileText = """
       |1 match {
       |  case 1 =>
@@ -157,9 +151,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "if").get, '(')
     checkResultByText(resultText)
-  }
 
-  def testTryBraces() {
+  def testTryBraces()
     val fileText = """
       |1 match {
       |  case 1 =>
@@ -179,9 +172,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "try").get, '{')
     checkResultByText(resultText)
-  }
 
-  def testDoWhile() {
+  def testDoWhile()
     val fileText = """
       |do {} whi<caret>
       |1
@@ -197,9 +189,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "while").get, '(')
     checkResultByText(resultText)
-  }
 
-  def testFilterFinal() {
+  def testFilterFinal()
     val fileText = """
       |class Test {
       |  def fina<caret>
@@ -209,9 +200,8 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.SMART)
 
     Assert.assertNull(activeLookup)
-  }
 
-  def testFilterImplicit() {
+  def testFilterImplicit()
     val fileText = """
       |def foo(p: (Int => Int)) {}
       |foo((impl<caret>: Int) => 0)
@@ -220,5 +210,3 @@ class ScalaKeywordCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.SMART)
 
     Assert.assertNull(activeLookup)
-  }
-}

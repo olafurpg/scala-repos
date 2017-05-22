@@ -10,7 +10,6 @@ import akka.testkit._
 
 case class RouteTestTimeout(duration: FiniteDuration)
 
-object RouteTestTimeout {
+object RouteTestTimeout
   implicit def default(implicit system: ActorSystem) =
     RouteTestTimeout(1.second dilated)
-}

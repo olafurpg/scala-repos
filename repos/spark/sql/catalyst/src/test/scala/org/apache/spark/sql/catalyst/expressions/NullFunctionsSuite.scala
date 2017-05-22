@@ -20,9 +20,9 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
-class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
+class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper
 
-  def testAllTypes(testFunc: (Any, DataType) => Unit): Unit = {
+  def testAllTypes(testFunc: (Any, DataType) => Unit): Unit =
     testFunc(false, BooleanType)
     testFunc(1.toByte, ByteType)
     testFunc(1.toShort, ShortType)
@@ -34,18 +34,15 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     testFunc(new java.sql.Date(10), DateType)
     testFunc(new java.sql.Timestamp(10), TimestampType)
     testFunc("abcd", StringType)
-  }
 
-  test("isnull and isnotnull") {
-    testAllTypes { (value: Any, tpe: DataType) =>
+  test("isnull and isnotnull")
+    testAllTypes  (value: Any, tpe: DataType) =>
       checkEvaluation(IsNull(Literal.create(value, tpe)), false)
       checkEvaluation(IsNotNull(Literal.create(value, tpe)), true)
       checkEvaluation(IsNull(Literal.create(null, tpe)), true)
       checkEvaluation(IsNotNull(Literal.create(null, tpe)), false)
-    }
-  }
 
-  test("IsNaN") {
+  test("IsNaN")
     checkEvaluation(IsNaN(Literal(Double.NaN)), true)
     checkEvaluation(IsNaN(Literal(Float.NaN)), true)
     checkEvaluation(IsNaN(Literal(math.log(-3))), true)
@@ -53,9 +50,8 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(IsNaN(Literal(Double.PositiveInfinity)), false)
     checkEvaluation(IsNaN(Literal(Float.MaxValue)), false)
     checkEvaluation(IsNaN(Literal(5.5f)), false)
-  }
 
-  test("nanvl") {
+  test("nanvl")
     checkEvaluation(NaNvl(Literal(5.0), Literal.create(null, DoubleType)), 5.0)
     checkEvaluation(
         NaNvl(Literal.create(null, DoubleType), Literal(5.0)), null)
@@ -69,10 +65,9 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
           .eval(EmptyRow)
           .asInstanceOf[Double]
           .isNaN)
-  }
 
-  test("coalesce") {
-    testAllTypes { (value: Any, tpe: DataType) =>
+  test("coalesce")
+    testAllTypes  (value: Any, tpe: DataType) =>
       val lit = Literal.create(value, tpe)
       val nullLit = Literal.create(null, tpe)
       checkEvaluation(Coalesce(Seq(nullLit)), null)
@@ -80,10 +75,8 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
       checkEvaluation(Coalesce(Seq(nullLit, lit)), value)
       checkEvaluation(Coalesce(Seq(nullLit, lit, lit)), value)
       checkEvaluation(Coalesce(Seq(nullLit, nullLit, lit)), value)
-    }
-  }
 
-  test("AtLeastNNonNulls") {
+  test("AtLeastNNonNulls")
     val mix = Seq(Literal("x"),
                   Literal.create(null, StringType),
                   Literal.create(null, DoubleType),
@@ -108,5 +101,3 @@ class NullFunctionsSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(AtLeastNNonNulls(4, nanOnly), false, EmptyRow)
     checkEvaluation(AtLeastNNonNulls(3, nullOnly), true, EmptyRow)
     checkEvaluation(AtLeastNNonNulls(4, nullOnly), false, EmptyRow)
-  }
-}

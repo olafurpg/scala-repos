@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 26.06.2015.
   */
-trait FreeSpecStaticStringTest extends ScalaTestTestCase {
+trait FreeSpecStaticStringTest extends ScalaTestTestCase
   val freeSpecClassName = "FreeSpecStringTest"
   val freeSpecFileName = freeSpecClassName + ".scala"
 
-  def addFreeSpec() {
+  def addFreeSpec()
     addFileToProject(freeSpecFileName,
                      """
         |import org.scalatest._
@@ -42,18 +42,16 @@ trait FreeSpecStaticStringTest extends ScalaTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
 
-  def testFreeSpecSum() = {
+  def testFreeSpecSum() =
     addFreeSpec()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(8, 7, freeSpecFileName),
                                freeSpecClassName,
                                "A FreeSpecTest should work with sum"))
-  }
 
-  def testFreeSpecVal() = {
+  def testFreeSpecVal() =
     addFreeSpec()
 
     assert(
@@ -64,9 +62,8 @@ trait FreeSpecStaticStringTest extends ScalaTestTestCase {
         checkConfigAndSettings(createTestFromLocation(19, 7, freeSpecFileName),
                                freeSpecClassName,
                                "Const name InnerConst"))
-  }
 
-  def testFreeSpecValSum() = {
+  def testFreeSpecValSum() =
     addFreeSpec()
 
     assert(
@@ -74,13 +71,10 @@ trait FreeSpecStaticStringTest extends ScalaTestTestCase {
             createTestFromLocation(11, 7, freeSpecFileName),
             freeSpecClassName,
             "A FreeSpecTest should work with sum of consts"))
-  }
 
-  def testFreeSpecNonConst() = {
+  def testFreeSpecNonConst() =
     addFreeSpec()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(24, 7, freeSpecFileName),
                                freeSpecClassName))
-  }
-}

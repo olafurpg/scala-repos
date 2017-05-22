@@ -29,22 +29,19 @@ object AkkaHttpHeadActionSpec
 
 trait HeadActionSpec
     extends Specification with FutureAwaits with DefaultAwaitTimeout
-    with ServerIntegrationSpecification {
+    with ServerIntegrationSpecification
 
   private def route(verb: String, path: String)(
-      handler: EssentialAction): PartialFunction[(String, String), Handler] = {
+      handler: EssentialAction): PartialFunction[(String, String), Handler] =
     case (v, p) if v == verb && p == path => handler
-  }
   sequential
 
-  "HEAD requests" should {
+  "HEAD requests" should
 
-    val chunkedResponse: Routes = {
+    val chunkedResponse: Routes =
       case GET(p"/chunked") =>
-        Action { request =>
+        Action  request =>
           Results.Ok.chunked(Source(List("a", "b", "c")))
-        }
-    }
 
     val routes = get // GET /get
       .orElse(patch) // PATCH /patch
@@ -54,41 +51,35 @@ trait HeadActionSpec
       .orElse(stream) // GET /stream/0
       .orElse(chunkedResponse) // GET /chunked
 
-    def withServer[T](block: WSClient => T): T = {
+    def withServer[T](block: WSClient => T): T =
       // Routes from HttpBinApplication
-      Server.withRouter()(routes) { implicit port =>
+      Server.withRouter()(routes)  implicit port =>
         implicit val mat = Play.current.materializer
         WsTestClient.withClient(block)
-      }
-    }
 
-    def serverWithAction[T](action: EssentialAction)(block: WSClient => T): T = {
-      Server.withRouter() {
+    def serverWithAction[T](action: EssentialAction)(block: WSClient => T): T =
+      Server.withRouter()
         case _ => action
-      } { implicit port =>
+       implicit port =>
         implicit val mat = Play.current.materializer
         WsTestClient.withClient(block)
-      }
-    }
 
-    "return 200 in response to a URL with a GET handler" in withServer {
+    "return 200 in response to a URL with a GET handler" in withServer
       client =>
         val result = await(client.url("/get").head())
 
         result.status must_== OK
-    }
 
-    "return an empty body" in withServer { client =>
+    "return an empty body" in withServer  client =>
       val result = await(client.url("/get").head())
 
       result.body.length must_== 0
-    }
 
-    "match the headers of an equivalent GET" in withServer { client =>
-      val collectedFutures = for {
+    "match the headers of an equivalent GET" in withServer  client =>
+      val collectedFutures = for
         headResponse <- client.url("/get").head()
         getResponse <- client.url("/get").get()
-      } yield List(headResponse, getResponse)
+      yield List(headResponse, getResponse)
 
       val responses = await(collectedFutures)
 
@@ -102,54 +93,46 @@ trait HeadActionSpec
       val secondHeaders = getHeaders.remove(DATE)
 
       // HTTPHeaders doesn't seem to be anything as simple as an equals method, so let's compare A !< B && B >! A
-      val notInFirst = secondHeaders.asScala.collectFirst {
+      val notInFirst = secondHeaders.asScala.collectFirst
         case entry
             if !firstHeaders.contains(entry.getKey, entry.getValue, true) =>
           entry
-      }
-      val notInSecond = firstHeaders.asScala.collectFirst {
+      val notInSecond = firstHeaders.asScala.collectFirst
         case entry
             if !secondHeaders.contains(entry.getKey, entry.getValue, true) =>
           entry
-      }
       notInFirst must beEmpty
       notInSecond must beEmpty
-    }
 
-    "return 404 in response to a URL without an associated GET handler" in withServer {
+    "return 404 in response to a URL without an associated GET handler" in withServer
       client =>
-        val collectedFutures = for {
+        val collectedFutures = for
           putRoute <- client.url("/put").head()
           patchRoute <- client.url("/patch").head()
           postRoute <- client.url("/post").head()
           deleteRoute <- client.url("/delete").head()
-        } yield List(putRoute, patchRoute, postRoute, deleteRoute)
+        yield List(putRoute, patchRoute, postRoute, deleteRoute)
 
         val responseList = await(collectedFutures)
 
         foreach(responseList)((_: WSResponse).status must_== NOT_FOUND)
-    }
 
     "tag request with DefaultHttpRequestHandler" in serverWithAction(
-        new RequestTaggingHandler with EssentialAction {
+        new RequestTaggingHandler with EssentialAction
       def tagRequest(request: RequestHeader) =
         request.copy(tags = Map(RouteComments -> "some comment"))
       def apply(rh: RequestHeader) =
-        Action {
+        Action
           Results.Ok.withHeaders(
               rh.tags.get(RouteComments).map(RouteComments -> _).toSeq: _*)
-        }(rh)
-    }) { client =>
+        (rh)
+    )  client =>
       val result = await(client.url("/get").head())
       result.status must_== OK
       result.header(RouteComments) must beSome("some comment")
-    }
 
-    "omit Content-Length for chunked responses" in withServer { client =>
+    "omit Content-Length for chunked responses" in withServer  client =>
       val response = await(client.url("/chunked").head())
 
       response.body must_== ""
       response.header(CONTENT_LENGTH) must beNone
-    }
-  }
-}

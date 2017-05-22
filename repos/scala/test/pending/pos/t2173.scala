@@ -1,7 +1,6 @@
-class A[+U >: Null] {
+class A[+U >: Null]
   type R[+X >: Null] = X
   type O[+X] = A[R[X]]
-}
 
 // with the following error:
 // 

@@ -14,8 +14,8 @@ import org.junit.Assert
 /**
   * @author Alexander Podkhalyuzin
   */
-class BlockParseTest extends SimpleTestCase {
-  def parseBlock(s: String): PsiElement = {
+class BlockParseTest extends SimpleTestCase
+  def parseBlock(s: String): PsiElement =
     val fileFactory = PsiFileFactory.getInstance(fixture.getProject)
     val context = parseText("")
     val holder: FileElement = DummyHolderFactory
@@ -33,14 +33,12 @@ class BlockParseTest extends SimpleTestCase {
     val node = builder.getTreeBuilt
     holder.rawAddChildren(node.asInstanceOf[TreeElement])
     node.getPsi
-  }
 
-  def doTest(s: String) {
+  def doTest(s: String)
     val elem = parseBlock(s)
     Assert.assertEquals(s, elem.getText)
-  }
 
-  def testBlock() {
+  def testBlock()
     doTest(
         """{
   val a = new df
@@ -55,9 +53,8 @@ class BlockParseTest extends SimpleTestCase {
   asdg
 }"""
     )
-  }
 
-  def testBlock2() {
+  def testBlock2()
     doTest(
         """{
     PsiDocumentManager.getInstance(project).commitAllDocuments()
@@ -99,9 +96,8 @@ class BlockParseTest extends SimpleTestCase {
     }
 }"""
     )
-  }
 
-  def testBlock3() {
+  def testBlock3()
     doTest(
         """{
       var asdga = adf
@@ -131,9 +127,8 @@ class BlockParseTest extends SimpleTestCase {
       assert(adsfadsf, "")
     }"""
     )
-  }
 
-  def testBlock4() {
+  def testBlock4()
     doTest(
         """{
     val asdfadf = fadfad.:
@@ -144,5 +139,3 @@ class BlockParseTest extends SimpleTestCase {
     }
   }"""
     )
-  }
-}

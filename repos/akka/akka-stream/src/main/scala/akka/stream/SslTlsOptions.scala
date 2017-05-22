@@ -15,7 +15,7 @@ import scala.collection.immutable
   * server, where the latter listens passively for messages and the former
   * actively initiates the exchange.
   */
-object TLSRole {
+object TLSRole
 
   /**
     * Java API: obtain the [[Client]] singleton value.
@@ -26,7 +26,6 @@ object TLSRole {
     * Java API: obtain the [[Server]] singleton value.
     */
   def server: TLSRole = Server
-}
 sealed abstract class TLSRole
 
 /**
@@ -75,11 +74,10 @@ case object Server extends Server
   *  - [[IgnoreBoth]] means to ignore the first termination signal—be that
   *    cancellation or completion—and only act upon the second one
   */
-sealed abstract class TLSClosing {
+sealed abstract class TLSClosing
   def ignoreCancel: Boolean
   def ignoreComplete: Boolean
-}
-object TLSClosing {
+object TLSClosing
 
   /**
     * Java API: obtain the [[EagerClose]] singleton value.
@@ -100,45 +98,40 @@ object TLSClosing {
     * Java API: obtain the [[IgnoreBoth]] singleton value.
     */
   def ignoreBoth: TLSClosing = IgnoreBoth
-}
 
 /**
   * see [[TLSClosing]]
   */
-sealed abstract class EagerClose extends TLSClosing {
+sealed abstract class EagerClose extends TLSClosing
   override def ignoreCancel = false
   override def ignoreComplete = false
-}
 case object EagerClose extends EagerClose
 
 /**
   * see [[TLSClosing]]
   */
-sealed abstract class IgnoreCancel extends TLSClosing {
+sealed abstract class IgnoreCancel extends TLSClosing
   override def ignoreCancel = true
   override def ignoreComplete = false
-}
 case object IgnoreCancel extends IgnoreCancel
 
 /**
   * see [[TLSClosing]]
   */
-sealed abstract class IgnoreComplete extends TLSClosing {
+sealed abstract class IgnoreComplete extends TLSClosing
   override def ignoreCancel = false
   override def ignoreComplete = true
-}
 case object IgnoreComplete extends IgnoreComplete
 
 /**
   * see [[TLSClosing]]
   */
-sealed abstract class IgnoreBoth extends TLSClosing {
+sealed abstract class IgnoreBoth extends TLSClosing
   override def ignoreCancel = true
   override def ignoreComplete = true
-}
 case object IgnoreBoth extends IgnoreBoth
 
-object TLSProtocol {
+object TLSProtocol
 
   /**
     * This is the supertype of all messages that the SslTls stage emits on the
@@ -200,7 +193,7 @@ object TLSProtocol {
       enabledProtocols: Option[immutable.Seq[String]],
       clientAuth: Option[TLSClientAuth],
       sslParameters: Option[SSLParameters])
-      extends SslTlsOutbound {
+      extends SslTlsOutbound
 
     /**
       * Java API: Make a copy of this message with the given `enabledCipherSuites`.
@@ -224,24 +217,21 @@ object TLSProtocol {
       * Java API: Make a copy of this message with the given [[SSLParameters]].
       */
     def withParameters(p: SSLParameters) = copy(sslParameters = Some(p))
-  }
 
   object NegotiateNewSession
-      extends NegotiateNewSession(None, None, None, None) {
+      extends NegotiateNewSession(None, None, None, None)
 
     /**
       * Java API: obtain the default value (which will leave the SSLEngine’s
       * settings unchanged).
       */
     def withDefaults: NegotiateNewSession = this
-  }
 
   /**
     * Send the given [[akka.util.ByteString]] across the encrypted session to the
     * peer.
     */
   final case class SendBytes(bytes: ByteString) extends SslTlsOutbound
-}
 
 /**
   * An SSLEngine can either demand, allow or ignore its peer’s authentication
@@ -253,7 +243,7 @@ object TLSProtocol {
   * See the documentation for `SSLEngine::setWantClientAuth` for more information.
   */
 sealed abstract class TLSClientAuth
-object TLSClientAuth {
+object TLSClientAuth
   case object None extends TLSClientAuth
   case object Want extends TLSClientAuth
   case object Need extends TLSClientAuth
@@ -261,4 +251,3 @@ object TLSClientAuth {
   def none: TLSClientAuth = None
   def want: TLSClientAuth = Want
   def need: TLSClientAuth = Need
-}

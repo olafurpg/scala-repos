@@ -22,7 +22,7 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
                               "akka-graphite-reporter",
                               MetricFilter.ALL,
                               TimeUnit.SECONDS,
-                              TimeUnit.NANOSECONDS) {
+                              TimeUnit.NANOSECONDS)
 
   // todo get rid of ScheduledReporter (would mean removing codahale metrics)?
 
@@ -37,7 +37,7 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
                       counters: util.SortedMap[String, Counter],
                       histograms: util.SortedMap[String, Histogram],
                       meters: util.SortedMap[String, Meter],
-                      timers: util.SortedMap[String, Timer]) {
+                      timers: util.SortedMap[String, Timer])
     val dateTime = dateFormat.format(new Date(clock.getTime))
 
     // akka-custom metrics
@@ -52,7 +52,7 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
                    metricsCount + " metrics)",
                    '=')
 
-    try {
+    try
       // graphite takes timestamps in seconds
       val now = System.currentTimeMillis.millis.toSeconds
 
@@ -68,22 +68,18 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
           now, knownOpsInTimespanCounters, sendKnownOpsInTimespanCounter)
       sendMetrics(now, hdrHistograms, sendHdrHistogram)
       sendMetrics(now, averagingGauges, sendAveragingGauge)
-    } catch {
+    catch
       case ex: Exception ⇒
         throw new RuntimeException("Unable to send metrics to Graphite!", ex)
-    }
-  }
 
   def sendMetrics[T <: Metric](now: Long,
                                metrics: Iterable[(String, T)],
-                               send: (Long, String, T) ⇒ Unit) {
-    for ((key, metric) ← metrics) {
+                               send: (Long, String, T) ⇒ Unit)
+    for ((key, metric) ← metrics)
       if (verbose) println("  " + key)
       send(now, key, metric)
-    }
-  }
 
-  private def sendHistogram(now: Long, key: String, histogram: Histogram) {
+  private def sendHistogram(now: Long, key: String, histogram: Histogram)
     val snapshot = histogram.getSnapshot
     send(key + ".count", histogram.getCount, now)
     send(key + ".max", snapshot.getMax, now)
@@ -96,9 +92,8 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     send(key + ".p98", snapshot.get98thPercentile, now)
     send(key + ".p99", snapshot.get99thPercentile, now)
     send(key + ".p999", snapshot.get999thPercentile, now)
-  }
 
-  private def sendTimer(now: Long, key: String, timer: Timer) {
+  private def sendTimer(now: Long, key: String, timer: Timer)
     val snapshot = timer.getSnapshot
     send(key + ".max", convertDuration(snapshot.getMax), now)
     send(key + ".mean", convertDuration(snapshot.getMean), now)
@@ -111,33 +106,28 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     send(key + ".p99", convertDuration(snapshot.get99thPercentile), now)
     send(key + ".p999", convertDuration(snapshot.get999thPercentile), now)
     sendMetered(now, key, timer)
-  }
 
-  private def sendMetered(now: Long, key: String, meter: Metered) {
+  private def sendMetered(now: Long, key: String, meter: Metered)
     send(key + ".count", meter.getCount, now)
     send(key + ".m1_rate", convertRate(meter.getOneMinuteRate), now)
     send(key + ".m5_rate", convertRate(meter.getFiveMinuteRate), now)
     send(key + ".m15_rate", convertRate(meter.getFifteenMinuteRate), now)
     send(key + ".mean_rate", convertRate(meter.getMeanRate), now)
-  }
 
-  private def sendGauge(now: Long, key: String, gauge: Gauge[_]) {
+  private def sendGauge(now: Long, key: String, gauge: Gauge[_])
     sendNumericOrIgnore(key + ".gauge", gauge.getValue, now)
-  }
 
-  private def sendCounter(now: Long, key: String, counter: Counter) {
+  private def sendCounter(now: Long, key: String, counter: Counter)
     sendNumericOrIgnore(key + ".count", counter.getCount, now)
-  }
 
   private def sendKnownOpsInTimespanCounter(
-      now: Long, key: String, counter: KnownOpsInTimespanTimer) {
+      now: Long, key: String, counter: KnownOpsInTimespanTimer)
     send(key + ".ops", counter.getCount, now)
     send(key + ".time", counter.elapsedTime, now)
     send(key + ".opsPerSec", counter.opsPerSecond, now)
     send(key + ".avg", counter.avgDuration, now)
-  }
 
-  private def sendHdrHistogram(now: Long, key: String, hist: HdrHistogram) {
+  private def sendHdrHistogram(now: Long, key: String, hist: HdrHistogram)
     val snapshot = hist.getData
     send(key + ".min", snapshot.getMinValue, now)
     send(key + ".max", snapshot.getMaxValue, now)
@@ -148,26 +138,23 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
     send(key + ".p98", snapshot.getValueAtPercentile(98.0), now)
     send(key + ".p99", snapshot.getValueAtPercentile(99.0), now)
     send(key + ".p999", snapshot.getValueAtPercentile(99.9), now)
-  }
 
   private def sendAveragingGauge(
-      now: Long, key: String, gauge: AveragingGauge) {
+      now: Long, key: String, gauge: AveragingGauge)
     sendNumericOrIgnore(key + ".avg-gauge", gauge.getValue, now)
-  }
 
   override def stop(): Unit =
-    try {
+    try
       super.stop()
       graphite.close()
-    } catch {
+    catch
       case ex: Exception ⇒
         System.err.println(
             "Was unable to close Graphite connection: " + ex.getMessage)
-    }
 
-  private def sendNumericOrIgnore(key: String, value: Any, now: Long) {
+  private def sendNumericOrIgnore(key: String, value: Any, now: Long)
     // seriously nothing better than this? (without Any => String => Num)
-    value match {
+    value match
       case v: Int ⇒ send(key, v, now)
       case v: Long ⇒ send(key, v, now)
       case v: Byte ⇒ send(key, v, now)
@@ -175,25 +162,18 @@ class AkkaGraphiteReporter(registry: AkkaMetricRegistry,
       case v: Float ⇒ send(key, v, now)
       case v: Double ⇒ send(key, v, now)
       case _ ⇒ // ignore non-numeric metric...
-    }
-  }
 
-  private def send(key: String, value: Double, now: Long) {
+  private def send(key: String, value: Double, now: Long)
     if (value >= 0) graphite.send(s"$prefix.$key", "%2.2f".format(value), now)
-  }
 
-  private def send(key: String, value: Long, now: Long) {
+  private def send(key: String, value: Long, now: Long)
     if (value >= 0) graphite.send(s"$prefix.$key", value.toString, now)
-  }
 
-  private def sendWithBanner(s: String, c: Char) {
+  private def sendWithBanner(s: String, c: Char)
     print(s)
     print(' ')
     var i: Int = 0
-    while (i < (ConsoleWidth - s.length - 1)) {
+    while (i < (ConsoleWidth - s.length - 1))
       print(c)
       i += 1
-    }
     println()
-  }
-}

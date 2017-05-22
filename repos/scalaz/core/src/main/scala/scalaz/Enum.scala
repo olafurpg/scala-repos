@@ -5,7 +5,7 @@ package scalaz
   * An [[scalaz.Order]]able with discrete values.
   */
 ////
-trait Enum[F] extends Order[F] { self =>
+trait Enum[F] extends Order[F]  self =>
   ////
 
   def succ(a: F): F
@@ -142,29 +142,27 @@ trait Enum[F] extends Order[F] { self =>
                          else
                            fromTo(if (lessThan(a, z)) succ(a) else pred(a), z))
 
-  def fromToL(a: F, z: F): List[F] = {
+  def fromToL(a: F, z: F): List[F] =
     def fromToLT(a: F, z: F): Trampoline[List[F]] =
       if (equal(a, z)) return_(a :: Nil)
       else
         suspend(
             fromToLT(if (lessThan(a, z)) succ(a) else pred(a), z) map (a :: _))
     fromToLT(a, z).run
-  }
 
-  def fromStepTo(n: Int, a: F, z: F): EphemeralStream[F] = {
+  def fromStepTo(n: Int, a: F, z: F): EphemeralStream[F] =
     lazy val cmp =
       if (n > 0) greaterThan(_, _)
       else if (n < 0) lessThan(_, _)
       else (_: F, _: F) => false
-    EphemeralStream.cons(a, {
+    EphemeralStream.cons(a,
       val k = succn(n, a)
       if (cmp(k, z)) EphemeralStream.emptyEphemeralStream
       else fromStepTo(n, k, z)
-    })
-  }
+    )
 
-  def fromStepToL(n: Int, a: F, z: F): List[F] = {
-    def fromStepToLT(n: Int, a: F, z: F): Trampoline[List[F]] = {
+  def fromStepToL(n: Int, a: F, z: F): List[F] =
+    def fromStepToLT(n: Int, a: F, z: F): Trampoline[List[F]] =
       lazy val cmp =
         if (n > 0) greaterThan(_, _)
         else if (n < 0) lessThan(_, _)
@@ -172,11 +170,9 @@ trait Enum[F] extends Order[F] { self =>
       val k = succn(n, a)
       if (cmp(k, z)) return_(a :: Nil)
       else suspend(fromStepToLT(n, k, z) map (a :: _))
-    }
     fromStepToLT(n, a, z).run
-  }
 
-  trait EnumLaw extends OrderLaw {
+  trait EnumLaw extends OrderLaw
     def succpred(x: F): Boolean =
       equal(succ(pred(x)), x)
 
@@ -200,44 +196,35 @@ trait Enum[F] extends Order[F] { self =>
 
     def predorder(x: F): Boolean =
       (min exists (equal(_, x))) || lessThanOrEqual(pred(x), x)
-  }
 
   def enumLaw = new EnumLaw {}
 
   ////
   val enumSyntax = new scalaz.syntax.EnumSyntax[F] { def F = Enum.this }
-}
 
-object Enum {
+object Enum
   @inline def apply[F](implicit F: Enum[F]): Enum[F] = F
 
   ////
-  def succn[F](n: Int, a: F)(implicit F: Enum[F]): F = {
+  def succn[F](n: Int, a: F)(implicit F: Enum[F]): F =
     var w = n
     var z = a
-    while (w < 0) {
+    while (w < 0)
       z = F.pred(z)
       w = w + 1
-    }
-    while (w > 0) {
+    while (w > 0)
       z = F.succ(z)
       w = w - 1
-    }
     z
-  }
 
-  def predn[F](n: Int, a: F)(implicit F: Enum[F]): F = {
+  def predn[F](n: Int, a: F)(implicit F: Enum[F]): F =
     var w = n
     var z = a
-    while (w < 0) {
+    while (w < 0)
       z = F.succ(z)
       w = w + 1
-    }
-    while (w > 0) {
+    while (w > 0)
       z = F.pred(z)
       w = w - 1
-    }
     z
-  }
   ////
-}

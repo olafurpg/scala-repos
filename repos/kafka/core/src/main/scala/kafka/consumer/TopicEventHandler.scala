@@ -16,7 +16,6 @@
   */
 package kafka.consumer
 
-trait TopicEventHandler[T] {
+trait TopicEventHandler[T]
 
   def handleTopicEvent(allTopics: Seq[T])
-}

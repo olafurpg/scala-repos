@@ -21,24 +21,20 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.statements._
  *              | Expr
  */
 
-object TemplateStat {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
-    builder.getTokenType match {
+object TemplateStat
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    builder.getTokenType match
       case ScalaTokenTypes.kIMPORT =>
         Import parse builder
         return true
       case _ =>
-        if (Def parse builder) {
+        if (Def parse builder)
           return true
-        } else if (Dcl parse builder) {
+        else if (Dcl parse builder)
           return true
-        } else if (EmptyDcl parse builder) {
+        else if (EmptyDcl parse builder)
           return true
-        } else if (Expr.parse(builder)) {
+        else if (Expr.parse(builder))
           return true
-        } else {
+        else
           return false
-        }
-    }
-  }
-}

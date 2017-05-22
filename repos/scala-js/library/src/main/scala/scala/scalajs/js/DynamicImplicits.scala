@@ -17,7 +17,7 @@ import scala.language.implicitConversions
   *  to selectively import the implicits that you want to reduce the likelihood
   *  of making mistakes.
   */
-object DynamicImplicits {
+object DynamicImplicits
   @inline implicit def truthValue(x: Dynamic): Boolean =
     (!(!x)).asInstanceOf[Boolean]
 
@@ -30,4 +30,3 @@ object DynamicImplicits {
 
   implicit def boolean2dynamic(x: Boolean): Dynamic =
     x.asInstanceOf[Dynamic]
-}

@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
   import scala.reflect.macros.blackbox.Context
@@ -18,4 +18,3 @@ def impl3(c: Context)(x: c.Expr[Int])(y: c.Expr[Int]) = { import c.universe._; c
 def foo3(x: Int)(y: Int): Unit = macro impl3
 foo3(2)(3)
   """
-}

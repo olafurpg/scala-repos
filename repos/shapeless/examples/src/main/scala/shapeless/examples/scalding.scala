@@ -31,7 +31,7 @@ import syntax.singleton._
   * 
   * @author Miles Sabin
   */
-object ScaldingPoC extends App {
+object ScaldingPoC extends App
 
   // map, flatMap etc.
   val birds = List(
@@ -64,4 +64,3 @@ object ScaldingPoC extends App {
         for (word <- book("text").split("\\s+")) yield
           book + ("word" ->> word))
   lines foreach println
-}

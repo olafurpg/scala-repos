@@ -6,7 +6,7 @@ package akka.stream
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
 
-class DslFactoriesConsistencySpec extends WordSpec with Matchers {
+class DslFactoriesConsistencySpec extends WordSpec with Matchers
 
   // configuration //
 
@@ -63,7 +63,7 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
                       sClass: Option[Class[_]],
                       jClass: Option[Class[_]],
                       jFactory: Option[Class[_]])
-  object TestCase {
+  object TestCase
     def apply(name: String,
               sClass: Class[_],
               jClass: Class[_],
@@ -72,7 +72,6 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
 
     def apply(name: String, sClass: Class[_], jClass: Class[_]): TestCase =
       TestCase(name, Some(sClass), Some(jClass), None)
-  }
 
   val testCases = Seq(
       TestCase("Source", scaladsl.Source.getClass, javadsl.Source.getClass),
@@ -104,20 +103,16 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
                scaladsl.StreamConverters.getClass,
                javadsl.StreamConverters.getClass))
 
-  "Java DSL" must provide {
-    testCases foreach {
+  "Java DSL" must provide
+    testCases foreach
       case TestCase(name, Some(sClass), jClass, jFactoryOption) ⇒
-        name which {
-          s"allows creating the same ${name}s as Scala DSL" in {
+        name which
+          s"allows creating the same ${name}s as Scala DSL" in
             runSpec(getSMethods(sClass),
                     jClass.toList.flatMap(getJMethods) ++ jFactoryOption.toList
                       .flatMap(f ⇒
                           getJMethods(f).map(
                               unspecializeName andThen curryLikeJava)))
-          }
-        }
-    }
-  }
 
   // here be dragons...
 
@@ -145,7 +140,7 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
                             parameters: Int ⇒ Boolean,
                             paramTypes: List[Class[_]] ⇒ Boolean)
 
-  private def ignore(m: Method): Boolean = {
+  private def ignore(m: Method): Boolean =
     val ignores = Seq(
         // private scaladsl method
         Ignore(_ == akka.stream.scaladsl.Source.getClass,
@@ -180,14 +175,12 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
         // all generated methods like scaladsl.Sink$.akka$stream$scaladsl$Sink$$newOnCompleteStage$1
         Ignore(_ ⇒ true, _.contains("$"), _ ⇒ true, _ ⇒ true))
 
-    ignores.foldLeft(false) {
+    ignores.foldLeft(false)
       case (acc, i) ⇒
         acc ||
         (i.cls(m.declaringClass) && i.name(m.name) &&
             i.parameters(m.parameterTypes.length) &&
             i.paramTypes(m.parameterTypes))
-    }
-  }
 
   /**
     * Rename
@@ -195,69 +188,58 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
     *   runnableN => runnable
     *   createN => create
     */
-  private val unspecializeName: PartialFunction[Method, Method] = {
+  private val unspecializeName: PartialFunction[Method, Method] =
     case m ⇒ m.copy(name = m.name.filter(Character.isLetter))
-  }
 
   /**
     * Adapt java side non curried functions to scala side like
     */
-  private val curryLikeJava: PartialFunction[Method, Method] = {
+  private val curryLikeJava: PartialFunction[Method, Method] =
     case m if m.parameterTypes.size > 1 ⇒
       m.copy(name = m.name.filter(Character.isLetter),
              parameterTypes = m.parameterTypes.dropRight(1) :+ classOf[
                    akka.japi.function.Function[_, _]])
     case m ⇒ m
-  }
 
-  def runSpec(sMethods: List[Method], jMethods: List[Method]) {
+  def runSpec(sMethods: List[Method], jMethods: List[Method])
     var warnings = 0
 
-    val results = for {
+    val results = for
       s ← sMethods
       j ← jMethods
       result = delegationCheck(s, j)
-    } yield {
+    yield
       result
-    }
 
-    for {
+    for
       row ← results.groupBy(_.s)
       matches = row._2.filter(_.matches)
-    } {
-      if (matches.length == 0) {
+    
+      if (matches.length == 0)
         warnings += 1
         alert("No match for " + row._1)
-        row._2 foreach { m ⇒
+        row._2 foreach  m ⇒
           alert(s" > ${m.j.toString}: ${m.reason}")
-        }
-      } else if (matches.length == 1) {
+      else if (matches.length == 1)
         info(
             "Matched: Scala:" + row._1.name + "(" +
             row._1.parameterTypes.map(_.getName).mkString(",") + "): " +
             returnTypeString(row._1) + " == " + "Java:" + matches.head.j.name +
             "(" + matches.head.j.parameterTypes.map(_.getName).mkString(",") +
             "): " + returnTypeString(matches.head.j))
-      } else {
+      else
         warnings += 1
         alert("Multiple matches for " + row._1 + "!")
-        matches foreach { m ⇒
+        matches foreach  m ⇒
           alert(s" > ${m.j.toString}")
-        }
-      }
-    }
 
-    if (warnings > 0) {
-      jMethods foreach { m ⇒
+    if (warnings > 0)
+      jMethods foreach  m ⇒
         info("  java: " + m + ": " + returnTypeString(m))
-      }
-      sMethods foreach { m ⇒
+      sMethods foreach  m ⇒
         info(" scala: " + m + ": " + returnTypeString(m))
-      }
       fail(
           "Warnings were issued! Fix name / type mappings or delegation code!")
-    }
-  }
 
   def returnTypeString(m: Method): String =
     m.returnType.getName.drop("akka.stream.".length)
@@ -268,19 +250,18 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
                     returnType: Class[_],
                     declaringClass: Class[_])
 
-  sealed trait MatchResult {
+  sealed trait MatchResult
     def j: Method
     def s: Method
     def reason: String
     def matches: Boolean
-  }
   case class MatchFailure(s: Method, j: Method, reason: String = "")
       extends MatchResult { val matches = false }
   case class Match(s: Method, j: Method, reason: String = "")
       extends MatchResult { val matches = true }
 
-  def delegationCheck(s: Method, j: Method): MatchResult = {
-    if (nameMatch(s.name, j.name)) {
+  def delegationCheck(s: Method, j: Method): MatchResult =
+    if (nameMatch(s.name, j.name))
       if (s.parameterTypes.length == j.parameterTypes.length)
         if (typeMatch(s.parameterTypes, j.parameterTypes))
           if (returnTypeMatch(s.returnType, j.returnType)) Match(s, j)
@@ -291,17 +272,14 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
                          j.returnType)
         else MatchFailure(s, j, "Types of parameters don't match!")
       else MatchFailure(s, j, "Same name, but different number of parameters!")
-    } else {
+    else
       MatchFailure(s, j, "Names don't match!")
-    }
-  }
 
   def nameMatch(scalaName: String, javaName: String): Boolean =
-    (scalaName, javaName) match {
+    (scalaName, javaName) match
       case (s, j) if s == j ⇒ true
       case t if `scala -> java aliases` contains t ⇒ true
       case t ⇒ false
-    }
 
   /**
     * Keyed elements in scaladsl must also be keyed elements in javadsl.
@@ -317,11 +295,10 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
 
   def typeMatch(
       scalaParams: List[Class[_]], javaParams: List[Class[_]]): Boolean =
-    (scalaParams.toList, javaParams.toList) match {
+    (scalaParams.toList, javaParams.toList) match
       case (s, j) if s == j ⇒ true
       case (s, j) if s.zip(j).forall(typeMatch) ⇒ true
       case _ ⇒ false
-    }
 
   def typeMatch(p: (Class[_], Class[_])): Boolean =
     if (p._1 == p._2) true
@@ -329,4 +306,3 @@ class DslFactoriesConsistencySpec extends WordSpec with Matchers {
     else false
 
   private def provide = afterWord("provide")
-}

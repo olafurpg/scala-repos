@@ -19,7 +19,7 @@ import com.twitter.algebird.{Semigroup, StatefulSummer}
 
 import scala.collection.mutable.ArrayBuffer
 
-private[summingbird] object IteratorSums extends java.io.Serializable {
+private[summingbird] object IteratorSums extends java.io.Serializable
 
   def sumWith[T](it: Iterator[T], summer: StatefulSummer[T]): Iterator[T] =
     // this is for MAXIMUM speed. Any ideas to speed it up, say so + benchmark
@@ -28,93 +28,78 @@ private[summingbird] object IteratorSums extends java.io.Serializable {
   // get a big block, but not so big to OOM
   def optimizedPairSemigroup[T1 : Semigroup, T2 : Semigroup](
       blockSize: Int): Semigroup[(T1, T2)] =
-    new Semigroup[(T1, T2)] {
-      def plus(a: (T1, T2), b: (T1, T2)) = {
+    new Semigroup[(T1, T2)]
+      def plus(a: (T1, T2), b: (T1, T2)) =
         (Semigroup.plus(a._1, b._1), Semigroup.plus(a._2, b._2))
-      }
       override def sumOption(
-          items: TraversableOnce[(T1, T2)]): Option[(T1, T2)] = {
+          items: TraversableOnce[(T1, T2)]): Option[(T1, T2)] =
         if (items.isEmpty) None
-        else {
-          val op = new BufferOp[(T1, T2)](blockSize) {
+        else
+          val op = new BufferOp[(T1, T2)](blockSize)
             def operate(items: Seq[(T1, T2)]): Option[(T1, T2)] =
-              for {
+              for
                 t1 <- Semigroup.sumOption(items.iterator.map(_._1))
                 t2 <- Semigroup.sumOption(items.iterator.map(_._2))
-              } yield (t1, t2)
-          }
+              yield (t1, t2)
           items.foreach(op.put(_))
           op.flush
-        }
-      }
-    }
 
-  abstract class BufferOp[V](sz: Int) extends java.io.Serializable {
+  abstract class BufferOp[V](sz: Int) extends java.io.Serializable
     def operate(items: Seq[V]): Option[V]
 
     require(sz > 0, "buffer <= 0 not allowed")
     val buffer = new ArrayBuffer[V](sz)
 
-    def put(v: V): Option[V] = {
+    def put(v: V): Option[V] =
       buffer += v
       if (buffer.size > sz) flush.flatMap(put(_)) // put it back in the front
       None
-    }
 
     def isFlushed = buffer.isEmpty
 
-    def flush: Option[V] = {
+    def flush: Option[V] =
       val res = operate(buffer)
       buffer.clear
       res
-    }
-  }
 
   def bufferStatefulSummer[V : Semigroup](sz: Int): StatefulSummer[V] =
-    new BufferOp[V](sz) with StatefulSummer[V] {
+    new BufferOp[V](sz) with StatefulSummer[V]
       def semigroup = implicitly[Semigroup[V]]
       def operate(items: Seq[V]) = Semigroup.sumOption(items)
-    }
 
   def groupedStatefulSummer[K : Equiv, V : Semigroup](
-      sz: Int): StatefulSummer[(K, V)] = new StatefulSummer[(K, V)] {
+      sz: Int): StatefulSummer[(K, V)] = new StatefulSummer[(K, V)]
     require(sz > 0, "buffer <= 0 not allowed")
 
     // The StatefulSummer (wrongly?) needs this, but it is never used
-    def semigroup = Semigroup.from {
+    def semigroup = Semigroup.from
       case ((lk, lv), (rk, rv)) =>
         // if the keys match, sum, else return the new pair
         if (Equiv[K].equiv(lk, rk)) (rk, Semigroup.plus(lv, rv))
         else (rk, rv)
-    }
 
     var lastK: Option[K] = None
     val buffer = new ArrayBuffer[V](sz)
 
-    def put(kv: (K, V)): Option[(K, V)] = {
+    def put(kv: (K, V)): Option[(K, V)] =
       val (k, v) = kv
-      val res = lastK.flatMap { lk =>
+      val res = lastK.flatMap  lk =>
         if (!Equiv[K].equiv(lk, k)) flush
         else if (buffer.size > sz)
           flush.flatMap(put(_)) // put it back in the front
         else None
-      }
       lastK = Some(k)
       buffer += v
       res
-    }
 
     def isFlushed = buffer.isEmpty
 
-    def flush = {
+    def flush =
       // sumOption is highly optimized
-      val res = Semigroup.sumOption(buffer).flatMap { sv =>
+      val res = Semigroup.sumOption(buffer).flatMap  sv =>
         lastK.map((_, sv))
-      }
       buffer.clear
       res
-    }
-  }
 
   def groupedSum[K1 : Equiv, V1 : Semigroup](
       in: Iterator[(K1, V1)], bufferSize: Int = 1000): Iterator[(K1, V1)] =
@@ -126,13 +111,10 @@ private[summingbird] object IteratorSums extends java.io.Serializable {
     * this value and the current value
     */
   def partials[U, V : Semigroup](
-      in: Iterator[(U, V)]): Iterator[(U, (Option[V], V))] = {
+      in: Iterator[(U, V)]): Iterator[(U, (Option[V], V))] =
     var prev: Option[V] = None
-    in.map {
+    in.map
       case (k, v) =>
         val stored = prev
         prev = Some(prev.map(Semigroup.plus(_, v)).getOrElse(v))
         (k, (stored, v))
-    }
-  }
-}

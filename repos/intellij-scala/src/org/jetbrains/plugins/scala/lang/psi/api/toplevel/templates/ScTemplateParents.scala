@@ -22,15 +22,13 @@ import org.jetbrains.plugins.scala.macroAnnotations.{ModCount, Cached}
   * Date: 22.02.2008
   * Time: 9:23:53
   */
-trait ScTemplateParents extends ScalaPsiElement {
+trait ScTemplateParents extends ScalaPsiElement
   def typeElements: Seq[ScTypeElement]
   @Cached(false, ModCount.getBlockModificationCount, this)
-  def syntheticTypeElements: Seq[ScTypeElement] = {
-    getContext.getContext match {
+  def syntheticTypeElements: Seq[ScTypeElement] =
+    getContext.getContext match
       case td: ScTypeDefinition => SyntheticMembersInjector.injectSupers(td)
       case _ => Seq.empty
-    }
-  }
   def allTypeElements: Seq[ScTypeElement] =
     typeElements ++ syntheticTypeElements
   def typeElementsWithoutConstructor: Seq[ScTypeElement] =
@@ -38,61 +36,47 @@ trait ScTemplateParents extends ScalaPsiElement {
   def superTypes: Seq[ScType]
   def supers: Seq[PsiClass] =
     ScTemplateParents.extractSupers(allTypeElements, getProject)
-}
 
-object ScTemplateParents {
+object ScTemplateParents
   def extractSupers(
-      typeElements: Seq[ScTypeElement], project: Project): Seq[PsiClass] = {
-    typeElements.map {
+      typeElements: Seq[ScTypeElement], project: Project): Seq[PsiClass] =
+    typeElements.map
       case element: ScTypeElement =>
-        def tail(): PsiClass = {
+        def tail(): PsiClass =
           element
             .getType(TypingContext.empty)
-            .map {
+            .map
               case tp: ScType =>
-                ScType.extractClass(tp) match {
+                ScType.extractClass(tp) match
                   case Some(clazz) => clazz
                   case _ => null
-                }
-            }
             .getOrElse(null)
-        }
 
-        def refTail(ref: ScStableCodeReferenceElement): PsiClass = {
+        def refTail(ref: ScStableCodeReferenceElement): PsiClass =
           val resolve = ref.resolveNoConstructor
-          if (resolve.length == 1) {
-            resolve(0) match {
+          if (resolve.length == 1)
+            resolve(0) match
               case ScalaResolveResult(c: PsiClass, _) => c
               case ScalaResolveResult(ta: ScTypeAliasDefinition, _) =>
-                ta.aliasedType match {
+                ta.aliasedType match
                   case Success(te, _) =>
-                    ScType.extractClass(te, Some(project)) match {
+                    ScType.extractClass(te, Some(project)) match
                       case Some(c) => c
                       case _ => null
-                    }
                   case _ => null
-                }
               case _ => tail()
-            }
-          } else tail()
-        }
-        element match {
+          else tail()
+        element match
           case s: ScSimpleTypeElement =>
-            s.reference match {
+            s.reference match
               case Some(ref) => refTail(ref)
               case _ => tail()
-            }
           case p: ScParameterizedTypeElement =>
-            p.typeElement match {
+            p.typeElement match
               case s: ScSimpleTypeElement =>
-                s.reference match {
+                s.reference match
                   case Some(ref) => refTail(ref)
                   case _ => tail()
-                }
               case _ => tail()
-            }
           case _ => tail()
-        }
-    }.filter(_ != null)
-  }
-}
+    .filter(_ != null)

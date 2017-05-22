@@ -22,31 +22,26 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Models]] */
 class JDBCModels(client: String, config: StorageClientConfig, prefix: String)
-    extends Models with Logging {
+    extends Models with Logging
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "models")
 
   /** Determines binary column type based on JDBC driver type */
   val binaryColumnType = JDBCUtils.binaryColumnType(client)
-  DB autoCommit { implicit session =>
+  DB autoCommit  implicit session =>
     sql"""
     create table if not exists $tableName (
       id varchar(100) not null primary key,
       models $binaryColumnType not null)""".execute().apply()
-  }
 
-  def insert(i: Model): Unit = DB localTx { implicit session =>
+  def insert(i: Model): Unit = DB localTx  implicit session =>
     sql"insert into $tableName values(${i.id}, ${i.models})".update().apply()
-  }
 
-  def get(id: String): Option[Model] = DB readOnly { implicit session =>
-    sql"select id, models from $tableName where id = $id".map { r =>
+  def get(id: String): Option[Model] = DB readOnly  implicit session =>
+    sql"select id, models from $tableName where id = $id".map  r =>
       Model(id = r.string("id"), models = r.bytes("models"))
-    }.single().apply()
-  }
+    .single().apply()
 
-  def delete(id: String): Unit = DB localTx { implicit session =>
+  def delete(id: String): Unit = DB localTx  implicit session =>
     sql"delete from $tableName where id = $id".execute().apply()
-  }
-}

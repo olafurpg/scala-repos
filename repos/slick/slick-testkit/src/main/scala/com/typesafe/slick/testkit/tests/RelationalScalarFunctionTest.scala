@@ -2,10 +2,10 @@ package com.typesafe.slick.testkit.tests
 
 import com.typesafe.slick.testkit.util.{RelationalTestDB, AsyncTest}
 
-class RelationalScalarFunctionTest extends AsyncTest[RelationalTestDB] {
+class RelationalScalarFunctionTest extends AsyncTest[RelationalTestDB]
   import tdb.profile.api._
 
-  def test = {
+  def test =
     def check[T](q: Rep[T], exp: T) = q.result.map(_ shouldBe exp)
     def checkLit[T : ColumnType](v: T) = check(LiteralColumn(v), v)
     val s = "abcdefghijklmnopqrstuvwxyz"
@@ -67,5 +67,3 @@ class RelationalScalarFunctionTest extends AsyncTest[RelationalTestDB] {
             )),
         ifCap(rcap.repeat)(check(LiteralColumn(s) * 2, s * 2))
     )
-  }
-}

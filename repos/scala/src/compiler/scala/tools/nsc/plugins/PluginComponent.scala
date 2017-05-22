@@ -13,7 +13,7 @@ package plugins
   * @version 1.1, 2009/1/2
   * Updated 2009/1/2 by Anders Bach Nielsen: Added features to implement SIP 00002
   */
-abstract class PluginComponent extends SubComponent {
+abstract class PluginComponent extends SubComponent
 
   /** By definition, plugin phases are externally provided. */
   final override val internal = false
@@ -23,4 +23,3 @@ abstract class PluginComponent extends SubComponent {
 
   /** Useful for -Xshow-phases. */
   def description: String = ""
-}

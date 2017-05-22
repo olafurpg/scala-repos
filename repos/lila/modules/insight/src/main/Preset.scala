@@ -4,7 +4,7 @@ import lila.rating.PerfType
 
 case class Preset(name: String, question: Question[_])
 
-object Preset {
+object Preset
 
   import lila.insight.{Dimension => D, Metric => M}
 
@@ -53,4 +53,3 @@ object Preset {
                           Filter(D.Phase, List(Phase.Opening))
                       )))
   )
-}

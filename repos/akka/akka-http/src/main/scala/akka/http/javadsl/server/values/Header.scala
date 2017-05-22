@@ -16,14 +16,13 @@ import akka.http.scaladsl.server.util.ClassMagnet
 import scala.compat.java8.OptionConverters._
 import scala.reflect.{ClassTag, classTag}
 
-trait Header[T <: HttpHeader] {
+trait Header[T <: HttpHeader]
   def instance(): RequestVal[T]
   def optionalInstance(): RequestVal[Optional[T]]
 
   def value(): RequestVal[String]
   def optionalValue(): RequestVal[Optional[String]]
-}
-object Headers {
+object Headers
   import akka.http.scaladsl.server.directives.BasicDirectives._
   import akka.http.scaladsl.server.directives.HeaderDirectives._
 
@@ -41,7 +40,6 @@ object Headers {
   private def optionalHeaderInstanceByName(
       lowercaseName: String): Directive1[Optional[model.HttpHeader]] =
     extract(
-        _.request.headers.collectFirst {
+        _.request.headers.collectFirst
       case h @ model.HttpHeader(`lowercaseName`, _) ⇒ h
-    }.asJava)
-}
+    .asJava)

@@ -40,7 +40,7 @@ import scalafx.scene.Node
   *
   * @since 8.0
   */
-object TreeTableRow {
+object TreeTableRow
 
   /**
     * Converts a ScalaFX TreeTableRow to its JavaFX couterpart.
@@ -52,7 +52,6 @@ object TreeTableRow {
   implicit def sfxTreeTableRow2jfx[T](
       ttr: TreeTableRow[T]): jfxsc.TreeTableRow[T] =
     if (ttr != null) ttr.delegate else null
-}
 
 /**
   * Wraps a $JFX $URL0 $TTR]].
@@ -69,7 +68,7 @@ object TreeTableRow {
   */
 class TreeTableRow[T](
     override val delegate: jfxsc.TreeTableRow[T] = new jfxsc.TreeTableRow[T])
-    extends IndexedCell[T](delegate) with SFXDelegate[jfxsc.TreeTableRow[T]] {
+    extends IndexedCell[T](delegate) with SFXDelegate[jfxsc.TreeTableRow[T]]
 
   // protected  createDefaultSkin: Skin[_]
 
@@ -81,9 +80,8 @@ class TreeTableRow[T](
     */
   def disclosureNode: ObjectProperty[jfxs.Node] =
     delegate.disclosureNodeProperty
-  def disclosureNode_=(node: Node) {
+  def disclosureNode_=(node: Node)
     disclosureNode() = node
-  }
 
   /**
     * Each TreeTableCell represents at most a single TreeItem, which is represented by this property.
@@ -108,7 +106,5 @@ class TreeTableRow[T](
     * @param treeItem The new TreeItem that should be associated with this TreeTableCell.
     * @see $URL0#updateTreeTableView-javafx.scene.control.TreeTableView- $ORIGINALDOC
     */
-  def updateTreeItem(treeItem: TreeItem[T]) {
+  def updateTreeItem(treeItem: TreeItem[T])
     delegate.updateTreeItem(treeItem)
-  }
-}

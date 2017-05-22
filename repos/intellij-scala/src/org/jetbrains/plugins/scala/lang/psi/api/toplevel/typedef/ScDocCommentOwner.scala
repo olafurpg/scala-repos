@@ -11,11 +11,10 @@ import com.intellij.psi.PsiDocCommentOwner
 import com.intellij.psi.javadoc.PsiDocComment
 import org.jetbrains.annotations.Nullable
 
-trait ScDocCommentOwner extends PsiDocCommentOwner {
+trait ScDocCommentOwner extends PsiDocCommentOwner
   def docComment: Option[ScDocComment] = getFirstChild.asOptionOf[ScDocComment]
 
   @Nullable
   def getDocComment: PsiDocComment = docComment.orNull
 
   def isDeprecated = false
-}

@@ -7,13 +7,12 @@ import com.twitter.finagle.stats.StatsReceiver
 import com.twitter.finagle.util.DefaultTimer
 import com.twitter.util.{Timer, Duration}
 
-object DefaultPool {
+object DefaultPool
 
-  implicit object Role extends Stack.Role("Pool") {
+  implicit object Role extends Stack.Role("Pool")
     val bufferingPool = Stack.Role("BufferingPool")
     val cachingPool = Stack.Role("CachingPool")
     val watermarkPool = Stack.Role("WatermarkPool")
-  }
 
   /**
     * A class eligible for configuring a [[com.twitter.finagle.Stackable]]
@@ -41,14 +40,12 @@ object DefaultPool {
                    high: Int,
                    bufferSize: Int,
                    idleTime: Duration,
-                   maxWaiters: Int) {
+                   maxWaiters: Int)
     def mk(): (Param, Stack.Param[Param]) =
       (this, Param.param)
-  }
-  object Param {
+  object Param
     implicit val param =
       Stack.Param(Param(0, Int.MaxValue, 0, Duration.Top, Int.MaxValue))
-  }
 
   /**
     * A [[com.twitter.finagle.Stackable]] client connection pool.
@@ -58,42 +55,37 @@ object DefaultPool {
     * @see [[com.twitter.finagle.pool.CachingPool]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module[ServiceFactory[Req, Rep]] {
+    new Stack.Module[ServiceFactory[Req, Rep]]
       import com.twitter.finagle.pool.{CachingPool, WatermarkPool, BufferingPool}
       val role = DefaultPool.Role
       val description = "Control client connection pool"
       val parameters = Seq(implicitly[Stack.Param[Param]],
                            implicitly[Stack.Param[param.Stats]],
                            implicitly[Stack.Param[param.Timer]])
-      def make(prms: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
+      def make(prms: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) =
         val Param(low, high, bufferSize, idleTime, maxWaiters) = prms[Param]
         val param.Stats(statsReceiver) = prms[param.Stats]
         val param.Timer(timer) = prms[param.Timer]
 
         val stack = new StackBuilder[ServiceFactory[Req, Rep]](next)
 
-        if (idleTime > 0.seconds && high > low) {
+        if (idleTime > 0.seconds && high > low)
           stack.push(Role.cachingPool,
                      (sf: ServiceFactory[Req, Rep]) =>
                        new CachingPool(
                            sf, high - low, idleTime, timer, statsReceiver))
-        }
 
         stack.push(
             Role.watermarkPool,
             (sf: ServiceFactory[Req, Rep]) =>
               new WatermarkPool(sf, low, high, statsReceiver, maxWaiters))
 
-        if (bufferSize > 0) {
+        if (bufferSize > 0)
           stack.push(Role.bufferingPool,
                      (sf: ServiceFactory[Req, Rep]) =>
                        new BufferingPool(sf, bufferSize))
-        }
 
         stack.result
-      }
-    }
-}
 
 /**
   * Create a watermark pool backed by a caching pool. This is the
@@ -125,10 +117,9 @@ case class DefaultPool[Req, Rep](
     maxWaiters: Int = Int.MaxValue,
     timer: Timer = DefaultTimer.twitter
 )
-    extends (StatsReceiver => Transformer[Req, Rep]) {
+    extends (StatsReceiver => Transformer[Req, Rep])
   def apply(statsReceiver: StatsReceiver) =
     inputFactory =>
-      {
         val factory =
           if (idleTime <= 0.seconds || high <= low) inputFactory
           else
@@ -141,5 +132,3 @@ case class DefaultPool[Req, Rep](
         val pool = new WatermarkPool(
             factory, low, high, statsReceiver, maxWaiters)
         if (bufferSize <= 0) pool else new BufferingPool(pool, bufferSize)
-    }
-}

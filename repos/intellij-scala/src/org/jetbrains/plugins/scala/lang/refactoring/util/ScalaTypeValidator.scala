@@ -18,20 +18,18 @@ import scala.collection.mutable.ArrayBuffer
   * Created by Kate Ustyuzhanina
   * on 8/3/15
   */
-object ScalaTypeValidator {
+object ScalaTypeValidator
   def apply(conflictsReporter: ConflictsReporter,
             project: Project,
             element: PsiElement,
             container: PsiElement,
-            noOccurrences: Boolean): ScalaTypeValidator = {
+            noOccurrences: Boolean): ScalaTypeValidator =
     new ScalaTypeValidator(conflictsReporter,
                            project,
                            element,
                            noOccurrences,
                            container,
                            container)
-  }
-}
 
 class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
                          val myProject: Project,
@@ -44,10 +42,10 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
                            selectedElement,
                            noOccurrences,
                            enclosingContainerAll,
-                           enclosingOne) {
+                           enclosingOne)
 
   override def findConflicts(
-      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] = {
+      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] =
     //returns declaration and message
     val container = enclosingContainer(allOcc)
     if (container == null) return Array()
@@ -55,20 +53,18 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
 
     buf ++= getForbiddenNames(container, name)
 
-    if (buf.isEmpty) {
+    if (buf.isEmpty)
       buf ++= getForbiddenNamesInBlock(container, name)
-    }
 
     buf.toArray
-  }
 
-  def getForbiddenNames(position: PsiElement, name: String) = {
+  def getForbiddenNames(position: PsiElement, name: String) =
     class FindTypeAliasProcessor
-        extends BaseProcessor(ValueSet(ResolveTargets.CLASS)) {
+        extends BaseProcessor(ValueSet(ResolveTargets.CLASS))
       val buf = new ArrayBuffer[(PsiNamedElement, String)]
 
-      override def execute(element: PsiElement, state: ResolveState): Boolean = {
-        element match {
+      override def execute(element: PsiElement, state: ResolveState): Boolean =
+        element match
           case typeAlias: ScTypeAlias if typeAlias.getName == name =>
             buf += ((typeAlias, messageForTypeAliasMember(name)))
             true
@@ -76,25 +72,20 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
             buf += ((typeParametr, messageForTypeAliasMember(name)))
             true
           case typeDefinition: ScTypeDefinition =>
-            if (typeDefinition.getName == name) {
+            if (typeDefinition.getName == name)
               buf += ((typeDefinition, messageForClassMember(name)))
-            }
             true
           case _ => true
-        }
-      }
-    }
 
     val processor = new FindTypeAliasProcessor
     PsiTreeUtil.treeWalkUp(processor, position, null, ResolveState.initial())
     processor.buf
-  }
 
   def getForbiddenNamesInBlock(
       commonParent: PsiElement,
-      name: String): ArrayBuffer[(PsiNamedElement, String)] = {
+      name: String): ArrayBuffer[(PsiNamedElement, String)] =
     val buf = new ArrayBuffer[(PsiNamedElement, String)]
-    commonParent.depthFirst.foreach {
+    commonParent.depthFirst.foreach
       case typeAlias: ScTypeAlias if typeAlias.getName == name =>
         buf += ((typeAlias, messageForTypeAliasMember(name)))
         true
@@ -104,19 +95,15 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
       case typeDefinition: ScTypeDefinition =>
         if ((typeDefinition.getName == name) &&
             (PsiTreeUtil.getParentOfType(
-                    typeDefinition, classOf[ScFunctionDefinition]) == null)) {
+                    typeDefinition, classOf[ScFunctionDefinition]) == null))
           buf += ((typeDefinition, messageForClassMember(name)))
-        }
         true
       case _ => true
-    }
     buf
-  }
 
-  override def validateName(name: String, increaseNumber: Boolean): String = {
+  override def validateName(name: String, increaseNumber: Boolean): String =
     val newName = name.capitalize
     super.validateName(newName, increaseNumber)
-  }
 
   private def messageForTypeAliasMember(name: String) =
     ScalaBundle.message(
@@ -125,4 +112,3 @@ class ScalaTypeValidator(val conflictsReporter: ConflictsReporter,
   private def messageForClassMember(name: String) =
     ScalaBundle.message(
         "introduced.typealias.will.conflict.with.class.name", name)
-}

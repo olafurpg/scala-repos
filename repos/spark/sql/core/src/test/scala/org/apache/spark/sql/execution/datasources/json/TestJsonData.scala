@@ -20,7 +20,7 @@ package org.apache.spark.sql.execution.datasources.json
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 
-private[json] trait TestJsonData {
+private[json] trait TestJsonData
   protected def sqlContext: SQLContext
 
   def primitiveFieldAndType: RDD[String] =
@@ -169,4 +169,3 @@ private[json] trait TestJsonData {
     sqlContext.sparkContext.parallelize("""{"a":123}""" :: Nil)
 
   def empty: RDD[String] = sqlContext.sparkContext.parallelize(Seq[String]())
-}

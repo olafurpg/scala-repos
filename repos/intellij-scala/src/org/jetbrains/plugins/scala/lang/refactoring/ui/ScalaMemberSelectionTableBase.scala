@@ -22,10 +22,10 @@ abstract class ScalaMemberSelectionTableBase[
     memberInfoModel: MemberInfoModel[M, I],
     abstractColumnHeader: String)
     extends AbstractMemberSelectionTable[M, I](
-        memberInfos, memberInfoModel, abstractColumnHeader) {
+        memberInfos, memberInfoModel, abstractColumnHeader)
 
-  def getAbstractColumnValue(memberInfo: I): AnyRef = {
-    memberInfo.getMember match {
+  def getAbstractColumnValue(memberInfo: I): AnyRef =
+    memberInfo.getMember match
       case member: ScMember if member.containingClass.isInstanceOf[ScObject] =>
         null
       case member: ScMember
@@ -38,35 +38,28 @@ abstract class ScalaMemberSelectionTableBase[
         res
       case _ if memberInfo.isToAbstract => java.lang.Boolean.TRUE
       case _ => java.lang.Boolean.FALSE
-    }
-  }
 
-  def isAbstractColumnEditable(rowIndex: Int): Boolean = {
+  def isAbstractColumnEditable(rowIndex: Int): Boolean =
     val info: I = myMemberInfos.get(rowIndex)
-    info.getMember match {
+    info.getMember match
       case member: ScMember
           if member.hasAbstractModifier &&
           myMemberInfoModel.isFixedAbstract(info) == java.lang.Boolean.TRUE =>
         false
       case _ => info.isChecked && myMemberInfoModel.isAbstractEnabled(info)
-    }
-  }
 
-  def setVisibilityIcon(memberInfo: I, icon: RowIcon) {
-    memberInfo.getMember match {
+  def setVisibilityIcon(memberInfo: I, icon: RowIcon)
+    memberInfo.getMember match
       case owner: PsiModifierListOwner =>
-        owner.getModifierList match {
+        owner.getModifierList match
           case mods: PsiModifierList =>
             VisibilityIcons.setVisibilityIcon(mods, icon)
           case _ =>
             icon.setIcon(IconUtil.getEmptyIcon(true),
                          AbstractMemberSelectionTable.VISIBILITY_ICON_POSITION)
-        }
       case _ =>
-    }
-  }
 
-  def getOverrideIcon(memberInfo: I): Icon = memberInfo.getMember match {
+  def getOverrideIcon(memberInfo: I): Icon = memberInfo.getMember match
     case fun: ScFunction =>
       if (java.lang.Boolean.TRUE == memberInfo.getOverrides)
         AllIcons.General.OverridingMethod
@@ -74,5 +67,3 @@ abstract class ScalaMemberSelectionTableBase[
         AllIcons.General.ImplementingMethod
       else AbstractMemberSelectionTable.EMPTY_OVERRIDE_ICON
     case _ => AbstractMemberSelectionTable.EMPTY_OVERRIDE_ICON
-  }
-}

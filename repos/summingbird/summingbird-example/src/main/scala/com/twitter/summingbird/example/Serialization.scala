@@ -33,7 +33,7 @@ import twitter4j.json.DataObjectFactory
   * where serialization format depends on unstable parameters, like
   * the serializer registration order for the given Kryo instance.
   */
-object Serialization {
+object Serialization
 
   /**
     * This Injection converts the twitter4j.Status objects that Storm
@@ -68,12 +68,10 @@ object Serialization {
     * or protobuf "pair" structure that can safely store these pairs
     * over the long-term.
     */
-  implicit def kInjection[T : Codec]: Injection[(T, BatchID), Array[Byte]] = {
+  implicit def kInjection[T : Codec]: Injection[(T, BatchID), Array[Byte]] =
     implicit val buf =
       Bufferable.viaInjection[(T, BatchID), (Array[Byte], Array[Byte])]
     Bufferable.injectionOf[(T, BatchID)]
-  }
 
   implicit def vInj[V : Codec]: Injection[(BatchID, V), Array[Byte]] =
     Injection.connect[(BatchID, V), (V, BatchID), Array[Byte]]
-}

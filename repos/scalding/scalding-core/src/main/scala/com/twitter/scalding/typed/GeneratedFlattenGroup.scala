@@ -6,76 +6,64 @@ package com.twitter.scalding.typed
   * joining many pipes together. These methods can be used directly, or via the
   * the joins available in MultiJoin.
   */
-object FlattenGroup {
+object FlattenGroup
   val pairOfNones = (None, None)
 
   // methods for flattening results of join / leftJoin
 
-  def flattenNestedTuple[A, B, C](nested: ((A, B), C)): (A, B, C) = {
+  def flattenNestedTuple[A, B, C](nested: ((A, B), C)): (A, B, C) =
     val ((a, b), c) = nested
     (a, b, c)
-  }
 
   class FlattenLeftJoin3[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C](nested: KLL[KEY, ((A, B), C)]) {
-    def flattenValueTuple: KLL[KEY, (A, B, C)] = nested.mapValues { tup =>
+          KLL_K, KLL_V, KLL], A, B, C](nested: KLL[KEY, ((A, B), C)])
+    def flattenValueTuple: KLL[KEY, (A, B, C)] = nested.mapValues  tup =>
       FlattenGroup.flattenNestedTuple(tup)
-    }
-  }
 
   implicit def toFlattenLeftJoin3[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C](nested: KLL[KEY, ((A, B), C)]) =
     new FlattenLeftJoin3(nested)
 
-  def flattenNestedTuple[A, B, C, D](nested: (((A, B), C), D)): (A, B, C, D) = {
+  def flattenNestedTuple[A, B, C, D](nested: (((A, B), C), D)): (A, B, C, D) =
     val (((a, b), c), d) = nested
     (a, b, c, d)
-  }
 
   class FlattenLeftJoin4[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
-          KLL_K, KLL_V, KLL], A, B, C, D](nested: KLL[KEY, (((A, B), C), D)]) {
-    def flattenValueTuple: KLL[KEY, (A, B, C, D)] = nested.mapValues { tup =>
+          KLL_K, KLL_V, KLL], A, B, C, D](nested: KLL[KEY, (((A, B), C), D)])
+    def flattenValueTuple: KLL[KEY, (A, B, C, D)] = nested.mapValues  tup =>
       FlattenGroup.flattenNestedTuple(tup)
-    }
-  }
 
   implicit def toFlattenLeftJoin4[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C, D](nested: KLL[KEY, (((A, B), C), D)]) =
     new FlattenLeftJoin4(nested)
 
   def flattenNestedTuple[A, B, C, D, E](
-      nested: ((((A, B), C), D), E)): (A, B, C, D, E) = {
+      nested: ((((A, B), C), D), E)): (A, B, C, D, E) =
     val ((((a, b), c), d), e) = nested
     (a, b, c, d, e)
-  }
 
   class FlattenLeftJoin5[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C, D, E](
-      nested: KLL[KEY, ((((A, B), C), D), E)]) {
-    def flattenValueTuple: KLL[KEY, (A, B, C, D, E)] = nested.mapValues {
+      nested: KLL[KEY, ((((A, B), C), D), E)])
+    def flattenValueTuple: KLL[KEY, (A, B, C, D, E)] = nested.mapValues
       tup =>
         FlattenGroup.flattenNestedTuple(tup)
-    }
-  }
 
   implicit def toFlattenLeftJoin5[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C, D, E](
       nested: KLL[KEY, ((((A, B), C), D), E)]) = new FlattenLeftJoin5(nested)
 
   def flattenNestedTuple[A, B, C, D, E, F](
-      nested: (((((A, B), C), D), E), F)): (A, B, C, D, E, F) = {
+      nested: (((((A, B), C), D), E), F)): (A, B, C, D, E, F) =
     val (((((a, b), c), d), e), f) = nested
     (a, b, c, d, e, f)
-  }
 
   class FlattenLeftJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C, D, E, F](
-      nested: KLL[KEY, (((((A, B), C), D), E), F)]) {
-    def flattenValueTuple: KLL[KEY, (A, B, C, D, E, F)] = nested.mapValues {
+      nested: KLL[KEY, (((((A, B), C), D), E), F)])
+    def flattenValueTuple: KLL[KEY, (A, B, C, D, E, F)] = nested.mapValues
       tup =>
         FlattenGroup.flattenNestedTuple(tup)
-    }
-  }
 
   implicit def toFlattenLeftJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C, D, E, F](
@@ -83,106 +71,94 @@ object FlattenGroup {
     new FlattenLeftJoin6(nested)
 
   def flattenNestedTuple[A, B, C, D, E, F, G](
-      nested: ((((((A, B), C), D), E), F), G)): (A, B, C, D, E, F, G) = {
+      nested: ((((((A, B), C), D), E), F), G)): (A, B, C, D, E, F, G) =
     val ((((((a, b), c), d), e), f), g) = nested
     (a, b, c, d, e, f, g)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H](
       nested: (((((((A, B), C), D), E), F), G),
-      H)): (A, B, C, D, E, F, G, H) = {
+      H)): (A, B, C, D, E, F, G, H) =
     val (((((((a, b), c), d), e), f), g), h) = nested
     (a, b, c, d, e, f, g, h)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I](
       nested: ((((((((A, B), C), D), E), F), G), H),
-      I)): (A, B, C, D, E, F, G, H, I) = {
+      I)): (A, B, C, D, E, F, G, H, I) =
     val ((((((((a, b), c), d), e), f), g), h), i) = nested
     (a, b, c, d, e, f, g, h, i)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J](
       nested: (((((((((A, B), C), D), E), F), G), H), I),
-      J)): (A, B, C, D, E, F, G, H, I, J) = {
+      J)): (A, B, C, D, E, F, G, H, I, J) =
     val (((((((((a, b), c), d), e), f), g), h), i), j) = nested
     (a, b, c, d, e, f, g, h, i, j)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K](
       nested: ((((((((((A, B), C), D), E), F), G), H), I), J),
-      K)): (A, B, C, D, E, F, G, H, I, J, K) = {
+      K)): (A, B, C, D, E, F, G, H, I, J, K) =
     val ((((((((((a, b), c), d), e), f), g), h), i), j), k) = nested
     (a, b, c, d, e, f, g, h, i, j, k)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L](
       nested: (((((((((((A, B), C), D), E), F), G), H), I), J), K),
-      L)): (A, B, C, D, E, F, G, H, I, J, K, L) = {
+      L)): (A, B, C, D, E, F, G, H, I, J, K, L) =
     val (((((((((((a, b), c), d), e), f), g), h), i), j), k), l) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M](
       nested: ((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
-      M)): (A, B, C, D, E, F, G, H, I, J, K, L, M) = {
+      M)): (A, B, C, D, E, F, G, H, I, J, K, L, M) =
     val ((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       nested: (((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M),
-      N)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) = {
+      N)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N) =
     val (((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n) =
       nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       nested: ((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M),
-      N), O)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) = {
+      N), O)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O) =
     val ((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o) =
       nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       nested: (((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L), M),
-      N), O), P)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) = {
+      N), O), P)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P) =
     val (
     ((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
     p) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
       nested: ((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
       M), N), O), P),
-      Q)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) = {
+      Q)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q) =
     val (
     (((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
      p),
     q) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
-  }
 
   def flattenNestedTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
       nested: (((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
       M), N), O), P), Q),
-      R)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) = {
+      R)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R) =
     val (
     ((((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
       p),
      q),
     r) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)
-  }
 
   def flattenNestedTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
       nested: ((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
       M), N), O), P), Q), R),
-      S)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) = {
+      S)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S) =
     val (
     (((((((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n), o),
        p),
@@ -190,13 +166,12 @@ object FlattenGroup {
      r),
     s) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)
-  }
 
   def flattenNestedTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       nested: (((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K), L),
       M), N), O), P), Q), R), S),
-      T)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) = {
+      T)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T) =
     val (((((
             (
             (((((((((((((a, b), c), d), e), f), g), h), i), j), k), l), m), n),
@@ -207,13 +182,12 @@ object FlattenGroup {
           s),
          t) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)
-  }
 
   def flattenNestedTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
       nested: ((((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K),
       L), M), N), O), P), Q), R), S), T),
-      U)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) = {
+      U)): (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U) =
     val (((((
             (
             (
@@ -226,13 +200,12 @@ object FlattenGroup {
           t),
          u) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)
-  }
 
   def flattenNestedTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       nested: (((((((((((((((((((((A, B), C), D), E), F), G), H), I), J), K),
       L), M), N), O), P), Q), R), S), T), U), V))
-    : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) = {
+    : (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V) =
     val (
     (
     ((((
@@ -246,26 +219,22 @@ object FlattenGroup {
     u),
     v) = nested
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v)
-  }
 
   // methods for flattening results of outerJoin
 
   def flattenNestedOptionTuple[A, B, C](
       nested: (Option[(Option[A], Option[B])],
-      Option[C])): (Option[A], Option[B], Option[C]) = {
+      Option[C])): (Option[A], Option[B], Option[C]) =
     val (rest1, c) = nested
     val (a, b) = rest1.getOrElse(pairOfNones)
     (a, b, c)
-  }
 
   class FlattenOuterJoin3[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C](
-      nested: KLL[KEY, (Option[(Option[A], Option[B])], Option[C])]) {
+      nested: KLL[KEY, (Option[(Option[A], Option[B])], Option[C])])
     def flattenValueTuple: KLL[KEY, (Option[A], Option[B], Option[C])] =
-      nested.mapValues { tup =>
+      nested.mapValues  tup =>
         FlattenGroup.flattenNestedOptionTuple(tup)
-      }
-  }
 
   implicit def toFlattenOuterJoin3[KEY, KLL[
           KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C](
@@ -274,24 +243,21 @@ object FlattenGroup {
 
   def flattenNestedOptionTuple[A, B, C, D](
       nested: (Option[(Option[(Option[A], Option[B])], Option[C])],
-      Option[D])): (Option[A], Option[B], Option[C], Option[D]) = {
+      Option[D])): (Option[A], Option[B], Option[C], Option[D]) =
     val (rest1, d) = nested
     val (rest2, c) = rest1.getOrElse(pairOfNones)
     val (a, b) = rest2.getOrElse(pairOfNones)
     (a, b, c, d)
-  }
 
   class FlattenOuterJoin4[
       KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
       nested: KLL[KEY,
                   (Option[(Option[(Option[A], Option[B])], Option[C])],
-                  Option[D])]) {
+                  Option[D])])
     def flattenValueTuple: KLL[
-        KEY, (Option[A], Option[B], Option[C], Option[D])] = nested.mapValues {
+        KEY, (Option[A], Option[B], Option[C], Option[D])] = nested.mapValues
       tup =>
         FlattenGroup.flattenNestedOptionTuple(tup)
-    }
-  }
 
   implicit def toFlattenOuterJoin4[KEY, KLL[
           KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D](
@@ -302,26 +268,23 @@ object FlattenGroup {
   def flattenNestedOptionTuple[A, B, C, D, E](
       nested: (Option[
           (Option[(Option[(Option[A], Option[B])], Option[C])], Option[D])],
-      Option[E])): (Option[A], Option[B], Option[C], Option[D], Option[E]) = {
+      Option[E])): (Option[A], Option[B], Option[C], Option[D], Option[E]) =
     val (rest1, e) = nested
     val (rest2, d) = rest1.getOrElse(pairOfNones)
     val (rest3, c) = rest2.getOrElse(pairOfNones)
     val (a, b) = rest3.getOrElse(pairOfNones)
     (a, b, c, d, e)
-  }
 
   class FlattenOuterJoin5[KEY, KLL[
           KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E](
       nested: KLL[
           KEY,
           (Option[(Option[(Option[(Option[A], Option[B])], Option[C])], Option[
-                  D])], Option[E])]) {
+                  D])], Option[E])])
     def flattenValueTuple: KLL[
         KEY, (Option[A], Option[B], Option[C], Option[D], Option[E])] =
-      nested.mapValues { tup =>
+      nested.mapValues  tup =>
         FlattenGroup.flattenNestedOptionTuple(tup)
-      }
-  }
 
   implicit def toFlattenOuterJoin5[KEY, KLL[
           KLL_K, +KLL_V] <: KeyedListLike[KLL_K, KLL_V, KLL], A, B, C, D, E](
@@ -333,14 +296,13 @@ object FlattenGroup {
   def flattenNestedOptionTuple[A, B, C, D, E, F](
       nested: (Option[(Option[(Option[(Option[(Option[A], Option[B])], Option[
                       C])], Option[D])], Option[E])], Option[F]))
-    : (Option[A], Option[B], Option[C], Option[D], Option[E], Option[F]) = {
+    : (Option[A], Option[B], Option[C], Option[D], Option[E], Option[F]) =
     val (rest1, f) = nested
     val (rest2, e) = rest1.getOrElse(pairOfNones)
     val (rest3, d) = rest2.getOrElse(pairOfNones)
     val (rest4, c) = rest3.getOrElse(pairOfNones)
     val (a, b) = rest4.getOrElse(pairOfNones)
     (a, b, c, d, e, f)
-  }
 
   class FlattenOuterJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C, D, E, F](
@@ -348,14 +310,12 @@ object FlattenGroup {
                   (Option[
                       (Option[(Option[(Option[(Option[A], Option[B])], Option[
                                   C])], Option[D])], Option[E])],
-                  Option[F])]) {
+                  Option[F])])
     def flattenValueTuple: KLL[KEY,
                                (Option[A], Option[B], Option[C], Option[D],
-                               Option[E], Option[F])] = nested.mapValues {
+                               Option[E], Option[F])] = nested.mapValues
       tup =>
         FlattenGroup.flattenNestedOptionTuple(tup)
-    }
-  }
 
   implicit def toFlattenOuterJoin6[KEY, KLL[KLL_K, +KLL_V] <: KeyedListLike[
           KLL_K, KLL_V, KLL], A, B, C, D, E, F](
@@ -369,7 +329,7 @@ object FlattenGroup {
       nested: (Option[(Option[(Option[
                   (Option[(Option[(Option[A], Option[B])], Option[C])], Option[
                       D])], Option[E])], Option[F])], Option[G])): (Option[A],
-  Option[B], Option[C], Option[D], Option[E], Option[F], Option[G]) = {
+  Option[B], Option[C], Option[D], Option[E], Option[F], Option[G]) =
     val (rest1, g) = nested
     val (rest2, f) = rest1.getOrElse(pairOfNones)
     val (rest3, e) = rest2.getOrElse(pairOfNones)
@@ -377,14 +337,13 @@ object FlattenGroup {
     val (rest5, c) = rest4.getOrElse(pairOfNones)
     val (a, b) = rest5.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g)
-  }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H](
       nested: (Option[(Option[(Option[(Option[(Option[
                           (Option[(Option[A], Option[B])], Option[C])], Option[
                           D])], Option[E])], Option[F])], Option[G])],
       Option[H])): (Option[A], Option[B], Option[C],
-  Option[D], Option[E], Option[F], Option[G], Option[H]) = {
+  Option[D], Option[E], Option[F], Option[G], Option[H]) =
     val (rest1, h) = nested
     val (rest2, g) = rest1.getOrElse(pairOfNones)
     val (rest3, f) = rest2.getOrElse(pairOfNones)
@@ -393,14 +352,13 @@ object FlattenGroup {
     val (rest6, c) = rest5.getOrElse(pairOfNones)
     val (a, b) = rest6.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h)
-  }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I](
       nested: (Option[(Option[(Option[(Option[(Option[(Option[(Option[
                                   (Option[A], Option[B])], Option[C])], Option[
                               D])], Option[E])], Option[F])], Option[G])], Option[
               H])], Option[I])): (Option[A], Option[B], Option[C], Option[D],
-  Option[E], Option[F], Option[G], Option[H], Option[I]) = {
+  Option[E], Option[F], Option[G], Option[H], Option[I]) =
     val (rest1, i) = nested
     val (rest2, h) = rest1.getOrElse(pairOfNones)
     val (rest3, g) = rest2.getOrElse(pairOfNones)
@@ -410,7 +368,6 @@ object FlattenGroup {
     val (rest7, c) = rest6.getOrElse(pairOfNones)
     val (a, b) = rest7.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J](nested: (Option[(Option[
@@ -420,7 +377,7 @@ object FlattenGroup {
                                   (Option[(Option[A], Option[B])], Option[C])], Option[D])], Option[
                               E])], Option[F])], Option[G])], Option[H])], Option[
               I])], Option[J])): (Option[A], Option[B], Option[C], Option[D],
-  Option[E], Option[F], Option[G], Option[H], Option[I], Option[J]) = {
+  Option[E], Option[F], Option[G], Option[H], Option[I], Option[J]) =
     val (rest1, j) = nested
     val (rest2, i) = rest1.getOrElse(pairOfNones)
     val (rest3, h) = rest2.getOrElse(pairOfNones)
@@ -431,7 +388,6 @@ object FlattenGroup {
     val (rest8, c) = rest7.getOrElse(pairOfNones)
     val (a, b) = rest8.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K](
@@ -444,7 +400,7 @@ object FlattenGroup {
                               F])], Option[G])], Option[H])], Option[I])], Option[
               J])],
       Option[K])): (Option[A], Option[B], Option[C], Option[D], Option[E],
-  Option[F], Option[G], Option[H], Option[I], Option[J], Option[K]) = {
+  Option[F], Option[G], Option[H], Option[I], Option[J], Option[K]) =
     val (rest1, k) = nested
     val (rest2, j) = rest1.getOrElse(pairOfNones)
     val (rest3, i) = rest2.getOrElse(pairOfNones)
@@ -456,7 +412,6 @@ object FlattenGroup {
     val (rest9, c) = rest8.getOrElse(pairOfNones)
     val (a, b) = rest9.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k)
-  }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L](
       nested: (Option[
@@ -470,7 +425,7 @@ object FlattenGroup {
                                   F])], Option[G])], Option[H])], Option[I])], Option[
                   J])], Option[K])], Option[L]))
     : (Option[A], Option[B], Option[C], Option[D], Option[E], Option[F],
-    Option[G], Option[H], Option[I], Option[J], Option[K], Option[L]) = {
+    Option[G], Option[H], Option[I], Option[J], Option[K], Option[L]) =
     val (rest1, l) = nested
     val (rest2, k) = rest1.getOrElse(pairOfNones)
     val (rest3, j) = rest2.getOrElse(pairOfNones)
@@ -483,7 +438,6 @@ object FlattenGroup {
     val (rest10, c) = rest9.getOrElse(pairOfNones)
     val (a, b) = rest10.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l)
-  }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M](
       nested: (Option[
@@ -496,7 +450,7 @@ object FlattenGroup {
                                   G])], Option[H])], Option[I])], Option[J])], Option[
                   K])], Option[L])], Option[M])): (Option[A], Option[B],
   Option[C], Option[D], Option[E], Option[F], Option[G],
-  Option[H], Option[I], Option[J], Option[K], Option[L], Option[M]) = {
+  Option[H], Option[I], Option[J], Option[K], Option[L], Option[M]) =
     val (rest1, m) = nested
     val (rest2, l) = rest1.getOrElse(pairOfNones)
     val (rest3, k) = rest2.getOrElse(pairOfNones)
@@ -510,7 +464,6 @@ object FlattenGroup {
     val (rest11, c) = rest10.getOrElse(pairOfNones)
     val (a, b) = rest11.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m)
-  }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N](
       nested: (Option[(Option[
@@ -524,7 +477,7 @@ object FlattenGroup {
                                   H])], Option[I])], Option[J])], Option[K])], Option[
                   L])], Option[M])], Option[N])): (Option[A],
   Option[B], Option[C], Option[D], Option[E], Option[F], Option[G], Option[H],
-  Option[I], Option[J], Option[K], Option[L], Option[M], Option[N]) = {
+  Option[I], Option[J], Option[K], Option[L], Option[M], Option[N]) =
     val (rest1, n) = nested
     val (rest2, m) = rest1.getOrElse(pairOfNones)
     val (rest3, l) = rest2.getOrElse(pairOfNones)
@@ -539,7 +492,6 @@ object FlattenGroup {
     val (rest12, c) = rest11.getOrElse(pairOfNones)
     val (a, b) = rest12.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n)
-  }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O](
       nested: (Option[
@@ -555,7 +507,7 @@ object FlattenGroup {
                                   I])], Option[J])], Option[K])], Option[L])], Option[
                   M])], Option[N])], Option[O])): (Option[A], Option[B],
   Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
-  Option[J], Option[K], Option[L], Option[M], Option[N], Option[O]) = {
+  Option[J], Option[K], Option[L], Option[M], Option[N], Option[O]) =
     val (rest1, o) = nested
     val (rest2, n) = rest1.getOrElse(pairOfNones)
     val (rest3, m) = rest2.getOrElse(pairOfNones)
@@ -571,7 +523,6 @@ object FlattenGroup {
     val (rest13, c) = rest12.getOrElse(pairOfNones)
     val (a, b) = rest13.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)
-  }
 
   def flattenNestedOptionTuple[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P](
       nested: (Option[(Option[
@@ -587,7 +538,7 @@ object FlattenGroup {
                   N])], Option[O])],
       Option[P])): (Option[A], Option[B], Option[C], Option[D], Option[E],
   Option[F], Option[G], Option[H], Option[I], Option[J],
-  Option[K], Option[L], Option[M], Option[N], Option[O], Option[P]) = {
+  Option[K], Option[L], Option[M], Option[N], Option[O], Option[P]) =
     val (rest1, p) = nested
     val (rest2, o) = rest1.getOrElse(pairOfNones)
     val (rest3, n) = rest2.getOrElse(pairOfNones)
@@ -604,7 +555,6 @@ object FlattenGroup {
     val (rest14, c) = rest13.getOrElse(pairOfNones)
     val (a, b) = rest14.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q](
@@ -623,7 +573,7 @@ object FlattenGroup {
                   O])], Option[P])],
       Option[Q])): (Option[A], Option[B], Option[C], Option[D],
   Option[E], Option[F], Option[G], Option[H], Option[I], Option[J], Option[K],
-  Option[L], Option[M], Option[N], Option[O], Option[P], Option[Q]) = {
+  Option[L], Option[M], Option[N], Option[O], Option[P], Option[Q]) =
     val (rest1, q) = nested
     val (rest2, p) = rest1.getOrElse(pairOfNones)
     val (rest3, o) = rest2.getOrElse(pairOfNones)
@@ -641,7 +591,6 @@ object FlattenGroup {
     val (rest15, c) = rest14.getOrElse(pairOfNones)
     val (a, b) = rest15.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R](
@@ -663,7 +612,7 @@ object FlattenGroup {
                   P])], Option[Q])],
       Option[R])): (Option[A], Option[B], Option[C], Option[D], Option[E],
   Option[F], Option[G], Option[H], Option[I], Option[J], Option[K], Option[L],
-  Option[M], Option[N], Option[O], Option[P], Option[Q], Option[R]) = {
+  Option[M], Option[N], Option[O], Option[P], Option[Q], Option[R]) =
     val (rest1, r) = nested
     val (rest2, q) = rest1.getOrElse(pairOfNones)
     val (rest3, p) = rest2.getOrElse(pairOfNones)
@@ -682,7 +631,6 @@ object FlattenGroup {
     val (rest16, c) = rest15.getOrElse(pairOfNones)
     val (a, b) = rest16.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S](
@@ -705,7 +653,7 @@ object FlattenGroup {
                   Q])], Option[R])], Option[S])): (Option[A], Option[B],
   Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
   Option[J], Option[K], Option[L], Option[M], Option[N], Option[O], Option[P],
-  Option[Q], Option[R], Option[S]) = {
+  Option[Q], Option[R], Option[S]) =
     val (rest1, s) = nested
     val (rest2, r) = rest1.getOrElse(pairOfNones)
     val (rest3, q) = rest2.getOrElse(pairOfNones)
@@ -725,7 +673,6 @@ object FlattenGroup {
     val (rest17, c) = rest16.getOrElse(pairOfNones)
     val (a, b) = rest17.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
@@ -749,7 +696,7 @@ object FlattenGroup {
                   R])], Option[S])], Option[T])): (Option[A], Option[B],
   Option[C], Option[D], Option[E], Option[F], Option[G],
   Option[H], Option[I], Option[J], Option[K], Option[L], Option[M], Option[N],
-  Option[O], Option[P], Option[Q], Option[R], Option[S], Option[T]) = {
+  Option[O], Option[P], Option[Q], Option[R], Option[S], Option[T]) =
     val (rest1, t) = nested
     val (rest2, s) = rest1.getOrElse(pairOfNones)
     val (rest3, r) = rest2.getOrElse(pairOfNones)
@@ -770,7 +717,6 @@ object FlattenGroup {
     val (rest18, c) = rest17.getOrElse(pairOfNones)
     val (a, b) = rest18.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U](
@@ -793,7 +739,7 @@ object FlattenGroup {
                   S])], Option[T])], Option[U])): (Option[A], Option[B],
   Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
   Option[J], Option[K], Option[L], Option[M], Option[N], Option[O], Option[P],
-  Option[Q], Option[R], Option[S], Option[T], Option[U]) = {
+  Option[Q], Option[R], Option[S], Option[T], Option[U]) =
     val (rest1, u) = nested
     val (rest2, t) = rest1.getOrElse(pairOfNones)
     val (rest3, s) = rest2.getOrElse(pairOfNones)
@@ -815,7 +761,6 @@ object FlattenGroup {
     val (rest19, c) = rest18.getOrElse(pairOfNones)
     val (a, b) = rest19.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)
-  }
 
   def flattenNestedOptionTuple[
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
@@ -843,7 +788,7 @@ object FlattenGroup {
                   T])], Option[U])], Option[V])): (Option[A], Option[B],
   Option[C], Option[D], Option[E], Option[F], Option[G], Option[H], Option[I],
   Option[J], Option[K], Option[L], Option[M], Option[N], Option[O], Option[P],
-  Option[Q], Option[R], Option[S], Option[T], Option[U], Option[V]) = {
+  Option[Q], Option[R], Option[S], Option[T], Option[U], Option[V]) =
     val (rest1, v) = nested
     val (rest2, u) = rest1.getOrElse(pairOfNones)
     val (rest3, t) = rest2.getOrElse(pairOfNones)
@@ -866,6 +811,4 @@ object FlattenGroup {
     val (rest20, c) = rest19.getOrElse(pairOfNones)
     val (a, b) = rest20.getOrElse(pairOfNones)
     (a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v)
-  }
-}
 // end of autogenerated

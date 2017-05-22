@@ -5,11 +5,11 @@ import akka.stream.scaladsl._
 import akka.stream.testkit._
 import scala.concurrent.duration._
 
-class RecipeManualTrigger extends RecipeSpec {
+class RecipeManualTrigger extends RecipeSpec
 
-  "Recipe for triggering a stream manually" must {
+  "Recipe for triggering a stream manually" must
 
-    "work" in {
+    "work" in
 
       val elements = Source(List("1", "2", "3", "4"))
       val pub = TestPublisher.probe[Trigger]()
@@ -20,16 +20,16 @@ class RecipeManualTrigger extends RecipeSpec {
       //#manually-triggered-stream
       val graph =
         RunnableGraph.fromGraph(
-            GraphDSL.create() { implicit builder =>
+            GraphDSL.create()  implicit builder =>
           import GraphDSL.Implicits._
           val zip = builder.add(Zip[Message, Trigger]())
           elements ~> zip.in0
           triggerSource ~> zip.in1
-          zip.out ~> Flow[(Message, Trigger)].map {
+          zip.out ~> Flow[(Message, Trigger)].map
             case (msg, trigger) => msg
-          } ~> sink
+          ~> sink
           ClosedShape
-        })
+        )
       //#manually-triggered-stream
 
       graph.run()
@@ -50,9 +50,8 @@ class RecipeManualTrigger extends RecipeSpec {
       pub.sendNext(())
       sub.expectNext("4")
       sub.expectComplete()
-    }
 
-    "work with ZipWith" in {
+    "work with ZipWith" in
 
       val elements = Source(List("1", "2", "3", "4"))
       val pub = TestPublisher.probe[Trigger]()
@@ -62,7 +61,7 @@ class RecipeManualTrigger extends RecipeSpec {
 
       //#manually-triggered-stream-zipwith
       val graph = RunnableGraph.fromGraph(
-          GraphDSL.create() { implicit builder =>
+          GraphDSL.create()  implicit builder =>
         import GraphDSL.Implicits._
         val zip = builder.add(ZipWith((msg: Message, trigger: Trigger) => msg))
 
@@ -70,7 +69,7 @@ class RecipeManualTrigger extends RecipeSpec {
         triggerSource ~> zip.in1
         zip.out ~> sink
         ClosedShape
-      })
+      )
       //#manually-triggered-stream-zipwith
 
       graph.run()
@@ -91,6 +90,3 @@ class RecipeManualTrigger extends RecipeSpec {
       pub.sendNext(())
       sub.expectNext("4")
       sub.expectComplete()
-    }
-  }
-}

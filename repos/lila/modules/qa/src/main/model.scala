@@ -16,14 +16,13 @@ case class Question(_id: QuestionId, // autoincrement integer
                     createdAt: DateTime,
                     updatedAt: DateTime,
                     acceptedAt: Option[DateTime],
-                    editedAt: Option[DateTime]) {
+                    editedAt: Option[DateTime])
 
   def id = _id
 
-  def slug = {
+  def slug =
     val s = lila.common.String slugify title
     if (s.isEmpty) "-" else s
-  }
 
   def ownBy(user: User) = userId == user.id
 
@@ -33,7 +32,6 @@ case class Question(_id: QuestionId, // autoincrement integer
   def editNow = copy(editedAt = Some(DateTime.now)).updateNow
 
   def accepted = acceptedAt.isDefined
-}
 
 case class Answer(_id: AnswerId,
                   questionId: QuestionId,
@@ -43,7 +41,7 @@ case class Answer(_id: AnswerId,
                   comments: List[Comment],
                   acceptedAt: Option[DateTime],
                   createdAt: DateTime,
-                  editedAt: Option[DateTime]) {
+                  editedAt: Option[DateTime])
 
   def id = _id
 
@@ -54,11 +52,10 @@ case class Answer(_id: AnswerId,
   def ownBy(user: User) = userId == user.id
 
   def editNow = copy(editedAt = Some(DateTime.now))
-}
 
 case class AnswerWithQuestion(answer: Answer, question: Question)
 
-case class Vote(up: Set[String], down: Set[String], score: Int) {
+case class Vote(up: Set[String], down: Set[String], score: Int)
 
   def add(user: String, v: Boolean) = (if (v) addUp _ else addDown _)(user)
   def addUp(user: String) =
@@ -72,14 +69,12 @@ case class Vote(up: Set[String], down: Set[String], score: Int) {
     else None
 
   private def computeScore = copy(score = up.size - down.size)
-}
 
 case class Comment(id: CommentId, // random string
                    userId: String,
                    body: String,
                    createdAt: DateTime)
 
-object Comment {
+object Comment
 
   def makeId = ornicar.scalalib.Random nextStringUppercase 8
-}

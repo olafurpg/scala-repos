@@ -15,13 +15,12 @@ import org.jetbrains.plugins.scala.settings._
 /**
   * @author ilyas
   */
-class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
+class ScalaParserDefinition extends ScalaParserDefinitionWrapper
 
-  def createLexer(project: Project) = {
+  def createLexer(project: Project) =
     val treatDocCommentAsBlockComment =
       ScalaProjectSettings.getInstance(project).isTreatDocCommentAsBlockComment
     new ScalaLexer(treatDocCommentAsBlockComment)
-  }
 
   def createLexer = new ScalaLexer
 
@@ -39,28 +38,23 @@ class ScalaParserDefinition extends ScalaParserDefinitionWrapper {
   def createElement(astNode: ASTNode): PsiElement =
     ScalaPsiCreator.createElement(astNode)
 
-  def createFile(fileViewProvider: FileViewProvider): PsiFile = {
+  def createFile(fileViewProvider: FileViewProvider): PsiFile =
     ScalaFileFactory.EP_NAME.getExtensions.view
       .flatMap(_.createFile(fileViewProvider))
       .headOption
       .getOrElse(new ScalaFileImpl(fileViewProvider))
-  }
 
   override def spaceExistanceTypeBetweenTokens(
       leftNode: ASTNode,
-      rightNode: ASTNode): ParserDefinition.SpaceRequirements = {
+      rightNode: ASTNode): ParserDefinition.SpaceRequirements =
     import com.intellij.lang.ParserDefinition._
     if (rightNode.getElementType != ScalaTokenTypes.tWHITE_SPACE_IN_LINE ||
-        !rightNode.getText.contains("\n")) {
+        !rightNode.getText.contains("\n"))
       val imp: ScImportStmt =
         PsiTreeUtil.getParentOfType(leftNode.getPsi, classOf[ScImportStmt])
       if (imp != null &&
           rightNode.getTextRange.getStartOffset == imp.getTextRange.getEndOffset)
         return SpaceRequirements.MUST_LINE_BREAK
-    }
-    (leftNode.getElementType, rightNode.getElementType) match {
+    (leftNode.getElementType, rightNode.getElementType) match
       case (_, ScalaTokenTypes.kIMPORT) => SpaceRequirements.MUST_LINE_BREAK
       case _ => super.spaceExistanceTypeBetweenTokens(leftNode, rightNode)
-    }
-  }
-}

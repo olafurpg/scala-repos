@@ -19,7 +19,7 @@ package org.apache.spark.sql.jdbc
 
 import org.apache.spark.sql.types._
 
-private object MsSqlServerDialect extends JdbcDialect {
+private object MsSqlServerDialect extends JdbcDialect
 
   override def canHandle(url: String): Boolean =
     url.startsWith("jdbc:sqlserver")
@@ -27,17 +27,13 @@ private object MsSqlServerDialect extends JdbcDialect {
   override def getCatalystType(sqlType: Int,
                                typeName: String,
                                size: Int,
-                               md: MetadataBuilder): Option[DataType] = {
-    if (typeName.contains("datetimeoffset")) {
+                               md: MetadataBuilder): Option[DataType] =
+    if (typeName.contains("datetimeoffset"))
       // String is recommend by Microsoft SQL Server for datetimeoffset types in non-MS clients
       Option(StringType)
-    } else {
+    else
       None
-    }
-  }
 
-  override def getJDBCType(dt: DataType): Option[JdbcType] = dt match {
+  override def getJDBCType(dt: DataType): Option[JdbcType] = dt match
     case TimestampType => Some(JdbcType("DATETIME", java.sql.Types.TIMESTAMP))
     case _ => None
-  }
-}

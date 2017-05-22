@@ -13,34 +13,28 @@ import com.typesafe.config.Config
 
 import scala.concurrent.duration._
 
-object PersistencePluginProxy {
+object PersistencePluginProxy
   final case class TargetLocation(address: Address)
   private case object InitTimeout
 
-  def setTargetLocation(system: ActorSystem, address: Address): Unit = {
+  def setTargetLocation(system: ActorSystem, address: Address): Unit =
     Persistence(system).journalFor(null) ! TargetLocation(address)
     if (system.settings.config.getString(
             "akka.persistence.snapshot-store.plugin") != "")
       Persistence(system).snapshotStoreFor(null) ! TargetLocation(address)
-  }
 
-  def start(system: ActorSystem): Unit = {
+  def start(system: ActorSystem): Unit =
     Persistence(system).journalFor(null)
     if (system.settings.config.getString(
             "akka.persistence.snapshot-store.plugin") != "")
       Persistence(system).snapshotStoreFor(null)
-  }
 
-  private sealed trait PluginType {
+  private sealed trait PluginType
     def qualifier: String
-  }
-  private case object Journal extends PluginType {
+  private case object Journal extends PluginType
     override def qualifier: String = "journal"
-  }
-  private case object SnapshotStore extends PluginType {
+  private case object SnapshotStore extends PluginType
     override def qualifier: String = "snapshot-store"
-  }
-}
 
 /**
   * PersistencePluginProxyExtensionImpl is an `Extension` that enables initialization of the `PersistencePluginProxy`
@@ -48,13 +42,12 @@ object PersistencePluginProxy {
   * @param system The actor system to initialize the extension for
   */
 class PersistencePluginProxyExtensionImpl(system: ActorSystem)
-    extends Extension {
+    extends Extension
   PersistencePluginProxy.start(system)
-}
 
 object PersistencePluginProxyExtension
     extends ExtensionId[PersistencePluginProxyExtensionImpl]
-    with ExtensionIdProvider {
+    with ExtensionIdProvider
   override def createExtension(
       system: ExtendedActorSystem): PersistencePluginProxyExtensionImpl =
     new PersistencePluginProxyExtensionImpl(system)
@@ -62,64 +55,56 @@ object PersistencePluginProxyExtension
     PersistencePluginProxyExtension
   override def get(system: ActorSystem): PersistencePluginProxyExtensionImpl =
     super.get(system)
-}
 
 final class PersistencePluginProxy(config: Config)
-    extends Actor with Stash with ActorLogging {
+    extends Actor with Stash with ActorLogging
   import PersistencePluginProxy._
   import JournalProtocol._
   import SnapshotProtocol._
 
   private val pluginId = self.path.name
-  private val pluginType: PluginType = pluginId match {
+  private val pluginType: PluginType = pluginId match
     case "akka.persistence.journal.proxy" ⇒ Journal
     case "akka.persistence.snapshot-store.proxy" ⇒ SnapshotStore
     case other ⇒
       throw new IllegalArgumentException("Unknown plugin type: " + other)
-  }
 
   private val initTimeout: FiniteDuration =
     config.getDuration("init-timeout", MILLISECONDS).millis
-  private val targetPluginId: String = {
+  private val targetPluginId: String =
     val key = s"target-${pluginType.qualifier}-plugin"
     config.getString(key).requiring(_ != "", s"$pluginId.$key must be defined")
-  }
   private val startTarget: Boolean =
     config.getBoolean(s"start-target-${pluginType.qualifier}")
 
-  override def preStart(): Unit = {
-    if (startTarget) {
-      val target = pluginType match {
+  override def preStart(): Unit =
+    if (startTarget)
+      val target = pluginType match
         case Journal ⇒
           log.info("Starting target journal [{}]", targetPluginId)
           Persistence(context.system).journalFor(targetPluginId)
         case SnapshotStore ⇒
           log.info("Starting target snapshot-store [{}]", targetPluginId)
           Persistence(context.system).snapshotStoreFor(targetPluginId)
-      }
       context.become(active(target, targetAtThisNode = true))
-    } else {
+    else
       val targetAddressKey = s"target-${pluginType.qualifier}-address"
       val targetAddress = config.getString(targetAddressKey)
-      if (targetAddress != "") {
-        try {
+      if (targetAddress != "")
+        try
           log.info("Setting target {} address to {}",
                    pluginType.qualifier,
                    targetAddress)
           PersistencePluginProxy.setTargetLocation(
               context.system, AddressFromURIString(targetAddress))
-        } catch {
+        catch
           case _: URISyntaxException ⇒
             log.warning("Invalid URL provided for target {} address: {}",
                         pluginType.qualifier,
                         targetAddress)
-        }
-      }
 
       context.system.scheduler
         .scheduleOnce(initTimeout, self, InitTimeout)(context.dispatcher)
-    }
-  }
 
   private val selfAddress: Address =
     context.system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
@@ -130,7 +115,7 @@ final class PersistencePluginProxy(config: Config)
 
   def receive = init
 
-  def init: Receive = {
+  def init: Receive =
     case TargetLocation(address) ⇒
       context.setReceiveTimeout(1.second) // for retries
       context.become(identifying(address))
@@ -144,23 +129,20 @@ final class PersistencePluginProxy(config: Config)
     case Terminated(_) ⇒
     case msg ⇒
       stash()
-  }
 
-  def becomeIdentifying(address: Address): Unit = {
+  def becomeIdentifying(address: Address): Unit =
     sendIdentify(address)
     context.setReceiveTimeout(1.second) // for retries
     context.become(identifying(address))
-  }
 
-  def sendIdentify(address: Address): Unit = {
+  def sendIdentify(address: Address): Unit =
     val sel = context.actorSelection(
         RootActorPath(address) / "system" / targetPluginId)
     log.info("Trying to identify target {} at {}", pluginType.qualifier, sel)
     sel ! Identify(targetPluginId)
-  }
 
   def identifying(address: Address): Receive =
-    ({
+    (
       case ActorIdentity(`targetPluginId`, Some(target)) ⇒
         log.info("Found target {} at [{}]", pluginType.qualifier, address)
         context.setReceiveTimeout(Duration.Undefined)
@@ -171,9 +153,9 @@ final class PersistencePluginProxy(config: Config)
       case Terminated(_) ⇒
       case ReceiveTimeout ⇒
         sendIdentify(address)
-    }: Receive).orElse(init)
+    : Receive).orElse(init)
 
-  def active(targetJournal: ActorRef, targetAtThisNode: Boolean): Receive = {
+  def active(targetJournal: ActorRef, targetAtThisNode: Boolean): Receive =
     case TargetLocation(address) ⇒
       if (targetAtThisNode && address != selfAddress)
         becomeIdentifying(address)
@@ -184,25 +166,22 @@ final class PersistencePluginProxy(config: Config)
     case InitTimeout ⇒
     case msg ⇒
       targetJournal forward msg
-  }
 
-  def initTimedOut: Receive = {
+  def initTimedOut: Receive =
 
     case req: JournalProtocol.Request ⇒
-      req match {
+      req match
         // exhaustive match
         case WriteMessages(messages, persistentActor, actorInstanceId) ⇒
           persistentActor ! WriteMessagesFailed(timeoutException)
-          messages.foreach {
+          messages.foreach
             case a: AtomicWrite ⇒
-              a.payload.foreach { p ⇒
+              a.payload.foreach  p ⇒
                 persistentActor ! WriteMessageFailure(p,
                                                       timeoutException,
                                                       actorInstanceId)
-              }
             case r: NonPersistentRepr ⇒
               persistentActor ! LoopMessageSuccess(r.payload, actorInstanceId)
-          }
         case ReplayMessages(fromSequenceNr,
                             toSequenceNr,
                             max,
@@ -212,10 +191,9 @@ final class PersistencePluginProxy(config: Config)
         case DeleteMessagesTo(persistenceId, toSequenceNr, persistentActor) ⇒
           persistentActor ! DeleteMessagesFailure(
               timeoutException, toSequenceNr)
-      }
 
     case req: SnapshotProtocol.Request ⇒
-      req match {
+      req match
         // exhaustive match
         case LoadSnapshot(persistenceId, criteria, toSequenceNr) ⇒
           sender() ! LoadSnapshotResult(None, toSequenceNr)
@@ -225,7 +203,6 @@ final class PersistencePluginProxy(config: Config)
           sender() ! DeleteSnapshotFailure(metadata, timeoutException)
         case DeleteSnapshots(persistenceId, criteria) ⇒
           sender() ! DeleteSnapshotsFailure(criteria, timeoutException)
-      }
 
     case TargetLocation(address) ⇒
       becomeIdentifying(address)
@@ -234,5 +211,3 @@ final class PersistencePluginProxy(config: Config)
     case other ⇒
       val e = timeoutException()
       log.error(e, "Failed PersistencePluginProxy request: {}", e.getMessage)
-  }
-}

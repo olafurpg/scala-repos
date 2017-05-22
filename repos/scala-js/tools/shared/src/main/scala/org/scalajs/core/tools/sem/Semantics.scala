@@ -17,7 +17,7 @@ final class Semantics private (
     val moduleInit: CheckedBehavior,
     val strictFloats: Boolean,
     val productionMode: Boolean,
-    val runtimeClassName: Semantics.RuntimeClassNameFunction) {
+    val runtimeClassName: Semantics.RuntimeClassNameFunction)
 
   import Semantics._
 
@@ -37,13 +37,12 @@ final class Semantics private (
       runtimeClassName: RuntimeClassNameFunction): Semantics =
     copy(runtimeClassName = runtimeClassName)
 
-  def optimized: Semantics = {
+  def optimized: Semantics =
     copy(asInstanceOfs = this.asInstanceOfs.optimized,
          moduleInit = this.moduleInit.optimized,
          productionMode = true)
-  }
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: Semantics =>
       this.asInstanceOfs == that.asInstanceOfs &&
       this.moduleInit == that.moduleInit &&
@@ -51,9 +50,8 @@ final class Semantics private (
       this.productionMode == that.productionMode
     case _ =>
       false
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     import scala.util.hashing.MurmurHash3._
     var acc = HashSeed
     acc = mix(acc, asInstanceOfs.hashCode)
@@ -61,33 +59,29 @@ final class Semantics private (
     acc = mix(acc, strictFloats.##)
     acc = mixLast(acc, productionMode.##)
     finalizeHash(acc, 4)
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     s"""Semantics(
        |  asInstanceOfs  = $asInstanceOfs,
        |  moduleInit     = $moduleInit,
        |  strictFloats   = $strictFloats,
        |  productionMode = $productionMode
        |)""".stripMargin
-  }
 
   /** Checks whether the given semantics setting is Java compliant */
-  def isCompliant(name: String): Boolean = name match {
+  def isCompliant(name: String): Boolean = name match
     case "asInstanceOfs" => asInstanceOfs == CheckedBehavior.Compliant
     case "moduleInit" => moduleInit == CheckedBehavior.Compliant
     case "strictFloats" => strictFloats
     case _ => false
-  }
 
   /** Retrieve a list of semantics which are set to compliant */
-  def compliants: List[String] = {
+  def compliants: List[String] =
     def cl(name: String, cond: Boolean) = if (cond) List(name) else Nil
 
     cl("asInstanceOfs", asInstanceOfs == CheckedBehavior.Compliant) ++ cl(
         "moduleInit", moduleInit == CheckedBehavior.Compliant) ++ cl(
         "strictFloats", strictFloats)
-  }
 
   private def copy(
       asInstanceOfs: CheckedBehavior = this.asInstanceOfs,
@@ -95,16 +89,14 @@ final class Semantics private (
       strictFloats: Boolean = this.strictFloats,
       productionMode: Boolean = this.productionMode,
       runtimeClassName: RuntimeClassNameFunction = this.runtimeClassName)
-    : Semantics = {
+    : Semantics =
     new Semantics(asInstanceOfs = asInstanceOfs,
                   moduleInit = moduleInit,
                   strictFloats = strictFloats,
                   productionMode = productionMode,
                   runtimeClassName = runtimeClassName)
-  }
-}
 
-object Semantics {
+object Semantics
   private val HashSeed =
     scala.util.hashing.MurmurHash3.stringHash(classOf[Semantics].getName)
 
@@ -117,7 +109,7 @@ object Semantics {
       productionMode = false,
       runtimeClassName = _.fullName)
 
-  def compliantTo(semantics: Traversable[String]): Semantics = {
+  def compliantTo(semantics: Traversable[String]): Semantics =
     import Defaults._
     import CheckedBehavior._
 
@@ -132,5 +124,3 @@ object Semantics {
         strictFloats = sw("strictFloats", true, strictFloats),
         productionMode = false,
         runtimeClassName = Defaults.runtimeClassName)
-  }
-}

@@ -1,7 +1,7 @@
 package scala.tools.nsc
 package typechecker
 
-trait StdAttachments { self: Analyzer =>
+trait StdAttachments  self: Analyzer =>
 
   import global._
 
@@ -10,9 +10,8 @@ trait StdAttachments { self: Analyzer =>
     *  After a macro application has been successfully expanded, this attachment is destroyed.
     */
   type UnaffiliatedMacroContext = scala.reflect.macros.contexts.Context
-  type MacroContext = UnaffiliatedMacroContext {
+  type MacroContext = UnaffiliatedMacroContext
     val universe: self.global.type
-  }
   case class MacroRuntimeAttachment(delayed: Boolean,
                                     typerContext: Context,
                                     macroContext: Option[MacroContext])
@@ -24,22 +23,19 @@ trait StdAttachments { self: Analyzer =>
   /** Loads underlying MacroExpanderAttachment from a macro expandee or returns a default value for that attachment.
     */
   def macroExpanderAttachment(tree: Tree): MacroExpanderAttachment =
-    tree.attachments.get[MacroExpanderAttachment] getOrElse {
-      tree match {
+    tree.attachments.get[MacroExpanderAttachment] getOrElse
+      tree match
         case Apply(fn, _) if tree.isInstanceOf[ApplyToImplicitArgs] =>
           macroExpanderAttachment(fn)
         case _ => MacroExpanderAttachment(tree, EmptyTree)
-      }
-    }
 
   /** After macro expansion is completed, links the expandee and the expansion result
     *  by annotating them both with a `MacroExpansionAttachment`.
     */
-  def linkExpandeeAndDesugared(expandee: Tree, desugared: Tree): Unit = {
+  def linkExpandeeAndDesugared(expandee: Tree, desugared: Tree): Unit =
     val metadata = MacroExpanderAttachment(expandee, desugared)
     expandee updateAttachment metadata
     desugared updateAttachment metadata
-  }
 
   /** Is added by the macro engine to originals and results of macro expansions.
     *  Stores the original expandee as it entered the `macroExpand` function.
@@ -49,10 +45,9 @@ trait StdAttachments { self: Analyzer =>
   /** Determines whether the target is either an original or a result of a macro expansion.
     *  The parameter is of type `Any`, because macros can expand both into trees and into annotations.
     */
-  def hasMacroExpansionAttachment(any: Any): Boolean = any match {
+  def hasMacroExpansionAttachment(any: Any): Boolean = any match
     case tree: Tree => tree.hasAttachment[MacroExpansionAttachment]
     case _ => false
-  }
 
   /** Returns the original tree of the macro expansion if the argument is a macro expansion or EmptyTree otherwise.
     */
@@ -65,15 +60,13 @@ trait StdAttachments { self: Analyzer =>
   /** After macro expansion is completed, links the expandee and the expansion result by annotating them both with a `MacroExpansionAttachment`.
     *  The `expanded` parameter is of type `Any`, because macros can expand both into trees and into annotations.
     */
-  def linkExpandeeAndExpanded(expandee: Tree, expanded: Any): Unit = {
+  def linkExpandeeAndExpanded(expandee: Tree, expanded: Any): Unit =
     val metadata = MacroExpansionAttachment(expandee, expanded)
     expandee updateAttachment metadata
-    expanded match {
+    expanded match
       case expanded: Tree if !expanded.isEmpty =>
         expanded updateAttachment metadata
       case _ => // do nothing
-    }
-  }
 
   /** When present, suppresses macro expansion for the host.
     *  This is occasionally necessary, e.g. to prohibit eta-expansion of macros.
@@ -90,31 +83,29 @@ trait StdAttachments { self: Analyzer =>
 
   /** Unsuppresses macro expansion of the tree by removing SuppressMacroExpansionAttachment from it and its children.
     */
-  def unsuppressMacroExpansion(tree: Tree): Tree = {
+  def unsuppressMacroExpansion(tree: Tree): Tree =
     tree.removeAttachment[SuppressMacroExpansionAttachment.type]
-    tree match {
+    tree match
       // see the comment to `isMacroExpansionSuppressed` to learn why we need
       // a special traversal strategy here
       case Apply(fn, _) => unsuppressMacroExpansion(fn)
       case TypeApply(fn, _) => unsuppressMacroExpansion(fn)
       case _ => // do nothing
-    }
     tree
-  }
 
   /** Determines whether a tree should not be expanded, because someone has put SuppressMacroExpansionAttachment on it or one of its children.
     */
   def isMacroExpansionSuppressed(tree: Tree): Boolean =
     (settings.Ymacroexpand.value == settings.MacroExpand.None // SI-6812
         || tree.hasAttachment[SuppressMacroExpansionAttachment.type] ||
-        (tree match {
+        (tree match
               // we have to account for the fact that during typechecking an expandee might become wrapped,
               // i.e. surrounded by an inferred implicit argument application or by an inferred type argument application.
               // in that case the expandee itself will no longer be suppressed and we need to look at the core
               case Apply(fn, _) => isMacroExpansionSuppressed(fn)
               case TypeApply(fn, _) => isMacroExpansionSuppressed(fn)
               case _ => false
-            }))
+            ))
 
   /** After being synthesized by the parser, primary constructors aren't fully baked yet.
     *  A call to super in such constructors is just a fill-me-in-later dummy resolved later
@@ -128,9 +119,8 @@ trait StdAttachments { self: Analyzer =>
     *  so it really benefits from a dedicated extractor.
     */
   def superArgs(tree: Tree): Option[List[List[Tree]]] =
-    tree.attachments.get[SuperArgsAttachment] collect {
+    tree.attachments.get[SuperArgsAttachment] collect
       case SuperArgsAttachment(argss) => argss
-    }
 
   /** Determines whether the given tree has an associated SuperArgsAttachment.
     */
@@ -182,4 +172,3 @@ trait StdAttachments { self: Analyzer =>
     tree.removeAttachment[DynamicRewriteAttachment.type]
   def isDynamicRewrite(tree: Tree): Boolean =
     tree.attachments.get[DynamicRewriteAttachment.type].isDefined
-}

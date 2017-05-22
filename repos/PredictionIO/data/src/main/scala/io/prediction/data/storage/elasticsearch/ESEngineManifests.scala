@@ -27,12 +27,12 @@ import org.json4s.native.Serialization.write
 
 class ESEngineManifests(
     client: Client, config: StorageClientConfig, index: String)
-    extends EngineManifests with Logging {
+    extends EngineManifests with Logging
   implicit val formats = DefaultFormats + new EngineManifestSerializer
   private val estype = "engine_manifests"
   private def esid(id: String, version: String) = s"$id $version"
 
-  def insert(engineManifest: EngineManifest): Unit = {
+  def insert(engineManifest: EngineManifest): Unit =
     val json = write(engineManifest)
     val response = client
       .prepareIndex(
@@ -40,48 +40,39 @@ class ESEngineManifests(
       .setSource(json)
       .execute()
       .actionGet()
-  }
 
-  def get(id: String, version: String): Option[EngineManifest] = {
-    try {
+  def get(id: String, version: String): Option[EngineManifest] =
+    try
       val response = client
         .prepareGet(index, estype, esid(id, version))
         .execute()
         .actionGet()
-      if (response.isExists) {
+      if (response.isExists)
         Some(read[EngineManifest](response.getSourceAsString))
-      } else {
+      else
         None
-      }
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         None
-    }
-  }
 
-  def getAll(): Seq[EngineManifest] = {
-    try {
+  def getAll(): Seq[EngineManifest] =
+    try
       val builder = client.prepareSearch()
       ESUtils.getAll[EngineManifest](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq()
-    }
-  }
 
   def update(engineManifest: EngineManifest, upsert: Boolean = false): Unit =
     insert(engineManifest)
 
-  def delete(id: String, version: String): Unit = {
-    try {
+  def delete(id: String, version: String): Unit =
+    try
       client
         .prepareDelete(index, estype, esid(id, version))
         .execute()
         .actionGet()
-    } catch {
+    catch
       case e: ElasticsearchException => error(e.getMessage)
-    }
-  }
-}

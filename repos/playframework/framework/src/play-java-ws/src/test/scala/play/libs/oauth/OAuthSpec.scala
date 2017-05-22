@@ -14,7 +14,7 @@ import scala.concurrent.Promise
 import play.libs.oauth.OAuth._
 import play.api.libs.oauth.OAuthRequestVerifier
 
-class OAuthSpec extends PlaySpecification {
+class OAuthSpec extends PlaySpecification
 
   sequential
 
@@ -29,58 +29,47 @@ class OAuthSpec extends PlaySpecification {
   val requestToken = play.api.libs.oauth
     .RequestToken(javaRequestToken.token, javaRequestToken.secret)
 
-  "OAuth" should {
-    "sign a simple get request" in {
-      val (request, body, hostUrl) = receiveRequest { (client, hostUrl) =>
+  "OAuth" should
+    "sign a simple get request" in
+      val (request, body, hostUrl) = receiveRequest  (client, hostUrl) =>
         client.url(hostUrl + "/foo").sign(oauthCalculator).get()
-      }
       OAuthRequestVerifier.verifyRequest(
           request, body, hostUrl, consumerKey, requestToken)
-    }
 
-    "sign a get request with query parameters" in {
-      val (request, body, hostUrl) = receiveRequest { (client, hostUrl) =>
+    "sign a get request with query parameters" in
+      val (request, body, hostUrl) = receiveRequest  (client, hostUrl) =>
         client
           .url(hostUrl + "/foo")
           .setQueryParameter("param", "paramValue")
           .sign(oauthCalculator)
           .get()
-      }
       OAuthRequestVerifier.verifyRequest(
           request, body, hostUrl, consumerKey, requestToken)
-    }
 
-    "sign a post request with a body" in {
-      val (request, body, hostUrl) = receiveRequest { (client, hostUrl) =>
+    "sign a post request with a body" in
+      val (request, body, hostUrl) = receiveRequest  (client, hostUrl) =>
         client
           .url(hostUrl + "/foo")
           .sign(oauthCalculator)
           .setContentType("application/x-www-form-urlencoded")
           .post("param=paramValue")
-      }
       OAuthRequestVerifier.verifyRequest(
           request, body, hostUrl, consumerKey, requestToken)
-    }
-  }
 
   def receiveRequest(
       makeRequest: (play.libs.ws.WSClient,
-      String) => CompletionStage[_]): (RequestHeader, ByteString, String) = {
+      String) => CompletionStage[_]): (RequestHeader, ByteString, String) =
     val hostUrl = "http://localhost:" + testServerPort
     val promise = Promise[(RequestHeader, ByteString)]()
-    val app = GuiceApplicationBuilder().routes {
+    val app = GuiceApplicationBuilder().routes
       case _ =>
-        Action(BodyParsers.parse.raw) { request =>
+        Action(BodyParsers.parse.raw)  request =>
           promise.success(
               (request, request.body.asBytes().getOrElse(ByteString.empty)))
           Results.Ok
-        }
-    }.build()
-    running(TestServer(testServerPort, app)) {
+    .build()
+    running(TestServer(testServerPort, app))
       val client = app.injector.instanceOf(classOf[play.libs.ws.WSClient])
       makeRequest(client, hostUrl).toCompletableFuture.get()
-    }
     val (request, body) = await(promise.future)
     (request, body, hostUrl)
-  }
-}

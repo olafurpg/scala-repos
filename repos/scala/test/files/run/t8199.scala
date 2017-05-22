@@ -1,4 +1,4 @@
-class reallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongname {
+class reallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongname
   object obj0
   object obj01
   object obj012
@@ -32,16 +32,13 @@ class reallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereal
   trait trt012345678
   trait trt0123456789
   trait trt01234567890
-}
 
-object Test extends App {
-  def check(c: Class[_]) {
+object Test extends App
+  def check(c: Class[_])
     checkClassName(c.getName)
-  }
-  def checkClassName(name: String) {
+  def checkClassName(name: String)
     val defaultMaxClassFileLength = 255
     assert((name + ".class").length <= defaultMaxClassFileLength, name)
-  }
 
   val c =
     new reallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongname
@@ -82,6 +79,5 @@ object Test extends App {
   check(classOf[trt012345678])
   check(classOf[trt0123456789])
   check(classOf[trt01234567890])
-}
 
 // filename too long: reallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongnamereallylongname$obj012345$.class

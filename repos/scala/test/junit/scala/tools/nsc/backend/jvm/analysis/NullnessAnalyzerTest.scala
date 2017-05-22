@@ -19,16 +19,14 @@ import AsmUtils._
 
 import scala.collection.convert.decorateAsScala._
 
-object NullnessAnalyzerTest extends ClearAfterClass.Clearable {
+object NullnessAnalyzerTest extends ClearAfterClass.Clearable
   var noOptCompiler = newCompiler(extraArgs = "-Yopt:l:none")
 
-  def clear(): Unit = {
+  def clear(): Unit =
     noOptCompiler = null
-  }
-}
 
 @RunWith(classOf[JUnit4])
-class NullnessAnalyzerTest extends ClearAfterClass {
+class NullnessAnalyzerTest extends ClearAfterClass
   ClearAfterClass.stateToClear = NullnessAnalyzerTest
   val noOptCompiler = NullnessAnalyzerTest.noOptCompiler
   import noOptCompiler.genBCode.bTypes.backendUtils._
@@ -43,22 +41,20 @@ class NullnessAnalyzerTest extends ClearAfterClass {
                    method: MethodNode,
                    query: String,
                    index: Int,
-                   nullness: NullnessValue): Unit = {
-    for (i <- findInstr(method, query)) {
+                   nullness: NullnessValue): Unit =
+    for (i <- findInstr(method, query))
       val r = analyzer.frameAt(i).getValue(index)
       assertTrue(s"Expected: $nullness, found: $r. At instr ${textify(i)}",
                  nullness == r)
-    }
-  }
 
   // debug / helper for writing tests
   def showAllNullnessFrames(
-      analyzer: AsmAnalyzer[NullnessValue], method: MethodNode): String = {
+      analyzer: AsmAnalyzer[NullnessValue], method: MethodNode): String =
     val instrLength =
       method.instructions.iterator.asScala.map(textify(_).length).max
-    val lines = for (i <- method.instructions.iterator.asScala) yield {
+    val lines = for (i <- method.instructions.iterator.asScala) yield
       val f = analyzer.frameAt(i)
-      val frameString = {
+      val frameString =
         if (f == null) "null"
         else
           (0 until (f.getLocals + f.getStackSize)).iterator
@@ -67,14 +63,11 @@ class NullnessAnalyzerTest extends ClearAfterClass {
             .zipWithIndex
             .map({ case (s, i) => s"$i: $s" })
             .mkString(", ")
-      }
       ("%" + instrLength + "s: %s").format(textify(i), frameString)
-    }
     lines.mkString("\n")
-  }
 
   @Test
-  def showNullnessFramesTest(): Unit = {
+  def showNullnessFramesTest(): Unit =
     val List(m) = compileMethods(noOptCompiler)("def f = this.toString")
 
     // NOTE: the frame for an instruction represents the state *before* executing that instr.
@@ -89,25 +82,22 @@ class NullnessAnalyzerTest extends ClearAfterClass {
         |                                                          L0: null""".stripMargin
 //    println(showAllNullnessFrames(newNullnessAnalyzer(m), m))
     assertEquals(showAllNullnessFrames(newNullnessAnalyzer(m), m), res)
-  }
 
   @Test
-  def thisNonNull(): Unit = {
+  def thisNonNull(): Unit =
     val List(m) = compileMethods(noOptCompiler)("def f = this.toString")
     val a = newNullnessAnalyzer(m)
     testNullness(a, m, "ALOAD 0", 0, NotNullValue)
-  }
 
   @Test
-  def instanceMethodCall(): Unit = {
+  def instanceMethodCall(): Unit =
     val List(m) = compileMethods(noOptCompiler)("def f(a: String) = a.trim")
     val a = newNullnessAnalyzer(m)
     testNullness(a, m, "INVOKEVIRTUAL java/lang/String.trim", 1, UnknownValue1)
     testNullness(a, m, "ARETURN", 1, NotNullValue)
-  }
 
   @Test
-  def constructorCall(): Unit = {
+  def constructorCall(): Unit =
     val List(m) = compileMethods(noOptCompiler)(
         "def f = { val a = new Object; a.toString }")
     val a = newNullnessAnalyzer(m)
@@ -130,10 +120,9 @@ class NullnessAnalyzerTest extends ClearAfterClass {
         ("+ALOAD 1", 2, NotNullValue), // loading the value 1 puts a NotNull value on the stack (at 2)
         ("+INVOKEVIRTUAL java/lang/Object.toString", 2, UnknownValue1) // nullness of value returned by `toString` is Unknown
     )) testNullness(a, m, insn, index, nullness)
-  }
 
   @Test
-  def explicitNull(): Unit = {
+  def explicitNull(): Unit =
     val List(m) =
       compileMethods(noOptCompiler)("def f = { var a: Object = null; a }")
     val a = newNullnessAnalyzer(m)
@@ -142,27 +131,24 @@ class NullnessAnalyzerTest extends ClearAfterClass {
         ("+ASTORE 1", 1, NullValue),
         ("+ALOAD 1", 2, NullValue)
     )) testNullness(a, m, insn, index, nullness)
-  }
 
   @Test
-  def stringLiteralsNotNull(): Unit = {
+  def stringLiteralsNotNull(): Unit =
     val List(m) =
       compileMethods(noOptCompiler)("""def f = { val a = "hi"; a.trim }""")
     val a = newNullnessAnalyzer(m)
     testNullness(a, m, "+ASTORE 1", 1, NotNullValue)
-  }
 
   @Test
-  def newArraynotNull() {
+  def newArraynotNull()
     val List(m) = compileMethods(noOptCompiler)(
         "def f = { val a = new Array[Int](2); a(0) }")
     val a = newNullnessAnalyzer(m)
     testNullness(a, m, "+NEWARRAY T_INT", 2, NotNullValue) // new array on stack
     testNullness(a, m, "+ASTORE 1", 1, NotNullValue) // local var (a)
-  }
 
   @Test
-  def mergeNullNotNull(): Unit = {
+  def mergeNullNotNull(): Unit =
     val code = """def f(o: Object) = {
         |  var a: Object = o
         |  var c: Object = null
@@ -176,10 +162,9 @@ class NullnessAnalyzerTest extends ClearAfterClass {
     val a = newNullnessAnalyzer(m)
     val toSt = "+INVOKEVIRTUAL java/lang/Object.toString"
     testNullness(a, m, toSt, 3, UnknownValue1)
-  }
 
   @Test
-  def aliasBranching(): Unit = {
+  def aliasBranching(): Unit =
     val code =
       """def f(o: Object) = {
         |  var a: Object = o     // a and o are aliases
@@ -220,10 +205,9 @@ class NullnessAnalyzerTest extends ClearAfterClass {
         (end, 4, UnknownValue1), // c, no change (not an alias of b)
         (end, 5, NullValue) // d, no change
     )) testNullness(a, m, insn, index, nullness)
-  }
 
   @Test
-  def testInstanceOf(): Unit = {
+  def testInstanceOf(): Unit =
     val code =
       """def f(a: Object) = {
         |  val x = a
@@ -246,5 +230,3 @@ class NullnessAnalyzerTest extends ClearAfterClass {
         (tost, 2, NotNullValue),
         (trim, 3, NotNullValue) // receiver at `trim`
     )) testNullness(a, m, insn, index, nullness)
-  }
-}

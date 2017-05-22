@@ -13,14 +13,13 @@ import scala.collection.mutable
   * User: Dmitry.Naydanov
   * Date: 15.04.15.
   */
-object ScalaXmlTokenTypes {
+object ScalaXmlTokenTypes
   private val allTypes = mutable.HashMap.empty[String, IElementType]
 
-  protected def create(name: String) = {
+  protected def create(name: String) =
     val tp = new ScalaElementType(name)
     allTypes.put(name, tp)
     tp
-  }
 
   def getByName(name: String) = allTypes.get(name)
 
@@ -123,7 +122,5 @@ object ScalaXmlTokenTypes {
   class PatchedXmlLexer
       extends MergingLexerAdapter(
           new _XmlLexer(new __XmlLexer(null.asInstanceOf[Reader]), false),
-          XML_TOKENS_TO_MERGE) {
+          XML_TOKENS_TO_MERGE)
     override def getTokenType: IElementType = substitute(super.getTokenType)
-  }
-}

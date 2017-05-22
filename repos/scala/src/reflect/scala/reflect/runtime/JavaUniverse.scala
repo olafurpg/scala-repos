@@ -15,7 +15,7 @@ import scala.reflect.api.{TypeCreator, Universe}
   */
 class JavaUniverse
     extends InternalSymbolTable with JavaUniverseForce with ReflectSetup
-    with RuntimeSymbolTable {
+    with RuntimeSymbolTable
   self =>
   def picklerPhase = SomePhase
   def erasurePhase = SomePhase
@@ -27,18 +27,16 @@ class JavaUniverse
 
   // TODO: why put output under isLogging? Calls to inform are already conditional on debug/verbose/...
   import scala.reflect.internal.{Reporter, ReporterImpl}
-  override def reporter: Reporter = new ReporterImpl {
+  override def reporter: Reporter = new ReporterImpl
     protected def info0(
         pos: Position, msg: String, severity: Severity, force: Boolean): Unit =
       log(msg)
-  }
 
   // minimal Run to get Reporting wired
   def currentRun = new RunReporting {}
-  class PerRunReporting extends PerRunReportingBase {
+  class PerRunReporting extends PerRunReportingBase
     def deprecationWarning(pos: Position, msg: String): Unit =
       reporter.warning(pos, msg)
-  }
   protected def PerRunReporting = new PerRunReporting
 
   type TreeCopier = InternalTreeCopierOps
@@ -49,47 +47,42 @@ class JavaUniverse
 
   def currentFreshNameCreator = globalFreshNameCreator
 
-  override lazy val internal: Internal = new SymbolTableInternal {
+  override lazy val internal: Internal = new SymbolTableInternal
     override def typeTagToManifest[T : ClassTag](
-        mirror0: Any, tag: Universe#TypeTag[T]): Manifest[T] = {
+        mirror0: Any, tag: Universe#TypeTag[T]): Manifest[T] =
       // SI-6239: make this conversion more precise
       val mirror = mirror0.asInstanceOf[Mirror]
       val runtimeClass = mirror.runtimeClass(tag.in(mirror).tpe)
       Manifest.classType(runtimeClass).asInstanceOf[Manifest[T]]
-    }
     override def manifestToTypeTag[T](
         mirror0: Any, manifest: Manifest[T]): Universe#TypeTag[T] =
-      TypeTag(mirror0.asInstanceOf[Mirror], new TypeCreator {
+      TypeTag(mirror0.asInstanceOf[Mirror], new TypeCreator
         def apply[U <: Universe with Singleton](
-            mirror: scala.reflect.api.Mirror[U]): U#Type = {
-          mirror.universe match {
+            mirror: scala.reflect.api.Mirror[U]): U#Type =
+          mirror.universe match
             case ju: JavaUniverse =>
               val jm = mirror.asInstanceOf[ju.Mirror]
               val sym = jm.classSymbol(manifest.runtimeClass)
               val tpe =
                 if (manifest.typeArguments.isEmpty) sym.toType
-                else {
+                else
                   val tags =
                     manifest.typeArguments map
                     (targ => ju.internal.manifestToTypeTag(jm, targ))
                   ju.appliedType(
                       sym.toTypeConstructor, tags map (_.in(jm).tpe))
-                }
               tpe.asInstanceOf[U#Type]
             case u =>
               u.internal
                 .manifestToTypeTag(mirror.asInstanceOf[u.Mirror], manifest)
                 .in(mirror)
                 .tpe
-          }
-        }
-      })
-  }
+      )
 
   // can't put this in runtime.Trees since that's mixed with Global in ReflectGlobal, which has the definition from internal.Trees
-  object treeInfo extends {
+  object treeInfo extends
     val global: JavaUniverse.this.type = JavaUniverse.this
-  } with TreeInfo
+  with TreeInfo
 
   init()
 
@@ -151,7 +144,7 @@ class JavaUniverse
   // 5) That will crash PackageScope.enter that helpfully detects double-enters.
   //
   // Therefore, before initializing ScalaPackageClass, we must pre-initialize ObjectClass
-  def init() {
+  def init()
     definitions.init()
 
     // workaround for http://groups.google.com/group/scala-internals/browse_thread/thread/97840ba4fd37b52e
@@ -161,5 +154,3 @@ class JavaUniverse
 
     // TODO Convert this into a macro
     force()
-  }
-}

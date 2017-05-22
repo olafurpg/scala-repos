@@ -16,7 +16,7 @@ import scala.annotation.tailrec
 
 import java.net.URI
 
-private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
+private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI])
 
   private val inputId = new InputId("Scala.js IR")
 
@@ -25,10 +25,10 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
   def transformStat(tree: Tree)(implicit parentPos: Position): Node =
     innerTransformStat(tree, tree.pos orElse parentPos)
 
-  private def innerTransformStat(tree: Tree, pos_in: Position): Node = {
+  private def innerTransformStat(tree: Tree, pos_in: Position): Node =
     implicit val pos = pos_in
 
-    wrapTransform(tree) {
+    wrapTransform(tree)
       case VarDef(ident, EmptyTree) =>
         new Node(Token.VAR, transformName(ident))
       case VarDef(ident, rhs) =>
@@ -106,21 +106,19 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
       case Switch(selector, cases, default) =>
         val switchNode = new Node(Token.SWITCH, transformExpr(selector))
 
-        for ((expr, body) <- cases) {
+        for ((expr, body) <- cases)
           val bodyNode = transformBlock(body)
           bodyNode.putBooleanProp(Node.SYNTHETIC_BLOCK_PROP, true)
           val caseNode = new Node(Token.CASE, transformExpr(expr), bodyNode)
           switchNode.addChildToBack(
               setNodePosition(caseNode, expr.pos orElse pos))
-        }
 
-        if (default != EmptyTree) {
+        if (default != EmptyTree)
           val bodyNode = transformBlock(default)
           bodyNode.putBooleanProp(Node.SYNTHETIC_BLOCK_PROP, true)
           val caseNode = new Node(Token.DEFAULT_CASE, bodyNode)
           switchNode.addChildToBack(
               setNodePosition(caseNode, default.pos orElse pos))
-        }
 
         switchNode
 
@@ -136,20 +134,17 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
       case _ =>
         // We just assume it is an expression
         new Node(Token.EXPR_RESULT, transformExpr(tree))
-    }
-  }
 
   def transformExpr(tree: Tree)(implicit parentPos: Position): Node =
     innerTransformExpr(tree, tree.pos orElse parentPos)
 
-  private def innerTransformExpr(tree: Tree, pos_in: Position): Node = {
+  private def innerTransformExpr(tree: Tree, pos_in: Position): Node =
     implicit val pos = pos_in
 
-    wrapTransform(tree) {
+    wrapTransform(tree)
       case Block(exprs) =>
-        exprs.map(transformExpr).reduceRight { (expr1, expr2) =>
+        exprs.map(transformExpr).reduceRight  (expr1, expr2) =>
           setNodePosition(new Node(Token.COMMA, expr1, expr2), pos)
-        }
       case If(cond, thenp, elsep) =>
         new Node(Token.HOOK,
                  transformExpr(cond),
@@ -193,11 +188,10 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
       case ObjectConstr(fields) =>
         val node = new Node(Token.OBJECTLIT)
 
-        for ((name, expr) <- fields) {
+        for ((name, expr) <- fields)
           val fldNode = transformStringKey(name)
           fldNode.addChildToBack(transformExpr(expr))
           node.addChildToBack(fldNode)
-        }
 
         node
 
@@ -224,18 +218,15 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
       case _ =>
         throw new TransformException(
             s"Unknown tree of class ${tree.getClass()}")
-    }
-  }
 
   private def genFunction(name: String, args: List[ParamDef], body: Tree)(
-      implicit pos: Position): Node = {
+      implicit pos: Position): Node =
     val paramList = new Node(Token.PARAM_LIST)
     args.foreach(arg => paramList.addChildToBack(transformParam(arg)))
 
     val nameNode = setNodePosition(Node.newString(Token.NAME, name), pos)
 
     new Node(Token.FUNCTION, nameNode, paramList, transformBlock(body))
-  }
 
   def transformParam(param: ParamDef)(implicit parentPos: Position): Node =
     transformName(param.name)
@@ -253,120 +244,106 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
     setNodePosition(Node.newString(pName.name), pName.pos orElse parentPos)
 
   def transformStringKey(pName: PropertyName)(
-      implicit parentPos: Position): Node = {
+      implicit parentPos: Position): Node =
     val node = Node.newString(Token.STRING_KEY, pName.name)
 
     if (pName.isInstanceOf[StringLiteral]) node.setQuotedString()
 
     setNodePosition(node, pName.pos orElse parentPos)
-  }
 
-  def transformBlock(tree: Tree)(implicit parentPos: Position): Node = {
+  def transformBlock(tree: Tree)(implicit parentPos: Position): Node =
     val pos = if (tree.pos.isDefined) tree.pos else parentPos
-    wrapTransform(tree) {
+    wrapTransform(tree)
       case Block(stats) =>
         transformBlock(stats, pos)
       case tree =>
         transformBlock(List(tree), pos)
-    }(pos)
-  }
+    (pos)
 
-  def transformBlock(stats: List[Tree], blockPos: Position): Node = {
-    @inline def ctorDoc(node: Node) = {
+  def transformBlock(stats: List[Tree], blockPos: Position): Node =
+    @inline def ctorDoc(node: Node) =
       val b = new JSDocInfoBuilder(false)
       b.recordConstructor()
       b.build(node)
-    }
 
     val block = new Node(Token.BLOCK)
 
     // The Rhino IR attaches DocComments to the following nodes (rather than
     // having individual nodes). We preprocess these here.
     @tailrec
-    def loop(ts: List[Tree], nextIsCtor: Boolean = false): Unit = ts match {
+    def loop(ts: List[Tree], nextIsCtor: Boolean = false): Unit = ts match
       case DocComment(text) :: tss if text.startsWith("@constructor") =>
         loop(tss, nextIsCtor = true)
       case DocComment(text) :: tss =>
         loop(tss)
       case t :: tss =>
         val node = transformStat(t)(blockPos)
-        if (nextIsCtor) {
+        if (nextIsCtor)
           // The @constructor must be propagated through an ExprResult node
           val trg =
             if (node.isExprResult()) node.getChildAtIndex(0)
             else node
 
           trg.setJSDocInfo(ctorDoc(trg))
-        }
 
         block.addChildToBack(node)
 
         loop(tss)
       case Nil =>
-    }
 
     loop(stats)
 
     block
-  }
 
   @inline
   private def wrapTransform(tree: Tree)(body: Tree => Node)(
-      implicit pos: Position): Node = {
-    try {
+      implicit pos: Position): Node =
+    try
       setNodePosition(body(tree), pos)
-    } catch {
+    catch
       case e: TransformException =>
         throw e // pass through
       case e: RuntimeException =>
         throw new TransformException(tree, e)
-    }
-  }
 
-  def setNodePosition(node: Node, pos: ir.Position): node.type = {
-    if (pos != ir.Position.NoPosition) {
+  def setNodePosition(node: Node, pos: ir.Position): node.type =
+    if (pos != ir.Position.NoPosition)
       attachSourceFile(node, pos.source)
       node.setLineno(pos.line + 1)
       node.setCharno(pos.column)
-    } else {
+    else
       attachSourceFile(node, dummySourceName)
-    }
     node
-  }
 
-  private def attachSourceFile(node: Node, source: URI): node.type = {
+  private def attachSourceFile(node: Node, source: URI): node.type =
     val str = sourceUriToString(source)
 
     node.setInputId(inputId)
     node.setStaticSourceFile(new SourceFile(str))
 
     node
-  }
 
-  private def sourceUriToString(uri: URI): String = {
+  private def sourceUriToString(uri: URI): String =
     val relURI = relativizeBaseURI.fold(uri)(ir.Utils.relativize(_, uri))
     ir.Utils.fixFileURI(relURI).toASCIIString
-  }
 
   // Helpers for IR
   @inline
-  private def mkUnaryOp(op: UnaryOp.Code, lhs: Node): Node = {
+  private def mkUnaryOp(op: UnaryOp.Code, lhs: Node): Node =
     import ir.Trees.JSUnaryOp._
-    val tok = (op: @switch) match {
+    val tok = (op: @switch) match
       case ! => Token.NOT
       case ~ => Token.BITNOT
       case + => Token.POS
       case - => Token.NEG
       case `typeof` => Token.TYPEOF
-    }
 
     new Node(tok, lhs)
-  }
 
   @inline
-  private def mkBinaryOp(op: BinaryOp.Code, lhs: Node, rhs: Node): Node = {
+  private def mkBinaryOp(op: BinaryOp.Code, lhs: Node, rhs: Node): Node =
     import ir.Trees.JSBinaryOp._
-    val tok = (op: @switch) match {
+    val tok = (op: @switch) match
       case === => Token.SHEQ
       case !== => Token.SHNE
 
@@ -393,29 +370,23 @@ private[closure] class ClosureAstTransformer(relativizeBaseURI: Option[URI]) {
 
       case `in` => Token.IN
       case `instanceof` => Token.INSTANCEOF
-    }
 
     new Node(tok, lhs, rhs)
-  }
 
   // Exception wrapper in transforms
 
   class TransformException private (msg: String, e: Throwable)
-      extends RuntimeException(msg, e) {
+      extends RuntimeException(msg, e)
 
     def this(tree: Tree, e: Throwable) =
       this(TransformException.mkMsg(tree), e)
 
     def this(msg: String) = this(msg, null)
-  }
 
-  object TransformException {
+  object TransformException
     import ir.Printers._
     import java.io._
 
-    private def mkMsg(tree: Tree): String = {
+    private def mkMsg(tree: Tree): String =
       "Exception while translating Scala.js JS tree to GCC IR at tree:\n" +
       tree.show
-    }
-  }
-}

@@ -13,6 +13,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
   * Date: 28.02.2008
   */
 class ScCaseClausesImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCaseClauses {
+    extends ScalaPsiElementImpl(node) with ScCaseClauses
   override def toString: String = "CaseClauses"
-}

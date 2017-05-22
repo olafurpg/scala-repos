@@ -22,24 +22,16 @@ import net.liftweb.http._
 import net.liftweb.util.Helpers._
 import scala.xml._
 
-object Counter {
+object Counter
   @volatile var x = 0
-}
 
-class Oneshot {
-  def render(in: NodeSeq): NodeSeq = {
-    S.disableTestFuncNames {
-      S.oneShot {
+class Oneshot
+  def render(in: NodeSeq): NodeSeq =
+    S.disableTestFuncNames
+      S.oneShot
         SHtml.text("", s => { Counter.x += 1 })
-      }
-    }
-  }
-}
 
-class Twoshot {
-  def render(in: NodeSeq): NodeSeq = {
-    S.disableTestFuncNames {
+class Twoshot
+  def render(in: NodeSeq): NodeSeq =
+    S.disableTestFuncNames
       SHtml.text("", s => Counter.x += 1)
-    }
-  }
-}

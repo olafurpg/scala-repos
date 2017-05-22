@@ -32,32 +32,29 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 import org.apache.spark.util.Utils
 
-object LogisticRegressionSuite {
+object LogisticRegressionSuite
 
   def generateLogisticInputAsList(offset: Double,
                                   scale: Double,
                                   nPoints: Int,
-                                  seed: Int): java.util.List[LabeledPoint] = {
+                                  seed: Int): java.util.List[LabeledPoint] =
     generateLogisticInput(offset, scale, nPoints, seed).asJava
-  }
 
   // Generate input of the form Y = logistic(offset + scale*X)
   def generateLogisticInput(offset: Double,
                             scale: Double,
                             nPoints: Int,
-                            seed: Int): Seq[LabeledPoint] = {
+                            seed: Int): Seq[LabeledPoint] =
     val rnd = new Random(seed)
     val x1 = Array.fill[Double](nPoints)(rnd.nextGaussian())
 
-    val y = (0 until nPoints).map { i =>
+    val y = (0 until nPoints).map  i =>
       val p = 1.0 / (1.0 + math.exp(-(offset + scale * x1(i))))
       if (rnd.nextDouble() < p) 1.0 else 0.0
-    }
 
     val testData = (0 until nPoints).map(
         i => LabeledPoint(y(i), Vectors.dense(Array(x1(i)))))
     testData
-  }
 
   /**
     * Generates `k` classes multinomial synthetic logistic input in `n` dimensional space given the
@@ -87,7 +84,7 @@ object LogisticRegressionSuite {
                                        xVariance: Array[Double],
                                        addIntercept: Boolean,
                                        nPoints: Int,
-                                       seed: Int): Seq[LabeledPoint] = {
+                                       seed: Int): Seq[LabeledPoint] =
     val rnd = new Random(seed)
 
     val xDim = xMean.length
@@ -97,61 +94,51 @@ object LogisticRegressionSuite {
     val x = Array.fill[Vector](nPoints)(
         Vectors.dense(Array.fill[Double](xDim)(rnd.nextGaussian())))
 
-    x.foreach { vector =>
+    x.foreach  vector =>
       // This doesn't work if `vector` is a sparse vector.
       val vectorArray = vector.toArray
       var i = 0
       val len = vectorArray.length
-      while (i < len) {
+      while (i < len)
         vectorArray(i) = vectorArray(i) * math.sqrt(xVariance(i)) + xMean(i)
         i += 1
-      }
-    }
 
-    val y = (0 until nPoints).map { idx =>
+    val y = (0 until nPoints).map  idx =>
       val xArray = x(idx).toArray
       val margins = Array.ofDim[Double](nClasses)
       val probs = Array.ofDim[Double](nClasses)
 
-      for (i <- 0 until nClasses - 1) {
+      for (i <- 0 until nClasses - 1)
         for (j <- 0 until xDim) margins(i + 1) +=
           weights(i * xWithInterceptsDim + j) * xArray(j)
         if (addIntercept)
           margins(i + 1) += weights((i + 1) * xWithInterceptsDim - 1)
-      }
       // Preventing the overflow when we compute the probability
       val maxMargin = margins.max
       if (maxMargin > 0) for (i <- 0 until nClasses) margins(i) -= maxMargin
 
       // Computing the probabilities for each class from the margins.
-      val norm = {
+      val norm =
         var temp = 0.0
-        for (i <- 0 until nClasses) {
+        for (i <- 0 until nClasses)
           probs(i) = math.exp(margins(i))
           temp += probs(i)
-        }
         temp
-      }
       for (i <- 0 until nClasses) probs(i) /= norm
 
       // Compute the cumulative probability so we can generate a random number and assign a label.
       for (i <- 1 until nClasses) probs(i) += probs(i - 1)
       val p = rnd.nextDouble()
       var y = 0
-      breakable {
-        for (i <- 0 until nClasses) {
-          if (p < probs(i)) {
+      breakable
+        for (i <- 0 until nClasses)
+          if (p < probs(i))
             y = i
             break
-          }
-        }
-      }
       y
-    }
 
     val testData = (0 until nPoints).map(i => LabeledPoint(y(i), x(i)))
     testData
-  }
 
   /** Binary labels, 3 features */
   private val binaryModel = new LogisticRegressionModel(
@@ -168,21 +155,19 @@ object LogisticRegressionSuite {
       numClasses = 3)
 
   private def checkModelsEqual(
-      a: LogisticRegressionModel, b: LogisticRegressionModel): Unit = {
+      a: LogisticRegressionModel, b: LogisticRegressionModel): Unit =
     assert(a.weights == b.weights)
     assert(a.intercept == b.intercept)
     assert(a.numClasses == b.numClasses)
     assert(a.numFeatures == b.numFeatures)
     assert(a.getThreshold == b.getThreshold)
-  }
-}
 
 class LogisticRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite with MLlibTestSparkContext with Matchers
 
   @transient var binaryDataset: RDD[LabeledPoint] = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     /*
        Here is the instruction describing how to export the test data into CSV format
@@ -197,7 +182,7 @@ class LogisticRegressionSuite
        data.map(x=> x.label + ", " + x.features(0) + ", " + x.features(1) + ", "
          + x.features(2) + ", " + x.features(3)).saveAsTextFile("path")
      */
-    binaryDataset = {
+    binaryDataset =
       val nPoints = 10000
       val coefficients = Array(
           -0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
@@ -208,23 +193,19 @@ class LogisticRegressionSuite
           coefficients, xMean, xVariance, true, nPoints, 42)
 
       sc.parallelize(testData, 2)
-    }
-  }
 
   def validatePrediction(predictions: Seq[Double],
                          input: Seq[LabeledPoint],
-                         expectedAcc: Double = 0.83) {
-    val numOffPredictions = predictions.zip(input).count {
+                         expectedAcc: Double = 0.83)
+    val numOffPredictions = predictions.zip(input).count
       case (prediction, expected) =>
         prediction != expected.label
-    }
     // At least 83% of the predictions should be on.
     ((input.length -
             numOffPredictions).toDouble / input.length) should be > expectedAcc
-  }
 
   // Test if we can correctly learn A, B where Y = logistic(A + B*X)
-  test("logistic regression with SGD") {
+  test("logistic regression with SGD")
     val nPoints = 10000
     val A = 2.0
     val B = -1.5
@@ -257,15 +238,13 @@ class LogisticRegressionSuite
     // Test prediction on Array.
     validatePrediction(
         validationData.map(row => model.predict(row.features)), validationData)
-  }
 
   // Test if we can correctly learn A, B where Y = logistic(A + B*X)
-  test("logistic regression with LBFGS") {
+  test("logistic regression with LBFGS")
     val updaters: List[Updater] = List(new SquaredL2Updater(), new L1Updater())
     updaters.foreach(testLBFGS)
-  }
 
-  private def testLBFGS(myUpdater: Updater): Unit = {
+  private def testLBFGS(myUpdater: Updater): Unit =
     val nPoints = 10000
     val A = 2.0
     val B = -1.5
@@ -278,9 +257,8 @@ class LogisticRegressionSuite
 
     // Override the updater
     class LogisticRegressionWithLBFGSCustomUpdater
-        extends LogisticRegressionWithLBFGS {
+        extends LogisticRegressionWithLBFGS
       override val optimizer = new LBFGS(new LogisticGradient, myUpdater)
-    }
 
     val lr = new LogisticRegressionWithLBFGSCustomUpdater().setIntercept(true)
 
@@ -300,9 +278,8 @@ class LogisticRegressionSuite
     // Test prediction on Array.
     validatePrediction(
         validationData.map(row => model.predict(row.features)), validationData)
-  }
 
-  test("logistic regression with initial weights with SGD") {
+  test("logistic regression with initial weights with SGD")
     val nPoints = 10000
     val A = 2.0
     val B = -1.5
@@ -336,10 +313,9 @@ class LogisticRegressionSuite
     // Test prediction on Array.
     validatePrediction(
         validationData.map(row => model.predict(row.features)), validationData)
-  }
 
   test(
-      "logistic regression with initial weights and non-default regularization parameter") {
+      "logistic regression with initial weights and non-default regularization parameter")
     val nPoints = 10000
     val A = 2.0
     val B = -1.5
@@ -376,9 +352,8 @@ class LogisticRegressionSuite
     validatePrediction(validationData.map(row => model.predict(row.features)),
                        validationData,
                        0.8)
-  }
 
-  test("logistic regression with initial weights with LBFGS") {
+  test("logistic regression with initial weights with LBFGS")
     val nPoints = 10000
     val A = 2.0
     val B = -1.5
@@ -411,10 +386,9 @@ class LogisticRegressionSuite
     // Test prediction on Array.
     validatePrediction(
         validationData.map(row => model.predict(row.features)), validationData)
-  }
 
   test(
-      "numerical stability of scaling features using logistic regression with LBFGS") {
+      "numerical stability of scaling features using logistic regression with LBFGS")
 
     /**
       * If we rescale the features, the condition number will be changed so the convergence rate
@@ -482,9 +456,8 @@ class LogisticRegressionSuite
     // inside of LogisticRegression
     assert(modelB1.weights(0) ~== modelB2.weights(0) * 1.0E3 absTol 0.1)
     assert(modelB1.weights(0) ~== modelB3.weights(0) * 1.0E6 absTol 0.1)
-  }
 
-  test("multinomial logistic regression with LBFGS") {
+  test("multinomial logistic regression with LBFGS")
     val nPoints = 10000
 
     /**
@@ -591,9 +564,8 @@ class LogisticRegressionSuite
     validatePrediction(model.predict(validationRDD.map(_.features)).collect(),
                        validationData,
                        0.47)
-  }
 
-  test("model save/load: binary classification") {
+  test("model save/load: binary classification")
     // NOTE: This will need to be generalized once there are multiple model format versions.
     val model = LogisticRegressionSuite.binaryModel
 
@@ -604,26 +576,23 @@ class LogisticRegressionSuite
     val path = tempDir.toURI.toString
 
     // Save model, load it back, and compare.
-    try {
+    try
       model.save(sc, path)
       val sameModel = LogisticRegressionModel.load(sc, path)
       LogisticRegressionSuite.checkModelsEqual(model, sameModel)
-    } finally {
+    finally
       Utils.deleteRecursively(tempDir)
-    }
 
     // Save model with threshold.
-    try {
+    try
       model.setThreshold(0.7)
       model.save(sc, path)
       val sameModel = LogisticRegressionModel.load(sc, path)
       LogisticRegressionSuite.checkModelsEqual(model, sameModel)
-    } finally {
+    finally
       Utils.deleteRecursively(tempDir)
-    }
-  }
 
-  test("model save/load: multiclass classification") {
+  test("model save/load: multiclass classification")
     // NOTE: This will need to be generalized once there are multiple model format versions.
     val model = LogisticRegressionSuite.multiclassModel
 
@@ -631,21 +600,19 @@ class LogisticRegressionSuite
     val path = tempDir.toURI.toString
 
     // Save model, load it back, and compare.
-    try {
+    try
       model.save(sc, path)
       val sameModel = LogisticRegressionModel.load(sc, path)
       LogisticRegressionSuite.checkModelsEqual(model, sameModel)
-    } finally {
+    finally
       Utils.deleteRecursively(tempDir)
-    }
-  }
 
   /**
     * From Spark 2.0, MLlib LogisticRegressionWithLBFGS will call the LogisticRegression
     * implementation in ML to train model. We copies test cases from ML to guarantee
     * they produce the same result.
     */
-  test("binary logistic regression with intercept without regularization") {
+  test("binary logistic regression with intercept without regularization")
     val trainer1 = new LogisticRegressionWithLBFGS()
       .setIntercept(true)
       .setFeatureScaling(true)
@@ -684,9 +651,8 @@ class LogisticRegressionSuite
     // Without regularization, with or without feature scaling will converge to the same solution.
     assert(model2.intercept ~== interceptR relTol 1E-3)
     assert(model2.weights ~= coefficientsR relTol 1E-3)
-  }
 
-  test("binary logistic regression without intercept without regularization") {
+  test("binary logistic regression without intercept without regularization")
     val trainer1 = new LogisticRegressionWithLBFGS()
       .setIntercept(false)
       .setFeatureScaling(true)
@@ -726,9 +692,8 @@ class LogisticRegressionSuite
     // Without regularization, with or without feature scaling should converge to the same solution.
     assert(model2.intercept ~== interceptR relTol 1E-3)
     assert(model2.weights ~= coefficientsR relTol 1E-2)
-  }
 
-  test("binary logistic regression with intercept with L1 regularization") {
+  test("binary logistic regression with intercept with L1 regularization")
     val trainer1 = new LogisticRegressionWithLBFGS()
       .setIntercept(true)
       .setFeatureScaling(true)
@@ -789,9 +754,8 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 relTol 1E-2)
     assert(model2.weights ~= coefficientsR2 absTol 1E-3)
-  }
 
-  test("binary logistic regression without intercept with L1 regularization") {
+  test("binary logistic regression without intercept with L1 regularization")
     val trainer1 = new LogisticRegressionWithLBFGS()
       .setIntercept(false)
       .setFeatureScaling(true)
@@ -853,9 +817,8 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 absTol 1E-3)
     assert(model2.weights ~= coefficientsR2 absTol 1E-3)
-  }
 
-  test("binary logistic regression with intercept with L2 regularization") {
+  test("binary logistic regression with intercept with L2 regularization")
     val trainer1 = new LogisticRegressionWithLBFGS()
       .setIntercept(true)
       .setFeatureScaling(true)
@@ -918,9 +881,8 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 relTol 1E-3)
     assert(model2.weights ~= coefficientsR2 relTol 1E-3)
-  }
 
-  test("binary logistic regression without intercept with L2 regularization") {
+  test("binary logistic regression without intercept with L2 regularization")
     val trainer1 = new LogisticRegressionWithLBFGS()
       .setIntercept(false)
       .setFeatureScaling(true)
@@ -984,24 +946,21 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 absTol 1E-3)
     assert(model2.weights ~= coefficientsR2 relTol 1E-2)
-  }
-}
 
 class LogisticRegressionClusterSuite
-    extends SparkFunSuite with LocalClusterSparkContext {
+    extends SparkFunSuite with LocalClusterSparkContext
 
   test(
-      "task size should be small in both training and prediction using SGD optimizer") {
+      "task size should be small in both training and prediction using SGD optimizer")
     val m = 4
     val n = 200000
     val points = sc
       .parallelize(0 until m, 2)
-      .mapPartitionsWithIndex { (idx, iter) =>
+      .mapPartitionsWithIndex  (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
               LabeledPoint(1.0,
                            Vectors.dense(Array.fill(n)(random.nextDouble()))))
-      }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be
     // greater than 1MB and hence Spark would throw an error.
@@ -1011,20 +970,18 @@ class LogisticRegressionClusterSuite
 
     // Materialize the RDDs
     predictions.count()
-  }
 
   test(
-      "task size should be small in both training and prediction using LBFGS optimizer") {
+      "task size should be small in both training and prediction using LBFGS optimizer")
     val m = 4
     val n = 200000
     val points = sc
       .parallelize(0 until m, 2)
-      .mapPartitionsWithIndex { (idx, iter) =>
+      .mapPartitionsWithIndex  (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
               LabeledPoint(1.0,
                            Vectors.dense(Array.fill(n)(random.nextDouble()))))
-      }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be
     // greater than 1MB and hence Spark would throw an error.
@@ -1036,5 +993,3 @@ class LogisticRegressionClusterSuite
 
     // Materialize the RDDs
     predictions.count()
-  }
-}

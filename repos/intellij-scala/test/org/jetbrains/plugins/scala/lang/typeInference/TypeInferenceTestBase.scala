@@ -23,7 +23,7 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * Date: 10.03.2009
   */
 abstract class TypeInferenceTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val startExprMarker = "/*start*/"
   private val endExprMarker = "/*end*/"
   private val fewVariantsMarker = "Few variants:"
@@ -33,18 +33,16 @@ abstract class TypeInferenceTestBase
   protected def folderPath: String =
     TestUtils.getTestDataPath + "/typeInference/"
 
-  protected def doInjectorTest(injector: SyntheticMembersInjector): Unit = {
+  protected def doInjectorTest(injector: SyntheticMembersInjector): Unit =
     val extensionPoint = Extensions.getRootArea.getExtensionPoint(
         SyntheticMembersInjector.EP_NAME)
     extensionPoint.registerExtension(injector)
-    try {
+    try
       doTest()
-    } finally {
+    finally
       extensionPoint.unregisterExtension(injector)
-    }
-  }
 
-  protected def doTest() {
+  protected def doTest()
     import org.junit.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -70,38 +68,35 @@ abstract class TypeInferenceTestBase
     val expr: ScExpression = PsiTreeUtil.findElementOfClassAtRange(
         scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
-    val typez = expr.getType(TypingContext.empty) match {
+    val typez = expr.getType(TypingContext.empty) match
       case Success(Unit, _) => expr.getTypeIgnoreBaseType(TypingContext.empty)
       case x => x
-    }
-    typez match {
+    typez match
       case Success(ttypez, _) =>
         val res = ScType.presentableText(ttypez)
         val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
         val text = lastPsi.getText
-        val output = lastPsi.getNode.getElementType match {
+        val output = lastPsi.getNode.getElementType match
           case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
           case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
             val resText = text.substring(2, text.length - 2).trim
-            if (resText.startsWith(fewVariantsMarker)) {
+            if (resText.startsWith(fewVariantsMarker))
               val results =
                 resText.substring(fewVariantsMarker.length).trim.split('\n')
               if (!results.contains(res)) assertEquals(results(0), res)
               return
-            } else resText
+            else resText
           case _ =>
             throw new AssertionError(
                 "Test result must be in last comment statement.")
-        }
-        output match {
+        output match
           case ExpectedPattern("<none>") =>
-            expr.expectedType() match {
+            expr.expectedType() match
               case Some(et) =>
                 fail(
                     "found unexpected expected type: %s".format(
                         ScType.presentableText(et)))
               case None => // all good
-            }
           case ExpectedPattern(expectedExpectedTypeText) =>
             val actualExpectedType =
               expr.expectedType().getOrElse(sys.error("no expected type"))
@@ -112,14 +107,10 @@ abstract class TypeInferenceTestBase
             assertEquals(
                 expectedText, ScTypePresentation.withoutAliases(ttypez))
           case _ => assertEquals(output, res)
-        }
       case Failure(msg, elem) =>
         assert(assertion = false,
                msg + " :: " +
-               (elem match {
+               (elem match
                      case Some(x) => x.getText
                      case None => "empty element"
-                   }))
-    }
-  }
-}
+                   ))

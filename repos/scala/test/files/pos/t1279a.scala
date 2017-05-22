@@ -1,5 +1,5 @@
 // covariant linked list
-abstract class M { self =>
+abstract class M  self =>
 
   type T
   final type selfType = M { type T <: self.T }
@@ -22,10 +22,9 @@ abstract class M { self =>
 
   def all4: Stream[M { type T <: self.T }] =
     Unrelated.all4Impl[T](self: actualSelfType)
-}
 
 // TODO!!! fix this bug for real, it compiles successfully, but weird types are inferred
-object Unrelated {
+object Unrelated
   // compiles successfully
   def all4Impl[U](first: M { type T <: U }): Stream[M { type T <: U }] =
     Stream.cons(first, all4Impl[U](first.next))
@@ -40,4 +39,3 @@ object Unrelated {
   //   def all4ImplFail[U](first: M {type T <: U}): Stream[M {type T <: U}] = Stream.cons(first, all4ImplFail(first.next))
   //                                                                                                                ^
   // one error found
-}

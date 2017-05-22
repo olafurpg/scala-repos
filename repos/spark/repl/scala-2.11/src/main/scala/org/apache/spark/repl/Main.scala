@@ -26,7 +26,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.Utils
 import org.apache.spark.sql.SQLContext
 
-object Main extends Logging {
+object Main extends Logging
 
   initializeLogIfNecessary(true)
 
@@ -42,17 +42,15 @@ object Main extends Logging {
 
   private var hasErrors = false
 
-  private def scalaOptionError(msg: String): Unit = {
+  private def scalaOptionError(msg: String): Unit =
     hasErrors = true
     Console.err.println(msg)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     doMain(args, new SparkILoop)
-  }
 
   // Visible for testing
-  private[repl] def doMain(args: Array[String], _interp: SparkILoop): Unit = {
+  private[repl] def doMain(args: Array[String], _interp: SparkILoop): Unit =
     interp = _interp
     val jars = conf
       .getOption("spark.jars")
@@ -70,13 +68,11 @@ object Main extends Logging {
     val settings = new GenericRunnerSettings(scalaOptionError)
     settings.processArguments(interpArguments, true)
 
-    if (!hasErrors) {
+    if (!hasErrors)
       interp.process(settings) // Repl starts and goes in loop of R.E.P.L
       Option(sparkContext).map(_.stop)
-    }
-  }
 
-  def createSparkContext(): SparkContext = {
+  def createSparkContext(): SparkContext =
     val execUri = System.getenv("SPARK_EXECUTOR_URI")
     conf
       .setIfMissing("spark.app.name", "Spark shell")
@@ -86,33 +82,27 @@ object Main extends Logging {
       // initialization in certain cases, there's an initialization order issue that prevents
       // this from being set after SparkContext is instantiated.
       .set("spark.repl.class.outputDir", outputDir.getAbsolutePath())
-    if (execUri != null) {
+    if (execUri != null)
       conf.set("spark.executor.uri", execUri)
-    }
-    if (System.getenv("SPARK_HOME") != null) {
+    if (System.getenv("SPARK_HOME") != null)
       conf.setSparkHome(System.getenv("SPARK_HOME"))
-    }
     sparkContext = new SparkContext(conf)
     logInfo("Created spark context..")
     sparkContext
-  }
 
-  def createSQLContext(): SQLContext = {
+  def createSQLContext(): SQLContext =
     val name = "org.apache.spark.sql.hive.HiveContext"
     val loader = Utils.getContextOrSparkClassLoader
-    try {
+    try
       sqlContext = loader
         .loadClass(name)
         .getConstructor(classOf[SparkContext])
         .newInstance(sparkContext)
         .asInstanceOf[SQLContext]
       logInfo("Created sql context (with Hive support)..")
-    } catch {
+    catch
       case _: java.lang.ClassNotFoundException |
           _: java.lang.NoClassDefFoundError =>
         sqlContext = new SQLContext(sparkContext)
         logInfo("Created sql context..")
-    }
     sqlContext
-  }
-}

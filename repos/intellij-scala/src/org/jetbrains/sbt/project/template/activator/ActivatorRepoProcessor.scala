@@ -14,7 +14,7 @@ import org.apache.lucene.document.Document
   *
   *
   */
-object ActivatorRepoProcessor {
+object ActivatorRepoProcessor
   val REPO_URI = "http://downloads.typesafe.com/typesafe-activator"
   val INDEX_DIR = "index"
   val TEMPLATES_DIR = "templates"
@@ -32,14 +32,12 @@ object ActivatorRepoProcessor {
                      src: String,
                      category: String,
                      desc: String,
-                     tags: String) {
+                     tags: String)
     override def toString: String = title
-  }
 
-  object Keys {
-    class Key(val keyName: String) {
+  object Keys
+    class Key(val keyName: String)
       def getValue(doc: Document): String = doc.get(keyName)
-    }
 
     val TEMPLATE_ID = new Key("id")
     val NAME = new Key("name")
@@ -59,60 +57,52 @@ object ActivatorRepoProcessor {
                CATEGORY getValue doc,
                DESCRIPTION getValue doc,
                TAGS getValue doc))
-  }
 
-  def downloadStringFromRepo(url: String): Option[String] = {
+  def downloadStringFromRepo(url: String): Option[String] =
     val conf = HttpConfigurable.getInstance()
     var connection: HttpURLConnection = null
 
-    try {
+    try
       connection = conf openHttpConnection url
       connection.connect()
 
       val status = connection.getResponseMessage
-      if (status != null && status.trim.startsWith("OK")) {
+      if (status != null && status.trim.startsWith("OK"))
         val text = StreamUtil.readText(
             connection.getInputStream,
             "utf-8" /*connection.getContentEncoding*/ )
         Some(text)
-      } else None
-    } catch {
+      else None
+    catch
       case _: Exception => None
-    } finally {
+    finally
       if (connection != null) connection.disconnect()
-    }
-  }
 
   def downloadFile(url: String,
                    toFile: String,
                    onError: String => Unit,
-                   indicator: ProgressIndicator = null): Boolean = {
-    try {
+                   indicator: ProgressIndicator = null): Boolean =
+    try
       val file = new File(toFile)
       if (!file.exists()) return false
 
       ActivatorDownloadUtil.downloadContentToFile(indicator, url, file)
       true
-    } catch {
+    catch
       case io: IOException =>
         onError(io.getMessage)
         ActivatorCachedRepoProcessor.logError(s"Can't download $url", io)
         false
-    }
-  }
 
   def downloadTemplateFromRepo(id: String,
                                pathTo: File,
                                onError: String => Unit,
-                               indicator: ProgressIndicator = null) {
-    try {
+                               indicator: ProgressIndicator = null)
+    try
       val url =
         s"$REPO_URI/$TEMPLATES_DIR/${calculateHash(id)}${templateFileName(id)}"
       ActivatorDownloadUtil.downloadContentToFile(indicator, url, pathTo)
-    } catch {
+    catch
       case io: IOException =>
 //        log.error(s"Can't download template $id", io) - it is not an error anymore
         onError(io.getMessage)
-    }
-  }
-}

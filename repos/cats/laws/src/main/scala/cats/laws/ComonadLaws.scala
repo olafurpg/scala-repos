@@ -7,7 +7,7 @@ import cats.implicits._
 /**
   * Laws that must be obeyed by any `Comonad`.
   */
-trait ComonadLaws[F[_]] extends CoflatMapLaws[F] {
+trait ComonadLaws[F[_]] extends CoflatMapLaws[F]
   implicit override def F: Comonad[F]
 
   def extractCoflattenIdentity[A](fa: F[A]): IsEq[F[A]] =
@@ -38,9 +38,7 @@ trait ComonadLaws[F[_]] extends CoflatMapLaws[F] {
     */
   def cokleisliRightIdentity[A, B](fa: F[A], f: F[A] => B): IsEq[B] =
     (Cokleisli(f) andThen Cokleisli(F.extract[B])).run(fa) <-> f(fa)
-}
 
-object ComonadLaws {
+object ComonadLaws
   def apply[F[_]](implicit ev: Comonad[F]): ComonadLaws[F] =
     new ComonadLaws[F] { def F: Comonad[F] = ev }
-}

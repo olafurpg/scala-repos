@@ -34,7 +34,7 @@ package collection
   *  @define willNotTerminateInf
   *  @define mayNotTerminateInf
   */
-trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr] { self =>
+trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr]  self =>
 
   def seq: IndexedSeq[A]
   override def hashCode() =
@@ -52,25 +52,23 @@ trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr] { self =>
   // pre: start >= 0, end <= self.length
   @SerialVersionUID(1756321872811029277L)
   protected class Elements(start: Int, end: Int)
-      extends AbstractIterator[A] with BufferedIterator[A] with Serializable {
+      extends AbstractIterator[A] with BufferedIterator[A] with Serializable
     private var index = start
     private def available = (end - index) max 0
 
     def hasNext: Boolean = index < end
 
-    def next(): A = {
+    def next(): A =
       if (index >= end) Iterator.empty.next()
 
       val x = self(index)
       index += 1
       x
-    }
 
-    def head = {
+    def head =
       if (index >= end) Iterator.empty.next()
 
       self(index)
-    }
 
     override def drop(n: Int): Iterator[A] =
       if (n <= 0) new Elements(index, end)
@@ -82,15 +80,12 @@ trait IndexedSeqLike[+A, +Repr] extends Any with SeqLike[A, Repr] { self =>
       else new Elements(index, end)
     override def slice(from: Int, until: Int): Iterator[A] =
       this take until drop from
-  }
 
   override /*IterableLike*/
   def iterator: Iterator[A] = new Elements(0, length)
 
   /* Overridden for efficiency */
-  override def toBuffer[A1 >: A]: mutable.Buffer[A1] = {
+  override def toBuffer[A1 >: A]: mutable.Buffer[A1] =
     val result = new mutable.ArrayBuffer[A1](size)
     copyToBuffer(result)
     result
-  }
-}

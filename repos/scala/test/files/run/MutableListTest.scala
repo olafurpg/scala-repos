@@ -1,33 +1,29 @@
 import scala.collection.mutable.MutableList
 
-class ExtList[T] extends MutableList[T] {
-  def printState {
+class ExtList[T] extends MutableList[T]
+  def printState
     println("Length: " + len)
     println("Last elem: " + last0.elem)
     println("First elem: " + first0.elem)
     println("After first elem: " + first0.next.elem)
     println("After first: " + first0.next)
     println("Last: " + last0)
-  }
-}
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     testEmpty
     testAddElement
     testAddFewElements
     testAddMoreElements
     testTraversables
-  }
 
-  def testEmpty {
+  def testEmpty
     val mlist = new MutableList[Int]
     assert(mlist.isEmpty)
     assert(mlist.get(0) == None)
-  }
 
-  def testAddElement {
+  def testAddElement
     val mlist = new MutableList[Int]
     mlist += 17
     assert(mlist.nonEmpty)
@@ -43,9 +39,8 @@ object Test {
     assert(mlist.tail.get(0) == None)
     assert((mlist.tail += 19).head == 19)
     assert(mlist.tail.length == 0)
-  }
 
-  def testAddFewElements {
+  def testAddFewElements
     val mlist = new MutableList[Int]
     for (i <- 0 until 2) mlist += i
 //    mlist.printState
@@ -55,9 +50,8 @@ object Test {
     assert(mlist.tail.length == 1)
     assert(mlist.tail.tail.length == 0)
     assert(mlist.tail.tail.isEmpty)
-  }
 
-  def testAddMoreElements {
+  def testAddMoreElements
     val mlist = new MutableList[Int]
     for (i <- 0 until 10) mlist += i * i
     assert(mlist.nonEmpty)
@@ -66,10 +60,9 @@ object Test {
     assert(mlist(5) == 5 * 5)
     assert(mlist(9) == 9 * 9)
     var sometail = mlist
-    for (i <- 0 until 10) {
+    for (i <- 0 until 10)
       assert(sometail.head == i * i)
       sometail = sometail.tail
-    }
     mlist(5) = -25
     assert(mlist(5) == -25)
     mlist(0) = -1
@@ -86,9 +79,8 @@ object Test {
     mlist += 9999
     assert(mlist.tail.head == 9999)
     assert(mlist.last == 9999)
-  }
 
-  def testTraversables {
+  def testTraversables
     val mlist = new MutableList[Int]
     for (i <- 0 until 10) mlist += i * i
     var lst = mlist.drop(5)
@@ -106,5 +98,3 @@ object Test {
     assert(lst.length == 0)
     for (i <- 0 until 5) lst += i
     assert(lst.reduceLeft(_ + _) == 10)
-  }
-}

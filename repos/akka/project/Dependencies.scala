@@ -6,7 +6,7 @@ package akka
 import sbt._
 import Keys._
 
-object Dependencies {
+object Dependencies
   import DependencyHelpers._
 
   lazy val scalaTestVersion =
@@ -30,7 +30,7 @@ object Dependencies {
        else "2.2.4")
   )
 
-  object Compile {
+  object Compile
     // Compile
 
     val camelCore =
@@ -40,9 +40,9 @@ object Dependencies {
     // when updating config version, update links ActorSystem ScalaDoc to link to the updated version
     val config = "com.typesafe" % "config" % "1.3.0" // ApacheV2
     val netty = "io.netty" % "netty" % "3.10.3.Final" // ApacheV2
-    val scalaStm = Def.setting {
+    val scalaStm = Def.setting
       "org.scala-stm" %% "scala-stm" % scalaStmVersion.value
-    } // Modified BSD (Scala)
+    // Modified BSD (Scala)
 
     val scalaXml =
       "org.scala-lang.modules" %% "scala-xml" % "1.0.5" // Scala License
@@ -84,12 +84,11 @@ object Dependencies {
     val java8Compat =
       "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0" // Scala License
 
-    object Docs {
+    object Docs
       val sprayJson = "io.spray" %% "spray-json" % "1.3.2" % "test"
       val gson = "com.google.code.gson" % "gson" % "2.3.1" % "test"
-    }
 
-    object Test {
+    object Test
       val commonsMath =
         "org.apache.commons" % "commons-math" % "2.2" % "test" // ApacheV2
       val commonsIo = "commons-io" % "commons-io" % "2.4" % "test" // ApacheV2
@@ -101,12 +100,12 @@ object Dependencies {
         "ch.qos.logback" % "logback-classic" % "1.1.3" % "test" // EPL 1.0 / LGPL 2.1
       val mockito = "org.mockito" % "mockito-all" % "1.10.19" % "test" // MIT
       // changing the scalatest dependency must be reflected in akka-docs/rst/dev/multi-jvm-testing.rst
-      val scalatest = Def.setting {
+      val scalatest = Def.setting
         "org.scalatest" %% "scalatest" % scalaTestVersion.value % "test"
-      } // ApacheV2
-      val scalacheck = Def.setting {
+      // ApacheV2
+      val scalacheck = Def.setting
         "org.scalacheck" %% "scalacheck" % scalaCheckVersion.value % "test"
-      } // New BSD
+      // New BSD
       val pojosr =
         "com.googlecode.pojosr" % "de.kalpatec.pojosr.framework" % "0.2.1" % "test" // ApacheV2
       val tinybundles =
@@ -137,9 +136,8 @@ object Dependencies {
       // reactive streams tck
       val reactiveStreamsTck =
         "org.reactivestreams" % "reactive-streams-tck" % "1.0.0" % "test" // CC0
-    }
 
-    object Provided {
+    object Provided
       // TODO remove from "test" config
       val sigarLoader =
         "io.kamon" % "sigar-loader" % "1.6.6-rev002" % "optional;provided;test" // ApacheV2
@@ -148,8 +146,6 @@ object Dependencies {
         "org.iq80.leveldb" % "leveldb" % "0.7" % "optional;provided" // ApacheV2
       val levelDBNative =
         "org.fusesource.leveldbjni" % "leveldbjni-all" % "1.8" % "optional;provided" // New BSD
-    }
-  }
 
   import Compile._
   // TODO check if `l ++=` everywhere expensive?
@@ -306,15 +302,13 @@ object Dependencies {
               Test.scalacheck.value,
               Test.junit,
               Test.reactiveStreamsTck)
-}
 
-object DependencyHelpers {
-  case class ScalaVersionDependentModuleID(modules: String => Seq[ModuleID]) {
+object DependencyHelpers
+  case class ScalaVersionDependentModuleID(modules: String => Seq[ModuleID])
     def %(config: String): ScalaVersionDependentModuleID =
       ScalaVersionDependentModuleID(
           version => modules(version).map(_ % config))
-  }
-  object ScalaVersionDependentModuleID {
+  object ScalaVersionDependentModuleID
     implicit def liftConstantModule(
         mod: ModuleID): ScalaVersionDependentModuleID = versioned(_ => mod)
 
@@ -324,7 +318,6 @@ object DependencyHelpers {
         f: PartialFunction[String, ModuleID]): ScalaVersionDependentModuleID =
       ScalaVersionDependentModuleID(
           version => if (f.isDefinedAt(version)) Seq(f(version)) else Nil)
-  }
 
   /**
     * Use this as a dependency setting if the dependencies contain both static and Scala-version
@@ -336,7 +329,7 @@ object DependencyHelpers {
       scalaVersion(version => modules.flatMap(m => m.modules(version)))
 
   val ScalaVersion = """\d\.\d+\.\d+(?:-(?:M|RC)\d+)?""".r
-  val nominalScalaVersion: String => String = {
+  val nominalScalaVersion: String => String =
     // matches:
     // 2.12.0-M1
     // 2.12.0-RC1
@@ -344,5 +337,3 @@ object DependencyHelpers {
     case version @ ScalaVersion() => version
     // transforms 2.12.0-custom-version to 2.12.0
     case version => version.takeWhile(_ != '-')
-  }
-}

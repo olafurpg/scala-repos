@@ -16,13 +16,12 @@ import ASMConverters._
 import scala.collection.convert.decorateAsScala._
 import scala.tools.testing.ClearAfterClass
 
-object ScalaInlineInfoTest extends ClearAfterClass.Clearable {
+object ScalaInlineInfoTest extends ClearAfterClass.Clearable
   var compiler = newCompiler(extraArgs = "-Yopt:l:none")
   def clear(): Unit = { compiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class ScalaInlineInfoTest extends ClearAfterClass {
+class ScalaInlineInfoTest extends ClearAfterClass
   ClearAfterClass.stateToClear = ScalaInlineInfoTest
 
   val compiler = newCompiler()
@@ -33,7 +32,7 @@ class ScalaInlineInfoTest extends ClearAfterClass {
       .head
 
   @Test
-  def traitMembersInlineInfo(): Unit = {
+  def traitMembersInlineInfo(): Unit =
     val code =
       """trait T {
         |  def f1 = 1                   // concrete method
@@ -118,10 +117,9 @@ class ScalaInlineInfoTest extends ClearAfterClass {
         None // warning
     )
     assert(info == expect, info)
-  }
 
   @Test
-  def inlineInfoSam(): Unit = {
+  def inlineInfoSam(): Unit =
     val code = """abstract class C {
         |  def f = 0
         |  def g(x: Int): Int
@@ -153,5 +151,3 @@ class ScalaInlineInfoTest extends ClearAfterClass {
                       ("F", None),
                       ("T", Some("h(Ljava/lang/String;)I")),
                       ("U", None)))
-  }
-}

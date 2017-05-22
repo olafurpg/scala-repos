@@ -33,12 +33,11 @@ import org.apache.spark.util.random.SamplingUtils
   * An object that defines how the elements in a key-value pair RDD are partitioned by key.
   * Maps each key to a partition ID, from 0 to `numPartitions - 1`.
   */
-abstract class Partitioner extends Serializable {
+abstract class Partitioner extends Serializable
   def numPartitions: Int
   def getPartition(key: Any): Int
-}
 
-object Partitioner {
+object Partitioner
 
   /**
     * Choose a partitioner to use for a cogroup-like operation between a number of RDDs.
@@ -55,19 +54,15 @@ object Partitioner {
     *
     * We use two method parameters (rdd, others) to enforce callers passing at least 1 RDD.
     */
-  def defaultPartitioner(rdd: RDD[_], others: RDD[_]*): Partitioner = {
+  def defaultPartitioner(rdd: RDD[_], others: RDD[_]*): Partitioner =
     val bySize = (Seq(rdd) ++ others).sortBy(_.partitions.length).reverse
     for (r <- bySize if r.partitioner.isDefined &&
-             r.partitioner.get.numPartitions > 0) {
+             r.partitioner.get.numPartitions > 0)
       return r.partitioner.get
-    }
-    if (rdd.context.conf.contains("spark.default.parallelism")) {
+    if (rdd.context.conf.contains("spark.default.parallelism"))
       new HashPartitioner(rdd.context.defaultParallelism)
-    } else {
+    else
       new HashPartitioner(bySize.head.partitions.length)
-    }
-  }
-}
 
 /**
   * A [[org.apache.spark.Partitioner]] that implements hash-based partitioning using
@@ -77,26 +72,23 @@ object Partitioner {
   * so attempting to partition an RDD[Array[_]] or RDD[(Array[_], _)] using a HashPartitioner will
   * produce an unexpected or incorrect result.
   */
-class HashPartitioner(partitions: Int) extends Partitioner {
+class HashPartitioner(partitions: Int) extends Partitioner
   require(partitions >= 0,
           s"Number of partitions ($partitions) cannot be negative.")
 
   def numPartitions: Int = partitions
 
-  def getPartition(key: Any): Int = key match {
+  def getPartition(key: Any): Int = key match
     case null => 0
     case _ => Utils.nonNegativeMod(key.hashCode, numPartitions)
-  }
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case h: HashPartitioner =>
       h.numPartitions == numPartitions
     case _ =>
       false
-  }
 
   override def hashCode: Int = numPartitions
-}
 
 /**
   * A [[org.apache.spark.Partitioner]] that partitions sortable records by range into roughly
@@ -110,7 +102,7 @@ class RangePartitioner[K : Ordering : ClassTag, V](
     partitions: Int,
     rdd: RDD[_ <: Product2[K, V]],
     private var ascending: Boolean = true)
-    extends Partitioner {
+    extends Partitioner
 
   // We allow partitions = 0, which happens when sorting an empty RDD under the default settings.
   require(partitions >= 0,
@@ -119,10 +111,10 @@ class RangePartitioner[K : Ordering : ClassTag, V](
   private var ordering = implicitly[Ordering[K]]
 
   // An array of upper bounds for the first (partitions - 1) partitions
-  private var rangeBounds: Array[K] = {
-    if (partitions <= 1) {
+  private var rangeBounds: Array[K] =
+    if (partitions <= 1)
       Array.empty
-    } else {
+    else
       // This is the sample size we need to have roughly balanced output partitions, capped at 1M.
       val sampleSize = math.min(20.0 * partitions, 1e6)
       // Assume the input partitions are roughly balanced and over-sample a little bit.
@@ -130,27 +122,24 @@ class RangePartitioner[K : Ordering : ClassTag, V](
         math.ceil(3.0 * sampleSize / rdd.partitions.length).toInt
       val (numItems, sketched) =
         RangePartitioner.sketch(rdd.map(_._1), sampleSizePerPartition)
-      if (numItems == 0L) {
+      if (numItems == 0L)
         Array.empty
-      } else {
+      else
         // If a partition contains much more than the average number of items, we re-sample from it
         // to ensure that enough items are collected from that partition.
         val fraction = math.min(sampleSize / math.max(numItems, 1L), 1.0)
         val candidates = ArrayBuffer.empty[(K, Float)]
         val imbalancedPartitions = mutable.Set.empty[Int]
-        sketched.foreach {
+        sketched.foreach
           case (idx, n, sample) =>
-            if (fraction * n > sampleSizePerPartition) {
+            if (fraction * n > sampleSizePerPartition)
               imbalancedPartitions += idx
-            } else {
+            else
               // The weight is 1 over the sampling probability.
               val weight = (n.toDouble / sample.length).toFloat
-              for (key <- sample) {
+              for (key <- sample)
                 candidates += ((key, weight))
-              }
-            }
-        }
-        if (imbalancedPartitions.nonEmpty) {
+        if (imbalancedPartitions.nonEmpty)
           // Re-sample imbalanced partitions with the desired sampling probability.
           val imbalanced = new PartitionPruningRDD(
               rdd.map(_._1), imbalancedPartitions.contains)
@@ -160,68 +149,55 @@ class RangePartitioner[K : Ordering : ClassTag, V](
             .collect()
           val weight = (1.0 / fraction).toFloat
           candidates ++= reSampled.map(x => (x, weight))
-        }
         RangePartitioner.determineBounds(candidates, partitions)
-      }
-    }
-  }
 
   def numPartitions: Int = rangeBounds.length + 1
 
   private var binarySearch: ((Array[K], K) => Int) =
     CollectionsUtils.makeBinarySearch[K]
 
-  def getPartition(key: Any): Int = {
+  def getPartition(key: Any): Int =
     val k = key.asInstanceOf[K]
     var partition = 0
-    if (rangeBounds.length <= 128) {
+    if (rangeBounds.length <= 128)
       // If we have less than 128 partitions naive search
       while (partition < rangeBounds.length &&
-      ordering.gt(k, rangeBounds(partition))) {
+      ordering.gt(k, rangeBounds(partition)))
         partition += 1
-      }
-    } else {
+    else
       // Determine which binary search method to use only once.
       partition = binarySearch(rangeBounds, k)
       // binarySearch either returns the match location or -[insertion point]-1
-      if (partition < 0) {
+      if (partition < 0)
         partition = -partition - 1
-      }
-      if (partition > rangeBounds.length) {
+      if (partition > rangeBounds.length)
         partition = rangeBounds.length
-      }
-    }
-    if (ascending) {
+    if (ascending)
       partition
-    } else {
+    else
       rangeBounds.length - partition
-    }
-  }
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case r: RangePartitioner[_, _] =>
       r.rangeBounds.sameElements(rangeBounds) && r.ascending == ascending
     case _ =>
       false
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     val prime = 31
     var result = 1
     var i = 0
-    while (i < rangeBounds.length) {
+    while (i < rangeBounds.length)
       result = prime * result + rangeBounds(i).hashCode
       i += 1
-    }
     result = prime * result + ascending.hashCode
     result
-  }
 
   @throws(classOf[IOException])
   private def writeObject(out: ObjectOutputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       val sfactory = SparkEnv.get.serializer
-      sfactory match {
+      sfactory match
         case js: JavaSerializer => out.defaultWriteObject()
         case _ =>
           out.writeBoolean(ascending)
@@ -229,18 +205,15 @@ class RangePartitioner[K : Ordering : ClassTag, V](
           out.writeObject(binarySearch)
 
           val ser = sfactory.newInstance()
-          Utils.serializeViaNestedStream(out, ser) { stream =>
+          Utils.serializeViaNestedStream(out, ser)  stream =>
             stream.writeObject(scala.reflect.classTag[Array[K]])
             stream.writeObject(rangeBounds)
-          }
-      }
-    }
 
   @throws(classOf[IOException])
   private def readObject(in: ObjectInputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       val sfactory = SparkEnv.get.serializer
-      sfactory match {
+      sfactory match
         case js: JavaSerializer => in.defaultReadObject()
         case _ =>
           ascending = in.readBoolean()
@@ -248,15 +221,11 @@ class RangePartitioner[K : Ordering : ClassTag, V](
           binarySearch = in.readObject().asInstanceOf[(Array[K], K) => Int]
 
           val ser = sfactory.newInstance()
-          Utils.deserializeViaNestedStream(in, ser) { ds =>
+          Utils.deserializeViaNestedStream(in, ser)  ds =>
             implicit val classTag = ds.readObject[ClassTag[Array[K]]]()
             rangeBounds = ds.readObject[Array[K]]()
-          }
-      }
-    }
-}
 
-private[spark] object RangePartitioner {
+private[spark] object RangePartitioner
 
   /**
     * Sketches the input RDD via reservoir sampling on each partition.
@@ -267,20 +236,19 @@ private[spark] object RangePartitioner {
     */
   def sketch[K : ClassTag](
       rdd: RDD[K],
-      sampleSizePerPartition: Int): (Long, Array[(Int, Long, Array[K])]) = {
+      sampleSizePerPartition: Int): (Long, Array[(Int, Long, Array[K])]) =
     val shift = rdd.id
     // val classTagK = classTag[K] // to avoid serializing the entire partitioner object
-    val sketched = rdd.mapPartitionsWithIndex { (idx, iter) =>
+    val sketched = rdd.mapPartitionsWithIndex  (idx, iter) =>
       val seed = byteswap32(idx ^ (shift << 16))
       val (sample, n) = SamplingUtils.reservoirSampleAndCount(
           iter, sampleSizePerPartition, seed)
       Iterator((idx, n, sample))
-    }.collect()
+    .collect()
     val numItems = sketched
       .map(_._2)
       .sum
       (numItems, sketched)
-  }
 
   /**
     * Determines the bounds for range partitioning from candidates with weights indicating how many
@@ -291,7 +259,7 @@ private[spark] object RangePartitioner {
     * @return selected bounds
     */
   def determineBounds[K : Ordering : ClassTag](
-      candidates: ArrayBuffer[(K, Float)], partitions: Int): Array[K] = {
+      candidates: ArrayBuffer[(K, Float)], partitions: Int): Array[K] =
     val ordering = implicitly[Ordering[K]]
     val ordered = candidates.sortBy(_._1)
     val numCandidates = ordered.size
@@ -303,20 +271,15 @@ private[spark] object RangePartitioner {
     var i = 0
     var j = 0
     var previousBound = Option.empty[K]
-    while ( (i < numCandidates) && (j < partitions - 1)) {
+    while ( (i < numCandidates) && (j < partitions - 1))
       val (key, weight) = ordered(i)
       cumWeight += weight
-      if (cumWeight >= target) {
+      if (cumWeight >= target)
         // Skip duplicate values.
-        if (previousBound.isEmpty || ordering.gt(key, previousBound.get)) {
+        if (previousBound.isEmpty || ordering.gt(key, previousBound.get))
           bounds += key
           target += step
           j += 1
           previousBound = Some(key)
-        }
-      }
       i += 1
-    }
     bounds.toArray
-  }
-}

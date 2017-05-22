@@ -17,17 +17,15 @@ import scala.concurrent.Future
 class ActorOfferMatcher(clock: Clock,
                         actorRef: ActorRef,
                         override val precedenceFor: Option[PathId])
-    extends OfferMatcher {
-  def matchOffer(deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+    extends OfferMatcher
+  def matchOffer(deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] =
     implicit val timeout: Timeout = clock.now().until(deadline)
     val answerFuture = actorRef ? ActorOfferMatcher.MatchOffer(deadline, offer)
     answerFuture.mapTo[MatchedTaskOps]
-  }
 
   override def toString: String = s"ActorOfferMatcher($actorRef)"
-}
 
-object ActorOfferMatcher {
+object ActorOfferMatcher
 
   /**
     * Send to an offer matcher to request a match.
@@ -35,4 +33,3 @@ object ActorOfferMatcher {
     * This should always be replied to with a LaunchTasks message.
     */
   case class MatchOffer(matchingDeadline: Timestamp, remainingOffer: Offer)
-}

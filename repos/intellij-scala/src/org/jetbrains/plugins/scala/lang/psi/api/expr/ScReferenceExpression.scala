@@ -17,40 +17,35 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
   * Date: 06.03.2008
   */
 trait ScReferenceExpression
-    extends ScalaPsiElement with ScExpression with ScReferenceElement {
+    extends ScalaPsiElement with ScExpression with ScReferenceElement
   def isQualified = qualifier.isDefined
 
-  def qualifier: Option[ScExpression] = getFirstChild match {
+  def qualifier: Option[ScExpression] = getFirstChild match
     case e: ScExpression => Some(e)
     case _ => None
-  }
 
   protected var resolveFunction: () => Array[ResolveResult] = null
 
   protected var shapeResolveFunction: () => Array[ResolveResult] = null
 
   def setupResolveFunctions(resolveFunction: () => Array[ResolveResult],
-                            shapeResolveFunction: () => Array[ResolveResult]) {
+                            shapeResolveFunction: () => Array[ResolveResult])
     this.resolveFunction = resolveFunction
     this.shapeResolveFunction = shapeResolveFunction
-  }
 
   /**
     * Includes qualifier for Infix, Postfix and Prefix expression
     * @return qualifier for Infix, Postfix, Prefix or reference expression
     */
-  def smartQualifier: Option[ScExpression] = {
-    qualifier match {
+  def smartQualifier: Option[ScExpression] =
+    qualifier match
       case Some(qual) => Some(qual)
       case _ =>
-        getParent match {
+        getParent match
           case p: ScPrefixExpr if p.operation == this => Some(p.operand)
           case p: ScPostfixExpr if p.operation == this => Some(p.getBaseExpr)
           case p: ScInfixExpr if p.operation == this => Some(p.getBaseExpr)
           case _ => None
-        }
-    }
-  }
 
   /**
     * This method returns all possible types for this place.
@@ -71,15 +66,13 @@ trait ScReferenceExpression
   def shapeType: TypeResult[ScType]
 
   override def createReplacingElementWithClassName(
-      useFullQualifiedName: Boolean, clazz: TypeToImport) = {
-    if (useFullQualifiedName) {
+      useFullQualifiedName: Boolean, clazz: TypeToImport) =
+    if (useFullQualifiedName)
       super.createReplacingElementWithClassName(useFullQualifiedName, clazz)
-    } else {
+    else
       ScalaPsiElementFactory
         .createExpressionFromText(clazz.name, clazz.element.getManager)
         .asInstanceOf[ScReferenceExpression]
-    }
-  }
 
   def bindToElement(
       element: PsiElement, containingClass: Option[PsiClass]): PsiElement
@@ -88,11 +81,8 @@ trait ScReferenceExpression
 
   def getSimpleVariants(implicits: Boolean,
                         filterNotNamedVariants: Boolean): Array[ResolveResult]
-}
 
-object ScReferenceExpression {
-  object withQualifier {
+object ScReferenceExpression
+  object withQualifier
     def unapply(exp: ScReferenceExpression): Option[ScExpression] =
       exp.qualifier
-  }
-}

@@ -19,6 +19,5 @@ package org.evactor.model.attributes
   * Objects with this traits includes a message
   * 
   */
-trait HasMessage {
+trait HasMessage
   val message: String
-}

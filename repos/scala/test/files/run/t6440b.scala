@@ -1,15 +1,14 @@
 import scala.tools.partest._
 import java.io.File
 
-object Test extends StoreReporterDirectTest {
+object Test extends StoreReporterDirectTest
   def code = ???
 
-  def compileCode(code: String) = {
+  def compileCode(code: String) =
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(code)
-  }
 
   def library1 = """
     package pack1
@@ -41,7 +40,7 @@ object Test extends StoreReporterDirectTest {
     }
   """
 
-  def show(): Unit = {
+  def show(): Unit =
     compileCode(library1)
     val pack1 = new File(testOutput.path, "pack1")
     val tClass = new File(pack1, "T.class")
@@ -59,5 +58,3 @@ object Test extends StoreReporterDirectTest {
     // bad symbolic reference error expected (but no stack trace!)
     compileCode(app2)
     println(filteredInfos.mkString("\n"))
-  }
-}

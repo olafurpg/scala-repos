@@ -6,7 +6,7 @@ import cats.functor.Contravariant
 /** `F` on the left and `G` on the right of [[Xor]].
   *
   * @param run The underlying [[Xor]]. */
-final case class Coproduct[F[_], G[_], A](run: F[A] Xor G[A]) {
+final case class Coproduct[F[_], G[_], A](run: F[A] Xor G[A])
 
   import Coproduct._
 
@@ -66,9 +66,8 @@ final case class Coproduct[F[_], G[_], A](run: F[A] Xor G[A]) {
 
   def toValidated: Validated[F[A], G[A]] =
     run.toValidated
-}
 
-object Coproduct extends CoproductInstances {
+object Coproduct extends CoproductInstances
 
   def leftc[F[_], G[_], A](x: F[A]): Coproduct[F, G, A] =
     Coproduct(Xor.left(x))
@@ -76,20 +75,17 @@ object Coproduct extends CoproductInstances {
   def rightc[F[_], G[_], A](x: G[A]): Coproduct[F, G, A] =
     Coproduct(Xor.right(x))
 
-  final class CoproductLeft[G[_]] private[Coproduct] {
+  final class CoproductLeft[G[_]] private[Coproduct]
     def apply[F[_], A](fa: F[A]): Coproduct[F, G, A] = Coproduct(Xor.left(fa))
-  }
 
-  final class CoproductRight[F[_]] private[Coproduct] {
+  final class CoproductRight[F[_]] private[Coproduct]
     def apply[G[_], A](ga: G[A]): Coproduct[F, G, A] = Coproduct(Xor.right(ga))
-  }
 
   def left[G[_]]: CoproductLeft[G] = new CoproductLeft[G]
 
   def right[F[_]]: CoproductRight[F] = new CoproductRight[F]
-}
 
-private[data] sealed abstract class CoproductInstances3 {
+private[data] sealed abstract class CoproductInstances3
 
   implicit def coproductEq[F[_], G[_], A](
       implicit E: Eq[F[A] Xor G[A]]): Eq[Coproduct[F, G, A]] =
@@ -97,92 +93,79 @@ private[data] sealed abstract class CoproductInstances3 {
 
   implicit def coproductFunctor[F[_], G[_]](
       implicit F0: Functor[F], G0: Functor[G]): Functor[Coproduct[F, G, ?]] =
-    new CoproductFunctor[F, G] {
+    new CoproductFunctor[F, G]
       implicit def F: Functor[F] = F0
 
       implicit def G: Functor[G] = G0
-    }
 
   implicit def coproductFoldable[F[_], G[_]](
       implicit F0: Foldable[F],
       G0: Foldable[G]): Foldable[Coproduct[F, G, ?]] =
-    new CoproductFoldable[F, G] {
+    new CoproductFoldable[F, G]
       implicit def F: Foldable[F] = F0
 
       implicit def G: Foldable[G] = G0
-    }
-}
 
 private[data] sealed abstract class CoproductInstances2
-    extends CoproductInstances3 {
+    extends CoproductInstances3
 
   implicit def coproductContravariant[F[_], G[_]](
       implicit F0: Contravariant[F],
       G0: Contravariant[G]): Contravariant[Coproduct[F, G, ?]] =
-    new CoproductContravariant[F, G] {
+    new CoproductContravariant[F, G]
       implicit def F: Contravariant[F] = F0
 
       implicit def G: Contravariant[G] = G0
-    }
-}
 
 private[data] sealed abstract class CoproductInstances1
-    extends CoproductInstances2 {
+    extends CoproductInstances2
   implicit def coproductCoflatMap[F[_], G[_]](
       implicit F0: CoflatMap[F],
       G0: CoflatMap[G]): CoflatMap[Coproduct[F, G, ?]] =
-    new CoproductCoflatMap[F, G] {
+    new CoproductCoflatMap[F, G]
       implicit def F: CoflatMap[F] = F0
 
       implicit def G: CoflatMap[G] = G0
-    }
-}
 
 private[data] sealed abstract class CoproductInstances0
-    extends CoproductInstances1 {
+    extends CoproductInstances1
   implicit def coproductTraverse[F[_], G[_]](
       implicit F0: Traverse[F],
       G0: Traverse[G]): Traverse[Coproduct[F, G, ?]] =
-    new CoproductTraverse[F, G] {
+    new CoproductTraverse[F, G]
       implicit def F: Traverse[F] = F0
 
       implicit def G: Traverse[G] = G0
-    }
-}
 
-sealed abstract class CoproductInstances extends CoproductInstances0 {
+sealed abstract class CoproductInstances extends CoproductInstances0
 
   implicit def coproductComonad[F[_], G[_]](
       implicit F0: Comonad[F], G0: Comonad[G]): Comonad[Coproduct[F, G, ?]] =
-    new CoproductComonad[F, G] {
+    new CoproductComonad[F, G]
       implicit def F: Comonad[F] = F0
 
       implicit def G: Comonad[G] = G0
-    }
-}
 
 private[data] trait CoproductFunctor[F[_], G[_]]
-    extends Functor[Coproduct[F, G, ?]] {
+    extends Functor[Coproduct[F, G, ?]]
   implicit def F: Functor[F]
 
   implicit def G: Functor[G]
 
   def map[A, B](a: Coproduct[F, G, A])(f: A => B): Coproduct[F, G, B] =
     a map f
-}
 
 private[data] trait CoproductContravariant[F[_], G[_]]
-    extends Contravariant[Coproduct[F, G, ?]] {
+    extends Contravariant[Coproduct[F, G, ?]]
   implicit def F: Contravariant[F]
 
   implicit def G: Contravariant[G]
 
   def contramap[A, B](a: Coproduct[F, G, A])(f: B => A): Coproduct[F, G, B] =
     a contramap f
-}
 
 private[data] trait CoproductFoldable[F[_], G[_]]
-    extends Foldable[Coproduct[F, G, ?]] {
+    extends Foldable[Coproduct[F, G, ?]]
   implicit def F: Foldable[F]
 
   implicit def G: Foldable[G]
@@ -197,10 +180,9 @@ private[data] trait CoproductFoldable[F[_], G[_]]
   override def foldMap[A, B](fa: Coproduct[F, G, A])(f: A => B)(
       implicit M: Monoid[B]): B =
     fa foldMap f
-}
 
 private[data] trait CoproductTraverse[F[_], G[_]]
-    extends CoproductFoldable[F, G] with Traverse[Coproduct[F, G, ?]] {
+    extends CoproductFoldable[F, G] with Traverse[Coproduct[F, G, ?]]
   implicit def F: Traverse[F]
 
   implicit def G: Traverse[G]
@@ -212,10 +194,9 @@ private[data] trait CoproductTraverse[F[_], G[_]]
   override def traverse[X[_]: Applicative, A, B](fa: Coproduct[F, G, A])(
       f: A => X[B]): X[Coproduct[F, G, B]] =
     fa traverse f
-}
 
 private[data] trait CoproductCoflatMap[F[_], G[_]]
-    extends CoflatMap[Coproduct[F, G, ?]] {
+    extends CoflatMap[Coproduct[F, G, ?]]
   implicit def F: CoflatMap[F]
 
   implicit def G: CoflatMap[G]
@@ -230,14 +211,12 @@ private[data] trait CoproductCoflatMap[F[_], G[_]]
   override def coflatten[A](
       fa: Coproduct[F, G, A]): Coproduct[F, G, Coproduct[F, G, A]] =
     fa.coflatten
-}
 
 private[data] trait CoproductComonad[F[_], G[_]]
-    extends Comonad[Coproduct[F, G, ?]] with CoproductCoflatMap[F, G] {
+    extends Comonad[Coproduct[F, G, ?]] with CoproductCoflatMap[F, G]
   implicit def F: Comonad[F]
 
   implicit def G: Comonad[G]
 
   def extract[A](p: Coproduct[F, G, A]): A =
     p.extract
-}

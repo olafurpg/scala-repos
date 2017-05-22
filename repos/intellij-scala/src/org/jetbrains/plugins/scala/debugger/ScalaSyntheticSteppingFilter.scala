@@ -13,26 +13,24 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 /**
   * @author Nikolay.Tropin
   */
-class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter {
+class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter
 
-  override def isApplicable(context: SuspendContext): Boolean = {
+  override def isApplicable(context: SuspendContext): Boolean =
     val debugProcess = context.getDebugProcess
     val frameProxy = context.getFrameProxy
     if (debugProcess == null || frameProxy == null) return false
 
     val location = frameProxy.location()
     isSynthetic(location, debugProcess)
-  }
 
   override def getStepRequestDepth(context: SuspendContext): Int =
     StepRequest.STEP_INTO
 
   private def isSynthetic(
-      location: Location, debugProcess: DebugProcess): Boolean = {
-    val positionManager = ScalaPositionManager.instance(debugProcess) match {
+      location: Location, debugProcess: DebugProcess): Boolean =
+    val positionManager = ScalaPositionManager.instance(debugProcess) match
       case Some(m) => m
       case None => return true
-    }
 
     val method = location.method()
     val name = method.name()
@@ -46,28 +44,21 @@ class ScalaSyntheticSteppingFilter extends ExtraSteppingFilter {
 
     if (method.isConstructor) return false
 
-    inReadAction {
-      positionManager.findElementByReferenceType(location.declaringType()) match {
+    inReadAction
+      positionManager.findElementByReferenceType(location.declaringType()) match
         case Some(td: ScTemplateDefinition) =>
           td.functions.forall(f => !nameMatches(name, f.name)) &&
           !hasLocalFun(name, td)
         case _ => false
-      }
-    }
-  }
 
-  private def hasLocalFun(name: String, td: PsiElement): Boolean = {
+  private def hasLocalFun(name: String, td: PsiElement): Boolean =
     td.depthFirst(elem =>
             elem == td || !ScalaEvaluatorBuilderUtil.isGenerateClass(elem))
-      .exists {
+      .exists
         case fun: ScFunction if fun.isLocal => nameMatches(name, fun.name)
         case _ => false
-      }
-  }
 
-  private def nameMatches(jvmName: String, funName: String) = {
+  private def nameMatches(jvmName: String, funName: String) =
     val encoded = ScalaNamesUtil.toJavaName(funName)
     encoded == jvmName || jvmName.startsWith(encoded + "$") ||
     jvmName.contains("$$" + encoded + "$")
-  }
-}

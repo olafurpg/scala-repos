@@ -19,8 +19,8 @@ import io.prediction.tools.Runner
 case class ImportArgs(
     appId: Int = 0, channel: Option[String] = None, inputPath: String = "")
 
-object Import {
-  def fileToEvents(ca: ConsoleArgs): Int = {
+object Import
+  def fileToEvents(ca: ConsoleArgs): Int =
     val channelArg =
       ca.imprt.channel.map(ch => Seq("--channel", ch)).getOrElse(Nil)
     Runner.runOnSpark("io.prediction.tools.imprt.FileToEvents",
@@ -30,5 +30,3 @@ object Import {
                           ca.imprt.inputPath) ++ channelArg,
                       ca,
                       Nil)
-  }
-}

@@ -28,7 +28,7 @@ import scala.language.implicitConversions
   *  @contentDiagram hideNodes "*Api"
   *  @group ReflectionAPI
   */
-trait Names {
+trait Names
 
   /** An implicit conversion from String to TermName.
     * Enables an alternative notation `"map": TermName` as opposed to `TermName("map")`.
@@ -72,7 +72,7 @@ trait Names {
   /** The API of Name instances.
     *  @group API
     */
-  abstract class NameApi {
+  abstract class NameApi
 
     /** Checks whether the name is a term name */
     def isTermName: Boolean
@@ -105,7 +105,6 @@ trait Names {
     /** The encoded name, still represented as a name.
       */
     def encodedName: Name
-  }
 
   /** Create a new term name.
     *  @group Names
@@ -127,10 +126,9 @@ trait Names {
   /** An extractor class to create and pattern match with syntax `TermName(s)`.
     *  @group Extractors
     */
-  abstract class TermNameExtractor {
+  abstract class TermNameExtractor
     def apply(s: String): TermName
     def unapply(name: TermName): Option[String]
-  }
 
   /** The constructor/extractor for `TypeName` instances.
     *  @group Extractors
@@ -140,8 +138,6 @@ trait Names {
   /** An extractor class to create and pattern match with syntax `TypeName(s)`.
     *  @group Extractors
     */
-  abstract class TypeNameExtractor {
+  abstract class TypeNameExtractor
     def apply(s: String): TypeName
     def unapply(name: TypeName): Option[String]
-  }
-}

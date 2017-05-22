@@ -6,59 +6,47 @@ import reflect.ClassTag
   * instances employing various strategies.
   */
 sealed abstract class Memo[
-    @specialized(Int) K, @specialized(Int, Long, Double) V] {
+    @specialized(Int) K, @specialized(Int, Long, Double) V]
   def apply(z: K => V): K => V
-}
 
 sealed abstract class MemoInstances {}
 
 /** @define immuMapNote As this memo uses a single var, it's
   * thread-safe. */
-object Memo extends MemoInstances {
+object Memo extends MemoInstances
   def memo[@specialized(Int) K, @specialized(Int, Long, Double) V](
-      f: (K => V) => K => V): Memo[K, V] = new Memo[K, V] {
+      f: (K => V) => K => V): Memo[K, V] = new Memo[K, V]
     def apply(z: K => V) = f(z)
-  }
 
   def nilMemo[@specialized(Int) K, @specialized(Int, Long, Double) V]: Memo[
       K, V] = memo[K, V](z => z)
 
-  private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V] {
-    override def apply(f: (Int) => V) = {
+  private class ArrayMemo[V >: Null : ClassTag](n: Int) extends Memo[Int, V]
+    override def apply(f: (Int) => V) =
       lazy val a = new Array[V](n)
       k =>
-        {
           val t = a(k)
-          if (t == null) {
+          if (t == null)
             val v = f(k)
             a(k) = v
             v
-          } else t
-        }
-    }
-  }
+          else t
 
   private class DoubleArrayMemo(n: Int, sentinel: Double)
-      extends Memo[Int, Double] {
-    override def apply(f: (Int) => Double) = {
-      lazy val a = {
-        if (sentinel == 0d) {
+      extends Memo[Int, Double]
+    override def apply(f: (Int) => Double) =
+      lazy val a =
+        if (sentinel == 0d)
           new Array[Double](n)
-        } else {
+        else
           Array.fill(n)(sentinel)
-        }
-      }
       k =>
-        {
           val t = a(k)
-          if (t == sentinel) {
+          if (t == sentinel)
             val v = f(k)
             a(k) = v
             v
-          } else t
-        }
-    }
-  }
+          else t
 
   /** Cache results in an `n`-long array. */
   def arrayMemo[V >: Null : ClassTag](n: Int): Memo[Int, V] = new ArrayMemo(n)
@@ -89,20 +77,17 @@ object Memo extends MemoInstances {
 
   import collection.immutable
 
-  def immutableMapMemo[K, V](m: immutable.Map[K, V]): Memo[K, V] = {
+  def immutableMapMemo[K, V](m: immutable.Map[K, V]): Memo[K, V] =
     var a = m
 
     memo[K, V](
         f =>
           k =>
-            {
-          a get k getOrElse {
+          a get k getOrElse
             val v = f(k)
             a = a updated (k, v)
             v
-          }
-    })
-  }
+    )
 
   /** Cache results in a hash map.  Nonsensical unless `K` has
     * a meaningful `hashCode` and `java.lang.Object.equals`.
@@ -120,4 +105,3 @@ object Memo extends MemoInstances {
   /** Cache results in a tree map. $immuMapNote */
   def immutableTreeMapMemo[K : scala.Ordering, V]: Memo[K, V] =
     immutableMapMemo(new immutable.TreeMap[K, V])
-}

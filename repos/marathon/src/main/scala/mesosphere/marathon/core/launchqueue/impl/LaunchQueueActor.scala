@@ -14,14 +14,12 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.util.control.NonFatal
 
-private[launchqueue] object LaunchQueueActor {
+private[launchqueue] object LaunchQueueActor
   def props(config: LaunchQueueConfig,
-            appActorProps: (AppDefinition, Int) => Props): Props = {
+            appActorProps: (AppDefinition, Int) => Props): Props =
     Props(new LaunchQueueActor(config, appActorProps))
-  }
 
   case class FullCount(appId: PathId)
-}
 
 /**
   * An actor-based implementation of the [[LaunchQueue]] interface.
@@ -31,7 +29,7 @@ private[launchqueue] object LaunchQueueActor {
 private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
                                      appActorProps: (AppDefinition,
                                      Int) => Props)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   import LaunchQueueDelegate._
 
   /** Currently active actors by pathId. */
@@ -58,7 +56,7 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
   implicit val askTimeout: Timeout =
     launchQueueConfig.launchQueueRequestTimeout().milliseconds
 
-  override def receive: Receive = LoggingReceive {
+  override def receive: Receive = LoggingReceive
     Seq(
         receiveHandlePurging,
         receiveTaskUpdateToSuspendedActor,
@@ -66,7 +64,6 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
         receiveTaskUpdate,
         receiveHandleNormalCommands
     ).reduce(_.orElse[Any, Unit](_))
-  }
 
   /**
     * Handles purging of an actor.
@@ -79,9 +76,9 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
     * have been sent to this actor. When we receive confirmation of the actor's death (Terminated),
     * we will replay these messages to ourselves with the correct sender.
     */
-  private[this] def receiveHandlePurging: Receive = {
+  private[this] def receiveHandlePurging: Receive =
     case Purge(appId) =>
-      launchers.get(appId) match {
+      launchers.get(appId) match
         case Some(actorRef) =>
           val deferredMessages: Vector[DeferredMessage] =
             suspendedLaunchersMessages(actorRef) :+ DeferredMessage(
@@ -90,17 +87,16 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
           suspendedLauncherPathIds += appId
           actorRef ! AppTaskLauncherActor.Stop
         case None => sender() ! (())
-      }
 
     case ConfirmPurge => sender() ! (())
 
     case Terminated(actorRef) =>
-      launcherRefs.get(actorRef) match {
+      launcherRefs.get(actorRef) match
         case Some(pathId) =>
           launcherRefs -= actorRef
           launchers -= pathId
 
-          suspendedLaunchersMessages.get(actorRef) match {
+          suspendedLaunchersMessages.get(actorRef) match
             case None =>
               log.warning(
                   "Got unexpected terminated for app {}: {}", pathId, actorRef)
@@ -110,19 +106,15 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
 
               suspendedLauncherPathIds -= pathId
               suspendedLaunchersMessages -= actorRef
-          }
         case None =>
           log.warning(
               "Don't know anything about terminated actor: {}", actorRef)
-      }
-  }
 
-  private[this] def receiveTaskUpdateToSuspendedActor: Receive = {
+  private[this] def receiveTaskUpdateToSuspendedActor: Receive =
     case update: TaskStatusUpdate if suspendedLauncherPathIds(update.appId) =>
       deferMessageToSuspendedActor(update, update.appId)
-  }
 
-  private[this] def receiveMessagesToSuspendedActor: Receive = {
+  private[this] def receiveMessagesToSuspendedActor: Receive =
     case msg @ Count(appId) if suspendedLauncherPathIds(appId) =>
       deferMessageToSuspendedActor(msg, appId)
 
@@ -132,29 +124,25 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
     case msg @ RateLimiterActor.DelayUpdate(app, _)
         if suspendedLauncherPathIds(app.id) =>
       deferMessageToSuspendedActor(msg, app.id)
-  }
 
   private[this] def deferMessageToSuspendedActor(
-      msg: Any, appId: PathId): Unit = {
+      msg: Any, appId: PathId): Unit =
     val actorRef = launchers(appId)
     val deferredMessages: Vector[DeferredMessage] =
       suspendedLaunchersMessages(actorRef) :+ DeferredMessage(sender(), msg)
     suspendedLaunchersMessages += actorRef -> deferredMessages
-  }
 
-  private[this] def receiveTaskUpdate: Receive = {
+  private[this] def receiveTaskUpdate: Receive =
     case update: TaskStatusUpdate =>
       import context.dispatcher
-      launchers.get(update.appId) match {
+      launchers.get(update.appId) match
         case Some(actorRef) =>
           val eventualCount: Future[QueuedTaskInfo] =
             (actorRef ? update).mapTo[QueuedTaskInfo]
           eventualCount.map(Some(_)).pipeTo(sender())
         case None => sender() ! None
-      }
-  }
 
-  private[this] def receiveHandleNormalCommands: Receive = {
+  private[this] def receiveHandleNormalCommands: Receive =
     case List =>
       import context.dispatcher
       val scatter = launchers.keys.map(
@@ -165,16 +153,15 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
 
     case Count(appId) =>
       import context.dispatcher
-      launchers.get(appId) match {
+      launchers.get(appId) match
         case Some(actorRef) =>
           val eventualCount: Future[QueuedTaskInfo] =
             (actorRef ? AppTaskLauncherActor.GetCount).mapTo[QueuedTaskInfo]
           eventualCount.map(Some(_)).pipeTo(sender())
         case None => sender() ! None
-      }
 
     case Add(app, count) =>
-      launchers.get(app.id) match {
+      launchers.get(app.id) match
         case None =>
           import context.dispatcher
           val actorRef = createAppTaskLauncher(app, count)
@@ -188,14 +175,12 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
             (actorRef ? AppTaskLauncherActor.AddTasks(app, count))
               .mapTo[QueuedTaskInfo]
           eventualCount.map(_ => ()).pipeTo(sender())
-      }
 
     case msg @ RateLimiterActor.DelayUpdate(app, _) =>
       launchers.get(app.id).foreach(_.forward(msg))
-  }
 
   private[this] def createAppTaskLauncher(
-      app: AppDefinition, initialCount: Int): ActorRef = {
+      app: AppDefinition, initialCount: Int): ActorRef =
     val actorRef = context.actorOf(
         appActorProps(app, initialCount), s"$childSerial-${app.id.safePath}")
     childSerial += 1
@@ -203,13 +188,10 @@ private[impl] class LaunchQueueActor(launchQueueConfig: LaunchQueueConfig,
     launcherRefs += actorRef -> app.id
     context.watch(actorRef)
     actorRef
-  }
 
-  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
+  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy()
     case NonFatal(e) =>
       // We periodically check if scaling is needed, so we should recover. TODO: Speedup
       // Just restarting an AppTaskLauncherActor will potentially lead to starting too many tasks.
       Stop
     case m: Any => SupervisorStrategy.defaultDecider(m)
-  }
-}

@@ -18,7 +18,7 @@ import java.security.interfaces.RSAPublicKey
 /**
   * A fake key store
   */
-object FakeKeyStore {
+object FakeKeyStore
   private val logger = Logger(FakeKeyStore.getClass)
   val GeneratedKeyStore = "conf/generated.keystore"
   val DnName =
@@ -26,36 +26,31 @@ object FakeKeyStore {
   val SignatureAlgorithmOID = AlgorithmId.sha256WithRSAEncryption_oid
   val SignatureAlgorithmName = "SHA256withRSA"
 
-  def shouldGenerate(keyStoreFile: File): Boolean = {
+  def shouldGenerate(keyStoreFile: File): Boolean =
     import scala.collection.JavaConverters._
 
-    if (!keyStoreFile.exists()) {
+    if (!keyStoreFile.exists())
       return true
-    }
 
     // Should regenerate if we find an unacceptably weak key in there.
     val store = KeyStore.getInstance("JKS")
     val in = new FileInputStream(keyStoreFile)
-    try {
+    try
       store.load(in, "".toCharArray)
-    } finally {
+    finally
       PlayIO.closeQuietly(in)
-    }
-    store.aliases().asScala.exists { alias =>
+    store.aliases().asScala.exists  alias =>
       Option(store.getCertificate(alias)).exists(c => certificateTooWeak(c))
-    }
-  }
 
-  def certificateTooWeak(c: java.security.cert.Certificate): Boolean = {
+  def certificateTooWeak(c: java.security.cert.Certificate): Boolean =
     val key: RSAPublicKey = c.getPublicKey.asInstanceOf[RSAPublicKey]
     key.getModulus.bitLength < 2048 ||
     c.asInstanceOf[X509CertImpl].getSigAlgName != SignatureAlgorithmName
-  }
 
-  def keyManagerFactory(appPath: File): KeyManagerFactory = {
+  def keyManagerFactory(appPath: File): KeyManagerFactory =
     val keyStore = KeyStore.getInstance("JKS")
     val keyStoreFile = new File(appPath, GeneratedKeyStore)
-    if (shouldGenerate(keyStoreFile)) {
+    if (shouldGenerate(keyStoreFile))
 
       logger.info(
           "Generating HTTPS key pair in " + keyStoreFile.getAbsolutePath +
@@ -75,27 +70,23 @@ object FakeKeyStore {
           "playgenerated", keyPair.getPrivate, "".toCharArray, Array(cert))
       keyStore.setCertificateEntry("playgeneratedtrusted", cert)
       val out = new FileOutputStream(keyStoreFile)
-      try {
+      try
         keyStore.store(out, "".toCharArray)
-      } finally {
+      finally
         PlayIO.closeQuietly(out)
-      }
-    } else {
+    else
       val in = new FileInputStream(keyStoreFile)
-      try {
+      try
         keyStore.load(in, "".toCharArray)
-      } finally {
+      finally
         PlayIO.closeQuietly(in)
-      }
-    }
 
     // Load the key and certificate into a key manager factory
     val kmf = KeyManagerFactory.getInstance("SunX509")
     kmf.init(keyStore, "".toCharArray)
     kmf
-  }
 
-  def createSelfSignedCertificate(keyPair: KeyPair): X509Certificate = {
+  def createSelfSignedCertificate(keyPair: KeyPair): X509Certificate =
     val certInfo = new X509CertInfo()
 
     // Serial number and version
@@ -142,5 +133,3 @@ object FakeKeyStore {
     val newCert = new X509CertImpl(certInfo)
     newCert.sign(keyPair.getPrivate, SignatureAlgorithmName)
     newCert
-  }
-}

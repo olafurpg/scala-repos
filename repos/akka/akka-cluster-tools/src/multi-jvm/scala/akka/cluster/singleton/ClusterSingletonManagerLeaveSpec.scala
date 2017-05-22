@@ -27,7 +27,7 @@ import akka.actor.Terminated
 import akka.actor.ActorSelection
 import akka.cluster.MemberStatus
 
-object ClusterSingletonManagerLeaveSpec extends MultiNodeConfig {
+object ClusterSingletonManagerLeaveSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -44,17 +44,13 @@ object ClusterSingletonManagerLeaveSpec extends MultiNodeConfig {
   /**
     * The singleton actor
     */
-  class Echo(testActor: ActorRef) extends Actor {
-    override def postStop(): Unit = {
+  class Echo(testActor: ActorRef) extends Actor
+    override def postStop(): Unit =
       testActor ! "stopped"
-    }
 
-    def receive = {
+    def receive =
       case _ ⇒
         sender() ! self
-    }
-  }
-}
 
 class ClusterSingletonManagerLeaveMultiJvmNode1
     extends ClusterSingletonManagerLeaveSpec
@@ -65,76 +61,62 @@ class ClusterSingletonManagerLeaveMultiJvmNode3
 
 class ClusterSingletonManagerLeaveSpec
     extends MultiNodeSpec(ClusterSingletonManagerLeaveSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec with ImplicitSender
   import ClusterSingletonManagerLeaveSpec._
 
   override def initialParticipants = roles.size
 
   lazy val cluster = Cluster(system)
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       cluster join node(to).address
       createSingleton()
-    }
-  }
 
-  def createSingleton(): ActorRef = {
+  def createSingleton(): ActorRef =
     system.actorOf(ClusterSingletonManager.props(
                        singletonProps = Props(classOf[Echo], testActor),
                        terminationMessage = PoisonPill,
                        settings = ClusterSingletonManagerSettings(system)),
                    name = "echo")
-  }
 
-  lazy val echoProxy: ActorRef = {
+  lazy val echoProxy: ActorRef =
     system.actorOf(ClusterSingletonProxy.props(
                        singletonManagerPath = "/user/echo",
                        settings = ClusterSingletonProxySettings(system)),
                    name = "echoProxy")
-  }
 
-  "Leaving ClusterSingletonManager" must {
+  "Leaving ClusterSingletonManager" must
 
-    "hand-over to new instance" in {
+    "hand-over to new instance" in
       join(first, first)
 
-      runOn(first) {
+      runOn(first)
         echoProxy ! "hello"
         expectMsgType[ActorRef](5.seconds)
-      }
       enterBarrier("first-active")
 
       join(second, first)
       join(third, first)
-      within(10.seconds) {
+      within(10.seconds)
         awaitAssert(cluster.state.members
               .count(m ⇒ m.status == MemberStatus.Up) should be(3))
-      }
       enterBarrier("all-up")
 
-      runOn(second) {
+      runOn(second)
         cluster.leave(node(first).address)
-      }
 
-      runOn(first) {
+      runOn(first)
         expectMsg(10.seconds, "stopped")
-      }
       enterBarrier("first-stopped")
 
-      runOn(second, third) {
+      runOn(second, third)
         val p = TestProbe()
         val firstAddress = node(first).address
-        p.within(10.seconds) {
-          p.awaitAssert {
+        p.within(10.seconds)
+          p.awaitAssert
             echoProxy.tell("hello2", p.ref)
             p.expectMsgType[ActorRef](1.seconds).path.address should not be
             (firstAddress)
-          }
-        }
-      }
 
       enterBarrier("hand-over-done")
-    }
-  }
-}

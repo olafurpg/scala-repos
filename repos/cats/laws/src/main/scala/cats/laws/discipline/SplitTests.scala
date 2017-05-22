@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait SplitTests[F[_, _]] extends ComposeTests[F] {
+trait SplitTests[F[_, _]] extends ComposeTests[F]
   def laws: SplitLaws[F]
 
   def split[A, B, C, D, E, G](implicit ArbFAB: Arbitrary[F[A, B]],
@@ -21,9 +21,7 @@ trait SplitTests[F[_, _]] extends ComposeTests[F] {
                        parent = Some(compose[A, B, C, D]),
                        "split interchange" -> forAll(
                            laws.splitInterchange[A, B, C, D, E, G] _))
-}
 
-object SplitTests {
+object SplitTests
   def apply[F[_, _]: Split]: SplitTests[F] =
     new SplitTests[F] { def laws: SplitLaws[F] = SplitLaws[F] }
-}

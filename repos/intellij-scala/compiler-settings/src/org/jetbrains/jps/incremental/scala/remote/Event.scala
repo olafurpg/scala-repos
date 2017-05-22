@@ -9,30 +9,25 @@ import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
 /**
   * @author Pavel Fatin
   */
-sealed abstract class Event {
-  def toBytes: Array[Byte] = {
+sealed abstract class Event
+  def toBytes: Array[Byte] =
     val buffer = new ByteArrayOutputStream()
     val stream = new ObjectOutputStream(buffer)
     stream.writeObject(this)
     stream.close()
     buffer.toByteArray
-  }
-}
 
-object Event {
-  def fromBytes(bytes: Array[Byte]): Event = {
+object Event
+  def fromBytes(bytes: Array[Byte]): Event =
     val buffer = new ByteArrayInputStream(bytes)
     val stream = new ObjectInputStream(buffer)
     val event = stream.readObject().asInstanceOf[Event]
-    if (stream.available > 0) {
+    if (stream.available > 0)
       val excess = FileUtil.loadTextAndClose(stream)
       throw new IllegalArgumentException(
           "Excess bytes after event deserialization: " + excess)
-    }
     stream.close()
     event
-  }
-}
 
 @SerialVersionUID(1317094340928824239L)
 case class MessageEvent(kind: Kind,

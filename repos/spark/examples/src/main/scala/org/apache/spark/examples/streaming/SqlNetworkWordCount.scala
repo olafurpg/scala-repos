@@ -37,12 +37,11 @@ import org.apache.spark.streaming.{Seconds, StreamingContext, Time}
   * and then run the example
   *    `$ bin/run-example org.apache.spark.examples.streaming.SqlNetworkWordCount localhost 9999`
   */
-object SqlNetworkWordCount {
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+object SqlNetworkWordCount
+  def main(args: Array[String])
+    if (args.length < 2)
       System.err.println("Usage: NetworkWordCount <hostname> <port>")
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -61,7 +60,6 @@ object SqlNetworkWordCount {
     // Convert RDDs of the words DStream to DataFrame and run SQL query
     words.foreachRDD(
         (rdd: RDD[String], time: Time) =>
-          {
         // Get the singleton instance of SQLContext
         val sqlContext = SQLContextSingleton.getInstance(rdd.sparkContext)
         import sqlContext.implicits._
@@ -77,26 +75,21 @@ object SqlNetworkWordCount {
             "select word, count(*) as total from words group by word")
         println(s"========= $time =========")
         wordCountsDataFrame.show()
-    })
+    )
 
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 
 /** Case class for converting RDD to DataFrame */
 case class Record(word: String)
 
 /** Lazily instantiated singleton instance of SQLContext */
-object SQLContextSingleton {
+object SQLContextSingleton
 
   @transient private var instance: SQLContext = _
 
-  def getInstance(sparkContext: SparkContext): SQLContext = {
-    if (instance == null) {
+  def getInstance(sparkContext: SparkContext): SQLContext =
+    if (instance == null)
       instance = new SQLContext(sparkContext)
-    }
     instance
-  }
-}
 // scalastyle:on println

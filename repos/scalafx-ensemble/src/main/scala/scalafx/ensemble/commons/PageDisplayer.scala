@@ -35,27 +35,21 @@ import scalafx.scene.layout.{Priority, VBox}
   * the class that updates tabbed view or dashboard view
   * based on the TreeItem selected from left pane
   */
-object PageDisplayer {
+object PageDisplayer
 
-  def choosePage(value: String = "dashBoard"): Node = {
-    value match {
+  def choosePage(value: String = "dashBoard"): Node =
+    value match
       case "dashBoard" => displayPage(new DashboardPage())
       case _ =>
-        if (value.startsWith("dashBoard - ")) {
+        if (value.startsWith("dashBoard - "))
           displayPage(new DashboardPage(value.split("-")(1).trim()))
-        } else {
+        else
           displayPage(
               EnsembleTabbedPage.buildTab(
                   value.split(">")(1).trim(), value.split(">")(0).trim()))
-        }
-    }
-  }
 
-  private def displayPage(nodeToAdd: DisplayablePage): Node = {
-    new VBox {
+  private def displayPage(nodeToAdd: DisplayablePage): Node =
+    new VBox
       vgrow = Priority.Always
       hgrow = Priority.Always
       children = nodeToAdd.getPage
-    }
-  }
-}

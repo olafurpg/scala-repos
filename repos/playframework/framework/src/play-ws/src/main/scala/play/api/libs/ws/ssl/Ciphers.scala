@@ -15,7 +15,7 @@ import javax.net.ssl.SSLContext
   *
   * Please see https://www.playframework.com/documentation/latest/CipherSuites for more details.
   */
-object Ciphers {
+object Ciphers
 
   // We want to prioritize ECC and perfect forward security.
   // Unfortunately, ECC is only available under the "SunEC" provider, which is part of Oracle JDK.  If you're
@@ -26,9 +26,9 @@ object Ciphers {
     foldVersion(
         run16 = java16RecommendedCiphers, runHigher = java17RecommendedCiphers)
 
-  lazy val java17RecommendedCiphers: Seq[String] = {
+  lazy val java17RecommendedCiphers: Seq[String] =
     SSLContext.getDefault.getDefaultSSLParameters.getCipherSuites
-  }.filterNot(deprecatedCiphers.contains(_))
+  .filterNot(deprecatedCiphers.contains(_))
 
   val java16RecommendedCiphers: Seq[String] = Seq(
       "TLS_DHE_RSA_WITH_AES_128_CBC_SHA",
@@ -180,4 +180,3 @@ object Ciphers {
   // rc4 added to deprecated ciphers as of https://tools.ietf.org/html/rfc7465
   val deprecatedCiphers =
     desCiphers ++ nullCiphers ++ anonCiphers ++ exportCiphers ++ rc4Ciphers
-}

@@ -27,7 +27,7 @@ import scala.annotation.tailrec
   *
   * @author Miles Sabin
   */
-final class HListOps[L <: HList](l: L) extends Serializable {
+final class HListOps[L <: HList](l: L) extends Serializable
   import ops.adjoin.Adjoin
   import ops.hlist._
 
@@ -126,10 +126,9 @@ final class HListOps[L <: HList](l: L) extends Serializable {
     * Returns the elements of this `HList` specified by `Ids`. Available only if there is
     * evidence that this `HList` contains all elements specified in `Ids`.
     */
-  case class SelectManyAux[L <: HList](l: L) extends NatProductArgs {
+  case class SelectManyAux[L <: HList](l: L) extends NatProductArgs
     def applyNatProduct[Ids <: HList](
         implicit sel: SelectMany[L, Ids]): sel.Out = sel(l)
-  }
 
   def selectManyType[Ids <: HList](implicit sel: SelectMany[L, Ids]): sel.Out =
     sel(l)
@@ -213,21 +212,19 @@ final class HListOps[L <: HList](l: L) extends Serializable {
     */
   def reinsert[O <: HList] = new ReinsertAux[O]
 
-  class ReinsertAux[O <: HList] {
+  class ReinsertAux[O <: HList]
     def apply[U](u: U)(implicit remove: Remove.Aux[O, U, (U, L)]): O =
       remove.reinsert((u, l))
-  }
 
   /**
     * Reinserts the elements of `SL` into this `HList` to return another `HList` `O`.
     */
   def reinsertAll[O <: HList] = new ReinsertAllAux[O]
 
-  class ReinsertAllAux[O <: HList] {
+  class ReinsertAllAux[O <: HList]
     def apply[SL <: HList](sl: SL)(
         implicit removeAll: RemoveAll.Aux[O, SL, (SL, L)]): O =
       removeAll.reinsert((sl, l))
-  }
 
   /**
     * Replaces the first element of type `U` of this `HList` with the supplied value, also of type `U` returning both
@@ -237,10 +234,9 @@ final class HListOps[L <: HList](l: L) extends Serializable {
   def replace[U](u: U)(implicit replacer: Replacer[L, U, U]): replacer.Out =
     replacer(l, u)
 
-  class ReplaceTypeAux[U] {
+  class ReplaceTypeAux[U]
     def apply[V](v: V)(implicit replacer: Replacer[L, U, V]): replacer.Out =
       replacer(l, v)
-  }
 
   /**
     * Replaces the first element of type `U` of this `HList` with the supplied value of type `V`, returning both the
@@ -278,11 +274,10 @@ final class HListOps[L <: HList](l: L) extends Serializable {
       f: n.instance.Out => V)(
       implicit upd: ModifierAt[L, n.N, n.instance.Out, V]): upd.Out = upd(l, f)
 
-  class UpdatedTypeAux[U] {
+  class UpdatedTypeAux[U]
     def apply[V, Out <: HList](v: V)(
         implicit replacer: Replacer.Aux[L, U, V, (U, Out)]): Out =
       replacer(l, v)._2
-  }
 
   /**
     * Replaces the first element of type `U` of this `HList` with the supplied value of type `V`. An explicit type
@@ -291,11 +286,10 @@ final class HListOps[L <: HList](l: L) extends Serializable {
     */
   def updatedType[U] = new UpdatedTypeAux[U]
 
-  class UpdatedAtAux[N <: Nat] {
+  class UpdatedAtAux[N <: Nat]
     def apply[U, V, Out <: HList](u: U)(
         implicit replacer: ReplaceAt.Aux[L, N, U, (V, Out)]): Out =
       replacer(l, u)._2
-  }
 
   /**
     * Replaces the ''nth' element of this `HList` with the supplied value of type `U`. An explicit type argument
@@ -611,32 +605,28 @@ final class HListOps[L <: HList](l: L) extends Serializable {
   /**
     * Compute the length of this `HList` as a runtime Int value.
     */
-  def runtimeLength: Int = {
-    @tailrec def loop(l: HList, acc: Int): Int = l match {
+  def runtimeLength: Int =
+    @tailrec def loop(l: HList, acc: Int): Int = l match
       case HNil => acc
       case hd :: tl => loop(tl, acc + 1)
-    }
 
     loop(l, 0)
-  }
 
   /**
     * Convert this `HList` to a `List[Any]`.
     */
-  def runtimeList: List[Any] = {
+  def runtimeList: List[Any] =
     val builder = List.newBuilder[Any]
 
-    @tailrec def loop(l: HList): Unit = l match {
+    @tailrec def loop(l: HList): Unit = l match
       case HNil => ()
       case hd :: tl =>
         builder += hd
         loop(tl)
-    }
 
     loop(l)
 
     builder.result
-  }
 
   /**
     * Converts this `HList` to a `M` of elements typed as the least upper bound of the types of the elements
@@ -763,10 +753,9 @@ final class HListOps[L <: HList](l: L) extends Serializable {
     */
   def patch[N <: Nat, M <: Nat] = new PatchAux[N, M]
 
-  class PatchAux[N <: Nat, M <: Nat] {
+  class PatchAux[N <: Nat, M <: Nat]
     def apply[In <: HList](in: In)(
         implicit patcher: Patcher[N, M, L, In]): patcher.Out = patcher(l, in)
-  }
 
   /**
     * Adjoins the elements of this `HList` by flattening any `HList` elements.
@@ -807,4 +796,3 @@ final class HListOps[L <: HList](l: L) extends Serializable {
     */
   def slice(from: Nat, until: Nat)(
       implicit slice: Slice[from.N, until.N, L]): slice.Out = slice(l)
-}

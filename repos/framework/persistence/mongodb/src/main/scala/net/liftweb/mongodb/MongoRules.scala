@@ -16,11 +16,10 @@ package mongodb
 import util.{ConnectionIdentifier, SimpleInjector}
 import util.Helpers._
 
-object MongoRules extends SimpleInjector {
+object MongoRules extends SimpleInjector
   private def defaultCollectionNameFunc(
-      conn: ConnectionIdentifier, name: String): String = {
+      conn: ConnectionIdentifier, name: String): String =
     charSplit(name, '.').last.toLowerCase + "s"
-  }
 
   /**
     * Calculate the name of a collection based on the full
@@ -34,4 +33,3 @@ object MongoRules extends SimpleInjector {
     */
   val collectionName = new Inject[(ConnectionIdentifier, String) => String](
       defaultCollectionNameFunc _) {}
-}

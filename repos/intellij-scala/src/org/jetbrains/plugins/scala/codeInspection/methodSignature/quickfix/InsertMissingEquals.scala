@@ -8,10 +8,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDeclaration
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 class InsertMissingEquals(functionDecl: ScFunctionDeclaration)
-    extends AbstractFixOnPsiElement("Insert missing '='", functionDecl) {
-  def doApplyFix(project: Project) {
+    extends AbstractFixOnPsiElement("Insert missing '='", functionDecl)
+  def doApplyFix(project: Project)
     val funDef = getElement
-    funDef.typeElement match {
+    funDef.typeElement match
       case Some(ScCompoundTypeElement(types, Some(refinement)))
           if types.nonEmpty =>
         val lastTypeInDecl =
@@ -23,6 +23,3 @@ class InsertMissingEquals(functionDecl: ScFunctionDeclaration)
             defAndReturnType + " = " + methodBody, funDef.getManager)
         funDef.replace(newMethod)
       case _ =>
-    }
-  }
-}

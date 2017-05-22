@@ -9,10 +9,10 @@ import scala.tools.partest._
 //  error: error while loading Outer$1, class file 't7455-run.obj/Outer$1.class' is broken
 //  (class java.util.NoSuchElementException/key not found: E)
 //  ...
-object Test extends DirectTest {
+object Test extends DirectTest
   override def code = ""
 
-  def show {
+  def show
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
@@ -20,16 +20,13 @@ object Test extends DirectTest {
     import compiler._, definitions._
     new compiler.Run
 
-    for {
+    for
       name <- Seq("Outer",
                   "Outer$PrivateInner",
                   "Outer$PrivateStaticInner",
                   "Outer$PublicInner")
       clazz = compiler.rootMirror.staticClass(name)
       constr <- clazz.info.member(termNames.CONSTRUCTOR).alternatives
-    } {
+    
       println(constr.defString)
       fullyInitializeSymbol(constr)
-    }
-  }
-}

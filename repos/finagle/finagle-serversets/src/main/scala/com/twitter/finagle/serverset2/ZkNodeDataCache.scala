@@ -53,32 +53,29 @@ import scala.collection.JavaConverters._
   * (accessed via asMap) thus we need to keep instances of each of these underlying classes.
   */
 private[serverset2] abstract class ZkNodeDataCache[Entity](
-    clusterPath: String, entityType: String, statsReceiver: StatsReceiver) {
+    clusterPath: String, entityType: String, statsReceiver: StatsReceiver)
   private[this] val logger = Logger(getClass)
 
   /** zkSession needs to be set via setSession before the cache is used */
   private[this] val zkSession = new AtomicReference(ZkSession.nil)
 
   protected[this] def loadEntity(path: String): Future[Seq[Entity]] =
-    zkSession.get.immutableDataOf(clusterPath + "/" + path).map {
+    zkSession.get.immutableDataOf(clusterPath + "/" + path).map
       case Some(Buf.Utf8(data)) =>
         val results = parseNode(path, data)
         // avoid string concatenation cost if not logging debug
-        if (logger.isLoggable(Level.DEBUG)) {
+        if (logger.isLoggable(Level.DEBUG))
           logger.debug(s"$path retrieved ${results.length} for ${entityType}")
-        }
         results
       case None => Nil
-    }
 
   private[this] val underlying: LoadingCache[String, Future[Seq[Entity]]] =
     CacheBuilder
       .newBuilder()
       .build(
-          new CacheLoader[String, Future[Seq[Entity]]] {
+          new CacheLoader[String, Future[Seq[Entity]]]
             override def load(path: String): Future[Seq[Entity]] =
               loadEntity(path)
-          }
       )
 
   private[this] val asMap = underlying.asMap
@@ -105,23 +102,19 @@ private[serverset2] abstract class ZkNodeDataCache[Entity](
   def remove(memberNode: String): Unit = underlying.invalidate(memberNode)
 
   def setSession(newZkSession: ZkSession): Unit = zkSession.set(newZkSession)
-}
 
 /** See [[ZkNodeDataCache]] comment */
 private[serverset2] class ZkEntryCache(
     clusterPath: String, statsReceiver: StatsReceiver)
-    extends ZkNodeDataCache[Entry](clusterPath, "Entry", statsReceiver) {
+    extends ZkNodeDataCache[Entry](clusterPath, "Entry", statsReceiver)
   override def parseNode(path: String, data: String): Seq[Entry] =
     Entry.parseJson(path, data)
-}
 
 /** See [[ZkNodeDataCache]] comment */
 private[serverset2] class ZkVectorCache(
     clusterPath: String, statsReceiver: StatsReceiver)
-    extends ZkNodeDataCache[Vector](clusterPath, "Vector", statsReceiver) {
+    extends ZkNodeDataCache[Vector](clusterPath, "Vector", statsReceiver)
   override def parseNode(path: String, data: String): Seq[Vector] =
-    Vector.parseJson(data) match {
+    Vector.parseJson(data) match
       case Some(vector) => Seq(vector)
       case _ => Nil
-    }
-}

@@ -12,18 +12,18 @@ import org.jetbrains.sbt.{structure => sbtStructure}
 /**
   * @author Pavel Fatin
   */
-trait ExternalSourceRootResolution { self: SbtProjectResolver =>
+trait ExternalSourceRootResolution  self: SbtProjectResolver =>
   def createSharedSourceModules(
       projectToModuleNode: Map[sbtStructure.ProjectData, ModuleNode],
       libraryNodes: Seq[LibraryNode],
-      moduleFilesDirectory: File): Seq[ModuleNode] = {
+      moduleFilesDirectory: File): Seq[ModuleNode] =
 
     val projects = projectToModuleNode.keys.toSeq
 
     val (sharedRoots, externalRoots) =
       sharedAndExternalRootsIn(projects).partition(_.projects.length > 1)
 
-    if (externalRoots.nonEmpty) {
+    if (externalRoots.nonEmpty)
       val externalRootsStr = externalRoots
         .map(_.root.directory)
         .distinct
@@ -38,22 +38,19 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
           | </p>
         """.stripMargin
       self.taskListener.onTaskOutput(WarningMessage(msg), stdOut = false)
-    }
 
-    groupSharedRoots(sharedRoots).map { group =>
+    groupSharedRoots(sharedRoots).map  group =>
       createSourceModuleNodesAndDependencies(
           group, projectToModuleNode, libraryNodes, moduleFilesDirectory)
-    }
-  }
 
   def createSourceModuleNodesAndDependencies(
       rootGroup: RootGroup,
       projectToModuleNode: Map[sbtStructure.ProjectData, ModuleNode],
       libraryNodes: Seq[LibraryNode],
-      moduleFilesDirectory: File): ModuleNode = {
+      moduleFilesDirectory: File): ModuleNode =
     val projects = rootGroup.projects
 
-    val sourceModuleNode = {
+    val sourceModuleNode =
       val moduleNode = createSourceModule(rootGroup, moduleFilesDirectory)
 
       val uniqueModuleDependencies =
@@ -63,7 +60,7 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
 
       val uniqueProjectDependencies =
         projects.flatMap(_.dependencies.projects).distinct
-      uniqueProjectDependencies.foreach { dependencyId =>
+      uniqueProjectDependencies.foreach  dependencyId =>
         val dependency = projectToModuleNode.values
           .find(_.getId == dependencyId.project)
           .getOrElse(throw new ExternalSystemException(
@@ -72,47 +69,40 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
         val dependencyNode = new ModuleDependencyNode(moduleNode, dependency)
         dependencyNode.setScope(scopeFor(dependencyId.configuration))
         moduleNode.add(dependencyNode)
-      }
 
       moduleNode
-    }
 
-    projects.map(projectToModuleNode).foreach { ownerModule =>
+    projects.map(projectToModuleNode).foreach  ownerModule =>
       val node = new ModuleDependencyNode(ownerModule, sourceModuleNode)
       node.setExported(true)
       ownerModule.add(node)
-    }
 
     sourceModuleNode
-  }
 
   private def createSourceModule(
-      group: RootGroup, moduleFilesDirectory: File): ModuleNode = {
+      group: RootGroup, moduleFilesDirectory: File): ModuleNode =
     val moduleNode = new ModuleNode(SharedSourcesModuleType.instance.getId,
                                     group.name,
                                     group.name,
                                     moduleFilesDirectory.path,
                                     group.base.canonicalPath)
 
-    val contentRootNode = {
+    val contentRootNode =
       val node = new ContentRootNode(group.base.path)
 
-      group.roots.foreach { root =>
+      group.roots.foreach  root =>
         node.storePath(scopeAndKindToSourceType(root.scope, root.kind),
                        root.directory.path)
-      }
 
       node
-    }
 
     moduleNode.add(contentRootNode)
 
     moduleNode
-  }
 
   private def scopeAndKindToSourceType(
       scope: Root.Scope, kind: Root.Kind): ExternalSystemSourceType =
-    (scope, kind) match {
+    (scope, kind) match
       case (Root.Scope.Compile, Root.Kind.Sources) =>
         ExternalSystemSourceType.SOURCE
       case (Root.Scope.Compile, Root.Kind.Resources) =>
@@ -121,10 +111,9 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
         ExternalSystemSourceType.TEST
       case (Root.Scope.Test, Root.Kind.Resources) =>
         ExternalSystemSourceType.TEST_RESOURCE
-    }
 
   private def sharedAndExternalRootsIn(
-      projects: Seq[sbtStructure.ProjectData]): Seq[SharedRoot] = {
+      projects: Seq[sbtStructure.ProjectData]): Seq[SharedRoot] =
     val projectRoots = projects.flatMap(
         project => sourceRootsIn(project).map(ProjectRoot(project, _)))
 
@@ -140,97 +129,79 @@ trait ExternalSourceRootResolution { self: SbtProjectResolver =>
       .mapValues(_.map(_.project).toSet)
       .map(p => SharedRoot(p._1, p._2.toSeq))
       .toSeq
-  }
 
-  private def groupSharedRoots(roots: Seq[SharedRoot]): Seq[RootGroup] = {
+  private def groupSharedRoots(roots: Seq[SharedRoot]): Seq[RootGroup] =
     val nameProvider = new SharedSourceRootNameProvider()
 
     // TODO consider base/projects correspondence
-    roots.groupBy(_.root.base).values.toSeq.map { roots =>
+    roots.groupBy(_.root.base).values.toSeq.map  roots =>
       val sharedRoot = roots.head
       val name = nameProvider.nameFor(sharedRoot.root.base)
       RootGroup(name, roots.map(_.root), sharedRoot.projects)
-    }
-  }
 
-  private def sourceRootsIn(project: sbtStructure.ProjectData): Seq[Root] = {
+  private def sourceRootsIn(project: sbtStructure.ProjectData): Seq[Root] =
     val relevantScopes = Set("compile", "test", "it")
 
     val relevantConfigurations =
       project.configurations.filter(it => relevantScopes.contains(it.id))
 
-    relevantConfigurations.flatMap { configuration =>
-      def createRoot(kind: Root.Kind)(directory: sbtStructure.DirectoryData) = {
+    relevantConfigurations.flatMap  configuration =>
+      def createRoot(kind: Root.Kind)(directory: sbtStructure.DirectoryData) =
         val scope =
           if (configuration.id == "compile") Root.Scope.Compile
           else Root.Scope.Test
         Root(scope, kind, directory.file.canonicalFile)
-      }
 
       configuration.sources.map(createRoot(Root.Kind.Sources)) ++ configuration.resources
         .map(createRoot(Root.Kind.Resources))
-    }
-  }
 
   private case class RootGroup(name: String,
                                roots: Seq[Root],
-                               projects: Seq[sbtStructure.ProjectData]) {
-    def base: File = {
+                               projects: Seq[sbtStructure.ProjectData])
+    def base: File =
       val root = roots.head
       root.base.getOrElse(root.directory)
-    }
-  }
 
   private case class SharedRoot(
       root: Root, projects: Seq[sbtStructure.ProjectData])
 
-  private case class ProjectRoot(project: sbtStructure.ProjectData, root: Root) {
+  private case class ProjectRoot(project: sbtStructure.ProjectData, root: Root)
     def isInternal: Boolean = !isExternal
 
     def isExternal: Boolean = root.directory.isOutsideOf(project.base)
-  }
 
-  private case class Root(scope: Root.Scope, kind: Root.Kind, directory: File) {
-    def base: Option[File] = Root.DefaultPaths.collectFirst {
+  private case class Root(scope: Root.Scope, kind: Root.Kind, directory: File)
+    def base: Option[File] = Root.DefaultPaths.collectFirst
       case paths if directory.parent.exists(_.endsWith(paths: _*)) =>
         directory << (paths.length + 1)
-    }
-  }
 
-  private object Root {
+  private object Root
     private val DefaultPaths = Seq(Seq("src", "main"), Seq("src", "test"))
 
     sealed trait Scope
-    object Scope {
+    object Scope
       case object Compile extends Scope
       case object Test extends Scope
-    }
 
     sealed trait Kind
-    object Kind {
+    object Kind
       case object Sources extends Kind
       case object Resources extends Kind
-    }
-  }
 
-  private class SharedSourceRootNameProvider {
+  private class SharedSourceRootNameProvider
     var usedNames = Set.empty[String]
     var counter = 1
 
-    def nameFor(base: Option[File]) = {
+    def nameFor(base: Option[File]) =
       val namedDirectory =
         if (base.exists(_.getName == "shared")) base.flatMap(_.parent)
         else base
       val prefix =
         namedDirectory.map(_.getName + "-sources").getOrElse("shared-sources")
-      if (usedNames.contains(prefix)) {
+      if (usedNames.contains(prefix))
         val result = prefix + counter
         counter += 1
         usedNames += result
         result
-      } else {
+      else
         prefix
-      }
-    }
-  }
-}

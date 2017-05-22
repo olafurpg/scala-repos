@@ -29,7 +29,7 @@ import org.apache.spark.annotation.{DeveloperApi, Since}
   */
 @Since("1.2.0")
 @DeveloperApi
-object SquaredError extends Loss {
+object SquaredError extends Loss
 
   /**
     * Method to calculate the gradients for the gradient boosting calculation for least
@@ -40,13 +40,10 @@ object SquaredError extends Loss {
     * @return Loss gradient
     */
   @Since("1.2.0")
-  override def gradient(prediction: Double, label: Double): Double = {
+  override def gradient(prediction: Double, label: Double): Double =
     -2.0 * (label - prediction)
-  }
 
   override private[spark] def computeError(
-      prediction: Double, label: Double): Double = {
+      prediction: Double, label: Double): Double =
     val err = label - prediction
     err * err
-  }
-}

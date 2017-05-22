@@ -8,33 +8,29 @@ package reversi
 import scala.scalajs.js
 
 @js.native
-trait Window extends js.Object {
+trait Window extends js.Object
   val document: DOMDocument = js.native
 
   def alert(msg: String): Unit = js.native
-}
 
 @js.native
-trait DOMDocument extends js.Object {
+trait DOMDocument extends js.Object
   def getElementById(id: String): DOMElement = js.native
   def createElement(tag: String): DOMElement = js.native
-}
 
 @js.native
-trait DOMElement extends js.Object {
+trait DOMElement extends js.Object
   var innerHTML: String = js.native
 
   def appendChild(child: DOMElement): Unit = js.native
-}
 
 @js.native
-trait JQueryStatic extends js.Object {
+trait JQueryStatic extends js.Object
   def apply(arg: js.Any): JQuery = js.native
   def apply(arg: js.Any, attributes: js.Any): JQuery = js.native
-}
 
 @js.native
-trait JQuery extends js.Object {
+trait JQuery extends js.Object
   def get(index: Int): DOMElement = js.native
 
   def text(value: String): JQuery = js.native
@@ -58,27 +54,23 @@ trait JQuery extends js.Object {
 
   def click[U](handler: js.Function0[U]): JQuery = js.native
   def click[U](handler: js.Function1[JQueryEvent, U]): JQuery = js.native
-}
 
 @js.native
-trait JQueryOffset extends js.Object {
+trait JQueryOffset extends js.Object
   val top: Double = js.native
   val left: Double = js.native
-}
 
 @js.native
-trait JQueryEvent extends js.Object {
+trait JQueryEvent extends js.Object
   val pageX: Double = js.native
   val pageY: Double = js.native
-}
 
 @js.native
-trait HTMLCanvasElement extends DOMElement {
+trait HTMLCanvasElement extends DOMElement
   def getContext(kind: String): js.Any = js.native // depends on the kind
-}
 
 @js.native
-trait CanvasRenderingContext2D extends js.Object {
+trait CanvasRenderingContext2D extends js.Object
   val canvas: HTMLCanvasElement = js.native
 
   var fillStyle: String = js.native
@@ -97,4 +89,3 @@ trait CanvasRenderingContext2D extends js.Object {
           startAngle: Double,
           endAngle: Double,
           anticlockwise: Boolean): Unit = js.native
-}

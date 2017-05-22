@@ -7,15 +7,13 @@ import scalaguide.tests.controllers
 
 import play.api.test._
 
-object FunctionalExampleControllerSpec extends PlaySpecification {
+object FunctionalExampleControllerSpec extends PlaySpecification
 
   // #scalafunctionaltest-functionalexamplecontrollerspec
-  "respond to the index Action" in {
+  "respond to the index Action" in
     val result = controllers.Application.index()(FakeRequest())
 
     status(result) must equalTo(OK)
     contentType(result) must beSome("text/plain")
     contentAsString(result) must contain("Hello Bob")
-  }
   // #scalafunctionaltest-functionalexamplecontrollerspec
-}

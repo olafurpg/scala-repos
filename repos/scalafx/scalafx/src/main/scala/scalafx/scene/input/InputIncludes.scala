@@ -83,7 +83,7 @@ object InputIncludes extends InputIncludes
   * @define TRMD TransferMode
   * @define ZMEV ZoomEvent
   */
-trait InputIncludes {
+trait InputIncludes
 
   /**
     * $START$CLIP.html $CLIP$END
@@ -389,4 +389,3 @@ trait InputIncludes {
     */
   implicit def jfxZoomEvent2sfx(ze: jfxsi.ZoomEvent): ZoomEvent =
     if (ze != null) new ZoomEvent(ze) else null
-}

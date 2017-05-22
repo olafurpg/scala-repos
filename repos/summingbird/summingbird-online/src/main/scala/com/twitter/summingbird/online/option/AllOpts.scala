@@ -14,9 +14,8 @@ case class OnlineSuccessHandler(handlerFn: Unit => Unit)
   */
 case class IncludeSuccessHandler(get: Boolean)
 
-object IncludeSuccessHandler {
+object IncludeSuccessHandler
   val default = IncludeSuccessHandler(true)
-}
 
 case class OnlineExceptionHandler(handlerFn: PartialFunction[Throwable, Unit])
 
@@ -69,9 +68,8 @@ case class MaxEmitPerExecute(get: Int)
 /**
   * SoftMemoryFlushPercent is the percentage of memory used in the JVM at which a flush will be triggered of the cache.
   */
-case class SoftMemoryFlushPercent(get: Float) {
+case class SoftMemoryFlushPercent(get: Float)
   require(0 < get && get <= 100.0, "must be a percentage.")
-}
 
 /**
   * ValueCombinerCacheSize is used in caches that support it as a trigger to crush down a high locality of
@@ -83,9 +81,8 @@ case class ValueCombinerCacheSize(get: Int)
   * A SummerBuilder is a generic trait that should be implemented to build a totally custom aggregator.
   * This is the same trait for both map side and reduce side aggregation.
   */
-trait SummerBuilder extends Serializable {
+trait SummerBuilder extends Serializable
   def getSummer[K, V : Semigroup]: AsyncSummer[(K, V), Map[K, V]]
-}
 
 /**
   * The SummerConstructor option, set this instead of CacheSize, AsyncPoolSize, etc.. to provide how to construct the aggregation for this bolt

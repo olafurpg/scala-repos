@@ -8,7 +8,7 @@ import scala.reflect.runtime.universe.Mirror
 /**
   * This trait provides access to all the runtime services used in pickling.
   */
-trait PicklingRuntime {
+trait PicklingRuntime
 
   /** Lock used to secure reflection usage. */
   def GRL: ReentrantLock // TODO - Use some abstraction so that one day we could have a no-lock variant for a runtime that doesn't allow reflection.
@@ -24,4 +24,3 @@ trait PicklingRuntime {
   /** The current reflection mirror to use when doing runtime unpickling/pickling. */
   //  TODO - Allow this to get modified!
   def currentMirror: Mirror
-}

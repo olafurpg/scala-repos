@@ -12,10 +12,9 @@ class Parameters(newExpression: PsiNamedElement,
                  oldExpression: ScExpression,
                  editor: Editor,
                  firstPart: Seq[PsiNamedElement],
-                 secondPart: Seq[PsiNamedElement]) {
+                 secondPart: Seq[PsiNamedElement])
   def getOldExpression = oldExpression
   def getNewExpression = newExpression
   def getEditor = editor
   def getFirstPart = firstPart
   def getSecondPart = secondPart
-}

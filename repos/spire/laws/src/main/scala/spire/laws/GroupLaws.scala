@@ -9,14 +9,12 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object GroupLaws {
-  def apply[A : Eq : Arbitrary] = new GroupLaws[A] {
+object GroupLaws
+  def apply[A : Eq : Arbitrary] = new GroupLaws[A]
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
-  }
-}
 
-trait GroupLaws[A] extends Laws {
+trait GroupLaws[A] extends Laws
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
@@ -106,10 +104,8 @@ trait GroupLaws[A] extends Laws {
       val parent: Option[AdditiveProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet with HasOneParent {
+      extends RuleSet with HasOneParent
     val name = base.name
     val bases = Seq("base" → base)
-  }
-}
 
 // vim: expandtab:ts=2:sw=2

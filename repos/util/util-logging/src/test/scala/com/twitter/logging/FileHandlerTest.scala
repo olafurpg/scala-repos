@@ -28,24 +28,22 @@ import com.twitter.conversions.time._
 import com.twitter.util.{TempFolder, Time}
 
 @RunWith(classOf[JUnitRunner])
-class FileHandlerTest extends WordSpec with TempFolder {
-  def reader(filename: String) = {
+class FileHandlerTest extends WordSpec with TempFolder
+  def reader(filename: String) =
     new BufferedReader(
         new InputStreamReader(
             new FileInputStream(new File(folderName, filename))))
-  }
 
-  def writer(filename: String) = {
+  def writer(filename: String) =
     new OutputStreamWriter(
         new FileOutputStream(new File(folderName, filename)), "UTF-8")
-  }
 
-  "FileHandler" should {
+  "FileHandler" should
     val record1 = new javalog.LogRecord(Level.INFO, "first post!")
     val record2 = new javalog.LogRecord(Level.INFO, "second post")
 
-    "honor append setting on logfiles" in {
-      withTempFolder {
+    "honor append setting on logfiles" in
+      withTempFolder
         val f = writer("test.log")
         f.write("hello!\n")
         f.close
@@ -61,9 +59,8 @@ class FileHandlerTest extends WordSpec with TempFolder {
 
         val f2 = reader("test.log")
         assert(f2.readLine == "hello!")
-      }
 
-      withTempFolder {
+      withTempFolder
         val f = writer("test.log")
         f.write("hello!\n")
         f.close
@@ -79,8 +76,6 @@ class FileHandlerTest extends WordSpec with TempFolder {
 
         val f2 = reader("test.log")
         assert(f2.readLine == "first post!")
-      }
-    }
 
     // /* Test is commented out according to http://jira.local.twitter.com/browse/REPLA-618 */
     //
@@ -119,9 +114,9 @@ class FileHandlerTest extends WordSpec with TempFolder {
     //   }
     // }
 
-    "roll logs on time" should {
-      "hourly" in {
-        withTempFolder {
+    "roll logs on time" should
+      "hourly" in
+        withTempFolder
           val handler = FileHandler(
               filename = folderName + "/test.log",
               rollPolicy = Policy.Hourly,
@@ -134,11 +129,9 @@ class FileHandlerTest extends WordSpec with TempFolder {
                   1206774000000L))
           assert(handler.computeNextRollTime(1206774000001L) == Some(
                   1206777600000L))
-        }
-      }
 
-      "weekly" in {
-        withTempFolder {
+      "weekly" in
+        withTempFolder
           val handler = FileHandler(
               filename = folderName + "/test.log",
               rollPolicy = Policy.Weekly(Calendar.SUNDAY),
@@ -155,20 +148,17 @@ class FileHandlerTest extends WordSpec with TempFolder {
                   1251010800000L))
           assert(handler.computeNextRollTime(1250496000000L) == Some(
                   1251010800000L))
-        }
-      }
-    }
 
     // verify that at the proper time, the log file rolls and resets.
-    "roll logs into new files" in {
-      withTempFolder {
+    "roll logs into new files" in
+      withTempFolder
         val handler = new FileHandler(folderName + "/test.log",
                                       Policy.Hourly,
                                       true,
                                       -1,
                                       BareFormatter,
                                       None)
-        Time.withCurrentTimeFrozen { time =>
+        Time.withCurrentTimeFrozen  time =>
           handler.publish(record1)
           val date = new Date(Time.now.inMilliseconds)
 
@@ -180,12 +170,9 @@ class FileHandlerTest extends WordSpec with TempFolder {
           assert(
               reader("test-" + handler.timeSuffix(date) + ".log").readLine == "first post!")
           assert(reader("test.log").readLine == "second post")
-        }
-      }
-    }
 
-    "keep no more than N log files around" in {
-      withTempFolder {
+    "keep no more than N log files around" in
+      withTempFolder
         assert(new File(folderName).list().length == 0)
 
         val handler = FileHandler(
@@ -207,13 +194,11 @@ class FileHandlerTest extends WordSpec with TempFolder {
         handler.publish(record1)
         assert(new File(folderName).list().length == 2)
         handler.close()
-      }
-    }
 
-    "ignores the target filename despite shorter filenames" in {
+    "ignores the target filename despite shorter filenames" in
       // even if the sort order puts the target filename before `rotateCount` other
       // files, it should not be removed
-      withTempFolder {
+      withTempFolder
         assert(new File(folderName).list().length == 0)
         val namePrefix = "test"
         val name = namePrefix + ".log"
@@ -229,29 +214,25 @@ class FileHandlerTest extends WordSpec with TempFolder {
         // create a file without the '.log' suffix, which will sort before the target
         new File(folderName, namePrefix).createNewFile()
 
-        def flush() = {
+        def flush() =
           handler.publish(record1)
           handler.roll()
           assert(new File(folderName).list().length == 3)
-        }
 
         // the target, 1 rotated file, and the short file should all remain
-        (1 to 5).foreach { _ =>
+        (1 to 5).foreach  _ =>
           flush()
-        }
         val fileSet = new File(folderName).list().toSet
         assert(fileSet.contains(name) == true)
         assert(fileSet.contains(namePrefix) == true)
-      }
-    }
 
-    "correctly handles relative paths" in {
-      withTempFolder {
+    "correctly handles relative paths" in
+      withTempFolder
         // user.dir will be replaced with the temp folder,
         // and will be restored when the test is complete
         val wdir = System.getProperty("user.dir")
 
-        try {
+        try
           System.setProperty("user.dir", folderName)
 
           val handler = FileHandler(
@@ -273,15 +254,12 @@ class FileHandlerTest extends WordSpec with TempFolder {
           handler.publish(record1)
           assert(new File(folderName).list().length == 2)
           handler.close()
-        } finally {
+        finally
           // restore user.dir to its original configuration
           System.setProperty("user.dir", wdir)
-        }
-      }
-    }
 
-    "roll log files based on max size" in {
-      withTempFolder {
+    "roll log files based on max size" in
+      withTempFolder
         // roll the log on the 3rd write.
         val maxSize = record1.getMessage.length * 3 - 1
 
@@ -295,7 +273,7 @@ class FileHandlerTest extends WordSpec with TempFolder {
         ).apply()
 
         // move time forward so the rotated logfiles will have distinct names.
-        Time.withCurrentTimeFrozen { time =>
+        Time.withCurrentTimeFrozen  time =>
           time.advance(1.second)
           handler.publish(record1)
           assert(new File(folderName).list().length == 1)
@@ -313,10 +291,5 @@ class FileHandlerTest extends WordSpec with TempFolder {
           time.advance(1.second)
           handler.publish(record1)
           assert(new File(folderName).list().length == 3)
-        }
 
         handler.close()
-      }
-    }
-  }
-}

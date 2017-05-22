@@ -6,24 +6,21 @@ import scala.pickling._, scala.pickling.Defaults._, json._
 case class PersonY(name: String, age: Int)
 case class PersonX(name: String, age: Int, salary: Int)
 class CustomPersonXPickler(implicit val format: PickleFormat)
-    extends Pickler[PersonX] {
+    extends Pickler[PersonX]
   def tag: FastTypeTag[PersonX] = implicitly[FastTypeTag[PersonX]]
 
-  def pickle(picklee: PersonX, builder: PBuilder) = {
+  def pickle(picklee: PersonX, builder: PBuilder) =
     builder
       .beginEntry(picklee, tag)
       .putField("name",
                 b =>
-                  {
                     b.beginEntry(picklee.name, FastTypeTag.String)
                     b.endEntry()
-                })
+                )
     builder.endEntry()
-  }
-}
 
-class GenericPickler extends FunSuite {
-  test("stack-overflow-pickle-unpickle") {
+class GenericPickler extends FunSuite
+  test("stack-overflow-pickle-unpickle")
     def bar[T : Pickler](t: T) = t.pickle
     def unbar[T : Unpickler](s: String) = JSONPickle(s).unpickle[T]
 
@@ -33,9 +30,8 @@ class GenericPickler extends FunSuite {
 
     val unbarred = unbar[PersonY](bar(p).value)
     assert(unbarred == p)
-  }
 
-  test("issue-4") {
+  test("issue-4")
     implicit def genCustomPersonXPickler[T <: PersonX](
         implicit format: PickleFormat) = new CustomPersonXPickler
     def fn[T <: PersonX : Pickler](x: T) = x.pickle
@@ -49,5 +45,3 @@ class GenericPickler extends FunSuite {
       |  }
       |})""".stripMargin.trim
     assert(fn(p).toString === jsn)
-  }
-}

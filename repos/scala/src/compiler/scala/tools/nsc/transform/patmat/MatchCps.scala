@@ -7,12 +7,12 @@
 package scala.tools.nsc.transform.patmat
 
 /** Segregating this super hacky CPS code. */
-trait MatchCps { self: PatternMatching =>
+trait MatchCps  self: PatternMatching =>
 
   import global._
 
   // duplicated from CPSUtils (avoid dependency from compiler -> cps plugin...)
-  private object CpsSymbols {
+  private object CpsSymbols
     private def cpsSymbol(name: String) =
       rootMirror.getClassIfDefined(s"scala.util.continuations.$name")
 
@@ -32,6 +32,4 @@ trait MatchCps { self: PatternMatching =>
            (stripTriggerCPSAnns exists pt.hasAnnotation))
          pt filterAnnotations (ann => !(strippedCPSAnns exists ann.matches))
        else pt)
-  }
   def removeCPSFromPt(pt: Type): Type = CpsSymbols removeCPSFromPt pt
-}

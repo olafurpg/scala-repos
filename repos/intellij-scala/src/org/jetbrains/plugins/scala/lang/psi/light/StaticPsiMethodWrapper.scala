@@ -15,47 +15,38 @@ import _root_.scala.collection.immutable.HashMap
 class StaticPsiMethodWrapper private (
     val method: PsiMethod, containingClass: PsiClass)
     extends LightMethodAdapter(method.getManager, method, containingClass)
-    with LightScalaMethod {
+    with LightScalaMethod
   setNavigationElement(method)
 
-  override def hasModifierProperty(name: String): Boolean = {
-    name match {
+  override def hasModifierProperty(name: String): Boolean =
+    name match
       case "static" => true
       case _ => super.hasModifierProperty(name)
-    }
-  }
 
   override def getModifierList: PsiModifierList =
-    new LightModifierList(getManager, ScalaFileType.SCALA_LANGUAGE) {
-      override def hasModifierProperty(name: String): Boolean = {
-        name match {
+    new LightModifierList(getManager, ScalaFileType.SCALA_LANGUAGE)
+      override def hasModifierProperty(name: String): Boolean =
+        name match
           case "static" => true
           case _ => super.hasModifierProperty(name)
-        }
-      }
 
-      override def hasExplicitModifier(name: String): Boolean = {
-        name match {
+      override def hasExplicitModifier(name: String): Boolean =
+        name match
           case "static" => true
           case _ => super.hasModifierProperty(name)
-        }
-      }
-    }
 
   override def isWritable: Boolean = getContainingFile.isWritable
-}
 
-object StaticPsiMethodWrapper {
+object StaticPsiMethodWrapper
   private val KEY: Key[HashMap[PsiClass, (StaticPsiMethodWrapper, Long)]] =
     Key.create("static.psi.method.wrapper.key")
 
   def getWrapper(
-      method: PsiMethod, containingClass: PsiClass): StaticPsiMethodWrapper = {
+      method: PsiMethod, containingClass: PsiClass): StaticPsiMethodWrapper =
     var data = method.getUserData(KEY)
-    if (data == null) {
+    if (data == null)
       data = new HashMap()
       method.putUserData(KEY, data)
-    }
     val count =
       ScalaPsiManager.instance(method.getProject).getModificationCount
     var res = data.getOrElse(containingClass, null)
@@ -64,5 +55,3 @@ object StaticPsiMethodWrapper {
     data += ((containingClass, res))
     method.putUserData(KEY, data)
     res._1
-  }
-}

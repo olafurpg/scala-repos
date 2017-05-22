@@ -19,7 +19,7 @@ import spire.implicits._
   * Scala, people will usually use the `+` method to denote addition, whereas in
   * Java, they use `add`.
   */
-object AutoAlgebraExample extends App {
+object AutoAlgebraExample extends App
 
   // Let's say you wanted to use the Apfloat arbitrary precision number type,
   // from the Apfloat Java library, with some code that uses Spire. Normally,
@@ -109,4 +109,3 @@ object AutoAlgebraExample extends App {
   implicit val doubleField = Auto.scala.field[Double](0d, 1d)
 
   implicit def listMonoid[A] = Auto.scala.collection.monoid[List[A]](Nil)
-}

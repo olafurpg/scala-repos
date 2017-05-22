@@ -12,12 +12,12 @@ import akka.actor.PoisonPill
 import akka.actor.Status
 import akka.testkit.AkkaSpec
 
-class ActorRefSourceSpec extends AkkaSpec {
+class ActorRefSourceSpec extends AkkaSpec
   implicit val materializer = ActorMaterializer()
 
-  "A ActorRefSource" must {
+  "A ActorRefSource" must
 
-    "emit received messages to the stream" in {
+    "emit received messages to the stream" in
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(10, OverflowStrategy.fail)
@@ -31,9 +31,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       s.expectNext(2)
       ref ! 3
       s.expectNoMsg(500.millis)
-    }
 
-    "buffer when needed" in {
+    "buffer when needed" in
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(100, OverflowStrategy.dropHead)
@@ -49,9 +48,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       for (n ← 200 to 399) ref ! n
       sub.request(100)
       for (n ← 300 to 399) s.expectNext(n)
-    }
 
-    "drop new when full and with dropNew strategy" in {
+    "drop new when full and with dropNew strategy" in
       val (ref, sub) = Source
         .actorRef(100, OverflowStrategy.dropNew)
         .toMat(TestSink.probe[Int])(Keep.both)
@@ -66,9 +64,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       for (n ← 200 to 399) ref ! n
       sub.request(100)
       for (n ← 200 to 299) sub.expectNext(n)
-    }
 
-    "terminate when the stream is cancelled" in assertAllStagesStopped {
+    "terminate when the stream is cancelled" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(0, OverflowStrategy.fail)
@@ -78,9 +75,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       val sub = s.expectSubscription
       sub.cancel()
       expectTerminated(ref)
-    }
 
-    "not fail when 0 buffer space and demand is signalled" in assertAllStagesStopped {
+    "not fail when 0 buffer space and demand is signalled" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(0, OverflowStrategy.dropHead)
@@ -91,9 +87,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       sub.request(100)
       sub.cancel()
       expectTerminated(ref)
-    }
 
-    "complete the stream immediatly when receiving PoisonPill" in assertAllStagesStopped {
+    "complete the stream immediatly when receiving PoisonPill" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(10, OverflowStrategy.fail)
@@ -102,9 +97,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       val sub = s.expectSubscription
       ref ! PoisonPill
       s.expectComplete()
-    }
 
-    "signal buffered elements and complete the stream after receiving Status.Success" in assertAllStagesStopped {
+    "signal buffered elements and complete the stream after receiving Status.Success" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(3, OverflowStrategy.fail)
@@ -118,9 +112,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       sub.request(10)
       s.expectNext(1, 2, 3)
       s.expectComplete()
-    }
 
-    "not buffer elements after receiving Status.Success" in assertAllStagesStopped {
+    "not buffer elements after receiving Status.Success" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(3, OverflowStrategy.dropBuffer)
@@ -137,9 +130,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       sub.request(10)
       s.expectNext(1, 2, 3)
       s.expectComplete()
-    }
 
-    "after receiving Status.Success, allow for earlier completion with PoisonPill" in assertAllStagesStopped {
+    "after receiving Status.Success, allow for earlier completion with PoisonPill" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(3, OverflowStrategy.dropBuffer)
@@ -154,9 +146,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       s.expectNext(1, 2)
       ref ! PoisonPill
       s.expectComplete() // element `3` not signaled
-    }
 
-    "fail the stream when receiving Status.Failure" in assertAllStagesStopped {
+    "fail the stream when receiving Status.Failure" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val ref = Source
         .actorRef(10, OverflowStrategy.fail)
@@ -166,9 +157,8 @@ class ActorRefSourceSpec extends AkkaSpec {
       val exc = TE("testfailure")
       ref ! Status.Failure(exc)
       s.expectError(exc)
-    }
 
-    "set actor name equal to stage name" in assertAllStagesStopped {
+    "set actor name equal to stage name" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val name = "SomeCustomName"
       val ref = Source
@@ -178,6 +168,3 @@ class ActorRefSourceSpec extends AkkaSpec {
         .run()
       ref.path.name.contains(name) should ===(true)
       ref ! PoisonPill
-    }
-  }
-}

@@ -21,9 +21,9 @@ import scala.util.Failure
 
 import org.apache.spark.SparkFunSuite
 
-class JobWaiterSuite extends SparkFunSuite {
+class JobWaiterSuite extends SparkFunSuite
 
-  test("call jobFailed multiple times") {
+  test("call jobFailed multiple times")
     val waiter = new JobWaiter[Int](null, 0, totalTasks = 2, null)
 
     // Should not throw exception if calling jobFailed multiple times
@@ -31,12 +31,9 @@ class JobWaiterSuite extends SparkFunSuite {
     waiter.jobFailed(new RuntimeException("Oops 2"))
     waiter.jobFailed(new RuntimeException("Oops 3"))
 
-    waiter.completionFuture.value match {
+    waiter.completionFuture.value match
       case Some(Failure(e)) =>
         // We should receive the first exception
         assert("Oops 1" === e.getMessage)
       case other =>
         fail("Should receiver the first exception but it was " + other)
-    }
-  }
-}

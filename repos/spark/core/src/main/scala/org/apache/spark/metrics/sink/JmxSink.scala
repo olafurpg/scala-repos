@@ -26,17 +26,14 @@ import org.apache.spark.SecurityManager
 private[spark] class JmxSink(val property: Properties,
                              val registry: MetricRegistry,
                              securityMgr: SecurityManager)
-    extends Sink {
+    extends Sink
 
   val reporter: JmxReporter = JmxReporter.forRegistry(registry).build()
 
-  override def start() {
+  override def start()
     reporter.start()
-  }
 
-  override def stop() {
+  override def stop()
     reporter.stop()
-  }
 
   override def report() {}
-}

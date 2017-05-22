@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * @author Alexander Podkhalyuzin
   */
-class OverloadingHardTest extends ResolveTestBase {
-  override def folderPath: String = {
+class OverloadingHardTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "overloading/hardOverloadings/"
-  }
 
   def testIgnoreValue() = doTest()
   def testImplicitsPriority() = doTest()
@@ -27,4 +26,3 @@ class OverloadingHardTest extends ResolveTestBase {
   def testFunctionObject2() = doTest()
   def testParameterlessFunction() = doTest()
   def testParameterlessFunction2() = doTest()
-}

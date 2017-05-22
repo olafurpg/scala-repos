@@ -37,22 +37,19 @@ import scalaz._
 import scalaz.syntax.apply._
 import scalaz.syntax.plus._
 
-trait CheckpointCoordination {
+trait CheckpointCoordination
   def loadYggCheckpoint(
       bifrost: String): Option[Validation[Error, YggCheckpoint]]
   def saveYggCheckpoint(bifrost: String, checkpoint: YggCheckpoint): Unit
-}
 
-object CheckpointCoordination {
-  object Noop extends CheckpointCoordination {
+object CheckpointCoordination
+  object Noop extends CheckpointCoordination
     def loadYggCheckpoint(
         bifrost: String): Option[Validation[Error, YggCheckpoint]] = None
     def saveYggCheckpoint(bifrost: String, checkpoint: YggCheckpoint): Unit =
       ()
-  }
-}
 
-trait SystemCoordination extends CheckpointCoordination {
+trait SystemCoordination extends CheckpointCoordination
   def registerRelayAgent(
       agent: String, blockSize: Int): Validation[Error, EventRelayState]
   def unregisterRelayAgent(agent: String, state: EventRelayState): Unit
@@ -66,34 +63,29 @@ trait SystemCoordination extends CheckpointCoordination {
       state: EventRelayState): Validation[Error, EventRelayState]
 
   def close(): Unit
-}
 
-sealed trait IdSequence {
+sealed trait IdSequence
   def isEmpty(): Boolean
   def next(): (Int, Int)
-}
 
-case object EmptyIdSequence extends IdSequence {
+case object EmptyIdSequence extends IdSequence
   def isEmpty(): Boolean = true
   def next() = sys.error("No ids available from empty id sequence block")
-}
 
 case class IdSequenceBlock(
     producerId: Int, firstSequenceId: Int, lastSequenceId: Int)
-    extends IdSequence {
+    extends IdSequence
   private val currentSequenceId = new AtomicInteger(firstSequenceId)
 
   def isEmpty() = currentSequenceId.get > lastSequenceId
 
-  def next() = {
+  def next() =
     val sequenceId = currentSequenceId.getAndIncrement
     if (sequenceId > lastSequenceId)
       sys.error("Id sequence block is exhausted no more ids available.")
     (producerId, sequenceId)
-  }
-}
 
-object IdSequenceBlock {
+object IdSequenceBlock
   implicit val iso =
     Iso.hlist(IdSequenceBlock.apply _, IdSequenceBlock.unapply _)
   val schemaV1 = "producerId" :: "firstSequenceId" :: "lastSequenceId" :: HNil
@@ -102,10 +94,9 @@ object IdSequenceBlock {
     serializationV[IdSequenceBlock](schemaV1, Some("1.0".v))
   implicit val decomposer = decomposerV1
   implicit val extractor = extractorV1 <+> extractorPreV
-}
 
 case class EventRelayState(
-    offset: Long, nextSequenceId: Int, idSequenceBlock: IdSequenceBlock) {
+    offset: Long, nextSequenceId: Int, idSequenceBlock: IdSequenceBlock)
   override def toString() =
     "EventRelayState[ offset: %d prodId: %d seqId: %d in [%d,%d] ]".format(
         offset,
@@ -114,9 +105,8 @@ case class EventRelayState(
         idSequenceBlock.firstSequenceId,
         idSequenceBlock.lastSequenceId
     )
-}
 
-object EventRelayState {
+object EventRelayState
   implicit val iso =
     Iso.hlist(EventRelayState.apply _, EventRelayState.unapply _)
   val schemaV1 = "offset" :: "nextSequenceId" :: "idSequenceBlock" :: HNil
@@ -125,24 +115,21 @@ object EventRelayState {
     serializationV[EventRelayState](schemaV1, Some("1.0".v))
   implicit val decomposer = decomposerV1
   implicit val extractor = extractorV1 <+> extractorPreV
-}
 
 case class ProducerState(lastSequenceId: Int)
 
-object ProducerState {
+object ProducerState
   implicit val ProducerStateDecomposer =
     implicitly[Decomposer[Int]].contramap((_: ProducerState).lastSequenceId)
   implicit val ProducerStateExtractor =
     implicitly[Extractor[Int]].map(ProducerState.apply _)
-}
 
-case class YggCheckpoint(offset: Long, messageClock: VectorClock) {
+case class YggCheckpoint(offset: Long, messageClock: VectorClock)
   def update(newOffset: Long, newPid: Int, newSid: Int) =
     this.copy(offset max newOffset, messageClock.update(newPid, newSid))
   def skipTo(newOffset: Long) = this.copy(offset max newOffset, messageClock)
-}
 
-object YggCheckpoint {
+object YggCheckpoint
   val Empty = YggCheckpoint(0, VectorClock.empty)
 
   sealed trait LoadError
@@ -160,6 +147,5 @@ object YggCheckpoint {
   implicit val extractor = extractorV1 <+> extractorPreV
 
   implicit val ordering = scala.math.Ordering.by((_: YggCheckpoint).offset)
-}
 
 case class ServiceUID(systemId: String, hostId: String, serviceId: String)

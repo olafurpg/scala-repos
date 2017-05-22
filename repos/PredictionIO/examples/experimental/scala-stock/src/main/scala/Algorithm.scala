@@ -15,14 +15,13 @@ import scala.reflect.runtime.universe._
 import scala.collection.immutable.HashMap
 
 abstract class StockStrategy[M : ClassTag]
-    extends LAlgorithm[TrainingData, (TrainingData, M), QueryDate, Prediction] {
-  def train(trainingData: TrainingData): (TrainingData, M) = {
+    extends LAlgorithm[TrainingData, (TrainingData, M), QueryDate, Prediction]
+  def train(trainingData: TrainingData): (TrainingData, M) =
     (trainingData, createModel(trainingData.view))
-  }
 
   def createModel(dataView: DataView): M
 
-  def predict(dataModel: (TrainingData, M), queryDate: QueryDate): Prediction = {
+  def predict(dataModel: (TrainingData, M), queryDate: QueryDate): Prediction =
     val (trainingData, model) = dataModel
 
     val rawData = trainingData.rawDataB.value
@@ -43,14 +42,11 @@ abstract class StockStrategy[M : ClassTag]
     val prediction: Prediction = onClose(model, query)
 
     return prediction
-  }
 
   def onClose(model: M, query: Query): Prediction
-}
 
-class EmptyStrategy extends StockStrategy[AnyRef] {
+class EmptyStrategy extends StockStrategy[AnyRef]
   def createModel(dataView: DataView): AnyRef = None
 
   def onClose(model: AnyRef, query: Query): Prediction =
     Prediction(HashMap[String, Double]())
-}

@@ -35,7 +35,7 @@ case class Statistics private[ragnarok](tails: Int,
                                         allMax: List[Double],
                                         m: Double,
                                         vn: Double,
-                                        n: Int) {
+                                        n: Int)
 
   //FIXME: keep track of Double error
 
@@ -46,17 +46,16 @@ case class Statistics private[ragnarok](tails: Int,
     * example.
     */
   def *(x: Double): Statistics =
-    if (x >= 0.0) {
+    if (x >= 0.0)
       Statistics(
           tails, allMin map (_ * x), allMax map (_ * x), m * x, vn * x * x, n)
-    } else {
+    else
       Statistics(tails,
                  allMax map (_ * x),
                  allMin map (_ * x),
                  m * x,
                  vn * math.abs(x) * math.abs(x),
                  n)
-    }
 
   def +(x: Double): Statistics = this + Statistics(x, tails = tails)
 
@@ -64,19 +63,17 @@ case class Statistics private[ragnarok](tails: Int,
 
   // Calculates the mean, variance, and count without outliers.
   private lazy val meanVarCount: (Double, Double, Int) =
-    if (n > 2 * tails) {
-      (allMin.reverse.tail ++ allMax.tail).foldLeft((m, vn, n)) {
+    if (n > 2 * tails)
+      (allMin.reverse.tail ++ allMax.tail).foldLeft((m, vn, n))
         case ((m, vn, n), x) =>
           val mprev = m + (m - x) / (n - 1)
           val sprev = vn - (x - mprev) * (x - m)
           (mprev, sprev, n - 1)
-      } match {
+      match
         case (m, vn, 1) => (m, 0.0, 1)
         case (m, vn, n) => (m, math.abs(vn / (n - 1)), n)
-      }
-    } else {
+    else
       (Double.NaN, Double.NaN, 0)
-    }
 
   def min: Double = allMin.last
 
@@ -98,9 +95,8 @@ case class Statistics private[ragnarok](tails: Int,
              JField("min", JNum(min)),
              JField("max", JNum(max)),
              JField("count", JNum(count))))
-}
 
-object Statistics {
+object Statistics
   def apply(x: Double, tails: Int = 0): Statistics =
     Statistics(tails, x :: Nil, x :: Nil, x, 0.0, 1)
 
@@ -109,8 +105,8 @@ object Statistics {
     * of outliers kept is the minimum of the 2 `Statistics`, as this is the only
     * way to ensure associativity.
     */
-  implicit object semigroup extends Semigroup[Statistics] {
-    def append(x: Statistics, _y: => Statistics): Statistics = {
+  implicit object semigroup extends Semigroup[Statistics]
+    def append(x: Statistics, _y: => Statistics): Statistics =
       val y = _y
 
       val z_m = x.m + (y.n / (x.n + y.n).toDouble) * (y.m - x.m)
@@ -123,6 +119,3 @@ object Statistics {
                  z_m,
                  z_vn,
                  x.n + y.n)
-    }
-  }
-}

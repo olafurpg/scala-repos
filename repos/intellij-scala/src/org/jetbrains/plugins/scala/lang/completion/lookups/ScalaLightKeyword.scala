@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
   */
 class ScalaLightKeyword private (manager: PsiManager, text: String)
     extends LightElement(manager, ScalaFileType.SCALA_LANGUAGE)
-    with ScalaPsiElement {
+    with ScalaPsiElement
   protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): Array[T] =
     findChildrenByClass[T](clazz)
@@ -24,26 +24,22 @@ class ScalaLightKeyword private (manager: PsiManager, text: String)
 
   override def getText: String = text
 
-  def getTokenType: IElementType = {
+  def getTokenType: IElementType =
     val lexer = new ScalaLexer
     lexer.start(text)
     lexer.getTokenType
-  }
 
   override def copy: PsiElement = new ScalaLightKeyword(getManager, text)
 
   override def toString: String = "ScalaLightKeyword:" + text
-}
 
-object ScalaLightKeyword {
+object ScalaLightKeyword
   private val keywords =
     ContainerUtil.newConcurrentMap[(PsiManager, String), ScalaLightKeyword]()
 
-  def apply(manager: PsiManager, text: String): ScalaLightKeyword = {
+  def apply(manager: PsiManager, text: String): ScalaLightKeyword =
     var res = keywords.get((manager, text))
     if (res != null && res.isValid) return res
     res = new ScalaLightKeyword(manager, text)
     keywords.put((manager, text), res)
     res
-  }
-}

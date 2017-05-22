@@ -6,27 +6,21 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
-class ZkMetadataTest extends FunSuite {
+class ZkMetadataTest extends FunSuite
   val metadata = ZkMetadata(Some(4))
 
-  test("toAddrMetadata") {
+  test("toAddrMetadata")
     val addrMetadata = ZkMetadata.toAddrMetadata(metadata)
     assert(addrMetadata(ZkMetadata.key) == metadata)
-  }
 
-  test("fromAddrMetadata") {
+  test("fromAddrMetadata")
     val addrMetadata = ZkMetadata.toAddrMetadata(metadata)
     assert(ZkMetadata.fromAddrMetadata(addrMetadata) == metadata)
-  }
 
-  test("unapply") {
-    Addr.Metadata.empty match {
+  test("unapply")
+    Addr.Metadata.empty match
       case ZkMetadata(_) => assert(false)
       case _ => assert(true)
-    }
-    ZkMetadata.toAddrMetadata(metadata) match {
+    ZkMetadata.toAddrMetadata(metadata) match
       case ZkMetadata(4) => assert(true)
       case _ => assert(false)
-    }
-  }
-}

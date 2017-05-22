@@ -1,5 +1,4 @@
 case class Blah(a: Int)
 
-object Blah {
+object Blah
   def apply2(a: Int) = apply(a)
-}

@@ -15,17 +15,16 @@ import org.jetbrains.plugins.scala.lang.structureView.ScalaElementPresentation
   * 2014-05-23
   */
 abstract class ScalaMemberInfoBase[Member <: PsiElement](member: Member)
-    extends MemberInfoBase[Member](member: Member) {
+    extends MemberInfoBase[Member](member: Member)
 
-  member match {
+  member match
     case method: PsiMethod =>
       displayName = ScalaPsiUtil.getMethodPresentableText(method)
-      val (superMethod, containingClass) = method match {
+      val (superMethod, containingClass) = method match
         case scFun: ScFunction => (scFun.superMethod, scFun.containingClass)
         case _ =>
           (method.findSuperMethods().headOption, method.getContainingClass)
-      }
-      superMethod match {
+      superMethod match
         case Some(m: ScFunctionDefinition) =>
           overrides = java.lang.Boolean.TRUE
         case Some(m: ScFunctionDeclaration) =>
@@ -35,12 +34,10 @@ abstract class ScalaMemberInfoBase[Member <: PsiElement](member: Member)
           overrides = if (!m.hasModifierProperty(PsiModifier.ABSTRACT))
             java.lang.Boolean.TRUE else java.lang.Boolean.FALSE
         case _ => overrides = null
-      }
-      isStatic = containingClass match {
+      isStatic = containingClass match
         case _: ScObject => true
         case _: ScTemplateDefinition => false
         case _ => method.hasModifierProperty(PsiModifier.STATIC)
-      }
     case clazz: ScTypeDefinition =>
       displayName = ScalaElementPresentation.getTypeDefinitionPresentableText(
           clazz)
@@ -66,5 +63,3 @@ abstract class ScalaMemberInfoBase[Member <: PsiElement](member: Member)
       isStatic = false
       displayName = ""
       overrides = null
-  }
-}

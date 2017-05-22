@@ -45,7 +45,7 @@ object CanvasIncludes extends CanvasIncludes
   * @define CANV Canvas
   * @define GRCT GraphicsContext
   */
-trait CanvasIncludes {
+trait CanvasIncludes
 
   /**
     * $START$CANV.html $CANV$END
@@ -65,4 +65,3 @@ trait CanvasIncludes {
   implicit def jfxGraphicsContext2sfx(
       gc: jfxsc.GraphicsContext): GraphicsContext =
     if (gc != null) new GraphicsContext(gc) else null
-}

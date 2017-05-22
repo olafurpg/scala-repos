@@ -1,8 +1,7 @@
 class T(val a: Array[_])
 
-class U {
+class U
   val a = Array(Array(1, 2), Array("a", "b"))
-}
 
 class T1 { val a: Array[_] = Array(1) }
 

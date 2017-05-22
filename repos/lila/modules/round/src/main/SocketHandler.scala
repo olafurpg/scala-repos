@@ -23,39 +23,34 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                                          socketHub: ActorRef,
                                          hub: lila.hub.Env,
                                          messenger: Messenger,
-                                         bus: lila.common.Bus) {
+                                         bus: lila.common.Bus)
 
   private def controller(gameId: String,
                          socket: ActorRef,
                          uid: String,
                          ref: PovRef,
-                         member: Member): Handler.Controller = {
+                         member: Member): Handler.Controller =
 
     def send(msg: Any) { roundMap ! Tell(gameId, msg) }
 
-    member.playerIdOption.fold[Handler.Controller]({
+    member.playerIdOption.fold[Handler.Controller](
       case ("p", o) =>
-        o int "v" foreach { v =>
+        o int "v" foreach  v =>
           socket ! PingVersion(uid, v)
-        }
       case ("talk", o) =>
-        o str "d" foreach { text =>
+        o str "d" foreach  text =>
           messenger.watcher(gameId, member, text, socket)
-        }
       case ("outoftime", _) => send(Outoftime)
-    }) { playerId =>
-      {
+    )  playerId =>
         case ("p", o) =>
-          o int "v" foreach { v =>
+          o int "v" foreach  v =>
             socket ! PingVersion(uid, v)
-          }
         case ("move", o) =>
-          parseMove(o) foreach {
+          parseMove(o) foreach
             case (move, blur, lag) =>
               val promise = Promise[Unit]
-              promise.future onFailure {
+              promise.future onFailure
                 case _: Exception => socket ! Resync(uid)
-              }
               send(
                   HumanPlay(
                       playerId,
@@ -65,15 +60,13 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                       promise.some
                   ))
               member push ackEvent
-          }
         case ("drop", o) =>
-          parseDrop(o) foreach {
+          parseDrop(o) foreach
             case (drop, blur, lag) =>
               member push ackEvent
               val promise = Promise[Unit]
-              promise.future onFailure {
+              promise.future onFailure
                 case _: Exception => socket ! Resync(uid)
-              }
               send(
                   HumanPlay(
                       playerId,
@@ -82,7 +75,6 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                       lag.millis,
                       promise.some
                   ))
-          }
         case ("rematch-yes", _) => send(RematchYes(playerId))
         case ("rematch-no", _) => send(RematchNo(playerId))
         case ("takeback-yes", _) => send(TakebackYes(playerId))
@@ -98,22 +90,17 @@ private[round] final class SocketHandler(roundMap: ActorRef,
         case ("outoftime", _) => send(Outoftime)
         case ("bye", _) => socket ! Bye(ref.color)
         case ("talk", o) =>
-          o str "d" foreach { text =>
+          o str "d" foreach  text =>
             messenger.owner(gameId, member, text, socket)
-          }
         case ("hold", o) =>
-          for {
+          for
             d ← o obj "d"
             mean ← d int "mean"
             sd ← d int "sd"
-          } send(HoldAlert(playerId, mean, sd, member.ip))
+          send(HoldAlert(playerId, mean, sd, member.ip))
         case ("berserk", _) =>
-          member.userId foreach { userId =>
+          member.userId foreach  userId =>
             hub.actor.tournamentApi ! Berserk(gameId, userId)
-          }
-      }
-    }
-  }
 
   def watcher(gameId: String,
               colorName: String,
@@ -121,9 +108,8 @@ private[round] final class SocketHandler(roundMap: ActorRef,
               user: Option[User],
               ip: String,
               userTv: Option[String]): Fu[Option[JsSocketHandler]] =
-    GameRepo.pov(gameId, colorName) flatMap {
+    GameRepo.pov(gameId, colorName) flatMap
       _ ?? { join(_, none, uid, "", user, ip, userTv = userTv) map some }
-    }
 
   def player(pov: Pov,
              uid: String,
@@ -138,23 +124,20 @@ private[round] final class SocketHandler(roundMap: ActorRef,
                    token: String,
                    user: Option[User],
                    ip: String,
-                   userTv: Option[String]): Fu[JsSocketHandler] = {
+                   userTv: Option[String]): Fu[JsSocketHandler] =
     val join = Join(uid = uid,
                     user = user,
                     color = pov.color,
                     playerId = playerId,
                     ip = ip,
                     userTv = userTv)
-    socketHub ? Get(pov.gameId) mapTo manifest[ActorRef] flatMap { socket =>
-      Handler(hub, socket, uid, join, user map (_.id)) {
+    socketHub ? Get(pov.gameId) mapTo manifest[ActorRef] flatMap  socket =>
+      Handler(hub, socket, uid, join, user map (_.id))
         case Connected(enum, member) =>
           (controller(pov.gameId, socket, uid, pov.ref, member), enum, member)
-      }
-    }
-  }
 
   private def parseMove(o: JsObject) =
-    for {
+    for
       d ← o obj "d"
       orig ← d str "from"
       dest ← d str "to"
@@ -162,17 +145,16 @@ private[round] final class SocketHandler(roundMap: ActorRef,
       move <- Uci.Move.fromStrings(orig, dest, prom)
       blur = (d int "b") == Some(1)
       lag = d int "lag"
-    } yield (move, blur, ~lag)
+    yield (move, blur, ~lag)
 
   private def parseDrop(o: JsObject) =
-    for {
+    for
       d ← o obj "d"
       role ← d str "role"
       pos ← d str "pos"
       drop <- Uci.Drop.fromStrings(role, pos)
       blur = (d int "b") == Some(1)
       lag = d int "lag"
-    } yield (drop, blur, ~lag)
+    yield (drop, blur, ~lag)
 
   private val ackEvent = Json.obj("t" -> "ack")
-}

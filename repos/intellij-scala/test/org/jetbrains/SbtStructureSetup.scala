@@ -12,19 +12,17 @@ import com.intellij.openapi.project.Project
   * @author Nikolay Obedin
   * @since 10/19/15.
   */
-trait SbtStructureSetup {
+trait SbtStructureSetup
 
   val IvyCacheDir: File = new File(TestUtils.getIvyCachePath)
 
-  def setUpSbtLauncherAndStructure(project: Project): Unit = {
+  def setUpSbtLauncherAndStructure(project: Project): Unit =
     val systemSettings = SbtSystemSettings.getInstance(project)
     systemSettings.setCustomLauncherEnabled(true)
     systemSettings.setCustomLauncherPath(CustomSbtLauncher.canonicalPath)
     systemSettings.setCustomSbtStructurePath(CustomSbtStructure.canonicalPath)
-    Option(System.getProperty("sbt.ivy.home")).foreach { ivyHome =>
+    Option(System.getProperty("sbt.ivy.home")).foreach  ivyHome =>
       systemSettings.vmParameters += s" -Dsbt.ivy.home=$ivyHome"
-    }
-  }
 
   private val LauncherVersion = "0.13.8"
   private val SbtStructureVersion = "5.1.0"
@@ -32,4 +30,3 @@ trait SbtStructureSetup {
     IvyCacheDir / "org.scala-sbt" / "sbt-launch" / "jars" / s"sbt-launch-$LauncherVersion.jar"
   private val CustomSbtStructure =
     IvyCacheDir / "scala_2.10" / "sbt_0.13" / "org.jetbrains" / "sbt-structure-extractor-0-13" / "jars" / s"sbt-structure-extractor-0-13-$SbtStructureVersion.jar"
-}

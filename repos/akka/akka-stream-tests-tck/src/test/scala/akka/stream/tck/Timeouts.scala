@@ -6,9 +6,8 @@ package akka.stream.tck
 /**
   * Specifies timeouts for the TCK
   */
-object Timeouts {
+object Timeouts
 
   def publisherShutdownTimeoutMillis: Int = 3000
 
   def defaultTimeoutMillis: Int = 800
-}

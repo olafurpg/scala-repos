@@ -33,11 +33,10 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object EventDispatchChain {
+object EventDispatchChain
   implicit def sfxEventDispatchChain2jfx(
       v: EventDispatchChain): jfxe.EventDispatchChain =
     if (v != null) v.delegate else null
-}
 
 /**
   * Represents a chain of `EventDispatcher` objects, which can dispatch
@@ -58,7 +57,7 @@ object EventDispatchChain {
   */
 abstract class EventDispatchChain(
     override val delegate: jfxe.EventDispatchChain)
-    extends SFXDelegate[jfxe.EventDispatchChain] {
+    extends SFXDelegate[jfxe.EventDispatchChain]
 
   /**
     * Appends the specified `EventDispatcher` to this chain. Returns a
@@ -116,4 +115,3 @@ abstract class EventDispatchChain(
     */
   def dispatchEvent(event: Event): Event =
     delegate.dispatchEvent(event)
-}

@@ -10,9 +10,9 @@ package org.scalajs.testsuite.jsinterop
 import org.junit.Assert._
 import org.junit.Test
 
-class PrimitivesTest {
+class PrimitivesTest
 
-  @Test def should_convert_Java_boxed_types_to_js_Any(): Unit = {
+  @Test def should_convert_Java_boxed_types_to_js_Any(): Unit =
     assertEquals(false, new java.lang.Boolean(false))
     assertNull(null: java.lang.Boolean)
 
@@ -33,5 +33,3 @@ class PrimitivesTest {
 
     assertEquals(42.0, new java.lang.Double(42.0), 0.0)
     assertNull(null: java.lang.Double)
-  }
-}

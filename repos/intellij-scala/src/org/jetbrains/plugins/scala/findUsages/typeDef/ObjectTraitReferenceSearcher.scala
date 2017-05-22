@@ -14,51 +14,39 @@ import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
   * Date: 18.02.12
   */
 class ObjectTraitReferenceSearcher
-    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
+    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters]
   def execute(queryParameters: ReferencesSearch.SearchParameters,
-              consumer: Processor[PsiReference]): Boolean = {
+              consumer: Processor[PsiReference]): Boolean =
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
 
-    val toProcess = inReadAction {
-      element match {
+    val toProcess = inReadAction
+      element match
         case _ if !element.isValid => None
         case o: ScObject => Some((o, o.name))
         case wrapper: PsiClassWrapper =>
-          wrapper.definition match {
+          wrapper.definition match
             case _: ScObject | _: ScTrait => Some((wrapper, wrapper.getName))
             case _ => None
-          }
         case _ => None
-      }
-    }
-    toProcess.foreach {
+    toProcess.foreach
       case (elem, name) =>
-        val processor = new TextOccurenceProcessor {
-          def execute(element: PsiElement, offsetInElement: Int): Boolean = {
+        val processor = new TextOccurenceProcessor
+          def execute(element: PsiElement, offsetInElement: Int): Boolean =
             val references = inReadAction(element.getReferences)
             for (ref <- references if ref.getRangeInElement.contains(
-                           offsetInElement)) {
-              inReadAction {
-                if (ref.isReferenceTo(elem) || ref.resolve() == elem) {
+                           offsetInElement))
+              inReadAction
+                if (ref.isReferenceTo(elem) || ref.resolve() == elem)
                   if (!consumer.process(ref)) return false
-                }
-              }
-            }
             true
-          }
-        }
         val helper: PsiSearchHelper =
           PsiSearchHelper.SERVICE.getInstance(queryParameters.getProject)
-        try {
+        try
           helper.processElementsWithWord(
               processor, scope, name, UsageSearchContext.IN_CODE, true)
-        } catch {
+        catch
           case ignore: IndexNotReadyException =>
           case ignore: AssertionError
               if ignore.getMessage endsWith "has null range" =>
-        }
-    }
     true
-  }
-}

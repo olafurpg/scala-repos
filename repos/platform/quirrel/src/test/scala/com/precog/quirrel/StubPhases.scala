@@ -21,7 +21,7 @@ package com.precog.quirrel
 
 import com.precog.util.BitSet
 
-trait StubPhases extends Phases with RawErrors {
+trait StubPhases extends Phases with RawErrors
   protected def LoadId = Identifier(Vector(), "load")
   protected def RelLoadId = Identifier(Vector(), "relativeLoad")
   protected def ExpandGlobId = Identifier(Vector("std", "fs"), "expandPath")
@@ -33,4 +33,3 @@ trait StubPhases extends Phases with RawErrors {
   def buildTrace(sigma: Sigma)(expr: Expr): Trace = Trace.empty
   def findCriticalConditions(expr: Expr): Map[String, Set[ConditionTree]] =
     Map()
-}

@@ -19,11 +19,11 @@ import io.prediction.data.webhooks.ConnectorTestUtil
 import org.specs2.mutable._
 
 /** Test the ExampleJsonConnector */
-class ExampleJsonConnectorSpec extends Specification with ConnectorTestUtil {
+class ExampleJsonConnectorSpec extends Specification with ConnectorTestUtil
 
-  "ExampleJsonConnector" should {
+  "ExampleJsonConnector" should
 
-    "convert userAction to Event JSON" in {
+    "convert userAction to Event JSON" in
       // webhooks input
       val userAction = """
         {
@@ -61,9 +61,8 @@ class ExampleJsonConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleJsonConnector, userAction, expected)
-    }
 
-    "convert userAction without optional field to Event JSON" in {
+    "convert userAction without optional field to Event JSON" in
       // webhooks input
       val userAction = """
         {
@@ -89,9 +88,8 @@ class ExampleJsonConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleJsonConnector, userAction, expected)
-    }
 
-    "convert userActionItem to Event JSON" in {
+    "convert userActionItem to Event JSON" in
       // webhooks input
       val userActionItem = """
         {
@@ -132,9 +130,8 @@ class ExampleJsonConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleJsonConnector, userActionItem, expected)
-    }
 
-    "convert userActionItem without optional fields to Event JSON" in {
+    "convert userActionItem without optional fields to Event JSON" in
       // webhooks input
       val userActionItem = """
         {
@@ -171,6 +168,3 @@ class ExampleJsonConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleJsonConnector, userActionItem, expected)
-    }
-  }
-}

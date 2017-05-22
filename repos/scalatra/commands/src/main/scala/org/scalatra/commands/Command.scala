@@ -39,7 +39,7 @@ import org.scalatra.util.conversion._
   * @version 0.1
   *
   */
-trait Command extends BindingSyntax with ParamsValueReaderProperties {
+trait Command extends BindingSyntax with ParamsValueReaderProperties
 
   type CommandTypeConverterFactory [T] <: TypeConverterFactory[T]
   private[this] var preBindingActions: Seq[BindingAction] = Nil
@@ -69,14 +69,12 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
   /**
     * Perform command as afterBinding task.
     */
-  afterBinding {
+  afterBinding
     _errors = bindings.values.filter(_.isInvalid).toSeq
-  }
 
   implicit def binding2field[T : Manifest : TypeConverterFactory](
-      field: FieldDescriptor[T]): Field[T] = {
+      field: FieldDescriptor[T]): Field[T] =
     new Field(bind(field), this)
-  }
 
   implicit def autoBind[T : Manifest : TypeConverterFactory](
       fieldName: String): Field[T] =
@@ -84,22 +82,21 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
 
   implicit def bind[T](field: FieldDescriptor[T])(
       implicit mf: Manifest[T],
-      conv: TypeConverterFactory[T]): FieldDescriptor[T] = {
+      conv: TypeConverterFactory[T]): FieldDescriptor[T] =
     val f: FieldDescriptor[T] =
-      if (mf.runtimeClass.isAssignableFrom(classOf[Option[_]])) {
+      if (mf.runtimeClass.isAssignableFrom(classOf[Option[_]]))
         // Yay! not one but 2 casts in the same line
         field
           .asInstanceOf[FieldDescriptor[Option[_]]]
           .withDefaultValue(None)
           .asInstanceOf[FieldDescriptor[T]]
-      } else field
+      else field
     val b = Binding(f)
     bindings += b.name -> b
     f
-  }
 
   def typeConverterBuilder[I](tc: CommandTypeConverterFactory[_])
-    : PartialFunction[ValueReader[_, _], TypeConverter[I, _]] = {
+    : PartialFunction[ValueReader[_, _], TypeConverter[I, _]] =
     case r: MultiParamsValueReader =>
       tc.resolveMultiParams.asInstanceOf[TypeConverter[I, _]]
     case r: MultiMapHeadViewValueReader[_] =>
@@ -109,21 +106,18 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
     case r =>
       throw new BindingException(
           "No converter found for value reader: " + r.getClass.getSimpleName)
-  }
 
   /**
     * Add an action that will be evaluated before field binding occurs.
     */
-  protected def beforeBinding(action: => Any) {
+  protected def beforeBinding(action: => Any)
     preBindingActions = preBindingActions :+ (() => action)
-  }
 
   /**
     * Add an action that will be evaluated after field binding has been done.
     */
-  protected def afterBinding(action: => Any) {
+  protected def afterBinding(action: => Any)
     postBindingActions = postBindingActions :+ (() => action)
-  }
 
   def bindTo[S, I](data: S,
                    params: MultiParams = MultiMap.empty,
@@ -131,10 +125,10 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
       implicit r: S => ValueReader[S, I],
       mi: Manifest[I],
       multiParams: MultiParams => ValueReader[MultiParams, Seq[String]])
-    : this.type = {
+    : this.type =
     doBeforeBindingActions()
 
-    bindings = bindings map {
+    bindings = bindings map
       case (name, b) =>
         val tcf = b.typeConverterFactory
         val cv = typeConverterBuilder(
@@ -143,7 +137,7 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
         val fieldBinding =
           Binding(b.field, cv, b.typeConverterFactory)(mi, b.valueManifest)
 
-        val result = b.field.valueSource match {
+        val result = b.field.valueSource match
           case ValueSource.Body =>
             fieldBinding(
                 data
@@ -169,17 +163,14 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
                   .read(name)
                   .right
                   .map(_ map (_.asInstanceOf[paramsBinding.S])))
-        }
 
         name -> result
-    }
 
     // Defer validation until after all the fields have been bound.
     bindings = bindings map { case (k, v) => k -> v.validate }
 
     doAfterBindingActions()
     this
-  }
 
   private def doBeforeBindingActions() = preBindingActions.foreach(_.apply())
 
@@ -196,11 +187,9 @@ trait Command extends BindingSyntax with ParamsValueReaderProperties {
     apply(handler)
   def >>[S](handler: this.type => S)(implicit executor: ExecutorView[S]): S =
     apply(handler)
-}
 
-trait ParamsOnlyCommand extends TypeConverterFactories with Command {
+trait ParamsOnlyCommand extends TypeConverterFactories with Command
   type CommandTypeConverterFactory[T] = TypeConverterFactory[T]
-}
 
 //trait ForceFromParams { self: Command =>
 //

@@ -18,29 +18,27 @@ class ALSModel(
     val similarUserStringIntMap: BiMap[String, Int],
     val similarUsers: Map[Int, User]
 )
-    extends Serializable {
+    extends Serializable
 
   @transient lazy val similarUserIntStringMap = similarUserStringIntMap.inverse
 
-  override def toString = {
+  override def toString =
     s" similarUserFeatures: [${similarUserFeatures.size}]" +
     s"(${similarUserFeatures.take(2).toList}...)" +
     s" similarUserStringIntMap: [${similarUserStringIntMap.size}]" +
     s"(${similarUserStringIntMap.take(2).toString()}...)]" +
     s" users: [${similarUsers.size}]" +
     s"(${similarUsers.take(2).toString()}...)]"
-  }
-}
 
 /**
   * Use ALS to build user x feature matrix
   */
 class ALSAlgorithm(val ap: ALSAlgorithmParams)
-    extends P2LAlgorithm[PreparedData, ALSModel, Query, PredictedResult] {
+    extends P2LAlgorithm[PreparedData, ALSModel, Query, PredictedResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  def train(sc: SparkContext, data: PreparedData): ALSModel = {
+  def train(sc: SparkContext, data: PreparedData): ALSModel =
     require(data.followEvents.take(1).nonEmpty,
             s"followEvents in PreparedData cannot be empty." +
             " Please check if DataSource generates TrainingData" +
@@ -54,12 +52,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val similarUserStringIntMap = userStringIntMap
 
     // collect SimilarUser as Map and convert ID to Int index
-    val similarUsers: Map[Int, User] = data.users.map {
+    val similarUsers: Map[Int, User] = data.users.map
       case (id, similarUser) =>
         (similarUserStringIntMap(id), similarUser)
-    }.collectAsMap().toMap
+    .collectAsMap().toMap
 
-    val mllibRatings = data.followEvents.map { r =>
+    val mllibRatings = data.followEvents.map  r =>
       // Convert user and user String IDs to Int index for MLlib
       val uindex = userStringIntMap.getOrElse(r.user, -1)
       val iindex = similarUserStringIntMap.getOrElse(r.followedUser, -1)
@@ -74,15 +72,15 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             " to Int index.")
 
       ((uindex, iindex), 1)
-    }.filter {
+    .filter
       case ((u, i), v) =>
         // keep events with valid user and user index
         (u != -1) && (i != -1)
-    }.map {
+    .map
       case ((u, i), v) =>
         // MLlibRating requires integer index for user and user
         MLlibRating(u, i, v)
-    }.cache()
+    .cache()
 
     // MLLib ALS cannot handle empty training data.
     require(
@@ -106,9 +104,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
         similarUserStringIntMap = similarUserStringIntMap,
         similarUsers = similarUsers
     )
-  }
 
-  def predict(model: ALSModel, query: Query): PredictedResult = {
+  def predict(model: ALSModel, query: Query): PredictedResult =
 
     val similarUserFeatures = model.similarUserFeatures
 
@@ -118,9 +115,9 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
 
     val queryFeatures: Vector[Array[Double]] = queryList.toVector
     // similarUserFeatures may not contain the requested user
-    .map { similarUser =>
+    .map  similarUser =>
       similarUserFeatures.get(similarUser)
-    }.flatten
+    .flatten
 
     val whiteList: Option[Set[Int]] = query.whiteList.map(
         set => set.map(model.similarUserStringIntMap.get).flatten)
@@ -130,22 +127,21 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val ord = Ordering.by[(Int, Double), Double](_._2).reverse
 
     val indexScores: Array[(Int, Double)] =
-      if (queryFeatures.isEmpty) {
+      if (queryFeatures.isEmpty)
         logger.info(
             s"No similarUserFeatures vector for query users ${query.users}.")
         Array[(Int, Double)]()
-      } else {
+      else
         similarUserFeatures.par // convert to parallel collection
-        .mapValues { f =>
-          queryFeatures.map { qf =>
+        .mapValues  f =>
+          queryFeatures.map  qf =>
             cosine(qf, f)
-          }.sum
-        }.filter(_._2 > 0) // keep similarUsers with score > 0
+          .sum
+        .filter(_._2 > 0) // keep similarUsers with score > 0
           .seq // convert back to sequential collection
           .toArray
-      }
 
-    val filteredScore = indexScores.view.filter {
+    val filteredScore = indexScores.view.filter
       case (i, v) =>
         isCandidateSimilarUser(
             i = i,
@@ -154,54 +150,45 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
             whiteList = whiteList,
             blackList = blackList
         )
-    }
 
     val topScores = getTopN(filteredScore, query.num)(ord).toArray
 
-    val similarUserScores = topScores.map {
+    val similarUserScores = topScores.map
       case (i, s) =>
         new similarUserScore(
             user = model.similarUserIntStringMap(i),
             score = s
         )
-    }
 
     new PredictedResult(similarUserScores)
-  }
 
   private def getTopN[T](s: Seq[T], n: Int)(
-      implicit ord: Ordering[T]): Seq[T] = {
+      implicit ord: Ordering[T]): Seq[T] =
     val q = mutable.PriorityQueue()
 
-    for (x <- s) {
+    for (x <- s)
       if (q.size < n) q.enqueue(x)
-      else {
+      else
         // q is full
-        if (ord.compare(x, q.head) < 0) {
+        if (ord.compare(x, q.head) < 0)
           q.dequeue()
           q.enqueue(x)
-        }
-      }
-    }
 
     q.dequeueAll.toSeq.reverse
-  }
 
-  private def cosine(v1: Array[Double], v2: Array[Double]): Double = {
+  private def cosine(v1: Array[Double], v2: Array[Double]): Double =
     val size = v1.length
     var i = 0
     var n1: Double = 0
     var n2: Double = 0
     var d: Double = 0
-    while (i < size) {
+    while (i < size)
       n1 += v1(i) * v1(i)
       n2 += v2(i) * v2(i)
       d += v1(i) * v2(i)
       i += 1
-    }
     val n1n2 = math.sqrt(n1) * math.sqrt(n2)
     if (n1n2 == 0) 0 else d / n1n2
-  }
 
   private def isCandidateSimilarUser(
       i: Int,
@@ -209,10 +196,8 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
       queryList: Set[Int],
       whiteList: Option[Set[Int]],
       blackList: Option[Set[Int]]
-  ): Boolean = {
+  ): Boolean =
     whiteList.map(_.contains(i)).getOrElse(true) &&
     blackList.map(!_.contains(i)).getOrElse(true) &&
     // discard similarUsers in query as well
     (!queryList.contains(i))
-  }
-}

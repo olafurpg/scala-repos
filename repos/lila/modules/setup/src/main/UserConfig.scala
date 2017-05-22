@@ -8,7 +8,7 @@ private[setup] case class UserConfig(id: String,
                                      ai: AiConfig,
                                      friend: FriendConfig,
                                      hook: HookConfig,
-                                     filter: FilterConfig) {
+                                     filter: FilterConfig)
 
   def withFilter(c: FilterConfig) = copy(filter = c)
 
@@ -17,9 +17,8 @@ private[setup] case class UserConfig(id: String,
   def withFriend(c: FriendConfig) = copy(friend = c)
 
   def withHook(c: HookConfig) = copy(hook = c)
-}
 
-private[setup] object UserConfig {
+private[setup] object UserConfig
 
   def default(id: String): UserConfig =
     UserConfig(id = id,
@@ -35,7 +34,7 @@ private[setup] object UserConfig {
   import HookConfig.hookConfigBSONHandler
   import FilterConfig.filterConfigBSONHandler
 
-  private[setup] implicit val userConfigBSONHandler = new BSON[UserConfig] {
+  private[setup] implicit val userConfigBSONHandler = new BSON[UserConfig]
 
     def reads(r: BSON.Reader): UserConfig =
       UserConfig(
@@ -51,7 +50,5 @@ private[setup] object UserConfig {
                    "friend" -> o.friend,
                    "hook" -> o.hook,
                    "filter" -> o.filter)
-  }
 
   private[setup] val tube = BsTube(userConfigBSONHandler)
-}

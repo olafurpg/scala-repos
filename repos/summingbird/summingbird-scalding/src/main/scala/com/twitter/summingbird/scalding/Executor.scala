@@ -32,24 +32,22 @@ import org.slf4j.LoggerFactory
 /**
   * @author Ian O Connell
   */
-trait ScaldingExecutionConfig extends ChillExecutionConfig[Scalding] {
+trait ScaldingExecutionConfig extends ChillExecutionConfig[Scalding]
   def getWaitingState(hadoopConfig: Configuration,
                       startDate: Option[Timestamp],
                       batches: Int): WaitingState[Interval[Timestamp]]
-}
 
-object Executor {
+object Executor
   @transient private val logger = LoggerFactory.getLogger(Executor.getClass)
 
-  def buildHadoopConf(inArgs: Array[String]): (Configuration, Args) = {
+  def buildHadoopConf(inArgs: Array[String]): (Configuration, Args) =
     val baseConfig = new Configuration
     val args = Args(
         new GenericOptionsParser(baseConfig, inArgs).getRemainingArgs)
     (baseConfig, args)
-  }
 
   def apply(
-      inArgs: Array[String], generator: (Args => ScaldingExecutionConfig)) {
+      inArgs: Array[String], generator: (Args => ScaldingExecutionConfig))
 
     val (hadoopConf, args) = buildHadoopConf(inArgs)
 
@@ -87,30 +85,25 @@ object Executor {
 
     val scaldPlatform = Scalding(config.name, options)
       .withRegistrars(config.registrars)
-      .withConfigUpdater { c =>
+      .withConfigUpdater  c =>
         com.twitter.scalding.Config
           .tryFrom(config.transformConfig(c.toMap).toMap)
           .get
-      }
 
     val toRun = scaldPlatform.plan(config.graph)
 
-    try {
+    try
       scaldPlatform.run(config.getWaitingState(hadoopConf, startDate, batches),
                         Hdfs(true, hadoopConf),
                         toRun)
-    } catch {
+    catch
       case f @ FlowPlanException(errs) =>
         /* This is generally due to data not being ready, don't give a failed error code */
-        if (!args.boolean("scalding.nothrowplan")) {
+        if (!args.boolean("scalding.nothrowplan"))
           logger.error(
               "use: --scalding.nothrowplan to not give a failing error code in this case")
           throw f
-        } else {
+        else
           logger.info("[ERROR]: ========== FlowPlanException =========")
           errs.foreach { logger.info(_) }
           logger.info("========== FlowPlanException =========")
-        }
-    }
-  }
-}

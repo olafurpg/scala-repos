@@ -1,6 +1,6 @@
 import scala._;
 
-object test {
+object test
 
   abstract trait F { type If; }
 
@@ -10,9 +10,9 @@ object test {
 
   def g[Jg](h: Jg): G { type Ig = Jg } = g[Jg](h);
 
-  abstract class M() {
+  abstract class M()
     type P;
-    abstract class I() {
+    abstract class I()
       type X;
 
       // Methods to check the type X and P as seen from instances of I
@@ -21,21 +21,19 @@ object test {
 
       // Value with type X as seen from instances of I
       def val_ix: X = val_ix;
-    }
 
     val i: I { type X = G { type Ig = P } } = null;
 
     // Values with types P and i.X as seen from instances of M
     def val_mp: P = val_mp;
     def val_mix: G { type Ig = P } = g[P](val_mp);
-  }
 
-  abstract class N() extends M() {
+  abstract class N() extends M()
     type Q;
     type P = F { type If = Q };
     val j: J { type Y = G { type Ig = Q } } = null;
 
-    abstract class J() extends I() {
+    abstract class J() extends I()
       type Y;
       type X = G { type Ig = Y; };
       // Values with types Y and X as seen from instances of J
@@ -45,7 +43,6 @@ object test {
       // Check type P
       chk_ip(val_mp);
       chk_ip(val_np);
-    }
 
     // Values with types Q, X.P, i.X, j.Y and j.X as seen from instances of N
     def val_nq: Q = val_nq;
@@ -73,5 +70,3 @@ object test {
     j.chk_ix(j.val_ix);
     j.chk_ix(j.val_jx);
     j.chk_ix(val_njx);
-  }
-}

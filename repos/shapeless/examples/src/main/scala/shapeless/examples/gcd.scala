@@ -21,7 +21,7 @@ package shapeless.examples
   * 
   * @author George Leontiev
   */
-object GCDExamples {
+object GCDExamples
   import shapeless._
   import nat._
   import ops.nat._
@@ -29,7 +29,7 @@ object GCDExamples {
 
   trait GCD[X <: Nat, Y <: Nat] { type Out <: Nat }
 
-  object GCD {
+  object GCD
     def gcd[N <: Nat](x: Nat, y: Nat)(
         implicit gcd: Aux[x.N, y.N, N], wn: Witness.Aux[N]): N = wn.value
 
@@ -44,7 +44,6 @@ object GCDExamples {
     implicit def gcd2[X <: Nat, Y <: Nat, Out0 <: Nat](
         implicit ev0: LT[Y, X], ev1: Aux[Y, X, Out0]): Aux[X, Y, Out0] =
       new GCD[X, Y] { type Out = Out0 }
-  }
 
   import GCD._
 
@@ -59,4 +58,3 @@ object GCDExamples {
 
   val g4 = gcd(8, 12)
   typed[_4](g4)
-}

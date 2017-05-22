@@ -9,14 +9,14 @@ import java.net.SocketAddress
   *
   * Use the companion object [[DefaultMonitor]].
   */
-private[util] class DefaultMonitor(log: Logger) extends Monitor {
+private[util] class DefaultMonitor(log: Logger) extends Monitor
   private[this] val MinLogLevel = Level.INFO.value
 
   private[this] def logThrowable(t: Throwable, level: Level): Unit =
     log.log(level, t, "Exception propagated to DefaultMonitor")
 
-  def handle(exc: Throwable): Boolean = {
-    exc match {
+  def handle(exc: Throwable): Boolean =
+    exc match
       case f: HasLogLevel if f.logLevel.value < MinLogLevel =>
         logThrowable(exc, f.logLevel)
         true
@@ -30,11 +30,8 @@ private[util] class DefaultMonitor(log: Logger) extends Monitor {
         true
       case _ =>
         RootMonitor.handle(exc)
-    }
-  }
 
   override def toString: String = "DefaultMonitor"
-}
 
 /**
   * The default [[Monitor]] to be used throughout Finagle.
@@ -46,30 +43,25 @@ private[util] class DefaultMonitor(log: Logger) extends Monitor {
   * `Future.raiseWithin`.
   */
 object DefaultMonitor
-    extends DefaultMonitor(Logger.get(classOf[DefaultMonitor])) {
+    extends DefaultMonitor(Logger.get(classOf[DefaultMonitor]))
   val get = this
-}
 
 trait ReporterFactory extends ((String, Option[SocketAddress]) => Monitor)
 
-object NullReporterFactory extends ReporterFactory {
+object NullReporterFactory extends ReporterFactory
   def apply(name: String, addr: Option[SocketAddress]): Monitor = NullMonitor
 
   override def toString: String = "NullReporterFactory"
-}
 
-object LoadedReporterFactory extends ReporterFactory {
+object LoadedReporterFactory extends ReporterFactory
   private[this] val factories = LoadService[ReporterFactory]()
 
   def apply(name: String, addr: Option[SocketAddress]): Monitor =
-    factories.map(_ (name, addr)).foldLeft(NullMonitor: Monitor) { (a, m) =>
+    factories.map(_ (name, addr)).foldLeft(NullMonitor: Monitor)  (a, m) =>
       a andThen m
-    }
 
   val get = this
 
-  override def toString: String = {
+  override def toString: String =
     val names = factories.map(_.getClass.getName).mkString(",")
     s"LoadedReporterFactory($names)"
-  }
-}

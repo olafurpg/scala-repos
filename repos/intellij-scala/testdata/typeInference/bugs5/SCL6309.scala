@@ -1,4 +1,4 @@
-object A {
+object A
   class B
   class C
   implicit def a2b(a: Any): B = new B
@@ -9,5 +9,4 @@ object A {
 
   /*start*/
   l(1) /*end*/
-}
 //A.C

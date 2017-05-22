@@ -1,4 +1,4 @@
-object test {
+object test
   trait A { def apply(x: Int) = x }
   trait B { def apply(x: Int) = x }
   trait C {}
@@ -8,6 +8,5 @@ object test {
 
   /*start*/
   (foo[A](1), foo[B](1), foo[C](1), null.asInstanceOf[A](1)) /*end*/
-}
 
 //(Int, Int, Int, Int)

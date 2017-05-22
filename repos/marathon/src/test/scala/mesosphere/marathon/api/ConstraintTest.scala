@@ -5,19 +5,18 @@ import mesosphere.marathon.Protos.Constraint
 import org.scalatest.Matchers
 import play.api.libs.json.{JsResultException, Json}
 
-class ConstraintTest extends MarathonSpec with Matchers {
+class ConstraintTest extends MarathonSpec with Matchers
 
-  test("Deserialize") {
+  test("Deserialize")
     def shouldMatch(json: String,
                     field: String,
                     operator: Constraint.Operator,
-                    value: String = "") {
+                    value: String = "")
       import mesosphere.marathon.api.v2.json.Formats._
       val constraint = Json.fromJson[Constraint](Json.parse(json)).get
       assert(field == constraint.getField)
       assert(operator == constraint.getOperator)
       assert(value == constraint.getValue)
-    }
 
     shouldMatch(
         """["hostname","UNIQUE"]""", "hostname", Constraint.Operator.UNIQUE)
@@ -28,9 +27,8 @@ class ConstraintTest extends MarathonSpec with Matchers {
     shouldMatch("""["jdk","LIKE","7"]""", "jdk", Constraint.Operator.LIKE, "7")
     shouldMatch(
         """["jdk","UNLIKE","7"]""", "jdk", Constraint.Operator.UNLIKE, "7")
-  }
 
-  test("Read should allow only valid Constraints (regression for #2951)") {
+  test("Read should allow only valid Constraints (regression for #2951)")
     import mesosphere.marathon.api.v2.json.Formats._
     Json.parse("""[]""").asOpt[Constraint] should be(empty)
     Json.parse("""["foo", "UNKNOWN"]""").asOpt[Constraint] should be(empty)
@@ -46,10 +44,9 @@ class ConstraintTest extends MarathonSpec with Matchers {
     ex.errors.head._2 should have size 1
     ex.errors.head._2.head.messages.head should startWith(
         "Constraint definition must be an array of string")
-  }
 
   test(
-      "Read should give a nice validation error for unknown operators (regression for #3161)") {
+      "Read should give a nice validation error for unknown operators (regression for #3161)")
     import mesosphere.marathon.api.v2.json.Formats._
     val ex = intercept[JsResultException](
         Json.parse("""["foo", "unique"]""").as[Constraint])
@@ -57,15 +54,13 @@ class ConstraintTest extends MarathonSpec with Matchers {
     ex.errors.head._2 should have size 1
     ex.errors.head._2.head.messages.head should startWith(
         "Constraint operator must be one of the following")
-  }
 
-  test("Serialize") {
-    def shouldMatch(expected: String, constraint: Constraint) {
+  test("Serialize")
+    def shouldMatch(expected: String, constraint: Constraint)
       import mesosphere.marathon.api.v2.json.Formats._
       JsonTestHelper
         .assertThatJsonOf(constraint)
         .correspondsToJsonString(expected)
-    }
 
     shouldMatch("""["hostname","UNIQUE"]""",
                 Constraint.newBuilder
@@ -90,5 +85,3 @@ class ConstraintTest extends MarathonSpec with Matchers {
                   .setOperator(Constraint.Operator.UNLIKE)
                   .setValue("7")
                   .build)
-  }
-}

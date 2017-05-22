@@ -3,12 +3,11 @@
 class A
 class B
 
-trait S {
+trait S
   implicit def aToB(a: A): B = new B
-}
 
-class T1 extends S {
-  def x: B = {
+class T1 extends S
+  def x: B =
     val aToB = 3
     // ok: doesn't compile, because aToB method requires 'T.this.' prefix
     //aToB(new A)
@@ -16,17 +15,14 @@ class T1 extends S {
     // bug: compiles, using T.this.aToB,
     //   despite it not being accessible without a prefix
     new A
-  }
-}
 
-object O {
+object O
   implicit def aToB(a: A): B = new B
-}
 
-class T2a {
+class T2a
   import O._
 
-  def x: B = {
+  def x: B =
     val aToB = 3
     // ok: doesn't compile, because aToB method requires 'T.this.' prefix
     //aToB(new A)
@@ -34,13 +30,11 @@ class T2a {
     // bug: compiles, using T.this.aToB,
     //   despite it not being accessible without a prefix
     new A
-  }
-}
 
-class T2b {
+class T2b
   import O.aToB
 
-  def x: B = {
+  def x: B =
     val aToB = 3
     // ok: doesn't compile, because aToB method requires 'T.this.' prefix
     //aToB(new A)
@@ -48,13 +42,11 @@ class T2b {
     // bug: compiles, using T.this.aToB,
     //   despite it not being accessible without a prefix
     new A
-  }
-}
 
-class T3 {
+class T3
   implicit def aToB(a: A): B = new B
 
-  def x: B = {
+  def x: B =
     val aToB = 3
     // ok: doesn't compile, because aToB method requires 'T.this.' prefix
     //aToB(new A)
@@ -62,5 +54,3 @@ class T3 {
     // bug: compiles, using T.this.aToB,
     //   despite it not being accessible without a prefix
     new A
-  }
-}

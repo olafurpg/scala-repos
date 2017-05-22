@@ -3,7 +3,7 @@ import Import._
 import Def.Initialize
 import complete.{DefaultParsers, Parser}
 
-object A {
+object A
   val x1: Initialize[Task[Int]] = Def.task { 3 }
   val y1 = Def.task { x1.value }
 
@@ -12,4 +12,3 @@ object A {
 
   val x3: Initialize[Int] = Def.setting { 3 }
   val y3 = Def.setting { x3.value }
-}

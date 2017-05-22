@@ -39,7 +39,7 @@ import com.precog.util.BitSetUtil.Implicits._
  *
  * DCB - 2012-07-27
  */
-private[jdbm3] object CTypeMappings {
+private[jdbm3] object CTypeMappings
   final val FSTRING = 0.toByte
   final val FBOOLEAN = 1.toByte
   final val FLONG = 2.toByte
@@ -53,7 +53,7 @@ private[jdbm3] object CTypeMappings {
   final val FPERIOD = 10.toByte
   final val FUNDEFINED = -1.toByte
 
-  def flagFor(tpe: CType): Byte = tpe match {
+  def flagFor(tpe: CType): Byte = tpe match
     case CString => FSTRING
     case CBoolean => FBOOLEAN
     case CLong => FLONG
@@ -66,9 +66,8 @@ private[jdbm3] object CTypeMappings {
     case CEmptyArray => FEMPTYARRAY
     case CArrayType(_) => FARRAY
     case CUndefined => sys.error("Undefined is not a valid format")
-  }
 
-  def fromFlag(b: Byte): CType = b match {
+  def fromFlag(b: Byte): CType = b match
     case FSTRING => CString
     case FBOOLEAN => CBoolean
     case FLONG => CLong
@@ -81,8 +80,6 @@ private[jdbm3] object CTypeMappings {
     case FEMPTYARRAY => CEmptyArray
     case FARRAY => sys.error("todo")
     case invalid => sys.error(invalid + " is not a valid format")
-  }
-}
 
 //object CValueSerializer {
 //import CTypeMappings._

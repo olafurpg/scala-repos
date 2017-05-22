@@ -6,7 +6,7 @@ import com.twitter.finagle.benchmark.StdBenchAnnotations
 import org.openjdk.jmh.annotations.{Scope, State, Benchmark}
 
 // ./sbt 'project finagle-benchmark' 'run .*BackoffBenchmark.*'
-class BackoffBenchmark extends StdBenchAnnotations {
+class BackoffBenchmark extends StdBenchAnnotations
   import BackoffBenchmark._
 
   @Benchmark
@@ -24,17 +24,14 @@ class BackoffBenchmark extends StdBenchAnnotations {
   @Benchmark
   def decorrelatedJittered(state: DecorrelatedJittered): Duration =
     state.next()
-}
 
-object BackoffBenchmark {
+object BackoffBenchmark
 
-  abstract class BackoffState(var backoff: Stream[Duration]) {
-    def next(): Duration = {
+  abstract class BackoffState(var backoff: Stream[Duration])
+    def next(): Duration =
       val head = backoff.head
       backoff = backoff.tail
       head
-    }
-  }
 
   @State(Scope.Thread)
   class FromFunction
@@ -68,4 +65,3 @@ object BackoffBenchmark {
           Backoff.decorrelatedJittered(5.second, 300.seconds) ++ Backoff.const(
               300.seconds)
       )
-}

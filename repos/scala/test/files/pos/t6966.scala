@@ -1,7 +1,7 @@
 import Ordering.{Byte, comparatorToOrdering}
 trait Format[T]
 trait InputCache[T]
-object CacheIvy {
+object CacheIvy
   implicit def basicInputCache[I](
       implicit fmt: Format[I], eqv: Equiv[I]): InputCache[I] = null
   implicit def arrEquiv[T](implicit t: Equiv[T]): Equiv[Array[T]] = null
@@ -12,7 +12,6 @@ object CacheIvy {
       implicit head: InputCache[H], tail: InputCache[T]): InputCache[H :+: T] =
     null
   hConsCache[Array[Byte], HNil]
-}
 
 sealed trait HList
 sealed trait HNil extends HList

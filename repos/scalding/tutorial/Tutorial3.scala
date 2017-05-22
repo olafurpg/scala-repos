@@ -37,7 +37,7 @@ You can also of course try this with other input parameters. For example:
     --input tutorial/data/output2.txt
 
   **/
-class Tutorial3(args: Args) extends Job(args) {
+class Tutorial3(args: Args) extends Job(args)
 
   /**
   We can ask args for the --input argument from the command line.
@@ -53,9 +53,8 @@ class Tutorial3(args: Args) extends Job(args) {
     function, we return a collection of items. Each of these items will create
     a new entry in the data stream; here, we'll end up with a new entry for each word.
       **/
-    .flatMap('line -> 'word) { line: String =>
+    .flatMap('line -> 'word)  line: String =>
       line.split("\\s")
-    }
 
     /**
     We still want to project just the 'word field for our final output.
@@ -65,4 +64,3 @@ class Tutorial3(args: Args) extends Job(args) {
     .write(Tsv("tutorial/data/tmp3.tsv"))
     .project('word)
     .write(output)
-}

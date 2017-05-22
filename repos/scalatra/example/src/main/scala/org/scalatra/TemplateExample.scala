@@ -4,7 +4,7 @@ import org.scalatra.scalate.ScalateSupport
 
 import scala.xml.{Node, Text}
 
-object Template {
+object Template
 
   def page(
       title: String,
@@ -13,7 +13,7 @@ object Template {
       head: Seq[Node] = Nil,
       scripts: Seq[String] = Seq.empty,
       defaultScripts: Seq[String] = Seq(
-            "/assets/js/jquery.min.js", "/assets/js/bootstrap.min.js")) = {
+            "/assets/js/jquery.min.js", "/assets/js/bootstrap.min.js")) =
     <html lang="en">
       <head>
         <title>{ title }</title>
@@ -70,23 +70,20 @@ object Template {
         <!-- Le javascript
             ================================================== -->
         <!-- Placed at the end of the document so the pages load faster -->
-        {
-          (defaultScripts ++ scripts) map { pth =>
+        
+          (defaultScripts ++ scripts) map  pth =>
             <script type="text/javascript" src={ url(pth) }></script>
-          }
-        }
+        
       </body>
     </html>
-  }
-}
 
 class TemplateExample
-    extends ScalatraServlet with FlashMapSupport with ScalateSupport {
+    extends ScalatraServlet with FlashMapSupport with ScalateSupport
 
   private def displayPage(title: String, content: Seq[Node]) =
     Template.page(title, content, url(_, includeServletPath = false))
 
-  get("/date/:year/:month/:day") {
+  get("/date/:year/:month/:day")
     displayPage("Scalatra: Date Example",
                 <ul>
         <li>Year: { params("year") }</li>
@@ -94,25 +91,22 @@ class TemplateExample
         <li>Day: { params("day") }</li>
       </ul>
       <pre>Route: /date/:year/:month/:day</pre>)
-  }
 
-  get("/form") {
+  get("/form")
     displayPage("Scalatra: Form Post Example",
                 <form action={ url("/post") } method='POST'>
         Post something:<input name="submission" type='text'/>
         <input type='submit'/>
       </form>
       <pre>Route: /form</pre>)
-  }
 
-  post("/post") {
+  post("/post")
     displayPage("Scalatra: Form Post Result",
                 <p>You posted: { params("submission") }</p>
       <pre>Route: /post</pre>)
-  }
 
-  get("/login") {
-    (session.get("first"), session.get("last")) match {
+  get("/login")
+    (session.get("first"), session.get("last")) match
       case (Some(first: String), Some(last: String)) =>
         displayPage("Scalatra: Session Example",
                     <pre>You have logged in as: { first + "-" + last }</pre>
@@ -125,42 +119,34 @@ class TemplateExample
             <input type='submit'/>
           </form>
           <pre>Route: /login</pre>)
-    }
-  }
 
-  post("/login") {
-    (params("first"), params("last")) match {
-      case (first: String, last: String) => {
+  post("/login")
+    (params("first"), params("last")) match
+      case (first: String, last: String) =>
           session("first") = first
           session("last") = last
           displayPage(
               "Scalatra: Session Example",
               <pre>You have just logged in as: { first + " " + last }</pre>
           <pre>Route: /login</pre>)
-        }
-    }
-  }
 
-  get("/logout") {
+  get("/logout")
     session.invalidate
     displayPage("Scalatra: Session Example",
                 <pre>You have logged out</pre>
       <pre>Route: /logout</pre>)
-  }
 
-  get("/") {
+  get("/")
     displayPage("Scalatra: Hello World",
                 <h2>Hello world!</h2>
       <p>Referer: { (request referrer) map { Text(_) } getOrElse { <i>none</i> } }</p>
       <pre>Route: /</pre>)
-  }
 
-  get("/scalate") {
+  get("/scalate")
     val content = "this is some fake content for the web page"
     layoutTemplate("index.scaml", "content" -> content)
-  }
 
-  get("/flash-map/form") {
+  get("/flash-map/form")
     displayPage("Scalatra: Flash Map Example",
                 <span>Supports the post-then-redirect pattern</span>
       <br/>
@@ -168,22 +154,17 @@ class TemplateExample
         <label>Message: <input type="text" name="message"/></label><br/>
         <input type="submit"/>
       </form>)
-  }
 
-  post("/flash-map/form") {
+  post("/flash-map/form")
     flash("message") = params.getOrElse("message", "")
     redirect("/flash-map/result")
-  }
 
-  get("/flash-map/result") {
+  get("/flash-map/result")
     displayPage(
         title = "Scalatra: Flash  Example",
         content = <span>Message = { flash.getOrElse("message", "") }</span>
     )
-  }
 
-  post("/echo") {
+  post("/echo")
     import org.scalatra.util.RicherString._
     params("echo").urlDecode
-  }
-}

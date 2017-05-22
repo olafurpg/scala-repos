@@ -10,10 +10,10 @@ case class UnexpectedException(
     message: Option[String] = None, unexpected: Option[Throwable] = None)
     extends PlayException(
         "Unexpected exception",
-        message.getOrElse {
+        message.getOrElse
           unexpected
             .map(t => "%s: %s".format(t.getClass.getSimpleName, t.getMessage))
             .getOrElse("")
-        },
+        ,
         unexpected.orNull
     )

@@ -35,30 +35,25 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 import scalafx.scene.paint.Material
 
-object Shape3D {
+object Shape3D
   implicit def sfxShape3D2jfx(v: Shape3D): jfxss.Shape3D =
     if (v != null) v.delegate else null
-}
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/Shape3D.html]]. */
 abstract class Shape3D(override val delegate: jfxss.Shape3D)
-    extends Node(delegate) with SFXDelegate[jfxss.Shape3D] {
+    extends Node(delegate) with SFXDelegate[jfxss.Shape3D]
 
   /** Defines the cullFace this Shape3D. */
   def cullFace: ObjectProperty[jfxss.CullFace] = delegate.cullFaceProperty
-  def cullFace_=(v: CullFace) {
+  def cullFace_=(v: CullFace)
     ObjectProperty.fillProperty[jfxss.CullFace](this.cullFace, v)
-  }
 
   /** Defines the drawMode this Shape3D. */
   def drawMode: ObjectProperty[jfxss.DrawMode] = delegate.drawModeProperty
-  def drawMode_=(v: DrawMode) {
+  def drawMode_=(v: DrawMode)
     ObjectProperty.fillProperty[jfxss.DrawMode](this.drawMode, v)
-  }
 
   /** Defines the material this Shape3D. */
   def material: ObjectProperty[jfxsp.Material] = delegate.materialProperty
-  def material_=(v: Material) {
+  def material_=(v: Material)
     ObjectProperty.fillProperty[jfxsp.Material](this.material, v)
-  }
-}

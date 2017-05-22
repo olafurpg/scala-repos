@@ -25,51 +25,45 @@ import java.lang.Character.isWhitespace
 import scalaz._
 import scalaz.syntax.monad._
 
-object TerminateJson {
+object TerminateJson
   final class ArrayStack[@specialized(Int) A : Manifest](
-      initCapacity: Int = 128) {
+      initCapacity: Int = 128)
     private[bifrost] var stack = new Array[A](initCapacity)
     private[bifrost] var next: Int = 0
 
-    private def resize() {
+    private def resize()
       val stack0 = new Array[A](stack.length * 2)
       System.arraycopy(stack, 0, stack0, 0, stack.length)
       stack = stack0
-    }
 
-    def copy(): ArrayStack[A] = {
+    def copy(): ArrayStack[A] =
       val copy = new ArrayStack[A](stack.length)
       System.arraycopy(stack, 0, copy.stack, 0, next)
       copy.next = next
       copy
-    }
 
-    def head: A = {
+    def head: A =
       if (next == 0)
         throw new IllegalStateException(
             "Cannot pop element off of empty stack.")
       stack(next - 1)
-    }
 
-    def push(a: A) {
+    def push(a: A)
       if (next == stack.length) resize()
       stack(next) = a
       next += 1
-    }
 
-    def pop(): A = {
+    def pop(): A =
       if (next == 0)
         throw new IllegalStateException(
             "Cannot pop element off of empty stack.")
       next -= 1
       stack(next)
-    }
 
     def isEmpty: Boolean = next == 0
     def nonEmpty: Boolean = next > 0
     override def toString: String =
       stack.take(next).mkString("ArrayStack(", ", ", ")")
-  }
 
   @inline private final val ExpectValue = 0
   @inline private final val ExpectField = 1
@@ -89,26 +83,25 @@ object TerminateJson {
     * inserted.
     */
   def ensure[M[+ _]: Monad](
-      stream0: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] = {
+      stream0: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] =
     def build(stack0: ArrayStack[Int],
-              buf: CharBuffer): (ArrayStack[Int], CharBuffer) = {
+              buf: CharBuffer): (ArrayStack[Int], CharBuffer) =
       val stack = stack0.copy()
 
-      while (buf.remaining() > 0) {
+      while (buf.remaining() > 0)
         val c = buf.get()
 
-        def anyValue(): Boolean = c match {
+        def anyValue(): Boolean = c match
           case '"' => stack.push(CloseString); true
           case '[' => stack.push(CloseArray); true
           case '{' => stack.push(CloseObject); true
           case s if isWhitespace(s) => false
           case c => true
-        }
 
-        if (stack.isEmpty) {
+        if (stack.isEmpty)
           anyValue()
-        } else {
-          stack.head match {
+        else
+          stack.head match
             case SkipChar =>
               stack.pop()
             case ExpectValue =>
@@ -122,40 +115,35 @@ object TerminateJson {
               else if (c == ',') stack.push(ExpectValue)
               else anyValue()
             case ExpectField =>
-              if (c == '"') {
+              if (c == '"')
                 stack.pop()
                 stack.push(ExpectValue)
                 stack.push(FieldDelim)
                 stack.push(CloseString)
-              }
             case CloseObject =>
               if (c == '}') stack.pop()
               else if (c == ',') stack.push(ExpectField)
-              else if (c == '"') {
+              else if (c == '"')
                 stack.push(ExpectValue)
                 stack.push(FieldDelim)
                 stack.push(CloseString)
-              } else anyValue()
+              else anyValue()
             case FieldDelim =>
               if (c == ':') stack.pop()
             case _ =>
               anyValue()
-          }
-        }
-      }
 
       buf.flip()
       (stack, buf)
-    }
 
-    def terminal(stack: ArrayStack[Int]): Option[CharBuffer] = {
+    def terminal(stack: ArrayStack[Int]): Option[CharBuffer] =
       if (stack.isEmpty) None
       else
-        Some({
+        Some(
           val sb = new StringBuilder()
-          while (stack.nonEmpty) {
+          while (stack.nonEmpty)
             sb ++=
-            (stack.pop() match {
+            (stack.pop() match
                   case ExpectValue => "null"
                   case ExpectField => "\"\":null"
                   case SkipChar => "\""
@@ -164,27 +152,22 @@ object TerminateJson {
                   case CloseArray => "]"
                   case CloseObject => "}"
                   case _ => sys.error("Unreachable.")
-                })
-          }
+                )
           CharBuffer.wrap(sb.toString)
-        })
-    }
+        )
 
     def rec(stack0: ArrayStack[Int],
-            stream: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] = {
-      StreamT(stream.uncons map {
+            stream: StreamT[M, CharBuffer]): StreamT[M, CharBuffer] =
+      StreamT(stream.uncons map
         case Some((buf0, tail)) =>
           val (stack, buf) = build(stack0, buf0)
           StreamT.Yield(buf, rec(stack, tail))
         case None =>
-          terminal(stack0) map { buf =>
+          terminal(stack0) map  buf =>
             StreamT.Yield(buf, StreamT.empty)
-          } getOrElse StreamT.Done
-      })
-    }
+          getOrElse StreamT.Done
+      )
 
     val init = new ArrayStack[Int]
     init.push(ExpectValue)
     rec(init, stream0)
-  }
-}

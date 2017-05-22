@@ -9,7 +9,7 @@ import play.api.mvc._
 import play.api.mvc.Results._
 import views._
 
-private[controllers] trait TheftPrevention { self: LilaController =>
+private[controllers] trait TheftPrevention  self: LilaController =>
 
   protected def PreventTheft(pov: Pov)(
       ok: => Fu[Result])(implicit ctx: Context): Fu[Result] =
@@ -18,8 +18,8 @@ private[controllers] trait TheftPrevention { self: LilaController =>
         ok)
 
   protected def isTheft(pov: Pov)(implicit ctx: Context) =
-    pov.game.isPgnImport || pov.player.isAi || {
-      (pov.player.userId, ctx.userId) match {
+    pov.game.isPgnImport || pov.player.isAi ||
+      (pov.player.userId, ctx.userId) match
         case (Some(playerId), None) => true
         case (Some(playerId), Some(userId)) =>
           playerId != userId && !(ctx.me ?? Granter.superAdmin)
@@ -29,28 +29,23 @@ private[controllers] trait TheftPrevention { self: LilaController =>
             .get(AnonCookie.name)
             .map(_.value)
             .contains(pov.playerId)
-      }
-    }
 
   protected def isMyPov(pov: Pov)(implicit ctx: Context) = !isTheft(pov)
 
   protected def playablePovForReq(game: GameModel)(implicit ctx: Context) =
-    (!game.isPgnImport && game.playable) ?? {
+    (!game.isPgnImport && game.playable) ??
       ctx.userId
         .flatMap(game.playerByUserId)
-        .orElse {
+        .orElse
           ctx.req.cookies
             .get(AnonCookie.name)
             .map(_.value)
             .flatMap(game.player)
             .filterNot(_.hasUser)
-        }
         .filterNot(_.isAi)
         .map { Pov(game, _) }
-    }
 
   protected lazy val theftResponse =
     Unauthorized(jsonError(
             "This game requires authentication"
         )) as JSON
-}

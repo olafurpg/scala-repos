@@ -12,9 +12,9 @@ import java.math.RoundingMode
 import org.junit.Test
 import org.junit.Assert._
 
-class RoundingModeTest {
+class RoundingModeTest
 
-  @Test def testValues(): Unit = {
+  @Test def testValues(): Unit =
 
     val values = RoundingMode.values
     assertEquals(8, values.size)
@@ -30,5 +30,3 @@ class RoundingModeTest {
 
     val rmUP = RoundingMode.UP
     assertEquals("UP", rmUP.toString)
-  }
-}

@@ -57,7 +57,7 @@ object StageIncludes extends StageIncludes
   * @define WN Window
   * @define WE WindowEvent
   */
-trait StageIncludes {
+trait StageIncludes
 
   /**
     * $START$DC.html $DC$END
@@ -169,4 +169,3 @@ trait StageIncludes {
     */
   implicit def jfxWindowEvent2sfx(we: jfxs.WindowEvent): WindowEvent =
     if (we != null) new WindowEvent(we) {} else null
-}

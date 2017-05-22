@@ -6,7 +6,7 @@
 package scala.tools.nsc
 package javac
 
-object JavaTokens extends ast.parser.CommonTokens {
+object JavaTokens extends ast.parser.CommonTokens
 
   def isLiteral(code: Int) =
     code >= CHARLIT && code <= STRINGLIT
@@ -91,4 +91,3 @@ object JavaTokens extends ast.parser.CommonTokens {
   final val LONG = 186
   final val FLOAT = 187
   final val DOUBLE = 188
-}

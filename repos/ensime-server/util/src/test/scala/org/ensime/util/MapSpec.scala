@@ -6,7 +6,7 @@ import Predef.{any2stringadd => _, _ => _}
 
 import org.scalatest._
 
-class MapSpec extends FlatSpec with Matchers {
+class MapSpec extends FlatSpec with Matchers
   import map._
 
   val as = Map(
@@ -26,22 +26,18 @@ class MapSpec extends FlatSpec with Matchers {
       3 -> Set('e)
   )
 
-  "map._" should "map values eagerly" in {
+  "map._" should "map values eagerly" in
     var count = 0
-    val mapped = merged.mapValuesEagerly { syms =>
+    val mapped = merged.mapValuesEagerly  syms =>
       count += 1
       syms.head
-    }
 
     count shouldBe 3 // not lazy
 
     mapped shouldBe Map(1 -> 'a, 2 -> 'a, 3 -> 'e)
-  }
 
-  it should "merge multimap sets" in {
+  it should "merge multimap sets" in
     (as merge Map.empty) shouldBe as
     (Map.empty[Int, Set[Symbol]] merge as) shouldBe as
 
     (as merge bs) shouldBe merged
-  }
-}

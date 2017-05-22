@@ -7,7 +7,7 @@ import com.twitter.finagle.stats.{StatsReceiver, NullStatsReceiver}
 import com.twitter.finagle.util.{Drv, Rng}
 import com.twitter.util._
 
-private[finagle] object TrafficDistributor {
+private[finagle] object TrafficDistributor
 
   /**
     * A [[ServiceFactory]] and its associated weight. The `closeGate` defers closes
@@ -53,9 +53,9 @@ private[finagle] object TrafficDistributor {
   private def safelyScanLeft[T, U](
       init: U,
       stream: Event[Activity.State[T]]
-  )(f: (U, T) => U): Event[Activity.State[U]] = {
+  )(f: (U, T) => U): Event[Activity.State[U]] =
     val initState: Activity.State[U] = Activity.Ok(init)
-    stream.foldLeft(initState) {
+    stream.foldLeft(initState)
       case (Activity.Pending, Activity.Ok(update)) =>
         Activity.Ok(f(init, update))
       case (Activity.Failed(_), Activity.Ok(update)) =>
@@ -68,31 +68,26 @@ private[finagle] object TrafficDistributor {
         stale
       case (_, failed @ Activity.Failed(_)) => failed
       case (_, Activity.Pending) => Activity.Pending
-    }
-  }
 
   /**
     * Distributes requests to `classes` according to their weight and size.
     */
   private class Distributor[Req, Rep](
       classes: Iterable[WeightClass[Req, Rep]], rng: Rng = Rng.threadLocal)
-      extends ServiceFactory[Req, Rep] {
+      extends ServiceFactory[Req, Rep]
 
     private[this] val (balancers, drv): (IndexedSeq[ServiceFactory[Req, Rep]],
-    Drv) = {
-      val tupled = classes.map {
+    Drv) =
+      val tupled = classes.map
         case WeightClass(b, weight, size) => (b, weight * size)
-      }
       val (bs, ws) = tupled.unzip
       (bs.toIndexedSeq, Drv.fromWeights(ws.toSeq))
-    }
 
     def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
       balancers(drv(rng))(conn)
 
-    def close(deadline: Time): Future[Unit] = {
+    def close(deadline: Time): Future[Unit] =
       Closable.all(balancers: _*).close(deadline)
-    }
 
     private[this] val svcFactoryStatus: ServiceFactory[Req, Rep] => Status =
       sf => sf.status
@@ -100,8 +95,6 @@ private[finagle] object TrafficDistributor {
     override def status =
       Status.bestOf[ServiceFactory[Req, Rep]](balancers, svcFactoryStatus)
     override def toString = s"Distributor($classes)"
-  }
-}
 
 /**
   * A traffic distributor groups the input `dest` into distinct weight classes and
@@ -130,7 +123,7 @@ private[finagle] class TrafficDistributor[Req, Rep](
     eagerEviction: Boolean,
     rng: Rng = Rng.threadLocal,
     statsReceiver: StatsReceiver = NullStatsReceiver)
-    extends ServiceFactory[Req, Rep] {
+    extends ServiceFactory[Req, Rep]
   import TrafficDistributor._
 
   // Allows per endpoint closes to be overwritten by
@@ -146,18 +139,18 @@ private[finagle] class TrafficDistributor[Req, Rep](
     */
   private[this] def weightEndpoints(
       addrs: Event[Activity.State[Set[Address]]]
-  ): Event[Activity.State[Set[WeightedFactory[Req, Rep]]]] = {
+  ): Event[Activity.State[Set[WeightedFactory[Req, Rep]]]] =
     val init = Map.empty[Address, WeightedFactory[Req, Rep]]
-    safelyScanLeft(init, addrs) {
+    safelyScanLeft(init, addrs)
       case (active, addrs) =>
         // Note, if an update contains multiple `Address` instances
         // with duplicate `weight` metadata, only one of the instances and its associated
         // factory is cached. Last write wins.
         val weightedAddrs: Set[(Address, Double)] =
           addrs.map(WeightedAddress.extract)
-        val merged = weightedAddrs.foldLeft(active) {
+        val merged = weightedAddrs.foldLeft(active)
           case (cache, (addr, weight)) =>
-            cache.get(addr) match {
+            cache.get(addr) match
               // An update with an existing Address that has a new weight
               // results in the the weight being overwritten but the [[ServiceFactory]]
               // instance is maintained.
@@ -169,36 +162,29 @@ private[finagle] class TrafficDistributor[Req, Rep](
                 // be closed prematurely when moving across weight classes if the
                 // weight class is removed.
                 val closeGate = new Promise[Unit]
-                val endpoint = new ServiceFactoryProxy(newEndpoint(addr)) {
+                val endpoint = new ServiceFactoryProxy(newEndpoint(addr))
                   override def close(when: Time) =
                     (closeGate or outerClose).before { super.close(when) }
-                }
                 cache.updated(addr,
                               WeightedFactory(endpoint, closeGate, weight))
               case _ => cache
-            }
-        }
 
         // Remove stale cache entries. When `eagerEviction` is false cache
         // entries are only removed in subsequent stream updates.
         val removed = merged.keySet -- weightedAddrs.map(_._1)
-        removed.foldLeft(merged) {
+        removed.foldLeft(merged)
           case (cache, addr) =>
-            cache.get(addr) match {
+            cache.get(addr) match
               case Some(WeightedFactory(f, g, _))
                   if eagerEviction || f.status != Status.Open =>
                 g.setDone()
                 f.close()
                 cache - addr
               case _ => cache
-            }
-        }
-    }.map {
+    .map
       case Activity.Ok(cache) => Activity.Ok(cache.values.toSet)
       case Activity.Pending => Activity.Pending
       case failed @ Activity.Failed(_) => failed
-    }
-  }
 
   /**
     * Partitions `endpoints` and assigns a `newBalancer` instance to each partition.
@@ -206,58 +192,51 @@ private[finagle] class TrafficDistributor[Req, Rep](
     */
   private[this] def partition(
       endpoints: Event[Activity.State[Set[WeightedFactory[Req, Rep]]]]
-  ): Event[Activity.State[Iterable[WeightClass[Req, Rep]]]] = {
+  ): Event[Activity.State[Iterable[WeightClass[Req, Rep]]]] =
     // Cache entries are balancer instances together with their backing collection
     // which is updatable. The entries are keyed by weight class.
     val init = Map.empty[Double, CachedBalancer[Req, Rep]]
-    safelyScanLeft(init, endpoints) {
+    safelyScanLeft(init, endpoints)
       case (balancers, activeSet) =>
         val weightedGroups: Map[Double, Set[WeightedFactory[Req, Rep]]] =
           activeSet.groupBy(_.weight)
 
-        val merged = weightedGroups.foldLeft(balancers) {
+        val merged = weightedGroups.foldLeft(balancers)
           case (cache, (weight, factories)) =>
-            val unweighted = factories.map {
+            val unweighted = factories.map
               case WeightedFactory(f, _, _) => f
-            }
             val newCacheEntry =
-              if (cache.contains(weight)) {
+              if (cache.contains(weight))
                 // an update that contains an existing weight class updates
                 // the balancers backing collection.
                 val cached = cache(weight)
                 cached.endpoints.update(Activity.Ok(unweighted))
                 cached.copy(size = unweighted.size)
-              } else {
+              else
                 val endpoints: BalancerEndpoints[Req, Rep] =
                   Var(Activity.Ok(unweighted))
                 val lb = newBalancer(Activity(endpoints))
                 CachedBalancer(lb, endpoints, unweighted.size)
-              }
             cache + (weight -> newCacheEntry)
-        }
 
         // weight classes that no longer exist in the update are removed from
         // the cache and the associated balancer instances are closed.
         val removed = balancers.keySet -- weightedGroups.keySet
-        removed.foldLeft(merged) {
+        removed.foldLeft(merged)
           case (cache, weight) =>
-            cache.get(weight) match {
+            cache.get(weight) match
               case Some(CachedBalancer(bal, _, _)) =>
                 bal.close()
                 cache - weight
               case _ => cache
-            }
-        }
-    }.map {
+    .map
       case Activity.Ok(cache) =>
-        Activity.Ok(cache.map {
+        Activity.Ok(cache.map
           case (weight, CachedBalancer(bal, _, size)) =>
             WeightClass(bal, weight, size)
-        })
+        )
       case Activity.Pending => Activity.Pending
       case failed @ Activity.Failed(_) => failed
-    }
-  }
 
   private[this] val weightClasses = partition(weightEndpoints(dest.states))
   private[this] val pending = new Promise[ServiceFactory[Req, Rep]]
@@ -267,24 +246,22 @@ private[finagle] class TrafficDistributor[Req, Rep](
   @volatile
   private[this] var meanWeight = 0.0f
 
-  private[this] val meanWeightGauge = statsReceiver.addGauge("meanweight") {
+  private[this] val meanWeightGauge = statsReceiver.addGauge("meanweight")
     meanWeight
-  }
 
   private[this] def updateMeanWeight(
-      classes: Iterable[WeightClass[Req, Rep]]): Unit = {
+      classes: Iterable[WeightClass[Req, Rep]]): Unit =
     val size = classes.map(_.size).sum
     meanWeight = if (size != 0)
-      classes.map { c =>
+      classes.map  c =>
         c.weight * c.size
-      }.sum.toFloat / size
+      .sum.toFloat / size
     else 0.0F
-  }
 
   // Translate the stream of weightClasses into a stream of underlying
   // ServiceFactories that can service requests.
   private[this] val underlying: Event[ServiceFactory[Req, Rep]] =
-    weightClasses.foldLeft(init) {
+    weightClasses.foldLeft(init)
       case (_, Activity.Ok(wcs)) if wcs.isEmpty =>
         // Defer the handling of an empty destination set to `newBalancer`
         val emptyBal = newBalancer(
@@ -307,18 +284,15 @@ private[finagle] class TrafficDistributor[Req, Rep](
         // This should only happen on initialization and never be seen again
         // due to the logic in safelyScanLeft.
         staleState
-    }
 
   private[this] val ref = new ServiceFactoryRef(init)
   private[this] val obs = underlying.register(Witness(ref))
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] = ref(conn)
 
-  def close(deadline: Time): Future[Unit] = {
+  def close(deadline: Time): Future[Unit] =
     outerClose.setDone()
     meanWeightGauge.remove()
     Closable.all(obs, ref).close(deadline)
-  }
 
   override def status: Status = ref.status
-}

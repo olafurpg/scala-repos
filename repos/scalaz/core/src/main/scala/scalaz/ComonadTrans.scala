@@ -1,17 +1,13 @@
 package scalaz
 
-trait ComonadTrans[F[_ [_], _]] {
+trait ComonadTrans[F[_ [_], _]]
   def lower[G[_]: Cobind, A](a: F[G, A]): G[A]
-}
 
-object ComonadTrans {
+object ComonadTrans
   def apply[F[_ [_], _]](implicit F: ComonadTrans[F]): ComonadTrans[F] = F
-}
 
-trait Cohoist[F[_ [_], _]] extends ComonadTrans[F] {
+trait Cohoist[F[_ [_], _]] extends ComonadTrans[F]
   def cohoist[M[_], N[_]: Comonad](f: M ~> N): F[M, ?] ~> F[N, ?]
-}
 
-object Cohoist {
+object Cohoist
   def apply[F[_ [_], _]](implicit F: Cohoist[F]): Cohoist[F] = F
-}

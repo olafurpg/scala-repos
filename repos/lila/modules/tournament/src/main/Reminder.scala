@@ -10,16 +10,16 @@ import lila.hub.actorApi.SendTos
 import makeTimeout.short
 
 private[tournament] final class Reminder(renderer: ActorSelection)
-    extends Actor {
+    extends Actor
 
   private val bus = context.system.lilaBus
 
   private val max = 100
 
-  def receive = {
+  def receive =
 
     case msg @ RemindTournament(tour, activeUserIds) =>
-      renderer ? msg foreach {
+      renderer ? msg foreach
         case html: Html =>
           val userIds =
             if (activeUserIds.size > max)
@@ -32,6 +32,3 @@ private[tournament] final class Reminder(renderer: ActorSelection)
                                            "html" -> html.toString
                                        ))),
                       'users)
-      }
-  }
-}

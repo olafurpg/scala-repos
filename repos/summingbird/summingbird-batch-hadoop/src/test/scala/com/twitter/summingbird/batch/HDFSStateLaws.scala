@@ -27,15 +27,15 @@ import org.apache.hadoop.fs.Path
 
 import org.scalatest.WordSpec
 
-class HDFSStateLaws extends WordSpec {
+class HDFSStateLaws extends WordSpec
 
   val batchLength: Long = 30
   implicit val batcher = Batcher.ofMinutes(batchLength)
   implicit def tz = TimeZone.getTimeZone("UTC")
   implicit def parser = DateParser.default
 
-  "make sure HDFSState creates checkpoint" in {
-    withTmpDir { path =>
+  "make sure HDFSState creates checkpoint" in
+    withTmpDir  path =>
       val startDate: Timestamp = RichDate("2012-12-26T09:45").value
       val numBatches: Long = 10
       val state = HDFSState(
@@ -53,24 +53,20 @@ class HDFSStateLaws extends WordSpec {
       val nextState =
         HDFSState(path, startTime = None, numBatches = numBatches)
       val nextPrepareState = nextState.begin
-      nextPrepareState.requested match {
-        case intersection @ Intersection(low, high) => {
+      nextPrepareState.requested match
+        case intersection @ Intersection(low, high) =>
             val startBatchTime: Timestamp =
               batcher.earliestTimeOf(batcher.batchOf(startDate))
             val expectedNextRunStartMillis: Long = startBatchTime
               .incrementMinutes(numBatches * batchLength)
               .milliSinceEpoch
             assert(low.least.get.milliSinceEpoch == expectedNextRunStartMillis)
-          }
         case _ => fail("requested interval should be an interseciton")
-      }
       shouldCheckpointInterval(
           batcher, nextState, nextPrepareState.requested, path)
-    }
-  }
 
-  "make sure HDFSState creates partial checkpoint" in {
-    withTmpDir { path =>
+  "make sure HDFSState creates partial checkpoint" in
+    withTmpDir  path =>
       val startDate: Option[Timestamp] =
         Some("2012-12-26T09:45").map(RichDate(_).value)
       val numBatches: Long = 10
@@ -96,8 +92,6 @@ class HDFSStateLaws extends WordSpec {
                                     RichDate("2012-12-26T11:30").value)
       shouldCheckpointInterval(
           batcher, waitingState, partialCompleteInterval, path)
-    }
-  }
 
   def leftClosedRightOpenInterval(low: Timestamp, high: Timestamp) =
     Interval.leftClosedRightOpen[Timestamp](low, high).right.get
@@ -105,51 +99,40 @@ class HDFSStateLaws extends WordSpec {
   def shouldNotAcceptInterval(
       state: WaitingState[Interval[Timestamp]],
       interval: Interval[Timestamp],
-      message: String = "PreparedState accepted a bad Interval!") = {
-    state.begin.willAccept(interval) match {
+      message: String = "PreparedState accepted a bad Interval!") =
+    state.begin.willAccept(interval) match
       case Left(t) => t
       case Right(t) => sys.error(message)
-    }
-  }
 
   def completeState[T](
-      either: Either[WaitingState[T], RunningState[T]]): WaitingState[T] = {
-    either match {
+      either: Either[WaitingState[T], RunningState[T]]): WaitingState[T] =
+    either match
       case Right(t) => t.succeed
       case Left(t) =>
         sys.error(
             "PreparedState didn't accept its proposed Interval! failed state: " +
             t)
-    }
-  }
 
   def shouldCheckpointInterval(batcher: Batcher,
                                state: WaitingState[Interval[Timestamp]],
                                interval: Interval[Timestamp],
-                               path: String) = {
+                               path: String) =
     completeState(state.begin.willAccept(interval))
-    interval match {
-      case intersection @ Intersection(low, high) => {
+    interval match
+      case intersection @ Intersection(low, high) =>
           BatchID
             .range(batcher.batchOf(low.least.get),
                    batcher.batchOf(high.greatest.get))
-            .foreach { t =>
+            .foreach  t =>
               val totPath =
                 (path + "/" + batcher.earliestTimeOf(t).milliSinceEpoch +
                     ".version")
               assert(new java.io.File(totPath).exists)
-            }
-        }
       case _ => sys.error("interval should be an intersection")
-    }
-  }
 
-  def withTmpDir(doWithTmpFolder: String => Unit) = {
+  def withTmpDir(doWithTmpFolder: String => Unit) =
     val path = "/tmp/" + UUID.randomUUID
-    try {
+    try
       doWithTmpFolder(path)
-    } finally {
+    finally
       FileSystem.get(new Configuration()).delete(new Path(path), true)
-    }
-  }
-}

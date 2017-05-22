@@ -16,27 +16,25 @@ import scala.util.Success
 /**
   * Used to start the documentation server.
   */
-class DocServerStart {
+class DocServerStart
 
   def start(projectPath: File,
             buildDocHandler: BuildDocHandler,
             translationReport: Callable[File],
             forceTranslationReport: Callable[File],
-            port: java.lang.Integer): ServerWithStop = {
+            port: java.lang.Integer): ServerWithStop =
 
-    val application: Application = {
+    val application: Application =
       val environment = Environment(
           projectPath, this.getClass.getClassLoader, Mode.Test)
       val context = ApplicationLoader.createContext(environment)
-      val components = new BuiltInComponentsFromContext(context) {
+      val components = new BuiltInComponentsFromContext(context)
         lazy val router = Router.empty
-      }
       components.application
-    }
 
     Play.start(application)
 
-    val applicationProvider = new ApplicationProvider {
+    val applicationProvider = new ApplicationProvider
 
       override def get = Success(application)
       override def handleWebCommand(request: RequestHeader) =
@@ -44,21 +42,19 @@ class DocServerStart {
           .maybeHandleDocRequest(request)
           .asInstanceOf[Option[Result]]
           .orElse(
-              if (request.path == "/@report") {
-                if (request.getQueryString("force").isDefined) {
+              if (request.path == "/@report")
+                if (request.getQueryString("force").isDefined)
                   forceTranslationReport.call()
                   Some(Results.Redirect("/@report"))
-                } else {
+                else
                   Some(Results.Ok.sendFile(translationReport.call(),
                                            inline = true,
                                            fileName = _ => "report.html"))
-                }
-              } else None
+              else None
           )
           .orElse(
               Some(Results.Redirect("/@documentation"))
           )
-    }
 
     val config = ServerConfig(
         rootDir = projectPath,
@@ -76,5 +72,3 @@ class DocServerStart {
         stopHook = () => Future.successful(())
     )
     serverProvider.createServer(context)
-  }
-}

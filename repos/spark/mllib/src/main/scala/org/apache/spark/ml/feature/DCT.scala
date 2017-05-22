@@ -37,7 +37,7 @@ import org.apache.spark.sql.types.DataType
   */
 @Experimental
 class DCT(override val uid: String)
-    extends UnaryTransformer[Vector, Vector, DCT] with DefaultParamsWritable {
+    extends UnaryTransformer[Vector, Vector, DCT] with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("dct"))
 
@@ -57,25 +57,21 @@ class DCT(override val uid: String)
 
   setDefault(inverse -> false)
 
-  override protected def createTransformFunc: Vector => Vector = { vec =>
+  override protected def createTransformFunc: Vector => Vector =  vec =>
     val result = vec.toArray
     val jTransformer = new DoubleDCT_1D(result.length)
     if ($(inverse)) jTransformer.inverse(result, true)
     else jTransformer.forward(result, true)
     Vectors.dense(result)
-  }
 
-  override protected def validateInputType(inputType: DataType): Unit = {
+  override protected def validateInputType(inputType: DataType): Unit =
     require(inputType.isInstanceOf[VectorUDT],
             s"Input type must be VectorUDT but got $inputType.")
-  }
 
   override protected def outputDataType: DataType = new VectorUDT
-}
 
 @Since("1.6.0")
-object DCT extends DefaultParamsReadable[DCT] {
+object DCT extends DefaultParamsReadable[DCT]
 
   @Since("1.6.0")
   override def load(path: String): DCT = super.load(path)
-}

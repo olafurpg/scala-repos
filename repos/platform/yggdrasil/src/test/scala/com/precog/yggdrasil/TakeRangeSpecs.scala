@@ -33,13 +33,13 @@ import org.scalacheck.Gen
 
 trait TakeRangeSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with Specification
-    with ScalaCheck {
+    with ScalaCheck
   import SampleData._
   import trans._
 
-  def checkTakeRange = {
+  def checkTakeRange =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val table = fromSample(sample)
       val size = sample.data.size
 
@@ -54,10 +54,9 @@ trait TakeRangeSpec[M[+ _]]
         else sample.data.toSeq.drop(start).take(count)
 
       result must_== expected
-    }
-  }.set(minTestsOk -> 1000)
+  .set(minTestsOk -> 1000)
 
-  def testTakeRange = {
+  def testTakeRange =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -84,9 +83,8 @@ trait TakeRangeSpec[M[+ _]]
                      "key", JArray(JNum(3) :: Nil)) :: Nil))
 
     results.copoint must_== expected
-  }
 
-  def testTakeRangeNegStart = {
+  def testTakeRangeNegStart =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -105,9 +103,8 @@ trait TakeRangeSpec[M[+ _]]
     val results = toJson(table.takeRange(-1, 5))
 
     results.copoint must_== Stream()
-  }
 
-  def testTakeRangeNegNumber = {
+  def testTakeRangeNegNumber =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -126,9 +123,8 @@ trait TakeRangeSpec[M[+ _]]
     val results = toJson(table.takeRange(2, -3))
 
     results.copoint must_== Stream()
-  }
 
-  def testTakeRangeNeg = {
+  def testTakeRangeNeg =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -147,9 +143,8 @@ trait TakeRangeSpec[M[+ _]]
     val results = toJson(table.takeRange(-1, 5))
 
     results.copoint must_== Stream()
-  }
 
-  def testTakeRangeLarger = {
+  def testTakeRangeLarger =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -176,9 +171,8 @@ trait TakeRangeSpec[M[+ _]]
                      "key", JArray(JNum(4) :: Nil)) :: Nil))
 
     results.copoint must_== expected
-  }
 
-  def testTakeRangeEmpty = {
+  def testTakeRangeEmpty =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -199,9 +193,8 @@ trait TakeRangeSpec[M[+ _]]
     val expected = Stream()
 
     results.copoint must_== expected
-  }
 
-  def testTakeRangeAcrossSlices = {
+  def testTakeRangeAcrossSlices =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -246,9 +239,8 @@ trait TakeRangeSpec[M[+ _]]
                      "key", JArray(JNum(7) :: Nil)) :: Nil))
 
     results.copoint must_== expected
-  }
 
-  def testTakeRangeSecondSlice = {
+  def testTakeRangeSecondSlice =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -281,9 +273,8 @@ trait TakeRangeSpec[M[+ _]]
                                   "key", JArray(JNum(7) :: Nil)) :: Nil))
 
     results.copoint must_== expected
-  }
 
-  def testTakeRangeFirstSliceOnly = {
+  def testTakeRangeFirstSliceOnly =
     val data: Stream[JValue] =
       Stream(JObject(JField("value", JString("foo")) :: JField(
                      "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -323,5 +314,3 @@ trait TakeRangeSpec[M[+ _]]
                 "key", JArray(JNum(5) :: Nil)) :: Nil))
 
     results.copoint must_== expected
-  }
-}

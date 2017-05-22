@@ -1,16 +1,11 @@
-object Test {
-  trait Manager {
+object Test
+  trait Manager
     type Node;
     def iterator: Iterator[Node]
-  }
-  trait Core {
+  trait Core
     type Node;
     trait NodeImpl
-    trait Manager extends Test.Manager {
+    trait Manager extends Test.Manager
       type Node = Core.this.Node
-    }
-    def f(manager: Manager) = manager.iterator.foreach {
+    def f(manager: Manager) = manager.iterator.foreach
       case node: NodeImpl =>
-    }
-  }
-}

@@ -32,62 +32,52 @@ import org.apache.spark.util.ThreadUtils
   * SparkPlan.
   */
 case class BroadcastExchange(mode: BroadcastMode, child: SparkPlan)
-    extends Exchange {
+    extends Exchange
 
   override def outputPartitioning: Partitioning = BroadcastPartitioning(mode)
 
-  override def sameResult(plan: SparkPlan): Boolean = plan match {
+  override def sameResult(plan: SparkPlan): Boolean = plan match
     case p: BroadcastExchange =>
       mode.compatibleWith(p.mode) && child.sameResult(p.child)
     case _ => false
-  }
 
   @transient
-  private val timeout: Duration = {
+  private val timeout: Duration =
     val timeoutValue = sqlContext.conf.broadcastTimeout
-    if (timeoutValue < 0) {
+    if (timeoutValue < 0)
       Duration.Inf
-    } else {
+    else
       timeoutValue.seconds
-    }
-  }
 
   @transient
-  private lazy val relationFuture: Future[broadcast.Broadcast[Any]] = {
+  private lazy val relationFuture: Future[broadcast.Broadcast[Any]] =
     // broadcastFuture is used in "doExecute". Therefore we can get the execution id correctly here.
     val executionId =
       sparkContext.getLocalProperty(SQLExecution.EXECUTION_ID_KEY)
-    Future {
+    Future
       // This will run in another thread. Set the execution id so that we can connect these jobs
       // with the correct execution.
-      SQLExecution.withExecutionId(sparkContext, executionId) {
+      SQLExecution.withExecutionId(sparkContext, executionId)
         // Note that we use .executeCollect() because we don't want to convert data to Scala types
         val input: Array[InternalRow] = child.executeCollect()
 
         // Construct and broadcast the relation.
         sparkContext.broadcast(mode.transform(input))
-      }
-    }(BroadcastExchange.executionContext)
-  }
+    (BroadcastExchange.executionContext)
 
-  override protected def doPrepare(): Unit = {
+  override protected def doPrepare(): Unit =
     // Materialize the future.
     relationFuture
-  }
 
-  override protected def doExecute(): RDD[InternalRow] = {
+  override protected def doExecute(): RDD[InternalRow] =
     throw new UnsupportedOperationException(
         "BroadcastExchange does not support the execute() code path.")
-  }
 
-  override protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] = {
+  override protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] =
     val result = Await.result(relationFuture, timeout)
     result.asInstanceOf[broadcast.Broadcast[T]]
-  }
-}
 
-object BroadcastExchange {
+object BroadcastExchange
   private[execution] val executionContext =
     ExecutionContext.fromExecutorService(
         ThreadUtils.newDaemonCachedThreadPool("broadcast-exchange", 128))
-}

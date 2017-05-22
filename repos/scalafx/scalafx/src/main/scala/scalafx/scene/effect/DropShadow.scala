@@ -34,16 +34,15 @@ import scalafx.beans.property.{DoubleProperty, ObjectProperty}
 import scalafx.delegate.{DimensionDelegate, SFXDelegate}
 import scalafx.scene.paint.Color
 
-object DropShadow {
+object DropShadow
   implicit def sfxDropShadow2jfx(ds: DropShadow): jfxse.DropShadow =
     if (ds != null) ds.delegate else null
-}
 
 class DropShadow(
     override val delegate: jfxse.DropShadow = new jfxse.DropShadow())
     extends Effect(delegate) with ColorDelegate[jfxse.DropShadow]
     with DimensionDelegate[jfxse.DropShadow]
-    with InputDelegate[jfxse.DropShadow] with SFXDelegate[jfxse.DropShadow] {
+    with InputDelegate[jfxse.DropShadow] with SFXDelegate[jfxse.DropShadow]
 
   /**
     * Creates a new instance of DropShadow with the specified blurType, color, radius, spread, offsetX and offsetY.
@@ -71,27 +70,21 @@ class DropShadow(
     this(new jfxse.DropShadow(radius, offsetX, offsetY, color))
 
   def blurType: ObjectProperty[jfxse.BlurType] = delegate.blurTypeProperty
-  def blurType_=(bt: BlurType) {
+  def blurType_=(bt: BlurType)
     blurType() = bt
-  }
 
   def offsetX: DoubleProperty = delegate.offsetXProperty
-  def offsetX_=(d: Double) {
+  def offsetX_=(d: Double)
     offsetX() = d
-  }
 
   def offsetY: DoubleProperty = delegate.offsetYProperty
-  def offsetY_=(d: Double) {
+  def offsetY_=(d: Double)
     offsetY() = d
-  }
 
   def radius: DoubleProperty = delegate.radiusProperty
-  def radius_=(d: Double) {
+  def radius_=(d: Double)
     radius() = d
-  }
 
   def spread: DoubleProperty = delegate.spreadProperty
-  def spread_=(d: Double) {
+  def spread_=(d: Double)
     spread() = d
-  }
-}

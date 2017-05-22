@@ -38,7 +38,7 @@ case class Sort(sortOrder: Seq[SortOrder],
                 global: Boolean,
                 child: SparkPlan,
                 testSpillFrequency: Int = 0)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode with CodegenSupport
 
   override def output: Seq[Attribute] = child.output
 
@@ -52,7 +52,7 @@ case class Sort(sortOrder: Seq[SortOrder],
       "dataSize" -> SQLMetrics.createSizeMetric(sparkContext, "data size"),
       "spillSize" -> SQLMetrics.createSizeMetric(sparkContext, "spill size"))
 
-  def createSorter(): UnsafeExternalRowSorter = {
+  def createSorter(): UnsafeExternalRowSorter =
     val ordering = newOrdering(sortOrder, output)
 
     // The comparator for comparing prefix
@@ -64,26 +64,22 @@ case class Sort(sortOrder: Seq[SortOrder],
     // The generator for prefix
     val prefixProjection =
       UnsafeProjection.create(Seq(SortPrefix(boundSortExpression)))
-    val prefixComputer = new UnsafeExternalRowSorter.PrefixComputer {
-      override def computePrefix(row: InternalRow): Long = {
+    val prefixComputer = new UnsafeExternalRowSorter.PrefixComputer
+      override def computePrefix(row: InternalRow): Long =
         prefixProjection.apply(row).getLong(0)
-      }
-    }
 
     val pageSize = SparkEnv.get.memoryManager.pageSizeBytes
     val sorter = new UnsafeExternalRowSorter(
         schema, ordering, prefixComparator, prefixComputer, pageSize)
-    if (testSpillFrequency > 0) {
+    if (testSpillFrequency > 0)
       sorter.setTestSpillFrequency(testSpillFrequency)
-    }
     sorter
-  }
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val dataSize = longMetric("dataSize")
     val spillSize = longMetric("spillSize")
 
-    child.execute().mapPartitionsInternal { iter =>
+    child.execute().mapPartitionsInternal  iter =>
       val sorter = createSorter()
 
       val metrics = TaskContext.get().taskMetrics()
@@ -98,19 +94,16 @@ case class Sort(sortOrder: Seq[SortOrder],
       metrics.incPeakExecutionMemory(sorter.getPeakMemoryUsage)
 
       sortedIterator
-    }
-  }
 
-  override def upstreams(): Seq[RDD[InternalRow]] = {
+  override def upstreams(): Seq[RDD[InternalRow]] =
     child.asInstanceOf[CodegenSupport].upstreams()
-  }
 
   // Name of sorter variable used in codegen.
   private var sorterVariable: String = _
 
   override def preferUnsafeRow: Boolean = true
 
-  override protected def doProduce(ctx: CodegenContext): String = {
+  override protected def doProduce(ctx: CodegenContext): String =
     val needToSort = ctx.freshName("needToSort")
     ctx.addMutableState("boolean", needToSort, s"$needToSort = true;")
 
@@ -162,17 +155,15 @@ case class Sort(sortOrder: Seq[SortOrder],
        |   if (shouldStop()) return;
        | }
      """.stripMargin.trim
-  }
 
   override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
-    if (row != null) {
+      ctx: CodegenContext, input: Seq[ExprCode], row: String): String =
+    if (row != null)
       s"$sorterVariable.insertRow((UnsafeRow)$row);"
-    } else {
-      val colExprs = child.output.zipWithIndex.map {
+    else
+      val colExprs = child.output.zipWithIndex.map
         case (attr, i) =>
           BoundReference(i, attr.dataType, attr.nullable)
-      }
 
       ctx.currentVars = input
       val code = GenerateUnsafeProjection.createCode(ctx, colExprs)
@@ -182,6 +173,3 @@ case class Sort(sortOrder: Seq[SortOrder],
          | ${code.code}
          | $sorterVariable.insertRow(${code.value});
        """.stripMargin.trim
-    }
-  }
-}

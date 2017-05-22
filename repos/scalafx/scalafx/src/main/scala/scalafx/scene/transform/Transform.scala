@@ -34,7 +34,7 @@ import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, ReadOnlyBooleanProperty}
 import scalafx.delegate.SFXDelegate
 
-object Transform {
+object Transform
 
   implicit def sfxTransform2jfx(v: Transform): jfxst.Transform =
     if (v != null) v.delegate else null
@@ -101,13 +101,12 @@ object Transform {
     */
   def translate(x: Double, y: Double): Translate =
     jfxst.Transform.translate(x, y)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Transform.html]]
   */
 abstract class Transform(override val delegate: jfxst.Transform)
-    extends SFXDelegate[jfxst.Transform] {
+    extends SFXDelegate[jfxst.Transform]
 
   // TODO implement missing methods from JFX2 and JFX8
 
@@ -119,12 +118,10 @@ abstract class Transform(override val delegate: jfxst.Transform)
       jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]] =
     delegate.onTransformChangedProperty
   def onTransformChanged_=(
-      v: jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]) {
+      v: jfxe.EventHandler[_ >: jfxst.TransformChangedEvent])
     ObjectProperty
       .fillProperty[jfxe.EventHandler[_ >: jfxst.TransformChangedEvent]](
         this.onTransformChanged, v)
-  }
 
   /** Determines if this is currently a 2D transform. */
   def type2D: ReadOnlyBooleanProperty = delegate.type2DProperty
-}

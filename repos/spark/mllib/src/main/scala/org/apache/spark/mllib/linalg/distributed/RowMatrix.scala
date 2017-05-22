@@ -45,7 +45,7 @@ import org.apache.spark.util.random.XORShiftRandom
 class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
                                 private var nRows: Long,
                                 private var nCols: Int)
-    extends DistributedMatrix with Logging {
+    extends DistributedMatrix with Logging
 
   /** Alternative constructor leaving matrix dimensions to be determined automatically. */
   @Since("1.0.0")
@@ -53,34 +53,28 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
 
   /** Gets or computes the number of columns. */
   @Since("1.0.0")
-  override def numCols(): Long = {
-    if (nCols <= 0) {
-      try {
+  override def numCols(): Long =
+    if (nCols <= 0)
+      try
         // Calling `first` will throw an exception if `rows` is empty.
         nCols = rows.first().size
-      } catch {
+      catch
         case err: UnsupportedOperationException =>
           sys.error(
               "Cannot determine the number of cols because it is not specified in the " +
               "constructor and the rows RDD is empty.")
-      }
-    }
     nCols
-  }
 
   /** Gets or computes the number of rows. */
   @Since("1.0.0")
-  override def numRows(): Long = {
-    if (nRows <= 0L) {
+  override def numRows(): Long =
+    if (nRows <= 0L)
       nRows = rows.count()
-      if (nRows == 0L) {
+      if (nRows == 0L)
         sys.error(
             "Cannot determine the number of rows because it is not specified in the " +
             "constructor and the rows RDD is empty.")
-      }
-    }
     nRows
-  }
 
   /**
     * Multiplies the Gramian matrix `A^T A` by a dense vector on the right without computing `A^T A`.
@@ -88,33 +82,30 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     * @param v a dense vector whose length must match the number of columns of this matrix
     * @return a dense vector representing the product
     */
-  private[mllib] def multiplyGramianMatrixBy(v: BDV[Double]): BDV[Double] = {
+  private[mllib] def multiplyGramianMatrixBy(v: BDV[Double]): BDV[Double] =
     val n = numCols().toInt
     val vbr = rows.context.broadcast(v)
     rows.treeAggregate(BDV.zeros[Double](n))(
         seqOp = (U, r) =>
-            {
             val rBrz = r.toBreeze
             val a = rBrz.dot(vbr.value)
-            rBrz match {
+            rBrz match
               // use specialized axpy for better performance
               case _: BDV[_] => brzAxpy(a, rBrz.asInstanceOf[BDV[Double]], U)
               case _: BSV[_] => brzAxpy(a, rBrz.asInstanceOf[BSV[Double]], U)
               case _ =>
                 throw new UnsupportedOperationException(
                     s"Do not support vector operation from type ${rBrz.getClass.getName}.")
-            }
             U
-        },
+        ,
         combOp = (U1, U2) => U1 += U2)
-  }
 
   /**
     * Computes the Gramian matrix `A^T A`. Note that this cannot be computed on matrices with
     * more than 65535 columns.
     */
   @Since("1.0.0")
-  def computeGramianMatrix(): Matrix = {
+  def computeGramianMatrix(): Matrix =
     val n = numCols().toInt
     checkNumColumns(n)
     // Computes n*(n+1)/2, avoiding overflow in the multiplication.
@@ -124,26 +115,21 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     // Compute the upper triangular part of the gram matrix.
     val GU = rows.treeAggregate(new BDV[Double](new Array[Double](nt)))(
         seqOp = (U, v) =>
-            {
             BLAS.spr(1.0, v, U.data)
             U
-        },
+        ,
         combOp = (U1, U2) => U1 += U2)
 
     RowMatrix.triuToFull(n, GU.data)
-  }
 
-  private def checkNumColumns(cols: Int): Unit = {
-    if (cols > 65535) {
+  private def checkNumColumns(cols: Int): Unit =
+    if (cols > 65535)
       throw new IllegalArgumentException(
           s"Argument with more than 65535 cols: $cols")
-    }
-    if (cols > 10000) {
+    if (cols > 10000)
       val memMB = (cols.toLong * cols) / 125000
       logWarning(
           s"$cols columns will require at least $memMB megabytes of memory!")
-    }
-  }
 
   /**
     * Computes singular value decomposition of this matrix. Denote this matrix by A (m x n). This
@@ -193,13 +179,12 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
   def computeSVD(
       k: Int,
       computeU: Boolean = false,
-      rCond: Double = 1e-9): SingularValueDecomposition[RowMatrix, Matrix] = {
+      rCond: Double = 1e-9): SingularValueDecomposition[RowMatrix, Matrix] =
     // maximum number of Arnoldi update iterations for invoking ARPACK
     val maxIter = math.max(300, k * 3)
     // numerical tolerance for invoking ARPACK
     val tol = 1e-10
     computeSVD(k, computeU, rCond, maxIter, tol, "auto")
-  }
 
   /**
     * The actual SVD implementation, visible for testing.
@@ -221,44 +206,39 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
       rCond: Double,
       maxIter: Int,
       tol: Double,
-      mode: String): SingularValueDecomposition[RowMatrix, Matrix] = {
+      mode: String): SingularValueDecomposition[RowMatrix, Matrix] =
     val n = numCols().toInt
     require(k > 0 && k <= n,
             s"Requested k singular values but got k=$k and numCols=$n.")
 
-    object SVDMode extends Enumeration {
+    object SVDMode extends Enumeration
       val LocalARPACK, LocalLAPACK, DistARPACK = Value
-    }
 
-    val computeMode = mode match {
+    val computeMode = mode match
       case "auto" =>
-        if (k > 5000) {
+        if (k > 5000)
           logWarning(
               s"computing svd with k=$k and n=$n, please check necessity")
-        }
 
         // TODO: The conditions below are not fully tested.
-        if (n < 100 || (k > n / 2 && n <= 15000)) {
+        if (n < 100 || (k > n / 2 && n <= 15000))
           // If n is small or k is large compared with n, we better compute the Gramian matrix first
           // and then compute its eigenvalues locally, instead of making multiple passes.
-          if (k < n / 3) {
+          if (k < n / 3)
             SVDMode.LocalARPACK
-          } else {
+          else
             SVDMode.LocalLAPACK
-          }
-        } else {
+        else
           // If k is small compared with n, we use ARPACK with distributed multiplication.
           SVDMode.DistARPACK
-        }
       case "local-svd" => SVDMode.LocalLAPACK
       case "local-eigs" => SVDMode.LocalARPACK
       case "dist-eigs" => SVDMode.DistARPACK
       case _ =>
         throw new IllegalArgumentException(s"Do not support mode $mode.")
-    }
 
     // Compute the eigen-decomposition of A' * A.
-    val (sigmaSquares: BDV[Double], u: BDM[Double]) = computeMode match {
+    val (sigmaSquares: BDV[Double], u: BDM[Double]) = computeMode match
       case SVDMode.LocalARPACK =>
         require(
             k < n,
@@ -273,17 +253,15 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
           brzSvd(G)
         (sigmaSquaresFull, uFull)
       case SVDMode.DistARPACK =>
-        if (rows.getStorageLevel == StorageLevel.NONE) {
+        if (rows.getStorageLevel == StorageLevel.NONE)
           logWarning(
               "The input data is not directly cached, which may hurt performance if its" +
               " parent RDDs are also uncached.")
-        }
         require(
             k < n,
             s"k must be smaller than n in dist-eigs mode but got k=$k and n=$n.")
         EigenValueDecomposition.symmetricEigs(
             multiplyGramianMatrixBy, n, k, tol, maxIter)
-    }
 
     val sigmas: BDV[Double] = brzSqrt(sigmaSquares)
 
@@ -294,50 +272,42 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     // sigmas might have a length smaller than k, if some Ritz values do not satisfy the convergence
     // criterion specified by tol after max number of iterations.
     // Thus use i < min(k, sigmas.length) instead of i < k.
-    if (sigmas.length < k) {
+    if (sigmas.length < k)
       logWarning(
           s"Requested $k singular values but only found ${sigmas.length} converged.")
-    }
-    while (i < math.min(k, sigmas.length) && sigmas(i) >= threshold) {
+    while (i < math.min(k, sigmas.length) && sigmas(i) >= threshold)
       i += 1
-    }
     val sk = i
 
-    if (sk < k) {
+    if (sk < k)
       logWarning(s"Requested $k singular values but only found $sk nonzeros.")
-    }
 
     // Warn at the end of the run as well, for increased visibility.
     if (computeMode == SVDMode.DistARPACK &&
-        rows.getStorageLevel == StorageLevel.NONE) {
+        rows.getStorageLevel == StorageLevel.NONE)
       logWarning(
           "The input data was not directly cached, which may hurt performance if its" +
           " parent RDDs are also uncached.")
-    }
 
     val s = Vectors.dense(Arrays.copyOfRange(sigmas.data, 0, sk))
     val V = Matrices.dense(n, sk, Arrays.copyOfRange(u.data, 0, n * sk))
 
-    if (computeU) {
+    if (computeU)
       // N = Vk * Sk^{-1}
       val N = new BDM[Double](n, sk, Arrays.copyOfRange(u.data, 0, n * sk))
       var i = 0
       var j = 0
-      while (j < sk) {
+      while (j < sk)
         i = 0
         val sigma = sigmas(j)
-        while (i < n) {
+        while (i < n)
           N(i, j) /= sigma
           i += 1
-        }
         j += 1
-      }
       val U = this.multiply(Matrices.fromBreeze(N))
       SingularValueDecomposition(U, s, V)
-    } else {
+    else
       SingularValueDecomposition(null, s, V)
-    }
-  }
 
   /**
     * Computes the covariance matrix, treating each row as an observation. Note that this cannot
@@ -345,7 +315,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     * @return a local dense matrix of size n x n
     */
   @Since("1.0.0")
-  def computeCovariance(): Matrix = {
+  def computeCovariance(): Matrix =
     val n = numCols().toInt
     checkNumColumns(n)
 
@@ -357,11 +327,10 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
             BDV[Double])) => (s1._1 + s2._1, s1._2 += s2._2)
       )
 
-    if (m <= 1) {
+    if (m <= 1)
       sys.error(
           s"RowMatrix.computeCovariance called on matrix with only $m rows." +
           "  Cannot compute the covariance of a RowMatrix with <= 1 row.")
-    }
     updateNumRows(m)
 
     mean :/= m.toDouble
@@ -376,20 +345,17 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     var j = 0
     val m1 = m - 1.0
     var alpha = 0.0
-    while (i < n) {
+    while (i < n)
       alpha = m / m1 * mean(i)
       j = i
-      while (j < n) {
+      while (j < n)
         val Gij = G(i, j) / m1 - alpha * mean(j)
         G(i, j) = Gij
         G(j, i) = Gij
         j += 1
-      }
       i += 1
-    }
 
     Matrices.fromBreeze(G)
-  }
 
   /**
     * Computes the top k principal components and a vector of proportions of
@@ -410,7 +376,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     */
   @Since("1.6.0")
   def computePrincipalComponentsAndExplainedVariance(
-      k: Int): (Matrix, Vector) = {
+      k: Int): (Matrix, Vector) =
     val n = numCols().toInt
     require(k > 0 && k <= n, s"k = $k out of range (0, n = $n]")
 
@@ -421,13 +387,11 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     val eigenSum = s.data.sum
     val explainedVariance = s.data.map(_ / eigenSum)
 
-    if (k == n) {
+    if (k == n)
       (Matrices.dense(n, k, u.data), Vectors.dense(explainedVariance))
-    } else {
+    else
       (Matrices.dense(n, k, Arrays.copyOfRange(u.data, 0, n * k)),
        Vectors.dense(Arrays.copyOfRange(explainedVariance, 0, k)))
-    }
-  }
 
   /**
     * Computes the top k principal components only.
@@ -437,21 +401,19 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     * @see computePrincipalComponentsAndExplainedVariance
     */
   @Since("1.0.0")
-  def computePrincipalComponents(k: Int): Matrix = {
+  def computePrincipalComponents(k: Int): Matrix =
     computePrincipalComponentsAndExplainedVariance(k)._1
-  }
 
   /**
     * Computes column-wise summary statistics.
     */
   @Since("1.0.0")
-  def computeColumnSummaryStatistics(): MultivariateStatisticalSummary = {
+  def computeColumnSummaryStatistics(): MultivariateStatisticalSummary =
     val summary = rows.treeAggregate(new MultivariateOnlineSummarizer)(
         (aggregator, data) => aggregator.add(data),
         (aggregator1, aggregator2) => aggregator1.merge(aggregator2))
     updateNumRows(summary.count)
     summary
-  }
 
   /**
     * Multiply this matrix by a local matrix on the right.
@@ -461,7 +423,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     *         which preserves partitioning
     */
   @Since("1.0.0")
-  def multiply(B: Matrix): RowMatrix = {
+  def multiply(B: Matrix): RowMatrix =
     val n = numCols().toInt
     val k = B.numCols
     require(n == B.numRows, s"Dimension mismatch: $n vs ${B.numRows}")
@@ -472,21 +434,17 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
 
     val Bb = rows.context.broadcast(
         B.toBreeze.asInstanceOf[BDM[Double]].toDenseVector.toArray)
-    val AB = rows.mapPartitions { iter =>
+    val AB = rows.mapPartitions  iter =>
       val Bi = Bb.value
-      iter.map { row =>
+      iter.map  row =>
         val v = BDV.zeros[Double](k)
         var i = 0
-        while (i < k) {
+        while (i < k)
           v(i) = row.toBreeze.dot(new BDV(Bi, i * n, 1, n))
           i += 1
-        }
         Vectors.fromBreeze(v)
-      }
-    }
 
     new RowMatrix(AB, nRows, B.numCols)
-  }
 
   /**
     * Compute all cosine similarities between columns of this matrix using the brute-force
@@ -496,9 +454,8 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     *         columns of this matrix.
     */
   @Since("1.2.0")
-  def columnSimilarities(): CoordinateMatrix = {
+  def columnSimilarities(): CoordinateMatrix =
     columnSimilarities(0.0)
-  }
 
   /**
     * Compute similarities between columns of this matrix using a sampling approach.
@@ -540,26 +497,23 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     *         between columns of this matrix.
     */
   @Since("1.2.0")
-  def columnSimilarities(threshold: Double): CoordinateMatrix = {
+  def columnSimilarities(threshold: Double): CoordinateMatrix =
     require(threshold >= 0, s"Threshold cannot be negative: $threshold")
 
-    if (threshold > 1) {
+    if (threshold > 1)
       logWarning(
           s"Threshold is greater than 1: $threshold " +
           "Computation will be more efficient with promoted sparsity, " +
           " however there is no correctness guarantee.")
-    }
 
     val gamma =
-      if (threshold < 1e-6) {
+      if (threshold < 1e-6)
         Double.PositiveInfinity
-      } else {
+      else
         10 * math.log(numCols()) / threshold
-      }
 
     columnSimilaritiesDIMSUM(
         computeColumnSummaryStatistics().normL2.toArray, gamma)
-  }
 
   /**
     * Compute QR decomposition for [[RowMatrix]]. The implementation is designed to optimize the QR
@@ -573,40 +527,34 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     */
   @Since("1.5.0")
   def tallSkinnyQR(
-      computeQ: Boolean = false): QRDecomposition[RowMatrix, Matrix] = {
+      computeQ: Boolean = false): QRDecomposition[RowMatrix, Matrix] =
     val col = numCols().toInt
     // split rows horizontally into smaller matrices, and compute QR for each of them
-    val blockQRs = rows.glom().map { partRows =>
+    val blockQRs = rows.glom().map  partRows =>
       val bdm = BDM.zeros[Double](partRows.length, col)
       var i = 0
-      partRows.foreach { row =>
+      partRows.foreach  row =>
         bdm(i, ::) := row.toBreeze.t
         i += 1
-      }
       breeze.linalg.qr.reduced(bdm).r
-    }
 
     // combine the R part from previous results vertically into a tall matrix
-    val combinedR = blockQRs.treeReduce { (r1, r2) =>
+    val combinedR = blockQRs.treeReduce  (r1, r2) =>
       val stackedR = BDM.vertcat(r1, r2)
       breeze.linalg.qr.reduced(stackedR).r
-    }
     val finalR = Matrices.fromBreeze(combinedR.toDenseMatrix)
     val finalQ =
-      if (computeQ) {
-        try {
+      if (computeQ)
+        try
           val invR = inv(combinedR)
           this.multiply(Matrices.fromBreeze(invR))
-        } catch {
+        catch
           case err: MatrixSingularException =>
             logWarning("R is not invertible and return Q as null")
             null
-        }
-      } else {
+      else
         null
-      }
     QRDecomposition(finalQ, finalR)
-  }
 
   /**
     * Find all similar columns using the DIMSUM sampling algorithm, described in two papers
@@ -622,7 +570,7 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     *         between columns of this matrix.
     */
   private[mllib] def columnSimilaritiesDIMSUM(
-      colMags: Array[Double], gamma: Double): CoordinateMatrix = {
+      colMags: Array[Double], gamma: Double): CoordinateMatrix =
     require(gamma > 1.0, s"Oversampling should be greater than 1: $gamma")
     require(colMags.size == this.numCols(),
             "Number of magnitudes didn't match column dimension")
@@ -635,128 +583,104 @@ class RowMatrix @Since("1.0.0")(@Since("1.0.0") val rows: RDD[Vector],
     val pBV = sc.broadcast(colMagsCorrected.map(c => sg / c))
     val qBV = sc.broadcast(colMagsCorrected.map(c => math.min(sg, c)))
 
-    val sims = rows.mapPartitionsWithIndex { (indx, iter) =>
+    val sims = rows.mapPartitionsWithIndex  (indx, iter) =>
       val p = pBV.value
       val q = qBV.value
 
       val rand = new XORShiftRandom(indx)
       val scaled = new Array[Double](p.size)
-      iter.flatMap { row =>
-        row match {
+      iter.flatMap  row =>
+        row match
           case SparseVector(size, indices, values) =>
             val nnz = indices.size
             var k = 0
-            while (k < nnz) {
+            while (k < nnz)
               scaled(k) = values(k) / q(indices(k))
               k += 1
-            }
 
             Iterator
-              .tabulate(nnz) { k =>
+              .tabulate(nnz)  k =>
                 val buf = new ListBuffer[((Int, Int), Double)]()
                 val i = indices(k)
                 val iVal = scaled(k)
-                if (iVal != 0 && rand.nextDouble() < p(i)) {
+                if (iVal != 0 && rand.nextDouble() < p(i))
                   var l = k + 1
-                  while (l < nnz) {
+                  while (l < nnz)
                     val j = indices(l)
                     val jVal = scaled(l)
-                    if (jVal != 0 && rand.nextDouble() < p(j)) {
+                    if (jVal != 0 && rand.nextDouble() < p(j))
                       buf += (((i, j), iVal * jVal))
-                    }
                     l += 1
-                  }
-                }
                 buf
-              }
               .flatten
           case DenseVector(values) =>
             val n = values.size
             var i = 0
-            while (i < n) {
+            while (i < n)
               scaled(i) = values(i) / q(i)
               i += 1
-            }
             Iterator
-              .tabulate(n) { i =>
+              .tabulate(n)  i =>
                 val buf = new ListBuffer[((Int, Int), Double)]()
                 val iVal = scaled(i)
-                if (iVal != 0 && rand.nextDouble() < p(i)) {
+                if (iVal != 0 && rand.nextDouble() < p(i))
                   var j = i + 1
-                  while (j < n) {
+                  while (j < n)
                     val jVal = scaled(j)
-                    if (jVal != 0 && rand.nextDouble() < p(j)) {
+                    if (jVal != 0 && rand.nextDouble() < p(j))
                       buf += (((i, j), iVal * jVal))
-                    }
                     j += 1
-                  }
-                }
                 buf
-              }
               .flatten
-        }
-      }
-    }.reduceByKey(_ + _).map {
+    .reduceByKey(_ + _).map
       case ((i, j), sim) =>
         MatrixEntry(i.toLong, j.toLong, sim)
-    }
     new CoordinateMatrix(sims, numCols(), numCols())
-  }
 
-  private[mllib] override def toBreeze(): BDM[Double] = {
+  private[mllib] override def toBreeze(): BDM[Double] =
     val m = numRows().toInt
     val n = numCols().toInt
     val mat = BDM.zeros[Double](m, n)
     var i = 0
-    rows.collect().foreach { vector =>
-      vector.foreachActive {
+    rows.collect().foreach  vector =>
+      vector.foreachActive
         case (j, v) =>
           mat(i, j) = v
-      }
       i += 1
-    }
     mat
-  }
 
   /** Updates or verifies the number of rows. */
-  private def updateNumRows(m: Long) {
-    if (nRows <= 0) {
+  private def updateNumRows(m: Long)
+    if (nRows <= 0)
       nRows = m
-    } else {
+    else
       require(
           nRows == m,
           s"The number of rows $m is different from what specified or previously computed: ${nRows}.")
-    }
-  }
-}
 
 @Since("1.0.0")
-object RowMatrix {
+object RowMatrix
 
   /**
     * Fills a full square matrix from its upper triangular part.
     */
-  private def triuToFull(n: Int, U: Array[Double]): Matrix = {
+  private def triuToFull(n: Int, U: Array[Double]): Matrix =
     val G = new BDM[Double](n, n)
 
     var row = 0
     var col = 0
     var idx = 0
     var value = 0.0
-    while (col < n) {
+    while (col < n)
       row = 0
-      while (row < col) {
+      while (row < col)
         value = U(idx)
         G(row, col) = value
         G(col, row) = value
         idx += 1
         row += 1
-      }
       G(col, col) = U(idx)
       idx += 1
       col += 1
-    }
 
     Matrices.dense(n, n, G.data)
-  }
-}

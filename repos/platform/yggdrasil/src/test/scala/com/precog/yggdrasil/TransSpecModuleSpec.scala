@@ -27,12 +27,12 @@ import com.precog.common._
 import org.specs2.mutable.Specification
 
 trait TransSpecModuleSpec
-    extends TransSpecModule with FNDummyModule with Specification {
+    extends TransSpecModule with FNDummyModule with Specification
   import trans._
   import CPath._
 
-  "concatChildren" should {
-    "transform a CPathTree into a TransSpec" in {
+  "concatChildren" should
+    "transform a CPathTree into a TransSpec" in
       val tree: CPathTree[Int] = RootNode(
           Seq(FieldNode(CPathField("bar"),
                         Seq(IndexNode(CPathIndex(0), Seq(LeafNode(4))),
@@ -59,8 +59,5 @@ trait TransSpecModuleSpec
           WrapObject(DerefArrayStatic(Leaf(Source), CPathIndex(0)), "foo"))
 
       result mustEqual expected
-    }
-  }
-}
 
 object TransSpecModuleSpec extends TransSpecModuleSpec

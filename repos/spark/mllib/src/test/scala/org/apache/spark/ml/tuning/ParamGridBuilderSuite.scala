@@ -22,22 +22,20 @@ import scala.collection.mutable
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.param.{ParamMap, TestParams}
 
-class ParamGridBuilderSuite extends SparkFunSuite {
+class ParamGridBuilderSuite extends SparkFunSuite
 
   val solver = new TestParams()
   import solver.{inputCol, maxIter}
 
-  test("param grid builder") {
+  test("param grid builder")
     def validateGrid(
-        maps: Array[ParamMap], expected: mutable.Set[(Int, String)]): Unit = {
+        maps: Array[ParamMap], expected: mutable.Set[(Int, String)]): Unit =
       assert(maps.size === expected.size)
-      maps.foreach { m =>
+      maps.foreach  m =>
         val tuple = (m(maxIter), m(inputCol))
         assert(expected.contains(tuple))
         expected.remove(tuple)
-      }
       assert(expected.isEmpty)
-    }
 
     val maps0 = new ParamGridBuilder()
       .baseOn(maxIter -> 10)
@@ -56,5 +54,3 @@ class ParamGridBuilderSuite extends SparkFunSuite {
                                 (10, "input1"),
                                 (20, "input1"))
     validateGrid(maps1, expected1)
-  }
-}

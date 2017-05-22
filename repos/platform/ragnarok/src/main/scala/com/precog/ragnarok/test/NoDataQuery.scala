@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object NoDataTestSuite extends PerfTestSuite {
+object NoDataTestSuite extends PerfTestSuite
   val input =
     """
     | import std::stats::*
@@ -87,4 +87,3 @@ object NoDataTestSuite extends PerfTestSuite {
     | """.stripMargin
 
   query(input)
-}

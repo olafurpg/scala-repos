@@ -38,14 +38,14 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
                          condition: Option[Expression],
                          left: SparkPlan,
                          right: SparkPlan)
-    extends BinaryNode with CodegenSupport {
+    extends BinaryNode with CodegenSupport
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
                                                      "number of output rows"))
 
-  override def output: Seq[Attribute] = {
-    joinType match {
+  override def output: Seq[Attribute] =
+    joinType match
       case Inner =>
         left.output ++ right.output
       case LeftOuter =>
@@ -57,10 +57,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
       case x =>
         throw new IllegalArgumentException(
             s"${getClass.getSimpleName} should not take $x as the JoinType")
-    }
-  }
 
-  override def outputPartitioning: Partitioning = joinType match {
+  override def outputPartitioning: Partitioning = joinType match
     case Inner =>
       PartitioningCollection(
           Seq(left.outputPartitioning, right.outputPartitioning))
@@ -72,7 +70,6 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     case x =>
       throw new IllegalArgumentException(
           s"${getClass.getSimpleName} should not take $x as the JoinType")
-  }
 
   override def requiredChildDistribution: Seq[Distribution] =
     ClusteredDistribution(leftKeys) :: ClusteredDistribution(rightKeys) :: Nil
@@ -82,10 +79,9 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
   override def requiredChildOrdering: Seq[Seq[SortOrder]] =
     requiredOrders(leftKeys) :: requiredOrders(rightKeys) :: Nil
 
-  private def requiredOrders(keys: Seq[Expression]): Seq[SortOrder] = {
+  private def requiredOrders(keys: Seq[Expression]): Seq[SortOrder] =
     // This must be ascending in order to agree with the `keyOrdering` defined in `doExecute()`.
     keys.map(SortOrder(_, Ascending))
-  }
 
   private def createLeftKeyGenerator(): Projection =
     UnsafeProjection.create(leftKeys, left.output)
@@ -93,25 +89,23 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
   private def createRightKeyGenerator(): Projection =
     UnsafeProjection.create(rightKeys, right.output)
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val numOutputRows = longMetric("numOutputRows")
 
-    left.execute().zipPartitions(right.execute()) { (leftIter, rightIter) =>
-      val boundCondition: (InternalRow) => Boolean = {
-        condition.map { cond =>
+    left.execute().zipPartitions(right.execute())  (leftIter, rightIter) =>
+      val boundCondition: (InternalRow) => Boolean =
+        condition.map  cond =>
           newPredicate(cond, left.output ++ right.output)
-        }.getOrElse { (r: InternalRow) =>
+        .getOrElse  (r: InternalRow) =>
           true
-        }
-      }
       // An ordering that can be used to compare keys from both sides.
       val keyOrdering = newNaturalAscendingOrdering(leftKeys.map(_.dataType))
       val resultProj: InternalRow => InternalRow =
         UnsafeProjection.create(output, output)
 
-      joinType match {
+      joinType match
         case Inner =>
-          new RowIterator {
+          new RowIterator
             // The projection used to extract keys from input rows of the left child.
             private[this] val leftKeyGenerator =
               UnsafeProjection.create(leftKeys, left.output)
@@ -137,38 +131,32 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
             private[this] val resultProjection: (InternalRow) => InternalRow =
               UnsafeProjection.create(schema)
 
-            if (smjScanner.findNextInnerJoinRows()) {
+            if (smjScanner.findNextInnerJoinRows())
               currentRightMatches = smjScanner.getBufferedMatches
               currentLeftRow = smjScanner.getStreamedRow
               currentMatchIdx = 0
-            }
 
-            override def advanceNext(): Boolean = {
-              while (currentMatchIdx >= 0) {
-                if (currentMatchIdx == currentRightMatches.length) {
-                  if (smjScanner.findNextInnerJoinRows()) {
+            override def advanceNext(): Boolean =
+              while (currentMatchIdx >= 0)
+                if (currentMatchIdx == currentRightMatches.length)
+                  if (smjScanner.findNextInnerJoinRows())
                     currentRightMatches = smjScanner.getBufferedMatches
                     currentLeftRow = smjScanner.getStreamedRow
                     currentMatchIdx = 0
-                  } else {
+                  else
                     currentRightMatches = null
                     currentLeftRow = null
                     currentMatchIdx = -1
                     return false
-                  }
-                }
                 joinRow(currentLeftRow, currentRightMatches(currentMatchIdx))
                 currentMatchIdx += 1
-                if (boundCondition(joinRow)) {
+                if (boundCondition(joinRow))
                   numOutputRows += 1
                   return true
-                }
-              }
               false
-            }
 
             override def getRow: InternalRow = resultProjection(joinRow)
-          }.toScala
+          .toScala
 
         case LeftOuter =>
           val smjScanner = new SortMergeJoinScanner(
@@ -218,29 +206,23 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
         case x =>
           throw new IllegalArgumentException(
               s"SortMergeJoin should not take $x as the JoinType")
-      }
-    }
-  }
 
-  override def supportCodegen: Boolean = {
+  override def supportCodegen: Boolean =
     joinType == Inner
-  }
 
-  override def upstreams(): Seq[RDD[InternalRow]] = {
+  override def upstreams(): Seq[RDD[InternalRow]] =
     left.execute() :: right.execute() :: Nil
-  }
 
   private def createJoinKey(ctx: CodegenContext,
                             row: String,
                             keys: Seq[Expression],
-                            input: Seq[Attribute]): Seq[ExprCode] = {
+                            input: Seq[Attribute]): Seq[ExprCode] =
     ctx.INPUT_ROW = row
     keys.map(BindReferences.bindReference(_, input).gen(ctx))
-  }
 
   private def copyKeys(
-      ctx: CodegenContext, vars: Seq[ExprCode]): Seq[ExprCode] = {
-    vars.zipWithIndex.map {
+      ctx: CodegenContext, vars: Seq[ExprCode]): Seq[ExprCode] =
+    vars.zipWithIndex.map
       case (ev, i) =>
         val value = ctx.freshName("value")
         ctx.addMutableState(ctx.javaType(leftKeys(i).dataType), value, "")
@@ -248,30 +230,26 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
            |$value = ${ev.value};
          """.stripMargin
         ExprCode(code, "false", value)
-    }
-  }
 
   private def genComparision(
-      ctx: CodegenContext, a: Seq[ExprCode], b: Seq[ExprCode]): String = {
-    val comparisons = a.zip(b).zipWithIndex.map {
+      ctx: CodegenContext, a: Seq[ExprCode], b: Seq[ExprCode]): String =
+    val comparisons = a.zip(b).zipWithIndex.map
       case ((l, r), i) =>
         s"""
          |if (comp == 0) {
          |  comp = ${ctx.genComp(leftKeys(i).dataType, l.value, r.value)};
          |}
        """.stripMargin.trim
-    }
     s"""
        |comp = 0;
        |${comparisons.mkString("\n")}
      """.stripMargin
-  }
 
   /**
     * Generate a function to scan both left and right to find a match, returns the term for
     * matched one row from left side and buffered rows from right side.
     */
-  private def genScanner(ctx: CodegenContext): (String, String) = {
+  private def genScanner(ctx: CodegenContext): (String, String) =
     // Create class member for next row from both sides.
     val leftRow = ctx.freshName("leftRow")
     ctx.addMutableState("InternalRow", leftRow, "")
@@ -349,7 +327,6 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
        """.stripMargin)
 
     (leftRow, matches)
-  }
 
   /**
     * Creates variables for left part of result row.
@@ -359,15 +336,15 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     * codegen of BoundReference here.
     */
   private def createLeftVars(
-      ctx: CodegenContext, leftRow: String): Seq[ExprCode] = {
+      ctx: CodegenContext, leftRow: String): Seq[ExprCode] =
     ctx.INPUT_ROW = leftRow
-    left.output.zipWithIndex.map {
+    left.output.zipWithIndex.map
       case (a, i) =>
         val value = ctx.freshName("value")
         val valueCode = ctx.getValue(leftRow, a.dataType, i.toString)
         // declare it as class member, so we can access the column before or in the loop.
         ctx.addMutableState(ctx.javaType(a.dataType), value, "")
-        if (a.nullable) {
+        if (a.nullable)
           val isNull = ctx.freshName("isNull")
           ctx.addMutableState("boolean", isNull, "")
           val code = s"""
@@ -375,24 +352,19 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
              |$value = $isNull ? ${ctx.defaultValue(a.dataType)} : ($valueCode);
            """.stripMargin
           ExprCode(code, isNull, value)
-        } else {
+        else
           ExprCode(s"$value = $valueCode;", "false", value)
-        }
-    }
-  }
 
   /**
     * Creates the variables for right part of result row, using BoundReference, since the right
     * part are accessed inside the loop.
     */
   private def createRightVar(
-      ctx: CodegenContext, rightRow: String): Seq[ExprCode] = {
+      ctx: CodegenContext, rightRow: String): Seq[ExprCode] =
     ctx.INPUT_ROW = rightRow
-    right.output.zipWithIndex.map {
+    right.output.zipWithIndex.map
       case (a, i) =>
         BoundReference(i, a.dataType, a.nullable).gen(ctx)
-    }
-  }
 
   /**
     * Splits variables based on whether it's used by condition or not, returns the code to create
@@ -403,22 +375,19 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     */
   private def splitVarsByCondition(
       attributes: Seq[Attribute],
-      variables: Seq[ExprCode]): (String, String) = {
-    if (condition.isDefined) {
+      variables: Seq[ExprCode]): (String, String) =
+    if (condition.isDefined)
       val condRefs = condition.get.references
-      val (used, notUsed) = attributes.zip(variables).partition {
+      val (used, notUsed) = attributes.zip(variables).partition
         case (a, ev) =>
           condRefs.contains(a)
-      }
       val beforeCond = evaluateVariables(used.map(_._2))
       val afterCond = evaluateVariables(notUsed.map(_._2))
       (beforeCond, afterCond)
-    } else {
+    else
       (evaluateVariables(variables), "")
-    }
-  }
 
-  override def doProduce(ctx: CodegenContext): String = {
+  override def doProduce(ctx: CodegenContext): String =
     ctx.copyResult = true
     val leftInput = ctx.freshName("leftInput")
     ctx.addMutableState(
@@ -438,7 +407,7 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
     val i = ctx.freshName("i")
     val numOutput = metricTerm(ctx, "numOutputRows")
     val (beforeLoop, condCheck) =
-      if (condition.isDefined) {
+      if (condition.isDefined)
         // Split the code of creating variables based on whether it's used by condition or not.
         val loaded = ctx.freshName("loaded")
         val (leftBefore, leftAfter) = splitVarsByCondition(
@@ -465,9 +434,8 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
          |$rightAfter
      """.stripMargin
         (before, checking)
-      } else {
+      else
         (evaluateVariables(leftVars), "")
-      }
 
     s"""
        |while (findNextInnerJoinRows($leftInput, $rightInput)) {
@@ -482,8 +450,6 @@ case class SortMergeJoin(leftKeys: Seq[Expression],
        |  if (shouldStop()) return;
        |}
      """.stripMargin
-  }
-}
 
 /**
   * Helper class that is used to implement [[SortMergeJoin]].
@@ -508,7 +474,7 @@ private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
                                           bufferedKeyGenerator: Projection,
                                           keyOrdering: Ordering[InternalRow],
                                           streamedIter: RowIterator,
-                                          bufferedIter: RowIterator) {
+                                          bufferedIter: RowIterator)
   private[this] var streamedRow: InternalRow = _
   private[this] var streamedRowKey: InternalRow = _
   private[this] var bufferedRow: InternalRow = _
@@ -539,53 +505,48 @@ private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
     *         [[getStreamedRow]] and [[getBufferedMatches]] can be called to construct the join
     *         results.
     */
-  final def findNextInnerJoinRows(): Boolean = {
-    while (advancedStreamed() && streamedRowKey.anyNull) {
+  final def findNextInnerJoinRows(): Boolean =
+    while (advancedStreamed() && streamedRowKey.anyNull)
       // Advance the streamed side of the join until we find the next row whose join key contains
       // no nulls or we hit the end of the streamed iterator.
-    }
-    if (streamedRow == null) {
+    if (streamedRow == null)
       // We have consumed the entire streamed iterator, so there can be no more matches.
       matchJoinKey = null
       bufferedMatches.clear()
       false
-    } else if (matchJoinKey != null &&
-               keyOrdering.compare(streamedRowKey, matchJoinKey) == 0) {
+    else if (matchJoinKey != null &&
+               keyOrdering.compare(streamedRowKey, matchJoinKey) == 0)
       // The new streamed row has the same join key as the previous row, so return the same matches.
       true
-    } else if (bufferedRow == null) {
+    else if (bufferedRow == null)
       // The streamed row's join key does not match the current batch of buffered rows and there are
       // no more rows to read from the buffered iterator, so there can be no more matches.
       matchJoinKey = null
       bufferedMatches.clear()
       false
-    } else {
+    else
       // Advance both the streamed and buffered iterators to find the next pair of matching rows.
       var comp = keyOrdering.compare(streamedRowKey, bufferedRowKey)
-      do {
-        if (streamedRowKey.anyNull) {
+      do
+        if (streamedRowKey.anyNull)
           advancedStreamed()
-        } else {
+        else
           assert(!bufferedRowKey.anyNull)
           comp = keyOrdering.compare(streamedRowKey, bufferedRowKey)
           if (comp > 0) advancedBufferedToRowWithNullFreeJoinKey()
           else if (comp < 0) advancedStreamed()
-        }
-      } while (streamedRow != null && bufferedRow != null && comp != 0)
-      if (streamedRow == null || bufferedRow == null) {
+      while (streamedRow != null && bufferedRow != null && comp != 0)
+      if (streamedRow == null || bufferedRow == null)
         // We have either hit the end of one of the iterators, so there can be no more matches.
         matchJoinKey = null
         bufferedMatches.clear()
         false
-      } else {
+      else
         // The streamed row's join key matches the current buffered row's join, so walk through the
         // buffered iterator to buffer the rest of the matching rows.
         assert(comp == 0)
         bufferMatchingRows()
         true
-      }
-    }
-  }
 
   /**
     * Advances the streamed input iterator and buffers all rows from the buffered input that
@@ -594,39 +555,34 @@ private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
     *         then [[getStreamedRow]] and [[getBufferedMatches]] can be called to produce the outer
     *         join results.
     */
-  final def findNextOuterJoinRows(): Boolean = {
-    if (!advancedStreamed()) {
+  final def findNextOuterJoinRows(): Boolean =
+    if (!advancedStreamed())
       // We have consumed the entire streamed iterator, so there can be no more matches.
       matchJoinKey = null
       bufferedMatches.clear()
       false
-    } else {
+    else
       if (matchJoinKey != null &&
-          keyOrdering.compare(streamedRowKey, matchJoinKey) == 0) {
+          keyOrdering.compare(streamedRowKey, matchJoinKey) == 0)
         // Matches the current group, so do nothing.
-      } else {
+      else
         // The streamed row does not match the current group.
         matchJoinKey = null
         bufferedMatches.clear()
-        if (bufferedRow != null && !streamedRowKey.anyNull) {
+        if (bufferedRow != null && !streamedRowKey.anyNull)
           // The buffered iterator could still contain matching rows, so we'll need to walk through
           // it until we either find matches or pass where they would be found.
           var comp = 1
-          do {
+          do
             comp = keyOrdering.compare(streamedRowKey, bufferedRowKey)
-          } while (comp > 0 && advancedBufferedToRowWithNullFreeJoinKey())
-          if (comp == 0) {
+          while (comp > 0 && advancedBufferedToRowWithNullFreeJoinKey())
+          if (comp == 0)
             // We have found matches, so buffer them (this updates matchJoinKey)
             bufferMatchingRows()
-          } else {
+          else
             // We have overshot the position where the row would be found, hence no matches.
-          }
-        }
-      }
       // If there is a streamed input then we always return true
       true
-    }
-  }
 
   // --- Private methods --------------------------------------------------------------------------
 
@@ -634,42 +590,37 @@ private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
     * Advance the streamed iterator and compute the new row's join key.
     * @return true if the streamed iterator returned a row and false otherwise.
     */
-  private def advancedStreamed(): Boolean = {
-    if (streamedIter.advanceNext()) {
+  private def advancedStreamed(): Boolean =
+    if (streamedIter.advanceNext())
       streamedRow = streamedIter.getRow
       streamedRowKey = streamedKeyGenerator(streamedRow)
       true
-    } else {
+    else
       streamedRow = null
       streamedRowKey = null
       false
-    }
-  }
 
   /**
     * Advance the buffered iterator until we find a row with join key that does not contain nulls.
     * @return true if the buffered iterator returned a row and false otherwise.
     */
-  private def advancedBufferedToRowWithNullFreeJoinKey(): Boolean = {
+  private def advancedBufferedToRowWithNullFreeJoinKey(): Boolean =
     var foundRow: Boolean = false
-    while (!foundRow && bufferedIter.advanceNext()) {
+    while (!foundRow && bufferedIter.advanceNext())
       bufferedRow = bufferedIter.getRow
       bufferedRowKey = bufferedKeyGenerator(bufferedRow)
       foundRow = !bufferedRowKey.anyNull
-    }
-    if (!foundRow) {
+    if (!foundRow)
       bufferedRow = null
       bufferedRowKey = null
       false
-    } else {
+    else
       true
-    }
-  }
 
   /**
     * Called when the streamed and buffered join keys match in order to buffer the matching rows.
     */
-  private def bufferMatchingRows(): Unit = {
+  private def bufferMatchingRows(): Unit =
     assert(streamedRowKey != null)
     assert(!streamedRowKey.anyNull)
     assert(bufferedRowKey != null)
@@ -678,13 +629,11 @@ private[joins] class SortMergeJoinScanner(streamedKeyGenerator: Projection,
     // This join key may have been produced by a mutable projection, so we need to make a copy:
     matchJoinKey = streamedRowKey.copy()
     bufferedMatches.clear()
-    do {
+    do
       bufferedMatches += bufferedRow.copy() // need to copy mutable rows before buffering them
       advancedBufferedToRowWithNullFreeJoinKey()
-    } while (bufferedRow != null &&
+    while (bufferedRow != null &&
     keyOrdering.compare(streamedRowKey, bufferedRowKey) == 0)
-  }
-}
 
 /**
   * An iterator for outputting rows in left outer join.
@@ -695,13 +644,12 @@ private class LeftOuterIterator(smjScanner: SortMergeJoinScanner,
                                 resultProj: InternalRow => InternalRow,
                                 numOutputRows: LongSQLMetric)
     extends OneSideOuterIterator(
-        smjScanner, rightNullRow, boundCondition, resultProj, numOutputRows) {
+        smjScanner, rightNullRow, boundCondition, resultProj, numOutputRows)
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withLeft(row)
   protected override def setBufferedSideOutput(row: InternalRow): Unit =
     joinedRow.withRight(row)
-}
 
 /**
   * An iterator for outputting rows in right outer join.
@@ -712,13 +660,12 @@ private class RightOuterIterator(smjScanner: SortMergeJoinScanner,
                                  resultProj: InternalRow => InternalRow,
                                  numOutputRows: LongSQLMetric)
     extends OneSideOuterIterator(
-        smjScanner, leftNullRow, boundCondition, resultProj, numOutputRows) {
+        smjScanner, leftNullRow, boundCondition, resultProj, numOutputRows)
 
   protected override def setStreamSideOutput(row: InternalRow): Unit =
     joinedRow.withRight(row)
   protected override def setBufferedSideOutput(row: InternalRow): Unit =
     joinedRow.withLeft(row)
-}
 
 /**
   * An abstract iterator for sharing code between [[LeftOuterIterator]] and [[RightOuterIterator]].
@@ -742,7 +689,7 @@ private abstract class OneSideOuterIterator(
     boundCondition: InternalRow => Boolean,
     resultProj: InternalRow => InternalRow,
     numOutputRows: LongSQLMetric)
-    extends RowIterator {
+    extends RowIterator
 
   // A row to store the joined result, reused many times
   protected[this] val joinedRow: JoinedRow = new JoinedRow()
@@ -761,48 +708,40 @@ private abstract class OneSideOuterIterator(
     * Advance to the next row on the stream side and populate the buffer with matches.
     * @return whether there are more rows in the stream to consume.
     */
-  private def advanceStream(): Boolean = {
+  private def advanceStream(): Boolean =
     bufferIndex = 0
-    if (smjScanner.findNextOuterJoinRows()) {
+    if (smjScanner.findNextOuterJoinRows())
       setStreamSideOutput(smjScanner.getStreamedRow)
-      if (smjScanner.getBufferedMatches.isEmpty) {
+      if (smjScanner.getBufferedMatches.isEmpty)
         // There are no matching rows in the buffer, so return the null row
         setBufferedSideOutput(bufferedSideNullRow)
-      } else {
+      else
         // Find the next row in the buffer that satisfied the bound condition
-        if (!advanceBufferUntilBoundConditionSatisfied()) {
+        if (!advanceBufferUntilBoundConditionSatisfied())
           setBufferedSideOutput(bufferedSideNullRow)
-        }
-      }
       true
-    } else {
+    else
       // Stream has been exhausted
       false
-    }
-  }
 
   /**
     * Advance to the next row in the buffer that satisfies the bound condition.
     * @return whether there is such a row in the current buffer.
     */
-  private def advanceBufferUntilBoundConditionSatisfied(): Boolean = {
+  private def advanceBufferUntilBoundConditionSatisfied(): Boolean =
     var foundMatch: Boolean = false
-    while (!foundMatch && bufferIndex < smjScanner.getBufferedMatches.length) {
+    while (!foundMatch && bufferIndex < smjScanner.getBufferedMatches.length)
       setBufferedSideOutput(smjScanner.getBufferedMatches(bufferIndex))
       foundMatch = boundCondition(joinedRow)
       bufferIndex += 1
-    }
     foundMatch
-  }
 
-  override def advanceNext(): Boolean = {
+  override def advanceNext(): Boolean =
     val r = advanceBufferUntilBoundConditionSatisfied() || advanceStream()
     if (r) numOutputRows += 1
     r
-  }
 
   override def getRow: InternalRow = resultProj(joinedRow)
-}
 
 private class SortMergeFullOuterJoinScanner(
     leftKeyGenerator: Projection,
@@ -812,7 +751,7 @@ private class SortMergeFullOuterJoinScanner(
     rightIter: RowIterator,
     boundCondition: InternalRow => Boolean,
     leftNullRow: InternalRow,
-    rightNullRow: InternalRow) {
+    rightNullRow: InternalRow)
   private[this] val joinedRow: JoinedRow = new JoinedRow()
   private[this] var leftRow: InternalRow = _
   private[this] var leftRowKey: InternalRow = _
@@ -837,66 +776,57 @@ private class SortMergeFullOuterJoinScanner(
     * Advance the left iterator and compute the new row's join key.
     * @return true if the left iterator returned a row and false otherwise.
     */
-  private def advancedLeft(): Boolean = {
-    if (leftIter.advanceNext()) {
+  private def advancedLeft(): Boolean =
+    if (leftIter.advanceNext())
       leftRow = leftIter.getRow
       leftRowKey = leftKeyGenerator(leftRow)
       true
-    } else {
+    else
       leftRow = null
       leftRowKey = null
       false
-    }
-  }
 
   /**
     * Advance the right iterator and compute the new row's join key.
     * @return true if the right iterator returned a row and false otherwise.
     */
-  private def advancedRight(): Boolean = {
-    if (rightIter.advanceNext()) {
+  private def advancedRight(): Boolean =
+    if (rightIter.advanceNext())
       rightRow = rightIter.getRow
       rightRowKey = rightKeyGenerator(rightRow)
       true
-    } else {
+    else
       rightRow = null
       rightRowKey = null
       false
-    }
-  }
 
   /**
     * Populate the left and right buffers with rows matching the provided key.
     * This consumes rows from both iterators until their keys are different from the matching key.
     */
-  private def findMatchingRows(matchingKey: InternalRow): Unit = {
+  private def findMatchingRows(matchingKey: InternalRow): Unit =
     leftMatches.clear()
     rightMatches.clear()
     leftIndex = 0
     rightIndex = 0
 
     while (leftRowKey != null &&
-    keyOrdering.compare(leftRowKey, matchingKey) == 0) {
+    keyOrdering.compare(leftRowKey, matchingKey) == 0)
       leftMatches += leftRow.copy()
       advancedLeft()
-    }
     while (rightRowKey != null &&
-    keyOrdering.compare(rightRowKey, matchingKey) == 0) {
+    keyOrdering.compare(rightRowKey, matchingKey) == 0)
       rightMatches += rightRow.copy()
       advancedRight()
-    }
 
-    if (leftMatches.size <= leftMatched.capacity) {
+    if (leftMatches.size <= leftMatched.capacity)
       leftMatched.clear()
-    } else {
+    else
       leftMatched = new BitSet(leftMatches.size)
-    }
-    if (rightMatches.size <= rightMatched.capacity) {
+    if (rightMatches.size <= rightMatched.capacity)
       rightMatched.clear()
-    } else {
+    else
       rightMatched = new BitSet(rightMatches.size)
-    }
-  }
 
   /**
     * Scan the left and right buffers for the next valid match.
@@ -907,91 +837,76 @@ private class SortMergeFullOuterJoinScanner(
     *
     * @return true if a valid match is found, false otherwise.
     */
-  private def scanNextInBuffered(): Boolean = {
-    while (leftIndex < leftMatches.size) {
-      while (rightIndex < rightMatches.size) {
+  private def scanNextInBuffered(): Boolean =
+    while (leftIndex < leftMatches.size)
+      while (rightIndex < rightMatches.size)
         joinedRow(leftMatches(leftIndex), rightMatches(rightIndex))
-        if (boundCondition(joinedRow)) {
+        if (boundCondition(joinedRow))
           leftMatched.set(leftIndex)
           rightMatched.set(rightIndex)
           rightIndex += 1
           return true
-        }
         rightIndex += 1
-      }
       rightIndex = 0
-      if (!leftMatched.get(leftIndex)) {
+      if (!leftMatched.get(leftIndex))
         // the left row has never matched any right row, join it with null row
         joinedRow(leftMatches(leftIndex), rightNullRow)
         leftIndex += 1
         return true
-      }
       leftIndex += 1
-    }
 
-    while (rightIndex < rightMatches.size) {
-      if (!rightMatched.get(rightIndex)) {
+    while (rightIndex < rightMatches.size)
+      if (!rightMatched.get(rightIndex))
         // the right row has never matched any left row, join it with null row
         joinedRow(leftNullRow, rightMatches(rightIndex))
         rightIndex += 1
         return true
-      }
       rightIndex += 1
-    }
 
     // There are no more valid matches in the left and right buffers
     false
-  }
 
   // --- Public methods --------------------------------------------------------------------------
 
   def getJoinedRow(): JoinedRow = joinedRow
 
-  def advanceNext(): Boolean = {
+  def advanceNext(): Boolean =
     // If we already buffered some matching rows, use them directly
-    if (leftIndex <= leftMatches.size || rightIndex <= rightMatches.size) {
-      if (scanNextInBuffered()) {
+    if (leftIndex <= leftMatches.size || rightIndex <= rightMatches.size)
+      if (scanNextInBuffered())
         return true
-      }
-    }
 
-    if (leftRow != null && (leftRowKey.anyNull || rightRow == null)) {
+    if (leftRow != null && (leftRowKey.anyNull || rightRow == null))
       joinedRow(leftRow.copy(), rightNullRow)
       advancedLeft()
       true
-    } else if (rightRow != null && (rightRowKey.anyNull || leftRow == null)) {
+    else if (rightRow != null && (rightRowKey.anyNull || leftRow == null))
       joinedRow(leftNullRow, rightRow.copy())
       advancedRight()
       true
-    } else if (leftRow != null && rightRow != null) {
+    else if (leftRow != null && rightRow != null)
       // Both rows are present and neither have null values,
       // so we populate the buffers with rows matching the next key
       val comp = keyOrdering.compare(leftRowKey, rightRowKey)
-      if (comp <= 0) {
+      if (comp <= 0)
         findMatchingRows(leftRowKey.copy())
-      } else {
+      else
         findMatchingRows(rightRowKey.copy())
-      }
       scanNextInBuffered()
       true
-    } else {
+    else
       // Both iterators have been consumed
       false
-    }
-  }
-}
 
 private class FullOuterIterator(smjScanner: SortMergeFullOuterJoinScanner,
                                 resultProj: InternalRow => InternalRow,
                                 numRows: LongSQLMetric)
-    extends RowIterator {
+    extends RowIterator
   private[this] val joinedRow: JoinedRow = smjScanner.getJoinedRow()
 
-  override def advanceNext(): Boolean = {
+  override def advanceNext(): Boolean =
     val r = smjScanner.advanceNext()
     if (r) numRows += 1
     r
-  }
 
   override def getRow: InternalRow = resultProj(joinedRow)
-}

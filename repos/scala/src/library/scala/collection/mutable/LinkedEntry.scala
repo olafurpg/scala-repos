@@ -14,7 +14,6 @@ package mutable
   *  @since 2.8
   */
 final class LinkedEntry[A, B](val key: A, var value: B)
-    extends HashEntry[A, LinkedEntry[A, B]] with Serializable {
+    extends HashEntry[A, LinkedEntry[A, B]] with Serializable
   var earlier: LinkedEntry[A, B] = null
   var later: LinkedEntry[A, B] = null
-}

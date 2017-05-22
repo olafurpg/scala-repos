@@ -30,11 +30,11 @@ case class WSClientConfig(connectionTimeout: Duration = 2.minutes,
 @Singleton
 class WSConfigParser @Inject()(
     configuration: Configuration, environment: Environment)
-    extends Provider[WSClientConfig] {
+    extends Provider[WSClientConfig]
 
   def get = parse()
 
-  def parse(): WSClientConfig = {
+  def parse(): WSClientConfig =
 
     val config =
       PlayConfig(configuration).getDeprecatedWithFallback("play.ws", "ws")
@@ -61,5 +61,3 @@ class WSConfigParser @Inject()(
                    userAgent = userAgent,
                    compressionEnabled = compressionEnabled,
                    ssl = sslConfig)
-  }
-}

@@ -5,7 +5,7 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
                                                    _csqOffset: Int,
                                                    _initialPosition: Int,
                                                    _initialLimit: Int)
-    extends CharBuffer(_capacity) {
+    extends CharBuffer(_capacity)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -14,26 +14,23 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
 
   def isDirect(): Boolean = false
 
-  def slice(): CharBuffer = {
+  def slice(): CharBuffer =
     val cap = remaining
     new StringCharBuffer(cap, _csq, _csqOffset + position, 0, cap)
-  }
 
-  def duplicate(): CharBuffer = {
+  def duplicate(): CharBuffer =
     val result = new StringCharBuffer(
         capacity, _csq, _csqOffset, position, limit)
     result._mark = this._mark
     result
-  }
 
   def asReadOnlyBuffer(): CharBuffer = duplicate()
 
-  def subSequence(start: Int, end: Int): CharBuffer = {
+  def subSequence(start: Int, end: Int): CharBuffer =
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
     new StringCharBuffer(
         capacity, _csq, _csqOffset, position + start, position + end)
-  }
 
   @noinline
   def get(): Char =
@@ -59,10 +56,9 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
   def compact(): CharBuffer =
     throw new ReadOnlyBufferException
 
-  override def toString(): String = {
+  override def toString(): String =
     val offset = _csqOffset
     _csq.subSequence(position + offset, limit + offset).toString()
-  }
 
   def order(): ByteOrder = ByteOrder.nativeOrder()
 
@@ -85,14 +81,13 @@ private[nio] final class StringCharBuffer private (_capacity: Int,
   override private[nio] def store(
       startIndex: Int, src: Array[Char], offset: Int, length: Int): Unit =
     throw new ReadOnlyBufferException
-}
 
-private[nio] object StringCharBuffer {
+private[nio] object StringCharBuffer
   private[nio] def wrap(csq: CharSequence,
                         csqOffset: Int,
                         capacity: Int,
                         initialPosition: Int,
-                        initialLength: Int): CharBuffer = {
+                        initialLength: Int): CharBuffer =
     if (csqOffset < 0 || capacity < 0 || csqOffset + capacity > csq.length)
       throw new IndexOutOfBoundsException
     val initialLimit = initialPosition + initialLength
@@ -100,5 +95,3 @@ private[nio] object StringCharBuffer {
       throw new IndexOutOfBoundsException
     new StringCharBuffer(
         capacity, csq, csqOffset, initialPosition, initialLimit)
-  }
-}

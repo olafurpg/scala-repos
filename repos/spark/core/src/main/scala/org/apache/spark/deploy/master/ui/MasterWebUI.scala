@@ -33,7 +33,7 @@ private[master] class MasterWebUI(val master: Master,
                   master.securityMgr.getSSLOptions("standalone"),
                   requestedPort,
                   master.conf,
-                  name = "MasterUI") with Logging with UIRoot {
+                  name = "MasterUI") with Logging with UIRoot
 
   val masterEndpointRef = master.self
   val killEnabled = master.conf.getBoolean("spark.ui.killEnabled", true)
@@ -43,7 +43,7 @@ private[master] class MasterWebUI(val master: Master,
   initialize()
 
   /** Initialize all components of the server. */
-  def initialize() {
+  def initialize()
     val masterPage = new MasterPage(this)
     attachPage(new ApplicationPage(this))
     attachPage(new HistoryNotFoundPage(this))
@@ -61,45 +61,36 @@ private[master] class MasterWebUI(val master: Master,
                               "/",
                               masterPage.handleDriverKillRequest,
                               httpMethods = Set("POST")))
-  }
 
   /** Attach a reconstructed UI to this Master UI. Only valid after bind(). */
-  def attachSparkUI(ui: SparkUI) {
+  def attachSparkUI(ui: SparkUI)
     assert(serverInfo.isDefined,
            "Master UI must be bound to a server before attaching SparkUIs")
     ui.getHandlers.foreach(attachHandler)
-  }
 
   /** Detach a reconstructed UI from this Master UI. Only valid after bind(). */
-  def detachSparkUI(ui: SparkUI) {
+  def detachSparkUI(ui: SparkUI)
     assert(serverInfo.isDefined,
            "Master UI must be bound to a server before detaching SparkUIs")
     ui.getHandlers.foreach(detachHandler)
-  }
 
-  def getApplicationInfoList: Iterator[ApplicationInfo] = {
+  def getApplicationInfoList: Iterator[ApplicationInfo] =
     val state = masterPage.getMasterState
     val activeApps = state.activeApps.sortBy(_.startTime).reverse
     val completedApps = state.completedApps.sortBy(_.endTime).reverse
-    activeApps.iterator.map {
+    activeApps.iterator.map
       ApplicationsListResource.convertApplicationInfo(_, false)
-    } ++ completedApps.iterator.map {
+    ++ completedApps.iterator.map
       ApplicationsListResource.convertApplicationInfo(_, true)
-    }
-  }
 
-  def getSparkUI(appId: String): Option[SparkUI] = {
+  def getSparkUI(appId: String): Option[SparkUI] =
     val state = masterPage.getMasterState
     val activeApps = state.activeApps.sortBy(_.startTime).reverse
     val completedApps = state.completedApps
       .sortBy(_.endTime)
       .reverse
-      (activeApps ++ completedApps).find { _.id == appId }.flatMap {
+      (activeApps ++ completedApps).find { _.id == appId }.flatMap
       master.rebuildSparkUI
-    }
-  }
-}
 
-private[master] object MasterWebUI {
+private[master] object MasterWebUI
   private val STATIC_RESOURCE_DIR = SparkUI.STATIC_RESOURCE_DIR
-}

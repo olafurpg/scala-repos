@@ -12,9 +12,9 @@ import sun.net.www.protocol.file.FileURLConnection
 /**
   * Provide resources helpers
   */
-object Resources {
+object Resources
 
-  def isDirectory(classLoader: ClassLoader, url: URL) = url.getProtocol match {
+  def isDirectory(classLoader: ClassLoader, url: URL) = url.getProtocol match
     case "file" => new File(url.toURI).isDirectory
     case "jar" => isZipResourceDirectory(url)
     case "zip" => isZipResourceDirectory(url)
@@ -22,7 +22,6 @@ object Resources {
     case _ =>
       throw new IllegalArgumentException(
           s"Cannot check isDirectory for a URL with protocol='${url.getProtocol}'")
-  }
 
   /**
     * Tries to work out whether the given URL connection is a directory or not.
@@ -31,23 +30,20 @@ object Resources {
     * this returns false.
     */
   def isUrlConnectionADirectory(urlConnection: URLConnection) =
-    urlConnection match {
+    urlConnection match
       case file: FileURLConnection => new File(file.getURL.toURI).isDirectory
       case jar: JarURLConnection =>
-        if (jar.getJarEntry.isDirectory) {
+        if (jar.getJarEntry.isDirectory)
           true
-        } else {
+        else
           // JarEntry.isDirectory is rubbish....
           val is = jar.getJarFile.getInputStream(jar.getJarEntry)
-          if (is == null) {
+          if (is == null)
             true
-          } else {
+          else
             is.close()
             false
-          }
-        }
       case other => false
-    }
 
   /**
     * Close a URL connection.
@@ -55,19 +51,16 @@ object Resources {
     * This works around a JDK bug where if the URL connection is to a JAR file, and the entry is a directory, an NPE is
     * thrown.
     */
-  def closeUrlConnection(connection: URLConnection): Unit = {
-    connection match {
+  def closeUrlConnection(connection: URLConnection): Unit =
+    connection match
       case jar: JarURLConnection =>
-        if (!jar.getUseCaches) {
+        if (!jar.getUseCaches)
           jar.getJarFile.close()
-        }
       case other =>
         other.getInputStream.close()
-    }
-  }
 
   private def isBundleResourceDirectory(
-      classLoader: ClassLoader, url: URL): Boolean = {
+      classLoader: ClassLoader, url: URL): Boolean =
     /* ClassLoader within an OSGi container behave differently than the standard classloader.
      * One difference is how getResource returns when the resource's name end with a slash.
      * In a standard JVM, getResource doesn't care of ending slashes, and return the URL of
@@ -79,9 +72,8 @@ object Resources {
 
     classLoader.getResource(path) != null &&
     classLoader.getResource(pathSlash) != null
-  }
 
-  private def isZipResourceDirectory(url: URL): Boolean = {
+  private def isZipResourceDirectory(url: URL): Boolean =
     val path = url.getPath
     val bangIndex = url.getFile.indexOf("!")
 
@@ -95,17 +87,13 @@ object Resources {
       URI.create(path.substring(bangIndex + 1)).getPath.drop(1)
     val zip = new ZipFile(zipFile)
 
-    try {
+    try
       val entry = zip.getEntry(resourcePath)
       if (entry.isDirectory) true
-      else {
+      else
         val stream = zip.getInputStream(entry)
         val isDir = stream == null
         if (stream != null) stream.close()
         isDir
-      }
-    } finally {
+    finally
       zip.close()
-    }
-  }
-}

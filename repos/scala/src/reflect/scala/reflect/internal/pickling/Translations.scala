@@ -11,10 +11,10 @@ package pickling
 import PickleFormat._
 import util.shortClassOfInstance
 
-trait Translations { self: SymbolTable =>
+trait Translations  self: SymbolTable =>
 
   def isTreeSymbolPickled(code: Int): Boolean =
-    (code: @annotation.switch) match {
+    (code: @annotation.switch) match
       case PACKAGEtree | CLASStree | MODULEtree | VALDEFtree | DEFDEFtree |
           TYPEDEFtree | LABELtree =>
         true
@@ -23,7 +23,6 @@ trait Translations { self: SymbolTable =>
       case APPLYDYNAMICtree | SUPERtree | THIStree | SELECTtree | IDENTtree =>
         true
       case _ => false
-    }
 
   /** This method should be equivalent to tree.hasSymbolField, but that method
     *  doesn't do us any good when we're unpickling because we need to know based
@@ -36,7 +35,7 @@ trait Translations { self: SymbolTable =>
   // truly terrible idea. It reaches the height of its powers in
   // combination with scala's insistence on helpfully tupling
   // multiple arguments passed to a single-arg AnyRef.
-  def picklerTag(ref: AnyRef): Int = ref match {
+  def picklerTag(ref: AnyRef): Int = ref match
     case tp: Type => picklerTag(tp)
     case sym: Symbol => picklerTag(sym)
     case const: Constant => LITERAL + const.tag
@@ -52,7 +51,6 @@ trait Translations { self: SymbolTable =>
       CHILDREN // the direct subclasses of a sealed symbol
     case _: Modifiers => MODIFIERS
     case _ => sys.error(s"unpicklable entry ${shortClassOfInstance(ref)} $ref")
-  }
 
   /** Local symbols only. The assessment of locality depends
     *  on convoluted conditions which depends in part on the root
@@ -61,16 +59,15 @@ trait Translations { self: SymbolTable =>
     *  Those tags are never produced here - such symbols must be
     *  excluded prior to calling this method.
     */
-  def picklerTag(sym: Symbol): Int = sym match {
+  def picklerTag(sym: Symbol): Int = sym match
     case NoSymbol => NONEsym
     case _: ClassSymbol => CLASSsym
     case _: TypeSymbol if sym.isAbstractType => TYPEsym
     case _: TypeSymbol => ALIASsym
     case _: TermSymbol if sym.isModule => MODULEsym
     case _: TermSymbol => VALsym
-  }
 
-  def picklerTag(tpe: Type): Int = tpe match {
+  def picklerTag(tpe: Type): Int = tpe match
     case NoType => NOtpe
     case NoPrefix => NOPREFIXtpe
     case _: ThisType => THIStpe
@@ -88,9 +85,8 @@ trait Translations { self: SymbolTable =>
     case _: ExistentialType => EXISTENTIALtpe
     case StaticallyAnnotatedType(_, _) => ANNOTATEDtpe
     case _: AnnotatedType => picklerTag(tpe.underlying)
-  }
 
-  def picklerSubTag(tree: Tree): Int = tree match {
+  def picklerSubTag(tree: Tree): Int = tree match
     case EmptyTree => EMPTYtree
     case _: PackageDef => PACKAGEtree
     case _: ClassDef => CLASStree
@@ -134,5 +130,3 @@ trait Translations { self: SymbolTable =>
     case _: AppliedTypeTree => APPLIEDTYPEtree
     case _: TypeBoundsTree => TYPEBOUNDStree
     case _: ExistentialTypeTree => EXISTENTIALTYPEtree
-  }
-}

@@ -20,7 +20,7 @@ import shapeless._
 
 class TyApp[App, TyCon, Args <: HList]
 
-object TyApp {
+object TyApp
   class Arbitrary
   implicit def tyApp1[TC[_], A] =
     new TyApp[TC[A], TC[Arbitrary], A :: HNil]
@@ -31,9 +31,8 @@ object TyApp {
   implicit def tyApp3[TC[_, _, _], A, B, C] =
     new TyApp[
         TC[A, B, C], TC[Arbitrary, Arbitrary, Arbitrary], A :: B :: C :: HNil]
-}
 
-object KindPolyExamples {
+object KindPolyExamples
 
   def sameTypeArgs[T, ET, U, EU, A <: HList](t: T, u: U)(
       implicit evt: TyApp[T, ET, A], evu: TyApp[U, EU, A]) = {}
@@ -54,4 +53,3 @@ object KindPolyExamples {
   // sameTypeCtor(23, true)                           // Does not compile
   // sameTypeCtor(List(23), Set(13))                  // Does not compile
   // sameTypeCtor(Map(23 -> "foo"), (13, "bar"))      // Does not compile
-}

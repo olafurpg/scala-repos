@@ -49,7 +49,7 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     with BufferLike[A, ArrayBuffer[A]]
     with IndexedSeqOptimized[A, ArrayBuffer[A]] with Builder[A, ArrayBuffer[A]]
     with ResizableArray[A] with CustomParallelizable[A, ParArray[A]]
-    with Serializable {
+    with Serializable
 
   override def companion: GenericCompanion[ArrayBuffer] = ArrayBuffer
 
@@ -59,13 +59,11 @@ class ArrayBuffer[A](override protected val initialSize: Int)
 
   def clear() { reduceToSize(0) }
 
-  override def sizeHint(len: Int) {
-    if (len > size && len >= 1) {
+  override def sizeHint(len: Int)
+    if (len > size && len >= 1)
       val newarray = new Array[AnyRef](len)
       scala.compat.Platform.arraycopy(array, 0, newarray, 0, size0)
       array = newarray
-    }
-  }
 
   override def par = ParArray.handoff[A](array.asInstanceOf[Array[A]], size)
 
@@ -75,12 +73,11 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     *  @param elem  the element to append.
     *  @return      the updated buffer.
     */
-  def +=(elem: A): this.type = {
+  def +=(elem: A): this.type =
     ensureSize(size0 + 1)
     array(size0) = elem.asInstanceOf[AnyRef]
     size0 += 1
     this
-  }
 
   /** Appends a number of elements provided by a traversable object.
     *  The identity of the buffer is returned.
@@ -88,7 +85,7 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     *  @param xs    the traversable object.
     *  @return      the updated buffer.
     */
-  override def ++=(xs: TraversableOnce[A]): this.type = xs match {
+  override def ++=(xs: TraversableOnce[A]): this.type = xs match
     case v: scala.collection.IndexedSeqLike[_, _] =>
       val n = v.length
       ensureSize(size0 + n)
@@ -97,7 +94,6 @@ class ArrayBuffer[A](override protected val initialSize: Int)
       this
     case _ =>
       super.++=(xs)
-  }
 
   /** Prepends a single element to this buffer and returns
     *  the identity of the buffer. It takes time linear in
@@ -106,13 +102,12 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     *  @param elem  the element to prepend.
     *  @return      the updated buffer.
     */
-  def +=:(elem: A): this.type = {
+  def +=:(elem: A): this.type =
     ensureSize(size0 + 1)
     copy(0, 1, size0)
     array(0) = elem.asInstanceOf[AnyRef]
     size0 += 1
     this
-  }
 
   /** Prepends a number of elements provided by a traversable object.
     *  The identity of the buffer is returned.
@@ -120,9 +115,8 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     *  @param xs    the traversable object.
     *  @return      the updated buffer.
     */
-  override def ++=:(xs: TraversableOnce[A]): this.type = {
+  override def ++=:(xs: TraversableOnce[A]): this.type =
     insertAll(0, xs.toTraversable); this
-  }
 
   /** Inserts new elements at the index `n`. Opposed to method
     *  `update`, this method will not replace an element with a new
@@ -132,7 +126,7 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     *  @param seq   the traversable object providing all elements to insert.
     *  @throws IndexOutOfBoundsException if `n` is out of bounds.
     */
-  def insertAll(n: Int, seq: Traversable[A]) {
+  def insertAll(n: Int, seq: Traversable[A])
     if (n < 0 || n > size0) throw new IndexOutOfBoundsException(n.toString)
     val len = seq.size
     val newSize = size0 + len
@@ -141,7 +135,6 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     copy(n, n + len, size0 - n)
     seq.copyToArray(array.asInstanceOf[Array[Any]], n)
     size0 = newSize
-  }
 
   /** Removes the element on a given index position. It takes time linear in
     *  the buffer size.
@@ -152,7 +145,7 @@ class ArrayBuffer[A](override protected val initialSize: Int)
     *            `0 <= n <= length - count` (with `count > 0`).
     *  @throws   IllegalArgumentException if `count < 0`.
     */
-  override def remove(n: Int, count: Int) {
+  override def remove(n: Int, count: Int)
     if (count < 0)
       throw new IllegalArgumentException(
           "removing negative number of elements: " + count.toString)
@@ -162,25 +155,22 @@ class ArrayBuffer[A](override protected val initialSize: Int)
           "at " + n.toString + " deleting " + count.toString)
     copy(n + count, n, size0 - (n + count))
     reduceToSize(size0 - count)
-  }
 
   /** Removes the element at a given index position.
     *
     *  @param n  the index which refers to the element to delete.
     *  @return   the element that was formerly at position `n`.
     */
-  def remove(n: Int): A = {
+  def remove(n: Int): A =
     val result = apply(n)
     remove(n, 1)
     result
-  }
 
   def result: ArrayBuffer[A] = this
 
   /** Defines the prefix of the string representation.
     */
   override def stringPrefix: String = "ArrayBuffer"
-}
 
 /** Factory object for the `ArrayBuffer` class.
   *
@@ -188,10 +178,9 @@ class ArrayBuffer[A](override protected val initialSize: Int)
   *  @define coll array buffer
   *  @define Coll `ArrayBuffer`
   */
-object ArrayBuffer extends SeqFactory[ArrayBuffer] {
+object ArrayBuffer extends SeqFactory[ArrayBuffer]
 
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, ArrayBuffer[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, ArrayBuffer[A]] = new ArrayBuffer[A]
-}

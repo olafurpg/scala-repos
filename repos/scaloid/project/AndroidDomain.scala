@@ -7,7 +7,7 @@ case class ScalaType(
     javaName: String
 )
 
-object ScalaType {
+object ScalaType
   def apply(name: String,
             params: List[ScalaType] = Nil,
             bounds: List[ScalaType] = Nil,
@@ -18,7 +18,6 @@ object ScalaType {
               bounds,
               isVar,
               name /* reuse scala name by default */ )
-}
 
 case class Argument(
     name: String,
@@ -62,11 +61,10 @@ case class AndroidListener(
     callbackClassName: String,
     callbackMethods: List[AndroidCallbackMethod],
     isDeprecated: Boolean
-) {
+)
   def isSafe: Boolean =
     (!setter.startsWith("set")) || callbackMethods.length == 1 ||
     callbackMethods.forall(_.retType.name == "Unit")
-}
 
 case class AndroidIntentMethod(
     name: String,

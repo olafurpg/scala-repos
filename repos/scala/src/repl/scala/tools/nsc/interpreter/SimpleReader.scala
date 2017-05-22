@@ -13,7 +13,7 @@ import session.NoHistory
 /** Reads using standard JDK API */
 class SimpleReader(
     in: BufferedReader, out: JPrintWriter, val interactive: Boolean)
-    extends InteractiveReader {
+    extends InteractiveReader
   val history = NoHistory
   val completion = NoCompletion
 
@@ -21,21 +21,18 @@ class SimpleReader(
   def redrawLine() = ()
 
   // InteractiveReader internals
-  protected def readOneLine(prompt: String): String = {
+  protected def readOneLine(prompt: String): String =
     echo(prompt)
     readOneLine()
-  }
   protected def readOneKey(prompt: String) =
     sys.error("No char-based input in SimpleReader")
 
   protected def readOneLine(): String = in.readLine()
-  protected def echo(s: String): Unit = if (interactive) {
+  protected def echo(s: String): Unit = if (interactive)
     out.print(s)
     out.flush()
-  }
-}
 
-object SimpleReader {
+object SimpleReader
   def defaultIn = Console.in
   def defaultOut = new JPrintWriter(Console.out)
 
@@ -43,14 +40,11 @@ object SimpleReader {
             out: JPrintWriter = defaultOut,
             interactive: Boolean = true): SimpleReader =
     new SimpleReader(in, out, interactive)
-}
 
 // pretend we are a console for verbose purposes
-trait EchoReader extends SimpleReader {
+trait EchoReader extends SimpleReader
   // if there is more input, then maybe echo the prompt and the input
-  override def readOneLine(prompt: String) = {
+  override def readOneLine(prompt: String) =
     val input = readOneLine()
     if (input != null) echo(f"$prompt$input%n")
     input
-  }
-}

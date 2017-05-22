@@ -10,9 +10,9 @@ import org.ensime.core.Protocol
   * FramedStringProtocol is used to support stream based messaging (e.g. SWANK or JERKY over TCP).
   * Each message consists of a 6 byte h
   */
-trait FramedStringProtocol extends Protocol with SLF4JLogging {
+trait FramedStringProtocol extends Protocol with SLF4JLogging
 
-  protected def writeString(value: String): ByteString = {
+  protected def writeString(value: String): ByteString =
     if (value.isEmpty)
       throw new IllegalStateException("Message to send is empty")
 
@@ -20,19 +20,17 @@ trait FramedStringProtocol extends Protocol with SLF4JLogging {
     val header = ByteString("%06x".format(data.length), "UTF-8")
 
     val message = header ++ data
-    if (log.isTraceEnabled) {
+    if (log.isTraceEnabled)
       log.trace(message.utf8String)
-    }
 
     message
-  }
 
   val headerLen = 6
 
   protected def tryReadString(
-      bytes: ByteString): (Option[String], ByteString) = {
+      bytes: ByteString): (Option[String], ByteString) =
     if (bytes.length < headerLen) (None, bytes) // header is incomplete
-    else {
+    else
       val header = bytes.take(headerLen)
       val msgLen = Integer.valueOf(header.utf8String, 16).intValue()
       if (msgLen == 0)
@@ -41,14 +39,10 @@ trait FramedStringProtocol extends Protocol with SLF4JLogging {
       val totalMessageBytes = headerLen + msgLen
       if (bytes.length < totalMessageBytes)
         (None, bytes) // header is complete, but not all of message is ready
-      else {
+      else
         // take the header and the message and drop the header
         val (messageBytes, remainingBytes) = bytes.splitAt(totalMessageBytes)
         val msgUTF8 = messageBytes
           .drop(headerLen)
           .utf8String
           (Some(msgUTF8), remainingBytes)
-      }
-    }
-  }
-}

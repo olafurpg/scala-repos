@@ -23,14 +23,12 @@ import org.openjdk.jmh.annotations.{Benchmark, Setup, Scope, State}
   * > run HelloClient -prof gc [-wi 20 -f 4]
   */
 @State(Scope.Benchmark)
-class HelloClient extends StdBenchAnnotations {
+class HelloClient extends StdBenchAnnotations
   val svc: Hello[Future] = ThriftMux.client
     .configured(param.Tracer(NullTracer))
     .configured(param.Stats(NullStatsReceiver))
     .newIface[Hello.FutureIface]("localhost:1234")
 
   @Benchmark
-  def helloClient(): String = {
+  def helloClient(): String =
     Await.result(svc.echo("asdf"))
-  }
-}

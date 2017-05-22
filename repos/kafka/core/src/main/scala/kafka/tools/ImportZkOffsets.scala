@@ -38,9 +38,9 @@ import org.apache.kafka.common.security.JaasUtils
   *  log4j.logger.kafka.tools.ImportZkOffsets$=DEBUG
   *  (for eclipse debugging, copy log4j.properties to the binary directory in "core" such as core/bin)
   */
-object ImportZkOffsets extends Logging {
+object ImportZkOffsets extends Logging
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val parser = new OptionParser
 
     val zkConnectOpt = parser
@@ -60,10 +60,9 @@ object ImportZkOffsets extends Logging {
 
     val options = parser.parse(args: _*)
 
-    if (options.has("help")) {
+    if (options.has("help"))
       parser.printHelpOn(System.out)
       System.exit(0)
-    }
 
     CommandLineUtils.checkRequiredArgs(parser, options, inFileOpt)
 
@@ -76,37 +75,30 @@ object ImportZkOffsets extends Logging {
         partitionOffsetFile)
 
     updateZkOffsets(zkUtils, partitionOffsets)
-  }
 
   private def getPartitionOffsetsFromFile(
-      filename: String): Map[String, String] = {
+      filename: String): Map[String, String] =
     val fr = new FileReader(filename)
     val br = new BufferedReader(fr)
     var partOffsetsMap: Map[String, String] = Map()
 
     var s: String = br.readLine()
-    while (s != null && s.length() >= 1) {
+    while (s != null && s.length() >= 1)
       val tokens = s.split(":")
 
       partOffsetsMap += tokens(0) -> tokens(1)
       debug("adding node path [" + s + "]")
 
       s = br.readLine()
-    }
 
     partOffsetsMap
-  }
 
   private def updateZkOffsets(
-      zkUtils: ZkUtils, partitionOffsets: Map[String, String]): Unit = {
-    for ((partition, offset) <- partitionOffsets) {
+      zkUtils: ZkUtils, partitionOffsets: Map[String, String]): Unit =
+    for ((partition, offset) <- partitionOffsets)
       debug("updating [" + partition + "] with offset [" + offset + "]")
 
-      try {
+      try
         zkUtils.updatePersistentPath(partition, offset.toString)
-      } catch {
+      catch
         case e: Throwable => e.printStackTrace()
-      }
-    }
-  }
-}

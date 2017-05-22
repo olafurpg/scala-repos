@@ -5,13 +5,12 @@
 import collection._
 
 // test conversions between collections
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     testConversions
-  }
 
-  def testConversions {
+  def testConversions
     // seq conversions
     assertSeq(parallel.mutable.ParArray(1, 2, 3))
     assertSeq(parallel.mutable.ParHashMap(1 -> 2, 2 -> 3))
@@ -53,7 +52,6 @@ object Test {
 
     // seq and par again conversions)
     assertSeqPar(parallel.mutable.ParArray(1, 2, 3))
-  }
 
   def assertSeqPar[T](pc: parallel.ParIterable[T]) = pc.seq.par == pc
 
@@ -61,13 +59,12 @@ object Test {
 
   def assertPar[T, P <: Parallel](xs: GenIterable[T]) = assert(xs == xs.par)
 
-  def assertToPar[K, V](xs: GenTraversable[(K, V)]) {
-    xs match {
+  def assertToPar[K, V](xs: GenTraversable[(K, V)])
+    xs match
       case _: Seq[_] =>
         assert(xs.toIterable.par == xs)
         assert(xs.par.toIterable == xs)
       case _ =>
-    }
 
     assert(xs.toSeq.par == xs.toSeq)
     assert(xs.par.toSeq == xs.toSeq)
@@ -77,9 +74,8 @@ object Test {
 
     assert(xs.toMap.par == xs.toMap)
     assert(xs.par.toMap == xs.toMap)
-  }
 
-  def assertToParWoMap[T](xs: GenSeq[T]) {
+  def assertToParWoMap[T](xs: GenSeq[T])
     assert(xs.toIterable.par == xs.toIterable)
     assert(xs.par.toIterable == xs.toIterable)
 
@@ -88,5 +84,3 @@ object Test {
 
     assert(xs.toSet.par == xs.toSet)
     assert(xs.par.toSet == xs.toSet)
-  }
-}

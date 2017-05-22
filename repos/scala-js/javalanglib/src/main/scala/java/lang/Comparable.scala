@@ -1,5 +1,4 @@
 package java.lang
 
-trait Comparable[A] {
+trait Comparable[A]
   def compareTo(o: A): scala.Int
-}

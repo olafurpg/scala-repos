@@ -18,7 +18,7 @@ import sbt.internal.util.complete.{DefaultParsers, Parsers}
 		if(y.value) z else x
 	}
 }*/
-object Assign {
+object Assign
   import java.io.File
   import Def.{inputKey, settingKey, taskKey}
   import Def.{Initialize, macroValueT, parserToInput}
@@ -53,10 +53,9 @@ object Assign {
 		bk ++= Seq(z.value)
 	)*/
 
-  val zz = Def.task {
+  val zz = Def.task
     mk.value + tk.value + mk.value + tk.value + mk.value + tk.value +
     mk.value + tk.value + mk.value + tk.value + mk.value + tk.value
-  }
 
   import DefaultParsers._
   val p = Def.setting { name.value ~> Space ~> ID }
@@ -68,44 +67,36 @@ object Assign {
       //		ik := { if( tsk.parsed.value == "blue") tk.value else mk.value }
   )
 
-  val it1 = Def.inputTask {
+  val it1 = Def.inputTask
     tsk.parsed //"as" //dummy.value.parsed
-  }
-  val it2 = Def.inputTask {
+  val it2 = Def.inputTask
     "lit"
-  }
 
-  val it3: Initialize[InputTask[String]] = Def.inputTask[String] {
+  val it3: Initialize[InputTask[String]] = Def.inputTask[String]
     tsk.parsed.value + itsk.parsed.value.toString + isk.value
-  }
   // should not compile: cannot use a task to define the parser
   /*	val it4 = Def.inputTask {
 		dummyt.value.parsed
 	}*/
   // should compile: can use a setting to define the parser
-  val it5 = Def.inputTask {
+  val it5 = Def.inputTask
     dummys.parsed
-  }
-  val it6 = Def.inputTaskDyn {
+  val it6 = Def.inputTaskDyn
     val d3 = dummy3.parsed
     val x = d3._1
     val i = d3._2
     Def.task { tk.value + i }
-  }
 
-  val it7 = Def.inputTask {
+  val it7 = Def.inputTask
     it5.parsed
-  }
 
   def bool: Initialize[Boolean] = Def.setting { true }
-  def enabledOnly[T](key: Initialize[T]): Initialize[Seq[T]] = Def.setting {
+  def enabledOnly[T](key: Initialize[T]): Initialize[Seq[T]] = Def.setting
     val keys: Seq[T] = forallIn(key).value
     val enabled: Seq[Boolean] = forallIn(bool).value
     (keys zip enabled) collect { case (a, true) => a }
-  }
-  def forallIn[T](key: Initialize[T]): Initialize[Seq[T]] = Def.setting {
+  def forallIn[T](key: Initialize[T]): Initialize[Seq[T]] = Def.setting
     key.value :: Nil
-  }
 
   // Test that Append.Sequence instances for Seq/List work and don't mess up with each other
   seqSetting := Seq("test1")
@@ -116,4 +107,3 @@ object Assign {
   listSetting := List("test1")
   listSetting ++= List("test2")
   listSetting += "test4"
-}

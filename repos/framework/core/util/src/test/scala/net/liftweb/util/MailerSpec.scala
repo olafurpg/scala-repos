@@ -27,60 +27,53 @@ import Mailer.{From, To, Subject, PlainMailBodyType, XHTMLMailBodyType, XHTMLPlu
 
 import scala.io.Source
 
-trait MailerForTesting {
+trait MailerForTesting
   def lastMessage_=(message: Box[MimeMessage]): Unit
   def lastMessage: Box[MimeMessage]
-}
 
 /**
   * Systems under specification for Lift Mailer.
   */
-object MailerSpec extends Specification {
+object MailerSpec extends Specification
   "Mailer Specification".title
   sequential
 
   Props.mode // touch the lazy val so it's detected correctly
 
-  val myMailer = new Mailer with MailerForTesting {
+  val myMailer = new Mailer with MailerForTesting
     @volatile var lastMessage: Box[MimeMessage] = Empty
 
     testModeSend.default.set(
         (msg: MimeMessage) =>
-          {
         lastMessage = Full(msg)
-    })
-  }
+    )
 
   import myMailer._
 
-  private def doNewMessage(send: => Unit): MimeMessage = {
+  private def doNewMessage(send: => Unit): MimeMessage =
     lastMessage = Empty
 
     send
 
-    eventually {
+    eventually
       lastMessage.isEmpty must_== false
-    }
     lastMessage openOrThrowException ("Checked")
-  }
 
-  "A Mailer" should {
+  "A Mailer" should
 
-    "deliver simple messages as simple messages" in {
-      val msg = doNewMessage {
+    "deliver simple messages as simple messages" in
+      val msg = doNewMessage
         sendMail(
             From("sender@nowhere.com"),
             Subject("This is a simple email"),
             To("recipient@nowhere.com"),
             PlainMailBodyType("Here is some plain text.")
         )
-      }
 
       msg.getContent must beAnInstanceOf[String]
-    }
 
-    "deliver multipart messages as multipart" in {
-      val msg = doNewMessage {
+    "deliver multipart messages as multipart" in
+      val msg = doNewMessage
         sendMail(
             From("sender@nowhere.com"),
             Subject("This is a multipart email"),
@@ -88,13 +81,11 @@ object MailerSpec extends Specification {
             PlainMailBodyType("Here is some plain text."),
             PlainMailBodyType("Here is some more plain text.")
         )
-      }
 
       msg.getContent must beAnInstanceOf[MimeMultipart]
-    }
 
-    "deliver rich messages as multipart" in {
-      val msg = doNewMessage {
+    "deliver rich messages as multipart" in
+      val msg = doNewMessage
         sendMail(
             From("sender@nowhere.com"),
             Subject("This is a rich email"),
@@ -102,12 +93,10 @@ object MailerSpec extends Specification {
             XHTMLMailBodyType(
                 <html> <body>Here is some rich text</body> </html>)
         )
-      }
 
       msg.getContent must beAnInstanceOf[MimeMultipart]
-    }
 
-    "deliver emails with attachments as mixed multipart" in {
+    "deliver emails with attachments as mixed multipart" in
       val attachmentBytes = Source
         .fromInputStream(
             getClass.getClassLoader.getResourceAsStream(
@@ -115,7 +104,7 @@ object MailerSpec extends Specification {
         )
         .map(_.toByte)
         .toArray
-      val msg = doNewMessage {
+      val msg = doNewMessage
         sendMail(
             From("sender@nowhere.com"),
             Subject("This is a mixed email"),
@@ -128,17 +117,11 @@ object MailerSpec extends Specification {
                                 true)
             )
         )
-      }
 
-      msg.getContent must beLike {
+      msg.getContent must beLike
         case mp: MimeMultipart =>
           mp.getContentType.substring(0, 21) must_== "multipart/alternative"
 
-          mp.getBodyPart(0).getContent must beLike {
+          mp.getBodyPart(0).getContent must beLike
             case mp2: MimeMultipart =>
               mp2.getContentType.substring(0, 15) must_== "multipart/mixed"
-          }
-      }
-    }
-  }
-}

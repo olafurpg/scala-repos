@@ -1,18 +1,14 @@
-class P {
+class P
   def a[@specialized(Int) T](t: T): List[T] = List(t)
-}
-class FX extends P {
+class FX extends P
   override def a[@specialized(Int) T](t: T): List[T] = Nil
-}
-class FX1 extends P {
+class FX1 extends P
   override def a[@specialized(Double) T](t: T): List[T] = Nil
-}
 
-class FX2 extends P {
+class FX2 extends P
   override def a[T](t: T): List[T] = Nil
-}
 
-object Test extends App {
+object Test extends App
   val fx = new FX
   val p = new P
 
@@ -21,4 +17,3 @@ object Test extends App {
   println((fx: P).a(3.0))
   // val d = new Derived[Int]
   // println((d: Base[Int]).m(10))
-}

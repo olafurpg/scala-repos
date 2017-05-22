@@ -3,7 +3,7 @@ package com.twitter.finagle.exp.mysql
 import java.nio.charset.{Charset => JCharset}
 import com.twitter.finagle.exp.mysql.transport.Buffer
 
-object Type {
+object Type
 
   /**
     * MySQL type codes as enumerated here:
@@ -41,7 +41,7 @@ object Type {
     * Retrieves the MySQL type code for the given parameter. If the parameter
     * type mapping is unknown -1 is returned.
     */
-  private[mysql] def getCode(any: Any): Short = any match {
+  private[mysql] def getCode(any: Any): Short = any match
     // primitives
     case s: String => VarChar
     case b: Boolean => Tiny
@@ -70,5 +70,3 @@ object Type {
     case DoubleValue(_) => Double
     case NullValue => Null
     case _ => -1
-  }
-}

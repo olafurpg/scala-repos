@@ -19,12 +19,12 @@ package typechecker
   *
   *  This is a work in progress.
   */
-trait DestructureTypes {
+trait DestructureTypes
   val global: Global
   import global._
   import definitions.{NothingClass, AnyClass}
 
-  trait DestructureType[Node] extends (Type => Node) {
+  trait DestructureType[Node] extends (Type => Node)
     def withLabel(node: Node, label: String): Node
     def withType(node: Node, typeName: String): Node
 
@@ -49,43 +49,39 @@ trait DestructureTypes {
     private def annotationList(annots: List[AnnotationInfo]): Node =
       nodeList(annots, annotation)
 
-    private def assocsNode(ann: AnnotationInfo): Node = {
+    private def assocsNode(ann: AnnotationInfo): Node =
       val (names, args) = ann.assocs.toIndexedSeq.unzip
       if (names.isEmpty) wrapEmpty
       else
         node("assocs",
              nodeList(names.indices.toList,
                       (i: Int) => atom(names(i).toString, args(i))))
-    }
-    private def typeTypeName(tp: Type) = tp match {
+    private def typeTypeName(tp: Type) = tp match
       case mt @ MethodType(_, _) if mt.isImplicit => "ImplicitMethodType"
       case TypeRef(_, sym, _) => typeRefType(sym)
       case _ => tp.kind
-    }
 
     def wrapTree(tree: Tree): Node = withType(
-        tree match {
+        tree match
           case x: NameTree => atom(x.name.toString, x)
           case _ => wrapAtom(tree)
-        },
+        ,
         tree.productPrefix
     )
-    def wrapSymbolInfo(sym: Symbol): Node = {
+    def wrapSymbolInfo(sym: Symbol): Node =
       if ((sym eq NoSymbol) || openSymbols(sym)) wrapEmpty
-      else {
+      else
         openSymbols += sym
         try product(symbolType(sym), wrapAtom(sym.defString)) finally openSymbols -= sym
-      }
-    }
 
     def list(nodes: List[Node]): Node = wrapSequence(nodes)
     def product(tp: Type, nodes: Node*): Node =
       product(typeTypeName(tp), nodes: _*)
     def product(typeName: String, nodes: Node*): Node = (nodes.toList filterNot
-    (_ == wrapEmpty) match {
+    (_ == wrapEmpty) match
       case Nil => wrapEmpty
       case xs => withType(wrapProduct(xs), typeName)
-    })
+    )
 
     def atom[U](label: String, value: U): Node = node(label, wrapAtom(value))
     def constant(label: String, const: Constant): Node = atom(label, const)
@@ -107,11 +103,10 @@ trait DestructureTypes {
       wrapMono(valueParams(params), resultType(restpe))
     def nullaryFunction(restpe: Type): Node = wrapMono(wrapEmpty, this(restpe))
 
-    def prefix(pre: Type): Node = pre match {
+    def prefix(pre: Type): Node = pre match
       case NoPrefix => wrapEmpty
       case _ => this("pre", pre)
-    }
-    def typeBounds(lo0: Type, hi0: Type): Node = {
+    def typeBounds(lo0: Type, hi0: Type): Node =
       val lo =
         if ((lo0 eq WildcardType) || (lo0.typeSymbol eq NothingClass))
           wrapEmpty else this("lo", lo0)
@@ -120,7 +115,6 @@ trait DestructureTypes {
         else this("hi", hi0)
 
       product("TypeBounds", lo, hi)
-    }
 
     def annotation(ann: AnnotationInfo): Node = product(
         "AnnotationInfo",
@@ -152,7 +146,7 @@ trait DestructureTypes {
       *  empty args) and too little (bounds hidden behind indirection.) So drop the prefix
       *  and promote the bounds.
       */
-    def typeRef(tp: TypeRef) = {
+    def typeRef(tp: TypeRef) =
       val TypeRef(pre, sym, args) = tp
       // Filtered down to elements with "interesting" content
       product(
@@ -163,7 +157,6 @@ trait DestructureTypes {
           if (tp ne tp.normalize) this("normalize", tp.normalize)
           else wrapEmpty
       )
-    }
 
     def symbolType(sym: Symbol) = (if (sym.isRefinementClass) "Refinement"
                                    else if (sym.isAliasType) "Alias"
@@ -183,7 +176,7 @@ trait DestructureTypes {
     def node(label: String, node: Node): Node = withLabel(node, label)
     def apply(label: String, tp: Type): Node = withLabel(this(tp), label)
 
-    def apply(tp: Type): Node = tp match {
+    def apply(tp: Type): Node = tp match
       case AntiPolyType(pre, targs) =>
         product(tp, prefix(pre), typeArgs(targs))
       case ClassInfoType(parents, decls, clazz) =>
@@ -210,6 +203,3 @@ trait DestructureTypes {
       case TypeBounds(lo, hi) => typeBounds(lo, hi)
       case tr @ TypeRef(pre, sym, args) => typeRef(tr)
       case _ => wrapAtom(tp) // XXX see what this is
-    }
-  }
-}

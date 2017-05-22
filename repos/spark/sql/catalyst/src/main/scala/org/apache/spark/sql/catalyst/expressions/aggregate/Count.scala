@@ -21,7 +21,7 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
 
-case class Count(children: Seq[Expression]) extends DeclarativeAggregate {
+case class Count(children: Seq[Expression]) extends DeclarativeAggregate
 
   override def nullable: Boolean = false
 
@@ -41,19 +41,17 @@ case class Count(children: Seq[Expression]) extends DeclarativeAggregate {
       /* count = */ Literal(0L)
   )
 
-  override lazy val updateExpressions = {
+  override lazy val updateExpressions =
     val nullableChildren = children.filter(_.nullable)
-    if (nullableChildren.isEmpty) {
+    if (nullableChildren.isEmpty)
       Seq(
           /* count = */ count + 1L
       )
-    } else {
+    else
       Seq(
           /* count = */ If(
               nullableChildren.map(IsNull).reduce(Or), count, count + 1L)
       )
-    }
-  }
 
   override lazy val mergeExpressions = Seq(
       /* count = */ count.left + count.right
@@ -62,8 +60,6 @@ case class Count(children: Seq[Expression]) extends DeclarativeAggregate {
   override lazy val evaluateExpression = count
 
   override def defaultResult: Option[Literal] = Option(Literal(0L))
-}
 
-object Count {
+object Count
   def apply(child: Expression): Count = Count(child :: Nil)
-}

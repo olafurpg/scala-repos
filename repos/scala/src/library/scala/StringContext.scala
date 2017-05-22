@@ -51,7 +51,7 @@ import scala.annotation.tailrec
   *  @param   parts  The parts that make up the interpolated string,
   *                  without the expressions that get inserted by interpolation.
   */
-case class StringContext(parts: String*) {
+case class StringContext(parts: String*)
 
   import StringContext._
 
@@ -116,17 +116,15 @@ case class StringContext(parts: String*) {
     */
   def raw(args: Any*): String = standardInterpolator(identity, args)
 
-  def standardInterpolator(process: String => String, args: Seq[Any]): String = {
+  def standardInterpolator(process: String => String, args: Seq[Any]): String =
     checkLengths(args)
     val pi = parts.iterator
     val ai = args.iterator
     val bldr = new JLSBuilder(process(pi.next()))
-    while (ai.hasNext) {
+    while (ai.hasNext)
       bldr append ai.next
       bldr append process(pi.next())
-    }
     bldr.toString
-  }
 
   /** The formatted string interpolator.
     *
@@ -166,9 +164,8 @@ case class StringContext(parts: String*) {
   // The implementation is hardwired to `scala.tools.reflect.MacroImplementations.macro_StringInterpolation_f`
   // Using the mechanism implemented in `scala.tools.reflect.FastTrack`
   def f[A >: Any](args: A*): String = macro ???
-}
 
-object StringContext {
+object StringContext
 
   /** An exception that is thrown if a string contains a backslash (`\`) character
     *  that does not start a valid escape sequence.
@@ -178,12 +175,12 @@ object StringContext {
   class InvalidEscapeException(
       str: String, @deprecatedName('idx) val index: Int)
       extends IllegalArgumentException(
-          s"""invalid escape ${
+          s"""invalid escape $
             require(index >= 0 && index < str.length)
             val ok = """[\b, \t, \n, \f, \r, \\, \", \']"""
             if (index == str.length - 1) "at terminal"
             else s"'\\${str(index + 1)}' not one of $ok at"
-          } index $index in "$str". Use \\\\ for literal \\."""
+           index $index in "$str". Use \\\\ for literal \\."""
       )
 
   /** Expands standard Scala escape sequences in a string.
@@ -200,19 +197,19 @@ object StringContext {
   /** Treats escapes, but disallows octal escape sequences. */
   def processEscapes(str: String): String = treatEscapes0(str, strict = true)
 
-  private def treatEscapes0(str: String, strict: Boolean): String = {
+  private def treatEscapes0(str: String, strict: Boolean): String =
     val len = str.length
     // replace escapes with given first escape
-    def replace(first: Int): String = {
+    def replace(first: Int): String =
       val b = new JLSBuilder
       // append replacement starting at index `i`, with `next` backslash
-      @tailrec def loop(i: Int, next: Int): String = {
-        if (next >= 0) {
+      @tailrec def loop(i: Int, next: Int): String =
+        if (next >= 0)
           //require(str(next) == '\\')
           if (next > i) b.append(str, i, next)
           var idx = next + 1
           if (idx >= len) throw new InvalidEscapeException(str, next)
-          val c = str(idx) match {
+          val c = str(idx) match
             case 'b' => '\b'
             case 't' => '\t'
             case 'n' => '\n'
@@ -226,32 +223,23 @@ object StringContext {
               val leadch = str(idx)
               var oct = leadch - '0'
               idx += 1
-              if (idx < len && '0' <= str(idx) && str(idx) <= '7') {
+              if (idx < len && '0' <= str(idx) && str(idx) <= '7')
                 oct = oct * 8 + str(idx) - '0'
                 idx += 1
                 if (idx < len && leadch <= '3' && '0' <= str(idx) &&
-                    str(idx) <= '7') {
+                    str(idx) <= '7')
                   oct = oct * 8 + str(idx) - '0'
                   idx += 1
-                }
-              }
               idx -= 1 // retreat
               oct.toChar
             case _ => throw new InvalidEscapeException(str, next)
-          }
           idx += 1 // advance
           b append c
           loop(idx, str.indexOf('\\', idx))
-        } else {
+        else
           if (i < len) b.append(str, i, len)
           b.toString
-        }
-      }
       loop(0, first)
-    }
-    str indexOf '\\' match {
+    str indexOf '\\' match
       case -1 => str
       case i => replace(i)
-    }
-  }
-}

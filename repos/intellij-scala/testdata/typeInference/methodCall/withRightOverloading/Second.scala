@@ -1,6 +1,6 @@
 package mo
 
-object Second {
+object Second
   def foo(x: Int) = 45
   def foo(x: String) = 45
   def foo(x: Int, y: Int) = 45
@@ -8,5 +8,4 @@ object Second {
 
   /*start*/
   foo("") /*end*/
-}
 //Int

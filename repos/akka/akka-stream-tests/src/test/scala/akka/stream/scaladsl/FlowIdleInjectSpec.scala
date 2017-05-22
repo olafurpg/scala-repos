@@ -6,24 +6,23 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import akka.testkit.AkkaSpec
 
-class FlowIdleInjectSpec extends AkkaSpec {
+class FlowIdleInjectSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "keepAlive" must {
+  "keepAlive" must
 
-    "not emit additional elements if upstream is fast enough" in Utils.assertAllStagesStopped {
+    "not emit additional elements if upstream is fast enough" in Utils.assertAllStagesStopped
       Await.result(Source(1 to 10)
                      .keepAlive(1.second, () ⇒ 0)
                      .grouped(1000)
                      .runWith(Sink.head),
                    3.seconds) should ===(1 to 10)
-    }
 
-    "emit elements periodically after silent periods" in Utils.assertAllStagesStopped {
+    "emit elements periodically after silent periods" in Utils.assertAllStagesStopped
       val sourceWithIdleGap =
         Source(1 to 5) ++ Source(6 to 10).initialDelay(2.second)
 
@@ -34,9 +33,8 @@ class FlowIdleInjectSpec extends AkkaSpec {
                        .runWith(Sink.head),
                      3.seconds) should ===(
             List(1, 2, 3, 4, 5, 0, 0, 0, 6, 7, 8, 9, 10))
-    }
 
-    "immediately pull upstream" in {
+    "immediately pull upstream" in
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
@@ -52,9 +50,8 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
       upstream.sendComplete()
       downstream.expectComplete()
-    }
 
-    "immediately pull upstream after busy period" in {
+    "immediately pull upstream after busy period" in
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
@@ -72,9 +69,8 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
       upstream.sendComplete()
       downstream.expectComplete()
-    }
 
-    "work if timer fires before initial request" in {
+    "work if timer fires before initial request" in
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
@@ -90,9 +86,8 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
       upstream.sendComplete()
       downstream.expectComplete()
-    }
 
-    "work if timer fires before initial request after busy period" in {
+    "work if timer fires before initial request after busy period" in
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
@@ -109,9 +104,8 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
       upstream.sendComplete()
       downstream.expectComplete()
-    }
 
-    "prefer upstream element over injected" in {
+    "prefer upstream element over injected" in
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
@@ -129,9 +123,8 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
       upstream.sendComplete()
       downstream.expectComplete()
-    }
 
-    "prefer upstream element over injected after busy period" in {
+    "prefer upstream element over injected after busy period" in
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
@@ -150,9 +143,8 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
       upstream.sendComplete()
       downstream.expectComplete()
-    }
 
-    "reset deadline properly after injected element" in {
+    "reset deadline properly after injected element" in
       val upstream = TestPublisher.probe[Int]()
       val downstream = TestSubscriber.probe[Int]()
 
@@ -167,6 +159,3 @@ class FlowIdleInjectSpec extends AkkaSpec {
 
       downstream.expectNoMsg(500.millis)
       downstream.expectNext(0)
-    }
-  }
-}

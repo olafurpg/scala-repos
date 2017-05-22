@@ -13,6 +13,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
   * Date: 21.04.2008
   */
 class ScXmlCDSectImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlCDSect {
+    extends ScalaPsiElementImpl(node) with ScXmlCDSect
   override def toString: String = "CDataSection"
-}

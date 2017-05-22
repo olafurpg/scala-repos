@@ -7,7 +7,7 @@ import com.typesafe.sbt.osgi.SbtOsgi._
 import sbt._
 import sbt.Keys._
 
-object OSGi {
+object OSGi
 
   // The included osgiSettings that creates bundles also publish the jar files
   // in the .../bundles directory which makes testing locally published artifacts
@@ -122,13 +122,12 @@ object OSGi {
     versionedImport(packageName, "2.4", "2.5")
   def configImport(packageName: String = "com.typesafe.config.*") =
     versionedImport(packageName, "1.3.0", "1.4.0")
-  def scalaImport(version: String) = {
+  def scalaImport(version: String) =
     val packageName = "scala.*"
     val ScalaVersion = """(\d+)\.(\d+)\..*""".r
     val ScalaVersion(epoch, major) = version
     versionedImport(
         packageName, s"$epoch.$major", s"$epoch.${major.toInt + 1}")
-  }
   def scalaJava8CompatImport(packageName: String = "scala.compat.java8.*") =
     versionedImport(packageName, "0.7.0", "1.0.0")
   def kamonImport(packageName: String = "kamon.sigar.*") =
@@ -139,4 +138,3 @@ object OSGi {
     "%s;resolution:=optional".format(packageName)
   def versionedImport(packageName: String, lower: String, upper: String) =
     s"""$packageName;version="[$lower,$upper)""""
-}

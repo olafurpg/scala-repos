@@ -27,6 +27,5 @@ import java.io.Serializable
   */
 case class AnchorTuples(anchor: Boolean) extends Serializable
 
-object AnchorTuples {
+object AnchorTuples
   val default = AnchorTuples(false)
-}

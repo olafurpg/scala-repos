@@ -15,12 +15,12 @@ import Arbitrary.arbitrary
 import spire.implicits._
 
 class FactorHeapCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
 
   import SieveUtil._
 
-  property("heap property") {
-    forAll { (ns0: List[Int]) =>
+  property("heap property")
+    forAll  (ns0: List[Int]) =>
       val ns = ns0.map(n => Factor(n, n))
       val sorted = ns.sorted.map(_.next)
 
@@ -32,6 +32,3 @@ class FactorHeapCheck
       while (h.nonEmpty) result = h.dequeue.next :: result
 
       result shouldBe sorted
-    }
-  }
-}

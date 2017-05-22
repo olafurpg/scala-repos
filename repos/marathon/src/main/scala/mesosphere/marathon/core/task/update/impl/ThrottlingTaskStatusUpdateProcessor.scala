@@ -8,19 +8,17 @@ import org.apache.mesos.Protos.TaskStatus
 
 import scala.concurrent.Future
 
-object ThrottlingTaskStatusUpdateProcessor {
+object ThrottlingTaskStatusUpdateProcessor
 
   /**
     * A tag used for dependency injection to disambiguate the dependencies of this processor from
     * other instances with the same type.
     */
   final val dependencyTag = "ThrottlingTaskStatusUpdateProcessor"
-}
 
 private[core] class ThrottlingTaskStatusUpdateProcessor @Inject()(
     @Named(ThrottlingTaskStatusUpdateProcessor.dependencyTag) serializePublish: CapConcurrentExecutions,
     @Named(ThrottlingTaskStatusUpdateProcessor.dependencyTag) wrapped: TaskStatusUpdateProcessor)
-    extends TaskStatusUpdateProcessor {
+    extends TaskStatusUpdateProcessor
   override def publish(status: TaskStatus): Future[Unit] =
     serializePublish(wrapped.publish(status))
-}

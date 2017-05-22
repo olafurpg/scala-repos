@@ -11,7 +11,7 @@ import com.intellij.psi.tree.IElementType
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-trait ScModifierList extends ScalaPsiElement with PsiModifierList {
+trait ScModifierList extends ScalaPsiElement with PsiModifierList
   def has(prop: IElementType): Boolean
 
   //only one access modifier can occur in a particular modifier list
@@ -20,4 +20,3 @@ trait ScModifierList extends ScalaPsiElement with PsiModifierList {
   def getModifiersStrings: Array[String]
 
   def hasExplicitModifiers: Boolean
-}

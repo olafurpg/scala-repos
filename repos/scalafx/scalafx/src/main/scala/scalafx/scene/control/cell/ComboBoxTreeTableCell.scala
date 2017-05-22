@@ -59,7 +59,7 @@ import scalafx.util.StringConverter.sfxStringConverter2jfx
   * @define ORIGINALDOC Original Documentation]].
   * @define SATISFY Added just to satisfy Spec tests.
   */
-object ComboBoxTreeTableCell {
+object ComboBoxTreeTableCell
 
   /**
     * Converts a $SFX $CBTC to its JavaFX counterpart.
@@ -164,7 +164,6 @@ object ComboBoxTreeTableCell {
   @deprecated(message = "Use forTreeTableColumn[S, T](T*)", since = "8.0")
   def forTreeTableColumn[S, T](items: Array[T]) =
     jfxscc.ComboBoxTreeTableCell.forTreeTableColumn[S, T](items: _*)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ComboBoxTreeTableCell.html $CBTC]]
@@ -189,7 +188,7 @@ class ComboBoxTreeTableCell[S, T](override val delegate: jfxscc.ComboBoxTreeTabl
     with ComboBoxEditableCell[jfxscc.ComboBoxTreeTableCell[S, T], T]
     with UpdatableCell[jfxscc.ComboBoxTreeTableCell[S, T], T]
     with ItemableCell[jfxscc.ComboBoxTreeTableCell[S, T], T]
-    with SFXDelegate[jfxscc.ComboBoxTreeTableCell[S, T]] {
+    with SFXDelegate[jfxscc.ComboBoxTreeTableCell[S, T]]
 
   /**
     * $CONSTITEMS
@@ -223,4 +222,3 @@ class ComboBoxTreeTableCell[S, T](override val delegate: jfxscc.ComboBoxTreeTabl
     * @param items $ITEMSPARAM
     */
   def this(items: T*) = this(new jfxscc.ComboBoxTreeTableCell[S, T](items: _*))
-}

@@ -8,8 +8,8 @@ import org.scalatest.junit.JUnitRunner
 
 // Test assumptions of how Netty works
 @RunWith(classOf[JUnitRunner])
-class NettyTest extends FunSuite {
-  test("compose buffers") {
+class NettyTest extends FunSuite
+  test("compose buffers")
     val bufferA = ChannelBuffers.wrappedBuffer("A".getBytes)
     assert(bufferA.readableBytes == 1)
 
@@ -24,17 +24,12 @@ class NettyTest extends FunSuite {
     val bufferABC = ChannelBuffers.wrappedBuffer(bufferAB, bufferC)
     assert(bufferABC.readableBytes == 3)
     assert(bufferABC.toString(Charset.forName("UTF-8")) == "ABC")
-  }
 
-  test("empty buffers are immutable") {
-    assert {
-      try {
+  test("empty buffers are immutable")
+    assert
+      try
         ChannelBuffers.EMPTY_BUFFER.writeInt(23)
         false
-      } catch {
+      catch
         case _: IndexOutOfBoundsException => true
         case _: Throwable => false
-      }
-    }
-  }
-}

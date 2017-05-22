@@ -8,26 +8,24 @@ import org.joda.time.DateTime
 
 case class Analysed(game: Game, analysis: Analysis)
 
-case class Assessible(analysed: Analysed) {
+case class Assessible(analysed: Analysed)
   import Statistics._
   import analysed._
 
   def suspiciousErrorRate(color: Color): Boolean =
     listAverage(Accuracy.diffsList(Pov(game, color), analysis)) <
-    (game.speed match {
+    (game.speed match
           case Speed.Bullet => 25
           case Speed.Blitz => 20
           case _ => 15
-        })
+        )
 
   def alwaysHasAdvantage(color: Color): Boolean =
-    !analysis.infos.exists { info =>
-      info.score.fold(info.mate.fold(false) { a =>
+    !analysis.infos.exists  info =>
+      info.score.fold(info.mate.fold(false)  a =>
         (signum(a).toInt == color.fold(-1, 1))
-      }) { cp =>
+      )  cp =>
         color.fold(cp.centipawns < -100, cp.centipawns > 100)
-      }
-    }
 
   def highBlurRate(color: Color): Boolean =
     !game.isSimul && game.playerBlurPercent(color) > 90
@@ -51,10 +49,10 @@ case class Assessible(analysed: Analysed) {
   private val T = true
   private val F = false
 
-  private def rankCheating(color: Color): GameAssessment = {
+  private def rankCheating(color: Color): GameAssessment =
     import GameAssessment._
     val flags = mkFlags(color)
-    val assessment = flags match {
+    val assessment = flags match
       //               SF1 SF2 BLR1 BLR2 MTs1 MTs2 Holds
       case PlayerFlags(T, T, T, T, T, T, T) => Cheating // all T, obvious cheat
       case PlayerFlags(T, _, T, _, _, T, _) =>
@@ -82,13 +80,11 @@ case class Assessible(analysed: Analysed) {
       case PlayerFlags(F, F, _, _, _, _, _) =>
         NotCheating // low accuracy, doesn't hold advantage
       case _ => NotCheating
-    }
 
     if (flags.suspiciousHoldAlert) assessment
     else if (~game.wonBy(color)) assessment
     else if (assessment == Cheating || assessment == LikelyCheating) Unclear
     else assessment
-  }
 
   def sfAvg(color: Color): Int =
     listAverage(Accuracy.diffsList(Pov(game, color), analysis)).toInt
@@ -116,4 +112,3 @@ case class Assessible(analysed: Analysed) {
         blurs = blurs(color),
         hold = hold(color)
     )
-}

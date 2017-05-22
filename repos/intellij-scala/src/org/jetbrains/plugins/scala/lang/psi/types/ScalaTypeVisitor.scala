@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue._
   * User: Alefas
   * Date: 28.09.11
   */
-trait ScalaTypeVisitor {
+trait ScalaTypeVisitor
   def visitStdType(x: StdType) {}
   def visitCompoundType(c: ScCompoundType) {}
   def visitProjectionType(p: ScProjectionType) {}
@@ -23,4 +23,3 @@ trait ScalaTypeVisitor {
   def visitMethodType(m: ScMethodType) {}
   def visitAbstractType(a: ScAbstractType) {}
   def visitTypePolymorphicType(t: ScTypePolymorphicType) {}
-}

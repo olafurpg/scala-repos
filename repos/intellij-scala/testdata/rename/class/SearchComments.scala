@@ -3,10 +3,9 @@ object SearchComments
 /**
   * SearchComments
   */
-object Main {
+object Main
   /*caret*/
   SearchComments
-}
 /*
 object NameAfterRename
 

@@ -22,42 +22,35 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 class ScFieldIdImpl private (
     stub: StubElement[ScFieldId], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScFieldId
-    with ScImportableDeclarationsOwner {
+    with ScImportableDeclarationsOwner
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScFieldIdStub) = {
+  def this(stub: ScFieldIdStub) =
     this(stub, ScalaElementTypes.FIELD_ID, null)
-  }
 
   override def toString: String = "Field identifier: " + name
 
-  def getType(ctx: TypingContext) = getParent /*id list*/ .getParent match {
+  def getType(ctx: TypingContext) = getParent /*id list*/ .getParent match
     case typed: ScTypedDeclaration => typed.getType(ctx)
     //partial matching
-  }
 
   def nameId: PsiElement =
     findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
 
-  override def isStable = getContext match {
+  override def isStable = getContext match
     case l: ScIdList =>
-      l.getContext match {
+      l.getContext match
         case _: ScVariable => false
         case _ => true
-      }
     case _ => true
-  }
 
-  override def delete() {
-    getContext match {
+  override def delete()
+    getContext match
       case id: ScIdList if id.fieldIds == Seq(this) =>
         id.getContext.delete()
       case _ =>
         throw new UnsupportedOperationException(
             "Cannot delete on id in a list of field ides.")
-    }
-  }
 
   override def isVar: Boolean = nameContext.isInstanceOf[ScVariable]
 
   override def isVal: Boolean = nameContext.isInstanceOf[ScValue]
-}

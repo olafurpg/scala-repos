@@ -7,7 +7,7 @@
   */
 package object views
 
-package views {
+package views
 
   /**
     * Contains ready to use built-in templates and template helpers for html templates.
@@ -23,4 +23,3 @@ package views {
     * Contains ready to use built-in templates and template helpers for xml templates.
     */
   package object xml
-}

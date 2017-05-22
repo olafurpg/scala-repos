@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
   override def code = """
     package a
 
@@ -22,11 +22,11 @@ object Test extends ScaladocModelTest {
   // no need for special settings
   def scaladocSettings = ""
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     import scala.tools.nsc.doc.base.comment._
     import access._
 
-    def inlineToStr(inl: Inline): String = inl match {
+    def inlineToStr(inl: Inline): String = inl match
       case Chain(items) => items flatMap (inlineToStr(_)) mkString ""
       case Italic(in) => inlineToStr(in)
       case Bold(in) => inlineToStr(in)
@@ -36,7 +36,6 @@ object Test extends ScaladocModelTest {
       case Summary(in) => inlineToStr(in)
       case EntityLink(Text(text), _) => text
       case _ => inl.toString
-    }
 
     val foo = rootPackage._package("a")._class("Foo")
 
@@ -51,5 +50,3 @@ object Test extends ScaladocModelTest {
     // Assert that the `goo` method has the correct short description
     val gooDesc = inlineToStr(foo._method("goo").comment.get.short)
     assert(gooDesc == "This comment should appear", gooDesc)
-  }
-}

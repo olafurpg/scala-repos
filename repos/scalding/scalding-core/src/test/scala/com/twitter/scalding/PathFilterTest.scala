@@ -3,12 +3,12 @@ package com.twitter.scalding
 import org.scalatest.{Matchers, WordSpec}
 import org.apache.hadoop.fs.{Path => HadoopPath, PathFilter}
 
-class PathFilterTest extends WordSpec with Matchers {
-  "RichPathFilter" should {
+class PathFilterTest extends WordSpec with Matchers
+  "RichPathFilter" should
     import RichPathFilter.toRichPathFilter
     val p = new HadoopPath("/nowhere")
 
-    "compose ands" in {
+    "compose ands" in
       AlwaysTrue.and(AlwaysTrue).accept(p) shouldBe true
       AlwaysTrue.and(AlwaysFalse).accept(p) shouldBe false
       AlwaysFalse.and(AlwaysTrue).accept(p) shouldBe false
@@ -16,9 +16,8 @@ class PathFilterTest extends WordSpec with Matchers {
 
       AlwaysTrue.and(AlwaysTrue, AlwaysTrue).accept(p) shouldBe true
       AlwaysTrue.and(AlwaysTrue, AlwaysFalse).accept(p) shouldBe false
-    }
 
-    "compose ors" in {
+    "compose ors" in
       AlwaysTrue.or(AlwaysTrue).accept(p) shouldBe true
       AlwaysTrue.or(AlwaysFalse).accept(p) shouldBe true
       AlwaysFalse.or(AlwaysTrue).accept(p) shouldBe true
@@ -26,20 +25,14 @@ class PathFilterTest extends WordSpec with Matchers {
 
       AlwaysFalse.or(AlwaysTrue, AlwaysTrue).accept(p) shouldBe true
       AlwaysTrue.or(AlwaysFalse, AlwaysFalse).accept(p) shouldBe true
-    }
 
-    "negate nots" in {
+    "negate nots" in
       AlwaysTrue.not.accept(p) shouldBe false
       AlwaysFalse.not.accept(p) shouldBe true
       AlwaysTrue.not.not.accept(p) shouldBe true
-    }
-  }
-}
 
-object AlwaysTrue extends PathFilter {
+object AlwaysTrue extends PathFilter
   override def accept(p: HadoopPath): Boolean = true
-}
 
-object AlwaysFalse extends PathFilter {
+object AlwaysFalse extends PathFilter
   override def accept(p: HadoopPath): Boolean = false
-}

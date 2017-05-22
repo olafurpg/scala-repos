@@ -10,29 +10,26 @@ import scala.tools.nsc.backend.jvm.CodeGenTools._
 import scala.tools.testing.ClearAfterClass
 import scala.collection.JavaConverters._
 
-object IndyLambdaTest extends ClearAfterClass.Clearable {
+object IndyLambdaTest extends ClearAfterClass.Clearable
   var compiler = newCompiler()
 
-  def clear(): Unit = {
+  def clear(): Unit =
     compiler = null
-  }
-}
 
-class IndyLambdaTest extends ClearAfterClass {
+class IndyLambdaTest extends ClearAfterClass
   ClearAfterClass.stateToClear = IndyLambdaTest
   val compiler = IndyLambdaTest.compiler
 
-  @Test def boxingBridgeMethodUsedSelectively(): Unit = {
-    def implMethodDescriptorFor(code: String): String = {
+  @Test def boxingBridgeMethodUsedSelectively(): Unit =
+    def implMethodDescriptorFor(code: String): String =
       val method =
         compileMethods(compiler)(s"""def f = $code """).find(_.name == "f").get
       val x = method.instructions.iterator.asScala.toList
-      x.flatMap {
+      x.flatMap
         case insn: InvokeDynamicInsnNode =>
           insn.bsmArgs.collect { case h: Handle => h.getDesc }
         case _ => Nil
-      }.head
-    }
+      .head
     // unspecialized functions that have a primitive in parameter or return position
     // give rise to a "boxing bridge" method (which has the suffix `$adapted`).
     // This is because Scala's unboxing of null values gives zero, whereas Java's throw a NPE.
@@ -58,5 +55,3 @@ class IndyLambdaTest extends ClearAfterClass {
     // 3. Specialized functions, don't need any of this as they implement a method like `apply$mcII$sp`,
     //    and the (un)boxing is handled in the base class in code emitted by scalac.
     assertEquals("(I)I", implMethodDescriptorFor("(x: Int) => x"))
-  }
-}

@@ -23,45 +23,35 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.Suite
 
 /** Manages a local `sc` {@link SparkContext} variable, correctly stopping it after each test. */
-trait LocalSparkContext extends BeforeAndAfterEach with BeforeAndAfterAll {
+trait LocalSparkContext extends BeforeAndAfterEach with BeforeAndAfterAll
   self: Suite =>
 
   @transient var sc: SparkContext = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory())
-  }
 
-  override def afterEach() {
-    try {
+  override def afterEach()
+    try
       resetSparkContext()
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
-  def resetSparkContext(): Unit = {
+  def resetSparkContext(): Unit =
     LocalSparkContext.stop(sc)
     sc = null
-  }
-}
 
-object LocalSparkContext {
-  def stop(sc: SparkContext) {
-    if (sc != null) {
+object LocalSparkContext
+  def stop(sc: SparkContext)
+    if (sc != null)
       sc.stop()
-    }
     // To avoid RPC rebinding to the same port, since it doesn't unbind immediately on shutdown
     System.clearProperty("spark.driver.port")
-  }
 
   /** Runs `f` by passing in `sc` and ensures that `sc` is stopped. */
-  def withSpark[T](sc: SparkContext)(f: SparkContext => T): T = {
-    try {
+  def withSpark[T](sc: SparkContext)(f: SparkContext => T): T =
+    try
       f(sc)
-    } finally {
+    finally
       stop(sc)
-    }
-  }
-}

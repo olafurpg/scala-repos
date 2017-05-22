@@ -25,36 +25,29 @@ import provider._
 /**
   * The base trait of Controllers that handle pre-view requests
   */
-trait SimpleController {
+trait SimpleController
   def request: Req
 
   def httpRequest: HTTPRequest
 
-  def param(name: String): Box[String] = {
-    request.params.get(name) match {
+  def param(name: String): Box[String] =
+    request.params.get(name) match
       case None => Empty
       case Some(nl) =>
-        nl.take(1) match {
+        nl.take(1) match
           case Nil => Empty
           case l => Full(l.head)
-        }
-    }
-  }
 
   def post_? : Boolean = request.post_?
 
   def get(name: String): Box[String] =
-    httpRequest.session.attribute(name) match {
+    httpRequest.session.attribute(name) match
       case null => Empty
       case n: String => Full(n)
       case _ => Empty
-    }
 
-  def set(name: String, value: String) {
+  def set(name: String, value: String)
     httpRequest.session.setAttribute(name, value)
-  }
 
-  def unset(name: String) {
+  def unset(name: String)
     httpRequest.session.removeAttribute(name)
-  }
-}

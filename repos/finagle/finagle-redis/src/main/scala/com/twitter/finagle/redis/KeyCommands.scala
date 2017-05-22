@@ -6,7 +6,7 @@ import com.twitter.finagle.redis.util.ReplyFormat
 import com.twitter.util.{Future, Time}
 import org.jboss.netty.buffer.ChannelBuffer
 
-trait Keys { self: BaseClient =>
+trait Keys  self: BaseClient =>
 
   /**
     * Removes keys
@@ -14,9 +14,8 @@ trait Keys { self: BaseClient =>
     * @return Number of keys removed
     */
   def del(keys: Seq[ChannelBuffer]): Future[JLong] =
-    doRequest(Del(keys)) {
+    doRequest(Del(keys))
       case IntegerReply(n) => Future.value(n)
-    }
 
   /**
     * Serialize the value stored at key in a Redis-specific format and
@@ -25,10 +24,9 @@ trait Keys { self: BaseClient =>
     * @return bytes, or none if the key did not exist
     */
   def dump(key: ChannelBuffer): Future[Option[ChannelBuffer]] =
-    doRequest(Dump(key)) {
+    doRequest(Dump(key))
       case BulkReply(message) => Future.value(Some(message))
       case EmptyBulkReply() => Future.value(None)
-    }
 
   /**
     * Checks if given key exists
@@ -36,9 +34,8 @@ trait Keys { self: BaseClient =>
     * @return true if key exists, false otherwise
     */
   def exists(key: ChannelBuffer): Future[JBoolean] =
-    doRequest(Exists(key)) {
+    doRequest(Exists(key))
       case IntegerReply(n) => Future.value((n == 1))
-    }
 
   /**
     * Sets how long it will take the key to expire
@@ -48,9 +45,8 @@ trait Keys { self: BaseClient =>
     * false otherwise.
     */
   def expire(key: ChannelBuffer, ttl: JLong): Future[JBoolean] =
-    doRequest(Expire(key, ttl)) {
+    doRequest(Expire(key, ttl))
       case IntegerReply(n) => Future.value(n == 1)
-    }
 
   /**
     * Same effect and semantic as "expire", but takes an absolute Unix timestamp
@@ -60,9 +56,8 @@ trait Keys { self: BaseClient =>
     * false otherwise.
     */
   def expireAt(key: ChannelBuffer, ttl: JLong): Future[JBoolean] =
-    doRequest(ExpireAt(key, Time.fromMilliseconds(ttl))) {
+    doRequest(ExpireAt(key, Time.fromMilliseconds(ttl)))
       case IntegerReply(n) => Future.value(n == 1)
-    }
 
   /**
     * Returns all keys matching pattern
@@ -70,11 +65,10 @@ trait Keys { self: BaseClient =>
     * @return list of keys matching pattern
     */
   def keys(pattern: ChannelBuffer): Future[Seq[ChannelBuffer]] =
-    doRequest(Keys(pattern)) {
+    doRequest(Keys(pattern))
       case MBulkReply(messages) =>
         Future.value(ReplyFormat.toChannelBuffers(messages))
       case EmptyMBulkReply() => Future.Nil
-    }
 
   /**
     * Move key from the currently selected database to the specified destination
@@ -86,9 +80,8 @@ trait Keys { self: BaseClient =>
     *         false if key was not moved for any reason.
     */
   def move(key: ChannelBuffer, db: ChannelBuffer): Future[JBoolean] =
-    doRequest(Move(key, db)) {
+    doRequest(Move(key, db))
       case IntegerReply(n) => Future.value(n == 1)
-    }
 
   /**
     * Set a key's time to live in milliseconds.
@@ -99,9 +92,8 @@ trait Keys { self: BaseClient =>
     * @see http://redis.io/commands/pexpire
     */
   def pExpire(key: ChannelBuffer, milliseconds: JLong): Future[JBoolean] =
-    doRequest(PExpire(key, milliseconds)) {
+    doRequest(PExpire(key, milliseconds))
       case IntegerReply(n) => Future.value(n == 1)
-    }
 
   /**
     * Set the expiration for a key as a UNIX timestamp specified in milliseconds.
@@ -113,9 +105,8 @@ trait Keys { self: BaseClient =>
     * @see http://redis.io/commands/pexpireat
     */
   def pExpireAt(key: ChannelBuffer, timestamp: JLong): Future[JBoolean] =
-    doRequest(PExpireAt(key, Time.fromMilliseconds(timestamp))) {
+    doRequest(PExpireAt(key, Time.fromMilliseconds(timestamp)))
       case IntegerReply(n) => Future.value(n == 1)
-    }
 
   /**
     * Get the time to live for a key in milliseconds.
@@ -126,11 +117,10 @@ trait Keys { self: BaseClient =>
     * @see
     */
   def pTtl(key: ChannelBuffer): Future[Option[JLong]] =
-    doRequest(PTtl(key)) {
+    doRequest(PTtl(key))
       case IntegerReply(n) =>
         if (n != -1) Future.value(Some(n))
         else Future.value(None)
-    }
 
   /**
     * Returns keys starting at cursor
@@ -140,11 +130,10 @@ trait Keys { self: BaseClient =>
   def scan(cursor: JLong,
            count: Option[JLong],
            pattern: Option[ChannelBuffer]): Future[Seq[ChannelBuffer]] =
-    doRequest(Scan(cursor, count, pattern)) {
+    doRequest(Scan(cursor, count, pattern))
       case MBulkReply(messages) =>
         Future.value(ReplyFormat.toChannelBuffers(messages))
       case EmptyMBulkReply() => Future.Nil
-    }
 
   /**
     * Gets the ttl of the given key.
@@ -153,13 +142,9 @@ trait Keys { self: BaseClient =>
     * and has a timeout, or else nothing.
     */
   def ttl(key: ChannelBuffer): Future[Option[JLong]] =
-    doRequest(Ttl(key)) {
-      case IntegerReply(n) => {
-          if (n != -1) {
+    doRequest(Ttl(key))
+      case IntegerReply(n) =>
+          if (n != -1)
             Future.value(Some(n))
-          } else {
+          else
             Future.value(None)
-          }
-        }
-    }
-}

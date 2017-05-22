@@ -3,10 +3,10 @@ package syntax
 package std
 
 final class MapOps[Map[_, _], BKC[_], K, A](
-    self: Map[K, A])(dict: scalaz.std.MapSubFunctions {
+    self: Map[K, A])(dict: scalaz.std.MapSubFunctions
   type XMap[A, B] = Map[A, B]
   type BuildKeyConstraint[A] = BKC[A]
-}) {
+)
   final def alter(k: K)(f: (Option[A] => Option[A]))(
       implicit bk: BKC[K]): Map[K, A] = dict.alter(self, k)(f)
   final def intersectWithKey[B, C](m: Map[K, B])(f: (K, A, B) => C)(
@@ -23,12 +23,10 @@ final class MapOps[Map[_, _], BKC[_], K, A](
   final def getOrAdd[F[_]](k: K)(
       fa: => F[A])(implicit F: Applicative[F], bk: BKC[K]): F[(Map[K, A], A)] =
     dict.getOrAdd(self, k)(fa)
-}
 
-trait ToMapOps {
+trait ToMapOps
   import scalaz.std.{map => dict}
 
   implicit def ToMapOpsFromMap[K, V](
       m: Map[K, V]): MapOps[Map, dict.BuildKeyConstraint, K, V] =
     new MapOps[Map, dict.BuildKeyConstraint, K, V](m)(dict)
-}

@@ -12,14 +12,11 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.SyntheticNam
   * Nikolay.Tropin
   * 2014-04-14
   */
-object ExtractMethodControlFlowPolicy extends ScControlFlowPolicy {
-  override def isElementAccepted(named: PsiNamedElement): Boolean = {
+object ExtractMethodControlFlowPolicy extends ScControlFlowPolicy
+  override def isElementAccepted(named: PsiNamedElement): Boolean =
     if (named.isInstanceOf[SyntheticNamedElement]) return false
 
-    ScalaPsiUtil.nameContext(named) match {
+    ScalaPsiUtil.nameContext(named) match
       case cp: ScClassParameter => false
       case member: ScMember => member.isLocal
       case _ => true
-    }
-  }
-}

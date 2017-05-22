@@ -13,7 +13,7 @@ package scalaz
   * @see [[scalaz.Functor.FunctorLaw]]
   */
 ////
-trait Functor[F[_]] extends InvariantFunctor[F] { self =>
+trait Functor[F[_]] extends InvariantFunctor[F]  self =>
   ////
   import Liskov.<~<
 
@@ -53,41 +53,36 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   def void[A](fa: F[A]): F[Unit] = map(fa)(_ => ())
 
   def counzip[A, B](a: F[A] \/ F[B]): F[(A \/ B)] =
-    a match {
+    a match
       case -\/(x) => map(x)(\/.left)
       case \/-(x) => map(x)(\/.right)
-    }
 
   /**The composition of Functors `F` and `G`, `[x]F[G[x]]`, is a Functor */
   def compose[G[_]](implicit G0: Functor[G]): Functor[λ[α => F[G[α]]]] =
-    new CompositionFunctor[F, G] {
+    new CompositionFunctor[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /** The composition of Functor F and Contravariant G, `[x]F[G[x]]`,
     * is contravariant.
     */
   def icompose[G[_]](
       implicit G0: Contravariant[G]): Contravariant[λ[α => F[G[α]]]] =
-    new Contravariant[λ[α => F[G[α]]]] {
+    new Contravariant[λ[α => F[G[α]]]]
       def contramap[A, B](fa: F[G[A]])(f: B => A) =
         self.map(fa)(ga => G0.contramap(ga)(f))
-    }
 
   /** The composition of Functor `F` and Bifunctor `G`, `[x, y]F[G[x, y]]`, is a Bifunctor */
   def bicompose[G[_, _]: Bifunctor]: Bifunctor[λ[(α, β) => F[G[α, β]]]] =
-    new CompositionFunctorBifunctor[F, G] {
+    new CompositionFunctorBifunctor[F, G]
       def F = self
       def G = implicitly
-    }
 
   /**The product of Functors `F` and `G`, `[x](F[x], G[x]])`, is a Functor */
   def product[G[_]](implicit G0: Functor[G]): Functor[λ[α => (F[α], G[α])]] =
-    new ProductFunctor[F, G] {
+    new ProductFunctor[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /**
     * Functors are covariant by nature, so we can treat an `F[A]` as
@@ -96,7 +91,7 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
   def widen[A, B](fa: F[A])(implicit ev: A <~< B): F[B] =
     map(fa)(ev.apply)
 
-  trait FunctorLaw extends InvariantFunctorLaw {
+  trait FunctorLaw extends InvariantFunctorLaw
 
     /** The identity function, lifted, is a no-op. */
     def identity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
@@ -109,18 +104,14 @@ trait Functor[F[_]] extends InvariantFunctor[F] { self =>
     def composite[A, B, C](fa: F[A], f1: A => B, f2: B => C)(
         implicit FC: Equal[F[C]]): Boolean =
       FC.equal(map(map(fa)(f1))(f2), map(fa)(f2 compose f1))
-  }
   def functorLaw = new FunctorLaw {}
   ////
-  val functorSyntax = new scalaz.syntax.FunctorSyntax[F] {
+  val functorSyntax = new scalaz.syntax.FunctorSyntax[F]
     def F = Functor.this
-  }
-}
 
-object Functor {
+object Functor
   @inline def apply[F[_]](implicit F: Functor[F]): Functor[F] = F
 
   ////
 
   ////
-}

@@ -32,7 +32,7 @@ class XYDataset[Item](x: Item => Number,
                       y: Item => Number,
                       label: Item => String,
                       tip: Item => String)
-    extends org.jfree.data.xy.AbstractXYDataset {
+    extends org.jfree.data.xy.AbstractXYDataset
   val names = ArrayBuffer[String]();
   val items = ArrayBuffer[IndexedSeq[Item]]();
 
@@ -56,21 +56,18 @@ class XYDataset[Item](x: Item => Number,
 
   def getTip(series: Int, item: Int): String =
     tip(items(series)(item))
-}
 
-object XYDataset {
+object XYDataset
   def apply[Item](name: String,
                   items: IndexedSeq[Item],
                   x: Item => Number,
                   y: Item => Number,
                   label: Item => String,
-                  tip: Item => String): XYDataset[Item] = {
+                  tip: Item => String): XYDataset[Item] =
     val rv = new XYDataset(x, y, label, tip);
     rv.names += name;
     rv.items += items;
     rv;
-  }
-}
 
 /**
   * An XYX dataset consisting of some number of named series, each consisting
@@ -84,7 +81,7 @@ class XYZDataset[Item](x: Item => Number,
                        z: Item => Number,
                        label: Item => String,
                        tip: Item => String)
-    extends org.jfree.data.xy.AbstractXYZDataset {
+    extends org.jfree.data.xy.AbstractXYZDataset
   val names = ArrayBuffer[String]();
   val items = ArrayBuffer[IndexedSeq[Item]]();
 
@@ -111,19 +108,16 @@ class XYZDataset[Item](x: Item => Number,
 
   def getTip(series: Int, item: Int): String =
     tip(items(series)(item));
-}
 
-object XYZDataset {
+object XYZDataset
   def apply[Item](name: String,
                   items: IndexedSeq[Item],
                   x: Item => Number,
                   y: Item => Number,
                   z: Item => Number,
                   label: Item => String,
-                  tip: Item => String): XYZDataset[Item] = {
+                  tip: Item => String): XYZDataset[Item] =
     val rv = new XYZDataset(x, y, z, label, tip);
     rv.names += name;
     rv.items += items;
     rv;
-  }
-}

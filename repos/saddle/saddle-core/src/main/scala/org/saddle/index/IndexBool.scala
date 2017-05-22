@@ -26,7 +26,7 @@ import org.saddle.scalar._
 /**
   * Index with integer keys
   */
-class IndexBool(keys: Vec[Boolean]) extends Index[Boolean] {
+class IndexBool(keys: Vec[Boolean]) extends Index[Boolean]
   val scalarTag = ScalarTagBool
 
   private lazy val (kmap, IndexProperties(contiguous, monotonic)) =
@@ -64,34 +64,29 @@ class IndexBool(keys: Vec[Boolean]) extends Index[Boolean] {
     JoinerImpl.join(this, other, how)
 
   // Intersects two indices if both have set semantics
-  def intersect(other: Index[Boolean]): ReIndexer[Boolean] = {
+  def intersect(other: Index[Boolean]): ReIndexer[Boolean] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot intersect non-unique indexes")
     JoinerImpl.join(this, other, InnerJoin)
-  }
 
   // Unions two indices if both have set semantics
-  def union(other: Index[Boolean]): ReIndexer[Boolean] = {
+  def union(other: Index[Boolean]): ReIndexer[Boolean] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot union non-unique indexes")
     JoinerImpl.join(this, other, OuterJoin)
-  }
 
-  def slice(from: Int, until: Int, stride: Int): Index[Boolean] = {
+  def slice(from: Int, until: Int, stride: Int): Index[Boolean] =
     new IndexBool(keys.slice(from, until, stride))
-  }
 
   // find the first location whereby an insertion would maintain a sorted index
-  def lsearch(t: Boolean): Int = {
+  def lsearch(t: Boolean): Int =
     require(isMonotonic, "Index must be sorted")
     locator.get(t)
-  }
 
   // find the last location whereby an insertion would maintain a sorted index
-  def rsearch(t: Boolean): Int = {
+  def rsearch(t: Boolean): Int =
     require(isMonotonic, "Index must be sorted")
     locator.get(t) + locator.count(t)
-  }
 
   def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
       f: Boolean => B): Index[B] =
@@ -100,19 +95,14 @@ class IndexBool(keys: Vec[Boolean]) extends Index[Boolean] {
   def toArray: Array[Boolean] = keys.toArray
 
   /**Default equality does an iterative, element-wise equality check of all values. */
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case rv: IndexBool =>
-        (this eq rv) || (this.length == rv.length) && {
+        (this eq rv) || (this.length == rv.length) &&
           var i = 0
           var eq = true
-          while (eq && i < this.length) {
+          while (eq && i < this.length)
             eq &&= raw(i) == rv.raw(i)
             i += 1
-          }
           eq
-        }
       case _ => super.equals(o)
-    }
-  }
-}

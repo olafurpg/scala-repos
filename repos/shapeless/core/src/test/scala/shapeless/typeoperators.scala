@@ -23,34 +23,31 @@ import org.junit.Assert._
 
 import newtype._, tag._, test._, testutil._
 
-class TypeOperatorTests {
+class TypeOperatorTests
   import TypeOperatorTests._
 
   trait ATag
 
-  object ATag {
+  object ATag
     implicit def taggedToString[T](value: T with Tagged[ATag]): String =
       message
 
     val message = "This object has ATag tag type"
-  }
 
   @Test
-  def testImplicitScopeForTaggedType {
+  def testImplicitScopeForTaggedType
     val x = tag[ATag](1)
     val s: String = x
     assertEquals(ATag.message, s)
-  }
 
   @Test
-  def testNewtype {
+  def testNewtype
     type MyString = Newtype[String, MyStringOps]
 
     def MyString(s: String): MyString = newtype(s)
 
-    case class MyStringOps(s: String) {
+    case class MyStringOps(s: String)
       def mySize = s.size
-    }
     implicit val mkOps = MyStringOps
 
     val ms = MyString("foo")
@@ -71,46 +68,35 @@ class TypeOperatorTests {
     val ms2 = MyString(s2)
 
     assertTrue(ms2 eq (s2: AnyRef))
-  }
 
-  trait Foo {
+  trait Foo
     type T
     val t: T
-  }
 
-  object Foo {
-    implicit def mkFoo: Foo { type T = Int } = new Foo {
+  object Foo
+    implicit def mkFoo: Foo { type T = Int } = new Foo
       type T = Int; val t = 23
-    }
-  }
 
-  trait Foo2[U] {
+  trait Foo2[U]
     type T
     val t: T
-  }
 
-  object Foo2 {
-    implicit def mkFoo2: Foo2[Char] { type T = Int } = new Foo2[Char] {
+  object Foo2
+    implicit def mkFoo2: Foo2[Char] { type T = Int } = new Foo2[Char]
       type T = Int; val t = 23
-    }
-  }
 
-  trait Bar[T] {
+  trait Bar[T]
     type U
     val tu: Either[T, U]
-  }
 
-  object Bar {
-    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean] {
+  object Bar
+    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean]
       type U = Int; val tu = Right(23)
-    }
-    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String] {
+    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String]
       type U = Double; val tu = Right(13.0)
-    }
-  }
 
   @Test
-  def testTheValues {
+  def testTheValues
     val foo = the[Foo]
     typed[Foo](foo)
     typed[Int](foo.t)
@@ -122,10 +108,9 @@ class TypeOperatorTests {
     val bar2 = the[Bar[String]]
     typed[Bar[String]](bar2)
     typed[Either[String, Double]](bar2.tu)
-  }
 
   @Test
-  def testTheTypes {
+  def testTheTypes
     val t: the.Foo.T = 23
     typed[Int](t)
 
@@ -134,37 +119,32 @@ class TypeOperatorTests {
 
     val tu2: Either[String, the.`Bar[String]`.U] = Right(23)
     typed[Either[String, Double]](tu2)
-  }
 
   @Test
-  def testTheQuantifiers {
+  def testTheQuantifiers
     def bar0[T, U0](
-        implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } = {
+        implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } =
       val res = the[Bar[T]]
       res
-    }
 
     // Note: Slightly different method signature in TypeOperator211Tests
-    def bar1[T, U0](implicit b: Bar[T] { type U = U0 }): Option[U0] = {
+    def bar1[T, U0](implicit b: Bar[T] { type U = U0 }): Option[U0] =
       val res: Option[the.`Bar[T]`.U] = None
       res
-    }
 
     val b0 = bar0[Boolean, Int]
     typed[Bar[Boolean] { type U = Int }](b0)
 
     val b1 = bar1[Boolean, Int]
     typed[Option[Int]](b1)
-  }
 
   @Test
-  def testRejectBogus {
-    try {
+  def testRejectBogus
+    try
       the.Foo
       assert(false)
-    } catch {
+    catch
       case _: Throwable => // OK
-    }
 
     //the.Unit  // illTyped fails for this expression
 
@@ -179,17 +159,13 @@ class TypeOperatorTests {
     illTyped("""
     val blah = the.`package wibble`
     """)
-  }
 
   @Test
-  def testValueClass {
+  def testValueClass
     implicit val one: AValueClass = AValueClass(1L)
 
     val x = the[AValueClass]
     typed[AValueClass](x)
-  }
-}
 
-object TypeOperatorTests {
+object TypeOperatorTests
   final case class AValueClass(l: Long) extends AnyVal
-}

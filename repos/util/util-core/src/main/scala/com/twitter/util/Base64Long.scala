@@ -5,7 +5,7 @@ package com.twitter.util
   *
   * This is intended for use in e.g. cache keys.
   */
-object Base64Long {
+object Base64Long
   val StandardBase64Alphabet: Int => Char = Array[Char](
       'A',
       'B',
@@ -91,19 +91,17 @@ object Base64Long {
   /**
     * Enable re-use of the StringBuilder for toBase64(Long): String
     */
-  private[this] val threadLocalBuilder = new ThreadLocal[StringBuilder] {
+  private[this] val threadLocalBuilder = new ThreadLocal[StringBuilder]
     override def initialValue = new StringBuilder
-  }
 
   /**
     * Convert this Long to a base 64 String, using the standard base 64 alphabet.
     */
-  def toBase64(l: Long): String = {
+  def toBase64(l: Long): String =
     val b = threadLocalBuilder.get()
     b.clear()
     toBase64(b, l)
     b.toString()
-  }
 
   /**
     * Append a base-64 encoded Long to a StringBuilder.
@@ -117,25 +115,20 @@ object Base64Long {
     */
   def toBase64(builder: StringBuilder,
                l: Long,
-               alphabet: Int => Char = StandardBase64Alphabet) {
-    if (l == 0) {
+               alphabet: Int => Char = StandardBase64Alphabet)
+    if (l == 0)
       // Special case for zero: Just like in decimal, if the number is
       // zero, represent it as a single zero digit.
       builder.append(alphabet(0))
-    } else {
+    else
       var bitPosition = StartingBitPosition
-      while ( (l >>> bitPosition) == 0) {
+      while ( (l >>> bitPosition) == 0)
         bitPosition -= DigitWidth
-      }
       // Copy in the 6-bit segments, one at a time.
-      while (bitPosition >= 0) {
+      while (bitPosition >= 0)
         val shifted = l >>> bitPosition
         // The offset into the digit array is the 6 bits that are b
         // bits from the right of the number we're encoding.
         val digitValue = (shifted & DigitMask).toInt
         builder.append(alphabet(digitValue))
         bitPosition -= DigitWidth
-      }
-    }
-  }
-}

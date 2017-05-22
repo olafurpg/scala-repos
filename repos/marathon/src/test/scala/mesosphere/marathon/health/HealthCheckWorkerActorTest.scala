@@ -17,20 +17,19 @@ import scala.concurrent.{Await, Future}
 
 class HealthCheckWorkerActorTest
     extends MarathonActorSupport with ImplicitSender with MarathonSpec
-    with Matchers {
+    with Matchers
 
   import HealthCheckWorker._
   import MarathonTestHelper.Implicits._
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  test("A TCP health check should correctly resolve the hostname") {
+  test("A TCP health check should correctly resolve the hostname")
     val socket = new ServerSocket(0)
     val socketPort: Int = socket.getLocalPort
 
-    val res = Future {
+    val res = Future
       socket.accept().close()
-    }
 
     val task = MarathonTestHelper
       .runningTask("test_id")
@@ -49,18 +48,15 @@ class HealthCheckWorkerActorTest
 
     try { Await.result(res, 1.seconds) } finally { socket.close() }
 
-    expectMsgPF(1.seconds) {
+    expectMsgPF(1.seconds)
       case Healthy(taskId, _, _) => ()
-    }
-  }
 
-  test("A health check worker should shut itself down") {
+  test("A health check worker should shut itself down")
     val socket = new ServerSocket(0)
     val socketPort: Int = socket.getLocalPort
 
-    val res = Future {
+    val res = Future
       socket.accept().close()
-    }
 
     val task = MarathonTestHelper
       .runningTask("test_id")
@@ -79,11 +75,8 @@ class HealthCheckWorkerActorTest
 
     try { Await.result(res, 1.seconds) } finally { socket.close() }
 
-    expectMsgPF(1.seconds) {
+    expectMsgPF(1.seconds)
       case _: HealthResult => ()
-    }
 
     watch(ref)
     expectTerminated(ref)
-  }
-}

@@ -19,7 +19,7 @@ import ClassfileConstants._
   *  The high bits encode whether the access flags are directly
   *  associated with a class, constructor, field, or method.
   */
-final class JavaAccFlags private (val coded: Int) extends AnyVal {
+final class JavaAccFlags private (val coded: Int) extends AnyVal
   private def has(mask: Int) = (flags & mask) != 0
   private def flagCarrierId = coded >>> 16
   private def flags = coded & 0xFFFF
@@ -53,14 +53,12 @@ final class JavaAccFlags private (val coded: Int) extends AnyVal {
     !has(JAVA_ACC_PRIVATE | JAVA_ACC_PROTECTED | JAVA_ACC_PUBLIC)
 
   def toJavaFlags: Int = flags
-  def toScalaFlags: Long = flagCarrierId match {
+  def toScalaFlags: Long = flagCarrierId match
     case Method | Constructor => FlagTranslation methodFlags flags
     case Class => FlagTranslation classFlags flags
     case _ => FlagTranslation fieldFlags flags
-  }
-}
 
-object JavaAccFlags {
+object JavaAccFlags
   private val Unknown = 0
   private val Class = 1
   private val Field = 2
@@ -77,10 +75,8 @@ object JavaAccFlags {
 
   def apply(access_flags: Int): JavaAccFlags = create(Unknown, access_flags)
   def apply(clazz: jClass[_]): JavaAccFlags = classFlags(clazz.getModifiers)
-  def apply(member: jMember): JavaAccFlags = member match {
+  def apply(member: jMember): JavaAccFlags = member match
     case x: jConstructor[_] => constructorFlags(x.getModifiers)
     case x: jMethod => methodFlags(x.getModifiers)
     case x: jField => fieldFlags(x.getModifiers)
     case _ => apply(member.getModifiers)
-  }
-}

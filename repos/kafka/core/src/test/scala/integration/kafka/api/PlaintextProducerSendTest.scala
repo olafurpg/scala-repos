@@ -24,53 +24,47 @@ import org.apache.kafka.common.errors.SerializationException
 import org.apache.kafka.common.serialization.ByteArraySerializer
 import org.junit.Test
 
-class PlaintextProducerSendTest extends BaseProducerSendTest {
+class PlaintextProducerSendTest extends BaseProducerSendTest
 
   @Test
-  def testSerializerConstructors() {
-    try {
+  def testSerializerConstructors()
+    try
       createNewProducerWithNoSerializer(brokerList)
       fail(
           "Instantiating a producer without specifying a serializer should cause a ConfigException")
-    } catch {
+    catch
       case ce: ConfigException => // this is ok
-    }
 
     // create a producer with explicit serializers should succeed
     createNewProducerWithExplicitSerializer(brokerList)
-  }
 
   private def createNewProducerWithNoSerializer(
-      brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] = {
+      brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] =
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     return new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
-  }
 
   private def createNewProducerWithExplicitSerializer(
-      brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] = {
+      brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] =
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     return new KafkaProducer[Array[Byte], Array[Byte]](
         producerProps, new ByteArraySerializer, new ByteArraySerializer)
-  }
 
   @Test
-  def testWrongSerializer() {
+  def testWrongSerializer()
     // send a record with a wrong type should receive a serialization exception
-    try {
+    try
       val producer = createProducerWithWrongSerializer(brokerList)
       val record5 = new ProducerRecord[Array[Byte], Array[Byte]](
           topic, new Integer(0), "key".getBytes, "value".getBytes)
       producer.send(record5)
       fail("Should have gotten a SerializationException")
-    } catch {
+    catch
       case se: SerializationException => // this is ok
-    }
-  }
 
   private def createProducerWithWrongSerializer(
-      brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] = {
+      brokerList: String): KafkaProducer[Array[Byte], Array[Byte]] =
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
     producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
@@ -78,5 +72,3 @@ class PlaintextProducerSendTest extends BaseProducerSendTest {
     producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                       "org.apache.kafka.common.serialization.StringSerializer")
     return new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
-  }
-}

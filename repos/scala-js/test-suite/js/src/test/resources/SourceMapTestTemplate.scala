@@ -7,11 +7,10 @@ import org.junit.{BeforeClass, Test}
 import org.scalajs.testsuite.utils.Platform._
 
 /** The test counter */
-private[testsuite] object TC {
+private[testsuite] object TC
   var testNum: Int = _
 
   def is(x: Int): Boolean = testNum == x
-}
 
 /** Exception to test source maps. Not a ControlThrowable, because it has
   *  NoStackTrace which would defeat its purpose
@@ -32,23 +31,21 @@ case class TestException(lineNo: Int) extends Exception
   * `@Test def workTest(): Unit = ...` is replaced by the list of all tests
   * (in a single line) up to the number of /n-star/s in the file.
   */
-object SourceMapTest {
-  @BeforeClass def beforeClass(): Unit = {
+object SourceMapTest
+  @BeforeClass def beforeClass(): Unit =
     assumeTrue("source-maps", sourceMaps)
-  }
-}
 
-class SourceMapTest {
+class SourceMapTest
 
   @Test def workTest(): Unit = sys.error("stubs")
 
-  def test(i: Int): Unit = {
+  def test(i: Int): Unit =
     TC.testNum = i
 
-    try {
+    try
       run()
       sys.error("No exception thrown")
-    } catch {
+    catch
       case e @ TestException(lineNo) =>
         def normFileName(e: StackTraceElement): String =
           e.getFileName.replace('\\', '/')
@@ -63,32 +60,28 @@ class SourceMapTest {
         assertTrue(normFileName(topSte).contains("/SourceMapTest.scala"))
 
         val throwSte =
-          if (topSte.getLineNumber == 19) {
+          if (topSte.getLineNumber == 19)
             // line where `case class TestException is written` above
             val throwSte = trace2.tail.head
             assertTrue(normFileName(throwSte).contains("/SourceMapTest.scala"))
             throwSte
-          } else {
+          else
             /* In fullOpt, it may happen that the constructor of
              * TestException is inlined, in which case there is no trace of
              * it anymore. The first stack element in SourceMapTest.scala is
              * therefore the one we're interested in.
              */
             topSte
-          }
 
         assertEquals(lineNo, throwSte.getLineNumber)
-    }
-  }
 
-  def get(json: JsValue, index: Int) = {
+  def get(json: JsValue, index: Int) =
 
     /**/
     /**/
     json.asInstanceOf[JsArray].value(index).value
-  }
 
-  def get(json: JsValue, index: Int, fieldName: String) = {
+  def get(json: JsValue, index: Int, fieldName: String) =
 
     /**/
     /**/ /***/
@@ -98,8 +91,7 @@ class SourceMapTest {
       .asInstanceOf[JsObject]
       .value(fieldName)
       .value
-  }
-  def run() = {
+  def run() =
 
     /**/
     /**/
@@ -173,7 +165,7 @@ class SourceMapTest {
     val unparsed = json.write(parsed) /**/
     /**/
     val reparsed = json.read(unparsed) /**/
-    for (json <- Seq(parsed, reparsed)) {
+    for (json <- Seq(parsed, reparsed))
 
       /**/
       assert(get(json, 0) == "JSON Test Pattern pass1")
@@ -187,14 +179,10 @@ class SourceMapTest {
       assert(
           get(json, 8, "jsontext") == "{\"object with 1 member\":[\"array with 1 element\"]}")
       assert(get(json, 19) == "rosebud") /**/
-    }
     /**/
-  }
-}
 
-sealed trait JsValue {
+sealed trait JsValue
   def value: Any
-}
 
 case class JsString(value: java.lang.String) extends JsValue
 
@@ -204,44 +192,38 @@ case class JsArray(value: Seq[JsValue]) extends JsValue
 
 case class JsNumber(value: java.lang.String) extends JsValue
 
-sealed trait JsBoolean extends JsValue {
+sealed trait JsBoolean extends JsValue
   def value: Boolean
-}
 
-case object JsFalse extends JsBoolean {
-  def value = {
+case object JsFalse extends JsBoolean
+  def value =
 
     /**/
     false
-  }
-}
 
-case object JsTrue extends JsBoolean {
-  def value = {
+case object JsTrue extends JsBoolean
+  def value =
 
     /**/
     true
-  }
-}
 
-case object JsNull extends JsValue {
+case object JsNull extends JsValue
   def value = { null }
-}
 
-trait Writer {
+trait Writer
 
   /**/
-  def writeToBuffer(v: JsValue, sb: StringBuffer): Unit = v match {
+  def writeToBuffer(v: JsValue, sb: StringBuffer): Unit = v match
     case JsString(s) =>
       /**/
       sb.append('"') /**/
       /**/
       var i = 0 /**/
-      while (i < s.length) {
+      while (i < s.length)
 
         /**/
         /**/
-        s.charAt(i) match {
+        s.charAt(i) match
           case '\\' => /**/ sb.append("\\\\") /**/
           case '"' => sb.append("\\\"")
           case '/' => /**/ sb.append("\\/") /**/
@@ -251,15 +233,12 @@ trait Writer {
           case '\f' => sb.append("\\f")
           case '\r' => sb.append("\\r")
           case c =>
-            if (c < ' ') {
+            if (c < ' ')
               val t = "000" + Integer.toHexString(c)
               sb.append("\\u" + t.takeRight(4))
-            } else {
+            else
               sb.append(c.toString)
-            }
-        }
         i += 1
-      }
 
       /**/
       sb.append('"')
@@ -273,7 +252,6 @@ trait Writer {
       var first = true
       kvs.foreach(
           kv =>
-            {
 
           /**/
           val (k, v) = kv
@@ -286,7 +264,7 @@ trait Writer {
 
           /**/
           writeToBuffer(v, sb)
-      })
+      )
       sb.append("}")
 
     case JsArray(vs) =>
@@ -294,39 +272,34 @@ trait Writer {
       sb.append("[")
       if (vs.length > 0) writeToBuffer(vs(0), sb)
       var i = 1
-      while (i < vs.length) {
+      while (i < vs.length)
         sb.append(", ")
         writeToBuffer(vs(i), sb)
         i += 1
-      }
       sb.append("]")
     case JsNumber(d) => sb.append(d)
     case JsFalse => sb.append("false")
     case JsTrue => sb.append("true")
     case JsNull => sb.append("null")
-  }
   /**/
-}
-class Writer2 extends Writer {
+class Writer2 extends Writer
 
   /**/
-  def write(v: JsValue): String = {
+  def write(v: JsValue): String =
 
     /**/
     val sb = new StringBuffer()
     writeToBuffer(v, sb)
     sb.toString
-  }
   /**/
-}
-class Json extends Writer2 {
+class Json extends Writer2
 
   /**
     * Self-contained JSON parser adapted from
     *
     * https://github.com/nestorpersist/json
     */
-  def read(s: String): JsValue = {
+  def read(s: String): JsValue =
 
     // *** Character Kinds
     /**/
@@ -366,7 +339,7 @@ class Json extends Writer2 {
     /**/
     // *** Character => CharKind Map ***
 
-    val charKind = (0 to 255).toArray.map {
+    val charKind = (0 to 255).toArray.map
       case c if 'a'.toInt <= c && c <= 'z'.toInt => Letter
       case c if 'A'.toInt <= c && c <= 'Z'.toInt => Letter
       case c if '0'.toInt <= c && c <= '9'.toInt => Digit
@@ -384,7 +357,6 @@ class Json extends Writer2 {
       case '\r' => Blank
       case '/' => Slash
       case _ => Other
-    }
 
     // *** Character Escapes
     /**/
@@ -415,54 +387,50 @@ class Json extends Writer2 {
     var chLinePos: Int = 0
     var chCharPos: Int = 0
 
-    def chNext() = {
+    def chNext() =
 
       /**/
-      if (pos < size) {
+      if (pos < size)
 
         /**/
         //ch = s1(pos).toInt
         /**/
         ch = s.charAt(pos) /**/
         /**/
-        chKind = /***/ if (ch < 255) {
+        chKind = /***/ if (ch < 255)
 
           /**/
           /**/ /***/
           charKind(ch)
-        } else {
+        else
 
           /**/
           /**/ /***/
           Other
-        } /**/
+        /**/
         pos += 1
-        if (ch == '\n'.toInt) {
+        if (ch == '\n'.toInt)
           chLinePos += 1
           chCharPos = 1
-        } else {
+        else
 
           /**/
           chCharPos += 1 /**/
-        }
-      } else {
+      else
         ch = -1
         pos = size + 1
         chKind = Eof
-      }
-    } /**/
     /**/
     /**/
     /**/
-    def chError(msg: String): Nothing = {
+    /**/
+    def chError(msg: String): Nothing =
       throw new Json.Exception(msg, s, chLinePos, chCharPos)
-    }
 
     def chMark = pos - 1
 
-    def chSubstr(first: Int, delta: Int = 0) = {
+    def chSubstr(first: Int, delta: Int = 0) =
       s.substring(first, pos - 1 - delta)
-    }
 
     // *** LEXER ***
 
@@ -471,79 +439,71 @@ class Json extends Writer2 {
     var linePos = 1
     var charPos = 1
 
-    def getDigits() = {
+    def getDigits() =
       while (chKind == Digit) chNext()
-    }
 
-    def handleDigit() {
+    def handleDigit()
       val first = chMark
       getDigits()
       val k1 =
-        if (ch == '.'.toInt) {
+        if (ch == '.'.toInt)
           chNext()
           getDigits()
           BIGNUMBER
-        } else {
+        else
           NUMBER
-        }
       val k2 =
-        if (ch == 'E'.toInt || ch == 'e'.toInt) {
+        if (ch == 'E'.toInt || ch == 'e'.toInt)
           chNext()
-          if (ch == '+'.toInt) {
+          if (ch == '+'.toInt)
             chNext()
-          } else if (ch == '-'.toInt) {
+          else if (ch == '-'.toInt)
             chNext()
-          }
           getDigits()
           FLOATNUMBER
-        } else {
+        else
           k1
-        }
 
       /**/
       tokenKind = k2 /**/
       /**/
       tokenValue = chSubstr(first) /**/
       /**/
-    } /**/
     /**/
-    def handleRaw() {
+    /**/
+    def handleRaw()
       chNext()
       val first = chMark
       var state = 0
-      do {
+      do
         if (chKind == Eof) chError("EOF encountered in raw string")
-        state = (ch, state) match {
+        state = (ch, state) match
           case ('}', _) => 1
           case ('"', 1) => 2
           case ('"', 2) => 3
           case ('"', 3) => 0
           case _ => 0
-        }
 
         chNext()
-      } while (state != 3)
+      while (state != 3)
       tokenKind = STRING
       tokenValue = chSubstr(first, 3)
-    }
 
-    def handle(i: Int) = {
+    def handle(i: Int) =
       chNext()
       tokenKind = i
       tokenValue = ""
-    }
 
-    def tokenNext() {
-      do {
+    def tokenNext()
+      do
         linePos = chLinePos
         charPos = chCharPos
         val kind: Int = chKind
-        kind match {
+        kind match
           case Letter =>
             val first = chMark
-            while (chKind == Letter || chKind == Digit) {
+            while (chKind == Letter || chKind == Digit)
               chNext()
-            }
             tokenKind = ID
             tokenValue = chSubstr(first)
 
@@ -557,11 +517,11 @@ class Json extends Writer2 {
             val sb = new StringBuilder(50)
             chNext()
             var first = chMark
-            while (ch != '"'.toInt && ch >= 32) {
-              if (ch == '\\'.toInt) {
+            while (ch != '"'.toInt && ch >= 32)
+              if (ch == '\\'.toInt)
                 sb.append(chSubstr(first))
                 chNext()
-                escapeMap.get(ch) match {
+                escapeMap.get(ch) match
                   case Some(s) =>
                     sb.append(s)
                     chNext()
@@ -570,20 +530,16 @@ class Json extends Writer2 {
                     if (ch != 'u'.toInt) chError("Illegal escape")
                     chNext()
                     var code = 0
-                    for (i <- 1 to 4) {
+                    for (i <- 1 to 4)
                       val ch1 = ch.toChar.toString
                       val i = "0123456789abcdef".indexOf(ch1.toLowerCase)
                       if (i == -1) chError("Illegal hex character")
                       code = code * 16 + i
                       chNext()
-                    }
                     sb.append(code.toChar.toString)
-                }
                 first = chMark
-              } else {
+              else
                 chNext()
-              }
-            }
             if (ch != '"') chError("Unexpected string character: " + ch.toChar)
 
             sb.append(chSubstr(first))
@@ -592,9 +548,8 @@ class Json extends Writer2 {
 
             tokenValue = sb.toString()
             chNext()
-            if (tokenValue.length() == 0 && ch == '{') {
+            if (tokenValue.length() == 0 && ch == '{')
               handleRaw()
-            }
 
           case Colon => handle(COLON) /**/
           case Comma => handle(COMMA) /**/
@@ -619,14 +574,11 @@ class Json extends Writer2 {
             do chNext() while (ch != '\n' && chKind != Eof)
             tokenKind = BLANK
             tokenValue = ""
-        }
-      } while (tokenKind == BLANK)
-    }
+      while (tokenKind == BLANK)
 
     /**/
-    def tokenError(msg: String): Nothing = {
+    def tokenError(msg: String): Nothing =
       throw new Json.Exception(msg, s, linePos, charPos)
-    }
 
     /**/
     // *** PARSER ***
@@ -634,31 +586,28 @@ class Json extends Writer2 {
     def handleEof() = tokenError("Unexpected eof")
     def handleUnexpected(i: String) = tokenError(s"Unexpected input: [$i]")
 
-    def handleArray(): JsArray = {
+    def handleArray(): JsArray =
       tokenNext()
       var result = List.empty[JsValue]
-      while (tokenKind != RARR) {
+      while (tokenKind != RARR)
 
         /**/
         result = getJson() :: result
 
         /**/
-        tokenKind match {
+        tokenKind match
           case COMMA => /**/ tokenNext()
           case RARR => // do nothing
           case _ => tokenError("Expecting , or ]")
-        }
-      }
       tokenNext()
       JsArray(result.reverse)
-    }
 
-    def handleObject(): JsObject = {
+    def handleObject(): JsObject =
       tokenNext()
       var result = List.empty[(String, JsValue)]
 
       /**/
-      while (tokenKind != ROBJ) {
+      while (tokenKind != ROBJ)
         if (tokenKind != STRING && tokenKind != ID)
           tokenError("Expecting string or name")
         val name = tokenValue
@@ -666,36 +615,30 @@ class Json extends Writer2 {
         if (tokenKind != COLON) tokenError("Expecting :")
         tokenNext()
         result = (name -> getJson()) :: result
-        tokenKind match {
+        tokenKind match
           case COMMA => tokenNext()
           case ROBJ => // do nothing
           case _ => tokenError("Expecting , or }")
-        }
-      }
       tokenNext()
       JsObject(result.toMap)
-    }
-    def handleNumber(name: String, f: String => Unit) = {
-      try {
+    def handleNumber(name: String, f: String => Unit) =
+      try
         f(tokenValue)
-      } catch {
+      catch
         case _: Throwable => tokenError("Bad " + name)
-      }
       val old = tokenValue
       tokenNext()
 
       JsNumber(old)
-    }
-    def getJson(): JsValue = {
+    def getJson(): JsValue =
       val kind: Int = tokenKind
-      val result: JsValue = kind match {
+      val result: JsValue = kind match
         case ID =>
-          val result: JsValue = tokenValue match {
+          val result: JsValue = tokenValue match
             case "true" => JsTrue
             case "false" => JsFalse
             case "null" => JsNull
             case _ => tokenError("Not true, false, or null")
-          }
 
           tokenNext()
           result
@@ -715,25 +658,19 @@ class Json extends Writer2 {
         case LARR => handleArray()
         case RARR => handleUnexpected("]")
         case EOF => handleEof()
-      }
       result
-    }
-    def parse(): JsValue = {
+    def parse(): JsValue =
       chNext()
       tokenNext()
       val result = getJson
       if (tokenKind != EOF) tokenError("Excess input")
       result
-    }
     parse()
-  }
-}
 
-object Json {
+object Json
   class Exception(val msg: String,
                   val input: String,
                   val line: Int,
                   val char: Int)
       extends scala.Exception(
           s"JsonParse Error: $msg line $line [$char] in $input")
-}

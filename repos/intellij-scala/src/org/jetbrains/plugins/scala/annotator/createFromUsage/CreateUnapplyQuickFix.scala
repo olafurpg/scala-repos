@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
   */
 class CreateUnapplyQuickFix(clazz: ScTypeDefinition, pattern: ScPattern)
     extends { val getFamilyName = "Create 'unapply' method" }
-with CreateApplyOrUnapplyQuickFix(clazz) {
+with CreateApplyOrUnapplyQuickFix(clazz)
 
   override protected def methodType: Some[String] =
     Some(unapplyMethodTypeText(pattern))
@@ -21,9 +21,7 @@ with CreateApplyOrUnapplyQuickFix(clazz) {
   override protected def methodText = unapplyMethodText(pattern)
 
   override protected def addElementsToTemplate(
-      method: ScFunction, builder: TemplateBuilder) = {
+      method: ScFunction, builder: TemplateBuilder) =
     addParametersToTemplate(method, builder)
     addUnapplyResultTypesToTemplate(method, builder)
     addQmarksToTemplate(method, builder)
-  }
-}

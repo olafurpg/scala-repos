@@ -35,7 +35,7 @@ import java.util
   * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
   */
 final class Well44497a protected[random](state: Array[Int], i0: Int)
-    extends IntBasedGenerator {
+    extends IntBasedGenerator
 
   import Well44497a.{UpperMask, LowerMask, R, BYTES, mat0pos, mat0neg, mat1, mat3neg, mat5}
 
@@ -43,29 +43,25 @@ final class Well44497a protected[random](state: Array[Int], i0: Int)
 
   def copyInit: Well44497a = new Well44497a(state.clone(), i)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes(): Array[Byte] =
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
-    cfor(0)(_ < R, _ + 1) { i =>
+    cfor(0)(_ < R, _ + 1)  i =>
       bb.putInt(state(i))
-    }
     bb.putInt(i)
     bytes
-  }
 
-  def setSeedBytes(bytes: Array[Byte]): Unit = {
+  def setSeedBytes(bytes: Array[Byte]): Unit =
     val bs =
       if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
 
-    cfor(0)(_ < R, _ + 1) { i =>
+    cfor(0)(_ < R, _ + 1)  i =>
       state(i) = bb.getInt
-    }
     i = bb.getInt
-  }
 
-  def nextInt(): Int = {
+  def nextInt(): Int =
 
     import Well44497abIndexCache._
 
@@ -79,10 +75,8 @@ final class Well44497a protected[random](state: Array[Int], i0: Int)
     i = vrm1(i)
 
     state(i)
-  }
-}
 
-object Well44497a extends GeneratorCompanion[Well44497a, (Array[Int], Int)] {
+object Well44497a extends GeneratorCompanion[Well44497a, (Array[Int], Int)]
 
   @inline private val UpperMask = 0xFFFFFFFF >>> 17
   @inline private val LowerMask = ~UpperMask
@@ -119,23 +113,20 @@ object Well44497a extends GeneratorCompanion[Well44497a, (Array[Int], Int)] {
   @inline private final def mat3neg(t: Int, v: Int) = v << -t
   // @inline private final def mat4pos(t: Int, b: Int, v: Int) = v ^ ((v >>> t) & b)
   // @inline private final def mat4neg(t: Int, b: Int, v: Int) = v ^ ((v << -t) & b)
-  @inline private final def mat5(r: Int, a: Int, ds: Int, dt: Int, v: Int) = {
-    if ((v & dt) != 0) {
+  @inline private final def mat5(r: Int, a: Int, ds: Int, dt: Int, v: Int) =
+    if ((v & dt) != 0)
       (((v << r) ^ (v >>> (32 - r))) & ds) ^ a
-    } else {
+    else
       ((v << r) ^ (v >>> (32 - r))) & ds
-    }
-  }
 
   def randomSeed(): (Array[Int], Int) =
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well44497a =
-    seed match {
+    seed match
       case (state, stateIndex) =>
         assert(state.length == R)
         new Well44497a(state, stateIndex)
-    }
 
   def fromArray(arr: Array[Int]): Well44497a =
     fromSeed((Utils.seedFromArray(R, arr), 0))
@@ -145,4 +136,3 @@ object Well44497a extends GeneratorCompanion[Well44497a, (Array[Int], Int)] {
 
   def fromTime(time: Long = System.nanoTime): Well44497a =
     fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time)), 0))
-}

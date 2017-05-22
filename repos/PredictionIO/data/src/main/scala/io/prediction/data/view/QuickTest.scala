@@ -27,10 +27,10 @@ import org.joda.time.DateTime
 
 import scala.language.implicitConversions
 
-class TestHBLEvents() {
+class TestHBLEvents()
   @transient lazy val eventsDb = Storage.getLEvents()
 
-  def run(): Unit = {
+  def run(): Unit =
     val r = eventsDb
       .find(appId = 1,
             startTime = None,
@@ -39,35 +39,29 @@ class TestHBLEvents() {
             entityId = Some("3"))
       .toList
     println(r)
-  }
-}
 
-class TestSource(val appId: Int) {
+class TestSource(val appId: Int)
   @transient lazy val logger = Logger[this.type]
   @transient lazy val batchView = new LBatchView(appId, None, None)
 
-  def run(): Unit = {
+  def run(): Unit =
     println(batchView.events)
-  }
-}
 
-object QuickTest {
+object QuickTest
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val t = new TestHBLEvents()
     t.run()
 
     // val ts = new TestSource(args(0).toInt)
     // ts.run()
-  }
-}
 
-object TestEventTime {
+object TestEventTime
   @transient lazy val batchView = new LBatchView(9, None, None)
 
   // implicit def back2list(es: EventSeq) = es.events
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val e = batchView.events.filter(
         eventOpt = Some("rate"),
         startTimeOpt = Some(new DateTime(1998, 1, 1, 0, 0))
@@ -88,5 +82,3 @@ object TestEventTime {
     // val l: Seq[Event] = e
     val l = e.map { _.entityId }
     l.foreach { println }
-  }
-}

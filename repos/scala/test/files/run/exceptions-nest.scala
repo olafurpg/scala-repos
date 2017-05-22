@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
 
   println(test1)
   println(test2)
@@ -13,146 +13,121 @@ object Test extends App {
   println(test11)
   println(test12)
 
-  def test1 = {
+  def test1 =
     var x = 1
-    try {
+    try
       x = 2
-    } catch {
+    catch
       case _: NullPointerException => x = 3
       case _: Throwable => x = 4
-    }
     x
-  }
 
-  def test2 = {
+  def test2 =
     var x = 1
-    try {
+    try
       x = 2
-      try {
+      try
         x = 21
-      } catch {
+      catch
         case _: Throwable => x = 22
-      }
       x = 23
-    } catch {
+    catch
       case _: NullPointerException => x = 3
       case _: Throwable => x = 4
-    }
     x
-  }
 
-  def test3 = {
+  def test3 =
     var x = 1
-    try {
+    try
       try { x = 2 } catch { case _: Throwable => x = 4 }
-    } catch {
+    catch
       case _: NullPointerException => x = 3
       case _: Throwable => x = 4
-    }
     x
-  }
 
-  def test4 = {
+  def test4 =
     var x = 1
-    try {
+    try
       x = 2
-    } catch {
+    catch
       case _: NullPointerException => x = 3
       case _: Throwable => x = 4
-    }
-    try {
+    try
       x = 5
-    } catch {
+    catch
       case _: NullPointerException => x = 6
-    }
     x
-  }
 
-  def test5 = {
+  def test5 =
     var x = 1
-    try {
+    try
       x = 2
-    } catch {
+    catch
       case _: NullPointerException =>
         try { x = 3 } catch { case f: Throwable => throw f }
       case _: Throwable =>
         x = 4; try { x = 41 } catch { case _: Exception => x = 42 }; x = 43
-    }
     x
-  }
 
-  def test6: Int = {
+  def test6: Int =
     var x = 1
-    try {
+    try
       x = 2
       (null: String).toString
-    } catch {
+    catch
       case e: NullPointerException =>
         throw e
       case _: Throwable =>
         x = 3
         return 1000
-    } finally {
+    finally
       x = 4
       println(x)
-    }
     x
-  }
 
-  def test7 = {
+  def test7 =
     var x = 1
-    try {
+    try
       x = 2
-    } finally {
-      try {
+    finally
+      try
         x = 4
-      } catch {
+      catch
         case _: Throwable => x = 5
-      }
-    }
     x
-  }
 
-  def test8 = {
+  def test8 =
     var x = 1
-    try {
+    try
       throw new NullPointerException
-    } catch {
+    catch
       case e: Throwable => throw e
-    }
     x
-  }
 
-  def test9 = {
-    try {
-      "" match {
+  def test9 =
+    try
+      "" match
         case s: String => 10
-      }
-    } catch { case _: Throwable => 20 }
-  }
+    catch { case _: Throwable => 20 }
 
   var x10 = 1
-  def test10: Int = {
+  def test10: Int =
     try { 1 } catch { case e if (x10 == 1) => 1 }
-  }
 
-  def test11 {
+  def test11
     try { () } catch { case e: Throwable => () }
-  }
 
   class E1 extends Exception
   class E2 extends Exception
   class E3 extends Exception
 
   def test12_impl(op: => Int) =
-    try {
+    try
       op
-    } catch {
+    catch
       case e: E1 => 2
       case e: E2 => 3
       case e: E3 => 4
-    }
   def test12 =
     test12_impl(1) + test12_impl(throw new E1) + test12_impl(throw new E2) +
     test12_impl(throw new E3)
-}

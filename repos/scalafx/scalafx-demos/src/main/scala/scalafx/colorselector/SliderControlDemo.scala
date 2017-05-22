@@ -36,91 +36,78 @@ import scalafx.scene.control.{CheckBox, Label, TextField}
 import scalafx.scene.layout.{AnchorPane, ColumnConstraints, GridPane, Priority, VBox}
 import scalafx.scene.paint.Color
 
-object SliderControlDemo extends JFXApp {
+object SliderControlDemo extends JFXApp
 
   var initialized = false
 
   val sliderControl = new SliderControl("X")
 
-  val txfInputValue = new TextField {
+  val txfInputValue = new TextField
     alignmentInParent = Pos.BaselineLeft
     promptText = "Enter the value"
     hgrow = Priority.Never
-    onAction = handle {
+    onAction = handle
       sliderControl.value = text.get.toDouble
-    }
-  }
 
-  val lblOutputValue = new Label {
+  val lblOutputValue = new Label
     alignmentInParent = Pos.BaselineLeft
     text <== sliderControl.realValue.asString("%03.0f")
-  }
 
-  val chbSelected = new CheckBox {
+  val chbSelected = new CheckBox
     alignmentInParent = Pos.BaselineLeft
     selected <==> sliderControl.selectedControl
-  }
 
-  val chbEnabled = new CheckBox {
+  val chbEnabled = new CheckBox
     alignmentInParent = Pos.BaselineLeft
     selected <==> sliderControl.disable
-  }
 
-  val pnlControls = new GridPane {
-    add(new Label {
+  val pnlControls = new GridPane
+    add(new Label
       text = "Input Value"
-    }, 0, 0)
+    , 0, 0)
     add(txfInputValue, 1, 0)
-    add(new Label {
+    add(new Label
       text = "Output Value"
-    }, 2, 0)
+    , 2, 0)
     add(lblOutputValue, 3, 0)
-    add(new Label {
+    add(new Label
       text = "Selected"
-    }, 0, 1)
+    , 0, 1)
     add(chbSelected, 1, 1)
-    add(new Label {
+    add(new Label
       text = "Disabled"
-    }, 2, 1)
+    , 2, 1)
     add(chbEnabled, 3, 1)
     padding = insets
-  }
   GridPane.setHgrow(txfInputValue, Priority.Never)
   GridPane.setValignment(txfInputValue, VPos.Baseline)
   GridPane.setVgrow(txfInputValue, Priority.Never)
   GridPane.setHgrow(lblOutputValue, Priority.Never)
   GridPane.setValignment(lblOutputValue, VPos.Baseline)
   GridPane.setVgrow(lblOutputValue, Priority.Never)
-  val ccOdd = new ColumnConstraints {
+  val ccOdd = new ColumnConstraints
     halignment = HPos.Right
     hgrow = Priority.Never
-  }
-  val ccEven = new ColumnConstraints {
+  val ccEven = new ColumnConstraints
     halignment = HPos.Left
     hgrow = Priority.Sometimes
-  }
   pnlControls.columnConstraints = List(ccOdd, ccEven, ccOdd, ccEven)
 
-  val box = new VBox(5.0) {
+  val box = new VBox(5.0)
     children = List(sliderControl, pnlControls)
-  }
   VBox.setVgrow(sliderControl, Priority.Never)
   VBox.setVgrow(pnlControls, Priority.Always)
 
-  val mainScene = new Scene {
+  val mainScene = new Scene
     fill = Color.LightGray
-    content = new AnchorPane {
+    content = new AnchorPane
       children = List(box)
-    }
-  }
   box.prefWidth <== mainScene.width
   box.prefHeight <== mainScene.height
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "SliderControl Demo"
     width = 600
     height = 200
     scene = mainScene
-  }
   AnchorPane.setAnchors(box, 0, 0, 0, 0)
-}

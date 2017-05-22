@@ -38,7 +38,7 @@ case class APIKeyRecord(apiKey: APIKey,
                         grants: Set[GrantId],
                         isRoot: Boolean)
 
-object APIKeyRecord {
+object APIKeyRecord
   implicit val apiKeyRecordIso =
     Iso.hlist(APIKeyRecord.apply _, APIKeyRecord.unapply _)
 
@@ -64,5 +64,4 @@ object APIKeyRecord {
   implicit val decomposer: Decomposer[APIKeyRecord] = decomposerV1
   implicit val extractor: Extractor[APIKeyRecord] =
     extractorV2 <+> extractorV1 <+> extractorV0
-}
 // vim: set ts=4 sw=4 et:

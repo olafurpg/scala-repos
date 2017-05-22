@@ -25,6 +25,5 @@ package breeze.optimize.linear
   *
   * @author dlwh
   */
-trait BipartiteMatching {
+trait BipartiteMatching
   def extractMatching(weights: Seq[Seq[Double]]): (Seq[Int], Double);
-}

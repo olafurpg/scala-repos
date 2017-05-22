@@ -23,21 +23,19 @@ import Tags._
 
 import Utils.JumpBackByteArrayOutputStream
 
-object Serializers {
-  def serialize(stream: OutputStream, tree: Tree): Unit = {
+object Serializers
+  def serialize(stream: OutputStream, tree: Tree): Unit =
     new Serializer().serialize(stream, tree)
-  }
 
-  def deserialize(stream: InputStream, version: String): Tree = {
+  def deserialize(stream: InputStream, version: String): Tree =
     new Deserializer(stream, version).deserialize()
-  }
 
   // true for easier debugging (not for "production", it adds 8 bytes per node)
   private final val UseDebugMagic = false
   private final val DebugMagic = 0x3fa8ef84
   private final val PosDebugMagic = 0x65f0ec32
 
-  private object PositionFormat {
+  private object PositionFormat
     /* Positions are serialized incrementally as diffs wrt the last position.
      *
      * Formats are (the first byte is decomposed in bits):
@@ -68,9 +66,8 @@ object Serializers {
     final val FormatFullMaskValue = 0x7
 
     final val FormatNoPositionValue = -1
-  }
 
-  private final class Serializer {
+  private final class Serializer
     private[this] val bufferUnderlying = new JumpBackByteArrayOutputStream
     private[this] val buffer = new DataOutputStream(bufferUnderlying)
 
@@ -86,7 +83,7 @@ object Serializers {
 
     private[this] var lastPosition: Position = Position.NoPosition
 
-    def serialize(stream: OutputStream, tree: Tree): Unit = {
+    def serialize(stream: OutputStream, tree: Tree): Unit =
       // Write tree to buffer and record files and strings
       writeTree(tree)
 
@@ -104,12 +101,11 @@ object Serializers {
       bufferUnderlying.writeTo(s)
 
       s.flush()
-    }
 
-    def writeTree(tree: Tree): Unit = {
+    def writeTree(tree: Tree): Unit =
       import buffer._
       writePosition(tree.pos)
-      tree match {
+      tree match
         case EmptyTree =>
           writeByte(TagEmptyTree)
 
@@ -173,9 +169,8 @@ object Serializers {
           writeByte(TagMatch)
           writeTree(selector)
           writeInt(cases.size)
-          cases foreach { caze =>
+          cases foreach  caze =>
             writeTrees(caze._1); writeTree(caze._2)
-          }
           writeTree(default)
           writeType(tree.tpe)
 
@@ -333,9 +328,8 @@ object Serializers {
         case JSObjectConstr(fields) =>
           writeByte(TagJSObjectConstr)
           writeInt(fields.size)
-          fields foreach { field =>
+          fields foreach  field =>
             writePropertyName(field._1); writeTree(field._2)
-          }
 
         case JSLinkingInfo() =>
           writeByte(TagJSLinkingInfo)
@@ -409,14 +403,13 @@ object Serializers {
           /* TODO Simply use `writePropertyName` when we can break binary
            * compatibility.
            */
-          name match {
+          name match
             case name: Ident =>
               writeByte(TagFieldDef)
               writeIdent(name)
             case name: StringLiteral =>
               writeByte(TagStringLitFieldDef)
               writeTree(name)
-          }
           writeType(ftpe); writeBoolean(mutable)
 
         case methodDef: MethodDef =>
@@ -455,32 +448,26 @@ object Serializers {
         case ModuleExportDef(fullName) =>
           writeByte(TagModuleExportDef)
           writeString(fullName)
-      }
       if (UseDebugMagic) writeInt(DebugMagic)
-    }
 
-    def writeTrees(trees: List[Tree]): Unit = {
+    def writeTrees(trees: List[Tree]): Unit =
       buffer.writeInt(trees.size)
       trees.foreach(writeTree)
-    }
 
-    def writeIdent(ident: Ident): Unit = {
+    def writeIdent(ident: Ident): Unit =
       writePosition(ident.pos)
       writeString(ident.name); writeString(ident.originalName.getOrElse(""))
-    }
 
-    def writeIdents(idents: List[Ident]): Unit = {
+    def writeIdents(idents: List[Ident]): Unit =
       buffer.writeInt(idents.size)
       idents.foreach(writeIdent)
-    }
 
-    def writeOptIdent(optIdent: Option[Ident]): Unit = {
+    def writeOptIdent(optIdent: Option[Ident]): Unit =
       buffer.writeBoolean(optIdent.isDefined)
       optIdent.foreach(writeIdent)
-    }
 
-    def writeType(tpe: Type): Unit = {
-      tpe match {
+    def writeType(tpe: Type): Unit =
+      tpe match
         case AnyType => buffer.write(TagAnyType)
         case NothingType => buffer.write(TagNothingType)
         case UndefType => buffer.write(TagUndefType)
@@ -504,90 +491,77 @@ object Serializers {
         case RecordType(fields) =>
           buffer.write(TagRecordType)
           buffer.writeInt(fields.size)
-          for (RecordType.Field(name, originalName, tpe, mutable) <- fields) {
+          for (RecordType.Field(name, originalName, tpe, mutable) <- fields)
             writeString(name)
             writeString(originalName.getOrElse(""))
             writeType(tpe)
             buffer.writeBoolean(mutable)
-          }
-      }
-    }
 
     def writeClassType(tpe: ClassType): Unit =
       writeString(tpe.className)
 
-    def writeArrayType(tpe: ArrayType): Unit = {
+    def writeArrayType(tpe: ArrayType): Unit =
       writeString(tpe.baseClassName)
       buffer.writeInt(tpe.dimensions)
-    }
 
     def writeReferenceType(tpe: ReferenceType): Unit =
       writeType(tpe.asInstanceOf[Type])
 
-    def writePropertyName(name: PropertyName): Unit = {
-      name match {
+    def writePropertyName(name: PropertyName): Unit =
+      name match
         case name: Ident => buffer.writeBoolean(true); writeIdent(name)
         case name: StringLiteral => buffer.writeBoolean(false); writeTree(name)
-      }
-    }
 
-    def writePosition(pos: Position): Unit = {
+    def writePosition(pos: Position): Unit =
       import buffer._
       import PositionFormat._
 
-      def writeFull(): Unit = {
+      def writeFull(): Unit =
         writeByte(FormatFullMaskValue)
         writeInt(fileToIndex(pos.source))
         writeInt(pos.line)
         writeInt(pos.column)
-      }
 
-      if (pos == Position.NoPosition) {
+      if (pos == Position.NoPosition)
         writeByte(FormatNoPositionValue)
-      } else if (lastPosition == Position.NoPosition ||
-                 pos.source != lastPosition.source) {
+      else if (lastPosition == Position.NoPosition ||
+                 pos.source != lastPosition.source)
         writeFull()
         lastPosition = pos
-      } else {
+      else
         val line = pos.line
         val column = pos.column
         val lineDiff = line - lastPosition.line
         val columnDiff = column - lastPosition.column
         val columnIsByte = column >= 0 && column < 256
 
-        if (lineDiff == 0 && columnDiff >= -64 && columnDiff < 64) {
+        if (lineDiff == 0 && columnDiff >= -64 && columnDiff < 64)
           writeByte((columnDiff << Format1Shift) | Format1MaskValue)
-        } else if (lineDiff >= -32 && lineDiff < 32 && columnIsByte) {
+        else if (lineDiff >= -32 && lineDiff < 32 && columnIsByte)
           writeByte((lineDiff << Format2Shift) | Format2MaskValue)
           writeByte(column)
-        } else if (lineDiff >= Short.MinValue && lineDiff <= Short.MaxValue &&
-                   columnIsByte) {
+        else if (lineDiff >= Short.MinValue && lineDiff <= Short.MaxValue &&
+                   columnIsByte)
           writeByte(Format3MaskValue)
           writeShort(lineDiff)
           writeByte(column)
-        } else {
+        else
           writeFull()
-        }
 
         lastPosition = pos
-      }
 
       if (UseDebugMagic) writeInt(PosDebugMagic)
-    }
 
-    def writeOptHash(optHash: Option[TreeHash]): Unit = {
+    def writeOptHash(optHash: Option[TreeHash]): Unit =
       buffer.writeBoolean(optHash.isDefined)
-      for (hash <- optHash) {
+      for (hash <- optHash)
         buffer.write(hash.treeHash)
         buffer.write(hash.posHash)
-      }
-    }
 
     def writeString(s: String): Unit =
       buffer.writeInt(stringToIndex(s))
-  }
 
-  private final class Deserializer(stream: InputStream, sourceVersion: String) {
+  private final class Deserializer(stream: InputStream, sourceVersion: String)
     private[this] val useHacks060 = sourceVersion == "0.6.0"
     private[this] val useHacks065 =
       Set("0.6.0", "0.6.3", "0.6.4", "0.6.5").contains(sourceVersion)
@@ -604,15 +578,14 @@ object Serializers {
 
     private[this] var foundArguments: Boolean = false
 
-    def deserialize(): Tree = {
+    def deserialize(): Tree =
       readTree()
-    }
 
-    def readTree(): Tree = {
+    def readTree(): Tree =
       import input._
       implicit val pos = readPosition()
       val tag = readByte()
-      val result = (tag: @switch) match {
+      val result = (tag: @switch) match
         case TagEmptyTree => EmptyTree
 
         case TagVarDef =>
@@ -636,9 +609,9 @@ object Serializers {
         case TagThrow => Throw(readTree())
         case TagContinue => Continue(readOptIdent())
         case TagMatch =>
-          Match(readTree(), List.fill(readInt()) {
+          Match(readTree(), List.fill(readInt())
             (readTrees().map(_.asInstanceOf[Literal]), readTree())
-          }, readTree())(readType())
+          , readTree())(readType())
         case TagDebugger => Debugger()
 
         case TagNew => New(readClassType(), readIdent(), readTrees())
@@ -731,16 +704,14 @@ object Serializers {
           val jsName = Some(readString()).filter(_ != "")
           val defs0 = readTrees()
           val defs =
-            if (useHacks065) {
-              defs0.filter {
+            if (useHacks065)
+              defs0.filter
                 case MethodDef(_, Ident(name, _), _, _, _) =>
                   !Definitions.isReflProxyName(name)
                 case _ =>
                   true
-              }
-            } else {
+            else
               defs0
-            }
           val optimizerHints = new OptimizerHints(readInt())
           ClassDef(name, kind, superClass, parents, jsName, defs)(
               optimizerHints)
@@ -767,19 +738,17 @@ object Serializers {
                       readType(),
                       readTree())(new OptimizerHints(readInt()), optHash)
           val result2 =
-            if (foundArguments) {
+            if (foundArguments)
               foundArguments = false
               new RewriteArgumentsTransformer().transformMethodDef(result1)
-            } else {
+            else
               result1
-            }
           if (useHacks065 && result2.resultType != NoType &&
-              isConstructorName(result2.name.name)) {
+              isConstructorName(result2.name.name))
             result2.copy(resultType = NoType, body = result2.body)(
                 result2.optimizerHints, result2.hash)(result2.pos)
-          } else {
+          else
             result2
-          }
         case TagPropertyDef =>
           PropertyDef(readPropertyName(),
                       readTree(),
@@ -788,25 +757,21 @@ object Serializers {
         case TagConstructorExportDef =>
           val result = ConstructorExportDef(
               readString(), readParamDefs(), readTree())
-          if (foundArguments) {
+          if (foundArguments)
             foundArguments = false
             new RewriteArgumentsTransformer()
               .transformConstructorExportDef(result)
-          } else {
+          else
             result
-          }
         case TagJSClassExportDef =>
           JSClassExportDef(readString())
         case TagModuleExportDef =>
           ModuleExportDef(readString())
-      }
-      if (UseDebugMagic) {
+      if (UseDebugMagic)
         val magic = readInt()
         assert(magic == DebugMagic,
                s"Bad magic after reading a ${result.getClass}!")
-      }
       result
-    }
 
     def readTrees(): List[Tree] =
       List.fill(input.readInt())(readTree())
@@ -814,24 +779,22 @@ object Serializers {
     def readParamDefs(): List[ParamDef] =
       readTrees().map(_.asInstanceOf[ParamDef])
 
-    def readIdent(): Ident = {
+    def readIdent(): Ident =
       implicit val pos = readPosition()
       val name = readString()
       val originalName = readString()
       Ident(name, if (originalName.isEmpty) None else Some(originalName))
-    }
 
     def readIdents(): List[Ident] =
       List.fill(input.readInt())(readIdent())
 
-    def readOptIdent(): Option[Ident] = {
+    def readOptIdent(): Option[Ident] =
       if (input.readBoolean()) Some(readIdent())
       else None
-    }
 
-    def readType(): Type = {
+    def readType(): Type =
       val tag = input.readByte()
-      (tag: @switch) match {
+      (tag: @switch) match
         case TagAnyType => AnyType
         case TagNothingType => NothingType
         case TagUndefType => UndefType
@@ -848,7 +811,7 @@ object Serializers {
         case TagArrayType => readArrayType()
 
         case TagRecordType =>
-          RecordType(List.fill(input.readInt()) {
+          RecordType(List.fill(input.readInt())
             val name = readString()
             val originalName = readString()
             val tpe = readType()
@@ -858,9 +821,7 @@ object Serializers {
                              else Some(originalName),
                              tpe,
                              mutable)
-          })
-      }
-    }
+          )
 
     def readClassType(): ClassType =
       ClassType(readString())
@@ -871,41 +832,40 @@ object Serializers {
     def readReferenceType(): ReferenceType =
       readType().asInstanceOf[ReferenceType]
 
-    def readPropertyName(): PropertyName = {
+    def readPropertyName(): PropertyName =
       if (input.readBoolean()) readIdent()
       else readTree().asInstanceOf[StringLiteral]
-    }
 
-    def readPosition(): Position = {
+    def readPosition(): Position =
       import input._
       import PositionFormat._
 
       val first = readByte()
 
       val result =
-        if (first == FormatNoPositionValue) {
+        if (first == FormatNoPositionValue)
           Position.NoPosition
-        } else {
+        else
           val result =
-            if ((first & FormatFullMask) == FormatFullMaskValue) {
+            if ((first & FormatFullMask) == FormatFullMaskValue)
               val file = files(readInt())
               val line = readInt()
               val column = readInt()
               Position(file, line, column)
-            } else {
+            else
               assert(lastPosition != NoPosition,
                      "Position format error: first position must be full")
-              if ((first & Format1Mask) == Format1MaskValue) {
+              if ((first & Format1Mask) == Format1MaskValue)
                 val columnDiff = first >> Format1Shift
                 Position(lastPosition.source,
                          lastPosition.line,
                          lastPosition.column + columnDiff)
-              } else if ((first & Format2Mask) == Format2MaskValue) {
+              else if ((first & Format2Mask) == Format2MaskValue)
                 val lineDiff = first >> Format2Shift
                 val column = readByte() & 0xff // unsigned
                 Position(
                     lastPosition.source, lastPosition.line + lineDiff, column)
-              } else {
+              else
                 assert(
                     (first & Format3Mask) == Format3MaskValue,
                     s"Position format error: first byte $first does not match any format")
@@ -913,42 +873,34 @@ object Serializers {
                 val column = readByte() & 0xff // unsigned
                 Position(
                     lastPosition.source, lastPosition.line + lineDiff, column)
-              }
-            }
           lastPosition = result
           result
-        }
 
-      if (UseDebugMagic) {
+      if (UseDebugMagic)
         val magic = readInt()
         assert(magic == PosDebugMagic,
                s"Bad magic after reading position with first byte $first")
-      }
 
       result
-    }
 
-    def readOptHash(): Option[TreeHash] = {
-      if (input.readBoolean()) {
+    def readOptHash(): Option[TreeHash] =
+      if (input.readBoolean())
         val treeHash = new Array[Byte](20)
         val posHash = new Array[Byte](20)
         input.readFully(treeHash)
         input.readFully(posHash)
         Some(new TreeHash(treeHash, posHash))
-      } else None
-    }
+      else None
 
-    def readString(): String = {
+    def readString(): String =
       strings(input.readInt())
-    }
-  }
 
-  private class RewriteArgumentsTransformer extends Transformers.Transformer {
+  private class RewriteArgumentsTransformer extends Transformers.Transformer
     import RewriteArgumentsTransformer._
 
     private[this] var paramToIndex: Map[String, Int] = _
 
-    def transformMethodDef(tree: MethodDef): MethodDef = {
+    def transformMethodDef(tree: MethodDef): MethodDef =
       /* Ideally, we would re-hash the new MethodDef here, but we cannot do
        * that because it prevents the JS version of the tools to link.
        * Since the hashes of exported methods are not used by our pipeline
@@ -962,16 +914,14 @@ object Serializers {
                 resultType,
                 transform(body, isStat = resultType == NoType))(
           tree.optimizerHints, None)(tree.pos)
-    }
 
     def transformConstructorExportDef(
-        tree: ConstructorExportDef): ConstructorExportDef = {
+        tree: ConstructorExportDef): ConstructorExportDef =
       val ConstructorExportDef(name, args, body) = tree
       setupParamToIndex(args)
       ConstructorExportDef(name,
                            List(argumentsParamDef(tree.pos)),
                            transformStat(body))(tree.pos)
-    }
 
     private def setupParamToIndex(params: List[ParamDef]): Unit =
       paramToIndex = params.map(_.name.name).zipWithIndex.toMap
@@ -982,24 +932,19 @@ object Serializers {
     private def argumentsRef(implicit pos: Position): VarRef =
       VarRef(Ident(ArgumentsName))(AnyType)
 
-    override def transform(tree: Tree, isStat: Boolean): Tree = tree match {
+    override def transform(tree: Tree, isStat: Boolean): Tree = tree match
       case VarRef(Ident(name, origName)) =>
         implicit val pos = tree.pos
         paramToIndex
           .get(name)
-          .fold {
+          .fold
             if (name == "arguments") argumentsRef
             else tree
-          } { paramIndex =>
+           paramIndex =>
             JSBracketSelect(argumentsRef, IntLiteral(paramIndex))
-          }
 
       case _ =>
         super.transform(tree, isStat)
-    }
-  }
 
-  private object RewriteArgumentsTransformer {
+  private object RewriteArgumentsTransformer
     private final val ArgumentsName = "$arguments"
-  }
-}

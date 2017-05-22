@@ -29,7 +29,7 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
-class MacroExpandAction extends AnAction {
+class MacroExpandAction extends AnAction
 
   case class ResolvedMacroExpansion(
       expansion: MacroExpansion,
@@ -38,7 +38,7 @@ class MacroExpandAction extends AnAction {
 
   private val LOG = Logger.getInstance(getClass)
 
-  override def actionPerformed(e: AnActionEvent): Unit = {
+  override def actionPerformed(e: AnActionEvent): Unit =
 
     implicit val currentEvent = e
 
@@ -49,17 +49,15 @@ class MacroExpandAction extends AnAction {
     val psiFile = PsiDocumentManager
       .getInstance(e.getProject)
       .getPsiFile(sourceEditor.getDocument)
-    val candidates = psiFile match {
+    val candidates = psiFile match
       case file: ScalaFile => findCandidatesInFile(file)
       case _ => Seq.empty
-    }
 
     suggestUsingCompilerFlag(e, psiFile)
 
     val expansions = deserializeExpansions(e)
-    val filtered = expansions.filter { exp =>
+    val filtered = expansions.filter  exp =>
       psiFile.getVirtualFile.getPath == exp.place.sourceFile
-    }
     val ensugared =
       filtered.map(e => MacroExpansion(e.place, ensugarExpansion(e.body)))
     val resolved = tryResolveExpansionPlaces(ensugared)
@@ -71,91 +69,73 @@ class MacroExpandAction extends AnAction {
           1)
       .map(expandMacroUnderCursor)
       .getOrElse(expandAllMacroInCurrentFile(resolved))
-  }
 
   def expandMacroUnderCursor(expansion: ResolvedMacroExpansion)(
-      implicit e: AnActionEvent) = {
-    inWriteCommandAction(e.getProject) {
-      try {
+      implicit e: AnActionEvent) =
+    inWriteCommandAction(e.getProject)
+      try
         applyExpansion(expansion)
-      } catch {
+      catch
         case e: UnresolvedExpansion =>
           LOG.warn(
               s"unable to expand ${expansion.expansion.place}, cannot resolve place, skipping")
-      }
       e.getProject
-    }
-  }
 
   def expandAllMacroInCurrentFile(expansions: Seq[ResolvedMacroExpansion])(
-      implicit e: AnActionEvent) = {
-    inWriteCommandAction(e.getProject) {
+      implicit e: AnActionEvent) =
+    inWriteCommandAction(e.getProject)
       applyExpansions(expansions.toList)
       e.getProject
-    }
-  }
 
-  def findCandidatesInFile(file: ScalaFile): Seq[ScalaPsiElement] = {
+  def findCandidatesInFile(file: ScalaFile): Seq[ScalaPsiElement] =
     val buffer = scala.collection.mutable.ListBuffer[ScalaPsiElement]()
-    val visitor = new ScalaRecursiveElementVisitor {
-      override def visitAnnotation(annotation: ScAnnotation) = {
+    val visitor = new ScalaRecursiveElementVisitor
+      override def visitAnnotation(annotation: ScAnnotation) =
         // TODO
-      }
-      override def visitMethodCallExpression(call: ScMethodCall) = {
+      override def visitMethodCallExpression(call: ScMethodCall) =
         // TODO
-      }
-    }
     file.accept(visitor)
     buffer.toSeq
-  }
 
   @throws[UnresolvedExpansion]
   def applyExpansion(resolved: ResolvedMacroExpansion)(
-      implicit e: AnActionEvent): Unit = {
+      implicit e: AnActionEvent): Unit =
     if (resolved.psiElement.isEmpty) throw new UnresolvedExpansion
-    if (resolved.expansion.body.isEmpty) {
+    if (resolved.expansion.body.isEmpty)
       LOG.warn(s"got empty expansion at ${resolved.expansion.place}, skipping")
       return
-    }
-    resolved.psiElement.get.getElement match {
+    resolved.psiElement.get.getElement match
       case (annot: ScAnnotation) =>
         expandAnnotation(annot, resolved.expansion)
       case (mc: ScMethodCall) =>
         expandMacroCall(mc, resolved.expansion)
       case (other) => () // unreachable
-    }
-  }
 
-  def reformatCode(psi: PsiElement): PsiElement = {
+  def reformatCode(psi: PsiElement): PsiElement =
     val res = CodeStyleManager.getInstance(psi.getProject).reformat(psi)
     val tobeDeleted = new ArrayBuffer[PsiElement]
-    val v = new PsiElementVisitor {
-      override def visitElement(element: PsiElement) = {
-        if (element.getNode.getElementType == ScalaTokenTypes.tSEMICOLON) {
+    val v = new PsiElementVisitor
+      override def visitElement(element: PsiElement) =
+        if (element.getNode.getElementType == ScalaTokenTypes.tSEMICOLON)
           val file = element.getContainingFile
           val nextLeaf = file.findElementAt(element.getTextRange.getEndOffset)
           if (nextLeaf.isInstanceOf[PsiWhiteSpace] &&
-              nextLeaf.getText.contains("\n")) {
+              nextLeaf.getText.contains("\n"))
             tobeDeleted += element
-          }
-        }
         element.acceptChildren(this)
-      }
-    }
     v.visitElement(res)
     tobeDeleted.foreach(_.delete())
     res
-  }
 
   def applyExpansions(expansions: Seq[ResolvedMacroExpansion],
                       triedResolving: Boolean = false)(
-      implicit e: AnActionEvent): Unit = {
-    expansions match {
+      implicit e: AnActionEvent): Unit =
+    expansions match
       case x :: xs =>
-        try {
+        try
           applyExpansion(x)
           applyExpansions(xs)
-        } catch {
+        catch
           case exc: UnresolvedExpansion if !triedResolving =>
             applyExpansions(tryResolveExpansionPlace(x.expansion) :: xs,
                             triedResolving = true)
@@ -163,22 +143,19 @@ class MacroExpandAction extends AnAction {
             LOG.warn(
                 s"unable to expand ${x.expansion.place}, cannot resolve place, skipping")
             applyExpansions(xs)
-        }
       case Nil =>
-    }
-  }
 
   def expandAnnotation(place: ScAnnotation, expansion: MacroExpansion)(
-      implicit e: AnActionEvent) = {
+      implicit e: AnActionEvent) =
     // we can only macro-annotate scala code
-    place.getParent.getParent match {
+    place.getParent.getParent match
       case holder: ScAnnotationsHolder =>
         val body = expansion.body
         val newPsi =
           ScalaPsiElementFactory.createBlockExpressionWithoutBracesFromText(
               body, PsiManager.getInstance(e.getProject))
         reformatCode(newPsi)
-        newPsi.firstChild match {
+        newPsi.firstChild match
           case Some(block: ScBlock) =>
             // insert content of block expression(annotation can generate >1 expression)
             val children = block.getChildren
@@ -195,53 +172,45 @@ class MacroExpandAction extends AnAction {
             result.putCopyableUserData(
                 MacroExpandAction.EXPANDED_KEY, holder.getText)
           case None => LOG.warn(s"Failed to parse expansion: $body")
-        }
       case other =>
         LOG.warn(s"Unexpected annotated element: $other at ${other.getText}")
-    }
-  }
 
   def expandMacroCall(call: ScMethodCall, expansion: MacroExpansion)(
-      implicit e: AnActionEvent) = {
+      implicit e: AnActionEvent) =
     val blockImpl =
       ScalaPsiElementFactory.createBlockExpressionWithoutBracesFromText(
           expansion.body, PsiManager.getInstance(e.getProject))
     val element = call.getParent.addAfter(blockImpl, call)
-    element match {
+    element match
       case ScBlock(x, _ *) =>
         x.putCopyableUserData(MacroExpandAction.EXPANDED_KEY, call.getText)
       case _ => // unreachable
-    }
     call.delete()
     reformatCode(element)
-  }
 
   def tryResolveExpansionPlace(expansion: MacroExpansion)(
-      implicit e: AnActionEvent): ResolvedMacroExpansion = {
+      implicit e: AnActionEvent): ResolvedMacroExpansion =
     ResolvedMacroExpansion(
         expansion,
         getRealOwner(expansion).map(new IdentitySmartPointer[PsiElement](_)))
-  }
 
   def tryResolveExpansionPlaces(expansions: Seq[MacroExpansion])(
-      implicit e: AnActionEvent): Seq[ResolvedMacroExpansion] = {
+      implicit e: AnActionEvent): Seq[ResolvedMacroExpansion] =
     expansions.map(tryResolveExpansionPlace)
-  }
 
   def getRealOwner(expansion: MacroExpansion)(
-      implicit e: AnActionEvent): Option[PsiElement] = {
+      implicit e: AnActionEvent): Option[PsiElement] =
     val virtualFile = VirtualFileManager
       .getInstance()
       .findFileByUrl("file://" + expansion.place.sourceFile)
     val psiFile = PsiManager.getInstance(e.getProject).findFile(virtualFile)
-    psiFile.findElementAt(expansion.place.offset) match {
+    psiFile.findElementAt(expansion.place.offset) match
       // macro method call has offset pointing to '(', not method name
       case e: LeafPsiElement if e.findReferenceAt(0) == null =>
-        def walkUp(elem: PsiElement = e): Option[PsiElement] = elem match {
+        def walkUp(elem: PsiElement = e): Option[PsiElement] = elem match
           case null => None
           case m: ScMethodCall => Some(m)
           case e: PsiElement => walkUp(e.getParent)
-        }
         walkUp()
       // handle macro calls with incorrect offset pointing to macro annotation
       // most likely it means given call is located inside another macro expansion
@@ -253,39 +222,32 @@ class MacroExpandAction extends AnAction {
         else None
       // macro annotations
       case e: LeafPsiElement =>
-        def walkUp(elem: PsiElement = e): Option[PsiElement] = elem match {
+        def walkUp(elem: PsiElement = e): Option[PsiElement] = elem match
           case null => None
           case a: ScAnnotation => Some(a)
           case e: PsiElement => walkUp(e.getParent)
-        }
         walkUp()
       case _ => None
-    }
-  }
 
   def isMacroAnnotation(expansion: MacroExpansion)(
-      implicit e: AnActionEvent): Boolean = {
-    getRealOwner(expansion) match {
+      implicit e: AnActionEvent): Boolean =
+    getRealOwner(expansion) match
       case Some(_: ScAnnotation) => true
       case Some(_: ScMethodCall) => false
       case Some(other) => false
       case None => false
-    }
-  }
 
-  def ensugarExpansion(text: String): String = {
+  def ensugarExpansion(text: String): String =
 
     @tailrec
     def applyRules(
-        rules: Seq[(String, String)], input: String = text): String = {
+        rules: Seq[(String, String)], input: String = text): String =
       def pat(p: String) =
         Pattern.compile(p, Pattern.DOTALL | Pattern.MULTILINE)
-      rules match {
+      rules match
         case (pattern, replacement) :: xs =>
           applyRules(xs, pat(pattern).matcher(input).replaceAll(replacement))
         case Nil => input
-      }
-    }
 
     val rules = Seq(
         "\\<init\\>" -> "this", // replace constructor names
@@ -296,23 +258,20 @@ class MacroExpandAction extends AnAction {
     )
 
     applyRules(rules)
-  }
 
   def deserializeExpansions(
-      implicit event: AnActionEvent): Seq[MacroExpansion] = {
+      implicit event: AnActionEvent): Seq[MacroExpansion] =
     val file = new File(
         PathManager.getSystemPath + s"/expansion-${event.getProject.getName}")
     if (!file.exists()) return Seq.empty
     val fs = new BufferedInputStream(new FileInputStream(file))
     val os = new ObjectInputStream(fs)
     val res = scala.collection.mutable.ListBuffer[MacroExpansion]()
-    while (fs.available() > 0) {
+    while (fs.available() > 0)
       res += os.readObject().asInstanceOf[MacroExpansion]
-    }
     res
-  }
 
-  def suggestUsingCompilerFlag(e: AnActionEvent, file: PsiFile): Unit = {
+  def suggestUsingCompilerFlag(e: AnActionEvent, file: PsiFile): Unit =
 
     import org.jetbrains.plugins.scala.project._
 
@@ -326,7 +285,7 @@ class MacroExpandAction extends AnAction {
     val state = module.scalaCompilerSettings.getState
 
     val options = state.additionalCompilerOptions.to[mutable.ListBuffer]
-    if (!options.contains(MacroExpandAction.MACRO_DEBUG_OPTION)) {
+    if (!options.contains(MacroExpandAction.MACRO_DEBUG_OPTION))
       options += MacroExpandAction.MACRO_DEBUG_OPTION
       state.additionalCompilerOptions = options.toArray
       module.scalaCompilerSettings.loadState(state)
@@ -337,13 +296,9 @@ class MacroExpandAction extends AnAction {
             |Please recompile the file to gather macro expansions""".stripMargin,
             NotificationType.INFORMATION)
         .notify(e.getProject)
-    }
-  }
-}
 
-object MacroExpandAction {
+object MacroExpandAction
 
   val MACRO_DEBUG_OPTION = "-Ymacro-debug-lite"
 
   val EXPANDED_KEY = new Key[String]("MACRO_EXPANDED_KEY")
-}

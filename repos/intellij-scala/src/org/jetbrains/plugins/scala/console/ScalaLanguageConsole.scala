@@ -18,7 +18,7 @@ import scala.collection.mutable
   * Date: 18.10.11
   */
 class ScalaLanguageConsole(project: Project, title: String)
-    extends LanguageConsoleImpl(project, title, ScalaFileType.SCALA_LANGUAGE) {
+    extends LanguageConsoleImpl(project, title, ScalaFileType.SCALA_LANGUAGE)
   private val textBuffer = new StringBuilder
   private var scalaFile =
     ScalaPsiElementFactory.createScalaFileFromText("1", project)
@@ -26,24 +26,23 @@ class ScalaLanguageConsole(project: Project, title: String)
 
   def getHistory = textBuffer.toString()
 
-  override def attachToProcess(processHandler: ProcessHandler): Unit = {
+  override def attachToProcess(processHandler: ProcessHandler): Unit =
     super.attachToProcess(processHandler)
     val controller = new ConsoleHistoryController(
         ScalaLanguageConsoleView.SCALA_CONSOLE_ROOT_TYPE, null, this)
     controller.install()
 
     ScalaConsoleInfo.addConsole(this, controller, processHandler)
-  }
 
-  private[console] def textSent(text: String) {
+  private[console] def textSent(text: String)
     textBuffer.append(text)
     scalaFile = ScalaPsiElementFactory.createScalaFileFromText(
         textBuffer.toString() + ";\n1", project)
     val types = new mutable.HashMap[String, TextRange]
     val values = new mutable.HashMap[String, (TextRange, Boolean)]
     def addValue(
-        name: String, range: TextRange, replaceWithPlaceholder: Boolean) {
-      values.get(name) match {
+        name: String, range: TextRange, replaceWithPlaceholder: Boolean)
+      values.get(name) match
         case Some((oldRange, r)) =>
           val newText =
             if (r) "_" + StringUtil.repeatSymbol(' ', oldRange.getLength - 1)
@@ -51,20 +50,16 @@ class ScalaLanguageConsole(project: Project, title: String)
           textBuffer.replace(
               oldRange.getStartOffset, oldRange.getEndOffset, newText)
         case None =>
-      }
       values.put(name, (range, replaceWithPlaceholder))
-    }
-    def addType(name: String, range: TextRange) {
-      types.get(name) match {
+    def addType(name: String, range: TextRange)
+      types.get(name) match
         case Some(oldRange) =>
           val newText = StringUtil.repeatSymbol(' ', oldRange.getLength)
           textBuffer.replace(
               oldRange.getStartOffset, oldRange.getEndOffset, newText)
         case None =>
-      }
       types.put(name, range)
-    }
-    scalaFile.getChildren.foreach {
+    scalaFile.getChildren.foreach
       case v: ScValue =>
         v.declaredElements.foreach(td =>
               addValue(td.name,
@@ -83,11 +78,8 @@ class ScalaLanguageConsole(project: Project, title: String)
       case c: ScTrait => addType(c.name, c.nameId.getTextRange)
       case t: ScTypeAlias => addType(t.name, t.nameId.getTextRange)
       case _ => //do nothing
-    }
     scalaFile = ScalaPsiElementFactory.createScalaFileFromText(
         textBuffer.toString() + ";\n1", project)
     getFile
       .asInstanceOf[ScalaFile]
       .setContext(scalaFile, scalaFile.getLastChild)
-  }
-}

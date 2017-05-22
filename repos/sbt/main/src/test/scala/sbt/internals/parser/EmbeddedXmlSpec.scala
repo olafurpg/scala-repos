@@ -2,11 +2,11 @@ package sbt.internals.parser
 
 import sbt.internal.util.MessageOnlyException
 
-class EmbeddedXmlSpec extends CheckIfParsedSpec {
+class EmbeddedXmlSpec extends CheckIfParsedSpec
 
-  "File with xml content " should {
+  "File with xml content " should
 
-    "Handle last xml part" in {
+    "Handle last xml part" in
       val errorLine = """<version>4.0<version>"""
       val buildSbt = s"""|
                          |
@@ -29,7 +29,7 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
                          |
                          |""".stripMargin
 
-      split(buildSbt) must throwA[MessageOnlyException].like {
+      split(buildSbt) must throwA[MessageOnlyException].like
         case exception =>
           val index =
             buildSbt.lines.indexWhere(line => line.contains(errorLine)) + 1
@@ -37,9 +37,6 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
           val message = exception.getMessage
           val list = numberRegex.findAllIn(message).toList
           list must contain(index.toString)
-      }
-    }
-  }
 
   protected val files = Seq(
       ("""
@@ -154,4 +151,3 @@ class EmbeddedXmlSpec extends CheckIfParsedSpec {
        false,
        true)
   )
-}

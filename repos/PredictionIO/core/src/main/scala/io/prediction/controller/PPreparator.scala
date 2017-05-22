@@ -26,11 +26,10 @@ import org.apache.spark.SparkContext
   * @tparam PD Prepared data class.
   * @group Preparator
   */
-abstract class PPreparator[TD, PD] extends BasePreparator[TD, PD] {
+abstract class PPreparator[TD, PD] extends BasePreparator[TD, PD]
 
-  def prepareBase(sc: SparkContext, td: TD): PD = {
+  def prepareBase(sc: SparkContext, td: TD): PD =
     prepare(sc, td)
-  }
 
   /** Implement this method to produce prepared data that is ready for model
     * training.
@@ -39,4 +38,3 @@ abstract class PPreparator[TD, PD] extends BasePreparator[TD, PD] {
     * @param trainingData Training data to be prepared.
     */
   def prepare(sc: SparkContext, trainingData: TD): PD
-}

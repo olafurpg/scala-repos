@@ -43,11 +43,10 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class BackgroundFillSpec
     extends SimpleSFXDelegateSpec[jfxsl.BackgroundFill, BackgroundFill](
-        classOf[jfxsl.BackgroundFill], classOf[BackgroundFill]) {
+        classOf[jfxsl.BackgroundFill], classOf[BackgroundFill])
 
   override protected def getScalaClassInstance =
     new BackgroundFill(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance =
     new jfxsl.BackgroundFill(Color.White, CornerRadii.Empty, Insets(0))
-}

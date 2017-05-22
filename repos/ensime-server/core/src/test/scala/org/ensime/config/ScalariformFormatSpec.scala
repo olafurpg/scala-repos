@@ -8,7 +8,7 @@ import org.ensime.util.EnsimeSpec
 
 import scalariform.formatter.preferences._
 
-class ScalariformFormatSpec extends EnsimeSpec {
+class ScalariformFormatSpec extends EnsimeSpec
 
   object ScalariformProtocol extends DefaultSexpProtocol with ScalariformFormat
   import ScalariformProtocol._
@@ -17,14 +17,13 @@ class ScalariformFormatSpec extends EnsimeSpec {
     .setPreference(DoubleIndentClassDeclaration, true)
     .setPreference(IndentSpaces, 13)
 
-  "ScalariformFormat" should "parse some example config" in {
+  "ScalariformFormat" should "parse some example config" in
     val text = """(:doubleIndentClassDeclaration t
                      :indentSpaces 13)"""
     val recover = text.parseSexp.convertTo[FormattingPreferences]
     recover.preferencesMap shouldBe prefs.preferencesMap
-  }
 
-  it should "create valid output" in {
+  it should "create valid output" in
     prefs.toSexp should ===(
         SexpList(
             SexpSymbol(":doubleIndentClassDeclaration"),
@@ -32,5 +31,3 @@ class ScalariformFormatSpec extends EnsimeSpec {
             SexpSymbol(":indentSpaces"),
             SexpNumber(13)
         ))
-  }
-}

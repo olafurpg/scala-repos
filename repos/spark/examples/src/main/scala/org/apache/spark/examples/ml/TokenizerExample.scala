@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.{RegexTokenizer, Tokenizer}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object TokenizerExample {
-  def main(args: Array[String]): Unit = {
+object TokenizerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("TokenizerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -52,6 +52,4 @@ object TokenizerExample {
     regexTokenized.select("words", "label").take(3).foreach(println)
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

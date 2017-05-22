@@ -14,34 +14,29 @@ import org.scalatest.BeforeAndAfterEach
 
 import scala.concurrent.duration._
 
-object PersistentActorBoundedStashingSpec {
+object PersistentActorBoundedStashingSpec
   final case class Cmd(data: Any)
   final case class Evt(data: Any)
 
   class ReplyToWithRejectConfigurator
-      extends StashOverflowStrategyConfigurator {
+      extends StashOverflowStrategyConfigurator
     override def create(config: Config): StashOverflowStrategy =
       ReplyToStrategy("RejectToStash")
-  }
 
   class StashOverflowStrategyFromConfigPersistentActor(name: String)
-      extends NamedPersistentActor(name) {
+      extends NamedPersistentActor(name)
     var events: List[Any] = Nil
 
-    val updateState: Receive = {
+    val updateState: Receive =
       case Evt(data) ⇒ events = data :: events
-    }
 
-    val commonBehavior: Receive = {
+    val commonBehavior: Receive =
       case GetState ⇒ sender() ! events.reverse
-    }
 
     def receiveRecover = updateState
 
-    override def receiveCommand: Receive = commonBehavior orElse {
+    override def receiveCommand: Receive = commonBehavior orElse
       case Cmd(x: Any) ⇒ persist(Evt(x))(updateState)
-    }
-  }
 
   val capacity = 10
 
@@ -58,7 +53,6 @@ object PersistentActorBoundedStashingSpec {
   val replyToConfig = String.format(
       templateConfig,
       "akka.persistence.PersistentActorBoundedStashingSpec$ReplyToWithRejectConfigurator")
-}
 
 class SteppingInMemPersistentActorBoundedStashingSpec(strategyConfig: String)
     extends PersistenceSpec(
@@ -68,25 +62,23 @@ class SteppingInMemPersistentActorBoundedStashingSpec(strategyConfig: String)
                   "stepping-inmem",
                   "SteppingInMemPersistentActorBoundedStashingSpec",
                   extraConfig = Some(strategyConfig)))) with BeforeAndAfterEach
-    with ImplicitSender {
+    with ImplicitSender
 
-  override def atStartup: Unit = {
+  override def atStartup: Unit =
     system.eventStream.publish(Mute(EventFilter.warning(
                 pattern = ".*received dead letter from.*Cmd.*")))
-  }
 
   override def beforeEach(): Unit =
     system.eventStream.subscribe(testActor, classOf[DeadLetter])
 
   override def afterEach(): Unit =
     system.eventStream.unsubscribe(testActor, classOf[DeadLetter])
-}
 
 class ThrowExceptionStrategyPersistentActorBoundedStashingSpec
     extends SteppingInMemPersistentActorBoundedStashingSpec(
-        PersistentActorBoundedStashingSpec.throwConfig) {
-  "Stashing with ThrowOverflowExceptionStrategy in a persistence actor " should {
-    "throws stash overflow exception" in {
+        PersistentActorBoundedStashingSpec.throwConfig)
+  "Stashing with ThrowOverflowExceptionStrategy in a persistence actor " should
+    "throws stash overflow exception" in
       val persistentActor =
         namedPersistentActor[StashOverflowStrategyFromConfigPersistentActor]
       awaitAssert(SteppingInmemJournal.getRef("persistence-bounded-stash"),
@@ -107,15 +99,12 @@ class ThrowExceptionStrategyPersistentActorBoundedStashingSpec
       //non-stashed messages
       (capacity + 2) to (2 * capacity) foreach
       (i ⇒ expectMsg(DeadLetter(Cmd(i), testActor, persistentActor)))
-    }
-  }
-}
 
 class DiscardStrategyPersistentActorBoundedStashingSpec
     extends SteppingInMemPersistentActorBoundedStashingSpec(
-        PersistentActorBoundedStashingSpec.discardConfig) {
-  "Stashing with DiscardToDeadLetterStrategy in a persistence actor " should {
-    "discard to deadletter" in {
+        PersistentActorBoundedStashingSpec.discardConfig)
+  "Stashing with DiscardToDeadLetterStrategy in a persistence actor " should
+    "discard to deadletter" in
       val persistentActor =
         namedPersistentActor[StashOverflowStrategyFromConfigPersistentActor]
       awaitAssert(SteppingInmemJournal.getRef("persistence-bounded-stash"),
@@ -139,15 +128,12 @@ class DiscardStrategyPersistentActorBoundedStashingSpec
       persistentActor ! GetState
 
       expectMsg("a" :: (1 to capacity).toList ::: Nil)
-    }
-  }
-}
 
 class ReplyToStrategyPersistentActorBoundedStashingSpec
     extends SteppingInMemPersistentActorBoundedStashingSpec(
-        PersistentActorBoundedStashingSpec.replyToConfig) {
-  "Stashing with DiscardToDeadLetterStrategy in a persistence actor" should {
-    "reply to request with custom message" in {
+        PersistentActorBoundedStashingSpec.replyToConfig)
+  "Stashing with DiscardToDeadLetterStrategy in a persistence actor" should
+    "reply to request with custom message" in
       val persistentActor =
         namedPersistentActor[StashOverflowStrategyFromConfigPersistentActor]
       awaitAssert(SteppingInmemJournal.getRef("persistence-bounded-stash"),
@@ -170,6 +156,3 @@ class ReplyToStrategyPersistentActorBoundedStashingSpec
       persistentActor ! GetState
 
       expectMsg("a" :: (1 to capacity).toList ::: Nil)
-    }
-  }
-}

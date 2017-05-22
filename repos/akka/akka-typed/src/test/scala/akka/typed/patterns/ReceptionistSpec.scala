@@ -9,7 +9,7 @@ import akka.typed.AskPattern._
 import scala.concurrent.duration._
 import akka.typed._
 
-class ReceptionistSpec extends TypedSpec {
+class ReceptionistSpec extends TypedSpec
 
   trait ServiceA
   case object ServiceKeyA extends ServiceKey[ServiceA]
@@ -19,9 +19,9 @@ class ReceptionistSpec extends TypedSpec {
   case object ServiceKeyB extends ServiceKey[ServiceB]
   val propsB = Props(Static[ServiceB](msg ⇒ ()))
 
-  object `A Receptionist` {
+  object `A Receptionist`
 
-    def `must register a service`(): Unit = {
+    def `must register a service`(): Unit =
       val ctx = new EffectfulActorContext("register", Props(behavior), system)
       val a = Inbox.sync[ServiceA]("a")
       val r = Inbox.sync[Registered[_]]("r")
@@ -33,9 +33,8 @@ class ReceptionistSpec extends TypedSpec {
       ctx.getAllEffects() should be(Nil)
       q.receiveMsg() should be(Listing(ServiceKeyA, Set(a.ref)))
       assertEmpty(a, r, q)
-    }
 
-    def `must register two services`(): Unit = {
+    def `must register two services`(): Unit =
       val ctx = new EffectfulActorContext(
           "registertwo", Props(behavior), system)
       val a = Inbox.sync[ServiceA]("a")
@@ -51,9 +50,8 @@ class ReceptionistSpec extends TypedSpec {
       ctx.run(Find(ServiceKeyB)(q.ref))
       q.receiveMsg() should be(Listing(ServiceKeyB, Set(b.ref)))
       assertEmpty(a, b, r, q)
-    }
 
-    def `must register two services with the same key`(): Unit = {
+    def `must register two services with the same key`(): Unit =
       val ctx = new EffectfulActorContext(
           "registertwosame", Props(behavior), system)
       val a1 = Inbox.sync[ServiceA]("a1")
@@ -70,9 +68,8 @@ class ReceptionistSpec extends TypedSpec {
       q.receiveMsg() should be(
           Listing(ServiceKeyB, Set.empty[ActorRef[ServiceB]]))
       assertEmpty(a1, a2, r, q)
-    }
 
-    def `must unregister services when they terminate`(): Unit = {
+    def `must unregister services when they terminate`(): Unit =
       val ctx = new EffectfulActorContext(
           "registertwosame", Props(behavior), system)
       val r = Inbox.sync[Registered[_]]("r")
@@ -106,33 +103,26 @@ class ReceptionistSpec extends TypedSpec {
       ctx.run(Find(ServiceKeyB)(q.ref))
       q.receiveMsg() should be(Listing(ServiceKeyB, Set(b.ref)))
       assertEmpty(a, b, c, r, q)
-    }
 
     def `must work with ask`(): Unit =
-      sync(runTest("Receptionist") {
-        StepWise[Registered[ServiceA]] {
+      sync(runTest("Receptionist")
+        StepWise[Registered[ServiceA]]
           (ctx, startWith) ⇒
             val self = ctx.self
             import system.executionContext
             startWith
-              .withKeepTraces(true) {
+              .withKeepTraces(true)
                 val r = ctx.spawnAnonymous(Props(behavior))
                 val s = ctx.spawnAnonymous(propsA)
                 val f = r ? Register(ServiceKeyA, s)
                 r ! Register(ServiceKeyA, s)(self)
                 (f, s)
-              }
-              .expectMessage(1.second) {
+              .expectMessage(1.second)
                 case (msg, (f, s)) ⇒
                   msg should be(Registered(ServiceKeyA, s))
                   f foreach (self ! _)
                   s
-              }
-              .expectMessage(1.second) {
+              .expectMessage(1.second)
                 case (msg, s) ⇒
                   msg should be(Registered(ServiceKeyA, s))
-              }
-        }
-      })
-  }
-}
+      )

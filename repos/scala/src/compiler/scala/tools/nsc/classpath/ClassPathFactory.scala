@@ -14,7 +14,7 @@ import scala.tools.nsc.util.ClassPath
   *
   * Therefore, we expect that T will be either ClassPath[U] or FlatClassPath.
   */
-trait ClassPathFactory[T] {
+trait ClassPathFactory[T]
 
   /**
     * Create a new classpath based on the abstract file.
@@ -32,11 +32,11 @@ trait ClassPathFactory[T] {
   def expandDir(extdir: String): List[String] = ClassPath.expandDir(extdir)
 
   def contentsOfDirsInPath(path: String): List[T] =
-    for {
+    for
       dir <- expandPath(path, expandStar = false)
       name <- expandDir(dir)
       entry <- Option(AbstractFile.getDirectory(name))
-    } yield newClassPath(entry)
+    yield newClassPath(entry)
 
   def classesInExpandedPath(path: String): IndexedSeq[T] =
     classesInPathImpl(path, expand = true).toIndexedSeq
@@ -51,8 +51,7 @@ trait ClassPathFactory[T] {
 
   // Internal
   protected def classesInPathImpl(path: String, expand: Boolean) =
-    for {
+    for
       file <- expandPath(path, expand)
       dir <- Option(AbstractFile.getDirectory(file))
-    } yield newClassPath(dir)
-}
+    yield newClassPath(dir)

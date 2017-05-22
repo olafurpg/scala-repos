@@ -33,7 +33,7 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object TextInputDialog {
+object TextInputDialog
 
   /**
     * Converts a ScalaFX TextInputDialog to its JavaFX counterpart.
@@ -44,7 +44,6 @@ object TextInputDialog {
   implicit def sfxTextInputDialog2jfx(
       v: TextInputDialog): jfxsc.TextInputDialog =
     if (v != null) v.delegate else null
-}
 
 /**
   * A dialog that shows a text input control to the user.
@@ -60,7 +59,7 @@ object TextInputDialog {
   */
 class TextInputDialog(
     override val delegate: jfxsc.TextInputDialog = new jfxsc.TextInputDialog())
-    extends Dialog[String](delegate) with SFXDelegate[jfxsc.TextInputDialog] {
+    extends Dialog[String](delegate) with SFXDelegate[jfxsc.TextInputDialog]
 
   /**
     * Creates a new TextInputDialog with the default value entered into the
@@ -87,9 +86,8 @@ class TextInputDialog(
     *
     * @return An `Option` that contains the `result`.
     */
-  def showAndWait(): Option[String] = {
+  def showAndWait(): Option[String] =
     super.showAndWait((x: String) => x).asInstanceOf[Option[String]]
-  }
 
   /**
     * The `TextField` used within this dialog.
@@ -100,4 +98,3 @@ class TextInputDialog(
     * The default value that was specified in the constructor.
     */
   def defaultValue: String = delegate.getDefaultValue
-}

@@ -27,7 +27,7 @@ import com.twitter.util.{Future, Time}
   *      for details and examples.
   */
 abstract class Filter[-ReqIn, +RepOut, +ReqOut, -RepIn]
-    extends ((ReqIn, Service[ReqOut, RepIn]) => Future[RepOut]) {
+    extends ((ReqIn, Service[ReqOut, RepIn]) => Future[RepOut])
   import Filter.AndThen
 
   /**
@@ -67,20 +67,17 @@ abstract class Filter[-ReqIn, +RepOut, +ReqOut, -RepIn]
     * }}}
     * @param service a service that takes the output request type and the input response type.
     */
-  def andThen(service: Service[ReqOut, RepIn]): Service[ReqIn, RepOut] = {
+  def andThen(service: Service[ReqOut, RepIn]): Service[ReqIn, RepOut] =
     val svc = Service.rescue(service)
-    new Service[ReqIn, RepOut] {
+    new Service[ReqIn, RepOut]
       def apply(request: ReqIn) = Filter.this.apply(request, svc)
       override def close(deadline: Time) = service.close(deadline)
       override def status = service.status
-    }
-  }
 
-  def andThen(f: ReqOut => Future[RepIn]): ReqIn => Future[RepOut] = {
+  def andThen(f: ReqOut => Future[RepIn]): ReqIn => Future[RepOut] =
     val service = Service.mk(f)
     req =>
       Filter.this.apply(req, service)
-  }
 
   /**
     * Terminates a filter chain in a [[ServiceFactory]]. For example,
@@ -93,7 +90,7 @@ abstract class Filter[-ReqIn, +RepOut, +ReqOut, -RepIn]
     */
   def andThen(
       factory: ServiceFactory[ReqOut, RepIn]): ServiceFactory[ReqIn, RepOut] =
-    new ServiceFactory[ReqIn, RepOut] {
+    new ServiceFactory[ReqIn, RepOut]
       val fn: Service[ReqOut, RepIn] => Service[ReqIn, RepOut] = svc =>
         Filter.this.andThen(svc)
       def apply(conn: ClientConnection): Future[Service[ReqIn, RepOut]] =
@@ -101,7 +98,6 @@ abstract class Filter[-ReqIn, +RepOut, +ReqOut, -RepIn]
       def close(deadline: Time) = factory.close(deadline)
       override def status = factory.status
       override def toString() = factory.toString()
-    }
 
   /**
     * Conditionally propagates requests down the filter chain. This may
@@ -113,23 +109,21 @@ abstract class Filter[-ReqIn, +RepOut, +ReqOut, -RepIn]
   def andThenIf[Req2 >: ReqOut, Rep2 <: RepIn](
       condAndFilter: (Boolean, Filter[ReqOut, RepIn, Req2, Rep2])
   ): Filter[ReqIn, RepOut, Req2, Rep2] =
-    condAndFilter match {
+    condAndFilter match
       case (true, filter) => andThen(filter)
       case (false, _) => this
-    }
-}
 
 /**
   * A [[Filter]] where the request and reply types are the same.
   */
 abstract class SimpleFilter[Req, Rep] extends Filter[Req, Rep, Req, Rep]
 
-object Filter {
+object Filter
   // `AndThen` is a function that represents the prefix of the filter chain to
   // transform a terminal Service received as an argument.
   private case class AndThen[ReqIn, RepOut, ReqOut, RepIn](
       build: Service[ReqOut, RepIn] => Service[ReqIn, RepOut])
-      extends Filter[ReqIn, RepOut, ReqOut, RepIn] {
+      extends Filter[ReqIn, RepOut, ReqOut, RepIn]
     override def andThen[Req2, Rep2](
         next: Filter[ReqOut, RepIn, Req2, Rep2]
     ): Filter[ReqIn, RepOut, Req2, Rep2] =
@@ -144,7 +138,7 @@ object Filter {
     override def andThen(
         factory: ServiceFactory[ReqOut, RepIn]
     ): ServiceFactory[ReqIn, RepOut] =
-      new ServiceFactory[ReqIn, RepOut] {
+      new ServiceFactory[ReqIn, RepOut]
         val fn: Service[ReqOut, RepIn] => Service[ReqIn, RepOut] = svc =>
           AndThen.this.andThen(svc)
         def apply(conn: ClientConnection): Future[Service[ReqIn, RepOut]] =
@@ -152,14 +146,12 @@ object Filter {
         def close(deadline: Time) = factory.close(deadline)
         override def status = factory.status
         override def toString() = factory.toString()
-      }
 
     def apply(
         request: ReqIn, service: Service[ReqOut, RepIn]): Future[RepOut] =
       build(service)(request)
-  }
 
-  private case object Identity extends SimpleFilter[Any, Nothing] {
+  private case object Identity extends SimpleFilter[Any, Nothing]
     override def andThen[Req2, Rep2](next: Filter[Any, Nothing, Req2, Rep2])
       : Filter[Any, Nothing, Req2, Rep2] = next
 
@@ -172,50 +164,41 @@ object Filter {
 
     def apply(request: Any, service: Service[Any, Nothing]): Future[Nothing] =
       service(request)
-  }
 
   implicit def canStackFromSvc[Req, Rep]: CanStackFrom[
       Filter[Req, Rep, Req, Rep], Service[Req, Rep]] =
-    new CanStackFrom[Filter[Req, Rep, Req, Rep], Service[Req, Rep]] {
+    new CanStackFrom[Filter[Req, Rep, Req, Rep], Service[Req, Rep]]
       def toStackable(_role: Stack.Role, filter: Filter[Req, Rep, Req, Rep]) =
-        new Stack.Module0[Service[Req, Rep]] {
+        new Stack.Module0[Service[Req, Rep]]
           val role = _role
           val description = role.name
           def make(next: Service[Req, Rep]) = filter andThen next
-        }
-    }
 
   implicit def canStackFromFac[Req, Rep]: CanStackFrom[
       Filter[Req, Rep, Req, Rep], ServiceFactory[Req, Rep]] =
-    new CanStackFrom[Filter[Req, Rep, Req, Rep], ServiceFactory[Req, Rep]] {
+    new CanStackFrom[Filter[Req, Rep, Req, Rep], ServiceFactory[Req, Rep]]
       def toStackable(_role: Stack.Role, filter: Filter[Req, Rep, Req, Rep]) =
-        new Stack.Module0[ServiceFactory[Req, Rep]] {
+        new Stack.Module0[ServiceFactory[Req, Rep]]
           val role = _role
           val description = role.name
           def make(next: ServiceFactory[Req, Rep]) = filter andThen next
-        }
-    }
 
   /**
     * TypeAgnostic filters are like SimpleFilters but they leave the Rep and Req types unspecified
     * until `toFilter` is called.
     */
-  trait TypeAgnostic { self =>
+  trait TypeAgnostic  self =>
     def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep]
 
     def andThen(next: TypeAgnostic): TypeAgnostic =
-      new TypeAgnostic {
+      new TypeAgnostic
         def toFilter[Req, Rep] =
           self.toFilter[Req, Rep].andThen(next.toFilter[Req, Rep])
-      }
-  }
 
-  object TypeAgnostic {
-    val Identity: TypeAgnostic = new TypeAgnostic {
+  object TypeAgnostic
+    val Identity: TypeAgnostic = new TypeAgnostic
       override def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep] =
         identity[Req, Rep]
-    }
-  }
 
   def identity[Req, Rep]: SimpleFilter[Req, Rep] =
     Identity.asInstanceOf[SimpleFilter[Req, Rep]]
@@ -223,10 +206,9 @@ object Filter {
   def mk[ReqIn, RepOut, ReqOut, RepIn](
       f: (ReqIn, ReqOut => Future[RepIn]) => Future[RepOut]
   ): Filter[ReqIn, RepOut, ReqOut, RepIn] =
-    new Filter[ReqIn, RepOut, ReqOut, RepIn] {
+    new Filter[ReqIn, RepOut, ReqOut, RepIn]
       def apply(request: ReqIn, service: Service[ReqOut, RepIn]) =
         f(request, service)
-    }
 
   /**
     * Chooses a filter to apply based on incoming requests. If the given partial
@@ -238,11 +220,9 @@ object Filter {
     */
   def choose[Req, Rep](
       pf: PartialFunction[Req, Filter[Req, Rep, Req, Rep]]
-  ): Filter[Req, Rep, Req, Rep] = new Filter[Req, Rep, Req, Rep] {
+  ): Filter[Req, Rep, Req, Rep] = new Filter[Req, Rep, Req, Rep]
     private[this] val const: (Req => SimpleFilter[Req, Rep]) =
       Function.const(Filter.identity[Req, Rep])
 
     def apply(request: Req, service: Service[Req, Rep]): Future[Rep] =
       pf.applyOrElse(request, const)(request, service)
-  }
-}

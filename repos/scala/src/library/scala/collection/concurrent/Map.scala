@@ -32,7 +32,7 @@ package collection.concurrent
   *  @define atomicop
   *  This is an atomic operation.
   */
-trait Map[A, B] extends scala.collection.mutable.Map[A, B] {
+trait Map[A, B] extends scala.collection.mutable.Map[A, B]
 
   /**
     * Associates the given key with a given value, unless the key was already
@@ -87,13 +87,10 @@ trait Map[A, B] extends scala.collection.mutable.Map[A, B] {
     */
   def replace(k: A, v: B): Option[B]
 
-  override def getOrElseUpdate(key: A, op: => B): B = get(key) match {
+  override def getOrElseUpdate(key: A, op: => B): B = get(key) match
     case Some(v) => v
     case None =>
       val v = op
-      putIfAbsent(key, v) match {
+      putIfAbsent(key, v) match
         case Some(nv) => nv
         case None => v
-      }
-  }
-}

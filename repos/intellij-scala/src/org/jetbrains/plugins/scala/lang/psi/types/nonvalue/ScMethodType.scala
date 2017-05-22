@@ -19,9 +19,8 @@ import scala.collection.immutable.{HashMap, HashSet}
 /**
   * This is internal type, no expression can have such type.
   */
-trait NonValueType extends ScType {
+trait NonValueType extends ScType
   def isValue = false
-}
 
 /**
   * Generalized parameter. It's not psi element. So can be used in any place.
@@ -36,7 +35,7 @@ case class Parameter(name: String,
                      isByName: Boolean,
                      index: Int = -1,
                      psiParam: Option[PsiParameter] = None,
-                     defaultType: Option[ScType] = None) {
+                     defaultType: Option[ScType] = None)
 
   def this(name: String,
            deprecatedName: Option[String],
@@ -44,7 +43,7 @@ case class Parameter(name: String,
            isDefault: Boolean,
            isRepeated: Boolean,
            isByName: Boolean,
-           index: Int) {
+           index: Int)
     this(name,
          deprecatedName,
          paramType,
@@ -53,9 +52,8 @@ case class Parameter(name: String,
          isRepeated,
          isByName,
          index)
-  }
 
-  def this(param: ScParameter) {
+  def this(param: ScParameter)
     this(param.name,
          param.deprecatedName,
          param.getType(TypingContext.empty).getOrNothing,
@@ -66,9 +64,8 @@ case class Parameter(name: String,
          param.index,
          Some(param),
          param.getDefaultExpression.flatMap(_.getType().toOption))
-  }
 
-  def this(param: PsiParameter) {
+  def this(param: PsiParameter)
     this(param.getName,
          None,
          param.paramType,
@@ -78,15 +75,12 @@ case class Parameter(name: String,
          false,
          param.index,
          Some(param))
-  }
 
-  def paramInCode: Option[ScParameter] = psiParam match {
+  def paramInCode: Option[ScParameter] = psiParam match
     case Some(scParam: ScParameter) => Some(scParam)
     case _ => None
-  }
 
   def nameInCode = psiParam.map(_.getName)
-}
 
 /**
   * Class representing type parameters in our type system. Can be constructed from psi.
@@ -98,109 +92,95 @@ class TypeParameter(val name: String,
                     val typeParams: Seq[TypeParameter],
                     val lowerType: () => ScType,
                     val upperType: () => ScType,
-                    val ptp: PsiTypeParameter) {
-  def this(ptp: PsiTypeParameter) {
-    this(ptp match {
+                    val ptp: PsiTypeParameter)
+  def this(ptp: PsiTypeParameter)
+    this(ptp match
       case tp: ScTypeParam => tp.name
       case _ => ptp.getName
-    }, ptp match {
+    , ptp match
       case tp: ScTypeParam => tp.typeParameters.map(new TypeParameter(_))
       case _ => Seq.empty
-    }, ptp match {
+    , ptp match
       case tp: ScTypeParam =>
         () =>
           tp.lowerBound.getOrNothing
         case _ =>
         () =>
           Nothing //todo: lower type?
-    }, ptp match {
+    , ptp match
       case tp: ScTypeParam =>
         () =>
           tp.upperBound.getOrAny
         case _ =>
         () =>
           Any //todo: upper type?
-    }, ptp)
-  }
+    , ptp)
 
-  def update(fun: ScType => ScType): TypeParameter = {
-    new TypeParameter(name, typeParams.map(_.update(fun)), {
+  def update(fun: ScType => ScType): TypeParameter =
+    new TypeParameter(name, typeParams.map(_.update(fun)),
       val res = fun(lowerType())
       () =>
         res
-    }, {
+    ,
       val res = fun(upperType())
       () =>
         res
-    }, ptp)
-  }
+    , ptp)
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[TypeParameter]
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case that: TypeParameter =>
       (that canEqual this) && name == that.name &&
       typeParams == that.typeParams && lowerType() == that.lowerType() &&
       upperType() == that.upperType() && ptp == that.ptp
     case _ => false
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     val state = Seq(name, typeParams, ptp)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
-  }
-}
 
-object TypeParameter {
+object TypeParameter
   def apply(name: String,
             typeParams: Seq[TypeParameter],
             lowerType: () => ScType,
             upperType: () => ScType,
-            ptp: PsiTypeParameter): TypeParameter = {
+            ptp: PsiTypeParameter): TypeParameter =
     new TypeParameter(name, typeParams, lowerType, upperType, ptp)
-  }
 
   def unapply(t: TypeParameter): Option[
-      (String, Seq[TypeParameter], () => ScType, () => ScType, PsiTypeParameter)] = {
+      (String, Seq[TypeParameter], () => ScType, () => ScType, PsiTypeParameter)] =
     Some(t.name, t.typeParams, t.lowerType, t.upperType, t.ptp)
-  }
 
-  def fromArray(ptps: Array[PsiTypeParameter]): Array[TypeParameter] = {
+  def fromArray(ptps: Array[PsiTypeParameter]): Array[TypeParameter] =
     if (ptps.length == 0) EMPTY_ARRAY
     else ptps.map(new TypeParameter(_))
-  }
 
   val EMPTY_ARRAY: Array[TypeParameter] = Array.empty
-}
 
 case class ScMethodType(
     returnType: ScType, params: Seq[Parameter], isImplicit: Boolean)(
     val project: Project, val scope: GlobalSearchScope)
-    extends NonValueType {
+    extends NonValueType
 
-  def visitType(visitor: ScalaTypeVisitor) {
+  def visitType(visitor: ScalaTypeVisitor)
     visitor.visitMethodType(this)
-  }
 
   override def typeDepth: Int = returnType.typeDepth
 
-  def inferValueType: ValueType = {
+  def inferValueType: ValueType =
     ScFunctionType(returnType.inferValueType,
                    params.map(p =>
-                         {
                        val inferredParamType = p.paramType.inferValueType
                        if (!p.isRepeated) inferredParamType
-                       else {
+                       else
                          val seqClass = ScalaPsiManager
                            .instance(project)
                            .getCachedClass(scope, "scala.collection.Seq")
-                         seqClass.fold(inferredParamType) { inferred =>
+                         seqClass.fold(inferredParamType)  inferred =>
                            ScParameterizedType(ScDesignatorType(inferred),
                                                Seq(inferredParamType))
-                         }
-                       }
-                   }))(project, scope)
-  }
+                   ))(project, scope)
 
   override def removeAbstracts =
     new ScMethodType(
@@ -209,15 +189,13 @@ case class ScMethodType(
         isImplicit)(project, scope)
 
   override def recursiveUpdate(update: ScType => (Boolean, ScType),
-                               visited: HashSet[ScType]): ScType = {
-    if (visited.contains(this)) {
-      return update(this) match {
+                               visited: HashSet[ScType]): ScType =
+    if (visited.contains(this))
+      return update(this) match
         case (true, res) => res
         case _ => this
-      }
-    }
     val newVisited = visited + this
-    update(this) match {
+    update(this) match
       case (true, res) => res
       case _ =>
         new ScMethodType(
@@ -226,14 +204,12 @@ case class ScMethodType(
                   p.copy(paramType = p.paramType.recursiveUpdate(update,
                                                                  newVisited))),
             isImplicit)(project, scope)
-    }
-  }
 
   override def recursiveVarianceUpdateModifiable[T](
       data: T,
       update: (ScType, Int, T) => (Boolean, ScType, T),
-      variance: Int = 1): ScType = {
-    update(this, variance, data) match {
+      variance: Int = 1): ScType =
+    update(this, variance, data) match
       case (true, res, _) => res
       case (_, _, newData) =>
         new ScMethodType(
@@ -245,15 +221,13 @@ case class ScMethodType(
                                                              update,
                                                              -variance))),
             isImplicit)(project, scope)
-    }
-  }
 
   override def equivInner(
       r: ScType,
       uSubst: ScUndefinedSubstitutor,
-      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
+      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) =
     var undefinedSubst = uSubst
-    r match {
+    r match
       case m: ScMethodType =>
         if (m.params.length != params.length) return (false, undefinedSubst)
         var t = Equivalence.equivInner(
@@ -261,7 +235,7 @@ case class ScMethodType(
         if (!t._1) return (false, undefinedSubst)
         undefinedSubst = t._2
         var i = 0
-        while (i < params.length) {
+        while (i < params.length)
           //todo: Seq[Type] instead of Type*
           if (params(i).isRepeated != m.params(i).isRepeated)
             return (false, undefinedSubst)
@@ -272,20 +246,15 @@ case class ScMethodType(
           if (!t._1) return (false, undefinedSubst)
           undefinedSubst = t._2
           i = i + 1
-        }
         (true, undefinedSubst)
       case _ => (false, undefinedSubst)
-    }
-  }
-}
 
 case class ScTypePolymorphicType(
     internalType: ScType, typeParameters: Seq[TypeParameter])
-    extends NonValueType {
-  if (internalType.isInstanceOf[ScTypePolymorphicType]) {
+    extends NonValueType
+  if (internalType.isInstanceOf[ScTypePolymorphicType])
     throw new IllegalArgumentException(
         "Polymorphic type can't have wrong internal type")
-  }
 
   def polymorphicTypeSubstitutor: ScSubstitutor =
     polymorphicTypeSubstitutor(inferValueType = false)
@@ -293,12 +262,11 @@ case class ScTypePolymorphicType(
   def polymorphicTypeSubstitutor(inferValueType: Boolean): ScSubstitutor =
     new ScSubstitutor(
         new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp =>
-              {
             var contraVariant = 0
             var coOrInVariant = 0
-            internalType.recursiveVarianceUpdate {
+            internalType.recursiveVarianceUpdate
               case (typez: ScType, i: Int) =>
-                val pair = typez match {
+                val pair = typez match
                   case tp: ScTypeParameterType =>
                     (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
                   case ScUndefinedType(tp) =>
@@ -306,47 +274,39 @@ case class ScTypePolymorphicType(
                   case ScAbstractType(tp, _, _) =>
                     (tp.name, ScalaPsiUtil.getPsiElementId(tp.param))
                   case _ => null
-                }
-                if (pair != null) {
+                if (pair != null)
                   val (tpName, id) = pair
                   if (tp.name == tpName &&
-                      id == ScalaPsiUtil.getPsiElementId(tp.ptp)) {
+                      id == ScalaPsiUtil.getPsiElementId(tp.ptp))
                     if (i == -1) contraVariant += 1
                     else coOrInVariant += 1
-                  }
-                }
                 (false, typez)
-            }
             if (coOrInVariant == 0 && contraVariant != 0)
               ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
                tp.upperType().inferValueType)
             else
               ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
                tp.lowerType().inferValueType)
-        }),
+        ),
         Map.empty,
         None)
 
-  def abstractTypeSubstitutor: ScSubstitutor = {
-    def hasRecursiveTypeParameters(typez: ScType): Boolean = {
+  def abstractTypeSubstitutor: ScSubstitutor =
+    def hasRecursiveTypeParameters(typez: ScType): Boolean =
       var hasRecursiveTypeParameters = false
-      typez.recursiveUpdate {
+      typez.recursiveUpdate
         case tpt: ScTypeParameterType =>
           typeParameters.find(tp =>
                 (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
-                (tpt.name, tpt.getId)) match {
+                (tpt.name, tpt.getId)) match
             case None => (true, tpt)
             case _ =>
               hasRecursiveTypeParameters = true
               (true, tpt)
-          }
         case tp: ScType => (hasRecursiveTypeParameters, tp)
-      }
       hasRecursiveTypeParameters
-    }
     new ScSubstitutor(
         new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp =>
-              {
             val lowerType: ScType =
               if (hasRecursiveTypeParameters(tp.lowerType())) Nothing
               else tp.lowerType()
@@ -358,31 +318,26 @@ case class ScTypePolymorphicType(
                                                         ScSubstitutor.empty),
                                 lowerType,
                                 upperType))
-        }),
+        ),
         Map.empty,
         None)
-  }
 
-  def abstractOrLowerTypeSubstitutor: ScSubstitutor = {
-    def hasRecursiveTypeParameters(typez: ScType): Boolean = {
+  def abstractOrLowerTypeSubstitutor: ScSubstitutor =
+    def hasRecursiveTypeParameters(typez: ScType): Boolean =
       var hasRecursiveTypeParameters = false
-      typez.recursiveUpdate {
+      typez.recursiveUpdate
         case tpt: ScTypeParameterType =>
           typeParameters.find(tp =>
                 (tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)) ==
-                (tpt.name, tpt.getId)) match {
+                (tpt.name, tpt.getId)) match
             case None => (true, tpt)
             case _ =>
               hasRecursiveTypeParameters = true
               (true, tpt)
-          }
         case tp: ScType => (hasRecursiveTypeParameters, tp)
-      }
       hasRecursiveTypeParameters
-    }
     new ScSubstitutor(
         new HashMap[(String, PsiElement), ScType] ++ typeParameters.map(tp =>
-              {
             val lowerType: ScType =
               if (hasRecursiveTypeParameters(tp.lowerType())) Nothing
               else tp.lowerType()
@@ -396,82 +351,73 @@ case class ScTypePolymorphicType(
                                   lowerType,
                                   upperType)
              else lowerType)
-        }),
+        ),
         Map.empty,
         None)
-  }
 
   def typeParameterTypeSubstitutor: ScSubstitutor =
     new ScSubstitutor(
-        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map { tp =>
+        new HashMap[(String, PsiElement), ScType] ++ typeParameters.map  tp =>
       ((tp.name, ScalaPsiUtil.getPsiElementId(tp.ptp)),
        new ScTypeParameterType(tp.ptp, ScSubstitutor.empty))
-    }, Map.empty, None)
+    , Map.empty, None)
 
-  def inferValueType: ValueType = {
+  def inferValueType: ValueType =
     polymorphicTypeSubstitutor(inferValueType = true)
       .subst(internalType.inferValueType)
       .asInstanceOf[ValueType]
-  }
 
   override def removeAbstracts =
     ScTypePolymorphicType(
         internalType.removeAbstracts,
         typeParameters.map(
             tp =>
-              {
             TypeParameter(tp.name,
                           tp.typeParams /* todo: ? */,
                           () => tp.lowerType().removeAbstracts,
                           () => tp.upperType().removeAbstracts,
                           tp.ptp)
-        }))
+        ))
 
   override def recursiveUpdate(update: ScType => (Boolean, ScType),
-                               visited: HashSet[ScType]): ScType = {
-    if (visited.contains(this)) {
-      return update(this) match {
+                               visited: HashSet[ScType]): ScType =
+    if (visited.contains(this))
+      return update(this) match
         case (true, res) => res
         case _ => this
-      }
-    }
     val newVisited = visited + this
-    update(this) match {
+    update(this) match
       case (true, res) => res
       case _ =>
         ScTypePolymorphicType(
             internalType.recursiveUpdate(update, newVisited),
             typeParameters.map(tp =>
-                  {
-                TypeParameter(tp.name, tp.typeParams /* todo: ? */, {
+                TypeParameter(tp.name, tp.typeParams /* todo: ? */,
                   val res = tp
                     .lowerType()
                     .recursiveUpdate(update, newVisited)
                     () =>
                       res
-                }, {
+                ,
                   val res = tp
                     .upperType()
                     .recursiveUpdate(update, newVisited)
                     () =>
                       res
-                }, tp.ptp)
-            }))
-    }
-  }
+                , tp.ptp)
+            ))
 
   override def recursiveVarianceUpdateModifiable[T](
       data: T,
       update: (ScType, Int, T) => (Boolean, ScType, T),
-      variance: Int = 1): ScType = {
-    update(this, variance, data) match {
+      variance: Int = 1): ScType =
+    update(this, variance, data) match
       case (true, res, _) => res
       case (_, _, newData) =>
         ScTypePolymorphicType(
             internalType.recursiveVarianceUpdateModifiable(
                 newData, update, variance),
             typeParameters.map(tp =>
-                  {
                 TypeParameter(tp.name,
                               tp.typeParams /* todo: ? */,
                               () =>
@@ -483,21 +429,19 @@ case class ScTypePolymorphicType(
                                   .recursiveVarianceUpdateModifiable(
                                       newData, update, variance),
                               tp.ptp)
-            }))
-    }
-  }
+            ))
 
   override def equivInner(
       r: ScType,
       uSubst: ScUndefinedSubstitutor,
-      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
+      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) =
     var undefinedSubst = uSubst
-    r match {
+    r match
       case p: ScTypePolymorphicType =>
         if (typeParameters.length != p.typeParameters.length)
           return (false, undefinedSubst)
         var i = 0
-        while (i < typeParameters.length) {
+        while (i < typeParameters.length)
           var t = Equivalence.equivInner(typeParameters(i).lowerType(),
                                          p.typeParameters(i).lowerType(),
                                          undefinedSubst,
@@ -511,30 +455,28 @@ case class ScTypePolymorphicType(
           if (!t._1) return (false, undefinedSubst)
           undefinedSubst = t._2
           i = i + 1
-        }
         val subst =
           new ScSubstitutor(
               new collection.immutable.HashMap[(String, PsiElement), ScType] ++ typeParameters
                 .zip(p.typeParameters)
-                .map({
+                .map(
                   tuple =>
                     ((tuple._1.name,
                       ScalaPsiUtil.getPsiElementId(tuple._1.ptp)),
                      new ScTypeParameterType(tuple._2.name,
-                                             tuple._2.ptp match {
+                                             tuple._2.ptp match
                                                case p: ScTypeParam =>
-                                                 p.typeParameters.toList.map {
+                                                 p.typeParameters.toList.map
                                                    new ScTypeParameterType(
                                                        _, ScSubstitutor.empty)
-                                                 }
                                                case _ => Nil
-                                             },
+                                             ,
                                              new Suspension(
                                                  tuple._2.lowerType),
                                              new Suspension(
                                                  tuple._2.upperType),
                                              tuple._2.ptp))
-                }),
+                ),
               Map.empty,
               None)
         Equivalence.equivInner(subst.subst(internalType),
@@ -542,17 +484,12 @@ case class ScTypePolymorphicType(
                                undefinedSubst,
                                falseUndef)
       case _ => (false, undefinedSubst)
-    }
-  }
 
-  def visitType(visitor: ScalaTypeVisitor): Unit = {
+  def visitType(visitor: ScalaTypeVisitor): Unit =
     visitor.visitTypePolymorphicType(this)
-  }
 
-  override def typeDepth: Int = {
+  override def typeDepth: Int =
     if (typeParameters.nonEmpty)
       internalType.typeDepth.max(
           ScType.typeParamsDepth(typeParameters.toArray) + 1)
     else internalType.typeDepth
-  }
-}

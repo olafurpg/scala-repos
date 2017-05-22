@@ -7,20 +7,18 @@ import scala.util.Random
 import org.scalatest.{ShouldMatchers, WordSpec}
 import akka.stream.impl.ResizableMultiReaderRingBuffer._
 
-class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
+class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers
 
-  "A ResizableMultiReaderRingBuffer" should {
+  "A ResizableMultiReaderRingBuffer" should
 
-    "initially be empty (1)" in new Test(iSize = 2, mSize = 4, cursorCount = 1) {
+    "initially be empty (1)" in new Test(iSize = 2, mSize = 4, cursorCount = 1)
       inspect shouldEqual "0 0 (size=0, writeIx=0, readIx=0, cursors=1)"
-    }
 
-    "initially be empty (2)" in new Test(iSize = 4, mSize = 4, cursorCount = 3) {
+    "initially be empty (2)" in new Test(iSize = 4, mSize = 4, cursorCount = 3)
       inspect shouldEqual "0 0 0 0 (size=0, writeIx=0, readIx=0, cursors=3)"
-    }
 
     "fail reads if nothing can be read" in new Test(
-        iSize = 4, mSize = 4, cursorCount = 3) {
+        iSize = 4, mSize = 4, cursorCount = 3)
       write(1) shouldEqual true
       write(2) shouldEqual true
       write(3) shouldEqual true
@@ -40,10 +38,9 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
       read(2) shouldEqual 2
       read(2) shouldEqual 3
       inspect shouldEqual "0 0 0 0 (size=0, writeIx=3, readIx=3, cursors=3)"
-    }
 
     "fail writes if there is no more space" in new Test(
-        iSize = 4, mSize = 4, cursorCount = 2) {
+        iSize = 4, mSize = 4, cursorCount = 2)
       write(1) shouldEqual true
       write(2) shouldEqual true
       write(3) shouldEqual true
@@ -81,10 +78,9 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
       read(1) shouldEqual 9
       read(1) shouldEqual null
       inspect shouldEqual "0 0 0 0 (size=0, writeIx=9, readIx=9, cursors=2)"
-    }
 
     "automatically grow if possible" in new Test(
-        iSize = 2, mSize = 8, cursorCount = 2) {
+        iSize = 2, mSize = 8, cursorCount = 2)
       write(1) shouldEqual true
       inspect shouldEqual "1 0 (size=1, writeIx=1, readIx=0, cursors=2)"
       write(2) shouldEqual true
@@ -116,9 +112,8 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
       read(1) shouldEqual 7
       read(1) shouldEqual null
       inspect shouldEqual "0 0 0 0 0 0 0 0 (size=0, writeIx=5, readIx=5, cursors=2)"
-    }
 
-    "pass the stress test" in {
+    "pass the stress test" in
       // create 100 buffers with an initialSize of 1 and a maxSize of 1 to 64,
       // for each one attach 1 to 8 cursors and randomly try reading and writing to the buffer;
       // in total 200 elements need to be written to the buffer and read in the correct order by each cursor
@@ -128,88 +123,74 @@ class ResizableMultiReaderRingBufferSpec extends WordSpec with ShouldMatchers {
       val sb = new java.lang.StringBuilder
       def log(s: ⇒ String): Unit = if (LOG) sb.append(s)
 
-      class StressTestCursor(cursorNr: Int, run: Int) extends Cursor {
+      class StressTestCursor(cursorNr: Int, run: Int) extends Cursor
         var cursor: Int = _
         var counter = 1
-        def tryReadAndReturnTrueIfDone(buf: TestBuffer): Boolean = {
+        def tryReadAndReturnTrueIfDone(buf: TestBuffer): Boolean =
           log(s"  Try reading of $toString: ")
-          try {
+          try
             val x = buf.read(this)
             log("OK\n")
             if (x != counter)
               fail(
                   s"""|Run $run, cursorNr $cursorNr, counter $counter: got unexpected $x
                          |  Buf: ${buf.inspect}
-                         |  Cursors: ${buf.cursors.cursors.mkString(
-                     "\n           ")}
+                         |  Cursors: $buf.cursors.cursors.mkString(
+                     "\n           ")
                          |Log:\n$sb
                       """.stripMargin)
             counter += 1
             counter == COUNTER_LIMIT
-          } catch {
+          catch
             case NothingToReadException ⇒
               log("FAILED\n"); false // ok, we currently can't read, try again later
-          }
-        }
         override def toString: String =
           s"cursorNr $cursorNr, ix $cursor, counter $counter"
-      }
 
       val random = new Random
-      for {
+      for
         bit ← 1 to MAXSIZEBIT_LIMIT
         n ← 1 to 2
-      } {
+      
         var counter = 1
         var activeCursors = List
           .tabulate(random.nextInt(8) + 1)(new StressTestCursor(_, 1 << bit))
         var stillWriting =
           2 // give writing a slight bias, so as to somewhat "stretch" the buffer
-        val buf = new TestBuffer(1, 1 << bit, new Cursors {
+        val buf = new TestBuffer(1, 1 << bit, new Cursors
           def cursors = activeCursors
-        })
+        )
         sb.setLength(0)
-        while (activeCursors.nonEmpty) {
+        while (activeCursors.nonEmpty)
           log(s"Buf: ${buf.inspect}\n")
           val activeCursorCount = activeCursors.size
           val index = random.nextInt(activeCursorCount + stillWriting)
-          if (index >= activeCursorCount) {
+          if (index >= activeCursorCount)
             log(s"  Writing $counter: ")
-            if (buf.write(counter)) {
+            if (buf.write(counter))
               log("OK\n")
               counter += 1
-            } else {
+            else
               log("FAILED\n")
               if (counter == COUNTER_LIMIT) stillWriting = 0
-            }
-          } else {
+          else
             val cursor = activeCursors(index)
             if (cursor.tryReadAndReturnTrueIfDone(buf))
               activeCursors = activeCursors.filter(_ != cursor)
-          }
-        }
-      }
-    }
-  }
 
   class TestBuffer(iSize: Int, mSize: Int, cursors: Cursors)
-      extends ResizableMultiReaderRingBuffer[Int](iSize, mSize, cursors) {
+      extends ResizableMultiReaderRingBuffer[Int](iSize, mSize, cursors)
     def inspect: String =
       underlyingArray
         .map(x ⇒ if (x == null) 0 else x)
         .mkString("", " ", " " + toString.dropWhile(_ != '('))
-  }
 
   class Test(iSize: Int, mSize: Int, cursorCount: Int)
-      extends TestBuffer(iSize, mSize, new SimpleCursors(cursorCount)) {
+      extends TestBuffer(iSize, mSize, new SimpleCursors(cursorCount))
     def read(cursorIx: Int): Integer =
-      try read(cursors.cursors(cursorIx)) catch {
+      try read(cursors.cursors(cursorIx)) catch
         case NothingToReadException ⇒ null
-      }
-  }
 
-  class SimpleCursors(cursorCount: Int) extends Cursors {
+  class SimpleCursors(cursorCount: Int) extends Cursors
     val cursors: List[Cursor] =
       List.fill(cursorCount)(new Cursor { var cursor: Int = _ })
-  }
-}

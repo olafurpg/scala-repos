@@ -33,12 +33,12 @@ import org.apache.spark.scheduler.cluster.mesos.MesosTaskLaunchData
 import org.apache.spark.util.Utils
 
 private[spark] class MesosExecutorBackend
-    extends MesosExecutor with ExecutorBackend with Logging {
+    extends MesosExecutor with ExecutorBackend with Logging
 
   var executor: Executor = null
   var driver: ExecutorDriver = null
 
-  override def statusUpdate(taskId: Long, state: TaskState, data: ByteBuffer) {
+  override def statusUpdate(taskId: Long, state: TaskState, data: ByteBuffer)
     val mesosTaskId = TaskID.newBuilder().setValue(taskId.toString).build()
     driver.sendStatusUpdate(
         MesosTaskStatus
@@ -47,12 +47,11 @@ private[spark] class MesosExecutorBackend
           .setState(TaskState.toMesos(state))
           .setData(ByteString.copyFrom(data))
           .build())
-  }
 
   override def registered(driver: ExecutorDriver,
                           executorInfo: ExecutorInfo,
                           frameworkInfo: FrameworkInfo,
-                          slaveInfo: SlaveInfo) {
+                          slaveInfo: SlaveInfo)
 
     // Get num cores for this task from ExecutorInfo, created in MesosSchedulerBackend.
     val cpusPerTask = executorInfo.getResourcesList.asScala
@@ -83,36 +82,29 @@ private[spark] class MesosExecutorBackend
                                          isLocal = false)
 
     executor = new Executor(executorId, slaveInfo.getHostname, env)
-  }
 
-  override def launchTask(d: ExecutorDriver, taskInfo: TaskInfo) {
+  override def launchTask(d: ExecutorDriver, taskInfo: TaskInfo)
     val taskId = taskInfo.getTaskId.getValue.toLong
     val taskData = MesosTaskLaunchData.fromByteString(taskInfo.getData)
-    if (executor == null) {
+    if (executor == null)
       logError("Received launchTask but executor was null")
-    } else {
-      SparkHadoopUtil.get.runAsSparkUser { () =>
+    else
+      SparkHadoopUtil.get.runAsSparkUser  () =>
         executor.launchTask(this,
                             taskId = taskId,
                             attemptNumber = taskData.attemptNumber,
                             taskInfo.getName,
                             taskData.serializedTask)
-      }
-    }
-  }
 
-  override def error(d: ExecutorDriver, message: String) {
+  override def error(d: ExecutorDriver, message: String)
     logError("Error from Mesos: " + message)
-  }
 
-  override def killTask(d: ExecutorDriver, t: TaskID) {
-    if (executor == null) {
+  override def killTask(d: ExecutorDriver, t: TaskID)
+    if (executor == null)
       logError("Received KillTask but executor was null")
-    } else {
+    else
       // TODO: Determine the 'interruptOnCancel' property set for the given job.
       executor.killTask(t.getValue.toLong, interruptThread = false)
-    }
-  }
 
   override def reregistered(d: ExecutorDriver, p2: SlaveInfo) {}
 
@@ -121,16 +113,13 @@ private[spark] class MesosExecutorBackend
   override def frameworkMessage(d: ExecutorDriver, data: Array[Byte]) {}
 
   override def shutdown(d: ExecutorDriver) {}
-}
 
 /**
   * Entry point for Mesos executor.
   */
-private[spark] object MesosExecutorBackend extends Logging {
-  def main(args: Array[String]) {
+private[spark] object MesosExecutorBackend extends Logging
+  def main(args: Array[String])
     Utils.initDaemon(log)
     // Create a new Executor and start it running
     val runner = new MesosExecutorBackend()
     new MesosExecutorDriver(runner).run()
-  }
-}

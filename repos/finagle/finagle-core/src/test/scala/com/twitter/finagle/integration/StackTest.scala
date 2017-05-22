@@ -11,22 +11,20 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class StackTest extends FunSuite {
-  class TestCtx extends StringClient with StringServer {
-    val failService = Service.mk[String, String] { s: String =>
+class StackTest extends FunSuite
+  class TestCtx extends StringClient with StringServer
+    val failService = Service.mk[String, String]  s: String =>
       Future.exception(Failure.rejected("unhappy"))
-    }
 
     val newClientStack = StackClient
       .newStack[String, String]
       .replace(StackClient.Role.prepFactory,
                (sf: ServiceFactory[String, String]) =>
                  sf.map(identity[Service[String, String]]))
-  }
 
   test(
-      "Client/Server: Status.busy propagates from failAccrual to the top of the stack") {
-    new TestCtx {
+      "Client/Server: Status.busy propagates from failAccrual to the top of the stack")
+    new TestCtx
       val server = stringServer.serve(new InetSocketAddress(0), failService)
       val client = stringClient
         .withStack(newClientStack)
@@ -36,17 +34,14 @@ class StackTest extends FunSuite {
             "client")
 
       // marked busy by FailureAccrualFactory
-      for (_ <- 0 until 6) {
+      for (_ <- 0 until 6)
         intercept[Exception](Await.result(client("hello\n")))
-      }
 
       assert(client.status == Status.Busy)
-    }
-  }
 
   test(
-      "ClientBuilder: Status.busy propagates from failAccrual to the top of the stack") {
-    new TestCtx {
+      "ClientBuilder: Status.busy propagates from failAccrual to the top of the stack")
+    new TestCtx
       val server = ServerBuilder()
         .codec(StringCodec)
         .bindTo(new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
@@ -60,17 +55,14 @@ class StackTest extends FunSuite {
         .build()
 
       // marked busy by FailureAccrualFactory
-      for (_ <- 0 until 6) {
+      for (_ <- 0 until 6)
         intercept[Exception](Await.result(client("hello\n")))
-      }
 
       assert(client.status == Status.Busy)
-    }
-  }
 
   test(
-      "Client/Server: Status.busy propagates from failFast to the top of the stack") {
-    new TestCtx {
+      "Client/Server: Status.busy propagates from failFast to the top of the stack")
+    new TestCtx
       val client = stringClient
         .withStack(newClientStack)
         .newService(
@@ -82,6 +74,3 @@ class StackTest extends FunSuite {
       intercept[Exception](Await.result(client("hello\n")))
 
       assert(client.status == Status.Busy)
-    }
-  }
-}

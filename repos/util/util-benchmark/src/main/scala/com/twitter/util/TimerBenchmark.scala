@@ -16,7 +16,7 @@ import org.openjdk.jmh.annotations._
 @BenchmarkMode(Array(Mode.SingleShotTime))
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 @Threads(4)
-class TimerBenchmark extends StdBenchAnnotations {
+class TimerBenchmark extends StdBenchAnnotations
 
   private[this] val period = 5.minutes
   private[this] val wayLater = Time.now + 20.minutes
@@ -26,17 +26,15 @@ class TimerBenchmark extends StdBenchAnnotations {
   @volatile private[this] var executor: ScheduledThreadPoolTimer = _
 
   @Setup(Level.Iteration)
-  def setup(): Unit = {
+  def setup(): Unit =
     javaUtil = new JavaTimer(true)
     executor = new ScheduledThreadPoolTimer(poolSize = 1, makeDaemons = true)
-  }
 
   @TearDown(Level.Iteration)
-  def tearDown(): Unit = {
+  def tearDown(): Unit =
     javaUtil.stop()
     // without this, the heap fills up with pending tasks.
     executor.stopWithPending()
-  }
 
   /**
     * Note: this really just benchmarks how expensive it is to "enqueue"
@@ -86,4 +84,3 @@ class TimerBenchmark extends StdBenchAnnotations {
   @Benchmark
   def doAtBaseline(): Future[Unit] =
     doAt(baseline)
-}

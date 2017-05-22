@@ -14,67 +14,54 @@ import org.jboss.netty.handler.codec.http.{HttpClientCodec, HttpServerCodec}
   */
 private[stream] class DelayedReleaseService[Req](
     self: Service[Req, StreamResponse])
-    extends ServiceProxy[Req, StreamResponse](self) {
+    extends ServiceProxy[Req, StreamResponse](self)
   @volatile private[this] var done: Future[Unit] = Future.Done
 
-  override def apply(req: Req) = {
+  override def apply(req: Req) =
     if (!done.isDefined)
       Future.exception(new TooManyConcurrentRequestsException)
-    else {
+    else
       val p = new Promise[Unit]
       done = p
-      self(req) map { res =>
-        new StreamResponse {
+      self(req) map  res =>
+        new StreamResponse
           def info = res.info
           def messages = res.messages
           def error = res.error
-          def release() {
+          def release()
             p.setDone()
             res.release()
-          }
-        }
-      } onFailure { _ =>
+      onFailure  _ =>
         p.setDone()
-      }
-    }
-  }
 
   override def close(deadline: Time) =
     done ensure { self.close(deadline) }
-}
 
-object Stream {
+object Stream
   def apply[Req : RequestType](): Stream[Req] = new Stream()
   def get[Req : RequestType](): Stream[Req] = apply()
-}
 
-class Stream[Req : RequestType] extends CodecFactory[Req, StreamResponse] {
-  def server: Server = Function.const {
-    new Codec[Req, StreamResponse] {
-      def pipelineFactory = new ChannelPipelineFactory {
-        def getPipeline = {
+class Stream[Req : RequestType] extends CodecFactory[Req, StreamResponse]
+  def server: Server = Function.const
+    new Codec[Req, StreamResponse]
+      def pipelineFactory = new ChannelPipelineFactory
+        def getPipeline =
           val pipeline = Channels.pipeline()
           pipeline.addLast("httpCodec", new HttpServerCodec)
           pipeline
-        }
-      }
 
       override def newServerDispatcher(
           transport: Transport[Any, Any],
           service: Service[Req, StreamResponse]): Closable =
         new StreamServerDispatcher(transport, service)
-    }
-  }
 
-  def client: Client = Function.const {
-    new Codec[Req, StreamResponse] {
-      def pipelineFactory = new ChannelPipelineFactory {
-        def getPipeline = {
+  def client: Client = Function.const
+    new Codec[Req, StreamResponse]
+      def pipelineFactory = new ChannelPipelineFactory
+        def getPipeline =
           val pipeline = Channels.pipeline()
           pipeline.addLast("httpCodec", new HttpClientCodec)
           pipeline
-        }
-      }
 
       override def newClientDispatcher(
           trans: Transport[Any, Any],
@@ -96,11 +83,8 @@ class Stream[Req : RequestType] extends CodecFactory[Req, StreamResponse] {
       override def newClientTransport(
           ch: Channel, statsReceiver: StatsReceiver): Transport[Any, Any] =
         new ChannelTransport(ch)
-    }
-  }
 
   override val protocolLibraryName: String = "http-stream"
-}
 
 /**
   * Indicates that a stream has ended.
@@ -110,34 +94,29 @@ object EOF extends Exception
 /**
   * HTTP header encoded as a string pair.
   */
-final class Header private (val key: String, val value: String) {
+final class Header private (val key: String, val value: String)
   override def toString: String = s"Header($key, $value)"
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case h: Header => h.key == key && h.value == value
     case _ => false
-  }
-}
 
-object Header {
-  implicit class Ops(val headers: Seq[Header]) extends AnyVal {
+object Header
+  implicit class Ops(val headers: Seq[Header]) extends AnyVal
 
     /**
       * The value of the first header found matching this key, or None.
       */
     def first(key: String): Option[String] =
       headers.find(_.key == key.toLowerCase).map(_.value)
-  }
 
   def apply(key: String, value: Any): Header =
     new Header(key.toLowerCase, value.toString)
-}
 
 /**
   * Represents the HTTP version.
   */
 case class Version(major: Int, minor: Int)
 
-trait RequestType[Req] {
+trait RequestType[Req]
   def canonize(req: Req): StreamRequest
   def specialize(req: StreamRequest): Req
-}

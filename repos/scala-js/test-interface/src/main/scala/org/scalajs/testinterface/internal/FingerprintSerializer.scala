@@ -5,9 +5,9 @@ import js.Dynamic.{literal => lit}
 
 import sbt.testing._
 
-object FingerprintSerializer {
+object FingerprintSerializer
 
-  def serialize(fp: Fingerprint): js.Dynamic = fp match {
+  def serialize(fp: Fingerprint): js.Dynamic = fp match
     case fp: AnnotatedFingerprint =>
       lit(fpType = "AnnotatedFingerprint",
           isModule = fp.isModule,
@@ -20,10 +20,9 @@ object FingerprintSerializer {
     case _ =>
       throw new IllegalArgumentException(
           s"Unknown Fingerprint type: ${fp.getClass}")
-  }
 
-  def deserialize(obj: js.Dynamic): Fingerprint = {
-    obj.fpType.asInstanceOf[String] match {
+  def deserialize(obj: js.Dynamic): Fingerprint =
+    obj.fpType.asInstanceOf[String] match
       case "AnnotatedFingerprint" =>
         new DeserializedAnnotatedFingerprint(
             obj.isModule.asInstanceOf[Boolean],
@@ -35,8 +34,6 @@ object FingerprintSerializer {
             obj.requireNoArgConstructor.asInstanceOf[Boolean])
       case tpe =>
         throw new IllegalArgumentException(s"Unknown Fingerprint type: $tpe")
-    }
-  }
 
   final class DeserializedAnnotatedFingerprint(
       val isModule: Boolean,
@@ -50,4 +47,3 @@ object FingerprintSerializer {
       val requireNoArgConstructor: Boolean
   )
       extends SubclassFingerprint
-}

@@ -43,7 +43,7 @@ import org.apache.spark.ui.SparkUI
 import org.apache.spark.util.{Clock, ManualClock, Utils}
 
 class ApplicationCacheSuite
-    extends SparkFunSuite with Logging with MockitoSugar with Matchers {
+    extends SparkFunSuite with Logging with MockitoSugar with Matchers
 
   /**
     * subclass with access to the cache internals
@@ -53,17 +53,16 @@ class ApplicationCacheSuite
       operations: ApplicationCacheOperations = new StubCacheOperations(),
       retainedApplications: Int,
       clock: Clock = new ManualClock(0))
-      extends ApplicationCache(operations, retainedApplications, clock) {
+      extends ApplicationCache(operations, retainedApplications, clock)
 
     def cache(): LoadingCache[CacheKey, CacheEntry] = appCache
-  }
 
   /**
     * Stub cache operations.
     * The state is kept in a map of [[CacheKey]] to [[CacheEntry]],
     * the `probeTime` field in the cache entry setting the timestamp of the entry
     */
-  class StubCacheOperations extends ApplicationCacheOperations with Logging {
+  class StubCacheOperations extends ApplicationCacheOperations with Logging
 
     /** map to UI instances, including timestamps, which are used in update probes */
     val instances = mutable.HashMap.empty[CacheKey, CacheEntry]
@@ -77,58 +76,53 @@ class ApplicationCacheSuite
     var updateProbeCount = 0L
 
     override def getAppUI(
-        appId: String, attemptId: Option[String]): Option[LoadedAppUI] = {
+        appId: String, attemptId: Option[String]): Option[LoadedAppUI] =
       logDebug(s"getAppUI($appId, $attemptId)")
       getAppUICount += 1
       instances
         .get(CacheKey(appId, attemptId))
         .map(
             e => LoadedAppUI(e.ui, updateProbe(appId, attemptId, e.probeTime)))
-    }
 
     override def attachSparkUI(appId: String,
                                attemptId: Option[String],
                                ui: SparkUI,
-                               completed: Boolean): Unit = {
+                               completed: Boolean): Unit =
       logDebug(s"attachSparkUI($appId, $attemptId, $ui)")
       attachCount += 1
       attached += (CacheKey(appId, attemptId) -> ui)
-    }
 
     def putAndAttach(appId: String,
                      attemptId: Option[String],
                      completed: Boolean,
                      started: Long,
                      ended: Long,
-                     timestamp: Long): SparkUI = {
+                     timestamp: Long): SparkUI =
       val ui = putAppUI(appId, attemptId, completed, started, ended, timestamp)
       attachSparkUI(appId, attemptId, ui, completed)
       ui
-    }
 
     def putAppUI(appId: String,
                  attemptId: Option[String],
                  completed: Boolean,
                  started: Long,
                  ended: Long,
-                 timestamp: Long): SparkUI = {
+                 timestamp: Long): SparkUI =
       val ui = newUI(appId, attemptId, completed, started, ended)
       putInstance(appId, attemptId, ui, completed, timestamp)
       ui
-    }
 
     def putInstance(appId: String,
                     attemptId: Option[String],
                     ui: SparkUI,
                     completed: Boolean,
-                    timestamp: Long): Unit = {
+                    timestamp: Long): Unit =
       instances +=
       (CacheKey(appId, attemptId) -> new CacheEntry(
               ui,
               completed,
               updateProbe(appId, attemptId, timestamp),
               timestamp))
-    }
 
     /**
       * Detach a reconstructed UI
@@ -136,22 +130,20 @@ class ApplicationCacheSuite
       * @param ui Spark UI
       */
     override def detachSparkUI(
-        appId: String, attemptId: Option[String], ui: SparkUI): Unit = {
+        appId: String, attemptId: Option[String], ui: SparkUI): Unit =
       logDebug(s"detachSparkUI($appId, $attemptId, $ui)")
       detachCount += 1
       var name = ui.getAppName
       val key = CacheKey(appId, attemptId)
       attached.getOrElse(key, { throw new java.util.NoSuchElementException() })
       attached -= key
-    }
 
     /**
       * Lookup from the internal cache of attached UIs
       */
     def getAttached(
-        appId: String, attemptId: Option[String]): Option[SparkUI] = {
+        appId: String, attemptId: Option[String]): Option[SparkUI] =
       attached.get(CacheKey(appId, attemptId))
-    }
 
     /**
       * The update probe.
@@ -161,15 +153,13 @@ class ApplicationCacheSuite
       */
     private[history] def updateProbe(appId: String,
                                      attemptId: Option[String],
-                                     updateTime: Long)(): Boolean = {
+                                     updateTime: Long)(): Boolean =
       updateProbeCount += 1
       logDebug(s"isUpdated($appId, $attemptId, ${updateTime})")
       val entry = instances.get(CacheKey(appId, attemptId)).get
       val updated = entry.probeTime > updateTime
       logDebug(s"entry = $entry; updated = $updated")
       updated
-    }
-  }
 
   /**
     * Create a new UI. The info/attempt info classes here are from the package
@@ -179,7 +169,7 @@ class ApplicationCacheSuite
             attemptId: Option[String],
             completed: Boolean,
             started: Long,
-            ended: Long): SparkUI = {
+            ended: Long): SparkUI =
     val info = new ApplicationInfo(name,
                                    name,
                                    Some(1),
@@ -201,7 +191,6 @@ class ApplicationCacheSuite
     val handler = new ServletContextHandler()
     when(ui.getHandlers).thenReturn(Seq(handler))
     ui
-  }
 
   /**
     * Test operations on completed UIs: they are loaded on demand, entries
@@ -209,7 +198,7 @@ class ApplicationCacheSuite
     *
     * This effectively tests the original behavior of the history server's cache.
     */
-  test("Completed UI get") {
+  test("Completed UI get")
     val operations = new StubCacheOperations()
     val clock = new ManualClock(1)
     implicit val cache = new ApplicationCache(operations, 2, clock)
@@ -268,9 +257,8 @@ class ApplicationCacheSuite
     operations.putAppUI(appId, attemptId, false, time3, 0, time3)
     // expect an error here
     assertNotFound(appId, None)
-  }
 
-  test("Test that if an attempt ID is is set, it must be used in lookups") {
+  test("Test that if an attempt ID is is set, it must be used in lookups")
     val operations = new StubCacheOperations()
     val clock = new ManualClock(1)
     implicit val cache = new ApplicationCache(
@@ -279,14 +267,13 @@ class ApplicationCacheSuite
     val attemptId = Some("_01")
     operations.putAppUI(appId, attemptId, false, clock.getTimeMillis(), 0, 0)
     assertNotFound(appId, None)
-  }
 
   /**
     * Test that incomplete apps are not probed for updates during the time window,
     * but that they are checked if that window has expired and they are not completed.
     * Then, if they have changed, the old entry is replaced by a new one.
     */
-  test("Incomplete apps refreshed") {
+  test("Incomplete apps refreshed")
     val operations = new StubCacheOperations()
     val clock = new ManualClock(50)
     val window = 500
@@ -337,7 +324,6 @@ class ApplicationCacheSuite
     clock.setTime(window * 20)
     assertCacheEntryEquals(appId, attemptId, entry5)
     assertMetric("updateProbeCount", metrics.updateProbeCount, 2)
-  }
 
   /**
     * Assert that a metric counter has a specific value; failure raises an exception
@@ -348,14 +334,12 @@ class ApplicationCacheSuite
     * @param cache cache
     */
   def assertMetric(name: String, counter: Counter, expected: Long)(
-      implicit cache: ApplicationCache): Unit = {
+      implicit cache: ApplicationCache): Unit =
     val actual = counter.getCount
-    if (actual != expected) {
+    if (actual != expected)
       // this is here because Scalatest loses stack depth
       throw new Exception(
           s"Wrong $name value - expected $expected but got $actual in $cache")
-    }
-  }
 
   /**
     * Look up the cache entry and assert that it matches in the expected value.
@@ -368,7 +352,7 @@ class ApplicationCacheSuite
     */
   def assertCacheEntryEquals(
       appId: String, attemptId: Option[String], expected: CacheEntry)(
-      implicit cache: ApplicationCache): Unit = {
+      implicit cache: ApplicationCache): Unit =
     val actual = cache.lookupCacheEntry(appId, attemptId)
     val errorText =
       s"Expected get($appId, $attemptId) -> $expected, but got $actual from $cache"
@@ -376,7 +360,6 @@ class ApplicationCacheSuite
     assert(expected.completed === actual.completed,
            errorText + " -completed flag")
     assert(expected.probeTime === actual.probeTime, errorText + " -timestamp")
-  }
 
   /**
     * Assert that a key wasn't found in cache or loaded.
@@ -387,18 +370,15 @@ class ApplicationCacheSuite
     * @param cache app cache
     */
   def assertNotFound(appId: String, attemptId: Option[String])(
-      implicit cache: ApplicationCache): Unit = {
-    val ex = intercept[UncheckedExecutionException] {
+      implicit cache: ApplicationCache): Unit =
+    val ex = intercept[UncheckedExecutionException]
       cache.get(appId, attemptId)
-    }
     var cause = ex.getCause
     assert(cause !== null)
-    if (!cause.isInstanceOf[NoSuchElementException]) {
+    if (!cause.isInstanceOf[NoSuchElementException])
       throw cause
-    }
-  }
 
-  test("Large Scale Application Eviction") {
+  test("Large Scale Application Eviction")
     val operations = new StubCacheOperations()
     val clock = new ManualClock(0)
     val size = 5
@@ -411,25 +391,22 @@ class ApplicationCacheSuite
     val ids = new ListBuffer[String]()
     // build a list of applications
     val count = 100
-    for (i <- 1 to count) {
+    for (i <- 1 to count)
       val appId = f"app-$i%04d"
       ids += appId
       clock.advance(10)
       val t = clock.getTimeMillis()
       operations.putAppUI(appId, attempt1, true, t, t, t)
-    }
     // now go through them in sequence reading them, expect evictions
-    ids.foreach { id =>
+    ids.foreach  id =>
       cache.get(id, attempt1)
-    }
     logInfo(cache.toString)
     val metrics = cache.metrics
 
     assertMetric("loadCount", metrics.loadCount, count)
     assertMetric("evictionCount", metrics.evictionCount, count - size)
-  }
 
-  test("Attempts are Evicted") {
+  test("Attempts are Evicted")
     val operations = new StubCacheOperations()
     implicit val cache: ApplicationCache =
       new TestApplicationCache(operations, retainedApplications = 4)
@@ -447,11 +424,10 @@ class ApplicationCacheSuite
     operations.putAppUI(appId, attempt5, true, 500, 510, 510)
 
     def expectLoadAndEvictionCounts(
-        expectedLoad: Int, expectedEvictionCount: Int): Unit = {
+        expectedLoad: Int, expectedEvictionCount: Int): Unit =
       assertMetric("loadCount", metrics.loadCount, expectedLoad)
       assertMetric(
           "evictionCount", metrics.evictionCount, expectedEvictionCount)
-    }
 
     // first entry
     cache.get(appId, attempt1)
@@ -474,17 +450,15 @@ class ApplicationCacheSuite
     expectLoadAndEvictionCounts(5, 1)
     cache.get(appId, attempt5)
     expectLoadAndEvictionCounts(5, 1)
-  }
 
-  test("Instantiate Filter") {
+  test("Instantiate Filter")
     // this is a regression test on the filter being constructable
     val clazz =
       Utils.classForName(ApplicationCacheCheckFilterRelay.FILTER_NAME)
     val instance = clazz.newInstance()
     instance shouldBe a[Filter]
-  }
 
-  test("redirect includes query params") {
+  test("redirect includes query params")
     val clazz =
       Utils.classForName(ApplicationCacheCheckFilterRelay.FILTER_NAME)
     val filter = clazz.newInstance().asInstanceOf[ApplicationCacheCheckFilter]
@@ -498,13 +472,10 @@ class ApplicationCacheSuite
       .thenReturn("http://localhost:18080/history/local-123/jobs/job/")
     when(request.getQueryString()).thenReturn("id=2")
     val resp = mock[HttpServletResponse]
-    when(resp.encodeRedirectURL(any())).thenAnswer(new Answer[String]() {
-      override def answer(invocationOnMock: InvocationOnMock): String = {
+    when(resp.encodeRedirectURL(any())).thenAnswer(new Answer[String]()
+      override def answer(invocationOnMock: InvocationOnMock): String =
         invocationOnMock.getArguments()(0).asInstanceOf[String]
-      }
-    })
+    )
     filter.doFilter(request, resp, null)
     verify(resp).sendRedirect(
         "http://localhost:18080/history/local-123/jobs/job/?id=2")
-  }
-}

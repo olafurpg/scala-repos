@@ -21,7 +21,7 @@ import scala.{specialized => spec}
  * Some matrix utilities
  */
 
-package object mat {
+package object mat
 
   /**
     * Generate a uniform random Mat[Double] of a certain size
@@ -89,11 +89,10 @@ package object mat {
   def randn2(rows: Int, cols: Int, mu: Double, sigma: Double): Mat[Double] =
     Mat(rows, cols, array.randNormal2(rows * cols, mu, sigma))
 
-  def ones(rows: Int, cols: Int): Mat[Double] = {
+  def ones(rows: Int, cols: Int): Mat[Double] =
     val tmp = Array.ofDim[Double](rows * cols)
     array.fill(tmp, 1.0)
     Mat(rows, cols, tmp)
-  }
 
   def zeros(rows: Int, cols: Int): Mat[Double] =
     Mat(rows, cols, array.empty[Double](rows * cols))
@@ -102,35 +101,30 @@ package object mat {
     * Create a square identity matrix of dimension n x n
     * @param n The number of rows/columns of the square matrix
     */
-  def ident(n: Int): Mat[Double] = {
+  def ident(n: Int): Mat[Double] =
     if (n <= 0) Mat.empty[Double]
-    else {
+    else
       val tmp = Array.ofDim[Double](n * n)
       var i = 0
-      while (i < n) {
+      while (i < n)
         tmp(n * i + i) = 1
         i += 1
-      }
       Mat(n, n, tmp)
-    }
-  }
 
   /**
     * Given a vector, create a matrix whose diagonal entries equal the vector, with zeros off-diagonal.
     * @param v The vector of source data
     */
-  def diag(v: Vec[Double]): Mat[Double] = {
+  def diag(v: Vec[Double]): Mat[Double] =
     val l = v.length
     val d = array.empty[Double](l * l)
 
     var i = 0
-    while (i < l) {
+    while (i < l)
       d(i * l + i) = v.raw(i)
       i += 1
-    }
 
     Mat(l, l, d)
-  }
 
   /**
     * Repeats an array in a particular direction to create a 2D matrix
@@ -141,14 +135,11 @@ package object mat {
     * @tparam T type of elements in array
     */
   def repeat[@spec(Boolean, Int, Long, Double) T : ST](
-      v: Array[T], n: Int, asRows: Boolean = false): Mat[T] = {
+      v: Array[T], n: Int, asRows: Boolean = false): Mat[T] =
 
-    if (asRows) {
+    if (asRows)
       val tmp = array.flatten(for (i <- 1 to n) yield v)
       Mat(n, v.length, tmp)
-    } else {
+    else
       val tmp = for (i <- array.range(0, n)) yield v
       Mat(tmp)
-    }
-  }
-}

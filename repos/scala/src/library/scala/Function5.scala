@@ -12,7 +12,7 @@ package scala
 /** A function of 5 parameters.
   *
   */
-trait Function5[-T1, -T2, -T3, -T4, -T5, +R] extends AnyRef { self =>
+trait Function5[-T1, -T2, -T3, -T4, -T5, +R] extends AnyRef  self =>
 
   /** Apply the body of this function to the arguments.
     *  @return   the result of function application.
@@ -24,10 +24,9 @@ trait Function5[-T1, -T2, -T3, -T4, -T5, +R] extends AnyRef { self =>
     *  @return   a function `f` such that `f(x1)(x2)(x3)(x4)(x5) == apply(x1, x2, x3, x4, x5)`
     */
   @annotation.unspecialized
-  def curried: T1 => T2 => T3 => T4 => T5 => R = { (x1: T1) =>
+  def curried: T1 => T2 => T3 => T4 => T5 => R =  (x1: T1) =>
     ((x2: T2, x3: T3, x4: T4, x5: T5) =>
       self.apply(x1, x2, x3, x4, x5)).curried
-  }
 
   /** Creates a tupled version of this function: instead of 5 arguments,
     *  it accepts a single [[scala.Tuple5]] argument.
@@ -35,8 +34,6 @@ trait Function5[-T1, -T2, -T3, -T4, -T5, +R] extends AnyRef { self =>
     *  @return   a function `f` such that `f((x1, x2, x3, x4, x5)) == f(Tuple5(x1, x2, x3, x4, x5)) == apply(x1, x2, x3, x4, x5)`
     */
   @annotation.unspecialized
-  def tupled: Tuple5[T1, T2, T3, T4, T5] => R = {
+  def tupled: Tuple5[T1, T2, T3, T4, T5] => R =
     case Tuple5(x1, x2, x3, x4, x5) => apply(x1, x2, x3, x4, x5)
-  }
   override def toString() = "<function5>"
-}

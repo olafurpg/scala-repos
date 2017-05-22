@@ -20,16 +20,14 @@ import org.scalajs.testsuite.niobuffer.ByteBufferJSFactories._
 
 object WrappedTypedArrayCharBufferJSTest extends SupportsTypedArrays
 
-class WrappedTypedArrayCharBufferJSTest extends CharBufferTest {
+class WrappedTypedArrayCharBufferJSTest extends CharBufferTest
 
   val factory: CharBufferFactory = new WrappedTypedArrayCharBufferJSFactory
 
   class WrappedTypedArrayCharBufferJSFactory
-      extends Factory with BufferFactory.WrappedTypedArrayBufferFactory {
+      extends Factory with BufferFactory.WrappedTypedArrayBufferFactory
     def baseWrap(array: Array[Char]): CharBuffer =
       TypedArrayBuffer.wrap(new Uint16Array(array.map(_.toInt).toJSArray))
-  }
-}
 
 // Char views of byte buffers
 

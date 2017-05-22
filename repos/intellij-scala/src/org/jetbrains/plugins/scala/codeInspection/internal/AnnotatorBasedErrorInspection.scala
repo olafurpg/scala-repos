@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.annotator.ScalaAnnotator
 /**
   * @author Alexander Podkhalyuzin
   */
-class AnnotatorBasedErrorInspection extends LocalInspectionTool {
+class AnnotatorBasedErrorInspection extends LocalInspectionTool
   override def isEnabledByDefault: Boolean = false
 
   override def getID: String = "AnnotatorBasedError"
@@ -30,40 +30,36 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
   override def getDisplayName: String = "Error highlighting for Scala"
 
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
-    new PsiElementVisitor {
-      override def visitElement(element: PsiElement) {
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
+    new PsiElementVisitor
+      override def visitElement(element: PsiElement)
         val file = element.getContainingFile
-        if (file.isInstanceOf[PsiJavaFile]) {
+        if (file.isInstanceOf[PsiJavaFile])
           val highlightVisitors = Extensions.getExtensions(
               HighlightVisitor.EP_HIGHLIGHT_VISITOR, element.getProject)
           val highlightInfoHolder = new HighlightInfoHolder(file)
 
-          highlightVisitors.headOption.map {
+          highlightVisitors.headOption.map
             case vr: HighlightVisitorImpl =>
               vr.clone()
-                .analyze(file, true, highlightInfoHolder, new Runnable {
-                  def run() {
+                .analyze(file, true, highlightInfoHolder, new Runnable
+                  def run()
                     vr.visit(element)
-                  }
-                })
+                )
             case _ =>
-          }
 
-          if (highlightInfoHolder.hasErrorResults) {
+          if (highlightInfoHolder.hasErrorResults)
             holder.registerProblem(element,
                                    "Error detected",
                                    ProblemHighlightType.ERROR,
                                    null: TextRange)
-          }
-        } else {
-          val annotator = new ScalaAnnotator {
+        else
+          val annotator = new ScalaAnnotator
             override def isAdvancedHighlightingEnabled(
                 element: PsiElement): Boolean = true
-          }
           val FakeAnnotation = new com.intellij.lang.annotation.Annotation(
               0, 0, HighlightSeverity.WEAK_WARNING, "message", "tooltip")
-          val annotationHolder = new AnnotationHolder {
+          val annotationHolder = new AnnotationHolder
             override def createAnnotation(severity: HighlightSeverity,
                                           range: TextRange,
                                           message: String,
@@ -95,65 +91,55 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
                 elt: PsiElement, message: String): Annotation = FakeAnnotation
 
             def createWarningAnnotation(
-                range: TextRange, message: String): Annotation = {
+                range: TextRange, message: String): Annotation =
               holder.registerProblem(
                   element,
                   s"Warning: $message",
                   ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
               FakeAnnotation
-            }
 
             def createWarningAnnotation(
-                node: ASTNode, message: String): Annotation = {
+                node: ASTNode, message: String): Annotation =
               holder.registerProblem(
                   element,
                   s"Warning: $message",
                   ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
               FakeAnnotation
-            }
 
             def createWarningAnnotation(
-                elt: PsiElement, message: String): Annotation = {
+                elt: PsiElement, message: String): Annotation =
               holder.registerProblem(
                   element,
                   s"Warning: $message",
                   ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
               FakeAnnotation
-            }
 
             def createErrorAnnotation(
-                range: TextRange, message: String): Annotation = {
-              if (message != null) {
+                range: TextRange, message: String): Annotation =
+              if (message != null)
                 holder.registerProblem(element,
                                        s"Error detected: $message",
                                        ProblemHighlightType.ERROR)
-              }
               FakeAnnotation
-            }
 
             def createErrorAnnotation(
-                node: ASTNode, message: String): Annotation = {
-              if (message != null) {
+                node: ASTNode, message: String): Annotation =
+              if (message != null)
                 holder.registerProblem(element,
                                        s"Error detected: $message",
                                        ProblemHighlightType.ERROR)
-              }
               FakeAnnotation
-            }
 
             def createErrorAnnotation(
-                elt: PsiElement, message: String): Annotation = {
-              if (message != null) {
+                elt: PsiElement, message: String): Annotation =
+              if (message != null)
                 holder.registerProblem(element,
                                        s"Error detected: $message",
                                        ProblemHighlightType.ERROR)
-              }
               FakeAnnotation
-            }
 
-            def getCurrentAnnotationSession: AnnotationSession = {
+            def getCurrentAnnotationSession: AnnotationSession =
               new AnnotationSession(element.getContainingFile)
-            }
 
             def createWeakWarningAnnotation(
                 p1: TextRange, p2: String): Annotation = FakeAnnotation
@@ -163,10 +149,4 @@ class AnnotatorBasedErrorInspection extends LocalInspectionTool {
 
             def createWeakWarningAnnotation(
                 p1: PsiElement, p2: String): Annotation = FakeAnnotation
-          }
           annotator.annotate(element, annotationHolder)
-        }
-      }
-    }
-  }
-}

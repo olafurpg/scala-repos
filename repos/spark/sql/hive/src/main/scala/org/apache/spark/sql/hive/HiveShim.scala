@@ -42,7 +42,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.sql.types.Decimal
 import org.apache.spark.util.Utils
 
-private[hive] object HiveShim {
+private[hive] object HiveShim
   // Precision and scale to pass for unlimited decimals; these are the same as the precision and
   // scale Hive 0.13 infers for BigDecimals from sources that don't specify them (e.g. UDFs)
   val UNLIMITED_DECIMAL_PRECISION = 38
@@ -53,74 +53,62 @@ private[hive] object HiveShim {
   /*
    * This function in hive-0.13 become private, but we have to do this to walkaround hive bug
    */
-  private def appendReadColumnNames(conf: Configuration, cols: Seq[String]) {
+  private def appendReadColumnNames(conf: Configuration, cols: Seq[String])
     val old: String =
       conf.get(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR, "")
     val result: StringBuilder = new StringBuilder(old)
     var first: Boolean = old.isEmpty
 
-    for (col <- cols) {
-      if (first) {
+    for (col <- cols)
+      if (first)
         first = false
-      } else {
+      else
         result.append(',')
-      }
       result.append(col)
-    }
     conf.set(ColumnProjectionUtils.READ_COLUMN_NAMES_CONF_STR, result.toString)
-  }
 
   /*
    * Cannot use ColumnProjectionUtils.appendReadColumns directly, if ids is null or empty
    */
   def appendReadColumns(
-      conf: Configuration, ids: Seq[Integer], names: Seq[String]) {
-    if (ids != null && ids.nonEmpty) {
+      conf: Configuration, ids: Seq[Integer], names: Seq[String])
+    if (ids != null && ids.nonEmpty)
       ColumnProjectionUtils.appendReadColumns(conf, ids.asJava)
-    }
-    if (names != null && names.nonEmpty) {
+    if (names != null && names.nonEmpty)
       appendReadColumnNames(conf, names)
-    }
-  }
 
   /*
    * Bug introduced in hive-0.13. AvroGenericRecordWritable has a member recordReaderID that
    * is needed to initialize before serialization.
    */
   def prepareWritable(
-      w: Writable, serDeProps: Seq[(String, String)]): Writable = {
-    w match {
+      w: Writable, serDeProps: Seq[(String, String)]): Writable =
+    w match
       case w: AvroGenericRecordWritable =>
         w.setRecordReaderID(new UID())
         // In Hive 1.1, the record's schema may need to be initialized manually or a NPE will
         // be thrown.
-        if (w.getFileSchema() == null) {
+        if (w.getFileSchema() == null)
           serDeProps
             .find(_._1 == AvroSerdeUtils.AvroTableProperties.SCHEMA_LITERAL
                   .getPropName())
-            .foreach { kv =>
+            .foreach  kv =>
               w.setFileSchema(new Schema.Parser().parse(kv._2))
-            }
-        }
       case _ =>
-    }
     w
-  }
 
-  def toCatalystDecimal(hdoi: HiveDecimalObjectInspector, data: Any): Decimal = {
-    if (hdoi.preferWritable()) {
+  def toCatalystDecimal(hdoi: HiveDecimalObjectInspector, data: Any): Decimal =
+    if (hdoi.preferWritable())
       Decimal(hdoi
                 .getPrimitiveWritableObject(data)
                 .getHiveDecimal()
                 .bigDecimalValue,
               hdoi.precision(),
               hdoi.scale())
-    } else {
+    else
       Decimal(hdoi.getPrimitiveJavaObject(data).bigDecimalValue(),
               hdoi.precision(),
               hdoi.scale())
-    }
-  }
 
   /**
     * This class provides the UDF creation and also the UDF instance serialization and
@@ -133,69 +121,61 @@ private[hive] object HiveShim {
     */
   private[hive] case class HiveFunctionWrapper(
       var functionClassName: String, private var instance: AnyRef = null)
-      extends java.io.Externalizable {
+      extends java.io.Externalizable
 
     // for Serialization
     def this() = this(null)
 
-    override def hashCode(): Int = {
-      if (functionClassName == HIVE_GENERIC_UDF_MACRO_CLS) {
+    override def hashCode(): Int =
+      if (functionClassName == HIVE_GENERIC_UDF_MACRO_CLS)
         Objects.hashCode(functionClassName,
                          instance.asInstanceOf[GenericUDFMacro].getBody())
-      } else {
+      else
         functionClassName.hashCode()
-      }
-    }
 
-    override def equals(other: Any): Boolean = other match {
+    override def equals(other: Any): Boolean = other match
       case a: HiveFunctionWrapper
           if functionClassName == a.functionClassName =>
         // In case of udf macro, check to make sure they point to the same underlying UDF
-        if (functionClassName == HIVE_GENERIC_UDF_MACRO_CLS) {
+        if (functionClassName == HIVE_GENERIC_UDF_MACRO_CLS)
           a.instance.asInstanceOf[GenericUDFMacro].getBody() == instance
             .asInstanceOf[GenericUDFMacro]
             .getBody()
-        } else {
+        else
           true
-        }
       case _ => false
-    }
 
     @transient
     def deserializeObjectByKryo[T : ClassTag](
-        kryo: Kryo, in: InputStream, clazz: Class[_]): T = {
+        kryo: Kryo, in: InputStream, clazz: Class[_]): T =
       val inp = new Input(in)
       val t: T = kryo.readObject(inp, clazz).asInstanceOf[T]
       inp.close()
       t
-    }
 
     @transient
-    def serializeObjectByKryo(kryo: Kryo, plan: Object, out: OutputStream) {
+    def serializeObjectByKryo(kryo: Kryo, plan: Object, out: OutputStream)
       val output: Output = new Output(out)
       kryo.writeObject(output, plan)
       output.close()
-    }
 
     def deserializePlan[UDFType](
-        is: java.io.InputStream, clazz: Class[_]): UDFType = {
+        is: java.io.InputStream, clazz: Class[_]): UDFType =
       deserializeObjectByKryo(
           Utilities.runtimeSerializationKryo.get(), is, clazz)
         .asInstanceOf[UDFType]
-    }
 
-    def serializePlan(function: AnyRef, out: java.io.OutputStream): Unit = {
+    def serializePlan(function: AnyRef, out: java.io.OutputStream): Unit =
       serializeObjectByKryo(
           Utilities.runtimeSerializationKryo.get(), function, out)
-    }
 
-    def writeExternal(out: java.io.ObjectOutput) {
+    def writeExternal(out: java.io.ObjectOutput)
       // output the function name
       out.writeUTF(functionClassName)
 
       // Write a flag if instance is null or not
       out.writeBoolean(instance != null)
-      if (instance != null) {
+      if (instance != null)
         // Some of the UDF are serializable, but some others are not
         // Hive Utilities can handle both cases
         val baos = new java.io.ByteArrayOutputStream()
@@ -205,14 +185,12 @@ private[hive] object HiveShim {
         // output the function bytes
         out.writeInt(functionInBytes.length)
         out.write(functionInBytes, 0, functionInBytes.length)
-      }
-    }
 
-    def readExternal(in: java.io.ObjectInput) {
+    def readExternal(in: java.io.ObjectInput)
       // read the function name
       functionClassName = in.readUTF()
 
-      if (in.readBoolean()) {
+      if (in.readBoolean())
         // if the instance is not null
         // read the function in bytes
         val functionInBytesLength = in.readInt()
@@ -223,39 +201,32 @@ private[hive] object HiveShim {
         instance = deserializePlan[AnyRef](
             new java.io.ByteArrayInputStream(functionInBytes),
             Utils.getContextOrSparkClassLoader.loadClass(functionClassName))
-      }
-    }
 
-    def createFunction[UDFType <: AnyRef](): UDFType = {
-      if (instance != null) {
+    def createFunction[UDFType <: AnyRef](): UDFType =
+      if (instance != null)
         instance.asInstanceOf[UDFType]
-      } else {
+      else
         val func = Utils.getContextOrSparkClassLoader
           .loadClass(functionClassName)
           .newInstance
           .asInstanceOf[UDFType]
-        if (!func.isInstanceOf[UDF]) {
+        if (!func.isInstanceOf[UDF])
           // We cache the function if it's no the Simple UDF,
           // as we always have to create new instance for Simple UDF
           instance = func
-        }
         func
-      }
-    }
-  }
 
   /*
    * Bug introduced in hive-0.13. FileSinkDesc is serializable, but its member path is not.
    * Fix it through wrapper.
    */
-  implicit def wrapperToFileSinkDesc(w: ShimFileSinkDesc): FileSinkDesc = {
+  implicit def wrapperToFileSinkDesc(w: ShimFileSinkDesc): FileSinkDesc =
     val f = new FileSinkDesc(new Path(w.dir), w.tableInfo, w.compressed)
     f.setCompressCodec(w.compressCodec)
     f.setCompressType(w.compressType)
     f.setTableInfo(w.tableInfo)
     f.setDestTableId(w.destTableId)
     f
-  }
 
   /*
    * Bug introduced in hive-0.13. FileSinkDesc is serializable, but its member path is not.
@@ -264,31 +235,24 @@ private[hive] object HiveShim {
   private[hive] class ShimFileSinkDesc(var dir: String,
                                        var tableInfo: TableDesc,
                                        var compressed: Boolean)
-      extends Serializable with Logging {
+      extends Serializable with Logging
     var compressCodec: String = _
     var compressType: String = _
     var destTableId: Int = _
 
-    def setCompressed(compressed: Boolean) {
+    def setCompressed(compressed: Boolean)
       this.compressed = compressed
-    }
 
     def getDirName(): String = dir
 
-    def setDestTableId(destTableId: Int) {
+    def setDestTableId(destTableId: Int)
       this.destTableId = destTableId
-    }
 
-    def setTableInfo(tableInfo: TableDesc) {
+    def setTableInfo(tableInfo: TableDesc)
       this.tableInfo = tableInfo
-    }
 
-    def setCompressCodec(intermediateCompressorCodec: String) {
+    def setCompressCodec(intermediateCompressorCodec: String)
       compressCodec = intermediateCompressorCodec
-    }
 
-    def setCompressType(intermediateCompressType: String) {
+    def setCompressType(intermediateCompressType: String)
       compressType = intermediateCompressType
-    }
-  }
-}

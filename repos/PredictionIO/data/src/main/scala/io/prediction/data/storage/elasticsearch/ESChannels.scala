@@ -28,7 +28,7 @@ import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
 class ESChannels(client: Client, config: StorageClientConfig, index: String)
-    extends Channels with Logging {
+    extends Channels with Logging
 
   implicit val formats = DefaultFormats.lossless
   private val estype = "channels"
@@ -37,12 +37,11 @@ class ESChannels(client: Client, config: StorageClientConfig, index: String)
 
   val indices = client.admin.indices
   val indexExistResponse = indices.prepareExists(index).get
-  if (!indexExistResponse.isExists) {
+  if (!indexExistResponse.isExists)
     indices.prepareCreate(index).get
-  }
   val typeExistResponse =
     indices.prepareTypesExists(index).setTypes(estype).get
-  if (!typeExistResponse.isExists) {
+  if (!typeExistResponse.isExists)
     val json =
       (estype ->
           ("properties" ->
@@ -52,66 +51,55 @@ class ESChannels(client: Client, config: StorageClientConfig, index: String)
       .setType(estype)
       .setSource(compact(render(json)))
       .get
-  }
 
-  def insert(channel: Channel): Option[Int] = {
+  def insert(channel: Channel): Option[Int] =
     val id =
-      if (channel.id == 0) {
+      if (channel.id == 0)
         var roll = seq.genNext(seqName)
         while (!get(roll).isEmpty) roll = seq.genNext(seqName)
         roll
-      } else channel.id
+      else channel.id
 
     val realChannel = channel.copy(id = id)
     if (update(realChannel)) Some(id) else None
-  }
 
-  def get(id: Int): Option[Channel] = {
-    try {
+  def get(id: Int): Option[Channel] =
+    try
       val response = client.prepareGet(index, estype, id.toString).get()
       Some(read[Channel](response.getSourceAsString))
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         None
       case e: NullPointerException => None
-    }
-  }
 
-  def getByAppid(appid: Int): Seq[Channel] = {
-    try {
+  def getByAppid(appid: Int): Seq[Channel] =
+    try
       val builder = client
         .prepareSearch(index)
         .setTypes(estype)
         .setPostFilter(termFilter("appid", appid))
       ESUtils.getAll[Channel](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq[Channel]()
-    }
-  }
 
-  def update(channel: Channel): Boolean = {
-    try {
+  def update(channel: Channel): Boolean =
+    try
       val response = client
         .prepareIndex(index, estype, channel.id.toString)
         .setSource(write(channel))
         .get()
       true
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         false
-    }
-  }
 
-  def delete(id: Int): Unit = {
-    try {
+  def delete(id: Int): Unit =
+    try
       client.prepareDelete(index, estype, id.toString).get
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
-    }
-  }
-}

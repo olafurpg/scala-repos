@@ -24,42 +24,38 @@ import org.apache.spark.sql.catalyst.plans.logical._
   * This suite is used to test [[LogicalPlan]]'s `resolveOperators` and make sure it can correctly
   * skips sub-trees that have already been marked as analyzed.
   */
-class LogicalPlanSuite extends SparkFunSuite {
+class LogicalPlanSuite extends SparkFunSuite
   private var invocationCount = 0
-  private val function: PartialFunction[LogicalPlan, LogicalPlan] = {
+  private val function: PartialFunction[LogicalPlan, LogicalPlan] =
     case p: Project =>
       invocationCount += 1
       p
-  }
 
   private val testRelation = LocalRelation()
 
-  test("resolveOperator runs on operators") {
+  test("resolveOperator runs on operators")
     invocationCount = 0
     val plan = Project(Nil, testRelation)
     plan resolveOperators function
 
     assert(invocationCount === 1)
-  }
 
-  test("resolveOperator runs on operators recursively") {
+  test("resolveOperator runs on operators recursively")
     invocationCount = 0
     val plan = Project(Nil, Project(Nil, testRelation))
     plan resolveOperators function
 
     assert(invocationCount === 2)
-  }
 
-  test("resolveOperator skips all ready resolved plans") {
+  test("resolveOperator skips all ready resolved plans")
     invocationCount = 0
     val plan = Project(Nil, Project(Nil, testRelation))
     plan.foreach(_.setAnalyzed())
     plan resolveOperators function
 
     assert(invocationCount === 0)
-  }
 
-  test("resolveOperator skips partially resolved plans") {
+  test("resolveOperator skips partially resolved plans")
     invocationCount = 0
     val plan1 = Project(Nil, testRelation)
     val plan2 = Project(Nil, plan1)
@@ -67,5 +63,3 @@ class LogicalPlanSuite extends SparkFunSuite {
     plan2 resolveOperators function
 
     assert(invocationCount === 1)
-  }
-}

@@ -14,7 +14,7 @@ import akka.util.ByteString
 /**
   * A collection of predefined marshallers.
   */
-object Marshallers {
+object Marshallers
 
   /**
     * A marshaller that marshals a String to a `text/plain` using a charset as negotiated with the
@@ -76,7 +76,7 @@ object Marshallers {
   def toEntity[T](
       contentType: ContentType,
       convert: function.Function[T, ResponseEntity]): Marshaller[T] =
-    MarshallerImpl { _ ⇒
+    MarshallerImpl  _ ⇒
       ScalaMarshaller.withFixedContentType(contentType.asScala)(
           t ⇒
             HttpResponse
@@ -84,7 +84,6 @@ object Marshallers {
               .withStatus(200)
               .withEntity(convert(t))
               .asScala)
-    }
 
   /**
     * Creates a marshaller from a ContentType and a conversion function from `T` to an `HttpResponse`.
@@ -92,8 +91,6 @@ object Marshallers {
   def toResponse[T](
       contentType: ContentType,
       convert: function.Function[T, HttpResponse]): Marshaller[T] =
-    MarshallerImpl { _ ⇒
+    MarshallerImpl  _ ⇒
       ScalaMarshaller.withFixedContentType(contentType.asScala)(
           t ⇒ convert(t).asScala)
-    }
-}

@@ -35,22 +35,20 @@ import com.weiglewilczek.slf4s.Logging
 
 class MongoStorageMetadataSource(
     mongo: Mongo)(implicit asyncContext: ExecutionContext)
-    extends StorageMetadataSource[Future] {
+    extends StorageMetadataSource[Future]
   def userMetadataView(apiKey: APIKey): StorageMetadata[Future] =
     new MongoStorageMetadata(mongo)
-}
 
 class MongoStorageMetadata(
     mongo: Mongo)(implicit asyncContext: ExecutionContext)
-    extends StorageMetadata[Future] with Logging {
+    extends StorageMetadata[Future] with Logging
   implicit val M = new FutureMonad(asyncContext)
 
   // FIXME: Actually implement these for Mongo
-  def findDirectChildren(path: Path): Future[Set[Path]] = {
+  def findDirectChildren(path: Path): Future[Set[Path]] =
     logger.warn(
         "Path globs will be supported in a future release of Precog for MongoDB")
     Promise.successful(Set())
-  }
 
   def findSize(path: Path) = Promise.successful(0L)
 
@@ -61,4 +59,3 @@ class MongoStorageMetadata(
 
   def currentVersion(path: Path) = Promise.successful(None)
   def currentAuthorities(path: Path) = Promise.successful(None)
-}

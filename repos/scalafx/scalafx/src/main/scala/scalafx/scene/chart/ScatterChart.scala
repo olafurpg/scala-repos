@@ -32,7 +32,7 @@ import scala.language.implicitConversions
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object ScatterChart {
+object ScatterChart
   implicit def sfxScatterChart2jfx[X, Y](
       v: ScatterChart[X, Y]): jfxsc.ScatterChart[X, Y] =
     if (v != null) v.delegate else null
@@ -44,19 +44,15 @@ object ScatterChart {
                   yAxis: Axis[Y],
                   data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new ScatterChart[X, Y](new jfxsc.ScatterChart[X, Y](xAxis, yAxis, data))
-}
 
 class ScatterChart[X, Y](override val delegate: jfxsc.ScatterChart[X, Y])
     extends XYChart[X, Y](delegate)
-    with SFXDelegate[jfxsc.ScatterChart[X, Y]] {
+    with SFXDelegate[jfxsc.ScatterChart[X, Y]]
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y]) {
+  def this(xAxis: Axis[X], yAxis: Axis[Y])
     this(new jfxsc.ScatterChart[X, Y](xAxis, yAxis))
-  }
 
   def this(xAxis: Axis[X],
            yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]])
     this(new jfxsc.ScatterChart[X, Y](xAxis, yAxis, data))
-  }
-}

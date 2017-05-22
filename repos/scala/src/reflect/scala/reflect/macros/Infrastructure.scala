@@ -8,7 +8,7 @@ package macros
   *  A slice of [[scala.reflect.macros.blackbox.Context the Scala macros context]] that
   *  provides facilities to communicate with the compiler's infrastructure.
   */
-trait Infrastructure { self: blackbox.Context =>
+trait Infrastructure  self: blackbox.Context =>
 
   /** Exposes macro-specific settings as a list of strings.
     *  These settings are passed to the compiler via the "-Xmacro-settings:setting1,setting2...,settingN" command-line option.
@@ -22,4 +22,3 @@ trait Infrastructure { self: blackbox.Context =>
 
   /** Exposes current classpath. */
   def classPath: List[java.net.URL]
-}

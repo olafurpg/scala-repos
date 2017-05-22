@@ -8,7 +8,7 @@ import java.lang.reflect.Modifier
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
 
-object DslConsistencySpec {
+object DslConsistencySpec
   class ScalaSubSource[Out, Mat]
       extends impl.SubFlowImpl[Out,
                                Out,
@@ -21,9 +21,8 @@ object DslConsistencySpec {
                                Mat,
                                scaladsl.Flow[In, Out, Mat]#Repr,
                                scaladsl.Sink[In, Mat]](null, null, null)
-}
 
-class DslConsistencySpec extends WordSpec with Matchers {
+class DslConsistencySpec extends WordSpec with Matchers
 
   val sFlowClass: Class[_] = classOf[akka.stream.scaladsl.Flow[_, _, _]]
   val jFlowClass: Class[_] = classOf[akka.stream.javadsl.Flow[_, _, _]]
@@ -95,15 +94,14 @@ class DslConsistencySpec extends WordSpec with Matchers {
   def materializing(m: Method): Boolean =
     m.getParameterTypes.contains(classOf[ActorMaterializer])
 
-  def assertHasMethod(c: Class[_], name: String): Unit = {
+  def assertHasMethod(c: Class[_], name: String): Unit =
     // include class name to get better error message
     if (!allowMissing.getOrElse(c, Set.empty).contains(name))
-      c.getMethods.collect {
+      c.getMethods.collect
         case m if !ignore(m.getName) ⇒ c.getName + "." + m.getName
-      } should contain(c.getName + "." + name)
-  }
+      should contain(c.getName + "." + name)
 
-  "Java and Scala DSLs" must {
+  "Java and Scala DSLs" must
 
     ("Source" -> List[Class[_]](sSourceClass, jSourceClass)) ::
     ("SubSource" -> List[Class[_]](sSubSourceClass, jSubSourceClass)) ::
@@ -111,31 +109,26 @@ class DslConsistencySpec extends WordSpec with Matchers {
     ("SubFlow" -> List[Class[_]](sSubFlowClass, jSubFlowClass)) ::
     ("Sink" -> List[Class[_]](sSinkClass, jSinkClass)) ::
     ("RunanbleFlow" -> List[Class[_]](sRunnableGraphClass,
-                                      jRunnableGraphClass)) :: Nil foreach {
+                                      jRunnableGraphClass)) :: Nil foreach
       case (element, classes) ⇒
-        s"provide same $element transforming operators" in {
-          val allOps = (for {
+        s"provide same $element transforming operators" in
+          val allOps = (for
             c ← classes
             m ← c.getMethods if !Modifier.isStatic(m.getModifiers)
                if !ignore(m.getName)
                if !m.getName.contains("$")
                if !materializing(m)
-          } yield m.getName).toSet
+          yield m.getName).toSet
 
           for (c ← classes; op ← allOps) assertHasMethod(c, op)
-        }
 
-        s"provide same $element materializing operators" in {
-          val materializingOps = (for {
+        s"provide same $element materializing operators" in
+          val materializingOps = (for
             c ← classes
             m ← c.getMethods if !Modifier.isStatic(m.getModifiers)
                if !ignore(m.getName)
                if !m.getName.contains("$")
                if materializing(m)
-          } yield m.getName).toSet
+          yield m.getName).toSet
 
           for (c ← classes; op ← materializingOps) assertHasMethod(c, op)
-        }
-    }
-  }
-}

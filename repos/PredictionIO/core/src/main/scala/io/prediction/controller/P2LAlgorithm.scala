@@ -40,7 +40,7 @@ import scala.reflect._
   * @group Algorithm
   */
 abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
-    extends BaseAlgorithm[PD, M, Q, P] {
+    extends BaseAlgorithm[PD, M, Q, P]
 
   def trainBase(sc: SparkContext, pd: PD): M = train(sc, pd)
 
@@ -63,11 +63,9 @@ abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
     *           predicted results with corresponding queries.
     * @return Batch of predicted results
     */
-  def batchPredict(m: M, qs: RDD[(Long, Q)]): RDD[(Long, P)] = {
-    qs.mapValues { q =>
+  def batchPredict(m: M, qs: RDD[(Long, Q)]): RDD[(Long, P)] =
+    qs.mapValues  q =>
       predict(m, q)
-    }
-  }
 
   def predictBase(bm: Any, q: Q): P = predict(bm.asInstanceOf[M], q)
 
@@ -103,17 +101,13 @@ abstract class P2LAlgorithm[PD, M : ClassTag, Q : ClassTag, P]
     */
   @DeveloperApi
   override def makePersistentModel(
-      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any = {
+      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any =
     val m = bm.asInstanceOf[M]
-    if (m.isInstanceOf[PersistentModel[_]]) {
+    if (m.isInstanceOf[PersistentModel[_]])
       if (m.asInstanceOf[PersistentModel[Params]]
-            .save(modelId, algoParams, sc)) {
+            .save(modelId, algoParams, sc))
         PersistentModelManifest(className = m.getClass.getName)
-      } else {
+      else
         Unit
-      }
-    } else {
+    else
       m
-    }
-  }
-}

@@ -27,17 +27,16 @@ import BackendReporting._
 import scala.collection.convert.decorateAsScala._
 import scala.tools.testing.ClearAfterClass
 
-object InlineWarningTest extends ClearAfterClass.Clearable {
+object InlineWarningTest extends ClearAfterClass.Clearable
   val argsNoWarn = "-Yopt:l:classpath"
   val args = argsNoWarn + " -Yopt-warnings"
   var compiler = newCompiler(extraArgs = args)
   var compilerWarnAll = newCompiler(
       extraArgs = argsNoWarn + " -Yopt-warnings:_")
   def clear(): Unit = { compiler = null; compilerWarnAll = null }
-}
 
 @RunWith(classOf[JUnit4])
-class InlineWarningTest extends ClearAfterClass {
+class InlineWarningTest extends ClearAfterClass
   ClearAfterClass.stateToClear = InlineWarningTest
 
   val compiler = InlineWarningTest.compiler
@@ -46,12 +45,11 @@ class InlineWarningTest extends ClearAfterClass {
   def compile(scalaCode: String,
               javaCode: List[(String, String)] = Nil,
               allowMessage: StoreReporter#Info => Boolean = _ => false,
-              compiler: Global = compiler): List[ClassNode] = {
+              compiler: Global = compiler): List[ClassNode] =
     compileClasses(compiler)(scalaCode, javaCode, allowMessage)
-  }
 
   @Test
-  def nonFinal(): Unit = {
+  def nonFinal(): Unit =
     val code = """class C {
         |  @inline def m1 = 1
         |}
@@ -72,20 +70,17 @@ class InlineWarningTest extends ClearAfterClass {
     compile(code,
             allowMessage = i => { count += 1; warns.exists(i.msg contains _) })
     assert(count == 5, count) // TODO SD-85: 5th warning
-  }
 
   // TODO SD-85: no more impl classes. this test (and the warning it tests!) can be removed
   @org.junit.Ignore
   @Test
-  def traitMissingImplClass(): Unit = {
+  def traitMissingImplClass(): Unit =
     val codeA = "trait T { @inline final def f = 1 }"
     val codeB = "class C { def t1(t: T) = t.f }"
 
     val removeImpl = (outDir: AbstractFile) =>
-      {
         val f = outDir.lookupName("T$class.class", directory = false)
         if (f != null) f.delete()
-    }
 
     val warn =
       """T::f()I is annotated @inline but cannot be inlined: the trait method call could not be rewritten to the static implementation method. Possible reason:
@@ -105,10 +100,9 @@ class InlineWarningTest extends ClearAfterClass {
         extraArgs = InlineWarningTest.argsNoWarn,
         afterEach = removeImpl,
         allowMessage = _.msg contains "there was one inliner warning")
-  }
 
   @Test
-  def handlerNonEmptyStack(): Unit = {
+  def handlerNonEmptyStack(): Unit =
     val code =
       """class C {
         |  @noinline def q = 0
@@ -121,15 +115,13 @@ class InlineWarningTest extends ClearAfterClass {
     compile(
         code,
         allowMessage = i =>
-            {
             c += 1;
             i.msg contains "operand stack at the callsite in C::t1()V contains more values"
-        })
+        )
     assert(c == 1, c)
-  }
 
   @Test
-  def mixedWarnings(): Unit = {
+  def mixedWarnings(): Unit =
     val javaCode = """public class A {
         |  public static final int bar() { return 100; }
         |}
@@ -168,10 +160,9 @@ class InlineWarningTest extends ClearAfterClass {
         List((javaCode, "A.java")),
         allowMessage = i => { c += 1; warns.exists(i.msg contains _) })
     assert(c == 2, c)
-  }
 
   @Test
-  def cannotInlinePrivateCallIntoDifferentClass(): Unit = {
+  def cannotInlinePrivateCallIntoDifferentClass(): Unit =
     val code = """class M {
         |  @inline final def f = {
         |    @noinline def nested = 0
@@ -194,10 +185,9 @@ class InlineWarningTest extends ClearAfterClass {
     var c = 0
     compile(code, allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
-  }
 
   @Test
-  def dontWarnWhenNotIlnineAnnotated(): Unit = {
+  def dontWarnWhenNotIlnineAnnotated(): Unit =
     val code = """class M {
         |  final def f(t: Int => Int) = {
         |    @noinline def nested = 0
@@ -222,10 +212,9 @@ class InlineWarningTest extends ClearAfterClass {
             compiler = compilerWarnAll,
             allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
-  }
 
   @Test
-  def cannotMixStrictfp(): Unit = {
+  def cannotMixStrictfp(): Unit =
     val code = """import annotation.strictfp
         |class C {
         |  @strictfp @inline final def f = 0
@@ -241,5 +230,3 @@ class InlineWarningTest extends ClearAfterClass {
     var c = 0
     compile(code, allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
-  }
-}

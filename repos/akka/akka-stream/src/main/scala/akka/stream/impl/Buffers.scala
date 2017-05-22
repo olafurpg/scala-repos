@@ -9,7 +9,7 @@ import akka.stream._
 /**
   * INTERNAL API
   */
-private[akka] trait Buffer[T] {
+private[akka] trait Buffer[T]
   def capacity: Int
   def used: Int
   def isFull: Boolean
@@ -23,9 +23,8 @@ private[akka] trait Buffer[T] {
   def clear(): Unit
   def dropHead(): Unit
   def dropTail(): Unit
-}
 
-private[akka] object Buffer {
+private[akka] object Buffer
   val FixedQueueSize = 128
   val FixedQueueMask = 127
 
@@ -33,20 +32,18 @@ private[akka] object Buffer {
     apply(size, settings.maxFixedBufferSize)
 
   def apply[T](size: Int, materializer: Materializer): Buffer[T] =
-    materializer match {
+    materializer match
       case m: ActorMaterializer ⇒ apply(size, m.settings.maxFixedBufferSize)
       case _ ⇒ apply(size, 1000000000)
-    }
 
   def apply[T](size: Int, max: Int): Buffer[T] =
     if (size < FixedQueueSize || size < max) FixedSizeBuffer(size)
     else new BoundedBuffer(size)
-}
 
 /**
   * INTERNAL API
   */
-private[akka] object FixedSizeBuffer {
+private[akka] object FixedSizeBuffer
 
   /**
     * INTERNAL API
@@ -63,7 +60,7 @@ private[akka] object FixedSizeBuffer {
     else new ModuloFixedSizeBuffer(size)
 
   sealed abstract class FixedSizeBuffer[T](val capacity: Int)
-      extends Buffer[T] {
+      extends Buffer[T]
     override def toString =
       s"Buffer($capacity, $readIdx, $writeIdx)(${(readIdx until writeIdx).map(get).mkString(", ")})"
     private val buffer = new Array[AnyRef](capacity)
@@ -76,10 +73,9 @@ private[akka] object FixedSizeBuffer {
     def isEmpty: Boolean = used == 0
     def nonEmpty: Boolean = used != 0
 
-    def enqueue(elem: T): Unit = {
+    def enqueue(elem: T): Unit =
       put(writeIdx, elem, false)
       writeIdx += 1
-    }
 
     // for the maintenance parameter see dropHead
     protected def toOffset(idx: Long, maintenance: Boolean): Int
@@ -91,37 +87,32 @@ private[akka] object FixedSizeBuffer {
 
     def peek(): T = get(readIdx)
 
-    def dequeue(): T = {
+    def dequeue(): T =
       val result = get(readIdx)
       dropHead()
       result
-    }
 
-    def clear(): Unit = {
+    def clear(): Unit =
       java.util.Arrays.fill(buffer, null)
       readIdx = 0
       writeIdx = 0
-    }
 
-    def dropHead(): Unit = {
+    def dropHead(): Unit =
       /*
        * this is the only place where readIdx is advanced, so give ModuloFixedSizeBuffer
        * a chance to prevent its fatal wrap-around
        */
       put(readIdx, null.asInstanceOf[T], true)
       readIdx += 1
-    }
 
-    def dropTail(): Unit = {
+    def dropTail(): Unit =
       writeIdx -= 1
       put(writeIdx, null.asInstanceOf[T], false)
-    }
-  }
 
   private[akka] final class ModuloFixedSizeBuffer[T](_size: Int)
-      extends FixedSizeBuffer[T](_size) {
-    override protected def toOffset(idx: Long, maintenance: Boolean): Int = {
-      if (maintenance && readIdx > Int.MaxValue) {
+      extends FixedSizeBuffer[T](_size)
+    override protected def toOffset(idx: Long, maintenance: Boolean): Int =
+      if (maintenance && readIdx > Int.MaxValue)
         /*
          * In order to be able to run perpetually we must ensure that the counters
          * don’t overrun into negative territory, so set them back by as many multiples
@@ -130,24 +121,19 @@ private[akka] object FixedSizeBuffer {
         val shift = Int.MaxValue - (Int.MaxValue % capacity)
         readIdx -= shift
         writeIdx -= shift
-      }
       (idx % capacity).toInt
-    }
-  }
 
   private[akka] final class PowerOfTwoFixedSizeBuffer[T](_size: Int)
-      extends FixedSizeBuffer[T](_size) {
+      extends FixedSizeBuffer[T](_size)
     private val Mask = capacity - 1
     override protected def toOffset(idx: Long, maintenance: Boolean): Int =
       idx.toInt & Mask
-  }
-}
 
 /**
   * INTERNAL API
   */
 private[akka] final class BoundedBuffer[T](val capacity: Int)
-    extends Buffer[T] {
+    extends Buffer[T]
 
   def used: Int = q.used
   def isFull: Boolean = q.isFull
@@ -162,7 +148,7 @@ private[akka] final class BoundedBuffer[T](val capacity: Int)
   def dropHead(): Unit = q.dropHead()
   def dropTail(): Unit = q.dropTail()
 
-  private final class FixedQueue extends Buffer[T] {
+  private final class FixedQueue extends Buffer[T]
     import Buffer._
 
     private val queue = new Array[AnyRef](FixedQueueSize)
@@ -176,41 +162,35 @@ private[akka] final class BoundedBuffer[T](val capacity: Int)
     override def nonEmpty = tail != head
 
     override def enqueue(elem: T): Unit =
-      if (tail - head == FixedQueueSize) {
+      if (tail - head == FixedQueueSize)
         val queue = new DynamicQueue(head)
-        while (nonEmpty) {
+        while (nonEmpty)
           queue.enqueue(dequeue())
-        }
         q = queue
         queue.enqueue(elem)
-      } else {
+      else
         queue(tail & FixedQueueMask) = elem.asInstanceOf[AnyRef]
         tail += 1
-      }
-    override def dequeue(): T = {
+    override def dequeue(): T =
       val pos = head & FixedQueueMask
       val ret = queue(pos).asInstanceOf[T]
       queue(pos) = null
       head += 1
       ret
-    }
 
     override def peek(): T =
       if (tail == head) null.asInstanceOf[T]
       else queue(head & FixedQueueMask).asInstanceOf[T]
     override def clear(): Unit =
-      while (nonEmpty) {
+      while (nonEmpty)
         dequeue()
-      }
     override def dropHead(): Unit = dequeue()
-    override def dropTail(): Unit = {
+    override def dropTail(): Unit =
       tail -= 1
       queue(tail & FixedQueueMask) = null
-    }
-  }
 
   private final class DynamicQueue(startIdx: Int)
-      extends ju.LinkedList[T] with Buffer[T] {
+      extends ju.LinkedList[T] with Buffer[T]
     override def capacity = BoundedBuffer.this.capacity
     override def used = size
     override def isFull = size == capacity
@@ -221,7 +201,5 @@ private[akka] final class BoundedBuffer[T](val capacity: Int)
 
     override def dropHead(): Unit = remove()
     override def dropTail(): Unit = removeLast()
-  }
 
   private var q: Buffer[T] = new FixedQueue
-}

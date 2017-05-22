@@ -23,11 +23,11 @@ import scalikejdbc._
 /** JDBC implementations of [[EvaluationInstances]] */
 class JDBCEvaluationInstances(
     client: String, config: StorageClientConfig, prefix: String)
-    extends EvaluationInstances with Logging {
+    extends EvaluationInstances with Logging
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "evaluationinstances")
-  DB autoCommit { implicit session =>
+  DB autoCommit  implicit session =>
     sql"""
     create table if not exists $tableName (
       id varchar(100) not null primary key,
@@ -42,9 +42,8 @@ class JDBCEvaluationInstances(
       evaluatorResults text not null,
       evaluatorResultsHTML text not null,
       evaluatorResultsJSON text)""".execute().apply()
-  }
 
-  def insert(i: EvaluationInstance): String = DB localTx { implicit session =>
+  def insert(i: EvaluationInstance): String = DB localTx  implicit session =>
     val id = java.util.UUID.randomUUID().toString
     sql"""
     INSERT INTO $tableName VALUES(
@@ -61,9 +60,8 @@ class JDBCEvaluationInstances(
       ${i.evaluatorResultsHTML},
       ${i.evaluatorResultsJSON})""".update().apply()
     id
-  }
 
-  def get(id: String): Option[EvaluationInstance] = DB localTx {
+  def get(id: String): Option[EvaluationInstance] = DB localTx
     implicit session =>
       sql"""
     SELECT
@@ -81,9 +79,8 @@ class JDBCEvaluationInstances(
       evaluatorResultsJSON
     FROM $tableName WHERE id = $id
     """.map(resultToEvaluationInstance).single().apply()
-  }
 
-  def getAll(): Seq[EvaluationInstance] = DB localTx { implicit session =>
+  def getAll(): Seq[EvaluationInstance] = DB localTx  implicit session =>
     sql"""
     SELECT
       id,
@@ -100,9 +97,8 @@ class JDBCEvaluationInstances(
       evaluatorResultsJSON
     FROM $tableName
     """.map(resultToEvaluationInstance).list().apply()
-  }
 
-  def getCompleted(): Seq[EvaluationInstance] = DB localTx { implicit s =>
+  def getCompleted(): Seq[EvaluationInstance] = DB localTx  implicit s =>
     sql"""
     SELECT
       id,
@@ -122,9 +118,8 @@ class JDBCEvaluationInstances(
       status = 'EVALCOMPLETED'
     ORDER BY starttime DESC
     """.map(resultToEvaluationInstance).list().apply()
-  }
 
-  def update(i: EvaluationInstance): Unit = DB localTx { implicit session =>
+  def update(i: EvaluationInstance): Unit = DB localTx  implicit session =>
     sql"""
     update $tableName set
       status = ${i.status},
@@ -139,14 +134,12 @@ class JDBCEvaluationInstances(
       evaluatorResultsHTML = ${i.evaluatorResultsHTML},
       evaluatorResultsJSON = ${i.evaluatorResultsJSON}
     where id = ${i.id}""".update().apply()
-  }
 
-  def delete(id: String): Unit = DB localTx { implicit session =>
+  def delete(id: String): Unit = DB localTx  implicit session =>
     sql"DELETE FROM $tableName WHERE id = $id".update().apply()
-  }
 
   /** Convert JDBC results to [[EvaluationInstance]] */
-  def resultToEvaluationInstance(rs: WrappedResultSet): EvaluationInstance = {
+  def resultToEvaluationInstance(rs: WrappedResultSet): EvaluationInstance =
     EvaluationInstance(
         id = rs.string("id"),
         status = rs.string("status"),
@@ -160,5 +153,3 @@ class JDBCEvaluationInstances(
         evaluatorResults = rs.string("evaluatorResults"),
         evaluatorResultsHTML = rs.string("evaluatorResultsHTML"),
         evaluatorResultsJSON = rs.string("evaluatorResultsJSON"))
-  }
-}

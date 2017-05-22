@@ -8,19 +8,18 @@ import org.specs2.mutable.Specification
 import scalaz.Scalaz._
 import scalaz._
 
-class WithValidation extends WithBindingFromParams {
+class WithValidation extends WithBindingFromParams
   val notRequiredCap: Field[Int] = asInt("cap").optional(0).greaterThan(100)
 
   val legalAge: Field[Int] = asInt("age").greaterThanOrEqualTo(18)
-}
 
-class ValidationSupportSpec extends Specification {
+class ValidationSupportSpec extends Specification
   implicit val formats: Formats = DefaultFormats
   import org.scalatra.util.ParamsValueReaderProperties._
 
-  "The 'ValidationSupport' trait" should {
+  "The 'ValidationSupport' trait" should
 
-    "do normal binding within 'bindTo'" in {
+    "do normal binding within 'bindTo'" in
 
       val ageValidatedForm = new WithValidation
       val params = Map("name" -> "John", "surname" -> "Doe", "age" -> "18")
@@ -31,9 +30,8 @@ class ValidationSupportSpec extends Specification {
       ageValidatedForm.lower.validation must_==
         params("surname").toLowerCase.success
       ageValidatedForm.age.validation must_== 18.success
-    }
 
-    "validate only 'validatable bindings' within bindTo" in {
+    "validate only 'validatable bindings' within bindTo" in
 
       val ageValidatedForm = new WithValidation
       val params = Map("name" -> "John", "surname" -> "Doe", "age" -> "15")
@@ -44,17 +42,15 @@ class ValidationSupportSpec extends Specification {
 
       ageValidatedForm.isValid must beFalse
 
-      ageValidatedForm.errors must contain { x: Binding =>
+      ageValidatedForm.errors must contain  x: Binding =>
         x.name == "age"
-      }
 
       ageValidatedForm.legalAge.validation aka "the validation result" must_==
         Failure(ValidationError("Age must be greater than or equal to 18",
                                 FieldName("age"),
                                 ValidationFail))
-    }
 
-    "evaluate non-exhaustive validation as 'accepted'" in {
+    "evaluate non-exhaustive validation as 'accepted'" in
       val formUnderTest = new WithValidation
       val params = Map("name" -> "John", "surname" -> "Doe", "age" -> "20")
 
@@ -65,6 +61,3 @@ class ValidationSupportSpec extends Specification {
 
       formUnderTest.notRequiredCap.validation must_== 0.success
       formUnderTest.notRequiredCap.isValid must beTrue
-    }
-  }
-}

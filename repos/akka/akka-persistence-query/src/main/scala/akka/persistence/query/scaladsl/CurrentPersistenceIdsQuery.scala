@@ -9,7 +9,7 @@ import akka.stream.scaladsl.Source
 /**
   * A plugin may optionally support this query by implementing this trait.
   */
-trait CurrentPersistenceIdsQuery extends ReadJournal {
+trait CurrentPersistenceIdsQuery extends ReadJournal
 
   /**
     * Same type of query as [[AllPersistenceIdsQuery#allPersistenceIds]] but the stream
@@ -17,4 +17,3 @@ trait CurrentPersistenceIdsQuery extends ReadJournal {
     * actors that are created after the query is completed are not included in the stream.
     */
   def currentPersistenceIds(): Source[String, NotUsed]
-}

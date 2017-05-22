@@ -2,7 +2,7 @@ package lila.i18n
 
 import play.api.i18n.Lang
 
-case class I18nDomain(domain: String) {
+case class I18nDomain(domain: String)
 
   lazy val parts = domain.split('.').toList
 
@@ -17,4 +17,3 @@ case class I18nDomain(domain: String) {
 
   def withLang(lang: String): I18nDomain =
     I18nDomain(lang + "." + commonDomain)
-}

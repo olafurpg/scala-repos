@@ -20,7 +20,7 @@ import akka.remote.testconductor.RoleName
 import akka.actor.Identify
 import scala.concurrent.Await
 
-object RemoteRestartedQuarantinedSpec extends MultiNodeConfig {
+object RemoteRestartedQuarantinedSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -42,14 +42,11 @@ object RemoteRestartedQuarantinedSpec extends MultiNodeConfig {
 
   testTransport(on = true)
 
-  class Subject extends Actor {
-    def receive = {
+  class Subject extends Actor
+    def receive =
       case "shutdown" ⇒ context.system.terminate()
       case "identify" ⇒
         sender() ! (AddressUidExtension(context.system).addressUid -> self)
-    }
-  }
-}
 
 class RemoteRestartedQuarantinedSpecMultiJvmNode1
     extends RemoteRestartedQuarantinedSpec
@@ -58,25 +55,24 @@ class RemoteRestartedQuarantinedSpecMultiJvmNode2
 
 abstract class RemoteRestartedQuarantinedSpec
     extends MultiNodeSpec(RemoteRestartedQuarantinedSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import RemoteRestartedQuarantinedSpec._
 
   override def initialParticipants = 2
 
-  def identifyWithUid(role: RoleName, actorName: String): (Int, ActorRef) = {
+  def identifyWithUid(role: RoleName, actorName: String): (Int, ActorRef) =
     system.actorSelection(node(role) / "user" / actorName) ! "identify"
     expectMsgType[(Int, ActorRef)]
-  }
 
-  "A restarted quarantined system" must {
+  "A restarted quarantined system" must
 
-    "should not crash the other system (#17213)" taggedAs LongRunningTest in {
+    "should not crash the other system (#17213)" taggedAs LongRunningTest in
 
       system.actorOf(Props[Subject], "subject")
       enterBarrier("subject-started")
 
-      runOn(first) {
+      runOn(first)
         val secondAddress = node(second).address
 
         val (uid, ref) = identifyWithUid(second, "subject")
@@ -89,20 +85,17 @@ abstract class RemoteRestartedQuarantinedSpec
 
         testConductor.shutdown(second).await
 
-        within(30.seconds) {
-          awaitAssert {
+        within(30.seconds)
+          awaitAssert
             system.actorSelection(
                 RootActorPath(secondAddress) / "user" / "subject") ! Identify(
                 "subject")
             expectMsgType[ActorIdentity](1.second).ref.get
-          }
-        }
 
         system.actorSelection(
             RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
-      }
 
-      runOn(second) {
+      runOn(second)
         val addr =
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         val firstAddress = node(first).address
@@ -114,21 +107,17 @@ abstract class RemoteRestartedQuarantinedSpec
         enterBarrier("quarantined")
 
         // Check that quarantine is intact
-        within(10.seconds) {
-          awaitAssert {
+        within(10.seconds)
+          awaitAssert
             EventFilter
               .warning(
                   pattern = "The remote system has quarantined this system",
                   occurrences = 1)
-              .intercept {
+              .intercept
                 ref ! "boo!"
-              }
-          }
-        }
 
-        expectMsgPF(10 seconds) {
+        expectMsgPF(10 seconds)
           case ThisActorSystemQuarantinedEvent(local, remote) ⇒
-        }
 
         enterBarrier("still-quarantined")
 
@@ -157,7 +146,3 @@ abstract class RemoteRestartedQuarantinedSpec
         freshSystem.actorOf(Props[Subject], "subject")
 
         Await.ready(freshSystem.whenTerminated, 10.seconds)
-      }
-    }
-  }
-}

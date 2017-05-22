@@ -14,8 +14,8 @@ import org.jetbrains.jps.incremental.scala.remote.Arguments._
 case class Arguments(sbtData: SbtData,
                      compilerData: CompilerData,
                      compilationData: CompilationData,
-                     worksheetFiles: Seq[String]) {
-  def asStrings: Seq[String] = {
+                     worksheetFiles: Seq[String])
+  def asStrings: Seq[String] =
     val (outputs, caches) = compilationData.outputToCacheMap.toSeq.unzip
 
     val (sourceRoots, outputDirs) = compilationData.outputGroups.unzip
@@ -52,13 +52,11 @@ case class Arguments(sbtData: SbtData,
         sequenceToString(worksheetFiles),
         sbtIncOptions
     )
-  }
-}
 
-object Arguments {
+object Arguments
   private val Delimiter = "\n"
 
-  def from(strings: Seq[String]): Arguments = strings match {
+  def from(strings: Seq[String]): Arguments = strings match
     case Seq(PathToFile(interfaceJar),
              PathToFile(sourceJar),
              PathToFile(interfacesHome),
@@ -82,14 +80,12 @@ object Arguments {
       val sbtData = SbtData(
           interfaceJar, sourceJar, interfacesHome, javaClassVersion)
 
-      val compilerJars = compilerJarPaths.map {
+      val compilerJars = compilerJarPaths.map
         case PathsToFiles(Seq(libraryJar, compilerJar, extraJars @ _ *)) =>
           CompilerJars(libraryJar, compilerJar, extraJars)
-      }
 
-      val javaHome = javaHomePath.map {
+      val javaHome = javaHomePath.map
         case PathToFile(file) => file
-      }
 
       val incrementalType = IncrementalityType.valueOf(incrementalTypeName)
 
@@ -113,7 +109,6 @@ object Arguments {
                                             sbtIncOptions)
 
       Arguments(sbtData, compilerData, compilationData, worksheetClass)
-  }
 
   private def fileToPath(file: File): String =
     FileUtil.toCanonicalPath(file.getPath)
@@ -126,20 +121,15 @@ object Arguments {
   private def sequenceToString(strings: Iterable[String]): String =
     strings.mkString(Delimiter)
 
-  private val PathToFile = extractor[String, File] { path: String =>
+  private val PathToFile = extractor[String, File]  path: String =>
     new File(path)
-  }
 
-  private val PathsToFiles = extractor[String, Seq[File]] { paths: String =>
+  private val PathsToFiles = extractor[String, Seq[File]]  paths: String =>
     if (paths.isEmpty) Seq.empty
     else paths.split(Delimiter).map(new File(_)).toSeq
-  }
 
-  private val StringToOption = extractor[String, Option[String]] { s: String =>
+  private val StringToOption = extractor[String, Option[String]]  s: String =>
     if (s.isEmpty) None else Some(s)
-  }
 
-  private val StringToSequence = extractor[String, Seq[String]] { s: String =>
+  private val StringToSequence = extractor[String, Seq[String]]  s: String =>
     if (s.isEmpty) Seq.empty else s.split(Delimiter).toSeq
-  }
-}

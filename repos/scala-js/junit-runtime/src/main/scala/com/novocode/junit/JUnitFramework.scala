@@ -3,39 +3,35 @@ package com.novocode.junit
 import org.scalajs.junit.{JUnitMasterRunner, JUnitSlaveRunner}
 import sbt.testing._
 
-final class JUnitFramework extends Framework {
+final class JUnitFramework extends Framework
 
   val name: String = "Scala.js JUnit test framework"
 
-  private object JUnitFingerprint extends AnnotatedFingerprint {
+  private object JUnitFingerprint extends AnnotatedFingerprint
     override def annotationName(): String = "org.junit.Test"
 
     override def isModule(): Boolean = false
-  }
 
-  def fingerprints(): Array[Fingerprint] = {
+  def fingerprints(): Array[Fingerprint] =
     Array(JUnitFingerprint)
-  }
 
   def runner(args: Array[String],
              remoteArgs: Array[String],
-             testClassLoader: ClassLoader): JUnitMasterRunner = {
+             testClassLoader: ClassLoader): JUnitMasterRunner =
     new JUnitMasterRunner(
         args, remoteArgs, testClassLoader, parseRunSettings(args))
-  }
 
   def slaveRunner(args: Array[String],
                   remoteArgs: Array[String],
                   testClassLoader: ClassLoader,
-                  send: String => Unit): JUnitSlaveRunner = {
+                  send: String => Unit): JUnitSlaveRunner =
     new JUnitSlaveRunner(
         args, remoteArgs, testClassLoader, send, parseRunSettings(args))
-  }
 
   def arrayString(arr: Array[String]): String =
     arr.mkString("Array(", ", ", ")")
 
-  def parseRunSettings(args: Array[String]): RunSettings = {
+  def parseRunSettings(args: Array[String]): RunSettings =
     var quiet = false
     var verbose = false
     var noColor = false
@@ -44,8 +40,8 @@ final class JUnitFramework extends Framework {
     var logExceptionClass = true
     var ignoreRunners = "org.junit.runners.Suite"
     var runListener: String = null
-    for (str <- args) {
-      str match {
+    for (str <- args)
+      str match
         case "-q" => quiet = true
         case "-v" => verbose = true
         case "-n" => noColor = true
@@ -78,10 +74,8 @@ final class JUnitFramework extends Framework {
           throw new UnsupportedOperationException(s)
 
         case _ =>
-      }
-    }
-    for (s <- args) {
-      s match {
+    for (s <- args)
+      s match
         case "+q" => quiet = false
         case "+v" => verbose = false
         case "+n" => noColor = false
@@ -89,8 +83,6 @@ final class JUnitFramework extends Framework {
         case "+a" => logAssert = false
         case "+c" => logExceptionClass = false
         case _ =>
-      }
-    }
     new RunSettings(!noColor,
                     decodeScalaNames,
                     quiet,
@@ -98,5 +90,3 @@ final class JUnitFramework extends Framework {
                     logAssert,
                     ignoreRunners,
                     logExceptionClass)
-  }
-}

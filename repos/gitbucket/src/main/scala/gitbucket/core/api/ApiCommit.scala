@@ -21,49 +21,44 @@ case class ApiCommit(id: String,
                      author: ApiPersonIdent,
                      committer: ApiPersonIdent)(
     repositoryName: RepositoryName, urlIsHtmlUrl: Boolean)
-    extends FieldSerializable {
+    extends FieldSerializable
   val url =
-    if (urlIsHtmlUrl) {
+    if (urlIsHtmlUrl)
       ApiPath(s"/${repositoryName.fullName}/commit/${id}")
-    } else {
+    else
       ApiPath(s"/api/v3/${repositoryName.fullName}/commits/${id}")
-    }
   val html_url =
-    if (urlIsHtmlUrl) {
+    if (urlIsHtmlUrl)
       None
-    } else {
+    else
       Some(ApiPath(s"/${repositoryName.fullName}/commit/${id}"))
-    }
-}
 
-object ApiCommit {
+object ApiCommit
   def apply(git: Git,
             repositoryName: RepositoryName,
             commit: CommitInfo,
-            urlIsHtmlUrl: Boolean = false): ApiCommit = {
+            urlIsHtmlUrl: Boolean = false): ApiCommit =
     val diffs = JGitUtil.getDiffs(git, commit.id, false)
     ApiCommit(
         id = commit.id,
         message = commit.fullMessage,
         timestamp = commit.commitTime,
-        added = diffs._1.collect {
+        added = diffs._1.collect
           case x if x.changeType == DiffEntry.ChangeType.ADD => x.newPath
-        },
-        removed = diffs._1.collect {
+        ,
+        removed = diffs._1.collect
           case x if x.changeType == DiffEntry.ChangeType.DELETE => x.oldPath
-        },
-        modified = diffs._1.collect {
+        ,
+        modified = diffs._1.collect
           case x
               if x.changeType != DiffEntry.ChangeType.ADD &&
               x.changeType != DiffEntry.ChangeType.DELETE =>
             x.newPath
-        },
+        ,
         author = ApiPersonIdent.author(commit),
         committer = ApiPersonIdent.committer(commit)
     )(repositoryName, urlIsHtmlUrl)
-  }
   def forPushPayload(git: Git,
                      repositoryName: RepositoryName,
                      commit: CommitInfo): ApiCommit =
     apply(git, repositoryName, commit, true)
-}

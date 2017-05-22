@@ -33,7 +33,7 @@ import scala.collection.mutable
   * Note that a missing `main` is OK: mixins may provide behavior that
   * does not require defining a custom `main` method.
   */
-trait App extends Closable with CloseAwaitably {
+trait App extends Closable with CloseAwaitably
 
   /** The name of the application, based on the classname */
   val name: String = getClass.getName.stripSuffix("$")
@@ -62,11 +62,10 @@ trait App extends Closable with CloseAwaitably {
     */
   protected def failfastOnFlagsNotParsed: Boolean = false
 
-  protected def exitOnError(reason: String): Unit = {
+  protected def exitOnError(reason: String): Unit =
     System.err.println(reason)
     close()
     System.exit(1)
-  }
 
   private val inits: mutable.Buffer[() => Unit] = mutable.Buffer.empty
   private val premains: mutable.Buffer[() => Unit] = mutable.Buffer.empty
@@ -78,16 +77,14 @@ trait App extends Closable with CloseAwaitably {
   /**
     * Invoke `f` before anything else (including flag parsing).
     */
-  protected final def init(f: => Unit): Unit = {
+  protected final def init(f: => Unit): Unit =
     inits += (() => f)
-  }
 
   /**
     * Invoke `f` right before the user's main is invoked.
     */
-  protected final def premain(f: => Unit): Unit = {
+  protected final def premain(f: => Unit): Unit =
     premains += (() => f)
-  }
 
   /** Minimum duration to allow for exits to be processed. */
   final val MinGrace: Duration = 1.second
@@ -107,46 +104,40 @@ trait App extends Closable with CloseAwaitably {
   /**
     * Close `closable` when shutdown is requested. Closables are closed in parallel.
     */
-  protected final def closeOnExit(closable: Closable): Unit = {
+  protected final def closeOnExit(closable: Closable): Unit =
     exits.add(closable)
-  }
 
   /**
     * Invoke `f` when shutdown is requested. Exit hooks run in parallel and are
     * executed after all postmains complete. The thread resumes when all exit
     * hooks complete or `closeDeadline` expires.
     */
-  protected final def onExit(f: => Unit): Unit = {
-    closeOnExit {
-      Closable.make { deadline =>
+  protected final def onExit(f: => Unit): Unit =
+    closeOnExit
+      Closable.make  deadline =>
         // close() ensures that this deadline is sane
         // finagle isn't available here, so no DefaultTimer
         val exitTimer = new JavaTimer(isDaemon = true)
         FuturePool.unboundedPool(f).within(exitTimer, deadline - Time.now)
-      }
-    }
-  }
 
   /**
     * Invoke `f` after the user's main has exited.
     */
-  protected final def postmain(f: => Unit): Unit = {
+  protected final def postmain(f: => Unit): Unit =
     postmains.add(() => f)
-  }
 
   /**
     * Notify the application that it may stop running.
     * Returns a Future that is satisfied when the App has been torn down or errors at the deadline.
     */
-  final def close(deadline: Time): Future[Unit] = closeAwaitably {
+  final def close(deadline: Time): Future[Unit] = closeAwaitably
     closeDeadline = deadline max (Time.now + MinGrace)
     Closable.all(exits.asScala.toSeq: _*).close(closeDeadline)
-  }
 
-  final def main(args: Array[String]): Unit = {
-    try {
+  final def main(args: Array[String]): Unit =
+    try
       nonExitingMain(args)
-    } catch {
+    catch
       case FlagUsageError(reason) =>
         exitOnError(reason)
       case FlagParseException(reason, _) =>
@@ -154,36 +145,30 @@ trait App extends Closable with CloseAwaitably {
       case e: Throwable =>
         e.printStackTrace()
         exitOnError("Exception thrown in main on startup")
-    }
-  }
 
-  final def nonExitingMain(args: Array[String]): Unit = {
+  final def nonExitingMain(args: Array[String]): Unit =
     App.register(this)
 
     for (f <- inits) f()
 
-    flag.parseArgs(args, allowUndefinedFlags) match {
+    flag.parseArgs(args, allowUndefinedFlags) match
       case Flags.Ok(remainder) =>
         _args = remainder.toArray
       case Flags.Help(usage) =>
         throw FlagUsageError(usage)
       case Flags.Error(reason) =>
         throw FlagParseException(reason)
-    }
 
     for (f <- premains) f()
 
     // Get a main() if it's defined. It's possible to define traits that only use pre/post mains.
-    val mainMethod = try Some(getClass.getMethod("main")) catch {
+    val mainMethod = try Some(getClass.getMethod("main")) catch
       case _: NoSuchMethodException => None
-    }
 
     // Invoke main() if it exists.
-    mainMethod foreach { method =>
-      try method.invoke(this) catch {
+    mainMethod foreach  method =>
+      try method.invoke(this) catch
         case e: InvocationTargetException => throw e.getCause
-      }
-    }
 
     for (f <- postmains.asScala) f()
 
@@ -194,10 +179,8 @@ trait App extends Closable with CloseAwaitably {
 
     // The deadline to 'close' is advisory; we enforce it here.
     Await.result(this, closeDeadline - Time.now)
-  }
-}
 
-object App {
+object App
   private[this] val log = Logger.getLogger(getClass.getName)
   private[this] val ref = new AtomicReference[Option[App]](None)
 
@@ -209,8 +192,6 @@ object App {
   def registered: Option[App] = ref.get
 
   private[app] def register(app: App): Unit =
-    ref.getAndSet(Some(app)).foreach { existing =>
+    ref.getAndSet(Some(app)).foreach  existing =>
       log.warning(
           s"Multiple com.twitter.app.App main methods called. ${existing.name}, then ${app.name}")
-    }
-}

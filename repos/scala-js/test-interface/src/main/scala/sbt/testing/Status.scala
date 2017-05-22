@@ -31,7 +31,7 @@ package sbt.testing
 class Status private (name: String, ordinal: Int)
     extends Enum[Status](name, ordinal)
 
-object Status {
+object Status
 
   /** Indicates a test succeeded. */
   final val Success = new Status("Success", 0)
@@ -59,9 +59,6 @@ object Status {
 
   def values(): Array[Status] = _values.clone()
 
-  def valueOf(name: String): Status = {
-    _values.find(_.name == name).getOrElse {
+  def valueOf(name: String): Status =
+    _values.find(_.name == name).getOrElse
       throw new IllegalArgumentException("No enum const Status." + name)
-    }
-  }
-}

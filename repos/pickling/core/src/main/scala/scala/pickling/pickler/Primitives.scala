@@ -3,7 +3,7 @@ package pickler
 
 /** Picklers for primitive types.
   */
-trait PrimitivePicklers {
+trait PrimitivePicklers
   // TODO: figure out why removing these pickler/unpicklers slows down evactor1
   implicit val bytePickler: Pickler[Byte] with Unpickler[Byte] =
     PrimitivePickler[Byte]
@@ -27,30 +27,24 @@ trait PrimitivePicklers {
     PrimitivePickler[String]
   implicit val unitPickler: Pickler[Unit] with Unpickler[Unit] =
     PrimitivePickler[Unit]
-}
 
 class PrimitivePickler[T : FastTypeTag](name: String)
-    extends AutoRegister[T](name) {
-  def pickle(picklee: T, builder: PBuilder): Unit = {
+    extends AutoRegister[T](name)
+  def pickle(picklee: T, builder: PBuilder): Unit =
     builder.beginEntry(picklee, tag)
     builder.endEntry()
-  }
-  def unpickle(tag: String, reader: PReader): Any = {
-    try {
+  def unpickle(tag: String, reader: PReader): Any =
+    try
       // TODO - beginEntry/endEntry?
       reader.readPrimitive()
-    } catch {
+    catch
       case PicklingException(msg, cause) =>
         throw PicklingException(
             s"""error in unpickle of primitive unpickler '$name':
                                    |tag in unpickle: '${tag}'
                                    |message:
                                    |$msg""".stripMargin, cause)
-    }
-  }
-}
-object PrimitivePickler {
+object PrimitivePickler
   def apply[A : FastTypeTag]: Pickler[A] with Unpickler[A] =
     new PrimitivePickler[A](
         FastTypeTag.valueTypeName(implicitly[FastTypeTag[A]]))
-}

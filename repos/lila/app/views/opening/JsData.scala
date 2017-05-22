@@ -8,7 +8,7 @@ import lila.api.Context
 import lila.app.templating.Environment._
 import lila.opening._
 
-object JsData extends lila.Steroids {
+object JsData extends lila.Steroids
 
   def apply(
       opening: Opening,
@@ -28,14 +28,14 @@ object JsData extends lila.Steroids {
                     "goal" -> opening.goal,
                     "fen" -> opening.fen,
                     "color" -> opening.color.name,
-                    "moves" -> JsArray(opening.qualityMoves.map {
+                    "moves" -> JsArray(opening.qualityMoves.map
               case QualityMove(move, quality) =>
                 Json.obj("uci" -> move.first,
                          "san" -> move.line.headOption,
                          "cp" -> move.cp,
                          "line" -> move.line.mkString(" "),
                          "quality" -> quality.name)
-            }),
+            ),
                     "url" -> s"$netBaseUrl${routes.Opening.show(opening.id)}",
                     "identified" -> identified
                 ),
@@ -45,15 +45,14 @@ object JsData extends lila.Steroids {
                 "animation" -> Json.obj(
                     "duration" -> ctx.pref.animationFactor * animationDuration.toMillis
                 ),
-                "attempt" -> attempt.map { a =>
+                "attempt" -> attempt.map  a =>
           Json.obj("userRatingDiff" -> a.userRatingDiff, "win" -> a.win)
-        },
+        ,
                 "win" -> win,
-                "user" -> userInfos.map { i =>
+                "user" -> userInfos.map  i =>
           Json.obj(
               "rating" -> i.user.perfs.opening.intRating,
               "history" -> i.history.nonEmpty.option(Json.toJson(i.chart))
           )
-        },
+        ,
                 "play" -> play)))
-}

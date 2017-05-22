@@ -45,7 +45,7 @@ class DateTimeStringConverterSpec
         Date, jfxuc.DateTimeStringConverter, Date, DateTimeStringConverter](
         classOf[jfxuc.DateTimeStringConverter],
         classOf[DateTimeStringConverter],
-        classOf[Date]) {
+        classOf[Date])
 
   val examples = List(
       (dateFormat.parse("2012-04-01 12:34:56"), "01/04/2012 12:34:56"),
@@ -53,4 +53,3 @@ class DateTimeStringConverterSpec
 
   override protected def getConverterForExample =
     new DateTimeStringConverter("dd/MM/yyyy HH:mm:ss")
-}

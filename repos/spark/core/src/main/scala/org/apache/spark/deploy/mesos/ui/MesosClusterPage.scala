@@ -28,8 +28,8 @@ import org.apache.spark.scheduler.cluster.mesos.MesosClusterSubmissionState
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
 private[mesos] class MesosClusterPage(parent: MesosClusterUI)
-    extends WebUIPage("") {
-  def render(request: HttpServletRequest): Seq[Node] = {
+    extends WebUIPage("")
+  def render(request: HttpServletRequest): Seq[Node] =
     val state = parent.scheduler.getSchedulerState()
     val queuedHeaders = Seq(
         "Driver ID", "Submit Date", "Main Class", "Driver Resources")
@@ -60,9 +60,8 @@ private[mesos] class MesosClusterPage(parent: MesosClusterUI)
         </div>
       </div>;
     UIUtils.basicSparkPage(content, "Spark Drivers for Mesos cluster")
-  }
 
-  private def queuedRow(submission: MesosDriverDescription): Seq[Node] = {
+  private def queuedRow(submission: MesosDriverDescription): Seq[Node] =
     val id = submission.submissionId
     <tr>
       <td><a href={s"driver?id=$id"}>{id}</a></td>
@@ -70,9 +69,8 @@ private[mesos] class MesosClusterPage(parent: MesosClusterUI)
       <td>{submission.command.mainClass}</td>
       <td>cpus: {submission.cores}, mem: {submission.mem}</td>
     </tr>
-  }
 
-  private def driverRow(state: MesosClusterSubmissionState): Seq[Node] = {
+  private def driverRow(state: MesosClusterSubmissionState): Seq[Node] =
     val id = state.driverDescription.submissionId
     <tr>
       <td><a href={s"driver?id=$id"}>{id}</a></td>
@@ -83,9 +81,8 @@ private[mesos] class MesosClusterPage(parent: MesosClusterUI)
       <td>{state.slaveId.getValue}</td>
       <td>{stateString(state.mesosTaskStatus)}</td>
     </tr>
-  }
 
-  private def retryRow(submission: MesosDriverDescription): Seq[Node] = {
+  private def retryRow(submission: MesosDriverDescription): Seq[Node] =
     val id = submission.submissionId
     <tr>
       <td><a href={s"driver?id=$id"}>{id}</a></td>
@@ -95,30 +92,21 @@ private[mesos] class MesosClusterPage(parent: MesosClusterUI)
       <td>{submission.retryState.get.nextRetry}</td>
       <td>{submission.retryState.get.retries}</td>
     </tr>
-  }
 
-  private def stateString(status: Option[TaskStatus]): String = {
-    if (status.isEmpty) {
+  private def stateString(status: Option[TaskStatus]): String =
+    if (status.isEmpty)
       return ""
-    }
     val sb = new StringBuilder
     val s = status.get
     sb.append(s"State: ${s.getState}")
-    if (status.get.hasMessage) {
+    if (status.get.hasMessage)
       sb.append(s", Message: ${s.getMessage}")
-    }
-    if (status.get.hasHealthy) {
+    if (status.get.hasHealthy)
       sb.append(s", Healthy: ${s.getHealthy}")
-    }
-    if (status.get.hasSource) {
+    if (status.get.hasSource)
       sb.append(s", Source: ${s.getSource}")
-    }
-    if (status.get.hasReason) {
+    if (status.get.hasReason)
       sb.append(s", Reason: ${s.getReason}")
-    }
-    if (status.get.hasTimestamp) {
+    if (status.get.hasTimestamp)
       sb.append(s", Time: ${s.getTimestamp}")
-    }
     sb.toString()
-  }
-}

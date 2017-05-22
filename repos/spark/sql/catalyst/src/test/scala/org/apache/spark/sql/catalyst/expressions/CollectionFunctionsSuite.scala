@@ -21,9 +21,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
 class CollectionFunctionsSuite
-    extends SparkFunSuite with ExpressionEvalHelper {
+    extends SparkFunSuite with ExpressionEvalHelper
 
-  test("Array and Map Size") {
+  test("Array and Map Size")
     val a0 = Literal.create(Seq(1, 2, 3), ArrayType(IntegerType))
     val a1 = Literal.create(Seq[Integer](), ArrayType(IntegerType))
     val a2 = Literal.create(Seq(1, 2), ArrayType(IntegerType))
@@ -45,9 +45,8 @@ class CollectionFunctionsSuite
     checkEvaluation(
         Literal.create(null, MapType(StringType, StringType)), null)
     checkEvaluation(Literal.create(null, ArrayType(StringType)), null)
-  }
 
-  test("Sort Array") {
+  test("Sort Array")
     val a0 = Literal.create(Seq(2, 1, 3), ArrayType(IntegerType))
     val a1 = Literal.create(Seq[Integer](), ArrayType(IntegerType))
     val a2 = Literal.create(Seq("b", "a"), ArrayType(StringType))
@@ -75,9 +74,8 @@ class CollectionFunctionsSuite
 
     checkEvaluation(
         new SortArray(arrayStruct), Seq(create_row(1), create_row(2)))
-  }
 
-  test("Array contains") {
+  test("Array contains")
     val a0 = Literal.create(Seq(1, 2, 3), ArrayType(IntegerType))
     val a1 = Literal.create(Seq[String](null, ""), ArrayType(StringType))
     val a2 = Literal.create(Seq(null), ArrayType(LongType))
@@ -96,5 +94,3 @@ class CollectionFunctionsSuite
 
     checkEvaluation(ArrayContains(a3, Literal("")), null)
     checkEvaluation(ArrayContains(a3, Literal.create(null, StringType)), null)
-  }
-}

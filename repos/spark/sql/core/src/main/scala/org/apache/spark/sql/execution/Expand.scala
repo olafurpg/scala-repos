@@ -36,7 +36,7 @@ import org.apache.spark.sql.execution.metric.SQLMetrics
 case class Expand(projections: Seq[Seq[Expression]],
                   output: Seq[Attribute],
                   child: SparkPlan)
-    extends UnaryNode with CodegenSupport {
+    extends UnaryNode with CodegenSupport
 
   private[sql] override lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
@@ -53,12 +53,12 @@ case class Expand(projections: Seq[Seq[Expression]],
     UnsafeProjection.create(exprs, child.output)
 
   protected override def doExecute(): RDD[InternalRow] =
-    attachTree(this, "execute") {
+    attachTree(this, "execute")
       val numOutputRows = longMetric("numOutputRows")
 
-      child.execute().mapPartitions { iter =>
+      child.execute().mapPartitions  iter =>
         val groups = projections.map(projection).toArray
-        new Iterator[InternalRow] {
+        new Iterator[InternalRow]
           private[this] var result: InternalRow = _
           private[this] var idx = -1 // -1 means the initial state
           private[this] var input: InternalRow = _
@@ -66,37 +66,29 @@ case class Expand(projections: Seq[Seq[Expression]],
           override final def hasNext: Boolean =
             (-1 < idx && idx < groups.length) || iter.hasNext
 
-          override final def next(): InternalRow = {
-            if (idx <= 0) {
+          override final def next(): InternalRow =
+            if (idx <= 0)
               // in the initial (-1) or beginning(0) of a new input row, fetch the next input tuple
               input = iter.next()
               idx = 0
-            }
 
             result = groups(idx)(input)
             idx += 1
 
-            if (idx == groups.length && iter.hasNext) {
+            if (idx == groups.length && iter.hasNext)
               idx = 0
-            }
 
             numOutputRows += 1
             result
-          }
-        }
-      }
-    }
 
-  override def upstreams(): Seq[RDD[InternalRow]] = {
+  override def upstreams(): Seq[RDD[InternalRow]] =
     child.asInstanceOf[CodegenSupport].upstreams()
-  }
 
-  protected override def doProduce(ctx: CodegenContext): String = {
+  protected override def doProduce(ctx: CodegenContext): String =
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
-  }
 
   override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+      ctx: CodegenContext, input: Seq[ExprCode], row: String): String =
     /*
      * When the projections list looks like:
      *   expr1A, exprB, expr1C
@@ -141,36 +133,34 @@ case class Expand(projections: Seq[Seq[Expression]],
     // Size of sameOutput array should equal N.
     // If sameOutput(i) is true, then the i-th column has the same value for all output rows given
     // an input row.
-    val sameOutput: Array[Boolean] = output.indices.map { colIndex =>
+    val sameOutput: Array[Boolean] = output.indices.map  colIndex =>
       projections.map(p => p(colIndex)).toSet.size == 1
-    }.toArray
+    .toArray
 
     // Part 1: declare variables for each column
     // If a column has the same value for all output rows, then we also generate its computation
     // right after declaration. Otherwise its value is computed in the part 2.
-    val outputColumns = output.indices.map { col =>
+    val outputColumns = output.indices.map  col =>
       val firstExpr = projections.head(col)
-      if (sameOutput(col)) {
+      if (sameOutput(col))
         // This column is the same across all output rows. Just generate code for it here.
         BindReferences.bindReference(firstExpr, child.output).gen(ctx)
-      } else {
+      else
         val isNull = ctx.freshName("isNull")
         val value = ctx.freshName("value")
         val code = s"""
           |boolean $isNull = true;
-          |${ctx.javaType(firstExpr.dataType)} $value = ${ctx.defaultValue(
-                          firstExpr.dataType)};
+          |${ctx.javaType(firstExpr.dataType)} $value = $ctx.defaultValue(
+                          firstExpr.dataType);
          """.stripMargin
         ExprCode(code, isNull, value)
-      }
-    }
 
     // Part 2: switch/case statements
-    val cases = projections.zipWithIndex.map {
+    val cases = projections.zipWithIndex.map
       case (exprs, row) =>
         var updateCode = ""
-        for (col <- exprs.indices) {
-          if (!sameOutput(col)) {
+        for (col <- exprs.indices)
+          if (!sameOutput(col))
             val ev =
               BindReferences.bindReference(exprs(col), child.output).gen(ctx)
             updateCode += s"""
@@ -178,15 +168,12 @@ case class Expand(projections: Seq[Seq[Expression]],
                |${outputColumns(col).isNull} = ${ev.isNull};
                |${outputColumns(col).value} = ${ev.value};
             """.stripMargin
-          }
-        }
 
         s"""
          |case $row:
          |  ${updateCode.trim}
          |  break;
        """.stripMargin
-    }
 
     val numOutput = metricTerm(ctx, "numOutputRows")
     val i = ctx.freshName("i")
@@ -203,5 +190,3 @@ case class Expand(projections: Seq[Seq[Expression]],
        |  ${consume(ctx, outputColumns)}
        |}
      """.stripMargin
-  }
-}

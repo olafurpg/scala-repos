@@ -1,4 +1,4 @@
-object SCL5472 {
+object SCL5472
   class AA[A, B]
   class BB[A, B]
 
@@ -9,5 +9,4 @@ object SCL5472 {
 
   /*start*/
   foo("") /*end*/
-}
 //List[List[String]]

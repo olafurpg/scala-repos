@@ -1,9 +1,7 @@
-object test {
+object test
   type PFIntInt = PartialFunction[Int, Int];
 
-  {
     case x => /*start*/ x /*end*/
-  }: PFIntInt
-}
+  : PFIntInt
 
 // Int

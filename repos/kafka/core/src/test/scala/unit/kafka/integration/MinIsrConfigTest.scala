@@ -23,7 +23,7 @@ import kafka.server.KafkaConfig
 import kafka.utils.TestUtils
 import org.junit.Test
 
-class MinIsrConfigTest extends KafkaServerTestHarness {
+class MinIsrConfigTest extends KafkaServerTestHarness
 
   val overridingProps = new Properties()
   overridingProps.put(KafkaConfig.MinInSyncReplicasProp, "5")
@@ -33,7 +33,5 @@ class MinIsrConfigTest extends KafkaServerTestHarness {
       .map(KafkaConfig.fromProps(_, overridingProps))
 
   @Test
-  def testDefaultKafkaConfig() {
+  def testDefaultKafkaConfig()
     assert(servers.head.getLogManager().defaultConfig.minInSyncReplicas == 5)
-  }
-}

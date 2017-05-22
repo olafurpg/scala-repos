@@ -15,32 +15,28 @@ import scala.reflect.macros.whitebox
   * Date: 9/25/15.
   */
 class CachedInsidePsiElement(psiElement: Any, dependencyItem: Object)
-    extends StaticAnnotation {
+    extends StaticAnnotation
   def macroTransform(annottees: Any*) = macro CachedInsidePsiElement.cachedInsidePsiElementImpl
-}
 
-object CachedInsidePsiElement {
+object CachedInsidePsiElement
   def cachedInsidePsiElementImpl(c: whitebox.Context)(
-      annottees: c.Tree*): c.Expr[Any] = {
+      annottees: c.Tree*): c.Expr[Any] =
     import CachedMacroUtil._
     import c.universe._
     implicit val x: c.type = c
-    def parameters: (Tree, Tree) = {
-      c.prefix.tree match {
+    def parameters: (Tree, Tree) =
+      c.prefix.tree match
         case q"new CachedInsidePsiElement(..$params)" if params.length == 2 =>
           (params.head, modCountParamToModTracker(c)(params(1), params.head))
         case _ => abort("Wrong annotation parameters!")
-      }
-    }
 
     //annotation parameters
     val (elem, dependencyItem) = parameters
 
-    annottees.toList match {
+    annottees.toList match
       case DefDef(mods, name, tpParams, paramss, retTp, rhs) :: Nil =>
-        if (retTp.isEmpty) {
+        if (retTp.isEmpty)
           abort("You must specify return type")
-        }
 
         //generated names
         val cachedFunName = generateTermName("cachedFun")
@@ -68,15 +64,12 @@ object CachedInsidePsiElement {
             mods, name, tpParams, paramss, retTp, updatedRhs)
         val res = q"""
           private val $key = $cachesUtilFQN.getOrCreateKey[$keyTypeFQN[$cachedValueTypeFQN[$retTp]]]($keyId)
-          ${if (analyzeCaches)
+          $if (analyzeCaches)
           q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
-        else EmptyTree}
+        else EmptyTree
 
           ..$updatedDef
           """
         println(res)
         c.Expr(res)
       case _ => abort("You can only annotate one function!")
-    }
-  }
-}

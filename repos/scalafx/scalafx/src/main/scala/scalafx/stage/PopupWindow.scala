@@ -36,7 +36,7 @@ import scalafx.scene.Node
 import scalafx.scene.Node._
 import scalafx.stage.Window._
 
-object PopupWindow {
+object PopupWindow
   implicit def sfxPopupWindow2jfx(v: PopupWindow): jfxs.PopupWindow =
     if (v != null) v.delegate else null
 
@@ -45,7 +45,7 @@ object PopupWindow {
     */
   object AnchorLocation
       extends SFXEnumDelegateCompanion[
-          jfxs.PopupWindow.AnchorLocation, AnchorLocation] {
+          jfxs.PopupWindow.AnchorLocation, AnchorLocation]
 
     /** Represents bottom left content corner. */
     val ContentBottomLeft = new AnchorLocation(
@@ -120,7 +120,6 @@ object PopupWindow {
             WindowBottomRight,
             WindowTopLeft,
             WindowTopRight)
-  }
 
   /** Anchor location constants for popup anchor point selection.
     * Wraps [[http://download.java.net/jdk8/jfxdocs/javafx/stage/PopupWindow.AnchorLocation.html AnchorLocation]]
@@ -128,18 +127,16 @@ object PopupWindow {
   sealed case class AnchorLocation(
       override val delegate: jfxs.PopupWindow.AnchorLocation)
       extends SFXEnumDelegate[jfxs.PopupWindow.AnchorLocation]
-}
 
 abstract class PopupWindow(override val delegate: jfxs.PopupWindow)
-    extends Window(delegate) with SFXDelegate[jfxs.PopupWindow] {
+    extends Window(delegate) with SFXDelegate[jfxs.PopupWindow]
 
   /** Specifies the popup anchor point which is used in popup positioning. */
   def anchorLocation: ObjectProperty[jfxs.PopupWindow.AnchorLocation] =
     delegate.anchorLocationProperty
-  def anchorLocation_=(v: PopupWindow.AnchorLocation) {
+  def anchorLocation_=(v: PopupWindow.AnchorLocation)
     ObjectProperty
       .fillProperty[jfxs.PopupWindow.AnchorLocation](this.anchorLocation, v)
-  }
 
   /** Specifies the x coordinate of the popup anchor point on the screen. */
   def anchorX: ReadOnlyDoubleProperty = delegate.anchorXProperty
@@ -152,34 +149,30 @@ abstract class PopupWindow(override val delegate: jfxs.PopupWindow)
     * such that it doesn't end up positioned off the screen.
     */
   def autoFix: BooleanProperty = delegate.autoFixProperty
-  def autoFix_=(v: Boolean) {
+  def autoFix_=(v: Boolean)
     autoFix() = v
-  }
 
   /**
     * Specifies whether Popups should auto hide.
     */
   def autoHide: BooleanProperty = delegate.autoHideProperty
-  def autoHide_=(v: Boolean) {
+  def autoHide_=(v: Boolean)
     autoHide() = v
-  }
 
   /**
     * Specifies whether the PopupWindow should be hidden when an unhandled escape key is pressed while the popup has
     * focus.
     */
   def hideOnEscape: BooleanProperty = delegate.hideOnEscapeProperty
-  def hideOnEscape_=(v: Boolean) {
+  def hideOnEscape_=(v: Boolean)
     hideOnEscape() = v
-  }
 
   /**
     * Called after autoHide is run.
     */
   def onAutoHide = delegate.onAutoHideProperty
-  def onAutoHide_=(v: jfxe.EventHandler[jfxe.Event]) {
+  def onAutoHide_=(v: jfxe.EventHandler[jfxe.Event])
     onAutoHide() = v
-  }
 
   /**
     * The window which is the parent of this popup.
@@ -197,23 +190,20 @@ abstract class PopupWindow(override val delegate: jfxs.PopupWindow)
   /**
     * Show the Popup at the specified x,y location relative to the screen
     */
-  def show(owner: Node, screenX: Double, screenY: Double) {
+  def show(owner: Node, screenX: Double, screenY: Double)
     delegate.show(owner, screenX, screenY)
-  }
 
   /**
     * Show the popup.
     */
-  def show(owner: Window) {
+  def show(owner: Window)
     delegate.show(owner)
-  }
 
   /**
     * Show the Popup at the specified x,y location relative to the screen
     */
-  def show(owner: Window, screenX: Double, screenY: Double) {
+  def show(owner: Window, screenX: Double, screenY: Double)
     delegate.show(owner, screenX, screenY)
-  }
 
   /**
     * Specifies whether the event, which caused the Popup to hide, should be consumed.
@@ -221,7 +211,5 @@ abstract class PopupWindow(override val delegate: jfxs.PopupWindow)
     */
   def consumeAutoHidingEvents: BooleanProperty =
     delegate.consumeAutoHidingEventsProperty
-  def consumeAutoHidingEvents_=(v: Boolean) {
+  def consumeAutoHidingEvents_=(v: Boolean)
     consumeAutoHidingEvents() = v
-  }
-}

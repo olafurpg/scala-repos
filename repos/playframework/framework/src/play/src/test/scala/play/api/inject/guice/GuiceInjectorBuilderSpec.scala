@@ -10,11 +10,11 @@ import java.net.URLClassLoader
 import org.specs2.mutable.Specification
 import play.api.{Configuration, Environment, Mode}
 
-object GuiceInjectorBuilderSpec extends Specification {
+object GuiceInjectorBuilderSpec extends Specification
 
-  "GuiceInjectorBuilder" should {
+  "GuiceInjectorBuilder" should
 
-    "set environment" in {
+    "set environment" in
       val env = new GuiceInjectorBuilder()
         .in(Environment.simple(mode = Mode.Dev))
         .bindings(new EnvironmentModule)
@@ -22,9 +22,8 @@ object GuiceInjectorBuilderSpec extends Specification {
         .instanceOf[Environment]
 
       env.mode must_== Mode.Dev
-    }
 
-    "set environment values" in {
+    "set environment values" in
       val classLoader = new URLClassLoader(Array.empty)
       val env = new GuiceInjectorBuilder()
         .in(new File("test"))
@@ -37,9 +36,8 @@ object GuiceInjectorBuilderSpec extends Specification {
       env.rootPath must_== new File("test")
       env.mode must_== Mode.Dev
       env.classLoader must be(classLoader)
-    }
 
-    "set configuration" in {
+    "set configuration" in
       val conf = new GuiceInjectorBuilder()
         .configure(Configuration("a" -> 1))
         .configure(Map("b" -> 2))
@@ -55,9 +53,8 @@ object GuiceInjectorBuilderSpec extends Specification {
       conf.getInt("c") must beSome(3)
       conf.getInt("d.1") must beSome(4)
       conf.getInt("d.2") must beSome(5)
-    }
 
-    "support various bindings" in {
+    "support various bindings" in
       val injector = new GuiceInjectorBuilder()
         .bindings(new EnvironmentModule,
                   Seq(new ConfigurationModule),
@@ -72,9 +69,8 @@ object GuiceInjectorBuilderSpec extends Specification {
       injector.instanceOf[B] must beAnInstanceOf[B1]
       injector.instanceOf[C] must beAnInstanceOf[C1]
       injector.instanceOf[D] must beAnInstanceOf[D1]
-    }
 
-    "override bindings" in {
+    "override bindings" in
       val injector = new GuiceInjectorBuilder()
         .in(Mode.Dev)
         .configure("a" -> 1)
@@ -88,9 +84,8 @@ object GuiceInjectorBuilderSpec extends Specification {
       env.mode must_== Mode.Test
       conf.getInt("a") must beNone
       conf.getInt("b") must beSome(2)
-    }
 
-    "disable modules" in {
+    "disable modules" in
       val injector = new GuiceInjectorBuilder()
         .bindings(new EnvironmentModule,
                   new ConfigurationModule,
@@ -111,9 +106,8 @@ object GuiceInjectorBuilderSpec extends Specification {
       injector.instanceOf[B] must beAnInstanceOf[B1]
       injector.instanceOf[C] must beAnInstanceOf[C1]
       injector.instanceOf[D] must beAnInstanceOf[D1]
-    }
 
-    "configure binder" in {
+    "configure binder" in
       val injector = new GuiceInjectorBuilder()
         .requireExplicitBindings()
         .bindings(
@@ -127,46 +121,37 @@ object GuiceInjectorBuilderSpec extends Specification {
           com.google.inject.ConfigurationException]
       injector.instanceOf[C1] must throwA[
           com.google.inject.ConfigurationException]
-    }
-  }
 
-  class EnvironmentModule extends Module {
+  class EnvironmentModule extends Module
     def bindings(env: Environment, conf: Configuration) = Seq(
         bind[Environment] to env
     )
-  }
 
-  class ConfigurationModule extends Module {
+  class ConfigurationModule extends Module
     def bindings(env: Environment, conf: Configuration) = Seq(
         bind[Configuration] to conf
     )
-  }
 
-  class SetConfigurationModule(conf: Configuration) extends AbstractModule {
+  class SetConfigurationModule(conf: Configuration) extends AbstractModule
     def configure = bind(classOf[Configuration]) toInstance conf
-  }
 
   trait A
   class A1 extends A
 
-  class AModule extends AbstractModule {
+  class AModule extends AbstractModule
     def configure = bind(classOf[A]) to classOf[A1]
-  }
 
   trait B
   class B1 extends B
 
-  class BModule extends AbstractModule {
+  class BModule extends AbstractModule
     def configure = bind(classOf[B]) to classOf[B1]
-  }
 
   trait C
   class C1 extends C
 
-  class CModule extends AbstractModule {
+  class CModule extends AbstractModule
     def configure = bind(classOf[C]) to classOf[C1]
-  }
 
   trait D
   class D1 extends D
-}

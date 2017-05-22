@@ -45,7 +45,7 @@ import org.apache.spark.sql.DataFrame
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object RandomForestExample {
+object RandomForestExample
 
   case class Params(input: String = null,
                     testInput: String = "",
@@ -63,10 +63,10 @@ object RandomForestExample {
                     checkpointInterval: Int = 10)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("RandomForestExample") {
+    val parser = new OptionParser[Params]("RandomForestExample")
       head("RandomForestExample: an example random forest app.")
       opt[String]("algo")
         .text(
@@ -106,10 +106,10 @@ object RandomForestExample {
       opt[String]("checkpointDir")
         .text(
             s"checkpoint directory where intermediate node Id caches will be stored, " +
-            s"default: ${defaultParams.checkpointDir match {
+            s"default: $defaultParams.checkpointDir match
           case Some(strVal) => strVal
           case None => "None"
-        }}")
+        ")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"how often to checkpoint the node Id cache, " +
@@ -127,27 +127,21 @@ object RandomForestExample {
         .text("input path to labeled examples")
         .required()
         .action((x, c) => c.copy(input = x))
-      checkConfig { params =>
-        if (params.fracTest < 0 || params.fracTest >= 1) {
+      checkConfig  params =>
+        if (params.fracTest < 0 || params.fracTest >= 1)
           failure(
               s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
-        } else {
+        else
           success
-        }
-      }
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"RandomForestExample with $params")
     val sc = new SparkContext(conf)
     params.checkpointDir.foreach(sc.setCheckpointDir)
@@ -169,11 +163,10 @@ object RandomForestExample {
     // (1) For classification, re-index classes.
     val labelColName =
       if (algo == "classification") "indexedLabel" else "label"
-    if (algo == "classification") {
+    if (algo == "classification")
       val labelIndexer =
         new StringIndexer().setInputCol("label").setOutputCol(labelColName)
       stages += labelIndexer
-    }
     // (2) Identify categorical features using VectorIndexer.
     //     Features with more than maxCategories values will be treated as continuous.
     val featuresIndexer = new VectorIndexer()
@@ -182,7 +175,7 @@ object RandomForestExample {
       .setMaxCategories(10)
     stages += featuresIndexer
     // (3) Learn Random Forest
-    val dt = algo match {
+    val dt = algo match
       case "classification" =>
         new RandomForestClassifier()
           .setFeaturesCol("indexedFeatures")
@@ -210,7 +203,6 @@ object RandomForestExample {
       case _ =>
         throw new IllegalArgumentException(
             "Algo ${params.algo} not supported.")
-    }
     stages += dt
     val pipeline = new Pipeline().setStages(stages.toArray)
 
@@ -221,30 +213,27 @@ object RandomForestExample {
     println(s"Training time: $elapsedTime seconds")
 
     // Get the trained Random Forest from the fitted PipelineModel
-    algo match {
+    algo match
       case "classification" =>
         val rfModel = pipelineModel.stages.last
           .asInstanceOf[RandomForestClassificationModel]
-        if (rfModel.totalNumNodes < 30) {
+        if (rfModel.totalNumNodes < 30)
           println(rfModel.toDebugString) // Print full model.
-        } else {
+        else
           println(rfModel) // Print model summary.
-        }
       case "regression" =>
         val rfModel =
           pipelineModel.stages.last.asInstanceOf[RandomForestRegressionModel]
-        if (rfModel.totalNumNodes < 30) {
+        if (rfModel.totalNumNodes < 30)
           println(rfModel.toDebugString) // Print full model.
-        } else {
+        else
           println(rfModel) // Print model summary.
-        }
       case _ =>
         throw new IllegalArgumentException(
             "Algo ${params.algo} not supported.")
-    }
 
     // Evaluate model on training, test data
-    algo match {
+    algo match
       case "classification" =>
         println("Training data results:")
         DecisionTreeExample.evaluateClassificationModel(
@@ -262,9 +251,6 @@ object RandomForestExample {
       case _ =>
         throw new IllegalArgumentException(
             "Algo ${params.algo} not supported.")
-    }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

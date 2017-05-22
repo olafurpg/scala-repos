@@ -1,13 +1,11 @@
-object Test extends App {
-  abstract class Base {
+object Test extends App
+  abstract class Base
     type T
     var x: T = _
-    class Inner {
+    class Inner
       def set(y: T) = x = y
       def get() = x
       def print() = println("Hello world")
-    }
-  }
 
   object IntBase extends Base { type T = Int }
   object StringBase extends Base { type T = String }
@@ -19,4 +17,3 @@ object Test extends App {
   b.print() // OK
 
   a.set(b.get()) // Error
-}

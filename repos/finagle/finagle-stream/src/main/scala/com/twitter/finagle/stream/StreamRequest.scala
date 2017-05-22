@@ -10,10 +10,10 @@ case class StreamRequest(
     body: Buf = Buf.Empty
 )
 
-object StreamRequest {
+object StreamRequest
   sealed trait Method
 
-  object Method {
+  object Method
     case object Options extends Method
     case object Get extends Method
     case object Head extends Method
@@ -28,7 +28,7 @@ object StreamRequest {
     /**
       * Create a method from a String. The input is case-insensitive.
       */
-    def apply(name: String): Method = name.toUpperCase match {
+    def apply(name: String): Method = name.toUpperCase match
       case "OPTIONS" => Method.Options
       case "GET" => Method.Get
       case "HEAD" => Method.Head
@@ -39,6 +39,3 @@ object StreamRequest {
       case "CONNECT" => Method.Connect
       case "PATCH" => Method.Patch
       case name => Method.Custom(name)
-    }
-  }
-}

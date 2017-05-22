@@ -68,9 +68,9 @@ import TableModule._
 
 trait JDBCColumnarTableModuleConfig {}
 
-object JDBCColumnarTableModule {
+object JDBCColumnarTableModule
   def escapePath(path: String) =
-    path.toList.map {
+    path.toList.map
       case '[' => "PCLBRACKET"
       case ']' => "PCRBRACKET"
       case '-' => "PCFIELDDASH"
@@ -78,9 +78,9 @@ object JDBCColumnarTableModule {
       case ' ' => "PCSPACE"
       case c if c.isUpper => "PCUPPER" + c
       case c => c.toString
-    }.mkString("")
+    .mkString("")
 
-  def unescapePath(name: String): String = {
+  def unescapePath(name: String): String =
     val initial = name
       .replace("PCLBRACKET", "[")
       .replace("PCRBRACKET", "]")
@@ -90,40 +90,34 @@ object JDBCColumnarTableModule {
 
     val parts = initial.split("PCUPPER")
 
-    if (parts.length > 1) {
-      parts.head.toLowerCase + parts.tail.map { ucSeg =>
+    if (parts.length > 1)
+      parts.head.toLowerCase + parts.tail.map  ucSeg =>
         val (ucChar, rest) = ucSeg.splitAt(1)
         ucChar.toUpperCase + rest.toLowerCase
-      }.mkString("")
-    } else {
+      .mkString("")
+    else
       parts.head.toLowerCase
-    }
-  }
-}
 
-trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
+trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future]
   import JDBCColumnarTableModule._
 
   type YggConfig <: IdSourceConfig with ColumnarTableModuleConfig with BlockStoreColumnarTableModuleConfig with JDBCColumnarTableModuleConfig
 
-  trait DBColumns {
+  trait DBColumns
     def extract(rs: ResultSet, rowId: Int): Unit
 
     // asPairs is intended to be called once reads are complete
     def columns: Seq[(ColumnRef, Column)]
-  }
 
-  case object EmptyDBColumn extends DBColumns {
+  case object EmptyDBColumn extends DBColumns
     def extract(rs: ResultSet, rowId: Int) {}
     def columns = Seq.empty
-  }
 
   case class SingleDBColumn(
       cref: ColumnRef, column: Column, extractor: (ResultSet, Int) => Unit)
-      extends DBColumns {
+      extends DBColumns
     def extract(rs: ResultSet, rowId: Int) = extractor(rs, rowId)
     def columns = Seq(cref -> column)
-  }
 
   private def notNull(rs: ResultSet, columnIndex: Int) =
     rs.getObject(columnIndex) != null
@@ -131,13 +125,12 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
   protected def unescapeColumnNames: Boolean
 
   private def truncateString(input: String) =
-    if (input.length > 43) {
+    if (input.length > 43)
       input.take(40) + "..."
-    } else {
+    else
       input
-    }
 
-  private def metaToColumn(meta: ResultSetMetaData, index: Int): DBColumns = {
+  private def metaToColumn(meta: ResultSetMetaData, index: Int): DBColumns =
     val columnName = meta.getColumnLabel(index)
     val selector =
       paths.Value \ CPath(
@@ -145,13 +138,12 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
     import Types._
 
-    meta.getColumnType(index) match {
+    meta.getColumnType(index) match
       case BIT | BOOLEAN =>
         val column = ArrayBoolColumn.empty
         val update = (rs: ResultSet, rowId: Int) =>
-          if (notNull(rs, index)) {
+          if (notNull(rs, index))
             column.update(rowId, rs.getBoolean(index))
-        }
         SingleDBColumn(ColumnRef(selector, CBoolean), column, update)
 
       case CHAR | LONGNVARCHAR | LONGVARCHAR | NCHAR | NVARCHAR | VARCHAR =>
@@ -199,49 +191,45 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
       case DECIMAL | NUMERIC =>
         val column = ArrayNumColumn.empty(yggConfig.maxSliceSize)
         val update = (rs: ResultSet, rowId: Int) =>
-          if (notNull(rs, index)) {
+          if (notNull(rs, index))
             column.update(rowId, rs.getBigDecimal(index))
-        }
         SingleDBColumn(ColumnRef(selector, CNum), column, update)
 
       case DATE =>
         val column = ArrayDateColumn.empty(yggConfig.maxSliceSize)
         val update = (rs: ResultSet, rowId: Int) =>
-          if (notNull(rs, index)) {
+          if (notNull(rs, index))
             column.update(rowId, new DateTime(rs.getDate(index).getTime))
-        }
         SingleDBColumn(ColumnRef(selector, CDate), column, update)
 
       case TIMESTAMP =>
         val column = ArrayDateColumn.empty(yggConfig.maxSliceSize)
         val update = (rs: ResultSet, rowId: Int) =>
-          if (notNull(rs, index)) {
+          if (notNull(rs, index))
             column.update(rowId, new DateTime(rs.getTimestamp(index).getTime))
-        }
         SingleDBColumn(ColumnRef(selector, CDate), column, update)
 
       case OTHER =>
         // Here's where things get tricky. We support postgresql for now, but this code needs changed if we want to support something else
-        if (meta.getClass.toString.contains("postgresql")) {
-          new DBColumns {
+        if (meta.getClass.toString.contains("postgresql"))
+          new DBColumns
             private[this] var buildColumns =
               Map.empty[ColumnRef, ArrayColumn[_]]
 
             def columns = buildColumns.toSeq
 
             def extract(rs: ResultSet, rowId: Int) =
-              rs.getObject(index) match {
+              rs.getObject(index) match
                 case pgo: PGobject =>
-                  pgo.getType match {
+                  pgo.getType match
                     case "hstore" =>
                       pgo.getValue
                         .split(",|=>")
                         .toList
-                        .map { v =>
+                        .map  v =>
                           val t = v.trim; t.substring(1, t.length - 1)
-                        }
                         .grouped(2)
-                        .foreach {
+                        .foreach
                           case List(key, value) =>
                             val hsRef = ColumnRef(selector \ key, CString)
                             val column = buildColumns
@@ -249,18 +237,16 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                                   hsRef,
                                   ArrayStrColumn.empty(yggConfig.maxSliceSize))
                               .asInstanceOf[ArrayStrColumn]
-                              .unsafeTap { c =>
+                              .unsafeTap  c =>
                                 c.update(rowId, value)
-                              }
                             buildColumns += (hsRef -> column)
 
                           case invalid =>
                             logger.error(
                                 "Invalid pair in hstore value: " + invalid)
-                        }
 
                     case "json" =>
-                      JParser.parseFromString(pgo.getValue) match {
+                      JParser.parseFromString(pgo.getValue) match
                         case Success(jv) =>
                           buildColumns = Slice.withIdsAndValues(
                               jv,
@@ -274,77 +260,64 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                               "Failure parsing JSON column value (%s): %s"
                                 .format(truncateString(pgo.getValue),
                                         error.getMessage))
-                      }
 
                     case other =>
                       logger.warn("Unsupportd PostgreSQL type: " + other)
-                  }
 
                 case other =>
                   logger.warn(
                       "Encountered unknown data from PostgreSQL: %s (%s)"
                         .format(other, other.getClass))
-              }
-          }
-        } else {
+        else
           EmptyDBColumn
-        }
 
       case other =>
         logger.warn(
             "Unsupported JDBC column type %d for %s".format(other, selector)); EmptyDBColumn
-    }
-  }
 
-  private def columnsForResultSet(rs: ResultSet): Seq[DBColumns] = {
+  private def columnsForResultSet(rs: ResultSet): Seq[DBColumns] =
     val metadata = rs.getMetaData
 
     import java.sql.Types._
 
     (1 to metadata.getColumnCount).map(metaToColumn(metadata, _))
-  }
 
   trait JDBCColumnarTableCompanion
-      extends BlockStoreColumnarTableCompanion with Logging {
+      extends BlockStoreColumnarTableCompanion with Logging
 
     /** Maps a given database name to a JDBC connection URL */
     def databaseMap: Map[String, String]
 
     private def jTypeToProperties(
-        tpe: JType, current: Set[String]): Set[String] = tpe match {
+        tpe: JType, current: Set[String]): Set[String] = tpe match
       case JArrayFixedT(elements) if current.nonEmpty =>
-        elements.map {
+        elements.map
           case (index, childType) =>
-            val newPaths = current.map { s =>
+            val newPaths = current.map  s =>
               s + "[" + index + "]"
-            }
             jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+        .toSet.flatten
 
       case JObjectFixedT(fields) =>
-        fields.map {
+        fields.map
           case (name, childType) =>
             val newPaths =
-              if (current.nonEmpty) {
-                current.map { s =>
+              if (current.nonEmpty)
+                current.map  s =>
                   s + "." + name
-                }
-              } else {
+              else
                 Set(name)
-              }
             jTypeToProperties(childType, newPaths)
-        }.toSet.flatten
+        .toSet.flatten
 
       case _ => current
-    }
 
-    case class Query(expr: String, limit: Int) {
+    case class Query(expr: String, limit: Int)
       private val baseQuery =
         if (limit > 0) { expr + " LIMIT " + limit } else { expr }
 
       def atOffset(offset: Long) =
         if (offset > 0) { baseQuery + " OFFSET " + offset } else baseQuery
-    }
 
     sealed trait LoadState
     case class InitialLoad(paths: List[Path]) extends LoadState
@@ -354,10 +327,10 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                       remainingPaths: List[Path])
         extends LoadState
 
-    def load(table: Table, apiKey: APIKey, tpe: JType): Future[Table] = {
-      for {
+    def load(table: Table, apiKey: APIKey, tpe: JType): Future[Table] =
+      for
         paths <- pathsM(table)
-      } yield {
+      yield
         import trans._
         val idSpec = InnerObjectConcat(
             Leaf(Source),
@@ -366,29 +339,27 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
         Table(
             StreamT.unfoldM[Future, Slice, LoadState](
-                InitialLoad(paths.toList)) {
+                InitialLoad(paths.toList))
               case InLoad(connGen, query, skip, remaining) =>
-                M.point {
+                M.point
                   val (slice, nextSkip) = makeSlice(connGen, query, skip)
                   Some((slice,
                         nextSkip
                           .map(InLoad(connGen, query, _, remaining))
                           .getOrElse(InitialLoad(remaining))))
-                }
 
               case InitialLoad(path :: xs) =>
-                path.elements.toList match {
+                path.elements.toList match
                   case dbName :: tableName :: Nil =>
-                    M.point {
-                      try {
-                        databaseMap.get(dbName).map {
+                    M.point
+                      try
+                        databaseMap.get(dbName).map
                           url =>
                             // Extra split/take at the end is because we can only map to column level. While hstore and json column types
                             // will end up with deepeer paths, they cannot be queried against in PostgreSQL
-                            val columns = jTypeToProperties(tpe, Set()).map {
+                            val columns = jTypeToProperties(tpe, Set()).map
                               c =>
                                 c.split('.').head
-                            }
                             val query = Query("SELECT %s FROM %s".format(
                                                   if (columns.isEmpty) "*"
                                                   else columns.mkString(","),
@@ -406,42 +377,36 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
                                  nextSkip
                                    .map(InLoad(connGen, query, _, xs))
                                    .getOrElse(InitialLoad(xs)))
-                        } getOrElse {
+                        getOrElse
                           throw new Exception(
                               "Database %s is not configured" format dbName)
-                        }
-                      } catch {
+                      catch
                         case t =>
                           logger.error(
                               "Failure during JDBC query: " + t.getMessage)
                           // FIXME: We should be able to throw here and terminate the query, but something in BlueEyes is hanging when we do so
                           //throw new Exception("Failure during JDBC query: " + t.getMessage)
                           None
-                      }
-                    }
 
                   case err =>
                     sys.error("JDBC path " + path.path +
                         " does not have the form /dbName/tableName; rollups not yet supported.")
-                }
 
               case InitialLoad(Nil) =>
                 M.point(None)
-            },
+            ,
             UnknownSize
         ).transform(idSpec) //.printer("JDBC Table")
-      }
-    }
 
     def makeSlice(connGen: () => Connection,
                   query: Query,
-                  skip: Int): (Slice, Option[Int]) = {
+                  skip: Int): (Slice, Option[Int]) =
       import TransSpecModule.paths._
 
-      try {
+      try
         val conn = connGen()
 
-        try {
+        try
           // We could probably be slightly more efficient with driver-specific prepared statements for offset/limit
           val results = conn.createStatement.executeQuery(query.atOffset(skip))
 
@@ -450,32 +415,23 @@ trait JDBCColumnarTableModule extends BlockStoreColumnarTableModule[Future] {
 
           var rowIndex = 0
 
-          while (results.next && rowIndex < yggConfig.maxSliceSize) {
-            valColumns.foreach { dbc =>
+          while (results.next && rowIndex < yggConfig.maxSliceSize)
+            valColumns.foreach  dbc =>
               dbc.extract(results, rowIndex)
-            }
 
             rowIndex += 1
-          }
 
-          val slice = new Slice {
+          val slice = new Slice
             val size = rowIndex
             val columns = valColumns.flatMap(_.columns).toMap
-          }
 
           val nextSkip =
-            if (rowIndex == yggConfig.maxSliceSize) {
+            if (rowIndex == yggConfig.maxSliceSize)
               Some(skip + yggConfig.maxSliceSize)
-            } else {
+            else
               None
-            }
 
           (slice, nextSkip)
-        } finally {
+        finally
           conn.close()
-        }
-      }
-    }
-  }
-}
 // vim: set ts=4 sw=4 et:

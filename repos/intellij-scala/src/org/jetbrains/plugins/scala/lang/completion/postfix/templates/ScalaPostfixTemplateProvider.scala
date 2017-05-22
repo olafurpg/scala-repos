@@ -11,7 +11,7 @@ import com.intellij.util.containers.ContainerUtil
   * @author Roman.Shein
   * @since 03.09.2015.
   */
-class ScalaPostfixTemplateProvider extends PostfixTemplateProvider {
+class ScalaPostfixTemplateProvider extends PostfixTemplateProvider
   override def getTemplates: util.Set[PostfixTemplate] =
     ScalaPostfixTemplateProvider.templates
 
@@ -25,9 +25,8 @@ class ScalaPostfixTemplateProvider extends PostfixTemplateProvider {
     copyFile
 
   override def afterExpand(file: PsiFile, editor: Editor): Unit = {}
-}
 
-object ScalaPostfixTemplateProvider {
+object ScalaPostfixTemplateProvider
   protected def templates: util.Set[PostfixTemplate] =
     ContainerUtil.newHashSet(
         new ScalaTryPostfixTemplate,
@@ -54,4 +53,3 @@ object ScalaPostfixTemplateProvider {
         new ScalaSeqPostfixTemplate,
         new ScalaListPostfixTemplate
     )
-}

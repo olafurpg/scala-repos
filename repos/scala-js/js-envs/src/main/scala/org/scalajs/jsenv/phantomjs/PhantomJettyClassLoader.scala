@@ -18,7 +18,7 @@ import org.scalajs.core.tools.io.IO
   */
 final class PhantomJettyClassLoader(
     jettyLoader: ClassLoader, parent: ClassLoader)
-    extends ClassLoader(parent) {
+    extends ClassLoader(parent)
 
   def this(loader: ClassLoader) =
     this(loader, ClassLoader.getSystemClassLoader())
@@ -34,31 +34,25 @@ final class PhantomJettyClassLoader(
       "org.scalajs.jsenv.phantomjs.JettyWebsocketManager$$anon$2"
   )
 
-  override protected def loadClass(name: String, resolve: Boolean): Class[_] = {
-    if (bridgeClasses.contains(name)) {
+  override protected def loadClass(name: String, resolve: Boolean): Class[_] =
+    if (bridgeClasses.contains(name))
       // Load bridgeClasses manually since they must be associated to this
       // class loader, rather than the parent class loader in order to find the
       // jetty classes
 
       // First check if we have loaded it already
-      Option(findLoadedClass(name)) getOrElse {
+      Option(findLoadedClass(name)) getOrElse
         val wsManager =
           parent.getResourceAsStream(name.replace('.', '/') + ".class")
 
-        if (wsManager == null) {
+        if (wsManager == null)
           throw new ClassNotFoundException(name)
-        } else {
+        else
           val buf = IO.readInputStreamToByteArray(wsManager)
           defineClass(name, buf, 0, buf.length)
-        }
-      }
-    } else {
-      try {
+    else
+      try
         jettyLoader.loadClass(name)
-      } catch {
+      catch
         case _: ClassNotFoundException =>
           super.loadClass(name, resolve)
-      }
-    }
-  }
-}

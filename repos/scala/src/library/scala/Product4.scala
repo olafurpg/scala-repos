@@ -9,16 +9,15 @@
 
 package scala
 
-object Product4 {
+object Product4
   def unapply[T1, T2, T3, T4](
       x: Product4[T1, T2, T3, T4]): Option[Product4[T1, T2, T3, T4]] =
     Some(x)
-}
 
 /** Product4 is a cartesian product of 4 components.
   *  @since 2.3
   */
-trait Product4[+T1, +T2, +T3, +T4] extends Any with Product {
+trait Product4[+T1, +T2, +T3, +T4] extends Any with Product
 
   /** The arity of this product.
     *  @return 4
@@ -33,13 +32,12 @@ trait Product4[+T1, +T2, +T3, +T4] extends Any with Product {
     *  @throws  IndexOutOfBoundsException
     */
   @throws(classOf[IndexOutOfBoundsException])
-  override def productElement(n: Int) = n match {
+  override def productElement(n: Int) = n match
     case 0 => _1
     case 1 => _2
     case 2 => _3
     case 3 => _4
     case _ => throw new IndexOutOfBoundsException(n.toString())
-  }
 
   /** A projection of element 1 of this Product.
     *  @return   A projection of element 1.
@@ -60,4 +58,3 @@ trait Product4[+T1, +T2, +T3, +T4] extends Any with Product {
     *  @return   A projection of element 4.
     */
   def _4: T4
-}

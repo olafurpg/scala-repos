@@ -1,7 +1,7 @@
 import scala.reflect.macros.whitebox.Context
 
-object Macros {
-  def impl(c: Context) = {
+object Macros
+  def impl(c: Context) =
     import c.universe._
 
     val inscope =
@@ -14,18 +14,15 @@ object Macros {
     val line = fun.pos.line
     val charOffset = fun.pos.point
     def literal[T](x: T) = c.Expr[T](Literal(Constant(x)))
-    c.universe.reify {
+    c.universe.reify
       SourceLocation1(outer.splice,
                       literal(fileName).splice,
                       literal(line).splice,
                       literal(charOffset).splice)
-    }
-  }
 
   implicit def sourceLocation: SourceLocation1 = macro impl
-}
 
-trait SourceLocation {
+trait SourceLocation
 
   /** Source location of the outermost call */
   val outer: SourceLocation
@@ -38,7 +35,6 @@ trait SourceLocation {
 
   /** The character offset */
   val charOffset: Int
-}
 
 case class SourceLocation1(val outer: SourceLocation,
                            val fileName: String,

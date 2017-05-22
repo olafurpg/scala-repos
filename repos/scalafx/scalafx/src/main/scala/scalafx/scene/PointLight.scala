@@ -32,10 +32,9 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 
-object PointLight {
+object PointLight
   implicit def sfxPointLight2jfx(pl: PointLight): jfxs.PointLight =
     if (pl != null) pl.delegate else null
-}
 
 /** Defines a point light source object.
   * An attenuated light source that has a fixed point in space and radiates light equally
@@ -43,10 +42,8 @@ object PointLight {
   */
 class PointLight(
     override val delegate: jfxs.PointLight = new jfxs.PointLight())
-    extends LightBase(delegate) with SFXDelegate[jfxs.PointLight] {
+    extends LightBase(delegate) with SFXDelegate[jfxs.PointLight]
 
   /** Creates a new instance of `PointLight` class using the specified color. */
-  def this(color: Color) {
+  def this(color: Color)
     this(new jfxs.PointLight(color))
-  }
-}

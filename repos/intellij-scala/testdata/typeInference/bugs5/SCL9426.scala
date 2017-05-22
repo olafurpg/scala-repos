@@ -1,11 +1,10 @@
-object SCL9426 {
+object SCL9426
   trait TC[A]
 
-  object E {
+  object E
     implicit def e[X : TC, Y : TC]: TC[Either[X, Y]] = ???
-  }
 
-  object Demo {
+  object Demo
     import E._
 
     trait A
@@ -15,9 +14,8 @@ object SCL9426 {
     implicit val b: TC[B] = ???
     //  implicit val ab: TC[Either[A, B]] = e
 
-    class F1[X](implicit PV: TC[X]) {
+    class F1[X](implicit PV: TC[X])
       type Instance = Unit
-    }
 
     object F2 extends F1[Either[A, B]]
 
@@ -25,6 +23,4 @@ object SCL9426 {
 
     /*start*/
     asd /*end*/
-  }
-}
 //Demo.F2.Instance

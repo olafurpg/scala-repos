@@ -22,23 +22,21 @@ import org.specs2.mutable.Specification
 /**
   * Systems under specification for Menu DSL.
   */
-object MenuDslSpec extends Specification {
+object MenuDslSpec extends Specification
   "Menu DSL Specification".title
 
-  "The Menu DSL" should {
-    "allow basic menu definition via '/ path'" in {
+  "The Menu DSL" should
+    "allow basic menu definition via '/ path'" in
       val menu = (Menu("Test") / "foo").toMenu
       menu.loc.link.uriList mustEqual List("foo")
       menu.loc.link.matchHead_? mustEqual false
-    }
 
-    "allow wildcard menu definitions via '/ path / **'" in {
+    "allow wildcard menu definitions via '/ path / **'" in
       val menu = (Menu("Test") / "foo" / **).toMenu
       menu.loc.link.uriList mustEqual List("foo")
       menu.loc.link.matchHead_? mustEqual true
-    }
 
-    "handle LocParams" in {
+    "handle LocParams" in
       import Loc._
       val worthlessTest =
         If(() => System.currentTimeMillis % 2 == 0, "So sad for you!")
@@ -49,17 +47,15 @@ object MenuDslSpec extends Specification {
       // Got a weird type error when trying to just use "must contain" :(
       menu1.toMenu.loc.params.exists(_ == worthlessTest) mustEqual true
       menu2.toMenu.loc.params.exists(_ == worthlessTest) mustEqual true
-    }
 
-    "handle submenus" in {
+    "handle submenus" in
       val menu =
         Menu("Foo") / "test" submenus
         (Menu("Bar") / "bar", Menu("Bat") / "bat")
 
       menu.toMenu.kids.size mustEqual 2
-    }
 
-    "handle sub-submenus" in {
+    "handle sub-submenus" in
       val menu =
         Menu("Foo") / "test" submenus
         (Menu("Bar") / "bar" submenus
@@ -67,17 +63,14 @@ object MenuDslSpec extends Specification {
             Menu("Bat") / "bat")
 
       menu.toMenu.kids(0).kids.size mustEqual 2
-    }
 
-    "handle I18N menu names" in {
+    "handle I18N menu names" in
       val menu = Menu.i("Home") / "index"
 
       menu.toMenu.loc.name mustEqual "Home"
-    }
-  }
 
-  "MenuItems" should {
-    "support nesting deeper than two levels" in {
+  "MenuItems" should
+    "support nesting deeper than two levels" in
       val menu =
         Menu("Foo") / "test" submenus
         (Menu("Bar") / "bar" submenus
@@ -91,6 +84,3 @@ object MenuDslSpec extends Specification {
 
       complete.kids.size must_== 2
       complete.kids(0).kids.size must_== 3
-    }
-  }
-}

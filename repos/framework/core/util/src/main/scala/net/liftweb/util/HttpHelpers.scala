@@ -30,7 +30,7 @@ import common._
 
 object HttpHelpers extends ListHelpers with StringHelpers
 
-trait HttpHelpers { self: ListHelpers with StringHelpers =>
+trait HttpHelpers  self: ListHelpers with StringHelpers =>
 
   /**
     * The list of known suffixes used to split the URI into path parts and suffixes.
@@ -509,9 +509,9 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     * @return a valid query string
     */
   def paramsToUrlParams(params: List[(String, String)]): String =
-    params.map {
+    params.map
       case (n, v) => urlEncode(n) + "=" + urlEncode(v)
-    }.mkString("&")
+    .mkString("&")
 
   /**
     * Append parameters to a URL
@@ -522,11 +522,10 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     * @return the url with the parameters appended
     */
   def appendParams(url: String, params: Seq[(String, String)]): String =
-    params.toList match {
+    params.toList match
       case Nil => url
       case xs if !url.contains("?") => url + "?" + paramsToUrlParams(xs)
       case xs => url + "&" + paramsToUrlParams(xs)
-    }
 
   /**
     * Given a map of HTTP properties, return true if the "Content-type"
@@ -536,18 +535,14 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     *                                 ("Content-Type", "application/xhtml+xml")
     */
   def couldBeHtml(in: Map[String, String]): Boolean =
-    in match {
+    in match
       case null => true
-      case n => {
-          n.get("Content-Type") match {
-            case Some(s) => {
+      case n =>
+          n.get("Content-Type") match
+            case Some(s) =>
                 (s.toLowerCase == "text/html") ||
                 (s.toLowerCase == "application/xhtml+xml")
-              }
             case None => true
-          }
-        }
-    }
 
   /**
     * Return true if the xml doesn't contain an &lt;html&gt; tag
@@ -558,37 +553,32 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
   /**
     * Transform a general Map to a nutable HashMap
     */
-  def toHashMap[A, B](in: Map[A, B]): HashMap[A, B] = {
+  def toHashMap[A, B](in: Map[A, B]): HashMap[A, B] =
     val ret = new HashMap[A, B];
-    in.keysIterator.foreach { k =>
+    in.keysIterator.foreach  k =>
       ret += (k -> in(k))
-    }
     ret
-  }
 
   /**
     * Ensure that all the appropriate fields are in the header.
     */
   def insureField(toInsure: List[(String, String)],
-                  headers: List[(String, String)]): List[(String, String)] = {
+                  headers: List[(String, String)]): List[(String, String)] =
     def insureField_inner(toInsure: List[(String, String)],
                           field: (String, String)): List[(String, String)] =
-      toInsure.ciGet(field._1) match {
+      toInsure.ciGet(field._1) match
         case Full(_) => toInsure
         case _ => field :: toInsure
-      }
 
-    headers match {
+    headers match
       case Nil => toInsure
       case x :: xs => insureField(insureField_inner(toInsure, x), xs)
-    }
-  }
 
   /**
     * Transform a pair (name: String, value: Any) to an unprefixed XML attribute name="value"
     */
-  implicit def pairToUnprefixed(in: (String, Any)): MetaData = {
-    val value: Option[NodeSeq] = in._2 match {
+  implicit def pairToUnprefixed(in: (String, Any)): MetaData =
+    val value: Option[NodeSeq] = in._2 match
       case null => None
       case js: ToJsCmd => Some(Text(js.toJsCmd))
       case n: Node => Some(n)
@@ -600,10 +590,8 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
       case Full(n: Node) => Some(n)
       case Full(n: NodeSeq) => Some(n)
       case s => Some(Text(s.toString))
-    }
 
     value.map(v => new UnprefixedAttribute(in._1, v, Null)) getOrElse Null
-  }
 
   /**
     * If the specified Elem has an attribute named 'id', return it, otherwise
@@ -612,48 +600,41 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     * @param in the element to test &amp; add 'id' to
     * @return the new element and the id
     */
-  def findOrAddId(in: Elem): (Elem, String) = (in \ "@id").toList match {
-    case Nil => {
+  def findOrAddId(in: Elem): (Elem, String) = (in \ "@id").toList match
+    case Nil =>
         val id = nextFuncName
         (in % ("id" -> id), id)
-      }
     case x :: xs => (in, x.text)
-  }
 
   /**
     * Within a NodeSeq, find the first elem and run it through
     * the function.  Return the resulting NodeSeq
     */
-  def evalElemWithId(f: (String, Elem) => NodeSeq)(ns: NodeSeq): NodeSeq = {
+  def evalElemWithId(f: (String, Elem) => NodeSeq)(ns: NodeSeq): NodeSeq =
     var found = false
-    ns.flatMap {
-      case e: Elem if !found => {
+    ns.flatMap
+      case e: Elem if !found =>
           found = true
           val (ne, id) = findOrAddId(e)
           f(id, ne)
-        }
       case x => x
-    }
-  }
 
   /**
     * Given a URL and a Lift function String, append the function
     * even if the URL has query params and a #
     */
   def appendFuncToURL(url: String, funcStr: String): String =
-    splitAtHash(url) { to =>
+    splitAtHash(url)  to =>
       to + (if (to.indexOf("?") >= 0) "&" else "?") + funcStr
-    }
 
   /**
     * Split a String at the Hash sign, run the function
     * on the non-# side and then append the hash side
     */
   def splitAtHash(str: String)(f: String => String): String =
-    str.indexOf("#") match {
+    str.indexOf("#") match
       case idx if idx < 0 => f(str)
       case idx => f(str.substring(0, idx)) + str.substring(idx)
-    }
 
   /**
     * Given a list of query parameters, append them to the
@@ -662,15 +643,13 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     */
   def appendQueryParameters(
       url: String, params: List[(String, String)]): String =
-    params match {
+    params match
       case Nil => url
       case ps =>
-        splitAtHash(url) { to =>
-          to + (if (to.indexOf("?") >= 0) "&" else "?") + ps.map {
+        splitAtHash(url)  to =>
+          to + (if (to.indexOf("?") >= 0) "&" else "?") + ps.map
             case (n, v) => urlEncode(n) + "=" + urlEncode(v)
-          }.mkString("&")
-        }
-    }
+          .mkString("&")
 
   private val serial = new AtomicLong(
       math.abs(Helpers.randomLong(Helpers.millis)) + 1000000L)
@@ -690,46 +669,40 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     * @param f - the predicate to match elements with
     * @return the NodeSeq resulting from concatenation of the matched elements.
     */
-  def findElems(nodes: NodeSeq)(f: Elem => Boolean): NodeSeq = {
+  def findElems(nodes: NodeSeq)(f: Elem => Boolean): NodeSeq =
     val ret = new ListBuffer[Elem]
-    def find(what: NodeSeq) {
-      what.foreach {
+    def find(what: NodeSeq)
+      what.foreach
         case Group(g) => find(g)
         case e: Elem =>
           if (f(e)) ret += e
           find(e.child)
 
         case n => find(n.child)
-      }
-    }
     find(nodes)
 
     ret.toList
-  }
 
   /**
     * Map the specified function over the elements of the
     * specified NodeSeq and return the concatenated result.
     * This is essentially a container-type-transforming flatMap operation.
     */
-  def findInElems[T](nodes: NodeSeq)(f: Elem => Iterable[T]): List[T] = {
+  def findInElems[T](nodes: NodeSeq)(f: Elem => Iterable[T]): List[T] =
     val ret = new ListBuffer[T]
 
-    def find(what: NodeSeq) {
-      what.foreach {
+    def find(what: NodeSeq)
+      what.foreach
         case Group(g) => find(g)
         case e: Elem =>
           ret ++= f(e)
           find(e.child)
 
         case n => find(n.child)
-      }
-    }
 
     find(nodes)
 
     ret.toList
-  }
 
   /**
     * Get a guaranteed unique field name
@@ -741,44 +714,38 @@ trait HttpHelpers { self: ListHelpers with StringHelpers =>
     * Get a guaranteed unique field name
     * (16 or 17 letters and numbers, starting with a letter)
     */
-  def nextFuncName(seed: Long): String = {
+  def nextFuncName(seed: Long): String =
     val sb = new StringBuilder(24)
     sb.append('F')
     sb.append(nextNum + seed)
     // sb.append('_')
     sb.append(randomString(6))
     sb.toString
-  }
 
   def findKids(in: NodeSeq, prefix: String, label: String): NodeSeq =
     in.filter(n => n.label == label && n.prefix == prefix).flatMap(_.child)
 
-  def deepFindKids(in: NodeSeq, prefix: String, label: String): NodeSeq = {
+  def deepFindKids(in: NodeSeq, prefix: String, label: String): NodeSeq =
     val ret: ListBuffer[Node] = new ListBuffer
 
-    def doIt(in: NodeSeq) {
-      in.foreach {
+    def doIt(in: NodeSeq)
+      in.foreach
         case e: Elem if e.prefix == prefix && e.label == label =>
           e.child.foreach(ret.+=)
         case g: Group => doIt(g.nodes)
         case n => doIt(n.child)
-      }
-    }
 
     doIt(in)
     ret.toList
-  }
-}
 
 /**
   * TODO: Is this something that can be converted to a JavaScript Command
   */
-trait ToJsCmd {
+trait ToJsCmd
   def toJsCmd: String
-}
 
-object CheckNodeSeq {
-  def unapply(in: Any): Option[NodeSeq] = in match {
+object CheckNodeSeq
+  def unapply(in: Any): Option[NodeSeq] = in match
     case Some(ns: NodeSeq) => Some(ns)
     case Full(ns: NodeSeq) => Some(ns)
     case Some(sq: Seq[_]) if sq.forall(_.isInstanceOf[Node]) =>
@@ -792,5 +759,3 @@ object CheckNodeSeq {
       val ns: NodeSeq = sq.asInstanceOf[Seq[Node]]
       Some(ns)
     case _ => None
-  }
-}

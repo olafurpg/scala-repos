@@ -12,10 +12,8 @@ import scala.reflect.internal.util.Position
   */
 trait PresentationCompilerBackCompat
 
-trait PositionBackCompat {
-  implicit class RichPosition(pos: Position) {
+trait PositionBackCompat
+  implicit class RichPosition(pos: Position)
     // annoyingly, {start, end}OrPoint is deprecated
     def startOrCursor: Int = pos.start
     def endOrCursor: Int = pos.end
-  }
-}

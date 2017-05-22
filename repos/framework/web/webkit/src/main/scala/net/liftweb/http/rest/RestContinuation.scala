@@ -34,7 +34,7 @@ final private[http] case class ContinuationException(
   * the underlying web container does not support continuations the asynchronous
   * nature is achieved using locks.
   */
-object RestContinuation {
+object RestContinuation
 
   /**
     * Process a request asynchronously.  If your web container supports
@@ -71,16 +71,13 @@ object RestContinuation {
     * body will be executed in the scope of the current request (the
     * current session and the current Req object).
     */
-  def async(f: ((=> LiftResponse) => Unit) => Unit): Nothing = {
+  def async(f: ((=> LiftResponse) => Unit) => Unit): Nothing =
     throw new ContinuationException(CurrentReq.value, S.session, f)
-  }
-}
 
 object ContinuationsStore
     extends SessionVar[HashMap[ContinuationKey, Continuation]](
         new HashMap[ContinuationKey, Continuation])
 
-trait Continuation {
+trait Continuation
   def tryRespond: Box[LiftResponse]
-}
 case class ContinuationKey(path: ParsePath, reqType: RequestType)

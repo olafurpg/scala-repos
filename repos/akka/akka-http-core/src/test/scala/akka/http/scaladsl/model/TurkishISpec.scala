@@ -8,9 +8,9 @@ import java.util.Locale
 import org.scalatest.{Matchers, WordSpec}
 import akka.http.impl.util._
 
-class TurkishISpec extends WordSpec with Matchers {
-  "Model" should {
-    "not suffer from turkish-i problem" in {
+class TurkishISpec extends WordSpec with Matchers
+  "Model" should
+    "not suffer from turkish-i problem" in
       val charsetCons = Class
         .forName("akka.http.scaladsl.model.HttpCharsets$")
         .getDeclaredConstructor()
@@ -18,7 +18,7 @@ class TurkishISpec extends WordSpec with Matchers {
 
       val previousLocale = Locale.getDefault
 
-      try {
+      try
         // recreate HttpCharsets in turkish locale
         Locale.setDefault(new Locale("tr", "TR"))
 
@@ -30,9 +30,5 @@ class TurkishISpec extends WordSpec with Matchers {
           charsetCons.newInstance().asInstanceOf[HttpCharsets.type]
         newCharsets.getForKey("iso-8859-1") shouldEqual Some(
             newCharsets.`ISO-8859-1`)
-      } finally {
+      finally
         Locale.setDefault(previousLocale)
-      }
-    }
-  }
-}

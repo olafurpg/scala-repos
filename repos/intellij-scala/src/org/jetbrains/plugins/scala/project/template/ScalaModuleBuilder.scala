@@ -19,29 +19,27 @@ import com.intellij.openapi.util.Disposer
   */
 class ScalaModuleBuilder(
     languageName: String, libraryDescription: CustomLibraryDescription)
-    extends JavaModuleBuilder {
+    extends JavaModuleBuilder
   private var librariesContainer: LibrariesContainer = _
 
   private var libraryCompositionSettings: LibraryCompositionSettings = _
 
   addModuleConfigurationUpdater(
-      new ModuleConfigurationUpdater() {
-    override def update(module: Module, rootModel: ModifiableRootModel) {
+      new ModuleConfigurationUpdater()
+    override def update(module: Module, rootModel: ModifiableRootModel)
       libraryCompositionSettings.addLibraries(
           rootModel, new util.ArrayList[Library](), librariesContainer)
-    }
-  })
+  )
 
   override def modifySettingsStep(
-      settingsStep: SettingsStep): ModuleWizardStep = {
+      settingsStep: SettingsStep): ModuleWizardStep =
     librariesContainer = LibrariesContainerFactory.createContainer(
         settingsStep.getContext.getProject)
 
     new ScalaStep(settingsStep)
-  }
 
   private class ScalaStep(settingsStep: SettingsStep)
-      extends ModuleWizardStep() {
+      extends ModuleWizardStep()
     private val javaStep = JavaModuleType.getModuleType.modifyProjectTypeStep(
         settingsStep, ScalaModuleBuilder.this)
 
@@ -55,20 +53,16 @@ class ScalaModuleBuilder(
     settingsStep.addSettingsField(
         s"$languageName S\u001BDK:", libraryPanel.getSimplePanel)
 
-    override def updateDataModel() {
+    override def updateDataModel()
       libraryCompositionSettings = libraryPanel.apply()
       javaStep.updateDataModel()
-    }
 
     override def getComponent = libraryPanel.getMainPanel
 
-    override def disposeUIResources() {
+    override def disposeUIResources()
       super.disposeUIResources()
       javaStep.disposeUIResources()
       Disposer.dispose(libraryPanel)
-    }
 
     override def validate =
       super.validate && (javaStep == null || javaStep.validate)
-  }
-}

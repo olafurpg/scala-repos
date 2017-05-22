@@ -1,14 +1,13 @@
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     import collection.JavaConversions._
 
     test(new java.util.HashMap[String, String])
     test(new java.util.Properties)
     testConcMap
-  }
 
-  def testConcMap {
+  def testConcMap
     import collection.JavaConversions._
 
     val concMap = new java.util.concurrent.ConcurrentHashMap[String, String]
@@ -20,9 +19,8 @@ object Test {
     assert(cmap.remove("somekey", "somevalue") == true)
     assert(cmap.replace("absentKey", "newAbsentValue") == Some("absentValue"))
     assert(cmap.replace("absentKey", "newAbsentValue", ".......") == true)
-  }
 
-  def test(m: collection.mutable.Map[String, String]) {
+  def test(m: collection.mutable.Map[String, String])
     m.clear
     assert(m.size == 0)
 
@@ -44,5 +42,3 @@ object Test {
     m.clear
     for (i <- 0 until 10) m += (("key" + i, "value" + i))
     for ((k, v) <- m) assert(k.startsWith("key"))
-  }
-}

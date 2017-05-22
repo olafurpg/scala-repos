@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 import akka.persistence.JournalProtocol._
 
-object PersistentActorJournalProtocolSpec {
+object PersistentActorJournalProtocolSpec
 
   val config =
     ConfigFactory.parseString("""
@@ -34,7 +34,7 @@ akka.persistence.snapshot-store.plugin = "akka.persistence.no-snapshot-store"
   case class PostRestart(name: String)
   case class PostStop(name: String)
 
-  class A(monitor: ActorRef) extends PersistentActor {
+  class A(monitor: ActorRef) extends PersistentActor
 
     def persistenceId = self.path.name
 
@@ -45,91 +45,73 @@ akka.persistence.snapshot-store.plugin = "akka.persistence.no-snapshot-store"
       monitor ! PostRestart(persistenceId)
     override def postStop(): Unit = monitor ! PostStop(persistenceId)
 
-    def receiveRecover = {
+    def receiveRecover =
       case x ⇒ monitor ! x
-    }
-    def receiveCommand = behavior orElse {
+    def receiveCommand = behavior orElse
       case m: Multi ⇒ m.cmd.foreach(behavior)
-    }
 
-    val behavior: Receive = {
+    val behavior: Receive =
       case p: Persist ⇒ P(p)
       case p: PersistAsync ⇒ PA(p)
       case Echo(id) ⇒ sender() ! Done(id, 0)
       case Fail(ex) ⇒ throw ex
-    }
     val doNothing = (_: Any) ⇒ ()
 
-    def P(p: Persist): Unit = {
+    def P(p: Persist): Unit =
       var sub = 0
-      persistAll(p.msgs.toList) { e ⇒
+      persistAll(p.msgs.toList)  e ⇒
         sender() ! Done(p.id, { sub += 1; sub })
         behavior.applyOrElse(e, doNothing)
-      }
-    }
-    def PA(p: PersistAsync): Unit = {
+    def PA(p: PersistAsync): Unit =
       var sub = 0
-      persistAllAsync(p.msgs.toList) { e ⇒
+      persistAllAsync(p.msgs.toList)  e ⇒
         sender() ! Done(p.id, { sub += 1; sub })
         behavior.applyOrElse(e, doNothing)
-      }
-    }
-  }
-}
 
 object JournalPuppet extends ExtensionKey[JournalProbe]
 class JournalProbe(implicit private val system: ExtendedActorSystem)
-    extends Extension {
+    extends Extension
   val probe = TestProbe()
   val ref = probe.ref
-}
 
-class JournalPuppet extends Actor {
+class JournalPuppet extends Actor
   val ref = JournalPuppet(context.system).ref
-  def receive = {
+  def receive =
     case x ⇒ ref forward x
-  }
-}
 
 import PersistentActorJournalProtocolSpec._
 
 class PersistentActorJournalProtocolSpec
-    extends AkkaSpec(config) with ImplicitSender {
+    extends AkkaSpec(config) with ImplicitSender
 
   val journal = JournalPuppet(system).probe
 
   case class Msgs(msg: Any*)
 
-  def expectWrite(subject: ActorRef, msgs: Msgs*): WriteMessages = {
+  def expectWrite(subject: ActorRef, msgs: Msgs*): WriteMessages =
     val w = journal.expectMsgType[WriteMessages]
-    withClue(s"$w: ") {
+    withClue(s"$w: ")
       w.persistentActor should ===(subject)
       w.messages.size should ===(msgs.size)
-      w.messages.zip(msgs).foreach {
+      w.messages.zip(msgs).foreach
         case (AtomicWrite(writes), msg) ⇒
           writes.size should ===(msg.msg.size)
-          writes.zip(msg.msg).foreach {
+          writes.zip(msg.msg).foreach
             case (PersistentRepr(evt, _), m) ⇒
               evt should ===(m)
-          }
         case x ⇒ fail(s"unexpected $x")
-      }
-    }
     w
-  }
 
-  def confirm(w: WriteMessages): Unit = {
+  def confirm(w: WriteMessages): Unit =
     journal.send(w.persistentActor, WriteMessagesSuccessful)
-    w.messages.foreach {
+    w.messages.foreach
       case AtomicWrite(msgs) ⇒
         msgs.foreach(msg ⇒
               w.persistentActor.tell(
                   WriteMessageSuccess(msg, w.actorInstanceId), msg.sender))
       case NonPersistentRepr(msg, sender) ⇒ w.persistentActor.tell(msg, sender)
-    }
-  }
 
-  def startActor(name: String): ActorRef = {
+  def startActor(name: String): ActorRef =
     val subject = system.actorOf(Props(new A(testActor)), name)
     subject ! Echo(0)
     expectMsg(PreStart(name))
@@ -138,13 +120,12 @@ class PersistentActorJournalProtocolSpec
     expectMsg(RecoveryCompleted)
     expectMsg(Done(0, 0))
     subject
-  }
 
-  "A PersistentActor’s journal protocol" must {
+  "A PersistentActor’s journal protocol" must
 
-    "not send WriteMessages while a write is still outstanding" when {
+    "not send WriteMessages while a write is still outstanding" when
 
-      "using simple persist()" in {
+      "using simple persist()" in
         val subject = startActor("test-1")
         subject ! Persist(1, "a-1")
         val w1 = expectWrite(subject, Msgs("a-1"))
@@ -159,9 +140,8 @@ class PersistentActorJournalProtocolSpec
         subject ! PoisonPill
         expectMsg(PostStop("test-1"))
         journal.msgAvailable should ===(false)
-      }
 
-      "using nested persist()" in {
+      "using nested persist()" in
         val subject = startActor("test-2")
         subject ! Persist(1, Persist(2, "a-1"))
         val w1 = expectWrite(subject, Msgs(Persist(2, "a-1")))
@@ -179,9 +159,8 @@ class PersistentActorJournalProtocolSpec
         subject ! PoisonPill
         expectMsg(PostStop("test-2"))
         journal.msgAvailable should ===(false)
-      }
 
-      "using nested multiple persist()" in {
+      "using nested multiple persist()" in
         val subject = startActor("test-3")
         subject ! Multi(Persist(1, Persist(2, "a-1")), Persist(3, "a-2"))
         val w1 = expectWrite(subject, Msgs(Persist(2, "a-1")), Msgs("a-2"))
@@ -194,9 +173,8 @@ class PersistentActorJournalProtocolSpec
         subject ! PoisonPill
         expectMsg(PostStop("test-3"))
         journal.msgAvailable should ===(false)
-      }
 
-      "using large number of persist() calls" in {
+      "using large number of persist() calls" in
         val subject = startActor("test-4")
         subject ! Multi(Vector.tabulate(30)(i ⇒ Persist(i, s"a-$i")): _*)
         val w1 =
@@ -206,9 +184,8 @@ class PersistentActorJournalProtocolSpec
         subject ! PoisonPill
         expectMsg(PostStop("test-4"))
         journal.msgAvailable should ===(false)
-      }
 
-      "using large number of persistAsync() calls" in {
+      "using large number of persistAsync() calls" in
         def msgs(start: Int, end: Int) =
           (start until end).map(i ⇒ Msgs(s"a-$i-1", s"a-$i-2"))
         def commands(start: Int, end: Int) =
@@ -234,26 +211,20 @@ class PersistentActorJournalProtocolSpec
         subject ! PoisonPill
         expectMsg(PostStop("test-5"))
         journal.msgAvailable should ===(false)
-      }
 
-      "the actor fails with queued events" in {
+      "the actor fails with queued events" in
         val subject = startActor("test-6")
         subject ! PersistAsync(1, "a-1")
         val w1 = expectWrite(subject, Msgs("a-1"))
         subject ! PersistAsync(2, "a-2")
-        EventFilter[Exception](message = "K-BOOM!", occurrences = 1) intercept {
+        EventFilter[Exception](message = "K-BOOM!", occurrences = 1) intercept
           subject ! Fail(new Exception("K-BOOM!"))
           expectMsg(PreRestart("test-6"))
           expectMsg(PostRestart("test-6"))
           journal.expectMsgType[ReplayMessages]
-        }
         journal.reply(RecoverySuccess(0L))
         expectMsg(RecoveryCompleted)
         confirm(w1)
         subject ! PoisonPill
         expectMsg(PostStop("test-6"))
         journal.msgAvailable should ===(false)
-      }
-    }
-  }
-}

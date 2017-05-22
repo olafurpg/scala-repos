@@ -36,32 +36,26 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.scene._
 
-object TitledPane {
+object TitledPane
   implicit def sfxTitledPane2jfx(v: TitledPane): jfxs.control.TitledPane =
     if (v != null) v.delegate else null
-}
 
 class TitledPane(
     override val delegate: jfxsc.TitledPane = new jfxsc.TitledPane)
-    extends Labeled(delegate) with SFXDelegate[jfxsc.TitledPane] {
+    extends Labeled(delegate) with SFXDelegate[jfxsc.TitledPane]
 
   def animated: BooleanProperty = delegate.animatedProperty
-  def animated_=(v: Boolean) {
+  def animated_=(v: Boolean)
     animated() = v
-  }
 
   def collapsible: BooleanProperty = delegate.collapsibleProperty
-  def collapsible_=(v: Boolean) {
+  def collapsible_=(v: Boolean)
     collapsible() = v
-  }
 
   def content: ObjectProperty[jfxs.Node] = delegate.contentProperty
-  def content_=(v: Node) {
+  def content_=(v: Node)
     content() = v
-  }
 
   def expanded: BooleanProperty = delegate.expandedProperty
-  def expanded_=(v: Boolean) {
+  def expanded_=(v: Boolean)
     expanded() = v
-  }
-}

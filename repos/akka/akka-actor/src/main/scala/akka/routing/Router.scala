@@ -16,7 +16,7 @@ import akka.actor.NoSerializationVerificationNeeded
   *
   * The implementation must be thread safe.
   */
-trait RoutingLogic extends NoSerializationVerificationNeeded {
+trait RoutingLogic extends NoSerializationVerificationNeeded
 
   /**
     * Pick the destination for a given message. Normally it picks one of the
@@ -28,46 +28,41 @@ trait RoutingLogic extends NoSerializationVerificationNeeded {
     * from the `IndexedSeq`.
     */
   def select(message: Any, routees: immutable.IndexedSeq[Routee]): Routee
-}
 
 /**
   * Abstraction of a destination for messages routed via a [[Router]].
   */
-trait Routee {
+trait Routee
   def send(message: Any, sender: ActorRef): Unit
-}
 
 /**
   * [[Routee]] that sends the messages to an [[akka.actor.ActorRef]].
   */
-final case class ActorRefRoutee(ref: ActorRef) extends Routee {
+final case class ActorRefRoutee(ref: ActorRef) extends Routee
   override def send(message: Any, sender: ActorRef): Unit =
     ref.tell(message, sender)
-}
 
 /**
   * [[Routee]] that sends the messages to an [[akka.actor.ActorSelection]].
   */
 final case class ActorSelectionRoutee(selection: ActorSelection)
-    extends Routee {
+    extends Routee
   override def send(message: Any, sender: ActorRef): Unit =
     selection.tell(message, sender)
-}
 
 /**
   * [[Routee]] that doesn't send the message to any routee.
   * The [[Router]] will send the message to `deadLetters` if
   * `NoRoutee` is returned from [[RoutingLogic#select]]
   */
-object NoRoutee extends Routee {
+object NoRoutee extends Routee
   override def send(message: Any, sender: ActorRef): Unit = ()
-}
 
 /**
   * [[Routee]] that sends each message to all `routees`.
   */
 final case class SeveralRoutees(routees: immutable.IndexedSeq[Routee])
-    extends Routee {
+    extends Routee
 
   /**
     * Java API
@@ -78,14 +73,12 @@ final case class SeveralRoutees(routees: immutable.IndexedSeq[Routee])
   /**
     * Java API
     */
-  def getRoutees(): java.util.List[Routee] = {
+  def getRoutees(): java.util.List[Routee] =
     import scala.collection.JavaConverters._
     routees.asJava
-  }
 
   override def send(message: Any, sender: ActorRef): Unit =
     routees.foreach(_.send(message, sender))
-}
 
 /**
   * For each message that is sent through the router via the [[#route]] method the
@@ -97,7 +90,7 @@ final case class SeveralRoutees(routees: immutable.IndexedSeq[Routee])
   */
 final case class Router(
     val logic: RoutingLogic,
-    val routees: immutable.IndexedSeq[Routee] = Vector.empty) {
+    val routees: immutable.IndexedSeq[Routee] = Vector.empty)
 
   /**
     * Java API
@@ -117,13 +110,12 @@ final case class Router(
     * Messages wrapped in a [[Broadcast]] envelope are always sent to all `routees`.
     */
   def route(message: Any, sender: ActorRef): Unit =
-    message match {
+    message match
       case akka.routing.Broadcast(msg) ⇒
         SeveralRoutees(routees).send(msg, sender)
       case msg ⇒ send(logic.select(msg, routees), message, sender)
-    }
 
-  private def send(routee: Routee, msg: Any, sender: ActorRef): Unit = {
+  private def send(routee: Routee, msg: Any, sender: ActorRef): Unit =
     if (routee == NoRoutee && sender.isInstanceOf[InternalActorRef])
       sender
         .asInstanceOf[InternalActorRef]
@@ -131,12 +123,10 @@ final case class Router(
         .deadLetters
         .tell(unwrap(msg), sender)
     else routee.send(unwrap(msg), sender)
-  }
 
-  private def unwrap(msg: Any): Any = msg match {
+  private def unwrap(msg: Any): Any = msg match
     case env: RouterEnvelope ⇒ env.message
     case _ ⇒ msg
-  }
 
   /**
     * Create a new instance with the specified routees and the same [[RoutingLogic]].
@@ -180,7 +170,6 @@ final case class Router(
     */
   def removeRoutee(sel: ActorSelection): Router =
     removeRoutee(ActorSelectionRoutee(sel))
-}
 
 /**
   * Used to broadcast a message to all routees in a router; only the
@@ -194,6 +183,5 @@ final case class Broadcast(message: Any) extends RouterEnvelope
   * Only the contained message will be forwarded to the
   * destination, i.e. the envelope will be stripped off.
   */
-trait RouterEnvelope {
+trait RouterEnvelope
   def message: Any
-}

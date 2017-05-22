@@ -19,7 +19,7 @@ import scala.language.implicitConversions
 @scala.scalajs.js.annotation.RawJSType // Don't do this at home!
 sealed trait |[A, B] // scalastyle:ignore
 
-object | {
+object |
   // scalastyle:ignore
   /** Evidence that `A <: B`, taking top-level `|`-types into account. */
   sealed trait Evidence[-A, +B]
@@ -29,16 +29,15 @@ object | {
     */
   private object ReusableEvidence extends Evidence[scala.Any, scala.Any]
 
-  abstract sealed class EvidenceLowestPrioImplicits {
+  abstract sealed class EvidenceLowestPrioImplicits
 
     /** If `A <: B2`, then `A <: B1 | B2`. */
     implicit def right[A, B1, B2](
         implicit ev: Evidence[A, B2]): Evidence[A, B1 | B2] =
       ReusableEvidence.asInstanceOf[Evidence[A, B1 | B2]]
-  }
 
   abstract sealed class EvidenceLowPrioImplicits
-      extends EvidenceLowestPrioImplicits {
+      extends EvidenceLowestPrioImplicits
 
     /** `Int <: Double`, because that's true in Scala.js. */
     implicit def intDouble: Evidence[Int, Double] =
@@ -53,9 +52,8 @@ object | {
     implicit def undefOr[A, B](
         implicit ev: Evidence[A, B]): Evidence[A, UndefOr[B]] =
       ReusableEvidence.asInstanceOf[Evidence[A, UndefOr[B]]]
-  }
 
-  object Evidence extends EvidenceLowPrioImplicits {
+  object Evidence extends EvidenceLowPrioImplicits
 
     /** `A <: A`. */
     implicit def base[A]: Evidence[A, A] =
@@ -66,7 +64,6 @@ object | {
         implicit ev1: Evidence[A1, B],
         ev2: Evidence[A2, B]): Evidence[A1 | A2, B] =
       ReusableEvidence.asInstanceOf[Evidence[A1 | A2, B]]
-  }
 
   /** Upcast `A` to `B1 | B2`.
     *
@@ -77,7 +74,7 @@ object | {
     a.asInstanceOf[B1 | B2]
 
   /** Operations on union types. */
-  implicit class UnionOps[A <: _ | _](val self: A) extends AnyVal {
+  implicit class UnionOps[A <: _ | _](val self: A) extends AnyVal
 
     /** Explicitly merge a union type to a supertype (which might not be a
       *  union type itself).
@@ -86,5 +83,3 @@ object | {
       */
     def merge[B](implicit ev: |.Evidence[A, B]): B =
       self.asInstanceOf[B]
-  }
-}

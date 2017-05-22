@@ -11,15 +11,12 @@ import java.{util => ju}
 
 import scala.reflect.ClassTag
 
-abstract class AbstractSetTest extends SetTest {
+abstract class AbstractSetTest extends SetTest
   def factory: AbstractSetFactory
-}
 
-object AbstractSetFactory {
+object AbstractSetFactory
   def allFactories: Iterator[AbstractSetFactory] =
     HashSetFactory.allFactories
-}
 
-trait AbstractSetFactory extends SetFactory {
+trait AbstractSetFactory extends SetFactory
   def empty[E : ClassTag]: ju.AbstractSet[E]
-}

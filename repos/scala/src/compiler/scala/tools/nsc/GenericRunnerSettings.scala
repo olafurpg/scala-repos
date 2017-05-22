@@ -8,7 +8,7 @@ package scala.tools.nsc
 import java.net.URL
 import scala.tools.util.PathResolverFactory
 
-class GenericRunnerSettings(error: String => Unit) extends Settings(error) {
+class GenericRunnerSettings(error: String => Unit) extends Settings(error)
   lazy val classpathURLs: Seq[URL] =
     PathResolverFactory.create(this).resultAsURLs
 
@@ -32,4 +32,3 @@ class GenericRunnerSettings(error: String => Unit) extends Settings(error) {
 
   val nc =
     BooleanSetting("-nc", "do not use the fsc compilation daemon") withAbbreviation "-nocompdaemon"
-}

@@ -7,48 +7,38 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import org.scalatest.concurrent.Eventually._
 
-class RouteConcurrencyServlet extends ScalatraServlet {
-  for {
+class RouteConcurrencyServlet extends ScalatraServlet
+  for
     i <- 0 until 250
     x = Future { get(false) { "/" } }
-  } x
+  x
 
-  val postRoutes = for {
+  val postRoutes = for
     i <- 0 until 250
     x = Future { post(false) { "/" } }
-  } yield x
+  yield x
 
-  val b = for {
+  val b = for
     route <- postRoutes.take(250)
     x = Future { post(false) {}; post(false) {} } // add some more routes while we're removing
-    y = Future {
-      route.foreach { route =>
+    y = Future
+      route.foreach  route =>
         removeRoute("POST", route)
-      }
-    }
-  } yield (x, y)
+  yield (x, y)
   Await.result(
       Future.sequence(b map (kv => kv._1.flatMap(_ => kv._2))), 5.seconds)
 
-  get("/count/:method") {
+  get("/count/:method")
     routes(HttpMethod(params("method"))).size.toString
-  }
-}
 
-class RouteConcurrencySpec extends ScalatraWordSpec {
+class RouteConcurrencySpec extends ScalatraWordSpec
   addServlet(classOf[RouteConcurrencyServlet], "/*")
 
-  "A scalatra kernel " should {
-    "support adding routes concurrently" in {
-      get("/count/get") {
+  "A scalatra kernel " should
+    "support adding routes concurrently" in
+      get("/count/get")
         body should equal("251") // the 500 we added in the future, plus this count route
-      }
-    }
 
-    "support removing routes concurrently with adding routes" in {
-      eventually {
+    "support removing routes concurrently with adding routes" in
+      eventually
         get("/count/post") { body should equal("500") }
-      }
-    }
-  }
-}

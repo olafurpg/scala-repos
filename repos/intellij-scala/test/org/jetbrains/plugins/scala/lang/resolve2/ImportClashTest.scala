@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class ImportClashTest extends ResolveTestBase {
-  override def folderPath: String = {
+class ImportClashTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "import/clash/"
-  }
 
   def testFunction1() = doTest()
   def testFunction2() = doTest()
@@ -21,4 +20,3 @@ class ImportClashTest extends ResolveTestBase {
   def testValue1() = doTest()
   def testValue2() = doTest()
   def testValue3() = doTest()
-}

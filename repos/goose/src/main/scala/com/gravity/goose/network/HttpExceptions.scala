@@ -7,18 +7,15 @@ package com.gravity.goose.network
   * Time: 10:25 AM
   */
 class LoggableException(msg: String, innerEx: Exception = null)
-    extends Exception(msg, innerEx) {
-  override lazy val getMessage = {
+    extends Exception(msg, innerEx)
+  override lazy val getMessage =
     val innerMessage =
-      if (innerEx != null) {
+      if (innerEx != null)
         "%n\tand inner Exception of type %s:%n\t\tmessage: %s".format(
             innerEx.getClass.getName, innerEx.getMessage)
-      } else {
+      else
         ""
-      }
     getClass.getName + " ==> " + msg + innerMessage
-  }
-}
 
 class NotFoundException(url: String)
     extends LoggableException("SERVER RETURNED 404 FOR LINK: " + url)
@@ -37,9 +34,9 @@ class UnhandledStatusCodeException(url: String, statusCode: Int)
         "Received HTTP statusCode: %d from URL: %s and did not know how to handle it!"
           .format(statusCode, url))
 
-object HttpStatusValidator {
+object HttpStatusValidator
   def validate(url: String, statusCode: Int): Either[Exception, String] =
-    statusCode match {
+    statusCode match
       case 200 => Right("OK")
       case 400 => Left(new BadRequestException(url))
       case 404 => Left(new NotFoundException(url))
@@ -47,8 +44,6 @@ object HttpStatusValidator {
         Left(new NotAuthorizedException(url, auth))
       case error if (error > 499) => Left(new ServerErrorException(url, error))
       case unk => Left(new UnhandledStatusCodeException(url, statusCode))
-    }
-}
 
 class ImageFetchException(imgSrc: String, ex: Exception = null)
     extends LoggableException(

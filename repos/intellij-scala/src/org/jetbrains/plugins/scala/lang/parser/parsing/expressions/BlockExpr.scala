@@ -17,38 +17,32 @@ import org.jetbrains.plugins.scala.lang.parser.util.{ParserPatcher, ParserUtils}
  * BlockExpr ::= '{' CaseClauses '}'
  *             | '{' Block '}'
  */
-object BlockExpr {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object BlockExpr
+  def parse(builder: ScalaPsiBuilder): Boolean =
     if (ParserPatcher.getSuitablePatcher(builder).parse(builder)) return true
     val blockExprMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLBRACE =>
         builder.advanceLexer()
         builder.enableNewlines
       case _ =>
         blockExprMarker.drop()
         return false
-    }
-    def loopFunction() {
-      builder.getTokenType match {
+    def loopFunction()
+      builder.getTokenType match
         case ScalaTokenTypes.kCASE =>
           val backMarker = builder.mark
           builder.advanceLexer()
-          builder.getTokenType match {
+          builder.getTokenType match
             case ScalaTokenTypes.kCLASS | ScalaTokenTypes.kOBJECT =>
               backMarker.rollbackTo()
               Block.parse(builder)
             case _ =>
               backMarker.rollbackTo()
               CaseClauses parse builder
-          }
         case _ =>
           Block.parse(builder)
-      }
-    }
     ParserUtils.parseLoopUntilRBrace(builder, loopFunction)
     builder.restoreNewlinesState
     blockExprMarker.done(ScalaElementTypes.BLOCK_EXPR)
     true
-  }
-}

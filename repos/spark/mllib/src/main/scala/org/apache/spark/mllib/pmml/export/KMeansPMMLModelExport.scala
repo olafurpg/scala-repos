@@ -27,17 +27,17 @@ import org.apache.spark.mllib.clustering.KMeansModel
   * PMML Model Export for KMeansModel class
   */
 private[mllib] class KMeansPMMLModelExport(model: KMeansModel)
-    extends PMMLModelExport {
+    extends PMMLModelExport
 
   populateKMeansPMML(model)
 
   /**
     * Export the input KMeansModel model to PMML format.
     */
-  private def populateKMeansPMML(model: KMeansModel): Unit = {
+  private def populateKMeansPMML(model: KMeansModel): Unit =
     pmml.getHeader.setDescription("k-means clustering")
 
-    if (model.clusterCenters.length > 0) {
+    if (model.clusterCenters.length > 0)
       val clusterCenter = model.clusterCenters(0)
       val fields = new SArray[FieldName](clusterCenter.size)
       val dataDictionary = new DataDictionary
@@ -53,7 +53,7 @@ private[mllib] class KMeansPMMLModelExport(model: KMeansModel)
         .setModelClass(ClusteringModel.ModelClass.CENTER_BASED)
         .setNumberOfClusters(model.clusterCenters.length)
 
-      for (i <- 0 until clusterCenter.size) {
+      for (i <- 0 until clusterCenter.size)
         fields(i) = FieldName.create("field_" + i)
         dataDictionary.addDataFields(
             new DataField(fields(i), OpType.CONTINUOUS, DataType.DOUBLE))
@@ -61,11 +61,10 @@ private[mllib] class KMeansPMMLModelExport(model: KMeansModel)
             new MiningField(fields(i)).setUsageType(FieldUsageType.ACTIVE))
         clusteringModel.addClusteringFields(new ClusteringField(fields(i))
               .setCompareFunction(CompareFunctionType.ABS_DIFF))
-      }
 
       dataDictionary.setNumberOfFields(dataDictionary.getDataFields.size)
 
-      for (i <- model.clusterCenters.indices) {
+      for (i <- model.clusterCenters.indices)
         val cluster = new Cluster()
           .setName("cluster_" + i)
           .setArray(new org.dmg.pmml.Array()
@@ -75,10 +74,6 @@ private[mllib] class KMeansPMMLModelExport(model: KMeansModel)
         // we don't have the size of the single cluster but only the centroids (withValue)
         // .withSize(value)
         clusteringModel.addClusters(cluster)
-      }
 
       pmml.setDataDictionary(dataDictionary)
       pmml.addModels(clusteringModel)
-    }
-  }
-}

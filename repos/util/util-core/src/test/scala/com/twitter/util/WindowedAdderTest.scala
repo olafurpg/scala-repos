@@ -6,11 +6,11 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class WindowedAdderTest extends FunSuite {
+class WindowedAdderTest extends FunSuite
   private def newAdder() = WindowedAdder(3 * 1000, 3, Stopwatch.timeMillis)
 
-  test("sums things up when time stands still") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("sums things up when time stands still")
+    Time.withCurrentTimeFrozen  tc =>
       val adder = newAdder()
       adder.add(1)
       assert(adder.sum() == 1)
@@ -18,11 +18,9 @@ class WindowedAdderTest extends FunSuite {
       assert(adder.sum() == 2)
       adder.add(3)
       assert(adder.sum() == 5)
-    }
-  }
 
-  test("maintains a sliding window") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("maintains a sliding window")
+    Time.withCurrentTimeFrozen  tc =>
       val adder = newAdder()
       adder.add(1)
       assert(adder.sum() == 1)
@@ -36,11 +34,9 @@ class WindowedAdderTest extends FunSuite {
       assert(adder.sum() == 2)
       tc.advance(1.second)
       assert(adder.sum() == 0)
-    }
-  }
 
-  test("maintains a sliding window when slices are skipped") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("maintains a sliding window when slices are skipped")
+    Time.withCurrentTimeFrozen  tc =>
       val adder = newAdder()
       adder.incr()
       assert(adder.sum() == 1)
@@ -66,11 +62,9 @@ class WindowedAdderTest extends FunSuite {
       assert(adder.sum() == 300)
       tc.advance(100.seconds)
       assert(adder.sum() == 0)
-    }
-  }
 
-  test("maintains negative sums") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("maintains negative sums")
+    Time.withCurrentTimeFrozen  tc =>
       val adder = newAdder()
       // net: 2
       adder.add(-2)
@@ -101,6 +95,3 @@ class WindowedAdderTest extends FunSuite {
 
       tc.advance(100.seconds)
       assert(adder.sum() == 0)
-    }
-  }
-}

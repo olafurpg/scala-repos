@@ -38,14 +38,13 @@ import scalafx.event.EventHandlerDelegate
 import scalafx.scene.Node
 import scalafx.scene.input.KeyCombination
 
-object MenuItem {
+object MenuItem
   implicit def sfxMenuItem2jfx(m: MenuItem): jfxsc.MenuItem =
     if (m != null) m.delegate else null
-}
 
 class MenuItem(override val delegate: jfxsc.MenuItem = new jfxsc.MenuItem)
     extends jfxe.EventTarget with Styleable with EventHandlerDelegate
-    with FireDelegate[jfxsc.MenuItem] with SFXDelegate[jfxsc.MenuItem] {
+    with FireDelegate[jfxsc.MenuItem] with SFXDelegate[jfxsc.MenuItem]
 
   /**
     * Constructs a MenuItem and sets the display text with the specified text
@@ -64,49 +63,43 @@ class MenuItem(override val delegate: jfxsc.MenuItem = new jfxsc.MenuItem)
     */
   def accelerator: ObjectProperty[jfxsi.KeyCombination] =
     delegate.acceleratorProperty
-  def accelerator_=(v: KeyCombination) {
+  def accelerator_=(v: KeyCombination)
     accelerator() = v
-  }
 
   /**
     *
     */
   def disable: BooleanProperty = delegate.disableProperty
-  def disable_=(v: Boolean) {
+  def disable_=(v: Boolean)
     disable() = v
-  }
 
   /**
     *
     */
   def graphic: ObjectProperty[jfxs.Node] = delegate.graphicProperty
-  def graphic_=(v: Node) {
+  def graphic_=(v: Node)
     graphic() = v
-  }
 
   /**
     *
     */
   def id: StringProperty = delegate.idProperty
-  def id_=(v: String) {
+  def id_=(v: String)
     id() = v
-  }
 
   /**
     * MnemonicParsing property to enable/disable text parsing.
     */
   def mnemonicParsing: BooleanProperty = delegate.mnemonicParsingProperty
-  def mnemonicParsing_=(v: Boolean) {
+  def mnemonicParsing_=(v: Boolean)
     mnemonicParsing() = v
-  }
 
   /**
     *
     */
   def onAction = delegate.onActionProperty
-  def onAction_=(v: jfxe.EventHandler[jfxe.ActionEvent]) {
+  def onAction_=(v: jfxe.EventHandler[jfxe.ActionEvent])
     onAction() = v
-  }
 
   /**
     *
@@ -124,25 +117,22 @@ class MenuItem(override val delegate: jfxsc.MenuItem = new jfxsc.MenuItem)
     *
     */
   def style: StringProperty = delegate.styleProperty
-  def style_=(v: String) {
+  def style_=(v: String)
     style() = v
-  }
 
   /**
     *
     */
   def text: StringProperty = delegate.textProperty
-  def text_=(v: String) {
+  def text_=(v: String)
     text() = v
-  }
 
   /**
     *
     */
   def visible: BooleanProperty = delegate.visibleProperty
-  def visible_=(v: Boolean) {
+  def visible_=(v: Boolean)
     visible() = v
-  }
 
   /**
     * Returns an observable map of properties on this menu item for use primarily by application
@@ -155,9 +145,8 @@ class MenuItem(override val delegate: jfxsc.MenuItem = new jfxsc.MenuItem)
     * setUserData(java.lang.Object) method.
     */
   def userData: AnyRef = delegate.getUserData
-  def userData_=(v: AnyRef) {
+  def userData_=(v: AnyRef)
     delegate.setUserData(v)
-  }
 
   /**
     * The event handler that is associated with invocation of an accelerator for a MenuItem.
@@ -166,10 +155,8 @@ class MenuItem(override val delegate: jfxsc.MenuItem = new jfxsc.MenuItem)
     * @since 2.2
     */
   def onMenuValidation = delegate.onMenuValidationProperty()
-  def onMenuValidation_=(eventHandler: jfxe.EventHandler[jfxe.Event]) {
+  def onMenuValidation_=(eventHandler: jfxe.EventHandler[jfxe.Event])
     onMenuValidation() = eventHandler
-  }
 
   override protected def eventHandlerDelegate =
     delegate.asInstanceOf[EventHandled]
-}

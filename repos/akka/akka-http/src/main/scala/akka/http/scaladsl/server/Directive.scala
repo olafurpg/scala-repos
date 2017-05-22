@@ -15,7 +15,7 @@ import akka.http.impl.util._
   * A directive that provides a tuple of values of type `L` to create an inner route.
   */
 //#basic
-abstract class Directive[L](implicit val ev: Tuple[L]) {
+abstract class Directive[L](implicit val ev: Tuple[L])
 
   /**
     * Calls the inner route with a tuple of extracted values of type `L`.
@@ -43,42 +43,36 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
     * Converts this directive into one which, instead of a tuple of type `L`, creates an
     * instance of type `A` (which is usually a case class).
     */
-  def as[A](constructor: ConstructFromTuple[L, A]): Directive1[A] = {
+  def as[A](constructor: ConstructFromTuple[L, A]): Directive1[A] =
     def validatedMap[R](
         f: L ⇒ R)(implicit tupler: Tupler[R]): Directive[tupler.Out] =
-      Directive[tupler.Out] { inner ⇒
-        tapply { values ⇒ ctx ⇒
-          try inner(tupler(f(values)))(ctx) catch {
+      Directive[tupler.Out]  inner ⇒
+        tapply  values ⇒ ctx ⇒
+          try inner(tupler(f(values)))(ctx) catch
             case e: IllegalArgumentException ⇒
               ctx.reject(
                   ValidationRejection(e.getMessage.nullAsEmpty, Some(e)))
-          }
-        }
-      }(tupler.OutIsTuple)
+      (tupler.OutIsTuple)
 
     validatedMap(constructor)
-  }
 
   /**
     * Maps over this directive using the given function, which can produce either a tuple or any other value
     * (which will then we wrapped into a [[scala.Tuple1]]).
     */
   def tmap[R](f: L ⇒ R)(implicit tupler: Tupler[R]): Directive[tupler.Out] =
-    Directive[tupler.Out] { inner ⇒
-      tapply { values ⇒
+    Directive[tupler.Out]  inner ⇒
+      tapply  values ⇒
         inner(tupler(f(values)))
-      }
-    }(tupler.OutIsTuple)
+    (tupler.OutIsTuple)
 
   /**
     * Flatmaps this directive using the given function.
     */
   def tflatMap[R : Tuple](f: L ⇒ Directive[R]): Directive[R] =
-    Directive[R] { inner ⇒
-      tapply { values ⇒
+    Directive[R]  inner ⇒
+      tapply  values ⇒
         f(values) tapply inner
-      }
-    }
 
   /**
     * Creates a new [[akka.http.scaladsl.server.Directive0]], which passes if the given predicate matches the current
@@ -92,12 +86,10 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
     * extractions or rejects with the given rejections.
     */
   def tfilter(predicate: L ⇒ Boolean, rejections: Rejection*): Directive[L] =
-    Directive[L] { inner ⇒
-      tapply { values ⇒ ctx ⇒
+    Directive[L]  inner ⇒
+      tapply  values ⇒ ctx ⇒
         if (predicate(values)) inner(values)(ctx)
         else ctx.reject(rejections: _*)
-      }
-    }
 
   /**
     * Creates a new directive that is able to recover from rejections that were produced by `this` Directive
@@ -105,17 +97,15 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
     */
   def recover[R >: L : Tuple](
       recovery: immutable.Seq[Rejection] ⇒ Directive[R]): Directive[R] =
-    Directive[R] { inner ⇒ ctx ⇒
+    Directive[R]  inner ⇒ ctx ⇒
       import ctx.executionContext
       @volatile var rejectedFromInnerRoute = false
-      tapply({ list ⇒ c ⇒
+      tapply( list ⇒ c ⇒
         rejectedFromInnerRoute = true; inner(list)(c)
-      })(ctx).fast.flatMap {
+      )(ctx).fast.flatMap
         case RouteResult.Rejected(rejections) if !rejectedFromInnerRoute ⇒
           recovery(rejections).tapply(inner)(ctx)
         case x ⇒ FastFuture.successful(x)
-      }
-    }
 
   /**
     * Variant of `recover` that only recovers from rejections handled by the given PartialFunction.
@@ -123,17 +113,15 @@ abstract class Directive[L](implicit val ev: Tuple[L]) {
   def recoverPF[R >: L : Tuple](
       recovery: PartialFunction[immutable.Seq[Rejection], Directive[R]])
     : Directive[R] =
-    recover { rejections ⇒
+    recover  rejections ⇒
       recovery.applyOrElse(
           rejections,
           (rejs: Seq[Rejection]) ⇒ RouteDirectives.reject(rejs: _*))
-    }
 
   //#basic
-}
 //#
 
-object Directive {
+object Directive
 
   /**
     * Constructs a directive from a function literal.
@@ -163,7 +151,7 @@ object Directive {
     r ⇒ directive.tapply(_ ⇒ r)
 
   implicit class SingleValueModifiers[T](underlying: Directive1[T])
-      extends AnyRef {
+      extends AnyRef
     def map[R](f: T ⇒ R)(implicit tupler: Tupler[R]): Directive[tupler.Out] =
       underlying.tmap { case Tuple1(value) ⇒ f(value) }
 
@@ -176,43 +164,34 @@ object Directive {
     def filter(predicate: T ⇒ Boolean, rejections: Rejection*): Directive1[T] =
       underlying.tfilter({ case Tuple1(value) ⇒ predicate(value) },
       rejections: _*)
-  }
-}
 
-trait ConjunctionMagnet[L] {
+trait ConjunctionMagnet[L]
   type Out
   def apply(underlying: Directive[L]): Out
-}
 
-object ConjunctionMagnet {
+object ConjunctionMagnet
   implicit def fromDirective[L, R](other: Directive[R])(
       implicit join: TupleOps.Join[L, R])
     : ConjunctionMagnet[L] { type Out = Directive[join.Out] } =
-    new ConjunctionMagnet[L] {
+    new ConjunctionMagnet[L]
       type Out = Directive[join.Out]
       def apply(underlying: Directive[L]) =
-        Directive[join.Out] { inner ⇒
-          underlying.tapply { prefix ⇒
-            other.tapply { suffix ⇒
+        Directive[join.Out]  inner ⇒
+          underlying.tapply  prefix ⇒
+            other.tapply  suffix ⇒
               inner(join(prefix, suffix))
-            }
-          }
-        }(Tuple.yes) // we know that join will only ever produce tuples
-    }
+        (Tuple.yes) // we know that join will only ever produce tuples
 
   implicit def fromStandardRoute[L](route: StandardRoute)
     : ConjunctionMagnet[L] { type Out = StandardRoute } =
-    new ConjunctionMagnet[L] {
+    new ConjunctionMagnet[L]
       type Out = StandardRoute
       def apply(underlying: Directive[L]) =
         StandardRoute(underlying.tapply(_ ⇒ route))
-    }
 
   implicit def fromRouteGenerator[T, R <: Route](generator: T ⇒ R)
     : ConjunctionMagnet[Unit] { type Out = RouteGenerator[T] } =
-    new ConjunctionMagnet[Unit] {
+    new ConjunctionMagnet[Unit]
       type Out = RouteGenerator[T]
       def apply(underlying: Directive0) =
         value ⇒ underlying.tapply(_ ⇒ generator(value))
-    }
-}

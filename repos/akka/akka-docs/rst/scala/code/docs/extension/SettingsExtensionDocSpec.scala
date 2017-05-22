@@ -19,16 +19,15 @@ import akka.actor.Actor
 import akka.testkit.AkkaSpec
 
 //#extension
-class SettingsImpl(config: Config) extends Extension {
+class SettingsImpl(config: Config) extends Extension
   val DbUri: String = config.getString("myapp.db.uri")
   val CircuitBreakerTimeout: Duration = Duration(
       config.getMilliseconds("myapp.circuit-breaker.timeout"),
       TimeUnit.MILLISECONDS)
-}
 //#extension
 
 //#extensionid
-object Settings extends ExtensionId[SettingsImpl] with ExtensionIdProvider {
+object Settings extends ExtensionId[SettingsImpl] with ExtensionIdProvider
 
   override def lookup = Settings
 
@@ -39,10 +38,9 @@ object Settings extends ExtensionId[SettingsImpl] with ExtensionIdProvider {
     * Java API: retrieve the Settings extension for the given system.
     */
   override def get(system: ActorSystem): SettingsImpl = super.get(system)
-}
 //#extensionid
 
-object SettingsExtensionDocSpec {
+object SettingsExtensionDocSpec
 
   val config = """
     //#config
@@ -59,28 +57,22 @@ object SettingsExtensionDocSpec {
 
   //#extension-usage-actor
 
-  class MyActor extends Actor {
+  class MyActor extends Actor
     val settings = Settings(context.system)
     val connection = connect(settings.DbUri, settings.CircuitBreakerTimeout)
 
     //#extension-usage-actor
-    def receive = {
+    def receive =
       case someMessage =>
-    }
 
-    def connect(dbUri: String, circuitBreakerTimeout: Duration) = {
+    def connect(dbUri: String, circuitBreakerTimeout: Duration) =
       "dummy"
-    }
-  }
-}
 
 class SettingsExtensionDocSpec
-    extends AkkaSpec(SettingsExtensionDocSpec.config) {
+    extends AkkaSpec(SettingsExtensionDocSpec.config)
 
-  "demonstrate how to create application specific settings extension in Scala" in {
+  "demonstrate how to create application specific settings extension in Scala" in
     //#extension-usage
     val dbUri = Settings(system).DbUri
     val circuitBreakerTimeout = Settings(system).CircuitBreakerTimeout
     //#extension-usage
-  }
-}

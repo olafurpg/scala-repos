@@ -1,9 +1,9 @@
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
-object Test extends App {
+object Test extends App
 
-  def testMap(): Unit = {
+  def testMap(): Unit =
     val mapJ = new java.util.HashMap[Int, String]
     val mapS: mutable.Map[Int, String] = mapJ
 
@@ -13,9 +13,8 @@ object Test extends App {
     // ConcurrentModificationException thrown in the following line
     mapS.retain((i, str) => i % 2 == 0)
     assert(6 == mapS.size)
-  }
 
-  def testSet(): Unit = {
+  def testSet(): Unit =
     val mapJ = new java.util.HashSet[Int]
     val mapS: mutable.Set[Int] = mapJ
 
@@ -25,8 +24,6 @@ object Test extends App {
     // ConcurrentModificationException thrown in the following line
     mapS.retain((i) => i % 2 == 0)
     assert(6 == mapS.size)
-  }
 
   testSet()
   testMap()
-}

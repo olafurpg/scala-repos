@@ -6,28 +6,23 @@ import play.api.Play.current
 
 import lila.common.PimpedJson._
 
-trait Recaptcha {
+trait Recaptcha
 
   def verify(response: String, req: RequestHeader): Fu[Boolean]
-}
 
-object RecaptchaSkip extends Recaptcha {
+object RecaptchaSkip extends Recaptcha
 
   def verify(response: String, req: RequestHeader) = fuccess(true)
-}
 
 final class RecaptchaGoogle(endpoint: String, privateKey: String)
-    extends Recaptcha {
+    extends Recaptcha
 
-  def verify(response: String, req: RequestHeader) = {
+  def verify(response: String, req: RequestHeader) =
     WS.url(endpoint)
       .post(Map(
               "secret" -> Seq(privateKey),
               "response" -> Seq(response),
               "remoteip" -> Seq(req.remoteAddress)
-          )) flatMap {
+          )) flatMap
       case res if res.status == 200 => fuccess(~res.json.boolean("success"))
       case res => fufail(s"[recaptcha] ${res.status} ${res.body}")
-    }
-  }
-}

@@ -4,7 +4,7 @@ package laws
 import cats.data.{Xor, XorT}
 
 // Taken from http://functorial.com/psc-pages/docs/Control/Monad/Error/Class/index.html
-trait ApplicativeErrorLaws[F[_], E] extends ApplicativeLaws[F] {
+trait ApplicativeErrorLaws[F[_], E] extends ApplicativeLaws[F]
   implicit override def F: ApplicativeError[F, E]
 
   def applicativeErrorHandleWith[A](e: E, f: E => F[A]): IsEq[F[A]] =
@@ -38,10 +38,8 @@ trait ApplicativeErrorLaws[F[_], E] extends ApplicativeLaws[F] {
 
   def attemptConsistentWithAttemptT[A](fa: F[A]): IsEq[XorT[F, E, A]] =
     XorT(F.attempt(fa)) <-> F.attemptT(fa)
-}
 
-object ApplicativeErrorLaws {
+object ApplicativeErrorLaws
   def apply[F[_], E](
       implicit ev: ApplicativeError[F, E]): ApplicativeErrorLaws[F, E] =
     new ApplicativeErrorLaws[F, E] { def F: ApplicativeError[F, E] = ev }
-}

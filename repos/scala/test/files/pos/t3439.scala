@@ -10,7 +10,7 @@ abstract class ParametricMessage[M : Manifest](msg: M) { def message = msg }
 case class ParametricMessage1[M : Manifest](msg: M, p1: Class[_])
     extends ParametricMessage(msg)
 
-class Wrap {
+class Wrap
   class Base[M](i: Int)
 
   // was "implicit modifier not allowed on top level objects"
@@ -22,4 +22,3 @@ class Wrap {
   abstract class ParametricMessage[M : Manifest](msg: M) { def message = msg }
   case class ParametricMessage1[M : Manifest](msg: M, p1: Class[_])
       extends ParametricMessage(msg)
-}

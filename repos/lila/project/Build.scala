@@ -6,7 +6,7 @@ import play.twirl.sbt.Import._
 import PlayKeys._
 import sbt._, Keys._
 
-object ApplicationBuild extends Build {
+object ApplicationBuild extends Build
 
   import BuildSettings._
   import Dependencies._
@@ -59,9 +59,9 @@ object ApplicationBuild extends Build {
                   "lila.app.templating.Environment._",
                   "lila.api.Context",
                   "lila.common.paginator.Paginator"),
-            watchSources <<= sourceDirectory in Compile map { sources =>
+            watchSources <<= sourceDirectory in Compile map  sources =>
           (sources ** "*").get
-        },
+        ,
             // trump sbt-web into not looking at public/
             resourceDirectory in Assets := (sourceDirectory in Compile).value / "assets"
         ))
@@ -454,4 +454,3 @@ object ApplicationBuild extends Build {
   )
 
   lazy val chess = project("chess")
-}

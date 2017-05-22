@@ -30,43 +30,38 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * Date: 21.11.2008
   */
 class RenameScalaVariableProcessor
-    extends RenameJavaMemberProcessor with ScalaRenameProcessor {
+    extends RenameJavaMemberProcessor with ScalaRenameProcessor
   override def canProcessElement(element: PsiElement): Boolean =
-    element match {
+    element match
       case c: ScNamedElement =>
-        ScalaPsiUtil.nameContext(c) match {
+        ScalaPsiUtil.nameContext(c) match
           case _: ScVariable | _: ScValue | _: ScParameter => true
           case method: FakePsiMethod => true
           case _ => false
-        }
       case _ => false
-    }
 
   override def findReferences(element: PsiElement) =
     ScalaRenameUtil.findReferences(element)
 
   override def prepareRenaming(element: PsiElement,
                                newName: String,
-                               allRenames: util.Map[PsiElement, String]) {
-    val namedElement = element match {
+                               allRenames: util.Map[PsiElement, String])
+    val namedElement = element match
       case x: PsiNamedElement => x
       case _ => return
-    }
-    def addBeanMethods(element: PsiElement, newName: String) {
-      element match {
+    def addBeanMethods(element: PsiElement, newName: String)
+      element match
         case t: ScTypedDefinition =>
-          for (method <- t.getBeanMethods) {
+          for (method <- t.getBeanMethods)
             val name = method.name
             val is = name.startsWith("is")
             val prefix = if (is) "is" else name.substring(0, 3)
             val newBeanName = prefix + StringUtil.capitalize(newName)
             allRenames.put(method, newBeanName)
-          }
-          t.nameContext match {
+          t.nameContext match
             case member: ScMember if member.containingClass != null =>
               Seq(GETTER, SETTER, IS_GETTER).foreach(
                   r =>
-                    {
                       val wrapper = t.getTypedDefinitionWrapper(
                           isStatic = false, isInterface = false, r, None)
                       val name = wrapper.getName
@@ -76,63 +71,49 @@ class RenameScalaVariableProcessor
                         prefix + StringUtil.capitalize(
                             ScalaNamesUtil.toJavaName(newName))
                       allRenames.put(wrapper, newBeanName)
-                  }
               )
             case _ =>
-          }
         case _ =>
-      }
-    }
 
     addBeanMethods(element, newName)
 
     for (elem <- ScalaOverridingMemberSearcher.search(
-        namedElement, deep = true)) {
+        namedElement, deep = true))
       val overriderName = elem.name
       val baseName = namedElement.name
       val newOverriderName = RefactoringUtil.suggestNewOverriderName(
           overriderName, baseName, newName)
-      if (newOverriderName != null) {
+      if (newOverriderName != null)
         allRenames.put(elem, newOverriderName)
         addBeanMethods(elem, newOverriderName)
-      }
-    }
     RenameSuperMembersUtil.prepareSuperMembers(element, newName, allRenames)
-  }
   override def findCollisions(element: PsiElement,
                               newName: String,
                               allRenames: util.Map[_ <: PsiElement, String],
                               result: util.List[UsageInfo]) { /*todo*/ }
 
   override def substituteElementToRename(
-      element: PsiElement, editor: Editor): PsiElement = {
-    element match {
+      element: PsiElement, editor: Editor): PsiElement =
+    element match
       case method: FakePsiMethod =>
         substituteElementToRename(method.navElement, editor)
       case named: ScNamedElement => RenameSuperMembersUtil.chooseSuper(named)
       case _ => element
-    }
-  }
 
   override def substituteElementToRename(
-      element: PsiElement, editor: Editor, renameCallback: Pass[PsiElement]) {
-    val named = element match {
+      element: PsiElement, editor: Editor, renameCallback: Pass[PsiElement])
+    val named = element match
       case named: ScNamedElement => named; case _ => return
-    }
     RenameSuperMembersUtil.chooseAndProcessSuper(
-        named, new PsiElementProcessor[PsiNamedElement] {
-      def execute(named: PsiNamedElement): Boolean = {
+        named, new PsiElementProcessor[PsiNamedElement]
+      def execute(named: PsiNamedElement): Boolean =
         renameCallback.pass(named)
         false
-      }
-    }, editor)
-  }
+    , editor)
 
   override def renameElement(element: PsiElement,
                              newName: String,
                              usages: Array[UsageInfo],
-                             listener: RefactoringElementListener) {
+                             listener: RefactoringElementListener)
     ScalaRenameUtil.doRenameGenericNamedElement(
         element, newName, usages, listener)
-  }
-}

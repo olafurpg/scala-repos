@@ -39,10 +39,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class EventTypeSpec
     extends SimpleSFXDelegateSpec[
         jfxe.EventType[jfxe.Event], EventType[jfxe.Event]](
-        classOf[jfxe.EventType[jfxe.Event]], classOf[EventType[jfxe.Event]]) {
+        classOf[jfxe.EventType[jfxe.Event]], classOf[EventType[jfxe.Event]])
 
   override protected def getJavaClassInstance: jfxe.EventType[jfxe.Event] =
     jfxe.EventType.ROOT
   override protected def getScalaClassInstance: EventType[jfxe.Event] =
     EventType.ROOT
-}

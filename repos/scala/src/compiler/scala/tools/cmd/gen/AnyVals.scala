@@ -7,38 +7,35 @@ package scala.tools.cmd
 package gen
 
 /** Code generation of the AnyVal types and their companions. */
-trait AnyValReps { self: AnyVals =>
+trait AnyValReps  self: AnyVals =>
 
   sealed abstract class AnyValNum(
       name: String, repr: Option[String], javaEquiv: String)
-      extends AnyValRep(name, repr, javaEquiv) {
+      extends AnyValRep(name, repr, javaEquiv)
 
     case class Op(op: String, doc: String)
 
-    private def companionCoercions(tos: AnyValRep*) = {
+    private def companionCoercions(tos: AnyValRep*) =
       tos.toList map
       (to =>
             s"implicit def @javaequiv@2${to.javaEquiv}(x: @name@): ${to.name} = x.to${to.name}")
-    }
     def coercionComment =
       """/** Language mandated coercions from @name@ to "wider" types. */
 import scala.language.implicitConversions"""
 
-    def implicitCoercions: List[String] = {
-      val coercions = this match {
+    def implicitCoercions: List[String] =
+      val coercions = this match
         case B => companionCoercions(S, I, L, F, D)
         case S | C => companionCoercions(I, L, F, D)
         case I => companionCoercions(L, F, D)
         case L => companionCoercions(F, D)
         case F => companionCoercions(D)
         case _ => Nil
-      }
       if (coercions.isEmpty) Nil
       else coercionComment.lines.toList ++ coercions
-    }
 
     def isCardinal: Boolean = isIntegerType(this)
-    def unaryOps = {
+    def unaryOps =
       val ops = List(Op("+", "/** Returns this value, unmodified. */"),
                      Op("-", "/** Returns the negation of this value. */"))
 
@@ -49,7 +46,6 @@ import scala.language.implicitConversions"""
            " * ~5 == -6\n" + " * // in binary: ~00000101 ==\n" +
            " * //             11111010\n" + " * }}}\n" + " */") :: ops
       else ops
-    }
 
     def bitwiseOps =
       if (isCardinal)
@@ -137,13 +133,11 @@ import scala.language.implicitConversions"""
     // Otherwise the operation type of S and T is the larger of the two types wrt ranking.
     // Given two numeric values v and w the operation type of v and w is the operation type
     // of their run-time types.
-    def opType(that: AnyValNum): AnyValNum = {
+    def opType(that: AnyValNum): AnyValNum =
       val rank = IndexedSeq(I, L, F, D)
-      (rank indexOf this, rank indexOf that) match {
+      (rank indexOf this, rank indexOf that) match
         case (-1, -1) => I
         case (r1, r2) => rank apply (r1 max r2)
-      }
-    }
 
     def mkCoercions = numeric map (x => "def to%s: %s".format(x, x))
     def mkUnaryOps =
@@ -153,7 +147,7 @@ import scala.language.implicitConversions"""
     def mkShiftOps = (for (op <- shiftOps; arg <- List(I, L)) yield
       "%s\n  def %s(x: %s): %s".format(op.doc, op.op, arg, this opType I))
 
-    def clumps: List[List[String]] = {
+    def clumps: List[List[String]] =
       val xs1 =
         List(mkCoercions, mkUnaryOps, mkStringOps, mkShiftOps) map
         (xs => if (xs.isEmpty) xs else xs :+ "")
@@ -163,22 +157,18 @@ import scala.language.implicitConversions"""
           mkBinOpsGroup(otherOps, numeric, this opType _)
       )
       xs1 ++ xs2
-    }
-    def classLines = (clumps :+ commonClassLines).foldLeft(List[String]()) {
+    def classLines = (clumps :+ commonClassLines).foldLeft(List[String]())
       case (res, Nil) => res
       case (res, lines) =>
         val xs =
-          lines map {
+          lines map
             case "" => ""
             case s => interpolate(s)
-          }
         res ++ xs
-    }
-    def objectLines = {
+    def objectLines =
       val comp = if (isCardinal) cardinalCompanion else floatingCompanion
       interpolate(comp + allCompanions + "\n" + nonUnitCompanions).trim.lines.toList ++
       (implicitCoercions map interpolate)
-    }
 
     /** Makes a set of binary operations based on the given set of ops, args, and resultFn.
       *
@@ -195,10 +185,9 @@ import scala.language.implicitConversions"""
                 args.map(arg =>
                       "%s\n  def %s(x: %s): %s".format(
                           op.doc, op.op, arg, resultFn(arg))) :+ "")).toList
-  }
 
   sealed abstract class AnyValRep(
-      val name: String, val repr: Option[String], val javaEquiv: String) {
+      val name: String, val repr: Option[String], val javaEquiv: String)
     def classLines: List[String]
     def objectLines: List[String]
     def commonClassLines = List(
@@ -206,21 +195,18 @@ import scala.language.implicitConversions"""
     )
 
     def lcname = name.toLowerCase
-    def boxedSimpleName = this match {
+    def boxedSimpleName = this match
       case C => "Character"
       case I => "Integer"
       case _ => name
-    }
-    def boxedName = this match {
+    def boxedName = this match
       case U => "scala.runtime.BoxedUnit"
       case _ => "java.lang." + boxedSimpleName
-    }
-    def zeroRep = this match {
+    def zeroRep = this match
       case L => "0L"
       case F => "0.0f"
       case D => "0.0d"
       case _ => "0"
-    }
 
     def representation = repr.map(", a " + _).getOrElse("")
 
@@ -250,9 +236,8 @@ import scala.language.implicitConversions"""
           "@zero@" -> zeroRep
       ) ++ boxUnboxImpls
 
-    def interpolate(s: String): String = interpolations.foldLeft(s) {
+    def interpolate(s: String): String = interpolations.foldLeft(s)
       case (str, (key, value)) => str.replaceAll(key, value)
-    }
     def classDoc = interpolate(classDocTemplate)
     def objectDoc = ""
     def mkImports = ""
@@ -272,18 +257,15 @@ import scala.language.implicitConversions"""
           mkObject
       ) mkString ""
 
-    def assemble(decl: String, lines: List[String]): String = {
+    def assemble(decl: String, lines: List[String]): String =
       val body =
         if (lines.isEmpty) " { }\n\n"
         else lines map indent mkString (" {\n", "\n", "\n}\n")
 
       decl + body + "\n"
-    }
     override def toString = name
-  }
-}
 
-trait AnyValTemplates {
+trait AnyValTemplates
   def headerTemplate =
     """/*                     __                                               *\
 **     ________ ___   / /  ___     Scala API                            **
@@ -365,9 +347,8 @@ final val MinValue = -@boxed@.MAX_VALUE
 /** The largest finite positive number representable as a @name@. */
 final val MaxValue = @boxed@.MAX_VALUE
 """
-}
 
-class AnyVals extends AnyValReps with AnyValTemplates {
+class AnyVals extends AnyValReps with AnyValTemplates
   object B extends AnyValNum("Byte", Some("8-bit signed integer"), "byte")
   object S extends AnyValNum("Short", Some("16-bit signed integer"), "short")
   object C extends AnyValNum("Char", Some("16-bit unsigned integer"), "char")
@@ -379,7 +360,7 @@ class AnyVals extends AnyValReps with AnyValTemplates {
   object D
       extends AnyValNum(
           "Double", Some("64-bit IEEE-754 floating point number"), "double")
-  object Z extends AnyValRep("Boolean", None, "boolean") {
+  object Z extends AnyValRep("Boolean", None, "boolean")
     def classLines =
       """
 /** Negates a Boolean expression.
@@ -469,8 +450,7 @@ override def getClass(): Class[Boolean] = null
 
     def objectLines =
       interpolate(allCompanions + "\n" + nonUnitCompanions).lines.toList
-  }
-  object U extends AnyValRep("Unit", None, "void") {
+  object U extends AnyValRep("Unit", None, "void")
     override def classDoc =
       """
 /** `Unit` is a subtype of [[scala.AnyVal]]. There is only one value of type
@@ -491,7 +471,6 @@ override def getClass(): Class[Boolean] = null
         "@unboxImpl@" -> "()",
         "@unboxDoc@" -> "the Unit value ()"
     )
-  }
 
   def isSubrangeType = Set(B, S, C)
   def isIntegerType = Set(B, S, C, I, L)
@@ -503,4 +482,3 @@ override def getClass(): Class[Boolean] = null
   def values = List(U, Z) ++ numeric
 
   def make() = values map (x => (x.name, x.make()))
-}

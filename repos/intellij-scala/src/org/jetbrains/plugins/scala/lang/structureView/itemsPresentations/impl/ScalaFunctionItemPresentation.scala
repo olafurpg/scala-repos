@@ -13,12 +13,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements._
   */
 class ScalaFunctionItemPresentation(
     private val element: ScFunction, private val isInherited: Boolean)
-    extends ScalaItemPresentation(element) {
-  def getPresentableText: String = {
+    extends ScalaItemPresentation(element)
+  def getPresentableText: String =
     ScalaElementPresentation.getMethodPresentableText(
         myElement.asInstanceOf[ScFunction])
-  }
-  override def getTextAttributesKey: TextAttributesKey = {
+  override def getTextAttributesKey: TextAttributesKey =
     if (isInherited) CodeInsightColors.NOT_USED_ELEMENT_ATTRIBUTES else null
-  }
-}

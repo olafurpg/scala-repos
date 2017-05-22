@@ -33,17 +33,16 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.image.Image
 
-object BackgroundImage {
+object BackgroundImage
   implicit def sfxBackgroundImage2jfx(
       v: BackgroundImage): jfxsl.BackgroundImage =
     if (v != null) v.delegate else null
-}
 
 /**
   * Defines properties describing how to render an image as the background to some `Region`.
   */
 class BackgroundImage(override val delegate: jfxsl.BackgroundImage)
-    extends SFXDelegate[jfxsl.BackgroundImage] {
+    extends SFXDelegate[jfxsl.BackgroundImage]
 
   /**
     * Creates a new BackgroundImage.
@@ -79,4 +78,3 @@ class BackgroundImage(override val delegate: jfxsl.BackgroundImage)
     * The size of this image relative to the Region.
     */
   def size: BackgroundSize = delegate.getSize
-}

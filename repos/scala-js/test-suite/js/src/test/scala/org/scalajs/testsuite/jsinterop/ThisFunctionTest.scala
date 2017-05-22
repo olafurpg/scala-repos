@@ -12,11 +12,11 @@ import scala.scalajs.js
 import org.junit.Assert._
 import org.junit.Test
 
-class ThisFunctionTest {
+class ThisFunctionTest
 
   @Test
   def should_provide_an_implicit_conversion_from_Scala_function_to_js_ThisFunction(
-      ): Unit = {
+      ): Unit =
     val g = js
       .eval("""
         var g = function(f, x) { return f.call(x, 42, x.foo); }; g;
@@ -29,21 +29,19 @@ class ThisFunctionTest {
                                  js.Dynamic,
                                  String]]
 
-    val f = { (thiz: js.Dynamic, v: Int, u: String) =>
+    val f =  (thiz: js.Dynamic, v: Int, u: String) =>
       import js.DynamicImplicits.truthValue
       assertTrue(thiz)
       val thiz_foobar = thiz.foobar
       assertEquals("foobar", thiz_foobar)
       u + v
-    }
     val obj = js.Object().asInstanceOf[js.Dynamic]
     obj.foo = "foo"
     obj.foobar = "foobar"
     assertEquals("foo42", g(f, obj))
-  }
 
   @Test
-  def should_accept_a_lambda_where_a_js_ThisFunction_is_expected(): Unit = {
+  def should_accept_a_lambda_where_a_js_ThisFunction_is_expected(): Unit =
     val g = js
       .eval("""
         var g = function(f, x) { return f.call(x, 42, x.foo); }; g;
@@ -59,30 +57,28 @@ class ThisFunctionTest {
     val obj = js.Object().asInstanceOf[js.Dynamic]
     obj.foo = "foo"
     obj.foobar = "foobar"
-    val res = g({ (thiz: js.Dynamic, v: Int, u: String) =>
+    val res = g( (thiz: js.Dynamic, v: Int, u: String) =>
       import js.DynamicImplicits.truthValue
       assertTrue(thiz)
       val thiz_foobar = thiz.foobar
       assertEquals("foobar", thiz_foobar)
       u + v
-    }, obj)
+    , obj)
     assertEquals("foo42", res)
-  }
 
   @Test
   def should_bind_the_first_argument_to_this_when_applying_js_ThisFunctionN(
-      ): Unit = {
+      ): Unit =
     val g = js.eval("""
         var g = function(x) { return this.foo + ":" + x; }; g;
     """).asInstanceOf[js.ThisFunction1[js.Dynamic, Int, String]]
     val obj = js.Object().asInstanceOf[js.Dynamic]
     obj.foo = "foo"
     assertEquals("foo:42", g(obj, 42))
-  }
 
   @Test
   def should_provide_an_implicit_conversion_from_js_ThisFunction_to_Scala_function(
-      ): Unit = {
+      ): Unit =
     val g = js.eval("""
         var g = function(x) { return this.foo + ":" + x; }; g;
     """).asInstanceOf[js.ThisFunction1[js.Dynamic, Int, String]]
@@ -90,5 +86,3 @@ class ThisFunctionTest {
     val obj = js.Object().asInstanceOf[js.Dynamic]
     obj.foo = "foo"
     assertEquals("foo:42", f(obj, 42))
-  }
-}

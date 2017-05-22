@@ -12,7 +12,7 @@ import scala.reflect.ClassTag
 class SparseArrayMap[@specialized T : ClassTag : Zero](
     val length: Int, default: => T)
     extends scala.collection.mutable.Map[Int, T]
-    with MapLike[Int, T, SparseArrayMap[T]] with Serializable {
+    with MapLike[Int, T, SparseArrayMap[T]] with Serializable
   val array = new SparseArray[T](length)
 
   def activeSize = array.activeSize
@@ -44,29 +44,23 @@ class SparseArrayMap[@specialized T : ClassTag : Zero](
 
   def indexAt(i: Int) = array.indexAt(i)
   def valueAt(i: Int) = array.valueAt(i)
-}
 
-object SparseArrayMap {
+object SparseArrayMap
   implicit def canMapValues[T, U : ClassTag : Zero]: CanBuildFrom[
       SparseArrayMap[T], (Int, U), SparseArrayMap[U]] =
-    new CanBuildFrom[SparseArrayMap[T], (Int, U), SparseArrayMap[U]] {
+    new CanBuildFrom[SparseArrayMap[T], (Int, U), SparseArrayMap[U]]
       def apply(): Builder[(Int, U), SparseArrayMap[U]] =
-        new Builder[(Int, U), SparseArrayMap[U]] {
+        new Builder[(Int, U), SparseArrayMap[U]]
           var bld =
             new SparseArrayMap[U](Int.MaxValue, implicitly[Zero[U]].zero)
           def result() = bld
 
-          def clear() {
+          def clear()
             bld = new SparseArrayMap[U](Int.MaxValue, implicitly[Zero[U]].zero)
-          }
 
-          def +=(elem: (Int, U)): this.type = {
+          def +=(elem: (Int, U)): this.type =
             bld(elem._1) = elem._2
             this
-          }
-        }
       def apply(
           from: SparseArrayMap[T]): Builder[(Int, U), SparseArrayMap[U]] =
         apply()
-    }
-}

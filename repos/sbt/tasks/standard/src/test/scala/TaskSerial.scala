@@ -13,19 +13,17 @@ import ConcurrentRestrictions.{All, completionService, limitTotal, tagged => tag
 
 import java.util.concurrent.{CountDownLatch, TimeUnit}
 
-object TaskSerial extends Properties("task serial") {
+object TaskSerial extends Properties("task serial")
   val checkCycles = true
   val Timeout = 100 // in milliseconds
 
   def eval[T](t: Task[T]): T = tryRun(t, checkCycles, limitTotal(MaxWorkers))
 
-  property("Evaluates basic") = forAll { (i: Int) =>
+  property("Evaluates basic") = forAll  (i: Int) =>
     checkResult(eval(task(i)), i)
-  }
 
-  property("Evaluates Function0") = forAll { (i: Int) =>
+  property("Evaluates Function0") = forAll  (i: Int) =>
     checkResult(eval(() => i), i)
-  }
 
   // Note - This test is flaky on cpu/mem pressured machines, so we ignore it for now.
   // Any test using a timeout (especially 100ms) on EC2 is guaranteed flaky.
@@ -45,19 +43,16 @@ object TaskSerial extends Properties("task serial") {
 
   def checkArbitrary(size: Int,
                      restrictions: ConcurrentRestrictions[Task[_]],
-                     shouldSucceed: Boolean) = {
+                     shouldSucceed: Boolean) =
     val latch = task { new CountDownLatch(size) }
-    def mktask = latch map { l =>
+    def mktask = latch map  l =>
       l.countDown()
       l.await(Timeout, TimeUnit.MILLISECONDS)
-    }
-    val tasks = (0 until size).map(_ => mktask).toList.join.map { results =>
+    val tasks = (0 until size).map(_ => mktask).toList.join.map  results =>
       val success = results.forall(idFun[Boolean])
       assert(success == shouldSucceed,
              if (shouldSucceed) unschedulableMsg else scheduledMsg)
-    }
     checkResult(evalRestricted(tasks)(restrictions), ())
-  }
   def unschedulableMsg =
     "Some tasks were unschedulable: verify this is an actual failure by extending the timeout to several seconds."
   def scheduledMsg = "All tasks were unexpectedly scheduled."
@@ -66,12 +61,11 @@ object TaskSerial extends Properties("task serial") {
   def evalRestricted[T](t: Task[T])(
       restrictions: ConcurrentRestrictions[Task[_]]): T =
     tryRun[T](t, checkCycles, restrictions)
-}
 
-object TaskTest {
+object TaskTest
   def run[T](root: Task[T],
              checkCycles: Boolean,
-             restrictions: ConcurrentRestrictions[Task[_]]): Result[T] = {
+             restrictions: ConcurrentRestrictions[Task[_]]): Result[T] =
     val (service, shutdown) = completionService[Task[_], Completed](
         restrictions, (x: String) => System.err.println(x))
 
@@ -80,12 +74,9 @@ object TaskTest {
                         Execute.noTriggers,
                         ExecuteProgress.empty[Task])(taskToNode(idK[Task]))
     try { x.run(root)(service) } finally { shutdown() }
-  }
   def tryRun[T](root: Task[T],
                 checkCycles: Boolean,
                 restrictions: ConcurrentRestrictions[Task[_]]): T =
-    run(root, checkCycles, restrictions) match {
+    run(root, checkCycles, restrictions) match
       case Value(v) => v
       case Inc(i) => throw i
-    }
-}

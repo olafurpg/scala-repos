@@ -6,7 +6,7 @@ import scalaz.std.anyVal._
 import scalaz.syntax.monoid._
 import scalaz.syntax.foldable._
 
-object EndoUsage extends App {
+object EndoUsage extends App
   // The scala Endo class is a class which wraps functions from A ⇒ A
   // for some A. This class exists in order to supply some special
   // typeclass instances, since functions where the domain and the
@@ -63,4 +63,3 @@ object EndoUsage extends App {
 
   val foo = (ints zip strings) map Zip[Endo].zip(plus1, toUpper).run
   assert(foo == IList((2, "A"), (3, "B"), (4, "C")))
-}

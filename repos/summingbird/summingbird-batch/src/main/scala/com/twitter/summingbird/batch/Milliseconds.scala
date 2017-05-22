@@ -16,15 +16,13 @@ limitations under the License.
 
 package com.twitter.summingbird.batch
 
-case class Milliseconds(toLong: Long) extends Ordered[Milliseconds] {
+case class Milliseconds(toLong: Long) extends Ordered[Milliseconds]
   def compare(that: Milliseconds) = toLong.compare(that.toLong)
   def prev = copy(toLong = toLong - 1)
   def next = copy(toLong = toLong + 1)
-}
 
-object Milliseconds {
+object Milliseconds
   val Max = Milliseconds(Long.MaxValue)
   val Min = Milliseconds(Long.MinValue)
   implicit val orderingOnTimestamp: Ordering[Milliseconds] =
     Ordering.by(_.toLong)
-}

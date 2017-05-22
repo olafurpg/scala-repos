@@ -9,11 +9,11 @@ import org.junit.Assert
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaGlobalMemberCompletionTest extends ScalaCodeInsightTestBase {
+class ScalaGlobalMemberCompletionTest extends ScalaCodeInsightTestBase
   protected override def rootPath(): String =
     baseRootPath() + "completion3/globalMember"
 
-  def testGlobalMember1() {
+  def testGlobalMember1()
     val fileText = """
 class TUI {
   rawObj<caret>
@@ -35,9 +35,8 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "rawObject").get)
     checkResultByText(resultText)
-  }
 
-  def testGlobalMember2() {
+  def testGlobalMember2()
     val fileText = """
 class TUI {
   globalVal<caret>
@@ -59,9 +58,8 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "globalValue").get)
     checkResultByText(resultText)
-  }
 
-  def testGlobalMember3() {
+  def testGlobalMember3()
     val fileText = """
 class TUI {
   globalVar<caret>
@@ -83,9 +81,8 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "globalVariable").get)
     checkResultByText(resultText)
-  }
 
-  def testGlobalMember4() {
+  def testGlobalMember4()
     val fileText = """
 class TUI {
   patternVal<caret>
@@ -107,9 +104,8 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "patternValue").get)
     checkResultByText(resultText)
-  }
 
-  def testGlobalMember5() {
+  def testGlobalMember5()
     val fileText = """
 class TUI {
   patternVar<caret>
@@ -131,9 +127,8 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "patternVariable").get)
     checkResultByText(resultText)
-  }
 
-  def testGlobalMember6() {
+  def testGlobalMember6()
     val fileText = """
 import rawObject.RawObject6.importedDef
 
@@ -157,9 +152,8 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "importedDef").get)
     checkResultByText(resultText)
-  }
 
-  def testGlobalMember7() {
+  def testGlobalMember7()
     val fileText = """
 class TUI {
   imposToR<caret>
@@ -177,9 +171,8 @@ class TUI {
 """.replaceAll("\r", "").trim()
 
     checkResultByText(resultText)
-  }
 
-  def testGlobalMemberJava() {
+  def testGlobalMemberJava()
     val fileText = """
 class TUI {
   activeCoun<caret>
@@ -200,9 +193,8 @@ class TUI {
           activeLookup.find(le => le.getLookupString == "activeCount").get)
 
     checkResultByText(resultText)
-  }
 
-  def testGlobalMember8() {
+  def testGlobalMember8()
     val fileText = """
 object BlahBlahBlahContainer {
   private def doSmthPrivate() {}
@@ -220,9 +212,8 @@ class Test {
         completionType = CompletionType.BASIC, time = 2)
     Assert.assertTrue(
         !activeLookup.exists(_.getLookupString == "doSmthPrivate"))
-  }
 
-  def testGlobalMember9() {
+  def testGlobalMember9()
     val fileText = """
       object BlahBlahBlahContainer {
         private def doSmthPrivate() {}
@@ -240,9 +231,8 @@ class Test {
         completionType = CompletionType.BASIC, time = 3)
     Assert.assertTrue(
         activeLookup.exists(_.getLookupString == "doSmthPrivate"))
-  }
 
-  def testGlobalMemberInherited() {
+  def testGlobalMemberInherited()
     val fileText = """
       class Base {
         def zeeGlobalDefInherited = 0
@@ -265,10 +255,9 @@ class Test {
     configureFromFileTextAdapter("dummyGlobalMemberInherited.scala", fileText)
     val (activeLookup, _) = complete(
         completionType = CompletionType.BASIC, time = 3)
-    val lookups = activeLookup.collect {
+    val lookups = activeLookup.collect
       case sli: ScalaLookupItem =>
         sli.containingClass.name + "." + sli.getLookupString
-    }
     val expected = Set("D1.zeeGlobalDefInherited",
                        "D1.zeeGlobalValInherited",
                        "D1.zeeGlobalDef",
@@ -276,5 +265,3 @@ class Test {
                        "D2.zeeGlobalDefInherited",
                        "D2.zeeGlobalValInherited")
     Assert.assertEquals(expected, lookups.toSet)
-  }
-}

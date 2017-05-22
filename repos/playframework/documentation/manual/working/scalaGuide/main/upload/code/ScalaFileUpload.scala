@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2009-2016 Lightbend Inc. <https://www.lightbend.com>
  */
-package scalaguide.upload.fileupload {
+package scalaguide.upload.fileupload
 
   import play.api.inject.guice.GuiceApplicationBuilder
   import play.api.mvc._
@@ -15,11 +15,11 @@ package scalaguide.upload.fileupload {
   import play.api.mvc.MultipartFormData.FilePart
 
   @RunWith(classOf[JUnitRunner])
-  class ScalaFileUploadSpec extends PlaySpecification with Controller {
+  class ScalaFileUploadSpec extends PlaySpecification with Controller
 
-    "A scala file upload" should {
+    "A scala file upload" should
 
-      "upload file" in {
+      "upload file" in
         val tmpFile = new File("/tmp/picture/tmpformuploaded")
         writeFile(tmpFile, "hello")
 
@@ -28,21 +28,18 @@ package scalaguide.upload.fileupload {
         uploaded.delete()
 
         //#upload-file-action
-        def upload = Action(parse.multipartFormData) { request =>
+        def upload = Action(parse.multipartFormData)  request =>
           request.body
             .file("picture")
-            .map { picture =>
+            .map  picture =>
               import java.io.File
               val filename = picture.filename
               val contentType = picture.contentType
               picture.ref.moveTo(new File(s"/tmp/picture/$filename"))
               Ok("File uploaded")
-            }
-            .getOrElse {
+            .getOrElse
               Redirect(routes.Application.index)
                 .flashing("error" -> "Missing file")
-            }
-        }
         //#upload-file-action
 
         val request = FakeRequest().withBody(
@@ -57,9 +54,8 @@ package scalaguide.upload.fileupload {
 
         uploaded.delete()
         success
-      }
 
-      "upload file directly" in {
+      "upload file directly" in
         val tmpFile = new File("/tmp/picture/tmpuploaded")
         writeFile(tmpFile, "hello")
 
@@ -72,43 +68,31 @@ package scalaguide.upload.fileupload {
 
         uploaded.delete()
         success
-      }
-    }
 
     def testAction[A](action: Action[A],
                       request: => Request[A] = FakeRequest(),
-                      expectedResponse: Int = OK) = {
-      running(GuiceApplicationBuilder().build()) {
+                      expectedResponse: Int = OK) =
+      running(GuiceApplicationBuilder().build())
 
         val result = action(request)
 
         status(result) must_== expectedResponse
-      }
-    }
 
-    def writeFile(file: File, content: String) = {
+    def writeFile(file: File, content: String) =
       file.getParentFile.mkdirs()
       val out = new FileWriter(file)
-      try {
+      try
         out.write(content)
-      } finally {
+      finally
         out.close()
-      }
-    }
-  }
-  package controllers {
-    class Application extends Controller {
+  package controllers
+    class Application extends Controller
 
       //#upload-file-directly-action
-      def upload = Action(parse.temporaryFile) { request =>
+      def upload = Action(parse.temporaryFile)  request =>
         request.body.moveTo(new File("/tmp/picture/uploaded"))
         Ok("File uploaded")
-      }
       //#upload-file-directly-action
 
-      def index = Action { request =>
+      def index = Action  request =>
         Ok("Upload failed")
-      }
-    }
-  }
-}

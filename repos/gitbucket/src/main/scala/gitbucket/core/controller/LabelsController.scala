@@ -13,7 +13,7 @@ class LabelsController
     with RepositoryService with AccountService with ReferrerAuthenticator
     with CollaboratorsAuthenticator
 
-trait LabelsControllerBase extends ControllerBase {
+trait LabelsControllerBase extends ControllerBase
   self: LabelsService with IssuesService with RepositoryService with ReferrerAuthenticator with CollaboratorsAuthenticator =>
 
   case class LabelForm(labelName: String, color: String)
@@ -26,7 +26,7 @@ trait LabelsControllerBase extends ControllerBase {
   )(LabelForm.apply)
 
   get("/:owner/:repository/issues/labels")(
-      referrersOnly { repository =>
+      referrersOnly  repository =>
     html.list(getLabels(repository.owner, repository.name),
               countIssueGroupByLabels(repository.owner,
                                       repository.name,
@@ -35,15 +35,15 @@ trait LabelsControllerBase extends ControllerBase {
               repository,
               hasWritePermission(
                   repository.owner, repository.name, context.loginAccount))
-  })
+  )
 
   ajaxGet("/:owner/:repository/issues/labels/new")(
-      collaboratorsOnly { repository =>
+      collaboratorsOnly  repository =>
     html.edit(None, repository)
-  })
+  )
 
   ajaxPost("/:owner/:repository/issues/labels/new", labelForm)(
-      collaboratorsOnly { (form, repository) =>
+      collaboratorsOnly  (form, repository) =>
     val labelId = createLabel(repository.owner,
                               repository.name,
                               form.labelName,
@@ -57,18 +57,18 @@ trait LabelsControllerBase extends ControllerBase {
                repository,
                hasWritePermission(
                    repository.owner, repository.name, context.loginAccount))
-  })
+  )
 
   ajaxGet("/:owner/:repository/issues/labels/:labelId/edit")(
-      collaboratorsOnly { repository =>
-    getLabel(repository.owner, repository.name, params("labelId").toInt).map {
+      collaboratorsOnly  repository =>
+    getLabel(repository.owner, repository.name, params("labelId").toInt).map
       label =>
         html.edit(Some(label), repository)
-    } getOrElse NotFound()
-  })
+    getOrElse NotFound()
+  )
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/edit", labelForm)(
-      collaboratorsOnly { (form, repository) =>
+      collaboratorsOnly  (form, repository) =>
     updateLabel(repository.owner,
                 repository.name,
                 params("labelId").toInt,
@@ -85,38 +85,33 @@ trait LabelsControllerBase extends ControllerBase {
                repository,
                hasWritePermission(
                    repository.owner, repository.name, context.loginAccount))
-  })
+  )
 
   ajaxPost("/:owner/:repository/issues/labels/:labelId/delete")(
-      collaboratorsOnly { repository =>
+      collaboratorsOnly  repository =>
     deleteLabel(repository.owner, repository.name, params("labelId").toInt)
     Ok()
-  })
+  )
 
   /**
     * Constraint for the identifier such as user name, repository name or page name.
     */
-  private def labelName: Constraint = new Constraint() {
+  private def labelName: Constraint = new Constraint()
     override def validate(
         name: String, value: String, messages: Messages): Option[String] =
-      if (value.contains(',')) {
+      if (value.contains(','))
         Some(s"${name} contains invalid character.")
-      } else if (value.startsWith("_") || value.startsWith("-")) {
+      else if (value.startsWith("_") || value.startsWith("-"))
         Some(s"${name} starts with invalid character.")
-      } else {
+      else
         None
-      }
-  }
 
-  private def uniqueLabelName: Constraint = new Constraint() {
+  private def uniqueLabelName: Constraint = new Constraint()
     override def validate(name: String,
                           value: String,
                           params: Map[String, String],
-                          messages: Messages): Option[String] = {
+                          messages: Messages): Option[String] =
       val owner = params("owner")
       val repository = params("repository")
       getLabel(owner, repository, value).map(
           _ => "Name has already been taken.")
-    }
-  }
-}

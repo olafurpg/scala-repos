@@ -5,10 +5,9 @@ package scalasig
 
 sealed trait Type
 
-trait FunctionType extends Type {
+trait FunctionType extends Type
   def resultType: Type
   def paramSymbols: Seq[Symbol]
-}
 
 case object NoType extends Type
 case object NoPrefixType extends Type

@@ -24,8 +24,8 @@ import java.util.Properties
 import org.apache.spark.tags.DockerTest
 
 @DockerTest
-class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
-  override val db = new DatabaseOnDocker {
+class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite
+  override val db = new DatabaseOnDocker
     override val imageName = "mysql:5.7.9"
     override val env = Map(
         "MYSQL_ROOT_PASSWORD" -> "rootpass"
@@ -33,9 +33,8 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
     override val jdbcPort: Int = 3306
     override def getJdbcUrl(ip: String, port: Int): String =
       s"jdbc:mysql://$ip:$port/mysql?user=root&password=rootpass"
-  }
 
-  override def dataPreparation(conn: Connection): Unit = {
+  override def dataPreparation(conn: Connection): Unit =
     conn.prepareStatement("CREATE DATABASE foo").executeUpdate()
     conn
       .prepareStatement("CREATE TABLE tbl (x INTEGER, y TEXT(8))")
@@ -77,9 +76,8 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
           "INSERT INTO strings VALUES ('the', 'quick', 'brown', 'fox', " +
           "'jumps', 'over', 'the', 'lazy', 'dog')")
       .executeUpdate()
-  }
 
-  test("Basic test") {
+  test("Basic test")
     val df = sqlContext.read.jdbc(jdbcUrl, "tbl", new Properties)
     val rows = df.collect()
     assert(rows.length == 2)
@@ -87,9 +85,8 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
     assert(types.length == 2)
     assert(types(0).equals("class java.lang.Integer"))
     assert(types(1).equals("class java.lang.String"))
-  }
 
-  test("Numeric types") {
+  test("Numeric types")
     val df = sqlContext.read.jdbc(jdbcUrl, "numbers", new Properties)
     val rows = df.collect()
     assert(rows.length == 1)
@@ -114,9 +111,8 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
     assert(rows(0).getAs[BigDecimal](6).equals(bd))
     assert(rows(0).getDouble(7) == 42.75)
     assert(rows(0).getDouble(8) == 1.0000000000000002)
-  }
 
-  test("Date types") {
+  test("Date types")
     val df = sqlContext.read.jdbc(jdbcUrl, "dates", new Properties)
     val rows = df.collect()
     assert(rows.length == 1)
@@ -138,9 +134,8 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
           .getAs[Timestamp](3)
           .equals(Timestamp.valueOf("2009-02-13 23:31:30")))
     assert(rows(0).getAs[Date](4).equals(Date.valueOf("2001-01-01")))
-  }
 
-  test("String types") {
+  test("String types")
     val df = sqlContext.read.jdbc(jdbcUrl, "strings", new Properties)
     val rows = df.collect()
     assert(rows.length == 1)
@@ -167,14 +162,11 @@ class MySQLIntegrationSuite extends DockerJDBCIntegrationSuite {
                                    Array[Byte](108, 97, 122, 121)))
     assert(java.util.Arrays
           .equals(rows(0).getAs[Array[Byte]](8), Array[Byte](100, 111, 103)))
-  }
 
-  test("Basic write test") {
+  test("Basic write test")
     val df1 = sqlContext.read.jdbc(jdbcUrl, "numbers", new Properties)
     val df2 = sqlContext.read.jdbc(jdbcUrl, "dates", new Properties)
     val df3 = sqlContext.read.jdbc(jdbcUrl, "strings", new Properties)
     df1.write.jdbc(jdbcUrl, "numberscopy", new Properties)
     df2.write.jdbc(jdbcUrl, "datescopy", new Properties)
     df3.write.jdbc(jdbcUrl, "stringscopy", new Properties)
-  }
-}

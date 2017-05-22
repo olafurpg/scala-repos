@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 6/8/12
   */
-class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase {
+class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase
   val familyName = RemoveRedundantElseIntention.familyName
 
-  def testRemoveElse() {
+  def testRemoveElse()
     val text = """
         |class X {
         |  def f(i: Int) {
@@ -34,9 +34,8 @@ class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testRemoveElse2() {
+  def testRemoveElse2()
     val text = """
         |class X {
         |  def f(i: Int): Boolean = {
@@ -62,9 +61,8 @@ class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testRemoveElse3() {
+  def testRemoveElse3()
     val text = """
         |class X {
         |  def f(i: Int): Boolean = {
@@ -94,9 +92,8 @@ class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testRemoveElse4() {
+  def testRemoveElse4()
     val text = """
         |class X {
         |  def f(i: Int): Boolean = {
@@ -121,9 +118,8 @@ class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testRemoveElse5() {
+  def testRemoveElse5()
     val text = """
         |class X {
         |  def f(i: Int): Boolean = {
@@ -147,9 +143,8 @@ class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testRemoveElse6() {
+  def testRemoveElse6()
     val text = """
         |class X {
         |  def f(i: Int): Boolean = {
@@ -173,5 +168,3 @@ class RemoveRedundantElseIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

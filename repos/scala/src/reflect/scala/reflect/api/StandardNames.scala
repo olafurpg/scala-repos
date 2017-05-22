@@ -25,7 +25,7 @@ package api
   *  @groupname StandardNames Standard Names
   *  @group ReflectionAPI
   */
-trait StandardNames { self: Universe =>
+trait StandardNames  self: Universe =>
 
   /** @see [[termNames]] */
   @deprecated("Use `termNames` instead", "2.11.0")
@@ -48,7 +48,7 @@ trait StandardNames { self: Universe =>
   /** Defines standard names, common for term and type names: These can be accessed via the [[nme]] and [[tpnme]] members.
     *  @group API
     */
-  trait NamesApi {
+  trait NamesApi
 
     /** An abstract type that represents the exact flavor of the name. */
     type NameType >: Null <: Name
@@ -74,12 +74,11 @@ trait StandardNames { self: Universe =>
       *  Used to get modules representing package objects.
       */
     val PACKAGE: NameType
-  }
 
   /** Defines standard term names that can be accessed via the [[nme]] member.
     *  @group API
     */
-  trait TermNamesApi extends NamesApi {
+  trait TermNamesApi extends NamesApi
 
     /** @inheritdoc */
     type NameType = TermName
@@ -105,12 +104,11 @@ trait StandardNames { self: Universe =>
       *  of non-private vals and vars are renamed using `LOCAL_SUFFIX_STRING`.
       */
     val LOCAL_SUFFIX_STRING: String
-  }
 
   /** Defines standard type names that can be accessed via the [[tpnme]] member.
     *  @group API
     */
-  trait TypeNamesApi extends NamesApi {
+  trait TypeNamesApi extends NamesApi
 
     /** @inheritdoc */
     type NameType = TypeName
@@ -119,5 +117,3 @@ trait StandardNames { self: Universe =>
       *  Used to construct types that specify sequence arguments to repeated parameters.
       */
     val WILDCARD_STAR: NameType
-  }
-}

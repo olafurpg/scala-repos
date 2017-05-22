@@ -40,7 +40,7 @@ import scalaz._
 
 trait SecurityService
     extends BlueEyesServiceBuilder with APIKeyServiceCombinators
-    with PathServiceCombinators {
+    with PathServiceCombinators
   case class State(handlers: SecurityServiceHandlers, stoppable: Stoppable)
 
   val timeout = akka.util.Timeout(120000) //for now
@@ -51,62 +51,46 @@ trait SecurityService
   def APIKeyManager(config: Configuration): (APIKeyManager[Future], Stoppable)
   def clock: blueeyes.util.Clock
 
-  def securityService = service("security", "1.0") {
-    requestLogging(timeout) {
-      help("/docs/api") {
-        healthMonitor("/health", timeout, List(eternity)) {
+  def securityService = service("security", "1.0")
+    requestLogging(timeout)
+      help("/docs/api")
+        healthMonitor("/health", timeout, List(eternity))
           monitor => context =>
-            startup {
+            startup
               import context._
               val securityConfig = config.detach("security")
               val (apiKeyManager, stoppable) = APIKeyManager(securityConfig)
               M.point(State(new SecurityServiceHandlers(apiKeyManager, clock),
                             stoppable))
-            } -> request {
+            -> request
               case State(handlers, stoppable) =>
                 import CORSHeaderHandler.allowOrigin
                 import handlers._
-                allowOrigin("*", executionContext) {
-                  jsonp {
-                    jvalue[ByteChunk] {
-                      path("/apikeys/'apikey") {
+                allowOrigin("*", executionContext)
+                  jsonp
+                    jvalue[ByteChunk]
+                      path("/apikeys/'apikey")
                         get(ReadAPIKeyDetailsHandler) ~ delete(
-                            DeleteAPIKeyHandler) ~ path("/grants/") {
+                            DeleteAPIKeyHandler) ~ path("/grants/")
                           get(ReadAPIKeyGrantsHandler) ~ post(
-                              CreateAPIKeyGrantHandler) ~ path("'grantId") {
+                              CreateAPIKeyGrantHandler) ~ path("'grantId")
                             delete(DeleteAPIKeyGrantHandler)
-                          }
-                        }
-                      } ~ path("/grants/'grantId") {
-                        get(ReadGrantDetailsHandler) ~ path("/children/") {
+                      ~ path("/grants/'grantId")
+                        get(ReadGrantDetailsHandler) ~ path("/children/")
                           get(ReadGrantChildrenHandler)
-                        }
-                      } ~ jsonAPIKey(k =>
+                      ~ jsonAPIKey(k =>
                             handlers.apiKeyManager
                               .findAPIKey(k)
-                              .map(_.map(_.apiKey))) {
-                        path("/apikeys/") {
+                              .map(_.map(_.apiKey)))
+                        path("/apikeys/")
                           get(ReadAPIKeysHandler) ~ post(CreateAPIKeyHandler)
-                        } ~ path("/grants/") {
+                        ~ path("/grants/")
                           get(ReadGrantsHandler) ~ post(CreateGrantHandler) ~ path(
-                              "'grantId") {
-                            delete(DeleteGrantHandler) ~ path("/children/") {
+                              "'grantId")
+                            delete(DeleteGrantHandler) ~ path("/children/")
                               post(CreateGrantChildHandler)
-                            }
-                          }
-                        } ~ dataPath("/permissions/fs") {
+                        ~ dataPath("/permissions/fs")
                           get(ReadPermissionsHandler)
-                        }
-                      }
-                    }
-                  }
-                }
-            } -> stop[State] {
+            -> stop[State]
               case State(_, stoppable) =>
                 stoppable
-            }
-        }
-      }
-    }
-  }
-}

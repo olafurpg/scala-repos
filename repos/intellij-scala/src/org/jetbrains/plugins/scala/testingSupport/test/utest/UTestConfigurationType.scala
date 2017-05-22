@@ -6,7 +6,7 @@ import javax.swing.Icon
 import com.intellij.execution.configurations.{ConfigurationFactory, ConfigurationType}
 import org.jetbrains.plugins.scala.icons.Icons
 
-class UTestConfigurationType extends ConfigurationType {
+class UTestConfigurationType extends ConfigurationType
   val confFactory = new UTestRunConfigurationFactory(this)
 
   def getConfigurationFactories: Array[ConfigurationFactory] =
@@ -21,4 +21,3 @@ class UTestConfigurationType extends ConfigurationType {
     "uTestRunConfiguration" //if you want to change id, change it in Android plugin too
 
   def getIcon: Icon = Icons.SCALA_TEST
-}

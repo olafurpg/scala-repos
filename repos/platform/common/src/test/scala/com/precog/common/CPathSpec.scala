@@ -21,11 +21,11 @@ package com.precog.common
 
 import org.specs2.mutable.Specification
 
-class CPathSpec extends Specification {
+class CPathSpec extends Specification
   import CPath._
 
-  "makeTree" should {
-    "return correct tree given a sequence of CPath" in {
+  "makeTree" should
+    "return correct tree given a sequence of CPath" in
       val cpaths: Seq[CPath] =
         Seq(CPath(CPathField("foo")),
             CPath(CPathField("bar"), CPathIndex(0)),
@@ -37,7 +37,7 @@ class CPathSpec extends Specification {
 
       val result = makeTree(cpaths, values)
 
-      val expected: CPathTree[Int] = {
+      val expected: CPathTree[Int] =
         RootNode(
             Seq(FieldNode(CPathField("bar"),
                           Seq(IndexNode(CPathIndex(0), Seq(LeafNode(4))),
@@ -48,9 +48,5 @@ class CPathSpec extends Specification {
                                                       Seq(LeafNode(7))))),
                               IndexNode(CPathIndex(2), Seq(LeafNode(2))))),
                 FieldNode(CPathField("foo"), Seq(LeafNode(0)))))
-      }
 
       result mustEqual expected
-    }
-  }
-}

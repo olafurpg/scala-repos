@@ -1,6 +1,6 @@
 package foo.bar.baz // the package nesting level material to this bug
 
-class DivergenceTest {
+class DivergenceTest
 
   trait ColumnBase[T]
 
@@ -20,12 +20,10 @@ class DivergenceTest {
       implicit u1: Shape2[_ <: Level, M1, U1],
       u2: Shape2[_ <: Level, M2, U2]): Shape2[Level, (M1, M2), (U1, U2)] = ???
 
-  def foo {
+  def foo
     class Coffees extends ColumnBase[Int]
 
     def map1[F, T](f: F)(implicit shape: Shape2[_ <: Flat, F, T]) = ???
 
     map1(((1, null: Coffees), 1))
     map1(((null: Coffees, 1), 1)) // fails with implicit divergence error in 2.11.0-M6, works under 2.10.3
-  }
-}

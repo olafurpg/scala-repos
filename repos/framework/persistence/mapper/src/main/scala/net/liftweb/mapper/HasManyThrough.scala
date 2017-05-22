@@ -30,11 +30,11 @@ class HasManyThrough[From <: KeyedMapper[ThroughType, From],
     through: MetaMapper[Through],
     throughFromField: MappedField[ThroughType, Through],
     throughToField: MappedField[ThroughType, Through])
-    extends LifecycleCallbacks {
+    extends LifecycleCallbacks
   private var theSetList: Seq[ThroughType] = Nil
 
-  private val others = FatLazy[List[To]] {
-    DB.use(owner.connectionIdentifier) { conn =>
+  private val others = FatLazy[List[To]]
+    DB.use(owner.connectionIdentifier)  conn =>
       val query =
         "SELECT DISTINCT " + otherSingleton._dbTableNameLC + ".* FROM " +
         otherSingleton._dbTableNameLC + "," + through._dbTableNameLC +
@@ -44,19 +44,15 @@ class HasManyThrough[From <: KeyedMapper[ThroughType, From],
           ._dbColumnNameLC + " = " + through._dbTableNameLC + "." +
         throughToField._dbColumnNameLC + " AND " + through._dbTableNameLC +
         "." + throughFromField._dbColumnNameLC + " = ?"
-      DB.prepareStatement(query, conn) { st =>
-        owner.getSingleton.indexedField(owner).map { indVal =>
+      DB.prepareStatement(query, conn)  st =>
+        owner.getSingleton.indexedField(owner).map  indVal =>
           if (indVal.dbIgnoreSQLType_?) st.setObject(1, indVal.jdbcFriendly)
           else st.setObject(1, indVal.jdbcFriendly, indVal.targetSQLType)
 
-          DB.exec(st) { rs =>
+          DB.exec(st)  rs =>
             otherSingleton.createInstances(
                 owner.connectionIdentifier, rs, Empty, Empty)
-          }
-        } openOr Nil
-      }
-    }
-  }
+        openOr Nil
 
   def apply(): List[To] = others.get
 
@@ -64,19 +60,16 @@ class HasManyThrough[From <: KeyedMapper[ThroughType, From],
 
   def reset = others.reset
 
-  def set(what: Seq[ThroughType]): Seq[ThroughType] = {
+  def set(what: Seq[ThroughType]): Seq[ThroughType] =
     theSetList = what
     theSetList
-  }
 
-  override def beforeDelete {
-    through.findAll(By(throughFromField, owner.primaryKeyField.get)).foreach {
+  override def beforeDelete
+    through.findAll(By(throughFromField, owner.primaryKeyField.get)).foreach
       toDelete =>
         toDelete.delete_!
-    }
-  }
 
-  override def afterUpdate {
+  override def afterUpdate
     val current =
       through.findAll(By(throughFromField, owner.primaryKeyField.get))
 
@@ -90,27 +83,22 @@ class HasManyThrough[From <: KeyedMapper[ThroughType, From],
     val oldKeys = new HashSet[ThroughType];
     current.foreach(i => oldKeys += throughToField.actualField(i).get)
 
-    theSetList.toList.distinct.filter(i => !oldKeys.contains(i)).foreach { i =>
+    theSetList.toList.distinct.filter(i => !oldKeys.contains(i)).foreach  i =>
       val toCreate = through.createInstance
       throughFromField.actualField(toCreate).set(owner.primaryKeyField.get)
       throughToField.actualField(toCreate).set(i)
       toCreate.save
-    }
 
     theSetList = Nil
     others.reset
     super.afterUpdate
-  }
 
-  override def afterCreate {
-    theSetList.toList.distinct.foreach { i =>
+  override def afterCreate
+    theSetList.toList.distinct.foreach  i =>
       val toCreate = through.createInstance
       throughFromField.actualField(toCreate)(owner.primaryKeyField.get)
       throughToField.actualField(toCreate)(i)
       toCreate.save
-    }
     theSetList = Nil
     others.reset
     super.afterCreate
-  }
-}

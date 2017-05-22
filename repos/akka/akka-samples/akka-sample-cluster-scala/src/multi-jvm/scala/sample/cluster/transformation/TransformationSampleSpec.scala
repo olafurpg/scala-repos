@@ -15,7 +15,7 @@ import akka.remote.testkit.MultiNodeConfig
 import akka.remote.testkit.MultiNodeSpec
 import akka.testkit.ImplicitSender
 
-object TransformationSampleSpecConfig extends MultiNodeConfig {
+object TransformationSampleSpecConfig extends MultiNodeConfig
   // register the named roles (nodes) of the test
   val frontend1 = role("frontend1")
   val frontend2 = role("frontend2")
@@ -26,8 +26,8 @@ object TransformationSampleSpecConfig extends MultiNodeConfig {
   def nodeList = Seq(frontend1, frontend2, backend1, backend2, backend3)
 
   // Extract individual sigar library for every node.
-  nodeList foreach { role ⇒
-    nodeConfig(role) {
+  nodeList foreach  role ⇒
+    nodeConfig(role)
       ConfigFactory.parseString(s"""
       # Disable legacy metrics in akka-cluster.
       akka.cluster.metrics.enabled=off
@@ -36,8 +36,6 @@ object TransformationSampleSpecConfig extends MultiNodeConfig {
       # Sigar native library extract location during tests.
       akka.cluster.metrics.native-library-extract-folder=target/native/${role.name}
       """)
-    }
-  }
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
@@ -51,7 +49,6 @@ object TransformationSampleSpecConfig extends MultiNodeConfig {
 
   nodeConfig(backend1, backend2, backend3)(
       ConfigFactory.parseString("akka.cluster.roles =[backend]"))
-}
 
 // need one concrete test class per node
 class TransformationSampleSpecMultiJvmNode1 extends TransformationSampleSpec
@@ -62,7 +59,7 @@ class TransformationSampleSpecMultiJvmNode5 extends TransformationSampleSpec
 
 abstract class TransformationSampleSpec
     extends MultiNodeSpec(TransformationSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    with Matchers with BeforeAndAfterAll with ImplicitSender
 
   import TransformationSampleSpecConfig._
 
@@ -72,69 +69,55 @@ abstract class TransformationSampleSpec
 
   override def afterAll() = multiNodeSpecAfterAll()
 
-  "The transformation sample" must {
-    "illustrate how to start first frontend" in within(15 seconds) {
-      runOn(frontend1) {
+  "The transformation sample" must
+    "illustrate how to start first frontend" in within(15 seconds)
+      runOn(frontend1)
         // this will only run on the 'first' node
         Cluster(system) join node(frontend1).address
         val transformationFrontend =
           system.actorOf(Props[TransformationFrontend], name = "frontend")
         transformationFrontend ! TransformationJob("hello")
-        expectMsgPF() {
+        expectMsgPF()
           // no backends yet, service unavailable
           case JobFailed(_, TransformationJob("hello")) =>
-        }
-      }
 
       // this will run on all nodes
       // use barrier to coordinate test steps
       testConductor.enter("frontend1-started")
-    }
 
-    "illustrate how a backend automatically registers" in within(15 seconds) {
-      runOn(backend1) {
+    "illustrate how a backend automatically registers" in within(15 seconds)
+      runOn(backend1)
         Cluster(system) join node(frontend1).address
         system.actorOf(Props[TransformationBackend], name = "backend")
-      }
       testConductor.enter("backend1-started")
 
-      runOn(frontend1) {
+      runOn(frontend1)
         assertServiceOk()
-      }
 
       testConductor.enter("frontend1-backend1-ok")
-    }
 
-    "illustrate how more nodes registers" in within(20 seconds) {
-      runOn(frontend2) {
+    "illustrate how more nodes registers" in within(20 seconds)
+      runOn(frontend2)
         Cluster(system) join node(frontend1).address
         system.actorOf(Props[TransformationFrontend], name = "frontend")
-      }
       testConductor.enter("frontend2-started")
 
-      runOn(backend2, backend3) {
+      runOn(backend2, backend3)
         Cluster(system) join node(backend1).address
         system.actorOf(Props[TransformationBackend], name = "backend")
-      }
 
       testConductor.enter("all-started")
 
-      runOn(frontend1, frontend2) {
+      runOn(frontend1, frontend2)
         assertServiceOk()
-      }
 
       testConductor.enter("all-ok")
-    }
-  }
 
-  def assertServiceOk(): Unit = {
+  def assertServiceOk(): Unit =
     val transformationFrontend =
       system.actorSelection("akka://" + system.name + "/user/frontend")
     // eventually the service should be ok,
     // backends might not have registered initially
-    awaitAssert {
+    awaitAssert
       transformationFrontend ! TransformationJob("hello")
       expectMsgType[TransformationResult](1.second).text should be("HELLO")
-    }
-  }
-}

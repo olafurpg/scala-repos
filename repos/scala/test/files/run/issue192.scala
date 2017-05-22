@@ -1,6 +1,6 @@
 import scala.language.reflectiveCalls
 
-object Test extends App {
+object Test extends App
 
   def f1(p: Any { def unary_+ : Int }) = +p
   def f2(p: Any { def unary_- : Int }) = -p
@@ -87,4 +87,3 @@ object Test extends App {
   print("f35 = "); println(f35(4) == (4 > 7))
 
   println("ok")
-}

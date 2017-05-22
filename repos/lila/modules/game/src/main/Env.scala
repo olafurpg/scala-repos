@@ -14,9 +14,9 @@ final class Env(config: Config,
                 getLightUser: String => Option[lila.common.LightUser],
                 appPath: String,
                 isProd: Boolean,
-                scheduler: lila.common.Scheduler) {
+                scheduler: lila.common.Scheduler)
 
-  private val settings = new {
+  private val settings = new
     val CachedNbTtl = config duration "cached.nb.ttl"
     val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
     val CaptcherName = config getString "captcher.name"
@@ -29,7 +29,6 @@ final class Env(config: Config,
     val netBaseUrl = config getString "net.base_url"
     val PdfExecPath = config getString "pdf.exec_path"
     val PngExecPath = config getString "png.exec_path"
-  }
   import settings._
 
   private[game] lazy val gameColl = db(CollectionGame)
@@ -59,27 +58,22 @@ final class Env(config: Config,
   private val captcher =
     system.actorOf(Props(new Captcher), name = CaptcherName)
 
-  scheduler.message(CaptcherDuration) {
+  scheduler.message(CaptcherDuration)
     captcher -> actorApi.NewCaptcha
-  }
 
   def cli = new Cli(db, system = system)
 
-  def onStart(gameId: String) = GameRepo game gameId foreach {
-    _ foreach { game =>
+  def onStart(gameId: String) = GameRepo game gameId foreach
+    _ foreach  game =>
       system.lilaBus.publish(actorApi.StartGame(game), 'startGame)
-      game.userIds foreach { userId =>
+      game.userIds foreach  userId =>
         system.lilaBus.publish(actorApi.UserStartGame(userId, game),
                                Symbol(s"userStartGame:$userId"))
-      }
-    }
-  }
 
   private def jsPath =
     "%s/%s".format(appPath, isProd.fold(JsPathCompiled, JsPathRaw))
-}
 
-object Env {
+object Env
 
   lazy val current =
     "game" boot new Env(config = lila.common.PlayApp loadConfig "game",
@@ -91,4 +85,3 @@ object Env {
                         appPath = play.api.Play.current.path.getCanonicalPath,
                         isProd = lila.common.PlayApp.isProd,
                         scheduler = lila.common.PlayApp.scheduler)
-}

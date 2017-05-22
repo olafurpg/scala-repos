@@ -33,13 +33,13 @@ import scalafx.scene.layout.VBox
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Line
 
-class EnsembleLine extends EnsembleExample {
+class EnsembleLine extends EnsembleExample
 
-  def getContent = new VBox {
+  def getContent = new VBox
     spacing = 20
     padding = Insets(20)
     children = List(
-        new Line {
+        new Line
           startX = 320
           startY = 120
           endX = 20
@@ -47,8 +47,8 @@ class EnsembleLine extends EnsembleExample {
           fill = Color.Black
           stroke = Color.Green
           strokeWidth = 1d
-        },
-        new Line {
+        ,
+        new Line
           startX = 320
           startY = 120
           endX = 20
@@ -56,7 +56,4 @@ class EnsembleLine extends EnsembleExample {
           fill = Color.White
           stroke = Color.Orange
           strokeWidth = 10d
-        }
     )
-  }
-}

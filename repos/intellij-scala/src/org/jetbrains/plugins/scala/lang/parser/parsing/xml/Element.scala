@@ -16,19 +16,16 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserPatcher
  *            | STag Content ETag
  */
 
-object Element {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object Element
+  def parse(builder: ScalaPsiBuilder): Boolean =
     if (EmptyElemTag.parse(builder) ||
         ParserPatcher.getSuitablePatcher(builder).parse(builder)) return true
 
     val elemMarker = builder.mark()
-    if (!STag.parse(builder)) {
+    if (!STag.parse(builder))
       elemMarker.drop()
       return false
-    }
     Content parse builder
     if (!ETag.parse(builder)) builder error ErrMsg("xml.end.tag.expected")
     elemMarker.done(ScalaElementTypes.XML_ELEMENT)
     return true
-  }
-}

@@ -71,7 +71,7 @@ trait Extension
   * Lookup of Extensions is done by object identity, so the Id must be the same wherever it's used,
   * otherwise you'll get the same extension loaded multiple times.
   */
-trait ExtensionId[T <: Extension] {
+trait ExtensionId[T <: Extension]
 
   /**
     * Returns an instance of the extension identified by this ExtensionId instance.
@@ -99,7 +99,6 @@ trait ExtensionId[T <: Extension] {
   override final def hashCode: Int = System.identityHashCode(this)
   override final def equals(other: Any): Boolean =
     this eq other.asInstanceOf[AnyRef]
-}
 
 /**
   * Java API for ExtensionId
@@ -111,13 +110,12 @@ abstract class AbstractExtensionId[T <: Extension] extends ExtensionId[T]
   * a class that implements ExtensionIdProvider must be specified.
   * The lookup method should return the canonical reference to the extension.
   */
-trait ExtensionIdProvider {
+trait ExtensionIdProvider
 
   /**
     * Returns the canonical ExtensionId for this Extension
     */
   def lookup(): ExtensionId[_ <: Extension]
-}
 
 /**
   * This is a one-stop-shop if all you want is an extension which is
@@ -149,7 +147,7 @@ trait ExtensionIdProvider {
   *
   */
 abstract class ExtensionKey[T <: Extension](implicit m: ClassTag[T])
-    extends ExtensionId[T] with ExtensionIdProvider {
+    extends ExtensionId[T] with ExtensionIdProvider
   def this(clazz: Class[T]) = this()(ClassTag(clazz))
 
   override def lookup(): ExtensionId[T] = this
@@ -158,4 +156,3 @@ abstract class ExtensionKey[T <: Extension](implicit m: ClassTag[T])
       .createInstanceFor[T](
           m.runtimeClass, List(classOf[ExtendedActorSystem] -> system))
       .get
-}

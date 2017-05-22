@@ -25,7 +25,7 @@ import org.apache.spark.{SparkConf, SparkContext}
   *
   * Usage: LogQuery [logFile]
   */
-object LogQuery {
+object LogQuery
   val exampleApacheLogs = List(
       """10.10.10.10 - "FRED" [18/Jan/2013:17:56:07 +1100] "GET http://images.com/2013/Generic.jpg
       | HTTP/1.1" 304 315 "http://referall.com/" "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1;
@@ -41,7 +41,7 @@ object LogQuery {
       | 0 73.23.2.15 images.com 1358492557 - Whatup""".stripMargin.lines.mkString
   )
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val sparkConf = new SparkConf().setAppName("Log Query")
     val sc = new SparkContext(sparkConf)
@@ -54,40 +54,32 @@ object LogQuery {
       """^([\d.]+) (\S+) (\S+) \[([\w\d:/]+\s[+\-]\d{4})\] "(.+?)" (\d{3}) ([\d\-]+) "([^"]+)" "([^"]+)".*""".r
     // scalastyle:on
     /** Tracks the total query count and number of aggregate bytes for a particular group. */
-    class Stats(val count: Int, val numBytes: Int) extends Serializable {
+    class Stats(val count: Int, val numBytes: Int) extends Serializable
       def merge(other: Stats): Stats =
         new Stats(count + other.count, numBytes + other.numBytes)
       override def toString: String = "bytes=%s\tn=%s".format(numBytes, count)
-    }
 
-    def extractKey(line: String): (String, String, String) = {
-      apacheLogRegex.findFirstIn(line) match {
+    def extractKey(line: String): (String, String, String) =
+      apacheLogRegex.findFirstIn(line) match
         case Some(apacheLogRegex(
             ip, _, user, dateTime, query, status, bytes, referer, ua)) =>
           if (user != "\"-\"") (ip, user, query)
           else (null, null, null)
         case _ => (null, null, null)
-      }
-    }
 
-    def extractStats(line: String): Stats = {
-      apacheLogRegex.findFirstIn(line) match {
+    def extractStats(line: String): Stats =
+      apacheLogRegex.findFirstIn(line) match
         case Some(apacheLogRegex(
             ip, _, user, dateTime, query, status, bytes, referer, ua)) =>
           new Stats(1, bytes.toInt)
         case _ => new Stats(1, 0)
-      }
-    }
 
     dataSet
       .map(line => (extractKey(line), extractStats(line)))
       .reduceByKey((a, b) => a.merge(b))
       .collect()
-      .foreach {
+      .foreach
         case (user, query) => println("%s\t%s".format(user, query))
-      }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

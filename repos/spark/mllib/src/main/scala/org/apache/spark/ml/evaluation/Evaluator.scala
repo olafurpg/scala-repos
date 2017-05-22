@@ -27,7 +27,7 @@ import org.apache.spark.sql.DataFrame
   */
 @Since("1.5.0")
 @DeveloperApi
-abstract class Evaluator extends Params {
+abstract class Evaluator extends Params
 
   /**
     * Evaluates model output and returns a scalar metric (larger is better).
@@ -37,9 +37,8 @@ abstract class Evaluator extends Params {
     * @return metric
     */
   @Since("1.5.0")
-  def evaluate(dataset: DataFrame, paramMap: ParamMap): Double = {
+  def evaluate(dataset: DataFrame, paramMap: ParamMap): Double =
     this.copy(paramMap).evaluate(dataset)
-  }
 
   /**
     * Evaluates the output.
@@ -59,4 +58,3 @@ abstract class Evaluator extends Params {
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): Evaluator
-}

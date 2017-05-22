@@ -17,33 +17,30 @@ class UTestRunConfiguration(
     override val configurationFactory: ConfigurationFactory,
     override val name: String)
     extends AbstractTestRunConfiguration(project, configurationFactory, name)
-    with ScalaTestingConfiguration {
+    with ScalaTestingConfiguration
 
-  override protected[test] def isInvalidSuite(clazz: PsiClass): Boolean = {
+  override protected[test] def isInvalidSuite(clazz: PsiClass): Boolean =
     val list: PsiModifierList = clazz.getModifierList
     list != null && list.hasModifierProperty("abstract")
-  }
 
   @tailrec
   private def getClassPath(
-      currentClass: ScTypeDefinition, acc: String = ""): String = {
+      currentClass: ScTypeDefinition, acc: String = ""): String =
     val parentTypeDef = PsiTreeUtil.getParentOfType(
         currentClass, classOf[ScTypeDefinition], true)
-    if (parentTypeDef == null) {
+    if (parentTypeDef == null)
       currentClass.qualifiedName + acc
-    } else {
+    else
       getClassPath(parentTypeDef,
                    acc + (if (parentTypeDef.isObject) "$" else ".") +
                    currentClass.getName)
-    }
-  }
 
   override protected def getClassFileNames(
       classes: scala.collection.mutable.HashSet[PsiClass]): Seq[String] =
-    classes.map {
+    classes.map
       case typeDef: ScTypeDefinition => getClassPath(typeDef)
       case aClass => aClass.qualifiedName
-    }.toSeq
+    .toSeq
 
   override def reporterClass: String = null
 
@@ -55,4 +52,3 @@ class UTestRunConfiguration(
   override def errorMessage: String = "utest is not specified"
 
   override def currentConfiguration = UTestRunConfiguration.this
-}

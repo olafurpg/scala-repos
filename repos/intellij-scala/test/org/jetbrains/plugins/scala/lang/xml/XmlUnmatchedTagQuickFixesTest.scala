@@ -9,34 +9,31 @@ import org.jetbrains.plugins.scala.codeInspection.xml.ScalaXmlUnmatchedTagInspec
   * Date: 4/13/12
   */
 class XmlUnmatchedTagQuickFixesTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
   val renameOpeningQuickFixHint = ScalaBundle.message("xml.rename.opening.tag")
   val renameClosingQuickFixHint = ScalaBundle.message("xml.rename.closing.tag")
   val deleteUnmatchedTagHint = ScalaBundle.message("xml.delete.unmatched.tag")
 
-  private def check(text: String, assumedStub: String, hint: String) {
+  private def check(text: String, assumedStub: String, hint: String)
     testQuickFix(text.replace("\r", ""),
                  assumedStub.replace("\r", ""),
                  hint,
                  classOf[ScalaXmlUnmatchedTagInspection])
-  }
 
-  def testSimple() {
+  def testSimple()
     val text = "val xml = <a>blah</b>"
     val assumedStub = "val xml = <a>blah</a>"
 
     check(text, assumedStub, renameClosingQuickFixHint)
-  }
 
-  def testWithAttributes() {
+  def testWithAttributes()
     val text = """val xml = <aaa attr1="1" attr2="attr2">blah blah</bbb>"""
     val assumedStub =
       """val xml = <bbb attr1="1" attr2="attr2">blah blah</bbb>"""
 
     check(text, assumedStub, renameOpeningQuickFixHint)
-  }
 
-  def testNested() {
+  def testNested()
     val text = """
         val xml = <aaa attr1="1">
                     <bbb>blah blah</bbb>
@@ -59,9 +56,8 @@ class XmlUnmatchedTagQuickFixesTest
       """
 
     check(text, assumedStub, renameOpeningQuickFixHint)
-  }
 
-  def testInsideCase() {
+  def testInsideCase()
     val text = """
         <aa></aa> match {
           case <aaa><bbb>{1 + 2 + i}</ccc></aaa> =>
@@ -76,5 +72,3 @@ class XmlUnmatchedTagQuickFixesTest
       """
 
     check(text, assumedStub, renameClosingQuickFixHint)
-  }
-}

@@ -22,17 +22,16 @@ import java.util.Random
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
-class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext {
+class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext
 
   import StopwatchSuite._
 
-  private def testStopwatchOnDriver(sw: Stopwatch): Unit = {
+  private def testStopwatchOnDriver(sw: Stopwatch): Unit =
     assert(sw.name === "sw")
     assert(sw.elapsed() === 0L)
     assert(!sw.isRunning)
-    intercept[AssertionError] {
+    intercept[AssertionError]
       sw.stop()
-    }
     val duration = checkStopwatch(sw)
     val elapsed = sw.elapsed()
     assert(elapsed === duration)
@@ -42,40 +41,33 @@ class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(sw.toString === s"sw: ${elapsed2}ms")
     sw.start()
     assert(sw.isRunning)
-    intercept[AssertionError] {
+    intercept[AssertionError]
       sw.start()
-    }
-  }
 
-  test("LocalStopwatch") {
+  test("LocalStopwatch")
     val sw = new LocalStopwatch("sw")
     testStopwatchOnDriver(sw)
-  }
 
-  test("DistributedStopwatch on driver") {
+  test("DistributedStopwatch on driver")
     val sw = new DistributedStopwatch(sc, "sw")
     testStopwatchOnDriver(sw)
-  }
 
-  test("DistributedStopwatch on executors") {
+  test("DistributedStopwatch on executors")
     val sw = new DistributedStopwatch(sc, "sw")
     val rdd = sc.parallelize(0 until 4, 4)
     val acc = sc.accumulator(0L)
-    rdd.foreach { i =>
+    rdd.foreach  i =>
       acc += checkStopwatch(sw)
-    }
     assert(!sw.isRunning)
     val elapsed = sw.elapsed()
     assert(elapsed === acc.value)
-  }
 
-  test("MultiStopwatch") {
+  test("MultiStopwatch")
     val sw = new MultiStopwatch(sc).addLocal("local").addDistributed("spark")
     assert(sw("local").name === "local")
     assert(sw("spark").name === "spark")
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       sw("some")
-    }
     assert(sw.toString === "{\n  local: 0ms,\n  spark: 0ms\n}")
     val localDuration = checkStopwatch(sw("local"))
     val sparkDuration = checkStopwatch(sw("spark"))
@@ -87,26 +79,23 @@ class StopwatchSuite extends SparkFunSuite with MLlibTestSparkContext {
         sw.toString === s"{\n  local: ${localElapsed}ms,\n  spark: ${sparkElapsed}ms\n}")
     val rdd = sc.parallelize(0 until 4, 4)
     val acc = sc.accumulator(0L)
-    rdd.foreach { i =>
+    rdd.foreach  i =>
       sw("local").start()
       val duration = checkStopwatch(sw("spark"))
       sw("local").stop()
       acc += duration
-    }
     val localElapsed2 = sw("local").elapsed()
     assert(localElapsed2 === localElapsed)
     val sparkElapsed2 = sw("spark").elapsed()
     assert(sparkElapsed2 === sparkElapsed + acc.value)
-  }
-}
 
-private object StopwatchSuite extends SparkFunSuite {
+private object StopwatchSuite extends SparkFunSuite
 
   /**
     * Checks the input stopwatch on a task that takes a random time (<10ms) to finish. Validates and
     * returns the duration reported by the stopwatch.
     */
-  def checkStopwatch(sw: Stopwatch): Long = {
+  def checkStopwatch(sw: Stopwatch): Long =
     val ubStart = now
     sw.start()
     val lbStart = now
@@ -116,8 +105,6 @@ private object StopwatchSuite extends SparkFunSuite {
     val ub = now - ubStart
     assert(duration >= lb && duration <= ub)
     duration
-  }
 
   /** The current time in milliseconds. */
   private def now: Long = System.currentTimeMillis()
-}

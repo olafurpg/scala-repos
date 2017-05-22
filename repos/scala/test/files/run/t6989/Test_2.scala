@@ -8,26 +8,22 @@ import scala.reflect.runtime.universe._
 // I'm leaving the incorrect results of FromJavaClassCompleters in the check
 // file, so that we get notified when something changes there.
 
-package object foo {
-  def testAll(): Unit = {
+package object foo
+  def testAll(): Unit =
     test(typeOf[foo.PackagePrivateJavaClass].typeSymbol)
     test(typeOf[foo.PackagePrivateJavaClass].typeSymbol.companion)
     test(typeOf[foo.JavaClass_1].typeSymbol)
     test(typeOf[foo.JavaClass_1].typeSymbol.companion)
-  }
 
-  def test(sym: Symbol): Unit = {
+  def test(sym: Symbol): Unit =
     printSymbolDetails(sym)
-    if (sym.isClass || sym.isModule) {
+    if (sym.isClass || sym.isModule)
       sym.info.decls.toList.sortBy(_.name.toString) foreach test
-    }
-  }
 
-  def printSymbolDetails(sym: Symbol): Unit = {
-    def stableSignature(sym: Symbol) = sym.info match {
+  def printSymbolDetails(sym: Symbol): Unit =
+    def stableSignature(sym: Symbol) = sym.info match
       case ClassInfoType(_, _, _) => "ClassInfoType(...)"
       case tpe => tpe.toString
-    }
     println("============")
     println(
         s"sym = $sym, signature = ${stableSignature(sym)}, owner = ${sym.owner}")
@@ -35,9 +31,6 @@ package object foo {
     println(s"isProtected = ${sym.isProtected}")
     println(s"isPublic = ${sym.isPublic}")
     println(s"privateWithin = ${sym.privateWithin}")
-  }
-}
 
-object Test extends App {
+object Test extends App
   foo.testAll()
-}

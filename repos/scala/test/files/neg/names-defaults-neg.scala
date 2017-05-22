@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   // TESTS
 
   // re-ordering
@@ -26,23 +26,20 @@ object Test extends App {
   test3(b = 3, a = 1)(3)
 
   // overloading resolution
-  object t1 {
+  object t1
     def f(a: Int, b: String) = "first"
     def f(b: String, a: Int) = "second"
-  }
   t1.f(b = "dkljf", a = 1)
 
-  object t3 {
+  object t3
     def f(a1: Int) = "first"
     def f(a2: Int)(b: Int) = "second"
-  }
   t3.f(1)
   t3.f(1)(2)
 
-  object t7 {
+  object t7
     def g(a: C, b: Int*) = "third"
     def g(a: B) = "fourth"
-  }
   t7.g(new C()) // ambiguous reference
 
   // vararg
@@ -51,10 +48,9 @@ object Test extends App {
   test5(1, "2", b = 3)
   test5(b = "dlkj")
 
-  object t8 {
+  object t8
     def f(a: Int, b: Object) = "first"
     def f(b: String, a: Int) = "second"
-  }
   println(t8.f(a = 0, b = "1")) // ambiguous reference
 
   // case class copy does not exist if there's a vararg
@@ -76,10 +72,9 @@ object Test extends App {
   // correct error message
   new A2[String]()
 
-  object t3648 {
+  object t3648
     class C(val s: String = "")
     object C extends C()
-  }
 
   // deprecated names
   def deprNam1(x: Int, @deprecatedName('x) y: String) = 0
@@ -102,19 +97,16 @@ object Test extends App {
   def test3(a: Int, b: Int) = a + b
   def test7(m: Int) = m
   def test8[T](x: => T) = println("test8")
-}
 
-class B {
+class B
   def foo(a: Int) = a
   def bar(u: String = "ldksj") = u
-}
 
-class C extends B {
+class C extends B
   override def foo(a: Int = 1092) = a
   def foo(b: String = "lskdfj")
 
   def bar(i: Int = 129083) = i
-}
 
 case class Fact(a: Int, b: String)(c: Int*)
 
@@ -123,7 +115,7 @@ case class A1(x: Int = 1, y: String = "2")
 class A2[T](a: T = 1)
 
 // anonymous functions
-object anfun {
+object anfun
   var var2 = 0
   def delay(var2: => Unit) { var2 }
   delay(var2 = 40)
@@ -132,9 +124,8 @@ object anfun {
   val taf2: Int => Unit = testAnnFun(a = _, b = get("+"))
   val taf3 = testAnnFun(b = _: String, a = get(8))
   val taf4: (Int, String) => Unit = testAnnFun(_, b = _)
-}
 
-object t3685 {
+object t3685
   object t { def f(x: Int) = x }
 
   def t1 { def x = t.f(x = 1) }
@@ -178,4 +169,3 @@ object t3685 {
   class u19 { def x: Int = u.f(x = "32") }
   class u20 { val x: Int = u.f(x = "32") }
   class u21 { var x: Int = u.f(x = "32") }
-}

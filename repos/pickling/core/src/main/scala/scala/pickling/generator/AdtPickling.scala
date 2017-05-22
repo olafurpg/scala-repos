@@ -4,18 +4,18 @@ package generator
 /** This algorithm isnpects symbols to determine if we have an abstract class with fully known sub-classes,
   * in which case we delegate behavior to the subclasses.
   */
-private[pickling] object AdtPickling extends PicklingAlgorithm {
+private[pickling] object AdtPickling extends PicklingAlgorithm
 
   /**
     * Attempts to construct pickling logic for a given type.
     */
   override def generate(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
-    if (!tpe.isAbstract) {
+      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult =
+    if (!tpe.isAbstract)
       AlgorithmFailure(
           s"Cannot use ADT algorithm because $tpe is not abstract")
-    } else
-      tpe.closedSubclasses match {
+    else
+      tpe.closedSubclasses match
         case scala.util.Failure(msgs) =>
           // TODO - SHould we warn here, or collect errors for later?
           AlgorithmFailure(
@@ -30,6 +30,3 @@ private[pickling] object AdtPickling extends PicklingAlgorithm {
           val unpickle = UnpickleBehavior(
               Seq(SubclassUnpicklerDelegation(subclasses, tpe)))
           AlgorithmSucccess(PickleUnpickleImplementation(pickle, unpickle))
-      }
-  }
-}

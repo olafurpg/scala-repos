@@ -6,7 +6,7 @@ package play.utils
 import java.sql._
 import java.util.logging.Logger
 
-class ProxyDriver(proxied: Driver) extends Driver {
+class ProxyDriver(proxied: Driver) extends Driver
 
   def acceptsURL(url: String) = proxied.acceptsURL(url)
   def connect(user: String, properties: java.util.Properties) =
@@ -17,4 +17,3 @@ class ProxyDriver(proxied: Driver) extends Driver {
     proxied.getPropertyInfo(user, properties)
   def jdbcCompliant() = proxied.jdbcCompliant
   def getParentLogger(): Logger = null
-}

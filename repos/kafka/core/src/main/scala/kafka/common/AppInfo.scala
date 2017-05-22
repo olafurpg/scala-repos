@@ -20,31 +20,24 @@ import com.yammer.metrics.core.Gauge
 import kafka.metrics.KafkaMetricsGroup
 import org.apache.kafka.common.utils.AppInfoParser
 
-object AppInfo extends KafkaMetricsGroup {
+object AppInfo extends KafkaMetricsGroup
   private var isRegistered = false
   private val lock = new Object()
 
-  def registerInfo(): Unit = {
-    lock.synchronized {
-      if (isRegistered) {
+  def registerInfo(): Unit =
+    lock.synchronized
+      if (isRegistered)
         return
-      }
-    }
 
-    newGauge("Version", new Gauge[String] {
-      def value = {
+    newGauge("Version", new Gauge[String]
+      def value =
         AppInfoParser.getVersion()
-      }
-    })
+    )
 
-    newGauge("CommitID", new Gauge[String] {
-      def value = {
+    newGauge("CommitID", new Gauge[String]
+      def value =
         AppInfoParser.getCommitId();
-      }
-    })
+    )
 
-    lock.synchronized {
+    lock.synchronized
       isRegistered = true
-    }
-  }
-}

@@ -25,7 +25,7 @@ import org.scalatest.prop._
 @RunWith(classOf[JUnitRunner])
 class StudentsTTest
     extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with HasCdfTestBase {
+    with MomentsTestBase[Double] with HasCdfTestBase
   import org.scalacheck.Arbitrary.arbitrary
 
   override val numSamples = 40000
@@ -34,11 +34,9 @@ class StudentsTTest
 
   def fromDouble(x: Double) = x
 
-  implicit def arbDistr = Arbitrary {
-    for (dof <- arbitrary[Double].map { x =>
+  implicit def arbDistr = Arbitrary
+    for (dof <- arbitrary[Double].map  x =>
       math.abs(x) % 1000.0 + 3.0
-    }) yield new StudentsT(dof)(RandBasis.mt0)
-  }
+    ) yield new StudentsT(dof)(RandBasis.mt0)
 
   override type Distr = StudentsT
-}

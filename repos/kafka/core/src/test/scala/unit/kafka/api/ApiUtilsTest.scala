@@ -24,16 +24,15 @@ import java.nio.ByteBuffer
 import kafka.common.KafkaException
 import kafka.utils.TestUtils
 
-object ApiUtilsTest {
+object ApiUtilsTest
   val rnd: Random = new Random()
-}
 
-class ApiUtilsTest extends JUnitSuite {
+class ApiUtilsTest extends JUnitSuite
 
   @Test
-  def testShortStringNonASCII() {
+  def testShortStringNonASCII()
     // Random-length strings
-    for (i <- 0 to 100) {
+    for (i <- 0 to 100)
       // Since we're using UTF-8 encoding, each encoded byte will be one to four bytes long 
       val s: String = ApiUtilsTest.rnd.nextString(
           math.abs(ApiUtilsTest.rnd.nextInt()) % (Short.MaxValue / 4))
@@ -41,20 +40,17 @@ class ApiUtilsTest extends JUnitSuite {
       ApiUtils.writeShortString(bb, s)
       bb.rewind()
       assertEquals(s, ApiUtils.readShortString(bb))
-    }
-  }
 
   @Test
-  def testShortStringASCII() {
+  def testShortStringASCII()
     // Random-length strings
-    for (i <- 0 to 100) {
+    for (i <- 0 to 100)
       val s: String = TestUtils.randomString(
           math.abs(ApiUtilsTest.rnd.nextInt()) % Short.MaxValue)
       val bb: ByteBuffer = ByteBuffer.allocate(ApiUtils.shortStringLength(s))
       ApiUtils.writeShortString(bb, s)
       bb.rewind()
       assertEquals(s, ApiUtils.readShortString(bb))
-    }
 
     // Max size string
     val s1: String = TestUtils.randomString(Short.MaxValue)
@@ -65,21 +61,15 @@ class ApiUtilsTest extends JUnitSuite {
 
     // One byte too big
     val s2: String = TestUtils.randomString(Short.MaxValue + 1)
-    try {
+    try
       ApiUtils.shortStringLength(s2)
       fail
-    } catch {
-      case e: KafkaException => {
+    catch
+      case e: KafkaException =>
           // ok
-        }
-    }
-    try {
+    try
       ApiUtils.writeShortString(bb, s2)
       fail
-    } catch {
-      case e: KafkaException => {
+    catch
+      case e: KafkaException =>
           // ok
-        }
-    }
-  }
-}

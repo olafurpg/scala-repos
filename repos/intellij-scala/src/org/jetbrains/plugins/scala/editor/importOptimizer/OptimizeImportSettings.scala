@@ -14,9 +14,9 @@ case class OptimizeImportSettings(addFullQualifiedImports: Boolean,
                                   spacesInImports: Boolean,
                                   classCountToUseImportOnDemand: Int,
                                   importLayout: Array[String],
-                                  isAlwaysUsedImport: String => Boolean) {
+                                  isAlwaysUsedImport: String => Boolean)
 
-  private def this(s: ScalaCodeStyleSettings) {
+  private def this(s: ScalaCodeStyleSettings)
     this(
         s.isAddFullQualifiedImports,
         s.isDoNotChangeLocalImportsOnOptimize,
@@ -28,10 +28,7 @@ case class OptimizeImportSettings(addFullQualifiedImports: Boolean,
         s.getImportLayout,
         s.isAlwaysUsedImport
     )
-  }
-}
 
-object OptimizeImportSettings {
+object OptimizeImportSettings
   def apply(project: Project) =
     new OptimizeImportSettings(ScalaCodeStyleSettings.getInstance(project))
-}

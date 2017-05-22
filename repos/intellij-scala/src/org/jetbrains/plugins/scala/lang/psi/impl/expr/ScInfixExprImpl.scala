@@ -19,26 +19,23 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScInfixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScInfixExpr {
+    extends ScalaPsiElementImpl(node) with ScInfixExpr
   override def toString: String = "InfixExpression"
 
-  override def argumentExpressions: Seq[ScExpression] = {
+  override def argumentExpressions: Seq[ScExpression] =
     if (isLeftAssoc) Seq(lOp)
     else
-      rOp match {
+      rOp match
         case tuple: ScTuple => tuple.exprs
         case t: ScParenthesisedExpr =>
-          t.expr match {
+          t.expr match
             case Some(expr) => Seq(expr)
             case None => Seq(t)
-          }
         case unit: ScUnitExpr => Seq.empty
         case expr => Seq(expr)
-      }
-  }
 
-  protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
-    operation.bind() match {
+  protected override def innerType(ctx: TypingContext): TypeResult[ScType] =
+    operation.bind() match
       //this is assignment statement: x += 1 equals to x = x + 1
       case Some(r) if r.element.name + "=" == operation.refName =>
         super.innerType(ctx)
@@ -50,17 +47,11 @@ class ScInfixExprImpl(node: ASTNode)
               exprText, getContext, this)
         newExpr.getType(TypingContext.empty)
       case _ => super.innerType(ctx)
-    }
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitInfixExpression(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => visitor.visitInfixExpression(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

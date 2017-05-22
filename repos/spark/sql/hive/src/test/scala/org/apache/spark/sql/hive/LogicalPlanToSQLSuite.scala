@@ -23,10 +23,10 @@ import org.apache.spark.sql.Column
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SQLTestUtils
 
-class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
+class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils
   import testImplicits._
 
-  protected override def beforeAll(): Unit = {
+  protected override def beforeAll(): Unit =
     sql("DROP TABLE IF EXISTS parquet_t0")
     sql("DROP TABLE IF EXISTS parquet_t1")
     sql("DROP TABLE IF EXISTS parquet_t2")
@@ -47,9 +47,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
       .write
       .saveAsTable("parquet_t2")
 
-    def createArray(id: Column): Column = {
+    def createArray(id: Column): Column =
       when(id % 3 === 0, lit(null)).otherwise(array('id, 'id + 1))
-    }
 
     sqlContext
       .range(10)
@@ -61,20 +60,18 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
       )
       .write
       .saveAsTable("parquet_t3")
-  }
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     sql("DROP TABLE IF EXISTS parquet_t0")
     sql("DROP TABLE IF EXISTS parquet_t1")
     sql("DROP TABLE IF EXISTS parquet_t2")
     sql("DROP TABLE IF EXISTS parquet_t3")
     sql("DROP TABLE IF EXISTS t0")
-  }
 
-  private def checkHiveQl(hiveQl: String): Unit = {
+  private def checkHiveQl(hiveQl: String): Unit =
     val df = sql(hiveQl)
 
-    val convertedSQL = try new SQLBuilder(df).toSQL catch {
+    val convertedSQL = try new SQLBuilder(df).toSQL catch
       case NonFatal(e) =>
         fail(
             s"""Cannot convert the following HiveQL query plan back to SQL query string:
@@ -85,11 +82,10 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
              |# Resolved query plan:
              |${df.queryExecution.analyzed.treeString}
            """.stripMargin, e)
-    }
 
-    try {
+    try
       checkAnswer(sql(convertedSQL), df)
-    } catch {
+    catch
       case cause: Throwable =>
         fail(s"""Failed to execute converted SQL string or got wrong answer:
            |
@@ -102,100 +98,80 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
            |# Resolved query plan:
            |${df.queryExecution.analyzed.treeString}
          """.stripMargin, cause)
-    }
-  }
 
-  test("in") {
+  test("in")
     checkHiveQl("SELECT id FROM parquet_t0 WHERE id IN (1, 2, 3)")
-  }
 
-  test("not in") {
+  test("not in")
     checkHiveQl("SELECT id FROM t0 WHERE id NOT IN (1, 2, 3)")
-  }
 
-  test("not like") {
+  test("not like")
     checkHiveQl("SELECT id FROM t0 WHERE id + 5 NOT LIKE '1%'")
-  }
 
-  test("aggregate function in having clause") {
+  test("aggregate function in having clause")
     checkHiveQl(
         "SELECT COUNT(value) FROM parquet_t1 GROUP BY key HAVING MAX(key) > 0")
-  }
 
-  test("aggregate function in order by clause") {
+  test("aggregate function in order by clause")
     checkHiveQl(
         "SELECT COUNT(value) FROM parquet_t1 GROUP BY key ORDER BY MAX(key)")
-  }
 
   // When there are multiple aggregate functions in ORDER BY clause, all of them are extracted into
   // Aggregate operator and aliased to the same name "aggOrder".  This is OK for normal query
   // execution since these aliases have different expression ID.  But this introduces name collision
   // when converting resolved plans back to SQL query strings as expression IDs are stripped.
-  test("aggregate function in order by clause with multiple order keys") {
+  test("aggregate function in order by clause with multiple order keys")
     checkHiveQl(
         "SELECT COUNT(value) FROM parquet_t1 GROUP BY key ORDER BY key, MAX(key)")
-  }
 
-  test("type widening in union") {
+  test("type widening in union")
     checkHiveQl(
         "SELECT id FROM parquet_t0 UNION ALL SELECT CAST(id AS INT) AS id FROM parquet_t0")
-  }
 
-  test("union distinct") {
+  test("union distinct")
     checkHiveQl("SELECT * FROM t0 UNION SELECT * FROM t0")
-  }
 
-  test("three-child union") {
+  test("three-child union")
     checkHiveQl("""
         |SELECT id FROM parquet_t0
         |UNION ALL SELECT id FROM parquet_t0
         |UNION ALL SELECT id FROM parquet_t0
       """.stripMargin)
-  }
 
-  test("intersect") {
+  test("intersect")
     checkHiveQl("SELECT * FROM t0 INTERSECT SELECT * FROM t0")
-  }
 
-  test("except") {
+  test("except")
     checkHiveQl("SELECT * FROM t0 EXCEPT SELECT * FROM t0")
-  }
 
-  test("self join") {
+  test("self join")
     checkHiveQl(
         "SELECT x.key FROM parquet_t1 x JOIN parquet_t1 y ON x.key = y.key")
-  }
 
-  test("self join with group by") {
+  test("self join with group by")
     checkHiveQl(
         "SELECT x.key, COUNT(*) FROM parquet_t1 x JOIN parquet_t1 y ON x.key = y.key group by x.key")
-  }
 
-  test("case") {
+  test("case")
     checkHiveQl(
         "SELECT CASE WHEN id % 2 > 0 THEN 0 WHEN id % 2 = 0 THEN 1 END FROM parquet_t0")
-  }
 
-  test("case with else") {
+  test("case with else")
     checkHiveQl(
         "SELECT CASE WHEN id % 2 > 0 THEN 0 ELSE 1 END FROM parquet_t0")
-  }
 
-  test("case with key") {
+  test("case with key")
     checkHiveQl(
         "SELECT CASE id WHEN 0 THEN 'foo' WHEN 1 THEN 'bar' END FROM parquet_t0")
-  }
 
-  test("case with key and else") {
+  test("case with key and else")
     checkHiveQl(
         "SELECT CASE id WHEN 0 THEN 'foo' WHEN 1 THEN 'bar' ELSE 'baz' END FROM parquet_t0")
-  }
 
-  test("select distinct without aggregate functions") {
+  test("select distinct without aggregate functions")
     checkHiveQl("SELECT DISTINCT id FROM parquet_t0")
-  }
 
-  test("rollup/cube #1") {
+  test("rollup/cube #1")
     // Original logical plan:
     //   Aggregate [(key#17L % cast(5 as bigint))#47L,grouping__id#46],
     //             [(count(1),mode=Complete,isDistinct=false) AS cnt#43L,
@@ -220,23 +196,20 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         "SELECT count(*) as cnt, key%5, grouping_id() FROM parquet_t1 GROUP BY key % 5 WITH ROLLUP")
     checkHiveQl(
         "SELECT count(*) as cnt, key%5, grouping_id() FROM parquet_t1 GROUP BY key % 5 WITH CUBE")
-  }
 
-  test("rollup/cube #2") {
+  test("rollup/cube #2")
     checkHiveQl(
         "SELECT key, value, count(value) FROM parquet_t1 GROUP BY key, value WITH ROLLUP")
     checkHiveQl(
         "SELECT key, value, count(value) FROM parquet_t1 GROUP BY key, value WITH CUBE")
-  }
 
-  test("rollup/cube #3") {
+  test("rollup/cube #3")
     checkHiveQl(
         "SELECT key, count(value), grouping_id() FROM parquet_t1 GROUP BY key, value WITH ROLLUP")
     checkHiveQl(
         "SELECT key, count(value), grouping_id() FROM parquet_t1 GROUP BY key, value WITH CUBE")
-  }
 
-  test("rollup/cube #4") {
+  test("rollup/cube #4")
     checkHiveQl(s"""
         |SELECT count(*) as cnt, key % 5 as k1, key - 5 as k2, grouping_id() FROM parquet_t1
         |GROUP BY key % 5, key - 5 WITH ROLLUP
@@ -245,9 +218,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |SELECT count(*) as cnt, key % 5 as k1, key - 5 as k2, grouping_id() FROM parquet_t1
         |GROUP BY key % 5, key - 5 WITH CUBE
       """.stripMargin)
-  }
 
-  test("rollup/cube #5") {
+  test("rollup/cube #5")
     checkHiveQl(s"""
         |SELECT count(*) AS cnt, key % 5 AS k1, key - 5 AS k2, grouping_id(key % 5, key - 5) AS k3
         |FROM (SELECT key, key%2, key - 5 FROM parquet_t1) t GROUP BY key%5, key-5
@@ -258,9 +230,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |FROM (SELECT key, key % 2, key - 5 FROM parquet_t1) t GROUP BY key % 5, key - 5
         |WITH CUBE
       """.stripMargin)
-  }
 
-  test("rollup/cube #6") {
+  test("rollup/cube #6")
     checkHiveQl(
         "SELECT a, b, sum(c) FROM parquet_t2 GROUP BY ROLLUP(a, b) ORDER BY a, b")
     checkHiveQl(
@@ -273,16 +244,14 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         "SELECT a + b, b, sum(a - b) FROM parquet_t2 GROUP BY a + b, b WITH ROLLUP")
     checkHiveQl(
         "SELECT a + b, b, sum(a - b) FROM parquet_t2 GROUP BY a + b, b WITH CUBE")
-  }
 
-  test("rollup/cube #7") {
+  test("rollup/cube #7")
     checkHiveQl(
         "SELECT a, b, grouping_id(a, b) FROM parquet_t2 GROUP BY cube(a, b)")
     checkHiveQl("SELECT a, b, grouping(b) FROM parquet_t2 GROUP BY cube(a, b)")
     checkHiveQl("SELECT a, b, grouping(a) FROM parquet_t2 GROUP BY cube(a, b)")
-  }
 
-  test("rollup/cube #8") {
+  test("rollup/cube #8")
     // grouping_id() is part of another expression
     checkHiveQl(s"""
          |SELECT hkey AS k1, value - 5 AS k2, hash(grouping_id()) AS hgid
@@ -294,9 +263,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
          |FROM (SELECT hash(key) as hkey, key as value FROM parquet_t1) t GROUP BY hkey, value-5
          |WITH CUBE
       """.stripMargin)
-  }
 
-  test("rollup/cube #9") {
+  test("rollup/cube #9")
     // self join is used as the child node of ROLLUP/CUBE with replaced quantifiers
     checkHiveQl(s"""
          |SELECT t.key - 5, cnt, SUM(cnt)
@@ -312,17 +280,15 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
          |GROUP BY cnt, t.key - 5
          |WITH CUBE
       """.stripMargin)
-  }
 
-  test("grouping sets #1") {
+  test("grouping sets #1")
     checkHiveQl(s"""
          |SELECT count(*) AS cnt, key % 5 AS k1, key - 5 AS k2, grouping_id() AS k3
          |FROM (SELECT key, key % 2, key - 5 FROM parquet_t1) t GROUP BY key % 5, key - 5
          |GROUPING SETS (key % 5, key - 5)
       """.stripMargin)
-  }
 
-  test("grouping sets #2") {
+  test("grouping sets #2")
     checkHiveQl(
         "SELECT a, b, sum(c) FROM parquet_t2 GROUP BY a, b GROUPING SETS (a, b) ORDER BY a, b")
     checkHiveQl(
@@ -335,30 +301,24 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
          |SELECT a, b, sum(c) FROM parquet_t2 GROUP BY a, b
          |GROUPING SETS ((), (a), (a, b)) ORDER BY a, b
       """.stripMargin)
-  }
 
-  test("cluster by") {
+  test("cluster by")
     checkHiveQl("SELECT id FROM parquet_t0 CLUSTER BY id")
-  }
 
-  test("distribute by") {
+  test("distribute by")
     checkHiveQl("SELECT id FROM parquet_t0 DISTRIBUTE BY id")
-  }
 
-  test("distribute by with sort by") {
+  test("distribute by with sort by")
     checkHiveQl("SELECT id FROM parquet_t0 DISTRIBUTE BY id SORT BY id")
-  }
 
-  test("SPARK-13720: sort by after having") {
+  test("SPARK-13720: sort by after having")
     checkHiveQl(
         "SELECT COUNT(value) FROM parquet_t1 GROUP BY key HAVING MAX(key) > 0 SORT BY key")
-  }
 
-  test("distinct aggregation") {
+  test("distinct aggregation")
     checkHiveQl("SELECT COUNT(DISTINCT id) FROM parquet_t0")
-  }
 
-  test("TABLESAMPLE") {
+  test("TABLESAMPLE")
     // Project [id#2L]
     // +- Sample 0.0, 1.0, false, ...
     //    +- Subquery s
@@ -388,59 +348,49 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkHiveQl(
         "SELECT s.id FROM parquet_t0 TABLESAMPLE(0.1 PERCENT) s WHERE 1=0")
     checkHiveQl("SELECT * FROM parquet_t0 TABLESAMPLE(0.1 PERCENT) WHERE 1=0")
-  }
 
-  test("multi-distinct columns") {
+  test("multi-distinct columns")
     checkHiveQl(
         "SELECT a, COUNT(DISTINCT b), COUNT(DISTINCT c), SUM(d) FROM parquet_t2 GROUP BY a")
-  }
 
-  test("persisted data source relations") {
-    Seq("orc", "json", "parquet").foreach { format =>
+  test("persisted data source relations")
+    Seq("orc", "json", "parquet").foreach  format =>
       val tableName = s"${format}_parquet_t0"
-      withTable(tableName) {
+      withTable(tableName)
         sqlContext.range(10).write.format(format).saveAsTable(tableName)
         checkHiveQl(s"SELECT id FROM $tableName")
-      }
-    }
-  }
 
-  test("script transformation - schemaless") {
+  test("script transformation - schemaless")
     checkHiveQl("SELECT TRANSFORM (a, b, c, d) USING 'cat' FROM parquet_t2")
     checkHiveQl("SELECT TRANSFORM (*) USING 'cat' FROM parquet_t2")
-  }
 
-  test("script transformation - alias list") {
+  test("script transformation - alias list")
     checkHiveQl(
         "SELECT TRANSFORM (a, b, c, d) USING 'cat' AS (d1, d2, d3, d4) FROM parquet_t2")
-  }
 
-  test("script transformation - alias list with type") {
+  test("script transformation - alias list with type")
     checkHiveQl("""FROM
         |(FROM parquet_t1 SELECT TRANSFORM(key, value) USING 'cat' AS (thing1 int, thing2 string)) t
         |SELECT thing1 + 1
       """.stripMargin)
-  }
 
   test(
-      "script transformation - row format delimited clause with only one format property") {
+      "script transformation - row format delimited clause with only one format property")
     checkHiveQl("""SELECT TRANSFORM (key) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
         |USING 'cat' AS (tKey) ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
         |FROM parquet_t1
       """.stripMargin)
-  }
 
   test(
-      "script transformation - row format delimited clause with multiple format properties") {
+      "script transformation - row format delimited clause with multiple format properties")
     checkHiveQl("""SELECT TRANSFORM (key)
         |ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\t'
         |USING 'cat' AS (tKey)
         |ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t' LINES TERMINATED BY '\t'
         |FROM parquet_t1
       """.stripMargin)
-  }
 
-  test("script transformation - row format serde clauses with SERDEPROPERTIES") {
+  test("script transformation - row format serde clauses with SERDEPROPERTIES")
     checkHiveQl("""SELECT TRANSFORM (key, value)
         |ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
         |WITH SERDEPROPERTIES('field.delim' = '|')
@@ -449,29 +399,25 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |WITH SERDEPROPERTIES('field.delim' = '|')
         |FROM parquet_t1
       """.stripMargin)
-  }
 
   test(
-      "script transformation - row format serde clauses without SERDEPROPERTIES") {
+      "script transformation - row format serde clauses without SERDEPROPERTIES")
     checkHiveQl("""SELECT TRANSFORM (key, value)
         |ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
         |USING 'cat' AS (tKey, tValue)
         |ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
         |FROM parquet_t1
       """.stripMargin)
-  }
 
-  test("plans with non-SQL expressions") {
+  test("plans with non-SQL expressions")
     sqlContext.udf.register("foo", (_: Int) * 2)
     intercept[UnsupportedOperationException](
         new SQLBuilder(sql("SELECT foo(id) FROM t0")).toSQL)
-  }
 
-  test("named expression in column names shouldn't be quoted") {
-    def checkColumnNames(query: String, expectedColNames: String*): Unit = {
+  test("named expression in column names shouldn't be quoted")
+    def checkColumnNames(query: String, expectedColNames: String*): Unit =
       checkHiveQl(query)
       assert(sql(query).columns === expectedColNames)
-    }
 
     // Attributes
     checkColumnNames(
@@ -538,9 +484,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         "c[foo]",
         "d[0]"
     )
-  }
 
-  test("window basic") {
+  test("window basic")
     checkHiveQl(
         "SELECT MAX(value) OVER (PARTITION BY key % 3) FROM parquet_t1")
     checkHiveQl("""
@@ -551,79 +496,69 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
          |SELECT value, MAX(key + 1) OVER (PARTITION BY key % 5 ORDER BY key % 7) AS max
          |FROM parquet_t1
       """.stripMargin)
-  }
 
-  test("multiple window functions in one expression") {
+  test("multiple window functions in one expression")
     checkHiveQl("""
         |SELECT
         |  MAX(key) OVER (ORDER BY key DESC, value) / MIN(key) OVER (PARTITION BY key % 3)
         |FROM parquet_t1
       """.stripMargin)
-  }
 
-  test("regular expressions and window functions in one expression") {
+  test("regular expressions and window functions in one expression")
     checkHiveQl(
         "SELECT MAX(key) OVER (PARTITION BY key % 3) + key FROM parquet_t1")
-  }
 
-  test("aggregate functions and window functions in one expression") {
+  test("aggregate functions and window functions in one expression")
     checkHiveQl(
         "SELECT MAX(c) + COUNT(a) OVER () FROM parquet_t2 GROUP BY a, b")
-  }
 
-  test("window with different window specification") {
+  test("window with different window specification")
     checkHiveQl("""
          |SELECT key, value,
          |DENSE_RANK() OVER (ORDER BY key, value) AS dr,
          |MAX(value) OVER (PARTITION BY key ORDER BY key ASC) AS max
          |FROM parquet_t1
       """.stripMargin)
-  }
 
-  test("window with the same window specification with aggregate + having") {
+  test("window with the same window specification with aggregate + having")
     checkHiveQl("""
          |SELECT key, value,
          |MAX(value) OVER (PARTITION BY key % 5 ORDER BY key DESC) AS max
          |FROM parquet_t1 GROUP BY key, value HAVING key > 5
       """.stripMargin)
-  }
 
-  test("window with the same window specification with aggregate functions") {
+  test("window with the same window specification with aggregate functions")
     checkHiveQl("""
          |SELECT key, value,
          |MAX(value) OVER (PARTITION BY key % 5 ORDER BY key) AS max
          |FROM parquet_t1 GROUP BY key, value
       """.stripMargin)
-  }
 
-  test("window with the same window specification with aggregate") {
+  test("window with the same window specification with aggregate")
     checkHiveQl("""
          |SELECT key, value,
          |DENSE_RANK() OVER (DISTRIBUTE BY key SORT BY key, value) AS dr,
          |COUNT(key)
          |FROM parquet_t1 GROUP BY key, value
       """.stripMargin)
-  }
 
   test(
-      "window with the same window specification without aggregate and filter") {
+      "window with the same window specification without aggregate and filter")
     checkHiveQl("""
          |SELECT key, value,
          |DENSE_RANK() OVER (DISTRIBUTE BY key SORT BY key, value) AS dr,
          |COUNT(key) OVER(DISTRIBUTE BY key SORT BY key, value) AS ca
          |FROM parquet_t1
       """.stripMargin)
-  }
 
-  test("window clause") {
+  test("window clause")
     checkHiveQl("""
          |SELECT key, MAX(value) OVER w1 AS MAX, MIN(value) OVER w2 AS min
          |FROM parquet_t1
          |WINDOW w1 AS (PARTITION BY key % 5 ORDER BY key), w2 AS (PARTITION BY key % 6)
       """.stripMargin)
-  }
 
-  test("special window functions") {
+  test("special window functions")
     checkHiveQl("""
         |SELECT
         |  RANK() OVER w,
@@ -637,52 +572,44 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |FROM parquet_t1
         |WINDOW w AS (PARTITION BY key % 5 ORDER BY key)
       """.stripMargin)
-  }
 
-  test("window with join") {
+  test("window with join")
     checkHiveQl("""
         |SELECT x.key, MAX(y.key) OVER (PARTITION BY x.key % 5 ORDER BY x.key)
         |FROM parquet_t1 x JOIN parquet_t1 y ON x.key = y.key
       """.stripMargin)
-  }
 
-  test("join 2 tables and aggregate function in having clause") {
+  test("join 2 tables and aggregate function in having clause")
     checkHiveQl("""
         |SELECT COUNT(a.value), b.KEY, a.KEY
         |FROM parquet_t1 a, parquet_t1 b
         |GROUP BY a.KEY, b.KEY
         |HAVING MAX(a.KEY) > 0
       """.stripMargin)
-  }
 
-  test("generator in project list without FROM clause") {
+  test("generator in project list without FROM clause")
     checkHiveQl("SELECT EXPLODE(ARRAY(1,2,3))")
     checkHiveQl("SELECT EXPLODE(ARRAY(1,2,3)) AS val")
-  }
 
-  test("generator in project list with non-referenced table") {
+  test("generator in project list with non-referenced table")
     checkHiveQl("SELECT EXPLODE(ARRAY(1,2,3)) FROM t0")
     checkHiveQl("SELECT EXPLODE(ARRAY(1,2,3)) AS val FROM t0")
-  }
 
-  test("generator in project list with referenced table") {
+  test("generator in project list with referenced table")
     checkHiveQl("SELECT EXPLODE(arr) FROM parquet_t3")
     checkHiveQl("SELECT EXPLODE(arr) AS val FROM parquet_t3")
-  }
 
-  test("generator in project list with non-UDTF expressions") {
+  test("generator in project list with non-UDTF expressions")
     checkHiveQl("SELECT EXPLODE(arr), id FROM parquet_t3")
     checkHiveQl("SELECT EXPLODE(arr) AS val, id as a FROM parquet_t3")
-  }
 
-  test("generator in lateral view") {
+  test("generator in lateral view")
     checkHiveQl(
         "SELECT val, id FROM parquet_t3 LATERAL VIEW EXPLODE(arr) exp AS val")
     checkHiveQl(
         "SELECT val, id FROM parquet_t3 LATERAL VIEW OUTER EXPLODE(arr) exp AS val")
-  }
 
-  test("generator in lateral view with ambiguous names") {
+  test("generator in lateral view with ambiguous names")
     checkHiveQl("""
         |SELECT exp.id, parquet_t3.id
         |FROM parquet_t3
@@ -693,9 +620,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |FROM parquet_t3
         |LATERAL VIEW OUTER EXPLODE(arr) exp AS id
       """.stripMargin)
-  }
 
-  test("use JSON_TUPLE as generator") {
+  test("use JSON_TUPLE as generator")
     checkHiveQl("""
         |SELECT c0, c1, c2
         |FROM parquet_t3
@@ -706,9 +632,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |FROM parquet_t3
         |LATERAL VIEW JSON_TUPLE(json, 'f1', 'f2', 'f3') jt AS a, b, c
       """.stripMargin)
-  }
 
-  test("nested generator in lateral view") {
+  test("nested generator in lateral view")
     checkHiveQl("""
         |SELECT val, id
         |FROM parquet_t3
@@ -722,9 +647,8 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |LATERAL VIEW EXPLODE(arr2) exp1 AS nested_array
         |LATERAL VIEW OUTER EXPLODE(nested_array) exp1 AS val
       """.stripMargin)
-  }
 
-  test("generate with other operators") {
+  test("generate with other operators")
     checkHiveQl("""
         |SELECT EXPLODE(arr) AS val, id
         |FROM parquet_t3
@@ -742,10 +666,7 @@ class LogicalPlanToSQLSuite extends SQLBuilderTest with SQLTestUtils {
         |ORDER BY val, id
         |LIMIT 5
       """.stripMargin)
-  }
 
-  test("filter after subquery") {
+  test("filter after subquery")
     checkHiveQl(
         "SELECT a FROM (SELECT key + 1 AS a FROM parquet_t1) t WHERE a > 5")
-  }
-}

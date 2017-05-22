@@ -31,13 +31,13 @@ import scalaz._
   * It does this by writing the data out in chunks. These chunks are fixed and
   * can use a checksum to ensure our data isn't corrupted.
   */
-trait Chunker {
+trait Chunker
   def verify: Boolean
   val ChunkSize = 4096
 
   private def allocate(size: Int): ByteBuffer = ByteBuffer.allocate(size)
 
-  private def takeChunk(buffer: ByteBuffer): ByteBuffer = {
+  private def takeChunk(buffer: ByteBuffer): ByteBuffer =
     val bytes = new Array[Byte](ChunkSize)
     val remaining = buffer.remaining()
     val len = math.min(ChunkSize - 12, remaining)
@@ -50,9 +50,8 @@ trait Chunker {
     chunk.putInt(0, remaining)
     chunk.putLong(ChunkSize - 8, checksum.getValue())
     chunk
-  }
 
-  private def readChunk(chunk: ByteBuffer, buffer: ByteBuffer): Int = {
+  private def readChunk(chunk: ByteBuffer, buffer: ByteBuffer): Int =
     chunk.mark()
     val remaining = chunk.getInt()
     val bytes = new Array[Byte](ChunkSize - 12)
@@ -60,61 +59,49 @@ trait Chunker {
     chunk.get(bytes, 0, len)
     chunk.reset()
 
-    if (verify) {
+    if (verify)
       val checksum = new Adler32()
       checksum.update(bytes)
       val sum0 = checksum.getValue()
       val sum1 = chunk.getLong(ChunkSize - 8)
       if (sum0 != sum1) throw new IOException("Corrupted chunk.")
-    }
 
     buffer.put(bytes, 0, len)
     remaining - len
-  }
 
   def write[A](channel: WritableByteChannel, maxSize: Int)(
-      f: ByteBuffer => A): Validation[IOException, A] = {
+      f: ByteBuffer => A): Validation[IOException, A] =
     val buffer = allocate(maxSize)
     val result = f(buffer)
     buffer.flip()
 
-    try {
-      while (buffer.remaining() > 0) {
+    try
+      while (buffer.remaining() > 0)
         val chunk = takeChunk(buffer)
-        while (chunk.remaining() > 0) {
+        while (chunk.remaining() > 0)
           channel.write(chunk)
-        }
-      }
       Success(result)
-    } catch {
+    catch
       case ex: IOException =>
         Failure(ex)
-    }
-  }
 
-  def read(channel: ReadableByteChannel): Validation[IOException, ByteBuffer] = {
-    try {
+  def read(channel: ReadableByteChannel): Validation[IOException, ByteBuffer] =
+    try
       val chunk = allocate(ChunkSize)
-      while (chunk.remaining() > 0) {
+      while (chunk.remaining() > 0)
         channel.read(chunk)
-      }
       chunk.flip()
 
       val length = chunk.getInt(0)
       val buffer = allocate(length)
-      while (readChunk(chunk, buffer) > 0) {
+      while (readChunk(chunk, buffer) > 0)
         chunk.clear()
-        while (chunk.remaining() > 0) {
+        while (chunk.remaining() > 0)
           channel.read(chunk)
-        }
         chunk.flip()
-      }
       buffer.flip()
 
       Success(buffer)
-    } catch {
+    catch
       case ioe: IOException =>
         Failure(ioe)
-    }
-  }
-}

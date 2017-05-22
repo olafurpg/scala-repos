@@ -6,7 +6,7 @@ import complete.DefaultParsers._
 import sbinary.DefaultProtocol._
 import Project.Initialize
 
-object MyBuild extends Build {
+object MyBuild extends Build
   val keep = TaskKey[Int]("keep")
   val persisted = TaskKey[Int]("persist")
   val checkKeep = InputKey[Unit]("check-keep")
@@ -16,9 +16,8 @@ object MyBuild extends Build {
   val check = InputKey[Unit]("check")
   val sample = AttributeKey[Int]("demo-key")
 
-  def updateDemoInit = state map { s =>
+  def updateDemoInit = state map  s =>
     (s get sample getOrElse 9) + 1
-  }
 
   lazy val root =
     Project("root", file(".")) settings
@@ -28,9 +27,9 @@ object MyBuild extends Build {
 
   def checkInit: Initialize[InputTask[Unit]] =
     InputTask(
-        (_: State) => token(Space ~> IntBasic) ~ token(Space ~> IntBasic).?) {
+        (_: State) => token(Space ~> IntBasic) ~ token(Space ~> IntBasic).?)
       key =>
-        (key, updateDemo, state) map {
+        (key, updateDemo, state) map
           case ((curExpected, prevExpected), value, s) =>
             val prev = s get sample
             assert(value == curExpected,
@@ -39,17 +38,15 @@ object MyBuild extends Build {
             assert(prev == prevExpected,
                    "Expected previous value to be " + prevExpected + ", got " +
                    prev)
-        }
-    }
 
   def inMemorySetting =
     keep <<=
       getPrevious(keep) map { case None => 3; case Some(x) => x + 1 } keepAs
     (keep)
   def persistedSetting =
-    persisted <<= loadPrevious(persisted) map {
+    persisted <<= loadPrevious(persisted) map
       case None => 17; case Some(x) => x + 1
-    } storeAs (persisted)
+    storeAs (persisted)
 
   def inMemoryCheck =
     checkKeep <<=
@@ -64,10 +61,7 @@ object MyBuild extends Build {
 
   def dummyTask =
     (key: Any) =>
-      maxErrors map { _ =>
+      maxErrors map  _ =>
         ()
-    }
-  def str(o: Option[Int]) = o match {
+  def str(o: Option[Int]) = o match
     case None => "blue"; case Some(i) => i.toString
-  }
-}

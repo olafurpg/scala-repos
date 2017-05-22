@@ -24,7 +24,7 @@ import org.apache.spark.storage.TestBlockId
 import org.apache.spark.storage.memory.MemoryStore
 
 class UnifiedMemoryManagerSuite
-    extends MemoryManagerSuite with PrivateMethodTester {
+    extends MemoryManagerSuite with PrivateMethodTester
   private val dummyBlock = TestBlockId("--")
 
   private val storageFraction: Double = 0.5
@@ -33,24 +33,22 @@ class UnifiedMemoryManagerSuite
     * Make a [[UnifiedMemoryManager]] and a [[MemoryStore]] with limited class dependencies.
     */
   private def makeThings(
-      maxMemory: Long): (UnifiedMemoryManager, MemoryStore) = {
+      maxMemory: Long): (UnifiedMemoryManager, MemoryStore) =
     val mm = createMemoryManager(maxMemory)
     val ms = makeMemoryStore(mm)
     (mm, ms)
-  }
 
   override protected def createMemoryManager(
       maxOnHeapExecutionMemory: Long,
-      maxOffHeapExecutionMemory: Long): UnifiedMemoryManager = {
+      maxOffHeapExecutionMemory: Long): UnifiedMemoryManager =
     val conf = new SparkConf()
       .set("spark.memory.fraction", "1")
       .set("spark.testing.memory", maxOnHeapExecutionMemory.toString)
       .set("spark.memory.offHeap.size", maxOffHeapExecutionMemory.toString)
       .set("spark.memory.storageFraction", storageFraction.toString)
     UnifiedMemoryManager(conf, numCores = 1)
-  }
 
-  test("basic execution memory") {
+  test("basic execution memory")
     val maxMemory = 1000L
     val taskAttemptId = 0L
     val (mm, _) = makeThings(maxMemory)
@@ -76,9 +74,8 @@ class UnifiedMemoryManagerSuite
     // Release beyond what was acquired
     mm.releaseExecutionMemory(maxMemory, taskAttemptId, MemoryMode.ON_HEAP)
     assert(mm.executionMemoryUsed === 0L)
-  }
 
-  test("basic storage memory") {
+  test("basic storage memory")
     val maxMemory = 1000L
     val (mm, ms) = makeThings(maxMemory)
     assert(mm.storageMemoryUsed === 0L)
@@ -121,9 +118,8 @@ class UnifiedMemoryManagerSuite
     // Release beyond what was acquired
     mm.releaseStorageMemory(100L)
     assert(mm.storageMemoryUsed === 0L)
-  }
 
-  test("execution evicts storage") {
+  test("execution evicts storage")
     val maxMemory = 1000L
     val taskAttemptId = 0L
     val (mm, ms) = makeThings(maxMemory)
@@ -162,10 +158,9 @@ class UnifiedMemoryManagerSuite
     assert(mm.executionMemoryUsed === 600L)
     assert(mm.storageMemoryUsed === 400L)
     assertEvictBlocksToFreeSpaceNotCalled(ms)
-  }
 
   test(
-      "execution memory requests smaller than free memory should evict storage (SPARK-12165)") {
+      "execution memory requests smaller than free memory should evict storage (SPARK-12165)")
     val maxMemory = 1000L
     val taskAttemptId = 0L
     val (mm, ms) = makeThings(maxMemory)
@@ -184,9 +179,8 @@ class UnifiedMemoryManagerSuite
     assert(mm.storageMemoryUsed === 500L)
     assert(mm.executionMemoryUsed === 500L)
     assert(evictedBlocks.nonEmpty)
-  }
 
-  test("storage does not evict execution") {
+  test("storage does not evict execution")
     val maxMemory = 1000L
     val taskAttemptId = 0L
     val (mm, ms) = makeThings(maxMemory)
@@ -224,9 +218,8 @@ class UnifiedMemoryManagerSuite
     assert(mm.storageMemoryUsed === 750L)
     // Do not attempt to evict blocks, since evicting will not free enough memory:
     assertEvictBlocksToFreeSpaceNotCalled(ms)
-  }
 
-  test("small heap") {
+  test("small heap")
     val systemMemory = 1024 * 1024
     val reservedMemory = 300 * 1024
     val memoryFraction = 0.8
@@ -242,13 +235,11 @@ class UnifiedMemoryManagerSuite
     // Try using a system memory that's too small
     val conf2 =
       conf.clone().set("spark.testing.memory", (reservedMemory / 2).toString)
-    val exception = intercept[IllegalArgumentException] {
+    val exception = intercept[IllegalArgumentException]
       UnifiedMemoryManager(conf2, numCores = 1)
-    }
     assert(exception.getMessage.contains("increase heap size"))
-  }
 
-  test("insufficient executor memory") {
+  test("insufficient executor memory")
     val systemMemory = 1024 * 1024
     val reservedMemory = 300 * 1024
     val memoryFraction = 0.8
@@ -261,14 +252,12 @@ class UnifiedMemoryManagerSuite
     // Try using an executor memory that's too small
     val conf2 =
       conf.clone().set("spark.executor.memory", (reservedMemory / 2).toString)
-    val exception = intercept[IllegalArgumentException] {
+    val exception = intercept[IllegalArgumentException]
       UnifiedMemoryManager(conf2, numCores = 1)
-    }
     assert(exception.getMessage.contains("increase executor memory"))
-  }
 
   test(
-      "execution can evict cached blocks when there are multiple active tasks (SPARK-12155)") {
+      "execution can evict cached blocks when there are multiple active tasks (SPARK-12155)")
     val conf = new SparkConf()
       .set("spark.memory.fraction", "1")
       .set("spark.memory.storageFraction", "0")
@@ -291,5 +280,3 @@ class UnifiedMemoryManagerSuite
     assert(mm.executionMemoryUsed === 300)
     assert(mm.storageMemoryUsed === 700)
     assert(evictedBlocks.nonEmpty)
-  }
-}

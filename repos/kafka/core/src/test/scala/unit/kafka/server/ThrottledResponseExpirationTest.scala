@@ -23,7 +23,7 @@ import org.apache.kafka.common.metrics.MetricConfig
 import org.apache.kafka.common.utils.MockTime
 import org.junit.{Assert, Before, Test}
 
-class ThrottledResponseExpirationTest {
+class ThrottledResponseExpirationTest
   private val time = new MockTime
   private var numCallbacks: Int = 0
   private val metrics = new org.apache.kafka.common.metrics.Metrics(
@@ -31,46 +31,41 @@ class ThrottledResponseExpirationTest {
       Collections.emptyList(),
       time)
 
-  def callback(delayTimeMs: Int) {
+  def callback(delayTimeMs: Int)
     numCallbacks += 1
-  }
 
   @Before
-  def beforeMethod() {
+  def beforeMethod()
     numCallbacks = 0
-  }
 
   @Test
-  def testExpire() {
+  def testExpire()
     val clientMetrics = new ClientQuotaManager(
         ClientQuotaManagerConfig(), metrics, "producer", time)
 
     val delayQueue = new DelayQueue[ThrottledResponse]()
     val reaper = new clientMetrics.ThrottledRequestReaper(delayQueue)
-    try {
+    try
       // Add 4 elements to the queue out of order. Add 2 elements with the same expire timestamp
       delayQueue.add(new ThrottledResponse(time, 10, callback))
       delayQueue.add(new ThrottledResponse(time, 30, callback))
       delayQueue.add(new ThrottledResponse(time, 30, callback))
       delayQueue.add(new ThrottledResponse(time, 20, callback))
 
-      for (itr <- 1 to 3) {
+      for (itr <- 1 to 3)
         time.sleep(10)
         reaper.doWork()
         Assert.assertEquals(itr, numCallbacks)
-      }
       reaper.doWork()
       Assert.assertEquals(4, numCallbacks)
       Assert.assertEquals(0, delayQueue.size())
       reaper.doWork()
       Assert.assertEquals(4, numCallbacks)
-    } finally {
+    finally
       clientMetrics.shutdown()
-    }
-  }
 
   @Test
-  def testThrottledRequest() {
+  def testThrottledRequest()
     val t1: ThrottledResponse = new ThrottledResponse(time, 10, callback)
     val t2: ThrottledResponse = new ThrottledResponse(time, 20, callback)
     val t3: ThrottledResponse = new ThrottledResponse(time, 20, callback)
@@ -78,11 +73,8 @@ class ThrottledResponseExpirationTest {
     Assert.assertEquals(20, t2.throttleTimeMs)
     Assert.assertEquals(20, t3.throttleTimeMs)
 
-    for (itr <- 0 to 2) {
+    for (itr <- 0 to 2)
       Assert.assertEquals(10 - 10 * itr, t1.getDelay(TimeUnit.MILLISECONDS))
       Assert.assertEquals(20 - 10 * itr, t2.getDelay(TimeUnit.MILLISECONDS))
       Assert.assertEquals(20 - 10 * itr, t3.getDelay(TimeUnit.MILLISECONDS))
       time.sleep(10)
-    }
-  }
-}

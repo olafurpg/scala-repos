@@ -8,7 +8,7 @@ import org.junit.runners.JUnit4
 import AssertUtil.assertThrows
 
 @RunWith(classOf[JUnit4])
-class AssertThrowsTest {
+class AssertThrowsTest
   class Foo extends Exception
   class SubFoo extends Foo
   class Bar extends Exception
@@ -21,24 +21,20 @@ class AssertThrowsTest {
 
   @Test
   def rethrowBar =
-    assertTrue("exception wasn't rethrown", {
-      try {
+    assertTrue("exception wasn't rethrown",
+      try
         assertThrows[Foo] { throw new Bar }
         false
-      } catch {
+      catch
         case bar: Bar => true
         case e: Throwable => fail(s"expected Bar but got $e"); false
-      }
-    })
+    )
 
   @Test
-  def errorIfNoThrow: Unit = {
-    try {
+  def errorIfNoThrow: Unit =
+    try
       assertThrows[Foo] { () }
-    } catch {
+    catch
       case e: AssertionError => return
-    }
     fail(
         "assertThrows should error if the tested expression does not throw anything")
-  }
-}

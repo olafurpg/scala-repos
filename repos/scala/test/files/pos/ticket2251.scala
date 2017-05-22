@@ -5,7 +5,7 @@ trait B[T <: B[T]] extends A
 class C extends B[C]
 class D extends B[D]
 
-class Data {
+class Data
   // force computing lub of C and D (printLubs enabled:)
 
   /*
@@ -35,4 +35,3 @@ lub of List(D, C) is B[_2] forSome { type _2 >: D with C{} <: B[_1] forSome { ty
 
   // works
   val data5 = List[B[X] forSome { type X <: B[X] }](new C, new D)
-}

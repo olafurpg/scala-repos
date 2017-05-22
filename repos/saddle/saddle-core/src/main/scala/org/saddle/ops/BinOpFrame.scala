@@ -24,16 +24,15 @@ import vec._
   * instances provide implicit support for [[org.saddle.ops.NumericOps]] methods which are
   * inherited by Frame.
   */
-trait BinOpFrame {
+trait BinOpFrame
   // ***************
 
   // Binary element-wise operation on one frame and one scalar
   final class FrScEOp[
       OP <: ScalarOp, X : ST : ORD, Y : ST : ORD, A, B, C : ST](
       opv: BinOp[OP, Vec[A], B, Vec[C]])
-      extends BinOp[OP, Frame[X, Y, A], B, Frame[X, Y, C]] {
+      extends BinOp[OP, Frame[X, Y, A], B, Frame[X, Y, C]]
     def apply(v1: Frame[X, Y, A], v2: B) = v1.mapVec(opv(_, v2))
-  }
 
   // concrete implementations
   implicit def FrScEOpDDD[Op <: ScalarOp, X, Y](
@@ -184,13 +183,11 @@ trait BinOpFrame {
   final class FrFrEOp[
       OP <: ScalarOp, X : ST : ORD, Y : ST : ORD, A, B : ST, C : ST](
       opv: BinOp[OP, Vec[A], Vec[B], Vec[C]])
-      extends BinOp[OP, Frame[X, Y, A], Frame[X, Y, B], Frame[X, Y, C]] {
-    def apply(f1: Frame[X, Y, A], f2: Frame[X, Y, B]) = {
+      extends BinOp[OP, Frame[X, Y, A], Frame[X, Y, B], Frame[X, Y, C]]
+    def apply(f1: Frame[X, Y, A], f2: Frame[X, Y, B]) =
       val (l, r) = f1.align(f2, OuterJoin, OuterJoin)
       val result = l.values.zip(r.values) map { case (v1, v2) => opv(v1, v2) }
       Frame(result, l.rowIx, l.colIx)
-    }
-  }
 
   // concrete implementations
 
@@ -335,4 +332,3 @@ trait BinOpFrame {
       cmpY: ORD[Y],
       opv: BinOp[Op, Vec[Boolean], Vec[Boolean], Vec[Boolean]]) =
     new FrFrEOp[Op, X, Y, Boolean, Boolean, Boolean](opv)
-}

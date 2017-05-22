@@ -5,7 +5,7 @@ import scala.collection.mutable.ArrayBuffer
 
 /** An `ObjectOutput` that enables access to the written data using array-valued fields.
   */
-trait ArrayObjectOutput extends ObjectOutput {
+trait ArrayObjectOutput extends ObjectOutput
   def booleanArr: Array[Boolean]
   def byteArr: Array[Int]
   def charArr: Array[Int]
@@ -16,7 +16,6 @@ trait ArrayObjectOutput extends ObjectOutput {
   def shortArr: Array[Int]
   def arrByteArr: Array[Array[Byte]]
   def anyRefArr: Array[Any]
-}
 
 class GenObjectInput(booleanIter: Iterator[Boolean],
                      byteIter: Iterator[Int],
@@ -29,17 +28,16 @@ class GenObjectInput(booleanIter: Iterator[Boolean],
                      arrByteIter: Iterator[Array[Byte]],
                      anyRefIter: Iterator[Any],
                      stringIter: Iterator[String])
-    extends ObjectInput {
+    extends ObjectInput
   def readByte(): Byte = byteIter.next().asInstanceOf[Byte]
   def readBoolean(): Boolean = booleanIter.next()
   def readChar(): Char = charIter.next().asInstanceOf[Char]
   def readDouble(): Double = doubleIter.next()
   def readFloat(): Float = floatIter.next()
   def readFully(x1: Array[Byte], x2: Int, x3: Int): Unit = ???
-  def readFully(dest: Array[Byte]): Unit = {
+  def readFully(dest: Array[Byte]): Unit =
     val src = arrByteIter.next()
     java.lang.System.arraycopy(src, 0, dest, 0, dest.length)
-  }
   def readInt(): Int = intIter.next()
   def readLine(): String = ???
   def readLong(): Long = longIter.next()
@@ -55,7 +53,6 @@ class GenObjectInput(booleanIter: Iterator[Boolean],
   def read(): Int = ???
   def readObject(): AnyRef = anyRefIter.next().asInstanceOf[AnyRef]
   def skip(x1: Long): Long = ???
-}
 
 case class GenObjectOutput(
     val booleanArrBuf: ArrayBuffer[Boolean] = new ArrayBuffer[Boolean],
@@ -70,7 +67,7 @@ case class GenObjectOutput(
     val anyRefArrBuf: ArrayBuffer[Any] = new ArrayBuffer[Any],
     val stringArrBuf: ArrayBuffer[String] = new ArrayBuffer[String]
 )
-    extends ObjectOutput {
+    extends ObjectOutput
   def toInput: ObjectInput =
     new GenObjectInput(booleanArrBuf.iterator,
                        byteArrBuf.iterator,
@@ -104,4 +101,3 @@ case class GenObjectOutput(
   def write(x: Array[Byte]): Unit = { arrByteArrBuf += x }
   def write(x: Int): Unit = ???
   def writeObject(x: Any): Unit = { anyRefArrBuf += x }
-}

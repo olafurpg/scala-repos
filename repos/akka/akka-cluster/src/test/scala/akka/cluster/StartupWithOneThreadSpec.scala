@@ -11,7 +11,7 @@ import akka.actor.Props
 import akka.actor.Actor
 import akka.actor.ActorLogging
 
-object StartupWithOneThreadSpec {
+object StartupWithOneThreadSpec
   val config = """
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.actor.creation-timeout = 10s
@@ -29,25 +29,23 @@ object StartupWithOneThreadSpec {
 
   def testProps =
     Props(
-        new Actor with ActorLogging {
+        new Actor with ActorLogging
       val cluster = Cluster(context.system)
       log.debug(
           s"started ${cluster.selfAddress} ${Thread.currentThread().getName}")
-      def receive = {
+      def receive =
         case msg ⇒ sender() ! msg
-      }
-    })
-}
+    )
 
 class StartupWithOneThreadSpec(startTime: Long)
-    extends AkkaSpec(StartupWithOneThreadSpec.config) with ImplicitSender {
+    extends AkkaSpec(StartupWithOneThreadSpec.config) with ImplicitSender
   import StartupWithOneThreadSpec._
 
   def this() = this(System.nanoTime())
 
-  "A Cluster" must {
+  "A Cluster" must
 
-    "startup with one dispatcher thread" in {
+    "startup with one dispatcher thread" in
       // This test failed before fixing #17253 when adding a sleep before the
       // Await of GetClusterCoreRef in the Cluster extension constructor.
       // The reason was that other cluster actors were started too early and
@@ -68,6 +66,3 @@ class StartupWithOneThreadSpec(startTime: Long)
       expectMsg("hello")
       expectMsg("hello")
       expectMsg("hello")
-    }
-  }
-}

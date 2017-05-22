@@ -10,7 +10,7 @@ import scalaz.Id.Id
   * @see [[scalaz.Traverse.TraverseLaw]]
   */
 ////
-trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
+trait Traverse[F[_]] extends Functor[F] with Foldable[F]  self =>
   ////
 
   /** Transform `fa` using `f`, collecting all the `G`s with `ap`. */
@@ -20,45 +20,39 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /**The composition of Traverses `F` and `G`, `[x]F[G[x]]`, is a Traverse */
   def compose[G[_]](implicit G0: Traverse[G]): Traverse[λ[α => F[G[α]]]] =
-    new CompositionTraverse[F, G] {
+    new CompositionTraverse[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /** The composition of Traverse `F` and Bitraverse `G`, `[x, y]F[G[x, y]]`, is a Bitraverse */
   def bicompose[G[_, _]: Bitraverse]: Bitraverse[λ[(α, β) => F[G[α, β]]]] =
-    new CompositionTraverseBitraverse[F, G] {
+    new CompositionTraverseBitraverse[F, G]
       def F = self
       def G = implicitly
-    }
 
   /**The product of Traverses `F` and `G`, `[x](F[x], G[x]])`, is a Traverse */
   def product[G[_]](implicit G0: Traverse[G]): Traverse[λ[α => (F[α], G[α])]] =
-    new ProductTraverse[F, G] {
+    new ProductTraverse[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /**The product of Traverse `F` and Traverse1 `G`, `[x](F[x], G[x]])`, is a Traverse1 */
   def product0[G[_]](
       implicit G0: Traverse1[G]): Traverse1[λ[α => (F[α], G[α])]] =
-    new ProductTraverse1R[F, G] {
+    new ProductTraverse1R[F, G]
       def F = self
       def G = G0
-    }
 
-  class Traversal[G[_]](implicit G: Applicative[G]) {
+  class Traversal[G[_]](implicit G: Applicative[G])
     def run[A, B](fa: F[A])(f: A => G[B]): G[F[B]] =
       traverseImpl[G, A, B](fa)(f)
-  }
 
   // reduce - given monoid
   def traversal[G[_]: Applicative]: Traversal[G] =
     new Traversal[G]
   def traversalS[S]: Traversal[State[S, ?]] =
-    new Traversal[State[S, ?]]()(StateT.stateMonad) {
+    new Traversal[State[S, ?]]()(StateT.stateMonad)
       override def run[A, B](fa: F[A])(f: A => State[S, B]) = traverseS(fa)(f)
-    }
 
   def traverse[G[_]: Applicative, A, B](fa: F[A])(f: A => G[B]): G[F[B]] =
     traversal[G].run(fa)(f)
@@ -82,33 +76,29 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   /** Traverse `fa` with a `State[S, G[B]]`, internally using a `Trampoline` to avoid stack overflow. */
   def traverseSTrampoline[S, G[_]: Applicative, A, B](fa: F[A])(
-      f: A => State[S, G[B]]): State[S, G[F[B]]] = {
+      f: A => State[S, G[B]]): State[S, G[F[B]]] =
     import Free._
     implicit val A =
       StateT.stateTMonadState[S, Trampoline].compose(Applicative[G])
     State[S, G[F[B]]](
         s =>
-          {
         val st = traverse[λ[α => StateT[Trampoline, S, G[α]]], A, B](fa)(
             f(_: A).lift[Trampoline])
         st.run(s).run
-    })
-  }
+    )
 
   /** Traverse `fa` with a `Kleisli[G, S, B]`, internally using a `Trampoline` to avoid stack overflow. */
   def traverseKTrampoline[S, G[_]: Applicative, A, B](fa: F[A])(
-      f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] = {
+      f: A => Kleisli[G, S, B]): Kleisli[G, S, F[B]] =
     import Free._
     implicit val A =
       Kleisli.kleisliMonadReader[Trampoline, S].compose(Applicative[G])
     Kleisli[G, S, F[B]](
         s =>
-          {
         val kl = traverse[λ[α => Kleisli[Trampoline, S, G[α]]], A, B](fa)(
             z => Kleisli[Id, S, G[B]](i => f(z)(i)).lift[Trampoline]).run(s)
         kl.run
-    })
-  }
+    )
 
   /** Traverse with the identity function. */
   def sequence[G[_]: Applicative, A](fga: F[G[A]]): G[F[A]] =
@@ -138,24 +128,23 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
     foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
 
-  def reverse[A](fa: F[A]): F[A] = {
+  def reverse[A](fa: F[A]): F[A] =
     val (as, shape) = mapAccumL(fa, scala.List[A]())((t, h) => (h :: t, h))
     runTraverseS(shape, as)(
         _ =>
-          for {
+          for
         e <- State.get
         _ <- State.put(e.tail)
-      } yield e.head)._2
-  }
+      yield e.head)._2
 
   def zipWith[A, B, C](
       fa: F[A], fb: F[B])(f: (A, Option[B]) => C): (List[B], F[C]) =
     runTraverseS(fa, toList(fb))(
         a =>
-          for {
+          for
         bs <- State.get
         _ <- State.put(if (bs.isEmpty) bs else bs.tail)
-      } yield f(a, bs.headOption))
+      yield f(a, bs.headOption))
 
   def zipWithL[A, B, C](fa: F[A], fb: F[B])(f: (A, Option[B]) => C): F[C] =
     zipWith(fa, fb)(f)._2
@@ -173,35 +162,33 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
   def mapAccumL[S, A, B](fa: F[A], z: S)(f: (S, A) => (S, B)): (S, F[B]) =
     runTraverseS(fa, z)(
         a =>
-          for {
+          for
         s1 <- State.init[S]
         (s2, b) = f(s1, a)
         _ <- State.put(s2)
-      } yield b)
+      yield b)
 
   def mapAccumR[S, A, B](fa: F[A], z: S)(f: (S, A) => (S, B)): (S, F[B]) =
     mapAccumL(reverse(fa), z)(f) match { case (s, fb) => (s, reverse(fb)) }
 
-  trait TraverseLaw extends FunctorLaw {
+  trait TraverseLaw extends FunctorLaw
 
     /** Traversal through the [[scalaz.Id]] effect is equivalent to `Functor#map` */
-    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) = {
+    def identityTraverse[A, B](fa: F[A], f: A => B)(implicit FB: Equal[F[B]]) =
       FB.equal(traverse[Id, A, B](fa)(f), map(fa)(f))
-    }
 
     /** Two sequentially dependent effects can be fused into one, their composition */
     def sequentialFusion[N[_], M[_], A, B, C](
         fa: F[A], amb: A => M[B], bnc: B => N[C])(
         implicit N: Applicative[N],
         M: Applicative[M],
-        MN: Equal[M[N[F[C]]]]): Boolean = {
+        MN: Equal[M[N[F[C]]]]): Boolean =
       type MN[A] = M[N[A]]
       val t1: MN[F[C]] =
         M.map(traverse[M, A, B](fa)(amb))(fb => traverse[N, B, C](fb)(bnc))
       val t2: MN[F[C]] =
         traverse[MN, A, C](fa)(a => M.map(amb(a))(bnc))(M compose N)
       MN.equal(t1, t2)
-    }
 
     /** Traversal with the `point` function is the same as applying the `point` function directly */
     def purity[G[_], A](fa: F[A])(
@@ -216,38 +203,32 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
     def naturality[N[_], M[_], A](nat: (M ~> N))(
         fma: F[M[A]])(implicit N: Applicative[N],
                       M: Applicative[M],
-                      NFA: Equal[N[F[A]]]): Boolean = {
+                      NFA: Equal[N[F[A]]]): Boolean =
       val n1: N[F[A]] = nat[F[A]](sequence[M, A](fma))
       val n2: N[F[A]] = sequence[N, A](map(fma)(ma => nat(ma)))
       NFA.equal(n1, n2)
-    }
 
     /** Two independent effects can be fused into a single effect, their product. */
     def parallelFusion[N[_], M[_], A, B](
         fa: F[A], amb: A => M[B], anb: A => N[B])(
         implicit N: Applicative[N],
         M: Applicative[M],
-        MN: Equal[(M[F[B]], N[F[B]])]): Boolean = {
+        MN: Equal[(M[F[B]], N[F[B]])]): Boolean =
       type MN[A] = (M[A], N[A])
       val t1: MN[F[B]] =
         (traverse[M, A, B](fa)(amb), traverse[N, A, B](fa)(anb))
       val t2: MN[F[B]] =
         traverse[MN, A, B](fa)(a => (amb(a), anb(a)))(M product N)
       MN.equal(t1, t2)
-    }
-  }
   def traverseLaw = new TraverseLaw {}
 
   ////
-  val traverseSyntax = new scalaz.syntax.TraverseSyntax[F] {
+  val traverseSyntax = new scalaz.syntax.TraverseSyntax[F]
     def F = Traverse.this
-  }
-}
 
-object Traverse {
+object Traverse
   @inline def apply[F[_]](implicit F: Traverse[F]): Traverse[F] = F
 
   ////
 
   ////
-}

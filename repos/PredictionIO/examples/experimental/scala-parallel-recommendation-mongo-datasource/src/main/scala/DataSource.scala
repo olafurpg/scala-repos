@@ -27,11 +27,11 @@ case class DataSourceParams( // CHANGED
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     // CHANGED
     val config = new Configuration()
     config.set(
@@ -44,15 +44,12 @@ class DataSource(val dsp: DataSourceParams)
                                       classOf[BSONObject])
 
     // mongoRDD contains tuples of (ObjectId, BSONObject)
-    val ratings = mongoRDD.map {
+    val ratings = mongoRDD.map
       case (id, bson) =>
         Rating(bson.get("uid").asInstanceOf[String],
                bson.get("iid").asInstanceOf[String],
                bson.get("rating").asInstanceOf[Double])
-    }
     new TrainingData(ratings)
-  }
-}
 
 case class Rating(
     user: String,
@@ -63,8 +60,6 @@ case class Rating(
 class TrainingData(
     val ratings: RDD[Rating]
 )
-    extends Serializable {
-  override def toString = {
+    extends Serializable
+  override def toString =
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
-  }
-}

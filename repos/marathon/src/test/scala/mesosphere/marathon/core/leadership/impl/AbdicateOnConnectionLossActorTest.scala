@@ -10,9 +10,9 @@ import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, GivenWhenThen}
 
 class AbdicateOnConnectionLossActorTest
     extends MarathonActorSupport with MarathonSpec with Mockito
-    with GivenWhenThen with BeforeAndAfter {
+    with GivenWhenThen with BeforeAndAfter
 
-  test("register as zk listener on start") {
+  test("register as zk listener on start")
     Given("ZK and leader refs")
     val leader = mock[LeadershipAbdication]
 
@@ -21,9 +21,8 @@ class AbdicateOnConnectionLossActorTest
 
     Then("register is called")
     verify(zk).register(any)
-  }
 
-  test("zk disconnect events lead to abdication") {
+  test("zk disconnect events lead to abdication")
     Given("A started AbdicateOnConnectionLossActor")
     val leader = mock[LeadershipAbdication]
     val actor = TestActorRef[AbdicateOnConnectionLossActor](
@@ -37,9 +36,8 @@ class AbdicateOnConnectionLossActorTest
 
     Then("Abdication is called")
     verify(leader).abdicateLeadership()
-  }
 
-  test("other zk events do not lead to abdication") {
+  test("other zk events do not lead to abdication")
     Given("A started AbdicateOnConnectionLossActor")
     val leader = mock[LeadershipAbdication]
     val actor = TestActorRef[AbdicateOnConnectionLossActor](
@@ -52,14 +50,11 @@ class AbdicateOnConnectionLossActorTest
 
     Then("Abdication is _NOT_ called")
     verify(leader, never).abdicateLeadership()
-  }
 
   var zk: ZooKeeperClient = _
 
-  before {
+  before
     val zookeeper = mock[ZooKeeper]
     zookeeper.getState returns ZooKeeper.States.CONNECTED
     zk = mock[ZooKeeperClient]
     zk.get() returns zookeeper
-  }
-}

@@ -15,7 +15,7 @@ import scala.concurrent.{Future, ExecutionContext}
   */
 @Singleton
 class PersonRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(
-    implicit ec: ExecutionContext) {
+    implicit ec: ExecutionContext)
   // We want the JdbcProfile for this provider
   private val dbConfig = dbConfigProvider.get[JdbcProfile]
 
@@ -27,7 +27,7 @@ class PersonRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(
   /**
     * Here we define the table. It will have a name of people
     */
-  private class PeopleTable(tag: Tag) extends Table[Person](tag, "people") {
+  private class PeopleTable(tag: Tag) extends Table[Person](tag, "people")
 
     /** The ID column, which is the primary key, and auto incremented */
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
@@ -47,7 +47,6 @@ class PersonRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(
       * apply and unapply methods.
       */
     def * = (id, name, age) <> ((Person.apply _).tupled, Person.unapply)
-  }
 
   /**
     * The starting point for all queries on the people table.
@@ -60,7 +59,7 @@ class PersonRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(
     * This is an asynchronous operation, it will return a future of the created person, which can be used to obtain the
     * id for that person.
     */
-  def create(name: String, age: Int): Future[Person] = db.run {
+  def create(name: String, age: Int): Future[Person] = db.run
     // We create a projection of just the name and age columns, since we're not inserting a value for the id column
     (people.map(p => (p.name, p.age))
         // Now define it to return the id, because we want to know what id was generated for the person
@@ -70,12 +69,9 @@ class PersonRepository @Inject()(dbConfigProvider: DatabaseConfigProvider)(
         into ((nameAge, id) => Person(id, nameAge._1, nameAge._2))
         // And finally, insert the person into the database
         ) += (name, age)
-  }
 
   /**
     * List all the people in the database.
     */
-  def list(): Future[Seq[Person]] = db.run {
+  def list(): Future[Seq[Person]] = db.run
     people.result
-  }
-}

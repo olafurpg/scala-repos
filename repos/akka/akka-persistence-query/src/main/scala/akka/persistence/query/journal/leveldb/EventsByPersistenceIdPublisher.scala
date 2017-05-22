@@ -18,14 +18,14 @@ import akka.persistence.query.EventEnvelope
 /**
   * INTERNAL API
   */
-private[akka] object EventsByPersistenceIdPublisher {
+private[akka] object EventsByPersistenceIdPublisher
   def props(persistenceId: String,
             fromSequenceNr: Long,
             toSequenceNr: Long,
             refreshInterval: Option[FiniteDuration],
             maxBufSize: Int,
-            writeJournalPluginId: String): Props = {
-    refreshInterval match {
+            writeJournalPluginId: String): Props =
+    refreshInterval match
       case Some(interval) ⇒
         Props(
             new LiveEventsByPersistenceIdPublisher(persistenceId,
@@ -41,14 +41,11 @@ private[akka] object EventsByPersistenceIdPublisher {
                                                       toSequenceNr,
                                                       maxBufSize,
                                                       writeJournalPluginId))
-    }
-  }
 
   /**
     * INTERNAL API
     */
   private[akka] case object Continue
-}
 
 /**
   * INTERNAL API
@@ -59,7 +56,7 @@ private[akka] abstract class AbstractEventsByPersistenceIdPublisher(
     val maxBufSize: Int,
     val writeJournalPluginId: String)
     extends ActorPublisher[EventEnvelope] with DeliveryBuffer[EventEnvelope]
-    with ActorLogging {
+    with ActorLogging
   import EventsByPersistenceIdPublisher._
 
   val journal: ActorRef =
@@ -71,15 +68,14 @@ private[akka] abstract class AbstractEventsByPersistenceIdPublisher(
 
   def receive = init
 
-  def init: Receive = {
+  def init: Receive =
     case _: Request ⇒ receiveInitialRequest()
     case Continue ⇒ // skip, wait for first Request
     case Cancel ⇒ context.stop(self)
-  }
 
   def receiveInitialRequest(): Unit
 
-  def idle: Receive = {
+  def idle: Receive =
     case Continue | _: LeveldbJournal.EventAppended ⇒
       if (timeForReplay) replay()
 
@@ -88,14 +84,13 @@ private[akka] abstract class AbstractEventsByPersistenceIdPublisher(
 
     case Cancel ⇒
       context.stop(self)
-  }
 
   def receiveIdleRequest(): Unit
 
   def timeForReplay: Boolean =
     (buf.isEmpty || buf.size <= maxBufSize / 2) && (currSeqNo <= toSequenceNr)
 
-  def replay(): Unit = {
+  def replay(): Unit =
     val limit = maxBufSize - buf.size
     log.debug(
         "request replay for persistenceId [{}] from [{}] to [{}] limit [{}]",
@@ -106,9 +101,8 @@ private[akka] abstract class AbstractEventsByPersistenceIdPublisher(
     journal ! ReplayMessages(
         currSeqNo, toSequenceNr, limit, persistenceId, self)
     context.become(replaying(limit))
-  }
 
-  def replaying(limit: Int): Receive = {
+  def replaying(limit: Int): Receive =
     case ReplayedMessage(p) ⇒
       buf :+= EventEnvelope(offset = p.sequenceNr,
                             persistenceId = persistenceId,
@@ -137,10 +131,8 @@ private[akka] abstract class AbstractEventsByPersistenceIdPublisher(
 
     case Cancel ⇒
       context.stop(self)
-  }
 
   def receiveRecoverySuccess(highestSeqNr: Long): Unit
-}
 
 /**
   * INTERNAL API
@@ -153,7 +145,7 @@ private[akka] class LiveEventsByPersistenceIdPublisher(
     maxBufSize: Int,
     writeJournalPluginId: String)
     extends AbstractEventsByPersistenceIdPublisher(
-        persistenceId, fromSequenceNr, maxBufSize, writeJournalPluginId) {
+        persistenceId, fromSequenceNr, maxBufSize, writeJournalPluginId)
   import EventsByPersistenceIdPublisher._
 
   val tickTask = context.system.scheduler.schedule(
@@ -162,22 +154,18 @@ private[akka] class LiveEventsByPersistenceIdPublisher(
   override def postStop(): Unit =
     tickTask.cancel()
 
-  override def receiveInitialRequest(): Unit = {
+  override def receiveInitialRequest(): Unit =
     journal ! LeveldbJournal.SubscribePersistenceId(persistenceId)
     replay()
-  }
 
-  override def receiveIdleRequest(): Unit = {
+  override def receiveIdleRequest(): Unit =
     deliverBuf()
     if (buf.isEmpty && currSeqNo > toSequenceNr) onCompleteThenStop()
-  }
 
-  override def receiveRecoverySuccess(highestSeqNr: Long): Unit = {
+  override def receiveRecoverySuccess(highestSeqNr: Long): Unit =
     deliverBuf()
     if (buf.isEmpty && currSeqNo > toSequenceNr) onCompleteThenStop()
     context.become(idle)
-  }
-}
 
 /**
   * INTERNAL API
@@ -189,7 +177,7 @@ private[akka] class CurrentEventsByPersistenceIdPublisher(
     maxBufSize: Int,
     writeJournalPluginId: String)
     extends AbstractEventsByPersistenceIdPublisher(
-        persistenceId, fromSequenceNr, maxBufSize, writeJournalPluginId) {
+        persistenceId, fromSequenceNr, maxBufSize, writeJournalPluginId)
   import EventsByPersistenceIdPublisher._
 
   override def toSequenceNr: Long = toSeqNr
@@ -197,13 +185,12 @@ private[akka] class CurrentEventsByPersistenceIdPublisher(
   override def receiveInitialRequest(): Unit =
     replay()
 
-  override def receiveIdleRequest(): Unit = {
+  override def receiveIdleRequest(): Unit =
     deliverBuf()
     if (buf.isEmpty && currSeqNo > toSequenceNr) onCompleteThenStop()
     else self ! Continue
-  }
 
-  override def receiveRecoverySuccess(highestSeqNr: Long): Unit = {
+  override def receiveRecoverySuccess(highestSeqNr: Long): Unit =
     deliverBuf()
     if (highestSeqNr < toSequenceNr) toSeqNr = highestSeqNr
     if (buf.isEmpty &&
@@ -211,5 +198,3 @@ private[akka] class CurrentEventsByPersistenceIdPublisher(
       onCompleteThenStop()
     else self ! Continue // more to fetch
     context.become(idle)
-  }
-}

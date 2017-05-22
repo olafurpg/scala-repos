@@ -1,6 +1,6 @@
 package scala.collection.parallel
 
-trait Operators[T] {
+trait Operators[T]
   def reduceOperators: List[(T, T) => T]
   def countPredicates: List[T => Boolean]
   def forallPredicates: List[T => Boolean]
@@ -19,13 +19,11 @@ trait Operators[T] {
   def addAllTraversables: List[Traversable[T]]
   def newArray(sz: Int): Array[T]
   def groupByFunctions: List[T => T]
-}
 
-trait SeqOperators[T] extends Operators[T] {
+trait SeqOperators[T] extends Operators[T]
   def segmentLengthPredicates: List[T => Boolean]
   def indexWherePredicates: List[T => Boolean]
   def lastIndexWherePredicates: List[T => Boolean]
   def reverseMapFunctions: List[T => T]
   def sameElementsSeqs: List[Seq[T]]
   def startEndSeqs: List[Seq[T]]
-}

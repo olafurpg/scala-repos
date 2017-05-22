@@ -12,20 +12,18 @@ case class PredictedResult(p: Int) extends Serializable
 
 case class ActualResult() extends Serializable
 
-object VanillaEngine extends IEngineFactory {
-  def apply() = {
+object VanillaEngine extends IEngineFactory
+  def apply() =
     new Engine(classOf[DataSource],
                //classOf[Preparator],
                PIdentityPreparator(classOf[DataSource]),
                Map("algo" -> classOf[Algorithm]),
                classOf[Serving])
-  }
-}
 
-object Runner {
+object Runner
   @transient lazy val logger = Logger[this.type]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val engine = VanillaEngine()
     val engineParams = EngineParams(
         algorithmParamsList = Seq(("algo", AlgorithmParams(2)))
@@ -39,5 +37,3 @@ object Runner {
                      engineParams = engineParams,
                      evaluator = evaluator,
                      evaluatorParams = EmptyParams())
-  }
-}

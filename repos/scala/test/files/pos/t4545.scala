@@ -1,4 +1,4 @@
-object Test {
+object Test
   def f[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T](
       table: Tuple20[
           A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T])(
@@ -32,9 +32,8 @@ object Test {
          1,
          1,
          1)
-    ) {
+    )
       case ((a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) => ()
-    }
 
   def g21 =
     g(
@@ -59,8 +58,6 @@ object Test {
          1,
          1,
          1)
-    ) {
+    )
       case ((a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)) =>
         ()
-    }
-}

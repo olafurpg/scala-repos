@@ -6,38 +6,31 @@ import mesosphere.marathon.state.{PathId, Timestamp}
 import org.apache.mesos.Protos.TaskID
 import org.joda.time.DateTime
 
-class TaskStatusUpdateTestHelper(val wrapped: TaskStatusUpdate) {
-  def withTaskId(taskId: String): TaskStatusUpdateTestHelper = {
+class TaskStatusUpdateTestHelper(val wrapped: TaskStatusUpdate)
+  def withTaskId(taskId: String): TaskStatusUpdateTestHelper =
     withTaskId(TaskID.newBuilder().setValue(taskId).build())
-  }
 
   def withTaskId(taskId: TaskID): TaskStatusUpdateTestHelper =
-    TaskStatusUpdateTestHelper {
+    TaskStatusUpdateTestHelper
       wrapped.copy(taskId = Task.Id(taskId))
-    }
 
   def withTaskId(taskId: Task.Id): TaskStatusUpdateTestHelper =
-    TaskStatusUpdateTestHelper {
+    TaskStatusUpdateTestHelper
       wrapped.copy(taskId = taskId)
-    }
 
-  def withAppId(appId: String): TaskStatusUpdateTestHelper = {
+  def withAppId(appId: String): TaskStatusUpdateTestHelper =
     withTaskId(TaskStatusUpdateTestHelper.newTaskID(appId))
-  }
 
   def withStatus(status: MarathonTaskStatus): TaskStatusUpdateTestHelper =
-    TaskStatusUpdateTestHelper {
+    TaskStatusUpdateTestHelper
       wrapped.copy(status = status)
-    }
-}
 
-object TaskStatusUpdateTestHelper {
+object TaskStatusUpdateTestHelper
   def apply(update: TaskStatusUpdate): TaskStatusUpdateTestHelper =
     new TaskStatusUpdateTestHelper(update)
 
-  private def newTaskID(appId: String) = {
+  private def newTaskID(appId: String) =
     Task.Id.forApp(PathId(appId))
-  }
 
   val taskId = newTaskID("/app")
 
@@ -104,4 +97,3 @@ object TaskStatusUpdateTestHelper {
           status = MarathonTaskStatusTestHelper.error
       )
   )
-}

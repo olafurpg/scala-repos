@@ -25,48 +25,41 @@ import org.apache.spark.sql.sources.{StreamSinkProvider, StreamSourceProvider}
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 
-object LastOptions {
+object LastOptions
   var parameters: Map[String, String] = null
   var schema: Option[StructType] = null
   var partitionColumns: Seq[String] = Nil
-}
 
 /** Dummy provider: returns no-op source/sink and records options in [[LastOptions]]. */
-class DefaultSource extends StreamSourceProvider with StreamSinkProvider {
+class DefaultSource extends StreamSourceProvider with StreamSinkProvider
   override def createSource(sqlContext: SQLContext,
                             schema: Option[StructType],
                             providerName: String,
-                            parameters: Map[String, String]): Source = {
+                            parameters: Map[String, String]): Source =
     LastOptions.parameters = parameters
     LastOptions.schema = schema
-    new Source {
+    new Source
       override def getNextBatch(start: Option[Offset]): Option[Batch] = None
       override def schema: StructType =
         StructType(StructField("a", IntegerType) :: Nil)
-    }
-  }
 
   override def createSink(sqlContext: SQLContext,
                           parameters: Map[String, String],
-                          partitionColumns: Seq[String]): Sink = {
+                          partitionColumns: Seq[String]): Sink =
     LastOptions.parameters = parameters
     LastOptions.partitionColumns = partitionColumns
-    new Sink {
+    new Sink
       override def addBatch(batch: Batch): Unit = {}
       override def currentOffset: Option[Offset] = None
-    }
-  }
-}
 
 class DataFrameReaderWriterSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest with SharedSQLContext with BeforeAndAfter
   import testImplicits._
 
-  after {
+  after
     sqlContext.streams.active.foreach(_.stop())
-  }
 
-  test("resolve default source") {
+  test("resolve default source")
     sqlContext.read
       .format("org.apache.spark.sql.streaming.test")
       .stream()
@@ -74,9 +67,8 @@ class DataFrameReaderWriterSuite
       .format("org.apache.spark.sql.streaming.test")
       .startStream()
       .stop()
-  }
 
-  test("resolve full class") {
+  test("resolve full class")
     sqlContext.read
       .format("org.apache.spark.sql.streaming.test.DefaultSource")
       .stream()
@@ -84,9 +76,8 @@ class DataFrameReaderWriterSuite
       .format("org.apache.spark.sql.streaming.test")
       .startStream()
       .stop()
-  }
 
-  test("options") {
+  test("options")
     val map = new java.util.HashMap[String, String]
     map.put("opt3", "3")
 
@@ -114,9 +105,8 @@ class DataFrameReaderWriterSuite
     assert(LastOptions.parameters("opt1") == "1")
     assert(LastOptions.parameters("opt2") == "2")
     assert(LastOptions.parameters("opt3") == "3")
-  }
 
-  test("partitioning") {
+  test("partitioning")
     val df =
       sqlContext.read.format("org.apache.spark.sql.streaming.test").stream()
 
@@ -130,25 +120,22 @@ class DataFrameReaderWriterSuite
       .stop()
     assert(LastOptions.partitionColumns == Seq("a"))
 
-    withSQLConf("spark.sql.caseSensitive" -> "false") {
+    withSQLConf("spark.sql.caseSensitive" -> "false")
       df.write
         .format("org.apache.spark.sql.streaming.test")
         .partitionBy("A")
         .startStream()
         .stop()
       assert(LastOptions.partitionColumns == Seq("a"))
-    }
 
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       df.write
         .format("org.apache.spark.sql.streaming.test")
         .partitionBy("b")
         .startStream()
         .stop()
-    }
-  }
 
-  test("stream paths") {
+  test("stream paths")
     val df = sqlContext.read
       .format("org.apache.spark.sql.streaming.test")
       .stream("/test")
@@ -163,9 +150,8 @@ class DataFrameReaderWriterSuite
       .stop()
 
     assert(LastOptions.parameters("path") == "/test")
-  }
 
-  test("test different data types for options") {
+  test("test different data types for options")
     val df = sqlContext.read
       .format("org.apache.spark.sql.streaming.test")
       .option("intOpt", 56)
@@ -189,12 +175,11 @@ class DataFrameReaderWriterSuite
     assert(LastOptions.parameters("intOpt") == "56")
     assert(LastOptions.parameters("boolOpt") == "false")
     assert(LastOptions.parameters("doubleOpt") == "6.7")
-  }
 
-  test("unique query names") {
+  test("unique query names")
 
     /** Start a query with a specific name */
-    def startQueryWithName(name: String = ""): ContinuousQuery = {
+    def startQueryWithName(name: String = ""): ContinuousQuery =
       sqlContext.read
         .format("org.apache.spark.sql.streaming.test")
         .stream("/test")
@@ -202,33 +187,29 @@ class DataFrameReaderWriterSuite
         .format("org.apache.spark.sql.streaming.test")
         .queryName(name)
         .startStream()
-    }
 
     /** Start a query without specifying a name */
-    def startQueryWithoutName(): ContinuousQuery = {
+    def startQueryWithoutName(): ContinuousQuery =
       sqlContext.read
         .format("org.apache.spark.sql.streaming.test")
         .stream("/test")
         .write
         .format("org.apache.spark.sql.streaming.test")
         .startStream()
-    }
 
     /** Get the names of active streams */
-    def activeStreamNames: Set[String] = {
+    def activeStreamNames: Set[String] =
       val streams = sqlContext.streams.active
       val names = streams.map(_.name).toSet
       assert(streams.length === names.size,
              s"names of active queries are not unique: $names")
       names
-    }
 
     val q1 = startQueryWithName("name")
 
     // Should not be able to start another query with the same name
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       startQueryWithName("name")
-    }
     assert(activeStreamNames === Set("name"))
 
     // Should be able to start queries with other names
@@ -240,14 +221,11 @@ class DataFrameReaderWriterSuite
     assert(activeStreamNames.contains(q4.name))
 
     // Should not be able to start a query with same auto-generated name
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       startQueryWithName(q4.name)
-    }
 
     // Should be able to start query with that name after stopping the previous query
     q1.stop()
     val q5 = startQueryWithName("name")
     assert(activeStreamNames.contains("name"))
     sqlContext.streams.active.foreach(_.stop())
-  }
-}

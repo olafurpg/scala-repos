@@ -27,46 +27,41 @@ import scala.collection.mutable.ListBuffer
   * Nikolay.Tropin
   * 2/26/14
   */
-abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
+abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion
 
   private var deleteProjectAtTearDown = false
   private var scalaLibraryLoader: ScalaLibraryLoader = null
 
-  override def setUp(): Unit = {
+  override def setUp(): Unit =
     super.setUp()
     myProject.getMessageBus
       .connect(myTestRootDisposable)
-      .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter {
-        override def rootsChanged(event: ModuleRootEvent) {
+      .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter
+        override def rootsChanged(event: ModuleRootEvent)
           forceFSRescan()
-        }
-      })
+      )
     CompilerTestUtil.enableExternalCompiler()
 
     addRoots()
     DebuggerTestUtil.setCompileServerSettings()
     DebuggerTestUtil.forceJdk8ForBuildProcess()
-  }
 
-  protected def addRoots() {
-    def getOrCreateChildDir(name: String) = {
+  protected def addRoots()
+    def getOrCreateChildDir(name: String) =
       val file = new File(getBaseDir.getCanonicalPath, name)
       if (!file.exists()) file.mkdir()
       LocalFileSystem.getInstance.refreshAndFindFileByPath(
           file.getCanonicalPath)
-    }
 
-    inWriteAction {
+    inWriteAction
       val srcRoot = getOrCreateChildDir("src")
       PsiTestUtil.addSourceRoot(getModule, srcRoot, false)
       val output = getOrCreateChildDir("out")
       CompilerProjectExtension
         .getInstance(getProject)
         .setCompilerOutputUrl(output.getUrl)
-    }
-  }
 
-  protected def addScalaSdk(loadReflect: Boolean = true) {
+  protected def addScalaSdk(loadReflect: Boolean = true)
     scalaLibraryLoader = new ScalaLibraryLoader(
         getProject,
         getModule,
@@ -75,9 +70,8 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
         Some(getTestProjectJdk))
 
     scalaLibraryLoader.loadScala(scalaSdkVersion)
-  }
 
-  override protected def getTestProjectJdk: Sdk = {
+  override protected def getTestProjectJdk: Sdk =
 //    val jdkTable = JavaAwareProjectJdkTableImpl.getInstanceEx
 //    if (scalaVersion.startsWith("2.12")) {
 //      DebuggerTestUtil.findJdk8()
@@ -86,12 +80,11 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
 //      jdkTable.getInternalJdk
 //    }
     DebuggerTestUtil.findJdk8()
-  }
 
   protected def forceFSRescan() =
     BuildManager.getInstance.clearState(myProject)
 
-  protected override def tearDown() {
+  protected override def tearDown()
     CompilerTestUtil.disableExternalCompiler(myProject)
     CompileServerLauncher.instance.stop()
     val baseDir = getBaseDir
@@ -99,103 +92,83 @@ abstract class ScalaCompilerTestBase extends ModuleTestCase with ScalaVersion {
     super.tearDown()
 
     if (deleteProjectAtTearDown) VfsTestUtil.deleteFile(baseDir)
-  }
 
-  protected def make(): List[String] = {
+  protected def make(): List[String] =
     val semaphore: Semaphore = new Semaphore
     semaphore.down()
     val callback = new ErrorReportingCallback(semaphore)
-    UIUtil.invokeAndWaitIfNeeded(new Runnable {
-      def run() {
-        try {
+    UIUtil.invokeAndWaitIfNeeded(new Runnable
+      def run()
+        try
           CompilerTestUtil.saveApplicationSettings()
           val ioFile: File =
             VfsUtilCore.virtualToIoFile(myModule.getModuleFile)
           saveProject()
           assert(ioFile.exists, "File does not exist: " + ioFile.getPath)
           CompilerManager.getInstance(getProject).rebuild(callback)
-        } catch {
+        catch
           case e: Exception => throw new RuntimeException(e)
-        }
-      }
-    })
+    )
     val maxCompileTime = 6000
     var i = 0
-    while (!semaphore.waitFor(100) && i < maxCompileTime) {
-      if (SwingUtilities.isEventDispatchThread) {
+    while (!semaphore.waitFor(100) && i < maxCompileTime)
+      if (SwingUtilities.isEventDispatchThread)
         UIUtil.dispatchAllInvocationEvents()
-      }
       i += 1
-    }
     Assert.assertTrue(
         s"Too long compilation of test data for ${getClass.getSimpleName}.test${getTestName(false)}",
         i < maxCompileTime)
-    if (callback.hasError) {
+    if (callback.hasError)
       deleteProjectAtTearDown = true
       callback.throwException()
-    }
     callback.getMessages
-  }
 
   private class ErrorReportingCallback(semaphore: Semaphore)
-      extends CompileStatusNotification {
+      extends CompileStatusNotification
     private var myError: Throwable = null
     private val myMessages = ListBuffer[String]()
 
     def finished(aborted: Boolean,
                  errors: Int,
                  warnings: Int,
-                 compileContext: CompileContext) {
-      try {
-        for (category <- CompilerMessageCategory.values) {
-          for (message <- compileContext.getMessages(category)) {
+                 compileContext: CompileContext)
+      try
+        for (category <- CompilerMessageCategory.values)
+          for (message <- compileContext.getMessages(category))
             val msg: String = message.getMessage
             if (category != CompilerMessageCategory.INFORMATION ||
-                !msg.startsWith("Compilation completed successfully")) {
+                !msg.startsWith("Compilation completed successfully"))
               myMessages += (category + ": " + msg)
-            }
-          }
-        }
-        if (errors > 0) {
+        if (errors > 0)
           Assert.fail("Compiler errors occurred! " + myMessages.mkString("\n"))
-        }
         Assert.assertFalse("Code did not compile!", aborted)
-      } catch {
+      catch
         case t: Throwable => myError = t
-      } finally {
+      finally
         semaphore.up()
-      }
-    }
 
     def hasError = myError != null
 
-    def throwException() {
+    def throwException()
       if (myError != null) throw new RuntimeException(myError)
-    }
 
     def getMessages: List[String] = myMessages.toList
-  }
 
-  protected def getBaseDir: VirtualFile = {
+  protected def getBaseDir: VirtualFile =
     val baseDir: VirtualFile = myProject.getBaseDir
     Assert.assertNotNull(baseDir)
     baseDir
-  }
 
-  protected def addFileToProject(relativePath: String, text: String) {
+  protected def addFileToProject(relativePath: String, text: String)
     VfsTestUtil.createFile(
         getSourceRootDir, relativePath, StringUtil.convertLineSeparators(text))
-  }
 
-  protected def getSourceRootDir: VirtualFile = {
+  protected def getSourceRootDir: VirtualFile =
     getBaseDir.findChild("src")
-  }
 
-  protected def saveProject(): Unit = {
+  protected def saveProject(): Unit =
     val applicationEx = ApplicationManagerEx.getApplicationEx
     val setting = applicationEx.isDoNotSave
     applicationEx.doNotSave(false)
     getProject.save()
     applicationEx.doNotSave(setting)
-  }
-}

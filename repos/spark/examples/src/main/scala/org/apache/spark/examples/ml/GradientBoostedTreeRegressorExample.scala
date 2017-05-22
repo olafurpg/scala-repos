@@ -27,8 +27,8 @@ import org.apache.spark.ml.regression.{GBTRegressionModel, GBTRegressor}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object GradientBoostedTreeRegressorExample {
-  def main(args: Array[String]): Unit = {
+object GradientBoostedTreeRegressorExample
+  def main(args: Array[String]): Unit =
     val conf =
       new SparkConf().setAppName("GradientBoostedTreeRegressorExample")
     val sc = new SparkContext(conf)
@@ -82,6 +82,4 @@ object GradientBoostedTreeRegressorExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

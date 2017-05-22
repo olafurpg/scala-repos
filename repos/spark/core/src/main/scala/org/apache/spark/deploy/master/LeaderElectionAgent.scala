@@ -25,19 +25,16 @@ import org.apache.spark.annotation.DeveloperApi
   * A LeaderElectionAgent tracks current master and is a common interface for all election Agents.
   */
 @DeveloperApi
-trait LeaderElectionAgent {
+trait LeaderElectionAgent
   val masterInstance: LeaderElectable
   def stop() {} // to avoid noops in implementations.
-}
 
 @DeveloperApi
-trait LeaderElectable {
+trait LeaderElectable
   def electedLeader()
   def revokedLeadership()
-}
 
 /** Single-node implementation of LeaderElectionAgent -- we're initially and always the leader. */
 private[spark] class MonarchyLeaderAgent(val masterInstance: LeaderElectable)
-    extends LeaderElectionAgent {
+    extends LeaderElectionAgent
   masterInstance.electedLeader()
-}

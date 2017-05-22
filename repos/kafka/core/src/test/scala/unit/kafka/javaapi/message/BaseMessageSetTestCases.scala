@@ -22,55 +22,48 @@ import org.junit.Test
 import kafka.utils.TestUtils
 import kafka.message.{DefaultCompressionCodec, NoCompressionCodec, CompressionCodec, Message}
 
-trait BaseMessageSetTestCases extends JUnitSuite {
+trait BaseMessageSetTestCases extends JUnitSuite
 
   val messages = Array(
       new Message("abcd".getBytes()), new Message("efgh".getBytes()))
   def createMessageSet(
       messages: Seq[Message],
       compressed: CompressionCodec = NoCompressionCodec): MessageSet
-  def toMessageIterator(messageSet: MessageSet): Iterator[Message] = {
+  def toMessageIterator(messageSet: MessageSet): Iterator[Message] =
     import scala.collection.JavaConversions._
     messageSet.map(m => m.message).iterator
-  }
 
   @Test
-  def testWrittenEqualsRead {
+  def testWrittenEqualsRead
     val messageSet = createMessageSet(messages)
     TestUtils.checkEquals(messages.iterator, toMessageIterator(messageSet))
-  }
 
   @Test
-  def testIteratorIsConsistent() {
+  def testIteratorIsConsistent()
     import scala.collection.JavaConversions._
     val m = createMessageSet(messages)
     // two iterators over the same set should give the same results
     TestUtils.checkEquals(m.iterator, m.iterator)
-  }
 
   @Test
-  def testIteratorIsConsistentWithCompression() {
+  def testIteratorIsConsistentWithCompression()
     import scala.collection.JavaConversions._
     val m = createMessageSet(messages, DefaultCompressionCodec)
     // two iterators over the same set should give the same results
     TestUtils.checkEquals(m.iterator, m.iterator)
-  }
 
   @Test
-  def testSizeInBytes() {
+  def testSizeInBytes()
     assertEquals("Empty message set should have 0 bytes.",
                  0,
                  createMessageSet(Array[Message]()).sizeInBytes)
     assertEquals("Predicted size should equal actual size.",
                  kafka.message.MessageSet.messageSetSize(messages),
                  createMessageSet(messages).sizeInBytes)
-  }
 
   @Test
-  def testSizeInBytesWithCompression() {
+  def testSizeInBytesWithCompression()
     assertEquals(
         "Empty message set should have 0 bytes.",
         0, // overhead of the GZIP output stream
         createMessageSet(Array[Message](), DefaultCompressionCodec).sizeInBytes)
-  }
-}

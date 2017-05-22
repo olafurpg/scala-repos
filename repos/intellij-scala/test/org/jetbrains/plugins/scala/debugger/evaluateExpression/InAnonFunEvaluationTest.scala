@@ -11,10 +11,10 @@ class InAnonFunEvaluationTest
     extends InAnonFunEvaluationTestBase with ScalaVersion_2_11
 
 class InAnonFunEvaluationTest_212
-    extends InAnonFunEvaluationTestBase with ScalaVersion_2_12 {
+    extends InAnonFunEvaluationTestBase with ScalaVersion_2_12
   //todo SCL-9139
-  override def testPartialFunction(): Unit = {
-    runDebugger() {
+  override def testPartialFunction(): Unit =
+    runDebugger()
       waitForBreakpoint()
       evalEquals("a", "a")
       evalEquals("x", "x")
@@ -22,11 +22,8 @@ class InAnonFunEvaluationTest_212
       evalEquals("name", "name")
       evalEquals("notUsed", "notUsed")
       evalEquals("args", "[]")
-    }
-  }
-}
 
-abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
+abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase
 
   addFileWithBreakpoints("FunctionValue.scala",
                          s"""
@@ -42,16 +39,14 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testFunctionValue() {
-    runDebugger() {
+  def testFunctionValue()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("a", "a")
       evalEquals("b", "b")
       evalEquals("x", "x")
       evalEquals("n", "10")
       evalEquals("args", "[]")
-    }
-  }
 
   addFileWithBreakpoints("PartialFunction.scala",
                          s"""
@@ -70,8 +65,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testPartialFunction() {
-    runDebugger() {
+  def testPartialFunction()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("a", "a")
       evalEquals("i", "10")
@@ -80,8 +75,6 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
       evalEquals("name", "name")
       evalEquals("notUsed", "notUsed")
       evalEquals("args", "[]")
-    }
-  }
 
   addFileWithBreakpoints("FunctionExpr.scala",
                          s"""
@@ -100,8 +93,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testFunctionExpr() {
-    runDebugger() {
+  def testFunctionExpr()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("a", "a")
       evalEquals("x", "x")
@@ -109,8 +102,6 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
       evalEquals("name", "name")
       evalEquals("notUsed", "notUsed")
       evalEquals("args", "[]")
-    }
-  }
 
   addFileWithBreakpoints("ForStmt.scala",
                          s"""
@@ -128,8 +119,8 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testForStmt() {
-    runDebugger() {
+  def testForStmt()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("s", "a")
       evalEquals("in", "in")
@@ -141,6 +132,3 @@ abstract class InAnonFunEvaluationTestBase extends ScalaDebuggerTestCase {
       evalEquals("i", ScalaBundle.message("not.used.from.for.statement", "i"))
       evalEquals(
           "si", ScalaBundle.message("not.used.from.for.statement", "si"))
-    }
-  }
-}

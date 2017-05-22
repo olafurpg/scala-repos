@@ -24,7 +24,7 @@ import com.google.common.io.Files
 import org.apache.spark._
 import org.apache.spark.util.Utils
 
-class HistoryServerArgumentsSuite extends SparkFunSuite {
+class HistoryServerArgumentsSuite extends SparkFunSuite
 
   private val logDir = new File("src/test/resources/spark-events")
   private val conf = new SparkConf()
@@ -32,34 +32,31 @@ class HistoryServerArgumentsSuite extends SparkFunSuite {
     .set("spark.history.fs.updateInterval", "1")
     .set("spark.testing", "true")
 
-  test("No Arguments Parsing") {
+  test("No Arguments Parsing")
     val argStrings = Array[String]()
     val hsa = new HistoryServerArguments(conf, argStrings)
     assert(
         conf.get("spark.history.fs.logDirectory") === logDir.getAbsolutePath)
     assert(conf.get("spark.history.fs.updateInterval") === "1")
     assert(conf.get("spark.testing") === "true")
-  }
 
-  test("Directory Arguments Parsing --dir or -d") {
+  test("Directory Arguments Parsing --dir or -d")
     val argStrings = Array("--dir", "src/test/resources/spark-events1")
     val hsa = new HistoryServerArguments(conf, argStrings)
     assert(
         conf.get("spark.history.fs.logDirectory") === "src/test/resources/spark-events1")
-  }
 
-  test("Directory Param can also be set directly") {
+  test("Directory Param can also be set directly")
     val argStrings = Array("src/test/resources/spark-events2")
     val hsa = new HistoryServerArguments(conf, argStrings)
     assert(
         conf.get("spark.history.fs.logDirectory") === "src/test/resources/spark-events2")
-  }
 
-  test("Properties File Arguments Parsing --properties-file") {
+  test("Properties File Arguments Parsing --properties-file")
     val tmpDir = Utils.createTempDir()
     val outFile =
       File.createTempFile("test-load-spark-properties", "test", tmpDir)
-    try {
+    try
       Files.write("spark.test.CustomPropertyA blah\n" +
                   "spark.test.CustomPropertyB notblah\n",
                   outFile,
@@ -68,8 +65,5 @@ class HistoryServerArgumentsSuite extends SparkFunSuite {
       val hsa = new HistoryServerArguments(conf, argStrings)
       assert(conf.get("spark.test.CustomPropertyA") === "blah")
       assert(conf.get("spark.test.CustomPropertyB") === "notblah")
-    } finally {
+    finally
       Utils.deleteRecursively(tmpDir)
-    }
-  }
-}

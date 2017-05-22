@@ -1,4 +1,4 @@
-object Test {
+object Test
   //Were affected by SI-6306
   def f[A](a: => A) = println(a.toString)
   def f1[A <: AnyVal](a: => A) = println(a.toString)
@@ -10,14 +10,13 @@ object Test {
 
   def foo() = println(2)
   def client(f: () => Unit) = { f(); f() }
-  def attempt2() {
+  def attempt2()
     val bar: () => Unit = foo _
     //The code causing SI-6306 was supposed to optimize code like this:
     client(() => bar())
     //to:
     client(bar)
-  }
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     attempt2()
     f3(Seq(1))
     f3(Seq())
@@ -27,7 +26,5 @@ object Test {
     f1((1).##)
     f2((1).toString)
     f2a((1).toString)
-  }
-}
 
 // vim: set ts=8 sw=2 et:

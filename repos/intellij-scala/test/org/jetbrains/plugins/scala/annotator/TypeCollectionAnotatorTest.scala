@@ -13,55 +13,50 @@ import org.jetbrains.plugins.scala.settings.ScalaProjectSettings
   */
 class TypeCollectionAnotatorTest
     extends ScalaLightPlatformCodeInsightTestCaseAdapter
-    with TestScalaProjectSettings {
+    with TestScalaProjectSettings
   private val immutableCollectionMessage =
     ScalaBundle.message("scala.immutable.collection")
   private val mutableCollectionMessage =
     ScalaBundle.message("scala.mutable.collection")
   private val javaCollectionMessage = ScalaBundle.message("java.collection")
 
-  protected override def setUp() {
+  protected override def setUp()
     super.setUp()
 
     scalaProjectSettings.setCollectionTypeHighlightingLevel(
         ScalaProjectSettings.COLLECTION_TYPE_HIGHLIGHTING_ALL)
-  }
 
-  private def annotate(text: String, holder: AnnotatorHolderMock) {
+  private def annotate(text: String, holder: AnnotatorHolderMock)
     configureFromFileTextAdapter("dummy.scala", text.replace("\r", ""))
 
-    getFileAdapter.asInstanceOf[ScalaFile].breadthFirst.foreach {
+    getFileAdapter.asInstanceOf[ScalaFile].breadthFirst.foreach
       case refElement: ScReferenceElement =>
         AnnotatorHighlighter.highlightReferenceElement(refElement, holder)
       case _ =>
-    }
-  }
 
   private def testCanAnnotate(
-      text: String, highlightedText: String, highlightingMessage: String) {
+      text: String, highlightedText: String, highlightingMessage: String)
     val holder = new AnnotatorHolderMock
     annotate(text, holder)
 
     assert(
-        holder.annotations.exists {
+        holder.annotations.exists
       case Info(`highlightedText`, `highlightingMessage`) => true
       case _ => false
-    })
-  }
+    )
 
   private def testCannotAnnotate(
-      text: String, textCantHighlight: (String, String)) {
+      text: String, textCantHighlight: (String, String))
     val holder = new AnnotatorHolderMock
     annotate(text, holder)
 
     assert(
-        !holder.annotations.exists {
+        !holder.annotations.exists
       case Info(`textCantHighlight`._1, `textCantHighlight`._2) => true
       case _ => false
-    })
-  }
+    )
 
-  def testAnnotateImmutableSimpple() {
+  def testAnnotateImmutableSimpple()
     val text = """
     import scala.collection.immutable.HashMap
 
@@ -71,9 +66,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "HashMap", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableFromPredef() {
+  def testAnnotateImmutableFromPredef()
     val text = """
     class A {
       val list = List(1, 2, 3)
@@ -81,9 +75,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "List", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableWithApplyFromPredef() {
+  def testAnnotateImmutableWithApplyFromPredef()
     val text = """
     class A {
       val map = Map.apply(1 -> 2, 3 -> 4)
@@ -91,9 +84,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableQualifiedName() {
+  def testAnnotateImmutableQualifiedName()
     val text = """
     class A {
       val lst = scala.collection.immutable.List(1, 2, 3)
@@ -101,9 +93,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "List", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableQualifiedNameWithApply() {
+  def testAnnotateImmutableQualifiedNameWithApply()
     val text = """
     class A {
       val lst = scala.collection.immutable.List.apply(1, 2, 3)
@@ -111,9 +102,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "List", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableWithExplicitType() {
+  def testAnnotateImmutableWithExplicitType()
     val text = """
     class A {
       val lst = Map[String, Int]()
@@ -121,9 +111,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableWithNew() {
+  def testAnnotateImmutableWithNew()
     val text = """
     import scala.collection.immutable.HashMap
 
@@ -133,9 +122,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "HashMap", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableWithTypeAnnotation() {
+  def testAnnotateImmutableWithTypeAnnotation()
     val text = """
     import scala.collection.immutable.HashMap
 
@@ -145,9 +133,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", immutableCollectionMessage)
-  }
 
-  def testAnnotateMutableSimple() {
+  def testAnnotateMutableSimple()
     val text = """
     import scala.collection.mutable.HashMap
 
@@ -157,9 +144,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "HashMap", mutableCollectionMessage)
-  }
 
-  def testAnnotateMutableNewFromPredef() {
+  def testAnnotateMutableNewFromPredef()
     val text = """
     class A {
       val sb = new StringBuilder("blah")
@@ -167,9 +153,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "StringBuilder", mutableCollectionMessage)
-  }
 
-  def testAnnotateMutableQualifiedName() {
+  def testAnnotateMutableQualifiedName()
     val text = """
       class A {
         val sb = scala.collection.mutable.HashMap(1 -> 2, 3 -> 4)
@@ -177,9 +162,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "HashMap", mutableCollectionMessage)
-  }
 
-  def testAnnotateMutableQualifiedNameWithApply() {
+  def testAnnotateMutableQualifiedNameWithApply()
     val text =
       """
       class A {
@@ -188,9 +172,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "HashMap", mutableCollectionMessage)
-  }
 
-  def testAnnotateMutableWithExplicitType() {
+  def testAnnotateMutableWithExplicitType()
     val text = """
     import scala.collection.mutable.HashMap
 
@@ -200,9 +183,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "HashMap", mutableCollectionMessage)
-  }
 
-  def testAnnotateMutableWithTypeAnnotation() {
+  def testAnnotateMutableWithTypeAnnotation()
     val text = """
     import scala.collection.mutable.HashMap
     import collection.mutable.Map
@@ -213,9 +195,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", mutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableAsParam() {
+  def testAnnotateImmutableAsParam()
     val text = """
     class A {
       def f(map: Map[String, String]) {
@@ -225,9 +206,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableAsReturnType() {
+  def testAnnotateImmutableAsReturnType()
     val text = """
     import scala.collection.immutable.HashMap
 
@@ -239,9 +219,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", immutableCollectionMessage)
-  }
 
-  def testAnnotateImmutableAsTypeParam() {
+  def testAnnotateImmutableAsTypeParam()
     val text = """
     class A[T <: Map[String, String]] {
 
@@ -249,9 +228,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", immutableCollectionMessage)
-  }
 
-  def testAnnotateMutableAsParam() {
+  def testAnnotateMutableAsParam()
     val text = """
     import scala.collection.mutable.Map
 
@@ -263,9 +241,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", mutableCollectionMessage)
-  }
 
-  def testAnnotateMutableAsReturnType() {
+  def testAnnotateMutableAsReturnType()
     val text = """
     import scala.collection.mutable.Map
     import scala.collection.mutable.HashMap
@@ -278,9 +255,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", mutableCollectionMessage)
-  }
 
-  def testAnnotateMutableAsTypeParam() {
+  def testAnnotateMutableAsTypeParam()
     val text = """
     import scala.collection.mutable.Map
 
@@ -290,9 +266,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "Map", mutableCollectionMessage)
-  }
 
-  def testAnnotateJavaConstructor() {
+  def testAnnotateJavaConstructor()
     val text = """
     import java.util.ArrayList
 
@@ -302,9 +277,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "ArrayList", javaCollectionMessage)
-  }
 
-  def testAnnotateJavaValType() {
+  def testAnnotateJavaValType()
     val text = """
     import java.util.ArrayList
 
@@ -314,9 +288,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "List", javaCollectionMessage)
-  }
 
-  def testAnnotateJavaReturnType() {
+  def testAnnotateJavaReturnType()
     val text = """
     import java.util.{ArrayList, List}
 
@@ -324,9 +297,8 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "List", javaCollectionMessage)
-  }
 
-  def testJavaParamType() {
+  def testJavaParamType()
     val text = """
     import java.util.{ArrayList, List}
 
@@ -335,18 +307,16 @@ class TypeCollectionAnotatorTest
     """
 
     testCanAnnotate(text, "List", javaCollectionMessage)
-  }
 
-  def testCannotAnnotateApply() {
+  def testCannotAnnotateApply()
     val text = """
     class A {
       val a = List.apply(1, 2, 3)
     }
     """
     testCannotAnnotate(text, ("apply", immutableCollectionMessage))
-  }
 
-  def testCannotHighlightImport() {
+  def testCannotHighlightImport()
     val text = """
       import scala.collection.mutable.HashMap
       import java.util.ArrayList
@@ -358,5 +328,3 @@ class TypeCollectionAnotatorTest
 
     testCannotAnnotate(text, ("HashMap", mutableCollectionMessage))
     testCannotAnnotate(text, ("ArrayList", javaCollectionMessage))
-  }
-}

@@ -12,10 +12,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScIfStmt}
   * @author Ksenia.Sautina
   * @since 1/31/13
   */
-class ScalaMissingIfBranchesFixer extends ScalaFixer {
+class ScalaMissingIfBranchesFixer extends ScalaFixer
   def apply(editor: Editor,
             processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
+            psiElement: PsiElement): OperationPerformed =
     val ifStatement =
       PsiTreeUtil.getParentOfType(psiElement, classOf[ScIfStmt], false)
     if (ifStatement == null) return NoOperation
@@ -24,21 +24,19 @@ class ScalaMissingIfBranchesFixer extends ScalaFixer {
     var transformingOneLiner = false
     val thenBranch = ifStatement.thenBranch
 
-    ifStatement.thenBranch match {
+    ifStatement.thenBranch match
       case Some(block: ScBlockExpr) =>
-        ifStatement.condition.foreach {
+        ifStatement.condition.foreach
           case cond =>
             if (cond.getTextRange.containsOffset(
                     editor.getCaretModel.getOffset))
               return placeInWholeBlock(block, editor)
-        }
         return NoOperation
       case Some(branch)
           if startLine(doc, branch) == startLine(doc, ifStatement) =>
         if (ifStatement.condition.isDefined) return NoOperation
         transformingOneLiner = true
       case _ =>
-    }
 
     val rParenth = ifStatement.getRightParenthesis.orNull
     assert(rParenth != null)
@@ -46,15 +44,12 @@ class ScalaMissingIfBranchesFixer extends ScalaFixer {
     val rParenthOffset = rParenth.getTextRange.getEndOffset
 
     if (ifStatement.elseBranch.isEmpty && !transformingOneLiner ||
-        ifStatement.thenBranch.isEmpty) {
+        ifStatement.thenBranch.isEmpty)
       doc.insertString(rParenthOffset, " {}")
-    } else {
+    else
       doc.insertString(rParenthOffset, " {")
       doc.insertString(thenBranch.get.getTextRange.getEndOffset + 1, "}")
-    }
 
     editor.getCaretModel.moveToOffset(rParenthOffset)
 
     WithEnter(2)
-  }
-}

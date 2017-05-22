@@ -21,7 +21,7 @@ package breeze.util
   *
   * @author dlwh, dramage
   */
-object Iterators {
+object Iterators
 
   def fromProducer[E](prod: => Option[E]): Iterator[E] =
     Iterator.continually(prod).takeWhile(None !=).map(_.get)
@@ -32,7 +32,7 @@ object Iterators {
     * from the first iterator.
     */
   def merge[T](iters: Iterator[T]*)(compare: ((T, T) => Int)): Iterator[T] =
-    new Iterator[T] {
+    new Iterator[T]
 
       /** Keep track of the top of each list. */
       val heads = iters.map(get _).toArray
@@ -42,26 +42,21 @@ object Iterators {
         heads.map(_ != None).foldLeft(false)(_ || _)
 
       /** Return the smallest element that is currently a list head. */
-      override def next: T = {
+      override def next: T =
         val top =
-          heads.zipWithIndex.foldLeft((None.asInstanceOf[Option[T]], -1)) {
+          heads.zipWithIndex.foldLeft((None.asInstanceOf[Option[T]], -1))
             (headA: (Option[T], Int), headB: (Option[T], Int)) =>
-              (headA, headB) match {
+              (headA, headB) match
                 case ((Some(a), i), (Some(b), j)) =>
                   if (compare(a, b) <= 0) headA else headB
                 case ((Some(a), i), (None, j)) => headA
                 case ((None, i), (Some(b), j)) => headB
                 case ((None, i), (None, j)) => headA
                 case x: Any => throw new IllegalStateException(x.toString)
-              }
-          }
 
         // update the top list and return its value
         heads(top._2) = get(iters(top._2))
         return top._1.get
-      }
 
       def get(iter: Iterator[T]): Option[T] =
         if (iter.hasNext) Some(iter.next) else None
-    }
-}

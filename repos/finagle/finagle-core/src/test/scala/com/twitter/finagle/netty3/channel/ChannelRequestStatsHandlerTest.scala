@@ -10,8 +10,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
-  test("records requests number") {
+class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar
+  test("records requests number")
     val sr = new InMemoryStatsReceiver
     val handler = new ChannelRequestStatsHandler(sr)
 
@@ -30,5 +30,3 @@ class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
 
     handler.channelClosed(ctx, e)
     assert(sr.stats(Seq("connection_requests")) == Seq(2.0f))
-  }
-}

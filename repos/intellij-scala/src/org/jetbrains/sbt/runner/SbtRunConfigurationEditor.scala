@@ -10,7 +10,7 @@ import com.intellij.openapi.project.Project
   */
 class SbtRunConfigurationEditor(
     project: Project, configuration: SbtRunConfiguration)
-    extends SettingsEditor[SbtRunConfiguration] {
+    extends SettingsEditor[SbtRunConfiguration]
   val form = new SbtRunConfigurationForm(project, configuration)
 
   def resetEditorFrom(configuration: SbtRunConfiguration): Unit =
@@ -20,4 +20,3 @@ class SbtRunConfigurationEditor(
     configuration(form)
 
   def createEditor: JComponent = form.getMainPanel
-}

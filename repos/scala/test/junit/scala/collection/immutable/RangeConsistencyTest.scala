@@ -8,14 +8,14 @@ import scala.util._
 
 /* Tests various ranges by making sure they all agree on the same answers. */
 @RunWith(classOf[JUnit4])
-class RangeConsistencyTest {
+class RangeConsistencyTest
   def r2nr[T : Integral](
       r: Range,
       puff: T,
       stride: T,
       check: (T, T) => Boolean,
       bi: T => BigInt
-  ): List[(BigInt, Try[Int])] = {
+  ): List[(BigInt, Try[Int])] =
     val num = implicitly[Integral[T]]
     import num._
     val one = num.one
@@ -33,15 +33,13 @@ class RangeConsistencyTest {
     if (!check(stride, fromInt(r.step))) return Nil
     val step = stride * fromInt(r.step)
 
-    def NR(s: T, e: T, i: T) = {
+    def NR(s: T, e: T, i: T) =
       val delta = (bi(e) - bi(s)).abs - (if (r.isInclusive) 0 else 1)
       val n = if (r.length == 0) BigInt(0) else delta / bi(i).abs + 1
-      if (r.isInclusive) {
+      if (r.isInclusive)
         (n, Try(NumericRange.inclusive(s, e, i).length))
-      } else {
+      else
         (n, Try(NumericRange(s, e, i).length))
-      }
-    }
 
     List(NR(start, end, step)) ::: (if (sn1 < start) List(NR(sn1, end, step))
                                     else Nil) ::: (if (start < sp1)
@@ -53,42 +51,37 @@ class RangeConsistencyTest {
                                                                          step))
                                                                else Nil) :::
     (if (end < ep1) List(NR(start, ep1, step)) else Nil)
-  }
 
   // Motivated by SI-4370: Wrong result for Long.MinValue to Long.MaxValue by Int.MaxValue
   @Test
-  def rangeChurnTest() {
+  def rangeChurnTest()
     val rn = new Random(4370)
-    for (i <- 0 to 10000) {
-      control.Breaks.breakable {
+    for (i <- 0 to 10000)
+      control.Breaks.breakable
         val start = rn.nextInt
         val end = rn.nextInt
-        val step = rn.nextInt(4) match {
+        val step = rn.nextInt(4) match
           case 0 => 1
           case 1 => -1
           case 2 => (rn.nextInt(11) + 2) * (2 * rn.nextInt(2) + 1)
           case 3 => var x = rn.nextInt; while (x == 0) x = rn.nextInt; x
-        }
         val r =
           if (rn.nextBoolean) Range.inclusive(start, end, step)
           else Range(start, end, step)
 
-        try { r.length } catch {
+        try { r.length } catch
           case iae: IllegalArgumentException => control.Breaks.break
-        }
 
-        val lpuff = rn.nextInt(4) match {
+        val lpuff = rn.nextInt(4) match
           case 0 => 1L
           case 1 => rn.nextInt(11) + 2L
           case 2 => 1L << rn.nextInt(60)
           case 3 => math.max(1L, math.abs(rn.nextLong))
-        }
-        val lstride = rn.nextInt(4) match {
+        val lstride = rn.nextInt(4) match
           case 0 => lpuff
           case 1 => 1L
           case 2 => 1L << rn.nextInt(60)
           case 3 => math.max(1L, math.abs(rn.nextLong))
-        }
         val lr = r2nr[Long](
             r,
             lpuff,
@@ -97,55 +90,45 @@ class RangeConsistencyTest {
             x => BigInt(x)
         )
 
-        lr.foreach {
+        lr.foreach
           case (n, t) =>
             assert(
-                t match {
+                t match
                   case Failure(_) => n > Int.MaxValue
                   case Success(m) => n == m
-                },
+                ,
                 (r.start, r.end, r.step, r.isInclusive, lpuff, lstride, n, t)
             )
-        }
 
-        val bipuff = rn.nextInt(3) match {
+        val bipuff = rn.nextInt(3) match
           case 0 => BigInt(1)
           case 1 => BigInt(rn.nextLong) + Long.MaxValue + 2
           case 2 => BigInt("1" + "0" * (rn.nextInt(100) + 1))
-        }
-        val bistride = rn.nextInt(3) match {
+        val bistride = rn.nextInt(3) match
           case 0 => bipuff
           case 1 => BigInt(1)
           case 2 => BigInt("1" + "0" * (rn.nextInt(100) + 1))
-        }
         val bir = r2nr[BigInt](r, bipuff, bistride, (a, b) => true, identity)
 
-        bir.foreach {
+        bir.foreach
           case (n, t) =>
             assert(
-                t match {
+                t match
                   case Failure(_) => n > Int.MaxValue
                   case Success(m) => n == m
-                },
+                ,
                 (r.start, r.end, r.step, r.isInclusive, bipuff, bistride, n, t)
             )
-        }
-      }
-    }
-  }
 
   @Test
-  def testSI4370() {
-    assert {
-      Try((Long.MinValue to Long.MaxValue by Int.MaxValue).length) match {
+  def testSI4370()
+    assert
+      Try((Long.MinValue to Long.MaxValue by Int.MaxValue).length) match
         case Failure(iae: IllegalArgumentException) => true
         case _ => false
-      }
-    }
-  }
 
   @Test
-  def testSI6736() {
+  def testSI6736()
     // These operations on overfull ranges should all succeed.
     assert((0 to Int.MaxValue).contains(4))
     assert(!( (Int.MinValue to 0).contains(4)))
@@ -159,13 +142,12 @@ class RangeConsistencyTest {
     assert((-3 to Int.MaxValue).takeRight(1234).length == 1234)
     assert((-3 to Int.MaxValue).dropWhile(_ <= 0).length == Int.MaxValue)
     assert(
-        (-3 to Int.MaxValue).span(_ <= 0) match {
+        (-3 to Int.MaxValue).span(_ <= 0) match
       case (a, b) => a.length == 4 && b.length == Int.MaxValue
-    })
-  }
+    )
 
   @Test
-  def testSI9348() {
+  def testSI9348()
     // Test exclusive range with (end-start) != 0 (mod step)
     assert((0.0f until 0.4f by 0.25f) sameElements List(0.0f, 0.25f))
     assert((1.0 until 2.2 by 0.5) sameElements List(1.0, 1.5, 2.0))
@@ -173,11 +155,10 @@ class RangeConsistencyTest {
     def bd(d: Double) = BigDecimal(d)
     val bdRange = bd(-10.0) until bd(0.0) by bd(4.5)
     assert(bdRange sameElements List(bd(-10.0), bd(-5.5), bd(-1.0)))
-  }
 
   @Test
-  def test_SI9388() {
-    val possiblyNotDefaultNumeric = new scala.math.Numeric[Int] {
+  def test_SI9388()
+    val possiblyNotDefaultNumeric = new scala.math.Numeric[Int]
       def fromInt(x: Int) = x
       def minus(x: Int, y: Int): Int = x - y
       def negate(x: Int): Int = -x
@@ -188,7 +169,6 @@ class RangeConsistencyTest {
       def toInt(x: Int): Int = x
       def toLong(x: Int): Long = x.toLong
       def compare(x: Int, y: Int) = x compare y
-    }
     val r = (Int.MinValue to Int.MaxValue by (1 << 23))
     val nr = NumericRange(Int.MinValue, Int.MaxValue, 1 << 23)
     assert({ var i = 0; r.foreach(_ => i += 1); i } == 512)
@@ -197,5 +177,3 @@ class RangeConsistencyTest {
     assert(nr.sum == Int.MinValue)
     assert(r.sum(possiblyNotDefaultNumeric) == Int.MinValue)
     assert(nr.sum(possiblyNotDefaultNumeric) == Int.MinValue)
-  }
-}

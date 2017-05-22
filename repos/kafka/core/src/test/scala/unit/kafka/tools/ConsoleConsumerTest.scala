@@ -26,10 +26,10 @@ import org.junit.Assert._
 import org.junit.Test
 import org.scalatest.junit.JUnitSuite
 
-class ConsoleConsumerTest extends JUnitSuite {
+class ConsoleConsumerTest extends JUnitSuite
 
   @Test
-  def shouldLimitReadsToMaxMessageLimit() {
+  def shouldLimitReadsToMaxMessageLimit()
     //Mocks
     val consumer = EasyMock.createNiceMock(classOf[BaseConsumer])
     val formatter = EasyMock.createNiceMock(classOf[MessageFormatter])
@@ -53,10 +53,9 @@ class ConsoleConsumerTest extends JUnitSuite {
 
     //Test
     ConsoleConsumer.process(messageLimit, formatter, consumer, true)
-  }
 
   @Test
-  def shouldParseValidOldConsumerValidConfig() {
+  def shouldParseValidOldConsumerValidConfig()
     //Given
     val args: Array[String] = Array("--zookeeper",
                                     "localhost:2181",
@@ -72,10 +71,9 @@ class ConsoleConsumerTest extends JUnitSuite {
     assertEquals("localhost:2181", config.zkConnectionStr)
     assertEquals("test", config.topicArg)
     assertEquals(true, config.fromBeginning)
-  }
 
   @Test
-  def shouldParseValidNewConsumerValidConfig() {
+  def shouldParseValidNewConsumerValidConfig()
     //Given
     val args: Array[String] = Array("--bootstrap-server",
                                     "localhost:9092",
@@ -92,10 +90,9 @@ class ConsoleConsumerTest extends JUnitSuite {
     assertEquals("localhost:9092", config.bootstrapServer)
     assertEquals("test", config.topicArg)
     assertEquals(true, config.fromBeginning)
-  }
 
   @Test
-  def shouldParseConfigsFromFile() {
+  def shouldParseConfigsFromFile()
     val propsFile = TestUtils.tempFile()
     val propsStream = new FileOutputStream(propsFile)
     propsStream.write("consumer.timeout.ms=1000".getBytes())
@@ -113,5 +110,3 @@ class ConsoleConsumerTest extends JUnitSuite {
 
     assertEquals(
         "1000", config.consumerProps.getProperty("consumer.timeout.ms"))
-  }
-}

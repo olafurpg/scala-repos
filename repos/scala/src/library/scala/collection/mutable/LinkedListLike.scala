@@ -59,7 +59,7 @@ import scala.annotation.tailrec
     "Low-level linked lists are deprecated due to idiosyncrasies in interface and incomplete features.",
     "2.11.0")
 trait LinkedListLike[A, This <: Seq[A] with LinkedListLike[A, This]]
-    extends SeqLike[A, This] { self =>
+    extends SeqLike[A, This]  self =>
 
   var elem: A = _
   var next: This = _
@@ -78,10 +78,9 @@ trait LinkedListLike[A, This <: Seq[A] with LinkedListLike[A, This]]
     if (isEmpty) throw new NoSuchElementException
     else elem
 
-  override def tail: This = {
+  override def tail: This =
     require(nonEmpty, "tail of empty list")
     next
-  }
 
   /** If `this` is empty then it does nothing and returns `that`. Otherwise, appends `that` to `this`. The append
     * requires a full traversal of `this`.
@@ -119,77 +118,63 @@ trait LinkedListLike[A, This <: Seq[A] with LinkedListLike[A, This]]
     *  @return the list after append (this is the list itself if nonempty,
     *  or list `that` if list this is empty. )
     */
-  def append(that: This): This = {
+  def append(that: This): This =
     @tailrec
-    def loop(x: This) {
+    def loop(x: This)
       if (x.next.isEmpty) x.next = that
       else loop(x.next)
-    }
     if (isEmpty) that
     else { loop(repr); repr }
-  }
 
   /** Insert linked list `that` at current position of this linked list
     *  @note this linked list must not be empty
     */
-  def insert(that: This): Unit = {
+  def insert(that: This): Unit =
     require(nonEmpty, "insert into empty list")
-    if (that.nonEmpty) {
+    if (that.nonEmpty)
       that append next
       next = that
-    }
-  }
 
-  override def drop(n: Int): This = {
+  override def drop(n: Int): This =
     var i = 0
     var these: This = repr
-    while (i < n && !these.isEmpty) {
+    while (i < n && !these.isEmpty)
       these = these.next
       i += 1
-    }
     these
-  }
 
-  private def atLocation[T](n: Int)(f: This => T) = {
+  private def atLocation[T](n: Int)(f: This => T) =
     val loc = drop(n)
     if (loc.nonEmpty) f(loc)
     else throw new IndexOutOfBoundsException(n.toString)
-  }
 
   override def apply(n: Int): A = atLocation(n)(_.elem)
   def update(n: Int, x: A): Unit = atLocation(n)(_.elem = x)
 
-  def get(n: Int): Option[A] = {
+  def get(n: Int): Option[A] =
     val loc = drop(n)
     if (loc.nonEmpty) Some(loc.elem)
     else None
-  }
 
-  override def iterator: Iterator[A] = new AbstractIterator[A] {
+  override def iterator: Iterator[A] = new AbstractIterator[A]
     var elems = self
     def hasNext = elems.nonEmpty
-    def next = {
+    def next =
       val res = elems.elem
       elems = elems.next
       res
-    }
-  }
 
-  override def foreach[U](f: A => U) {
+  override def foreach[U](f: A => U)
     var these = this
-    while (these.nonEmpty) {
+    while (these.nonEmpty)
       f(these.elem)
       these = these.next
-    }
-  }
 
   /** Return a clone of this list.
     *
     *  @return a `LinkedList` with the same elements.
     */
-  override def clone(): This = {
+  override def clone(): This =
     val bf = newBuilder
     bf ++= this
     bf.result()
-  }
-}

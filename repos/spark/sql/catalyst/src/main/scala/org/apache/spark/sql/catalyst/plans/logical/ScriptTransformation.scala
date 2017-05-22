@@ -32,10 +32,9 @@ case class ScriptTransformation(input: Seq[Expression],
                                 output: Seq[Attribute],
                                 child: LogicalPlan,
                                 ioschema: ScriptInputOutputSchema)
-    extends UnaryNode {
+    extends UnaryNode
   override def references: AttributeSet =
     AttributeSet(input.flatMap(_.references))
-}
 
 /**
   * A placeholder for implementation specific input and output properties when passing data

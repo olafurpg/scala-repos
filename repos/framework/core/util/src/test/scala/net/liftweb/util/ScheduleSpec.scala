@@ -29,43 +29,38 @@ import Helpers._
   */
 object ScheduleSpec
     extends Specification with PendingUntilFixed with PingedService
-    with BeforeExample {
+    with BeforeExample
   "Schedule Specification".title
 
   def before = Schedule.restart
 
-  "The Schedule object" should {
-    "provide a schedule method to ping an actor regularly" in {
+  "The Schedule object" should
+    "provide a schedule method to ping an actor regularly" in
       Schedule.schedule(service, Alive, TimeSpan(10))
       service.pinged must eventually(beTrue)
-    }
-    "honor multiple restarts" in {
+    "honor multiple restarts" in
       Schedule.restart
       Schedule.restart
       Schedule.restart
       Schedule.schedule(service, Alive, TimeSpan(10))
       service.pinged must eventually(beTrue)
-    }
-    "honor shutdown followed by restart" in {
+    "honor shutdown followed by restart" in
       Schedule.shutdown
       Schedule.restart
       Schedule.schedule(service, Alive, TimeSpan(10))
       service.pinged must eventually(beTrue)
-    }
-    "not honor multiple shutdowns" in {
+    "not honor multiple shutdowns" in
       Schedule.shutdown
       Schedule.shutdown
 //      service.pinged must eventually(beFalse)
       service.pinged must throwA[ActorPingException]
-    }.pendingUntilFixed
-  }
-}
+    .pendingUntilFixed
 
-trait PingedService {
+trait PingedService
   case object Alive
   val service = new Service
 
-  class Service extends LiftActor {
+  class Service extends LiftActor
     @volatile var pinged = false
     /*
     def act() {
@@ -76,8 +71,5 @@ trait PingedService {
       }
     }
      */
-    protected def messageHandler = {
+    protected def messageHandler =
       case Alive => { pinged = true /*; exit() */ }
-    }
-  }
-}

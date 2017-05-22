@@ -41,7 +41,7 @@ import org.apache.spark.storage._
   */
 abstract class ContextCleanerSuiteBase(
     val shuffleManager: Class[_] = classOf[HashShuffleManager])
-    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext {
+    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext
   implicit val defaultTimeout = timeout(10000 millis)
   val conf = new SparkConf()
     .setMaster("local[2]")
@@ -51,16 +51,13 @@ abstract class ContextCleanerSuiteBase(
     .set("spark.cleaner.referenceTracking.cleanCheckpoints", "true")
     .set("spark.shuffle.manager", shuffleManager.getName)
 
-  before {
+  before
     sc = new SparkContext(conf)
-  }
 
-  after {
-    if (sc != null) {
+  after
+    if (sc != null)
       sc.stop()
       sc = null
-    }
-  }
 
   // ------ Helper functions ------
 
@@ -70,12 +67,10 @@ abstract class ContextCleanerSuiteBase(
   protected def newBroadcast() = sc.broadcast(1 to 100)
 
   protected def newRDDWithShuffleDependencies(
-      ): (RDD[_], Seq[ShuffleDependency[_, _, _]]) = {
-    def getAllDependencies(rdd: RDD[_]): Seq[Dependency[_]] = {
-      rdd.dependencies ++ rdd.dependencies.flatMap { dep =>
+      ): (RDD[_], Seq[ShuffleDependency[_, _, _]]) =
+    def getAllDependencies(rdd: RDD[_]): Seq[Dependency[_]] =
+      rdd.dependencies ++ rdd.dependencies.flatMap  dep =>
         getAllDependencies(dep.rdd)
-      }
-    }
     val rdd = newShuffleRDD()
 
     // Get all the shuffle dependencies
@@ -83,40 +78,34 @@ abstract class ContextCleanerSuiteBase(
       .filter(_.isInstanceOf[ShuffleDependency[_, _, _]])
       .map(_.asInstanceOf[ShuffleDependency[_, _, _]])
       (rdd, shuffleDeps)
-  }
 
-  protected def randomRdd() = {
-    val rdd: RDD[_] = Random.nextInt(3) match {
+  protected def randomRdd() =
+    val rdd: RDD[_] = Random.nextInt(3) match
       case 0 => newRDD()
       case 1 => newShuffleRDD()
       case 2 => newPairRDD.join(newPairRDD())
-    }
     if (Random.nextBoolean()) rdd.persist()
     rdd.count()
     rdd
-  }
 
   /** Run GC and make sure it actually has run */
-  protected def runGC() {
+  protected def runGC()
     val weakRef = new WeakReference(new Object())
     val startTime = System.currentTimeMillis
     System.gc() // Make a best effort to run the garbage collection. It *usually* runs GC.
     // Wait until a weak reference object has been GCed
     while (System.currentTimeMillis - startTime < 10000 &&
-    weakRef.get != null) {
+    weakRef.get != null)
       System.gc()
       Thread.sleep(200)
-    }
-  }
 
   protected def cleaner = sc.cleaner.get
-}
 
 /**
   * Basic ContextCleanerSuite, which uses sort-based shuffle
   */
-class ContextCleanerSuite extends ContextCleanerSuiteBase {
-  test("cleanup RDD") {
+class ContextCleanerSuite extends ContextCleanerSuiteBase
+  test("cleanup RDD")
     val rdd = newRDD().persist()
     val collected = rdd.collect().toList
     val tester = new CleanerTester(sc, rddIds = Seq(rdd.id))
@@ -127,9 +116,8 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
 
     // Verify that RDDs can be re-executed after cleaning up
     assert(rdd.collect().toList === collected)
-  }
 
-  test("cleanup shuffle") {
+  test("cleanup shuffle")
     val (rdd, shuffleDeps) = newRDDWithShuffleDependencies()
     val collected = rdd.collect().toList
     val tester =
@@ -142,27 +130,24 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
 
     // Verify that shuffles can be re-executed after cleaning up
     assert(rdd.collect().toList.equals(collected))
-  }
 
-  test("cleanup broadcast") {
+  test("cleanup broadcast")
     val broadcast = newBroadcast()
     val tester = new CleanerTester(sc, broadcastIds = Seq(broadcast.id))
 
     // Explicit cleanup
     cleaner.doCleanupBroadcast(broadcast.id, blocking = true)
     tester.assertCleanup()
-  }
 
-  test("automatically cleanup RDD") {
+  test("automatically cleanup RDD")
     var rdd = newRDD().persist()
     rdd.count()
 
     // Test that GC does not cause RDD cleanup due to a strong reference
     val preGCTester = new CleanerTester(sc, rddIds = Seq(rdd.id))
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
 
     // Test that GC causes RDD cleanup after dereferencing the RDD
     // Note rdd is used after previous GC to avoid early collection by the JVM
@@ -170,18 +155,16 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     rdd = null // Make RDD out of scope
     runGC()
     postGCTester.assertCleanup()
-  }
 
-  test("automatically cleanup shuffle") {
+  test("automatically cleanup shuffle")
     var rdd = newShuffleRDD()
     rdd.count()
 
     // Test that GC does not cause shuffle cleanup due to a strong reference
     val preGCTester = new CleanerTester(sc, shuffleIds = Seq(0))
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
     rdd.count() // Defeat early collection by the JVM
 
     // Test that GC causes shuffle cleanup after dereferencing the RDD
@@ -189,17 +172,15 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     rdd = null // Make RDD out of scope, so that corresponding shuffle goes out of scope
     runGC()
     postGCTester.assertCleanup()
-  }
 
-  test("automatically cleanup broadcast") {
+  test("automatically cleanup broadcast")
     var broadcast = newBroadcast()
 
     // Test that GC does not cause broadcast cleanup due to a strong reference
     val preGCTester = new CleanerTester(sc, broadcastIds = Seq(broadcast.id))
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
 
     // Test that GC causes broadcast cleanup after dereferencing the broadcast variable
     // Note broadcast is used after previous GC to avoid early collection by the JVM
@@ -207,9 +188,8 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     broadcast = null // Make broadcast variable out of scope
     runGC()
     postGCTester.assertCleanup()
-  }
 
-  test("automatically cleanup normal checkpoint") {
+  test("automatically cleanup normal checkpoint")
     val checkpointDir = java.io.File.createTempFile("temp", "")
     checkpointDir.deleteOnExit()
     checkpointDir.delete()
@@ -259,9 +239,8 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     runGC()
     postGCTester.assertCleanup()
     assert(fs.exists(ReliableRDDCheckpointData.checkpointPath(sc, rddId).get))
-  }
 
-  test("automatically clean up local checkpoint") {
+  test("automatically clean up local checkpoint")
     // Note that this test is similar to the RDD cleanup
     // test because the same underlying mechanism is used!
     var rdd = newPairRDD().localCheckpoint()
@@ -273,18 +252,16 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     // Test that GC does not cause checkpoint cleanup due to a strong reference
     val preGCTester = new CleanerTester(sc, rddIds = Seq(rdd.id))
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
 
     // Test that RDD going out of scope does cause the checkpoint blocks to be cleaned up
     val postGCTester = new CleanerTester(sc, rddIds = Seq(rdd.id))
     rdd = null
     runGC()
     postGCTester.assertCleanup()
-  }
 
-  test("automatically cleanup RDD + shuffle + broadcast") {
+  test("automatically cleanup RDD + shuffle + broadcast")
     val numRdds = 100
     val numBroadcasts = 4 // Broadcasts are more costly
     val rddBuffer = (1 to numRdds).map(i => randomRdd()).toBuffer
@@ -296,9 +273,8 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
 
     val preGCTester = new CleanerTester(sc, rddIds, shuffleIds, broadcastIds)
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
 
     // Test that GC triggers the cleanup of all variables after the dereferencing them
     val postGCTester = new CleanerTester(sc, rddIds, shuffleIds, broadcastIds)
@@ -311,14 +287,13 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     val taskClosureBroadcastId = broadcastIds.max + 1
     assert(
         sc.env.blockManager.master
-          .getMatchingBlockIds({
+          .getMatchingBlockIds(
         case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
         case _ => false
-      }, askSlaves = true)
+      , askSlaves = true)
           .isEmpty)
-  }
 
-  test("automatically cleanup RDD + shuffle + broadcast in distributed mode") {
+  test("automatically cleanup RDD + shuffle + broadcast in distributed mode")
     sc.stop()
 
     val conf2 = new SparkConf()
@@ -340,9 +315,8 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
 
     val preGCTester = new CleanerTester(sc, rddIds, shuffleIds, broadcastIds)
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
 
     // Test that GC triggers the cleanup of all variables after the dereferencing them
     val postGCTester = new CleanerTester(sc, rddIds, shuffleIds, broadcastIds)
@@ -355,20 +329,18 @@ class ContextCleanerSuite extends ContextCleanerSuiteBase {
     val taskClosureBroadcastId = broadcastIds.max + 1
     assert(
         sc.env.blockManager.master
-          .getMatchingBlockIds({
+          .getMatchingBlockIds(
         case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
         case _ => false
-      }, askSlaves = true)
+      , askSlaves = true)
           .isEmpty)
-  }
-}
 
 /**
   * A copy of the shuffle tests for sort-based shuffle
   */
 class SortShuffleContextCleanerSuite
-    extends ContextCleanerSuiteBase(classOf[SortShuffleManager]) {
-  test("cleanup shuffle") {
+    extends ContextCleanerSuiteBase(classOf[SortShuffleManager])
+  test("cleanup shuffle")
     val (rdd, shuffleDeps) = newRDDWithShuffleDependencies()
     val collected = rdd.collect().toList
     val tester =
@@ -381,18 +353,16 @@ class SortShuffleContextCleanerSuite
 
     // Verify that shuffles can be re-executed after cleaning up
     assert(rdd.collect().toList.equals(collected))
-  }
 
-  test("automatically cleanup shuffle") {
+  test("automatically cleanup shuffle")
     var rdd = newShuffleRDD()
     rdd.count()
 
     // Test that GC does not cause shuffle cleanup due to a strong reference
     val preGCTester = new CleanerTester(sc, shuffleIds = Seq(0))
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
     rdd.count() // Defeat early collection by the JVM
 
     // Test that GC causes shuffle cleanup after dereferencing the RDD
@@ -400,9 +370,8 @@ class SortShuffleContextCleanerSuite
     rdd = null // Make RDD out of scope, so that corresponding shuffle goes out of scope
     runGC()
     postGCTester.assertCleanup()
-  }
 
-  test("automatically cleanup RDD + shuffle + broadcast in distributed mode") {
+  test("automatically cleanup RDD + shuffle + broadcast in distributed mode")
     sc.stop()
 
     val conf2 = new SparkConf()
@@ -423,9 +392,8 @@ class SortShuffleContextCleanerSuite
 
     val preGCTester = new CleanerTester(sc, rddIds, shuffleIds, broadcastIds)
     runGC()
-    intercept[Exception] {
+    intercept[Exception]
       preGCTester.assertCleanup()(timeout(1000 millis))
-    }
 
     // Test that GC triggers the cleanup of all variables after the dereferencing them
     val postGCTester = new CleanerTester(sc, rddIds, shuffleIds, broadcastIds)
@@ -438,13 +406,11 @@ class SortShuffleContextCleanerSuite
     val taskClosureBroadcastId = broadcastIds.max + 1
     assert(
         sc.env.blockManager.master
-          .getMatchingBlockIds({
+          .getMatchingBlockIds(
         case BroadcastBlockId(`taskClosureBroadcastId`, _) => true
         case _ => false
-      }, askSlaves = true)
+      , askSlaves = true)
           .isEmpty)
-  }
-}
 
 /**
   * Class to test whether RDDs, shuffles, etc. have been successfully cleaned.
@@ -455,7 +421,7 @@ class CleanerTester(sc: SparkContext,
                     shuffleIds: Seq[Int] = Seq.empty,
                     broadcastIds: Seq[Long] = Seq.empty,
                     checkpointIds: Seq[Long] = Seq.empty)
-    extends Logging {
+    extends Logging
 
   val toBeCleanedRDDIds = new HashSet[Int] ++= rddIds
   val toBeCleanedShuffleIds = new HashSet[Int] ++= shuffleIds
@@ -463,33 +429,26 @@ class CleanerTester(sc: SparkContext,
   val toBeCheckpointIds = new HashSet[Long] ++= checkpointIds
   val isDistributed = !sc.isLocal
 
-  val cleanerListener = new CleanerListener {
-    def rddCleaned(rddId: Int): Unit = {
+  val cleanerListener = new CleanerListener
+    def rddCleaned(rddId: Int): Unit =
       toBeCleanedRDDIds.synchronized { toBeCleanedRDDIds -= rddId }
       logInfo("RDD " + rddId + " cleaned")
-    }
 
-    def shuffleCleaned(shuffleId: Int): Unit = {
+    def shuffleCleaned(shuffleId: Int): Unit =
       toBeCleanedShuffleIds.synchronized { toBeCleanedShuffleIds -= shuffleId }
       logInfo("Shuffle " + shuffleId + " cleaned")
-    }
 
-    def broadcastCleaned(broadcastId: Long): Unit = {
-      toBeCleanedBroadcstIds.synchronized {
+    def broadcastCleaned(broadcastId: Long): Unit =
+      toBeCleanedBroadcstIds.synchronized
         toBeCleanedBroadcstIds -= broadcastId
-      }
       logInfo("Broadcast " + broadcastId + " cleaned")
-    }
 
-    def accumCleaned(accId: Long): Unit = {
+    def accumCleaned(accId: Long): Unit =
       logInfo("Cleaned accId " + accId + " cleaned")
-    }
 
-    def checkpointCleaned(rddId: Long): Unit = {
+    def checkpointCleaned(rddId: Long): Unit =
       toBeCheckpointIds.synchronized { toBeCheckpointIds -= rddId }
       logInfo("checkpoint  " + rddId + " cleaned")
-    }
-  }
 
   val MAX_VALIDATION_ATTEMPTS = 10
   val VALIDATION_ATTEMPT_INTERVAL = 100
@@ -500,28 +459,25 @@ class CleanerTester(sc: SparkContext,
   sc.cleaner.get.attachListener(cleanerListener)
 
   /** Assert that all the stuff has been cleaned up */
-  def assertCleanup()(implicit waitTimeout: PatienceConfiguration.Timeout) {
-    try {
-      eventually(waitTimeout, interval(100 millis)) {
+  def assertCleanup()(implicit waitTimeout: PatienceConfiguration.Timeout)
+    try
+      eventually(waitTimeout, interval(100 millis))
         assert(isAllCleanedUp,
                "The following resources were not cleaned up:\n" +
                uncleanedResourcesToString)
-      }
       postCleanupValidate()
-    } finally {
+    finally
       logInfo(
           "Resources left from cleaning up:\n" + uncleanedResourcesToString)
-    }
-  }
 
   /** Verify that RDDs, shuffles, etc. occupy resources */
-  private def preCleanupValidate() {
+  private def preCleanupValidate()
     assert(rddIds.nonEmpty || shuffleIds.nonEmpty ||
            broadcastIds.nonEmpty || checkpointIds.nonEmpty,
            "Nothing to cleanup")
 
     // Verify the RDDs have been persisted and blocks are present
-    rddIds.foreach { rddId =>
+    rddIds.foreach  rddId =>
       assert(
           sc.persistentRdds.contains(rddId),
           "RDD " + rddId +
@@ -533,10 +489,9 @@ class CleanerTester(sc: SparkContext,
           "Blocks of RDD " + rddId + " cannot be found in block manager, " +
           "cannot start cleaner test"
       )
-    }
 
     // Verify the shuffle ids are registered and blocks are present
-    shuffleIds.foreach { shuffleId =>
+    shuffleIds.foreach  shuffleId =>
       assert(
           mapOutputTrackerMaster.containsShuffle(shuffleId),
           "Shuffle " + shuffleId +
@@ -548,25 +503,22 @@ class CleanerTester(sc: SparkContext,
           "Blocks of shuffle " + shuffleId +
           " cannot be found in block manager, " + "cannot start cleaner test"
       )
-    }
 
     // Verify that the broadcast blocks are present
-    broadcastIds.foreach { broadcastId =>
+    broadcastIds.foreach  broadcastId =>
       assert(
           !getBroadcastBlocks(broadcastId).isEmpty,
           "Blocks of broadcast " + broadcastId +
           "cannot be found in block manager, " + "cannot start cleaner test"
       )
-    }
-  }
 
   /**
     * Verify that RDDs, shuffles, etc. do not occupy resources. Tests multiple times as there is
     * as there is not guarantee on how long it will take clean up the resources.
     */
-  private def postCleanupValidate() {
+  private def postCleanupValidate()
     // Verify the RDDs have been persisted and blocks are present
-    rddIds.foreach { rddId =>
+    rddIds.foreach  rddId =>
       assert(
           !sc.persistentRdds.contains(rddId),
           "RDD " + rddId + " was not cleared from sc.persistentRdds"
@@ -576,10 +528,9 @@ class CleanerTester(sc: SparkContext,
           getRDDBlocks(rddId).isEmpty,
           "Blocks of RDD " + rddId + " were not cleared from block manager"
       )
-    }
 
     // Verify the shuffle ids are registered and blocks are present
-    shuffleIds.foreach { shuffleId =>
+    shuffleIds.foreach  shuffleId =>
       assert(
           !mapOutputTrackerMaster.containsShuffle(shuffleId),
           "Shuffle " + shuffleId +
@@ -591,34 +542,27 @@ class CleanerTester(sc: SparkContext,
           "Blocks of shuffle " + shuffleId +
           " were not cleared from block manager"
       )
-    }
 
     // Verify that the broadcast blocks are present
-    broadcastIds.foreach { broadcastId =>
+    broadcastIds.foreach  broadcastId =>
       assert(
           getBroadcastBlocks(broadcastId).isEmpty,
           "Blocks of broadcast " + broadcastId +
           " were not cleared from block manager"
       )
-    }
-  }
 
-  private def uncleanedResourcesToString = {
-    val s1 = toBeCleanedRDDIds.synchronized {
+  private def uncleanedResourcesToString =
+    val s1 = toBeCleanedRDDIds.synchronized
       toBeCleanedRDDIds.toSeq.sorted.mkString("[", ", ", "]")
-    }
-    val s2 = toBeCleanedShuffleIds.synchronized {
+    val s2 = toBeCleanedShuffleIds.synchronized
       toBeCleanedShuffleIds.toSeq.sorted.mkString("[", ", ", "]")
-    }
-    val s3 = toBeCleanedBroadcstIds.synchronized {
+    val s3 = toBeCleanedBroadcstIds.synchronized
       toBeCleanedBroadcstIds.toSeq.sorted.mkString("[", ", ", "]")
-    }
     s"""
        |\tRDDs = $s1
        |\tShuffles = $s2
        |\tBroadcasts = $s3
     """.stripMargin
-  }
 
   private def isAllCleanedUp =
     toBeCleanedRDDIds.synchronized { toBeCleanedRDDIds.isEmpty } &&
@@ -626,29 +570,25 @@ class CleanerTester(sc: SparkContext,
     toBeCleanedBroadcstIds.synchronized { toBeCleanedBroadcstIds.isEmpty } &&
     toBeCheckpointIds.synchronized { toBeCheckpointIds.isEmpty }
 
-  private def getRDDBlocks(rddId: Int): Seq[BlockId] = {
-    blockManager.master.getMatchingBlockIds(_ match {
+  private def getRDDBlocks(rddId: Int): Seq[BlockId] =
+    blockManager.master.getMatchingBlockIds(_ match
       case RDDBlockId(`rddId`, _) => true
       case _ => false
-    }, askSlaves = true)
-  }
+    , askSlaves = true)
 
-  private def getShuffleBlocks(shuffleId: Int): Seq[BlockId] = {
-    blockManager.master.getMatchingBlockIds(_ match {
+  private def getShuffleBlocks(shuffleId: Int): Seq[BlockId] =
+    blockManager.master.getMatchingBlockIds(_ match
       case ShuffleBlockId(`shuffleId`, _, _) => true
       case ShuffleIndexBlockId(`shuffleId`, _, _) => true
       case _ => false
-    }, askSlaves = true)
-  }
+    , askSlaves = true)
 
-  private def getBroadcastBlocks(broadcastId: Long): Seq[BlockId] = {
-    blockManager.master.getMatchingBlockIds(_ match {
+  private def getBroadcastBlocks(broadcastId: Long): Seq[BlockId] =
+    blockManager.master.getMatchingBlockIds(_ match
       case BroadcastBlockId(`broadcastId`, _) => true
       case _ => false
-    }, askSlaves = true)
-  }
+    , askSlaves = true)
 
   private def blockManager = sc.env.blockManager
   private def mapOutputTrackerMaster =
     sc.env.mapOutputTracker.asInstanceOf[MapOutputTrackerMaster]
-}

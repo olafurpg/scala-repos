@@ -1,5 +1,4 @@
 package moveRefactoring.foo
 
-object O {
+object O
   def m1() {}
-}

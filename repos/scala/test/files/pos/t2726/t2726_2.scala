@@ -1,3 +1,2 @@
-object SQuery2Test {
+object SQuery2Test
   new SQLBuilder
-}

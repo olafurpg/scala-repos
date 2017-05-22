@@ -8,29 +8,26 @@ import com.intellij.psi.PsiElement
 /**
   * Pavel.Fatin, 18.05.2010
   */
-class AnnotatorHolderMock extends AnnotationHolder {
+class AnnotatorHolderMock extends AnnotationHolder
   private val FakeAnnotation = new com.intellij.lang.annotation.Annotation(
       0, 0, HighlightSeverity.WEAK_WARNING, "message", "tooltip")
 
   def annotations = myAnnotations.reverse
-  def errorAnnotations = annotations.filter {
+  def errorAnnotations = annotations.filter
     case error: Error => true
     case _ => false
-  }
 
   private var myAnnotations = List[Message]()
 
   def createInfoAnnotation(range: TextRange, message: String) = FakeAnnotation
 
-  def createInfoAnnotation(node: ASTNode, message: String) = {
+  def createInfoAnnotation(node: ASTNode, message: String) =
     myAnnotations ::= Info(node.getText, message)
     FakeAnnotation
-  }
 
-  def createInfoAnnotation(elt: PsiElement, message: String) = {
+  def createInfoAnnotation(elt: PsiElement, message: String) =
     myAnnotations ::= Info(elt.getText, message)
     FakeAnnotation
-  }
 
   override def createAnnotation(severity: HighlightSeverity,
                                 range: TextRange,
@@ -52,22 +49,19 @@ class AnnotatorHolderMock extends AnnotationHolder {
 
   def createWarningAnnotation(node: ASTNode, message: String) = FakeAnnotation
 
-  def createWarningAnnotation(elt: PsiElement, message: String) = {
+  def createWarningAnnotation(elt: PsiElement, message: String) =
     myAnnotations ::= Warning(elt.getText, message)
     FakeAnnotation
-  }
 
-  def createErrorAnnotation(range: TextRange, message: String) = {
+  def createErrorAnnotation(range: TextRange, message: String) =
     myAnnotations ::= ErrorWithRange(range, message)
     FakeAnnotation
-  }
 
   def createErrorAnnotation(node: ASTNode, message: String) = FakeAnnotation
 
-  def createErrorAnnotation(elt: PsiElement, message: String) = {
+  def createErrorAnnotation(elt: PsiElement, message: String) =
     myAnnotations ::= Error(elt.getText, message)
     FakeAnnotation
-  }
 
   def getCurrentAnnotationSession: AnnotationSession = null
 
@@ -85,4 +79,3 @@ class AnnotatorHolderMock extends AnnotationHolder {
   override def createAnnotation(severity: HighlightSeverity,
                                 range: TextRange,
                                 message: String): Annotation = FakeAnnotation
-}

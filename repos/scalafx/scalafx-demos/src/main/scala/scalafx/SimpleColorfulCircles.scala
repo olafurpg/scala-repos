@@ -46,15 +46,15 @@ import scalafx.scene.shape.{Circle, Rectangle}
 /**
   * SimpleColorfulCircles
   */
-object SimpleColorfulCircles extends JFXApp {
+object SimpleColorfulCircles extends JFXApp
   var circles: Seq[Circle] = null
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     width = 800
     height = 600
-    scene = new Scene { _scene =>
+    scene = new Scene  _scene =>
       fill = Black
       circles = for (i <- 0 until 30) yield
-        new Circle {
+        new Circle
           centerX = random * 800
           centerY = random * 600
           radius = 150
@@ -63,8 +63,7 @@ object SimpleColorfulCircles extends JFXApp {
           strokeWidth = 4
           strokeType = Outside
           effect = new BoxBlur(10, 10, 3)
-        }
-      content = circles :+ new Rectangle {
+      content = circles :+ new Rectangle
         width <== _scene.width
         height <== _scene.height
         fill = new LinearGradient(0,
@@ -82,18 +81,13 @@ object SimpleColorfulCircles extends JFXApp {
                                         0xef504c,
                                         0xf2660f))
         blendMode = Overlay
-      }
-    }
-  }
-  new Timeline {
+  new Timeline
     cycleCount = Indefinite
     autoReverse = true
     keyFrames = for (circle <- circles) yield
-      at(40 s) {
+      at(40 s)
         Set(
             circle.centerX -> random * 800,
             circle.centerY -> random * 600
         )
-      }
-  }.play()
-}
+  .play()

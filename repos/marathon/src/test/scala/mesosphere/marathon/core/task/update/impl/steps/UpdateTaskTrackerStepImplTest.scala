@@ -15,12 +15,11 @@ import MarathonTestHelper.Implicits._
 
 class UpdateTaskTrackerStepImplTest
     extends FunSuite with Matchers with ScalaFutures with Mockito
-    with GivenWhenThen {
-  test("name") {
+    with GivenWhenThen
+  test("name")
     new Fixture().step.name should equal("updateTaskTracker")
-  }
 
-  test("processing update succeeds") {
+  test("processing update succeeds")
     val f = new Fixture
 
     Given("a running task and a working taskTracker")
@@ -44,9 +43,8 @@ class UpdateTaskTrackerStepImplTest
 
     And("that's it")
     f.verifyNoMoreInteractions()
-  }
 
-  test("processing update fails") {
+  test("processing update fails")
     val f = new Fixture
 
     Given("a running task and a broken taskTracker")
@@ -74,7 +72,6 @@ class UpdateTaskTrackerStepImplTest
 
     And("that's it")
     f.verifyNoMoreInteractions()
-  }
 
   private[this] val slaveId = SlaveID.newBuilder().setValue("slave1")
   private[this] val appId = PathId("/test")
@@ -101,21 +98,17 @@ class UpdateTaskTrackerStepImplTest
   private[this] val runningMarathonTask =
     stagedMarathonTask.withStatus(_.copy(startedAt = Some(Timestamp(2))))
 
-  class Fixture {
+  class Fixture
     lazy val taskUpdater = mock[TaskUpdater]
     lazy val driver = mock[SchedulerDriver]
     lazy val driverOpt = Some(driver)
-    lazy val driverHolder = {
+    lazy val driverHolder =
       val ret = new MarathonSchedulerDriverHolder
       ret.driver = driverOpt
       ret
-    }
 
     lazy val step = new UpdateTaskTrackerStepImpl(taskUpdater)
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       noMoreInteractions(taskUpdater)
       noMoreInteractions(driver)
-    }
-  }
-}

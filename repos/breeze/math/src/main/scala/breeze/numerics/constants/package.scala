@@ -4,7 +4,7 @@ package breeze.numerics
   *
   * @author ktakagaki * @date 3/13/14.
   */
-package object constants {
+package object constants
 
   // <editor-fold defaultstate="collapsed" desc=" Mathematics ">
 
@@ -277,4 +277,3 @@ package object constants {
   val yobi = pow(2.0, 80d)
 
   // </editor-fold>
-}

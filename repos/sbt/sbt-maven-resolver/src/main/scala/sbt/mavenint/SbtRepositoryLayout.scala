@@ -15,27 +15,24 @@ import sbt.internal.librarymanagement.mavenint.SbtPomExtraProperties
 import scala.util.matching.Regex
 
 /** A factory which knows how to create repository layouts which can find sbt plugins. */
-class SbtPluginLayoutFactory extends RepositoryLayoutFactory {
+class SbtPluginLayoutFactory extends RepositoryLayoutFactory
   def newInstance(session: RepositorySystemSession,
-                  repository: RemoteRepository): RepositoryLayout = {
-    repository.getContentType match {
+                  repository: RemoteRepository): RepositoryLayout =
+    repository.getContentType match
       case SbtRepositoryLayout.LAYOUT_NAME =>
         SbtRepositoryLayout
       case _ =>
         throw new NoRepositoryLayoutException(
             repository, "Not an sbt-plugin repository")
-    }
-  }
   def getPriority: Float = 100.0f
-}
 
-object SbtRepositoryLayout extends RepositoryLayout {
+object SbtRepositoryLayout extends RepositoryLayout
 
   val LAYOUT_NAME = "sbt-plugin"
 
   // get location is ALMOST the same for Metadata + artifact... but subtle differences are important.
 
-  def getLocation(artifact: Artifact, upload: Boolean): URI = {
+  def getLocation(artifact: Artifact, upload: Boolean): URI =
     val sbtVersion = Option(
         artifact.getProperties.get(SbtPomExtraProperties.POM_SBT_VERSION))
     val scalaVersion = Option(
@@ -44,9 +41,9 @@ object SbtRepositoryLayout extends RepositoryLayout {
     path
       .append(artifact.getGroupId.replace('.', '/'))
       .append('/')
-      (sbtVersion zip scalaVersion).headOption match {
+      (sbtVersion zip scalaVersion).headOption match
       case Some((sbt, scala)) =>
-        if (artifact.getArtifactId contains "_sbt_") {
+        if (artifact.getArtifactId contains "_sbt_")
           val SbtNameVersionSplit(name, sbt2) = artifact.getArtifactId
           path
             .append(name)
@@ -55,7 +52,7 @@ object SbtRepositoryLayout extends RepositoryLayout {
             .append('_')
             .append(sbt)
             .append('/')
-        } else
+        else
           path
             .append(artifact.getArtifactId)
             .append('_')
@@ -66,9 +63,8 @@ object SbtRepositoryLayout extends RepositoryLayout {
       case None =>
         // TODO - Should we automatically append the _<scala-verison> here if it's not there?  Probably not for now.
         path.append(artifact.getArtifactId).append('/')
-    }
     path.append(artifact.getBaseVersion).append('/')
-    sbtVersion match {
+    sbtVersion match
       case Some(_) if artifact.getArtifactId contains "_sbt_" =>
         val SbtNameVersionSplit(name, sbt2) = artifact.getArtifactId
         path.append(name).append('-').append(artifact.getVersion)
@@ -77,22 +73,18 @@ object SbtRepositoryLayout extends RepositoryLayout {
           .append(artifact.getArtifactId)
           .append('-')
           .append(artifact.getVersion)
-    }
 
     if (artifact.getClassifier != null &&
-        !artifact.getClassifier.trim.isEmpty) {
+        !artifact.getClassifier.trim.isEmpty)
       path.append("-").append(artifact.getClassifier)
-    }
-    if (artifact.getExtension.length > 0) {
+    if (artifact.getExtension.length > 0)
       path.append('.').append(artifact.getExtension)
-    }
     URI.create(path.toString())
-  }
 
   // Trickery for disambiguating sbt plugins in maven repositories.
   val SbtNameVersionSplit = new Regex("(.*)_sbt_(.*)")
 
-  def getLocation(metadata: Metadata, upload: Boolean): URI = {
+  def getLocation(metadata: Metadata, upload: Boolean): URI =
     val sbtVersion = Option(
         metadata.getProperties.get(SbtPomExtraProperties.POM_SBT_VERSION))
     val scalaVersion = Option(
@@ -101,9 +93,9 @@ object SbtRepositoryLayout extends RepositoryLayout {
     path
       .append(metadata.getGroupId.replace('.', '/'))
       .append('/')
-      (sbtVersion zip scalaVersion).headOption match {
+      (sbtVersion zip scalaVersion).headOption match
       case Some((sbt, scala)) =>
-        if (metadata.getArtifactId contains "_sbt_") {
+        if (metadata.getArtifactId contains "_sbt_")
           val SbtNameVersionSplit(name, sbt2) = metadata.getArtifactId
           path
             .append(name)
@@ -112,7 +104,7 @@ object SbtRepositoryLayout extends RepositoryLayout {
             .append('_')
             .append(sbt)
             .append('/')
-        } else
+        else
           path
             .append(metadata.getArtifactId)
             .append('_')
@@ -123,12 +115,10 @@ object SbtRepositoryLayout extends RepositoryLayout {
       case None =>
         // TODO - Should we automatically append the _<scala-verison> here?  Proabbly not for now.
         path.append(metadata.getArtifactId).append('/')
-    }
     if (metadata.getVersion.length > 0)
       path.append(metadata.getVersion).append('/')
     path.append(metadata.getType)
     URI.create(path.toString)
-  }
 
   // TODO - This should be the same as configured from Ivy...
   def getChecksums(artifact: Artifact,
@@ -143,4 +133,3 @@ object SbtRepositoryLayout extends RepositoryLayout {
   private def getChecksums(location: URI): java.util.List[Checksum] =
     java.util.Arrays.asList(Checksum.forLocation(location, "SHA-1"),
                             Checksum.forLocation(location, "MD5"))
-}

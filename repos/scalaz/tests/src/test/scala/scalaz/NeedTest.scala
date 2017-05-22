@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object NeedTest extends SpecLite {
+object NeedTest extends SpecLite
   // TODO check distributive laws
 
   checkAll("Value", bindRec.laws[Value])
@@ -27,4 +27,3 @@ object NeedTest extends SpecLite {
   checkAll("Need", traverse1.laws[Need])
   checkAll("Need", zip.laws[Need])
   checkAll("Need", align.laws[Need])
-}

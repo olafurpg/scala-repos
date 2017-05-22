@@ -5,7 +5,7 @@ import sbt.Keys._
 import sbt.Project.Initialize
 import scala.language.postfixOps
 
-object Unidoc extends Plugin {
+object Unidoc extends Plugin
   val unidocDirectory = SettingKey[File]("unidoc-directory")
   val unidocExclude = SettingKey[Seq[String]]("unidoc-exclude")
   val unidocAllSources = TaskKey[Seq[Seq[File]]]("unidoc-all-sources")
@@ -23,48 +23,39 @@ object Unidoc extends Plugin {
       unidocSources <<= unidocAllSources map { _.flatten },
       unidocAllClasspaths <<=
         (thisProjectRef, buildStructure, unidocExclude) flatMap allClasspaths,
-      unidocClasspath <<= unidocAllClasspaths map {
+      unidocClasspath <<= unidocAllClasspaths map
         _.flatten.map(_.data).distinct
-      },
+      ,
       unidoc <<= unidocTask
   )
 
   def allSources(projectRef: ProjectRef,
                  structure: BuildStructure,
-                 exclude: Seq[String]): Task[Seq[Seq[File]]] = {
+                 exclude: Seq[String]): Task[Seq[Seq[File]]] =
     val projects = aggregated(projectRef, structure, exclude)
-    projects flatMap {
+    projects flatMap
       sources in Compile in LocalProject(_) get structure.data
-    } join
-  }
+    join
 
   def allClasspaths(projectRef: ProjectRef,
                     structure: BuildStructure,
-                    exclude: Seq[String]): Task[Seq[Classpath]] = {
+                    exclude: Seq[String]): Task[Seq[Classpath]] =
     val projects = aggregated(projectRef, structure, exclude)
-    projects flatMap {
+    projects flatMap
       dependencyClasspath in Compile in LocalProject(_) get structure.data
-    } join
-  }
+    join
 
   def aggregated(projectRef: ProjectRef,
                  structure: BuildStructure,
-                 exclude: Seq[String]): Seq[String] = {
+                 exclude: Seq[String]): Seq[String] =
     val aggregate =
       Project.getProject(projectRef, structure).toSeq.flatMap(_.aggregate)
-    aggregate flatMap { ref =>
+    aggregate flatMap  ref =>
       if (exclude contains ref.project) Seq.empty
       else ref.project +: aggregated(ref, structure, exclude)
-    }
-  }
 
-  def unidocTask: Def.Initialize[Task[File]] = {
-    (compilers, unidocSources, unidocDirectory, scalacOptions in doc, streams) map {
+  def unidocTask: Def.Initialize[Task[File]] =
+    (compilers, unidocSources, unidocDirectory, scalacOptions in doc, streams) map
       (compilers, sources, target, options, s) =>
-        {
           Doc.scaladoc("Scalatra", s.cacheDirectory, compilers.scalac, options)
           target
-        }
-    }
-  }
-}

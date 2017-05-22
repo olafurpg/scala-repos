@@ -22,7 +22,7 @@ import akka.dispatch.ExecutionContexts
   * allowing for broadcasting of messages to that section.
   */
 @SerialVersionUID(1L)
-abstract class ActorSelection extends Serializable {
+abstract class ActorSelection extends Serializable
   this: ScalaActorSelection ⇒
 
   protected[akka] val anchor: ActorRef
@@ -59,15 +59,13 @@ abstract class ActorSelection extends Serializable {
     * Under the hood it talks to the actor to verify its existence and acquire its
     * [[ActorRef]].
     */
-  def resolveOne()(implicit timeout: Timeout): Future[ActorRef] = {
+  def resolveOne()(implicit timeout: Timeout): Future[ActorRef] =
     implicit val ec = ExecutionContexts.sameThreadExecutionContext
     val p = Promise[ActorRef]()
-    this.ask(Identify(None)) onComplete {
+    this.ask(Identify(None)) onComplete
       case Success(ActorIdentity(_, Some(ref))) ⇒ p.success(ref)
       case _ ⇒ p.failure(ActorNotFound(this))
-    }
     p.future
-  }
 
   /**
     * Resolve the [[ActorRef]] matching this selection.
@@ -82,7 +80,7 @@ abstract class ActorSelection extends Serializable {
   def resolveOne(timeout: FiniteDuration): Future[ActorRef] =
     resolveOne()(timeout)
 
-  override def toString: String = {
+  override def toString: String =
     val builder = new java.lang.StringBuilder()
     builder.append("ActorSelection[Anchor(").append(anchor.path)
     if (anchor.path.uid != ActorCell.undefinedUid)
@@ -90,7 +88,6 @@ abstract class ActorSelection extends Serializable {
 
     builder.append("), Path(").append(path.mkString("/", "/", "")).append(")]")
     builder.toString
-  }
 
   /**
     * The [[akka.actor.ActorPath]] of the anchor actor.
@@ -107,12 +104,11 @@ abstract class ActorSelection extends Serializable {
     * The output is similar to the URI fragment returned by [[akka.actor.ActorPath#toSerializationFormat]].
     * @return URI fragment
     */
-  def toSerializationFormat: String = {
-    val anchorPath = anchor match {
+  def toSerializationFormat: String =
+    val anchorPath = anchor match
       case a: ActorRefWithCell ⇒
         anchor.path.toStringWithAddress(a.provider.getDefaultAddress)
       case _ ⇒ anchor.path.toString
-    }
 
     val builder = new java.lang.StringBuilder()
     builder.append(anchorPath)
@@ -121,26 +117,22 @@ abstract class ActorSelection extends Serializable {
       builder.append(path.mkString("/", "/", ""))
     else if (path.nonEmpty) builder.append(path.mkString("/"))
     builder.toString
-  }
 
-  override def equals(obj: Any): Boolean = obj match {
+  override def equals(obj: Any): Boolean = obj match
     case s: ActorSelection ⇒ this.anchor == s.anchor && this.path == s.path
     case _ ⇒ false
-  }
 
-  override lazy val hashCode: Int = {
+  override lazy val hashCode: Int =
     import MurmurHash._
     var h = startHash(anchor.##)
     h = extendHash(h, path.##, startMagicA, startMagicB)
     finalizeHash(h)
-  }
-}
 
 /**
   * An ActorSelection is a logical view of a section of an ActorSystem's tree of Actors,
   * allowing for broadcasting of messages to that section.
   */
-object ActorSelection {
+object ActorSelection
   //This cast is safe because the self-type of ActorSelection requires that it mixes in ScalaActorSelection
   implicit def toScala(sel: ActorSelection): ScalaActorSelection =
     sel.asInstanceOf[ScalaActorSelection]
@@ -160,20 +152,18 @@ object ActorSelection {
     * matching magic, so it is preferable to cache its result if the
     * intention is to send messages frequently.
     */
-  def apply(anchorRef: ActorRef, elements: Iterable[String]): ActorSelection = {
+  def apply(anchorRef: ActorRef, elements: Iterable[String]): ActorSelection =
     val compiled: immutable.IndexedSeq[SelectionPathElement] =
-      elements.collect({
+      elements.collect(
         case x if !x.isEmpty ⇒
           if ((x.indexOf('?') != -1) || (x.indexOf('*') != -1))
             SelectChildPattern(x)
           else if (x == "..") SelectParent
           else SelectChildName(x)
-      })(scala.collection.breakOut)
-    new ActorSelection with ScalaActorSelection {
+      )(scala.collection.breakOut)
+    new ActorSelection with ScalaActorSelection
       override val anchor = anchorRef
       override val path = compiled
-    }
-  }
 
   /**
     * INTERNAL API
@@ -184,12 +174,12 @@ object ActorSelection {
                                      sender: ActorRef,
                                      sel: ActorSelectionMessage): Unit =
     if (sel.elements.isEmpty) anchor.tell(sel.msg, sender)
-    else {
+    else
 
       val iter = sel.elements.iterator
 
-      @tailrec def rec(ref: InternalActorRef): Unit = {
-        ref match {
+      @tailrec def rec(ref: InternalActorRef): Unit =
+        ref match
           case refWithCell: ActorRefWithCell ⇒
             def emptyRef =
               new EmptyLocalActorRef(
@@ -197,65 +187,57 @@ object ActorSelection {
                   anchor.path / sel.elements.map(_.toString),
                   refWithCell.underlying.system.eventStream)
 
-            iter.next() match {
+            iter.next() match
               case SelectParent ⇒
                 val parent = ref.getParent
                 if (iter.isEmpty) parent.tell(sel.msg, sender)
                 else rec(parent)
               case SelectChildName(name) ⇒
                 val child = refWithCell.getSingleChild(name)
-                if (child == Nobody) {
+                if (child == Nobody)
                   // don't send to emptyRef after wildcard fan-out
                   if (!sel.wildcardFanOut) emptyRef.tell(sel, sender)
-                } else if (iter.isEmpty) child.tell(sel.msg, sender)
+                else if (iter.isEmpty) child.tell(sel.msg, sender)
                 else rec(child)
               case p: SelectChildPattern ⇒
                 // fan-out when there is a wildcard
                 val chldr = refWithCell.children
-                if (iter.isEmpty) {
+                if (iter.isEmpty)
                   // leaf
                   val matchingChildren =
                     chldr.filter(c ⇒ p.pattern.matcher(c.path.name).matches)
                   if (matchingChildren.isEmpty && !sel.wildcardFanOut)
                     emptyRef.tell(sel, sender)
                   else matchingChildren.foreach(_.tell(sel.msg, sender))
-                } else {
+                else
                   val matchingChildren =
                     chldr.filter(c ⇒ p.pattern.matcher(c.path.name).matches)
                   // don't send to emptyRef after wildcard fan-out 
                   if (matchingChildren.isEmpty && !sel.wildcardFanOut)
                     emptyRef.tell(sel, sender)
-                  else {
+                  else
                     val m = sel.copy(elements = iter.toVector,
                                      wildcardFanOut = sel.wildcardFanOut ||
                                        matchingChildren.size > 1)
                     matchingChildren.foreach(c ⇒
                           deliverSelection(
                               c.asInstanceOf[InternalActorRef], sender, m))
-                  }
-                }
-            }
 
           case _ ⇒
             // foreign ref, continue by sending ActorSelectionMessage to it with remaining elements
             ref.tell(sel.copy(elements = iter.toVector), sender)
-        }
-      }
 
       rec(anchor)
-    }
-}
 
 /**
   * Contains the Scala API (!-method) for ActorSelections) which provides automatic tracking of the sender,
   * as per the usual implicit ActorRef pattern.
   */
-trait ScalaActorSelection {
+trait ScalaActorSelection
   this: ActorSelection ⇒
 
   def !(msg: Any)(implicit sender: ActorRef = Actor.noSender) =
     tell(msg, sender)
-}
 
 /**
   * INTERNAL API
@@ -268,13 +250,11 @@ private[akka] final case class ActorSelectionMessage(
     msg: Any,
     elements: immutable.Iterable[SelectionPathElement],
     wildcardFanOut: Boolean)
-    extends AutoReceivedMessage with PossiblyHarmful {
+    extends AutoReceivedMessage with PossiblyHarmful
 
-  def identifyRequest: Option[Identify] = msg match {
+  def identifyRequest: Option[Identify] = msg match
     case x: Identify ⇒ Some(x)
     case _ ⇒ None
-  }
-}
 
 /**
   * INTERNAL API
@@ -287,27 +267,24 @@ private[akka] sealed trait SelectionPathElement
   */
 @SerialVersionUID(2L)
 private[akka] final case class SelectChildName(name: String)
-    extends SelectionPathElement {
+    extends SelectionPathElement
   override def toString: String = name
-}
 
 /**
   * INTERNAL API
   */
 @SerialVersionUID(2L)
 private[akka] final case class SelectChildPattern(patternStr: String)
-    extends SelectionPathElement {
+    extends SelectionPathElement
   val pattern: Pattern = Helpers.makePattern(patternStr)
   override def toString: String = patternStr
-}
 
 /**
   * INTERNAL API
   */
 @SerialVersionUID(2L)
-private[akka] case object SelectParent extends SelectionPathElement {
+private[akka] case object SelectParent extends SelectionPathElement
   override def toString: String = ".."
-}
 
 /**
   * When [[ActorSelection#resolveOne]] can't identify the actor the

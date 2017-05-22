@@ -6,31 +6,28 @@ import akka.event.EventStream
 import akka.testkit.TestProbe
 import mesosphere.marathon.event.MarathonEvent
 
-class CaptureEvents(eventStream: EventStream) {
+class CaptureEvents(eventStream: EventStream)
 
   /**
     * Captures the events send to the EventStream while the block is executing.
     */
-  def forBlock(block: => Unit): Seq[MarathonEvent] = {
+  def forBlock(block: => Unit): Seq[MarathonEvent] =
     implicit val actorSystem = ActorSystem("captureEvents")
 
     // yes, this is ugly. Since we only access it in the actor until it terminates, we do have
     // the correct thread sync boundaries in place.
 
     var capture = Vector.empty[MarathonEvent]
-    val captureEventsActor = actor {
-      new Act {
-        become {
+    val captureEventsActor = actor
+      new Act
+        become
           case captureMe: MarathonEvent => capture :+= captureMe
-        }
-      }
-    }
     eventStream.subscribe(captureEventsActor, classOf[MarathonEvent])
     eventStream.subscribe(captureEventsActor, classOf[String])
 
-    try {
+    try
       block
-    } finally {
+    finally
       eventStream.unsubscribe(captureEventsActor)
       captureEventsActor ! PoisonPill
       val probe = TestProbe()
@@ -38,8 +35,5 @@ class CaptureEvents(eventStream: EventStream) {
       probe.expectMsgClass(classOf[Terminated])
       actorSystem.shutdown()
       actorSystem.awaitTermination()
-    }
 
     capture
-  }
-}

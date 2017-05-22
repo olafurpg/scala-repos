@@ -38,23 +38,20 @@ import scalafx.scene.image.Image
 import scalafx.scene.image.Image.sfxImage2jfx
 import scalafx.scene.image.ImageIncludes.jfxImage2sfx
 
-object ClipboardContent {
+object ClipboardContent
   implicit def sfxClipboardContent2jfx(
       c: ClipboardContent): jfxsi.ClipboardContent =
     if (c != null) c.delegate else null
 
-  def apply[T <: AnyRef](arg: Map[DataFormat, T]): ClipboardContent = {
+  def apply[T <: AnyRef](arg: Map[DataFormat, T]): ClipboardContent =
     val c = new jfxsi.ClipboardContent()
     arg.foreach { case (k, v) => c.put(k.delegate, v) }
     new ClipboardContent(c)
-  }
 
-  def apply[T <: AnyRef](elems: (DataFormat, T)*): ClipboardContent = {
+  def apply[T <: AnyRef](elems: (DataFormat, T)*): ClipboardContent =
     val c = new jfxsi.ClipboardContent()
     elems.foreach { case (k, v) => c.put(k.delegate, v) }
     new ClipboardContent(c)
-  }
-}
 
 /**
   * Data container for Clipboard data. It can hold multiple data in several data formats.
@@ -101,7 +98,7 @@ object ClipboardContent {
 class ClipboardContent(
     override val delegate: jfxsi.ClipboardContent = new jfxsi.ClipboardContent)
     extends JMapWrapperLike[jfxsi.DataFormat, AnyRef, ClipboardContent]
-    with SFXDelegate[jfxsi.ClipboardContent] {
+    with SFXDelegate[jfxsi.ClipboardContent]
 
   override def underlying: java.util.Map[jfxsi.DataFormat, AnyRef] = delegate
 
@@ -200,4 +197,3 @@ class ClipboardContent(
     * Puts a URL String onto the Clipboard.
     */
   def putUrl(url: String): Boolean = delegate.putUrl(url)
-}

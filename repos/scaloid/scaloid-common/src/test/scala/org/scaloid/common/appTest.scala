@@ -15,10 +15,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @RunWith(classOf[RobolectricTestRunner])
 @Config(manifest = Config.NONE, emulateSdk = 16)
-class appTest extends JUnitSuite with ShouldMatchers {
+class appTest extends JUnitSuite with ShouldMatchers
 
   @Test
-  def testSActivityType(): Unit = {
+  def testSActivityType(): Unit =
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     activity shouldBe a[SActivity]
     activity shouldBe a[SContext]
@@ -26,44 +26,38 @@ class appTest extends JUnitSuite with ShouldMatchers {
     activity shouldBe a[Destroyable]
     activity shouldBe a[Creatable]
     activity shouldBe a[Registerable]
-  }
 
   @Test
-  def testTraitActivityMembers(): Unit = {
+  def testTraitActivityMembers(): Unit =
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     activity.basis shouldBe activity
 
     val textView = activity.find[TextView](1)
     textView shouldBe activity.findViewById(1)
     textView.getText.toString shouldBe "Hello"
-  }
 
   @Test
-  def testRunOnUIThread(): Unit = {
+  def testRunOnUIThread(): Unit =
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     val mainThread = Looper.getMainLooper.getThread
-    activity.runOnUiThread {
+    activity.runOnUiThread
       Thread.currentThread shouldBe mainThread
-    }
 
-    Future[Unit] {
+    Future[Unit]
       Thread.currentThread() shouldNot be(mainThread)
-      activity.runOnUiThread {
+      activity.runOnUiThread
         Thread.currentThread shouldBe mainThread
-      }
-    }(ExecutionContext.global)
-  }
+    (ExecutionContext.global)
 
   @Test
-  def testButtonClick(): Unit = {
+  def testButtonClick(): Unit =
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     val button = activity.find[Button](2)
     button.performClick()
     button.getText shouldBe "Pressed"
-  }
 
   @Test
-  def testSStateListDrawable(): Unit = {
+  def testSStateListDrawable(): Unit =
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     val drawable =
       activity.find[ImageView](3).getDrawable.asInstanceOf[StateListDrawable]
@@ -77,15 +71,14 @@ class appTest extends JUnitSuite with ShouldMatchers {
     val normalDrawable = shadowDrawable.getDrawableForState(Array.empty)
     normalDrawable shouldBe activity.getResources.getDrawable(
         android.R.drawable.btn_star_big_off)
-  }
 
   @Test
-  def testAlertDialog(): Unit = {
+  def testAlertDialog(): Unit =
     val activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
     val alert = activity.alertDialog
-      .positiveButton("POS", { (di: DialogInterface, id: Int) =>
+      .positiveButton("POS",  (di: DialogInterface, id: Int) =>
         di.dismiss
-      })
+      )
       .show()
     alert shouldBe a('showing)
 
@@ -95,10 +88,9 @@ class appTest extends JUnitSuite with ShouldMatchers {
 
     alert.getButton(DialogInterface.BUTTON_POSITIVE).performClick()
     alert shouldNot be a 'showing
-  }
 
   @Test
-  def testSActivityLifeCycles(): Unit = {
+  def testSActivityLifeCycles(): Unit =
     val c = Robolectric.buildActivity(classOf[SActivityImpl])
     c.create.get.current shouldBe OnCreate
     c.create.start.get.current shouldBe OnStart
@@ -106,22 +98,18 @@ class appTest extends JUnitSuite with ShouldMatchers {
     c.create.start.resume.pause.get.current shouldBe OnPause
     c.create.start.resume.pause.stop.get.current shouldBe OnStop
     c.create.start.resume.pause.stop.destroy.get.current shouldBe OnDestroy
-  }
 
   @Test
-  def testSServiceType(): Unit = {
+  def testSServiceType(): Unit =
     val service = Robolectric.buildService(classOf[SServiceImpl]).create.get
     service shouldBe a[SService]
     service shouldBe a[SContext]
     service shouldBe a[Destroyable]
     service shouldBe a[Creatable]
     service shouldBe a[Registerable]
-  }
 
   @Test
-  def testSServiceLifeCycles(): Unit = {
+  def testSServiceLifeCycles(): Unit =
     val c = Robolectric.buildService(classOf[SServiceImpl])
     c.create.get.current shouldBe OnCreate
     c.create.destroy.get.current shouldBe OnDestroy
-  }
-}

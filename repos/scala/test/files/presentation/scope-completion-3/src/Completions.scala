@@ -2,7 +2,7 @@ package test
 
 /* check availability of members defined locally and in hierarchy */
 
-abstract class Base1 {
+abstract class Base1
 
   type tb1 = Int
   val vb1 = 0
@@ -22,9 +22,8 @@ abstract class Base1 {
   val vb3: Int
   var rb3: Int
   def fb3: Int
-}
 
-trait Trait1 {
+trait Trait1
 
   type tt1 = Int
   val vt1 = 0
@@ -44,9 +43,8 @@ trait Trait1 {
   val vt3: Int
   var rt3: Int
   def ft3: Int
-}
 
-class Completion1 extends Base1 with Trait1 {
+class Completion1 extends Base1 with Trait1
 
   type tc1 = Int
   val vc1 = 0
@@ -73,9 +71,8 @@ class Completion1 extends Base1 with Trait1 {
   override def ft3 = 12
 
   /*_*/
-}
 
-object Completion2 extends Base1 with Trait1 {
+object Completion2 extends Base1 with Trait1
 
   type to1 = Int
   val vo1 = 0
@@ -102,4 +99,3 @@ object Completion2 extends Base1 with Trait1 {
   override def ft3 = 12
 
   /*_*/
-}

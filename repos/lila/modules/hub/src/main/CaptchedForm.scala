@@ -6,14 +6,13 @@ import play.api.data._
 import actorApi.captcha._
 import lila.common.Captcha
 
-trait CaptchedForm {
+trait CaptchedForm
 
   import makeTimeout.large
 
-  type CaptchedData = {
+  type CaptchedData =
     def gameId: String
     def move: String
-  }
 
   def captcher: akka.actor.ActorSelection
 
@@ -30,4 +29,3 @@ trait CaptchedForm {
     getCaptcha(data.gameId) awaitSeconds 2 valid data.move.trim.toLowerCase
 
   val captchaFailMessage = "captcha.fail"
-}

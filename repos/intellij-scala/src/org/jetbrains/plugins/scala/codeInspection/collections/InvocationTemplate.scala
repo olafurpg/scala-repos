@@ -9,30 +9,27 @@ import scala.util.Try
 /**
   * @author Nikolay.Tropin
   */
-class InvocationTemplate(nameCondition: String => Boolean) {
+class InvocationTemplate(nameCondition: String => Boolean)
 
-  private class Condition[T](f: T => Boolean) {
+  private class Condition[T](f: T => Boolean)
     def and(other: T => Boolean): Condition[T] =
       new Condition[T](x => f(x) && other(x))
 
     def apply(t: T) = f(t)
-  }
 
   private var refCondition = new Condition[ScReferenceExpression](_ => true)
 
-  def from(patterns: Array[String]): this.type = {
+  def from(patterns: Array[String]): this.type =
     refCondition = refCondition.and(checkResolve(_, patterns))
     this
-  }
 
-  def ref(otherRefCondition: ScReferenceExpression => Boolean): this.type = {
+  def ref(otherRefCondition: ScReferenceExpression => Boolean): this.type =
     refCondition = refCondition.and(otherRefCondition)
     this
-  }
 
   def unapplySeq(
-      expr: ScExpression): Option[(ScExpression, Seq[ScExpression])] = {
-    stripped(expr) match {
+      expr: ScExpression): Option[(ScExpression, Seq[ScExpression])] =
+    stripped(expr) match
       case (mc: ScMethodCall) childOf (parentCall: ScMethodCall)
           if !parentCall.isApplyOrUpdateCall =>
         None
@@ -42,11 +39,10 @@ class InvocationTemplate(nameCondition: String => Boolean) {
       case MethodRepr(call: ScMethodCall, Some(qual), None, args)
           if nameCondition("apply") && call.isApplyOrUpdateCall &&
           !call.isUpdateCall =>
-        val text = qual match {
+        val text = qual match
           case _: ScReferenceExpression | _: ScMethodCall | _: ScGenericCall =>
             s"${qual.getText}.apply"
           case _ => s"(${qual.getText}).apply"
-        }
         val ref = Try(
             ScalaPsiElementFactory
               .createExpressionFromText(text, call)
@@ -60,6 +56,3 @@ class InvocationTemplate(nameCondition: String => Boolean) {
           if nameCondition(ref.refName) && refCondition(ref) =>
         Some(qualOpt.orNull, firstArgs ++ secondArgs)
       case _ => None
-    }
-  }
-}

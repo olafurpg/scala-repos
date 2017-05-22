@@ -14,7 +14,7 @@ import org.scalatest.testng.TestNGSuiteLike
 abstract class AkkaPublisherVerification[T](
     val env: TestEnvironment, publisherShutdownTimeout: Long)
     extends PublisherVerification[T](env, publisherShutdownTimeout)
-    with TestNGSuiteLike with ActorSystemLifecycle {
+    with TestNGSuiteLike with ActorSystemLifecycle
 
   def this(printlnDebug: Boolean) =
     this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
@@ -33,4 +33,3 @@ abstract class AkkaPublisherVerification[T](
     if (elements > Int.MaxValue)
       new immutable.Iterable[Int] { override def iterator = Iterator from 0 } else
       0 until elements.toInt
-}

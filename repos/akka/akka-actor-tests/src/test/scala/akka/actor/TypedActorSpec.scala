@@ -21,7 +21,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future, Promise}
 import scala.language.postfixOps
 
-object TypedActorSpec {
+object TypedActorSpec
 
   val config = """
     pooled-dispatcher {
@@ -33,32 +33,28 @@ object TypedActorSpec {
     }
     """
 
-  class CyclicIterator[T](val items: immutable.Seq[T]) extends Iterator[T] {
+  class CyclicIterator[T](val items: immutable.Seq[T]) extends Iterator[T]
 
     private[this] val current = new AtomicReference(items)
 
     def hasNext = items != Nil
 
-    def next: T = {
+    def next: T =
       @tailrec
-      def findNext: T = {
+      def findNext: T =
         val currentItems = current.get
-        val newItems = currentItems match {
+        val newItems = currentItems match
           case Nil ⇒ items
           case xs ⇒ xs
-        }
 
         if (current.compareAndSet(currentItems, newItems.tail)) newItems.head
         else findNext
-      }
 
       findNext
-    }
 
     override def exists(f: T ⇒ Boolean): Boolean = items exists f
-  }
 
-  trait Foo {
+  trait Foo
     def pigdog(): String
 
     @throws(classOf[TimeoutException])
@@ -109,9 +105,8 @@ object TypedActorSpec {
 
     def testMethodCallSerialization(foo: Foo, s: String, i: Int): Unit =
       throw new IllegalStateException("expected")
-  }
 
-  class Bar extends Foo with Serializable {
+  class Bar extends Foo with Serializable
 
     import akka.actor.TypedActor.dispatcher
 
@@ -119,75 +114,62 @@ object TypedActorSpec {
 
     def futurePigdog(): Future[String] = Promise.successful(pigdog).future
 
-    def futurePigdog(delay: FiniteDuration): Future[String] = {
+    def futurePigdog(delay: FiniteDuration): Future[String] =
       Thread.sleep(delay.toMillis)
       futurePigdog
-    }
 
-    def futurePigdog(delay: FiniteDuration, numbered: Int): Future[String] = {
+    def futurePigdog(delay: FiniteDuration, numbered: Int): Future[String] =
       Thread.sleep(delay.toMillis)
       Promise.successful(pigdog + numbered).future
-    }
 
-    def futureComposePigdogFrom(foo: Foo): Future[String] = {
+    def futureComposePigdogFrom(foo: Foo): Future[String] =
       implicit val timeout =
         TypedActor(TypedActor.context.system).DefaultReturnTimeout
       foo.futurePigdog(500 millis).map(_.toUpperCase)
-    }
 
     def optionPigdog(): Option[String] = Some(pigdog)
 
-    def optionPigdog(delay: FiniteDuration): Option[String] = {
+    def optionPigdog(delay: FiniteDuration): Option[String] =
       Thread.sleep(delay.toMillis)
       Some(pigdog)
-    }
 
-    def joptionPigdog(delay: FiniteDuration): JOption[String] = {
+    def joptionPigdog(delay: FiniteDuration): JOption[String] =
       Thread.sleep(delay.toMillis)
       JOption.some(pigdog)
-    }
 
     var internalNumber = 0
 
-    def incr() {
+    def incr()
       internalNumber += 1
-    }
 
     def read() = internalNumber
-  }
 
-  trait Stackable1 {
+  trait Stackable1
     def stackable1: String = "foo"
-  }
 
-  trait Stackable2 {
+  trait Stackable2
     def stackable2: String = "bar"
-  }
 
-  trait Stacked extends Stackable1 with Stackable2 {
+  trait Stacked extends Stackable1 with Stackable2
     def stacked: String = stackable1 + stackable2
 
     def notOverriddenStacked: String = stackable1 + stackable2
-  }
 
-  class StackedImpl extends Stacked {
+  class StackedImpl extends Stacked
     override def stacked: String = "FOOBAR" //Uppercase
-  }
 
-  trait LifeCycles {
+  trait LifeCycles
     def crash(): Unit
-  }
 
   class LifeCyclesImpl(val latch: CountDownLatch)
       extends PreStart with PostStop with PreRestart with PostRestart
-      with LifeCycles with Receiver {
+      with LifeCycles with Receiver
 
     private def ensureContextAvailable[T](f: ⇒ T): T =
-      TypedActor.context match {
+      TypedActor.context match
         case null ⇒
           throw new IllegalStateException("TypedActor.context is null!")
         case some ⇒ f
-      }
 
     override def crash(): Unit = throw new IllegalStateException("Crash!")
 
@@ -202,25 +184,21 @@ object TypedActorSpec {
     override def postRestart(reason: Throwable): Unit =
       ensureContextAvailable(for (i ← 1 to 7) latch.countDown())
 
-    override def onReceive(msg: Any, sender: ActorRef): Unit = {
+    override def onReceive(msg: Any, sender: ActorRef): Unit =
       ensureContextAvailable(
-          msg match {
+          msg match
         case "pigdog" ⇒ sender ! "dogpig"
-      })
-    }
-  }
+      )
 
   trait F { def f(pow: Boolean): Int }
-  class FI extends F {
+  class FI extends F
     def f(pow: Boolean): Int =
       if (pow) throw new IllegalStateException("expected") else 1
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorSpec
     extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    with BeforeAndAfterAll with DefaultTimeout
 
   import akka.actor.TypedActorSpec._
 
@@ -242,58 +220,49 @@ class TypedActorSpec
   def mustStop(typedActor: AnyRef) =
     TypedActor(system).stop(typedActor) should ===(true)
 
-  "TypedActors" must {
+  "TypedActors" must
 
-    "be able to instantiate" in {
+    "be able to instantiate" in
       val t = newFooBar
       TypedActor(system).isTypedActor(t) should ===(true)
       mustStop(t)
-    }
 
-    "be able to stop" in {
+    "be able to stop" in
       val t = newFooBar
       mustStop(t)
-    }
 
-    "not stop non-started ones" in {
+    "not stop non-started ones" in
       TypedActor(system).stop(null) should ===(false)
-    }
 
-    "throw an IllegalStateExcpetion when TypedActor.self is called in the wrong scope" in {
-      filterEvents(EventFilter[IllegalStateException]("Calling")) {
-        (intercept[IllegalStateException] {
+    "throw an IllegalStateExcpetion when TypedActor.self is called in the wrong scope" in
+      filterEvents(EventFilter[IllegalStateException]("Calling"))
+        (intercept[IllegalStateException]
           TypedActor.self[Foo]
-        }).getMessage should ===(
+        ).getMessage should ===(
             "Calling TypedActor.self outside of a TypedActor implementation method!")
-      }
-    }
 
-    "have access to itself when executing a method call" in {
+    "have access to itself when executing a method call" in
       val t = newFooBar
       t.self should ===(t)
       mustStop(t)
-    }
 
-    "be able to call toString" in {
+    "be able to call toString" in
       val t = newFooBar
       t.toString should ===(TypedActor(system).getActorRefFor(t).toString)
       mustStop(t)
-    }
 
-    "be able to call equals" in {
+    "be able to call equals" in
       val t = newFooBar
       t should ===(t)
       t should not equal (null)
       mustStop(t)
-    }
 
-    "be able to call hashCode" in {
+    "be able to call hashCode" in
       val t = newFooBar
       t.hashCode should ===(TypedActor(system).getActorRefFor(t).hashCode)
       mustStop(t)
-    }
 
-    "be able to call user-defined void-methods" in {
+    "be able to call user-defined void-methods" in
       val t = newFooBar
       t.incr()
       t.read() should ===(1)
@@ -301,81 +270,69 @@ class TypedActorSpec
       t.read() should ===(2)
       t.read() should ===(2)
       mustStop(t)
-    }
 
-    "be able to call normally returning methods" in {
+    "be able to call normally returning methods" in
       val t = newFooBar
       t.pigdog() should ===("Pigdog")
       mustStop(t)
-    }
 
-    "be able to call null returning methods" in {
+    "be able to call null returning methods" in
       val t = newFooBar
       t.nullJOption() should be(JOption.none)
       t.nullOption() should ===(None)
       t.nullReturn() should ===(null)
       Await.result(t.nullFuture(), timeout.duration) should ===(null)
-    }
 
-    "be able to call Future-returning methods non-blockingly" in {
+    "be able to call Future-returning methods non-blockingly" in
       val t = newFooBar
       val f = t.futurePigdog(200 millis)
       f.isCompleted should ===(false)
       Await.result(f, timeout.duration) should ===("Pigdog")
       mustStop(t)
-    }
 
     "be able to call multiple Future-returning methods non-blockingly" in within(
-        timeout.duration) {
+        timeout.duration)
       val t = newFooBar
       val futures = for (i ← 1 to 20) yield (i, t.futurePigdog(20 millis, i))
-      for ((i, f) ← futures) {
+      for ((i, f) ← futures)
         Await.result(f, remaining) should ===("Pigdog" + i)
-      }
       mustStop(t)
-    }
 
-    "be able to call methods returning Java Options" taggedAs TimingTest in {
+    "be able to call methods returning Java Options" taggedAs TimingTest in
       val t = newFooBar(1 second)
       t.joptionPigdog(100 millis).get should ===("Pigdog")
       t.joptionPigdog(2 seconds) should ===(JOption.none[String])
       mustStop(t)
-    }
 
-    "be able to handle AskTimeoutException as None" taggedAs TimingTest in {
+    "be able to handle AskTimeoutException as None" taggedAs TimingTest in
       val t = newFooBar(200 millis)
       t.joptionPigdog(600 millis) should ===(JOption.none[String])
       mustStop(t)
-    }
 
-    "be able to call methods returning Scala Options" taggedAs TimingTest in {
+    "be able to call methods returning Scala Options" taggedAs TimingTest in
       val t = newFooBar(1 second)
       t.optionPigdog(100 millis).get should ===("Pigdog")
       t.optionPigdog(2 seconds) should ===(None)
       mustStop(t)
-    }
 
-    "be able to compose futures without blocking" in within(timeout.duration) {
+    "be able to compose futures without blocking" in within(timeout.duration)
       val t, t2 = newFooBar(remaining)
       val f = t.futureComposePigdogFrom(t2)
       f.isCompleted should ===(false)
       Await.result(f, remaining) should ===("PIGDOG")
       mustStop(t)
       mustStop(t2)
-    }
 
-    "be able to handle exceptions when calling methods" in {
-      filterEvents(EventFilter[IllegalStateException]("expected")) {
-        val boss = system.actorOf(Props(new Actor {
-          override val supervisorStrategy = OneForOneStrategy() {
+    "be able to handle exceptions when calling methods" in
+      filterEvents(EventFilter[IllegalStateException]("expected"))
+        val boss = system.actorOf(Props(new Actor
+          override val supervisorStrategy = OneForOneStrategy()
             case e: IllegalStateException if e.getMessage == "expected" ⇒
               SupervisorStrategy.Resume
-          }
-          def receive = {
+          def receive =
             case p: TypedProps[_] ⇒
               context.sender() ! TypedActor(context).typedActorOf(p)
-          }
-        }))
+        ))
         val t =
           Await.result((boss ? TypedProps[Bar](classOf[Foo], classOf[Bar])
                              .withTimeout(2 seconds)).mapTo[Foo],
@@ -385,9 +342,9 @@ class TypedActorSpec
         t.failingPigdog()
         t.read() should ===(1) //Make sure state is not reset after failure
 
-        intercept[IllegalStateException] {
+        intercept[IllegalStateException]
           Await.result(t.failingFuturePigdog, 2 seconds)
-        }.getMessage should ===("expected")
+        .getMessage should ===("expected")
         t.read() should ===(1) //Make sure state is not reset after failure
 
         (intercept[IllegalStateException] { t.failingJOptionPigdog }).getMessage should ===(
@@ -400,11 +357,9 @@ class TypedActorSpec
         t.read() should ===(1) //Make sure state is not reset after failure
 
         mustStop(t)
-      }
-    }
 
-    "be restarted on failure" in {
-      filterEvents(EventFilter[IllegalStateException]("expected")) {
+    "be restarted on failure" in
+      filterEvents(EventFilter[IllegalStateException]("expected"))
         val t = newFooBar(Duration(2, "s"))
         intercept[IllegalStateException] { t.failingOptionPigdog() }.getMessage should ===(
             "expected")
@@ -417,18 +372,15 @@ class TypedActorSpec
         ta.f(false) should ===(1)
 
         mustStop(ta)
-      }
-    }
 
-    "be able to support stacked traits for the interface part" in {
+    "be able to support stacked traits for the interface part" in
       val t = newStacked()
       t.notOverriddenStacked should ===("foobar")
       t.stacked should ===("FOOBAR")
       mustStop(t)
-    }
 
     "be able to support implementation only typed actors" in within(
-        timeout.duration) {
+        timeout.duration)
       val t: Foo = TypedActor(system).typedActorOf(TypedProps[Bar]())
       val f = t.futurePigdog(200 millis)
       val f2 = t.futurePigdog(Duration.Zero)
@@ -436,17 +388,15 @@ class TypedActorSpec
       f.isCompleted should ===(false)
       Await.result(f, remaining) should ===(Await.result(f2, remaining))
       mustStop(t)
-    }
 
-    "be able to support implementation only typed actors with complex interfaces" in {
+    "be able to support implementation only typed actors with complex interfaces" in
       val t: Stackable1 with Stackable2 =
         TypedActor(system).typedActorOf(TypedProps[StackedImpl]())
       t.stackable1 should ===("foo")
       t.stackable2 should ===("bar")
       mustStop(t)
-    }
 
-    "be able to use balancing dispatcher" in within(timeout.duration) {
+    "be able to use balancing dispatcher" in within(timeout.duration)
       val thais = for (i ← 1 to 60) yield
         newFooBar("pooled-dispatcher", 6 seconds)
       val iterator = new CyclicIterator(thais)
@@ -458,12 +408,11 @@ class TypedActorSpec
           "Pigdog" + i)
 
       for (t ← thais) mustStop(t)
-    }
 
-    "be able to serialize and deserialize invocations" in {
+    "be able to serialize and deserialize invocations" in
       import java.io._
       JavaSerializer.currentSystem.withValue(
-          system.asInstanceOf[ExtendedActorSystem]) {
+          system.asInstanceOf[ExtendedActorSystem])
         val m = TypedActor.MethodCall(classOf[Foo].getDeclaredMethod("pigdog"),
                                       Array[AnyRef]())
         val baos = new ByteArrayOutputStream(8192 * 4)
@@ -478,14 +427,12 @@ class TypedActorSpec
         val mNew = in.readObject().asInstanceOf[TypedActor.MethodCall]
 
         mNew.method should ===(m.method)
-      }
-    }
 
-    "be able to serialize and deserialize invocations' parameters" in {
+    "be able to serialize and deserialize invocations' parameters" in
       import java.io._
       val someFoo: Foo = new Bar
       JavaSerializer.currentSystem.withValue(
-          system.asInstanceOf[ExtendedActorSystem]) {
+          system.asInstanceOf[ExtendedActorSystem])
         val m = TypedActor.MethodCall(
             classOf[Foo].getDeclaredMethod("testMethodCallSerialization",
                                            Array[Class[_]](classOf[Foo],
@@ -510,13 +457,11 @@ class TypedActorSpec
         mNew.parameters(1) should ===(null)
         mNew.parameters(2) should not be null
         mNew.parameters(2).asInstanceOf[Int] should ===(1)
-      }
-    }
 
-    "be able to serialize and deserialize proxies" in {
+    "be able to serialize and deserialize proxies" in
       import java.io._
       JavaSerializer.currentSystem.withValue(
-          system.asInstanceOf[ExtendedActorSystem]) {
+          system.asInstanceOf[ExtendedActorSystem])
         val t = newFooBar(Duration(2, "s"))
 
         t.optionPigdog() should ===(Some("Pigdog"))
@@ -537,18 +482,15 @@ class TypedActorSpec
         tNew.optionPigdog() should ===(Some("Pigdog"))
 
         mustStop(t)
-      }
-    }
 
-    "be able to override lifecycle callbacks" in {
+    "be able to override lifecycle callbacks" in
       val latch = new CountDownLatch(16)
       val ta = TypedActor(system)
       val t: LifeCycles =
         ta.typedActorOf(TypedProps[LifeCyclesImpl](classOf[LifeCycles],
                                                    new LifeCyclesImpl(latch)))
-      EventFilter[IllegalStateException]("Crash!", occurrences = 1) intercept {
+      EventFilter[IllegalStateException]("Crash!", occurrences = 1) intercept
         t.crash()
-      }
 
       //Sneak in a check for the Receiver override
       val ref = ta getActorRefFor t
@@ -561,14 +503,11 @@ class TypedActorSpec
 
       ta.poisonPill(t)
       latch.await(10, TimeUnit.SECONDS) should ===(true)
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TypedActorRouterSpec
     extends AkkaSpec(TypedActorSpec.config) with BeforeAndAfterEach
-    with BeforeAndAfterAll with DefaultTimeout {
+    with BeforeAndAfterAll with DefaultTimeout
 
   import akka.actor.TypedActorSpec._
 
@@ -581,17 +520,16 @@ class TypedActorRouterSpec
   def mustStop(typedActor: AnyRef) =
     TypedActor(system).stop(typedActor) should ===(true)
 
-  "TypedActor Router" must {
+  "TypedActor Router" must
 
-    "work" in {
+    "work" in
       val t1 = newFooBar
       val t2 = newFooBar
       val t3 = newFooBar
       val t4 = newFooBar
       val routees =
-        List(t1, t2, t3, t4) map { t ⇒
+        List(t1, t2, t3, t4) map  t ⇒
           TypedActor(system).getActorRefFor(t).path.toStringWithoutAddress
-        }
 
       TypedActor(system).isTypedActor(t1) should ===(true)
       TypedActor(system).isTypedActor(t2) should ===(true)
@@ -611,6 +549,3 @@ class TypedActorRouterSpec
       mustStop(t2)
       mustStop(t3)
       mustStop(t4)
-    }
-  }
-}

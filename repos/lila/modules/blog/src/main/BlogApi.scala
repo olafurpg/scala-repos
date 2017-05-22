@@ -5,7 +5,7 @@ import lila.memo.AsyncCache
 import play.api.mvc.RequestHeader
 import scala.concurrent.duration._
 
-final class BlogApi(prismicUrl: String, collection: String) {
+final class BlogApi(prismicUrl: String, collection: String)
 
   def recent(api: Api, ref: Option[String], nb: Int): Fu[Option[Response]] =
     api
@@ -27,42 +27,36 @@ final class BlogApi(prismicUrl: String, collection: String) {
   // -- Build a Prismic context
   def context(ref: Option[String])(
       implicit linkResolver: (Api, Option[String]) => DocumentLinkResolver) =
-    prismicApi map { api =>
+    prismicApi map  api =>
       BlogApi.Context(
           api,
           ref.map(_.trim).filterNot(_.isEmpty).getOrElse(api.master.ref),
           linkResolver(api, ref))
-    }
 
   private val cache = BuiltInCache(200)
   private val prismicLogger = (level: Symbol, message: String) =>
-    level match {
+    level match
       case 'DEBUG => logger debug message
       case 'ERROR => logger error message
       case _ => logger info message
-  }
 
   private val fetchPrismicApi = AsyncCache.single[Api](
       f = Api.get(prismicUrl, cache = cache, logger = prismicLogger),
       timeToLive = 10 seconds)
 
   def prismicApi = fetchPrismicApi(true)
-}
 
-object BlogApi {
+object BlogApi
 
   def extract(body: Fragment.StructuredText): String =
     body.blocks
       .takeWhile(_.isInstanceOf[Fragment.StructuredText.Block.Paragraph])
       .take(2)
-      .map {
+      .map
         case Fragment.StructuredText.Block.Paragraph(text, _, _) =>
           s"<p>$text</p>"
         case _ => ""
-      }
       .mkString
 
-  case class Context(api: Api, ref: String, linkResolver: DocumentLinkResolver) {
+  case class Context(api: Api, ref: String, linkResolver: DocumentLinkResolver)
     def maybeRef = Option(ref).filterNot(_ == api.master.ref)
-  }
-}

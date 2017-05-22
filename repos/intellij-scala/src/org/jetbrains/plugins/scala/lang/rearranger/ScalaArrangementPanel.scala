@@ -9,7 +9,7 @@ import com.intellij.psi.codeStyle.CodeStyleSettings
   * Date: 15.07.13
   */
 class ScalaArrangementPanel(settings: CodeStyleSettings)
-    extends ArrangementSettingsPanel(settings, ScalaFileType.SCALA_LANGUAGE) {
+    extends ArrangementSettingsPanel(settings, ScalaFileType.SCALA_LANGUAGE)
 
   override protected def getRightMargin: Int = 80
 
@@ -17,4 +17,3 @@ class ScalaArrangementPanel(settings: CodeStyleSettings)
     ScalaFileType.SCALA_FILE_TYPE
 
   protected def getPreviewText: String = null
-}

@@ -1,5 +1,4 @@
 package moveRefactoring.bar
 
-object O {
+object O
   def m1() {}
-}

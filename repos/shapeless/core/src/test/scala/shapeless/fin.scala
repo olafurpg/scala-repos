@@ -22,13 +22,13 @@ import org.junit.Assert._
 import test._
 import testutil._
 
-class FinTests {
+class FinTests
   import nat._
   import fin._
   import ops.fin._
 
   @Test
-  def testFromNats {
+  def testFromNats
     val r1 = Fin[_0, _1]
     assertTypedEquals[FinZero[_1]](FinZero[_1](), r1)
 
@@ -42,10 +42,9 @@ class FinTests {
     illTyped("""
       Fin(_0, _0)
     """)
-  }
 
   @Test
-  def testToNat {
+  def testToNat
     val r1 = Fin.toNat(Fin[_0, _3])
     assertTypedEquals[_0](_0, r1)
 
@@ -54,5 +53,3 @@ class FinTests {
 
     val r3 = Fin.toNat(Fin[_2, _3])
     assertTypedEquals[_2](_2, r3)
-  }
-}

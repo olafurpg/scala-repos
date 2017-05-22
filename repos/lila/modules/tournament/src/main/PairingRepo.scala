@@ -9,7 +9,7 @@ import BSONHandlers._
 import lila.db.BSON._
 import lila.db.Implicits._
 
-object PairingRepo {
+object PairingRepo
 
   private lazy val coll = Env.current.pairingColl
 
@@ -47,13 +47,12 @@ object PairingRepo {
       .sort(recentSort)
       .cursor[BSONDocument]()
       .enumerate(nb) |>>> Iteratee.fold(
-        scala.collection.immutable.Map.empty[String, String]) { (acc, doc) =>
-      ~doc.getAs[List[String]]("u") match {
+        scala.collection.immutable.Map.empty[String, String])  (acc, doc) =>
+      ~doc.getAs[List[String]]("u") match
         case List(u1, u2) =>
           val acc1 = acc.contains(u1).fold(acc, acc.updated(u1, u2))
           acc.contains(u2).fold(acc1, acc1.updated(u2, u1))
-      }
-    } map Pairing.LastOpponents.apply
+    map Pairing.LastOpponents.apply
 
   def opponentsOf(tourId: String, userId: String): Fu[Set[String]] =
     coll
@@ -63,11 +62,10 @@ object PairingRepo {
       )
       .cursor[BSONDocument]()
       .collect[List]()
-      .map {
-        _.flatMap { doc =>
+      .map
+        _.flatMap  doc =>
           ~doc.getAs[List[String]]("u").filter(userId !=)
-        }.toSet
-      }
+        .toSet
 
   def recentIdsByTourAndUserId(
       tourId: String, userId: String, nb: Int): Fu[List[String]] =
@@ -79,9 +77,8 @@ object PairingRepo {
       .sort(recentSort)
       .cursor[BSONDocument]()
       .collect[List](nb)
-      .map {
+      .map
         _.flatMap(_.getAs[String]("_id"))
-      }
 
   def byTourUserNb(
       tourId: String, userId: String, nb: Int): Fu[Option[Pairing]] =
@@ -101,7 +98,7 @@ object PairingRepo {
   def count(tourId: String): Fu[Int] =
     coll.count(selectTour(tourId).some)
 
-  def countByTourIdAndUserIds(tourId: String): Fu[Map[String, Int]] = {
+  def countByTourIdAndUserIds(tourId: String): Fu[Map[String, Int]] =
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
     coll
       .aggregate(Match(selectTour(tourId)),
@@ -110,14 +107,11 @@ object PairingRepo {
                      Unwind("u"),
                      GroupField("u")("nb" -> SumValue(1))
                  ))
-      .map {
-        _.documents.flatMap { doc =>
-          doc.getAs[String]("_id") flatMap { uid =>
+      .map
+        _.documents.flatMap  doc =>
+          doc.getAs[String]("_id") flatMap  uid =>
             doc.getAs[Int]("nb") map { uid -> _ }
-          }
-        }.toMap
-      }
-  }
+        .toMap
 
   def removePlaying(tourId: String) =
     coll.remove(selectTour(tourId) ++ selectPlaying).void
@@ -142,9 +136,9 @@ object PairingRepo {
       .collect[List]()
 
   def insert(pairing: Pairing) =
-    coll.insert {
+    coll.insert
       pairingHandler.write(pairing) ++ BSONDocument("d" -> DateTime.now)
-    }.void
+    .void
 
   def finish(g: lila.game.Game) =
     coll
@@ -156,16 +150,15 @@ object PairingRepo {
       .void
 
   def setBerserk(pairing: Pairing, userId: String, value: Int) =
-    (userId match {
+    (userId match
       case uid if pairing.user1 == uid => "b1".some
       case uid if pairing.user2 == uid => "b2".some
       case _ => none
-    }) ?? { field =>
+    ) ??  field =>
       coll
         .update(selectId(pairing.id),
                 BSONDocument("$set" -> BSONDocument(field -> value)))
         .void
-    }
 
   import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework,
   AggregationFramework.{AddToSet, Group, Match, Project, Push, Unwind}
@@ -188,4 +181,3 @@ object PairingRepo {
       .map(_.documents.headOption
             .flatMap(_.getAs[List[String]]("ids"))
             .getOrElse(List.empty[String]))
-}

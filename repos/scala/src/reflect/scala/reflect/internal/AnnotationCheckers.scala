@@ -10,12 +10,12 @@ package internal
 /** Additions to the type checker that can be added at
   *  run time.  Typically these are added by
   *  compiler plugins. */
-trait AnnotationCheckers { self: SymbolTable =>
+trait AnnotationCheckers  self: SymbolTable =>
 
   /** An additional checker for annotations on types.
     *  Typically these are registered by compiler plugins
     *  with the addAnnotationChecker method. */
-  trait AnnotationChecker {
+  trait AnnotationChecker
 
     /**
       * Selectively activate this annotation checker. When using both an annotation checker
@@ -78,7 +78,6 @@ trait AnnotationCheckers { self: SymbolTable =>
         "2.10.1")
     def adaptTypeOfReturn(tree: Tree, pt: Type, default: => Type): Type =
       default
-  }
 
   // Syncnote: Annotation checkers inaccessible to reflection, so no sync in var necessary.
 
@@ -86,15 +85,13 @@ trait AnnotationCheckers { self: SymbolTable =>
   private var annotationCheckers: List[AnnotationChecker] = Nil
 
   /** Register an annotation checker.  Typically these are added by compiler plugins. */
-  def addAnnotationChecker(checker: AnnotationChecker) {
+  def addAnnotationChecker(checker: AnnotationChecker)
     if (!(annotationCheckers contains checker))
       annotationCheckers = checker :: annotationCheckers
-  }
 
   /** Remove all annotation checkers */
-  def removeAllAnnotationCheckers() {
+  def removeAllAnnotationCheckers()
     annotationCheckers = Nil
-  }
 
   /** @see AnnotationChecker.annotationsConform */
   def annotationsConform(tp1: Type, tp2: Type): Boolean =
@@ -103,9 +100,8 @@ trait AnnotationCheckers { self: SymbolTable =>
     else
       annotationCheckers.forall(
           checker =>
-            {
           !checker.isActive() || checker.annotationsConform(tp1, tp2)
-      })
+      )
 
   /** @see AnnotationChecker.annotationsLub */
   def annotationsLub(tpe: Type, ts: List[Type]): Type =
@@ -145,9 +141,8 @@ trait AnnotationCheckers { self: SymbolTable =>
     else
       annotationCheckers.exists(
           checker =>
-            {
           checker.isActive() && checker.canAdaptAnnotations(tree, mode, pt)
-      })
+      )
 
   def adaptAnnotations(tree: Tree, mode: Mode, pt: Type): Tree =
     if (annotationCheckers.isEmpty) tree
@@ -162,4 +157,3 @@ trait AnnotationCheckers { self: SymbolTable =>
       annotationCheckers.foldLeft(default)((tpe, checker) =>
             if (!checker.isActive()) tpe
             else checker.adaptTypeOfReturn(tree, pt, tpe))
-}

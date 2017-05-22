@@ -29,7 +29,7 @@ import com.twitter.io.Files
   * Note that multiple uses of TempFolder cannot be nested, because the temporary directory
   * is effectively a thread-local global.
   */
-trait TempFolder {
+trait TempFolder
   private val _folderName = new ThreadLocal[File]
 
   /**
@@ -38,22 +38,20 @@ trait TempFolder {
     *
     * Use of this function may not be nested.
     */
-  def withTempFolder(f: => Any) {
+  def withTempFolder(f: => Any)
     val tempFolder = System.getProperty("java.io.tmpdir")
     // Note: If we were willing to have a dependency on Guava in util-core
     // we could just use `com.google.common.io.Files.createTempDir()`
     var folder: File = null
-    do {
+    do
       folder = new File(tempFolder, "scala-test-" + System.currentTimeMillis)
-    } while (!folder.mkdir())
+    while (!folder.mkdir())
     _folderName.set(folder)
 
-    try {
+    try
       f
-    } finally {
+    finally
       Files.delete(folder)
-    }
-  }
 
   /**
     * @return The current thread's active temporary folder.
@@ -66,4 +64,3 @@ trait TempFolder {
     * @throws RuntimeException if not running within a withTempFolder block
     */
   def canonicalFolderName = { _folderName.get.getCanonicalPath }
-}

@@ -14,7 +14,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
-class ProxyTest extends FunSuite with BeforeAndAfter {
+class ProxyTest extends FunSuite with BeforeAndAfter
 
   type MemcacheService = Service[Command, Response]
 
@@ -28,18 +28,17 @@ class ProxyTest extends FunSuite with BeforeAndAfter {
   var proxyClient: MemcacheService = null
   var testServer: Option[TestMemcachedServer] = None
 
-  before {
+  before
     testServer = TestMemcachedServer.start()
-    if (testServer.isDefined) {
+    if (testServer.isDefined)
       Thread.sleep(150) // On my box the 100ms sleep wasn't long enough
       proxyClient = ClientBuilder()
         .hosts(Seq(testServer.get.address))
         .codec(Memcached())
         .hostConnectionLimit(1)
         .build()
-      proxyService = new MemcacheService {
+      proxyService = new MemcacheService
         def apply(request: Command) = proxyClient(request)
-      }
 
       server = ServerBuilder()
         .codec(Memcached())
@@ -50,28 +49,23 @@ class ProxyTest extends FunSuite with BeforeAndAfter {
       serverAddress = server.boundAddress.asInstanceOf[InetSocketAddress]
       externalClient = Client(
           "%s:%d".format(serverAddress.getHostName, serverAddress.getPort))
-    }
-  }
 
-  after {
+  after
     // externalClient.close() needs to be called explicitly by each test. Otherwise
     // 'quit' test would call it twice.
-    if (testServer.isDefined) {
+    if (testServer.isDefined)
       server.close(0.seconds)
       proxyService.close()
       proxyClient.close()
       testServer.map(_.stop())
-    }
-  }
 
-  override def withFixture(test: NoArgTest) = {
-    if (testServer == None) {
+  override def withFixture(test: NoArgTest) =
+    if (testServer == None)
       info("Cannot start memcached. skipping test...")
       cancel()
-    } else test()
-  }
+    else test()
 
-  test("Proxied Memcached Servers should handle a basic get/set operation") {
+  test("Proxied Memcached Servers should handle a basic get/set operation")
     Await.result(externalClient.delete("foo"))
     assert(Await.result(externalClient.get("foo")) == None)
     Await.result(externalClient.set("foo", Buf.Utf8("bar")))
@@ -80,27 +74,22 @@ class ProxyTest extends FunSuite with BeforeAndAfter {
     val Buf.Utf8(res) = foo.get
     assert(res == "bar")
     externalClient.release()
-  }
 
-  if (Option(System.getProperty("USE_EXTERNAL_MEMCACHED")).isDefined) {
-    test("stats is supported") {
+  if (Option(System.getProperty("USE_EXTERNAL_MEMCACHED")).isDefined)
+    test("stats is supported")
       Await.result(externalClient.delete("foo"))
       assert(Await.result(externalClient.get("foo")) == None)
       Await.result(externalClient.set("foo", Buf.Utf8("bar")))
-      Seq(None, Some("slabs")).foreach { arg =>
+      Seq(None, Some("slabs")).foreach  arg =>
         val stats = Await.result(externalClient.stats(arg))
         assert(stats != null)
         assert(!stats.isEmpty)
-        stats.foreach { line =>
+        stats.foreach  line =>
           assert(line.startsWith("STAT"))
-        }
-      }
       externalClient.release()
-    }
-  }
 
-  if (Option(System.getProperty("USE_EXTERNAL_MEMCACHED")).isDefined) {
-    test("stats (cachedump) is supported") {
+  if (Option(System.getProperty("USE_EXTERNAL_MEMCACHED")).isDefined)
+    test("stats (cachedump) is supported")
       Await.result(externalClient.delete("foo"))
       assert(Await.result(externalClient.get("foo")) == None)
       Await.result(externalClient.set("foo", Buf.Utf8("bar")))
@@ -112,21 +101,15 @@ class ProxyTest extends FunSuite with BeforeAndAfter {
         Await.result(externalClient.stats(Some("cachedump " + n + " 100")))
       assert(stats != null)
       assert(!stats.isEmpty)
-      stats.foreach { stat =>
+      stats.foreach  stat =>
         assert(stat.startsWith("ITEM"))
-      }
-      assert(stats.find { stat =>
+      assert(stats.find  stat =>
         stat.contains("foo")
-      }.isDefined)
+      .isDefined)
       externalClient.release()
-    }
-  }
 
-  test("quit is supported") {
+  test("quit is supported")
     Await.result(externalClient.get("foo")) // do nothing
     Await.result(externalClient.quit())
-    intercept[ServiceClosedException] {
+    intercept[ServiceClosedException]
       Await.result(externalClient.get("foo"))
-    }
-  }
-}

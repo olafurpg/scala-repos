@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.NGram
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object NGramExample {
-  def main(args: Array[String]): Unit = {
+object NGramExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("NGramExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -48,6 +48,4 @@ object NGramExample {
       .foreach(println)
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

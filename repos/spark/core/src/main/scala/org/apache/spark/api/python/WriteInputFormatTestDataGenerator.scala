@@ -34,7 +34,7 @@ import org.apache.spark.api.java.JavaSparkContext
   * in Python
   */
 case class TestWritable(var str: String, var int: Int, var double: Double)
-    extends Writable {
+    extends Writable
   def this() = this("", 0, 0.0)
 
   def getStr: String = str
@@ -44,51 +44,40 @@ case class TestWritable(var str: String, var int: Int, var double: Double)
   def getDouble: Double = double
   def setDouble(double: Double) { this.double = double }
 
-  def write(out: DataOutput): Unit = {
+  def write(out: DataOutput): Unit =
     out.writeUTF(str)
     out.writeInt(int)
     out.writeDouble(double)
-  }
 
-  def readFields(in: DataInput): Unit = {
+  def readFields(in: DataInput): Unit =
     str = in.readUTF()
     int = in.readInt()
     double = in.readDouble()
-  }
-}
 
-private[python] class TestInputKeyConverter extends Converter[Any, Any] {
-  override def convert(obj: Any): Char = {
+private[python] class TestInputKeyConverter extends Converter[Any, Any]
+  override def convert(obj: Any): Char =
     obj.asInstanceOf[IntWritable].get().toChar
-  }
-}
 
-private[python] class TestInputValueConverter extends Converter[Any, Any] {
-  override def convert(obj: Any): ju.List[Double] = {
+private[python] class TestInputValueConverter extends Converter[Any, Any]
+  override def convert(obj: Any): ju.List[Double] =
     val m = obj.asInstanceOf[MapWritable]
     m.keySet.asScala.map(_.asInstanceOf[DoubleWritable].get()).toSeq.asJava
-  }
-}
 
-private[python] class TestOutputKeyConverter extends Converter[Any, Any] {
-  override def convert(obj: Any): Text = {
+private[python] class TestOutputKeyConverter extends Converter[Any, Any]
+  override def convert(obj: Any): Text =
     new Text(obj.asInstanceOf[Int].toString)
-  }
-}
 
-private[python] class TestOutputValueConverter extends Converter[Any, Any] {
-  override def convert(obj: Any): DoubleWritable = {
+private[python] class TestOutputValueConverter extends Converter[Any, Any]
+  override def convert(obj: Any): DoubleWritable =
     new DoubleWritable(
         obj.asInstanceOf[java.util.Map[Double, _]].keySet().iterator().next())
-  }
-}
 
 private[python] class DoubleArrayWritable
     extends ArrayWritable(classOf[DoubleWritable])
 
 private[python] class DoubleArrayToWritableConverter
-    extends Converter[Any, Writable] {
-  override def convert(obj: Any): DoubleArrayWritable = obj match {
+    extends Converter[Any, Writable]
+  override def convert(obj: Any): DoubleArrayWritable = obj match
     case arr
         if arr.getClass.isArray &&
         arr.getClass.getComponentType == classOf[Double] =>
@@ -97,32 +86,27 @@ private[python] class DoubleArrayToWritableConverter
       daw
     case other =>
       throw new SparkException(s"Data of type $other is not supported")
-  }
-}
 
 private[python] class WritableToDoubleArrayConverter
-    extends Converter[Any, Array[Double]] {
-  override def convert(obj: Any): Array[Double] = obj match {
+    extends Converter[Any, Array[Double]]
+  override def convert(obj: Any): Array[Double] = obj match
     case daw: DoubleArrayWritable =>
       daw.get().map(_.asInstanceOf[DoubleWritable].get())
     case other =>
       throw new SparkException(s"Data of type $other is not supported")
-  }
-}
 
 /**
   * This object contains method to generate SequenceFile test data and write it to a
   * given directory (probably a temp directory)
   */
-object WriteInputFormatTestDataGenerator {
+object WriteInputFormatTestDataGenerator
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val path = args(0)
     val sc = new JavaSparkContext("local[4]", "test-writables")
     generateData(path, sc)
-  }
 
-  def generateData(path: String, jsc: JavaSparkContext) {
+  def generateData(path: String, jsc: JavaSparkContext)
     val sc = jsc.sc
 
     val basePath = s"$path/sftestdata/"
@@ -147,18 +131,17 @@ object WriteInputFormatTestDataGenerator {
       .saveAsSequenceFile(doublePath)
     sc.parallelize(intKeys.map { case (k, v) => (k.toString, v) })
       .saveAsSequenceFile(textPath)
-    sc.parallelize(intKeys.map {
+    sc.parallelize(intKeys.map
         case (k, v) => (k, v.getBytes(StandardCharsets.UTF_8))
-      })
+      )
       .saveAsSequenceFile(bytesPath)
     val bools = Seq(
         (1, true), (2, true), (2, false), (3, true), (2, false), (1, false))
     sc.parallelize(bools).saveAsSequenceFile(boolPath)
     sc.parallelize(intKeys)
-      .map {
+      .map
         case (k, v) =>
           (new IntWritable(k), NullWritable.get())
-      }
       .saveAsSequenceFile(nullPath)
 
     // Create test data for ArrayWritable
@@ -168,12 +151,11 @@ object WriteInputFormatTestDataGenerator {
         (3, Array(4.0, 5.0, 6.0))
     )
     sc.parallelize(data, numSlices = 2)
-      .map {
+      .map
         case (k, v) =>
           val va = new DoubleArrayWritable
           va.set(v.map(new DoubleWritable(_)))
           (new IntWritable(k), va)
-      }
       .saveAsNewAPIHadoopFile[SequenceFileOutputFormat[
               IntWritable, DoubleArrayWritable]](arrPath)
 
@@ -186,15 +168,13 @@ object WriteInputFormatTestDataGenerator {
         (1, Map(3.0 -> "bb"))
     )
     sc.parallelize(mapData, numSlices = 2)
-      .map {
+      .map
         case (i, m) =>
           val mw = new MapWritable()
-          m.foreach {
+          m.foreach
             case (k, v) =>
               mw.put(new DoubleWritable(k), new Text(v))
-          }
           (new IntWritable(i), mw)
-      }
       .saveAsSequenceFile(mapPath)
 
     // Create test data for arbitrary custom writable TestWritable
@@ -205,13 +185,10 @@ object WriteInputFormatTestDataGenerator {
         ("5", TestWritable("test56", 5, 5.5)),
         ("4", TestWritable("test4", 4, 4.2))
     )
-    val rdd = sc.parallelize(testClass, numSlices = 2).map {
+    val rdd = sc.parallelize(testClass, numSlices = 2).map
       case (k, v) => (new Text(k), v)
-    }
     rdd.saveAsNewAPIHadoopFile(
         classPath,
         classOf[Text],
         classOf[TestWritable],
         classOf[SequenceFileOutputFormat[Text, TestWritable]])
-  }
-}

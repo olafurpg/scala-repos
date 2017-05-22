@@ -16,13 +16,12 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class MonitorFilterTest
-    extends FunSuite with MockitoSugar with IntegrationBase {
+    extends FunSuite with MockitoSugar with IntegrationBase
 
-  class MockMonitor extends Monitor {
+  class MockMonitor extends Monitor
     def handle(cause: Throwable) = false
-  }
 
-  class MonitorFilterHelper {
+  class MonitorFilterHelper
     val monitor = Mockito.spy(new MockMonitor)
     val underlying = mock[Service[Int, Int]]
     when(underlying.close(any[Time])) thenReturn Future.Done
@@ -30,9 +29,8 @@ class MonitorFilterTest
     when(underlying(any[Int])) thenReturn reply
     val service = new MonitorFilter(monitor) andThen underlying
     val exc = new RuntimeException
-  }
 
-  test("MonitorFilter should report Future.exception") {
+  test("MonitorFilter should report Future.exception")
     val h = new MonitorFilterHelper
     import h._
 
@@ -42,9 +40,8 @@ class MonitorFilterTest
     reply() = Throw(exc)
     assert(f.poll == Some(Throw(exc)))
     verify(monitor).handle(exc)
-  }
 
-  test("MonitorFilter should report raw service exception") {
+  test("MonitorFilter should report raw service exception")
     val h = new MonitorFilterHelper
     import h._
 
@@ -53,15 +50,13 @@ class MonitorFilterTest
     val f = service(123)
     assert(f.poll == Some(Throw(exc)))
     verify(monitor).handle(exc)
-  }
 
   class MockSourcedException(underlying: Throwable, name: String)
-      extends RuntimeException(underlying) with SourcedException {
+      extends RuntimeException(underlying) with SourcedException
     def this(name: String) = this(null, name)
     serviceName = name
-  }
 
-  class Helper {
+  class Helper
     val monitor = Mockito.spy(new MockMonitor)
     val inner = new MockSourcedException("FakeService1")
     val outer = new MockSourcedException(
@@ -71,10 +66,9 @@ class MonitorFilterTest
     // add handler to redirect and mute output, so that it doesn't show up in the console during a test run.
     mockLogger.setUseParentHandlers(false)
     mockLogger.addHandler(new StreamHandler())
-  }
 
   test(
-      "MonitorFilter should when attached to a server, report source for sourced exceptions") {
+      "MonitorFilter should when attached to a server, report source for sourced exceptions")
     val h = new Helper
     import h._
 
@@ -99,12 +93,11 @@ class MonitorFilterTest
 
     when(service(any[String])) thenThrow outer // make server service throw the mock exception
 
-    try {
+    try
       val f = Await.result(client("123"))
-    } catch {
+    catch
       case e: ChannelException =>
       // deliberately empty. Server exception comes back as ChannelClosedException
-    }
 
     verify(monitor, times(0)).handle(inner)
     verify(monitor).handle(outer)
@@ -113,10 +106,9 @@ class MonitorFilterTest
         Matchers.eq(
             "The 'FakeService2' service FakeService2 on behalf of FakeService1 threw an exception"),
         Matchers.eq(outer))
-  }
 
   test(
-      "MonitorFilter should when attached to a client, report source for sourced exceptions") {
+      "MonitorFilter should when attached to a client, report source for sourced exceptions")
     val h = new Helper
     import h._
 
@@ -140,14 +132,11 @@ class MonitorFilterTest
     val requestFuture = client("123")
 
     assert(!requestFuture.isDefined)
-    val mockService = new Service[String, String] {
+    val mockService = new Service[String, String]
       def apply(request: String): Future[String] = Future.exception(outer)
-    }
 
     preparedServicePromise() = Return(mockService)
     assert(requestFuture.poll == Some(Throw(outer)))
 
     verify(monitor, times(0)).handle(inner)
     verify(monitor).handle(outer)
-  }
-}

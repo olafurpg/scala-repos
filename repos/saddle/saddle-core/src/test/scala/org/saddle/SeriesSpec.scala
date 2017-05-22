@@ -18,8 +18,8 @@ package org.saddle
 import org.specs2.mutable.Specification
 import time._
 
-class SeriesSpec extends Specification {
-  "reindex works on dates" in {
+class SeriesSpec extends Specification
+  "reindex works on dates" in
     val s1 = Series(Vec(1d, 2, 3),
                     Index(datetime(2005, 1, 1),
                           datetime(2005, 1, 2),
@@ -28,20 +28,15 @@ class SeriesSpec extends Specification {
       Series(Vec(5d, 7), Index(datetime(2005, 1, 1), datetime(2005, 1, 3)))
 
     s2.reindex(s1.index).index must_== s1.index
-  }
 
-  "non-spec primitive groupby must work" in {
+  "non-spec primitive groupby must work" in
     val s = Series('a' -> 1, 'b' -> 2, 'b' -> 3)
     s.groupBy.combine(_.first.getOrElse(0)) must_== Series('a' -> 1, 'b' -> 2)
-  }
 
-  "map works" in {
+  "map works" in
     val s = Series('a' -> 1, 'b' -> 2, 'b' -> 3)
     s.map { case (k, v) => (k, v + 1) } must_== s + 1
-  }
 
-  "flatMap works" in {
+  "flatMap works" in
     val s = Series('a' -> 1, 'b' -> 2, 'b' -> 3)
     s.flatMap { case (k, v) => Some((k, v + 1)) } must_== s + 1
-  }
-}

@@ -7,7 +7,7 @@ package scala.tools.nsc
 
 /** Loads `compiler.properties` from the jar archive file.
   */
-object Properties extends scala.util.PropertiesTrait {
+object Properties extends scala.util.PropertiesTrait
   protected def propCategory = "compiler"
   protected def pickJarBasedOn = classOf[Global]
 
@@ -29,4 +29,3 @@ object Properties extends scala.util.PropertiesTrait {
 
   // derived values
   def isEmacsShell = propOrEmpty("env.emacs") != ""
-}

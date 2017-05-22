@@ -10,9 +10,9 @@ package org.scalajs.testsuite.javalib.lang
 import org.junit.Test
 import org.junit.Assert._
 
-class ThrowablesTest {
+class ThrowablesTest
 
-  @Test def should_define_all_java_lang_Errors_and_Exceptions(): Unit = {
+  @Test def should_define_all_java_lang_Errors_and_Exceptions(): Unit =
     new ArithmeticException()
     new ArrayIndexOutOfBoundsException()
     new ArrayStoreException()
@@ -62,5 +62,3 @@ class ThrowablesTest {
     new UnsupportedClassVersionError()
     new VerifyError()
     new VirtualMachineError() {}
-  }
-}

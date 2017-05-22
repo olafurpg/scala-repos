@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.beans.property.{DoubleProperty, ObjectProperty}
 import scalafx.delegate.SFXDelegate
 
-object Arc {
+object Arc
   implicit def sfxArc2jfx(v: Arc): jfxss.Arc =
     if (v != null) v.delegate else null
 
@@ -45,42 +45,33 @@ object Arc {
             length: Double) =
     new Arc(
         new jfxss.Arc(centerX, centerY, radiusX, radiusY, startAngle, length))
-}
 
 class Arc(override val delegate: jfxss.Arc = new jfxss.Arc())
-    extends Shape(delegate) with SFXDelegate[jfxss.Arc] {
+    extends Shape(delegate) with SFXDelegate[jfxss.Arc]
   def centerX: DoubleProperty = delegate.centerXProperty
-  def centerX_=(v: Double) {
+  def centerX_=(v: Double)
     centerX() = v
-  }
 
   def centerY: DoubleProperty = delegate.centerYProperty
-  def centerY_=(v: Double) {
+  def centerY_=(v: Double)
     centerY() = v
-  }
 
   def length: DoubleProperty = delegate.lengthProperty
-  def length_=(v: Double) {
+  def length_=(v: Double)
     length() = v
-  }
 
   def radiusX: DoubleProperty = delegate.radiusXProperty
-  def radiusX_=(v: Double) {
+  def radiusX_=(v: Double)
     radiusX() = v
-  }
 
   def radiusY: DoubleProperty = delegate.radiusYProperty
-  def radiusY_=(v: Double) {
+  def radiusY_=(v: Double)
     radiusY() = v
-  }
 
   def startAngle: DoubleProperty = delegate.startAngleProperty
-  def startAngle_=(v: Double) {
+  def startAngle_=(v: Double)
     startAngle() = v
-  }
 
   def `type`: ObjectProperty[jfxss.ArcType] = delegate.typeProperty
-  def `type_=`(v: ArcType) {
+  def `type_=`(v: ArcType)
     `type`() = v
-  }
-}

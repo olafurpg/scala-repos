@@ -17,9 +17,9 @@ import scala.language.reflectiveCalls
 @RunWith(classOf[JUnitRunner])
 class FailFastFactoryTest
     extends FunSuite with MockitoSugar with Conductors
-    with IntegrationPatience {
+    with IntegrationPatience
 
-  def newCtx() = new {
+  def newCtx() = new
     val timer = new MockTimer
     val backoffs = 1.second #:: 2.seconds #:: Stream.empty[Duration]
     val service = mock[Service[Int, Int]]
@@ -38,20 +38,17 @@ class FailFastFactoryTest
     assert(pp.isDefined == false)
     assert(failfast.isAvailable)
     assert(timer.tasks.isEmpty)
-  }
 
-  test("pass through whenever everything is fine") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("pass through whenever everything is fine")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
       p() = Return(service)
       assert(pp.poll == Some(Return(service)))
-    }
-  }
 
-  test("failure") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("failure")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
@@ -59,11 +56,9 @@ class FailFastFactoryTest
       verify(underlying).apply()
       assert(!failfast.isAvailable)
       assert(stats.counters.get(Seq("marked_dead")) == Some(1))
-    }
-  }
 
-  test("time out according to backoffs") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("time out according to backoffs")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
       p() = Throw(new Exception)
@@ -73,11 +68,9 @@ class FailFastFactoryTest
       timer.tick()
       verify(underlying, times(2)).apply()
       assert(!failfast.isAvailable)
-    }
-  }
 
-  test("become available again if the next attempt succeeds") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("become available again if the next attempt succeeds")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
       p() = Throw(new Exception)
@@ -92,11 +85,9 @@ class FailFastFactoryTest
       assert(timer.tasks.isEmpty)
       assert(failfast.isAvailable)
       assert(stats.counters.get(Seq("marked_available")) == Some(1))
-    }
-  }
 
-  test("is Busy when failing; done when revived") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("is Busy when failing; done when revived")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
@@ -108,27 +99,21 @@ class FailFastFactoryTest
       when(underlying()).thenReturn(Future.value(service))
       timer.tick()
       assert(failfast.status == Status.Open)
-    }
-  }
 
-  test("refuse external attempts") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("refuse external attempts")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
       p() = Throw(new Exception)
 
-      assert {
-        failfast().poll match {
+      assert
+        failfast().poll match
           case Some(Throw(_: FailedFastException)) => true
           case _ => false
-        }
-      }
       verify(underlying).apply() // nothing new
-    }
-  }
 
-  test("admit external attempts when available again") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("admit external attempts when available again")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
       p() = Throw(new Exception)
@@ -142,17 +127,13 @@ class FailFastFactoryTest
       when(underlying()).thenReturn(r)
       assert(failfast().poll == None)
       r() = Return(service)
-      assert {
-        failfast().poll match {
+      assert
+        failfast().poll match
           case Some(Return(s)) => s eq service
           case _ => false
-        }
-      }
-    }
-  }
 
-  test("cancels timer on close") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("cancels timer on close")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
       p() = Throw(new Exception)
@@ -165,18 +146,15 @@ class FailFastFactoryTest
       assert(timer.tasks.isEmpty)
       assert(failfast.status == underlying.status)
 
-      val status = underlying.status match {
+      val status = underlying.status match
         case Status.Open => Status.Closed
         case Status.Closed => Status.Open
         case status => fail(s"bad status $status")
-      }
       when(underlying.status).thenReturn(status)
       assert(failfast.status == underlying.status)
-    }
-  }
 
-  test("fails simultaneous requests properly") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("fails simultaneous requests properly")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
@@ -187,62 +165,47 @@ class FailFastFactoryTest
       assert(pp.poll == Some(Throw(e)))
       assert(pp2.poll == Some(Throw(e)))
 
-      val ffe = intercept[FailedFastException] {
+      val ffe = intercept[FailedFastException]
         failfast().poll.get.get
-      }
       assert(ffe
             .getMessage()
             .contains("twitter.github.io/finagle/guide/FAQ.html"))
-    }
-  }
 
-  test("maintains separate exception state in separate threads") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("maintains separate exception state in separate threads")
+    Time.withCurrentTimeFrozen  tc =>
       val conductor = new Conductor
       import conductor._
 
       val threadCompletionCount = new AtomicInteger(0)
 
-      thread("threadOne") {
+      thread("threadOne")
         val ctx = newCtx()
         ctx.p() = Throw(new Exception)
-        ctx.failfast().poll match {
-          case Some(Throw(ex: FailedFastException)) => {
+        ctx.failfast().poll match
+          case Some(Throw(ex: FailedFastException)) =>
               ex.serviceName = "threadOne"
               assert(beat == 0)
-            }
           case _ => throw new Exception
-        }
         threadCompletionCount.incrementAndGet()
-      }
 
-      thread("threadTwo") {
+      thread("threadTwo")
         waitForBeat(1)
         val ctx = newCtx()
         ctx.p() = Throw(new Exception)
-        ctx.failfast().poll match {
-          case Some(Throw(ex: FailedFastException)) => {
+        ctx.failfast().poll match
+          case Some(Throw(ex: FailedFastException)) =>
               assert(ex.serviceName == SourcedException.UnspecifiedServiceName)
-            }
           case _ => throw new Exception
-        }
         threadCompletionCount.incrementAndGet()
-      }
 
-      whenFinished {
+      whenFinished
         assert(threadCompletionCount.get == 2)
-      }
-    }
-  }
 
-  test("accepts empty backoff stream") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("accepts empty backoff stream")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
       val failfast = new FailFastFactory(
           underlying, stats, timer, label, backoffs = Stream.empty)
       failfast()
-    }
-  }
-}

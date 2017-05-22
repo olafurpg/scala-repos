@@ -18,36 +18,34 @@ case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val eventsDb = Storage.getPEvents()
 
     val users: EntityMap[User] = eventsDb.extractEntityMap[User](
         appId = dsp.appId,
         entityType = "user",
         required = Some(Seq("attr0", "attr1", "attr2"))
-    )(sc) { dm =>
+    )(sc)  dm =>
       User(
           attr0 = dm.get[Double]("attr0"),
           attr1 = dm.get[Int]("attr1"),
           attr2 = dm.get[Int]("attr2")
       )
-    }
 
     val items: EntityMap[Item] = eventsDb.extractEntityMap[Item](
         appId = dsp.appId,
         entityType = "item",
         required = Some(Seq("attrA", "attrB", "attrC"))
-    )(sc) { dm =>
+    )(sc)  dm =>
       Item(
           attrA = dm.get[String]("attrA"),
           attrB = dm.get[Int]("attrB"),
           attrC = dm.get[Boolean]("attrC")
       )
-    }
 
     val eventsRDD: RDD[Event] = eventsDb.find(
         appId = dsp.appId,
@@ -56,27 +54,21 @@ class DataSource(val dsp: DataSourceParams)
         // targetEntityType is optional field of an event.
         targetEntityType = Some(Some("item")))(sc)
 
-    val ratingsRDD: RDD[Rating] = eventsRDD.map { event =>
-      val rating = try {
-        val ratingValue: Double = event.event match {
+    val ratingsRDD: RDD[Rating] = eventsRDD.map  event =>
+      val rating = try
+        val ratingValue: Double = event.event match
           case "rate" => event.properties.get[Double]("rating")
           case "buy" => 4.0 // map buy event to rating value of 4
           case _ => throw new Exception(s"Unexpected event ${event} is read.")
-        }
         // entityId and targetEntityId is String
         Rating(event.entityId, event.targetEntityId.get, ratingValue)
-      } catch {
-        case e: Exception => {
+      catch
+        case e: Exception =>
             logger.error(
                 s"Cannot convert ${event} to Rating. Exception: ${e}.")
             throw e
-          }
-      }
       rating
-    }
     new TrainingData(users, items, ratingsRDD)
-  }
-}
 
 case class User(
     attr0: Double,
@@ -101,10 +93,8 @@ class TrainingData(
     val items: EntityMap[Item],
     val ratings: RDD[Rating]
 )
-    extends Serializable {
-  override def toString = {
+    extends Serializable
+  override def toString =
     s"users: [${users.size} (${users.take(2).toString}...)]" +
     s"items: [${items.size} (${items.take(2).toString}...)]" +
     s"ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
-  }
-}

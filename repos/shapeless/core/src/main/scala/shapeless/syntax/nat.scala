@@ -22,11 +22,10 @@ package syntax
   *
   * @author Dale Wijnand
   */
-final class NatOps[N <: Nat](val n: N) extends AnyVal with Serializable {
+final class NatOps[N <: Nat](val n: N) extends AnyVal with Serializable
   import ops.nat._
 
   /**
     * Returns the int value of this `Nat`.
     */
   def toInt(implicit toIntN: ToInt[n.N]): Int = Nat.toInt(n)
-}

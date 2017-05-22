@@ -4,7 +4,7 @@ import play.api.data._
 import play.api.data.Forms._
 
 private[forum] final class DataForm(val captcher: akka.actor.ActorSelection)
-    extends lila.hub.CaptchedForm {
+    extends lila.hub.CaptchedForm
 
   import DataForm._
 
@@ -25,9 +25,8 @@ private[forum] final class DataForm(val captcher: akka.actor.ActorSelection)
           "name" -> text(minLength = 3),
           "post" -> postMapping
       )(TopicData.apply)(TopicData.unapply))
-}
 
-object DataForm {
+object DataForm
 
   case class PostData(text: String,
                       author: Option[String],
@@ -35,4 +34,3 @@ object DataForm {
                       move: String)
 
   case class TopicData(name: String, post: PostData)
-}

@@ -14,14 +14,14 @@ import akka.testkit.AkkaSpec
 import akka.testkit.ImplicitSender
 import java.util.concurrent.TimeoutException
 
-object CircuitBreakerStressSpec {
+object CircuitBreakerStressSpec
   case object JobDone
   case object GetResult
   case class Result(
       doneCount: Int, timeoutCount: Int, failCount: Int, circCount: Int)
 
   class StressActor(breaker: CircuitBreaker)
-      extends Actor with ActorLogging with PipeToSupport {
+      extends Actor with ActorLogging with PipeToSupport
     import context.dispatcher
 
     private var doneCount = 0
@@ -29,18 +29,16 @@ object CircuitBreakerStressSpec {
     private var failCount = 0
     private var circCount = 0
 
-    private def job = {
+    private def job =
       val promise = Promise[JobDone.type]()
 
       context.system.scheduler
-        .scheduleOnce(ThreadLocalRandom.current.nextInt(300).millisecond) {
+        .scheduleOnce(ThreadLocalRandom.current.nextInt(300).millisecond)
         promise.success(JobDone)
-      }
 
       promise.future
-    }
 
-    override def receive = {
+    override def receive =
       case JobDone ⇒
         doneCount += 1
         breaker.withCircuitBreaker(job).pipeTo(self)
@@ -55,31 +53,23 @@ object CircuitBreakerStressSpec {
         breaker.withCircuitBreaker(job).pipeTo(self)
       case GetResult ⇒
         sender() ! Result(doneCount, timeoutCount, failCount, circCount)
-    }
-  }
-}
 
 // reproducer for issue #17415
-class CircuitBreakerStressSpec extends AkkaSpec with ImplicitSender {
+class CircuitBreakerStressSpec extends AkkaSpec with ImplicitSender
   import CircuitBreakerStressSpec._
 
   muteDeadLetters(classOf[AnyRef])(system)
 
-  "A CircuitBreaker" in {
+  "A CircuitBreaker" in
     val breaker =
       CircuitBreaker(system.scheduler, 5, 200.millisecond, 200.seconds)
-    val stressActors = Vector.fill(3) {
+    val stressActors = Vector.fill(3)
       system.actorOf(Props(classOf[StressActor], breaker))
-    }
-    for (_ ← 0 to 1000; a ← stressActors) {
+    for (_ ← 0 to 1000; a ← stressActors)
       a ! JobDone
-    }
     // let them work for a while
     Thread.sleep(3000)
-    stressActors.foreach { a ⇒
+    stressActors.foreach  a ⇒
       a ! GetResult
       val result = expectMsgType[Result]
       result.failCount should be(0)
-    }
-  }
-}

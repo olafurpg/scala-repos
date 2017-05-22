@@ -14,23 +14,22 @@ import java.net.InetSocketAddress
   *
   * The data is sent over a plain Socket, even though it would fit AkkaIO nicely, but this way it has no dependencies.
   */
-class GraphiteClient(address: InetSocketAddress) extends Closeable {
+class GraphiteClient(address: InetSocketAddress) extends Closeable
 
   private final val WHITESPACE = Pattern.compile("[\\s]+")
   private final val charset: Charset = Charset.forName("UTF-8")
 
-  private lazy val socket = {
+  private lazy val socket =
     val s = SocketFactory.getDefault.createSocket(
         address.getAddress, address.getPort)
     s.setKeepAlive(true)
     s
-  }
 
   private lazy val writer = new BufferedWriter(
       new OutputStreamWriter(socket.getOutputStream, charset))
 
   /** Send measurement carbon server. Thread-safe. */
-  def send(name: String, value: String, timestamp: Long) {
+  def send(name: String, value: String, timestamp: Long)
     val sb = new StringBuilder()
       .append(sanitize(name))
       .append(' ')
@@ -44,14 +43,10 @@ class GraphiteClient(address: InetSocketAddress) extends Closeable {
     // which could become interwoven, thus producing a wrong metric-line, when called by multiple threads.
     writer.write(sb.toString())
     writer.flush()
-  }
 
   /** Closes underlying connection. */
-  def close() {
+  def close()
     try socket.close() finally writer.close()
-  }
 
-  protected def sanitize(s: String): String = {
+  protected def sanitize(s: String): String =
     WHITESPACE.matcher(s).replaceAll("-")
-  }
-}

@@ -2,7 +2,7 @@ package java.nio
 
 import scala.scalajs.js.typedarray._
 
-object ByteBuffer {
+object ByteBuffer
   private final val HashSeed = -547316498 // "java.nio.ByteBuffer".##
 
   def allocate(capacity: Int): ByteBuffer =
@@ -27,12 +27,11 @@ object ByteBuffer {
 
   def wrap(array: Int8Array): ByteBuffer =
     TypedArrayByteBuffer.wrap(array)
-}
 
 abstract class ByteBuffer private[nio](_capacity: Int,
                                        private[nio] val _array: Array[Byte],
                                        private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[ByteBuffer] {
+    extends Buffer(_capacity) with Comparable[ByteBuffer]
 
   private[nio] type ElementType = Byte
   private[nio] type BufferType = ByteBuffer
@@ -93,10 +92,9 @@ abstract class ByteBuffer private[nio](_capacity: Int,
   override def hashCode(): Int =
     GenBuffer(this).generic_hashCode(ByteBuffer.HashSeed)
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: ByteBuffer => compareTo(that) == 0
     case _ => false
-  }
 
   @noinline
   def compareTo(that: ByteBuffer): Int =
@@ -106,11 +104,10 @@ abstract class ByteBuffer private[nio](_capacity: Int,
     if (_isBigEndian) ByteOrder.BIG_ENDIAN
     else ByteOrder.LITTLE_ENDIAN
 
-  final def order(bo: ByteOrder): ByteBuffer = {
+  final def order(bo: ByteOrder): ByteBuffer =
     if (bo == null) throw new NullPointerException
     _isBigEndian = bo == ByteOrder.BIG_ENDIAN
     this
-  }
 
   def getChar(): Char
   def putChar(value: Char): ByteBuffer
@@ -172,4 +169,3 @@ abstract class ByteBuffer private[nio](_capacity: Int,
   private[nio] def store(
       startIndex: Int, src: Array[Byte], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}

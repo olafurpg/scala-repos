@@ -9,29 +9,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaContainingClassWiegher extends CompletionWeigher {
+class ScalaContainingClassWiegher extends CompletionWeigher
   def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+      element: LookupElement, location: CompletionLocation): Comparable[_] =
     import KindWeights._
-    ScalaLookupItem.original(element) match {
+    ScalaLookupItem.original(element) match
       case si: ScalaLookupItem if si.isLocalVariable => local
       case si: ScalaLookupItem if si.isUnderlined => underlined
       case si: ScalaLookupItem if si.isDeprecated => deprecated
       case p: ScalaLookupItem if p.isNamedParameter => nparam
       case sii: ScalaLookupItem if sii.bold => bold
       case si: ScalaLookupItem =>
-        si.element match {
+        si.element match
           case func: ScFunction if func.getContainingClass == null => localFunc
           case withImplicit: ScModifierListOwner
               if withImplicit.hasModifierPropertyScala("implicit") =>
             underlined
           case _ => normal
-        }
       case _ => normal
-    }
-  }
 
-  object KindWeights extends Enumeration {
+  object KindWeights extends Enumeration
     val deprecated, underlined, normal, nparam, bold, localFunc, local = Value
-  }
-}

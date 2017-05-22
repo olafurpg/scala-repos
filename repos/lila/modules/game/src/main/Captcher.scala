@@ -15,9 +15,9 @@ import lila.hub.actorApi.captcha._
 import tube.gameTube
 
 // only works with standard chess (not chess960)
-private final class Captcher extends Actor {
+private final class Captcher extends Actor
 
-  def receive = {
+  def receive =
 
     case AnyCaptcha => sender ! Impl.current
 
@@ -27,20 +27,17 @@ private final class Captcher extends Actor {
 
     case ValidCaptcha(id: String, solution: String) =>
       Impl get id map (_ valid solution) pipeTo sender
-  }
 
-  private object Impl {
+  private object Impl
 
-    def get(id: String): Fu[Captcha] = find(id) match {
+    def get(id: String): Fu[Captcha] = find(id) match
       case None => getFromDb(id) map (c => (c | Captcha.default) ~ add)
       case Some(c) => fuccess(c)
-    }
 
     def current = challenges.head
 
-    def refresh = createFromDb onSuccess {
+    def refresh = createFromDb onSuccess
       case Some(captcha) => add(captcha)
-    }
 
     // Private stuff
 
@@ -48,19 +45,17 @@ private final class Captcher extends Actor {
     private var challenges: NonEmptyList[Captcha] = NonEmptyList(
         Captcha.default)
 
-    private def add(c: Captcha) {
-      find(c.gameId) ifNone {
+    private def add(c: Captcha)
+      find(c.gameId) ifNone
         challenges = NonEmptyList.nel(c, challenges.list take capacity)
-      }
-    }
 
     private def find(id: String): Option[Captcha] =
       challenges.list.find(_.gameId == id)
 
     private def createFromDb: Fu[Option[Captcha]] =
-      optionT(findCheckmateInDb(10) flatMap {
+      optionT(findCheckmateInDb(10) flatMap
         _.fold(findCheckmateInDb(1))(g => fuccess(g.some))
-      }) flatMap fromGame
+      ) flatMap fromGame
 
     private def findCheckmateInDb(distribution: Int): Fu[Option[Game]] =
       GameRepo findRandomStandardCheckmate distribution
@@ -74,41 +69,36 @@ private final class Captcher extends Actor {
     private def makeCaptcha(
         game: Game, moves: List[String]): OptionT[Fu, Captcha] =
       optionT(
-          Future {
-        for {
+          Future
+        for
           rewinded ← rewind(game, moves)
           solutions ← solve(rewinded)
-          moves = rewinded.situation.destinations map {
+          moves = rewinded.situation.destinations map
             case (from, dests) => from.key -> dests.mkString
-          }
-        } yield
+        yield
           Captcha(game.id,
                   fen(rewinded),
                   rewinded.player.white,
                   solutions,
                   moves = moves)
-      })
+      )
 
     private def solve(game: ChessGame): Option[Captcha.Solutions] =
-      game.situation.moves.toList flatMap {
+      game.situation.moves.toList flatMap
         case (_, moves) =>
-          moves filter { move =>
+          moves filter  move =>
             (move.after situationOf !game.player).checkMate
-          }
-      } map { move =>
+      map  move =>
         s"${move.orig} ${move.dest}"
-      } toNel
+      toNel
 
     private def rewind(game: Game, moves: List[String]): Option[ChessGame] =
       pgn.Reader.movesWithSans(moves, safeInit, tags = Nil) map (_.state) toOption
 
-    private def safeInit[A](list: List[A]): List[A] = list match {
+    private def safeInit[A](list: List[A]): List[A] = list match
       case x :: Nil => Nil
       case x :: xs => x :: safeInit(xs)
       case _ => Nil
-    }
 
     private def fen(game: ChessGame): String =
       Forsyth >> game takeWhile (_ != ' ')
-  }
-}

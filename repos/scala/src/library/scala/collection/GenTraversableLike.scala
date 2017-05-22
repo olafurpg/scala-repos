@@ -54,7 +54,7 @@ import scala.annotation.migration
   */
 trait GenTraversableLike[+A, +Repr]
     extends Any with GenTraversableOnce[A]
-    with Parallelizable[A, parallel.ParIterable[A]] {
+    with Parallelizable[A, parallel.ParIterable[A]]
 
   def repr: Repr
 
@@ -406,4 +406,3 @@ trait GenTraversableLike[+A, +Repr]
     *           simple name of the collection class $coll.
     */
   def stringPrefix: String
-}

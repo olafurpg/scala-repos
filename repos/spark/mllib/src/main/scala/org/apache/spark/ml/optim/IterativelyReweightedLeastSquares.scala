@@ -63,9 +63,9 @@ private[ml] class IterativelyReweightedLeastSquares(
     val regParam: Double,
     val maxIter: Int,
     val tol: Double)
-    extends Logging with Serializable {
+    extends Logging with Serializable
 
-  def fit(instances: RDD[Instance]): IterativelyReweightedLeastSquaresModel = {
+  def fit(instances: RDD[Instance]): IterativelyReweightedLeastSquaresModel =
 
     var converged = false
     var iter = 0
@@ -73,15 +73,14 @@ private[ml] class IterativelyReweightedLeastSquares(
     var model: WeightedLeastSquaresModel = initialModel
     var oldModel: WeightedLeastSquaresModel = null
 
-    while (iter < maxIter && !converged) {
+    while (iter < maxIter && !converged)
 
       oldModel = model
 
       // Update offsets and weights using reweightFunc
-      val newInstances = instances.map { instance =>
+      val newInstances = instances.map  instance =>
         val (newOffset, newWeight) = reweightFunc(instance, oldModel)
         Instance(newOffset, newWeight, instance.features)
-      }
 
       // Estimate new model
       model = new WeightedLeastSquares(
@@ -94,26 +93,20 @@ private[ml] class IterativelyReweightedLeastSquares(
       val oldCoefficients = oldModel.coefficients
       val coefficients = model.coefficients
       BLAS.axpy(-1.0, coefficients, oldCoefficients)
-      val maxTolOfCoefficients = oldCoefficients.toArray.reduce { (x, y) =>
+      val maxTolOfCoefficients = oldCoefficients.toArray.reduce  (x, y) =>
         math.max(math.abs(x), math.abs(y))
-      }
       val maxTol = math.max(
           maxTolOfCoefficients, math.abs(oldModel.intercept - model.intercept))
 
-      if (maxTol < tol) {
+      if (maxTol < tol)
         converged = true
         logInfo(s"IRLS converged in $iter iterations.")
-      }
 
       logInfo(s"Iteration $iter : relative tolerance = $maxTol")
       iter = iter + 1
 
-      if (iter == maxIter) {
+      if (iter == maxIter)
         logInfo(s"IRLS reached the max number of iterations: $maxIter.")
-      }
-    }
 
     new IterativelyReweightedLeastSquaresModel(
         model.coefficients, model.intercept, model.diagInvAtWA, iter)
-  }
-}

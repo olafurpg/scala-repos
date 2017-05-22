@@ -1,6 +1,6 @@
 package lila.blog
 
-object Youtube {
+object Youtube
 
   private val EmbedRegex =
     """youtube\.com/watch\?v=[\w-]+\#t=([^"]+).+\?feature=oembed""".r
@@ -15,28 +15,25 @@ object Youtube {
   def fixStartTimes(html: String) =
     EmbedRegex.replaceAllIn(html,
                             m =>
-                              {
                                 val orig = m group 0
                                 parseSeconds(m group 1).fold(orig)(
                                     seconds => s"$orig&start=$seconds")
-                            })
+                            )
 
-  private def parseSeconds(text: String) = text match {
+  private def parseSeconds(text: String) = text match
     case HourMinSecRegex(hourS, minS, secS) =>
-      for {
+      for
         hour <- parseIntOption(hourS)
         min <- parseIntOption(minS)
         sec <- parseIntOption(secS)
-      } yield 3600 * hour + 60 * min + sec
+      yield 3600 * hour + 60 * min + sec
     case MinSecRegex(minS, secS) =>
-      for {
+      for
         min <- parseIntOption(minS)
         sec <- parseIntOption(secS)
-      } yield 60 * min + sec
+      yield 60 * min + sec
     case SecRegex(secS) =>
-      for {
+      for
         sec <- parseIntOption(secS)
-      } yield sec
+      yield sec
     case _ => None
-  }
-}

@@ -27,16 +27,13 @@ import org.apache.spark.util.collection.WritablePartitionedPairCollection._
   */
 private[spark] class PartitionedAppendOnlyMap[K, V]
     extends SizeTrackingAppendOnlyMap[(Int, K), V]
-    with WritablePartitionedPairCollection[K, V] {
+    with WritablePartitionedPairCollection[K, V]
 
   def partitionedDestructiveSortedIterator(
-      keyComparator: Option[Comparator[K]]): Iterator[((Int, K), V)] = {
+      keyComparator: Option[Comparator[K]]): Iterator[((Int, K), V)] =
     val comparator =
       keyComparator.map(partitionKeyComparator).getOrElse(partitionComparator)
     destructiveSortedIterator(comparator)
-  }
 
-  def insert(partition: Int, key: K, value: V): Unit = {
+  def insert(partition: Int, key: K, value: V): Unit =
     update((partition, key), value)
-  }
-}

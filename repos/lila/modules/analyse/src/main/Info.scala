@@ -9,7 +9,7 @@ case class Info(ply: Int,
                 // variation is first in UCI, then converted to PGN before storage
                 variation: List[String] = Nil,
                 // best is always in UCI (used for hilight)
-                best: Option[Uci.Move] = None) {
+                best: Option[Uci.Move] = None)
 
   def turn = 1 + (ply - 1) / 2
 
@@ -29,24 +29,21 @@ case class Info(ply: Int,
   def invert = copy(score = score.map(_.invert), mate = mate.map(-_))
 
   def scoreComment: Option[String] = score map (_.showPawns)
-  def mateComment: Option[String] = mate map { m =>
+  def mateComment: Option[String] = mate map  m =>
     s"Mate in ${math.abs(m)}"
-  }
   def evalComment: Option[String] = scoreComment orElse mateComment
 
   def isEmpty = score.isEmpty && mate.isEmpty
 
-  def forceCentipawns: Option[Int] = mate match {
+  def forceCentipawns: Option[Int] = mate match
     case None => score.map(_.centipawns)
     case Some(m) if m < 0 => Some(Int.MinValue - m)
     case Some(m) => Some(Int.MaxValue - m)
-  }
 
   override def toString =
     s"Info $color [$ply] ${score.fold("?")(_.showPawns)} ${mate | 0} ${variation.mkString(" ")}"
-}
 
-object Info {
+object Info
 
   val LineMaxPlies = 14
 
@@ -56,7 +53,7 @@ object Info {
   def start(ply: Int) = Info(ply, Score.initial.some, none, Nil)
 
   def decode(ply: Int, str: String): Option[Info] =
-    str.split(separator) match {
+    str.split(separator) match
       case Array() => Info(ply).some
       case Array(cp) => Info(ply, Score(cp)).some
       case Array(cp, ma) => Info(ply, Score(cp), parseIntOption(ma)).some
@@ -69,13 +66,11 @@ object Info {
              va.split(' ').toList,
              Uci.Move piotr be).some
       case _ => none
-    }
 
-  def decodeList(str: String, fromPly: Int): Option[List[Info]] = {
-    str.split(listSeparator).toList.zipWithIndex map {
+  def decodeList(str: String, fromPly: Int): Option[List[Info]] =
+    str.split(listSeparator).toList.zipWithIndex map
       case (infoStr, index) => decode(index + 1 + fromPly, infoStr)
-    }
-  }.sequence
+  .sequence
 
   def encodeList(infos: List[Info]): String =
     infos map (_.encode) mkString listSeparator
@@ -84,4 +79,3 @@ object Info {
             mate: Option[Int],
             variation: List[String]): Int => Info =
     ply => Info(ply, score map Score.apply, mate, variation)
-}

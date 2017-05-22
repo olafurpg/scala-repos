@@ -17,58 +17,39 @@ package com.twitter.scalding.typed
 
 import com.twitter.scalding._
 
-object Joiner extends java.io.Serializable {
+object Joiner extends java.io.Serializable
   def toCogroupJoiner2[K, V, U, R](
       hashJoiner: (K, V, Iterable[U]) => Iterator[R])
-    : (K, Iterator[V], Iterable[U]) => Iterator[R] = {
+    : (K, Iterator[V], Iterable[U]) => Iterator[R] =
     (k: K, itv: Iterator[V], itu: Iterable[U]) =>
       itv.flatMap { hashJoiner(k, _, itu) }
-  }
 
-  def hashInner2[K, V, U] = { (key: K, v: V, itu: Iterable[U]) =>
+  def hashInner2[K, V, U] =  (key: K, v: V, itu: Iterable[U]) =>
     itu.iterator.map { (v, _) }
-  }
-  def hashLeft2[K, V, U] = { (key: K, v: V, itu: Iterable[U]) =>
+  def hashLeft2[K, V, U] =  (key: K, v: V, itu: Iterable[U]) =>
     asOuter(itu.iterator).map { (v, _) }
-  }
 
-  def inner2[K, V, U] = { (key: K, itv: Iterator[V], itu: Iterable[U]) =>
-    itv.flatMap { v =>
-      itu.map { u =>
+  def inner2[K, V, U] =  (key: K, itv: Iterator[V], itu: Iterable[U]) =>
+    itv.flatMap  v =>
+      itu.map  u =>
         (v, u)
-      }
-    }
-  }
-  def asOuter[U](it: Iterator[U]): Iterator[Option[U]] = {
-    if (it.isEmpty) {
+  def asOuter[U](it: Iterator[U]): Iterator[Option[U]] =
+    if (it.isEmpty)
       Iterator(None)
-    } else {
+    else
       it.map { Some(_) }
-    }
-  }
-  def outer2[K, V, U] = { (key: K, itv: Iterator[V], itu: Iterable[U]) =>
-    if (itv.isEmpty && itu.isEmpty) {
+  def outer2[K, V, U] =  (key: K, itv: Iterator[V], itu: Iterable[U]) =>
+    if (itv.isEmpty && itu.isEmpty)
       Iterator.empty
-    } else {
-      asOuter(itv).flatMap { v =>
-        asOuter(itu.iterator).map { u =>
+    else
+      asOuter(itv).flatMap  v =>
+        asOuter(itu.iterator).map  u =>
           (v, u)
-        }
-      }
-    }
-  }
-  def left2[K, V, U] = { (key: K, itv: Iterator[V], itu: Iterable[U]) =>
-    itv.flatMap { v =>
-      asOuter(itu.iterator).map { u =>
+  def left2[K, V, U] =  (key: K, itv: Iterator[V], itu: Iterable[U]) =>
+    itv.flatMap  v =>
+      asOuter(itu.iterator).map  u =>
         (v, u)
-      }
-    }
-  }
-  def right2[K, V, U] = { (key: K, itv: Iterator[V], itu: Iterable[U]) =>
-    asOuter(itv).flatMap { v =>
-      itu.map { u =>
+  def right2[K, V, U] =  (key: K, itv: Iterator[V], itu: Iterable[U]) =>
+    asOuter(itv).flatMap  v =>
+      itu.map  u =>
         (v, u)
-      }
-    }
-  }
-}

@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
   * Start an actor system for all test methods and provide akka TestKit utility methods.
   */
 trait MarathonActorSupport
-    extends Suite with TestKitBase with BeforeAndAfterAll {
+    extends Suite with TestKitBase with BeforeAndAfterAll
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -24,9 +24,7 @@ trait MarathonActorSupport
       getClass.getSimpleName, stoppingConfig)
   log.info("actor system {}: starting", system.name)
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     super.afterAll()
     log.info("actor system {}: shutting down", system.name)
     TestKit.shutdownActorSystem(system)
-  }
-}

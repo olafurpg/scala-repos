@@ -30,7 +30,7 @@ import akka.http.impl.util._
   *
   * See `JUnitRouteTest` for an example of a concrete implementation.
   */
-abstract class RouteTest extends AllDirectives {
+abstract class RouteTest extends AllDirectives
   implicit def system: ActorSystem
   implicit def materializer: Materializer
   implicit def executionContext: ExecutionContextExecutor = system.dispatcher
@@ -59,7 +59,7 @@ abstract class RouteTest extends AllDirectives {
 
   private def runScalaRoute(scalaRoute: ScalaRoute,
                             request: HttpRequest,
-                            defaultHostInfo: DefaultHostInfo): TestResponse = {
+                            defaultHostInfo: DefaultHostInfo): TestResponse =
     val effectiveRequest = request.asScala.withEffectiveUri(
         securedConnection = defaultHostInfo.isSecuredConnection(),
         defaultHostHeader = defaultHostInfo.getHost().asScala)
@@ -68,24 +68,21 @@ abstract class RouteTest extends AllDirectives {
         new server.RequestContextImpl(
             effectiveRequest, NoLogging, RoutingSettings(system)))
 
-    result.awaitResult(awaitDuration) match {
+    result.awaitResult(awaitDuration) match
       case RouteResult.Complete(response) ⇒ createTestResponse(response)
       case RouteResult.Rejected(ex) ⇒
         throw new AssertionError("got unexpected rejection: " + ex)
-    }
-  }
 
   /**
     * Wraps a list of route alternatives with testing support.
     */
   @varargs
   def testRoute(first: Route, others: Route*): TestRoute =
-    new TestRoute {
+    new TestRoute
       val underlying: Route = Directives.route(first, others: _*)
 
       def run(request: HttpRequest): TestResponse =
         runRoute(underlying, request)
-    }
 
   /**
     * Creates a [[TestRoute]] for the main route of an [[akka.http.javadsl.server.HttpApp]].
@@ -93,4 +90,3 @@ abstract class RouteTest extends AllDirectives {
   def testAppRoute(app: HttpApp): TestRoute = testRoute(app.createRoute())
 
   protected def createTestResponse(response: HttpResponse): TestResponse
-}

@@ -19,19 +19,18 @@ case class MProcedureColumn(procedure: MQName,
                             charOctetLength: Option[Int],
                             ordinalPosition: Option[Int],
                             isNullable: Option[Boolean],
-                            specificName: Option[String]) {
+                            specificName: Option[String])
 
   def sqlTypeName = JdbcTypesComponent.typeNames.get(sqlType)
-}
 
-object MProcedureColumn {
+object MProcedureColumn
   def getProcedureColumns(
       procedurePattern: MQName, columnNamePattern: String = "%") =
     ResultSetAction[MProcedureColumn](
         _.metaData.getProcedureColumns(procedurePattern.catalog_?,
                                        procedurePattern.schema_?,
                                        procedurePattern.name,
-                                       columnNamePattern)) { r =>
+                                       columnNamePattern))  r =>
       MProcedureColumn(MQName.from(r),
                        r.<<,
                        r.<<,
@@ -41,16 +40,14 @@ object MProcedureColumn {
                        r.<<,
                        r.<<,
                        r.<<,
-                       r.nextShort match {
+                       r.nextShort match
                          case DatabaseMetaData.procedureNoNulls => Some(false)
                          case DatabaseMetaData.procedureNullable => Some(true)
                          case _ => None
-                       },
+                       ,
                        r.<<,
                        r.<<?,
                        r.skip.skip.<<?,
                        r.<<?,
                        DatabaseMeta.yesNoOpt(r),
                        r.<<?)
-    }
-}

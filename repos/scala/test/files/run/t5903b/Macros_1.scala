@@ -1,16 +1,13 @@
 import scala.reflect.macros.whitebox.Context
 import language.experimental.macros
 
-object Interpolation {
-  implicit class TestInterpolation(c: StringContext) {
-    object t {
+object Interpolation
+  implicit class TestInterpolation(c: StringContext)
+    object t
       def unapply[T](x: T): Any = macro Macros.unapplyImpl[T]
-    }
-  }
-}
 
-object Macros {
-  def unapplyImpl[T : c.WeakTypeTag](c: Context)(x: c.Tree) = {
+object Macros
+  def unapplyImpl[T : c.WeakTypeTag](c: Context)(x: c.Tree) =
     import c.universe._
     q"""
       new {
@@ -21,5 +18,3 @@ object Macros {
         override def toString = "oops"
       }.unapply($x)
     """
-  }
-}

@@ -21,7 +21,7 @@ import Bijections._
   * Base class for Request and Response.  There are both input and output
   * methods, though only one set of methods should be used.
   */
-abstract class Message extends HttpMessageProxy {
+abstract class Message extends HttpMessageProxy
 
   private[this] val readerWriter = BufReader.writable()
 
@@ -60,21 +60,18 @@ abstract class Message extends HttpMessageProxy {
   def getCookies(): JIterator[Cookie] = cookies.valuesIterator.asJava
 
   /** Add a cookie */
-  def addCookie(cookie: Cookie) {
+  def addCookie(cookie: Cookie)
     cookies += cookie
-  }
 
   /** Remove a cookie */
-  def removeCookie(name: String) {
+  def removeCookie(name: String)
     cookies -= name
-  }
 
   /** Accept header */
   def accept: Seq[String] =
-    Option(headers.get(Fields.Accept)) match {
+    Option(headers.get(Fields.Accept)) match
       case Some(s) => s.split(",").map(_.trim).filter(_.nonEmpty)
       case None => Seq()
-    }
 
   /** Set Accept header */
   def accept_=(value: String) { headers.set(Fields.Accept, value) }
@@ -84,11 +81,11 @@ abstract class Message extends HttpMessageProxy {
 
   /** Accept header media types (normalized, no parameters) */
   def acceptMediaTypes: Seq[String] =
-    accept.map {
+    accept.map
       _.split(";", 2).headOption
         .map(_.trim.toLowerCase) // media types are case-insensitive
         .filter(_.nonEmpty) // skip blanks
-    }.flatten
+    .flatten
 
   /** Allow header */
   def allow: Option[String] = Option(headers.get(Fields.Allow))
@@ -97,17 +94,15 @@ abstract class Message extends HttpMessageProxy {
   def allow_=(value: String) { headers.set(Fields.Allow, value) }
 
   /** Set Authorization header */
-  def allow_=(values: Iterable[Method]) {
+  def allow_=(values: Iterable[Method])
     allow = values.mkString(",").toUpperCase
-  }
 
   /** Get Authorization header */
   def authorization: Option[String] = Option(headers.get(Fields.Authorization))
 
   /** Set Authorization header */
-  def authorization_=(value: String) {
+  def authorization_=(value: String)
     headers.set(Fields.Authorization, value)
-  }
 
   /** Get Cache-Control header */
   def cacheControl: Option[String] = Option(headers.get(Fields.CacheControl))
@@ -116,60 +111,49 @@ abstract class Message extends HttpMessageProxy {
   def cacheControl_=(value: String) { headers.set(Fields.CacheControl, value) }
 
   /** Set Cache-Control header with a max-age (and must-revalidate). */
-  def cacheControl_=(maxAge: Duration) {
+  def cacheControl_=(maxAge: Duration)
     cacheControl = "max-age=" + maxAge.inSeconds.toString + ", must-revalidate"
-  }
 
   /** Get charset from Content-Type header */
-  def charset: Option[String] = {
-    contentType.foreach { contentType =>
+  def charset: Option[String] =
+    contentType.foreach  contentType =>
       val parts = StringUtils.split(contentType, ';')
-      1.to(parts.length - 1) foreach { i =>
+      1.to(parts.length - 1) foreach  i =>
         val part = parts(i).trim
-        if (part.startsWith("charset=")) {
+        if (part.startsWith("charset="))
           val equalsIndex = part.indexOf('=')
           val charset = part.substring(equalsIndex + 1)
           return Some(charset)
-        }
-      }
-    }
     None
-  }
 
   /** Set charset in Content-Type header.  This does not change the content. */
-  def charset_=(value: String) {
+  def charset_=(value: String)
     val contentType = this.contentType.getOrElse("")
     val parts = StringUtils.split(contentType, ';')
-    if (parts.isEmpty) {
+    if (parts.isEmpty)
       this.contentType = ";charset=" + value // malformed
       return
-    }
 
     val builder = new StringBuilder(parts(0))
-    if (!(parts.exists { _.trim.startsWith("charset=") })) {
+    if (!(parts.exists { _.trim.startsWith("charset=") }))
       // No charset parameter exist, add charset after media type
       builder.append(";charset=")
       builder.append(value)
       // Copy other parameters
-      1.to(parts.length - 1) foreach { i =>
+      1.to(parts.length - 1) foreach  i =>
         builder.append(";")
         builder.append(parts(i))
-      }
-    } else {
+    else
       // Replace charset= parameter(s)
-      1.to(parts.length - 1) foreach { i =>
+      1.to(parts.length - 1) foreach  i =>
         val part = parts(i)
-        if (part.trim.startsWith("charset=")) {
+        if (part.trim.startsWith("charset="))
           builder.append(";charset=")
           builder.append(value)
-        } else {
+        else
           builder.append(";")
           builder.append(part)
-        }
-      }
-    }
     this.contentType = builder.toString
-  }
 
   /** Get Content-Length header.  Use length to get the length of actual content. */
   def contentLength: Option[Long] =
@@ -177,9 +161,8 @@ abstract class Message extends HttpMessageProxy {
 
   /** Set Content-Length header.  Normally, this is automatically set by the
     * Codec, but this method allows you to override that. */
-  def contentLength_=(value: Long) {
+  def contentLength_=(value: Long)
     headers.set(Fields.ContentLength, value.toString)
-  }
 
   /** Get Content-Type header */
   def contentType: Option[String] = Option(headers.get(Fields.ContentType))
@@ -188,14 +171,12 @@ abstract class Message extends HttpMessageProxy {
   def contentType_=(value: String) { headers.set(Fields.ContentType, value) }
 
   /** Set Content-Type header by media-type and charset */
-  def setContentType(mediaType: String, charset: String = "utf-8") {
+  def setContentType(mediaType: String, charset: String = "utf-8")
     headers.set(Fields.ContentType, mediaType + ";charset=" + charset)
-  }
 
   /** Set Content-Type header to application/json;charset=utf-8 */
-  def setContentTypeJson() {
+  def setContentTypeJson()
     headers.set(Fields.ContentType, Message.ContentTypeJson)
-  }
 
   /** Get Date header */
   def date: Option[String] = Option(headers.get(Fields.Date))
@@ -228,9 +209,8 @@ abstract class Message extends HttpMessageProxy {
   def lastModified_=(value: String) { headers.set(Fields.LastModified, value) }
 
   /** Set Last-Modified header by Date */
-  def lastModified_=(value: Date) {
+  def lastModified_=(value: Date)
     lastModified = Message.httpDateFormat(value)
-  }
 
   /** Get Location header */
   def location: Option[String] = Option(headers.get(Fields.Location))
@@ -240,33 +220,28 @@ abstract class Message extends HttpMessageProxy {
 
   /** Get media-type from Content-Type header */
   def mediaType: Option[String] =
-    contentType.flatMap { contentType =>
-      val beforeSemi = contentType.indexOf(";") match {
+    contentType.flatMap  contentType =>
+      val beforeSemi = contentType.indexOf(";") match
         case -1 => contentType
         case n => contentType.substring(0, n)
-      }
       val mediaType = beforeSemi.trim
       if (mediaType.nonEmpty) Some(mediaType.toLowerCase)
       else None
-    }
 
   /**
     * Set media-type in Content-Type header.  Charset and parameter values are
     * preserved, though may not be appropriate for the new media type.
     */
-  def mediaType_=(value: String) {
-    contentType match {
+  def mediaType_=(value: String)
+    contentType match
       case Some(contentType) =>
         val parts = StringUtils.split(contentType, ";", 2)
-        if (parts.length == 2) {
+        if (parts.length == 2)
           this.contentType = value + ";" + parts(1)
-        } else {
+        else
           this.contentType = value
-        }
       case None =>
         this.contentType = value
-    }
-  }
 
   /** Get Referer [sic] header */
   def referer: Option[String] = Option(headers.get(Fields.Referer))
@@ -300,9 +275,8 @@ abstract class Message extends HttpMessageProxy {
     Option(headers.get(Fields.WwwAuthenticate))
 
   /** Set WWW-Authenticate header */
-  def wwwAuthenticate_=(value: String) {
+  def wwwAuthenticate_=(value: String)
     headers.set(Fields.WwwAuthenticate, value)
-  }
 
   /** Get X-Forwarded-For header */
   def xForwardedFor: Option[String] = Option(headers.get("X-Forwarded-For"))
@@ -316,45 +290,39 @@ abstract class Message extends HttpMessageProxy {
     * requests specially.  For example, an endpoint might render JSON or XML
     * instead HTML if it's an XmlHttpRequest.  (Tip: don't do this - it's gross.)
     */
-  def isXmlHttpRequest = {
-    Option(headers.get("X-Requested-With")) exists {
+  def isXmlHttpRequest =
+    Option(headers.get("X-Requested-With")) exists
       _.toLowerCase.contains("xmlhttprequest")
-    }
-  }
 
   /** Get length of content. */
   def length: Int = getContent.readableBytes
   def getLength(): Int = length
 
   /** Get the content as a string. */
-  def contentString: String = {
-    val encoding = try {
+  def contentString: String =
+    val encoding = try
       Charset.forName(charset getOrElse "UTF-8")
-    } catch {
+    catch
       case _: Throwable => Message.Utf8
-    }
     getContent.toString(encoding)
-  }
 
   def getContentString(): String = contentString
 
   /** Set the content as a string. */
-  def contentString_=(value: String) {
+  def contentString_=(value: String)
     if (value != "") setContent(BufChannelBuffer(Buf.Utf8(value)))
     else setContent(ChannelBuffers.EMPTY_BUFFER)
-  }
   def setContentString(value: String) { contentString = value }
 
   /**
     * Use content as InputStream.  The underlying channel buffer's reader
     * index is advanced.  (Scala interface.  Java users can use getInputStream().)
     */
-  def withInputStream[T](f: InputStream => T): T = {
+  def withInputStream[T](f: InputStream => T): T =
     val inputStream = getInputStream()
     val result = f(inputStream) // throws
     inputStream.close()
     result
-  }
 
   /**
     * Get InputStream for content.  Caller must close.  (Java interface.  Scala
@@ -364,32 +332,27 @@ abstract class Message extends HttpMessageProxy {
     new ChannelBufferInputStream(getContent)
 
   /** Use content as Reader.  (Scala interface.  Java usrs can use getReader().) */
-  def withReader[T](f: Reader => T): T = {
-    withInputStream { inputStream =>
+  def withReader[T](f: Reader => T): T =
+    withInputStream  inputStream =>
       val reader = new InputStreamReader(inputStream)
       f(reader)
-    }
-  }
 
   /** Get Reader for content.  (Java interface.  Scala users should use withReader.) */
   def getReader(): Reader =
     new InputStreamReader(getInputStream())
 
   /** Append string to content. */
-  def write(string: String) {
+  def write(string: String)
     write(string.getBytes("UTF-8"))
-  }
 
   /** Append bytes to content. */
-  def write(bytes: Array[Byte]) {
-    getContent match {
+  def write(bytes: Array[Byte])
+    getContent match
       case buffer: DynamicChannelBuffer =>
         buffer.writeBytes(bytes)
       case _ =>
         val buffer = ChannelBuffers.wrappedBuffer(bytes)
         write(buffer)
-    }
-  }
 
   /** Append ChannelBuffer to content.
     *
@@ -401,24 +364,21 @@ abstract class Message extends HttpMessageProxy {
     */
   @throws(classOf[BufReader.ReaderDiscarded])
   @throws(classOf[IllegalStateException])
-  def write(buffer: ChannelBuffer) {
+  def write(buffer: ChannelBuffer)
     if (isChunked) writeChunk(buffer)
-    else {
-      getContent match {
+    else
+      getContent match
         case ChannelBuffers.EMPTY_BUFFER =>
           setContent(buffer)
         case content =>
           setContent(ChannelBuffers.wrappedBuffer(content, buffer))
-      }
-    }
-  }
 
   /**
     * Use content as OutputStream.  Content is replaced with stream contents.
     * (Java users can use this with a Function, or use Netty's ChannelBufferOutputStream
     * and then call setContent() with the underlying buffer.)
     */
-  def withOutputStream[T](f: OutputStream => T): T = {
+  def withOutputStream[T](f: OutputStream => T): T =
     // Use buffer size of 1024.  Netty default is 256, which seems too small.
     // Netty doubles buffers on resize.
     val outputStream = new ChannelBufferOutputStream(
@@ -427,37 +387,30 @@ abstract class Message extends HttpMessageProxy {
     outputStream.close()
     write(outputStream.buffer)
     result
-  }
 
   /** Use as a Writer.  Content is replaced with writer contents. */
-  def withWriter[T](f: Writer => T): T = {
-    withOutputStream { outputStream =>
+  def withWriter[T](f: Writer => T): T =
+    withOutputStream  outputStream =>
       val writer = new OutputStreamWriter(outputStream, Message.Utf8)
       val result = f(writer)
       writer.close()
       // withOutputStream will write()
       result
-    }
-  }
 
   /** Clear content (set to ""). */
-  def clearContent() {
+  def clearContent()
     setContent(ChannelBuffers.EMPTY_BUFFER)
-  }
 
   /** End the response stream. */
   def close() = writer.close()
 
-  private[this] def writeChunk(buf: ChannelBuffer) {
-    if (buf.readable) {
+  private[this] def writeChunk(buf: ChannelBuffer)
+    if (buf.readable)
       val future = writer.write(new ChannelBufferBuf(buf))
       // Unwraps the future in the Return case, or throws exception in the Throw case.
       if (future.isDefined) Await.result(future)
-    }
-  }
-}
 
-object Message {
+object Message
   private[http] val Utf8 = Charset.forName("UTF-8")
   val CharsetUtf8 = "charset=utf-8"
   val ContentTypeJson = MediaType.Json + ";" + CharsetUtf8
@@ -469,4 +422,3 @@ object Message {
       TimeZone.getTimeZone("GMT"))
   def httpDateFormat(date: Date): String =
     HttpDateFormat.format(date) + " GMT"
-}

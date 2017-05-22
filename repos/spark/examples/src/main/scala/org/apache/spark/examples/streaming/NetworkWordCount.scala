@@ -33,12 +33,11 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   * and then run the example
   *    `$ bin/run-example org.apache.spark.examples.streaming.NetworkWordCount localhost 9999`
   */
-object NetworkWordCount {
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+object NetworkWordCount
+  def main(args: Array[String])
+    if (args.length < 2)
       System.err.println("Usage: NetworkWordCount <hostname> <port>")
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -57,6 +56,4 @@ object NetworkWordCount {
     wordCounts.print()
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 // scalastyle:on println

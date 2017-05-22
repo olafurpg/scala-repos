@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 26.06.2015.
   */
-trait WordSpecStaticStringTest extends ScalaTestTestCase {
+trait WordSpecStaticStringTest extends ScalaTestTestCase
   val wordSpecClassName = "WordSpecStringTest"
   val wordSpecFileName = wordSpecClassName + ".scala"
 
-  def addWordSpec() = {
+  def addWordSpec() =
     addFileToProject(wordSpecFileName,
                      """
         |import org.scalatest._
@@ -38,9 +38,8 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
         |}
         |
       """.stripMargin.trim())
-  }
 
-  def testWordSpecSum() = {
+  def testWordSpecSum() =
     addWordSpec()
 
     assert(
@@ -48,18 +47,16 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
             createTestFromLocation(17, 10, wordSpecFileName),
             wordSpecClassName,
             "sum name should test"))
-  }
 
-  def testWordSpecVal() = {
+  def testWordSpecVal() =
     addWordSpec()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(6, 10, wordSpecFileName),
                                wordSpecClassName,
                                "const should const"))
-  }
 
-  def testWordSpecValSum() = {
+  def testWordSpecValSum() =
     addWordSpec()
 
     assert(
@@ -71,14 +68,11 @@ trait WordSpecStaticStringTest extends ScalaTestTestCase {
         checkConfigAndSettings(createTestFromLocation(9, 10, wordSpecFileName),
                                wordSpecClassName,
                                "const should const sum"))
-  }
 
-  def testWordSpecNonConst() = {
+  def testWordSpecNonConst() =
     addWordSpec()
 
     assert(
         checkConfigAndSettings(
             createTestFromLocation(19, 10, wordSpecFileName),
             wordSpecClassName))
-  }
-}

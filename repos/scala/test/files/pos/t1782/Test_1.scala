@@ -1,9 +1,8 @@
 @ImplementedBy(classOf[Provider])
-trait Service {
+trait Service
   def someMethod()
-}
 
-class Provider extends Service {
+class Provider extends Service
   // test enumeration java annotations
   @Ann(Days.Friday)
   def someMethod() = ()
@@ -12,4 +11,3 @@ class Provider extends Service {
   @scala.beans.BeanProperty
   @Ann(value = Days.Sunday)
   val t2103 = "test"
-}

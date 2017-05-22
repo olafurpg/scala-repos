@@ -3,7 +3,7 @@
   */
 package akka.cluster.ddata
 
-object GSet {
+object GSet
   private val _empty: GSet[Any] = new GSet(Set.empty)
   def empty[A]: GSet[A] = _empty.asInstanceOf[GSet[A]]
   def apply(): GSet[Any] = _empty
@@ -14,7 +14,6 @@ object GSet {
   def create[A](): GSet[A] = empty[A]
 
   // unapply from case class
-}
 
 /**
   * Implements a 'Add Set' CRDT, also called a 'G-Set'. You can't
@@ -29,17 +28,16 @@ object GSet {
   */
 @SerialVersionUID(1L)
 final case class GSet[A](elements: Set[A])
-    extends ReplicatedData with ReplicatedDataSerialization with FastMerge {
+    extends ReplicatedData with ReplicatedDataSerialization with FastMerge
 
   type T = GSet[A]
 
   /**
     * Java API
     */
-  def getElements(): java.util.Set[A] = {
+  def getElements(): java.util.Set[A] =
     import scala.collection.JavaConverters._
     elements.asJava
-  }
 
   def contains(a: A): Boolean = elements(a)
 
@@ -60,15 +58,12 @@ final case class GSet[A](elements: Set[A])
   override def merge(that: GSet[A]): GSet[A] =
     if ((this eq that) || that.isAncestorOf(this)) this.clearAncestor()
     else if (this.isAncestorOf(that)) that.clearAncestor()
-    else {
+    else
       clearAncestor()
       copy(elements union that.elements)
-    }
-}
 
-object GSetKey {
+object GSetKey
   def create[A](id: String): Key[GSet[A]] = GSetKey(id)
-}
 
 @SerialVersionUID(1L)
 final case class GSetKey[A](_id: String)

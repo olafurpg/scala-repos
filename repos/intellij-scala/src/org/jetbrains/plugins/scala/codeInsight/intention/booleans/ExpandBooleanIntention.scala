@@ -15,17 +15,16 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Ksenia.Sautina
   * @since 6/29/12
   */
-object ExpandBooleanIntention {
+object ExpandBooleanIntention
   def familyName = "Expand Boolean"
-}
 
-class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
+class ExpandBooleanIntention extends PsiElementBaseIntentionAction
   def getFamilyName = ExpandBooleanIntention.familyName
 
   override def getText: String = "Expand boolean use to 'if else'"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val returnStmt: ScReturnStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScReturnStmt], false)
     if (returnStmt == null) return false
@@ -42,9 +41,8 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
     if (valType.canonicalText == "Boolean") return true
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val returnStmt: ScReturnStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScReturnStmt], false)
     if (returnStmt == null || !returnStmt.isValid) return
@@ -55,10 +53,9 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
     if (value == null) return
     expr.append("if ")
 
-    value match {
+    value match
       case v: ScParenthesisedExpr => expr.append(v.getText)
       case _ => expr.append("(").append(value.getText).append(")")
-    }
 
     expr.append("{ return true } else { return false }")
 
@@ -66,12 +63,9 @@ class ExpandBooleanIntention extends PsiElementBaseIntentionAction {
       ScalaPsiElementFactory.createExpressionFromText(
           expr.toString(), element.getManager)
 
-    inWriteAction {
+    inWriteAction
       returnStmt.replaceExpression(newReturnStmt, true)
       editor.getCaretModel.moveToOffset(start)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

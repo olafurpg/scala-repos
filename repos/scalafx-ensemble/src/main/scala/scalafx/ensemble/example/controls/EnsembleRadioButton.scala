@@ -32,9 +32,9 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.{RadioButton, ToggleGroup}
 import scalafx.scene.layout.{Priority, VBox}
 
-class EnsembleRadioButton extends EnsembleExample {
+class EnsembleRadioButton extends EnsembleExample
 
-  def getContent = new VBox {
+  def getContent = new VBox
     vgrow = Priority.Always
     hgrow = Priority.Always
     spacing = 10
@@ -43,22 +43,20 @@ class EnsembleRadioButton extends EnsembleExample {
     //Radio Button Toggle Group
     val tog = new ToggleGroup()
 
-    children = List(new RadioButton {
+    children = List(new RadioButton
       maxWidth = 200
       maxHeight = 50
       text = "Hi"
       toggleGroup = tog
-    }, new RadioButton {
+    , new RadioButton
       maxWidth = 200
       maxHeight = 50
       text = "Good bye"
       selected = true
       toggleGroup = tog
-    }, new RadioButton {
+    , new RadioButton
       maxWidth = 200
       maxHeight = 50
       text = "Disabled!!"
       disable = true
-    })
-  }
-}
+    )

@@ -9,7 +9,7 @@ import akka.actor.Address
 import scala.collection.immutable.SortedSet
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ClusterDomainEventSpec extends WordSpec with Matchers {
+class ClusterDomainEventSpec extends WordSpec with Matchers
 
   import MemberStatus._
   import ClusterEvent._
@@ -45,19 +45,17 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
       Address("akka.tcp", "sys", "selfDummy", 2552), 17)
 
   private[cluster] def converge(gossip: Gossip): (Gossip, Set[UniqueAddress]) =
-    ((gossip, Set.empty[UniqueAddress]) /: gossip.members) {
+    ((gossip, Set.empty[UniqueAddress]) /: gossip.members)
       case ((gs, as), m) ⇒ (gs.seen(m.uniqueAddress), as + m.uniqueAddress)
-    }
 
-  "Domain events" must {
+  "Domain events" must
 
-    "be empty for the same gossip" in {
+    "be empty for the same gossip" in
       val g1 = Gossip(members = SortedSet(aUp))
 
       diffUnreachable(g1, g1, selfDummyAddress) should ===(Seq.empty)
-    }
 
-    "be produced for new members" in {
+    "be produced for new members" in
       val (g1, _) = converge(Gossip(members = SortedSet(aUp)))
       val (g2, s2) = converge(Gossip(members = SortedSet(aUp, bUp, eJoining)))
 
@@ -66,9 +64,8 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
       diffUnreachable(g1, g2, selfDummyAddress) should ===(Seq.empty)
       diffSeen(g1, g2, selfDummyAddress) should ===(
           Seq(SeenChanged(convergence = true, seenBy = s2.map(_.address))))
-    }
 
-    "be produced for changed status of members" in {
+    "be produced for changed status of members" in
       val (g1, _) = converge(Gossip(members = SortedSet(aJoining, bUp, cUp)))
       val (g2, s2) =
         converge(Gossip(members = SortedSet(aUp, bUp, cLeaving, eJoining)))
@@ -78,9 +75,8 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
       diffUnreachable(g1, g2, selfDummyAddress) should ===(Seq.empty)
       diffSeen(g1, g2, selfDummyAddress) should ===(
           Seq(SeenChanged(convergence = true, seenBy = s2.map(_.address))))
-    }
 
-    "be produced for members in unreachable" in {
+    "be produced for members in unreachable" in
       val reachability1 = Reachability.empty
         .unreachable(aUp.uniqueAddress, cUp.uniqueAddress)
         .unreachable(aUp.uniqueAddress, eUp.uniqueAddress)
@@ -96,9 +92,8 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
       // never include self member in unreachable
       diffUnreachable(g1, g2, bDown.uniqueAddress) should ===(Seq())
       diffSeen(g1, g2, selfDummyAddress) should ===(Seq.empty)
-    }
 
-    "be produced for members becoming reachable after unreachable" in {
+    "be produced for members becoming reachable after unreachable" in
       val reachability1 = Reachability.empty
         .unreachable(aUp.uniqueAddress, cUp.uniqueAddress)
         .reachable(aUp.uniqueAddress, cUp.uniqueAddress)
@@ -120,9 +115,8 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
           Seq(ReachableMember(bUp)))
       // never include self member in reachable
       diffReachable(g1, g2, bUp.uniqueAddress) should ===(Seq())
-    }
 
-    "be produced for removed members" in {
+    "be produced for removed members" in
       val (g1, _) = converge(Gossip(members = SortedSet(aUp, dExiting)))
       val (g2, s2) = converge(Gossip(members = SortedSet(aUp)))
 
@@ -131,9 +125,8 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
       diffUnreachable(g1, g2, selfDummyAddress) should ===(Seq.empty)
       diffSeen(g1, g2, selfDummyAddress) should ===(
           Seq(SeenChanged(convergence = true, seenBy = s2.map(_.address))))
-    }
 
-    "be produced for convergence changes" in {
+    "be produced for convergence changes" in
       val g1 = Gossip(members = SortedSet(aUp, bUp, eJoining))
         .seen(aUp.uniqueAddress)
         .seen(bUp.uniqueAddress)
@@ -152,9 +145,8 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
       diffSeen(g2, g1, selfDummyAddress) should ===(Seq(SeenChanged(
                   convergence = true,
                   seenBy = Set(aUp.address, bUp.address, eJoining.address))))
-    }
 
-    "be produced for leader changes" in {
+    "be produced for leader changes" in
       val (g1, _) = converge(Gossip(members = SortedSet(aUp, bUp, eJoining)))
       val (g2, s2) = converge(Gossip(members = SortedSet(bUp, eJoining)))
 
@@ -164,9 +156,8 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
           Seq(SeenChanged(convergence = true, seenBy = s2.map(_.address))))
       diffLeader(g1, g2, selfDummyAddress) should ===(
           Seq(LeaderChanged(Some(bUp.address))))
-    }
 
-    "be produced for role leader changes" in {
+    "be produced for role leader changes" in
       val g0 = Gossip.empty
       val g1 = Gossip(members = SortedSet(aUp, bUp, cUp, dLeaving, eJoining))
       val g2 = Gossip(members = SortedSet(bUp, cUp, dExiting, eJoining))
@@ -181,6 +172,3 @@ class ClusterDomainEventSpec extends WordSpec with Matchers {
           Set(RoleLeaderChanged("AA", None),
               RoleLeaderChanged("AB", Some(bUp.address)),
               RoleLeaderChanged("DE", Some(eJoining.address))))
-    }
-  }
-}

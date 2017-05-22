@@ -28,7 +28,7 @@ import scala.collection.JavaConversions._
 /**
   * Integration tests for the new consumer that cover basic usage as well as server failures
   */
-class ConsumerBounceTest extends IntegrationTestHarness with Logging {
+class ConsumerBounceTest extends IntegrationTestHarness with Logging
 
   val producerCount = 1
   val consumerCount = 2
@@ -56,20 +56,18 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
   this.consumerConfig
     .setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest")
 
-  override def generateConfigs() = {
+  override def generateConfigs() =
     FixedPortTestUtils
       .createBrokerConfigs(
           serverCount, zkConnect, enableControlledShutdown = false)
       .map(KafkaConfig.fromProps(_, serverConfig))
-  }
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     // create the test topic with all the brokers as replicas
     TestUtils.createTopic(this.zkUtils, topic, 1, serverCount, this.servers)
-  }
 
   @Test
   def testConsumptionWithBrokerFailures() = consumeWithBrokerFailures(10)
@@ -78,7 +76,7 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
    * 1. Produce a bunch of messages
    * 2. Then consume the messages while killing and restarting brokers at random
    */
-  def consumeWithBrokerFailures(numIters: Int) {
+  def consumeWithBrokerFailures(numIters: Int)
     val numRecords = 1000
     sendRecords(numRecords)
     this.producers.foreach(_.close)
@@ -86,48 +84,42 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
     var consumed = 0L
     val consumer = this.consumers(0)
 
-    consumer.subscribe(List(topic), new ConsumerRebalanceListener {
+    consumer.subscribe(List(topic), new ConsumerRebalanceListener
       override def onPartitionsAssigned(
-          partitions: util.Collection[TopicPartition]) {
+          partitions: util.Collection[TopicPartition])
         // TODO: until KAFKA-2017 is merged, we have to handle the case in which the
         // the commit fails on prior to rebalancing on coordinator fail-over.
         consumer.seek(tp, consumed)
-      }
       override def onPartitionsRevoked(
           partitions: util.Collection[TopicPartition]) {}
-    })
+    )
 
     val scheduler = new BounceBrokerScheduler(numIters)
     scheduler.start()
 
-    while (scheduler.isRunning.get()) {
-      for (record <- consumer.poll(100)) {
+    while (scheduler.isRunning.get())
+      for (record <- consumer.poll(100))
         assertEquals(consumed, record.offset())
         consumed += 1
-      }
 
-      try {
+      try
         consumer.commitSync()
         assertEquals(consumer.position(tp), consumer.committed(tp).offset)
 
-        if (consumer.position(tp) == numRecords) {
+        if (consumer.position(tp) == numRecords)
           consumer.seekToBeginning(List[TopicPartition]())
           consumed = 0
-        }
-      } catch {
+      catch
         // TODO: should be no need to catch these exceptions once KAFKA-2017 is
         // merged since coordinator fail-over will not cause a rebalance
         case _: CommitFailedException =>
-      }
-    }
     scheduler.shutdown()
-  }
 
   @Test
   def testSeekAndCommitWithBrokerFailures() =
     seekAndCommitWithBrokerFailures(5)
 
-  def seekAndCommitWithBrokerFailures(numIters: Int) {
+  def seekAndCommitWithBrokerFailures(numIters: Int)
     val numRecords = 1000
     sendRecords(numRecords)
     this.producers.foreach(_.close)
@@ -151,30 +143,27 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
     val scheduler = new BounceBrokerScheduler(numIters)
     scheduler.start()
 
-    while (scheduler.isRunning.get()) {
+    while (scheduler.isRunning.get())
       val coin = TestUtils.random.nextInt(3)
-      if (coin == 0) {
+      if (coin == 0)
         info("Seeking to end of log")
         consumer.seekToEnd(List[TopicPartition]())
         assertEquals(numRecords.toLong, consumer.position(tp))
-      } else if (coin == 1) {
+      else if (coin == 1)
         val pos = TestUtils.random.nextInt(numRecords).toLong
         info("Seeking to " + pos)
         consumer.seek(tp, pos)
         assertEquals(pos, consumer.position(tp))
-      } else if (coin == 2) {
+      else if (coin == 2)
         info("Committing offset.")
         consumer.commitSync()
         assertEquals(consumer.position(tp), consumer.committed(tp).offset)
-      }
-    }
-  }
 
   private class BounceBrokerScheduler(val numIters: Int)
-      extends ShutdownableThread("daemon-bounce-broker", false) {
+      extends ShutdownableThread("daemon-bounce-broker", false)
     var iter: Int = 0
 
-    override def doWork(): Unit = {
+    override def doWork(): Unit =
       killRandomBroker()
       Thread.sleep(500)
       restartDeadBrokers()
@@ -182,16 +171,11 @@ class ConsumerBounceTest extends IntegrationTestHarness with Logging {
       iter += 1
       if (iter == numIters) initiateShutdown()
       else Thread.sleep(500)
-    }
-  }
 
-  private def sendRecords(numRecords: Int) {
-    val futures = (0 until numRecords).map { i =>
+  private def sendRecords(numRecords: Int)
+    val futures = (0 until numRecords).map  i =>
       this
         .producers(0)
         .send(new ProducerRecord(
                 topic, part, i.toString.getBytes, i.toString.getBytes))
-    }
     futures.map(_.get)
-  }
-}

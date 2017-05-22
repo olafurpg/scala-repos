@@ -7,7 +7,7 @@ package reflect.internal.util
 
 /** A common class for lightweight sets.
   */
-abstract class Set[T <: AnyRef] {
+abstract class Set[T <: AnyRef]
 
   def findEntry(x: T): T
 
@@ -23,4 +23,3 @@ abstract class Set[T <: AnyRef] {
     findEntry(x) ne null
 
   def toList = iterator.toList
-}

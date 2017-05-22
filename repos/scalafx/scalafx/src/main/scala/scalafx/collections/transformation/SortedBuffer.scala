@@ -37,7 +37,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object SortedBuffer {
+object SortedBuffer
 
   /**
     * Converts a ScalaFX SortedBuffer to its JavaFX counterpart SortedList.
@@ -47,7 +47,6 @@ object SortedBuffer {
     */
   implicit def sfxSortedList2jfx[E](v: SortedBuffer[E]): jfxct.SortedList[E] =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a $JFX $URL0 $TC]].
@@ -59,7 +58,7 @@ object SortedBuffer {
   */
 class SortedBuffer[E](override val delegate: jfxct.SortedList[E])
     extends TransformationBuffer[E, E](delegate)
-    with SFXDelegate[jfxct.SortedList[E]] {
+    with SFXDelegate[jfxct.SortedList[E]]
 
   /**
     * Constructs a new unordered SortedList wrapper around the source list.
@@ -87,21 +86,17 @@ class SortedBuffer[E](override val delegate: jfxct.SortedList[E])
     */
   def comparator: ObjectProperty[ju.Comparator[_ >: E]] =
     delegate.comparatorProperty
-  def comparator_=(v: Ordering[_ >: E]) {
+  def comparator_=(v: Ordering[_ >: E])
     ObjectProperty.fillProperty(delegate.comparatorProperty, v)
-  }
 
   /**
     * Creates and align new comparator value using provided comparison function `lessThan`.
     *
     * @param lessThan Comparison function that returns `true` if first element was lesser than second or `false` otherwise.
     */
-  def comparator_[T >: E](lessThan: (T, T) => Boolean) {
-    val c = new ju.Comparator[T] {
+  def comparator_[T >: E](lessThan: (T, T) => Boolean)
+    val c = new ju.Comparator[T]
       def compare(p1: T, p2: T) =
         if (lessThan(p1, p2)) -1 else if (lessThan(p2, p1)) 1 else 0
-    }
     ObjectProperty.fillProperty(
         delegate.comparatorProperty(), Ordering.fromLessThan(lessThan))
-  }
-}

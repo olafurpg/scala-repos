@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
   *
   * Deltas are computed from the last `update`.
   */
-private[stats] class CounterDeltas {
+private[stats] class CounterDeltas
 
   /**
     * @param abs the last absolute value seen
@@ -26,13 +26,12 @@ private[stats] class CounterDeltas {
   /**
     * Return the deltas as seen by the last call to [[update]].
     */
-  def deltas: Map[String, Number] = {
+  def deltas: Map[String, Number] =
     val prevs = synchronized(lasts)
-    prevs.asScala.map {
+    prevs.asScala.map
       case (key, pd) =>
         key -> Long.box(pd.delta)
-    }.toMap
-  }
+    .toMap
 
   /**
     * Updates the values to be used for future calls
@@ -40,19 +39,15 @@ private[stats] class CounterDeltas {
     *
     * @param newCounters the new absolute values for the counters.
     */
-  def update(newCounters: JMap[String, Number]): Unit = synchronized {
+  def update(newCounters: JMap[String, Number]): Unit = synchronized
     val next = new JHashMap[String, Last](newCounters.size)
-    newCounters.asScala.foreach {
+    newCounters.asScala.foreach
       case (k, v) =>
         val last = lasts.get(k)
         val current = v.longValue
         val delta =
           if (last == null) current
-          else {
+          else
             current - last.abs
-          }
         next.put(k, new Last(current, delta))
-    }
     lasts = next
-  }
-}

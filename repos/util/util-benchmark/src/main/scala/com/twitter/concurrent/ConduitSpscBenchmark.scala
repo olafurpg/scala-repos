@@ -18,7 +18,7 @@ import org.openjdk.jmh.annotations.{Benchmark, Param, Scope, State}
   * the source feeds directly into the sink.
   */
 @State(Scope.Benchmark)
-class ConduitSpscBenchmark extends StdBenchAnnotations {
+class ConduitSpscBenchmark extends StdBenchAnnotations
   @Param(Array("1", "2", "5", "10"))
   var size: Int = _
 
@@ -54,7 +54,7 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
 
   @Benchmark
   def asyncQueue: Boolean =
-    Await.result({
+    Await.result(
       // When the producer outpaces the consumer, AsyncQueue are buffers writes,
       // so it's impossible for the producer to rendezvous with the reader. The
       // offers aren't coordinated with the polls. As a result, the AsyncQueue
@@ -65,7 +65,7 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
 
       // Consume
       consumeQueue(size)
-    })
+    )
 
   private[this] def mkAsyncStream(n: Int): AsyncStream[Buf] =
     if (n <= 0) AsyncStream.empty
@@ -74,7 +74,7 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
 
   @Benchmark
   def asyncStream: Boolean =
-    Await.result({
+    Await.result(
       // AsyncStream is a persistent structure, so access is effectively
       // memoized, which means we have to create one new for each benchmark,
       // otherwise it'd be cheating.
@@ -83,10 +83,9 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
       val stream = mkAsyncStream(size)
 
       // Consume
-      stream.foldLeftF(false) { (_, buf) =>
+      stream.foldLeftF(false)  (_, buf) =>
         sink(buf)
-      }
-    })
+    )
 
   private[this] def feedBroker(n: Int): Future[Unit] =
     if (n <= 0) Future.Done
@@ -98,13 +97,13 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
 
   @Benchmark
   def broker: Boolean =
-    Await.result({
+    Await.result(
       // Produce
       feedBroker(size)
 
       // Consume
       consumeBroker(size)
-    })
+    )
 
   private[this] def feedReader(n: Int): Future[Unit] =
     if (n <= 0) Future.Done
@@ -116,13 +115,13 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
 
   @Benchmark
   def reader: Boolean =
-    Await.result({
+    Await.result(
       // Produce
       feedReader(size)
 
       // Consume
       consumeReader(size)
-    })
+    )
 
   import Spool.*::
   private[this] def mkSpool(n: Int): Future[Spool[Buf]] =
@@ -133,21 +132,17 @@ class ConduitSpscBenchmark extends StdBenchAnnotations {
       spool: Spool[A], b: Boolean): Future[Boolean] =
     if (spool.isEmpty) Future.value(b)
     else
-      sink(spool.head).flatMap { newB =>
-        spool.tail.flatMap { tail =>
+      sink(spool.head).flatMap  newB =>
+        spool.tail.flatMap  tail =>
           consumeSpool(tail, newB)
-        }
-      }
 
   @Benchmark
   def spool: Boolean =
-    Await.result({
+    Await.result(
       // Produce
       val f = mkSpool(size)
 
       // Consume
-      f.flatMap { s =>
+      f.flatMap  s =>
         consumeSpool(s, false)
-      }
-    })
-}
+    )

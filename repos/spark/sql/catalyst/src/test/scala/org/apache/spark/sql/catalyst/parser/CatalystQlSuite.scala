@@ -25,26 +25,24 @@ import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.unsafe.types.CalendarInterval
 
-class CatalystQlSuite extends PlanTest {
+class CatalystQlSuite extends PlanTest
   val parser = new CatalystQl()
 
-  test("test case insensitive") {
+  test("test case insensitive")
     val result = Project(UnresolvedAlias(Literal(1)) :: Nil, OneRowRelation)
     assert(result === parser.parsePlan("seLect 1"))
     assert(result === parser.parsePlan("select 1"))
     assert(result === parser.parsePlan("SELECT 1"))
-  }
 
-  test("test NOT operator with comparison operations") {
+  test("test NOT operator with comparison operations")
     val parsed = parser.parsePlan("SELECT NOT TRUE > TRUE")
     val expected = Project(UnresolvedAlias(
                                Not(GreaterThan(Literal(true), Literal(true)))
                            ) :: Nil,
                            OneRowRelation)
     comparePlans(parsed, expected)
-  }
 
-  test("test Union Distinct operator") {
+  test("test Union Distinct operator")
     val parsed1 = parser.parsePlan("SELECT * FROM t0 UNION SELECT * FROM t1")
     val parsed2 =
       parser.parsePlan("SELECT * FROM t0 UNION DISTINCT SELECT * FROM t1")
@@ -60,9 +58,8 @@ class CatalystQlSuite extends PlanTest {
                                                  None))))))
     comparePlans(parsed1, expected)
     comparePlans(parsed2, expected)
-  }
 
-  test("test Union All operator") {
+  test("test Union All operator")
     val parsed =
       parser.parsePlan("SELECT * FROM t0 UNION ALL SELECT * FROM t1")
     val expected = Project(
@@ -74,32 +71,27 @@ class CatalystQlSuite extends PlanTest {
                   Project(UnresolvedAlias(UnresolvedStar(None)) :: Nil,
                           UnresolvedRelation(TableIdentifier("t1"), None)))))
     comparePlans(parsed, expected)
-  }
 
-  test("support hive interval literal") {
-    def checkInterval(sql: String, result: CalendarInterval): Unit = {
+  test("support hive interval literal")
+    def checkInterval(sql: String, result: CalendarInterval): Unit =
       val parsed = parser.parsePlan(sql)
       val expected = Project(UnresolvedAlias(
                                  Literal(result)
                              ) :: Nil,
                              OneRowRelation)
       comparePlans(parsed, expected)
-    }
 
-    def checkYearMonth(lit: String): Unit = {
+    def checkYearMonth(lit: String): Unit =
       checkInterval(s"SELECT INTERVAL '$lit' YEAR TO MONTH",
                     CalendarInterval.fromYearMonthString(lit))
-    }
 
-    def checkDayTime(lit: String): Unit = {
+    def checkDayTime(lit: String): Unit =
       checkInterval(s"SELECT INTERVAL '$lit' DAY TO SECOND",
                     CalendarInterval.fromDayTimeString(lit))
-    }
 
-    def checkSingleUnit(lit: String, unit: String): Unit = {
+    def checkSingleUnit(lit: String, unit: String): Unit =
       checkInterval(s"SELECT INTERVAL '$lit' $unit",
                     CalendarInterval.fromSingleUnitString(unit, lit))
-    }
 
     checkYearMonth("123-10")
     checkYearMonth("496-0")
@@ -113,25 +105,22 @@ class CatalystQlSuite extends PlanTest {
     checkDayTime("-1 0:0:0")
     checkDayTime("1 0:0:1")
 
-    for (unit <- Seq("year", "month", "day", "hour", "minute", "second")) {
+    for (unit <- Seq("year", "month", "day", "hour", "minute", "second"))
       checkSingleUnit("7", unit)
       checkSingleUnit("-7", unit)
       checkSingleUnit("0", unit)
-    }
 
     checkSingleUnit("13.123456789", "second")
     checkSingleUnit("-13.123456789", "second")
-  }
 
-  test("support scientific notation") {
-    def assertRight(input: String, output: Double): Unit = {
+  test("support scientific notation")
+    def assertRight(input: String, output: Double): Unit =
       val parsed = parser.parsePlan("SELECT " + input)
       val expected = Project(UnresolvedAlias(
                                  Literal(output)
                              ) :: Nil,
                              OneRowRelation)
       comparePlans(parsed, expected)
-    }
 
     assertRight("9.0e1", 90)
     assertRight(".9e+2", 90)
@@ -141,9 +130,8 @@ class CatalystQlSuite extends PlanTest {
     assertRight("9.e+1", 90)
 
     intercept[AnalysisException](parser.parsePlan("SELECT .e3"))
-  }
 
-  test("parse expressions") {
+  test("parse expressions")
     compareExpressions(
         parser.parseExpression("prinln('hello', 'world')"),
         UnresolvedFunction(
@@ -164,17 +152,15 @@ class CatalystQlSuite extends PlanTest {
 
     intercept[AnalysisException](
         parser.parseExpression("1 - f('o', o(bar)) hello * world"))
-  }
 
-  test("table identifier") {
+  test("table identifier")
     assert(TableIdentifier("q") === parser.parseTableIdentifier("q"))
     assert(
         TableIdentifier("q", Some("d")) === parser.parseTableIdentifier("d.q"))
     intercept[AnalysisException](parser.parseTableIdentifier(""))
     intercept[AnalysisException](parser.parseTableIdentifier("d.q.g"))
-  }
 
-  test("parse union/except/intersect") {
+  test("parse union/except/intersect")
     parser.parsePlan("select * from t1 union all select * from t2")
     parser.parsePlan("select * from t1 union distinct select * from t2")
     parser.parsePlan("select * from t1 union select * from t2")
@@ -185,9 +171,8 @@ class CatalystQlSuite extends PlanTest {
     parser.parsePlan("(select * from t1) union (select * from t2)")
     parser.parsePlan(
         "select * from ((select * from t1) union (select * from t2)) t")
-  }
 
-  test("window function: better support of parentheses") {
+  test("window function: better support of parentheses")
     parser.parsePlan(
         "select sum(product + 1) over (partition by ((1) + (product / 2)) " +
         "order by 2) from windowData")
@@ -207,9 +192,8 @@ class CatalystQlSuite extends PlanTest {
     parser.parsePlan(
         "select sum(product + 1) over (partition by (product + (1)) order by 2) " +
         "from windowData")
-  }
 
-  test("very long AND/OR expression") {
+  test("very long AND/OR expression")
     val equals = (1 to 1000).map(x => s"$x == $x")
     val expr = parser.parseExpression(equals.mkString(" AND "))
     assert(expr.isInstanceOf[And])
@@ -218,15 +202,13 @@ class CatalystQlSuite extends PlanTest {
     val expr2 = parser.parseExpression(equals.mkString(" OR "))
     assert(expr2.isInstanceOf[Or])
     assert(expr2.collect({ case EqualTo(_, _) => true }).size == 1000)
-  }
 
-  test("subquery") {
+  test("subquery")
     parser.parsePlan("select (select max(b) from s) ss from t")
     parser.parsePlan("select * from t where a = (select b from s)")
     parser.parsePlan("select * from t group by g having a > (select b from s)")
-  }
 
-  test("using clause in JOIN") {
+  test("using clause in JOIN")
     // Tests parsing of using clause for different join types.
     parser.parsePlan("select * from t1 join t2 using (c1)")
     parser.parsePlan("select * from t1 join t2 using (c1, c2)")
@@ -247,5 +229,3 @@ class CatalystQlSuite extends PlanTest {
     error = intercept[AnalysisException](parser.parsePlan(
             "select * from t1" + " join t2 using (c1) on t1.c1 = t2.c1"))
     assert(error.message.contains("missing EOF at 'on' near ')'"))
-  }
-}

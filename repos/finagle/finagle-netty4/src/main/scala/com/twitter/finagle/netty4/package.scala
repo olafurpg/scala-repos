@@ -11,7 +11,7 @@ import java.util.concurrent.{ExecutorService, Executors}
   * [[com.twitter.finagle.Server]] and a client transport in terms of
   * the netty4 event loop.
   */
-package object netty4 {
+package object netty4
 
   object numWorkers
       extends GlobalFlag(
@@ -25,4 +25,3 @@ package object netty4 {
 
   private[netty4] object WorkerPool
       extends NioEventLoopGroup(numWorkers(), Executor)
-}

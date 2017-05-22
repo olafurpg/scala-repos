@@ -28,20 +28,19 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import yggdrasil.test._
 
 trait StaticInlinerSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification with EvaluatorTestSupport[M]
 
   import dag._
   import instructions._
   import library._
 
-  object inliner extends StdLibStaticInliner with StdLibOpFinder {
+  object inliner extends StdLibStaticInliner with StdLibOpFinder
     def MorphContext(ctx: EvaluationContext, node: DepGraph): MorphContext =
       new MorphContext(ctx, null)
-  }
   import inliner._
 
-  "static inlining of Root computation" should {
-    "detect and resolve addition" in {
+  "static inlining of Root computation" should
+    "detect and resolve addition" in
       val line = Line(1, 1, "")
 
       val input = Join(Add,
@@ -52,9 +51,8 @@ trait StaticInlinerSpecs[M[+ _]]
       val expected = Const(CNum(45.14))(line)
 
       inlineStatics(input, defaultEvaluationContext) mustEqual expected
-    }
 
-    "detect and resolve operations at depth" in {
+    "detect and resolve operations at depth" in
       val line = Line(1, 1, "")
 
       val input = Join(Add,
@@ -68,9 +66,8 @@ trait StaticInlinerSpecs[M[+ _]]
       val expected = Const(CNum(48.28))(line)
 
       inlineStatics(input, defaultEvaluationContext) mustEqual expected
-    }
 
-    "produce CUndefined in cases where the operation is undefined" in {
+    "produce CUndefined in cases where the operation is undefined" in
       val line = Line(1, 1, "")
 
       val input = Join(Div,
@@ -81,9 +78,8 @@ trait StaticInlinerSpecs[M[+ _]]
       val expected = Const(CUndefined)(line)
 
       inlineStatics(input, defaultEvaluationContext) mustEqual expected
-    }
 
-    "propagate through static computations CUndefined when produced at depth" in {
+    "propagate through static computations CUndefined when produced at depth" in
       val line = Line(1, 1, "")
 
       val input = Join(Add,
@@ -97,12 +93,11 @@ trait StaticInlinerSpecs[M[+ _]]
       val expected = Const(CUndefined)(line)
 
       inlineStatics(input, defaultEvaluationContext) mustEqual expected
-    }
 
-    "propagate through non-singleton computations CUndefined when produced at depth" >> {
+    "propagate through non-singleton computations CUndefined when produced at depth" >>
       val line = Line(1, 1, "")
 
-      "left" >> {
+      "left" >>
         val input = Join(Add,
                          Cross(None),
                          dag.AbsoluteLoad(Const(CString("/foo"))(line))(line),
@@ -114,9 +109,8 @@ trait StaticInlinerSpecs[M[+ _]]
         val expected = Const(CUndefined)(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual expected
-      }
 
-      "right" >> {
+      "right" >>
         val input =
           Join(Add,
                Cross(None),
@@ -129,13 +123,11 @@ trait StaticInlinerSpecs[M[+ _]]
         val expected = Const(CUndefined)(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual expected
-      }
-    }
 
-    "reduce filters with static RHS" >> {
+    "reduce filters with static RHS" >>
       val line = Line(1, 1, "")
 
-      "true" >> {
+      "true" >>
         val input =
           Filter(Cross(None),
                  dag.AbsoluteLoad(Const(CString("/foo"))(line))(line),
@@ -143,9 +135,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual dag
           .AbsoluteLoad(Const(CString("/foo"))(line))(line)
-      }
 
-      "false" >> {
+      "false" >>
         val input =
           Filter(Cross(None),
                  dag.AbsoluteLoad(Const(CString("/foo"))(line))(line),
@@ -153,20 +144,17 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             CUndefined)(line)
-      }
-    }
 
-    "detect and resolve array" >> {
+    "detect and resolve array" >>
       val line = Line(1, 1, "")
 
-      "wrap" >> {
+      "wrap" >>
         val input = Operate(WrapArray, Const(CBoolean(false))(line))(line)
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             RArray(CBoolean(false)))(line)
-      }
 
-      "deref" >> {
+      "deref" >>
         val input = Join(DerefArray,
                          Cross(None),
                          Const(RArray(CBoolean(false), CTrue))(line),
@@ -174,9 +162,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(CTrue)(
             line)
-      }
 
-      "join" >> {
+      "join" >>
         val input = Join(JoinArray,
                          Cross(None),
                          Const(RArray(CTrue))(line),
@@ -184,9 +171,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             RArray(CTrue, CBoolean(false)))(line)
-      }
 
-      "swap" >> {
+      "swap" >>
         val input =
           Join(ArraySwap,
                Cross(None),
@@ -195,13 +181,11 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             RArray(CBoolean(false), CTrue, CString("TEST")))(line)
-      }
-    }
 
-    "detect and resolve object" >> {
+    "detect and resolve object" >>
       val line = Line(1, 1, "")
 
-      "wrap" >> {
+      "wrap" >>
         val input = Join(WrapObject,
                          Cross(None),
                          Const(CString("k"))(line),
@@ -209,9 +193,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             RObject("k" -> CTrue))(line)
-      }
 
-      "deref" >> {
+      "deref" >>
         val input = Join(DerefObject,
                          Cross(None),
                          Const(RObject("k" -> CBoolean(false)))(line),
@@ -219,9 +202,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             CBoolean(false))(line)
-      }
 
-      "join" >> {
+      "join" >>
         val input = Join(JoinObject,
                          Cross(None),
                          Const(RObject("k" -> CTrue))(line),
@@ -229,13 +211,11 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             RObject("k" -> CTrue, "l" -> CBoolean(false)))(line)
-      }
-    }
 
-    "detect and resolve cond" >> {
+    "detect and resolve cond" >>
       val line = Line(1, 1, "")
 
-      "const true" >> {
+      "const true" >>
         val input = Cond(Const(CBoolean(true))(line),
                          Const(CString("j"))(line),
                          Cross(None),
@@ -244,9 +224,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             CString("j"))(line)
-      }
 
-      "const false" >> {
+      "const false" >>
         val input = Cond(Const(CBoolean(false))(line),
                          Const(CString("j"))(line),
                          Cross(None),
@@ -255,9 +234,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             CString("k"))(line)
-      }
 
-      "invalid const" >> {
+      "invalid const" >>
         val input = Cond(Const(CString("fubar"))(line),
                          Const(CString("j"))(line),
                          Cross(None),
@@ -266,29 +244,25 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Undefined(
             line)
-      }
-    }
 
-    "detect and resove union with identical left/right" in {
+    "detect and resove union with identical left/right" in
       val line = Line(1, 1, "")
 
       val side = Const(CString("j"))(line)
       val input = IUI(true, side, side)(line)
 
       inlineStatics(input, defaultEvaluationContext) mustEqual side
-    }
 
-    "detect and resove intersect with identical left/right" in {
+    "detect and resove intersect with identical left/right" in
       val line = Line(1, 1, "")
 
       val side = Const(CString("j"))(line)
       val input = IUI(false, side, side)(line)
 
       inlineStatics(input, defaultEvaluationContext) mustEqual side
-    }
 
-    "rewrite a filter with undefined to undefined" >> {
-      "target" >> {
+    "rewrite a filter with undefined to undefined" >>
+      "target" >>
         val line = Line(1, 1, "")
         val input = Filter(IdentitySort,
                            Const(CUndefined)(line),
@@ -296,9 +270,8 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             CUndefined)(line)
-      }
 
-      "predicate" >> {
+      "predicate" >>
         val line = Line(1, 1, "")
         val input = Filter(IdentitySort,
                            Const(CString("j"))(line),
@@ -306,10 +279,6 @@ trait StaticInlinerSpecs[M[+ _]]
 
         inlineStatics(input, defaultEvaluationContext) mustEqual Const(
             CUndefined)(line)
-      }
-    }
-  }
-}
 
 object StaticInlinerSpecs
     extends StaticInlinerSpecs[YId] with test.YIdInstances

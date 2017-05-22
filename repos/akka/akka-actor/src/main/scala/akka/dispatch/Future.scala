@@ -16,7 +16,7 @@ import java.util.concurrent.CompletableFuture
 /**
   * ExecutionContexts is the Java API for ExecutionContexts
   */
-object ExecutionContexts {
+object ExecutionContexts
 
   /**
     * Returns a new ExecutionContextExecutor which will delegate execution to the underlying Executor,
@@ -78,7 +78,7 @@ object ExecutionContexts {
     * non-throwing in order to save a round-trip to the thread pool.
     */
   private[akka] object sameThreadExecutionContext
-      extends ExecutionContext with BatchingExecutor {
+      extends ExecutionContext with BatchingExecutor
     override protected def unbatchedExecute(runnable: Runnable): Unit =
       runnable.run()
     override protected def resubmitOnBlock: Boolean =
@@ -86,13 +86,11 @@ object ExecutionContexts {
     override def reportFailure(t: Throwable): Unit =
       throw new IllegalStateException(
           "exception in sameThreadExecutionContext", t)
-  }
-}
 
 /**
   * Futures is the Java API for Futures and Promises
   */
-object Futures {
+object Futures
   import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 
   /**
@@ -127,21 +125,19 @@ object Futures {
   /**
     * Creates an already completed CompletionStage with the specified exception
     */
-  def failedCompletionStage[T](ex: Throwable): CompletionStage[T] = {
+  def failedCompletionStage[T](ex: Throwable): CompletionStage[T] =
     val f = CompletableFuture.completedFuture[T](null.asInstanceOf[T])
     f.obtrudeException(ex)
     f
-  }
 
   /**
     * Returns a Future that will hold the optional result of the first Future with a result that matches the predicate
     */
   def find[T <: AnyRef](futures: JIterable[Future[T]],
                         predicate: JFunc[T, java.lang.Boolean],
-                        executor: ExecutionContext): Future[JOption[T]] = {
+                        executor: ExecutionContext): Future[JOption[T]] =
     implicit val ec = executor
     Future.find[T](futures.asScala)(predicate.apply(_))(executor) map JOption.fromScalaOption
-  }
 
   /**
     * Returns a Future to the result of the first future in the list that is completed
@@ -175,12 +171,10 @@ object Futures {
     * Useful for reducing many Futures into a single Future.
     */
   def sequence[A](in: JIterable[Future[A]],
-                  executor: ExecutionContext): Future[JIterable[A]] = {
+                  executor: ExecutionContext): Future[JIterable[A]] =
     implicit val d = executor
-    in.asScala.foldLeft(Future(new JLinkedList[A]())) { (fr, fa) ⇒
+    in.asScala.foldLeft(Future(new JLinkedList[A]()))  (fr, fa) ⇒
       for (r ← fr; a ← fa) yield { r add a; r }
-    }
-  }
 
   /**
     * Transforms a JIterable[A] into a Future[JIterable[B]] using the provided Function A ⇒ Future[B].
@@ -189,61 +183,48 @@ object Futures {
     */
   def traverse[A, B](in: JIterable[A],
                      fn: JFunc[A, Future[B]],
-                     executor: ExecutionContext): Future[JIterable[B]] = {
+                     executor: ExecutionContext): Future[JIterable[B]] =
     implicit val d = executor
-    in.asScala.foldLeft(Future(new JLinkedList[B]())) { (fr, a) ⇒
+    in.asScala.foldLeft(Future(new JLinkedList[B]()))  (fr, a) ⇒
       val fb = fn(a)
       for (r ← fr; b ← fb) yield { r add b; r }
-    }
-  }
-}
 
 /**
   * This class contains bridge classes between Scala and Java.
   * Internal use only.
   */
-object japi {
+object japi
   @deprecated("Do not use this directly, use subclasses of this", "2.0")
-  class CallbackBridge[-T] extends AbstractPartialFunction[T, BoxedUnit] {
+  class CallbackBridge[-T] extends AbstractPartialFunction[T, BoxedUnit]
     override final def isDefinedAt(t: T): Boolean = true
-    override final def apply(t: T): BoxedUnit = {
+    override final def apply(t: T): BoxedUnit =
       internal(t)
       BoxedUnit.UNIT
-    }
     protected def internal(result: T): Unit = ()
-  }
 
   @deprecated("Do not use this directly, use 'Recover'", "2.0")
-  class RecoverBridge[+T] extends AbstractPartialFunction[Throwable, T] {
+  class RecoverBridge[+T] extends AbstractPartialFunction[Throwable, T]
     override final def isDefinedAt(t: Throwable): Boolean = true
     override final def apply(t: Throwable): T = internal(t)
     protected def internal(result: Throwable): T = null.asInstanceOf[T]
-  }
 
   @deprecated("Do not use this directly, use subclasses of this", "2.0")
-  class BooleanFunctionBridge[-T] extends scala.Function1[T, Boolean] {
+  class BooleanFunctionBridge[-T] extends scala.Function1[T, Boolean]
     override final def apply(t: T): Boolean = internal(t)
     protected def internal(result: T): Boolean = false
-  }
 
   @deprecated("Do not use this directly, use subclasses of this", "2.0")
-  class UnitFunctionBridge[-T] extends (T ⇒ BoxedUnit) {
-    final def apply$mcLJ$sp(l: Long): BoxedUnit = {
+  class UnitFunctionBridge[-T] extends (T ⇒ BoxedUnit)
+    final def apply$mcLJ$sp(l: Long): BoxedUnit =
       internal(l.asInstanceOf[T]); BoxedUnit.UNIT
-    }
-    final def apply$mcLI$sp(i: Int): BoxedUnit = {
+    final def apply$mcLI$sp(i: Int): BoxedUnit =
       internal(i.asInstanceOf[T]); BoxedUnit.UNIT
-    }
-    final def apply$mcLF$sp(f: Float): BoxedUnit = {
+    final def apply$mcLF$sp(f: Float): BoxedUnit =
       internal(f.asInstanceOf[T]); BoxedUnit.UNIT
-    }
-    final def apply$mcLD$sp(d: Double): BoxedUnit = {
+    final def apply$mcLD$sp(d: Double): BoxedUnit =
       internal(d.asInstanceOf[T]); BoxedUnit.UNIT
-    }
     override final def apply(t: T): BoxedUnit = { internal(t); BoxedUnit.UNIT }
     protected def internal(result: T): Unit = ()
-  }
-}
 
 /**
   * Callback for when a Future is completed successfully
@@ -251,7 +232,7 @@ object japi {
   *
   * Java API
   */
-abstract class OnSuccess[-T] extends japi.CallbackBridge[T] {
+abstract class OnSuccess[-T] extends japi.CallbackBridge[T]
   protected final override def internal(result: T) = onSuccess(result)
 
   /**
@@ -260,7 +241,6 @@ abstract class OnSuccess[-T] extends japi.CallbackBridge[T] {
     */
   @throws(classOf[Throwable])
   def onSuccess(result: T): Unit
-}
 
 /**
   * Callback for when a Future is completed with a failure
@@ -268,7 +248,7 @@ abstract class OnSuccess[-T] extends japi.CallbackBridge[T] {
   *
   * Java API
   */
-abstract class OnFailure extends japi.CallbackBridge[Throwable] {
+abstract class OnFailure extends japi.CallbackBridge[Throwable]
   protected final override def internal(failure: Throwable) =
     onFailure(failure)
 
@@ -278,7 +258,6 @@ abstract class OnFailure extends japi.CallbackBridge[Throwable] {
     */
   @throws(classOf[Throwable])
   def onFailure(failure: Throwable): Unit
-}
 
 /**
   * Callback for when a Future is completed with either failure or a success
@@ -286,11 +265,10 @@ abstract class OnFailure extends japi.CallbackBridge[Throwable] {
   *
   * Java API
   */
-abstract class OnComplete[-T] extends japi.CallbackBridge[Try[T]] {
-  protected final override def internal(value: Try[T]): Unit = value match {
+abstract class OnComplete[-T] extends japi.CallbackBridge[Try[T]]
+  protected final override def internal(value: Try[T]): Unit = value match
     case Failure(t) ⇒ onComplete(t, null.asInstanceOf[T])
     case Success(r) ⇒ onComplete(null, r)
-  }
 
   /**
     * This method will be invoked once when/if a Future that this callback is registered on
@@ -299,7 +277,6 @@ abstract class OnComplete[-T] extends japi.CallbackBridge[Try[T]] {
     */
   @throws(classOf[Throwable])
   def onComplete(failure: Throwable, success: T): Unit
-}
 
 /**
   * Callback for the Future.recover operation that conditionally turns failures into successes.
@@ -308,7 +285,7 @@ abstract class OnComplete[-T] extends japi.CallbackBridge[Try[T]] {
   *
   * Java API
   */
-abstract class Recover[+T] extends japi.RecoverBridge[T] {
+abstract class Recover[+T] extends japi.RecoverBridge[T]
   protected final override def internal(result: Throwable): T = recover(result)
 
   /**
@@ -322,7 +299,6 @@ abstract class Recover[+T] extends japi.RecoverBridge[T] {
     */
   @throws(classOf[Throwable])
   def recover(failure: Throwable): T
-}
 
 /**
   * <i><b>Java API (not recommended):</b></i>
@@ -348,12 +324,10 @@ abstract class Recover[+T] extends japi.RecoverBridge[T] {
   * thus Java users should prefer `Future.map`, translating non-matching values
   * to failure cases.
   */
-object Filter {
+object Filter
   def filterOf[T](f: akka.japi.Function[T, java.lang.Boolean]): (T ⇒ Boolean) =
-    new Function1[T, Boolean] {
+    new Function1[T, Boolean]
       def apply(result: T): Boolean = f(result).booleanValue()
-    }
-}
 
 /**
   * Callback for the Future.foreach operation that will be invoked if the Future that this callback
@@ -363,7 +337,7 @@ object Filter {
   * SAM (Single Abstract Method) class
   * Java API
   */
-abstract class Foreach[-T] extends japi.UnitFunctionBridge[T] {
+abstract class Foreach[-T] extends japi.UnitFunctionBridge[T]
   override final def internal(t: T): Unit = each(t)
 
   /**
@@ -372,7 +346,6 @@ abstract class Foreach[-T] extends japi.UnitFunctionBridge[T] {
     */
   @throws(classOf[Throwable])
   def each(result: T): Unit
-}
 
 /**
   * Callback for the Future.map and Future.flatMap operations that will be invoked
@@ -385,7 +358,7 @@ abstract class Foreach[-T] extends japi.UnitFunctionBridge[T] {
   *
   * Java API
   */
-abstract class Mapper[-T, +R] extends scala.runtime.AbstractFunction1[T, R] {
+abstract class Mapper[-T, +R] extends scala.runtime.AbstractFunction1[T, R]
 
   /**
     * Override this method to perform the map operation, by default delegates to "checkedApply"
@@ -402,4 +375,3 @@ abstract class Mapper[-T, +R] extends scala.runtime.AbstractFunction1[T, R] {
   def checkedApply(parameter: T): R =
     throw new UnsupportedOperationException(
         "Mapper.checkedApply has not been implemented")
-}

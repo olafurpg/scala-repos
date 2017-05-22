@@ -21,11 +21,10 @@ case class Player(id: String,
                   blurs: Int = 0,
                   holdAlert: Option[Player.HoldAlert] = None,
                   berserk: Boolean = false,
-                  name: Option[String] = None) {
+                  name: Option[String] = None)
 
-  def playerUser = userId flatMap { uid =>
+  def playerUser = userId flatMap  uid =>
     rating map { PlayerUser(uid, _, ratingDiff) }
-  }
 
   def withUser(id: User.ID, perf: lila.rating.Perf): Player =
     copy(userId = id.some,
@@ -40,9 +39,8 @@ case class Player(id: String,
 
   def isUser(u: User) = userId.fold(false)(_ == u.id)
 
-  def userInfos: Option[Player.UserInfo] = (userId |@| rating) {
+  def userInfos: Option[Player.UserInfo] = (userId |@| rating)
     case (id, ra) => Player.UserInfo(id, ra, provisional)
-  }
 
   def wins = isWinner getOrElse false
 
@@ -74,26 +72,23 @@ case class Player(id: String,
 
   def withName(name: String) = copy(name = name.some)
 
-  def nameSplit: Option[(String, Option[Int])] = name map {
+  def nameSplit: Option[(String, Option[Int])] = name map
     case Player.nameSplitRegex(n, r) => n -> parseIntOption(r)
     case n => n -> none
-  }
 
-  def before(other: Player) = ((rating, id), (other.rating, other.id)) match {
+  def before(other: Player) = ((rating, id), (other.rating, other.id)) match
     case ((Some(a), _), (Some(b), _)) if a != b => a > b
     case ((Some(_), _), (None, _)) => true
     case ((None, _), (Some(_), _)) => false
     case ((_, a), (_, b)) => a < b
-  }
 
   def ratingAfter = rating map (_ + ~ratingDiff)
 
   def stableRating = rating ifFalse provisional
 
   def stableRatingAfter = stableRating map (_ + ~ratingDiff)
-}
 
-object Player {
+object Player
 
   private val nameSplitRegex = """^([^\(]+)\((.+)\)$""".r
 
@@ -104,17 +99,16 @@ object Player {
 
   def black = make(Color.Black, None)
 
-  case class HoldAlert(ply: Int, mean: Int, sd: Int) {
+  case class HoldAlert(ply: Int, mean: Int, sd: Int)
 
     def suspicious = ply >= 16 && ply <= 40
-  }
 
   case class UserInfo(id: String, rating: Int, provisional: Boolean)
 
   import reactivemongo.bson.Macros
   implicit val holdAlertBSONHandler = Macros.handler[HoldAlert]
 
-  object BSONFields {
+  object BSONFields
 
     val aiLevel = "ai"
     val isOfferingDraw = "od"
@@ -128,7 +122,6 @@ object Player {
     val holdAlert = "h"
     val berserk = "be"
     val name = "na"
-  }
 
   import reactivemongo.bson._
   import lila.db.BSON
@@ -141,16 +134,15 @@ object Player {
   private def safeRange(range: Range, name: String)(userId: Option[String])(
       v: Int): Option[Int] =
     if (range contains v) Some(v)
-    else {
+    else
       logger.warn(
           s"Player $userId $name=$v (range: ${range.min}-${range.max})")
       None
-    }
 
   private val ratingRange = safeRange(0 to 4000, "rating") _
   private val ratingDiffRange = safeRange(-1000 to 1000, "ratingDiff") _
 
-  implicit val playerBSONHandler = new BSON[Builder] {
+  implicit val playerBSONHandler = new BSON[Builder]
 
     import BSONFields._
 
@@ -178,7 +170,7 @@ object Player {
                      name = r strO name)
 
     def writes(w: BSON.Writer, o: Builder) =
-      o(chess.White)("0000")(none)(none) |> { p =>
+      o(chess.White)("0000")(none)(none) |>  p =>
         BSONDocument(aiLevel -> p.aiLevel,
                      isOfferingDraw -> w.boolO(p.isOfferingDraw),
                      isOfferingRematch -> w.boolO(p.isOfferingRematch),
@@ -190,6 +182,3 @@ object Player {
                      blurs -> w.intO(p.blurs),
                      holdAlert -> p.holdAlert,
                      name -> p.name)
-      }
-  }
-}

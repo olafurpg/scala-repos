@@ -10,7 +10,7 @@ package model
 import scala.collection._
 
 /** A fragment of code. */
-abstract class TreeEntity {
+abstract class TreeEntity
 
   /** The human-readable representation of this abstract syntax tree. */
   def expression: String
@@ -22,4 +22,3 @@ abstract class TreeEntity {
 
   /** The human-readable representation of this abstract syntax tree. */
   override def toString = expression
-}

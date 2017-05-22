@@ -16,6 +16,5 @@
   */
 package kafka.common
 
-class TopicExistsException(message: String) extends RuntimeException(message) {
+class TopicExistsException(message: String) extends RuntimeException(message)
   def this() = this(null)
-}

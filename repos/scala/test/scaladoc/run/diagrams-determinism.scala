@@ -2,7 +2,7 @@ import scala.tools.nsc.doc.model._
 import scala.tools.nsc.doc.model.diagram._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code = """
       package scala.test.scaladoc.diagrams
@@ -17,11 +17,11 @@ object Test extends ScaladocModelTest {
   // diagrams must be started. In case there's an error with dot, it should not report anything
   def scaladocSettings = "-diagrams -implicits"
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
-    def diagramString(rootPackage: Package) = {
+    def diagramString(rootPackage: Package) =
       val base = rootPackage
         ._package("scala")
         ._package("test")
@@ -39,27 +39,26 @@ object Test extends ScaladocModelTest {
       C.inheritanceDiagram.get.toString + "\n" +
       D.inheritanceDiagram.get.toString + "\n" +
       E.inheritanceDiagram.get.toString
-    }
 
     // 1. check that several runs produce the same output
     val run0 = diagramString(rootPackage)
     val run1 = diagramString(
         model
-          .getOrElse({
+          .getOrElse(
         sys.error("Scaladoc Model Test ERROR: No universe generated!")
-      })
+      )
           .rootPackage)
     val run2 = diagramString(
         model
-          .getOrElse({
+          .getOrElse(
         sys.error("Scaladoc Model Test ERROR: No universe generated!")
-      })
+      )
           .rootPackage)
     val run3 = diagramString(
         model
-          .getOrElse({
+          .getOrElse(
         sys.error("Scaladoc Model Test ERROR: No universe generated!")
-      })
+      )
           .rootPackage)
 
     // any variance in the order of the diagram elements should crash the following tests:
@@ -86,5 +85,3 @@ object Test extends ScaladocModelTest {
     assertRightOrder(base._trait("C"), base._trait("C").inheritanceDiagram.get)
     assertRightOrder(base._trait("D"), base._trait("D").inheritanceDiagram.get)
     assertRightOrder(base._trait("E"), base._trait("E").inheritanceDiagram.get)
-  }
-}

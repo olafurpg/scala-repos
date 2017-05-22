@@ -12,12 +12,12 @@ import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
   * User: Alexander Podkhalyuzin
   * Date: 08.11.11
   */
-class ScalaEqEvaluator(left: Evaluator, right: Evaluator) extends Evaluator {
-  def evaluate(context: EvaluationContextImpl): AnyRef = {
+class ScalaEqEvaluator(left: Evaluator, right: Evaluator) extends Evaluator
+  def evaluate(context: EvaluationContextImpl): AnyRef =
     val leftResult = left.evaluate(context).asInstanceOf[Value]
     val rightResult = right.evaluate(context).asInstanceOf[Value]
     val vm = context.getDebugProcess.getVirtualMachineProxy
-    (leftResult, rightResult) match {
+    (leftResult, rightResult) match
       case (null, null) => DebuggerUtilsEx.createValue(vm, "boolean", true)
       case (null, _) =>
         DebuggerUtilsEx.createValue(vm, "boolean", rightResult == leftResult)
@@ -43,8 +43,5 @@ class ScalaEqEvaluator(left: Evaluator, right: Evaluator) extends Evaluator {
         throw EvaluationException(
             DebuggerBundle.message(
                 "evaluation.error.incompatible.types", "=="))
-    }
-  }
 
   def getModifier: Modifier = null
-}

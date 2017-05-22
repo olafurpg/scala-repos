@@ -11,9 +11,9 @@ import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 import sbt._
 import sbt.Keys._
 
-object MultiNode extends AutoPlugin {
+object MultiNode extends AutoPlugin
 
-  object CliOptions {
+  object CliOptions
     val multiNode = CliOption("akka.test.multi-node", false)
     val sbtLogNoFormat = CliOption("sbt.log.noformat", false)
 
@@ -22,7 +22,6 @@ object MultiNode extends AutoPlugin {
     val javaName = sys.props.get("akka.test.multi-node.java").toSeq
     val targetDirName =
       sys.props.get("akka.test.multi-node.targetDirName").toSeq
-  }
 
   val multiExecuteTests = CliOptions.multiNode
     .ifTrue(multiNodeExecuteTests in MultiJvm)
@@ -36,7 +35,7 @@ object MultiNode extends AutoPlugin {
 
   override lazy val projectSettings = multiJvmSettings
 
-  private val defaultMultiJvmOptions: Seq[String] = {
+  private val defaultMultiJvmOptions: Seq[String] =
     import scala.collection.JavaConverters._
     // multinode.D= and multinode.X= makes it possible to pass arbitrary
     // -D or -X arguments to the forked jvm, e.g.
@@ -45,18 +44,16 @@ object MultiNode extends AutoPlugin {
     val MultinodeJvmArgs = "multinode\\.(D|X)(.*)".r
     val knownPrefix = Set("multnode.", "akka.", "MultiJvm.")
     val akkaProperties =
-      System.getProperties.propertyNames.asScala.toList.collect {
+      System.getProperties.propertyNames.asScala.toList.collect
         case MultinodeJvmArgs(a, b) =>
           val value = System.getProperty("multinode." + a + b)
           "-" + a + b + (if (value == "") "" else "=" + value)
         case key: String if knownPrefix.exists(pre => key.startsWith(pre)) =>
           "-D" + key + "=" + System.getProperty(key)
-      }
 
     "-Xmx256m" :: akkaProperties ::: CliOptions.sbtLogNoFormat
       .ifTrue("-Dakka.test.nocolor=true")
       .toList
-  }
 
   private val multiJvmSettings =
     SbtMultiJvm.multiJvmSettings ++ inConfig(MultiJvm)(
@@ -72,7 +69,7 @@ object MultiNode extends AutoPlugin {
       .map(multiNodeJavaName in MultiJvm := _) ++ CliOptions.targetDirName.map(
         multiNodeTargetDirName in MultiJvm := _) ++ // make sure that MultiJvm tests are executed by the default test target,
     // and combine the results from ordinary test and multi-jvm tests
-    (executeTests in Test <<= (executeTests in Test, multiExecuteTests) map {
+    (executeTests in Test <<= (executeTests in Test, multiExecuteTests) map
           case (testResults, multiNodeResults) =>
             val overall =
               if (testResults.overall.id < multiNodeResults.overall.id)
@@ -81,24 +78,23 @@ object MultiNode extends AutoPlugin {
             Tests.Output(overall,
                          testResults.events ++ multiNodeResults.events,
                          testResults.summaries ++ multiNodeResults.summaries)
-        })
-}
+        )
 
 /**
   * Additional settings for scalatest.
   */
-object MultiNodeScalaTest extends AutoPlugin {
+object MultiNodeScalaTest extends AutoPlugin
 
   override def requires = MultiNode
 
   override lazy val projectSettings = Seq(
-      extraOptions in MultiJvm <<= (sourceDirectory in MultiJvm) {
+      extraOptions in MultiJvm <<= (sourceDirectory in MultiJvm)
         src => (name: String) =>
           (src ** (name + ".conf")).get.headOption
             .map("-Dakka.config=" + _.absolutePath)
             .toSeq
-      },
-      scalatestOptions in MultiJvm := {
+      ,
+      scalatestOptions in MultiJvm :=
         Seq("-C", "org.scalatest.extra.QuietReporter") ++
         (if (excludeTestTags.value.isEmpty) Seq.empty
          else
@@ -112,6 +108,4 @@ object MultiNodeScalaTest extends AutoPlugin {
                if (MultiNode.CliOptions.multiNode.get)
                  onlyTestTags.value.mkString("\"", " ", "\"")
                else onlyTestTags.value.mkString(" ")))
-      }
   )
-}

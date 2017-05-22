@@ -7,11 +7,11 @@ import org.scalacheck.{Arbitrary, Properties}
 import org.scalacheck.Prop._
 import spire.implicits._
 
-object BinaryMergeCheck extends Properties("QuickArrayMerge") {
+object BinaryMergeCheck extends Properties("QuickArrayMerge")
 
   implicit val arbitraryArray = implicitly[Arbitrary[Array[Int]]]
 
-  property("merge") = forAll { (a: Array[Int], b: Array[Int]) =>
+  property("merge") = forAll  (a: Array[Int], b: Array[Int]) =>
     val r = (a ++ b)
     Arrays.sort(a)
     Arrays.sort(b)
@@ -27,9 +27,8 @@ object BinaryMergeCheck extends Properties("QuickArrayMerge") {
     //      println(s"$worstCase ${order.count}")
     //    }
     r1.corresponds(r)(_ == _)
-  }
 
-  property("merge order") = forAll { (a: Array[Int], b: Array[Int]) =>
+  property("merge order") = forAll  (a: Array[Int], b: Array[Int]) =>
     val r = (a ++ b)
     Arrays.sort(a)
     Arrays.sort(b)
@@ -41,5 +40,3 @@ object BinaryMergeCheck extends Properties("QuickArrayMerge") {
     val worstCase = math.max(a.length + b.length - 1, 0)
     // println(s"${o1.count} ${o2.count} $worstCase")
     r1.corresponds(r2)(_ == _)
-  }
-}

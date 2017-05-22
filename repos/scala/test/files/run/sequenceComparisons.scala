@@ -1,7 +1,7 @@
 import scala.collection.{mutable, immutable}
 import collection.{Seq, Traversable}
 
-object Test {
+object Test
   // TODO:
   //
   // SeqProxy
@@ -30,7 +30,7 @@ object Test {
       immutable.Stream(_: _*)
   )
 
-  abstract class Data[T] {
+  abstract class Data[T]
     val seq: Seq[T]
     private def seqList = seq.toList
     // _1 is inputs which must be true, _2 which must be false
@@ -39,10 +39,9 @@ object Test {
         f: (Seq[T], Seq[T]) => Boolean,
         inputs: Inputs,
         descr: String
-    ) {
+    )
       def trueList = inputs._1
       def falseList = inputs._2
-    }
 
     lazy val eqeq = Method(
         _ == _,
@@ -67,9 +66,8 @@ object Test {
 
     def methodList =
       List(eqeq, startsWith, endsWith, indexOfSlice, sameElements)
-  }
 
-  object test1 extends Data[Int] {
+  object test1 extends Data[Int]
     val seq = List(1, 2, 3, 4, 5)
 
     val startsWithInputs = (
@@ -105,37 +103,30 @@ object Test {
              List(1, 2, 3, 5, 4),
              seq.reverse)
     )
-  }
 
   val failures = new mutable.ListBuffer[String]
   var testCount = 0
 
-  def assertOne(op1: Any, op2: Any, res: Boolean, str: String) {
+  def assertOne(op1: Any, op2: Any, res: Boolean, str: String)
     testCount += 1
     val resStr = str.format(op1, op2)
     // println(resStr)
     if (!res) failures += ("FAIL: " + resStr)
     // assert(res, resStr)
-  }
 
-  def runSeqs() = {
-    for (s1f <- seqMakers; s2f <- seqMakers; testData <- List(test1)) {
+  def runSeqs() =
+    for (s1f <- seqMakers; s2f <- seqMakers; testData <- List(test1))
       import testData._
       val scrut = s1f(seq)
 
-      for (Method(f, (trueList, falseList), descr) <- methodList) {
+      for (Method(f, (trueList, falseList), descr) <- methodList)
         for (s <- trueList; rhs = s2f(s)) assertOne(
             scrut, rhs, f(scrut, rhs), descr)
 
         for (s <- falseList; rhs = s2f(s)) assertOne(
             scrut, rhs, !f(scrut, rhs), "!(" + descr + ")")
-      }
-    }
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     runSeqs()
 
     assert(failures.isEmpty, failures mkString "\n")
-  }
-}

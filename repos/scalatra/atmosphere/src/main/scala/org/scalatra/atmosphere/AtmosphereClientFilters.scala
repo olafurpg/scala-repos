@@ -3,7 +3,7 @@ package org.scalatra.atmosphere
 /**
   * Useful filters to limit who receives broadcasts.
   */
-trait AtmosphereClientFilters extends Serializable {
+trait AtmosphereClientFilters extends Serializable
 
   /**
     * A unique identifier for a given connection. Can be used for filtering
@@ -26,4 +26,3 @@ trait AtmosphereClientFilters extends Serializable {
   final protected def OnlySelf: ClientFilter = new OnlySelf(uuid)
 
   final protected def Me: ClientFilter = OnlySelf
-}

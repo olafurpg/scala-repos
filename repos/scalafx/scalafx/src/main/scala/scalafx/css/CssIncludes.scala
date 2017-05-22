@@ -52,7 +52,7 @@ object CssIncludes extends CssIncludes
   * @define MD CssMetaData
   * @define FD FontCssMetaData
   */
-trait CssIncludes {
+trait CssIncludes
 
   /*
    * $START$PV.html $PV$END
@@ -80,9 +80,9 @@ trait CssIncludes {
     */
   implicit def jfxStyleable2sfx(s: jfxcss.Styleable): Styleable =
     if (s != null)
-      new Styleable {
+      new Styleable
         override val delegate = s
-      } else null
+      else null
 
   /*
    * $START$SP.html $SP$END
@@ -132,4 +132,3 @@ trait CssIncludes {
   implicit def jfxStyleConverter2sfx[F, T](
       sc: jfxcss.StyleConverter[F, T]): StyleConverter[F, T] =
     if (sc != null) new StyleConverter[F, T](sc) else null
-}

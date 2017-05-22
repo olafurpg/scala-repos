@@ -7,11 +7,11 @@ import org.apache.zookeeper.{Watcher, WatchedEvent}
 
 private[serverset2] class ApacheWatcher(
     statsIn: StatsReceiver = NullStatsReceiver)
-    extends Watcher with EventStats {
+    extends Watcher with EventStats
   protected val stats = statsIn
   val state = Var[WatchState](WatchState.Pending)
-  def process(event: WatchedEvent) = {
-    event.getType match {
+  def process(event: WatchedEvent) =
+    event.getType match
       case Watcher.Event.EventType.None =>
         EventDeliveryThread.offer(
             state,
@@ -19,6 +19,3 @@ private[serverset2] class ApacheWatcher(
       case e =>
         EventDeliveryThread.offer(
             state, WatchState.Determined(EventFilter(ApacheNodeEvent(e))))
-    }
-  }
-}

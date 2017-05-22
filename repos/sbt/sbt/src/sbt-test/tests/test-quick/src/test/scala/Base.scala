@@ -1,5 +1,4 @@
 import java.io.File
 
-trait Base {
+trait Base
   val marker = new File("marker")
-}

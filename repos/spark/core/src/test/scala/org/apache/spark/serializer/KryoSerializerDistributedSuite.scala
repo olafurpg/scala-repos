@@ -24,9 +24,9 @@ import org.apache.spark.serializer.KryoDistributedTest._
 import org.apache.spark.util.Utils
 
 class KryoSerializerDistributedSuite
-    extends SparkFunSuite with LocalSparkContext {
+    extends SparkFunSuite with LocalSparkContext
 
-  test("kryo objects are serialised consistently in different processes") {
+  test("kryo objects are serialised consistently in different processes")
     val conf = new SparkConf(false)
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
       .set("spark.kryo.registrator", classOf[AppJarRegistrator].getName)
@@ -47,29 +47,22 @@ class KryoSerializerDistributedSuite
 
     // Randomly mix the keys so that the join below will require a shuffle with each partition
     // sending data to multiple other partitions.
-    val shuffledRDD = cachedRDD.map {
+    val shuffledRDD = cachedRDD.map
       case (i, o) => (i * i * i - 10 * i * i, o)
-    }
 
     // Join the two RDDs, and force evaluation
     assert(shuffledRDD.join(cachedRDD).collect().size == 1)
-  }
-}
 
-object KryoDistributedTest {
+object KryoDistributedTest
   class MyCustomClass
 
-  class AppJarRegistrator extends KryoRegistrator {
-    override def registerClasses(k: Kryo) {
+  class AppJarRegistrator extends KryoRegistrator
+    override def registerClasses(k: Kryo)
       val classLoader = Thread.currentThread.getContextClassLoader
       // scalastyle:off classforname
       k.register(
           Class.forName(AppJarRegistrator.customClassName, true, classLoader))
       // scalastyle:on classforname
-    }
-  }
 
-  object AppJarRegistrator {
+  object AppJarRegistrator
     val customClassName = "KryoSerializerDistributedSuiteCustomClass"
-  }
-}

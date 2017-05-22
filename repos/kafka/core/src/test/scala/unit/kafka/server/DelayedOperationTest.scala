@@ -19,23 +19,21 @@ package kafka.server
 import org.junit.{After, Before, Test}
 import org.junit.Assert._
 
-class DelayedOperationTest {
+class DelayedOperationTest
 
   var purgatory: DelayedOperationPurgatory[MockDelayedOperation] = null
 
   @Before
-  def setUp() {
+  def setUp()
     purgatory = new DelayedOperationPurgatory[MockDelayedOperation](
         purgatoryName = "mock")
-  }
 
   @After
-  def tearDown() {
+  def tearDown()
     purgatory.shutdown()
-  }
 
   @Test
-  def testRequestSatisfaction() {
+  def testRequestSatisfaction()
     val r1 = new MockDelayedOperation(100000L)
     val r2 = new MockDelayedOperation(100000L)
     assertEquals("With no waiting requests, nothing should be satisfied",
@@ -55,10 +53,9 @@ class DelayedOperationTest {
     r2.completable = true
     assertEquals("r2 satisfied", 1, purgatory.checkAndComplete("test2"))
     assertEquals("Nothing satisfied", 0, purgatory.checkAndComplete("test2"))
-  }
 
   @Test
-  def testRequestExpiry() {
+  def testRequestExpiry()
     val expiration = 20L
     val start = System.currentTimeMillis
     val r1 = new MockDelayedOperation(expiration)
@@ -74,10 +71,9 @@ class DelayedOperationTest {
     assertTrue("Time for expiration %d should at least %d".format(
                    elapsed, expiration),
                elapsed >= expiration)
-  }
 
   @Test
-  def testRequestPurge() {
+  def testRequestPurge()
     val r1 = new MockDelayedOperation(100000L)
     val r2 = new MockDelayedOperation(100000L)
     val r3 = new MockDelayedOperation(100000L)
@@ -126,28 +122,20 @@ class DelayedOperationTest {
                  purgatory.watched(),
                  1,
                  purgatory.watched())
-  }
 
-  class MockDelayedOperation(delayMs: Long) extends DelayedOperation(delayMs) {
+  class MockDelayedOperation(delayMs: Long) extends DelayedOperation(delayMs)
     var completable = false
 
-    def awaitExpiration() {
-      synchronized {
+    def awaitExpiration()
+      synchronized
         wait()
-      }
-    }
 
-    override def tryComplete() = {
+    override def tryComplete() =
       if (completable) forceComplete()
       else false
-    }
 
     override def onExpiration() {}
 
-    override def onComplete() {
-      synchronized {
+    override def onComplete()
+      synchronized
         notify()
-      }
-    }
-  }
-}

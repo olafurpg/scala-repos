@@ -1,5 +1,4 @@
 package foo
 
-package object bar {
+package object bar
   type Foo = Int => String
-}

@@ -13,7 +13,7 @@ import org.json4s.ext.{EnumNameSerializer, JodaTimeSerializers}
 import org.scalatra.HttpMethod
 import org.scalatra.util.RicherString._
 
-object SwaggerSerializers {
+object SwaggerSerializers
   import org.scalatra.swagger.AllowableValues._
   private val simpleTypes = Set("int32",
                                 "int64",
@@ -31,14 +31,13 @@ object SwaggerSerializers {
     jv.getAs[String].flatMap(_.blankOption)
 
   private[swagger] def dontAddOnEmpty(key: String, value: List[String])(
-      json: JValue) = {
+      json: JValue) =
     if (value.nonEmpty)
       json merge JObject(List(key -> JArray(value map (JString(_))))) else json
-  }
 
   lazy val Iso8601Date = ISODateTimeFormat.dateTime.withZone(DateTimeZone.UTC)
 
-  object SwaggerFormats {
+  object SwaggerFormats
     val serializers =
       JodaTimeSerializers.all ++ Seq(new EnumNameSerializer(ParamType),
                                      new HttpMethodSerializer,
@@ -48,8 +47,7 @@ object SwaggerSerializers {
                                      new ResponseMessageSerializer,
                                      new ParameterSerializer,
                                      new GrantTypeSerializer)
-  }
-  trait SwaggerFormats extends DefaultFormats {
+  trait SwaggerFormats extends DefaultFormats
 
     private[this] val self = this
 
@@ -58,13 +56,12 @@ object SwaggerSerializers {
 
     def withAuthorizationTypeSerializer(
         serializer: Serializer[AuthorizationType]): SwaggerFormats =
-      new SwaggerFormats {
+      new SwaggerFormats
         override val customSerializers: List[Serializer[_]] =
           serializer :: SwaggerFormats.serializers
-      }
 
     override def +[A](newSerializer: FieldSerializer[A]): SwaggerFormats =
-      new SwaggerFormats {
+      new SwaggerFormats
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
         override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
@@ -78,10 +75,9 @@ object SwaggerSerializers {
         override val primitives: Set[Type] = self.primitives
         override val companions: List[(Class[_], AnyRef)] = self.companions
         override val strict: Boolean = self.strict
-      }
 
     override def +(extraHints: TypeHints): SwaggerFormats =
-      new SwaggerFormats {
+      new SwaggerFormats
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
         override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
@@ -95,10 +91,9 @@ object SwaggerSerializers {
         override val primitives: Set[Type] = self.primitives
         override val companions: List[(Class[_], AnyRef)] = self.companions
         override val strict: Boolean = self.strict
-      }
 
     override def withCompanions(comps: (Class[_], AnyRef)*): SwaggerFormats =
-      new SwaggerFormats {
+      new SwaggerFormats
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
         override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
@@ -113,9 +108,8 @@ object SwaggerSerializers {
         override val companions: List[(Class[_], AnyRef)] =
           comps.toList ::: self.companions
         override val strict: Boolean = self.strict
-      }
 
-    override def withDouble: SwaggerFormats = new SwaggerFormats {
+    override def withDouble: SwaggerFormats = new SwaggerFormats
       override val dateFormat: DateFormat = self.dateFormat
       override val typeHintFieldName: String = self.typeHintFieldName
       override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
@@ -129,9 +123,8 @@ object SwaggerSerializers {
       override val primitives: Set[Type] = self.primitives
       override val companions: List[(Class[_], AnyRef)] = self.companions
       override val strict: Boolean = self.strict
-    }
 
-    override def withBigDecimal: SwaggerFormats = new SwaggerFormats {
+    override def withBigDecimal: SwaggerFormats = new SwaggerFormats
       override val dateFormat: DateFormat = self.dateFormat
       override val typeHintFieldName: String = self.typeHintFieldName
       override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
@@ -145,10 +138,9 @@ object SwaggerSerializers {
       override val primitives: Set[Type] = self.primitives
       override val companions: List[(Class[_], AnyRef)] = self.companions
       override val strict: Boolean = self.strict
-    }
 
     override def withHints(hints: TypeHints): SwaggerFormats =
-      new SwaggerFormats {
+      new SwaggerFormats
         override val dateFormat: DateFormat = self.dateFormat
         override val typeHintFieldName: String = self.typeHintFieldName
         override val parameterNameReader: org.json4s.reflect.ParameterNameReader =
@@ -162,12 +154,10 @@ object SwaggerSerializers {
         override val primitives: Set[Type] = self.primitives
         override val companions: List[(Class[_], AnyRef)] = self.companions
         override val strict: Boolean = self.strict
-      }
 
-    override def lossless: SwaggerFormats = new SwaggerFormats {
+    override def lossless: SwaggerFormats = new SwaggerFormats
       override protected def dateFormatter: SimpleDateFormat =
         DefaultFormats.losslessDate()
-    }
 
     override val customSerializers: List[Serializer[_]] =
       new AuthorizationTypeSerializer :: SwaggerFormats.serializers
@@ -175,21 +165,17 @@ object SwaggerSerializers {
         newSerializers: Traversable[Serializer[_]]): SwaggerFormats =
       newSerializers.foldLeft(this)(_ + _)
     override def +(newSerializer: Serializer[_]): SwaggerFormats =
-      new SwaggerFormats {
+      new SwaggerFormats
         override val customSerializers: List[Serializer[_]] =
           newSerializer :: SwaggerFormats.this.customSerializers
-      }
 
-    override val dateFormat = new DateFormat {
+    override val dateFormat = new DateFormat
       def format(d: JDate) = new DateTime(d).toString(Iso8601Date)
       def parse(s: String) =
-        try {
+        try
           Option(Iso8601Date.parseDateTime(s).toDate)
-        } catch {
+        catch
           case _: Throwable ⇒ None
-        }
-    }
-  }
 
   private[swagger] val formats: SwaggerFormats = new SwaggerFormats {}
 
@@ -200,14 +186,14 @@ object SwaggerSerializers {
   class HttpMethodSerializer
       extends CustomSerializer[HttpMethod](
           implicit formats =>
-            ({
+            (
           case JString(method) => HttpMethod(method)
-        }, {
+        ,
           case method: HttpMethod => JString(method.toString)
-        }))
+        ))
 
   def writeDataType(dataType: DataType, key: String = "type")(
-      implicit formats: Formats): JValue = dataType match {
+      implicit formats: Formats): JValue = dataType match
     case DataType.ValueDataType(name, Some(format), _) =>
       ("type" -> name) ~ ("format" -> format)
     case DataType.ValueDataType("string", format, _) =>
@@ -227,42 +213,36 @@ object SwaggerSerializers {
       ("type" -> "array") ~ ("uniqueItems" -> true)
     case DataType.ValueDataType(name, _, qualifiedName) =>
       (key -> name): JValue //~ ("qualifiedType" -> qualifiedName)
-  }
 
-  def readDataType(value: JValue)(implicit formats: Formats): DataType = {
+  def readDataType(value: JValue)(implicit formats: Formats): DataType =
     def karmaIsABitch =
       throw new MappingException(
           "Couldn't determine the type for this data type from " + value)
     val t =
       str(value \ "format") orElse str(value \ "type") orElse str(
           value \ "$ref") getOrElse karmaIsABitch
-    if (isSimpleType(t)) {
-      if (t == "array") {
-        val items = value \ "items" match {
+    if (isSimpleType(t))
+      if (t == "array")
+        val items = value \ "items" match
           case JNothing => None
           case jv => Some(readDataType(jv))
-        }
-        value \ "uniqueItems" match {
+        value \ "uniqueItems" match
           case JBool(true) =>
             items map (DataType.GenSet(_)) getOrElse DataType.GenSet()
           case _ =>
             items map (DataType.GenList(_)) getOrElse DataType.GenList()
-        }
-      } else {
+      else
         DataType((value \ "type").as[String], format = str(value \ "format"))
-      }
-    } else {
+    else
       DataType(t, qualifiedName = str(value \ "qualifiedType"))
-    }
-  }
 
   class AllowableValuesSerializer
       extends CustomSerializer[AllowableValues](implicit formats =>
-            ({
+            (
           case value @ JObject(flds) if flds.exists(_._1 == "enum") =>
-            value \ "enum" match {
+            value \ "enum" match
               case JArray(entries) =>
-                entries.headOption match {
+                entries.headOption match
                   case Some(_: JInt) =>
                     AllowableValuesList(entries.map(_.as[Int]))
                   case Some(_: JDouble) =>
@@ -274,58 +254,54 @@ object SwaggerSerializers {
                   case Some(_: JString) =>
                     AllowableValuesList(entries.map(_.as[String]))
                   case _ => AnyValue
-                }
               case _ => AnyValue
-            }
           case value @ JObject(flds)
               if flds.exists(_._1 == "minimum") &&
               flds.exists(_._1 == "maximum") =>
             AllowableRangeValues(
                 (value \ "minimum").as[Int] to (value \ "maximum").as[Int])
           case _ => AnyValue
-        }, {
+        ,
           case AnyValue => JNothing
           case AllowableValuesList(values) =>
             ("enum" -> Extraction.decompose(values)): JValue
           case AllowableRangeValues(range) =>
             ("minimum" -> range.start) ~ ("maximum" -> range.end)
-        }))
+        ))
 
   class ModelPropertySerializer
       extends CustomSerializer[ModelProperty](implicit formats =>
-            ({
+            (
           case json: JObject =>
             ModelProperty(`type` = readDataType(json),
                           position = (json \ "position").getAsOrElse(0),
-                          json \ "required" match {
+                          json \ "required" match
                             case JString(s) => s.toCheckboxBool
                             case JBool(value) => value
                             case _ => false
-                          },
+                          ,
                           description = (json \ "description")
                               .getAs[String]
                               .flatMap(_.blankOption),
                           allowableValues = json.extract[AllowableValues],
                           items = None)
-        }, {
+        ,
           case x: ModelProperty =>
             val json: JValue =
               ("description" -> x.description) ~ ("position" -> x.position)
             (json merge writeDataType(x.`type`, "$ref")) merge Extraction
               .decompose(x.allowableValues)
-        }))
+        ))
 
   class ModelSerializer
       extends CustomSerializer[Model](implicit formats =>
-            ({
+            (
           case json: JObject =>
-            val properties = json \ "properties" match {
-              case JObject(entries) => {
+            val properties = json \ "properties" match
+              case JObject(entries) =>
                   for ((key, value) <- entries) yield
                     key -> value.extract[ModelProperty]
-                }
               case _ => Nil
-            }
 
             Model(
                 (json \ "id").getAsOrElse(""),
@@ -336,7 +312,7 @@ object SwaggerSerializers {
                 (json \ "extends").getAs[String].flatMap(_.blankOption),
                 (json \ "discriminator").getAs[String].flatMap(_.blankOption)
             )
-        }, {
+        ,
           case x: Model =>
             val required = for ((key, value) <- x.properties
                                                    if value.required) yield key
@@ -347,26 +323,26 @@ object SwaggerSerializers {
                     s => s.nonBlank && !s.trim.equalsIgnoreCase("VOID"))) ~
             ("discriminator" -> x.discriminator) ~
             ("properties" ->
-                (x.properties.sortBy { case (_, p) ⇒ p.position } map {
+                (x.properties.sortBy { case (_, p) ⇒ p.position } map
                       case (k, v) => k -> Extraction.decompose(v)
-                    }))
-        }))
+                    ))
+        ))
 
   class ResponseMessageSerializer
       extends CustomSerializer[ResponseMessage[_]](
           implicit formats =>
-            ({
+            (
           case value: JObject =>
             StringResponseMessage(
                 (value \ "code").as[Int], (value \ "message").as[String])
-        }, {
+        ,
           case StringResponseMessage(code, message) =>
             ("code" -> code) ~ ("message" -> message)
-        }))
+        ))
 
   class ParameterSerializer
       extends CustomSerializer[Parameter](implicit formats =>
-            ({
+            (
           case json: JObject =>
             val t = readDataType(json)
             Parameter(
@@ -379,23 +355,23 @@ object SwaggerSerializers {
                   .flatMap(_.blankOption)
                   .map(ParamType.withName)
                   .getOrElse(ParamType.Query),
-                json \ "defaultValue" match {
+                json \ "defaultValue" match
                   case JInt(num) => Some(num.toString)
                   case JBool(value) => Some(value.toString)
                   case JString(s) => Some(s)
                   case JDouble(num) => Some(num.toString)
                   case JDecimal(num) => Some(num.toString)
                   case _ => None
-                },
+                ,
                 (json \ "allowableValues").extract[AllowableValues],
-                json \ "required" match {
+                json \ "required" match
                   case JString(s) => s.toBoolean
                   case JBool(value) => value
                   case _ => false
-                },
+                ,
                 (json \ "paramAccess").getAs[String].flatMap(_.blankOption)
             )
-        }, {
+        ,
           case x: Parameter =>
             val output =
               ("name" -> x.name) ~ ("description" -> x.description) ~
@@ -405,11 +381,11 @@ object SwaggerSerializers {
 
             (output merge writeDataType(x.`type`)) merge Extraction.decompose(
                 x.allowableValues)
-        }))
+        ))
 
   class OperationSerializer
       extends CustomSerializer[Operation](implicit formats =>
-            ({
+            (
           case value =>
             Operation(
                 (value \ "method").extract[HttpMethod],
@@ -426,7 +402,7 @@ object SwaggerSerializers {
                 (value \ "protocols").extract[List[String]],
                 (value \ "authorizations").extract[List[String]]
             )
-        }, {
+        ,
           case obj: Operation =>
             val json =
               ("method" -> Extraction.decompose(obj.method)) ~
@@ -449,27 +425,27 @@ object SwaggerSerializers {
               (consumes andThen produces andThen authorizations andThen protocols)(
                   json)
             r merge writeDataType(obj.responseClass)
-        }))
+        ))
 
   class EndpointSerializer
       extends CustomSerializer[Endpoint](
           implicit formats =>
-            ({
+            (
           case value =>
             Endpoint((value \ "path").extract[String],
                      (value \ "description")
                        .extractOpt[String]
                        .flatMap(_.blankOption),
                      (value \ "operations").extract[List[Operation]])
-        }, {
+        ,
           case obj: Endpoint =>
             ("path" -> obj.path) ~ ("description" -> obj.description) ~
             ("operations" -> Extraction.decompose(obj.operations))
-        }))
+        ))
 
   class ApiSerializer
       extends CustomSerializer[Api](implicit formats =>
-            ({
+            (
           case json =>
             Api(
                 (json \ "apiVersion").extractOrElse(""),
@@ -488,46 +464,46 @@ object SwaggerSerializers {
                 (json \ "authorizations").extractOrElse(List.empty[String]),
                 (json \ "position").extractOrElse(0)
             )
-        }, {
+        ,
           case x: Api =>
             ("apiVersion" -> x.apiVersion) ~
             ("swaggerVersion" -> x.swaggerVersion) ~
             ("resourcePath" -> x.resourcePath) ~
             ("produces" ->
-                (x.produces match {
+                (x.produces match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("consumes" ->
-                (x.consumes match {
+                (x.consumes match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("protocols" ->
-                (x.protocols match {
+                (x.protocols match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("authorizations" ->
-                (x.authorizations match {
+                (x.authorizations match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("apis" ->
-                (x.apis match {
+                (x.apis match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("models" ->
-                (x.models match {
+                (x.models match
                       case x if x.isEmpty => JNothing
                       case e => Extraction.decompose(e)
-                    }))
-        }))
+                    ))
+        ))
 
   class GrantTypeSerializer
       extends CustomSerializer[GrantType](implicit formats =>
-            ({
+            (
           case value if value \ "type" == JString("implicit") =>
             ImplicitGrant(
                 LoginEndpoint((value \ "loginEndpoint" \ "url").as[String]),
@@ -544,7 +520,7 @@ object SwaggerSerializers {
                 TokenEndpoint(
                     (value \ "tokenEndpoint" \ "url").as[String],
                     (value \ "tokenEndpoint" \ "tokenName").as[String]))
-        }, {
+        ,
           case ImplicitGrant(login, tokenName) =>
             ("type" -> "implicit") ~
             ("loginEndpoint" -> (("url" -> login.url): JValue)) ~
@@ -558,11 +534,11 @@ object SwaggerSerializers {
             ("tokenEndpoint" ->
                 (("url" -> tokenEndpoint.url) ~
                     ("tokenName" -> tokenEndpoint.tokenName)))
-        }))
+        ))
 
   class AuthorizationTypeSerializer
       extends CustomSerializer[AuthorizationType](implicit formats =>
-            ({
+            (
           case value if value \ "type" == JString("apiKey") =>
             ApiKey((value \ "keyname")
                      .extractOpt[String]
@@ -572,14 +548,13 @@ object SwaggerSerializers {
           case value if value \ "type" == JString("oauth2") =>
             OAuth((value \ "scopes").extract[List[String]],
                   (value \ "grantTypes").extract[List[GrantType]])
-        }, {
+        ,
           case obj @ OAuth(scopes, grantTypes) =>
             ("type" -> obj.`type`) ~ ("scopes" -> scopes) ~
-            ("grantTypes" -> (for (t <- grantTypes) yield {
+            ("grantTypes" -> (for (t <- grantTypes) yield
                   (t.`type`, Extraction.decompose(t))
-                }).toMap)
+                ).toMap)
           case obj @ ApiKey(keyname, passAs) =>
             ("type" -> obj.`type`) ~ ("passAs" -> passAs) ~
             ("keyname" -> keyname)
-        }))
-}
+        ))

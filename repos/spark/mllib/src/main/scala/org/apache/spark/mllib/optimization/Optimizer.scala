@@ -26,10 +26,9 @@ import org.apache.spark.rdd.RDD
   * Trait for optimization problem solvers.
   */
 @DeveloperApi
-trait Optimizer extends Serializable {
+trait Optimizer extends Serializable
 
   /**
     * Solve the provided convex optimization problem.
     */
   def optimize(data: RDD[(Double, Vector)], initialWeights: Vector): Vector
-}

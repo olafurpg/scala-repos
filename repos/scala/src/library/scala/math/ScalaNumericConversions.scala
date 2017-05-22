@@ -13,14 +13,13 @@ package math
   *  extend ScalaNumber (which excludes value classes.)
   */
 trait ScalaNumericConversions
-    extends ScalaNumber with ScalaNumericAnyConversions {
+    extends ScalaNumber with ScalaNumericAnyConversions
   def underlying(): Object
-}
 
 /** Conversions which present a consistent conversion interface
   *  across all the numeric types, suitable for use in value classes.
   */
-trait ScalaNumericAnyConversions extends Any {
+trait ScalaNumericAnyConversions extends Any
 
   /** @return `'''true'''` if this number has no decimal component, `'''false'''` otherwise. */
   def isWhole(): Boolean
@@ -89,11 +88,10 @@ trait ScalaNumericAnyConversions extends Any {
   def isValidChar =
     isWhole && (toInt >= Char.MinValue && toInt <= Char.MaxValue)
 
-  protected def unifiedPrimitiveHashcode() = {
+  protected def unifiedPrimitiveHashcode() =
     val lv = toLong
     if (lv >= Int.MinValue && lv <= Int.MaxValue) lv.toInt
     else lv.##
-  }
 
   /** Should only be called after all known non-primitive
     *  types have been excluded.  This method won't dispatch
@@ -109,7 +107,7 @@ trait ScalaNumericAnyConversions extends Any {
     *  than Double can hold: same thing.  There's no way given the
     *  interface available here to prevent this error.
     */
-  protected def unifiedPrimitiveEquals(x: Any) = x match {
+  protected def unifiedPrimitiveEquals(x: Any) = x match
     case x: Char => isValidChar && (toInt == x.toInt)
     case x: Byte => isValidByte && (toByte == x)
     case x: Short => isValidShort && (toShort == x)
@@ -118,5 +116,3 @@ trait ScalaNumericAnyConversions extends Any {
     case x: Float => toFloat == x
     case x: Double => toDouble == x
     case _ => false
-  }
-}

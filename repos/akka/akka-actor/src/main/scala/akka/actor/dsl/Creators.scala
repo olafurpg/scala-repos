@@ -6,7 +6,7 @@ package akka.actor.dsl
 import akka.actor._
 import scala.reflect.ClassTag
 
-trait Creators {
+trait Creators
   this: ActorDSL.type ⇒
 
   /**
@@ -31,7 +31,7 @@ trait Creators {
     * Using the life-cycle keywords multiple times results in replacing the
     * content of the respective hook.
     */
-  trait Act extends Actor {
+  trait Act extends Actor
 
     private[this] var preStartFun: () ⇒ Unit = null
     private[this] var postStopFun: () ⇒ Unit = null
@@ -137,7 +137,6 @@ trait Creators {
       * Default behavior of the actor is empty, use `become` to change this.
       */
     override def receive: Receive = Actor.emptyBehavior
-  }
 
   /**
     * Use this trait when defining an [[akka.actor.Actor]] with [[akka.actor.Stash]],
@@ -160,12 +159,11 @@ trait Creators {
     *        where the latter is always implicitly available within an [[akka.actor.Actor]].
     */
   def actor[T <: Actor : ClassTag](ctor: ⇒ T)(
-      implicit factory: ActorRefFactory): ActorRef = {
+      implicit factory: ActorRefFactory): ActorRef =
     // configure dispatcher/mailbox based on runtime class
     val classOfActor = implicitly[ClassTag[T]].runtimeClass
     val props = mkProps(classOfActor, () ⇒ ctor)
     factory.actorOf(props)
-  }
 
   /**
     * Create an actor from the given thunk which must produce an [[akka.actor.Actor]].
@@ -180,14 +178,13 @@ trait Creators {
     *        where the latter is always implicitly available within an [[akka.actor.Actor]].
     */
   def actor[T <: Actor : ClassTag](name: String)(ctor: ⇒ T)(
-      implicit factory: ActorRefFactory): ActorRef = {
+      implicit factory: ActorRefFactory): ActorRef =
     // configure dispatcher/mailbox based on runtime class
     val classOfActor = implicitly[ClassTag[T]].runtimeClass
     val props = mkProps(classOfActor, () ⇒ ctor)
 
     if (name == null) factory.actorOf(props)
     else factory.actorOf(props, name)
-  }
 
   /**
     * Create an actor from the given thunk which must produce an [[akka.actor.Actor]].
@@ -219,4 +216,3 @@ trait Creators {
   def actor[T <: Actor : ClassTag](factory: ActorRefFactory)(
       ctor: ⇒ T): ActorRef =
     actor(null: String)(ctor)(implicitly[ClassTag[T]], factory)
-}

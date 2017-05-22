@@ -7,7 +7,7 @@ import com.twitter.finagle.transport.Transport
 import com.twitter.util.Future
 import java.net.SocketAddress
 
-object Bridge {
+object Bridge
 
   /**
     * Bridges a transporter with a dispatcher, returning a function that,
@@ -26,7 +26,7 @@ object Bridge {
       transporter: (SocketAddress,
       StatsReceiver) => Future[Transport[In, Out]],
       newDispatcher: Transport[In, Out] => Service[Req, Rep]
-  ): ((Address, StatsReceiver) => ServiceFactory[Req, Rep]) = {
+  ): ((Address, StatsReceiver) => ServiceFactory[Req, Rep]) =
     case (Address.Inet(ia, _), sr) =>
       ServiceFactory(() => transporter(ia, sr) map newDispatcher)
     case (com.twitter.finagle.exp.Address
@@ -34,5 +34,3 @@ object Bridge {
           _) =>
       sf
     case (Address.Failed(e), _) => new FailingFactory(e)
-  }
-}

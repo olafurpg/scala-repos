@@ -1,16 +1,14 @@
 import Function._
 
-object Test extends App {
+object Test extends App
   var xyz: (Int, String, Boolean) = _
   xyz = (1, "abc", true)
   Console.println(xyz)
-  xyz match {
+  xyz match
     case (1, "abc", true) => Console.println("OK")
     case _ => ???
-  }
-  def func(x: Int, y: String, z: Double) {
+  def func(x: Int, y: String, z: Double)
     Console.println("x = " + x + "; y = " + y + "; z = " + z);
-  }
 
   def params = (2, "xxx", 3.14159) // (*****)
 
@@ -28,4 +26,3 @@ object Test extends App {
   assert(i == 1)
   assert(s == "Hello")
   assert(b == false)
-}

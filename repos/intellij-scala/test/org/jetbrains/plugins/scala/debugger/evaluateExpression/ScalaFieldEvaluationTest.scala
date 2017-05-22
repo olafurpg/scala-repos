@@ -11,7 +11,7 @@ class ScalaFieldEvaluationTest
 class ScalaFieldEvaluationTest_212
     extends ScalaFieldEvaluationTestBase with ScalaVersion_2_12
 
-abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
+abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase
 
   addFileWithBreakpoints("Static.scala",
                          s"""
@@ -24,16 +24,14 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testStatic(): Unit = {
-    runDebugger() {
+  def testStatic(): Unit =
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("x", "23")
       evalStartsWith("scala.math.Pi", "3.14") //from package object
       evalStartsWith("scala.Predef.Map", "scala.collection.immutable.Map$")
       evalStartsWith("java.lang.Math.PI", "3.14") //static java
       evalStartsWith("y", "1") //private this
-    }
-  }
 
   addFileWithBreakpoints("test/Java.java",
                          s"""
@@ -53,13 +51,11 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testSimpleJava() {
-    runDebugger() {
+  def testSimpleJava()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("x.x", "23")
       evalStartsWith("Java.y", "42")
-    }
-  }
 
   addFileWithBreakpoints("PrivateThisField.scala",
                          s"""
@@ -86,15 +82,13 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testPrivateThisField() {
-    runDebugger() {
+  def testPrivateThisField()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("x", "0")
       evalStartsWith("y", "1")
       evalStartsWith("z", "2")
       evalStartsWith("w", "3")
-    }
-  }
 
   addFileWithBreakpoints("NonStatic.scala",
                          s"""
@@ -113,15 +107,13 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
       |  val t = 100
       |}
     """.stripMargin.trim())
-  def testNonStatic() {
-    runDebugger() {
+  def testNonStatic()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("a.x", "0")
       evalStartsWith("a.y", "1")
       evalStartsWith("a.z", "2")
       evalStartsWith("a.w", "3")
-    }
-  }
 
   addFileWithBreakpoints("SimpleDynamicField.scala",
                          s"""
@@ -134,10 +126,7 @@ abstract class ScalaFieldEvaluationTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testSimpleDynamicField() {
-    runDebugger() {
+  def testSimpleDynamicField()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("x.x", "23")
-    }
-  }
-}

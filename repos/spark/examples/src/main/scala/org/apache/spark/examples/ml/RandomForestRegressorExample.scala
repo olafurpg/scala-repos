@@ -27,8 +27,8 @@ import org.apache.spark.ml.regression.{RandomForestRegressionModel, RandomForest
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object RandomForestRegressorExample {
-  def main(args: Array[String]): Unit = {
+object RandomForestRegressorExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("RandomForestRegressorExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -80,6 +80,4 @@ object RandomForestRegressorExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

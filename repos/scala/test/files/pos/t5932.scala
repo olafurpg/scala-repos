@@ -2,7 +2,7 @@ class A
 
 case object B extends A
 
-object Test {
+object Test
   val x1 = (B: A)
 
   println(x1 == B) // no warning
@@ -12,4 +12,3 @@ object Test {
 
   println(x2 == B) // no warning
   println(B == x2) // spurious warning: "always returns false"
-}

@@ -62,7 +62,7 @@ object CellIncludes extends CellIncludes
   * @define TTYPE The type of the elements contained within the Element
   * @define STYPE The type of the elements contained  ...
   */
-trait CellIncludes {
+trait CellIncludes
 
   /**
     * $START$CHBLC.html $CHBLC$END
@@ -257,4 +257,3 @@ trait CellIncludes {
       cell: jfxscc.TextFieldTreeTableCell[S, T])
     : TextFieldTreeTableCell[S, T] =
     if (cell != null) new TextFieldTreeTableCell[S, T](cell) else null
-}

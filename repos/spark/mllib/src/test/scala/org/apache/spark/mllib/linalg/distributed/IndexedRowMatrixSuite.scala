@@ -24,7 +24,7 @@ import org.apache.spark.mllib.linalg.{Matrices, Vectors}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
 
-class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
+class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext
 
   val m = 4
   val n = 3
@@ -35,12 +35,11 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
   ).map(x => IndexedRow(x._1, x._2))
   var indexedRows: RDD[IndexedRow] = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     indexedRows = sc.parallelize(data, 2)
-  }
 
-  test("size") {
+  test("size")
     val mat1 = new IndexedRowMatrix(indexedRows)
     assert(mat1.numRows() === m)
     assert(mat1.numCols() === n)
@@ -48,60 +47,50 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     val mat2 = new IndexedRowMatrix(indexedRows, 5, 0)
     assert(mat2.numRows() === 5)
     assert(mat2.numCols() === n)
-  }
 
-  test("empty rows") {
+  test("empty rows")
     val rows = sc.parallelize(Seq[IndexedRow](), 1)
     val mat = new IndexedRowMatrix(rows)
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       mat.numRows()
-    }
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       mat.numCols()
-    }
-  }
 
-  test("toBreeze") {
+  test("toBreeze")
     val mat = new IndexedRowMatrix(indexedRows)
     val expected = BDM((0.0, 1.0, 2.0),
                        (3.0, 4.0, 5.0),
                        (0.0, 0.0, 0.0),
                        (9.0, 0.0, 1.0))
     assert(mat.toBreeze() === expected)
-  }
 
-  test("toRowMatrix") {
+  test("toRowMatrix")
     val idxRowMat = new IndexedRowMatrix(indexedRows)
     val rowMat = idxRowMat.toRowMatrix()
     assert(rowMat.numCols() === n)
     assert(rowMat.numRows() === 3, "should drop empty rows")
     assert(rowMat.rows.collect().toSeq === data.map(_.vector).toSeq)
-  }
 
-  test("toCoordinateMatrix") {
+  test("toCoordinateMatrix")
     val idxRowMat = new IndexedRowMatrix(indexedRows)
     val coordMat = idxRowMat.toCoordinateMatrix()
     assert(coordMat.numRows() === m)
     assert(coordMat.numCols() === n)
     assert(coordMat.toBreeze() === idxRowMat.toBreeze())
-  }
 
-  test("toBlockMatrix") {
+  test("toBlockMatrix")
     val idxRowMat = new IndexedRowMatrix(indexedRows)
     val blockMat = idxRowMat.toBlockMatrix(2, 2)
     assert(blockMat.numRows() === m)
     assert(blockMat.numCols() === n)
     assert(blockMat.toBreeze() === idxRowMat.toBreeze())
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       idxRowMat.toBlockMatrix(-1, 2)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       idxRowMat.toBlockMatrix(2, 0)
-    }
-  }
 
-  test("multiply a local matrix") {
+  test("multiply a local matrix")
     val A = new IndexedRowMatrix(indexedRows)
     val B = Matrices.dense(3, 2, Array(0.0, 1.0, 2.0, 3.0, 4.0, 5.0))
     val C = A.multiply(B)
@@ -109,17 +98,15 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     val localC = C.toBreeze()
     val expected = localA * B.toBreeze.asInstanceOf[BDM[Double]]
     assert(localC === expected)
-  }
 
-  test("gram") {
+  test("gram")
     val A = new IndexedRowMatrix(indexedRows)
     val G = A.computeGramianMatrix()
     val expected =
       BDM((90.0, 12.0, 24.0), (12.0, 17.0, 22.0), (24.0, 22.0, 30.0))
     assert(G.toBreeze === expected)
-  }
 
-  test("svd") {
+  test("svd")
     val A = new IndexedRowMatrix(indexedRows)
     val svd = A.computeSVD(n, computeU = true)
     assert(svd.U.isInstanceOf[IndexedRowMatrix])
@@ -130,9 +117,8 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(closeToZero(U.t * U - BDM.eye[Double](n)))
     assert(closeToZero(V.t * V - BDM.eye[Double](n)))
     assert(closeToZero(U * brzDiag(s) * V.t - localA))
-  }
 
-  test("validate matrix sizes of svd") {
+  test("validate matrix sizes of svd")
     val k = 2
     val A = new IndexedRowMatrix(indexedRows)
     val svd = A.computeSVD(k, computeU = true)
@@ -141,28 +127,21 @@ class IndexedRowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(svd.s.size === k)
     assert(svd.V.numRows === n)
     assert(svd.V.numCols === k)
-  }
 
-  test("validate k in svd") {
+  test("validate k in svd")
     val A = new IndexedRowMatrix(indexedRows)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       A.computeSVD(-1)
-    }
-  }
 
-  test("similar columns") {
+  test("similar columns")
     val A = new IndexedRowMatrix(indexedRows)
     val gram = A.computeGramianMatrix().toBreeze.toDenseMatrix
 
     val G = A.columnSimilarities().toBreeze()
 
-    for (i <- 0 until n; j <- i + 1 until n) {
+    for (i <- 0 until n; j <- i + 1 until n)
       val trueResult = gram(i, j) / scala.math.sqrt(gram(i, i) * gram(j, j))
       assert(math.abs(G(i, j) - trueResult) < 1e-6)
-    }
-  }
 
-  def closeToZero(G: BDM[Double]): Boolean = {
+  def closeToZero(G: BDM[Double]): Boolean =
     G.valuesIterator.map(math.abs).sum < 1e-6
-  }
-}

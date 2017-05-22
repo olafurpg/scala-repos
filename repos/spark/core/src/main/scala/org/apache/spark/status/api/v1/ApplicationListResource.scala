@@ -24,42 +24,36 @@ import org.apache.spark.deploy.history.ApplicationHistoryInfo
 import org.apache.spark.deploy.master.{ApplicationInfo => InternalApplicationInfo}
 
 @Produces(Array(MediaType.APPLICATION_JSON))
-private[v1] class ApplicationListResource(uiRoot: UIRoot) {
+private[v1] class ApplicationListResource(uiRoot: UIRoot)
 
   @GET
   def appList(
       @QueryParam("status") status: JList[ApplicationStatus],
       @DefaultValue("2010-01-01") @QueryParam("minDate") minDate: SimpleDateParam,
       @DefaultValue("3000-01-01") @QueryParam("maxDate") maxDate: SimpleDateParam)
-    : Iterator[ApplicationInfo] = {
+    : Iterator[ApplicationInfo] =
     val allApps = uiRoot.getApplicationInfoList
-    val adjStatus = {
-      if (status.isEmpty) {
+    val adjStatus =
+      if (status.isEmpty)
         Arrays.asList(ApplicationStatus.values(): _*)
-      } else {
+      else
         status
-      }
-    }
     val includeCompleted = adjStatus.contains(ApplicationStatus.COMPLETED)
     val includeRunning = adjStatus.contains(ApplicationStatus.RUNNING)
-    allApps.filter { app =>
+    allApps.filter  app =>
       val anyRunning = app.attempts.exists(!_.completed)
       // if any attempt is still running, we consider the app to also still be running
       val statusOk =
         (!anyRunning && includeCompleted) || (anyRunning && includeRunning)
       // keep the app if *any* attempts fall in the right time window
-      val dateOk = app.attempts.exists { attempt =>
+      val dateOk = app.attempts.exists  attempt =>
         attempt.startTime.getTime >= minDate.timestamp &&
         attempt.startTime.getTime <= maxDate.timestamp
-      }
       statusOk && dateOk
-    }
-  }
-}
 
-private[spark] object ApplicationsListResource {
+private[spark] object ApplicationsListResource
   def appHistoryInfoToPublicAppInfo(
-      app: ApplicationHistoryInfo): ApplicationInfo = {
+      app: ApplicationHistoryInfo): ApplicationInfo =
     new ApplicationInfo(
         id = app.id,
         name = app.name,
@@ -67,26 +61,24 @@ private[spark] object ApplicationsListResource {
         maxCores = None,
         coresPerExecutor = None,
         memoryPerExecutorMB = None,
-        attempts = app.attempts.map { internalAttemptInfo =>
+        attempts = app.attempts.map  internalAttemptInfo =>
           new ApplicationAttemptInfo(
               attemptId = internalAttemptInfo.attemptId,
               startTime = new Date(internalAttemptInfo.startTime),
               endTime = new Date(internalAttemptInfo.endTime),
-              duration = if (internalAttemptInfo.endTime > 0) {
+              duration = if (internalAttemptInfo.endTime > 0)
                 internalAttemptInfo.endTime - internalAttemptInfo.startTime
-              } else {
+              else
                 0
-              },
+              ,
               lastUpdated = new Date(internalAttemptInfo.lastUpdated),
               sparkUser = internalAttemptInfo.sparkUser,
               completed = internalAttemptInfo.completed
           )
-        }
     )
-  }
 
   def convertApplicationInfo(internal: InternalApplicationInfo,
-                             completed: Boolean): ApplicationInfo = {
+                             completed: Boolean): ApplicationInfo =
     // standalone application info always has just one attempt
     new ApplicationInfo(
         id = internal.id,
@@ -100,15 +92,13 @@ private[spark] object ApplicationsListResource {
                   attemptId = None,
                   startTime = new Date(internal.startTime),
                   endTime = new Date(internal.endTime),
-                  duration = if (internal.endTime > 0) {
+                  duration = if (internal.endTime > 0)
               internal.endTime - internal.startTime
-            } else {
+            else
               0
-            },
+            ,
                   lastUpdated = new Date(internal.endTime),
                   sparkUser = internal.desc.user,
                   completed = completed
               ))
     )
-  }
-}

@@ -7,8 +7,8 @@ import org.scalatest.junit.JUnitRunner
 import com.twitter.util.Await
 
 @RunWith(classOf[JUnitRunner])
-class AsyncMutexTest extends FlatSpec {
-  "AsyncMutex" should "admit only one operation at a time" in {
+class AsyncMutexTest extends FlatSpec
+  "AsyncMutex" should "admit only one operation at a time" in
     val m = new AsyncMutex
 
     val a0 = m.acquire()
@@ -24,5 +24,3 @@ class AsyncMutexTest extends FlatSpec {
     assert(a2.isDefined == false)
     Await.result(a1).release() // satisfy operation 1
     assert(a2.isDefined == true)
-  }
-}

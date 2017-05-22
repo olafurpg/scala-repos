@@ -16,10 +16,10 @@ import scala.concurrent.duration._
 
 class OfferMatcherReconcilerTest
     extends FunSuite with GivenWhenThen with Mockito with Matchers
-    with ScalaFutures {
+    with ScalaFutures
   import scala.collection.JavaConverters._
 
-  test("offer without reservations leads to no task ops") {
+  test("offer without reservations leads to no task ops")
     val f = new Fixture
     Given("an offer without reservations")
     val offer = MarathonTestHelper.makeBasicOffer().build()
@@ -28,9 +28,8 @@ class OfferMatcherReconcilerTest
       f.reconciler.matchOffer(Timestamp.now() + 1.day, offer).futureValue
     Then("no task ops are generated")
     matchedTaskOps.ops should be(empty)
-  }
 
-  test("offer with volume for unknown tasks/apps leads to unreserve/destroy") {
+  test("offer with volume for unknown tasks/apps leads to unreserve/destroy")
     val f = new Fixture
     Given("an offer with volume")
     val appId = PathId("/test")
@@ -62,9 +61,8 @@ class OfferMatcherReconcilerTest
     // for the nicer error message with diff indication
     matchedTaskOps.ops.mkString("\n") should be(expectedOps.mkString("\n"))
     matchedTaskOps.ops should be(expectedOps)
-  }
 
-  test("offer with volume for unknown tasks leads to unreserve/destroy") {
+  test("offer with volume for unknown tasks leads to unreserve/destroy")
     val f = new Fixture
     Given("an offer with volume")
     val appId = PathId("/test")
@@ -98,9 +96,8 @@ class OfferMatcherReconcilerTest
     // for the nicer error message with diff
     matchedTaskOps.ops.mkString("\n") should be(expectedOps.mkString("\n"))
     matchedTaskOps.ops should be(expectedOps)
-  }
 
-  test("offer with volume for unknown apps leads to unreserve/destroy") {
+  test("offer with volume for unknown apps leads to unreserve/destroy")
     val f = new Fixture
     Given("an offer with volume")
     val appId = PathId("/test")
@@ -134,10 +131,9 @@ class OfferMatcherReconcilerTest
     // for the nicer error message with diff
     matchedTaskOps.ops.mkString("\n") should be(expectedOps.mkString("\n"))
     matchedTaskOps.ops should be(expectedOps)
-  }
 
   test(
-      "offer with volume for known tasks/apps DOES NOT lead to unreserve/destroy") {
+      "offer with volume for known tasks/apps DOES NOT lead to unreserve/destroy")
     val f = new Fixture
     Given("an offer with volume")
     val appId = PathId("/test")
@@ -162,12 +158,9 @@ class OfferMatcherReconcilerTest
 
     Then("no resources are destroyed and unreserved")
     matchedTaskOps.ops should be(empty)
-  }
 
-  class Fixture {
+  class Fixture
     lazy val taskTracker = mock[TaskTracker]
     lazy val groupRepository = mock[GroupRepository]
     lazy val reconciler = new OfferMatcherReconciler(
         taskTracker, groupRepository)
-  }
-}

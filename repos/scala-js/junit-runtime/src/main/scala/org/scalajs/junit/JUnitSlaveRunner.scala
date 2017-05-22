@@ -8,13 +8,12 @@ final class JUnitSlaveRunner(args: Array[String],
                              testClassLoader: ClassLoader,
                              send: String => Unit,
                              runSettings: RunSettings)
-    extends JUnitBaseRunner(args, remoteArgs, testClassLoader, runSettings) {
+    extends JUnitBaseRunner(args, remoteArgs, testClassLoader, runSettings)
 
-  def tasks(taskDefs: Array[TaskDef]): Array[Task] = {
+  def tasks(taskDefs: Array[TaskDef]): Array[Task] =
     taskDefs.map(newTask)
-  }
 
-  def done(): String = {
+  def done(): String =
     send(
         "d" + JUnitBaseRunner
           .Done(doneCount,
@@ -25,9 +24,6 @@ final class JUnitSlaveRunner(args: Array[String],
                 totalCount)
           .serialize)
     ""
-  }
 
-  def receiveMessage(msg: String): Option[String] = {
+  def receiveMessage(msg: String): Option[String] =
     None // <- ignored
-  }
-}

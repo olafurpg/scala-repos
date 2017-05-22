@@ -7,9 +7,9 @@ import akka.actor.{ActorSystem, Props, OneForOneStrategy, SupervisorStrategy}
 import akka.pattern.{Backoff, BackoffSupervisor}
 import akka.testkit.TestActors.EchoActor
 
-class BackoffSupervisorDocSpec {
+class BackoffSupervisorDocSpec
 
-  class BackoffSupervisorDocSpecExampleStop {
+  class BackoffSupervisorDocSpecExampleStop
     val system: ActorSystem = ???
     import scala.concurrent.duration._
 
@@ -27,9 +27,8 @@ class BackoffSupervisorDocSpec {
 
     system.actorOf(supervisor, name = "echoSupervisor")
     //#backoff-stop
-  }
 
-  class BackoffSupervisorDocSpecExampleFail {
+  class BackoffSupervisorDocSpecExampleFail
     val system: ActorSystem = ???
     import scala.concurrent.duration._
 
@@ -47,9 +46,8 @@ class BackoffSupervisorDocSpec {
 
     system.actorOf(supervisor, name = "echoSupervisor")
     //#backoff-fail
-  }
 
-  class BackoffSupervisorDocSpecExampleStopOptions {
+  class BackoffSupervisorDocSpecExampleStopOptions
     val system: ActorSystem = ???
     import scala.concurrent.duration._
 
@@ -71,9 +69,8 @@ class BackoffSupervisorDocSpec {
     //#backoff-custom-stop
 
     system.actorOf(supervisor, name = "echoSupervisor")
-  }
 
-  class BackoffSupervisorDocSpecExampleFailureOptions {
+  class BackoffSupervisorDocSpecExampleFailureOptions
     val system: ActorSystem = ???
     import scala.concurrent.duration._
 
@@ -90,14 +87,12 @@ class BackoffSupervisorDocSpec {
               randomFactor = 0.2 // adds 20% "noise" to vary the intervals slightly
           )
           .withAutoReset(10.seconds) // the child must send BackoffSupervisor.Reset to its parent
-          .withSupervisorStrategy(OneForOneStrategy() {
+          .withSupervisorStrategy(OneForOneStrategy()
         case _: MyException ⇒ SupervisorStrategy.Restart
         case _ ⇒ SupervisorStrategy.Escalate
-      }))
+      ))
     //#backoff-custom-fail
 
     system.actorOf(supervisor, name = "echoSupervisor")
-  }
 
   case class MyException(msg: String) extends Exception(msg)
-}

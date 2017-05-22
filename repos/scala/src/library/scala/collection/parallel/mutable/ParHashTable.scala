@@ -18,7 +18,7 @@ import scala.collection.parallel.IterableSplitter
   *  for their parallel construction and iteration.
   */
 trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
-    extends scala.collection.mutable.HashTable[K, Entry] {
+    extends scala.collection.mutable.HashTable[K, Entry]
 
   override def alwaysInitSizeMap = true
 
@@ -29,7 +29,7 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
       private val until: Int,
       private val totalsize: Int,
       private var es: Entry)
-      extends IterableSplitter[T] with SizeMapUtils {
+      extends IterableSplitter[T] with SizeMapUtils
     private val itertable = table
     private var traversed = 0
     scan()
@@ -38,29 +38,25 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
     def newIterator(
         idxFrom: Int, idxUntil: Int, totalSize: Int, es: Entry): IterRepr
 
-    def hasNext = {
+    def hasNext =
       es ne null
-    }
 
-    def next(): T = {
+    def next(): T =
       val res = es
       es = es.next
       scan()
       traversed += 1
       entry2item(res)
-    }
 
-    def scan() {
-      while (es == null && idx < until) {
+    def scan()
+      while (es == null && idx < until)
         es = itertable(idx).asInstanceOf[Entry]
         idx = idx + 1
-      }
-    }
 
     def remaining = totalsize - traversed
 
-    private[parallel] override def debugInformation = {
-      buildString { append =>
+    private[parallel] override def debugInformation =
+      buildString  append =>
         append("/--------------------\\")
         append("Parallel hash table entry iterator")
         append("total hash table elements: " + tableSize)
@@ -76,14 +72,12 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
               .map(x => if (x != null) x.toString else "n/a")
               .mkString(" | "))
         append("\\--------------------/")
-      }
-    }
 
     def dup = newIterator(idx, until, totalsize, es)
 
     def split: Seq[IterableSplitter[T]] =
-      if (remaining > 1) {
-        if (until > idx) {
+      if (remaining > 1)
+        if (until > idx)
           // there is at least one more slot for the next iterator
           // divide the rest of the table
           val divsz = (until - idx) / 2
@@ -106,53 +100,42 @@ trait ParHashTable[K, Entry >: Null <: HashEntry[K, Entry]]
               newIterator(fidx, funtil, ftotal, fes),
               newIterator(sidx, suntil, stotal, ses)
           )
-        } else {
+        else
           // otherwise, this is the last entry in the table - all what remains is the chain
           // so split the rest of the chain
           val arr = convertToArrayBuffer(es)
           val arrpit = new scala.collection.parallel.BufferSplitter[T](
               arr, 0, arr.length, signalDelegate)
           arrpit.split
-        }
-      } else Seq(this.asInstanceOf[IterRepr])
+      else Seq(this.asInstanceOf[IterRepr])
 
     private def convertToArrayBuffer(
-        chainhead: Entry): mutable.ArrayBuffer[T] = {
+        chainhead: Entry): mutable.ArrayBuffer[T] =
       val buff = mutable.ArrayBuffer[Entry]()
       var curr = chainhead
-      while (curr ne null) {
+      while (curr ne null)
         buff += curr
         curr = curr.next
-      }
       // println("converted " + remaining + " element iterator into buffer: " + buff)
-      buff map { e =>
+      buff map  e =>
         entry2item(e)
-      }
-    }
 
-    protected def countElems(from: Int, until: Int) = {
+    protected def countElems(from: Int, until: Int) =
       var c = 0
       var idx = from
       var es: Entry = null
-      while (idx < until) {
+      while (idx < until)
         es = itertable(idx).asInstanceOf[Entry]
-        while (es ne null) {
+        while (es ne null)
           c += 1
           es = es.next
-        }
         idx += 1
-      }
       c
-    }
 
-    protected def countBucketSizes(fromBucket: Int, untilBucket: Int) = {
+    protected def countBucketSizes(fromBucket: Int, untilBucket: Int) =
       var c = 0
       var idx = fromBucket
-      while (idx < untilBucket) {
+      while (idx < untilBucket)
         c += sizemap(idx)
         idx += 1
-      }
       c
-    }
-  }
-}

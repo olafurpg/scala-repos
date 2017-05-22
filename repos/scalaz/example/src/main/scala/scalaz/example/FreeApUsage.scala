@@ -8,7 +8,7 @@ import scalaz.syntax.std.option._
 import scala.reflect.ClassTag
 
 // Example usage of free applicative
-object FreeApUsage extends App {
+object FreeApUsage extends App
 
   // An algebra of primitive operations in parsing types from Map[String, Any]
   sealed trait ParseOp[A]
@@ -25,15 +25,14 @@ object FreeApUsage extends App {
   def parseBool(key: String) = FreeAp.lift(ParseBool(key))
 
   def parseOpt[A : ClassTag](a: Any): Option[A] =
-    a match {
+    a match
       case a: A => Some(a)
       case _ => None
-    }
 
   // Natural transformation to Option[A]
   def toOption(input: Map[String, Any]): ParseOp ~> Option =
-    new (ParseOp ~> Option) {
-      def apply[A](fa: ParseOp[A]) = fa match {
+    new (ParseOp ~> Option)
+      def apply[A](fa: ParseOp[A]) = fa match
         case ParseInt(key) =>
           input
             .get(key)
@@ -43,14 +42,12 @@ object FreeApUsage extends App {
           input
             .get(key)
             .flatMap(parseOpt[java.lang.Boolean](_).map(x => (x: Boolean)))
-      }
-    }
 
   // Natural transformation to ValidationNel[String, A]
   type ValidatedParse[A] = ValidationNel[String, A]
   def toValidation(input: Map[String, Any]): ParseOp ~> ValidatedParse =
-    new (ParseOp ~> ValidatedParse) {
-      def apply[A](fa: ParseOp[A]) = fa match {
+    new (ParseOp ~> ValidatedParse)
+      def apply[A](fa: ParseOp[A]) = fa match
         case s @ ParseInt(_) =>
           toOption(input)(s).toSuccessNel(s"${s.key} not found with type Int")
         case s @ ParseString(_) =>
@@ -59,8 +56,6 @@ object FreeApUsage extends App {
         case i @ ParseBool(_) =>
           toOption(input)(i)
             .toSuccessNel(s"${i.key} not found with type Boolean")
-      }
-    }
 
   // An example that returns a tuple of (String, Int, Boolean) parsed from Map[String, Any]
   val successfulProg: Parse[(String, Int, Boolean)] =
@@ -81,4 +76,3 @@ object FreeApUsage extends App {
   println(successfulProg.foldMap(toValidation(testInput)))
   println(failedProg.foldMap(toOption(testInput)))
   println(failedProg.foldMap(toValidation(testInput)))
-}

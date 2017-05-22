@@ -1,4 +1,4 @@
-class Trac3790 {
+class Trac3790
 
   /**
     * A lazy String
@@ -9,4 +9,3 @@ class Trac3790 {
     * A non-lazy String
     */
   val nonLazyString = "non-lazy"
-}

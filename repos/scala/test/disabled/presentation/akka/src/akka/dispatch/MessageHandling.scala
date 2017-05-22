@@ -19,49 +19,44 @@ final case class MessageInvocation(
     val receiver: ActorRef,
     val message: Any,
     val sender: Option[ActorRef],
-    val senderFuture: Option[CompletableFuture[Any]]) {
+    val senderFuture: Option[CompletableFuture[Any]])
   if (receiver eq null)
     throw new IllegalArgumentException("Receiver can't be null")
 
   def invoke =
-    try {
+    try
       receiver.invoke(this)
-    } catch {
+    catch
       case e: NullPointerException =>
         throw new ActorInitializationException(
             "Don't call 'self ! message' in the Actor's constructor (in Scala this means in the body of the class).")
-    }
-}
 
 final case class FutureInvocation[T](
     future: CompletableFuture[T], function: () => T, cleanup: () => Unit)
-    extends Runnable {
-  def run = {
+    extends Runnable
+  def run =
     future complete
-    (try {
+    (try
           Right(function())
-        } catch {
+        catch
           case e =>
             EventHandler.error(e, this, e.getMessage)
             Left(e)
-        } finally {
+        finally
           cleanup()
-        })
-  }
-}
+        )
 
-object MessageDispatcher {
+object MessageDispatcher
   val UNSCHEDULED = 0
   val SCHEDULED = 1
   val RESCHEDULED = 2
 
   implicit def defaultGlobalDispatcher = Dispatchers.defaultGlobalDispatcher
-}
 
 /**
   *  @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-trait MessageDispatcher {
+trait MessageDispatcher
   import MessageDispatcher._
 
   protected val uuids = new ConcurrentSkipListSet[Uuid]
@@ -80,42 +75,38 @@ trait MessageDispatcher {
   /**
     * Attaches the specified actorRef to this dispatcher
     */
-  final def attach(actorRef: ActorRef): Unit = guard withGuard {
+  final def attach(actorRef: ActorRef): Unit = guard withGuard
     register(actorRef)
-  }
 
   /**
     * Detaches the specified actorRef from this dispatcher
     */
-  final def detach(actorRef: ActorRef): Unit = guard withGuard {
+  final def detach(actorRef: ActorRef): Unit = guard withGuard
     unregister(actorRef)
-  }
 
   private[akka] final def dispatchMessage(
       invocation: MessageInvocation): Unit = dispatch(invocation)
 
   private[akka] final def dispatchFuture[T](
-      block: () => T, timeout: Long): Future[T] = {
+      block: () => T, timeout: Long): Future[T] =
     futures.getAndIncrement()
-    try {
+    try
       val future = new DefaultCompletableFuture[T](timeout)
 
       if (active.isOff) guard withGuard { active.switchOn { start } }
 
       executeFuture(FutureInvocation[T](future, block, futureCleanup))
       future
-    } catch {
+    catch
       case e =>
         futures.decrementAndGet
         throw e
-    }
-  }
 
   private val futureCleanup: () => Unit = () =>
-    if (futures.decrementAndGet() == 0) {
-      guard withGuard {
-        if (futures.get == 0 && uuids.isEmpty) {
-          shutdownSchedule match {
+    if (futures.decrementAndGet() == 0)
+      guard withGuard
+        if (futures.get == 0 && uuids.isEmpty)
+          shutdownSchedule match
             case UNSCHEDULED =>
               shutdownSchedule = SCHEDULED
               Scheduler.scheduleOnce(
@@ -123,27 +114,20 @@ trait MessageDispatcher {
             case SCHEDULED =>
               shutdownSchedule = RESCHEDULED
             case RESCHEDULED => //Already marked for reschedule
-          }
-        }
-      }
-  }
 
-  private[akka] def register(actorRef: ActorRef) {
+  private[akka] def register(actorRef: ActorRef)
     if (actorRef.mailbox eq null) actorRef.mailbox = createMailbox(actorRef)
 
     uuids add actorRef.uuid
-    if (active.isOff) {
-      active.switchOn {
+    if (active.isOff)
+      active.switchOn
         start
-      }
-    }
-  }
 
-  private[akka] def unregister(actorRef: ActorRef) = {
-    if (uuids remove actorRef.uuid) {
+  private[akka] def unregister(actorRef: ActorRef) =
+    if (uuids remove actorRef.uuid)
       actorRef.mailbox = null
-      if (uuids.isEmpty && futures.get == 0) {
-        shutdownSchedule match {
+      if (uuids.isEmpty && futures.get == 0)
+        shutdownSchedule match
           case UNSCHEDULED =>
             shutdownSchedule = SCHEDULED
             Scheduler.scheduleOnce(
@@ -151,42 +135,30 @@ trait MessageDispatcher {
           case SCHEDULED =>
             shutdownSchedule = RESCHEDULED
           case RESCHEDULED => //Already marked for reschedule
-        }
-      }
-    }
-  }
 
   /**
     * Traverses the list of actors (uuids) currently being attached to this dispatcher and stops those actors
     */
-  def stopAllAttachedActors {
+  def stopAllAttachedActors
     val i = uuids.iterator
-    while (i.hasNext()) {
+    while (i.hasNext())
       val uuid = i.next()
-      Actor.registry.actorFor(uuid) match {
+      Actor.registry.actorFor(uuid) match
         case Some(actor) => actor.stop()
         case None => {}
-      }
-    }
-  }
 
-  private val shutdownAction = new Runnable {
-    def run = guard withGuard {
-      shutdownSchedule match {
+  private val shutdownAction = new Runnable
+    def run = guard withGuard
+      shutdownSchedule match
         case RESCHEDULED =>
           shutdownSchedule = SCHEDULED
           Scheduler.scheduleOnce(this, timeoutMs, TimeUnit.MILLISECONDS)
         case SCHEDULED =>
-          if (uuids.isEmpty && futures.get == 0) {
-            active switchOff {
+          if (uuids.isEmpty && futures.get == 0)
+            active switchOff
               shutdown // shut down in the dispatcher's references is zero
-            }
-          }
           shutdownSchedule = UNSCHEDULED
         case UNSCHEDULED => //Do nothing
-      }
-    }
-  }
 
   /**
     * When the dispatcher no longer has any actors registered, how long will it wait until it shuts itself down, in Ms
@@ -231,19 +203,18 @@ trait MessageDispatcher {
     * Returns the amount of futures queued for execution
     */
   def pendingFutures: Long = futures.get
-}
 
 /**
   * Trait to be used for hooking in new dispatchers into Dispatchers.fromConfig
   */
-abstract class MessageDispatcherConfigurator {
+abstract class MessageDispatcherConfigurator
 
   /**
     * Returns an instance of MessageDispatcher given a Configuration
     */
   def configure(config: Configuration): MessageDispatcher
 
-  def mailboxType(config: Configuration): MailboxType = {
+  def mailboxType(config: Configuration): MailboxType =
     val capacity =
       config.getInt("mailbox-capacity", Dispatchers.MAILBOX_CAPACITY)
     if (capacity < 1) UnboundedMailbox()
@@ -254,12 +225,11 @@ abstract class MessageDispatcherConfigurator {
               config.getInt("mailbox-push-timeout-time",
                             Dispatchers.MAILBOX_PUSH_TIME_OUT.toMillis.toInt),
               TIME_UNIT))
-  }
 
   def configureThreadPool(
       config: Configuration,
       createDispatcher: => (ThreadPoolConfig) => MessageDispatcher)
-    : ThreadPoolConfigDispatcherBuilder = {
+    : ThreadPoolConfigDispatcherBuilder =
     import ThreadPoolConfigDispatcherBuilder.conf_?
 
     //Apply the following options to the config if they are present in the config
@@ -274,7 +244,7 @@ abstract class MessageDispatcherConfigurator {
                      bounds => _.setExecutorBounds(bounds)),
                  conf_?(config getBool "allow-core-timeout")(
                      allow => _.setAllowCoreThreadTimeout(allow)),
-                 conf_?(config getString "rejection-policy" map {
+                 conf_?(config getString "rejection-policy" map
                    case "abort" => new AbortPolicy()
                    case "caller-runs" => new CallerRunsPolicy()
                    case "discard-oldest" => new DiscardOldestPolicy()
@@ -282,6 +252,4 @@ abstract class MessageDispatcherConfigurator {
                    case x =>
                      throw new IllegalArgumentException(
                          "[%s] is not a valid rejectionPolicy!" format x)
-                 })(policy => _.setRejectionPolicy(policy)))
-  }
-}
+                 )(policy => _.setRejectionPolicy(policy)))

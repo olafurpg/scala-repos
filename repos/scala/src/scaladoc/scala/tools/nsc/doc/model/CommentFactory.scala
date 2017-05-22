@@ -18,7 +18,7 @@ import scala.reflect.internal.util.Position
   *
   * @author Manohar Jonnalagedda
   * @author Gilles Dubochet */
-trait CommentFactory extends base.CommentFactoryBase {
+trait CommentFactory extends base.CommentFactoryBase
   thisFactory: ModelFactory with CommentFactory with MemberLookup =>
 
   val global: Global
@@ -30,9 +30,9 @@ trait CommentFactory extends base.CommentFactoryBase {
   def comment(sym: Symbol,
               linkTarget: DocTemplateImpl,
               inTpl: DocTemplateImpl): Option[Comment] =
-    commentCache.getOrElseUpdate((sym, inTpl), {
+    commentCache.getOrElseUpdate((sym, inTpl),
       defineComment(sym, linkTarget, inTpl)
-    })
+    )
 
   /** A comment is usually created by the parser, however for some special
     * cases we have to give some `inTpl` comments (parent class for example)
@@ -40,20 +40,19 @@ trait CommentFactory extends base.CommentFactoryBase {
     * This function manages some of those cases : Param accessor and Primary constructor */
   def defineComment(sym: Symbol,
                     linkTarget: DocTemplateImpl,
-                    inTpl: DocTemplateImpl): Option[Comment] = {
+                    inTpl: DocTemplateImpl): Option[Comment] =
 
     //param accessor case
     // We just need the @param argument, we put it into the body
     if (sym.isParamAccessor && inTpl.comment.isDefined &&
-        inTpl.comment.get.valueParams.isDefinedAt(sym.encodedName)) {
+        inTpl.comment.get.valueParams.isDefinedAt(sym.encodedName))
       val comContent = Some(inTpl.comment.get.valueParams(sym.encodedName))
       Some(createComment(body0 = comContent))
-    }
 
     // Primary constructor case
     // We need some content of the class definition : @constructor for the body,
     // @param and @deprecated, we can add some more if necessary
-    else if (sym.isPrimaryConstructor && inTpl.comment.isDefined) {
+    else if (sym.isPrimaryConstructor && inTpl.comment.isDefined)
       val tplComment = inTpl.comment.get
       // If there is nothing to put into the comment there is no need to create it
       if (tplComment.constructor.isDefined || tplComment.throws != Map.empty ||
@@ -67,29 +66,25 @@ trait CommentFactory extends base.CommentFactoryBase {
                           typeParams0 = tplComment.typeParams,
                           deprecated0 = tplComment.deprecated))
       else None
-    }
 
     //other comment cases
     // parse function will make the comment
-    else {
+    else
       val rawComment = global.expandedDocComment(sym, inTpl.sym).trim
-      if (rawComment != "") {
+      if (rawComment != "")
         val c = parse(rawComment,
                       global.rawDocComment(sym),
                       global.docCommentPos(sym),
                       linkTarget)
         Some(c)
-      } else None
-    }
-  }
+      else None
 
   protected def parse(comment: String,
                       src: String,
                       pos: Position,
-                      linkTarget: DocTemplateImpl): Comment = {
+                      linkTarget: DocTemplateImpl): Comment =
     val sym = if (linkTarget eq null) NoSymbol else linkTarget.sym
     parseAtSymbol(comment, src, pos, sym)
-  }
 
   /** Parses a string containing wiki syntax into a `Comment` object.
     * Note that the string is assumed to be clean:
@@ -97,8 +92,6 @@ trait CommentFactory extends base.CommentFactoryBase {
     *  - Removed start-of-line star and one whitespace afterwards (if present).
     *  - Removed all end-of-line whitespace.
     *  - Only `endOfLine` is used to mark line endings. */
-  def parseWiki(string: String, pos: Position, inTpl: DocTemplateImpl): Body = {
+  def parseWiki(string: String, pos: Position, inTpl: DocTemplateImpl): Body =
     val sym = if (inTpl eq null) NoSymbol else inTpl.sym
     parseWikiAtSymbol(string, pos, sym)
-  }
-}

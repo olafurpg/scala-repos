@@ -1,12 +1,8 @@
-object Z {
-  trait A {
+object Z
+  trait A
     def foo: Int = 34
-  }
 
-  class C {
+  class C
     def foo: Int = 77
-  }
-  object Main {
+  object Main
     val g = new A with C { override def foo: Int = super.< ref > foo }
-  }
-}

@@ -17,33 +17,26 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
   * Date: 07.03.2008
   */
 class ScExistentialClauseImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScExistentialClause {
+    extends ScalaPsiElementImpl(node) with ScExistentialClause
   override def toString: String = "ExistentialClause"
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
-    if (lastParent != null) {
+                                   place: PsiElement): Boolean =
+    if (lastParent != null)
       var run = lastParent
-      while (run != null) {
+      while (run != null)
         if (!processElement(run, processor, state)) return false
         run = run.getPrevSibling
-      }
-    }
     true
-  }
 
   private def processElement(e: PsiElement,
                              processor: PsiScopeProcessor,
-                             state: ResolveState): Boolean = e match {
+                             state: ResolveState): Boolean = e match
     case named: ScNamedElement => processor.execute(named, state)
-    case holder: ScDeclaredElementsHolder => {
-        for (declared <- holder.declaredElements) {
+    case holder: ScDeclaredElementsHolder =>
+        for (declared <- holder.declaredElements)
           if (!processor.execute(declared, state)) return false
-        }
         true
-      }
     case _ => true
-  }
-}

@@ -4,7 +4,7 @@
 import sbt._
 import Keys._
 
-object SonatypeSupport {
+object SonatypeSupport
   val GPL3 = ("GPL 3.0" -> url("http://www.gnu.org/licenses/gpl.html"))
   val LGPL3 = ("LGPL 3.0" -> url("http://www.gnu.org/licenses/lgpl.html"))
   val Apache2 =
@@ -17,27 +17,27 @@ object SonatypeSupport {
   ) = Seq(
       publishMavenStyle := true,
       publishArtifact in Test := false,
-      pomIncludeRepository := { _ =>
+      pomIncludeRepository :=  _ =>
         false
-      },
+      ,
       homepage := Some(url(s"http://github.com/$ghUser/$ghRepo")),
       licenses := Seq(license),
-      publishTo <<= version { v: String =>
+      publishTo <<= version  v: String =>
         val nexus = "https://oss.sonatype.org/"
         if (v.contains("SNAP"))
           Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      },
-      credentials ++= {
-        for {
+      ,
+      credentials ++=
+        for
           username <- sys.env.get("SONATYPE_USERNAME")
           password <- sys.env.get("SONATYPE_PASSWORD")
-        } yield
+        yield
           Credentials("Sonatype Nexus Repository Manager",
                       "oss.sonatype.org",
                       username,
                       password)
-      }.toSeq,
+      .toSeq,
       pomExtra := (<scm>
         <url>git@github.com:${ ghUser }/${ ghRepo }.git</url>
         <connection>scm:git:git@github.com:${ ghUser }/${ ghRepo }.git</connection>
@@ -48,4 +48,3 @@ object SonatypeSupport {
         </developer>
       </developers>)
   )
-}

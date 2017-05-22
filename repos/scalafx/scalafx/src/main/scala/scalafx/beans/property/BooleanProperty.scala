@@ -31,7 +31,7 @@ import javafx.beans.{property => jfxbp}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object BooleanProperty {
+object BooleanProperty
   implicit def sfxBooleanProperty2jfx(
       bp: BooleanProperty): jfxbp.BooleanProperty =
     if (bp != null) bp.delegate else null
@@ -44,13 +44,12 @@ object BooleanProperty {
     */
   def apply(value: Boolean) =
     new BooleanProperty(new jfxbp.SimpleBooleanProperty(value))
-}
 
 class BooleanProperty(
     override val delegate: jfxbp.BooleanProperty = new jfxbp.SimpleBooleanProperty)
     extends ReadOnlyBooleanProperty(delegate)
     with Property[Boolean, java.lang.Boolean]
-    with SFXDelegate[jfxbp.BooleanProperty] {
+    with SFXDelegate[jfxbp.BooleanProperty]
 
   def this(bean: Object, name: String) =
     this(new jfxbp.SimpleBooleanProperty(bean, name))
@@ -58,7 +57,5 @@ class BooleanProperty(
   def this(bean: Object, name: String, initialValue: Boolean) =
     this(new jfxbp.SimpleBooleanProperty(bean, name, initialValue))
 
-  def value_=(v: Boolean) {
+  def value_=(v: Boolean)
     delegate.set(v)
-  }
-}

@@ -16,28 +16,25 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class FinagleClientThriftServerTest extends FunSuite {
-  trait TestServer {
+class FinagleClientThriftServerTest extends FunSuite
+  trait TestServer
     def server: InetSocketAddress
     def shutdown(): Unit
-  }
 
   def makeServer(
       transportFactory: TTransportFactory, somewayPromise: Promise[Unit])(
-      f: (Int, Int) => Int) = {
-    val processor = new B.Iface {
+      f: (Int, Int) => Int) =
+    val processor = new B.Iface
       def multiply(a: Int, b: Int): Int = f(a, b)
       def add(a: Int, b: Int): Int = { throw new AnException }
       def add_one(a: Int, b: Int) = {}
       def complex_return(someString: String) = new SomeStruct(123, someString)
-      def someway() {
+      def someway()
         somewayPromise() = Return.Unit
-      }
       def show_me_your_dtab() = ""
       def show_me_your_dtab_size() = 0
-    }
 
-    val (thriftServerAddr, thriftServer) = {
+    val (thriftServerAddr, thriftServer) =
       val loopback = InetAddress.getLoopbackAddress
       val socket = new ServerSocket(0, 50, loopback)
       val serverSocketTransport = new TServerSocket(socket)
@@ -50,34 +47,29 @@ class FinagleClientThriftServerTest extends FunSuite {
       )
 
       (socket.getLocalSocketAddress.asInstanceOf[InetSocketAddress], server)
-    }
 
-    val thriftServerThread = new Thread("thriftServer") {
+    val thriftServerThread = new Thread("thriftServer")
       override def run() = thriftServer.serve()
-    }
     thriftServerThread.start()
 
-    new TestServer {
+    new TestServer
       def shutdown(): Unit = thriftServer.stop()
 
       def server: InetSocketAddress = thriftServerAddr
-    }
-  }
 
   def doit(
       transportFactory: TTransportFactory,
       codec: CodecFactory[ThriftClientRequest, Array[Byte]]#Client,
       named: String
-  ) {
+  )
     test("%s:finagle client vs. synchronous thrift server should talk to each other"
-          .format(named)) {
+          .format(named))
       val somewayPromise = new Promise[Unit]
 
       // TODO: interleave requests (to test seqids, etc.)
 
-      val testServer = makeServer(transportFactory, somewayPromise) { (a, b) =>
+      val testServer = makeServer(transportFactory, somewayPromise)  (a, b) =>
         a + b
-      }
 
       // ** Set up the client & query the server.
       val service = ClientBuilder()
@@ -92,15 +84,13 @@ class FinagleClientThriftServerTest extends FunSuite {
       val future = client.multiply(1, 2)
       assert(Await.result(future) == 3)
       testServer.shutdown()
-    }
 
     test("%s:finagle client vs. synchronous thrift server should handle exceptions"
-          .format(named)) {
+          .format(named))
       val somewayPromise = new Promise[Unit]
 
-      val testServer = makeServer(transportFactory, somewayPromise) { (a, b) =>
+      val testServer = makeServer(transportFactory, somewayPromise)  (a, b) =>
         a + b
-      }
 
       // ** Set up the client & query the server.
       val service = ClientBuilder()
@@ -112,18 +102,15 @@ class FinagleClientThriftServerTest extends FunSuite {
       val client =
         new B.ServiceToClient(service, new TBinaryProtocol.Factory())
 
-      intercept[Exception] {
+      intercept[Exception]
         Await.result(client.add(1, 2))
-      }
       testServer.shutdown()
-    }
 
     test("%s:finagle client vs. synchronous thrift server should handle void returns"
-          .format(named)) {
+          .format(named))
       val somewayPromise = new Promise[Unit]
-      val testServer = makeServer(transportFactory, somewayPromise) { (a, b) =>
+      val testServer = makeServer(transportFactory, somewayPromise)  (a, b) =>
         a + b
-      }
 
       // ** Set up the client & query the server.
       val service = ClientBuilder()
@@ -138,15 +125,13 @@ class FinagleClientThriftServerTest extends FunSuite {
       Await.result(client.add_one(1, 2))
       assert(true == true)
       testServer.shutdown()
-    }
 
     // race condition..
     test("%s:finagle client vs. synchronous thrift server should handle one-way calls"
-          .format(named)) {
+          .format(named))
       val somewayPromise = new Promise[Unit]
-      val testServer = makeServer(transportFactory, somewayPromise) { (a, b) =>
+      val testServer = makeServer(transportFactory, somewayPromise)  (a, b) =>
         a + b
-      }
 
       // ** Set up the client & query the server.
       val service = ClientBuilder()
@@ -163,22 +148,19 @@ class FinagleClientThriftServerTest extends FunSuite {
       assert(Await.result(somewayPromise.liftToTry) == Return.Unit)
 
       testServer.shutdown()
-    }
 
     // this test assumes that N requests will be evenly distributed to N hosts.
     if (defaultBalancer() == "heap")
       test(
-          s"$named:finagle client vs. synchronous thrift server should talk to multiple servers") {
+          s"$named:finagle client vs. synchronous thrift server should talk to multiple servers")
         val somewayPromise = new Promise[Unit]
         val NumParties = 10
         val barrier = new CyclicBarrier(NumParties)
 
         val addrs =
-          0 until NumParties map { _ =>
-            makeServer(transportFactory, somewayPromise) { (a, b) =>
+          0 until NumParties map  _ =>
+            makeServer(transportFactory, somewayPromise)  (a, b) =>
               barrier.await(); a + b
-            }
-          }
 
         // ** Set up the client & query the server.
         val service = ClientBuilder()
@@ -190,20 +172,14 @@ class FinagleClientThriftServerTest extends FunSuite {
         val client =
           new B.ServiceToClient(service, new TBinaryProtocol.Factory())
 
-        {
           val futures =
-            0 until NumParties map { _ =>
+            0 until NumParties map  _ =>
               client.multiply(1, 2)
-            }
           val resolved = futures map (Await.result(_, 5.seconds))
-          resolved foreach { r =>
+          resolved foreach  r =>
             assert(r == (3))
-          }
-        }
 
         addrs.foreach(_.shutdown())
-      }
-  }
 
   doit(new TFramedTransport.Factory(),
        ThriftClientFramedCodec(),
@@ -211,4 +187,3 @@ class FinagleClientThriftServerTest extends FunSuite {
 
   doit(
       new TTransportFactory, ThriftClientBufferedCodec(), "buffered transport")
-}

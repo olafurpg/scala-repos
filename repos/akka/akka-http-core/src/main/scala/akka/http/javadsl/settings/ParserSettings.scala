@@ -18,7 +18,7 @@ import com.typesafe.config.Config
 /**
   * Public API but not intended for subclassing
   */
-abstract class ParserSettings private[akka]() extends BodyPartParser.Settings {
+abstract class ParserSettings private[akka]() extends BodyPartParser.Settings
   self: ParserSettingsImpl ⇒
   def getMaxUriLength: Int
   def getMaxMethodLength: Int
@@ -80,18 +80,15 @@ abstract class ParserSettings private[akka]() extends BodyPartParser.Settings {
   // special ---
 
   @varargs
-  def withCustomMethods(methods: HttpMethod*): ParserSettings = {
+  def withCustomMethods(methods: HttpMethod*): ParserSettings =
     val map = methods.map(m ⇒ m.name -> m.asScala).toMap
     self.copy(customMethods = map.get)
-  }
   @varargs
-  def withCustomStatusCodes(codes: StatusCode*): ParserSettings = {
+  def withCustomStatusCodes(codes: StatusCode*): ParserSettings =
     val map = codes.map(c ⇒ c.intValue -> c.asScala).toMap
     self.copy(customStatusCodes = map.get)
-  }
-}
 
-object ParserSettings extends SettingsCompanion[ParserSettings] {
+object ParserSettings extends SettingsCompanion[ParserSettings]
   trait CookieParsingMode
   trait ErrorLoggingVerbosity
 
@@ -99,4 +96,3 @@ object ParserSettings extends SettingsCompanion[ParserSettings] {
     ParserSettingsImpl(config)
   override def create(configOverrides: String): ParserSettings =
     ParserSettingsImpl(configOverrides)
-}

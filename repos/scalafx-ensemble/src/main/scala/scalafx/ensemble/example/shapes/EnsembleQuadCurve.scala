@@ -33,11 +33,11 @@ import scalafx.scene.layout.VBox
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.QuadCurve
 
-class EnsembleQuadCurve extends EnsembleExample {
-  def getContent = new VBox {
+class EnsembleQuadCurve extends EnsembleExample
+  def getContent = new VBox
     spacing = 20
     padding = Insets(20)
-    children = List(new QuadCurve {
+    children = List(new QuadCurve
       controlX = 50
       controlY = 10
       startX = 0
@@ -47,7 +47,7 @@ class EnsembleQuadCurve extends EnsembleExample {
       stroke = Color.Red
       fill = Color.RosyBrown
       strokeWidth = 2d
-    }, new QuadCurve {
+    , new QuadCurve
       controlX = 150
       controlY = 100
       startX = 35
@@ -57,6 +57,4 @@ class EnsembleQuadCurve extends EnsembleExample {
       stroke = Color.Blue
       fill = Color.White
       strokeWidth = 2d
-    })
-  }
-}
+    )

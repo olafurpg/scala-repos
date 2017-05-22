@@ -25,11 +25,10 @@ import scala.collection.JavaConverters._
 
 import org.apache.kafka.common.utils.{Time => JTime}
 
-object NetworkClientBlockingOps {
+object NetworkClientBlockingOps
   implicit def networkClientBlockingOps(
       client: NetworkClient): NetworkClientBlockingOps =
     new NetworkClientBlockingOps(client)
-}
 
 /**
   * Provides extension methods for `NetworkClient` that are useful for implementing blocking behaviour. Use with care.
@@ -42,7 +41,7 @@ object NetworkClientBlockingOps {
   * networkClient.blockingReady(...)
   * }}}
   */
-class NetworkClientBlockingOps(val client: NetworkClient) extends AnyVal {
+class NetworkClientBlockingOps(val client: NetworkClient) extends AnyVal
 
   /**
     * Invokes `client.ready` followed by 0 or more `client.poll` invocations until the connection to `node` is ready,
@@ -54,14 +53,12 @@ class NetworkClientBlockingOps(val client: NetworkClient) extends AnyVal {
     * This method is useful for implementing blocking behaviour on top of the non-blocking `NetworkClient`, use it with
     * care.
     */
-  def blockingReady(node: Node, timeout: Long)(implicit time: JTime): Boolean = {
-    client.ready(node, time.milliseconds()) || pollUntil(timeout) { (_, now) =>
+  def blockingReady(node: Node, timeout: Long)(implicit time: JTime): Boolean =
+    client.ready(node, time.milliseconds()) || pollUntil(timeout)  (_, now) =>
       if (client.isReady(node, now)) true
       else if (client.connectionFailed(node))
         throw new IOException(s"Connection to $node failed")
       else false
-    }
-  }
 
   /**
     * Invokes `client.send` followed by 1 or more `client.poll` invocations until a response is received,
@@ -74,24 +71,19 @@ class NetworkClientBlockingOps(val client: NetworkClient) extends AnyVal {
     * care.
     */
   def blockingSendAndReceive(request: ClientRequest, timeout: Long)(
-      implicit time: JTime): Option[ClientResponse] = {
+      implicit time: JTime): Option[ClientResponse] =
     client.send(request, time.milliseconds())
 
-    pollUntilFound(timeout) {
+    pollUntilFound(timeout)
       case (responses, _) =>
-        val response = responses.find { response =>
+        val response = responses.find  response =>
           response.request.request.header.correlationId == request.request.header.correlationId
-        }
-        response.foreach { r =>
-          if (r.wasDisconnected) {
+        response.foreach  r =>
+          if (r.wasDisconnected)
             val destination = request.request.destination
             throw new IOException(
                 s"Connection to $destination was disconnected before the response was read")
-          }
-        }
         response
-    }
-  }
 
   /**
     * Invokes `client.poll` until `predicate` returns `true` or the timeout expires.
@@ -104,12 +96,11 @@ class NetworkClientBlockingOps(val client: NetworkClient) extends AnyVal {
     */
   private def pollUntil(timeout: Long)(
       predicate: (Seq[ClientResponse], Long) => Boolean)(
-      implicit time: JTime): Boolean = {
-    pollUntilFound(timeout) { (responses, now) =>
+      implicit time: JTime): Boolean =
+    pollUntilFound(timeout)  (responses, now) =>
       if (predicate(responses, now)) Some(true)
       else None
-    }.fold(false)(_ => true)
-  }
+    .fold(false)(_ => true)
 
   /**
     * Invokes `client.poll` until `collect` returns `Some` or the timeout expires.
@@ -122,26 +113,22 @@ class NetworkClientBlockingOps(val client: NetworkClient) extends AnyVal {
     */
   private def pollUntilFound[T](
       timeout: Long)(collect: (Seq[ClientResponse], Long) => Option[T])(
-      implicit time: JTime): Option[T] = {
+      implicit time: JTime): Option[T] =
 
     val methodStartTime = time.milliseconds()
     val timeoutExpiryTime = methodStartTime + timeout
 
     @tailrec
-    def recurse(iterationStartTime: Long): Option[T] = {
+    def recurse(iterationStartTime: Long): Option[T] =
       val pollTimeout =
         if (timeout < 0) timeout else timeoutExpiryTime - iterationStartTime
       val responses = client.poll(pollTimeout, iterationStartTime).asScala
       val result = collect(responses, iterationStartTime)
       if (result.isDefined) result
-      else {
+      else
         val afterPollTime = time.milliseconds()
         if (timeout < 0 || afterPollTime < timeoutExpiryTime)
           recurse(afterPollTime)
         else None
-      }
-    }
 
     recurse(methodStartTime)
-  }
-}

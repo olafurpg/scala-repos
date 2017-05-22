@@ -10,8 +10,8 @@ import org.junit.Assert._
 /**
   * Pavel Fatin
   */
-abstract class StatementMoverTestBase extends SimpleTestCase {
-  private def move(code: String, direction: Direction): Option[String] = {
+abstract class StatementMoverTestBase extends SimpleTestCase
+  private def move(code: String, direction: Direction): Option[String] =
     val preparedCode = code.replaceAll("\r\n", "\n")
 
     val cursors = preparedCode.count(_ == '|')
@@ -31,7 +31,7 @@ abstract class StatementMoverTestBase extends SimpleTestCase {
 
     val available = mover.checkAvailable(editor, file, info, direction == Down)
 
-    available.ifTrue {
+    available.ifTrue
       val it =
         cleanCode.split('\n').toList.iterator // Workaround for SI-5972 (should be without "toList")
 
@@ -46,28 +46,20 @@ abstract class StatementMoverTestBase extends SimpleTestCase {
       val c = it.toList
 
       (a ++ dest ++ b ++ source ++ c).mkString("\n")
-    }
-  }
 
   private class Direction
   private case object Up extends Direction
   private case object Down extends Direction
 
-  protected implicit class Movable(val code: String) {
-    def moveUpIsDisabled() {
+  protected implicit class Movable(val code: String)
+    def moveUpIsDisabled()
       assertEquals(None, move(code, Up))
-    }
 
-    def moveDownIsDisabled() {
+    def moveDownIsDisabled()
       assertEquals(None, move(code, Down))
-    }
 
-    def movedUpIs(s: String) {
+    def movedUpIs(s: String)
       assertEquals(Some(s), move(code, Up))
-    }
 
-    def movedDownIs(s: String) {
+    def movedDownIs(s: String)
       assertEquals(Some(s), move(code, Down))
-    }
-  }
-}

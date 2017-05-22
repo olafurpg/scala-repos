@@ -1,7 +1,7 @@
 package scala.reflect.macros
 package contexts
 
-trait Names { self: Context =>
+trait Names  self: Context =>
 
   import global._
 
@@ -19,7 +19,7 @@ trait Names { self: Context =>
   def freshName(): String =
     freshName(nme.FRESH_PREFIX)
 
-  def freshName(name: String): String = {
+  def freshName(name: String): String =
     // In comparison with the first version of freshName, current "fresh" names
     // at least can't clash with legible user-written identifiers and are much less likely to clash with each other.
     // It is still not good enough however, because the counter gets reset every time we create a new Global.
@@ -35,8 +35,6 @@ trait Names { self: Context =>
     val prefix = if (name.endsWith("$")) name else name + "$" // SI-8425
     val sortOfUniqueSuffix = freshNameCreator.newName(nme.FRESH_SUFFIX)
     prefix + sortOfUniqueSuffix
-  }
 
   def freshName[NameType <: Name](name: NameType): NameType =
     name.mapName(freshName(_)).asInstanceOf[NameType]
-}

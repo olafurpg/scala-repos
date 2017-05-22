@@ -12,7 +12,7 @@ import lila.game.{Game, GameRepo}
 import lila.user.User
 import tube.bookmarkTube
 
-private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
+private[bookmark] final class PaginatorBuilder(maxPerPage: Int)
 
   def byUser(user: User, page: Int): Fu[Paginator[Bookmark]] =
     paginator(new UserAdapter(user), page)
@@ -25,25 +25,21 @@ private[bookmark] final class PaginatorBuilder(maxPerPage: Int) {
         maxPerPage = maxPerPage
     )
 
-  final class UserAdapter(user: User) extends AdapterLike[Bookmark] {
+  final class UserAdapter(user: User) extends AdapterLike[Bookmark]
 
     def nbResults: Fu[Int] = $count(selector)
 
     def slice(offset: Int, length: Int): Fu[Seq[Bookmark]] =
-      for {
+      for
         gameIds ← $primitive(selector,
                              "g",
                              _ sort sorting skip offset,
                              length.some)(_.asOpt[String])
-        games ← lila.game.tube.gameTube |> { implicit t =>
+        games ← lila.game.tube.gameTube |>  implicit t =>
           $find.byOrderedIds[Game](gameIds)
-        }
-      } yield
-        games map { g =>
+      yield
+        games map  g =>
           Bookmark(g, user)
-        }
 
     private def selector = BookmarkRepo userIdQuery user.id
     private def sorting = $sort desc "d"
-  }
-}

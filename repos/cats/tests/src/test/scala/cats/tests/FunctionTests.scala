@@ -8,7 +8,7 @@ import cats.laws.discipline.eq._
 import cats.laws.discipline.arbitrary._
 import algebra.laws.GroupLaws
 
-class FunctionTests extends CatsSuite {
+class FunctionTests extends CatsSuite
 
   checkAll(
       "Function0[Int]", CartesianTests[Function0].cartesian[Int, Int, Int])
@@ -60,4 +60,3 @@ class FunctionTests extends CatsSuite {
       "Function1[Int, Int]", MonoidKTests[Lambda[A => A => A]].monoidK[Int])
   checkAll("MonoidK[Lambda[A => A => A]",
            SerializableTests.serializable(function1MonoidK))
-}

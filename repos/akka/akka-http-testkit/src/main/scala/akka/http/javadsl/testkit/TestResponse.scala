@@ -25,7 +25,7 @@ import akka.http.javadsl.model._
   */
 abstract class TestResponse(
     _response: HttpResponse, awaitAtMost: FiniteDuration)(
-    implicit ec: ExecutionContext, materializer: Materializer) {
+    implicit ec: ExecutionContext, materializer: Materializer)
 
   /**
     * Returns the strictified entity of the response. It will be strictified on first access.
@@ -135,62 +135,55 @@ abstract class TestResponse(
   /**
     * Assert that a given header instance exists in the response.
     */
-  def assertHeaderExists(expected: HttpHeader): TestResponse = {
+  def assertHeaderExists(expected: HttpHeader): TestResponse =
     assertTrue(response.headers.exists(_ == expected),
                s"Header $expected was missing.")
     this
-  }
 
   /**
     * Assert that a header of the given type exists.
     */
-  def assertHeaderKindExists(name: String): TestResponse = {
+  def assertHeaderKindExists(name: String): TestResponse =
     val lowercased = name.toRootLowerCase
     assertTrue(response.headers.exists(_.is(lowercased)),
                s"Expected `$name` header was missing.")
     this
-  }
 
   /**
     * Assert that a header of the given name and value exists.
     */
-  def assertHeaderExists(name: String, value: String): TestResponse = {
+  def assertHeaderExists(name: String, value: String): TestResponse =
     val lowercased = name.toRootLowerCase
     val headers = response.headers.filter(_.is(lowercased))
     if (headers.isEmpty) fail(s"Expected `$name` header was missing.")
     else
       assertTrue(
           headers.exists(_.value == value),
-          s"`$name` header was found but had the wrong value. Found headers: ${headers
-            .mkString(", ")}")
+          s"`$name` header was found but had the wrong value. Found headers: $headers
+            .mkString(", ")")
 
     this
-  }
 
   private[this] def extractFromResponse[T](f: HttpResponse ⇒ T): T =
     if (response eq null) doFail("Request didn't complete with response")
     else f(response)
 
   protected def assertEqualsKind(
-      expected: AnyRef, actual: AnyRef, kind: String): TestResponse = {
+      expected: AnyRef, actual: AnyRef, kind: String): TestResponse =
     assertEquals(expected, actual, s"Unexpected $kind!")
     this
-  }
   protected def assertEqualsKind(
-      expected: Int, actual: Int, kind: String): TestResponse = {
+      expected: Int, actual: Int, kind: String): TestResponse =
     assertEquals(expected, actual, s"Unexpected $kind!")
     this
-  }
 
   // allows to `fail` as an expression
-  private def doFail(message: String): Nothing = {
+  private def doFail(message: String): Nothing =
     fail(message)
     throw new IllegalStateException("Shouldn't be reached")
-  }
 
   protected def fail(message: String): Unit
   protected def assertEquals(
       expected: AnyRef, actual: AnyRef, message: String): Unit
   protected def assertEquals(expected: Int, actual: Int, message: String): Unit
   protected def assertTrue(predicate: Boolean, message: String): Unit
-}

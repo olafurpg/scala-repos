@@ -38,13 +38,12 @@ import scala.collection.JavaConverters._
 case class IterableSource[+T](
     @transient iter: Iterable[T], inFields: Fields = Fields.NONE)(
     implicit set: TupleSetter[T], conv: TupleConverter[T])
-    extends Source with Mappable[T] {
+    extends Source with Mappable[T]
 
-  def fields = {
-    if (inFields.isNone && set.arity > 0) {
+  def fields =
+    if (inFields.isNone && set.arity > 0)
       Dsl.intFields(0 until set.arity)
-    } else inFields
-  }
+    else inFields
 
   override def converter[U >: T] = TupleConverter.asSuperConverter[T, U](conv)
 
@@ -55,11 +54,10 @@ case class IterableSource[+T](
       asBuffer.asJava, fields)
 
   override def createTap(readOrWrite: AccessMode)(
-      implicit mode: Mode): Tap[_, _, _] = {
-    if (readOrWrite == Write) {
+      implicit mode: Mode): Tap[_, _, _] =
+    if (readOrWrite == Write)
       sys.error("IterableSource is a Read-only Source")
-    }
-    mode match {
+    mode match
       case Local(_) =>
         new MemoryTap[InputStream, OutputStream](
             new NullScheme(fields, fields), asBuffer)
@@ -71,8 +69,6 @@ case class IterableSource[+T](
       case _ =>
         throw ModeException(
             "Unsupported mode for IterableSource: " + mode.toString)
-    }
-  }
 
   /**
     * Don't use the whole string of the iterable, which can be huge.
@@ -80,4 +76,3 @@ case class IterableSource[+T](
     */
   override val sourceId: String = "IterableSource(%s)-%d".format(
       iter.take(10).toString, System.identityHashCode(iter))
-}

@@ -22,34 +22,28 @@ class ScClassParentsImpl private (stub: StubElement[ScTemplateParents],
                                   nodeType: IElementType,
                                   node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScClassParents {
+    with ScClassParents
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScTemplateParentsStub) = {
+  def this(stub: ScTemplateParentsStub) =
     this(stub, ScalaElementTypes.CLASS_PARENTS, null)
-  }
 
   override def toString: String = "ClassParents"
 
-  def superTypes: Seq[ScType] = {
+  def superTypes: Seq[ScType] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypes ++ syntheticTypeElements
         .map(_.getType(TypingContext.empty).getOrAny)
-    }
     allTypeElements.map(_.getType(TypingContext.empty).getOrAny)
-  }
 
-  def typeElements: Seq[ScTypeElement] = {
+  def typeElements: Seq[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub
         .asInstanceOf[ScTemplateParentsStub]
         .getTemplateParentsTypeElements
-    }
-    (constructor match {
+    (constructor match
       case Some(x) => Array[ScTypeElement](x.typeElement)
       case None => Array[ScTypeElement]()
-    }) ++ findChildrenByClassScala(classOf[ScTypeElement])
-  }
-}
+    ) ++ findChildrenByClassScala(classOf[ScTypeElement])

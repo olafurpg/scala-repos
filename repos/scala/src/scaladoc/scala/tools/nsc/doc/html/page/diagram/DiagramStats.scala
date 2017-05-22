@@ -4,22 +4,21 @@
 package scala.tools.nsc.doc
 package html.page.diagram
 
-object DiagramStats {
+object DiagramStats
 
-  class TimeTracker(title: String) {
+  class TimeTracker(title: String)
     var totalTime: Long = 0l
     var maxTime: Long = 0l
     var instances: Int = 0
 
-    def addTime(ms: Long) = {
+    def addTime(ms: Long) =
       if (maxTime < ms) maxTime = ms
       totalTime += ms
       instances += 1
-    }
 
-    def printStats(print: String => Unit) = {
+    def printStats(print: String => Unit) =
       if (instances == 0) print(title + ": no stats gathered")
-      else {
+      else
         print("  " + title)
         print("  " + "=" * title.length)
         print("    count:        " + instances + " items")
@@ -27,9 +26,6 @@ object DiagramStats {
         print("    average time: " + (totalTime / instances) + " ms")
         print("    maximum time: " + maxTime + " ms")
         print("")
-      }
-    }
-  }
 
   private[this] val filterTrack = new TimeTracker("diagrams model filtering")
   private[this] val modelTrack = new TimeTracker("diagrams model generation")
@@ -39,8 +35,8 @@ object DiagramStats {
   private[this] var brokenImages = 0
   private[this] var fixedImages = 0
 
-  def printStats(settings: Settings) = {
-    if (settings.docDiagramsDebug) {
+  def printStats(settings: Settings) =
+    if (settings.docDiagramsDebug)
       settings.printMsg("\nDiagram generation running time breakdown:\n")
       filterTrack.printStats(settings.printMsg)
       modelTrack.printStats(settings.printMsg)
@@ -50,8 +46,6 @@ object DiagramStats {
       println("  Broken images: " + brokenImages)
       println("  Fixed images: " + fixedImages)
       println("")
-    }
-  }
 
   def addFilterTime(ms: Long) = filterTrack.addTime(ms)
   def addModelTime(ms: Long) = modelTrack.addTime(ms)
@@ -61,4 +55,3 @@ object DiagramStats {
 
   def addBrokenImage(): Unit = brokenImages += 1
   def addFixedImage(): Unit = fixedImages += 1
-}

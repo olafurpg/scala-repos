@@ -33,17 +33,16 @@ private[akka] case class ActorMaterializerImpl(
     supervisor: ActorRef,
     haveShutDown: AtomicBoolean,
     flowNames: SeqActorName)
-    extends ActorMaterializer {
+    extends ActorMaterializer
   import akka.stream.impl.Stages._
   private val _logger = Logging.getLogger(system, this)
   override def logger = _logger
 
   if (settings.fuzzingMode && !system.settings.config.hasPath(
-          "akka.stream.secret-test-fuzzing-warning-disable")) {
+          "akka.stream.secret-test-fuzzing-warning-disable"))
     _logger.warning(
         "Fuzzing mode is enabled on this system. If you see this warning on your production system then " +
         "set akka.stream.materializer.debug.fuzzing-mode to off.")
-  }
 
   override def shutdown(): Unit =
     if (haveShutDown.compareAndSet(false, true)) supervisor ! PoisonPill
@@ -62,18 +61,15 @@ private[akka] case class ActorMaterializerImpl(
         .SupervisionStrategy(settings.supervisionDecider) :: Nil)
 
   override def effectiveSettings(
-      opAttr: Attributes): ActorMaterializerSettings = {
+      opAttr: Attributes): ActorMaterializerSettings =
     import Attributes._
     import ActorAttributes._
-    opAttr.attributeList.foldLeft(settings) { (s, attr) ⇒
-      attr match {
+    opAttr.attributeList.foldLeft(settings)  (s, attr) ⇒
+      attr match
         case InputBuffer(initial, max) ⇒ s.withInputBuffer(initial, max)
         case Dispatcher(dispatcher) ⇒ s.withDispatcher(dispatcher)
         case SupervisionStrategy(decider) ⇒ s.withSupervisionStrategy(decider)
         case _ ⇒ s
-      }
-    }
-  }
 
   override def schedulePeriodically(
       initialDelay: FiniteDuration, interval: FiniteDuration, task: Runnable) =
@@ -87,7 +83,7 @@ private[akka] case class ActorMaterializerImpl(
 
   private[stream] def materialize[Mat](
       _runnableGraph: Graph[ClosedShape, Mat],
-      subflowFuser: GraphInterpreterShell ⇒ ActorRef): Mat = {
+      subflowFuser: GraphInterpreterShell ⇒ ActorRef): Mat =
     val runnableGraph =
       if (settings.autoFusing) Fusing.aggressive(_runnableGraph)
       else _runnableGraph
@@ -98,26 +94,25 @@ private[akka] case class ActorMaterializerImpl(
     if (StreamLayout.Debug) StreamLayout.validate(runnableGraph.module)
 
     val session = new MaterializerSession(
-        runnableGraph.module, initialAttributes) {
+        runnableGraph.module, initialAttributes)
       private val flowName = createFlowName()
       private var nextId = 0
-      private def stageName(attr: Attributes): String = {
+      private def stageName(attr: Attributes): String =
         val name = s"$flowName-$nextId-${attr.nameOrDefault()}"
         nextId += 1
         name
-      }
 
       override protected def materializeAtomic(
           atomic: AtomicModule,
           effectiveAttributes: Attributes,
-          matVal: ju.Map[Module, Any]): Unit = {
+          matVal: ju.Map[Module, Any]): Unit =
         if (MaterializerSession.Debug) println(s"materializing $atomic")
 
         def newMaterializationContext() =
           new MaterializationContext(ActorMaterializerImpl.this,
                                      effectiveAttributes,
                                      stageName(effectiveAttributes))
-        atomic match {
+        atomic match
           case sink: SinkModule[_, _] ⇒
             val (sub, mat) = sink.create(newMaterializationContext())
             assignPort(sink.shape.in, sub)
@@ -148,9 +143,8 @@ private[akka] case class ActorMaterializerImpl(
                                        tls.hostInfo)
             val impl = actorOf(
                 props, stageName(effectiveAttributes), es.dispatcher)
-            def factory(id: Int) = new ActorPublisher[Any](impl) {
+            def factory(id: Int) = new ActorPublisher[Any](impl)
               override val wakeUpMsg = FanOut.SubstreamSubscribePending(id)
-            }
             val publishers = Vector.tabulate(2)(factory)
             impl ! FanOut.ExposedPublishers(publishers)
 
@@ -174,12 +168,10 @@ private[akka] case class ActorMaterializerImpl(
                 stage.attributes,
                 Array(stage))
             matGraph(graph, effectiveAttributes, matVal)
-        }
-      }
 
       private def matGraph(graph: GraphModule,
                            effectiveAttributes: Attributes,
-                           matVal: ju.Map[Module, Any]): Unit = {
+                           matVal: ju.Map[Module, Any]): Unit =
         val calculatedSettings = effectiveSettings(effectiveAttributes)
         val (inHandlers, outHandlers, logics) = graph.assembly.materialize(
             effectiveAttributes, graph.matValIDs, matVal, registerSrc)
@@ -194,33 +186,29 @@ private[akka] case class ActorMaterializerImpl(
 
         val impl =
           if (subflowFuser != null &&
-              !effectiveAttributes.contains(Attributes.AsyncBoundary)) {
+              !effectiveAttributes.contains(Attributes.AsyncBoundary))
             subflowFuser(shell)
-          } else {
+          else
             val props = ActorGraphInterpreter.props(shell)
             actorOf(props,
                     stageName(effectiveAttributes),
                     calculatedSettings.dispatcher)
-          }
 
-        for ((inlet, i) ← graph.shape.inlets.iterator.zipWithIndex) {
+        for ((inlet, i) ← graph.shape.inlets.iterator.zipWithIndex)
           val subscriber =
             new ActorGraphInterpreter.BoundarySubscriber(impl, shell, i)
           assignPort(inlet, subscriber)
-        }
-        for ((outlet, i) ← graph.shape.outlets.iterator.zipWithIndex) {
+        for ((outlet, i) ← graph.shape.outlets.iterator.zipWithIndex)
           val publisher =
             new ActorGraphInterpreter.BoundaryPublisher(impl, shell, i)
           impl ! ActorGraphInterpreter.ExposedPublisher(shell, i, publisher)
           assignPort(outlet, publisher)
-        }
-      }
 
       // FIXME: Remove this, only stream-of-stream ops need it
       private def processorFor(op: StageModule,
                                effectiveAttributes: Attributes,
                                effectiveSettings: ActorMaterializerSettings)
-        : (Processor[Any, Any], Any) = op match {
+        : (Processor[Any, Any], Any) = op match
         case DirectProcessor(processorFactory, _) ⇒ processorFactory()
         case _ ⇒
           val (opprops, mat) = ActorProcessorFactory.props(
@@ -229,31 +217,27 @@ private[akka] case class ActorMaterializerImpl(
               actorOf(opprops,
                       stageName(effectiveAttributes),
                       effectiveSettings.dispatcher)) -> mat
-      }
-    }
 
     session.materialize().asInstanceOf[Mat]
-  }
 
   override lazy val executionContext: ExecutionContextExecutor =
     dispatchers.lookup(
-        settings.dispatcher match {
+        settings.dispatcher match
       case Deploy.NoDispatcherGiven ⇒ Dispatchers.DefaultDispatcherId
       case other ⇒ other
-    })
+    )
 
   override def actorOf(
-      context: MaterializationContext, props: Props): ActorRef = {
+      context: MaterializationContext, props: Props): ActorRef =
     val dispatcher =
       if (props.deploy.dispatcher == Deploy.NoDispatcherGiven)
         effectiveSettings(context.effectiveAttributes).dispatcher
       else props.dispatcher
     actorOf(props, context.stageName, dispatcher)
-  }
 
   private[akka] def actorOf(
-      props: Props, name: String, dispatcher: String): ActorRef = {
-    supervisor match {
+      props: Props, name: String, dispatcher: String): ActorRef =
+    supervisor match
       case ref: LocalActorRef ⇒
         ref.underlying.attachChild(
             props.withDispatcher(dispatcher), name, systemService = false)
@@ -263,23 +247,19 @@ private[akka] case class ActorMaterializerImpl(
             .asInstanceOf[ActorCell]
             .attachChild(
                 props.withDispatcher(dispatcher), name, systemService = false)
-        else {
+        else
           implicit val timeout = ref.system.settings.CreationTimeout
           val f = (supervisor ? StreamSupervisor.Materialize(
                   props.withDispatcher(dispatcher), name)).mapTo[ActorRef]
           Await.result(f, timeout.duration)
-        }
       case unknown ⇒
         throw new IllegalStateException(
             s"Stream supervisor must be a local actor, was [${unknown.getClass.getName}]")
-    }
-  }
-}
 
 private[akka] class SubFusingActorMaterializerImpl(
     val delegate: ActorMaterializerImpl,
     registerShell: GraphInterpreterShell ⇒ ActorRef)
-    extends Materializer {
+    extends Materializer
   override def executionContext: ExecutionContextExecutor =
     delegate.executionContext
 
@@ -298,30 +278,27 @@ private[akka] class SubFusingActorMaterializerImpl(
   def withNamePrefix(name: String): SubFusingActorMaterializerImpl =
     new SubFusingActorMaterializerImpl(
         delegate.withNamePrefix(name), registerShell)
-}
 
 /**
   * INTERNAL API
   */
 private[akka] object FlowNames
-    extends ExtensionId[FlowNames] with ExtensionIdProvider {
+    extends ExtensionId[FlowNames] with ExtensionIdProvider
   override def get(system: ActorSystem): FlowNames = super.get(system)
   override def lookup() = FlowNames
   override def createExtension(system: ExtendedActorSystem): FlowNames =
     new FlowNames
-}
 
 /**
   * INTERNAL API
   */
-private[akka] class FlowNames extends Extension {
+private[akka] class FlowNames extends Extension
   val name = SeqActorName("Flow")
-}
 
 /**
   * INTERNAL API
   */
-private[akka] object StreamSupervisor {
+private[akka] object StreamSupervisor
   def props(settings: ActorMaterializerSettings,
             haveShutDown: AtomicBoolean): Props =
     Props(new StreamSupervisor(settings, haveShutDown))
@@ -347,16 +324,15 @@ private[akka] object StreamSupervisor {
 
   /** Testing purpose */
   case object PrintDebugDump
-}
 
 private[akka] class StreamSupervisor(
     settings: ActorMaterializerSettings, haveShutDown: AtomicBoolean)
-    extends Actor {
+    extends Actor
   import akka.stream.impl.StreamSupervisor._
 
   override def supervisorStrategy = SupervisorStrategy.stoppingStrategy
 
-  def receive = {
+  def receive =
     case Materialize(props, name) ⇒
       val impl = context.actorOf(props, name)
       sender() ! impl
@@ -364,37 +340,31 @@ private[akka] class StreamSupervisor(
     case StopChildren ⇒
       context.children.foreach(context.stop)
       sender() ! StoppedChildren
-  }
 
   override def postStop(): Unit = haveShutDown.set(true)
-}
 
 /**
   * INTERNAL API
   */
-private[akka] object ActorProcessorFactory {
+private[akka] object ActorProcessorFactory
   import akka.stream.impl.Stages._
 
   def props(materializer: ActorMaterializer,
             op: StageModule,
-            parentAttributes: Attributes): (Props, Any) = {
+            parentAttributes: Attributes): (Props, Any) =
     val att = parentAttributes and op.attributes
     // USE THIS TO AVOID CLOSING OVER THE MATERIALIZER BELOW
     // Also, otherwise the attributes will not affect the settings properly!
     val settings = materializer.effectiveSettings(att)
-    op match {
+    op match
       case GroupBy(maxSubstreams, f, _) ⇒
         (GroupByProcessorImpl.props(settings, maxSubstreams, f), ())
       case DirectProcessor(p, m) ⇒
         throw new AssertionError(
             "DirectProcessor cannot end up in ActorProcessorFactory")
-    }
-  }
 
-  def apply[I, O](impl: ActorRef): ActorProcessor[I, O] = {
+  def apply[I, O](impl: ActorRef): ActorProcessor[I, O] =
     val p = new ActorProcessor[I, O](impl)
     // Resolve cyclic dependency with actor. This MUST be the first message no matter what.
     impl ! ExposedPublisher(p.asInstanceOf[ActorPublisher[Any]])
     p
-  }
-}

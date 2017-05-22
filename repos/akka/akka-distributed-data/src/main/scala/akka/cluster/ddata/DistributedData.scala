@@ -12,21 +12,20 @@ import akka.actor.ExtensionIdProvider
 import akka.cluster.Cluster
 
 object DistributedData
-    extends ExtensionId[DistributedData] with ExtensionIdProvider {
+    extends ExtensionId[DistributedData] with ExtensionIdProvider
   override def get(system: ActorSystem): DistributedData = super.get(system)
 
   override def lookup = DistributedData
 
   override def createExtension(system: ExtendedActorSystem): DistributedData =
     new DistributedData(system)
-}
 
 /**
   * Akka extension for convenient configuration and use of the
   * [[Replicator]]. Configuration settings are defined in the
   * `akka.cluster.ddata` section, see `reference.conf`.
   */
-class DistributedData(system: ExtendedActorSystem) extends Extension {
+class DistributedData(system: ExtendedActorSystem) extends Extension
 
   private val config =
     system.settings.config.getConfig("akka.cluster.distributed-data")
@@ -44,12 +43,10 @@ class DistributedData(system: ExtendedActorSystem) extends Extension {
     * `ActorRef` of the [[Replicator]] .
     */
   val replicator: ActorRef =
-    if (isTerminated) {
+    if (isTerminated)
       system.log.warning(
           "Replicator points to dead letters: Make sure the cluster node is not terminated and has the proper role!")
       system.deadLetters
-    } else {
+    else
       val name = config.getString("name")
       system.systemActorOf(Replicator.props(settings), name)
-    }
-}

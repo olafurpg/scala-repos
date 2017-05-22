@@ -6,7 +6,7 @@ import play.api.Play.current
 
 import lila.common.PimpedJson._
 
-private final class SlackClient(url: String, defaultChannel: String) {
+private final class SlackClient(url: String, defaultChannel: String)
 
   def apply(msg: SlackMessage): Funit =
     url.nonEmpty ?? WS
@@ -20,8 +20,6 @@ private final class SlackClient(url: String, defaultChannel: String) {
                     s"#${msg.channel}")
             )
             .noNull)
-      .flatMap {
+      .flatMap
         case res if res.status == 200 => funit
         case res => fufail(s"[slack] $url $msg ${res.status} ${res.body}")
-      }
-}

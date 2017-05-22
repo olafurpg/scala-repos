@@ -7,7 +7,7 @@ import com.intellij.openapi.util.Key
 /**
   * @author Pavel Fatin
   */
-class ProcessWatcher(process: Process, commandLine: String) {
+class ProcessWatcher(process: Process, commandLine: String)
   private val processHandler = new OSProcessHandler(process, commandLine)
   private var errorLines = Vector[String]()
   private var errorInStdOut = false
@@ -15,49 +15,37 @@ class ProcessWatcher(process: Process, commandLine: String) {
 
   processHandler.addProcessListener(MyProcessListener)
 
-  def startNotify() {
+  def startNotify()
     processHandler.startNotify()
-  }
 
   def running: Boolean = !processHandler.isProcessTerminated
 
-  def errors(): Seq[String] = {
-    lock.synchronized {
+  def errors(): Seq[String] =
+    lock.synchronized
       val result = errorLines
       errorLines = Vector()
       result
-    }
-  }
 
-  def destroyProcess() {
+  def destroyProcess()
     process.destroy()
-  }
 
-  private object MyProcessListener extends ProcessAdapter {
-    override def onTextAvailable(event: ProcessEvent, outputType: Key[_]) {
+  private object MyProcessListener extends ProcessAdapter
+    override def onTextAvailable(event: ProcessEvent, outputType: Key[_])
       val text = event.getText
 
-      outputType match {
+      outputType match
         case ProcessOutputTypes.STDOUT =>
-          lock.synchronized {
+          lock.synchronized
             if (errorInStdOut ||
-                ProcessWatcher.ExceptionPattern.matcher(text).find) {
+                ProcessWatcher.ExceptionPattern.matcher(text).find)
               errorInStdOut = true
               errorLines :+= text
-            }
-          }
 
         case ProcessOutputTypes.STDERR =>
-          lock.synchronized {
+          lock.synchronized
             errorLines :+= text
-          }
 
         case _ => // do nothing
-      }
-    }
-  }
-}
 
-object ProcessWatcher {
+object ProcessWatcher
   private val ExceptionPattern = "error|exception".r.pattern
-}

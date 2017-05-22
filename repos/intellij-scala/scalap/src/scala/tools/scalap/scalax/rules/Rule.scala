@@ -27,38 +27,33 @@ import scala.language.postfixOps
   *   
   * Inspired by the Scala parser combinator.
   */
-trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X]) {
+trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X])
   val factory: Rules
   import factory._
 
   def as(name: String) = ruleWithName(name, this)
 
   def flatMap[Out2, B, X2 >: X](fa2ruleb: A => Out => Result[Out2, B, X2]) =
-    mapResult {
+    mapResult
       case Success(out, a) => fa2ruleb(a)(out)
       case Failure => Failure
       case err @ Error(_) => err
-    }
 
-  def map[B](fa2b: A => B) = flatMap { a => out =>
+  def map[B](fa2b: A => B) = flatMap  a => out =>
     Success(out, fa2b(a))
-  }
 
-  def filter(f: A => Boolean) = flatMap { a => out =>
+  def filter(f: A => Boolean) = flatMap  a => out =>
     if (f(a)) Success(out, a) else Failure
-  }
 
   def mapResult[Out2, B, Y](f: Result[Out, A, X] => Result[Out2, B, Y]) =
-    rule { in: In =>
+    rule  in: In =>
       f(apply(in))
-    }
 
   def orElse[In2 <: In, Out2 >: Out, A2 >: A, X2 >: X](
       other: => Rule[In2, Out2, A2, X2]): Rule[In2, Out2, A2, X2] =
-    new Choice[In2, Out2, A2, X2] {
+    new Choice[In2, Out2, A2, X2]
       val factory = Rule.this.factory
       lazy val choices = Rule.this :: other :: Nil
-    }
 
   def orError[In2 <: In] = this orElse (error[In2])
 
@@ -71,34 +66,29 @@ trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X]) {
 
   def ??(pf: PartialFunction[A, Any]) = filter(pf.isDefinedAt(_))
 
-  def -^[B](b: B) = map { any =>
+  def -^[B](b: B) = map  any =>
     b
-  }
 
   /** Maps an Error */
-  def !^[Y](fx2y: X => Y) = mapResult {
+  def !^[Y](fx2y: X => Y) = mapResult
     case s @ Success(_, _) => s
     case Failure => Failure
     case Error(x) => Error(fx2y(x))
-  }
 
   def >>[Out2, B, X2 >: X](fa2ruleb: A => Out => Result[Out2, B, X2]) =
     flatMap(fa2ruleb)
 
-  def >->[Out2, B, X2 >: X](fa2resultb: A => Result[Out2, B, X2]) = flatMap {
+  def >->[Out2, B, X2 >: X](fa2resultb: A => Result[Out2, B, X2]) = flatMap
     a => any =>
       fa2resultb(a)
-  }
 
   def >>?[Out2, B, X2 >: X](pf: PartialFunction[A, Rule[Out, Out2, B, X2]]) =
     filter(pf isDefinedAt _) flatMap pf
 
-  def >>&[B, X2 >: X](fa2ruleb: A => Out => Result[Any, B, X2]) = flatMap {
+  def >>&[B, X2 >: X](fa2ruleb: A => Out => Result[Any, B, X2]) = flatMap
     a => out =>
-      fa2ruleb(a)(out) mapOut { any =>
+      fa2ruleb(a)(out) mapOut  any =>
         out
-      }
-  }
 
   def ~[Out2, B, X2 >: X](next: => Rule[Out, Out2, B, X2]) =
     for (a <- this; b <- next) yield new ~(a, b)
@@ -133,100 +123,80 @@ trait Rule[-In, +Out, +A, +X] extends (In => Result[Out, A, X]) {
 
   /** ^~^(f) is equivalent to ^^ { case b1 ~ b2 => f(b1, b2) } 
     */
-  def ^~^[B1, B2, B >: A <% B1 ~ B2, C](f: (B1, B2) => C) = map { a =>
+  def ^~^[B1, B2, B >: A <% B1 ~ B2, C](f: (B1, B2) => C) = map  a =>
     (a: B1 ~ B2) match { case b1 ~ b2 => f(b1, b2) }
-  }
 
   /** ^~~^(f) is equivalent to ^^ { case b1 ~ b2 ~ b3 => f(b1, b2, b3) } 
     */
-  def ^~~^[B1, B2, B3, B >: A <% B1 ~ B2 ~ B3, C](f: (B1, B2, B3) => C) = map {
+  def ^~~^[B1, B2, B3, B >: A <% B1 ~ B2 ~ B3, C](f: (B1, B2, B3) => C) = map
     a =>
       (a: B1 ~ B2 ~ B3) match { case b1 ~ b2 ~ b3 => f(b1, b2, b3) }
-  }
 
   /** ^~~~^(f) is equivalent to ^^ { case b1 ~ b2 ~ b3 ~ b4 => f(b1, b2, b3, b4) } 
     */
   def ^~~~^[B1, B2, B3, B4, B >: A <% B1 ~ B2 ~ B3 ~ B4, C](
-      f: (B1, B2, B3, B4) => C) = map { a =>
-    (a: B1 ~ B2 ~ B3 ~ B4) match {
+      f: (B1, B2, B3, B4) => C) = map  a =>
+    (a: B1 ~ B2 ~ B3 ~ B4) match
       case b1 ~ b2 ~ b3 ~ b4 => f(b1, b2, b3, b4)
-    }
-  }
 
   /** ^~~~~^(f) is equivalent to ^^ { case b1 ~ b2 ~ b3 ~ b4 ~ b5 => f(b1, b2, b3, b4, b5) } 
     */
   def ^~~~~^[B1, B2, B3, B4, B5, B >: A <% B1 ~ B2 ~ B3 ~ B4 ~ B5, C](
-      f: (B1, B2, B3, B4, B5) => C) = map { a =>
-    (a: B1 ~ B2 ~ B3 ~ B4 ~ B5) match {
+      f: (B1, B2, B3, B4, B5) => C) = map  a =>
+    (a: B1 ~ B2 ~ B3 ~ B4 ~ B5) match
       case b1 ~ b2 ~ b3 ~ b4 ~ b5 => f(b1, b2, b3, b4, b5)
-    }
-  }
 
   /** ^~~~~~^(f) is equivalent to ^^ { case b1 ~ b2 ~ b3 ~ b4 ~ b5 ~ b6 => f(b1, b2, b3, b4, b5, b6) } 
     */
   def ^~~~~~^[
       B1, B2, B3, B4, B5, B6, B >: A <% B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6, C](
-      f: (B1, B2, B3, B4, B5, B6) => C) = map { a =>
-    (a: B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6) match {
+      f: (B1, B2, B3, B4, B5, B6) => C) = map  a =>
+    (a: B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6) match
       case b1 ~ b2 ~ b3 ~ b4 ~ b5 ~ b6 => f(b1, b2, b3, b4, b5, b6)
-    }
-  }
 
   /** ^~~~~~~^(f) is equivalent to ^^ { case b1 ~ b2 ~ b3 ~ b4 ~ b5 ~ b6 => f(b1, b2, b3, b4, b5, b6) } 
     */
   def ^~~~~~~^[
       B1, B2, B3, B4, B5, B6, B7, B >: A <% B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6 ~ B7, C](
-      f: (B1, B2, B3, B4, B5, B6, B7) => C) = map { a =>
-    (a: B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6 ~ B7) match {
+      f: (B1, B2, B3, B4, B5, B6, B7) => C) = map  a =>
+    (a: B1 ~ B2 ~ B3 ~ B4 ~ B5 ~ B6 ~ B7) match
       case b1 ~ b2 ~ b3 ~ b4 ~ b5 ~ b6 ~ b7 => f(b1, b2, b3, b4, b5, b6, b7)
-    }
-  }
 
   /** >~>(f) is equivalent to >> { case b1 ~ b2 => f(b1, b2) } 
     */
   def >~>[Out2, B1, B2, B >: A <% B1 ~ B2, C, X2 >: X](
-      f: (B1, B2) => Out => Result[Out2, C, X2]) = flatMap { a =>
+      f: (B1, B2) => Out => Result[Out2, C, X2]) = flatMap  a =>
     (a: B1 ~ B2) match { case b1 ~ b2 => f(b1, b2) }
-  }
 
   /** ^-^(f) is equivalent to ^^ { b2 => b1 => f(b1, b2) } 
     */
-  def ^-^[B1, B2 >: A, C](f: (B1, B2) => C) = map { b2: B2 => b1: B1 =>
+  def ^-^[B1, B2 >: A, C](f: (B1, B2) => C) = map  b2: B2 => b1: B1 =>
     f(b1, b2)
-  }
 
   /** ^~>~^(f) is equivalent to ^^ { case b2 ~ b3 => b1 => f(b1, b2, b3) } 
     */
-  def ^~>~^[B1, B2, B3, B >: A <% B2 ~ B3, C](f: (B1, B2, B3) => C) = map {
+  def ^~>~^[B1, B2, B3, B >: A <% B2 ~ B3, C](f: (B1, B2, B3) => C) = map
     a =>
-      (a: B2 ~ B3) match {
+      (a: B2 ~ B3) match
         case b2 ~ b3 =>
           b1: B1 =>
             f(b1, b2, b3)
-      }
-  }
-}
 
-trait Choice[-In, +Out, +A, +X] extends Rule[In, Out, A, X] {
+trait Choice[-In, +Out, +A, +X] extends Rule[In, Out, A, X]
   def choices: List[Rule[In, Out, A, X]]
 
-  def apply(in: In) = {
+  def apply(in: In) =
     def oneOf(list: List[Rule[In, Out, A, X]]): Result[Out, A, X] =
-      list match {
+      list match
         case Nil => Failure
         case first :: rest =>
-          first(in) match {
+          first(in) match
             case Failure => oneOf(rest)
             case result => result
-          }
-      }
     oneOf(choices)
-  }
 
   override def orElse[In2 <: In, Out2 >: Out, A2 >: A, X2 >: X](
       other: => Rule[In2, Out2, A2, X2]): Rule[In2, Out2, A2, X2] =
-    new Choice[In2, Out2, A2, X2] {
+    new Choice[In2, Out2, A2, X2]
       val factory = Choice.this.factory
       lazy val choices = Choice.this.choices ::: other :: Nil
-    }
-}

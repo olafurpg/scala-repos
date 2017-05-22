@@ -27,7 +27,7 @@ import org.apache.spark.scheduler.SchedulingMode.SchedulingMode
   * An interface for schedulable entities.
   * there are two type of Schedulable entities(Pools and TaskSetManagers)
   */
-private[spark] trait Schedulable {
+private[spark] trait Schedulable
   var parent: Pool
   // child queues
   def schedulableQueue: ConcurrentLinkedQueue[Schedulable]
@@ -46,4 +46,3 @@ private[spark] trait Schedulable {
       executorId: String, host: String, reason: ExecutorLossReason): Unit
   def checkSpeculatableTasks(): Boolean
   def getSortedTaskSetQueue: ArrayBuffer[TaskSetManager]
-}

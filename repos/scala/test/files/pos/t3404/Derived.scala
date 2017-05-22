@@ -1,3 +1,2 @@
-class Derived extends Base {
+class Derived extends Base
   def foo(a: AnyRef) = classOf[String]
-}

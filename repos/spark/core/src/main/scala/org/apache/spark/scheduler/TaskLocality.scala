@@ -20,13 +20,11 @@ package org.apache.spark.scheduler
 import org.apache.spark.annotation.DeveloperApi
 
 @DeveloperApi
-object TaskLocality extends Enumeration {
+object TaskLocality extends Enumeration
   // Process local is expected to be used ONLY within TaskSetManager for now.
   val PROCESS_LOCAL, NODE_LOCAL, NO_PREF, RACK_LOCAL, ANY = Value
 
   type TaskLocality = Value
 
-  def isAllowed(constraint: TaskLocality, condition: TaskLocality): Boolean = {
+  def isAllowed(constraint: TaskLocality, condition: TaskLocality): Boolean =
     condition <= constraint
-  }
-}

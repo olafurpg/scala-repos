@@ -27,7 +27,7 @@ import org.apache.spark.streaming.Time
 private[streaming] case class JobSet(
     time: Time,
     jobs: Seq[Job],
-    streamIdToInputInfo: Map[Int, StreamInputInfo] = Map.empty) {
+    streamIdToInputInfo: Map[Int, StreamInputInfo] = Map.empty)
 
   private val incompleteJobs = new HashSet[Job]()
   private val submissionTime =
@@ -40,15 +40,13 @@ private[streaming] case class JobSet(
   jobs.zipWithIndex.foreach { case (job, i) => job.setOutputOpId(i) }
   incompleteJobs ++= jobs
 
-  def handleJobStart(job: Job) {
+  def handleJobStart(job: Job)
     if (processingStartTime < 0)
       processingStartTime = System.currentTimeMillis()
-  }
 
-  def handleJobCompletion(job: Job) {
+  def handleJobCompletion(job: Job)
     incompleteJobs -= job
     if (hasCompleted) processingEndTime = System.currentTimeMillis()
-  }
 
   def hasStarted: Boolean = processingStartTime > 0
 
@@ -62,16 +60,14 @@ private[streaming] case class JobSet(
   // (i.e. including the time they wait in the streaming scheduler queue)
   def totalDelay: Long = processingEndTime - time.milliseconds
 
-  def toBatchInfo: BatchInfo = {
+  def toBatchInfo: BatchInfo =
     BatchInfo(
         time,
         streamIdToInputInfo,
         submissionTime,
         if (hasStarted) Some(processingStartTime) else None,
         if (hasCompleted) Some(processingEndTime) else None,
-        jobs.map { job =>
+        jobs.map  job =>
           (job.outputOpId, job.toOutputOperationInfo)
-        }.toMap
+        .toMap
     )
-  }
-}

@@ -8,25 +8,23 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TlsFilterTest extends FunSuite {
+class TlsFilterTest extends FunSuite
   import Version._
   import Method._
 
-  def svc(p: Promise[Request]) = Service.mk { (req: Request) =>
+  def svc(p: Promise[Request]) = Service.mk  (req: Request) =>
     p.setValue(req)
     Future.never
-  }
 
-  test("filter") {
+  test("filter")
     val host = "test.host"
     val tls = new TlsFilter(host)
     val req = Request(Http11, Get, "/")
     val p = new Promise[Request]
     (tls andThen svc(p))(req)
     assert(Await.result(p).headerMap.get("Host") == Some(host))
-  }
 
-  test("module") {
+  test("module")
     val host = "test.host"
     val p = new Promise[Request]
     val stk = TlsFilter.module.toStack(
@@ -35,5 +33,3 @@ class TlsFilterTest extends FunSuite {
       stk.make(Stack.Params.empty + Transporter.TLSHostname(Some(host)))
     Await.result(fac())(Request(Http11, Get, "/"))
     assert(Await.result(p).headerMap.get("Host") == Some(host))
-  }
-}

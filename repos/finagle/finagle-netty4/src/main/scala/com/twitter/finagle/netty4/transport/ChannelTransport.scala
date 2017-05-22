@@ -17,19 +17,18 @@ import java.util.concurrent.atomic.AtomicBoolean
   * handlers inserted after that won't get any of the inbound traffic.
   */
 private[netty4] class ChannelTransport[In, Out](ch: Channel)
-    extends Transport[In, Out] {
+    extends Transport[In, Out]
   private[this] val queue = new AsyncQueue[Out]
 
   private[this] val failed = new AtomicBoolean(false)
   private[this] val closed = new Promise[Throwable]
 
-  private[this] val readInterruptHandler: PartialFunction[Throwable, Unit] = {
+  private[this] val readInterruptHandler: PartialFunction[Throwable, Unit] =
     case e => fail(e)
-  }
 
   val onClose: Future[Throwable] = closed
 
-  private[this] def fail(exc: Throwable): Unit = {
+  private[this] def fail(exc: Throwable): Unit =
     if (!failed.compareAndSet(false, true)) return
 
     // Do not discard existing queue items. Doing so causes a race
@@ -47,34 +46,30 @@ private[netty4] class ChannelTransport[In, Out](ch: Channel)
     // which should be illegal after failure.
     close()
     closed.updateIfEmpty(Return(exc))
-  }
 
-  def write(msg: In): Future[Unit] = {
+  def write(msg: In): Future[Unit] =
     // We support Netty's channel-level backpressure thereby respecting
     // slow receivers on the other side.
-    if (!ch.isWritable) {
+    if (!ch.isWritable)
       // Note: It's up to the layer above a transport to decided whether or
       // not to requeue a canceled write.
       Future.exception(new DroppedWriteException)
-    } else {
+    else
       val op = ch.writeAndFlush(msg)
 
       val p = new Promise[Unit]
-      op.addListener(new ChannelFutureListener {
+      op.addListener(new ChannelFutureListener
         def operationComplete(f: ChannelFuture): Unit =
           if (f.isSuccess) p.setDone()
           else if (f.isCancelled) p.setException(new CancelledWriteException)
           else p.setException(ChannelException(f.cause, remoteAddress))
-      })
+      )
 
-      p.setInterruptHandler {
+      p.setInterruptHandler
         case _ => op.cancel(true /* mayInterruptIfRunning */ )
-      }
       p
-    }
-  }
 
-  def read(): Future[Out] = {
+  def read(): Future[Out] =
     ch.read()
 
     // This is fine, but we should consider being a little more fine-grained
@@ -93,17 +88,15 @@ private[netty4] class ChannelTransport[In, Out](ch: Channel)
     // raise on the "other" side of the become indiscriminately in all cases.
     p.setInterruptHandler(readInterruptHandler)
     p
-  }
 
   def status: Status =
     if (failed.get || !ch.isOpen) Status.Closed
     else if (!ch.isWritable) Status.Busy
     else Status.Open
 
-  def close(deadline: Time): Future[Unit] = {
+  def close(deadline: Time): Future[Unit] =
     if (ch.isOpen) ch.close()
     closed.unit
-  }
 
   // TODO: We don't support SSL for Netty 4 yet
   val peerCertificate: Option[Certificate] = None
@@ -116,18 +109,14 @@ private[netty4] class ChannelTransport[In, Out](ch: Channel)
 
   ch.pipeline()
     .addLast(
-        "finagleChannelTransport", new SimpleChannelInboundHandler[Out]() {
-      override def channelRead0(ctx: ChannelHandlerContext, msg: Out): Unit = {
+        "finagleChannelTransport", new SimpleChannelInboundHandler[Out]()
+      override def channelRead0(ctx: ChannelHandlerContext, msg: Out): Unit =
         queue.offer(msg)
-      }
 
-      override def channelInactive(ctx: ChannelHandlerContext): Unit = {
+      override def channelInactive(ctx: ChannelHandlerContext): Unit =
         fail(new ChannelClosedException(remoteAddress))
-      }
 
       override def exceptionCaught(
-          ctx: ChannelHandlerContext, e: Throwable): Unit = {
+          ctx: ChannelHandlerContext, e: Throwable): Unit =
         fail(ChannelException(e, remoteAddress))
-      }
-    })
-}
+    )

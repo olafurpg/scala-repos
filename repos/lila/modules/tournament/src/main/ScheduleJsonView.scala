@@ -8,7 +8,7 @@ import lila.game.{Game, GameRepo}
 import lila.rating.PerfType
 import lila.user.User
 
-final class ScheduleJsonView(getLightUser: String => Option[LightUser]) {
+final class ScheduleJsonView(getLightUser: String => Option[LightUser])
 
   import JsonView._
 
@@ -48,4 +48,3 @@ final class ScheduleJsonView(getLightUser: String => Option[LightUser]) {
     Json.obj("icon" -> p.iconChar.toString,
              "name" -> p.name,
              "position" -> PerfType.all.indexOf(p))
-}

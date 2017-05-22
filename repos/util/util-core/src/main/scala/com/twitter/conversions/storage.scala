@@ -19,8 +19,8 @@ package com.twitter.conversions
 import com.twitter.util.StorageUnit
 import scala.language.implicitConversions
 
-object storage {
-  class RichWholeNumber(wrapped: Long) {
+object storage
+  class RichWholeNumber(wrapped: Long)
     def byte: StorageUnit = bytes
     def bytes: StorageUnit = new StorageUnit(wrapped)
     def kilobyte: StorageUnit = kilobytes
@@ -39,10 +39,8 @@ object storage {
     def thousand: Long = wrapped * 1000
     def million: Long = wrapped * 1000 * 1000
     def billion: Long = wrapped * 1000 * 1000 * 1000
-  }
 
   implicit def intToStorageUnitableWholeNumber(i: Int): RichWholeNumber =
     new RichWholeNumber(i)
   implicit def longToStorageUnitableWholeNumber(l: Long): RichWholeNumber =
     new RichWholeNumber(l)
-}

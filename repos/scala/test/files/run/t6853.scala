@@ -1,8 +1,8 @@
 // Test cases: the only place we can cut and paste without crying
 // ourself to sleep.
-object Test {
+object Test
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     // First testing the basic operations
     val m = collection.mutable.ListMap[String, Int]()
     var i = 0
@@ -14,5 +14,3 @@ object Test {
     i = 0
     while (i < 80000) { m += ("foo" + i) -> i; i = i + 1 }
     assert(m.size == 80000)
-  }
-}

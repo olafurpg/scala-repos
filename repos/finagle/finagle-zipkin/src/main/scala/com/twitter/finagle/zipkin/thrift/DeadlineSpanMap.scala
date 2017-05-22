@@ -16,7 +16,7 @@ import scala.collection.mutable.ArrayBuffer
 private class DeadlineSpanMap(logSpans: Seq[Span] => Future[Unit],
                               ttl: Duration,
                               statsReceiver: StatsReceiver,
-                              timer: Timer) {
+                              timer: Timer)
 
   private[this] val spanMap = new ConcurrentHashMap[TraceId, MutableSpan](64)
 
@@ -30,49 +30,42 @@ private class DeadlineSpanMap(logSpans: Seq[Span] => Future[Unit],
     *
     * If the span is deemed complete it will be removed from the map and sent to `logSpans`
     */
-  def update(traceId: TraceId)(f: MutableSpan => Unit): Unit = {
-    val span: MutableSpan = {
+  def update(traceId: TraceId)(f: MutableSpan => Unit): Unit =
+    val span: MutableSpan =
       val span = spanMap.get(traceId)
-      if (span != null) {
+      if (span != null)
         span
-      } else {
+      else
         val newSpan = new MutableSpan(traceId, Time.now)
         val prev = spanMap.putIfAbsent(traceId, newSpan)
         if (prev == null) newSpan else prev
-      }
-    }
 
     f(span)
 
-    if (span.isComplete) {
+    if (span.isComplete)
       spanMap.remove(traceId, span)
       logSpans(Seq(span.toSpan))
-    }
-  }
 
   /**
     * Flush spans created earlier than `now`
     *
     * @return Future indicating completion.
     */
-  def flush(deadline: Time): Future[Unit] = {
+  def flush(deadline: Time): Future[Unit] =
     val ss = new ArrayBuffer[Span](spanMap.size)
 
     val iter = spanMap.entrySet.iterator
-    while (iter.hasNext) {
+    while (iter.hasNext)
       val kv = iter.next()
       val span = kv.getValue
-      if (span.started <= deadline) {
+      if (span.started <= deadline)
         spanMap.remove(kv.getKey, span)
         span.addAnnotation(
             ZipkinAnnotation(deadline, "finagle.flush", span.endpoint))
         ss.append(span.toSpan)
-      }
-    }
 
     if (ss.isEmpty) Future.Done
     else logSpans(ss)
-  }
 
   /**
     * Flush all currently tracked spans.
@@ -81,9 +74,8 @@ private class DeadlineSpanMap(logSpans: Seq[Span] => Future[Unit],
     */
   def flush(): Future[Unit] =
     flush(Time.Top)
-}
 
-private final class MutableSpan(val traceId: TraceId, val started: Time) {
+private final class MutableSpan(val traceId: TraceId, val started: Time)
   private[this] var _isComplete: Boolean = false
   private[this] var _name: Option[String] = None
   private[this] var _service: Option[String] = None
@@ -94,17 +86,15 @@ private final class MutableSpan(val traceId: TraceId, val started: Time) {
 
   def endpoint: Endpoint = synchronized { _endpoint }
 
-  def setName(n: String): MutableSpan = synchronized {
+  def setName(n: String): MutableSpan = synchronized
     _name = Some(n)
     this
-  }
 
-  def setServiceName(n: String): MutableSpan = synchronized {
+  def setServiceName(n: String): MutableSpan = synchronized
     _service = Some(n)
     this
-  }
 
-  def addAnnotation(ann: ZipkinAnnotation): MutableSpan = synchronized {
+  def addAnnotation(ann: ZipkinAnnotation): MutableSpan = synchronized
     if (!_isComplete &&
         (ann.value.equals(Constants.CLIENT_RECV) ||
             ann.value.equals(Constants.SERVER_SEND) ||
@@ -113,28 +103,22 @@ private final class MutableSpan(val traceId: TraceId, val started: Time) {
 
     annotations.append(ann)
     this
-  }
 
-  def addBinaryAnnotation(ann: BinaryAnnotation): MutableSpan = synchronized {
+  def addBinaryAnnotation(ann: BinaryAnnotation): MutableSpan = synchronized
     binaryAnnotations.append(ann)
     this
-  }
 
-  def setEndpoint(ep: Endpoint): MutableSpan = synchronized {
+  def setEndpoint(ep: Endpoint): MutableSpan = synchronized
     _endpoint = ep
     var idx = 0
-    while (idx < annotations.size) {
+    while (idx < annotations.size)
       val a = annotations(idx)
       if (a.endpoint == Endpoint.Unknown)
         annotations(idx) = a.copy(endpoint = ep)
       idx += 1
-    }
     this
-  }
 
-  def toSpan: Span = synchronized {
+  def toSpan: Span = synchronized
     Span(traceId, _service, _name, annotations, binaryAnnotations, _endpoint)
-  }
 
   def isComplete: Boolean = synchronized { _isComplete }
-}

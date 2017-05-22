@@ -9,7 +9,7 @@ import akka.camel.internal.ActivationProtocol._
 
 class ActivationTrackerTest
     extends TestKit(ActorSystem("test")) with WordSpecLike with Matchers
-    with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen {
+    with BeforeAndAfterAll with BeforeAndAfterEach with GivenWhenThen
 
   override protected def afterAll() { shutdown() }
 
@@ -18,18 +18,17 @@ class ActivationTrackerTest
   var anotherAwaiting: Awaiting = _
   val cause = new Exception("cause of failure")
 
-  override protected def beforeEach() {
+  override protected def beforeEach()
     actor = TestProbe()
     awaiting = new Awaiting(actor)
     anotherAwaiting = new Awaiting(actor)
-  }
 
   val at =
     system.actorOf(Props[ActivationTracker], name = "activationTrackker")
-  "ActivationTracker" must {
+  "ActivationTracker" must
     def publish(msg: Any) = at ! msg
     implicit def timeout = remainingOrDefault
-    "forwards activation message to all awaiting parties" taggedAs TimingTest in {
+    "forwards activation message to all awaiting parties" taggedAs TimingTest in
       awaiting.awaitActivation()
       anotherAwaiting.awaitActivation()
 
@@ -37,26 +36,23 @@ class ActivationTrackerTest
 
       awaiting.verifyActivated()
       anotherAwaiting.verifyActivated()
-    }
 
-    "send activation message even if activation happened earlier" taggedAs TimingTest in {
+    "send activation message even if activation happened earlier" taggedAs TimingTest in
       publish(EndpointActivated(actor.ref))
       Thread.sleep(50)
       awaiting.awaitActivation()
 
       awaiting.verifyActivated()
-    }
 
-    "send activation message even if actor is already deactivated" taggedAs TimingTest in {
+    "send activation message even if actor is already deactivated" taggedAs TimingTest in
       publish(EndpointActivated(actor.ref))
       publish(EndpointDeActivated(actor.ref))
       Thread.sleep(50)
       awaiting.awaitActivation()
 
       awaiting.verifyActivated()
-    }
 
-    "forward de-activation message to all awaiting parties" taggedAs TimingTest in {
+    "forward de-activation message to all awaiting parties" taggedAs TimingTest in
       publish(EndpointActivated(actor.ref))
       publish(EndpointDeActivated(actor.ref))
 
@@ -65,9 +61,8 @@ class ActivationTrackerTest
 
       awaiting.verifyDeActivated()
       anotherAwaiting.verifyDeActivated()
-    }
 
-    "forward de-activation message even if deactivation happened earlier" taggedAs TimingTest in {
+    "forward de-activation message even if deactivation happened earlier" taggedAs TimingTest in
       publish(EndpointActivated(actor.ref))
 
       awaiting.awaitDeActivation()
@@ -75,9 +70,8 @@ class ActivationTrackerTest
       publish(EndpointDeActivated(actor.ref))
 
       awaiting.verifyDeActivated()
-    }
 
-    "forward de-activation message even if someone awaits de-activation even before activation happens" taggedAs TimingTest in {
+    "forward de-activation message even if someone awaits de-activation even before activation happens" taggedAs TimingTest in
       val awaiting = new Awaiting(actor)
       awaiting.awaitDeActivation()
 
@@ -86,57 +80,46 @@ class ActivationTrackerTest
       publish(EndpointDeActivated(actor.ref))
 
       awaiting.verifyDeActivated()
-    }
 
-    "send activation failure when failed to activate" taggedAs TimingTest in {
+    "send activation failure when failed to activate" taggedAs TimingTest in
       awaiting.awaitActivation()
       publish(EndpointFailedToActivate(actor.ref, cause))
 
       awaiting.verifyFailedToActivate()
-    }
 
-    "send de-activation failure when failed to de-activate" taggedAs TimingTest in {
+    "send de-activation failure when failed to de-activate" taggedAs TimingTest in
       publish(EndpointActivated(actor.ref))
       awaiting.awaitDeActivation()
       publish(EndpointFailedToDeActivate(actor.ref, cause))
 
       awaiting.verifyFailedToDeActivate()
-    }
 
-    "send activation message even if it failed to de-activate" taggedAs TimingTest in {
+    "send activation message even if it failed to de-activate" taggedAs TimingTest in
       publish(EndpointActivated(actor.ref))
       publish(EndpointFailedToDeActivate(actor.ref, cause))
       awaiting.awaitActivation()
 
       awaiting.verifyActivated()
-    }
 
-    "send activation message when an actor is activated, deactivated and activated again" taggedAs TimingTest in {
+    "send activation message when an actor is activated, deactivated and activated again" taggedAs TimingTest in
       publish(EndpointActivated(actor.ref))
       publish(EndpointDeActivated(actor.ref))
       publish(EndpointActivated(actor.ref))
       awaiting.awaitActivation()
       awaiting.verifyActivated()
-    }
-  }
 
-  class Awaiting(actor: TestProbe) {
+  class Awaiting(actor: TestProbe)
     val probe = TestProbe()
     def awaitActivation() = at.tell(AwaitActivation(actor.ref), probe.ref)
     def awaitDeActivation() = at.tell(AwaitDeActivation(actor.ref), probe.ref)
-    def verifyActivated()(implicit timeout: FiniteDuration) = within(timeout) {
+    def verifyActivated()(implicit timeout: FiniteDuration) = within(timeout)
       probe.expectMsg(EndpointActivated(actor.ref))
-    }
     def verifyDeActivated()(implicit timeout: FiniteDuration) =
       within(timeout) { probe.expectMsg(EndpointDeActivated(actor.ref)) }
 
     def verifyFailedToActivate()(implicit timeout: FiniteDuration) =
-      within(timeout) {
+      within(timeout)
         probe.expectMsg(EndpointFailedToActivate(actor.ref, cause))
-      }
     def verifyFailedToDeActivate()(implicit timeout: FiniteDuration) =
-      within(timeout) {
+      within(timeout)
         probe.expectMsg(EndpointFailedToDeActivate(actor.ref, cause))
-      }
-  }
-}

@@ -36,7 +36,7 @@ import scala.language.implicitConversions
   * @tparam S `SFXEnumDelegate` that wrappers `E`
   */
 trait SFXEnumDelegateCompanion[
-    E <: java.lang.Enum[E], S <: SFXEnumDelegate[E]] {
+    E <: java.lang.Enum[E], S <: SFXEnumDelegate[E]]
 
   /**
     *  Converts a `SFXEnumDelegate` to its respective JavaFX `Enum`.
@@ -72,10 +72,8 @@ trait SFXEnumDelegateCompanion[
     * @throws IllegalArgumentException If the specified `enum` type has no constant with the specified name, 
     * or the specified class object does not represent an `enum` type.
     */
-  def apply(name: String) = values.find(_.name == name) match {
+  def apply(name: String) = values.find(_.name == name) match
     case Some(e) => e
     case None =>
       throw new IllegalArgumentException(
           "No enum constant %s.%s".format(values.head.getClass.getName, name))
-  }
-}

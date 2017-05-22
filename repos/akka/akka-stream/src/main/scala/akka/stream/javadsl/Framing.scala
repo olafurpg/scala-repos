@@ -9,7 +9,7 @@ import akka.NotUsed
 import akka.stream.scaladsl
 import akka.util.ByteString
 
-object Framing {
+object Framing
 
   /**
     * Creates a Flow that handles decoding a stream of unstructured byte chunks into a stream of frames where the
@@ -29,9 +29,8 @@ object Framing {
     */
   def delimiter(
       delimiter: ByteString,
-      maximumFrameLength: Int): Flow[ByteString, ByteString, NotUsed] = {
+      maximumFrameLength: Int): Flow[ByteString, ByteString, NotUsed] =
     scaladsl.Framing.delimiter(delimiter, maximumFrameLength).asJava
-  }
 
   /**
     * Creates a Flow that handles decoding a stream of unstructured byte chunks into a stream of frames where the
@@ -51,12 +50,11 @@ object Framing {
   def delimiter(delimiter: ByteString,
                 maximumFrameLength: Int,
                 allowTruncation: FramingTruncation)
-    : Flow[ByteString, ByteString, NotUsed] = {
+    : Flow[ByteString, ByteString, NotUsed] =
     val truncationAllowed = allowTruncation == FramingTruncation.ALLOW
     scaladsl.Framing
       .delimiter(delimiter, maximumFrameLength, truncationAllowed)
       .asJava
-  }
 
   /**
     * Creates a Flow that decodes an incoming stream of unstructured byte chunks into a stream of frames, assuming that
@@ -125,4 +123,3 @@ object Framing {
   def simpleFramingProtocol(maximumMessageLength: Int)
     : BidiFlow[ByteString, ByteString, ByteString, ByteString, NotUsed] =
     scaladsl.Framing.simpleFramingProtocol(maximumMessageLength).asJava
-}

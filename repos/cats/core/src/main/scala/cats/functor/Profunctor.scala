@@ -7,7 +7,7 @@ package functor
   *
   * Must obey the laws defined in cats.laws.ProfunctorLaws.
   */
-trait Profunctor[F[_, _]] extends Serializable { self =>
+trait Profunctor[F[_, _]] extends Serializable  self =>
 
   /**
     * contramap on the first type parameter and map on the second type parameter
@@ -25,8 +25,6 @@ trait Profunctor[F[_, _]] extends Serializable { self =>
     */
   def rmap[A, B, C](fab: F[A, B])(f: B => C): F[A, C] =
     dimap[A, B, A, C](fab)(identity)(f)
-}
 
-object Profunctor {
+object Profunctor
   def apply[F[_, _]](implicit ev: Profunctor[F]): Profunctor[F] = ev
-}

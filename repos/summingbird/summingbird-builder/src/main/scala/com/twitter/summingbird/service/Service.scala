@@ -27,7 +27,7 @@ case class CompoundService[Key, Joined](
     offline: Option[Service[Key, Joined]],
     online: Option[() => ReadableStore[Key, Joined]])
 
-object CompoundService {
+object CompoundService
   def apply[K, J](offline: Service[K, J],
                   online: => ReadableStore[K, J]): CompoundService[K, J] =
     CompoundService(Some(offline), Some(() => online))
@@ -35,4 +35,3 @@ object CompoundService {
     CompoundService(Some(offline), None)
   def fromOnline[K, J](online: => ReadableStore[K, J]): CompoundService[K, J] =
     CompoundService(None, Some(() => online))
-}

@@ -29,7 +29,7 @@ class ScalaScriptRunConfiguration(
     val name: String)
     extends ModuleBasedConfiguration[RunConfigurationModule](
         name, new RunConfigurationModule(project), configurationFactory)
-    with RefactoringListenerProvider {
+    with RefactoringListenerProvider
   val SCALA_HOME = "-Dscala.home="
   val CLASSPATH = "-Denv.classpath=\"%CLASSPATH%\""
   val EMACS = "-Denv.emacs=\"%EMACS%\""
@@ -38,62 +38,52 @@ class ScalaScriptRunConfiguration(
   private var scriptArgs = ""
   private var javaOptions = ""
   private var consoleArgs = ""
-  private var workingDirectory = {
+  private var workingDirectory =
     val base = getProject.getBaseDir
     if (base != null) base.getPath
     else ""
-  }
 
   def getScriptPath = scriptPath
   def getScriptArgs = scriptArgs
   def getJavaOptions = javaOptions
   def getConsoleArgs = consoleArgs
   def getWorkingDirectory: String = workingDirectory
-  def setScriptPath(s: String) {
+  def setScriptPath(s: String)
     scriptPath = s
-  }
-  def setScriptArgs(s: String) {
+  def setScriptArgs(s: String)
     scriptArgs = s
-  }
-  def setJavaOptions(s: String) {
+  def setJavaOptions(s: String)
     javaOptions = s
-  }
-  def setConsoleArgs(s: String) {
+  def setConsoleArgs(s: String)
     consoleArgs = s
-  }
-  def setWorkingDirectory(s: String) {
+  def setWorkingDirectory(s: String)
     workingDirectory = s
-  }
 
-  def apply(params: ScalaScriptRunConfigurationForm) {
+  def apply(params: ScalaScriptRunConfigurationForm)
     setScriptArgs(params.getScriptArgs)
     setScriptPath(params.getScriptPath)
     setJavaOptions(params.getJavaOptions)
     setConsoleArgs(params.getConsoleArgs)
     setWorkingDirectory(params.getWorkingDirectory)
-  }
 
   def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
-    def fileNotFoundError() {
+      executor: Executor, env: ExecutionEnvironment): RunProfileState =
+    def fileNotFoundError()
       throw new ExecutionException("Scala script file not found.")
-    }
-    try {
+    try
       val file: VirtualFile = VcsUtil.getVirtualFile(scriptPath)
-      PsiManager.getInstance(project).findFile(file) match {
+      PsiManager.getInstance(project).findFile(file) match
         case f: ScalaFile if f.isScriptFile() && !f.isWorksheetFile =>
         case _ => fileNotFoundError()
-      }
-    } catch {
+    catch
       case e: Exception => fileNotFoundError()
-    }
 
     val module = getModule
     if (module == null) throw new ExecutionException("Module is not specified")
 
     val script = VcsUtil.getVirtualFile(scriptPath)
-    val state = new JavaCommandLineState(env) {
-      protected override def createJavaParameters: JavaParameters = {
+    val state = new JavaCommandLineState(env)
+      protected override def createJavaParameters: JavaParameters =
         val params = new JavaParameters()
 
         params.setCharset(null)
@@ -117,34 +107,29 @@ class ScalaScriptRunConfiguration(
         params.getProgramParametersList.add(scriptPath)
         params.getProgramParametersList.addParametersString(scriptArgs)
         params
-      }
-    }
 
     val consoleBuilder =
       TextConsoleBuilderFactory.getInstance.createBuilder(getProject)
     consoleBuilder.addFilter(getFilter(script))
     state.setConsoleBuilder(consoleBuilder)
     state
-  }
 
-  def getModule: Module = {
+  def getModule: Module =
     var module: Module = null
-    try {
+    try
       val file: VirtualFile = VcsUtil.getVirtualFile(scriptPath)
       module = ModuleUtilCore.findModuleForFile(file, getProject)
-    } catch {
+    catch
       case e: Exception =>
-    }
     if (module == null) module = getConfigurationModule.getModule
     module
-  }
 
   def getValidModules: java.util.List[Module] = getProject.modulesWithScala
 
   def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new ScalaScriptRunConfigurationEditor(project, this)
 
-  override def writeExternal(element: Element) {
+  override def writeExternal(element: Element)
     super.writeExternal(element)
     writeModule(element)
     JDOMExternalizer.write(element, "path", getScriptPath)
@@ -152,9 +137,8 @@ class ScalaScriptRunConfiguration(
     JDOMExternalizer.write(element, "consoleargs", getConsoleArgs)
     JDOMExternalizer.write(element, "params", getScriptArgs)
     JDOMExternalizer.write(element, "workingDirectory", workingDirectory)
-  }
 
-  override def readExternal(element: Element) {
+  override def readExternal(element: Element)
     super.readExternal(element)
     readModule(element)
     scriptPath = JDOMExternalizer.readString(element, "path")
@@ -163,16 +147,15 @@ class ScalaScriptRunConfiguration(
     consoleArgs = JDOMExternalizer.readString(element, "consoleargs")
     val pp = JDOMExternalizer.readString(element, "workingDirectory")
     if (pp != null) workingDirectory = pp
-  }
 
-  private def getFilter(file: VirtualFile): Filter = {
+  private def getFilter(file: VirtualFile): Filter =
     import com.intellij.execution.filters.Filter._
-    new Filter {
-      def applyFilter(line: String, entireLength: Int): Result = {
+    new Filter
+      def applyFilter(line: String, entireLength: Int): Result =
         val start = entireLength - line.length
         var end = entireLength - line.length
-        if (line.startsWith("(fragment of ")) {
-          try {
+        if (line.startsWith("(fragment of "))
+          try
             var cache =
               line.replaceFirst("[(][f][r][a][g][m][e][n][t][ ][o][f][ ]", "")
             cache = cache.replaceFirst("[^)]*[)][:]", "")
@@ -183,33 +166,23 @@ class ScalaScriptRunConfiguration(
             val hyperlink = new OpenFileHyperlinkInfo(
                 getProject, file, lineNumber - 1)
             new Result(start, end, hyperlink)
-          } catch {
+          catch
             case _: Exception => return null
-          }
-        } else null
-      }
-    }
-  }
+        else null
 
   def getRefactoringElementListener(
-      element: PsiElement): RefactoringElementListener = element match {
+      element: PsiElement): RefactoringElementListener = element match
     case file: ScalaFile =>
-      new RefactoringElementAdapter {
-        def elementRenamedOrMoved(newElement: PsiElement) = {
-          newElement match {
+      new RefactoringElementAdapter
+        def elementRenamedOrMoved(newElement: PsiElement) =
+          newElement match
             case f: ScalaFile =>
               val newPath = f.getVirtualFile.getPath
               setScriptPath(newPath)
             case _ =>
-          }
-        }
 
         //todo this method does not called when undo of moving action executed
         def undoElementMovedOrRenamed(
-            newElement: PsiElement, oldQualifiedName: String) {
+            newElement: PsiElement, oldQualifiedName: String)
           setScriptPath(oldQualifiedName)
-        }
-      }
     case _ => RefactoringElementListener.DEAF
-  }
-}

@@ -45,31 +45,28 @@ private[ui] case class ExecutorSummaryInfo(id: String,
 
 private[ui] class ExecutorsPage(
     parent: ExecutorsTab, threadDumpEnabled: Boolean)
-    extends WebUIPage("") {
+    extends WebUIPage("")
   private val listener = parent.listener
   // When GCTimePercent is edited change ToolTips.TASK_TIME to match
   private val GCTimePercent = 0.1
 
-  def render(request: HttpServletRequest): Seq[Node] = {
-    val (activeExecutorInfo, deadExecutorInfo) = listener.synchronized {
+  def render(request: HttpServletRequest): Seq[Node] =
+    val (activeExecutorInfo, deadExecutorInfo) = listener.synchronized
       // The follow codes should be protected by `listener` to make sure no executors will be
       // removed before we query their status. See SPARK-12784.
-      val _activeExecutorInfo = {
+      val _activeExecutorInfo =
         for (statusId <- 0 until listener.activeStorageStatusList.size) yield
           ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
-      }
-      val _deadExecutorInfo = {
+      val _deadExecutorInfo =
         for (statusId <- 0 until listener.deadStorageStatusList.size) yield
           ExecutorsPage.getExecInfo(listener, statusId, isActive = false)
-      }
       (_activeExecutorInfo, _deadExecutorInfo)
-    }
 
     val execInfo = activeExecutorInfo ++ deadExecutorInfo
     val execInfoSorted = execInfo.sortBy(_.id)
     val logsExist = execInfo.filter(_.executorLogs.nonEmpty).nonEmpty
 
-    val execTable = {
+    val execTable =
       <table class={UIUtils.TABLE_CLASS_STRIPED_SORTABLE}>
         <thead>
           <th>Executor ID</th>
@@ -101,7 +98,6 @@ private[ui] class ExecutorsPage(
           {execInfoSorted.map(execRow(_, logsExist))}
         </tbody>
       </table>
-    }
 
     val content = <div class="row">
         <div class="span12">
@@ -117,19 +113,17 @@ private[ui] class ExecutorsPage(
       </div>;
 
     UIUtils.headerSparkPage("Executors", content, parent)
-  }
 
   /** Render an HTML row representing an executor */
-  private def execRow(info: ExecutorSummary, logsExist: Boolean): Seq[Node] = {
+  private def execRow(info: ExecutorSummary, logsExist: Boolean): Seq[Node] =
     val maximumMemory = info.maxMemory
     val memoryUsed = info.memoryUsed
     val diskUsed = info.diskUsed
     val executorStatus =
-      if (info.isActive) {
+      if (info.isActive)
         "Active"
-      } else {
+      else
         "Dead"
-      }
 
     <tr>
       <td>{info.id}</td>
@@ -146,8 +140,8 @@ private[ui] class ExecutorsPage(
         {Utils.bytesToString(diskUsed)}
       </td>
       <td>{info.totalCores}</td>
-      {taskData(info.maxTasks, info.activeTasks, info.failedTasks, info.completedTasks,
-      info.totalTasks, info.totalDuration, info.totalGCTime)}
+      taskData(info.maxTasks, info.activeTasks, info.failedTasks, info.completedTasks,
+      info.totalTasks, info.totalDuration, info.totalGCTime)
       <td sorttable_customkey={info.totalInputBytes.toString}>
         {Utils.bytesToString(info.totalInputBytes)}
       </td>
@@ -157,40 +151,35 @@ private[ui] class ExecutorsPage(
       <td sorttable_customkey={info.totalShuffleWrite.toString}>
         {Utils.bytesToString(info.totalShuffleWrite)}
       </td>
-      {
-        if (logsExist) {
+      
+        if (logsExist)
           <td>
-            {
-              info.executorLogs.map { case (logName, logUrl) =>
+            
+              info.executorLogs.map  case (logName, logUrl) =>
                 <div>
                   <a href={logUrl}>
                     {logName}
                   </a>
                 </div>
-              }
-            }
+            
           </td>
-        }
-      }
-      {
-        if (threadDumpEnabled) {
-          if (info.isActive) {
+      
+      
+        if (threadDumpEnabled)
+          if (info.isActive)
             val encodedId = URLEncoder.encode(info.id, "UTF-8")
             <td>
               <a href={s"threadDump/?executorId=${encodedId}"}>Thread Dump</a>
             </td>
-          } else {
+          else
             <td> </td>
-          }
-        } else {
+        else
           Seq.empty
-        }
-      }
+      
     </tr>
-  }
 
   private def execSummaryRow(
-      execInfo: Seq[ExecutorSummary], rowName: String): Seq[Node] = {
+      execInfo: Seq[ExecutorSummary], rowName: String): Seq[Node] =
     val maximumMemory = execInfo.map(_.maxMemory).sum
     val memoryUsed = execInfo.map(_.memoryUsed).sum
     val diskUsed = execInfo.map(_.diskUsed).sum
@@ -210,13 +199,13 @@ private[ui] class ExecutorsPage(
         {Utils.bytesToString(diskUsed)}
       </td>
       <td>{totalCores}</td>
-      {taskData(execInfo.map(_.maxTasks).sum,
+      taskData(execInfo.map(_.maxTasks).sum,
       execInfo.map(_.activeTasks).sum,
       execInfo.map(_.failedTasks).sum,
       execInfo.map(_.completedTasks).sum,
       execInfo.map(_.totalTasks).sum,
       execInfo.map(_.totalDuration).sum,
-      execInfo.map(_.totalGCTime).sum)}
+      execInfo.map(_.totalGCTime).sum)
       <td sorttable_customkey={totalInputBytes.toString}>
         {Utils.bytesToString(totalInputBytes)}
       </td>
@@ -227,10 +216,9 @@ private[ui] class ExecutorsPage(
         {Utils.bytesToString(totalShuffleWrite)}
       </td>
     </tr>
-  }
 
   private def execSummary(activeExecInfo: Seq[ExecutorSummary],
-                          deadExecInfo: Seq[ExecutorSummary]): Seq[Node] = {
+                          deadExecInfo: Seq[ExecutorSummary]): Seq[Node] =
     val totalExecInfo = activeExecInfo ++ deadExecInfo
     val activeRow = execSummaryRow(activeExecInfo, "Active");
     val deadRow = execSummaryRow(deadExecInfo, "Dead");
@@ -262,7 +250,6 @@ private[ui] class ExecutorsPage(
         {totalRow}
       </tbody>
     </table>
-  }
 
   private def taskData(maxTasks: Int,
                        activeTasks: Int,
@@ -270,74 +257,65 @@ private[ui] class ExecutorsPage(
                        completedTasks: Int,
                        totalTasks: Int,
                        totalDuration: Long,
-                       totalGCTime: Long): Seq[Node] = {
+                       totalGCTime: Long): Seq[Node] =
     // Determine Color Opacity from 0.5-1
     // activeTasks range from 0 to maxTasks
     val activeTasksAlpha =
-      if (maxTasks > 0) {
+      if (maxTasks > 0)
         (activeTasks.toDouble / maxTasks) * 0.5 + 0.5
-      } else {
+      else
         1
-      }
     // failedTasks range max at 10% failure, alpha max = 1
     val failedTasksAlpha =
-      if (totalTasks > 0) {
+      if (totalTasks > 0)
         math.min(10 * failedTasks.toDouble / totalTasks, 1) * 0.5 + 0.5
-      } else {
+      else
         1
-      }
     // totalDuration range from 0 to 50% GC time, alpha max = 1
     val totalDurationAlpha =
-      if (totalDuration > 0) {
+      if (totalDuration > 0)
         math.min(totalGCTime.toDouble / totalDuration + 0.5, 1)
-      } else {
+      else
         1
-      }
 
-    val tableData = <td style={
-      if (activeTasks > 0) {
+    val tableData = <td style=
+      if (activeTasks > 0)
         "background:hsla(240, 100%, 50%, " + activeTasksAlpha + ");color:white"
-      } else {
+      else
         ""
-      }
-      }>{activeTasks}</td>
-    <td style={
-      if (failedTasks > 0) {
+      >{activeTasks}</td>
+    <td style=
+      if (failedTasks > 0)
         "background:hsla(0, 100%, 50%, " + failedTasksAlpha + ");color:white"
-      } else {
+      else
         ""
-      }
-      }>{failedTasks}</td>
+      >{failedTasks}</td>
     <td>{completedTasks}</td>
     <td>{totalTasks}</td>
-    <td sorttable_customkey={totalDuration.toString} style={
+    <td sorttable_customkey={totalDuration.toString} style=
       // Red if GC time over GCTimePercent of total time
-      if (totalGCTime > GCTimePercent * totalDuration) {
+      if (totalGCTime > GCTimePercent * totalDuration)
         "background:hsla(0, 100%, 50%, " + totalDurationAlpha + ");color:white"
-      } else {
+      else
         ""
-      }
-    }>
+    >
       {Utils.msDurationToString(totalDuration)}
       ({Utils.msDurationToString(totalGCTime)})
     </td>;
 
     tableData
-  }
-}
 
-private[spark] object ExecutorsPage {
+private[spark] object ExecutorsPage
 
   /** Represent an executor's info as a map given a storage status index */
   def getExecInfo(listener: ExecutorsListener,
                   statusId: Int,
-                  isActive: Boolean): ExecutorSummary = {
+                  isActive: Boolean): ExecutorSummary =
     val status =
-      if (isActive) {
+      if (isActive)
         listener.activeStorageStatusList(statusId)
-      } else {
+      else
         listener.deadStorageStatusList(statusId)
-      }
     val execId = status.blockManagerId.executorId
     val hostPort = status.blockManagerId.hostPort
     val rddBlocks = status.numBlocks
@@ -379,5 +357,3 @@ private[spark] object ExecutorsPage {
         maxMem,
         executorLogs
     )
-  }
-}

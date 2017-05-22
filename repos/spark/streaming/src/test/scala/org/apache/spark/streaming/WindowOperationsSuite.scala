@@ -20,7 +20,7 @@ package org.apache.spark.streaming
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.dstream.DStream
 
-class WindowOperationsSuite extends TestSuiteBase {
+class WindowOperationsSuite extends TestSuiteBase
 
   override def maxWaitTimeMillis: Int =
     20000 // large window tests can sometimes take longer
@@ -144,7 +144,7 @@ class WindowOperationsSuite extends TestSuiteBase {
       Seconds(3)
   )
 
-  test("window - persistence level") {
+  test("window - persistence level")
     val input = Seq(Seq(0), Seq(1), Seq(2), Seq(3), Seq(4), Seq(5))
     val ssc = new StreamingContext(conf, batchDuration)
     val inputStream = new TestInputStream[Int](ssc, input, 1)
@@ -155,7 +155,6 @@ class WindowOperationsSuite extends TestSuiteBase {
     assert(windowStream1.storageLevel === StorageLevel.NONE)
     assert(inputStream.storageLevel === StorageLevel.MEMORY_ONLY)
     ssc.stop()
-  }
 
   // Testing naive reduceByKeyAndWindow (without invertible function)
 
@@ -232,7 +231,7 @@ class WindowOperationsSuite extends TestSuiteBase {
   testReduceByKeyAndWindowWithFilteredInverse(
       "big test", bigInput, bigReduceOutput)
 
-  test("groupByKeyAndWindow") {
+  test("groupByKeyAndWindow")
     val input = bigInput
     val expectedOutput = bigGroupByOutput.map(_.map(x => (x._1, x._2.toSet)))
     val windowDuration = Seconds(2)
@@ -240,14 +239,11 @@ class WindowOperationsSuite extends TestSuiteBase {
     val numBatches =
       expectedOutput.size * (slideDuration / batchDuration).toInt
     val operation = (s: DStream[(String, Int)]) =>
-      {
         s.groupByKeyAndWindow(windowDuration, slideDuration)
           .map(x => (x._1, x._2.toSet))
-    }
     testOperation(input, operation, expectedOutput, numBatches, true)
-  }
 
-  test("countByWindow") {
+  test("countByWindow")
     val input = Seq(Seq(1), Seq(1), Seq(1, 2), Seq(0), Seq(), Seq())
     val expectedOutput = Seq(Seq(1), Seq(2), Seq(3), Seq(3), Seq(1), Seq(0))
     val windowDuration = Seconds(2)
@@ -255,13 +251,10 @@ class WindowOperationsSuite extends TestSuiteBase {
     val numBatches =
       expectedOutput.size * (slideDuration / batchDuration).toInt
     val operation = (s: DStream[Int]) =>
-      {
         s.countByWindow(windowDuration, slideDuration).map(_.toInt)
-    }
     testOperation(input, operation, expectedOutput, numBatches, true)
-  }
 
-  test("countByValueAndWindow") {
+  test("countByValueAndWindow")
     val input = Seq(Seq("a"), Seq("b", "b"), Seq("a", "b"))
     val expectedOutput =
       Seq(Seq(("a", 1)), Seq(("a", 1), ("b", 2)), Seq(("a", 1), ("b", 3)))
@@ -270,12 +263,9 @@ class WindowOperationsSuite extends TestSuiteBase {
     val numBatches =
       expectedOutput.size * (slideDuration / batchDuration).toInt
     val operation = (s: DStream[String]) =>
-      {
         s.countByValueAndWindow(windowDuration, slideDuration)
           .map(x => (x._1, x._2.toInt))
-    }
     testOperation(input, operation, expectedOutput, numBatches, true)
-  }
 
   // Helper functions
 
@@ -285,15 +275,13 @@ class WindowOperationsSuite extends TestSuiteBase {
       expectedOutput: Seq[Seq[Int]],
       windowDuration: Duration = Seconds(2),
       slideDuration: Duration = Seconds(1)
-  ) {
-    test("window - " + name) {
+  )
+    test("window - " + name)
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
       val operation =
         (s: DStream[Int]) => s.window(windowDuration, slideDuration)
       testOperation(input, operation, expectedOutput, numBatches, true)
-    }
-  }
 
   def testReduceByKeyAndWindow(
       name: String,
@@ -301,19 +289,15 @@ class WindowOperationsSuite extends TestSuiteBase {
       expectedOutput: Seq[Seq[(String, Int)]],
       windowDuration: Duration = Seconds(2),
       slideDuration: Duration = Seconds(1)
-  ) {
-    test("reduceByKeyAndWindow - " + name) {
+  )
+    test("reduceByKeyAndWindow - " + name)
       logInfo("reduceByKeyAndWindow - " + name)
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
       val operation = (s: DStream[(String, Int)]) =>
-        {
           s.reduceByKeyAndWindow(
               (x: Int, y: Int) => x + y, windowDuration, slideDuration)
-      }
       testOperation(input, operation, expectedOutput, numBatches, true)
-    }
-  }
 
   def testReduceByKeyAndWindowWithInverse(
       name: String,
@@ -321,19 +305,15 @@ class WindowOperationsSuite extends TestSuiteBase {
       expectedOutput: Seq[Seq[(String, Int)]],
       windowDuration: Duration = Seconds(2),
       slideDuration: Duration = Seconds(1)
-  ) {
-    test("reduceByKeyAndWindow with inverse function - " + name) {
+  )
+    test("reduceByKeyAndWindow with inverse function - " + name)
       logInfo("reduceByKeyAndWindow with inverse function - " + name)
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
       val operation = (s: DStream[(String, Int)]) =>
-        {
           s.reduceByKeyAndWindow(_ + _, _ - _, windowDuration, slideDuration)
             .checkpoint(Seconds(100)) // Large value to avoid effect of RDD checkpointing
-      }
       testOperation(input, operation, expectedOutput, numBatches, true)
-    }
-  }
 
   def testReduceByKeyAndWindowWithFilteredInverse(
       name: String,
@@ -341,15 +321,14 @@ class WindowOperationsSuite extends TestSuiteBase {
       expectedOutput: Seq[Seq[(String, Int)]],
       windowDuration: Duration = Seconds(2),
       slideDuration: Duration = Seconds(1)
-  ) {
-    test("reduceByKeyAndWindow with inverse and filter functions - " + name) {
+  )
+    test("reduceByKeyAndWindow with inverse and filter functions - " + name)
       logInfo(
           "reduceByKeyAndWindow with inverse and filter functions - " + name)
       val numBatches =
         expectedOutput.size * (slideDuration / batchDuration).toInt
       val filterFunc = (p: (String, Int)) => p._2 != 0
       val operation = (s: DStream[(String, Int)]) =>
-        {
           s.reduceByKeyAndWindow(_ + _,
                                   _ - _,
                                   windowDuration,
@@ -357,8 +336,4 @@ class WindowOperationsSuite extends TestSuiteBase {
                                   filterFunc = filterFunc)
             .persist()
             .checkpoint(Seconds(100)) // Large value to avoid effect of RDD checkpointing
-      }
       testOperation(input, operation, expectedOutput, numBatches, true)
-    }
-  }
-}

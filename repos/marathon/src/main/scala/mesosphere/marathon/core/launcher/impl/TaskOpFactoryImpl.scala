@@ -15,33 +15,30 @@ import org.slf4j.LoggerFactory
 import scala.collection.JavaConverters._
 
 class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
-    extends TaskOpFactory {
+    extends TaskOpFactory
 
   private[this] val log = LoggerFactory.getLogger(getClass)
-  private[this] val taskOperationFactory = {
+  private[this] val taskOperationFactory =
     val principalOpt = config.mesosAuthenticationPrincipal.get
     val roleOpt = config.mesosRole.get
 
     new TaskOpFactoryHelper(principalOpt, roleOpt)
-  }
 
-  override def buildTaskOp(request: TaskOpFactory.Request): Option[TaskOp] = {
+  override def buildTaskOp(request: TaskOpFactory.Request): Option[TaskOp] =
     log.debug("buildTaskOp")
 
-    if (request.isForResidentApp) {
+    if (request.isForResidentApp)
       inferForResidents(request)
-    } else {
+    else
       inferNormalTaskOp(request)
-    }
-  }
 
   private[this] def inferNormalTaskOp(
-      request: TaskOpFactory.Request): Option[TaskOp] = {
+      request: TaskOpFactory.Request): Option[TaskOp] =
     val TaskOpFactory.Request(app, offer, tasks, _) = request
 
     new TaskBuilder(app, Task.Id.forApp, config)
       .buildIfMatches(offer, tasks.values)
-      .map {
+      .map
         case (taskInfo, ports) =>
           val task = Task.LaunchedEphemeral(
               taskId = Task.Id(taskInfo.getTaskId),
@@ -57,24 +54,21 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
               networking = Task.HostPorts(ports)
           )
           taskOperationFactory.launch(taskInfo, task)
-      }
-  }
 
   private[this] def inferForResidents(
-      request: TaskOpFactory.Request): Option[TaskOp] = {
+      request: TaskOpFactory.Request): Option[TaskOp] =
     val TaskOpFactory.Request(app, offer, tasks, additionalLaunches) = request
 
     val needToLaunch = additionalLaunches > 0 && request.hasWaitingReservations
     val needToReserve =
       request.numberOfWaitingReservations < additionalLaunches
 
-    val acceptedResourceRoles: Set[String] = {
+    val acceptedResourceRoles: Set[String] =
       val roles = app.acceptedResourceRoles.getOrElse(
           config.defaultAcceptedResourceRolesSet)
       if (log.isDebugEnabled)
         log.debug(s"inferForResidents, acceptedResourceRoles $roles")
       roles
-    }
 
     /* *
      * If an offer HAS reservations/volumes that match our app, handling these has precedence
@@ -92,11 +86,11 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
      */
 
     def maybeLaunchOnReservation =
-      if (needToLaunch) {
+      if (needToLaunch)
         val maybeVolumeMatch =
           PersistentVolumeMatcher.matchVolumes(offer, app, request.reserved)
 
-        maybeVolumeMatch.flatMap { volumeMatch =>
+        maybeVolumeMatch.flatMap  volumeMatch =>
           val matchingReservedResourcesWithoutVolumes =
             ResourceMatcher.matchResources(
                 offer,
@@ -110,33 +104,29 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
                 )
             )
 
-          matchingReservedResourcesWithoutVolumes.flatMap {
+          matchingReservedResourcesWithoutVolumes.flatMap
             otherResourcesMatch =>
               launchOnReservation(app,
                                   offer,
                                   volumeMatch.task,
                                   matchingReservedResourcesWithoutVolumes,
                                   maybeVolumeMatch)
-          }
-        }
-      } else None
+      else None
 
     def maybeReserveAndCreateVolumes =
-      if (needToReserve) {
+      if (needToReserve)
         val matchingResourcesForReservation = ResourceMatcher.matchResources(
             offer,
             app,
             tasks.values,
             ResourceSelector(acceptedResourceRoles, reserved = false)
         )
-        matchingResourcesForReservation.map { resourceMatch =>
+        matchingResourcesForReservation.map  resourceMatch =>
           reserveAndCreateVolumes(
               request.frameworkId, app, offer, resourceMatch)
-        }
-      } else None
+      else None
 
     maybeLaunchOnReservation orElse maybeReserveAndCreateVolumes
-  }
 
   private[this] def launchOnReservation(
       app: AppDefinition,
@@ -144,11 +134,11 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
       task: Task,
       resourceMatch: Option[ResourceMatcher.ResourceMatch],
       volumeMatch: Option[PersistentVolumeMatcher.VolumeMatch])
-    : Option[TaskOp] = {
+    : Option[TaskOp] =
 
     // create a TaskBuilder that used the id of the existing task as id for the created TaskInfo
     new TaskBuilder(app, (_) => task.taskId, config)
-      .build(offer, resourceMatch, volumeMatch) map {
+      .build(offer, resourceMatch, volumeMatch) map
       case (taskInfo, ports) =>
         val launch = TaskStateOp.Launch(appVersion = app.version,
                                         status = Task.Status(
@@ -157,27 +147,23 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
                                         networking = Task.HostPorts(ports))
 
         // FIXME (3221): something like reserved.launch(...): LaunchedOnReservation so we don't need to match?
-        task.update(launch) match {
+        task.update(launch) match
           case TaskStateChange.Update(updatedTask) =>
             taskOperationFactory.launch(taskInfo, updatedTask)
 
           case unexpected: TaskStateChange =>
             throw new scala.RuntimeException(
                 s"Expected TaskStateChange.Update but got $unexpected")
-        }
-    }
-  }
 
   private[this] def reserveAndCreateVolumes(
       frameworkId: FrameworkId,
       app: AppDefinition,
       offer: Mesos.Offer,
-      resourceMatch: ResourceMatcher.ResourceMatch): TaskOp = {
+      resourceMatch: ResourceMatcher.ResourceMatch): TaskOp =
 
-    val localVolumes: Iterable[Task.LocalVolume] = app.persistentVolumes.map {
+    val localVolumes: Iterable[Task.LocalVolume] = app.persistentVolumes.map
       volume =>
         Task.LocalVolume(Task.LocalVolumeId(app.id, volume), volume)
-    }
     val persistentVolumeIds = localVolumes.map(_.id)
     val task = Task.Reserved(
         taskId = Task.Id.forApp(app.id),
@@ -191,5 +177,3 @@ class TaskOpFactoryImpl @Inject()(config: MarathonConf, clock: Clock)
     )
     taskOperationFactory.reserveAndCreateVolumes(
         frameworkId, task, resourceMatch.resources, localVolumes)
-  }
-}

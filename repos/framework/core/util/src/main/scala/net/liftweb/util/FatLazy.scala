@@ -24,7 +24,7 @@ import common._
 /**
   * Companion object for FatLaxy.
   */
-object FatLazy {
+object FatLazy
 
   /**
     * Create a new FatLazy.
@@ -32,14 +32,13 @@ object FatLazy {
   def apply[T](f: => T) = new FatLazy(f)
 
   // implicit def fromLazy[T](in: Lazy[T]): T = in.get
-}
 
 /**
   * A class that does lazy evaluation
   *
   * @param f -- a function that evaluates to the default value of the instance
   */
-class FatLazy[T](f: => T) {
+class FatLazy[T](f: => T)
   private var value: Box[T] = Empty
 
   /**
@@ -47,21 +46,18 @@ class FatLazy[T](f: => T) {
     *
     * @return the value of the instance
     */
-  def get: T = synchronized {
-    value match {
+  def get: T = synchronized
+    value match
       case Full(v) => v
       case _ =>
         value = Full(f)
         value.openOrThrowException("We just checked that this is a Full box.")
-    }
-  }
 
   /**
     * Test whether the value of this class has been set or initialized from the default.
     */
-  def defined_? = synchronized {
+  def defined_? = synchronized
     value != None
-  }
 
   /**
     * Set the instance to a new value and return that value
@@ -70,17 +66,15 @@ class FatLazy[T](f: => T) {
     *
     * @return v
     */
-  def set(v: T): T = synchronized {
+  def set(v: T): T = synchronized
     value = Full(v)
     v
-  }
 
   /**
     * Copy the value of the specified FatLazy into this FatLazy
     */
-  def setFrom(other: FatLazy[T]): Unit = synchronized {
+  def setFrom(other: FatLazy[T]): Unit = synchronized
     value = other.value
-  }
 
   /**
     * and the lazy() = foo style of assignment
@@ -99,7 +93,6 @@ class FatLazy[T](f: => T) {
   def calculated_? = synchronized { value.isDefined }
 
   // implicit def fromLazy[T](in: Lazy[T]): T = in.get
-}
 
 /**
   * Sometimes, you want to do pattern matching against a lazy value.  Why?
@@ -107,28 +100,25 @@ class FatLazy[T](f: => T) {
   * and if they evaluate successfully, you then want to test another part of
   * the pattern. Thus, the LZ pattern match.
   */
-object LZ {
+object LZ
   def apply[T](f: => T): LZ[T] = new LZ(f)
   def unapply[T](in: LZ[T]): Option[T] = Some(in.get)
 
   // implicit def lazyToT[T](in: LazyMatcher[T]): T = in.get
-}
 
 /**
   * LZ encapsulates a lazy value.
   *
   * @param f - a value to be evaluated lazily
   */
-class LZ[T](f: => T) {
+class LZ[T](f: => T)
   lazy val get = f
   override def toString = "LZ(" + get + ")"
-}
 
-object ThreadLazy {
+object ThreadLazy
   def apply[T](f: => T) = new ThreadLazy(f)
 
   implicit def what[T](in: ThreadLazy[T]): T = in.get
-}
 
 /**
   * A thread-local lazy value that provides a means to evaluate
@@ -137,7 +127,7 @@ object ThreadLazy {
   * @param theFunc the lazily-evaluated expression for which to
   * cache the result in thread-local scope.
   */
-class ThreadLazy[TheType](theFunc: => TheType) extends LoanWrapper {
+class ThreadLazy[TheType](theFunc: => TheType) extends LoanWrapper
   private val calced = new ThreadGlobal[Boolean]
   private val value = new ThreadGlobal[TheType]
 
@@ -147,16 +137,14 @@ class ThreadLazy[TheType](theFunc: => TheType) extends LoanWrapper {
     * of this function is to essentially perform a reset of this lazy value
     * to being unevaluated prior to function evaluation.
     */
-  def apply[T](f: => T): T = {
+  def apply[T](f: => T): T =
     val old = value.value
     calced.set(false)
-    try {
+    try
       f
-    } finally {
+    finally
       calced.set(false)
       value.set(old)
-    }
-  }
 
   /**
     * Reset the lazy value so that it will be recalculated from the default expression
@@ -167,12 +155,9 @@ class ThreadLazy[TheType](theFunc: => TheType) extends LoanWrapper {
   /**
     * Return the value, evaluating the default expression if necessary.
     */
-  def get: TheType = {
+  def get: TheType =
     if (calced.value) value.value
-    else {
+    else
       value.set(theFunc)
       calced.set(true)
       value.value
-    }
-  }
-}

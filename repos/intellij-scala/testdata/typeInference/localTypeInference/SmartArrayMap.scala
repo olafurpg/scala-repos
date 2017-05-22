@@ -1,4 +1,4 @@
-abstract class test {
+abstract class test
 
   class CBF[-B, +T]
 
@@ -11,5 +11,4 @@ abstract class test {
   class H extends O
 
   def x: Array[O] = /*start*/ map(new H) /*end*/
-}
 //Array[test.this.O]

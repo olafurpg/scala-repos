@@ -9,14 +9,14 @@ import scala.reflect.ClassTag
 import scala.collection.immutable
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
-package object testkit {
+package object testkit
   def filterEvents[T](eventFilters: Iterable[EventFilter])(block: ⇒ T)(
-      implicit system: ActorSystem): T = {
+      implicit system: ActorSystem): T =
     def now = System.currentTimeMillis
 
     system.eventStream.publish(TestEvent.Mute(eventFilters.to[immutable.Seq]))
 
-    try {
+    try
       val result = block
 
       val testKitSettings = TestKitExtension(system)
@@ -31,11 +31,9 @@ package object testkit {
             "Filter completion error:\n" + failed.mkString("\n"))
 
       result
-    } finally {
+    finally
       system.eventStream.publish(
           TestEvent.UnMute(eventFilters.to[immutable.Seq]))
-    }
-  }
 
   def filterEvents[T](eventFilters: EventFilter*)(
       block: ⇒ T)(implicit system: ActorSystem): T =
@@ -56,9 +54,7 @@ package object testkit {
     * }}}
     * Corresponding Java API is available in JavaTestKit.dilated()
     */
-  implicit class TestDuration(val duration: FiniteDuration) extends AnyVal {
+  implicit class TestDuration(val duration: FiniteDuration) extends AnyVal
     def dilated(implicit system: ActorSystem): FiniteDuration =
       (duration * TestKitExtension(system).TestTimeFactor)
         .asInstanceOf[FiniteDuration]
-  }
-}

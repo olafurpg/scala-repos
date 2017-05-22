@@ -23,20 +23,19 @@ import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{Com
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object CaseObjectOrderedBuf {
-  def dispatch(c: Context)(): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+object CaseObjectOrderedBuf
+  def dispatch(c: Context)(): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe
         if tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass &&
         tpe.typeSymbol.asClass.isModuleClass &&
         !tpe.typeConstructor.takesTypeArgs =>
       CaseObjectOrderedBuf(c)(tpe)
-  }
 
-  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -56,6 +55,3 @@ object CaseObjectOrderedBuf {
 
       override val lazyOuterVariables: Map[String, ctx.Tree] = Map.empty
       override def length(element: Tree) = ConstantLengthCalculation(c)(0)
-    }
-  }
-}

@@ -31,20 +31,17 @@ import javafx.scene.{transform => jfxst}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object NonInvertibleTransformException {
+object NonInvertibleTransformException
   implicit def sfxNonInvertibleTransformException2jfx(
       v: NonInvertibleTransformException)
     : jfxst.NonInvertibleTransformException =
     if (v != null) v.delegate else null
-}
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/scene/transform/NonInvertibleTransformException.html]] */
 class NonInvertibleTransformException(
     override val delegate: jfxst.NonInvertibleTransformException)
     extends Exception(delegate)
-    with SFXDelegate[jfxst.NonInvertibleTransformException] {
+    with SFXDelegate[jfxst.NonInvertibleTransformException]
 
-  def this(message: String) {
+  def this(message: String)
     this(new jfxst.NonInvertibleTransformException(message))
-  }
-}

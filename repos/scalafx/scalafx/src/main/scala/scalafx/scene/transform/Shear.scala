@@ -33,17 +33,16 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 
-object Shear {
+object Shear
   implicit def sfxShear2jfx(v: Shear): jfxst.Shear =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Shear.html]]
   */
 class Shear(override val delegate: jfxst.Shear = new jfxst.Shear)
     extends Transform(delegate) with PositionDelegate[jfxst.Shear]
-    with SFXDelegate[jfxst.Shear] {
+    with SFXDelegate[jfxst.Shear]
 
   /**
     * Creates a new instance of Shear.
@@ -60,15 +59,12 @@ class Shear(override val delegate: jfxst.Shear = new jfxst.Shear)
     * Defines the X coordinate of the shear pivot point.
     */
   def pivotX: DoubleProperty = delegate.pivotXProperty()
-  def pivotX_=(v: Double) {
+  def pivotX_=(v: Double)
     pivotX() = v
-  }
 
   /**
     * Defines the Y coordinate of the shear pivot point.
     */
   def pivotY: DoubleProperty = delegate.pivotYProperty()
-  def pivotY_=(v: Double) {
+  def pivotY_=(v: Double)
     pivotY() = v
-  }
-}

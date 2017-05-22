@@ -13,7 +13,7 @@ import com.google.caliper.Param
 
 object ArrayOrderBenchmarks extends MyRunner(classOf[ArrayOrderBenchmarks])
 
-class ArrayOrderBenchmarks extends MyBenchmark {
+class ArrayOrderBenchmarks extends MyBenchmark
   @Param(Array("6", "10", "14", "18"))
   var pow: Int = 0
 
@@ -24,7 +24,7 @@ class ArrayOrderBenchmarks extends MyBenchmark {
   var e: Array[Int] = null
   var f: Array[Int] = null
 
-  override protected def setUp(): Unit = {
+  override protected def setUp(): Unit =
     val size = spire.math.pow(2, pow).toInt
 
     a = init(size)(nextInt)
@@ -33,38 +33,33 @@ class ArrayOrderBenchmarks extends MyBenchmark {
     d = a.clone; d(size / 3) += 1
     e = a.clone; e(size - 7) += 1
     f = init(size + 10)(nextInt); System.arraycopy(a, 0, f, 0, a.length)
-  }
 
-  def directEq(x: Array[Int], y: Array[Int]): Boolean = {
+  def directEq(x: Array[Int], y: Array[Int]): Boolean =
     var i = 0
     if (x.length != y.length) return false
     while (i < x.length && i < y.length && x(i) === y(i)) i += 1
     i == x.length
-  }
 
-  def directCompare(x: Array[Int], y: Array[Int]): Int = {
+  def directCompare(x: Array[Int], y: Array[Int]): Int =
     var i = 0
     val ev = Order[Int]
-    while (i < x.length && i < y.length) {
+    while (i < x.length && i < y.length)
       val cmp = ev.compare(x(i), y(i))
       if (cmp != 0) return cmp
       i += 1
-    }
     x.length - y.length
-  }
 
   def indirectAdd[@sp(Int) A : ClassTag : Ring](
       x: Array[A], y: Array[A]): Array[A] =
     spire.std.ArraySupport.plus(x, y)
 
-  def directAdd(x: Array[Int], y: Array[Int]): Array[Int] = {
+  def directAdd(x: Array[Int], y: Array[Int]): Array[Int] =
     val z = new Array[Int](spire.math.max(x.length, y.length))
     var i = 0
     while (i < x.length && i < y.length) { z(i) = x(i) + y(i); i += 1 }
     while (i < x.length) { z(i) = x(i); i += 1 }
     while (i < y.length) { z(i) = y(i); i += 1 }
     z
-  }
 
   // def timeEqGeneric(reps: Int) = run(reps) { a === b }
   // def timeEqDirect(reps: Int) = run(reps) { directEq(a, b) }
@@ -75,4 +70,3 @@ class ArrayOrderBenchmarks extends MyBenchmark {
   def timeAddGeneric(reps: Int) = run(reps) { a + b }
   def timeAddIndirect(reps: Int) = run(reps) { indirectAdd(a, b) }
   def timeAddDirect(reps: Int) = run(reps) { directAdd(a, b) }
-}

@@ -5,7 +5,7 @@ package org.hamcrest
 
 import org.hamcrest.core._
 
-object CoreMatchers {
+object CoreMatchers
   // Commented matchers where implemented using reflexion. It is possible that
   // some of them could be reimplemented from scratch without using reflexion.
 
@@ -114,4 +114,3 @@ object CoreMatchers {
 
   //  def endsWithIgnoringCase(suffix: String): Matcher[String] =
   //    core.StringEndsWith.endsWithIgnoringCase(suffix)
-}

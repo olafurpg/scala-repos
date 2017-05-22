@@ -38,7 +38,7 @@ import kafka.message.Message
   * "0.10.0-IV0" and "0.10.0-IV1" to upgrade one internal version at a time. For most people who just want to use
   * released version, they can use "0.10.0" when upgrading to the 0.10.0 release.
   */
-object ApiVersion {
+object ApiVersion
   // This implicit is necessary due to: https://issues.scala-lang.org/browse/SI-8541
   implicit def orderingByVersion[A <: ApiVersion]: Ordering[A] =
     Ordering.by(_.id)
@@ -61,9 +61,8 @@ object ApiVersion {
             s"Version `$version` is not a valid version"))
 
   def latestVersion = versionNameMap.values.max
-}
 
-sealed trait ApiVersion extends Ordered[ApiVersion] {
+sealed trait ApiVersion extends Ordered[ApiVersion]
   val version: String
   val messageFormatVersion: Byte
   val id: Int
@@ -72,35 +71,29 @@ sealed trait ApiVersion extends Ordered[ApiVersion] {
     ApiVersion.orderingByVersion.compare(this, that)
 
   override def toString(): String = version
-}
 
 // Keep the IDs in order of versions
-case object KAFKA_0_8_0 extends ApiVersion {
+case object KAFKA_0_8_0 extends ApiVersion
   val version: String = "0.8.0.X"
   val messageFormatVersion: Byte = Message.MagicValue_V0
   val id: Int = 0
-}
 
-case object KAFKA_0_8_1 extends ApiVersion {
+case object KAFKA_0_8_1 extends ApiVersion
   val version: String = "0.8.1.X"
   val messageFormatVersion: Byte = Message.MagicValue_V0
   val id: Int = 1
-}
 
-case object KAFKA_0_8_2 extends ApiVersion {
+case object KAFKA_0_8_2 extends ApiVersion
   val version: String = "0.8.2.X"
   val messageFormatVersion: Byte = Message.MagicValue_V0
   val id: Int = 2
-}
 
-case object KAFKA_0_9_0 extends ApiVersion {
+case object KAFKA_0_9_0 extends ApiVersion
   val version: String = "0.9.0.X"
   val messageFormatVersion: Byte = Message.MagicValue_V0
   val id: Int = 3
-}
 
-case object KAFKA_0_10_0_IV0 extends ApiVersion {
+case object KAFKA_0_10_0_IV0 extends ApiVersion
   val version: String = "0.10.0-IV0"
   val messageFormatVersion: Byte = Message.MagicValue_V1
   val id: Int = 4
-}

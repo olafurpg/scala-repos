@@ -1,7 +1,7 @@
 import com.typesafe.tools.mima.core._
 import com.typesafe.tools.mima.core.ProblemFilters._
 
-object BinaryIncompatibilities {
+object BinaryIncompatibilities
   val IR = Seq(
       )
 
@@ -25,4 +25,3 @@ object BinaryIncompatibilities {
 
   val TestInterface = Seq(
       )
-}

@@ -1,7 +1,7 @@
 import collection.immutable.ListMap
 
-object Test {
-  def testImmutableMinus() {
+object Test
+  def testImmutableMinus()
     val empty = ListMap.empty[Int, Int]
 
     val m0 = ListMap(1 -> 1, 2 -> 2)
@@ -18,9 +18,6 @@ object Test {
     assert(m5.toList == (2, 2) :: (3, 3) :: Nil)
 
     assert((empty - 1) eq empty)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     testImmutableMinus()
-  }
-}

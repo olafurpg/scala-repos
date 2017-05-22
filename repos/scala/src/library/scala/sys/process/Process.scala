@@ -28,7 +28,7 @@ import scala.language.implicitConversions
   *
   *  @see [[scala.sys.process.ProcessBuilder]]
   */
-trait Process {
+trait Process
 
   /** Returns this process alive status */
   def isAlive(): Boolean
@@ -38,7 +38,6 @@ trait Process {
 
   /** Destroys this process. */
   def destroy(): Unit
-}
 
 /** Methods for constructing simple commands that can then be combined. */
 object Process extends ProcessImpl with ProcessCreation {}
@@ -46,7 +45,7 @@ object Process extends ProcessImpl with ProcessCreation {}
 /** Factories for creating [[scala.sys.process.ProcessBuilder]]. They can be
   *  found on and used through [[scala.sys.process.Process]]'s companion object.
   */
-trait ProcessCreation {
+trait ProcessCreation
 
   /** Creates a [[scala.sys.process.ProcessBuilder]] from a `String`, including the
     * parameters.
@@ -97,14 +96,13 @@ trait ProcessCreation {
     */
   def apply(command: String,
             cwd: Option[File],
-            extraEnv: (String, String)*): ProcessBuilder = {
+            extraEnv: (String, String)*): ProcessBuilder =
     apply(command.split("""\s+"""), cwd, extraEnv: _*)
     // not smart to use this on windows, because CommandParser uses \ to escape ".
     /*CommandParser.parse(command) match {
       case Left(errorMsg) => error(errorMsg)
       case Right((cmd, args)) => apply(cmd :: args, cwd, extraEnv : _*)
     }*/
-  }
 
   /** Creates a [[scala.sys.process.ProcessBuilder]] with working dir optionally set to
     * `File` and extra environment variables.
@@ -113,12 +111,11 @@ trait ProcessCreation {
     */
   def apply(command: Seq[String],
             cwd: Option[File],
-            extraEnv: (String, String)*): ProcessBuilder = {
+            extraEnv: (String, String)*): ProcessBuilder =
     val jpb = new JProcessBuilder(command.toArray: _*)
     cwd foreach (jpb directory _)
     extraEnv foreach { case (k, v) => jpb.environment.put(k, v) }
     apply(jpb)
-  }
 
   /** Creates a [[scala.sys.process.ProcessBuilder]] from a `java.lang.ProcessBuilder`.
     *
@@ -185,18 +182,16 @@ trait ProcessCreation {
     *
     * This will concatenate the output of all sources.
     */
-  def cat(files: Seq[Source]): ProcessBuilder = {
+  def cat(files: Seq[Source]): ProcessBuilder =
     require(files.nonEmpty)
     files map (_.cat) reduceLeft (_ #&& _)
-  }
-}
 
 /** Provide implicit conversions for the factories offered by [[scala.sys.process.Process]]'s
   * companion object. These implicits can then be used to decrease the noise in a pipeline
   * of commands, making it look more shell-like. They are available through the package object
   * [[scala.sys.process]].
   */
-trait ProcessImplicits {
+trait ProcessImplicits
   import Process._
 
   /** Return a sequence of [[scala.sys.process.ProcessBuilder.Source]] from a sequence
@@ -240,4 +235,3 @@ trait ProcessImplicits {
     */
   implicit def stringSeqToProcess(command: Seq[String]): ProcessBuilder =
     apply(command)
-}

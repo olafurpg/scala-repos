@@ -21,9 +21,9 @@ import scala.xml.Node
 
 import org.apache.spark.SparkFunSuite
 
-class PagedDataSourceSuite extends SparkFunSuite {
+class PagedDataSourceSuite extends SparkFunSuite
 
-  test("basic") {
+  test("basic")
     val dataSource1 = new SeqPagedDataSource[Int](1 to 5, pageSize = 2)
     assert(dataSource1.pageData(1) === PageData(3, (1 to 2)))
 
@@ -34,25 +34,21 @@ class PagedDataSourceSuite extends SparkFunSuite {
     assert(dataSource3.pageData(3) === PageData(3, Seq(5)))
 
     val dataSource4 = new SeqPagedDataSource[Int](1 to 5, pageSize = 2)
-    val e1 = intercept[IndexOutOfBoundsException] {
+    val e1 = intercept[IndexOutOfBoundsException]
       dataSource4.pageData(4)
-    }
     assert(
         e1.getMessage === "Page 4 is out of range. Please select a page number between 1 and 3.")
 
     val dataSource5 = new SeqPagedDataSource[Int](1 to 5, pageSize = 2)
-    val e2 = intercept[IndexOutOfBoundsException] {
+    val e2 = intercept[IndexOutOfBoundsException]
       dataSource5.pageData(0)
-    }
     assert(
         e2.getMessage === "Page 0 is out of range. Please select a page number between 1 and 3.")
-  }
-}
 
-class PagedTableSuite extends SparkFunSuite {
-  test("pageNavigation") {
+class PagedTableSuite extends SparkFunSuite
+  test("pageNavigation")
     // Create a fake PagedTable to test pageNavigation
-    val pagedTable = new PagedTable[Int] {
+    val pagedTable = new PagedTable[Int]
       override def tableId: String = ""
 
       override def tableCssClass: String = ""
@@ -72,7 +68,6 @@ class PagedTableSuite extends SparkFunSuite {
       override def pageNumberFormField: String = "page"
 
       override def goButtonFormPath: String = ""
-    }
 
     assert(pagedTable.pageNavigation(1, 10, 1) === Nil)
     assert(
@@ -100,14 +95,11 @@ class PagedTableSuite extends SparkFunSuite {
     assert((pagedTable.pageNavigation(93, 10, 97).head \\ "li").map(
             _.text.trim) === Seq("<<", "<") ++ (91 to 97).map(_.toString) ++ Seq(
             ">"))
-  }
-}
 
 private[spark] class SeqPagedDataSource[T](seq: Seq[T], pageSize: Int)
-    extends PagedDataSource[T](pageSize) {
+    extends PagedDataSource[T](pageSize)
 
   override protected def dataSize: Int = seq.size
 
   override protected def sliceData(from: Int, to: Int): Seq[T] =
     seq.slice(from, to)
-}

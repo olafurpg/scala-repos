@@ -1,4 +1,4 @@
-object O {
+object O
   private def f1 {}
   private[O] def f2 {}
 
@@ -10,4 +10,3 @@ object O {
   O. /* */ f1
   /* */
   O. /* */ f2
-}

@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object KeenfulTestSuite3 extends PerfTestSuite {
+object KeenfulTestSuite3 extends PerfTestSuite
   query("""
 import std::stats::rank
 data := //keenful
@@ -40,4 +40,3 @@ byItem' := byItem with {rank : rank(byItem.count)}
 
 byItem' where byItem'.rank > max(byItem'.rank - 5)
     """)
-}

@@ -31,21 +31,18 @@ private[spark] class MesosClusterUI(securityManager: SecurityManager,
                                     dispatcherPublicAddress: String,
                                     val scheduler: MesosClusterScheduler)
     extends WebUI(
-        securityManager, securityManager.getSSLOptions("mesos"), port, conf) {
+        securityManager, securityManager.getSSLOptions("mesos"), port, conf)
 
   initialize()
 
   def activeWebUiUrl: String =
     "http://" + dispatcherPublicAddress + ":" + boundPort
 
-  override def initialize() {
+  override def initialize()
     attachPage(new MesosClusterPage(this))
     attachPage(new DriverPage(this))
     attachHandler(
         createStaticHandler(MesosClusterUI.STATIC_RESOURCE_DIR, "/static"))
-  }
-}
 
-private object MesosClusterUI {
+private object MesosClusterUI
   val STATIC_RESOURCE_DIR = SparkUI.STATIC_RESOURCE_DIR
-}

@@ -8,7 +8,7 @@ import chess.Mode
 import chess.StartingPosition
 import lila.common.Form._
 
-final class DataForm {
+final class DataForm
 
   import DataForm._
 
@@ -18,9 +18,8 @@ final class DataForm {
     clockTimes ++ (10d to 30d by 5d) ++ (40d to 60d by 10d)
   val clockTimeDefault = 2d
   private def formatLimit(l: Double) =
-    chess.Clock.showLimit(l * 60 toInt) + {
+    chess.Clock.showLimit(l * 60 toInt) +
       if (l <= 1) " minute" else " minutes"
-    }
   val clockTimeChoices = optionsDouble(clockTimes, formatLimit)
   val clockTimePrivateChoices = optionsDouble(clockTimesPrivate, formatLimit)
 
@@ -43,9 +42,8 @@ final class DataForm {
   val waitMinuteDefault = 2
 
   val positions = StartingPosition.allWithInitial.map(_.eco)
-  val positionChoices = StartingPosition.allWithInitial.map { p =>
+  val positionChoices = StartingPosition.allWithInitial.map  p =>
     p.eco -> p.fullName
-  }
   val positionDefault = StartingPosition.initial.eco
 
   lazy val create =
@@ -72,9 +70,8 @@ final class DataForm {
         position = StartingPosition.initial.eco,
         `private` = None,
         mode = Mode.Rated.id.some)
-}
 
-object DataForm {
+object DataForm
 
   import chess.variant._
 
@@ -89,7 +86,6 @@ object DataForm {
                            Crazyhouse)
 
   val validVariantIds = validVariants.map(_.id).toSet
-}
 
 private[tournament] case class TournamentSetup(clockTime: Double,
                                                clockIncrement: Int,
@@ -98,11 +94,10 @@ private[tournament] case class TournamentSetup(clockTime: Double,
                                                variant: Int,
                                                position: String,
                                                mode: Option[Int],
-                                               `private`: Option[String]) {
+                                               `private`: Option[String])
 
   def validClock = (clockTime + clockIncrement) > 0
 
   def validTiming = (minutes * 60) >= (3 * estimatedGameDuration)
 
   private def estimatedGameDuration = 60 * clockTime + 30 * clockIncrement
-}

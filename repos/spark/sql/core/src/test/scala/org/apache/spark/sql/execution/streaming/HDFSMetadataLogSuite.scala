@@ -25,10 +25,10 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.test.SharedSQLContext
 
-class HDFSMetadataLogSuite extends SparkFunSuite with SharedSQLContext {
+class HDFSMetadataLogSuite extends SparkFunSuite with SharedSQLContext
 
-  test("basic") {
-    withTempDir { temp =>
+  test("basic")
+    withTempDir  temp =>
       val metadataLog =
         new HDFSMetadataLog[String](sqlContext, temp.getAbsolutePath)
       assert(metadataLog.add(0, "batch0"))
@@ -49,11 +49,9 @@ class HDFSMetadataLogSuite extends SparkFunSuite with SharedSQLContext {
       assert(metadataLog.get(1) === Some("batch1"))
       assert(metadataLog.getLatest() === Some(1 -> "batch1"))
       assert(metadataLog.get(None, 1) === Array(0 -> "batch0", 1 -> "batch1"))
-    }
-  }
 
-  test("restart") {
-    withTempDir { temp =>
+  test("restart")
+    withTempDir  temp =>
       val metadataLog =
         new HDFSMetadataLog[String](sqlContext, temp.getAbsolutePath)
       assert(metadataLog.add(0, "batch0"))
@@ -69,35 +67,29 @@ class HDFSMetadataLogSuite extends SparkFunSuite with SharedSQLContext {
       assert(metadataLog2.get(1) === Some("batch1"))
       assert(metadataLog2.getLatest() === Some(1 -> "batch1"))
       assert(metadataLog2.get(None, 1) === Array(0 -> "batch0", 1 -> "batch1"))
-    }
-  }
 
-  test("metadata directory collision") {
-    withTempDir { temp =>
+  test("metadata directory collision")
+    withTempDir  temp =>
       val waiter = new Waiter
       val maxBatchId = 100
-      for (id <- 0 until 10) {
-        new Thread() {
-          override def run(): Unit = waiter {
+      for (id <- 0 until 10)
+        new Thread()
+          override def run(): Unit = waiter
             val metadataLog =
               new HDFSMetadataLog[String](sqlContext, temp.getAbsolutePath)
-            try {
+            try
               var nextBatchId =
                 metadataLog.getLatest().map(_._1).getOrElse(-1L)
               nextBatchId += 1
-              while (nextBatchId <= maxBatchId) {
+              while (nextBatchId <= maxBatchId)
                 metadataLog.add(nextBatchId, nextBatchId.toString)
                 nextBatchId += 1
-              }
-            } catch {
+            catch
               case e: ConcurrentModificationException =>
               // This is expected since there are multiple writers
-            } finally {
+            finally
               waiter.dismiss()
-            }
-          }
-        }.start()
-      }
+        .start()
 
       waiter.await(timeout(10.seconds), dismissals(10))
       val metadataLog =
@@ -106,6 +98,3 @@ class HDFSMetadataLogSuite extends SparkFunSuite with SharedSQLContext {
           metadataLog.getLatest() === Some(maxBatchId -> maxBatchId.toString))
       assert(metadataLog.get(None, maxBatchId) === (0 to maxBatchId).map(
               i => (i, i.toString)))
-    }
-  }
-}

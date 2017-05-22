@@ -26,7 +26,7 @@ import common._
   * to allow requests to be suspended and resumed later on.
   *  
   */
-trait ServletAsyncProvider {
+trait ServletAsyncProvider
 
   /**
     * @return true if the underlying JEE container supports suspend/resume
@@ -53,9 +53,8 @@ trait ServletAsyncProvider {
     * @return false if the resume cannot occure
     */
   def resume(ref: (Req, LiftResponse)): Boolean
-}
 
-trait AsyncProviderMeta {
+trait AsyncProviderMeta
 
   /**
     * @return true if the underlying JEE container supports suspend/resume
@@ -66,4 +65,3 @@ trait AsyncProviderMeta {
     * return a function that vends the ServletAsyncProvider
     */
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider]
-}

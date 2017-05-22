@@ -57,7 +57,7 @@ import SampleData._
 
 trait IndicesSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with TableModuleSpec[M]
-    with IndicesModule[M] {
+    with IndicesModule[M]
   spec =>
 
   type GroupId = Int
@@ -76,7 +76,7 @@ trait IndicesSpec[M[+ _]]
   def newGroupId = groupId.getAndIncrement
 
   class Table(slices: StreamT[M, Slice], size: TableSize)
-      extends ColumnarTable(slices, size) {
+      extends ColumnarTable(slices, size)
     import trans._
     def load(apiKey: APIKey, jtpe: JType) = sys.error("todo")
     def sort(sortKey: TransSpec1,
@@ -86,9 +86,8 @@ trait IndicesSpec[M[+ _]]
                  valueSpec: TransSpec1,
                  sortOrder: DesiredSortOrder = SortAscending,
                  unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
-  }
 
-  trait TableCompanion extends ColumnarTableCompanion {
+  trait TableCompanion extends ColumnarTableCompanion
     def apply(slices: StreamT[M, Slice], size: TableSize) =
       new Table(slices, size)
 
@@ -100,15 +99,14 @@ trait IndicesSpec[M[+ _]]
               sourceRight: Table,
               alignOnR: TransSpec1): M[(Table, Table)] =
       sys.error("not implemented here")
-  }
 
   object Table extends TableCompanion
 
   def groupkey(s: String) = DerefObjectStatic(Leaf(Source), CPathField(s))
   def valuekey(s: String) = DerefObjectStatic(Leaf(Source), CPathField(s))
 
-  "a table index" should {
-    "handle empty tables" in {
+  "a table index" should
+    "handle empty tables" in
       val table = fromJson(Stream.empty[JValue])
 
       val keySpecs = Array(groupkey("a"), groupkey("b"))
@@ -119,7 +117,6 @@ trait IndicesSpec[M[+ _]]
 
       index.getUniqueKeys(0).size must_== 0
       index.getSubTable(Array(0), Array(CString("a"))).size == ExactSize(0)
-    }
 
     val json = """
 {"a": 1, "b": 2, "c": 3}
@@ -146,14 +143,13 @@ trait IndicesSpec[M[+ _]]
     val index: TableIndex =
       TableIndex.createFromTable(table, keySpecs, valSpec).copoint
 
-    "determine unique groupkey values" in {
+    "determine unique groupkey values" in
       index.getUniqueKeys(0) must_==
         Set(CLong(1), CLong(2), CLong(3), CString("foo"))
       index.getUniqueKeys(1) must_==
         Set(CLong(2), CLong(999), CString("bar"), CString(""))
-    }
 
-    "determine unique groupkey sets" in {
+    "determine unique groupkey sets" in
       index.getUniqueKeys() must_== Set[Seq[RValue]](
           Array(CLong(1), CLong(2)),
           Array(CLong(2), CLong(2)),
@@ -162,7 +158,6 @@ trait IndicesSpec[M[+ _]]
           Array(CLong(3), CLong(2)),
           Array(CString("foo"), CLong(999))
       )
-    }
 
     def subtableSet(
         index: TableIndex, ids: Seq[Int], vs: Seq[RValue]): Set[RValue] =
@@ -171,7 +166,7 @@ trait IndicesSpec[M[+ _]]
     def test(vs: Seq[RValue], result: Set[RValue]): Unit =
       subtableSet(index, Array(0, 1), vs) must_== result
 
-    "generate subtables based on groupkeys" in {
+    "generate subtables based on groupkeys" in
       def empty = Set.empty[RValue]
 
       test(Array(CLong(1), CLong(1)), empty)
@@ -197,7 +192,6 @@ trait IndicesSpec[M[+ _]]
       def s5 = Set[RValue](RArray(CLong(1), CLong(2), CLong(3), CLong(4)))
 
       test(Array(CString("foo"), CLong(999)), empty)
-    }
 
     val index1 = TableIndex
       .createFromTable(
@@ -215,13 +209,12 @@ trait IndicesSpec[M[+ _]]
       )
       .copoint
 
-    "efficiently combine to produce unions" in {
+    "efficiently combine to produce unions" in
 
       def tryit(tpls: (TableIndex, Seq[Int], Seq[RValue])*)(
-          expected: JValue*) {
+          expected: JValue*)
         val table = TableIndex.joinSubTables(tpls.toList)
         table.toJson.copoint.toSet must_== expected.toSet
-      }
 
       // both disjunctions have data
       tryit(
@@ -269,21 +262,16 @@ trait IndicesSpec[M[+ _]]
           (index1, Seq(0), Seq(CLong(-8000))),
           (index2, Seq(0), Seq(CLong(1234567)))
       )()
-    }
-  }
-}
 
-object IndicesSpec extends IndicesSpec[Need] {
+object IndicesSpec extends IndicesSpec[Need]
   implicit def M = Need.need
 
   type YggConfig = IdSourceConfig with ColumnarTableModuleConfig
 
-  val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig {
+  val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig
     val maxSliceSize = 10
     val smallSliceSize = 3
 
     val idSource = new FreshAtomicIdSource
-  }
-}
 
 // vim: set ts=4 sw=4 et:

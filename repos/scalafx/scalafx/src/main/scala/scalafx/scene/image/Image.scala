@@ -34,13 +34,12 @@ import scalafx.Includes._
 import scalafx.beans.property.{ReadOnlyBooleanProperty, ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
 import scalafx.delegate.SFXDelegate
 
-object Image {
+object Image
   implicit def sfxImage2jfx(i: Image): jfxsi.Image =
     if (i != null) i.delegate else null
-}
 
 class Image(override val delegate: jfxsi.Image)
-    extends SFXDelegate[jfxsi.Image] {
+    extends SFXDelegate[jfxsi.Image]
 
   /**
     * Construct an Image which pixels are loaded from the specified input stream.
@@ -135,9 +134,8 @@ class Image(override val delegate: jfxsi.Image)
   /**
     * Cancels the background loading of this image.
     */
-  def cancel() {
+  def cancel()
     delegate.cancel()
-  }
 
   /**
     * Indicates whether the image is being loaded in the background.
@@ -163,4 +161,3 @@ class Image(override val delegate: jfxsi.Image)
     * `width` and `height`.
     */
   def smooth = delegate.isSmooth
-}

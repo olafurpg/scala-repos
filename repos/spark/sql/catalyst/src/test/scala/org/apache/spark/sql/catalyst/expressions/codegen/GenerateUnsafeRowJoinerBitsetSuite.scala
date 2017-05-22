@@ -27,69 +27,54 @@ import org.apache.spark.unsafe.Platform
 /**
   * A test suite for the bitset portion of the row concatenation.
   */
-class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
+class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite
 
-  test("bitset concat: boundary size 0, 0") {
+  test("bitset concat: boundary size 0, 0")
     testBitsets(0, 0)
-  }
 
-  test("bitset concat: boundary size 0, 64") {
+  test("bitset concat: boundary size 0, 64")
     testBitsets(0, 64)
-  }
 
-  test("bitset concat: boundary size 64, 0") {
+  test("bitset concat: boundary size 64, 0")
     testBitsets(64, 0)
-  }
 
-  test("bitset concat: boundary size 64, 64") {
+  test("bitset concat: boundary size 64, 64")
     testBitsets(64, 64)
-  }
 
-  test("bitset concat: boundary size 0, 128") {
+  test("bitset concat: boundary size 0, 128")
     testBitsets(0, 128)
-  }
 
-  test("bitset concat: boundary size 128, 0") {
+  test("bitset concat: boundary size 128, 0")
     testBitsets(128, 0)
-  }
 
-  test("bitset concat: boundary size 128, 128") {
+  test("bitset concat: boundary size 128, 128")
     testBitsets(128, 128)
-  }
 
-  test("bitset concat: single word bitsets") {
+  test("bitset concat: single word bitsets")
     testBitsets(10, 5)
-  }
 
-  test("bitset concat: first bitset larger than a word") {
+  test("bitset concat: first bitset larger than a word")
     testBitsets(67, 5)
-  }
 
-  test("bitset concat: second bitset larger than a word") {
+  test("bitset concat: second bitset larger than a word")
     testBitsets(6, 67)
-  }
 
-  test("bitset concat: no reduction in bitset size") {
+  test("bitset concat: no reduction in bitset size")
     testBitsets(33, 34)
-  }
 
-  test("bitset concat: two words") {
+  test("bitset concat: two words")
     testBitsets(120, 95)
-  }
 
-  test("bitset concat: bitset 65, 128") {
+  test("bitset concat: bitset 65, 128")
     testBitsets(65, 128)
-  }
 
-  test("bitset concat: randomized tests") {
-    for (i <- 1 until 20) {
+  test("bitset concat: randomized tests")
+    for (i <- 1 until 20)
       val numFields1 = Random.nextInt(1000)
       val numFields2 = Random.nextInt(1000)
       testBitsetsOnce(numFields1, numFields2)
-    }
-  }
 
-  private def createUnsafeRow(numFields: Int): UnsafeRow = {
+  private def createUnsafeRow(numFields: Int): UnsafeRow =
     val row = new UnsafeRow(numFields)
     val sizeInBytes = numFields * 8 + ((numFields + 63) / 64) * 8
     // Allocate a larger buffer than needed and point the UnsafeRow to somewhere in the middle.
@@ -98,52 +83,42 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
     val buf = new Array[Byte](sizeInBytes + offset)
     row.pointTo(buf, Platform.BYTE_ARRAY_OFFSET + offset, sizeInBytes)
     row
-  }
 
-  private def testBitsets(numFields1: Int, numFields2: Int): Unit = {
-    for (i <- 0 until 5) {
+  private def testBitsets(numFields1: Int, numFields2: Int): Unit =
+    for (i <- 0 until 5)
       testBitsetsOnce(numFields1, numFields2)
-    }
-  }
 
-  private def testBitsetsOnce(numFields1: Int, numFields2: Int): Unit = {
+  private def testBitsetsOnce(numFields1: Int, numFields2: Int): Unit =
     info(s"num fields: $numFields1 and $numFields2")
     val schema1 = StructType(
-        Seq.tabulate(numFields1) { i =>
+        Seq.tabulate(numFields1)  i =>
       StructField(s"a_$i", IntegerType)
-    })
+    )
     val schema2 = StructType(
-        Seq.tabulate(numFields2) { i =>
+        Seq.tabulate(numFields2)  i =>
       StructField(s"b_$i", IntegerType)
-    })
+    )
 
     val row1 = createUnsafeRow(numFields1)
     val row2 = createUnsafeRow(numFields2)
 
-    if (numFields1 > 0) {
-      for (i <- 0 until Random.nextInt(numFields1)) {
+    if (numFields1 > 0)
+      for (i <- 0 until Random.nextInt(numFields1))
         row1.setNullAt(Random.nextInt(numFields1))
-      }
-    }
-    if (numFields2 > 0) {
-      for (i <- 0 until Random.nextInt(numFields2)) {
+    if (numFields2 > 0)
+      for (i <- 0 until Random.nextInt(numFields2))
         row2.setNullAt(Random.nextInt(numFields2))
-      }
-    }
 
     val concater = GenerateUnsafeRowJoiner.create(schema1, schema2)
     val output = concater.join(row1, row2)
 
-    def dumpDebug(): String = {
-      val set1 = Seq.tabulate(numFields1) { i =>
+    def dumpDebug(): String =
+      val set1 = Seq.tabulate(numFields1)  i =>
         if (row1.isNullAt(i)) "1" else "0"
-      }
-      val set2 = Seq.tabulate(numFields2) { i =>
+      val set2 = Seq.tabulate(numFields2)  i =>
         if (row2.isNullAt(i)) "1" else "0"
-      }
-      val out = Seq.tabulate(numFields1 + numFields2) { i =>
+      val out = Seq.tabulate(numFields1 + numFields2)  i =>
         if (output.isNullAt(i)) "1" else "0"
-      }
 
       s"""
          |input1: ${set1.mkString}
@@ -151,15 +126,10 @@ class GenerateUnsafeRowJoinerBitsetSuite extends SparkFunSuite {
          |output: ${out.mkString}
          |expect: ${set1.mkString}${set2.mkString}
        """.stripMargin
-    }
 
-    for (i <- 0 until (numFields1 + numFields2)) {
-      if (i < numFields1) {
+    for (i <- 0 until (numFields1 + numFields2))
+      if (i < numFields1)
         assert(output.isNullAt(i) === row1.isNullAt(i), dumpDebug())
-      } else {
+      else
         assert(
             output.isNullAt(i) === row2.isNullAt(i - numFields1), dumpDebug())
-      }
-    }
-  }
-}

@@ -28,7 +28,7 @@ import scala.collection.mutable.{HashMap, ArrayBuffer, ListBuffer}
   * The prefix is the beginning of the line that indicates the line type,
   * the payload is the actual content after the prefix.
   */
-sealed abstract class MarkdownLine(val prefix: String, val payload: String) {
+sealed abstract class MarkdownLine(val prefix: String, val payload: String)
 
   /**
     * Constructs a MarkdownLine where the prefix is the empty String and the
@@ -40,7 +40,6 @@ sealed abstract class MarkdownLine(val prefix: String, val payload: String) {
     * Returns the full line as it was originally, i.e. prefix+payload.
     */
   def fullLine = prefix + payload
-}
 
 /**Represents lines of verbatim xml.
   * Actually this class is a little cheat, as it represents multiple lines.
@@ -58,20 +57,18 @@ case class SetExtHeaderLine(content: String, headerLevel: Int)
   * Trims hashes automatically and determines the header level from them.
   */
 case class AtxHeaderLine(pre: String, pay: String)
-    extends MarkdownLine(pre, pay) {
+    extends MarkdownLine(pre, pay)
 
   /** removes all whitespace, nl and trailing hashes from the payload
     * "  foo ##  \n" => "foo"
     */
-  def trimHashes() = {
+  def trimHashes() =
     val s = payload.trim
     var idx = s.length - 1
     while (idx >= 0 && s.charAt(idx) == '#') idx -= 1
     s.substring(0, idx + 1).trim
-  }
 
   def headerLevel = prefix.length
-}
 
 /** A line consisting only of whitespace.
   */
@@ -104,9 +101,8 @@ case class CodeLine(pre: String, pay: String) extends MarkdownLine(pre, pay)
   * language token
   */
 case class ExtendedFencedCode(pre: String, pay: String)
-    extends MarkdownLine(pre, pay) {
+    extends MarkdownLine(pre, pay)
   def languageFormat = pay.trim()
-}
 
 /** Ending line of a fenced code block: three backticks followed by optional whitespace 
   */
@@ -122,10 +118,9 @@ case class LinkDefinition(id: String, url: String, title: Option[String])
 
 /** Stub class that is an intermediate result when parsing link definitions.
   */
-case class LinkDefinitionStart(id: String, url: String) {
+case class LinkDefinitionStart(id: String, url: String)
   def toLinkDefinition(title: Option[String]) =
     new LinkDefinition(id, url, title)
-}
 
 /**
   * This class allows us to reference a map with link definitions resulting from the line parsing during block parsing.
@@ -135,7 +130,7 @@ case class LinkDefinitionStart(id: String, url: String) {
 case class MarkdownLineReader private (val lines: Seq[MarkdownLine],
                                        val lookup: Map[String, LinkDefinition],
                                        val lineCount: Int)
-    extends Reader[MarkdownLine] {
+    extends Reader[MarkdownLine]
 
   /** Not existing line that signals EOF.
     * This object cannot be referenced by any other code so it will fail all line parsers. 
@@ -150,19 +145,17 @@ case class MarkdownLineReader private (val lines: Seq[MarkdownLine],
     if (lines.isEmpty) this
     else new MarkdownLineReader(lines.tail, lookup, lineCount + 1)
   def atEnd = lines.isEmpty
-  def pos = new Position {
+  def pos = new Position
     def line = lineCount
     def column = 1
     protected def lineContents = first.fullLine
-  }
-}
 
 /**
   * Parses single lines into tokens.
   * Markdown lines are differentiated by their beginning.
   * These lines are then organized in blocks by the BlockParsers.
   */
-trait LineParsers extends InlineParsers {
+trait LineParsers extends InlineParsers
 
   /////////////////////////////////
   // Link definition pre-parsing //
@@ -171,9 +164,8 @@ trait LineParsers extends InlineParsers {
   /** The Start of a link definition: the id in square brackets, optionally indented by three spaces
     */
   def linkDefinitionId: Parser[String] =
-    """ {0,3}\[""".r ~> markdownText(Set(']'), true) <~ ("]:" ~ ows) ^^ {
+    """ {0,3}\[""".r ~> markdownText(Set(']'), true) <~ ("]:" ~ ows) ^^
       _.trim.toLowerCase
-    }
 
   /** The link url in a link definition.
     */
@@ -184,18 +176,16 @@ trait LineParsers extends InlineParsers {
   /** The title in a link definition.
     */
   def linkDefinitionTitle: Parser[String] =
-    ows ~> ("""\"[^\n]*["]""".r | """\'[^\n]*\'""".r | """\([^\n]*\)""".r) <~ ows ^^ {
+    ows ~> ("""\"[^\n]*["]""".r | """\'[^\n]*\'""".r | """\([^\n]*\)""".r) <~ ows ^^
       s =>
         s.substring(1, s.length - 1)
-    }
 
   /** A link definition that later gets stripped from the output.
     * Either a link definition on one line or the first line of a two line link definition.
     */
   def linkDefinitionStart: Parser[(LinkDefinitionStart, Option[String])] =
-    linkDefinitionId ~ linkDefinitionUrl ~ opt(linkDefinitionTitle) ^^ {
+    linkDefinitionId ~ linkDefinitionUrl ~ opt(linkDefinitionTitle) ^^
       case i ~ u ~ t => (new LinkDefinitionStart(i, u), t)
-    }
 
   //////////////////////////////////////////
   // Lines for XML Block tokenizing       //
@@ -230,9 +220,8 @@ trait LineParsers extends InlineParsers {
   /** Parses headers of the form: ### header ###
     */
   val atxHeader: Parser[AtxHeaderLine] =
-    """#+""".r ~ rest ^^ {
+    """#+""".r ~ rest ^^
       case prefix ~ payload => new AtxHeaderLine(prefix, payload)
-    }
 
   /** Parses a horizontal rule.
     */
@@ -243,25 +232,22 @@ trait LineParsers extends InlineParsers {
     * (i.e.: the start or continuation of a block quote.)
     */
   val blockquoteLine: Parser[BlockQuoteLine] =
-    """ {0,3}\>( )?""".r ~ rest ^^ {
+    """ {0,3}\>( )?""".r ~ rest ^^
       case prefix ~ payload => new BlockQuoteLine(prefix, payload)
-    }
 
   /** A line that starts an unordered list item.
     * Matches a line starting with up to three spaces followed by an asterisk, a space, and any whitespace.
     */
   val uItemStartLine: Parser[UItemStartLine] =
-    (""" {0,3}[\*\+-] [\t\v ]*""".r) ~ rest ^^ {
+    (""" {0,3}[\*\+-] [\t\v ]*""".r) ~ rest ^^
       case prefix ~ payload => new UItemStartLine(prefix, payload)
-    }
 
   /** A line that starts an ordered list item.
     * Matches a line starting with up to three spaces followed by a number, a dot and a space, and any whitespace
     */
   val oItemStartLine: Parser[OItemStartLine] =
-    (""" {0,3}[0-9]+\. [\t\v ]*""".r) ~ rest ^^ {
+    (""" {0,3}[0-9]+\. [\t\v ]*""".r) ~ rest ^^
       case prefix ~ payload => new OItemStartLine(prefix, payload)
-    }
 
   /** Accepts an empty line. (A line that consists only of optional whitespace or the empty string.)
     */
@@ -271,27 +257,24 @@ trait LineParsers extends InlineParsers {
   /** Matches a code example line: any line starting with four spaces or a tab.
     */
   val codeLine: Parser[CodeLine] =
-    ("    " | "\t") ~ rest ^^ {
+    ("    " | "\t") ~ rest ^^
       case prefix ~ payload => new CodeLine(prefix, payload)
-    }
 
   /**
     * A fenced code line. Can be the start or the end of a fenced code block 
     */
   val fencedCodeLine: Parser[FencedCode] =
-    """ {0,3}\`{3,}[\t\v ]*""".r ^^ {
+    """ {0,3}\`{3,}[\t\v ]*""".r ^^
       case prefix => new FencedCode(prefix)
-    }
 
   /** Matches the start of a fenced code block with additional language token: 
     * up to three spaces, three or more backticks, whitespace, an optional
     * language token, optional whitespace 
     */
   val extendedFencedCodeLine: Parser[ExtendedFencedCode] =
-    fencedCodeLine ~ """\w+[\t\v ]*""".r ^^ {
+    fencedCodeLine ~ """\w+[\t\v ]*""".r ^^
       case prefix ~ languageToken =>
         new ExtendedFencedCode(prefix.fullLine, languageToken)
-    }
 
   /** Matches any line. Only called when all other line parsers have failed.
     * Makes sure line tokenizing does not fail and we do not loose any lines on the way.
@@ -318,4 +301,3 @@ trait LineParsers extends InlineParsers {
     */
   val fencedCodeStartOrEnd: Parser[MarkdownLine] =
     extendedFencedCodeLine | fencedCodeLine
-}

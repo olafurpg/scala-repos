@@ -1,13 +1,11 @@
 class ClassCounts extends scala.collection.mutable.HashMap[Class[_], Int] {}
 
-class A {
-  def f(xs: ClassCounts) {
+class A
+  def f(xs: ClassCounts)
     // ok
     xs(getClass) = xs(getClass) + 1
     // not ok
     xs(getClass) += 1
-  }
-}
 
 // [Not checkable: parser]
 // [Not checkable: namer]

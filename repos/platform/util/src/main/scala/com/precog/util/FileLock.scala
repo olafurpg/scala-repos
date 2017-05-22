@@ -22,42 +22,35 @@ package com.precog.util
 import java.io.{File, RandomAccessFile}
 import java.nio.channels.{FileChannel, FileLock => JFileLock}
 
-trait FileLock {
+trait FileLock
   def release: Unit
-}
 
 class FileLockException(message: String) extends Exception(message)
 
-object FileLock {
+object FileLock
   private case class LockHolder(
       channel: FileChannel, lock: JFileLock, lockFile: Option[File])
-      extends FileLock {
-    def release = {
+      extends FileLock
+    def release =
       lock.release
       channel.close
 
       lockFile.foreach(_.delete)
-    }
-  }
 
-  def apply(target: File, lockPrefix: String = "LOCKFILE"): FileLock = {
+  def apply(target: File, lockPrefix: String = "LOCKFILE"): FileLock =
     val (lockFile, removeFile) =
-      if (target.isDirectory) {
+      if (target.isDirectory)
         val lockFile = new File(target, lockPrefix + ".lock")
         lockFile.createNewFile
         (lockFile, true)
-      } else {
+      else
         (target, false)
-      }
 
     val channel = new RandomAccessFile(lockFile, "rw").getChannel
     val lock = channel.tryLock
 
-    if (lock == null) {
+    if (lock == null)
       throw new FileLockException(
           "Could not lock. Previous lock exists on " + target)
-    }
 
     LockHolder(channel, lock, if (removeFile) Some(lockFile) else None)
-  }
-}

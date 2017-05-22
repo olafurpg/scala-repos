@@ -38,7 +38,7 @@ import scala.util.Try
   *
   * INTERNAL API
   */
-private[http] object Utf8Decoder extends StreamingCharsetDecoder {
+private[http] object Utf8Decoder extends StreamingCharsetDecoder
   private[this] val Utf8Accept = 0
   private[this] val Utf8Reject = 12
 
@@ -411,15 +411,15 @@ private[http] object Utf8Decoder extends StreamingCharsetDecoder {
       12)
 
   def create(): StreamingCharsetDecoderInstance =
-    new StreamingCharsetDecoderInstance {
+    new StreamingCharsetDecoderInstance
       var currentCodePoint = 0
       var currentState = Utf8Accept
 
-      def decode(bytes: ByteString, endOfInput: Boolean): Try[String] = Try {
+      def decode(bytes: ByteString, endOfInput: Boolean): Try[String] = Try
         val result = new StringBuilder(bytes.size)
         val length = bytes.size
 
-        def step(byte: Int): Unit = {
+        def step(byte: Int): Unit =
           val chClass = characterClasses(byte)
           currentCodePoint = if (currentState == Utf8Accept) // first byte
             (0xff >> chClass) & byte // take as much bits as the characterClass says
@@ -428,41 +428,32 @@ private[http] object Utf8Decoder extends StreamingCharsetDecoder {
             (0x3f & byte) | (currentCodePoint << 6) // take 6 bits
           currentState = states(currentState + chClass)
 
-          currentState match {
+          currentState match
             case Utf8Accept ⇒
               if (currentCodePoint <= 0xffff)
                 // fits in single UTF-16 char
                 result.append(currentCodePoint.toChar)
-              else {
+              else
                 // create surrogate pair
                 result.append((0xD7C0 + (currentCodePoint >> 10)).toChar)
                 result.append((0xDC00 + (currentCodePoint & 0x3FF)).toChar)
-              }
             case Utf8Reject ⇒ fail("Invalid UTF-8 input")
             case _ ⇒ // valid intermediate state, need more input
-          }
-        }
 
         var offset = 0
-        while (offset < length) {
+        while (offset < length)
           step(bytes(offset) & 0xff)
           offset += 1
-        }
 
         if (endOfInput && currentState != Utf8Accept)
           fail("Truncated UTF-8 input")
         else result.toString()
-      }
 
       def fail(msg: String): Nothing = throw new IllegalArgumentException(msg)
-    }
-}
 
-private[http] trait StreamingCharsetDecoder {
+private[http] trait StreamingCharsetDecoder
   def create(): StreamingCharsetDecoderInstance
   def decode(bytes: ByteString): Try[String] =
     create().decode(bytes, endOfInput = true)
-}
-private[http] trait StreamingCharsetDecoderInstance {
+private[http] trait StreamingCharsetDecoderInstance
   def decode(bytes: ByteString, endOfInput: Boolean): Try[String]
-}

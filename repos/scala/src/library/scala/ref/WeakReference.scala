@@ -15,14 +15,13 @@ package scala.ref
   *  @author Sean McDirmid
   */
 class WeakReference[+T <: AnyRef](value: T, queue: ReferenceQueue[T])
-    extends ReferenceWrapper[T] {
+    extends ReferenceWrapper[T]
   def this(value: T) = this(value, null)
   val underlying: java.lang.ref.WeakReference[_ <: T] =
     new WeakReferenceWithWrapper[T](value, queue, this)
-}
 
 /** An extractor for weak reference values */
-object WeakReference {
+object WeakReference
 
   /** Creates a weak reference pointing to `value` */
   def apply[T <: AnyRef](value: T) = new WeakReference(value)
@@ -30,7 +29,6 @@ object WeakReference {
   /** Optionally returns the referenced value, or `None` if that value no longer exists */
   def unapply[T <: AnyRef](wr: WeakReference[T]): Option[T] =
     Option(wr.underlying.get)
-}
 
 /**
   *  @author Philipp Haller

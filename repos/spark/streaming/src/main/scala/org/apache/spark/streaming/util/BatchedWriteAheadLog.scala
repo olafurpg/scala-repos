@@ -54,7 +54,7 @@ import org.apache.spark.util.Utils
   */
 private[util] class BatchedWriteAheadLog(
     val wrappedLog: WriteAheadLog, conf: SparkConf)
-    extends WriteAheadLog with Logging {
+    extends WriteAheadLog with Logging
 
   import BatchedWriteAheadLog._
 
@@ -71,108 +71,93 @@ private[util] class BatchedWriteAheadLog(
     * until the record is properly written by the parent.
     */
   override def write(
-      byteBuffer: ByteBuffer, time: Long): WriteAheadLogRecordHandle = {
+      byteBuffer: ByteBuffer, time: Long): WriteAheadLogRecordHandle =
     val promise = Promise[WriteAheadLogRecordHandle]()
-    val putSuccessfully = synchronized {
-      if (active) {
+    val putSuccessfully = synchronized
+      if (active)
         walWriteQueue.offer(Record(byteBuffer, time, promise))
         true
-      } else {
+      else
         false
-      }
-    }
-    if (putSuccessfully) {
+    if (putSuccessfully)
       Await.result(promise.future,
                    WriteAheadLogUtils.getBatchingTimeout(conf).milliseconds)
-    } else {
+    else
       throw new IllegalStateException(
           "close() was called on BatchedWriteAheadLog before " +
           s"write request with time $time could be fulfilled.")
-    }
-  }
 
   /**
     * This method is not supported as the resulting ByteBuffer would actually require de-aggregation.
     * This method is primarily used in testing, and to ensure that it is not used in production,
     * we throw an UnsupportedOperationException.
     */
-  override def read(segment: WriteAheadLogRecordHandle): ByteBuffer = {
+  override def read(segment: WriteAheadLogRecordHandle): ByteBuffer =
     throw new UnsupportedOperationException(
         "read() is not supported for BatchedWriteAheadLog " +
         "as the data may require de-aggregation.")
-  }
 
   /**
     * Read all the existing logs from the log directory. The output of the wrapped WriteAheadLog
     * will be de-aggregated.
     */
-  override def readAll(): JIterator[ByteBuffer] = {
+  override def readAll(): JIterator[ByteBuffer] =
     wrappedLog.readAll().asScala.flatMap(deaggregate).asJava
-  }
 
   /**
     * Delete the log files that are older than the threshold time.
     *
     * This method is handled by the parent WriteAheadLog.
     */
-  override def clean(threshTime: Long, waitForCompletion: Boolean): Unit = {
+  override def clean(threshTime: Long, waitForCompletion: Boolean): Unit =
     wrappedLog.clean(threshTime, waitForCompletion)
-  }
 
   /**
     * Stop the batched writer thread, fulfill promises with failures and close the wrapped WAL.
     */
-  override def close(): Unit = {
+  override def close(): Unit =
     logInfo(
         s"BatchedWriteAheadLog shutting down at time: ${System.currentTimeMillis()}.")
-    synchronized {
+    synchronized
       active = false
-    }
     batchedWriterThread.interrupt()
     batchedWriterThread.join()
-    while (!walWriteQueue.isEmpty) {
+    while (!walWriteQueue.isEmpty)
       val Record(_, time, promise) = walWriteQueue.poll()
       promise.failure(
           new IllegalStateException(
               "close() was called on BatchedWriteAheadLog " +
               s"before write request with time $time could be fulfilled."))
-    }
     wrappedLog.close()
-  }
 
   /** Start the actual log writer on a separate thread. */
-  private def startBatchedWriterThread(): Thread = {
-    val thread = new Thread(new Runnable {
-      override def run(): Unit = {
-        while (active) {
-          try {
+  private def startBatchedWriterThread(): Thread =
+    val thread = new Thread(new Runnable
+      override def run(): Unit =
+        while (active)
+          try
             flushRecords()
-          } catch {
+          catch
             case NonFatal(e) =>
               logWarning("Encountered exception in Batched Writer Thread.", e)
-          }
-        }
         logInfo("BatchedWriteAheadLog Writer thread exiting.")
-      }
-    }, "BatchedWriteAheadLog Writer")
+    , "BatchedWriteAheadLog Writer")
     thread.setDaemon(true)
     thread.start()
     thread
-  }
 
   /** Write all the records in the buffer to the write ahead log. */
-  private def flushRecords(): Unit = {
-    try {
+  private def flushRecords(): Unit =
+    try
       buffer.append(walWriteQueue.take())
       val numBatched = walWriteQueue.drainTo(buffer.asJava) + 1
       logDebug(s"Received $numBatched records from queue")
-    } catch {
+    catch
       case _: InterruptedException =>
         logWarning("BatchedWriteAheadLog Writer queue interrupted.")
-    }
-    try {
+    try
       var segment: WriteAheadLogRecordHandle = null
-      if (buffer.length > 0) {
+      if (buffer.length > 0)
         logDebug(s"Batched ${buffer.length} records for Write Ahead Log write")
         // threads may not be able to add items in order by time
         val sortedByTime = buffer.sortBy(_.time)
@@ -180,26 +165,22 @@ private[util] class BatchedWriteAheadLog(
         // detailed explanation
         val time = sortedByTime.last.time
         segment = wrappedLog.write(aggregate(sortedByTime), time)
-      }
       buffer.foreach(_.promise.success(segment))
-    } catch {
+    catch
       case e: InterruptedException =>
         logWarning("BatchedWriteAheadLog Writer queue interrupted.", e)
         buffer.foreach(_.promise.failure(e))
       case NonFatal(e) =>
         logWarning(s"BatchedWriteAheadLog Writer failed to write $buffer", e)
         buffer.foreach(_.promise.failure(e))
-    } finally {
+    finally
       buffer.clear()
-    }
-  }
 
   /** Method for querying the queue length. Should only be used in tests. */
   private def getQueueLength(): Int = walWriteQueue.size()
-}
 
 /** Static methods for aggregating and de-aggregating records. */
-private[util] object BatchedWriteAheadLog {
+private[util] object BatchedWriteAheadLog
 
   /**
     * Wrapper class for representing the records that we will write to the WriteAheadLog. Coupled
@@ -211,29 +192,25 @@ private[util] object BatchedWriteAheadLog {
                     promise: Promise[WriteAheadLogRecordHandle])
 
   /** Aggregate multiple serialized ReceivedBlockTrackerLogEvents in a single ByteBuffer. */
-  def aggregate(records: Seq[Record]): ByteBuffer = {
+  def aggregate(records: Seq[Record]): ByteBuffer =
     ByteBuffer.wrap(Utils.serialize[Array[Array[Byte]]](records
               .map(record => JavaUtils.bufferToArray(record.data))
               .toArray))
-  }
 
   /**
     * De-aggregate serialized ReceivedBlockTrackerLogEvents in a single ByteBuffer.
     * A stream may not have used batching initially, but started using it after a restart. This
     * method therefore needs to be backwards compatible.
     */
-  def deaggregate(buffer: ByteBuffer): Array[ByteBuffer] = {
+  def deaggregate(buffer: ByteBuffer): Array[ByteBuffer] =
     val prevPosition = buffer.position()
-    try {
+    try
       Utils
         .deserialize[Array[Array[Byte]]](JavaUtils.bufferToArray(buffer))
         .map(ByteBuffer.wrap)
-    } catch {
+    catch
       case _: ClassCastException =>
         // users may restart a stream with batching enabled
         // Restore `position` so that the user can read `buffer` later
         buffer.position(prevPosition)
         Array(buffer)
-    }
-  }
-}

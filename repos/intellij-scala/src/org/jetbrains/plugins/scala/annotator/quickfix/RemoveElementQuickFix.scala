@@ -10,16 +10,14 @@ import com.intellij.psi.{PsiElement, PsiFile}
   * Pavel Fatin
   */
 class RemoveElementQuickFix(element: PsiElement, description: String)
-    extends IntentionAction {
+    extends IntentionAction
   def getText = description
 
   def getFamilyName = ""
 
   def isAvailable(project: Project, editor: Editor, file: PsiFile) = true
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     element.delete()
-  }
 
   def startInWriteAction() = true
-}

@@ -25,32 +25,29 @@ import org.specs2.mutable.Specification
 
 import com.mongodb._
 
-package mongoclientsaverecords {
+package mongoclientsaverecords
 
   import field._
 
   class SaveDoc private ()
-      extends MongoRecord[SaveDoc] with ObjectIdPk[SaveDoc] {
+      extends MongoRecord[SaveDoc] with ObjectIdPk[SaveDoc]
     def meta = SaveDoc
 
     object name extends StringField(this, 12)
-  }
-  object SaveDoc extends SaveDoc with MongoMetaRecord[SaveDoc] {
+  object SaveDoc extends SaveDoc with MongoMetaRecord[SaveDoc]
     import BsonDSL._
 
     createIndex(("name" -> 1), true) // unique name
-  }
-}
 
 /**
   * Systems under specification for MongoClientSave.
   */
-class MongoClientSaveSpec extends Specification with MongoTestKit {
+class MongoClientSaveSpec extends Specification with MongoTestKit
   "MongoClientSave Specification".title
 
   import mongoclientsaverecords._
 
-  "MongoMetaRecord with Mongo save" in {
+  "MongoMetaRecord with Mongo save" in
 
     checkMongoIsRunning
 
@@ -62,11 +59,8 @@ class MongoClientSaveSpec extends Specification with MongoTestKit {
     sd1.save()
     sd2.save(false) // no exception thrown
     sd2.save(true) must throwA[MongoException]
-    sd2.saveBox() must beLike {
+    sd2.saveBox() must beLike
       case Failure(msg, _, _) => msg must contain("E11000")
-    }
     sd3.save()
 
     success
-  }
-}

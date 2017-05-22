@@ -32,7 +32,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[scalafx.scene.control.ContentDisplay]] */
 object ContentDisplay
-    extends SFXEnumDelegateCompanion[jfxsc.ContentDisplay, ContentDisplay] {
+    extends SFXEnumDelegateCompanion[jfxsc.ContentDisplay, ContentDisplay]
 
   val Bottom = new ContentDisplay(jfxsc.ContentDisplay.BOTTOM)
   @deprecated(
@@ -70,7 +70,6 @@ object ContentDisplay
       GraphicOnly,
       TextOnly
   )
-}
 
 sealed case class ContentDisplay(override val delegate: jfxsc.ContentDisplay)
     extends SFXEnumDelegate[jfxsc.ContentDisplay]

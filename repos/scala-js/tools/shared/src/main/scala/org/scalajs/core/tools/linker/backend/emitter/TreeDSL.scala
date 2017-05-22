@@ -15,8 +15,8 @@ import org.scalajs.core.ir.Position
 
 import org.scalajs.core.tools.javascript.Trees._
 
-private[emitter] object TreeDSL {
-  implicit class TreeOps(val self: Tree) extends AnyVal {
+private[emitter] object TreeDSL
+  implicit class TreeOps(val self: Tree) extends AnyVal
 
     /** Select a member */
     def DOT(field: Ident)(implicit pos: Position): DotSelect =
@@ -47,8 +47,6 @@ private[emitter] object TreeDSL {
 
     def :=(that: Tree)(implicit pos: Position): Tree =
       Assign(self, that)
-  }
 
   def typeof(expr: Tree)(implicit pos: Position): Tree =
     UnaryOp(ir.Trees.JSUnaryOp.typeof, expr)
-}

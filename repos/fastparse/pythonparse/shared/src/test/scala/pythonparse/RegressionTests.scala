@@ -2,7 +2,7 @@ package pythonparse
 import utest._
 import fastparse.all._
 
-object RegressionTests extends TestSuite {
+object RegressionTests extends TestSuite
   import Ast.expr._
   import Ast.stmt._
   import Ast.expr_context._
@@ -12,7 +12,7 @@ object RegressionTests extends TestSuite {
   import Ast._
   implicit def strName(s: Symbol) = Name(identifier(s.name), Load)
   implicit def strIdent(s: Symbol) = identifier(s.name)
-  val tests = TestSuite {
+  val tests = TestSuite
     'multiple_comments - TestUtils.check(
         Statements.file_input,
         Seq(Ast.stmt.Pass),
@@ -248,5 +248,3 @@ object RegressionTests extends TestSuite {
         Seq(While(Num(1), Seq(Pass), Nil)),
         "while 1:\n\tpass"
     )
-  }
-}

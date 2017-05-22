@@ -29,18 +29,18 @@ private[prediction] case class PropTime(val d: JValue, val t: Long)
 private[prediction] case class SetProp(val fields: Map[String, PropTime],
                                        // last set time. Note: fields could be empty with valid set time
                                        val t: Long)
-    extends Serializable {
+    extends Serializable
 
-  def ++(that: SetProp): SetProp = {
+  def ++(that: SetProp): SetProp =
     val commonKeys = fields.keySet.intersect(that.fields.keySet)
 
-    val common: Map[String, PropTime] = commonKeys.map { k =>
+    val common: Map[String, PropTime] = commonKeys.map  k =>
       val thisData = this.fields(k)
       val thatData = that.fields(k)
       // only keep the value with latest time
       val v = if (thisData.t > thatData.t) thisData else thatData
       (k, v)
-    }.toMap
+    .toMap
 
     val combinedFields =
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
@@ -52,21 +52,19 @@ private[prediction] case class SetProp(val fields: Map[String, PropTime],
         fields = combinedFields,
         t = combinedT
     )
-  }
-}
 
 private[prediction] case class UnsetProp(fields: Map[String, Long])
-    extends Serializable {
-  def ++(that: UnsetProp): UnsetProp = {
+    extends Serializable
+  def ++(that: UnsetProp): UnsetProp =
     val commonKeys = fields.keySet.intersect(that.fields.keySet)
 
-    val common: Map[String, Long] = commonKeys.map { k =>
+    val common: Map[String, Long] = commonKeys.map  k =>
       val thisData = this.fields(k)
       val thatData = that.fields(k)
       // only keep the value with latest time
       val v = if (thisData > thatData) thisData else thatData
       (k, v)
-    }.toMap
+    .toMap
 
     val combinedFields =
       common ++ (this.fields -- commonKeys) ++ (that.fields -- commonKeys)
@@ -74,14 +72,10 @@ private[prediction] case class UnsetProp(fields: Map[String, Long])
     UnsetProp(
         fields = combinedFields
     )
-  }
-}
 
-private[prediction] case class DeleteEntity(t: Long) extends Serializable {
-  def ++(that: DeleteEntity): DeleteEntity = {
+private[prediction] case class DeleteEntity(t: Long) extends Serializable
+  def ++(that: DeleteEntity): DeleteEntity =
     if (this.t > that.t) this else that
-  }
-}
 
 private[prediction] case class EventOp(
     val setProp: Option[SetProp] = None,
@@ -90,17 +84,15 @@ private[prediction] case class EventOp(
     val firstUpdated: Option[DateTime] = None,
     val lastUpdated: Option[DateTime] = None
 )
-    extends Serializable {
+    extends Serializable
 
-  def ++(that: EventOp): EventOp = {
-    val firstUp = (this.firstUpdated ++ that.firstUpdated).reduceOption {
+  def ++(that: EventOp): EventOp =
+    val firstUp = (this.firstUpdated ++ that.firstUpdated).reduceOption
       (a, b) =>
         if (b.getMillis < a.getMillis) b else a
-    }
-    val lastUp = (this.lastUpdated ++ that.lastUpdated).reduceOption {
+    val lastUp = (this.lastUpdated ++ that.lastUpdated).reduceOption
       (a, b) =>
         if (b.getMillis > a.getMillis) b else a
-    }
 
     EventOp(
         setProp = (setProp ++ that.setProp).reduceOption(_ ++ _),
@@ -110,33 +102,30 @@ private[prediction] case class EventOp(
         firstUpdated = firstUp,
         lastUpdated = lastUp
     )
-  }
 
-  def toPropertyMap(): Option[PropertyMap] = {
-    setProp.flatMap { set =>
+  def toPropertyMap(): Option[PropertyMap] =
+    setProp.flatMap  set =>
       val unsetKeys: Set[String] = unsetProp
         .map(unset =>
               unset.fields.filter { case (k, v) => (v >= set.fields(k).t) }.keySet)
         .getOrElse(Set())
 
-      val combinedFields = deleteEntity.map { delete =>
-        if (delete.t >= set.t) {
+      val combinedFields = deleteEntity.map  delete =>
+        if (delete.t >= set.t)
           None
-        } else {
-          val deleteKeys: Set[String] = set.fields.filter {
+        else
+          val deleteKeys: Set[String] = set.fields.filter
             case (k, PropTime(kv, t)) =>
               (delete.t >= t)
-          }.keySet
+          .keySet
           Some(set.fields -- unsetKeys -- deleteKeys)
-        }
-      }.getOrElse {
+      .getOrElse
         Some(set.fields -- unsetKeys)
-      }
 
       // Note: mapValues() doesn't return concrete Map and causes
       // NotSerializableException issue. Use map(identity) to work around this.
       // see https://issues.scala-lang.org/browse/SI-7005
-      combinedFields.map { f =>
+      combinedFields.map  f =>
         require(firstUpdated.isDefined,
                 "Unexpected Error: firstUpdated cannot be None.")
         require(lastUpdated.isDefined,
@@ -146,17 +135,13 @@ private[prediction] case class EventOp(
             firstUpdated = firstUpdated.get,
             lastUpdated = lastUpdated.get
         )
-      }
-    }
-  }
-}
 
-private[prediction] object EventOp {
+private[prediction] object EventOp
   // create EventOp from Event object
-  def apply(e: Event): EventOp = {
+  def apply(e: Event): EventOp =
     val t = e.eventTime.getMillis
-    e.event match {
-      case "$set" => {
+    e.event match
+      case "$set" =>
           val fields =
             e.properties.fields.mapValues(jv => PropTime(jv, t)).map(identity)
 
@@ -165,34 +150,27 @@ private[prediction] object EventOp {
               firstUpdated = Some(e.eventTime),
               lastUpdated = Some(e.eventTime)
           )
-        }
-      case "$unset" => {
+      case "$unset" =>
           val fields = e.properties.fields.mapValues(jv => t).map(identity)
           EventOp(
               unsetProp = Some(UnsetProp(fields = fields)),
               firstUpdated = Some(e.eventTime),
               lastUpdated = Some(e.eventTime)
           )
-        }
-      case "$delete" => {
+      case "$delete" =>
           EventOp(
               deleteEntity = Some(DeleteEntity(t)),
               firstUpdated = Some(e.eventTime),
               lastUpdated = Some(e.eventTime)
           )
-        }
-      case _ => {
+      case _ =>
           EventOp()
-        }
-    }
-  }
-}
 
-private[prediction] object PEventAggregator {
+private[prediction] object PEventAggregator
 
   val eventNames = List("$set", "$unset", "$delete")
 
-  def aggregateProperties(eventsRDD: RDD[Event]): RDD[(String, PropertyMap)] = {
+  def aggregateProperties(eventsRDD: RDD[Event]): RDD[(String, PropertyMap)] =
     eventsRDD
       .map(e => (e.entityId, EventOp(e)))
       .aggregateByKey[EventOp](EventOp())(
@@ -204,5 +182,3 @@ private[prediction] object PEventAggregator {
       .mapValues(_.toPropertyMap)
       .filter { case (k, v) => v.isDefined }
       .map { case (k, v) => (k, v.get) }
-  }
-}

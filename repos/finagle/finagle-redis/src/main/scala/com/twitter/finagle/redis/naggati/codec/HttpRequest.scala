@@ -24,49 +24,40 @@ case class HeaderLine(name: String, value: String)
 case class HttpRequest(
     request: RequestLine, headers: List[HeaderLine], body: Array[Byte])
 
-object HttpRequest {
+object HttpRequest
   def codec(bytesReadCounter: Int => Unit, bytesWrittenCounter: Int => Unit) =
     new Codec(read, Codec.NONE, bytesReadCounter, bytesWrittenCounter)
 
   def codec() = new Codec(read, Codec.NONE)
 
-  val read = readLine(true, "UTF-8") { line =>
-    line.split(' ').toList match {
+  val read = readLine(true, "UTF-8")  line =>
+    line.split(' ').toList match
       case method :: resource :: version :: Nil =>
         val requestLine = RequestLine(method, resource, version)
         readHeader(requestLine, Nil)
       case _ =>
         throw new ProtocolError("Malformed request line: " + line)
-    }
-  }
 
-  def readHeader(requestLine: RequestLine, headers: List[HeaderLine]): Stage = {
-    readLine(true, "UTF-8") { line =>
-      if (line == "") {
+  def readHeader(requestLine: RequestLine, headers: List[HeaderLine]): Stage =
+    readLine(true, "UTF-8")  line =>
+      if (line == "")
         // end of headers
-        val contentLength = headers.find { _.name == "content-length" }.map {
+        val contentLength = headers.find { _.name == "content-length" }.map
           _.value.toInt
-        }.getOrElse(0)
-        readBytes(contentLength) { data =>
+        .getOrElse(0)
+        readBytes(contentLength)  data =>
           emit(HttpRequest(requestLine, headers.reverse, data))
-        }
-      } else if (line.length > 0 && (line.head == ' ' || line.head == '\t')) {
+      else if (line.length > 0 && (line.head == ' ' || line.head == '\t'))
         // continuation line
-        if (headers.size == 0) {
+        if (headers.size == 0)
           throw new ProtocolError("Malformed header line: " + line)
-        }
         val newHeaderLine =
           HeaderLine(headers.head.name, headers.head.value + " " + line.trim)
         readHeader(requestLine, newHeaderLine :: headers.drop(1))
-      } else {
-        val newHeaderLine = line.split(':').toList match {
+      else
+        val newHeaderLine = line.split(':').toList match
           case name :: value :: Nil =>
             HeaderLine(name.trim.toLowerCase, value.trim)
           case _ =>
             throw new ProtocolError("Malformed header line: " + line)
-        }
         readHeader(requestLine, newHeaderLine :: headers)
-      }
-    }
-  }
-}

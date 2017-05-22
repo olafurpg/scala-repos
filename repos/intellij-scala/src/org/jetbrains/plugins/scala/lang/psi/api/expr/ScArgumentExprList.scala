@@ -19,7 +19,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
   * 2. foo {expr}
   * In second way there is no parentheses, just one block expression.
   */
-trait ScArgumentExprList extends ScArguments {
+trait ScArgumentExprList extends ScArguments
 
   /**
     * Expressions applied to appropriate method call (@see ScMethodCall).
@@ -61,19 +61,16 @@ trait ScArgumentExprList extends ScArguments {
   def parameterOf(argExpr: ScExpression): Option[Parameter] =
     ScalaPsiUtil.parameterOf(argExpr)
 
-  def missedLastExpr: Boolean = {
+  def missedLastExpr: Boolean =
     var child = getLastChild
     while (child != null &&
-    child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
+    child.getNode.getElementType != ScalaTokenTypes.tCOMMA)
       if (child.isInstanceOf[ScExpression]) return false
       child = child.getPrevSibling
-    }
     child != null && child.getNode.getElementType == ScalaTokenTypes.tCOMMA
-  }
 
   def addExpr(expr: ScExpression): ScArgumentExprList
 
   def addExprAfter(expr: ScExpression, anchor: PsiElement): ScArgumentExprList
 
   def isBraceArgs: Boolean = findChild(classOf[ScBlock]).isDefined
-}

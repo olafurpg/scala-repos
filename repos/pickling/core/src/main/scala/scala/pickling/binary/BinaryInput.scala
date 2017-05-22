@@ -2,7 +2,7 @@ package scala.pickling.binary
 
 import scala.reflect.ClassTag
 
-abstract class BinaryInput {
+abstract class BinaryInput
 
   def getByte(): Byte
 
@@ -24,41 +24,36 @@ abstract class BinaryInput {
   // Derived operations //
   ////////////////////////
 
-  def getBoolean(): Boolean = {
+  def getBoolean(): Boolean =
     getByte() != 0
-  }
 
-  def getString(): String = {
+  def getString(): String =
     val array = getByteArray
     new String(array, "UTF-8")
-  }
 
   private val chunkSize = 1024
   private val chunk = Array.ofDim[Byte](chunkSize)
 
   protected def getArrayByChunk[T <: AnyVal : ClassTag](
-      offset: Long, eltSize: Int): Array[T] = {
+      offset: Long, eltSize: Int): Array[T] =
     val size = getIntWithLookahead
     val array = Array.ofDim[T](size)
     var toCopy = size * eltSize
     var destOffset = offset
-    while (toCopy > 0) {
+    while (toCopy > 0)
       val byteLen = math.min(chunkSize, toCopy)
       getBytes(chunk, byteLen)
       UnsafeMemory.unsafe.copyMemory(
           chunk, UnsafeMemory.byteArrayOffset, array, destOffset, byteLen)
       toCopy -= byteLen
       destOffset += byteLen
-    }
     array
-  }
 
-  def getByteArray(): Array[Byte] = {
+  def getByteArray(): Array[Byte] =
     val size = getIntWithLookahead
     val array = Array.ofDim[Byte](size)
     getBytes(array, size)
     array
-  }
 
   def getBooleanArray(): Array[Boolean] =
     getArrayByChunk[Boolean](UnsafeMemory.booleanArrayOffset, 1)
@@ -77,12 +72,11 @@ abstract class BinaryInput {
 
   protected var lookahead: Option[Byte] = None
 
-  def setLookahead(b: Byte) {
+  def setLookahead(b: Byte)
     lookahead = Some(b)
-  }
 
-  def getIntWithLookahead() = {
-    lookahead match {
+  def getIntWithLookahead() =
+    lookahead match
       case Some(b) =>
         var i = b << 24
         i |= (getByte.toInt << 16) & 0xFF0000
@@ -92,19 +86,15 @@ abstract class BinaryInput {
         i
       case None =>
         getInt
-    }
-  }
 
-  def getStringWithLookahead(la: Byte): String = {
+  def getStringWithLookahead(la: Byte): String =
     val oldLa = lookahead
     setLookahead(la)
     val res = getString
     lookahead = oldLa
     res
-  }
-}
 
-class ByteBufferInput(buffer: java.nio.ByteBuffer) extends BinaryInput {
+class ByteBufferInput(buffer: java.nio.ByteBuffer) extends BinaryInput
 
   import java.nio.ByteOrder
   assert(buffer.order == ByteOrder.BIG_ENDIAN)
@@ -123,38 +113,33 @@ class ByteBufferInput(buffer: java.nio.ByteBuffer) extends BinaryInput {
 
   def getDouble() = buffer.getDouble
 
-  def getBytes(target: Array[Byte], len: Int): Unit = {
+  def getBytes(target: Array[Byte], len: Int): Unit =
     buffer.get(target, 0, len)
-  }
-}
 
-class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
+class ByteArrayInput(data: Array[Byte]) extends BinaryInput
 
   private var idx = 0
 
-  def getByte() = {
+  def getByte() =
     val res = data(idx)
     idx += 1
     res
-  }
 
-  def getChar() = {
+  def getChar() =
     var res = 0
     res |= data(idx) << 8
     res |= data(idx + 1).toInt & 0xFF
     idx += 2
     res.asInstanceOf[Char]
-  }
 
-  def getShort() = {
+  def getShort() =
     var res = 0
     res |= data(idx) << 8
     res |= data(idx + 1).toInt & 0xFF
     idx += 2
     res.asInstanceOf[Short]
-  }
 
-  def getInt() = {
+  def getInt() =
     var res = (0: Int)
     res |= (data(idx) << 24)
     res |= (data(idx + 1) << 16) & 0xFF0000
@@ -162,9 +147,8 @@ class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
     res |=(data(idx + 3)) & 0xFF
     idx += 4
     res
-  }
 
-  def getLong() = {
+  def getLong() =
     var res = (0: Long)
     res |= (data(idx).toLong << 56) & 0xFFFFFFFFFFFFFFFFL
     res |= (data(idx + 1).toLong << 48) & 0x00FFFFFFFFFFFFFFL
@@ -176,30 +160,26 @@ class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
     res |= (data(idx + 7).toLong) & 0x00000000000000FFL
     idx += 8
     res
-  }
 
-  def getFloat() = {
+  def getFloat() =
     val r = getInt()
     java.lang.Float.intBitsToFloat(r)
-  }
 
-  def getDouble() = {
+  def getDouble() =
     val r = getLong()
     java.lang.Double.longBitsToDouble(r)
-  }
 
-  def getBytes(target: Array[Byte], len: Int): Unit = {
+  def getBytes(target: Array[Byte], len: Int): Unit =
     UnsafeMemory.unsafe.copyMemory(data,
                                    UnsafeMemory.byteArrayOffset + idx,
                                    target,
                                    UnsafeMemory.byteArrayOffset,
                                    len)
     idx += len
-  }
 
   //override array for faster copy (get rid of ckunk)
   override protected def getArrayByChunk[T <: AnyVal : ClassTag](
-      offset: Long, eltSize: Int): Array[T] = {
+      offset: Long, eltSize: Int): Array[T] =
     val size = getIntWithLookahead
     val array = Array.ofDim[T](size)
     var toCopy = size * eltSize
@@ -207,10 +187,8 @@ class ByteArrayInput(data: Array[Byte]) extends BinaryInput {
         data, UnsafeMemory.byteArrayOffset + idx, array, offset, toCopy)
     idx += toCopy
     array
-  }
-}
 
-class StreamInput(stream: java.io.InputStream) extends BinaryInput {
+class StreamInput(stream: java.io.InputStream) extends BinaryInput
   //by default java, uses big-endian.
   val ds = new java.io.DataInputStream(stream)
   def getByte() = ds.readByte()
@@ -221,7 +199,5 @@ class StreamInput(stream: java.io.InputStream) extends BinaryInput {
   def getFloat() = ds.readFloat()
   def getDouble() = ds.readDouble()
 
-  def getBytes(target: Array[Byte], len: Int): Unit = {
+  def getBytes(target: Array[Byte], len: Int): Unit =
     ds.readFully(target, 0, len)
-  }
-}

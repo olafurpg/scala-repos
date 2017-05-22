@@ -1,3 +1,2 @@
-class SimpleClass {
+class SimpleClass
   def foo = 239
-}

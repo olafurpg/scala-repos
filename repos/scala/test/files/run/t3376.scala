@@ -1,7 +1,7 @@
 import scala.tools.nsc.interpreter._
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   class M[@specialized T] {}
 
   def code = """
@@ -10,4 +10,3 @@ object Test extends ReplTest {
     |val m2 = new M[Float]()
     |val m3 = new M[String]()
     |""".stripMargin
-}

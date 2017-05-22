@@ -55,7 +55,7 @@ import scalafx.ensemble.commons.EnsembleExample
   *
   * @resource /scalafx/ensemble/example/charts/AdvCandleStickChartSample.css
   */
-class EnsembleAdvCandleStickChart extends EnsembleExample {
+class EnsembleAdvCandleStickChart extends EnsembleExample
 
   case class CandleStick(day: Int,
                          open: Double,
@@ -64,7 +64,7 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
                          low: Double,
                          average: Double)
 
-  def getContent = {
+  def getContent =
 
     val data = Array[CandleStick](
         CandleStick(1, 25, 20, 32, 16, 20),
@@ -101,31 +101,26 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     )
 
     createChart(data)
-  }
 
-  protected def createChart(data: Array[CandleStick]): CandleStickChart = {
+  protected def createChart(data: Array[CandleStick]): CandleStickChart =
     //Style Sheet loaded from external
     val css =
       this.getClass.getResource("AdvCandleStickChartSample.css").toExternalForm
 
-    val xAxis = new NumberAxis("Day", 0, 32, 1) {
+    val xAxis = new NumberAxis("Day", 0, 32, 1)
       minorTickCount = 0
-    }
     val yAxis = NumberAxis("Price")
 
-    val seriesData = data.map { d =>
+    val seriesData = data.map  d =>
       XYChart.Data[Number, Number](d.day, d.open, d)
-    }
 
     val series =
       XYChart.Series[Number, Number](ObservableBuffer(seriesData.toSeq))
 
-    new CandleStickChart(xAxis, yAxis) {
+    new CandleStickChart(xAxis, yAxis)
       title = "Custom Candle Stick Chart"
       data = ObservableBuffer(series)
       getStylesheets += css
-    }
-  }
 
   /**
     * A candlestick chart is a style of bar-chart used primarily to describe price movements of a security, derivative,
@@ -135,7 +130,7 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     * extra value property using a CandleStick object.
     */
   class CandleStickChart(xa: Axis[Number], ya: Axis[Number])
-      extends jfxsc.XYChart[Number, Number](xa, ya) {
+      extends jfxsc.XYChart[Number, Number](xa, ya)
 
     setAnimated(false)
     xAxis.animated = false
@@ -150,56 +145,50 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
       */
     def this(xAxis: Axis[Number],
              yAxis: Axis[Number],
-             data: ObservableBuffer[jfxsc.XYChart.Series[Number, Number]]) {
+             data: ObservableBuffer[jfxsc.XYChart.Series[Number, Number]])
       this(xAxis, yAxis)
       setData(data)
-    }
 
     def title: String = getTitle
 
-    def title_=(t: String) {
+    def title_=(t: String)
       setTitle(t)
-    }
 
     def data: ObservableBuffer[jfxsc.XYChart.Series[Number, Number]] = getData
 
-    def data_=(d: ObservableBuffer[jfxsc.XYChart.Series[Number, Number]]) {
+    def data_=(d: ObservableBuffer[jfxsc.XYChart.Series[Number, Number]])
       setData(d)
-    }
 
     def plotChildren = getPlotChildren
     def xAxis = getXAxis
     def yAxis = getYAxis
 
     /** Called to update and layout the content for the plot */
-    override protected def layoutPlotChildren() {
-      if (data == null) {
+    override protected def layoutPlotChildren()
+      if (data == null)
         return
-      }
 
-      for (series <- data) {
-        val seriesPath: Option[Path] = series.node() match {
+      for (series <- data)
+        val seriesPath: Option[Path] = series.node() match
           case path: jfxss.Path => Some(path)
           case _ => None
-        }
         seriesPath.foreach(_.elements.clear())
 
-        for (item <- getDisplayedDataIterator(series)) {
-          item.extraValue() match {
+        for (item <- getDisplayedDataIterator(series))
+          item.extraValue() match
             case dayValues: CandleStick =>
               val x = xAxis.displayPosition(dayValues.day)
 
-              item.node() match {
+              item.node() match
                 case candle: Candle =>
                   val yOpen = yAxis.displayPosition(dayValues.open)
                   val yClose = yAxis.displayPosition(dayValues.close)
                   val yHigh = yAxis.displayPosition(dayValues.high)
                   val yLow = yAxis.displayPosition(dayValues.low)
-                  val candleWidth = xAxis match {
+                  val candleWidth = xAxis match
                     case xa: jfxsc.NumberAxis =>
                       xa.displayPosition(xa.tickUnit()) * 0.90
                     case _ => -1
-                  }
                   candle.update(
                       yClose - yOpen, yHigh - yOpen, yLow - yOpen, candleWidth)
                   candle.updateTooltip(item.YValue().doubleValue,
@@ -209,21 +198,14 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
                   candle.layoutX = x
                   candle.layoutY = yOpen
                 case _ =>
-              }
 
-              seriesPath.foreach { p =>
+              seriesPath.foreach  p =>
                 val yAverage = yAxis.displayPosition(dayValues.average)
-                if (p.elements.isEmpty) {
+                if (p.elements.isEmpty)
                   p.elements += MoveTo(x, yAverage)
-                } else {
+                else
                   p.elements += LineTo(x, yAverage)
-                }
-              }
             case _ =>
-          }
-        }
-      }
-    }
 
     override protected def dataItemChanged(
         item: jfxsc.XYChart.Data[Number, Number]) {}
@@ -231,105 +213,86 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     override protected def dataItemAdded(
         series: jfxsc.XYChart.Series[Number, Number],
         itemIndex: Int,
-        item: jfxsc.XYChart.Data[Number, Number]) {
+        item: jfxsc.XYChart.Data[Number, Number])
       val candle = Candle(getData.indexOf(series), item, itemIndex)
-      if (shouldAnimate) {
+      if (shouldAnimate)
         candle.opacity = 0
         plotChildren += candle
-        new FadeTransition(500 ms, candle) {
+        new FadeTransition(500 ms, candle)
           toValue = 1
-        }.play()
-      } else {
+        .play()
+      else
         plotChildren += candle
-      }
-      if (series.node() != null) {
+      if (series.node() != null)
         series.node().toFront()
-      }
-    }
 
     override protected def dataItemRemoved(
         item: jfxsc.XYChart.Data[Number, Number],
-        series: jfxsc.XYChart.Series[Number, Number]) {
+        series: jfxsc.XYChart.Series[Number, Number])
       val candle = item.node()
-      if (shouldAnimate) {
-        new FadeTransition(500 ms, candle) {
+      if (shouldAnimate)
+        new FadeTransition(500 ms, candle)
           toValue = 0
           onFinished = (_: ActionEvent) => plotChildren -= candle
-        }.play()
-      } else {
+        .play()
+      else
         plotChildren -= candle
-      }
-    }
 
     override protected def seriesAdded(
-        series: jfxsc.XYChart.Series[Number, Number], seriesIndex: Int) {
-      for (j <- 0 until series.data().size) {
+        series: jfxsc.XYChart.Series[Number, Number], seriesIndex: Int)
+      for (j <- 0 until series.data().size)
         val item = series.data()(j)
         val candle = Candle(seriesIndex, item, j)
-        if (shouldAnimate) {
+        if (shouldAnimate)
           candle.opacity = 0
           plotChildren += candle
-          val ft = new FadeTransition(500 ms, candle) {
+          val ft = new FadeTransition(500 ms, candle)
             toValue = 1
-          }
           ft.play()
-        } else {
+        else
           plotChildren += candle
-        }
-      }
-      val seriesPath = new Path {
+      val seriesPath = new Path
         styleClass = Seq("candlestick-average-line", "series" + seriesIndex)
-      }
       series.node = seriesPath
       plotChildren += seriesPath
-    }
 
     override protected def seriesRemoved(
-        series: jfxsc.XYChart.Series[Number, Number]) {
-      for (d <- series.getData) {
+        series: jfxsc.XYChart.Series[Number, Number])
+      for (d <- series.getData)
         val candle = d.node()
-        if (shouldAnimate) {
-          new FadeTransition(500 ms, candle) {
+        if (shouldAnimate)
+          new FadeTransition(500 ms, candle)
             toValue = 0
             onFinished = (_: ActionEvent) => plotChildren -= candle
-          }.play()
-        } else {
+          .play()
+        else
           plotChildren -= candle
-        }
-      }
-    }
 
     /**
       * This is called when the range has been invalidated and we need to update it. If the axis are auto
       * ranging then we compile a list of all data that the given axis has to plot and call invalidateRange() on the
       * axis passing it that data.
       */
-    override protected def updateAxisRange() {
+    override protected def updateAxisRange()
 
-      if (xAxis.isAutoRanging) {
+      if (xAxis.isAutoRanging)
         val xData = for (series <- data; seriesData <- series.data()) yield
           seriesData.XValue()
         xAxis.invalidateRange(xData)
-      }
 
-      if (yAxis.isAutoRanging) {
+      if (yAxis.isAutoRanging)
         val yData = mutable.ListBuffer.empty[Number]
-        for (series <- data; seriesData <- series.data()) {
-          seriesData.extraValue() match {
+        for (series <- data; seriesData <- series.data())
+          seriesData.extraValue() match
             case extras: CandleStick =>
               yData += extras.high
               yData += extras.low
             case _ =>
               yData += seriesData.YValue()
-          }
-        }
 
         yAxis.invalidateRange(yData)
-      }
-    }
-  }
 
-  private object Candle {
+  private object Candle
 
     /**
       * Create a new Candle node to represent a single data item
@@ -340,24 +303,21 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
       * @return New candle node to represent the give data item
       */
     def apply(
-        seriesIndex: Int, item: XYChart.Data[_, _], itemIndex: Int): Node = {
+        seriesIndex: Int, item: XYChart.Data[_, _], itemIndex: Int): Node =
       var candle = item.node()
-      candle match {
+      candle match
         case c: Candle =>
           c.setSeriesAndDataStyleClasses(
               "series" + seriesIndex, "data" + itemIndex)
         case _ =>
           candle = new Candle("series" + seriesIndex, "data" + itemIndex)
           item.node = candle
-      }
       candle
-    }
-  }
 
   /** Candle node used for drawing a candle */
   private class Candle(private var seriesStyleClass: String,
                        private var dataStyleClass: String)
-      extends jfxs.Group {
+      extends jfxs.Group
 
     private val highLowLine: Line = new Line
     private val bar: Region = new Region
@@ -373,39 +333,35 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     Tooltip.install(bar, tooltip)
 
     def setSeriesAndDataStyleClasses(
-        seriesStyleClass: String, dataStyleClass: String) {
+        seriesStyleClass: String, dataStyleClass: String)
       this.seriesStyleClass = seriesStyleClass
       this.dataStyleClass = dataStyleClass
       updateStyleClasses()
-    }
 
     def update(closeOffset: Double,
                highOffset: Double,
                lowOffset: Double,
-               candleWidth: Double) {
+               candleWidth: Double)
       openAboveClose = closeOffset > 0
       updateStyleClasses()
       highLowLine.startY = highOffset
       highLowLine.endY = lowOffset
       val cw =
-        if (candleWidth == -1) {
+        if (candleWidth == -1)
           // FIXME: It should be possible to access this method without delegate, it is not the same as setPrefWidth
           bar.delegate.prefWidth(-1)
-        } else candleWidth
-      if (openAboveClose) {
+        else candleWidth
+      if (openAboveClose)
         bar.resizeRelocate(-cw / 2, 0, cw, closeOffset)
-      } else {
+      else
         bar.resizeRelocate(-cw / 2, closeOffset, cw, closeOffset * -1)
-      }
-    }
 
-    def updateTooltip(open: Double, close: Double, high: Double, low: Double) {
+    def updateTooltip(open: Double, close: Double, high: Double, low: Double)
       val tooltipContent: TooltipContent =
         tooltip.graphic().asInstanceOf[TooltipContent]
       tooltipContent.update(open, close, high, low)
-    }
 
-    private def updateStyleClasses() {
+    private def updateStyleClasses()
       val closeVsOpen =
         if (openAboveClose) "open-above-close" else "close-above-open"
 
@@ -414,19 +370,16 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
           "candlestick-line", seriesStyleClass, dataStyleClass, closeVsOpen)
       bar.styleClass = Seq(
           "candlestick-bar", seriesStyleClass, dataStyleClass, closeVsOpen)
-    }
-  }
 
-  private class TooltipContent extends jfxsl.GridPane {
+  private class TooltipContent extends jfxsl.GridPane
     private val openValue = new Label()
     private val closeValue = new Label()
     private val highValue = new Label()
     private val lowValue = new Label()
 
     val open = new Label("OPEN:") { styleClass += "candlestick-tooltip-label" }
-    val close = new Label("CLOSE:") {
+    val close = new Label("CLOSE:")
       styleClass += "candlestick-tooltip-label"
-    }
     val high = new Label("HIGH:") { styleClass += "candlestick-tooltip-label" }
     val low = new Label("LOW:") { styleClass += "candlestick-tooltip-label" }
 
@@ -441,11 +394,8 @@ class EnsembleAdvCandleStickChart extends EnsembleExample {
     getChildren.addAll(
         open, openValue, close, closeValue, high, highValue, low, lowValue)
 
-    def update(open: Double, close: Double, high: Double, low: Double) {
+    def update(open: Double, close: Double, high: Double, low: Double)
       openValue.text = open.toString
       closeValue.text = close.toString
       highValue.text = high.toString
       lowValue.text = low.toString
-    }
-  }
-}

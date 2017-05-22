@@ -35,14 +35,13 @@ import org.apache.spark.storage.StorageLevel
 /**
   * Params for [[OneVsRest]].
   */
-private[ml] trait OneVsRestParams extends PredictorParams {
+private[ml] trait OneVsRestParams extends PredictorParams
 
   // scalastyle:off structural.type
-  type ClassifierType = Classifier[F, E, M] forSome {
+  type ClassifierType = Classifier[F, E, M] forSome
     type F
     type M <: ClassificationModel[F, M]
     type E <: Classifier[F, E, M]
-  }
   // scalastyle:on structural.type
 
   /**
@@ -56,7 +55,6 @@ private[ml] trait OneVsRestParams extends PredictorParams {
 
   /** @group getParam */
   def getClassifier: ClassifierType = $(classifier)
-}
 
 /**
   * :: Experimental ::
@@ -77,16 +75,15 @@ final class OneVsRestModel private[ml](
     @Since("1.4.0") override val uid: String,
     @Since("1.4.0") labelMetadata: Metadata,
     @Since("1.4.0") val models: Array[_ <: ClassificationModel[_, _]])
-    extends Model[OneVsRestModel] with OneVsRestParams {
+    extends Model[OneVsRestModel] with OneVsRestParams
 
   @Since("1.4.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(
         schema, fitting = false, getClassifier.featuresDataType)
-  }
 
   @Since("1.4.0")
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     // Check schema
     transformSchema(dataset.schema, logging = true)
 
@@ -95,20 +92,18 @@ final class OneVsRestModel private[ml](
 
     // add an accumulator column to store predictions of all the models
     val accColName = "mbc$acc" + UUID.randomUUID().toString
-    val initUDF = udf { () =>
+    val initUDF = udf  () =>
       Map[Int, Double]()
-    }
     val newDataset = dataset.withColumn(accColName, initUDF())
 
     // persist if underlying dataset is not persistent.
     val handlePersistence = dataset.rdd.getStorageLevel == StorageLevel.NONE
-    if (handlePersistence) {
+    if (handlePersistence)
       newDataset.persist(StorageLevel.MEMORY_AND_DISK)
-    }
 
     // update the accumulator column with the result of prediction of models
     val aggregatedDataset =
-      models.zipWithIndex.foldLeft[DataFrame](newDataset) {
+      models.zipWithIndex.foldLeft[DataFrame](newDataset)
         case (df, (model, index)) =>
           val rawPredictionCol = model.getRawPredictionCol
           val columns =
@@ -116,10 +111,9 @@ final class OneVsRestModel private[ml](
 
           // add temporary column to store intermediate scores and update
           val tmpColName = "mbc$tmp" + UUID.randomUUID().toString
-          val updateUDF = udf {
+          val updateUDF = udf
             (predictions: Map[Int, Double], prediction: Vector) =>
               predictions + ((index, prediction(1)))
-          }
           val transformedDataset = model.transform(df).select(columns: _*)
           val updatedDataset = transformedDataset.withColumn(
               tmpColName, updateUDF(col(accColName), col(rawPredictionCol)))
@@ -129,32 +123,26 @@ final class OneVsRestModel private[ml](
           updatedDataset
             .select(newColumns: _*)
             .withColumnRenamed(tmpColName, accColName)
-      }
 
-    if (handlePersistence) {
+    if (handlePersistence)
       newDataset.unpersist()
-    }
 
     // output the index of the classifier with highest confidence as prediction
-    val labelUDF = udf { (predictions: Map[Int, Double]) =>
+    val labelUDF = udf  (predictions: Map[Int, Double]) =>
       predictions.maxBy(_._2)._1.toDouble
-    }
 
     // output label and label metadata as prediction
     aggregatedDataset
       .withColumn($(predictionCol), labelUDF(col(accColName)), labelMetadata)
       .drop(accColName)
-  }
 
   @Since("1.4.1")
-  override def copy(extra: ParamMap): OneVsRestModel = {
+  override def copy(extra: ParamMap): OneVsRestModel =
     val copied = new OneVsRestModel(
         uid,
         labelMetadata,
         models.map(_.copy(extra).asInstanceOf[ClassificationModel[_, _]]))
     copyValues(copied, extra).setParent(parent)
-  }
-}
 
 /**
   * :: Experimental ::
@@ -168,16 +156,15 @@ final class OneVsRestModel private[ml](
 @Since("1.4.0")
 @Experimental
 final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
-    extends Estimator[OneVsRestModel] with OneVsRestParams {
+    extends Estimator[OneVsRestModel] with OneVsRestParams
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("oneVsRest"))
 
   /** @group setParam */
   @Since("1.4.0")
-  def setClassifier(value: Classifier[_, _, _]): this.type = {
+  def setClassifier(value: Classifier[_, _, _]): this.type =
     set(classifier, value.asInstanceOf[ClassifierType])
-  }
 
   /** @group setParam */
   @Since("1.5.0")
@@ -192,21 +179,18 @@ final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
   def setPredictionCol(value: String): this.type = set(predictionCol, value)
 
   @Since("1.4.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(
         schema, fitting = true, getClassifier.featuresDataType)
-  }
 
   @Since("1.4.0")
-  override def fit(dataset: DataFrame): OneVsRestModel = {
+  override def fit(dataset: DataFrame): OneVsRestModel =
     // determine number of classes either from metadata if provided, or via computation.
     val labelSchema = dataset.schema($(labelCol))
     val computeNumClasses: () => Int = () =>
-      {
         val Row(maxLabelIndex: Double) = dataset.agg(max($(labelCol))).head()
         // classes are assumed to be numbered from 0,...,maxLabelIndex
         maxLabelIndex.toInt + 1
-    }
     val numClasses = MetadataUtils
       .getNumClasses(labelSchema)
       .fold(computeNumClasses())(identity)
@@ -215,12 +199,11 @@ final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
 
     // persist if underlying dataset is not persistent.
     val handlePersistence = dataset.rdd.getStorageLevel == StorageLevel.NONE
-    if (handlePersistence) {
+    if (handlePersistence)
       multiclassLabeled.persist(StorageLevel.MEMORY_AND_DISK)
-    }
 
     // create k columns, one for each binary classifier.
-    val models = Range(0, numClasses).par.map { index =>
+    val models = Range(0, numClasses).par.map  index =>
       // generate new label metadata for the binary problem.
       val newLabelMeta =
         BinaryAttribute.defaultAttr.withName("label").toMetadata()
@@ -235,32 +218,26 @@ final class OneVsRest @Since("1.4.0")(@Since("1.4.0") override val uid: String)
       paramMap.put(classifier.featuresCol -> getFeaturesCol)
       paramMap.put(classifier.predictionCol -> getPredictionCol)
       classifier.fit(trainingDataset, paramMap)
-    }.toArray[ClassificationModel[_, _]]
+    .toArray[ClassificationModel[_, _]]
 
-    if (handlePersistence) {
+    if (handlePersistence)
       multiclassLabeled.unpersist()
-    }
 
     // extract label metadata from label column if present, or create a nominal attribute
     // to output the number of labels
-    val labelAttribute = Attribute.fromStructField(labelSchema) match {
+    val labelAttribute = Attribute.fromStructField(labelSchema) match
       case _: NumericAttribute | UnresolvedAttribute =>
         NominalAttribute.defaultAttr
           .withName("label")
           .withNumValues(numClasses)
       case attr: Attribute => attr
-    }
     val model = new OneVsRestModel(uid, labelAttribute.toMetadata(), models)
       .setParent(this)
     copyValues(model)
-  }
 
   @Since("1.4.1")
-  override def copy(extra: ParamMap): OneVsRest = {
+  override def copy(extra: ParamMap): OneVsRest =
     val copied = defaultCopy(extra).asInstanceOf[OneVsRest]
-    if (isDefined(classifier)) {
+    if (isDefined(classifier))
       copied.setClassifier($(classifier).copy(extra))
-    }
     copied
-  }
-}

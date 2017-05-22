@@ -36,7 +36,7 @@ import scalafx.scene.control.Control
 /**
   * Companion object for [[scalafx.scene.web.HTMLEditor]]
   */
-object HTMLEditor {
+object HTMLEditor
 
   /**
     * Converts a ScalaFX HTMLEditor to its JavaFX counterpart.
@@ -46,7 +46,6 @@ object HTMLEditor {
     */
   implicit def sfxHTMLEditor2jfx(he: HTMLEditor): jfxsw.HTMLEditor =
     if (he != null) he.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/web/HTMLEditor.html JavaFX HTMLEditor]]
@@ -56,15 +55,14 @@ object HTMLEditor {
   */
 class HTMLEditor(
     override val delegate: jfxsw.HTMLEditor = new jfxsw.HTMLEditor)
-    extends Control(delegate) with SFXDelegate[jfxsw.HTMLEditor] {
+    extends Control(delegate) with SFXDelegate[jfxsw.HTMLEditor]
 
   /**
     * Returns the HTML content of the editor.
     */
   def htmlText = delegate.getHtmlText
-  def htmlText_=(htmlText: String) {
+  def htmlText_=(htmlText: String)
     delegate.setHtmlText(htmlText)
-  }
 
   /**
     * Prints the content of the editor using the given printer job.
@@ -73,4 +71,3 @@ class HTMLEditor(
     * @since 8.0
     */
   def print(job: PrinterJob): Unit = delegate.print(job)
-}

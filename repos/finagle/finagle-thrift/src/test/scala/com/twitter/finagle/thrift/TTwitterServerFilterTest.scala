@@ -10,22 +10,21 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TTwitterServerFilterTest extends FunSuite {
+class TTwitterServerFilterTest extends FunSuite
   val protocolFactory = Protocols.binaryFactory()
 
-  test("handles legacy client_id headers") {
+  test("handles legacy client_id headers")
     val filter = new TTwitterServerFilter("test", protocolFactory)
 
     // Upgrade the protocol.
-    val service = new Service[Array[Byte], Array[Byte]] {
+    val service = new Service[Array[Byte], Array[Byte]]
       def apply(req: Array[Byte]) =
         Future.value(ClientId.current
               .map(_.name)
               .getOrElse("NOCLIENT")
               .getBytes(Charsets.Utf8))
-    }
 
-    val upgraded = {
+    val upgraded =
       val buffer = new OutputBuffer(protocolFactory)
       buffer().writeMessageBegin(
           new TMessage(ThriftTracing.CanTraceMethodName, TMessageType.CALL, 0))
@@ -34,11 +33,10 @@ class TTwitterServerFilterTest extends FunSuite {
       buffer().writeMessageEnd()
 
       filter(buffer.toArray, service)
-    }
     assert(upgraded.isDefined)
     Await.result(upgraded)
 
-    val req = {
+    val req =
       val buffer = new OutputBuffer(protocolFactory)
       buffer().writeMessageBegin(new TMessage("testrpc", TMessageType.CALL, 0))
       buffer().writeMessageEnd()
@@ -49,15 +47,11 @@ class TTwitterServerFilterTest extends FunSuite {
         ByteArrays.concat(OutputBuffer.messageToArray(header, protocolFactory),
                           buffer.toArray)
 
-      filter(bytes, service) map { bytes =>
+      filter(bytes, service) map  bytes =>
         // Strip the response header.
         InputBuffer.peelMessage(
             bytes, new thrift.ResponseHeader, protocolFactory)
-      }
-    }
     assert(req.isDefined)
     val rep = Await.result(req)
     val clientId = new String(rep, Charsets.Utf8)
     assert(clientId == "testclient")
-  }
-}

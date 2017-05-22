@@ -22,7 +22,7 @@ import scala.util.Try
  * NOT: map( { stat.inc; { x => 2*x } } )
  * which increments on the submitter before creating the function. See the difference?
  */
-trait Stat extends java.io.Serializable {
+trait Stat extends java.io.Serializable
 
   /**
     * increment by the given amount
@@ -35,62 +35,52 @@ trait Stat extends java.io.Serializable {
   /** increment by -1L (decrement) */
   def dec: Unit = incBy(-1L)
   def key: StatKey
-}
 
 case class StatKey(counter: String, group: String) extends java.io.Serializable
 
-object StatKey {
+object StatKey
   // This is implicit to allow Stat("c", "g") to work.
   implicit def fromCounterGroup(counterGroup: (String, String)): StatKey =
-    counterGroup match {
+    counterGroup match
       case (c, g) => StatKey(c, g)
-    }
   // Create a Stat in the ScaldingGroup
   implicit def fromCounterDefaultGroup(counter: String): StatKey =
     StatKey(counter, Stats.ScaldingGroup)
   implicit def fromStat(stat: Stat): StatKey = stat.key
-}
 
-private[scalding] object CounterImpl {
+private[scalding] object CounterImpl
   def apply(fp: FlowProcess[_], statKey: StatKey): CounterImpl =
-    fp match {
+    fp match
       case hFP: HadoopFlowProcess => HadoopFlowPCounterImpl(hFP, statKey)
       case _ => GenericFlowPCounterImpl(fp, statKey)
-    }
-}
 
-sealed private[scalding] trait CounterImpl {
+sealed private[scalding] trait CounterImpl
   def increment(amount: Long): Unit
-}
 
 private[scalding] case class GenericFlowPCounterImpl(
     fp: FlowProcess[_], statKey: StatKey)
-    extends CounterImpl {
+    extends CounterImpl
   override def increment(amount: Long): Unit =
     fp.increment(statKey.group, statKey.counter, amount)
-}
 
 private[scalding] case class HadoopFlowPCounterImpl(
     fp: HadoopFlowProcess, statKey: StatKey)
-    extends CounterImpl {
+    extends CounterImpl
   private[this] val cntr =
     fp.getReporter().getCounter(statKey.group, statKey.counter)
   override def increment(amount: Long): Unit = cntr.increment(amount)
-}
 
-object Stat {
+object Stat
 
-  def apply(k: StatKey)(implicit uid: UniqueID): Stat = new Stat {
+  def apply(k: StatKey)(implicit uid: UniqueID): Stat = new Stat
     // This is materialized on the mappers, and will throw an exception if users incBy before then
     private[this] lazy val cntr = CounterImpl(
         RuntimeStats.getFlowProcessForUniqueId(uid), k)
 
     def incBy(amount: Long): Unit = cntr.increment(amount)
     def key: StatKey = k
-  }
-}
 
-object Stats {
+object Stats
   // This is the group that we assign all custom counters to
   val ScaldingGroup = "Scalding Custom"
 
@@ -102,14 +92,12 @@ object Stats {
 
   // Returns a map of all custom counter names and their counts.
   def getAllCustomCounters()(
-      implicit cascadingStats: CascadingStats): Map[String, Long] = {
-    val counts = for {
+      implicit cascadingStats: CascadingStats): Map[String, Long] =
+    val counts = for
       counter <- cascadingStats.getCountersFor(ScaldingGroup).asScala
       value = getCounterValue(counter)
-    } yield (counter, value)
+    yield (counter, value)
     counts.toMap
-  }
-}
 
 /**
   * Used to inject a typed unique identifier to uniquely name each scalding flow.
@@ -117,20 +105,18 @@ object Stats {
   * concurrent threads running Flows. Users should never have to worry about
   * these
   */
-case class UniqueID(get: String) {
+case class UniqueID(get: String)
   assert(get.indexOf(',') == -1, "UniqueID cannot contain ,: " + get)
-}
 
-object UniqueID {
+object UniqueID
   val UNIQUE_JOB_ID = "scalding.job.uniqueId"
   private val id = new java.util.concurrent.atomic.AtomicInteger(0)
 
-  def getRandom: UniqueID = {
+  def getRandom: UniqueID =
     // This number is unique as long as we don't create more than 10^6 per milli
     // across separate jobs. which seems very unlikely.
     val unique = (System.currentTimeMillis << 20) ^ (id.getAndIncrement.toLong)
     UniqueID(unique.toString)
-  }
 
   implicit def getIDFor(implicit fd: FlowDef): UniqueID =
     /*
@@ -139,51 +125,43 @@ object UniqueID {
      * at the same time from touching each other's counters.
      */
     UniqueID(System.identityHashCode(fd).toString)
-}
 
 /**
   * Wrapper around a FlowProcess useful, for e.g. incrementing counters.
   */
-object RuntimeStats extends java.io.Serializable {
+object RuntimeStats extends java.io.Serializable
   @transient private lazy val logger: Logger =
     LoggerFactory.getLogger(this.getClass)
 
   private val flowMappingStore: mutable.Map[
-      String, WeakReference[FlowProcess[_]]] = {
+      String, WeakReference[FlowProcess[_]]] =
     (new ConcurrentHashMap[String, WeakReference[FlowProcess[_]]]).asScala
-  }
 
-  def getFlowProcessForUniqueId(uniqueId: UniqueID): FlowProcess[_] = {
-    (for {
+  def getFlowProcessForUniqueId(uniqueId: UniqueID): FlowProcess[_] =
+    (for
       weakFlowProcess <- flowMappingStore.get(uniqueId.get)
       flowProcess <- weakFlowProcess.get
-    } yield {
+    yield
       flowProcess
-    }).getOrElse {
+    ).getOrElse
       sys.error(
           "Error in job deployment, the FlowProcess for unique id %s isn't available"
             .format(uniqueId))
-    }
-  }
 
   private[this] var prevFP: FlowProcess[_] = null
-  def addFlowProcess(fp: FlowProcess[_]) {
-    if (!(prevFP eq fp)) {
+  def addFlowProcess(fp: FlowProcess[_])
+    if (!(prevFP eq fp))
       val uniqueJobIdObj = fp.getProperty(UniqueID.UNIQUE_JOB_ID)
-      if (uniqueJobIdObj != null) {
+      if (uniqueJobIdObj != null)
         // for speed concern, use a while loop instead of foreach here
         var splitted =
           StringUtility.fastSplit(uniqueJobIdObj.asInstanceOf[String], ",")
-        while (!splitted.isEmpty) {
+        while (!splitted.isEmpty)
           val uniqueId = splitted.head
           splitted = splitted.tail
           logger.debug("Adding flow process id: " + uniqueId)
           flowMappingStore.put(uniqueId, new WeakReference(fp))
-        }
-      }
       prevFP = fp
-    }
-  }
 
   /**
     * For serialization, you may need to do:
@@ -192,42 +170,34 @@ object RuntimeStats extends java.io.Serializable {
     * keepAlive()
     * inside of your closure (mapping, reducing function)
     */
-  def getKeepAliveFunction(implicit flowDef: FlowDef): () => Unit = {
+  def getKeepAliveFunction(implicit flowDef: FlowDef): () => Unit =
     // Don't capture the flowDef, just the id
     val id = UniqueID.getIDFor(flowDef)
     () =>
-      {
         val flowProcess = RuntimeStats.getFlowProcessForUniqueId(id)
         flowProcess.keepAlive
-      }
-  }
-}
 
 /**
   * FlowListener that checks counter values against a function.
   */
 class StatsFlowListener(f: Map[StatKey, Long] => Try[Unit])
-    extends FlowListener {
+    extends FlowListener
 
   private var success = true
 
-  override def onCompleted(flow: Flow[_]): Unit = {
-    if (success) {
+  override def onCompleted(flow: Flow[_]): Unit =
+    if (success)
       val stats = flow.getFlowStats
       val keys = stats.getCounterGroups.asScala
         .flatMap(g => stats.getCountersFor(g).asScala.map(c => StatKey(c, g)))
       val values =
         keys.map(k => (k, stats.getCounterValue(k.group, k.counter))).toMap
       f(values).get
-    }
-  }
 
-  override def onThrowable(flow: Flow[_], throwable: Throwable): Boolean = {
+  override def onThrowable(flow: Flow[_], throwable: Throwable): Boolean =
     success = false
     false
-  }
 
   override def onStarting(flow: Flow[_]): Unit = {}
 
   override def onStopping(flow: Flow[_]): Unit = {}
-}

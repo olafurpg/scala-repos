@@ -1,49 +1,38 @@
-trait A extends DelayedInit {
+trait A extends DelayedInit
   print("-A ")
 
-  def delayedInit(body: => Unit) = {
+  def delayedInit(body: => Unit) =
     body
     postConstructionCode
-  }
-  protected def postConstructionCode: Unit = {
+  protected def postConstructionCode: Unit =
     print("\nA+ ")
-  }
-}
-trait B extends A {
+trait B extends A
   print("-B ")
-  override protected def postConstructionCode: Unit = {
+  override protected def postConstructionCode: Unit =
     super.postConstructionCode
     print("B+ ")
-  }
-}
 
-trait C extends B {
+trait C extends B
   print("-C ")
-  override protected def postConstructionCode: Unit = {
+  override protected def postConstructionCode: Unit =
     super.postConstructionCode
     print("C+ ")
-  }
-}
 
-class D() extends C {
+class D() extends C
   print("-D ")
-  override protected def postConstructionCode: Unit = {
+  override protected def postConstructionCode: Unit =
     super.postConstructionCode
     print("D+ ")
-  }
-}
-class E() extends D() {
+class E() extends D()
   println("-E")
-  override protected def postConstructionCode: Unit = {
+  override protected def postConstructionCode: Unit =
     super.postConstructionCode
     println("E+")
-  }
-}
 
-object Test {
+object Test
   def p(msg: String) = println("\n\n// " + msg)
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     p("new C { }")
     new C {}
     p("new C { 5 }")
@@ -66,5 +55,3 @@ object Test {
     new { val x = 5 } with E() {}
     p("new { val x = 5 } with E() { 5 }")
     new { val x = 5 } with E() { 5 }
-  }
-}

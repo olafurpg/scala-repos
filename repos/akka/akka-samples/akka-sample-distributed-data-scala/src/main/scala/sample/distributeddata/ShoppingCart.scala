@@ -9,7 +9,7 @@ import akka.cluster.ddata.DistributedData
 import akka.cluster.ddata.LWWMap
 import akka.cluster.ddata.LWWMapKey
 
-object ShoppingCart {
+object ShoppingCart
   import akka.cluster.ddata.Replicator._
 
   def props(userId: String): Props = Props(new ShoppingCart(userId))
@@ -26,9 +26,8 @@ object ShoppingCart {
   private val readMajority = ReadMajority(timeout)
   private val writeMajority = WriteMajority(timeout)
   //#read-write-majority
-}
 
-class ShoppingCart(userId: String) extends Actor {
+class ShoppingCart(userId: String) extends Actor
   import ShoppingCart._
   import akka.cluster.ddata.Replicator._
 
@@ -44,7 +43,7 @@ class ShoppingCart(userId: String) extends Actor {
       .orElse[Any, Unit](receiveOther)
 
   //#get-cart
-  def receiveGetCart: Receive = {
+  def receiveGetCart: Receive =
     case GetCart ⇒
       replicator ! Get(DataKey, readMajority, Some(sender()))
 
@@ -59,57 +58,48 @@ class ShoppingCart(userId: String) extends Actor {
     case GetFailure(DataKey, Some(replyTo: ActorRef)) ⇒
       // ReadMajority failure, try again with local read
       replicator ! Get(DataKey, ReadLocal, Some(replyTo))
-  }
   //#get-cart
 
   //#add-item
-  def receiveAddItem: Receive = {
+  def receiveAddItem: Receive =
     case cmd @ AddItem(item) ⇒
       val update =
-        Update(DataKey, LWWMap.empty[LineItem], writeMajority, Some(cmd)) {
+        Update(DataKey, LWWMap.empty[LineItem], writeMajority, Some(cmd))
           cart ⇒
             updateCart(cart, item)
-        }
       replicator ! update
-  }
   //#add-item
 
   def updateCart(data: LWWMap[LineItem], item: LineItem): LWWMap[LineItem] =
-    data.get(item.productId) match {
+    data.get(item.productId) match
       case Some(LineItem(_, _, existingQuantity)) ⇒
         data +
         (item.productId -> item.copy(
                 quantity = existingQuantity + item.quantity))
       case None ⇒ data + (item.productId -> item)
-    }
 
   //#remove-item
-  def receiveRemoveItem: Receive = {
+  def receiveRemoveItem: Receive =
     case cmd @ RemoveItem(productId) ⇒
       // Try to fetch latest from a majority of nodes first, since ORMap
       // remove must have seen the item to be able to remove it.
       replicator ! Get(DataKey, readMajority, Some(cmd))
 
     case GetSuccess(DataKey, Some(RemoveItem(productId))) ⇒
-      replicator ! Update(DataKey, LWWMap(), writeMajority, None) {
+      replicator ! Update(DataKey, LWWMap(), writeMajority, None)
         _ - productId
-      }
 
     case GetFailure(DataKey, Some(RemoveItem(productId))) ⇒
       // ReadMajority failed, fall back to best effort local value
-      replicator ! Update(DataKey, LWWMap(), writeMajority, None) {
+      replicator ! Update(DataKey, LWWMap(), writeMajority, None)
         _ - productId
-      }
 
     case NotFound(DataKey, Some(RemoveItem(productId))) ⇒
     // nothing to remove
-  }
   //#remove-item
 
-  def receiveOther: Receive = {
+  def receiveOther: Receive =
     case _: UpdateSuccess[_] | _: UpdateTimeout[_] ⇒
     // UpdateTimeout, will eventually be replicated
     case e: UpdateFailure[_] ⇒
       throw new IllegalStateException("Unexpected failure: " + e)
-  }
-}

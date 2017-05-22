@@ -5,14 +5,13 @@ import cats.data.{NonEmptyList, NonEmptyVector}
 import cats.laws.discipline.{AlternativeTests, ApplicativeTests, FoldableTests, CartesianTests, MonoidKTests, SemigroupKTests, arbitrary, eq},
 arbitrary._, eq._
 
-class ComposeTests extends CatsSuite {
+class ComposeTests extends CatsSuite
   // we have a lot of generated lists of lists in these tests. We have to tell
   // Scalacheck to calm down a bit so we don't hit memory and test duration
   // issues.
   implicit override val generatorDrivenConfig: PropertyCheckConfiguration =
     PropertyCheckConfig(maxSize = 5, minSuccessful = 20)
 
-  {
     // Alternative composition
 
     implicit val alternativeListVector: Alternative[
@@ -24,9 +23,7 @@ class ComposeTests extends CatsSuite {
     checkAll("Alternative[Lambda[A => List[Vector[A]]]]",
              AlternativeTests[Lambda[A => List[Vector[A]]]]
                .alternative[Int, Int, Int])
-  }
 
-  {
     // Applicative composition
 
     implicit val applicativeListVector: Applicative[
@@ -38,9 +35,7 @@ class ComposeTests extends CatsSuite {
     checkAll("Applicative[Lambda[A => List[Vector[A]]]]",
              ApplicativeTests[Lambda[A => List[Vector[A]]]]
                .applicative[Int, Int, Int])
-  }
 
-  {
     // Foldable composition
 
     implicit val foldableListVector: Foldable[Lambda[A => List[Vector[A]]]] =
@@ -48,9 +43,7 @@ class ComposeTests extends CatsSuite {
 
     checkAll("Foldable[Lambda[A => List[Vector[A]]]]",
              FoldableTests[Lambda[A => List[Vector[A]]]].foldable[Int, Int])
-  }
 
-  {
     // MonoidK composition
 
     implicit val monoidKListVector: MonoidK[Lambda[A => List[Vector[A]]]] =
@@ -58,9 +51,7 @@ class ComposeTests extends CatsSuite {
 
     checkAll("MonoidK[Lambda[A => List[Vector[A]]]]",
              MonoidKTests[Lambda[A => List[Vector[A]]]].monoidK[Int])
-  }
 
-  {
     // Reducible composition
 
     implicit val reducibleListVector: Reducible[Lambda[A => NonEmptyList[
@@ -71,9 +62,7 @@ class ComposeTests extends CatsSuite {
     checkAll("Reducible[Lambda[A => List[Vector[A]]]]",
              FoldableTests[Lambda[A => NonEmptyList[NonEmptyVector[A]]]]
                .foldable[Int, Int])
-  }
 
-  {
     // SemigroupK composition
 
     implicit val semigroupKListVector: SemigroupK[Lambda[A => List[Vector[A]]]] =
@@ -81,5 +70,3 @@ class ComposeTests extends CatsSuite {
 
     checkAll("SemigroupK[Lambda[A => List[Vector[A]]]]",
              SemigroupKTests[Lambda[A => List[Vector[A]]]].semigroupK[Int])
-  }
-}

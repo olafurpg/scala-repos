@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
 import Imports.PlayDocsKeys._
 
 // Test that all the docs are renderable and valid
-object PlayDocsValidation {
+object PlayDocsValidation
 
   /**
     * A report of all references from all markdown files.
@@ -51,18 +51,16 @@ object PlayDocsValidation {
     *
     * This is used to compare translations to the originals, checking that all files exist and all code samples exist.
     */
-  case class CodeSamplesReport(files: Seq[FileWithCodeSamples]) {
+  case class CodeSamplesReport(files: Seq[FileWithCodeSamples])
     lazy val byFile = files.map(f => f.name -> f).toMap
     lazy val byName = files
       .filterNot(_.name.endsWith("_Sidebar.md"))
-      .map { file =>
+      .map  file =>
         val filename = file.name
         val name =
           filename.takeRight(filename.length - filename.lastIndexOf('/'))
         name -> file
-      }
       .toMap
-  }
   case class FileWithCodeSamples(
       name: String, source: String, codeSamples: Seq[CodeSample])
   case class CodeSample(source: String,
@@ -91,7 +89,7 @@ object PlayDocsValidation {
       downstreamWikiPages: Set[String] = Set.empty[String],
       downstreamApiPaths: Seq[String] = Nil)
 
-  val generateMarkdownRefReportTask = Def.task {
+  val generateMarkdownRefReportTask = Def.task
 
     val base = manualPath.value
 
@@ -104,13 +102,12 @@ object PlayDocsValidation {
     val externalLinks = mutable.ListBuffer[LinkRef]()
 
     def stripFragment(path: String) =
-      if (path.contains("#")) {
+      if (path.contains("#"))
         path.dropRight(path.length - path.indexOf('#'))
-      } else {
+      else
         path
-      }
 
-    def parseMarkdownFile(markdownFile: File): String = {
+    def parseMarkdownFile(markdownFile: File): String =
 
       val processor =
         new PegDownProcessor(Extensions.ALL,
@@ -120,9 +117,9 @@ object PlayDocsValidation {
                                .build)
 
       // Link renderer will also verify that all wiki links exist
-      val linkRenderer = new LinkRenderer {
-        override def render(node: WikiLinkNode) = {
-          node.getText match {
+      val linkRenderer = new LinkRenderer
+        override def render(node: WikiLinkNode) =
+          node.getText match
 
             case link if link.contains("|") =>
               val parts = link.split('|')
@@ -132,7 +129,7 @@ object PlayDocsValidation {
                   page, markdownFile, node.getStartIndex + desc.length + 3)
 
             case image if image.endsWith(".png") =>
-              image match {
+              image match
                 case full if full.startsWith("http://") =>
                   externalLinks +=
                     LinkRef(full, markdownFile, node.getStartIndex + 2)
@@ -147,22 +144,19 @@ object PlayDocsValidation {
                       .stripPrefix("/") + "/" + relative
                   resourceLinks +=
                     LinkRef(link, markdownFile, node.getStartIndex + 2)
-              }
 
             case link =>
               wikiLinks +=
                 LinkRef(link.trim, markdownFile, node.getStartIndex + 2)
-          }
           new LinkRenderer.Rendering("foo", "bar")
-        }
 
         override def render(node: AutoLinkNode) =
           addLink(node.getText, node, 1)
         override def render(node: ExpLinkNode, text: String) =
           addLink(node.url, node, text.length + 3)
 
-        private def addLink(url: String, node: Node, offset: Int) = {
-          url match {
+        private def addLink(url: String, node: Node, offset: Int) =
+          url match
             case full
                 if full.startsWith("http://") || full.startsWith("https://") =>
               externalLinks +=
@@ -172,53 +166,43 @@ object PlayDocsValidation {
             case relative =>
               relativeLinks +=
                 LinkRef(relative, markdownFile, node.getStartIndex + offset)
-          }
           new LinkRenderer.Rendering("foo", "bar")
-        }
-      }
 
-      val codeReferenceSerializer = new ToHtmlSerializerPlugin() {
+      val codeReferenceSerializer = new ToHtmlSerializerPlugin()
         def visit(node: Node, visitor: Visitor, printer: Printer) =
-          node match {
-            case code: CodeReferenceNode => {
+          node match
+            case code: CodeReferenceNode =>
 
                 // Label is after the #, or if no #, then is the link label
-                val (source, label) = code.getSource.split("#", 2) match {
+                val (source, label) = code.getSource.split("#", 2) match
                   case Array(source, label) => (source, label)
                   case Array(source) => (source, code.getLabel)
-                }
 
                 // The file is either relative to current page page or absolute, under the root
                 val sourceFile =
-                  if (source.startsWith("/")) {
+                  if (source.startsWith("/"))
                     source.drop(1)
-                  } else {
+                  else
                     markdownFile.getParentFile.getCanonicalPath
                       .stripPrefix(base.getCanonicalPath)
                       .stripPrefix("/") + "/" + source
-                  }
 
                 val sourcePos = code.getStartIndex + code.getLabel.length + 4
                 val labelPos =
-                  if (code.getSource.contains("#")) {
+                  if (code.getSource.contains("#"))
                     sourcePos + source.length + 1
-                  } else {
+                  else
                     code.getStartIndex + 2
-                  }
 
                 codeSamples += CodeSampleRef(
                     sourceFile, label, markdownFile, sourcePos, labelPos)
                 true
-              }
             case _ => false
-          }
-      }
 
       val astRoot = processor.parseMarkdown(IO.read(markdownFile).toCharArray)
       new ToHtmlSerializer(linkRenderer,
                            java.util.Arrays.asList[ToHtmlSerializerPlugin](
                                codeReferenceSerializer)).toHtml(astRoot)
-    }
 
     markdownFiles.foreach(parseMarkdownFile)
 
@@ -228,10 +212,9 @@ object PlayDocsValidation {
                       codeSamples.toSeq,
                       relativeLinks.toSeq,
                       externalLinks.toSeq)
-  }
 
   private def extractCodeSamples(
-      filename: String, markdownSource: String): FileWithCodeSamples = {
+      filename: String, markdownSource: String): FileWithCodeSamples =
 
     val codeSamples = ListBuffer.empty[CodeSample]
 
@@ -242,39 +225,33 @@ object PlayDocsValidation {
           .withPlugin(classOf[CodeReferenceParser])
           .build)
 
-    val codeReferenceSerializer = new ToHtmlSerializerPlugin() {
-      def visit(node: Node, visitor: Visitor, printer: Printer) = node match {
-        case code: CodeReferenceNode => {
+    val codeReferenceSerializer = new ToHtmlSerializerPlugin()
+      def visit(node: Node, visitor: Visitor, printer: Printer) = node match
+        case code: CodeReferenceNode =>
 
             // Label is after the #, or if no #, then is the link label
-            val (source, label) = code.getSource.split("#", 2) match {
+            val (source, label) = code.getSource.split("#", 2) match
               case Array(source, label) => (source, label)
               case Array(source) => (source, code.getLabel)
-            }
 
             // The file is either relative to current page page or absolute, under the root
             val sourceFile =
-              if (source.startsWith("/")) {
+              if (source.startsWith("/"))
                 source.drop(1)
-              } else {
+              else
                 filename.dropRight(
                     filename.length - filename.lastIndexOf('/') + 1) + source
-              }
 
             val sourcePos = code.getStartIndex + code.getLabel.length + 4
             val labelPos =
-              if (code.getSource.contains("#")) {
+              if (code.getSource.contains("#"))
                 sourcePos + source.length + 1
-              } else {
+              else
                 code.getStartIndex + 2
-              }
 
             codeSamples += CodeSample(sourceFile, label, sourcePos, labelPos)
             true
-          }
         case _ => false
-      }
-    }
 
     val astRoot = processor.parseMarkdown(markdownSource.toCharArray)
     new ToHtmlSerializer(new LinkRenderer(),
@@ -282,51 +259,45 @@ object PlayDocsValidation {
                              codeReferenceSerializer)).toHtml(astRoot)
 
     FileWithCodeSamples(filename, markdownSource, codeSamples.toList)
-  }
 
-  val generateUpstreamCodeSamplesTask = Def.task {
-    docsJarFile.value match {
+  val generateUpstreamCodeSamplesTask = Def.task
+    docsJarFile.value match
       case Some(jarFile) =>
         import scala.collection.JavaConversions._
         val jar = new JarFile(jarFile)
         val parsedFiles = jar
           .entries()
           .toIterator
-          .collect {
+          .collect
             case entry
                 if entry.getName.endsWith(".md") &&
                 entry.getName.startsWith("play/docs/content/manual") =>
               val fileName = entry.getName.stripPrefix("play/docs/content")
               val contents = IO.readStream(jar.getInputStream(entry))
               extractCodeSamples(fileName, contents)
-          }
           .toList
         jar.close()
         CodeSamplesReport(parsedFiles)
       case None =>
         CodeSamplesReport(Seq.empty)
-    }
-  }
 
-  val generateMarkdownCodeSamplesTask = Def.task {
+  val generateMarkdownCodeSamplesTask = Def.task
     val base = manualPath.value
 
     val markdownFiles = (base / "manual" ** "*.md").get.pair(relativeTo(base))
 
-    CodeSamplesReport(markdownFiles.map {
+    CodeSamplesReport(markdownFiles.map
       case (file, name) => extractCodeSamples("/" + name, IO.read(file))
-    })
-  }
+    )
 
-  val translationCodeSamplesReportTask = Def.task {
+  val translationCodeSamplesReportTask = Def.task
     val report = generateMarkdownCodeSamplesReport.value
     val upstream = generateUpstreamCodeSamplesReport.value
     val file = translationCodeSamplesReportFile.value
     val version = docsVersion.value
 
-    def sameCodeSample(cs1: CodeSample)(cs2: CodeSample) = {
+    def sameCodeSample(cs1: CodeSample)(cs2: CodeSample) =
       cs1.source == cs2.source && cs1.segment == cs2.segment
-    }
 
     def hasCodeSample(samples: Seq[CodeSample])(sample: CodeSample) =
       samples.exists(sameCodeSample(sample))
@@ -336,12 +307,11 @@ object PlayDocsValidation {
     val introducedFiles =
       (report.byFile.keySet -- upstream.byFile.keySet).toList.sorted
     val matchingFilesByName =
-      (report.byName.keySet & upstream.byName.keySet).map { name =>
+      (report.byName.keySet & upstream.byName.keySet).map  name =>
         report.byName(name) -> upstream.byName(name)
-      }
     val (matchingFiles, changedPathFiles) =
       matchingFilesByName.partition(f => f._1.name == f._2.name)
-    val (codeSampleIssues, okFiles) = matchingFiles.map {
+    val (codeSampleIssues, okFiles) = matchingFiles.map
       case (actualFile, upstreamFile) =>
         val missingCodeSamples = upstreamFile.codeSamples.filterNot(
             hasCodeSample(actualFile.codeSamples))
@@ -351,7 +321,7 @@ object PlayDocsValidation {
                                missingCodeSamples,
                                introducedCodeSamples,
                                upstreamFile.codeSamples.size)
-    }.partition(c =>
+    .partition(c =>
           c.missingCodeSamples.nonEmpty || c.introducedCodeSamples.nonEmpty)
 
     val result = TranslationReport(
@@ -365,38 +335,34 @@ object PlayDocsValidation {
 
     IO.write(file, html.translationReport(result, version).body)
     file
-  }
 
-  val cachedTranslationCodeSamplesReportTask = Def.task {
+  val cachedTranslationCodeSamplesReportTask = Def.task
     val file = translationCodeSamplesReportFile.value
-    if (!file.exists) {
+    if (!file.exists)
       println("Generating report...")
       Project
         .runTask(translationCodeSamplesReport, state.value)
         .get
         ._2
         .toEither
-        .fold({ incomplete =>
+        .fold( incomplete =>
           throw incomplete.directCause.get
-        }, result => result)
-    } else {
+        , result => result)
+    else
       file
-    }
-  }
 
-  val validateDocsTask = Def.task {
+  val validateDocsTask = Def.task
     val report = generateMarkdownRefReport.value
     val log = streams.value.log
     val base = manualPath.value
     val validationConfig = playDocsValidationConfig.value
 
     val allResources = PlayDocsKeys.resources.value
-    val repos = allResources.map {
+    val repos = allResources.map
       case PlayDocsDirectoryResource(directory) =>
         new FilesystemRepository(directory)
       case PlayDocsJarFileResource(jarFile, base) =>
         new JarRepository(new JarFile(jarFile), base)
-    }
 
     val combinedRepo = new AggregateFileRepository(repos)
 
@@ -409,51 +375,43 @@ object PlayDocsValidation {
 
     var failed = false
 
-    def doAssertion(desc: String, errors: Seq[_])(onFail: => Unit): Unit = {
-      if (errors.isEmpty) {
+    def doAssertion(desc: String, errors: Seq[_])(onFail: => Unit): Unit =
+      if (errors.isEmpty)
         log.info("[" + Colors.green("pass") + "] " + desc)
-      } else {
+      else
         failed = true
         onFail
         log.info("[" + Colors.red("fail") + "] " + desc + " (" + errors.size +
             " errors)")
-      }
-    }
 
-    def fileExists(path: String): Boolean = {
+    def fileExists(path: String): Boolean =
       combinedRepo.loadFile(path)(_ => ()).nonEmpty
-    }
 
     def assertLinksNotMissing(
-        desc: String, links: Seq[LinkRef], errorMessage: String): Unit = {
-      doAssertion(desc, links) {
-        links.foreach { link =>
+        desc: String, links: Seq[LinkRef], errorMessage: String): Unit =
+      doAssertion(desc, links)
+        links.foreach  link =>
           logErrorAtLocation(
               log, link.file, link.position, errorMessage + " " + link.link)
-        }
-      }
-    }
 
     val duplicates = report.markdownFiles
       .filterNot(_.getName.startsWith("_"))
       .groupBy(s => s.getName)
       .filter(v => v._2.size > 1)
 
-    doAssertion("Duplicate markdown file name test", duplicates.toSeq) {
-      duplicates.foreach { d =>
+    doAssertion("Duplicate markdown file name test", duplicates.toSeq)
+      duplicates.foreach  d =>
         log.error(d._1 + ":\n" + d._2.mkString("\n    "))
-      }
-    }
 
     assertLinksNotMissing(
-        "Missing wiki links test", report.wikiLinks.filterNot { link =>
+        "Missing wiki links test", report.wikiLinks.filterNot  link =>
       pages.contains(link.link) ||
       validationConfig.downstreamWikiPages(link.link) ||
       combinedRepo.findFileWithName(link.link + ".md").nonEmpty
-    }, "Could not find link")
+    , "Could not find link")
 
-    def relativeLinkOk(link: LinkRef) = {
-      link match {
+    def relativeLinkOk(link: LinkRef) =
+      link match
         case badScalaApi
             if badScalaApi.link.startsWith("api/scala/index.html#") =>
           println(
@@ -469,17 +427,15 @@ object PlayDocsValidation {
         case resource if resource.link.startsWith("resources/") =>
           fileExists(resource.link.stripPrefix("resources/"))
         case bad => false
-      }
-    }
 
-    assertLinksNotMissing("Relative link test", report.relativeLinks.collect {
+    assertLinksNotMissing("Relative link test", report.relativeLinks.collect
       case link if !relativeLinkOk(link) => link
-    }, "Bad relative link")
+    , "Bad relative link")
 
     assertLinksNotMissing(
-        "Missing wiki resources test", report.resourceLinks.collect {
+        "Missing wiki resources test", report.resourceLinks.collect
       case link if !fileExists(link.link) => link
-    }, "Could not find resource")
+    , "Could not find resource")
 
     val (existing, nonExisting) =
       report.codeSamples.partition(sample => fileExists(sample.source))
@@ -490,8 +446,8 @@ object PlayDocsValidation {
               LinkRef(sample.source, sample.file, sample.sourcePosition)),
         "Could not find source file")
 
-    def segmentExists(sample: CodeSampleRef) = {
-      if (sample.segment.nonEmpty) {
+    def segmentExists(sample: CodeSampleRef) =
+      if (sample.segment.nonEmpty)
         // Find the code segment
         val sourceCode = combinedRepo
           .loadFile(sample.source)(is =>
@@ -501,141 +457,117 @@ object PlayDocsValidation {
         val segment =
           sourceCode dropWhile (notLabel) drop (1) takeWhile (notLabel)
         !segment.isEmpty
-      } else {
+      else
         true
-      }
-    }
 
-    assertLinksNotMissing("Missing source segments test", existing.collect {
+    assertLinksNotMissing("Missing source segments test", existing.collect
       case sample if !segmentExists(sample) =>
         LinkRef(sample.segment, sample.file, sample.segmentPosition)
-    }, "Could not find source segment")
+    , "Could not find source segment")
 
     val allLinks = report.wikiLinks.map(_.link).toSet
 
-    pageIndex.foreach { idx =>
+    pageIndex.foreach  idx =>
       // Make sure all pages are in the page index
       val orphanPages = pages.filterNot(p => idx.get(p._1).isDefined)
-      doAssertion("Orphan pages test", orphanPages.toSeq) {
-        orphanPages.foreach { page =>
+      doAssertion("Orphan pages test", orphanPages.toSeq)
+        orphanPages.foreach  page =>
           log.error("Page " + page._2 + " is not referenced by the index")
-        }
-      }
-    }
 
-    repos.foreach {
+    repos.foreach
       case jarRepo: JarRepository => jarRepo.close()
       case _ => ()
-    }
 
-    if (failed) {
+    if (failed)
       throw new RuntimeException("Documentation validation failed")
-    }
-  }
 
-  val validateExternalLinksTask = Def.task {
+  val validateExternalLinksTask = Def.task
     val log = streams.value.log
     val report = generateMarkdownRefReport.value
 
-    val grouped = report.externalLinks.groupBy { _.link }.filterNot { e =>
+    val grouped = report.externalLinks.groupBy { _.link }.filterNot  e =>
       e._1.startsWith("http://localhost:") || e._1.contains("example.com") ||
       e._1.startsWith("http://127.0.0.1")
-    }.toSeq.sortBy { _._1 }
+    .toSeq.sortBy { _._1 }
 
     implicit val ec =
       ExecutionContext.fromExecutorService(Executors.newFixedThreadPool(50))
 
-    val futures = grouped.map { entry =>
-      Future {
+    val futures = grouped.map  entry =>
+      Future
         val (url, refs) = entry
         val connection =
           new URL(url).openConnection().asInstanceOf[HttpURLConnection]
-        try {
+        try
           connection.setRequestProperty(
               "User-Agent",
               "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:37.0) Gecko/20100101 Firefox/37.0")
           connection.connect()
-          connection.getResponseCode match {
+          connection.getResponseCode match
             // A few people use GitHub.com repositories, which will return 403 errors for directory listings
             case 403
                 if "GitHub.com".equals(connection.getHeaderField("Server")) =>
               Nil
-            case bad if bad >= 300 => {
-                refs.foreach { link =>
+            case bad if bad >= 300 =>
+                refs.foreach  link =>
                   logErrorAtLocation(log,
                                      link.file,
                                      link.position,
                                      connection.getResponseCode +
                                      " response for external link " +
                                      link.link)
-                }
                 refs
-              }
             case ok => Nil
-          }
-        } catch {
+        catch
           case NonFatal(e) =>
-            refs.foreach { link =>
+            refs.foreach  link =>
               logErrorAtLocation(log,
                                  link.file,
                                  link.position,
                                  e.getClass.getName + ": " + e.getMessage +
                                  " for external link " + link.link)
-            }
             refs
-        } finally {
+        finally
           connection.disconnect()
-        }
-      }
-    }
 
     val invalidRefs =
       Await.result(Future.sequence(futures), Duration.Inf).flatten
 
     ec.shutdownNow()
 
-    if (invalidRefs.isEmpty) {
+    if (invalidRefs.isEmpty)
       log.info("[" + Colors.green("pass") + "] External links test")
-    } else {
+    else
       log.info("[" + Colors.red("fail") + "] External links test (" +
           invalidRefs.size + " errors)")
       throw new RuntimeException("External links validation failed")
-    }
 
     grouped.map(_._1)
-  }
 
   private def logErrorAtLocation(
       log: Logger, file: File, position: Int, errorMessage: String) =
-    synchronized {
+    synchronized
       // Load the source
       val lines = IO.readLines(file)
       // Calculate the line and col
       // Tuple is (total chars seen, line no, col no, Option[line])
       val (_, lineNo, colNo, line) =
-        lines.foldLeft((0, 0, 0, None: Option[String])) { (state, line) =>
-          state match {
+        lines.foldLeft((0, 0, 0, None: Option[String]))  (state, line) =>
+          state match
             case (_, _, _, Some(_)) => state
-            case (total, l, c, None) => {
-                if (total + line.length < position) {
+            case (total, l, c, None) =>
+                if (total + line.length < position)
                   (total + line.length + 1, l + 1, c, None)
-                } else {
+                else
                   (0, l + 1, position - total + 1, Some(line))
-                }
-              }
-          }
-        }
       log.error(errorMessage + " at " + file.getAbsolutePath + ":" + lineNo)
-      line.foreach { l =>
+      line.foreach  l =>
         log.error(l)
         log.error(
             l.take(colNo - 1).map { case '\t' => '\t'; case _ => ' ' } + "^")
-      }
-    }
-}
 
 class AggregateFileRepository(repos: Seq[FileRepository])
-    extends FileRepository {
+    extends FileRepository
 
   def this(repos: Array[FileRepository]) = this(repos.toSeq)
 
@@ -649,4 +581,3 @@ class AggregateFileRepository(repos: Seq[FileRepository])
     fromFirstRepo(_.handleFile(path)(handler))
 
   def findFileWithName(name: String) = fromFirstRepo(_.findFileWithName(name))
-}

@@ -31,15 +31,14 @@ import javafx.scene.{input => jfxsi}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object KeyCodeCombination {
+object KeyCodeCombination
   implicit def sfxKeyCodeCombination2jfx(
       kcc: KeyCodeCombination): jfxsi.KeyCodeCombination =
     if (kcc != null) kcc.delegate else null
-}
 
 class KeyCodeCombination(override val delegate: jfxsi.KeyCodeCombination)
     extends KeyCombination(delegate)
-    with SFXDelegate[jfxsi.KeyCodeCombination] {
+    with SFXDelegate[jfxsi.KeyCodeCombination]
 
   /**
     * Constructs a KeyCodeCombination for the specified main key and with the specified list of modifiers.
@@ -64,4 +63,3 @@ class KeyCodeCombination(override val delegate: jfxsi.KeyCodeCombination)
     * Gets the key code associated with this key combination.
     */
   def code = delegate.getCode
-}

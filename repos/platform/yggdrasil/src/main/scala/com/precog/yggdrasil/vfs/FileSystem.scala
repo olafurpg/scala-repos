@@ -63,36 +63,33 @@ import scalaz.syntax.semigroup._
 import scalaz.syntax.traverse._
 
 sealed class PathData(val typeName: PathData.DataType)
-object PathData {
-  sealed abstract class DataType(val name: String) {
+object PathData
+  sealed abstract class DataType(val name: String)
     def contentType: MimeType
-  }
 
-  object DataType {
+  object DataType
     implicit val decomposer: Decomposer[DataType] with Extractor[DataType] =
-      new Decomposer[DataType] with Extractor[DataType] {
-        def decompose(t: DataType) = t match {
+      new Decomposer[DataType] with Extractor[DataType]
+        def decompose(t: DataType) = t match
           case BLOB(contentType) =>
             JObject("type" -> JString("blob"),
                     "mimeType" -> JString(contentType.value))
           case NIHDB =>
             JObject("type" -> JString("nihdb"),
                     "mimeType" -> JString(FileContent.XQuirrelData.value))
-        }
 
-        def validated(v: JValue) = {
+        def validated(v: JValue) =
           val mimeTypeV = v
             .validated[String]("mimeType")
-            .flatMap { mimeString =>
+            .flatMap  mimeString =>
               MimeTypes
                 .parseMimeTypes(mimeString)
                 .headOption
                 .toSuccess(Extractor.Error.invalid(
                         "No recognized mimeType values foundin %s".format(
                             v.renderCompact)))
-            }
 
-            (v.validated[String]("type") tuple mimeTypeV) flatMap {
+            (v.validated[String]("type") tuple mimeTypeV) flatMap
             case ("blob", mimeType) => success(BLOB(mimeType))
             case ("nihdb", FileContent.XQuirrelData) => success(NIHDB)
             case (unknownType, mimeType) =>
@@ -100,28 +97,20 @@ object PathData {
                   Extractor.Error.invalid(
                       "Data type %s (mimetype %s) is not a recognized PathData datatype"
                         .format(unknownType, mimeType.toString)))
-          }
-        }
-      }
-  }
 
   case class BLOB(contentType: MimeType) extends DataType("blob")
-  case object NIHDB extends DataType("nihdb") {
+  case object NIHDB extends DataType("nihdb")
     val contentType = FileContent.XQuirrelData
-  }
-}
 
 case class BlobData(data: Array[Byte], mimeType: MimeType)
     extends PathData(PathData.BLOB(mimeType))
 case class NIHDBData(data: Seq[NIHDB.Batch]) extends PathData(PathData.NIHDB)
 
-object NIHDBData {
+object NIHDBData
   val Empty = NIHDBData(Seq.empty)
-}
 
-sealed trait PathOp {
+sealed trait PathOp
   def path: Path
-}
 
 case class Read(path: Path, version: Version) extends PathOp
 case class FindChildren(path: Path) extends PathOp

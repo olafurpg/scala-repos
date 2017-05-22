@@ -15,13 +15,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   * @author Alexander Podkhalyuzin, ilyas
   */
 class ScThrowStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScThrowStmt {
-  override def accept(visitor: PsiElementVisitor): Unit = {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScThrowStmt
+  override def accept(visitor: PsiElementVisitor): Unit =
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   override def toString: String = "ThrowStatement"
 
@@ -29,4 +27,3 @@ class ScThrowStmtImpl(node: ASTNode)
     Success(Nothing, Some(this))
 
   def body = findChild(classOf[ScExpression])
-}

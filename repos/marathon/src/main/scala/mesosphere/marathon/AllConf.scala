@@ -13,8 +13,7 @@ class AllConf(args: Seq[String] = Nil)
     with MarathonConf with AppConfiguration with EventConfiguration
     with HttpEventConfiguration with DebugConf with PluginManagerConfiguration
 
-object AllConf {
+object AllConf
   //Set if main is initialized. Allow test to override this value.
   @volatile private[marathon] var SuppliedOptionNames: Set[String] = Set.empty
   def suppliedOptionNames: Set[String] = SuppliedOptionNames
-}

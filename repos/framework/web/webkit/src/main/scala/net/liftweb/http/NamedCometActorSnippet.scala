@@ -23,7 +23,7 @@ import xml.NodeSeq
 /**
   * This trait adds a named comet actor on the page. *
   */
-trait NamedCometActorSnippet {
+trait NamedCometActorSnippet
 
   /**
     * This is your Comet Class
@@ -48,12 +48,10 @@ trait NamedCometActorSnippet {
     * The render method that inserts the <lift:comet> tag
     * to add the comet actor to the page
     */
-  final def render(xhtml: NodeSeq): NodeSeq = {
+  final def render(xhtml: NodeSeq): NodeSeq =
     for (sess <- S.session) sess.sendCometActorMessage(
         cometClass,
         Full(name),
         CometName(name)
     )
     <lift:comet type={cometClass} name={name}>{xhtml}</lift:comet>
-  }
-}

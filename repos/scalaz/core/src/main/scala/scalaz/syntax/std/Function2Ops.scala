@@ -2,7 +2,7 @@ package scalaz
 package syntax
 package std
 
-final class Function2Ops[T1, T2, R](val self: (T1, T2) => R) extends AnyVal {
+final class Function2Ops[T1, T2, R](val self: (T1, T2) => R) extends AnyVal
   def flip: (T2, T1) => R = (v2: T2, v1: T1) => self(v1, v2)
 
   def on[X](f: (R, R) => X, t1: (T1, T1), t2: (T2, T2)): X =
@@ -15,9 +15,7 @@ final class Function2Ops[T1, T2, R](val self: (T1, T2) => R) extends AnyVal {
     F.lift2(self)
 
   def byName: (=> T1, => T2) => R = (t1, t2) => self(t1, t2)
-}
 
-trait ToFunction2Ops {
+trait ToFunction2Ops
   implicit def ToFunction2Ops[T1, T2, R](f: (T1, T2) => R) =
     new Function2Ops(f)
-}

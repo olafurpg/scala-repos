@@ -5,7 +5,7 @@ package akka
 
 import actor.{ScalaActorRef, ActorRef}
 
-package object actor {
+package object actor
   implicit def actorRef2Scala(ref: ActorRef): ScalaActorRef =
     ref.asInstanceOf[ScalaActorRef]
 
@@ -20,4 +20,3 @@ package object actor {
     new Uuid(time, clockSeqAndNode)
 
   def uuidFrom(uuid: String): Uuid = new Uuid(uuid)
-}

@@ -6,8 +6,8 @@ import scala.pickling._, scala.pickling.Defaults._, json._
 case class Room(val name: String)
 case class RoomList(val rooms: Array[Room])
 
-class RoomListObjectArrayTest extends FunSuite {
-  test("main") {
+class RoomListObjectArrayTest extends FunSuite
+  test("main")
     val rl = RoomList(Array(Room("foo"), Room("biz"), Room("bang")))
     val p = rl.pickle
     //println(p.toString)
@@ -33,5 +33,3 @@ class RoomListObjectArrayTest extends FunSuite {
 
     assert(p.toString === jsn)
     assert(rl.pickle.unpickle[RoomList].rooms.sameElements(rl.rooms))
-  }
-}

@@ -12,7 +12,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.coding._
 import akka.http.impl.util._
 
-trait CodingDirectives {
+trait CodingDirectives
   import BasicDirectives._
   import MiscDirectives._
   import RouteDirectives._
@@ -25,10 +25,9 @@ trait CodingDirectives {
     * if the given response encoding is not accepted by the client.
     */
   def responseEncodingAccepted(encoding: HttpEncoding): Directive0 =
-    extractRequest.flatMap { request ⇒
+    extractRequest.flatMap  request ⇒
       if (EncodingNegotiator(request.headers).isAccepted(encoding)) pass
       else reject(UnacceptedResponseEncodingRejection(Set(encoding)))
-    }
 
   /**
     * Encodes the response with the encoding that is requested by the client via the `Accept-
@@ -61,39 +60,35 @@ trait CodingDirectives {
     * Decodes the incoming request using the given Decoder.
     * If the request encoding doesn't match the request is rejected with an `UnsupportedRequestEncodingRejection`.
     */
-  def decodeRequestWith(decoder: Decoder): Directive0 = {
+  def decodeRequestWith(decoder: Decoder): Directive0 =
     def applyDecoder =
       if (decoder == NoCoding) pass
       else
-        extractSettings flatMap { settings ⇒
+        extractSettings flatMap  settings ⇒
           val effectiveDecoder =
             decoder.withMaxBytesPerChunk(settings.decodeMaxBytesPerChunk)
-          mapRequest { request ⇒
+          mapRequest  request ⇒
             effectiveDecoder
               .decode(request)
-              .mapEntity(StreamUtils.mapEntityError {
+              .mapEntity(StreamUtils.mapEntityError
                 case NonFatal(e) ⇒
                   IllegalRequestException(
                       StatusCodes.BadRequest,
                       ErrorInfo("The request's encoding is corrupt",
                                 e.getMessage))
-              })
-          }
-        }
+              )
 
     requestEntityEmpty |
     (requestEncodedWith(decoder.encoding) & applyDecoder & cancelRejections(
             classOf[UnsupportedRequestEncodingRejection]))
-  }
 
   /**
     * Rejects the request with an UnsupportedRequestEncodingRejection if its encoding doesn't match the given one.
     */
   def requestEncodedWith(encoding: HttpEncoding): Directive0 =
-    extract(_.request.encoding).flatMap {
+    extract(_.request.encoding).flatMap
       case `encoding` ⇒ pass
       case _ ⇒ reject(UnsupportedRequestEncodingRejection(encoding))
-    }
 
   /**
     * Decodes the incoming request if it is encoded with one of the given
@@ -117,16 +112,14 @@ trait CodingDirectives {
     * the entities media-type is precompressed with gzip and no `Content-Encoding` header is present yet.
     */
   def withPrecompressedMediaTypeSupport: Directive0 =
-    mapResponse { response ⇒
+    mapResponse  response ⇒
       if (response.entity.contentType.mediaType.comp != MediaType.Gzipped)
         response
       else
         response.withDefaultHeaders(
             headers.`Content-Encoding`(HttpEncodings.gzip))
-    }
-}
 
-object CodingDirectives extends CodingDirectives {
+object CodingDirectives extends CodingDirectives
   val DefaultCoders: immutable.Seq[Coder] =
     immutable.Seq(Gzip, Deflate, NoCoding)
 
@@ -140,19 +133,16 @@ object CodingDirectives extends CodingDirectives {
   import RouteDirectives._
 
   private def _encodeResponse(encoders: immutable.Seq[Encoder]): Directive0 =
-    BasicDirectives.extractRequest.flatMap { request ⇒
+    BasicDirectives.extractRequest.flatMap  request ⇒
       val negotiator = EncodingNegotiator(request.headers)
       val encodings: List[HttpEncoding] =
         encoders.map(_.encoding)(collection.breakOut)
       val bestEncoder = negotiator
         .pickEncoding(encodings)
         .flatMap(be ⇒ encoders.find(_.encoding == be))
-      bestEncoder match {
+      bestEncoder match
         case Some(encoder) ⇒ mapResponse(encoder.encode(_))
         case _ ⇒
           if (encoders.contains(NoCoding) &&
               !negotiator.hasMatchingFor(HttpEncodings.identity)) pass
           else reject(UnacceptedResponseEncodingRejection(encodings.toSet))
-      }
-    }
-}

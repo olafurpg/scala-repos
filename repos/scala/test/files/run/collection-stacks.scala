@@ -1,19 +1,16 @@
 import scala.collection.{immutable, mutable}
 
-object Test extends App {
-  def mutableStack[T](xs: T*): mutable.Stack[T] = {
+object Test extends App
+  def mutableStack[T](xs: T*): mutable.Stack[T] =
     val s = new mutable.Stack[T]
     s.pushAll(xs)
     s
-  }
 
-  def immutableStack[T](xs: T*): immutable.Stack[T] = {
+  def immutableStack[T](xs: T*): immutable.Stack[T] =
     immutable.Stack.empty[T] pushAll xs
-  }
 
-  def check[T](expected: T, got: T) {
+  def check[T](expected: T, got: T)
     println(got + ": " + (expected == got))
-  }
 
   // check #957
   check("3-2-1", immutableStack(1, 2, 3).iterator.mkString("-"))
@@ -32,9 +29,8 @@ object Test extends App {
   println("pop")
   check("2-1", immutableStack(1, 2, 3).pop.mkString("-"))
   check(3, mutableStack(1, 2, 3).pop())
-  check("2-1", {
+  check("2-1",
     val s = mutableStack(1, 2, 3); s.pop(); s.toList.mkString("-")
-  })
-}
+  )
 
 // vim: set ts=2 sw=2 et:

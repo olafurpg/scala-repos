@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import collection.mutable.ListBuffer
 
   def newLB = ListBuffer('a, 'b, 'c, 'd, 'e)
@@ -18,4 +18,3 @@ object Test extends App {
   val lb3 = newLB
   iiobe(lb3.updated(-1, 'u))
   iiobe(lb3.updated(5, 'u))
-}

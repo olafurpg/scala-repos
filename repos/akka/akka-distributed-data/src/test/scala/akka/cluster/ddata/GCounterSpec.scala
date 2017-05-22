@@ -9,14 +9,14 @@ import akka.cluster.ddata.Replicator.Changed
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
 
-class GCounterSpec extends WordSpec with Matchers {
+class GCounterSpec extends WordSpec with Matchers
   val node1 = UniqueAddress(Address("akka.tcp", "Sys", "localhost", 2551), 1)
   val node2 = UniqueAddress(node1.address.copy(port = Some(2552)), 2)
   val node3 = UniqueAddress(node1.address.copy(port = Some(2553)), 3)
 
-  "A GCounter" must {
+  "A GCounter" must
 
-    "be able to increment each node's record by one" in {
+    "be able to increment each node's record by one" in
       val c1 = GCounter()
 
       val c2 = c1 increment node1
@@ -28,9 +28,8 @@ class GCounterSpec extends WordSpec with Matchers {
 
       c6.state(node1) should be(2)
       c6.state(node2) should be(3)
-    }
 
-    "be able to increment each node's record by arbitrary delta" in {
+    "be able to increment each node's record by arbitrary delta" in
       val c1 = GCounter()
 
       val c2 = c1 increment (node1, 3)
@@ -42,9 +41,8 @@ class GCounterSpec extends WordSpec with Matchers {
 
       c6.state(node1) should be(7)
       c6.state(node2) should be(10)
-    }
 
-    "be able to summarize the history to the correct aggregated value" in {
+    "be able to summarize the history to the correct aggregated value" in
       val c1 = GCounter()
 
       val c2 = c1 increment (node1, 3)
@@ -58,9 +56,8 @@ class GCounterSpec extends WordSpec with Matchers {
       c6.state(node2) should be(10)
 
       c6.value should be(17)
-    }
 
-    "be able to have its history correctly merged with another GCounter 1" in {
+    "be able to have its history correctly merged with another GCounter 1" in
       // counter 1
       val c11 = GCounter()
       val c12 = c11 increment (node1, 3)
@@ -95,9 +92,8 @@ class GCounterSpec extends WordSpec with Matchers {
       merged2.state(node1) should be(7)
       merged2.state(node2) should be(10)
       merged2.value should be(17)
-    }
 
-    "be able to have its history correctly merged with another GCounter 2" in {
+    "be able to have its history correctly merged with another GCounter 2" in
       // counter 1
       val c11 = GCounter()
       val c12 = c11 increment (node1, 2)
@@ -132,9 +128,8 @@ class GCounterSpec extends WordSpec with Matchers {
       merged2.state(node1) should be(7)
       merged2.state(node2) should be(10)
       merged2.value should be(17)
-    }
 
-    "have support for pruning" in {
+    "have support for pruning" in
       val c1 = GCounter()
       val c2 = c1 increment node1
       val c3 = c2 increment node2
@@ -152,18 +147,13 @@ class GCounterSpec extends WordSpec with Matchers {
       val c5 = (c4 increment node1).pruningCleanup(node1)
       c5.needPruningFrom(node1) should be(false)
       c4.value should be(2)
-    }
 
-    "have unapply extractor" in {
+    "have unapply extractor" in
       val c1 = GCounter.empty.increment(node1).increment(node2)
       val GCounter(value1) = c1
       val value2: BigInt = value1
-      Changed(GCounterKey("key"))(c1) match {
+      Changed(GCounterKey("key"))(c1) match
         case c @ Changed(GCounterKey("key")) ⇒
           val GCounter(value3) = c.dataValue
           val value4: BigInt = value3
           value4 should be(2L)
-      }
-    }
-  }
-}

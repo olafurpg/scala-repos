@@ -1,12 +1,12 @@
 import scala.tools.nsc.interactive.tests._
 import scala.reflect.internal.util._
 
-object Test extends InteractiveTest {
+object Test extends InteractiveTest
 
   import compiler._, definitions._
 
-  override def runDefaultTests() {
-    def resolveTypeTagHyperlink() {
+  override def runDefaultTests()
+    def resolveTypeTagHyperlink()
       val sym = compiler
         .askForResponse(() => compiler.currentRun.runDefinitions.TypeTagClass)
         .get
@@ -15,11 +15,9 @@ object Test extends InteractiveTest {
       val r = new Response[Position]
       compiler.askLinkPos(sym, new BatchSourceFile("", source), r)
       r.get
-    }
 
-    def checkTypeTagSymbolConsistent() {
-      compiler.askForResponse { () =>
-        {
+    def checkTypeTagSymbolConsistent()
+      compiler.askForResponse  () =>
           val runDefinitions = currentRun.runDefinitions
           import runDefinitions._
           assert(
@@ -35,17 +33,13 @@ object Test extends InteractiveTest {
           assert(ReflectApiPackage.map(sym =>
                     getMemberMethod(sym, nme.materializeTypeTag)) == materializeTypeTag)
           ()
-        }
-      }.get match {
+      .get match
         case Right(t) => t.printStackTrace
         case Left(_) =>
-      }
-    }
     resolveTypeTagHyperlink()
     // The presentation compiler loads TypeTags from source; we'll get new symbols for its members.
     // Need to make sure we didn't cache the old ones in Definitions.
     checkTypeTagSymbolConsistent()
-  }
 
   def source =
     """
@@ -69,4 +63,3 @@ object Test extends InteractiveTest {
       |  object TypeTag
       |
     """.stripMargin
-}

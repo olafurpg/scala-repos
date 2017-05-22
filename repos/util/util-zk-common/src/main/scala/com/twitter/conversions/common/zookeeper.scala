@@ -7,20 +7,16 @@ import com.twitter.zk.{CommonConnector, ZkClient}
 import scala.language.implicitConversions
 
 /** Adapters for common's ZooKeeperClient (and, later, serversets, etc) */
-object zookeeper {
-  class CommonZkClientAdapter(zkc: ZooKeeperClient) {
+object zookeeper
+  class CommonZkClientAdapter(zkc: ZooKeeperClient)
     def toConnector(timeout: Duration = COMMON_FOREVER)(
-        implicit pool: FuturePool): CommonConnector = {
+        implicit pool: FuturePool): CommonConnector =
       new CommonConnector(zkc, timeout)
-    }
 
     def toZkClient(timeout: Duration = COMMON_FOREVER)(
-        implicit pool: FuturePool): ZkClient = {
+        implicit pool: FuturePool): ZkClient =
       ZkClient(toConnector(timeout))
-    }
-  }
 
   /** Implicit conversion of ZooKeeperClient to CommonZkClient */
   implicit def commonZkClient(zkc: ZooKeeperClient): CommonZkClientAdapter =
     new CommonZkClientAdapter(zkc)
-}

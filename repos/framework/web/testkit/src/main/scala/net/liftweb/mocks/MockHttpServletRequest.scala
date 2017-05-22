@@ -61,7 +61,7 @@ import json.JsonAST._
   */
 class MockHttpServletRequest(
     val url: String = null, var contextPath: String = "")
-    extends HttpServletRequest {
+    extends HttpServletRequest
   var attributes: Map[String, Object] = Map()
 
   var authType: String = null
@@ -94,10 +94,9 @@ class MockHttpServletRequest(
     * Note that the String will be converted to bytes
     * based on the current setting of charEncoding.
     */
-  def body_=(s: String, contentType: String): Unit = {
+  def body_=(s: String, contentType: String): Unit =
     body = s.getBytes(charEncoding)
     this.contentType = contentType
-  }
 
   /**
     * Sets the body to the given elements. Also sets
@@ -114,10 +113,9 @@ class MockHttpServletRequest(
     * Note that the elements will be converted to bytes
     * based on the current setting of charEncoding.
     */
-  def body_=(nodes: NodeSeq, contentType: String): Unit = {
+  def body_=(nodes: NodeSeq, contentType: String): Unit =
     body = nodes.toString.getBytes(charEncoding)
     this.contentType = contentType
-  }
 
   /**
     * Sets the body to the given json value. Also
@@ -128,13 +126,12 @@ class MockHttpServletRequest(
   /**
     * Sets the body to the given json value and content type.
     */
-  def body_=(jval: JValue, contentType: String): Unit = {
+  def body_=(jval: JValue, contentType: String): Unit =
     import json.JsonDSL._
     import json.JsonAST
 
     body = JsonAST.prettyRender(jval).getBytes(charEncoding)
     this.contentType = contentType
-  }
 
   var contentType: String = null
 
@@ -188,39 +185,32 @@ class MockHttpServletRequest(
   var protocol = "HTTP/1.0"
 
   def queryString: String =
-    if (method == "GET" && !parameters.isEmpty) {
+    if (method == "GET" && !parameters.isEmpty)
       parameters.map { case (k, v) => k + "=" + v }.mkString("&")
-    } else {
+    else
       null
-    }
 
-  def queryString_=(q: String) {
-    if (q != null && q.length > 0) {
+  def queryString_=(q: String)
+    if (q != null && q.length > 0)
       val newParams = ListBuffer[(String, String)]()
 
-      q.split('&').foreach { pair =>
-        pair.split('=') match {
-          case Array(key, value) => {
+      q.split('&').foreach  pair =>
+        pair.split('=') match
+          case Array(key, value) =>
               // Append to the current key's value
               newParams += key -> value
-            }
           case Array("") =>
             throw new IllegalArgumentException(
                 "Invalid query string: \"" + q + "\"")
-          case Array(key) => {
+          case Array(key) =>
               // Append to the current key's value
               newParams += key -> ""
-            }
           case invalid =>
             throw new IllegalArgumentException(
                 "Invalid query string: \"" + q + "\"")
-        }
-      }
 
       parameters = newParams.toList
       method = "GET"
-    }
-  }
 
   var remotePort = 80
 
@@ -273,15 +263,13 @@ class MockHttpServletRequest(
 
   // BEGIN PRIMARY CONSTRUCTOR LOGIC
   if (contextPath.length > 0 &&
-      (contextPath(0) != '/' || contextPath.last == '/')) {
+      (contextPath(0) != '/' || contextPath.last == '/'))
     throw new IllegalArgumentException(
         "Context path must be empty, or must start with a '/' and not end with a '/': " +
         contextPath)
-  }
 
-  if (url != null) {
+  if (url != null)
     processUrl(url)
-  }
 
   // END PRIMARY CONSTRUCTOR
 
@@ -291,10 +279,9 @@ class MockHttpServletRequest(
     *
     * @param url The URL to extract from
     */
-  def this(url: URL) = {
+  def this(url: URL) =
     this()
     processUrl(url)
-  }
 
   /**
     * Construct a new mock request for the given URL. See processUrl
@@ -303,10 +290,9 @@ class MockHttpServletRequest(
     * @param url The URL to extract from
     * @param contextPath The servlet context of the request.
     */
-  def this(url: URL, contextPath: String) = {
+  def this(url: URL, contextPath: String) =
     this(null: String, contextPath)
     processUrl(url)
-  }
 
   /**
     * Set fields based on the given url string. If the
@@ -316,21 +302,18 @@ class MockHttpServletRequest(
     *
     * @param url The URL to extract from
     */
-  def processUrl(url: String) {
-    if (url.toLowerCase.startsWith("http")) {
+  def processUrl(url: String)
+    if (url.toLowerCase.startsWith("http"))
       processUrl(new URL(url))
-    } else if (url.startsWith("/")) {
-      computeRealPath(url).split('?') match {
+    else if (url.startsWith("/"))
+      computeRealPath(url).split('?') match
         case Array(path, query) => this.path = path; queryString = query
         case Array(path) => this.path = path; queryString = null
         case _ =>
           throw new IllegalArgumentException("too many '?' in URL : " + url)
-      }
-    } else {
+    else
       throw new IllegalArgumentException(
           "Could not process url: \"%s\"".format(url))
-    }
-  }
 
   /**
     * Set fields based on the given URL. There are several limitations:
@@ -345,50 +328,44 @@ class MockHttpServletRequest(
     * @param url The URL to extract from
     * @param contextPath The servlet context of the request. Defaults to ""
     */
-  def processUrl(url: URL) {
+  def processUrl(url: URL)
     // Deconstruct the URL to set values
-    url.getProtocol match {
+    url.getProtocol match
       case "http" => scheme = "http"; secure = false
       case "https" => scheme = "https"; secure = true
       case other =>
         throw new IllegalArgumentException("Unsupported protocol: " + other)
-    }
 
     localName = url.getHost
     localAddr = localName
     serverName = localName
 
-    if (url.getPort == -1) {
+    if (url.getPort == -1)
       localPort = 80
-    } else {
+    else
       localPort = url.getPort
-    }
 
     serverPort = localPort
 
     path = computeRealPath(url.getPath)
 
     queryString = url.getQuery
-  }
 
   /** Compute the path portion after the contextPath */
-  def computeRealPath(path: String) = {
-    if (!path.startsWith(contextPath)) {
+  def computeRealPath(path: String) =
+    if (!path.startsWith(contextPath))
       throw new IllegalArgumentException(
           "Path \"%s\" doesn't begin with context path \"%s\"!".format(
               path, contextPath))
-    }
 
     path.substring(contextPath.length)
-  }
 
   /**
     * Adds an "Authorization" header, per RFC1945.
     */
-  def addBasicAuth(user: String, pass: String) {
+  def addBasicAuth(user: String, pass: String)
     val hashedCredentials = Helpers.base64Encode((user + ":" + pass).getBytes)
     headers += "Authorization" -> List("Basic " + hashedCredentials)
-  }
 
   // ServletRequest methods
 
@@ -402,9 +379,8 @@ class MockHttpServletRequest(
 
   def getContentType(): String = contentType
 
-  def getInputStream(): ServletInputStream = {
+  def getInputStream(): ServletInputStream =
     new MockServletInputStream(new ByteArrayInputStream(body))
-  }
 
   def getLocalAddr(): String = localAddr
 
@@ -419,19 +395,17 @@ class MockHttpServletRequest(
   def getParameter(key: String): String =
     parameters.find(_._1 == key).map(_._2) getOrElse null
 
-  def getParameterMap(): java.util.Map[String, Array[String]] = {
+  def getParameterMap(): java.util.Map[String, Array[String]] =
     // Build a new map based on the parameters List
     var newMap = Map[String, List[String]]().withDefault(ignore => Nil)
 
-    parameters.foreach {
+    parameters.foreach
       case (k, v) =>
         newMap += k -> (newMap(k) ::: v :: Nil) // Ugly, but it works and keeps order
-    }
 
     newMap.map { case (k, v) => (k, v.toArray) }
       .asInstanceOf[Map[String, Array[String]]]
 //    asMap(newMap.map{case (k,v) => (k,v.toArray)}.asInstanceOf[Map[Object,Object]])
-  }
 
   def getParameterNames(): JEnum[String] =
     parameters.map(_._1).distinct.iterator
@@ -477,39 +451,34 @@ class MockHttpServletRequest(
 
   def getCookies(): Array[Cookie] = cookies.toArray
 
-  def getDateHeader(h: String): Long = {
-    val handler: PartialFunction[Throwable, Box[Long]] = {
-      case pe: ParseException => {
+  def getDateHeader(h: String): Long =
+    val handler: PartialFunction[Throwable, Box[Long]] =
+      case pe: ParseException =>
           throw new IllegalArgumentException(
               "Could not parse the date for %s : \"%s\"".format(
                   h, getHeader(h)))
           Empty
-        }
-    }
 
     Helpers
-      .tryo(handler, {
+      .tryo(handler,
         // Have to use internetDateFormatter directly since parseInternetDate returns the epoch date on failure
         Box
           .!!(getHeader(h))
           .map(Helpers.internetDateFormatter.parse(_).getTime)
-      })
+      )
       .flatMap(x => x) openOr -1L
-  }
 
-  def getHeader(h: String): String = headers.get(h) match {
+  def getHeader(h: String): String = headers.get(h) match
     case Some(v :: _) => v
     case _ => null
-  }
 
   def getHeaderNames(): JEnum[String] = headers.keys.iterator
 
   def getHeaders(s: String): JEnum[String] =
     headers.getOrElse(s, Nil).iterator
 
-  def getIntHeader(h: String): Int = {
+  def getIntHeader(h: String): Int =
     Box.!!(getHeader(h)).map(_.toInt) openOr -1
-  }
 
   def getMethod(): String = method
 
@@ -525,7 +494,7 @@ class MockHttpServletRequest(
 
   def getRequestURI(): String = contextPath + path
 
-  def getRequestURL(): StringBuffer = {
+  def getRequestURL(): StringBuffer =
     val buffer = new StringBuffer(scheme + "://" + localName)
 
     if (localPort != 80) buffer.append(":" + localPort)
@@ -534,23 +503,19 @@ class MockHttpServletRequest(
 
     buffer.append(path)
 
-    if (queryString ne null) {
+    if (queryString ne null)
       buffer.append("?" + queryString)
-    }
 
     buffer
-  }
 
   def getServletPath(): String = servletPath
 
   def getSession(): HttpSession = getSession(true)
 
-  def getSession(create: Boolean): HttpSession = {
-    if ((session eq null) && create) {
+  def getSession(create: Boolean): HttpSession =
+    if ((session eq null) && create)
       session = new MockHttpSession
-    }
     session
-  }
 
   def getUserPrincipal(): java.security.Principal = null
 
@@ -568,17 +533,14 @@ class MockHttpServletRequest(
     * A utility method to set the given header to an RFC1123 date
     * based on the given long value (epoch seconds).
     */
-  def setDateHeader(s: String, l: Long) {
+  def setDateHeader(s: String, l: Long)
     headers += (s -> List(Helpers.toInternetDate(l)))
-  }
 
-  def getParts(): Collection[Part] = {
+  def getParts(): Collection[Part] =
     Seq[Part]()
-  }
 
-  def getPart(partName: String): Part = {
+  def getPart(partName: String): Part =
     null
-  }
 
   def login(username: String, password: String): Unit = ()
 
@@ -599,4 +561,3 @@ class MockHttpServletRequest(
 
   def upgrade[T <: javax.servlet.http.HttpUpgradeHandler](x$1: Class[T]): T =
     ???
-}

@@ -19,44 +19,39 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
   * Date: 28.02.2008
   */
 class ScCaseClauseImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCaseClause {
-  override def accept(visitor: PsiElementVisitor): Unit = {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScCaseClause
+  override def accept(visitor: PsiElementVisitor): Unit =
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   override def toString: String = "CaseClause"
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
 
-    pattern match {
+    pattern match
       case Some(p) =>
-        def process: Boolean = {
+        def process: Boolean =
           val iterator = p.bindings.iterator
-          while (iterator.hasNext) {
+          while (iterator.hasNext)
             val b = iterator.next()
             if (!processor.execute(b, state)) return false
-          }
           val typeVariablesIterator = p.typeVariables.iterator
-          while (typeVariablesIterator.hasNext) {
+          while (typeVariablesIterator.hasNext)
             val tvar = typeVariablesIterator.next()
             if (!processor.execute(tvar, state)) return false
-          }
           true
-        }
-        expr match {
+        expr match
           case Some(e)
               if lastParent != null &&
               e.startOffsetInParent == lastParent.startOffsetInParent =>
             if (!process) return false
           case Some(e: ScInterpolationPattern) => if (!process) return false
           case _ =>
-            guard match {
+            guard match
               case Some(g)
                   if lastParent != null &&
                   g.startOffsetInParent == lastParent.startOffsetInParent =>
@@ -76,13 +71,7 @@ class ScCaseClauseImpl(node: ASTNode)
                                     ScalaElementTypes.TRAIT_DEF,
                                     ScalaElementTypes.OBJECT_DEF))
                 if (last != null && lastParent != null &&
-                    last.startOffsetInParent == lastParent.startOffsetInParent) {
+                    last.startOffsetInParent == lastParent.startOffsetInParent)
                   if (!process) return false
-                }
-            }
-        }
       case _ =>
-    }
     true
-  }
-}

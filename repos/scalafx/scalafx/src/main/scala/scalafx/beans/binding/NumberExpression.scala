@@ -32,20 +32,17 @@ import javafx.beans.{binding => jfxbb}
 import scala.language.implicitConversions
 import scalafx.beans.binding.NumberExpression.VariablePrecisionNumber
 
-object NumberExpression {
+object NumberExpression
   implicit def sfxNumberExpression2jfx(
       ne: NumberExpression): jfxbb.NumberExpression =
     if (ne != null) ne.delegate else null
 
-  case class VariablePrecisionNumber(number: Double, var precision: Double = 0) {
-    def +-(p: Double): VariablePrecisionNumber = {
+  case class VariablePrecisionNumber(number: Double, var precision: Double = 0)
+    def +-(p: Double): VariablePrecisionNumber =
       precision = p
       this
-    }
-  }
-}
 
-class NumberExpression(val delegate: jfxbb.NumberExpression) {
+class NumberExpression(val delegate: jfxbb.NumberExpression)
   def +(v: Int) = new NumberBinding(delegate.add(v))
   def +(v: Long) = new NumberBinding(delegate.add(v))
   def +(v: Float) = new NumberBinding(delegate.add(v))
@@ -116,4 +113,3 @@ class NumberExpression(val delegate: jfxbb.NumberExpression) {
   def toLong = delegate.longValue
   def toFloat = delegate.floatValue
   def toDouble = delegate.doubleValue
-}

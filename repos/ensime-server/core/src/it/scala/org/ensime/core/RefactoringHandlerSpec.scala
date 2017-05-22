@@ -11,7 +11,7 @@ import org.ensime.util.EnsimeSpec
 
 class RefactoringHandlerSpec
     extends EnsimeSpec with IsolatedAnalyzerFixture
-    with RichPresentationCompilerTestUtils {
+    with RichPresentationCompilerTestUtils
 
   val encoding = "UTF-16"
   def original = EnsimeConfigFixture.EmptyTestProject.copy(
@@ -24,8 +24,8 @@ class RefactoringHandlerSpec
   def ContentsInSourceFileInfo(file: File, contentsIn: File) =
     SourceFileInfo(file, contentsIn = Some(contentsIn))
 
-  "RefactoringHandler" should "format files and preserve encoding" in {
-    withAnalyzer { (config, analyzerRef) =>
+  "RefactoringHandler" should "format files and preserve encoding" in
+    withAnalyzer  (config, analyzerRef) =>
       val file = srcFile(config,
                          "abc.scala",
                          contents(
@@ -51,11 +51,9 @@ class RefactoringHandlerSpec
           "}"
       )
       fileContents should ===(expectedContents)
-    }
-  }
 
-  it should "format files from ContentsSourceFileInfo with handleFormatFile" in {
-    withAnalyzer { (dir, analyzerRef) =>
+  it should "format files from ContentsSourceFileInfo with handleFormatFile" in
+    withAnalyzer  (dir, analyzerRef) =>
       val content = contents(
           "package blah",
           "   class  Something   {}"
@@ -70,11 +68,9 @@ class RefactoringHandlerSpec
           ""
       )
       formatted should ===(expectedContents)
-    }
-  }
 
-  it should "format files from ContentsInSourceFileInfo with handleFormatFile and handle encoding" in {
-    withAnalyzer { (dir, analyzerRef) =>
+  it should "format files from ContentsInSourceFileInfo with handleFormatFile and handle encoding" in
+    withAnalyzer  (dir, analyzerRef) =>
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
@@ -94,11 +90,9 @@ class RefactoringHandlerSpec
           ""
       )
       formatted should ===(expectedContents)
-    }
-  }
 
-  it should "format files from FileSourceFileInfo with handleFormatFile and handle encoding" in {
-    withAnalyzer { (dir, analyzerRef) =>
+  it should "format files from FileSourceFileInfo with handleFormatFile and handle encoding" in
+    withAnalyzer  (dir, analyzerRef) =>
       val file = srcFile(dir,
                          "abc.scala",
                          contents(
@@ -118,10 +112,8 @@ class RefactoringHandlerSpec
           ""
       )
       formatted === (expectedContents)
-    }
-  }
 
-  it should "not format invalid files" in withAnalyzer {
+  it should "not format invalid files" in withAnalyzer
     (config, analyzerRef) =>
       val file = srcFile(config,
                          "abc.scala",
@@ -142,12 +134,11 @@ class RefactoringHandlerSpec
           "invalid scala syntax"
       )
       fileContents should ===(expectedContents)
-  }
 
   //
   // core/src/main/scala/org/ensime/core/Refactoring.scala#L.239
   //
-  it should "organize imports when 3 imports exist" in withAnalyzer {
+  it should "organize imports when 3 imports exist" in withAnalyzer
     (dir, analyzerRef) =>
       // Please refer Scala IDE
       // scala-refactoring/src/test/scala/scala/tools/refactoring/tests/implementations/imports/
@@ -197,9 +188,8 @@ class RefactoringHandlerSpec
           "}"
       )
       formatted should ===(expectedContents)
-  }
 
-  it should "add imports on the first line" in withAnalyzer {
+  it should "add imports on the first line" in withAnalyzer
     (dir, analyzerRef) =>
       val file = srcFile(dir,
                          "tmp-contents",
@@ -247,10 +237,9 @@ class RefactoringHandlerSpec
       )
 
       formatted should ===(expectedContents)
-  }
 
-  it should "add imports on the first line when other examples come" in {
-    withAnalyzer { (dir, analyzerRef) =>
+  it should "add imports on the first line when other examples come" in
+    withAnalyzer  (dir, analyzerRef) =>
       val file = srcFile(dir,
                          "tmp-contents",
                          contents(
@@ -294,10 +283,8 @@ class RefactoringHandlerSpec
       )
 
       formatted should ===(expectedContents)
-    }
-  }
 
-  it should "rename a function id with params' opening/closing parenthesis on different lines" in withAnalyzer {
+  it should "rename a function id with params' opening/closing parenthesis on different lines" in withAnalyzer
     (dir, analyzerRef) =>
       val file = srcFile(dir,
                          "tmp-contents",
@@ -336,10 +323,9 @@ class RefactoringHandlerSpec
           ""
       )
       formatted should ===(expectedContents)
-  }
 
-  it should "organize imports" in {
-    withAnalyzer { (dir, analyzerRef) =>
+  it should "organize imports" in
+    withAnalyzer  (dir, analyzerRef) =>
       import org.ensime.util.file._
 
       //when 3 imports exist
@@ -371,10 +357,9 @@ class RefactoringHandlerSpec
               false
           )
       )
-      val diffFile = result match {
+      val diffFile = result match
         case RefactorDiffEffect(_, _, f) => f.canon
         case _ => fail()
-      }
 
       val sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z")
       val t = sdf.format(new Date((new File(file.path)).lastModified()))
@@ -390,11 +375,9 @@ class RefactoringHandlerSpec
 
       diffContents should ===(expectedContents)
       diffFile.delete()
-    }
-  }
 
-  it should "organize and group imports" in {
-    withAnalyzer { (dir, analyzerRef) =>
+  it should "organize and group imports" in
+    withAnalyzer  (dir, analyzerRef) =>
       import org.ensime.util.file._
 
       val file = srcFile(dir,
@@ -424,10 +407,9 @@ class RefactoringHandlerSpec
               false
           )
       )
-      val diffFile = result match {
+      val diffFile = result match
         case RefactorDiffEffect(_, _, f) => f.canon
         case default => fail()
-      }
 
       val sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z")
       val t = sdf.format(new Date((new File(file.path)).lastModified()))
@@ -446,6 +428,3 @@ class RefactoringHandlerSpec
 
       diffContents should ===(expectedContents)
       diffFile.delete()
-    }
-  }
-}

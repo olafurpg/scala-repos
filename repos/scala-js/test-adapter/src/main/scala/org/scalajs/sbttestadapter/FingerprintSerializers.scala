@@ -12,12 +12,12 @@ import sbt.testing._
 
 import org.scalajs.core.tools.json._
 
-private[testadapter] object FingerprintSerializers {
+private[testadapter] object FingerprintSerializers
 
-  implicit object FingerprintSerializer extends JSONSerializer[Fingerprint] {
-    def serialize(fp: Fingerprint): JSON = {
+  implicit object FingerprintSerializer extends JSONSerializer[Fingerprint]
+    def serialize(fp: Fingerprint): JSON =
       val bld = new JSONObjBuilder()
-      fp match {
+      fp match
         case fp: AnnotatedFingerprint =>
           bld
             .fld("fpType", "AnnotatedFingerprint")
@@ -32,16 +32,13 @@ private[testadapter] object FingerprintSerializers {
         case _ =>
           throw new IllegalArgumentException(
               s"Unknown Fingerprint type: ${fp.getClass}")
-      }
       bld.toJSON
-    }
-  }
 
   implicit object FingerprintDeserializer
-      extends JSONDeserializer[Fingerprint] {
-    def deserialize(x: JSON): Fingerprint = {
+      extends JSONDeserializer[Fingerprint]
+    def deserialize(x: JSON): Fingerprint =
       val obj = new JSONObjExtractor(x)
-      obj.fld[String]("fpType") match {
+      obj.fld[String]("fpType") match
         case "AnnotatedFingerprint" =>
           new DeserializedAnnotatedFingerprint(
               obj.fld[Boolean]("isModule"),
@@ -53,9 +50,6 @@ private[testadapter] object FingerprintSerializers {
               obj.fld[Boolean]("requireNoArgConstructor"))
         case tpe =>
           throw new IllegalArgumentException(s"Unknown Fingerprint type: $tpe")
-      }
-    }
-  }
 
   final class DeserializedAnnotatedFingerprint(
       val isModule: Boolean,
@@ -69,4 +63,3 @@ private[testadapter] object FingerprintSerializers {
       val requireNoArgConstructor: Boolean
   )
       extends SubclassFingerprint
-}

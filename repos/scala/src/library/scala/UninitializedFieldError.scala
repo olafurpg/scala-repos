@@ -17,6 +17,5 @@ package scala
   *  @since 2.7
   */
 final case class UninitializedFieldError(msg: String)
-    extends RuntimeException(msg) {
+    extends RuntimeException(msg)
   def this(obj: Any) = this("" + obj)
-}

@@ -24,7 +24,7 @@ import akka.testkit.ImplicitSender
 import akka.testkit.TestActors.EchoActor
 import org.apache.commons.io.FileUtils
 
-object RemoveInternalClusterShardingDataSpec {
+object RemoveInternalClusterShardingDataSpec
   val config =
     """
     akka.loglevel = INFO
@@ -40,20 +40,18 @@ object RemoveInternalClusterShardingDataSpec {
     akka.cluster.sharding.snapshot-after = 5
     """
 
-  val extractEntityId: ShardRegion.ExtractEntityId = {
+  val extractEntityId: ShardRegion.ExtractEntityId =
     case msg: Int ⇒ (msg.toString, msg)
-  }
 
-  val extractShardId: ShardRegion.ExtractShardId = {
+  val extractShardId: ShardRegion.ExtractShardId =
     case msg: Int ⇒ (msg % 10).toString
-  }
 
   class HasSnapshots(override val persistenceId: String, replyTo: ActorRef)
-      extends PersistentActor {
+      extends PersistentActor
 
     var hasSnapshots = false
 
-    override def receiveRecover: Receive = {
+    override def receiveRecover: Receive =
       case SnapshotOffer(_, _) ⇒
         hasSnapshots = true
       case RecoveryCompleted ⇒
@@ -61,81 +59,69 @@ object RemoveInternalClusterShardingDataSpec {
         context.stop(self)
 
       case _ ⇒
-    }
 
-    override def receiveCommand: Receive = {
+    override def receiveCommand: Receive =
       case _ ⇒
-    }
-  }
 
   class HasEvents(override val persistenceId: String, replyTo: ActorRef)
-      extends PersistentActor {
+      extends PersistentActor
 
     var hasEvents = false
 
     override def recovery: Recovery =
       Recovery(fromSnapshot = SnapshotSelectionCriteria.None)
 
-    override def receiveRecover: Receive = {
+    override def receiveRecover: Receive =
       case event: ShardCoordinator.Internal.DomainEvent ⇒
         hasEvents = true
       case RecoveryCompleted ⇒
         replyTo ! hasEvents
         context.stop(self)
-    }
 
-    override def receiveCommand: Receive = {
+    override def receiveCommand: Receive =
       case _ ⇒
-    }
-  }
-}
 
 class RemoveInternalClusterShardingDataSpec
     extends AkkaSpec(RemoveInternalClusterShardingDataSpec.config)
-    with ImplicitSender {
+    with ImplicitSender
   import RemoveInternalClusterShardingDataSpec._
 
   val storageLocations = List("akka.persistence.journal.leveldb.dir",
                               "akka.persistence.snapshot-store.local.dir").map(
       s ⇒ new File(system.settings.config.getString(s)))
 
-  override protected def atStartup() {
+  override protected def atStartup()
     storageLocations.foreach(
         dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-  }
 
-  override protected def afterTermination() {
+  override protected def afterTermination()
     storageLocations.foreach(
         dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-  }
 
   // same persistenceId as is used by ShardCoordinator
   def persistenceId(typeName: String): String =
     s"/sharding/${typeName}Coordinator"
 
-  def hasSnapshots(typeName: String): Boolean = {
+  def hasSnapshots(typeName: String): Boolean =
     system.actorOf(
         Props(classOf[HasSnapshots], persistenceId(typeName), testActor))
     expectMsgType[Boolean]
-  }
 
-  def hasEvents(typeName: String): Boolean = {
+  def hasEvents(typeName: String): Boolean =
     system.actorOf(
         Props(classOf[HasEvents], persistenceId(typeName), testActor))
     expectMsgType[Boolean]
-  }
 
-  "RemoveOnePersistenceId" must {
-    "setup sharding" in {
+  "RemoveOnePersistenceId" must
+    "setup sharding" in
       Cluster(system).join(Cluster(system).selfAddress)
       val settings = ClusterShardingSettings(system)
       ClusterSharding(system).start(
           "type1", Props[EchoActor], settings, extractEntityId, extractShardId)
       ClusterSharding(system).start(
           "type2", Props[EchoActor], settings, extractEntityId, extractShardId)
-    }
 
-    "work when no data" in within(10.seconds) {
+    "work when no data" in within(10.seconds)
       hasSnapshots("type1") should ===(false)
       hasEvents("type1") should ===(false)
       val rm =
@@ -144,9 +130,8 @@ class RemoveInternalClusterShardingDataSpec
       watch(rm)
       expectMsg(Result(Success(Removals(false, false))))
       expectTerminated(rm)
-    }
 
-    "remove all events when no snapshot" in within(10.seconds) {
+    "remove all events when no snapshot" in within(10.seconds)
       val region = ClusterSharding(system).shardRegion("type1")
       (1 to 3).foreach(region ! _)
       receiveN(3).toSet should be((1 to 3).toSet)
@@ -161,16 +146,14 @@ class RemoveInternalClusterShardingDataSpec
       expectTerminated(rm)
       hasSnapshots("type1") should ===(false)
       hasEvents("type1") should ===(false)
-    }
 
-    "remove all events and snapshots" in within(10.seconds) {
+    "remove all events and snapshots" in within(10.seconds)
       val region = ClusterSharding(system).shardRegion("type2")
       (1 to 10).foreach(region ! _)
       receiveN(10).toSet should be((1 to 10).toSet)
-      awaitAssert {
+      awaitAssert
         // theoretically it might take a while until snapshot is visible
         hasSnapshots("type2") should ===(true)
-      }
       hasEvents("type2") should ===(true)
 
       val rm =
@@ -181,35 +164,29 @@ class RemoveInternalClusterShardingDataSpec
       expectTerminated(rm)
       hasSnapshots("type2") should ===(false)
       hasEvents("type2") should ===(false)
-    }
-  }
 
-  "RemoveInternalClusterShardingData" must {
+  "RemoveInternalClusterShardingData" must
     val typeNames = List("type10", "type20", "type30")
 
-    "setup sharding" in {
+    "setup sharding" in
       Cluster(system).join(Cluster(system).selfAddress)
       val settings = ClusterShardingSettings(system)
-      typeNames.foreach { typeName ⇒
+      typeNames.foreach  typeName ⇒
         ClusterSharding(system).start(typeName,
                                       Props[EchoActor],
                                       settings,
                                       extractEntityId,
                                       extractShardId)
-      }
-    }
 
-    "remove all events and snapshots" in within(10.seconds) {
-      typeNames.foreach { typeName ⇒
+    "remove all events and snapshots" in within(10.seconds)
+      typeNames.foreach  typeName ⇒
         val region = ClusterSharding(system).shardRegion(typeName)
         (1 to 10).foreach(region ! _)
         receiveN(10).toSet should be((1 to 10).toSet)
-        awaitAssert {
+        awaitAssert
           // theoretically it might take a while until snapshot is visible
           hasSnapshots(typeName) should ===(true)
-        }
         hasEvents(typeName) should ===(true)
-      }
 
       val result =
         RemoveInternalClusterShardingData.remove(system,
@@ -219,10 +196,6 @@ class RemoveInternalClusterShardingDataSpec
                                                  remove2dot3Data = true)
       Await.ready(result, remaining)
 
-      typeNames.foreach { typeName ⇒
+      typeNames.foreach  typeName ⇒
         hasSnapshots(typeName) should ===(false)
         hasEvents(typeName) should ===(false)
-      }
-    }
-  }
-}

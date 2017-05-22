@@ -35,14 +35,13 @@ import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty}
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.VPos
 
-object RowConstraints {
+object RowConstraints
   implicit def sfxRowConstraints2jfx(v: RowConstraints): jfxsl.RowConstraints =
     if (v != null) v.delegate else null
-}
 
 class RowConstraints(
     override val delegate: jfxsl.RowConstraints = new jfxsl.RowConstraints)
-    extends ConstraintsBase(delegate) with SFXDelegate[jfxsl.RowConstraints] {
+    extends ConstraintsBase(delegate) with SFXDelegate[jfxsl.RowConstraints]
 
   /**
     * Creates a row constraint object with a fixed height.
@@ -73,55 +72,47 @@ class RowConstraints(
     * The vertical fill policy for the row.
     */
   def fillHeight: BooleanProperty = delegate.fillHeightProperty
-  def fillHeight_=(v: Boolean) {
+  def fillHeight_=(v: Boolean)
     fillHeight() = v
-  }
 
   /**
     * The maximum height for the row.
     */
   def maxHeight: DoubleProperty = delegate.maxHeightProperty
-  def maxHeight_=(v: Double) {
+  def maxHeight_=(v: Double)
     maxHeight() = v
-  }
 
   /**
     * The minimum height for the row.
     */
   def minHeight: DoubleProperty = delegate.minHeightProperty
-  def minHeight_=(v: Double) {
+  def minHeight_=(v: Double)
     minHeight() = v
-  }
 
   /**
     * The height percentage of the row.
     */
   def percentHeight: DoubleProperty = delegate.percentHeightProperty
-  def percentHeight_=(v: Double) {
+  def percentHeight_=(v: Double)
     percentHeight() = v
-  }
 
   /**
     * The preferred height for the row.
     */
   def prefHeight: DoubleProperty = delegate.prefHeightProperty
-  def prefHeight_=(v: Double) {
+  def prefHeight_=(v: Double)
     prefHeight() = v
-  }
 
   /**
     * The vertical alignment for the row.
     */
   def valignment: ObjectProperty[jfxg.VPos] = delegate.valignmentProperty
-  def valignment_=(v: VPos) {
+  def valignment_=(v: VPos)
     valignment() = v
-  }
 
   /**
     * The vertical grow priority for the row.
     */
   def vgrow: ObjectProperty[jfxsl.Priority] = delegate.vgrowProperty
-  def vgrow_=(v: Priority) {
+  def vgrow_=(v: Priority)
     vgrow() = v
-  }
-}

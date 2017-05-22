@@ -5,8 +5,8 @@ package testingSupport.specs2
   * @author Roman.Shein
   * @since 16.10.2014.
   */
-abstract class Specs2ObjectSpecTest extends Specs2TestCase {
-  def testSpecObject() {
+abstract class Specs2ObjectSpecTest extends Specs2TestCase
+  def testSpecObject()
     addFileToProject("SpecObject.scala",
                      """
       |import org.specs2.mutable.Specification
@@ -39,5 +39,3 @@ abstract class Specs2ObjectSpecTest extends Specs2TestCase {
                                            "run alone") &&
           checkResultTreeDoesNotHaveNodes(root, "ignore other test"),
         debug = true)
-  }
-}

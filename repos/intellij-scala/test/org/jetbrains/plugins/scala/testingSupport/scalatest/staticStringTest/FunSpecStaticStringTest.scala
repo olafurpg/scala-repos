@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 26.06.2015.
   */
-trait FunSpecStaticStringTest extends ScalaTestTestCase {
+trait FunSpecStaticStringTest extends ScalaTestTestCase
   val funSpecClassName = "FunSpecStringTest"
   val funSpecFileName = funSpecClassName + ".scala"
 
-  def addFunSpec() = {
+  def addFunSpec() =
     addFileToProject(funSpecFileName,
                      """
         |import org.scalatest._
@@ -35,27 +35,22 @@ trait FunSpecStaticStringTest extends ScalaTestTestCase {
         |}
         |
       """.stripMargin.trim())
-  }
 
-  def testFunSpecSum() = {
+  def testFunSpecSum() =
     addFunSpec()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(8, 10, funSpecFileName),
                                funSpecClassName,
                                "FunSpecTest works with sums"))
-  }
 
-  def testFunSpecVal() = {
+  def testFunSpecVal() =
     addFunSpec()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(5, 10, funSpecFileName),
                                funSpecClassName,
                                "FunSpecTest consts"))
-  }
 
-  def testFunSpecValSum() = {
+  def testFunSpecValSum() =
     addFunSpec()
-  }
-}

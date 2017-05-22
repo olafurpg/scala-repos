@@ -1,6 +1,6 @@
 package java.util
 
-trait Map[K, V] {
+trait Map[K, V]
   def size(): Int
   def isEmpty(): Boolean
   def containsKey(key: Any): Boolean
@@ -15,15 +15,12 @@ trait Map[K, V] {
   def entrySet(): Set[Map.Entry[K, V]]
   def equals(o: Any): Boolean
   def hashCode(): Int
-}
 
-object Map {
+object Map
 
-  trait Entry[K, V] {
+  trait Entry[K, V]
     def getKey(): K
     def getValue(): V
     def setValue(value: V): V
     def equals(o: Any): Boolean
     def hashCode(): Int
-  }
-}

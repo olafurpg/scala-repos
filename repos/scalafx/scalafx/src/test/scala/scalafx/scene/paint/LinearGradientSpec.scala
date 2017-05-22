@@ -43,10 +43,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class LinearGradientSpec
     extends SimpleSFXDelegateSpec[jfxsp.LinearGradient, LinearGradient](
-        classOf[jfxsp.LinearGradient], classOf[LinearGradient]) {
+        classOf[jfxsp.LinearGradient], classOf[LinearGradient])
 
   override protected def getScalaClassInstance = new LinearGradient
 
   override protected def getJavaClassInstance =
     new jfxsp.LinearGradient(0, 0, 0, 0, true, CycleMethod.NoCycle, Nil)
-}

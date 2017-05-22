@@ -22,28 +22,23 @@ class ScImportSelectorsImpl private (stub: StubElement[ScImportSelectors],
                                      nodeType: IElementType,
                                      node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScImportSelectors {
+    with ScImportSelectors
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScImportSelectorsStub) = {
+  def this(stub: ScImportSelectorsStub) =
     this(stub, ScalaElementTypes.IMPORT_SELECTORS, null)
-  }
 
   override def toString: String = "ImportSelectors"
 
-  def hasWildcard: Boolean = {
+  def hasWildcard: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScImportSelectorsStub].hasWildcard
-    }
     findChildByType[PsiElement](ScalaTokenTypes.tUNDER) != null
-  }
 
-  def wildcardElement: Option[PsiElement] = {
+  def wildcardElement: Option[PsiElement] =
     if (hasWildcard) Some(findChildByType[PsiElement](ScalaTokenTypes.tUNDER))
     else None
-  }
 
   def selectors: Array[ScImportSelector] =
     getStubOrPsiChildren(ScalaElementTypes.IMPORT_SELECTOR,
                          JavaArrayFactoryUtil.ScImportSelectorFactory)
-}

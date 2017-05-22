@@ -1,5 +1,4 @@
 import Macros._
 
-object Test extends App {
+object Test extends App
   a""
-}

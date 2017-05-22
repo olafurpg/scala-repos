@@ -31,12 +31,12 @@ import kafka.admin.{AdminOperationException, AdminUtils}
 
 import scala.collection.Map
 
-class DynamicConfigChangeTest extends KafkaServerTestHarness {
+class DynamicConfigChangeTest extends KafkaServerTestHarness
   def generateConfigs() =
     List(KafkaConfig.fromProps(TestUtils.createBrokerConfig(0, zkConnect)))
 
   @Test
-  def testConfigChange() {
+  def testConfigChange()
     assertTrue(
         "Should contain a ConfigHandler for topics",
         this.servers(0).dynamicConfigHandlers.contains(ConfigType.Topic))
@@ -46,22 +46,19 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     val logProps = new Properties()
     logProps.put(LogConfig.FlushMessagesProp, oldVal.toString)
     AdminUtils.createTopic(zkUtils, tp.topic, 1, 1, logProps)
-    TestUtils.retry(10000) {
+    TestUtils.retry(10000)
       val logOpt = this.servers(0).logManager.getLog(tp)
       assertTrue(logOpt.isDefined)
       assertEquals(oldVal, logOpt.get.config.flushInterval)
-    }
     logProps.put(LogConfig.FlushMessagesProp, newVal.toString)
     AdminUtils.changeTopicConfig(zkUtils, tp.topic, logProps)
-    TestUtils.retry(10000) {
+    TestUtils.retry(10000)
       assertEquals(
           newVal,
           this.servers(0).logManager.getLog(tp).get.config.flushInterval)
-    }
-  }
 
   @Test
-  def testClientQuotaConfigChange() {
+  def testClientQuotaConfigChange()
     assertTrue(
         "Should contain a ConfigHandler for topics",
         this.servers(0).dynamicConfigHandlers.contains(ConfigType.Client))
@@ -71,7 +68,7 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
     props.put(ClientConfigOverride.ConsumerOverride, "2000")
     AdminUtils.changeClientIdConfig(zkUtils, clientId, props)
 
-    TestUtils.retry(10000) {
+    TestUtils.retry(10000)
       val configHandler = this
         .servers(0)
         .dynamicConfigHandlers(ConfigType.Client)
@@ -91,24 +88,20 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
           s"ClientId $clientId must have overridden consumer quota of 2000",
           Quota.upperBound(2000),
           overrideConsumerQuota)
-    }
-  }
 
   @Test
-  def testConfigChangeOnNonExistingTopic() {
+  def testConfigChangeOnNonExistingTopic()
     val topic = TestUtils.tempTopic
-    try {
+    try
       val logProps = new Properties()
       logProps.put(LogConfig.FlushMessagesProp, 10000: java.lang.Integer)
       AdminUtils.changeTopicConfig(zkUtils, topic, logProps)
       fail("Should fail with AdminOperationException for topic doesn't exist")
-    } catch {
+    catch
       case e: AdminOperationException => // expected
-    }
-  }
 
   @Test
-  def testProcessNotification {
+  def testProcessNotification
     val props = new Properties()
     props.put("a.b", "10")
 
@@ -131,18 +124,17 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
         "not json")
 
     // Incorrect Map. No version
-    try {
+    try
       val jsonMap = Map("v" -> 1, "x" -> 2)
       configManager.ConfigChangedNotificationHandler.processNotification(
           Json.encode(jsonMap))
       fail(
           "Should have thrown an Exception while parsing incorrect notification " +
           jsonMap)
-    } catch {
+    catch
       case t: Throwable =>
-    }
     // Version is provided. EntityType is incorrect
-    try {
+    try
       val jsonMap = Map(
           "version" -> 1, "entity_type" -> "garbage", "entity_name" -> "x")
       configManager.ConfigChangedNotificationHandler.processNotification(
@@ -150,21 +142,19 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
       fail(
           "Should have thrown an Exception while parsing incorrect notification " +
           jsonMap)
-    } catch {
+    catch
       case t: Throwable =>
-    }
 
     // EntityName isn't provided
-    try {
+    try
       val jsonMap = Map("version" -> 1, "entity_type" -> ConfigType.Topic)
       configManager.ConfigChangedNotificationHandler.processNotification(
           Json.encode(jsonMap))
       fail(
           "Should have thrown an Exception while parsing incorrect notification " +
           jsonMap)
-    } catch {
+    catch
       case t: Throwable =>
-    }
 
     // Everything is provided
     val jsonMap = Map("version" -> 1,
@@ -175,5 +165,3 @@ class DynamicConfigChangeTest extends KafkaServerTestHarness {
 
     // Verify that processConfigChanges was only called once
     EasyMock.verify(handler)
-  }
-}

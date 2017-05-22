@@ -51,7 +51,7 @@ import java.util.regex.Pattern
   *  @author  Matthias Zenger
   */
 @SerialVersionUID(8476000850333817230L)
-abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
+abstract class Enumeration(initial: Int) extends Serializable  thisenum =>
 
   def this() = this(0)
 
@@ -79,13 +79,11 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
 
   /** The values of this enumeration as a set.
     */
-  def values: ValueSet = {
-    if (!vsetDefined) {
+  def values: ValueSet =
+    if (!vsetDefined)
       vset = (ValueSet.newBuilder ++= vmap.values).result()
       vsetDefined = true
-    }
     vset
-  }
 
   /** The integer to use to identify the next created value. */
   protected var nextId: Int = initial
@@ -120,13 +118,12 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     * @throws   NoSuchElementException if no `Value` with a matching
     *           name is in this `Enumeration`
     */
-  final def withName(s: String): Value = {
+  final def withName(s: String): Value =
     val (unnamed, named) =
-      values partition {
+      values partition
         _.toString().startsWith("<Unknown name for enum field ")
-      }
 
-    named.find(_.toString == s) match {
+    named.find(_.toString == s) match
       case Some(v) => v
       // If we have unnamed values, we issue a detailed error message
       case None if unnamed.nonEmpty =>
@@ -136,8 +133,6 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
                |${unnamed.mkString("  ", "\n  ", "")}""".stripMargin)
       // Normal case (no unnamed Values)
       case _ => None.get
-    }
-  }
 
   /** Creates a fresh value, part of this enumeration. */
   protected final def Value: Value = Value(nextId)
@@ -170,7 +165,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
 
   /** The type of the enumerated values. */
   @SerialVersionUID(7091335633555234129L)
-  abstract class Value extends Ordered[Value] with Serializable {
+  abstract class Value extends Ordered[Value] with Serializable
 
     /** the id and bit location of this enumeration value */
     def id: Int
@@ -182,23 +177,21 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
       if (this.id < that.id) -1
       else if (this.id == that.id) 0
       else 1
-    override def equals(other: Any) = other match {
+    override def equals(other: Any) = other match
       case that: Enumeration#Value =>
         (outerEnum eq that.outerEnum) && (id == that.id)
       case _ => false
-    }
     override def hashCode: Int = id.##
 
     /** Create a ValueSet which contains this value and another one */
     def +(v: Value) = ValueSet(this, v)
-  }
 
   /** A class implementing the [[scala.Enumeration.Value]] type. This class
     *  can be overridden to change the enumeration's naming and integer
     *  identification behaviour.
     */
   @SerialVersionUID(0 - 3501153230598116017L)
-  protected class Val(i: Int, name: String) extends Value with Serializable {
+  protected class Val(i: Int, name: String) extends Value with Serializable
 
     def this(i: Int) = this(i, nextNameOrNull)
     def this(name: String) = this(nextId, name)
@@ -216,17 +209,14 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
       // Scala.js specific
       else s"<Unknown name for enum field #$i of class ${getClass}>"
 
-    protected def readResolve(): AnyRef = {
+    protected def readResolve(): AnyRef =
       val enum = thisenum.readResolve().asInstanceOf[Enumeration]
       if (enum.vmap == null) this
       else enum.vmap(i)
-    }
-  }
 
   /** An ordering by id for values of this set */
-  object ValueOrdering extends Ordering[Value] {
+  object ValueOrdering extends Ordering[Value]
     def compare(x: Value, y: Value): Int = x compare y
-  }
 
   /** A class for sets of values.
     *  Iterating through this set will yield values in increasing order of their ids.
@@ -236,7 +226,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     */
   class ValueSet private[ValueSet](private[this] var nnIds: immutable.BitSet)
       extends AbstractSet[Value] with immutable.SortedSet[Value]
-      with SortedSetLike[Value, ValueSet] with Serializable {
+      with SortedSetLike[Value, ValueSet] with Serializable
 
     implicit def ordering: Ordering[Value] = ValueOrdering
     def rangeImpl(from: Option[Value], until: Option[Value]): ValueSet =
@@ -258,10 +248,9 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     /** Creates a bit mask for the zero-adjusted ids in this set as a
       *  new array of longs */
     def toBitMask: Array[Long] = nnIds.toBitMask
-  }
 
   /** A factory object for value sets */
-  object ValueSet {
+  object ValueSet
     import generic.CanBuildFrom
 
     /** The empty value set */
@@ -277,18 +266,14 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
 
     /** A builder object for value sets */
     def newBuilder: mutable.Builder[Value, ValueSet] =
-      new mutable.Builder[Value, ValueSet] {
+      new mutable.Builder[Value, ValueSet]
         private[this] val b = new mutable.BitSet
         def +=(x: Value) = { b += (x.id - bottomId); this }
         def clear() = b.clear()
         def result() = new ValueSet(b.toImmutable)
-      }
 
     /** The implicit builder for value sets */
     implicit def canBuildFrom: CanBuildFrom[ValueSet, Value, ValueSet] =
-      new CanBuildFrom[ValueSet, Value, ValueSet] {
+      new CanBuildFrom[ValueSet, Value, ValueSet]
         def apply(from: ValueSet) = newBuilder
         def apply() = newBuilder
-      }
-  }
-}

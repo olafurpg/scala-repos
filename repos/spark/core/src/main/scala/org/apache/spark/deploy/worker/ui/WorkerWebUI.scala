@@ -35,14 +35,14 @@ private[worker] class WorkerWebUI(
                   worker.securityMgr.getSSLOptions("standalone"),
                   requestedPort,
                   worker.conf,
-                  name = "WorkerUI") with Logging {
+                  name = "WorkerUI") with Logging
 
   private[ui] val timeout = RpcUtils.askRpcTimeout(worker.conf)
 
   initialize()
 
   /** Initialize all components of the server. */
-  def initialize() {
+  def initialize()
     val logPage = new LogPage(this)
     attachPage(logPage)
     attachPage(new WorkerPage(this))
@@ -54,11 +54,8 @@ private[worker] class WorkerWebUI(
             (request: HttpServletRequest) => logPage.renderLog(request),
             worker.securityMgr,
             worker.conf))
-  }
-}
 
-private[worker] object WorkerWebUI {
+private[worker] object WorkerWebUI
   val STATIC_RESOURCE_BASE = SparkUI.STATIC_RESOURCE_DIR
   val DEFAULT_RETAINED_DRIVERS = 1000
   val DEFAULT_RETAINED_EXECUTORS = 1000
-}

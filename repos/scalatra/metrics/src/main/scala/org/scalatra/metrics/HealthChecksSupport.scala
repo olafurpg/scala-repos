@@ -4,7 +4,7 @@ import com.codahale.metrics.health.HealthCheckRegistry
 import nl.grons.metrics.scala._
 
 trait HealthChecksSupport
-    extends nl.grons.metrics.scala.CheckedBuilder with MetricsBootstrap {
+    extends nl.grons.metrics.scala.CheckedBuilder with MetricsBootstrap
   implicit def healthCheckRegistry: HealthCheckRegistry
   val registry = healthCheckRegistry
 
@@ -21,4 +21,3 @@ trait HealthChecksSupport
 
   def runHealthCheck(name: String) = healthCheckRegistry.runHealthCheck(name)
   def runHealthChecks() = healthCheckRegistry.runHealthChecks()
-}

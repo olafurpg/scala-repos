@@ -33,7 +33,7 @@ import org.joda.time.DateTime
   * @group Event Data
   */
 @DeveloperApi
-trait LEvents {
+trait LEvents
 
   /** Default timeout for asynchronous operations that is set to 1 minute */
   val defaultTimeout = Duration(60, "seconds")
@@ -198,7 +198,7 @@ trait LEvents {
       startTime: Option[DateTime] = None,
       untilTime: Option[DateTime] = None,
       required: Option[Seq[String]] = None)(
-      implicit ec: ExecutionContext): Future[Map[String, PropertyMap]] = {
+      implicit ec: ExecutionContext): Future[Map[String, PropertyMap]] =
     futureFind(
         appId = appId,
         channelId = channelId,
@@ -206,16 +206,13 @@ trait LEvents {
         untilTime = untilTime,
         entityType = Some(entityType),
         eventNames = Some(LEventAggregator.eventNames)
-    ).map { eventIt =>
+    ).map  eventIt =>
       val dm = LEventAggregator.aggregateProperties(eventIt)
-      if (required.isDefined) {
-        dm.filter {
+      if (required.isDefined)
+        dm.filter
           case (k, v) =>
             required.get.map(v.contains(_)).reduce(_ && _)
-        }
-      } else dm
-    }
-  }
+      else dm
 
   /**
     * :: Experimental ::
@@ -242,7 +239,7 @@ trait LEvents {
       entityId: String,
       startTime: Option[DateTime] = None,
       untilTime: Option[DateTime] = None)(
-      implicit ec: ExecutionContext): Future[Option[PropertyMap]] = {
+      implicit ec: ExecutionContext): Future[Option[PropertyMap]] =
     futureFind(
         appId = appId,
         channelId = channelId,
@@ -251,35 +248,30 @@ trait LEvents {
         entityType = Some(entityType),
         entityId = Some(entityId),
         eventNames = Some(LEventAggregator.eventNames)
-    ).map { eventIt =>
+    ).map  eventIt =>
       LEventAggregator.aggregatePropertiesSingle(eventIt)
-    }
-  }
 
   // following is blocking
   private[prediction] def insert(event: Event,
                                  appId: Int,
                                  channelId: Option[Int] = None,
                                  timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): String = {
+      implicit ec: ExecutionContext): String =
     Await.result(futureInsert(event, appId, channelId), timeout)
-  }
 
   private[prediction] def get(eventId: String,
                               appId: Int,
                               channelId: Option[Int] = None,
                               timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): Option[Event] = {
+      implicit ec: ExecutionContext): Option[Event] =
     Await.result(futureGet(eventId, appId, channelId), timeout)
-  }
 
   private[prediction] def delete(eventId: String,
                                  appId: Int,
                                  channelId: Option[Int] = None,
                                  timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): Boolean = {
+      implicit ec: ExecutionContext): Boolean =
     Await.result(futureDelete(eventId, appId, channelId), timeout)
-  }
 
   /** reads from database and returns events iterator.
     *
@@ -318,7 +310,7 @@ trait LEvents {
                                limit: Option[Int] = None,
                                reversed: Option[Boolean] = None,
                                timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): Iterator[Event] = {
+      implicit ec: ExecutionContext): Iterator[Event] =
     Await.result(futureFind(appId = appId,
                             channelId = channelId,
                             startTime = startTime,
@@ -331,7 +323,6 @@ trait LEvents {
                             limit = limit,
                             reversed = reversed),
                  timeout)
-  }
 
   // NOTE: remove in next release
   @deprecated("Use find() instead.", "0.9.2")
@@ -348,8 +339,8 @@ trait LEvents {
       limit: Option[Int] = None,
       reversed: Option[Boolean] = None,
       timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): Either[StorageError, Iterator[Event]] = {
-    try {
+      implicit ec: ExecutionContext): Either[StorageError, Iterator[Event]] =
+    try
       // return Either for legacy usage
       Right(
           Await.result(futureFind(appId = appId,
@@ -364,11 +355,9 @@ trait LEvents {
                                   limit = limit,
                                   reversed = reversed),
                        timeout))
-    } catch {
+    catch
       case e: TimeoutException => Left(StorageError(s"${e}"))
       case e: Exception => Left(StorageError(s"${e}"))
-    }
-  }
 
   /** reads events of the specified entity.
     *
@@ -406,7 +395,7 @@ trait LEvents {
                        limit: Option[Int] = None,
                        latest: Boolean = true,
                        timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): Either[StorageError, Iterator[Event]] = {
+      implicit ec: ExecutionContext): Either[StorageError, Iterator[Event]] =
 
     findLegacy(appId = appId,
                channelId = channelId,
@@ -420,7 +409,6 @@ trait LEvents {
                limit = limit,
                reversed = Some(latest),
                timeout = timeout)
-  }
 
   /** Aggregate properties of entities based on these special events:
     * \$set, \$unset, \$delete events.
@@ -443,7 +431,7 @@ trait LEvents {
       untilTime: Option[DateTime] = None,
       required: Option[Seq[String]] = None,
       timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): Map[String, PropertyMap] = {
+      implicit ec: ExecutionContext): Map[String, PropertyMap] =
     Await.result(futureAggregateProperties(appId = appId,
                                            channelId = channelId,
                                            entityType = entityType,
@@ -451,7 +439,6 @@ trait LEvents {
                                            untilTime = untilTime,
                                            required = required),
                  timeout)
-  }
 
   /**
     * :: Experimental ::
@@ -479,7 +466,7 @@ trait LEvents {
       startTime: Option[DateTime] = None,
       untilTime: Option[DateTime] = None,
       timeout: Duration = defaultTimeout)(
-      implicit ec: ExecutionContext): Option[PropertyMap] = {
+      implicit ec: ExecutionContext): Option[PropertyMap] =
 
     Await.result(futureAggregatePropertiesOfEntity(appId = appId,
                                                    channelId = channelId,
@@ -488,5 +475,3 @@ trait LEvents {
                                                    startTime = startTime,
                                                    untilTime = untilTime),
                  timeout)
-  }
-}

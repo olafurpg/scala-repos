@@ -21,18 +21,15 @@ import org.junit.Assert._
 
 import test.illTyped
 
-class Cached211Test {
+class Cached211Test
   trait Foo[A]
-  object Foo {
+  object Foo
     implicit def materialize[A]: Foo[A] = new Foo[A] {}
-  }
 
   @Test
-  def testAmbiguous {
+  def testAmbiguous
     implicit val a = new Foo[String] {}
     implicit val b = new Foo[String] {}
     illTyped(
         "cachedImplicit[Foo[String]]"
     )
-  }
-}

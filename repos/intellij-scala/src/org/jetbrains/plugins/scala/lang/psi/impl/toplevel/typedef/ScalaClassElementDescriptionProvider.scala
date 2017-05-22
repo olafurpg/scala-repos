@@ -8,13 +8,10 @@ import org.jetbrains.plugins.scala.lang.psi.light.PsiClassWrapper
   * User: Alefas
   * Date: 18.02.12
   */
-class ScalaClassElementDescriptionProvider extends ElementDescriptionProvider {
+class ScalaClassElementDescriptionProvider extends ElementDescriptionProvider
   def getElementDescription(
-      element: PsiElement, location: ElementDescriptionLocation): String = {
-    element match {
+      element: PsiElement, location: ElementDescriptionLocation): String =
+    element match
       case o: ScObject => o.name
       case wrapper: PsiClassWrapper => wrapper.definition.name
       case _ => null
-    }
-  }
-}

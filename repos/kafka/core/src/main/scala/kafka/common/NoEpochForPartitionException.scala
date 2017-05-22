@@ -20,6 +20,5 @@ package kafka.common
   * Thrown when a get epoch request is made for partition, but no epoch exists for that partition
   */
 class NoEpochForPartitionException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

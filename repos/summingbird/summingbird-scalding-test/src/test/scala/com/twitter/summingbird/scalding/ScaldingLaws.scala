@@ -55,24 +55,23 @@ import org.scalatest.WordSpec
 /**
   * Tests for Summingbird's Scalding planner.
   */
-class ScaldingLaws extends WordSpec {
+class ScaldingLaws extends WordSpec
   import MapAlgebra.sparseEquiv
 
   implicit def timeExtractor[T <: (Long, _)] = TestUtil.simpleTimeExtractor[T]
 
   def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
-  "The ScaldingPlatform" should {
+  "The ScaldingPlatform" should
 
     //Set up the job:
-    "match scala for single step jobs" in {
+    "match scala for single step jobs" in
       val original = sample[List[Int]]
       val fn = sample[(Int) => List[(Int, Int)]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -101,18 +100,16 @@ class ScaldingLaws extends WordSpec {
 
       assert(TestUtil.compareMaps(
               original, Monoid.plus(initStore, inMemory), testStore) == true)
-    }
 
-    "match scala single step pruned jobs" in {
+    "match scala single step pruned jobs" in
       val original = sample[List[Int]]
       val fn = sample[(Int) => List[(Int, Int)]]
       val initStore = sample[Map[Int, Int]]
       val prunedList = sample[Set[Int]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -121,17 +118,14 @@ class ScaldingLaws extends WordSpec {
       val batchCoveredInput =
         TestUtil.pruneToBatchCovered(inWithTime, intr, batcher)
 
-      val inMemory = {
+      val inMemory =
         val computedMap = TestGraphs.singleStepInScala(batchCoveredInput)(fn)
         val totalMap = Monoid.plus(initStore, computedMap)
         totalMap.filter(kv => !prunedList.contains(kv._1)).toMap
-      }
 
-      val pruner = new PrunedSpace[(Int, Int)] {
-        def prune(item: (Int, Int), writeTime: Timestamp) = {
+      val pruner = new PrunedSpace[(Int, Int)]
+        def prune(item: (Int, Int), writeTime: Timestamp) =
           prunedList.contains(item._1)
-        }
-      }
 
       val testStore = TestStore[Int, Int](
           "test", batcher, initStore, inWithTime.size, pruner)
@@ -149,18 +143,16 @@ class ScaldingLaws extends WordSpec {
       // Now check that the inMemory ==
 
       assert(TestUtil.compareMaps(original, inMemory, testStore) == true)
-    }
 
-    "match scala for flatMapKeys jobs" in {
+    "match scala for flatMapKeys jobs" in
       val original = sample[List[Int]]
       val initStore = sample[Map[Int, Int]]
       val fnA = sample[(Int) => List[(Int, Int)]]
       val fnB = sample[Int => List[Int]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -190,9 +182,8 @@ class ScaldingLaws extends WordSpec {
 
       assert(TestUtil.compareMaps(
               original, Monoid.plus(initStore, inMemory), testStore) == true)
-    }
 
-    "match scala for multiple summer jobs" in {
+    "match scala for multiple summer jobs" in
       val original = sample[List[Int]]
       val initStoreA = sample[Map[Int, Int]]
       val initStoreB = sample[Map[Int, Int]]
@@ -201,9 +192,8 @@ class ScaldingLaws extends WordSpec {
       val fnC = sample[(Int) => List[(Int, Int)]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -223,9 +213,9 @@ class ScaldingLaws extends WordSpec {
 
       val tail = TestGraphs
         .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-          source, testStoreA, testStoreB)({ t =>
+          source, testStoreA, testStoreB)( t =>
         fnA(t._2)
-      }, fnB, fnC)
+      , fnB, fnC)
 
       val scald = Scalding("scalaCheckMultipleSumJob")
       val ws = new LoopState(intr)
@@ -242,18 +232,16 @@ class ScaldingLaws extends WordSpec {
       assert(TestUtil.compareMaps(original,
                                   Monoid.plus(initStoreB, inMemoryB),
                                   testStoreB) == true)
-    }
 
-    "match scala for leftJoin jobs" in {
+    "match scala for leftJoin jobs" in
       val original = sample[List[Int]]
       val prejoinMap = sample[(Int) => List[(Int, Int)]]
       val service = sample[(Int, Int) => Option[Int]]
       val postJoin = sample[((Int, (Int, Option[Int]))) => List[(Int, Int)]]
 
       //Add a time
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -264,17 +252,14 @@ class ScaldingLaws extends WordSpec {
 
       // We need to keep track of time correctly to use the service
       var fakeTime = -1
-      val timeIncIt = new Iterator[Int] {
+      val timeIncIt = new Iterator[Int]
         val inner = batchCoveredInput.iterator
         def hasNext = inner.hasNext
-        def next = {
+        def next =
           fakeTime += 1
           inner.next
-        }
-      }
-      val srvWithTime = { (key: Int) =>
+      val srvWithTime =  (key: Int) =>
         service(fakeTime, key)
-      }
 
       val inMemory = TestGraphs.leftJoinInScala(timeIncIt)(srvWithTime)(
           prejoinMap)(postJoin)
@@ -282,9 +267,9 @@ class ScaldingLaws extends WordSpec {
       // Add a time:
       val allKeys = original.flatMap(prejoinMap).map { _._1 }
       val allTimes = (0 until original.size)
-      val stream = for {
+      val stream = for
         time <- allTimes; key <- allKeys; v = service(time, key)
-      } yield (time.toLong, (key, v))
+      yield (time.toLong, (key, v))
 
       val initStore = sample[Map[Int, Int]]
       val testStore =
@@ -293,9 +278,9 @@ class ScaldingLaws extends WordSpec {
       /**
         * Create the batched service
         */
-      val batchedService = stream.map {
+      val batchedService = stream.map
         case (time, v) => (Timestamp(time), v)
-      }.groupBy { case (ts, _) => batcher.batchOf(ts) }
+      .groupBy { case (ts, _) => batcher.batchOf(ts) }
       val testService = new TestService[Int, Int](
           "srv", batcher, batcher.batchOf(Timestamp(0)).prev, batchedService)
 
@@ -303,9 +288,9 @@ class ScaldingLaws extends WordSpec {
 
       val summer =
         TestGraphs.leftJoinJob[Scalding, (Long, Int), Int, Int, Int, Int](
-            source, testService, testStore) { tup =>
+            source, testService, testStore)  tup =>
           prejoinMap(tup._2)
-        }(postJoin)
+        (postJoin)
 
       val scald = Scalding("scalaCheckleftJoinJob")
       val ws = new LoopState(intr)
@@ -318,18 +303,16 @@ class ScaldingLaws extends WordSpec {
 
       assert(TestUtil.compareMaps(
               original, Monoid.plus(initStore, inMemory), testStore) == true)
-    }
 
-    "match scala for leftJoin  repeated tuple leftJoin jobs" in {
+    "match scala for leftJoin  repeated tuple leftJoin jobs" in
       val original = sample[List[Int]]
       val prejoinMap = sample[(Int) => List[(Int, Int)]]
       val service = sample[(Int, Int) => Option[Int]]
       val postJoin = sample[((Int, (Int, Option[Int]))) => List[(Int, Int)]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -340,26 +323,23 @@ class ScaldingLaws extends WordSpec {
 
       // We need to keep track of time correctly to use the service
       var fakeTime = -1
-      val timeIncIt = new Iterator[Int] {
+      val timeIncIt = new Iterator[Int]
         val inner = batchCoveredInput.iterator
         def hasNext = inner.hasNext
-        def next = {
+        def next =
           fakeTime += 1
           inner.next
-        }
-      }
-      val srvWithTime = { (key: Int) =>
+      val srvWithTime =  (key: Int) =>
         service(fakeTime, key)
-      }
       val inMemory = TestGraphs.repeatedTupleLeftJoinInScala(timeIncIt)(
           srvWithTime)(prejoinMap)(postJoin)
 
       // Add a time:
       val allKeys = original.flatMap(prejoinMap).map { _._1 }
       val allTimes = (0 until original.size)
-      val stream = for {
+      val stream = for
         time <- allTimes; key <- allKeys; v = service(time, key)
-      } yield (time.toLong, (key, v))
+      yield (time.toLong, (key, v))
 
       val initStore = sample[Map[Int, Int]]
       val testStore =
@@ -368,9 +348,9 @@ class ScaldingLaws extends WordSpec {
       /**
         * Create the batched service
         */
-      val batchedService = stream.map {
+      val batchedService = stream.map
         case (time, v) => (Timestamp(time), v)
-      }.groupBy { case (ts, _) => batcher.batchOf(ts) }
+      .groupBy { case (ts, _) => batcher.batchOf(ts) }
       val testService = new TestService[Int, Int](
           "srv", batcher, batcher.batchOf(Timestamp(0)).prev, batchedService)
 
@@ -378,9 +358,9 @@ class ScaldingLaws extends WordSpec {
 
       val summer = TestGraphs
         .repeatedTupleLeftJoinJob[Scalding, (Long, Int), Int, Int, Int, Int](
-          source, testService, testStore) { tup =>
+          source, testService, testStore)  tup =>
         prejoinMap(tup._2)
-      }(postJoin)
+      (postJoin)
 
       val scald = Scalding("scalaCheckleftJoinJob")
       val ws = new LoopState(intr)
@@ -393,27 +373,23 @@ class ScaldingLaws extends WordSpec {
 
       assert(TestUtil.compareMaps(
               original, Monoid.plus(initStore, inMemory), testStore) == true)
-    }
 
-    "match scala for leftJoin with store (no dependency between the two) jobs" in {
+    "match scala for leftJoin with store (no dependency between the two) jobs" in
       // TODO: what if the two sources are of different sizes here?
       val original1 = sample[List[Int]]
       val original2Fn = sample[(Int) => Int]
-      val original2 = original1.map { v =>
+      val original2 = original1.map  v =>
         original2Fn(v)
-      }
 
       val fnA = sample[(Int) => List[(Int, Int)]]
       val fnB = sample[(Int) => List[(Int, Int)]]
       val postJoin = sample[((Int, (Int, Option[Int]))) => List[(Int, Int)]]
 
       // Add a time
-      val inWithTime1 = original1.zipWithIndex.map {
+      val inWithTime1 = original1.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
-      val inWithTime2 = original2.zipWithIndex.map {
+      val inWithTime2 = original2.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original1.size.toLong)
@@ -486,9 +462,8 @@ class ScaldingLaws extends WordSpec {
       assert(TestUtil.compareMaps(original2,
                                   Monoid.plus(finalStoreInit, inMemoryB),
                                   finalStore) == true)
-    }
 
-    "match scala for leftJoin with store (with dependency between store and join) jobs" in {
+    "match scala for leftJoin with store (with dependency between store and join) jobs" in
       val original = sample[List[Int]]
 
       val fnA = sample[(Int) => List[(Int, Int)]]
@@ -498,9 +473,8 @@ class ScaldingLaws extends WordSpec {
       val valuesFlatMap2 = sample[(String) => List[Int]]
 
       val valuesFlatMap = (e: ((Int, Option[Int]))) =>
-        valuesFlatMap1(e).flatMap { x =>
+        valuesFlatMap1(e).flatMap  x =>
           { valuesFlatMap2(x) }
-      }
 
       def toTime[T, U](fn: T => TraversableOnce[U])
         : ((Long, T)) => TraversableOnce[(Long, U)] =
@@ -510,9 +484,8 @@ class ScaldingLaws extends WordSpec {
       val valuesFlatMapWithTime = toTime(valuesFlatMap)
 
       // add a time
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -558,9 +531,8 @@ class ScaldingLaws extends WordSpec {
           TestUtil.compareMaps(original,
                                Monoid.plus(storeAndServiceInit, inMemoryStore),
                                storeAndServiceStore) == true)
-    }
 
-    "match scala for leftJoin with store and join fanout (with dependency between store and join) jobs" in {
+    "match scala for leftJoin with store and join fanout (with dependency between store and join) jobs" in
       val original = sample[List[Int]]
 
       val fnA = sample[(Int) => List[(Int, Int)]]
@@ -578,9 +550,8 @@ class ScaldingLaws extends WordSpec {
       val valuesFlatMapWithTime = toTime(valuesFlatMap)
 
       // Add a time
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -641,17 +612,15 @@ class ScaldingLaws extends WordSpec {
                                Monoid.plus(fmStoreInit,
                                            inMemoryStoreAfterFlatMap),
                                fmStore) == true)
-    }
 
-    "match scala for diamond jobs with write" in {
+    "match scala for diamond jobs with write" in
       val original = sample[List[Int]]
       val fn1 = sample[(Int) => List[(Int, Int)]]
       val fn2 = sample[(Int) => List[(Int, Int)]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -684,22 +653,19 @@ class ScaldingLaws extends WordSpec {
               original, Monoid.plus(initStore, inMemory), testStore) == true)
       val wrongSink = sinkOut.map { _._2 }.toList != inWithTime
       assert(wrongSink == false)
-      if (wrongSink) {
+      if (wrongSink)
         println("input: " + inWithTime)
         println("SinkExtra: " + (sinkOut.map(_._2).toSet -- inWithTime.toSet))
         println(
             "SinkMissing: " + (inWithTime.toSet -- sinkOut.map(_._2).toSet))
-      }
-    }
 
-    "Correctly aggregate multiple sumByKeys" in {
+    "Correctly aggregate multiple sumByKeys" in
       val original = sample[List[(Int, Int)]]
       val keyExpand = sample[(Int) => List[Int]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -740,16 +706,14 @@ class ScaldingLaws extends WordSpec {
                                Monoid.plus(initStore, inMemoryB),
                                testStoreB,
                                "B") == true)
-    }
 
-    "compute correct statistics" in {
+    "compute correct statistics" in
       val original = sample[List[Int]]
       val fn = sample[(Int) => List[(Int, Int)]]
 
       // Add a time
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -768,18 +732,17 @@ class ScaldingLaws extends WordSpec {
       val jobID: JobId = new JobId("scalding.job.testJobId")
       val summer = TestGraphs.jobWithStats[Scalding, (Long, Int), Int, Int](
           jobID, source, testStore)(t => fn(t._2))
-      val scald = Scalding("scalaCheckJob").withConfigUpdater { sbconf =>
+      val scald = Scalding("scalaCheckJob").withConfigUpdater  sbconf =>
         sbconf.+("scalding.job.uniqueId", jobID.get)
-      }
       val ws = new LoopState(intr)
       val conf: Configuration = new Configuration()
       val mode: Mode =
         HadoopTest(conf, t => (testStore.sourceToBuffer ++ buffer).get(t))
 
       var flow: Flow[_] = null
-      scald.run(ws, mode, scald.plan(summer), { f: Flow[_] =>
+      scald.run(ws, mode, scald.plan(summer),  f: Flow[_] =>
         flow = f
-      })
+      )
 
       val flowStats: FlowStats = flow.getFlowStats()
       val origCounter: Long =
@@ -792,11 +755,7 @@ class ScaldingLaws extends WordSpec {
       assert(origCounter == original.size)
       assert(fmCounter == original.flatMap(fn).size * 2)
       assert(fltrCounter == original.flatMap(fn).size)
-    }
 
-    "contain and be able to init a ScaldingRuntimeStatsProvider object" in {
+    "contain and be able to init a ScaldingRuntimeStatsProvider object" in
       val s = SummingbirdRuntimeStats.SCALDING_STATS_MODULE
       assert(ScalaTry[Unit] { Class.forName(s) }.toOption.isDefined)
-    }
-  }
-}

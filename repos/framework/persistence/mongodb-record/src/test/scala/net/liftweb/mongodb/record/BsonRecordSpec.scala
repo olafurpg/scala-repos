@@ -20,17 +20,16 @@ package record
 
 import org.specs2.mutable.Specification
 
-class BsonRecordSpec extends Specification with MongoTestKit {
+class BsonRecordSpec extends Specification with MongoTestKit
   "BsonRecordSpec Specification".title
   import fixtures._
 
-  override def before = {
+  override def before =
     super.before
     checkMongoIsRunning
-  }
 
-  "BsonRecord" should {
-    "compare properly with set values" in {
+  "BsonRecord" should
+    "compare properly with set values" in
 
       val subRec = SubSubRecord.createRecord.name("subrecord")
       val subRec2 = SubSubRecord.createRecord.name("subrecord")
@@ -40,13 +39,9 @@ class BsonRecordSpec extends Specification with MongoTestKit {
       subRec2.name("subrecord2")
 
       (subRec == subRec2) must_== false
-    }
 
-    "compare properly with default values" in {
+    "compare properly with default values" in
       val subRec = SubSubRecord.createRecord
       val subRec2 = SubSubRecord.createRecord
 
       (subRec == subRec2) must_== true
-    }
-  }
-}

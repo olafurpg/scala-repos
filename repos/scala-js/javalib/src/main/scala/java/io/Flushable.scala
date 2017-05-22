@@ -1,5 +1,4 @@
 package java.io
 
-trait Flushable {
+trait Flushable
   def flush(): Unit
-}

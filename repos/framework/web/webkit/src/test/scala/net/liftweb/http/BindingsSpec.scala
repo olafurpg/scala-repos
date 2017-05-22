@@ -27,7 +27,7 @@ import util.Helpers._
 /**
   * System under specification for Bindings.
   */
-object BindingsSpec extends Specification with XmlMatchers {
+object BindingsSpec extends Specification with XmlMatchers
   "Bindings Bindings".title
 
   case class MyClass(str: String, i: Int, other: MyOtherClass)
@@ -80,25 +80,22 @@ object BindingsSpec extends Specification with XmlMatchers {
   }
    */
 
-  "SHtml" should {
-    "deal with # in link" in {
+  "SHtml" should
+    "deal with # in link" in
       val session = new LiftSession("hello", "", Empty)
 
-      val href = S.initIfUninitted(session) {
+      val href = S.initIfUninitted(session)
         val a = SHtml.link("/foo#bar", () => true, Text("Test"))
 
         (a \ "@href").text
-      }
 
       href.endsWith("#bar") must_== true
-    }
-  }
 
-  "CSS Selector Transforms" should {
-    "retain attributes for input" in {
+  "CSS Selector Transforms" should
+    "retain attributes for input" in
       val session = new LiftSession("hello", "", Empty)
 
-      S.initIfUninitted(session) {
+      S.initIfUninitted(session)
         val org = <span><input id="frog" class="dog cat"/></span>
 
         val res = ("#frog" #> SHtml.text("", s => ())).apply(org)
@@ -106,7 +103,3 @@ object BindingsSpec extends Specification with XmlMatchers {
         (res \ "input" \ "@id").text must_== "frog"
 
         (res \ "input" \ "@class").text must_== "dog cat"
-      }
-    }
-  }
-}

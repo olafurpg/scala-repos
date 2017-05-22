@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScTypeParam
   * User: Alexander Podkhalyuzin
   * Date: 17.06.2009
   */
-trait ScTypeParamStub extends NamedStub[ScTypeParam] {
+trait ScTypeParamStub extends NamedStub[ScTypeParam]
   def getUpperText: String
   def getLowerText: String
   def getViewText: Seq[String]
@@ -25,4 +25,3 @@ trait ScTypeParamStub extends NamedStub[ScTypeParam] {
   def getPositionInFile: Int
   def getContainingFileName: String
   def typeParameterText: String
-}

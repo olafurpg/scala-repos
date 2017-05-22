@@ -23,21 +23,20 @@ import scala.concurrent.{Await, Future}
 
 class GroupManagerTest
     extends MarathonActorSupport with MockitoSugar with Matchers
-    with MarathonSpec {
+    with MarathonSpec
 
   val actorId = new AtomicInteger(0)
 
-  class Fixture {
+  class Fixture
     lazy val scheduler = mock[MarathonSchedulerService]
     lazy val appRepo = mock[AppRepository]
     lazy val groupRepo = mock[GroupRepository]
     lazy val eventBus = mock[EventStream]
     lazy val provider = mock[StorageProvider]
-    lazy val config = {
+    lazy val config =
       val conf = new ScallopConf(Seq("--master", "foo")) with MarathonConf
       conf.afterInit()
       conf
-    }
 
     lazy val metricRegistry = new MetricRegistry()
     lazy val metrics = new Metrics(metricRegistry)
@@ -60,9 +59,8 @@ class GroupManagerTest
         storage = provider,
         config = config,
         eventBus = eventBus)
-  }
 
-  test("Assign dynamic app ports") {
+  test("Assign dynamic app ports")
     val group =
       Group(PathId.empty,
             Set(
@@ -77,9 +75,8 @@ class GroupManagerTest
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
     update.transitiveApps.flatMap(
         _.portNumbers.filter(x => x >= 10 && x <= 20)) should have size 5
-  }
 
-  test("Assign dynamic service ports specified in the container") {
+  test("Assign dynamic service ports specified in the container")
     import Container.Docker
     import Docker.PortMapping
     import org.apache.mesos.Protos.ContainerInfo.DockerInfo.Network
@@ -116,10 +113,9 @@ class GroupManagerTest
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
     update.transitiveApps.flatMap(
         _.portNumbers.filter(x => x >= 10 && x <= 20)) should have size 2
-  }
 
   //regression for #2743
-  test("Reassign dynamic service ports specified in the container") {
+  test("Reassign dynamic service ports specified in the container")
     val from =
       Group(PathId.empty,
             Set(AppDefinition("/app1".toPath,
@@ -131,11 +127,10 @@ class GroupManagerTest
     val update = manager(minServicePort = 10, maxServicePort = 20)
       .assignDynamicServicePorts(from, to)
     update.app("/app1".toPath).get.portNumbers should be(Seq(10, 12, 11))
-  }
 
   // Regression test for #1365
   test(
-      "Export non-dynamic service ports specified in the container to the ports field") {
+      "Export non-dynamic service ports specified in the container to the ports field")
     import Container.Docker
     import Docker.PortMapping
     import org.apache.mesos.Protos.ContainerInfo.DockerInfo.Network
@@ -165,9 +160,8 @@ class GroupManagerTest
       .assignDynamicServicePorts(Group.empty, group)
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
     update.transitiveApps.flatMap(_.portNumbers) should equal(Set(80, 81))
-  }
 
-  test("Already taken ports will not be used") {
+  test("Already taken ports will not be used")
     val group =
       Group(PathId.empty,
             Set(
@@ -180,10 +174,9 @@ class GroupManagerTest
     update.transitiveApps.filter(_.hasDynamicPort) should be('empty)
     update.transitiveApps.flatMap(
         _.portNumbers.filter(x => x >= 10 && x <= 20)) should have size 5
-  }
 
   // Regression test for #2868
-  test("Don't assign duplicated service ports") {
+  test("Don't assign duplicated service ports")
     val group =
       Group(PathId.empty,
             Set(
@@ -194,10 +187,9 @@ class GroupManagerTest
 
     val assignedPorts: Set[Int] = update.transitiveApps.flatMap(_.portNumbers)
     assignedPorts should have size 2
-  }
 
   test(
-      "Assign unique service ports also when adding a dynamic service port to an app") {
+      "Assign unique service ports also when adding a dynamic service port to an app")
     val originalGroup =
       Group(PathId.empty,
             Set(
@@ -216,9 +208,8 @@ class GroupManagerTest
 
     val assignedPorts: Set[Int] = result.transitiveApps.flatMap(_.portNumbers)
     assignedPorts should have size 3
-  }
 
-  test("If there are not enough ports, a PortExhausted exception is thrown") {
+  test("If there are not enough ports, a PortExhausted exception is thrown")
     val group =
       Group(PathId.empty,
             Set(
@@ -227,14 +218,12 @@ class GroupManagerTest
                 AppDefinition("/app2".toPath,
                               portDefinitions = PortDefinitions(0, 0, 0))
             ))
-    val ex = intercept[PortRangeExhaustedException] {
+    val ex = intercept[PortRangeExhaustedException]
       manager(10, 15).assignDynamicServicePorts(Group.empty, group)
-    }
     ex.minPort should be(10)
     ex.maxPort should be(15)
-  }
 
-  test("Retain the original container definition if port mappings are missing") {
+  test("Retain the original container definition if port mappings are missing")
     import Container.Docker
 
     val container = Container(
@@ -255,9 +244,8 @@ class GroupManagerTest
     result.apps.size should be(1)
     val app = result.apps.head
     app.container should be(Some(container))
-  }
 
-  test("Don't store invalid groups") {
+  test("Don't store invalid groups")
     val f = new Fixture
 
     val group = Group(PathId.empty,
@@ -268,14 +256,13 @@ class GroupManagerTest
     when(f.groupRepo.group(GroupRepository.zkRootName))
       .thenReturn(Future.successful(None))
 
-    intercept[ValidationFailedException] {
+    intercept[ValidationFailedException]
       Await.result(f.manager.update(group.id, _ => group), 3.seconds)
-    }.printStackTrace()
+    .printStackTrace()
 
     verify(f.groupRepo, times(0)).store(any(), any())
-  }
 
-  test("Store new apps with correct version infos in groupRepo and appRepo") {
+  test("Store new apps with correct version infos in groupRepo and appRepo")
     val f = new Fixture
 
     val app: AppDefinition = AppDefinition(
@@ -300,9 +287,8 @@ class GroupManagerTest
 
     verify(f.groupRepo).store(GroupRepository.zkRootName, groupWithVersionInfo)
     verify(f.appRepo).store(appWithVersionInfo)
-  }
 
-  test("Expunge removed apps from appRepo") {
+  test("Expunge removed apps from appRepo")
     val f = new Fixture
 
     val app: AppDefinition = AppDefinition(
@@ -323,10 +309,9 @@ class GroupManagerTest
 
     verify(f.groupRepo).store(GroupRepository.zkRootName, groupEmpty)
     verify(f.appRepo).expunge(app.id)
-  }
 
-  def manager(minServicePort: Int, maxServicePort: Int) = {
-    val f = new Fixture {
+  def manager(minServicePort: Int, maxServicePort: Int) =
+    val f = new Fixture
       override lazy val config = new ScallopConf(
           Seq("--master",
               "foo",
@@ -334,9 +319,6 @@ class GroupManagerTest
               minServicePort.toString,
               "--local_port_max",
               maxServicePort.toString)) with MarathonConf
-    }
 
     f.config.afterInit()
     f.manager
-  }
-}

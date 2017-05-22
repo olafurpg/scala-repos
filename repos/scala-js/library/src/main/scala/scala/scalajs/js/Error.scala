@@ -14,7 +14,7 @@
 package scala.scalajs.js
 
 @native
-class Error(message0: String = "") extends Object {
+class Error(message0: String = "") extends Object
   val name: String = native
 
   /**
@@ -23,12 +23,10 @@ class Error(message0: String = "") extends Object {
     * MDN
     */
   val message: String = native
-}
 
 @native
-object Error extends Object {
+object Error extends Object
   def apply(message: String = ""): Error = native
-}
 
 /**
   * An instance representing an error that occurs regarding the global function
@@ -40,9 +38,8 @@ object Error extends Object {
 class EvalError(message: String = "") extends Error
 
 @native
-object EvalError extends Object {
+object EvalError extends Object
   def apply(message: String = ""): EvalError = native
-}
 
 /**
   * An instance representing an error that occurs when a numeric variable or
@@ -60,9 +57,8 @@ object EvalError extends Object {
 class RangeError(message: String = "") extends Error
 
 @native
-object RangeError extends Object {
+object RangeError extends Object
   def apply(message: String = ""): RangeError = native
-}
 
 /**
   * Represents an error when a non-existent variable is referenced.
@@ -76,9 +72,8 @@ object RangeError extends Object {
 class ReferenceError(message: String = "") extends Error
 
 @native
-object ReferenceError extends Object {
+object ReferenceError extends Object
   def apply(message: String = ""): ReferenceError = native
-}
 
 /**
   * Represents an error when trying to interpret syntactically invalid code.
@@ -92,9 +87,8 @@ object ReferenceError extends Object {
 class SyntaxError(message: String = "") extends Error
 
 @native
-object SyntaxError extends Object {
+object SyntaxError extends Object
   def apply(message: String = ""): SyntaxError = native
-}
 
 /**
   * Represents an error when a value is not of the expected type.
@@ -108,9 +102,8 @@ object SyntaxError extends Object {
 class TypeError(message: String = "") extends Error
 
 @native
-object TypeError extends Object {
+object TypeError extends Object
   def apply(message: String = ""): TypeError = native
-}
 
 /**
   * Represents an error when a malformed URI is encountered.
@@ -123,6 +116,5 @@ object TypeError extends Object {
 class URIError(message: String = "") extends Error
 
 @native
-object URIError extends Object {
+object URIError extends Object
   def apply(message: String = ""): URIError = native
-}

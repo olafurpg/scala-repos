@@ -22,7 +22,7 @@ import scala.language.higherKinds
   *  @tparam CC   the type constructor representing the collection class
   *  @since 2.8
   */
-trait GenericParCompanion[+CC[X] <: ParIterable[X]] {
+trait GenericParCompanion[+CC[X] <: ParIterable[X]]
 
   /** The default builder for $Coll objects.
     */
@@ -31,8 +31,6 @@ trait GenericParCompanion[+CC[X] <: ParIterable[X]] {
   /** The parallel builder for $Coll objects.
     */
   def newCombiner[A]: Combiner[A, CC[A]]
-}
 
-trait GenericParMapCompanion[+CC[P, Q] <: ParMap[P, Q]] {
+trait GenericParMapCompanion[+CC[P, Q] <: ParMap[P, Q]]
   def newCombiner[P, Q]: Combiner[(P, Q), CC[P, Q]]
-}

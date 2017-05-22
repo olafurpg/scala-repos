@@ -13,7 +13,7 @@ case class FriendConfig(variant: chess.variant.Variant,
                         mode: Mode,
                         color: Color,
                         fen: Option[String] = None)
-    extends HumanConfig with Positional {
+    extends HumanConfig with Positional
 
   val strictFen = false
 
@@ -29,9 +29,8 @@ case class FriendConfig(variant: chess.variant.Variant,
 
   def isPersistent =
     timeMode == TimeMode.Unlimited || timeMode == TimeMode.Correspondence
-}
 
-object FriendConfig extends BaseHumanConfig {
+object FriendConfig extends BaseHumanConfig
 
   def <<(v: Int,
          tm: Int,
@@ -63,7 +62,7 @@ object FriendConfig extends BaseHumanConfig {
   import lila.db.BSON
 
   private[setup] implicit val friendConfigBSONHandler =
-    new BSON[FriendConfig] {
+    new BSON[FriendConfig]
 
       def reads(r: BSON.Reader): FriendConfig =
         FriendConfig(variant = chess.variant.Variant orDefault (r int "v"),
@@ -83,5 +82,3 @@ object FriendConfig extends BaseHumanConfig {
                      "d" -> o.days,
                      "m" -> o.mode.id,
                      "f" -> o.fen)
-    }
-}

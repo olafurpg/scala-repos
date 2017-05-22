@@ -42,10 +42,8 @@ class TextFieldSpec
     extends SimpleSFXDelegateSpec[jfxsc.TextField, TextField](
         classOf[jfxsc.TextField], classOf[TextField])
     with AlignmentDelegateSpec[jfxsc.TextField, TextField]
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
-  it should "have a Property class that exposes all the JavaFX properties" in {
+  it should "have a Property class that exposes all the JavaFX properties" in
     comparePropertiesInProxy(
         classOf[jfxsc.TextField], classOf[TextFieldProperty])
-  }
-}

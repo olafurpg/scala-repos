@@ -8,7 +8,7 @@ import breeze.math.Complex
   * @author ktakagaki
   * @date 03/20/2014.
   */
-object JavaArrayOps {
+object JavaArrayOps
 
   def dvCToArray(data: DenseVector[Complex]): Array[Complex] = data.toArray
   def dvDToArray(data: DenseVector[Double]): Array[Double] = data.toArray
@@ -50,21 +50,18 @@ object JavaArrayOps {
       dv: DenseVector[V]): Array[V] = dv.toArray
 
   def dmToArray2[@specialized(Int, Double, Long, Float) V : ClassTag](
-      dm: DenseMatrix[V]): Array[Array[V]] = {
+      dm: DenseMatrix[V]): Array[Array[V]] =
     val ret = new Array[Array[V]](dm.rows)
     var rowI = 0
-    while (rowI < dm.rows) {
+    while (rowI < dm.rows)
       ret(rowI) = new Array[V](dm.cols)
       var colI = 0
-      while (colI < dm.cols) {
+      while (colI < dm.cols)
         ret(rowI)(colI) = dm(rowI, colI)
         colI += 1
-      }
       //ret(i) = dm( i, :: ).toArray //How else to circumvent Transpose[] wrapper?
       rowI += 1
-    }
     ret
-  }
 
   def arrayToDv[@specialized(Int, Double, Long, Float) V : ClassTag](
       array: Array[V]): DenseVector[V] = new DenseVector(array)
@@ -76,7 +73,7 @@ object JavaArrayOps {
     * @return
     */
   def array2ToDm[@specialized(Int, Double, Long, Float) V : ClassTag](
-      values: Array[Array[V]]): DenseMatrix[V] = {
+      values: Array[Array[V]]): DenseMatrix[V] =
 
     val tempRows = values.length
     val tempCols = values(0).length
@@ -84,25 +81,20 @@ object JavaArrayOps {
 
     var rowIndex = 0
     var tempretIndex = 0
-    while (rowIndex < tempRows) {
+    while (rowIndex < tempRows)
       //raggedness check
       require(values(rowIndex).length == tempCols,
               "Input Array[Array[V]] is ragged!")
       rowIndex += 1
-    }
 
     var colIndex = 0
-    while (colIndex < tempCols) {
+    while (colIndex < tempCols)
       rowIndex = 0
-      while (rowIndex < tempRows) {
+      while (rowIndex < tempRows)
         tempret(tempretIndex) = values(rowIndex)(colIndex)
         tempretIndex += 1
         rowIndex += 1
-      }
       colIndex += 1
-    }
     new DenseMatrix(tempRows, tempCols, tempret)
-  }
 
   // </editor-fold>
-}

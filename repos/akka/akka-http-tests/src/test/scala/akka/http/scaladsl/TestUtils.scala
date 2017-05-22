@@ -8,29 +8,25 @@ import java.io.{FileOutputStream, File}
 import java.net.InetSocketAddress
 import java.nio.channels.ServerSocketChannel
 
-object TestUtils {
-  def writeAllText(text: String, file: File): Unit = {
+object TestUtils
+  def writeAllText(text: String, file: File): Unit =
     val fos = new FileOutputStream(file)
-    try {
+    try
       fos.write(text.getBytes("UTF-8"))
-    } finally fos.close()
-  }
+    finally fos.close()
 
   // TODO duplicated code from akka-http-core-tests
   def temporaryServerAddress(
-      interface: String = "127.0.0.1"): InetSocketAddress = {
+      interface: String = "127.0.0.1"): InetSocketAddress =
     val serverSocket = ServerSocketChannel.open()
-    try {
+    try
       serverSocket.socket.bind(new InetSocketAddress(interface, 0))
       val port = serverSocket.socket.getLocalPort
       new InetSocketAddress(interface, port)
-    } finally serverSocket.close()
-  }
+    finally serverSocket.close()
 
   // TODO duplicated code from akka-http-core-tests
   def temporaryServerHostnameAndPort(
-      interface: String = "127.0.0.1"): (InetSocketAddress, String, Int) = {
+      interface: String = "127.0.0.1"): (InetSocketAddress, String, Int) =
     val socketAddress = temporaryServerAddress(interface)
     (socketAddress, socketAddress.getHostName, socketAddress.getPort)
-  }
-}

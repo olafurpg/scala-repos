@@ -29,7 +29,7 @@ import org.apache.spark.sql.internal.SQLConf
 /**
   * Runs the test cases that are included in the hive distribution.
   */
-class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
+class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter
   // TODO: bundle in jar files... get from classpath
   private lazy val hiveQueryDir = TestHive.getHiveFile(
       "ql/src/test/queries/clientpositive".split("/").mkString(File.separator))
@@ -40,11 +40,10 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
   private val originalInMemoryPartitionPruning =
     TestHive.conf.inMemoryPartitionPruning
 
-  def testCases: Seq[(String, File)] = {
+  def testCases: Seq[(String, File)] =
     hiveQueryDir.listFiles.map(f => f.getName.stripSuffix(".q") -> f)
-  }
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     TestHive.cacheTables = true
     // Timezone is fixed to America/Los_Angeles for those timezone sensitive tests (timestamp_*)
@@ -58,9 +57,8 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
     // Use Hive hash expression instead of the native one
     TestHive.sessionState.functionRegistry.unregisterFunction("hash")
     RuleExecutor.resetTime()
-  }
 
-  override def afterAll() {
+  override def afterAll()
     TestHive.cacheTables = false
     TimeZone.setDefault(originalTimeZone)
     Locale.setDefault(originalLocale)
@@ -72,7 +70,6 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
     // For debugging dump some statistics about how much time was spent in various optimizer rules.
     logWarning(RuleExecutor.dumpTimeSpent())
     super.afterAll()
-  }
 
   /** A list of tests deemed out of scope currently and thus completely disregarded. */
   override def blackList: Seq[String] = Seq(
@@ -1020,4 +1017,3 @@ class HiveCompatibilitySuite extends HiveQueryFileTest with BeforeAndAfter {
       "view_cast",
       "view_inputs"
   )
-}

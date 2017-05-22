@@ -8,19 +8,19 @@ import lila.game.{Game, GameRepo}
 import lila.user.{User, UserRepo}
 import lila.quote.Quote.quoteWriter
 
-final class JsonView(getLightUser: String => Option[LightUser]) {
+final class JsonView(getLightUser: String => Option[LightUser])
 
   def apply(simul: Simul): Fu[JsObject] =
-    GameRepo.games(simul.gameIds) map { games =>
+    GameRepo.games(simul.gameIds) map  games =>
       val lightHost = getLightUser(simul.hostId)
       Json.obj("id" -> simul.id,
-               "host" -> lightHost.map { host =>
+               "host" -> lightHost.map  host =>
                  Json.obj("id" -> host.id,
                           "username" -> host.name,
                           "title" -> host.title,
                           "rating" -> simul.hostRating,
                           "gameId" -> simul.hostGameId)
-               },
+               ,
                "name" -> simul.name,
                "fullName" -> simul.fullName,
                "variants" -> simul.variants
@@ -35,7 +35,6 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
                "isRunning" -> simul.isRunning,
                "isFinished" -> simul.isFinished,
                "quote" -> lila.quote.Quote.one(simul.id))
-    }
 
   private def variantJson(speed: chess.Speed)(v: chess.variant.Variant) =
     Json.obj("key" -> v.key,
@@ -44,7 +43,7 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
                .map(_.iconChar.toString),
              "name" -> v.name)
 
-  private def playerJson(player: SimulPlayer) = {
+  private def playerJson(player: SimulPlayer) =
     val light = getLightUser(player.user)
     Json
       .obj(
@@ -56,7 +55,6 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
           "provisional" -> player.provisional.filter(identity)
       )
       .noNull
-  }
 
   private def applicantJson(app: SimulApplicant) =
     Json.obj("player" -> playerJson(app.player), "accepted" -> app.accepted)
@@ -77,7 +75,5 @@ final class JsonView(getLightUser: String => Option[LightUser]) {
         "game" -> games.find(_.id == p.gameId).map(gameJson(hostId))
     )
 
-  private implicit val colorWriter: Writes[chess.Color] = Writes { c =>
+  private implicit val colorWriter: Writes[chess.Color] = Writes  c =>
     JsString(c.name)
-  }
-}

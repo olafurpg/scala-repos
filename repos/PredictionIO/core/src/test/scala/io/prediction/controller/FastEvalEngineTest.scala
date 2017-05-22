@@ -8,10 +8,10 @@ import org.scalatest.Inspectors._
 
 import io.prediction.workflow.SharedSparkContext
 
-class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
+class FastEngineSuite extends FunSuite with Inside with SharedSparkContext
   import io.prediction.controller.Engine0._
 
-  test("Single Evaluation") {
+  test("Single Evaluation")
     val engine = new FastEvalEngine(Map("" -> classOf[PDataSource2]),
                                     Map("" -> classOf[PPreparator1]),
                                     Map(
@@ -43,8 +43,8 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
 
     evalDataSet should have size en
 
-    forAll(evalDataSet.zipWithIndex) {
-      case (evalData, ex) => {
+    forAll(evalDataSet.zipWithIndex)
+      case (evalData, ex) =>
           val (evalInfo, qpaRDD) = evalData
           evalInfo shouldBe EvalInfo(0)
 
@@ -52,7 +52,7 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
 
           qpaSeq should have size qn
 
-          forAll(qpaSeq) {
+          forAll(qpaSeq)
             case (q, p, a) =>
               val Query(qId, qEx, qQx, _) = q
               val Actual(aId, aEx, aQx) = a
@@ -61,8 +61,8 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
               aEx shouldBe ex
               qQx shouldBe aQx
 
-              inside(p) {
-                case Prediction(pId, pQ, pModels, pPs) => {
+              inside(p)
+                case Prediction(pId, pQ, pModels, pPs) =>
                     pId shouldBe 3
                     pQ shouldBe q
                     pModels shouldBe None
@@ -72,14 +72,8 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
                         Prediction(id = 21, q = q, models = Some(model1)),
                         Prediction(id = 22, q = q, models = Some(model2))
                     )
-                  }
-              }
-          }
-        }
-    }
-  }
 
-  test("Batch Evaluation") {
+  test("Batch Evaluation")
     val engine = new FastEvalEngine(Map("" -> classOf[PDataSource2]),
                                     Map("" -> classOf[PPreparator1]),
                                     Map("" -> classOf[PAlgo2]),
@@ -114,25 +108,20 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     // evalDataSet0._1 should be theSameInstanceAs evalDataSet1._1
     // When things are cached correctly, evalDataSet0 and 1 should share the
     // same EI
-    evalDataSet0.zip(evalDataSet1).foreach {
-      case (e0, e1) => {
+    evalDataSet0.zip(evalDataSet1).foreach
+      case (e0, e1) =>
           e0._1 should be theSameInstanceAs e1._1
           e0._2 should be theSameInstanceAs e1._2
-        }
-    }
 
     // So as set1 and set2, however, the QPA-RDD should be different.
-    evalDataSet1.zip(evalDataSet2).foreach {
-      case (e1, e2) => {
+    evalDataSet1.zip(evalDataSet2).foreach
+      case (e1, e2) =>
           e1._1 should be theSameInstanceAs e2._1
           val e1Qpa = e1._2
           val e2Qpa = e2._2
           e1Qpa should not be theSameInstanceAs(e2Qpa)
-        }
-    }
-  }
 
-  test("Not cached when isEqual not implemented") {
+  test("Not cached when isEqual not implemented")
     // PDataSource3.Params is a class not case class. Need to implement the
     // isEqual function for hashing.
     val engine = new FastEvalEngine(Map("" -> classOf[PDataSource4]),
@@ -170,18 +159,12 @@ class FastEngineSuite extends FunSuite with Inside with SharedSparkContext {
     evalDataSet1 should not be evalDataSet2
 
     // Set0 should have same EI as Set1, since their dsp are the same instance.
-    evalDataSet0.zip(evalDataSet1).foreach {
-      case (e0, e1) => {
+    evalDataSet0.zip(evalDataSet1).foreach
+      case (e0, e1) =>
           e0._1 should be theSameInstanceAs (e1._1)
-        }
-    }
 
     // Set1 should have different EI as Set2, since Set2's dsp is another
     // instance
-    evalDataSet1.zip(evalDataSet2).foreach {
-      case (e1, e2) => {
+    evalDataSet1.zip(evalDataSet2).foreach
+      case (e1, e2) =>
           e1._1 should not be theSameInstanceAs(e2._1)
-        }
-    }
-  }
-}

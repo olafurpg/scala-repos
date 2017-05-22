@@ -25,9 +25,9 @@ import org.apache.spark.mllib.evaluation.BinaryClassificationMetrics
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object SVMWithSGDExample {
+object SVMWithSGDExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("SVMWithSGDExample")
     val sc = new SparkContext(conf)
 
@@ -48,10 +48,9 @@ object SVMWithSGDExample {
     model.clearThreshold()
 
     // Compute raw scores on the test set.
-    val scoreAndLabels = test.map { point =>
+    val scoreAndLabels = test.map  point =>
       val score = model.predict(point.features)
       (score, point.label)
-    }
 
     // Get evaluation metrics.
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
@@ -65,6 +64,4 @@ object SVMWithSGDExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

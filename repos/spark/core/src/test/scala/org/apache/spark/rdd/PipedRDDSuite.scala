@@ -31,10 +31,10 @@ import org.apache.hadoop.mapred.{FileSplit, JobConf, TextInputFormat}
 import org.apache.spark._
 import org.apache.spark.util.Utils
 
-class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
+class PipedRDDSuite extends SparkFunSuite with SharedSparkContext
 
-  test("basic pipe") {
-    if (testCommandAvailable("cat")) {
+  test("basic pipe")
+    if (testCommandAvailable("cat"))
       val nums = sc.makeRDD(Array(1, 2, 3, 4), 2)
 
       val piped = nums.pipe(Seq("cat"))
@@ -45,45 +45,36 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
       assert(c(1) === "2")
       assert(c(2) === "3")
       assert(c(3) === "4")
-    } else {
+    else
       assert(true)
-    }
-  }
 
-  test("failure in iterating over pipe input") {
-    if (testCommandAvailable("cat")) {
+  test("failure in iterating over pipe input")
+    if (testCommandAvailable("cat"))
       val nums = sc
         .makeRDD(Array(1, 2, 3, 4), 2)
         .mapPartitionsWithIndex(
             (index, iterator) =>
-              {
-            new Iterator[Int] {
+            new Iterator[Int]
               def hasNext = true
-              def next() = {
+              def next() =
                 throw new SparkException("Exception to simulate bad scenario")
-              }
-            }
-        })
+        )
 
       val piped = nums.pipe(Seq("cat"))
 
-      intercept[SparkException] {
+      intercept[SparkException]
         piped.collect()
-      }
-    }
-  }
 
-  test("advanced pipe") {
-    if (testCommandAvailable("cat")) {
+  test("advanced pipe")
+    if (testCommandAvailable("cat"))
       val nums = sc.makeRDD(Array(1, 2, 3, 4), 2)
       val bl = sc.broadcast(List("0"))
 
       val piped = nums.pipe(Seq("cat"),
                             Map[String, String](),
                             (f: String => Unit) =>
-                              {
                                 bl.value.map(f(_)); f("\u0001")
-                            },
+                            ,
                             (i: Int, f: String => Unit) => f(i + "_"))
 
       val c = piped.collect()
@@ -104,15 +95,12 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
         .pipe(Seq("cat"),
               Map[String, String](),
               (f: String => Unit) =>
-                {
                   bl.value.map(f(_)); f("\u0001")
-              },
+              ,
               (i: Tuple2[String, Iterable[String]], f: String => Unit) =>
-                {
-                  for (e <- i._2) {
+                  for (e <- i._2)
                     f(e + "_")
-                  }
-              })
+              )
         .collect()
       assert(d.size === 8)
       assert(d(0) === "0")
@@ -123,13 +111,11 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
       assert(d(5) === "\u0001")
       assert(d(6) === "a\t1_")
       assert(d(7) === "a\t3_")
-    } else {
+    else
       assert(true)
-    }
-  }
 
-  test("pipe with env variable") {
-    if (testCommandAvailable("printenv")) {
+  test("pipe with env variable")
+    if (testCommandAvailable("printenv"))
       val nums = sc.makeRDD(Array(1, 2, 3, 4), 2)
       val piped = nums.pipe(
           Seq("printenv", "MY_TEST_ENV"), Map("MY_TEST_ENV" -> "LALALA"))
@@ -137,25 +123,20 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
       assert(c.size === 2)
       assert(c(0) === "LALALA")
       assert(c(1) === "LALALA")
-    } else {
+    else
       assert(true)
-    }
-  }
 
-  test("pipe with non-zero exit status") {
-    if (testCommandAvailable("cat")) {
+  test("pipe with non-zero exit status")
+    if (testCommandAvailable("cat"))
       val nums = sc.makeRDD(Array(1, 2, 3, 4), 2)
       val piped = nums.pipe(Seq("cat nonexistent_file", "2>", "/dev/null"))
-      intercept[SparkException] {
+      intercept[SparkException]
         piped.collect()
-      }
-    } else {
+    else
       assert(true)
-    }
-  }
 
-  test("basic pipe with separate working directory") {
-    if (testCommandAvailable("cat")) {
+  test("basic pipe with separate working directory")
+    if (testCommandAvailable("cat"))
       val nums = sc.makeRDD(Array(1, 2, 3, 4), 2)
       val piped = nums.pipe(Seq("cat"), separateWorkingDir = true)
       val c = piped.collect()
@@ -172,58 +153,47 @@ class PipedRDDSuite extends SparkFunSuite with SharedSparkContext {
       assert(pipedLs.length > 0)
       // clean up top level tasks directory
       Utils.deleteRecursively(new File("tasks"))
-    } else {
+    else
       assert(true)
-    }
-  }
 
-  test("test pipe exports map_input_file") {
+  test("test pipe exports map_input_file")
     testExportInputFile("map_input_file")
-  }
 
-  test("test pipe exports mapreduce_map_input_file") {
+  test("test pipe exports mapreduce_map_input_file")
     testExportInputFile("mapreduce_map_input_file")
-  }
 
-  def testCommandAvailable(command: String): Boolean = {
+  def testCommandAvailable(command: String): Boolean =
     Try(Process(command) !!).isSuccess
-  }
 
-  def testExportInputFile(varName: String) {
-    if (testCommandAvailable("printenv")) {
+  def testExportInputFile(varName: String)
+    if (testCommandAvailable("printenv"))
       val nums = new HadoopRDD(sc,
                                new JobConf(),
                                classOf[TextInputFormat],
                                classOf[LongWritable],
                                classOf[Text],
-                               2) {
+                               2)
         override def getPartitions: Array[Partition] =
           Array(generateFakeHadoopPartition())
 
         override val getDependencies = List[Dependency[_]]()
 
-        override def compute(theSplit: Partition, context: TaskContext) = {
+        override def compute(theSplit: Partition, context: TaskContext) =
           new InterruptibleIterator[(LongWritable, Text)](
               context, Iterator((new LongWritable(1), new Text("b"))))
-        }
-      }
       val hadoopPart1 = generateFakeHadoopPartition()
       val pipedRdd = new PipedRDD(nums, "printenv " + varName)
       val tContext = TaskContext.empty()
       val rddIter = pipedRdd.compute(hadoopPart1, tContext)
       val arr = rddIter.toArray
       assert(arr(0) == "/some/path")
-    } else {
+    else
       // printenv isn't available so just pass the test
-    }
-  }
 
-  def generateFakeHadoopPartition(): HadoopPartition = {
+  def generateFakeHadoopPartition(): HadoopPartition =
     val split = new FileSplit(
         new Path("/some/path"),
         0,
         1,
         Array[String]("loc1", "loc2", "loc3", "loc4", "loc5"))
     new HadoopPartition(sc.newRddId(), 1, split)
-  }
-}

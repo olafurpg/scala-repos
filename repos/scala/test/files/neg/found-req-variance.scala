@@ -17,7 +17,7 @@ class MultiCov[+T <: A] extends Multi[T, B, C]
 class MultiInv[T] extends Multi[A, T, C]
 class MultiCon[-T >: C] extends Multi[A, B, T]
 
-object Test {
+object Test
   def f1 = Set[Inv[A]]() + new Inv[A]
   def f2 = Set[Inv[A]]() + new Inv[B]
   def f3 = Set[Inv[A]]() + new Inv[C]
@@ -37,10 +37,9 @@ object Test {
   def g7 = Set[Multi[A, B, C]]() + new MultiCon[A]
   def g8 = Set[Multi[A, B, C]]() + new MultiCon[B]
   def g9 = Set[Multi[A, B, C]]() + new MultiCon[C]
-}
 
-object Functions {
-  object Set1 {
+object Functions
+  object Set1
     def f[T, R](x: FF1[T, R]) = ()
     def h[T, R]: FF1[T, R] = sys.error("")
 
@@ -53,8 +52,7 @@ object Functions {
     def ff7 = f[B, B](h[A, C]) // suggest
     def ff8 = f[B, B](h[B, C]) // ok
     def ff9 = f[B, B](h[C, C]) // suggest
-  }
-  object Set2 {
+  object Set2
     def f[T, R](x: FF2[T, R]) = ()
     def h[T, R]: FF2[T, R] = sys.error("")
 
@@ -67,8 +65,6 @@ object Functions {
     def ff7 = f[B, B](h[A, C]) // suggest
     def ff8 = f[B, B](h[B, C]) // suggest
     def ff9 = f[B, B](h[C, C]) // fail
-  }
-}
 
 // TODO
 // object TypeAlias {
@@ -79,15 +75,14 @@ object Functions {
 //   def f2 = Set[LL[B]]() + LL[C](new C)
 // }
 
-object Javas {
+object Javas
   def f[T](x: java.util.List[T]) = ()
   def g[T](x: java.util.Comparator[T]) = ()
 
   def g1 = f[AnyRef](new java.util.ArrayList[String] {})
   def g2 = g[String](Ordering.fromLessThan[AnyRef](_.toString < _.toString))
-}
 
-object Misc {
+object Misc
   // original motivation
   class Data[A <: AnyVal]
   class MyData extends Data[Int] {}
@@ -95,13 +90,11 @@ object Misc {
 
   // from stackoverflow
   def foo(s: Set[CharSequence]): Unit = ()
-  def f4 = {
+  def f4 =
     val s: Set[String] = Set("Hello", "World");
     foo(s)
-  }
 
   class Trippy[+T1, T2, +T3]
   def g1 =
     Set[Trippy[AnyRef, AnyRef, AnyRef]]() + new Trippy[String, String, String]
   def g2 = Set[Map[String, String]]() + Map[AnyRef, String]()
-}

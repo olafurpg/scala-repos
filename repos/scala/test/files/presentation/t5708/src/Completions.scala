@@ -1,6 +1,6 @@
 package test
 
-object Compat {
+object Compat
   final val CONST_STRING = "constant"
   lazy val foo = 4
 
@@ -11,8 +11,6 @@ object Compat {
   private def privateM = ""
   private[test] def pkgPrivateM = ""
   protected def protectedValM = ""
-}
 
-class Foo {
+class Foo
   Compat. /*!*/ CONST_STRING // its 'accessible' flag is false
-}

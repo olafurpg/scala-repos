@@ -1,7 +1,6 @@
-object Test extends App {
-  class Result(_str: => String) {
+object Test extends App
+  class Result(_str: => String)
     lazy val str = _str
-  }
 
   def foo(str: => String)(i: Int) = new Result(str)
 
@@ -11,9 +10,7 @@ object Test extends App {
   val result = bar(foo(test))
   test = "bar"
 
-  if (result.str == null) {
+  if (result.str == null)
     println("Destroy ALL THE THINGS!!!")
-  } else {
+  else
     println("Stroke a kitten")
-  }
-}

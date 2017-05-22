@@ -6,12 +6,11 @@ sealed abstract class PerfType(val id: Perf.ID,
                                val key: Perf.Key,
                                val name: String,
                                val title: String,
-                               val iconChar: Char) {
+                               val iconChar: Char)
 
   def iconString = iconChar.toString
-}
 
-object PerfType {
+object PerfType
 
   case object Bullet
       extends PerfType(1,
@@ -133,12 +132,12 @@ object PerfType {
                                  RacingKings,
                                  Puzzle,
                                  Opening)
-  val byKey = all map { p =>
+  val byKey = all map  p =>
     (p.key, p)
-  } toMap
-  val byId = all map { p =>
+  toMap
+  val byId = all map  p =>
     (p.id, p)
-  } toMap
+  toMap
 
   val default = Standard
 
@@ -186,11 +185,11 @@ object PerfType {
 
   def isGame(pt: PerfType) = !nonGame.contains(pt)
 
-  val nonPuzzleIconByName = nonPuzzle.map { pt =>
+  val nonPuzzleIconByName = nonPuzzle.map  pt =>
     pt.name -> pt.iconString
-  } toMap
+  toMap
 
-  def variantOf(pt: PerfType): chess.variant.Variant = pt match {
+  def variantOf(pt: PerfType): chess.variant.Variant = pt match
     case Crazyhouse => chess.variant.Crazyhouse
     case Chess960 => chess.variant.Chess960
     case KingOfTheHill => chess.variant.KingOfTheHill
@@ -200,10 +199,9 @@ object PerfType {
     case Horde => chess.variant.Horde
     case RacingKings => chess.variant.RacingKings
     case _ => chess.variant.Standard
-  }
 
   def byVariant(variant: chess.variant.Variant): Option[PerfType] =
-    variant match {
+    variant match
       case chess.variant.Crazyhouse => Crazyhouse.some
       case chess.variant.Chess960 => Chess960.some
       case chess.variant.KingOfTheHill => KingOfTheHill.some
@@ -213,8 +211,6 @@ object PerfType {
       case chess.variant.Horde => Horde.some
       case chess.variant.RacingKings => RacingKings.some
       case _ => none
-    }
 
   def iconByVariant(variant: chess.variant.Variant): Char =
     byVariant(variant).fold('C')(_.iconChar)
-}

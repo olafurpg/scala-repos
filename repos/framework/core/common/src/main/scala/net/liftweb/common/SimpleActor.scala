@@ -21,7 +21,7 @@ package common
   * The simple definition of an actor.  Something that can be sent a message of
   * type `T`.
   */
-trait SimpleActor[-T] {
+trait SimpleActor[-T]
 
   /**
     * Send a message to the Actor
@@ -29,7 +29,6 @@ trait SimpleActor[-T] {
     * @param param the message to send
     */
   def !(param: T): Unit
-}
 
 /**
   * An Actor that can receive a message of any type.
@@ -40,7 +39,7 @@ trait SimplestActor extends SimpleActor[Any]
   * An Actor that can receive messsages of type `T` and return responses of type
   * `R`.
   */
-trait TypedActor[-T, +R] extends SimpleActor[T] {
+trait TypedActor[-T, +R] extends SimpleActor[T]
 
   /**
     * Compatible with Scala actors' `!?` method, sends the given `message` to
@@ -70,7 +69,6 @@ trait TypedActor[-T, +R] extends SimpleActor[T] {
     * `[[Empty]]` or `[[Failure]]`.
     */
   def !!(message: T, timeout: Long): Box[R]
-}
 
 /**
   * Generic Actor interface. Can receive any type of message.  Can return (via
@@ -88,10 +86,9 @@ trait SimplestGenericActor extends GenericActor[Any]
   * Interface for an actor that can internally forward received messages to other
   * actors.
   */
-trait ForwardableActor[From, To] { self: TypedActor[From, To] =>
+trait ForwardableActor[From, To]  self: TypedActor[From, To] =>
 
   protected def forwardMessageTo(
       msg: From, forwardTo: TypedActor[From, To]): Unit
 
   protected def reply(msg: To): Unit
-}

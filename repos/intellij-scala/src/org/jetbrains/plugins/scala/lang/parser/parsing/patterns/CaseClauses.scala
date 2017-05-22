@@ -14,15 +14,12 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *  CaseClauses ::= CaseClause {CaseClause}
  */
 
-object CaseClauses {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object CaseClauses
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val caseClausesMarker = builder.mark
-    if (!CaseClause.parse(builder)) {
+    if (!CaseClause.parse(builder))
       caseClausesMarker.drop()
       return false
-    }
     while (CaseClause parse builder) {}
     caseClausesMarker.done(ScalaElementTypes.CASE_CLAUSES)
     return true
-  }
-}

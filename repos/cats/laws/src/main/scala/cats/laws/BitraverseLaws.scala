@@ -1,7 +1,7 @@
 package cats
 package laws
 
-trait BitraverseLaws[F[_, _]] extends BifoldableLaws[F] with BifunctorLaws[F] {
+trait BitraverseLaws[F[_, _]] extends BifoldableLaws[F] with BifunctorLaws[F]
   implicit override def F: Bitraverse[F]
 
   def bitraverseIdentity[A, B](fab: F[A, B]): IsEq[F[A, B]] =
@@ -13,7 +13,7 @@ trait BitraverseLaws[F[_, _]] extends BifoldableLaws[F] with BifunctorLaws[F] {
       g: B => G[D],
       h: C => G[E],
       i: D => G[H]
-  )(implicit G: Applicative[G]): IsEq[G[G[F[E, H]]]] = {
+  )(implicit G: Applicative[G]): IsEq[G[G[F[E, H]]]] =
     val fg = F.bitraverse(fab)(f, g)
     val hi = G.map(fg)(f => F.bitraverse(f)(h, i))
 
@@ -26,10 +26,7 @@ trait BitraverseLaws[F[_, _]] extends BifoldableLaws[F] with BifunctorLaws[F] {
     )(GCompose)
 
     hi <-> c
-  }
-}
 
-object BitraverseLaws {
+object BitraverseLaws
   def apply[F[_, _]](implicit ev: Bitraverse[F]): BitraverseLaws[F] =
     new BitraverseLaws[F] { def F: Bitraverse[F] = ev }
-}

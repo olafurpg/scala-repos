@@ -14,7 +14,7 @@ import java.net.{InetAddress, InetSocketAddress, SocketAddress}
 trait ClientMonitorFactory extends (String => Monitor)
 trait ServerMonitorFactory extends ((String, SocketAddress) => Monitor)
 
-trait MonitorFactory extends ServerMonitorFactory with ClientMonitorFactory {
+trait MonitorFactory extends ServerMonitorFactory with ClientMonitorFactory
   def clientMonitor(serviceName: String): Monitor
   def serverMonitor(serviceName: String, address: SocketAddress): Monitor
 
@@ -22,19 +22,17 @@ trait MonitorFactory extends ServerMonitorFactory with ClientMonitorFactory {
 
   def apply(serviceName: String, address: SocketAddress): Monitor =
     serverMonitor(serviceName, address)
-}
 
-object NullMonitorFactory extends MonitorFactory {
+object NullMonitorFactory extends MonitorFactory
   def clientMonitor(serviceName: String) = NullMonitor
   def serverMonitor(serviceName: String, address: SocketAddress) = NullMonitor
-}
 
 /**
   * A collection of methods to construct a Monitor that logs to a ScribeHandler
   * specifically for the chickadee exception reporting service. These methods are not generic
   * enough for general use.
   */
-object Reporter {
+object Reporter
   private[Reporter] val scribeCategory = "chickadee"
 
   /**
@@ -44,9 +42,8 @@ object Reporter {
     * receive method is called does not report any endpoints.
     */
   def defaultReporter(
-      scribeHost: String, scribePort: Int, serviceName: String): Reporter = {
+      scribeHost: String, scribePort: Int, serviceName: String): Reporter =
     new Reporter(makeClient(scribeHost, scribePort), serviceName)
-  }
 
   /**
     * Create a default client reporter.
@@ -57,9 +54,8 @@ object Reporter {
     * It returns a String => Reporter, which conforms to ClientBuilder's monitor option.
     */
   @deprecated("Use reporterFactory instead")
-  def clientReporter(scribeHost: String, scribePort: Int): String => Monitor = {
+  def clientReporter(scribeHost: String, scribePort: Int): String => Monitor =
     monitorFactory(scribeHost, scribePort).clientMonitor
-  }
 
   /**
     * Create a default source (i.e. server) reporter.
@@ -72,16 +68,15 @@ object Reporter {
     */
   @deprecated("Use reporterFactory instead")
   def sourceReporter(scribeHost: String,
-                     scribePort: Int): (String, SocketAddress) => Monitor = {
+                     scribePort: Int): (String, SocketAddress) => Monitor =
     monitorFactory(scribeHost, scribePort).serverMonitor
-  }
 
   /**
     * Create a reporter factory that can produce either a client or server reporter based
     * on the signature.
     */
   def monitorFactory(scribeHost: String, scribePort: Int): MonitorFactory =
-    new MonitorFactory {
+    new MonitorFactory
       private[this] val scribeClient = makeClient(scribeHost, scribePort)
 
       def clientMonitor(serviceName: String): Reporter =
@@ -89,9 +84,8 @@ object Reporter {
       def serverMonitor(
           serviceName: String, address: SocketAddress): Reporter =
         new Reporter(scribeClient, serviceName).withSource(address)
-    }
 
-  private[exception] def makeClient(scribeHost: String, scribePort: Int) = {
+  private[exception] def makeClient(scribeHost: String, scribePort: Int) =
     val service = ClientBuilder() // these are from the zipkin tracer
       .name("exception_reporter")
       .hosts(new InetSocketAddress(scribeHost, scribePort))
@@ -106,8 +100,6 @@ object Reporter {
       .build()
 
     new Scribe$FinagleClient(service, Protocols.binaryFactory())
-  }
-}
 
 /**
   * An implementation of ExceptionReceiver custom to the chickadee reporting service.
@@ -126,7 +118,7 @@ sealed case class Reporter(client: Scribe[Future],
                            private val sourceAddress: Option[String] = Some(
                                  InetAddress.getLoopbackAddress.getHostName),
                            private val clientAddress: Option[String] = None)
-    extends Monitor {
+    extends Monitor
 
   private[this] val okCounter = statsReceiver.counter("report_exception_ok")
   private[this] val tryLaterCounter =
@@ -149,31 +141,27 @@ sealed case class Reporter(client: Scribe[Future],
     * interfaces.  We use the host name internaly.
     */
   def withSource(address: SocketAddress): Reporter =
-    address match {
+    address match
       case isa: InetSocketAddress =>
         copy(sourceAddress = Some(isa.getAddress.getHostName))
       case _ =>
         this // don't deal with non-InetSocketAddress types, but don't crash either
-    }
 
   /**
     * Create a default ServiceException and fold in the modifiers (i.e. to add a source/client
     * endpoint).
     */
-  def createEntry(e: Throwable): LogEntry = {
+  def createEntry(e: Throwable): LogEntry =
     var se = new ServiceException(
         serviceName, e, Time.now, Trace.id.traceId.toLong)
 
-    sourceAddress foreach { sa =>
+    sourceAddress foreach  sa =>
       se = se withSource sa
-    }
-    clientAddress foreach { ca =>
+    clientAddress foreach  ca =>
       se = se withClient ca
-    }
 
     LogEntry(
         Reporter.scribeCategory, GZIPStringEncoder.encodeString(se.toJson))
-  }
 
   /**
     * Log an exception to the specified scribe endpoint.
@@ -181,30 +169,25 @@ sealed case class Reporter(client: Scribe[Future],
     * See top level comment for this class for more details on performance
     * implications.
     */
-  def handle(t: Throwable): Boolean = {
-    client.log(createEntry(t) :: Nil) onSuccess {
+  def handle(t: Throwable): Boolean =
+    client.log(createEntry(t) :: Nil) onSuccess
       case ResultCode.Ok => okCounter.incr()
       case ResultCode.TryLater => tryLaterCounter.incr()
-    } onFailure {
+    onFailure
       case e => statsReceiver.counter("report_exception_" + e.toString).incr()
-    }
 
     false // did not actually handle
-  }
-}
 
 object host
     extends GlobalFlag[InetSocketAddress](
         new InetSocketAddress("localhost", 1463),
         "Host to scribe exception messages")
 
-class ExceptionReporter extends ReporterFactory {
+class ExceptionReporter extends ReporterFactory
   private[this] val client =
     Reporter.makeClient(host().getHostName, host().getPort)
 
-  def apply(name: String, addr: Option[SocketAddress]): Reporter = addr match {
+  def apply(name: String, addr: Option[SocketAddress]): Reporter = addr match
     case Some(a: InetSocketAddress) =>
       new Reporter(client, name).withClient(a.getAddress)
     case _ => new Reporter(client, name)
-  }
-}

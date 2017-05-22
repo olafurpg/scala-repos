@@ -25,30 +25,28 @@ import org.apache.spark.sql.execution.columnar._
 import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 import org.apache.spark.sql.types.AtomicType
 
-class DictionaryEncodingSuite extends SparkFunSuite {
+class DictionaryEncodingSuite extends SparkFunSuite
   testDictionaryEncoding(new IntColumnStats, INT)
   testDictionaryEncoding(new LongColumnStats, LONG)
   testDictionaryEncoding(new StringColumnStats, STRING)
 
   def testDictionaryEncoding[T <: AtomicType](
-      columnStats: ColumnStats, columnType: NativeColumnType[T]) {
+      columnStats: ColumnStats, columnType: NativeColumnType[T])
 
     val typeName = columnType.getClass.getSimpleName.stripSuffix("$")
 
-    def buildDictionary(buffer: ByteBuffer) = {
+    def buildDictionary(buffer: ByteBuffer) =
       (0 until buffer.getInt())
         .map(columnType.extract(buffer) -> _.toShort)
         .toMap
-    }
 
     def stableDistinct(seq: Seq[Int]): Seq[Int] =
-      if (seq.isEmpty) {
+      if (seq.isEmpty)
         Seq.empty
-      } else {
+      else
         seq.head +: seq.tail.filterNot(_ == seq.head)
-      }
 
-    def skeleton(uniqueValueCount: Int, inputSeq: Seq[Int]) {
+    def skeleton(uniqueValueCount: Int, inputSeq: Seq[Int])
       // -------------
       // Tests encoder
       // -------------
@@ -61,13 +59,11 @@ class DictionaryEncodingSuite extends SparkFunSuite {
 
       inputSeq.foreach(i => builder.appendFrom(rows(i), 0))
 
-      if (dictValues.length > DictionaryEncoding.MAX_DICT_SIZE) {
-        withClue("Dictionary overflowed, compression should fail") {
-          intercept[Throwable] {
+      if (dictValues.length > DictionaryEncoding.MAX_DICT_SIZE)
+        withClue("Dictionary overflowed, compression should fail")
+          intercept[Throwable]
             builder.build()
-          }
-        }
-      } else {
+      else
         val buffer = builder.build()
         val headerSize = CompressionScheme.columnHeaderSize(buffer)
         // 4 extra bytes for dictionary size
@@ -85,16 +81,13 @@ class DictionaryEncodingSuite extends SparkFunSuite {
 
         val dictionary = buildDictionary(buffer).toMap
 
-        dictValues.foreach { i =>
-          assertResult(i, "Wrong dictionary entry") {
+        dictValues.foreach  i =>
+          assertResult(i, "Wrong dictionary entry")
             dictionary(values(i))
-          }
-        }
 
-        inputSeq.foreach { i =>
+        inputSeq.foreach  i =>
           assertResult(i.toShort, "Wrong column element value")(
               buffer.getShort())
-        }
 
         // -------------
         // Tests decoder
@@ -106,31 +99,21 @@ class DictionaryEncodingSuite extends SparkFunSuite {
         val decoder = DictionaryEncoding.decoder(buffer, columnType)
         val mutableRow = new GenericMutableRow(1)
 
-        if (inputSeq.nonEmpty) {
-          inputSeq.foreach { i =>
+        if (inputSeq.nonEmpty)
+          inputSeq.foreach  i =>
             assert(decoder.hasNext)
-            assertResult(values(i), "Wrong decoded value") {
+            assertResult(values(i), "Wrong decoded value")
               decoder.next(mutableRow, 0)
               columnType.getField(mutableRow, 0)
-            }
-          }
-        }
 
         assert(!decoder.hasNext)
-      }
-    }
 
-    test(s"$DictionaryEncoding with $typeName: empty") {
+    test(s"$DictionaryEncoding with $typeName: empty")
       skeleton(0, Seq.empty)
-    }
 
-    test(s"$DictionaryEncoding with $typeName: simple case") {
+    test(s"$DictionaryEncoding with $typeName: simple case")
       skeleton(2, Seq(0, 1, 0, 1))
-    }
 
-    test(s"$DictionaryEncoding with $typeName: dictionary overflow") {
+    test(s"$DictionaryEncoding with $typeName: dictionary overflow")
       skeleton(DictionaryEncoding.MAX_DICT_SIZE + 1,
                0 to DictionaryEncoding.MAX_DICT_SIZE)
-    }
-  }
-}

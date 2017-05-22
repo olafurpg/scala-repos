@@ -27,7 +27,7 @@ import org.json4s.native.Serialization
 /** JDBC implementation of [[PEvents]] */
 class JDBCPEvents(
     client: String, config: StorageClientConfig, namespace: String)
-    extends PEvents {
+    extends PEvents
   @transient private implicit lazy val formats = org.json4s.DefaultFormats
   def find(appId: Int,
            channelId: Option[Int] = None,
@@ -38,7 +38,7 @@ class JDBCPEvents(
            eventNames: Option[Seq[String]] = None,
            targetEntityType: Option[Option[String]] = None,
            targetEntityId: Option[Option[String]] = None)(
-      sc: SparkContext): RDD[Event] = {
+      sc: SparkContext): RDD[Event] =
     val lower = startTime.map(_.getMillis).getOrElse(0.toLong)
 
     /** Change the default upper bound from +100 to +1 year because MySQL's
@@ -93,17 +93,15 @@ class JDBCPEvents(
     new JdbcRDD(
         sc,
         () =>
-          {
             DriverManager.getConnection(client,
                                         config.properties("USERNAME"),
                                         config.properties("PASSWORD"))
-        },
+        ,
         q,
         lower / 1000,
         upper / 1000,
         par,
         (r: ResultSet) =>
-          {
             Event(eventId = Option(r.getString("id")),
                   event = r.getString("event"),
                   entityType = r.getString("entityType"),
@@ -123,11 +121,10 @@ class JDBCPEvents(
                   creationTime = new DateTime(
                         r.getTimestamp("creationTime").getTime,
                         DateTimeZone.forID(r.getString("creationTimeZone"))))
-        }).cache()
-  }
+        ).cache()
 
   def write(events: RDD[Event], appId: Int, channelId: Option[Int])(
-      sc: SparkContext): Unit = {
+      sc: SparkContext): Unit =
     val sqlContext = new SQLContext(sc)
 
     import sqlContext.implicits._
@@ -148,7 +145,7 @@ class JDBCPEvents(
                                         "creationTime",
                                         "creationTimeZone")
 
-    val eventDF = events.map { event =>
+    val eventDF = events.map  event =>
       (event.eventId.getOrElse(JDBCUtils.generateId),
        event.event,
        event.entityType,
@@ -163,12 +160,10 @@ class JDBCPEvents(
        event.prId,
        new java.sql.Timestamp(event.creationTime.getMillis),
        event.creationTime.getZone.getID)
-    }.toDF(eventTableColumns: _*)
+    .toDF(eventTableColumns: _*)
 
     // spark version 1.4.0 or higher
     val prop = new java.util.Properties
     prop.setProperty("user", config.properties("USERNAME"))
     prop.setProperty("password", config.properties("PASSWORD"))
     eventDF.write.mode(SaveMode.Append).jdbc(client, tableName, prop)
-  }
-}

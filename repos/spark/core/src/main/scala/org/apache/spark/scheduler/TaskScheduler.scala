@@ -29,7 +29,7 @@ import org.apache.spark.storage.BlockManagerId
   * them, retrying if there are failures, and mitigating stragglers. They return events to the
   * DAGScheduler.
   */
-private[spark] trait TaskScheduler {
+private[spark] trait TaskScheduler
 
   private val appId = "spark-application-" + System.currentTimeMillis
 
@@ -87,4 +87,3 @@ private[spark] trait TaskScheduler {
     * @return An application's Attempt ID
     */
   def applicationAttemptId(): Option[String]
-}

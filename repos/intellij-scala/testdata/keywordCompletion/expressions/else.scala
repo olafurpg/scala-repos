@@ -1,7 +1,6 @@
-class A {
+class A
   if (true) {}
   /*caret*/
-}
 /*
 abstract
 case

@@ -10,8 +10,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScModifierList
   * User: Alexander Podkhalyuzin
   * Date: 21.01.2009
   */
-trait ScModifiersStub extends StubElement[ScModifierList] {
+trait ScModifiersStub extends StubElement[ScModifierList]
   def hasExplicitModifiers: Boolean
 
   def getModifiers: Array[String]
-}

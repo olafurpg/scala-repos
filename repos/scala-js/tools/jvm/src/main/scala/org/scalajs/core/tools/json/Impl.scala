@@ -6,7 +6,7 @@ import scala.collection.JavaConverters._
 
 import java.io.{Writer, Reader}
 
-private[json] object Impl extends AbstractJSONImpl {
+private[json] object Impl extends AbstractJSONImpl
 
   type Repr = Object
 
@@ -34,4 +34,3 @@ private[json] object Impl extends AbstractJSONImpl {
   def deserialize(str: String): Repr = JSONValue.parse(str)
 
   def deserialize(reader: Reader): Repr = JSONValue.parse(reader)
-}

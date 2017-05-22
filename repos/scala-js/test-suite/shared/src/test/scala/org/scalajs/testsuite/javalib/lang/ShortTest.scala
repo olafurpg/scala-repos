@@ -16,9 +16,9 @@ import org.scalajs.testsuite.utils.AssertThrows._
 
 /** Tests the implementation of the java standard library Short
   */
-class ShortTest {
+class ShortTest
 
-  @Test def compareTo(): Unit = {
+  @Test def compareTo(): Unit =
     def compare(x: Short, y: Short): Int =
       new JShort(x).compareTo(new JShort(y))
 
@@ -26,9 +26,8 @@ class ShortTest {
     assertTrue(compare(10.toShort, 9.toShort) > 0)
     assertTrue(compare(-2.toShort, -1.toShort) < 0)
     assertEquals(0, compare(3.toShort, 3.toShort))
-  }
 
-  @Test def should_be_a_Comparable(): Unit = {
+  @Test def should_be_a_Comparable(): Unit =
     def compare(x: Any, y: Any): Int =
       x.asInstanceOf[Comparable[Any]].compareTo(y)
 
@@ -36,23 +35,20 @@ class ShortTest {
     assertTrue(compare(10.toShort, 9.toShort) > 0)
     assertTrue(compare(-2.toShort, -1.toShort) < 0)
     assertEquals(0, compare(3.toShort, 3.toShort))
-  }
 
-  @Test def should_parse_strings(): Unit = {
-    def test(s: String, v: Short): Unit = {
+  @Test def should_parse_strings(): Unit =
+    def test(s: String, v: Short): Unit =
       assertEquals(v, JShort.parseShort(s))
       assertEquals(v, JShort.valueOf(s).shortValue())
       assertEquals(v, new JShort(s).shortValue())
-    }
 
     test("0", 0)
     test("5", 5)
     test("127", 127)
     test("-100", -100)
     test("30000", 30000)
-  }
 
-  @Test def should_reject_invalid_strings_when_parsing(): Unit = {
+  @Test def should_reject_invalid_strings_when_parsing(): Unit =
     def test(s: String): Unit =
       expectThrows(classOf[NumberFormatException], JShort.parseShort(s))
 
@@ -60,5 +56,3 @@ class ShortTest {
     test("")
     test("60000") // out of range
     test("-90000") // out of range
-  }
-}

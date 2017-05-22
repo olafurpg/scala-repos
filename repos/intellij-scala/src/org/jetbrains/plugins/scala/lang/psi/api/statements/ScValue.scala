@@ -23,7 +23,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
 trait ScValue
     extends ScBlockStatement with ScMember with ScDocCommentOwner
     with ScDeclaredElementsHolder with ScAnnotationsHolder with ScCommentOwner
-    with ScModifiableTypedDeclaration {
+    with ScModifiableTypedDeclaration
   self =>
   def valKeyword = findChildrenByType(ScalaTokenTypes.kVAL).apply(0)
 
@@ -37,34 +37,29 @@ trait ScValue
 
   def declaredType: Option[ScType] =
     typeElement flatMap
-    (_.getType(TypingContext.empty) match {
+    (_.getType(TypingContext.empty) match
           case Success(t, _) => Some(t)
           case _ => None
-        })
+        )
 
   def getType(ctx: TypingContext): TypeResult[ScType]
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean): Boolean = m match {
+      m: ScMember, isStrict: Boolean): Boolean = m match
     case other: ScValue =>
-      for (elem <- self.declaredElements) {
+      for (elem <- self.declaredElements)
         if (other.declaredElements.exists(_.name == elem.name)) return true
-      }
       false
     case _ => false
-  }
 
-  override def getIcon(flags: Int): Icon = {
+  override def getIcon(flags: Int): Icon =
     var parent = getParent
-    while (parent != null) {
-      parent match {
+    while (parent != null)
+      parent match
         case _: ScExtendsBlock => return Icons.FIELD_VAL
         case _: ScBlock => return Icons.VAL
         case _ => parent = parent.getParent
-      }
-    }
     null
-  }
 
   def getValToken: PsiElement = findFirstChildByType(ScalaTokenTypes.kVAL)
 
@@ -74,4 +69,3 @@ trait ScValue
 
   override def modifiableReturnType: Option[ScType] =
     getType(TypingContext.empty).toOption
-}

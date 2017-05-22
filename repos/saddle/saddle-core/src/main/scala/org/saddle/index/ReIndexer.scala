@@ -80,7 +80,7 @@ import org.saddle._
   *   ixer.lTake.map(x => v.take(x)) getOrElse v
   * }}}
   */
-trait ReIndexer[T] {
+trait ReIndexer[T]
 
   /**
     * Offsets into left index corresponding to new index
@@ -103,9 +103,8 @@ trait ReIndexer[T] {
     * Return ReIndexer with lTake and rTake swapped
     */
   def swap: ReIndexer[T] = ReIndexer(rTake, lTake, index)
-}
 
-object ReIndexer {
+object ReIndexer
 
   /**
     * Factory to produce a new [[org.saddle.index.ReIndexer]] instance
@@ -116,9 +115,7 @@ object ReIndexer {
     */
   def apply[T](
       lft: Option[Array[Int]], rgt: Option[Array[Int]], ix: Index[T]) =
-    new ReIndexer[T] {
+    new ReIndexer[T]
       def lTake = lft
       def rTake = rgt
       def index = ix
-    }
-}

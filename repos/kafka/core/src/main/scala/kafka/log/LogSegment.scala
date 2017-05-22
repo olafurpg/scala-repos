@@ -46,7 +46,7 @@ class LogSegment(val log: FileMessageSet,
                  val indexIntervalBytes: Int,
                  val rollJitterMs: Long,
                  time: Time)
-    extends Logging {
+    extends Logging
 
   var created = time.milliseconds
 
@@ -87,21 +87,18 @@ class LogSegment(val log: FileMessageSet,
     * @param messages The messages to append.
     */
   @nonthreadsafe
-  def append(offset: Long, messages: ByteBufferMessageSet) {
-    if (messages.sizeInBytes > 0) {
+  def append(offset: Long, messages: ByteBufferMessageSet)
+    if (messages.sizeInBytes > 0)
       trace(
           "Inserting %d bytes at offset %d at position %d".format(
               messages.sizeInBytes, offset, log.sizeInBytes()))
       // append an entry to the index (if needed)
-      if (bytesSinceLastIndexEntry > indexIntervalBytes) {
+      if (bytesSinceLastIndexEntry > indexIntervalBytes)
         index.append(offset, log.sizeInBytes())
         this.bytesSinceLastIndexEntry = 0
-      }
       // append the messages
       log.append(messages)
       this.bytesSinceLastIndexEntry += messages.sizeInBytes
-    }
-  }
 
   /**
     * Find the physical file position for the first message with offset >= the requested offset.
@@ -117,10 +114,9 @@ class LogSegment(val log: FileMessageSet,
     */
   @threadsafe
   private[log] def translateOffset(
-      offset: Long, startingFilePosition: Int = 0): OffsetPosition = {
+      offset: Long, startingFilePosition: Int = 0): OffsetPosition =
     val mapping = index.lookup(offset)
     log.searchFor(offset, max(mapping.position, startingFilePosition))
-  }
 
   /**
     * Read a message set from this segment beginning with the first offset >= startOffset. The message set will include
@@ -138,7 +134,7 @@ class LogSegment(val log: FileMessageSet,
   def read(startOffset: Long,
            maxOffset: Option[Long],
            maxSize: Int,
-           maxPosition: Long = size): FetchDataInfo = {
+           maxPosition: Long = size): FetchDataInfo =
     if (maxSize < 0)
       throw new IllegalArgumentException(
           "Invalid max size for log read (%d)".format(maxSize))
@@ -157,11 +153,11 @@ class LogSegment(val log: FileMessageSet,
     if (maxSize == 0) return FetchDataInfo(offsetMetadata, MessageSet.Empty)
 
     // calculate the length of the message set to read based on whether or not they gave us a maxOffset
-    val length = maxOffset match {
+    val length = maxOffset match
       case None =>
         // no max offset, just read until the max position
         min((maxPosition - startPosition.position).toInt, maxSize)
-      case Some(offset) => {
+      case Some(offset) =>
           // there is a max offset, translate it to a file position and use that to calculate the max read size
           if (offset < startOffset)
             throw new IllegalArgumentException(
@@ -173,10 +169,7 @@ class LogSegment(val log: FileMessageSet,
               logSize // the max offset is off the end of the log, use the end of the file
             else mapping.position
           min(min(maxPosition, endPosition) - startPosition.position, maxSize).toInt
-        }
-    }
     FetchDataInfo(offsetMetadata, log.read(startPosition.position, length))
-  }
 
   /**
     * Run recovery on the given segment. This will rebuild the index from the log file and lop off any invalid bytes from the end of the log and index.
@@ -187,40 +180,35 @@ class LogSegment(val log: FileMessageSet,
     * @return The number of bytes truncated from the log
     */
   @nonthreadsafe
-  def recover(maxMessageSize: Int): Int = {
+  def recover(maxMessageSize: Int): Int =
     index.truncate()
     index.resize(index.maxIndexSize)
     var validBytes = 0
     var lastIndexEntry = 0
     val iter = log.iterator(maxMessageSize)
-    try {
-      while (iter.hasNext) {
+    try
+      while (iter.hasNext)
         val entry = iter.next
         entry.message.ensureValid()
-        if (validBytes - lastIndexEntry > indexIntervalBytes) {
+        if (validBytes - lastIndexEntry > indexIntervalBytes)
           // we need to decompress the message, if required, to get the offset of the first uncompressed message
-          val startOffset = entry.message.compressionCodec match {
+          val startOffset = entry.message.compressionCodec match
             case NoCompressionCodec =>
               entry.offset
             case _ =>
               ByteBufferMessageSet.deepIterator(entry).next().offset
-          }
           index.append(startOffset, validBytes)
           lastIndexEntry = validBytes
-        }
         validBytes += MessageSet.entrySize(entry.message)
-      }
-    } catch {
+    catch
       case e: CorruptRecordException =>
         logger.warn(
             "Found invalid messages in log segment %s at byte offset %d: %s."
               .format(log.file.getAbsolutePath, validBytes, e.getMessage))
-    }
     val truncated = log.sizeInBytes - validBytes
     log.truncateTo(validBytes)
     index.trimToValidSize()
     truncated
-  }
 
   override def toString() =
     "LogSegment(baseOffset=" + baseOffset + ", size=" + size + ")"
@@ -232,7 +220,7 @@ class LogSegment(val log: FileMessageSet,
     * @return The number of log bytes truncated
     */
   @nonthreadsafe
-  def truncateTo(offset: Long): Int = {
+  def truncateTo(offset: Long): Int =
     val mapping = translateOffset(offset)
     if (mapping == null) return 0
     index.truncateTo(offset)
@@ -242,40 +230,34 @@ class LogSegment(val log: FileMessageSet,
     if (log.sizeInBytes == 0) created = time.milliseconds
     bytesSinceLastIndexEntry = 0
     bytesTruncated
-  }
 
   /**
     * Calculate the offset that would be used for the next message to be append to this segment.
     * Note that this is expensive.
     */
   @threadsafe
-  def nextOffset(): Long = {
+  def nextOffset(): Long =
     val ms = read(index.lastOffset, None, log.sizeInBytes)
-    if (ms == null) {
+    if (ms == null)
       baseOffset
-    } else {
-      ms.messageSet.lastOption match {
+    else
+      ms.messageSet.lastOption match
         case None => baseOffset
         case Some(last) => last.nextOffset
-      }
-    }
-  }
 
   /**
     * Flush this log segment to disk
     */
   @threadsafe
-  def flush() {
-    LogFlushStats.logFlushTimer.time {
+  def flush()
+    LogFlushStats.logFlushTimer.time
       log.flush()
       index.flush()
-    }
-  }
 
   /**
     * Change the suffix for the index and log file for this log segment
     */
-  def changeFileSuffixes(oldSuffix: String, newSuffix: String) {
+  def changeFileSuffixes(oldSuffix: String, newSuffix: String)
 
     def kafkaStorageException(fileType: String, e: IOException) =
       new KafkaStorageException(
@@ -283,28 +265,24 @@ class LogSegment(val log: FileMessageSet,
           e)
 
     try log.renameTo(new File(CoreUtils.replaceSuffix(
-                log.file.getPath, oldSuffix, newSuffix))) catch {
+                log.file.getPath, oldSuffix, newSuffix))) catch
       case e: IOException => throw kafkaStorageException("log", e)
-    }
     try index.renameTo(new File(CoreUtils.replaceSuffix(
-                index.file.getPath, oldSuffix, newSuffix))) catch {
+                index.file.getPath, oldSuffix, newSuffix))) catch
       case e: IOException => throw kafkaStorageException("index", e)
-    }
-  }
 
   /**
     * Close this log segment
     */
-  def close() {
+  def close()
     CoreUtils.swallow(index.close)
     CoreUtils.swallow(log.close)
-  }
 
   /**
     * Delete this log segment from the filesystem.
     * @throws KafkaStorageException if the delete fails.
     */
-  def delete() {
+  def delete()
     val deletedLog = log.delete()
     val deletedIndex = index.delete()
     if (!deletedLog && log.file.exists)
@@ -313,7 +291,6 @@ class LogSegment(val log: FileMessageSet,
     if (!deletedIndex && index.file.exists)
       throw new KafkaStorageException(
           "Delete of index " + index.file.getName + " failed.")
-  }
 
   /**
     * The last modified time of this log segment as a unix time stamp
@@ -323,8 +300,6 @@ class LogSegment(val log: FileMessageSet,
   /**
     * Change the last modified time for this log segment
     */
-  def lastModified_=(ms: Long) = {
+  def lastModified_=(ms: Long) =
     log.file.setLastModified(ms)
     index.file.setLastModified(ms)
-  }
-}

@@ -1,6 +1,6 @@
 /** Testing compact tree printers.
   */
-object Test {
+object Test
   import scala.tools.nsc._
   import interpreter._
   import java.io.{OutputStream, BufferedReader, StringReader, PrintWriter, Writer, OutputStreamWriter}
@@ -29,7 +29,7 @@ object Test {
 
   class NullOutputStream extends OutputStream { def write(b: Int) {} }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val settings = new Settings
     settings.classpath.value = System.getProperty("java.class.path")
     settings.Ycompacttrees.value = true
@@ -40,5 +40,3 @@ object Test {
     intp.interpret(
         """def initialize = "Have to interpret something or we get errors." """)
     power trees code foreach println
-  }
-}

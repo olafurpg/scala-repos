@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 19.04.2015.
   */
-trait FlatSpecFileStructureViewTest extends ScalaTestTestCase {
+trait FlatSpecFileStructureViewTest extends ScalaTestTestCase
   private val className = "FlatSpecViewTest"
 
-  def addFlatSpecViewTest() {
+  def addFlatSpecViewTest()
     addFileToProject(className + ".scala",
                      """
         |import org.scalatest._
@@ -35,37 +35,31 @@ trait FlatSpecFileStructureViewTest extends ScalaTestTestCase {
         |  it should "ignore and pend2" ignore pending
         |}
       """.stripMargin)
-  }
 
-  def testFlatSpecNormal(): Unit = {
+  def testFlatSpecNormal(): Unit =
     addFlatSpecViewTest()
     runFileStructureViewTest(className,
                              normalStatusId,
                              "it should \"child1\"",
                              "they should \"child2\"")
-  }
 
-  def testFlatSpecIgnored(): Unit = {
+  def testFlatSpecIgnored(): Unit =
     addFlatSpecViewTest()
     runFileStructureViewTest(className,
                              ignoredStatusId,
                              "ignore should \"ignore1\"",
                              "they should \"ignore2\"")
-  }
 
-  def testFlatSpecIgnoredAndPending(): Unit = {
+  def testFlatSpecIgnoredAndPending(): Unit =
     addFlatSpecViewTest()
     runFileStructureViewTest(className,
                              ignoredStatusId,
                              "ignore should \"ignore and pend\"",
                              "it should \"ignore and pend2\"")
-  }
 
-  def testFlatSpecPending(): Unit = {
+  def testFlatSpecPending(): Unit =
     addFlatSpecViewTest()
     runFileStructureViewTest(className,
                              pendingStatusId,
                              "\"second\" should \"pend1\"",
                              "it should \"pend2\"")
-  }
-}

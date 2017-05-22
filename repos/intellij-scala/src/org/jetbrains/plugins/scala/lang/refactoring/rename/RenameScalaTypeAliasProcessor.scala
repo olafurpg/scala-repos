@@ -18,7 +18,7 @@ import org.jetbrains.plugins.scala.lang.psi.impl.search.ScalaOverridingMemberSea
   * User: Jason Zaugg
   */
 class RenameScalaTypeAliasProcessor
-    extends RenameJavaMemberProcessor with ScalaRenameProcessor {
+    extends RenameJavaMemberProcessor with ScalaRenameProcessor
   override def canProcessElement(element: PsiElement): Boolean =
     element.isInstanceOf[ScTypeAlias]
 
@@ -26,37 +26,29 @@ class RenameScalaTypeAliasProcessor
     ScalaRenameUtil.findReferences(element)
 
   override def substituteElementToRename(
-      element: PsiElement, editor: Editor): PsiElement = {
+      element: PsiElement, editor: Editor): PsiElement =
     RenameSuperMembersUtil.chooseSuper(element.asInstanceOf[ScNamedElement])
-  }
 
   override def substituteElementToRename(
-      element: PsiElement, editor: Editor, renameCallback: Pass[PsiElement]) {
-    val named = element match {
+      element: PsiElement, editor: Editor, renameCallback: Pass[PsiElement])
+    val named = element match
       case named: ScNamedElement => named
       case _ => return
-    }
     RenameSuperMembersUtil.chooseAndProcessSuper(
-        named, new PsiElementProcessor[PsiNamedElement] {
-      def execute(named: PsiNamedElement): Boolean = {
+        named, new PsiElementProcessor[PsiNamedElement]
+      def execute(named: PsiNamedElement): Boolean =
         renameCallback.pass(named)
         false
-      }
-    }, editor)
-  }
+    , editor)
 
   override def prepareRenaming(element: PsiElement,
                                newName: String,
-                               allRenames: util.Map[PsiElement, String]) {
-    val typeAlias = element match {
+                               allRenames: util.Map[PsiElement, String])
+    val typeAlias = element match
       case x: ScTypeAlias => x
       case _ => return
-    }
 
-    for (elem <- ScalaOverridingMemberSearcher.search(typeAlias, deep = true)) {
+    for (elem <- ScalaOverridingMemberSearcher.search(typeAlias, deep = true))
       allRenames.put(elem, newName)
-    }
 
     ScalaElementToRenameContributor.getAll(element, newName, allRenames)
-  }
-}

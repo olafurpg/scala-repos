@@ -3,7 +3,7 @@ package lila.forum
 import org.joda.time.DateTime
 
 case class CategView(
-    categ: Categ, lastPost: Option[(Topic, Post, Int)], troll: Boolean) {
+    categ: Categ, lastPost: Option[(Topic, Post, Int)], troll: Boolean)
 
   def nbTopics = categ nbTopics troll
   def nbPosts = categ nbPosts troll
@@ -12,13 +12,12 @@ case class CategView(
   def slug = categ.slug
   def name = categ.name
   def desc = categ.desc
-}
 
 case class TopicView(categ: Categ,
                      topic: Topic,
                      lastPost: Option[Post],
                      lastPage: Int,
-                     troll: Boolean) {
+                     troll: Boolean)
 
   def updatedAt = topic updatedAt troll
   def nbPosts = topic nbPosts troll
@@ -30,13 +29,11 @@ case class TopicView(categ: Categ,
   def name = topic.name
   def views = topic.views
   def createdAt = topic.createdAt
-}
 
-case class PostView(post: Post, topic: Topic, categ: Categ, topicLastPage: Int) {
+case class PostView(post: Post, topic: Topic, categ: Categ, topicLastPage: Int)
 
   def show =
     post.showUserIdOrAuthor + " @ " + topic.name + " - " + post.text.take(80)
-}
 
 case class PostLiteView(post: Post, topic: Topic)
 

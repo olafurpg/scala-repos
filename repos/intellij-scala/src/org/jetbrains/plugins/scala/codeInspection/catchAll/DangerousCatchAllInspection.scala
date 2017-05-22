@@ -11,16 +11,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScCatchBlock}
   * @author Ksenia.Sautina
   * @since 6/25/12
   */
-class DangerousCatchAllInspection extends LocalInspectionTool {
+class DangerousCatchAllInspection extends LocalInspectionTool
   override def isEnabledByDefault: Boolean = true
 
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
-    new ScalaElementVisitor {
-      override def visitCatchBlock(catchBlock: ScCatchBlock) {
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
+    new ScalaElementVisitor
+      override def visitCatchBlock(catchBlock: ScCatchBlock)
         val expr = catchBlock.expression.orNull
         if (expr == null) return
-        def isInspection: (Boolean, ScCaseClause) = expr match {
+        def isInspection: (Boolean, ScCaseClause) = expr match
           case block: ScBlockExpr =>
             val caseClauses = block.caseClauses.orNull
             if (caseClauses == null || caseClauses.caseClauses.size != 1)
@@ -30,14 +30,12 @@ class DangerousCatchAllInspection extends LocalInspectionTool {
             val pattern = caseClause.pattern.orNull
             if (pattern == null) return (false, null)
             val guard = caseClause.guard.orNull
-            pattern match {
+            pattern match
               case p: ScWildcardPattern if guard == null => (true, caseClause)
               case p: ScReferencePattern if guard == null => (true, caseClause)
               case _ => (false, null)
-            }
           case _ => (false, null)
-        }
-        if (isInspection._1) {
+        if (isInspection._1)
           val startElement = isInspection._2.firstChild.orNull
           val endElement = isInspection._2.pattern.orNull
           if (startElement == null || endElement == null) return
@@ -49,8 +47,3 @@ class DangerousCatchAllInspection extends LocalInspectionTool {
                   ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                   isOnTheFly,
                   new ReplaceDangerousCatchAllQuickFix(isInspection._2)))
-        }
-      }
-    }
-  }
-}

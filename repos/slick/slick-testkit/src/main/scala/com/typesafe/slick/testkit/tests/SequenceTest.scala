@@ -2,16 +2,15 @@ package com.typesafe.slick.testkit.tests
 
 import com.typesafe.slick.testkit.util.{JdbcTestDB, AsyncTest}
 
-class SequenceTest extends AsyncTest[JdbcTestDB] {
+class SequenceTest extends AsyncTest[JdbcTestDB]
   import tdb.profile.api._
 
-  def test1 = ifCap(scap.sequence) {
+  def test1 = ifCap(scap.sequence)
     case class User(id: Int, first: String, last: String)
 
-    class Users(tag: Tag) extends Table[Int](tag, "users") {
+    class Users(tag: Tag) extends Table[Int](tag, "users")
       def id = column[Int]("id", O.PrimaryKey)
       def * = id
-    }
     val users = TableQuery[Users]
 
     val mySequence = Sequence[Int]("mysequence") start 200 inc 10
@@ -26,9 +25,8 @@ class SequenceTest extends AsyncTest[JdbcTestDB] {
         q1.result.map(r => r.toSet shouldBe Set((200, 1), (210, 2), (220, 3))),
         ifCap(scap.sequenceCurr)(mySequence.curr.result.map(_ shouldBe 220))
     ).withPinnedSession
-  }
 
-  def test2 = ifCap(scap.sequence) {
+  def test2 = ifCap(scap.sequence)
     val s1 = Sequence[Int]("s1")
     val s2 = Sequence[Int]("s2") start 3
     val s3 = Sequence[Int]("s3") start 3 inc 2
@@ -36,11 +34,10 @@ class SequenceTest extends AsyncTest[JdbcTestDB] {
     val s5 = Sequence[Int]("s5").cycle start 3 min 2 max 5 inc -1
     val s6 = Sequence[Int]("s6") start 3 min 2 max 5
 
-    def values(s: Sequence[Int], count: Int = 5, create: Boolean = true) = {
+    def values(s: Sequence[Int], count: Int = 5, create: Boolean = true) =
       val q = Query(s.next)
       (if (create) s.schema.create else DBIO.successful(())) >> DBIO.sequence(
           (1 to count).toList map (_ => q.result.map(_.head)))
-    }
 
     seq(
         values(s1).map(_ shouldBe List(1, 2, 3, 4, 5)),
@@ -55,5 +52,3 @@ class SequenceTest extends AsyncTest[JdbcTestDB] {
                 values(s6, 1, false).failed
             ))
     ).withPinnedSession
-  }
-}

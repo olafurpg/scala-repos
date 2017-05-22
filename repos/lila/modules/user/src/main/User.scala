@@ -25,12 +25,11 @@ case class User(id: String,
                 seenAt: Option[DateTime],
                 kid: Boolean,
                 lang: Option[String])
-    extends Ordered[User] {
+    extends Ordered[User]
 
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case u: User => id == u.id
     case _ => false
-  }
 
   override def toString =
     s"User $username(${perfs.bestRating}) games:${count.game}${troll ?? " troll"}${engine ?? " engine"}"
@@ -64,22 +63,19 @@ case class User(id: String,
 
   def seenRecently: Boolean = timeNoSee < 10.minutes
 
-  def timeNoSee: Duration = seenAt.fold[Duration](Duration.Inf) { s =>
+  def timeNoSee: Duration = seenAt.fold[Duration](Duration.Inf)  s =>
     (nowMillis - s.getMillis).millis
-  }
 
   def lame = booster || engine
 
   def lameOrTroll = lame || troll
 
-  def lightPerf(key: String) = perfs(key) map { perf =>
+  def lightPerf(key: String) = perfs(key) map  perf =>
     User.LightPerf(light, key, perf.intRating, perf.progress)
-  }
 
   def lightCount = User.LightCount(light, count.game)
-}
 
-object User {
+object User
 
   type ID = String
 
@@ -91,11 +87,10 @@ object User {
 
   case class Active(user: User)
 
-  case class PlayTime(total: Int, tv: Int) {
+  case class PlayTime(total: Int, tv: Int)
     import org.joda.time.Period
     def totalPeriod = new Period(total * 1000l)
     def tvPeriod = (tv > 0) option new Period(tv * 1000l)
-  }
   import lila.db.BSON.BSONJodaDateTimeHandler
   implicit def playTimeHandler = reactivemongo.bson.Macros.handler[PlayTime]
 
@@ -117,7 +112,7 @@ object User {
 
   def titleName(title: String) = titlesMap get title getOrElse title
 
-  object BSONFields {
+  object BSONFields
     val id = "_id"
     val username = "username"
     val perfs = "perfs"
@@ -141,11 +136,10 @@ object User {
     val email = "email"
     val mustConfirmEmail = "mustConfirmEmail"
     val colorIt = "colorIt"
-  }
 
   import lila.db.BSON
 
-  implicit val userBSONHandler = new BSON[User] {
+  implicit val userBSONHandler = new BSON[User]
 
     import BSONFields._
     import reactivemongo.bson.BSONDocument
@@ -192,7 +186,5 @@ object User {
                    kid -> w.boolO(o.kid),
                    lang -> o.lang,
                    title -> o.title)
-  }
 
   private[user] lazy val tube = lila.db.BsTube(userBSONHandler)
-}

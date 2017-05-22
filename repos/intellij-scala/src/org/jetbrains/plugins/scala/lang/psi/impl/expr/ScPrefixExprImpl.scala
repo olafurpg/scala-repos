@@ -16,21 +16,17 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScPrefixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScPrefixExpr {
+    extends ScalaPsiElementImpl(node) with ScPrefixExpr
   override def toString: String = "PrefixExpression"
 
   def argumentExpressions: Seq[ScExpression] = Seq.empty
 
   def getInvokedExpr: ScExpression = operation
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitPrefixExpression(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => visitor.visitPrefixExpression(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

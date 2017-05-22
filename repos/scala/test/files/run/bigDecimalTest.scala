@@ -1,5 +1,5 @@
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
 
     // SI-4981: avoid being limited by math context when not needed
     val big = BigDecimal("32432875832753287583275382753288325325328532875325")
@@ -31,5 +31,3 @@ object Test {
 
     // meaningless sanity check
     List[BigDecimal](a, b, c, d, e, f) map (_.scale) foreach println
-  }
-}

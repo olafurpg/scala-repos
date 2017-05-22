@@ -26,7 +26,7 @@
  */
 package scalafx.delegate
 
-object SFXDelegate {
+object SFXDelegate
 
   /**
     * Return `delegate` contained in this wrapper or `null`.
@@ -44,17 +44,15 @@ object SFXDelegate {
     * @param wrapper ScalaFX wrapper
     * @tparam J JavaFX type
     */
-  def delegateOrNull[J <: Object](wrapper: SFXDelegate[J]): J = {
+  def delegateOrNull[J <: Object](wrapper: SFXDelegate[J]): J =
     if (wrapper != null) wrapper.delegate else null.asInstanceOf[J]
-  }
-}
 
 /**
   * Basic trait for all JavaFX classes wrapping.
   *
   * @tparam D JavaFX class to be wrapped.
   */
-trait SFXDelegate[+D <: Object] extends AnyRef {
+trait SFXDelegate[+D <: Object] extends AnyRef
 
   /**
     * JavaFX object to be wrapped.
@@ -72,15 +70,12 @@ trait SFXDelegate[+D <: Object] extends AnyRef {
     * @param ref Object to be compared.
     * @return if the other object is equals to this delegate or not.
     */
-  override def equals(ref: Any): Boolean = {
-    ref match {
+  override def equals(ref: Any): Boolean =
+    ref match
       case sfxd: SFXDelegate[_] => delegate.equals(sfxd.delegate)
       case _ => delegate.equals(ref)
-    }
-  }
 
   /**
     * @return The delegate hashcode
     */
   override def hashCode = delegate.hashCode
-}

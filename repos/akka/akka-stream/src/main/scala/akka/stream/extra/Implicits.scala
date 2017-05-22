@@ -10,7 +10,7 @@ import scala.concurrent.duration.FiniteDuration
 /**
   * Additional [[akka.stream.scaladsl.Flow]] and [[akka.stream.scaladsl.Flow]] operators.
   */
-object Implicits {
+object Implicits
 
   /**
     * Provides time measurement utilities on Stream elements.
@@ -18,7 +18,7 @@ object Implicits {
     * See [[Timed]]
     */
   implicit class TimedSourceDsl[I, Mat](val source: Source[I, Mat])
-      extends AnyVal {
+      extends AnyVal
 
     /**
       * Measures time from receiving the first element and completion events - one for each subscriber of this `Flow`.
@@ -34,7 +34,6 @@ object Implicits {
         matching: I ⇒ Boolean,
         onInterval: FiniteDuration ⇒ Unit): Source[I, Mat] =
       Timed.timedIntervalBetween[I, Mat](source, matching, onInterval)
-  }
 
   /**
     * Provides time measurement utilities on Stream elements.
@@ -42,7 +41,7 @@ object Implicits {
     * See [[Timed]]
     */
   implicit class TimedFlowDsl[I, O, Mat](val flow: Flow[I, O, Mat])
-      extends AnyVal {
+      extends AnyVal
 
     /**
       * Measures time from receiving the first element and completion events - one for each subscriber of this `Flow`.
@@ -59,5 +58,3 @@ object Implicits {
         matching: O ⇒ Boolean,
         onInterval: FiniteDuration ⇒ Unit): Flow[I, O, Mat] =
       Timed.timedIntervalBetween[I, O, Mat](flow, matching, onInterval)
-  }
-}

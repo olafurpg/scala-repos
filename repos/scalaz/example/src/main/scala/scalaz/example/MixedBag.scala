@@ -2,7 +2,7 @@ package scalaz.example
 
 import scalaz._
 
-object MixedBag extends App {
+object MixedBag extends App
   monoid()
   traverseBigList()
   traverseBigStream()
@@ -10,7 +10,7 @@ object MixedBag extends App {
   kleisiArrow()
   dListExample()
 
-  def monoid() {
+  def monoid()
     import std.anyVal._
     import std.option._
 
@@ -22,9 +22,8 @@ object MixedBag extends App {
     some(1) |+| mzero[Option[Int]]
 
     intInstance.semigroupSyntax.mappend(1, 2)
-  }
 
-  def traverseBigList() {
+  def traverseBigList()
     import std.option._
     import std.list._
     import syntax.traverse._
@@ -32,9 +31,8 @@ object MixedBag extends App {
     //    val xs: Option[List[Int]] = (1 to 100000).toList.traverse(x => some(x * 2))
     //    println(xs map (_ take 10))
     ()
-  }
 
-  def traverseBigStream() {
+  def traverseBigStream()
     import std.option._
     import std.stream._
     import syntax.traverse._
@@ -42,9 +40,8 @@ object MixedBag extends App {
     (1 to 100000).toStream.traverse(x => none[Int])
     //    (1 to 100000).toStream.traverse(x => some(x * 2))
     ()
-  }
 
-  def tree() {
+  def tree()
     import std.string._
     import syntax.semigroup._
     import syntax.equal._
@@ -59,9 +56,8 @@ object MixedBag extends App {
     f assert_=== "12345"
     val m = tree.foldMap(_.toString)
     m assert_=== "12345"
-  }
 
-  def kleisiArrow() {
+  def kleisiArrow()
     import Kleisli._
     import std.option._
     import syntax.compose._
@@ -71,9 +67,8 @@ object MixedBag extends App {
 
     val K = Arrow[λ[(α, β) => Kleisli[Option, α, β]]]
     f >>> K.arr(i => i * 2) >>> K.arr(x => println(x)) run 3
-  }
 
-  def dListExample() {
+  def dListExample()
     import DList._
     import syntax.monad._
     import syntax.writer._
@@ -82,31 +77,27 @@ object MixedBag extends App {
     type Pair[+A] = (A, A)
     type Tree[A] = Free[Pair, A]
 
-    implicit val pairFunctor: Functor[Pair] = new Functor[Pair] {
+    implicit val pairFunctor: Functor[Pair] = new Functor[Pair]
       def map[A, B](as: Pair[A])(f: A => B) =
         f(as._1) -> f(as._2)
-    }
 
     def leaf[A](a: A): Tree[A] = Free.pure(a)
     def node[A](l: Tree[A], r: Tree[A]): Tree[A] = Free[Pair, A](l -> r)
 
-    def flattenWriter[A](t: Tree[A]): DList[A] = {
-      def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match {
+    def flattenWriter[A](t: Tree[A]): DList[A] =
+      def flatten(t: Tree[A]): Writer[DList[A], Unit] = t.resume match
         case \/-(a) => DList(a).tell
         case -\/((x, y)) => flatten(x) >> flatten(y)
-      }
       flatten(t).run._1
-    }
 
     flattenWriter(node(node(leaf(1), leaf(3)), leaf(2))).toList
-  }
 
-  def zipper() {
+  def zipper()
     import scalaz.std.list
 
     val fileName = "abc.txt"
 
-    val oldExtensionAndNewName: Option[(String, String)] = for {
+    val oldExtensionAndNewName: Option[(String, String)] = for
       zipper <- list.toZipper(fileName.toList)
 
       // previousC from the first position rotates the focus to the last element
@@ -123,6 +114,4 @@ object MixedBag extends App {
 
       // Convert the Zipper back to a string
       newFileName = changedExtZipper.toStream.mkString
-    } yield (oldExtension, newFileName)
-  }
-}
+    yield (oldExtension, newFileName)

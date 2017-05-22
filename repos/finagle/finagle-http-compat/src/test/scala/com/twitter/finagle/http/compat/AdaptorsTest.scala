@@ -14,7 +14,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
+class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks
   import Arbitrary.arbitrary
   import Bijections._
 
@@ -28,59 +28,56 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
 
   val arbKeys = Gen.oneOf("Foo", "Bar", "Foo-Bar", "Bar-Baz")
 
-  val arbUri = for {
+  val arbUri = for
     scheme <- Gen.oneOf("http", "https")
     hostLen <- Gen.choose(1, 20)
     pathLen <- Gen.choose(1, 20)
     tld <- Gen.oneOf(".net", ".com", "org", ".edu")
     host = util.Random.alphanumeric.take(hostLen).mkString
     path = util.Random.alphanumeric.take(pathLen).mkString
-  } yield (new URI(scheme, host + tld, "/" + path, null)).toASCIIString
+  yield (new URI(scheme, host + tld, "/" + path, null)).toASCIIString
 
-  val arbHeader = for {
+  val arbHeader = for
     key <- arbKeys
     len <- Gen.choose(0, 100)
-  } yield (key, util.Random.alphanumeric.take(len).mkString)
+  yield (key, util.Random.alphanumeric.take(len).mkString)
 
-  val arbResponse = for {
+  val arbResponse = for
     code <- Gen.chooseNum(100, 510)
     version <- Gen.oneOf(Version.Http10, Version.Http11)
     chunked <- arbitrary[Boolean]
     headers <- Gen.containerOf[Seq, (String, String)](arbHeader)
     body <- arbitrary[String]
-  } yield {
-    if (chunked) {
+  yield
+    if (chunked)
       val res = Response(version, Status(code), Reader.fromBuf(Buf.Utf8(body)))
       headers foreach { case (k, v) => res.headerMap.add(k, v) }
       res.headerMap.set(Fields.TransferEncoding, "chunked")
       (res, body)
-    } else {
+    else
       val res = Response(version, Status(code))
       headers foreach { case (k, v) => res.headerMap.add(k, v) }
       res.contentString = body
       (res, body)
-    }
-  }
 
-  val arbRequest = for {
+  val arbRequest = for
     method <- arbMethod
     uri <- arbUri
     version <- Gen.oneOf(Version.Http10, Version.Http11)
     chunked <- arbitrary[Boolean]
     headers <- Gen.containerOf[Seq, (String, String)](arbHeader)
     body <- arbitrary[String]
-  } yield {
+  yield
     val reqIn = Request(version, method, uri)
     headers foreach { case (k, v) => reqIn.headers.add(k, v) }
     val req = Request(reqIn.httpRequest,
                       BufReader(Buf.Utf8(body)),
                       new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
-    if (chunked) {
+    if (chunked)
       req.headers.set(Fields.TransferEncoding, "chunked")
       req.setChunked(chunked)
-    } else req.contentString = body
+    else req.contentString = body
     (req, body)
-  }
 
   val arbNettyVersion = Gen.oneOf(
       HttpVersion.HTTP_1_0,
@@ -88,29 +85,27 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
       new HttpVersion("SECURE-HTTP/1.4", true)
   )
 
-  val arbNettyResponse = for {
+  val arbNettyResponse = for
     (resp, body) <- arbResponse
     version <- arbNettyVersion
-  } yield {
+  yield
     resp.httpResponse.setProtocolVersion(version)
     (resp.httpResponse, body)
-  }
 
-  val arbNettyRequest = for {
+  val arbNettyRequest = for
     (req, body) <- arbRequest
     version <- arbNettyVersion
-  } yield {
+  yield
     req.setProtocolVersion(version)
     (req.getHttpRequest, body)
-  }
 
-  test("netty: http request to netty") {
-    forAll(arbRequest) {
+  test("netty: http request to netty")
+    forAll(arbRequest)
       case (in: Request, body: String) =>
-        if (in.isChunked) {
+        if (in.isChunked)
           val exc = intercept[Exception] { Await.result(NettyAdaptor.in(in)) }
           assert(NettyAdaptor.NoStreaming == exc)
-        } else {
+        else
           val out = Await.result(NettyAdaptor.in(in))
           assert(out.getProtocolVersion == from(in.version))
           assert(out.getMethod == from(in.method))
@@ -118,36 +113,29 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
           assert(out.headers == in.headers)
           assert(out.isChunked == in.isChunked)
           assert(out.getContent == in.getContent)
-        }
-    }
-  }
 
-  test("netty: netty response to http") {
-    forAll(arbNettyResponse) {
+  test("netty: netty response to http")
+    forAll(arbNettyResponse)
       case (in: HttpResponse, body: String) =>
-        if (in.isChunked) {
+        if (in.isChunked)
           val exc = intercept[Exception] { Await.result(NettyAdaptor.out(in)) }
           assert(NettyAdaptor.NoStreaming == exc)
-        } else {
+        else
           val out = Await.result(NettyAdaptor.out(in))
           assert(out.version == from(in.getProtocolVersion))
           assert(out.status == from(in.getStatus))
           assert(out.headers == in.headers)
           assert(out.isChunked == in.isChunked)
           assert(out.getContent == in.getContent)
-        }
-    }
-  }
 
-  test("http: netty request to http") {
-    forAll(arbNettyRequest) {
+  test("http: netty request to http")
+    forAll(arbNettyRequest)
       case (in: HttpRequest, body: String) =>
-        if (in.isChunked) {
-          val exc = intercept[Exception] {
+        if (in.isChunked)
+          val exc = intercept[Exception]
             Await.result(NettyClientAdaptor.in(in))
-          }
           assert(NettyClientAdaptor.NoStreaming == exc)
-        } else {
+        else
           val out = Await.result(NettyClientAdaptor.in(in))
           assert(out.version == from(in.getProtocolVersion))
           assert(out.method == from(in.getMethod))
@@ -155,26 +143,18 @@ class AdaptorsTest extends FunSuite with GeneratorDrivenPropertyChecks {
           assert(out.headers == in.headers)
           assert(out.isChunked == in.isChunked)
           assert(out.getContent == in.getContent)
-        }
-    }
-  }
 
-  test("http: http response to netty") {
-    forAll(arbResponse) {
+  test("http: http response to netty")
+    forAll(arbResponse)
       case (in: Response, body: String) =>
-        if (in.isChunked) {
-          val exc = intercept[Exception] {
+        if (in.isChunked)
+          val exc = intercept[Exception]
             Await.result(NettyClientAdaptor.out(in))
-          }
           assert(NettyClientAdaptor.NoStreaming == exc)
-        } else {
+        else
           val out = Await.result(NettyClientAdaptor.out(in))
           assert(out.getProtocolVersion == from(in.version))
           assert(out.getStatus == from(in.status))
           assert(out.headers == in.headers)
           assert(out.isChunked == in.isChunked)
           assert(out.getContent == BufChannelBuffer(in.content))
-        }
-    }
-  }
-}

@@ -5,33 +5,30 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.{AssertionsForJUnit, JUnitRunner}
 
 @RunWith(classOf[JUnitRunner])
-class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
-  test("parsePath") {
+class NameTreeParsersTest extends FunSuite with AssertionsForJUnit
+  test("parsePath")
     assert(NameTreeParsers.parsePath("/") == Path.empty)
     assert(
         NameTreeParsers.parsePath("  /foo/bar  ") == Path.Utf8("foo", "bar"))
     assert(NameTreeParsers.parsePath("/\\x66\\x6f\\x6F") == Path.Utf8("foo"))
 
     intercept[IllegalArgumentException] { NameTreeParsers.parsePath("") }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       NameTreeParsers.parsePath("/foo/bar/")
-    }
     intercept[IllegalArgumentException] { NameTreeParsers.parsePath("/{}") }
     intercept[IllegalArgumentException] { NameTreeParsers.parsePath("/\\?") }
     intercept[IllegalArgumentException] { NameTreeParsers.parsePath("/\\x?") }
     intercept[IllegalArgumentException] { NameTreeParsers.parsePath("/\\x0?") }
-  }
 
-  test("error messages") {
-    assert(intercept[IllegalArgumentException] {
+  test("error messages")
+    assert(intercept[IllegalArgumentException]
       NameTreeParsers.parsePath("/foo^bar")
-    }.getMessage contains "'/foo[^]bar'")
-    assert(intercept[IllegalArgumentException] {
+    .getMessage contains "'/foo[^]bar'")
+    assert(intercept[IllegalArgumentException]
       NameTreeParsers.parsePath("/foo/bar/")
-    }.getMessage contains "'/foo/bar/[]'")
-  }
+    .getMessage contains "'/foo/bar/[]'")
 
-  test("parseNameTree") {
+  test("parseNameTree")
     val defaultWeight = NameTree.Weighted.defaultWeight
 
     assert(NameTreeParsers.parseNameTree("! | ~ | $") == NameTree.Alt(
@@ -69,27 +66,22 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
 
     intercept[IllegalArgumentException] { NameTreeParsers.parseNameTree("") }
     intercept[IllegalArgumentException] { NameTreeParsers.parseNameTree("#") }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       NameTreeParsers.parseNameTree("/foo &")
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       NameTreeParsers.parseNameTree("/foo & 0.1.2 * /bar")
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       NameTreeParsers.parseNameTree("/foo & . * /bar")
-    }
-  }
 
-  test("parseDentry") {
+  test("parseDentry")
     assert(NameTreeParsers.parseDentry("/=>!") == Dentry(Path.empty,
                                                          NameTree.Fail))
     assert(NameTreeParsers.parseDentry("/ => !") == Dentry(Path.empty,
                                                            NameTree.Fail))
 
     intercept[IllegalArgumentException] { NameTreeParsers.parseDentry("/&!") }
-  }
 
-  test("parseDtab") {
+  test("parseDtab")
     assert(NameTreeParsers.parseDtab("") == Dtab.empty)
     assert(NameTreeParsers.parseDtab("  /=>!  ") == Dtab(
             IndexedSeq(Dentry(Path.empty, NameTree.Fail))))
@@ -98,5 +90,3 @@ class NameTreeParsersTest extends FunSuite with AssertionsForJUnit {
     assert(NameTreeParsers.parseDtab("/=>!;/foo=>/bar") == Dtab(IndexedSeq(
                 Dentry(Path.empty, NameTree.Fail),
                 Dentry(Path.Utf8("foo"), NameTree.Leaf(Path.Utf8("bar"))))))
-  }
-}

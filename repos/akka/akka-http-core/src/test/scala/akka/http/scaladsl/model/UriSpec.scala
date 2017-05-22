@@ -11,15 +11,14 @@ import org.scalatest.{Matchers, WordSpec}
 import akka.parboiled2.UTF8
 import Uri._
 
-class UriSpec extends WordSpec with Matchers {
+class UriSpec extends WordSpec with Matchers
 
-  "Uri.Host instances" should {
+  "Uri.Host instances" should
 
-    "correctly parse empty hosts" in {
+    "correctly parse empty hosts" in
       Host("") shouldEqual Host.Empty
-    }
 
-    "parse correctly from IPv4 literals" in {
+    "parse correctly from IPv4 literals" in
       Host("192.0.2.16") shouldEqual IPv4Host("192.0.2.16")
       Host("255.0.0.0") shouldEqual IPv4Host("255.0.0.0")
       Host("0.0.0.0") shouldEqual IPv4Host("0.0.0.0")
@@ -27,15 +26,13 @@ class UriSpec extends WordSpec with Matchers {
       Host("2.0.0.0") shouldEqual IPv4Host("2.0.0.0")
       Host("3.0.0.0") shouldEqual IPv4Host("3.0.0.0")
       Host("30.0.0.0") shouldEqual IPv4Host("30.0.0.0")
-    }
 
-    "support inetAddresses round-trip for Inet4Addresses" in {
-      def roundTrip(ip: String): Unit = {
+    "support inetAddresses round-trip for Inet4Addresses" in
+      def roundTrip(ip: String): Unit =
         val inetAddr = InetAddress.getByName(ip)
         val addr = Host(inetAddr)
         addr shouldEqual IPv4Host(ip)
         addr.inetAddresses shouldEqual Seq(inetAddr)
-      }
 
       roundTrip("192.0.2.16")
       roundTrip("192.0.2.16")
@@ -45,9 +42,8 @@ class UriSpec extends WordSpec with Matchers {
       roundTrip("2.0.0.0")
       roundTrip("3.0.0.0")
       roundTrip("30.0.0.0")
-    }
 
-    "parse correctly from IPv6 literals (RFC2732)" in {
+    "parse correctly from IPv6 literals (RFC2732)" in
       // various
       Host("[FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]") shouldEqual IPv6Host(
           "FEDCBA9876543210FEDCBA9876543210",
@@ -149,16 +145,14 @@ class UriSpec extends WordSpec with Matchers {
           "000a000b000c00000000000000120001", "a:b:c::12:1")
       Host("[a:b::0:1:2:3]") shouldEqual IPv6Host(
           "000a000b000000000000000100020003", "a:b::0:1:2:3")
-    }
-    "support inetAddresses round-trip for Inet6Addresses" in {
+    "support inetAddresses round-trip for Inet6Addresses" in
       def fromAddress(address: String): IPv6Host =
         Host(s"[$address]").asInstanceOf[IPv6Host]
-      def roundTrip(ip: String): Unit = {
+      def roundTrip(ip: String): Unit =
         val inetAddr = InetAddress.getByName(ip)
         val addr = Host(inetAddr)
         addr equalsIgnoreCase fromAddress(ip) should be(true)
         addr.inetAddresses shouldEqual Seq(inetAddr)
-      }
 
       roundTrip("1:1:1::1:1:1:1")
       roundTrip("::1:2:3:4:5:6:7")
@@ -166,15 +160,13 @@ class UriSpec extends WordSpec with Matchers {
       roundTrip("2001:0db8:100:f101:0:0:0:1")
       roundTrip("abcd::12")
       roundTrip("::192.9.5.5")
-    }
 
-    "parse correctly from NamedHost literals" in {
+    "parse correctly from NamedHost literals" in
       Host("www.spray.io") shouldEqual NamedHost("www.spray.io")
       Host("localhost") shouldEqual NamedHost("localhost")
       Host("%2FH%C3%A4ll%C3%B6%5C") shouldEqual NamedHost("""/hällö\""")
-    }
 
-    "not accept illegal IPv4 literals" in {
+    "not accept illegal IPv4 literals" in
       Host("01.0.0.0") shouldBe a[NamedHost]
       Host("001.0.0.0") shouldBe a[NamedHost]
       Host("00.0.0.0") shouldBe a[NamedHost]
@@ -189,15 +181,13 @@ class UriSpec extends WordSpec with Matchers {
       Host("0.0.0.0.0") shouldBe a[NamedHost]
       Host("0.0..0") shouldBe a[NamedHost]
       Host(".0.0.0") shouldBe a[NamedHost]
-    }
 
-    "not accept illegal IPv6 literals" in {
+    "not accept illegal IPv6 literals" in
       // 5 char quad
-      the[IllegalUriException] thrownBy Host("[::12345]") shouldBe {
+      the[IllegalUriException] thrownBy Host("[::12345]") shouldBe
         IllegalUriException(
             "Illegal URI host: Invalid input '5', expected ':' or ']' (line 1, column 8)",
             "[::12345]\n" + "       ^")
-      }
 
       // Two zippers
       a[IllegalUriException] should be thrownBy Host("[abcd::abcd::abcd]")
@@ -237,14 +227,12 @@ class UriSpec extends WordSpec with Matchers {
 
       // Nonhex
       a[IllegalUriException] should be thrownBy Host("[g:0:0:0:0:0:0]")
-    }
-  }
 
-  "Uri.Path instances" should {
+  "Uri.Path instances" should
     import Path.Empty
-    "be parsed and rendered correctly" in {
+    "be parsed and rendered correctly" in
       def roundTripTo(p: Path, cs: Charset = UTF8) =
-        Matcher[String] { s ⇒
+        Matcher[String]  s ⇒
           val rendering =
             UriRendering.renderPath(new StringRendering, p, cs).get
           if (rendering != s)
@@ -257,7 +245,6 @@ class UriSpec extends WordSpec with Matchers {
                 s"The string parsed to '${Path(s, cs)}' rather than '$p'",
                 "<?>")
           else MatchResult(matches = true, "<?>", "<?>")
-        }
 
       "" should roundTripTo(Empty)
       "/" should roundTripTo(Path./)
@@ -281,8 +268,7 @@ class UriSpec extends WordSpec with Matchers {
           Path / "Ég get etið gler án þess að meiða mig")
       "/%00%E4%00%F6%00%FC" should roundTripTo(Path / "äöü",
                                                Charset.forName("UTF-16BE"))
-    }
-    "support the `startsWith` predicate" in {
+    "support the `startsWith` predicate" in
       Empty startsWith Empty shouldBe true
       Path./ startsWith Empty shouldBe true
       Path("abc") startsWith Empty shouldBe true
@@ -303,8 +289,7 @@ class UriSpec extends WordSpec with Matchers {
       Path("/abc/def") startsWith Path("/abc/d") shouldBe true
       Path("/abc/def") startsWith Path("/abc/def") shouldBe true
       Path("/abc/def") startsWith Path("/abc/def/") shouldBe false
-    }
-    "support the `endsWithSlash` predicate" in {
+    "support the `endsWithSlash` predicate" in
       Empty.endsWithSlash shouldBe false
       Path./.endsWithSlash shouldBe true
       Path("abc").endsWithSlash shouldBe false
@@ -312,8 +297,7 @@ class UriSpec extends WordSpec with Matchers {
       Path("/abc").endsWithSlash shouldBe false
       Path("/abc/def").endsWithSlash shouldBe false
       Path("/abc/def/").endsWithSlash shouldBe true
-    }
-    "support the `dropChars` modifier" in {
+    "support the `dropChars` modifier" in
       Path./.dropChars(0) shouldEqual Path./
       Path./.dropChars(1) shouldEqual Empty
       Path("/abc/def/").dropChars(0) shouldEqual Path("/abc/def/")
@@ -326,12 +310,10 @@ class UriSpec extends WordSpec with Matchers {
       Path("/abc/def/").dropChars(7) shouldEqual Path("f/")
       Path("/abc/def/").dropChars(8) shouldEqual Path("/")
       Path("/abc/def/").dropChars(9) shouldEqual Empty
-    }
-  }
 
-  "Uri.Query instances" should {
+  "Uri.Query instances" should
     def parser(mode: Uri.ParsingMode): String ⇒ Query = Query(_, mode = mode)
-    "be parsed correctly in strict mode" in {
+    "be parsed correctly in strict mode" in
       val strict = parser(Uri.ParsingMode.Strict)
       strict("") shouldEqual ("", "") +: Query.Empty
       strict("a") shouldEqual ("a", "") +: Query.Empty
@@ -342,8 +324,7 @@ class UriSpec extends WordSpec with Matchers {
       strict("a&") shouldEqual ("a", "") +: ("", "") +: Query.Empty
       strict("a=%62") shouldEqual ("a", "b") +: Query.Empty
       a[IllegalUriException] should be thrownBy strict("a^=b")
-    }
-    "be parsed correctly in relaxed mode" in {
+    "be parsed correctly in relaxed mode" in
       val relaxed = parser(Uri.ParsingMode.Relaxed)
       relaxed("") shouldEqual ("", "") +: Query.Empty
       relaxed("a") shouldEqual ("a", "") +: Query.Empty
@@ -354,8 +335,7 @@ class UriSpec extends WordSpec with Matchers {
       relaxed("a&") shouldEqual ("a", "") +: ("", "") +: Query.Empty
       relaxed("a=%62") shouldEqual ("a", "b") +: Query.Empty
       relaxed("a^=b") shouldEqual ("a^", "b") +: Query.Empty
-    }
-    "properly support the retrieval interface" in {
+    "properly support the retrieval interface" in
       val query = Query("a=1&b=2&c=3&b=4&b")
       query.get("a") shouldEqual Some("1")
       query.get("d") shouldEqual None
@@ -371,33 +351,28 @@ class UriSpec extends WordSpec with Matchers {
           "a" -> "1", "b" -> "2", "c" -> "3", "b" -> "4", "b" -> "")
       query.toSeq shouldEqual Seq(
           "a" -> "1", "b" -> "2", "c" -> "3", "b" -> "4", "b" -> "")
-    }
-    "support conversion from list of name/value pairs" in {
+    "support conversion from list of name/value pairs" in
       import Query._
       val pairs =
         List("key1" -> "value1", "key2" -> "value2", "key3" -> "value3")
       Query(pairs: _*).toList.diff(pairs) shouldEqual Nil
       Query() shouldEqual Empty
       Query("k" -> "v") shouldEqual ("k" -> "v") +: Empty
-    }
-    "encode special separators in query parameter names" in {
+    "encode special separators in query parameter names" in
       Query("a=b" -> "c").toString() shouldEqual "a%3Db=c"
       Query("a&b" -> "c").toString() shouldEqual "a%26b=c"
       Query("a+b" -> "c").toString() shouldEqual "a%2Bb=c"
       Query("a;b" -> "c").toString() shouldEqual "a%3Bb=c"
-    }
-    "encode special separators in query parameter values" in {
+    "encode special separators in query parameter values" in
       Query("a" -> "b=c").toString() shouldEqual "a=b%3Dc"
       Query("a" -> "b&c").toString() shouldEqual "a=b%26c"
       Query("a" -> "b+c").toString() shouldEqual "a=b%2Bc"
       Query("a" -> "b;c").toString() shouldEqual "a=b%3Bc"
-    }
-  }
 
-  "URIs" should {
+  "URIs" should
 
     // http://tools.ietf.org/html/rfc3986#section-1.1.2
-    "be correctly parsed from and rendered to simple test examples" in {
+    "be correctly parsed from and rendered to simple test examples" in
       Uri("ftp://ftp.is.co.za/rfc/rfc1808.txt") shouldEqual Uri.from(
           scheme = "ftp", host = "ftp.is.co.za", path = "/rfc/rfc1808.txt")
 
@@ -459,9 +434,8 @@ class UriSpec extends WordSpec with Matchers {
       Uri("http://:80/foo") shouldEqual Uri("http",
                                             Authority.Empty,
                                             Path / "foo")
-    }
 
-    "properly complete a normalization cycle" in {
+    "properly complete a normalization cycle" in
 
       // http://tools.ietf.org/html/rfc3986#section-6.2.2
       normalize("eXAMPLE://a/./b/../b/%63/%7bfoo%7d") shouldEqual "example://a/b/c/%7Bfoo%7D"
@@ -532,9 +506,8 @@ class UriSpec extends WordSpec with Matchers {
       normalize("#{}[]") shouldEqual "#%7B%7D%5B%5D"
       a[IllegalUriException] should be thrownBy normalize(
           "#{}[]", mode = Uri.ParsingMode.Strict)
-    }
 
-    "support tunneling a URI through a query param" in {
+    "support tunneling a URI through a query param" in
       val uri = Uri("http://aHost/aPath?aParam=aValue#aFragment")
       val q = Query("uri" -> uri.toString)
       val uri2 =
@@ -542,60 +515,52 @@ class UriSpec extends WordSpec with Matchers {
       uri2 shouldEqual "/?uri=http://ahost/aPath?aParam%3DaValue%23aFragment#aFragment"
       Uri(uri2).query() shouldEqual q
       Uri(q.getOrElse("uri", "<nope>")) shouldEqual uri
-    }
 
-    "produce proper error messages for illegal URIs" in {
+    "produce proper error messages for illegal URIs" in
       // illegal scheme
-      the[IllegalUriException] thrownBy Uri("foö:/a") shouldBe {
+      the[IllegalUriException] thrownBy Uri("foö:/a") shouldBe
         IllegalUriException(
             "Illegal URI reference: Invalid input 'ö', expected scheme-char, 'EOI', '#', ':', '?', slashSegments or pchar (line 1, column 3)",
             "foö:/a\n" + "  ^")
-      }
 
       // illegal userinfo
-      the[IllegalUriException] thrownBy Uri("http://user:ö@host") shouldBe {
+      the[IllegalUriException] thrownBy Uri("http://user:ö@host") shouldBe
         IllegalUriException(
             "Illegal URI reference: Invalid input 'ö', expected userinfo-char, pct-encoded, '@' or port (line 1, column 13)",
             "http://user:ö@host\n" + "            ^")
-      }
 
       // illegal percent-encoding
-      the[IllegalUriException] thrownBy Uri("http://use%2G@host") shouldBe {
+      the[IllegalUriException] thrownBy Uri("http://use%2G@host") shouldBe
         IllegalUriException(
             "Illegal URI reference: Invalid input 'G', expected HEXDIG (line 1, column 13)",
             "http://use%2G@host\n" + "            ^")
-      }
 
       // illegal path
       the[IllegalUriException] thrownBy Uri(
-          "http://www.example.com/name with spaces/") shouldBe {
+          "http://www.example.com/name with spaces/") shouldBe
         IllegalUriException(
             "Illegal URI reference: Invalid input ' ', expected '/', 'EOI', '#', '?' or pchar (line 1, column 28)",
             "http://www.example.com/name with spaces/\n" +
             "                           ^")
-      }
 
       // illegal path with control character
-      the[IllegalUriException] thrownBy Uri("http:///with\newline") shouldBe {
+      the[IllegalUriException] thrownBy Uri("http:///with\newline") shouldBe
         IllegalUriException(
             "Illegal URI reference: Invalid input '\\n', expected '/', 'EOI', '#', '?' or pchar (line 1, column 13)",
             "http:///with\n" + "            ^")
-      }
 
       // illegal query
-      the[IllegalUriException] thrownBy Uri("?a=b=c").query() shouldBe {
+      the[IllegalUriException] thrownBy Uri("?a=b=c").query() shouldBe
         IllegalUriException(
             "Illegal query: Invalid input '=', expected '+', query-char, 'EOI', '&' or pct-encoded (line 1, column 4)",
             "a=b=c\n" + "   ^")
-      }
-    }
 
     // http://tools.ietf.org/html/rfc3986#section-5.4
-    "pass the RFC 3986 reference resolution examples" when {
+    "pass the RFC 3986 reference resolution examples" when
       val base = parseAbsolute("http://a/b/c/d;p?q")
       def resolve(uri: String) = parseAndResolve(uri, base).toString
 
-      "normal examples" in {
+      "normal examples" in
         resolve("g:h") shouldEqual "g:h"
         resolve("g") shouldEqual "http://a/b/c/g"
         resolve("./g") shouldEqual "http://a/b/c/g"
@@ -619,9 +584,8 @@ class UriSpec extends WordSpec with Matchers {
         resolve("../..") shouldEqual "http://a/"
         resolve("../../") shouldEqual "http://a/"
         resolve("../../g") shouldEqual "http://a/g"
-      }
 
-      "abnormal examples" in {
+      "abnormal examples" in
         resolve("../../../g") shouldEqual "http://a/g"
         resolve("../../../../g") shouldEqual "http://a/g"
 
@@ -645,15 +609,12 @@ class UriSpec extends WordSpec with Matchers {
         resolve("g#s/../x") shouldEqual "http://a/b/c/g#s/../x"
 
         resolve("http:g") shouldEqual "http:g"
-      }
-    }
 
-    "be properly copyable" in {
+    "be properly copyable" in
       val uri = Uri("http://host:80/path?query#fragment")
       uri.copy() shouldEqual uri
-    }
 
-    "provide sugar for fluent transformations" in {
+    "provide sugar for fluent transformations" in
       val uri = Uri("http://host:80/path?query#fragment")
       val nonDefaultUri = Uri("http://host:6060/path?query#fragment")
 
@@ -689,9 +650,8 @@ class UriSpec extends WordSpec with Matchers {
 
       uri.withFragment("otherFragment") shouldEqual Uri(
           "http://host:80/path?query#otherFragment")
-    }
 
-    "return the correct effective port" in {
+    "return the correct effective port" in
       80 shouldEqual Uri("http://host/").effectivePort
       21 shouldEqual Uri("ftp://host/").effectivePort
       9090 shouldEqual Uri("http://host:9090/").effectivePort
@@ -699,17 +659,12 @@ class UriSpec extends WordSpec with Matchers {
 
       4450 shouldEqual Uri("https://host/").withPort(4450).effectivePort
       4450 shouldEqual Uri("https://host:3030/").withPort(4450).effectivePort
-    }
 
-    "properly render as HTTP request target origin forms" in {
+    "properly render as HTTP request target origin forms" in
       Uri("http://example.com/foo/bar?query=1#frag").toHttpRequestTargetOriginForm.toString === "/foo/bar?query=1"
       Uri("http://example.com//foo/bar?query=1#frag").toHttpRequestTargetOriginForm.toString === "//foo/bar?query=1"
-    }
 
-    "survive parsing a URI with thousands of path segments" in {
+    "survive parsing a URI with thousands of path segments" in
       val slashes = "/a/" * 2000
       val uri = Uri(s"http://foo.bar/$slashes")
       uri.toString // was reported to throw StackOverflowException in Spray's URI
-    }
-  }
-}

@@ -21,14 +21,12 @@ private[io] class TcpIncomingConnection(
     bindHandler: ActorRef,
     options: immutable.Traversable[SocketOption],
     readThrottling: Boolean)
-    extends TcpConnection(_tcp, _channel, readThrottling) {
+    extends TcpConnection(_tcp, _channel, readThrottling)
 
   signDeathPact(bindHandler)
 
   registry.register(channel, initialOps = 0)
 
-  def receive = {
+  def receive =
     case registration: ChannelRegistration ⇒
       completeConnect(registration, bindHandler, options)
-  }
-}

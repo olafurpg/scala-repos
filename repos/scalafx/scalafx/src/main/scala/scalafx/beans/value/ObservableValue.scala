@@ -34,7 +34,7 @@ import scalafx.beans.Observable
 import scalafx.delegate.SFXDelegate
 import scalafx.event.subscriptions.Subscription
 
-object ObservableValue {
+object ObservableValue
   implicit def sfxObservableValue2jfx[T, J](
       ov: ObservableValue[T, J]): jfxbv.ObservableValue[J] =
     if (ov != null) ov.delegate else null
@@ -72,7 +72,6 @@ object ObservableValue {
   implicit def sfxObservableValue2jfxNumberValue(
       ov: ObservableValue[Number, Number]): ObservableNumberValue =
     ov.delegate.asInstanceOf[jfxbv.ObservableNumberValue]
-}
 
 /**
   * An ObservableValue is an entity that wraps a value and allows to observe the value for changes.
@@ -87,7 +86,7 @@ object ObservableValue {
   * @define SUBRET A new [[scalafx.event.subscriptions.Subscription]] to remove $OV.
   */
 trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
-    extends Observable with SFXDelegate[jfxbv.ObservableValue[J]] {
+    extends Observable with SFXDelegate[jfxbv.ObservableValue[J]]
 
   /**
     * Returns $OV
@@ -115,23 +114,18 @@ trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
     * @return $SUBRET
     */
   def onChange[J1 >: J](
-      op: (ObservableValue[T, J], J1, J1) => Unit): Subscription = {
-    val listener = new jfxbv.ChangeListener[J1] {
+      op: (ObservableValue[T, J], J1, J1) => Unit): Subscription =
+    val listener = new jfxbv.ChangeListener[J1]
       def changed(observable: jfxbv.ObservableValue[_ <: J1],
                   oldValue: J1,
-                  newValue: J1) {
+                  newValue: J1)
         op(ObservableValue.this, oldValue, newValue)
-      }
-    }
 
     delegate.addListener(listener)
 
-    new Subscription {
-      def cancel() {
+    new Subscription
+      def cancel()
         delegate.removeListener(listener)
-      }
-    }
-  }
 
   /**
     * Adds a function as a $URLCV. This function has no arguments because it will not handle values changed.
@@ -139,21 +133,15 @@ trait ObservableValue[@specialized(Int, Long, Float, Double, Boolean) T, J]
     * @param op A Function with no arguments. It will be called when value changes.
     * @return $SUBRET
     */
-  def onChange[J1 >: J](op: => Unit): Subscription = {
-    val listener = new jfxbv.ChangeListener[J1] {
+  def onChange[J1 >: J](op: => Unit): Subscription =
+    val listener = new jfxbv.ChangeListener[J1]
       def changed(observable: jfxbv.ObservableValue[_ <: J1],
                   oldValue: J1,
-                  newValue: J1) {
+                  newValue: J1)
         op
-      }
-    }
 
     delegate.addListener(listener)
 
-    new Subscription {
-      def cancel() {
+    new Subscription
+      def cancel()
         delegate.removeListener(listener)
-      }
-    }
-  }
-}

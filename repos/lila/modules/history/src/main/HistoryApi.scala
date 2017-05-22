@@ -9,11 +9,11 @@ import lila.db.Types.Coll
 import lila.game.Game
 import lila.user.{User, Perfs}
 
-final class HistoryApi(coll: Coll) {
+final class HistoryApi(coll: Coll)
 
   import History.BSONReader
 
-  def add(user: User, game: Game, perfs: Perfs): Funit = {
+  def add(user: User, game: Game, perfs: Perfs): Funit =
     val isStd = game.ratingVariant.standard
     val changes = List(
         isStd.option("standard" -> perfs.standard),
@@ -33,20 +33,18 @@ final class HistoryApi(coll: Coll) {
           .option("classical" -> perfs.classical),
         (isStd && game.speed == Speed.Correspondence).option(
             "correspondence" -> perfs.correspondence)
-    ).flatten.map {
+    ).flatten.map
       case (k, p) => k -> p.intRating
-    }
     val days = daysBetween(user.createdAt, game.updatedAt | game.createdAt)
     coll
       .update(
           BSONDocument("_id" -> user.id),
-          BSONDocument("$set" -> BSONDocument(changes.map {
+          BSONDocument("$set" -> BSONDocument(changes.map
             case (perf, rating) => s"$perf.$days" -> BSONInteger(rating)
-          })),
+          )),
           upsert = true
       )
       .void
-  }
 
   def daysBetween(from: DateTime, to: DateTime): Int =
     Days
@@ -55,4 +53,3 @@ final class HistoryApi(coll: Coll) {
 
   def get(userId: String): Fu[Option[History]] =
     coll.find(BSONDocument("_id" -> userId)).one[History]
-}

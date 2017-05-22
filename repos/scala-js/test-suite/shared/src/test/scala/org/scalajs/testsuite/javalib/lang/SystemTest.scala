@@ -14,51 +14,44 @@ import org.junit.Assert._
 
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
-class SystemTest {
+class SystemTest
 
-  @Test def setIn(): Unit = {
+  @Test def setIn(): Unit =
     val savedIn = System.in
-    try {
+    try
       val testIn = new java.io.ByteArrayInputStream(Array[Byte]())
       System.setIn(testIn)
       assertTrue(System.in eq testIn)
-    } finally {
+    finally
       System.setIn(savedIn)
-    }
-  }
 
-  @Test def setOut(): Unit = {
+  @Test def setOut(): Unit =
     val savedOut = System.out
-    try {
+    try
       val testOut = new java.io.PrintStream(new java.io.ByteArrayOutputStream)
       System.setOut(testOut)
       assertTrue(System.out eq testOut)
-    } finally {
+    finally
       System.setOut(savedOut)
-    }
-  }
 
-  @Test def setErr(): Unit = {
+  @Test def setErr(): Unit =
     val savedErr = System.err
-    try {
+    try
       val testErr = new java.io.PrintStream(new java.io.ByteArrayOutputStream)
       System.setErr(testErr)
       assertTrue(System.err eq testErr)
-    } finally {
+    finally
       System.setErr(savedErr)
-    }
-  }
 
-  @Test def arraycopy(): Unit = {
+  @Test def arraycopy(): Unit =
     val object0 = Array[Any]("[", "b", "c", "d", "e", "f", "]")
     val object1 = Array[Any](() => true, 1, "2", '3', 4.0, true, object0)
 
     System.arraycopy(object1, 1, object0, 1, 5)
-    if (executingInJVM) {
+    if (executingInJVM)
       assertEquals("[1234.0true]", object0.mkString)
-    } else {
+    else
       assertEquals("[1234true]", object0.mkString)
-    }
 
     val string0 = Array("a", "b", "c", "d", "e", "f")
     val string1 = Array("1", "2", "3", "4")
@@ -69,21 +62,18 @@ class SystemTest {
     val ab01Chars = Array("ab".toCharArray, "01".toCharArray)
     val chars = new Array[Array[Char]](32)
     System.arraycopy(ab01Chars, 0, chars, 0, 2)
-    for (i <- Seq(0, 2, 4, 8, 16)) {
+    for (i <- Seq(0, 2, 4, 8, 16))
       System.arraycopy(chars, i / 4, chars, i, i)
-    }
 
     assertEquals(12, chars.filter(_ == null).length)
     assertEquals("ab01ab0101ab01ab0101ab0101ab01ab0101ab01",
                  chars.filter(_ != null).map(_.mkString).mkString)
-  }
 
-  @Test def arraycopy_with_range_overlaps_for_the_same_array(): Unit = {
+  @Test def arraycopy_with_range_overlaps_for_the_same_array(): Unit =
     val array = new Array[Int](10)
 
-    for (i <- 1 to 6) {
+    for (i <- 1 to 6)
       array(i) = i
-    }
 
     assertArrayEquals(Array(0, 1, 2, 3, 4, 5, 6, 0, 0, 0), array)
     System.arraycopy(array, 0, array, 3, 7)
@@ -104,9 +94,8 @@ class SystemTest {
     val reversed = array.reverse
     System.arraycopy(reversed, 5, array, 5, 5)
     assertArrayEquals(Array(0, 1, 2, 0, 1, 1, 0, 2, 1, 0), array)
-  }
 
-  @Test def identityHashCode(): Unit = {
+  @Test def identityHashCode(): Unit =
     class HasIDHashCode
 
     val x1 = new HasIDHashCode
@@ -118,23 +107,20 @@ class SystemTest {
 
     assertEquals(x1FirstHash, System.identityHashCode(x1))
     assertEquals(x2.hashCode(), System.identityHashCode(x2))
-  }
 
-  @Test def identityHashCode_should_by_pass_hashCode(): Unit = {
+  @Test def identityHashCode_should_by_pass_hashCode(): Unit =
     val list1 = List(1, 3, 5)
     val list2 = List(1, 3, 5)
     assertEquals(list2, list1)
     assertEquals(list2.hashCode(), list1.hashCode())
     assertNotEquals(
         System.identityHashCode(list1), System.identityHashCode(list2))
-  }
 
-  @Test def identityHashCode_of_null(): Unit = {
+  @Test def identityHashCode_of_null(): Unit =
     assertEquals(0, System.identityHashCode(null))
-  }
 
-  @Test def identityHashCode_of_values_implemented_as_JS_primitives(): Unit = {
-    if (!executingInJVM) {
+  @Test def identityHashCode_of_values_implemented_as_JS_primitives(): Unit =
+    if (!executingInJVM)
       assertEquals("foo".hashCode(), System.identityHashCode("foo"))
       assertEquals("".hashCode(), System.identityHashCode(""))
 
@@ -145,6 +131,3 @@ class SystemTest {
       assertEquals(789456.hashCode(), System.identityHashCode(789456))
 
       assertEquals(().hashCode(), System.identityHashCode(()))
-    }
-  }
-}

@@ -41,7 +41,7 @@ import Util._
   * Call save to actualize changes.
   * @author nafg
   */
-trait ItemsList[T <: Mapper[T]] {
+trait ItemsList[T <: Mapper[T]]
 
   /**
     * The MetaMapper that provides create and findAll functionality etc.
@@ -84,15 +84,15 @@ trait ItemsList[T <: Mapper[T]] {
     * Sorting sorts strings case-insensitive, as well as Ordered and java.lang.Comparable.
     * Anything else where both values are nonnull are sorted via their toString method (case sensitive)
     */
-  def items: Seq[T] = {
+  def items: Seq[T] =
     import scala.util.Sorting._
     val unsorted: List[T] = current.filterNot(removed.contains) ++ added
-    sortField match {
+    sortField match
       case None =>
         unsorted
       case Some(field) =>
-        unsorted.sortWith { (a, b) =>
-          ((field.actualField(a).get: Any, field.actualField(b).get: Any) match {
+        unsorted.sortWith  (a, b) =>
+          ((field.actualField(a).get: Any, field.actualField(b).get: Any) match
             case (aval: String, bval: String) =>
               aval.toLowerCase < bval.toLowerCase
             case (aval: Ordered[_], bval: Ordered[_]) =>
@@ -104,44 +104,36 @@ trait ItemsList[T <: Mapper[T]] {
             case (null, _) => sortNullFirst
             case (_, null) => !sortNullFirst
             case (aval, bval) => aval.toString < bval.toString
-          }) match {
+          ) match
             case cmp =>
               if (ascending) cmp else !cmp
-          }
-        }
-    }
-  }
 
   /**
     * Adds a new, unsaved item
     */
-  def add {
+  def add
     added ::= metaMapper.create
-  }
 
   /**
     * Marks an item pending for removal
     */
-  def remove(i: T) {
+  def remove(i: T)
     if (added.exists(i.eq)) added = added.filter(i.ne)
     else if (current.contains(i)) removed ::= i
-  }
 
   /**
     * Reset the ItemsList from the database: calls refresh, and 'added' and 'removed' are cleared.
     */
-  def reload {
+  def reload
     refresh
     added = Nil
     removed = Nil
-  }
 
   /**
     * Reloads the contents of 'current' from the database
     */
-  def refresh {
+  def refresh
     current = metaMapper.findAll
-  }
 
   /**
     * Sends to the database:
@@ -149,7 +141,7 @@ trait ItemsList[T <: Mapper[T]] {
     *  removed is deleted
     *  (current - removed) is saved
     */
-  def save {
+  def save
     val (successAdd, failAdd) = added.partition(_.save)
     added = failAdd
 
@@ -160,29 +152,23 @@ trait ItemsList[T <: Mapper[T]] {
     for (c <- current if c.validate.isEmpty) c.save
 
     current ++= successAdd
-  }
 
-  def sortBy(field: MappedField[_, T]) = (sortField, ascending) match {
+  def sortBy(field: MappedField[_, T]) = (sortField, ascending) match
     case (Some(f), true) if f eq field =>
       ascending = false
     case _ | null =>
       sortField = Some(field)
       ascending = true
-  }
-  def sortFn(field: MappedField[_, T]) = (sortField, ascending) match {
+  def sortFn(field: MappedField[_, T]) = (sortField, ascending) match
     case (Some(f), true) if f eq field =>
       () =>
         ascending = false
       case _ | null =>
       () =>
-        {
           sortField = Some(field)
           ascending = true
-        }
-  }
 
   reload
-}
 
 /**
   * Holds a registry of TableEditor delegates
@@ -192,7 +178,7 @@ trait ItemsList[T <: Mapper[T]] {
   * the provided template, /tableeditor/default.
   * @author nafg
   */
-object TableEditor {
+object TableEditor
   net.liftweb.http.LiftRules.addToPackages("net.liftweb.mapper.view")
 
   private[view] val map =
@@ -200,9 +186,8 @@ object TableEditor {
   def registerTable[T <: Mapper[T]](
       name: String, meta: T with MetaMapper[T], title: String) =
     map(name) = new TableEditorImpl(title, meta)
-}
 
-package snippet {
+package snippet
 
   /**
     * This is the snippet that the view references.
@@ -218,17 +203,14 @@ package snippet {
     * For a default layout, use lift:embed what="/tableeditor/default", with
     * @author nafg
     */
-  class TableEditor extends DispatchSnippet {
+  class TableEditor extends DispatchSnippet
     private def getInstance: Box[TableEditorImpl[_]] =
       S.attr("table").map(TableEditor.map(_))
-    def dispatch = {
+    def dispatch =
       case "edit" =>
         val o = getInstance.openOrThrowException(
             "if we don't have the table attr, we want the dev to know about it.")
         o.edit
-    }
-  }
-}
 
 /**
   * This class does the actual view binding against a ItemsList.
@@ -237,29 +219,26 @@ package snippet {
   */
 protected class TableEditorImpl[T <: Mapper[T]](
     val title: String, meta: T with MetaMapper[T])
-    extends ItemsListEditor[T] {
-  var items = new ItemsList[T] {
+    extends ItemsListEditor[T]
+  var items = new ItemsList[T]
     def metaMapper = meta
-  }
-}
 
 /**
   * General trait to edit an ItemsList.
   * @author nafg
   */
-trait ItemsListEditor[T <: Mapper[T]] {
+trait ItemsListEditor[T <: Mapper[T]]
   def items: ItemsList[T]
   def title: String
 
   def onInsert: Unit = items.add
   def onRemove(item: T): Unit = items.remove(item)
   def onSubmit: Unit =
-    try {
+    try
       items.save
-    } catch {
+    catch
       case e: java.sql.SQLException =>
         S.error("Not all items could be saved!")
-    }
   def sortFn(f: MappedField[_, T]): () => Unit = items.sortFn(f)
 
   val fieldFilter: MappedField[_, T] => Boolean = (f: MappedField[_, T]) =>
@@ -267,8 +246,8 @@ trait ItemsListEditor[T <: Mapper[T]] {
 
   def customBind(item: T): NodeSeq => NodeSeq = (ns: NodeSeq) => ns
 
-  def edit: (NodeSeq) => NodeSeq = {
-    def unsavedScript = ( <head>{Script(Run("""
+  def edit: (NodeSeq) => NodeSeq =
+    def unsavedScript = ( <head>Script(Run("""
                            var safeToContinue = false
                            window.onbeforeunload = function(evt) {{  // thanks Tim!
                              if(!safeToContinue) {{
@@ -278,59 +257,51 @@ trait ItemsListEditor[T <: Mapper[T]] {
                                return reply;
                              }}
                            }}
-    """))}</head>)
+    """))</head>)
     val noPrompt = "onclick" -> "safeToContinue=true"
     val optScript =
       if ((items.added.length + items.removed.length == 0) &&
-          items.current.forall(!_.dirty_?)) {
+          items.current.forall(!_.dirty_?))
         NodeSeq.Empty
-      } else {
+      else
         unsavedScript
-      }
 
-    val bindRemovedItems = items.removed.map { item =>
-      "^" #> customBind(item) andThen ".fields" #> eachField(item, {
+    val bindRemovedItems = items.removed.map  item =>
+      "^" #> customBind(item) andThen ".fields" #> eachField(item,
         f: MappedField[_, T] =>
           ".form" #> <strike>{f.asHtml}</strike>
-      }) & ".removeBtn" #> SHtml.submit(?("Remove"),
+      ) & ".removeBtn" #> SHtml.submit(?("Remove"),
                                         () => onRemove(item),
                                         noPrompt) & ".msg" #> Text(
           ?("Deleted"))
-    }
 
-    val bindRegularItems = items.items.map { item =>
-      "^" #> customBind(item) andThen ".fields" #> eachField(item, {
+    val bindRegularItems = items.items.map  item =>
+      "^" #> customBind(item) andThen ".fields" #> eachField(item,
         f: MappedField[_, T] =>
           ".form" #> f.toForm
-      }) & ".removeBtn" #> SHtml.submit(?("Remove"),
+      ) & ".removeBtn" #> SHtml.submit(?("Remove"),
                                         () => onRemove(item),
-                                        noPrompt) & ".msg" #> {
-        item.validate match {
+                                        noPrompt) & ".msg" #>
+        item.validate match
           case Nil =>
             if (!item.saved_?) Text(?("New"))
             else if (item.dirty_?) Text(?("Unsaved"))
             else NodeSeq.Empty
           case errors =>
             <ul>{errors.flatMap(e => <li>{e.msg}</li>)}</ul>
-        }
-      }
-    }
 
-    "^ >*" #> optScript andThen ".fields *" #> {
+    "^ >*" #> optScript andThen ".fields *" #>
       eachField[T](
-          items.metaMapper, { f: MappedField[_, T] =>
+          items.metaMapper,  f: MappedField[_, T] =>
             ".name" #> SHtml.link(S.uri,
                                   sortFn(f),
                                   Text(capify(f.displayName)))
-          },
+          ,
           fieldFilter
       )
-    } & ".table" #> {
+    & ".table" #>
       ".title *" #> title & ".insertBtn" #> SHtml.submit(?("Insert"),
                                                          onInsert _,
                                                          noPrompt) & ".item" #>
       (bindRegularItems ++ bindRemovedItems) & ".saveBtn" #> SHtml.submit(
           ?("Save"), onSubmit _, noPrompt)
-    }
-  }
-}

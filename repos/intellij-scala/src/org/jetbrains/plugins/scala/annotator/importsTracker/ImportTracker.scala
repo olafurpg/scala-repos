@@ -13,34 +13,25 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * @author Alexander Podkhalyuzin
   */
-class ImportTracker {
-  def registerUsedImports(file: ScalaFile, used: Set[ImportUsed]) {
+class ImportTracker
+  def registerUsedImports(file: ScalaFile, used: Set[ImportUsed])
     val refHolder = ScalaRefCountHolder.getInstance(file)
-    for (imp <- used) {
+    for (imp <- used)
       refHolder.registerImportUsed(imp)
-    }
-  }
 
-  def getUnusedImport(file: ScalaFile): Array[ImportUsed] = {
+  def getUnusedImport(file: ScalaFile): Array[ImportUsed] =
     val buff = new ArrayBuffer[ImportUsed]
     val iter = file.getAllImportUsed.iterator
     val refHolder = ScalaRefCountHolder getInstance file
-    val runnable = new Runnable {
-      def run() {
-        while (iter.nonEmpty) {
+    val runnable = new Runnable
+      def run()
+        while (iter.nonEmpty)
           val used = iter.next()
           if (refHolder.isRedundant(used)) buff += used
-        }
-      }
-    }
 
     refHolder retrieveUnusedReferencesInfo runnable
     buff.toArray
-  }
-}
 
-object ImportTracker {
-  def getInstance(project: Project): ImportTracker = {
+object ImportTracker
+  def getInstance(project: Project): ImportTracker =
     ServiceManager.getService(project, classOf[ImportTracker])
-  }
-}

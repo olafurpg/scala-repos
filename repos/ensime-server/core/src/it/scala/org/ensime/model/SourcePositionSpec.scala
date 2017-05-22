@@ -11,54 +11,41 @@ import org.ensime.util.file._
 
 class SourcePositionSpec
     extends EnsimeSpec with SharedEnsimeConfigFixture
-    with SharedEnsimeVFSFixture {
+    with SharedEnsimeVFSFixture
 
   val original = EnsimeConfigFixture.SimpleTestProject.copy(
       javaLibs = Nil
   )
 
-  "SourcePosition" should "resolve FqnSymbols for local files with no line number" in {
-    withEnsimeConfig { implicit config =>
-      lookup(knownFile) match {
+  "SourcePosition" should "resolve FqnSymbols for local files with no line number" in
+    withEnsimeConfig  implicit config =>
+      lookup(knownFile) match
         case Some(LineSourcePosition(name, 0)) if name.isFile =>
         case o => fail(s"not resolved $o")
-      }
-    }
-  }
 
-  it should "resolve FqnSymbols for local with a line number" in {
-    withEnsimeConfig { implicit config =>
-      lookup(knownFile, Some(100)) match {
+  it should "resolve FqnSymbols for local with a line number" in
+    withEnsimeConfig  implicit config =>
+      lookup(knownFile, Some(100)) match
         case Some(LineSourcePosition(name, 100)) if name.isFile =>
         case o => fail(s"not resolved $o")
-      }
-    }
-  }
 
-  it should "resolve FqnSymbols for archive entries with no line number" in {
-    withEnsimeConfig { implicit config =>
-      lookup(knownJarEntry) match {
+  it should "resolve FqnSymbols for archive entries with no line number" in
+    withEnsimeConfig  implicit config =>
+      lookup(knownJarEntry) match
         case Some(LineSourcePosition(name, 0)) if name.isFile =>
         case o => fail(s"not resolved $o")
-      }
-    }
-  }
 
-  it should "resolve FqnSymbols for archive entries with a line number" in {
-    withEnsimeConfig { implicit config =>
-      lookup(knownJarEntry, Some(100)) match {
+  it should "resolve FqnSymbols for archive entries with a line number" in
+    withEnsimeConfig  implicit config =>
+      lookup(knownJarEntry, Some(100)) match
         case Some(LineSourcePosition(name, 100)) if name.isFile =>
         case o => fail(s"not resolved $o")
-      }
-    }
-  }
 
-  def knownFile(implicit config: EnsimeConfig): String = {
+  def knownFile(implicit config: EnsimeConfig): String =
     val f = scalaMain / "org/example/Foo.scala"
     "file://" + f
-  }
 
-  def knownJarEntry(implicit config: EnsimeConfig): String = {
+  def knownJarEntry(implicit config: EnsimeConfig): String =
     val scalatest = config.subprojects.head.referenceSourceJars
       .find(
           _.getName.contains("scalatest_")
@@ -66,14 +53,10 @@ class SourcePositionSpec
       .get
       .getAbsoluteFile
     "jar:" + scalatest + "!/org/scalatest/FunSpec.scala"
-  }
 
   def lookup(uri: String, line: Option[Int] = None)(
-      implicit config: EnsimeConfig) = {
-    withVFS { implicit vfs: EnsimeVFS =>
+      implicit config: EnsimeConfig) =
+    withVFS  implicit vfs: EnsimeVFS =>
       val sym =
         FqnSymbol(None, "", "", "", None, None, Some(uri), line, Some(0))
       LineSourcePositionHelper.fromFqnSymbol(sym)
-    }
-  }
-}

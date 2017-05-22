@@ -12,18 +12,17 @@ import scala.util.Try
   * Nikolay.Tropin
   * 2014-12-03
   */
-class ScalaSyntheticProvider extends SyntheticTypeComponentProvider {
+class ScalaSyntheticProvider extends SyntheticTypeComponentProvider
   override def isSynthetic(typeComponent: TypeComponent): Boolean =
     ScalaSyntheticProvider.isSynthetic(typeComponent)
-}
 
-object ScalaSyntheticProvider {
-  def isSynthetic(typeComponent: TypeComponent): Boolean = {
+object ScalaSyntheticProvider
+  def isSynthetic(typeComponent: TypeComponent): Boolean =
     val isScala =
       DebuggerUtil.isScala(typeComponent.declaringType(), default = false)
     if (!isScala) return false
 
-    typeComponent match {
+    typeComponent match
       case m: Method
           if m.isConstructor &&
           ScalaPositionManager.isAnonfunType(m.declaringType()) =>
@@ -41,80 +40,64 @@ object ScalaSyntheticProvider {
         val machine: VirtualMachine = typeComponent.virtualMachine
         machine != null && machine.canGetSyntheticAttribute &&
         typeComponent.isSynthetic
-    }
-  }
 
-  private def hasSpecializationMethod(refType: ReferenceType): Boolean = {
+  private def hasSpecializationMethod(refType: ReferenceType): Boolean =
     refType.methods().asScala.exists(isSpecialization)
-  }
 
-  private def isSpecialization(method: Method): Boolean = {
+  private def isSpecialization(method: Method): Boolean =
     method.name.contains("$mc") && method.name.endsWith("$sp")
-  }
 
   private val defaultArgPattern = """\$default\$\d+""".r
 
-  private def isDefaultArg(m: Method): Boolean = {
+  private def isDefaultArg(m: Method): Boolean =
     val methodName = m.name()
     if (!methodName.contains("$default$")) false
-    else {
+    else
       val lastDefault =
         defaultArgPattern.findAllMatchIn(methodName).toSeq.lastOption
-      lastDefault.map(_.matched) match {
+      lastDefault.map(_.matched) match
         case Some(s) if methodName.endsWith(s) =>
           val origMethodName = methodName.stripSuffix(s)
           val refType = m.declaringType
           !refType.methodsByName(origMethodName).isEmpty
         case _ => false
-      }
-    }
-  }
 
-  private def isTraitForwarder(m: Method): Boolean = {
+  private def isTraitForwarder(m: Method): Boolean =
     Try(onlyInvokesStatic(m) && hasTraitWithImplementation(m)).getOrElse(false)
-  }
 
-  def isMacroDefined(typeComponent: TypeComponent) = {
+  def isMacroDefined(typeComponent: TypeComponent) =
     typeComponent.declaringType().name().contains("$macro")
-  }
 
-  private def onlyInvokesStatic(m: Method): Boolean = {
-    val bytecodes = try m.bytecodes() catch {
+  private def onlyInvokesStatic(m: Method): Boolean =
+    val bytecodes = try m.bytecodes() catch
       case t: Throwable => return false
-    }
 
     var i = 0
-    while (i < bytecodes.length) {
+    while (i < bytecodes.length)
       val instr = bytecodes(i)
       if (BytecodeUtil.twoBytesLoadCodes.contains(instr)) i += 2
       else if (BytecodeUtil.oneByteLoadCodes.contains(instr)) i += 1
-      else if (instr == DecompilerUtil.Opcodes.invokeStatic) {
+      else if (instr == DecompilerUtil.Opcodes.invokeStatic)
         val nextIdx = i + 3
         val nextInstr = bytecodes(nextIdx)
         return nextIdx == (bytecodes.length - 1) &&
         BytecodeUtil.returnCodes.contains(nextInstr)
-      } else return false
-    }
+      else return false
     false
-  }
 
-  private def hasTraitWithImplementation(m: Method): Boolean = {
-    m.declaringType() match {
+  private def hasTraitWithImplementation(m: Method): Boolean =
+    m.declaringType() match
       case ct: ClassType =>
         val interfaces = ct.allInterfaces().asScala
         val vm = ct.virtualMachine()
         val allTraitImpls =
           vm.allClasses().asScala.filter(_.name().endsWith("$class"))
-        for {
+        for
           interface <- interfaces
           traitImpl <- allTraitImpls
                           if traitImpl.name().stripSuffix("$class") == interface
                         .name() && !traitImpl.methodsByName(m.name).isEmpty
-        } {
+        
           return true
-        }
         false
       case _ => false
-    }
-  }
-}

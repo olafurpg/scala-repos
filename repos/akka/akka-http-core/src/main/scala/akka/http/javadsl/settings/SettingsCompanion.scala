@@ -3,7 +3,7 @@ package akka.http.javadsl.settings
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
 
-trait SettingsCompanion[T] {
+trait SettingsCompanion[T]
 
   /**
     * Creates an instance of settings using the configuration provided by the given ActorSystem.
@@ -27,4 +27,3 @@ trait SettingsCompanion[T] {
     * Java API
     */
   def create(configOverrides: String): T
-}

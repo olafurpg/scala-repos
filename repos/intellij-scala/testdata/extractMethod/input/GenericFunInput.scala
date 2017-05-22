@@ -1,5 +1,5 @@
-class GenericFunInput {
-  def foo {
+class GenericFunInput
+  def foo
     def goo[T](x: T) = x
     /*start*/
     val x = goo(3)
@@ -9,8 +9,6 @@ class GenericFunInput {
     val f = x
     val h = y
     val u = z
-  }
-}
 /*
 class GenericFunInput {
   def foo {

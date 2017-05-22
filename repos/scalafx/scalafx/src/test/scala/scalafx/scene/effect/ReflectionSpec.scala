@@ -43,7 +43,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class ReflectionSpec
     extends SimpleSFXDelegateSpec[jfxse.Reflection, Reflection](
         classOf[jfxse.Reflection], classOf[Reflection])
-    with InputDelegateSpec[Reflection] {
+    with InputDelegateSpec[Reflection]
 
   val inputDelegate = getScalaClassInstance
-}

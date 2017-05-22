@@ -8,22 +8,18 @@ import scala.collection.mutable
   * Pavel.Fatin, 09.05.2010
   */
 class DepthFirstIterator(element: PsiElement, predicate: PsiElement => Boolean)
-    extends Iterator[PsiElement] {
+    extends Iterator[PsiElement]
   private val stack = mutable.Stack[PsiElement](element)
 
   def hasNext = stack.nonEmpty
 
-  def next() = {
+  def next() =
     val element = stack.pop()
     if (predicate(element)) pushChildren(element)
     element
-  }
 
-  def pushChildren(element: PsiElement) {
+  def pushChildren(element: PsiElement)
     var child = element.getLastChild
-    while (child != null) {
+    while (child != null)
       stack.push(child)
       child = child.getPrevSibling
-    }
-  }
-}

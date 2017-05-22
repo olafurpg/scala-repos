@@ -9,62 +9,58 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ListBuffer
 import scala.util.Properties
 
-object DevModeBuild {
+object DevModeBuild
 
-  object DevModeKeys {
+  object DevModeKeys
     val writeRunProperties = TaskKey[Unit]("writeRunProperties")
     val waitForServer = TaskKey[Unit]("waitForServer")
     val resetReloads = TaskKey[Unit]("resetReloads")
     val verifyReloads = InputKey[Unit]("verifyReloads")
     val verifyResourceContains = InputKey[Unit]("verifyResourceContains")
-  }
 
   def settings: Seq[Setting[_]] = Seq(
-      DevModeKeys.writeRunProperties := {
+      DevModeKeys.writeRunProperties :=
         IO.write(file("run.properties"),
                  s"project.version=${play.core.PlayVersion.current}")
-      },
-      DevModeKeys.waitForServer := {
+      ,
+      DevModeKeys.waitForServer :=
         DevModeBuild.waitForServer()
-      },
-      DevModeKeys.resetReloads := {
+      ,
+      DevModeKeys.resetReloads :=
         (target.value / "reload.log").delete()
-      },
-      DevModeKeys.verifyReloads := {
+      ,
+      DevModeKeys.verifyReloads :=
         val expected = Def.spaceDelimited().parsed.head.toInt
         val actual = try IO
           .readLines(target.value / "reload.log")
-          .count(_.nonEmpty) catch {
+          .count(_.nonEmpty) catch
           case _: java.io.IOException => 0
-        }
-        if (expected == actual) {
+        if (expected == actual)
           println(s"Expected and got $expected reloads")
-        } else {
+        else
           throw new RuntimeException(
               s"Expected $expected reloads but got $actual")
-        }
-      },
-      DevModeKeys.verifyResourceContains := {
+      ,
+      DevModeKeys.verifyResourceContains :=
         val args = Def.spaceDelimited("<path> <status> <words> ...").parsed
         val path = args.head
         val status = args.tail.head.toInt
         val assertions = args.tail.tail
         DevModeBuild.verifyResourceContains(path, status, assertions, 0)
-      }
   )
 
   val ServerMaxAttempts = 3 * 60
   val ServerWaitTime = 1000l
 
   @tailrec
-  def waitForServer(attempts: Int = 0): Unit = {
+  def waitForServer(attempts: Int = 0): Unit =
     println(s"Connecting to server: attempt $attempts")
-    try {
+    try
       val url = new java.net.URL("http://localhost:9000")
       val connection =
         url.openConnection().asInstanceOf[java.net.HttpURLConnection]
       connection.connect()
-      connection match {
+      connection match
         case h: java.net.HttpURLConnection =>
           println(
               s"Server gave us status ${h.getResponseCode} ${h.getResponseMessage}")
@@ -73,19 +69,15 @@ object DevModeBuild {
                 s"Bad response code ${h.getResponseCode} from server")
         case _ =>
           println(s"Not an HttpURLConnection? ${connection.getClass.getName}")
-      }
       connection.disconnect()
-    } catch {
+    catch
       case e: Exception =>
-        if (attempts < ServerMaxAttempts) {
+        if (attempts < ServerMaxAttempts)
           Thread.sleep(ServerWaitTime)
           waitForServer(attempts + 1)
-        } else {
+        else
           println(s"After $attempts attempts:")
           throw e
-        }
-    }
-  }
 
   val MaxAttempts = 10
   val WaitTime = 500l
@@ -96,59 +88,51 @@ object DevModeBuild {
   def verifyResourceContains(path: String,
                              status: Int,
                              assertions: Seq[String],
-                             attempts: Int): Unit = {
+                             attempts: Int): Unit =
     println(s"Attempt $attempts at $path")
     val messages = ListBuffer.empty[String]
-    try {
+    try
       val url = new java.net.URL("http://localhost:9000" + path)
       val conn = url.openConnection().asInstanceOf[java.net.HttpURLConnection]
       conn.setConnectTimeout(ConnectTimeout)
       conn.setReadTimeout(ReadTimeout)
 
-      if (status == conn.getResponseCode) {
+      if (status == conn.getResponseCode)
         messages += s"Resource at $path returned $status as expected"
-      } else {
+      else
         throw new RuntimeException(
             s"Resource at $path returned ${conn.getResponseCode} instead of $status")
-      }
 
       val is =
-        if (conn.getResponseCode >= 400) {
+        if (conn.getResponseCode >= 400)
           conn.getErrorStream
-        } else {
+        else
           conn.getInputStream
-        }
 
       // The input stream may be null if there's no body
       val contents =
-        if (is != null) {
+        if (is != null)
           val c = IO.readStream(is)
           is.close()
           c
-        } else ""
+        else ""
       conn.disconnect()
 
-      assertions.foreach { assertion =>
-        if (contents.contains(assertion)) {
+      assertions.foreach  assertion =>
+        if (contents.contains(assertion))
           messages += s"Resource at $path contained $assertion"
-        } else {
+        else
           throw new RuntimeException(
               s"Resource at $path didn't contain '$assertion':\n$contents")
-        }
-      }
 
       messages.foreach(println)
-    } catch {
+    catch
       case e: Exception =>
         println(s"Got exception: $e")
-        if (attempts < MaxAttempts) {
+        if (attempts < MaxAttempts)
           Thread.sleep(WaitTime)
           verifyResourceContains(path, status, assertions, attempts + 1)
-        } else {
+        else
           messages.foreach(println)
           println(s"After $attempts attempts:")
           throw e
-        }
-    }
-  }
-}

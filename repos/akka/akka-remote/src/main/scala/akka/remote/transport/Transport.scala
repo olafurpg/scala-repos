@@ -11,7 +11,7 @@ import akka.AkkaException
 import scala.util.control.NoStackTrace
 import akka.actor.DeadLetterSuppression
 
-object Transport {
+object Transport
 
   trait AssociationEvent extends NoSerializationVerificationNeeded
 
@@ -37,14 +37,13 @@ object Transport {
   /**
     * An interface that needs to be implemented by the user of a transport to listen to association events
     */
-  trait AssociationEventListener {
+  trait AssociationEventListener
 
     /**
       * Called by the transport to notify the listener about an AssociationEvent
       * @param ev The AssociationEvent of the transport
       */
     def notify(ev: AssociationEvent): Unit
-  }
 
   /**
     * Class to convert ordinary [[akka.actor.ActorRef]] instances to an AssociationEventListener. The adapter will
@@ -52,10 +51,8 @@ object Transport {
     * @param actor
     */
   final case class ActorAssociationEventListener(actor: ActorRef)
-      extends AssociationEventListener {
+      extends AssociationEventListener
     override def notify(ev: AssociationEvent): Unit = actor ! ev
-  }
-}
 
 /**
   * An SPI layer for implementing asynchronous transport mechanisms. The Transport is responsible for initializing the
@@ -64,7 +61,7 @@ object Transport {
   * Transport implementations that are loaded dynamically by the remoting must have a constructor that accepts a
   * [[com.typesafe.config.Config]] and an [[akka.actor.ExtendedActorSystem]] as parameters.
   */
-trait Transport {
+trait Transport
   import akka.remote.transport.Transport._
 
   /**
@@ -143,12 +140,10 @@ trait Transport {
     * @param cmd Command message to the transport
     * @return Future that succeeds when the command was handled or dropped
     */
-  def managementCommand(cmd: Any): Future[Boolean] = {
+  def managementCommand(cmd: Any): Future[Boolean] =
     Future.successful(false)
-  }
-}
 
-object AssociationHandle {
+object AssociationHandle
 
   /**
     * Trait for events that the registered listener for an [[akka.remote.transport.AssociationHandle]] might receive.
@@ -162,10 +157,9 @@ object AssociationHandle {
     * @param payload
     *   The raw bytes that were sent by the remote endpoint.
     */
-  final case class InboundPayload(payload: ByteString) extends HandleEvent {
+  final case class InboundPayload(payload: ByteString) extends HandleEvent
     override def toString: String =
       s"InboundPayload(size = ${payload.length} bytes)"
-  }
 
   /**
     * Message sent to the listener registered to an association
@@ -189,14 +183,13 @@ object AssociationHandle {
     * An interface that needs to be implemented by the user of an [[akka.remote.transport.AssociationHandle]]
     * to listen to association events.
     */
-  trait HandleEventListener {
+  trait HandleEventListener
 
     /**
       * Called by the transport to notify the listener about a HandleEvent
       * @param ev The HandleEvent of the handle
       */
     def notify(ev: HandleEvent): Unit
-  }
 
   /**
     * Class to convert ordinary [[akka.actor.ActorRef]] instances to a HandleEventListener. The adapter will
@@ -204,10 +197,8 @@ object AssociationHandle {
     * @param actor
     */
   final case class ActorHandleEventListener(actor: ActorRef)
-      extends HandleEventListener {
+      extends HandleEventListener
     override def notify(ev: HandleEvent): Unit = actor ! ev
-  }
-}
 
 /**
   * An SPI layer for abstracting over logical links (associations) created by a [[akka.remote.transport.Transport]].
@@ -217,7 +208,7 @@ object AssociationHandle {
   * returned by [[akka.remote.transport.AssociationHandle#readHandlerPromise]]. Incoming data is not processed until
   * this registration takes place.
   */
-trait AssociationHandle {
+trait AssociationHandle
 
   /**
     * Address of the local endpoint.
@@ -270,4 +261,3 @@ trait AssociationHandle {
     *
     */
   def disassociate(): Unit
-}

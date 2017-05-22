@@ -4,7 +4,7 @@ package org.ensime.server.protocol.swank
 
 import org.ensime.api._
 
-object SwankTestData extends EnsimeTestData {
+object SwankTestData extends EnsimeTestData
 
   val typeInfoStr =
     """(:arrow-type nil :name "type1" :decl-as method :full-name "FOO.type1")"""
@@ -94,4 +94,3 @@ object SwankTestData extends EnsimeTestData {
 
   val entityInfoStr =
     """(:arrow-type t :name "Arrow1" :result-type (:arrow-type nil :name "type1" :decl-as method :full-name "FOO.type1") :param-sections ((:params (("ABC" (:arrow-type nil :name "type1" :decl-as method :full-name "FOO.type1"))))))"""
-}

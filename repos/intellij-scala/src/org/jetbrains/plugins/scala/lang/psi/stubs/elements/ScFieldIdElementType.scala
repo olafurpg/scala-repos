@@ -16,26 +16,21 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScFieldIdStubImpl
   * Date: 19.07.2009
   */
 class ScFieldIdElementType[Func <: ScFieldId]
-    extends ScStubElementType[ScFieldIdStub, ScFieldId]("field id") {
+    extends ScStubElementType[ScFieldIdStub, ScFieldId]("field id")
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScFieldId, parentStub: StubElement[ParentPsi]): ScFieldIdStub = {
+      psi: ScFieldId, parentStub: StubElement[ParentPsi]): ScFieldIdStub =
     new ScFieldIdStubImpl[ParentPsi](parentStub, this, psi.name)
-  }
 
-  def serialize(stub: ScFieldIdStub, dataStream: StubOutputStream): Unit = {
+  def serialize(stub: ScFieldIdStub, dataStream: StubOutputStream): Unit =
     dataStream.writeName(stub.getName)
-  }
 
-  def createPsi(stub: ScFieldIdStub): ScFieldId = {
+  def createPsi(stub: ScFieldIdStub): ScFieldId =
     new ScFieldIdImpl(stub)
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScFieldIdStub = {
+      dataStream: StubInputStream, parentStub: Any): ScFieldIdStub =
     val name = StringRef.toString(dataStream.readName)
     new ScFieldIdStubImpl(
         parentStub.asInstanceOf[StubElement[_ <: PsiElement]], this, name)
-  }
 
   def indexStub(stub: ScFieldIdStub, sink: IndexSink): Unit = {}
-}

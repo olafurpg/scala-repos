@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 
-object CubicCurveTo {
+object CubicCurveTo
   implicit def sfxCubicCurveTo2jfx(v: CubicCurveTo): jfxss.CubicCurveTo =
     if (v != null) v.delegate else null
 
@@ -46,30 +46,24 @@ object CubicCurveTo {
     new CubicCurveTo(
         new jfxss.CubicCurveTo(
             controlX1, controlY1, controlX2, controlY2, x, y))
-}
 
 class CubicCurveTo(
     override val delegate: jfxss.CubicCurveTo = new jfxss.CubicCurveTo)
     extends PathElement(delegate) with PositionDelegate[jfxss.CubicCurveTo]
-    with SFXDelegate[jfxss.CubicCurveTo] {
+    with SFXDelegate[jfxss.CubicCurveTo]
 
   def controlX1: DoubleProperty = delegate.controlX1Property
-  def controlX1_=(v: Double) {
+  def controlX1_=(v: Double)
     controlX1() = v
-  }
 
   def controlX2: DoubleProperty = delegate.controlX2Property
-  def controlX2_=(v: Double) {
+  def controlX2_=(v: Double)
     controlX2() = v
-  }
 
   def controlY1: DoubleProperty = delegate.controlY1Property
-  def controlY1_=(v: Double) {
+  def controlY1_=(v: Double)
     controlY1() = v
-  }
 
   def controlY2: DoubleProperty = delegate.controlY2Property
-  def controlY2_=(v: Double) {
+  def controlY2_=(v: Double)
     controlY2() = v
-  }
-}

@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   println(f"%")
   println(f"%%")
   println(f"%%%")
@@ -22,4 +22,3 @@ object Test extends App {
 
   println(f"${0}%n")
   println(f"${0}%d%n")
-}

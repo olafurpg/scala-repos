@@ -13,51 +13,45 @@ import scala.collection.JavaConverters._
   * A SPNEGO HTTP authenticator as defined in https://tools.ietf.org/html/rfc4559, which gets
   * its credentials from a provided CredentialSource... usually JAAS.
   */
-object SpnegoAuthenticator {
+object SpnegoAuthenticator
   private val log = Logger("spnego")
 
   type Token = Array[Byte]
-  object Token {
+  object Token
     val Empty = Array.empty[Byte]
-  }
 
   val AuthScheme = "Negotiate"
 
-  private object AuthHeader {
+  private object AuthHeader
     val SchemePrefixLength = AuthScheme.length + 1
     def apply(token: Option[Token]): Option[String] =
-      token map { t =>
+      token map  t =>
         AuthScheme + " " + Base64StringEncoder.encode(t)
-      }
 
     /** If the header represents a valid spnego negotiation, return it. */
     def unapply(header: String): Option[Token] =
       // must be a valid Negotiate header, and have a token
       if (header.length <= SchemePrefixLength ||
-          !header.startsWith(AuthScheme)) {
+          !header.startsWith(AuthScheme))
         None
-      } else {
+      else
         val tokenStr = header.substring(SchemePrefixLength)
         Some(Base64StringEncoder.decode(tokenStr))
-      }
-  }
 
   /** An authenticated HTTP request, with its GSS context. */
-  trait Authenticated[Req] {
+  trait Authenticated[Req]
     val request: Req
     val context: GSSContext
-  }
 
-  object Authenticated {
+  object Authenticated
     case class Http(request: Request, context: GSSContext)
         extends Authenticated[Request]
-  }
 
   case class Negotiated(
       established: Option[GSSContext], wwwAuthenticate: Option[String])
 
-  object Credentials {
-    trait ServerSource {
+  object Credentials
+    trait ServerSource
 
       /** Loads a GSSContext (for previously specified identifiers).  */
       def load(): Future[GSSContext]
@@ -67,9 +61,8 @@ object SpnegoAuthenticator {
         * Returns a Negotitated representing the response.
         */
       def accept(context: GSSContext, negotiation: Token): Future[Negotiated]
-    }
 
-    trait ClientSource {
+    trait ClientSource
 
       /** Loads a GSSContext (for previously specified identifiers).  */
       def load(): Future[GSSContext]
@@ -80,7 +73,6 @@ object SpnegoAuthenticator {
         */
       def init(
           context: GSSContext, challengeToken: Option[Token]): Future[Token]
-    }
 
     /**
       * JAAS implementation of credential fetching/validation (via the configuration section named by
@@ -90,7 +82,7 @@ object SpnegoAuthenticator {
       * Since the authentication operations may block when i.e. talking to a KDC, these potentially
       * blocking calls are wrapped in a FuturePool.
       */
-    object JAAS {
+    object JAAS
 
       /**
         * Oid for the KRB5 mechanism  These come from
@@ -106,22 +98,19 @@ object SpnegoAuthenticator {
         *
         */
       val SpnegoMechanism = new Oid("1.3.6.1.5.5.2")
-    }
 
-    trait JAAS {
+    trait JAAS
       val loginContext: String
 
-      def load(): Future[GSSContext] = pool {
+      def load(): Future[GSSContext] = pool
         log.debug("Getting context: %s", loginContext)
         val portal = new LoginContext(loginContext)
         // TODO: should logout?
         portal.login()
         Subject.doAs(portal.getSubject, createContextAction)
-      }
 
-      private val createContextAction = new PrivilegedAction[GSSContext] {
+      private val createContextAction = new PrivilegedAction[GSSContext]
         def run(): GSSContext = createGSSContext()
-      }
 
       /** Called while running with the privileges of the given loginContext.  */
       protected def createGSSContext(): GSSContext
@@ -133,27 +122,25 @@ object SpnegoAuthenticator {
       protected def mechanism: Oid = JAAS.Krb5Mechanism
       protected def manager: GSSManager = GSSManager.getInstance
       protected def pool: FuturePool = FuturePool.unboundedPool
-    }
 
     class JAASClientSource(
         val loginContext: String,
         _serverPrincipal: String,
         _serverPrincipalType: Oid = JAAS.Krb5PrincipalType
     )
-        extends ClientSource with JAAS {
+        extends ClientSource with JAAS
       val serverPrincipal =
         manager.createName(_serverPrincipal, _serverPrincipalType)
 
       def init(
           context: GSSContext, challengeToken: Option[Token]): Future[Token] =
-        pool {
+        pool
           val tokenIn = challengeToken.getOrElse(Token.Empty)
           var tokenOut: Token = null
-          do {
+          do
             tokenOut = context.initSecContext(tokenIn, 0, tokenIn.length)
-          } while (tokenOut == null);
+          while (tokenOut == null);
           tokenOut
-        }
 
       protected def createGSSContext(): GSSContext =
         manager.createContext(
@@ -167,20 +154,18 @@ object SpnegoAuthenticator {
             ),
             lifetime
         )
-    }
 
     class JAASServerSource(val loginContext: String)
-        extends ServerSource with JAAS {
+        extends ServerSource with JAAS
       def accept(context: GSSContext, negotiation: Token): Future[Negotiated] =
-        pool {
+        pool
           val token =
             context.acceptSecContext(negotiation, 0, negotiation.length)
           val established = if (context.isEstablished) Some(context) else None
           val wwwAuthenticate = AuthHeader(Option(token))
           Negotiated(established, wwwAuthenticate)
-        }
 
-      protected def createGSSContext(): GSSContext = {
+      protected def createGSSContext(): GSSContext =
         val cred = manager.createCredential(
             selfPrincipal.orNull,
             lifetime,
@@ -195,15 +180,12 @@ object SpnegoAuthenticator {
             GSSCredential.ACCEPT_ONLY
         )
         manager.createContext(cred)
-      }
-    }
-  }
 
   /**
     * A typeclass to get/set fields of http responses of type Rsp.
     * TODO: Remove after http and http are merged
     */
-  sealed trait RspSupport[Rsp] {
+  sealed trait RspSupport[Rsp]
 
     /** Get the status for the Rsp. */
     def status(rsp: Rsp): Status
@@ -216,13 +198,12 @@ object SpnegoAuthenticator {
 
     /** Create an Unauthorized response with the given protocolVersion. */
     def unauthorized(version: Version): Rsp
-  }
 
   /**
     * A typeclass to get/set fields of http requests of type Req.
     * TODO: Remove after http and http are merged
     */
-  sealed trait ReqSupport[Req] {
+  sealed trait ReqSupport[Req]
 
     /** Returns the AUTHORIZATION header for the given Req. */
     def authorizationHeader(req: Req): Option[String]
@@ -235,31 +216,27 @@ object SpnegoAuthenticator {
 
     /** Wrap a Req with authentication information. */
     def authenticated(req: Req, context: GSSContext): Authenticated[Req]
-  }
 
-  implicit val httpResponseSupport = new RspSupport[Response] {
+  implicit val httpResponseSupport = new RspSupport[Response]
     def status(rsp: Response) = rsp.status
     def wwwAuthenticateHeader(rsp: Response) =
       Option(rsp.headers.get(Fields.WwwAuthenticate))
     def wwwAuthenticateHeader(rsp: Response, auth: String) =
       rsp.headers.set(Fields.WwwAuthenticate, auth)
     def unauthorized(version: Version) = Response(version, Status.Unauthorized)
-  }
 
-  implicit val httpRequestSupport = new ReqSupport[Request] {
+  implicit val httpRequestSupport = new ReqSupport[Request]
     def authorizationHeader(req: Request) =
       Option(req.headers.get(Fields.Authorization))
     def authorizationHeader(req: Request, token: Token) =
-      AuthHeader(Some(token)).foreach { header =>
+      AuthHeader(Some(token)).foreach  header =>
         req.headers.set(Fields.Authorization, header)
-      }
     def protocolVersion(req: Request) = req.version
     def authenticated(req: Request, context: GSSContext) =
       Authenticated.Http(req, context)
-  }
 
   sealed abstract class Client[Req : ReqSupport, Rsp : RspSupport]
-      extends Filter[Req, Rsp, Req, Rsp] {
+      extends Filter[Req, Rsp, Req, Rsp]
     val credSrc: Credentials.ClientSource
     val reqs = implicitly[ReqSupport[Req]]
     val rsps = implicitly[RspSupport[Rsp]]
@@ -277,72 +254,59 @@ object SpnegoAuthenticator {
         backend: Service[Req, Rsp],
         credentialOption: Option[Future[GSSContext]]
     ): Future[Rsp] =
-      backend(req).transform {
+      backend(req).transform
         case Return(rsp) if rsps.status(rsp) == Status.Unauthorized =>
           // we've been challenged: reattempt the request with an improved token
           val credentialFuture = credentialOption.getOrElse(credSrc.load())
-          credentialFuture.flatMap { context =>
+          credentialFuture.flatMap  context =>
             // look for any Token data in the challenge, and attempt to initialize
-            val challengeToken = rsps.wwwAuthenticateHeader(rsp).collect {
+            val challengeToken = rsps.wwwAuthenticateHeader(rsp).collect
               case AuthHeader(token) => token
-            }
-            credSrc.init(context, challengeToken).flatMap { nextToken =>
+            credSrc.init(context, challengeToken).flatMap  nextToken =>
               // loop to reattempt the request, mutated with the next token data
               reqs.authorizationHeader(req, nextToken)
               challengeResponseLoop(req, backend, Some(credentialFuture))
-            }
-          }
         case rsp =>
           // no challenge (or an exception): we're finished
           Future.const(rsp)
-      }
-  }
 
   sealed abstract class Server[Req : ReqSupport, Rsp : RspSupport]
-      extends Filter[Req, Rsp, SpnegoAuthenticator.Authenticated[Req], Rsp] {
+      extends Filter[Req, Rsp, SpnegoAuthenticator.Authenticated[Req], Rsp]
     val credSrc: Credentials.ServerSource
     val reqs = implicitly[ReqSupport[Req]]
     val rsps = implicitly[RspSupport[Rsp]]
 
-    private def unauthorized(req: Req) = {
+    private def unauthorized(req: Req) =
       val rsp = rsps.unauthorized(reqs.protocolVersion(req))
       rsps.wwwAuthenticateHeader(rsp, AuthScheme)
       rsp
-    }
 
     final def apply(
         req: Req, authed: Service[Authenticated[Req], Rsp]): Future[Rsp] =
-      reqs.authorizationHeader(req).collect {
+      reqs.authorizationHeader(req).collect
         case AuthHeader(negotiation) =>
-          credSrc.load() flatMap {
+          credSrc.load() flatMap
             credSrc.accept(_, negotiation)
-          } flatMap { negotiated =>
-            negotiated.established map { ctx =>
+          flatMap  negotiated =>
+            negotiated.established map  ctx =>
               authed(reqs.authenticated(req, ctx))
-            } getOrElse {
+            getOrElse
               Future value unauthorized(req)
-            } map { rsp =>
-              negotiated.wwwAuthenticate foreach {
+            map  rsp =>
+              negotiated.wwwAuthenticate foreach
                 rsps.wwwAuthenticateHeader(rsp, _)
-              }
               rsp
-            }
-          } handle {
-            case e: GSSException => {
+          handle
+            case e: GSSException =>
                 log.error(e, "authenticating")
                 unauthorized(req)
-              }
-          }
-      } getOrElse {
+      getOrElse
         log.debug(
             "Request had no AuthHeader information.  Returning Unauthorized.")
         Future value unauthorized(req)
-      }
-  }
 
   case class ClientFilter(credSrc: Credentials.ClientSource)
       extends Client[Request, Response]
 
   case class ServerFilter(credSrc: Credentials.ServerSource)
       extends Server[Request, Response]
-}

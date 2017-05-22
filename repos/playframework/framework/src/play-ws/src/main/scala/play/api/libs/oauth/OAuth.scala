@@ -16,14 +16,13 @@ import play.api.libs.ws.WSSignatureCalculator
   *  @param use10a whether the service should use the 1.0 version of the spec, or the 1.0a version fixing a security issue.
   *  You must use the version corresponding to the
   */
-case class OAuth(info: ServiceInfo, use10a: Boolean = true) {
+case class OAuth(info: ServiceInfo, use10a: Boolean = true)
 
-  private val provider = {
+  private val provider =
     val p = new CommonsHttpOAuthProvider(
         info.requestTokenURL, info.accessTokenURL, info.authorizationURL)
     p.setOAuth10a(use10a)
     p
-  }
 
   /**
     * Request the request token and secret.
@@ -32,15 +31,13 @@ case class OAuth(info: ServiceInfo, use10a: Boolean = true) {
     * @return A Right(RequestToken) in case of success, Left(OAuthException) otherwise
     */
   def retrieveRequestToken(
-      callbackURL: String): Either[OAuthException, RequestToken] = {
+      callbackURL: String): Either[OAuthException, RequestToken] =
     val consumer = new DefaultOAuthConsumer(info.key.key, info.key.secret)
-    try {
+    try
       provider.retrieveRequestToken(consumer, callbackURL)
       Right(RequestToken(consumer.getToken(), consumer.getTokenSecret()))
-    } catch {
+    catch
       case e: OAuthException => Left(e)
-    }
-  }
 
   /**
     * Exchange a request token for an access token.
@@ -51,30 +48,26 @@ case class OAuth(info: ServiceInfo, use10a: Boolean = true) {
     */
   def retrieveAccessToken(
       token: RequestToken,
-      verifier: String): Either[OAuthException, RequestToken] = {
+      verifier: String): Either[OAuthException, RequestToken] =
     val consumer = new DefaultOAuthConsumer(info.key.key, info.key.secret)
     consumer.setTokenWithSecret(token.token, token.secret)
-    try {
+    try
       provider.retrieveAccessToken(consumer, verifier)
       Right(RequestToken(consumer.getToken(), consumer.getTokenSecret()))
-    } catch {
+    catch
       case e: OAuthException => Left(e)
-    }
-  }
 
   /**
     * The URL where the user needs to be redirected to grant authorization to your application.
     *
     * @param token request token
     */
-  def redirectUrl(token: String): String = {
+  def redirectUrl(token: String): String =
     _root_.oauth.signpost.OAuth.addQueryParameters(
         provider.getAuthorizationWebsiteUrl(),
         _root_.oauth.signpost.OAuth.OAUTH_TOKEN,
         token
     )
-  }
-}
 
 /**
   * A consumer key / consumer secret pair that the OAuth provider gave you, to identify your application.
@@ -98,7 +91,7 @@ case class ServiceInfo(requestTokenURL: String,
   * The public AsyncHttpClient implementation of WSSignatureCalculator.
   */
 class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
-    extends WSSignatureCalculator with SignatureCalculator {
+    extends WSSignatureCalculator with SignatureCalculator
 
   import org.asynchttpclient.oauth.{ConsumerKey => AHCConsumerKey, RequestToken => AHCRequestToken}
 
@@ -110,10 +103,8 @@ class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
       ahcConsumerKey, ahcRequestToken)
 
   override def calculateAndAddSignature(
-      request: Request, requestBuilder: RequestBuilderBase[_]): Unit = {
+      request: Request, requestBuilder: RequestBuilderBase[_]): Unit =
     calculator.calculateAndAddSignature(request, requestBuilder)
-  }
-}
 
 /**
   * Object for creating signature calculator for the Play WS API.
@@ -126,9 +117,7 @@ class OAuthCalculator(consumerKey: ConsumerKey, requestToken: RequestToken)
   * WS.url("http://example.com/protected").sign(OAuthCalculator(consumerKey, requestToken)).get()
   * }}}
   */
-object OAuthCalculator {
+object OAuthCalculator
   def apply(
-      consumerKey: ConsumerKey, token: RequestToken): WSSignatureCalculator = {
+      consumerKey: ConsumerKey, token: RequestToken): WSSignatureCalculator =
     new OAuthCalculator(consumerKey, token)
-  }
-}

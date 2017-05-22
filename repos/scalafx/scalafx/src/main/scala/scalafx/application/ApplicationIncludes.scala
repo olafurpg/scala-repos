@@ -38,7 +38,7 @@ object ApplicationIncludes extends ApplicationIncludes
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/application/package-summary.html `javafx.application`]] Classes to 
   * their ScalaFX counterparts.
   */
-trait ApplicationIncludes {
+trait ApplicationIncludes
 
   /**
     * Converts a 
@@ -51,12 +51,12 @@ trait ApplicationIncludes {
   implicit def jfxParameters2sfx(
       p: jfxa.Application.Parameters): JFXApp.Parameters =
     if (p != null)
-      new JFXApp.Parameters {
+      new JFXApp.Parameters
         def raw = p.getRaw
         def named = p.getNamed
         def unnamed = p.getUnnamed
         def delegate = p
-      } else null
+      else null
 
   /**
     * Converts a 
@@ -72,4 +72,3 @@ trait ApplicationIncludes {
 
   implicit def jfxHostServices2sfx(e: jfxa.HostServices): HostServices =
     new HostServices(e)
-}

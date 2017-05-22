@@ -31,16 +31,15 @@ class Dispatcher(
     val throughputDeadlineTime: Duration,
     executorServiceFactoryProvider: ExecutorServiceFactoryProvider,
     val shutdownTimeout: FiniteDuration)
-    extends MessageDispatcher(_configurator) {
+    extends MessageDispatcher(_configurator)
 
   import configurator.prerequisites._
 
   private class LazyExecutorServiceDelegate(factory: ExecutorServiceFactory)
-      extends ExecutorServiceDelegate {
+      extends ExecutorServiceDelegate
     lazy val executor: ExecutorService = factory.createExecutorService
     def copy(): LazyExecutorServiceDelegate =
       new LazyExecutorServiceDelegate(factory)
-  }
 
   @volatile private var executorServiceDelegate: LazyExecutorServiceDelegate =
     new LazyExecutorServiceDelegate(
@@ -54,33 +53,31 @@ class Dispatcher(
     * INTERNAL API
     */
   protected[akka] def dispatch(
-      receiver: ActorCell, invocation: Envelope): Unit = {
+      receiver: ActorCell, invocation: Envelope): Unit =
     val mbox = receiver.mailbox
     mbox.enqueue(receiver.self, invocation)
     registerForExecution(mbox, true, false)
-  }
 
   /**
     * INTERNAL API
     */
   protected[akka] def systemDispatch(
-      receiver: ActorCell, invocation: SystemMessage): Unit = {
+      receiver: ActorCell, invocation: SystemMessage): Unit =
     val mbox = receiver.mailbox
     mbox.systemEnqueue(receiver.self, invocation)
     registerForExecution(mbox, false, true)
-  }
 
   /**
     * INTERNAL API
     */
-  protected[akka] def executeTask(invocation: TaskInvocation) {
-    try {
+  protected[akka] def executeTask(invocation: TaskInvocation)
+    try
       executorService execute invocation
-    } catch {
+    catch
       case e: RejectedExecutionException ⇒
-        try {
+        try
           executorService execute invocation
-        } catch {
+        catch
           case e2: RejectedExecutionException ⇒
             eventStream.publish(
                 Error(e,
@@ -88,18 +85,14 @@ class Dispatcher(
                       getClass,
                       "executeTask was rejected twice!"))
             throw e2
-        }
-    }
-  }
 
   /**
     * INTERNAL API
     */
   protected[akka] def createMailbox(
-      actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox = {
+      actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox =
     new Mailbox(mailboxType.create(Some(actor.self), Some(actor.system)))
     with DefaultSystemMessageQueue
-  }
 
   private val esUpdater = AtomicReferenceFieldUpdater.newUpdater(
       classOf[Dispatcher],
@@ -109,12 +102,11 @@ class Dispatcher(
   /**
     * INTERNAL API
     */
-  protected[akka] def shutdown: Unit = {
+  protected[akka] def shutdown: Unit =
     val newDelegate =
       executorServiceDelegate.copy() // Doesn't matter which one we copy
     val es = esUpdater.getAndSet(this, newDelegate)
     es.shutdown()
-  }
 
   /**
     * Returns if it was registered
@@ -124,19 +116,19 @@ class Dispatcher(
   protected[akka] override def registerForExecution(
       mbox: Mailbox,
       hasMessageHint: Boolean,
-      hasSystemMessageHint: Boolean): Boolean = {
-    if (mbox.canBeScheduledForExecution(hasMessageHint, hasSystemMessageHint)) {
+      hasSystemMessageHint: Boolean): Boolean =
+    if (mbox.canBeScheduledForExecution(hasMessageHint, hasSystemMessageHint))
       //This needs to be here to ensure thread safety and no races
-      if (mbox.setAsScheduled()) {
-        try {
+      if (mbox.setAsScheduled())
+        try
           executorService execute mbox
           true
-        } catch {
+        catch
           case e: RejectedExecutionException ⇒
-            try {
+            try
               executorService execute mbox
               true
-            } catch {
+            catch
               //Retry once
               case e: RejectedExecutionException ⇒
                 mbox.setAsIdle()
@@ -146,33 +138,26 @@ class Dispatcher(
                           getClass,
                           "registerForExecution was rejected twice!"))
                 throw e
-            }
-        }
-      } else false
-    } else false
-  }
+      else false
+    else false
 
   override val toString: String = Logging.simpleName(this) + "[" + id + "]"
-}
 
-object PriorityGenerator {
+object PriorityGenerator
 
   /**
     * Creates a PriorityGenerator that uses the supplied function as priority generator
     */
   def apply(priorityFunction: Any ⇒ Int): PriorityGenerator =
-    new PriorityGenerator {
+    new PriorityGenerator
       def gen(message: Any): Int = priorityFunction(message)
-    }
-}
 
 /**
   * A PriorityGenerator is a convenience API to create a Comparator that orders the messages of a
   * PriorityDispatcher
   */
-abstract class PriorityGenerator extends java.util.Comparator[Envelope] {
+abstract class PriorityGenerator extends java.util.Comparator[Envelope]
   def gen(message: Any): Int
 
   final def compare(thisMessage: Envelope, thatMessage: Envelope): Int =
     gen(thisMessage.message) - gen(thatMessage.message)
-}

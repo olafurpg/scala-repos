@@ -13,13 +13,13 @@ import scala.sys.SystemProperties.preferIPv4Stack
 /** The client part of the fsc offline compiler.  Instead of compiling
   *  things itself, it send requests to a CompileServer.
   */
-class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
+class StandardCompileClient extends HasCompileSocket with CompileOutputCommon
   lazy val compileSocket: CompileSocket = CompileSocket
 
   val versionMsg = "Fast " + Properties.versionMsg
   var verbose = false
 
-  def process(args: Array[String]): Boolean = {
+  def process(args: Array[String]): Boolean =
     // Trying to get out in front of the log messages in case we're
     // going from verbose to not verbose.
     verbose = (args contains "-verbose")
@@ -35,10 +35,9 @@ class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
       settings.jvmargs.unparse ++ settings.defines.unparse ++ extraVmArgs
     val fscArgs = args.toList ++ command.extraFscArgs
 
-    if (settings.version) {
+    if (settings.version)
       Console println versionMsg
       return true
-    }
 
     info(versionMsg)
     info(args.mkString("[Given arguments: ", " ", "]"))
@@ -51,7 +50,7 @@ class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
             vmArgs mkString " ", !shutdown, settings.port.value)
       else compileSocket.getSocket(settings.server.value)
 
-    socket match {
+    socket match
       case Some(sock) => compileOnServer(sock, fscArgs)
       case _ =>
         echo(
@@ -59,12 +58,7 @@ class StandardCompileClient extends HasCompileSocket with CompileOutputCommon {
             else "Compilation failed."
         )
         shutdown
-    }
-  }
-}
 
-object CompileClient extends StandardCompileClient {
-  def main(args: Array[String]): Unit = sys exit {
+object CompileClient extends StandardCompileClient
+  def main(args: Array[String]): Unit = sys exit
     try { if (process(args)) 0 else 1 } catch { case _: Exception => 1 }
-  }
-}

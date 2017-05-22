@@ -40,36 +40,33 @@ import scalafx.scene.layout.VBox
   * @see scalafx.scene.control.Label
   * @resource /scalafx/ensemble/images/icon-48x48.png
   */
-class EnsembleAdvancedLabel extends EnsembleExample {
+class EnsembleAdvancedLabel extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     val icon = new Image(
         this.getClass
           .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
-    new VBox {
+    new VBox
       spacing = 10
       padding = Insets(20)
-      children = List(new Label {
+      children = List(new Label
         text = "Image above"
         graphic = new ImageView(icon)
         contentDisplay = ContentDisplay.Top
-      }, new Label {
+      , new Label
         text = "Image on the right"
         graphic = new ImageView(icon)
         contentDisplay = ContentDisplay.Right
-      }, new Label {
+      , new Label
         text = "Image below"
         graphic = new ImageView(icon)
         contentDisplay = ContentDisplay.Bottom
-      }, new Label {
+      , new Label
         text = "Image on the left"
         graphic = new ImageView(icon)
         contentDisplay = ContentDisplay.Left
-      }, new Label {
+      , new Label
         text = "Image centered"
         graphic = new ImageView(icon)
         contentDisplay = ContentDisplay.Center
-      })
-    }
-  }
-}
+      )

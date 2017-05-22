@@ -27,9 +27,9 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD
 // $example off$
 
-object PCAOnSourceVectorExample {
+object PCAOnSourceVectorExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     val conf = new SparkConf().setAppName("PCAOnSourceVectorExample")
     val sc = new SparkContext(conf)
@@ -51,9 +51,6 @@ object PCAOnSourceVectorExample {
     // $example off$
     val collect = projected.collect()
     println("Projected vector of principal component:")
-    collect.foreach { vector =>
+    collect.foreach  vector =>
       println(vector)
-    }
-  }
-}
 // scalastyle:on println

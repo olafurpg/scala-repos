@@ -1,5 +1,3 @@
-object Test {
-  0 match {
+object Test
+  0 match
     case _ => 0 == ""
-  }
-}

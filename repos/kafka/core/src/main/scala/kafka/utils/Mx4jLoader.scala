@@ -28,14 +28,14 @@ import javax.management.ObjectName
   *
   * This is a Scala port of org.apache.cassandra.utils.Mx4jTool written by Ran Tavory for CASSANDRA-1068
   * */
-object Mx4jLoader extends Logging {
+object Mx4jLoader extends Logging
 
-  def maybeLoad(): Boolean = {
+  def maybeLoad(): Boolean =
     val props = new VerifiableProperties(System.getProperties())
     if (props.getBoolean("kafka_mx4jenable", false)) return false
     val address = props.getString("mx4jaddress", "0.0.0.0")
     val port = props.getInt("mx4jport", 8082)
-    try {
+    try
       debug("Will try to load MX4j now, if it's in the classpath")
 
       val mbs = ManagementFactory.getPlatformMBeanServer()
@@ -65,14 +65,9 @@ object Mx4jLoader extends Logging {
       httpAdaptorClass.getMethod("start").invoke(httpAdaptor)
       info("mx4j successfuly loaded")
       true
-    } catch {
-      case e: ClassNotFoundException => {
+    catch
+      case e: ClassNotFoundException =>
           info("Will not load MX4J, mx4j-tools.jar is not in the classpath")
-        }
-      case e: Throwable => {
+      case e: Throwable =>
           warn("Could not start register mbean in JMX", e)
-        }
-    }
     false
-  }
-}

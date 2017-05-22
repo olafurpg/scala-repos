@@ -12,15 +12,15 @@ import com.intellij.openapi.project.Project
   * @since 15.12.12
   */
 class ScalaTypeDefinitionFindUsagesOptions(project: Project)
-    extends JavaFindUsagesOptions(project) {
+    extends JavaFindUsagesOptions(project)
   isSearchForTextOccurrences = false
 
   var isImplementingTypeDefinitions = false
   var isMembersUsages = false
   var isSearchCompanionModule = false
 
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case other: ScalaTypeDefinitionFindUsagesOptions =>
         if (!super.equals(o)) return false
         if (other.isImplementingTypeDefinitions != isImplementingTypeDefinitions)
@@ -30,29 +30,21 @@ class ScalaTypeDefinitionFindUsagesOptions(project: Project)
           return false
         true
       case _ => false
-    }
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     var res = super.hashCode()
     res = 31 * res + (if (isImplementingTypeDefinitions) 1 else 0)
     res = 31 * res + (if (isMembersUsages) 1 else 0)
     res = 31 * res + (if (isSearchCompanionModule) 1 else 0)
     res
-  }
 
-  protected override def addUsageTypes(strings: util.LinkedHashSet[String]) {
-    if (isUsages || isMembersUsages) {
+  protected override def addUsageTypes(strings: util.LinkedHashSet[String])
+    if (isUsages || isMembersUsages)
       strings.add(FindBundle.message("find.usages.panel.title.usages"))
-    }
 
-    if (isImplementingTypeDefinitions) {
+    if (isImplementingTypeDefinitions)
       strings.add(
           ScalaBundle.message("find.usages.implementing.type.definition"))
-    }
 
-    if (isSearchCompanionModule) {
+    if (isSearchCompanionModule)
       strings.add(ScalaBundle.message("find.usages.companin.module"))
-    }
-  }
-}

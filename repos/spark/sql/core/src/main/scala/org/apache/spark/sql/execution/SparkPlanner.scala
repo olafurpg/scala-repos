@@ -26,7 +26,7 @@ import org.apache.spark.sql.internal.SQLConf
 class SparkPlanner(val sparkContext: SparkContext,
                    val conf: SQLConf,
                    val experimentalMethods: ExperimentalMethods)
-    extends SparkStrategies {
+    extends SparkStrategies
 
   def numPartitions: Int = conf.numShufflePartitions
 
@@ -51,7 +51,7 @@ class SparkPlanner(val sparkContext: SparkContext,
       projectList: Seq[NamedExpression],
       filterPredicates: Seq[Expression],
       prunePushedDownFilters: Seq[Expression] => Seq[Expression],
-      scanBuilder: Seq[Attribute] => SparkPlan): SparkPlan = {
+      scanBuilder: Seq[Attribute] => SparkPlan): SparkPlan =
 
     val projectSet = AttributeSet(projectList.flatMap(_.references))
     val filterSet = AttributeSet(filterPredicates.flatMap(_.references))
@@ -65,16 +65,13 @@ class SparkPlanner(val sparkContext: SparkContext,
     // avoided safely.
 
     if (AttributeSet(projectList.map(_.toAttribute)) == projectSet &&
-        filterSet.subsetOf(projectSet)) {
+        filterSet.subsetOf(projectSet))
       // When it is possible to just use column pruning to get the right projection and
       // when the columns of this projection are enough to evaluate all filter conditions,
       // just do a scan followed by a filter, with no extra project.
       val scan = scanBuilder(projectList.asInstanceOf[Seq[Attribute]])
       filterCondition.map(Filter(_, scan)).getOrElse(scan)
-    } else {
+    else
       val scan = scanBuilder((projectSet ++ filterSet).toSeq)
       Project(
           projectList, filterCondition.map(Filter(_, scan)).getOrElse(scan))
-    }
-  }
-}

@@ -15,18 +15,18 @@ package scala.concurrent
   *  @author  Philipp Haller
   *  @version 2.0, 04/17/2008
   */
-class SyncChannel[A] {
+class SyncChannel[A]
 
   private var pendingWrites = List[(A, SyncVar[Boolean])]()
   private var pendingReads = List[SyncVar[A]]()
 
-  def write(data: A) {
+  def write(data: A)
     // create write request
     val writeReq = new SyncVar[Boolean]
 
-    this.synchronized {
+    this.synchronized
       // check whether there is a reader waiting
-      if (!pendingReads.isEmpty) {
+      if (!pendingReads.isEmpty)
         val readReq = pendingReads.head
         pendingReads = pendingReads.tail
 
@@ -35,22 +35,19 @@ class SyncChannel[A] {
 
         // resolve write request
         writeReq set true
-      } else {
+      else
         // enqueue write request
         pendingWrites = pendingWrites ::: List((data, writeReq))
-      }
-    }
 
     writeReq.get
-  }
 
-  def read: A = {
+  def read: A =
     // create read request
     val readReq = new SyncVar[A]
 
-    this.synchronized {
+    this.synchronized
       // check whether there is a writer waiting
-      if (!pendingWrites.isEmpty) {
+      if (!pendingWrites.isEmpty)
         // read data
         val (data, writeReq) = pendingWrites.head
         pendingWrites = pendingWrites.tail
@@ -60,12 +57,8 @@ class SyncChannel[A] {
 
         // resolve read request
         readReq set data
-      } else {
+      else
         // enqueue read request
         pendingReads = pendingReads ::: List(readReq)
-      }
-    }
 
     readReq.get
-  }
-}

@@ -38,17 +38,17 @@ import scalaz._
   * Provides a mechanism for returning an account-specific threadpool. These
   * threadpools are tied to the account and can be used to monitor CPU usage.
   */
-class PerAccountThreadPooling(accountFinder: AccountFinder[Future]) {
+class PerAccountThreadPooling(accountFinder: AccountFinder[Future])
   private val executorCache =
     new ConcurrentHashMap[AccountId, ExecutionContext]()
 
   private def threadFactoryFor(accountId: AccountId) =
     (new ThreadFactoryBuilder().setNameFormat(accountId + "%04d")).build
 
-  private def asyncContextFor(accountId: AccountId): ExecutionContext = {
-    if (executorCache.contains(accountId)) {
+  private def asyncContextFor(accountId: AccountId): ExecutionContext =
+    if (executorCache.contains(accountId))
       executorCache.get(accountId)
-    } else {
+    else
       val executor = new ThreadPoolExecutor(
           16,
           128,
@@ -59,21 +59,16 @@ class PerAccountThreadPooling(accountFinder: AccountFinder[Future]) {
       val ec = ExecutionContext.fromExecutor(executor)
 
       // FIXME: Dummy pool for now
-      executorCache.putIfAbsent(accountId, ec) match {
+      executorCache.putIfAbsent(accountId, ec) match
         case null => ec
         case ec0 => executor.shutdown(); ec0
-      }
-    }
-  }
 
   def getAccountExecutionContext(
-      apiKey: APIKey): EitherT[Future, String, ExecutionContext] = {
+      apiKey: APIKey): EitherT[Future, String, ExecutionContext] =
     EitherT.eitherT(
-        accountFinder.findAccountByAPIKey(apiKey) map {
+        accountFinder.findAccountByAPIKey(apiKey) map
       case None =>
         \/.left("Could not locate accountId for apiKey " + apiKey)
       case Some(accountId) =>
         \/.right(asyncContextFor(accountId)) // FIXME: Which account should we use if there's more than one?
-    })
-  }
-}
+    )

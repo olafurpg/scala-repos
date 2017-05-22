@@ -31,13 +31,12 @@ import javafx.scene.{media => jfxsm}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Track {
+object Track
   implicit def sfxTrack2jfx(t: Track): jfxsm.Track =
     if (t != null) t.delegate else null
-}
 
 abstract class Track(override val delegate: jfxsm.Track)
-    extends SFXDelegate[jfxsm.Track] {
+    extends SFXDelegate[jfxsm.Track]
 
   /**
     * Retrieves the name of the track.
@@ -55,4 +54,3 @@ abstract class Track(override val delegate: jfxsm.Track)
     * Gets the `trackID` as defined by the media container format.
     */
   def trackID = delegate.getTrackID
-}

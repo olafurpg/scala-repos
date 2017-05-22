@@ -8,9 +8,9 @@ import com.twitter.common.objectsize.ObjectSizeCalculator
 import com.twitter.util.{Await, Return}
 
 @RunWith(classOf[JUnitRunner])
-class BrokerTest extends WordSpec {
-  "Broker" should {
-    "send data (send, recv)" in {
+class BrokerTest extends WordSpec
+  "Broker" should
+    "send data (send, recv)" in
       val br = new Broker[Int]
       val sendF = br.send(123).sync()
       assert(sendF.isDefined == false)
@@ -18,9 +18,8 @@ class BrokerTest extends WordSpec {
       assert(recvF.isDefined == true)
       assert(Await.result(recvF) == 123)
       assert(sendF.isDefined == true)
-    }
 
-    "send data (recv, send)" in {
+    "send data (recv, send)" in
       val br = new Broker[Int]
       val recvF = br.recv.sync()
       assert(recvF.isDefined == false)
@@ -29,9 +28,8 @@ class BrokerTest extends WordSpec {
       assert(recvF.isDefined == true)
 
       assert(Await.result(recvF) == 123)
-    }
 
-    "queue receivers (recv, recv, send, send)" in {
+    "queue receivers (recv, recv, send, send)" in
       val br = new Broker[Int]
       val r0, r1 = br.recv.sync()
       assert(r0.isDefined == false)
@@ -43,9 +41,8 @@ class BrokerTest extends WordSpec {
       assert(s.sync().poll == Some(Return.Unit))
       assert(r1.poll == Some(Return(123)))
       assert(s.sync().isDefined == false)
-    }
 
-    "queue senders (send, send, recv, recv)" in {
+    "queue senders (send, send, recv, recv)" in
       val br = new Broker[Int]
       val s0, s1 = br.send(123).sync()
       assert(s0.isDefined == false)
@@ -57,38 +54,33 @@ class BrokerTest extends WordSpec {
       assert(r.sync().poll == Some(Return(123)))
       assert(s1.poll == Some(Return.Unit))
       assert(r.sync().isDefined == false)
-    }
 
-    "interrupts" should {
-      "removes queued receiver" in {
+    "interrupts" should
+      "removes queued receiver" in
         val br = new Broker[Int]
         val recvF = br.recv.sync()
         recvF.raise(new Exception)
         assert(br.send(123).sync().poll == None)
         assert(recvF.poll == None)
-      }
 
-      "removes queued sender" in {
+      "removes queued sender" in
         val br = new Broker[Int]
         val sendF = br.send(123).sync()
         sendF.raise(new Exception)
         assert(br.recv.sync().poll == None)
         assert(sendF.poll == None)
-      }
 
-      "doesn't result in space leaks" in {
+      "doesn't result in space leaks" in
         val br = new Broker[Int]
 
         assert(Offer.select(Offer.const(1), br.recv).poll == Some(Return(1)))
         val initial = ObjectSizeCalculator.getObjectSize(br)
 
-        for (_ <- 0 until 1000) {
+        for (_ <- 0 until 1000)
           assert(Offer.select(Offer.const(1), br.recv).poll == Some(Return(1)))
           assert(ObjectSizeCalculator.getObjectSize(br) == initial)
-        }
-      }
 
-      "works with orElse" in {
+      "works with orElse" in
         val b0, b1 = new Broker[Int]
 
         val o = b0.recv orElse b1.recv
@@ -103,10 +95,8 @@ class BrokerTest extends WordSpec {
 
         assert(o.sync().poll == Some(Return(12)))
         assert(sendf0.poll == Some(Return.Unit))
-      }
-    }
 
-    "integrate" in {
+    "integrate" in
       val br = new Broker[Int]
       val offer = Offer.choose(br.recv, Offer.const(999))
       assert(offer.sync().poll == Some(Return(999)))
@@ -116,6 +106,3 @@ class BrokerTest extends WordSpec {
 
       assert(br.send(123).sync().poll == Some(Return.Unit))
       assert(item.poll == Some(Return(123)))
-    }
-  }
-}

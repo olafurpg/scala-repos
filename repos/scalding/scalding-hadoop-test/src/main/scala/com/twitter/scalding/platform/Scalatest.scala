@@ -21,7 +21,7 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
   * This is a mixin fixture for scalatest which makes it easy to use a LocalCluster and will manage
   * the lifecycle of one appropriately.
   */
-trait HadoopPlatformTest extends BeforeAndAfterEach {
+trait HadoopPlatformTest extends BeforeAndAfterEach
   this: Suite =>
   org.apache.log4j.Logger
     .getLogger("org.apache.hadoop")
@@ -37,23 +37,17 @@ trait HadoopPlatformTest extends BeforeAndAfterEach {
 
   def initialize() = cluster.initialize()
 
-  override def beforeEach() {
-    cluster.synchronized {
+  override def beforeEach()
+    cluster.synchronized
       initialize()
-    }
     super.beforeEach()
-  }
 
   //TODO is there a way to buffer such that we see test results AFTER afterEach? Otherwise the results
   // get lost in the logging
-  override def afterEach() {
-    try super.afterEach() finally {
+  override def afterEach()
+    try super.afterEach() finally
       // Necessary because afterAll can be called from a different thread and we want to make sure that the state
       // is visible. Note that this assumes there is no contention for LocalCluster (which LocalCluster ensures),
       // otherwise there could be deadlock.
-      cluster.synchronized {
+      cluster.synchronized
         cluster.shutdown()
-      }
-    }
-  }
-}

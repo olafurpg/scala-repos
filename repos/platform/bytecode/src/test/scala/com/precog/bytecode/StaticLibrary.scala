@@ -19,7 +19,7 @@
  */
 package com.precog.bytecode
 
-trait StaticLibrary extends Library {
+trait StaticLibrary extends Library
 
   lazy val libReduction = Set(
       Reduction(Vector(), "count", 0x2000),
@@ -66,9 +66,8 @@ trait StaticLibrary extends Library {
                               Morphism1(Vector(), "denseRank", 0x0003),
                               flatten)
 
-  lazy val flatten = new Morphism1(Vector(), "flatten", 0x0100) {
+  lazy val flatten = new Morphism1(Vector(), "flatten", 0x0100)
     override val idPolicy = IdentityPolicy.Synthesize
-  }
 
   lazy val libMorphism2 = Set(M2RetainLeft,
                               M2RetainRight,
@@ -81,90 +80,71 @@ trait StaticLibrary extends Library {
 
   lazy val expandGlob = Morphism1(Vector("std", "fs"), "expandGlob", 0x0004)
 
-  object DeprecatedM1 extends Morphism1(Vector(), "bin25", 0x0025) {
+  object DeprecatedM1 extends Morphism1(Vector(), "bin25", 0x0025)
     override val idPolicy = IdentityPolicy.Retain.Merge
     override val deprecation = Some("use bin5 instead")
-  }
 
-  object M1Retain extends Morphism1(Vector(), "bin5", 0x0000) {
+  object M1Retain extends Morphism1(Vector(), "bin5", 0x0000)
     override val idPolicy = IdentityPolicy.Retain.Merge
-  }
 
-  object M1Synth extends Morphism1(Vector(), "bin6", 0x0093) {
+  object M1Synth extends Morphism1(Vector(), "bin6", 0x0093)
     override val idPolicy = IdentityPolicy.Synthesize
-  }
 
-  object M1Strip extends Morphism1(Vector(), "bin7", 0x0009) {
+  object M1Strip extends Morphism1(Vector(), "bin7", 0x0009)
     override val idPolicy = IdentityPolicy.Strip
-  }
 
-  object M1Product extends Morphism1(Vector(), "bin8", 0x0339) {
+  object M1Product extends Morphism1(Vector(), "bin8", 0x0339)
     override val idPolicy = IdentityPolicy.Product(
         IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
-  }
 
-  object M2RetainMerge extends Morphism2(Vector(), "bin9", 0x1000) {
+  object M2RetainMerge extends Morphism2(Vector(), "bin9", 0x1000)
     override val idPolicy = IdentityPolicy.Retain.Merge
-  }
 
-  object M2RetainCross extends Morphism2(Vector(), "bin99", 0x1900) {
+  object M2RetainCross extends Morphism2(Vector(), "bin99", 0x1900)
     override val idPolicy = IdentityPolicy.Retain.Cross
-  }
 
-  object M2RetainLeft extends Morphism2(Vector(), "bin100", 0x1030) {
+  object M2RetainLeft extends Morphism2(Vector(), "bin100", 0x1030)
     override val idPolicy = IdentityPolicy.Retain.Left
-  }
 
-  object M2RetainRight extends Morphism2(Vector(), "bin101", 0x1200) {
+  object M2RetainRight extends Morphism2(Vector(), "bin101", 0x1200)
     override val idPolicy = IdentityPolicy.Retain.Right
-  }
 
-  object M2Synth extends Morphism2(Vector(), "bin10", 0x1093) {
+  object M2Synth extends Morphism2(Vector(), "bin10", 0x1093)
     override val idPolicy = IdentityPolicy.Synthesize
-  }
 
-  object M2Strip extends Morphism2(Vector(), "bin11", 0x1009) {
+  object M2Strip extends Morphism2(Vector(), "bin11", 0x1009)
     override val idPolicy = IdentityPolicy.Strip
-  }
 
-  object M2Product extends Morphism2(Vector(), "bin12", 0x1339) {
+  object M2Product extends Morphism2(Vector(), "bin12", 0x1339)
     override val idPolicy = IdentityPolicy.Product(
         IdentityPolicy.Synthesize, IdentityPolicy.Retain.Merge)
-  }
 
-  object M11 extends Morphism1(Vector("std", "random"), "foobar", 0x0006) {
+  object M11 extends Morphism1(Vector("std", "random"), "foobar", 0x0006)
     override val isInfinite = true
-  }
 
   case class Morphism1(namespace: Vector[String], name: String, opcode: Int)
-      extends Morphism1Like {
+      extends Morphism1Like
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
-  }
 
   case class Morphism2(namespace: Vector[String], name: String, opcode: Int)
-      extends Morphism2Like {
+      extends Morphism2Like
     val tpe = BinaryOperationType(
         JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
-  }
 
   case class Op1(namespace: Vector[String], name: String, opcode: Int)
-      extends Op1Like with Morphism1Like {
+      extends Op1Like with Morphism1Like
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = true
-  }
 
   case class Op2(namespace: Vector[String], name: String, opcode: Int)
-      extends Op2Like with Morphism2Like {
+      extends Op2Like with Morphism2Like
     val tpe = BinaryOperationType(
         JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = true
-  }
 
   case class Reduction(namespace: Vector[String], name: String, opcode: Int)
-      extends ReductionLike with Morphism1Like {
+      extends ReductionLike with Morphism1Like
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
-  }
-}

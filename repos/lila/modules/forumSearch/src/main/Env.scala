@@ -9,7 +9,7 @@ import lila.search._
 final class Env(config: Config,
                 postApi: PostApi,
                 makeClient: Index => ESClient,
-                system: ActorSystem) {
+                system: ActorSystem)
 
   private val IndexName = config getString "index"
   private val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
@@ -22,11 +22,9 @@ final class Env(config: Config,
   def apply(text: String, page: Int, staff: Boolean, troll: Boolean) =
     paginatorBuilder(Query(text, staff, troll), page)
 
-  def cli = new lila.common.Cli {
-    def process = {
+  def cli = new lila.common.Cli
+    def process =
       case "forum" :: "search" :: "reset" :: Nil => api.reset inject "done"
-    }
-  }
 
   import Query.jsonWriter
 
@@ -35,18 +33,16 @@ final class Env(config: Config,
 
   system.actorOf(
       Props(
-          new Actor {
+          new Actor
         import lila.forum.actorApi._
-        def receive = {
+        def receive =
           case InsertPost(post) => api store post
           case RemovePost(id) => client deleteById Id(id)
           case RemovePosts(ids) => client deleteByIds ids.map(Id.apply)
-        }
-      }),
+      ),
       name = ActorName)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "forumSearch" boot new Env(
@@ -54,4 +50,3 @@ object Env {
         postApi = lila.forum.Env.current.postApi,
         makeClient = lila.search.Env.current.makeClient,
         system = lila.common.PlayApp.system)
-}

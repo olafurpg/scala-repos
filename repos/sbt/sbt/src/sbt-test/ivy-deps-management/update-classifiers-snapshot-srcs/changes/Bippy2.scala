@@ -1,5 +1,4 @@
 package t
 
-object Bippy {
+object Bippy
   def release = 2
-}

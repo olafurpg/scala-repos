@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventType
 
-object ZoomEvent {
+object ZoomEvent
   implicit def sfxZoomEvent2jfx(ze: ZoomEvent): jfxsi.ZoomEvent =
     if (ze != null) ze.delegate else null
 
@@ -69,13 +69,12 @@ object ZoomEvent {
       "Use ZoomFinished; ZOOM_FINISHED will be removed in a future release",
       "8.0.60-R10")
   val ZOOM_FINISHED = ZoomFinished
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/ZoomEvent.html]]
   */
 class ZoomEvent(override val delegate: jfxsi.ZoomEvent)
-    extends GestureEvent(delegate) with SFXDelegate[jfxsi.ZoomEvent] {
+    extends GestureEvent(delegate) with SFXDelegate[jfxsi.ZoomEvent]
 
   /**
     * Gets the zooming amount of this gesture.
@@ -86,4 +85,3 @@ class ZoomEvent(override val delegate: jfxsi.ZoomEvent)
     * Gets the zooming amount of this event.
     */
   def zoomFactor: Double = delegate.getZoomFactor
-}

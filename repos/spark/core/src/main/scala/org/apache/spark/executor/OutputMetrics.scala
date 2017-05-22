@@ -26,10 +26,9 @@ import org.apache.spark.annotation.DeveloperApi
   * Operations are not thread-safe.
   */
 @DeveloperApi
-object DataWriteMethod extends Enumeration with Serializable {
+object DataWriteMethod extends Enumeration with Serializable
   type DataWriteMethod = Value
   val Hadoop = Value
-}
 
 /**
   * :: DeveloperApi ::
@@ -39,16 +38,15 @@ object DataWriteMethod extends Enumeration with Serializable {
 class OutputMetrics private (_bytesWritten: Accumulator[Long],
                              _recordsWritten: Accumulator[Long],
                              _writeMethod: Accumulator[String])
-    extends Serializable {
+    extends Serializable
 
-  private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
+  private[executor] def this(accumMap: Map[String, Accumulator[_]])
     this(TaskMetrics.getAccum[Long](
              accumMap, InternalAccumulator.output.BYTES_WRITTEN),
          TaskMetrics.getAccum[Long](
              accumMap, InternalAccumulator.output.RECORDS_WRITTEN),
          TaskMetrics.getAccum[String](
              accumMap, InternalAccumulator.output.WRITE_METHOD))
-  }
 
   /**
     * Create a new [[OutputMetrics]] that is not associated with any particular task.
@@ -57,15 +55,13 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
     * a case class before Spark 2.0. Once we remove support for matching on [[OutputMetrics]]
     * we can remove this constructor as well.
     */
-  private[executor] def this() {
+  private[executor] def this()
     this(
         InternalAccumulator
           .createOutputAccums()
-          .map { a =>
+          .map  a =>
         (a.name.get, a)
-      }
           .toMap[String, Accumulator[_]])
-  }
 
   /**
     * Total number of bytes written.
@@ -88,24 +84,20 @@ class OutputMetrics private (_bytesWritten: Accumulator[Long],
     _recordsWritten.setValue(v)
   private[spark] def setWriteMethod(v: DataWriteMethod.Value): Unit =
     _writeMethod.setValue(v.toString)
-}
 
 /**
   * Deprecated methods to preserve case class matching behavior before Spark 2.0.
   */
-object OutputMetrics {
+object OutputMetrics
 
   @deprecated(
       "matching on OutputMetrics will not be supported in the future", "2.0.0")
-  def apply(writeMethod: DataWriteMethod.Value): OutputMetrics = {
+  def apply(writeMethod: DataWriteMethod.Value): OutputMetrics =
     val om = new OutputMetrics
     om.setWriteMethod(writeMethod)
     om
-  }
 
   @deprecated(
       "matching on OutputMetrics will not be supported in the future", "2.0.0")
-  def unapply(output: OutputMetrics): Option[DataWriteMethod.Value] = {
+  def unapply(output: OutputMetrics): Option[DataWriteMethod.Value] =
     Some(output.writeMethod)
-  }
-}

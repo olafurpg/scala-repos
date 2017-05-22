@@ -1,26 +1,22 @@
 /** Test that constructor operations are reordered correctly.  */
-class Outer {
+class Outer
 
-  object global {
+  object global
     val x = 10;
-  }
 
-  class X extends {
+  class X extends
     /* The constructor of X should set this.$outer to the outer instance
      * *before* calling the super constructors. This is tested by
      * mixin M1, which tries to access global from the enclosing class.
      */
     val outer = Outer.this
-  } with AnyRef with M1
+  with AnyRef with M1
 
-  trait M1 { self: X =>
+  trait M1  self: X =>
     Console.println(global.x);
     Console.println(outer.global.x);
-  }
-}
 
-object Test extends AnyRef with App {
+object Test extends AnyRef with App
   val o = new Outer;
 
   new o.X;
-}

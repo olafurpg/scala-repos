@@ -4,7 +4,7 @@ package std
 
 import scalaz.std.{list => l}
 
-final class ListOps[A](val self: List[A]) extends AnyVal {
+final class ListOps[A](val self: List[A]) extends AnyVal
   final def intersperse(a: A): List[A] = l.intersperse(self, a)
 
   final def tailOption: Option[List[A]] = l.tailOption(self)
@@ -67,8 +67,6 @@ final class ListOps[A](val self: List[A]) extends AnyVal {
   final def allPairs: List[(A, A)] = l.allPairs(self)
 
   final def adjacentPairs: List[(A, A)] = l.adjacentPairs(self)
-}
 
-trait ToListOps {
+trait ToListOps
   implicit def ToListOpsFromList[A](a: List[A]): ListOps[A] = new ListOps(a)
-}

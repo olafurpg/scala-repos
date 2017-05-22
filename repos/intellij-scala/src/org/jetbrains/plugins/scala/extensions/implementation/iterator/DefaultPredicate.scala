@@ -5,6 +5,5 @@ import com.intellij.psi.PsiElement
 /**
   * Pavel.Fatin, 21.05.2010
   */
-object DefaultPredicate extends Function[PsiElement, Boolean] {
+object DefaultPredicate extends Function[PsiElement, Boolean]
   def apply(e: PsiElement) = true
-}

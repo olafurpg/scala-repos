@@ -19,7 +19,7 @@ class OfferMatcherReconciliationModule(
     taskTracker: TaskTracker,
     groupRepository: GroupRepository,
     offerMatcherManager: OfferMatcherManager,
-    leadershipModule: LeadershipModule) {
+    leadershipModule: LeadershipModule)
 
   /** An offer matcher that performs reconciliation on the expected reservations. */
   lazy val offerMatcherReconciler: OfferMatcher = new OfferMatcherReconciler(
@@ -46,4 +46,3 @@ class OfferMatcherReconciliationModule(
         ),
         "offersWantedForReconciliation"
     )
-}

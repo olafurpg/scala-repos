@@ -10,6 +10,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelecto
   * User: Alexander Podkhalyuzin
   * Date: 20.06.2009
   */
-trait ScImportSelectorsStub extends StubElement[ScImportSelectors] {
+trait ScImportSelectorsStub extends StubElement[ScImportSelectors]
   def hasWildcard: Boolean
-}

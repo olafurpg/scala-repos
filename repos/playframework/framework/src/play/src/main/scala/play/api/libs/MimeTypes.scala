@@ -8,7 +8,7 @@ import java.util.Locale
 /**
   * MIME type utilities.
   */
-object MimeTypes {
+object MimeTypes
 
   /**
     * Retrieves the usual MIME type for a given extension.
@@ -34,16 +34,15 @@ object MimeTypes {
     * Mimetypes defined in the current application, as declared in application.conf
     */
   def applicationTypes: Map[String, String] =
-    play.api.Play.privateMaybeApplication.flatMap { application =>
-      application.configuration.getConfig("mimetype").map { config =>
-        config.subKeys.map { key =>
+    play.api.Play.privateMaybeApplication.flatMap  application =>
+      application.configuration.getConfig("mimetype").map  config =>
+        config.subKeys.map  key =>
           (key, config.getString(key))
-        }.collect {
+        .collect
           case ((key, Some(value))) =>
             (key, value)
-        }.toMap
-      }
-    }.getOrElse(Map.empty)
+        .toMap
+    .getOrElse(Map.empty)
 
   /**
     * tells you if mimeType is text or not.
@@ -51,13 +50,11 @@ object MimeTypes {
     * @param mimeType mimeType to check
     * @return true if mimeType is text
     */
-  def isText(mimeType: String): Boolean = {
-    mimeType.trim match {
+  def isText(mimeType: String): Boolean =
+    mimeType.trim match
       case text if text.startsWith("text/") => true
       case text if additionalText.contains(text) => true
       case _ => false
-    }
-  }
 
   lazy val defaultTypes =
     """
@@ -628,4 +625,3 @@ object MimeTypes {
         application/json
         application/javascript
     """.split('\n').map(_.trim).filter(_.size > 0).filter(_ (0) != '#')
-}

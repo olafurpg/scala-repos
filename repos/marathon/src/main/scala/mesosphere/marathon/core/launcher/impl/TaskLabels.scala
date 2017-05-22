@@ -7,7 +7,7 @@ import org.apache.mesos.{Protos => MesosProtos}
 
 import scala.collection.mutable
 
-object TaskLabels {
+object TaskLabels
   private[this] final val FRAMEWORK_ID_LABEL = "marathon_framework_id"
   private[this] final val TASK_ID_LABEL = "marathon_task_id"
 
@@ -16,7 +16,7 @@ object TaskLabels {
     * labeled by this framework.
     */
   def taskIdForResource(frameworkId: FrameworkId,
-                        resource: MesosProtos.Resource): Option[Task.Id] = {
+                        resource: MesosProtos.Resource): Option[Task.Id] =
     val labels = ResourceLabels(resource)
 
     val maybeMatchingFrameworkId =
@@ -24,7 +24,6 @@ object TaskLabels {
     def maybeTaskId = labels.get(TASK_ID_LABEL).map(Task.Id(_))
 
     maybeMatchingFrameworkId.flatMap(_ => maybeTaskId)
-  }
 
   def labelsForTask(frameworkId: FrameworkId, task: Task): ResourceLabels =
     labelsForTask(frameworkId, task.taskId)
@@ -35,4 +34,3 @@ object TaskLabels {
             FRAMEWORK_ID_LABEL -> frameworkId.id,
             TASK_ID_LABEL -> taskId.idString
         ))
-}

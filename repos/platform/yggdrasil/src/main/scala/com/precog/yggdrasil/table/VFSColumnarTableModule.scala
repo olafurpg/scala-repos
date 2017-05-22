@@ -46,48 +46,40 @@ import TableModule._
 
 trait VFSColumnarTableModule
     extends BlockStoreColumnarTableModule[Future]
-    with SecureVFSModule[Future, Slice] with AskSupport with Logging {
+    with SecureVFSModule[Future, Slice] with AskSupport with Logging
   def vfs: SecureVFS
 
-  trait VFSColumnarTableCompanion extends BlockStoreColumnarTableCompanion {
+  trait VFSColumnarTableCompanion extends BlockStoreColumnarTableCompanion
     def load(table: Table,
              apiKey: APIKey,
-             tpe: JType): EitherT[Future, ResourceError, Table] = {
-      for {
+             tpe: JType): EitherT[Future, ResourceError, Table] =
+      for
         _ <- EitherT.right(
-            table.toJson map { json =>
+            table.toJson map  json =>
           logger.trace(
               "Starting load from " + json.toList.map(_.renderCompact))
-        })
+        )
         paths <- EitherT.right(pathsM(table))
         projections <- paths.toList
           .traverse[({ type l[a] = EitherT[Future, ResourceError, a] })#l,
-                    ProjectionLike[Future, Slice]] { path =>
+                    ProjectionLike[Future, Slice]]  path =>
           logger.debug("Loading path: " + path)
-          vfs.readProjection(apiKey, path, Version.Current, AccessMode.Read) leftMap {
+          vfs.readProjection(apiKey, path, Version.Current, AccessMode.Read) leftMap
             error =>
               logger.warn("An error was encountered in loading path %s: %s"
                     .format(path, error))
               error
-          }
-        }
-      } yield {
+      yield
         val length = projections.map(_.length).sum
-        val stream = projections.foldLeft(StreamT.empty[Future, Slice]) {
+        val stream = projections.foldLeft(StreamT.empty[Future, Slice])
           (acc, proj) =>
             // FIXME: Can Schema.flatten return Option[Set[ColumnRef]] instead?
-            val constraints = proj.structure.map { struct =>
+            val constraints = proj.structure.map  struct =>
               Some(Schema.flatten(tpe, struct.toList))
-            }
 
             logger.debug("Appending from projection: " + proj)
-            acc ++ StreamT.wrapEffect(constraints map { c =>
+            acc ++ StreamT.wrapEffect(constraints map  c =>
               proj.getBlockStream(c)
-            })
-        }
+            )
 
         Table(stream, ExactSize(length))
-      }
-    }
-  }
-}

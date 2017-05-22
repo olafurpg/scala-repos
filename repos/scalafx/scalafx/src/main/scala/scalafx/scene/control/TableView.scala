@@ -55,7 +55,7 @@ import scalafx.scene.Node
   * @define TVSM TableViewSelectionModel
   * @define TVFM TableViewFocusModel
   */
-object TableView {
+object TableView
 
   /**
     * Converts a ScalaFX $TV instance to its $JFX counterpart.
@@ -92,7 +92,7 @@ object TableView {
   /**
     * $OBJCOMPSTA$TV.$RF$OBJCOMPEND
     */
-  object ResizeFeatures {
+  object ResizeFeatures
 
     /**
       * Converts a ScalaFX ResizeFeatures instance to its JavaFX counterpart.
@@ -103,7 +103,6 @@ object TableView {
     implicit def sfxResizeFeatures2jfx[S](
         rf: ResizeFeatures[S]): jfxsc.TableView.ResizeFeatures[S] =
       delegateOrNull(rf)
-  }
 
   /**
     * $WRAPSTA$TV.$RF.html $RF$WRAPEND
@@ -114,7 +113,7 @@ object TableView {
   class ResizeFeatures[S](
       override val delegate: jfxsc.TableView.ResizeFeatures[S])
       extends ResizeFeaturesBase[S](delegate)
-      with SFXDelegate[jfxsc.TableView.ResizeFeatures[S]] {
+      with SFXDelegate[jfxsc.TableView.ResizeFeatures[S]]
 
     /**
       * Creates an instance of this class, with the provided TableView, TableColumn and delta
@@ -133,12 +132,11 @@ object TableView {
       * `ResizeFeatures` instance was created as a result of a TableView resize operation.
       */
     def table: TableView[S] = delegate.getTable
-  }
 
   /**
     * $OBJCOMPSTA$TV.$TVSM$OBJCOMPEND
     */
-  object TableViewSelectionModel {
+  object TableViewSelectionModel
 
     /**
       * Converts a ScalaFX TableViewSelectionModel instance to its JavaFX counterpart.
@@ -150,7 +148,6 @@ object TableView {
         tvsm: TableViewSelectionModel[S])
       : jfxsc.TableView.TableViewSelectionModel[S] =
       delegateOrNull(tvsm)
-  }
 
   /**
     * $WRAPSTA$TV.$TVSM.html $TVSM$WRAPEND
@@ -161,21 +158,19 @@ object TableView {
   abstract class TableViewSelectionModel[S](
       override val delegate: jfxsc.TableView.TableViewSelectionModel[S])
       extends TableSelectionModel[S](delegate)
-      with SFXDelegate[jfxsc.TableView.TableViewSelectionModel[S]] {
+      with SFXDelegate[jfxsc.TableView.TableViewSelectionModel[S]]
 
     /**
       * Clears all selection, and then selects the cell at the given row/column intersection.
       */
-    def clearAndSelect(row: Int, column: TableColumn[S, _]) {
+    def clearAndSelect(row: Int, column: TableColumn[S, _])
       delegate.clearAndSelect(row, delegateOrNull(column))
-    }
 
     /**
       * Removes selection from the specified row/column position (in view indexes).
       */
-    def clearSelection(row: Int, column: TableColumn[S, _]) {
+    def clearSelection(row: Int, column: TableColumn[S, _])
       delegate.clearSelection(row, delegateOrNull(column))
-    }
 
     def focusedIndex: Int = delegate.getFocusedIndex
 
@@ -194,21 +189,19 @@ object TableView {
     /**
       * Selects the cell at the given row/column intersection.
       */
-    def select(row: Int, column: TableColumn[S, _]) {
+    def select(row: Int, column: TableColumn[S, _])
       delegate.select(row, delegateOrNull(column))
-    }
 
     /**
       * Selects the cell at the given row/column intersection.
       */
     def isSelected(row: Int, column: TableColumn[S, _]): Boolean =
       delegate.isSelected(row, delegateOrNull(column))
-  }
 
   /**
     * $OBJCOMPSTA$TV.$TVFM$OBJCOMPEND
     */
-  object TableViewFocusModel {
+  object TableViewFocusModel
 
     /**
       * Converts a ScalaFX TableViewFocusModel instance to its JavaFX counterpart.
@@ -219,7 +212,6 @@ object TableView {
     implicit def sfxTableViewFocusModel2jfx[S](
         tvfm: TableViewFocusModel[S]): jfxsc.TableView.TableViewFocusModel[S] =
       delegateOrNull(tvfm)
-  }
 
   /**
     * $WRAPSTA$TV.$TVFM.html $TVFM$WRAPEND
@@ -230,7 +222,7 @@ object TableView {
   class TableViewFocusModel[S](
       override val delegate: jfxsc.TableView.TableViewFocusModel[S])
       extends TableFocusModel[S, jfxsc.TableColumn[S, _]](delegate)
-      with SFXDelegate[jfxsc.TableView.TableViewFocusModel[S]] {
+      with SFXDelegate[jfxsc.TableView.TableViewFocusModel[S]]
 
     /**
       * Creates a default TableViewFocusModel instance that will be used to manage focus of the provided TableView
@@ -253,9 +245,8 @@ object TableView {
       * @param index The row index of the item to give focus to.
       * @param column The column of the item to give focus to. Can be `null`.
       */
-    def focus(index: Int, column: TableColumn[S, _]) {
+    def focus(index: Int, column: TableColumn[S, _])
       delegate.focus(index, delegateOrNull(column))
-    }
 
     /**
       * Convenience method for setting focus on a particular row or cell using a
@@ -263,11 +254,8 @@ object TableView {
       *
       * @param pos The table position where focus should be set.
       */
-    def focus(pos: TablePosition[_, _]) {
+    def focus(pos: TablePosition[_, _])
       delegate.focus(pos.delegate)
-    }
-  }
-}
 
 /**
   * Wraps JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableView.html TableView]].
@@ -278,7 +266,7 @@ object TableView {
   */
 class TableView[S](
     override val delegate: jfxsc.TableView[S] = new jfxsc.TableView[S])
-    extends Control(delegate) with SFXDelegate[jfxsc.TableView[S]] {
+    extends Control(delegate) with SFXDelegate[jfxsc.TableView[S]]
 
   /**
     * Creates a TableView with the content provided in the items ObservableBuffer.
@@ -309,20 +297,17 @@ class TableView[S](
       TableView.ResizeFeatures[S] => Boolean] =
     ObjectProperty((features: TableView.ResizeFeatures[S]) =>
           delegate.columnResizePolicyProperty.value.call(features))
-  def columnResizePolicy_=(p: TableView.ResizeFeatures[_] => Boolean) {
+  def columnResizePolicy_=(p: TableView.ResizeFeatures[_] => Boolean)
     delegate
       .columnResizePolicyProperty()
       .setValue(new jfxu.Callback[
-              jfxsc.TableView.ResizeFeatures[_], java.lang.Boolean] {
-        def call(v: jfxsc.TableView.ResizeFeatures[_]): java.lang.Boolean = {
+              jfxsc.TableView.ResizeFeatures[_], java.lang.Boolean]
+        def call(v: jfxsc.TableView.ResizeFeatures[_]): java.lang.Boolean =
           p(v)
-        }
-      })
-  }
+      )
   def columnResizePolicy_=(
-      p: jfxu.Callback[jfxsc.TableView.ResizeFeatures[_], java.lang.Boolean]) {
+      p: jfxu.Callback[jfxsc.TableView.ResizeFeatures[_], java.lang.Boolean])
     delegate.columnResizePolicyProperty().setValue(p)
-  }
 
   /** The comparator property is a read-only property that is representative of the current state of the `sort order` list. */
   def comparator: ReadOnlyObjectProperty[java.util.Comparator[S]] =
@@ -333,9 +318,8 @@ class TableView[S](
     * TableCells within it are both editable will a TableCell be able to go into their editing state.
     */
   def editable: BooleanProperty = delegate.editableProperty
-  def editable_=(v: Boolean) {
+  def editable_=(v: Boolean)
     editable() = v
-  }
 
   /**
     * Represents the current cell being edited, or null if there is no cell being edited.
@@ -345,34 +329,30 @@ class TableView[S](
 
   /** Specifies whether this control has cells that are a fixed height (of the specified value). */
   def fixedCellSize: DoubleProperty = delegate.fixedCellSizeProperty
-  def fixedCellSize_=(v: Double) {
+  def fixedCellSize_=(v: Double)
     fixedCellSize() = v
-  }
 
   /**
     * Represents the currently-installed TableView.TableViewFocusModel for this TableView.
     */
   def focusModel: ObjectProperty[jfxsc.TableView.TableViewFocusModel[S]] =
     delegate.focusModelProperty
-  def focusModel_=(v: TableView.TableViewFocusModel[S]) {
+  def focusModel_=(v: TableView.TableViewFocusModel[S])
     focusModel() = v
-  }
 
   /**
     * The underlying data model for the TableView.
     */
   def items = delegate.itemsProperty
-  def items_=(v: ObservableBuffer[S]) {
+  def items_=(v: ObservableBuffer[S])
     items() = v
-  }
 
   /**
     * This Node is shown to the user when the table has no content to show.
     */
   def placeholder: ObjectProperty[jfxs.Node] = delegate.placeholderProperty
-  def placeholder_=(v: Node) {
+  def placeholder_=(v: Node)
     placeholder() = v
-  }
 
   /**
     * A function which produces a TableRow.
@@ -380,14 +360,12 @@ class TableView[S](
   def rowFactory: ObjectProperty[TableView[S] => TableRow[S]] =
     ObjectProperty(
         (view: TableView[S]) => delegate.rowFactoryProperty.value.call(view))
-  def rowFactory_=(factory: TableView[S] => TableRow[S]) {
+  def rowFactory_=(factory: TableView[S] => TableRow[S])
     delegate.rowFactoryProperty.setValue(
-        new jfxu.Callback[jfxsc.TableView[S], jfxsc.TableRow[S]] {
-      def call(v: jfxsc.TableView[S]): jfxsc.TableRow[S] = {
+        new jfxu.Callback[jfxsc.TableView[S], jfxsc.TableRow[S]]
+      def call(v: jfxsc.TableView[S]): jfxsc.TableRow[S] =
         factory(v)
-      }
-    })
-  }
+    )
 
   /**
     * The SelectionModel provides the API through which it is possible to select single or multiple items within a
@@ -396,9 +374,8 @@ class TableView[S](
   def selectionModel: ObjectProperty[
       jfxsc.TableView.TableViewSelectionModel[S]] =
     delegate.selectionModelProperty
-  def selectionModel_=(v: TableView.TableViewSelectionModel[S]) {
+  def selectionModel_=(v: TableView.TableViewSelectionModel[S])
     selectionModel() = v
-  }
 
   /**
     * The sortOrder list defines the order in which `TableColumn` instances are sorted.
@@ -412,17 +389,15 @@ class TableView[S](
     */
   def tableMenuButtonVisible: BooleanProperty =
     delegate.tableMenuButtonVisibleProperty
-  def tableMenuButtonVisible_=(v: Boolean) {
+  def tableMenuButtonVisible_=(v: Boolean)
     tableMenuButtonVisible() = v
-  }
 
   /**
     * Causes the cell at the given row/column view indexes to switch into its editing state, if it is not already in
     * it, and assuming that the TableView and column are also editable.
     */
-  def edit(row: Int, column: TableColumn[S, _]) {
+  def edit(row: Int, column: TableColumn[S, _])
     delegate.edit(row, delegateOrNull(column))
-  }
 
   /**
     * Applies the currently installed resize policy against the given column, resizing it based on the delta value
@@ -437,11 +412,10 @@ class TableView[S](
   def onScrollTo: ObjectProperty[
       jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]] =
     delegate.onScrollToProperty
-  def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]) {
+  def onScrollTo_=(v: jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]])
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[Integer]]](
         onScrollTo, v)
-  }
 
   /**
     * Called when there's a request to scroll a column into view using `scrollToColumn(TableColumn)` or `scrollToColumnIndex(int)`.
@@ -450,33 +424,28 @@ class TableView[S](
       jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]] =
     delegate.onScrollToColumnProperty
   def onScrollToColumn_=(
-      v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]]) {
+      v: jfxe.EventHandler[jfxsc.ScrollToEvent[jfxsc.TableColumn[S, _]]])
     ObjectProperty.fillProperty[jfxe.EventHandler[jfxsc.ScrollToEvent[
                 jfxsc.TableColumn[S, _]]]](onScrollToColumn, v)
-  }
 
   /** Called when there's a request to sort the control. */
   def onSort: ObjectProperty[
       jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]] =
     delegate.onSortProperty
-  def onSort_=(v: jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]) {
+  def onSort_=(v: jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]])
     ObjectProperty
       .fillProperty[jfxe.EventHandler[jfxsc.SortEvent[jfxsc.TableView[S]]]](
         onSort, v)
-  }
 
   /** Scrolls the TableView so that the given object is visible within the viewport. */
-  def scrollToColumn(column: TableColumn[S, _]) {
+  def scrollToColumn(column: TableColumn[S, _])
     delegate.scrollToColumn(column.delegate)
-  }
 
   /** The sort policy specifies how sorting in this TableView should be performed. */
   def sortPolicy: ObjectProperty[
       jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]] =
     delegate.sortPolicyProperty
-  def sortPolicy_=(v: jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]) {
+  def sortPolicy_=(v: jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean])
     ObjectProperty
       .fillProperty[jfxu.Callback[jfxsc.TableView[S], java.lang.Boolean]](
         sortPolicy, v)
-  }
-}

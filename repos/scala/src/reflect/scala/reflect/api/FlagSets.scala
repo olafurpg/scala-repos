@@ -54,7 +54,7 @@ import scala.language.implicitConversions
   * @group ReflectionAPI
   *
   */
-trait FlagSets { self: Universe =>
+trait FlagSets  self: Universe =>
 
   /** An abstract type representing sets of flags (like private, final, etc.) that apply to definition trees and symbols
     *  @template
@@ -66,11 +66,10 @@ trait FlagSets { self: Universe =>
     *  The main source of information about flag sets is the [[scala.reflect.api.FlagSets]] page.
     *  @group Flags
     */
-  trait FlagOps extends Any {
+  trait FlagOps extends Any
 
     /** Produces a flag set that's a union of this flag set and the provided flag set. */
     def |(right: FlagSet): FlagSet
-  }
 
   /** The API of `FlagSet` instances.
     *  @group Flags
@@ -91,7 +90,7 @@ trait FlagSets { self: Universe =>
     *  The main source of information about flag sets is the [[scala.reflect.api.FlagSets]] page.
     *  @group Flags
     */
-  trait FlagValues {
+  trait FlagValues
 
     /** Flag indicating that tree represents a trait */
     val TRAIT: FlagSet
@@ -253,10 +252,8 @@ trait FlagSets { self: Universe =>
       *  (e.g. synthetic getters of valdefs).
       */
     val STABLE: FlagSet
-  }
 
   /** The empty set of flags
     *  @group Flags
     */
   val NoFlags: FlagSet
-}

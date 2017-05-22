@@ -13,17 +13,15 @@ import akka.stream.ActorMaterializerSettings
 /**
   * INTERNAL API
   */
-private[akka] object ActorRefSourceActor {
+private[akka] object ActorRefSourceActor
   def props(bufferSize: Int,
             overflowStrategy: OverflowStrategy,
-            settings: ActorMaterializerSettings) = {
+            settings: ActorMaterializerSettings) =
     require(overflowStrategy != OverflowStrategies.Backpressure,
             "Backpressure overflowStrategy not supported")
     val maxFixedBufferSize = settings.maxFixedBufferSize
     Props(new ActorRefSourceActor(
             bufferSize, overflowStrategy, maxFixedBufferSize))
-  }
-}
 
 /**
   * INTERNAL API
@@ -31,7 +29,7 @@ private[akka] object ActorRefSourceActor {
 private[akka] class ActorRefSourceActor(bufferSize: Int,
                                         overflowStrategy: OverflowStrategy,
                                         maxFixedBufferSize: Int)
-    extends akka.stream.actor.ActorPublisher[Any] with ActorLogging {
+    extends akka.stream.actor.ActorPublisher[Any] with ActorLogging
   import akka.stream.actor.ActorPublisherMessage._
 
   // when bufferSize is 0 there the buffer is not used
@@ -39,7 +37,7 @@ private[akka] class ActorRefSourceActor(bufferSize: Int,
     if (bufferSize == 0) null else Buffer[Any](bufferSize, maxFixedBufferSize)
 
   def receive =
-    ({
+    (
       case Cancel ⇒
         context.stop(self)
 
@@ -50,16 +48,15 @@ private[akka] class ActorRefSourceActor(bufferSize: Int,
 
       case Status.Failure(cause) if isActive ⇒
         onErrorThenStop(cause)
-    }: Receive).orElse(requestElem).orElse(receiveElem)
+    : Receive).orElse(requestElem).orElse(receiveElem)
 
-  def requestElem: Receive = {
+  def requestElem: Receive =
     case _: Request ⇒
       // totalDemand is tracked by super
       if (bufferSize != 0)
         while (totalDemand > 0L && !buffer.isEmpty) onNext(buffer.dequeue())
-  }
 
-  def receiveElem: Receive = {
+  def receiveElem: Receive =
     case elem if isActive ⇒
       if (totalDemand > 0L) onNext(elem)
       else if (bufferSize == 0)
@@ -68,7 +65,7 @@ private[akka] class ActorRefSourceActor(bufferSize: Int,
             elem)
       else if (!buffer.isFull) buffer.enqueue(elem)
       else
-        overflowStrategy match {
+        overflowStrategy match
           case DropHead ⇒
             log.debug(
                 "Dropping the head element because buffer is full and overflowStrategy is: [DropHead]")
@@ -98,10 +95,8 @@ private[akka] class ActorRefSourceActor(bufferSize: Int,
             // there is a precondition check in Source.actorRefSource factory method
             log.debug(
                 "Backpressuring because buffer is full and overflowStrategy is: [Backpressure]")
-        }
-  }
 
-  def drainBufferThenComplete: Receive = {
+  def drainBufferThenComplete: Receive =
     case Cancel ⇒
       context.stop(self)
 
@@ -123,5 +118,3 @@ private[akka] class ActorRefSourceActor(bufferSize: Int,
           "only draining already buffered elements: [{}] (pending: [{}])",
           elem,
           buffer.used)
-  }
-}

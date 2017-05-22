@@ -21,31 +21,28 @@ import org.junit.Assert._
 
 import test._
 
-package ALaCarteTestsAux {
-  object FooDefns extends DefaultCaseClassDefns {
+package ALaCarteTestsAux
+  object FooDefns extends DefaultCaseClassDefns
     type C = Foo
     val ops = Ops
-  }
 
   object Foo extends FooDefns.CaseClassCompanion
   class Foo(val i: Int, val s: String) extends FooDefns.CaseClass
-}
 
-class ALaCarteTests {
+class ALaCarteTests
   import ALaCarteTestsAux._
 
   @Test
-  def testApplyUnapply {
+  def testApplyUnapply
     val foo = Foo(23, "foo")
     typed[Foo](foo)
 
     val Foo(i, s) = foo
     typed[Int](i)
     typed[String](s)
-  }
 
   @Test
-  def testProduct {
+  def testProduct
     val foo = Foo(23, "foo")
 
     val foo_1 = foo.productElement(0)
@@ -64,20 +61,18 @@ class ALaCarteTests {
 
     val fooArity = foo.productArity
     assertEquals(2, fooArity)
-  }
 
   @Test
-  def testPolyEquality {
+  def testPolyEquality
     val foo = Foo(23, "foo")
     val foo2 = Foo(23, "foo")
     val foo3 = Foo(13, "bar")
     assertEquals(foo, foo2)
     assertEquals(foo.hashCode, foo2.hashCode)
     assertFalse(foo == foo3)
-  }
 
   @Test
-  def testCopy {
+  def testCopy
     val foo = Foo(23, "foo")
     val fooCopy = foo.copy()
     assertFalse(fooCopy eq foo)
@@ -89,12 +84,9 @@ class ALaCarteTests {
     assertFalse(fooMod eq foo)
     assertEquals(mod, fooMod)
     assertEquals(mod.hashCode, fooMod.hashCode)
-  }
 
   @Test
-  def testToString {
+  def testToString
     val foo = Foo(23, "foo")
     val fooStr = foo.toString
     assertEquals("Foo(23,foo)", fooStr)
-  }
-}

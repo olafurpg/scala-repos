@@ -17,7 +17,7 @@ import akka.remote.testkit.STMultiNodeSpec
 import akka.testkit._
 import akka.testkit.TestEvent._
 
-object RemoteDeploymentDeathWatchMultiJvmSpec extends MultiNodeConfig {
+object RemoteDeploymentDeathWatchMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -29,10 +29,8 @@ object RemoteDeploymentDeathWatchMultiJvmSpec extends MultiNodeConfig {
 
   deployOn(second, """/hello.remote = "@third@" """)
 
-  class Hello extends Actor {
+  class Hello extends Actor
     def receive = Actor.emptyBehavior
-  }
-}
 
 // Several different variations of the test
 
@@ -43,9 +41,8 @@ class RemoteDeploymentDeathWatchFastMultiJvmNode2
 class RemoteDeploymentDeathWatchFastMultiJvmNode3
     extends RemoteDeploymentNodeDeathWatchFastSpec
 abstract class RemoteDeploymentNodeDeathWatchFastSpec
-    extends RemoteDeploymentDeathWatchSpec {
+    extends RemoteDeploymentDeathWatchSpec
   override def scenario = "fast"
-}
 
 class RemoteDeploymentDeathWatchSlowMultiJvmNode1
     extends RemoteDeploymentNodeDeathWatchSlowSpec
@@ -54,14 +51,13 @@ class RemoteDeploymentDeathWatchSlowMultiJvmNode2
 class RemoteDeploymentDeathWatchSlowMultiJvmNode3
     extends RemoteDeploymentNodeDeathWatchSlowSpec
 abstract class RemoteDeploymentNodeDeathWatchSlowSpec
-    extends RemoteDeploymentDeathWatchSpec {
+    extends RemoteDeploymentDeathWatchSpec
   override def scenario = "slow"
   override def sleep(): Unit = Thread.sleep(3000)
-}
 
 abstract class RemoteDeploymentDeathWatchSpec
     extends MultiNodeSpec(RemoteDeploymentDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec with ImplicitSender
 
   import RemoteDeploymentDeathWatchMultiJvmSpec._
 
@@ -71,11 +67,11 @@ abstract class RemoteDeploymentDeathWatchSpec
 
   override def initialParticipants = roles.size
 
-  "An actor system that deploys actors on another node" must {
+  "An actor system that deploys actors on another node" must
 
     "be able to shutdown when remote node crash" taggedAs LongRunningTest in within(
-        20 seconds) {
-      runOn(second) {
+        20 seconds)
+      runOn(second)
         // remote deployment to third
         val hello = system.actorOf(Props[Hello], "hello")
         hello.path.address should ===(node(third).address)
@@ -87,21 +83,18 @@ abstract class RemoteDeploymentDeathWatchSpec
         // if the remote deployed actor is not removed the system will not shutdown
 
         val timeout = remainingOrDefault
-        try Await.ready(system.whenTerminated, timeout) catch {
+        try Await.ready(system.whenTerminated, timeout) catch
           case _: TimeoutException ⇒
             fail("Failed to stop [%s] within [%s] \n%s".format(
                     system.name,
                     timeout,
                     system.asInstanceOf[ActorSystemImpl].printTree))
-        }
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("hello-deployed")
         enterBarrier("third-crashed")
-      }
 
-      runOn(first) {
+      runOn(first)
         enterBarrier("hello-deployed")
         sleep()
         testConductor.exit(third, 0).await
@@ -111,7 +104,3 @@ abstract class RemoteDeploymentDeathWatchSpec
         testConductor.shutdown(second).await
 
         enterBarrier("after-3")
-      }
-    }
-  }
-}

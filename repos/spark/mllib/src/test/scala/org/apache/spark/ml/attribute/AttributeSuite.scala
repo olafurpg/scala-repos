@@ -20,9 +20,9 @@ package org.apache.spark.ml.attribute
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
-class AttributeSuite extends SparkFunSuite {
+class AttributeSuite extends SparkFunSuite
 
-  test("default numeric attribute") {
+  test("default numeric attribute")
     val attr: NumericAttribute = NumericAttribute.defaultAttr
     val metadata = Metadata.fromJson("{}")
     val metadataWithType = Metadata.fromJson("""{"type":"numeric"}""")
@@ -40,12 +40,10 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr.toMetadataImpl(withType = true) === metadataWithType)
     assert(attr === Attribute.fromMetadata(metadata))
     assert(attr === Attribute.fromMetadata(metadataWithType))
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       attr.toStructField()
-    }
-  }
 
-  test("customized numeric attribute") {
+  test("customized numeric attribute")
     val name = "age"
     val index = 0
     val metadata = Metadata.fromJson("""{"name":"age","idx":0}""")
@@ -84,18 +82,16 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr2.std === Some(0.5))
     assert(attr2.sparsity === Some(0.3))
     assert(attr2 === Attribute.fromMetadata(attr2.toMetadataImpl()))
-  }
 
-  test("bad numeric attributes") {
+  test("bad numeric attributes")
     val attr = NumericAttribute.defaultAttr
     intercept[IllegalArgumentException](attr.withName(""))
     intercept[IllegalArgumentException](attr.withIndex(-1))
     intercept[IllegalArgumentException](attr.withStd(-0.1))
     intercept[IllegalArgumentException](attr.withSparsity(-0.5))
     intercept[IllegalArgumentException](attr.withSparsity(1.5))
-  }
 
-  test("default nominal attribute") {
+  test("default nominal attribute")
     val attr: NominalAttribute = NominalAttribute.defaultAttr
     val metadata = Metadata.fromJson("""{"type":"nominal"}""")
     val metadataWithoutType = Metadata.fromJson("{}")
@@ -112,12 +108,10 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr.toMetadataImpl(withType = false) === metadataWithoutType)
     assert(attr === Attribute.fromMetadata(metadata))
     assert(attr === NominalAttribute.fromMetadata(metadataWithoutType))
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       attr.toStructField()
-    }
-  }
 
-  test("customized nominal attribute") {
+  test("customized nominal attribute")
     val name = "size"
     val index = 1
     val values = Array("small", "medium", "large")
@@ -154,16 +148,14 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr2 === Attribute.fromMetadata(attr2.toMetadataImpl()))
     assert(attr2 === NominalAttribute.fromMetadata(
             attr2.toMetadataImpl(withType = false)))
-  }
 
-  test("bad nominal attributes") {
+  test("bad nominal attributes")
     val attr = NominalAttribute.defaultAttr
     intercept[IllegalArgumentException](attr.withName(""))
     intercept[IllegalArgumentException](attr.withIndex(-1))
     intercept[IllegalArgumentException](attr.withNumValues(-1))
-  }
 
-  test("default binary attribute") {
+  test("default binary attribute")
     val attr = BinaryAttribute.defaultAttr
     val metadata = Metadata.fromJson("""{"type":"binary"}""")
     val metadataWithoutType = Metadata.fromJson("{}")
@@ -178,12 +170,10 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr.toMetadataImpl(withType = false) === metadataWithoutType)
     assert(attr === Attribute.fromMetadata(metadata))
     assert(attr === BinaryAttribute.fromMetadata(metadataWithoutType))
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       attr.toStructField()
-    }
-  }
 
-  test("customized binary attribute") {
+  test("customized binary attribute")
     val name = "clicked"
     val index = 2
     val values = Array("no", "yes")
@@ -208,15 +198,13 @@ class AttributeSuite extends SparkFunSuite {
     assert(attr === BinaryAttribute.fromMetadata(metadataWithoutType))
     assert(
         attr.withoutIndex === Attribute.fromStructField(attr.toStructField()))
-  }
 
-  test("bad binary attributes") {
+  test("bad binary attributes")
     val attr = BinaryAttribute.defaultAttr
     intercept[IllegalArgumentException](attr.withName(""))
     intercept[IllegalArgumentException](attr.withIndex(-1))
-  }
 
-  test("attribute from struct field") {
+  test("attribute from struct field")
     val metadata = NumericAttribute.defaultAttr.withName("label").toMetadata()
     val fldWithoutMeta =
       new StructField("x", DoubleType, false, Metadata.empty)
@@ -229,5 +217,3 @@ class AttributeSuite extends SparkFunSuite {
     val decimalFldWithMeta =
       new StructField("x", DecimalType(38, 18), false, metadata)
     assert(Attribute.fromStructField(decimalFldWithMeta).isNumeric)
-  }
-}

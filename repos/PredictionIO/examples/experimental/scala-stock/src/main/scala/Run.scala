@@ -14,11 +14,11 @@ import java.io.File
 case class MomentumStrategyParams(val l: Int, val s: Int) extends Params
 
 class MomentumStrategy(val p: MomentumStrategyParams)
-    extends StockStrategy[AnyRef] {
+    extends StockStrategy[AnyRef]
 
   def createModel(dataView: DataView): AnyRef = None
 
-  def onClose(model: AnyRef, query: Query): Prediction = {
+  def onClose(model: AnyRef, query: Query): Prediction =
     val dataView = query.dataView
 
     val priceFrame = dataView.priceFrame(p.l + 1)
@@ -29,20 +29,15 @@ class MomentumStrategy(val p: MomentumStrategyParams)
     val sLgRet = (todayLgPrice - sLgPrice) / p.s
     val lLgRet = (todayLgPrice - lLgPrice) / p.l
 
-    val output = query.tickers.map { ticker =>
-      {
+    val output = query.tickers.map  ticker =>
         val s = sLgRet.first(ticker)
         val l = lLgRet.first(ticker)
         val p = l - s
         (ticker, p)
-      }
-    }
 
     Prediction(data = HashMap(output: _*))
-  }
-}
 
-object Run {
+object Run
   val sp500List = Vector(
       "A",
       "AA",
@@ -568,9 +563,9 @@ object Run {
                        "WDC",
                        "SNDK")
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val dataSourceParams =
-      (if (false) {
+      (if (false)
          new DataSourceParams(baseDate = new DateTime(2002, 1, 1, 0, 0),
                               fromIdx = 300,
                               untilIdx = 2000,
@@ -578,7 +573,7 @@ object Run {
                               maxTestingWindowSize = 20,
                               marketTicker = "SPY",
                               tickerList = tickerList)
-       } else {
+       else
          // Need to pass "--driver-memory 8G" to pio-run since it requires a lot
          // of driver memory.
          new DataSourceParams(baseDate = new DateTime(2002, 1, 1, 0, 0),
@@ -588,7 +583,7 @@ object Run {
                               maxTestingWindowSize = 20,
                               marketTicker = "SPY",
                               tickerList = sp500List)
-       })
+       )
 
     val momentumParams = MomentumStrategyParams(20, 3)
 
@@ -614,5 +609,3 @@ object Run {
         evaluatorClassOpt = Some(classOf[BacktestingEvaluator]),
         evaluatorParams = evaluatorParams,
         params = WorkflowParams(verbose = 0, batch = "Imagine: Stock II"))
-  }
-}

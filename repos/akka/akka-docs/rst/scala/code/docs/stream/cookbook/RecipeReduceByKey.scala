@@ -7,13 +7,13 @@ import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import akka.stream.stage.{GraphStage, GraphStageLogic}
 
-class RecipeReduceByKey extends RecipeSpec {
+class RecipeReduceByKey extends RecipeSpec
 
-  "Reduce by key recipe" must {
+  "Reduce by key recipe" must
 
     val MaximumDistinctWords = 1000
 
-    "work with simple word count" in {
+    "work with simple word count" in
 
       def words =
         Source(
@@ -39,9 +39,8 @@ class RecipeReduceByKey extends RecipeSpec {
               ("universe", 1),
               ("akka", 1),
               ("rocks!", 1000)))
-    }
 
-    "work generalized" in {
+    "work generalized" in
 
       def words =
         Source(
@@ -52,14 +51,13 @@ class RecipeReduceByKey extends RecipeSpec {
       def reduceByKey[In, K, Out](maximumGroupSize: Int,
                                   groupKey: (In) => K,
                                   map: (In) => Out)(
-          reduce: (Out, Out) => Out): Flow[In, (K, Out), NotUsed] = {
+          reduce: (Out, Out) => Out): Flow[In, (K, Out), NotUsed] =
 
         Flow[In]
           .groupBy[K](maximumGroupSize, groupKey)
           .map(e => groupKey(e) -> map(e))
           .reduce((l, r) => l._1 -> reduce(l._2, r._2))
           .mergeSubstreams
-      }
 
       val wordCounts = words.via(
           reduceByKey(MaximumDistinctWords,
@@ -75,6 +73,3 @@ class RecipeReduceByKey extends RecipeSpec {
               ("universe", 1),
               ("akka", 1),
               ("rocks!", 1000)))
-    }
-  }
-}

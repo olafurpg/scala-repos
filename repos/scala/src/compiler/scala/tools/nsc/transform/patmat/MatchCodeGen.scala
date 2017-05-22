@@ -16,14 +16,14 @@ import scala.reflect.internal.util.Position
   * We have two modes in which to emit trees: optimized (the default)
   * and pure (aka "virtualized": match is parametric in its monad).
   */
-trait MatchCodeGen extends Interface {
+trait MatchCodeGen extends Interface
   import global._
   import definitions._
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // generate actual trees
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  trait CodegenCore extends MatchMonadInterface {
+  trait CodegenCore extends MatchMonadInterface
     private var ctr = 0
     def freshName(prefix: String) = { ctr += 1; vpmName.counted(prefix, ctr) }
 
@@ -35,7 +35,7 @@ trait MatchCodeGen extends Interface {
       NoSymbol.newLabel(freshName(name), NoPosition) setFlag treeInfo.SYNTH_CASE_FLAGS
 
     // codegen relevant to the structure of the translation (how extractors are combined)
-    trait AbsCodegen {
+    trait AbsCodegen
       def matcher(scrut: Tree, scrutSym: Symbol, restpe: Type)(
           cases: List[Casegen => Tree],
           matchFailGen: Option[Tree => Tree]): Tree
@@ -48,10 +48,9 @@ trait MatchCodeGen extends Interface {
       def index(tgt: Tree)(i: Int): Tree
       def mkZero(tp: Type): Tree
       def tupleSel(binder: Symbol)(i: Int): Tree
-    }
 
     // structure
-    trait Casegen extends AbsCodegen {
+    trait Casegen extends AbsCodegen
       import CODE._
       def one(res: Tree): Tree
 
@@ -59,21 +58,18 @@ trait MatchCodeGen extends Interface {
       def flatMapCond(
           cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree
       def flatMapGuard(cond: Tree, next: Tree): Tree
-      def ifThenElseZero(c: Tree, thenp: Tree): Tree = {
+      def ifThenElseZero(c: Tree, thenp: Tree): Tree =
         val z = zero
-        thenp match {
+        thenp match
           case If(c1, thenp1, elsep1) if z equalsStructure elsep1 =>
             If(c AND c1, thenp1, elsep1) // cleaner, leaner trees
           case _ =>
             If(c, thenp, zero)
-        }
-      }
       protected def zero: Tree
-    }
 
     def codegen: AbsCodegen
 
-    abstract class CommonCodegen extends AbsCodegen {
+    abstract class CommonCodegen extends AbsCodegen
       import CODE._
       def fun(arg: Symbol, body: Tree): Tree =
         Function(List(ValDef(arg)), body)
@@ -85,7 +81,7 @@ trait MatchCodeGen extends Interface {
       // unless it verifiably has no drop method (this is the case in particular
       // with Array.) You should not actually have to write a method called drop
       // for name-based matching, but this was an expedient route for the basics.
-      def drop(tgt: Tree)(n: Int): Tree = {
+      def drop(tgt: Tree)(n: Int): Tree =
         def callDirect = fn(tgt, nme.drop, LIT(n))
         def callRuntime =
           Apply(REF(currentRun.runDefinitions.traversableDropMethod),
@@ -94,7 +90,6 @@ trait MatchCodeGen extends Interface {
           (tgt.tpe ne null) && (typeOfMemberNamedDrop(tgt.tpe) == NoType)
 
         if (needsRuntime) callRuntime else callDirect
-      }
 
       // NOTE: checker must be the target of the ==, that's the patmat semantics for ya
       def _equals(checker: Tree, binder: Symbol): Tree =
@@ -108,7 +103,7 @@ trait MatchCodeGen extends Interface {
         gen.mkIsInstanceOf(
             REF(b), tp.withoutAnnotations, any = true, wrapInApply = false)
 
-      def mkZero(tp: Type): Tree = gen.mkConstantZero(tp) match {
+      def mkZero(tp: Type): Tree = gen.mkConstantZero(tp) match
         case Constant(null) =>
           gen.mkAsInstanceOf(
               Literal(Constant(null)),
@@ -116,11 +111,8 @@ trait MatchCodeGen extends Interface {
               any = true,
               wrapInApply = false) // the magic incantation is true/false here
         case const => Literal(const)
-      }
-    }
-  }
 
-  trait PureMatchMonadInterface extends MatchMonadInterface {
+  trait PureMatchMonadInterface extends MatchMonadInterface
     val matchStrategy: Tree
     import CODE._
     def _match(n: Name): SelectStart = matchStrategy DOT n
@@ -129,12 +121,11 @@ trait MatchCodeGen extends Interface {
     private lazy val oneType = typer.typedOperator(_match(vpmName.one)).tpe
     override def pureType(tp: Type): Type =
       firstParamType(appliedType(oneType, tp :: Nil))
-  }
 
-  trait PureCodegen extends CodegenCore with PureMatchMonadInterface {
+  trait PureCodegen extends CodegenCore with PureMatchMonadInterface
     def codegen: AbsCodegen = pureCodegen
 
-    object pureCodegen extends CommonCodegen with Casegen {
+    object pureCodegen extends CommonCodegen with Casegen
       import CODE._
       //// methods in MatchingStrategy (the monad companion) -- used directly in translation
       // __match.runOrElse(`scrut`)(`scrutSym` => `matcher`)
@@ -170,18 +161,16 @@ trait MatchCodeGen extends Interface {
                     CODE.UNIT,
                     freshSym(guardTree.pos, pureType(UnitTpe)),
                     next)
-    }
-  }
 
   trait OptimizedCodegen
-      extends CodegenCore with TypedSubstitution with MatchMonadInterface {
+      extends CodegenCore with TypedSubstitution with MatchMonadInterface
     override def codegen: AbsCodegen = optimizedCodegen
 
     // when we know we're targeting Option, do some inlining the optimizer won't do
     // for example, `o.flatMap(f)` becomes `if(o == None) None else f(o.get)`, similarly for orElse and guard
     //   this is a special instance of the advanced inlining optimization that takes a method call on
     //   an object of a type that only has two concrete subclasses, and inlines both bodies, guarded by an if to distinguish the two cases
-    object optimizedCodegen extends CommonCodegen {
+    object optimizedCodegen extends CommonCodegen
       import CODE._
 
       /** Inline runOrElse and get rid of Option allocations
@@ -192,7 +181,7 @@ trait MatchCodeGen extends Interface {
         */
       def matcher(scrut: Tree, scrutSym: Symbol, restpe: Type)(
           cases: List[Casegen => Tree],
-          matchFailGen: Option[Tree => Tree]): Tree = {
+          matchFailGen: Option[Tree => Tree]): Tree =
         val matchRes =
           NoSymbol.newValueParameter(
               newTermName("x"),
@@ -207,7 +196,7 @@ trait MatchCodeGen extends Interface {
         var _currCase = newCaseSym
 
         val caseDefs =
-          cases map { (mkCase: Casegen => Tree) =>
+          cases map  (mkCase: Casegen => Tree) =>
             val currCase = _currCase
             val nextCase = newCaseSym
             _currCase = nextCase
@@ -215,16 +204,15 @@ trait MatchCodeGen extends Interface {
             LabelDef(currCase,
                      Nil,
                      mkCase(new OptimizedCasegen(matchEnd, nextCase)))
-          }
         // must compute catchAll after caseLabels (side-effects nextCase)
         // catchAll.isEmpty iff no synthetic default case needed (the (last) user-defined case is a default)
         // if the last user-defined case is a default, it will never jump to the next case; it will go immediately to matchEnd
-        val catchAllDef = matchFailGen map { matchFailGen =>
+        val catchAllDef = matchFailGen map  matchFailGen =>
           val scrutRef =
             scrutSym.fold(EmptyTree: Tree)(REF) // for alternatives
 
           LabelDef(_currCase, Nil, matchEnd APPLY (matchFailGen(scrutRef)))
-        } toList // at most 1 element
+        toList // at most 1 element
 
         // scrutSym == NoSymbol when generating an alternatives matcher
         val scrutDef =
@@ -238,10 +226,9 @@ trait MatchCodeGen extends Interface {
             scrutDef ++ caseDefs ++ catchAllDef,
             LabelDef(matchEnd, List(matchRes), REF(matchRes))
         )
-      }
 
       class OptimizedCasegen(matchEnd: Symbol, nextCase: Symbol)
-          extends CommonCodegen with Casegen {
+          extends CommonCodegen with Casegen
         def matcher(scrut: Tree, scrutSym: Symbol, restpe: Type)(
             cases: List[Casegen => Tree],
             matchFailGen: Option[Tree => Tree]): Tree =
@@ -259,7 +246,7 @@ trait MatchCodeGen extends Interface {
         // b: T
         // next: MatchMonad[U]
         // returns MatchMonad[U]
-        def flatMap(prev: Tree, b: Symbol, next: Tree): Tree = {
+        def flatMap(prev: Tree, b: Symbol, next: Tree): Tree =
           val prevSym = freshSym(prev.pos, prev.tpe, "o")
           BLOCK(
               ValDef(prevSym, prev),
@@ -269,7 +256,6 @@ trait MatchCodeGen extends Interface {
                   Substitution(b, prevSym DOT vpmName.get)(next)
               )
           )
-        }
 
         // cond: Boolean
         // res: T
@@ -277,14 +263,13 @@ trait MatchCodeGen extends Interface {
         // next == MatchMonad[U]
         // returns MatchMonad[U]
         def flatMapCond(
-            cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree = {
+            cond: Tree, res: Tree, nextBinder: Symbol, next: Tree): Tree =
           val rest =
             (// only emit a local val for `nextBinder` if it's actually referenced in `next`
              if (next.exists(_.symbol eq nextBinder))
                BLOCK(ValDef(nextBinder, res), next)
              else next)
           ifThenElseZero(cond, rest)
-        }
 
         // guardTree: Boolean
         // next: MatchMonad[T]
@@ -303,7 +288,3 @@ trait MatchCodeGen extends Interface {
                              nextBinder === res,
                              next
                          ))
-      }
-    }
-  }
-}

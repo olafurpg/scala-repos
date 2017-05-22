@@ -33,77 +33,68 @@ import org.openjdk.jmh.annotations._
 @Threads(10)
 @State(Scope.Benchmark)
 @BenchmarkMode(Array(Mode.AverageTime))
-class LevelDbBatchingBenchmark {
+class LevelDbBatchingBenchmark
 
   var sys: ActorSystem = _
   var probe: TestProbe = _
   var store: ActorRef = _
 
   val batch_1 = List.fill(1) { AtomicWrite(PersistentRepr("data", 12, "pa")) }
-  val batch_10 = List.fill(10) {
+  val batch_10 = List.fill(10)
     AtomicWrite(PersistentRepr("data", 12, "pa"))
-  }
-  val batch_100 = List.fill(100) {
+  val batch_100 = List.fill(100)
     AtomicWrite(PersistentRepr("data", 12, "pa"))
-  }
-  val batch_200 = List.fill(200) {
+  val batch_200 = List.fill(200)
     AtomicWrite(PersistentRepr("data", 12, "pa"))
-  }
 
   @Setup(Level.Trial)
-  def setup(): Unit = {
+  def setup(): Unit =
     sys = ActorSystem("sys")
     deleteStorage(sys)
     SharedLeveldbJournal.setStore(store, sys)
 
     probe = TestProbe()(sys)
     store = sys.actorOf(Props[SharedLeveldbStore], "store")
-  }
 
   @TearDown(Level.Trial)
-  def tearDown(): Unit = {
+  def tearDown(): Unit =
     store ! PoisonPill
     Thread.sleep(500)
 
     sys.terminate()
     Await.ready(sys.whenTerminated, 10.seconds)
-  }
 
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(1)
-  def write_1(): Unit = {
+  def write_1(): Unit =
     probe.send(store, WriteMessages(batch_1))
     probe.expectMsgType[Any]
-  }
 
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(10)
-  def writeBatch_10(): Unit = {
+  def writeBatch_10(): Unit =
     probe.send(store, WriteMessages(batch_10))
     probe.expectMsgType[Any]
-  }
 
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(100)
-  def writeBatch_100(): Unit = {
+  def writeBatch_100(): Unit =
     probe.send(store, WriteMessages(batch_100))
     probe.expectMsgType[Any]
-  }
 
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MICROSECONDS)
   @OperationsPerInvocation(200)
-  def writeBatch_200(): Unit = {
+  def writeBatch_200(): Unit =
     probe.send(store, WriteMessages(batch_200))
     probe.expectMsgType[Any]
-  }
 
   // TOOLS
 
-  private def deleteStorage(sys: ActorSystem) {
+  private def deleteStorage(sys: ActorSystem)
     val storageLocations =
       List("akka.persistence.journal.leveldb.dir",
            "akka.persistence.journal.leveldb-shared.store.dir",
@@ -111,5 +102,3 @@ class LevelDbBatchingBenchmark {
           s ⇒ new File(sys.settings.config.getString(s)))
 
     storageLocations.foreach(FileUtils.deleteDirectory)
-  }
-}

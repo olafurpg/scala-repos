@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
   * Created by kate
   * on 3/11/16
   */
-class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
+class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase
 
   private val baseText = """
       |class Base {
@@ -21,7 +21,7 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
   private def handleText(text: String): String =
     text.stripMargin.replaceAll("\r", "").trim()
 
-  def testFunction() {
+  def testFunction()
     val inText = """
           |class Inheritor extends Base {
           |   override def f<caret>
@@ -39,9 +39,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
     complete(1, CompletionType.BASIC)
     completeLookupItem()
     checkResultByText(handleText(baseText + outText))
-  }
 
-  def testValue() {
+  def testValue()
     val inText = """
           |class Inheritor extends Base {
           |   override val intVa<caret>
@@ -60,9 +59,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString.contains("intValue")).get,
         '\t')
     checkResultByText(handleText(baseText + outText))
-  }
 
-  def testVariable() {
+  def testVariable()
     val inText = """
           |class Inheritor extends Base {
           |   override var i<caret>
@@ -83,9 +81,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
           .get,
         '\t')
     checkResultByText(handleText(baseText + outText))
-  }
 
-  def testJavaObjectMethod() {
+  def testJavaObjectMethod()
     val inText = """
           |class Inheritor extends Base {
           |   override def e<caret>
@@ -105,9 +102,8 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString.contains("equals")).get,
         '\t')
     checkResultByText(handleText(baseText + outText))
-  }
 
-  def testOverrideKeword() {
+  def testOverrideKeword()
     val inText = """
         |class Inheritor extends Base {
         |   over<caret>
@@ -125,5 +121,3 @@ class ScalaOverrideCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString.contains("foo")).get, '\t')
     checkResultByText(handleText(baseText + outText))
-  }
-}

@@ -33,7 +33,7 @@ import javafx.{collections => jfxc}
   */
 object ObservableIntegerArray
     extends ObservableArrayCompanionBase[
-        Int, ObservableIntegerArray, jfxc.ObservableIntegerArray] {
+        Int, ObservableIntegerArray, jfxc.ObservableIntegerArray]
 
   /**
     * @inheritdoc
@@ -57,7 +57,6 @@ object ObservableIntegerArray
     */
   def range(start: Int, end: Int, step: Int = 1) =
     apply(Array.range(start, end, step))
-}
 
 // TODO: Enter link when JavaFX 8 API Docs are available on-line.
 /**
@@ -72,7 +71,7 @@ class ObservableIntegerArray(
     delegate: jfxc.ObservableIntegerArray = jfxc.FXCollections
         .observableIntegerArray())
     extends ObservableArray[
-        Int, ObservableIntegerArray, jfxc.ObservableIntegerArray](delegate) {
+        Int, ObservableIntegerArray, jfxc.ObservableIntegerArray](delegate)
 
   /**
     * Create $OIA with specified capacity.
@@ -91,17 +90,15 @@ class ObservableIntegerArray(
     * @inheritdoc
     */
   override def copyTo(
-      srcIdx: Int, dest: Array[Int], destIdx: Int, length: Int) {
+      srcIdx: Int, dest: Array[Int], destIdx: Int, length: Int)
     delegate.copyTo(srcIdx, dest, destIdx, length)
-  }
 
   /**
     * @inheritdoc
     */
   override def copyTo(
-      srcIdx: Int, dest: ObservableIntegerArray, destIdx: Int, length: Int) {
+      srcIdx: Int, dest: ObservableIntegerArray, destIdx: Int, length: Int)
     delegate.copyTo(srcIdx, dest.delegate, destIdx, length)
-  }
 
   /**
     * @inheritdoc
@@ -111,80 +108,69 @@ class ObservableIntegerArray(
   /**
     * @inheritdoc.
     */
-  override def addAll(elems: Int*) = {
+  override def addAll(elems: Int*) =
     delegate.addAll(elems: _*)
-  }
 
   /**
     * @inheritdoc.
     */
-  override def addAll(src: ObservableIntegerArray) {
+  override def addAll(src: ObservableIntegerArray)
     delegate.addAll(src.delegate)
-  }
 
   /**
     * @inheritdoc.
     */
-  override def addAll(src: Array[Int], srcIdx: Int, length: Int) {
+  override def addAll(src: Array[Int], srcIdx: Int, length: Int)
     delegate.addAll(src, srcIdx, length)
-  }
 
   /**
     * @inheritdoc.
     */
-  override def addAll(src: ObservableIntegerArray, srcIdx: Int, length: Int) {
+  override def addAll(src: ObservableIntegerArray, srcIdx: Int, length: Int)
     delegate.addAll(src.delegate, srcIdx, length)
-  }
 
   /**
     * @inheritdoc.
     */
-  override def setAll(elements: Int*) {
+  override def setAll(elements: Int*)
     delegate.setAll(elements: _*)
-  }
 
   /**
     * @inheritdoc.
     */
-  override def setAll(src: ObservableIntegerArray) {
+  override def setAll(src: ObservableIntegerArray)
     delegate.setAll(src.delegate)
-  }
 
   /**
     * @inheritdoc.
     */
-  override def setAll(src: Array[Int], srcIdx: Int, length: Int) {
+  override def setAll(src: Array[Int], srcIdx: Int, length: Int)
     delegate.setAll(src, srcIdx, length)
-  }
 
   /**
     * @inheritdoc.
     */
-  override def setAll(src: ObservableIntegerArray, srcIdx: Int, length: Int) {
+  override def setAll(src: ObservableIntegerArray, srcIdx: Int, length: Int)
     delegate.setAll(src.delegate, srcIdx, length)
-  }
 
   /**
     * @inheritdoc
     */
-  override def set(idx: Int, elem: Int) {
+  override def set(idx: Int, elem: Int)
     delegate.set(idx, elem)
-  }
 
   /**
     * @inheritdoc
     */
-  override def set(destIdx: Int, src: Array[Int], srcIdx: Int, length: Int) {
+  override def set(destIdx: Int, src: Array[Int], srcIdx: Int, length: Int)
     delegate.set(destIdx, src, srcIdx, length)
-  }
 
   /**
     * @inheritdoc
     */
   override def set(
-      destIdx: Int, src: ObservableIntegerArray, srcIdx: Int, length: Int) {
+      destIdx: Int, src: ObservableIntegerArray, srcIdx: Int, length: Int)
     delegate.set(destIdx, src.delegate, srcIdx, length)
-  }
 
   /**
     * @inheritdoc
@@ -204,4 +190,3 @@ class ObservableIntegerArray(
     * @return New empty $OIA.
     */
   protected[this] override def newBuilder = ObservableIntegerArray.empty()
-}

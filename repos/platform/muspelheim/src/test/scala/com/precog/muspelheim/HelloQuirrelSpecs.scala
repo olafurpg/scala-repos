@@ -22,103 +22,86 @@ package muspelheim
 
 import com.precog.yggdrasil._
 
-trait HelloQuirrelSpecs extends EvalStackSpecs {
+trait HelloQuirrelSpecs extends EvalStackSpecs
   import stack._
-  "evaluate the 'hello, quirrel' examples" >> {
-    "json" >> {
-      "object" >> {
+  "evaluate the 'hello, quirrel' examples" >>
+    "json" >>
+      "object" >>
         val result = eval("""{ name: "John", age: 29, gender: "male" }""")
         result must haveSize(1)
         result must contain(SObject(Map("name" -> SString("John"),
                                         "age" -> SDecimal(29),
                                         "gender" -> SString("male"))))
-      }
 
-      "object with null" >> {
+      "object with null" >>
         val result = eval("""{ name: "John", age: 29, gender: null }""")
         result must haveSize(1)
         result must contain(SObject(Map("name" -> SString("John"),
                                         "age" -> SDecimal(29),
                                         "gender" -> SNull)))
-      }
 
-      "object with undefined" >> {
+      "object with undefined" >>
         val result = eval("""{ name: "John", age: 29, gender: undefined }""")
         result must haveSize(0)
-      }
 
-      "boolean" >> {
+      "boolean" >>
         val result = eval("true")
         result must haveSize(1)
         result must contain(SBoolean(true))
-      }
 
-      "string" >> {
+      "string" >>
         val result = eval("\"hello, world\"")
         result must haveSize(1)
         result must contain(SString("hello, world"))
-      }
 
-      "null" >> {
+      "null" >>
         val result = eval("null")
         result must haveSize(1)
         result must contain(SNull)
-      }
 
-      "undefined" >> {
+      "undefined" >>
         val result = eval("undefined")
         result must haveSize(0)
-      }
-    }
 
-    "numbers" >> {
-      "addition" >> {
+    "numbers" >>
+      "addition" >>
         val result = eval("5 + 2")
         result must haveSize(1)
         result must contain(SDecimal(7))
-      }
 
-      "subtraction" >> {
+      "subtraction" >>
         val result = eval("5 - 2")
         result must haveSize(1)
         result must contain(SDecimal(3))
-      }
 
-      "multiplication" >> {
+      "multiplication" >>
         val result = eval("8 * 2")
         result must haveSize(1)
         result must contain(SDecimal(16))
-      }
 
-      "division" >> {
+      "division" >>
         val result = eval("12 / 3")
         result must haveSize(1)
         result must contain(SDecimal(4))
-      }
 
-      "mod" >> {
+      "mod" >>
         val result = eval("5 % 2")
         result must haveSize(1)
         result must contain(SDecimal(1))
-      }
-    }
 
-    "booleans" >> {
-      "greater-than" >> {
+    "booleans" >>
+      "greater-than" >>
         val result = eval("5 > 2")
         result must haveSize(1)
         result must contain(SBoolean(true))
-      }
 
-      "not-equal" >> {
+      "not-equal" >>
         val result = eval("\"foo\" != \"foo\"")
         result must haveSize(1)
         result must contain(SBoolean(false))
-      }
-    }
 
-    "variables" >> {
-      "1" >> {
+    "variables" >>
+      "1" >>
         val input = """
             | total := 2 + 1
             | total * 3""".stripMargin
@@ -126,9 +109,8 @@ trait HelloQuirrelSpecs extends EvalStackSpecs {
         val result = eval(input)
         result must haveSize(1)
         result must contain(SDecimal(9))
-      }
 
-      "2" >> {
+      "2" >>
         val input = """
             | num := 4
             | square := num * num
@@ -137,30 +119,24 @@ trait HelloQuirrelSpecs extends EvalStackSpecs {
         val result = eval(input)
         result must haveSize(1)
         result must contain(SDecimal(15))
-      }
-    }
 
-    "undefineds" >> {
-      "addition" >> {
+    "undefineds" >>
+      "addition" >>
         val result = eval("5 + undefined")
         result must haveSize(0)
-      }
 
-      "greater-than" >> {
+      "greater-than" >>
         val result = eval("5 > undefined")
         result must haveSize(0)
-      }
 
       // note that `5 intersect undefined` is provably empty
       // and thus kicked out by the compiler
-      "union" >> {
+      "union" >>
         val result = eval("5 union undefined")
         result must haveSize(1)
         result must contain(SDecimal(5))
-      }
-    }
 
-    "outliers" >> {
+    "outliers" >>
       val input = """
            | campaigns := //campaigns
            | bound := stdDev(campaigns.cpm)
@@ -170,27 +146,22 @@ trait HelloQuirrelSpecs extends EvalStackSpecs {
 
       val result = eval(input)
       result must haveSize(5)
-    }
 
-    "handle filter on null" >> {
+    "handle filter on null" >>
       val input = """
           //fastspring_nulls where (//fastspring_nulls).endDate = null
         """.stripMargin
 
       val result = eval(input)
       result must haveSize(1)
-    }
 
-    "handle load of error-prone fastspring data" >> {
+    "handle load of error-prone fastspring data" >>
       eval("//fastspring_nulls") must haveSize(2)
       eval("//fastspring_mixed_type") must haveSize(2)
-    }
 
-    "count the obnoxiously large dataset" >> {
-      "<root>" >> {
+    "count the obnoxiously large dataset" >>
+      "<root>" >>
         eval("count((//obnoxious).v)") mustEqual Set(SDecimal(100000))
-      }
-    }
     // FIXME: This is no longer proper syntax.
 //      "handle chained characteristic functions" in {
 //        val input = """
@@ -208,5 +179,3 @@ trait HelloQuirrelSpecs extends EvalStackSpecs {
 //        val result = eval(input)
 //        result must haveSize(4)
 //      }
-  }
-}

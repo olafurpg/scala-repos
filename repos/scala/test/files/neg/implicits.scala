@@ -2,29 +2,24 @@ class Pos
 
 class Super
 
-object Super {
+object Super
   implicit def pos2int(p: Pos): Int = 0
-}
 
-object Sub extends Super {
-  class Plus(x: Any) {
+object Sub extends Super
+  class Plus(x: Any)
     def +(y: String): String = x.toString + y
-  }
   implicit def any2plus(x: Any): Plus = new Plus(x)
-}
 
-object Test {
+object Test
   import Super._
   import Sub._
   val p = new Pos
   def f(x: Int): Int = x
   f(p + 1)
-}
 
-object test2 {
-  sealed trait HMap {
+object test2
+  sealed trait HMap
     def +[T](v: T) = HSome(v, this)
-  }
 
   final case class HSome[T, L <: HMap](head: T, tail: L) extends HMap
 
@@ -36,38 +31,29 @@ object test2 {
 
   def foo(x: Int) = 3
   foo(set)
-}
 
 // #2180
-class Mxml {
+class Mxml
 
-  private def processChildren(children: Seq[Any]): List[Mxml] = {
+  private def processChildren(children: Seq[Any]): List[Mxml] =
 
     children.toList.flatMap(
         e =>
-          {
 
-        e match {
+        e match
 
           case s: scala.collection.Traversable[_] => s
           case a => List(a)
-        }
-    })
-  }
-}
+    )
 
 // SI-5316
-class Test3 {
+class Test3
   def foo(p: => Any)(implicit x: Nothing): Unit = ()
 
   object X
 
-  foo {
+  foo
     val a = 0
 
-    {
       import X._
       a
-    }
-  }
-}

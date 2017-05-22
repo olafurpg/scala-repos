@@ -23,16 +23,15 @@ import java.util.{Iterator => JIterator}
 import java.util.Random // this one is serializable, scala.util.Random is not
 import scala.collection.JavaConverters._
 
-object JoinAlgorithms extends java.io.Serializable {
+object JoinAlgorithms extends java.io.Serializable
   // seed is ascii codes for "scalding" combined as affine maps.
   val Seed: Long = (((115L * 99 + 97) * 108 + 100) * 105 + 110) * 103
-}
 
 /*
  * Keeps all the logic related to RichPipe joins.
  *
  */
-trait JoinAlgorithms {
+trait JoinAlgorithms
   import Dsl._
   import RichPipe.assignName
   import JoinAlgorithms.Seed
@@ -50,9 +49,8 @@ trait JoinAlgorithms {
     *
     */
   def coGroupBy(f: Fields, j: JoinMode = InnerJoinMode)(
-      builder: CoGroupBuilder => GroupBuilder): Pipe = {
+      builder: CoGroupBuilder => GroupBuilder): Pipe =
     builder(new CoGroupBuilder(f, j)).schedule(pipe.getName, pipe)
-  }
 
   /**
     * == WARNING ==
@@ -67,36 +65,30 @@ trait JoinAlgorithms {
     *
     * Use at your own risk.
     */
-  def crossWithTiny(tiny: Pipe) = {
-    val tinyJoin = tiny.map(() -> '__joinTiny__) { (u: Unit) =>
+  def crossWithTiny(tiny: Pipe) =
+    val tinyJoin = tiny.map(() -> '__joinTiny__)  (u: Unit) =>
       1
-    }
     pipe
-      .map(() -> '__joinBig__) { (u: Unit) =>
+      .map(() -> '__joinBig__)  (u: Unit) =>
         1
-      }
       .joinWithTiny('__joinBig__ -> '__joinTiny__, tinyJoin)
       .discard('__joinBig__, '__joinTiny__)
-  }
 
   /**
     * Does a cross-product by doing a blockJoin.
     * Useful when doing a large cross, if your cluster can take it.
     * Prefer crossWithTiny
     */
-  def crossWithSmaller(p: Pipe, replication: Int = 20) = {
-    val smallJoin = p.map(() -> '__joinSmall__) { (u: Unit) =>
+  def crossWithSmaller(p: Pipe, replication: Int = 20) =
+    val smallJoin = p.map(() -> '__joinSmall__)  (u: Unit) =>
       1
-    }
     pipe
-      .map(() -> '__joinBig__) { (u: Unit) =>
+      .map(() -> '__joinBig__)  (u: Unit) =>
         1
-      }
       .blockJoinWithSmaller('__joinBig__ -> '__joinSmall__,
                             smallJoin,
                             rightReplication = replication)
       .discard('__joinBig__, '__joinSmall__)
-  }
 
   /**
     * Rename the collisions and return the pipe and the new names,
@@ -105,7 +97,7 @@ trait JoinAlgorithms {
   private def renameCollidingFields(
       p: Pipe,
       fields: Fields,
-      collisions: Set[Comparable[_]]): (Pipe, Fields, Fields) = {
+      collisions: Set[Comparable[_]]): (Pipe, Fields, Fields) =
     // Here is how we rename colliding fields
     def rename(f: Comparable[_]): String = "__temp_join_" + f.toString
 
@@ -116,21 +108,20 @@ trait JoinAlgorithms {
     // Now construct the new join keys, where we check for a rename
     // otherwise use the original key:
     val newJoinKeys = new Fields(
-        asList(fields).map { fname =>
+        asList(fields).map  fname =>
       // If we renamed, get the rename, else just use the field
-      if (collisions(fname)) {
+      if (collisions(fname))
         rename(fname)
-      } else fname
-    }: _*)
+      else fname
+    : _*)
     val renamedPipe = p.rename(orig -> temp)
     (renamedPipe, newJoinKeys, temp)
-  }
 
   /**
     * Flip between LeftJoin to RightJoin
     */
-  private def flipJoiner(j: Joiner): Joiner = {
-    j match {
+  private def flipJoiner(j: Joiner): Joiner =
+    j match
       case outer: OuterJoin => outer
       case inner: InnerJoin => inner
       case left: LeftJoin => new RightJoin
@@ -138,11 +129,9 @@ trait JoinAlgorithms {
       case other =>
         throw new InvalidJoinModeException("cannot use joiner " + other +
             " since it cannot be flipped safely")
-    }
-  }
 
-  def joinerToJoinModes(j: Joiner) = {
-    j match {
+  def joinerToJoinModes(j: Joiner) =
+    j match
       case i: InnerJoin => (InnerJoinMode, InnerJoinMode)
       case l: LeftJoin => (InnerJoinMode, OuterJoinMode)
       case r: RightJoin => (OuterJoinMode, InnerJoinMode)
@@ -150,8 +139,6 @@ trait JoinAlgorithms {
       case _ =>
         throw new InvalidJoinModeException(
             "cannot convert joiner to joiner modes")
-    }
-  }
 
   /**
     * Joins the first set of keys in the first pipe to the second set of keys in the second pipe.
@@ -172,16 +159,15 @@ trait JoinAlgorithms {
   def joinWithSmaller(fs: (Fields, Fields),
                       that: Pipe,
                       joiner: Joiner = new InnerJoin,
-                      reducers: Int = -1) = {
+                      reducers: Int = -1) =
     // If we are not doing an inner join, the join fields must be disjoint:
     val joiners = joinerToJoinModes(joiner)
     val intersection = asSet(fs._1).intersect(asSet(fs._2))
-    if (intersection.isEmpty) {
+    if (intersection.isEmpty)
       // Common case: no intersection in names: just CoGroup, which duplicates the grouping fields:
-      pipe.coGroupBy(fs._1, joiners._1) {
+      pipe.coGroupBy(fs._1, joiners._1)
         _.coGroup(fs._2, that, joiners._2).reducers(reducers)
-      }
-    } else if (joiners._1 == InnerJoinMode && joiners._2 == InnerJoinMode) {
+    else if (joiners._1 == InnerJoinMode && joiners._2 == InnerJoinMode)
       /*
        * Since it is an inner join, we only output if the key is present an equal in both sides.
        * For this (common) case, it doesn't matter if we drop one of the matching grouping fields.
@@ -190,16 +176,13 @@ trait JoinAlgorithms {
       val (renamedThat, newJoinFields, temp) = renameCollidingFields(
           that, fs._2, intersection)
       pipe
-        .coGroupBy(fs._1, joiners._1) {
+        .coGroupBy(fs._1, joiners._1)
           _.coGroup(newJoinFields, renamedThat, joiners._2).reducers(reducers)
-        }
         .discard(temp)
-    } else {
+    else
       throw new IllegalArgumentException(
           "join keys must be disjoint unless you are doing an InnerJoin.  Found: " +
           fs.toString + ", which overlap with: " + intersection.toString)
-    }
-  }
 
   /**
     * same as reversing the order on joinWithSmaller
@@ -207,25 +190,22 @@ trait JoinAlgorithms {
   def joinWithLarger(fs: (Fields, Fields),
                      that: Pipe,
                      joiner: Joiner = new InnerJoin,
-                     reducers: Int = -1) = {
+                     reducers: Int = -1) =
     that.joinWithSmaller((fs._2, fs._1), pipe, flipJoiner(joiner), reducers)
-  }
 
   /**
     * This is joinWithSmaller with joiner parameter fixed to LeftJoin. If the item is absent on the right put null for the keys and values
     */
   def leftJoinWithSmaller(
-      fs: (Fields, Fields), that: Pipe, reducers: Int = -1) = {
+      fs: (Fields, Fields), that: Pipe, reducers: Int = -1) =
     joinWithSmaller(fs, that, new LeftJoin, reducers)
-  }
 
   /**
     * This is joinWithLarger with joiner parameter fixed to LeftJoin. If the item is absent on the right put null for the keys and values
     */
   def leftJoinWithLarger(
-      fs: (Fields, Fields), that: Pipe, reducers: Int = -1) = {
+      fs: (Fields, Fields), that: Pipe, reducers: Int = -1) =
     joinWithLarger(fs, that, new LeftJoin, reducers)
-  }
 
   /**
     * This does an assymmetric join, using cascading's "HashJoin".  This only runs through
@@ -243,15 +223,15 @@ trait JoinAlgorithms {
     * This does not work with outer joins, or right joins, only inner and
     * left join versions are given.
     */
-  def joinWithTiny(fs: (Fields, Fields), that: Pipe) = {
+  def joinWithTiny(fs: (Fields, Fields), that: Pipe) =
     val intersection = asSet(fs._1).intersect(asSet(fs._2))
-    if (intersection.isEmpty) {
+    if (intersection.isEmpty)
       new HashJoin(assignName(pipe),
                    fs._1,
                    assignName(that),
                    fs._2,
                    WrappedJoiner(new InnerJoin))
-    } else {
+    else
       val (renamedThat, newJoinFields, temp) = renameCollidingFields(
           that, fs._2, intersection)
       (new HashJoin(assignName(pipe),
@@ -259,17 +239,14 @@ trait JoinAlgorithms {
                     assignName(renamedThat),
                     newJoinFields,
                     WrappedJoiner(new InnerJoin))).discard(temp)
-    }
-  }
 
-  def leftJoinWithTiny(fs: (Fields, Fields), that: Pipe) = {
+  def leftJoinWithTiny(fs: (Fields, Fields), that: Pipe) =
     //Rename these pipes to avoid cascading name conflicts
     new HashJoin(assignName(pipe),
                  fs._1,
                  assignName(that),
                  fs._2,
                  WrappedJoiner(new LeftJoin))
-  }
 
   /**
     * Performs a block join, otherwise known as a replicate fragment join (RF join).
@@ -303,7 +280,7 @@ trait JoinAlgorithms {
                            rightReplication: Int = 1,
                            leftReplication: Int = 1,
                            joiner: Joiner = new InnerJoin,
-                           reducers: Int = -1): Pipe = {
+                           reducers: Int = -1): Pipe =
 
     assert(
         rightReplication > 0,
@@ -331,7 +308,6 @@ trait JoinAlgorithms {
           (leftJoinFields, rightJoinFields), newRight, joiner, reducers)
       .discard(leftFields)
       .discard(rightFields)
-  }
 
   /**
     * Adds one random field and one replica field.
@@ -340,19 +316,17 @@ trait JoinAlgorithms {
                                    f: Fields,
                                    replication: Int,
                                    otherReplication: Int,
-                                   swap: Boolean = false): Pipe = {
+                                   swap: Boolean = false): Pipe =
 
     /**
       * We need to seed exactly once and capture that seed. If we let
       * each task create a seed, a restart will change the computation,
       * and this could result in subtle bugs.
       */
-    p.using(new Random(Seed) with Stateful).flatMap(() -> f) {
+    p.using(new Random(Seed) with Stateful).flatMap(() -> f)
       (rand: Random, _: Unit) =>
         val rfs = getReplicationFields(rand, replication, otherReplication)
         if (swap) rfs.map { case (i, j) => (j, i) } else rfs
-    }
-  }
 
   /**
     * Returns a list of the dummy replication fields used to replicate groups in skewed joins.
@@ -379,19 +353,17 @@ trait JoinAlgorithms {
   private def getReplicationFields(
       r: Random,
       replication: Int,
-      otherReplication: Int): IndexedSeq[(Int, Int)] = {
+      otherReplication: Int): IndexedSeq[(Int, Int)] =
     assert(replication >= 1 && otherReplication >= 1,
            "Replication counts must be >= 1")
 
     val rand = r.nextInt(otherReplication)
-    (0 until replication).map { rep =>
+    (0 until replication).map  rep =>
       (rand, rep)
-    }
-  }
 
   private def assertValidJoinMode(
-      joiner: Joiner, left: Int, right: Int): Unit = {
-    (joiner, left, right) match {
+      joiner: Joiner, left: Int, right: Int): Unit =
+    (joiner, left, right) match
       case (i: InnerJoin, _, _) => ()
       case (k: LeftJoin, 1, _) => ()
       case (m: RightJoin, _, 1) => ()
@@ -399,8 +371,6 @@ trait JoinAlgorithms {
         throw new InvalidJoinModeException(
             "you cannot use joiner " + j + " with left replication " + l +
             " and right replication " + r)
-    }
-  }
 
   /**
     * Performs a skewed join, which is useful when the data has extreme skew.
@@ -429,7 +399,7 @@ trait JoinAlgorithms {
       otherPipe: Pipe,
       sampleRate: Double = 0.001,
       reducers: Int = -1,
-      replicator: SkewReplication = SkewReplicationA()): Pipe = {
+      replicator: SkewReplication = SkewReplicationA()): Pipe =
 
     assert(sampleRate > 0 && sampleRate < 1,
            "Sampling rate for skew joins must lie strictly between 0 and 1")
@@ -457,19 +427,17 @@ trait JoinAlgorithms {
       * each task create a seed, a restart will change the computation,
       * and this could result in subtle bugs.
       */
-    val sampledLeft = pipe.sample(sampleRate, Seed).groupBy(fs._1) {
+    val sampledLeft = pipe.sample(sampleRate, Seed).groupBy(fs._1)
       _.size(leftSampledCountField)
-    }
     val sampledRight =
-      rightPipe.sample(sampleRate, Seed).groupBy(rightResolvedJoinFields) {
+      rightPipe.sample(sampleRate, Seed).groupBy(rightResolvedJoinFields)
         _.size(rightSampledCountField)
-      }
     val sampledCounts = sampledLeft
       .joinWithSmaller(fs._1 -> rightResolvedJoinFields,
                        sampledRight,
                        joiner = new OuterJoin)
       .project(Fields.join(mergedJoinKeys, sampledCountFields))
-      .map(mergedJoinKeys -> mergedJoinKeys) { t: cascading.tuple.Tuple =>
+      .map(mergedJoinKeys -> mergedJoinKeys)  t: cascading.tuple.Tuple =>
         // Make the outer join look like an inner join so that we can join
         // either the left or right fields for every entry.
         // Accomplished by replacing any null field with the corresponding
@@ -478,19 +446,16 @@ trait JoinAlgorithms {
         val keysSize = t.size / 2
         val result = new cascading.tuple.Tuple(t)
 
-        for (index <- 0 until keysSize) {
+        for (index <- 0 until keysSize)
           val leftValue = result.getObject(index)
           val rightValue = result.getObject(index + keysSize)
 
-          if (leftValue == null) {
+          if (leftValue == null)
             result.set(index, rightValue)
-          } else if (rightValue == null) {
+          else if (rightValue == null)
             result.set(index + keysSize, leftValue)
-          }
-        }
 
         result
-      }
 
     // 2. Now replicate each group of join keys in the left and right pipes, according to the sampled counts
     // from the previous step.
@@ -528,17 +493,15 @@ trait JoinAlgorithms {
 
     if (intersection.isEmpty) joinedPipe
     else joinedPipe.discard(dupeFields)
-  }
 
   def skewJoinWithLarger(
       fs: (Fields, Fields),
       otherPipe: Pipe,
       sampleRate: Double = 0.001,
       reducers: Int = -1,
-      replicator: SkewReplication = SkewReplicationA()): Pipe = {
+      replicator: SkewReplication = SkewReplicationA()): Pipe =
     otherPipe.skewJoinWithSmaller(
         (fs._2, fs._1), pipe, sampleRate, reducers, replicator)
-  }
 
   /**
     * Helper method for performing skewed joins. This replicates the rows in {pipe} according
@@ -557,12 +520,11 @@ trait JoinAlgorithms {
                             replicationFields: Fields,
                             replicator: SkewReplication,
                             numReducers: Int = -1,
-                            isPipeOnRight: Boolean = false) = {
+                            isPipeOnRight: Boolean = false) =
 
     // Rename the fields to prepare for the leftJoin below.
-    val renamedFields = joinFields.iterator.asScala.toList.map { field =>
+    val renamedFields = joinFields.iterator.asScala.toList.map  field =>
       "__RENAMED_" + field + "__"
-    }
     val renamedSampledCounts = sampledCounts
       .rename(joinFields -> renamedFields)
       .project(Fields.join(renamedFields, countFields))
@@ -577,7 +539,7 @@ trait JoinAlgorithms {
     // join key appears.
       .leftJoinWithTiny(joinFields -> renamedFields, renamedSampledCounts)
       .using(new Random(Seed) with Stateful)
-      .flatMap(countFields -> replicationFields) {
+      .flatMap(countFields -> replicationFields)
         (rand: Random, counts: (Int, Int)) =>
           val (leftRep, rightRep) =
             replicator.getReplications(counts._1, counts._2, numReducers)
@@ -586,11 +548,8 @@ trait JoinAlgorithms {
             if (isPipeOnRight) (rightRep, leftRep) else (leftRep, rightRep)
           val rfs = getReplicationFields(rand, rep, otherRep)
           if (isPipeOnRight) rfs.map(_.swap) else rfs
-      }
       .discard(renamedFields)
       .discard(countFields)
-  }
-}
 
 class InvalidJoinModeException(args: String) extends Exception(args)
 
@@ -598,11 +557,10 @@ class InvalidJoinModeException(args: String) extends Exception(args)
   * Wraps a Joiner instance so that the active FlowProcess may be noted. This allows features of Scalding that need
   * access to a FlowProcess (e.g., counters) to function properly inside a Joiner.
   */
-private[scalding] class WrappedJoiner(val joiner: Joiner) extends Joiner {
-  override def getIterator(joinerClosure: JoinerClosure): JIterator[Tuple] = {
+private[scalding] class WrappedJoiner(val joiner: Joiner) extends Joiner
+  override def getIterator(joinerClosure: JoinerClosure): JIterator[Tuple] =
     RuntimeStats.addFlowProcess(joinerClosure.getFlowProcess)
     joiner.getIterator(joinerClosure)
-  }
 
   override def numJoins(): Int = joiner.numJoins()
 
@@ -611,17 +569,13 @@ private[scalding] class WrappedJoiner(val joiner: Joiner) extends Joiner {
   override def toString: String = joiner.toString
 
   override def equals(other: Any): Boolean = joiner.equals(other)
-}
 
-private[scalding] object WrappedJoiner {
+private[scalding] object WrappedJoiner
 
   /**
     * Wrap the given Joiner in a WrappedJoiner instance if it is not already wrapped.
     */
-  def apply(joiner: Joiner): WrappedJoiner = {
-    joiner match {
+  def apply(joiner: Joiner): WrappedJoiner =
+    joiner match
       case wrapped: WrappedJoiner => wrapped
       case _ => new WrappedJoiner(joiner)
-    }
-  }
-}

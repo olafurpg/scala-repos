@@ -33,7 +33,7 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
                               healthCheckManager: HealthCheckManager,
                               val authenticator: Authenticator,
                               val authorizer: Authorizer)
-    extends AuthResource {
+    extends AuthResource
 
   val log = LoggerFactory.getLogger(getClass.getName)
   implicit val ec = ExecutionContext.Implicits.global
@@ -44,53 +44,50 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
   def indexJson(@QueryParam("status") status: String,
                 @QueryParam("status[]") statuses: util.List[String],
                 @Context req: HttpServletRequest): Response =
-    authenticated(req) { implicit identity =>
+    authenticated(req)  implicit identity =>
       Option(status).map(statuses.add)
       val statusSet = statuses.asScala.flatMap(toTaskState).toSet
 
       val taskList = taskTracker.tasksByAppSync
 
-      val tasks = taskList.appTasksMap.values.view.flatMap { app =>
+      val tasks = taskList.appTasksMap.values.view.flatMap  app =>
         app.tasks.view.map(t => app.appId -> t)
-      }
 
       val appIds = taskList.allAppIdsWithTasks
 
       val appIdsToApps =
         appIds.map(appId => appId -> result(groupManager.app(appId))).toMap
 
-      val appToPorts = appIdsToApps.map {
+      val appToPorts = appIdsToApps.map
         case (appId, app) => appId -> app.map(_.servicePorts).getOrElse(Nil)
-      }.toMap
+      .toMap
 
-      val health = appIds.flatMap { appId =>
+      val health = appIds.flatMap  appId =>
         result(healthCheckManager.statuses(appId))
-      }.toMap
+      .toMap
 
-      val enrichedTasks: IterableView[EnrichedTask, Iterable[_]] = for {
+      val enrichedTasks: IterableView[EnrichedTask, Iterable[_]] = for
         (appId, task) <- tasks
         app <- appIdsToApps(appId) if isAuthorized(ViewApp, app)
               if statusSet.isEmpty ||
               task.mesosStatus.exists(s => statusSet(s.getState))
-      } yield {
+      yield
         EnrichedTask(
             appId,
             task,
             health.getOrElse(task.taskId, Nil),
             appToPorts.getOrElse(appId, Nil)
         )
-      }
 
       ok(jsonObjString(
               "tasks" -> enrichedTasks
           ))
-    }
 
   @GET
   @Produces(Array(MediaType.TEXT_PLAIN))
   @Timed
   def indexTxt(@Context req: HttpServletRequest): Response =
-    authenticated(req) { implicit identity =>
+    authenticated(req)  implicit identity =>
       ok(
           EndpointsHelper.appsToEndpointString(
               taskTracker,
@@ -98,7 +95,6 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
                 .filter(app => isAuthorized(ViewApp, app)),
               "\t"
           ))
-    }
 
   @POST
   @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))
@@ -109,20 +105,18 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
                 @QueryParam("force") @DefaultValue("false") force: Boolean,
                 body: Array[Byte],
                 @Context req: HttpServletRequest): Response =
-    authenticated(req) { implicit identity =>
+    authenticated(req)  implicit identity =>
       val taskIds = (Json.parse(body) \ "ids").as[Set[String]]
-      val tasksToAppId = taskIds.map { id =>
-        try { id -> Task.Id.appId(id) } catch {
+      val tasksToAppId = taskIds.map  id =>
+        try { id -> Task.Id.appId(id) } catch
           case e: MatchError =>
             throw new BadRequestException(s"Invalid task id '$id'.")
-        }
-      }.toMap
+      .toMap
 
-      def scaleAppWithKill(toKill: Map[PathId, Iterable[Task]]): Response = {
+      def scaleAppWithKill(toKill: Map[PathId, Iterable[Task]]): Response =
         deploymentResult(result(taskKiller.killAndScale(toKill, force)))
-      }
 
-      def killTasks(toKill: Map[PathId, Iterable[Task]]): Response = {
+      def killTasks(toKill: Map[PathId, Iterable[Task]]): Response =
         val affectedApps = tasksToAppId.values
           .flatMap(appId => result(groupManager.app(appId)))
           .toSeq
@@ -130,28 +124,24 @@ class TasksResource @Inject()(service: MarathonSchedulerService,
         // starting to kill tasks
         affectedApps.foreach(checkAuthorization(UpdateApp, _))
 
-        val killed = result(Future.sequence(toKill.map {
+        val killed = result(Future.sequence(toKill.map
           case (appId, tasks) => taskKiller.kill(appId, _ => tasks)
-        })).flatten
+        )).flatten
         ok(jsonObjString("tasks" -> killed.map(
                     task => EnrichedTask(task.taskId.appId, task, Seq.empty))))
-      }
 
-      val tasksByAppId = tasksToAppId.flatMap {
+      val tasksByAppId = tasksToAppId.flatMap
         case (taskId, appId) =>
           taskTracker.tasksByAppSync.task(Task.Id(taskId))
-      }.groupBy { task =>
+      .groupBy  task =>
         task.taskId.appId
-      }.map { case (appId, tasks) => appId -> tasks }
+      .map { case (appId, tasks) => appId -> tasks }
 
       if (scale) scaleAppWithKill(tasksByAppId)
       else killTasks(tasksByAppId)
-    }
 
   private def toTaskState(state: String): Option[TaskState] =
-    state.toLowerCase match {
+    state.toLowerCase match
       case "running" => Some(TaskState.TASK_RUNNING)
       case "staging" => Some(TaskState.TASK_STAGING)
       case _ => None
-    }
-}

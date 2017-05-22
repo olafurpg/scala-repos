@@ -27,8 +27,8 @@ import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object GradientBoostedTreeClassifierExample {
-  def main(args: Array[String]): Unit = {
+object GradientBoostedTreeClassifierExample
+  def main(args: Array[String]): Unit =
     val conf =
       new SparkConf().setAppName("GradientBoostedTreeClassifierExample")
     val sc = new SparkContext(conf)
@@ -95,6 +95,4 @@ object GradientBoostedTreeClassifierExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

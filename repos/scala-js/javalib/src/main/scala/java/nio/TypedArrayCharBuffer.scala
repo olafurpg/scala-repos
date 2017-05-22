@@ -7,7 +7,7 @@ private[nio] final class TypedArrayCharBuffer private (
     _initialPosition: Int,
     _initialLimit: Int,
     _readOnly: Boolean)
-    extends CharBuffer(_typedArray.length, null, -1) {
+    extends CharBuffer(_typedArray.length, null, -1)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -31,12 +31,11 @@ private[nio] final class TypedArrayCharBuffer private (
   def asReadOnlyBuffer(): CharBuffer =
     GenTypedArrayBuffer(this).generic_asReadOnlyBuffer()
 
-  def subSequence(start: Int, end: Int): CharBuffer = {
+  def subSequence(start: Int, end: Int): CharBuffer =
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
     new TypedArrayCharBuffer(
         _typedArray, position + start, position + end, isReadOnly)
-  }
 
   @noinline
   def get(): Char =
@@ -100,27 +99,23 @@ private[nio] final class TypedArrayCharBuffer private (
   override private[nio] def store(
       startIndex: Int, src: Array[Char], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}
 
-private[nio] object TypedArrayCharBuffer {
+private[nio] object TypedArrayCharBuffer
   private[nio] implicit object NewTypedArrayCharBuffer
-      extends GenTypedArrayBuffer.NewTypedArrayBuffer[CharBuffer] {
+      extends GenTypedArrayBuffer.NewTypedArrayBuffer[CharBuffer]
     def bytesPerElem: Int = 2
 
     def apply(typedArray: Uint16Array,
               initialPosition: Int,
               initialLimit: Int,
-              readOnly: Boolean): TypedArrayCharBuffer = {
+              readOnly: Boolean): TypedArrayCharBuffer =
       new TypedArrayCharBuffer(
           typedArray, initialPosition, initialLimit, readOnly)
-    }
 
     @inline
     def newTypedArray(
-        buffer: ArrayBuffer, byteOffset: Int, length: Int): Uint16Array = {
+        buffer: ArrayBuffer, byteOffset: Int, length: Int): Uint16Array =
       new Uint16Array(buffer, byteOffset, length)
-    }
-  }
 
   @inline
   def fromTypedArrayByteBuffer(byteBuffer: TypedArrayByteBuffer): CharBuffer =
@@ -128,4 +123,3 @@ private[nio] object TypedArrayCharBuffer {
 
   def wrap(array: Uint16Array): CharBuffer =
     new TypedArrayCharBuffer(array, 0, array.length, false)
-}

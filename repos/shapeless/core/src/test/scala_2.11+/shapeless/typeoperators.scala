@@ -20,39 +20,31 @@ import org.junit.Test
 
 import test._
 
-class TypeOperator211Tests {
+class TypeOperator211Tests
 
-  trait Bar[T] {
+  trait Bar[T]
     type U
     val tu: Either[T, U]
-  }
 
-  object Bar {
-    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean] {
+  object Bar
+    implicit def mkBar1: Bar[Boolean] { type U = Int } = new Bar[Boolean]
       type U = Int; val tu = Right(23)
-    }
-    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String] {
+    implicit def mkBar2: Bar[String] { type U = Double } = new Bar[String]
       type U = Double; val tu = Right(13.0)
-    }
-  }
 
   @Test
-  def testTheQuantifiers {
+  def testTheQuantifiers
     def bar0[T, U0](
-        implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } = {
+        implicit b: Bar[T] { type U = U0 }): Bar[T] { type U = U0 } =
       val res = the[Bar[T]]
       res
-    }
 
-    def bar1[T, U0](implicit b: Bar[T] { type U = U0 }): Option[b.U] = {
+    def bar1[T, U0](implicit b: Bar[T] { type U = U0 }): Option[b.U] =
       val res: Option[the.`Bar[T]`.U] = None
       res
-    }
 
     val b0 = bar0[Boolean, Int]
     typed[Bar[Boolean] { type U = Int }](b0)
 
     val b1 = bar1[Boolean, Int]
     typed[Option[Int]](b1)
-  }
-}

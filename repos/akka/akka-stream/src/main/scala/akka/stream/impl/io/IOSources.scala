@@ -23,9 +23,9 @@ private[akka] final class FileSource(f: File,
                                      chunkSize: Int,
                                      val attributes: Attributes,
                                      shape: SourceShape[ByteString])
-    extends SourceModule[ByteString, Future[IOResult]](shape) {
+    extends SourceModule[ByteString, Future[IOResult]](shape)
   require(chunkSize > 0, "chunkSize must be greater than 0")
-  override def create(context: MaterializationContext) = {
+  override def create(context: MaterializationContext) =
     // FIXME rewrite to be based on GraphStage rather than dangerous downcasts
     val materializer = ActorMaterializer.downcast(context.materializer)
     val settings = materializer.effectiveSettings(context.effectiveAttributes)
@@ -42,7 +42,6 @@ private[akka] final class FileSource(f: File,
     val ref = materializer.actorOf(context, props.withDispatcher(dispatcher))
 
     (akka.stream.actor.ActorPublisher[ByteString](ref), ioResultPromise.future)
-  }
 
   override protected def newInstance(shape: SourceShape[ByteString])
     : SourceModule[ByteString, Future[IOResult]] =
@@ -52,7 +51,6 @@ private[akka] final class FileSource(f: File,
     new FileSource(f, chunkSize, attr, amendShape(attr))
 
   override protected def label: String = s"FileSource($f, $chunkSize)"
-}
 
 /**
   * INTERNAL API
@@ -63,27 +61,25 @@ private[akka] final class InputStreamSource(
     chunkSize: Int,
     val attributes: Attributes,
     shape: SourceShape[ByteString])
-    extends SourceModule[ByteString, Future[IOResult]](shape) {
-  override def create(context: MaterializationContext) = {
+    extends SourceModule[ByteString, Future[IOResult]](shape)
+  override def create(context: MaterializationContext) =
     val materializer = ActorMaterializer.downcast(context.materializer)
     val ioResultPromise = Promise[IOResult]()
 
-    val pub = try {
+    val pub = try
       val is = createInputStream() // can throw, i.e. FileNotFound
 
       val props = InputStreamPublisher.props(is, ioResultPromise, chunkSize)
 
       val ref = materializer.actorOf(context, props)
       akka.stream.actor.ActorPublisher[ByteString](ref)
-    } catch {
+    catch
       case ex: Exception ⇒
         ioResultPromise.failure(ex)
         ErrorPublisher(ex, attributes.nameOrDefault("inputStreamSource"))
           .asInstanceOf[Publisher[ByteString]]
-    }
 
     (pub, ioResultPromise.future)
-  }
 
   override protected def newInstance(shape: SourceShape[ByteString])
     : SourceModule[ByteString, Future[IOResult]] =
@@ -91,4 +87,3 @@ private[akka] final class InputStreamSource(
 
   override def withAttributes(attr: Attributes): Module =
     new InputStreamSource(createInputStream, chunkSize, attr, amendShape(attr))
-}

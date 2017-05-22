@@ -1,3 +1,2 @@
-class A {
+class A
   val x = 3
-}

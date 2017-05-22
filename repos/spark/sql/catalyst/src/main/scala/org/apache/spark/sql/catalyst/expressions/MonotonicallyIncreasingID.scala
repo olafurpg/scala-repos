@@ -40,7 +40,7 @@ import org.apache.spark.sql.types.{DataType, LongType}
       less than 1 billion partitions, and each partition has less than 8 billion records.""",
     extended = "> SELECT _FUNC_();\n 0")
 private[sql] case class MonotonicallyIncreasingID()
-    extends LeafExpression with Nondeterministic {
+    extends LeafExpression with Nondeterministic
 
   /**
     * Record ID within each partition. By being transient, count's value is reset to 0 every time
@@ -50,22 +50,20 @@ private[sql] case class MonotonicallyIncreasingID()
 
   @transient private[this] var partitionMask: Long = _
 
-  override protected def initInternal(): Unit = {
+  override protected def initInternal(): Unit =
     count = 0L
     partitionMask = TaskContext.getPartitionId().toLong << 33
-  }
 
   override def nullable: Boolean = false
 
   override def dataType: DataType = LongType
 
-  override protected def evalInternal(input: InternalRow): Long = {
+  override protected def evalInternal(input: InternalRow): Long =
     val currentCount = count
     count += 1
     partitionMask + currentCount
-  }
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val countTerm = ctx.freshName("count")
     val partitionMaskTerm = ctx.freshName("partitionMask")
     ctx.addMutableState(ctx.JAVA_LONG, countTerm, s"$countTerm = 0L;")
@@ -79,9 +77,7 @@ private[sql] case class MonotonicallyIncreasingID()
       final ${ctx.javaType(dataType)} ${ev.value} = $partitionMaskTerm + $countTerm;
       $countTerm++;
     """
-  }
 
   override def prettyName: String = "monotonically_increasing_id"
 
   override def sql: String = s"$prettyName()"
-}

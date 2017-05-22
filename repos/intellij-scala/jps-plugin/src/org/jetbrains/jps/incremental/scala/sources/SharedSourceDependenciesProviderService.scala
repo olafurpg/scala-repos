@@ -10,18 +10,15 @@ import scala.collection.JavaConverters._
   * @author Pavel Fatin
   */
 class SharedSourceDependenciesProviderService
-    extends SourceDependenciesProviderService {
-  def getSourceDependenciesFor(chunk: ModuleChunk) = {
+    extends SourceDependenciesProviderService
+  def getSourceDependenciesFor(chunk: ModuleChunk) =
     val modules = chunk.getModules.asScala.toSeq
 
     val dependencies =
       modules.flatMap(_.getDependenciesList.getDependencies.asScala)
 
-    dependencies.collect {
+    dependencies.collect
       case it: JpsModuleDependency
           if it.getModule != null &&
           it.getModule.getModuleType == SharedSourcesModuleType.INSTANCE =>
         it.getModule
-    }
-  }
-}

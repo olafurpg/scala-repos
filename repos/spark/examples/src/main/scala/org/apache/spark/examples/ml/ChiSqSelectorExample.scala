@@ -25,8 +25,8 @@ import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object ChiSqSelectorExample {
-  def main(args: Array[String]) {
+object ChiSqSelectorExample
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("ChiSqSelectorExample")
     val sc = new SparkContext(conf)
 
@@ -52,6 +52,4 @@ object ChiSqSelectorExample {
     result.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

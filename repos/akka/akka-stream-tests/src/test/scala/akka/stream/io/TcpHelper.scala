@@ -16,7 +16,7 @@ import akka.stream.testkit.TestUtils.temporaryServerAddress
 
 import scala.concurrent.duration._
 
-object TcpHelper {
+object TcpHelper
   case class ClientWrite(bytes: ByteString)
       extends NoSerializationVerificationNeeded
   case class ClientRead(count: Int, readTo: ActorRef)
@@ -40,7 +40,7 @@ object TcpHelper {
     Props(new TestServer(address, probe))
       .withDispatcher("akka.test.stream-dispatcher")
 
-  class TestClient(connection: ActorRef) extends Actor {
+  class TestClient(connection: ActorRef) extends Actor
     connection ! Tcp.Register(
         self, keepOpenOnPeerClosed = true, useResumeWriting = false)
 
@@ -54,7 +54,7 @@ object TcpHelper {
     var closeAfterWrite: Option[Tcp.CloseCommand] = None
 
     // FIXME: various close scenarios
-    def receive = {
+    def receive =
       case ClientWrite(bytes) if !writePending ⇒
         writePending = true
         connection ! Tcp.Write(bytes, WriteAck)
@@ -66,22 +66,21 @@ object TcpHelper {
         connection ! Tcp.Write(next, WriteAck)
       case WriteAck ⇒
         writePending = false
-        closeAfterWrite match {
+        closeAfterWrite match
           case Some(cmd) ⇒ connection ! cmd
           case None ⇒
-        }
       case ClientRead(count, requester) ⇒
         readTo = requester
         toRead = count
         connection ! Tcp.ResumeReading
       case Tcp.Received(bytes) ⇒
         readBuffer ++= bytes
-        if (readBuffer.size >= toRead) {
+        if (readBuffer.size >= toRead)
           readTo ! ReadResult(readBuffer)
           readBuffer = ByteString.empty
           toRead = 0
           readTo = context.system.deadLetters
-        } else connection ! Tcp.ResumeReading
+        else connection ! Tcp.ResumeReading
       case PingClose(requester) ⇒
         readTo = requester
         connection ! ResumeReading
@@ -91,18 +90,16 @@ object TcpHelper {
       case ClientClose(cmd) ⇒
         if (!writePending) connection ! cmd
         else closeAfterWrite = Some(cmd)
-    }
-  }
 
   case object ServerClose
 
   class TestServer(serverAddress: InetSocketAddress, probe: ActorRef)
-      extends Actor {
+      extends Actor
     import context.system
     IO(Tcp) ! Tcp.Bind(self, serverAddress, pullMode = true)
     var listener: ActorRef = _
 
-    def receive = {
+    def receive =
       case b @ Tcp.Bound(_) ⇒
         listener = sender()
         listener ! Tcp.ResumeAccepting(1)
@@ -114,11 +111,8 @@ object TcpHelper {
       case ServerClose ⇒
         listener ! Tcp.Unbind
         context.stop(self)
-    }
-  }
-}
 
-trait TcpHelper {
+trait TcpHelper
   this: TestKitBase ⇒
   import akka.stream.io.TcpHelper._
 
@@ -127,7 +121,7 @@ trait TcpHelper {
 
   implicit val materializer = ActorMaterializer(settings)
 
-  class Server(val address: InetSocketAddress = temporaryServerAddress()) {
+  class Server(val address: InetSocketAddress = temporaryServerAddress())
     val serverProbe = TestProbe()
     val serverRef = system.actorOf(testServerProps(address, serverProbe.ref))
     serverProbe.expectMsgType[Tcp.Bound]
@@ -135,9 +129,8 @@ trait TcpHelper {
     def waitAccept(): ServerConnection =
       new ServerConnection(serverProbe.expectMsgType[ActorRef])
     def close(): Unit = serverRef ! ServerClose
-  }
 
-  class ServerConnection(val connectionActor: ActorRef) {
+  class ServerConnection(val connectionActor: ActorRef)
     val connectionProbe = TestProbe()
 
     def write(bytes: ByteString): Unit = connectionActor ! ClientWrite(bytes)
@@ -156,47 +149,37 @@ trait TcpHelper {
       expectClosed(_ == expected)
 
     def expectClosed(
-        p: (ConnectionClosed) ⇒ Boolean, max: Duration = 3.seconds): Unit = {
+        p: (ConnectionClosed) ⇒ Boolean, max: Duration = 3.seconds): Unit =
       connectionActor ! PingClose(connectionProbe.ref)
-      connectionProbe.fishForMessage(max) {
+      connectionProbe.fishForMessage(max)
         case c: ConnectionClosed if p(c) ⇒ true
         case other ⇒ false
-      }
-    }
 
-    def expectTerminated(): Unit = {
+    def expectTerminated(): Unit =
       connectionProbe.watch(connectionActor)
       connectionProbe.expectTerminated(connectionActor)
-    }
-  }
 
-  class TcpReadProbe() {
+  class TcpReadProbe()
     val subscriberProbe = TestSubscriber.manualProbe[ByteString]()
     lazy val tcpReadSubscription = subscriberProbe.expectSubscription()
 
-    def read(count: Int): ByteString = {
+    def read(count: Int): ByteString =
       var result = ByteString.empty
-      while (result.size < count) {
+      while (result.size < count)
         tcpReadSubscription.request(1)
         result ++= subscriberProbe.expectNext()
-      }
       result
-    }
 
     def close(): Unit = tcpReadSubscription.cancel()
-  }
 
-  class TcpWriteProbe() {
+  class TcpWriteProbe()
     val publisherProbe = TestPublisher.manualProbe[ByteString]()
     lazy val tcpWriteSubscription = publisherProbe.expectSubscription()
     var demand = 0L
 
-    def write(bytes: ByteString): Unit = {
+    def write(bytes: ByteString): Unit =
       if (demand == 0) demand += tcpWriteSubscription.expectRequest()
       tcpWriteSubscription.sendNext(bytes)
       demand -= 1
-    }
 
     def close(): Unit = tcpWriteSubscription.sendComplete()
-  }
-}

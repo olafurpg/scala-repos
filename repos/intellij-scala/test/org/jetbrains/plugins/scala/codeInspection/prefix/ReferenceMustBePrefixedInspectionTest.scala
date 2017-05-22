@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.codeInspection.prefixMutableCollections.{AddP
   * 2/25/14
   */
 class ReferenceMustBePrefixedInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
   override protected def annotation: String =
     ReferenceMustBePrefixedInspection.displayName
   override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
@@ -19,10 +19,9 @@ class ReferenceMustBePrefixedInspectionTest
   def testFix(text: String, result: String): Unit =
     testFix(text, result, AddPrefixFix.hint)
 
-  def doTest(selected: String, text: String, result: String) = {
+  def doTest(selected: String, text: String, result: String) =
     check(selected)
     testFix(text, result)
-  }
 
   def testType() = doTest(
       s"""import java.util.List
@@ -120,4 +119,3 @@ class ReferenceMustBePrefixedInspectionTest
       |  val hm: mutable.HashMap = null
       |}"""
   )
-}

@@ -36,9 +36,9 @@ import scalafx.scene.chart.PieChart
   * @see scalafx.scene.chart.PieChart
   * @see scalafx.scene.chart.Chart
   */
-class EnsemblePieChart extends EnsembleExample {
+class EnsemblePieChart extends EnsembleExample
 
-  def getContent = new PieChart {
+  def getContent = new PieChart
     data = Seq(
         PieChart.Data("Sun", 20),
         PieChart.Data("IBM", 12),
@@ -47,5 +47,3 @@ class EnsemblePieChart extends EnsembleExample {
         PieChart.Data("Apple", 30)
     )
     clockwise = false
-  }
-}

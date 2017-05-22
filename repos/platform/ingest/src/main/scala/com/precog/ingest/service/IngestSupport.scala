@@ -39,7 +39,7 @@ import scalaz.syntax.monad._
 
 import com.weiglewilczek.slf4s._
 
-trait IngestSupport extends Logging {
+trait IngestSupport extends Logging
   def permissionsFinder: PermissionsFinder[Future]
   def clock: Clock
   implicit def M: Monad[Future]
@@ -53,32 +53,31 @@ trait IngestSupport extends Logging {
                                      path: Path,
                                      timestampO: Option[Instant] = None)(
       f: Authorities => Future[HttpResponse[JValue]])
-    : Future[HttpResponse[JValue]] = {
+    : Future[HttpResponse[JValue]] =
     val timestamp = timestampO getOrElse clock.now().toInstant
-    val requestAuthorities = for {
+    val requestAuthorities = for
       paramIds <- request.parameters.get('ownerAccountId)
       ids = paramIds.split("""\s*,\s*""")
       auths <- Authorities.ifPresent(ids.toSet) if ids.nonEmpty
-    } yield auths
+    yield auths
 
-    requestAuthorities map { authorities =>
+    requestAuthorities map  authorities =>
       permissionsFinder.checkWriteAuthorities(authorities,
                                               apiKey,
                                               path,
-                                              timestamp.toInstant) map {
+                                              timestamp.toInstant) map
         _.option(authorities)
-      }
-    } getOrElse {
+    getOrElse
       permissionsFinder.inferWriteAuthorities(apiKey,
                                               path,
                                               Some(timestamp.toInstant))
-    } onFailure {
+    onFailure
       case ex: Exception =>
         logger.error("Request " + request.shows +
                      " failed due to unavailability of security subsystem.",
                      ex)
       // FIXME: Provisionally accept data for ingest if one of the permissions-checking services is unavailable
-    } flatMap {
+    flatMap
       case Some(authorities) =>
         f(authorities)
 
@@ -90,6 +89,3 @@ trait IngestSupport extends Logging {
                 Forbidden,
                 content = Some(JString(
                           "Either the ownerAccountId parameter you specified could not be resolved to a set of permitted accounts, or the API key specified was invalid."))))
-    }
-  }
-}

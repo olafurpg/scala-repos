@@ -18,14 +18,13 @@ sealed trait Addr
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.finagle.Addrs]].
   */
-object Addr {
+object Addr
 
   /** Address metadata */
   type Metadata = Map[String, Any]
-  object Metadata {
+  object Metadata
     def apply(pairs: (String, Any)*): Metadata = Map(pairs: _*)
     val empty: Metadata = Map.empty
-  }
 
   /**
     * A bound name. The object is replicated at each of the given
@@ -54,33 +53,28 @@ object Addr {
   /**
     * The binding action is still pending.
     */
-  object Pending extends Addr {
+  object Pending extends Addr
     override def toString = "Pending"
-  }
 
   /**
     * A negative address: the name could not be bound.
     */
-  object Neg extends Addr {
+  object Neg extends Addr
     override def toString = "Neg"
-  }
 
-  object Bound {
+  object Bound
     @varargs
     def apply(addrs: Address*): Addr = Bound(Set(addrs: _*), Metadata.empty)
 
     def apply(addrs: Set[Address]): Addr = Bound(addrs, Metadata.empty)
-  }
 
-  object Failed {
+  object Failed
     def apply(why: String): Addr = Failed(new Exception(why))
-  }
-}
 
 /**
   * A Java adaptation of the [[com.twitter.finagle.Addr]] companion object.
   */
-object Addrs {
+object Addrs
 
   /**
     * @see com.twitter.finagle.Addr.Bound
@@ -120,4 +114,3 @@ object Addrs {
     * @see com.twitter.finagle.Addr.Neg
     */
   val negAddr: Addr = Addr.Neg
-}

@@ -26,7 +26,7 @@ import org.apache.spark.sql.types._
   * that behave differently based on foldable values.
   */
 case class NonFoldableLiteral(value: Any, dataType: DataType)
-    extends LeafExpression {
+    extends LeafExpression
 
   override def foldable: Boolean = false
   override def nullable: Boolean = true
@@ -35,18 +35,13 @@ case class NonFoldableLiteral(value: Any, dataType: DataType)
 
   override def eval(input: InternalRow): Any = value
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     Literal.create(value, dataType).genCode(ctx, ev)
-  }
-}
 
-object NonFoldableLiteral {
-  def apply(value: Any): NonFoldableLiteral = {
+object NonFoldableLiteral
+  def apply(value: Any): NonFoldableLiteral =
     val lit = Literal(value)
     NonFoldableLiteral(lit.value, lit.dataType)
-  }
-  def create(value: Any, dataType: DataType): NonFoldableLiteral = {
+  def create(value: Any, dataType: DataType): NonFoldableLiteral =
     val lit = Literal.create(value, dataType)
     NonFoldableLiteral(lit.value, lit.dataType)
-  }
-}

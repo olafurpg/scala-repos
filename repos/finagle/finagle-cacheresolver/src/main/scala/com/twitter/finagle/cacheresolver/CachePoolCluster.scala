@@ -21,11 +21,10 @@ import scala.collection.mutable
 // Type definition representing a cache node
 case class CacheNode(
     host: String, port: Int, weight: Int, key: Option[String] = None)
-    extends SocketAddress {
+    extends SocketAddress
   // Use overloads to keep the same ABI
   def this(host: String, port: Int, weight: Int) =
     this(host, port, weight, None)
-}
 
 /**
   * Indicates that an error occurred while resolving a cache address.
@@ -37,11 +36,11 @@ class TwitterCacheResolverException(msg: String) extends Exception(msg)
   * A [[com.twitter.finagle.Resolver]] for resolving destination names associated
   * with Twitter cache pools.
   */
-class TwitterCacheResolver extends Resolver {
+class TwitterCacheResolver extends Resolver
   val scheme = "twcache"
 
-  def bind(arg: String) = {
-    arg.split("!") match {
+  def bind(arg: String) =
+    arg.split("!") match
       // twcache!<host1>:<port>:<weight>:<key>,<host2>:<port>:<weight>:<key>,<host3>:<port>:<weight>:<key>
       case Array(hosts) =>
         CacheNodeGroup(hosts).set.map(toUnresolvedAddr)
@@ -58,43 +57,36 @@ class TwitterCacheResolver extends Resolver {
       case _ =>
         throw new TwitterCacheResolverException(
             "Invalid twcache format \"%s\"".format(arg))
-    }
-  }
 
-  private def toUnresolvedAddr(g: Set[CacheNode]): Addr = {
-    val set: Set[Address] = g.map {
+  private def toUnresolvedAddr(g: Set[CacheNode]): Addr =
+    val set: Set[Address] = g.map
       case CacheNode(host, port, weight, key) =>
         val ia = InetSocketAddress.createUnresolved(host, port)
         val metadata = CacheNodeMetadata(weight, key)
         Address.Inet(ia, CacheNodeMetadata.toAddrMetadata(metadata))
-    }
     Addr.Bound(set)
-  }
-}
 
 // TODO: Rewrite Memcache cluster representation in terms of Var[Addr].
-object CacheNodeGroup {
+object CacheNodeGroup
   // <host1>:<port>:<weight>:<key>,<host2>:<port>:<weight>:<key>,<host3>:<port>:<weight>:<key>
-  def apply(hosts: String) = {
+  def apply(hosts: String) =
     val hostSeq =
-      hosts.split(Array(' ', ',')).filter((_ != "")).map(_.split(":")).map {
+      hosts.split(Array(' ', ',')).filter((_ != "")).map(_.split(":")).map
         case Array(host) => (host, 11211, 1, None)
         case Array(host, port) => (host, port.toInt, 1, None)
         case Array(host, port, weight) =>
           (host, port.toInt, weight.toInt, None)
         case Array(host, port, weight, key) =>
           (host, port.toInt, weight.toInt, Some(key))
-      }
 
     newStaticGroup(
-        hostSeq.map {
+        hostSeq.map
       case (host, port, weight, key) => new CacheNode(host, port, weight, key)
-    }.toSet)
-  }
+    .toSet)
 
   def apply(
       group: Group[SocketAddress], useOnlyResolvedAddress: Boolean = false) =
-    group collect {
+    group collect
       case node: CacheNode => node
       // Note: we ignore weights here
       case ia: InetSocketAddress
@@ -105,7 +97,6 @@ object CacheNodeGroup {
         new CacheNode(ia.getHostName, ia.getPort, 1, Some(key))
       case ia: InetSocketAddress if !useOnlyResolvedAddress =>
         new CacheNode(ia.getHostName, ia.getPort, 1, None)
-    }
 
   def newStaticGroup(cacheNodeSet: Set[CacheNode]) =
     Group(cacheNodeSet.toSeq: _*)
@@ -120,11 +111,11 @@ object CacheNodeGroup {
 
   private[finagle] def fromVarAddr(
       va: Var[Addr], useOnlyResolvedAddress: Boolean = false) =
-    new Group[CacheNode] {
+    new Group[CacheNode]
       protected[finagle] val set: Var[Set[CacheNode]] =
-        va map {
+        va map
           case Addr.Bound(addrs, _) =>
-            addrs.collect {
+            addrs.collect
               case Address.Inet(ia, CacheNodeMetadata(weight, key)) =>
                 CacheNode(ia.getHostName, ia.getPort, weight, key)
               case Address.Inet(ia, _)
@@ -133,11 +124,7 @@ object CacheNodeGroup {
                 CacheNode(ia.getHostName, ia.getPort, 1, Some(key))
               case Address.Inet(ia, _) if !useOnlyResolvedAddress =>
                 CacheNode(ia.getHostName, ia.getPort, 1, None)
-            }
           case _ => Set[CacheNode]()
-        }
-    }
-}
 
 /**
   * Cache specific cluster implementation.
@@ -146,7 +133,7 @@ object CacheNodeGroup {
   * - the underlying pool manager encapsulates logic of monitoring the cache node changes and
   * deciding when to update the cache pool cluster
   */
-object CachePoolCluster {
+object CachePoolCluster
   val timer = new JavaTimer(isDaemon = true)
 
   /**
@@ -190,13 +177,11 @@ object CachePoolCluster {
     new ZookeeperServerSetCluster(
         ServerSets.create(
             zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)
-    ) map {
+    ) map
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
-    }
-}
 
-trait CachePoolCluster extends Cluster[CacheNode] {
+trait CachePoolCluster extends Cluster[CacheNode]
 
   /**
     * Cache pool snapshot and future changes
@@ -209,9 +194,8 @@ trait CachePoolCluster extends Cluster[CacheNode] {
     new Promise[Spool[Cluster.Change[CacheNode]]]
 
   def snap: (Seq[CacheNode],
-  Future[Spool[Cluster.Change[CacheNode]]]) = cachePool synchronized {
+  Future[Spool[Cluster.Change[CacheNode]]]) = cachePool synchronized
     (cachePool.toSeq, cachePoolChanges)
-  }
 
   /**
     * TODO: pick up new rev of Cluster once it's ready
@@ -220,39 +204,33 @@ trait CachePoolCluster extends Cluster[CacheNode] {
     * the updating pool is still done one by one.
     */
   final protected[this] def updatePool(newSet: Set[CacheNode]) =
-    cachePool synchronized {
+    cachePool synchronized
       val added = newSet &~ cachePool
       val removed = cachePool &~ newSet
 
       // modify cachePool and cachePoolChanges
-      removed foreach { node =>
+      removed foreach  node =>
         cachePool -= node
         appendUpdate(Cluster.Rem(node))
-      }
-      added foreach { node =>
+      added foreach  node =>
         cachePool += node
         appendUpdate(Cluster.Add(node))
-      }
-    }
 
   private[this] def appendUpdate(update: Cluster.Change[CacheNode]) =
-    cachePool synchronized {
+    cachePool synchronized
       val newTail = new Promise[Spool[Cluster.Change[CacheNode]]]
       cachePoolChanges() = Return(update *:: newTail)
       cachePoolChanges = newTail
-    }
-}
 
 /**
   * Cache pool config data object
   */
-object CachePoolConfig {
+object CachePoolConfig
   val jsonCodec: Codec[CachePoolConfig] = JsonCodec.create(
       classOf[CachePoolConfig],
       new GsonBuilder()
         .setExclusionStrategies(JsonCodec.getThriftExclusionStrategy())
         .create())
-}
 
 /**
   * Cache pool config data format
@@ -269,18 +247,16 @@ case class CachePoolConfig(
   * @param cacheNodeSet static set of cache nodes to construct the cluster
   */
 class StaticCachePoolCluster(cacheNodeSet: Set[CacheNode])
-    extends CachePoolCluster {
+    extends CachePoolCluster
   // The cache pool will updated once and only once as the underlying pool never changes
   updatePool(cacheNodeSet)
-}
 
 /**
   * ZooKeeper based cache pool cluster companion object
   */
-object ZookeeperCachePoolCluster {
+object ZookeeperCachePoolCluster
   private val CachePoolWaitCompleteTimeout = 10.seconds
   private val BackupPoolFallBackTimeout = 10.seconds
-}
 
 /**
   * Zookeeper based cache pool cluster with a serverset as the underlying pool.
@@ -299,34 +275,29 @@ class ZookeeperCachePoolCluster private[cacheresolver](
     protected val zkClient: ZooKeeperClient,
     backupPool: Option[Set[CacheNode]] = None,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver)
-    extends CachePoolCluster with ZookeeperStateMonitor {
+    extends CachePoolCluster with ZookeeperStateMonitor
 
   import ZookeeperCachePoolCluster._
 
   private[this] val zkServerSetCluster =
     new ZookeeperServerSetCluster(ServerSets.create(
-            zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)) map {
+            zkClient, ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL, zkPath)) map
       case addr: InetSocketAddress =>
         CacheNode(addr.getHostName, addr.getPort, 1)
-    }
 
   @volatile private[this] var underlyingSize = 0
-  zkServerSetCluster.snap match {
+  zkServerSetCluster.snap match
     case (current, changes) =>
       underlyingSize = current.size
-      changes foreach { spool =>
-        spool foreach {
+      changes foreach  spool =>
+        spool foreach
           case Cluster.Add(node) => underlyingSize += 1
           case Cluster.Rem(node) => underlyingSize -= 1
-        }
-      }
-  }
 
   // continuously gauging underlying cluster size
   private[this] val underlyingSizeGauge =
-    statsReceiver.addGauge("underlyingPoolSize") {
+    statsReceiver.addGauge("underlyingPoolSize")
       underlyingSize
-    }
 
   // Falling back to use the backup pool (if provided) after a certain timeout.
   // Meanwhile, the first time invoke of updating pool will still proceed once it successfully
@@ -334,17 +305,14 @@ class ZookeeperCachePoolCluster private[cacheresolver](
   // will overwrite the backup pool.
   // This backup pool is mainly provided in case of long time zookeeper outage during which
   // cache client needs to be restarted.
-  backupPool foreach { pool =>
-    if (!pool.isEmpty) {
-      ready within (CachePoolCluster.timer, BackupPoolFallBackTimeout) onFailure {
+  backupPool foreach  pool =>
+    if (!pool.isEmpty)
+      ready within (CachePoolCluster.timer, BackupPoolFallBackTimeout) onFailure
         _ =>
           updatePool(pool)
-      }
-    }
-  }
 
-  override def applyZKData(data: Array[Byte]): Unit = {
-    if (data != null) {
+  override def applyZKData(data: Array[Byte]): Unit =
+    if (data != null)
       val cachePoolConfig =
         CachePoolConfig.jsonCodec.deserialize(new ByteArrayInputStream(data))
 
@@ -363,8 +331,6 @@ class ZookeeperCachePoolCluster private[cacheresolver](
           CachePoolWaitCompleteTimeout)
 
       updatePool(newSet)
-    }
-  }
 
   /**
     * Wait for the current set to contain expected size of members.
@@ -378,22 +344,18 @@ class ZookeeperCachePoolCluster private[cacheresolver](
       currentSet: Set[CacheNode],
       expectedSize: Int,
       spoolChanges: Future[Spool[Cluster.Change[CacheNode]]]
-  ): Future[Set[CacheNode]] = {
-    if (expectedSize == currentSet.size) {
+  ): Future[Set[CacheNode]] =
+    if (expectedSize == currentSet.size)
       Future.value(currentSet)
-    } else
-      spoolChanges flatMap { spool =>
-        spool match {
+    else
+      spoolChanges flatMap  spool =>
+        spool match
           case Cluster.Add(node) *:: tail =>
             waitForClusterComplete(currentSet + node, expectedSize, tail)
           case Cluster.Rem(node) *:: tail =>
             // this should not happen in general as this code generally is only for first time pool
             // manager initialization
             waitForClusterComplete(currentSet - node, expectedSize, tail)
-        }
-      }
-  }
-}
 
 /**
   * Zookeeper based cache node group with a serverset as the underlying pool.
@@ -410,28 +372,26 @@ class ZookeeperCacheNodeGroup(
     protected val zkClient: ZooKeeperClient,
     protected val statsReceiver: StatsReceiver = NullStatsReceiver
 )
-    extends Group[CacheNode] with ZookeeperStateMonitor {
+    extends Group[CacheNode] with ZookeeperStateMonitor
 
   protected[finagle] val set = Var(Set[CacheNode]())
 
   @volatile private var detectKeyRemapping = false
 
   private val zkGroup =
-    new ZkGroup(new ServerSetImpl(zkClient, zkPath), zkPath) collect {
+    new ZkGroup(new ServerSetImpl(zkClient, zkPath), zkPath) collect
       case inst if inst.getStatus == ALIVE =>
         val ep = inst.getServiceEndpoint
         val shardInfo =
           if (inst.isSetShard) Some(inst.getShard.toString) else None
         CacheNode(ep.getHost, ep.getPort, 1, shardInfo)
-    }
 
   private[this] val underlyingSizeGauge =
-    statsReceiver.addGauge("underlyingPoolSize") {
+    statsReceiver.addGauge("underlyingPoolSize")
       zkGroup.members.size
-    }
 
-  def applyZKData(data: Array[Byte]) {
-    if (data != null) {
+  def applyZKData(data: Array[Byte])
+    if (data != null)
       val cachePoolConfig =
         CachePoolConfig.jsonCodec.deserialize(new ByteArrayInputStream(data))
 
@@ -444,18 +404,16 @@ class ZookeeperCacheNodeGroup(
             "Underlying group size not equal to expected size")
 
       set() = zkGroup.members
-    }
-  }
 
   // when enabled, monitor and apply new members in case of pure cache node key remapping
   override def applyZKChildren(children: List[String]) =
-    if (detectKeyRemapping) {
+    if (detectKeyRemapping)
       val newMembers = zkGroup.members
       if (newMembers.size != children.size)
         throw new IllegalStateException(
             "Underlying children size not equal to expected children size")
 
-      if (newMembers.size == members.size) {
+      if (newMembers.size == members.size)
         val removed = (members &~ newMembers)
         val added = (newMembers &~ members)
 
@@ -463,9 +421,5 @@ class ZookeeperCacheNodeGroup(
         // e.g. certain cache node key is re-assigned to another host
         if (removed.forall(_.key.isDefined) && added.forall(_.key.isDefined) &&
             removed.size == added.size &&
-            removed.map(_.key.get) == added.map(_.key.get)) {
+            removed.map(_.key.get) == added.map(_.key.get))
           set() = newMembers
-        }
-      }
-    }
-}

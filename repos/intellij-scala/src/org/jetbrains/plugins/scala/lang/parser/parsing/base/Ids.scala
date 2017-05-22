@@ -15,10 +15,10 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *  ids ::= id { ,  id}
  */
 
-object Ids {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object Ids
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val idListMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER =>
         val m = builder.mark
         builder.advanceLexer //Ate identifier
@@ -26,10 +26,9 @@ object Ids {
       case _ =>
         idListMarker.drop
         return false
-    }
-    while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
+    while (builder.getTokenType == ScalaTokenTypes.tCOMMA)
       builder.advanceLexer() //Ate ,
-      builder.getTokenType match {
+      builder.getTokenType match
         case ScalaTokenTypes.tIDENTIFIER =>
           val m = builder.mark
           builder.advanceLexer //Ate identifier
@@ -38,9 +37,5 @@ object Ids {
           builder error ErrMsg("identifier.expected")
           idListMarker.done(ScalaElementTypes.IDENTIFIER_LIST)
           return true
-      }
-    }
     idListMarker.done(ScalaElementTypes.IDENTIFIER_LIST)
     return true
-  }
-}

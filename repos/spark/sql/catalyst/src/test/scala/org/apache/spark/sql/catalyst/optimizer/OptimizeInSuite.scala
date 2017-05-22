@@ -26,9 +26,9 @@ import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 import org.apache.spark.sql.types._
 
-class OptimizeInSuite extends PlanTest {
+class OptimizeInSuite extends PlanTest
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("AnalysisNodes", Once, EliminateSubqueryAliases) :: Batch(
           "ConstantFolding",
@@ -37,22 +37,20 @@ class OptimizeInSuite extends PlanTest {
           ConstantFolding,
           BooleanSimplification,
           OptimizeIn) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
 
   test(
-      "OptimizedIn test: In clause not optimized to InSet when less than 10 items") {
+      "OptimizedIn test: In clause not optimized to InSet when less than 10 items")
     val originalQuery = testRelation
       .where(In(UnresolvedAttribute("a"), Seq(Literal(1), Literal(2))))
       .analyze
 
     val optimized = Optimize.execute(originalQuery.analyze)
     comparePlans(optimized, originalQuery)
-  }
 
   test(
-      "OptimizedIn test: In clause optimized to InSet when more than 10 items") {
+      "OptimizedIn test: In clause optimized to InSet when more than 10 items")
     val originalQuery = testRelation
       .where(In(UnresolvedAttribute("a"), (1 to 11).map(Literal(_))))
       .analyze
@@ -63,10 +61,9 @@ class OptimizeInSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   test(
-      "OptimizedIn test: In clause not optimized in case filter has attributes") {
+      "OptimizedIn test: In clause not optimized in case filter has attributes")
     val originalQuery = testRelation
       .where(In(UnresolvedAttribute("a"),
                 Seq(Literal(1), Literal(2), UnresolvedAttribute("b"))))
@@ -79,10 +76,9 @@ class OptimizeInSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   test(
-      "OptimizedIn test: NULL IN (expr1, ..., exprN) gets transformed to Filter(null)") {
+      "OptimizedIn test: NULL IN (expr1, ..., exprN) gets transformed to Filter(null)")
     val originalQuery = testRelation
       .where(In(Literal.create(null, NullType), Seq(Literal(1), Literal(2))))
       .analyze
@@ -92,10 +88,9 @@ class OptimizeInSuite extends PlanTest {
       testRelation.where(Literal.create(null, BooleanType)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   test("OptimizedIn test: Inset optimization disabled as " +
-      "list expression contains attribute)") {
+      "list expression contains attribute)")
     val originalQuery = testRelation
       .where(In(Literal.create(null, StringType),
                 Seq(Literal(1), UnresolvedAttribute("b"))))
@@ -106,10 +101,9 @@ class OptimizeInSuite extends PlanTest {
       testRelation.where(Literal.create(null, BooleanType)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   test("OptimizedIn test: Inset optimization disabled as " +
-      "list expression contains attribute - select)") {
+      "list expression contains attribute - select)")
     val originalQuery = testRelation
       .select(In(Literal.create(null, StringType),
                  Seq(Literal(1), UnresolvedAttribute("b"))).as("a"))
@@ -120,5 +114,3 @@ class OptimizeInSuite extends PlanTest {
       testRelation.select(Literal.create(null, BooleanType).as("a")).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
-}

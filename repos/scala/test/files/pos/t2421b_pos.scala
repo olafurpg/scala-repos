@@ -1,4 +1,4 @@
-object Test {
+object Test
   class A
   class B
   class C
@@ -10,7 +10,6 @@ object Test {
   implicit def b[X <: B] = new F[X]()
 
   f
-}
 /* bug:
 error: ambiguous implicit values:
  both method b in object Test1 of type [X <: Test1.B]Test1.F[X]

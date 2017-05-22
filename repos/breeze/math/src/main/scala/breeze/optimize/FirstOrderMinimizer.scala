@@ -16,7 +16,7 @@ import FirstOrderMinimizer.ConvergenceCheck
 abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
     val convergenceCheck: ConvergenceCheck[T])(
     implicit space: NormedModule[T, Double])
-    extends Minimizer[T, DF] with SerializableLogging {
+    extends Minimizer[T, DF] with SerializableLogging
 
   def this(maxIter: Int = -1,
            tolerance: Double = 1E-6,
@@ -46,7 +46,7 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
   protected def updateHistory(
       newX: T, newGrad: T, newVal: Double, f: DF, oldState: State): History
 
-  protected def initialState(f: DF, init: T): State = {
+  protected def initialState(f: DF, init: T): State =
     val x = init
     val history = initialHistory(f, init)
     val (value, grad) = calculateObjective(f, x, history)
@@ -60,19 +60,17 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
                               adjValue,
                               history,
                               convergenceCheck.initialInfo)
-  }
 
   protected def calculateObjective(
-      f: DF, x: T, history: History): (Double, T) = {
+      f: DF, x: T, history: History): (Double, T) =
     f.calculate(x)
-  }
 
-  def infiniteIterations(f: DF, state: State): Iterator[State] = {
+  def infiniteIterations(f: DF, state: State): Iterator[State] =
     var failedOnce = false
     val adjustedFun = adjustFunction(f)
 
-    Iterator.iterate(state) { state =>
-      try {
+    Iterator.iterate(state)  state =>
+      try
         val dir = chooseDescentDirection(state, adjustedFun)
         val stepSize = determineStepSize(state, adjustedFun, dir)
         logger.info(f"Step Size: $stepSize%.4g")
@@ -97,7 +95,7 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
                                   state.initialAdjVal,
                                   history,
                                   newCInfo)
-      } catch {
+      catch
         case x: FirstOrderException if !failedOnce =>
           failedOnce = true
           logger.error("Failure! Resetting history: " + x)
@@ -106,31 +104,22 @@ abstract class FirstOrderMinimizer[T, DF <: StochasticDiffFunction[T]](
           logger.error(
               "Failure again! Giving up and returning. Maybe the objective is just poorly behaved?")
           state.copy(searchFailed = true)
-      }
-    }
-  }
 
-  def iterations(f: DF, init: T): Iterator[State] = {
+  def iterations(f: DF, init: T): Iterator[State] =
     val adjustedFun = adjustFunction(f)
-    infiniteIterations(f, initialState(adjustedFun, init)).takeUpToWhere { s =>
-      convergenceCheck.apply(s, s.convergenceInfo) match {
+    infiniteIterations(f, initialState(adjustedFun, init)).takeUpToWhere  s =>
+      convergenceCheck.apply(s, s.convergenceInfo) match
         case Some(converged) =>
           logger.info(s"Converged because ${converged.reason}")
           true
         case None =>
           false
-      }
-    }
-  }
 
-  def minimize(f: DF, init: T): T = {
+  def minimize(f: DF, init: T): T =
     minimizeAndReturnState(f, init).x
-  }
 
-  def minimizeAndReturnState(f: DF, init: T): State = {
+  def minimizeAndReturnState(f: DF, init: T): State =
     iterations(f, init).last
-  }
-}
 
 sealed class FirstOrderException(msg: String = "")
     extends RuntimeException(msg)
@@ -141,7 +130,7 @@ class LineSearchFailed(gradNorm: Double, dirNorm: Double)
     extends FirstOrderException(
         "Grad norm: %.4f Dir Norm: %.4f".format(gradNorm, dirNorm))
 
-object FirstOrderMinimizer {
+object FirstOrderMinimizer
 
   /**
     * Tracks the information about the optimizer, including the current point, its value, gradient, and then any history.
@@ -168,7 +157,7 @@ object FirstOrderMinimizer {
       convergenceInfo: ConvergenceInfo,
       searchFailed: Boolean = false) {}
 
-  trait ConvergenceCheck[T] {
+  trait ConvergenceCheck[T]
     type Info
     def initialInfo: Info
     def apply(state: State[T, _, _], info: Info): Option[ConvergenceReason]
@@ -180,17 +169,15 @@ object FirstOrderMinimizer {
     def ||(otherCheck: ConvergenceCheck[T]): ConvergenceCheck[T] =
       orElse(otherCheck)
 
-    def orElse(other: ConvergenceCheck[T]): ConvergenceCheck[T] = {
+    def orElse(other: ConvergenceCheck[T]): ConvergenceCheck[T] =
       SequenceConvergenceCheck(asChecks ++ other.asChecks)
-    }
 
     protected def asChecks: IndexedSeq[ConvergenceCheck[T]] = IndexedSeq(this)
-  }
 
-  object ConvergenceCheck {
+  object ConvergenceCheck
     implicit def fromPartialFunction[T](
         pf: PartialFunction[State[T, _, _], ConvergenceReason])
-      : ConvergenceCheck[T] = new ConvergenceCheck[T] {
+      : ConvergenceCheck[T] = new ConvergenceCheck[T]
       override type Info = Unit
 
       def update(newX: T,
@@ -204,12 +191,10 @@ object FirstOrderMinimizer {
         pf.lift(state)
 
       override def initialInfo: Info = ()
-    }
-  }
 
   case class SequenceConvergenceCheck[T](
       checks: IndexedSeq[ConvergenceCheck[T]])
-      extends ConvergenceCheck[T] {
+      extends ConvergenceCheck[T]
     type Info = IndexedSeq[ConvergenceCheck[T]#Info]
 
     override def initialInfo: IndexedSeq[ConvergenceCheck[T]#Info] =
@@ -219,90 +204,73 @@ object FirstOrderMinimizer {
                         newGrad: T,
                         newVal: Double,
                         oldState: State[T, _, _],
-                        oldInfo: Info): Info = {
+                        oldInfo: Info): Info =
       require(oldInfo.length == checks.length)
-      (checks zip oldInfo).map {
+      (checks zip oldInfo).map
         case (c, i) =>
           c.update(newX, newGrad, newVal, oldState, i.asInstanceOf[c.Info])
-      }
-    }
 
     override def apply(
         state: State[T, _, _], info: IndexedSeq[ConvergenceCheck[T]#Info])
-      : Option[ConvergenceReason] = {
-      (checks zip info).iterator.flatMap {
+      : Option[ConvergenceReason] =
+      (checks zip info).iterator.flatMap
         case (c, i) => c(state, i.asInstanceOf[c.Info])
-      }.toStream.headOption
-    }
-  }
+      .toStream.headOption
 
-  trait ConvergenceReason {
+  trait ConvergenceReason
     def reason: String
-  }
-  case object MaxIterations extends ConvergenceReason {
+  case object MaxIterations extends ConvergenceReason
     override def reason: String = "max iterations reached"
-  }
-  case object FunctionValuesConverged extends ConvergenceReason {
+  case object FunctionValuesConverged extends ConvergenceReason
     override def reason: String = "function values converged"
-  }
-  case object GradientConverged extends ConvergenceReason {
+  case object GradientConverged extends ConvergenceReason
     override def reason: String = "gradient converged"
-  }
-  case object SearchFailed extends ConvergenceReason {
+  case object SearchFailed extends ConvergenceReason
     override def reason: String = "line search failed!"
-  }
 
-  case object MonitorFunctionNotImproving extends ConvergenceReason {
+  case object MonitorFunctionNotImproving extends ConvergenceReason
     override def reason: String = "monitor function is not improving"
-  }
 
-  case object ProjectedStepConverged extends ConvergenceReason {
+  case object ProjectedStepConverged extends ConvergenceReason
     override def reason: String = "projected step converged"
-  }
 
   def maxIterationsReached[T](maxIter: Int): ConvergenceCheck[T] =
-    ConvergenceCheck.fromPartialFunction {
+    ConvergenceCheck.fromPartialFunction
       case s: State[_, _, _] if (s.iter >= maxIter && maxIter >= 0) =>
         MaxIterations
-    }
 
   def functionValuesConverged[T](
       tolerance: Double = 1E-9,
       relative: Boolean = true,
-      historyLength: Int = 10): ConvergenceCheck[T] = {
+      historyLength: Int = 10): ConvergenceCheck[T] =
     new FunctionValuesConverged[T](tolerance, relative, historyLength)
-  }
 
   case class FunctionValuesConverged[T](
       tolerance: Double, relative: Boolean, historyLength: Int)
-      extends ConvergenceCheck[T] {
+      extends ConvergenceCheck[T]
     override type Info = IndexedSeq[Double]
 
     override def update(newX: T,
                         newGrad: T,
                         newVal: Double,
                         oldState: State[T, _, _],
-                        oldInfo: Info): Info = {
+                        oldInfo: Info): Info =
       (oldInfo :+ newVal).takeRight(historyLength)
-    }
 
     override def apply(state: State[T, _, _],
-                       info: IndexedSeq[Double]): Option[ConvergenceReason] = {
+                       info: IndexedSeq[Double]): Option[ConvergenceReason] =
       if (info.length >= 2 && (state.adjustedValue - info.max).abs <= tolerance *
-          (if (relative) state.initialAdjVal else 1.0)) {
+          (if (relative) state.initialAdjVal else 1.0))
         Some(FunctionValuesConverged)
-      } else {
+      else
         None
-      }
-    }
 
     override def initialInfo: Info = IndexedSeq(Double.PositiveInfinity)
-  }
 
   def gradientConverged[T](tolerance: Double, relative: Boolean = true)(
-      implicit space: NormedModule[T, Double]): ConvergenceCheck[T] = {
+      implicit space: NormedModule[T, Double]): ConvergenceCheck[T] =
     import space.normImpl
-    ConvergenceCheck.fromPartialFunction[T] {
+    ConvergenceCheck.fromPartialFunction[T]
       case s: State[T, _, _]
           if
           (norm(s.adjustedGradient) <= math.max(tolerance *
@@ -310,14 +278,11 @@ object FirstOrderMinimizer {
                                                  else 1.0),
                                                 1E-8)) =>
         GradientConverged
-    }
-  }
 
   def searchFailed[T]: ConvergenceCheck[T] =
-    ConvergenceCheck.fromPartialFunction {
+    ConvergenceCheck.fromPartialFunction
       case s: State[_, _, _] if (s.searchFailed) =>
         SearchFailed
-    }
 
   /**
     * Runs the function, and if it fails to decreased by at least improvementRequirement numFailures times in a row,
@@ -338,41 +303,35 @@ object FirstOrderMinimizer {
                                            numFailures: Int,
                                            improvementRequirement: Double,
                                            evalFrequency: Int)
-      extends ConvergenceCheck[T] with SerializableLogging {
+      extends ConvergenceCheck[T] with SerializableLogging
     case class Info(bestValue: Double, numFailures: Int)
 
     override def update(newX: T,
                         newGrad: T,
                         newVal: Double,
                         oldState: State[T, _, _],
-                        oldInfo: Info): Info = {
-      if (oldState.iter % evalFrequency == 0) {
+                        oldInfo: Info): Info =
+      if (oldState.iter % evalFrequency == 0)
         val newValue = f(newX)
-        if (newValue <= oldInfo.bestValue * (1 - improvementRequirement)) {
+        if (newValue <= oldInfo.bestValue * (1 - improvementRequirement))
           logger.info(
               f"External function improved: current ${newValue}%.3f old: ${oldInfo.bestValue}%.3f")
           Info(numFailures = 0, bestValue = newValue)
-        } else {
+        else
           logger.info(
               f"External function failed to improve sufficiently! current ${newValue}%.3f old: ${oldInfo.bestValue}%.3f")
           oldInfo.copy(numFailures = oldInfo.numFailures + 1)
-        }
-      } else {
+      else
         oldInfo
-      }
-    }
 
     override def apply(
-        state: State[T, _, _], info: Info): Option[ConvergenceReason] = {
-      if (info.numFailures >= numFailures) {
+        state: State[T, _, _], info: Info): Option[ConvergenceReason] =
+      if (info.numFailures >= numFailures)
         Some(MonitorFunctionNotImproving)
-      } else {
+      else
         None
-      }
-    }
 
     override def initialInfo: Info = Info(Double.PositiveInfinity, 0)
-  }
 
   def defaultConvergenceCheck[T](maxIter: Int,
                                  tolerance: Double,
@@ -409,63 +368,57 @@ object FirstOrderMinimizer {
                        useL1: Boolean = false,
                        tolerance: Double = 1E-5,
                        useStochastic: Boolean = false,
-                       randomSeed: Int = 0) {
+                       randomSeed: Int = 0)
     private implicit val random = new RandBasis(
         new ThreadLocalRandomGenerator(new MersenneTwister(randomSeed)))
 
     @deprecated(
         "Use breeze.optimize.minimize(f, init, params) instead.", "0.10")
     def minimize[T](f: BatchDiffFunction[T], init: T)(
-        implicit space: MutableFiniteCoordinateField[T, _, Double]): T = {
+        implicit space: MutableFiniteCoordinateField[T, _, Double]): T =
       this.iterations(f, init).last.x
-    }
 
     @deprecated(
         "Use breeze.optimize.minimize(f, init, params) instead.", "0.10")
     def minimize[T](f: DiffFunction[T], init: T)(
-        implicit space: MutableEnumeratedCoordinateField[T, _, Double]): T = {
+        implicit space: MutableEnumeratedCoordinateField[T, _, Double]): T =
       this.iterations(f, init).last.x
-    }
 
     @deprecated(
         "Use breeze.optimize.iterations(f, init, params) instead.", "0.10")
     def iterations[T](f: BatchDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double])
-      : Iterator[FirstOrderMinimizer[T, BatchDiffFunction[T]]#State] = {
+      : Iterator[FirstOrderMinimizer[T, BatchDiffFunction[T]]#State] =
       val it =
-        if (useStochastic) {
+        if (useStochastic)
           this.iterations(f.withRandomBatches(batchSize), init)(space)
-        } else {
+        else
           iterations(f: DiffFunction[T], init)
-        }
 
       it.asInstanceOf[Iterator[
               FirstOrderMinimizer[T, BatchDiffFunction[T]]#State]]
-    }
 
     @deprecated(
         "Use breeze.optimize.iterations(f, init, params) instead.", "0.10")
     def iterations[T](f: StochasticDiffFunction[T], init: T)(
         implicit space: MutableFiniteCoordinateField[T, _, Double])
-      : Iterator[FirstOrderMinimizer[T, StochasticDiffFunction[T]]#State] = {
+      : Iterator[FirstOrderMinimizer[T, StochasticDiffFunction[T]]#State] =
       val r =
-        if (useL1) {
+        if (useL1)
           new AdaptiveGradientDescent.L1Regularization[T](
               regularization, eta = alpha, maxIter = maxIterations)(
               space, random)
-        } else {
+        else
           // L2
           new AdaptiveGradientDescent.L2Regularization[T](
               regularization, alpha, maxIterations)(space, random)
-        }
       r.iterations(f, init)
-    }
 
     @deprecated(
         "Use breeze.optimize.iterations(f, init, params) instead.", "0.10")
     def iterations[T, K](f: DiffFunction[T], init: T)(
         implicit space: MutableEnumeratedCoordinateField[T, K, Double])
-      : Iterator[LBFGS[T]#State] = {
+      : Iterator[LBFGS[T]#State] =
       if (useL1)
         new OWLQN[K, T](maxIterations, 5, regularization, tolerance)(space)
           .iterations(f, init)
@@ -473,6 +426,3 @@ object FirstOrderMinimizer {
         (new LBFGS[T](maxIterations, 5, tolerance = tolerance)(space))
           .iterations(
             DiffFunction.withL2Regularization(f, regularization), init)
-    }
-  }
-}

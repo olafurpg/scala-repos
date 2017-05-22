@@ -7,12 +7,12 @@ package utils
 
 import scala.compat.Platform.EOL
 
-trait NodePrinters { self: Utils =>
+trait NodePrinters  self: Utils =>
 
   import global._
 
-  object reifiedNodeToString extends (Tree => String) {
-    def apply(tree: Tree): String = {
+  object reifiedNodeToString extends (Tree => String)
+    def apply(tree: Tree): String =
       var mirrorIsUsed = false
       var flagsAreUsed = false
 
@@ -24,7 +24,7 @@ trait NodePrinters { self: Utils =>
       val lines =
         (tree.toString.split(EOL) drop 1 dropRight 1).toList splitAt 2
       val (List(universe, mirror), reification0) = lines
-      val reification = (for (line <- reification0) yield {
+      val reification = (for (line <- reification0) yield
         var s = line substring 2
         s = s.replace(nme.UNIVERSE_PREFIX.toString, "")
         s = s.replace(".apply", "")
@@ -35,16 +35,14 @@ trait NodePrinters { self: Utils =>
         s = """internal\.reificationSupport\.FlagsRepr\((\d+)[lL]\)""".r
           .replaceAllIn(s,
                         m =>
-                          {
                             flagsAreUsed = true
                             show(m.group(1).toLong)
-                        })
+                        )
         s = s.replace("Modifiers(0L, TypeName(\"\"), List())", "Modifiers()")
         s = """Modifiers\((\d+)[lL], TypeName\("(.*?)"\), List\((.*?)\)\)""".r
           .replaceAllIn(
             s,
             m =>
-              {
                 val buf = new scala.collection.mutable.ListBuffer[String]
 
                 val annotations = m.group(3)
@@ -56,17 +54,16 @@ trait NodePrinters { self: Utils =>
                   buf.append("TypeName(\"" + privateWithin + "\")")
 
                 val bits = m.group(1)
-                if (buf.nonEmpty || bits != "0L") {
+                if (buf.nonEmpty || bits != "0L")
                   flagsAreUsed = true
                   buf.append(show(bits.toLong))
-                }
 
                 val replacement =
                   "Modifiers(" + buf.reverse.mkString(", ") + ")"
                 java.util.regex.Matcher.quoteReplacement(replacement)
-            })
+            )
         s
-      })
+      )
 
       val isExpr =
         reification.length > 0 && reification(0).trim.startsWith("Expr[")
@@ -78,12 +75,11 @@ trait NodePrinters { self: Utils =>
       rtree = rtree takeWhile (_ != "    }")
       rtree = rtree map
       (s0 =>
-            {
               var s = s0
               mirrorIsUsed |= s contains nme.MIRROR_PREFIX.toString
               s = s.replace(nme.MIRROR_PREFIX.toString, "")
               s.trim
-          })
+          )
 
       val printout = scala.collection.mutable.ListBuffer[String]()
       printout += universe.trim
@@ -96,27 +92,21 @@ trait NodePrinters { self: Utils =>
       printout += s"""import ${imports map (_ + "._") mkString ", "}"""
 
       val name = if (isExpr) "tree" else "tpe"
-      if (rtree(0) startsWith "val") {
+      if (rtree(0) startsWith "val")
         printout += s"val $name = {"
         printout ++= (rtree map ("  " + _))
         printout += "}"
-      } else {
+      else
         printout += s"val $name = " + rtree(0)
-      }
-      if (isExpr) {
-        if (mirror contains ".getClassLoader") {
+      if (isExpr)
+        if (mirror contains ".getClassLoader")
           printout += "import scala.tools.reflect.ToolBox"
           printout += s"println(${nme.MIRROR_SHORT}.mkToolBox().eval(tree))"
-        } else {
+        else
           printout += "println(tree)"
-        }
-      } else {
+      else
         printout += "println(tpe)"
-      }
 
       // printout mkString EOL
       val prefix = "// produced from " + reifier.defaultErrorPosition
       (prefix +: "object Test extends App {" +: (printout map ("  " + _)) :+ "}") mkString EOL
-    }
-  }
-}

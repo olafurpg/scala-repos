@@ -13,21 +13,20 @@ import akka.http.scaladsl.model._
 import scala.concurrent.Await
 import akka.testkit.AkkaSpec
 
-class FormDataSpec extends AkkaSpec {
+class FormDataSpec extends AkkaSpec
   implicit val materializer = ActorMaterializer()
   import system.dispatcher
 
   val formData = FormData(Map("surname" -> "Smith", "age" -> "42"))
 
-  "The FormData infrastructure" should {
-    "properly round-trip the fields of www-urlencoded forms" in {
+  "The FormData infrastructure" should
+    "properly round-trip the fields of www-urlencoded forms" in
       Marshal(formData)
         .to[HttpEntity]
         .flatMap(Unmarshal(_).to[FormData])
         .futureValue shouldEqual formData
-    }
 
-    "properly marshal www-urlencoded forms containing special chars" in {
+    "properly marshal www-urlencoded forms containing special chars" in
       Marshal(FormData(Map("name" -> "Smith&Wesson")))
         .to[HttpEntity]
         .flatMap(Unmarshal(_).to[String])
@@ -37,6 +36,3 @@ class FormDataSpec extends AkkaSpec {
         .to[HttpEntity]
         .flatMap(Unmarshal(_).to[String])
         .futureValue shouldEqual "name=Smith%2BWesson%3B+hopefully%21"
-    }
-  }
-}

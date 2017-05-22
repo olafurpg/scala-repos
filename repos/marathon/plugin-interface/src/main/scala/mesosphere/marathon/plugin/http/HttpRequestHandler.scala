@@ -5,7 +5,7 @@ import mesosphere.marathon.plugin.plugin.Plugin
 /**
   * A HttpRequestHandler plugin extends Marathon by handling HTTP Requests and provifing HTTP Responses.
   */
-trait HttpRequestHandler extends Plugin {
+trait HttpRequestHandler extends Plugin
 
   /**
     * Serve a http request and fill the response.
@@ -13,4 +13,3 @@ trait HttpRequestHandler extends Plugin {
     * @param response the response object to fill.
     */
   def serve(request: HttpRequest, response: HttpResponse): Unit
-}

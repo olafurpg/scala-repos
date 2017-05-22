@@ -9,77 +9,56 @@ import org.scalatest._
 import prop._
 
 class NumberPropertiesTest
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
-  property("Number.apply(Long)") {
-    forAll { (n: Long) =>
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
+  property("Number.apply(Long)")
+    forAll  (n: Long) =>
       Number(n) shouldBe n
-    }
-    forAll { (n: Long) =>
+    forAll  (n: Long) =>
       Number(n) shouldBe SafeLong(n)
-    }
     // we need to do (n - 1).abs to ensure we don't get a negative number
-    forAll { (n: Long) =>
+    forAll  (n: Long) =>
       Number((n - 1).abs) shouldBe Natural((n - 1).abs)
-    }
-  }
 
-  property("Number.apply(BigInt)") {
-    forAll { (n: BigInt) =>
+  property("Number.apply(BigInt)")
+    forAll  (n: BigInt) =>
       Number(n) shouldBe n
-    }
-    forAll { (n: BigInt) =>
+    forAll  (n: BigInt) =>
       Number(n) shouldBe SafeLong(n)
-    }
-    forAll { (n: BigInt) =>
+    forAll  (n: BigInt) =>
       Number(n.abs) shouldBe Natural(n.abs)
-    }
-  }
 
-  property("Number.apply(BigDecimal)") {
-    forAll { (n: BigDecimal) =>
+  property("Number.apply(BigDecimal)")
+    forAll  (n: BigDecimal) =>
       Number(n) shouldBe n
-    }
-  }
 
-  property("Number.apply(Rational)") {
-    forAll { (n: BigInt, d0: BigInt) =>
+  property("Number.apply(Rational)")
+    forAll  (n: BigInt, d0: BigInt) =>
       val d = if (d0 == 0) BigInt(1) else d0
       val r = Rational(n, d)
       Number(r) shouldBe r
-    }
-  }
 
-  def bothEq[A, B](a: A, b: B) = {
+  def bothEq[A, B](a: A, b: B) =
     a shouldBe b
     b shouldBe a
-  }
 
-  property("RationalNumber == Int") {
-    forAll { (n: Int) =>
+  property("RationalNumber == Int")
+    forAll  (n: Int) =>
       bothEq(Number(Rational(n)), n)
-    }
-  }
 
-  property("RationalNumber == Long") {
-    forAll { (n: Long) =>
+  property("RationalNumber == Long")
+    forAll  (n: Long) =>
       bothEq(Number(Rational(n)), n)
-    }
-  }
 
-  property("RationalNumber == Double") {
-    forAll { (n: Double) =>
+  property("RationalNumber == Double")
+    forAll  (n: Double) =>
       bothEq(Number(Rational(n)), n)
-    }
-  }
 
-  property("RationalNumber == BigInt") {
-    forAll { (n: BigInt) =>
+  property("RationalNumber == BigInt")
+    forAll  (n: BigInt) =>
       Number(Rational(n)) shouldBe n
-    }
-  }
 
-  property("Long + Long") {
-    forAll { (x: Long, y: Long) =>
+  property("Long + Long")
+    forAll  (x: Long, y: Long) =>
       val lx = Number(x)
       val ly = Number(y)
       val lz = lx + ly
@@ -90,13 +69,10 @@ class NumberPropertiesTest
       bx + by shouldBe lz
       lx + by shouldBe lz
       bx + ly shouldBe lz
-    }
-  }
-}
 
 // These tests are mostly about weird interplay between Long/Double/Number.
-class NumberTest extends FunSuite {
-  test("create numbers") {
+class NumberTest extends FunSuite
+  test("create numbers")
     Number(3.toByte)
     Number(3.toShort)
     Number(3)
@@ -105,15 +81,13 @@ class NumberTest extends FunSuite {
     Number(3.0)
     Number("333333333333333333333333333333")
     Number("99.253895895395839583958953895389538958395839583958958953")
-  }
 
-  test("doesn't allow sentinel values") {
+  test("doesn't allow sentinel values")
     intercept[IllegalArgumentException] { Number(Double.NaN) }
     intercept[IllegalArgumentException] { Number(Double.PositiveInfinity) }
     intercept[IllegalArgumentException] { Number(Double.NegativeInfinity) }
-  }
 
-  test("operations") {
+  test("operations")
     assert(Number(3) + Number(4) === Number(7))
 
     // since 30.0 can be repesented as a SafeLong, we get an IntNumber
@@ -154,5 +128,3 @@ class NumberTest extends FunSuite {
     val n2 = Number(m.toDouble - 1.0)
 
     assert(n1 != n2)
-  }
-}

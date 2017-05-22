@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-package object std {
+package object std
   object boolean extends ToBooleanOps
   object list extends ToListOps
   object stream extends ToStreamOps
@@ -17,4 +17,3 @@ package object std {
   object `try` extends ToTryOps
 
   object all extends ToAllStdOps
-}

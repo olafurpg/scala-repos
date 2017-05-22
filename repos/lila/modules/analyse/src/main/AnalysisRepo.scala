@@ -9,7 +9,7 @@ import lila.db.Implicits._
 import lila.game.Game
 import tube.analysisTube
 
-object AnalysisRepo {
+object AnalysisRepo
 
   import Analysis.analysisBSONHandler
 
@@ -23,13 +23,10 @@ object AnalysisRepo {
     $find optionsByOrderedIds ids
 
   def associateToGames(games: List[Game]): Fu[List[(Game, Analysis)]] =
-    byIds(games.map(_.id)) map { as =>
-      games zip as collect {
+    byIds(games.map(_.id)) map  as =>
+      games zip as collect
         case (game, Some(analysis)) => game -> analysis
-      }
-    }
 
   def remove(id: String) = $remove byId id
 
   def exists(id: String) = $count exists id
-}

@@ -1,7 +1,6 @@
-class S {
-  trait Apply[A] {
+class S
+  trait Apply[A]
     def apply(a: A): A = a
-  }
 
   def foo[A]: Apply[A] = null
 
@@ -9,5 +8,4 @@ class S {
     foo(1) // scalac infers the type argument 'A' as 'Int', plugin does not infer this.
   /*start*/
   x /*end*/
-}
 //Int

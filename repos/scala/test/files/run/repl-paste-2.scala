@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
 scala> 999l
 res4: Int = 0123
@@ -28,4 +28,3 @@ res9: Int = 6
 scala> x.length + res5
 res10: Int = 12
   """
-}

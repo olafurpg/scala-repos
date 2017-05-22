@@ -12,17 +12,15 @@ import org.scalatest.FunSuite
 @directSubclasses(Array(classOf[Banana]))
 trait Fruit
 
-object Banana {
+object Banana
   implicit val pickler = Defaults.genPickler[Banana]
   implicit val unpickler = Defaults.genUnpickler[Banana]
-}
 
 // this is BEFORE the subtypes below so directKnownSubclasses probably
 // won't work and this would break without the directSubclasses annotation.
-object Fruit {
+object Fruit
   implicit val pickler = Defaults.genPickler[Fruit]
   implicit val unpickler = Defaults.genUnpickler[Fruit]
-}
 
 sealed trait RedOrOrangeFruit extends Fruit
 final case class Apple(kind: String) extends RedOrOrangeFruit
@@ -33,9 +31,9 @@ final case class Cucumber(something: Int) // does not extend Fruit
 
 final case class Pumpkin(kind: String)
 
-class SealedTraitStaticAnnotatedTest extends FunSuite {
+class SealedTraitStaticAnnotatedTest extends FunSuite
 
-  test("main") {
+  test("main")
     // we should be able to pickle and unpickle a Banana, using either
     // Fruit or Banana unpickler
     val banana = Banana(42)
@@ -46,15 +44,14 @@ class SealedTraitStaticAnnotatedTest extends FunSuite {
     // we did not list apple in directSubclasses so it should be
     // as if Apple doesn't exist
     val apple = Apple("Fuji")
-    try {
+    try
       val pickled = (apple: Fruit).pickle.value
       throw new Exception(
           s"We should have failed to pickle Apple but we pickled as: $pickled")
-    } catch {
+    catch
       case PicklingException(message, cause) =>
         if (!message.contains("Apple not recognized"))
           throw new Exception(s"Not the expected exception: $message")
-    }
 
     // if we are only using static (un)picklers, then the Banana
     // unpickler should not know a thing about Cucumber, but duck typing
@@ -65,37 +62,32 @@ class SealedTraitStaticAnnotatedTest extends FunSuite {
 
     // the Fruit unpickler should not know anything about Cucumber, and
     // it should fail because it doesn't know to duck-type into Banana
-    try {
+    try
       val f =
         JSONPickle(bananaString.replace("Banana", "Cucumber")).unpickle[Fruit]
       throw new Exception(
           s"Should have thrown on unpickle but instead parsed $f")
-    } catch {
+    catch
       case PicklingException(message, cause) =>
         if (!message.contains("Cucumber not recognized"))
           throw new Exception(s"Not the expected exception: $message")
-    }
 
     // due to the annotation, the Fruit unpickler should not know
     // a thing about Apple either, even though it's a subtype of
     // Fruit.
-    try {
+    try
       val f =
         JSONPickle(bananaString.replace("Banana", "Apple")).unpickle[Fruit]
       throw new Exception(
           s"Should have thrown on unpickle but instead parsed $f")
-    } catch {
+    catch
       case PicklingException(message, cause) =>
         if (!message.contains("Apple not recognized"))
           throw new Exception(s"Not the expected exception: $message")
-    }
-  }
 
-  test("manually generate") {
+  test("manually generate")
     implicit val pumpkinPickler = Pickler.generate[Pumpkin]
     implicit val pumpkinUnpickler = Unpickler.generate[Pumpkin]
     val pumpkin = Pumpkin("Kabocha")
     val pumpkinString = pumpkin.pickle.value
     assert(JSONPickle(pumpkinString).unpickle[Pumpkin] == pumpkin)
-  }
-}

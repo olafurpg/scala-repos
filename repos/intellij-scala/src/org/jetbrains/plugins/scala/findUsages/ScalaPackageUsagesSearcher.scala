@@ -13,15 +13,14 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl
 
 class ScalaPackageUsagesSearcher
     extends QueryExecutorBase[PsiReference, ReferencesSearch.SearchParameters](
-        true) {
+        true)
 
   def processQuery(@NotNull parameters: ReferencesSearch.SearchParameters,
-                   @NotNull consumer: Processor[PsiReference]) {
+                   @NotNull consumer: Processor[PsiReference])
     val target: PsiElement = parameters.getElementToSearch
-    val scPack = target match {
+    val scPack = target match
       case pack: PsiPackage => ScPackageImpl(pack)
       case _ => return
-    }
     val name = scPack.name
     if (name == null || StringUtil.isEmptyOrSpaces(name)) return
     val scope: SearchScope =
@@ -33,19 +32,15 @@ class ScalaPackageUsagesSearcher
                          UsageSearchContext.IN_CODE,
                          true,
                          new MyProcessor(scPack, null, session))
-  }
 
   private class MyProcessor(
       myTarget: PsiElement, @Nullable prefix: String, mySession: SearchSession)
-      extends RequestResultProcessor(myTarget, prefix) {
+      extends RequestResultProcessor(myTarget, prefix)
     def processTextOccurrence(
         element: PsiElement,
         offsetInElement: Int,
-        consumer: Processor[PsiReference]): Boolean = inReadAction {
+        consumer: Processor[PsiReference]): Boolean = inReadAction
       val reference: PsiReference = element.getReference
-      if (reference == null || !reference.isReferenceTo(myTarget)) {
+      if (reference == null || !reference.isReferenceTo(myTarget))
         true
-      } else consumer.process(reference)
-    }
-  }
-}
+      else consumer.process(reference)

@@ -18,11 +18,10 @@ package rules
   *
   * @see the Scala parser combinator
   */
-case class ~[+A, +B](_1: A, _2: B) {
+case class ~[+A, +B](_1: A, _2: B)
   override def toString = "(" + _1 + " ~ " + _2 + ")"
-}
 
-sealed abstract class Result[+Out, +A, +X] {
+sealed abstract class Result[+Out, +A, +X]
   def out: Out
   def value: A
   def error: X
@@ -36,10 +35,9 @@ sealed abstract class Result[+Out, +A, +X] {
       f: (Out, A) => Result[Out2, B, Nothing]): Result[Out2, B, X]
   def orElse[Out2 >: Out, B >: A](
       other: => Result[Out2, B, Nothing]): Result[Out2, B, X]
-}
 
 case class Success[+Out, +A](out: Out, value: A)
-    extends Result[Out, A, Nothing] {
+    extends Result[Out, A, Nothing]
   def error = throw new ScalaSigParserError("No error")
 
   def toOption = Some(value)
@@ -54,9 +52,8 @@ case class Success[+Out, +A](out: Out, value: A)
     f(out, value)
   def orElse[Out2 >: Out, B >: A](
       other: => Result[Out2, B, Nothing]): Result[Out2, B, Nothing] = this
-}
 
-sealed abstract class NoSuccess[+X] extends Result[Nothing, Nothing, X] {
+sealed abstract class NoSuccess[+X] extends Result[Nothing, Nothing, X]
   def out = throw new ScalaSigParserError("No output")
   def value = throw new ScalaSigParserError("No value")
 
@@ -68,11 +65,9 @@ sealed abstract class NoSuccess[+X] extends Result[Nothing, Nothing, X] {
   def flatMap[Out2, B](f: (Nothing, Nothing) => Result[Out2, B, Nothing]) =
     this
   def orElse[Out2, B](other: => Result[Out2, B, Nothing]) = other
-}
 
-case object Failure extends NoSuccess[Nothing] {
+case object Failure extends NoSuccess[Nothing]
   def error = throw new ScalaSigParserError("No error")
-}
 
 case class ScalaSigParserError(msg: String) extends RuntimeException(msg)
 

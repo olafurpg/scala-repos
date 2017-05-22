@@ -17,11 +17,11 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * User: Alexander Podkhalyuzin
   * Date: 12.08.2009
   */
-object PresentationUtil {
+object PresentationUtil
   def presentationString(obj: Any): String =
     presentationString(obj, ScSubstitutor.empty)
-  def presentationString(obj: Any, substitutor: ScSubstitutor): String = {
-    val res: String = obj match {
+  def presentationString(obj: Any, substitutor: ScSubstitutor): String =
+    val res: String = obj match
       case clauses: ScParameters =>
         clauses.clauses.map(presentationString(_, substitutor)).mkString("")
       case clause: ScParameterClause =>
@@ -57,25 +57,21 @@ object PresentationUtil {
         var paramText = param.name
         if (param.isContravariant) paramText = "-" + paramText
         else if (param.isCovariant) paramText = "+" + paramText
-        param.lowerBound foreach {
+        param.lowerBound foreach
           case psi.types.Nothing =>
           case tp: ScType =>
             paramText = paramText + " >: " + presentationString(tp,
                                                                 substitutor)
-        }
-        param.upperBound foreach {
+        param.upperBound foreach
           case psi.types.Any =>
           case tp: ScType =>
             paramText = paramText + " <: " + presentationString(tp,
                                                                 substitutor)
-        }
-        param.viewBound foreach { (tp: ScType) =>
+        param.viewBound foreach  (tp: ScType) =>
           paramText = paramText + " <% " + presentationString(tp, substitutor)
-        }
-        param.contextBound foreach { (tp: ScType) =>
+        param.contextBound foreach  (tp: ScType) =>
           paramText = paramText + " : " + presentationString(
               ScTypeUtil.stripTypeArgs(substitutor.subst(tp)), substitutor)
-        }
         paramText
       case param: PsiTypeParameter =>
         var paramText = param.name
@@ -90,34 +86,29 @@ object PresentationUtil {
         val list = param.getModifierList
         if (list == null) return ""
         val lastSize = buffer.length
-        for (a <- list.getAnnotations) {
+        for (a <- list.getAnnotations)
           if (lastSize != buffer.length) buffer.append(" ")
           val element = a.getNameReferenceElement
           if (element != null) buffer.append("@").append(element.getText)
-        }
         if (lastSize != buffer.length) buffer.append(" ")
         val name = param.name
-        if (name != null) {
+        if (name != null)
           buffer.append(name)
-        }
         buffer.append(": ")
         buffer.append(presentationString(param.getType, substitutor)) //todo: create param type, java.lang.Object => Any
         buffer.toString()
       case fun: ScFunction =>
         val buffer: StringBuilder = new StringBuilder("")
-        fun.getParent match {
+        fun.getParent match
           case body: ScTemplateBody if fun.containingClass != null =>
             val qual = fun.containingClass.qualifiedName
-            if (qual != null) {
+            if (qual != null)
               buffer.append(qual).append(".")
-            }
           case _ =>
-        }
         buffer.append(fun.name)
-        fun.typeParametersClause match {
+        fun.typeParametersClause match
           case Some(tpc) => buffer.append(presentationString(tpc))
           case _ =>
-        }
         buffer
           .append(presentationString(fun.paramClauses, substitutor))
           .append(": ")
@@ -126,7 +117,4 @@ object PresentationUtil {
       case elem: PsiElement => elem.getText
       case null => ""
       case _ => obj.toString
-    }
     res.replace(ScalaUtils.typeParameter, "T")
-  }
-}

@@ -1,10 +1,8 @@
-class AddRepeatedParams {
+class AddRepeatedParams
   def foo(i: Int, xs: Int*): Int = i
 
   foo(i = 1)
   this foo (2)
-}
 
-class AddRepeatedParamsTest extends AddRepeatedParams {
+class AddRepeatedParamsTest extends AddRepeatedParams
   override def foo(i: Int, xs: Int*) = super.foo(i = 1)
-}

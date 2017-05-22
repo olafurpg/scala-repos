@@ -75,7 +75,7 @@ case class AddScheduledQueryRequest(schedule: CronExpression,
                                     sink: Path,
                                     timeout: Option[Long])
 
-object AddScheduledQueryRequest {
+object AddScheduledQueryRequest
   import CronExpressionSerialization._
 
   implicit val iso = Iso.hlist(
@@ -88,7 +88,6 @@ object AddScheduledQueryRequest {
       schemaV1, Some("1.0".v))
   implicit val extractor: Extractor[AddScheduledQueryRequest] = extractorV(
       schemaV1, Some("1.0".v))
-}
 
 class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                                       apiKeyFinder: APIKeyFinder[Future],
@@ -96,41 +95,34 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                                       clock: Clock)(
     implicit M: Monad[Future], executor: ExecutionContext, addTimeout: Timeout)
     extends CustomHttpService[
-        Future[JValue], APIKey => Future[HttpResponse[JValue]]] with Logging {
+        Future[JValue], APIKey => Future[HttpResponse[JValue]]] with Logging
   val service: HttpRequest[Future[JValue]] => Validation[
       NotServed, APIKey => Future[HttpResponse[JValue]]] =
     (request: HttpRequest[Future[JValue]]) =>
-      Success({ apiKey: APIKey =>
+      Success( apiKey: APIKey =>
         val permissionsFinder = new PermissionsFinder[Future](
             apiKeyFinder, accountFinder, clock.instant)
-        request.content map { contentFuture =>
-          val responseVF = for {
-            sreq <- EitherT {
-              contentFuture map { jv =>
-                jv.validated[AddScheduledQueryRequest].disjunction leftMap {
+        request.content map  contentFuture =>
+          val responseVF = for
+            sreq <- EitherT
+              contentFuture map  jv =>
+                jv.validated[AddScheduledQueryRequest].disjunction leftMap
                   err =>
                     badRequest(
                         "Request body %s is not a valid scheduling query request: %s"
                           .format(jv.renderCompact, err.message))
-                }
-              }
-            }
 
-            authorities <- EitherT {
-              M point {
+            authorities <- EitherT
+              M point
                 (Authorities.ifPresent(sreq.owners) \/> badRequest(
                         "You must provide an owner account for the task results!"))
-              }
-            }
 
-            okToReads <- EitherT.right {
-              authorities.accountIds.toStream traverse { acctId =>
+            okToReads <- EitherT.right
+              authorities.accountIds.toStream traverse  acctId =>
                 permissionsFinder.apiKeyFinder.hasCapability(
                     apiKey,
                     Set(ExecutePermission(sreq.source, WrittenBy(acctId))),
                     None)
-              }
-            }
             okToRead = okToReads.exists(_ == true)
             okToWrite <- EitherT.right(permissionsFinder.checkWriteAuthorities(
                     authorities, apiKey, sreq.sink, clock.instant))
@@ -142,7 +134,7 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                     "The API Key does not have permission to write to %s as %s"
                       .format(sreq.sink.path, authorities.render)))
 
-            taskId <- (readError |+| writeError) match {
+            taskId <- (readError |+| writeError) match
               case None =>
                 scheduler.addTask(Some(sreq.schedule),
                                   apiKey,
@@ -150,92 +142,77 @@ class AddScheduledQueryServiceHandler(scheduler: Scheduler[Future],
                                   sreq.context,
                                   sreq.source,
                                   sreq.sink,
-                                  sreq.timeout) leftMap { error =>
+                                  sreq.timeout) leftMap  error =>
                   logger.error("Failure adding scheduled execution: " + error)
                   HttpResponse(
                       status = HttpStatus(InternalServerError),
                       content = Some(
                             "An error occurred scheduling your query".serialize))
-                }
 
               case Some(errors) =>
                 EitherT.left(M point forbidden(errors.list.mkString(", ")))
-            }
-          } yield {
+          yield
             HttpResponse(content = Some(taskId.serialize))
-          }
 
           responseVF.fold(a => a, a => a)
-        } getOrElse {
+        getOrElse
           Promise successful badRequest(
               "Missing body for scheduled query submission")
-        }
-      })
+      )
 
   val metadata = DescriptionMetadata("Add a new scheduled query")
-}
 
 class DeleteScheduledQueryServiceHandler[A](scheduler: Scheduler[Future])(
     implicit executor: ExecutionContext, deleteTimeout: Timeout)
-    extends CustomHttpService[A, Future[HttpResponse[JValue]]] with Logging {
+    extends CustomHttpService[A, Future[HttpResponse[JValue]]] with Logging
   import com.precog.util._
   val service = (request: HttpRequest[A]) =>
-    {
-      for {
+      for
         idStr <- request.parameters
           .get('scheduleId)
           .toSuccess(
               DispatchError(BadRequest, "scheduleId parameter required"))
-        id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap {
+        id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap
           error =>
             DispatchError(
                 BadRequest, "Invalid schedule Id \"%s\"".format(idStr))
-        }
-      } yield {
-        scheduler.deleteTask(id) map { _ =>
+      yield
+        scheduler.deleteTask(id) map  _ =>
           ok[String](None)
-        } valueOr { error =>
+        valueOr  error =>
           sys.error("todo")
         //serverError("An error occurred deleting your query", Some(error))
-        }
-      }
-  }
 
   val metadata = DescriptionMetadata("Delete a scheduled entry")
-}
 
 class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
     implicit executor: ExecutionContext, addTimeout: Timeout)
-    extends CustomHttpService[A, Future[HttpResponse[JValue]]] with Logging {
+    extends CustomHttpService[A, Future[HttpResponse[JValue]]] with Logging
   import com.precog.util._
   val service = (request: HttpRequest[A]) =>
-    {
-      for {
+      for
         idStr <- request.parameters
           .get('scheduleId)
           .toSuccess(
               DispatchError(BadRequest, "Missing schedule Id for status."))
-        id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap {
+        id <- Validation.fromTryCatch { UUID.fromString(idStr) } leftMap
           ex =>
             DispatchError(BadRequest,
                           "Invalid schedule Id \"%s\"".format(idStr),
                           Some(ex.getMessage))
-        }
-        limit <- Validation.fromTryCatch {
+        limit <- Validation.fromTryCatch
           request.parameters.get('last) map (_.toInt)
-        } leftMap {
+        leftMap
           case ex: NumberFormatException =>
             DispatchError(BadRequest, "Invalid last limit: " + ex.getMessage)
-        }
-      } yield {
-        scheduler.statusForTask(id, limit) map {
+      yield
+        scheduler.statusForTask(id, limit) map
           case Some((task, reports)) =>
             val nextTime: Option[DateTime] =
-              task.repeat.flatMap { sched: CronExpression =>
+              task.repeat.flatMap  sched: CronExpression =>
                 Option(sched.getNextValidTimeAfter(new java.util.Date))
-              } map { d =>
+              map  d =>
                 new DateTime(d)
-              }
 
             val body: JValue = JObject(
                 "task" -> task.serialize,
@@ -248,16 +225,12 @@ class ScheduledQueryStatusServiceHandler[A](scheduler: Scheduler[Future])(
 
           case None =>
             notFound("No status found for id " + idStr)
-        } valueOr { error =>
+        valueOr  error =>
           HttpResponse(
               status = HttpStatus(InternalServerError),
               content = Some(
                     "An error occurred getting status for your query".serialize))
-        }
-      }
-  }
 
   val metadata = DescriptionMetadata("Query the status of a scheduled entry")
-}
 
 //type ScheduleServiceHandlers

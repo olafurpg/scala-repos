@@ -33,48 +33,44 @@ import scalaz.std.map._
 
 trait EvaluatorMethodsModule[M[+ _]]
     extends DAG with TableModule[M] with TableLibModule[M]
-    with OpFinderModule[M] {
+    with OpFinderModule[M]
   import dag._
   import instructions._
   import library._
   import trans._
   import trans.constants._
 
-  trait EvaluatorMethods extends OpFinder {
+  trait EvaluatorMethods extends OpFinder
     def MorphContext(ctx: EvaluationContext, node: DepGraph): MorphContext
 
-    def rValueToCValue(rvalue: RValue): Option[CValue] = rvalue match {
+    def rValueToCValue(rvalue: RValue): Option[CValue] = rvalue match
       case cvalue: CValue => Some(cvalue)
       case RArray.empty => Some(CEmptyArray)
       case RObject.empty => Some(CEmptyObject)
       case _ => None
-    }
 
     def transRValue[A <: SourceType](
-        rvalue: RValue, target: TransSpec[A]): TransSpec[A] = {
-      rValueToCValue(rvalue) map { cvalue =>
+        rvalue: RValue, target: TransSpec[A]): TransSpec[A] =
+      rValueToCValue(rvalue) map  cvalue =>
         trans.ConstLiteral(cvalue, target)
-      } getOrElse {
-        rvalue match {
+      getOrElse
+        rvalue match
           case RArray(elements) =>
-            InnerArrayConcat(elements map { element =>
+            InnerArrayConcat(elements map  element =>
               trans.WrapArray(transRValue(element, target))
-            }: _*)
+            : _*)
           case RObject(fields) =>
             InnerObjectConcat(
-                fields.toSeq map {
+                fields.toSeq map
               case (key, value) =>
                 trans.WrapObject(transRValue(value, target), key)
-            }: _*)
+            : _*)
           case _ =>
             sys.error("Can't handle RValue")
-        }
-      }
-    }
 
     def transFromBinOp[A <: SourceType](
         op: BinaryOperation, ctx: MorphContext)(
-        left: TransSpec[A], right: TransSpec[A]): TransSpec[A] = op match {
+        left: TransSpec[A], right: TransSpec[A]): TransSpec[A] = op match
       case Eq => trans.Equal[A](left, right)
       case NotEq => op1ForUnOp(Comp).spec(ctx)(trans.Equal[A](left, right))
       case instructions.WrapObject => WrapObjectDynamic(left, right)
@@ -85,23 +81,21 @@ trait EvaluatorMethodsModule[M[+ _]]
       case DerefMetadata => sys.error("cannot do a dynamic metadata deref")
       case DerefArray => DerefArrayDynamic(left, right)
       case _ => op2ForBinOp(op).get.spec(ctx)(left, right)
-    }
 
     def combineTransSpecs(specs: List[TransSpec1]): TransSpec1 =
-      specs map { trans.WrapArray(_): TransSpec1 } reduceLeftOption {
+      specs map { trans.WrapArray(_): TransSpec1 } reduceLeftOption
         trans.OuterArrayConcat(_, _)
-      } get
+      get
 
-    def buildJoinKeySpec(sharedLength: Int): TransSpec1 = {
+    def buildJoinKeySpec(sharedLength: Int): TransSpec1 =
       val components = for (i <- 0 until sharedLength) yield
         trans.WrapArray(DerefArrayStatic(SourceKey.Single, CPathIndex(i))): TransSpec1
 
       components reduceLeft { trans.InnerArrayConcat(_, _) }
-    }
 
     def buildWrappedJoinSpec(
         idMatch: IdentityMatch, valueKeys: Set[Int] = Set.empty)(
-        spec: (TransSpec2, TransSpec2) => TransSpec2): TransSpec2 = {
+        spec: (TransSpec2, TransSpec2) => TransSpec2): TransSpec2 =
       val leftIdentitySpec = DerefObjectStatic(Leaf(SourceLeft), paths.Key)
       val rightIdentitySpec = DerefObjectStatic(Leaf(SourceRight), paths.Key)
 
@@ -131,25 +125,22 @@ trait EvaluatorMethodsModule[M[+ _]]
         trans.WrapObject(spec(leftValueSpec, rightValueSpec), paths.Value.name)
 
       val valueKeySpecs =
-        valueKeys map { key =>
+        valueKeys map  key =>
           trans.WrapObject(
               DerefObjectStatic(Leaf(SourceLeft), CPathField("sort-" + key)),
               "sort-" + key)
-        }
 
       val keyValueSpec = InnerObjectConcat(
           wrappedValueSpec, wrappedIdentitySpec)
 
-      if (valueKeySpecs.isEmpty) {
+      if (valueKeySpecs.isEmpty)
         keyValueSpec
-      } else {
+      else
         InnerObjectConcat(
             keyValueSpec, OuterObjectConcat(valueKeySpecs.toList: _*))
-      }
-    }
 
     def buildWrappedCrossSpec(
-        spec: (TransSpec2, TransSpec2) => TransSpec2): TransSpec2 = {
+        spec: (TransSpec2, TransSpec2) => TransSpec2): TransSpec2 =
       val leftIdentitySpec = DerefObjectStatic(Leaf(SourceLeft), paths.Key)
       val rightIdentitySpec = DerefObjectStatic(Leaf(SourceRight), paths.Key)
 
@@ -166,12 +157,8 @@ trait EvaluatorMethodsModule[M[+ _]]
       val wrappedValueSpec = trans.WrapObject(valueSpec, paths.Value.name)
 
       InnerObjectConcat(wrappedIdentitySpec, wrappedValueSpec)
-    }
 
-    def buildIdShuffleSpec(indexes: Vector[Int]): TransSpec1 = {
-      indexes map { idx =>
+    def buildIdShuffleSpec(indexes: Vector[Int]): TransSpec1 =
+      indexes map  idx =>
         trans.WrapArray(DerefArrayStatic(Leaf(Source), CPathIndex(idx))): TransSpec1
-      } reduceLeft { trans.InnerArrayConcat(_, _) }
-    }
-  }
-}
+      reduceLeft { trans.InnerArrayConcat(_, _) }

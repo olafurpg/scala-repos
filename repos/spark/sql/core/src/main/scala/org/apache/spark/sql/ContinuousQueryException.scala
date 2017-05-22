@@ -38,12 +38,12 @@ class ContinuousQueryException private[sql](
     val startOffset: Option[Offset] = None,
     val endOffset: Option[Offset] = None
 )
-    extends Exception(message, cause) {
+    extends Exception(message, cause)
 
   /** Time when the exception occurred */
   val time: Long = System.currentTimeMillis
 
-  override def toString(): String = {
+  override def toString(): String =
     val causeStr =
       s"${cause.getMessage} ${cause.getStackTrace.take(10).mkString("", "\n|\t", "\n")}"
     s"""
@@ -51,5 +51,3 @@ class ContinuousQueryException private[sql](
        |
        |${query.asInstanceOf[StreamExecution].toDebugString}
        """.stripMargin
-  }
-}

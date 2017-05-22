@@ -13,7 +13,7 @@ import akka.http.javadsl.server.values.{PathMatchers, PathMatcher}
 import scala.annotation.varargs
 import scala.collection.immutable
 
-abstract class PathDirectives extends MiscDirectives {
+abstract class PathDirectives extends MiscDirectives
 
   /**
     * Applies the given PathMatchers to the remaining unmatched path after consuming a leading slash.
@@ -181,24 +181,20 @@ abstract class PathDirectives extends MiscDirectives {
     Directives.custom(RouteStructure.RawPathPrefixTest(matchers))
 
   private def joinWithSlash(matchers: immutable.Seq[PathMatcher[_]])
-    : immutable.Seq[PathMatcher[_]] = {
+    : immutable.Seq[PathMatcher[_]] =
     def join(result: immutable.Seq[PathMatcher[_]],
              next: PathMatcher[_]): immutable.Seq[PathMatcher[_]] =
       result :+ PathMatchers.SLASH :+ next
 
     matchers.foldLeft(immutable.Seq.empty[PathMatcher[_]])(join)
-  }
 
   private def convertMatchers(
-      matchers: Seq[AnyRef]): immutable.Seq[PathMatcher[_]] = {
-    def parse(matcher: AnyRef): PathMatcher[_] = matcher match {
+      matchers: Seq[AnyRef]): immutable.Seq[PathMatcher[_]] =
+    def parse(matcher: AnyRef): PathMatcher[_] = matcher match
       case p: PathMatcher[_] ⇒ p
       case name: String ⇒ PathMatchers.segment(name)
       case x ⇒
         throw new IllegalArgumentException(
             s"Matcher of class ${x.getClass} is unsupported for PathDirectives")
-    }
 
     matchers.map(parse).toVector
-  }
-}

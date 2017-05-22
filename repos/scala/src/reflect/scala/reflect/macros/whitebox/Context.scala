@@ -33,7 +33,7 @@ package whitebox
   *
   *  @see `scala.reflect.macros.blackbox.Context`
   */
-trait Context extends blackbox.Context {
+trait Context extends blackbox.Context
 
   /** @inheritdoc
     */
@@ -75,4 +75,3 @@ trait Context extends blackbox.Context {
     *  and always stays the same regardless of whatever happens during macro expansion.
     */
   def enclosingImplicits: List[ImplicitCandidate]
-}

@@ -18,6 +18,5 @@
 package kafka.common
 
 class BrokerEndPointNotAvailableException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

@@ -57,16 +57,15 @@ import java.util.regex.Pattern
   * Use of this class can improve performance if the sequence of replacements is intended to be used repeatedly throughout the life of an application.<br/>
   * This is due to the fact that each {@link Pattern} is only compiled once and each {@link Matcher} is only generated once.
   */
-object ReplaceSequence {
+object ReplaceSequence
 
   /**
     * Creates a new <code>ReplaceSequence</code> with the first pattern to be replaced with an empty <code>String</code>
     * @param firstPattern The regex {@link Pattern pattern} string for the first replacement
     * @return a new instance
     */
-  def create(firstPattern: String): ReplaceSequence = {
+  def create(firstPattern: String): ReplaceSequence =
     create(firstPattern, string.empty)
-  }
 
   /**
     * Creates a new <code>ReplaceSequence</code> with the first pattern to be replaced with the specified <code>replaceWith</code> parameter.
@@ -74,23 +73,20 @@ object ReplaceSequence {
     * @param replaceWith The {@link String} to replace matches of the specified pattern
     * @return a new instance
     */
-  def create(firstPattern: String, replaceWith: String): ReplaceSequence = {
+  def create(firstPattern: String, replaceWith: String): ReplaceSequence =
     val result: ReplaceSequence = new ReplaceSequence(
         StringReplacement.compile(firstPattern, replaceWith))
     result
-  }
-}
 
-class ReplaceSequence {
+class ReplaceSequence
 
   /**
     * Appends a new pattern to this instance in a builder pattern
     * @param pattern The regex {@link Pattern pattern} {@link String} for this replacement
     * @return this instance of itself for use in a builder pattern
     */
-  def append(pattern: String): ReplaceSequence = {
+  def append(pattern: String): ReplaceSequence =
     append(pattern, string.empty)
-  }
 
   /**
     * Appends a new pattern to this instance in a builder pattern
@@ -98,30 +94,25 @@ class ReplaceSequence {
     * @param replaceWith The {@link String} to replace matches of the specified pattern
     * @return this instance of itself for use in a builder pattern
     */
-  def append(pattern: String, replaceWith: String): ReplaceSequence = {
+  def append(pattern: String, replaceWith: String): ReplaceSequence =
     replacements.add(StringReplacement.compile(pattern, replaceWith))
     this
-  }
 
   /**
     * Applies each of the replacements specified via the initial {@link #create(String)} and/or any additional via {@link #append(String)}
     * @param input the {@link String} to apply all of the replacements to
     * @return the resulting {@link String} after all replacements have been applied
     */
-  def replaceAll(input: String): String = {
+  def replaceAll(input: String): String =
     if (string.isNullOrEmpty(input)) return string.empty
     var mutatedString = input
     import scala.collection.JavaConversions._
-    for (rp <- replacements) {
+    for (rp <- replacements)
       mutatedString = rp.replaceAll(mutatedString)
-    }
     mutatedString
-  }
 
-  private def this(pair: StringReplacement) {
+  private def this(pair: StringReplacement)
     this()
     replacements.add(pair)
-  }
 
   var replacements: List[StringReplacement] = new ArrayList[StringReplacement]
-}

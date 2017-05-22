@@ -22,11 +22,11 @@ import kafka.network.{RequestOrResponseSend, RequestChannel}
 import kafka.network.RequestChannel.Response
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 
-object GroupCoordinatorRequest {
+object GroupCoordinatorRequest
   val CurrentVersion = 0.shortValue
   val DefaultClientId = ""
 
-  def readFrom(buffer: ByteBuffer) = {
+  def readFrom(buffer: ByteBuffer) =
     // envelope
     val versionId = buffer.getShort
     val correlationId = buffer.getInt
@@ -35,22 +35,20 @@ object GroupCoordinatorRequest {
     // request
     val group = ApiUtils.readShortString(buffer)
     GroupCoordinatorRequest(group, versionId, correlationId, clientId)
-  }
-}
 
 case class GroupCoordinatorRequest(
     group: String,
     versionId: Short = GroupCoordinatorRequest.CurrentVersion,
     correlationId: Int = 0,
     clientId: String = GroupCoordinatorRequest.DefaultClientId)
-    extends RequestOrResponse(Some(ApiKeys.GROUP_COORDINATOR.id)) {
+    extends RequestOrResponse(Some(ApiKeys.GROUP_COORDINATOR.id))
 
   def sizeInBytes =
     2 + /* versionId */
     4 + /* correlationId */
     ApiUtils.shortStringLength(clientId) + ApiUtils.shortStringLength(group)
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     // envelope
     buffer.putShort(versionId)
     buffer.putInt(correlationId)
@@ -58,11 +56,10 @@ case class GroupCoordinatorRequest(
 
     // consumer metadata request
     ApiUtils.writeShortString(buffer, group)
-  }
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
+                           request: RequestChannel.Request): Unit =
     // return ConsumerCoordinatorNotAvailable for all uncaught errors
     val errorResponse = GroupCoordinatorResponse(
         None, Errors.GROUP_COORDINATOR_NOT_AVAILABLE.code, correlationId)
@@ -70,9 +67,8 @@ case class GroupCoordinatorRequest(
         new Response(
             request,
             new RequestOrResponseSend(request.connectionId, errorResponse)))
-  }
 
-  def describe(details: Boolean) = {
+  def describe(details: Boolean) =
     val consumerMetadataRequest = new StringBuilder
     consumerMetadataRequest.append("Name: " + this.getClass.getSimpleName)
     consumerMetadataRequest.append("; Version: " + versionId)
@@ -80,5 +76,3 @@ case class GroupCoordinatorRequest(
     consumerMetadataRequest.append("; ClientId: " + clientId)
     consumerMetadataRequest.append("; Group: " + group)
     consumerMetadataRequest.toString()
-  }
-}

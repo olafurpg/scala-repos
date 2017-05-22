@@ -87,7 +87,7 @@ package api
   *  @contentDiagram hideNodes "*Api"
   *  @group ReflectionAPI
   */
-trait Constants { self: Universe =>
+trait Constants  self: Universe =>
 
   /**
     *  This "virtual" case class represents the reflection interface for literal expressions which can not be further
@@ -192,7 +192,7 @@ trait Constants { self: Universe =>
     *  where `value` is the Scala value of the constant.
     *  @group Extractors
     */
-  abstract class ConstantExtractor {
+  abstract class ConstantExtractor
 
     /** A factory method that produces [[Constant `Constant`]] instances.
       *
@@ -204,17 +204,14 @@ trait Constants { self: Universe =>
 
     /** An extractor that enables writing pattern matches against the [[Constant `Constant`]] class. */
     def unapply(arg: Constant): Option[Any]
-  }
 
   /** The API of [[Constant]] instances.
     *  @group API
     */
-  abstract class ConstantApi {
+  abstract class ConstantApi
 
     /** Payload of the constant, that can be accessed directly or pattern matched against. */
     val value: Any
 
     /** Scala type that describes the constant. It is generated automatically based on the type of the value. */
     def tpe: Type
-  }
-}

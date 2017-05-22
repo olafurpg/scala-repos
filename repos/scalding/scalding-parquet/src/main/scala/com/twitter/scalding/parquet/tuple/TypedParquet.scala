@@ -10,7 +10,7 @@ import com.twitter.scalding.parquet.tuple.scheme.{ParquetReadSupport, ParquetWri
   * Typed parquet tuple
   * @author Jian Tang
   */
-object TypedParquet {
+object TypedParquet
 
   /**
     * Create readable typed parquet source.
@@ -35,16 +35,14 @@ object TypedParquet {
     */
   def apply[T](paths: Seq[String], fp: FilterPredicate)(
       implicit readSupport: ParquetReadSupport[T]): TypedParquet[T] =
-    new TypedFixedPathParquetTuple[T](paths, readSupport, null) {
+    new TypedFixedPathParquetTuple[T](paths, readSupport, null)
       override def withFilter = Some(fp)
-    }
 
   def apply[T](path: String, fp: FilterPredicate)(
       implicit readSupport: ParquetReadSupport[T]): TypedParquet[T] =
     apply[T](Seq(path), fp)
-}
 
-object TypedParquetSink {
+object TypedParquetSink
 
   /**
     * Create typed parquet sink.
@@ -63,14 +61,13 @@ object TypedParquetSink {
   def apply[T](path: String)(
       implicit writeSupport: ParquetWriteSupport[T]): TypedParquet[T] =
     apply[T](Seq(path))
-}
 
 /**
   * Typed Parquet tuple source/sink.
   */
 trait TypedParquet[T]
     extends FileSource with Mappable[T]
-    with TypedSink[T] with HasFilterPredicate {
+    with TypedSink[T] with HasFilterPredicate
 
   def readSupport: ParquetReadSupport[T]
   def writeSupport: ParquetWriteSupport[T]
@@ -81,12 +78,10 @@ trait TypedParquet[T]
   override def setter[U <: T] =
     TupleSetter.asSubSetter[T, U](TupleSetter.singleSetter[T])
 
-  override def hdfsScheme = {
+  override def hdfsScheme =
     val scheme =
       new TypedParquetTupleScheme[T](readSupport, writeSupport, withFilter)
     HadoopSchemeInstance(scheme.asInstanceOf[Scheme[_, _, _, _, _]])
-  }
-}
 
 class TypedFixedPathParquetTuple[T](val paths: Seq[String],
                                     val readSupport: ParquetReadSupport[T],

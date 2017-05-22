@@ -21,26 +21,22 @@ import org.junit.Assert._
 
 import test._
 
-package Generic1TestsAux {
+package Generic1TestsAux
   trait TC1[F[_]]
-  object TC1 extends TC10 {
+  object TC1 extends TC10
     implicit def tc1Id: TC1[Id] = new TC1[Id] {}
-  }
 
-  trait TC10 {
+  trait TC10
     implicit def tc1[F[_]]: TC1[F] = new TC1[F] {}
-  }
 
   trait TC2[L[_]]
-  object TC2 {
+  object TC2
     implicit def tc2[L[_]]: TC2[L] = new TC2[L] {}
-  }
 
   trait TC3[F[_], G[_]]
 
-  object TC3 {
+  object TC3
     implicit def tc3[F[_], G[_]]: TC3[F, G] = new TC3[F, G] {}
-  }
 
   trait Box[T]
 
@@ -60,10 +56,9 @@ package Generic1TestsAux {
   final case class ICons[A](head: A, tail: IList[A]) extends IList[A]
   final case class INil[A]() extends IList[A]
 
-  object IList {
+  object IList
     def fromSeq[T](ts: Seq[T]): IList[T] =
       ts.foldRight(INil[T](): IList[T])(ICons(_, _))
-  }
 
   sealed trait Tree[T]
   case class Leaf[T](t: T) extends Tree[T]
@@ -76,178 +71,146 @@ package Generic1TestsAux {
   case class OBC1[+T](t: T) extends OB1[T]
   case class OAB1[+T](t: T) extends OA1[T] with OB1[T]
 
-  trait Functor[F[_]] {
+  trait Functor[F[_]]
     def map[A, B](fa: F[A])(f: A => B): F[B]
-  }
 
-  object Functor extends Functor0 {
+  object Functor extends Functor0
     def apply[F[_]](implicit f: Lazy[Functor[F]]): Functor[F] = f.value
 
-    implicit val idFunctor: Functor[Id] = new Functor[Id] {
+    implicit val idFunctor: Functor[Id] = new Functor[Id]
       def map[A, B](a: A)(f: A => B): B = f(a)
-    }
 
     // Induction step for products
     implicit def hcons[F[_]](
         implicit ihc: IsHCons1[F, Functor, Functor]): Functor[F] =
-      new Functor[F] {
-        def map[A, B](fa: F[A])(f: A => B): F[B] = {
+      new Functor[F]
+        def map[A, B](fa: F[A])(f: A => B): F[B] =
           val (hd, tl) = ihc.unpack(fa)
           ihc.pack((ihc.fh.map(hd)(f), ihc.ft.map(tl)(f)))
-        }
-      }
 
     // Induction step for coproducts
     implicit def ccons[F[_]](
         implicit icc: IsCCons1[F, Functor, Functor]): Functor[F] =
-      new Functor[F] {
+      new Functor[F]
         def map[A, B](fa: F[A])(f: A => B): F[B] =
           icc.pack(
               icc
                 .unpack(fa)
                 .fold(hd => Left(icc.fh.map(hd)(f)),
                       tl => Right(icc.ft.map(tl)(f))))
-      }
 
     implicit def generic[F[_]](
         implicit gen: Generic1[F, Functor]): Functor[F] =
-      new Functor[F] {
+      new Functor[F]
         def map[A, B](fa: F[A])(f: A => B): F[B] =
           gen.from(gen.fr.map(gen.to(fa))(f))
-      }
-  }
 
-  trait Functor0 {
+  trait Functor0
     implicit def constFunctor[T]: Functor[Const[T]#λ] =
-      new Functor[Const[T]#λ] {
+      new Functor[Const[T]#λ]
         def map[A, B](t: T)(f: A => B): T = t
-      }
-  }
 
   // Functor syntax
-  object functorSyntax {
+  object functorSyntax
     implicit def apply[F[_]: Functor, A](fa: F[A]): FunctorOps[F, A] =
       new FunctorOps[F, A](fa)
 
-    class FunctorOps[F[_], A](fa: F[A])(implicit F: Functor[F]) {
+    class FunctorOps[F[_], A](fa: F[A])(implicit F: Functor[F])
       def map[B](f: A => B): F[B] = F.map(fa)(f)
-    }
-  }
 
   /** This version of Pointed isn't complete & NOT working but it allows to show bugs in IsHCons1/ISCCons/Generic1 macro generation */
   trait Pointed[F[_]] { def point[A](a: A): F[A] }
 
-  object Pointed extends Pointed0 {
+  object Pointed extends Pointed0
     def apply[F[_]](implicit f: Lazy[Pointed[F]]): Pointed[F] = f.value
 
-    implicit val idPointed: Pointed[Id] = new Pointed[Id] {
+    implicit val idPointed: Pointed[Id] = new Pointed[Id]
       def point[A](a: A): Id[A] = a
-    }
 
     // Pointed can be built for Singleton types
     implicit def constSingletonPointed[T](
         implicit w: Witness.Aux[T]): Pointed[Const[T]#λ] =
-      new Pointed[Const[T]#λ] {
+      new Pointed[Const[T]#λ]
         def point[A](a: A): T = w.value
-      }
 
     implicit def isCPointedSingleSingleton[C](
         implicit w: Witness.Aux[C],
         pf: Lazy[Pointed[Const[C]#λ]]
     ): Pointed[({ type λ[A] = Const[C]#λ[A] :+: Const[CNil]#λ[A] })#λ] =
-      new Pointed[({ type λ[A] = Const[C]#λ[A] :+: Const[CNil]#λ[A] })#λ] {
+      new Pointed[({ type λ[A] = Const[C]#λ[A] :+: Const[CNil]#λ[A] })#λ]
         def point[A](a: A): Const[C]#λ[A] :+: Const[CNil]#λ[A] =
           Inl(pf.value.point(a))
-      }
 
     implicit def isCPointedSingle[F[_]](
         implicit pf: Lazy[Pointed[F]]
     ): Pointed[({ type λ[A] = F[A] :+: Const[CNil]#λ[A] })#λ] =
-      new Pointed[({ type λ[A] = F[A] :+: Const[CNil]#λ[A] })#λ] {
+      new Pointed[({ type λ[A] = F[A] :+: Const[CNil]#λ[A] })#λ]
         def point[A](a: A): F[A] :+: Const[CNil]#λ[A] = Inl(pf.value.point(a))
-      }
-  }
 
-  trait Pointed0 extends Pointed1 {
+  trait Pointed0 extends Pointed1
 
     implicit def hcons[F[_]](
         implicit ihc: IsHCons1[F, Pointed, Pointed]): Pointed[F] =
-      new Pointed[F] {
-        def point[A](a: A): F[A] = {
+      new Pointed[F]
+        def point[A](a: A): F[A] =
           ihc.pack(ihc.fh.point(a), ihc.ft.point(a))
-        }
-      }
 
     implicit def ccons[F[_]](
         implicit ihc: IsCCons1[F, Pointed, Pointed]): Pointed[F] =
-      new Pointed[F] {
-        def point[A](a: A): F[A] = {
+      new Pointed[F]
+        def point[A](a: A): F[A] =
           ihc.pack(Left(ihc.fh.point(a)))
-        }
-      }
 
     implicit def generic[F[_]](
         implicit gen: Generic1[F, Pointed]): Pointed[F] =
-      new Pointed[F] {
+      new Pointed[F]
         def point[A](a: A): F[A] = gen.from(gen.fr.point(a))
-      }
-  }
 
-  trait Pointed1 {
+  trait Pointed1
 
     // HACKING the fact that CNil can't be pointed
     implicit def isCPointedSimpleType: Pointed[
         ({ type λ[A] = A :+: Const[CNil]#λ[A] })#λ] =
-      new Pointed[({ type λ[A] = A :+: Const[CNil]#λ[A] })#λ] {
+      new Pointed[({ type λ[A] = A :+: Const[CNil]#λ[A] })#λ]
         def point[A](a: A): A :+: Const[CNil]#λ[A] = Inl(a)
-      }
 
     implicit val constHNilPointed: Pointed[Const[HNil]#λ] =
-      new Pointed[Const[HNil]#λ] {
+      new Pointed[Const[HNil]#λ]
         def point[A](a: A): HNil = HNil
-      }
-  }
 
   // Pointed syntax
-  object pointedSyntax {
+  object pointedSyntax
     implicit def pointedOps[A](a: A): PointedOps[A] = new PointedOps(a)
 
-    class PointedOps[A](a: A) {
+    class PointedOps[A](a: A)
       def point[F[_]](implicit F: Pointed[F]): F[A] = F.point(a)
-    }
-  }
 
   trait Trivial1[F[_]]
 
-  object Trivial1 {
+  object Trivial1
     implicit def trivially[F[_]]: Trivial1[F] = new Trivial1[F] {}
-  }
 
   trait Trivial10[F[_], T]
 
-  object Trivial10 {
+  object Trivial10
     implicit def trivially[F[_], T]: Trivial10[F, T] = new Trivial10[F, T] {}
-  }
 
   trait Trivial01[T, F[_]]
 
-  object Trivial01 {
+  object Trivial01
     implicit def trivially[T, F[_]]: Trivial01[T, F] = new Trivial01[T, F] {}
-  }
 
   trait Trivial11[F[_], T[_]]
 
-  object Trivial11 {
+  object Trivial11
     implicit def trivially[F[_], T[_]]: Trivial11[F, T] =
       new Trivial11[F, T] {}
-  }
-}
 
-class Generic1Tests {
+class Generic1Tests
   import Generic1TestsAux._
 
   @Test
-  def testGeneric1: Unit = {
+  def testGeneric1: Unit =
     Generic1[Foo, TC1]
     Generic1[Bar, TC1]
     Generic1[Baz, TC1]
@@ -281,10 +244,9 @@ class Generic1Tests {
     val fr = gen0.fr
     typed[TC2[gen0.R]](fr)
     typed[TC2[({ type λ[t] = t :: List[t] :: HNil })#λ]](fr)
-  }
 
   @Test
-  def testOverlappingCoproducts1 {
+  def testOverlappingCoproducts1
     val gen = Generic1[Overlapping1, TC1]
     val o: Overlapping1[Int] = OAB1(1)
     val o0 = gen.to(o)
@@ -292,10 +254,9 @@ class Generic1Tests {
 
     val s1 = gen.from(o0)
     typed[Overlapping1[Int]](s1)
-  }
 
   @Test
-  def testIsHCons1: Unit = {
+  def testIsHCons1: Unit =
     type L[t] = Id[t] :: t :: String :: (t,
     t) :: List[Option[t]] :: Option[t] :: List[t] :: HNil
 
@@ -322,25 +283,22 @@ class Generic1Tests {
 
     type T[t] = (t, t) :: Option[t] :: HNil
     val ihcT = implicitly[IsHCons1[T, TC1, TC2]]
-  }
 
   trait Singleton1[T[_]]
-  object Singleton1 {
+  object Singleton1
     implicit val hnilInstance: Singleton1[Const[HNil]#λ] =
       new Singleton1[Const[HNil]#λ] {}
-  }
 
   @Test
-  def testSingletons {
+  def testSingletons
     type Unit1[t] = Unit
     type None1[t] = None.type
 
     implicitly[Generic1[Unit1, Singleton1]]
     implicitly[Generic1[None1, Singleton1]]
-  }
 
   @Test
-  def testFunctor: Unit = {
+  def testFunctor: Unit =
     import functorSyntax._
 
     type R0[t] = t :: HNil
@@ -424,20 +382,18 @@ class Generic1Tests {
     )
     assertEquals(expectedTree, t0)
     assertEquals(expectedTree, t1)
-  }
 
   @Test
-  def testPointed: Unit = {
+  def testPointed: Unit =
     import pointedSyntax._
 
     type R0[t] = None.type :: HNil
     IsHCons1[R0, Pointed, Pointed]
 
     Pointed[Option]
-  }
 
   @Test
-  def testPartiallyApplied {
+  def testPartiallyApplied
     implicitly[Trivial10[List, Int]]
     type FI[f[_]] = Trivial10[f, Int]
     implicitly[FI[List]]
@@ -488,10 +444,9 @@ class Generic1Tests {
     val s1 = Split1[LO, Trivial1, FI]
     typed[Trivial1[s1.O]](s1.mkFoo)
     typed[Trivial10[s1.I, Int]](s1.mkFii)
-  }
 
   @Test
-  def testPartiallyApplied2 {
+  def testPartiallyApplied2
     type CRepr[t] = t :: List[t] :: HNil
     type LRepr[t] = scala.collection.immutable.::[t] :+: Nil.type :+: CNil
     type LS[t] = List[Set[t]]
@@ -551,9 +506,8 @@ class Generic1Tests {
     val s3 = Split1[LS, Trivial1, ({ type λ[t[_]] = TC3[Option, t] })#λ]
     typed[Trivial1[s3.O]](s3.fo)
     typed[TC3[Option, s3.I]](s3.fi)
-  }
 
-  def testPartiallyApplied3 {
+  def testPartiallyApplied3
     def materialize1[F[_]](
         implicit gen: Generic1[F, ({ type λ[r[_]] = TC3[r, Option] })#λ])
       : Unit = ()
@@ -613,21 +567,17 @@ class Generic1Tests {
     materialize12[S]
     materialize13[S]
     materialize14[S]
-  }
-}
 
-object SplitTestDefns {
+object SplitTestDefns
   trait Dummy1[F[_]]
-  object Dummy1 {
+  object Dummy1
     implicit def mkDummy1[F[_]]: Dummy1[F] = new Dummy1[F] {}
-  }
-}
 
-class SplitTests {
+class SplitTests
   import SplitTestDefns._
 
   @Test
-  def testBasics {
+  def testBasics
     illTyped("""
     Split1[List, Dummy1, Dummy1]
     """)
@@ -699,5 +649,3 @@ class SplitTests {
     illTyped("""
     Split1[CCons1, Dummy1, Dummy1]
     """)
-  }
-}

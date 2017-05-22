@@ -1,17 +1,16 @@
 import scala.tools.partest._
 
-object Test extends DirectTest {
+object Test extends DirectTest
   override def code = ""
   lazy val global = newCompiler("-usejavacp")
   import global._, definitions._
 
-  override def show() {
+  override def show()
     new global.Run()
     // Once we plug all of the view gaps, the output should be empty!
     checkViews()
-  }
 
-  def isExempt(sym: Symbol) = {
+  def isExempt(sym: Symbol) =
     val exempt = Set("view",
                      "repr",
                      "sliceWithKnownDelta",
@@ -19,9 +18,8 @@ object Test extends DirectTest {
                      "transform",
                      "filterImpl")
     (exempt contains sym.name.decoded)
-  }
 
-  def checkView(viewType: Type, viewLikeType: Type) {
+  def checkView(viewType: Type, viewLikeType: Type)
     val sep = "=" * 70
     println(s"\n$sep\nChecking ${viewType.typeSymbol.fullName}\n$sep")
     val termMembers =
@@ -34,17 +32,15 @@ object Test extends DirectTest {
     val needOverride =
       inheritedFromGenericCollection filterNot isExempt filter returnsView
 
-    val grouped = needOverride.groupBy(_.owner).toSeq.sortBy {
+    val grouped = needOverride.groupBy(_.owner).toSeq.sortBy
       case (owner, _) => viewType baseTypeIndex owner
-    }
-    val report = grouped.map {
+    val report = grouped.map
       case (owner, syms) =>
         s"\n$owner\n${"-" * 70}\n${syms.map(_.defString).sorted.mkString("\n")}"
-    }.mkString("\n")
+    .mkString("\n")
     println(report)
-  }
 
-  def checkViews() {
+  def checkViews()
     import collection._
     checkView(
         typeOf[TraversableView[_, _]], typeOf[TraversableViewLike[_, _, _]])
@@ -55,5 +51,3 @@ object Test extends DirectTest {
     checkView(typeOf[immutable.StreamView[_, _]],
               typeOf[immutable.StreamViewLike[_, _, _]])
     // Parallel views not checked, assuming we will drop them in 2.11
-  }
-}

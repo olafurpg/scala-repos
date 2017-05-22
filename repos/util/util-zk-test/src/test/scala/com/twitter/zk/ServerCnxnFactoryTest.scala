@@ -9,23 +9,21 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ServerCnxnFactoryTest extends FunSuite with BeforeAndAfter {
+class ServerCnxnFactoryTest extends FunSuite with BeforeAndAfter
   val addr = InetAddress.getLocalHost
 
   var testServer: ZooKeeperServer = null
   var tmpDir: File = null
 
-  before {
+  before
     tmpDir = FileUtils.createTempDir()
     testServer = new ZooKeeperServer(
         tmpDir, tmpDir, ZooKeeperServer.DEFAULT_TICK_TIME)
-  }
 
-  after {
+  after
     tmpDir.delete()
-  }
 
-  test("ServerCnxnFactory returns valid Factory") {
+  test("ServerCnxnFactory returns valid Factory")
     val factory = ServerCnxnFactory(addr)
     val boundPort = factory.getLocalPort
 
@@ -34,5 +32,3 @@ class ServerCnxnFactoryTest extends FunSuite with BeforeAndAfter {
 
     factory.shutdown()
     assert(testServer.isRunning == false)
-  }
-}

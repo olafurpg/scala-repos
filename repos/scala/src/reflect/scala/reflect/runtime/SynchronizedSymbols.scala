@@ -5,7 +5,7 @@ package runtime
 import scala.collection.immutable
 import scala.reflect.internal.Flags._
 
-private[reflect] trait SynchronizedSymbols extends internal.Symbols {
+private[reflect] trait SynchronizedSymbols extends internal.Symbols
   self: SymbolTable =>
 
   private lazy val atomicIds = new java.util.concurrent.atomic.AtomicInteger(0)
@@ -43,7 +43,7 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
   override protected def makeNoSymbol: NoSymbol =
     new NoSymbol with SynchronizedSymbol
 
-  trait SynchronizedSymbol extends Symbol {
+  trait SynchronizedSymbol extends Symbol
 
     /** (Things written in this comment only applies to runtime reflection. Compile-time reflection,
       *  especially across phases and runs, is somewhat more complicated, but we won't be touching it,
@@ -98,13 +98,12 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
       *  I'm only considering TopLevelPickledFlags to be sources of potential initialization. This ensures that such system flags as
       *  isMethod, isModule or isPackage are never going to auto-initialize.
       */
-    override def isThreadsafe(purpose: SymbolOps) = {
+    override def isThreadsafe(purpose: SymbolOps) =
       if (isCompilerUniverse) false
       else if (_initialized) true
       else
         purpose.isFlagRelated &&
         (_initializationMask & purpose.mask & TopLevelPickledFlags) == 0
-    }
 
     /** Communicates with completers declared in scala.reflect.runtime.SymbolLoaders
       *  about the status of initialization of the underlying symbol.
@@ -129,53 +128,43 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
       */
     @volatile private[this] var _initialized = false
     @volatile private[this] var _initializationMask = TopLevelPickledFlags
-    override def markFlagsCompleted(mask: Long): this.type = {
+    override def markFlagsCompleted(mask: Long): this.type =
       _initializationMask = _initializationMask & ~mask; this
-    }
-    override def markAllCompleted(): this.type = {
+    override def markAllCompleted(): this.type =
       _initializationMask = 0L; _initialized = true; this
-    }
 
-    def gilSynchronizedIfNotThreadsafe[T](body: => T): T = {
+    def gilSynchronizedIfNotThreadsafe[T](body: => T): T =
       // TODO: debug and fix the race that doesn't allow us uncomment this optimization
       // if (isCompilerUniverse || isThreadsafe(purpose = AllOps)) body
       // else gilSynchronized { body }
       gilSynchronized { body }
-    }
 
     override def validTo = gilSynchronizedIfNotThreadsafe { super.validTo }
     override def info = gilSynchronizedIfNotThreadsafe { super.info }
-    override def rawInfo: Type = gilSynchronizedIfNotThreadsafe {
+    override def rawInfo: Type = gilSynchronizedIfNotThreadsafe
       super.rawInfo
-    }
-    override def typeSignature: Type = gilSynchronizedIfNotThreadsafe {
+    override def typeSignature: Type = gilSynchronizedIfNotThreadsafe
       super.typeSignature
-    }
     override def typeSignatureIn(site: Type): Type =
       gilSynchronizedIfNotThreadsafe { super.typeSignatureIn(site) }
 
-    override def typeParams: List[Symbol] = gilSynchronizedIfNotThreadsafe {
+    override def typeParams: List[Symbol] = gilSynchronizedIfNotThreadsafe
       if (isCompilerUniverse) super.typeParams
-      else {
+      else
         if (isMonomorphicType) Nil
-        else {
+        else
           // analogously to the "info" getter, here we allow for two completions:
           //   one: sourceCompleter to LazyType, two: LazyType to completed type
           if (validTo == NoPeriod) rawInfo load this
           if (validTo == NoPeriod) rawInfo load this
 
           rawInfo.typeParams
-        }
-      }
-    }
     override def unsafeTypeParams: List[Symbol] =
-      gilSynchronizedIfNotThreadsafe {
+      gilSynchronizedIfNotThreadsafe
         if (isCompilerUniverse) super.unsafeTypeParams
-        else {
+        else
           if (isMonomorphicType) Nil
           else rawInfo.typeParams
-        }
-      }
 
 // ------ creators -------------------------------------------------------------------
 
@@ -244,37 +233,31 @@ private[reflect] trait SynchronizedSymbols extends internal.Symbols {
         name: TermName, pos: Position, newFlags: Long) =
       new TermSymbol(this, pos, name)
       with SynchronizedTermSymbol initFlags newFlags
-  }
 
 // ------- subclasses ---------------------------------------------------------------------
 
   trait SynchronizedTermSymbol extends SynchronizedSymbol
 
   trait SynchronizedMethodSymbol
-      extends MethodSymbol with SynchronizedTermSymbol {
+      extends MethodSymbol with SynchronizedTermSymbol
     // we can keep this lock fine-grained, because it's just a cache over asSeenFrom, which makes deadlocks impossible
     // unfortunately we cannot elide this lock, because the cache depends on `pre`
     private lazy val typeAsMemberOfLock = new Object
     override def typeAsMemberOf(pre: Type): Type =
-      gilSynchronizedIfNotThreadsafe {
+      gilSynchronizedIfNotThreadsafe
         typeAsMemberOfLock.synchronized { super.typeAsMemberOf(pre) }
-      }
-  }
 
   trait SynchronizedModuleSymbol
       extends ModuleSymbol with SynchronizedTermSymbol
 
-  trait SynchronizedTypeSymbol extends TypeSymbol with SynchronizedSymbol {
+  trait SynchronizedTypeSymbol extends TypeSymbol with SynchronizedSymbol
     // unlike with typeConstructor, a lock is necessary here, because tpe calculation relies on
     // temporarily assigning NoType to tpeCache to detect cyclic reference errors
     private lazy val tpeLock = new Object
-    override def tpe_* : Type = gilSynchronizedIfNotThreadsafe {
+    override def tpe_* : Type = gilSynchronizedIfNotThreadsafe
       tpeLock.synchronized { super.tpe_* }
-    }
-  }
 
   trait SynchronizedClassSymbol extends ClassSymbol with SynchronizedTypeSymbol
 
   trait SynchronizedModuleClassSymbol
       extends ModuleClassSymbol with SynchronizedClassSymbol
-}

@@ -24,8 +24,8 @@ import org.apache.hadoop.hbase.mapreduce.TableInputFormat
 
 import org.apache.spark._
 
-object HBaseTest {
-  def main(args: Array[String]) {
+object HBaseTest
+  def main(args: Array[String])
     val sparkConf = new SparkConf().setAppName("HBaseTest")
     val sc = new SparkContext(sparkConf)
 
@@ -36,10 +36,9 @@ object HBaseTest {
 
     val conf = HBaseConfiguration.create()
 
-    if (args.length < 1) {
+    if (args.length < 1)
       System.err.println("Usage: HBaseTest <table_name>")
       System.exit(1)
-    }
 
     // Other options for configuring scan behavior are available. More information available at
     // http://hbase.apache.org/apidocs/org/apache/hadoop/hbase/mapreduce/TableInputFormat.html
@@ -47,10 +46,9 @@ object HBaseTest {
 
     // Initialize hBase table if necessary
     val admin = new HBaseAdmin(conf)
-    if (!admin.isTableAvailable(args(0))) {
+    if (!admin.isTableAvailable(args(0)))
       val tableDesc = new HTableDescriptor(TableName.valueOf(args(0)))
       admin.createTable(tableDesc)
-    }
 
     val hBaseRDD = sc.newAPIHadoopRDD(
         conf,
@@ -62,6 +60,4 @@ object HBaseTest {
 
     sc.stop()
     admin.close()
-  }
-}
 // scalastyle:on println

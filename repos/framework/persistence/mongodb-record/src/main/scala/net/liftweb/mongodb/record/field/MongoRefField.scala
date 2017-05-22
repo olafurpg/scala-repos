@@ -38,7 +38,7 @@ import net.liftweb.record.field._
  * options by overriding the options method.
  */
 trait MongoRefField[RefType <: MongoRecord[RefType], MyType]
-    extends TypedField[MyType] {
+    extends TypedField[MyType]
 
   /** The MongoMetaRecord of the referenced object **/
   def refMeta: MongoMetaRecord[RefType]
@@ -51,28 +51,24 @@ trait MongoRefField[RefType <: MongoRecord[RefType], MyType]
   /**
     * Get the cacheable referenced object
     */
-  def obj = synchronized {
-    if (!_calcedObj) {
+  def obj = synchronized
+    if (!_calcedObj)
       _calcedObj = true
       this._obj = find
-    }
     _obj
-  }
 
   def cached_? : Boolean = synchronized { _calcedObj }
 
-  def primeObj(obj: Box[RefType]) = synchronized {
+  def primeObj(obj: Box[RefType]) = synchronized
     _obj = obj
     _calcedObj = true
-  }
 
   private var _obj: Box[RefType] = Empty
   private var _calcedObj = false
 
-  override def setBox(in: Box[MyType]): Box[MyType] = synchronized {
+  override def setBox(in: Box[MyType]): Box[MyType] = synchronized
     _calcedObj = false // invalidate the cache
     super.setBox(in)
-  }
 
   /** Options for select list **/
   def options: List[(Box[MyType], String)] = Nil
@@ -80,9 +76,8 @@ trait MongoRefField[RefType <: MongoRecord[RefType], MyType]
   /** Label for the selection item representing Empty, show when this field is optional. Defaults to the empty string. */
   def emptyOptionLabel: String = ""
 
-  def buildDisplayList: List[(Box[MyType], String)] = {
+  def buildDisplayList: List[(Box[MyType], String)] =
     if (optional_?) (Empty, emptyOptionLabel) :: options else options
-  }
 
   private def elem =
     SHtml.selectObj[Box[MyType]](
@@ -93,11 +88,10 @@ trait MongoRefField[RefType <: MongoRecord[RefType], MyType]
 
   override def toForm =
     if (options.length > 0)
-      uniqueFieldId match {
+      uniqueFieldId match
         case Full(id) => Full(elem % ("id" -> id))
         case _ => Full(elem)
-      } else Empty
-}
+      else Empty
 
 class ObjectIdRefField[
     OwnerType <: BsonRecord[OwnerType], RefType <: MongoRecord[RefType]](

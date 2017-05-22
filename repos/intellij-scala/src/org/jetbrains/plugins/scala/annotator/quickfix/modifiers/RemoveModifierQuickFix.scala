@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
   * Date: 23.10.2008
   */
 class RemoveModifierQuickFix(method: ScModifierListOwner, modifier: String)
-    extends IntentionAction {
+    extends IntentionAction
   def getText: String = ScalaBundle.message("remove.modifier.fix", modifier)
 
   def startInWriteAction: Boolean = true
@@ -22,7 +22,7 @@ class RemoveModifierQuickFix(method: ScModifierListOwner, modifier: String)
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     method.isValid && method.getManager.isInProject(file)
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     method.setModifierProperty(modifier, value = false)
     //Should be handled by autoformatting
     CodeStyleManager
@@ -30,8 +30,6 @@ class RemoveModifierQuickFix(method: ScModifierListOwner, modifier: String)
       .reformatText(method.getContainingFile,
                     method.getModifierList.getTextRange.getStartOffset,
                     method.getModifierList.getTextRange.getEndOffset)
-  }
 
   def getFamilyName: String =
     ScalaBundle.message("remove.modifier.fix", modifier)
-}

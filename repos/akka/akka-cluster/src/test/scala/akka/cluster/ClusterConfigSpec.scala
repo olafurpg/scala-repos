@@ -12,11 +12,11 @@ import akka.util.Helpers.ConfigOps
 import akka.actor.Address
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ClusterConfigSpec extends AkkaSpec {
+class ClusterConfigSpec extends AkkaSpec
 
-  "Clustering" must {
+  "Clustering" must
 
-    "be able to parse generic cluster config elements" in {
+    "be able to parse generic cluster config elements" in
       val settings = new ClusterSettings(system.settings.config, system.name)
       import settings._
       LogInfo should ===(true)
@@ -57,6 +57,3 @@ class ClusterConfigSpec extends AkkaSpec {
       MetricsInterval should ===(3 seconds)
       MetricsGossipInterval should ===(3 seconds)
       MetricsMovingAverageHalfLife should ===(12 seconds)
-    }
-  }
-}

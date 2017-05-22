@@ -1,10 +1,8 @@
-object SCL8079 {
-  trait F {
+object SCL8079
+  trait F
     type R
-  }
-  class U extends F {
+  class U extends F
     type R = Int
-  }
   class R[T]
   class Q[T, E, C[_]] extends R[C[E]]
   class TQ[T <: F] extends Q[T, T#R, scala.Seq]
@@ -16,5 +14,4 @@ object SCL8079 {
 
   /*start*/
   foo(users) /*end*/
-}
 //Int

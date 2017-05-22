@@ -11,11 +11,11 @@ class CapacityLimitSpec extends AkkaSpec("""
     akka.loglevel = ERROR
     akka.io.tcp.max-channels = 4
     akka.actor.serialize-creators = on
-    """) with TcpIntegrationSpecSupport {
+    """) with TcpIntegrationSpecSupport
 
-  "The TCP transport implementation" should {
+  "The TCP transport implementation" should
 
-    "reply with CommandFailed to a Bind or Connect command if max-channels capacity has been reached" in new TestSetup {
+    "reply with CommandFailed to a Bind or Connect command if max-channels capacity has been reached" in new TestSetup
       establishNewClientConnection()
 
       // we now have three channels registered: a listener, a server connection and a client connection
@@ -36,6 +36,3 @@ class CapacityLimitSpec extends AkkaSpec("""
       commander.send(IO(Tcp), connectToFail)
       commander.expectMsgType[CommandFailed].cmd should be theSameInstanceAs
       (connectToFail)
-    }
-  }
-}

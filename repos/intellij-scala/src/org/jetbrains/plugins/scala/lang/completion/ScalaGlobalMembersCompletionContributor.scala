@@ -33,24 +33,24 @@ import scala.collection.mutable
   * @author Alexander Podkhalyuzin
   */
 class ScalaGlobalMembersCompletionContributor
-    extends ScalaCompletionContributor {
+    extends ScalaCompletionContributor
   extend(CompletionType.BASIC,
          psiElement,
-         new CompletionProvider[CompletionParameters]() {
+         new CompletionProvider[CompletionParameters]()
            def addCompletions(parameters: CompletionParameters,
                               context: ProcessingContext,
-                              result: CompletionResultSet) {
+                              result: CompletionResultSet)
              if (parameters.getInvocationCount < 2) return
              val position: PsiElement = positionFromParameters(parameters)
              if (!ScalaPsiUtil.fileContext(position).isInstanceOf[ScalaFile])
                return
              val parent: PsiElement = position.getContext
-             parent match {
+             parent match
                case ref: ScReferenceExpression =>
-                 val qualifier = ref.qualifier match {
+                 val qualifier = ref.qualifier match
                    case Some(qual) => qual
                    case None =>
-                     ref.getContext match {
+                     ref.getContext match
                        case inf: ScInfixExpr if inf.operation == ref =>
                          inf.getBaseExpr
                        case posf: ScPostfixExpr if posf.operation == ref =>
@@ -64,86 +64,71 @@ class ScalaGlobalMembersCompletionContributor
                                   parameters.getOriginalFile,
                                   parameters.getInvocationCount)
                          return
-                     }
-                 }
                  val typeWithoutImplicits = qualifier.getTypeWithoutImplicits()
                  if (typeWithoutImplicits.isEmpty) return
                  val tp = typeWithoutImplicits.get
                  completeImplicits(ref, result, parameters.getOriginalFile, tp)
                case _ =>
-             }
-           }
-         })
+         )
 
-  private def isStatic(member: PsiNamedElement): Boolean = {
-    ScalaPsiUtil.nameContext(member) match {
+  private def isStatic(member: PsiNamedElement): Boolean =
+    ScalaPsiUtil.nameContext(member) match
       case memb: PsiMember =>
         isStatic(member, memb.containingClass)
-    }
-  }
 
   private def isStatic(
-      member: PsiNamedElement, containingClass: PsiClass): Boolean = {
-    ScalaPsiUtil.nameContext(member) match {
+      member: PsiNamedElement, containingClass: PsiClass): Boolean =
+    ScalaPsiUtil.nameContext(member) match
       case memb: PsiMember =>
         if (containingClass == null) return false
         val qualifiedName = containingClass.qualifiedName + "." + member.name
-        for (excluded <- CodeInsightSettings.getInstance.EXCLUDED_PACKAGES) {
+        for (excluded <- CodeInsightSettings.getInstance.EXCLUDED_PACKAGES)
           if (qualifiedName == excluded ||
-              qualifiedName.startsWith(excluded + ".")) {
+              qualifiedName.startsWith(excluded + "."))
             return false
-          }
-        }
-        containingClass match {
+        containingClass match
           case o: ScObject if o.isStatic =>
             // filter out type class instances, such as scala.math.Numeric.String, to avoid too many results.
             !o.hasModifierProperty("implicit")
           case _: ScTypeDefinition => false
           case _ => memb.hasModifierProperty("static")
-        }
-    }
-  }
 
   private def completeImplicits(ref: ScReferenceExpression,
                                 result: CompletionResultSet,
                                 originalFile: PsiFile,
-                                originalType: ScType) {
+                                originalType: ScType)
     FeatureUsageTracker.getInstance.triggerFeatureUsed(
         JavaCompletionFeatures.GLOBAL_MEMBER_NAME)
     val scope: GlobalSearchScope = ref.getResolveScope
     val file = ref.getContainingFile
 
     val elemsSet = new mutable.HashSet[PsiNamedElement]
-    def addElemToSet(elem: PsiNamedElement) {
+    def addElemToSet(elem: PsiNamedElement)
       elemsSet += elem
-    }
 
-    def elemsSetContains(elem: PsiNamedElement): Boolean = {
-      if (elem.getContainingFile == originalFile) {
+    def elemsSetContains(elem: PsiNamedElement): Boolean =
+      if (elem.getContainingFile == originalFile)
         //complex logic to detect static methods in same file, which we shouldn't import
         val name = elem.name
-        val containingClass = ScalaPsiUtil.nameContext(elem) match {
+        val containingClass = ScalaPsiUtil.nameContext(elem) match
           case member: PsiMember => member.containingClass
           case _ => null
-        }
         if (containingClass == null) return false
         val qualName = containingClass.qualifiedName
         if (qualName == null) return false
-        for {
+        for
           element <- elemsSet if element.name == name
                     if element.getContainingFile == file
-          cClass = ScalaPsiUtil.nameContext(element) match {
+          cClass = ScalaPsiUtil.nameContext(element) match
             case member: PsiMember => member.containingClass
             case _ => null
-          } if cClass != null
+          if cClass != null
           if cClass.qualifiedName != null
           if cClass.qualifiedName == qualName
-        } {
+        
           return true
-        }
         false
-      } else elemsSet.contains(elem)
-    }
+      else elemsSet.contains(elem)
 
     val collection = StubIndex.getElements(ScalaIndexKeys.IMPLICITS_KEY,
                                            "implicit",
@@ -155,40 +140,35 @@ class ScalaGlobalMembersCompletionContributor
 
     val convertible = new ScImplicitlyConvertible(ref)
     val proc = new convertible.CollectImplicitsProcessor(true)
-    for (element <- collection) {
-      element match {
+    for (element <- collection)
+      element match
         case v: ScValue =>
-          for (d <- v.declaredElements if isStatic(d)) {
+          for (d <- v.declaredElements if isStatic(d))
             proc.execute(d, ResolveState.initial())
-          }
         case f: ScFunction if isStatic(f) =>
           proc.execute(element, ResolveState.initial())
         case c: ScClass if isStatic(c) =>
-          c.getSyntheticImplicitMethod match {
+          c.getSyntheticImplicitMethod match
             case Some(f: ScFunction) =>
               proc.execute(f, ResolveState.initial())
             case _ =>
-          }
         case _ =>
-      }
-    }
     val candidates = proc.candidates.map(convertible.forMap(_, originalType))
 
     ref
       .getVariants(implicits = false, filterNotNamedVariants = false)
-      .foreach {
+      .foreach
         case ScalaLookupItem(elem: PsiNamedElement) => addElemToSet(elem)
         case elem: PsiNamedElement => addElemToSet(elem)
-      }
 
     val iterator = candidates.iterator
-    while (iterator.hasNext) {
+    while (iterator.hasNext)
       val next = iterator.next()
-      if (next.condition) {
+      if (next.condition)
         val retTp = next.rt
         val c = new CompletionProcessor(StdKinds.methodRef, ref)
         c.processType(retTp, ref)
-        for (elem <- c.candidates) {
+        for (elem <- c.candidates)
           val shouldImport = !elemsSetContains(elem.getElement)
           //todo: overloads?
           val lookup: ScalaLookupItem = LookupElementManager
@@ -201,15 +181,11 @@ class ScalaGlobalMembersCompletionContributor
           lookup.usedImportStaticQuickfix = true
           lookup.elementToImport = next.resolveResult.getElement
           result.addElement(lookup)
-        }
-      }
-    }
-  }
 
   private def complete(ref: ScReferenceExpression,
                        result: CompletionResultSet,
                        originalFile: PsiFile,
-                       invocationCount: Int) {
+                       invocationCount: Int)
     FeatureUsageTracker.getInstance.triggerFeatureUsed(
         JavaCompletionFeatures.GLOBAL_MEMBER_NAME)
     val matcher: PrefixMatcher = result.getPrefixMatcher
@@ -217,109 +193,98 @@ class ScalaGlobalMembersCompletionContributor
     val file = ref.getContainingFile
 
     var hintShown: Boolean = false
-    def showHint(shouldImport: Boolean) {
+    def showHint(shouldImport: Boolean)
       if (!hintShown && !shouldImport &&
-          CompletionService.getCompletionService.getAdvertisementText == null) {
+          CompletionService.getCompletionService.getAdvertisementText == null)
         val actionId = IdeActions.ACTION_SHOW_INTENTION_ACTIONS
         val shortcut: String = KeymapUtil.getFirstKeyboardShortcutText(
             ActionManager.getInstance.getAction(actionId))
-        if (shortcut != null) {
+        if (shortcut != null)
           result.addLookupAdvertisement(
               s"To import a method statically, press $shortcut")
-        }
         hintShown = true
-      }
-    }
 
     val elemsSet = new mutable.HashSet[PsiNamedElement]
-    def addElemToSet(elem: PsiNamedElement) {
+    def addElemToSet(elem: PsiNamedElement)
       elemsSet += elem
-    }
 
-    def elemsSetContains(elem: PsiNamedElement): Boolean = {
-      if (elem.getContainingFile == originalFile) {
+    def elemsSetContains(elem: PsiNamedElement): Boolean =
+      if (elem.getContainingFile == originalFile)
         //complex logic to detect static methods in same file, which we shouldn't import
         val name = elem.name
-        val containingClass = ScalaPsiUtil.nameContext(elem) match {
+        val containingClass = ScalaPsiUtil.nameContext(elem) match
           case member: PsiMember => member.containingClass
           case _ => null
-        }
         if (containingClass == null) return false
         val qualName = containingClass.qualifiedName
         if (qualName == null) return false
-        for {
+        for
           element <- elemsSet if element.name == name
                     if element.getContainingFile == file
-          cClass = ScalaPsiUtil.nameContext(element) match {
+          cClass = ScalaPsiUtil.nameContext(element) match
             case member: PsiMember => member.containingClass
             case _ => null
-          } if cClass != null
+          if cClass != null
           if cClass.qualifiedName != null
           if cClass.qualifiedName == qualName
-        } {
+        
           return true
-        }
         false
-      } else elemsSet.contains(elem)
-    }
+      else elemsSet.contains(elem)
 
     ref
       .getVariants(implicits = false, filterNotNamedVariants = false)
-      .foreach {
+      .foreach
         case ScalaLookupItem(elem) => addElemToSet(elem)
         case elem: PsiNamedElement => addElemToSet(elem)
-      }
 
     val namesCache = ScalaShortNamesCacheManager.getInstance(ref.getProject)
 
     val methodNamesIterator =
       namesCache.getAllMethodNames.iterator ++ namesCache.getAllJavaMethodNames.iterator
 
-    def isAccessible(member: PsiMember, containingClass: PsiClass): Boolean = {
+    def isAccessible(member: PsiMember, containingClass: PsiClass): Boolean =
       invocationCount >= 3 ||
       (ResolveUtils.isAccessible(member, ref, forCompletion = true) &&
           ResolveUtils.isAccessible(
               containingClass, ref, forCompletion = true))
-    }
 
-    while (methodNamesIterator.hasNext) {
+    while (methodNamesIterator.hasNext)
       val methodName = methodNamesIterator.next()
-      if (matcher.prefixMatches(methodName)) {
+      if (matcher.prefixMatches(methodName))
         val classes = new THashSet[PsiClass]
         val methodsIterator =
           namesCache.getMethodsByName(methodName, scope).iterator
-        while (methodsIterator.hasNext) {
+        while (methodsIterator.hasNext)
           val method = methodsIterator.next()
           val cClass = method.containingClass
-          if (cClass != null) {
-            val inheritors: Array[PsiClass] = {
+          if (cClass != null)
+            val inheritors: Array[PsiClass] =
               if (method.isInstanceOf[ScFunction])
                 ClassInheritorsSearch
                   .search(cClass, scope, true)
                   .toArray(PsiClass.EMPTY_ARRAY)
               else Array.empty
-            }
             val currentAndInheritors = Iterator(cClass) ++ inheritors.iterator
-            for {
+            for
               containingClass <- currentAndInheritors if isStatic(
                                     method, containingClass)
-            } {
+            
               assert(containingClass != null)
               if (classes.add(containingClass) &&
-                  isAccessible(method, containingClass)) {
+                  isAccessible(method, containingClass))
                 val shouldImport = !elemsSetContains(method)
                 showHint(shouldImport)
 
-                val overloads = containingClass match {
+                val overloads = containingClass match
                   case o: ScObject => o.functionsByName(methodName)
                   case _ =>
                     containingClass.getAllMethods.toSeq
                       .filter(m => m.name == methodName)
-                }
-                if (overloads.size == 1) {
+                if (overloads.size == 1)
                   result.addElement(createLookupElement(
                           method, containingClass, shouldImport))
-                } else if (overloads.size > 1) {
+                else if (overloads.size > 1)
                   val lookup = createLookupElement(
                       if (overloads.head.getParameterList.getParametersCount == 0)
                         overloads(1)
@@ -328,89 +293,69 @@ class ScalaGlobalMembersCompletionContributor
                       shouldImport,
                       overloaded = true)
                   result.addElement(lookup)
-                }
-              }
-            }
-          }
-        }
-      }
-    }
 
     val fieldNamesIterator = namesCache.getAllFieldNames.iterator
 
-    while (fieldNamesIterator.hasNext) {
+    while (fieldNamesIterator.hasNext)
       val fieldName = fieldNamesIterator.next()
-      if (matcher.prefixMatches(fieldName)) {
+      if (matcher.prefixMatches(fieldName))
         val fieldsIterator =
           namesCache.getFieldsByName(fieldName, scope).iterator
-        while (fieldsIterator.hasNext) {
+        while (fieldsIterator.hasNext)
           val field = fieldsIterator.next()
-          if (isStatic(field)) {
+          if (isStatic(field))
             val containingClass: PsiClass = field.containingClass
             assert(containingClass != null)
-            if (isAccessible(field, containingClass)) {
+            if (isAccessible(field, containingClass))
               val shouldImport = !elemsSetContains(field)
               showHint(shouldImport)
 
               result.addElement(
                   createLookupElement(field, containingClass, shouldImport))
-            }
-          }
-        }
-      }
-    }
 
     val scalaFieldsIterator = ScalaShortNamesCacheManager
       .getInstance(ref.getProject)
       .getAllScalaFieldNames
       .iterator
 
-    while (scalaFieldsIterator.hasNext) {
+    while (scalaFieldsIterator.hasNext)
       val fieldName = scalaFieldsIterator.next()
-      if (matcher.prefixMatches(fieldName)) {
+      if (matcher.prefixMatches(fieldName))
         val fieldsIterator = ScalaShortNamesCacheManager
           .getInstance(ref.getProject)
           .getScalaFieldsByName(fieldName, scope)
           .iterator
-        while (fieldsIterator.hasNext) {
+        while (fieldsIterator.hasNext)
           val field = fieldsIterator.next()
-          val namedElement = field match {
+          val namedElement = field match
             case v: ScValue =>
               v.declaredElements.find(_.name == fieldName).orNull
             case v: ScVariable =>
               v.declaredElements.find(_.name == fieldName).orNull
-          }
-          if (field.containingClass != null) {
+          if (field.containingClass != null)
             val inheritors = ClassInheritorsSearch
               .search(field.containingClass, scope, true)
               .toArray(PsiClass.EMPTY_ARRAY)
             val currentAndInheritors =
               Iterator(field.containingClass) ++ inheritors.iterator
-            for {
+            for
               containingClass <- currentAndInheritors
                                     if namedElement != null &&
                                 isStatic(namedElement, containingClass)
-            } {
+            
               assert(containingClass != null)
-              if (isAccessible(field, containingClass)) {
+              if (isAccessible(field, containingClass))
                 val shouldImport = !elemsSetContains(namedElement)
                 showHint(shouldImport)
 
                 result.addElement(createLookupElement(
                         namedElement, containingClass, shouldImport))
-              }
-            }
-          }
-        }
-      }
-    }
-  }
 
   private def createLookupElement(
       member: PsiNamedElement,
       clazz: PsiClass,
       shouldImport: Boolean,
-      overloaded: Boolean = false): LookupElement = {
+      overloaded: Boolean = false): LookupElement =
     LookupElementManager
       .getLookupElement(new ScalaResolveResult(member),
                         isClassName = true,
@@ -419,5 +364,3 @@ class ScalaGlobalMembersCompletionContributor
                         isInStableCodeReference = false,
                         containingClass = Some(clazz))
       .head
-  }
-}

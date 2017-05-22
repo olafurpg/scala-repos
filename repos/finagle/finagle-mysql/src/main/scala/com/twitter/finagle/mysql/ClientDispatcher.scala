@@ -16,10 +16,9 @@ case class ServerError(code: Short, sqlState: String, message: String)
     extends Exception(message)
 
 case class LostSyncException(underlying: Throwable)
-    extends RuntimeException(underlying) {
+    extends RuntimeException(underlying)
   override def getMessage = underlying.toString
   override def getStackTrace = underlying.getStackTrace
-}
 
 /**
   * Caches statements that have been successfully prepared over the connection
@@ -32,19 +31,16 @@ private[mysql] class PrepareCache(
     svc: Service[Request, Result],
     max: Int = 20
 )
-    extends ServiceProxy[Request, Result](svc) {
+    extends ServiceProxy[Request, Result](svc)
 
-  private[this] val fn = {
-    val listener = new RemovalListener[Request, Future[Result]] {
+  private[this] val fn =
+    val listener = new RemovalListener[Request, Future[Result]]
       // make sure prepared futures get removed eventually
       def onRemoval(
-          notification: RemovalNotification[Request, Future[Result]]): Unit = {
-        notification.getValue() onSuccess {
+          notification: RemovalNotification[Request, Future[Result]]): Unit =
+        notification.getValue() onSuccess
           case r: PrepareOK => svc(CloseRequest(r.id))
           case _ => // nop
-        }
-      }
-    }
     val underlying = CacheBuilder
       .newBuilder()
       .maximumSize(max)
@@ -52,25 +48,21 @@ private[mysql] class PrepareCache(
       .build[Request, Future[Result]]()
 
     GuavaCache.fromCache(svc, underlying)
-  }
 
   /**
     * Populate cache with unique prepare requests identified by their
     * sql queries.
     */
-  override def apply(req: Request): Future[Result] = req match {
+  override def apply(req: Request): Future[Result] = req match
     case _: PrepareRequest => fn(req)
     case _ => super.apply(req)
-  }
-}
 
-object ClientDispatcher {
+object ClientDispatcher
   private val cancelledRequestExc = new CancelledRequestException
   private val lostSyncExc = new LostSyncException(new Throwable)
   private val emptyTx = (Nil, EOF(0: Short, 0: Short))
-  private val wrapWriteException: PartialFunction[Throwable, Future[Nothing]] = {
+  private val wrapWriteException: PartialFunction[Throwable, Future[Nothing]] =
     case exc: Throwable => Future.exception(WriteException(exc))
-  }
 
   /**
     * Creates a mysql client dispatcher with write-through caches for optimization.
@@ -81,9 +73,8 @@ object ClientDispatcher {
   def apply(
       trans: Transport[Packet, Packet],
       handshake: HandshakeInit => Try[HandshakeResponse]
-  ): Service[Request, Result] = {
+  ): Service[Request, Result] =
     new PrepareCache(new ClientDispatcher(trans, handshake))
-  }
 
   /**
     * Wrap a Try[T] into a Future[T]. This is useful for
@@ -93,7 +84,6 @@ object ClientDispatcher {
     */
   private def const[T](result: Try[T]): Future[T] =
     Future.const(result rescue { case exc => Throw(LostSyncException(exc)) })
-}
 
 /**
   * A ClientDispatcher that implements the mysql client/server protocol.
@@ -107,19 +97,18 @@ class ClientDispatcher(
     trans: Transport[Packet, Packet],
     handshake: HandshakeInit => Try[HandshakeResponse]
 )
-    extends GenSerialClientDispatcher[Request, Result, Packet, Packet](trans) {
+    extends GenSerialClientDispatcher[Request, Result, Packet, Packet](trans)
   import ClientDispatcher._
 
   override def apply(req: Request): Future[Result] =
-    connPhase flatMap { _ =>
+    connPhase flatMap  _ =>
       super.apply(req)
-    } onFailure {
+    onFailure
       // a LostSyncException represents a fatal state between
       // the client / server. The error is unrecoverable
       // so we close the service.
       case e @ LostSyncException(_) => close()
       case _ =>
-    }
 
   /**
     * Performs the connection phase. The phase should only be performed
@@ -128,17 +117,14 @@ class ClientDispatcher(
     * [[http://dev.mysql.com/doc/internals/en/connection-phase.html]]
     */
   private[this] val connPhase: Future[Result] =
-    trans.read() flatMap { packet =>
-      const(HandshakeInit(packet)) flatMap { init =>
-        const(handshake(init)) flatMap { req =>
+    trans.read() flatMap  packet =>
+      const(HandshakeInit(packet)) flatMap  init =>
+        const(handshake(init)) flatMap  req =>
           val rep = new Promise[Result]
           dispatch(req, rep)
           rep
-        }
-      }
-    } onFailure { _ =>
+    onFailure  _ =>
       close()
-    }
 
   /**
     * Returns a Future that represents the result of an exchange
@@ -148,21 +134,19 @@ class ClientDispatcher(
     * This leaves room for implementing streaming results.
     */
   protected def dispatch(req: Request, rep: Promise[Result]): Future[Unit] =
-    trans.write(req.toPacket) rescue {
+    trans.write(req.toPacket) rescue
       wrapWriteException
-    } before {
+    before
       val signal = new Promise[Unit]
-      if (req.cmd == Command.COM_STMT_CLOSE) {
+      if (req.cmd == Command.COM_STMT_CLOSE)
         // synthesize COM_STMT_CLOSE response
         signal.setDone()
         rep.updateIfEmpty(Return(CloseStatementOK))
         signal
-      } else
-        trans.read() flatMap { packet =>
+      else
+        trans.read() flatMap  packet =>
           rep.become(decodePacket(packet, req.cmd, signal))
           signal
-        }
-    }
 
   /**
     * Returns a Future[Result] representing the decoded
@@ -179,24 +163,24 @@ class ClientDispatcher(
       packet: Packet,
       cmd: Byte,
       signal: Promise[Unit]
-  ): Future[Result] = packet.body.headOption match {
+  ): Future[Result] = packet.body.headOption match
     case Some(Packet.OkByte) if cmd == Command.COM_STMT_PREPARE =>
       // decode PrepareOk Result: A header packet potentially followed
       // by two transmissions that contain parameter and column
       // information, respectively.
-      val result = for {
+      val result = for
         ok <- const(PrepareOK(packet))
         (seq1, _) <- readTx(ok.numOfParams)
         (seq2, _) <- readTx(ok.numOfCols)
         ps <- Future.collect(
-            seq1 map { p =>
+            seq1 map  p =>
           const(Field(p))
-        })
+        )
         cs <- Future.collect(
-            seq2 map { p =>
+            seq2 map  p =>
           const(Field(p))
-        })
-      } yield ok.copy(params = ps, columns = cs)
+        )
+      yield ok.copy(params = ps, columns = cs)
 
       result ensure signal.setDone()
 
@@ -208,25 +192,23 @@ class ClientDispatcher(
     // decode Error result
     case Some(Packet.ErrorByte) =>
       signal.setDone()
-      const(Error(packet)) flatMap { err =>
+      const(Error(packet)) flatMap  err =>
         val Error(code, state, msg) = err
         Future.exception(ServerError(code, state, msg))
-      }
 
     // decode ResultSet
     case Some(byte) =>
       val isBinaryEncoded = cmd != Command.COM_QUERY
-      val numCols = Try {
+      val numCols = Try
         val br = BufferReader(packet.body)
         br.readLengthCodedBinary().toInt
-      }
 
-      val result = for {
+      val result = for
         cnt <- const(numCols)
         (fields, _) <- readTx(cnt)
         (rows, _) <- readTx()
         res <- const(ResultSet(isBinaryEncoded)(packet, fields, rows))
-      } yield res
+      yield res
 
       // TODO: When streaming is implemented the
       // done signal should dependent on the
@@ -236,7 +218,6 @@ class ClientDispatcher(
     case _ =>
       signal.setDone()
       Future.exception(lostSyncExc)
-  }
 
   /**
     * Reads a transmission from the transport that is terminated by
@@ -250,28 +231,21 @@ class ClientDispatcher(
     * a Future encoded LostSyncException is returned.
     */
   private[this] def readTx(
-      limit: Int = Int.MaxValue): Future[(Seq[Packet], EOF)] = {
-    def aux(numRead: Int, xs: List[Packet]): Future[(List[Packet], EOF)] = {
+      limit: Int = Int.MaxValue): Future[(Seq[Packet], EOF)] =
+    def aux(numRead: Int, xs: List[Packet]): Future[(List[Packet], EOF)] =
       if (numRead > limit) Future.exception(lostSyncExc)
       else
-        trans.read() flatMap { packet =>
-          packet.body.headOption match {
+        trans.read() flatMap  packet =>
+          packet.body.headOption match
             case Some(Packet.EofByte) =>
-              const(EOF(packet)) map { eof =>
+              const(EOF(packet)) map  eof =>
                 (xs.reverse, eof)
-              }
             case Some(Packet.ErrorByte) =>
-              const(Error(packet)) flatMap { err =>
+              const(Error(packet)) flatMap  err =>
                 val Error(code, state, msg) = err
                 Future.exception(ServerError(code, state, msg))
-              }
             case Some(_) => aux(numRead + 1, packet :: xs)
             case None => Future.exception(lostSyncExc)
-          }
-        }
-    }
 
     if (limit <= 0) Future.value(emptyTx)
     else aux(0, Nil)
-  }
-}

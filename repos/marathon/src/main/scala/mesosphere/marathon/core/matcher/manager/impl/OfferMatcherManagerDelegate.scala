@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 
 import akka.pattern.ask
 
-private[matcher] object OfferMatcherManagerDelegate {
+private[matcher] object OfferMatcherManagerDelegate
   sealed trait ChangeMatchersRequest
   case class AddOrUpdateMatcher(consumer: OfferMatcher)
       extends ChangeMatchersRequest
@@ -24,29 +24,25 @@ private[matcher] object OfferMatcherManagerDelegate {
 
   case class SetTaskLaunchTokens(tokens: Int)
   case class AddTaskLaunchTokens(tokens: Int)
-}
 
 private[matcher] class OfferMatcherManagerDelegate(actorRef: ActorRef)
-    extends OfferMatcherManager {
+    extends OfferMatcherManager
 
   private[this] implicit val timeout: Timeout = 2.seconds
 
   override def addSubscription(offerMatcher: OfferMatcher)(
-      implicit ec: ExecutionContext): Future[Unit] = {
+      implicit ec: ExecutionContext): Future[Unit] =
     val future =
       actorRef ? OfferMatcherManagerDelegate.AddOrUpdateMatcher(offerMatcher)
     future.map(_ => ())
-  }
 
   override def removeSubscription(offerMatcher: OfferMatcher)(
-      implicit ec: ExecutionContext): Future[Unit] = {
+      implicit ec: ExecutionContext): Future[Unit] =
     val future =
       actorRef ? OfferMatcherManagerDelegate.RemoveMatcher(offerMatcher)
     future.map(_ => ())
-  }
 
   override def addLaunchTokens(tokens: Int): Unit =
     actorRef ! OfferMatcherManagerDelegate.AddTaskLaunchTokens(tokens)
   override def setLaunchTokens(tokens: Int): Unit =
     actorRef ! OfferMatcherManagerDelegate.SetTaskLaunchTokens(tokens)
-}

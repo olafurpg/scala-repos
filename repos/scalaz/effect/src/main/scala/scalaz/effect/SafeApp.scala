@@ -8,7 +8,7 @@ import IO._
   * trait provides an implementation of the `main` method by calling
   * `unsafePerformIO` on a specified `IO` action.
   */
-trait SafeApp {
+trait SafeApp
 
   def run(args: ImmutableArray[String]): IO[Unit] = runl(args.toList)
 
@@ -16,7 +16,5 @@ trait SafeApp {
 
   def runc: IO[Unit] = ioUnit
 
-  final def main(args: Array[String]) {
+  final def main(args: Array[String])
     run(ImmutableArray.fromArray(args)).unsafePerformIO()
-  }
-}

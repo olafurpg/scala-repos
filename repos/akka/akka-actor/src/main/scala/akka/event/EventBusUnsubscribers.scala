@@ -21,20 +21,19 @@ import java.util.concurrent.atomic.AtomicInteger
   */
 private[akka] class EventStreamUnsubscriber(
     eventStream: EventStream, debug: Boolean = false)
-    extends Actor {
+    extends Actor
 
   import EventStreamUnsubscriber._
 
-  override def preStart() {
+  override def preStart()
     if (debug)
       eventStream.publish(
           Logging.Debug(simpleName(getClass),
                         getClass,
                         s"registering unsubscriber with $eventStream"))
     eventStream initUnsubscriber self
-  }
 
-  def receive = {
+  def receive =
     case Register(actor) ⇒
       if (debug)
         eventStream.publish(
@@ -65,8 +64,6 @@ private[akka] class EventStreamUnsubscriber(
                 getClass,
                 s"unsubscribe $actor from $eventStream, because it was terminated"))
       eventStream unsubscribe actor
-  }
-}
 
 /**
   * INTERNAL API
@@ -75,7 +72,7 @@ private[akka] class EventStreamUnsubscriber(
   * This is needed if someone spins up more [[EventStream]]s using the same [[akka.actor.ActorSystem]],
   * each stream gets it's own unsubscriber.
   */
-private[akka] object EventStreamUnsubscriber {
+private[akka] object EventStreamUnsubscriber
 
   private val unsubscribersCount = new AtomicInteger(0)
 
@@ -86,7 +83,7 @@ private[akka] object EventStreamUnsubscriber {
   private def props(eventStream: EventStream, debug: Boolean) =
     Props(classOf[EventStreamUnsubscriber], eventStream, debug)
 
-  def start(system: ActorSystem, stream: EventStream) = {
+  def start(system: ActorSystem, stream: EventStream) =
     val debug =
       system.settings.config.getBoolean("akka.actor.debug.event-stream")
     system
@@ -94,8 +91,6 @@ private[akka] object EventStreamUnsubscriber {
       .systemActorOf(
           props(stream, debug),
           "eventStreamUnsubscriber-" + unsubscribersCount.incrementAndGet())
-  }
-}
 
 /**
   * INTERNAL API
@@ -104,21 +99,20 @@ private[akka] object EventStreamUnsubscriber {
   */
 private[akka] class ActorClassificationUnsubscriber(
     bus: ManagedActorClassification, debug: Boolean)
-    extends Actor with Stash {
+    extends Actor with Stash
 
   import ActorClassificationUnsubscriber._
 
   private var atSeq = 0
   private def nextSeq = atSeq + 1
 
-  override def preStart() {
+  override def preStart()
     super.preStart()
     if (debug)
       context.system.eventStream.publish(
           Logging.Debug(simpleName(getClass), getClass, s"will monitor $bus"))
-  }
 
-  def receive = {
+  def receive =
     case Register(actor, seq) if seq == nextSeq ⇒
       if (debug)
         context.system.eventStream.publish(
@@ -154,15 +148,13 @@ private[akka] class ActorClassificationUnsubscriber(
       // the `unsubscribe` will trigger another `Unregister(actor, _)` message to this unsubscriber;
       // but since that actor is terminated, there cannot be any harm in processing an Unregister for it.
       bus unsubscribe actor
-  }
-}
 
 /**
   * INTERNAL API
   *
   * Provides factory for [[akka.event.ActorClassificationUnsubscriber]] actors with **unique names**.
   */
-private[akka] object ActorClassificationUnsubscriber {
+private[akka] object ActorClassificationUnsubscriber
 
   private val unsubscribersCount = new AtomicInteger(0)
 
@@ -171,7 +163,7 @@ private[akka] object ActorClassificationUnsubscriber {
 
   def start(system: ActorSystem,
             bus: ManagedActorClassification,
-            debug: Boolean = false) = {
+            debug: Boolean = false) =
     val debug =
       system.settings.config.getBoolean("akka.actor.debug.event-stream")
     system
@@ -179,8 +171,6 @@ private[akka] object ActorClassificationUnsubscriber {
       .systemActorOf(props(bus, debug),
                      "actorClassificationUnsubscriber-" +
                      unsubscribersCount.incrementAndGet())
-  }
 
   private def props(eventBus: ManagedActorClassification, debug: Boolean) =
     Props(classOf[ActorClassificationUnsubscriber], eventBus, debug)
-}

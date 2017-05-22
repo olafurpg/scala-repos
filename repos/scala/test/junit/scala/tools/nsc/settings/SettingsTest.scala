@@ -8,10 +8,10 @@ import org.junit.runners.JUnit4
 import scala.tools.testing.AssertUtil.assertThrows
 
 @RunWith(classOf[JUnit4])
-class SettingsTest {
+class SettingsTest
   @Test
-  def booleanSettingColon() {
-    def check(args: String*): MutableSettings#BooleanSetting = {
+  def booleanSettingColon()
+    def check(args: String*): MutableSettings#BooleanSetting =
       val s = new MutableSettings(
           msg => throw new IllegalArgumentException(msg))
       val b1 = new s.BooleanSetting("-Ytest-setting", "")
@@ -19,47 +19,41 @@ class SettingsTest {
       val (ok, residual) = s.processArguments(args.toList, processAll = true)
       assert(residual.isEmpty)
       b1
-    }
     assertTrue(check("-Ytest-setting").value)
     assertTrue(check("-Ytest-setting:true").value)
     assertTrue(check("-Ytest-setting:TRUE").value)
     assertFalse(check("-Ytest-setting:false").value)
     assertFalse(check("-Ytest-setting:FALSE").value)
     assertThrows[IllegalArgumentException](check("-Ytest-setting:rubbish"))
-  }
 
   @Test
-  def userSettingsHavePrecedenceOverExperimental() {
-    def check(args: String*): MutableSettings#BooleanSetting = {
+  def userSettingsHavePrecedenceOverExperimental()
+    def check(args: String*): MutableSettings#BooleanSetting =
       val s = new MutableSettings(
           msg => throw new IllegalArgumentException(msg))
       val (ok, residual) = s.processArguments(args.toList, processAll = true)
       assert(residual.isEmpty)
       s.YmethodInfer // among -Xexperimental
-    }
     assertTrue(check("-Xexperimental").value)
     assertFalse(check("-Xexperimental", "-Yinfer-argument-types:false").value)
     assertFalse(check("-Yinfer-argument-types:false", "-Xexperimental").value)
-  }
 
   // for the given args, select the desired setting
-  private def check(args: String*)(b: MutableSettings => Boolean): Boolean = {
+  private def check(args: String*)(b: MutableSettings => Boolean): Boolean =
     val s = new MutableSettings(msg => throw new IllegalArgumentException(msg))
     val (ok, residual) = s.processArguments(args.toList, processAll = true)
     assert(residual.isEmpty)
     b(s)
-  }
   @Test
-  def userSettingsHavePrecedenceOverLint() {
+  def userSettingsHavePrecedenceOverLint()
     assertTrue(check("-Xlint")(_.warnAdaptedArgs))
     assertFalse(
         check("-Xlint", "-Ywarn-adapted-args:false")(_.warnAdaptedArgs))
     assertFalse(
         check("-Ywarn-adapted-args:false", "-Xlint")(_.warnAdaptedArgs))
-  }
 
   @Test
-  def anonymousLintersCanBeNamed() {
+  def anonymousLintersCanBeNamed()
     assertTrue(check("-Xlint")(_.warnMissingInterpolator)) // among Xlint
     assertFalse(
         check("-Xlint:-missing-interpolator")(_.warnMissingInterpolator))
@@ -115,16 +109,14 @@ class SettingsTest {
     assertTrue(
         check("-Xlint:missing-interpolator,_,-missing-interpolator")(
             _.warnMissingInterpolator))
-  }
 
-  @Test def xLintInvalidChoices(): Unit = {
+  @Test def xLintInvalidChoices(): Unit =
     assertThrows[IllegalArgumentException](
         check("-Xlint:-_")(_.warnAdaptedArgs))
     assertThrows[IllegalArgumentException](check("-Xlint:-warn-adapted-args")(
             _.warnAdaptedArgs)) // "warn-" should not be there
-  }
 
-  @Test def xLintNonColonated(): Unit = {
+  @Test def xLintNonColonated(): Unit =
     assertTrue(
         check("-Xlint", "adapted-args", "-deprecation")(_.warnAdaptedArgs))
     assertFalse(
@@ -137,18 +129,16 @@ class SettingsTest {
     assertThrows[IllegalArgumentException](
         check("-Xlint", "adapted-args", "-missing-interpolator")(
             _.warnAdaptedArgs)) // non-colonated: cannot provide negative args
-  }
 
-  @Test def xLintContainsValues(): Unit = {
+  @Test def xLintContainsValues(): Unit =
     // make sure that lint.contains and lint.value.contains are consistent
-    def t(s: MutableSettings, v: String) = {
+    def t(s: MutableSettings, v: String) =
       val r = s.lint.contains(v)
       assertSame(
           r,
           s.lint.value.contains(
               (s.LintWarnings withName v).asInstanceOf[s.lint.domain.Value]))
       r
-    }
 
     assertTrue(check("-Xlint")(t(_, "adapted-args")))
     assertTrue(check("-Xlint:_")(t(_, "adapted-args")))
@@ -156,9 +146,8 @@ class SettingsTest {
     assertFalse(check("-Xlint:-adapted-args,_")(t(_, "adapted-args")))
     assertTrue(
         check("-Xlint:-adapted-args,_,adapted-args")(t(_, "adapted-args")))
-  }
 
-  @Test def xLintDeprecatedAlias(): Unit = {
+  @Test def xLintDeprecatedAlias(): Unit =
     assertTrue(check("-Ywarn-adapted-args")(_.warnAdaptedArgs))
     assertTrue(
         check("-Xlint:_,-adapted-args", "-Ywarn-adapted-args")(
@@ -179,11 +168,10 @@ class SettingsTest {
     assertTrue(
         check("-Ywarn-adapted-args:false", "-Xlint:_,adapted-args")(
             _.warnAdaptedArgs))
-  }
 
-  @Test def expandingMultichoice(): Unit = {
+  @Test def expandingMultichoice(): Unit =
     val s = new MutableSettings(msg => throw new IllegalArgumentException(msg))
-    object mChoices extends s.MultiChoiceEnumeration {
+    object mChoices extends s.MultiChoiceEnumeration
       val a = Choice("a")
       val b = Choice("b")
       val c = Choice("c")
@@ -192,17 +180,15 @@ class SettingsTest {
       val ab = Choice("ab", expandsTo = List(a, b))
       val ac = Choice("ac", expandsTo = List(a, c))
       val uber = Choice("uber", expandsTo = List(ab, d))
-    }
     val m = s.MultiChoiceSetting(
         "-m", "args", "magic sauce", mChoices, Some(List("ac")))
 
     def check(args: String*)(
-        t: s.MultiChoiceSetting[mChoices.type] => Boolean): Boolean = {
+        t: s.MultiChoiceSetting[mChoices.type] => Boolean): Boolean =
       m.clear()
       val (ok, rest) = s.processArguments(args.toList, processAll = true)
       assert(rest.isEmpty)
       t(m)
-    }
 
     import mChoices._
 
@@ -231,16 +217,14 @@ class SettingsTest {
     assertThrows[IllegalArgumentException](
         check("-m:a,ac,-uber,uber")(_ => true),
         _ contains "'uber' cannot be negated")
-  }
 
-  @Test def xSourceTest(): Unit = {
-    def check(expected: String, args: String*): Unit = {
+  @Test def xSourceTest(): Unit =
+    def check(expected: String, args: String*): Unit =
       val s = new MutableSettings(
           msg => throw new IllegalArgumentException(msg))
       val (_, residual) = s.processArguments(args.toList, processAll = true)
       assert(residual.isEmpty)
       assertTrue(s.source.value == ScalaVersion(expected))
-    }
     check(expected = "2.12.0") // default
     check(expected = "2.11.0", "-Xsource:2.11")
     check(expected = "2.10", "-Xsource:2.10.0")
@@ -254,5 +238,3 @@ class SettingsTest {
     assertThrows[IllegalArgumentException](
         check(expected = "2.11", "-Xsource:2.invalid"),
         _ contains "Bad version (2.invalid)")
-  }
-}

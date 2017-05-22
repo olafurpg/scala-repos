@@ -16,7 +16,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * Date: 22.02.2008
   */
 trait ScLiteral
-    extends ScExpression with PsiLiteral with PsiLanguageInjectionHost {
+    extends ScExpression with PsiLiteral with PsiLanguageInjectionHost
 
   /**
     * This method works only for null literal (to avoid possibly dangerous usage)
@@ -31,20 +31,16 @@ trait ScLiteral
   def isSymbol: Boolean
   def isChar: Boolean
   def contentRange: TextRange
-}
 
-object ScLiteral {
+object ScLiteral
   def unapply(literal: ScLiteral) = Some(literal.getValue)
-}
 
-class ScLiteralValueExtractor[T](literalTypes: IElementType*)(f: AnyRef => T) {
+class ScLiteralValueExtractor[T](literalTypes: IElementType*)(f: AnyRef => T)
   private val types = literalTypes.toSet
 
-  def unapply(literal: ScLiteral): Option[T] = {
+  def unapply(literal: ScLiteral): Option[T] =
     val literalType = literal.getFirstChild.getNode.getElementType
     if (types.contains(literalType)) Some(f(literal.getValue)) else None
-  }
-}
 
 object ScIntLiteral
     extends ScLiteralValueExtractor(tINTEGER)(

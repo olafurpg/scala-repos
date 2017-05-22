@@ -23,7 +23,7 @@ import Series.Vec2RollingStats
   * These methods scan over the Series and compute cumulative values.
   */
 class SeriesRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
-    s: Series[X, T]) {
+    s: Series[X, T])
   protected val ev = implicitly[Vec2RollingStats[T]]
 
   /**
@@ -61,9 +61,8 @@ class SeriesRollingStats[X : ST : ORD, T : Vec2RollingStats : ST](
   def rollingMedian(winSz: Int): Series[X, Double] =
     Series(ev(s.values).rollingMedian(winSz),
            s.index.slice(winSz - 1, s.values.length))
-}
 
-object SeriesRollingStats {
+object SeriesRollingStats
 
   /**
     * Factory method for creating an enriched Series object containing statistical functions;
@@ -75,4 +74,3 @@ object SeriesRollingStats {
     */
   def apply[X : ST : ORD, T : Vec2RollingStats : ST](s: Series[X, T]) =
     new SeriesRollingStats(s)
-}

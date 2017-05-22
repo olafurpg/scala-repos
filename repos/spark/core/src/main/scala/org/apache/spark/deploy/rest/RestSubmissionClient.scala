@@ -56,17 +56,16 @@ import org.apache.spark.util.Utils
   * implementation of this client can use that information to retry using the version specified
   * by the server.
   */
-private[spark] class RestSubmissionClient(master: String) extends Logging {
+private[spark] class RestSubmissionClient(master: String) extends Logging
   import RestSubmissionClient._
 
   private val supportedMasterPrefixes = Seq("spark://", "mesos://")
 
   private val masters: Array[String] =
-    if (master.startsWith("spark://")) {
+    if (master.startsWith("spark://"))
       Utils.parseStandaloneMasterUrls(master)
-    } else {
+    else
       Array(master)
-    }
 
   // Set of masters that lost contact with us, used to keep track of
   // whether there are masters still alive for us to communicate with
@@ -79,100 +78,82 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     * it to the user. Otherwise, report the error message provided by the server.
     */
   def createSubmission(
-      request: CreateSubmissionRequest): SubmitRestProtocolResponse = {
+      request: CreateSubmissionRequest): SubmitRestProtocolResponse =
     logInfo(s"Submitting a request to launch an application in $master.")
     var handled: Boolean = false
     var response: SubmitRestProtocolResponse = null
-    for (m <- masters if !handled) {
+    for (m <- masters if !handled)
       validateMaster(m)
       val url = getSubmitUrl(m)
-      try {
+      try
         response = postJson(url, request.toJson)
-        response match {
+        response match
           case s: CreateSubmissionResponse =>
-            if (s.success) {
+            if (s.success)
               reportSubmissionStatus(s)
               handleRestResponse(s)
               handled = true
-            }
           case unexpected =>
             handleUnexpectedRestResponse(unexpected)
-        }
-      } catch {
+      catch
         case e: SubmitRestConnectionException =>
-          if (handleConnectionException(m)) {
+          if (handleConnectionException(m))
             throw new SubmitRestConnectionException(
                 "Unable to connect to server", e)
-          }
-      }
-    }
     response
-  }
 
   /** Request that the server kill the specified submission. */
-  def killSubmission(submissionId: String): SubmitRestProtocolResponse = {
+  def killSubmission(submissionId: String): SubmitRestProtocolResponse =
     logInfo(
         s"Submitting a request to kill submission $submissionId in $master.")
     var handled: Boolean = false
     var response: SubmitRestProtocolResponse = null
-    for (m <- masters if !handled) {
+    for (m <- masters if !handled)
       validateMaster(m)
       val url = getKillUrl(m, submissionId)
-      try {
+      try
         response = post(url)
-        response match {
+        response match
           case k: KillSubmissionResponse =>
-            if (!Utils.responseFromBackup(k.message)) {
+            if (!Utils.responseFromBackup(k.message))
               handleRestResponse(k)
               handled = true
-            }
           case unexpected =>
             handleUnexpectedRestResponse(unexpected)
-        }
-      } catch {
+      catch
         case e: SubmitRestConnectionException =>
-          if (handleConnectionException(m)) {
+          if (handleConnectionException(m))
             throw new SubmitRestConnectionException(
                 "Unable to connect to server", e)
-          }
-      }
-    }
     response
-  }
 
   /** Request the status of a submission from the server. */
   def requestSubmissionStatus(
       submissionId: String,
-      quiet: Boolean = false): SubmitRestProtocolResponse = {
+      quiet: Boolean = false): SubmitRestProtocolResponse =
     logInfo(
         s"Submitting a request for the status of submission $submissionId in $master.")
 
     var handled: Boolean = false
     var response: SubmitRestProtocolResponse = null
-    for (m <- masters if !handled) {
+    for (m <- masters if !handled)
       validateMaster(m)
       val url = getStatusUrl(m, submissionId)
-      try {
+      try
         response = get(url)
-        response match {
+        response match
           case s: SubmissionStatusResponse if s.success =>
-            if (!quiet) {
+            if (!quiet)
               handleRestResponse(s)
-            }
             handled = true
           case unexpected =>
             handleUnexpectedRestResponse(unexpected)
-        }
-      } catch {
+      catch
         case e: SubmitRestConnectionException =>
-          if (handleConnectionException(m)) {
+          if (handleConnectionException(m))
             throw new SubmitRestConnectionException(
                 "Unable to connect to server", e)
-          }
-      }
-    }
     response
-  }
 
   /** Construct a message that captures the specified parameters for submitting an application. */
   def constructSubmitRequest(
@@ -180,7 +161,7 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
       mainClass: String,
       appArgs: Array[String],
       sparkProperties: Map[String, String],
-      environmentVariables: Map[String, String]): CreateSubmissionRequest = {
+      environmentVariables: Map[String, String]): CreateSubmissionRequest =
     val message = new CreateSubmissionRequest
     message.clientSparkVersion = sparkVersion
     message.appResource = appResource
@@ -190,46 +171,40 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     message.environmentVariables = environmentVariables
     message.validate()
     message
-  }
 
   /** Send a GET request to the specified URL. */
-  private def get(url: URL): SubmitRestProtocolResponse = {
+  private def get(url: URL): SubmitRestProtocolResponse =
     logDebug(s"Sending GET request to server at $url.")
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
     conn.setRequestMethod("GET")
     readResponse(conn)
-  }
 
   /** Send a POST request to the specified URL. */
-  private def post(url: URL): SubmitRestProtocolResponse = {
+  private def post(url: URL): SubmitRestProtocolResponse =
     logDebug(s"Sending POST request to server at $url.")
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
     conn.setRequestMethod("POST")
     readResponse(conn)
-  }
 
   /** Send a POST request with the given JSON as the body to the specified URL. */
-  private def postJson(url: URL, json: String): SubmitRestProtocolResponse = {
+  private def postJson(url: URL, json: String): SubmitRestProtocolResponse =
     logDebug(s"Sending POST request to server at $url:\n$json")
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]
     conn.setRequestMethod("POST")
     conn.setRequestProperty("Content-Type", "application/json")
     conn.setRequestProperty("charset", "utf-8")
     conn.setDoOutput(true)
-    try {
+    try
       val out = new DataOutputStream(conn.getOutputStream)
-      Utils.tryWithSafeFinally {
+      Utils.tryWithSafeFinally
         out.write(json.getBytes(StandardCharsets.UTF_8))
-      } {
+      
         out.close()
-      }
-    } catch {
+    catch
       case e: ConnectException =>
         throw new SubmitRestConnectionException(
             "Connect Exception when connect to server", e)
-    }
     readResponse(conn)
-  }
 
   /**
     * Read the response from the server and return it as a validated [[SubmitRestProtocolResponse]].
@@ -237,24 +212,22 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     * Exposed for testing.
     */
   private[rest] def readResponse(
-      connection: HttpURLConnection): SubmitRestProtocolResponse = {
+      connection: HttpURLConnection): SubmitRestProtocolResponse =
     import scala.concurrent.ExecutionContext.Implicits.global
-    val responseFuture = Future {
+    val responseFuture = Future
       val dataStream =
-        if (connection.getResponseCode == HttpServletResponse.SC_OK) {
+        if (connection.getResponseCode == HttpServletResponse.SC_OK)
           connection.getInputStream
-        } else {
+        else
           connection.getErrorStream
-        }
       // If the server threw an exception while writing a response, it will not have a body
-      if (dataStream == null) {
+      if (dataStream == null)
         throw new SubmitRestProtocolException("Server returned empty body")
-      }
       val responseJson = Source.fromInputStream(dataStream).mkString
       logDebug(s"Response from the server:\n$responseJson")
       val response = SubmitRestProtocolMessage.fromJson(responseJson)
       response.validate()
-      response match {
+      response match
         // If the response is an error, log the message
         case error: ErrorResponse =>
           logError(s"Server responded with error:\n${error.message}")
@@ -264,10 +237,8 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
         case unexpected =>
           throw new SubmitRestProtocolException(
               s"Message received from server was not a response:\n${unexpected.toJson}")
-      }
-    }
 
-    try { Await.result(responseFuture, 10.seconds) } catch {
+    try { Await.result(responseFuture, 10.seconds) } catch
       case unreachable @ (_: FileNotFoundException | _: SocketException) =>
         throw new SubmitRestConnectionException(
             "Unable to connect to server", unreachable)
@@ -278,123 +249,100 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
       case timeout: TimeoutException =>
         throw new SubmitRestConnectionException(
             "No response from server", timeout)
-    }
-  }
 
   /** Return the REST URL for creating a new submission. */
-  private def getSubmitUrl(master: String): URL = {
+  private def getSubmitUrl(master: String): URL =
     val baseUrl = getBaseUrl(master)
     new URL(s"$baseUrl/create")
-  }
 
   /** Return the REST URL for killing an existing submission. */
-  private def getKillUrl(master: String, submissionId: String): URL = {
+  private def getKillUrl(master: String, submissionId: String): URL =
     val baseUrl = getBaseUrl(master)
     new URL(s"$baseUrl/kill/$submissionId")
-  }
 
   /** Return the REST URL for requesting the status of an existing submission. */
-  private def getStatusUrl(master: String, submissionId: String): URL = {
+  private def getStatusUrl(master: String, submissionId: String): URL =
     val baseUrl = getBaseUrl(master)
     new URL(s"$baseUrl/status/$submissionId")
-  }
 
   /** Return the base URL for communicating with the server, including the protocol version. */
-  private def getBaseUrl(master: String): String = {
+  private def getBaseUrl(master: String): String =
     var masterUrl = master
-    supportedMasterPrefixes.foreach { prefix =>
-      if (master.startsWith(prefix)) {
+    supportedMasterPrefixes.foreach  prefix =>
+      if (master.startsWith(prefix))
         masterUrl = master.stripPrefix(prefix)
-      }
-    }
     masterUrl = masterUrl.stripSuffix("/")
     s"http://$masterUrl/$PROTOCOL_VERSION/submissions"
-  }
 
   /** Throw an exception if this is not standalone mode. */
-  private def validateMaster(master: String): Unit = {
-    val valid = supportedMasterPrefixes.exists { prefix =>
+  private def validateMaster(master: String): Unit =
+    val valid = supportedMasterPrefixes.exists  prefix =>
       master.startsWith(prefix)
-    }
-    if (!valid) {
+    if (!valid)
       throw new IllegalArgumentException(
           "This REST client only supports master URLs that start with " +
           "one of the following: " + supportedMasterPrefixes.mkString(","))
-    }
-  }
 
   /** Report the status of a newly created submission. */
   private def reportSubmissionStatus(
-      submitResponse: CreateSubmissionResponse): Unit = {
-    if (submitResponse.success) {
+      submitResponse: CreateSubmissionResponse): Unit =
+    if (submitResponse.success)
       val submissionId = submitResponse.submissionId
-      if (submissionId != null) {
+      if (submissionId != null)
         logInfo(
             s"Submission successfully created as $submissionId. Polling submission state...")
         pollSubmissionStatus(submissionId)
-      } else {
+      else
         // should never happen
         logError(
             "Application successfully submitted, but submission ID was not provided!")
-      }
-    } else {
+    else
       val failMessage = Option(submitResponse.message).map { ": " + _ }
         .getOrElse("")
       logError(s"Application submission failed$failMessage")
-    }
-  }
 
   /**
     * Poll the status of the specified submission and log it.
     * This retries up to a fixed number of times before giving up.
     */
-  private def pollSubmissionStatus(submissionId: String): Unit = {
-    (1 to REPORT_DRIVER_STATUS_MAX_TRIES).foreach { _ =>
+  private def pollSubmissionStatus(submissionId: String): Unit =
+    (1 to REPORT_DRIVER_STATUS_MAX_TRIES).foreach  _ =>
       val response = requestSubmissionStatus(submissionId, quiet = true)
-      val statusResponse = response match {
+      val statusResponse = response match
         case s: SubmissionStatusResponse => s
         case _ => return // unexpected type, let upstream caller handle it
-      }
-      if (statusResponse.success) {
+      if (statusResponse.success)
         val driverState = Option(statusResponse.driverState)
         val workerId = Option(statusResponse.workerId)
         val workerHostPort = Option(statusResponse.workerHostPort)
         val exception = Option(statusResponse.message)
         // Log driver state, if present
-        driverState match {
+        driverState match
           case Some(state) =>
             logInfo(s"State of driver $submissionId is now $state.")
           case _ => logError(s"State of driver $submissionId was not found!")
-        }
         // Log worker node, if present
-        (workerId, workerHostPort) match {
+        (workerId, workerHostPort) match
           case (Some(id), Some(hp)) =>
             logInfo(s"Driver is running on worker $id at $hp.")
           case _ =>
-        }
         // Log exception stack trace, if present
-        exception.foreach { e =>
+        exception.foreach  e =>
           logError(e)
-        }
         return
-      }
       Thread.sleep(REPORT_DRIVER_STATUS_INTERVAL)
-    }
     logError(s"Error: Master did not recognize driver $submissionId.")
-  }
 
   /** Log the response sent by the server in the REST application submission protocol. */
-  private def handleRestResponse(response: SubmitRestProtocolResponse): Unit = {
+  private def handleRestResponse(response: SubmitRestProtocolResponse): Unit =
     logInfo(
         s"Server responded with ${response.messageType}:\n${response.toJson}")
-  }
 
   /** Log an appropriate error if the response sent by the server is not of the expected type. */
   private def handleUnexpectedRestResponse(
-      unexpected: SubmitRestProtocolResponse): Unit = {
+      unexpected: SubmitRestProtocolResponse): Unit =
     logError(
         s"Error: Server responded with message of unexpected type ${unexpected.messageType}.")
-  }
 
   /**
     * When a connection exception is caught, return true if all masters are lost.
@@ -403,16 +351,13 @@ private[spark] class RestSubmissionClient(master: String) extends Logging {
     * harmless because this client currently does not support retrying submission
     * on failure yet (SPARK-6443).
     */
-  private def handleConnectionException(masterUrl: String): Boolean = {
-    if (!lostMasters.contains(masterUrl)) {
+  private def handleConnectionException(masterUrl: String): Boolean =
+    if (!lostMasters.contains(masterUrl))
       logWarning(s"Unable to connect to server ${masterUrl}.")
       lostMasters += masterUrl
-    }
     lostMasters.size >= masters.length
-  }
-}
 
-private[spark] object RestSubmissionClient {
+private[spark] object RestSubmissionClient
   private val REPORT_DRIVER_STATUS_INTERVAL = 1000
   private val REPORT_DRIVER_STATUS_MAX_TRIES = 10
   val PROTOCOL_VERSION = "v1"
@@ -425,40 +370,33 @@ private[spark] object RestSubmissionClient {
           mainClass: String,
           appArgs: Array[String],
           conf: SparkConf,
-          env: Map[String, String] = Map()): SubmitRestProtocolResponse = {
-    val master = conf.getOption("spark.master").getOrElse {
+          env: Map[String, String] = Map()): SubmitRestProtocolResponse =
+    val master = conf.getOption("spark.master").getOrElse
       throw new IllegalArgumentException("'spark.master' must be set.")
-    }
     val sparkProperties = conf.getAll.toMap
     val client = new RestSubmissionClient(master)
     val submitRequest = client.constructSubmitRequest(
         appResource, mainClass, appArgs, sparkProperties, env)
     client.createSubmission(submitRequest)
-  }
 
-  def main(args: Array[String]): Unit = {
-    if (args.length < 2) {
+  def main(args: Array[String]): Unit =
+    if (args.length < 2)
       sys.error(
           "Usage: RestSubmissionClient [app resource] [main class] [app args*]")
       sys.exit(1)
-    }
     val appResource = args(0)
     val mainClass = args(1)
     val appArgs = args.slice(2, args.length)
     val conf = new SparkConf
     val env = filterSystemEnvironment(sys.env)
     run(appResource, mainClass, appArgs, conf, env)
-  }
 
   /**
     * Filter non-spark environment variables from any environment.
     */
   private[rest] def filterSystemEnvironment(
-      env: Map[String, String]): Map[String, String] = {
-    env.filterKeys { k =>
+      env: Map[String, String]): Map[String, String] =
+    env.filterKeys  k =>
       // SPARK_HOME is filtered out because it is usually wrong on the remote machine (SPARK-12345)
       (k.startsWith("SPARK_") && k != "SPARK_ENV_LOADED" &&
           k != "SPARK_HOME") || k.startsWith("MESOS_")
-    }
-  }
-}

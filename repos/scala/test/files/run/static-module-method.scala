@@ -3,12 +3,10 @@
 // even if those methods were static. This test would thus fail
 // with a verify error under -Ydelambdafy:method
 
-object Test {
+object Test
   def moduleMethod(x: String) = x
 
   def map(x: String, f: String => String) = f(x)
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     println(map("hello", Test.moduleMethod))
-  }
-}

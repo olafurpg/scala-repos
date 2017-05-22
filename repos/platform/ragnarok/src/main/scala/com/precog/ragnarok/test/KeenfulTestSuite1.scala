@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object KeenfulTestSuite1 extends PerfTestSuite {
+object KeenfulTestSuite1 extends PerfTestSuite
   query("""
 import std::time::*
 
@@ -36,4 +36,3 @@ count(distinct(data'.visitor.id))
 --2971 ms (1/1)
 --3113 ms (6/3)
     """)
-}

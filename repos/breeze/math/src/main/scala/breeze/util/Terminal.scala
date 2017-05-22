@@ -20,7 +20,7 @@ package breeze.util
   *
   * @author dlwh, dramage
   */
-object Terminal {
+object Terminal
 
   /** The width of the console, or 80 if it can't be discovered. */
 //  lazy val (terminalWidth: Int, terminalHeight : Int) = {
@@ -40,4 +40,3 @@ object Terminal {
   val terminalHeight: Int = 80
 
   val newline = "\n" //System.getProperty("line.separator")
-}

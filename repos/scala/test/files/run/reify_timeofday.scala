@@ -1,14 +1,14 @@
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
-object Test extends App {
-  reify {
+object Test extends App
+  reify
     class DateError extends Exception
 
     /** Simulating properties in Scala
       *  (example 4.2.1 in the Scala Language Specification)
       */
-    class TimeOfDayVar {
+    class TimeOfDayVar
       private var h, m, s: Int = 0
 
       def hours = h
@@ -29,15 +29,12 @@ object Test extends App {
       def seconds_=(s: Int) =
         if (0 <= s && s < 60) this.s = s
         else throw new DateError()
-    }
 
     val d = new TimeOfDayVar
     d.hours = 8; d.minutes = 30; d.seconds = 0
-    try {
+    try
       d.hours = 25 // throws a DateError exception
-    } catch {
+    catch
       case de: DateError => println("DateError")
       case e: Exception => println("Exception")
-    }
-  }.eval
-}
+  .eval

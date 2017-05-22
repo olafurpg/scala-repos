@@ -2,7 +2,7 @@ import scala.annotation.meta._
 
 class Bippy extends scala.annotation.StaticAnnotation
 
-abstract class Foo {
+abstract class Foo
   @Bippy val x1: Int // warn
   @(Bippy @field)
   val x2: Int // warn
@@ -12,9 +12,8 @@ abstract class Foo {
   val x4: Int // warn
   @(Bippy @param)
   val x5: Int // warn
-}
 
-object Bar extends Foo {
+object Bar extends Foo
   val x1 = 1
   val x2 = 2
   val x3 = 3
@@ -42,7 +41,6 @@ object Bar extends Foo {
 
   @(Bippy @companionObject @companionMethod)
   def g5(x: Int): Int = 0 // no warn
-}
 
 class Dingo(
     @Bippy p0: Int, // no warn

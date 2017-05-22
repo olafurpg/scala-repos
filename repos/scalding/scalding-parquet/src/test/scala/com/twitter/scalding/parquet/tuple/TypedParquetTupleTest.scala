@@ -10,10 +10,10 @@ import org.apache.parquet.filter2.predicate.{FilterApi, FilterPredicate}
 import org.apache.parquet.io.api.Binary
 
 class TypedParquetTupleTest
-    extends WordSpec with Matchers with HadoopPlatformTest {
-  "TypedParquetTuple" should {
+    extends WordSpec with Matchers with HadoopPlatformTest
+  "TypedParquetTuple" should
 
-    "read and write correctly" in {
+    "read and write correctly" in
       import com.twitter.scalding.parquet.tuple.TestValues._
 
       def toMap[T](i: Iterable[T]): Map[T, Int] =
@@ -21,24 +21,19 @@ class TypedParquetTupleTest
 
       HadoopPlatformJobTest(new WriteToTypedParquetTupleJob(_), cluster)
         .arg("output", "output1")
-        .sink[SampleClassB](TypedParquet[SampleClassB](Seq("output1"))) {
+        .sink[SampleClassB](TypedParquet[SampleClassB](Seq("output1")))
           toMap(_) shouldBe toMap(values)
-        }
         .run
 
       HadoopPlatformJobTest(new ReadWithFilterPredicateJob(_), cluster)
         .arg("input", "output1")
         .arg("output", "output2")
-        .sink[Boolean]("output2") {
+        .sink[Boolean]("output2")
           toMap(_) shouldBe toMap(
               values.filter(_.string == "B1").map(_.a.bool))
-        }
         .run
-    }
-  }
-}
 
-object TestValues {
+object TestValues
   val values = Seq(
       SampleClassB("B1",
                    Some(4.0D),
@@ -74,7 +69,6 @@ object TestValues {
                    Set(SampleClassF(3, 3F), SampleClassF(5, 4F)),
                    Map(3 -> "foo2"),
                    Map(SampleClassD(0, "q") -> SampleClassF(4, 3))))
-}
 
 case class SampleClassA(
     bool: Boolean, short: Short, long: Long, float: Float, byte: Byte)
@@ -97,21 +91,20 @@ case class SampleClassF(w: Byte, z: Float)
   * Test job write a sequence of sample class values into a typed parquet tuple.
   * To test typed parquet tuple can be used as sink
   */
-class WriteToTypedParquetTupleJob(args: Args) extends Job(args) {
+class WriteToTypedParquetTupleJob(args: Args) extends Job(args)
   import com.twitter.scalding.parquet.tuple.TestValues._
 
   val outputPath = args.required("output")
 
   val sink = TypedParquetSink[SampleClassB](outputPath)
   TypedPipe.from(values).write(sink)
-}
 
 /**
   * Test job read from a typed parquet source with filter predicate and push down(SampleClassC takes only part of
   * SampleClassB's data)
   * To test typed parquet tuple can bse used as source and apply filter predicate and push down correctly
   */
-class ReadWithFilterPredicateJob(args: Args) extends Job(args) {
+class ReadWithFilterPredicateJob(args: Args) extends Job(args)
   val fp: FilterPredicate =
     FilterApi.eq(binaryColumn("string"), Binary.fromString("B1"))
 
@@ -121,4 +114,3 @@ class ReadWithFilterPredicateJob(args: Args) extends Job(args) {
   val input = TypedParquet[SampleClassC](inputPath, fp)
 
   TypedPipe.from(input).map(_.a.bool).write(TypedTsv[Boolean](outputPath))
-}

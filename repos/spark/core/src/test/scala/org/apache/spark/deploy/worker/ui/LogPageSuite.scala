@@ -24,9 +24,9 @@ import org.scalatest.PrivateMethodTester
 
 import org.apache.spark.SparkFunSuite
 
-class LogPageSuite extends SparkFunSuite with PrivateMethodTester {
+class LogPageSuite extends SparkFunSuite with PrivateMethodTester
 
-  test("get logs simple") {
+  test("get logs simple")
     val webui = mock(classOf[WorkerWebUI])
     val tmpDir = new File(sys.props("java.io.tmpdir"))
     val workDir = new File(tmpDir, "work-dir")
@@ -73,15 +73,11 @@ class LogPageSuite extends SparkFunSuite with PrivateMethodTester {
     assert(error2.startsWith("Error: Log type must be one of "))
     assert(error3.startsWith("Error: invalid log directory"))
     assert(error4.startsWith("Error: invalid log directory"))
-  }
 
   /** Write the specified string to the file. */
-  private def write(f: File, s: String): Unit = {
+  private def write(f: File, s: String): Unit =
     val writer = new FileWriter(f)
-    try {
+    try
       writer.write(s)
-    } finally {
+    finally
       writer.close()
-    }
-  }
-}

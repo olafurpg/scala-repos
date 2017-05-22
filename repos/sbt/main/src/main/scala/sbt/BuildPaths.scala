@@ -11,7 +11,7 @@ import sbt.io.{GlobFilter, Path}
 import sbt.internal.util.AttributeKey
 import sbt.util.Logger
 
-object BuildPaths {
+object BuildPaths
   val globalBaseDirectory = AttributeKey[File](
       "global-base-directory",
       "The base directory for global sbt configuration and staging.",
@@ -35,12 +35,11 @@ object BuildPaths {
 
   import Path._
 
-  def getGlobalBase(state: State): File = {
+  def getGlobalBase(state: State): File =
     val default = defaultVersionedGlobalBase(binarySbtVersion(state))
     def getDefault = { checkTransition(state, default); default }
     getFileSetting(globalBaseDirectory, GlobalBaseProperty, getDefault)(state)
-  }
-  private[this] def checkTransition(state: State, versioned: File): Unit = {
+  private[this] def checkTransition(state: State, versioned: File): Unit =
     val unversioned = defaultGlobalBase
     def globalDefined(base: File): Boolean =
       getGlobalPluginsDirectory(state, base).exists || configurationSources(
@@ -49,7 +48,6 @@ object BuildPaths {
       !globalDefined(versioned) && globalDefined(unversioned)
     if (warnTransition)
       state.log.warn(globalDirTransitionWarning(unversioned, versioned))
-  }
 
   def getStagingDirectory(state: State, globalBase: File): File =
     fileSetting(stagingDirectory, StagingProperty, defaultStaging(globalBase))(
@@ -80,9 +78,8 @@ object BuildPaths {
     state get stateKey orElse getFileProperty(property) getOrElse default
 
   def getFileProperty(name: String): Option[File] =
-    Option(System.getProperty(name)) flatMap { path =>
+    Option(System.getProperty(name)) flatMap  path =>
       if (path.isEmpty) None else Some(new File(path))
-    }
 
   def defaultVersionedGlobalBase(sbtVersion: String): File =
     defaultGlobalBase / sbtVersion
@@ -135,4 +132,3 @@ object BuildPaths {
   You are seeing this warning because there is global configuration in $unversioned but not in $versioned.
   The global sbt directory may be changed via the $GlobalBaseProperty system property.
 """
-}

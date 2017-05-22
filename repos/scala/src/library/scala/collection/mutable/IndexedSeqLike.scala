@@ -35,7 +35,7 @@ package mutable
   *  @define mayNotTerminateInf
   */
 trait IndexedSeqLike[A, +Repr]
-    extends Any with scala.collection.IndexedSeqLike[A, Repr] { self =>
+    extends Any with scala.collection.IndexedSeqLike[A, Repr]  self =>
 
   override protected[this] def thisCollection: IndexedSeq[A] =
     this.asInstanceOf[IndexedSeq[A]]
@@ -52,13 +52,12 @@ trait IndexedSeqLike[A, +Repr]
 
   /** Creates a view of this iterable @see Iterable.View
     */
-  override def view = new IndexedSeqView[A, Repr] {
+  override def view = new IndexedSeqView[A, Repr]
     protected lazy val underlying = self.repr
     override def iterator = self.iterator
     override def length = self.length
     override def apply(idx: Int) = self.apply(idx)
     override def update(idx: Int, elem: A) = self.update(idx, elem)
-  }
 
   /** A sub-sequence view  starting at index `from`
     *  and extending up to (but not including) index `until`.
@@ -71,4 +70,3 @@ trait IndexedSeqLike[A, +Repr]
     *  @note view(from, to)  is equivalent to view.slice(from, to)
     */
   override def view(from: Int, until: Int) = view.slice(from, until)
-}

@@ -1,7 +1,7 @@
-package p {
+package p
   import java.util.ArrayList
 
-  class Container {
+  class Container
     type t = java.lang.Double
 
     def m(p: java.lang.Float) {} //(1)
@@ -19,5 +19,3 @@ package p {
     m(1) // ok
     /* line: 8 */
     m(new ArrayList[java.lang.Integer](5)) // ok
-  }
-}

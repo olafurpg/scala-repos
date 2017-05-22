@@ -3,8 +3,8 @@ package scala.pickling.json.list.t.`new`
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, json._
 
-class JsonListTNewTest extends FunSuite {
-  test("main") {
+class JsonListTNewTest extends FunSuite
+  test("main")
     val pickle = List(1, 2, 3).pickle
     // NOTE - Previously lists would encode as hd/tl lists, which was dramatically less efficient.
     assert(
@@ -19,5 +19,3 @@ class JsonListTNewTest extends FunSuite {
       |})
     """.stripMargin.trim)
     assert(pickle.unpickle[List[Int]] === List(1, 2, 3))
-  }
-}

@@ -19,7 +19,7 @@ import scala.language.reflectiveCalls
 class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
                                 val root: String,
                                 var timestamp: Long,
-                                val indexDir: File) {
+                                val indexDir: File)
   import org.jetbrains.sbt.resolvers.SbtResolverIndex._
 
   ensureIndexDir()
@@ -30,11 +30,11 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
   private val groupArtifactToVersionMap = createPersistentMap(
       indexDir / Paths.GROUP_ARTIFACT_TO_VERSION_FILE)
 
-  def update(progressIndicator: Option[ProgressIndicator] = None) {
+  def update(progressIndicator: Option[ProgressIndicator] = None)
     val agMap = mutable.HashMap.empty[String, mutable.Set[String]]
     val gaMap = mutable.HashMap.empty[String, mutable.Set[String]]
     val gavMap = mutable.HashMap.empty[String, mutable.Set[String]]
-    def processArtifact(artifact: ArtifactInfo) {
+    def processArtifact(artifact: ArtifactInfo)
       agMap.getOrElseUpdate(artifact.getArtifactId, mutable.Set.empty) +=
         artifact.getGroupId
       gaMap.getOrElseUpdate(artifact.getGroupId, mutable.Set.empty) +=
@@ -42,34 +42,28 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
       gavMap.getOrElseUpdate(
           SbtResolverUtils.joinGroupArtifact(artifact), mutable.Set.empty) +=
         artifact.getVersion
-    }
 
     if (kind == SbtResolver.Kind.Maven)
-      using(SbtMavenRepoIndexer(root, indexDir)) { indexer =>
+      using(SbtMavenRepoIndexer(root, indexDir))  indexer =>
         indexer.update(progressIndicator)
         indexer.foreach(processArtifact, progressIndicator)
-      } else
+      else
       new SbtIvyCacheIndexer(new File(root)).artifacts.foreach(processArtifact)
 
     progressIndicator foreach { _.checkCanceled() }
-    progressIndicator foreach {
+    progressIndicator foreach
       _.setText2(SbtBundle("sbt.resolverIndexer.progress.saving"))
-    }
 
-    agMap foreach { element =>
+    agMap foreach  element =>
       artifactToGroupMap.put(element._1, element._2.toSet)
-    }
-    gaMap foreach { element =>
+    gaMap foreach  element =>
       groupToArtifactMap.put(element._1, element._2.toSet)
-    }
-    gavMap foreach { element =>
+    gavMap foreach  element =>
       groupArtifactToVersionMap.put(element._1, element._2.toSet)
-    }
     timestamp = System.currentTimeMillis()
     store()
-  }
 
-  def store() {
+  def store()
     ensureIndexDir()
 
     val props = new Properties()
@@ -79,20 +73,17 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
     props.setProperty(Keys.KIND, kind.toString)
 
     val propFile = indexDir / Paths.PROPERTIES_FILE
-    using(new FileOutputStream(propFile)) { outputStream =>
+    using(new FileOutputStream(propFile))  outputStream =>
       props.store(outputStream, null)
-    }
 
     artifactToGroupMap.force()
     groupToArtifactMap.force()
     groupArtifactToVersionMap.force()
-  }
 
-  def close() {
+  def close()
     artifactToGroupMap.close()
     groupToArtifactMap.close()
     groupArtifactToVersionMap.close()
-  }
 
   def groups() =
     Option(groupToArtifactMap.getAllKeysWithExistingMapping) map { _.toSet } getOrElse Set.empty
@@ -109,58 +100,50 @@ class SbtResolverIndex private (val kind: SbtResolver.Kind.Value,
   def isLocal: Boolean =
     kind == SbtResolver.Kind.Ivy || root.startsWith("file:")
 
-  private def ensureIndexDir() {
+  private def ensureIndexDir()
     indexDir.mkdirs()
     if (!indexDir.exists || !indexDir.isDirectory)
       throw new CantCreateIndexDirectory(indexDir)
-  }
 
   private def createPersistentMap(file: File) =
     new PersistentHashMap[String, Set[String]](
-        file, new EnumeratorStringDescriptor, new SetDescriptor) {
+        file, new EnumeratorStringDescriptor, new SetDescriptor)
       def getOrEmpty(key: String): Set[String] =
-        try {
+        try
           Option(get(key)).getOrElse(Set.empty)
-        } catch {
+        catch
           case _: PersistentEnumeratorBase.CorruptedException |
               _: EOFException =>
             throw new CorruptedIndexException(file)
-        }
-    }
-}
 
-object SbtResolverIndex {
+object SbtResolverIndex
   val NO_TIMESTAMP = -1
 
   val CURRENT_INDEX_VERSION = "2"
 
-  object Paths {
+  object Paths
     val PROPERTIES_FILE = "index.properties"
     val ARTIFACT_TO_GROUP_FILE = "artifact-to-group.map"
     val GROUP_TO_ARTIFACT_FILE = "group-to-artifact.map"
     val GROUP_ARTIFACT_TO_VERSION_FILE = "group-artifact-to-version.map"
-  }
 
-  object Keys {
+  object Keys
     val VERSION = "version"
     val ROOT = "root"
     val UPDATE_TIMESTAMP = "update-timestamp"
     val KIND = "kind"
-  }
 
-  def create(kind: SbtResolver.Kind.Value, root: String, indexDir: File) = {
+  def create(kind: SbtResolver.Kind.Value, root: String, indexDir: File) =
     val index = new SbtResolverIndex(kind, root, NO_TIMESTAMP, indexDir)
     index.store()
     index
-  }
 
-  def load(indexDir: File) = {
+  def load(indexDir: File) =
     val propFile = indexDir / Paths.PROPERTIES_FILE
     val props = new Properties()
 
-    using(new FileInputStream(propFile)) { inputStream =>
+    using(new FileInputStream(propFile))  inputStream =>
       props.load(inputStream)
-    }
 
     val indexVersion = props.getProperty(Keys.VERSION)
     if (indexVersion != CURRENT_INDEX_VERSION)
@@ -168,24 +151,18 @@ object SbtResolverIndex {
 
     val root = props.getProperty(Keys.ROOT)
     val timestamp = props.getProperty(Keys.UPDATE_TIMESTAMP).toLong
-    val kind = {
+    val kind =
       if (props.getProperty(Keys.KIND) == SbtResolver.Kind.Maven.toString)
         SbtResolver.Kind.Maven
       else SbtResolver.Kind.Ivy
-    }
 
     new SbtResolverIndex(kind, root, timestamp, indexDir)
-  }
-}
 
-private class SetDescriptor extends DataExternalizer[Set[String]] {
-  def save(s: DataOutput, set: Set[String]) {
+private class SetDescriptor extends DataExternalizer[Set[String]]
+  def save(s: DataOutput, set: Set[String])
     s.writeInt(set.size)
     set foreach s.writeUTF
-  }
 
-  def read(s: DataInput): Set[String] = {
+  def read(s: DataInput): Set[String] =
     val count = s.readInt
     1.to(count).map(_ => s.readUTF()).toSet
-  }
-}

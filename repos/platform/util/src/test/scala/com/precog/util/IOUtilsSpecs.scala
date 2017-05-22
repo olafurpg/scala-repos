@@ -24,9 +24,9 @@ import java.io.File
 
 import org.specs2.mutable._
 
-class IOUtilsSpecs extends Specification {
-  "IOUtils" should {
-    "properly clean empty directories recursively" in {
+class IOUtilsSpecs extends Specification
+  "IOUtils" should
+    "properly clean empty directories recursively" in
       val tmpRoot = IOUtils.createTmpDir("IOUtilsSpecs").unsafePerformIO
 
       val rootParent = tmpRoot.getParentFile
@@ -70,6 +70,3 @@ class IOUtilsSpecs extends Specification {
       IOUtils.recursiveDelete(tmpRoot).unsafePerformIO
 
       tmpRoot.isDirectory mustEqual false
-    }
-  }
-}

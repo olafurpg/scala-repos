@@ -12,7 +12,7 @@ import play.api.test._
 
 import scala.concurrent.{Future, Promise}
 
-class OAuthSpec extends PlaySpecification {
+class OAuthSpec extends PlaySpecification
 
   sequential
 
@@ -22,57 +22,46 @@ class OAuthSpec extends PlaySpecification {
       "someRequestToken", "someVerySecretRequestSecret")
   val oauthCalculator = OAuthCalculator(consumerKey, requestToken)
 
-  "OAuth" should {
+  "OAuth" should
 
-    "sign a simple get request" in {
-      val (request, body, hostUrl) = receiveRequest {
+    "sign a simple get request" in
+      val (request, body, hostUrl) = receiveRequest
         implicit app => hostUrl =>
           WS.url(hostUrl + "/foo").sign(oauthCalculator).get()
-      }
       OAuthRequestVerifier.verifyRequest(
           request, body, hostUrl, consumerKey, requestToken)
-    }
 
-    "sign a get request with query parameters" in {
-      val (request, body, hostUrl) = receiveRequest {
+    "sign a get request with query parameters" in
+      val (request, body, hostUrl) = receiveRequest
         implicit app => hostUrl =>
           WS.url(hostUrl + "/foo")
             .withQueryString("param" -> "paramValue")
             .sign(oauthCalculator)
             .get()
-      }
       OAuthRequestVerifier.verifyRequest(
           request, body, hostUrl, consumerKey, requestToken)
-    }
 
-    "sign a post request with a body" in {
-      val (request, body, hostUrl) = receiveRequest {
+    "sign a post request with a body" in
+      val (request, body, hostUrl) = receiveRequest
         implicit app => hostUrl =>
           WS.url(hostUrl + "/foo")
             .sign(oauthCalculator)
             .post(Map("param" -> Seq("paramValue")))
-      }
       OAuthRequestVerifier.verifyRequest(
           request, body, hostUrl, consumerKey, requestToken)
-    }
-  }
 
   def receiveRequest(makeRequest: Application => String => Future[_])
-    : (RequestHeader, ByteString, String) = {
+    : (RequestHeader, ByteString, String) =
     val hostUrl = "http://localhost:" + testServerPort
     val promise = Promise[(RequestHeader, ByteString)]()
-    val app = GuiceApplicationBuilder().routes {
+    val app = GuiceApplicationBuilder().routes
       case _ =>
-        Action(BodyParsers.parse.raw) { request =>
+        Action(BodyParsers.parse.raw)  request =>
           promise.success(
               (request, request.body.asBytes().getOrElse(ByteString.empty)))
           Results.Ok
-        }
-    }.build()
-    running(TestServer(testServerPort, app)) {
+    .build()
+    running(TestServer(testServerPort, app))
       await(makeRequest(app)(hostUrl))
-    }
     val (request, body) = await(promise.future)
     (request, body, hostUrl)
-  }
-}

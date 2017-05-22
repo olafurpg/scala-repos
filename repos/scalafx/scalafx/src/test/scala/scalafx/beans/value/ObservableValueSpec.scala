@@ -43,49 +43,42 @@ import scalafx.beans.property.DoubleProperty
   *
   */
 @RunWith(classOf[JUnitRunner])
-class ObservableValueSpec extends FlatSpec with BeforeAndAfterEach {
+class ObservableValueSpec extends FlatSpec with BeforeAndAfterEach
   var property: DoubleProperty = null
 
-  override def beforeEach() {
+  override def beforeEach()
     property = new DoubleProperty(null, "observable value test")
-  }
 
-  "ObservableValue" should "support anonymous change listeners" in {
+  "ObservableValue" should "support anonymous change listeners" in
     var invalidateCalled = false
-    property onChange {
+    property onChange
       invalidateCalled = true
-    }
     invalidateCalled should be(false)
     property() = 100
     invalidateCalled should be(true)
-  }
 
-  it should "support anonymous change listeners with parameters" in {
+  it should "support anonymous change listeners with parameters" in
     var invalidateCalled = false
-    property onChange { (obs, oldV, newV) =>
+    property onChange  (obs, oldV, newV) =>
       invalidateCalled = true
       obs should equal(property)
-    }
     invalidateCalled should be(false)
     property() = 100
     invalidateCalled should be(true)
-  }
 
-  it should "support adding explicit listeners as a clojure" in {
+  it should "support adding explicit listeners as a clojure" in
     var invalidateCalled = false
-    property addListener {
+    property addListener
       (obs: JFXObservableValue[_ <: Number], oldV: Number, newV: Number) =>
         invalidateCalled = true
         obs should equal(property.delegate)
         oldV should equal(0)
         newV should equal(100)
-    }
     invalidateCalled should be(false)
     property() = 100
     invalidateCalled should be(true)
-  }
 
-  it should "support removing explicit listeners" in {
+  it should "support removing explicit listeners" in
     var invalidateCalled = false
     // We are forcing implicit conversion of a Function3 to ChangeListener[Number],
     // so we have a handle to actual listener object.
@@ -106,5 +99,3 @@ class ObservableValueSpec extends FlatSpec with BeforeAndAfterEach {
     invalidateCalled = false
     property() = 200
     invalidateCalled should be(false)
-  }
-}

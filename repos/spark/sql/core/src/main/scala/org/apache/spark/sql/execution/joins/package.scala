@@ -20,11 +20,10 @@ package org.apache.spark.sql.execution
 /**
   * Physical execution operators for join operations.
   */
-package object joins {
+package object joins
 
   sealed abstract class BuildSide
 
   case object BuildRight extends BuildSide
 
   case object BuildLeft extends BuildSide
-}

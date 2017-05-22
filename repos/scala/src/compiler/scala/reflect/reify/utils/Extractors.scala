@@ -1,7 +1,7 @@
 package scala.reflect.reify
 package utils
 
-trait Extractors { self: Utils =>
+trait Extractors  self: Utils =>
 
   import global._
   import definitions._
@@ -42,10 +42,10 @@ trait Extractors { self: Utils =>
   // }
 
   private def mkCreator(
-      flavor: TypeName, symtab: SymbolTable, rtree: Tree): Tree = {
+      flavor: TypeName, symtab: SymbolTable, rtree: Tree): Tree =
     val tparamu = newTypeName("U")
     val (reifierBase, reifierName, reifierTpt, reifierUniverse) =
-      flavor match {
+      flavor match
         case tpnme.REIFY_TYPECREATOR_PREFIX =>
           (TypeCreatorClass,
            nme.apply,
@@ -57,25 +57,21 @@ trait Extractors { self: Utils =>
            SelectFromTypeTree(Ident(tparamu), tpnme.Tree),
            ApiUniverseClass)
         case _ => throw new Error(s"unexpected flavor $flavor")
-      }
-    val reifierBody = {
-      def gc(symtab: SymbolTable): SymbolTable = {
-        def loop(symtab: SymbolTable): SymbolTable = {
+    val reifierBody =
+      def gc(symtab: SymbolTable): SymbolTable =
+        def loop(symtab: SymbolTable): SymbolTable =
           def extractNames(tree: Tree) =
             tree.collect { case ref: RefTree => ref.name }.toSet
           val usedNames =
             extractNames(rtree) ++ symtab.syms.flatMap(
                 sym => extractNames(symtab.symDef(sym)))
           symtab filterAliases { case (_, name) => usedNames(name) }
-        }
         var prev = symtab
         var next = loop(symtab)
-        while (next.syms.length < prev.syms.length) {
+        while (next.syms.length < prev.syms.length)
           prev = next
           next = loop(prev)
-        }
         next
-      }
 
       val universeAlias = ValDef(
           NoMods,
@@ -90,7 +86,6 @@ trait Extractors { self: Utils =>
                     List(Select(Ident(nme.UNIVERSE_SHORT), tpnme.Mirror))))
       val trimmedSymtab = if (hasReifier) gc(symtab) else symtab
       Block(universeAlias :: mirrorAlias :: trimmedSymtab.encode, rtree)
-    }
     val tpec = ClassDef(
         Modifiers(FINAL),
         newTypeName(global.currentUnit.fresh.newName(flavor.toString)),
@@ -130,9 +125,8 @@ trait Extractors { self: Utils =>
                           reifierTpt,
                           reifierBody))))
     Block(tpec, ApplyConstructor(Ident(tpec.name), List()))
-  }
 
-  private def mkWrapper(universe: Tree, mirror: Tree, wrappee: Tree): Tree = {
+  private def mkWrapper(universe: Tree, mirror: Tree, wrappee: Tree): Tree =
     val universeAlias = ValDef(
         NoMods, nme.UNIVERSE_SHORT, SingletonTypeTree(universe), universe)
     val mirrorAlias = ValDef(
@@ -141,7 +135,6 @@ trait Extractors { self: Utils =>
         Select(Ident(nme.UNIVERSE_SHORT), tpnme.Mirror),
         mirror orElse mkDefaultMirrorRef(global)(universe, typer))
     Block(List(universeAlias, mirrorAlias), wrappee)
-  }
 
   // if we're reifying a MethodType, we can't use it as a type argument for TypeTag ctor
   // http://groups.google.com/group/scala-internals/browse_thread/thread/2d7bb85bfcdb2e2
@@ -149,14 +142,14 @@ trait Extractors { self: Utils =>
     (if ((tpe eq null) || !isUseableAsTypeArg(tpe)) TypeTree(AnyTpe)
      else TypeTree(tpe))
 
-  object ReifiedTree {
+  object ReifiedTree
     def apply(universe: Tree,
               mirror: Tree,
               symtab: SymbolTable,
               rtree: Tree,
               tpe: Type,
               rtpe: Tree,
-              concrete: Boolean): Tree = {
+              concrete: Boolean): Tree =
       val tagFactory = if (concrete) nme.TypeTag else nme.WeakTypeTag
       val tagCtor = TypeApply(
           Select(Select(Ident(nme.UNIVERSE_SHORT), tagFactory), nme.apply),
@@ -174,11 +167,10 @@ trait Extractors { self: Utils =>
                    mkCreator(tpnme.REIFY_TREECREATOR_PREFIX, symtab, rtree))),
           List(Apply(tagCtor, tagArgs)))
       mkWrapper(universe, mirror, unwrapped)
-    }
 
     def unapply(tree: Tree)
       : Option[(Tree, Tree, SymbolTable, Tree, Type, Tree, Boolean)] =
-      tree match {
+      tree match
         case Block(
             List(
             udef @ ValDef(_, _, _, universe), mdef @ ValDef(_, _, _, mirror)),
@@ -224,10 +216,9 @@ trait Extractors { self: Utils =>
                                    _))))))
             if udef.name == nme.UNIVERSE_SHORT &&
             mdef.name == nme.MIRROR_SHORT =>
-          val tagFlavor = tagFactory match {
+          val tagFlavor = tagFactory match
             case Select(Select(_, tagFlavor), _) => tagFlavor
             case Select(_, tagFlavor) => tagFlavor
-          }
           Some(
               (universe,
                mirror,
@@ -238,16 +229,14 @@ trait Extractors { self: Utils =>
                tagFlavor == nme.TypeTag))
         case _ =>
           None
-      }
-  }
 
-  object ReifiedType {
+  object ReifiedType
     def apply(universe: Tree,
               mirror: Tree,
               symtab: SymbolTable,
               tpe: Type,
               rtpe: Tree,
-              concrete: Boolean) = {
+              concrete: Boolean) =
       val tagFactory = if (concrete) nme.TypeTag else nme.WeakTypeTag
       val ctor = TypeApply(
           Select(Select(Ident(nme.UNIVERSE_SHORT), tagFactory), nme.apply),
@@ -256,11 +245,10 @@ trait Extractors { self: Utils =>
                       mkCreator(tpnme.REIFY_TYPECREATOR_PREFIX, symtab, rtpe))
       val unwrapped = Apply(ctor, args)
       mkWrapper(universe, mirror, unwrapped)
-    }
 
     def unapply(
         tree: Tree): Option[(Tree, Tree, SymbolTable, Type, Tree, Boolean)] =
-      tree match {
+      tree match
         case Block(
             List(
             udef @ ValDef(_, _, _, universe), mdef @ ValDef(_, _, _, mirror)),
@@ -285,10 +273,9 @@ trait Extractors { self: Utils =>
                        _))))
             if udef.name == nme.UNIVERSE_SHORT &&
             mdef.name == nme.MIRROR_SHORT =>
-          val tagFlavor = tagFactory match {
+          val tagFlavor = tagFactory match
             case Select(Select(_, tagFlavor), _) => tagFlavor
             case Select(_, tagFlavor) => tagFlavor
-          }
           Some(
               (universe,
                mirror,
@@ -298,40 +285,33 @@ trait Extractors { self: Utils =>
                tagFlavor == nme.TypeTag))
         case _ =>
           None
-      }
-  }
 
-  object TreeSplice {
+  object TreeSplice
     def apply(splicee: Tree): Tree =
       Select(splicee, ExprSplice)
 
-    def unapply(tree: Tree): Option[Tree] = tree match {
+    def unapply(tree: Tree): Option[Tree] = tree match
       case Select(splicee, _)
           if tree.symbol != NoSymbol && tree.symbol == ExprSplice =>
         Some(splicee)
       case _ =>
         None
-    }
-  }
 
   // abstract over possible additional .apply select
   // which is sometimes inserted after desugaring of calls
-  object ApplyCall {
-    def unapply(tree: Tree): Option[(Tree, List[Tree])] = tree match {
+  object ApplyCall
+    def unapply(tree: Tree): Option[(Tree, List[Tree])] = tree match
       case Apply(Select(id, nme.apply), args) => Some((id, args))
       case Apply(id, args) => Some((id, args))
       case _ => None
-    }
-  }
 
   sealed abstract class FreeDefExtractor(
-      acceptTerms: Boolean, acceptTypes: Boolean) {
-    def unapply(tree: Tree): Option[(Tree, TermName, Tree, Long, String)] = {
-      def acceptFreeTermFactory(name: Name) = {
+      acceptTerms: Boolean, acceptTypes: Boolean)
+    def unapply(tree: Tree): Option[(Tree, TermName, Tree, Long, String)] =
+      def acceptFreeTermFactory(name: Name) =
         (acceptTerms && name == nme.newFreeTerm) ||
         (acceptTypes && name == nme.newFreeType)
-      }
-      tree match {
+      tree match
         case ValDef(
             _,
             name,
@@ -352,9 +332,6 @@ trait Extractors { self: Utils =>
           Some((uref1, name, reifyBinding(tree), flags, origin))
         case _ =>
           None
-      }
-    }
-  }
   object FreeDef
       extends FreeDefExtractor(acceptTerms = true, acceptTypes = true)
   object FreeTermDef
@@ -362,8 +339,8 @@ trait Extractors { self: Utils =>
   object FreeTypeDef
       extends FreeDefExtractor(acceptTerms = false, acceptTypes = true)
 
-  object FreeRef {
-    def unapply(tree: Tree): Option[(Tree, TermName)] = tree match {
+  object FreeRef
+    def unapply(tree: Tree): Option[(Tree, TermName)] = tree match
       case Apply(
           Select(Select(Select(uref @ Ident(_), internal), rs), mkIdent),
           List(Ident(name: TermName)))
@@ -372,12 +349,10 @@ trait Extractors { self: Utils =>
         Some((uref, name))
       case _ =>
         None
-    }
-  }
 
-  object SymDef {
+  object SymDef
     def unapply(tree: Tree): Option[(Tree, TermName, Long, Boolean)] =
-      tree match {
+      tree match
         case ValDef(
             _,
             name,
@@ -401,11 +376,9 @@ trait Extractors { self: Utils =>
           Some((uref1, name, flags, isClass))
         case _ =>
           None
-      }
-  }
 
-  object TypeRefToFreeType {
-    def unapply(tree: Tree): Option[TermName] = tree match {
+  object TypeRefToFreeType
+    def unapply(tree: Tree): Option[TermName] = tree match
       case Apply(Select(Select(uref @ Ident(_), typeRef), apply),
                  List(Select(_, noSymbol), Ident(freeType: TermName), nil))
           if
@@ -415,11 +388,9 @@ trait Extractors { self: Utils =>
         Some(freeType)
       case _ =>
         None
-    }
-  }
 
-  object BoundTerm {
-    def unapply(tree: Tree): Option[Tree] = tree match {
+  object BoundTerm
+    def unapply(tree: Tree): Option[Tree] = tree match
       case Select(_, name) if name.isTermName =>
         Some(tree)
       case Ident(name) if name.isTermName =>
@@ -428,11 +399,9 @@ trait Extractors { self: Utils =>
         Some(tree)
       case _ =>
         None
-    }
-  }
 
-  object BoundType {
-    def unapply(tree: Tree): Option[RefTree] = tree match {
+  object BoundType
+    def unapply(tree: Tree): Option[RefTree] = tree match
       case tree @ Select(_, name) if name.isTypeName =>
         Some(tree)
       case tree @ SelectFromTypeTree(_, _) =>
@@ -441,6 +410,3 @@ trait Extractors { self: Utils =>
         Some(tree)
       case _ =>
         None
-    }
-  }
-}

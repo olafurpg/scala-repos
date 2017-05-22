@@ -17,7 +17,7 @@ import akka.actor.ExtensionIdProvider
   * and port.
   */
 object AddressUidExtension
-    extends ExtensionId[AddressUidExtension] with ExtensionIdProvider {
+    extends ExtensionId[AddressUidExtension] with ExtensionIdProvider
   override def get(system: ActorSystem): AddressUidExtension =
     super.get(system)
 
@@ -26,8 +26,6 @@ object AddressUidExtension
   override def createExtension(
       system: ExtendedActorSystem): AddressUidExtension =
     new AddressUidExtension(system)
-}
 
-class AddressUidExtension(val system: ExtendedActorSystem) extends Extension {
+class AddressUidExtension(val system: ExtendedActorSystem) extends Extension
   val addressUid: Int = ThreadLocalRandom.current.nextInt()
-}

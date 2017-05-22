@@ -30,20 +30,19 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import yggdrasil.test._
 
 trait PredicatePullupSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification with EvaluatorTestSupport[M]
   import dag._
   import library._
 
   val ctx = defaultEvaluationContext
 
-  object pullups extends PredicatePullups with StdLibOpFinder {
+  object pullups extends PredicatePullups with StdLibOpFinder
     def MorphContext(ctx: EvaluationContext, node: DepGraph): MorphContext =
       new MorphContext(ctx, null)
-  }
   import pullups._
 
-  "Predicate pullups optimization" should {
-    "pull a predicate out of a solve with a single ticvar" in {
+  "Predicate pullups optimization" should
+    "pull a predicate out of a solve with a single ticvar" in
       val rawInput =
         """
         | clicks := //clicks
@@ -154,9 +153,8 @@ trait PredicatePullupSpecs[M[+ _]]
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
-    }
 
-    "pull a predicate out of a solve with more than one ticvar" in {
+    "pull a predicate out of a solve with more than one ticvar" in
       val rawInput =
         """
         | clicks := //clicks
@@ -282,9 +280,8 @@ trait PredicatePullupSpecs[M[+ _]]
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
-    }
 
-    "pull a predicate out of the top level of a nested solve" in {
+    "pull a predicate out of the top level of a nested solve" in
       val rawInput =
         """
         | medals := //summer_games/london_medals
@@ -374,9 +371,8 @@ trait PredicatePullupSpecs[M[+ _]]
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
-    }
 
-    "pull a predicate out of a solve where both the filtered and the unfiltered set occur in the body" in {
+    "pull a predicate out of a solve where both the filtered and the unfiltered set occur in the body" in
       val rawInput =
         """
         | medals := //summer_games/london_medals
@@ -483,9 +479,6 @@ trait PredicatePullupSpecs[M[+ _]]
       )(loc)
 
       predicatePullups(split, ctx) mustEqual expected
-    }
-  }
-}
 
 object PredicatePullupSpecs
     extends PredicatePullupSpecs[YId] with yggdrasil.test.YIdInstances

@@ -7,7 +7,7 @@ package sbt
 import java.net.URI
 
 /** Extends `URI` with additional convenience methods. */
-class RichURI(uri: URI) {
+class RichURI(uri: URI)
 
   /**
     * Provides a case-class-like `copy` method for URI.
@@ -39,17 +39,14 @@ class RichURI(uri: URI) {
     * If the URI has a fragment, the fragment is transferred to the wrapped URI.
     * If this URI does not have a marker scheme, it is returned unchanged.
     */
-  def withoutMarkerScheme = {
+  def withoutMarkerScheme =
     if (hasMarkerScheme)
       if (hasFragment)
         new URI(uri.getRawSchemeSpecificPart + "#" + uri.getRawFragment)
       else new URI(uri.getRawSchemeSpecificPart)
     else uri
-  }
-}
 
-object RichURI {
+object RichURI
 
   /** Provides additional convenience methods for `uri`. */
   implicit def fromURI(uri: URI): RichURI = new RichURI(uri)
-}

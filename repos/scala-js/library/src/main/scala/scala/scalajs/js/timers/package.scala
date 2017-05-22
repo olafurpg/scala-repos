@@ -18,7 +18,7 @@ import scala.concurrent.duration.FiniteDuration
   *  The methods in this package work in all JavaScript virtual machines
   *  supported by Scala.js (currently Rhino, Node.js and PhantomJS).
   */
-package object timers {
+package object timers
 
   /** Schedule something for execution in `interval` milliseconds.
     *
@@ -79,4 +79,3 @@ package object timers {
     */
   def clearInterval(handle: SetIntervalHandle): Unit =
     RawTimers.clearInterval(handle)
-}

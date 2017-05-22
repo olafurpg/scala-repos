@@ -24,10 +24,10 @@ import scala.xml.Node
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
 private[ui] class EnvironmentPage(parent: EnvironmentTab)
-    extends WebUIPage("") {
+    extends WebUIPage("")
   private val listener = parent.listener
 
-  def render(request: HttpServletRequest): Seq[Node] = {
+  def render(request: HttpServletRequest): Seq[Node] =
     val runtimeInformationTable = UIUtils.listingTable(
         propertyHeader, jvmRow, listener.jvmInformation, fixedWidth = true)
     val sparkPropertiesTable = UIUtils.listingTable(propertyHeader,
@@ -50,7 +50,6 @@ private[ui] class EnvironmentPage(parent: EnvironmentTab)
       </span>
 
     UIUtils.headerSparkPage("Environment", content, parent)
-  }
 
   private def propertyHeader = Seq("Name", "Value")
   private def classPathHeaders = Seq("Resource", "Source")
@@ -60,4 +59,3 @@ private[ui] class EnvironmentPage(parent: EnvironmentTab)
     <tr><td>{kv._1}</td><td>{kv._2}</td></tr>
   private def classPathRow(data: (String, String)) =
     <tr><td>{data._1}</td><td>{data._2}</td></tr>
-}

@@ -19,7 +19,7 @@ import scala.util.DynamicVariable
   *  @author  Matthias Zenger
   *  @version 1.0, 03/09/2003
   */
-object Console {
+object Console
 
   /** Foreground color for ANSI black */
   final val BLACK = "\033[30m"
@@ -186,9 +186,8 @@ object Console {
     *
     *  @param reader specifies the new input stream.
     */
-  def setIn(reader: Reader) {
+  def setIn(reader: Reader)
     inVar.value = new BufferedReader(reader)
-  }
 
   /** Sets the default input stream for the duration
     *  of execution of one thunk.
@@ -214,9 +213,8 @@ object Console {
     *
     *  @param in the new input stream.
     */
-  def setIn(in: InputStream) {
+  def setIn(in: InputStream)
     setIn(new InputStreamReader(in))
-  }
 
   /** Sets the default input stream for the duration
     *  of execution of one thunk.
@@ -234,9 +232,8 @@ object Console {
     *
     *  @param obj the object to print; may be null.
     */
-  def print(obj: Any) {
+  def print(obj: Any)
     out.print(if (null == obj) "null" else obj.toString())
-  }
 
   /** Flushes the output stream. This function is required when partial
     *  output (i.e. output not terminated by a newline character) has
@@ -281,10 +278,9 @@ object Console {
     *  @param args the parameters used to instantiate the format, as in `printf`.
     *  @return the string read from the default input
     */
-  def readLine(text: String, args: Any*): String = {
+  def readLine(text: String, args: Any*): String =
     printf(text, args: _*)
     readLine()
-  }
 
   /** Reads a boolean value from an entire line of the default input.
     *  Has a fairly liberal interpretation of the input.
@@ -292,19 +288,17 @@ object Console {
     *  @return the boolean value read, or false if it couldn't be converted to a boolean
     *  @throws java.io.EOFException if the end of the input stream has been reached.
     */
-  def readBoolean(): Boolean = {
+  def readBoolean(): Boolean =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else
-      s.toLowerCase() match {
+      s.toLowerCase() match
         case "true" => true
         case "t" => true
         case "yes" => true
         case "y" => true
         case _ => false
-      }
-  }
 
   /** Reads a byte value from an entire line of the default input.
     *
@@ -313,12 +307,11 @@ object Console {
     *  input stream has been reached.
     *  @throws java.lang.NumberFormatException if the value couldn't be converted to a Byte
     */
-  def readByte(): Byte = {
+  def readByte(): Byte =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else s.toByte
-  }
 
   /** Reads a short value from an entire line of the default input.
     *
@@ -327,12 +320,11 @@ object Console {
     *  input stream has been reached.
     *  @throws java.lang.NumberFormatException if the value couldn't be converted to a Short
     */
-  def readShort(): Short = {
+  def readShort(): Short =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else s.toShort
-  }
 
   /** Reads a char value from an entire line of the default input.
     *
@@ -341,12 +333,11 @@ object Console {
     *  input stream has been reached.
     *  @throws java.lang.StringIndexOutOfBoundsException if the line read from default input was empty
     */
-  def readChar(): Char = {
+  def readChar(): Char =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else s charAt 0
-  }
 
   /** Reads an int value from an entire line of the default input.
     *
@@ -355,12 +346,11 @@ object Console {
     *  input stream has been reached.
     *  @throws java.lang.NumberFormatException if the value couldn't be converted to an Int
     */
-  def readInt(): Int = {
+  def readInt(): Int =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else s.toInt
-  }
 
   /** Reads an long value from an entire line of the default input.
     *
@@ -369,12 +359,11 @@ object Console {
     *  input stream has been reached.
     *  @throws java.lang.NumberFormatException if the value couldn't be converted to a Long
     */
-  def readLong(): Long = {
+  def readLong(): Long =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else s.toLong
-  }
 
   /** Reads a float value from an entire line of the default input.
     *  @return the Float that was read.
@@ -383,12 +372,11 @@ object Console {
     *  @throws java.lang.NumberFormatException if the value couldn't be converted to a Float
     *
     */
-  def readFloat(): Float = {
+  def readFloat(): Float =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else s.toFloat
-  }
 
   /** Reads a double value from an entire line of the default input.
     *
@@ -397,12 +385,11 @@ object Console {
     *  input stream has been reached.
     *  @throws java.lang.NumberFormatException if the value couldn't be converted to a Float
     */
-  def readDouble(): Double = {
+  def readDouble(): Double =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else s.toDouble
-  }
 
   /** Reads in some structured input (from the default input), specified by
     *  a format specifier. See class `java.text.MessageFormat` for details of
@@ -413,12 +400,11 @@ object Console {
     *  @throws java.io.EOFException if the end of the input stream has been
     *          reached.
     */
-  def readf(format: String): List[Any] = {
+  def readf(format: String): List[Any] =
     val s = readLine()
     if (s == null)
       throw new java.io.EOFException("Console has reached end of input")
     else textComponents(new MessageFormat(format).parse(s))
-  }
 
   /** Reads in some structured input (from the default input), specified by
     *  a format specifier, returning only the first value extracted, according
@@ -436,10 +422,9 @@ object Console {
     *  @param format format string, as accepted by `readf`.
     *  @return A [[scala.Tuple2]] containing the first two values extracted
     */
-  def readf2(format: String): (Any, Any) = {
+  def readf2(format: String): (Any, Any) =
     val res = readf(format)
     (res.head, res.tail.head)
-  }
 
   /** Reads in some structured input (from the default input), specified
     *  by a format specifier, returning only the first three values extracted,
@@ -448,16 +433,15 @@ object Console {
     *  @param format format string, as accepted by `readf`.
     *  @return A [[scala.Tuple3]] containing the first three values extracted
     */
-  def readf3(format: String): (Any, Any, Any) = {
+  def readf3(format: String): (Any, Any, Any) =
     val res = readf(format)
     (res.head, res.tail.head, res.tail.tail.head)
-  }
 
-  private def textComponents(a: Array[AnyRef]): List[Any] = {
+  private def textComponents(a: Array[AnyRef]): List[Any] =
     var i: Int = a.length - 1
     var res: List[Any] = Nil
-    while (i >= 0) {
-      res = (a(i) match {
+    while (i >= 0)
+      res = (a(i) match
         case x: java.lang.Boolean => x.booleanValue()
         case x: java.lang.Byte => x.byteValue()
         case x: java.lang.Short => x.shortValue()
@@ -467,9 +451,6 @@ object Console {
         case x: java.lang.Float => x.floatValue()
         case x: java.lang.Double => x.doubleValue()
         case x => x
-      }) :: res;
+      ) :: res;
       i -= 1
-    }
     res
-  }
-}

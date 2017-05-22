@@ -25,7 +25,7 @@ import java.io.InputStream
   */
 class ArrayBufferInputStream(
     val buffer: ArrayBuffer, val offset: Int, val length: Int)
-    extends InputStream {
+    extends InputStream
 
   /** Convenience constructor. Strictly equivalent to
     *  {{new ArrayBufferInputStream(buffer, 0, buffer.byteLength)}
@@ -49,15 +49,14 @@ class ArrayBufferInputStream(
   override def available(): Int = length - pos
   override def mark(readlimit: Int): Unit = { mark = pos }
   override def markSupported(): Boolean = true
-  def read(): Int = {
-    if (pos < length) {
+  def read(): Int =
+    if (pos < length)
       val res = uintView(pos)
       pos += 1
       res
-    } else -1
-  }
+    else -1
 
-  override def read(b: Array[Byte], off: Int, reqLen: Int): Int = {
+  override def read(b: Array[Byte], off: Int, reqLen: Int): Int =
     if (off < 0 || reqLen < 0 || reqLen > b.length - off)
       throw new IndexOutOfBoundsException
 
@@ -65,23 +64,18 @@ class ArrayBufferInputStream(
 
     if (reqLen == 0) 0 // 0 requested, 0 returned
     else if (len == 0) -1 // nothing to read at all
-    else {
+    else
       var i = 0
-      while (i < len) {
+      while (i < len)
         b(i + off) = byteView(pos + i)
         i += 1
-      }
       pos += len
       len
-    }
-  }
 
   override def reset(): Unit = { pos = mark }
 
   /** Skips a given number of bytes. Always skips the maximum number possible */
-  override def skip(n: Long): Long = {
+  override def skip(n: Long): Long =
     val k = Math.max(0, Math.min(n, length - pos)).toInt
     pos += k
     k.toLong
-  }
-}

@@ -6,7 +6,7 @@ package play.sbt
 import sbt._
 import sbt.Keys._
 
-object PlayInternalKeys {
+object PlayInternalKeys
   type ClassLoaderCreator = play.runsupport.Reloader.ClassLoaderCreator
 
   val playDependencyClasspath = TaskKey[Classpath](
@@ -45,4 +45,3 @@ object PlayInternalKeys {
   val playAssetsClassLoader = TaskKey[ClassLoader => ClassLoader](
       "playAssetsClassloader",
       "Function that creates a classloader from a given parent that contains all the assets.")
-}

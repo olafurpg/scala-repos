@@ -31,25 +31,22 @@ import org.joda.time.DateTime
 
 class HBPEvents(
     client: HBClient, config: StorageClientConfig, namespace: String)
-    extends PEvents {
+    extends PEvents
 
-  def checkTableExists(appId: Int, channelId: Option[Int]): Unit = {
+  def checkTableExists(appId: Int, channelId: Option[Int]): Unit =
     if (!client.admin.tableExists(
-            HBEventsUtil.tableName(namespace, appId, channelId))) {
-      if (channelId.nonEmpty) {
+            HBEventsUtil.tableName(namespace, appId, channelId)))
+      if (channelId.nonEmpty)
         logger.error(
             s"The appId $appId with channelId $channelId does not exist." +
             s" Please use valid appId and channelId.")
         throw new Exception(
             s"HBase table not found for appId $appId" +
             s" with channelId $channelId.")
-      } else {
+      else
         logger.error(
             s"The appId $appId does not exist. Please use valid appId.")
         throw new Exception(s"HBase table not found for appId $appId.")
-      }
-    }
-  }
 
   override def find(
       appId: Int,
@@ -61,7 +58,7 @@ class HBPEvents(
       eventNames: Option[Seq[String]] = None,
       targetEntityType: Option[Option[String]] = None,
       targetEntityId: Option[Option[String]] = None
-  )(sc: SparkContext): RDD[Event] = {
+  )(sc: SparkContext): RDD[Event] =
 
     checkTableExists(appId, channelId)
 
@@ -88,15 +85,13 @@ class HBPEvents(
                        classOf[TableInputFormat],
                        classOf[ImmutableBytesWritable],
                        classOf[Result])
-      .map {
+      .map
         case (key, row) => HBEventsUtil.resultToEvent(row, appId)
-      }
 
     rdd
-  }
 
   override def write(events: RDD[Event], appId: Int, channelId: Option[Int])(
-      sc: SparkContext): Unit = {
+      sc: SparkContext): Unit =
 
     checkTableExists(appId, channelId)
 
@@ -107,9 +102,7 @@ class HBPEvents(
                   classOf[TableOutputFormat[Object]],
                   classOf[OutputFormat[Object, Writable]])
 
-    events.map { event =>
+    events.map  event =>
       val (put, rowKey) = HBEventsUtil.eventToPut(event, appId)
       (new ImmutableBytesWritable(rowKey.toBytes), put)
-    }.saveAsNewAPIHadoopDataset(conf)
-  }
-}
+    .saveAsNewAPIHadoopDataset(conf)

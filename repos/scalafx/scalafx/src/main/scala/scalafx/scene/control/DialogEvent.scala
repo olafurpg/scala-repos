@@ -38,7 +38,7 @@ import scalafx.event.{Event, EventType}
 /**
   * Object companion for [[scalafx.scene.control.DialogEvent]].
   */
-object DialogEvent {
+object DialogEvent
 
   /**
     * Converts a ScalaFX DialogEvent to its JavaFX counterpart.
@@ -86,7 +86,6 @@ object DialogEvent {
     */
   val DialogCloseRequest: EventType[jfxsc.DialogEvent] =
     jfxsc.DialogEvent.DIALOG_CLOSE_REQUEST
-}
 
 /**
   * Event related to dialog showing/hiding actions.
@@ -98,10 +97,9 @@ object DialogEvent {
   * @define ORIGINALDOC Original Documentation]].
   */
 class DialogEvent(override val delegate: jfxsc.DialogEvent)
-    extends Event(delegate) with SFXDelegate[jfxsc.DialogEvent] {
+    extends Event(delegate) with SFXDelegate[jfxsc.DialogEvent]
 
   def this(source: Dialog[_], eventType: EventType[_ <: jfxe.Event]) =
     this(new jfxsc.DialogEvent(source.delegate, eventType.delegate))
 
   override def eventType: EventType[jfxsc.DialogEvent] = delegate.getEventType
-}

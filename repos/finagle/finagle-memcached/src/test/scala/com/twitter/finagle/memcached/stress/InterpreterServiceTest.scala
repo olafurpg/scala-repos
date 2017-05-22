@@ -13,12 +13,12 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
-class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
+class InterpreterServiceTest extends FunSuite with BeforeAndAfter
 
   var server: InProcessMemcached = null
   var client: Service[Command, Response] = null
 
-  before {
+  before
     server = new InProcessMemcached(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 0))
     val address = server.start().boundAddress.asInstanceOf[InetSocketAddress]
@@ -27,25 +27,20 @@ class InterpreterServiceTest extends FunSuite with BeforeAndAfter {
       .codec(new Memcached)
       .hostConnectionLimit(1)
       .build()
-  }
 
-  after {
+  after
     server.stop()
-  }
 
-  test("set & get") {
+  test("set & get")
     val _key = "key"
     val value = Buf.Utf8("value")
     val zero = Buf.Utf8("0")
     val start = System.currentTimeMillis
-    (0 until 100) map { i =>
+    (0 until 100) map  i =>
       val key = _key + i
       Await.result(client(Delete(Buf.Utf8(key))))
       Await.result(client(Set(Buf.Utf8(key), 0, Time.epoch, value)))
       assert(Await.result(client(Get(Seq(Buf.Utf8(key))))) == Values(
               Seq(Value(Buf.Utf8(key), value, None, Some(zero)))))
-    }
     val end = System.currentTimeMillis
     // println("%d ms".format(end - start))
-  }
-}

@@ -25,7 +25,7 @@ import net.liftweb.util.Helpers._
 /**
   * Abstracted JavaScript artifacts used by lift core.
   */
-trait JSArtifacts {
+trait JSArtifacts
 
   /**
     * Toggles the visibility of the element denomiated by id
@@ -90,19 +90,17 @@ trait JSArtifacts {
     *
     */
   def pathRewriter: PartialFunction[List[String], List[String]] =
-    new PartialFunction[List[String], List[String]] {
+    new PartialFunction[List[String], List[String]]
 
       def isDefinedAt(in: List[String]): Boolean = false
 
       def apply(in: List[String]): List[String] = Nil
-    }
-}
 
 /**
   * The companion module for AjaxInfo that provides
   * different construction schemes
   */
-object AjaxInfo {
+object AjaxInfo
   def apply(data: JsExp, post: Boolean) =
     new AjaxInfo(
         data, if (post) "POST" else "GET", 1000, false, "script", Empty, Empty)
@@ -129,7 +127,6 @@ object AjaxInfo {
                  "script",
                  Full(successFunc),
                  Full(failFunc))
-}
 
 /**
   * Represents the meta data of an Ajax request.

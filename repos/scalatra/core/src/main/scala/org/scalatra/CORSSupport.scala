@@ -8,7 +8,7 @@ import org.scalatra.util.RicherString._
 
 import scala.collection.JavaConverters._
 
-object CorsSupport {
+object CorsSupport
 
   val OriginHeader: String = "Origin"
   val AccessControlRequestMethodHeader: String =
@@ -76,14 +76,13 @@ object CorsSupport {
                                            "Authorization",
                                            "Accept",
                                            "Content-Type").mkString(",")
-}
-trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
+trait CorsSupport extends Handler with Initializable  self: ScalatraBase ⇒
 
   import org.scalatra.CorsSupport._
 
   private[this] lazy val logger: Logger = Logger(getClass)
 
-  abstract override def initialize(config: ConfigT): Unit = {
+  abstract override def initialize(config: ConfigT): Unit =
     super.initialize(config)
     def createDefault: CORSConfig =
       CORSConfig(Option(config.context.getInitParameter(AllowedOriginsKey))
@@ -112,17 +111,15 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       .getOrElseUpdate(CorsConfigKey, createDefault)
       .asInstanceOf[CORSConfig]
     import corsCfg._
-    if (enabled) {
+    if (enabled)
       logger debug "Enabled CORS Support with:\nallowedOrigins:\n\t%s\nallowedMethods:\n\t%s\nallowedHeaders:\n\t%s"
         .format(allowedOrigins mkString ", ",
                 allowedMethods mkString ", ",
                 allowedHeaders mkString ", ")
-    } else {
+    else
       logger debug "Cors support is disabled"
-    }
-  }
 
-  protected def handlePreflightRequest(): Unit = {
+  protected def handlePreflightRequest(): Unit =
     logger debug "handling preflight request"
     // 5.2.7
     augmentSimpleRequest()
@@ -141,9 +138,8 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
         .flatMap(_ split (","))
     response.headers(AccessControlAllowHeadersHeader) = rh mkString ","
     response.end()
-  }
 
-  protected def augmentSimpleRequest(): Unit = {
+  protected def augmentSimpleRequest(): Unit =
     val anyOriginAllowed: Boolean =
       corsConfig.allowedOrigins.contains(AnyOrigin)
     val hdr =
@@ -155,11 +151,9 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       response.headers(AccessControlAllowCredentialsHeader) = "true"
     response.setHeader(AccessControlAllowHeadersHeader,
                        request.getHeader(AccessControlRequestHeadersHeader))
-  }
 
-  private[this] def corsConfig: CORSConfig = {
+  private[this] def corsConfig: CORSConfig =
     servletContext.get(CorsConfigKey).orNull.asInstanceOf[CORSConfig]
-  }
 
   private[this] def originMatches: Boolean =
     // 6.2.2
@@ -177,7 +171,7 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
 
   private[this] def isValidRoute: Boolean =
     routes.matchingMethods(requestPath).nonEmpty
-  private[this] def isPreflightRequest: Boolean = {
+  private[this] def isPreflightRequest: Boolean =
     val isCors = isCORSRequest
     val validRoute = isValidRoute
     val isPreflight = request.headers
@@ -192,16 +186,15 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       isCors && validRoute && isPreflight && enabled && matchesOrigin &&
       methodAllowed && allowsHeaders
     result
-  }
 
-  private[this] def isCORSRequest: Boolean = {
+  private[this] def isCORSRequest: Boolean =
     request.headers.get(OriginHeader).flatMap(_.blankOption).isDefined
-  } // 6.x.1
+  // 6.x.1
 
-  private[this] def isSimpleHeader(header: String): Boolean = {
+  private[this] def isSimpleHeader(header: String): Boolean =
     val ho = header.blankOption
     ho.isDefined &&
-    (ho forall { h ⇒
+    (ho forall  h ⇒
           val hu = h.toUpperCase(ENGLISH)
           SimpleHeaders.contains(hu) ||
           (hu == "CONTENT-TYPE" &&
@@ -209,17 +202,15 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
                     .getOrElse(""))
                     .toUpperCase(ENGLISH)
                     .startsWith))
-        })
-  }
+        )
 
-  private[this] def allOriginsMatch: Boolean = {
+  private[this] def allOriginsMatch: Boolean =
     // 6.1.2
     val h = request.headers.get(OriginHeader).flatMap(_.blankOption)
     h.isDefined && h.get.split(" ").nonEmpty &&
     h.get.split(" ").forall(corsConfig.allowedOrigins.contains)
-  }
 
-  private[this] def isSimpleRequest: Boolean = {
+  private[this] def isSimpleRequest: Boolean =
     val isCors = isCORSRequest
     val enabled = isEnabled
     val allOrigins = allOriginsMatch
@@ -228,24 +219,20 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
       request.headers.keys.forall(isSimpleHeader)
     //    logger debug "This is a simple request: %s, because: %s, %s, %s".format(res, isCors, enabled, allOrigins)
     res
-  }
 
-  private[this] def allowsMethod: Boolean = {
+  private[this] def allowsMethod: Boolean =
     // 5.2.3 and 5.2.5
-    val accessControlRequestMethod: String = {
+    val accessControlRequestMethod: String =
       request.headers
         .get(AccessControlRequestMethodHeader)
         .flatMap(_.blankOption)
         .getOrElse("")
-    }
-    val result: Boolean = {
+    val result: Boolean =
       accessControlRequestMethod.nonBlank && corsConfig.allowedMethods
         .contains(accessControlRequestMethod.toUpperCase(ENGLISH))
-    }
     result
-  }
 
-  private[this] def headersAreAllowed: Boolean = {
+  private[this] def headersAreAllowed: Boolean =
     // 5.2.4 and 5.2.6
     val allowedHeaders =
       corsConfig.allowedHeaders.map(_.trim.toUpperCase(ENGLISH))
@@ -256,29 +243,20 @@ trait CorsSupport extends Handler with Initializable { self: ScalatraBase ⇒
 
     requestedHeaders.forall(
         h => isSimpleHeader(h) || allowedHeaders.contains(h))
-  }
 
   abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
-    if (corsConfig.enabled) {
-      withRequestResponse(req, res) {
-        request.requestMethod match {
-          case Options if isPreflightRequest ⇒ {
+      req: HttpServletRequest, res: HttpServletResponse): Unit =
+    if (corsConfig.enabled)
+      withRequestResponse(req, res)
+        request.requestMethod match
+          case Options if isPreflightRequest ⇒
               handlePreflightRequest()
-            }
-          case Get | Post | Head if isSimpleRequest ⇒ {
+          case Get | Post | Head if isSimpleRequest ⇒
               augmentSimpleRequest()
               super.handle(req, res)
-            }
-          case _ if isCORSRequest ⇒ {
+          case _ if isCORSRequest ⇒
               augmentSimpleRequest()
               super.handle(req, res)
-            }
           case _ ⇒ super.handle(req, res)
-        }
-      }
-    } else {
+    else
       super.handle(req, res)
-    }
-  }
-}

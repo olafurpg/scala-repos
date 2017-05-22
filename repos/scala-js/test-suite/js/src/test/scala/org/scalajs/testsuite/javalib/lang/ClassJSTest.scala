@@ -12,18 +12,17 @@ import org.junit.Assert._
 
 import scala.scalajs.js
 
-class ClassJSTest {
+class ClassJSTest
 
-  @Test def getComponentType(): Unit = {
+  @Test def getComponentType(): Unit =
     @noinline
     def testNoInline(clazz: Class[_], componentType: Class[_]): Unit =
       assertEquals(componentType, clazz.getComponentType)
 
     @inline
-    def test(clazz: Class[_], componentType: Class[_]): Unit = {
+    def test(clazz: Class[_], componentType: Class[_]): Unit =
       testNoInline(clazz, componentType)
       assertEquals(componentType, clazz.getComponentType)
-    }
 
     test(classOf[Array[js.Date]], classOf[js.Date])
     test(classOf[Array[js.Dictionary[_]]], classOf[js.Dictionary[_]])
@@ -34,5 +33,3 @@ class ClassJSTest {
 
     test(classOf[js.Date], null)
     test(classOf[js.Dictionary[_]], null)
-  }
-}

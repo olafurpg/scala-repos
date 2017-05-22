@@ -13,8 +13,8 @@ import scala.util.matching.Regex
 /** This is for name logic which is independent of the compiler (notice there's no Global.)
   *  That includes at least generating, metaquoting, mangling, and unmangling.
   */
-trait Naming {
-  def unmangle(str: String): String = {
+trait Naming
+  def unmangle(str: String): String =
     val ESC = '\u001b'
     val cleaned = removeIWPackages(removeLineWrapper(str))
     // Looking to exclude binary data which hoses the terminal, but
@@ -25,36 +25,33 @@ trait Naming {
     // Lots of binary chars - translate all supposed whitespace into spaces
     // except supposed line endings, otherwise scrubbed lines run together
     if (binaryChars > 5) // more than one can count while holding a hamburger
-      cleaned map {
+      cleaned map
         case c if lineSeparator contains c => c
         case c if c.isWhitespace => ' '
         case c if c < 32 => '?'
         case c => c
-      }
     // Not lots - preserve whitespace and ESC
     else
       cleaned map
       (ch =>
             if (ch.isWhitespace || ch == ESC) ch else if (ch < 32) '?' else ch)
-  }
 
   // The two name forms this is catching are the two sides of this assignment:
   //
   // $line3.$read.$iw.$iw.Bippy =
   //   $line3.$read$$iw$$iw$Bippy@4a6a00ca
-  lazy val lineRegex = {
+  lazy val lineRegex =
     val sn = sessionNames
     val members =
       List(sn.read, sn.eval, sn.print) map Regex.quote mkString
       ("(?:", "|", ")")
     debugging("lineRegex")(
         Regex.quote(sn.line) + """\d+[./]""" + members + """[$.]""")
-  }
 
   private def removeLineWrapper(s: String) = s.replaceAll(lineRegex, "")
   private def removeIWPackages(s: String) = s.replaceAll("""\$iw[$.]""", "")
 
-  trait SessionNames {
+  trait SessionNames
     // All values are configurable by passing e.g. -Dscala.repl.name.read=XXX
     final def propOr(name: String): String = propOr(name, "$" + name)
     final def propOr(name: String, default: String): String =
@@ -71,23 +68,20 @@ trait Naming {
     def res = propOr("res", "res") // INTERPRETER_VAR_PREFIX
     // Internal ones
     def ires = propOr("ires")
-  }
   lazy val sessionNames: SessionNames = new SessionNames {}
 
   /** Generates names pre0, pre1, etc. via calls to apply method */
-  class NameCreator(pre: String) {
+  class NameCreator(pre: String)
     private var x = -1
     var mostRecent: String = ""
 
-    def apply(): String = {
+    def apply(): String =
       x += 1
       mostRecent = pre + x
       mostRecent
-    }
     def reset(): Unit = x = -1
     def didGenerate(name: String) =
       (name startsWith pre) && ((name drop pre.length) forall (_.isDigit))
-  }
 
   private lazy val userVar =
     new NameCreator(sessionNames.res) // var name, like res0
@@ -97,18 +91,15 @@ trait Naming {
   def isUserVarName(name: String) = userVar didGenerate name
   def isInternalVarName(name: String) = internalVar didGenerate name
 
-  val freshLineId = {
+  val freshLineId =
     var x = 0
     () =>
       { x += 1; x }
-  }
   def freshUserVarName() = userVar()
   def freshInternalVarName() = internalVar()
 
-  def resetAllCreators() {
+  def resetAllCreators()
     userVar.reset()
     internalVar.reset()
-  }
 
   def mostRecentVar = userVar.mostRecent
-}

@@ -12,6 +12,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * Date: 06.03.2008
   */
 class ScExprsImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScExprs {
+    extends ScalaPsiElementImpl(node) with ScExprs
   override def toString: String = "ExpressionsList"
-}

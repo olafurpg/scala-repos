@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators._
 trait ScalaTestWholeSuiteTest
     extends FeatureSpecGenerator with FlatSpecGenerator with FreeSpecGenerator
     with FunSpecGenerator with FunSuiteGenerator with PropSpecGenerator
-    with WordSpecGenerator {
+    with WordSpecGenerator
   val featureSpecTestPaths = List(List("[root]",
                                        "FeatureSpecTest",
                                        "Feature: Feature 1",
@@ -58,7 +58,7 @@ trait ScalaTestWholeSuiteTest
       List("[root]", "WordSpecTest", "WordSpecTest", "ignore other tests"),
       List("[root]", "WordSpecTest", "outer", "inner"))
 
-  def testFeatureSpec() {
+  def testFeatureSpec()
     addFeatureSpec()
 
     runTestByLocation(2,
@@ -72,9 +72,8 @@ trait ScalaTestWholeSuiteTest
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 1", "Scenario: Scenario B") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FeatureSpecTest", "Feature: Feature 2", "Scenario: Scenario C")
     )
-  }
 
-  def testFlatSpec() {
+  def testFlatSpec()
     addFlatSpec()
 
     runTestByLocation(2,
@@ -87,9 +86,8 @@ trait ScalaTestWholeSuiteTest
 //        checkResultTreeHasExactNamedPath(root, "[root]", "FlatSpecTest", "A FlatSpecTest", "should be able to run single test") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FlatSpecTest", "A FlatSpecTest", "should not run other tests")
     )
-  }
 
-  def testFreeSpec() {
+  def testFreeSpec()
     addFreeSpec()
 
     runTestByLocation(2,
@@ -102,9 +100,8 @@ trait ScalaTestWholeSuiteTest
 //        checkResultTreeHasExactNamedPath(root, "[root]", "FreeSpecTest", "A FreeSpecTest", "should be able to run single tests") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FreeSpecTest", "A FreeSpecTest", "should not run tests that are not selected")
     )
-  }
 
-  def testFunSpec() {
+  def testFunSpec()
     addFunSpec()
 
     runTestByLocation(2,
@@ -117,9 +114,8 @@ trait ScalaTestWholeSuiteTest
 //        checkResultTreeHasExactNamedPath(root, "[root]", "FunSpecTest", "FunSpecTest", "should launch single test") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FunSpecTest", "FunSpecTest", "should not launch other tests")
     )
-  }
 
-  def testFunSuite() {
+  def testFunSuite()
     addFunSuite()
 
     runTestByLocation(2,
@@ -132,9 +128,8 @@ trait ScalaTestWholeSuiteTest
 //        checkResultTreeHasExactNamedPath(root, "[root]", "FunSuiteTest", "should run single test") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "FunSuiteTest", "should not run other tests")
     )
-  }
 
-  def testPropSpec() {
+  def testPropSpec()
     addPropSpec()
 
     runTestByLocation(2,
@@ -147,9 +142,8 @@ trait ScalaTestWholeSuiteTest
 //        checkResultTreeHasExactNamedPath(root, "[root]", "PropSpecTest", "Single tests should run") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "PropSpecTest", "other test should not run")
     )
-  }
 
-  def testWordSpec() {
+  def testWordSpec()
     addWordSpec()
 
     runTestByLocation(2,
@@ -162,5 +156,3 @@ trait ScalaTestWholeSuiteTest
 //        checkResultTreeHasExactNamedPath(root, "[root]", "WordSpecTest", "WordSpecTest", "Run single test") &&
 //          checkResultTreeHasExactNamedPath(root, "[root]", "WordSpecTest", "WordSpecTest", "ignore other tests")
     )
-  }
-}

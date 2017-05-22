@@ -7,22 +7,21 @@ import com.twitter.io.Buf
 import com.twitter.util.Future
 
 class MetricsHostStatsReceiver(val registry: Metrics)
-    extends HostStatsReceiver {
+    extends HostStatsReceiver
   def this() = this(MetricsStatsReceiver.defaultHostRegistry)
 
   private[this] val _self = new MetricsStatsReceiver(registry)
   def self = _self
-}
 
 class HostMetricsExporter(val registry: Metrics)
-    extends JsonExporter(registry) with HttpMuxHandler {
+    extends JsonExporter(registry) with HttpMuxHandler
   def this() = this(MetricsStatsReceiver.defaultHostRegistry)
   val pattern = "/admin/per_host_metrics.json"
 
-  override def apply(request: Request): Future[Response] = {
-    if (perHostStats()) {
+  override def apply(request: Request): Future[Response] =
+    if (perHostStats())
       super.apply(request)
-    } else {
+    else
       val response = Response()
       response.contentType = MediaType.Json
       response.content = Buf.Utf8(s"""{
@@ -32,6 +31,3 @@ class HostMetricsExporter(val registry: Metrics)
         |  }
         |}""".stripMargin)
       Future.value(response)
-    }
-  }
-}

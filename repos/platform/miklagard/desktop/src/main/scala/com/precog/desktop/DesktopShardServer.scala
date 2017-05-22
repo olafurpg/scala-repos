@@ -36,7 +36,7 @@ import com.precog.bifrost.nihdb.NIHDBQueryExecutorComponent
 import com.precog.standalone.StandaloneShardServer
 
 object DesktopShardServer
-    extends StandaloneShardServer with NIHDBQueryExecutorComponent {
+    extends StandaloneShardServer with NIHDBQueryExecutorComponent
   val caveatMessage = None
 
   val actorSystem = ActorSystem("desktopExecutorActorSystem")
@@ -46,7 +46,7 @@ object DesktopShardServer
 
   def platformFor(config: Configuration,
                   apiKeyFinder: APIKeyFinder[Future],
-                  jobManager: JobManager[Future]) = {
+                  jobManager: JobManager[Future]) =
     val rootAPIKey = config[String]("security.masterAccount.apiKey")
     val accountFinder = new StaticAccountFinder(
         "desktop", rootAPIKey, Some("/"))
@@ -55,10 +55,7 @@ object DesktopShardServer
                                    accountFinder,
                                    jobManager)
 
-    val stoppable = Stoppable.fromFuture {
+    val stoppable = Stoppable.fromFuture
       platform.shutdown
-    }
 
     (platform, stoppable)
-  }
-}

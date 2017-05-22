@@ -12,7 +12,7 @@ import scala.concurrent._
 final class BoostingApi(modApi: ModApi,
                         collBoosting: Coll,
                         nbGamesToMark: Int,
-                        ratioGamesToMark: Double) {
+                        ratioGamesToMark: Double)
   import BoostingApi._
 
   private implicit val boostingRecordBSONHandler =
@@ -33,34 +33,30 @@ final class BoostingApi(modApi: ModApi,
 
   def determineBoosting(
       record: BoostingRecord, winner: User, loser: User): Funit =
-    (record.games >= nbGamesToMark) ?? {
-      {
+    (record.games >= nbGamesToMark) ??
         (record.games >= (winner.count.rated * ratioGamesToMark)) ?? modApi
           .autoBooster(winner.id, loser.id)
-      } >> {
+      >>
         (record.games >= (loser.count.rated * ratioGamesToMark)) ?? modApi
           .autoBooster(loser.id, winner.id)
-      }
-    }
 
   def boostingId(winner: User, loser: User): String =
     winner.id + "/" + loser.id
 
-  def check(game: Game, whiteUser: User, blackUser: User): Funit = {
+  def check(game: Game, whiteUser: User, blackUser: User): Funit =
     if (game.rated && game.accountable && game.playedTurns <= 10 &&
         !game.isTournament && game.winnerColor.isDefined &&
         variants.contains(game.variant) && !game.isCorrespondence &&
-        game.clock.fold(false) { _.limitInMinutes >= 1 }) {
-      game.winnerColor match {
-        case Some(a) => {
-            val result: GameResult = a match {
+        game.clock.fold(false) { _.limitInMinutes >= 1 })
+      game.winnerColor match
+        case Some(a) =>
+            val result: GameResult = a match
               case Color.White =>
                 GameResult(winner = whiteUser, loser = blackUser)
               case Color.Black =>
                 GameResult(winner = blackUser, loser = whiteUser)
-            }
             val id = boostingId(result.winner, result.loser)
-            getBoostingRecord(id).flatMap {
+            getBoostingRecord(id).flatMap
               case Some(record) =>
                 val newRecord =
                   BoostingRecord(_id = id, games = record.games + 1)
@@ -68,21 +64,13 @@ final class BoostingApi(modApi: ModApi,
                     newRecord, result.winner, result.loser)
               case none =>
                 createBoostRecord(BoostingRecord(_id = id, games = 1))
-            }
-          }
         case none => funit
-      }
-    } else {
+    else
       funit
-    }
-  }
-}
 
-object BoostingApi {
+object BoostingApi
 
-  case class BoostingRecord(_id: String, games: Int) {
+  case class BoostingRecord(_id: String, games: Int)
     def id = _id
-  }
 
   case class GameResult(winner: User, loser: User)
-}

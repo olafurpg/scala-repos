@@ -8,7 +8,7 @@ import breeze.linalg.copy
   * @author dlwh
   */
 class CachedDiffFunction[T : CanCopy](obj: DiffFunction[T])
-    extends DiffFunction[T] {
+    extends DiffFunction[T]
 
   /** calculates the gradient at a point */
   override def gradientAt(x: T): T = calculate(x)._2
@@ -19,24 +19,21 @@ class CachedDiffFunction[T : CanCopy](obj: DiffFunction[T])
   private var lastData: (T, Double, T) = null
 
   /** Calculates both the value and the gradient at a point */
-  def calculate(x: T): (Double, T) = {
+  def calculate(x: T): (Double, T) =
     var ld = lastData
-    if (ld == null || x != ld._1) {
+    if (ld == null || x != ld._1)
       val newData = obj.calculate(x)
       ld = (copy(x), newData._1, newData._2)
       lastData = ld
-    }
 
     val (_, v, g) = ld
     v -> g
-  }
-}
 
 /**
   * @author dlwh
   */
 class CachedBatchDiffFunction[T : CanCopy](obj: BatchDiffFunction[T])
-    extends BatchDiffFunction[T] {
+    extends BatchDiffFunction[T]
 
   /** calculates the gradient at a point */
   override def gradientAt(x: T, range: IndexedSeq[Int]): T =
@@ -51,15 +48,12 @@ class CachedBatchDiffFunction[T : CanCopy](obj: BatchDiffFunction[T])
   def fullRange = obj.fullRange
 
   /** Calculates both the value and the gradient at a point */
-  override def calculate(x: T, range: IndexedSeq[Int]): (Double, T) = {
+  override def calculate(x: T, range: IndexedSeq[Int]): (Double, T) =
     var ld = lastData
-    if (ld == null || range != ld._4 || x != ld._1) {
+    if (ld == null || range != ld._4 || x != ld._1)
       val newData = obj.calculate(x, range)
       ld = (copy(x), newData._1, newData._2, range)
       lastData = ld
-    }
 
     val (_, v, g, _) = ld
     v -> g
-  }
-}

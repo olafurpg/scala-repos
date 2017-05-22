@@ -1,5 +1,3 @@
-object Spawn {
-  def main(args: Array[String]) {
+object Spawn
+  def main(args: Array[String])
     error("Test error main")
-  }
-}

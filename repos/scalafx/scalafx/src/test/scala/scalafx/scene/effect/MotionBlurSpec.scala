@@ -43,7 +43,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class MotionBlurSpec
     extends SimpleSFXDelegateSpec[jfxse.MotionBlur, MotionBlur](
         classOf[jfxse.MotionBlur], classOf[MotionBlur])
-    with InputDelegateSpec[MotionBlur] {
+    with InputDelegateSpec[MotionBlur]
 
   val inputDelegate = getScalaClassInstance
-}

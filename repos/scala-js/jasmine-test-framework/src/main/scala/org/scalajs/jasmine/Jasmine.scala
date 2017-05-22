@@ -3,7 +3,7 @@ package org.scalajs.jasmine
 import scala.scalajs.js
 
 @js.native
-object Jasmine extends js.GlobalScope {
+object Jasmine extends js.GlobalScope
   def jasmine: JasmineEnv = js.native
   def describe(name: String, suite: js.Function0[_]): Unit = js.native
   def it(title: String, test: js.Function0[_]): Unit = js.native
@@ -18,4 +18,3 @@ object Jasmine extends js.GlobalScope {
   def waitsFor(
       block: js.Function0[Boolean], errorMsg: String, timeout: Int): Unit =
     js.native
-}

@@ -14,13 +14,11 @@ import org.jetbrains.sbt.project.SbtProjectSystem
   * @author Nikolay Obedin
   * @since 8/5/14.
   */
-class SbtRefreshProjectQuickFix extends AbstractIntentionAction {
+class SbtRefreshProjectQuickFix extends AbstractIntentionAction
 
   def getText = SbtBundle("sbt.fix.refreshProject")
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     FileDocumentManager.getInstance.saveAllDocuments()
     ExternalSystemUtil.refreshProjects(
         new ImportSpecBuilder(project, SbtProjectSystem.Id))
-  }
-}

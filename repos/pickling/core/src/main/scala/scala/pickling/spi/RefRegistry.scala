@@ -5,7 +5,7 @@ package spi
   *
   * This interface is stateful, and we assume only one thread will talk to it at a time.
   */
-trait RefPicklingRegistry {
+trait RefPicklingRegistry
 
   /** Returns the OID of the picklee.
     * @param picklee An object to tag/track
@@ -16,13 +16,12 @@ trait RefPicklingRegistry {
 
   /** Clears all registered objects out of the this cache. */
   def clear(): Unit
-}
 
 /** This is the interface used by unpicklers to register/handle `Ref` types when unpickling.
   *
   * We assume only one thread will be talking to a RefUnpicklingRegistry at a time.
   */
-trait RefUnpicklingRegistry {
+trait RefUnpicklingRegistry
 
   /** Grabs the registeration id for the next object. */
   def preregisterUnpicklee(): Int
@@ -35,16 +34,14 @@ trait RefUnpicklingRegistry {
 
   /** Removes all instances from the registry.  This should be done AFTER a top-level unpickle/pickle call. */
   def clear(): Unit
-}
 
 /** The owner of `Ref` registeries. These are used to help detangle circular references/trees when pickling or to
   * help optimise/reduce the amount of data pickled if an object shows up more than once.
   */
-trait RefRegistry {
+trait RefRegistry
 
   /** Returns the pickling registry for this thread. */
   def pickle: RefPicklingRegistry
 
   /** Returns the unpickling registry for this thread. */
   def unpickle: RefUnpicklingRegistry
-}

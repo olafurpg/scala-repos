@@ -1,4 +1,4 @@
-object SCL6628 {
+object SCL6628
   def foo(x: Int => Any) = 123
   def foo(x: Int) = 444
 
@@ -8,9 +8,8 @@ object SCL6628 {
   foo(A)
 
   class B(x: Int)
-  object B {
+  object B
     def apply(x: Int): B = new B(x)
-  }
 
   /*resolved: false */
   foo(B)
@@ -21,4 +20,3 @@ object SCL6628 {
   foo(C)
 
   List(1, 2, 3). /* resolved: false */ map(C)
-}

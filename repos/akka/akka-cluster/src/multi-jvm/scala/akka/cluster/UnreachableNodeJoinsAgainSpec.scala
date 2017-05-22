@@ -21,7 +21,7 @@ import akka.actor.Props
 import akka.actor.RootActorPath
 import akka.cluster.MultiNodeClusterSpec.EndActor
 
-object UnreachableNodeJoinsAgainMultiNodeConfig extends MultiNodeConfig {
+object UnreachableNodeJoinsAgainMultiNodeConfig extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -36,7 +36,6 @@ object UnreachableNodeJoinsAgainMultiNodeConfig extends MultiNodeConfig {
               .withFallback(MultiNodeClusterSpec.clusterConfig)))
 
   testTransport(on = true)
-}
 
 class UnreachableNodeJoinsAgainMultiJvmNode1
     extends UnreachableNodeJoinsAgainSpec
@@ -49,7 +48,7 @@ class UnreachableNodeJoinsAgainMultiJvmNode4
 
 abstract class UnreachableNodeJoinsAgainSpec
     extends MultiNodeSpec(UnreachableNodeJoinsAgainMultiNodeConfig)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import UnreachableNodeJoinsAgainMultiNodeConfig._
 
@@ -57,63 +56,54 @@ abstract class UnreachableNodeJoinsAgainSpec
 
   def allBut(
       role: RoleName,
-      roles: immutable.Seq[RoleName] = roles): immutable.Seq[RoleName] = {
+      roles: immutable.Seq[RoleName] = roles): immutable.Seq[RoleName] =
     roles.filterNot(_ == role)
-  }
 
   lazy val master = second
   lazy val victim = fourth
 
   var endBarrierNumber = 0
-  def endBarrier(): Unit = {
+  def endBarrier(): Unit =
     endBarrierNumber += 1
     enterBarrier("after_" + endBarrierNumber)
-  }
 
-  "A cluster of " + roles.size + " members" must {
+  "A cluster of " + roles.size + " members" must
 
-    "reach initial convergence" taggedAs LongRunningTest in {
+    "reach initial convergence" taggedAs LongRunningTest in
       awaitClusterUp(roles: _*)
       endBarrier()
-    }
 
-    "mark a node as UNREACHABLE when we pull the network" taggedAs LongRunningTest in {
+    "mark a node as UNREACHABLE when we pull the network" taggedAs LongRunningTest in
       // let them send at least one heartbeat to each other after the gossip convergence
       // because for new joining nodes we remove them from the failure detector when
       // receive gossip
       Thread.sleep(2.seconds.dilated.toMillis)
 
-      runOn(first) {
+      runOn(first)
         // pull network for victim node from all nodes
-        allBut(victim).foreach { roleName ⇒
+        allBut(victim).foreach  roleName ⇒
           testConductor.blackhole(victim, roleName, Direction.Both).await
-        }
-      }
 
       enterBarrier("unplug_victim")
 
       val allButVictim = allBut(victim, roles)
-      runOn(victim) {
+      runOn(victim)
         allButVictim.foreach(markNodeAsUnavailable(_))
-        within(30 seconds) {
+        within(30 seconds)
           // victim becomes all alone
-          awaitAssert {
+          awaitAssert
             val members = clusterView.members
             clusterView.unreachableMembers.size should ===(roles.size - 1)
-          }
           clusterView.unreachableMembers.map(_.address) should ===(
               (allButVictim map address).toSet)
-        }
-      }
 
-      runOn(allButVictim: _*) {
+      runOn(allButVictim: _*)
         markNodeAsUnavailable(victim)
-        within(30 seconds) {
+        within(30 seconds)
           // victim becomes unreachable
-          awaitAssert {
+          awaitAssert
             val members = clusterView.members
             clusterView.unreachableMembers.size should ===(1)
-          }
           awaitSeenSameState(allButVictim map address: _*)
           // still one unreachable
           clusterView.unreachableMembers.size should ===(1)
@@ -121,56 +111,46 @@ abstract class UnreachableNodeJoinsAgainSpec
               node(victim).address)
           clusterView.unreachableMembers.head.status should ===(
               MemberStatus.Up)
-        }
-      }
 
       endBarrier()
-    }
 
-    "mark the node as DOWN" taggedAs LongRunningTest in {
-      runOn(master) {
+    "mark the node as DOWN" taggedAs LongRunningTest in
+      runOn(master)
         cluster down victim
-      }
 
       val allButVictim = allBut(victim, roles)
-      runOn(allButVictim: _*) {
+      runOn(allButVictim: _*)
         // eventually removed
         awaitMembersUp(roles.size - 1, Set(victim))
         awaitAssert(clusterView.unreachableMembers should ===(Set.empty),
                     15 seconds)
         awaitAssert(clusterView.members.map(_.address) should ===(
                 (allButVictim map address).toSet))
-      }
 
       endBarrier()
-    }
 
-    "allow fresh node with same host:port to join again when the network is plugged back in" taggedAs LongRunningTest in {
+    "allow fresh node with same host:port to join again when the network is plugged back in" taggedAs LongRunningTest in
       val expectedNumberOfMembers = roles.size
 
       // victim actor system will be shutdown, not part of testConductor any more
       // so we can't use barriers to synchronize with it
       val masterAddress = address(master)
-      runOn(master) {
+      runOn(master)
         system.actorOf(Props(classOf[EndActor], testActor, None), "end")
-      }
       enterBarrier("end-actor-created")
 
-      runOn(first) {
+      runOn(first)
         // put the network back in
-        allBut(victim).foreach { roleName ⇒
+        allBut(victim).foreach  roleName ⇒
           testConductor.passThrough(victim, roleName, Direction.Both).await
-        }
-      }
 
       enterBarrier("plug_in_victim")
 
-      runOn(first) {
+      runOn(first)
         // will shutdown ActorSystem of victim
         testConductor.shutdown(victim)
-      }
 
-      runOn(victim) {
+      runOn(victim)
         val victimAddress =
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         Await.ready(system.whenTerminated, 10 seconds)
@@ -183,9 +163,9 @@ abstract class UnreachableNodeJoinsAgainSpec
             }
             """).withFallback(system.settings.config))
 
-        try {
+        try
           Cluster(freshSystem).join(masterAddress)
-          within(15 seconds) {
+          within(15 seconds)
             awaitAssert(
                 Cluster(freshSystem).readView.members.map(_.address) should contain(
                     victimAddress))
@@ -194,7 +174,6 @@ abstract class UnreachableNodeJoinsAgainSpec
             awaitAssert(
                 Cluster(freshSystem).readView.members.map(_.status) should ===(
                     Set(MemberStatus.Up)))
-          }
 
           // signal to master node that victim is done
           val endProbe = TestProbe()(freshSystem)
@@ -203,20 +182,13 @@ abstract class UnreachableNodeJoinsAgainSpec
               "end")
           endActor ! EndActor.SendEnd
           endProbe.expectMsg(EndActor.EndAck)
-        } finally {
+        finally
           shutdown(freshSystem)
-        }
         // no barrier here, because it is not part of testConductor roles any more
-      }
 
-      runOn(allBut(victim): _*) {
+      runOn(allBut(victim): _*)
         awaitMembersUp(expectedNumberOfMembers)
         // don't end the test until the freshSystem is done
-        runOn(master) {
+        runOn(master)
           expectMsg(20 seconds, EndActor.End)
-        }
         endBarrier()
-      }
-    }
-  }
-}

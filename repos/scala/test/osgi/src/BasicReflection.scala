@@ -16,7 +16,7 @@ import org.ops4j.pax.exam.spi.reactors.{ExamReactorStrategy, PerMethod}
 import org.ops4j.pax.swissbox.tracker.ServiceLookup
 import org.osgi.framework.BundleContext
 
-class C {
+class C
   val f1 = 2
   var f2 = 3
 
@@ -30,25 +30,23 @@ class C {
   object M
 
   override def toString = "an instance of C"
-}
 object M
 
 @RunWith(classOf[PaxExam])
 @ExamReactorStrategy(Array(classOf[PerMethod]))
-class BasicReflectionTest extends ScalaOsgiHelper {
+class BasicReflectionTest extends ScalaOsgiHelper
 
   @Configuration
   def config(): Array[exam.Option] =
     justReflectionOptions
 
   // Ensure Pax-exam requires C/M in our module
-  def dummy = {
+  def dummy =
     new C
     M.toString
-  }
 
   @Test
-  def basicMirrorThroughOsgi(): Unit = {
+  def basicMirrorThroughOsgi(): Unit =
     // Note for now just assert that we can do this stuff.
     import scala.reflect.runtime.universe._
     val cm = runtimeMirror(classOf[C].getClassLoader)
@@ -61,5 +59,3 @@ class BasicReflectionTest extends ScalaOsgiHelper {
     assertEquals("Unable to reflect value!",
                  2,
                  im.reflectField(typeOf[C].member(TermName("f1")).asTerm).get)
-  }
-}

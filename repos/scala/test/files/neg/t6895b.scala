@@ -3,7 +3,7 @@ trait Bar[F[_], A]
 
 trait Or[A, B]
 
-class Test {
+class Test
   implicit def orFoo[A]: Foo[({ type L[X] = Or[A, X] })#L] = ???
   implicit def barFoo[F[_]](
       implicit f: Foo[F]): Foo[({ type L[X] = Bar[F, X] })#L] = ???
@@ -37,4 +37,3 @@ class Test {
   // This is done so that it does not escape its defining scope.
   // However, one this is done, higher kinded inference
   // no longer is able to unify F with `StringOr` (SI-2712)
-}

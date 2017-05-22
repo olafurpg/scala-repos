@@ -1,4 +1,4 @@
-trait T extends Any {
+trait T extends Any
 
   var x = 1
 
@@ -7,4 +7,3 @@ trait T extends Any {
   type T = Int
 
   val y: T
-}

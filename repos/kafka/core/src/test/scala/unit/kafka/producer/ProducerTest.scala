@@ -39,7 +39,7 @@ import org.scalatest.exceptions.TestFailedException
 @deprecated(
     "This test has been deprecated and it will be removed in a future release.",
     "0.10.0.0")
-class ProducerTest extends ZooKeeperTestHarness with Logging {
+class ProducerTest extends ZooKeeperTestHarness with Logging
   private val brokerId1 = 0
   private val brokerId2 = 1
   private var server1: KafkaServer = null
@@ -52,22 +52,20 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
 
   // Creation of consumers is deferred until they are actually needed. This allows us to kill brokers that use random
   // ports and then get a consumer instance that will be pointed at the correct port
-  def getConsumer1() = {
+  def getConsumer1() =
     if (consumer1 == null)
       consumer1 = new SimpleConsumer(
           "localhost", server1.boundPort(), 1000000, 64 * 1024, "")
     consumer1
-  }
 
-  def getConsumer2() = {
+  def getConsumer2() =
     if (consumer2 == null)
       consumer2 = new SimpleConsumer(
           "localhost", server2.boundPort(), 100, 64 * 1024, "")
     consumer2
-  }
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     // set up 2 brokers with 4 partitions each
     val props1 = TestUtils.createBrokerConfig(brokerId1, zkConnect, false)
@@ -86,10 +84,9 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
 
     // temporarily set request handler logger to a higher level
     requestHandlerLogger.setLevel(Level.FATAL)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     // restore set request handler logger to a higher level
     requestHandlerLogger.setLevel(Level.ERROR)
 
@@ -101,10 +98,9 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     CoreUtils.rm(server1.config.logDirs)
     CoreUtils.rm(server2.config.logDirs)
     super.tearDown()
-  }
 
   @Test
-  def testUpdateBrokerPartitionInfo() {
+  def testUpdateBrokerPartitionInfo()
     val topic = "new-topic"
     TestUtils.createTopic(zkUtils,
                           topic,
@@ -121,15 +117,14 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         keyEncoder = classOf[StringEncoder].getName,
         producerProps = props)
 
-    try {
+    try
       producer1.send(new KeyedMessage[String, String](topic, "test", "test1"))
       fail("Test should fail because the broker list provided are not valid")
-    } catch {
+    catch
       case e: FailedToSendMessageException => // this is expected
       case oe: Throwable => fail("fails with exception", oe)
-    } finally {
+    finally
       producer1.close()
-    }
 
     val producer2 = TestUtils.createProducer[String, String](
         brokerList = "localhost:80," +
@@ -137,13 +132,12 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName)
 
-    try {
+    try
       producer2.send(new KeyedMessage[String, String](topic, "test", "test1"))
-    } catch {
+    catch
       case e: Throwable => fail("Should succeed sending the message", e)
-    } finally {
+    finally
       producer2.close()
-    }
 
     val producer3 = TestUtils.createProducer[String, String](
         brokerList = TestUtils.getBrokerListStrFromServers(
@@ -151,17 +145,15 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         encoder = classOf[StringEncoder].getName,
         keyEncoder = classOf[StringEncoder].getName)
 
-    try {
+    try
       producer3.send(new KeyedMessage[String, String](topic, "test", "test1"))
-    } catch {
+    catch
       case e: Throwable => fail("Should succeed sending the message", e)
-    } finally {
+    finally
       producer3.close()
-    }
-  }
 
   @Test
-  def testSendToNewTopic() {
+  def testSendToNewTopic()
     val props1 = new util.Properties()
     props1.put("request.required.acks", "-1")
 
@@ -192,15 +184,14 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     val leader = leaderOpt.get
 
     val messageSet =
-      if (leader == server1.config.brokerId) {
+      if (leader == server1.config.brokerId)
         val response1 = getConsumer1().fetch(
             new FetchRequestBuilder().addFetch(topic, 0, 0, 10000).build())
         response1.messageSet("new-topic", 0).iterator.toBuffer
-      } else {
+      else
         val response2 = getConsumer2().fetch(
             new FetchRequestBuilder().addFetch(topic, 0, 0, 10000).build())
         response2.messageSet("new-topic", 0).iterator.toBuffer
-      }
     assertEquals("Should have fetched 2 messages", 2, messageSet.size)
     // Message 1
     assertTrue(
@@ -236,7 +227,7 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     // no need to retry since the send will always fail
     props2.put("message.send.max.retries", "0")
 
-    try {
+    try
       val producer2 = TestUtils.createProducer[String, String](
           brokerList = TestUtils.getBrokerListStrFromServers(
                 Seq(server1, server2)),
@@ -246,14 +237,12 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
           producerProps = props2)
       producer2.close
       fail("we don't support request.required.acks greater than 1")
-    } catch {
+    catch
       case iae: IllegalArgumentException => // this is expected
       case e: Throwable => fail("Not expected", e)
-    }
-  }
 
   @Test
-  def testSendWithDeadBroker() {
+  def testSendWithDeadBroker()
     val props = new Properties()
     props.put("request.required.acks", "1")
     // No need to retry since the topic will be created beforehand and normal send will succeed on the first try.
@@ -277,27 +266,25 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         partitioner = classOf[StaticPartitioner].getName,
         producerProps = props)
     val startTime = System.currentTimeMillis()
-    try {
+    try
       // Available partition ids should be 0, 1, 2 and 3, all lead and hosted only
       // on broker 0
       producer.send(new KeyedMessage[String, String](topic, "test", "test1"))
-    } catch {
+    catch
       case e: Throwable => fail("Unexpected exception: " + e)
-    }
     val endTime = System.currentTimeMillis()
     // kill the broker
     server1.shutdown
     server1.awaitShutdown()
 
-    try {
+    try
       // These sends should fail since there are no available brokers
       producer.send(new KeyedMessage[String, String](topic, "test", "test1"))
       fail("Should fail since no leader exists for the partition.")
-    } catch {
+    catch
       case e: TestFailedException =>
         throw e // catch and re-throw the failure message
       case e2: Throwable => // otherwise success
-    }
 
     // restart server 1
     server1.startup()
@@ -305,7 +292,7 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
     TestUtils.waitUntilMetadataIsPropagated(servers, topic, 0)
     TestUtils.waitUntilLeaderIsKnown(servers, topic, 0)
 
-    try {
+    try
       // cross check if broker 1 got the messages
       val response1 = getConsumer1().fetch(
           new FetchRequestBuilder().addFetch(topic, 0, 0, 10000).build())
@@ -319,14 +306,12 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
       assertEquals(Message.MagicValue_V1, message.magic)
       assertFalse(
           "Message set should have another message", messageSet1.hasNext)
-    } catch {
+    catch
       case e: Exception => fail("Not expected", e)
-    }
     producer.close
-  }
 
   @Test
-  def testAsyncSendCanCorrectlyFailWithTimeout() {
+  def testAsyncSendCanCorrectlyFailWithTimeout()
     val timeoutMs = 500
     val props = new Properties()
     props.put("request.timeout.ms", String.valueOf(timeoutMs))
@@ -350,7 +335,7 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
                           servers = servers)
 
     // do a simple test to make sure plumbing is okay
-    try {
+    try
       // this message should be assigned to partition 0 whose leader is on broker 0
       producer.send(new KeyedMessage[String, String](topic, "test", "test"))
       // cross check if brokers got the messages
@@ -359,34 +344,31 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
       val messageSet1 = response1.messageSet("new-topic", 0).iterator
       assertTrue("Message set should have 1 message", messageSet1.hasNext)
       assertEquals(new Message("test".getBytes), messageSet1.next.message)
-    } catch {
+    catch
       case e: Throwable =>
       case e: Exception => producer.close; fail("Not expected", e)
-    }
 
     // stop IO threads and request handling, but leave networking operational
     // any requests should be accepted and queue up, but not handled
     server1.requestHandlerPool.shutdown()
 
     val t1 = SystemTime.milliseconds
-    try {
+    try
       // this message should be assigned to partition 0 whose leader is on broker 0, but
       // broker 0 will not response within timeoutMs millis.
       producer.send(new KeyedMessage[String, String](topic, "test", "test"))
-    } catch {
+    catch
       case e: FailedToSendMessageException => /* success */
       case e: Exception => fail("Not expected", e)
-    } finally {
+    finally
       producer.close()
-    }
     val t2 = SystemTime.milliseconds
 
     // make sure we don't wait fewer than timeoutMs
     assertTrue((t2 - t1) >= timeoutMs)
-  }
 
   @Test
-  def testSendNullMessage() {
+  def testSendNullMessage()
     val producer = TestUtils.createProducer[String, String](
         brokerList = TestUtils.getBrokerListStrFromServers(
               Seq(server1, server2)),
@@ -394,7 +376,7 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
         keyEncoder = classOf[StringEncoder].getName,
         partitioner = classOf[StaticPartitioner].getName)
 
-    try {
+    try
 
       // create topic
       AdminUtils.createTopic(zkUtils, "new-topic", 2, 1)
@@ -408,8 +390,5 @@ class ProducerTest extends ZooKeeperTestHarness with Logging {
       TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, "new-topic", 0)
 
       producer.send(new KeyedMessage[String, String]("new-topic", "key", null))
-    } finally {
+    finally
       producer.close()
-    }
-  }
-}

@@ -26,17 +26,16 @@ import org.apache.spark.util.Benchmark
 /**
   * Benchmark [[UnsafeProjection]] for fixed-length/primitive-type fields.
   */
-object UnsafeProjectionBenchmark {
+object UnsafeProjectionBenchmark
 
-  def generateRows(schema: StructType, numRows: Int): Array[InternalRow] = {
+  def generateRows(schema: StructType, numRows: Int): Array[InternalRow] =
     val generator = RandomDataGenerator.forType(schema, nullable = false).get
     val encoder = RowEncoder(schema)
     (1 to numRows)
       .map(_ => encoder.toRow(generator().asInstanceOf[Row]).copy())
       .toArray
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val iters = 1024 * 16
     val numRows = 1024 * 16
 
@@ -47,32 +46,26 @@ object UnsafeProjectionBenchmark {
     val rows1 = generateRows(schema1, numRows)
     val projection1 = UnsafeProjection.create(attrs1, attrs1)
 
-    benchmark.addCase("single long") { _ =>
-      for (_ <- 1 to iters) {
+    benchmark.addCase("single long")  _ =>
+      for (_ <- 1 to iters)
         var sum = 0L
         var i = 0
-        while (i < numRows) {
+        while (i < numRows)
           sum += projection1(rows1(i)).getLong(0)
           i += 1
-        }
-      }
-    }
 
     val schema2 = new StructType().add("l", LongType, true)
     val attrs2 = schema2.toAttributes
     val rows2 = generateRows(schema2, numRows)
     val projection2 = UnsafeProjection.create(attrs2, attrs2)
 
-    benchmark.addCase("single nullable long") { _ =>
-      for (_ <- 1 to iters) {
+    benchmark.addCase("single nullable long")  _ =>
+      for (_ <- 1 to iters)
         var sum = 0L
         var i = 0
-        while (i < numRows) {
+        while (i < numRows)
           sum += projection2(rows2(i)).getLong(0)
           i += 1
-        }
-      }
-    }
 
     val schema3 = new StructType()
       .add("boolean", BooleanType, false)
@@ -86,16 +79,13 @@ object UnsafeProjectionBenchmark {
     val rows3 = generateRows(schema3, numRows)
     val projection3 = UnsafeProjection.create(attrs3, attrs3)
 
-    benchmark.addCase("7 primitive types") { _ =>
-      for (_ <- 1 to iters) {
+    benchmark.addCase("7 primitive types")  _ =>
+      for (_ <- 1 to iters)
         var sum = 0L
         var i = 0
-        while (i < numRows) {
+        while (i < numRows)
           sum += projection3(rows3(i)).getLong(0)
           i += 1
-        }
-      }
-    }
 
     val schema4 = new StructType()
       .add("boolean", BooleanType, true)
@@ -109,16 +99,13 @@ object UnsafeProjectionBenchmark {
     val rows4 = generateRows(schema4, numRows)
     val projection4 = UnsafeProjection.create(attrs4, attrs4)
 
-    benchmark.addCase("7 nullable primitive types") { _ =>
-      for (_ <- 1 to iters) {
+    benchmark.addCase("7 nullable primitive types")  _ =>
+      for (_ <- 1 to iters)
         var sum = 0L
         var i = 0
-        while (i < numRows) {
+        while (i < numRows)
           sum += projection4(rows4(i)).getLong(0)
           i += 1
-        }
-      }
-    }
 
     /*
     Intel(R) Core(TM) i7-4960HQ CPU @ 2.60GHz
@@ -130,5 +117,3 @@ object UnsafeProjectionBenchmark {
     nullable primitive types               12448.39            21.56         0.12 X
      */
     benchmark.run()
-  }
-}

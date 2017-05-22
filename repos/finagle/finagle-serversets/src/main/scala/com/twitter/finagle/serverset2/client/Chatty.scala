@@ -11,17 +11,15 @@ private[serverset2] object chatty
   * A tool to see what low-level ZK commands are being issued,
   *  together with their responses.
   */
-private[serverset2] trait ChattyClient extends ZooKeeperClient {
+private[serverset2] trait ChattyClient extends ZooKeeperClient
   protected val underlying: ZooKeeperClient
   protected val print: String => Unit
 
   protected def printOp[U](
-      name: String, op: => Future[U], args: String*): Future[U] = {
+      name: String, op: => Future[U], args: String*): Future[U] =
     print("->" + name + "(" + (args mkString ",") + ")")
-    op respond { t =>
+    op respond  t =>
       print("<-" + name + "(" + (args mkString ",") + ") = " + t)
-    }
-  }
 
   def addAuthInfo(scheme: String, auth: Buf): Future[Unit] =
     printOp("addAuthInfo",
@@ -37,10 +35,9 @@ private[serverset2] trait ChattyClient extends ZooKeeperClient {
   def sessionId: Long = underlying.sessionId
   def sessionPasswd: Buf = underlying.sessionPasswd
   def sessionTimeout: Duration = underlying.sessionTimeout
-}
 
 private[serverset2] trait ChattyReader
-    extends ChattyClient with ZooKeeperReader {
+    extends ChattyClient with ZooKeeperReader
   protected val underlying: ZooKeeperReader
 
   def exists(path: String): Future[Option[Data.Stat]] =
@@ -66,10 +63,9 @@ private[serverset2] trait ChattyReader
 
   def sync(path: String): Future[Unit] =
     printOp("sync", underlying.sync(path), path)
-}
 
 private[serverset2] trait ChattyWriter
-    extends ChattyClient with ZooKeeperWriter {
+    extends ChattyClient with ZooKeeperWriter
   protected val underlying: ZooKeeperWriter
 
   def create(path: String,
@@ -103,23 +99,19 @@ private[serverset2] trait ChattyWriter
             path,
             acl.toString,
             version.toString)
-}
 
 private[serverset2] trait ChattyMulti
-    extends ChattyClient with ZooKeeperMulti {
+    extends ChattyClient with ZooKeeperMulti
   protected val underlying: ZooKeeperMulti
 
   def multi(ops: Seq[Op]): Future[Seq[OpResult]] =
     printOp("multi", underlying.multi(ops), ops.toString)
-}
 
 private[serverset2] trait ChattyRW
-    extends ZooKeeperRW with ChattyReader with ChattyWriter {
+    extends ZooKeeperRW with ChattyReader with ChattyWriter
   protected val underlying: ZooKeeperRW
-}
 
 private[serverset2] trait ChattyRWMulti
     extends ZooKeeperRWMulti with ChattyReader with ChattyWriter
-    with ChattyMulti {
+    with ChattyMulti
   protected val underlying: ZooKeeperRWMulti
-}

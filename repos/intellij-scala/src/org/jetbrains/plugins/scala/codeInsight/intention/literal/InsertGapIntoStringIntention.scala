@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
   * User: Dmitry Naydanov
   * Date: 3/31/12
   */
-class InsertGapIntoStringIntention extends PsiElementBaseIntentionAction {
+class InsertGapIntoStringIntention extends PsiElementBaseIntentionAction
   import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes._
 
   def getFamilyName: String = "Insert gap"
@@ -23,20 +23,15 @@ class InsertGapIntoStringIntention extends PsiElementBaseIntentionAction {
     element != null && element.getNode != null &&
     Set(tSTRING, tMULTILINE_STRING).contains(element.getNode.getElementType)
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    def insertString(str: String, caretMove: Int) {
-      extensions.inWriteAction {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
+    def insertString(str: String, caretMove: Int)
+      extensions.inWriteAction
         editor.getDocument.insertString(editor.getCaretModel.getOffset, str)
         editor.getCaretModel.moveCaretRelatively(
             caretMove, 0, false, false, false)
-      }
-    }
 
-    element.getNode.getElementType match {
+    element.getNode.getElementType match
       case ScalaTokenTypes.tSTRING => insertString("\" +  + \"", 4)
       case ScalaTokenTypes.tMULTILINE_STRING =>
         insertString("\"\"\" +  + \"\"\"", 6)
       case _ =>
-    }
-  }
-}

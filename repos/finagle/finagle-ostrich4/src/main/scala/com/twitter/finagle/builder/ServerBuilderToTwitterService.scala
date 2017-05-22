@@ -14,14 +14,11 @@ class ServerBuildertoTwitterService[Req, Rep](
         Req, Rep, ServerConfig.Yes, ServerConfig.Yes, ServerConfig.Yes],
     service: Service[Req, Rep],
     gracePeriod: Duration = 10.seconds)
-    extends admin.Service {
+    extends admin.Service
   private[this] var server: Option[Server] = None
 
-  def start() {
+  def start()
     if (!server.isDefined) server = Some(builder.build(service))
-  }
 
-  def shutdown() {
+  def shutdown()
     server foreach { _.close(gracePeriod) }
-  }
-}

@@ -16,32 +16,27 @@ trait ColumnsShapeLevel extends FlatShapeLevel
 
 trait ProvenShape[U]
 
-object ProvenShape {
+object ProvenShape
   implicit def proveShapeOf[T, U](v: T)(
       implicit sh: Shape[_ <: FlatShapeLevel, T, U, _]): ProvenShape[U] = ???
-}
 
-sealed abstract class HList {
+sealed abstract class HList
   type Self <: HList
   type ::[E] = HCons[E, Self]
   final def ::[E](elem: E): ::[E] = ???
-}
 
-final class HCons[+H, +T <: HList](val head: H, val tail: T) extends HList {
+final class HCons[+H, +T <: HList](val head: H, val tail: T) extends HList
   type Self = HCons[H @uncheckedVariance, T @uncheckedVariance]
-}
 
-final object HNil extends HList {
+final object HNil extends HList
   type Self = HNil.type
-}
 
 // Success is more likely when not using these aliases
-object syntax {
+object syntax
   type ::[+H, +T <: HList] = HCons[H, T]
   type HNil = HNil.type
-}
 
-class HListBench {
+class HListBench
 
   import syntax._
 
@@ -62,17 +57,14 @@ class HListBench {
       s2: HListShape[_ <: Level, M2, U2, P2]) =
     new HListShape[Level, M1 :: M2, U1 :: U2, P1 :: P2](s1 +: s2.shapes)
 
-  trait A[T] {
+  trait A[T]
     def * : ProvenShape[T]
-  }
 
   trait B
       extends A[
-          Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: HNil] {
+          Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: Int :: HNil]
 
     def c: Column[Int]
 
     def * =
       c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: c :: HNil
-  }
-}

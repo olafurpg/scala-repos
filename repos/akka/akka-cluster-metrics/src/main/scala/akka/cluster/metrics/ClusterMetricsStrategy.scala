@@ -21,17 +21,15 @@ class ClusterMetricsStrategy(config: Config)
 /**
   * Provide custom metrics strategy resources.
   */
-object ClusterMetricsStrategy {
+object ClusterMetricsStrategy
   import akka.actor._
   import akka.actor.SupervisorStrategy._
 
   /**
     * [[akka.actor.SupervisorStrategy]] `Decider` which allows to survive intermittent Sigar native method calls failures.
     */
-  val metricsDecider: SupervisorStrategy.Decider = {
+  val metricsDecider: SupervisorStrategy.Decider =
     case _: ActorInitializationException ⇒ Stop
     case _: ActorKilledException ⇒ Stop
     case _: DeathPactException ⇒ Stop
     case _: Throwable ⇒ Restart
-  }
-}

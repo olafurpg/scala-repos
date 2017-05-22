@@ -10,7 +10,7 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit._
 import scala.concurrent.duration._
 
-object NodeDowningAndBeingRemovedMultiJvmSpec extends MultiNodeConfig {
+object NodeDowningAndBeingRemovedMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -19,7 +19,6 @@ object NodeDowningAndBeingRemovedMultiJvmSpec extends MultiNodeConfig {
       debugConfig(on = false).withFallback(ConfigFactory
             .parseString("akka.cluster.auto-down-unreachable-after = off")
             .withFallback(MultiNodeClusterSpec.clusterConfig)))
-}
 
 class NodeDowningAndBeingRemovedMultiJvmNode1
     extends NodeDowningAndBeingRemovedSpec
@@ -30,41 +29,33 @@ class NodeDowningAndBeingRemovedMultiJvmNode3
 
 abstract class NodeDowningAndBeingRemovedSpec
     extends MultiNodeSpec(NodeDowningAndBeingRemovedMultiJvmSpec)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import NodeDowningAndBeingRemovedMultiJvmSpec._
 
-  "A node that is downed" must {
+  "A node that is downed" must
 
-    "eventually be removed from membership" taggedAs LongRunningTest in {
+    "eventually be removed from membership" taggedAs LongRunningTest in
 
       awaitClusterUp(first, second, third)
 
-      within(30.seconds) {
-        runOn(first) {
+      within(30.seconds)
+        runOn(first)
           cluster.down(second)
           cluster.down(third)
-        }
         enterBarrier("second-and-third-down")
 
-        runOn(second, third) {
+        runOn(second, third)
           // verify that the node is shut down
           awaitCond(cluster.isTerminated)
-        }
         enterBarrier("second-and-third-shutdown")
 
-        runOn(first) {
+        runOn(first)
           // verify that the nodes are no longer part of the 'members' set
-          awaitAssert {
+          awaitAssert
             clusterView.members.map(_.address) should not contain
             (address(second))
             clusterView.members.map(_.address) should not contain
             (address(third))
-          }
-        }
-      }
 
       enterBarrier("finished")
-    }
-  }
-}

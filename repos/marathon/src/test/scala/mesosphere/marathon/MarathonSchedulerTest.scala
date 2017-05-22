@@ -19,7 +19,7 @@ import scala.concurrent.Future
 
 class MarathonSchedulerTest
     extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
-    with Mockito with Matchers with GivenWhenThen {
+    with Mockito with Matchers with GivenWhenThen
 
   var probe: TestProbe = _
   var repo: AppRepository = _
@@ -31,11 +31,10 @@ class MarathonSchedulerTest
   var eventBus: EventStream = _
   var offerProcessor: OfferProcessor = _
   var taskStatusProcessor: TaskStatusUpdateProcessor = _
-  var suicideFn: (Boolean) => Unit = { _ =>
+  var suicideFn: (Boolean) => Unit =  _ =>
     ()
-  }
 
-  before {
+  before
     repo = mock[AppRepository]
     queue = mock[LaunchQueue]
     frameworkIdUtil = mock[FrameworkIdUtil]
@@ -54,17 +53,13 @@ class MarathonSchedulerTest
         mesosLeaderInfo,
         mock[ActorSystem],
         config,
-        new SchedulerCallbacks {
+        new SchedulerCallbacks
           override def disconnected(): Unit = {}
-        }
-    ) {
-      override protected def suicide(removeFrameworkId: Boolean): Unit = {
+    )
+      override protected def suicide(removeFrameworkId: Boolean): Unit =
         suicideFn(removeFrameworkId)
-      }
-    }
-  }
 
-  test("Publishes event when registered") {
+  test("Publishes event when registered")
     val driver = mock[SchedulerDriver]
     val frameworkId = FrameworkID.newBuilder.setValue("some_id").build()
 
@@ -80,19 +75,17 @@ class MarathonSchedulerTest
 
     scheduler.registered(driver, frameworkId, masterInfo)
 
-    try {
+    try
       val msg = probe.expectMsgType[SchedulerRegisteredEvent]
 
       assert(msg.frameworkId == frameworkId.getValue)
       assert(msg.master == masterInfo.getHostname)
       assert(msg.eventType == "scheduler_registered_event")
       assert(mesosLeaderInfo.currentLeaderUrl.get == "http://some_host:5050/")
-    } finally {
+    finally
       eventBus.unsubscribe(probe.ref)
-    }
-  }
 
-  test("Publishes event when reregistered") {
+  test("Publishes event when reregistered")
     val driver = mock[SchedulerDriver]
     val masterInfo = MasterInfo
       .newBuilder()
@@ -106,35 +99,31 @@ class MarathonSchedulerTest
 
     scheduler.reregistered(driver, masterInfo)
 
-    try {
+    try
       val msg = probe.expectMsgType[SchedulerReregisteredEvent]
 
       assert(msg.master == masterInfo.getHostname)
       assert(msg.eventType == "scheduler_reregistered_event")
       assert(mesosLeaderInfo.currentLeaderUrl.get == "http://some_host:5050/")
-    } finally {
+    finally
       eventBus.unsubscribe(probe.ref)
-    }
-  }
 
   // Currently does not work because of the injection used in MarathonScheduler.callbacks
-  test("Publishes event when disconnected") {
+  test("Publishes event when disconnected")
     val driver = mock[SchedulerDriver]
 
     eventBus.subscribe(probe.ref, classOf[SchedulerDisconnectedEvent])
 
     scheduler.disconnected(driver)
 
-    try {
+    try
       val msg = probe.expectMsgType[SchedulerDisconnectedEvent]
 
       assert(msg.eventType == "scheduler_disconnected_event")
-    } finally {
+    finally
       eventBus.unsubscribe(probe.ref)
-    }
-  }
 
-  test("Suicide with an unknown error will not remove the framework id") {
+  test("Suicide with an unknown error will not remove the framework id")
     Given("A suicide call trap")
     val driver = mock[SchedulerDriver]
     var suicideCall: Option[Boolean] = None
@@ -146,9 +135,8 @@ class MarathonSchedulerTest
     Then("Suicide is called without removing the framework id")
     suicideCall should be(defined)
     suicideCall.get should be(false)
-  }
 
-  test("Suicide with a framework error will remove the framework id") {
+  test("Suicide with a framework error will remove the framework id")
     Given("A suicide call trap")
     val driver = mock[SchedulerDriver]
     var suicideCall: Option[Boolean] = None
@@ -160,5 +148,3 @@ class MarathonSchedulerTest
     Then("Suicide is called with removing the framework id")
     suicideCall should be(defined)
     suicideCall.get should be(true)
-  }
-}

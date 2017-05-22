@@ -3,13 +3,12 @@ import java.lang.reflect.{Array => JavaArray, _}
 import org.reflections.ReflectionUtils._
 import scala.collection.JavaConversions._
 
-trait JavaConversionHelpers {
+trait JavaConversionHelpers
 
   def getSuperclass(cls: Class[_]): Option[Class[_]] =
-    cls.getSuperclass match {
+    cls.getSuperclass match
       case c: Class[_] => Some(c)
       case _ => cls.getInterfaces.headOption
-    }
 
   def isPublic(m: Member): Boolean = Modifier.isPublic(m.getModifiers)
   def isPublic(c: Class[_]): Boolean = Modifier.isPublic(c.getModifiers)
@@ -21,13 +20,12 @@ trait JavaConversionHelpers {
   def isStatic(c: Class[_]): Boolean = Modifier.isStatic(c.getModifiers)
   def isConcrete(c: Class[_]): Boolean = !(isInterface(c) || isStatic(c))
   def isOverride(m: Method): Boolean =
-    getSuperclass(m.getDeclaringClass) match {
+    getSuperclass(m.getDeclaringClass) match
       case Some(c) =>
         getAllMethods(c,
                       withName(m.getName),
                       withParameters(m.getParameterTypes: _*)).nonEmpty
       case None => false
-    }
   def isDeprecated(e: AnnotatedElement) =
     e.isAnnotationPresent(classOf[java.lang.Deprecated])
 
@@ -49,13 +47,13 @@ trait JavaConversionHelpers {
 
   private def innerClassDelim(c: Class[_]) = if (isConcrete(c)) "#" else "."
 
-  def toScalaType(_tpe: Type): ScalaType = {
-    def step(tpe: Type, level: Int): ScalaType = {
+  def toScalaType(_tpe: Type): ScalaType =
+    def step(tpe: Type, level: Int): ScalaType =
       val nextLevel = level + 1
 
       if (level > 5) ScalaType("_")
       else
-        tpe match {
+        tpe match
           case null => throw new Error("Property cannot be null")
           case ga: GenericArrayType =>
             ScalaType(
@@ -76,34 +74,30 @@ trait JavaConversionHelpers {
               .toList
               .filter(_.name != "Any")
             ScalaType("_", Nil, bounds = bs)
-          case c: Class[_] => {
-              if (c.isArray) {
+          case c: Class[_] =>
+              if (c.isArray)
                 ScalaType("Array", List(step(c.getComponentType, nextLevel)))
-              } else if (c.isPrimitive) {
+              else if (c.isPrimitive)
                 ScalaType(
-                    c.getName match {
+                    c.getName match
                   case "void" => "Unit"
                   case n => n.capitalize
-                })
-              } else if (c == classOf[java.lang.Object]) {
+                )
+              else if (c == classOf[java.lang.Object])
                 ScalaType("Any")
-              } else {
+              else
                 ScalaType(
                     name = c.getName.replace("$", innerClassDelim(c)),
                     params = c.getTypeParameters.map(step(_, nextLevel)).toList
                 )
-              }
-            }
           case _ =>
             throw new Error(
                 "Cannot find type of " + tpe.getClass + " ::" + tpe.toString)
-        }
-    }
 
     def javaTypeName(t: Type) =
       t.toString.replaceFirst("^[^ ]+ ", "").replace("$", ".")
 
-    val javaName = _tpe match {
+    val javaName = _tpe match
       case c: Class[_] =>
         if (c.isArray) javaTypeName(c.getComponentType) + "[]"
         else if (c.isPrimitive) _tpe.toString
@@ -111,31 +105,24 @@ trait JavaConversionHelpers {
 
       case _ => // TODO match generic types
         javaTypeName(_tpe)
-    }
 
     step(_tpe, 0).copy(javaName = javaName)
-  }
 
-  def toTypeStr(_tpe: Type, isVarArgs: Boolean, isLast: Boolean): String = {
-    def step(tpe: Type): String = {
+  def toTypeStr(_tpe: Type, isVarArgs: Boolean, isLast: Boolean): String =
+    def step(tpe: Type): String =
       val arrayNotation = if (isLast && isVarArgs) "..." else "[]"
 
-      tpe match {
+      tpe match
         case ga: GenericArrayType =>
           step(ga.getGenericComponentType) + arrayNotation
         case p: ParameterizedType =>
           p.toString.replace("$", ".")
         case _: WildcardType => "?"
         case c: Class[_] =>
-          if (c.isArray) {
+          if (c.isArray)
             step(c.getComponentType) + arrayNotation
-          } else {
+          else
             c.getName.replace("$", innerClassDelim(c))
-          }
         case _ =>
           tpe.toString
-      }
-    }
     step(_tpe)
-  }
-}

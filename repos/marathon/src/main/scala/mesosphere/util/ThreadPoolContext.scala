@@ -3,7 +3,7 @@ package mesosphere.util
 import scala.concurrent.ExecutionContext
 import java.util.concurrent.Executors
 
-object ThreadPoolContext {
+object ThreadPoolContext
 
   private val numberOfThreads: Int =
     System.getProperty("numberOfIoThreads", "100").toInt
@@ -15,4 +15,3 @@ object ThreadPoolContext {
     */
   implicit lazy val ioContext = ExecutionContext.fromExecutorService(
       Executors.newFixedThreadPool(numberOfThreads))
-}

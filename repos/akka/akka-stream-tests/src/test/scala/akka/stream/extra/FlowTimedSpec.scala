@@ -12,7 +12,7 @@ import akka.testkit.TestProbe
 import org.reactivestreams.{Publisher, Subscriber}
 import akka.testkit.AkkaSpec
 
-class FlowTimedSpec extends AkkaSpec with ScriptedTest {
+class FlowTimedSpec extends AkkaSpec with ScriptedTest
 
   import scala.concurrent.duration._
 
@@ -21,79 +21,70 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "Timed Source" must {
+  "Timed Source" must
 
     import akka.stream.extra.Implicits.TimedFlowDsl
 
-    "measure time it between elements matching a predicate" in {
+    "measure time it between elements matching a predicate" in
       val testActor = TestProbe()
 
       val measureBetweenEvery = 5
       val printInfo = (interval: Duration) ⇒
-        {
           testActor.ref ! interval
           info(
               s"Measured interval between $measureBetweenEvery elements was: $interval")
-      }
 
       val n = 20
       val testRuns = 1 to 2
 
       def script =
-        Script((1 to n) map { x ⇒
+        Script((1 to n) map  x ⇒
           Seq(x) -> Seq(x)
-        }: _*)
+        : _*)
       testRuns foreach
       (_ ⇒
-            runScript(script, settings) { flow ⇒
+            runScript(script, settings)  flow ⇒
               flow
                 .map(identity)
                 .timedIntervalBetween(_ % measureBetweenEvery == 0,
                                       onInterval = printInfo)
-          })
+          )
 
       val expectedNrOfOnIntervalCalls =
         testRuns.size * ((n / measureBetweenEvery) - 1) // first time has no value to compare to, so skips calling onInterval
-      1 to expectedNrOfOnIntervalCalls foreach { _ ⇒
+      1 to expectedNrOfOnIntervalCalls foreach  _ ⇒
         testActor.expectMsgType[Duration]
-      }
-    }
 
-    "measure time it takes from start to complete, by wrapping operations" in {
+    "measure time it takes from start to complete, by wrapping operations" in
       val testActor = TestProbe()
 
       val n = 50
       val printInfo = (d: FiniteDuration) ⇒
-        {
           testActor.ref ! d
           info(s"Processing $n elements took $d")
-      }
 
       val testRuns = 1 to 3
 
       def script =
-        Script((1 to n) map { x ⇒
+        Script((1 to n) map  x ⇒
           Seq(x) -> Seq(x)
-        }: _*)
+        : _*)
       testRuns foreach
       (_ ⇒
-            runScript(script, settings) { flow ⇒
+            runScript(script, settings)  flow ⇒
               flow.timed(_.map(identity), onComplete = printInfo)
-          })
+          )
 
-      testRuns foreach { _ ⇒
+      testRuns foreach  _ ⇒
         testActor.expectMsgType[Duration]
-      }
       testActor.expectNoMsg(1.second)
-    }
 
     "have a Java API" in pending
-  }
 
-  "Timed Flow" must {
+  "Timed Flow" must
     import akka.stream.extra.Implicits.TimedFlowDsl
 
-    "measure time it between elements matching a predicate" in assertAllStagesStopped {
+    "measure time it between elements matching a predicate" in assertAllStagesStopped
       val probe = TestProbe()
 
       val flow: Flow[Int, Long, _] = Flow[Int]
@@ -112,18 +103,16 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
 
       val duration = probe.expectMsgType[Duration]
       info(s"Got duration (first): $duration")
-    }
 
-    "measure time from start to complete, by wrapping operations" in assertAllStagesStopped {
+    "measure time from start to complete, by wrapping operations" in assertAllStagesStopped
       val probe = TestProbe()
 
       // making sure the types come out as expected
       val flow: Flow[Int, String, _] = Flow[Int]
         .timed(_.map(_.toDouble).map(_.toInt).map(_.toString),
                duration ⇒ probe.ref ! duration)
-        .map { s: String ⇒
+        .map  s: String ⇒
           s + "!"
-        }
 
       val (flowIn: Subscriber[Int], flowOut: Publisher[String]) =
         flow.runWith(Source.asSubscriber[Int], Sink.asPublisher[String](false))
@@ -136,13 +125,9 @@ class FlowTimedSpec extends AkkaSpec with ScriptedTest {
 
       val s = c1.expectSubscription()
       s.request(200)
-      0 to 100 foreach { i ⇒
+      0 to 100 foreach  i ⇒
         c1.expectNext(i.toString + "!")
-      }
       c1.expectComplete()
 
       val duration = probe.expectMsgType[Duration]
       info(s"Took: $duration")
-    }
-  }
-}

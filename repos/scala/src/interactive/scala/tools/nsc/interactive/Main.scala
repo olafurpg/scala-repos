@@ -10,9 +10,9 @@ package interactive
 /** The main class for NSC, a compiler for the programming
   *  language Scala.
   */
-object Main extends nsc.MainClass {
-  override def processSettingsHook(): Boolean = {
-    def run(): Unit = {
+object Main extends nsc.MainClass
+  override def processSettingsHook(): Boolean =
+    def run(): Unit =
       this.settings.Xprintpos.value = true
       this.settings.Yrangepos.value = true
       val compiler = new interactive.Global(this.settings, this.reporter)
@@ -22,15 +22,11 @@ object Main extends nsc.MainClass {
       val reloaded = new interactive.Response[Unit]
       askReload(sfs, reloaded)
 
-      reloaded.get.right.toOption match {
+      reloaded.get.right.toOption match
         case Some(ex) =>
           reporter.cancelled = true // Causes exit code to be non-0
         case None =>
           reporter.reset() // Causes other compiler errors to be ignored
-      }
       askShutdown
-    }
     super.processSettingsHook() &&
     (if (this.settings.Yidedebug) { run(); false } else true)
-  }
-}

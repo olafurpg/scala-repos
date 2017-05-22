@@ -9,11 +9,11 @@ import net.liftweb.json._
 
 import org.specs2.mutable.Specification
 
-object ValidationExample extends Specification {
+object ValidationExample extends Specification
 
   case class Person(name: String, age: Int)
 
-  "Validation" should {
+  "Validation" should
     def min(x: Int): Int => Result[Int] =
       (y: Int) => if (y < x) Fail("min", y + " < " + x) else y.success
 
@@ -23,21 +23,18 @@ object ValidationExample extends Specification {
     val json = JsonParser.parse(""" {"name":"joe","age":17} """)
 
     // Note 'apply _' is not needed on Scala 2.8.1 >=
-    "fail when age is less than min age" in {
+    "fail when age is less than min age" in
       // Age must be between 18 an 60
 // FIXME enable when 2.8 no longer supported, 2.9 needs: import Validation.Monad._
 //      val person = Person.applyJSON(field("name"), validate[Int]("age") >=> min(18) >=> max(60) apply _)
 //      person(json).fail.toOption.get.list mustEqual List(UncategorizedError("min", "17 < 18", Nil))
-    }
 
-    "pass when age within limits" in {
+    "pass when age within limits" in
       // Age must be between 16 an 60
       import Validation.Monad._
       val person = Person.applyJSON(
           field("name"), validate[Int]("age") >=> min(16) >=> max(60) apply _)
       person(json) mustEqual Success(Person("joe", 17))
-    }
-  }
 
   case class Range(start: Int, end: Int)
 
@@ -69,4 +66,3 @@ object ValidationExample extends Specification {
     }
   }
  */
-}

@@ -1,4 +1,4 @@
-object IllegalInheritance {
+object IllegalInheritance
   trait A
   implicit def a = new A {} // def => val
   //val r = implicitly[A]              // uncomment
@@ -7,4 +7,3 @@ object IllegalInheritance {
 
   class C extends B /*[Int]*/ (23) // uncomment
   val c = new C // comment
-}

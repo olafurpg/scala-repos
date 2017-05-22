@@ -7,7 +7,7 @@ import mesosphere.marathon.plugin.http.HttpRequest
 import scala.collection.JavaConverters._
 
 class RequestFacade(request: HttpServletRequest, path: String)
-    extends HttpRequest {
+    extends HttpRequest
   def this(request: HttpServletRequest) = this(request, request.getRequestURI)
   // Jersey will not allow calls to the request object from another thread
   // To circumvent that, we have to copy all data during creation
@@ -25,4 +25,3 @@ class RequestFacade(request: HttpServletRequest, path: String)
   override def queryParam(name: String): Seq[String] =
     params.asScala.get(name).map(_.toSeq).getOrElse(Seq.empty)
   override def method: String = request.getMethod
-}

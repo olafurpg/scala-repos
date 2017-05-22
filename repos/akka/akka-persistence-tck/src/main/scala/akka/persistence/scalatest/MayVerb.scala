@@ -6,7 +6,7 @@ package akka.persistence.scalatest
 import org.scalatest.exceptions.TestCanceledException
 import org.scalatest.words.StringVerbBlockRegistration
 
-trait MayVerb {
+trait MayVerb
   import MayVerb._
 
   /**
@@ -18,14 +18,13 @@ trait MayVerb {
   def mayVerbStacktraceContextFrames = 3
 
   def optional(whenSkippedMessage: String)(body: ⇒ Unit): Unit =
-    try body catch {
+    try body catch
       case cause: Throwable ⇒
         val shortTrace =
           cause.getStackTrace.take(mayVerbStacktraceContextFrames)
         throw new TestCanceledByFailure(whenSkippedMessage, shortTrace)
-    }
 
-  trait StringMayWrapperForVerb {
+  trait StringMayWrapperForVerb
     val leftSideString: String
 
     /**
@@ -38,10 +37,8 @@ trait MayVerb {
       *
       * @see <a href="https://www.rfc-editor.org/rfc/rfc2119.txt">RFC 2119</a>
       */
-    def may(right: ⇒ Unit)(implicit fun: StringVerbBlockRegistration) {
+    def may(right: ⇒ Unit)(implicit fun: StringVerbBlockRegistration)
       fun(leftSideString, "may", right _)
-    }
-  }
 
   import scala.language.implicitConversions
 
@@ -50,15 +47,11 @@ trait MayVerb {
     * to enable <code>may</code> methods to be invokable on that object.
     */
   implicit def convertToStringMayWrapper(o: String): StringMayWrapperForVerb =
-    new StringMayWrapperForVerb {
+    new StringMayWrapperForVerb
       val leftSideString = o.trim
-    }
-}
 
-object MayVerb {
+object MayVerb
   case class TestCanceledByFailure(
       msg: String, specialStackTrace: Array[StackTraceElement])
-      extends TestCanceledException(Some(msg), None, 2) {
+      extends TestCanceledException(Some(msg), None, 2)
     override def getStackTrace = specialStackTrace
-  }
-}

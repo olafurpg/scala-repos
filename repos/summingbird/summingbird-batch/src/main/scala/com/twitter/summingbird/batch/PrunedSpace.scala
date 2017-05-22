@@ -16,17 +16,13 @@ limitations under the License.
 
 package com.twitter.summingbird.batch
 
-trait PrunedSpace[-T] extends java.io.Serializable {
+trait PrunedSpace[-T] extends java.io.Serializable
   // expire (REMOVE) before writing, T is often (K, V) pair
   def prune(item: T, writeTime: Timestamp): Boolean
-}
 
-object PrunedSpace extends java.io.Serializable {
-  val neverPruned: PrunedSpace[Any] = new PrunedSpace[Any] {
+object PrunedSpace extends java.io.Serializable
+  val neverPruned: PrunedSpace[Any] = new PrunedSpace[Any]
     def prune(item: Any, writeTime: Timestamp) = false
-  }
 
-  def apply[T](pruneFn: (T, Timestamp) => Boolean) = new PrunedSpace[T] {
+  def apply[T](pruneFn: (T, Timestamp) => Boolean) = new PrunedSpace[T]
     def prune(item: T, writeTime: Timestamp) = pruneFn(item, writeTime)
-  }
-}

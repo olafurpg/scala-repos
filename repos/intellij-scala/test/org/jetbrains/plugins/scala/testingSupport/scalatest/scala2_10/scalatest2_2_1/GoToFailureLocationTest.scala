@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.testingSupport.util.scalatest.ScalaTestFailur
   * @author Roman.Shein
   * @since 31.01.2015.
   */
-class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base {
-  def testFailureLocationHyperlink(): Unit = {
+class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base
+  def testFailureLocationHyperlink(): Unit =
 
     addFileToProject(
         "FailureLocationTest.scala",
@@ -33,12 +33,10 @@ class GoToFailureLocationTest extends Scalatest2_10_2_2_1_Base {
       "ScalaTestFailureLocation: FailureLocationTest at (FailureLocationTest.scala:6)"
     var filterRes: Filter.Result = null
     UsefulTestCase.edt(
-        new Runnable() {
+        new Runnable()
       override def run(): Unit =
         filterRes = filter.applyFilter(
             errorLocationString, errorLocationString.length)
-    })
+    )
     assert(filterRes != null)
     assert(filterRes.getFirstHyperlinkInfo != null)
-  }
-}

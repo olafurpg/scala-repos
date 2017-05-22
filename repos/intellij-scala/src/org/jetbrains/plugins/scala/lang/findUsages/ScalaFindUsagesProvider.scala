@@ -17,24 +17,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObject, ScTrait, ScTypeDefinition}
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.PsiClassFake
 
-class ScalaFindUsagesProvider extends FindUsagesProvider {
+class ScalaFindUsagesProvider extends FindUsagesProvider
   @Nullable
   override def getWordsScanner: WordsScanner = new ScalaWordsScanner()
 
-  override def canFindUsagesFor(element: PsiElement): Boolean = {
-    element match {
+  override def canFindUsagesFor(element: PsiElement): Boolean =
+    element match
       case _: ScNamedElement | _: PsiMethod | _: PsiClass | _: PsiVariable =>
         true
       case _ => false
-    }
-  }
 
   @Nullable
   override def getHelpId(psiElement: PsiElement): String = null
 
   @NotNull
-  override def getType(element: PsiElement): String = {
-    element match {
+  override def getType(element: PsiElement): String =
+    element match
       case _: ScTypeAlias => "type"
       case _: ScClass => "class"
       case _: ScObject => "object"
@@ -45,30 +43,26 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
       case _: ScTypeParam => "type parameter"
       case _: ScBindingPattern =>
         var parent = element
-        while (parent match {
+        while (parent match
           case null | _: ScValue | _: ScVariable => false
           case _ => true
-        }) parent = parent.getParent
-        parent match {
+        ) parent = parent.getParent
+        parent match
           case null => "pattern"
           case _ => "variable"
-        }
       case _: PsiField => "field"
       case _: PsiParameter => "parameter"
       case _: PsiVariable => "variable"
       case f: ScFieldId =>
-        ScalaPsiUtil.nameContext(f) match {
+        ScalaPsiUtil.nameContext(f) match
           case v: ScValue => "pattern"
           case v: ScVariable => "variable"
           case _ => "pattern"
-        }
       case _ => ""
-    }
-  }
 
   @NotNull
-  override def getDescriptiveName(element: PsiElement): String = {
-    val name = element match {
+  override def getDescriptiveName(element: PsiElement): String =
+    val name = element match
       case x: PsiMethod =>
         var res = PsiFormatUtil.formatMethod(
             x,
@@ -84,13 +78,11 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
       case x: ScNamedElement => x.name
       case c: PsiClass if !c.isInstanceOf[PsiClassFake] => c.qualifiedName
       case _ => element.getText
-    }
     Option(name) getOrElse "anonymous"
-  }
 
   @NotNull
-  override def getNodeText(element: PsiElement, useFullName: Boolean): String = {
-    val name = element match {
+  override def getNodeText(element: PsiElement, useFullName: Boolean): String =
+    val name = element match
       case c: PsiMethod =>
         PsiFormatUtil.formatMethod(
             c,
@@ -104,7 +96,4 @@ class ScalaFindUsagesProvider extends FindUsagesProvider {
       case c: PsiClass if !c.isInstanceOf[PsiClassFake] =>
         if (useFullName) c.qualifiedName else c.name
       case _ => element.getText
-    }
     Option(name) getOrElse "anonymous"
-  }
-}

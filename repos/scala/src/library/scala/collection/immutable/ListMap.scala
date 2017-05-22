@@ -24,7 +24,7 @@ import scala.annotation.tailrec
   *  @define Coll immutable.ListMap
   *  @define coll immutable list map
   */
-object ListMap extends ImmutableMapFactory[ListMap] {
+object ListMap extends ImmutableMapFactory[ListMap]
 
   /** $mapCanBuildFromInfo */
   implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), ListMap[A, B]] =
@@ -32,7 +32,7 @@ object ListMap extends ImmutableMapFactory[ListMap] {
   def empty[A, B]: ListMap[A, B] = EmptyListMap.asInstanceOf[ListMap[A, B]]
 
   @SerialVersionUID(-8256686706655863282L)
-  private object EmptyListMap extends ListMap[Any, Nothing] {
+  private object EmptyListMap extends ListMap[Any, Nothing]
     override def apply(key: Any) =
       throw new NoSuchElementException("key not found: " + key)
     override def contains(key: Any) = false
@@ -40,8 +40,6 @@ object ListMap extends ImmutableMapFactory[ListMap] {
       throw new NoSuchElementException("Empty ListMap")
     override def init: ListMap[Any, Nothing] =
       throw new NoSuchElementException("Empty ListMap")
-  }
-}
 
 /** This class implements immutable maps using a list-based data structure, which preserves insertion order.
   *  Instances of `ListMap` represent empty maps; they can be either created by
@@ -65,7 +63,7 @@ object ListMap extends ImmutableMapFactory[ListMap] {
     "2.11.0")
 class ListMap[A, +B]
     extends AbstractMap[A, B] with Map[A, B]
-    with MapLike[A, B, ListMap[A, B]] with Serializable {
+    with MapLike[A, B, ListMap[A, B]] with Serializable
 
   override def empty = ListMap.empty
 
@@ -130,14 +128,14 @@ class ListMap[A, +B]
   /** Returns an iterator over key-value pairs.
     */
   def iterator: Iterator[(A, B)] =
-    new AbstractIterator[(A, B)] {
+    new AbstractIterator[(A, B)]
       var self: ListMap[A, B] = ListMap.this
       def hasNext = !self.isEmpty
       def next(): (A, B) =
         if (!hasNext)
           throw new NoSuchElementException("next on empty iterator")
         else { val res = (self.key, self.value); self = self.next; res }
-    }.toList.reverseIterator
+    .toList.reverseIterator
 
   protected def key: A = throw new NoSuchElementException("empty map")
   protected def value: B = throw new NoSuchElementException("empty map")
@@ -149,7 +147,7 @@ class ListMap[A, +B]
   @SerialVersionUID(-6453056603889598734L)
   protected class Node[B1 >: B](override protected val key: A,
                                 override protected val value: B1)
-      extends ListMap[A, B1] with Serializable {
+      extends ListMap[A, B1] with Serializable
 
     /** Returns the number of mappings in this map.
       *
@@ -204,10 +202,9 @@ class ListMap[A, +B]
       *  from `key` to `value`. If the map contains already a mapping for `key`,
       *  it will be overridden by this function.
       */
-    override def updated[B2 >: B1](k: A, v: B2): ListMap[A, B2] = {
+    override def updated[B2 >: B1](k: A, v: B2): ListMap[A, B2] =
       val m = this - k
       new m.Node[B2](k, v)
-    }
 
     /** Creates a new mapping without the given `key`.
       *  If the map does not contain a mapping for the given key, the
@@ -219,14 +216,12 @@ class ListMap[A, +B]
         k: A, cur: ListMap[A, B1], acc: List[ListMap[A, B1]]): ListMap[A, B1] =
       if (cur.isEmpty) acc.last
       else if (k == cur.key)
-        (cur.next /: acc) {
+        (cur.next /: acc)
           case (t, h) => val tt = t; new tt.Node(h.key, h.value) // SI-7459
-        } else remove0(k, cur.next, cur :: acc)
+        else remove0(k, cur.next, cur :: acc)
 
     override protected def next: ListMap[A, B1] = ListMap.this
 
     override def last: (A, B1) = (key, value)
 
     override def init: ListMap[A, B1] = next
-  }
-}

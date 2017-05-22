@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.beans.property.{DoubleProperty, IntegerProperty}
 import scalafx.delegate.SFXDelegate
 
-object AudioClip {
+object AudioClip
   implicit def sfxAudioClip2jfx(ac: AudioClip): jfxsm.AudioClip =
     if (ac != null) ac.delegate else null
 
@@ -44,10 +44,9 @@ object AudioClip {
   @deprecated("Use Indefinite; INDEFINITE will be removed in a future release",
               "8.0.60-R10")
   val INDEFINITE = Indefinite
-}
 
 class AudioClip(override val delegate: jfxsm.AudioClip)
-    extends SFXDelegate[jfxsm.AudioClip] {
+    extends SFXDelegate[jfxsm.AudioClip]
 
   /**
     * Create an AudioClip loaded from the supplied source URL
@@ -58,41 +57,36 @@ class AudioClip(override val delegate: jfxsm.AudioClip)
     * The relative left and right volume levels of the clip.
     */
   def balance: DoubleProperty = delegate.balanceProperty
-  def balance_=(v: Double) {
+  def balance_=(v: Double)
     balance() = v
-  }
 
   /**
     * The number of times the clip will be played when play() is called.
     */
   def cycleCount: IntegerProperty = delegate.cycleCountProperty
-  def cycleCount_=(v: Int) {
+  def cycleCount_=(v: Int)
     cycleCount() = v
-  }
 
   /**
     * The relative "center" of the clip.
     */
   def pan: DoubleProperty = delegate.panProperty
-  def pan_=(v: Double) {
+  def pan_=(v: Double)
     pan() = v
-  }
 
   /**
     * The relative priority of the clip with respect to other clips.
     */
   def priority: IntegerProperty = delegate.priorityProperty
-  def priority_=(v: Int) {
+  def priority_=(v: Int)
     priority() = v
-  }
 
   /**
     * The relative rate at which the clip is played.
     */
   def rate: DoubleProperty = delegate.rateProperty
-  def rate_=(v: Double) {
+  def rate_=(v: Double)
     rate() = v
-  }
 
   /**
     * Get the source URL used to create this AudioClip.
@@ -103,7 +97,5 @@ class AudioClip(override val delegate: jfxsm.AudioClip)
     * The relative volume level at which the clip is played.
     */
   def volume: DoubleProperty = delegate.volumeProperty
-  def volume_=(v: Double) {
+  def volume_=(v: Double)
     volume() = v
-  }
-}

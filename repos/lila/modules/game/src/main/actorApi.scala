@@ -9,9 +9,8 @@ import play.twirl.api.Html
 case class StartGame(game: Game)
 case class UserStartGame(userId: String, game: Game)
 
-case class FinishGame(game: Game, white: Option[User], black: Option[User]) {
+case class FinishGame(game: Game, white: Option[User], black: Option[User])
   def isVsSelf = white.isDefined && white == black
-}
 
 case class InsertGame(game: Game)
 

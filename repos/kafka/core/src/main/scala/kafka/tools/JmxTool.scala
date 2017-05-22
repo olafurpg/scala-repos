@@ -28,9 +28,9 @@ import scala.collection.mutable
 import scala.math._
 import kafka.utils.{CommandLineUtils, Logging}
 
-object JmxTool extends Logging {
+object JmxTool extends Logging
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     // Parse command line
     val parser = new OptionParser
     val objectNameOpt = parser
@@ -80,10 +80,9 @@ object JmxTool extends Logging {
 
     val options = parser.parse(args: _*)
 
-    if (options.has(helpOpt)) {
+    if (options.has(helpOpt))
       parser.printHelpOn(System.out)
       System.exit(0)
-    }
 
     val url = new JMXServiceURL(options.valueOf(jmxServiceUrlOpt))
     val interval = options.valueOf(reportingIntervalOpt).intValue
@@ -109,15 +108,14 @@ object JmxTool extends Logging {
       .flatten
 
     val numExpectedAttributes: Map[ObjectName, Int] =
-      attributesWhitelistExists match {
+      attributesWhitelistExists match
         case true => queries.map((_, attributesWhitelist.get.size)).toMap
         case false =>
-          names.map { (name: ObjectName) =>
+          names.map  (name: ObjectName) =>
             val mbean = mbsc.getMBeanInfo(name)
             (name,
              mbsc.getAttributes(name, mbean.getAttributes.map(_.getName)).size)
-          }.toMap
-      }
+          .toMap
 
     // print csv header
     val keys =
@@ -125,37 +123,29 @@ object JmxTool extends Logging {
     if (keys.size == numExpectedAttributes.map(_._2).sum + 1)
       println(keys.map("\"" + _ + "\"").mkString(","))
 
-    while (true) {
+    while (true)
       val start = System.currentTimeMillis
       val attributes = queryAttributes(mbsc, names, attributesWhitelist)
-      attributes("time") = dateFormat match {
+      attributes("time") = dateFormat match
         case Some(dFormat) => dFormat.format(new Date)
         case None => System.currentTimeMillis().toString
-      }
       if (attributes.keySet.size == numExpectedAttributes.map(_._2).sum + 1)
         println(keys.map(attributes(_)).mkString(","))
       val sleep = max(0, interval - (System.currentTimeMillis - start))
       Thread.sleep(sleep)
-    }
-  }
 
   def queryAttributes(mbsc: MBeanServerConnection,
                       names: Iterable[ObjectName],
-                      attributesWhitelist: Option[Array[String]]) = {
+                      attributesWhitelist: Option[Array[String]]) =
     var attributes = new mutable.HashMap[String, Any]()
-    for (name <- names) {
+    for (name <- names)
       val mbean = mbsc.getMBeanInfo(name)
       for (attrObj <- mbsc.getAttributes(
-          name, mbean.getAttributes.map(_.getName))) {
+          name, mbean.getAttributes.map(_.getName)))
         val attr = attrObj.asInstanceOf[Attribute]
-        attributesWhitelist match {
+        attributesWhitelist match
           case Some(allowedAttributes) =>
             if (allowedAttributes.contains(attr.getName))
               attributes(name + ":" + attr.getName) = attr.getValue
           case None => attributes(name + ":" + attr.getName) = attr.getValue
-        }
-      }
-    }
     attributes
-  }
-}

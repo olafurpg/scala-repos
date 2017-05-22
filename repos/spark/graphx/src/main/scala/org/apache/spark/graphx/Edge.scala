@@ -34,7 +34,7 @@ case class Edge[
     var srcId: VertexId = 0,
     var dstId: VertexId = 0,
     var attr: ED = null.asInstanceOf[ED])
-    extends Serializable {
+    extends Serializable
 
   /**
     * Given one vertex in the edge return the other vertex.
@@ -56,49 +56,39 @@ case class Edge[
   def relativeDirection(vid: VertexId): EdgeDirection =
     if (vid == srcId) EdgeDirection.Out
     else { assert(vid == dstId); EdgeDirection.In }
-}
 
-object Edge {
-  private[graphx] def lexicographicOrdering[ED] = new Ordering[Edge[ED]] {
-    override def compare(a: Edge[ED], b: Edge[ED]): Int = {
-      if (a.srcId == b.srcId) {
+object Edge
+  private[graphx] def lexicographicOrdering[ED] = new Ordering[Edge[ED]]
+    override def compare(a: Edge[ED], b: Edge[ED]): Int =
+      if (a.srcId == b.srcId)
         if (a.dstId == b.dstId) 0
         else if (a.dstId < b.dstId) -1
         else 1
-      } else if (a.srcId < b.srcId) -1
+      else if (a.srcId < b.srcId) -1
       else 1
-    }
-  }
 
   private[graphx] def edgeArraySortDataFormat[ED] =
-    new SortDataFormat[Edge[ED], Array[Edge[ED]]] {
-      override def getKey(data: Array[Edge[ED]], pos: Int): Edge[ED] = {
+    new SortDataFormat[Edge[ED], Array[Edge[ED]]]
+      override def getKey(data: Array[Edge[ED]], pos: Int): Edge[ED] =
         data(pos)
-      }
 
-      override def swap(data: Array[Edge[ED]], pos0: Int, pos1: Int): Unit = {
+      override def swap(data: Array[Edge[ED]], pos0: Int, pos1: Int): Unit =
         val tmp = data(pos0)
         data(pos0) = data(pos1)
         data(pos1) = tmp
-      }
 
       override def copyElement(src: Array[Edge[ED]],
                                srcPos: Int,
                                dst: Array[Edge[ED]],
-                               dstPos: Int) {
+                               dstPos: Int)
         dst(dstPos) = src(srcPos)
-      }
 
       override def copyRange(src: Array[Edge[ED]],
                              srcPos: Int,
                              dst: Array[Edge[ED]],
                              dstPos: Int,
-                             length: Int) {
+                             length: Int)
         System.arraycopy(src, srcPos, dst, dstPos, length)
-      }
 
-      override def allocate(length: Int): Array[Edge[ED]] = {
+      override def allocate(length: Int): Array[Edge[ED]] =
         new Array[Edge[ED]](length)
-      }
-    }
-}

@@ -52,9 +52,7 @@ abstract class SimpleSFXDelegateSpec[
     javaClass: Class[J], scalaClass: Class[S])(
     implicit jfx2sfx: J => S = null, sfx2jfx: S => J = null)
     extends SFXDelegateSpec[J, S](javaClass, scalaClass)
-    with PropertyComparator {
+    with PropertyComparator
 
-  it should "implement all the JavaFX properties" in {
+  it should "implement all the JavaFX properties" in
     compareProperties(javaClass, scalaClass)
-  }
-}

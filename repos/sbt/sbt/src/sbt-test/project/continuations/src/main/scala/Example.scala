@@ -1,11 +1,10 @@
 import scala.util.continuations._
 
-object Example {
+object Example
 
   val x =
-    reset {
-      shift { k: (Int => Int) =>
+    reset
+      shift  k: (Int => Int) =>
         k(k(k(7)))
-      } + 1
-    } * 2
-}
+      + 1
+    * 2

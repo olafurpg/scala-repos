@@ -7,7 +7,7 @@ import play.api.libs.json._
 import lila.db.api._
 import lila.user.User
 
-object Query {
+object Query
 
   import Game.{BSONFields => F}
 
@@ -106,4 +106,3 @@ object Query {
   val sortChronological = $sort asc F.createdAt
   val sortAntiChronological = $sort desc F.createdAt
   val sortUpdatedNoIndex = $sort desc F.updatedAt
-}

@@ -6,7 +6,7 @@ import org.scalatra.json.JacksonJsonSupport
 import org.scalatra.test.specs2.ScalatraSpec
 import org.specs2.matcher.JsonMatchers
 
-class SubPathSwaggerSpec extends ScalatraSpec with JsonMatchers {
+class SubPathSwaggerSpec extends ScalatraSpec with JsonMatchers
   def is = s2"""
   Swagger integration should
     list resources $listResources
@@ -27,17 +27,14 @@ class SubPathSwaggerSpec extends ScalatraSpec with JsonMatchers {
   addServlet(new HackersSwagger()(swagger), "/api-docs")
   implicit val formats: Formats = DefaultFormats
 
-  def listResources = get("/api-docs") {
+  def listResources = get("/api-docs")
     jackson.parseJson(body) \ "apis" \\ "path" must_== JString("/api/hackers")
-  }
-  def listHackerOperations = get("/api-docs/api/hackers") {
+  def listHackerOperations = get("/api-docs/api/hackers")
     val json = jackson.parseJson(body)
     json \ "apis" \\ "path" must_==
       JObject("path" -> JString("/api/hackers/") :: "path" -> JString(
             "/api/hackers/{id}") :: Nil)
-  }
   def checkModelOrder = pending
-}
 
 case class Hacker(id: Long,
                   firstName: String,
@@ -47,7 +44,7 @@ case class Hacker(id: Long,
 class HackersSwagger(implicit val swagger: Swagger)
     extends ScalatraServlet with JacksonSwaggerBase
 class ApiController()(implicit val swagger: Swagger)
-    extends ScalatraServlet with JacksonJsonSupport with SwaggerSupport {
+    extends ScalatraServlet with JacksonJsonSupport with SwaggerSupport
   override implicit protected def jsonFormats: Formats = DefaultFormats
 
   protected val applicationDescription: String =
@@ -59,9 +56,8 @@ class ApiController()(implicit val swagger: Swagger)
   /**
     * List all hackers.
     */
-  get("/", operation(listHackers)) {
+  get("/", operation(listHackers))
     List.empty[Hacker]
-  }
 
   val getHacker =
     (apiOperation[Hacker]("getHacker") summary "Retrieve a single hacker by id" notes "Foo" parameters Parameter(
@@ -75,9 +71,8 @@ class ApiController()(implicit val swagger: Swagger)
   /**
     * Retrieve a specific hacker.
     */
-  get("/:id", operation(getHacker)) {
+  get("/:id", operation(getHacker))
     null
-  }
 
   val createHacker =
     (apiOperation[Hacker]("createHacker") summary "Create a new hacker" notes "firstname, lastname, motto, and year of birth are required" parameters
@@ -109,11 +104,8 @@ class ApiController()(implicit val swagger: Swagger)
   /**
     * Create a new hacker in the database.
     */
-  post("/", operation(createHacker)) {
+  post("/", operation(createHacker))
     null
-  }
 
-  delete("/:id") {
+  delete("/:id")
     null
-  }
-}

@@ -39,55 +39,46 @@ import org.apache.spark.sql.internal.SQLConf
   *   dataFrame.typeCheck()
   * }}}
   */
-package object debug {
+package object debug
 
   /**
     * Augments [[SQLContext]] with debug methods.
     */
-  implicit class DebugSQLContext(sqlContext: SQLContext) {
-    def debug(): Unit = {
+  implicit class DebugSQLContext(sqlContext: SQLContext)
+    def debug(): Unit =
       sqlContext.setConf(SQLConf.DATAFRAME_EAGER_ANALYSIS, false)
-    }
-  }
 
   /**
     * Augments [[DataFrame]]s with debug methods.
     */
-  implicit class DebugQuery(query: DataFrame) extends Logging {
-    def debug(): Unit = {
+  implicit class DebugQuery(query: DataFrame) extends Logging
+    def debug(): Unit =
       val plan = query.queryExecution.executedPlan
       val visited = new collection.mutable.HashSet[TreeNodeRef]()
       val debugPlan =
-        plan transform {
+        plan transform
           case s: SparkPlan if !visited.contains(new TreeNodeRef(s)) =>
             visited += new TreeNodeRef(s)
             DebugNode(s)
-        }
       logDebug(s"Results returned: ${debugPlan.execute().count()}")
-      debugPlan.foreach {
+      debugPlan.foreach
         case d: DebugNode => d.dumpStats()
         case _ =>
-      }
-    }
-  }
 
   private[sql] case class DebugNode(child: SparkPlan)
-      extends UnaryNode with CodegenSupport {
+      extends UnaryNode with CodegenSupport
     def output: Seq[Attribute] = child.output
 
     implicit object SetAccumulatorParam
-        extends AccumulatorParam[HashSet[String]] {
-      def zero(initialValue: HashSet[String]): HashSet[String] = {
+        extends AccumulatorParam[HashSet[String]]
+      def zero(initialValue: HashSet[String]): HashSet[String] =
         initialValue.clear()
         initialValue
-      }
 
       def addInPlace(
-          v1: HashSet[String], v2: HashSet[String]): HashSet[String] = {
+          v1: HashSet[String], v2: HashSet[String]): HashSet[String] =
         v1 ++= v2
         v1
-      }
-    }
 
     /**
       * A collection of metrics for each column of output.
@@ -104,50 +95,37 @@ package object debug {
     val columnStats: Array[ColumnMetrics] =
       Array.fill(child.output.size)(new ColumnMetrics())
 
-    def dumpStats(): Unit = {
+    def dumpStats(): Unit =
       logDebug(s"== ${child.simpleString} ==")
       logDebug(s"Tuples output: ${tupleCount.value}")
-      child.output.zip(columnStats).foreach {
+      child.output.zip(columnStats).foreach
         case (attr, metric) =>
           val actualDataTypes =
             metric.elementTypes.value.mkString("{", ",", "}")
           logDebug(s" ${attr.name} ${attr.dataType}: $actualDataTypes")
-      }
-    }
 
-    protected override def doExecute(): RDD[InternalRow] = {
-      child.execute().mapPartitions { iter =>
-        new Iterator[InternalRow] {
+    protected override def doExecute(): RDD[InternalRow] =
+      child.execute().mapPartitions  iter =>
+        new Iterator[InternalRow]
           def hasNext: Boolean = iter.hasNext
 
-          def next(): InternalRow = {
+          def next(): InternalRow =
             val currentRow = iter.next()
             tupleCount += 1
             var i = 0
-            while (i < numColumns) {
+            while (i < numColumns)
               val value = currentRow.get(i, output(i).dataType)
-              if (value != null) {
+              if (value != null)
                 columnStats(i).elementTypes += HashSet(value.getClass.getName)
-              }
               i += 1
-            }
             currentRow
-          }
-        }
-      }
-    }
 
-    override def upstreams(): Seq[RDD[InternalRow]] = {
+    override def upstreams(): Seq[RDD[InternalRow]] =
       child.asInstanceOf[CodegenSupport].upstreams()
-    }
 
-    override def doProduce(ctx: CodegenContext): String = {
+    override def doProduce(ctx: CodegenContext): String =
       child.asInstanceOf[CodegenSupport].produce(ctx, this)
-    }
 
     override def doConsume(
-        ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+        ctx: CodegenContext, input: Seq[ExprCode], row: String): String =
       consume(ctx, input)
-    }
-  }
-}

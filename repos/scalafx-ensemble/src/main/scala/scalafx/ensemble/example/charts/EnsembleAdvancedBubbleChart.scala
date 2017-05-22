@@ -42,9 +42,9 @@ import scalafx.scene.chart.XYChart
   * @see scalafx.scene.chart.ScatterChart
   * @see scalafx.scene.chart.XYChart
   */
-class EnsembleAdvancedBubbleChart extends EnsembleExample {
+class EnsembleAdvancedBubbleChart extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     // Generate some random data
     def randomData =
       (1 to 20).map(_ =>
@@ -57,9 +57,6 @@ class EnsembleAdvancedBubbleChart extends EnsembleExample {
       XYChart.Series("Data Series 2", ObservableBuffer(randomData))
 
     // Create Bubble Chart
-    new BubbleChart(NumberAxis("X Axis"), NumberAxis("Y Axis")) {
+    new BubbleChart(NumberAxis("X Axis"), NumberAxis("Y Axis"))
       title = "Advanced BubbleChart"
       data = Seq(bcSeries1, bcSeries2)
-    }
-  }
-}

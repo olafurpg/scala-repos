@@ -10,9 +10,9 @@ import org.scalatest.Matchers
 import scala.language.postfixOps
 import PathId._
 
-class GroupRepositoryTest extends MarathonSpec with Matchers {
+class GroupRepositoryTest extends MarathonSpec with Matchers
 
-  test("Store canary strategy") {
+  test("Store canary strategy")
     val store = mock[MarathonStore[Group]]
     val group = Group("g1".toPath, Set.empty)
     val future = Future.successful(group)
@@ -30,12 +30,9 @@ class GroupRepositoryTest extends MarathonSpec with Matchers {
            "Should return the correct Group")
     verify(store).store(versionedKey, group)
     verify(store).store(s"root", group)
-  }
 
-  test("group back and forth again with rolling strategy") {
+  test("group back and forth again with rolling strategy")
     val group = Group("g1".toPath, Set.empty)
     val proto = group.toProto
     val merged = Group.fromProto(proto)
     group should be(merged)
-  }
-}

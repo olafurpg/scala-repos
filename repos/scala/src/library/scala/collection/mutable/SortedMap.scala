@@ -20,7 +20,7 @@ import generic._
 trait SortedMap[A, B]
     extends Map[A, B]
     with collection.SortedMap[A, B] with MapLike[A, B, SortedMap[A, B]]
-    with SortedMapLike[A, B, SortedMap[A, B]] {
+    with SortedMapLike[A, B, SortedMap[A, B]]
 
   override protected[this] def newBuilder: Builder[(A, B), SortedMap[A, B]] =
     SortedMap.newBuilder[A, B]
@@ -39,7 +39,6 @@ trait SortedMap[A, B]
 
   override def ++[B1 >: B](xs: GenTraversableOnce[(A, B1)]): SortedMap[A, B1] =
     clone().asInstanceOf[SortedMap[A, B1]] ++= xs.seq
-}
 
 /**
   * $factoryInfo
@@ -47,7 +46,7 @@ trait SortedMap[A, B]
   * @define Coll mutable.SortedMap
   * @define coll mutable sorted map
   */
-object SortedMap extends MutableSortedMapFactory[SortedMap] {
+object SortedMap extends MutableSortedMapFactory[SortedMap]
 
   def empty[A, B](implicit ord: Ordering[A]): SortedMap[A, B] =
     TreeMap.empty[A, B]
@@ -56,7 +55,6 @@ object SortedMap extends MutableSortedMapFactory[SortedMap] {
   implicit def canBuildFrom[A, B](
       implicit ord: Ordering[A]): CanBuildFrom[Coll, (A, B), SortedMap[A, B]] =
     new SortedMapCanBuildFrom[A, B]
-}
 
 /** Explicit instantiation of the `SortedMap` trait to reduce class file size in subclasses. */
 abstract class AbstractSortedMap[A, B]

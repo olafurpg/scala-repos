@@ -1,5 +1,4 @@
 trait S[T]
 
-object P {
+object P
   def x(t: Int)(ss: Seq[S[_]]): Seq[S[_]] = ss
-}

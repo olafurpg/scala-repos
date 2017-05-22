@@ -29,7 +29,7 @@ import org.apache.spark.rdd.RDD
   * belongs. The categories are represented by double values: 0.0, 1.0, 2.0, etc.
   */
 @Since("0.8.0")
-trait ClassificationModel extends Serializable {
+trait ClassificationModel extends Serializable
 
   /**
     * Predict values for the given data set using the model trained.
@@ -57,17 +57,14 @@ trait ClassificationModel extends Serializable {
   @Since("1.0.0")
   def predict(testData: JavaRDD[Vector]): JavaRDD[java.lang.Double] =
     predict(testData.rdd).toJavaRDD().asInstanceOf[JavaRDD[java.lang.Double]]
-}
 
-private[mllib] object ClassificationModel {
+private[mllib] object ClassificationModel
 
   /**
     * Helper method for loading GLM classification model metadata.
     * @return (numFeatures, numClasses)
     */
-  def getNumFeaturesClasses(metadata: JValue): (Int, Int) = {
+  def getNumFeaturesClasses(metadata: JValue): (Int, Int) =
     implicit val formats = DefaultFormats
     ((metadata \ "numFeatures").extract[Int],
      (metadata \ "numClasses").extract[Int])
-  }
-}

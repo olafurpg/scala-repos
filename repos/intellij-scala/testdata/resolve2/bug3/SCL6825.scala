@@ -1,15 +1,12 @@
-object SCL6825 {
-  object K {
+object SCL6825
+  object K
     def size(): Int = 123
-  }
 
-  object L {
+  object L
     val size: Int = 124
-  }
 
-  object M {
+  object M
     def size: Int = 125
-  }
 
   def foo(x: AnyRef { val size: Int }) = 1
   def foo(b: Boolean) = 2
@@ -36,4 +33,3 @@ object SCL6825 {
   zoo(L)
   /*                 */
   zoo(M)
-}

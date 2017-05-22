@@ -18,7 +18,7 @@ package com.twitter.summingbird.planner
 
 import com.twitter.summingbird._
 
-class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
+class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V])
   private type Prod[T] = Producer[P, T]
   private type VisitedStore = Set[Prod[_]]
   private type CNode = Node[P]
@@ -33,7 +33,7 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
   // We don't merge flatMaps or joins with source.
   // That is just a hueristic, and in some cases perhaps we should
   private def mergableWithSource(dep: Producer[P, _]): Boolean =
-    dep match {
+    dep match
       case NamedProducer(producer, _) => true
       case IdentityKeyedProducer(producer) => true
       case OptionMappedProducer(producer, _) => true
@@ -47,10 +47,9 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
       case Summer(_, _, _) => false
       case WrittenProducer(_, _) => false
       case MergedProducer(_, _) => false
-    }
 
   private def noOpProducer(dep: Producer[P, _]): Boolean =
-    dep match {
+    dep match
       // These are merely planning hint nodes, and don't do any logic
       case NamedProducer(_, _) => true
       case IdentityKeyedProducer(_) => true
@@ -65,7 +64,6 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
       case Source(_) => false
       case Summer(_, _, _) => false
       case WrittenProducer(_, _) => false
-    }
 
   private def noOpNode(c: CNode): Boolean = c.members.forall(noOpProducer)
 
@@ -102,9 +100,9 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
       previousBolt: CNode,
       nodeSet: List[CNode],
       visited: VisitedStore): (List[CNode], VisitedStore) =
-    if (visited.contains(dependantProducer)) {
+    if (visited.contains(dependantProducer))
       (distinctAddToList(nodeSet, previousBolt), visited)
-    } else {
+    else
       val currentBolt = previousBolt.add(dependantProducer)
       val visitedWithN = visited + dependantProducer
 
@@ -132,12 +130,12 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
       def maybeSplitThenRecurse[U, A](
           currentProducer: Prod[U],
           dep: Prod[A],
-          activeBolt: CNode = currentBolt): (List[CNode], VisitedStore) = {
+          activeBolt: CNode = currentBolt): (List[CNode], VisitedStore) =
         /*
          * First we enumerate the cases where we need to split. Then, the other cases are where we
          * don't split
          */
-        val doSplit = activeBolt match {
+        val doSplit = activeBolt match
           /*
            * If dep, the next node up the chain, has two dependants, we cannot pull it into this
            * node
@@ -179,17 +177,14 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
                   allTransDepsMergeableWithSource(dep)) =>
             true
           case _ => false
-        }
         // Note the currentProducer is *ALREADY* a part of activeBolt
-        if (doSplit) {
+        if (doSplit)
           // Note that FlatMapNode is used as the default empty node
           recurse(dep,
                   updatedBolt = FlatMapNode(),
                   updatedRegistry = distinctAddToList(nodeSet, activeBolt))
-        } else {
+        else
           recurse(dep, updatedBolt = activeBolt)
-        }
-      }
 
       /*
        * This is a peek ahead when we meet a MergedProducer. We pull the directly depended on MergedProducer's into the same Node,
@@ -202,7 +197,7 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
       def mergeCollapse[A](
           p: Prod[A],
           rootMerge: Boolean = false): (List[Prod[A]], List[Prod[A]]) =
-        p match {
+        p match
           case MergedProducer(subL, subR)
               if (!forkedNodes.contains(p) || rootMerge) =>
             // TODO support de-duping self merges  https://github.com/twitter/summingbird/issues/237
@@ -214,9 +209,8 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
             (distinctAddToList((lMergeNodes ::: rMergeNodes).distinct, p),
              (lSiblings ::: rSiblings).distinct)
           case _ => (List(), List(p))
-        }
 
-      dependantProducer match {
+      dependantProducer match
         // Names should have be removed before the planning phase
         case NamedProducer(producer, _) =>
           sys.error("Should not try plan a named producer")
@@ -253,28 +247,23 @@ class OnlinePlan[P <: Platform[P], V](tail: Producer[P, V]) {
           val (otherMergeNodes, dependencies) = mergeCollapse(
               dependantProducer, rootMerge = true)
           val newCurrentBolt = otherMergeNodes.foldLeft(currentBolt)(_.add(_))
-          val visitedWithOther = otherMergeNodes.foldLeft(visitedWithN) {
+          val visitedWithOther = otherMergeNodes.foldLeft(visitedWithN)
             (visited, n) =>
               visited + n
-          }
 
           // Recurse down all the newly generated dependencies
           dependencies.foldLeft(
-              (distinctAddToList(nodeSet, newCurrentBolt), visitedWithOther)) {
+              (distinctAddToList(nodeSet, newCurrentBolt), visitedWithOther))
             case ((newNodeSet, newVisited), n) =>
               recurse(n, FlatMapNode(), newNodeSet, newVisited)
-          }
-      }
-    }
 
   val (nodeSet, _) = addWithDependencies(
       tail, FlatMapNode(), List[CNode](), Set())
   require(nodeSet.collect { case n @ SourceNode(_) => n }.size > 0,
           "Valid nodeSet should have at least one source node")
-}
 
-object OnlinePlan {
-  def apply[P <: Platform[P], T](tail: TailProducer[P, T]): Dag[P] = {
+object OnlinePlan
+  def apply[P <: Platform[P], T](tail: TailProducer[P, T]): Dag[P] =
     val (nameMap, strippedTail) = StripNamedNode(tail)
     val planner = new OnlinePlan(strippedTail)
     val nodesSet = planner.nodeSet
@@ -283,10 +272,7 @@ object OnlinePlan {
     // but its easier to look at laws in a summer -> source manner
     // We also drop all Nodes with no members(may occur when we visit a node already seen and its the first in that Node)
     val reversedNodeSet =
-      nodesSet.filter(_.members.size > 0).foldLeft(List[Node[P]]()) {
+      nodesSet.filter(_.members.size > 0).foldLeft(List[Node[P]]())
         (nodes, n) =>
           n.reverse :: nodes
-      }
     Dag(tail, nameMap, strippedTail, reversedNodeSet)
-  }
-}

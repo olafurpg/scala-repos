@@ -34,13 +34,12 @@ import scalafx.beans.property.BooleanProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object Button {
+object Button
   implicit def sfxButton2jfx(v: Button): jfxsc.Button =
     if (v != null) v.delegate else null
-}
 
 class Button(override val delegate: jfxsc.Button = new jfxsc.Button)
-    extends ButtonBase(delegate) with SFXDelegate[jfxsc.Button] {
+    extends ButtonBase(delegate) with SFXDelegate[jfxsc.Button]
 
   /**
     * Creates a button with the specified text as its label.
@@ -57,16 +56,13 @@ class Button(override val delegate: jfxsc.Button = new jfxsc.Button)
     * scene consumes it.
     */
   def cancelButton: BooleanProperty = delegate.cancelButtonProperty
-  def cancelButton_=(b: Boolean) {
+  def cancelButton_=(b: Boolean)
     cancelButton() = b
-  }
 
   /**
     * A default Button is the button that receives a keyboard VK_ENTER press, if no other node in the
     * scene consumes it.
     */
   def defaultButton: BooleanProperty = delegate.defaultButtonProperty
-  def defaultButton_=(b: Boolean) {
+  def defaultButton_=(b: Boolean)
     defaultButton() = b
-  }
-}

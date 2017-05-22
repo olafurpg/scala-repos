@@ -65,34 +65,30 @@ import scalaz.syntax.std.option._
 import scala.collection.JavaConverters._
 
 class JDBCQueryExecutorConfig(val config: Configuration)
-    extends StandaloneQueryExecutorConfig with JDBCColumnarTableModuleConfig {
+    extends StandaloneQueryExecutorConfig with JDBCColumnarTableModuleConfig
   val logPrefix = "jdbc"
 
   val dbMap = config.detach("databases").data
-}
 
-object JDBCQueryExecutor {
+object JDBCQueryExecutor
   def apply(config: Configuration,
             jobManager: JobManager[Future],
             jobActorSystem: ActorSystem)(
-      implicit ec: ExecutionContext, M: Monad[Future]): ManagedPlatform = {
+      implicit ec: ExecutionContext, M: Monad[Future]): ManagedPlatform =
     new JDBCQueryExecutor(
         new JDBCQueryExecutorConfig(config), jobManager, jobActorSystem)
-  }
-}
 
 class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
                         val jobManager: JobManager[Future],
                         val jobActorSystem: ActorSystem)(
     implicit val executionContext: ExecutionContext, val M: Monad[Future])
-    extends StandaloneQueryExecutor with JDBCColumnarTableModule with Logging {
+    extends StandaloneQueryExecutor with JDBCColumnarTableModule with Logging
   platform =>
   type YggConfig = JDBCQueryExecutorConfig
 
   trait TableCompanion extends JDBCColumnarTableCompanion
-  object Table extends TableCompanion {
+  object Table extends TableCompanion
     val databaseMap = yggConfig.dbMap
-  }
 
   // Not for production
   val unescapeColumnNames = false
@@ -103,19 +99,19 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
   def startup() = Promise.successful(true)
   def shutdown() = Promise.successful(true)
 
-  val metadataClient = new MetadataClient[Future] {
+  val metadataClient = new MetadataClient[Future]
     def size(userUID: String, path: Path): Future[Validation[String, JNum]] =
-      Future {
-        path.elements.toList match {
+      Future
+        path.elements.toList match
           case dbName :: tableName :: Nil =>
             yggConfig.dbMap
               .get(dbName)
-              .toSuccess("DB %s is not configured".format(dbName)) flatMap {
+              .toSuccess("DB %s is not configured".format(dbName)) flatMap
               url =>
-                Validation.fromTryCatch {
+                Validation.fromTryCatch
                   val conn = DriverManager.getConnection(url)
 
-                  try {
+                  try
                     // May need refinement to get meaningful results
                     val stmt = conn.createStatement
 
@@ -126,45 +122,40 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
                     val result = stmt.executeQuery(query)
 
-                    if (result.next) {
+                    if (result.next)
                       JNum(result.getLong("count"))
-                    } else {
+                    else
                       JNum(0)
-                    }
-                  } finally {
+                  finally
                     conn.close()
-                  }
-                }.bimap({ t =>
+                .bimap( t =>
                   logger.error("Error enumerating tables", t); t.getMessage
-                }, x => x)
-            }
+                , x => x)
 
           case _ =>
             Success(JNum(0))
-        }
-      }.onFailure {
+      .onFailure
         case t => logger.error("Failure during size", t)
-      }
 
     def browse(
-        userUID: String, path: Path): Future[Validation[String, JArray]] = {
-      Future {
-        path.elements.toList match {
+        userUID: String, path: Path): Future[Validation[String, JArray]] =
+      Future
+        path.elements.toList match
           case Nil =>
-            Success(yggConfig.dbMap.keys.toList.map { d =>
+            Success(yggConfig.dbMap.keys.toList.map  d =>
               d + "/"
-            }.serialize.asInstanceOf[JArray])
+            .serialize.asInstanceOf[JArray])
 
           case dbName :: Nil =>
             // A little more complicated. Need to use metadata interface to enumerate table names
             yggConfig.dbMap
               .get(dbName)
-              .toSuccess("DB %s is not configured".format(dbName)) flatMap {
+              .toSuccess("DB %s is not configured".format(dbName)) flatMap
               url =>
-                Validation.fromTryCatch {
+                Validation.fromTryCatch
                   val conn = DriverManager.getConnection(url)
 
-                  try {
+                  try
                     // May need refinement to get meaningful results
                     val results = conn.getMetaData.getTables(null,
                                                              null,
@@ -173,18 +164,15 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
 
                     var tables = List.empty[String]
 
-                    while (results.next) {
+                    while (results.next)
                       tables ::= results.getString("TABLE_NAME") + "/"
-                    }
 
                     tables.serialize.asInstanceOf[JArray]
-                  } finally {
+                  finally
                     conn.close()
-                  }
-                }.bimap({ t =>
+                .bimap( t =>
                   logger.error("Error enumerating tables", t); t.getMessage
-                }, x => x)
-            }
+                , x => x)
 
           case dbName :: collectionName :: Nil =>
             Success(JArray(Nil))
@@ -192,11 +180,8 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
           case _ =>
             Failure(
                 "JDBC paths have the form /databaseName/tableName; longer paths are not supported.")
-        }
-      }.onFailure {
+      .onFailure
         case t => logger.error("Failure during size", t)
-      }
-    }
 
     def structure(userUID: String,
                   path: Path,
@@ -210,6 +195,4 @@ class JDBCQueryExecutor(val yggConfig: JDBCQueryExecutorConfig,
     def currentVersion(apiKey: APIKey, path: Path) = Promise.successful(None)
     def currentAuthorities(apiKey: APIKey, path: Path) =
       Promise.successful(None)
-  }
-}
 // vim: set ts=4 sw=4 et:

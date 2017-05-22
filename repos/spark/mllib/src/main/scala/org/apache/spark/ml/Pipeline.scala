@@ -39,7 +39,7 @@ import org.apache.spark.sql.types.StructType
   * A stage in a pipeline, either an [[Estimator]] or a [[Transformer]].
   */
 @DeveloperApi
-abstract class PipelineStage extends Params with Logging {
+abstract class PipelineStage extends Params with Logging
 
   /**
     * :: DeveloperApi ::
@@ -59,19 +59,15 @@ abstract class PipelineStage extends Params with Logging {
     */
   @DeveloperApi
   protected def transformSchema(
-      schema: StructType, logging: Boolean): StructType = {
-    if (logging) {
+      schema: StructType, logging: Boolean): StructType =
+    if (logging)
       logDebug(s"Input schema: ${schema.json}")
-    }
     val outputSchema = transformSchema(schema)
-    if (logging) {
+    if (logging)
       logDebug(s"Expected output schema: ${outputSchema.json}")
-    }
     outputSchema
-  }
 
   override def copy(extra: ParamMap): PipelineStage
-}
 
 /**
   * :: Experimental ::
@@ -88,7 +84,7 @@ abstract class PipelineStage extends Params with Logging {
 @Since("1.2.0")
 @Experimental
 class Pipeline @Since("1.4.0")(@Since("1.4.0") override val uid: String)
-    extends Estimator[PipelineModel] with MLWritable {
+    extends Estimator[PipelineModel] with MLWritable
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("pipeline"))
@@ -103,9 +99,8 @@ class Pipeline @Since("1.4.0")(@Since("1.4.0") override val uid: String)
 
   /** @group setParam */
   @Since("1.2.0")
-  def setStages(value: Array[PipelineStage]): this.type = {
+  def setStages(value: Array[PipelineStage]): this.type =
     set(stages, value); this
-  }
 
   // Below, we clone stages so that modifications to the list of stages will not change
   // the Param value in the Pipeline.
@@ -126,25 +121,23 @@ class Pipeline @Since("1.4.0")(@Since("1.4.0") override val uid: String)
     * @return fitted pipeline
     */
   @Since("1.2.0")
-  override def fit(dataset: DataFrame): PipelineModel = {
+  override def fit(dataset: DataFrame): PipelineModel =
     transformSchema(dataset.schema, logging = true)
     val theStages = $(stages)
     // Search for the last estimator.
     var indexOfLastEstimator = -1
-    theStages.view.zipWithIndex.foreach {
+    theStages.view.zipWithIndex.foreach
       case (stage, index) =>
-        stage match {
+        stage match
           case _: Estimator[_] =>
             indexOfLastEstimator = index
           case _ =>
-        }
-    }
     var curDataset = dataset
     val transformers = ListBuffer.empty[Transformer]
-    theStages.view.zipWithIndex.foreach {
+    theStages.view.zipWithIndex.foreach
       case (stage, index) =>
-        if (index <= indexOfLastEstimator) {
-          val transformer = stage match {
+        if (index <= indexOfLastEstimator)
+          val transformer = stage match
             case estimator: Estimator[_] =>
               estimator.fit(curDataset)
             case t: Transformer =>
@@ -152,40 +145,32 @@ class Pipeline @Since("1.4.0")(@Since("1.4.0") override val uid: String)
             case _ =>
               throw new IllegalArgumentException(
                   s"Do not support stage $stage of type ${stage.getClass}")
-          }
-          if (index < indexOfLastEstimator) {
+          if (index < indexOfLastEstimator)
             curDataset = transformer.transform(curDataset)
-          }
           transformers += transformer
-        } else {
+        else
           transformers += stage.asInstanceOf[Transformer]
-        }
-    }
 
     new PipelineModel(uid, transformers.toArray).setParent(this)
-  }
 
   @Since("1.4.0")
-  override def copy(extra: ParamMap): Pipeline = {
+  override def copy(extra: ParamMap): Pipeline =
     val map = extractParamMap(extra)
     val newStages = map(stages).map(_.copy(extra))
     new Pipeline().setStages(newStages)
-  }
 
   @Since("1.2.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val theStages = $(stages)
     require(theStages.toSet.size == theStages.length,
             "Cannot have duplicate components in a pipeline.")
     theStages.foldLeft(schema)((cur, stage) => stage.transformSchema(cur))
-  }
 
   @Since("1.6.0")
   override def write: MLWriter = new Pipeline.PipelineWriter(this)
-}
 
 @Since("1.6.0")
-object Pipeline extends MLReadable[Pipeline] {
+object Pipeline extends MLReadable[Pipeline]
 
   @Since("1.6.0")
   override def read: MLReader[Pipeline] = new PipelineReader
@@ -193,42 +178,37 @@ object Pipeline extends MLReadable[Pipeline] {
   @Since("1.6.0")
   override def load(path: String): Pipeline = super.load(path)
 
-  private[Pipeline] class PipelineWriter(instance: Pipeline) extends MLWriter {
+  private[Pipeline] class PipelineWriter(instance: Pipeline) extends MLWriter
 
     SharedReadWrite.validateStages(instance.getStages)
 
     override protected def saveImpl(path: String): Unit =
       SharedReadWrite.saveImpl(instance, instance.getStages, sc, path)
-  }
 
-  private class PipelineReader extends MLReader[Pipeline] {
+  private class PipelineReader extends MLReader[Pipeline]
 
     /** Checked against metadata when loading model */
     private val className = classOf[Pipeline].getName
 
-    override def load(path: String): Pipeline = {
+    override def load(path: String): Pipeline =
       val (uid: String, stages: Array[PipelineStage]) =
         SharedReadWrite.load(className, sc, path)
       new Pipeline(uid).setStages(stages)
-    }
-  }
 
   /** Methods for [[MLReader]] and [[MLWriter]] shared between [[Pipeline]] and [[PipelineModel]] */
-  private[ml] object SharedReadWrite {
+  private[ml] object SharedReadWrite
 
     import org.json4s.JsonDSL._
 
     /** Check that all stages are Writable */
-    def validateStages(stages: Array[PipelineStage]): Unit = {
-      stages.foreach {
+    def validateStages(stages: Array[PipelineStage]): Unit =
+      stages.foreach
         case stage: MLWritable => // good
         case other =>
           throw new UnsupportedOperationException(
               "Pipeline write will fail on this Pipeline" +
               s" because it contains a stage which does not implement Writable. Non-Writable stage:" +
               s" ${other.uid} of type ${other.getClass}")
-      }
-    }
 
     /**
       * Save metadata and stages for a [[Pipeline]] or [[PipelineModel]]
@@ -238,7 +218,7 @@ object Pipeline extends MLReadable[Pipeline] {
     def saveImpl(instance: Params,
                  stages: Array[PipelineStage],
                  sc: SparkContext,
-                 path: String): Unit = {
+                 path: String): Unit =
       val stageUids = stages.map(_.uid)
       val jsonParams = List(
           "stageUids" -> parse(compact(render(stageUids.toSeq))))
@@ -247,12 +227,10 @@ object Pipeline extends MLReadable[Pipeline] {
 
       // Save stages
       val stagesDir = new Path(path, "stages").toString
-      stages.zipWithIndex.foreach {
+      stages.zipWithIndex.foreach
         case (stage: MLWritable, idx: Int) =>
           stage.write.save(
               getStagePath(stage.uid, idx, stages.length, stagesDir))
-      }
-    }
 
     /**
       * Load metadata and stages for a [[Pipeline]] or [[PipelineModel]]
@@ -260,7 +238,7 @@ object Pipeline extends MLReadable[Pipeline] {
       */
     def load(expectedClassName: String,
              sc: SparkContext,
-             path: String): (String, Array[PipelineStage]) = {
+             path: String): (String, Array[PipelineStage]) =
       val metadata =
         DefaultParamsReader.loadMetadata(path, sc, expectedClassName)
 
@@ -268,27 +246,22 @@ object Pipeline extends MLReadable[Pipeline] {
       val stagesDir = new Path(path, "stages").toString
       val stageUids: Array[String] =
         (metadata.params \ "stageUids").extract[Seq[String]].toArray
-      val stages: Array[PipelineStage] = stageUids.zipWithIndex.map {
+      val stages: Array[PipelineStage] = stageUids.zipWithIndex.map
         case (stageUid, idx) =>
           val stagePath = SharedReadWrite.getStagePath(
               stageUid, idx, stageUids.length, stagesDir)
           DefaultParamsReader.loadParamsInstance[PipelineStage](stagePath, sc)
-      }
       (metadata.uid, stages)
-    }
 
     /** Get path for saving the given stage. */
     def getStagePath(stageUid: String,
                      stageIdx: Int,
                      numStages: Int,
-                     stagesDir: String): String = {
+                     stagesDir: String): String =
       val stageIdxDigits = numStages.toString.length
       val idxFormat = s"%0${stageIdxDigits}d"
       val stageDir = idxFormat.format(stageIdx) + "_" + stageUid
       new Path(stagesDir, stageDir).toString
-    }
-  }
-}
 
 /**
   * :: Experimental ::
@@ -298,36 +271,31 @@ object Pipeline extends MLReadable[Pipeline] {
 @Experimental
 class PipelineModel private[ml](@Since("1.4.0") override val uid: String,
                                 @Since("1.4.0") val stages: Array[Transformer])
-    extends Model[PipelineModel] with MLWritable with Logging {
+    extends Model[PipelineModel] with MLWritable with Logging
 
   /** A Java/Python-friendly auxiliary constructor. */
-  private[ml] def this(uid: String, stages: ju.List[Transformer]) = {
+  private[ml] def this(uid: String, stages: ju.List[Transformer]) =
     this(uid, stages.asScala.toArray)
-  }
 
   @Since("1.2.0")
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
     stages.foldLeft(dataset)((cur, transformer) => transformer.transform(cur))
-  }
 
   @Since("1.2.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     stages.foldLeft(schema)(
         (cur, transformer) => transformer.transformSchema(cur))
-  }
 
   @Since("1.4.0")
-  override def copy(extra: ParamMap): PipelineModel = {
+  override def copy(extra: ParamMap): PipelineModel =
     new PipelineModel(uid, stages.map(_.copy(extra))).setParent(parent)
-  }
 
   @Since("1.6.0")
   override def write: MLWriter = new PipelineModel.PipelineModelWriter(this)
-}
 
 @Since("1.6.0")
-object PipelineModel extends MLReadable[PipelineModel] {
+object PipelineModel extends MLReadable[PipelineModel]
 
   import Pipeline.SharedReadWrite
 
@@ -338,7 +306,7 @@ object PipelineModel extends MLReadable[PipelineModel] {
   override def load(path: String): PipelineModel = super.load(path)
 
   private[PipelineModel] class PipelineModelWriter(instance: PipelineModel)
-      extends MLWriter {
+      extends MLWriter
 
     SharedReadWrite.validateStages(
         instance.stages.asInstanceOf[Array[PipelineStage]])
@@ -349,25 +317,20 @@ object PipelineModel extends MLReadable[PipelineModel] {
           instance.stages.asInstanceOf[Array[PipelineStage]],
           sc,
           path)
-  }
 
-  private class PipelineModelReader extends MLReader[PipelineModel] {
+  private class PipelineModelReader extends MLReader[PipelineModel]
 
     /** Checked against metadata when loading model */
     private val className = classOf[PipelineModel].getName
 
-    override def load(path: String): PipelineModel = {
+    override def load(path: String): PipelineModel =
       val (uid: String, stages: Array[PipelineStage]) =
         SharedReadWrite.load(className, sc, path)
       val transformers =
-        stages map {
+        stages map
           case stage: Transformer => stage
           case other =>
             throw new RuntimeException(
                 s"PipelineModel.read loaded a stage but found it" +
                 s" was not a Transformer.  Bad stage ${other.uid} of type ${other.getClass}")
-        }
       new PipelineModel(uid, transformers)
-    }
-  }
-}

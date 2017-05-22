@@ -17,19 +17,17 @@
 package shapeless.examples
 
 // See http://research.microsoft.com/en-us/um/people/simonpj/papers/boxy/boxy-icfp.pdf
-object ImpredicativeExamples extends App {
+object ImpredicativeExamples extends App
   import shapeless._
   import poly._
   import test._
 
-  object head extends (List ~> Id) {
+  object head extends (List ~> Id)
     def apply[T](l: List[T]) = l.head
-  }
 
-  def g(o: Option[List ~> Id]) = o match {
+  def g(o: Option[List ~> Id]) = o match
     case None => (0, '0')
     case Some(get) => (get(List(1, 2)), get(List('a', 'b', 'c')))
-  }
 
   val gNone = g(None)
   typed[(Int, Char)](gNone)
@@ -38,4 +36,3 @@ object ImpredicativeExamples extends App {
   val gSome = g(Option(head))
   typed[(Int, Char)](gSome)
   assert(gSome == (1, 'a'))
-}

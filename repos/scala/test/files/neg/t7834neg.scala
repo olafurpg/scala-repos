@@ -5,7 +5,7 @@ class M3 extends M2
 trait S1 { val q = new M1; val q1: q.type = q }
 trait S2 { val q = new M2; val q2: q.type = q }
 
-class B extends S1 with S2 {
+class B extends S1 with S2
   override val q = new M3
   val q3: q.type = q
 
@@ -32,9 +32,8 @@ class B extends S1 with S2 {
   x3 = q1
   x3 = q2
   x3 = x3
-}
 
-class C extends S1 with S2 {
+class C extends S1 with S2
   override val q = new M3
   val q3: q.type = q
 
@@ -73,4 +72,3 @@ class C extends S1 with S2 {
   x3 = q
   x3 = super [S1].q // fail
   x3 = super [S2].q // fail
-}

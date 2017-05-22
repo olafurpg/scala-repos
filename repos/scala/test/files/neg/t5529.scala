@@ -3,11 +3,9 @@
 
 package test;
 
-object Test {
-  sealed class File {
+object Test
+  sealed class File
     val i = 1
-  }
   sealed class Dir extends File {}
 
   type File
-}

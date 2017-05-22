@@ -27,7 +27,7 @@ import java.util.regex.Pattern
 /**
   * This singleton contains the rules for persistence
   */
-object ProtoRules extends Factory with LazyLoggable {
+object ProtoRules extends Factory with LazyLoggable
 
   /**
     * The regular expression pattern for matching email addresses.
@@ -35,4 +35,3 @@ object ProtoRules extends Factory with LazyLoggable {
   val emailRegexPattern = new FactoryMaker(
       Pattern.compile("^[a-z0-9._%\\-+]+@(?:[a-z0-9\\-]+\\.)+[a-z]{2,}$",
                       Pattern.CASE_INSENSITIVE)) {}
-}

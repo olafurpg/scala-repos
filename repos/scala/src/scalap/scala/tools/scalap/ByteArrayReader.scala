@@ -8,7 +8,7 @@
 package scala
 package tools.scalap
 
-class ByteArrayReader(content: Array[Byte]) {
+class ByteArrayReader(content: Array[Byte])
 
   /** the buffer containing the file
     */
@@ -24,40 +24,35 @@ class ByteArrayReader(content: Array[Byte]) {
 
   /** read a byte
     */
-  def nextByte: Byte = {
+  def nextByte: Byte =
     bp += 1
     buf(bp - 1)
-  }
 
   /** read some bytes
     */
-  def nextBytes(len: Int): Array[Byte] = {
+  def nextBytes(len: Int): Array[Byte] =
     val res = new Array[Byte](len)
     System.arraycopy(buf, bp, res, 0, len)
     bp += len
     res
-  }
 
   /** read a character
     */
-  def nextChar: Char = {
+  def nextChar: Char =
     bp += 2
     getChar(bp - 2)
-  }
 
   /** read an integer
     */
-  def nextInt: Int = {
+  def nextInt: Int =
     bp += 4
     getInt(bp - 4)
-  }
 
   /** read a long
     */
-  def nextLong: Long = {
+  def nextLong: Long =
     bp += 8
     getLong(bp - 8)
-  }
 
   /** read a float
     */
@@ -69,11 +64,10 @@ class ByteArrayReader(content: Array[Byte]) {
 
   /** read an UTF8 encoded string
     */
-  def nextUTF8(len: Int): String = {
+  def nextUTF8(len: Int): String =
     val cs = scala.io.Codec.fromUTF8(buf, bp, len)
     bp += len
     new String(cs)
-  }
 
   /** extract a character at position bp from buf
     */
@@ -102,7 +96,5 @@ class ByteArrayReader(content: Array[Byte]) {
 
   /** skip next 'n' bytes
     */
-  def skip(n: Int) {
+  def skip(n: Int)
     bp += n
-  }
-}

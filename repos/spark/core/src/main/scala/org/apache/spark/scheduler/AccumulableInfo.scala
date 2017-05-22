@@ -50,42 +50,38 @@ case class AccumulableInfo private[spark](
 /**
   * A collection of deprecated constructors. This will be removed soon.
   */
-object AccumulableInfo {
+object AccumulableInfo
 
   @deprecated("do not create AccumulableInfo", "2.0.0")
   def apply(id: Long,
             name: String,
             update: Option[String],
             value: String,
-            internal: Boolean): AccumulableInfo = {
+            internal: Boolean): AccumulableInfo =
     new AccumulableInfo(id,
                         Option(name),
                         update,
                         Option(value),
                         internal,
                         countFailedValues = false)
-  }
 
   @deprecated("do not create AccumulableInfo", "2.0.0")
   def apply(id: Long,
             name: String,
             update: Option[String],
-            value: String): AccumulableInfo = {
+            value: String): AccumulableInfo =
     new AccumulableInfo(id,
                         Option(name),
                         update,
                         Option(value),
                         internal = false,
                         countFailedValues = false)
-  }
 
   @deprecated("do not create AccumulableInfo", "2.0.0")
-  def apply(id: Long, name: String, value: String): AccumulableInfo = {
+  def apply(id: Long, name: String, value: String): AccumulableInfo =
     new AccumulableInfo(id,
                         Option(name),
                         None,
                         Option(value),
                         internal = false,
                         countFailedValues = false)
-  }
-}

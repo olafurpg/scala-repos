@@ -4,10 +4,10 @@ package std
 import scalaz._
 import Id._
 
-trait AnyValInstances {
+trait AnyValInstances
 
   implicit val unitInstance: Monoid[Unit] with Enum[Unit] with Show[Unit] =
-    new Monoid[Unit] with Enum[Unit] with Show[Unit] {
+    new Monoid[Unit] with Enum[Unit] with Show[Unit]
       override def shows(f: Unit) = ().toString
 
       def append(f1: Unit, f2: => Unit) = ()
@@ -29,9 +29,8 @@ trait AnyValInstances {
       override def max = Some(())
 
       override def equalIsNatural: Boolean = true
-    }
 
-  implicit object booleanInstance extends Enum[Boolean] with Show[Boolean] {
+  implicit object booleanInstance extends Enum[Boolean] with Show[Boolean]
     override def shows(f: Boolean) = f.toString
 
     def order(x: Boolean, y: Boolean) =
@@ -51,24 +50,21 @@ trait AnyValInstances {
 
     override def equalIsNatural: Boolean = true
 
-    object conjunction extends Monoid[Boolean] {
+    object conjunction extends Monoid[Boolean]
       def append(f1: Boolean, f2: => Boolean) = f1 && f2
 
       def zero: Boolean = true
-    }
 
-    object disjunction extends Monoid[Boolean] {
+    object disjunction extends Monoid[Boolean]
       def append(f1: Boolean, f2: => Boolean) = f1 || f2
 
       def zero = false
-    }
-  }
 
   import Tags.{Conjunction, Disjunction}
 
   implicit val booleanDisjunctionNewTypeInstance: Monoid[
       Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] =
-    new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction] {
+    new Monoid[Boolean @@ Disjunction] with Enum[Boolean @@ Disjunction]
       def append(f1: Boolean @@ Disjunction, f2: => Boolean @@ Disjunction) =
         Disjunction(Tag.unwrap(f1) || Tag.unwrap(f2))
 
@@ -92,11 +88,10 @@ trait AnyValInstances {
       override def min = Disjunction.subst(Enum[Boolean].min)
 
       override def max = Disjunction.subst(Enum[Boolean].max)
-    }
 
   implicit val booleanConjunctionNewTypeInstance: Monoid[
       Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] =
-    new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction] {
+    new Monoid[Boolean @@ Conjunction] with Enum[Boolean @@ Conjunction]
       def append(f1: Boolean @@ Conjunction, f2: => Boolean @@ Conjunction) =
         Conjunction(Tag.unwrap(f1) && Tag.unwrap(f2))
 
@@ -120,10 +115,9 @@ trait AnyValInstances {
       override def min = Conjunction.subst(Enum[Boolean].min)
 
       override def max = Conjunction.subst(Enum[Boolean].max)
-    }
 
   implicit val byteInstance: Monoid[Byte] with Enum[Byte] with Show[Byte] =
-    new Monoid[Byte] with Enum[Byte] with Show[Byte] {
+    new Monoid[Byte] with Enum[Byte] with Show[Byte]
       override def shows(f: Byte) = f.toString
 
       def append(f1: Byte, f2: => Byte) = (f1 + f2).toByte
@@ -141,13 +135,12 @@ trait AnyValInstances {
       override def max = Some(Byte.MaxValue)
 
       override def equalIsNatural: Boolean = true
-    }
 
   import Tags.{Multiplication}
 
   implicit val byteMultiplicationNewType: Monoid[Byte @@ Multiplication] with Enum[
       Byte @@ Multiplication] = new Monoid[Byte @@ Multiplication]
-  with Enum[Byte @@ Multiplication] {
+  with Enum[Byte @@ Multiplication]
     def append(f1: Byte @@ Multiplication, f2: => Byte @@ Multiplication) =
       Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toByte)
 
@@ -173,10 +166,9 @@ trait AnyValInstances {
     override def max = Multiplication.subst(Enum[Byte].max)
 
     override def equalIsNatural: Boolean = true
-  }
 
   implicit val char: Monoid[Char] with Enum[Char] with Show[Char] =
-    new Monoid[Char] with Enum[Char] with Show[Char] {
+    new Monoid[Char] with Enum[Char] with Show[Char]
       override def shows(f: Char) = f.toString
 
       def append(f1: Char, f2: => Char) = (f1 + f2).toChar
@@ -194,11 +186,10 @@ trait AnyValInstances {
       override def max = Some(Char.MaxValue)
 
       override def equalIsNatural: Boolean = true
-    }
 
   implicit val charMultiplicationNewType: Monoid[Char @@ Multiplication] with Enum[
       Char @@ Multiplication] = new Monoid[Char @@ Multiplication]
-  with Enum[Char @@ Multiplication] {
+  with Enum[Char @@ Multiplication]
     def append(f1: Char @@ Multiplication, f2: => Char @@ Multiplication) =
       Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toChar)
 
@@ -224,10 +215,9 @@ trait AnyValInstances {
     override def max = Multiplication.subst(Enum[Char].max)
 
     override def equalIsNatural: Boolean = true
-  }
 
   implicit val shortInstance: Monoid[Short] with Enum[Short] with Show[Short] =
-    new Monoid[Short] with Enum[Short] with Show[Short] {
+    new Monoid[Short] with Enum[Short] with Show[Short]
       override def shows(f: Short) = f.toString
 
       def append(f1: Short, f2: => Short) = (f1 + f2).toShort
@@ -245,11 +235,10 @@ trait AnyValInstances {
       override def max = Some(Short.MaxValue)
 
       override def equalIsNatural: Boolean = true
-    }
 
   implicit val shortMultiplicationNewType: Monoid[Short @@ Multiplication] with Enum[
       Short @@ Multiplication] = new Monoid[Short @@ Multiplication]
-  with Enum[Short @@ Multiplication] {
+  with Enum[Short @@ Multiplication]
     def append(f1: Short @@ Multiplication, f2: => Short @@ Multiplication) =
       Multiplication((Tag.unwrap(f1) * Tag.unwrap(f2)).toShort)
 
@@ -273,10 +262,9 @@ trait AnyValInstances {
 
     def order(a1: Short @@ Multiplication, a2: Short @@ Multiplication) =
       Order[Short].order(Tag.unwrap(a1), Tag.unwrap(a2))
-  }
 
   implicit val intInstance: Monoid[Int] with Enum[Int] with Show[Int] =
-    new Monoid[Int] with Enum[Int] with Show[Int] {
+    new Monoid[Int] with Enum[Int] with Show[Int]
       override def shows(f: Int) = f.toString
 
       def append(f1: Int, f2: => Int) = f1 + f2
@@ -294,11 +282,10 @@ trait AnyValInstances {
       override def max = Some(Int.MaxValue)
 
       override def equalIsNatural: Boolean = true
-    }
 
   implicit val intMultiplicationNewType: Monoid[Int @@ Multiplication] with Enum[
       Int @@ Multiplication] = new Monoid[Int @@ Multiplication]
-  with Enum[Int @@ Multiplication] {
+  with Enum[Int @@ Multiplication]
     def append(f1: Int @@ Multiplication, f2: => Int @@ Multiplication) =
       Multiplication(Tag.unwrap(f1) * Tag.unwrap(f2))
 
@@ -322,10 +309,9 @@ trait AnyValInstances {
 
     def order(a1: Int @@ Multiplication, a2: Int @@ Multiplication) =
       Order[Int].order(Tag.unwrap(a1), Tag.unwrap(a2))
-  }
 
   implicit val longInstance: Monoid[Long] with Enum[Long] with Show[Long] =
-    new Monoid[Long] with Enum[Long] with Show[Long] {
+    new Monoid[Long] with Enum[Long] with Show[Long]
       override def shows(f: Long) = f.toString
 
       def append(f1: Long, f2: => Long) = f1 + f2
@@ -343,11 +329,10 @@ trait AnyValInstances {
       override def max = Some(Long.MaxValue)
 
       override def equalIsNatural: Boolean = true
-    }
 
   implicit val longMultiplicationNewType: Monoid[Long @@ Multiplication] with Enum[
       Long @@ Multiplication] = new Monoid[Long @@ Multiplication]
-  with Enum[Long @@ Multiplication] {
+  with Enum[Long @@ Multiplication]
     def append(f1: Long @@ Multiplication, f2: => Long @@ Multiplication) =
       Multiplication(Tag.unwrap(f1) * Tag.unwrap(f2))
 
@@ -371,30 +356,26 @@ trait AnyValInstances {
 
     def order(a1: Long @@ Multiplication, a2: Long @@ Multiplication) =
       Order[Long].order(Tag.unwrap(a1), Tag.unwrap(a2))
-  }
 
   implicit val floatInstance: Order[Float] with Show[Float] = new Order[Float]
-  with Show[Float] {
+  with Show[Float]
     override def shows(f: Float) = f.toString
 
     override def equalIsNatural: Boolean = true
 
     def order(x: Float, y: Float) =
       if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-  }
 
   implicit val doubleInstance: Order[Double] with Show[Double] =
-    new Order[Double] with Show[Double] {
+    new Order[Double] with Show[Double]
       override def shows(f: Double) = f.toString
 
       override def equalIsNatural: Boolean = true
 
       def order(x: Double, y: Double) =
         if (x < y) Ordering.LT else if (x == y) Ordering.EQ else Ordering.GT
-    }
-}
 
-trait BooleanFunctions {
+trait BooleanFunctions
 
   /**
     * Conjunction. (AND)
@@ -577,36 +558,28 @@ trait BooleanFunctions {
 
   final def pointOrEmptyNT[M[_]](
       cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
-    new (Id ~> M) {
+    new (Id ~> M)
       def apply[A](a: A): M[A] = pointOrEmpty[M, A](cond)(a)
-    }
 
   final def emptyOrPureNT[M[_]](
       cond: Boolean)(implicit M: Applicative[M], M0: PlusEmpty[M]): (Id ~> M) =
-    new (Id ~> M) {
+    new (Id ~> M)
       def apply[A](a: A): M[A] = emptyOrPure[M, A](cond)(a)
-    }
-}
 
-trait IntFunctions {
+trait IntFunctions
   def heaviside(i: Int): Int = if (i < 0) 0 else 1
-}
 
-trait ShortFunctions {
+trait ShortFunctions
   def heaviside(i: Short): Short = if (i < 0) 0 else 1
-}
 
-trait LongFunctions {
+trait LongFunctions
   def heaviside(i: Long): Long = if (i < 0) 0 else 1
-}
 
-trait DoubleFunctions {
+trait DoubleFunctions
   def heaviside(i: Double): Double = if (i < 0) 0 else 1.0
-}
 
-trait FloatFunctions {
+trait FloatFunctions
   def heaviside(i: Float): Float = if (i < 0) 0 else 1.0f
-}
 
 object anyVal extends AnyValInstances
 

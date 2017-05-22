@@ -16,9 +16,8 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.Future
 
-object TaskStatusUpdateProcessorImpl {
+object TaskStatusUpdateProcessorImpl
   lazy val name = Names.named(getClass.getSimpleName)
-}
 
 /**
   * Executes the given TaskStatusUpdateSteps for every update.
@@ -29,7 +28,7 @@ class TaskStatusUpdateProcessorImpl @Inject()(
     taskTracker: TaskTracker,
     driverHolder: MarathonSchedulerDriverHolder,
     steps: Seq[TaskStatusUpdateStep])
-    extends TaskStatusUpdateProcessor {
+    extends TaskStatusUpdateProcessor
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private[this] val log = LoggerFactory.getLogger(getClass)
@@ -40,20 +39,20 @@ class TaskStatusUpdateProcessorImpl @Inject()(
   private[this] val killUnknownTaskTimer: Timer = metrics.timer(
       metrics.name(MetricPrefixes.SERVICE, getClass, "killUnknownTask"))
 
-  private[this] val stepTimers: Map[String, Timer] = steps.map { step =>
+  private[this] val stepTimers: Map[String, Timer] = steps.map  step =>
     step.name -> metrics.timer(
         metrics.name(MetricPrefixes.SERVICE, getClass, s"step-${step.name}"))
-  }.toMap
+  .toMap
 
   log.info("Started status update processor with steps:\n{}",
            steps.map(step => s"* ${step.name}").mkString("\n"))
 
   override def publish(status: MesosProtos.TaskStatus): Future[Unit] =
-    publishFutureTimer.timeFuture {
+    publishFutureTimer.timeFuture
       val now = clock.now()
       val taskId = Task.Id(status.getTaskId)
 
-      taskTracker.task(taskId).flatMap {
+      taskTracker.task(taskId).flatMap
         case _ if status.getState == MesosProtos.TaskState.TASK_KILLING =>
           // introduced in Mesos 0.28.0, not yet processed
           log.info("Ignoring TASK_KILLING update for {}", taskId)
@@ -67,46 +66,34 @@ class TaskStatusUpdateProcessorImpl @Inject()(
               mesosStatus = status
           ).flatMap(_ => acknowledge(status))
         case _ =>
-          killUnknownTaskTimer {
-            if (status.getState != MesosProtos.TaskState.TASK_LOST) {
+          killUnknownTaskTimer
+            if (status.getState != MesosProtos.TaskState.TASK_LOST)
               // If we kill a unknown task, we will get another TASK_LOST notification which leads to an endless
               // stream of kills and TASK_LOST updates.
               killTask(taskId.mesosTaskId)
-            }
             acknowledge(status)
-          }
-      }
-    }
 
   private[this] def acknowledge(
-      taskStatus: MesosProtos.TaskStatus): Future[Unit] = {
+      taskStatus: MesosProtos.TaskStatus): Future[Unit] =
     driverHolder.driver.foreach(_.acknowledgeStatusUpdate(taskStatus))
     Future.successful(())
-  }
 
-  private[this] def killTask(taskId: MesosProtos.TaskID): Unit = {
+  private[this] def killTask(taskId: MesosProtos.TaskID): Unit =
     driverHolder.driver.foreach(_.killTask(taskId))
-  }
 
   private[this] def processUpdate(
       timestamp: Timestamp,
       appId: PathId,
       task: Task,
-      mesosStatus: MesosProtos.TaskStatus): Future[Unit] = {
-    steps.foldLeft(Future.successful(())) { (resultSoFar, nextStep) =>
-      resultSoFar.flatMap { _ =>
-        stepTimers(nextStep.name).timeFuture {
+      mesosStatus: MesosProtos.TaskStatus): Future[Unit] =
+    steps.foldLeft(Future.successful(()))  (resultSoFar, nextStep) =>
+      resultSoFar.flatMap  _ =>
+        stepTimers(nextStep.name).timeFuture
           log.debug("Executing {} for [{}]",
                     Array[Object](nextStep.name,
                                   mesosStatus.getTaskId.getValue): _*)
-          nextStep.processUpdate(timestamp, task, mesosStatus).map { _ =>
+          nextStep.processUpdate(timestamp, task, mesosStatus).map  _ =>
             log.debug(
                 "Done with executing {} for [{}]",
                 Array[Object](nextStep.name, mesosStatus.getTaskId.getValue): _*
             )
-          }
-        }
-      }
-    }
-  }
-}

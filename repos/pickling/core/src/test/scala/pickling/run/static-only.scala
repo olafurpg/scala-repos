@@ -12,10 +12,9 @@ sealed abstract class C extends B { val fld: Int }
 
 final class D extends C { val fld = 1 }
 
-final class E extends C {
+final class E extends C
   val fld = 2
   def incr(x: Int) = x + 1
-}
 
 // case class should work whether final or not
 final case class F(bar: Int) extends A
@@ -27,11 +26,10 @@ final case class I(fld: Int) extends C
 
 // companion object should not matter
 case class J(baz: Long) extends B
-object J {
+object J
   def apply(s: String): J = J(Integer.parseInt(s))
-}
 
-class StaticOnlyTest extends FunSuite {
+class StaticOnlyTest extends FunSuite
   // TODO - We should re-enable these once we figure out what StaticOnly should mean.
   /*
   test("main") {
@@ -46,4 +44,3 @@ class StaticOnlyTest extends FunSuite {
     assert(unpickle[C](pkl).fld == 1)
   }
  */
-}

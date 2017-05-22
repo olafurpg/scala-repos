@@ -3,7 +3,7 @@ package slick.jdbc
 import slick.basic.Capability
 
 /** Capabilities for [[slick.jdbc.JdbcProfile]]. */
-object JdbcCapabilities {
+object JdbcCapabilities
 
   /** Can be used for reverse-engineering the database schema */
   val createModel = Capability("jdbc.createModel")
@@ -57,4 +57,3 @@ object JdbcCapabilities {
                 distinguishesIntTypes,
                 supportsByte,
                 returnInsertOther)
-}

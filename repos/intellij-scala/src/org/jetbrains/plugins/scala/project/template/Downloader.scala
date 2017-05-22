@@ -8,62 +8,52 @@ import com.intellij.openapi.util.Key
 /**
   * @author Pavel Fatin
   */
-object Downloader extends Downloader {
+object Downloader extends Downloader
   def downloadScala(version: String, listener: String => Unit) =
     download(version, listener)
 
   override protected def sbtCommandsFor(version: String) =
     Seq(s"""set scalaVersion := "$version"""") ++ super.sbtCommandsFor(version)
-}
 
-trait Downloader {
+trait Downloader
   protected def sbtCommandsFor(version: String) = Seq("updateClassifiers")
 
-  protected def download(version: String, listener: String => Unit) {
+  protected def download(version: String, listener: String => Unit)
     val buffer = new StringBuffer()
 
-    usingTempFile("sbt-commands") { file =>
+    usingTempFile("sbt-commands")  file =>
       writeLinesTo(file, sbtCommandsFor(version): _*)
-      usingTempDirectory("sbt-project") { directory =>
+      usingTempDirectory("sbt-project")  directory =>
         val process =
           Runtime.getRuntime.exec(osCommandsFor(file).toArray, null, directory)
 
-        val listenerAdapter = new ProcessAdapter {
+        val listenerAdapter = new ProcessAdapter
           override def onTextAvailable(event: ProcessEvent,
-                                       outputType: Key[_]) {
+                                       outputType: Key[_])
             val text = event.getText
             listener(text)
             buffer.append(text)
-          }
-        }
 
         val handler = new OSProcessHandler(process, null, null)
         handler.addProcessListener(listenerAdapter)
         handler.startNotify()
         handler.waitFor()
 
-        if (process.exitValue != 0) {
+        if (process.exitValue != 0)
           throw new DownloadException(buffer.toString)
-        }
-      }
-    }
-  }
 
-  private def osCommandsFor(file: File) = {
+  private def osCommandsFor(file: File) =
     val launcher =
       jarWith[this.type].getParentFile.getParentFile / "launcher" / "sbt-launch.jar"
 
-    if (launcher.exists()) {
+    if (launcher.exists())
       Seq("java",
           "-Djline.terminal=jline.UnsupportedTerminal",
           "-Dsbt.log.noformat=true",
           "-jar",
           launcher.getAbsolutePath,
           "< " + file.getAbsolutePath)
-    } else {
+    else
       throw new FileNotFoundException(launcher.getPath)
-    }
-  }
-}
 
 class DownloadException(message: String) extends Exception(message)

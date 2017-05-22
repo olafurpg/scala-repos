@@ -18,8 +18,8 @@ package org.apache.spark.sql.catalyst.parser
 
 import org.apache.spark.SparkFunSuite
 
-class ASTNodeSuite extends SparkFunSuite {
-  test("SPARK-13157 - remainder must return all input chars") {
+class ASTNodeSuite extends SparkFunSuite
+  test("SPARK-13157 - remainder must return all input chars")
     val inputs = Seq(
         ("add jar", "file:///tmp/ab/TestUDTF.jar"),
         ("add jar", "file:///tmp/a@b/TestUDTF.jar"),
@@ -29,10 +29,7 @@ class ASTNodeSuite extends SparkFunSuite {
         ("SET", "foo=bar"),
         ("SET", "foo*)(@#^*@&!#^=bar")
     )
-    inputs.foreach {
+    inputs.foreach
       case (command, arguments) =>
         val node = ParseDriver.parsePlan(s"$command $arguments", null)
         assert(node.remainder === arguments)
-    }
-  }
-}

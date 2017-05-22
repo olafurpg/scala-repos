@@ -16,7 +16,7 @@ import org.jetbrains.plugins.scala.{ScalaLanguage, ScalaFileType}
   *         Date: 13.11.2015
   */
 class ScalaDocFormattingPanel(val settings: CodeStyleSettings)
-    extends OptionTreeWithPreviewPanel(settings) {
+    extends OptionTreeWithPreviewPanel(settings)
 
   private var myEnableCheckBox: JCheckBox = null
   private var myAsteriskStyleCheckBox: JCheckBox = null
@@ -24,14 +24,14 @@ class ScalaDocFormattingPanel(val settings: CodeStyleSettings)
 
   init()
 
-  override def init(): Unit = {
+  override def init(): Unit =
     super.init()
 
     myEnableCheckBox = new JCheckBox("Enable scaladoc formatting")
     myEnableCheckBox.addActionListener(
-        new ActionListener() {
+        new ActionListener()
       override def actionPerformed(e: ActionEvent): Unit = update()
-    })
+    )
 
     myAsteriskStyleCheckBox = new JCheckBox(
         "Use scaladoc indent for leading asterisk")
@@ -43,18 +43,16 @@ class ScalaDocFormattingPanel(val settings: CodeStyleSettings)
     myScaladocPanel.add(topPanel, BorderLayout.NORTH)
     topPanel.add(myEnableCheckBox, BorderLayout.NORTH)
     topPanel.add(myAsteriskStyleCheckBox, BorderLayout.SOUTH)
-  }
 
   override def getSettingsType =
     LanguageCodeStyleSettingsProvider.SettingsType.LANGUAGE_SPECIFIC
 
   override def getPanel = myScaladocPanel
 
-  protected override def initTables(): Unit = {
+  protected override def initTables(): Unit =
     initCustomOptions(ScalaDocFormattingPanel.ALIGNMENT_GROUP)
     initCustomOptions(ScalaDocFormattingPanel.BLANK_LINES_GROUP)
     initCustomOptions(ScalaDocFormattingPanel.OTHER_GROUP)
-  }
 
   protected override def getRightMargin: Int = 47
 
@@ -77,64 +75,53 @@ class ScalaDocFormattingPanel(val settings: CodeStyleSettings)
       |def foo(x: Int, yy: Iny, longParamName: Int): Int
     """.stripMargin.replace("\r", "")
 
-  private def update() {
+  private def update()
     setEnabled(getPanel, myEnableCheckBox.isSelected)
     myEnableCheckBox.setEnabled(true)
     myAsteriskStyleCheckBox.setEnabled(true)
-  }
 
-  private def setEnabled(c: JComponent, enabled: Boolean) {
+  private def setEnabled(c: JComponent, enabled: Boolean)
     c.setEnabled(enabled)
     val children = c.getComponents
-    for (child <- children) {
-      child match {
+    for (child <- children)
+      child match
         case c1: JComponent =>
           setEnabled(c1, enabled)
         case _ =>
-      }
-    }
-  }
 
-  override def apply(settings: CodeStyleSettings) {
+  override def apply(settings: CodeStyleSettings)
     super.apply(settings)
     val scalaSettings =
       settings.getCustomSettings(classOf[ScalaCodeStyleSettings])
     scalaSettings.ENABLE_SCALADOC_FORMATTING = myEnableCheckBox.isSelected
     scalaSettings.USE_SCALADOC2_FORMATTING = myAsteriskStyleCheckBox.isSelected
-  }
 
-  protected override def resetImpl(settings: CodeStyleSettings) {
+  protected override def resetImpl(settings: CodeStyleSettings)
     super.resetImpl(settings)
     val scalaSettings =
       settings.getCustomSettings(classOf[ScalaCodeStyleSettings])
     myEnableCheckBox.setSelected(scalaSettings.ENABLE_SCALADOC_FORMATTING)
     myAsteriskStyleCheckBox.setSelected(scalaSettings.USE_SCALADOC2_FORMATTING)
     update()
-  }
 
-  override def isModified(settings: CodeStyleSettings): Boolean = {
+  override def isModified(settings: CodeStyleSettings): Boolean =
     val scalaSettings =
       settings.getCustomSettings(classOf[ScalaCodeStyleSettings])
     super.isModified(settings) ||
     myEnableCheckBox.isSelected != scalaSettings.ENABLE_SCALADOC_FORMATTING ||
     myAsteriskStyleCheckBox.isSelected != scalaSettings.USE_SCALADOC2_FORMATTING
-  }
 
   protected override def getFileType: FileType = ScalaFileType.SCALA_FILE_TYPE
 
-  protected override def customizeSettings() {
+  protected override def customizeSettings()
     val provider: LanguageCodeStyleSettingsProvider =
       LanguageCodeStyleSettingsProvider.forLanguage(ScalaLanguage.Instance)
-    if (provider != null) {
+    if (provider != null)
       provider.customizeSettings(this, getSettingsType)
-    }
-  }
 
   protected override def getTabTitle: String = "ScalaDoc"
-}
 
-object ScalaDocFormattingPanel {
+object ScalaDocFormattingPanel
   val BLANK_LINES_GROUP = "Blank lines"
   val ALIGNMENT_GROUP = "Alignment"
   val OTHER_GROUP = "Other"
-}

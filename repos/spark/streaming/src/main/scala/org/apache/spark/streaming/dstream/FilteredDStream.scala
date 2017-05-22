@@ -26,13 +26,11 @@ private[streaming] class FilteredDStream[T : ClassTag](
     parent: DStream[T],
     filterFunc: T => Boolean
 )
-    extends DStream[T](parent.ssc) {
+    extends DStream[T](parent.ssc)
 
   override def dependencies: List[DStream[_]] = List(parent)
 
   override def slideDuration: Duration = parent.slideDuration
 
-  override def compute(validTime: Time): Option[RDD[T]] = {
+  override def compute(validTime: Time): Option[RDD[T]] =
     parent.getOrCompute(validTime).map(_.filter(filterFunc))
-  }
-}

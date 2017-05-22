@@ -11,7 +11,6 @@ package org.scalajs.core.tools.javascript
 /** ECMAScript level the target supports */
 sealed abstract class ESLevel
 
-object ESLevel {
+object ESLevel
   case object ES5 extends ESLevel
   case object ES6 extends ESLevel
-}

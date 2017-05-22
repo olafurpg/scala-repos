@@ -18,11 +18,11 @@ case class ALSAlgorithmParams(
     extends Params
 
 class ALSAlgorithm(val ap: ALSAlgorithmParams)
-    extends PAlgorithm[PreparedData, ALSModel, Query, PredictedResult] {
+    extends PAlgorithm[PreparedData, ALSModel, Query, PredictedResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  def train(sc: SparkContext, data: PreparedData): ALSModel = {
+  def train(sc: SparkContext, data: PreparedData): ALSModel =
     // MLLib ALS cannot handle empty training data.
     require(!data.ratings.take(1).isEmpty,
             s"RDD[Rating] in PreparedData cannot be empty." +
@@ -62,13 +62,12 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                  productFeatures = m.productFeatures,
                  userStringIntMap = userStringIntMap,
                  itemStringIntMap = itemStringIntMap)
-  }
 
-  def predict(model: ALSModel, query: Query): PredictedResult = {
+  def predict(model: ALSModel, query: Query): PredictedResult =
     // Convert String ID to Int index for Mllib
     model.userStringIntMap
       .get(query.user)
-      .map { userInt =>
+      .map  userInt =>
         // create inverse view of itemStringIntMap
         val itemIntStringMap = model.itemStringIntMap.inverse
         // recommendProducts() returns Array[MLlibRating], which uses item Int
@@ -77,10 +76,6 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
           .recommendProducts(userInt, query.num)
           .map(r => ItemScore(itemIntStringMap(r.product), r.rating))
         new PredictedResult(itemScores)
-      }
-      .getOrElse {
+      .getOrElse
         logger.info(s"No prediction for unknown user ${query.user}.")
         new PredictedResult(Array.empty)
-      }
-  }
-}

@@ -16,25 +16,20 @@ package sys
   *  @version 2.9
   *  @since   2.9
   */
-class ShutdownHookThread private (name: String) extends Thread(name) {
+class ShutdownHookThread private (name: String) extends Thread(name)
   def remove() = runtime removeShutdownHook this
-}
 
-object ShutdownHookThread {
+object ShutdownHookThread
   private var hookNameCount: Int = 0
-  private def hookName(): String = synchronized {
+  private def hookName(): String = synchronized
     hookNameCount += 1
     "shutdownHook" + hookNameCount
-  }
 
   /** Creates, names, and registers a shutdown hook to run the
     *  given code.
     */
-  def apply(body: => Unit): ShutdownHookThread = {
-    val t = new ShutdownHookThread(hookName()) {
+  def apply(body: => Unit): ShutdownHookThread =
+    val t = new ShutdownHookThread(hookName())
       override def run() = body
-    }
     runtime addShutdownHook t
     t
-  }
-}

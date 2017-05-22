@@ -22,7 +22,7 @@ import org.junit.Assert._
 import shapeless.test._
 import testutil._
 
-class TupleTests {
+class TupleTests
   import nat._
   import poly._
   import syntax.std.traversable._
@@ -122,22 +122,18 @@ class TupleTests {
   object mkString extends (Any -> String)(_.toString)
   object fruit extends (Fruit -> Fruit)(f => f)
 
-  trait incInt0 extends Poly1 {
+  trait incInt0 extends Poly1
     implicit def default[T] = at[T](t => ())
-  }
-  object incInt extends incInt0 {
+  object incInt extends incInt0
     implicit val caseInt = at[Int](i => Tuple1(i + 1))
-  }
 
-  trait extendedChoose0 extends Poly1 {
+  trait extendedChoose0 extends Poly1
     implicit def default[T] = at[T](t => ())
-  }
-  object extendedChoose extends extendedChoose0 {
+  object extendedChoose extends extendedChoose0
     implicit def caseSet[T] = at[Set[T]](s => Tuple1(s.headOption))
-  }
 
   @Test
-  def testBasics {
+  def testBasics
     val t = (1, "foo", 2.0)
 
     typed[Int](t.head)
@@ -160,10 +156,9 @@ class TupleTests {
     illTyped("""
       t.tail.tail.tail.head
     """)
-  }
 
   @Test
-  def testMap {
+  def testMap
     val s1 = Tuple1(Set(1))
     val o1 = s1 map choose
     typed[OI](o1)
@@ -215,14 +210,12 @@ class TupleTests {
     val l11 = apbp map mkString
     typed[(String, String, String, String)](l11)
     assertEquals(("Apple()", "Pear()", "Banana()", "Pear()"), l11)
-  }
 
-  object dup extends Poly1 {
+  object dup extends Poly1
     implicit def default[T] = at[T](t => (t, t))
-  }
 
   @Test
-  def testFlatMap {
+  def testFlatMap
     val l1 = (1, "foo", true)
 
     val l2 = l1 flatMap dup
@@ -244,10 +237,9 @@ class TupleTests {
     val l8 = l7 flatMap extendedChoose
     typed[(Option[Int], Option[Boolean])](l8)
     assertEquals((Option(23), Option(true)), l8)
-  }
 
   @Test
-  def testInitLast {
+  def testInitLast
     val lp = apbp.last
     typed[Pear](lp)
     assertEquals(p, lp)
@@ -255,10 +247,9 @@ class TupleTests {
     val iapb = apbp.init
     typed[APB](iapb)
     assertEquals((a, p, b), iapb)
-  }
 
   @Test
-  def testReverse {
+  def testReverse
     val pbpa = apbp.reverse
     typed[PBPA](pbpa)
     assertEquals((p, b, p, a), pbpa)
@@ -267,10 +258,9 @@ class TupleTests {
     val ral = al.reverse
     typed[Tuple1[Apple]](ral)
     assertEquals(Tuple1(a), ral)
-  }
 
   @Test
-  def testPrepend {
+  def testPrepend
     val apbp2 = ap ::: bp
     typed[APBP](apbp2)
     assertEquals((a, p, b, p), apbp2)
@@ -283,10 +273,9 @@ class TupleTests {
     val pabp = ap reverse_::: bp
     typed[PABP](pabp)
     assertEquals((p, a, b, p), pabp)
-  }
 
   @Test
-  def testToSizedList {
+  def testToSizedList
     def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val unit = ()
@@ -334,10 +323,9 @@ class TupleTests {
     typed[List[M2[_ >: Double with Int with String, _]]](
         sizedM2eim2esm2eim2eem2ed.unsized)
     assertEquals(m2eim2esm2eim2eem2edList, sizedM2eim2esm2eim2eem2ed.unsized)
-  }
 
   @Test
-  def testToSizedArray {
+  def testToSizedArray
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
       assertArrayEquals(
           arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
@@ -391,10 +379,9 @@ class TupleTests {
     // typed[Array[M2[_ >: Double with Int with String, _]]](sizedM2eim2esm2eim2eem2ed.unsized)  // Same remark as above
     assertArrayEquals2(m2eim2esm2eim2eem2edArray.map(x => x: Any),
                        sizedM2eim2esm2eim2eem2ed.unsized.map(x => x: Any))
-  }
 
   @Test
-  def testUnifier {
+  def testUnifier
     import ops.tuple._
 
     implicitly[Unifier.Aux[Tuple1[Apple], Tuple1[Apple]]]
@@ -451,10 +438,9 @@ class TupleTests {
     // arguments fails, presumably due to a failure to compute a sensible LUB.
     //val invar2 = (Set(23), Set("foo"), Set(true))
     //val uinvar2 = invar2.unify
-  }
 
   @Test
-  def testSubtypeUnifier {
+  def testSubtypeUnifier
     val fruits: (Apple, Pear, Fruit) = (a, p, f)
     typed[(Fruit, Fruit, Fruit)](fruits.unifySubtypes[Fruit])
     typed[(Apple, Pear, Fruit)](fruits.unifySubtypes[Apple])
@@ -464,10 +450,9 @@ class TupleTests {
     typed[(Fruit, String, Fruit)](stuff.unifySubtypes[Fruit])
     assertEquals((), stuff.filter[Fruit])
     assertEquals((a, p), stuff.unifySubtypes[Fruit].filter[Fruit])
-  }
 
   @Test
-  def testToTraversableList {
+  def testToTraversableList
     val empty = ().to[List]
     assertTypedEquals[List[Nothing]](Nil, empty)
 
@@ -522,10 +507,9 @@ class TupleTests {
     // equalType(m2eim2esm2eim2eem2edList, m2e)
     typed[List[M2[_ >: Int with String with Double, _]]](m2e)
     assertEquals(m2eim2esm2eim2eem2edList, m2e)
-  }
 
   @Test
-  def testToCoproduct {
+  def testToCoproduct
     import ops.tuple._
 
     type PISB = (Int, String, Boolean)
@@ -534,10 +518,9 @@ class TupleTests {
     implicitly[CISBa =:= CISBb.Out]
 
     // Note: Slightly different tests in Tuple211Tests
-  }
 
   @Test
-  def testToSum {
+  def testToSum
     import ops.tuple._
 
     type PISB = (Int, String, Boolean)
@@ -550,10 +533,9 @@ class TupleTests {
     implicitly[CISBa =:= SISBb.Out]
 
     // Note: Slightly different tests in Tuple211Tests
-  }
 
   @Test
-  def testToList {
+  def testToList
     import ops.tuple.ToList
 
     ToList[Unit, Nothing]
@@ -614,10 +596,9 @@ class TupleTests {
     // equalType(m2eim2esm2eim2eem2edList, m2e)
     typed[List[M2[_ >: Int with String with Double, _]]](m2e)
     assertEquals(m2eim2esm2eim2eem2edList, m2e)
-  }
 
   @Test
-  def testToTraversableArray {
+  def testToTraversableArray
     def assertArrayEquals2[T](arr1: Array[T], arr2: Array[T]) =
       assertArrayEquals(
           arr1.asInstanceOf[Array[Object]], arr2.asInstanceOf[Array[Object]])
@@ -682,10 +663,9 @@ class TupleTests {
     // Same remark as above
     assertArrayEquals2(
         m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
-  }
 
   @Test
-  def testToArray {
+  def testToArray
     import ops.tuple.ToArray
 
     ToArray[Unit, Nothing]
@@ -754,10 +734,9 @@ class TupleTests {
     // The line above compiles when mimsmimemd is an HList, not when it is a tuple...
     assertArrayEquals2(
         m2eim2esm2eim2eem2edArray.map(x => x: Any), m2e.map(x => x: Any))
-  }
 
   @Test
-  def testFoldMap {
+  def testFoldMap
     val tl1 = (Option(1), Option("foo"), Option(2), Option(3))
     val tl2 = (Option(1), Option("foo"), (None: Option[Int]), Option(3))
 
@@ -770,10 +749,9 @@ class TupleTests {
     assertTrue(fl1)
     val fl2 = tl2.foldMap(true)(isDefined)(_ && _)
     assertFalse(fl2)
-  }
 
   @Test
-  def testAt {
+  def testAt
     val sn1 = (23, 3.0, "foo", (), "bar", true, 5L)
 
     val at0 = sn1(_0)
@@ -832,10 +810,9 @@ class TupleTests {
     val at21 = sn2(_21)
     typed[Int](at21)
     assertEquals(21, at21)
-  }
 
   @Test
-  def testAtLiteral {
+  def testAtLiteral
     val sn1 = (23, 3.0, "foo", (), "bar", true, 5L)
 
     val at0 = sn1(0)
@@ -894,10 +871,9 @@ class TupleTests {
     val at21 = sn2(21)
     typed[Int](at21)
     assertEquals(21, at21)
-  }
 
   @Test
-  def testTakeDrop {
+  def testTakeDrop
     val sn1 = (23, 3.0, "foo", (), "bar", true, 5L)
 
     val t0 = sn1.take(_0)
@@ -923,10 +899,9 @@ class TupleTests {
     val d7 = sn1.drop(_7)
     typed[Unit](d7)
     assertEquals((), d7)
-  }
 
   @Test
-  def testTakeDropLiteral {
+  def testTakeDropLiteral
     val sn1 = (23, 3.0, "foo", (), "bar", true, 5L)
 
     val t0 = sn1.take(0)
@@ -952,10 +927,9 @@ class TupleTests {
     val d7 = sn1.drop(7)
     typed[Unit](d7)
     assertEquals((), d7)
-  }
 
   @Test
-  def testSplit {
+  def testSplit
     val sn1 = (23, 3.0, "foo", (), "bar", true, 5L)
 
     val sni0 = sn1.split(_0)
@@ -991,10 +965,9 @@ class TupleTests {
     typed[((Boolean, String, Unit, String, Double, Int), Tuple1[Long])](snri6)
     val snri7 = sn1.reverse_split(_7)
     typed[((Long, Boolean, String, Unit, String, Double, Int), Unit)](snri7)
-  }
 
   @Test
-  def testSplitLiteral {
+  def testSplitLiteral
     val sn1 = (23, 3.0, "foo", (), "bar", true, 5L)
 
     val sni0 = sn1.split(0)
@@ -1030,10 +1003,9 @@ class TupleTests {
     typed[((Boolean, String, Unit, String, Double, Int), Tuple1[Long])](snri6)
     val snri7 = sn1.reverse_split(7)
     typed[((Long, Boolean, String, Unit, String, Double, Int), Unit)](snri7)
-  }
 
   @Test
-  def testSelect {
+  def testSelect
     val sl = (1, true, "foo", 2.0)
     val si = sl.select[Int]
     typed[Int](si)
@@ -1050,10 +1022,9 @@ class TupleTests {
     val sd = sl.select[Double]
     typed[Double](sd)
     assertEquals(2.0, sd, Double.MinPositiveValue)
-  }
 
   @Test
-  def testFilter {
+  def testFilter
     val l1 = (1, 2)
     val f1 = l1.filter[Int]
     typed[(Int, Int)](f1)
@@ -1065,10 +1036,9 @@ class TupleTests {
     assertEquals((1, 2), f2)
 
     typed[Unit](l2.filter[Double])
-  }
 
   @Test
-  def testFilterNot {
+  def testFilterNot
     val l1 = (1, 2)
     val f1 = l1.filterNot[String]
     typed[(Int, Int)](f1)
@@ -1080,10 +1050,9 @@ class TupleTests {
     assertEquals((1, true, 2), f2)
 
     typed[Unit](l1.filterNot[Int])
-  }
 
   @Test
-  def testReplace {
+  def testReplace
     val sl = (1, true, "foo", 2.0)
 
     val (i, r1) = sl.replace(23)
@@ -1151,10 +1120,9 @@ class TupleTests {
     val (x5, rr5) = fruits.replace(f)
     typed[Fruit](x5)
     typed[(Apple, Pear, Apple, Fruit)](rr5)
-  }
 
   @Test
-  def testUpdate {
+  def testUpdate
     val sl = (1, true, "foo", 2.0)
 
     val r1 = sl.updatedElem(23)
@@ -1218,10 +1186,9 @@ class TupleTests {
 
     val rr8 = fruits.updateWith[Pear](p => f)
     typed[(Apple, Fruit, Apple, Fruit)](rr8)
-  }
 
   @Test
-  def testSplitLeft {
+  def testSplitLeft
     val sl = (1, true, "foo", 2.0)
     val sl2 = (23, 3.0, "foo", (), "bar", true, 5L)
 
@@ -1244,10 +1211,9 @@ class TupleTests {
     typed[(Double, Int)](rsli1)
     typed[(String, Unit, String, Boolean, Long)](rsli2)
     assertEquals((rsli1 reverse_::: rsli2), sl2)
-  }
 
   @Test
-  def testSplitRight {
+  def testSplitRight
     val sl = (1, true, "foo", 2.0)
     val sl2 = (23, 3.0, "foo", (), "bar", true, 5L)
 
@@ -1270,10 +1236,9 @@ class TupleTests {
     typed[(String, Unit, String, Double, Int)](rsrli1)
     typed[(Boolean, Long)](rsrli2)
     assertEquals((rsrli1 reverse_::: rsrli2), sl2)
-  }
 
   @Test
-  def testTranspose {
+  def testTranspose
     val l1 = Tuple1(1)
     val l2 = Tuple1(Tuple1("a"))
 
@@ -1317,10 +1282,9 @@ class TupleTests {
         ((Int, String, Double), (Int, String, Double), (Int, String, Double))](
         t4)
     assertEquals(z2, t4)
-  }
 
   @Test
-  def testZipUnzip {
+  def testZipUnzip
     val l1 = (1, "a", 1.0)
     val l2 = (2, "b", 2.0)
 
@@ -1353,10 +1317,9 @@ class TupleTests {
     val z5 = l3 zipApply l1
     typed[(Int, String, Int)](z5)
     assertEquals((2, "a*", 2), z5)
-  }
 
   @Test
-  def testRemove {
+  def testRemove
     val l = (1, true, "foo")
 
     val li = l.removeElem[Int]
@@ -1370,10 +1333,9 @@ class TupleTests {
     val ls = l.removeElem[String]
     typed[(String, (Int, Boolean))](ls)
     assertEquals(("foo", (1, true)), ls)
-  }
 
   @Test
-  def testRemoveAll {
+  def testRemoveAll
     val l = (1, true, "foo")
 
     val lnil = l.removeAll[Unit]
@@ -1391,16 +1353,14 @@ class TupleTests {
     val lbi = l.removeAll[(Boolean, Int)]
     typed[((Boolean, Int), Tuple1[String])](lbi)
     assertEquals(((true, 1), Tuple1("foo")), lbi)
-  }
 
-  object combine extends Poly {
+  object combine extends Poly
     implicit def caseCharString = use((c: Char, s: String) => s.indexOf(c))
     implicit def caseIntBoolean =
       use((i: Int, b: Boolean) => if ((i >= 0) == b) "pass" else "fail")
-  }
 
   @Test
-  def testFoldLeft {
+  def testFoldLeft
     val c1a = combine('o', "foo")
     val c1b = combine(c1a, true)
     assertEquals("pass", c1b)
@@ -1418,10 +1378,9 @@ class TupleTests {
     val f2 = l2.foldLeft('o')(combine)
     typed[String](f2)
     assertEquals("pass", f2)
-  }
 
   @Test
-  def testUpdatedAt {
+  def testUpdatedAt
     type IBS = (Int, Boolean, String)
 
     val l = (1, true, "foo")
@@ -1437,10 +1396,9 @@ class TupleTests {
     val ls = l.updatedAt[_2]("bar")
     typed[IBS](ls)
     assertEquals((1, true, "bar"), ls)
-  }
 
   @Test
-  def testUpdatedAtLiteral {
+  def testUpdatedAtLiteral
     type IBS = (Int, Boolean, String)
 
     val l = (1, true, "foo")
@@ -1456,10 +1414,9 @@ class TupleTests {
     val ls = l.updatedAt(2, "bar")
     typed[IBS](ls)
     assertEquals((1, true, "bar"), ls)
-  }
 
   @Test
-  def testZipConst {
+  def testZipConst
     val l1 = (1, true, "a")
     val c1 = 5
     val zl1 = l1 zipConst c1
@@ -1473,10 +1430,9 @@ class TupleTests {
     typed[((Option[String], C2), (Int, C2), (Set[Boolean], C2))](zl2)
     val expected = ((Option("a"), c2), (2, c2), (Set(true), c2))
     assertEquals(expected, zl2)
-  }
 
   @Test
-  def testZipWithIndex {
+  def testZipWithIndex
 
     // Unit zipWithIndex
     val l1 = ()
@@ -1489,29 +1445,25 @@ class TupleTests {
     val zl2 = l2.zipWithIndex
     typed[((Int, _0), (Boolean, _1), (String, _2))](zl2)
     assertEquals(((1, _0), (true, _1), ("a", _2)), zl2)
-  }
 
   @Test
-  def testPropagation {
+  def testPropagation
     def useHead[P <: Product](p: P)(implicit ic: ops.tuple.IsComposite[P]) =
       p.head
 
     val h = useHead((23, "foo", true))
     typed[Int](h)
-  }
 
   @Test
-  def testCollect {
+  def testCollect
     import poly._
 
     object empty extends Poly1
 
-    object complex extends Poly1 {
+    object complex extends Poly1
       implicit val caseInt = at[Int](_.toDouble)
       implicit val caseString = at[String](_ => 1)
-    }
 
-    {
       // () collect p
       val in: Unit = ()
 
@@ -1526,38 +1478,30 @@ class TupleTests {
       val complexResult = in.collect(complex)
       typed[Unit](complexResult)
       assertEquals((), complexResult)
-    }
 
-    {
       // non-() collect empty
       val in: (Int, String, Double) = (1, "foo", 2.2)
 
       val result = in.collect(empty)
       typed[Unit](result)
       assertEquals((), result)
-    }
 
-    {
       // t collect identity
       val in: (Int, String, Double) = (1, "foo", 2.2)
 
       val result = in.collect(identity)
       typed[(Int, String, Double)](result)
       assertEquals(in, result)
-    }
 
-    {
       // t collect complex
       val in: (Int, String, Double) = (1, "foo", 2.2)
 
       val result = in.collect(complex)
       typed[(Double, Int)](result)
       assertEquals((1.0, 1), result)
-    }
-  }
 
   @Test
-  def testPermutations {
+  def testPermutations
     assertEquals(((1, "foo"), ("foo", 1)), (1, "foo").permutations)
 
     assertEquals((
@@ -1569,15 +1513,13 @@ class TupleTests {
                      (2.0, "foo", 1)
                  ),
                  (1, "foo", 2.0).permutations)
-  }
 
   @Test
-  def testMkString {
+  def testMkString
     assertEquals(s"<1;foo;${2.0}>", (1, "foo", 2.0).mkString("<", ";", ">"))
-  }
 
   @Test
-  def testRotateLeft {
+  def testRotateLeft
     val in2 = (1, "foo")
     val in3 = (1, "foo", 2.0)
     val in4 = (1, "foo", 2.0, 'a')
@@ -1620,10 +1562,9 @@ class TupleTests {
     assertTypedEquals[(S, D, C, I)](("foo", 2.0, 'a', 1), r15)
     val r16 = in4.rotateLeft(6)
     assertTypedEquals[(D, C, I, S)]((2.0, 'a', 1, "foo"), r16)
-  }
 
   @Test
-  def testRotateRight {
+  def testRotateRight
     val in2 = (1, "foo")
     val in3 = (1, "foo", 2.0)
     val in4 = (1, "foo", 2.0, 'a')
@@ -1666,132 +1607,94 @@ class TupleTests {
     assertTypedEquals[(C, I, S, D)](('a', 1, "foo", 2.0), r15)
     val r16 = in4.rotateRight(6)
     assertTypedEquals[(D, C, I, S)]((2.0, 'a', 1, "foo"), r16)
-  }
 
-  object smear extends Poly {
+  object smear extends Poly
     implicit val caseIntInt = use((x: Int, y: Int) => x + y)
     implicit val caseStringInt = use((x: String, y: Int) => x.toInt + y)
     implicit val caseIntString = use((x: Int, y: String) => x + y.toInt)
-  }
 
   @Test
-  def testScanLeft {
+  def testScanLeft
     val in = (1, "2", 3)
     val out = in.scanLeft(1)(smear)
 
     typed[(Int, Int, Int, Int)](out)
     assertEquals((1, 2, 4, 7), out)
-  }
 
   @Test
-  def testScanRight {
+  def testScanRight
     val in = (1, "2", 3)
     val out = in.scanRight(1)(smear)
 
     typed[(Int, Int, Int, Int)](out)
     assertEquals((7, 6, 4, 1), out)
-  }
 
   @Test
-  def testFill {
-    {
+  def testFill
       val empty = Tuple.fill(0)(true)
       typed[Unit](empty)
-    }
 
-    {
       val empty = Tuple.fill[Boolean](0)(true)
       typed[Unit](empty)
-    }
 
-    {
       val single = Tuple.fill(1)(None)
       typed[Tuple1[None.type]](single)
       assertEquals(Tuple1(None), single)
-    }
 
-    {
       val single = Tuple.fill[None.type](1)(None)
       typed[Tuple1[None.type]](single)
       assertEquals(Tuple1(None), single)
-    }
 
-    {
       val three = Tuple.fill(3)(m2i)
       typed[(M2[Int, Unit], M2[Int, Unit], M2[Int, Unit])](three)
       assertEquals((m2i, m2i, m2i), three)
-    }
 
-    {
       val three = Tuple.fill[M2[Int, Unit]](3)(m2i)
       typed[(M2[Int, Unit], M2[Int, Unit], M2[Int, Unit])](three)
       assertEquals((m2i, m2i, m2i), three)
-    }
 
-    {
       val empty = Tuple.fill(0, 0)(true)
       typed[Unit](empty)
-    }
 
-    {
       val empty = Tuple.fill[Boolean](0, 0)(true)
       typed[Unit](empty)
-    }
 
-    {
       val empty = Tuple.fill(2, 0)(true)
       typed[(Unit, Unit)](empty)
-    }
 
-    {
       val empty = Tuple.fill[Boolean](2, 0)(true)
       typed[(Unit, Unit)](empty)
-    }
 
-    {
       val empty = Tuple.fill(0, 2)(true)
       typed[Unit](empty)
-    }
 
-    {
       val empty = Tuple.fill[Boolean](0, 2)(true)
       typed[Unit](empty)
-    }
 
-    {
       val oneByTwo = Tuple.fill(1, 2)(None)
       typed[Tuple1[(None.type, None.type)]](oneByTwo)
       assertEquals(Tuple1((None, None)), oneByTwo)
-    }
 
-    {
       val oneByTwo = Tuple.fill[None.type](1, 2)(None)
       typed[Tuple1[(None.type, None.type)]](oneByTwo)
       assertEquals(Tuple1((None, None)), oneByTwo)
-    }
 
-    {
       val twoByThree = Tuple.fill(2, 3)(None)
       typed[
           ((None.type, None.type, None.type), (None.type, None.type, None.type))](
           twoByThree)
       assertEquals(((None, None, None), (None, None, None)), twoByThree)
-    }
 
-    {
       val twoByThree = Tuple.fill[None.type](2, 3)(None)
       typed[
           ((None.type, None.type, None.type), (None.type, None.type, None.type))](
           twoByThree)
       assertEquals(((None, None, None), (None, None, None)), twoByThree)
-    }
-  }
 
   @Test
-  def testPatch {
+  def testPatch
     val in = (1, "two", 3)
 
-    {
       //single patch w/ nothing removed
       val out = in.patch(1, (4, 5), 0)
       val out2 = in.patch[_1, _0]((4, 5))
@@ -1799,9 +1702,7 @@ class TupleTests {
       typed[(Int, Int, Int, String, Int)](out)
       assertEquals((1, 4, 5, "two", 3), out)
       assertTypedEquals[(Int, Int, Int, String, Int)](out, out2)
-    }
 
-    {
       //single patch w/ 2 elements removed
       val out = in.patch(1, (3, 4), 2)
       val out2 = in.patch[_1, _2]((3, 4))
@@ -1809,9 +1710,7 @@ class TupleTests {
       typed[(Int, Int, Int)](out)
       assertEquals((1, 3, 4), out)
       assertTypedEquals[(Int, Int, Int)](out, out2)
-    }
 
-    {
       //essentially append
       val out = in.patch(3, (4, 5, "six"), 0)
       val out2 = in.patch[_3, _0]((4, 5, "six"))
@@ -1819,9 +1718,7 @@ class TupleTests {
       typed[(Int, String, Int, Int, Int, String)](out)
       assertEquals((1, "two", 3, 4, 5, "six"), out)
       assertTypedEquals[(Int, String, Int, Int, Int, String)](out, out2)
-    }
 
-    {
       //several patched w/ everything from original removed
       val sub = (4, "five", "six")
       val out = in.patch(0, sub, 3)
@@ -1830,15 +1727,12 @@ class TupleTests {
       typed[(Int, String, String)](out)
       assertEquals(sub, out)
       assertTypedEquals[(Int, String, String)](out, out2)
-    }
-  }
 
   @Test
-  def testGrouper {
-    object toInt extends Poly1 {
+  def testGrouper
+    object toInt extends Poly1
       implicit def default[N <: Nat](implicit toi: ops.nat.ToInt[N]) =
         at[N](_ => toi())
-    }
 
     def range[R <: HList, OutL <: HList](a: Nat, b: Nat)(
         implicit range: ops.nat.Range.Aux[a.N, b.N, R],
@@ -1886,10 +1780,9 @@ class TupleTests {
         ((0, 1), (2, 3), (4, 'a')),
         range(0, 5) group (2, 2, ('a', 'b', 'c'))
     )
-  }
 
   @Test
-  def testModifierAt = {
+  def testModifierAt =
     // first element
     assertEquals((1, (42, 2, 3)), (1, 2, 3).updateAtWith(0)(_ => 42))
 
@@ -1898,5 +1791,3 @@ class TupleTests {
 
     //different type
     assertEquals((3, (1, 2, 42.0)), (1, 2, 3).updateAtWith(2)(_ => 42.0))
-  }
-}

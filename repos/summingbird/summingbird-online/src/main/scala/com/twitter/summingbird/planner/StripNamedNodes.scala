@@ -24,7 +24,7 @@ case class ProducerF[P <: Platform[P]](
     oldRef: Producer[P, Any],
     f: List[Producer[P, Any]] => Producer[P, Any])
 
-object StripNamedNode {
+object StripNamedNode
 
   private[this] def castTail[P <: Platform[P], T](
       node: Producer[P, T]): TailProducer[P, T] =
@@ -36,7 +36,7 @@ object StripNamedNode {
     */
   private def irreducible[P <: Platform[P]](
       node: Producer[P, Any]): Option[Any] =
-    node match {
+    node match
       case Source(src) => Some(src)
       case OptionMappedProducer(_, fn) => Some(fn)
       case FlatMappedProducer(_, fn) => Some(fn)
@@ -53,10 +53,9 @@ object StripNamedNode {
       case _ =>
         sys.error(
             "Unreachable. Here to warn us if we add Producer subclasses but forget to update this")
-    }
 
   def apply[P <: Platform[P], T](tail: TailProducer[P, T])
-    : (Map[Producer[P, Any], List[String]], TailProducer[P, T]) = {
+    : (Map[Producer[P, Any], List[String]], TailProducer[P, T]) =
     val dagOpt = new DagOptimizer[P] {}
     // It must be a tail, but the optimizer doesn't retain that information
     val newTail = castTail(dagOpt.optimize(tail, dagOpt.RemoveNames))
@@ -86,9 +85,9 @@ object StripNamedNode {
       * Basically do a graph walk on the list of irreducibles for each node
       */
     val newNames: Map[Producer[P, Any], List[String]] =
-      newDependants.nodes.map { n =>
+      newDependants.nodes.map  n =>
         val newNodeIrr = transIrr(n)
-        oldIrrToNode.get(newNodeIrr) match {
+        oldIrrToNode.get(newNodeIrr) match
           case Some(oldProdList) => // get the name in the original graph
             // Find the longest list of names
             val oldNames = oldProdList.map(dependants.namesOf(_)).maxBy(_.size)
@@ -99,8 +98,5 @@ object StripNamedNode {
                 s"Node $n in the new node has no corresponding node in the original graph: ${tail}.\n" +
                 s"new: ${newNodeIrr}\n" +
                 s"old: ${oldIrrToNode.mkString(newLine)}")
-        }
-      }(breakOut)
+      (breakOut)
     (newNames, newTail)
-  }
-}

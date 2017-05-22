@@ -13,11 +13,11 @@ import scala.util.Failure
 
 object ModelBuilderTest extends DBTestObject(H2Mem)
 
-class ModelBuilderTest(val tdb: JdbcTestDB) extends DBTest {
+class ModelBuilderTest(val tdb: JdbcTestDB) extends DBTest
   import tdb.profile.api._
 
   @Test
-  def test(): Unit = {
+  def test(): Unit =
     // test timestamps don't fail
     val a =
       sqlu"""create table BAR (FOO TIMESTAMP DEFAULT CURRENT_TIMESTAMP)""" >> tdb.profile
@@ -31,5 +31,3 @@ class ModelBuilderTest(val tdb: JdbcTestDB) extends DBTest {
           .asInstanceOf[SlickException]
           .getMessage
           .contains("not parse default"))
-  }
-}

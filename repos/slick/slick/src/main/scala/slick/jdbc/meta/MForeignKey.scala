@@ -17,7 +17,7 @@ case class MForeignKey(pkTable: MQName,
                        pkName: Option[String],
                        deferrability: Short)
 
-object MForeignKey {
+object MForeignKey
 
   def getImportedKeys(table: MQName) =
     createAction(
@@ -39,7 +39,7 @@ object MForeignKey {
                                      foreignTable.name))
 
   private[this] def createAction(f: JdbcBackend#Session => ResultSet) =
-    ResultSetAction[MForeignKey](f) { r =>
+    ResultSetAction[MForeignKey](f)  r =>
       MForeignKey(MQName.from(r),
                   r.<<,
                   MQName.from(r),
@@ -50,13 +50,10 @@ object MForeignKey {
                   r.<<,
                   r.<<,
                   r.<<)
-    }
 
-  private[this] def fkActionFor(v: Short) = v match {
+  private[this] def fkActionFor(v: Short) = v match
     case DatabaseMetaData.importedKeyNoAction => ForeignKeyAction.NoAction
     case DatabaseMetaData.importedKeyCascade => ForeignKeyAction.Cascade
     case DatabaseMetaData.importedKeySetNull => ForeignKeyAction.SetNull
     case DatabaseMetaData.importedKeySetDefault => ForeignKeyAction.SetDefault
     case DatabaseMetaData.importedKeyRestrict => ForeignKeyAction.Restrict
-  }
-}

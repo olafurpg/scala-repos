@@ -10,7 +10,7 @@ import akka.actor.NoSerializationVerificationNeeded
 import com.typesafe.config.Config
 import akka.cluster.singleton.ClusterSingletonManagerSettings
 
-object ClusterShardingSettings {
+object ClusterShardingSettings
 
   /**
     * Create settings from the default configuration
@@ -23,7 +23,7 @@ object ClusterShardingSettings {
     * Create settings from a configuration with the same layout as
     * the default configuration `akka.cluster.sharding`.
     */
-  def apply(config: Config): ClusterShardingSettings = {
+  def apply(config: Config): ClusterShardingSettings =
     val tuningParameters = new TuningParameters(
         coordinatorFailureBackoff = config
             .getDuration("coordinator-failure-backoff", MILLISECONDS)
@@ -70,7 +70,6 @@ object ClusterShardingSettings {
         stateStoreMode = config.getString("state-store-mode"),
         tuningParameters,
         coordinatorSingletonSettings)
-  }
 
   /**
     * Java API: Create settings from the default configuration
@@ -103,7 +102,6 @@ object ClusterShardingSettings {
                          val leastShardAllocationMaxSimultaneousRebalance: Int,
                          val waitingForStateTimeout: FiniteDuration,
                          val updatingStateTimeout: FiniteDuration)
-}
 
 /**
   * @param role specifies that this entity type requires cluster nodes with a specific role.
@@ -128,7 +126,7 @@ final class ClusterShardingSettings(
     val stateStoreMode: String,
     val tuningParameters: ClusterShardingSettings.TuningParameters,
     val coordinatorSingletonSettings: ClusterSingletonManagerSettings)
-    extends NoSerializationVerificationNeeded {
+    extends NoSerializationVerificationNeeded
 
   require(
       stateStoreMode == "persistence" || stateStoreMode == "ddata",
@@ -180,4 +178,3 @@ final class ClusterShardingSettings(
                                 stateStoreMode,
                                 tuningParameters,
                                 coordinatorSingletonSettings)
-}

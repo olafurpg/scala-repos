@@ -7,28 +7,26 @@ import lila.db.paginator._
 import lila.user.{User, UserContext}
 import tube._
 
-private[forum] final class CategApi(env: Env) {
+private[forum] final class CategApi(env: Env)
 
   def list(teams: Set[String], troll: Boolean): Fu[List[CategView]] =
-    for {
+    for
       categs ← CategRepo withTeams teams
       views ←
-      (categs map { categ =>
-            env.postApi get (categ lastPostId troll) map { topicPost =>
-              CategView(categ, topicPost map {
-                _ match {
+      (categs map  categ =>
+            env.postApi get (categ lastPostId troll) map  topicPost =>
+              CategView(categ, topicPost map
+                _ match
                   case (topic, post) =>
                     (topic, post, env.postApi lastPageOf topic)
-                }
-              }, troll)
-            }
-          }).sequenceFu
-    } yield views
+              , troll)
+          ).sequenceFu
+    yield views
 
   def teamNbPosts(slug: String): Fu[Int] = CategRepo nbPosts teamSlug(slug)
 
   def makeTeam(slug: String, name: String): Funit =
-    CategRepo.nextPosition flatMap { position =>
+    CategRepo.nextPosition flatMap  position =>
       val categ = Categ(id = teamSlug(slug),
                         name = name,
                         desc = "Forum of the team " + name,
@@ -58,18 +56,16 @@ private[forum] final class CategApi(env: Env) {
           categId = categ.id)
       $insert(categ) >> $insert(post) >> $insert(topic withPost post) >> $update(
           categ withTopic post)
-    }
 
   def show(slug: String,
            page: Int,
            troll: Boolean): Fu[Option[(Categ, Paginator[TopicView])]] =
-    optionT(CategRepo bySlug slug) flatMap { categ =>
+    optionT(CategRepo bySlug slug) flatMap  categ =>
       optionT(
           env.topicApi.paginator(categ, page, troll) map { (categ, _).some })
-    }
 
   def denormalize(categ: Categ): Funit =
-    for {
+    for
       topics ← TopicRepo byCateg categ
       topicIds = topics map (_.id)
       nbPosts ← PostRepo countByTopics topicIds
@@ -87,10 +83,9 @@ private[forum] final class CategApi(env: Env) {
               nbPostsTroll = nbPostsTroll,
               lastPostIdTroll = lastPostTroll ?? (_.id)
           ))
-    } yield ()
+    yield ()
 
   def denormalize: Funit =
-    $find.all[Categ] flatMap { categs =>
+    $find.all[Categ] flatMap  categs =>
       categs.map(denormalize).sequenceFu
-    } void
-}
+    void

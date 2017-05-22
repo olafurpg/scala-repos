@@ -1,21 +1,17 @@
-object Test {
+object Test
   class A; class B
-  def main(args: Array[String]) {
-    def noExpectedType() {
+  def main(args: Array[String])
+    def noExpectedType()
       a().asInstanceOf[B] // cast elided!
-    }
-    def withExpectedType(): B = {
+    def withExpectedType(): B =
       a().asInstanceOf[B]
-    }
     def test(a: => Any) =
-      try {
+      try
         a
         sys.error("no CCE!")
-      } catch { case _: ClassCastException => }
+      catch { case _: ClassCastException => }
 
     test(noExpectedType())
     test(withExpectedType())
-  }
 
   def a(): Object = new A
-}

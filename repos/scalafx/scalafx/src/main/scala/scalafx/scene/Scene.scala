@@ -40,10 +40,9 @@ import scalafx.scene.image.WritableImage
 import scalafx.scene.input.{Dragboard, Mnemonic, TransferMode}
 import scalafx.scene.paint.Paint
 
-object Scene {
+object Scene
   implicit def sfxScene2jfx(v: Scene): jfxs.Scene =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/Scene.html]].
@@ -54,7 +53,7 @@ object Scene {
   */
 class Scene(
     override val delegate: jfxs.Scene = new jfxs.Scene(new jfxs.Group()))
-    extends SFXDelegate[jfxs.Scene] {
+    extends SFXDelegate[jfxs.Scene]
 
   /**
     * Creates a Scene with a [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/Group.html Group]] as root Node with a
@@ -168,21 +167,19 @@ class Scene(
   /**
     * Sets the root Node of the scene graph
     */
-  def root_=(v: Parent) {
+  def root_=(v: Parent)
     root() = v
-  }
 
   /**
     * Returns Nodes children from this Scene's `root`.
     */
-  def getChildren = root.value match {
+  def getChildren = root.value match
     case group: jfxs.Group => group.getChildren
     case pane: jfxsl.Pane => pane.getChildren
     case _ =>
       throw new IllegalStateException(
           "Cannot access children of root: " + root + "\n" +
           "Use a class that extends Group or Pane, or override the getChildren method.")
-  }
 
   /**
     * Returns scene's antialiasing setting.
@@ -200,34 +197,30 @@ class Scene(
     *
     * @param c list of Nodes children from this Scene's `root` to replace prior content.
     */
-  def content_=(c: Iterable[Node]) {
+  def content_=(c: Iterable[Node])
     fillSFXCollection(this.content, c)
-  }
 
   /**
     * Sets a Node child, replacing the prior content. If you want append to current content, use `add` or similar.
     *
     * @param n Node child to replace prior content.
     */
-  def content_=(n: Node) {
+  def content_=(n: Node)
     fillSFXCollectionWithOne(this.content, n)
-  }
 
   /**
     * Specifies the type of camera use for rendering this `Scene`.
     */
   def camera: ObjectProperty[jfxs.Camera] = delegate.cameraProperty
-  def camera_=(v: Camera) {
+  def camera_=(v: Camera)
     camera() = v
-  }
 
   /**
     * Defines the mouse cursor for this `Scene`.
     */
   def cursor: ObjectProperty[jfxs.Cursor] = delegate.cursorProperty
-  def cursor_=(v: Cursor) {
+  def cursor_=(v: Cursor)
     cursor() = v
-  }
 
   /** The effective node orientation of a scene resolves the inheritance of node orientation, returning either left-to-right or right-to-left.  */
   def effectiveNodeOrientation: ReadOnlyObjectProperty[jfxg.NodeOrientation] =
@@ -238,17 +231,15 @@ class Scene(
     */
   def eventDispatcher: ObjectProperty[jfxe.EventDispatcher] =
     delegate.eventDispatcherProperty
-  def eventDispatcher_=(v: jfxe.EventDispatcher) {
+  def eventDispatcher_=(v: jfxe.EventDispatcher)
     eventDispatcher() = v
-  }
 
   /**
     * Defines the background fill of this Scene.
     */
   def fill: ObjectProperty[jfxsp.Paint] = delegate.fillProperty
-  def fill_=(v: Paint) {
+  def fill_=(v: Paint)
     fill() = v
-  }
 
   /**
     * The height of this Scene
@@ -262,196 +253,172 @@ class Scene(
 
   def nodeOrientation: ObjectProperty[jfxg.NodeOrientation] =
     delegate.nodeOrientationProperty
-  def nodeOrientation_=(v: NodeOrientation) {
+  def nodeOrientation_=(v: NodeOrientation)
     ObjectProperty.fillProperty[jfxg.NodeOrientation](this.nodeOrientation, v)
-  }
 
   /**
     * Defines a function to be called when a mouse button has been clicked (pressed and released) on this `Scene`.
     */
   def onContextMenuRequested = delegate.onContextMenuRequestedProperty
   def onContextMenuRequested_=(
-      v: jfxe.EventHandler[_ >: jfxsi.ContextMenuEvent]) {
+      v: jfxe.EventHandler[_ >: jfxsi.ContextMenuEvent])
     onContextMenuRequested() = v
-  }
 
   /**
     * Defines a function to be called when drag gesture has been detected.
     */
   def onDragDetected = delegate.onDragDetectedProperty
-  def onDragDetected_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onDragDetected_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onDragDetected() = v
-  }
 
   /**
     * Defines a function to be called when this `Scene` is a drag and drop gesture source after its data has been
     * dropped on a drop target.
     */
   def onDragDone = delegate.onDragDoneProperty
-  def onDragDone_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent]) {
+  def onDragDone_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent])
     onDragDone() = v
-  }
 
   /**
     * Defines a function to be called when the mouse button is released on this `Scene` during drag and drop gesture.
     */
   def onDragDropped = delegate.onDragDroppedProperty
-  def onDragDropped_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent]) {
+  def onDragDropped_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent])
     onDragDropped() = v
-  }
 
   /**
     * Defines a function to be called when drag gesture enters this Scene.
     */
   def onDragEntered = delegate.onDragEnteredProperty
-  def onDragEntered_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent]) {
+  def onDragEntered_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent])
     onDragEntered() = v
-  }
 
   /**
     * Defines a function to be called when drag gesture exits this Scene.
     */
   def onDragExited = delegate.onDragExitedProperty
-  def onDragExited_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent]) {
+  def onDragExited_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent])
     onDragExited() = v
-  }
 
   /**
     * Defines a function to be called when drag gesture progresses within this `Scene`.
     */
   def onDragOver = delegate.onDragOverProperty
-  def onDragOver_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent]) {
+  def onDragOver_=(v: jfxe.EventHandler[_ >: jfxsi.DragEvent])
     onDragOver() = v
-  }
 
   /**
     * Defines a function to be called when this `Node` has input focus and the input method text has changed.
     */
   def onInputMethodTextChanged = delegate.onInputMethodTextChangedProperty
   def onInputMethodTextChanged_=(
-      v: jfxe.EventHandler[_ >: jfxsi.InputMethodEvent]) {
+      v: jfxe.EventHandler[_ >: jfxsi.InputMethodEvent])
     onInputMethodTextChanged() = v
-  }
 
   /**
     * Defines a function to be called when some `Node` of this `Scene` has input focus and a key has been pressed.
     */
   def onKeyPressed = delegate.onKeyPressedProperty
-  def onKeyPressed_=(v: jfxe.EventHandler[_ >: jfxsi.KeyEvent]) {
+  def onKeyPressed_=(v: jfxe.EventHandler[_ >: jfxsi.KeyEvent])
     onKeyPressed() = v
-  }
 
   /**
     * Defines a function to be called when some `Node` of this `Scene` has input focus and a key has been released.
     */
   def onKeyReleased = delegate.onKeyReleasedProperty
-  def onKeyReleased_=(v: jfxe.EventHandler[_ >: jfxsi.KeyEvent]) {
+  def onKeyReleased_=(v: jfxe.EventHandler[_ >: jfxsi.KeyEvent])
     onKeyReleased() = v
-  }
 
   /**
     * Defines a function to be called when some `Node` of this `Scene` has input focus and a key has been typed.
     */
   def onKeyTyped = delegate.onKeyTypedProperty
-  def onKeyTyped_=(v: jfxe.EventHandler[_ >: jfxsi.KeyEvent]) {
+  def onKeyTyped_=(v: jfxe.EventHandler[_ >: jfxsi.KeyEvent])
     onKeyTyped() = v
-  }
 
   /**
     * Defines a function to be called when a mouse button has been clicked (pressed and released) on this `Scene`.
     */
   def onMouseClicked = delegate.onMouseClickedProperty
-  def onMouseClicked_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onMouseClicked_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onMouseClicked() = v
-  }
 
   /**
     * Defines a function to be called when a mouse button is pressed on this `Scene` and then dragged.
     */
   def onMouseDragged = delegate.onMouseDraggedProperty
-  def onMouseDragged_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onMouseDragged_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onMouseDragged() = v
-  }
 
   /**
     * Defines a function to be called when a full press-drag-release gesture enters this `Scene`.
     */
   def onMouseDragEntered = delegate.onMouseDragEnteredProperty
-  def onMouseDragEntered_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent]) {
+  def onMouseDragEntered_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent])
     onMouseDragEntered() = v
-  }
 
   /**
     * Defines a function to be called when a full press-drag-release gesture exits this `Scene`.
     */
   def onMouseDragExited = delegate.onMouseDragExitedProperty
-  def onMouseDragExited_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent]) {
+  def onMouseDragExited_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent])
     onMouseDragExited() = v
-  }
 
   /**
     * Defines a function to be called when a full press-drag-release gesture progresses within this `Scene`.
     */
   def onMouseDragOver = delegate.onMouseDragOverProperty
-  def onMouseDragOver_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent]) {
+  def onMouseDragOver_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent])
     onMouseDragOver() = v
-  }
 
   /**
     * Defines a function to be called when a full press-drag-release gesture ends within this `Scene`.
     */
   def onMouseDragReleased = delegate.onMouseDragReleasedProperty
-  def onMouseDragReleased_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent]) {
+  def onMouseDragReleased_=(v: jfxe.EventHandler[_ >: jfxsi.MouseDragEvent])
     onMouseDragReleased() = v
-  }
 
   /**
     * Defines a function to be called when the mouse enters this `Scene`.
     */
   def onMouseEntered = delegate.onMouseEnteredProperty
-  def onMouseEntered_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onMouseEntered_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onMouseEntered() = v
-  }
 
   /**
     * Defines a function to be called when the mouse exits this `Scene`.
     */
   def onMouseExited = delegate.onMouseExitedProperty
-  def onMouseExited_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onMouseExited_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onMouseExited() = v
-  }
 
   /**
     * Defines a function to be called when mouse cursor moves within this `Scene` but no buttons have been pushed.
     */
   def onMouseMoved = delegate.onMouseMovedProperty
-  def onMouseMoved_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onMouseMoved_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onMouseMoved() = v
-  }
 
   /**
     * Defines a function to be called when a mouse button has been pressed on this `Scene`.
     */
   def onMousePressed = delegate.onMousePressedProperty
-  def onMousePressed_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onMousePressed_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onMousePressed() = v
-  }
 
   /**
     * Defines a function to be called when a mouse button has been released on this `Scene`.
     */
   def onMouseReleased = delegate.onMouseReleasedProperty
-  def onMouseReleased_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent]) {
+  def onMouseReleased_=(v: jfxe.EventHandler[_ >: jfxsi.MouseEvent])
     onMouseReleased() = v
-  }
 
   /**
     * Defines a function to be called when user performs a scrolling action.
     */
   def onScroll = delegate.onScrollProperty
-  def onScroll_=(v: jfxe.EventHandler[_ >: jfxsi.ScrollEvent]) {
+  def onScroll_=(v: jfxe.EventHandler[_ >: jfxsi.ScrollEvent])
     onScroll() = v
-  }
 
   /**
     * The URL of the user-agent stylesheet that will be used by this Scene in place of the the platform-default
@@ -479,9 +446,8 @@ class Scene(
     *             component only. Any leading '/' character of the `[path]` is ignored and the `[path]` is
     *             treated as a path relative to the root of the application's classpath.
     */
-  def userAgentStylesheet_=(url: String) {
+  def userAgentStylesheet_=(url: String)
     ObjectProperty.fillProperty[String](userAgentStylesheet, url)
-  }
 
   /**
     * The `Window` for this Scene
@@ -515,9 +481,8 @@ class Scene(
     *
     * @param c list of stylesheets URLs to replace prior content.
     */
-  def stylesheets_=(c: Iterable[String]) {
+  def stylesheets_=(c: Iterable[String])
     fillCollection(stylesheets, c)
-  }
 
   /**
     * Looks for any node within the scene graph based on the specified CSS selector.
@@ -534,18 +499,16 @@ class Scene(
     *
     * @param m The Mnemonic
     */
-  def addMnemonic(m: Mnemonic) {
+  def addMnemonic(m: Mnemonic)
     delegate.addMnemonic(m)
-  }
 
   /**
     * Unregisters the specified mnemonic.
     *
     * @param m The Mnemonic to be removed.
     */
-  def removeMnemonic(m: Mnemonic) {
+  def removeMnemonic(m: Mnemonic)
     delegate.removeMnemonic(m)
-  }
 
   /**
     * Gets the list of mnemonics for this `Scene`.
@@ -572,9 +535,8 @@ class Scene(
   /**
     * Starts a full press-drag-release gesture with this scene as gesture source.
     */
-  def startFullDrag() {
+  def startFullDrag()
     delegate.startFullDrag()
-  }
 
   /**
     * The scene's current focus owner node. This node's "focused" variable might be false if this scene has no window,
@@ -591,9 +553,8 @@ class Scene(
     * @since 2.2
     */
   def onRotate = delegate.onRotateProperty
-  def onRotate_=(v: jfxe.EventHandler[_ >: jfxsi.RotateEvent]) {
+  def onRotate_=(v: jfxe.EventHandler[_ >: jfxsi.RotateEvent])
     onRotate() = v
-  }
 
   /**
     * Defines a function to be called when a rotation gesture ends.
@@ -601,9 +562,8 @@ class Scene(
     * @since 2.2
     */
   def onRotationFinished = delegate.onRotationFinishedProperty()
-  def onRotationFinished_=(v: jfxe.EventHandler[_ >: jfxsi.RotateEvent]) {
+  def onRotationFinished_=(v: jfxe.EventHandler[_ >: jfxsi.RotateEvent])
     onRotationFinished() = v
-  }
 
   /**
     * Defines a function to be called when a rotation gesture starts.
@@ -611,9 +571,8 @@ class Scene(
     * @since 2.2
     */
   def onRotationStarted = delegate.onRotationFinishedProperty()
-  def onRotationStarted_=(v: jfxe.EventHandler[_ >: jfxsi.RotateEvent]) {
+  def onRotationStarted_=(v: jfxe.EventHandler[_ >: jfxsi.RotateEvent])
     onRotationStarted() = v
-  }
 
   /**
     * Defines a function to be called when a Scroll gesture ends.
@@ -621,9 +580,8 @@ class Scene(
     * @since 2.2
     */
   def onScrollFinished = delegate.onScrollFinishedProperty()
-  def onScrollFinished_=(v: jfxe.EventHandler[_ >: jfxsi.ScrollEvent]) {
+  def onScrollFinished_=(v: jfxe.EventHandler[_ >: jfxsi.ScrollEvent])
     onScrollFinished() = v
-  }
 
   /**
     * Defines a function to be called when a Scroll gesture starts.
@@ -631,9 +589,8 @@ class Scene(
     * @since 2.2
     */
   def onScrollStarted = delegate.onScrollStartedProperty()
-  def onScrollStarted_=(v: jfxe.EventHandler[_ >: jfxsi.ScrollEvent]) {
+  def onScrollStarted_=(v: jfxe.EventHandler[_ >: jfxsi.ScrollEvent])
     onScrollStarted() = v
-  }
 
   /**
     * Defines a function to be called when a Swipe Down gesture starts.
@@ -641,9 +598,8 @@ class Scene(
     * @since 2.2
     */
   def onSwipeDown = delegate.onSwipeDownProperty()
-  def onSwipeDown_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent]) {
+  def onSwipeDown_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent])
     onSwipeDown() = v
-  }
 
   /**
     * Defines a function to be called when a Swipe Down gesture starts.
@@ -651,9 +607,8 @@ class Scene(
     * @since 2.2
     */
   def onSwipeLeft = delegate.onSwipeLeftProperty()
-  def onSwipeLeft_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent]) {
+  def onSwipeLeft_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent])
     onSwipeLeft() = v
-  }
 
   /**
     * Defines a function to be called when a Swipe Up gesture starts.
@@ -661,9 +616,8 @@ class Scene(
     * @since 2.2
     */
   def onSwipeUp = delegate.onSwipeUpProperty()
-  def onSwipeUp_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent]) {
+  def onSwipeUp_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent])
     onSwipeUp() = v
-  }
 
   /**
     * Defines a function to be called when a Swipe Right gesture starts.
@@ -671,9 +625,8 @@ class Scene(
     * @since 2.2
     */
   def onSwipeRight = delegate.onSwipeRightProperty()
-  def onSwipeRight_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent]) {
+  def onSwipeRight_=(v: jfxe.EventHandler[_ >: jfxsi.SwipeEvent])
     onSwipeRight() = v
-  }
 
   /**
     * Defines a function to be called when user performs a Touch action.
@@ -681,9 +634,8 @@ class Scene(
     * @since 2.2
     */
   def onZoom = delegate.onZoomProperty()
-  def onZoom_=(v: jfxe.EventHandler[_ >: jfxsi.ZoomEvent]) {
+  def onZoom_=(v: jfxe.EventHandler[_ >: jfxsi.ZoomEvent])
     onZoom() = v
-  }
 
   /**
     * Defines a function to be called when a Zoom gesture ends.
@@ -691,9 +643,8 @@ class Scene(
     * @since 2.2
     */
   def onZoomFinished = delegate.onZoomFinishedProperty()
-  def onZoomFinished_=(v: jfxe.EventHandler[_ >: jfxsi.ZoomEvent]) {
+  def onZoomFinished_=(v: jfxe.EventHandler[_ >: jfxsi.ZoomEvent])
     onZoomFinished() = v
-  }
 
   /**
     * Defines a function to be called when a Zoom gesture starts.
@@ -701,9 +652,8 @@ class Scene(
     * @since 2.2
     */
   def onZoomStarted = delegate.onZoomStartedProperty()
-  def onZoomStarted_=(v: jfxe.EventHandler[_ >: jfxsi.ZoomEvent]) {
+  def onZoomStarted_=(v: jfxe.EventHandler[_ >: jfxsi.ZoomEvent])
     onZoomStarted() = v
-  }
 
   /**
     * Defines a function to be called when user performs a Touch Moved action.
@@ -711,9 +661,8 @@ class Scene(
     * @since 2.2
     */
   def onTouchMoved = delegate.onTouchMovedProperty()
-  def onTouchMoved_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent]) {
+  def onTouchMoved_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent])
     onTouchMoved() = v
-  }
 
   /**
     * Defines a function to be called when user performs a Touch Pressed action.
@@ -721,9 +670,8 @@ class Scene(
     * @since 2.2
     */
   def onTouchPressed = delegate.onTouchPressedProperty()
-  def onTouchPressed_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent]) {
+  def onTouchPressed_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent])
     onTouchPressed() = v
-  }
 
   /**
     * Defines a function to be called when user performs a Touch Released action.
@@ -731,9 +679,8 @@ class Scene(
     * @since 2.2
     */
   def onTouchReleased = delegate.onTouchReleasedProperty()
-  def onTouchReleased_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent]) {
+  def onTouchReleased_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent])
     onTouchReleased() = v
-  }
 
   /**
     * Defines a function to be called when user performs a Touch Stationary action.
@@ -741,9 +688,8 @@ class Scene(
     * @since 2.2
     */
   def onTouchStationary = delegate.onTouchStationaryProperty()
-  def onTouchStationary_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent]) {
+  def onTouchStationary_=(v: jfxe.EventHandler[_ >: jfxsi.TouchEvent])
     onTouchStationary() = v
-  }
 
   /**
     * Takes a snapshot of this scene and returns the rendered image when it is ready.
@@ -763,13 +709,9 @@ class Scene(
     *
     * @since 2.2
     */
-  def snapshot(callback: SnapshotResult => Unit, image: WritableImage) {
-    val javaCallback = new jfxu.Callback[jfxs.SnapshotResult, java.lang.Void] {
-      def call(result: jfxs.SnapshotResult): java.lang.Void = {
+  def snapshot(callback: SnapshotResult => Unit, image: WritableImage)
+    val javaCallback = new jfxu.Callback[jfxs.SnapshotResult, java.lang.Void]
+      def call(result: jfxs.SnapshotResult): java.lang.Void =
         callback(new SnapshotResult(result))
         null
-      }
-    }
     delegate.snapshot(javaCallback, image)
-  }
-}

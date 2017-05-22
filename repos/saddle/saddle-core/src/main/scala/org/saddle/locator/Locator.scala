@@ -40,7 +40,7 @@ import scala.{specialized => spec}
   * }}}
   * where s(t) = min(i) for any i such that f(i) = t.
   */
-trait Locator[@spec(Boolean, Int, Long, Double) T] extends Serializable {
+trait Locator[@spec(Boolean, Int, Long, Double) T] extends Serializable
 
   /**
     * Whether the instance contains the key
@@ -89,9 +89,8 @@ trait Locator[@spec(Boolean, Int, Long, Double) T] extends Serializable {
     * Number of entries in the Locator map
     */
   def size: Int
-}
 
-object Locator {
+object Locator
   val INIT_CAPACITY = 16
 
   /**
@@ -100,4 +99,3 @@ object Locator {
     * @tparam C Type of elements to be stored in Locator
     */
   def apply[C](sz: Int = 16)(implicit st: ST[C]): Locator[C] = st.makeLoc(sz)
-}

@@ -3,17 +3,15 @@
   *  @author Stephane Micheloud
   */
 import scala.language.{postfixOps}
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     Test1.run() //ctor, reverse
     Test2.run() //append
     Test3.run() //insert
     Test4.run() //indexOf, lastIndexOf
-  }
-}
 
-object Test1 {
-  def run() {
+object Test1
+  def run()
     val j0 = new java.lang.StringBuilder("abc")
     val s0 = new StringBuilder("abc")
     println("s0 equals j0 = " + (s0 equals j0))
@@ -39,11 +37,9 @@ Scala is a general purpose programming language designed to express common progr
     println("j3=" + j3 + ", s3=" + s3)
     println(
         "s3.toString equals j3.toString = " + (s3.toString equals j3.toString))
-  }
-}
 
-object Test2 {
-  def run() {
+object Test2
+  def run()
     val j0 = new java.lang.StringBuilder("abc")
     val s0 = new StringBuilder("abc")
     j0 append true append (1.toByte) append 'a' append 9 append -1L append 1.2e-10f append -2.1e+100d
@@ -58,11 +54,9 @@ object Test2 {
         'x', 'y', 'z')
     println(
         "s1.toString equals j1.toString = " + (s1.toString equals j1.toString))
-  }
-}
 
-object Test3 {
-  def run() {
+object Test3
+  def run()
     val j0 = new java.lang.StringBuilder("abc")
     val s0 = new StringBuilder("abc")
     j0 insert (0, true) insert (0, 1.toByte) insert (0, 'a') insert
@@ -82,11 +76,9 @@ object Test3 {
     println("j1=" + j1 + ", s1=" + s1)
     println(
         "s1.toString equals j1.toString = " + (s1.toString equals j1.toString))
-  }
-}
 
-object Test4 {
-  def run() {
+object Test4
+  def run()
     val j0 = new java.lang.StringBuilder("abc") // Java 1.5+
     val s0 = new StringBuilder("abc")
 
@@ -99,5 +91,3 @@ object Test4 {
     val s2 = s0 append "123abc" lastIndexOf ("c")
     println("j2=" + j2 + ", s2=" + s2)
     println("s2 == j2 = " + (s2 == j2))
-  }
-}

@@ -16,7 +16,7 @@ package cats
   * } yield r
   * }}}
   */
-trait MonadState[F[_], S] extends Monad[F] {
+trait MonadState[F[_], S] extends Monad[F]
   def get: F[S]
 
   def set(s: S): F[Unit]
@@ -24,8 +24,6 @@ trait MonadState[F[_], S] extends Monad[F] {
   def modify(f: S => S): F[Unit] = flatMap(get)(s => set(f(s)))
 
   def inspect[A](f: S => A): F[A] = map(get)(f)
-}
 
-object MonadState {
+object MonadState
   def apply[F[_], S](implicit F: MonadState[F, S]): MonadState[F, S] = F
-}

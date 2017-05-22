@@ -21,31 +21,28 @@ object AkkaHttpHttpPipeliningSpec
     extends HttpPipeliningSpec with AkkaHttpIntegrationSpecification
 
 trait HttpPipeliningSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification with ServerIntegrationSpecification
 
   val actorSystem = akka.actor.ActorSystem()
 
-  "Play's http pipelining support" should {
+  "Play's http pipelining support" should
 
-    def withServer[T](action: EssentialAction)(block: Port => T) = {
+    def withServer[T](action: EssentialAction)(block: Port => T) =
       val port = testServerPort
-      running(TestServer(port, GuiceApplicationBuilder().routes {
+      running(TestServer(port, GuiceApplicationBuilder().routes
         case _ => action
-      }.build())) {
+      .build()))
         block(port)
-      }
-    }
 
     "wait for the first response to return before returning the second" in withServer(
-        EssentialAction { req =>
-      req.path match {
+        EssentialAction  req =>
+      req.path match
         case "/long" =>
           Accumulator.done(after(100.milliseconds, actorSystem.scheduler)(
                   Future(Results.Ok("long"))))
         case "/short" => Accumulator.done(Results.Ok("short"))
         case _ => Accumulator.done(Results.NotFound)
-      }
-    }) { port =>
+    )  port =>
       val responses = BasicHttpClient.pipelineRequests(
           port,
           BasicRequest("GET", "/long", "HTTP/1.1", Map(), ""),
@@ -54,11 +51,10 @@ trait HttpPipeliningSpec
       responses(0).body must beLeft("long")
       responses(1).status must_== 200
       responses(1).body must beLeft("short")
-    }
 
     "wait for the first response body to return before returning the second" in withServer(
-        EssentialAction { req =>
-      req.path match {
+        EssentialAction  req =>
+      req.path match
         case "/long" =>
           Accumulator.done(
               Results.Ok.chunked(Source
@@ -69,8 +65,7 @@ trait HttpPipeliningSpec
             )
         case "/short" => Accumulator.done(Results.Ok("short"))
         case _ => Accumulator.done(Results.NotFound)
-      }
-    }) { port =>
+    )  port =>
       val responses = BasicHttpClient.pipelineRequests(
           port,
           BasicRequest("GET", "/long", "HTTP/1.1", Map(), ""),
@@ -81,6 +76,3 @@ trait HttpPipeliningSpec
           Seq("chunk", "chunk", "chunk")).inOrder
       responses(1).status must_== 200
       responses(1).body must beLeft("short")
-    }
-  }
-}

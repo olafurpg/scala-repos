@@ -19,7 +19,7 @@ import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
   *
   *  Essentially anything that has the [[link]] and [[linkUnit]] methods.
   */
-trait GenLinker {
+trait GenLinker
   def semantics: Semantics
   def esLevel: ESLevel
 
@@ -30,4 +30,3 @@ trait GenLinker {
   def link(irFiles: Seq[VirtualScalaJSIRFile],
            output: WritableVirtualJSFile,
            logger: Logger): Unit
-}

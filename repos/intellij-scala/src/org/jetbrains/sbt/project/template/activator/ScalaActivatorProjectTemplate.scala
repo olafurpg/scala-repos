@@ -11,7 +11,7 @@ import org.jetbrains.sbt.Sbt
   * User: Dmitry.Naydanov
   * Date: 22.01.15.
   */
-class ScalaActivatorProjectTemplate extends ProjectTemplate {
+class ScalaActivatorProjectTemplate extends ProjectTemplate
   override def getName: String = "Activator"
 
   override def getIcon: Icon = Sbt.Icon
@@ -23,4 +23,3 @@ class ScalaActivatorProjectTemplate extends ProjectTemplate {
 
   override def createModuleBuilder(): AbstractModuleBuilder =
     new ActivatorProjectBuilder
-}

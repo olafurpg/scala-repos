@@ -8,7 +8,7 @@ package macros
   *  A slice of [[scala.reflect.macros.blackbox.Context the Scala macros context]] that provides
   *  a facility to evaluate trees.
   */
-trait Evals { self: blackbox.Context =>
+trait Evals  self: blackbox.Context =>
 
   /** Takes a typed wrapper for a tree of type `T` and evaluates it to a value of type `T`.
     *
@@ -54,4 +54,3 @@ trait Evals { self: blackbox.Context =>
     *  refers to a runtime value `x`, which is unknown at compile time.
     */
   def eval[T](expr: Expr[T]): T
-}

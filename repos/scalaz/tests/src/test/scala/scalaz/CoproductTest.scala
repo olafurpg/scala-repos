@@ -4,13 +4,13 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object CoproductTest extends SpecLite {
+object CoproductTest extends SpecLite
 
   checkAll(comonad.laws[Coproduct[NonEmptyList, Tree, ?]])
   checkAll(traverse.laws[Coproduct[Option, List, ?]])
   checkAll(traverse1.laws[Coproduct[NonEmptyList, NonEmptyList, ?]])
 
-  object instances {
+  object instances
     def functor[F[_]: Functor, G[_]: Functor] = Functor[Coproduct[F, G, ?]]
     def foldable[F[_]: Foldable, G[_]: Foldable] = Foldable[Coproduct[F, G, ?]]
     def foldable1[F[_]: Foldable1, G[_]: Foldable1] =
@@ -40,5 +40,3 @@ object CoproductTest extends SpecLite {
     def foldable1[F[_]: Traverse1, G[_]: Traverse1] =
       Foldable1[Coproduct[F, G, ?]]
     def cobind[F[_]: Comonad, G[_]: Comonad] = Cobind[Coproduct[F, G, ?]]
-  }
-}

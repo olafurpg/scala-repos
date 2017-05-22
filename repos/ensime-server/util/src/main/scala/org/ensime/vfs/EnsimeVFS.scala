@@ -9,50 +9,43 @@ import org.apache.commons.vfs2._
 import org.apache.commons.vfs2.impl._
 import org.apache.commons.vfs2.provider.zip.ZipFileSystem
 
-abstract class ExtSelector extends FileSelector {
+abstract class ExtSelector extends FileSelector
   def includeFile(f: FileObject): Boolean = include(f.getName.getExtension)
   def includeFile(info: FileSelectInfo): Boolean = includeFile(info.getFile)
   def includeFile(f: File): Boolean = include.exists(f.getName.endsWith(_))
   def traverseDescendents(info: FileSelectInfo) = true
   def include: Set[String]
-}
 
 // intended to be used when watching a single jar file
-object JarSelector extends ExtSelector {
+object JarSelector extends ExtSelector
   val include = Set("jar")
   override def traverseDescendents(info: FileSelectInfo) = false
-}
 
-object ClassfileSelector extends ExtSelector {
+object ClassfileSelector extends ExtSelector
   val include = Set("class")
-}
 
-object SourceSelector extends ExtSelector {
+object SourceSelector extends ExtSelector
   val include = Set("scala", "java")
-}
 
-object EnsimeVFS {
-  def apply(): EnsimeVFS = {
+object EnsimeVFS
+  def apply(): EnsimeVFS =
     val vfsInst = new StandardFileSystemManager()
     vfsInst.init()
     vfsInst
-  }
-}
 
-object `package` {
+object `package`
   type EnsimeVFS = DefaultFileSystemManager
 
   // the alternative is a monkey patch, count yourself lucky
   private val zipFileField = classOf[ZipFileSystem].getDeclaredField("zipFile")
   zipFileField.setAccessible(true)
 
-  implicit class RichVFS(val vfs: DefaultFileSystemManager) extends AnyVal {
+  implicit class RichVFS(val vfs: DefaultFileSystemManager) extends AnyVal
     implicit def toFileObject(f: File): FileObject = vfile(f)
 
-    private def withContext[T](msg: String)(t: => T): T = try { t } catch {
+    private def withContext[T](msg: String)(t: => T): T = try { t } catch
       case e: FileSystemException =>
         throw new FileSystemException(e.getMessage + " in " + msg, e)
-    }
 
     def vfile(name: String) = withContext(s"$name =>")(
         vfs.resolveFile(name.intern)
@@ -71,7 +64,7 @@ object `package` {
     )
 
     // WORKAROUND https://issues.apache.org/jira/browse/VFS-594
-    def nuke(jar: FileObject) = {
+    def nuke(jar: FileObject) =
       jar.close()
 
       val fs = jar.getFileSystem
@@ -81,6 +74,3 @@ object `package` {
       if (zip != null) zip.asInstanceOf[ZipFile].close()
 
       vfs.getFilesCache.clear(fs)
-    }
-  }
-}

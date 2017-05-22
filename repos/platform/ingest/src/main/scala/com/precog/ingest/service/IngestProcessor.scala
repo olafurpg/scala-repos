@@ -43,7 +43,7 @@ import scala.annotation.tailrec
 import scalaz._
 import scalaz.syntax.std.boolean._
 
-object IngestProcessing {
+object IngestProcessing
   sealed trait ErrorHandling
   case object StopOnFirstError extends ErrorHandling
   case object AllOrNothing extends ErrorHandling
@@ -51,9 +51,8 @@ object IngestProcessing {
 
   sealed trait Durability { def jobId: Option[JobId] }
   case object LocalDurability extends Durability { val jobId = None }
-  case class GlobalDurability(jid: JobId) extends Durability {
+  case class GlobalDurability(jid: JobId) extends Durability
     val jobId = Some(jid)
-  }
 
   sealed trait IngestResult
   case class BatchResult(
@@ -71,21 +70,17 @@ object IngestProcessing {
   @tailrec final def select(
       from: List[IngestProcessingSelector],
       partialData: Array[Byte],
-      request: HttpRequest[_]): Option[IngestProcessing] = {
-    from match {
+      request: HttpRequest[_]): Option[IngestProcessing] =
+    from match
       case hd :: tl =>
-        hd.select(partialData, request) match {
+        hd.select(partialData, request) match
           // not using map so as to get tailrec
           case None => select(tl, partialData, request)
           case some => some
-        }
 
       case Nil => None
-    }
-  }
-}
 
-trait IngestProcessing {
+trait IngestProcessing
   import IngestProcessing._
 
   type IngestProcessor <: IngestProcessorLike
@@ -97,30 +92,27 @@ trait IngestProcessing {
   def forRequest(
       request: HttpRequest[_]): ValidationNel[String, IngestProcessor]
 
-  trait IngestProcessorLike {
+  trait IngestProcessorLike
     def ingest(durability: Durability,
                errorHandling: ErrorHandling,
                storeMode: WriteMode,
                data: ByteChunk): Future[IngestResult]
-  }
-}
 
-trait IngestProcessingSelector {
+trait IngestProcessingSelector
   def select(partialData: Array[Byte],
              request: HttpRequest[_]): Option[IngestProcessing]
-}
 
 class DefaultIngestProcessingSelectors(
     maxFields: Int, batchSize: Int, tmpdir: File, ingestStore: IngestStore)(
-    implicit M: Monad[Future], executor: ExecutionContext) {
+    implicit M: Monad[Future], executor: ExecutionContext)
   import IngestProcessing._
 
   class MimeIngestProcessingSelector(
       apiKey: APIKey, path: Path, authorities: Authorities)
-      extends IngestProcessingSelector {
+      extends IngestProcessingSelector
     def select(partialData: Array[Byte],
-               request: HttpRequest[_]): Option[IngestProcessing] = {
-      request.headers.header[`Content-Type`].toSeq.flatMap(_.mimeTypes) collectFirst {
+               request: HttpRequest[_]): Option[IngestProcessing] =
+      request.headers.header[`Content-Type`].toSeq.flatMap(_.mimeTypes) collectFirst
         case JSON =>
           new JSONIngestProcessing(apiKey,
                                    path,
@@ -138,19 +130,16 @@ class DefaultIngestProcessingSelectors(
         case CSV =>
           new CSVIngestProcessing(
               apiKey, path, authorities, batchSize, tmpdir, ingestStore)
-      }
-    }
-  }
 
   class JSONIngestProcessingSelector(
       apiKey: APIKey, path: Path, authorities: Authorities)
-      extends IngestProcessingSelector {
+      extends IngestProcessingSelector
     def select(partialData: Array[Byte],
-               request: HttpRequest[_]): Option[IngestProcessing] = {
+               request: HttpRequest[_]): Option[IngestProcessing] =
       val (AsyncParse(errors, values), parser) =
         AsyncParser.stream().apply(More(ByteBuffer.wrap(partialData)))
-      if (errors.isEmpty && !values.isEmpty) {
-        request.headers.header[`Content-Type`].toSeq.flatMap(_.mimeTypes) collectFirst {
+      if (errors.isEmpty && !values.isEmpty)
+        request.headers.header[`Content-Type`].toSeq.flatMap(_.mimeTypes) collectFirst
           case JSON_STREAM =>
             new JSONIngestProcessing(apiKey,
                                      path,
@@ -158,7 +147,7 @@ class DefaultIngestProcessingSelectors(
                                      JSONStreamStyle,
                                      maxFields,
                                      ingestStore)
-        } orElse {
+        orElse
           Some(
               new JSONIngestProcessing(apiKey,
                                        path,
@@ -166,12 +155,8 @@ class DefaultIngestProcessingSelectors(
                                        JSONValueStyle,
                                        maxFields,
                                        ingestStore))
-        }
-      } else {
+      else
         None
-      }
-    }
-  }
 
   def selectors(
       apiKey: APIKey,
@@ -180,4 +165,3 @@ class DefaultIngestProcessingSelectors(
       new MimeIngestProcessingSelector(apiKey, path, authorities),
       new JSONIngestProcessingSelector(apiKey, path, authorities)
   )
-}

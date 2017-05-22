@@ -21,7 +21,7 @@ class InfoResource @Inject() (
     // format: OFF
     protected val config: MarathonConf
       with HttpConf with EventConfiguration with HttpEventConfiguration with LeaderProxyConf
-) extends RestResource {
+) extends RestResource
   // format: ON
 
   // Marathon configurations
@@ -52,20 +52,18 @@ class InfoResource @Inject() (
     "zk_max_versions" -> config.zooKeeperMaxVersions()
   )
 
-  private[this] lazy val eventHandlerConfigValues = {
+  private[this] lazy val eventHandlerConfigValues =
     def httpEventConfig: JsObject = Json.obj(
       "http_endpoints" -> config.httpEventEndpoints.get
     )
 
-    def eventConfig(): JsObject = config.eventSubscriber.get match {
+    def eventConfig(): JsObject = config.eventSubscriber.get match
       case Some("http_callback") => httpEventConfig
       case _                     => Json.obj()
-    }
 
     Json.obj(
       "type" -> config.eventSubscriber.get
     ) ++ eventConfig
-  }
 
   private[this] lazy val httpConfigValues = Json.obj(
     "assets_path" -> config.assetsFileSystemPath.get,
@@ -75,7 +73,7 @@ class InfoResource @Inject() (
 
   @GET
   @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))
-  def index(): Response = {
+  def index(): Response =
     val mesosLeaderUiUrl = Json.obj("mesos_leader_ui_url" -> mesosLeaderInfo.currentLeaderUrl)
     Response.ok(
       jsonObjString(
@@ -88,5 +86,3 @@ class InfoResource @Inject() (
         "zookeeper_config" -> zookeeperConfigValues,
         "event_subscriber" -> config.eventSubscriber.get.map(_ => eventHandlerConfigValues),
         "http_config" -> httpConfigValues)).build()
-  }
-}

@@ -25,7 +25,7 @@ package java.math
 import scala.annotation.tailrec
 
 /** Object that provides all multiplication of {@link BigInteger} methods. */
-private[math] object Multiplication {
+private[math] object Multiplication
 
   /** An array of powers of ten.
     *
@@ -75,20 +75,20 @@ private[math] object Multiplication {
     *  @param factor a positive {@code int} number
     *  @return {@code val * factor}
     */
-  def multiplyByPosInt(bi: BigInteger, factor: Int): BigInteger = {
+  def multiplyByPosInt(bi: BigInteger, factor: Int): BigInteger =
     val resSign: Int = bi.sign
     val aNumberLength = bi.numberLength
     val aDigits = bi.digits
 
-    if (resSign == 0) {
+    if (resSign == 0)
       BigInteger.ZERO
-    } else if (aNumberLength == 1) {
+    else if (aNumberLength == 1)
       val res: Long = unsignedMultAddAdd(aDigits(0), factor, 0, 0)
       val resLo = res.toInt
       val resHi = (res >>> 32).toInt
       if (resHi == 0) new BigInteger(resSign, resLo)
       else new BigInteger(resSign, 2, Array(resLo, resHi))
-    } else {
+    else
       val resLength = aNumberLength + 1
       val resDigits = new Array[Int](resLength)
       resDigits(aNumberLength) = multiplyByInt(
@@ -96,8 +96,6 @@ private[math] object Multiplication {
       val result = new BigInteger(resSign, resLength, resDigits)
       result.cutOffLeadingZeroes()
       result
-    }
-  }
 
   /** Multiplies a number by a power of ten.
     *
@@ -107,33 +105,30 @@ private[math] object Multiplication {
     *  @param exp a positive {@code long} exponent
     *  @return {@code val * 10<sup>exp</sup>}
     */
-  def multiplyByTenPow(bi: BigInteger, exp: Long): BigInteger = {
+  def multiplyByTenPow(bi: BigInteger, exp: Long): BigInteger =
     if (exp < TenPows.length) multiplyByPosInt(bi, TenPows(exp.toInt))
     else bi.multiply(powerOf10(exp))
-  }
 
   /** Performs a<sup>2</sup>.
     *
     *  @param a The number to square.
     *  @param aLen The length of the number to square.
     */
-  def square(a: Array[Int], aLen: Int, res: Array[Int]): Array[Int] = {
+  def square(a: Array[Int], aLen: Int, res: Array[Int]): Array[Int] =
     var carry = 0
 
-    for (i <- 0 until aLen) {
+    for (i <- 0 until aLen)
       carry = 0
-      for (j <- i + 1 until aLen) {
+      for (j <- i + 1 until aLen)
         val t = unsignedMultAddAdd(a(i), a(j), res(i + j), carry)
         res(i + j) = t.toInt
         carry = (t >>> 32).toInt
-      }
       res(i + aLen) = carry
-    }
     BitLevel.shiftLeftOneBit(res, res, aLen << 1)
     carry = 0
     var i = 0
     var index = 0
-    while (i < aLen) {
+    while (i < aLen)
       val t = unsignedMultAddAdd(a(i), a(i), res(index), carry)
       res(index) = t.toInt
       index += 1
@@ -142,9 +137,7 @@ private[math] object Multiplication {
       carry = (t2 >>> 32).toInt
       i += 1
       index += 1
-    }
     res
-  }
 
   /** Computes the value unsigned ((uint)a*(uint)b + (uint)c + (uint)d).
     *
@@ -175,14 +168,14 @@ private[math] object Multiplication {
     *  @return {@code op1 * op2}
     *  @see #multiply(BigInteger, BigInteger)
     */
-  def karatsuba(val1: BigInteger, val2: BigInteger): BigInteger = {
+  def karatsuba(val1: BigInteger, val2: BigInteger): BigInteger =
     val (op1, op2) =
       if (val2.numberLength > val1.numberLength) (val2, val1)
       else (val1, val2)
 
-    if (op2.numberLength < whenUseKaratsuba) {
+    if (op2.numberLength < whenUseKaratsuba)
       multiplyPAP(op1, op2)
-    } else {
+    else
       /*
        * Karatsuba: u = u1*B + u0 v = v1*B + v0 u*v = (u1*v1)*B^2 +
        * ((u1-u0)*(v0-v1) + u1*v1 + u0*v0)*B + u0*v0
@@ -201,22 +194,18 @@ private[math] object Multiplication {
       middle = middle.shiftLeft(ndiv2)
       upper = upper.shiftLeft(ndiv2 << 1)
       upper.add(middle).add(lower)
-    }
-  }
 
   def multArraysPAP(aDigits: Array[Int],
                     aLen: Int,
                     bDigits: Array[Int],
                     bLen: Int,
-                    resDigits: Array[Int]): Unit = {
-    if (!(aLen == 0 || bLen == 0)) {
+                    resDigits: Array[Int]): Unit =
+    if (!(aLen == 0 || bLen == 0))
       if (aLen == 1)
         resDigits(bLen) = multiplyByInt(resDigits, bDigits, bLen, aDigits(0))
       else if (bLen == 1)
         resDigits(aLen) = multiplyByInt(resDigits, aDigits, aLen, bDigits(0))
       else multPAP(aDigits, bDigits, resDigits, aLen, bLen)
-    }
-  }
 
   def multiply(x: BigInteger, y: BigInteger): BigInteger = karatsuba(x, y)
 
@@ -308,7 +297,7 @@ private[math] object Multiplication {
     *  @param op2 second factor of the multiplication {@code op2 >= 0}
     *  @return a {@code BigInteger} of value {@code op1 * op2}
     */
-  def multiplyPAP(a: BigInteger, b: BigInteger): BigInteger = {
+  def multiplyPAP(a: BigInteger, b: BigInteger): BigInteger =
     val aLen = a.numberLength
     val bLen = b.numberLength
     val resLength = aLen + bLen
@@ -316,13 +305,13 @@ private[math] object Multiplication {
       if (a.sign != b.sign) -1
       else 1
 
-    if (resLength == 2) {
+    if (resLength == 2)
       val v = unsignedMultAddAdd(a.digits(0), b.digits(0), 0, 0)
       val valueLo = v.toInt
       val valueHi = (v >>> 32).toInt
       if (valueHi == 0) new BigInteger(resSign, valueLo)
       else new BigInteger(resSign, 2, Array(valueLo, valueHi))
-    } else {
+    else
       val aDigits = a.digits
       val bDigits = b.digits
       val resDigits = new Array[Int](resLength)
@@ -330,34 +319,27 @@ private[math] object Multiplication {
       val result = new BigInteger(resSign, resLength, resDigits)
       result.cutOffLeadingZeroes()
       result
-    }
-  }
 
-  def pow(base: BigInteger, exponent: Int): BigInteger = {
+  def pow(base: BigInteger, exponent: Int): BigInteger =
     @inline
     @tailrec
-    def loop(exp: Int, res: BigInteger, acc: BigInteger): BigInteger = {
-      if (exp > 1) {
+    def loop(exp: Int, res: BigInteger, acc: BigInteger): BigInteger =
+      if (exp > 1)
         val res2 =
           if ((exp & 1) != 0) res.multiply(acc)
           else res
-        val acc2 = {
-          if (acc.numberLength == 1) {
+        val acc2 =
+          if (acc.numberLength == 1)
             acc.multiply(acc)
-          } else {
+          else
             val a = new Array[Int](acc.numberLength << 1)
             val sq = square(acc.digits, acc.numberLength, a)
             new BigInteger(1, sq)
-          }
-        }
         loop(exp >> 1, res2, acc2)
-      } else {
+      else
         res.multiply(acc)
-      }
-    }
 
     loop(exponent, BigInteger.ONE, base)
-  }
 
   /** Calculates a power of ten, which exponent could be out of 32-bit range.
     *
@@ -366,35 +348,31 @@ private[math] object Multiplication {
     *  @param exp the exponent of power of ten, it must be positive.
     *  @return a {@code BigInteger} with value {@code 10<sup>exp</sup>}.
     */
-  def powerOf10(exp: Long): BigInteger = {
+  def powerOf10(exp: Long): BigInteger =
     // "SMALL POWERS"
-    if (exp < BigTenPows.length) {
+    if (exp < BigTenPows.length)
       BigTenPows(exp.toInt)
-    } else if (exp <= 50) {
+    else if (exp <= 50)
       BigInteger.TEN.pow(exp.toInt)
-    } else if (exp <= Int.MaxValue) {
+    else if (exp <= Int.MaxValue)
       // "LARGE POWERS"
       BigFivePows(1).pow(exp.toInt).shiftLeft(exp.toInt)
-    } else {
+    else
       //"HUGE POWERS"
       val powerOfFive = BigFivePows(1).pow(Integer.MAX_VALUE)
       var res: BigInteger = powerOfFive
       var longExp = exp - Int.MaxValue
       val intExp = (exp % Int.MaxValue).toInt
-      while (longExp > Int.MaxValue) {
+      while (longExp > Int.MaxValue)
         res = res.multiply(powerOfFive)
         longExp -= Int.MaxValue
-      }
       res = res.multiply(BigFivePows(1).pow(intExp))
       res = res.shiftLeft(Int.MaxValue)
       longExp = exp - Int.MaxValue
-      while (longExp > Int.MaxValue) {
+      while (longExp > Int.MaxValue)
         res = res.shiftLeft(Int.MaxValue)
         longExp -= Int.MaxValue
-      }
       res.shiftLeft(intExp)
-    }
-  }
 
   /** Multiplies a number by a power of five.
     *
@@ -403,58 +381,47 @@ private[math] object Multiplication {
     *  @param exp a positive {@code int} exponent
     *  @return {@code val * 5<sup>exp</sup>}
     */
-  def multiplyByFivePow(bi: BigInteger, exp: Int): BigInteger = {
+  def multiplyByFivePow(bi: BigInteger, exp: Int): BigInteger =
     if (exp < FivePows.length) multiplyByPosInt(bi, FivePows(exp))
     else if (exp < BigFivePows.length) bi.multiply(BigFivePows(exp))
     else bi.multiply(BigFivePows(1).pow(exp))
-  }
 
-  private def initialiseArrays(): Unit = {
+  private def initialiseArrays(): Unit =
     var fivePow = 1L
-    for (i <- 0 until 32) {
-      if (i <= 18) {
+    for (i <- 0 until 32)
+      if (i <= 18)
         BigFivePows(i) = BigInteger.valueOf(fivePow)
         BigTenPows(i) = BigInteger.valueOf(fivePow << i)
         fivePow *= 5
-      } else {
+      else
         BigFivePows(i) = BigFivePows(i - 1).multiply(BigFivePows(1))
         BigTenPows(i) = BigTenPows(i - 1).multiply(BigInteger.TEN)
-      }
-    }
-  }
 
   private def multiplyByInt(
-      res: Array[Int], a: Array[Int], aSize: Int, factor: Int): Int = {
+      res: Array[Int], a: Array[Int], aSize: Int, factor: Int): Int =
     var carry = 0
-    for (i <- 0 until aSize) {
+    for (i <- 0 until aSize)
       val t = unsignedMultAddAdd(a(i), factor, carry, 0)
       res(i) = t.toInt
       carry = (t >>> 32).toInt
-    }
     carry
-  }
 
   private def multPAP(a: Array[Int],
                       b: Array[Int],
                       t: Array[Int],
                       aLen: Int,
-                      bLen: Int): Unit = {
-    if (a == b && aLen == bLen) {
+                      bLen: Int): Unit =
+    if (a == b && aLen == bLen)
       square(a, aLen, t)
-    } else {
-      for (i <- 0 until aLen) {
+    else
+      for (i <- 0 until aLen)
         var carry = 0
         val aI = a(i)
-        for (j <- 0 until bLen) {
+        for (j <- 0 until bLen)
           val added = unsignedMultAddAdd(aI, b(j), t(i + j), carry.toInt)
           t(i + j) = added.toInt
           carry = (added >>> 32).toInt
-        }
         t(i + bLen) = carry
-      }
-    }
-  }
 
   private def newArrayOfPows(len: Int, pow: Int) =
     new Array[Int](len - 1).scanLeft[Int, Array[Int]](1)((z, _) => z * pow)
-}

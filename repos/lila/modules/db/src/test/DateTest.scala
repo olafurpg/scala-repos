@@ -11,19 +11,16 @@ import play.api.test._
 import reactivemongo.api._
 import reactivemongo.bson._
 
-class DateTest extends Specification {
+class DateTest extends Specification
 
   val date = DateTime.now
   import play.modules.reactivemongo.json.ImplicitBSONHandlers._
 
-  "date conversion" should {
-    "js to bson" in {
+  "date conversion" should
+    "js to bson" in
       val doc = JsObjectWriter.write(Json.obj(
               "ca" -> $gt($date(date))
           ))
-      doc.getAsTry[BSONDocument]("ca") flatMap { gt =>
+      doc.getAsTry[BSONDocument]("ca") flatMap  gt =>
         gt.getAsTry[BSONDateTime]("$gt")
-      } must_== scala.util.Success(BSONDateTime(date.getMillis))
-    }
-  }
-}
+      must_== scala.util.Success(BSONDateTime(date.getMillis))

@@ -1,9 +1,7 @@
-object WithStat {
+object WithStat
   val a = new A
   a.< caret >
 
-  class A {
+  class A
     def fboo = ???
     def fbar = ???
-  }
-}

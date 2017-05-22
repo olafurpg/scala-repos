@@ -47,7 +47,7 @@ class CurrencyStringConverterSpec
                                                 CurrencyStringConverter](
         classOf[jfxuc.CurrencyStringConverter],
         classOf[CurrencyStringConverter],
-        classOf[Number]) {
+        classOf[Number])
 
   override protected def getConverterForExample =
     new CurrencyStringConverter(Locale.US)
@@ -55,4 +55,3 @@ class CurrencyStringConverterSpec
   val examples = List((new java.lang.Long(123), "$123.00"),
                       (new java.lang.Long(0), "$0.00"),
                       (new java.lang.Long(-123), "($123.00)"))
-}

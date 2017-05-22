@@ -78,7 +78,7 @@ import scala.xml.{NodeSeq, Text}
   *
   * Please see the tests, as well as <a href="http://logji.blogspot.com/2009/09/composable-bindings-in-lift.html">this blog post</a> for additional details.
   */
-object Bindings {
+object Bindings
   type Binding = NodeSeq => NodeSeq
 
   type DataBinding[T] = T => NodeSeq => NodeSeq
@@ -101,7 +101,7 @@ object Bindings {
     * A decorator for a binding function that allows it to be called as bind() rather than apply().
     * This class also provides facilities for binding to a specific template
     */
-  case class Binder(val binding: Binding) {
+  case class Binder(val binding: Binding)
 
     /**
       * Apply this binder's binding function to the specified NodeSeq.
@@ -112,8 +112,8 @@ object Bindings {
       * Apply this binder's binding function to the specified templated
       * looked up using Templates.apply
       */
-    def bind(templatePath: List[String]): NodeSeq = {
-      Templates(templatePath) map binding match {
+    def bind(templatePath: List[String]): NodeSeq =
+      Templates(templatePath) map binding match
         case Full(xhtml) => xhtml
         case Failure(msg, ex, _) if Props.mode == Props.RunModes.Development =>
           Text(ex.map(_.getMessage).openOr(msg))
@@ -122,14 +122,9 @@ object Bindings {
               "Unable to find template with path " +
               templatePath.mkString("/", "/", ""))
         case _ => NodeSeq.Empty
-      }
-    }
-  }
 
   /**
     * Bind any input value to the empty NodeSeq.
     */
-  object EmptyBinding extends Binding {
+  object EmptyBinding extends Binding
     override def apply(xhtml: NodeSeq): NodeSeq = NodeSeq.Empty
-  }
-}

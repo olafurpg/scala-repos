@@ -12,21 +12,18 @@ import com.codahale.metrics.Gauge
   *
   * Can be used to expose average of a series of values to `com.codahale.metrics.ScheduledReporter`.
   */
-class AveragingGauge extends Gauge[Double] {
+class AveragingGauge extends Gauge[Double]
 
   private val sum = new LongAdder
   private val count = new LongAdder
 
-  def add(n: Long) {
+  def add(n: Long)
     count.increment()
     sum add n
-  }
 
-  def add(ns: Seq[Long]) {
+  def add(ns: Seq[Long])
     // takes a mutable Seq on order to allow use with Array's
     count add ns.length
     sum add ns.sum
-  }
 
   override def getValue: Double = sum.sum().toDouble / count.sum()
-}

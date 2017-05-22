@@ -55,16 +55,15 @@ import scala.collection.JavaConverters._
   * SaslTestHarness here directly because it extends ZooKeeperTestHarness, and we
   * would end up with ZooKeeperTestHarness twice.
   */
-trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
+trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup
   override val producerCount = 1
   override val consumerCount = 2
   override val serverCount = 3
-  override val setClusterAcl = Some { () =>
+  override val setClusterAcl = Some  () =>
     AclCommand.main(clusterAclArgs)
     servers.foreach(s =>
           TestUtils.waitAndVerifyAcls(
               ClusterActionAcl, s.apis.authorizer.get, clusterResource))
-  }
   val numRecords = 1
   val group = "group"
   val topic = "e2etopic"
@@ -174,13 +173,12 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
     * Starts MiniKDC and only then sets up the parent trait.
     */
   @Before
-  override def setUp {
-    securityProtocol match {
+  override def setUp
+    securityProtocol match
       case SecurityProtocol.SSL =>
         startSasl(ZkSasl)
       case _ =>
         startSasl(Both)
-    }
     super.setUp
     AclCommand.main(topicBrokerReadAclArgs)
     servers.foreach(
@@ -190,34 +188,31 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
                                       new Resource(Topic, "*")))
     // create the test topic with all the brokers as replicas
     TestUtils.createTopic(zkUtils, topic, 1, 3, this.servers)
-  }
 
   /**
     * Closes MiniKDC last when tearing down.
     */
   @After
-  override def tearDown {
+  override def tearDown
     super.tearDown
     closeSasl()
-  }
 
   /**
     * Tests the ability of producing and consuming with the appropriate ACLs set.
     */
   @Test
-  def testProduceConsume {
+  def testProduceConsume
     AclCommand.main(produceAclArgs)
     AclCommand.main(consumeAclArgs)
     servers.foreach(
         s =>
-          {
         TestUtils.waitAndVerifyAcls(
             TopicReadAcl ++ TopicWriteAcl ++ TopicDescribeAcl,
             s.apis.authorizer.get,
             topicResource)
         TestUtils.waitAndVerifyAcls(
             GroupReadAcl, s.apis.authorizer.get, groupResource)
-    })
+    )
     //Produce records
     debug("Starting to send records")
     sendRecords(numRecords, tp)
@@ -226,61 +221,55 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
     consumers.head.assign(List(tp).asJava)
     consumeRecords(this.consumers.head, numRecords)
     debug("Finished consuming")
-  }
 
   /**
     * Tests that a producer fails to publish messages when the appropriate ACL
     * isn't set.
     */
   @Test
-  def testNoProduceAcl {
+  def testNoProduceAcl
     //Produce records
     debug("Starting to send records")
-    try {
+    try
       sendRecords(numRecords, tp)
       fail("Topic authorization exception expected")
-    } catch {
+    catch
       case e: TopicAuthorizationException => //expected
-    }
-  }
 
   /**
     * Tests that a consumer fails to consume messages without the appropriate
     * ACL set.
     */
   @Test
-  def testNoConsumeAcl {
+  def testNoConsumeAcl
     AclCommand.main(produceAclArgs)
     AclCommand.main(groupAclArgs)
     servers.foreach(
         s =>
-          {
         TestUtils.waitAndVerifyAcls(TopicWriteAcl ++ TopicDescribeAcl,
                                     s.apis.authorizer.get,
                                     topicResource)
         TestUtils.waitAndVerifyAcls(
             GroupReadAcl, servers.head.apis.authorizer.get, groupResource)
-    })
+    )
     //Produce records
     debug("Starting to send records")
     sendRecords(numRecords, tp)
     //Consume records
     debug("Finished sending and starting to consume records")
     consumers.head.assign(List(tp).asJava)
-    try {
+    try
       consumeRecords(this.consumers.head)
       fail("Topic authorization exception expected")
-    } catch {
+    catch
       case e: TopicAuthorizationException => //expected
-    }
-  }
 
   /**
     * Tests that a consumer fails to consume messages without the appropriate
     * ACL set.
     */
   @Test
-  def testNoGroupAcl {
+  def testNoGroupAcl
     AclCommand.main(produceAclArgs)
     servers.foreach(
         s =>
@@ -293,52 +282,42 @@ trait EndToEndAuthorizationTest extends IntegrationTestHarness with SaslSetup {
     //Consume records
     debug("Finished sending and starting to consume records")
     consumers.head.assign(List(tp).asJava)
-    try {
+    try
       consumeRecords(this.consumers.head)
       fail("Topic authorization exception expected")
-    } catch {
+    catch
       case e: GroupAuthorizationException => //expected
-    }
-  }
 
-  private def sendRecords(numRecords: Int, tp: TopicPartition) {
-    val futures = (0 until numRecords).map { i =>
+  private def sendRecords(numRecords: Int, tp: TopicPartition)
+    val futures = (0 until numRecords).map  i =>
       val record = new ProducerRecord(
           tp.topic(), tp.partition(), s"$i".getBytes, s"$i".getBytes)
       debug(s"Sending this record: $record")
       this.producers.head.send(record)
-    }
-    try {
+    try
       futures.foreach(_.get)
-    } catch {
+    catch
       case e: ExecutionException => throw e.getCause
-    }
-  }
 
   private def consumeRecords(consumer: Consumer[Array[Byte], Array[Byte]],
                              numRecords: Int = 1,
                              startingOffset: Int = 0,
                              topic: String = topic,
-                             part: Int = part) {
+                             part: Int = part)
     val records = new ArrayList[ConsumerRecord[Array[Byte], Array[Byte]]]()
     val maxIters = numRecords * 50
     var iters = 0
-    while (records.size < numRecords) {
-      for (record <- consumer.poll(50).asScala) {
+    while (records.size < numRecords)
+      for (record <- consumer.poll(50).asScala)
         records.add(record)
-      }
       if (iters > maxIters)
         throw new IllegalStateException(
             "Failed to consume the expected records after " + iters +
             " iterations.")
       iters += 1
-    }
-    for (i <- 0 until numRecords) {
+    for (i <- 0 until numRecords)
       val record = records.get(i)
       val offset = startingOffset + i
       assertEquals(topic, record.topic())
       assertEquals(part, record.partition())
       assertEquals(offset.toLong, record.offset())
-    }
-  }
-}

@@ -12,55 +12,44 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.{BlockStat, S
   * @author Alexander Podkhalyuzin
   * Date: 13.03.2008
   */
-object ConstrBlock {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ConstrBlock
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val constrExprMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLBRACE =>
         builder.advanceLexer() //Ate {
         builder.enableNewlines
         SelfInvocation parse builder
-        while (true) {
-          builder.getTokenType match {
-            case ScalaTokenTypes.tRBRACE => {
+        while (true)
+          builder.getTokenType match
+            case ScalaTokenTypes.tRBRACE =>
                 builder.advanceLexer() //Ate }
                 builder.restoreNewlinesState
                 constrExprMarker.done(ScalaElementTypes.CONSTR_BLOCK)
                 return true
-              }
-            case ScalaTokenTypes.tSEMICOLON => {
+            case ScalaTokenTypes.tSEMICOLON =>
                 builder.advanceLexer() //Ate semi
                 BlockStat parse builder
-              }
             case _ if builder.newlineBeforeCurrentToken =>
-              if (!BlockStat.parse(builder)) {
+              if (!BlockStat.parse(builder))
                 builder error ErrMsg("rbrace.expected")
                 builder.restoreNewlinesState
                 while (!builder.eof &&
                 !ScalaTokenTypes.tRBRACE.eq(builder.getTokenType) &&
-                !builder.newlineBeforeCurrentToken) {
+                !builder.newlineBeforeCurrentToken)
                   builder.advanceLexer()
-                }
                 constrExprMarker.done(ScalaElementTypes.CONSTR_BLOCK)
                 return true
-              }
-            case _ => {
+            case _ =>
                 builder error ErrMsg("rbrace.expected")
                 builder.restoreNewlinesState
                 while (!builder.eof &&
                 !ScalaTokenTypes.tRBRACE.eq(builder.getTokenType) &&
-                !builder.newlineBeforeCurrentToken) {
+                !builder.newlineBeforeCurrentToken)
                   builder.advanceLexer()
-                }
                 constrExprMarker.done(ScalaElementTypes.CONSTR_BLOCK)
                 return true
-              }
-          }
-        }
         true //it's trick to compiler
       case _ =>
         constrExprMarker.drop()
         false
-    }
-  }
-}

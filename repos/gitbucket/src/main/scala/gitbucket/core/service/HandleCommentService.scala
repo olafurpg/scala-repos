@@ -8,7 +8,7 @@ import gitbucket.core.util.Implicits._
 import gitbucket.core.util.Notifier
 import profile.simple._
 
-trait HandleCommentService {
+trait HandleCommentService
   self: RepositoryService with IssuesService with ActivityService with WebHookService with WebHookIssueCommentService with WebHookPullRequestService =>
 
   /**
@@ -18,13 +18,13 @@ trait HandleCommentService {
                     content: Option[String],
                     repository: RepositoryService.RepositoryInfo,
                     actionOpt: Option[String])(
-      implicit context: Context, s: Session) = {
+      implicit context: Context, s: Session) =
 
-    defining(repository.owner, repository.name) {
+    defining(repository.owner, repository.name)
       case (owner, name) =>
         val userName = context.loginAccount.get.userName
 
-        val (action, recordActivity) = actionOpt.collect {
+        val (action, recordActivity) = actionOpt.collect
           case "close" if (!issue.closed) =>
             true ->
             (Some("close") -> Some(
@@ -32,13 +32,13 @@ trait HandleCommentService {
                     else recordCloseIssueActivity _))
           case "reopen" if (issue.closed) =>
             false -> (Some("reopen") -> Some(recordReopenIssueActivity _))
-        }.map {
+        .map
           case (closed, t) =>
             updateClosed(owner, name, issue.issueId, closed)
             t
-        }.getOrElse(None -> None)
+        .getOrElse(None -> None)
 
-        val commentId = (content, action) match {
+        val commentId = (content, action) match
           case (None, None) => None
           case (None, Some(action)) =>
             Some(
@@ -56,71 +56,56 @@ trait HandleCommentService {
                               issue.issueId,
                               content,
                               action.map(_ + "_comment").getOrElse("comment")))
-        }
 
         // record comment activity if comment is entered
-        content foreach {
+        content foreach
           (if (issue.isPullRequest) recordCommentPullRequestActivity _
            else recordCommentIssueActivity _)
           (owner, name, userName, issue.issueId, _)
-        }
         recordActivity foreach
         (_ (owner, name, userName, issue.issueId, issue.title))
 
         // extract references and create refer comment
-        content.map { content =>
+        content.map  content =>
           createReferComment(
               owner, name, issue, content, context.loginAccount.get)
-        }
 
         // call web hooks
-        action match {
+        action match
           case None =>
-            commentId.map { commentIdSome =>
+            commentId.map  commentIdSome =>
               callIssueCommentWebHook(
                   repository, issue, commentIdSome, context.loginAccount.get)
-            }
           case Some(act) =>
-            val webHookAction = act match {
+            val webHookAction = act match
               case "open" => "opened"
               case "reopen" => "reopened"
               case "close" => "closed"
               case _ => act
-            }
-            if (issue.isPullRequest) {
+            if (issue.isPullRequest)
               callPullRequestWebHook(webHookAction,
                                      repository,
                                      issue.issueId,
                                      context.baseUrl,
                                      context.loginAccount.get)
-            } else {
+            else
               callIssuesWebHook(webHookAction,
                                 repository,
                                 issue,
                                 context.baseUrl,
                                 context.loginAccount.get)
-            }
-        }
 
         // notifications
-        Notifier() match {
+        Notifier() match
           case f =>
-            content foreach {
-              f.toNotify(repository, issue, _) {
+            content foreach
+              f.toNotify(repository, issue, _)
                 Notifier.msgComment(
-                    s"${context.baseUrl}/${owner}/${name}/${if (issue.isPullRequest) "pull"
-                else "issues"}/${issue.issueId}#comment-${commentId.get}")
-              }
-            }
-            action foreach {
-              f.toNotify(repository, issue, _) {
+                    s"${context.baseUrl}/${owner}/${name}/$if (issue.isPullRequest) "pull"
+                else "issues"/${issue.issueId}#comment-${commentId.get}")
+            action foreach
+              f.toNotify(repository, issue, _)
                 Notifier.msgStatus(
                     s"${context.baseUrl}/${owner}/${name}/issues/${issue.issueId}")
-              }
-            }
-        }
 
         commentId.map(issue -> _)
-    }
-  }
-}

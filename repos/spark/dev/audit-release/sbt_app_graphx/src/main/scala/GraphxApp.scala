@@ -23,13 +23,12 @@ import org.apache.spark.SparkContext._
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
 
-object GraphXApp {
-  def main(args: Array[String]) {
-    val conf = sys.env.get("SPARK_AUDIT_MASTER") match {
+object GraphXApp
+  def main(args: Array[String])
+    val conf = sys.env.get("SPARK_AUDIT_MASTER") match
       case Some(master) =>
         new SparkConf().setAppName("Simple GraphX App").setMaster(master)
       case None => new SparkConf().setAppName("Simple Graphx App")
-    }
     val sc = new SparkContext(conf)
     SparkContext.jarOfClass(this.getClass).foreach(sc.addJar)
 
@@ -52,11 +51,8 @@ object GraphXApp {
     // 4 (peter) and 5 (franklin).
     val triplets =
       graph.triplets.map(e => (e.srcAttr._1, e.dstAttr._1)).collect
-    if (!triplets.exists(_ == ("peter", "John Doe"))) {
+    if (!triplets.exists(_ == ("peter", "John Doe")))
       println("Failed to run GraphX")
       System.exit(-1)
-    }
     println("Test succeeded")
-  }
-}
 // scalastyle:on println

@@ -23,7 +23,7 @@ import breeze.storage.Zero
 
 import scala.reflect.ClassTag
 
-trait ImmutableNumericOps[+This] extends Any {
+trait ImmutableNumericOps[+This] extends Any
   def repr: This
 
   // Immutable
@@ -56,9 +56,8 @@ trait ImmutableNumericOps[+This] extends Any {
 
   /** Alias for :-(b) for all b. */
   final def -[TT >: This, B, That](b: B)(
-      implicit op: OpSub.Impl2[TT, B, That]) = {
+      implicit op: OpSub.Impl2[TT, B, That]) =
     op(repr, b)
-  }
 
   /** Element-wise modulo of this and b. */
   final def :%[TT >: This, B, That](b: B)(
@@ -66,9 +65,8 @@ trait ImmutableNumericOps[+This] extends Any {
 
   /** Alias for :%(b) when b is a scalar. */
   final def %[TT >: This, B, That](b: B)(
-      implicit op: OpMod.Impl2[TT, B, That]) = {
+      implicit op: OpMod.Impl2[TT, B, That]) =
     op(repr, b)
-  }
 
   /*
    * Field Element Ops
@@ -81,9 +79,8 @@ trait ImmutableNumericOps[+This] extends Any {
 
   /** Alias for :/(b) when b is a scalar. */
   final def /[TT >: This, B, That](b: B)(
-      implicit op: OpDiv.Impl2[TT, B, That]) = {
+      implicit op: OpDiv.Impl2[TT, B, That]) =
     op(repr, b)
-  }
 
   /** Element-wise exponentiation of this and b. */
   final def :^[TT >: This, B, That](b: B)(
@@ -92,16 +89,14 @@ trait ImmutableNumericOps[+This] extends Any {
   /** Represents the "natural" norm of this vector, for types that don't support arbitrary norms */
   @deprecated("Use norm(XXX) instead of XXX.norm", "0.9")
   final def norm[TT >: This, R]()(
-      implicit op: breeze.linalg.norm.Impl[TT, R]): R = {
+      implicit op: breeze.linalg.norm.Impl[TT, R]): R =
     op(repr)
-  }
 
   /** Represents the norm of this vector */
   @deprecated("Use norm(XXX) instead of XXX.norm", "0.9")
   final def norm[TT >: This, B, R](b: B)(
-      implicit op: breeze.linalg.norm.Impl2[TT, B, R]): R = {
+      implicit op: breeze.linalg.norm.Impl2[TT, B, R]): R =
     op(repr, b)
-  }
 
   /** Inner product of this and b. */
   final def dot[TT >: This, B, BB >: B, That](b: B)(
@@ -128,30 +123,26 @@ trait ImmutableNumericOps[+This] extends Any {
 
   /** Alias for :&&(b) for all b. */
   final def &[TT >: This, B, That](b: B)(
-      implicit op: OpAnd.Impl2[TT, B, That]) = {
+      implicit op: OpAnd.Impl2[TT, B, That]) =
     op(repr, b)
-  }
 
   /** Alias for :||(b) for all b. */
   final def |[TT >: This, B, That](b: B)(
-      implicit op: OpOr.Impl2[TT, B, That]) = {
+      implicit op: OpOr.Impl2[TT, B, That]) =
     op(repr, b)
-  }
 
   /** Alias for :^^(b) for all b. */
   final def ^^[TT >: This, B, That](b: B)(
-      implicit op: OpXor.Impl2[TT, B, That]): That = {
+      implicit op: OpXor.Impl2[TT, B, That]): That =
     op(repr, b)
-  }
 
   /*
    * Matrix-y ops
    */
   /** Matrix multiplication (and scalar multiplication that follows standard order of operations) */
   final def *[TT >: This, B, That](b: B)(
-      implicit op: OpMulMatrix.Impl2[TT, B, That]) = {
+      implicit op: OpMulMatrix.Impl2[TT, B, That]) =
     op(repr, b)
-  }
 
   /** A transposed view of this object. */
   final def t[TT >: This, That](implicit op: CanTranspose[TT, That]) =
@@ -173,7 +164,6 @@ trait ImmutableNumericOps[+This] extends Any {
       implicit op: CanTranspose[TT, That],
       canSlice: CanSlice[That, Slice1, Result]): Result =
     canSlice(op.apply(repr), a)
-}
 
 /**
   * In some sense, this is the real root of the linalg hierarchy. It provides
@@ -181,14 +171,13 @@ trait ImmutableNumericOps[+This] extends Any {
   * We use this when we don't care about the index into the Tensor, or if we don't really have an index.
   * @author dlwh
   */
-trait NumericOps[+This] extends ImmutableNumericOps[This] {
+trait NumericOps[+This] extends ImmutableNumericOps[This]
 
   // We move this here because of ambiguities with any2stringadd
   /** Alias for :+(b) for all b. */
   final def +[TT >: This, B, That](b: B)(
-      implicit op: OpAdd.Impl2[TT, B, That]) = {
+      implicit op: OpAdd.Impl2[TT, B, That]) =
     op(repr, b)
-  }
 
   /*
    * Semiring Element Ops
@@ -197,24 +186,21 @@ trait NumericOps[+This] extends ImmutableNumericOps[This] {
   // Mutable
   /** Mutates this by element-wise assignment of b into this. */
   final def :=[TT >: This, B](b: B)(
-      implicit op: OpSet.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpSet.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise addition of b into this. */
   final def :+=[TT >: This, B](b: B)(
-      implicit op: OpAdd.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpAdd.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise multiplication of b into this. */
   final def :*=[TT >: This, B](b: B)(
-      implicit op: OpMulScalar.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpMulScalar.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Alias for :+=(b) for all b. */
   final def +=[TT >: This, B](b: B)(implicit op: OpAdd.InPlaceImpl2[TT, B]) =
@@ -228,17 +214,15 @@ trait NumericOps[+This] extends ImmutableNumericOps[This] {
   // Mutable
   /** Mutates this by element-wise subtraction of b from this */
   final def :-=[TT >: This, B](b: B)(
-      implicit op: OpSub.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpSub.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise modulo of b into this. */
   final def :%=[TT >: This, B](b: B)(
-      implicit op: OpMod.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpMod.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Alias for :%=(b) when b is a scalar. */
   final def %=[TT >: This, B](b: B)(implicit op: OpMod.InPlaceImpl2[TT, B]) =
@@ -251,17 +235,15 @@ trait NumericOps[+This] extends ImmutableNumericOps[This] {
   // Mutable
   /** Mutates this by element-wise division of b into this */
   final def :/=[TT >: This, B](b: B)(
-      implicit op: OpDiv.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpDiv.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise exponentiation of this by b. */
   final def :^=[TT >: This, B](b: B)(
-      implicit op: OpPow.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpPow.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Alias for :/=(b) when b is a scalar. */
   final def /=[TT >: This, B](b: B)(implicit op: OpDiv.InPlaceImpl2[TT, B]) =
@@ -289,48 +271,41 @@ trait NumericOps[+This] extends ImmutableNumericOps[This] {
 
   /** Mutates this by element-wise and of this and b. */
   final def :&=[TT >: This, B](b: B)(
-      implicit op: OpAnd.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpAnd.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise or of this and b. */
   final def :|=[TT >: This, B](b: B)(
-      implicit op: OpOr.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpOr.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise xor of this and b. */
   final def :^^=[TT >: This, B](b: B)(
-      implicit op: OpXor.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpXor.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise and of this and b. */
   final def &=[TT >: This, B](b: B)(
-      implicit op: OpAnd.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpAnd.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise or of this and b. */
   final def |=[TT >: This, B](b: B)(
-      implicit op: OpOr.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpOr.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
 
   /** Mutates this by element-wise xor of this and b. */
   final def ^^=[TT >: This, B](b: B)(
-      implicit op: OpXor.InPlaceImpl2[TT, B]): This = {
+      implicit op: OpXor.InPlaceImpl2[TT, B]): This =
     op(repr, b)
     repr
-  }
-}
 
-object NumericOps {
+object NumericOps
 
   /*
   implicit class ScalarsAreNumericOps[@specialized(Int, Double, Long, Float) S](x: S) extends NumericOps[S] {
@@ -341,120 +316,87 @@ object NumericOps {
   /**
     * If you import this object's members, you can treat Arrays as DenseVectors.
     */
-  object Arrays extends ArraysLowPriority {
+  object Arrays extends ArraysLowPriority
 
     implicit class ArrayIsNumericOps[V](arr: Array[V])
-        extends NumericOps[Array[V]] {
+        extends NumericOps[Array[V]]
       def repr = arr
-    }
 
     // TODO these two really shouldn't be necessary, but there's interference(?) from any2StringAdd, or something.
     implicit def binaryOpFromDVOp2Add[V](implicit op: OpAdd.Impl2[
             DenseVector[V], DenseVector[V], DenseVector[V]])
-      : OpAdd.Impl2[Array[V], Array[V], Array[V]] = {
-      new OpAdd.Impl2[Array[V], Array[V], Array[V]] {
-        def apply(a: Array[V], b: Array[V]): Array[V] = {
+      : OpAdd.Impl2[Array[V], Array[V], Array[V]] =
+      new OpAdd.Impl2[Array[V], Array[V], Array[V]]
+        def apply(a: Array[V], b: Array[V]): Array[V] =
           val r = op(DenseVector(a), DenseVector[V](b))
-          if (r.offset != 0 || r.stride != 1) {
+          if (r.offset != 0 || r.stride != 1)
             r.copy.data
-          } else {
+          else
             r.data
-          }
-        }
-      }
-    }
 
     implicit def binaryOpAddFromDVUOpAdd2[V](
-        implicit op: OpAdd.Impl2[DenseVector[V], V, DenseVector[V]]) = {
-      new OpAdd.Impl2[Array[V], V, Array[V]] {
-        def apply(a: Array[V], b: V): Array[V] = {
+        implicit op: OpAdd.Impl2[DenseVector[V], V, DenseVector[V]]) =
+      new OpAdd.Impl2[Array[V], V, Array[V]]
+        def apply(a: Array[V], b: V): Array[V] =
           val r = op(DenseVector(a), b)
-          if (r.offset != 0 || r.stride != 1) {
+          if (r.offset != 0 || r.stride != 1)
             r.copy.data
-          } else {
+          else
             r.data
-          }
-        }
-      }
-    }
 
     implicit def binaryOpFromDVOp2[V, Op <: OpType](implicit op: UFunc.UImpl2[
             Op, DenseVector[V], DenseVector[V], DenseVector[V]])
-      : UFunc.UImpl2[Op, Array[V], Array[V], Array[V]] = {
-      new UFunc.UImpl2[Op, Array[V], Array[V], Array[V]] {
-        def apply(a: Array[V], b: Array[V]): Array[V] = {
+      : UFunc.UImpl2[Op, Array[V], Array[V], Array[V]] =
+      new UFunc.UImpl2[Op, Array[V], Array[V], Array[V]]
+        def apply(a: Array[V], b: Array[V]): Array[V] =
           val r = op(DenseVector(a), DenseVector[V](b))
-          if (r.offset != 0 || r.stride != 1) {
+          if (r.offset != 0 || r.stride != 1)
             r.copy.data
-          } else {
+          else
             r.data
-          }
-        }
-      }
-    }
 
     implicit def binaryUpdateOpFromDVDVOp[
         V, Op <: OpType](implicit op: UFunc.InPlaceImpl2[
-            Op, DenseVector[V], DenseVector[V]]) = {
-      new UFunc.InPlaceImpl2[Op, Array[V], Array[V]] {
-        def apply(a: Array[V], b: Array[V]) {
+            Op, DenseVector[V], DenseVector[V]]) =
+      new UFunc.InPlaceImpl2[Op, Array[V], Array[V]]
+        def apply(a: Array[V], b: Array[V])
           op(DenseVector(a), DenseVector(b))
-        }
-      }
-    }
 
     implicit def binaryOpFromDVUOp2[V, Op <: OpType](
-        implicit op: UFunc.UImpl2[Op, DenseVector[V], V, DenseVector[V]]) = {
-      new UFunc.UImpl2[Op, Array[V], V, Array[V]] {
-        def apply(a: Array[V], b: V): Array[V] = {
+        implicit op: UFunc.UImpl2[Op, DenseVector[V], V, DenseVector[V]]) =
+      new UFunc.UImpl2[Op, Array[V], V, Array[V]]
+        def apply(a: Array[V], b: V): Array[V] =
           val r = op(DenseVector(a), b)
-          if (r.offset != 0 || r.stride != 1) {
+          if (r.offset != 0 || r.stride != 1)
             r.copy.data
-          } else {
+          else
             r.data
-          }
-        }
-      }
-    }
-  }
 
-  sealed trait ArraysLowPriority {
+  sealed trait ArraysLowPriority
     implicit def binaryUpdateOpFromDVOp[V, Other, Op, U](
         implicit op: UFunc.InPlaceImpl2[Op, DenseVector[V], Other],
-        man: ClassTag[U]) = {
-      new UFunc.InPlaceImpl2[Op, Array[V], Other] {
-        def apply(a: Array[V], b: Other) {
+        man: ClassTag[U]) =
+      new UFunc.InPlaceImpl2[Op, Array[V], Other]
+        def apply(a: Array[V], b: Other)
           op(DenseVector(a), b)
-        }
-      }
-    }
 
     implicit def binaryOpFromDVOp[V, Other, Op <: OpType, U](
         implicit op: UFunc.UImpl2[Op, DenseVector[V], Other, DenseVector[U]],
         man: ClassTag[U],
-        zero: Zero[U]) = {
-      new UFunc.UImpl2[Op, Array[V], Other, Array[U]] {
-        def apply(a: Array[V], b: Other): Array[U] = {
+        zero: Zero[U]) =
+      new UFunc.UImpl2[Op, Array[V], Other, Array[U]]
+        def apply(a: Array[V], b: Other): Array[U] =
           val r = op(DenseVector(a), b)
-          if (r.offset != 0 || r.stride != 1) {
+          if (r.offset != 0 || r.stride != 1)
             val z = DenseVector.zeros[U](r.length)
             z := r
             z.data
-          } else {
+          else
             r.data
-          }
-        }
-      }
-    }
-  }
 
   implicit def binaryUpdateOpFromDVVOp[V, Op, U](
       implicit op: UFunc.InPlaceImpl2[Op, DenseVector[V], U],
-      man: ClassTag[U]) = {
-    new UFunc.InPlaceImpl2[Op, Array[V], U] {
-      def apply(a: Array[V], b: U) {
+      man: ClassTag[U]) =
+    new UFunc.InPlaceImpl2[Op, Array[V], U]
+      def apply(a: Array[V], b: U)
         op(DenseVector(a), b)
-      }
-    }
-  }
-}

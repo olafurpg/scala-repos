@@ -30,30 +30,26 @@ import org.apache.spark.storage.memory.MemoryStore
   * @param lock a [[MemoryManager]] instance to synchronize on
   */
 private[memory] class StorageMemoryPool(lock: Object)
-    extends MemoryPool(lock) with Logging {
+    extends MemoryPool(lock) with Logging
 
   @GuardedBy("lock")
   private[this] var _memoryUsed: Long = 0L
 
-  override def memoryUsed: Long = lock.synchronized {
+  override def memoryUsed: Long = lock.synchronized
     _memoryUsed
-  }
 
   private var _memoryStore: MemoryStore = _
-  def memoryStore: MemoryStore = {
-    if (_memoryStore == null) {
+  def memoryStore: MemoryStore =
+    if (_memoryStore == null)
       throw new IllegalStateException("memory store not initialized yet")
-    }
     _memoryStore
-  }
 
   /**
     * Set the [[MemoryStore]] used by this manager to evict cached blocks.
     * This must be set after construction due to initialization ordering constraints.
     */
-  final def setMemoryStore(store: MemoryStore): Unit = {
+  final def setMemoryStore(store: MemoryStore): Unit =
     _memoryStore = store
-  }
 
   /**
     * Acquire N bytes of memory to cache the given block, evicting existing ones if necessary.
@@ -61,10 +57,9 @@ private[memory] class StorageMemoryPool(lock: Object)
     * @return whether all N bytes were successfully granted.
     */
   def acquireMemory(blockId: BlockId, numBytes: Long): Boolean =
-    lock.synchronized {
+    lock.synchronized
       val numBytesToFree = math.max(0, numBytes - memoryFree)
       acquireMemory(blockId, numBytes, numBytesToFree)
-    }
 
   /**
     * Acquire N bytes of storage memory for the given block, evicting existing ones if necessary.
@@ -76,47 +71,41 @@ private[memory] class StorageMemoryPool(lock: Object)
     */
   def acquireMemory(blockId: BlockId,
                     numBytesToAcquire: Long,
-                    numBytesToFree: Long): Boolean = lock.synchronized {
+                    numBytesToFree: Long): Boolean = lock.synchronized
     assert(numBytesToAcquire >= 0)
     assert(numBytesToFree >= 0)
     assert(memoryUsed <= poolSize)
-    if (numBytesToFree > 0) {
+    if (numBytesToFree > 0)
       memoryStore.evictBlocksToFreeSpace(Some(blockId), numBytesToFree)
-    }
     // NOTE: If the memory store evicts blocks, then those evictions will synchronously call
     // back into this StorageMemoryPool in order to free memory. Therefore, these variables
     // should have been updated.
     val enoughMemory = numBytesToAcquire <= memoryFree
-    if (enoughMemory) {
+    if (enoughMemory)
       _memoryUsed += numBytesToAcquire
-    }
     enoughMemory
-  }
 
-  def releaseMemory(size: Long): Unit = lock.synchronized {
-    if (size > _memoryUsed) {
+  def releaseMemory(size: Long): Unit = lock.synchronized
+    if (size > _memoryUsed)
       logWarning(s"Attempted to release $size bytes of storage " +
           s"memory when we only have ${_memoryUsed} bytes")
       _memoryUsed = 0
-    } else {
+    else
       _memoryUsed -= size
-    }
-  }
 
-  def releaseAllMemory(): Unit = lock.synchronized {
+  def releaseAllMemory(): Unit = lock.synchronized
     _memoryUsed = 0
-  }
 
   /**
     * Try to shrink the size of this storage memory pool by `spaceToFree` bytes. Return the number
     * of bytes removed from the pool's capacity.
     */
-  def shrinkPoolToFreeSpace(spaceToFree: Long): Long = lock.synchronized {
+  def shrinkPoolToFreeSpace(spaceToFree: Long): Long = lock.synchronized
     // First, shrink the pool by reclaiming free memory:
     val spaceFreedByReleasingUnusedMemory = math.min(spaceToFree, memoryFree)
     decrementPoolSize(spaceFreedByReleasingUnusedMemory)
     val remainingSpaceToFree = spaceToFree - spaceFreedByReleasingUnusedMemory
-    if (remainingSpaceToFree > 0) {
+    if (remainingSpaceToFree > 0)
       // If reclaiming free memory did not adequately shrink the pool, begin evicting blocks:
       val spaceFreedByEviction =
         memoryStore.evictBlocksToFreeSpace(None, remainingSpaceToFree)
@@ -124,8 +113,5 @@ private[memory] class StorageMemoryPool(lock: Object)
       // not need to decrement _memoryUsed here. However, we do need to decrement the pool size.
       decrementPoolSize(spaceFreedByEviction)
       spaceFreedByReleasingUnusedMemory + spaceFreedByEviction
-    } else {
+    else
       spaceFreedByReleasingUnusedMemory
-    }
-  }
-}

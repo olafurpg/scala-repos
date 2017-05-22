@@ -1,19 +1,17 @@
 // Tests to show that various `collect` functions avoid calling
 // both `PartialFunction#isDefinedAt` and `PartialFunction#apply`.
 //
-object Test {
+object Test
   def f(i: Int) = { println("f(" + i + ")"); true }
-  class Counter {
+  class Counter
     var count = 0
     def apply(i: Int) = synchronized { count += 1; true }
-  }
 
-  def testing(label: String)(body: => Any) {
+  def testing(label: String)(body: => Any)
     println(s"\n=$label=")
     println(body)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     testing("List.collect")(
         List(1, 2) collect { case x if f(x) && x < 2 => x })
     testing("List.collectFirst")(
@@ -28,19 +26,17 @@ object Test {
     import collection.parallel.ParIterable
     import collection.parallel.immutable.ParVector
     import collection.parallel.mutable.ParArray
-    testing("ParVector.collect") {
+    testing("ParVector.collect")
       val counter = new Counter()
       (ParVector(1, 2) collect { case x if counter(x) && x < 2 => x },
        counter.synchronized(counter.count))
-    }
 
-    testing("ParArray.collect") {
+    testing("ParArray.collect")
       val counter = new Counter()
       (ParArray(1, 2) collect { case x if counter(x) && x < 2 => x },
        counter.synchronized(counter.count))
-    }
 
-    object PendingTests {
+    object PendingTests
       testing("Iterator.collect")(
           (Iterator(1, 2) collect { case x if f(x) && x < 2 => x }).toList)
 
@@ -54,15 +50,11 @@ object Test {
       //   case Some(x) => p success x
       //   case None    => fail(v)
       // }
-      testing("Future.collect") {
+      testing("Future.collect")
         import concurrent.ExecutionContext.Implicits.global
         import concurrent.Await
         import concurrent.duration.Duration
         val result = concurrent.Future(1) collect { case x if f(x) => x }
         Await.result(result, Duration.Inf)
-      }
 
       // TODO Future.{onSuccess, onFailure, recoverWith, andThen}
-    }
-  }
-}

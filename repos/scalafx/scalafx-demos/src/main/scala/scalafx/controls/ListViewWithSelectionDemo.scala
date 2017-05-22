@@ -35,11 +35,10 @@ import scalafx.scene.Scene
 import scalafx.scene.control.ListView
 
 /** Illustrates simple monitoring of selection in a ListView using `onChange`. */
-object ListViewWithSelectionDemo extends JFXApp {
+object ListViewWithSelectionDemo extends JFXApp
 
-  case class Person(firstName: String, lastName: String) {
+  case class Person(firstName: String, lastName: String)
     override def toString = firstName + " " + lastName
-  }
 
   val characters = ObservableBuffer[Person](
       Person("Bungalow ", "Bill"),
@@ -49,15 +48,10 @@ object ListViewWithSelectionDemo extends JFXApp {
       Person("Peggy", "Sue")
   )
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "ListView with Selection Demo"
-    scene = new Scene {
-      content = new ListView[Person] {
+    scene = new Scene
+      content = new ListView[Person]
         items = characters
-        selectionModel().selectedItem.onChange { (_, _, newValue) =>
+        selectionModel().selectedItem.onChange  (_, _, newValue) =>
           println("Selection Changed: " + newValue)
-        }
-      }
-    }
-  }
-}

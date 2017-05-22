@@ -11,7 +11,7 @@ import com.twitter.finagle.util._
 import com.twitter.util._
 import java.net.SocketAddress
 
-object DefaultClient {
+object DefaultClient
   private def defaultFailureAccrual(
       sr: StatsReceiver,
       responseClassifier: ResponseClassifier
@@ -25,7 +25,6 @@ object DefaultClient {
 
   /** marker trait for uninitialized failure accrual */
   private[finagle] trait UninitializedFailureAccrual
-}
 
 /**
   * A default client implementation that does load balancing and
@@ -67,9 +66,9 @@ case class DefaultClient[Req, Rep](
     requestTimeout: Duration = Duration.Top,
     failFast: Boolean = true,
     failureAccrual: Transformer[Req, Rep] = new DefaultClient.UninitializedFailureAccrual
-      with Transformer[Req, Rep] {
+      with Transformer[Req, Rep]
       def apply(f: ServiceFactory[Req, Rep]) = f
-    },
+    ,
     serviceTimeout: Duration = Duration.Top,
     timer: Timer = DefaultTimer.twitter,
     statsReceiver: StatsReceiver = ClientStatsReceiver,
@@ -81,21 +80,18 @@ case class DefaultClient[Req, Rep](
     newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] = TraceInitializerFilter
         .clientModule[Req, Rep]
 )
-    extends Client[Req, Rep] { outer =>
+    extends Client[Req, Rep]  outer =>
 
-  private[this] def transform(stack: Stack[ServiceFactory[Req, Rep]]) = {
-    val failureAccrualTransform: Transformer[Req, Rep] = failureAccrual match {
+  private[this] def transform(stack: Stack[ServiceFactory[Req, Rep]]) =
+    val failureAccrualTransform: Transformer[Req, Rep] = failureAccrual match
       case _: DefaultClient.UninitializedFailureAccrual =>
         factory: ServiceFactory[Req, Rep] =>
-          {
             val classifier =
               params[param.ResponseClassifier].responseClassifier
             DefaultClient
               .defaultFailureAccrual(statsReceiver, classifier)
               .andThen(factory)
-          }
         case _ => failureAccrual
-    }
 
     val stk = stack
       .replace(FailureAccrualFactory.role, failureAccrualTransform)
@@ -103,7 +99,6 @@ case class DefaultClient[Req, Rep](
       .replace(TraceInitializerFilter.role, newTraceInitializer)
 
     if (!failFast) stk.remove(FailFastFactory.role) else stk
-  }
 
   private[this] val clientStack = transform(StackClient.newStack[Req, Rep])
   private[this] val endpointStack = transform(
@@ -121,7 +116,7 @@ case class DefaultClient[Req, Rep](
   private[this] case class Client(
       stack: Stack[ServiceFactory[Req, Rep]] = clientStack,
       params: Stack.Params = params)
-      extends StdStackClient[Req, Rep, Client] {
+      extends StdStackClient[Req, Rep, Client]
 
     protected def copy1(stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
                         params: Stack.Params = this.params) =
@@ -138,18 +133,15 @@ case class DefaultClient[Req, Rep](
 
     override protected val endpointer: Stackable[ServiceFactory[Req, Rep]] =
       new Stack.Module2[
-          Transporter.EndpointAddr, param.Stats, ServiceFactory[Req, Rep]] {
+          Transporter.EndpointAddr, param.Stats, ServiceFactory[Req, Rep]]
         val role = com.twitter.finagle.stack.Endpoint
         val description = "Send requests over the wire"
         def make(_addr: Transporter.EndpointAddr,
                  _stats: param.Stats,
-                 next: ServiceFactory[Req, Rep]) = {
+                 next: ServiceFactory[Req, Rep]) =
           val Transporter.EndpointAddr(addr) = _addr
           val param.Stats(sr) = _stats
           outer.endpointer(addr, sr)
-        }
-      }
-  }
 
   private[this] val underlying = Client()
 
@@ -163,11 +155,6 @@ case class DefaultClient[Req, Rep](
   // have been private[finagle] to begin with.
   val newStack: Name => ServiceFactory[Req, Rep] = newClient(_, name)
   val newStack0: Var[Addr] => ServiceFactory[Req, Rep] = va =>
-    {
       clientStack.make(params + LoadBalancerFactory.Dest(va))
-  }
   val bindStack: Address => ServiceFactory[Req, Rep] = addr =>
-    {
       endpointStack.make(params + Transporter.EndpointAddr(addr))
-  }
-}

@@ -19,7 +19,7 @@ package akka
 import akka.shapeless._
 import java.nio.charset.Charset
 
-package object parboiled2 {
+package object parboiled2
 
   type Rule0 = RuleN[HNil]
   type Rule1[+T] = RuleN[T :: HNil]
@@ -33,4 +33,3 @@ package object parboiled2 {
   val `ISO-8859-1` = Charset.forName("ISO-8859-1")
 
   val EmptyArray = Array.empty[Any]
-}

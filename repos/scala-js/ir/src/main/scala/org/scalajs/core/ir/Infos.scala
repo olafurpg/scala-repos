@@ -14,7 +14,7 @@ import Definitions._
 import Trees._
 import Types._
 
-object Infos {
+object Infos
 
   final class ClassInfo private (
       val encodedName: String,
@@ -25,17 +25,15 @@ object Infos {
       val methods: List[MethodInfo]
   )
 
-  object ClassInfo {
+  object ClassInfo
     def apply(encodedName: String,
               isExported: Boolean = false,
               kind: ClassKind = ClassKind.Class,
               superClass: Option[String] = None,
               interfaces: List[String] = Nil,
-              methods: List[MethodInfo] = Nil): ClassInfo = {
+              methods: List[MethodInfo] = Nil): ClassInfo =
       new ClassInfo(
           encodedName, isExported, kind, superClass, interfaces, methods)
-    }
-  }
 
   final class MethodInfo private (
       val encodedName: String,
@@ -54,7 +52,7 @@ object Infos {
       val accessedClassData: List[String]
   )
 
-  object MethodInfo {
+  object MethodInfo
     def apply(encodedName: String,
               isStatic: Boolean = false,
               isAbstract: Boolean = false,
@@ -65,7 +63,7 @@ object Infos {
               instantiatedClasses: List[String] = Nil,
               accessedModules: List[String] = Nil,
               usedInstanceTests: List[String] = Nil,
-              accessedClassData: List[String] = Nil): MethodInfo = {
+              accessedClassData: List[String] = Nil): MethodInfo =
       new MethodInfo(encodedName,
                      isStatic,
                      isAbstract,
@@ -77,10 +75,8 @@ object Infos {
                      accessedModules,
                      usedInstanceTests,
                      accessedClassData)
-    }
-  }
 
-  final class ClassInfoBuilder {
+  final class ClassInfoBuilder
     private var encodedName: String = ""
     private var kind: ClassKind = ClassKind.Class
     private var isExported: Boolean = false
@@ -88,52 +84,43 @@ object Infos {
     private val interfaces = mutable.ListBuffer.empty[String]
     private val methods = mutable.ListBuffer.empty[MethodInfo]
 
-    def setEncodedName(encodedName: String): this.type = {
+    def setEncodedName(encodedName: String): this.type =
       this.encodedName = encodedName
       this
-    }
 
-    def setKind(kind: ClassKind): this.type = {
+    def setKind(kind: ClassKind): this.type =
       this.kind = kind
       this
-    }
 
-    def setIsExported(isExported: Boolean): this.type = {
+    def setIsExported(isExported: Boolean): this.type =
       this.isExported = isExported
       this
-    }
 
-    def setSuperClass(superClass: Option[String]): this.type = {
+    def setSuperClass(superClass: Option[String]): this.type =
       this.superClass = superClass
       this
-    }
 
-    def addInterface(interface: String): this.type = {
+    def addInterface(interface: String): this.type =
       interfaces += interface
       this
-    }
 
-    def addInterfaces(interfaces: TraversableOnce[String]): this.type = {
+    def addInterfaces(interfaces: TraversableOnce[String]): this.type =
       this.interfaces ++= interfaces
       this
-    }
 
-    def addMethod(methodInfo: MethodInfo): this.type = {
+    def addMethod(methodInfo: MethodInfo): this.type =
       methods += methodInfo
       this
-    }
 
-    def result(): ClassInfo = {
+    def result(): ClassInfo =
       ClassInfo(encodedName,
                 isExported,
                 kind,
                 superClass,
                 interfaces.toList,
                 methods.toList)
-    }
-  }
 
-  final class MethodInfoBuilder {
+  final class MethodInfoBuilder
     private var encodedName: String = ""
     private var isStatic: Boolean = false
     private var isAbstract: Boolean = false
@@ -149,28 +136,24 @@ object Infos {
     private val usedInstanceTests = mutable.Set.empty[String]
     private val accessedClassData = mutable.Set.empty[String]
 
-    def setEncodedName(encodedName: String): this.type = {
+    def setEncodedName(encodedName: String): this.type =
       this.encodedName = encodedName
       this
-    }
 
-    def setIsStatic(isStatic: Boolean): this.type = {
+    def setIsStatic(isStatic: Boolean): this.type =
       this.isStatic = isStatic
       this
-    }
 
-    def setIsAbstract(isAbstract: Boolean): this.type = {
+    def setIsAbstract(isAbstract: Boolean): this.type =
       this.isAbstract = isAbstract
       this
-    }
 
-    def setIsExported(isExported: Boolean): this.type = {
+    def setIsExported(isExported: Boolean): this.type =
       this.isExported = isExported
       this
-    }
 
-    def addMethodCalled(receiverTpe: Type, method: String): this.type = {
-      receiverTpe match {
+    def addMethodCalled(receiverTpe: Type, method: String): this.type =
+      receiverTpe match
         case ClassType(cls) => addMethodCalled(cls, method)
         case AnyType => addMethodCalled(ObjectClass, method)
         case UndefType => addMethodCalled(BoxedUnitClass, method)
@@ -188,61 +171,51 @@ object Infos {
         case NoType | RecordType(_) =>
           throw new IllegalArgumentException(
               s"Illegal receiver type: $receiverTpe")
-      }
 
       this
-    }
 
-    def addMethodCalled(cls: String, method: String): this.type = {
+    def addMethodCalled(cls: String, method: String): this.type =
       methodsCalled.getOrElseUpdate(cls, mutable.Set.empty) += method
       this
-    }
 
-    def addMethodCalledStatically(cls: String, method: String): this.type = {
+    def addMethodCalledStatically(cls: String, method: String): this.type =
       methodsCalledStatically.getOrElseUpdate(cls, mutable.Set.empty) += method
       this
-    }
 
-    def addStaticMethodCalled(cls: String, method: String): this.type = {
+    def addStaticMethodCalled(cls: String, method: String): this.type =
       staticMethodsCalled.getOrElseUpdate(cls, mutable.Set.empty) += method
       this
-    }
 
-    def addInstantiatedClass(cls: String): this.type = {
+    def addInstantiatedClass(cls: String): this.type =
       instantiatedClasses += cls
       this
-    }
 
     def addInstantiatedClass(cls: String, ctor: String): this.type =
       addInstantiatedClass(cls).addMethodCalledStatically(cls, ctor)
 
-    def addAccessedModule(cls: String): this.type = {
+    def addAccessedModule(cls: String): this.type =
       accessedModules += cls
       this
-    }
 
     def addUsedInstanceTest(tpe: ReferenceType): this.type =
       addUsedInstanceTest(baseNameOf(tpe))
 
-    def addUsedInstanceTest(cls: String): this.type = {
+    def addUsedInstanceTest(cls: String): this.type =
       usedInstanceTests += cls
       this
-    }
 
     def addAccessedClassData(tpe: ReferenceType): this.type =
       addAccessedClassData(baseNameOf(tpe))
 
-    def addAccessedClassData(cls: String): this.type = {
+    def addAccessedClassData(cls: String): this.type =
       accessedClassData += cls
       this
-    }
 
-    private def baseNameOf(tpe: ReferenceType): String = tpe match {
+    private def baseNameOf(tpe: ReferenceType): String = tpe match
       case ClassType(name) => name
       case ArrayType(base, _) => base
-    }
 
-    def result(): MethodInfo = {
+    def result(): MethodInfo =
       MethodInfo(
           encodedName = encodedName,
           isStatic = isStatic,
@@ -257,11 +230,9 @@ object Infos {
           usedInstanceTests = usedInstanceTests.toList,
           accessedClassData = accessedClassData.toList
       )
-    }
-  }
 
   /** Generates the [[ClassInfo]] of a [[Trees.ClassDef]]. */
-  def generateClassInfo(classDef: ClassDef): ClassInfo = {
+  def generateClassInfo(classDef: ClassDef): ClassInfo =
     val builder = new ClassInfoBuilder()
       .setEncodedName(classDef.name.name)
       .setKind(classDef.kind)
@@ -270,7 +241,7 @@ object Infos {
 
     var exportedConstructors: List[ConstructorExportDef] = Nil
 
-    classDef.defs foreach {
+    classDef.defs foreach
       case methodDef: MethodDef =>
         builder.addMethod(generateMethodInfo(methodDef))
       case propertyDef: PropertyDef =>
@@ -281,13 +252,11 @@ object Infos {
       case _: JSClassExportDef | _: ModuleExportDef =>
         builder.setIsExported(true)
       case _ =>
-    }
 
     if (exportedConstructors.nonEmpty)
       builder.addMethod(generateExportedConstructorsInfo(exportedConstructors))
 
     builder.result()
-  }
 
   /** Generates the [[MethodInfo]] of a [[Trees.MethodDef]]. */
   def generateMethodInfo(methodDef: MethodDef): MethodInfo =
@@ -299,14 +268,13 @@ object Infos {
 
   /** Generates the [[MethodInfo]] of a list of [[Trees.ConstructorExportDef]]s. */
   def generateExportedConstructorsInfo(
-      constructorDefs: List[ConstructorExportDef]): MethodInfo = {
+      constructorDefs: List[ConstructorExportDef]): MethodInfo =
     new GenInfoTraverser().generateExportedConstructorsInfo(constructorDefs)
-  }
 
-  private final class GenInfoTraverser extends Traversers.Traverser {
+  private final class GenInfoTraverser extends Traversers.Traverser
     private val builder = new MethodInfoBuilder
 
-    def generateMethodInfo(methodDef: MethodDef): MethodInfo = {
+    def generateMethodInfo(methodDef: MethodDef): MethodInfo =
       builder
         .setEncodedName(methodDef.name.name)
         .setIsStatic(methodDef.static)
@@ -317,9 +285,8 @@ object Infos {
       traverse(methodDef.body)
 
       builder.result()
-    }
 
-    def generatePropertyInfo(propertyDef: PropertyDef): MethodInfo = {
+    def generatePropertyInfo(propertyDef: PropertyDef): MethodInfo =
       builder.setEncodedName(propertyDef.name.name).setIsExported(true)
 
       // Any of getterBody and setterBody can be EmptyTree, but that's fine
@@ -327,19 +294,17 @@ object Infos {
       traverse(propertyDef.setterBody)
 
       builder.result()
-    }
 
     def generateExportedConstructorsInfo(
-        constructorDefs: List[ConstructorExportDef]): MethodInfo = {
+        constructorDefs: List[ConstructorExportDef]): MethodInfo =
       builder.setEncodedName(ExportedConstructorsName).setIsExported(true)
 
       for (constructorDef <- constructorDefs) traverse(constructorDef.body)
 
       builder.result()
-    }
 
-    override def traverse(tree: Tree): Unit = {
-      tree match {
+    override def traverse(tree: Tree): Unit =
+      tree match
         case New(ClassType(cls), ctor, _) =>
           builder.addInstantiatedClass(cls, ctor.name)
 
@@ -372,9 +337,5 @@ object Infos {
           builder.addAccessedModule(cls)
 
         case _ =>
-      }
 
       super.traverse(tree)
-    }
-  }
-}

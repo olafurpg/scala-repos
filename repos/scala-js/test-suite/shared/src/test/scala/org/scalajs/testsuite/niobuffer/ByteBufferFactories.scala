@@ -2,27 +2,24 @@ package org.scalajs.testsuite.niobuffer
 
 import java.nio._
 
-object ByteBufferFactories {
+object ByteBufferFactories
   import BufferFactory._
 
-  class AllocByteBufferFactory extends ByteBufferFactory {
+  class AllocByteBufferFactory extends ByteBufferFactory
     def allocBuffer(capacity: Int): ByteBuffer =
       ByteBuffer.allocate(capacity)
-  }
 
   class WrappedByteBufferFactory
-      extends ByteBufferFactory with WrappedBufferFactory {
+      extends ByteBufferFactory with WrappedBufferFactory
     def baseWrap(array: Array[Byte]): ByteBuffer =
       ByteBuffer.wrap(array)
 
     def baseWrap(array: Array[Byte], offset: Int, length: Int): ByteBuffer =
       ByteBuffer.wrap(array, offset, length)
-  }
 
-  class AllocDirectByteBufferFactory extends ByteBufferFactory {
+  class AllocDirectByteBufferFactory extends ByteBufferFactory
     def allocBuffer(capacity: Int): ByteBuffer =
       ByteBuffer.allocateDirect(capacity)
-  }
 
   class ReadOnlyWrappedByteBufferFactory
       extends WrappedByteBufferFactory with ReadOnlyBufferFactory
@@ -32,4 +29,3 @@ object ByteBufferFactories {
 
   class SlicedAllocDirectByteBufferFactory
       extends AllocDirectByteBufferFactory with SlicedBufferFactory
-}

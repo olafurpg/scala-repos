@@ -9,7 +9,7 @@ import scala.tools.asm.tree._
 import scala.tools.asm.tree.analysis.{Frame, Value}
 import opt.BytecodeUtils._
 
-object InstructionStackEffect {
+object InstructionStackEffect
   val consShift = 3
   val prodMask = (1 << consShift) - 1
 
@@ -43,11 +43,10 @@ object InstructionStackEffect {
     * If a precise result is needed, invoke the `forAsmAnalysis` and provide a `frame` value that
     * allows looking up the sizes of values on the stack.
     */
-  def maxStackGrowth(insn: AbstractInsnNode): Int = {
+  def maxStackGrowth(insn: AbstractInsnNode): Int =
     val prodCons = computeConsProd(
         insn, forClassfile = false, conservative = true)
     prod(prodCons) - cons(prodCons)
-  }
 
   /**
     * Returns the number of stack values consumed and produced by `insn`, encoded in a single `Int`
@@ -59,36 +58,33 @@ object InstructionStackEffect {
 
   private def invokeConsProd(methodDesc: String,
                              insn: AbstractInsnNode,
-                             forClassfile: Boolean): Int = {
+                             forClassfile: Boolean): Int =
     val consumesReceiver =
       insn.getOpcode != INVOKESTATIC && insn.getOpcode != INVOKEDYNAMIC
-    if (forClassfile) {
+    if (forClassfile)
       val sizes = Type.getArgumentsAndReturnSizes(methodDesc)
       val cons = (sizes >> 2) - (if (consumesReceiver) 0 else 1)
       val prod = sizes & 0x03
       t(cons, prod)
-    } else {
+    else
       val cons =
         Type.getArgumentTypes(methodDesc).length +
         (if (consumesReceiver) 1 else 0)
       val prod = if (Type.getReturnType(methodDesc) == Type.VOID_TYPE) 0 else 1
       t(cons, prod)
-    }
-  }
 
-  private def fieldInsnIsLongOrDouble(insn: AbstractInsnNode) = {
+  private def fieldInsnIsLongOrDouble(insn: AbstractInsnNode) =
     val d = insn.asInstanceOf[FieldInsnNode].desc
     d == "J" || d == "D"
-  }
 
   private def computeConsProd[V <: Value](insn: AbstractInsnNode,
                                           forClassfile: Boolean,
                                           conservative: Boolean,
-                                          frame: Frame[V] = null): Int = {
+                                          frame: Frame[V] = null): Int =
     // not used if `forClassfile || conservative`: in these cases, `frame` is allowed to be `null`
     def peekStack(n: Int): V = frame.peekStack(n)
 
-    (insn.getOpcode: @switch) match {
+    (insn.getOpcode: @switch) match
       // The order of opcodes is the same as in Frame.execute.
       case NOP => t(0, 0)
 
@@ -99,10 +95,10 @@ object InstructionStackEffect {
 
       case LDC =>
         if (forClassfile)
-          insn.asInstanceOf[LdcInsnNode].cst match {
+          insn.asInstanceOf[LdcInsnNode].cst match
             case _: java.lang.Long | _: java.lang.Double => t(0, 2)
             case _ => t(0, 1)
-          } else t(0, 1)
+          else t(0, 1)
 
       case LCONST_0 | LCONST_1 | DCONST_0 | DCONST_1 | LLOAD | DLOAD =>
         if (forClassfile) t(0, 2) else t(0, 1)
@@ -124,10 +120,9 @@ object InstructionStackEffect {
       case POP2 =>
         if (forClassfile) t(2, 0)
         else if (conservative) t(1, 0)
-        else {
+        else
           val isSize2 = peekStack(0).getSize == 2
           if (isSize2) t(1, 0) else t(2, 0)
-        }
 
       case DUP => t(1, 2)
 
@@ -135,37 +130,32 @@ object InstructionStackEffect {
 
       case DUP_X2 =>
         if (forClassfile || conservative) t(3, 4)
-        else {
+        else
           val isSize2 = peekStack(1).getSize == 2
           if (isSize2) t(2, 3) else t(3, 4)
-        }
 
       case DUP2 =>
         if (forClassfile || conservative) t(2, 4)
-        else {
+        else
           val isSize2 = peekStack(0).getSize == 2
           if (isSize2) t(1, 2) else t(2, 4)
-        }
 
       case DUP2_X1 =>
         if (forClassfile || conservative) t(3, 5)
-        else {
+        else
           val isSize2 = peekStack(0).getSize == 2
           if (isSize2) t(2, 3) else t(3, 5)
-        }
 
       case DUP2_X2 =>
         if (forClassfile || conservative) t(4, 6)
-        else {
+        else
           val v1isSize2 = peekStack(0).getSize == 2
-          if (v1isSize2) {
+          if (v1isSize2)
             val v2isSize2 = peekStack(1).getSize == 2
             if (v2isSize2) t(2, 3) else t(3, 4)
-          } else {
+          else
             val v3isSize2 = peekStack(2).getSize == 2
             if (v3isSize2) t(3, 5) else t(4, 6)
-          }
-        }
 
       case SWAP => t(2, 2)
 
@@ -261,6 +251,3 @@ object InstructionStackEffect {
         t(insn.asInstanceOf[MultiANewArrayInsnNode].dims, 1)
 
       case IFNULL | IFNONNULL => t(1, 0)
-    }
-  }
-}

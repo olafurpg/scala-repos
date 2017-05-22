@@ -3,12 +3,11 @@ package syntax
 
 import cats.data.Coproduct
 
-trait CoproductSyntax {
+trait CoproductSyntax
   implicit def coproductSyntax[F[_], A](a: F[A]): CoproductOps[F, A] =
     new CoproductOps(a)
-}
 
-final class CoproductOps[F[_], A](val fa: F[A]) extends AnyVal {
+final class CoproductOps[F[_], A](val fa: F[A]) extends AnyVal
 
   /**
     * Lift an `F[A]` into a `Coproduct[F, G, A]` for any type constructor `G[_]`.
@@ -41,4 +40,3 @@ final class CoproductOps[F[_], A](val fa: F[A]) extends AnyVal {
     * }}}
     */
   def rightc[G[_]]: Coproduct[G, F, A] = Coproduct.rightc(fa)
-}

@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Foldable` */
 final class FoldableOps[F[_], A] private[syntax](
     val self: F[A])(implicit val F: Foldable[F])
-    extends Ops[F[A]] {
+    extends Ops[F[A]]
   ////
   import collection.generic.CanBuildFrom
   import Leibniz.===
@@ -103,24 +103,21 @@ final class FoldableOps[F[_], A] private[syntax](
   final def msuml[G[_], B](implicit ev: A === G[B], G: PlusEmpty[G]): G[B] =
     F.msuml(ev.subst[F](self))
   ////
-}
 
-sealed trait ToFoldableOps0 {
+sealed trait ToFoldableOps0
   implicit def ToFoldableOpsUnapply[FA](v: FA)(
       implicit F0: Unapply[Foldable, FA]) =
     new FoldableOps[F0.M, F0.A](F0(v))(F0.TC)
-}
 
-trait ToFoldableOps extends ToFoldableOps0 {
+trait ToFoldableOps extends ToFoldableOps0
   implicit def ToFoldableOps[F[_], A](v: F[A])(implicit F0: Foldable[F]) =
     new FoldableOps[F, A](v)
 
   ////
 
   ////
-}
 
-trait FoldableSyntax[F[_]] {
+trait FoldableSyntax[F[_]]
   implicit def ToFoldableOps[A](v: F[A]): FoldableOps[F, A] =
     new FoldableOps[F, A](v)(FoldableSyntax.this.F)
 
@@ -128,4 +125,3 @@ trait FoldableSyntax[F[_]] {
   ////
 
   ////
-}

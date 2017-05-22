@@ -1,4 +1,4 @@
-class Foo[@specialized(Int) T](_x: T) {
+class Foo[@specialized(Int) T](_x: T)
   val x = _x
   def bar {}
 
@@ -9,26 +9,21 @@ class Foo[@specialized(Int) T](_x: T) {
   def baz {}
   val z = y
   println(z)
-}
 
-class Bar[@specialized(Int) T] {
+class Bar[@specialized(Int) T]
   def foo(x: T) = print(x)
-}
 
-object Global {
+object Global
   var msg = "ok"
-}
 
-class TouchGlobal[@specialized(Int) T](_x: T) {
+class TouchGlobal[@specialized(Int) T](_x: T)
   println(Global.msg)
-  val x = {
+  val x =
     Global.msg = "not ok"
     _x
-  }
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     (new Foo("abc"))
     println("shouldn't see two initialized values and one uninitialized")
     (new Foo(42))
@@ -38,5 +33,3 @@ object Test {
     (new TouchGlobal(42))
 
     println(runtime.BoxesRunTime.integerBoxCount)
-  }
-}

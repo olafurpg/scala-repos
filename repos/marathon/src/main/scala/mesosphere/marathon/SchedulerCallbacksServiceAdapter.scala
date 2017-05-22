@@ -7,9 +7,7 @@ import com.google.inject.Inject
   */
 class SchedulerCallbacksServiceAdapter @Inject()(
     schedulerService: MarathonSchedulerService)
-    extends SchedulerCallbacks {
-  override def disconnected(): Unit = {
+    extends SchedulerCallbacks
+  override def disconnected(): Unit =
     // Abdicate leadership when we become disconnected from the Mesos master.
     schedulerService.abdicateLeadership()
-  }
-}

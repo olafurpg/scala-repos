@@ -15,21 +15,20 @@ import akka.testkit.AkkaSpec
 import akka.util.ByteString
 import scala.concurrent.duration._
 
-class PrepareRequestsSpec extends AkkaSpec {
+class PrepareRequestsSpec extends AkkaSpec
 
   val chunkedStart = ParserOutput.RequestStart(
       HttpMethods.GET,
       Uri("http://example.com/"),
       HttpProtocols.`HTTP/1.1`,
       List(),
-      StreamedEntityCreator[ParserOutput, RequestEntity] { entityChunks ⇒
-        val chunks = entityChunks.collect {
+      StreamedEntityCreator[ParserOutput, RequestEntity]  entityChunks ⇒
+        val chunks = entityChunks.collect
           case EntityChunk(chunk) ⇒ chunk
           case EntityStreamError(info) ⇒ throw EntityStreamException(info)
-        }
         HttpEntity.Chunked(ContentTypes.`application/octet-stream`,
                            HttpEntity.limitableChunkSource(chunks))
-      },
+      ,
       expect100Continue = true,
       closeRequested = false)
 
@@ -48,9 +47,9 @@ class PrepareRequestsSpec extends AkkaSpec {
       true,
       false)
 
-  "The PrepareRequest stage" should {
+  "The PrepareRequest stage" should
 
-    "not fail when there is demand from both streamed entity consumption and regular flow" in {
+    "not fail when there is demand from both streamed entity consumption and regular flow" in
       implicit val materializer = ActorMaterializer()
       // covers bug #19623 where a reply before the streamed
       // body has been consumed causes pull/push twice
@@ -110,9 +109,8 @@ class PrepareRequestsSpec extends AkkaSpec {
       inSub.sendNext(strictRequest)
 
       upstreamProbe.expectNext()
-    }
 
-    "not complete running entity stream when upstream cancels" in {
+    "not complete running entity stream when upstream cancels" in
       implicit val materializer = ActorMaterializer()
 
       val inProbe = TestPublisher.manualProbe[ParserOutput.RequestOutput]()
@@ -161,9 +159,8 @@ class PrepareRequestsSpec extends AkkaSpec {
 
       // and then when entity is complete, the stage should complete
       entityProbe.expectComplete()
-    }
 
-    "complete stage if chunked stream is completed without reaching end of chunks" in {
+    "complete stage if chunked stream is completed without reaching end of chunks" in
       // a bit unsure about this, but to document the assumption
       implicit val materializer = ActorMaterializer()
 
@@ -204,9 +201,8 @@ class PrepareRequestsSpec extends AkkaSpec {
       // assumption: should cause stage to complete
       entityProbe.expectComplete()
       upstreamProbe.expectComplete()
-    }
 
-    "cancel the stage when the entity stream is canceled" in {
+    "cancel the stage when the entity stream is canceled" in
       implicit val materializer = ActorMaterializer()
 
       val inProbe = TestPublisher.manualProbe[ParserOutput.RequestOutput]()
@@ -244,6 +240,3 @@ class PrepareRequestsSpec extends AkkaSpec {
       entitySub.cancel()
 
       inSub.expectCancellation()
-    }
-  }
-}

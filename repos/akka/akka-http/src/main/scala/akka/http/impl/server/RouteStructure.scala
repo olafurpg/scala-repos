@@ -19,23 +19,21 @@ import akka.http.javadsl.server._
 /**
   * INTERNAL API
   */
-private[http] object RouteStructure {
-  trait DirectiveRoute extends Route {
+private[http] object RouteStructure
+  trait DirectiveRoute extends Route
     def innerRoute: Route
     def moreInnerRoutes: immutable.Seq[Route]
 
     def children: immutable.Seq[Route] = innerRoute +: moreInnerRoutes
 
     require(children.nonEmpty)
-  }
   case class RouteAlternatives()(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
       extends DirectiveRoute
   case class MethodFilter(method: HttpMethod)(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
-      extends DirectiveRoute {
+      extends DirectiveRoute
     def filter(ctx: RequestContext): Boolean = ctx.request.method == method
-  }
 
   abstract case class FileAndResourceRouteWithDefaultResolver(
       routeConstructor: ContentTypeResolver ⇒ Route)
@@ -51,11 +49,10 @@ private[http] object RouteStructure {
   case class GetFromDirectory(
       directory: File, browseable: Boolean, resolver: ContentTypeResolver)
       extends Route
-  case class Redirect(uri: Uri, redirectionType: StatusCode) extends Route {
+  case class Redirect(uri: Uri, redirectionType: StatusCode) extends Route
     require(
         redirectionType.isRedirection,
         s"`redirectionType` must be a redirection status code but was $redirectionType")
-  }
 
   case class PathSuffix(pathElements: immutable.Seq[PathMatcher[_]])(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
@@ -71,18 +68,16 @@ private[http] object RouteStructure {
       extends DirectiveRoute
   case class RedirectToTrailingSlashIfMissing(redirectionType: StatusCode)(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
-      extends DirectiveRoute {
+      extends DirectiveRoute
     require(
         redirectionType.isRedirection,
         s"`redirectionType` must be a redirection status code but was $redirectionType")
-  }
   case class RedirectToNoTrailingSlashIfPresent(redirectionType: StatusCode)(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
-      extends DirectiveRoute {
+      extends DirectiveRoute
     require(
         redirectionType.isRedirection,
         s"`redirectionType` must be a redirection status code but was $redirectionType")
-  }
   case class Extract(extractions: Seq[StandaloneExtractionImpl[_]])(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
       extends DirectiveRoute
@@ -102,21 +97,18 @@ private[http] object RouteStructure {
   case class Conditional(entityTag: Option[EntityTag] = None,
                          lastModified: Option[DateTime] = None)(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
-      extends DirectiveRoute {
+      extends DirectiveRoute
     require(entityTag.isDefined || lastModified.isDefined)
-  }
 
   abstract class DynamicDirectiveRoute1[T1](val value1: RequestVal[T1])(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
-      extends Route {
+      extends Route
     def createDirective(t1: T1): Directive
-  }
   abstract class DynamicDirectiveRoute2[T1, T2](
       val value1: RequestVal[T1], val value2: RequestVal[T2])(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
-      extends Route {
+      extends Route
     def createDirective(t1: T1, t2: T2): Directive
-  }
   case class Validated(isValid: Boolean, errorMsg: String)(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
       extends DirectiveRoute
@@ -128,14 +120,12 @@ private[http] object RouteStructure {
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
       extends DirectiveRoute
 
-  sealed abstract class HostFilter extends DirectiveRoute {
+  sealed abstract class HostFilter extends DirectiveRoute
     def filter(hostName: String): Boolean
-  }
   case class HostNameFilter(hostWhiteList: immutable.Seq[String])(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
-      extends HostFilter {
+      extends HostFilter
     def filter(hostName: String): Boolean = hostWhiteList.contains(hostName)
-  }
   abstract class GenericHostFilter(
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
       extends HostFilter
@@ -158,7 +148,5 @@ private[http] object RouteStructure {
       val innerRoute: Route, val moreInnerRoutes: immutable.Seq[Route])
       extends DirectiveRoute
 
-  abstract class OpaqueRoute(extractions: RequestVal[_]*) extends Route {
+  abstract class OpaqueRoute(extractions: RequestVal[_]*) extends Route
     def handle(ctx: RequestContext): RouteResult
-  }
-}

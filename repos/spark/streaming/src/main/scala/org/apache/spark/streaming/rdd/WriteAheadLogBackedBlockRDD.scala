@@ -78,7 +78,7 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T : ClassTag](
     @transient private val isBlockIdValid: Array[Boolean] = Array.empty,
     storeInBlockManager: Boolean = false,
     storageLevel: StorageLevel = StorageLevel.MEMORY_ONLY_SER)
-    extends BlockRDD[T](sc, _blockIds) {
+    extends BlockRDD[T](sc, _blockIds)
 
   require(
       _blockIds.length == walRecordHandles.length,
@@ -97,35 +97,32 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T : ClassTag](
 
   override def isValid(): Boolean = true
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     assertValid()
-    Array.tabulate(_blockIds.length) { i =>
+    Array.tabulate(_blockIds.length)  i =>
       val isValid = if (isBlockIdValid.length == 0) true else isBlockIdValid(i)
       new WriteAheadLogBackedBlockRDDPartition(
           i, _blockIds(i), isValid, walRecordHandles(i))
-    }
-  }
 
   /**
     * Gets the partition data by getting the corresponding block from the block manager.
     * If the block does not exist, then the data is read from the corresponding record
     * in write ahead log files.
     */
-  override def compute(split: Partition, context: TaskContext): Iterator[T] = {
+  override def compute(split: Partition, context: TaskContext): Iterator[T] =
     assertValid()
     val hadoopConf = broadcastedHadoopConf.value
     val blockManager = SparkEnv.get.blockManager
     val partition = split.asInstanceOf[WriteAheadLogBackedBlockRDDPartition]
     val blockId = partition.blockId
 
-    def getBlockFromBlockManager(): Option[Iterator[T]] = {
+    def getBlockFromBlockManager(): Option[Iterator[T]] =
       blockManager.get(blockId).map(_.data.asInstanceOf[Iterator[T]])
-    }
 
-    def getBlockFromWriteAheadLog(): Iterator[T] = {
+    def getBlockFromWriteAheadLog(): Iterator[T] =
       var dataRead: ByteBuffer = null
       var writeAheadLog: WriteAheadLog = null
-      try {
+      try
         // The WriteAheadLogUtils.createLog*** method needs a directory to create a
         // WriteAheadLog object as the default FileBasedWriteAheadLog needs a directory for
         // writing log data. However, the directory is not needed if data needs to be read, hence
@@ -140,72 +137,59 @@ private[streaming] class WriteAheadLogBackedBlockRDD[T : ClassTag](
         writeAheadLog = WriteAheadLogUtils.createLogForReceiver(
             SparkEnv.get.conf, nonExistentDirectory, hadoopConf)
         dataRead = writeAheadLog.read(partition.walRecordHandle)
-      } catch {
+      catch
         case NonFatal(e) =>
           throw new SparkException(
               s"Could not read data from write ahead log record ${partition.walRecordHandle}",
               e)
-      } finally {
-        if (writeAheadLog != null) {
+      finally
+        if (writeAheadLog != null)
           writeAheadLog.close()
           writeAheadLog = null
-        }
-      }
-      if (dataRead == null) {
+      if (dataRead == null)
         throw new SparkException(
             s"Could not read data from write ahead log record ${partition.walRecordHandle}, " +
             s"read returned null")
-      }
       logInfo(
           s"Read partition data of $this from write ahead log, record handle " +
           partition.walRecordHandle)
-      if (storeInBlockManager) {
+      if (storeInBlockManager)
         blockManager.putBytes(
             blockId, new ChunkedByteBuffer(dataRead.duplicate()), storageLevel)
         logDebug(
             s"Stored partition data of $this into block manager with level $storageLevel")
         dataRead.rewind()
-      }
       blockManager.dataDeserialize(blockId, dataRead).asInstanceOf[Iterator[T]]
-    }
 
-    if (partition.isBlockIdValid) {
+    if (partition.isBlockIdValid)
       getBlockFromBlockManager().getOrElse { getBlockFromWriteAheadLog() }
-    } else {
+    else
       getBlockFromWriteAheadLog()
-    }
-  }
 
   /**
     * Get the preferred location of the partition. This returns the locations of the block
     * if it is present in the block manager, else if FileBasedWriteAheadLogSegment is used,
     * it returns the location of the corresponding file segment in HDFS .
     */
-  override def getPreferredLocations(split: Partition): Seq[String] = {
+  override def getPreferredLocations(split: Partition): Seq[String] =
     val partition = split.asInstanceOf[WriteAheadLogBackedBlockRDDPartition]
     val blockLocations =
-      if (partition.isBlockIdValid) {
+      if (partition.isBlockIdValid)
         getBlockIdLocations().get(partition.blockId)
-      } else {
+      else
         None
-      }
 
-    blockLocations.getOrElse {
-      partition.walRecordHandle match {
+    blockLocations.getOrElse
+      partition.walRecordHandle match
         case fileSegment: FileBasedWriteAheadLogSegment =>
-          try {
+          try
             HdfsUtils.getFileSegmentLocations(fileSegment.path,
                                               fileSegment.offset,
                                               fileSegment.length,
                                               hadoopConfig)
-          } catch {
+          catch
             case NonFatal(e) =>
               logError("Error getting WAL file segment locations", e)
               Seq.empty
-          }
         case _ =>
           Seq.empty
-      }
-    }
-  }
-}

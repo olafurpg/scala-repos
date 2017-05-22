@@ -3,7 +3,7 @@ package akka.dispatch
 import akka.testkit.{DefaultTimeout, AkkaSpec}
 import akka.actor.{Actor, Props}
 
-object ControlAwareDispatcherSpec {
+object ControlAwareDispatcherSpec
   val config = """
     unbounded-control-dispatcher {
       mailbox-type = "akka.dispatch.UnboundedControlAwareMailbox"
@@ -14,47 +14,40 @@ object ControlAwareDispatcherSpec {
     """
 
   case object ImportantMessage extends ControlMessage
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ControlAwareDispatcherSpec
-    extends AkkaSpec(ControlAwareDispatcherSpec.config) with DefaultTimeout {
+    extends AkkaSpec(ControlAwareDispatcherSpec.config) with DefaultTimeout
   import ControlAwareDispatcherSpec.ImportantMessage
 
-  "A ControlAwareDispatcher" must {
-    "deliver control messages first using an unbounded mailbox" in {
+  "A ControlAwareDispatcher" must
+    "deliver control messages first using an unbounded mailbox" in
       val dispatcherKey = "unbounded-control-dispatcher"
       testControl(dispatcherKey)
-    }
 
-    "deliver control messages first using a bounded mailbox" in {
+    "deliver control messages first using a bounded mailbox" in
       val dispatcherKey = "bounded-control-dispatcher"
       testControl(dispatcherKey)
-    }
-  }
 
-  def testControl(dispatcherKey: String) = {
+  def testControl(dispatcherKey: String) =
     // It's important that the actor under test is not a top level actor
     // with RepointableActorRef, since messages might be queued in
     // UnstartedCell and the sent to the PriorityQueue and consumed immediately
     // without the ordering taking place.
-    val actor = system.actorOf(Props(new Actor {
-      context.actorOf(Props(new Actor {
+    val actor = system.actorOf(Props(new Actor
+      context.actorOf(Props(new Actor
 
         self ! "test"
         self ! "test2"
         self ! ImportantMessage
 
-        def receive = {
+        def receive =
           case x ⇒ testActor ! x
-        }
-      }).withDispatcher(dispatcherKey))
+      ).withDispatcher(dispatcherKey))
 
       def receive = Actor.emptyBehavior
-    }))
+    ))
 
     expectMsg(ImportantMessage)
     expectMsg("test")
     expectMsg("test2")
-  }
-}

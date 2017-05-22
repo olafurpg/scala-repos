@@ -14,8 +14,7 @@ class Play2ProjectData(
     val projectKeys: Map[String, Map[String, ParsedValue[_]]])
     extends AbstractExternalEntityData(owner)
 
-object Play2ProjectData {
+object Play2ProjectData
   val Key: Key[Play2ProjectData] = new Key(
       classOf[Play2ProjectData].getName,
       ProjectKeys.PROJECT.getProcessingWeight + 1)
-}

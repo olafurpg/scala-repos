@@ -10,34 +10,28 @@ import com.intellij.openapi.util.TextRange
   * Pavel Fatin
   */
 case class Associations(associations: Seq[Association])
-    extends TextBlockTransferableData with Cloneable {
-  def setOffsets(offsets: Array[Int], _index: Int) = {
+    extends TextBlockTransferableData with Cloneable
+  def setOffsets(offsets: Array[Int], _index: Int) =
     var index = _index
-    for (association <- associations) {
+    for (association <- associations)
       association.range = new TextRange(offsets(index), offsets(index + 1))
       index += 2
-    }
     index
-  }
 
-  def getOffsets(offsets: Array[Int], _index: Int) = {
+  def getOffsets(offsets: Array[Int], _index: Int) =
     var index = _index
-    for (association <- associations) {
+    for (association <- associations)
       offsets(index) = association.range.getStartOffset
       index += 1
       offsets(index) = association.range.getEndOffset
       index += 1
-    }
     index
-  }
 
   def getOffsetCount = associations.length * 2
 
   def getFlavor = Associations.Flavor
 
   override def clone() = copy()
-}
 
-object Associations {
+object Associations
   lazy val Flavor = new DataFlavor(classOf[Associations], "ScalaReferenceData")
-}

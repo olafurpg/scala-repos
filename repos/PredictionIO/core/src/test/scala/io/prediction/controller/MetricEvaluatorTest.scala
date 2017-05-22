@@ -18,18 +18,16 @@ import io.prediction.workflow.SharedSparkContext
 import io.prediction.workflow.WorkflowParams
 import org.scalatest.FunSuite
 
-object MetricEvaluatorSuite {
-  case class Metric0() extends SumMetric[EmptyParams, Int, Int, Int, Int] {
+object MetricEvaluatorSuite
+  case class Metric0() extends SumMetric[EmptyParams, Int, Int, Int, Int]
     def calculate(q: Int, p: Int, a: Int): Int = q
-  }
 
   object Evaluation0 extends Evaluation {}
-}
 
-class MetricEvaluatorDevSuite extends FunSuite with SharedSparkContext {
+class MetricEvaluatorDevSuite extends FunSuite with SharedSparkContext
   import io.prediction.controller.MetricEvaluatorSuite._
 
-  test("a") {
+  test("a")
     val metricEvaluator = MetricEvaluator(
         Metric0(),
         Seq(Metric0(), Metric0())
@@ -43,5 +41,3 @@ class MetricEvaluatorDevSuite extends FunSuite with SharedSparkContext {
 
     val r = metricEvaluator.evaluateBase(
         sc, Evaluation0, engineEvalDataSet, WorkflowParams())
-  }
-}

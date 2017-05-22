@@ -10,13 +10,12 @@ trait IndexOption[T]
 /** Qualified name of a database table */
 case class QualifiedName(table: String,
                          schema: Option[String] = None,
-                         catalog: Option[String] = None) {
+                         catalog: Option[String] = None)
 
   /** human readable String representation */
   def asString =
     catalog.map(_ + ".").getOrElse("") + schema.map(_ + ".").getOrElse("") +
     table
-}
 
 case class Table(
     name: QualifiedName,
@@ -25,9 +24,8 @@ case class Table(
     foreignKeys: Seq[ForeignKey],
     indices: Seq[Index],
     options: Set[TableOption[_]] = Set()
-) {
+)
   require(name.table != "", "name cannot be empty string")
-}
 
 /** @param tpe qualified Scala type, e.g. java.sql.Date */
 case class Column(
@@ -36,18 +34,16 @@ case class Column(
     tpe: String,
     nullable: Boolean,
     options: Set[ColumnOption[_]] = Set()
-) {
+)
   require(name != "", "name cannot be empty string")
-}
 
 case class PrimaryKey(
     name: Option[String],
     table: QualifiedName,
     columns: Seq[Column],
     options: Set[PrimaryKeyOption[_]] = Set()
-) {
+)
   require(!name.contains(""), "name cannot be empty string")
-}
 
 case class ForeignKey(
     name: Option[String],
@@ -58,19 +54,17 @@ case class ForeignKey(
     onUpdate: ForeignKeyAction,
     onDelete: ForeignKeyAction,
     options: Set[ForeignKeyOption[_]] = Set()
-) {
+)
   require(!name.contains(""), "name cannot be empty string")
-}
 
 sealed abstract class ForeignKeyAction(val action: String)
 
-object ForeignKeyAction {
+object ForeignKeyAction
   case object Cascade extends ForeignKeyAction("CASCADE")
   case object Restrict extends ForeignKeyAction("RESTRICT")
   case object NoAction extends ForeignKeyAction("NO ACTION")
   case object SetNull extends ForeignKeyAction("SET NULL")
   case object SetDefault extends ForeignKeyAction("SET DEFAULT")
-}
 
 case class Index(
     name: Option[String],
@@ -78,9 +72,8 @@ case class Index(
     columns: Seq[Column],
     unique: Boolean,
     options: Set[IndexOption[_]] = Set()
-) {
+)
   require(!name.contains(""), "name cannot be empty string")
-}
 
 /**
   * A container class for Slick's data model
@@ -90,37 +83,35 @@ case class Index(
 case class Model(
     tables: Seq[Table],
     options: Set[ModelOption[_]] = Set()
-) {
+)
   lazy val tablesByName = tables.map(t => t.name -> t).toMap
 
   /**
     * Verifies consistency of the model by checking for duplicate names and references to non-existing entities.
     * In case such things are found, throws an AssertionError.
     */
-  def assertConsistency() {
+  def assertConsistency()
     assert(tables.size == tables.map(_.name).distinct.size,
            "duplicate tables names detected")
-    tables.foreach { table =>
+    tables.foreach  table =>
       import table._
       assert(columns.size == columns.map(_.name).distinct.size,
              "duplicate column names detected")
       def msg(what: String, where: String) =
         s"Reference to non-existent $what in $where of table $table."
-      primaryKey.foreach { pk =>
+      primaryKey.foreach  pk =>
         assert(tablesByName.isDefinedAt(pk.table),
                msg("table " + pk.table, "primary key " + pk))
-        pk.columns.foreach { column =>
+        pk.columns.foreach  column =>
           assert(table.columns.contains(column),
                  msg("column " + column, "primary key " + pk))
-        }
-      }
       assert(foreignKeys.count(_.name.isDefined) == foreignKeys
                .filter(_.name.isDefined)
                .map(_.name)
                .distinct
                .size,
              "duplicate foreign key names detected")
-      foreignKeys.foreach { fk =>
+      foreignKeys.foreach  fk =>
         assert(tablesByName.isDefinedAt(fk.referencedTable),
                msg("table " + fk.referencedTable, "foreign key " + fk))
         assert(tablesByName.isDefinedAt(fk.referencingTable),
@@ -130,31 +121,23 @@ case class Model(
         assert(
             table == fkTable,
             "Referencing table $fkTable does not match table $table the foreign key $fk is contained in.")
-        fk.referencedColumns.foreach { pkColumn =>
+        fk.referencedColumns.foreach  pkColumn =>
           assert(pkTable.columns.contains(pkColumn),
                  msg("column " + pkColumn + " of table " + pkTable,
                      "foreign key " + fk))
-        }
-        fk.referencingColumns.foreach { fkColumn =>
+        fk.referencingColumns.foreach  fkColumn =>
           assert(fkTable.columns.contains(fkColumn),
                  msg("column " + fkColumn + " of table " + fkTable,
                      "foreign key " + fk))
-        }
-      }
       assert(indices.count(_.name.isDefined) == indices
                .filter(_.name.isDefined)
                .map(_.name)
                .distinct
                .size,
              "duplicate index names detected")
-      indices.foreach { idx =>
+      indices.foreach  idx =>
         assert(tablesByName.isDefinedAt(idx.table),
                msg("table " + idx.table, "index " + idx))
-        idx.columns.foreach { column =>
+        idx.columns.foreach  column =>
           assert(table.columns.contains(column),
                  msg("column " + column, "index " + idx))
-        }
-      }
-    }
-  }
-}

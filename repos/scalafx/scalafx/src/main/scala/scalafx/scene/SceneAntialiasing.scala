@@ -37,7 +37,7 @@ import scalafx.delegate.SFXDelegate
   * @note In order for scene antialiasing to have an affect, the underlying system must support:
   *       ConditionalFeature.SCENE3D and anti-aliasing.
   */
-object SceneAntialiasing {
+object SceneAntialiasing
 
   /**
     * Convert a ScalaFX scene antialiasing value to a JavaFX scene-antialiasing value.
@@ -60,7 +60,6 @@ object SceneAntialiasing {
     * Defined SceneAntialiasing values
     */
   val values = Seq(Disabled, Balanced)
-}
 
 sealed case class SceneAntialiasing(
     override val delegate: jfxs.SceneAntialiasing)

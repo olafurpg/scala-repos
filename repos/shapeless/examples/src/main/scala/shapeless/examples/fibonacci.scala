@@ -21,7 +21,7 @@ package shapeless.examples
   * 
   * @author Miles Sabin
   */
-object FibonacciExamples {
+object FibonacciExamples
   import shapeless._
   import nat._
   import ops.nat._
@@ -32,7 +32,7 @@ object FibonacciExamples {
 
   class Fibonacci[I <: Nat, N <: Nat]
 
-  object Fibonacci {
+  object Fibonacci
     def apply(i: Nat, j: Nat) = new Fibonacci[i.N, j.N]
 
     implicit val fib0 = Fibonacci(0, 0)
@@ -43,7 +43,6 @@ object FibonacciExamples {
         m: Fibonacci[Succ[I], M],
         sum: Sum[L, M]) =
       new Fibonacci[Succ[Succ[I]], sum.Out]
-  }
 
   def fibonacci[N <: Nat](i: Nat)(
       implicit fib: Fibonacci[i.N, N], wn: Witness.Aux[N]): N = wn.value
@@ -74,21 +73,17 @@ object FibonacciExamples {
 
   // Compute an HList of the first N fibonacci numbers
 
-  trait Fibs[N <: Nat, Out <: HList] {
+  trait Fibs[N <: Nat, Out <: HList]
     def apply(): Out
-  }
 
-  object Fibs {
-    implicit def fibs0 = new Fibs[_0, HNil] {
+  object Fibs
+    implicit def fibs0 = new Fibs[_0, HNil]
       def apply() = HNil
-    }
 
     implicit def fibsN[N <: Nat, H <: Nat, T <: HList](
         implicit fib: Fibonacci[N, H], h: Witness.Aux[H], fibs: Fibs[N, T]) =
-      new Fibs[Succ[N], H :: T] {
+      new Fibs[Succ[N], H :: T]
         def apply() = h.value :: fibs()
-      }
-  }
 
   def fibs[L <: HList](n: Nat)(
       implicit fibs: Fibs[n.N, L], reverse: Reverse[L]) = fibs().reverse
@@ -119,4 +114,3 @@ object FibonacciExamples {
 
   val l8 = fibs(8)
   typed[_0 :: _1 :: _1 :: _2 :: _3 :: _5 :: _8 :: _13 :: HNil](l8)
-}

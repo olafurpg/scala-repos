@@ -22,22 +22,19 @@ import org.apache.spark.ml.util.DefaultReadWriteTest
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.{DataFrame, Row}
 
-object StopWordsRemoverSuite extends SparkFunSuite {
-  def testStopWordsRemover(t: StopWordsRemover, dataset: DataFrame): Unit = {
-    t.transform(dataset).select("filtered", "expected").collect().foreach {
+object StopWordsRemoverSuite extends SparkFunSuite
+  def testStopWordsRemover(t: StopWordsRemover, dataset: DataFrame): Unit =
+    t.transform(dataset).select("filtered", "expected").collect().foreach
       case Row(tokens, wantedTokens) =>
         assert(tokens === wantedTokens)
-    }
-  }
-}
 
 class StopWordsRemoverSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   import StopWordsRemoverSuite._
 
-  test("StopWordsRemover default") {
+  test("StopWordsRemover default")
     val remover =
       new StopWordsRemover().setInputCol("raw").setOutputCol("filtered")
     val dataSet = sqlContext
@@ -53,9 +50,8 @@ class StopWordsRemoverSuite
       .toDF("raw", "expected")
 
     testStopWordsRemover(remover, dataSet)
-  }
 
-  test("StopWordsRemover case sensitive") {
+  test("StopWordsRemover case sensitive")
     val remover = new StopWordsRemover()
       .setInputCol("raw")
       .setOutputCol("filtered")
@@ -68,9 +64,8 @@ class StopWordsRemoverSuite
       .toDF("raw", "expected")
 
     testStopWordsRemover(remover, dataSet)
-  }
 
-  test("StopWordsRemover with additional words") {
+  test("StopWordsRemover with additional words")
     val stopWords = StopWords.English ++ Array("python", "scala")
     val remover = new StopWordsRemover()
       .setInputCol("raw")
@@ -84,18 +79,16 @@ class StopWordsRemoverSuite
       .toDF("raw", "expected")
 
     testStopWordsRemover(remover, dataSet)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new StopWordsRemover()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setStopWords(Array("the", "a"))
       .setCaseSensitive(true)
     testDefaultReadWrite(t)
-  }
 
-  test("StopWordsRemover output column already exists") {
+  test("StopWordsRemover output column already exists")
     val outputCol = "expected"
     val remover =
       new StopWordsRemover().setInputCol("raw").setOutputCol(outputCol)
@@ -105,10 +98,7 @@ class StopWordsRemoverSuite
           ))
       .toDF("raw", outputCol)
 
-    val thrown = intercept[IllegalArgumentException] {
+    val thrown = intercept[IllegalArgumentException]
       testStopWordsRemover(remover, dataSet)
-    }
     assert(
         thrown.getMessage == s"requirement failed: Column $outputCol already exists.")
-  }
-}

@@ -1,6 +1,6 @@
 import collection.mutable.HashMap
 
-class a {
+class a
 
   /**
     * @tparam <testref>H
@@ -21,4 +21,3 @@ class a {
     * @tparam <testref>J
     */
   type bbb[A, B] = HashMap[A, B]
-}

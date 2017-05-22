@@ -34,7 +34,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Companion Object for [[scalafx.print.PrintQuality]].
   */
 object PrintQuality
-    extends SFXEnumDelegateCompanion[jfxp.PrintQuality, PrintQuality] {
+    extends SFXEnumDelegateCompanion[jfxp.PrintQuality, PrintQuality]
 
   /**
     * Specify DRAFT quality printing.
@@ -58,7 +58,6 @@ object PrintQuality
 
   protected override def unsortedValues: Array[PrintQuality] =
     Array(Draft, High, Low, Normal)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintQuality.html JavaFX PrintQuality]].

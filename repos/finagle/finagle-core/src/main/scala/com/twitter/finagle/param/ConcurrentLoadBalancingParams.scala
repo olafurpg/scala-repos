@@ -16,7 +16,7 @@ import com.twitter.finagle.loadbalancer.ConcurrentLoadBalancerFactory
   */
 class ConcurrentLoadBalancingParams[A <: Stack.Parameterized[A]](
     self: Stack.Parameterized[A])
-    extends DefaultLoadBalancingParams(self) {
+    extends DefaultLoadBalancingParams(self)
 
   /**
     * Configures the number of concurrent `connections` a single endpoint has
@@ -28,4 +28,3 @@ class ConcurrentLoadBalancingParams[A <: Stack.Parameterized[A]](
     */
   def connectionsPerEndpoint(connections: Int): A =
     self.configured(ConcurrentLoadBalancerFactory.Param(connections))
-}

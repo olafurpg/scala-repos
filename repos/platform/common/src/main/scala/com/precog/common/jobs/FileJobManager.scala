@@ -52,19 +52,17 @@ import java.util.UUID
 
 import scala.collection.mutable
 
-object FileJobManager {
-  def apply[M[+ _]](workDir: File, monadM: Monad[M]): FileJobManager[M] = {
+object FileJobManager
+  def apply[M[+ _]](workDir: File, monadM: Monad[M]): FileJobManager[M] =
     assert(workDir.isDirectory)
     assert(workDir.canWrite)
 
     new FileJobManager(workDir, monadM)
-  }
-}
 
 class FileJobManager[M[+ _]] private[FileJobManager](
     workDir: File, monadM: Monad[M])
     extends JobManager[M] with JobStateManager[M] with JobResultManager[M]
-    with FileStorage[M] with Logging {
+    with FileStorage[M] with Logging
 
   import JobState._
 
@@ -76,13 +74,12 @@ class FileJobManager[M[+ _]] private[FileJobManager](
   private[this] val cache: SimpleCache[JobId, FileJobState] =
     Cache.simple[JobId, FileJobState](
         ExpireAfterAccess(Duration(5, "minutes")),
-        OnRemoval({ (jobId, job, reason) =>
-          if (reason != RemovalCause.REPLACED) {
+        OnRemoval( (jobId, job, reason) =>
+          if (reason != RemovalCause.REPLACED)
             // Make sure to save expired entries
             saveJob(jobId, job)
-          }
           PrecogUnit
-        })
+        )
     )
 
   def shutdown = cache.invalidateAll
@@ -98,77 +95,64 @@ class FileJobManager[M[+ _]] private[FileJobManager](
   private[this] def resultFile(jobId: JobId) =
     new File(workDir, jobId + RESULT_SUFFIX)
 
-  private[this] def saveJob(jobId: JobId, jobState: FileJobState) = {
+  private[this] def saveJob(jobId: JobId, jobState: FileJobState) =
     cache += (jobId -> jobState)
     IOUtils
       .safeWriteToFile(jobState.serialize.renderCompact, jobFile(jobId))
       .unsafePerformIO
-  }
 
-  private[this] def loadJob(jobId: JobId): Option[FileJobState] = {
-    cache.get(jobId) orElse {
-      if (jobFile(jobId).exists) {
+  private[this] def loadJob(jobId: JobId): Option[FileJobState] =
+    cache.get(jobId) orElse
+      if (jobFile(jobId).exists)
         JParser
           .parseFromFile(jobFile(jobId))
           .bimap(Extractor.Thrown(_), j => j)
-          .flatMap { jobV =>
+          .flatMap  jobV =>
             jobV.validated[FileJobState]
-          }
-          .bimap({ error =>
+          .bimap( error =>
             logger.error(
                 "Error loading job for %s: %s".format(jobId, error.message))
-          }, j => j)
+          , j => j)
           .toOption
-      } else {
+      else
         None
-      }
-    }
-  }
 
   def createJob(auth: APIKey,
                 name: String,
                 jobType: String,
                 data: Option[JValue],
-                started: Option[DateTime]) = M.point {
+                started: Option[DateTime]) = M.point
     Job(newJobId,
         auth,
         name,
         jobType,
         data,
-        started map (Started(_, NotStarted)) getOrElse NotStarted) unsafeTap {
+        started map (Started(_, NotStarted)) getOrElse NotStarted) unsafeTap
       job =>
         val jobState = FileJobState(job, None, Map.empty)
         saveJob(job.id, jobState)
-    }
-  }
 
-  def findJob(jobId: JobId): M[Option[Job]] = M.point {
+  def findJob(jobId: JobId): M[Option[Job]] = M.point
     loadJob(jobId).map(_.job)
-  }
 
-  private val jobFileFilter = new FilenameFilter {
+  private val jobFileFilter = new FilenameFilter
     def accept(dir: File, name: String) = name.endsWith(JOB_SUFFIX)
-  }
 
-  def listJobs(apiKey: APIKey): M[Seq[Job]] = M.point {
+  def listJobs(apiKey: APIKey): M[Seq[Job]] = M.point
     // Load all jobs from the workDir that aren't in the cache
-    Option(workDir.list(jobFileFilter)).foreach { names =>
-      names.foreach { name =>
+    Option(workDir.list(jobFileFilter)).foreach  names =>
+      names.foreach  name =>
         loadJob(name.substring(0, name.length - JOB_SUFFIX.length))
-      }
-    }
-    cache.values.collect {
+    cache.values.collect
       case FileJobState(job, _, _) if job.apiKey == apiKey => job
-    }.toSeq
-  }
+    .toSeq
 
-  def listChannels(jobId: JobId): M[Seq[ChannelId]] = M.point {
+  def listChannels(jobId: JobId): M[Seq[ChannelId]] = M.point
     loadJob(jobId).map(_.messages.keys.toSeq).getOrElse(Seq.empty)
-  }
 
   def addMessage(jobId: JobId, channel: ChannelId, value: JValue): M[Message] =
-    M.point {
-      loadJob(jobId) match {
+    M.point
+      loadJob(jobId) match
         case Some(js @ FileJobState(_, _, messages)) =>
           val prior: List[Message] = messages.get(channel).getOrElse(Nil)
           val message = Message(jobId, prior.size, channel, value)
@@ -181,25 +165,22 @@ class FileJobManager[M[+ _]] private[FileJobManager](
         case None =>
           throw new Exception(
               "Message add attempt on non-existant job Id " + jobId)
-      }
-    }
 
   def listMessages(jobId: JobId,
                    channel: ChannelId,
-                   since: Option[MessageId]): M[Seq[Message]] = M.point {
+                   since: Option[MessageId]): M[Seq[Message]] = M.point
     val posts =
       cache.get(jobId).flatMap(_.messages.get(channel)).getOrElse(Nil)
-    since map { mId =>
+    since map  mId =>
       posts.takeWhile(_.id != mId).reverse
-    } getOrElse posts.reverse
-  }
+    getOrElse posts.reverse
 
   def updateStatus(jobId: JobId,
                    prevStatus: Option[StatusId],
                    msg: String,
                    progress: BigDecimal,
                    unit: String,
-                   extra: Option[JValue]): M[Either[String, Status]] = {
+                   extra: Option[JValue]): M[Either[String, Status]] =
 
     val jval = JObject(
         JField("message", JString(msg)) :: JField("progress", JNum(progress)) :: JField(
@@ -209,16 +190,15 @@ class FileJobManager[M[+ _]] private[FileJobManager](
 
     cache
       .get(jobId)
-      .map {
+      .map
         case FileJobState(_, status, _) =>
-          status match {
+          status match
             case Some(curStatus)
                 if curStatus.id == prevStatus.getOrElse(curStatus.id) =>
-              for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield {
+              for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield
                 val Some(s) = Status.fromMessage(m)
                 cache += (jobId -> cache(jobId).copy(status = Some(s)))
                 Right(s)
-              }
 
             case Some(_) =>
               M.point(Left("Current status did not match expected status."))
@@ -228,94 +208,74 @@ class FileJobManager[M[+ _]] private[FileJobManager](
                   Left("Job has not yet started, yet a status was expected."))
 
             case None =>
-              for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield {
+              for (m <- addMessage(jobId, JobManager.channels.Status, jval)) yield
                 val Some(s) = Status.fromMessage(m)
                 cache += (jobId -> cache(jobId).copy(status = Some(s)))
                 Right(s)
-              }
-          }
-      }
       .getOrElse(M.point(Left("No job found for jobId " + jobId)))
-  }
 
-  def getStatus(jobId: JobId): M[Option[Status]] = M.point {
+  def getStatus(jobId: JobId): M[Option[Status]] = M.point
     loadJob(jobId).flatMap(_.status)
-  }
 
   def transition(jobId: JobId)(
       t: JobState => Either[String, JobState]): M[Either[String, Job]] =
-    M.point {
+    M.point
       loadJob(jobId)
         .toSuccess("Failed to locate job " + jobId)
-        .flatMap { fjs =>
-          Validation.fromEither(t(fjs.job.state)).map { newState =>
+        .flatMap  fjs =>
+          Validation.fromEither(t(fjs.job.state)).map  newState =>
             val updated = fjs.copy(job = fjs.job.copy(state = newState))
             saveJob(jobId, updated)
             updated.job
-          }
-        }
         .toEither
-    }
 
   // Results handling
   def exists(file: String): M[Boolean] = M.point { resultFile(file).exists }
 
-  def save(file: String, data: FileData[M]): M[Unit] = {
+  def save(file: String, data: FileData[M]): M[Unit] =
     // TODO: Make this more efficient
-    data.data.toStream.map { chunks =>
+    data.data.toStream.map  chunks =>
       val output = new DataOutputStream(new FileOutputStream(resultFile(file)))
 
-      try {
+      try
         output.writeUTF(data.mimeType.map(_.toString).getOrElse(""))
         val length = chunks.foldLeft(0)(_ + _.length)
         output.writeInt(length)
-        chunks.foreach { bytes =>
+        chunks.foreach  bytes =>
           output.write(bytes)
-        }
-      } finally {
+      finally
         output.close()
-      }
-    }
-  }
 
-  def load(file: String): M[Option[FileData[M]]] = M.point {
-    if (resultFile(file).exists) {
+  def load(file: String): M[Option[FileData[M]]] = M.point
+    if (resultFile(file).exists)
       val input = new DataInputStream(new FileInputStream(resultFile(file)))
 
-      try {
-        val mime = input.readUTF match {
+      try
+        val mime = input.readUTF match
           case "" => None
           case mimestring => MimeTypes.parseMimeTypes(mimestring).headOption
-        }
 
         val length = input.readInt
         val data = new Array[Byte](length)
-        if (input.read(data) != length) {
+        if (input.read(data) != length)
           throw new IOException("Incomplete data in " + resultFile(file))
-        }
 
         Some(FileData(mime, data :: StreamT.empty[M, Array[Byte]]))
-      } finally {
+      finally
         input.close()
-      }
-    } else {
+    else
       None
-    }
-  }
 
-  def remove(file: String): M[Unit] = M.point {
+  def remove(file: String): M[Unit] = M.point
     val target = resultFile(file)
-    if (target.exists && !target.delete) {
+    if (target.exists && !target.delete)
       throw new IOException(
           "Failed to delete job file: " + target.getCanonicalPath)
-    }
-  }
-}
 
 case class FileJobState(
     job: Job, status: Option[Status], messages: Map[ChannelId, List[Message]])
 
-object FileJobState {
+object FileJobState
   val test = implicitly[Decomposer[Option[Status]]]
 
   implicit val fileJobStateIso =
@@ -327,4 +287,3 @@ object FileJobState {
       schemaV1, Some("1.0".v))
   implicit val fjsExtractorV1: Extractor[FileJobState] = extractorV(
       schemaV1, Some("1.0".v))
-}

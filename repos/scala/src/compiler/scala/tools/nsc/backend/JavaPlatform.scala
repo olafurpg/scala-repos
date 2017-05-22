@@ -13,7 +13,7 @@ import scala.tools.nsc.util.{ClassPath, DeltaClassPath, MergedClassPath}
 import scala.tools.util.FlatClassPathResolver
 import scala.tools.util.PathResolver
 
-trait JavaPlatform extends Platform {
+trait JavaPlatform extends Platform
   val global: Global
   override val symbolTable: global.type = global
   import global._
@@ -22,7 +22,7 @@ trait JavaPlatform extends Platform {
   private[nsc] var currentClassPath: Option[MergedClassPath[AbstractFile]] =
     None
 
-  def classPath: ClassPath[AbstractFile] = {
+  def classPath: ClassPath[AbstractFile] =
     assert(
         settings.YclasspathImpl.value == ClassPathRepresentationType.Recursive,
         "To use recursive classpath representation you must enable it with -YclasspathImpl:recursive compiler option.")
@@ -30,15 +30,13 @@ trait JavaPlatform extends Platform {
     if (currentClassPath.isEmpty)
       currentClassPath = Some(new PathResolver(settings).result)
     currentClassPath.get
-  }
 
-  private[nsc] lazy val flatClassPath: FlatClassPath = {
+  private[nsc] lazy val flatClassPath: FlatClassPath =
     assert(
         settings.YclasspathImpl.value == ClassPathRepresentationType.Flat,
         "To use flat classpath representation you must enable it with -YclasspathImpl:flat compiler option.")
 
     new FlatClassPathResolver(settings).result
-  }
 
   /** Update classpath with a substituted subentry */
   def updateClassPath(
@@ -62,13 +60,11 @@ trait JavaPlatform extends Platform {
     *  to anything but other booleans, but it should be present in
     *  case this is put to other uses.
     */
-  def isMaybeBoxed(sym: Symbol) = {
+  def isMaybeBoxed(sym: Symbol) =
     (sym == ObjectClass) || (sym == JavaSerializableClass) ||
     (sym == ComparableClass) || (sym isNonBottomSubClass BoxedNumberClass) ||
     (sym isNonBottomSubClass BoxedCharacterClass) ||
     (sym isNonBottomSubClass BoxedBooleanClass)
-  }
 
   def needCompile(bin: AbstractFile, src: AbstractFile) =
     src.lastModified >= bin.lastModified
-}

@@ -48,12 +48,11 @@ case class StoreIntermediateData[K, V](sink: Sink[(K, V)])
 // later).
 
 case class ScaldingEnv(override val jobName: String, inargs: Array[String])
-    extends Env(jobName) {
+    extends Env(jobName)
 
-  override lazy val args = {
+  override lazy val args =
     // pull out any hadoop specific args
     Args(new GenericOptionsParser(new Configuration, inargs).getRemainingArgs)
-  }
 
   def tz = TimeZone.getTimeZone("UTC")
 
@@ -83,16 +82,15 @@ case class ScaldingEnv(override val jobName: String, inargs: Array[String])
   // can be used as a Service
   private def addDeltaWrite(
       snode: Summer[Scalding, Any, Any],
-      sink: Sink[(Any, Any)]): Summer[Scalding, Any, Any] = {
+      sink: Sink[(Any, Any)]): Summer[Scalding, Any, Any] =
     val Summer(prod, store, monoid) = snode
     Summer(prod.write(sink), store, monoid)
-  }
 
   case class Built(platform: Scalding,
                    toRun: TailProducer[Scalding, (Any, (Option[Any], Any))],
                    stateFn: (Configuration) => VersionedState)
 
-  @transient lazy val build: Built = {
+  @transient lazy val build: Built =
     // Calling abstractJob's constructor and binding it to a variable
     // forces any side effects caused by that constructor (building up
     // of the environment and defining the builder).
@@ -106,64 +104,56 @@ case class ScaldingEnv(override val jobName: String, inargs: Array[String])
         _.set(Reducers(reducers)))
 
     // Support for the old setting based writing
-    val toRun: TailProducer[Scalding, (Any, (Option[Any], Any))] = (for {
+    val toRun: TailProducer[Scalding, (Any, (Option[Any], Any))] = (for
       opt <- opts.get(scaldingBuilder.id)
       stid <- opt.get[StoreIntermediateData[Any, Any]]
-    } yield addDeltaWrite(scaldingBuilder.node, stid.sink))
+    yield addDeltaWrite(scaldingBuilder.node, stid.sink))
       .getOrElse(scaldingBuilder.node)
       .name(scaldingBuilder.id)
 
     val scald = Scalding(name, opts)
       .withRegistrars(
           ajob.registrars ++ builder.registrar.getRegistrars.asScala)
-      .withConfigUpdater { c =>
+      .withConfigUpdater  c =>
         Config.tryFrom(ajob.transformConfig(c.toMap).toMap).get
-      }
 
     def getStatePath(ss: Store[_, _]): Option[String] =
-      ss match {
+      ss match
         case store: store.VersionedBatchStore[_, _, _, _] =>
           Some(store.rootPath)
         case initstore: store.InitialBatchedStore[_, _] =>
           getStatePath(initstore.proxy)
         case _ => None
-      }
     // VersionedState needs this
     implicit val batcher = scaldingBuilder.batcher
-    val stateFn = { (conf: Configuration) =>
-      val statePath = getStatePath(scaldingBuilder.node.store).getOrElse {
+    val stateFn =  (conf: Configuration) =>
+      val statePath = getStatePath(scaldingBuilder.node.store).getOrElse
         sys.error(
             "You must use a VersionedBatchStore with the old Summingbird API!")
-      }
       VersionedState(HDFSMetadata(conf, statePath), startDate, batches)
-    };
+    ;
 
     Built(scald, toRun, stateFn)
-  }
 
   def run() = run(build)
 
-  def run(b: Built) {
+  def run(b: Built)
     val Built(scald, toRun, stateFn) = b
 
     val conf = new Configuration
     // Add the generic options
     new GenericOptionsParser(conf, inargs)
 
-    try {
+    try
       scald.run(stateFn(conf), Hdfs(true, conf), toRun)
-    } catch {
+    catch
       case f @ FlowPlanException(errs) =>
         /* This is generally due to data not being ready, don't give a failed error code */
-        if (!args.boolean("scalding.nothrowplan")) {
+        if (!args.boolean("scalding.nothrowplan"))
           println(
               "use: --scalding.nothrowplan to not give a failing error code in this case")
           throw f
-        } else {
+        else
           println("[ERROR]: ========== FlowPlanException =========")
           errs.foreach { println(_) }
           println("========== FlowPlanException =========")
-        }
-    }
-  }
-}

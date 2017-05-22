@@ -26,11 +26,11 @@ case class DataSourceParams(
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val eventsDb = Storage.getPEvents()
     val lEventsDb = Storage.getLEvents()
     logger.info(s"CleanupApp: $dsp")
@@ -56,19 +56,16 @@ class DataSource(val dsp: DataSourceParams)
           appId = dsp.appId,
           untilTime = Some(dsp.cutoffTime)
       )(sc)
-      .map {
+      .map
         case e =>
           e.eventId.getOrElse("")
-      }
       .collect
 
     var lastFuture: Future[Boolean] = Future[Boolean] { true }
-    eventsToRemove.foreach {
+    eventsToRemove.foreach
       case eventId =>
-        if (eventId != "") {
+        if (eventId != "")
           lastFuture = lEventsDb.futureDelete(eventId, dsp.appId)
-        }
-    }
     // No, it's not correct to just wait for the last result.
     // This program only demonstrates how to remove old events.
     Await.result(lastFuture, scala.concurrent.duration.Duration(5, "minutes"))
@@ -82,11 +79,8 @@ class DataSource(val dsp: DataSourceParams)
     logger.info(s"Event count after cleanup: $countAfter")
 
     throw new StopAfterReadInterruption()
-  }
-}
 
 class TrainingData(
     )
-    extends Serializable {
+    extends Serializable
   override def toString = ""
-}

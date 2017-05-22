@@ -30,42 +30,34 @@ import org.apache.spark.internal.Logging
 @Produces(Array(MediaType.APPLICATION_OCTET_STREAM))
 private[v1] class EventLogDownloadResource(
     val uIRoot: UIRoot, val appId: String, val attemptId: Option[String])
-    extends Logging {
+    extends Logging
   val conf = SparkHadoopUtil.get.newConfiguration(new SparkConf)
 
   @GET
-  def getEventLogs(): Response = {
-    try {
-      val fileName = {
-        attemptId match {
+  def getEventLogs(): Response =
+    try
+      val fileName =
+        attemptId match
           case Some(id) => s"eventLogs-$appId-$id.zip"
           case None => s"eventLogs-$appId.zip"
-        }
-      }
 
-      val stream = new StreamingOutput {
-        override def write(output: OutputStream): Unit = {
+      val stream = new StreamingOutput
+        override def write(output: OutputStream): Unit =
           val zipStream = new ZipOutputStream(output)
-          try {
+          try
             uIRoot.writeEventLogs(appId, attemptId, zipStream)
-          } finally {
+          finally
             zipStream.close()
-          }
-        }
-      }
 
       Response
         .ok(stream)
         .header("Content-Disposition", s"attachment; filename=$fileName")
         .header("Content-Type", MediaType.APPLICATION_OCTET_STREAM)
         .build()
-    } catch {
+    catch
       case NonFatal(e) =>
         Response
           .serverError()
           .entity(s"Event logs are not available for app: $appId.")
           .status(Response.Status.SERVICE_UNAVAILABLE)
           .build()
-    }
-  }
-}

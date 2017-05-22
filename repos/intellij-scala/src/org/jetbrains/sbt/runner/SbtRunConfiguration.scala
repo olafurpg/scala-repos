@@ -30,7 +30,7 @@ class SbtRunConfiguration(val project: Project,
                           val configurationFactory: ConfigurationFactory,
                           val name: String)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory) {
+        name, new RunConfigurationModule(project), configurationFactory)
 
   /**
     * List of task to execute in format of SBT.
@@ -52,43 +52,38 @@ class SbtRunConfiguration(val project: Project,
   override def getValidModules: util.Collection[Module] = List()
 
   override def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+      executor: Executor, env: ExecutionEnvironment): RunProfileState =
     val state: SbtComandLineState = new SbtComandLineState(this, env)
     state.setConsoleBuilder(
         TextConsoleBuilderFactory.getInstance.createBuilder(getProject))
     state
-  }
 
   override def getConfigurationEditor: SettingsEditor[_ <: RunConfiguration] =
     new SbtRunConfigurationEditor(project, this)
 
-  override def writeExternal(element: Element) {
+  override def writeExternal(element: Element)
     super.writeExternal(element)
     JDOMExternalizer.write(element, "tasks", getTasks)
     JDOMExternalizer.write(element, "vmparams", getJavaOptions)
     EnvironmentVariablesComponent.writeExternal(
         element, getEnvironmentVariables)
-  }
 
-  override def readExternal(element: Element) {
+  override def readExternal(element: Element)
     super.readExternal(element)
     tasks = JDOMExternalizer.readString(element, "tasks")
     javaOptions = JDOMExternalizer.readString(element, "vmparams")
     EnvironmentVariablesComponent.readExternal(element, envirnomentVariables)
-  }
 
-  def apply(params: SbtRunConfigurationForm): Unit = {
+  def apply(params: SbtRunConfigurationForm): Unit =
     tasks = params.getTasks
     javaOptions = params.getJavaOptions
     envirnomentVariables.clear()
     envirnomentVariables.putAll(params.getEnvironmentVariables)
-  }
 
-  def determineMainClass(launcherPath: String): String = {
+  def determineMainClass(launcherPath: String): String =
     val jf = new JarFile(new File(launcherPath))
     val attributes = jf.getManifest.getMainAttributes
     Option(attributes.getValue("Main-Class")).getOrElse("xsbt.boot.Boot")
-  }
 
   def getTasks: String = tasks
 
@@ -98,42 +93,36 @@ class SbtRunConfiguration(val project: Project,
 
   class SbtComandLineState(
       configuration: SbtRunConfiguration, envirnoment: ExecutionEnvironment)
-      extends JavaCommandLineState(envirnoment) {
+      extends JavaCommandLineState(envirnoment)
 
-    def createJavaParameters(): JavaParameters = {
+    def createJavaParameters(): JavaParameters =
       val params: JavaParameters = new JavaParameters
       val jdk: Sdk =
         JavaParametersUtil.createProjectJdk(configuration.getProject, null)
-      try {
-        jdk.getSdkType match {
+      try
+        jdk.getSdkType match
           case sdkType: AndroidSdkType =>
             envirnomentVariables.put(
                 "ANDROID_HOME", jdk.getSdkModificator.getHomePath)
           case _ => // do nothing
-        }
-      } catch {
+      catch
         case _: NoClassDefFoundError => // no android plugin, do nothing
-      }
       params.setWorkingDirectory(project.getBaseDir.getPath)
       params.configureByProject(
           configuration.getProject, JavaParameters.JDK_ONLY, jdk)
       val sbtSystemSettings: SbtSystemSettings =
         SbtSystemSettings.getInstance(configuration.getProject)
-      if (sbtSystemSettings.getCustomLauncherEnabled) {
+      if (sbtSystemSettings.getCustomLauncherEnabled)
         params.getClassPath.add(sbtSystemSettings.getCustomLauncherPath)
         params.setMainClass(
             determineMainClass(sbtSystemSettings.getCustomLauncherPath))
-      } else {
+      else
         params.getClassPath.add(SbtRunner.getDefaultLauncher)
         params.setMainClass(
             determineMainClass(SbtRunner.getDefaultLauncher.getAbsolutePath))
-      }
       params.setEnv(envirnomentVariables)
       params.getVMParametersList.addParametersString(javaOptions)
       params.getProgramParametersList.addParametersString(tasks)
       params
-    }
 
     override def ansiColoringEnabled(): Boolean = true
-  }
-}

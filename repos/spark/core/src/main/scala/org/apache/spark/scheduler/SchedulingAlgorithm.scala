@@ -22,30 +22,25 @@ package org.apache.spark.scheduler
   * FIFO: FIFO algorithm between TaskSetManagers
   * FS: FS algorithm between Pools, and FIFO or FS within Pools
   */
-private[spark] trait SchedulingAlgorithm {
+private[spark] trait SchedulingAlgorithm
   def comparator(s1: Schedulable, s2: Schedulable): Boolean
-}
 
-private[spark] class FIFOSchedulingAlgorithm extends SchedulingAlgorithm {
-  override def comparator(s1: Schedulable, s2: Schedulable): Boolean = {
+private[spark] class FIFOSchedulingAlgorithm extends SchedulingAlgorithm
+  override def comparator(s1: Schedulable, s2: Schedulable): Boolean =
     val priority1 = s1.priority
     val priority2 = s2.priority
     var res = math.signum(priority1 - priority2)
-    if (res == 0) {
+    if (res == 0)
       val stageId1 = s1.stageId
       val stageId2 = s2.stageId
       res = math.signum(stageId1 - stageId2)
-    }
-    if (res < 0) {
+    if (res < 0)
       true
-    } else {
+    else
       false
-    }
-  }
-}
 
-private[spark] class FairSchedulingAlgorithm extends SchedulingAlgorithm {
-  override def comparator(s1: Schedulable, s2: Schedulable): Boolean = {
+private[spark] class FairSchedulingAlgorithm extends SchedulingAlgorithm
+  override def comparator(s1: Schedulable, s2: Schedulable): Boolean =
     val minShare1 = s1.minShare
     val minShare2 = s2.minShare
     val runningTasks1 = s1.runningTasks
@@ -60,22 +55,18 @@ private[spark] class FairSchedulingAlgorithm extends SchedulingAlgorithm {
     val taskToWeightRatio2 = runningTasks2.toDouble / s2.weight.toDouble
     var compare: Int = 0
 
-    if (s1Needy && !s2Needy) {
+    if (s1Needy && !s2Needy)
       return true
-    } else if (!s1Needy && s2Needy) {
+    else if (!s1Needy && s2Needy)
       return false
-    } else if (s1Needy && s2Needy) {
+    else if (s1Needy && s2Needy)
       compare = minShareRatio1.compareTo(minShareRatio2)
-    } else {
+    else
       compare = taskToWeightRatio1.compareTo(taskToWeightRatio2)
-    }
 
-    if (compare < 0) {
+    if (compare < 0)
       true
-    } else if (compare > 0) {
+    else if (compare > 0)
       false
-    } else {
+    else
       s1.name < s2.name
-    }
-  }
-}

@@ -13,10 +13,10 @@ import scala.collection.mutable
   * Note that the implementation of context maintains all bindings
   * in a linked list; context lookup requires a linear search.
   */
-trait Context {
+trait Context
   type Key [A]
 
-  sealed trait Env {
+  sealed trait Env
 
     /**
       * Retrieve the current definition of a key.
@@ -55,24 +55,22 @@ trait Context {
       * negative in the returned environment.
       */
     final def cleared(key: Key[_]): Env = Cleared(this, key)
-  }
 
   /**
     * An empty environment. No keys are present.
     */
-  object Empty extends Env {
+  object Empty extends Env
     def apply[A](key: Key[A]) = throw new NoSuchElementException
     def get[A](key: Key[A]) = None
     def getOrElse[A](key: Key[A], orElse: () => A): A = orElse()
     def contains[A](key: Key[A]) = false
     override def toString = "<empty com.twitter.finagle.context.Env>"
-  }
 
   /**
     * An environment with `key` bound to `value`; lookups for other keys
     * are forwarded to `next`.
     */
-  case class Bound[A](next: Env, key: Key[A], value: A) extends Env {
+  case class Bound[A](next: Env, key: Key[A], value: A) extends Env
     def apply[B](key: Key[B]): B =
       if (key == this.key) value.asInstanceOf[B]
       else next(key)
@@ -89,13 +87,12 @@ trait Context {
       key == this.key || next.contains(key)
 
     override def toString = s"Bound($key, $value) :: $next"
-  }
 
   /**
     * An environment without `key`. Lookups for other keys
     * are forwarded to `next`.
     */
-  case class Cleared[A](next: Env, key: Key[A]) extends Env {
+  case class Cleared[A](next: Env, key: Key[A]) extends Env
     def apply[B](key: Key[B]) =
       if (key == this.key) throw new NoSuchElementException
       else next(key)
@@ -112,12 +109,11 @@ trait Context {
       key != this.key && next.contains(key)
 
     override def toString = s"Clear($key) :: $next"
-  }
 
   /**
     * Concatenate two environments with left-hand side precedence.
     */
-  case class OrElse(left: Env, right: Env) extends Env {
+  case class OrElse(left: Env, right: Env) extends Env
     def apply[A](key: Key[A]) =
       if (left.contains(key)) left.apply(key)
       else right.apply(key)
@@ -133,14 +129,12 @@ trait Context {
       left.contains(key) || right.contains(key)
 
     override def toString = s"OrElse($left, $right)"
-  }
 
   private[this] val local = new Local[Env]
 
-  private[finagle] def env: Env = local() match {
+  private[finagle] def env: Env = local() match
     case Some(env) => env
     case None => Empty
-  }
 
   /**
     * Retrieve the current definition of a key.
@@ -192,12 +186,10 @@ trait Context {
   /**
     * Unbind the passed-in keys, in the scope of `fn`.
     */
-  def letClear[R](keys: Key[_]*)(fn: => R): R = {
-    val newEnv = keys.foldLeft(env) {
+  def letClear[R](keys: Key[_]*)(fn: => R): R =
+    val newEnv = keys.foldLeft(env)
       case (e, k) => e.cleared(k)
-    }
     local.let(newEnv)(fn)
-  }
 
   /**
     * Clears all bindings in the scope of `fn`.
@@ -217,10 +209,8 @@ trait Context {
     * }}}
     */
   def letClear[R]()(fn: => R): R =
-    local.let(Empty) {
+    local.let(Empty)
       fn
-    }
-}
 
 /**
   * A marshalled context contains bindings that may be
@@ -230,13 +220,13 @@ trait Context {
   * propagate a set of bindings across a whole request
   * tree.
   */
-final class MarshalledContext extends Context {
+final class MarshalledContext extends Context
 
   /**
     * Keys in MarshalledContext must provide a marshaller
     * and unmarshaller.
     */
-  abstract class Key[A](val id: String) {
+  abstract class Key[A](val id: String)
 
     /**
       * A unique identifier defining this marshaller. This is
@@ -254,21 +244,20 @@ final class MarshalledContext extends Context {
       * Attempt to unmarshal an A-typed context value.
       */
     def tryUnmarshal(buf: Buf): Try[A]
-  }
 
   /**
     * A translucent environment is capable of storing key/value pairs
     * to be (possibly) unmarshalled later.
     */
   case class Translucent(next: Env, marshalId: Buf, marshalled: Buf)
-      extends Env {
+      extends Env
     @volatile private var cachedEnv: Env = null
 
-    private def env[A](key: Key[A]): Env = {
+    private def env[A](key: Key[A]): Env =
       if (cachedEnv != null) cachedEnv
       else if (key.marshalId != marshalId) next
       else
-        (key.tryUnmarshal(marshalled): Try[A]) match {
+        (key.tryUnmarshal(marshalled): Try[A]) match
           case Return(value) =>
             cachedEnv = Bound(next, key, value)
             cachedEnv
@@ -276,8 +265,6 @@ final class MarshalledContext extends Context {
             // Should we omit the context altogether when this happens?
             // Should we log some warnings?
             next
-        }
-    }
 
     def apply[A](key: Key[A]): A = env(key).apply(key)
     def get[A](key: Key[A]): Option[A] = env(key).get(key)
@@ -287,14 +274,12 @@ final class MarshalledContext extends Context {
 
     override def toString =
       if (cachedEnv != null) cachedEnv.toString
-      else {
+      else
         val Buf.Utf8(id8) = marshalId
         s"Translucent(${id8}(${marshalled.length})) :: $next"
-      }
-  }
 
   private def marshalMap(env: Env, map: mutable.Map[Buf, Buf]): Unit =
-    env match {
+    env match
       case Bound(next, key, value) =>
         marshalMap(next, map)
         map.put(key.marshalId, key.marshal(value))
@@ -309,26 +294,23 @@ final class MarshalledContext extends Context {
         map.remove(key.marshalId)
       case Empty =>
         ()
-    }
 
   /**
     * Store into the current environment a set of marshalled
     * bindings and run `fn`. Bindings are unmarshalled on demand.
     */
-  def letUnmarshal[R](contexts: Iterable[(Buf, Buf)])(fn: => R): R = {
+  def letUnmarshal[R](contexts: Iterable[(Buf, Buf)])(fn: => R): R =
     val u = new Unmarshaller(env)
     for ((id, marshalled) <- contexts) u.put(id, marshalled)
     let(u.build)(fn)
-  }
 
   /**
     * Marshal the `env` into a set of (id, value) pairs.
     */
-  def marshal(env: Env): Iterable[(Buf, Buf)] = {
+  def marshal(env: Env): Iterable[(Buf, Buf)] =
     val map = mutable.Map[Buf, Buf]()
     marshalMap(env, map)
     map
-  }
 
   /**
     * Marshal the current environment into a set of (id, value) pairs.
@@ -340,31 +322,26 @@ final class MarshalledContext extends Context {
     * Produce an environment consisting of the given marshalled
     * (id, value) pairs. They are unmarshalled on demand.
     */
-  def unmarshal(contexts: Iterable[(Buf, Buf)]): Env = {
+  def unmarshal(contexts: Iterable[(Buf, Buf)]): Env =
     val builder = new Unmarshaller
     for ((id, marshalled) <- contexts) builder.put(id, marshalled)
     builder.build
-  }
 
   /**
     * An Unmarshaller gradually builds up an environment from
     * a set of (id, value) pairs.
     */
-  class Unmarshaller(init: Env) {
+  class Unmarshaller(init: Env)
     def this() = this(Empty)
 
     private[this] var env = init
 
-    def put(id: Buf, marshalled: Buf) {
+    def put(id: Buf, marshalled: Buf)
       // Copy the Bufs to avoid indirectly keeping a reference to Netty internal buffer (big)
       env = Translucent(env, copy(id), copy(marshalled))
-    }
 
     def build: Env = env
 
-    private[this] def copy(buf: Buf): Buf = buf match {
+    private[this] def copy(buf: Buf): Buf = buf match
       case ChannelBufferBuf(cb) => Buf.ByteBuffer.Shared(cb.toByteBuffer)
       case _ => buf
-    }
-  }
-}

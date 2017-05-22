@@ -27,22 +27,19 @@ import com.twitter.scalding.SequenceFile
   */
 class TypedSequenceFile[T](val path: String)
     extends SequenceFile(path, Fields.FIRST) with Mappable[T]
-    with TypedSink[T] {
+    with TypedSink[T]
   override def converter[U >: T] =
     TupleConverter.asSuperConverter[T, U](TupleConverter.singleConverter[T])
   override def setter[U <: T] =
     TupleSetter.asSubSetter[T, U](TupleSetter.singleSetter[T])
   override def toString: String = "TypedSequenceFile(%s)".format(path)
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case null => false
     case t: TypedSequenceFile[_] =>
       t.p == p // horribly named fields in the SequenceFile case class
     case _ => false
-  }
   override def hashCode = path.hashCode
-}
 
-object TypedSequenceFile {
+object TypedSequenceFile
   def apply[T](path: String): TypedSequenceFile[T] =
     new TypedSequenceFile[T](path)
-}

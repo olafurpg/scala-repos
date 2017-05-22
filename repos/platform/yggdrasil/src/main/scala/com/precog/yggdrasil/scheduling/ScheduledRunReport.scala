@@ -33,7 +33,7 @@ import scalaz._
 
 import shapeless._
 
-object ScheduledRunReport {
+object ScheduledRunReport
   import com.precog.common.ingest.JavaSerialization._
 
   implicit val iso =
@@ -46,7 +46,6 @@ object ScheduledRunReport {
     decomposerV[ScheduledRunReport](schemaV1, Some("1.0".v))
   implicit val extractor =
     extractorV[ScheduledRunReport](schemaV1, Some("1.0".v))
-}
 
 case class ScheduledRunReport(id: UUID,
                               startedAt: DateTime,

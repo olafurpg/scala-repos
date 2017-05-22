@@ -34,7 +34,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion object for [[scalafx.scene.web.PopupFeatures]]
   */
-object PopupFeatures {
+object PopupFeatures
 
   /**
     * Converts a ScalaFX PopupFeatures to its JavaFX counterpart.
@@ -44,7 +44,6 @@ object PopupFeatures {
     */
   implicit def sfxPopupFeatures2jfx(pe: PopupFeatures): jfxsw.PopupFeatures =
     if (pe != null) pe.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/web/PopupFeatures.html JavaFX PopupFeatures]]
@@ -53,7 +52,7 @@ object PopupFeatures {
   * @param delegate JavaFX PopupFeatures.
   */
 class PopupFeatures(override val delegate: jfxsw.PopupFeatures)
-    extends SFXDelegate[jfxsw.PopupFeatures] {
+    extends SFXDelegate[jfxsw.PopupFeatures]
 
   /**
     * Creates a new instance.
@@ -86,4 +85,3 @@ class PopupFeatures(override val delegate: jfxsw.PopupFeatures)
     * Returns whether popup window should be resizable.
     */
   def resizable = delegate.isResizable
-}

@@ -25,31 +25,29 @@ import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 
-class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
+class JsonHadoopFsRelationSuite extends HadoopFsRelationTest
   override val dataSourceName: String = "json"
 
   // JSON does not write data of NullType and does not play well with BinaryType.
   override protected def supportsDataType(dataType: DataType): Boolean =
-    dataType match {
+    dataType match
       case _: NullType => false
       case _: BinaryType => false
       case _: CalendarIntervalType => false
       case _ => true
-    }
 
   test(
-      "save()/load() - partitioned table - simple queries - partition columns in data") {
-    withTempDir { file =>
+      "save()/load() - partitioned table - simple queries - partition columns in data")
+    withTempDir  file =>
       val basePath = new Path(file.getCanonicalPath)
       val fs = basePath.getFileSystem(SparkHadoopUtil.get.conf)
       val qualifiedBasePath = fs.makeQualified(basePath)
 
-      for (p1 <- 1 to 2; p2 <- Seq("foo", "bar")) {
+      for (p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
         val partitionDir = new Path(qualifiedBasePath, s"p1=$p1/p2=$p2")
         sparkContext
           .parallelize(for (i <- 1 to 3) yield s"""{"a":$i,"b":"val_$i"}""")
           .saveAsTextFile(partitionDir.toString)
-      }
 
       val dataSchemaWithPartition = StructType(
           dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
@@ -58,11 +56,9 @@ class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
             .format(dataSourceName)
             .option("dataSchema", dataSchemaWithPartition.json)
             .load(file.getCanonicalPath))
-    }
-  }
 
-  test("SPARK-9894: save complex types to JSON") {
-    withTempDir { file =>
+  test("SPARK-9894: save complex types to JSON")
+    withTempDir  file =>
       file.delete()
 
       val schema = new StructType()
@@ -87,11 +83,9 @@ class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
             .load(file.getCanonicalPath),
           df
       )
-    }
-  }
 
-  test("SPARK-10196: save decimal type to JSON") {
-    withTempDir { file =>
+  test("SPARK-10196: save decimal type to JSON")
+    withTempDir  file =>
       file.delete()
 
       val schema = new StructType().add("decimal", DecimalType(7, 2))
@@ -113,6 +107,3 @@ class JsonHadoopFsRelationSuite extends HadoopFsRelationTest {
             .load(file.getCanonicalPath),
           df
       )
-    }
-  }
-}

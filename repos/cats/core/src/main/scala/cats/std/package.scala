@@ -1,6 +1,6 @@
 package cats
 
-package object std {
+package object std
   object all extends AllInstances
 
   object either extends EitherInstances
@@ -29,4 +29,3 @@ package object std {
   object bigDecimal extends BigDecimalInstances
 
   object tuple extends TupleInstances
-}

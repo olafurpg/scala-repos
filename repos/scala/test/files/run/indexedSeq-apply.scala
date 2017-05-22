@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   val empty = IndexedSeq()
   assert(empty.isEmpty)
 
@@ -10,6 +10,5 @@ object Test extends App {
   assert("b" == two.apply(1))
 
   println("OK")
-}
 
 // vim: set ts=2 sw=2 et:

@@ -41,7 +41,7 @@ import xml.{Text, NodeSeq}
   * @see MappedDate
   */
 abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
-    extends MappedField[Date, T] {
+    extends MappedField[Date, T]
   private val data = FatLazy(defaultValue)
   private val orgData = FatLazy(defaultValue)
 
@@ -65,7 +65,7 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Date } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(name, manifest, new FieldConverter
 
       /**
         * The type of the field
@@ -100,31 +100,28 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
         * @return the field as a sequence of SourceFields
         */
       def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+    )
 
-  protected def real_i_set_!(value: Date): Date = {
-    if (value != data.get) {
+  protected def real_i_set_!(value: Date): Date =
+    if (value != data.get)
       data() = value
       this.dirty_?(true)
-    }
     data.get
-  }
 
   def dbFieldClass = classOf[Date]
 
-  def toLong: Long = get match {
+  def toLong: Long = get match
     case null => 0L
     case d: Date => d.getTime / 1000L
-  }
 
   def asJsExp: JsExp = JE.Num(toLong)
 
   def asJsonValue: Box[JsonAST.JValue] =
     Full(
-        get match {
+        get match
       case null => JsonAST.JNull
       case x => JsonAST.JInt(x.getTime)
-    })
+    )
 
   /**
     * Get the JDBC SQL Type for this field
@@ -141,23 +138,21 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
   protected def i_was_! = orgData.get
   protected[mapper] def doneWithSave() { orgData.setFrom(data) }
 
-  protected def i_obscure_!(in: Date): Date = {
+  protected def i_obscure_!(in: Date): Date =
     new Date(0L)
-  }
 
   /**
     * Create an input field for the item
     */
   override def _toForm: Box[NodeSeq] =
-    S.fmapFunc({ s: List[String] =>
+    S.fmapFunc( s: List[String] =>
       this.setFromAny(s)
-    }) { funcName =>
+    )  funcName =>
       Full(appendFieldId(<input type={formInputType}
                      name={funcName}
                      value={get match {case null => "" case s => format(s)}}/>))
-    }
 
-  override def setFromAny(f: Any): Date = f match {
+  override def setFromAny(f: Any): Date = f match
     case JsonAST.JNull => this.set(null)
     case JsonAST.JInt(v) => this.set(new Date(v.longValue))
     case "" | null => this.set(null)
@@ -168,21 +163,18 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
     case Full(d: Date) => this.set(d)
     case None | Empty | Failure(_, _, _) => this.set(null)
     case f => toDate(f).map(d => this.set(d)).openOr(this.get)
-  }
 
-  def jdbcFriendly(field: String): Object = get match {
+  def jdbcFriendly(field: String): Object = get match
     case null => null
     case d => new java.sql.Time(d.getTime)
-  }
 
   def real_convertToJDBCFriendly(value: Date): Object =
     if (value == null) null else new java.sql.Time(value.getTime)
 
   private def st(in: Box[Date]): Unit =
-    in match {
+    in match
       case Full(d) => data.set(d); orgData.set(d)
       case _ => data.set(null); orgData.set(null)
-    }
 
   def buildSetActualValue(
       accessor: Method, v: AnyRef, columnName: String): (T, AnyRef) => Unit =
@@ -192,9 +184,9 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
   def buildSetLongValue(
       accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedTime[T] => f.st(if (isNull) Empty else Full(new Date(v)))
-      })
+      )
 
   def buildSetStringValue(
       accessor: Method, columnName: String): (T, String) => Unit =
@@ -218,4 +210,3 @@ abstract class MappedTime[T <: Mapper[T]](val fieldOwner: T)
     colName + " " + dbType.timeColumnType + notNullAppender()
 
   override def toString = if (get == null) "NULL" else format(get)
-}

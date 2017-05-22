@@ -28,15 +28,14 @@ import Helpers._
 import S._
 import JE._
 
-trait BinaryTypedField extends TypedField[Array[Byte]] {
+trait BinaryTypedField extends TypedField[Array[Byte]]
 
   def setFromAny(in: Any): Box[Array[Byte]] = genericSetFromAny(in)
 
-  def setFromString(s: String): Box[Array[Byte]] = s match {
+  def setFromString(s: String): Box[Array[Byte]] = s match
     case null | "" if optional_? => setBox(Empty)
     case null | "" => setBox(Failure(notOptionalErrorMessage))
     case _ => setBox(tryo(s.getBytes("UTF-8")))
-  }
 
   def toForm: Box[NodeSeq] = Empty
 
@@ -45,30 +44,25 @@ trait BinaryTypedField extends TypedField[Array[Byte]] {
   def asJValue: JValue = asJString(base64Encode _)
   def setFromJValue(jvalue: JValue) =
     setFromJString(jvalue)(s => tryo(base64Decode(s)))
-}
 
 class BinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
     extends Field[Array[Byte], OwnerType] with MandatoryTypedField[Array[Byte]]
-    with BinaryTypedField {
+    with BinaryTypedField
 
   def owner = rec
 
-  def this(rec: OwnerType, value: Array[Byte]) = {
+  def this(rec: OwnerType, value: Array[Byte]) =
     this(rec)
     set(value)
-  }
 
   def defaultValue = Array(0)
-}
 
 class OptionalBinaryField[OwnerType <: Record[OwnerType]](rec: OwnerType)
     extends Field[Array[Byte], OwnerType] with OptionalTypedField[Array[Byte]]
-    with BinaryTypedField {
+    with BinaryTypedField
 
   def owner = rec
 
-  def this(rec: OwnerType, value: Box[Array[Byte]]) = {
+  def this(rec: OwnerType, value: Box[Array[Byte]]) =
     this(rec)
     setBox(value)
-  }
-}

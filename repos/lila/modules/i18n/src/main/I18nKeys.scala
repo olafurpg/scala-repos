@@ -6,9 +6,9 @@ import play.api.i18n.Lang
 
 import lila.user.UserContext
 
-final class I18nKeys(translator: Translator) {
+final class I18nKeys(translator: Translator)
 
-  final class Key(val key: String) extends I18nKey {
+  final class Key(val key: String) extends I18nKey
 
     def apply(args: Any*)(implicit ctx: UserContext): Html =
       translator.html(key, args.toList)(ctx.req)
@@ -18,7 +18,6 @@ final class I18nKeys(translator: Translator) {
 
     def to(lang: Lang)(args: Any*): String =
       translator.transTo(key, args.toList)(lang)
-  }
 
   def untranslated(message: String) = Untranslated(message)
 
@@ -1062,4 +1061,3 @@ final class I18nKeys(translator: Translator) {
         `youDoNotHaveAnEstablishedPerfTypeRating`)
 
   lazy val count = keys.size
-}

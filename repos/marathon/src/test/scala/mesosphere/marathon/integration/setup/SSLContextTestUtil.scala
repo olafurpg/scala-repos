@@ -8,7 +8,7 @@ import mesosphere.marathon.io.SSLContextUtil
 /**
   * Create SSL context for tests.
   */
-object SSLContextTestUtil {
+object SSLContextTestUtil
   val keyStorePassword = "password"
 
   lazy val keyStoreURL =
@@ -21,10 +21,8 @@ object SSLContextTestUtil {
   lazy val testSSLContext =
     SSLContextUtil.createSSLContext(Some(keyStorePath), Some(keyStorePassword))
 
-  def sslConnection(url: URL): HttpsURLConnection = {
+  def sslConnection(url: URL): HttpsURLConnection =
     val connection = url.openConnection().asInstanceOf[HttpsURLConnection]
     connection.setSSLSocketFactory(
         SSLContextTestUtil.testSSLContext.getSocketFactory)
     connection
-  }
-}

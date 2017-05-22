@@ -10,14 +10,13 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class RetriesTest extends FunSuite {
+class RetriesTest extends FunSuite
 
   private[this] class MyRetryEx extends Exception
   private[this] class AnotherEx extends Exception
 
-  private[this] val retryFn: PartialFunction[Try[Nothing], Boolean] = {
+  private[this] val retryFn: PartialFunction[Try[Nothing], Boolean] =
     case Throw(_: MyRetryEx) => true
-  }
 
   private[this] def newRetryPolicy(retries: Int) =
     RetryPolicy.tries(retries + 1, // 1 request and `retries` retries
@@ -31,9 +30,8 @@ class RetriesTest extends FunSuite {
   private val end: Stack[ServiceFactory[Exception, Int]] = Stack.Leaf(
       Stack.Role("test"),
       ServiceFactory.const(
-          Service.mk[Exception, Int] { req =>
+          Service.mk[Exception, Int]  req =>
             Future.exception(req)
-          }
       )
   )
 
@@ -46,13 +44,12 @@ class RetriesTest extends FunSuite {
         percentCanRetry = 0.0, // this shouldn't be a factor because we are relying on the reserve
         nowMillis = Stopwatch.timeMillis)
 
-  test("moduleRetryableWrites only does requeues") {
+  test("moduleRetryableWrites only does requeues")
     val stats = new InMemoryStatsReceiver()
     val budget = newBudget()
 
-    val retryAll: PartialFunction[Try[Nothing], Boolean] = {
+    val retryAll: PartialFunction[Try[Nothing], Boolean] =
       case _ => true
-    }
 
     val params =
       Stack.Params.empty + param.Stats(stats) +
@@ -63,35 +60,30 @@ class RetriesTest extends FunSuite {
 
     val svc: Service[Exception, Int] = Await.result(svcFactory(), 5.seconds)
 
-    Time.withCurrentTimeFrozen { tc =>
+    Time.withCurrentTimeFrozen  tc =>
       // each request will use up 1 retry from the budget due to the
       // caps maxRetriesPerReq limits
-      1.to(minBudget).foreach { i =>
-        val f = intercept[Failure] {
+      1.to(minBudget).foreach  i =>
+        val f = intercept[Failure]
           Await.result(svc(requeableEx), 5.seconds)
-        }
         assert(f.getMessage == requeableEx.getMessage)
         assert(stats.counter("retries", "requeues")() == i)
-      }
       // and check that we didn't do anything in a retry filter
       assert(!stats.stats.contains(Seq("retries")))
 
       // next, a request that is not eligible for requeues nor retries
       tc.advance(1.minute) // make sure we have requeue budget from the reserve
       assert(budget.balance == minBudget)
-      val f2 = intercept[RuntimeException] {
+      val f2 = intercept[RuntimeException]
         Await.result(svc(notRequeueableEx), 5.seconds)
-      }
       assert(f2.getMessage == notRequeueableEx.getMessage)
       // no additional requeues, even though we had budget
       assert(stats.counter("retries", "requeues")() == minBudget)
 
       // and nothing got retried in the RetryFilter
       assert(!stats.stats.contains(Seq("retries")))
-    }
-  }
 
-  test("moduleWithRetryPolicy requeues without retries") {
+  test("moduleWithRetryPolicy requeues without retries")
     val stats = new InMemoryStatsReceiver()
     val budget = newBudget()
 
@@ -105,35 +97,30 @@ class RetriesTest extends FunSuite {
 
     val svc: Service[Exception, Int] = Await.result(svcFactory(), 5.seconds)
 
-    Time.withCurrentTimeFrozen { tc =>
+    Time.withCurrentTimeFrozen  tc =>
       // each request will use up 1 retry from the budget due to the
       // caps maxRetriesPerReq limits
-      1.to(minBudget).foreach { i =>
-        val f = intercept[Failure] {
+      1.to(minBudget).foreach  i =>
+        val f = intercept[Failure]
           Await.result(svc(requeableEx), 5.seconds)
-        }
         assert(f.getMessage == requeableEx.getMessage)
         assert(stats.counter("retries", "requeues")() == i)
-      }
       // and check that we didn't do anything in a retry filter
       assert(!stats.stats.contains(Seq("retries")))
 
       // next, a request that is not eligible for requeues nor retries
       tc.advance(1.minute) // make sure we have requeue budget from the reserve
       assert(budget.balance == minBudget)
-      val f2 = intercept[RuntimeException] {
+      val f2 = intercept[RuntimeException]
         Await.result(svc(notRequeueableEx), 5.seconds)
-      }
       assert(f2.getMessage == notRequeueableEx.getMessage)
       // no additional requeues, even though we had budget
       assert(stats.counter("retries", "requeues")() == minBudget)
 
       // and nothing got retried in the RetryFilter
       assert(!stats.stats.contains(Seq("retries")))
-    }
-  }
 
-  test("moduleWithRetryPolicy retries with no requeues") {
+  test("moduleWithRetryPolicy retries with no requeues")
     val stats = new InMemoryStatsReceiver()
 
     val budget = RetryBudget(
@@ -152,9 +139,8 @@ class RetriesTest extends FunSuite {
 
     val svc: Service[Exception, Int] = Await.result(svcFactory(), 5.seconds)
 
-    intercept[MyRetryEx] {
+    intercept[MyRetryEx]
       Await.result(svc(new MyRetryEx()), 5.seconds)
-    }
 
     // should not be requeued, but should have been retried
     // up to what the budget allows for.
@@ -163,9 +149,8 @@ class RetriesTest extends FunSuite {
     // and not all the way up to the RetryPolicy's allotment of 100.
     assert(Seq(20f) == stats.stats(Seq("retries")))
     assert(1 == stats.counter("retries", "budget_exhausted")())
-  }
 
-  test("moduleWithRetryPolicy neither requeued nor netried") {
+  test("moduleWithRetryPolicy neither requeued nor netried")
     val stats = new InMemoryStatsReceiver()
 
     val params =
@@ -178,22 +163,20 @@ class RetriesTest extends FunSuite {
 
     val svc: Service[Exception, Int] = Await.result(svcFactory(), 5.seconds)
 
-    intercept[AnotherEx] {
+    intercept[AnotherEx]
       Await.result(svc(new AnotherEx()), 5.seconds)
-    }
 
     // should not have triggered either requeue or retries
     assert(!stats.counters.contains(Seq("retries", "requeues")))
     assert(Seq(0.0) == stats.stats(Seq("retries")))
     assert(0 == stats.counter("retries", "budget_exhausted")())
-  }
 
   /** Uses 4 retries for the RetryPolicy */
   private def endToEndToEndSvc(
       stats: InMemoryStatsReceiver,
       backReqs: AtomicInteger,
       mkBudget: () => RetryBudget
-  ): Service[Exception, Int] = {
+  ): Service[Exception, Int] =
     val midParams =
       Stack.Params.empty + param.Stats(stats.scope("mid")) +
       Retries.Budget(mkBudget()) + Retries.Policy(newRetryPolicy(retries = 4))
@@ -203,10 +186,9 @@ class RetriesTest extends FunSuite {
       Retries.Budget(mkBudget()) + Retries.Policy(newRetryPolicy(retries = 4))
 
     val backSvc = ServiceFactory.const(
-        Service.mk[Exception, Int] { req =>
+        Service.mk[Exception, Int]  req =>
           backReqs.incrementAndGet()
           Future.exception(req)
-        }
     )
 
     // wire em together.
@@ -220,15 +202,12 @@ class RetriesTest extends FunSuite {
     val frontSvcFactory =
       Retries.moduleWithRetryPolicy.toStack(frontToMid).make(frontParams)
     Await.result(frontSvcFactory(), 5.seconds)
-  }
 
-  private def nRetries(retriesStat: Seq[Float]): Int = {
-    retriesStat.foldLeft(0) { (sum, next) =>
+  private def nRetries(retriesStat: Seq[Float]): Int =
+    retriesStat.foldLeft(0)  (sum, next) =>
       sum + next.toInt
-    }
-  }
 
-  test("moduleWithRetryPolicy end to end to end with RetryBudget") {
+  test("moduleWithRetryPolicy end to end to end with RetryBudget")
     val stats = new InMemoryStatsReceiver()
     val backReqs = new AtomicInteger()
     val retryPercent = 0.2 // 20% retries
@@ -241,12 +220,10 @@ class RetriesTest extends FunSuite {
     val svc = endToEndToEndSvc(stats, backReqs, mkBudget)
 
     val numReqs = 100
-    Time.withCurrentTimeFrozen { _ =>
-      0.until(numReqs).foreach { _ =>
-        intercept[MyRetryEx] {
+    Time.withCurrentTimeFrozen  _ =>
+      0.until(numReqs).foreach  _ =>
+        intercept[MyRetryEx]
           Await.result(svc(new MyRetryEx()), 5.seconds)
-        }
-      }
 
       // verify each layer only sees 20% more
       assert((numReqs * 0.2).toInt == nRetries(
@@ -256,10 +233,8 @@ class RetriesTest extends FunSuite {
       // numReqs + front's retries + mid's retries
       // which is a 1.44x multiplier
       assert((numReqs * 1.44).toInt == backReqs.get)
-    }
-  }
 
-  test("moduleWithRetryPolicy end to end to end without RetryBudget") {
+  test("moduleWithRetryPolicy end to end to end without RetryBudget")
     val stats = new InMemoryStatsReceiver()
     val backReqs = new AtomicInteger()
     def mkBudget() = RetryBudget.Infinite
@@ -268,12 +243,10 @@ class RetriesTest extends FunSuite {
 
     val retries = 4
     val numReqs = 100
-    Time.withCurrentTimeFrozen { _ =>
-      0.until(numReqs).foreach { i =>
-        intercept[MyRetryEx] {
+    Time.withCurrentTimeFrozen  _ =>
+      0.until(numReqs).foreach  i =>
+        intercept[MyRetryEx]
           Await.result(svc(new MyRetryEx()), 5.seconds)
-        }
-      }
 
       assert(
           numReqs * retries == nRetries(stats.stats(Seq("front", "retries"))))
@@ -283,10 +256,8 @@ class RetriesTest extends FunSuite {
       // 1 attempt + 4 retries = 5 reqs from the mid to the backend,
       // and the front will do that a total of 5 times (so 5 * 5 = 25)
       assert(numReqs * 25 == backReqs.get)
-    }
-  }
 
-  test("budget gauge lifecycle") {
+  test("budget gauge lifecycle")
     val stats = new InMemoryStatsReceiver()
     def budgetGauge: Option[Float] =
       stats.gauges.get(Seq("retries", "budget")).map(_ ())
@@ -309,5 +280,3 @@ class RetriesTest extends FunSuite {
     // closing the factory should remove the gauge
     svcFactory.close(Duration.Zero)
     assert(budgetGauge.isEmpty)
-  }
-}

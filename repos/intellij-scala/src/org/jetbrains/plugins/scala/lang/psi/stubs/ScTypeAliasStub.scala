@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScTypeAlias
   * User: Alexander Podkhalyuzin
   * Date: 18.10.2008
   */
-trait ScTypeAliasStub extends NamedStub[ScTypeAlias] with ScMemberOrLocal {
+trait ScTypeAliasStub extends NamedStub[ScTypeAlias] with ScMemberOrLocal
   def isDeclaration: Boolean
 
   def getTypeElementText: String
@@ -27,4 +27,3 @@ trait ScTypeAliasStub extends NamedStub[ScTypeAlias] with ScMemberOrLocal {
   def getUpperBoundTypeElement: ScTypeElement
 
   def isStableQualifier: Boolean
-}

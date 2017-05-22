@@ -20,13 +20,13 @@ private[akka] class ActorRefBackpressureSinkStage[In](
     ackMessage: Any,
     onCompleteMessage: Any,
     onFailureMessage: (Throwable) ⇒ Any)
-    extends GraphStage[SinkShape[In]] {
+    extends GraphStage[SinkShape[In]]
   val in: Inlet[In] = Inlet[In]("ActorRefBackpressureSink.in")
   override def initialAttributes = DefaultAttributes.actorRefWithAck
   override val shape: SinkShape[In] = SinkShape(in)
 
   override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
-    new GraphStageLogic(shape) {
+    new GraphStageLogic(shape)
       implicit def self: ActorRef = stageActor.ref
 
       val maxBuffer = inheritedAttributes
@@ -38,58 +38,45 @@ private[akka] class ActorRefBackpressureSinkStage[In](
       var acknowledgementReceived = false
       var completeReceived = false
 
-      private def receive(evt: (ActorRef, Any)): Unit = {
-        evt._2 match {
-          case `ackMessage` ⇒ {
+      private def receive(evt: (ActorRef, Any)): Unit =
+        evt._2 match
+          case `ackMessage` ⇒
               if (buffer.isEmpty) acknowledgementReceived = true
-              else {
+              else
                 // onPush might have filled the buffer up and
                 // stopped pulling, so we pull here
                 if (buffer.size() == maxBuffer) tryPull(in)
                 dequeueAndSend()
-              }
-            }
           case Terminated(`ref`) ⇒ completeStage()
           case _ ⇒ //ignore all other messages
-        }
-      }
 
-      override def preStart() = {
+      override def preStart() =
         setKeepGoing(true)
         getStageActor(receive).watch(ref)
         ref ! onInitMessage
         pull(in)
-      }
 
-      private def dequeueAndSend(): Unit = {
+      private def dequeueAndSend(): Unit =
         ref ! buffer.poll()
         if (buffer.isEmpty && completeReceived) finish()
-      }
 
-      private def finish(): Unit = {
+      private def finish(): Unit =
         ref ! onCompleteMessage
         completeStage()
-      }
 
-      setHandler(in, new InHandler {
-        override def onPush(): Unit = {
+      setHandler(in, new InHandler
+        override def onPush(): Unit =
           buffer offer grab(in)
-          if (acknowledgementReceived) {
+          if (acknowledgementReceived)
             dequeueAndSend()
             acknowledgementReceived = false
-          }
           if (buffer.size() < maxBuffer) pull(in)
-        }
-        override def onUpstreamFinish(): Unit = {
+        override def onUpstreamFinish(): Unit =
           if (buffer.isEmpty) finish()
           else completeReceived = true
-        }
-        override def onUpstreamFailure(ex: Throwable): Unit = {
+        override def onUpstreamFailure(ex: Throwable): Unit =
           ref ! onFailureMessage(ex)
           failStage(ex)
-        }
-      })
-    }
+      )
 
   override def toString = "ActorRefBackpressureSink"
-}

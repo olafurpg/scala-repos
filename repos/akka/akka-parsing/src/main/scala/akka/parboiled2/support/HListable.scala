@@ -18,15 +18,12 @@ package akka.parboiled2.support
 
 import akka.shapeless._
 
-trait HListable[T] {
+trait HListable[T]
   type Out <: HList
-}
 
-object HListable extends LowerPriorityHListable {
+object HListable extends LowerPriorityHListable
   implicit def fromUnit: HListable[Unit] { type Out = HNil } = `n/a`
   implicit def fromHList[T <: HList]: HListable[T] { type Out = T } = `n/a`
-}
 
-abstract class LowerPriorityHListable {
+abstract class LowerPriorityHListable
   implicit def fromAnyRef[T]: HListable[T] { type Out = T :: HNil } = `n/a`
-}

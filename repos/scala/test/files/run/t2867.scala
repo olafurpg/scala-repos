@@ -1,7 +1,7 @@
-object Test {
+object Test
   case class A(l: List[_]*)
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     /** Kind of sneaking a slightly different test in here as well as
       *  testing 2867.  How subversive.
@@ -12,5 +12,3 @@ object Test {
     val xs4 = List[Byte](1, 2, 3)
 
     assert(A(List(xs1, xs2)) == A(List(xs3, xs4)))
-  }
-}

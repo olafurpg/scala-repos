@@ -2,7 +2,7 @@ package lila.game
 
 import chess.Color
 
-case class Pov(game: Game, color: Color) {
+case class Pov(game: Game, color: Color)
 
   def player = game player color
 
@@ -26,9 +26,8 @@ case class Pov(game: Game, color: Color) {
   lazy val isMyTurn = game.started && game.playable && game.turnColor == color
 
   lazy val remainingSeconds: Option[Int] =
-    game.clock.map(_.remainingTime(color).toInt).orElse {
+    game.clock.map(_.remainingTime(color).toInt).orElse
       game.playableCorrespondenceClock.map(_.remainingTime(color).toInt)
-    }
 
   def hasMoved = game playerHasMoved color
 
@@ -39,9 +38,8 @@ case class Pov(game: Game, color: Color) {
   def forecastable = game.forecastable && game.turnColor != color
 
   override def toString = ref.toString
-}
 
-object Pov {
+object Pov
 
   def apply(game: Game): List[Pov] = game.players.map { apply(game, _) }
 
@@ -72,12 +70,11 @@ object Pov {
     ofUserId(game, userId) map (_.opponent)
 
   private def orInf(i: Option[Int]) = i getOrElse Int.MaxValue
-  private def isFresher(a: Pov, b: Pov) = {
+  private def isFresher(a: Pov, b: Pov) =
     val aDate = a.game.updatedAtOrCreatedAt.getSeconds
     val bDate = b.game.updatedAtOrCreatedAt.getSeconds
     if (aDate == bDate) a.gameId < b.gameId
     else aDate > bDate
-  }
 
   def priority(a: Pov, b: Pov) =
     if (!a.isMyTurn && !b.isMyTurn) isFresher(a, b)
@@ -89,19 +86,16 @@ object Pov {
     else if (orInf(a.remainingSeconds) < orInf(b.remainingSeconds)) true
     else if (orInf(b.remainingSeconds) < orInf(a.remainingSeconds)) false
     else isFresher(a, b)
-}
 
-case class PovRef(gameId: String, color: Color) {
+case class PovRef(gameId: String, color: Color)
 
   def unary_! = PovRef(gameId, !color)
 
   override def toString = s"$gameId/$color"
-}
 
 case class PlayerRef(gameId: String, playerId: String)
 
-object PlayerRef {
+object PlayerRef
 
   def apply(fullId: String): PlayerRef =
     PlayerRef(Game takeGameId fullId, Game takePlayerId fullId)
-}

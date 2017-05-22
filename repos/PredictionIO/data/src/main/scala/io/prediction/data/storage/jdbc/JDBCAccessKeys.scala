@@ -25,19 +25,18 @@ import scala.util.Random
 /** JDBC implementation of [[AccessKeys]] */
 class JDBCAccessKeys(
     client: String, config: StorageClientConfig, prefix: String)
-    extends AccessKeys with Logging {
+    extends AccessKeys with Logging
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "accesskeys")
-  DB autoCommit { implicit session =>
+  DB autoCommit  implicit session =>
     sql"""
     create table if not exists $tableName (
       accesskey varchar(64) not null primary key,
       appid integer not null,
       events text)""".execute().apply()
-  }
 
-  def insert(accessKey: AccessKey): Option[String] = DB localTx { implicit s =>
+  def insert(accessKey: AccessKey): Option[String] = DB localTx  implicit s =>
     val key = if (accessKey.key.isEmpty) generateKey else accessKey.key
     val events =
       if (accessKey.events.isEmpty) None
@@ -48,31 +47,27 @@ class JDBCAccessKeys(
       ${accessKey.appid},
       $events)""".update().apply()
     Some(key)
-  }
 
-  def get(key: String): Option[AccessKey] = DB readOnly { implicit session =>
+  def get(key: String): Option[AccessKey] = DB readOnly  implicit session =>
     sql"SELECT accesskey, appid, events FROM $tableName WHERE accesskey = $key"
       .map(resultToAccessKey)
       .single()
       .apply()
-  }
 
-  def getAll(): Seq[AccessKey] = DB readOnly { implicit session =>
+  def getAll(): Seq[AccessKey] = DB readOnly  implicit session =>
     sql"SELECT accesskey, appid, events FROM $tableName"
       .map(resultToAccessKey)
       .list()
       .apply()
-  }
 
-  def getByAppid(appid: Int): Seq[AccessKey] = DB readOnly {
+  def getByAppid(appid: Int): Seq[AccessKey] = DB readOnly
     implicit session =>
       sql"SELECT accesskey, appid, events FROM $tableName WHERE appid = $appid"
         .map(resultToAccessKey)
         .list()
         .apply()
-  }
 
-  def update(accessKey: AccessKey): Unit = DB localTx { implicit session =>
+  def update(accessKey: AccessKey): Unit = DB localTx  implicit session =>
     val events =
       if (accessKey.events.isEmpty) None
       else Some(accessKey.events.mkString(","))
@@ -81,17 +76,13 @@ class JDBCAccessKeys(
       appid = ${accessKey.appid},
       events = $events
     WHERE accesskey = ${accessKey.key}""".update().apply()
-  }
 
-  def delete(key: String): Unit = DB localTx { implicit session =>
+  def delete(key: String): Unit = DB localTx  implicit session =>
     sql"DELETE FROM $tableName WHERE accesskey = $key".update().apply()
-  }
 
   /** Convert JDBC results to [[AccessKey]] */
-  def resultToAccessKey(rs: WrappedResultSet): AccessKey = {
+  def resultToAccessKey(rs: WrappedResultSet): AccessKey =
     AccessKey(
         key = rs.string("accesskey"),
         appid = rs.int("appid"),
         events = rs.stringOpt("events").map(_.split(",").toSeq).getOrElse(Nil))
-  }
-}

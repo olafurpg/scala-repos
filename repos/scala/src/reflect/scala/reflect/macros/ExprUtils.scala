@@ -8,7 +8,7 @@ package macros
   * A slice of [[scala.reflect.macros.blackbox.Context the Scala macros context]] that defines shorthands for the
   *  most common `Expr`-creating functions.
   */
-trait ExprUtils { self: blackbox.Context =>
+trait ExprUtils  self: blackbox.Context =>
 
   /** Shorthand for `Literal(Constant(null))` in the underlying `universe`. */
   @deprecated("Use quasiquotes instead", "2.11.0")
@@ -61,4 +61,3 @@ trait ExprUtils { self: blackbox.Context =>
   /** Shorthand for `Literal(Constant(x: Char))` in the underlying `universe`. */
   @deprecated("Use quasiquotes instead", "2.11.0")
   def literal(x: Char): Expr[Char]
-}

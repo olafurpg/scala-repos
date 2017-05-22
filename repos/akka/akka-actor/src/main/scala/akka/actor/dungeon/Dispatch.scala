@@ -17,7 +17,7 @@ import akka.dispatch.ProducesMessageQueue
 import akka.serialization.SerializerWithStringManifest
 import akka.dispatch.UnboundedMailbox
 
-private[akka] trait Dispatch {
+private[akka] trait Dispatch
   this: ActorCell ⇒
 
   @volatile private var _mailboxDoNotCallMeDirectly: Mailbox =
@@ -28,13 +28,12 @@ private[akka] trait Dispatch {
       .getObjectVolatile(this, AbstractActorCell.mailboxOffset)
       .asInstanceOf[Mailbox]
 
-  @tailrec final def swapMailbox(newMailbox: Mailbox): Mailbox = {
+  @tailrec final def swapMailbox(newMailbox: Mailbox): Mailbox =
     val oldMailbox = mailbox
     if (!Unsafe.instance.compareAndSwapObject(
             this, AbstractActorCell.mailboxOffset, oldMailbox, newMailbox))
       swapMailbox(newMailbox)
     else oldMailbox
-  }
 
   final def hasMessages: Boolean = mailbox.hasMessages
 
@@ -47,7 +46,7 @@ private[akka] trait Dispatch {
     * reasonably different from the previous UID of a possible actor with the same path,
     * which can be achieved by using ThreadLocalRandom.current.nextInt().
     */
-  final def init(sendSupervise: Boolean, mailboxType: MailboxType): this.type = {
+  final def init(sendSupervise: Boolean, mailboxType: MailboxType): this.type =
     /*
      * Create the mailbox and enqueue the Create() message to ensure that
      * this is processed before anything else.
@@ -62,12 +61,12 @@ private[akka] trait Dispatch {
     // we need to delay the failure to the point of actor creation so we can handle
     // it properly in the normal way
     val actorClass = props.actorClass
-    val createMessage = mailboxType match {
+    val createMessage = mailboxType match
       case _: ProducesMessageQueue[_]
           if system.mailboxes.hasRequiredType(actorClass) ⇒
         val req = system.mailboxes.getRequiredType(actorClass)
         if (req isInstance mbox.messageQueue) Create(None)
-        else {
+        else
           val gotType =
             if (mbox.messageQueue == null) "null"
             else mbox.messageQueue.getClass.getName
@@ -75,9 +74,7 @@ private[akka] trait Dispatch {
               Some(ActorInitializationException(
                       self,
                       s"Actor [$self] requires mailbox type [$req] got [$gotType]")))
-        }
       case _ ⇒ Create(None)
-    }
 
     swapMailbox(mbox)
     mailbox.setActor(this)
@@ -85,15 +82,13 @@ private[akka] trait Dispatch {
     // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
     mailbox.systemEnqueue(self, createMessage)
 
-    if (sendSupervise) {
+    if (sendSupervise)
       // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
       parent.sendSystemMessage(
           akka.dispatch.sysmsg.Supervise(self, async = false))
-    }
     this
-  }
 
-  final def initWithFailure(failure: Throwable): this.type = {
+  final def initWithFailure(failure: Throwable): this.type =
     val mbox = dispatcher.createMailbox(this, new UnboundedMailbox)
     swapMailbox(mbox)
     mailbox.setActor(this)
@@ -102,18 +97,16 @@ private[akka] trait Dispatch {
                 self, "failure while creating ActorCell", failure)))
     mailbox.systemEnqueue(self, createMessage)
     this
-  }
 
   /**
     * Start this cell, i.e. attach it to the dispatcher.
     */
-  def start(): this.type = {
+  def start(): this.type =
     // This call is expected to start off the actor by scheduling its mailbox.
     dispatcher.attach(this)
     this
-  }
 
-  private def handleException: Catcher[Unit] = {
+  private def handleException: Catcher[Unit] =
     case e: InterruptedException ⇒
       system.eventStream.publish(
           Error(e,
@@ -127,7 +120,6 @@ private[akka] trait Dispatch {
                 self.path.toString,
                 clazz(actor),
                 "swallowing exception during message send"))
-  }
 
   // ➡➡➡ NEVER SEND THE SAME SYSTEM MESSAGE OBJECT TO TWO ACTORS ⬅⬅⬅
   final def suspend(): Unit =
@@ -146,28 +138,24 @@ private[akka] trait Dispatch {
     try dispatcher.systemDispatch(this, Terminate()) catch handleException
 
   def sendMessage(msg: Envelope): Unit =
-    try {
-      if (system.settings.SerializeAllMessages) {
-        val unwrapped = (msg.message match {
+    try
+      if (system.settings.SerializeAllMessages)
+        val unwrapped = (msg.message match
           case DeadLetter(wrapped, _, _) ⇒ wrapped
           case other ⇒ other
-        }).asInstanceOf[AnyRef]
-        if (!unwrapped.isInstanceOf[NoSerializationVerificationNeeded]) {
+        ).asInstanceOf[AnyRef]
+        if (!unwrapped.isInstanceOf[NoSerializationVerificationNeeded])
           val s = SerializationExtension(system)
           val serializer = s.findSerializerFor(unwrapped)
           val bytes = serializer.toBinary(unwrapped)
-          serializer match {
+          serializer match
             case ser2: SerializerWithStringManifest ⇒
               val manifest = ser2.manifest(unwrapped)
               s.deserialize(bytes, serializer.identifier, manifest).get != null
             case _ ⇒
               s.deserialize(bytes, unwrapped.getClass).get
-          }
-        }
-      }
       dispatcher.dispatch(this, msg)
-    } catch handleException
+    catch handleException
 
   override def sendSystemMessage(message: SystemMessage): Unit =
     try dispatcher.systemDispatch(this, message) catch handleException
-}

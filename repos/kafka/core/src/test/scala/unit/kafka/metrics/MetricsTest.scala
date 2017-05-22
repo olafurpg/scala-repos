@@ -32,7 +32,7 @@ import scala.collection._
 import scala.collection.JavaConversions._
 import scala.util.matching.Regex
 
-class MetricsTest extends KafkaServerTestHarness with Logging {
+class MetricsTest extends KafkaServerTestHarness with Logging
   val numNodes = 2
   val numParts = 2
   val topic = "topic1"
@@ -48,15 +48,14 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
   val nMessages = 2
 
   @After
-  override def tearDown() {
+  override def tearDown()
     super.tearDown()
-  }
 
   @Test
   @deprecated(
       "This test has been deprecated and it will be removed in a future release",
       "0.10.0.0")
-  def testMetricsLeak() {
+  def testMetricsLeak()
     // create topic topic1 with 1 partition on broker 0
     createTopic(zkUtils,
                 topic,
@@ -72,29 +71,26 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
     val countOfStaticMetrics =
       Metrics.defaultRegistry().allMetrics().keySet().size
 
-    for (i <- 0 to 5) {
+    for (i <- 0 to 5)
       createAndShutdownStep(
           "group" + i % 3, "consumer" + i % 2, "producer" + i % 2)
       assertEquals(countOfStaticMetrics,
                    Metrics.defaultRegistry().allMetrics().keySet().size)
-    }
-  }
 
   @Test
-  def testMetricsReporterAfterDeletingTopic() {
+  def testMetricsReporterAfterDeletingTopic()
     val topic = "test-topic-metric"
     AdminUtils.createTopic(zkUtils, topic, 1, 1)
     AdminUtils.deleteTopic(zkUtils, topic)
     TestUtils.verifyTopicDeletion(zkUtils, topic, 1, servers)
     assertFalse("Topic metrics exists after deleteTopic",
                 checkTopicMetricsExists(topic))
-  }
 
   @deprecated(
       "This test has been deprecated and it will be removed in a future release",
       "0.10.0.0")
   def createAndShutdownStep(
-      group: String, consumerId: String, producerId: String): Unit = {
+      group: String, consumerId: String, producerId: String): Unit =
     sendMessages(servers, topic, nMessages)
     // create a consumer
     val consumerConfig1 = new ConsumerConfig(
@@ -106,16 +102,12 @@ class MetricsTest extends KafkaServerTestHarness with Logging {
     getMessages(topicMessageStreams1, nMessages)
 
     zkConsumerConnector1.shutdown()
-  }
 
-  private def checkTopicMetricsExists(topic: String): Boolean = {
+  private def checkTopicMetricsExists(topic: String): Boolean =
     val topicMetricRegex = new Regex(".*(" + topic + ")$")
     val metricGroups =
       Metrics.defaultRegistry().groupedMetrics(MetricPredicate.ALL).entrySet()
-    for (metricGroup <- metricGroups) {
+    for (metricGroup <- metricGroups)
       if (topicMetricRegex.pattern.matcher(metricGroup.getKey()).matches)
         return true
-    }
     false
-  }
-}

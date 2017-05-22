@@ -4,23 +4,22 @@ package org.jetbrains.plugins.scala.testingSupport.utest
   * @author Roman.Shein
   * @since 04.09.2015.
   */
-trait UTestStaticStringTest extends UTestTestCase {
+trait UTestStaticStringTest extends UTestTestCase
 
   protected def staticStringTestName = "UTestStaticStringTest"
 
   protected def staticStringTestFileName = staticStringTestName + ".scala"
 
   protected def checkTest(
-      lineNumber: Int, position: Int, expectedName: String) = {
+      lineNumber: Int, position: Int, expectedName: String) =
     assert(
         checkConfigAndSettings(
             createTestFromLocation(
                 lineNumber, position, staticStringTestFileName),
             staticStringTestName,
             "tests" + (if (expectedName.isEmpty) "" else "\\" + expectedName)))
-  }
 
-  protected def addTest(): Unit = {
+  protected def addTest(): Unit =
     addFileToProject(staticStringTestFileName,
                      """
         |import utest._
@@ -52,58 +51,46 @@ trait UTestStaticStringTest extends UTestTestCase {
         |  }
         |}
       """.stripMargin)
-  }
 
-  def testSum(): Unit = {
+  def testSum(): Unit =
     addTest()
     checkTest(9, 7, "sumName")
-  }
 
-  def testVal(): Unit = {
+  def testVal(): Unit =
     addTest()
     checkTest(7, 5, "valName")
-  }
 
-  def testNonConst(): Unit = {
+  def testNonConst(): Unit =
     addTest()
     assert(
         checkConfigAndSettings(
             createTestFromLocation(11, 10, staticStringTestFileName),
             staticStringTestName))
-  }
 
-  def testTrim() = {
+  def testTrim() =
     addTest()
     checkTest(13, 10, "testTrim1")
-  }
 
-  def testToLowerCase() = {
+  def testToLowerCase() =
     addTest()
     checkTest(15, 13, "lowercase")
-  }
 
-  def testSuffix() = {
+  def testSuffix() =
     addTest()
     checkTest(17, 10, "prefix")
-  }
 
-  def testPrefix() = {
+  def testPrefix() =
     addTest()
     checkTest(19, 10, "suffix")
-  }
 
-  def testSubString1() = {
+  def testSubString1() =
     addTest()
     checkTest(21, 10, "Test1")
-  }
 
-  def testSubString2() = {
+  def testSubString2() =
     addTest()
     checkTest(23, 10, "Test2")
-  }
 
-  def testReplace(): Unit = {
+  def testReplace(): Unit =
     addTest()
     checkTest(25, 10, "replace")
-  }
-}

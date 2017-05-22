@@ -7,7 +7,7 @@ import org.reactivestreams._
 import play.api.libs.concurrent.StateMachine
 import scala.concurrent.Promise
 
-private[streams] object PromiseSubscriber {
+private[streams] object PromiseSubscriber
 
   /**
     * Internal state of the Subscriber.
@@ -31,52 +31,47 @@ private[streams] object PromiseSubscriber {
     * called or because its Promise is complete.
     */
   final case object Completed extends State
-}
 
 import PromiseSubscriber._
 
 // Assume that promise's onComplete handler runs asynchronously
 private[streams] class PromiseSubscriber[T](prom: Promise[T])
     extends StateMachine[State](initialState = AwaitingSubscription)
-    with Subscriber[T] {
+    with Subscriber[T]
 
   // Streams methods
 
-  override def onSubscribe(subscription: Subscription): Unit = exclusive {
+  override def onSubscribe(subscription: Subscription): Unit = exclusive
     case Subscribed =>
       throw new IllegalStateException("Can't call onSubscribe twice")
     case AwaitingSubscription =>
       // Check if promise is completed. Even if we request elements, we
       // still need to handle the Promise completing in some other way.
-      if (prom.isCompleted) {
+      if (prom.isCompleted)
         state = Completed
         subscription.cancel()
-      } else {
+      else
         state = Subscribed
         subscription.request(1)
-      }
     case Completed =>
       subscription.cancel()
-  }
 
-  override def onError(cause: Throwable): Unit = exclusive {
+  override def onError(cause: Throwable): Unit = exclusive
     case AwaitingSubscription | Subscribed =>
       state = Completed
       prom.failure(cause) // we assume any Future.onComplete handlers run asynchronously
     case Completed =>
       ()
-  }
 
-  override def onComplete(): Unit = exclusive {
+  override def onComplete(): Unit = exclusive
     case AwaitingSubscription | Subscribed =>
       prom.failure(new IllegalStateException(
               "Can't handle onComplete until an element has been received"))
       state = Completed
     case Completed =>
       ()
-  }
 
-  override def onNext(element: T): Unit = exclusive {
+  override def onNext(element: T): Unit = exclusive
     case AwaitingSubscription =>
       state = Completed
       throw new IllegalStateException(
@@ -86,5 +81,3 @@ private[streams] class PromiseSubscriber[T](prom: Promise[T])
       prom.success(element) // we assume any Future.onComplete handlers run asynchronously
     case Completed =>
       ()
-  }
-}

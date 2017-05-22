@@ -12,6 +12,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * Date: 06.03.2008
   */
 class ScErrorStatImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScErrorStat {
+    extends ScalaPsiElementImpl(node) with ScErrorStat
   override def toString: String = "ErrorStatement"
-}

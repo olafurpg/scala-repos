@@ -46,7 +46,7 @@ class CoordinateMatrix @Since("1.0.0")(
     @Since("1.0.0") val entries: RDD[MatrixEntry],
     private var nRows: Long,
     private var nCols: Long)
-    extends DistributedMatrix {
+    extends DistributedMatrix
 
   /** Alternative constructor leaving matrix dimensions to be determined automatically. */
   @Since("1.0.0")
@@ -54,63 +54,53 @@ class CoordinateMatrix @Since("1.0.0")(
 
   /** Gets or computes the number of columns. */
   @Since("1.0.0")
-  override def numCols(): Long = {
-    if (nCols <= 0L) {
+  override def numCols(): Long =
+    if (nCols <= 0L)
       computeSize()
-    }
     nCols
-  }
 
   /** Gets or computes the number of rows. */
   @Since("1.0.0")
-  override def numRows(): Long = {
-    if (nRows <= 0L) {
+  override def numRows(): Long =
+    if (nRows <= 0L)
       computeSize()
-    }
     nRows
-  }
 
   /** Transposes this CoordinateMatrix. */
   @Since("1.3.0")
-  def transpose(): CoordinateMatrix = {
+  def transpose(): CoordinateMatrix =
     new CoordinateMatrix(
         entries.map(x => MatrixEntry(x.j, x.i, x.value)), numCols(), numRows())
-  }
 
   /** Converts to IndexedRowMatrix. The number of columns must be within the integer range. */
   @Since("1.0.0")
-  def toIndexedRowMatrix(): IndexedRowMatrix = {
+  def toIndexedRowMatrix(): IndexedRowMatrix =
     val nl = numCols()
-    if (nl > Int.MaxValue) {
+    if (nl > Int.MaxValue)
       sys.error(
           s"Cannot convert to a row-oriented format because the number of columns $nl is " +
           "too large.")
-    }
     val n = nl.toInt
     val indexedRows = entries
       .map(entry => (entry.i, (entry.j.toInt, entry.value)))
       .groupByKey()
-      .map {
+      .map
         case (i, vectorEntries) =>
           IndexedRow(i, Vectors.sparse(n, vectorEntries.toSeq))
-      }
     new IndexedRowMatrix(indexedRows, numRows(), n)
-  }
 
   /**
     * Converts to RowMatrix, dropping row indices after grouping by row index.
     * The number of columns must be within the integer range.
     */
   @Since("1.0.0")
-  def toRowMatrix(): RowMatrix = {
+  def toRowMatrix(): RowMatrix =
     toIndexedRowMatrix().toRowMatrix()
-  }
 
   /** Converts to BlockMatrix. Creates blocks of [[SparseMatrix]] with size 1024 x 1024. */
   @Since("1.3.0")
-  def toBlockMatrix(): BlockMatrix = {
+  def toBlockMatrix(): BlockMatrix =
     toBlockMatrix(1024, 1024)
-  }
 
   /**
     * Converts to BlockMatrix. Creates blocks of [[SparseMatrix]].
@@ -121,7 +111,7 @@ class CoordinateMatrix @Since("1.0.0")(
     * @return a [[BlockMatrix]]
     */
   @Since("1.3.0")
-  def toBlockMatrix(rowsPerBlock: Int, colsPerBlock: Int): BlockMatrix = {
+  def toBlockMatrix(rowsPerBlock: Int, colsPerBlock: Int): BlockMatrix =
     require(
         rowsPerBlock > 0,
         s"rowsPerBlock needs to be greater than 0. rowsPerBlock: $rowsPerBlock")
@@ -135,7 +125,7 @@ class CoordinateMatrix @Since("1.0.0")(
     val partitioner = GridPartitioner(
         numRowBlocks, numColBlocks, entries.partitions.length)
 
-    val blocks: RDD[((Int, Int), Matrix)] = entries.map { entry =>
+    val blocks: RDD[((Int, Int), Matrix)] = entries.map  entry =>
       val blockRowIndex = (entry.i / rowsPerBlock).toInt
       val blockColIndex = (entry.j / colsPerBlock).toInt
 
@@ -143,7 +133,7 @@ class CoordinateMatrix @Since("1.0.0")(
       val colId = entry.j % colsPerBlock
 
       ((blockRowIndex, blockColIndex), (rowId.toInt, colId.toInt, entry.value))
-    }.groupByKey(partitioner).map {
+    .groupByKey(partitioner).map
       case ((blockRowIndex, blockColIndex), entry) =>
         val effRows =
           math.min(m - blockRowIndex.toLong * rowsPerBlock, rowsPerBlock).toInt
@@ -152,31 +142,24 @@ class CoordinateMatrix @Since("1.0.0")(
           .toInt
           ((blockRowIndex, blockColIndex),
            SparseMatrix.fromCOO(effRows, effCols, entry))
-    }
     new BlockMatrix(blocks, rowsPerBlock, colsPerBlock, m, n)
-  }
 
   /** Determines the size by computing the max row/column index. */
-  private def computeSize() {
+  private def computeSize()
     // Reduce will throw an exception if `entries` is empty.
-    val (m1, n1) = entries.map(entry => (entry.i, entry.j)).reduce {
+    val (m1, n1) = entries.map(entry => (entry.i, entry.j)).reduce
       case ((i1, j1), (i2, j2)) =>
         (math.max(i1, i2), math.max(j1, j2))
-    }
     // There may be empty columns at the very right and empty rows at the very bottom.
     nRows = math.max(nRows, m1 + 1L)
     nCols = math.max(nCols, n1 + 1L)
-  }
 
   /** Collects data and assembles a local matrix. */
-  private[mllib] override def toBreeze(): BDM[Double] = {
+  private[mllib] override def toBreeze(): BDM[Double] =
     val m = numRows().toInt
     val n = numCols().toInt
     val mat = BDM.zeros[Double](m, n)
-    entries.collect().foreach {
+    entries.collect().foreach
       case MatrixEntry(i, j, value) =>
         mat(i.toInt, j.toInt) = value
-    }
     mat
-  }
-}

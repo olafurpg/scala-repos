@@ -55,7 +55,7 @@ object BindingIncludes extends BindingIncludes
   * @define STB StringBinding
   * @define STE StringExpression
   */
-trait BindingIncludes extends Bindings {
+trait BindingIncludes extends Bindings
   // Implicit upcasts from JavaFX to ScalaFX types for all bindings
 
   /**
@@ -159,11 +159,9 @@ trait BindingIncludes extends Bindings {
     */
   implicit def closure2InvalidationListener(
       il: jfxb.Observable => Unit): InvalidationListener =
-    new jfxb.InvalidationListener {
-      def invalidated(observable: jfxb.Observable) {
+    new jfxb.InvalidationListener
+      def invalidated(observable: jfxb.Observable)
         il(observable)
-      }
-    }
 
   /**
     * Converts a closure to a $JFX ChangeListener.
@@ -174,13 +172,11 @@ trait BindingIncludes extends Bindings {
     */
   implicit def closure2ChangedListener[P](
       cl: (jfxbv.ObservableValue[_ <: P], P, P) => Unit): ChangeListener[P] =
-    new jfxbv.ChangeListener[P]() {
+    new jfxbv.ChangeListener[P]()
       def changed(observable: jfxbv.ObservableValue[_ <: P],
                   oldValue: P,
-                  newValue: P) {
+                  newValue: P)
         cl(observable, oldValue, newValue)
-      }
-    }
 
   // Upconversions from primitives to bindings
   // Needed for min and max, which take a list of bindings -- all other uses have the primitives declared directly for efficiency
@@ -192,9 +188,8 @@ trait BindingIncludes extends Bindings {
     * @return a new IntegerBinding generted from the Integer.
     */
   implicit def integer2IntegerBinding(i: Int): IntegerBinding =
-    new jfxbb.IntegerBinding {
+    new jfxbb.IntegerBinding
       def computeValue() = i
-    }
 
   /**
     * Converts a Long to a $JFX LongBinding
@@ -202,9 +197,8 @@ trait BindingIncludes extends Bindings {
     * @param i Long to generate a new LongBinding
     * @return a new LongBinding generated from the Long.
     */
-  implicit def long2LongBinding(i: Long): LongBinding = new jfxbb.LongBinding {
+  implicit def long2LongBinding(i: Long): LongBinding = new jfxbb.LongBinding
     def computeValue() = i
-  }
 
   /**
     * Converts a Float to a $JFX FloatBinding
@@ -213,9 +207,8 @@ trait BindingIncludes extends Bindings {
     * @return a new FloatBinding generated from the Float.
     */
   implicit def float2FloatBinding(i: Float): FloatBinding =
-    new jfxbb.FloatBinding {
+    new jfxbb.FloatBinding
       def computeValue() = i
-    }
 
   /**
     * Converts a Double to a $JFX DoubleBinding
@@ -224,7 +217,5 @@ trait BindingIncludes extends Bindings {
     * @return a new DoubleBinding generated from the Double.
     */
   implicit def double2DoubleBinding(i: Double): DoubleBinding =
-    new jfxbb.DoubleBinding {
+    new jfxbb.DoubleBinding
       def computeValue() = i
-    }
-}

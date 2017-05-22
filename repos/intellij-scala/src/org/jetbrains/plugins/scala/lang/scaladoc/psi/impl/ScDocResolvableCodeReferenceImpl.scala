@@ -27,24 +27,22 @@ import org.jetbrains.plugins.scala.project._
   */
 class ScDocResolvableCodeReferenceImpl(node: ASTNode)
     extends ScStableCodeReferenceElementImpl(node)
-    with ScDocResolvableCodeReference {
+    with ScDocResolvableCodeReference
   private def is2_10plus: Boolean =
     this.scalaLanguageLevel
       .map(_ >= ScalaLanguageLevel.Scala_2_10)
       .getOrElse(true)
 
-  override def multiResolve(incomplete: Boolean): Array[ResolveResult] = {
+  override def multiResolve(incomplete: Boolean): Array[ResolveResult] =
     val s = super.multiResolve(incomplete)
-    s.zipWithIndex.collect {
+    s.zipWithIndex.collect
       case (ScalaResolveResult(cstr: ScPrimaryConstructor, _), ind)
           if cstr.containingClass != null =>
         (new ScalaResolveResult(cstr.containingClass), ind)
-    } foreach {
+    foreach
       case (rr, idx) => s(idx) = rr
-    }
 
     s
-  }
 
   override def getKinds(incomplete: Boolean, completion: Boolean) =
     stableImportSelector
@@ -57,10 +55,10 @@ class ScDocResolvableCodeReferenceImpl(node: ASTNode)
           clazz.qualifiedName, clazz.element.getManager)
 
   override protected def processQualifier(
-      ref: ScStableCodeReferenceElement, processor: BaseProcessor) {
+      ref: ScStableCodeReferenceElement, processor: BaseProcessor)
     if (is2_10plus) super.processQualifier(ref, processor)
     else
-      pathQualifier match {
+      pathQualifier match
         case None =>
           val defaultPackage = ScPackageImpl(
               JavaPsiFacade.getInstance(getProject).findPackage(""))
@@ -70,6 +68,3 @@ class ScDocResolvableCodeReferenceImpl(node: ASTNode)
           q.multiResolve(true)
             .foreach(processQualifierResolveResult(_, processor, ref))
         case _ =>
-      }
-  }
-}

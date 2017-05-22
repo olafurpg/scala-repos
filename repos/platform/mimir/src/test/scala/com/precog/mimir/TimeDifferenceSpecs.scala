@@ -34,7 +34,7 @@ import org.joda.time.format._
 
 trait TimeDifferenceSpecs[M[+ _]]
     extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
+    with LongIdMemoryDatasetConsumer[M]
   self =>
 
   import Function._
@@ -45,15 +45,13 @@ trait TimeDifferenceSpecs[M[+ _]]
 
   val line = Line(1, 1, "")
 
-  def testEval(graph: DepGraph): Set[SEvent] = {
-    consumeEval(graph, defaultEvaluationContext) match {
+  def testEval(graph: DepGraph): Set[SEvent] =
+    consumeEval(graph, defaultEvaluationContext) match
       case Success(results) => results
       case Failure(error) => throw error
-    }
-  }
 
-  "time difference functions (homogeneous case)" should {
-    "compute difference of years" in {
+  "time difference functions (homogeneous case)" should
+    "compute difference of years" in
       val input =
         Join(BuiltInFunction2Op(YearsBetween),
              Cross(None),
@@ -65,13 +63,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-2, -1, 0)
-    }
-    "compute difference of months" in {
+    "compute difference of months" in
       val input =
         Join(BuiltInFunction2Op(MonthsBetween),
              Cross(None),
@@ -83,13 +79,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-16, -4, -27, 4, -11)
-    }
-    "compute difference of weeks" in {
+    "compute difference of weeks" in
       val input =
         Join(BuiltInFunction2Op(WeeksBetween),
              Cross(None),
@@ -101,13 +95,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-49, -118, -72, -21, 21)
-    }
-    "compute difference of days" in {
+    "compute difference of days" in
       val input =
         Join(BuiltInFunction2Op(DaysBetween),
              Cross(None),
@@ -119,13 +111,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-505, -347, 148, -826, -150)
-    }
-    "compute difference of hours" in {
+    "compute difference of hours" in
       val input =
         Join(BuiltInFunction2Op(HoursBetween),
              Cross(None),
@@ -137,13 +127,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-12131, -3606, -19836, -8340, 3554)
-    }
-    "compute difference of minutes" in {
+    "compute difference of minutes" in
       val input =
         Join(BuiltInFunction2Op(MinutesBetween),
              Cross(None),
@@ -155,13 +143,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-727898, 213295, -216396, -500411, -1190164)
-    }
-    "compute difference of seconds" in {
+    "compute difference of seconds" in
       val input =
         Join(BuiltInFunction2Op(SecondsBetween),
              Cross(None),
@@ -173,14 +159,12 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(
           -30024690, -43673890, -12983796, -71409896, 12797729)
-    }
-    "compute difference of ms" in {
+    "compute difference of ms" in
       val input =
         Join(BuiltInFunction2Op(MillisBetween),
              Cross(None),
@@ -192,20 +176,17 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(12797729921L,
                            -12983796645L,
                            -30024690328L,
                            -43673890874L,
                            -71409896910L)
-    }
-  }
 
-  "time difference functions (heterogeneous case)" should {
-    "compute difference of years" in {
+  "time difference functions (heterogeneous case)" should
+    "compute difference of years" in
       val input =
         Join(BuiltInFunction2Op(YearsBetween),
              Cross(None),
@@ -217,13 +198,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-2, -1, 0)
-    }
-    "compute difference of months" in {
+    "compute difference of months" in
       val input =
         Join(BuiltInFunction2Op(MonthsBetween),
              Cross(None),
@@ -235,13 +214,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-16, -4, -27, 4, -11)
-    }
-    "compute difference of weeks" in {
+    "compute difference of weeks" in
       val input =
         Join(BuiltInFunction2Op(WeeksBetween),
              Cross(None),
@@ -253,13 +230,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-49, -118, -72, -21, 21)
-    }
-    "compute difference of days" in {
+    "compute difference of days" in
       val input =
         Join(BuiltInFunction2Op(DaysBetween),
              Cross(None),
@@ -271,13 +246,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-505, -347, 148, -826, -150)
-    }
-    "compute difference of hours" in {
+    "compute difference of hours" in
       val input =
         Join(BuiltInFunction2Op(HoursBetween),
              Cross(None),
@@ -289,13 +262,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-12131, -3606, -19836, -8340, 3554)
-    }
-    "compute difference of minutes" in {
+    "compute difference of minutes" in
       val input =
         Join(BuiltInFunction2Op(MinutesBetween),
              Cross(None),
@@ -307,13 +278,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-727898, 213295, -216396, -500411, -1190164)
-    }
-    "compute difference of seconds" in {
+    "compute difference of seconds" in
       val input =
         Join(BuiltInFunction2Op(SecondsBetween),
              Cross(None),
@@ -325,14 +294,12 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(
           -30024690, -43673890, -12983796, -71409896, 12797729)
-    }
-    "compute difference of ms" in {
+    "compute difference of ms" in
       val input =
         Join(BuiltInFunction2Op(MillisBetween),
              Cross(None),
@@ -344,20 +311,17 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(5)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(12797729921L,
                            -12983796645L,
                            -30024690328L,
                            -43673890874L,
                            -71409896910L)
-    }
-  }
 
-  "time difference functions (homogeneous case across slices)" should {
-    "compute difference of years" in {
+  "time difference functions (homogeneous case across slices)" should
+    "compute difference of years" in
       val input =
         Join(BuiltInFunction2Op(YearsBetween),
              Cross(None),
@@ -370,13 +334,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(0, 1, 2, 3, -1, -2)
-    }
-    "compute difference of months" in {
+    "compute difference of months" in
       val input =
         Join(BuiltInFunction2Op(MonthsBetween),
              Cross(None),
@@ -389,9 +351,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-27,
                            10,
@@ -411,8 +372,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            30,
                            -24,
                            -17)
-    }
-    "compute difference of weeks" in {
+    "compute difference of weeks" in
       val input =
         Join(BuiltInFunction2Op(WeeksBetween),
              Cross(None),
@@ -425,9 +385,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-98,
                            -96,
@@ -451,8 +410,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            47,
                            -45,
                            62)
-    }
-    "compute difference of days" in {
+    "compute difference of days" in
       val input =
         Join(BuiltInFunction2Op(DaysBetween),
              Cross(None),
@@ -465,9 +423,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(1327,
                            930,
@@ -491,8 +448,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            415,
                            987,
                            -144)
-    }
-    "compute difference of hours" in {
+    "compute difference of hours" in
       val input =
         Join(BuiltInFunction2Op(HoursBetween),
              Cross(None),
@@ -505,9 +461,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-3458,
                            31864,
@@ -531,8 +486,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            30710,
                            7925,
                            5445)
-    }
-    "compute difference of minutes" in {
+    "compute difference of minutes" in
       val input =
         Join(BuiltInFunction2Op(MinutesBetween),
              Cross(None),
@@ -545,9 +499,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-573157,
                            1911875,
@@ -571,8 +524,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            733998,
                            -759345,
                            -207496)
-    }
-    "compute difference of seconds" in {
+    "compute difference of seconds" in
       val input =
         Join(BuiltInFunction2Op(SecondsBetween),
              Cross(None),
@@ -585,9 +537,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-12050411,
                            42695984,
@@ -611,8 +562,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            -58362317,
                            -14124214,
                            85301793)
-    }
-    "compute difference of ms" in {
+    "compute difference of ms" in
       val input =
         Join(BuiltInFunction2Op(MillisBetween),
              Cross(None),
@@ -625,9 +575,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(22)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(114712508479L,
                            -71409896910L,
@@ -651,11 +600,9 @@ trait TimeDifferenceSpecs[M[+ _]]
                            -14124214357L,
                            -12050411758L,
                            -58362317732L)
-    }
-  }
 
-  "time difference functions (heterogeneous case across slices)" should {
-    "compute difference of years" in {
+  "time difference functions (heterogeneous case across slices)" should
+    "compute difference of years" in
       val input =
         Join(BuiltInFunction2Op(YearsBetween),
              Cross(None),
@@ -668,13 +615,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(0, 1, 2, 3, -1)
-    }
-    "compute difference of months" in {
+    "compute difference of months" in
       val input =
         Join(BuiltInFunction2Op(MonthsBetween),
              Cross(None),
@@ -687,13 +632,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-12, 38, -19, 13, 22, 27, -1, -9, 26)
-    }
-    "compute difference of weeks" in {
+    "compute difference of weeks" in
       val input =
         Join(BuiltInFunction2Op(WeeksBetween),
              Cross(None),
@@ -706,13 +649,11 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(-54, -39, -8, 57, 121, 116, -4, 166, -84, 99)
-    }
-    "compute difference of days" in {
+    "compute difference of days" in
       val input =
         Join(BuiltInFunction2Op(DaysBetween),
              Cross(None),
@@ -725,14 +666,12 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toInt
-        }
 
       result2 must contain(
           -274, 849, -58, -588, 403, -384, 1167, -30, 699, 813)
-    }
-    "compute difference of hours" in {
+    "compute difference of hours" in
       val input =
         Join(BuiltInFunction2Op(HoursBetween),
              Cross(None),
@@ -745,14 +684,12 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(
           9672, -737, -14130, -9219, 20388, -1405, 19517, 16795, -6582, 28025)
-    }
-    "compute difference of minutes" in {
+    "compute difference of minutes" in
       val input =
         Join(BuiltInFunction2Op(MinutesBetween),
              Cross(None),
@@ -765,9 +702,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-394965,
                            -847824,
@@ -779,8 +715,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            1171059,
                            -44237,
                            -553154)
-    }
-    "compute difference of seconds" in {
+    "compute difference of seconds" in
       val input =
         Join(BuiltInFunction2Op(SecondsBetween),
              Cross(None),
@@ -793,9 +728,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(-2654273,
                            100892632,
@@ -807,8 +741,7 @@ trait TimeDifferenceSpecs[M[+ _]]
                            60464942,
                            -33189258,
                            34821554)
-    }
-    "compute difference of ms" in {
+    "compute difference of ms" in
       val input =
         Join(BuiltInFunction2Op(MillisBetween),
              Cross(None),
@@ -821,9 +754,8 @@ trait TimeDifferenceSpecs[M[+ _]]
       result must haveSize(10)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d.toLong
-        }
 
       result2 must contain(60464942676L,
                            -50869487651L,
@@ -835,9 +767,6 @@ trait TimeDifferenceSpecs[M[+ _]]
                            -23697928353L,
                            73397157662L,
                            70263579014L)
-    }
-  }
-}
 
 object TimeDifferenceSpecs
     extends TimeDifferenceSpecs[test.YId] with test.YIdInstances

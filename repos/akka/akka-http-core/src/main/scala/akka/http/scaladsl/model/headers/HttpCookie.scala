@@ -16,25 +16,22 @@ import scala.compat.java8.OptionConverters._
 // see http://tools.ietf.org/html/rfc6265
 // sealed abstract to prevent generation of default apply method in companion
 sealed abstract case class HttpCookiePair private (name: String, value: String)
-    extends jm.headers.HttpCookiePair with ToStringRenderable {
+    extends jm.headers.HttpCookiePair with ToStringRenderable
 
   def render[R <: Rendering](r: R): r.type = r ~~ name ~~ '=' ~~ value
   def toCookie: HttpCookie = HttpCookie.fromPair(this)
-}
-object HttpCookiePair {
+object HttpCookiePair
   def apply(pair: (String, String)): HttpCookiePair = apply(pair._1, pair._2)
-  def apply(name: String, value: String): HttpCookiePair = {
+  def apply(name: String, value: String): HttpCookiePair =
     HttpCookiePair.validate(name, value)
     new HttpCookiePair(name, value) {}
-  }
 
   def raw(pair: (String, String)): HttpCookiePair = raw(pair._1, pair._2)
-  def raw(name: String, value: String): HttpCookiePair = {
+  def raw(name: String, value: String): HttpCookiePair =
     HttpCookiePair.validateRaw(name, value)
     new HttpCookiePair(name, value) {}
-  }
 
-  private[http] def validate(name: String, value: String): Unit = {
+  private[http] def validate(name: String, value: String): Unit =
     import HttpCookie._
     require(
         nameChars.matchesAll(name),
@@ -42,8 +39,7 @@ object HttpCookiePair {
     require(
         valueChars.matchesAll(value),
         s"'${valueChars.firstMismatch(value).get}' not allowed in cookie content ('$value')")
-  }
-  private[http] def validateRaw(name: String, value: String): Unit = {
+  private[http] def validateRaw(name: String, value: String): Unit =
     import HttpCookie._
     require(
         nameChars.matchesAll(name),
@@ -51,8 +47,6 @@ object HttpCookiePair {
     require(
         rawValueChars.matchesAll(value),
         s"'${rawValueChars.firstMismatch(value).get}' not allowed in cookie content ('$value')")
-  }
-}
 
 // see http://tools.ietf.org/html/rfc6265
 final case class HttpCookie(name: String,
@@ -64,7 +58,7 @@ final case class HttpCookie(name: String,
                             secure: Boolean = false,
                             httpOnly: Boolean = false,
                             extension: Option[String] = None)
-    extends jm.headers.HttpCookie with ToStringRenderable {
+    extends jm.headers.HttpCookie with ToStringRenderable
 
   /** Returns the name/value pair for this cookie, to be used in [[Cookie]] headers. */
   def pair: HttpCookiePair = HttpCookiePair(name, value)
@@ -84,7 +78,7 @@ final case class HttpCookie(name: String,
       extension.forall(pathOrExtChars.matchesAll),
       s"'${pathOrExtChars.firstMismatch(extension.get).get}' not allowed in cookie extension ('${extension.get}')")
 
-  def render[R <: Rendering](r: R): r.type = {
+  def render[R <: Rendering](r: R): r.type =
     r ~~ name ~~ '=' ~~ value
     if (expires.isDefined)
       expires.get.renderRfc1123DateTimeString(r ~~ "; Expires=")
@@ -95,7 +89,6 @@ final case class HttpCookie(name: String,
     if (httpOnly) r ~~ "; HttpOnly"
     if (extension.isDefined) r ~~ ';' ~~ ' ' ~~ extension.get
     r
-  }
 
   /** Java API */
   def getExtension: Optional[String] = extension.asJava
@@ -137,9 +130,8 @@ final case class HttpCookie(name: String,
   /** Java API */
   def withExtension(extension: String): headers.HttpCookie =
     copy(extension = Some(extension))
-}
 
-object HttpCookie {
+object HttpCookie
   def fromPair(pair: HttpCookiePair,
                expires: Option[DateTime] = None,
                maxAge: Option[Long] = None,
@@ -171,4 +163,3 @@ object HttpCookie {
   private[http] val rawValueChars = CharacterClasses.`cookie-octet-raw`
   private[http] val domainChars = ALPHANUM ++ ".-"
   private[http] val pathOrExtChars = VCHAR ++ ' ' -- ';'
-}

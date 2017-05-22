@@ -4,14 +4,12 @@ package org.ensime.api
 
 import java.io.File
 
-trait EnsimeTestData {
+trait EnsimeTestData
   // duplicating utils to minimise dependencies
-  private def canon(s: String) = {
+  private def canon(s: String) =
     val file = new File(s)
-    try file.getCanonicalFile catch {
+    try file.getCanonicalFile catch
       case t: Throwable => file.getAbsoluteFile
-    }
-  }
 
   val typeInfo = new BasicTypeInfo(
       "type1", DeclaredAs.Method, "FOO.type1", List(), List(), None)
@@ -178,4 +176,3 @@ trait EnsimeTestData {
                 )
           )
       ))
-}

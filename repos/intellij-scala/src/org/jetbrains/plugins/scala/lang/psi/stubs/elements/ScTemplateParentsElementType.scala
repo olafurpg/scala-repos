@@ -20,46 +20,41 @@ import scala.collection.mutable.ArrayBuffer
 abstract class ScTemplateParentsElementType[Func <: ScTemplateParents](
     debugName: String)
     extends ScStubElementType[ScTemplateParentsStub, ScTemplateParents](
-        debugName) {
-  def serialize(stub: ScTemplateParentsStub, dataStream: StubOutputStream) {
+        debugName)
+  def serialize(stub: ScTemplateParentsStub, dataStream: StubOutputStream)
     val seq = stub.getTemplateParentsTypesTexts
     dataStream.writeInt(seq.length)
     for (s <- seq) dataStream.writeName(s)
-    stub.getConstructor match {
+    stub.getConstructor match
       case Some(str) =>
         dataStream.writeBoolean(true)
         dataStream.writeName(str)
       case _ => dataStream.writeBoolean(false)
-    }
-  }
 
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScTemplateParents,
-      parentStub: StubElement[ParentPsi]): ScTemplateParentsStub = {
-    val constr = psi match {
+      parentStub: StubElement[ParentPsi]): ScTemplateParentsStub =
+    val constr = psi match
       case p: ScClassParents => p.constructor.map(_.getText)
       case _ => None
-    }
     new ScTemplateParentsStubImpl(parentStub,
                                   this,
                                   constr.map(StringRef.fromString),
                                   psi.typeElementsWithoutConstructor.map(
                                       te => StringRef.fromString(te.getText)))
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTemplateParentsStub = {
+      dataStream: StubInputStream, parentStub: Any): ScTemplateParentsStub =
     val length = dataStream.readInt
-    if (length >= 0) {
+    if (length >= 0)
       val res = new ArrayBuffer[StringRef]
       for (i <- 0 until length) res += dataStream.readName
-      val constr = dataStream.readBoolean() match {
+      val constr = dataStream.readBoolean() match
         case true => Some(dataStream.readName())
         case false => None
-      }
       new ScTemplateParentsStubImpl(
           parentStub.asInstanceOf[StubElement[PsiElement]], this, constr, res)
-    } else {
+    else
       ScTemplateParentsElementType.LOG.error(
           "Negative byte deserialized for array")
       new ScTemplateParentsStubImpl(
@@ -67,13 +62,9 @@ abstract class ScTemplateParentsElementType[Func <: ScTemplateParents](
           this,
           None,
           Seq.empty)
-    }
-  }
 
   def indexStub(stub: ScTemplateParentsStub, sink: IndexSink) {}
-}
 
-object ScTemplateParentsElementType {
+object ScTemplateParentsElementType
   private val LOG = Logger.getInstance(
       "#org.jetbrains.plugins.scala.lang.psi.stubs.elements.ScTemplateParentsElementType")
-}

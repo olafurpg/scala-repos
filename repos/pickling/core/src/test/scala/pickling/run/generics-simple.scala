@@ -5,8 +5,8 @@ import scala.pickling._, scala.pickling.Defaults._, json._
 
 case class C[T](x: T)
 
-class GenericsSimpleTest extends FunSuite {
-  test("main") {
+class GenericsSimpleTest extends FunSuite
+  test("main")
     val c = C(2)
     val p = c.pickle
     assert(
@@ -17,5 +17,3 @@ class GenericsSimpleTest extends FunSuite {
       |})
     """.trim.stripMargin)
     assert(p.unpickle[C[Int]] === c)
-  }
-}

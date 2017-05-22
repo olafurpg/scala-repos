@@ -9,25 +9,24 @@ import akka.stream.ActorMaterializerSettings
 import akka.stream.testkit._
 import akka.testkit.AkkaSpec
 
-class FlowMapSpec extends AkkaSpec with ScriptedTest {
+class FlowMapSpec extends AkkaSpec with ScriptedTest
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "A Map" must {
+  "A Map" must
 
-    "map" in {
+    "map" in
       def script =
-        Script(TestConfig.RandomTestRange map { _ ⇒
+        Script(TestConfig.RandomTestRange map  _ ⇒
           val x = random.nextInt(); Seq(x) -> Seq(x.toString)
-        }: _*)
+        : _*)
       TestConfig.RandomTestRange foreach
       (_ ⇒ runScript(script, settings)(_.map(_.toString)))
-    }
 
-    "not blow up with high request counts" in {
+    "not blow up with high request counts" in
       val probe = TestSubscriber.manualProbe[Int]()
       Source(List(1))
         .map(_ + 1)
@@ -39,12 +38,8 @@ class FlowMapSpec extends AkkaSpec with ScriptedTest {
         .subscribe(probe)
 
       val subscription = probe.expectSubscription()
-      for (_ ← 1 to 10000) {
+      for (_ ← 1 to 10000)
         subscription.request(Int.MaxValue)
-      }
 
       probe.expectNext(6)
       probe.expectComplete()
-    }
-  }
-}

@@ -7,13 +7,12 @@ sealed abstract class C(val x: Int)
 object D extends C(42) { override def toString = "D" }
 case class E(override val x: Int) extends C(x)
 
-class SingletonHierarchyTest extends FunSuite {
-  test("main") {
-    def test(c: C, expected: String): Unit = {
+class SingletonHierarchyTest extends FunSuite
+  test("main")
+    def test(c: C, expected: String): Unit =
       val pickle = c.pickle
       assert(pickle.toString === expected)
       assert(pickle.unpickle[C] === c)
-    }
     test(D,
          """
       |JSONPickle({
@@ -27,5 +26,3 @@ class SingletonHierarchyTest extends FunSuite {
       |  "x": 2
       |})
     """.stripMargin.trim)
-  }
-}

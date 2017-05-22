@@ -16,14 +16,14 @@ import akka.NotUsed
 import akka.testkit.EventFilter
 import akka.testkit.AkkaSpec
 
-class SourceSpec extends AkkaSpec with DefaultTimeout {
+class SourceSpec extends AkkaSpec with DefaultTimeout
 
   implicit val materializer = ActorMaterializer()
   implicit val config = PatienceConfig(
       timeout = Span(timeout.duration.toMillis, Millis))
 
-  "Single Source" must {
-    "produce element" in {
+  "Single Source" must
+    "produce element" in
       val p = Source.single(1).runWith(Sink.asPublisher(false))
       val c = TestSubscriber.manualProbe[Int]()
       p.subscribe(c)
@@ -31,9 +31,8 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       sub.request(1)
       c.expectNext(1)
       c.expectComplete()
-    }
 
-    "reject later subscriber" in {
+    "reject later subscriber" in
       val p = Source.single(1).runWith(Sink.asPublisher(false))
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[Int]()
@@ -46,11 +45,9 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
 
       p.subscribe(c2)
       c2.expectSubscriptionAndError()
-    }
-  }
 
-  "Empty Source" must {
-    "complete immediately" in {
+  "Empty Source" must
+    "complete immediately" in
       val p = Source.empty.runWith(Sink.asPublisher(false))
       val c = TestSubscriber.manualProbe[Int]()
       p.subscribe(c)
@@ -60,11 +57,9 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       val c2 = TestSubscriber.manualProbe[Int]()
       p.subscribe(c2)
       c2.expectSubscriptionAndError()
-    }
-  }
 
-  "Failed Source" must {
-    "emit error immediately" in {
+  "Failed Source" must
+    "emit error immediately" in
       val ex = new RuntimeException with NoStackTrace
       val p = Source.failed(ex).runWith(Sink.asPublisher(false))
       val c = TestSubscriber.manualProbe[Int]()
@@ -75,11 +70,9 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       val c2 = TestSubscriber.manualProbe[Int]()
       p.subscribe(c2)
       c2.expectSubscriptionAndError()
-    }
-  }
 
-  "Maybe Source" must {
-    "complete materialized future with None when stream cancels" in Utils.assertAllStagesStopped {
+  "Maybe Source" must
+    "complete materialized future with None when stream cancels" in Utils.assertAllStagesStopped
       val neverSource = Source.maybe[Int]
       val pubSink = Sink.asPublisher[Int](false)
 
@@ -94,13 +87,11 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
 
       subs.cancel()
       Await.result(f.future, 500.millis) shouldEqual None
-    }
 
-    "allow external triggering of empty completion" in Utils.assertAllStagesStopped {
+    "allow external triggering of empty completion" in Utils.assertAllStagesStopped
       val neverSource = Source.maybe[Int].filter(_ ⇒ false)
-      val counterSink = Sink.fold[Int, Int](0) { (acc, _) ⇒
+      val counterSink = Sink.fold[Int, Int](0)  (acc, _) ⇒
         acc + 1
-      }
 
       val (neverPromise, counterFuture) =
         neverSource.toMat(counterSink)(Keep.both).run()
@@ -109,9 +100,8 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       neverPromise.trySuccess(None) shouldEqual true
 
       Await.result(counterFuture, 500.millis) shouldEqual 0
-    }
 
-    "allow external triggering of non-empty completion" in Utils.assertAllStagesStopped {
+    "allow external triggering of non-empty completion" in Utils.assertAllStagesStopped
       val neverSource = Source.maybe[Int]
       val counterSink = Sink.head[Int]
 
@@ -122,13 +112,11 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       neverPromise.trySuccess(Some(6)) shouldEqual true
 
       Await.result(counterFuture, 500.millis) shouldEqual 6
-    }
 
-    "allow external triggering of onError" in Utils.assertAllStagesStopped {
+    "allow external triggering of onError" in Utils.assertAllStagesStopped
       val neverSource = Source.maybe[Int]
-      val counterSink = Sink.fold[Int, Int](0) { (acc, _) ⇒
+      val counterSink = Sink.fold[Int, Int](0)  (acc, _) ⇒
         acc + 1
-      }
 
       val (neverPromise, counterFuture) =
         neverSource.toMat(counterSink)(Keep.both).run()
@@ -139,18 +127,16 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       val ready = Await.ready(counterFuture, 500.millis)
       val Failure(ex) = ready.value.get
       ex.getMessage should include("Boom")
-    }
-  }
 
-  "Composite Source" must {
-    "merge from many inputs" in {
+  "Composite Source" must
+    "merge from many inputs" in
       val probes = Seq.fill(5)(TestPublisher.manualProbe[Int]())
       val source = Source.asSubscriber[Int]
       val out = TestSubscriber.manualProbe[Int]
 
       val s = Source
         .fromGraph(GraphDSL.create(source, source, source, source, source)(
-                Seq(_, _, _, _, _)) { implicit b ⇒ (i0, i1, i2, i3, i4) ⇒
+                Seq(_, _, _, _, _))  implicit b ⇒ (i0, i1, i2, i3, i4) ⇒
           import GraphDSL.Implicits._
           val m = b.add(Merge[Int](5))
           i0.out ~> m.in(0)
@@ -159,7 +145,7 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
           i3.out ~> m.in(3)
           i4.out ~> m.in(4)
           SourceShape(m.out)
-        })
+        )
         .to(Sink.fromSubscriber(out))
         .run()
 
@@ -167,19 +153,17 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       val sub = out.expectSubscription()
       sub.request(10)
 
-      val subs = for (i ← 0 to 4) {
+      val subs = for (i ← 0 to 4)
         val s = probes(i).expectSubscription()
         s.expectRequest()
         s.sendNext(i)
         s.sendComplete()
-      }
 
       val gotten = for (_ ← 0 to 4) yield out.expectNext()
       gotten.toSet should ===(Set(0, 1, 2, 3, 4))
       out.expectComplete()
-    }
 
-    "combine from many inputs with simplified API" in {
+    "combine from many inputs with simplified API" in
       val probes = Seq.fill(3)(TestPublisher.manualProbe[Int]())
       val source = for (i ← 0 to 2) yield Source.fromPublisher(probes(i))
       val out = TestSubscriber.manualProbe[Int]
@@ -192,19 +176,17 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       val sub = out.expectSubscription()
       sub.request(3)
 
-      for (i ← 0 to 2) {
+      for (i ← 0 to 2)
         val s = probes(i).expectSubscription()
         s.expectRequest()
         s.sendNext(i)
         s.sendComplete()
-      }
 
       val gotten = for (_ ← 0 to 2) yield out.expectNext()
       gotten.toSet should ===(Set(0, 1, 2))
       out.expectComplete()
-    }
 
-    "combine from two inputs with simplified API" in {
+    "combine from two inputs with simplified API" in
       val probes = Seq.fill(2)(TestPublisher.manualProbe[Int]())
       val source =
         Source.fromPublisher(probes(0)) :: Source.fromPublisher(probes(1)) :: Nil
@@ -218,28 +200,23 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
       val sub = out.expectSubscription()
       sub.request(3)
 
-      for (i ← 0 to 1) {
+      for (i ← 0 to 1)
         val s = probes(i).expectSubscription()
         s.expectRequest()
         s.sendNext(i)
         s.sendComplete()
-      }
 
       val gotten = for (_ ← 0 to 1) yield out.expectNext()
       gotten.toSet should ===(Set(0, 1))
       out.expectComplete()
-    }
-  }
 
-  "Repeat Source" must {
-    "repeat as long as it takes" in {
+  "Repeat Source" must
+    "repeat as long as it takes" in
       val f = Source.repeat(42).grouped(1000).runWith(Sink.head)
       f.futureValue.size should ===(1000)
       f.futureValue.toSet should ===(Set(42))
-    }
-  }
 
-  "Unfold Source" must {
+  "Unfold Source" must
     val expected = List(9227465,
                         5702887,
                         3524578,
@@ -277,65 +254,51 @@ class SourceSpec extends AkkaSpec with DefaultTimeout {
                         1,
                         0)
 
-    "generate a finite fibonacci sequence" in {
+    "generate a finite fibonacci sequence" in
       Source
-        .unfold((0, 1)) {
+        .unfold((0, 1))
           case (a, _) if a > 10000000 ⇒ None
           case (a, b) ⇒ Some((b, a + b) → a)
-        }
         .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
         .futureValue should ===(expected)
-    }
 
-    "terminate with a failure if there is an exception thrown" in {
+    "terminate with a failure if there is an exception thrown" in
       val t = new RuntimeException("expected")
       EventFilter[RuntimeException](message = "expected", occurrences = 1) intercept whenReady(
           Source
-            .unfold((0, 1)) {
+            .unfold((0, 1))
           case (a, _) if a > 10000000 ⇒ throw t
           case (a, b) ⇒ Some((b, a + b) → a)
-        }
             .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
-            .failed) {
+            .failed)
         _ should be theSameInstanceAs (t)
-      }
-    }
 
-    "generate a finite fibonacci sequence asynchronously" in {
+    "generate a finite fibonacci sequence asynchronously" in
       Source
-        .unfoldAsync((0, 1)) {
+        .unfoldAsync((0, 1))
           case (a, _) if a > 10000000 ⇒ Future.successful(None)
           case (a, b) ⇒ Future(Some((b, a + b) → a))(system.dispatcher)
-        }
         .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
         .futureValue should ===(expected)
-    }
 
-    "generate an unbounded fibonacci sequence" in {
+    "generate an unbounded fibonacci sequence" in
       Source
         .unfold((0, 1))({ case (a, b) ⇒ Some((b, a + b) → a) })
         .take(36)
         .runFold(List.empty[Int]) { case (xs, x) ⇒ x :: xs }
         .futureValue should ===(expected)
-    }
-  }
 
-  "Iterator Source" must {
-    "properly iterate" in {
+  "Iterator Source" must
+    "properly iterate" in
       Source
         .fromIterator(() ⇒ Iterator.iterate(false)(!_))
         .grouped(10)
         .runWith(Sink.head)
         .futureValue should ===(
           Seq(false, true, false, true, false, true, false, true, false, true))
-    }
-  }
 
-  "A Source" must {
-    "suitably override attribute handling methods" in {
+  "A Source" must
+    "suitably override attribute handling methods" in
       import Attributes._
       val s: Source[Int, NotUsed] =
         Source.single(42).async.addAttributes(none).named("")
-    }
-  }
-}

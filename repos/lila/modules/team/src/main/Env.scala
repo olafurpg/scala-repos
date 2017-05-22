@@ -4,16 +4,15 @@ import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
 
-final class Env(config: Config, hub: lila.hub.Env, db: lila.db.Env) {
+final class Env(config: Config, hub: lila.hub.Env, db: lila.db.Env)
 
-  private val settings = new {
+  private val settings = new
     val CollectionTeam = config getString "collection.team"
     val CollectionMember = config getString "collection.member"
     val CollectionRequest = config getString "collection.request"
     val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
     val PaginatorMaxUserPerPage = config getInt "paginator.max_user_per_page"
     val NotifierSender = config getString "notifier.sender"
-  }
   import settings._
 
   lazy val forms = new DataForm(hub.actor.captcher)
@@ -39,12 +38,10 @@ final class Env(config: Config, hub: lila.hub.Env, db: lila.db.Env) {
   private lazy val notifier = new Notifier(sender = NotifierSender,
                                            messenger = hub.actor.messenger,
                                            router = hub.actor.router)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "team" boot new Env(config = lila.common.PlayApp loadConfig "team",
                         hub = lila.hub.Env.current,
                         db = lila.db.Env.current)
-}

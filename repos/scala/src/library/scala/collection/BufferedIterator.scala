@@ -16,11 +16,10 @@ package collection
   *  @version 2.8
   *  @since   2.8
   */
-trait BufferedIterator[+A] extends Iterator[A] {
+trait BufferedIterator[+A] extends Iterator[A]
 
   /** Returns next element of iterator without advancing beyond it.
     */
   def head: A
 
   override def buffered: this.type = this
-}

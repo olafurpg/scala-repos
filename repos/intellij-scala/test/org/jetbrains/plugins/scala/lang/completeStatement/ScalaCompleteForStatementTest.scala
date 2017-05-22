@@ -5,9 +5,9 @@ package lang.completeStatement
   * @author Ksenia.Sautina
   * @since 2/25/13
   */
-class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
+class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase
 
-  def testForStatement1() {
+  def testForStatement1()
     val fileText = """
         |class B {
         |  def method() {
@@ -25,9 +25,8 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testForStatement2() {
+  def testForStatement2()
     val fileText = """
         |class B {
         |  def method() {
@@ -45,9 +44,8 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testForStatement3() {
+  def testForStatement3()
     val fileText = """
         |class B {
         |  def method() {
@@ -66,9 +64,8 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testForStatement4() {
+  def testForStatement4()
     val fileText = """
         |class B {
         |  def method() {
@@ -88,9 +85,8 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testForStatement5() {
+  def testForStatement5()
     val fileText = """
         |class B {
         |  def method() {
@@ -109,9 +105,8 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testForStatement6() {
+  def testForStatement6()
     val fileText = """
         |class B {
         |  def method() {
@@ -133,9 +128,8 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testForStatement7() {
+  def testForStatement7()
     val fileText = """
         |class B {
         |  def method() {
@@ -154,5 +148,3 @@ class ScalaCompleteForStatementTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
-}

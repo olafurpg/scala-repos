@@ -13,33 +13,28 @@ import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.duration._
 
-object ClusterShardingGetStateSpec {
+object ClusterShardingGetStateSpec
   case object Stop
   case class Ping(id: Long)
   case object Pong
 
-  class ShardedActor extends Actor with ActorLogging {
+  class ShardedActor extends Actor with ActorLogging
     log.info(self.path.toString)
-    def receive = {
+    def receive =
       case Stop ⇒ context.stop(self)
       case _: Ping ⇒ sender() ! Pong
-    }
-  }
 
-  val extractEntityId: ShardRegion.ExtractEntityId = {
+  val extractEntityId: ShardRegion.ExtractEntityId =
     case msg @ Ping(id) ⇒ (id.toString, msg)
-  }
 
   val numberOfShards = 2
 
-  val extractShardId: ShardRegion.ExtractShardId = {
+  val extractShardId: ShardRegion.ExtractShardId =
     case Ping(id) ⇒ (id % numberOfShards).toString
-  }
 
   val shardTypeName = "Ping"
-}
 
-object ClusterShardingGetStateSpecConfig extends MultiNodeConfig {
+object ClusterShardingGetStateSpecConfig extends MultiNodeConfig
   val controller = role("controller")
   val first = role("first")
   val second = role("second")
@@ -59,7 +54,6 @@ object ClusterShardingGetStateSpecConfig extends MultiNodeConfig {
 
   nodeConfig(first, second)(
       ConfigFactory.parseString("""akka.cluster.roles=["shard"]"""))
-}
 
 class ClusterShardingGetStateSpecMultiJvmNode1
     extends ClusterShardingGetStateSpec
@@ -70,120 +64,98 @@ class ClusterShardingGetStateSpecMultiJvmNode3
 
 abstract class ClusterShardingGetStateSpec
     extends MultiNodeSpec(ClusterShardingGetStateSpecConfig)
-    with STMultiNodeSpec {
+    with STMultiNodeSpec
 
   import ClusterShardingGetStateSpec._
   import ClusterShardingGetStateSpecConfig._
 
   def initialParticipants = roles.size
 
-  def startShard(): ActorRef = {
+  def startShard(): ActorRef =
     ClusterSharding(system).start(
         typeName = shardTypeName,
         entityProps = Props(new ShardedActor),
         settings = ClusterShardingSettings(system).withRole("shard"),
         extractEntityId = extractEntityId,
         extractShardId = extractShardId)
-  }
 
-  def startProxy(): ActorRef = {
+  def startProxy(): ActorRef =
     ClusterSharding(system).startProxy(typeName = shardTypeName,
                                        role = Some("shard"),
                                        extractEntityId = extractEntityId,
                                        extractShardId = extractShardId)
-  }
 
-  def join(from: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName): Unit =
+    runOn(from)
       Cluster(system).join(node(controller).address)
-    }
     enterBarrier(from.name + "-joined")
-  }
 
-  "Inspecting cluster sharding state" must {
+  "Inspecting cluster sharding state" must
 
-    "join cluster" in {
+    "join cluster" in
       join(controller)
       join(first)
       join(second)
 
       // make sure all nodes has joined
-      awaitAssert {
+      awaitAssert
         Cluster(system).sendCurrentClusterState(testActor)
         expectMsgType[CurrentClusterState].members.size === 3
-      }
 
-      runOn(controller) {
+      runOn(controller)
         startProxy()
-      }
-      runOn(first, second) {
+      runOn(first, second)
         startShard()
-      }
 
       enterBarrier("sharding started")
-    }
 
-    "return empty state when no sharded actors has started" in {
+    "return empty state when no sharded actors has started" in
 
-      awaitAssert {
+      awaitAssert
         val probe = TestProbe()
         val region = ClusterSharding(system).shardRegion(shardTypeName)
         region.tell(ShardRegion.GetCurrentRegions, probe.ref)
         probe.expectMsgType[ShardRegion.CurrentRegions].regions.size === 0
-      }
 
       enterBarrier("empty sharding")
-    }
 
-    "trigger sharded actors" in {
-      runOn(controller) {
+    "trigger sharded actors" in
+      runOn(controller)
         val region = ClusterSharding(system).shardRegion(shardTypeName)
 
-        within(10.seconds) {
-          awaitAssert {
+        within(10.seconds)
+          awaitAssert
             val pingProbe = TestProbe()
             // trigger starting of 4 entities
             (1 to 4).foreach(n ⇒ region.tell(Ping(n), pingProbe.ref))
-            pingProbe.receiveWhile(messages = 4) {
+            pingProbe.receiveWhile(messages = 4)
               case Pong ⇒ ()
-            }
-          }
-        }
-      }
 
       enterBarrier("sharded actors started")
-    }
 
-    "get shard state" in {
-      within(10.seconds) {
-        awaitAssert {
+    "get shard state" in
+      within(10.seconds)
+        awaitAssert
           val probe = TestProbe()
           val region = ClusterSharding(system).shardRegion(shardTypeName)
           region.tell(ShardRegion.GetCurrentRegions, probe.ref)
           val regions = probe.expectMsgType[ShardRegion.CurrentRegions].regions
           regions.size === 2
-          regions.foreach { region ⇒
+          regions.foreach  region ⇒
             val path =
               RootActorPath(region) / "system" / "sharding" / shardTypeName
 
             system
               .actorSelection(path)
               .tell(ShardRegion.GetShardRegionState, probe.ref)
-          }
-          val states = probe.receiveWhile(messages = regions.size) {
+          val states = probe.receiveWhile(messages = regions.size)
             case msg: ShardRegion.CurrentShardRegionState ⇒ msg
-          }
-          val allEntityIds = for {
+          val allEntityIds = for
             state ← states
             shard ← state.shards
             entityId ← shard.entityIds
-          } yield entityId
+          yield entityId
 
           allEntityIds.toSet === Set("1", "2", "3", "4")
-        }
-      }
 
       enterBarrier("done")
-    }
-  }
-}

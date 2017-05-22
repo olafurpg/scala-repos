@@ -22,9 +22,8 @@ import Helpers.TimeSpan
 import common._
 import actor.ThreadPoolRules
 
-class ScheduleJBridge {
+class ScheduleJBridge
   def schedule: Schedule = Schedule
-}
 
 /**
   * The Schedule object schedules an actor to be ping-ed with a given message after a specified
@@ -40,7 +39,7 @@ object Schedule extends Schedule
   * 
   * The schedule methods return a ScheduledFuture object which can be cancelled if necessary
   */
-sealed trait Schedule extends Loggable {
+sealed trait Schedule extends Loggable
 
   /**
     * Set this variable to the number of threads to allocate in the thread pool
@@ -61,11 +60,11 @@ sealed trait Schedule extends Loggable {
                            maxThreadPoolSize,
                            60,
                            TimeUnit.SECONDS,
-                           blockingQueueSize match {
+                           blockingQueueSize match
                              case Full(x) =>
                                new ArrayBlockingQueue(x)
                              case _ => new LinkedBlockingQueue
-                           })
+                           )
 
   /** The underlying <code>java.util.concurrent.ScheduledExecutor</code> */
   private var service: ScheduledExecutorService =
@@ -76,19 +75,17 @@ sealed trait Schedule extends Loggable {
   /**
     * Re-create the underlying <code>SingleThreadScheduledExecutor</code>
     */
-  def restart: Unit = synchronized {
+  def restart: Unit = synchronized
     if ((service eq null) || service.isShutdown)
       service = Executors.newSingleThreadScheduledExecutor(TF)
     if ((pool eq null) || pool.isShutdown) pool = buildExecutor()
-  }
 
   /**
     * Shut down the underlying <code>SingleThreadScheduledExecutor</code>
     */
-  def shutdown(): Unit = synchronized {
+  def shutdown(): Unit = synchronized
     service.shutdown
     pool.shutdown
-  }
 
   /**
     * Schedules the sending of a message to occur after the specified delay.
@@ -143,37 +140,28 @@ sealed trait Schedule extends Loggable {
     * after the delay
     */
   def schedule(f: () => Unit, delay: TimeSpan): ScheduledFuture[Unit] =
-    synchronized {
-      val r = new Runnable {
-        def run() {
-          try {
+    synchronized
+      val r = new Runnable
+        def run()
+          try
             f.apply()
-          } catch {
+          catch
             case e: Exception => logger.error(e)
-          }
-        }
-      }
 
-      val fast = new java.util.concurrent.Callable[Unit] {
-        def call(): Unit = {
-          try {
+      val fast = new java.util.concurrent.Callable[Unit]
+        def call(): Unit =
+          try
             Schedule.this.restart
             pool.execute(r)
-          } catch {
+          catch
             case e: Exception => logger.error(e)
-          }
-        }
-      }
 
-      try {
+      try
         this.restart
         service.schedule(fast, delay.millis, TimeUnit.MILLISECONDS)
-      } catch {
+      catch
         case e: RejectedExecutionException =>
           throw ActorPingException("ping could not be scheduled", e)
-      }
-    }
-}
 
 /**
   * Send by the scheduled actor to sign off from recurrent scheduling
@@ -191,16 +179,13 @@ case object Scheduled
 case class ActorPingException(msg: String, e: Throwable)
     extends RuntimeException(msg, e)
 
-private object TF extends ThreadFactory {
+private object TF extends ThreadFactory
   val threadFactory = Executors.defaultThreadFactory()
-  def newThread(r: Runnable): Thread = {
+  def newThread(r: Runnable): Thread =
     val d: Thread = threadFactory.newThread(r)
     d setName "Lift Scheduler"
     d setDaemon true
 
-    if (ThreadPoolRules.nullContextClassLoader) {
+    if (ThreadPoolRules.nullContextClassLoader)
       d setContextClassLoader null
-    }
     d
-  }
-}

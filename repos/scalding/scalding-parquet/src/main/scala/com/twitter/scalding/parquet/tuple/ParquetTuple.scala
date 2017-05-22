@@ -22,28 +22,24 @@ import com.twitter.scalding._
 import com.twitter.scalding.parquet.HasFilterPredicate
 import com.twitter.scalding.source.{DailySuffixSource, HourlySuffixSource}
 
-object ParquetTupleSource {
+object ParquetTupleSource
   def apply(fields: Fields, paths: String*) =
     new FixedPathParquetTuple(fields, paths: _*)
-}
 
 /**
   * User should define their own source like:
   * class MySource(path: String, dateRange: DateRange, requestedFields: Fields) extends DailySuffixParquetTuple(path, dateRange, requestedFields) with Mappable2[Int, Int] with TypedSink2[Int,Int]
   */
-trait ParquetTupleSource extends FileSource with HasFilterPredicate {
+trait ParquetTupleSource extends FileSource with HasFilterPredicate
   def fields: Fields
 
-  override def hdfsScheme = {
+  override def hdfsScheme =
 
-    val scheme = withFilter match {
+    val scheme = withFilter match
       case Some(fp) => new ParquetTupleScheme(fp, fields)
       case None => new ParquetTupleScheme(fields)
-    }
 
     HadoopSchemeInstance(scheme.asInstanceOf[Scheme[_, _, _, _, _]])
-  }
-}
 
 /**
   * See [[com.twitter.scalding.parquet.thrift.DailySuffixParquetThrift]] for documentation on

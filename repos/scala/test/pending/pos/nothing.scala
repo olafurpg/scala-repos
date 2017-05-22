@@ -1,5 +1,5 @@
 // More shoddy treatment for nothing.
-class A {
+class A
   class Q3A[+T1, T2 <: T1](x: T1)
   class Q3B[+T1, T2 <: T1](x: Q3A[T1, T2])
 
@@ -21,4 +21,3 @@ class A {
   //   val x2 = new Q3B(new Q3A[String, Nothing]("a"))
   //                    ^
   // two errors found
-}

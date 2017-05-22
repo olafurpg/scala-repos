@@ -31,7 +31,7 @@ package mutable
   *  @tparam A     type of the elements contained in this hash table.
   */
 trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
-    extends HashTable.HashUtils[A] {
+    extends HashTable.HashUtils[A]
   // Replacing Entry type parameter by abstract type member here allows to not expose to public
   // implementation-specific entry classes such as `DefaultEntry` or `LinkedEntry`.
   // However, I'm afraid it's too late now for such breaking change.
@@ -71,19 +71,18 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
 
   private def initialCapacity = capacity(initialSize)
 
-  private def lastPopulatedIndex = {
+  private def lastPopulatedIndex =
     var idx = table.length - 1
     while (table(idx) == null && idx > 0) idx -= 1
 
     idx
-  }
 
   /**
     * Initializes the collection from the input stream. `readEntry` will be called for each
     * entry to be read from the input stream.
     */
   private[collection] def init(
-      in: java.io.ObjectInputStream, readEntry: => Entry) {
+      in: java.io.ObjectInputStream, readEntry: => Entry)
     in.defaultReadObject
 
     _loadFactor = in.readInt()
@@ -103,11 +102,9 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     if (smDefined) sizeMapInit(table.length) else sizemap = null
 
     var index = 0
-    while (index < size) {
+    while (index < size)
       addEntry(readEntry)
       index += 1
-    }
-  }
 
   /**
     * Serializes the collection to the output stream by saving the load factor, collection
@@ -117,7 +114,7 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     * deserialize, `init` should be used.
     */
   private[collection] def serializeTo(
-      out: java.io.ObjectOutputStream, writeEntry: Entry => Unit) {
+      out: java.io.ObjectOutputStream, writeEntry: Entry => Unit)
     out.defaultWriteObject
     out.writeInt(_loadFactor)
     out.writeInt(tableSize)
@@ -125,7 +122,6 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     out.writeBoolean(isSizeMapDefined)
 
     foreachEntry(writeEntry)
-  }
 
   /** Find entry with given key in table, null if not found.
     */
@@ -135,11 +131,10 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
   protected def findEntry(key: A): Entry =
     findEntry0(key, index(elemHashCode(key)))
 
-  private[this] def findEntry0(key: A, h: Int): Entry = {
+  private[this] def findEntry0(key: A, h: Int): Entry =
     var e = table(h).asInstanceOf[Entry]
     while (e != null && !elemEquals(e.key, key)) e = e.next
     e
-  }
 
   /** Add entry to table
     *  pre: no entry with same key exists
@@ -147,17 +142,15 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
   @deprecatedOverriding(
       "No sensible way to override addEntry as private addEntry0 is used in multiple places internally.",
       "2.11.0")
-  protected def addEntry(e: Entry) {
+  protected def addEntry(e: Entry)
     addEntry0(e, index(elemHashCode(e.key)))
-  }
 
-  private[this] def addEntry0(e: Entry, h: Int) {
+  private[this] def addEntry0(e: Entry, h: Int)
     e.next = table(h).asInstanceOf[Entry]
     table(h) = e
     tableSize = tableSize + 1
     nnSizeMapAdd(h)
     if (tableSize > threshold) resize(2 * table.length)
-  }
 
   /** Find entry with given key in table, or add new one if not found.
     *  May be somewhat faster then `findEntry`/`addEntry` pair as it
@@ -165,11 +158,10 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     *  Returns entry found in table or null.
     *  New entries are created by calling `createNewEntry` method.
     */
-  protected def findOrAddEntry[B](key: A, value: B): Entry = {
+  protected def findOrAddEntry[B](key: A, value: B): Entry =
     val h = index(elemHashCode(key))
     val e = findEntry0(key, h)
     if (e ne null) e else { addEntry0(createNewEntry(key, value), h); null }
-  }
 
   /** Creates new entry to be immediately inserted into the hashtable.
     *  This method is guaranteed to be called only once and in case that the entry
@@ -182,97 +174,82 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
   @deprecatedOverriding(
       "Internal implementation does not admit sensible overriding of this method.",
       "2.11.0")
-  protected def removeEntry(key: A): Entry = {
+  protected def removeEntry(key: A): Entry =
     val h = index(elemHashCode(key))
     var e = table(h).asInstanceOf[Entry]
-    if (e != null) {
-      if (elemEquals(e.key, key)) {
+    if (e != null)
+      if (elemEquals(e.key, key))
         table(h) = e.next
         tableSize = tableSize - 1
         nnSizeMapRemove(h)
         return e
-      } else {
+      else
         var e1 = e.next
-        while (e1 != null && !elemEquals(e1.key, key)) {
+        while (e1 != null && !elemEquals(e1.key, key))
           e = e1
           e1 = e1.next
-        }
-        if (e1 != null) {
+        if (e1 != null)
           e.next = e1.next
           tableSize = tableSize - 1
           nnSizeMapRemove(h)
           return e1
-        }
-      }
-    }
     null
-  }
 
   /** An iterator returning all entries.
     */
   protected def entriesIterator: Iterator[Entry] =
-    new AbstractIterator[Entry] {
+    new AbstractIterator[Entry]
       val iterTable = table
       var idx = lastPopulatedIndex
       var es = iterTable(idx)
 
       def hasNext = es != null
-      def next() = {
+      def next() =
         val res = es
         es = es.next
-        while (es == null && idx > 0) {
+        while (es == null && idx > 0)
           idx = idx - 1
           es = iterTable(idx)
-        }
         res.asInstanceOf[Entry]
-      }
-    }
 
   /** Avoid iterator for a 2x faster traversal. */
-  protected def foreachEntry[U](f: Entry => U) {
+  protected def foreachEntry[U](f: Entry => U)
     val iterTable = table
     var idx = lastPopulatedIndex
     var es = iterTable(idx)
 
-    while (es != null) {
+    while (es != null)
       f(es.asInstanceOf[Entry])
       es = es.next
 
-      while (es == null && idx > 0) {
+      while (es == null && idx > 0)
         idx -= 1
         es = iterTable(idx)
-      }
-    }
-  }
 
   /** Remove all entries from table
     */
-  protected def clearTable() {
+  protected def clearTable()
     var i = table.length - 1
     while (i >= 0) { table(i) = null; i = i - 1 }
     tableSize = 0
     nnSizeMapReset(0)
-  }
 
-  private def resize(newSize: Int) {
+  private def resize(newSize: Int)
     val oldTable = table
     table = new Array(newSize)
     nnSizeMapReset(table.length)
     var i = oldTable.length - 1
-    while (i >= 0) {
+    while (i >= 0)
       var e = oldTable(i)
-      while (e != null) {
+      while (e != null)
         val h = index(elemHashCode(e.key))
         val e1 = e.next
         e.next = table(h).asInstanceOf[Entry]
         table(h) = e
         e = e1
         nnSizeMapAdd(h)
-      }
       i = i - 1
-    }
     threshold = newThreshold(_loadFactor, newSize)
-  }
 
   /* Size map handling code */
 
@@ -296,25 +273,22 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
   @deprecatedOverriding(
       "Internal implementation does not admit sensible overriding of this method.",
       "2.11.0")
-  protected def nnSizeMapAdd(h: Int) = if (sizemap ne null) {
+  protected def nnSizeMapAdd(h: Int) = if (sizemap ne null)
     sizemap(h >> sizeMapBucketBitSize) += 1
-  }
 
   @deprecatedOverriding(
       "Internal implementation does not admit sensible overriding of this method.",
       "2.11.0")
-  protected def nnSizeMapRemove(h: Int) = if (sizemap ne null) {
+  protected def nnSizeMapRemove(h: Int) = if (sizemap ne null)
     sizemap(h >> sizeMapBucketBitSize) -= 1
-  }
 
   @deprecatedOverriding(
       "Internal implementation does not admit sensible overriding of this method.",
       "2.11.0")
-  protected def nnSizeMapReset(tableLength: Int) = if (sizemap ne null) {
+  protected def nnSizeMapReset(tableLength: Int) = if (sizemap ne null)
     val nsize = calcSizeMapSize(tableLength)
     if (sizemap.length != nsize) sizemap = new Array[Int](nsize)
     else java.util.Arrays.fill(sizemap, 0)
-  }
 
   private[collection] final def totalSizeMapBuckets =
     if (sizeMapBucketSize < table.length) 1
@@ -327,15 +301,14 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     (tableLength >> sizeMapBucketBitSize) + 1
 
   // discards the previous sizemap and only allocates a new one
-  protected def sizeMapInit(tableLength: Int) {
+  protected def sizeMapInit(tableLength: Int)
     sizemap = new Array[Int](calcSizeMapSize(tableLength))
-  }
 
   // discards the previous sizemap and populates the new one
   @deprecatedOverriding(
       "Internal implementation does not admit sensible overriding of this method.",
       "2.11.0")
-  protected def sizeMapInitAndRebuild() {
+  protected def sizeMapInitAndRebuild()
     sizeMapInit(table.length)
 
     // go through the buckets, count elements
@@ -346,25 +319,20 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
     if (tbl.length < sizeMapBucketSize) tableuntil = tbl.length
     else tableuntil = sizeMapBucketSize
     val totalbuckets = totalSizeMapBuckets
-    while (bucketidx < totalbuckets) {
+    while (bucketidx < totalbuckets)
       var currbucketsize = 0
-      while (tableidx < tableuntil) {
+      while (tableidx < tableuntil)
         var e = tbl(tableidx)
-        while (e ne null) {
+        while (e ne null)
           currbucketsize += 1
           e = e.next
-        }
         tableidx += 1
-      }
       sizemap(bucketidx) = currbucketsize
       tableuntil += sizeMapBucketSize
       bucketidx += 1
-    }
-  }
 
-  private[collection] def printSizeMap() {
+  private[collection] def printSizeMap()
     println(sizemap.toList)
-  }
 
   @deprecatedOverriding(
       "Internal implementation does not admit sensible overriding of this method.",
@@ -386,24 +354,21 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
   // Note:
   // we take the most significant bits of the hashcode, not the lower ones
   // this is of crucial importance when populating the table in parallel
-  protected final def index(hcode: Int) = {
+  protected final def index(hcode: Int) =
     val ones = table.length - 1
     val improved = improve(hcode, seedvalue)
     val shifted = (improved >> (32 - java.lang.Integer.bitCount(ones))) & ones
     shifted
-  }
 
-  protected def initWithContents(c: HashTable.Contents[A, Entry]) = {
-    if (c != null) {
+  protected def initWithContents(c: HashTable.Contents[A, Entry]) =
+    if (c != null)
       _loadFactor = c.loadFactor
       table = c.table
       tableSize = c.tableSize
       threshold = c.threshold
       seedvalue = c.seedvalue
       sizemap = c.sizemap
-    }
     if (alwaysInitSizeMap && sizemap == null) sizeMapInitAndRebuild()
-  }
 
   private[collection] def hashTableContents = new HashTable.Contents(
       _loadFactor,
@@ -413,9 +378,8 @@ trait HashTable[A, Entry >: Null <: HashEntry[A, Entry]]
       seedvalue,
       sizemap
   )
-}
 
-private[collection] object HashTable {
+private[collection] object HashTable
 
   /** The load factor for the hash table (in 0.001 step).
     */
@@ -432,14 +396,14 @@ private[collection] object HashTable {
   private[collection] final def capacity(expectedSize: Int) =
     if (expectedSize == 0) 1 else powerOfTwo(expectedSize)
 
-  trait HashUtils[KeyType] {
+  trait HashUtils[KeyType]
     protected final def sizeMapBucketBitSize = 5
     // so that:
     protected final def sizeMapBucketSize = 1 << sizeMapBucketBitSize
 
     protected def elemHashCode(key: KeyType) = key.##
 
-    protected final def improve(hcode: Int, seed: Int) = {
+    protected final def improve(hcode: Int, seed: Int) =
       /* Murmur hash
        *  m = 0x5bd1e995
        *  r = 24
@@ -491,13 +455,11 @@ private[collection] object HashTable {
       val rotation = seed % 32
       val rotated = (i >>> rotation) | (i << (32 - rotation))
       rotated
-    }
-  }
 
   /**
     * Returns a power of two >= `target`.
     */
-  private[collection] def powerOfTwo(target: Int): Int = {
+  private[collection] def powerOfTwo(target: Int): Int =
     /* See http://bits.stephan-brumme.com/roundUpToNextPowerOfTwo.html */
     var c = target - 1
     c |= c >>> 1
@@ -506,7 +468,6 @@ private[collection] object HashTable {
     c |= c >>> 8
     c |= c >>> 16
     c + 1
-  }
 
   class Contents[A, Entry >: Null <: HashEntry[A, Entry]](
       val loadFactor: Int,
@@ -515,9 +476,9 @@ private[collection] object HashTable {
       val threshold: Int,
       val seedvalue: Int,
       val sizemap: Array[Int]
-  ) {
+  )
     import scala.collection.DebugUtils._
-    private[collection] def debugInformation = buildString { append =>
+    private[collection] def debugInformation = buildString  append =>
       append("Hash table contents")
       append("-------------------")
       append("Table: [" + arrayString(table, 0, table.length) + "]")
@@ -526,6 +487,3 @@ private[collection] object HashTable {
       append("Seedvalue: " + seedvalue)
       append("Threshold: " + threshold)
       append("Sizemap: [" + arrayString(sizemap, 0, sizemap.length) + "]")
-    }
-  }
-}

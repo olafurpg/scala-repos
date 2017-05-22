@@ -10,14 +10,13 @@ import akka.testkit.AkkaSpec
 //#extension
 import akka.actor.Extension
 
-class CountExtensionImpl extends Extension {
+class CountExtensionImpl extends Extension
   //Since this Extension is a shared instance
   // per ActorSystem we need to be threadsafe
   private val counter = new AtomicLong(0)
 
   //This is the operation this Extension provides
   def increment() = counter.incrementAndGet()
-}
 //#extension
 
 //#extensionid
@@ -27,7 +26,7 @@ import akka.actor.ExtensionIdProvider
 import akka.actor.ExtendedActorSystem
 
 object CountExtension
-    extends ExtensionId[CountExtensionImpl] with ExtensionIdProvider {
+    extends ExtensionId[CountExtensionImpl] with ExtensionIdProvider
   //The lookup method is required by ExtensionIdProvider,
   // so we return ourselves here, this allows us
   // to configure our extension to be loaded when
@@ -43,10 +42,9 @@ object CountExtension
     * Java API: retrieve the Count extension for the given system.
     */
   override def get(system: ActorSystem): CountExtensionImpl = super.get(system)
-}
 //#extensionid
 
-object ExtensionDocSpec {
+object ExtensionDocSpec
 
   val config = """
     //#config
@@ -58,38 +56,29 @@ object ExtensionDocSpec {
 
   //#extension-usage-actor
 
-  class MyActor extends Actor {
-    def receive = {
+  class MyActor extends Actor
+    def receive =
       case someMessage =>
         CountExtension(context.system).increment()
-    }
-  }
   //#extension-usage-actor
 
   //#extension-usage-actor-trait
 
-  trait Counting { self: Actor =>
+  trait Counting  self: Actor =>
     def increment() = CountExtension(context.system).increment()
-  }
-  class MyCounterActor extends Actor with Counting {
-    def receive = {
+  class MyCounterActor extends Actor with Counting
+    def receive =
       case someMessage => increment()
-    }
-  }
   //#extension-usage-actor-trait
-}
 
-class ExtensionDocSpec extends AkkaSpec(ExtensionDocSpec.config) {
+class ExtensionDocSpec extends AkkaSpec(ExtensionDocSpec.config)
 
-  "demonstrate how to create an extension in Scala" in {
+  "demonstrate how to create an extension in Scala" in
     //#extension-usage
     CountExtension(system).increment
     //#extension-usage
-  }
 
-  "demonstrate how to lookup a configured extension in Scala" in {
+  "demonstrate how to lookup a configured extension in Scala" in
     //#extension-lookup
     system.extension(CountExtension)
     //#extension-lookup
-  }
-}

@@ -6,22 +6,19 @@ package akka.remote
 import scala.collection.immutable._
 import akka.AkkaException
 
-object SeqNo {
+object SeqNo
 
-  implicit val ord: Ordering[SeqNo] = new Ordering[SeqNo] {
-    override def compare(x: SeqNo, y: SeqNo): Int = {
+  implicit val ord: Ordering[SeqNo] = new Ordering[SeqNo]
+    override def compare(x: SeqNo, y: SeqNo): Int =
       val sgn =
         if (x.rawValue < y.rawValue) -1
         else if (x.rawValue > y.rawValue) 1 else 0
       if (((x.rawValue - y.rawValue) * sgn) < 0L) -sgn else sgn
-    }
-  }
-}
 
 /**
   * Implements a 64 bit sequence number with proper wrap-around ordering.
   */
-final case class SeqNo(rawValue: Long) extends Ordered[SeqNo] {
+final case class SeqNo(rawValue: Long) extends Ordered[SeqNo]
 
   /**
     * Checks if this sequence number is an immediate successor of the provided one.
@@ -40,26 +37,22 @@ final case class SeqNo(rawValue: Long) extends Ordered[SeqNo] {
   override def compare(that: SeqNo) = SeqNo.ord.compare(this, that)
 
   override def toString = String.valueOf(rawValue)
-}
 
-object HasSequenceNumber {
+object HasSequenceNumber
   implicit def seqOrdering[T <: HasSequenceNumber]: Ordering[T] =
-    new Ordering[T] {
+    new Ordering[T]
       def compare(x: T, y: T) = x.seq.compare(y.seq)
-    }
-}
 
 /**
   * Messages that are to be buffered in [[akka.remote.AckedSendBuffer]] or [[akka.remote.AckedReceiveBuffer]] has
   * to implement this interface to provide the sequence needed by the buffers.
   */
-trait HasSequenceNumber {
+trait HasSequenceNumber
 
   /**
     * Sequence number of the message
     */
   def seq: SeqNo
-}
 
 /**
   * Class representing an acknowledgement with selective negative acknowledgements.
@@ -67,10 +60,9 @@ trait HasSequenceNumber {
   * @param cumulativeAck Represents the highest sequence number received.
   * @param nacks Set of sequence numbers between the last delivered one and cumulativeAck that has been not yet received.
   */
-final case class Ack(cumulativeAck: SeqNo, nacks: Set[SeqNo] = Set.empty) {
+final case class Ack(cumulativeAck: SeqNo, nacks: Set[SeqNo] = Set.empty)
   override def toString =
     s"ACK[$cumulativeAck, ${nacks.mkString("{", ", ", "}")}]"
-}
 
 class ResendBufferCapacityReachedException(c: Int)
     extends AkkaException(s"Resend buffer capacity of [$c] has been reached.")
@@ -95,29 +87,27 @@ final case class AckedSendBuffer[T <: HasSequenceNumber](
     capacity: Int,
     nonAcked: IndexedSeq[T] = Vector.empty[T],
     nacked: IndexedSeq[T] = Vector.empty[T],
-    maxSeq: SeqNo = SeqNo(-1)) {
+    maxSeq: SeqNo = SeqNo(-1))
 
   /**
     * Processes an incoming acknowledgement and returns a new buffer with only unacknowledged elements remaining.
     * @param ack The received acknowledgement
     * @return An updated buffer containing the remaining unacknowledged messages
     */
-  def acknowledge(ack: Ack): AckedSendBuffer[T] = {
+  def acknowledge(ack: Ack): AckedSendBuffer[T] =
     if (ack.cumulativeAck > maxSeq)
       throw new IllegalArgumentException(
           s"Highest SEQ so far was $maxSeq but cumulative ACK is ${ack.cumulativeAck}")
     val newNacked =
       if (ack.nacks.isEmpty) Vector.empty
       else
-        (nacked ++ nonAcked) filter { m ⇒
+        (nacked ++ nonAcked) filter  m ⇒
           ack.nacks(m.seq)
-        }
     if (newNacked.size < ack.nacks.size) throw new ResendUnfulfillableException
     else
-      this.copy(nonAcked = nonAcked.filter { m ⇒
+      this.copy(nonAcked = nonAcked.filter  m ⇒
         m.seq > ack.cumulativeAck
-      }, nacked = newNacked)
-  }
+      , nacked = newNacked)
 
   /**
     * Puts a new message in the buffer. Throws [[java.lang.IllegalArgumentException]] if an out-of-sequence message
@@ -125,7 +115,7 @@ final case class AckedSendBuffer[T <: HasSequenceNumber](
     * @param msg The message to be stored for possible future retransmission.
     * @return The updated buffer
     */
-  def buffer(msg: T): AckedSendBuffer[T] = {
+  def buffer(msg: T): AckedSendBuffer[T] =
     if (msg.seq <= maxSeq)
       throw new IllegalArgumentException(
           s"Sequence number must be monotonic. Received [${msg.seq}] " +
@@ -135,11 +125,9 @@ final case class AckedSendBuffer[T <: HasSequenceNumber](
       throw new ResendBufferCapacityReachedException(capacity)
 
     this.copy(nonAcked = this.nonAcked :+ msg, maxSeq = msg.seq)
-  }
 
   override def toString =
     s"[$maxSeq ${nonAcked.map(_.seq).mkString("{", ", ", "}")}]"
-}
 
 /**
   * Implements an immutable receive buffer that buffers incoming messages until they can be safely delivered. This
@@ -153,7 +141,7 @@ final case class AckedReceiveBuffer[T <: HasSequenceNumber](
     lastDelivered: SeqNo = SeqNo(-1),
     cumulativeAck: SeqNo = SeqNo(-1),
     buf: SortedSet[T] = TreeSet.empty[T])(
-    implicit val seqOrdering: Ordering[T]) {
+    implicit val seqOrdering: Ordering[T])
 
   import SeqNo.ord.max
 
@@ -162,47 +150,42 @@ final case class AckedReceiveBuffer[T <: HasSequenceNumber](
     * @param arrivedMsg message to be put into the buffer.
     * @return The updated buffer containing the message.
     */
-  def receive(arrivedMsg: T): AckedReceiveBuffer[T] = {
+  def receive(arrivedMsg: T): AckedReceiveBuffer[T] =
     this.copy(
         cumulativeAck = max(arrivedMsg.seq, cumulativeAck),
         buf = if (arrivedMsg.seq > lastDelivered && !buf.contains(arrivedMsg))
             buf + arrivedMsg else buf)
-  }
 
   /**
     * Extract all messages that could be safely delivered, an updated ack to be sent to the sender(), and an updated
     * buffer that has the messages removed that can be delivered.
     * @return Triplet of the updated buffer, messages that can be delivered and the updated acknowledgement.
     */
-  def extractDeliverable: (AckedReceiveBuffer[T], Seq[T], Ack) = {
+  def extractDeliverable: (AckedReceiveBuffer[T], Seq[T], Ack) =
     var deliver = Vector.empty[T]
     var ack = Ack(cumulativeAck = cumulativeAck)
     var updatedLastDelivered = lastDelivered
     var prev = lastDelivered
 
-    for (bufferedMsg ← buf) {
-      if (bufferedMsg.seq.isSuccessor(updatedLastDelivered)) {
+    for (bufferedMsg ← buf)
+      if (bufferedMsg.seq.isSuccessor(updatedLastDelivered))
         deliver :+= bufferedMsg
         updatedLastDelivered = updatedLastDelivered.inc
-      } else if (!bufferedMsg.seq.isSuccessor(prev)) {
+      else if (!bufferedMsg.seq.isSuccessor(prev))
         var diff = bufferedMsg.seq.rawValue - prev.rawValue - 1
         var nacks = Set.empty[SeqNo]
 
         // Collect all missing sequence numbers (gaps)
-        while (diff > 0) {
+        while (diff > 0)
           nacks += SeqNo(prev.rawValue + diff)
           diff -= 1
-        }
         ack = ack.copy(nacks = ack.nacks ++ nacks)
-      }
       prev = bufferedMsg.seq
-    }
 
     val newBuf = if (deliver.isEmpty) buf else buf.filterNot(deliver.contains)
     (this.copy(buf = newBuf, lastDelivered = updatedLastDelivered),
      deliver,
      ack)
-  }
 
   /**
     * Merges two receive buffers. Merging preserves sequencing of messages, and drops all messages that has been
@@ -210,14 +193,12 @@ final case class AckedReceiveBuffer[T <: HasSequenceNumber](
     * @param that The receive buffer to merge with
     * @return The merged receive buffer.
     */
-  def mergeFrom(that: AckedReceiveBuffer[T]): AckedReceiveBuffer[T] = {
+  def mergeFrom(that: AckedReceiveBuffer[T]): AckedReceiveBuffer[T] =
     val mergedLastDelivered = max(this.lastDelivered, that.lastDelivered)
     this.copy(lastDelivered = mergedLastDelivered,
               cumulativeAck = max(this.cumulativeAck, that.cumulativeAck),
-              buf = (this.buf union that.buf).filter {
+              buf = (this.buf union that.buf).filter
                 _.seq > mergedLastDelivered
-              })
-  }
+              )
 
   override def toString = buf.map { _.seq }.mkString("[", ", ", "]")
-}

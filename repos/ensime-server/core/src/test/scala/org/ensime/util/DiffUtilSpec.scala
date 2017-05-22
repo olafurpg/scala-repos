@@ -4,8 +4,8 @@ package org.ensime.util
 
 import java.io.File
 
-class DiffUtilSpec extends EnsimeSpec {
-  "DiffUtil" should "compare original and revised contents and produce a diff in the unified format" in {
+class DiffUtilSpec extends EnsimeSpec
+  "DiffUtil" should "compare original and revised contents and produce a diff in the unified format" in
     val originalContent = """|line1
          |line2
          |line3""".stripMargin.lines.toSeq
@@ -27,5 +27,3 @@ class DiffUtilSpec extends EnsimeSpec {
     val diff = DiffUtil.compareContents(originalContent, revisedContent)
 
     diff should ===(expectedDiff)
-  }
-}

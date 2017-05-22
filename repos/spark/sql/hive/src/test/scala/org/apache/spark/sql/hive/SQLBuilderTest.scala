@@ -24,12 +24,12 @@ import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 
-abstract class SQLBuilderTest extends QueryTest with TestHiveSingleton {
-  protected def checkSQL(e: Expression, expectedSQL: String): Unit = {
+abstract class SQLBuilderTest extends QueryTest with TestHiveSingleton
+  protected def checkSQL(e: Expression, expectedSQL: String): Unit =
     val actualSQL = e.sql
-    try {
+    try
       assert(actualSQL === expectedSQL)
-    } catch {
+    catch
       case cause: Throwable =>
         fail(s"""Wrong SQL generated for the following expression:
              |
@@ -37,21 +37,18 @@ abstract class SQLBuilderTest extends QueryTest with TestHiveSingleton {
              |
              |$cause
            """.stripMargin)
-    }
-  }
 
-  protected def checkSQL(plan: LogicalPlan, expectedSQL: String): Unit = {
-    val generatedSQL = try new SQLBuilder(plan, hiveContext).toSQL catch {
+  protected def checkSQL(plan: LogicalPlan, expectedSQL: String): Unit =
+    val generatedSQL = try new SQLBuilder(plan, hiveContext).toSQL catch
       case NonFatal(e) =>
         fail(s"""Cannot convert the following logical query plan to SQL:
            |
            |${plan.treeString}
          """.stripMargin)
-    }
 
-    try {
+    try
       assert(generatedSQL === expectedSQL)
-    } catch {
+    catch
       case cause: Throwable =>
         fail(s"""Wrong SQL generated for the following logical query plan:
              |
@@ -59,13 +56,9 @@ abstract class SQLBuilderTest extends QueryTest with TestHiveSingleton {
              |
              |$cause
            """.stripMargin)
-    }
 
     checkAnswer(
         sqlContext.sql(generatedSQL), Dataset.newDataFrame(sqlContext, plan))
-  }
 
-  protected def checkSQL(df: DataFrame, expectedSQL: String): Unit = {
+  protected def checkSQL(df: DataFrame, expectedSQL: String): Unit =
     checkSQL(df.queryExecution.analyzed, expectedSQL)
-  }
-}

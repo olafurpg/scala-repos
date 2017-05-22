@@ -9,25 +9,24 @@ import akka.stream.ActorMaterializerSettings
 import akka.stream.testkit._
 import akka.testkit.AkkaSpec
 
-class FlowFilterSpec extends AkkaSpec with ScriptedTest {
+class FlowFilterSpec extends AkkaSpec with ScriptedTest
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 16)
 
-  "A Filter" must {
+  "A Filter" must
 
-    "filter" in {
+    "filter" in
       def script =
         Script(
-            TestConfig.RandomTestRange map { _ ⇒
+            TestConfig.RandomTestRange map  _ ⇒
           val x = random.nextInt();
           Seq(x) -> (if ((x & 1) == 0) Seq(x) else Seq())
-        }: _*)
+        : _*)
       TestConfig.RandomTestRange foreach
       (_ ⇒ runScript(script, settings)(_.filter(_ % 2 == 0)))
-    }
 
-    "not blow up with high request counts" in {
+    "not blow up with high request counts" in
       val settings = ActorMaterializerSettings(system).withInputBuffer(
           initialSize = 1, maxSize = 1)
       implicit val materializer = ActorMaterializer(settings)
@@ -38,24 +37,18 @@ class FlowFilterSpec extends AkkaSpec with ScriptedTest {
         .runWith(Sink.fromSubscriber(probe))
 
       val subscription = probe.expectSubscription()
-      for (_ ← 1 to 10000) {
+      for (_ ← 1 to 10000)
         subscription.request(Int.MaxValue)
-      }
 
       probe.expectNext(1)
       probe.expectComplete()
-    }
-  }
 
-  "A FilterNot" must {
-    "filter based on inverted predicate" in {
+  "A FilterNot" must
+    "filter based on inverted predicate" in
       def script =
-        Script(TestConfig.RandomTestRange map { _ ⇒
+        Script(TestConfig.RandomTestRange map  _ ⇒
           val x = random.nextInt()
           Seq(x) -> (if ((x & 1) == 1) Seq(x) else Seq())
-        }: _*)
+        : _*)
       TestConfig.RandomTestRange foreach
       (_ ⇒ runScript(script, settings)(_.filterNot(_ % 2 == 0)))
-    }
-  }
-}

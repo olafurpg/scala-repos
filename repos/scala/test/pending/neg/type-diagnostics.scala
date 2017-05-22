@@ -1,4 +1,4 @@
-object TooManyParens {
+object TooManyParens
   def f = Map(1 -> 2).keySet()
   //
   // Confusion reigns!
@@ -7,4 +7,3 @@ object TooManyParens {
   // Unspecified value parameter elem.
   //   def f = Map(1 -> 2).keySet()
   //                             ^
-}

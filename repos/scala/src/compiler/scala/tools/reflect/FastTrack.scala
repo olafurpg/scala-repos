@@ -10,7 +10,7 @@ import scala.reflect.quasiquotes.{Quasiquotes => QuasiquoteImpls}
   *  bypassing standard reflective load and invoke to avoid the overhead of Java/Scala reflection.
   */
 class FastTrack[MacrosAndAnalyzer <: Macros with Analyzer](
-    val macros: MacrosAndAnalyzer) {
+    val macros: MacrosAndAnalyzer)
 
   import macros._
   import global._
@@ -42,49 +42,44 @@ class FastTrack[MacrosAndAnalyzer <: Macros with Analyzer](
   final class FastTrackEntry(
       pf: PartialFunction[Applied, MacroContext => Tree],
       val isBlackbox: Boolean)
-      extends (MacroArgs => Any) {
+      extends (MacroArgs => Any)
     def validate(tree: Tree) = pf isDefinedAt Applied(tree)
-    def apply(margs: MacroArgs): margs.c.Expr[Nothing] = {
+    def apply(margs: MacroArgs): margs.c.Expr[Nothing] =
       val MacroArgs(c, _) = margs
       // Macros validated that the pf is defined here - and there's not much we could do if it weren't.
       c.Expr[Nothing](pf(Applied(c.expandee))(c))(c.WeakTypeTag.Nothing)
-    }
-  }
 
   /** A map from a set of pre-established macro symbols to their implementations. */
   private val fastTrackCache =
-    perRunCaches.newGeneric[Map[Symbol, FastTrackEntry]] {
+    perRunCaches.newGeneric[Map[Symbol, FastTrackEntry]]
       val runDefinitions = currentRun.runDefinitions
       import runDefinitions._
       Map[Symbol, FastTrackEntry](
-          makeBlackbox(materializeClassTag) {
+          makeBlackbox(materializeClassTag)
             case Applied(_, ttag :: Nil, _) => _.materializeClassTag(ttag.tpe)
-          },
-          makeBlackbox(materializeWeakTypeTag) {
+          ,
+          makeBlackbox(materializeWeakTypeTag)
             case Applied(_, ttag :: Nil, (u :: _) :: _) =>
               _.materializeTypeTag(u, EmptyTree, ttag.tpe, concrete = false)
-          },
-          makeBlackbox(materializeTypeTag) {
+          ,
+          makeBlackbox(materializeTypeTag)
             case Applied(_, ttag :: Nil, (u :: _) :: _) =>
               _.materializeTypeTag(u, EmptyTree, ttag.tpe, concrete = true)
-          },
-          makeBlackbox(ApiUniverseReify) {
+          ,
+          makeBlackbox(ApiUniverseReify)
             case Applied(_, ttag :: Nil, (expr :: _) :: _) =>
               c =>
                 c.materializeExpr(c.prefix.tree, EmptyTree, expr)
-          },
+          ,
           makeBlackbox(StringContext_f) { case _ => _.interpolate },
-          makeBlackbox(ReflectRuntimeCurrentMirror) {
+          makeBlackbox(ReflectRuntimeCurrentMirror)
             case _ =>
               c =>
                 currentMirror(c).tree
-          },
-          makeWhitebox(QuasiquoteClass_api_apply) {
+          ,
+          makeWhitebox(QuasiquoteClass_api_apply)
             case _ => _.expandQuasiquote
-          },
-          makeWhitebox(QuasiquoteClass_api_unapply) {
+          ,
+          makeWhitebox(QuasiquoteClass_api_unapply)
             case _ => _.expandQuasiquote
-          }
       )
-    }
-}

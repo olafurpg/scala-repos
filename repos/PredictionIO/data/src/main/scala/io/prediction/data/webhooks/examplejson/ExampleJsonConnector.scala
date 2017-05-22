@@ -56,21 +56,20 @@ import org.json4s.JObject
   *   "timestamp": "2015-01-15T04:20:23.567Z"
   * }
   */
-private[prediction] object ExampleJsonConnector extends JsonConnector {
+private[prediction] object ExampleJsonConnector extends JsonConnector
 
   implicit val json4sFormats: Formats = DefaultFormats
 
-  override def toEventJson(data: JObject): JObject = {
-    val common = try {
+  override def toEventJson(data: JObject): JObject =
+    val common = try
       data.extract[Common]
-    } catch {
+    catch
       case e: Exception =>
         throw new ConnectorException(
             s"Cannot extract Common field from ${data}. ${e.getMessage()}", e)
-    }
 
-    val json = try {
-      common.`type` match {
+    val json = try
+      common.`type` match
         case "userAction" =>
           toEventJson(common = common, userAction = data.extract[UserAction])
         case "userActionItem" =>
@@ -79,18 +78,15 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
         case x: String =>
           throw new ConnectorException(
               s"Cannot convert unknown type '${x}' to Event JSON.")
-      }
-    } catch {
+    catch
       case e: ConnectorException => throw e
       case e: Exception =>
         throw new ConnectorException(
             s"Cannot convert ${data} to eventJson. ${e.getMessage()}", e)
-    }
 
     json
-  }
 
-  def toEventJson(common: Common, userAction: UserAction): JObject = {
+  def toEventJson(common: Common, userAction: UserAction): JObject =
     import org.json4s.JsonDSL._
 
     // map to EventAPI JSON
@@ -102,9 +98,8 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
               ("anotherProperty1" -> userAction.anotherProperty1) ~
               ("anotherProperty2" -> userAction.anotherProperty2)))
     json
-  }
 
-  def toEventJson(common: Common, userActionItem: UserActionItem): JObject = {
+  def toEventJson(common: Common, userActionItem: UserActionItem): JObject =
     import org.json4s.JsonDSL._
 
     // map to EventAPI JSON
@@ -118,7 +113,6 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
               ("anotherPropertyA" -> userActionItem.anotherPropertyA) ~
               ("anotherPropertyB" -> userActionItem.anotherPropertyB)))
     json
-  }
 
   // Common required fields
   case class Common(
@@ -145,4 +139,3 @@ private[prediction] object ExampleJsonConnector extends JsonConnector {
       anotherPropertyB: Option[Boolean],
       timestamp: String
   )
-}

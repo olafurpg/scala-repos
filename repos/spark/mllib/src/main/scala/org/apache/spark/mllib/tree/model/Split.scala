@@ -34,13 +34,11 @@ import org.apache.spark.mllib.tree.configuration.FeatureType.FeatureType
 case class Split(@Since("1.0.0") feature: Int,
                  @Since("1.0.0") threshold: Double,
                  @Since("1.0.0") featureType: FeatureType,
-                 @Since("1.0.0") categories: List[Double]) {
+                 @Since("1.0.0") categories: List[Double])
 
-  override def toString: String = {
+  override def toString: String =
     s"Feature = $feature, threshold = $threshold, featureType = $featureType, " +
     s"categories = $categories"
-  }
-}
 
 /**
   * Split with minimum threshold for continuous features. Helps with the smallest bin creation.

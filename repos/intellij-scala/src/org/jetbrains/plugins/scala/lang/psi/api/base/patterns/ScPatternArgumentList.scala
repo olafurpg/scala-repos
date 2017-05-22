@@ -13,19 +13,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params._
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
-trait ScPatternArgumentList extends ScArguments {
+trait ScPatternArgumentList extends ScArguments
 
   def patterns: Seq[ScPattern]
 
-  def missedLastExpr: Boolean = {
+  def missedLastExpr: Boolean =
     var child = getLastChild
     while (child != null &&
-    child.getNode.getElementType != ScalaTokenTypes.tCOMMA) {
+    child.getNode.getElementType != ScalaTokenTypes.tCOMMA)
       if (child.isInstanceOf[ScPattern] || child.isInstanceOf[ScSequenceArg])
         return false
       child = child.getPrevSibling
-    }
     return child != null &&
     child.getNode.getElementType == ScalaTokenTypes.tCOMMA
-  }
-}

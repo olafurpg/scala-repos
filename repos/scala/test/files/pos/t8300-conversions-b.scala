@@ -1,5 +1,5 @@
 // cf. pos/t8300-conversions-a.scala
-trait Universe {
+trait Universe
   type Symbol >: Null <: AnyRef with SymbolApi
   trait SymbolApi
 
@@ -9,15 +9,12 @@ trait Universe {
   type FreeTypeSymbol >: Null <: FreeTypeSymbolApi with TypeSymbol
   trait FreeTypeSymbolApi extends TypeSymbolApi
 
-  implicit class CompatibleSymbol(sym: Symbol) {
+  implicit class CompatibleSymbol(sym: Symbol)
     def asFreeType: FreeTypeSymbol = ???
-  }
-}
 
-object Test extends App {
+object Test extends App
   val u: Universe = ???
   import u._
 
   val sym: Symbol = ???
   sym.asFreeType
-}

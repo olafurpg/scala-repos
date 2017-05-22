@@ -23,33 +23,29 @@ package org.apache.spark.sql.catalyst.expressions.codegen
   *
   * Written by Matei Zaharia.
   */
-object CodeFormatter {
+object CodeFormatter
   def format(code: String): String =
     new CodeFormatter().addLines(code).result()
-  def stripExtraNewLines(input: String): String = {
+  def stripExtraNewLines(input: String): String =
     val code = new StringBuilder
     var lastLine: String = "dummy"
-    input.split('\n').foreach { l =>
+    input.split('\n').foreach  l =>
       val line = l.trim()
       val skip = line == "" && (lastLine == "" || lastLine.endsWith("{"))
-      if (!skip) {
+      if (!skip)
         code.append(line)
         code.append("\n")
-      }
       lastLine = line
-    }
     code.result()
-  }
-}
 
-private class CodeFormatter {
+private class CodeFormatter
   private val code = new StringBuilder
   private var indentLevel = 0
   private val indentSize = 2
   private var indentString = ""
   private var currentLine = 1
 
-  private def addLine(line: String): Unit = {
+  private def addLine(line: String): Unit =
     val indentChange =
       line.count(c => "({".indexOf(c) >= 0) - line.count(
           c => ")}".indexOf(c) >= 0)
@@ -57,11 +53,10 @@ private class CodeFormatter {
     // Lines starting with '}' should be de-indented even if they contain '{' after;
     // in addition, lines ending with ':' are typically labels
     val thisLineIndent =
-      if (line.startsWith("}") || line.startsWith(")") || line.endsWith(":")) {
+      if (line.startsWith("}") || line.startsWith(")") || line.endsWith(":"))
         " " * (indentSize * (indentLevel - 1))
-      } else {
+      else
         indentString
-      }
     code.append(f"/* ${currentLine}%03d */ ")
     code.append(thisLineIndent)
     code.append(line)
@@ -69,12 +64,9 @@ private class CodeFormatter {
     indentLevel = newIndentLevel
     indentString = " " * (indentSize * newIndentLevel)
     currentLine += 1
-  }
 
-  private def addLines(code: String): CodeFormatter = {
+  private def addLines(code: String): CodeFormatter =
     code.split('\n').foreach(s => addLine(s.trim()))
     this
-  }
 
   private def result(): String = code.result()
-}

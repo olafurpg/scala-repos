@@ -17,11 +17,11 @@ import scala.annotation.tailrec
 /*
  * EarlyDef ::= '{' [PatVarDef {semi PatVarDef}] '}' 'with'
  */
-object EarlyDef {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object EarlyDef
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val earlyMarker = builder.mark
     //Look for {
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLBRACE =>
         builder.advanceLexer() //Ate {
         builder.enableNewlines
@@ -29,47 +29,37 @@ object EarlyDef {
         builder error ScalaBundle.message("unreachable.error")
         earlyMarker.drop()
         return false
-    }
     //this metod parse recursively PatVarDef {semi PatVarDef}
     @tailrec
-    def subparse: Boolean = {
-      builder.getTokenType match {
+    def subparse: Boolean =
+      builder.getTokenType match
         case ScalaTokenTypes.tRBRACE =>
           builder.advanceLexer() //Ate }
           true
         case _ =>
-          if (PatVarDef parse builder) {
-            builder.getTokenType match {
-              case ScalaTokenTypes.tRBRACE => {
+          if (PatVarDef parse builder)
+            builder.getTokenType match
+              case ScalaTokenTypes.tRBRACE =>
                   builder.advanceLexer() //Ate }
                   true
-                }
-              case ScalaTokenTypes.tSEMICOLON => {
+              case ScalaTokenTypes.tSEMICOLON =>
                   builder.advanceLexer() //Ate semicolon
                   subparse
-                }
-              case _ => {
-                  if (builder.newlineBeforeCurrentToken) {
+              case _ =>
+                  if (builder.newlineBeforeCurrentToken)
                     subparse
-                  } else {
+                  else
                     false
-                  }
-                }
-            }
-          } else {
+          else
             false
-          }
-      }
-    }
-    if (!subparse) {
+    if (!subparse)
       builder.restoreNewlinesState
       builder error ScalaBundle.message("unreachable.error")
       earlyMarker.rollbackTo()
       return false
-    }
     builder.restoreNewlinesState
     //finally look for 'with' keyword
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kWITH =>
         earlyMarker.done(ScalaElementTypes.EARLY_DEFINITIONS)
         builder.advanceLexer() //Ate with
@@ -78,6 +68,3 @@ object EarlyDef {
         builder error ScalaBundle.message("unreachable.error")
         earlyMarker.rollbackTo()
         false
-    }
-  }
-}

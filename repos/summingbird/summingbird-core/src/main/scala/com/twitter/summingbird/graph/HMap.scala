@@ -22,17 +22,16 @@ package com.twitter.summingbird.graph
   * the types are actually equal (either be careful or store a
   * type identifier).
   */
-sealed abstract class HMap[K[_], V[_]] {
+sealed abstract class HMap[K[_], V[_]]
   type Pair[t] = (K[t], V[t])
   protected val map: Map[K[_], V[_]]
   override def toString: String =
     "H%s".format(map)
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case null => false
     case h: HMap[_, _] => map.equals(h.map)
     case _ => false
-  }
   override def hashCode = map.hashCode
 
   def +[T](kv: (K[T], V[T])): HMap[K, V] =
@@ -46,65 +45,55 @@ sealed abstract class HMap[K[_], V[_]] {
   def contains[T](id: K[T]): Boolean = get(id).isDefined
 
   def filter(pred: GenFunction[Pair, ({ type BoolT[T] = Boolean })#BoolT])
-    : HMap[K, V] = {
+    : HMap[K, V] =
     val filtered =
       map.asInstanceOf[Map[K[Any], V[Any]]].filter(pred.apply[Any])
     HMap.from[K, V](filtered.asInstanceOf[Map[K[_], V[_]]])
-  }
 
   def get[T](id: K[T]): Option[V[T]] =
     map.get(id).asInstanceOf[Option[V[T]]]
 
   def keysOf[T](v: V[T]): Set[K[T]] =
-    map.collect {
+    map.collect
       case (k, w) if v == w =>
         k.asInstanceOf[K[T]]
-    }.toSet
+    .toSet
 
   // go through all the keys, and find the first key that matches this
   // function and apply
-  def updateFirst(p: GenPartial[K, V]): Option[(HMap[K, V], K[_])] = {
-    def collector[T]: PartialFunction[(K[T], V[T]), (K[T], V[T])] = {
+  def updateFirst(p: GenPartial[K, V]): Option[(HMap[K, V], K[_])] =
+    def collector[T]: PartialFunction[(K[T], V[T]), (K[T], V[T])] =
       val pf = p.apply[T]
 
-      {
         case (kv: (K[T], V[T])) if pf.isDefinedAt(kv._1) =>
           val v2 = pf(kv._1)
           (kv._1, v2)
-      }
-    }
 
-    map.asInstanceOf[Map[K[Any], V[Any]]].collectFirst(collector).map { kv =>
+    map.asInstanceOf[Map[K[Any], V[Any]]].collectFirst(collector).map  kv =>
       (this + kv, kv._1)
-    }
-  }
 
   def collect[R[_]](p: GenPartial[Pair, R]): Stream[R[_]] =
     map.toStream.asInstanceOf[Stream[(K[Any], V[Any])]].collect(p.apply)
 
   def collectValues[R[_]](p: GenPartial[V, R]): Stream[R[_]] =
     map.values.toStream.asInstanceOf[Stream[V[Any]]].collect(p.apply)
-}
 
 // This is a function that preserves the inner type
-trait GenFunction[T[_], R[_]] {
+trait GenFunction[T[_], R[_]]
   def apply[U]: (T[U] => R[U])
-}
 
-trait GenPartial[T[_], R[_]] {
+trait GenPartial[T[_], R[_]]
   def apply[U]: PartialFunction[T[U], R[U]]
-}
 
-object HMap {
+object HMap
   def empty[K[_], V[_]]: HMap[K, V] = from[K, V](Map.empty[K[_], V[_]])
   private def from[K[_], V[_]](m: Map[K[_], V[_]]): HMap[K, V] =
     new HMap[K, V] { override val map = m }
-}
 
 /**
   * This is a useful cache for memoizing heterogenously types functions
   */
-class HCache[K[_], V[_]]() {
+class HCache[K[_], V[_]]()
   private var hmap: HMap[K, V] = HMap.empty[K, V]
 
   /**
@@ -113,11 +102,9 @@ class HCache[K[_], V[_]]() {
   def snapshot: HMap[K, V] = hmap
 
   def getOrElseUpdate[T](k: K[T], v: => V[T]): V[T] =
-    hmap.get(k) match {
+    hmap.get(k) match
       case Some(exists) => exists
       case None =>
         val res = v
         hmap = hmap + (k -> res)
         res
-    }
-}

@@ -7,24 +7,22 @@ import scalaz.effect.Resource
 /** Wraps a value `self` and provides methods related to `Resource` */
 final class ResourceOps[F] private[syntax](val self: F)(
     implicit val F: Resource[F])
-    extends Ops[F] {
+    extends Ops[F]
   ////
 
   def close = F.close(self)
 
   ////
-}
 
-trait ToResourceOps {
+trait ToResourceOps
   implicit def ToResourceOps[F](v: F)(implicit F0: Resource[F]) =
     new ResourceOps[F](v)
 
   ////
 
   ////
-}
 
-trait ResourceSyntax[F] {
+trait ResourceSyntax[F]
   implicit def ToResourceOps(v: F): ResourceOps[F] =
     new ResourceOps[F](v)(ResourceSyntax.this.F)
 
@@ -32,4 +30,3 @@ trait ResourceSyntax[F] {
   ////
 
   ////
-}

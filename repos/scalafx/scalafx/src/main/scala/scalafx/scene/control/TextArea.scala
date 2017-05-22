@@ -34,13 +34,12 @@ import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty}
 import scalafx.delegate.SFXDelegate
 
-object TextArea {
+object TextArea
   implicit def sfxTextArea2jfx(v: TextArea): jfxsc.TextArea =
     if (v != null) v.delegate else null
-}
 
 class TextArea(override val delegate: jfxsc.TextArea = new jfxsc.TextArea())
-    extends TextInputControl(delegate) with SFXDelegate[jfxsc.TextArea] {
+    extends TextInputControl(delegate) with SFXDelegate[jfxsc.TextArea]
 
   /**
     * Creates a TextArea with initial text content.
@@ -50,29 +49,23 @@ class TextArea(override val delegate: jfxsc.TextArea = new jfxsc.TextArea())
   def this(text: String) = this(new jfxsc.TextArea(text))
 
   def prefColumnCount: IntegerProperty = delegate.prefColumnCountProperty()
-  def prefColumnCount_=(v: Int) {
+  def prefColumnCount_=(v: Int)
     prefColumnCount() = v
-  }
 
   def prefRowCount: IntegerProperty = delegate.prefRowCountProperty()
-  def prefRowCount_=(v: Int) {
+  def prefRowCount_=(v: Int)
     prefRowCount() = v
-  }
 
   def scrollLeft: DoubleProperty = delegate.scrollLeftProperty()
-  def scrollLeft_=(v: Double) {
+  def scrollLeft_=(v: Double)
     scrollLeft() = v
-  }
 
   def scrollTop: DoubleProperty = delegate.scrollTopProperty()
-  def scrollTop_=(v: Double) {
+  def scrollTop_=(v: Double)
     scrollTop() = v
-  }
 
   def wrapText: BooleanProperty = delegate.wrapTextProperty()
-  def wrapText_=(v: Boolean) {
+  def wrapText_=(v: Boolean)
     wrapText() = v
-  }
 
   def paragraphs = delegate.getParagraphs
-}

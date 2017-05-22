@@ -1,5 +1,4 @@
 import scala.reflect.macros.blackbox.Context
 
-object Impls {
+object Impls
   def foo[U <: String](c: Context) = ???
-}

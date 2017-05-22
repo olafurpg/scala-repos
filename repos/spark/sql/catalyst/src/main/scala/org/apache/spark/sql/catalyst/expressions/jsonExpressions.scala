@@ -31,45 +31,40 @@ import org.apache.spark.unsafe.types.UTF8String
 import org.apache.spark.util.Utils
 
 private[this] sealed trait PathInstruction
-private[this] object PathInstruction {
+private[this] object PathInstruction
   private[expressions] case object Subscript extends PathInstruction
   private[expressions] case object Wildcard extends PathInstruction
   private[expressions] case object Key extends PathInstruction
   private[expressions] case class Index(index: Long) extends PathInstruction
   private[expressions] case class Named(name: String) extends PathInstruction
-}
 
 private[this] sealed trait WriteStyle
-private[this] object WriteStyle {
+private[this] object WriteStyle
   private[expressions] case object RawStyle extends WriteStyle
   private[expressions] case object QuotedStyle extends WriteStyle
   private[expressions] case object FlattenStyle extends WriteStyle
-}
 
-private[this] object JsonPathParser extends RegexParsers {
+private[this] object JsonPathParser extends RegexParsers
   import PathInstruction._
 
   def root: Parser[Char] = '$'
 
-  def long: Parser[Long] = "\\d+".r ^? {
+  def long: Parser[Long] = "\\d+".r ^?
     case x => x.toLong
-  }
 
   // parse `[*]` and `[123]` subscripts
   def subscript: Parser[List[PathInstruction]] =
-    for {
+    for
       operand <- '[' ~> ('*' ^^^ Wildcard | long ^^ Index) <~ ']'
-    } yield {
+    yield
       Subscript :: operand :: Nil
-    }
 
   // parse `.name` or `['name']` child expressions
   def named: Parser[List[PathInstruction]] =
-    for {
+    for
       name <- '.' ~> "[^\\.\\[]+".r | "[\\'" ~> "[^\\'\\?]+" <~ "\\']"
-    } yield {
+    yield
       Key :: Named(name) :: Nil
-    }
 
   // child wildcards: `..`, `.*` or `['*']`
   def wildcard: Parser[List[PathInstruction]] =
@@ -78,34 +73,29 @@ private[this] object JsonPathParser extends RegexParsers {
   def node: Parser[List[PathInstruction]] =
     wildcard | named | subscript
 
-  val expression: Parser[List[PathInstruction]] = {
+  val expression: Parser[List[PathInstruction]] =
     phrase(root ~> rep(node) ^^ (x => x.flatten))
-  }
 
-  def parse(str: String): Option[List[PathInstruction]] = {
-    this.parseAll(expression, str) match {
+  def parse(str: String): Option[List[PathInstruction]] =
+    this.parseAll(expression, str) match
       case Success(result, _) =>
         Some(result)
 
       case NoSuccess(msg, next) =>
         None
-    }
-  }
-}
 
-private[this] object SharedFactory {
+private[this] object SharedFactory
   val jsonFactory = new JsonFactory()
 
   // Enabled for Hive compatibility
   jsonFactory.enable(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS)
-}
 
 /**
   * Extracts json object from a json string based on json path specified, and returns json string
   * of the extracted json object. It will return null if the input json string is invalid.
   */
 case class GetJsonObject(json: Expression, path: Expression)
-    extends BinaryExpression with ExpectsInputTypes with CodegenFallback {
+    extends BinaryExpression with ExpectsInputTypes with CodegenFallback
 
   import com.fasterxml.jackson.core.JsonToken._
 
@@ -123,54 +113,44 @@ case class GetJsonObject(json: Expression, path: Expression)
   @transient private lazy val parsedPath = parsePath(
       path.eval().asInstanceOf[UTF8String])
 
-  override def eval(input: InternalRow): Any = {
+  override def eval(input: InternalRow): Any =
     val jsonStr = json.eval(input).asInstanceOf[UTF8String]
-    if (jsonStr == null) {
+    if (jsonStr == null)
       return null
-    }
 
     val parsed =
-      if (path.foldable) {
+      if (path.foldable)
         parsedPath
-      } else {
+      else
         parsePath(path.eval(input).asInstanceOf[UTF8String])
-      }
 
-    if (parsed.isDefined) {
-      try {
-        Utils.tryWithResource(jsonFactory.createParser(jsonStr.getBytes)) {
+    if (parsed.isDefined)
+      try
+        Utils.tryWithResource(jsonFactory.createParser(jsonStr.getBytes))
           parser =>
             val output = new ByteArrayOutputStream()
             val matched = Utils.tryWithResource(
-                jsonFactory.createGenerator(output, JsonEncoding.UTF8)) {
+                jsonFactory.createGenerator(output, JsonEncoding.UTF8))
               generator =>
                 parser.nextToken()
                 evaluatePath(parser, generator, RawStyle, parsed.get)
-            }
-            if (matched) {
+            if (matched)
               UTF8String.fromBytes(output.toByteArray)
-            } else {
+            else
               null
-            }
-        }
-      } catch {
+      catch
         case _: JsonProcessingException => null
-      }
-    } else {
+    else
       null
-    }
-  }
 
-  private def parsePath(path: UTF8String): Option[List[PathInstruction]] = {
-    if (path != null) {
+  private def parsePath(path: UTF8String): Option[List[PathInstruction]] =
+    if (path != null)
       JsonPathParser.parse(path.toString)
-    } else {
+    else
       None
-    }
-  }
 
   // advance to the desired array index, assumes to start at the START_ARRAY token
-  private def arrayIndex(p: JsonParser, f: () => Boolean): Long => Boolean = {
+  private def arrayIndex(p: JsonParser, f: () => Boolean): Long => Boolean =
     case _ if p.getCurrentToken == END_ARRAY =>
       // terminate, nothing has been written
       false
@@ -179,10 +159,9 @@ case class GetJsonObject(json: Expression, path: Expression)
       // we've reached the desired index
       val dirty = f()
 
-      while (p.nextToken() != END_ARRAY) {
+      while (p.nextToken() != END_ARRAY)
         // advance the token stream to the end of the array
         p.skipChildren()
-      }
 
       dirty
 
@@ -191,7 +170,6 @@ case class GetJsonObject(json: Expression, path: Expression)
       p.skipChildren()
       p.nextToken()
       arrayIndex(p, f)(i - 1)
-  }
 
   /**
     * Evaluate a list of JsonPath instructions, returning a bool that indicates if any leaf nodes
@@ -200,23 +178,21 @@ case class GetJsonObject(json: Expression, path: Expression)
   private def evaluatePath(p: JsonParser,
                            g: JsonGenerator,
                            style: WriteStyle,
-                           path: List[PathInstruction]): Boolean = {
-    (p.getCurrentToken, path) match {
+                           path: List[PathInstruction]): Boolean =
+    (p.getCurrentToken, path) match
       case (VALUE_STRING, Nil) if style == RawStyle =>
         // there is no array wildcard or slice parent, emit this string without quotes
-        if (p.hasTextCharacters) {
+        if (p.hasTextCharacters)
           g.writeRaw(p.getTextCharacters, p.getTextOffset, p.getTextLength)
-        } else {
+        else
           g.writeRaw(p.getText)
-        }
         true
 
       case (START_ARRAY, Nil) if style == FlattenStyle =>
         // flatten this array into the parent
         var dirty = false
-        while (p.nextToken() != END_ARRAY) {
+        while (p.nextToken() != END_ARRAY)
           dirty |= evaluatePath(p, g, style, Nil)
-        }
         dirty
 
       case (_, Nil) =>
@@ -226,14 +202,12 @@ case class GetJsonObject(json: Expression, path: Expression)
 
       case (START_OBJECT, Key :: xs) =>
         var dirty = false
-        while (p.nextToken() != END_OBJECT) {
-          if (dirty) {
+        while (p.nextToken() != END_OBJECT)
+          if (dirty)
             // once a match has been found we can skip other fields
             p.skipChildren()
-          } else {
+          else
             dirty = evaluatePath(p, g, style, xs)
-          }
-        }
         dirty
 
       case (
@@ -241,56 +215,51 @@ case class GetJsonObject(json: Expression, path: Expression)
         // special handling for the non-structure preserving double wildcard behavior in Hive
         var dirty = false
         g.writeStartArray()
-        while (p.nextToken() != END_ARRAY) {
+        while (p.nextToken() != END_ARRAY)
           dirty |= evaluatePath(p, g, FlattenStyle, xs)
-        }
         g.writeEndArray()
         dirty
 
       case (START_ARRAY, Subscript :: Wildcard :: xs)
           if style != QuotedStyle =>
         // retain Flatten, otherwise use Quoted... cannot use Raw within an array
-        val nextStyle = style match {
+        val nextStyle = style match
           case RawStyle => QuotedStyle
           case FlattenStyle => FlattenStyle
           case QuotedStyle => throw new IllegalStateException()
-        }
 
         // temporarily buffer child matches, the emitted json will need to be
         // modified slightly if there is only a single element written
         val buffer = new StringWriter()
 
         var dirty = 0
-        Utils.tryWithResource(jsonFactory.createGenerator(buffer)) {
+        Utils.tryWithResource(jsonFactory.createGenerator(buffer))
           flattenGenerator =>
             flattenGenerator.writeStartArray()
 
-            while (p.nextToken() != END_ARRAY) {
+            while (p.nextToken() != END_ARRAY)
               // track the number of array elements and only emit an outer array if
               // we've written more than one element, this matches Hive's behavior
               dirty +=
               (if (evaluatePath(p, flattenGenerator, nextStyle, xs)) 1 else 0)
-            }
             flattenGenerator.writeEndArray()
-        }
 
         val buf = buffer.getBuffer
-        if (dirty > 1) {
+        if (dirty > 1)
           g.writeRawValue(buf.toString)
-        } else if (dirty == 1) {
+        else if (dirty == 1)
           // remove outer array tokens
           g.writeRawValue(buf.substring(1, buf.length() - 1))
-        } // else do not write anything
+        // else do not write anything
 
         dirty > 0
 
       case (START_ARRAY, Subscript :: Wildcard :: xs) =>
         var dirty = false
         g.writeStartArray()
-        while (p.nextToken() != END_ARRAY) {
+        while (p.nextToken() != END_ARRAY)
           // wildcards can have multiple matches, continually update the dirty count
           dirty |= evaluatePath(p, g, QuotedStyle, xs)
-        }
         g.writeEndArray()
 
         dirty
@@ -307,11 +276,10 @@ case class GetJsonObject(json: Expression, path: Expression)
 
       case (FIELD_NAME, Named(name) :: xs) if p.getCurrentName == name =>
         // exact field match
-        if (p.nextToken() != JsonToken.VALUE_NULL) {
+        if (p.nextToken() != JsonToken.VALUE_NULL)
           evaluatePath(p, g, style, xs)
-        } else {
+        else
           false
-        }
 
       case (FIELD_NAME, Wildcard :: xs) =>
         // wildcard field match
@@ -321,19 +289,15 @@ case class GetJsonObject(json: Expression, path: Expression)
       case _ =>
         p.skipChildren()
         false
-    }
-  }
-}
 
 case class JsonTuple(children: Seq[Expression])
-    extends Generator with CodegenFallback {
+    extends Generator with CodegenFallback
 
   import SharedFactory._
 
-  override def nullable: Boolean = {
+  override def nullable: Boolean =
     // a row is always returned
     false
-  }
 
   // if processing fails this shared value will be returned
   @transient private lazy val nullRow: Seq[InternalRow] =
@@ -346,116 +310,99 @@ case class JsonTuple(children: Seq[Expression])
   @transient private lazy val fieldExpressions: Seq[Expression] = children.tail
 
   // eagerly evaluate any foldable the field names
-  @transient private lazy val foldableFieldNames: IndexedSeq[String] = {
-    fieldExpressions.map {
+  @transient private lazy val foldableFieldNames: IndexedSeq[String] =
+    fieldExpressions.map
       case expr if expr.foldable =>
         expr.eval().asInstanceOf[UTF8String].toString
       case _ => null
-    }.toIndexedSeq
-  }
+    .toIndexedSeq
 
   // and count the number of foldable fields, we'll use this later to optimize evaluation
   @transient private lazy val constantFields: Int =
     foldableFieldNames.count(_ != null)
 
   override def elementTypes: Seq[(DataType, Boolean, String)] =
-    fieldExpressions.zipWithIndex.map {
+    fieldExpressions.zipWithIndex.map
       case (_, idx) => (StringType, true, s"c$idx")
-    }
 
   override def prettyName: String = "json_tuple"
 
-  override def checkInputDataTypes(): TypeCheckResult = {
-    if (children.length < 2) {
+  override def checkInputDataTypes(): TypeCheckResult =
+    if (children.length < 2)
       TypeCheckResult.TypeCheckFailure(
           s"$prettyName requires at least two arguments")
-    } else if (children.forall(
-                   child => StringType.acceptsType(child.dataType))) {
+    else if (children.forall(
+                   child => StringType.acceptsType(child.dataType)))
       TypeCheckResult.TypeCheckSuccess
-    } else {
+    else
       TypeCheckResult.TypeCheckFailure(
           s"$prettyName requires that all arguments are strings")
-    }
-  }
 
-  override def eval(input: InternalRow): TraversableOnce[InternalRow] = {
+  override def eval(input: InternalRow): TraversableOnce[InternalRow] =
     val json = jsonExpr.eval(input).asInstanceOf[UTF8String]
-    if (json == null) {
+    if (json == null)
       return nullRow
-    }
 
-    try {
-      Utils.tryWithResource(jsonFactory.createParser(json.getBytes)) {
+    try
+      Utils.tryWithResource(jsonFactory.createParser(json.getBytes))
         parser =>
           parseRow(parser, input)
-      }
-    } catch {
+    catch
       case _: JsonProcessingException =>
         nullRow
-    }
-  }
 
   private def parseRow(
-      parser: JsonParser, input: InternalRow): Seq[InternalRow] = {
+      parser: JsonParser, input: InternalRow): Seq[InternalRow] =
     // only objects are supported
-    if (parser.nextToken() != JsonToken.START_OBJECT) {
+    if (parser.nextToken() != JsonToken.START_OBJECT)
       return nullRow
-    }
 
     // evaluate the field names as String rather than UTF8String to
     // optimize lookups from the json token, which is also a String
     val fieldNames =
-      if (constantFields == fieldExpressions.length) {
+      if (constantFields == fieldExpressions.length)
         // typically the user will provide the field names as foldable expressions
         // so we can use the cached copy
         foldableFieldNames
-      } else if (constantFields == 0) {
+      else if (constantFields == 0)
         // none are foldable so all field names need to be evaluated from the input row
         fieldExpressions.map(_.eval(input).asInstanceOf[UTF8String].toString)
-      } else {
+      else
         // if there is a mix of constant and non-constant expressions
         // prefer the cached copy when available
-        foldableFieldNames.zip(fieldExpressions).map {
+        foldableFieldNames.zip(fieldExpressions).map
           case (null, expr) =>
             expr.eval(input).asInstanceOf[UTF8String].toString
           case (fieldName, _) => fieldName
-        }
-      }
 
     val row = Array.ofDim[Any](fieldNames.length)
 
     // start reading through the token stream, looking for any requested field names
-    while (parser.nextToken() != JsonToken.END_OBJECT) {
-      if (parser.getCurrentToken == JsonToken.FIELD_NAME) {
+    while (parser.nextToken() != JsonToken.END_OBJECT)
+      if (parser.getCurrentToken == JsonToken.FIELD_NAME)
         // check to see if this field is desired in the output
         val idx = fieldNames.indexOf(parser.getCurrentName)
-        if (idx >= 0) {
+        if (idx >= 0)
           // it is, copy the child tree to the correct location in the output row
           val output = new ByteArrayOutputStream()
 
           // write the output directly to UTF8 encoded byte array
-          if (parser.nextToken() != JsonToken.VALUE_NULL) {
+          if (parser.nextToken() != JsonToken.VALUE_NULL)
             Utils.tryWithResource(
-                jsonFactory.createGenerator(output, JsonEncoding.UTF8)) {
+                jsonFactory.createGenerator(output, JsonEncoding.UTF8))
               generator =>
                 copyCurrentStructure(generator, parser)
-            }
 
             row(idx) = UTF8String.fromBytes(output.toByteArray)
-          }
-        }
-      }
 
       // always skip children, it's cheap enough to do even if copyCurrentStructure was called
       parser.skipChildren()
-    }
 
     new GenericInternalRow(row) :: Nil
-  }
 
   private def copyCurrentStructure(
-      generator: JsonGenerator, parser: JsonParser): Unit = {
-    parser.getCurrentToken match {
+      generator: JsonGenerator, parser: JsonParser): Unit =
+    parser.getCurrentToken match
       // if the user requests a string field it needs to be returned without enclosing
       // quotes which is accomplished via JsonGenerator.writeRaw instead of JsonGenerator.write
       case JsonToken.VALUE_STRING if parser.hasTextCharacters =>
@@ -478,6 +425,3 @@ case class JsonTuple(children: Seq[Expression])
       case _ =>
         // handle other types including objects, arrays, booleans and numbers
         generator.copyCurrentStructure(parser)
-    }
-  }
-}

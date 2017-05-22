@@ -33,21 +33,19 @@ import org.apache.spark.util.Utils
   * to store Mesos cluster mode state.
   */
 private[spark] abstract class MesosClusterPersistenceEngineFactory(
-    conf: SparkConf) {
+    conf: SparkConf)
   def createEngine(path: String): MesosClusterPersistenceEngine
-}
 
 /**
   * Mesos cluster persistence engine is responsible for persisting Mesos cluster mode
   * specific state, so that on failover all the state can be recovered and the scheduler
   * can resume managing the drivers.
   */
-private[spark] trait MesosClusterPersistenceEngine {
+private[spark] trait MesosClusterPersistenceEngine
   def persist(name: String, obj: Object): Unit
   def expunge(name: String): Unit
   def fetch[T](name: String): Option[T]
   def fetchAll[T](): Iterable[T]
-}
 
 /**
   * Zookeeper backed persistence engine factory.
@@ -56,36 +54,31 @@ private[spark] trait MesosClusterPersistenceEngine {
   */
 private[spark] class ZookeeperMesosClusterPersistenceEngineFactory(
     conf: SparkConf)
-    extends MesosClusterPersistenceEngineFactory(conf) with Logging {
+    extends MesosClusterPersistenceEngineFactory(conf) with Logging
 
   lazy val zk = SparkCuratorUtil.newClient(conf)
 
-  def createEngine(path: String): MesosClusterPersistenceEngine = {
+  def createEngine(path: String): MesosClusterPersistenceEngine =
     new ZookeeperMesosClusterPersistenceEngine(path, zk, conf)
-  }
-}
 
 /**
   * Black hole persistence engine factory that creates black hole
   * persistence engines, which stores nothing.
   */
 private[spark] class BlackHoleMesosClusterPersistenceEngineFactory
-    extends MesosClusterPersistenceEngineFactory(null) {
-  def createEngine(path: String): MesosClusterPersistenceEngine = {
+    extends MesosClusterPersistenceEngineFactory(null)
+  def createEngine(path: String): MesosClusterPersistenceEngine =
     new BlackHoleMesosClusterPersistenceEngine
-  }
-}
 
 /**
   * Black hole persistence engine that stores nothing.
   */
 private[spark] class BlackHoleMesosClusterPersistenceEngine
-    extends MesosClusterPersistenceEngine {
+    extends MesosClusterPersistenceEngine
   override def persist(name: String, obj: Object): Unit = {}
   override def fetch[T](name: String): Option[T] = None
   override def expunge(name: String): Unit = {}
   override def fetchAll[T](): Iterable[T] = Iterable.empty[T]
-}
 
 /**
   * Zookeeper based Mesos cluster persistence engine, that stores cluster mode state
@@ -94,44 +87,36 @@ private[spark] class BlackHoleMesosClusterPersistenceEngine
   */
 private[spark] class ZookeeperMesosClusterPersistenceEngine(
     baseDir: String, zk: CuratorFramework, conf: SparkConf)
-    extends MesosClusterPersistenceEngine with Logging {
+    extends MesosClusterPersistenceEngine with Logging
   private val WORKING_DIR =
     conf.get("spark.deploy.zookeeper.dir", "/spark_mesos_dispatcher") + "/" +
     baseDir
 
   SparkCuratorUtil.mkdir(zk, WORKING_DIR)
 
-  def path(name: String): String = {
+  def path(name: String): String =
     WORKING_DIR + "/" + name
-  }
 
-  override def expunge(name: String): Unit = {
+  override def expunge(name: String): Unit =
     zk.delete().forPath(path(name))
-  }
 
-  override def persist(name: String, obj: Object): Unit = {
+  override def persist(name: String, obj: Object): Unit =
     val serialized = Utils.serialize(obj)
     val zkPath = path(name)
     zk.create().withMode(CreateMode.PERSISTENT).forPath(zkPath, serialized)
-  }
 
-  override def fetch[T](name: String): Option[T] = {
+  override def fetch[T](name: String): Option[T] =
     val zkPath = path(name)
 
-    try {
+    try
       val fileData = zk.getData().forPath(zkPath)
       Some(Utils.deserialize[T](fileData))
-    } catch {
+    catch
       case e: NoNodeException => None
-      case e: Exception => {
+      case e: Exception =>
           logWarning("Exception while reading persisted file, deleting", e)
           zk.delete().forPath(zkPath)
           None
-        }
-    }
-  }
 
-  override def fetchAll[T](): Iterable[T] = {
+  override def fetchAll[T](): Iterable[T] =
     zk.getChildren.forPath(WORKING_DIR).asScala.flatMap(fetch[T])
-  }
-}

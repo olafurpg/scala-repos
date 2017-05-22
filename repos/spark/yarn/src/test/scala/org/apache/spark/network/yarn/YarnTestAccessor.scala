@@ -21,16 +21,12 @@ import java.io.File
 /**
   * just a cheat to get package-visible members in tests
   */
-object YarnTestAccessor {
-  def getShuffleServicePort: Int = {
+object YarnTestAccessor
+  def getShuffleServicePort: Int =
     YarnShuffleService.boundPort
-  }
 
-  def getShuffleServiceInstance: YarnShuffleService = {
+  def getShuffleServiceInstance: YarnShuffleService =
     YarnShuffleService.instance
-  }
 
-  def getRegisteredExecutorFile(service: YarnShuffleService): File = {
+  def getRegisteredExecutorFile(service: YarnShuffleService): File =
     service.registeredExecutorFile
-  }
-}

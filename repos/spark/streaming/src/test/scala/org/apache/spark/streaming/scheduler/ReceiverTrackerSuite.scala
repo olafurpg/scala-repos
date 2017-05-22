@@ -30,189 +30,156 @@ import org.apache.spark.streaming.dstream.ReceiverInputDStream
 import org.apache.spark.streaming.receiver._
 
 /** Testsuite for receiver scheduling */
-class ReceiverTrackerSuite extends TestSuiteBase {
+class ReceiverTrackerSuite extends TestSuiteBase
 
-  test("send rate update to receivers") {
-    withStreamingContext(new StreamingContext(conf, Milliseconds(100))) {
+  test("send rate update to receivers")
+    withStreamingContext(new StreamingContext(conf, Milliseconds(100)))
       ssc =>
         val newRateLimit = 100L
         val inputDStream = new RateTestInputDStream(ssc)
         val tracker = new ReceiverTracker(ssc)
         tracker.start()
-        try {
+        try
           // we wait until the Receiver has registered with the tracker,
           // otherwise our rate update is lost
-          eventually(timeout(5 seconds)) {
+          eventually(timeout(5 seconds))
             assert(RateTestReceiver.getActive().nonEmpty)
-          }
 
           // Verify that the rate of the block generator in the receiver get updated
           val activeReceiver = RateTestReceiver.getActive().get
           tracker.sendRateUpdate(inputDStream.id, newRateLimit)
-          eventually(timeout(5 seconds)) {
+          eventually(timeout(5 seconds))
             assert(
                 activeReceiver.getDefaultBlockGeneratorRateLimit() === newRateLimit,
                 "default block generator did not receive rate update")
             assert(
                 activeReceiver.getCustomBlockGeneratorRateLimit() === newRateLimit,
                 "other block generator did not receive rate update")
-          }
-        } finally {
+        finally
           tracker.stop(false)
-        }
-    }
-  }
 
-  test("should restart receiver after stopping it") {
-    withStreamingContext(new StreamingContext(conf, Milliseconds(100))) {
+  test("should restart receiver after stopping it")
+    withStreamingContext(new StreamingContext(conf, Milliseconds(100)))
       ssc =>
         @volatile var startTimes = 0
         ssc.addStreamingListener(
-            new StreamingListener {
+            new StreamingListener
           override def onReceiverStarted(
-              receiverStarted: StreamingListenerReceiverStarted): Unit = {
+              receiverStarted: StreamingListenerReceiverStarted): Unit =
             startTimes += 1
-          }
-        })
+        )
         val input = ssc.receiverStream(new StoppableReceiver)
         val output = new TestOutputStream(input)
         output.register()
         ssc.start()
         StoppableReceiver.shouldStop = true
-        eventually(timeout(10 seconds), interval(10 millis)) {
+        eventually(timeout(10 seconds), interval(10 millis))
           // The receiver is stopped once, so if it's restarted, it should be started twice.
           assert(startTimes === 2)
-        }
-    }
-  }
 
   test(
-      "SPARK-11063: TaskSetManager should use Receiver RDD's preferredLocations") {
+      "SPARK-11063: TaskSetManager should use Receiver RDD's preferredLocations")
     // Use ManualClock to prevent from starting batches so that we can make sure the only task is
     // for starting the Receiver
     val _conf = conf.clone.set(
         "spark.streaming.clock", "org.apache.spark.util.ManualClock")
-    withStreamingContext(new StreamingContext(_conf, Milliseconds(100))) {
+    withStreamingContext(new StreamingContext(_conf, Milliseconds(100)))
       ssc =>
         @volatile var receiverTaskLocality: TaskLocality = null
-        ssc.sparkContext.addSparkListener(new SparkListener {
-          override def onTaskStart(taskStart: SparkListenerTaskStart): Unit = {
+        ssc.sparkContext.addSparkListener(new SparkListener
+          override def onTaskStart(taskStart: SparkListenerTaskStart): Unit =
             receiverTaskLocality = taskStart.taskInfo.taskLocality
-          }
-        })
+        )
         val input = ssc.receiverStream(new TestReceiver)
         val output = new TestOutputStream(input)
         output.register()
         ssc.start()
-        eventually(timeout(10 seconds), interval(10 millis)) {
+        eventually(timeout(10 seconds), interval(10 millis))
           // If preferredLocations is set correctly, receiverTaskLocality should be PROCESS_LOCAL
           assert(receiverTaskLocality === TaskLocality.PROCESS_LOCAL)
-        }
-    }
-  }
-}
 
 /** An input DStream with for testing rate controlling */
 private[streaming] class RateTestInputDStream(_ssc: StreamingContext)
-    extends ReceiverInputDStream[Int](_ssc) {
+    extends ReceiverInputDStream[Int](_ssc)
 
   override def getReceiver(): Receiver[Int] = new RateTestReceiver(id)
 
   @volatile
   var publishedRates = 0
 
-  override val rateController: Option[RateController] = {
+  override val rateController: Option[RateController] =
     Some(
-        new RateController(id, new ConstantEstimator(100)) {
-      override def publish(rate: Long): Unit = {
+        new RateController(id, new ConstantEstimator(100))
+      override def publish(rate: Long): Unit =
         publishedRates += 1
-      }
-    })
-  }
-}
+    )
 
 /** A receiver implementation for testing rate controlling */
 private[streaming] class RateTestReceiver(
     receiverId: Int, host: Option[String] = None)
-    extends Receiver[Int](StorageLevel.MEMORY_ONLY) {
+    extends Receiver[Int](StorageLevel.MEMORY_ONLY)
 
   private lazy val customBlockGenerator = supervisor.createBlockGenerator(
-      new BlockGeneratorListener {
+      new BlockGeneratorListener
         override def onPushBlock(
             blockId: StreamBlockId, arrayBuffer: ArrayBuffer[_]): Unit = {}
         override def onError(message: String, throwable: Throwable): Unit = {}
         override def onGenerateBlock(blockId: StreamBlockId): Unit = {}
         override def onAddData(data: Any, metadata: Any): Unit = {}
-      }
   )
 
   setReceiverId(receiverId)
 
-  override def onStart(): Unit = {
+  override def onStart(): Unit =
     customBlockGenerator
     RateTestReceiver.registerReceiver(this)
-  }
 
-  override def onStop(): Unit = {
+  override def onStop(): Unit =
     RateTestReceiver.deregisterReceiver()
-  }
 
   override def preferredLocation: Option[String] = host
 
-  def getDefaultBlockGeneratorRateLimit(): Long = {
+  def getDefaultBlockGeneratorRateLimit(): Long =
     supervisor.getCurrentRateLimit
-  }
 
-  def getCustomBlockGeneratorRateLimit(): Long = {
+  def getCustomBlockGeneratorRateLimit(): Long =
     customBlockGenerator.getCurrentLimit
-  }
-}
 
 /**
   * A helper object to RateTestReceiver that give access to the currently active RateTestReceiver
   * instance.
   */
-private[streaming] object RateTestReceiver {
+private[streaming] object RateTestReceiver
   @volatile private var activeReceiver: RateTestReceiver = null
 
-  def registerReceiver(receiver: RateTestReceiver): Unit = {
+  def registerReceiver(receiver: RateTestReceiver): Unit =
     activeReceiver = receiver
-  }
 
-  def deregisterReceiver(): Unit = {
+  def deregisterReceiver(): Unit =
     activeReceiver = null
-  }
 
   def getActive(): Option[RateTestReceiver] = Option(activeReceiver)
-}
 
 /**
   * A custom receiver that could be stopped via StoppableReceiver.shouldStop
   */
-class StoppableReceiver extends Receiver[Int](StorageLevel.MEMORY_ONLY) {
+class StoppableReceiver extends Receiver[Int](StorageLevel.MEMORY_ONLY)
 
   var receivingThreadOption: Option[Thread] = None
 
-  def onStart() {
-    val thread = new Thread() {
-      override def run() {
-        while (!StoppableReceiver.shouldStop) {
+  def onStart()
+    val thread = new Thread()
+      override def run()
+        while (!StoppableReceiver.shouldStop)
           Thread.sleep(10)
-        }
         StoppableReceiver.this.stop("stop")
-      }
-    }
     thread.start()
-  }
 
-  def onStop() {
+  def onStop()
     StoppableReceiver.shouldStop = true
     receivingThreadOption.foreach(_.join())
     // Reset it so as to restart it
     StoppableReceiver.shouldStop = false
-  }
-}
 
-object StoppableReceiver {
+object StoppableReceiver
   @volatile var shouldStop = false
-}

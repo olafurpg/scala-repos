@@ -16,26 +16,20 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext
   * Time: 9:24:19
   */
 class ScParenthesisedExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScParenthesisedExpr {
+    extends ScalaPsiElementImpl(node) with ScParenthesisedExpr
   override def toString: String = "ExpressionInParenthesis"
 
-  protected override def innerType(ctx: TypingContext) = {
-    expr match {
+  protected override def innerType(ctx: TypingContext) =
+    expr match
       case Some(x: ScExpression) =>
         val res = x.getNonValueType(ctx)
         res
       case _ => Failure("No expression in parentheseses", Some(this))
-    }
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitExprInParent(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => visitor.visitExprInParent(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

@@ -31,31 +31,27 @@ import org.specs2.mutable.Specification
 import json.DefaultFormats
 import net.liftweb.common.Failure
 
-package mongotestdocs {
+package mongotestdocs
   /*
    * ConnectionIdentifiers
    */
-  object TstDBa extends ConnectionIdentifier {
+  object TstDBa extends ConnectionIdentifier
     val jndiName = "test_a"
-  }
-  object TstDBb extends ConnectionIdentifier {
+  object TstDBb extends ConnectionIdentifier
     val jndiName = "test_b"
-  }
 
   /*
    * _id as a ObjectId
    */
   case class SimplePerson(_id: ObjectId, name: String, age: Int)
-      extends MongoDocument[SimplePerson] {
+      extends MongoDocument[SimplePerson]
     def meta = SimplePerson
-  }
-  object SimplePerson extends MongoDocumentMeta[SimplePerson] {
+  object SimplePerson extends MongoDocumentMeta[SimplePerson]
     override val collectionName = "simplepersons"
     override def connectionIdentifier = DefaultConnectionIdentifier
     override def formats = super.formats + new ObjectIdSerializer
     // index name
     createIndex(("name" -> 1))
-  }
 
   case class Address(street: String, city: String)
   case class Child(name: String, age: Int, birthdate: Option[Date])
@@ -69,16 +65,14 @@ package mongotestdocs {
                     address: Address,
                     children: List[Child],
                     dob: Date)
-      extends MongoDocument[Person] {
+      extends MongoDocument[Person]
 
     def meta = Person
-  }
 
-  object Person extends MongoDocumentMeta[Person] {
+  object Person extends MongoDocumentMeta[Person]
     override def connectionIdentifier = TstDBa
     override def collectionName = "mypersons"
     override def formats = super.formats + new UUIDSerializer
-  }
 
   /*
    * _id as ObjectId.toString
@@ -86,42 +80,36 @@ package mongotestdocs {
   case class TCInfo(x: Int, y: Int, uuid: UUID)
   case class TstCollection(
       _id: String, name: String, dbtype: String, count: Int, info: TCInfo)
-      extends MongoDocument[TstCollection] {
+      extends MongoDocument[TstCollection]
 
     def meta = TstCollection
-  }
 
-  object TstCollection extends MongoDocumentMeta[TstCollection] {
+  object TstCollection extends MongoDocumentMeta[TstCollection]
     override def formats = super.formats + new UUIDSerializer
     // create a unique index on name
     createIndex(("name" -> 1), true)
     // create a non-unique index on dbtype passing unique = false.
     createIndex(("dbtype" -> 1), false)
-  }
 
-  case class IDoc(_id: ObjectId, i: Int) extends MongoDocument[IDoc] {
+  case class IDoc(_id: ObjectId, i: Int) extends MongoDocument[IDoc]
 
     def meta = IDoc
-  }
 
-  object IDoc extends MongoDocumentMeta[IDoc] {
+  object IDoc extends MongoDocumentMeta[IDoc]
     override def formats = super.formats + new ObjectIdSerializer
     // create an index on "i", descending with custom name
     createIndex(("i" -> -1), ("name" -> "i_ix1"))
-  }
 
   case class SessCollection(
       _id: ObjectId, name: String, dbtype: String, count: Int)
-      extends MongoDocument[SessCollection] {
+      extends MongoDocument[SessCollection]
 
     def meta = SessCollection
-  }
 
-  object SessCollection extends MongoDocumentMeta[SessCollection] {
+  object SessCollection extends MongoDocumentMeta[SessCollection]
     override def formats = super.formats + new ObjectIdSerializer
     // create a unique index on name
     createIndex(("name" -> 1), true)
-  }
 
   /*
    * mongo-java-driver is not compatible with numbers that have an e in them
@@ -138,61 +126,50 @@ package mongotestdocs {
       shortfield: Short,
       datefield: Date
   )
-      extends MongoDocument[Primitive] {
+      extends MongoDocument[Primitive]
 
     def meta = Primitive
-  }
 
-  object Primitive extends MongoDocumentMeta[Primitive] {
+  object Primitive extends MongoDocumentMeta[Primitive]
     override def formats = super.formats + new ObjectIdSerializer
-  }
 
   case class MainJDoc(_id: ObjectId,
                       name: String,
                       refdoc: Option[MongoRef],
                       refId: Option[ObjectId])
-      extends MongoDocument[MainJDoc] {
+      extends MongoDocument[MainJDoc]
     def meta = MainJDoc
-  }
 
-  object MainJDoc extends MongoDocumentMeta[MainJDoc] {
+  object MainJDoc extends MongoDocumentMeta[MainJDoc]
     override def formats = super.formats + new ObjectIdSerializer
-  }
 
-  case class RefJDoc(_id: ObjectId) extends MongoDocument[RefJDoc] {
+  case class RefJDoc(_id: ObjectId) extends MongoDocument[RefJDoc]
     def meta = RefJDoc
-  }
 
-  object RefJDoc extends MongoDocumentMeta[RefJDoc] {
+  object RefJDoc extends MongoDocumentMeta[RefJDoc]
     override def formats = super.formats + new ObjectIdSerializer
-  }
 
   case class PatternDoc(_id: ObjectId, regx: Pattern)
-      extends MongoDocument[PatternDoc] {
+      extends MongoDocument[PatternDoc]
     def meta = PatternDoc
-  }
-  object PatternDoc extends MongoDocumentMeta[PatternDoc] {
+  object PatternDoc extends MongoDocumentMeta[PatternDoc]
     override def formats =
       super.formats + new ObjectIdSerializer + new PatternSerializer
-  }
 
   case class StringDateDoc(_id: ObjectId, dt: Date)
-      extends MongoDocument[StringDateDoc] {
+      extends MongoDocument[StringDateDoc]
     def meta = StringDateDoc
-  }
-  object StringDateDoc extends MongoDocumentMeta[StringDateDoc] {
+  object StringDateDoc extends MongoDocumentMeta[StringDateDoc]
     override def formats =
-      new DefaultFormats {
+      new DefaultFormats
         override def dateFormatter =
           new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
-      } + new DateSerializer + new ObjectIdSerializer
-  }
-}
+      + new DateSerializer + new ObjectIdSerializer
 
 /**
   * Systems under specification for MongoDocumentExamples.
   */
-class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
+class MongoDocumentExamplesSpec extends Specification with MongoTestKit
   "MongoDocumentExamples Specification".title
 
   import mongotestdocs._
@@ -201,7 +178,7 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
   override def dbs = (TstDBa, "lift_mongodocumentexamples_a") :: super.dbs
 
-  "Simple Person example" in {
+  "Simple Person example" in
 
     checkMongoIsRunning
 
@@ -246,14 +223,12 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     pFromDb.isEmpty must_== true
     pFromDbViaJson.isEmpty must_== true
 
-    if (!debug) {
+    if (!debug)
       SimplePerson.drop
-    }
 
     success
-  }
 
-  "Multiple Simple Person example" in {
+  "Multiple Simple Person example" in
 
     checkMongoIsRunning
 
@@ -287,7 +262,7 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     allBobs.isEmpty must_== false
     allBobs2.isEmpty must_== false
 
-    if (!debug) {
+    if (!debug)
       allBobs.size must_== 2
       allBobs2.size must_== 2
 
@@ -301,12 +276,10 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
       p3FromDb.isEmpty must_== true
 
       SimplePerson.drop
-    }
 
     success
-  }
 
-  "Person example" in {
+  "Person example" in
 
     checkMongoIsRunning
 
@@ -337,19 +310,17 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     Person.count must_== 1
 
-    if (!debug) {
+    if (!debug)
       // delete it
       p.delete
 
       pFromDb.isEmpty must_== true
 
       Person.drop
-    }
 
     success
-  }
 
-  "Mongo tutorial example" in {
+  "Mongo tutorial example" in
 
     import scala.collection.JavaConversions._
 
@@ -357,24 +328,21 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     // get the indexes
     val ixs = MongoDB.useCollection(TstCollection.collectionName)(coll =>
-          {
         coll.getIndexInfo
-    })
+    )
 
     // unique index on name
     val ixName = ixs.find(dbo => dbo.get("name") == "name_1")
     ixName.isDefined must_== true
-    ixName foreach { ix =>
+    ixName foreach  ix =>
       ix.containsField("unique") must beTrue
       ix.get("unique").asInstanceOf[Boolean] must beTrue
-    }
 
     // non-unique index on dbtype
     val ixDbtype = ixs.find(dbo => dbo.get("name") == "dbtype_1")
     ixDbtype.isDefined must_== true
-    ixDbtype foreach { ix =>
+    ixDbtype foreach  ix =>
       ix.containsField("unique") must beFalse
-    }
 
     // build a TstCollection
     val info = TCInfo(203, 102, UUID.randomUUID)
@@ -423,19 +391,17 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     TstCollection.update(("name" -> "nothing"), o3)
     TstCollection.findAll.length must_== 3
 
-    if (!debug) {
+    if (!debug)
       // delete them
       tc.delete
       tc2.delete
       tc4.delete
 
       TstCollection.findAll.size must_== 0
-    }
 
     // insert multiple documents
-    for (i <- List.range(1, 101)) {
+    for (i <- List.range(1, 101))
       IDoc(ObjectId.get, i).save
-    }
 
     // count the docs
     IDoc.count must_== 100
@@ -473,28 +439,25 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     val list4 = IDoc.findAll(("i" -> ("$gt" -> 50)), ("i" -> 1), Skip(10))
     list4.size must_== 40
     var cntr4 = 0
-    for (idoc <- list4) {
+    for (idoc <- list4)
       cntr4 += 1
       idoc.i must_== 60 + cntr4
-    }
 
     // skip and limit (get first 10, skipping the first 5, where i > 50)
     val list5 =
       IDoc.findAll(("i" -> ("$gt" -> 50)), ("i" -> 1), Limit(10), Skip(5))
     var cntr5 = 0
-    for (idoc <- list5) {
+    for (idoc <- list5)
       cntr5 += 1
       idoc.i must_== 55 + cntr5
-    }
     list5.length must_== 10
 
     // sorting (it's also easy to sort the List after it's returned)
     val list6 = IDoc.findAll(("i" -> ("$gt" -> 0)), ("i" -> -1)) // descending
     var cntr6 = 100
-    for (idoc <- list6) {
+    for (idoc <- list6)
       idoc.i must_== cntr6
       cntr6 -= 1
-    }
     list6.length must_== 100
 
     // remove some docs by a query
@@ -504,9 +467,8 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     IDoc.drop
 
     success
-  }
 
-  "Mongo examples" in {
+  "Mongo examples" in
 
     checkMongoIsRunning
 
@@ -516,15 +478,13 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     // use a Mongo instance directly
     MongoDB.use(db =>
-          {
 
         // save to db
         Helpers.tryo(SessCollection.save(tc, db)).toOption must beSome
         SessCollection.save(tc2, db) must throwA[MongoException]
-        Helpers.tryo(SessCollection.save(tc2, db)) must beLike {
+        Helpers.tryo(SessCollection.save(tc2, db)) must beLike
           case Failure(msg, _, _) =>
             msg must contain("E11000")
-        }
 
         Helpers.tryo(SessCollection.save(tc3, db)).toOption must beSome
 
@@ -556,19 +516,17 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
                 (("$regex" -> "^Mongo") ~ ("$flags" -> 0))) ~ ("count" -> 3))
         lstjobj2.size must_== 1
 
-        if (!debug) {
+        if (!debug)
           // delete them
           SessCollection.delete(qry)
           SessCollection.findAll.size must_== 0
 
           SessCollection.drop
-        }
-    })
+    )
 
     success
-  }
 
-  "Primitives example" in {
+  "Primitives example" in
 
     checkMongoIsRunning
 
@@ -595,18 +553,16 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
 
     p mustEqual pFromDb.get
 
-    if (!debug) {
+    if (!debug)
       // delete it
       p.delete
 
       pFromDb.isEmpty must_== true
       Primitive.drop
-    }
 
     success
-  }
 
-  "Ref example" in {
+  "Ref example" in
 
     checkMongoIsRunning
 
@@ -661,9 +617,8 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     RefJDoc.drop
 
     success
-  }
 
-  "Pattern example" in {
+  "Pattern example" in
 
     checkMongoIsRunning
 
@@ -671,15 +626,13 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
         ObjectId.get, Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE))
     pdoc1.save
 
-    PatternDoc.find(pdoc1._id) must beLike {
+    PatternDoc.find(pdoc1._id) must beLike
       case Some(pdoc) =>
         pdoc._id must_== pdoc1._id
         pdoc.regx.pattern must_== pdoc1.regx.pattern
         pdoc.regx.flags must_== pdoc1.regx.flags
-    }
-  }
 
-  "Issue 586 Date test" in {
+  "Issue 586 Date test" in
 
     checkMongoIsRunning
 
@@ -690,21 +643,16 @@ class MongoDocumentExamplesSpec extends Specification with MongoTestKit {
     val newDt = date(dtStr)
 
     // create a document manually with a String for the Date field
-    MongoDB.useCollection("stringdatedocs") { coll =>
+    MongoDB.useCollection("stringdatedocs")  coll =>
       coll.save(new BasicDBObject("_id", newId).append("dt", dtStr))
-    }
 
     val fromDb = StringDateDoc.find(newId)
-    fromDb must beLike {
+    fromDb must beLike
       case Some(sdd) =>
         sdd._id must_== newId
         sdd.dt must_== newDt
         sdd.save
 
-        StringDateDoc.find(newId) must beLike {
+        StringDateDoc.find(newId) must beLike
           case Some(sdd2) =>
             sdd2.dt must_== sdd.dt
-        }
-    }
-  }
-}

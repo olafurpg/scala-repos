@@ -37,7 +37,7 @@ case class ResetToken(tokenId: ResetTokenId,
                       expiresAt: DateTime,
                       usedAt: Option[DateTime] = None)
 
-object ResetToken {
+object ResetToken
   implicit val iso = Iso.hlist(ResetToken.apply _, ResetToken.unapply _)
 
   val schemaV1 =
@@ -45,4 +45,3 @@ object ResetToken {
 
   implicit val (decomposerV1, extractorV1) = serializationV(
       schemaV1, Some("1.0".v))
-}

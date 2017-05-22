@@ -30,13 +30,12 @@ import test._
 //
 // Note that no new macros were required for the creation of this library.
 
-object ALaCarteDemo extends App {
+object ALaCarteDemo extends App
   // Minimal boilerplate required for Foo to emulate a standard
   // Scala case class ...
-  object FooDefns extends DefaultCaseClassDefns {
+  object FooDefns extends DefaultCaseClassDefns
     type C = Foo
     val ops = Ops
-  }
 
   // Definitions of Foo and its companion in terms of the prior
   // declaration ...
@@ -95,4 +94,3 @@ object ALaCarteDemo extends App {
   // toString
   val fooStr = foo.toString
   assert("Foo(23,foo)" == fooStr)
-}

@@ -1,8 +1,7 @@
-object test {
+object test
   class C
-  class RichC {
+  class RichC
     def apply[X](x: String) = "bang!"
-  }
   implicit def RichC(c: C): RichC = null
 
   val richC: RichC = null
@@ -10,5 +9,4 @@ object test {
 
   /*start*/
   (richC[Int]("abc"), c("abc"), c[Int](" ")) /*end*/
-}
 // (String, String, String)

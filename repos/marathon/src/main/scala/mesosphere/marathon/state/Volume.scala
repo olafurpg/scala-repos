@@ -7,17 +7,16 @@ import mesosphere.marathon.Protos
 import org.apache.mesos.Protos.Volume.Mode
 import org.apache.mesos.{Protos => Mesos}
 
-sealed trait Volume {
+sealed trait Volume
   def containerPath: String
   def mode: Mesos.Volume.Mode
-}
 
-object Volume {
+object Volume
   def apply(containerPath: String,
             hostPath: Option[String],
             mode: Mesos.Volume.Mode,
             persistent: Option[PersistentVolumeInfo]): Volume =
-    persistent match {
+    persistent match
       case Some(persistentVolumeInfo) =>
         PersistentVolume(
             containerPath = containerPath,
@@ -30,14 +29,13 @@ object Volume {
             hostPath = hostPath.getOrElse(""),
             mode = mode
         )
-    }
 
-  def apply(proto: Protos.Volume): Volume = {
+  def apply(proto: Protos.Volume): Volume =
     val persistent: Option[PersistentVolumeInfo] =
       if (proto.hasPersistent)
         Some(PersistentVolumeInfo(proto.getPersistent.getSize)) else None
 
-    persistent match {
+    persistent match
       case Some(persistentVolumeInfo) =>
         PersistentVolume(
             containerPath = proto.getContainerPath,
@@ -50,8 +48,6 @@ object Volume {
             hostPath = proto.getHostPath,
             mode = proto.getMode
         )
-    }
-  }
 
   def apply(proto: Mesos.Volume): Volume =
     DockerVolume(
@@ -63,7 +59,7 @@ object Volume {
   def unapply(volume: Volume)
     : Option[(String, Option[String], Mesos.Volume.Mode, Option[
             PersistentVolumeInfo])] =
-    volume match {
+    volume match
       case persistentVolume: PersistentVolume =>
         Some(
             (persistentVolume.containerPath,
@@ -76,16 +72,12 @@ object Volume {
              Some(dockerVolume.hostPath),
              dockerVolume.mode,
              None))
-    }
 
-  implicit val validVolume: Validator[Volume] = new Validator[Volume] {
-    override def apply(volume: Volume): Result = volume match {
+  implicit val validVolume: Validator[Volume] = new Validator[Volume]
+    override def apply(volume: Volume): Result = volume match
       case pv: PersistentVolume =>
         validate(pv)(PersistentVolume.validPersistentVolume)
       case dv: DockerVolume => validate(dv)(DockerVolume.validDockerVolume)
-    }
-  }
-}
 
 /**
   * A volume mapping either from host to container or vice versa.
@@ -96,32 +88,28 @@ case class DockerVolume(
     containerPath: String, hostPath: String, mode: Mesos.Volume.Mode)
     extends Volume
 
-object DockerVolume {
+object DockerVolume
 
-  implicit val validDockerVolume = validator[DockerVolume] { vol =>
+  implicit val validDockerVolume = validator[DockerVolume]  vol =>
     vol.containerPath is notEmpty
     vol.hostPath is notEmpty
     vol.mode is oneOf(Mode.RW, Mode.RO)
-  }
-}
 
 case class PersistentVolumeInfo(size: Long)
 
-object PersistentVolumeInfo {
-  implicit val validPersistentVolumeInfo = validator[PersistentVolumeInfo] {
+object PersistentVolumeInfo
+  implicit val validPersistentVolumeInfo = validator[PersistentVolumeInfo]
     info =>
       info.size should be > 0L
-  }
-}
 
 case class PersistentVolume(containerPath: String,
                             persistent: PersistentVolumeInfo,
                             mode: Mesos.Volume.Mode)
     extends Volume
 
-object PersistentVolume {
+object PersistentVolume
   import org.apache.mesos.Protos.Volume.Mode
-  implicit val validPersistentVolume = validator[PersistentVolume] { vol =>
+  implicit val validPersistentVolume = validator[PersistentVolume]  vol =>
     vol.containerPath is notEmpty
     vol.persistent is valid
     vol.mode is equalTo(Mode.RW)
@@ -129,5 +117,3 @@ object PersistentVolume {
     vol is configValueSet("mesos_authentication_principal",
                           "mesos_role",
                           "mesos_authentication_secret_file")
-  }
-}

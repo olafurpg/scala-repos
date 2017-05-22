@@ -7,8 +7,8 @@ final case class Person(val name: String, val age: Int)
 case class Philipp(
     val nationality: String, val weird: Boolean, val mother: Person)
 
-class NonPrimitiveFieldsTest extends FunSuite {
-  test("main") {
+class NonPrimitiveFieldsTest extends FunSuite
+  test("main")
     val ph = new Philipp("German", true, new Person("Gudrun", 62))
     val ppickle = ph.pickle
     // Note: Previously case classes would be considered elided, even though they are non-terminal.
@@ -26,5 +26,3 @@ class NonPrimitiveFieldsTest extends FunSuite {
       |}
     """.stripMargin.trim)
     assert(ppickle.unpickle[Philipp] === ph)
-  }
-}

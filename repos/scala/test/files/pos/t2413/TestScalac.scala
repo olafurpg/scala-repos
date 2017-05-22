@@ -1,6 +1,6 @@
 import pack.TestJava
 
-class Foo extends TestJava {
+class Foo extends TestJava
 
   // THIS METHOD YIELDS TO CRASH
   /*   def foomethod : Option[String] => Unit = {
@@ -19,4 +19,3 @@ class Foo extends TestJava {
 
   // THIS YIELDS TO CRASH
   for (a <- 1 to 4; anotherVal = repeatParam("1", "2", "3")) yield anotherVal
-}

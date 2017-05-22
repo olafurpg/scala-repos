@@ -6,12 +6,11 @@ case class Captcha(gameId: String,
                    fen: String,
                    white: Boolean,
                    solutions: Captcha.Solutions,
-                   moves: Map[String, String]) {
+                   moves: Map[String, String])
 
   def valid(solution: String) = solutions.list contains solution
-}
 
-object Captcha {
+object Captcha
 
   type Solutions = NonEmptyList[String]
 
@@ -20,4 +19,3 @@ object Captcha {
                         white = true,
                         solutions = NonEmptyList("c6 c8"),
                         moves = Map("c6" -> "c8"))
-}

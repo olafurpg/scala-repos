@@ -33,62 +33,53 @@ import scala.collection.mutable.ArrayBuffer
 case class CTree(path: CPath,
                  fields: MMap[String, CTree],
                  indices: ArrayBuffer[CTree],
-                 types: MMap[CType, Int]) {
+                 types: MMap[CType, Int])
   def getField(s: String): CTree =
     fields.getOrElseUpdate(s, CTree.empty(CPath(path.nodes :+ CPathField(s))))
-  def getIndex(n: Int): CTree = {
+  def getIndex(n: Int): CTree =
     var i = indices.length
-    while (i <= n) {
+    while (i <= n)
       indices.append(CTree.empty(CPath(path.nodes :+ CPathIndex(i))))
       i += 1
-    }
     indices(n)
-  }
   def getType(ctype: CType): Int = types.getOrElse(ctype, -1)
   def setType(ctype: CType, n: Int): Unit = types(ctype) = n
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case CTree(`path`, fields2, indices2, types2) =>
       fields == fields2 && indices == indices2 && types == types2
     case _ =>
       false
-  }
-}
 
-object CTree {
+object CTree
   def empty(path: CPath) =
     CTree(path,
           MMap.empty[String, CTree],
           ArrayBuffer.empty[CTree],
           MMap.empty[CType, Int])
-}
 
-object Segments {
+object Segments
   def empty(id: Long): Segments =
     Segments(id, 0, CTree.empty(CPath.Identity), ArrayBuffer.empty[Segment])
-}
 
 case class Segments(
-    id: Long, var length: Int, t: CTree, a: ArrayBuffer[Segment]) {
+    id: Long, var length: Int, t: CTree, a: ArrayBuffer[Segment])
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case Segments(`id`, length2, t2, a2) =>
       length == length2 && t == t2 && a.toSet == a2.toSet
     case _ =>
       false
-  }
 
-  def addNullType(row: Int, tree: CTree, ct: CNullType) {
+  def addNullType(row: Int, tree: CTree, ct: CNullType)
     val n = tree.getType(ct)
-    if (n >= 0) {
+    if (n >= 0)
       a(n).defined.set(row)
-    } else {
+    else
       tree.setType(ct, a.length)
       val d = new BitSet()
       d.set(row)
       a.append(NullSegment(id, tree.path, ct, d, length))
-    }
-  }
 
   def addNull(row: Int, tree: CTree): Unit = addNullType(row, tree, CNull)
 
@@ -98,166 +89,143 @@ case class Segments(
   def addEmptyObject(row: Int, tree: CTree): Unit =
     addNullType(row, tree, CEmptyObject)
 
-  def addTrue(row: Int, tree: CTree) {
+  def addTrue(row: Int, tree: CTree)
     val n = tree.getType(CBoolean)
-    if (n >= 0) {
+    if (n >= 0)
       val seg = a(n).asInstanceOf[BooleanSegment]
       seg.defined.set(row)
       seg.values.set(row)
-    } else {
+    else
       tree.setType(CBoolean, a.length)
       val d = new BitSet()
       val v = new BitSet()
       d.set(row)
       v.set(row)
       a.append(BooleanSegment(id, tree.path, d, v, length))
-    }
-  }
 
-  def addFalse(row: Int, tree: CTree) {
+  def addFalse(row: Int, tree: CTree)
     val n = tree.getType(CBoolean)
-    if (n >= 0) {
+    if (n >= 0)
       a(n).defined.set(row)
-    } else {
+    else
       tree.setType(CBoolean, a.length)
       val d = new BitSet()
       val v = new BitSet()
       d.set(row)
       a.append(BooleanSegment(id, tree.path, d, v, length))
-    }
-  }
 
-  def detectDateTime(s: String): DateTime = {
+  def detectDateTime(s: String): DateTime =
     if (!DateTimeUtil.looksLikeIso8601(s)) return null
-    try {
+    try
       DateTimeUtil.parseDateTime(s, true)
-    } catch {
+    catch
       case e: IllegalArgumentException => null
-    }
-  }
 
-  def addString(row: Int, tree: CTree, s: String) {
+  def addString(row: Int, tree: CTree, s: String)
     val dateTime = detectDateTime(s)
-    if (dateTime == null) {
+    if (dateTime == null)
       addRealString(row, tree, s)
-    } else {
+    else
       addRealDateTime(row, tree, dateTime)
-    }
-  }
 
-  def addRealDateTime(row: Int, tree: CTree, s: DateTime) {
+  def addRealDateTime(row: Int, tree: CTree, s: DateTime)
     val n = tree.getType(CDate)
-    if (n >= 0) {
+    if (n >= 0)
       val seg = a(n).asInstanceOf[ArraySegment[DateTime]]
       seg.defined.set(row)
       seg.values(row) = s
-    } else {
+    else
       tree.setType(CDate, a.length)
       val d = new BitSet()
       d.set(row)
       val v = new Array[DateTime](length)
       v(row) = s
       a.append(ArraySegment[DateTime](id, tree.path, CDate, d, v))
-    }
-  }
 
-  def addRealString(row: Int, tree: CTree, s: String) {
+  def addRealString(row: Int, tree: CTree, s: String)
     val n = tree.getType(CString)
-    if (n >= 0) {
+    if (n >= 0)
       val seg = a(n).asInstanceOf[ArraySegment[String]]
       seg.defined.set(row)
       seg.values(row) = s
-    } else {
+    else
       tree.setType(CString, a.length)
       val d = new BitSet()
       d.set(row)
       val v = new Array[String](length)
       v(row) = s
       a.append(ArraySegment[String](id, tree.path, CString, d, v))
-    }
-  }
 
-  def addLong(row: Int, tree: CTree, x: Long) {
+  def addLong(row: Int, tree: CTree, x: Long)
     val n = tree.getType(CLong)
-    if (n >= 0) {
+    if (n >= 0)
       val seg = a(n).asInstanceOf[ArraySegment[Long]]
       seg.defined.set(row)
       seg.values(row) = x
-    } else {
+    else
       tree.setType(CLong, a.length)
       val d = new BitSet()
       d.set(row)
       val v = new Array[Long](length)
       v(row) = x
       a.append(ArraySegment[Long](id, tree.path, CLong, d, v))
-    }
-  }
 
-  def addDouble(row: Int, tree: CTree, x: Double) {
+  def addDouble(row: Int, tree: CTree, x: Double)
     val n = tree.getType(CDouble)
-    if (n >= 0) {
+    if (n >= 0)
       val seg = a(n).asInstanceOf[ArraySegment[Double]]
       seg.defined.set(row)
       seg.values(row) = x
-    } else {
+    else
       tree.setType(CDouble, a.length)
       val d = new BitSet()
       d.set(row)
       val v = new Array[Double](length)
       v(row) = x
       a.append(ArraySegment[Double](id, tree.path, CDouble, d, v))
-    }
-  }
 
-  def addBigDecimal(row: Int, tree: CTree, x: BigDecimal) {
+  def addBigDecimal(row: Int, tree: CTree, x: BigDecimal)
     val j = x.toLong
-    if (false && BigDecimal(j) == x) {
+    if (false && BigDecimal(j) == x)
       addLong(row, tree, j)
-    } else {
+    else
       val n = tree.getType(CNum)
 
-      if (n >= 0) {
+      if (n >= 0)
         val seg = a(n).asInstanceOf[ArraySegment[BigDecimal]]
         seg.defined.set(row)
         seg.values(row) = x
-      } else {
+      else
         tree.setType(CNum, a.length)
         val d = new BitSet()
         d.set(row)
         val v = new Array[BigDecimal](length)
         v(row) = x
         a.append(ArraySegment[BigDecimal](id, tree.path, CNum, d, v))
-      }
-    }
-  }
 
   // TODO: more principled number handling
-  def addNum(row: Int, tree: CTree, s: String): Unit = {
+  def addNum(row: Int, tree: CTree, s: String): Unit =
     addBigDecimal(row, tree, BigDecimal(s))
-  }
 
-  def extendWithRows(rows: Seq[JValue]) {
+  def extendWithRows(rows: Seq[JValue])
     var i = 0
 
     val rlen = rows.length
 
     val alen = a.length
-    while (i < alen) {
+    while (i < alen)
       a(i) = a(i).extend(rlen)
       i += 1
-    }
 
     i = length
     length += rlen
 
-    rows.foreach { j =>
+    rows.foreach  j =>
       initializeSegments(i, j, t)
       i += 1
-    }
-  }
 
-  def initializeSegments(row: Int, j: JValue, tree: CTree): Unit = {
-    j match {
+  def initializeSegments(row: Int, j: JValue, tree: CTree): Unit =
+    j match
       case JNull => addNull(row, tree)
       case JTrue => addTrue(row, tree)
       case JFalse => addFalse(row, tree)
@@ -269,27 +237,20 @@ case class Segments(
       case JNumStr(s) => addNum(row, tree, s)
 
       case JObject(m) =>
-        if (m.isEmpty) {
+        if (m.isEmpty)
           addEmptyObject(row, tree)
-        } else {
-          m.foreach {
+        else
+          m.foreach
             case (key, j) =>
               initializeSegments(row, j, tree.getField(key))
-          }
-        }
 
       case JArray(js) =>
-        if (js.isEmpty) {
+        if (js.isEmpty)
           addEmptyArray(row, tree)
-        } else {
+        else
           var i = 0
-          js.foreach { j =>
+          js.foreach  j =>
             initializeSegments(row, j, tree.getIndex(i))
             i += 1
-          }
-        }
 
       case JUndefined => ()
-    }
-  }
-}

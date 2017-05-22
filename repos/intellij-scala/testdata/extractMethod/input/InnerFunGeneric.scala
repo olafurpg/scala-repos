@@ -1,6 +1,6 @@
-class A {
-  def foo[T](x: T) {
-    def goo[G](y: G) {
+class A
+  def foo[T](x: T)
+    def goo[G](y: G)
       val z: T = x
       /*start*/
       y: G
@@ -8,10 +8,7 @@ class A {
       val u = x
       /*end*/
       u
-    }
     goo(3)
-  }
-}
 /*
 class A {
   def foo[T](x: T) {

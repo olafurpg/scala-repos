@@ -6,28 +6,23 @@
 // the competing implicits Any => StringAdd and Any => StringFormat.
 // Since then, these have both become value classes, but seeing as
 // this happened simultaneously, we're still okay.
-object Test {
-  locally {
+object Test
+  locally
     1: AnyRef
-  }
 
-  locally {
+  locally
     // before this test case was added and ContextErrors was tweaked, this
     // emitted: "Note that Any extends Any, not AnyRef."
     (null: Any): AnyRef
-  }
 
-  locally {
+  locally
     (0: AnyVal): AnyRef
-  }
 
   class AV(val a: Int) extends AnyVal
 
-  locally {
+  locally
     new AV(0): AnyRef
-  }
 
   "": AnyVal
 
   new Object(): AnyVal
-}

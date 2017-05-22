@@ -1,3 +1,2 @@
-trait badScala {
+trait badScala
   def foo: Int = false
-}

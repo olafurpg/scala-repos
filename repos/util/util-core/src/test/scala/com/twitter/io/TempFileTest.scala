@@ -8,11 +8,11 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TempFileTest extends WordSpec {
+class TempFileTest extends WordSpec
 
-  "TempFile" should {
+  "TempFile" should
 
-    "load resources" in {
+    "load resources" in
       val f1 = TempFile.fromResourcePath("/java/lang/String.class")
       val f2 = TempFile.fromResourcePath(getClass, "/java/lang/String.class")
       val f3 = TempFile.fromSystemResourcePath("java/lang/String.class")
@@ -25,6 +25,3 @@ class TempFileTest extends WordSpec {
       assert(Arrays.equals(c2, c3))
       assert(
           new DataInputStream(new ByteArrayInputStream(c1)).readInt == 0xcafebabe)
-    }
-  }
-}

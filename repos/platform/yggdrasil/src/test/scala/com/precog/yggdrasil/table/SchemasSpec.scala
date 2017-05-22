@@ -34,11 +34,11 @@ import org.specs2.mutable._
 
 trait SchemasSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with Specification
-    with ScalaCheck {
+    with ScalaCheck
   import SampleData._
   import trans._
 
-  def testSingleSchema = {
+  def testSingleSchema =
     val expected = Set(
         JObjectFixedT(Map("a" -> JNumberT, "b" -> JTextT, "c" -> JNullT)))
     val trivialData = Stream.fill(100)(
@@ -46,17 +46,15 @@ trait SchemasSpec[M[+ _]]
     val sample = SampleData(trivialData)
     val table = fromSample(sample, Some(10))
     table.schemas.copoint must_== expected
-  }
 
-  def testHomogeneousArraySchema = {
+  def testHomogeneousArraySchema =
     val expected = Set(JArrayHomogeneousT(JNumberT))
     val data = Stream.fill(10)(JParser.parseUnsafe("""[1, 2, 3]"""))
     val table0 = fromSample(SampleData(data), Some(10))
     val table = table0.toArray[Long]
     table.schemas.copoint must_== expected
-  }
 
-  def testCrossSliceSchema = {
+  def testCrossSliceSchema =
     val expected = Set(
         JObjectFixedT(Map("a" -> JNumberT, "b" -> JTextT)),
         JObjectFixedT(Map("a" -> JTextT, "b" -> JNumberT))
@@ -66,9 +64,8 @@ trait SchemasSpec[M[+ _]]
         .fill(10)(JParser.parseUnsafe("""{ "a": "x", "b": 2 }"""))
     val table = fromSample(SampleData(data), Some(10))
     table.schemas.copoint must_== expected
-  }
 
-  def testIntervleavedSchema = {
+  def testIntervleavedSchema =
     val expected = Set(
         JObjectFixedT(Map("a" -> JArrayFixedT(Map.empty), "b" -> JTextT)),
         JObjectFixedT(Map("a" -> JNullT, "b" -> JTextT)),
@@ -77,17 +74,15 @@ trait SchemasSpec[M[+ _]]
                 "b" -> JArrayFixedT(
                     Map(0 -> JTextT, 1 -> JObjectFixedT(Map.empty)))))
     )
-    val data = Stream.tabulate(30) {
+    val data = Stream.tabulate(30)
       case i if i % 3 == 0 => JParser.parseUnsafe("""{ "a": [], "b": "2" }""")
       case i if i % 3 == 1 =>
         JParser.parseUnsafe("""{ "a": null, "b": "2" }""")
       case _ => JParser.parseUnsafe("""{ "a": [ 1, 2 ], "b": [ "2", {} ] }""")
-    }
     val table = fromSample(SampleData(data), Some(10))
     table.schemas.copoint must_== expected
-  }
 
-  def testUndefinedsInSchema = {
+  def testUndefinedsInSchema =
     val expected = Set(
         JObjectFixedT(Map("a" -> JNumberT, "b" -> JNumberT)),
         JObjectFixedT(Map("a" -> JNumberT)),
@@ -95,7 +90,7 @@ trait SchemasSpec[M[+ _]]
         JObjectFixedT(Map.empty)
     )
 
-    val data = Stream.tabulate(100) {
+    val data = Stream.tabulate(100)
       case i if i % 4 == 0 =>
         JObject(List(JField("a", JNum(1)), JField("b", JNum(i))))
       case i if i % 4 == 1 =>
@@ -103,13 +98,11 @@ trait SchemasSpec[M[+ _]]
       case i if i % 4 == 2 =>
         JObject(List(JField("a", JUndefined), JField("b", JNum(i))))
       case _ => JObject(Map.empty)
-    }
 
     val table = fromSample(SampleData(data), Some(10))
     table.schemas.copoint must_== expected
-  }
 
-  def testAllTypesInSchema = {
+  def testAllTypesInSchema =
     val expected = Set(
         JNumberT,
         JTextT,
@@ -148,5 +141,3 @@ trait SchemasSpec[M[+ _]]
 
     val table = fromSample(SampleData(data), Some(10))
     table.schemas.copoint must_== expected
-  }
-}

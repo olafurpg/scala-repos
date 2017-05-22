@@ -7,7 +7,7 @@ import spire.math._
 
 import spire.macros.Ops
 
-package object unicode {
+package object unicode
 
   type ℍ = Quaternion[Real]
   type ℂ = Complex[Real]
@@ -40,41 +40,34 @@ package object unicode {
   def Π[A](as: Iterable[A])(implicit ev: MultiplicativeMonoid[A]): A =
     as.aggregate(ev.one)(ev.times, ev.times)
 
-  implicit class TimesOp[A](lhs: A)(implicit ev: MultiplicativeSemigroup[A]) {
+  implicit class TimesOp[A](lhs: A)(implicit ev: MultiplicativeSemigroup[A])
     def ∙(rhs: A): A = ev.times(lhs, rhs)
-  }
 
-  implicit class EqOps[A](lhs: A)(implicit ev: Eq[A]) {
+  implicit class EqOps[A](lhs: A)(implicit ev: Eq[A])
     def ≡(rhs: A): Boolean = macro Ops.binop[A, A]
     def ≠(rhs: A): Boolean = macro Ops.binop[A, A]
-  }
 
-  implicit class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A]) {
+  implicit class PartialOrderOps[A](lhs: A)(implicit ev: PartialOrder[A])
     def ≤(rhs: A): Boolean = macro Ops.binop[A, A]
     def ≥(rhs: A): Boolean = macro Ops.binop[A, A]
-  }
 
   implicit class MeetSemilatticeOps[
-      A](lhs: A)(implicit ev: MeetSemilattice[A]) {
+      A](lhs: A)(implicit ev: MeetSemilattice[A])
     def ∧(rhs: A): A = macro Ops.binop[A, A]
-  }
 
   implicit class JoinSemilatticeOps[
-      A](lhs: A)(implicit ev: JoinSemilattice[A]) {
+      A](lhs: A)(implicit ev: JoinSemilattice[A])
     def ∨(rhs: A): A = macro Ops.binop[A, A]
-  }
 
-  implicit class HeytingOps[A](lhs: A)(implicit ev: Heyting[A]) {
+  implicit class HeytingOps[A](lhs: A)(implicit ev: Heyting[A])
     def ⊃(rhs: A): A = macro Ops.binop[A, A]
-  }
 
-  implicit class BoolOps[A](lhs: A)(implicit ev: Bool[A]) {
+  implicit class BoolOps[A](lhs: A)(implicit ev: Bool[A])
     def ⊻(rhs: A): A = macro Ops.binop[A, A]
     def ⊼(rhs: A): A = macro Ops.binop[A, A]
     def ⊽(rhs: A): A = macro Ops.binop[A, A]
-  }
 
-  implicit class SymbolicSetOps[A](val lhs: Set[A]) extends AnyVal {
+  implicit class SymbolicSetOps[A](val lhs: Set[A]) extends AnyVal
     def ∋(a: A): Boolean = lhs(a)
     def ∌(a: A): Boolean = !lhs(a)
 
@@ -90,5 +83,3 @@ package object unicode {
 
     def ⊆(rhs: Set[A]): Boolean = lhs.size <= rhs.size && lhs.forall(rhs)
     def ⊇(rhs: Set[A]): Boolean = lhs.size >= rhs.size && rhs.forall(lhs)
-  }
-}

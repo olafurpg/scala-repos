@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import scalaz.scalacheck.ScalaCheckBinding._
 
-object CoyonedaTest extends SpecLite {
+object CoyonedaTest extends SpecLite
 
   implicit def coyonedaArb[F[_], A](
       implicit A: Arbitrary[F[A]]): Arbitrary[Coyoneda[F, A]] =
@@ -34,7 +34,7 @@ object CoyonedaTest extends SpecLite {
       foldable1.laws[CoyonedaNel](
           implicitly, Coyoneda.coyonedaFoldable1, implicitly))
 
-  object instances {
+  object instances
     def functor[F[_]] = Functor[Coyoneda[F, ?]]
     def contravariant[F[_]: Functor : Contravariant] =
       Contravariant[Coyoneda[F, ?]]
@@ -76,5 +76,3 @@ object CoyonedaTest extends SpecLite {
     def cobind[F[_]: Comonad] = Cobind[Coyoneda[F, ?]]
     def equal[F[_], A](implicit F: Functor[F], E: Order[F[A]]) =
       Equal[Coyoneda[F, A]]
-  }
-}

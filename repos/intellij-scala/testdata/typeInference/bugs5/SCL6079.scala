@@ -1,4 +1,4 @@
-abstract class A {
+abstract class A
   class B[T]
   class C extends B[S]
   type S <: B[S]
@@ -11,5 +11,4 @@ abstract class A {
 
   /*start*/
   foo(1) /*end*/
-}
 //Int

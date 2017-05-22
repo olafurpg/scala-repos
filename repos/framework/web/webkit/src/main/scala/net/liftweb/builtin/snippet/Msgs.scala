@@ -53,11 +53,10 @@ import xml.Text
   * @see net.liftweb.http.LiftRules#noticesAutoFadeOut
   * @see net.liftweb.http.LiftRules#noticesEffects
   */
-object Msgs extends DispatchSnippet {
+object Msgs extends DispatchSnippet
   // Dispatch to the render method no matter how we're called
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case _ => render
-  }
 
   /**
     * This method performs extraction of custom formatting and then
@@ -65,15 +64,15 @@ object Msgs extends DispatchSnippet {
     *
     * @see #renderNotices()
     */
-  def render(styles: NodeSeq): NodeSeq = {
+  def render(styles: NodeSeq): NodeSeq =
     // Capture the value for later AJAX updates
     ShowAll(toBoolean(S.attr("showAll") or S.attr("showall")))
 
     // Extract user-specified titles and CSS classes for later use
     List((NoticeType.Error, MsgsErrorMeta),
          (NoticeType.Warning, MsgsWarningMeta),
-         (NoticeType.Notice, MsgsNoticeMeta)).foreach {
-      case (noticeType, ajaxStorage) => {
+         (NoticeType.Notice, MsgsNoticeMeta)).foreach
+      case (noticeType, ajaxStorage) =>
           // Extract the title if provided, or default to none. Allow for XML nodes
           // so that people can localize, etc.
           val title: NodeSeq = (styles \\ noticeType.titleTag)
@@ -83,15 +82,12 @@ object Msgs extends DispatchSnippet {
           // Extract any provided classes for the messages
           val cssClasses = ((styles \\ noticeType.styleTag) ++
               (styles \\ noticeType.titleTag \\ "@class")).toList
-            .map(_.text.trim) match {
+            .map(_.text.trim) match
             case Nil => Empty
             case classes => Full(classes.mkString(" "))
-          }
 
           // Save the settings for AJAX usage
           ajaxStorage(Full(AjaxMessageMeta(title, cssClasses)))
-        }
-    }
 
     // Delegate the actual rendering to a shared method so that we don't
     // duplicate code for the AJAX pipeline
@@ -99,56 +95,49 @@ object Msgs extends DispatchSnippet {
         NoticeType.Notice) ++ noticesFadeOut(NoticeType.Warning) ++ noticesFadeOut(
         NoticeType.Error) ++ effects(NoticeType.Notice) ++ effects(
         NoticeType.Warning) ++ effects(NoticeType.Error)
-  }
 
   /**
     * This method renders the current notices to XHtml based on
     * the current user-specific formatting from the &lt;lift:Msgs> tag.
     */
-  def renderNotices(): NodeSeq = {
+  def renderNotices(): NodeSeq =
     // Determine which formatting function to use based on tag usage
     val f =
-      if (ShowAll.is) {
+      if (ShowAll.is)
         S.messages _
-      } else {
+      else
         S.noIdMessages _
-      }
 
     // Compute the formatted set of messages for a given input
     def computeMessageDiv(
         args: (List[(NodeSeq, Box[String])], NoticeType.Value,
-        SessionVar[Box[AjaxMessageMeta]])): NodeSeq = args match {
+        SessionVar[Box[AjaxMessageMeta]])): NodeSeq = args match
       case (messages, noticeType, ajaxStorage) =>
         // get current settings
         val title = ajaxStorage.get.map(_.title) openOr Text("")
         val styles = ajaxStorage.get.flatMap(_.cssClasses)
 
         // Compute the resulting div
-        f(messages).toList.map(e => ( <li>{e}</li>)) match {
+        f(messages).toList.map(e => ( <li>{e}</li>)) match
           case Nil => Nil
-          case msgList => {
+          case msgList =>
               val ret = <div id={noticeType.id}>{title}<ul>{msgList}</ul></div>
               styles.foldLeft(ret)((xml, style) =>
                     xml % new UnprefixedAttribute("class", Text(style), Null))
-            }
-        }
-    }
 
     // Render all three types together
     List((S.errors, NoticeType.Error, MsgsErrorMeta),
          (S.warnings, NoticeType.Warning, MsgsWarningMeta),
          (S.notices, NoticeType.Notice, MsgsNoticeMeta))
       .flatMap(computeMessageDiv)
-  }
 
   /**
     *  This method wraps the JavaScript fade and effect scripts into lift's page 
     *  script that runs onLoad.
     */
-  private[snippet] def appendScript(script: JsCmd): NodeSeq = {
+  private[snippet] def appendScript(script: JsCmd): NodeSeq =
     S.appendJs(script)
     NodeSeq.Empty
-  }
 
   /**
     * This method produces appropriate JavaScript to fade out the given
@@ -160,12 +149,11 @@ object Msgs extends DispatchSnippet {
     */
   def noticesFadeOut[T](
       noticeType: NoticeType.Value, default: T, wrap: JsCmd => T): T =
-    LiftRules.noticesAutoFadeOut()(noticeType) map {
-      case (duration, fadeTime) => {
+    LiftRules.noticesAutoFadeOut()(noticeType) map
+      case (duration, fadeTime) =>
           wrap(
               LiftRules.jsArtifacts.fadeOut(noticeType.id, duration, fadeTime))
-        }
-    } openOr default
+    openOr default
 
   /**
     * This method produces and appends a script element to lift's page script
@@ -188,10 +176,9 @@ object Msgs extends DispatchSnippet {
                  id: String,
                  default: T,
                  wrap: JsCmd => T): T =
-    LiftRules.noticesEffects()(noticeType, id) match {
+    LiftRules.noticesEffects()(noticeType, id) match
       case Full(jsCmd) => wrap(jsCmd)
       case _ => default
-    }
 
   /**
     * This method produces and appends a script element to lift's page script
@@ -201,39 +188,34 @@ object Msgs extends DispatchSnippet {
     */
   def effects(noticeType: NoticeType.Value): NodeSeq =
     effects(Full(noticeType), noticeType.id, NodeSeq.Empty, appendScript)
-}
 
 /**
   * This SessionVar holds formatting data for notice notices
   * so that the AJAX and static notice renderers use the same formatting.
   */
-object MsgsNoticeMeta extends SessionVar[Box[AjaxMessageMeta]](Empty) {
+object MsgsNoticeMeta extends SessionVar[Box[AjaxMessageMeta]](Empty)
   override private[liftweb] def magicSessionVar_? = true
-}
 
 /**
   * This SessionVar holds formatting data for warning notices
   * so that the AJAX and static notice renderers use the same formatting.
   */
-object MsgsWarningMeta extends SessionVar[Box[AjaxMessageMeta]](Empty) {
+object MsgsWarningMeta extends SessionVar[Box[AjaxMessageMeta]](Empty)
   override private[liftweb] def magicSessionVar_? = true
-}
 
 /**
   * This SessionVar holds formatting data for error notices
   * so that the AJAX and static notice renderers use the same formatting.
   */
-object MsgsErrorMeta extends SessionVar[Box[AjaxMessageMeta]](Empty) {
+object MsgsErrorMeta extends SessionVar[Box[AjaxMessageMeta]](Empty)
   override private[liftweb] def magicSessionVar_? = true
-}
 
 /**
   * This SessionVar records whether to show id-based messages in
   * addition to non-id messages.
   */
-object ShowAll extends RequestVar[Boolean](false) {
+object ShowAll extends RequestVar[Boolean](false)
   //override private[liftweb] def magicSessionVar_? = true
-}
 
 /**
   * This case class is used to hold formatting data for the

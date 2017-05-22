@@ -10,20 +10,16 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ServerStatsFilterTest extends FunSuite {
-  test("Records handletime for a service") {
-    Time.withCurrentTimeFrozen { ctl =>
+class ServerStatsFilterTest extends FunSuite
+  test("Records handletime for a service")
+    Time.withCurrentTimeFrozen  ctl =>
       val inMemory = new InMemoryStatsReceiver
-      val svc = Service.mk[Unit, Unit] { unit =>
+      val svc = Service.mk[Unit, Unit]  unit =>
         ctl.advance(5.microseconds)
         Future.never
-      }
       val filter =
         new ServerStatsFilter[Unit, Unit](inMemory, Stopwatch.timeNanos)
       filter.andThen(svc)(())
       val expected = 5
       val actual = inMemory.stats(Seq("handletime_us"))(0)
       assert(actual == expected)
-    }
-  }
-}

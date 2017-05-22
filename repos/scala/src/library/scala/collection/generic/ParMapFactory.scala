@@ -27,7 +27,7 @@ import scala.language.higherKinds
   */
 abstract class ParMapFactory[
     CC[X, Y] <: ParMap[X, Y] with ParMapLike[X, Y, CC[X, Y], _]]
-    extends GenMapFactory[CC] with GenericParMapCompanion[CC] {
+    extends GenMapFactory[CC] with GenericParMapCompanion[CC]
 
   type MapColl = CC[_, _]
 
@@ -44,9 +44,7 @@ abstract class ParMapFactory[
   def newCombiner[K, V]: Combiner[(K, V), CC[K, V]]
 
   class CanCombineFromMap[K, V]
-      extends CanCombineFrom[CC[_, _], (K, V), CC[K, V]] {
+      extends CanCombineFrom[CC[_, _], (K, V), CC[K, V]]
     def apply(from: MapColl) =
       from.genericMapCombiner[K, V].asInstanceOf[Combiner[(K, V), CC[K, V]]]
     def apply() = newCombiner[K, V]
-  }
-}

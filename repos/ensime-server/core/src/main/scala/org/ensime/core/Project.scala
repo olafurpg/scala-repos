@@ -25,7 +25,7 @@ class Project(
     broadcaster: ActorRef,
     implicit val config: EnsimeConfig
 )
-    extends Actor with ActorLogging with Stash {
+    extends Actor with ActorLogging with Stash
   import context.{dispatcher, system}
 
   import FileUtils._
@@ -46,13 +46,12 @@ class Project(
   private val resolver = new SourceResolver(config)
   private val searchService = new SearchService(config, resolver)
   private val sourceWatcher = new SourceWatcher(config, resolver :: Nil)
-  private val reTypecheck = new FileChangeListener {
+  private val reTypecheck = new FileChangeListener
     def reTypeCheck(): Unit = self ! AskReTypecheck
     def fileAdded(f: FileObject): Unit = reTypeCheck()
     def fileChanged(f: FileObject): Unit = reTypeCheck()
     def fileRemoved(f: FileObject): Unit = reTypeCheck()
     override def baseReCreated(f: FileObject): Unit = reTypeCheck()
-  }
   private val classfileWatcher = context.actorOf(
       Props(new ClassfileWatcher(config, searchService :: reTypecheck :: Nil)),
       "classFileWatcher")
@@ -60,7 +59,7 @@ class Project(
   def receive: Receive = awaitingConnectionInfoReq
 
   def awaitingConnectionInfoReq: Receive =
-    withLabel("awaitingConnectionInfoReq") {
+    withLabel("awaitingConnectionInfoReq")
       case ConnectionInfoReq =>
         sender() ! ConnectionInfo()
         context.become(handleRequests)
@@ -68,12 +67,11 @@ class Project(
         unstashAll()
       case other =>
         stash()
-    }
 
-  private def init(): Unit = {
+  private def init(): Unit =
     searchService
       .refresh()
-      .onComplete {
+      .onComplete
         case Success((deletes, inserts)) =>
           // legacy clients expect to see IndexerReady on connection.
           // we could also just blindly send this on each connection.
@@ -82,48 +80,44 @@ class Project(
         case Failure(problem) =>
           log.warning(problem.toString)
           throw problem
-      }(context.dispatcher)
+      (context.dispatcher)
     indexer = context.actorOf(Indexer(searchService), "indexer")
-    if (config.scalaLibrary.isDefined || Set("scala", "dotty")(config.name)) {
+    if (config.scalaLibrary.isDefined || Set("scala", "dotty")(config.name))
 
       // we merge scala and java AnalyzerReady messages into a single
       // AnalyzerReady message, fired only after java *and* scala are ready
-      val merger = context.actorOf(Props(new Actor {
+      val merger = context.actorOf(Props(new Actor
         var senders = ListSet.empty[ActorRef]
-        def receive: Receive = {
+        def receive: Receive =
           case Broadcaster.Persist(AnalyzerReadyEvent) if senders.size == 1 =>
             broadcaster ! Broadcaster.Persist(AnalyzerReadyEvent)
           case Broadcaster.Persist(AnalyzerReadyEvent) => senders += sender()
           case msg => broadcaster forward msg
-        }
-      }))
+      ))
 
       scalac = context.actorOf(
           Analyzer(merger, indexer, searchService), "scalac")
       javac = context.actorOf(
           JavaAnalyzer(merger, indexer, searchService), "javac")
-    } else {
+    else
       log.warning(
           "Detected a pure Java project. Scala queries are not available.")
       scalac = system.deadLetters
       javac = context.actorOf(
           JavaAnalyzer(broadcaster, indexer, searchService), "javac")
-    }
     debugger = context.actorOf(DebugManager(broadcaster), "debugging")
     docs = context.actorOf(DocResolver(), "docs")
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     // make sure the "reliable" dependencies are cleaned up
     Try(sourceWatcher.shutdown())
     searchService.shutdown() // async
     Try(vfs.close())
-  }
 
   // debounces ReloadExistingFilesEvent
   private var rechecking: Cancellable = _
 
-  def handleRequests: Receive = withLabel("handleRequests") {
+  def handleRequests: Receive = withLabel("handleRequests")
     case AskReTypecheck =>
       Option(rechecking).foreach(_.cancel())
       rechecking = system.scheduler.scheduleOnce(
@@ -155,9 +149,6 @@ class Project(
     // added here to prevent errors when client sends this repeatedly (e.g. as a keepalive
     case ConnectionInfoReq =>
       sender() ! ConnectionInfo()
-  }
-}
-object Project {
+object Project
   def apply(target: ActorRef)(implicit config: EnsimeConfig): Props =
     Props(classOf[Project], target, config)
-}

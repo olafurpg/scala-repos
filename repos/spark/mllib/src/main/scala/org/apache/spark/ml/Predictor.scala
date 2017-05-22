@@ -32,7 +32,7 @@ import org.apache.spark.sql.types.{DataType, DoubleType, StructType}
   * (private[ml])  Trait for parameters for prediction (regression and classification).
   */
 private[ml] trait PredictorParams
-    extends Params with HasLabelCol with HasFeaturesCol with HasPredictionCol {
+    extends Params with HasLabelCol with HasFeaturesCol with HasPredictionCol
 
   /**
     * Validates and transforms the input schema with the provided param map.
@@ -45,16 +45,13 @@ private[ml] trait PredictorParams
   protected def validateAndTransformSchema(
       schema: StructType,
       fitting: Boolean,
-      featuresDataType: DataType): StructType = {
+      featuresDataType: DataType): StructType =
     // TODO: Support casting Array[Double] and Array[Float] to Vector when FeaturesType = Vector
     SchemaUtils.checkColumnType(schema, $(featuresCol), featuresDataType)
-    if (fitting) {
+    if (fitting)
       // TODO: Allow other numeric types
       SchemaUtils.checkColumnType(schema, $(labelCol), DoubleType)
-    }
     SchemaUtils.appendColumn(schema, $(predictionCol), DoubleType)
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -71,7 +68,7 @@ private[ml] trait PredictorParams
 abstract class Predictor[FeaturesType,
                          Learner <: Predictor[FeaturesType, Learner, M],
                          M <: PredictionModel[FeaturesType, M]]
-    extends Estimator[M] with PredictorParams {
+    extends Estimator[M] with PredictorParams
 
   /** @group setParam */
   def setLabelCol(value: String): Learner =
@@ -85,12 +82,11 @@ abstract class Predictor[FeaturesType,
   def setPredictionCol(value: String): Learner =
     set(predictionCol, value).asInstanceOf[Learner]
 
-  override def fit(dataset: DataFrame): M = {
+  override def fit(dataset: DataFrame): M =
     // This handles a few items such as schema validation.
     // Developers only need to implement train().
     transformSchema(dataset.schema, logging = true)
     copyValues(train(dataset).setParent(this))
-  }
 
   override def copy(extra: ParamMap): Learner
 
@@ -114,21 +110,17 @@ abstract class Predictor[FeaturesType,
     */
   private[ml] def featuresDataType: DataType = new VectorUDT
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema, fitting = true, featuresDataType)
-  }
 
   /**
     * Extract [[labelCol]] and [[featuresCol]] from the given dataset,
     * and put it in an RDD with strong types.
     */
-  protected def extractLabeledPoints(dataset: DataFrame): RDD[LabeledPoint] = {
-    dataset.select($(labelCol), $(featuresCol)).rdd.map {
+  protected def extractLabeledPoints(dataset: DataFrame): RDD[LabeledPoint] =
+    dataset.select($(labelCol), $(featuresCol)).rdd.map
       case Row(label: Double, features: Vector) =>
         LabeledPoint(label, features)
-    }
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -142,7 +134,7 @@ abstract class Predictor[FeaturesType,
 @DeveloperApi
 abstract class PredictionModel[
     FeaturesType, M <: PredictionModel[FeaturesType, M]]
-    extends Model[M] with PredictorParams {
+    extends Model[M] with PredictorParams
 
   /** @group setParam */
   def setFeaturesCol(value: String): M =
@@ -166,9 +158,8 @@ abstract class PredictionModel[
     */
   protected def featuresDataType: DataType = new VectorUDT
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema, fitting = false, featuresDataType)
-  }
 
   /**
     * Transforms dataset by reading from [[featuresCol]], calling [[predict()]], and storing
@@ -177,27 +168,22 @@ abstract class PredictionModel[
     * @param dataset input dataset
     * @return transformed dataset with [[predictionCol]] of type [[Double]]
     */
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
-    if ($(predictionCol).nonEmpty) {
+    if ($(predictionCol).nonEmpty)
       transformImpl(dataset)
-    } else {
+    else
       this.logWarning(s"$uid: Predictor.transform() was called as NOOP" +
           " since no output columns were set.")
       dataset
-    }
-  }
 
-  protected def transformImpl(dataset: DataFrame): DataFrame = {
-    val predictUDF = udf { (features: Any) =>
+  protected def transformImpl(dataset: DataFrame): DataFrame =
+    val predictUDF = udf  (features: Any) =>
       predict(features.asInstanceOf[FeaturesType])
-    }
     dataset.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
-  }
 
   /**
     * Predict label for the given features.
     * This internal method is used to implement [[transform()]] and output [[predictionCol]].
     */
   protected def predict(features: FeaturesType): Double
-}

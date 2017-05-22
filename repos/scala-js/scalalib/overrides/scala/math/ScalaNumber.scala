@@ -13,7 +13,6 @@ package scala.math
   *  @version 2.8
   *  @since 2.8
   */
-abstract class ScalaNumber extends java.lang.Number {
+abstract class ScalaNumber extends java.lang.Number
   protected def isWhole(): Boolean
   def underlying(): Object
-}

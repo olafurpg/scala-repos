@@ -25,8 +25,8 @@ import org.apache.spark.mllib.tree.model.RandomForestModel
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object RandomForestRegressionExample {
-  def main(args: Array[String]): Unit = {
+object RandomForestRegressionExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("RandomForestRegressionExample")
     val sc = new SparkContext(conf)
     // $example on$
@@ -55,13 +55,12 @@ object RandomForestRegressionExample {
                                             maxBins)
 
     // Evaluate model on test instances and compute test error
-    val labelsAndPredictions = testData.map { point =>
+    val labelsAndPredictions = testData.map  point =>
       val prediction = model.predict(point.features)
       (point.label, prediction)
-    }
-    val testMSE = labelsAndPredictions.map {
+    val testMSE = labelsAndPredictions.map
       case (v, p) => math.pow((v - p), 2)
-    }.mean()
+    .mean()
     println("Test Mean Squared Error = " + testMSE)
     println("Learned regression forest model:\n" + model.toDebugString)
 
@@ -70,6 +69,4 @@ object RandomForestRegressionExample {
     val sameModel =
       RandomForestModel.load(sc, "target/tmp/myRandomForestRegressionModel")
     // $example off$
-  }
-}
 // scalastyle:on println

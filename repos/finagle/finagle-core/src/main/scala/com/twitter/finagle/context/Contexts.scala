@@ -3,7 +3,7 @@ package com.twitter.finagle.context
 /**
   * [[com.twitter.finagle.context.Context]]s that are managed by Finagle.
   */
-object Contexts {
+object Contexts
 
   /**
     * Local contexts have lifetimes bound by Finagle server requests.
@@ -34,9 +34,6 @@ object Contexts {
     * not capture these request scoped values.
     */
   def letClear[R](fn: => R): R =
-    local.letClear() {
-      broadcast.letClear() {
+    local.letClear()
+      broadcast.letClear()
         fn
-      }
-    }
-}

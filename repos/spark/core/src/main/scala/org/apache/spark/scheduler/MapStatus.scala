@@ -28,7 +28,7 @@ import org.apache.spark.util.Utils
   * Result returned by a ShuffleMapTask to a scheduler. Includes the block manager address that the
   * task ran on as well as the sizes of outputs for each reducer, for passing on to the reduce tasks.
   */
-private[spark] sealed trait MapStatus {
+private[spark] sealed trait MapStatus
 
   /** Location where this task was run. */
   def location: BlockManagerId
@@ -40,17 +40,14 @@ private[spark] sealed trait MapStatus {
     * necessary for correctness, since block fetchers are allowed to skip zero-size blocks.
     */
   def getSizeForBlock(reduceId: Int): Long
-}
 
-private[spark] object MapStatus {
+private[spark] object MapStatus
 
-  def apply(loc: BlockManagerId, uncompressedSizes: Array[Long]): MapStatus = {
-    if (uncompressedSizes.length > 2000) {
+  def apply(loc: BlockManagerId, uncompressedSizes: Array[Long]): MapStatus =
+    if (uncompressedSizes.length > 2000)
       HighlyCompressedMapStatus(loc, uncompressedSizes)
-    } else {
+    else
       new CompressedMapStatus(loc, uncompressedSizes)
-    }
-  }
 
   private[this] val LOG_BASE = 1.1
 
@@ -59,29 +56,24 @@ private[spark] object MapStatus {
     * We do this by encoding the log base 1.1 of the size as an integer, which can support
     * sizes up to 35 GB with at most 10% error.
     */
-  def compressSize(size: Long): Byte = {
-    if (size == 0) {
+  def compressSize(size: Long): Byte =
+    if (size == 0)
       0
-    } else if (size <= 1L) {
+    else if (size <= 1L)
       1
-    } else {
+    else
       math
         .min(255, math.ceil(math.log(size) / math.log(LOG_BASE)).toInt)
         .toByte
-    }
-  }
 
   /**
     * Decompress an 8-bit encoded block size, using the reverse operation of compressSize.
     */
-  def decompressSize(compressedSize: Byte): Long = {
-    if (compressedSize == 0) {
+  def decompressSize(compressedSize: Byte): Long =
+    if (compressedSize == 0)
       0
-    } else {
+    else
       math.pow(LOG_BASE, compressedSize & 0xFF).toLong
-    }
-  }
-}
 
 /**
   * A [[MapStatus]] implementation that tracks the size of each block. Size for each block is
@@ -93,35 +85,30 @@ private[spark] object MapStatus {
 private[spark] class CompressedMapStatus(
     private[this] var loc: BlockManagerId,
     private[this] var compressedSizes: Array[Byte])
-    extends MapStatus with Externalizable {
+    extends MapStatus with Externalizable
 
   protected def this() =
     this(null, null.asInstanceOf[Array[Byte]]) // For deserialization only
 
-  def this(loc: BlockManagerId, uncompressedSizes: Array[Long]) {
+  def this(loc: BlockManagerId, uncompressedSizes: Array[Long])
     this(loc, uncompressedSizes.map(MapStatus.compressSize))
-  }
 
   override def location: BlockManagerId = loc
 
-  override def getSizeForBlock(reduceId: Int): Long = {
+  override def getSizeForBlock(reduceId: Int): Long =
     MapStatus.decompressSize(compressedSizes(reduceId))
-  }
 
   override def writeExternal(out: ObjectOutput): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       loc.writeExternal(out)
       out.writeInt(compressedSizes.length)
       out.write(compressedSizes)
-    }
 
-  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException {
+  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException
     loc = BlockManagerId(in)
     val len = in.readInt()
     compressedSizes = new Array[Byte](len)
     in.readFully(compressedSizes)
-  }
-}
 
 /**
   * A [[MapStatus]] implementation that only stores the average size of non-empty blocks,
@@ -137,7 +124,7 @@ private[spark] class HighlyCompressedMapStatus private (
     private[this] var numNonEmptyBlocks: Int,
     private[this] var emptyBlocks: RoaringBitmap,
     private[this] var avgSize: Long)
-    extends MapStatus with Externalizable {
+    extends MapStatus with Externalizable
 
   // loc could be null when the default constructor is called during deserialization
   require(
@@ -148,32 +135,27 @@ private[spark] class HighlyCompressedMapStatus private (
 
   override def location: BlockManagerId = loc
 
-  override def getSizeForBlock(reduceId: Int): Long = {
-    if (emptyBlocks.contains(reduceId)) {
+  override def getSizeForBlock(reduceId: Int): Long =
+    if (emptyBlocks.contains(reduceId))
       0
-    } else {
+    else
       avgSize
-    }
-  }
 
   override def writeExternal(out: ObjectOutput): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       loc.writeExternal(out)
       emptyBlocks.writeExternal(out)
       out.writeLong(avgSize)
-    }
 
-  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException {
+  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException
     loc = BlockManagerId(in)
     emptyBlocks = new RoaringBitmap()
     emptyBlocks.readExternal(in)
     avgSize = in.readLong()
-  }
-}
 
-private[spark] object HighlyCompressedMapStatus {
+private[spark] object HighlyCompressedMapStatus
   def apply(loc: BlockManagerId,
-            uncompressedSizes: Array[Long]): HighlyCompressedMapStatus = {
+            uncompressedSizes: Array[Long]): HighlyCompressedMapStatus =
     // We must keep track of which blocks are empty so that we don't report a zero-sized
     // block as being non-empty (or vice-versa) when using the average block size.
     var i = 0
@@ -184,24 +166,19 @@ private[spark] object HighlyCompressedMapStatus {
     // we expect that there will be far fewer of them, so we will perform fewer bitmap insertions.
     val emptyBlocks = new RoaringBitmap()
     val totalNumBlocks = uncompressedSizes.length
-    while (i < totalNumBlocks) {
+    while (i < totalNumBlocks)
       var size = uncompressedSizes(i)
-      if (size > 0) {
+      if (size > 0)
         numNonEmptyBlocks += 1
         totalSize += size
-      } else {
+      else
         emptyBlocks.add(i)
-      }
       i += 1
-    }
     val avgSize =
-      if (numNonEmptyBlocks > 0) {
+      if (numNonEmptyBlocks > 0)
         totalSize / numNonEmptyBlocks
-      } else {
+      else
         0
-      }
     emptyBlocks.trim()
     emptyBlocks.runOptimize()
     new HighlyCompressedMapStatus(loc, numNonEmptyBlocks, emptyBlocks, avgSize)
-  }
-}

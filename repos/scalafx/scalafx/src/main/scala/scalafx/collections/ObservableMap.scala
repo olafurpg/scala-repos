@@ -41,7 +41,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @define OM `ObservableMap`
   */
-object ObservableMap extends MutableMapFactory[ObservableMap] {
+object ObservableMap extends MutableMapFactory[ObservableMap]
 
   /**
     * Extracts a JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableMap.html $OM]] from a 
@@ -113,11 +113,10 @@ object ObservableMap extends MutableMapFactory[ObservableMap] {
     *
     * @return A newly created $OM.
     */
-  def apply[K, V](keyValues: Seq[(K, V)]): ObservableMap[K, V] = {
+  def apply[K, V](keyValues: Seq[(K, V)]): ObservableMap[K, V] =
     val map = empty[K, V]
     keyValues.foreach(keyValue => map(keyValue._1) = keyValue._2)
     map
-  }
 
   /**
     * Creates a new $OM that is backed by the specified map. Mutation operations on the $OM instance will be reported
@@ -129,13 +128,11 @@ object ObservableMap extends MutableMapFactory[ObservableMap] {
     * @return A newly created $OM.
     */
   def apply[K, V](originalMap: Map[K, V]): ObservableMap[K, V] =
-    new ObservableMap[K, V] {
+    new ObservableMap[K, V]
       override val delegate =
         jfxc.FXCollections.observableMap(mutableMapAsJavaMap(originalMap))
-    }
 
   // CREATION METHODS - END
-}
 
 /**
   * Wrapper class to JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableMap.html $OM]].
@@ -153,7 +150,7 @@ object ObservableMap extends MutableMapFactory[ObservableMap] {
 trait ObservableMap[K, V]
     extends Map[K, V] with MapLike[K, V, ObservableMap[K, V]]
     with Builder[(K, V), ObservableMap[K, V]] with Observable
-    with SFXDelegate[jfxc.ObservableMap[K, V]] {
+    with SFXDelegate[jfxc.ObservableMap[K, V]]
 
   /**
     * The result when this $MAP is used as a builder.
@@ -173,10 +170,9 @@ trait ObservableMap[K, V]
     * @param kv the key/value pair.
     * @return The $OM itself
     */
-  def +=(kv: (K, V)) = {
+  def +=(kv: (K, V)) =
     delegate.put(kv._1, kv._2)
     this
-  }
 
   /**
     * Removes a key from this $MAP.
@@ -184,17 +180,15 @@ trait ObservableMap[K, V]
     * @param key the key to be removed
     * @return The $OM itself.
     */
-  def -=(key: K) = {
+  def -=(key: K) =
     delegate.remove(key)
     this
-  }
 
   /**
     * Removes all elements from the $MAP. After this operation has completed, the $MAP will be empty.
     */
-  override def clear() {
+  override def clear()
     delegate.clear()
-  }
 
   /**
     * Creates a new [[http://www.scala-lang.org/api/current/scala/collection/Iterator.html `Iterator`]] over all
@@ -202,15 +196,13 @@ trait ObservableMap[K, V]
     *
     * @return The new `iterator`.
     */
-  def iterator = new Iterator[(K, V)] {
+  def iterator = new Iterator[(K, V)]
     // Definition copied from JavaConversions.JMapWrapperLike.iterator
     val it = delegate.entrySet.iterator
     def hasNext = it.hasNext
-    def next() = {
+    def next() =
       val e = it.next();
       (e.getKey, e.getValue)
-    }
-  }
 
   /**
     * This $MAP's size.
@@ -236,11 +228,11 @@ trait ObservableMap[K, V]
     *
     * @param op Function that will handle this $OM's modifications data to be activated when some change was made.
     */
-  def onChange(op: (ObservableMap[K, V], Change[K, V]) => Unit) {
-    delegate.addListener(new jfxc.MapChangeListener[K, V] {
-      def onChanged(change: jfxc.MapChangeListener.Change[_ <: K, _ <: V]) {
+  def onChange(op: (ObservableMap[K, V], Change[K, V]) => Unit)
+    delegate.addListener(new jfxc.MapChangeListener[K, V]
+      def onChanged(change: jfxc.MapChangeListener.Change[_ <: K, _ <: V])
         val changeEvent: Change[K, V] =
-          (change.wasAdded, change.wasRemoved) match {
+          (change.wasAdded, change.wasRemoved) match
             case (true, true) =>
               Replace(
                   change.getKey, change.getValueAdded, change.getValueRemoved)
@@ -249,27 +241,21 @@ trait ObservableMap[K, V]
             case (false, false) =>
               throw new IllegalStateException(
                   "Irregular Change: neither addition nor remotion")
-          }
 
         op(ObservableMap.this, changeEvent)
-      }
-    })
-  }
+    )
 
   /**
     * Add a listener function to $MAP's changes. This function '''will not handle''' this $MAP's modifications data.
     *
     * @param op No-argument function to be activated when some change in this $OM was made.
     */
-  def onChange(op: => Unit) {
+  def onChange(op: => Unit)
     delegate.addListener(
-        new jfxc.MapChangeListener[K, V] {
-      def onChanged(change: jfxc.MapChangeListener.Change[_ <: K, _ <: V]) {
+        new jfxc.MapChangeListener[K, V]
+      def onChanged(change: jfxc.MapChangeListener.Change[_ <: K, _ <: V])
         op
-      }
-    })
-  }
-}
+    )
 
 /**
   * [[scalafx.collections.ObservableMap]] implementation backed for a

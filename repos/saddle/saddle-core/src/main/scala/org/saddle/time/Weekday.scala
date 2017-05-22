@@ -18,9 +18,9 @@ package org.saddle.time
 /**
   * Enumeration of weekdays for utilizing with an RRule
   */
-sealed trait Weekday {
+sealed trait Weekday
   this: Weekday =>
-  protected[time] def toICal: com.google.ical.values.Weekday = this match {
+  protected[time] def toICal: com.google.ical.values.Weekday = this match
     case SU => com.google.ical.values.Weekday.SU
     case MO => com.google.ical.values.Weekday.MO
     case TU => com.google.ical.values.Weekday.TU
@@ -28,21 +28,18 @@ sealed trait Weekday {
     case TH => com.google.ical.values.Weekday.TH
     case FR => com.google.ical.values.Weekday.FR
     case SA => com.google.ical.values.Weekday.SA
-  }
 
   /**
     * Create a WeekdayNum instance: e.g., MO(1) or TU(-2)
     */
   def apply(i: Int): WeekdayNum = WeekdayNum(i, this)
-}
 
-object Weekday {
+object Weekday
 
   /**
     * Allow for implicit Weekday => WeekdayNum conversion: e.g., MO => MO(0)
     */
   implicit def w2wn(w: Weekday) = WeekdayNum(0, w)
-}
 
 case object SU extends Weekday
 case object MO extends Weekday
@@ -55,11 +52,10 @@ case object SA extends Weekday
 /**
   * Weekday + Offset, for utilizing with an RRule
   */
-case class WeekdayNum(n: Int, d: Weekday) {
+case class WeekdayNum(n: Int, d: Weekday)
   assert(n <= 53 && n >= -53, "n must be in [-53, 53]")
 
   protected[time] def toICal: com.google.ical.values.WeekdayNum =
     new com.google.ical.values.WeekdayNum(n, d.toICal)
 
   override def toString = "%s(%d)" format (d, n)
-}

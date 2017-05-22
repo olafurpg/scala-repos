@@ -33,7 +33,7 @@ import scala.util.hashing.MurmurHash3
   * :: Experimental ::
   */
 @Experimental
-object DataView {
+object DataView
 
   /**
     * :: Experimental ::
@@ -62,20 +62,18 @@ object DataView {
       untilTime: Option[DateTime] = None,
       conversionFunction: Event => Option[E],
       name: String = "",
-      version: String = "")(sqlContext: SQLContext): DataFrame = {
+      version: String = "")(sqlContext: SQLContext): DataFrame =
 
     @transient lazy val logger = Logger[this.type]
 
     val sc = sqlContext.sparkContext
 
-    val beginTime = startTime match {
+    val beginTime = startTime match
       case Some(t) => t
       case None => new DateTime(0L)
-    }
-    val endTime = untilTime match {
+    val endTime = untilTime match
       case Some(t) => t
       case None => DateTime.now() // fix the current time
-    }
     // detect changes to the case class
     val uid = java.io.ObjectStreamClass
       .lookup(implicitly[reflect.ClassTag[E]].runtimeClass)
@@ -83,9 +81,9 @@ object DataView {
     val hash = MurmurHash3.stringHash(s"$beginTime-$endTime-$version-$uid")
     val baseDir = s"${sys.env("PIO_FS_BASEDIR")}/view"
     val fileName = s"$baseDir/$name-$appName-$hash.parquet"
-    try {
+    try
       sqlContext.parquetFile(fileName)
-    } catch {
+    catch
       case e: java.io.FileNotFoundException =>
         logger.info("Cached copy not found, reading from DB.")
         // if cached copy is found, use it. If not, grab from Storage
@@ -101,11 +99,7 @@ object DataView {
         resultDF.saveAsParquetFile(fileName)
         sqlContext.parquetFile(fileName)
       case e: java.lang.RuntimeException =>
-        if (e.toString.contains("is not a Parquet file")) {
+        if (e.toString.contains("is not a Parquet file"))
           logger.error(s"$fileName does not contain a valid Parquet file. " +
               "Please delete it and try again.")
-        }
         throw e
-    }
-  }
-}

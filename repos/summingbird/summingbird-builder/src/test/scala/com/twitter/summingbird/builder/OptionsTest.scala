@@ -31,26 +31,23 @@ import org.apache.hadoop.conf.Configuration
 import com.twitter.bijection.Conversion.asMethod
 import ConfigBijection._
 
-class TestJob1(env: Env) extends AbstractJob(env) {
+class TestJob1(env: Env) extends AbstractJob(env)
 
   implicit def batcher = Batcher.ofHours(1)
 
-  try {
+  try
     EventSource[Long](Some(null), None)
       .withTime(new java.util.Date(_))
-      .map { e =>
+      .map  e =>
         (e % 2, e)
-      }
       .groupAndSumTo(CompoundStore.fromOffline[Long, Long](
               new InitialBatchedStore(BatchID(12L), null)))
       .set(BMonoidIsCommutative(true))
-  } catch {
+  catch
     case t: Throwable => t.printStackTrace
-  }
-}
 
-class OptionsTest extends WordSpec {
-  "Commutative Options should not be lost" in {
+class OptionsTest extends WordSpec
+  "Commutative Options should not be lost" in
     val scalding = ScaldingEnv(
         "com.twitter.summingbird.builder.TestJob1",
         Array("-Dcascading.aggregateby.threshold=100000", "--test", "arg"))
@@ -76,5 +73,3 @@ class OptionsTest extends WordSpec {
             names,
             opts,
             summers.head.asInstanceOf[Summer[Scalding, _, _]]) == Commutative)
-  }
-}

@@ -25,16 +25,15 @@ import breeze.linalg.support.CanTraverseKeyValuePairs.KeyValuePairsVisitor
   * @author dramage
   * @author dlwh
   */
-trait CanTraverseKeyValuePairs[From, K, A] {
+trait CanTraverseKeyValuePairs[From, K, A]
 
   /**Traverses all values from the given collection. */
   def traverse(from: From, fn: KeyValuePairsVisitor[K, A]): Unit
   def isTraversableAgain(from: From): Boolean
-}
 
-object CanTraverseKeyValuePairs {
+object CanTraverseKeyValuePairs
 
-  trait KeyValuePairsVisitor[@specialized(Int) K, @specialized A] {
+  trait KeyValuePairsVisitor[@specialized(Int) K, @specialized A]
     def visit(k: K, a: A)
     def visitArray(indices: Int => K, arr: Array[A]): Unit =
       visitArray(indices, arr, 0, arr.length, 1)
@@ -43,30 +42,25 @@ object CanTraverseKeyValuePairs {
                    arr: Array[A],
                    offset: Int,
                    length: Int,
-                   stride: Int): Unit = {
+                   stride: Int): Unit =
       var i = 0
-      while (i < length) {
+      while (i < length)
         visit(indices(i * stride + offset), arr(i * stride + offset))
         i += 1
-      }
-    }
     def zeros(numZero: Int, zeroKeys: Iterator[K], zeroValue: A)
-  }
 
   //
   // Arrays
   //
 
   class OpArray[@specialized(Double, Int, Float, Long) A]
-      extends CanTraverseKeyValuePairs[Array[A], Int, A] {
+      extends CanTraverseKeyValuePairs[Array[A], Int, A]
 
     /** Traverses all values from the given collection. */
-    def traverse(from: Array[A], fn: KeyValuePairsVisitor[Int, A]): Unit = {
+    def traverse(from: Array[A], fn: KeyValuePairsVisitor[Int, A]): Unit =
       fn.visitArray(0 until from.length, from)
-    }
 
     def isTraversableAgain(from: Array[A]): Boolean = true
-  }
 
   implicit def opArray[@specialized A] =
     new OpArray[A]
@@ -82,4 +76,3 @@ object CanTraverseKeyValuePairs {
   implicit object OpArrayDD extends OpArray[Double]
 
   implicit object OpArrayCC extends OpArray[Complex]
-}

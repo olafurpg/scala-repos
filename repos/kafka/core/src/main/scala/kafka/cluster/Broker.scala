@@ -29,7 +29,7 @@ import org.apache.kafka.common.protocol.SecurityProtocol
   * A broker has an id and a collection of end-points.
   * Each end-point is (host, port, protocolType).
   */
-object Broker {
+object Broker
 
   /**
     * Create a broker object from id and JSON string.
@@ -67,11 +67,11 @@ object Broker {
     *   "rack":"dc1"
     * }
     */
-  def createBroker(id: Int, brokerInfoString: String): Broker = {
+  def createBroker(id: Int, brokerInfoString: String): Broker =
     if (brokerInfoString == null)
       throw new BrokerNotAvailableException(s"Broker id $id does not exist")
-    try {
-      Json.parseFull(brokerInfoString) match {
+    try
+      Json.parseFull(brokerInfoString) match
         case Some(m) =>
           val brokerInfo = m.asInstanceOf[Map[String, Any]]
           val version = brokerInfo("version").asInstanceOf[Int]
@@ -79,19 +79,18 @@ object Broker {
             if (version < 1)
               throw new KafkaException(
                   s"Unsupported version of broker registration: $brokerInfoString")
-            else if (version == 1) {
+            else if (version == 1)
               val host = brokerInfo("host").asInstanceOf[String]
               val port = brokerInfo("port").asInstanceOf[Int]
               Map(SecurityProtocol.PLAINTEXT -> new EndPoint(
                       host, port, SecurityProtocol.PLAINTEXT))
-            } else {
+            else
               val listeners =
                 brokerInfo("endpoints").asInstanceOf[List[String]]
-              listeners.map { listener =>
+              listeners.map  listener =>
                 val ep = EndPoint.createEndPoint(listener)
                 (ep.protocolType, ep)
-              }.toMap
-            }
+              .toMap
           val rack = brokerInfo
             .get("rack")
             .filter(_ != null)
@@ -100,51 +99,41 @@ object Broker {
         case None =>
           throw new BrokerNotAvailableException(
               s"Broker id $id does not exist")
-      }
-    } catch {
+    catch
       case t: Throwable =>
         throw new KafkaException(
             s"Failed to parse the broker info from zookeeper: $brokerInfoString",
             t)
-    }
-  }
-}
 
 case class Broker(id: Int,
                   endPoints: collection.Map[SecurityProtocol, EndPoint],
-                  rack: Option[String]) {
+                  rack: Option[String])
 
   override def toString: String =
     s"$id : ${endPoints.values.mkString("(", ",", ")")} : ${rack.orNull}"
 
-  def this(id: Int, endPoints: Map[SecurityProtocol, EndPoint]) = {
+  def this(id: Int, endPoints: Map[SecurityProtocol, EndPoint]) =
     this(id, endPoints, None)
-  }
 
   def this(id: Int,
            host: String,
            port: Int,
-           protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT) = {
+           protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT) =
     this(id, Map(protocol -> EndPoint(host, port, protocol)), None)
-  }
 
-  def this(bep: BrokerEndPoint, protocol: SecurityProtocol) = {
+  def this(bep: BrokerEndPoint, protocol: SecurityProtocol) =
     this(bep.id, bep.host, bep.port, protocol)
-  }
 
-  def getNode(protocolType: SecurityProtocol): Node = {
+  def getNode(protocolType: SecurityProtocol): Node =
     val endpoint = endPoints.getOrElse(
         protocolType,
         throw new BrokerEndPointNotAvailableException(
             s"End point with security protocol $protocolType not found for broker $id"))
     new Node(id, endpoint.host, endpoint.port)
-  }
 
-  def getBrokerEndPoint(protocolType: SecurityProtocol): BrokerEndPoint = {
+  def getBrokerEndPoint(protocolType: SecurityProtocol): BrokerEndPoint =
     val endpoint = endPoints.getOrElse(
         protocolType,
         throw new BrokerEndPointNotAvailableException(
             s"End point with security protocol $protocolType not found for broker $id"))
     new BrokerEndPoint(id, endpoint.host, endpoint.port)
-  }
-}

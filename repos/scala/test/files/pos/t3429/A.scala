@@ -1,7 +1,6 @@
-class A {
+class A
   @Test(exc = classOf[Exception])
   def myTestMethod = 0
-}
 // rytz@chara:~/scala/trunk/sandbox$ javac Test.java
 // rytz@chara:~/scala/trunk/sandbox$ ../build/pack/bin/scalac A.scala
 // A.scala:2: error: type mismatch;

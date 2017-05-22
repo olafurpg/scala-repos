@@ -9,13 +9,12 @@ import org.scalatra.util.RicherString._
 import scala.collection.JavaConverters._
 import scala.collection.concurrent
 
-object ApiFormats {
+object ApiFormats
 
   /**
     * The request attribute key in which the format is stored.
     */
   val FormatKey: String = "org.scalatra.FormatKey"
-}
 
 /**
   * Adds support for mapping and inferring formats to content types.
@@ -24,7 +23,7 @@ object ApiFormats {
   * $ - Maps formats to content types and vice versa
   * $ - Augments the content-type inferrer to use the format
   */
-trait ApiFormats extends ScalatraBase {
+trait ApiFormats extends ScalatraBase
 
   import org.scalatra.ApiFormats.FormatKey
 
@@ -78,10 +77,9 @@ trait ApiFormats extends ScalatraBase {
             "video/x-flv" -> "flv"
         ).asJava).asScala
 
-  protected def addMimeMapping(mime: String, extension: String) {
+  protected def addMimeMapping(mime: String, extension: String)
     mimeTypes += mime -> extension
     formats += extension -> mime
-  }
 
   /**
     * The default format.
@@ -107,36 +105,32 @@ trait ApiFormats extends ScalatraBase {
     parseAcceptHeader
 
   private[this] def getFromParams(
-      implicit request: HttpServletRequest): Option[String] = {
+      implicit request: HttpServletRequest): Option[String] =
     params.get("format").find(p ⇒ formats.contains(p.toLowerCase(ENGLISH)))
-  }
 
   private[this] def getFromAcceptHeader(
-      implicit request: HttpServletRequest): Option[String] = {
+      implicit request: HttpServletRequest): Option[String] =
     val hdrs = request.contentType.fold(acceptHeader)(
         contentType => (acceptHeader ::: List(contentType)).distinct)
     formatForMimeTypes(hdrs: _*)
-  }
 
   private[this] def getFromResponseHeader(
-      implicit response: HttpServletResponse): Option[String] = {
+      implicit response: HttpServletResponse): Option[String] =
     response.contentType flatMap
     (ctt => ctt.split(";").headOption flatMap mimeTypes.get)
-  }
 
   private def parseAcceptHeader(
-      implicit request: HttpServletRequest): List[String] = {
-    def isValidQPair(a: Array[String]) = {
+      implicit request: HttpServletRequest): List[String] =
+    def isValidQPair(a: Array[String]) =
       val validRange = Range.Double.inclusive(0, 1, 0.1)
       a.length == 2 && a(0) == "q" && validRange.contains(a(1).toDouble)
-    }
 
-    request.headers.get("Accept") map { s =>
+    request.headers.get("Accept") map  s =>
       val fmts = s.split(",").map(_.trim)
-      val accepted = fmts.foldLeft(Map.empty[Int, List[String]]) { (acc, f) =>
+      val accepted = fmts.foldLeft(Map.empty[Int, List[String]])  (acc, f) =>
         val parts = f.split(";").map(_.trim)
         val i =
-          if (parts.size > 1) {
+          if (parts.size > 1)
             val pars = parts(1)
               .split("=")
               .map(_.trim)
@@ -144,27 +138,22 @@ trait ApiFormats extends ScalatraBase {
               .find(isValidQPair)
               .getOrElse(Array("q", "0"))
               (pars(1).toDouble * 10).ceil.toInt
-          } else 10
+          else 10
         acc + (i -> (parts(0) :: acc.get(i).getOrElse(List.empty)))
-      }
       accepted.toList
         .sortWith((kv1, kv2) => kv1._1 > kv2._1)
         .flatMap(_._2.reverse)
-    } getOrElse Nil
-  }
+    getOrElse Nil
 
-  protected def formatForMimeTypes(mimeTypes: String*): Option[String] = {
+  protected def formatForMimeTypes(mimeTypes: String*): Option[String] =
     val defaultMimeType = formats(defaultFormat.name)
-    def matchMimeType(tm: String, f: String) = {
+    def matchMimeType(tm: String, f: String) =
       tm.toLowerCase(ENGLISH).startsWith(f) ||
       (defaultMimeType == f && tm.contains(defaultMimeType))
-    }
-    mimeTypes find { hdr =>
+    mimeTypes find  hdr =>
       formats exists { case (k, v) => matchMimeType(hdr, v) }
-    } flatMap { hdr =>
+    flatMap  hdr =>
       formats find { case (k, v) => matchMimeType(hdr, v) } map { _._1 }
-    }
-  }
 
   /**
     * A content type inferrer based on the `format` variable.  Looks up the media
@@ -172,59 +161,48 @@ trait ApiFormats extends ScalatraBase {
     * `application/octet-stream`.  This inferrer is prepended to the inherited
     * one.
     */
-  protected def inferFromFormats: ContentTypeInferrer = {
+  protected def inferFromFormats: ContentTypeInferrer =
     case _ if format.nonBlank =>
       formats.get(format) getOrElse "application/octet-stream"
-  }
 
-  override protected def contentTypeInferrer: ContentTypeInferrer = {
+  override protected def contentTypeInferrer: ContentTypeInferrer =
     inferFromFormats orElse super.contentTypeInferrer
-  }
 
-  protected def acceptedFormats(accepted: Symbol*): Boolean = {
-    val conditions: List[String] = {
+  protected def acceptedFormats(accepted: Symbol*): Boolean =
+    val conditions: List[String] =
       if (accepted.isEmpty) defaultAcceptedFormats.map(_.name)
       else accepted.map(_.name).toList
-    }
     conditions.isEmpty ||
-    (conditions filter { s =>
+    (conditions filter  s =>
           formats.get(s).isDefined
-        } contains contentType)
-  }
+        contains contentType)
 
   private def getFormat(implicit request: HttpServletRequest,
-                        response: HttpServletResponse): String = {
+                        response: HttpServletResponse): String =
     getFromResponseHeader orElse getFromParams orElse getFromAcceptHeader getOrElse defaultFormat.name
-  }
 
   protected[scalatra] override def withRouteMultiParams[S](
       matchedRoute: Option[MatchedRoute])(thunk: => S)(
-      implicit request: HttpServletRequest): S = {
+      implicit request: HttpServletRequest): S =
     val originalParams: MultiParams = multiParams
-    val routeParams: Map[String, Seq[String]] = {
-      matchedRoute.map(_.multiParams).getOrElse(Map.empty).map {
+    val routeParams: Map[String, Seq[String]] =
+      matchedRoute.map(_.multiParams).getOrElse(Map.empty).map
         case (key, values) =>
           key -> values.map(
               s => if (s.nonBlank) UriDecoder.secondStep(s) else s)
-      }
-    }
-    if (routeParams.contains("format")) {
+    if (routeParams.contains("format"))
       request(FormatKey) = routeParams.apply("format").head
-    }
     request(MultiParamsKey) = originalParams ++ routeParams
 
-    try {
+    try
       thunk
-    } finally {
+    finally
       request(MultiParamsKey) = originalParams
-    }
-  }
 
-  def requestFormat(implicit request: HttpServletRequest): String = {
+  def requestFormat(implicit request: HttpServletRequest): String =
     request.contentType
       .flatMap(t => t.split(";").headOption flatMap mimeTypes.get)
       .getOrElse(format)
-  }
 
   /**
     * Returns the request-scoped format.  If not explicitly set, the format is:
@@ -234,13 +212,11 @@ trait ApiFormats extends ScalatraBase {
     * $ - the default format
     */
   def format(implicit request: HttpServletRequest,
-             response: HttpServletResponse): String = {
+             response: HttpServletResponse): String =
     request
       .get(FormatKey)
-      .fold({
+      .fold(
         val fmt = getFormat
         request(FormatKey) = fmt
         fmt
-      })(_.asInstanceOf[String])
-  }
-}
+      )(_.asInstanceOf[String])

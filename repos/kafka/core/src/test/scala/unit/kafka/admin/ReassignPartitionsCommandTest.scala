@@ -21,10 +21,10 @@ import kafka.zk.ZooKeeperTestHarness
 import org.junit.Test
 
 class ReassignPartitionsCommandTest
-    extends ZooKeeperTestHarness with Logging with RackAwareTest {
+    extends ZooKeeperTestHarness with Logging with RackAwareTest
 
   @Test
-  def testRackAwareReassign() {
+  def testRackAwareReassign()
     val rackInfo = Map(0 -> "rack1",
                        1 -> "rack2",
                        2 -> "rack2",
@@ -55,11 +55,8 @@ class ReassignPartitionsCommandTest
                                                    disableRackAware = false)
 
     val assignment =
-      proposedAssignment map {
+      proposedAssignment map
         case (topicPartition, replicas) =>
           (topicPartition.partition, replicas)
-      }
     checkReplicaDistribution(
         assignment, rackInfo, rackInfo.size, numPartitions, replicationFactor)
-  }
-}

@@ -19,23 +19,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
-class CaseFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class CaseFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val (leaf, _) = processPsiLeafForFilter(
         getLeafByOffset(context.getTextRange.getStartOffset, context))
 
-    if (leaf != null && leaf.getParent != null) {
+    if (leaf != null && leaf.getParent != null)
       val parent = leaf.getParent
-      parent match {
+      parent match
         case _: ScalaFile =>
           if (leaf.getNextSibling != null &&
               leaf.getNextSibling.getNextSibling.isInstanceOf[ScPackaging] &&
               leaf.getNextSibling.getNextSibling.getText.indexOf('{') == -1)
             return false
         case _ =>
-      }
-      parent match {
+      parent match
         case _: ScCaseClause =>
           if (parent.getNode.findChildByType(ScalaTokenTypes.tFUNTYPE) != null)
             return true
@@ -44,33 +43,26 @@ class CaseFilter extends ElementFilter {
         case _: ScalaFile | _: ScPackaging =>
           var node = leaf.getPrevSibling
           if (node.isInstanceOf[PsiWhiteSpace]) node = node.getPrevSibling
-          node match {
-            case x: PsiErrorElement => {
+          node match
+            case x: PsiErrorElement =>
                 val s = ErrMsg("wrong.top.statment.declaration")
-                x.getErrorDescription match {
+                x.getErrorDescription match
                   case `s` => return true
                   case _ => return false
-                }
-              }
             case _ => return true
-          }
         case _ =>
-      }
-      if (parent.getParent != null) {
-        parent.getParent.getParent match {
+      if (parent.getParent != null)
+        parent.getParent.getParent match
           case _: ScCaseClause =>
             if (parent.getParent.getParent.getNode.findChildByType(
                     ScalaTokenTypes.tFUNTYPE) != null) return true
             else return false
           case _ =>
-        }
-      }
-      parent.getParent match {
+      parent.getParent match
         case _: ScBlockExpr | _: ScTemplateBody =>
-          parent match {
+          parent match
             case _: ScReferenceExpression =>
             case _ => return false
-          }
           if (leaf.getPrevSibling == null ||
               leaf.getPrevSibling.getPrevSibling == null ||
               leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF)
@@ -80,7 +72,6 @@ class CaseFilter extends ElementFilter {
                   ScalaTokenTypes.tFUNTYPE) != null) return true
           else return false
         case _ =>
-      }
       if (leaf.getPrevSibling != null &&
           leaf.getPrevSibling.getPrevSibling != null &&
           ((leaf.getPrevSibling.getPrevSibling.getNode.getElementType == ScalaElementTypes.MATCH_STMT &&
@@ -91,7 +82,7 @@ class CaseFilter extends ElementFilter {
                     .isInstanceOf[ScCatchBlock] &&
                   leaf.getPrevSibling.getPrevSibling.getLastChild.getLastChild
                     .isInstanceOf[PsiErrorElement]))) return true
-      if (parent.isInstanceOf[ScTemplateBody]) {
+      if (parent.isInstanceOf[ScTemplateBody])
         if (leaf.getPrevSibling != null &&
             leaf.getPrevSibling.getPrevSibling != null &&
             leaf.getPrevSibling.getPrevSibling.getLastChild != null &&
@@ -100,13 +91,9 @@ class CaseFilter extends ElementFilter {
               .indexOf('{') != -1 &&
             leaf.getPrevSibling.getPrevSibling.getLastChild.getLastChild
               .isInstanceOf[PsiErrorElement]) return true
-      }
-    }
     false
-  }
 
   def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = true
 
   @NonNls
   override def toString = "'case' keyword filter"
-}

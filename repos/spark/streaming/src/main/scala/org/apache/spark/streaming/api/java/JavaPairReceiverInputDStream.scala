@@ -32,7 +32,7 @@ class JavaPairReceiverInputDStream[K, V](
     override implicit val vClassTag: ClassTag[V])
     extends JavaPairInputDStream[K, V](receiverInputDStream) {}
 
-object JavaPairReceiverInputDStream {
+object JavaPairReceiverInputDStream
 
   /**
     * Convert a scala [[org.apache.spark.streaming.dstream.ReceiverInputDStream]] to a Java-friendly
@@ -40,7 +40,5 @@ object JavaPairReceiverInputDStream {
     */
   implicit def fromReceiverInputDStream[K : ClassTag, V : ClassTag](
       receiverInputDStream: ReceiverInputDStream[(K, V)])
-    : JavaPairReceiverInputDStream[K, V] = {
+    : JavaPairReceiverInputDStream[K, V] =
     new JavaPairReceiverInputDStream[K, V](receiverInputDStream)
-  }
-}

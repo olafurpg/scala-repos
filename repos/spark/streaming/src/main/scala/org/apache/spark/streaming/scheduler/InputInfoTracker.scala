@@ -35,28 +35,26 @@ import org.apache.spark.streaming.{StreamingContext, Time}
 @DeveloperApi
 case class StreamInputInfo(inputStreamId: Int,
                            numRecords: Long,
-                           metadata: Map[String, Any] = Map.empty) {
+                           metadata: Map[String, Any] = Map.empty)
   require(numRecords >= 0, "numRecords must not be negative")
 
   def metadataDescription: Option[String] =
     metadata.get(StreamInputInfo.METADATA_KEY_DESCRIPTION).map(_.toString)
-}
 
 @DeveloperApi
-object StreamInputInfo {
+object StreamInputInfo
 
   /**
     * The key for description in `StreamInputInfo.metadata`.
     */
   val METADATA_KEY_DESCRIPTION: String = "Description"
-}
 
 /**
   * This class manages all the input streams as well as their input data statistics. The information
   * will be exposed through StreamingListener for monitoring.
   */
 private[streaming] class InputInfoTracker(ssc: StreamingContext)
-    extends Logging {
+    extends Logging
 
   // Map to track all the InputInfo related to specific batch time and input stream.
   private val batchTimeToInputInfos =
@@ -64,29 +62,24 @@ private[streaming] class InputInfoTracker(ssc: StreamingContext)
 
   /** Report the input information with batch time to the tracker */
   def reportInfo(batchTime: Time, inputInfo: StreamInputInfo): Unit =
-    synchronized {
+    synchronized
       val inputInfos = batchTimeToInputInfos.getOrElseUpdate(
           batchTime, new mutable.HashMap[Int, StreamInputInfo]())
 
-      if (inputInfos.contains(inputInfo.inputStreamId)) {
+      if (inputInfos.contains(inputInfo.inputStreamId))
         throw new IllegalStateException(
             s"Input stream ${inputInfo.inputStreamId} for batch" +
             s"$batchTime is already added into InputInfoTracker, this is a illegal state")
-      }
       inputInfos += ((inputInfo.inputStreamId, inputInfo))
-    }
 
   /** Get the all the input stream's information of specified batch time */
-  def getInfo(batchTime: Time): Map[Int, StreamInputInfo] = synchronized {
+  def getInfo(batchTime: Time): Map[Int, StreamInputInfo] = synchronized
     val inputInfos = batchTimeToInputInfos.get(batchTime)
     // Convert mutable HashMap to immutable Map for the caller
     inputInfos.map(_.toMap).getOrElse(Map[Int, StreamInputInfo]())
-  }
 
   /** Cleanup the tracked input information older than threshold batch time */
-  def cleanup(batchThreshTime: Time): Unit = synchronized {
+  def cleanup(batchThreshTime: Time): Unit = synchronized
     val timesToCleanup = batchTimeToInputInfos.keys.filter(_ < batchThreshTime)
     logInfo(s"remove old batch metadata: ${timesToCleanup.mkString(" ")}")
     batchTimeToInputInfos --= timesToCleanup
-  }
-}

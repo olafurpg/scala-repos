@@ -44,7 +44,7 @@ private class ThresholdFailureDetector(
     nanoTime: () => Long = System.nanoTime,
     statsReceiver: StatsReceiver = NullStatsReceiver,
     implicit val timer: Timer = DefaultTimer.twitter)
-    extends FailureDetector {
+    extends FailureDetector
   require(windowSize > 0)
   private[this] val failureHandler =
     new MultiCategorizingExceptionStatsHandler()
@@ -63,31 +63,25 @@ private class ThresholdFailureDetector(
       Status.Busy)
 
   private[this] val onBusyTimeout: Throwable => Unit = x =>
-    x match {
+    x match
       case _: TimeoutException => markBusy()
       case _ =>
-  }
 
   def status: Status = state.get
 
-  private[this] def markBusy(): Unit = {
-    if (state.compareAndSet(Status.Open, Status.Busy)) {
+  private[this] def markBusy(): Unit =
+    if (state.compareAndSet(Status.Open, Status.Busy))
       busyCounter.incr()
-    }
-  }
 
-  private[this] def markOpen(): Unit = {
-    if (state.compareAndSet(Status.Busy, Status.Open)) {
+  private[this] def markOpen(): Unit =
+    if (state.compareAndSet(Status.Busy, Status.Open))
       revivalCounter.incr()
-    }
-  }
 
-  private[this] def markClosed(): Unit = {
+  private[this] def markClosed(): Unit =
     closeCounter.incr()
     state.set(Status.Closed)
-  }
 
-  private[this] def loop(): Future[Unit] = {
+  private[this] def loop(): Future[Unit] =
     pingCounter.incr()
     timestampNs = nanoTime()
     val p = ping()
@@ -97,7 +91,7 @@ private class ThresholdFailureDetector(
 
     p.within(busyTimeout).onFailure(onBusyTimeout)
 
-    p.within(closeTimeout).transform {
+    p.within(closeTimeout).transform
       case Return(_) =>
         val rtt = nanoTime() - timestampNs
         pingLatencyStat.add(rtt.toFloat / 1000)
@@ -108,15 +102,12 @@ private class ThresholdFailureDetector(
         failureHandler.record(statsReceiver, ex)
         markClosed()
         Future.exception(ex)
-    }
-  }
 
   // Note that we assume that the underlying ping() mechanism will
   // simply fail when the accrual detector is no longer required. If
   // ping can fail in other ways, and closeTimeout is not defined,
   // we may fail to do accrual (and indeed be forever stuck).
   loop()
-}
 
 /**
   * Maintains the maximum value over most recent `windowSize` elements of the stream, providing
@@ -124,34 +115,29 @@ private class ThresholdFailureDetector(
   *
   * @param windowSize the size of the window to keep track of
   */
-private[mux] class WindowedMax(windowSize: Int) {
+private[mux] class WindowedMax(windowSize: Int)
   @volatile private[this] var currentMax: Long = Long.MinValue
   private[this] val buf: Array[Long] = Array.fill(windowSize)(Long.MinValue)
   private[this] var index: Int = 0
 
   // Amortized 0(1)
-  def add(value: Long): Unit = synchronized {
-    if (value > currentMax) {
+  def add(value: Long): Unit = synchronized
+    if (value > currentMax)
       currentMax = value
-    }
 
     val prev = buf(index)
     buf(index) = value
     index = (index + 1) % windowSize
 
     // We should recalculate currentMax if it was evicted from the window.
-    if (prev == currentMax && currentMax != value) {
+    if (prev == currentMax && currentMax != value)
       var i = 0
       var nextMax = Long.MinValue
-      while (i < windowSize) {
+      while (i < windowSize)
         val v = buf(i)
         nextMax = math.max(nextMax, v)
         i = i + 1
-      }
       currentMax = nextMax
-    }
-  }
 
   // O(1)
   def get: Long = currentMax
-}

@@ -9,10 +9,10 @@ import com.twitter.scalding.macros.impl.{FieldsProviderImpl, TupleConverterImpl,
 import com.twitter.scalding.db.DBTypeDescriptor
 import com.twitter.scalding.db.macros._
 
-object DBTypeDescriptorImpl {
+object DBTypeDescriptorImpl
 
   def apply[T](c: Context)(
-      implicit T: c.WeakTypeTag[T]): c.Expr[DBTypeDescriptor[T]] = {
+      implicit T: c.WeakTypeTag[T]): c.Expr[DBTypeDescriptor[T]] =
     import c.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(c)(T.tpe))
@@ -39,5 +39,3 @@ object DBTypeDescriptorImpl {
     }
     """
     c.Expr[DBTypeDescriptor[T]](res)
-  }
-}

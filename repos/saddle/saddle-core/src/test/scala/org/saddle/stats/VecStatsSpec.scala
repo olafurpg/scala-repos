@@ -22,7 +22,7 @@ import org.saddle.scalar.NA
 /**
   * Hand-calculated tests
   */
-class VecStatsSpec extends Specification {
+class VecStatsSpec extends Specification
 
   val v1 = Vec[Double](1d, 2, 20, 23, 76, 12, -5, -27, 76, 67)
   val v1pos = Vec[Double](1d, 2, 20, 23, 76, 12, 76, 67)
@@ -31,64 +31,50 @@ class VecStatsSpec extends Specification {
   val v4 = Vec[Double](1d, 2, 20, 23, 56, 12)
   val v5 = Vec[Double](2d, 89, 23)
 
-  "compute mean of a vector" in {
+  "compute mean of a vector" in
     areClose(v1.mean, 24.5d)
-  }
 
-  "compute the median of a vector" in {
+  "compute the median of a vector" in
     areClose(v1.median, 16d)
-  }
 
-  "compute the geometric mean of a vector with positive elements" in {
+  "compute the geometric mean of a vector with positive elements" in
     areClose(v1pos.geomean, 15.9895, 1e-4)
-  }
 
-  "compute the sample variance of a vector" in {
+  "compute the sample variance of a vector" in
     areClose(v1.variance, 1318.9444, 1e-4)
-  }
 
-  "compute the sample standard deviation of a vector" in {
+  "compute the sample standard deviation of a vector" in
     areClose(v1.stdev, 36.3173, 1e-4)
-  }
 
-  "compute the sample skewness of a vector (unbiased)" in {
+  "compute the sample skewness of a vector (unbiased)" in
     areClose(v1.skew, 0.4676, 1e-4)
-  }
 
-  "compute the sample excess kurtosis of a vector (unbiased)" in {
+  "compute the sample excess kurtosis of a vector (unbiased)" in
     areClose(v1.kurt, -1.1138, 1e-4)
-  }
 
-  "find the maximum element of a vector" in {
+  "find the maximum element of a vector" in
     areClose(v1.max.get, 76d)
-  }
 
-  "find the minimum element of a vector" in {
+  "find the minimum element of a vector" in
     areClose(v1.min.get, -27d)
-  }
 
-  "find the sum of all elements in a vector" in {
+  "find the sum of all elements in a vector" in
     areClose(v1.sum, 245d)
-  }
 
-  "find the product of all elements in a vector" in {
+  "find the product of all elements in a vector" in
     areClose(v1.prod, 5.7677e11, 1e-4)
-  }
 
-  "Vector.median on an even vector is equivalent to the mean of the two center elements" in {
+  "Vector.median on an even vector is equivalent to the mean of the two center elements" in
     areClose(v4.median, (12 + 20) / 2d)
-  }
 
-  "Vector.geometricMean on a 3 element vector is equivalent to the cube root of the product of elements" in {
+  "Vector.geometricMean on a 3 element vector is equivalent to the cube root of the product of elements" in
     areClose(v5.geomean, math.cbrt(v5.foldLeft(1d)(_ * _)))
-  }
 
-  "Vector skew corner case works" in {
+  "Vector skew corner case works" in
     val vec = Vec[Double](-1d, 1000, -1000, 1)
     areClose(vec.skew, 0.0)
-  }
 
-  "Rank works" in {
+  "Rank works" in
     val vec = Vec[Double](1.0, 5.0, 4.0, 4.0, NA, 3.0)
 
     vec.rank(tie = stats.RankTie.Avg, ascending = true) must_==
@@ -114,9 +100,8 @@ class VecStatsSpec extends Specification {
 
     val vec3 = Vec(1d)
     vec3.rank() must_== vec3
-  }
 
-  "Percentile works" in {
+  "Percentile works" in
     val vec = Vec[Double](15d, 20, 35, 40, NA, 50)
     areClose(vec.percentile(40), 26.0)
 
@@ -144,5 +129,3 @@ class VecStatsSpec extends Specification {
     areClose(tst3.percentile(0, PctMethod.Excel), 0.0296, 1e-4)
     areClose(tst3.percentile(35, PctMethod.Excel), 0.4555, 1e-4)
     areClose(tst3.percentile(100, PctMethod.Excel), 0.8840, 1e-4)
-  }
-}

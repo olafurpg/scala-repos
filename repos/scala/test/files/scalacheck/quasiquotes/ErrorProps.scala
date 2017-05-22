@@ -1,6 +1,6 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 
-object ErrorProps extends QuasiquoteProperties("errors") {
+object ErrorProps extends QuasiquoteProperties("errors")
   property("can't extract two .. rankinalities in a row") = fails(
       "Can't extract with .. here",
       """
@@ -213,4 +213,3 @@ object ErrorProps extends QuasiquoteProperties("errors") {
 
   // // Make sure a nice error is reported in this case
   // { import Flag._; val mods = NoMods; q"lazy $mods val x: Int" }
-}

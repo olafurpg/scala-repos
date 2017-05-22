@@ -3,23 +3,20 @@ package scala.pickling.open.sum1
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, json._
 
-package outer {
-  abstract class Person {
+package outer
+  abstract class Person
     val name: String
     val age: Int
-  }
 
   case class Firefighter(val name: String, val age: Int, val since: Int)
       extends Person
 
-  package inner {
+  package inner
     case class Employee(val name: String, val age: Int, val salary: Int)
         extends Person
-  }
-}
 
-class OpenSum1Test extends FunSuite {
-  test("main") {
+class OpenSum1Test extends FunSuite
+  test("main")
     import outer._
 
     val f: Person = new Firefighter(
@@ -39,5 +36,3 @@ class OpenSum1Test extends FunSuite {
       |}
     """.stripMargin.trim)
     assert(pickle.unpickle[Person] === f)
-  }
-}

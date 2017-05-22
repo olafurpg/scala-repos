@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
   *  @since 2.8
   */
 trait GenericClassTagTraversableTemplate[+A, +CC[X] <: Traversable[X]]
-    extends HasNewBuilder[A, CC[A] @uncheckedVariance] {
+    extends HasNewBuilder[A, CC[A] @uncheckedVariance]
   implicit protected[this] val tag: ClassTag[A]
   def classTagCompanion: GenericClassTagCompanion[CC]
   def genericClassTagBuilder[B](implicit tag: ClassTag[B]): Builder[B, CC[B]] =
@@ -34,4 +34,3 @@ trait GenericClassTagTraversableTemplate[+A, +CC[X] <: Traversable[X]]
   def genericClassManifestBuilder[B](
       implicit manifest: ClassManifest[B]): Builder[B, CC[B]] =
     genericClassTagBuilder[B](manifest)
-}

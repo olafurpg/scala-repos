@@ -25,31 +25,26 @@ import scala.annotation.tailrec
  *              | ScalaPatterns
  */
 
-object ContentP {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ContentP
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val contentMarker = builder.mark()
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_DATA_CHARACTERS =>
         builder.advanceLexer()
       case _ =>
-    }
     @tailrec
-    def subparse() {
+    def subparse()
       var isReturn = false
       if (!CDSect.parse(builder) && !Comment.parse(builder) &&
           !PI.parse(builder) && !Reference.parse(builder) &&
           !ScalaPatterns.parse(builder) && !XmlPattern.parse(builder))
         isReturn = true
-      builder.getTokenType match {
+      builder.getTokenType match
         case ScalaXmlTokenTypes.XML_DATA_CHARACTERS =>
           builder.advanceLexer()
         case _ =>
           if (isReturn) return
-      }
       subparse()
-    }
     subparse()
     contentMarker.drop()
     true
-  }
-}

@@ -1,4 +1,4 @@
-object ExcludedPrefix1 {
+object ExcludedPrefix1
   case class Foo
 
   case object BLAH
@@ -20,4 +20,3 @@ object ExcludedPrefix1 {
   val (i, j) = (0, 0)
 
   val (k, l) = (0, 0)
-}

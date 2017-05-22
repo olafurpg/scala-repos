@@ -24,12 +24,11 @@ import scala.collection.Map
 
 // replace java's ridiculous log levels with the standard ones.
 sealed abstract class Level(val name: String, val value: Int)
-    extends javalog.Level(name, value) {
+    extends javalog.Level(name, value)
   // for java compat
   def get(): Level = this
-}
 
-object Level {
+object Level
   case object OFF extends Level("OFF", Int.MaxValue)
   case object FATAL extends Level("FATAL", 1000)
   case object CRITICAL extends Level("CRITICAL", 970)
@@ -54,7 +53,6 @@ object Level {
     * Get a `Level` by its name, or `None` if there is no match.
     */
   def parse(name: String): Option[Level] = AllLevels.find(_.name == name)
-}
 
 /**
   * Typically mixed into `Exceptions` to indicate what [[Level]]
@@ -62,16 +60,15 @@ object Level {
   *
   * @see Finagle's `com.twitter.finagle.Failure`.
   */
-trait HasLogLevel {
+trait HasLogLevel
   def logLevel: Level
-}
 
 class LoggingException(reason: String) extends Exception(reason)
 
 /**
   * Scala wrapper for logging.
   */
-class Logger protected (val name: String, private val wrapped: javalog.Logger) {
+class Logger protected (val name: String, private val wrapped: javalog.Logger)
   // wrapped methods:
   def addHandler(handler: javalog.Handler) = wrapped.addHandler(handler)
   def getFilter() = wrapped.getFilter()
@@ -86,14 +83,13 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
   def setLevel(level: javalog.Level) = wrapped.setLevel(level)
   def setUseParentHandlers(use: Boolean) = wrapped.setUseParentHandlers(use)
 
-  override def toString = {
+  override def toString =
     "<%s name='%s' level=%s handlers=%s use_parent=%s>".format(
         getClass.getName,
         name,
         getLevel(),
         getHandlers().toList.mkString("[", ", ", "]"),
         if (getUseParentHandlers()) "true" else "false")
-  }
 
   /**
     * Log a message, with sprintf formatting, at the desired level.
@@ -109,21 +105,18 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
     */
   @varargs
   final def log(
-      level: Level, thrown: Throwable, message: String, items: Any*) {
+      level: Level, thrown: Throwable, message: String, items: Any*)
     val myLevel = getLevel
-    if ((myLevel eq null) || (level.intValue >= myLevel.intValue)) {
+    if ((myLevel eq null) || (level.intValue >= myLevel.intValue))
 
       val record =
         if (items.size > 0)
           new LazyLogRecordUnformatted(level, message, items: _*)
         else new LogRecord(level, message)
       record.setLoggerName(wrapped.getName)
-      if (thrown ne null) {
+      if (thrown ne null)
         record.setThrown(thrown)
-      }
       wrapped.log(record)
-    }
-  }
 
   final def apply(level: Level, message: String, items: Any*) =
     log(level, message, items: _*)
@@ -183,17 +176,14 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
     * Log a message, with lazy (call-by-name) computation of the message,
     * and attach an exception and stack trace.
     */
-  def logLazy(level: Level, thrown: Throwable, message: => AnyRef): Unit = {
+  def logLazy(level: Level, thrown: Throwable, message: => AnyRef): Unit =
     val myLevel = getLevel
-    if ((myLevel eq null) || (level.intValue >= myLevel.intValue)) {
+    if ((myLevel eq null) || (level.intValue >= myLevel.intValue))
       val record = new LazyLogRecord(level, message)
       record.setLoggerName(wrapped.getName)
-      if (thrown ne null) {
+      if (thrown ne null)
         record.setThrown(thrown)
-      }
       wrapped.log(record)
-    }
-  }
 
   // convenience methods:
   def ifFatal(message: => AnyRef) = logLazy(Level.FATAL, message)
@@ -221,39 +211,34 @@ class Logger protected (val name: String, private val wrapped: javalog.Logger) {
   /**
     * Remove all existing log handlers.
     */
-  def clearHandlers() = {
+  def clearHandlers() =
     // some custom Logger implementations may return null from getHandlers
     val handlers = getHandlers()
-    if (handlers ne null) {
-      for (handler <- handlers) {
-        try {
+    if (handlers ne null)
+      for (handler <- handlers)
+        try
           handler.close()
-        } catch { case _: Throwable => () }
+        catch { case _: Throwable => () }
         removeHandler(handler)
-      }
-    }
-  }
-}
 
 object NullLogger
     extends Logger(
-        "null", {
+        "null",
           val jLog = javalog.Logger.getLogger("null")
           jLog.setLevel(Level.OFF)
           jLog
-        }
     )
 
-object Logger extends Iterable[Logger] {
+object Logger extends Iterable[Logger]
 
-  private[this] val levelNamesMap: Map[String, Level] = Level.AllLevels.map {
+  private[this] val levelNamesMap: Map[String, Level] = Level.AllLevels.map
     level =>
       level.name -> level
-  }.toMap
+  .toMap
 
-  private[this] val levelsMap: Map[Int, Level] = Level.AllLevels.map { level =>
+  private[this] val levelsMap: Map[Int, Level] = Level.AllLevels.map  level =>
     level.value -> level
-  }.toMap
+  .toMap
 
   // A cache of scala Logger objects by name.
   // Using a low concurrencyLevel (2), with the assumption that we aren't ever creating too
@@ -316,21 +301,18 @@ object Logger extends Iterable[Logger] {
     * INFO level and goes to the console (stderr). Any existing log
     * handlers are removed.
     */
-  def reset() = {
+  def reset() =
     clearHandlers()
     loggersCache.clear()
     root.addHandler(new ConsoleHandler(new Formatter(), None))
-  }
 
   /**
     * Remove all existing log handlers from all existing loggers.
     */
-  def clearHandlers() = {
-    foreach { logger =>
+  def clearHandlers() =
+    foreach  logger =>
       logger.clearHandlers()
       logger.setLevel(null)
-    }
-  }
 
   /**
     * Execute a block with a given set of handlers, reverting back to the original
@@ -343,7 +325,7 @@ object Logger extends Iterable[Logger] {
     * Execute a block with a given set of handlers, reverting back to the original
     * handlers upon completion.
     */
-  def withLazyLoggers(loggers: => List[Logger])(f: => Unit): Unit = {
+  def withLazyLoggers(loggers: => List[Logger])(f: => Unit): Unit =
     // Hold onto a local copy of loggerFactoryCache in case Logger.configure is called within f.
     val localLoggerFactoryCache = loggerFactoryCache
 
@@ -355,26 +337,22 @@ object Logger extends Iterable[Logger] {
     reset()
     loggerFactoryCache = localLoggerFactoryCache
     loggerFactoryCache.foreach { _ () }
-  }
 
   /**
     * Return a logger for the given package name. If one doesn't already
     * exist, a new logger will be created and returned.
     */
-  def get(name: String): Logger = {
-    loggersCache.get(name) match {
+  def get(name: String): Logger =
+    loggersCache.get(name) match
       case logger: Logger =>
         logger
       case null =>
         val logger = new Logger(name, javalog.Logger.getLogger(name))
         val oldLogger = loggersCache.putIfAbsent(name, logger)
-        if (oldLogger != null) {
+        if (oldLogger != null)
           oldLogger
-        } else {
+        else
           logger
-        }
-    }
-  }
 
   /** An alias for `get(name)` */
   def apply(name: String) = get(name)
@@ -393,13 +371,11 @@ object Logger extends Iterable[Logger] {
   /** An alias for `get()` */
   def apply() = get(2)
 
-  private def getForClassName(className: String) = {
-    if (className.endsWith("$")) {
+  private def getForClassName(className: String) =
+    if (className.endsWith("$"))
       get(className.substring(0, className.length - 1))
-    } else {
+    else
       get(className)
-    }
-  }
 
   /**
     * Return a logger for the package of the class given.
@@ -418,10 +394,8 @@ object Logger extends Iterable[Logger] {
     * Reset all the loggers and register new loggers
     * @note Only one logger is permitted per namespace
     */
-  def configure(loggerFactories: List[() => Logger]) {
+  def configure(loggerFactories: List[() => Logger])
     loggerFactoryCache = loggerFactories
 
     clearHandlers()
     loggerFactories.foreach { _ () }
-  }
-}

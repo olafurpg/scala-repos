@@ -38,7 +38,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/BorderRepeat.html javafx.scene.layout.BorderRepeat]].
   */
 object BorderRepeat
-    extends SFXEnumDelegateCompanion[jfxsl.BorderRepeat, BorderRepeat] {
+    extends SFXEnumDelegateCompanion[jfxsl.BorderRepeat, BorderRepeat]
 
   /**
     * The image is tiled (repeated) to fill the area. 
@@ -62,7 +62,6 @@ object BorderRepeat
 
   protected override def unsortedValues: Array[BorderRepeat] =
     Array(Repeat, Round, Space, Stretch)
-}
 
 sealed case class BorderRepeat(override val delegate: jfxsl.BorderRepeat)
     extends SFXEnumDelegate[jfxsl.BorderRepeat]

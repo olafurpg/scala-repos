@@ -9,14 +9,13 @@ import com.twitter.util.{Var, Activity}
   * a zk connect string like 'zk.foo.com:2181'.  Naming is performed by way of a
   * Resolver.
   */
-private[twitter] trait BaseServersetNamer extends Namer {
+private[twitter] trait BaseServersetNamer extends Namer
 
   /** Resolve a resolver string to a Var[Addr]. */
   protected[this] def resolve(spec: String): Var[Addr] =
-    Resolver.eval(spec) match {
+    Resolver.eval(spec) match
       case Name.Bound(addr) => addr
       case _ => Var.value(Addr.Neg)
-    }
 
   protected[this] def resolveServerset(hosts: String, path: String) =
     resolve(s"zk2!$hosts!$path")
@@ -32,21 +31,19 @@ private[twitter] trait BaseServersetNamer extends Namer {
   // risk of invalidating an otherwise valid tree when there is a bad serverset
   // on an Alt branch that would never be taken. A potential solution to this
   // conundrum is to introduce some form of lazy evaluation of name trees.
-  def lookup(path: Path): Activity[NameTree[Name]] = bind(path) match {
+  def lookup(path: Path): Activity[NameTree[Name]] = bind(path) match
     case Some(name) =>
       // We have to bind the name ourselves in order to know whether
       // it resolves negatively.
       Activity(
-          name.addr map {
+          name.addr map
         case Addr.Bound(_, _) => Activity.Ok(NameTree.Leaf(name))
         case Addr.Neg => Activity.Ok(NameTree.Neg)
         case Addr.Pending => Activity.Pending
         case Addr.Failed(exc) => Activity.Failed(exc)
-      })
+      )
 
     case None => Activity.value(NameTree.Neg)
-  }
-}
 
 /**
   * The serverset namer takes [[com.twitter.finagle.Path Paths]] of the form
@@ -68,20 +65,19 @@ private[twitter] trait BaseServersetNamer extends Namer {
   * is the endpoint `http` of serverset `/twitter/service/cuckoo/prod/read` on
   * the ensemble `sdzookeeper.local.twitter.com:2181`.
   */
-class serverset extends BaseServersetNamer {
+class serverset extends BaseServersetNamer
   private[this] val idPrefix = Path.Utf8("$", "com.twitter.serverset")
 
-  protected[this] def bind(path: Path): Option[Name.Bound] = path match {
+  protected[this] def bind(path: Path): Option[Name.Bound] = path match
     case Path.Utf8(hosts, rest @ _ *) =>
       val addr =
-        if (rest.nonEmpty && (rest.last contains ":")) {
+        if (rest.nonEmpty && (rest.last contains ":"))
           val Array(name, endpoint) = rest.last.split(":", 2)
           val zkPath = (rest.init :+ name).mkString("/", "/", "")
           resolveServerset(hosts, zkPath, endpoint)
-        } else {
+        else
           val zkPath = rest.mkString("/", "/", "")
           resolveServerset(hosts, zkPath)
-        }
 
       // Clients may depend on Name.Bound ids being Paths which resolve
       // back to the same Name.Bound
@@ -89,5 +85,3 @@ class serverset extends BaseServersetNamer {
       Some(Name.Bound(addr, id))
 
     case _ => None
-  }
-}

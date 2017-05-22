@@ -12,19 +12,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScLiteral
   */
 class ScalaStringContextType
     extends TemplateContextType(
-        "SCALA_STRING", "String", classOf[ScalaLiveTemplateContextType]) {
+        "SCALA_STRING", "String", classOf[ScalaLiveTemplateContextType])
   override def isInContext(file: PsiFile, offset: Int): Boolean =
     ScalaStringContextType.isInContext(file, offset)
-}
 
-object ScalaStringContextType {
-  def isInContext(file: PsiFile, offset: Int): Boolean = {
+object ScalaStringContextType
+  def isInContext(file: PsiFile, offset: Int): Boolean =
     if (!file.isInstanceOf[ScalaFile]) return false
     val element = file.findElementAt(offset)
-    PsiTreeUtil.getParentOfType(element, classOf[ScLiteral]) match {
+    PsiTreeUtil.getParentOfType(element, classOf[ScLiteral]) match
       case literal: ScLiteral =>
         literal.isString
       case _ => false
-    }
-  }
-}

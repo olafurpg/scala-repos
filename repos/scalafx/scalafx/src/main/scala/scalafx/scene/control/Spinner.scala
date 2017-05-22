@@ -35,7 +35,7 @@ import scalafx.beans.property.{BooleanProperty, ObjectProperty, ReadOnlyObjectPr
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object Spinner {
+object Spinner
 
   implicit def sfxSpinner2jfx[T](v: Spinner[T]): jfxsc.Spinner[T] =
     if (v != null) v.delegate else null
@@ -59,7 +59,6 @@ object Spinner {
   /** The decrement arrow is placed on the left of the Spinner, and the increment on the right. */
   val StyleClassSplitArrowsHorizontal =
     jfxsc.Spinner.STYLE_CLASS_SPLIT_ARROWS_HORIZONTAL
-}
 
 /**
   * A single line text field that lets the user select a number or an object
@@ -74,7 +73,7 @@ object Spinner {
   */
 class Spinner[T](
     override val delegate: jfxsc.Spinner[T] = new jfxsc.Spinner[T])
-    extends Control(delegate) with SFXDelegate[jfxsc.Spinner[T]] {
+    extends Control(delegate) with SFXDelegate[jfxsc.Spinner[T]]
 
   /**
     * Creates a Spinner instance with the value factory set to be an instance
@@ -88,9 +87,8 @@ class Spinner[T](
     *                     be within the bounds of the min and max arguments, or
     *                     else the min value will be used.
     */
-  def this(min: Int, max: Int, initialValue: Int) {
+  def this(min: Int, max: Int, initialValue: Int)
     this(new jfxsc.Spinner[T](min, max, initialValue))
-  }
 
   /**
     * Creates a Spinner instance with the value factory set to be an instance
@@ -105,9 +103,8 @@ class Spinner[T](
     *                     else the min value will be used.
     * @param amountToStepBy The amount to increment or decrement by, per step.
     */
-  def this(min: Int, max: Int, initialValue: Int, amountToStepBy: Int) {
+  def this(min: Int, max: Int, initialValue: Int, amountToStepBy: Int)
     this(new jfxsc.Spinner[T](min, max, initialValue, amountToStepBy))
-  }
 
   /**
     * Creates a Spinner instance with the value factory set to be an instance
@@ -121,9 +118,8 @@ class Spinner[T](
     *                     be within the bounds of the min and max arguments, or
     *                     else the min value will be used.
     */
-  def this(min: Double, max: Double, initialValue: Double) {
+  def this(min: Double, max: Double, initialValue: Double)
     this(new jfxsc.Spinner[T](min, max, initialValue))
-  }
 
   /**
     * Creates a Spinner instance with the value factory set to be an instance
@@ -139,9 +135,8 @@ class Spinner[T](
     * @param amountToStepBy The amount to increment or decrement by, per step.
     */
   def this(
-      min: Double, max: Double, initialValue: Double, amountToStepBy: Double) {
+      min: Double, max: Double, initialValue: Double, amountToStepBy: Double)
     this(new jfxsc.Spinner[T](min, max, initialValue, amountToStepBy))
-  }
 
   /**
     * Creates a Spinner instance with the value factory set to be an instance
@@ -151,18 +146,16 @@ class Spinner[T](
     *
     * @param items A list of items that will be stepped through in the Spinner.
     */
-  def this(items: ObservableBuffer[T]) {
+  def this(items: ObservableBuffer[T])
     this(new jfxsc.Spinner[T](items))
-  }
 
   /**
     * Creates a Spinner instance with the given value factory set.
     *
     * @param valueFactory The value factory to use.
     */
-  def this(valueFactory: SpinnerValueFactory[T]) {
+  def this(valueFactory: SpinnerValueFactory[T])
     this(new jfxsc.Spinner[T](valueFactory.delegate))
-  }
 
   /**
     * The value property on Spinner is a read-only property, as it is bound to
@@ -188,9 +181,8 @@ class Spinner[T](
     */
   def valueFactory: ObjectProperty[jfxsc.SpinnerValueFactory[T]] =
     delegate.valueFactoryProperty()
-  def valueFactory_=(value: SpinnerValueFactory[T]) {
+  def valueFactory_=(value: SpinnerValueFactory[T])
     valueFactory() = value
-  }
 
   /**
     * The editable property is used to specify whether user input is able to
@@ -204,10 +196,8 @@ class Spinner[T](
     * will need to react accordingly and back out this change.
     */
   def editable: BooleanProperty = delegate.editableProperty()
-  def editable_=(value: Boolean): Unit = {
+  def editable_=(value: Boolean): Unit =
     editable() = value
-  }
 
   def editor: ReadOnlyObjectProperty[jfxsc.TextField] =
     delegate.editorProperty()
-}

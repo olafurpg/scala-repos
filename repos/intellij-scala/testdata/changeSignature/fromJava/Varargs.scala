@@ -1,4 +1,4 @@
-class VarargsTest extends Varargs {
+class VarargsTest extends Varargs
   override def foo(i: Int, strs: String*) {}
 
   super.foo(1)
@@ -12,4 +12,3 @@ class VarargsTest extends Varargs {
   foo(i = 1, "2", "3")
   foo(strs = "2", i = 1)
   this foo (i = 1, "2", "3")
-}

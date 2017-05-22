@@ -27,7 +27,7 @@ package common
   * As an example, this trait defines the principal contract for function objects
   * that wrap the processing of HTTP requests in Lift.
   */
-trait CommonLoanWrapper {
+trait CommonLoanWrapper
 
   /**
     * Implementations of this method may either call `f` to continue processing
@@ -37,9 +37,8 @@ trait CommonLoanWrapper {
     * @param f the delegate which provides processing by the underlying framework
     */
   def apply[T](f: => T): T
-}
 
-object CommonLoanWrapper {
+object CommonLoanWrapper
 
   /**
     * If you have a `List` of `LoanWrapper`s, apply them and then the
@@ -59,8 +58,6 @@ object CommonLoanWrapper {
     * inside a transaction.
     */
   def apply[T, LWT <: CommonLoanWrapper](lst: List[LWT])(f: => T): T =
-    lst match {
+    lst match
       case Nil => f
       case x :: xs => x.apply(this.apply(xs)(f))
-    }
-}

@@ -23,7 +23,7 @@ import akka.dispatch.Dispatchers
   * A system also implements the [[ActorRef]] type, and sending a message to
   * the system directs that message to the root Actor.
   */
-abstract class ActorSystem[-T](_name: String) extends ActorRef[T] {
+abstract class ActorSystem[-T](_name: String) extends ActorRef[T]
   this: ScalaActorRef[T] ⇒
 
   /**
@@ -120,19 +120,17 @@ abstract class ActorSystem[-T](_name: String) extends ActorRef[T] {
     */
   def deadLetters[U]: ActorRef[U] = deadLetterRef
   lazy private val deadLetterRef = ActorRef[Any](untyped.deadLetters)
-}
 
-object ActorSystem {
+object ActorSystem
   private class Impl[T](_name: String,
                         _config: Config,
                         _cl: ClassLoader,
                         _ec: Option[ExecutionContext],
                         _p: Props[T])
-      extends ActorSystem[T](_name) with ScalaActorRef[T] {
+      extends ActorSystem[T](_name) with ScalaActorRef[T]
     override private[akka] val untyped: ExtendedActorSystem =
       new ActorSystemImpl(_name, _config, _cl, _ec, Some(Props.untyped(_p)))
         .start()
-  }
 
   private class Wrapper(val untyped: ExtendedActorSystem)
       extends ActorSystem[Nothing](untyped.name) with ScalaActorRef[Nothing]
@@ -142,12 +140,10 @@ object ActorSystem {
       guardianProps: Props[T],
       config: Option[Config] = None,
       classLoader: Option[ClassLoader] = None,
-      executionContext: Option[ExecutionContext] = None): ActorSystem[T] = {
+      executionContext: Option[ExecutionContext] = None): ActorSystem[T] =
     val cl = classLoader.getOrElse(akka.actor.ActorSystem.findClassLoader())
     val appConfig = config.getOrElse(ConfigFactory.load(cl))
     new Impl(name, appConfig, cl, executionContext, guardianProps)
-  }
 
   def apply(untyped: akka.actor.ActorSystem): ActorSystem[Nothing] =
     new Wrapper(untyped.asInstanceOf[ExtendedActorSystem])
-}

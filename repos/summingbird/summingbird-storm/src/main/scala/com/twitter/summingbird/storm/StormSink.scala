@@ -21,28 +21,23 @@ import com.twitter.storehaus.{Store, ReadableStore, WritableStore}
 
 import com.twitter.summingbird.online._
 
-trait StormSink[-T] extends java.io.Serializable {
+trait StormSink[-T] extends java.io.Serializable
   def toFn: T => Future[Unit]
-}
 
-class SinkFn[T](fn: => T => Future[Unit]) extends StormSink[T] {
+class SinkFn[T](fn: => T => Future[Unit]) extends StormSink[T]
   lazy val toFn = fn
-}
 
 class WritableStoreSink[K, V](writable: => WritableStore[K, V])
-    extends StormSink[(K, V)] {
+    extends StormSink[(K, V)]
   private lazy val store = writable // only construct it once
   def toFn = store.put(_)
-}
 
 /**
   * Used to do leftJoins of streams against other streams
   */
 class StormBuffer[K, V](supplier: => Store[K, V])
-    extends StormSink[(K, V)] with OnlineServiceFactory[K, V] {
+    extends StormSink[(K, V)] with OnlineServiceFactory[K, V]
   private lazy val constructed = supplier // only construct it once
-  def toFn = { (kv: (K, V)) =>
+  def toFn =  (kv: (K, V)) =>
     constructed.put((kv._1, Some(kv._2)))
-  }
   def serviceStore: () => ReadableStore[K, V] = () => constructed
-}

@@ -11,7 +11,7 @@ import org.scalatest.WordSpec
 import org.apache.parquet.filter2.predicate.FilterApi._
 import org.apache.parquet.filter2.predicate.{FilterApi, FilterPredicate}
 
-abstract class ParquetSourcesTestsBase extends WordSpec {
+abstract class ParquetSourcesTestsBase extends WordSpec
 
   val dateRange = DateRange(RichDate(0L), RichDate(0L))
   val path = "/a/path"
@@ -19,150 +19,132 @@ abstract class ParquetSourcesTestsBase extends WordSpec {
   val fields = new Fields("foo", "bar")
   val columnStrings = Set("a", "b", "c")
 
-  def testDefaultFilter[S <: Source with HasFilterPredicate](src: S) = {
-    "default to no filter predicate" in {
+  def testDefaultFilter[S <: Source with HasFilterPredicate](src: S) =
+    "default to no filter predicate" in
       assert(src.withFilter === None)
-    }
-  }
 
-  def testReturnProvidedFilter[S <: Source with HasFilterPredicate](src: S) = {
-    "return the provided filter" in {
+  def testReturnProvidedFilter[S <: Source with HasFilterPredicate](src: S) =
+    "return the provided filter" in
       assert(src.withFilter === Some(filter1))
-    }
-  }
 
-  def testDefaultColumns[S <: Source with HasColumnProjection](src: S) = {
-    "default to no column projection" in {
+  def testDefaultColumns[S <: Source with HasColumnProjection](src: S) =
+    "default to no column projection" in
       assert(src.columnProjectionString === None)
       assert(src.withColumns === Set())
       assert(src.withColumnProjections === Set())
-    }
-  }
 
   def testReturnProvidedColumns[S <: Source with HasColumnProjection](
-      src: S, expected: ColumnProjectionString) = {
-    "return the provided columns " + expected in {
+      src: S, expected: ColumnProjectionString) =
+    "return the provided columns " + expected in
       assert(src.columnProjectionString.get === expected)
-    }
 
-    "correctly format globs into parquet's expected format " + expected in {
+    "correctly format globs into parquet's expected format " + expected in
       verifyParquetStringFormat(
           src.columnProjectionString.get.asSemicolonString,
           expected.globStrings)
-    }
-  }
 
-  private def verifyParquetStringFormat(s: String, expected: Set[String]) = {
+  private def verifyParquetStringFormat(s: String, expected: Set[String]) =
     assert(s.split(";").toSet === expected)
-  }
-}
 
-class ParquetSourcesTests extends ParquetSourcesTestsBase {
+class ParquetSourcesTests extends ParquetSourcesTestsBase
 
-  "DailySuffixParquetThrift" should {
+  "DailySuffixParquetThrift" should
     val default = new DailySuffixParquetThrift[MockTBase](path, dateRange)
 
     testDefaultFilter(default)
 
     testReturnProvidedFilter(
-        new DailySuffixParquetThrift[MockTBase](path, dateRange) {
+        new DailySuffixParquetThrift[MockTBase](path, dateRange)
       override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+    )
 
     testDefaultColumns(default)
 
     testReturnProvidedColumns(
-        new DailySuffixParquetThrift[MockTBase](path, dateRange) {
+        new DailySuffixParquetThrift[MockTBase](path, dateRange)
       override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+    , DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
-        new DailySuffixParquetThrift[MockTBase](path, dateRange) {
+        new DailySuffixParquetThrift[MockTBase](path, dateRange)
       override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
-  }
+    , StrictColumnProjectionString(columnStrings))
 
-  "HourlySuffixParquetThrift" should {
+  "HourlySuffixParquetThrift" should
     val default = new HourlySuffixParquetThrift[MockTBase](path, dateRange)
 
     testDefaultFilter(default)
 
     testReturnProvidedFilter(
-        new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
+        new HourlySuffixParquetThrift[MockTBase](path, dateRange)
       override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+    )
 
     testDefaultColumns(default)
 
     testReturnProvidedColumns(
-        new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
+        new HourlySuffixParquetThrift[MockTBase](path, dateRange)
       override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+    , DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
-        new HourlySuffixParquetThrift[MockTBase](path, dateRange) {
+        new HourlySuffixParquetThrift[MockTBase](path, dateRange)
       override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
-  }
+    , StrictColumnProjectionString(columnStrings))
 
-  "FixedPathParquetThrift" should {
+  "FixedPathParquetThrift" should
     val default = new FixedPathParquetThrift[MockTBase](path, path, path)
 
     testDefaultFilter(default)
 
     testReturnProvidedFilter(
-        new FixedPathParquetThrift[MockTBase](path, path, path) {
+        new FixedPathParquetThrift[MockTBase](path, path, path)
       override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
+    )
 
     testDefaultColumns(default)
 
     testReturnProvidedColumns(
-        new FixedPathParquetThrift[MockTBase](path, path, path) {
+        new FixedPathParquetThrift[MockTBase](path, path, path)
       override def withColumns: Set[String] = columnStrings
-    }, DeprecatedColumnProjectionString(columnStrings))
+    , DeprecatedColumnProjectionString(columnStrings))
 
     testReturnProvidedColumns(
-        new FixedPathParquetThrift[MockTBase](path, path, path) {
+        new FixedPathParquetThrift[MockTBase](path, path, path)
       override def withColumnProjections: Set[String] = columnStrings
-    }, StrictColumnProjectionString(columnStrings))
-  }
+    , StrictColumnProjectionString(columnStrings))
 
-  "DailySuffixParquetTuple" should {
+  "DailySuffixParquetTuple" should
     val default = new DailySuffixParquetTuple(path, dateRange, fields)
 
     testDefaultFilter(default)
 
     testReturnProvidedFilter(
-        new DailySuffixParquetTuple(path, dateRange, fields) {
+        new DailySuffixParquetTuple(path, dateRange, fields)
       override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
-  }
+    )
 
-  "HourlySuffixParquetTuple" should {
+  "HourlySuffixParquetTuple" should
     val default = new HourlySuffixParquetTuple(path, dateRange, fields)
 
     testDefaultFilter(default)
 
     testReturnProvidedFilter(
-        new HourlySuffixParquetTuple(path, dateRange, fields) {
+        new HourlySuffixParquetTuple(path, dateRange, fields)
       override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
-  }
+    )
 
-  "FixedPathParquetTuple" should {
+  "FixedPathParquetTuple" should
     val default = new FixedPathParquetTuple(fields, path, path, path)
 
     testDefaultFilter(default)
 
     testReturnProvidedFilter(
-        new FixedPathParquetTuple(fields, path, path, path) {
+        new FixedPathParquetTuple(fields, path, path, path)
       override val withFilter: Option[FilterPredicate] = Some(filter1)
-    })
-  }
-}
+    )
 
-class MockTBase extends TBase[MockTBase, TFieldIdEnum] {
+class MockTBase extends TBase[MockTBase, TFieldIdEnum]
   override def read(p1: TProtocol): Unit = ()
   override def write(p1: TProtocol): Unit = ()
   override def fieldForId(p1: Int): TFieldIdEnum = null
@@ -172,4 +154,3 @@ class MockTBase extends TBase[MockTBase, TFieldIdEnum] {
   override def deepCopy(): TBase[MockTBase, TFieldIdEnum] = null
   override def clear(): Unit = ()
   override def compareTo(o: MockTBase): Int = 0
-}

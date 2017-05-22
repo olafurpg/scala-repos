@@ -19,34 +19,31 @@ import org.scalatest.{Matchers, WordSpec}
 
 import com.twitter.scalding._
 
-private[typed] object LongIntPacker {
+private[typed] object LongIntPacker
   def lr(l: Int, r: Int): Long = (l.toLong << 32) | r
   def l(rowCol: Long) = (rowCol >>> 32).toInt
   def r(rowCol: Long) = (rowCol & 0xFFFFFFFF).toInt
-}
 
-class MutatedSourceJob(args: Args) extends Job(args) {
+class MutatedSourceJob(args: Args) extends Job(args)
   import com.twitter.bijection._
-  implicit val bij = new AbstractBijection[Long, (Int, Int)] {
+  implicit val bij = new AbstractBijection[Long, (Int, Int)]
     override def apply(x: Long) = (LongIntPacker.l(x), LongIntPacker.r(x))
     override def invert(y: (Int, Int)) = LongIntPacker.lr(y._1, y._2)
-  }
 
   val in0: TypedPipe[(Int, Int)] =
     TypedPipe.from(BijectedSourceSink(TypedTsv[Long]("input0")))
 
-  in0.map { tup: (Int, Int) =>
+  in0.map  tup: (Int, Int) =>
     (tup._1 * 2, tup._2 * 2)
-  }.write(BijectedSourceSink(TypedTsv[Long]("output")))
-}
+  .write(BijectedSourceSink(TypedTsv[Long]("output")))
 
-class MutatedSourceTest extends WordSpec with Matchers {
+class MutatedSourceTest extends WordSpec with Matchers
   import Dsl._
-  "A MutatedSourceJob" should {
-    "Not throw when using a converted source" in {
+  "A MutatedSourceJob" should
+    "Not throw when using a converted source" in
       JobTest(new MutatedSourceJob(_))
         .source(TypedTsv[Long]("input0"), List(8L, 4123423431L, 12L))
-        .typedSink(TypedTsv[Long]("output")) { outBuf =>
+        .typedSink(TypedTsv[Long]("output"))  outBuf =>
           val unordered = outBuf.toSet
           // Size should be unchanged
           unordered should have size 3
@@ -58,32 +55,27 @@ class MutatedSourceTest extends WordSpec with Matchers {
           val newBig = LongIntPacker.lr(LongIntPacker.l(big) * 2,
                                         LongIntPacker.r(big) * 2)
           unordered should contain(newBig)
-        }
         .run
         .runHadoop
         .finish
-    }
-  }
-}
 
-class ContraMappedAndThenSourceJob(args: Args) extends Job(args) {
+class ContraMappedAndThenSourceJob(args: Args) extends Job(args)
   TypedPipe
-    .from(TypedTsv[Long]("input0").andThen { x =>
+    .from(TypedTsv[Long]("input0").andThen  x =>
       (LongIntPacker.l(x), LongIntPacker.r(x))
-    })
+    )
     .map { case (l, r) => (l * 2, r * 2) }
-    .write(TypedTsv[Long]("output").contraMap {
+    .write(TypedTsv[Long]("output").contraMap
       case (l, r) => LongIntPacker.lr(l, r)
-    })
-}
+    )
 
-class ContraMappedAndThenSourceTest extends WordSpec with Matchers {
+class ContraMappedAndThenSourceTest extends WordSpec with Matchers
   import Dsl._
-  "A ContraMappedAndThenSourceJob" should {
-    "Not throw when using a converted source" in {
+  "A ContraMappedAndThenSourceJob" should
+    "Not throw when using a converted source" in
       JobTest(new ContraMappedAndThenSourceJob(_))
         .source(TypedTsv[Long]("input0"), List(8L, 4123423431L, 12L))
-        .typedSink(TypedTsv[Long]("output")) { outBuf =>
+        .typedSink(TypedTsv[Long]("output"))  outBuf =>
           val unordered = outBuf.toSet
           // Size should be unchanged
           unordered should have size 3
@@ -95,10 +87,6 @@ class ContraMappedAndThenSourceTest extends WordSpec with Matchers {
           val newBig = LongIntPacker.lr(LongIntPacker.l(big) * 2,
                                         LongIntPacker.r(big) * 2)
           unordered should contain(newBig)
-        }
         .run
         .runHadoop
         .finish
-    }
-  }
-}

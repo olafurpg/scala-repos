@@ -14,7 +14,7 @@ import scala.util.control.NonFatal
 /**
   * INTERNAL API
   */
-private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
+private[io] trait WithUdpSend  me: Actor with ActorLogging ⇒
 
   private var pendingSend: Send = null
   private var pendingCommander: ActorRef = null
@@ -29,7 +29,7 @@ private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
 
   import settings._
 
-  def sendHandlers(registration: ChannelRegistration): Receive = {
+  def sendHandlers(registration: ChannelRegistration): Receive =
     case send: Send if hasWritePending ⇒
       if (TraceLogging) log.debug("Dropping write because queue is full")
       sender() ! CommandFailed(send)
@@ -40,14 +40,14 @@ private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
     case send: Send ⇒
       pendingSend = send
       pendingCommander = sender()
-      if (send.target.isUnresolved) {
-        Dns.resolve(send.target.getHostName)(context.system, self) match {
+      if (send.target.isUnresolved)
+        Dns.resolve(send.target.getHostName)(context.system, self) match
           case Some(r) ⇒
-            try {
+            try
               pendingSend = pendingSend.copy(target = new InetSocketAddress(
                         r.addr, pendingSend.target.getPort))
               doSend(registration)
-            } catch {
+            catch
               case NonFatal(e) ⇒
                 sender() ! CommandFailed(send)
                 log.debug(
@@ -57,19 +57,15 @@ private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
                 retriedSend = false
                 pendingSend = null
                 pendingCommander = null
-            }
           case None ⇒
-        }
-      } else {
+      else
         doSend(registration)
-      }
 
     case ChannelWritable ⇒ if (hasWritePending) doSend(registration)
-  }
 
-  private def doSend(registration: ChannelRegistration): Unit = {
+  private def doSend(registration: ChannelRegistration): Unit =
     val buffer = udp.bufferPool.acquire()
-    try {
+    try
       buffer.clear()
       pendingSend.payload.copyToBuffer(buffer)
       buffer.flip()
@@ -77,24 +73,19 @@ private[io] trait WithUdpSend { me: Actor with ActorLogging ⇒
       if (TraceLogging) log.debug("Wrote [{}] bytes to channel", writtenBytes)
 
       // Datagram channel either sends the whole message, or nothing
-      if (writtenBytes == 0) {
-        if (retriedSend) {
+      if (writtenBytes == 0)
+        if (retriedSend)
           pendingCommander ! CommandFailed(pendingSend)
           retriedSend = false
           pendingSend = null
           pendingCommander = null
-        } else {
+        else
           registration.enableInterest(SelectionKey.OP_WRITE)
           retriedSend = true
-        }
-      } else {
+      else
         if (pendingSend.wantsAck) pendingCommander ! pendingSend.ack
         retriedSend = false
         pendingSend = null
         pendingCommander = null
-      }
-    } finally {
+    finally
       udp.bufferPool.release(buffer)
-    }
-  }
-}

@@ -1,6 +1,4 @@
-object warney {
-  def foo = {
+object warney
+  def foo =
     0
     0
-  }
-}

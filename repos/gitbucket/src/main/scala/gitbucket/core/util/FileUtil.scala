@@ -6,25 +6,20 @@ import java.io.File
 import ControlUtil._
 import scala.util.Random
 
-object FileUtil {
+object FileUtil
 
   def getMimeType(name: String): String =
-    defining(new Tika()) { tika =>
-      tika.detect(name) match {
+    defining(new Tika())  tika =>
+      tika.detect(name) match
         case null => "application/octet-stream"
         case mimeType => mimeType
-      }
-    }
 
-  def getContentType(name: String, bytes: Array[Byte]): String = {
-    defining(getMimeType(name)) { mimeType =>
-      if (mimeType == "application/octet-stream" && isText(bytes)) {
+  def getContentType(name: String, bytes: Array[Byte]): String =
+    defining(getMimeType(name))  mimeType =>
+      if (mimeType == "application/octet-stream" && isText(bytes))
         "text/plain"
-      } else {
+      else
         mimeType
-      }
-    }
-  }
 
   def isImage(name: String): Boolean = getMimeType(name).startsWith("image/")
 
@@ -39,21 +34,17 @@ object FileUtil {
     System.currentTimeMillis + Random.alphanumeric.take(10).mkString
 
   def getExtension(name: String): String =
-    name.lastIndexOf('.') match {
+    name.lastIndexOf('.') match
       case i if (i >= 0) => name.substring(i + 1)
       case _ => ""
-    }
 
-  def withTmpDir[A](dir: File)(action: File => A): A = {
-    if (dir.exists()) {
+  def withTmpDir[A](dir: File)(action: File => A): A =
+    if (dir.exists())
       FileUtils.deleteDirectory(dir)
-    }
-    try {
+    try
       action(dir)
-    } finally {
+    finally
       FileUtils.deleteDirectory(dir)
-    }
-  }
 
   val mimeTypeWhiteList: Array[String] = Array(
       "application/pdf",
@@ -64,4 +55,3 @@ object FileUtil {
       "image/jpeg",
       "image/png",
       "text/plain")
-}

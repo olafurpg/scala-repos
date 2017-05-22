@@ -1,7 +1,7 @@
 package org.scalatra
 
-package object swagger {
-  object Symbols {
+package object swagger
+  object Symbols
     val Summary = Symbol("swagger.summary")
     val Notes = Symbol("swagger.notes")
     val Nickname = Symbol("swagger.nickname")
@@ -26,9 +26,8 @@ package object swagger {
                          Description,
                          Consumes,
                          Produces)
-  }
 
-  object annotations {
+  object annotations
     import scala.annotation.meta.field
 
     @deprecated(
@@ -46,5 +45,3 @@ package object swagger {
         "In swagger spec 1.2 this was replaced with org.scalatra.swagger.ResponseMessage",
         "2.2.2")
     type Error = org.scalatra.swagger.ResponseMessage[String]
-  }
-}

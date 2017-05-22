@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   println(new A_1.Inner())
 
   // Accessing foo or Deeper triggers the error of SI-9111.
@@ -7,4 +7,3 @@ object Test extends App {
 
   // println(i.foo(null))
   // new i.Deeper()
-}

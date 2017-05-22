@@ -37,23 +37,20 @@ import scala.concurrent.duration._
 
 case class DashboardConfig(ip: String = "localhost", port: Int = 9000)
 
-object Dashboard extends Logging with SSLConfiguration {
-  def main(args: Array[String]): Unit = {
-    val parser = new scopt.OptionParser[DashboardConfig]("Dashboard") {
-      opt[String]("ip") action { (x, c) =>
+object Dashboard extends Logging with SSLConfiguration
+  def main(args: Array[String]): Unit =
+    val parser = new scopt.OptionParser[DashboardConfig]("Dashboard")
+      opt[String]("ip") action  (x, c) =>
         c.copy(ip = x)
-      } text ("IP to bind to (default: localhost).")
-      opt[Int]("port") action { (x, c) =>
+      text ("IP to bind to (default: localhost).")
+      opt[Int]("port") action  (x, c) =>
         c.copy(port = x)
-      } text ("Port to bind to (default: 9000).")
-    }
+      text ("Port to bind to (default: 9000).")
 
-    parser.parse(args, DashboardConfig()) map { dc =>
+    parser.parse(args, DashboardConfig()) map  dc =>
       createDashboard(dc)
-    }
-  }
 
-  def createDashboard(dc: DashboardConfig): Unit = {
+  def createDashboard(dc: DashboardConfig): Unit =
     implicit val system = ActorSystem("pio-dashboard")
     val service =
       system.actorOf(Props(classOf[DashboardActor], dc), "dashboard")
@@ -64,17 +61,14 @@ object Dashboard extends Logging with SSLConfiguration {
                          port = dc.port,
                          settings = Some(settings.copy(sslEncryption = true)))
     system.awaitTermination
-  }
-}
 
 class DashboardActor(val dc: DashboardConfig)
-    extends Actor with DashboardService {
+    extends Actor with DashboardService
   def actorRefFactory: ActorContext = context
   def receive: Actor.Receive = runRoute(dashboardRoute)
-}
 
 trait DashboardService
-    extends HttpService with KeyAuthentication with CORSSupport {
+    extends HttpService with KeyAuthentication with CORSSupport
 
   implicit def executionContext: ExecutionContext = actorRefFactory.dispatcher
   val dc: DashboardConfig
@@ -82,11 +76,11 @@ trait DashboardService
   val pioEnvVars = sys.env.filter(kv => kv._1.startsWith("PIO_"))
   val serverStartTime = DateTime.now
   val dashboardRoute =
-    path("") {
-      authenticate(withAccessKeyFromFile) { request =>
-        get {
-          respondWithMediaType(`text/html`) {
-            complete {
+    path("")
+      authenticate(withAccessKeyFromFile)  request =>
+        get
+          respondWithMediaType(`text/html`)
+            complete
               val completedInstances = evaluationInstances.getCompleted
               html
                 .index(dc,
@@ -94,55 +88,35 @@ trait DashboardService
                        pioEnvVars,
                        completedInstances)
                 .toString
-            }
-          }
-        }
-      }
-    } ~ pathPrefix("engine_instances" / Segment) { instanceId =>
-      path("evaluator_results.txt") {
-        get {
-          respondWithMediaType(`text/plain`) {
-            evaluationInstances.get(instanceId).map { i =>
+    ~ pathPrefix("engine_instances" / Segment)  instanceId =>
+      path("evaluator_results.txt")
+        get
+          respondWithMediaType(`text/plain`)
+            evaluationInstances.get(instanceId).map  i =>
               complete(i.evaluatorResults)
-            } getOrElse {
+            getOrElse
               complete(StatusCodes.NotFound)
-            }
-          }
-        }
-      } ~ path("evaluator_results.html") {
-        get {
-          respondWithMediaType(`text/html`) {
-            evaluationInstances.get(instanceId).map { i =>
+      ~ path("evaluator_results.html")
+        get
+          respondWithMediaType(`text/html`)
+            evaluationInstances.get(instanceId).map  i =>
               complete(i.evaluatorResultsHTML)
-            } getOrElse {
+            getOrElse
               complete(StatusCodes.NotFound)
-            }
-          }
-        }
-      } ~ path("evaluator_results.json") {
-        get {
-          respondWithMediaType(`application/json`) {
-            evaluationInstances.get(instanceId).map { i =>
+      ~ path("evaluator_results.json")
+        get
+          respondWithMediaType(`application/json`)
+            evaluationInstances.get(instanceId).map  i =>
               complete(i.evaluatorResultsJSON)
-            } getOrElse {
+            getOrElse
               complete(StatusCodes.NotFound)
-            }
-          }
-        }
-      } ~ cors {
-        path("local_evaluator_results.json") {
-          get {
-            respondWithMediaType(`application/json`) {
-              evaluationInstances.get(instanceId).map { i =>
+      ~ cors
+        path("local_evaluator_results.json")
+          get
+            respondWithMediaType(`application/json`)
+              evaluationInstances.get(instanceId).map  i =>
                 complete(i.evaluatorResultsJSON)
-              } getOrElse {
+              getOrElse
                 complete(StatusCodes.NotFound)
-              }
-            }
-          }
-        }
-      }
-    } ~ pathPrefix("assets") {
+    ~ pathPrefix("assets")
       getFromResourceDirectory("assets")
-    }
-}

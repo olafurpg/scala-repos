@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class FunctionAssignmentTest extends ResolveTestBase {
-  override def folderPath: String = {
+class FunctionAssignmentTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "function/assignment/"
-  }
 
   def testClash() = doTest()
   def testClashWithType() = doTest()
@@ -26,4 +25,3 @@ class FunctionAssignmentTest extends ResolveTestBase {
   def testStartsWithEqual() = doTest()
   def testTwoArguments() = doTest()
   def testValue() = doTest()
-}

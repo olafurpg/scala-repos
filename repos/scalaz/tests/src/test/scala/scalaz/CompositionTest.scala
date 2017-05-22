@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object CompositionTest extends SpecLite {
+object CompositionTest extends SpecLite
   type OptionList[α] = Option[List[α]]
 
   implicit val optionListApplicative = ApplicativePlus[Option].compose[List]
@@ -22,4 +22,3 @@ object CompositionTest extends SpecLite {
 
   implicit val listEitherBitraverse = Traverse[List].bicompose[Either]
   checkAll(bitraverse.laws[λ[(α, β) => List[Either[α, β]]]])
-}

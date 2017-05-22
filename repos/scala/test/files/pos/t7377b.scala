@@ -1,4 +1,4 @@
-object Test {
+object Test
   List(1) match { case Nil => 0; case (x :: xs) => x }
 
   case class Foo(a: Int)
@@ -10,4 +10,3 @@ object Test {
   val BarAlias: Bar.type = Bar
   Bar() match { case BarAlias() => 0 }
   Bar() match { case Bar() => 0 }
-}

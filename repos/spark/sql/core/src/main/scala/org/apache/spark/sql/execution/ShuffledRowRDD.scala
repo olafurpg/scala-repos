@@ -32,19 +32,17 @@ private final class ShuffledRowRDDPartition(
     val postShufflePartitionIndex: Int,
     val startPreShufflePartitionIndex: Int,
     val endPreShufflePartitionIndex: Int)
-    extends Partition {
+    extends Partition
   override val index: Int = postShufflePartitionIndex
   override def hashCode(): Int = postShufflePartitionIndex
-}
 
 /**
   * A dummy partitioner for use with records whose partition ids have been pre-computed (i.e. for
   * use on RDDs of (Int, Row) pairs where the Int is a partition id in the expected range).
   */
 private class PartitionIdPassthrough(override val numPartitions: Int)
-    extends Partitioner {
+    extends Partitioner
   override def getPartition(key: Any): Int = key.asInstanceOf[Int]
-}
 
 /**
   * A Partitioner that might group together one or more partitions from the parent.
@@ -57,40 +55,34 @@ private class PartitionIdPassthrough(override val numPartitions: Int)
   */
 class CoalescedPartitioner(
     val parent: Partitioner, val partitionStartIndices: Array[Int])
-    extends Partitioner {
+    extends Partitioner
 
-  @transient private lazy val parentPartitionMapping: Array[Int] = {
+  @transient private lazy val parentPartitionMapping: Array[Int] =
     val n = parent.numPartitions
     val result = new Array[Int](n)
-    for (i <- 0 until partitionStartIndices.length) {
+    for (i <- 0 until partitionStartIndices.length)
       val start = partitionStartIndices(i)
       val end =
         if (i < partitionStartIndices.length - 1) partitionStartIndices(i + 1)
         else n
-      for (j <- start until end) {
+      for (j <- start until end)
         result(j) = i
-      }
-    }
     result
-  }
 
   override def numPartitions: Int = partitionStartIndices.length
 
-  override def getPartition(key: Any): Int = {
+  override def getPartition(key: Any): Int =
     parentPartitionMapping(parent.getPartition(key))
-  }
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case c: CoalescedPartitioner =>
       c.parent == parent &&
       Arrays.equals(c.partitionStartIndices, partitionStartIndices)
     case _ =>
       false
-  }
 
   override def hashCode(): Int =
     31 * parent.hashCode() + Arrays.hashCode(partitionStartIndices)
-}
 
 /**
   * This is a specialized version of [[org.apache.spark.rdd.ShuffledRDD]] that is optimized for
@@ -121,19 +113,18 @@ class CoalescedPartitioner(
 class ShuffledRowRDD(
     var dependency: ShuffleDependency[Int, InternalRow, InternalRow],
     specifiedPartitionStartIndices: Option[Array[Int]] = None)
-    extends RDD[InternalRow](dependency.rdd.context, Nil) {
+    extends RDD[InternalRow](dependency.rdd.context, Nil)
 
   private[this] val numPreShufflePartitions =
     dependency.partitioner.numPartitions
 
   private[this] val partitionStartIndices: Array[Int] =
-    specifiedPartitionStartIndices match {
+    specifiedPartitionStartIndices match
       case Some(indices) => indices
       case None =>
         // When specifiedPartitionStartIndices is not defined, every post-shuffle partition
         // corresponds to a pre-shuffle partition.
         (0 until numPreShufflePartitions).toArray
-    }
 
   private[this] val part: Partitioner = new CoalescedPartitioner(
       dependency.partitioner, partitionStartIndices)
@@ -142,29 +133,25 @@ class ShuffledRowRDD(
 
   override val partitioner: Option[Partitioner] = Some(part)
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     assert(partitionStartIndices.length == part.numPartitions)
-    Array.tabulate[Partition](partitionStartIndices.length) { i =>
+    Array.tabulate[Partition](partitionStartIndices.length)  i =>
       val startIndex = partitionStartIndices(i)
       val endIndex =
-        if (i < partitionStartIndices.length - 1) {
+        if (i < partitionStartIndices.length - 1)
           partitionStartIndices(i + 1)
-        } else {
+        else
           numPreShufflePartitions
-        }
       new ShuffledRowRDDPartition(i, startIndex, endIndex)
-    }
-  }
 
-  override def getPreferredLocations(partition: Partition): Seq[String] = {
+  override def getPreferredLocations(partition: Partition): Seq[String] =
     val tracker =
       SparkEnv.get.mapOutputTracker.asInstanceOf[MapOutputTrackerMaster]
     val dep = dependencies.head.asInstanceOf[ShuffleDependency[_, _, _]]
     tracker.getPreferredLocationsForShuffle(dep, partition.index)
-  }
 
   override def compute(
-      split: Partition, context: TaskContext): Iterator[InternalRow] = {
+      split: Partition, context: TaskContext): Iterator[InternalRow] =
     val shuffledRowPartition = split.asInstanceOf[ShuffledRowRDDPartition]
     // The range of pre-shuffle partitions that we are fetching at here is
     // [startPreShufflePartitionIndex, endPreShufflePartitionIndex - 1].
@@ -174,10 +161,7 @@ class ShuffledRowRDD(
         shuffledRowPartition.endPreShufflePartitionIndex,
         context)
     reader.read().asInstanceOf[Iterator[Product2[Int, InternalRow]]].map(_._2)
-  }
 
-  override def clearDependencies() {
+  override def clearDependencies()
     super.clearDependencies()
     dependency = null
-  }
-}

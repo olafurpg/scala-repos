@@ -8,39 +8,34 @@ import org.scalatra.util.RicherString._
 
 import scala.util.control.Exception.catching
 
-object ScalatraServlet {
+object ScalatraServlet
 
   import org.scalatra.servlet.ServletApiImplicits._
 
   val RequestPathKey = "org.scalatra.ScalatraServlet.requestPath"
 
-  def requestPath(request: HttpServletRequest): String = {
+  def requestPath(request: HttpServletRequest): String =
     require(request != null,
             "The request can't be null for getting the request path")
     def startIndex(r: HttpServletRequest) =
       r.getContextPath.blankOption.map(_.length).getOrElse(0) +
       r.getServletPath.blankOption.map(_.length).getOrElse(0)
-    def getRequestPath(r: HttpServletRequest) = {
+    def getRequestPath(r: HttpServletRequest) =
       val u =
         (catching(classOf[NullPointerException]) opt { r.getRequestURI } getOrElse "/")
       requestPath(u, startIndex(r))
-    }
 
-    request.get(RequestPathKey) map (_.toString) getOrElse {
+    request.get(RequestPathKey) map (_.toString) getOrElse
       val rp = getRequestPath(request)
       request(RequestPathKey) = rp
       rp
-    }
-  }
 
-  def requestPath(uri: String, idx: Int): String = {
+  def requestPath(uri: String, idx: Int): String =
     val u1 = UriDecoder.firstStep(uri)
     val u2 =
       (u1.blankOption map { _.substring(idx) } flatMap (_.blankOption) getOrElse "/")
     val pos = u2.indexOf(';')
     if (pos > -1) u2.substring(0, pos) else u2
-  }
-}
 
 /**
   * An implementation of the Scalatra DSL in a servlet.  This is the recommended
@@ -54,12 +49,11 @@ object ScalatraServlet {
   *
   * @see ScalatraFilter
   */
-trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
+trait ScalatraServlet extends HttpServlet with ServletBase with Initializable
 
   override def service(
-      request: HttpServletRequest, response: HttpServletResponse): Unit = {
+      request: HttpServletRequest, response: HttpServletResponse): Unit =
     handle(request, response)
-  }
 
   /**
     * Defines the request path to be matched by routers.  The default
@@ -75,7 +69,7 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
   def requestPath(implicit request: HttpServletRequest): String =
     ScalatraServlet.requestPath(request)
 
-  protected def routeBasePath(implicit request: HttpServletRequest): String = {
+  protected def routeBasePath(implicit request: HttpServletRequest): String =
     require(
         config != null, "routeBasePath requires the servlet to be initialized")
     require(
@@ -83,7 +77,6 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
         "routeBasePath requires an active request to determine the servlet path")
 
     servletContext.getContextPath + request.getServletPath
-  }
 
   /**
     * Invoked when no route matches.  By default, calls `serveStaticResource()`,
@@ -92,9 +85,7 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
     * This action can be overridden by a notFound block.
     */
   protected var doNotFound: Action = () =>
-    {
       serveStaticResource() getOrElse resourceNotFound()
-  }
 
   /**
     * Attempts to find a static resource matching the request path.  Override
@@ -102,42 +93,34 @@ trait ScalatraServlet extends HttpServlet with ServletBase with Initializable {
     */
   protected def serveStaticResource(
       )(implicit request: HttpServletRequest,
-        response: HttpServletResponse): Option[Any] = {
-    servletContext.resource(request) map { _ =>
+        response: HttpServletResponse): Option[Any] =
+    servletContext.resource(request) map  _ =>
       servletContext.getNamedDispatcher("default").forward(request, response)
-    }
-  }
 
   /**
     * Called by default notFound if no routes matched and no static resource
     * could be found.
     */
   protected def resourceNotFound()(implicit request: HttpServletRequest,
-                                   response: HttpServletResponse): Any = {
+                                   response: HttpServletResponse): Any =
     response.setStatus(404)
-    if (isDevelopmentMode) {
+    if (isDevelopmentMode)
       val error = "Requesting \"%s %s\" on servlet \"%s\" but only have: %s"
       response.getWriter println error.format(
           request.getMethod,
           Option(request.getPathInfo) getOrElse "/",
           request.getServletPath,
           routes.entryPoints.mkString("<ul><li>", "</li><li>", "</li></ul>"))
-    }
-  }
 
   type ConfigT = ServletConfig
 
-  override def init(config: ServletConfig): Unit = {
+  override def init(config: ServletConfig): Unit =
     super.init(config)
     initialize(config) // see Initializable.initialize for why
-  }
 
-  override def initialize(config: ServletConfig): Unit = {
+  override def initialize(config: ServletConfig): Unit =
     super.initialize(config)
-  }
 
-  override def destroy(): Unit = {
+  override def destroy(): Unit =
     shutdown()
     super.destroy()
-  }
-}

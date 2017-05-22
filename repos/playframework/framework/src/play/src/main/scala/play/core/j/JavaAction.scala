@@ -25,7 +25,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param method     The method to be evaluated
   */
 class JavaActionAnnotations(
-    val controller: Class[_], val method: java.lang.reflect.Method) {
+    val controller: Class[_], val method: java.lang.reflect.Method)
   private def config: ActionCompositionConfiguration =
     HttpConfiguration.current.actionComposition
 
@@ -39,19 +39,17 @@ class JavaActionAnnotations(
 
   val controllerAnnotations = play.api.libs.Collections
     .unfoldLeft[Seq[java.lang.annotation.Annotation], Option[Class[_]]](
-        Option(controller)) { clazz =>
+        Option(controller))  clazz =>
       clazz.map(c => (Option(c.getSuperclass), c.getDeclaredAnnotations.toSeq))
-    }
     .flatten
 
-  val actionMixins = {
+  val actionMixins =
     val allDeclaredAnnotations: Seq[java.lang.annotation.Annotation] =
-      if (config.controllerAnnotationsFirst) {
+      if (config.controllerAnnotationsFirst)
         controllerAnnotations ++ method.getDeclaredAnnotations
-      } else {
+      else
         method.getDeclaredAnnotations ++ controllerAnnotations
-      }
-    allDeclaredAnnotations.collect {
+    allDeclaredAnnotations.collect
       case a: play.mvc.With => a.value.map(c => (a, c)).toSeq
       case a if a.annotationType.isAnnotationPresent(classOf[play.mvc.With]) =>
         a.annotationType
@@ -59,51 +57,45 @@ class JavaActionAnnotations(
           .value
           .map(c => (a, c))
           .toSeq
-    }.flatten.reverse
-  }
-}
+    .flatten.reverse
 
 /*
  * An action that's handling Java requests
  */
 abstract class JavaAction(components: JavaHandlerComponents)
-    extends Action[play.mvc.Http.RequestBody] with JavaHelpers {
+    extends Action[play.mvc.Http.RequestBody] with JavaHelpers
   private def config: ActionCompositionConfiguration =
     HttpConfiguration.current.actionComposition
 
   def invocation: CompletionStage[JResult]
   val annotations: JavaActionAnnotations
 
-  def apply(req: Request[play.mvc.Http.RequestBody]): Future[Result] = {
+  def apply(req: Request[play.mvc.Http.RequestBody]): Future[Result] =
 
     val javaContext: JContext = createJavaContext(req)
 
-    val rootAction = new JAction[Any] {
-      def call(ctx: JContext): CompletionStage[JResult] = {
+    val rootAction = new JAction[Any]
+      def call(ctx: JContext): CompletionStage[JResult] =
         // The context may have changed, set it again
         val oldContext = JContext.current.get()
-        try {
+        try
           JContext.current.set(ctx)
           invocation
-        } finally {
+        finally
           JContext.current.set(oldContext)
-        }
-      }
-    }
 
     val baseAction = components.actionCreator.createAction(
         javaContext.request, annotations.method)
 
     val endOfChainAction =
-      if (config.executeActionCreatorActionFirst) {
+      if (config.executeActionCreatorActionFirst)
         rootAction
-      } else {
+      else
         baseAction.delegate = rootAction
         baseAction
-      }
 
     val finalUserDeclaredAction =
-      annotations.actionMixins.foldLeft[JAction[_ <: Any]](endOfChainAction) {
+      annotations.actionMixins.foldLeft[JAction[_ <: Any]](endOfChainAction)
         case (delegate, (annotation, actionClass)) =>
           val action = components
             .getAction(actionClass)
@@ -111,30 +103,26 @@ abstract class JavaAction(components: JavaHandlerComponents)
           action.configuration = annotation
           action.delegate = delegate
           action
-      }
 
     val finalAction = components.actionCreator.wrapAction(
-        if (config.executeActionCreatorActionFirst) {
+        if (config.executeActionCreatorActionFirst)
       baseAction.delegate = finalUserDeclaredAction
       baseAction
-    } else {
+    else
       finalUserDeclaredAction
-    })
+    )
 
-    val trampolineWithContext: ExecutionContext = {
+    val trampolineWithContext: ExecutionContext =
       val javaClassLoader = Thread.currentThread.getContextClassLoader
       new HttpExecutionContext(javaClassLoader, javaContext, trampoline)
-    }
-    val actionFuture: Future[Future[JResult]] = Future {
+    val actionFuture: Future[Future[JResult]] = Future
       FutureConverters.toScala(finalAction.call(javaContext))
-    }(trampolineWithContext)
+    (trampolineWithContext)
     val flattenedActionFuture: Future[JResult] =
       actionFuture.flatMap(identity)(trampoline)
     val resultFuture: Future[Result] =
       flattenedActionFuture.map(createResult(javaContext, _))(trampoline)
     resultFuture
-  }
-}
 
 /**
   * A Java handler.
@@ -143,28 +131,25 @@ abstract class JavaAction(components: JavaHandlerComponents)
   * that can't be supplied by the controller itself to do so.  So this handler is a factory for handlers that, given
   * the JavaComponents, will return a handler that can be invoked by a Play server.
   */
-trait JavaHandler extends Handler {
+trait JavaHandler extends Handler
 
   /**
     * Return a Handler that has the necessary components supplied to execute it.
     */
   def withComponents(components: JavaHandlerComponents): Handler
-}
 
-trait JavaHandlerComponents {
+trait JavaHandlerComponents
   def getBodyParser[A <: JBodyParser[_]](parserClass: Class[A]): A
   def getAction[A <: JAction[_]](actionClass: Class[A]): A
   def actionCreator: play.http.ActionCreator
-}
 
 /**
   * The components necessary to handle a Java handler.
   */
 class DefaultJavaHandlerComponents @Inject()(
     injector: Injector, val actionCreator: play.http.ActionCreator)
-    extends JavaHandlerComponents {
+    extends JavaHandlerComponents
   def getBodyParser[A <: JBodyParser[_]](parserClass: Class[A]): A =
     injector.instanceOf(parserClass)
   def getAction[A <: JAction[_]](actionClass: Class[A]): A =
     injector.instanceOf(actionClass)
-}

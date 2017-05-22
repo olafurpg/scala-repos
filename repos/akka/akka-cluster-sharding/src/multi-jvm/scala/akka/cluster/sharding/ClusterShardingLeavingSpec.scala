@@ -26,37 +26,30 @@ import akka.testkit._
 import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.FileUtils
 
-object ClusterShardingLeavingSpec {
+object ClusterShardingLeavingSpec
   case class Ping(id: String)
 
-  class Entity extends Actor {
-    def receive = {
+  class Entity extends Actor
+    def receive =
       case Ping(_) ⇒ sender() ! self
-    }
-  }
 
   case object GetLocations
   case class Locations(locations: Map[String, ActorRef])
 
-  class ShardLocations extends Actor {
+  class ShardLocations extends Actor
     var locations: Locations = _
-    def receive = {
+    def receive =
       case GetLocations ⇒ sender() ! locations
       case l: Locations ⇒ locations = l
-    }
-  }
 
-  val extractEntityId: ShardRegion.ExtractEntityId = {
+  val extractEntityId: ShardRegion.ExtractEntityId =
     case m @ Ping(id) ⇒ (id, m)
-  }
 
-  val extractShardId: ShardRegion.ExtractShardId = {
+  val extractShardId: ShardRegion.ExtractShardId =
     case Ping(id: String) ⇒ id.charAt(0).toString
-  }
-}
 
 abstract class ClusterShardingLeavingSpecConfig(val mode: String)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -79,7 +72,6 @@ abstract class ClusterShardingLeavingSpecConfig(val mode: String)
     akka.persistence.snapshot-store.local.dir = "target/snapshots-ClusterShardingLeavingSpec"
     akka.cluster.sharding.state-store-mode = "$mode"
     """))
-}
 
 object PersistentClusterShardingLeavingSpecConfig
     extends ClusterShardingLeavingSpecConfig("persistence")
@@ -112,7 +104,7 @@ class DDataClusterShardingLeavingMultiJvmNode4
 
 abstract class ClusterShardingLeavingSpec(
     config: ClusterShardingLeavingSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender
   import ClusterShardingLeavingSpec._
   import config._
 
@@ -124,54 +116,45 @@ abstract class ClusterShardingLeavingSpec(
          "akka.persistence.snapshot-store.local.dir").map(
         s ⇒ new File(system.settings.config.getString(s)))
 
-  override protected def atStartup() {
-    runOn(first) {
+  override protected def atStartup()
+    runOn(first)
       storageLocations.foreach(
           dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-    }
-  }
 
-  override protected def afterTermination() {
-    runOn(first) {
+  override protected def afterTermination()
+    runOn(first)
       storageLocations.foreach(
           dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-    }
-  }
 
   val cluster = Cluster(system)
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       cluster join node(to).address
       startSharding()
-      within(15.seconds) {
-        awaitAssert(cluster.state.members.exists { m ⇒
+      within(15.seconds)
+        awaitAssert(cluster.state.members.exists  m ⇒
           m.uniqueAddress == cluster.selfUniqueAddress &&
           m.status == MemberStatus.Up
-        } should be(true))
-      }
-    }
+        should be(true))
     enterBarrier(from.name + "-joined")
-  }
 
-  def startSharding(): Unit = {
+  def startSharding(): Unit =
     ClusterSharding(system).start(typeName = "Entity",
                                   entityProps = Props[Entity],
                                   settings = ClusterShardingSettings(system),
                                   extractEntityId = extractEntityId,
                                   extractShardId = extractShardId)
-  }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")
 
-  s"Cluster sharding ($mode) with leaving member" must {
+  s"Cluster sharding ($mode) with leaving member" must
 
-    "setup shared journal" in {
+    "setup shared journal" in
       // start the Persistence extension
       Persistence(system)
-      runOn(first) {
+      runOn(first)
         system.actorOf(Props[SharedLeveldbStore], "store")
-      }
       enterBarrier("peristence-started")
 
       system.actorSelection(node(first) / "user" / "store") ! Identify(None)
@@ -179,59 +162,47 @@ abstract class ClusterShardingLeavingSpec(
       SharedLeveldbJournal.setStore(sharedStore, system)
 
       enterBarrier("after-1")
-    }
 
-    "join cluster" in within(20.seconds) {
+    "join cluster" in within(20.seconds)
       join(first, first)
       join(second, first)
       join(third, first)
       join(fourth, first)
 
       enterBarrier("after-2")
-    }
 
-    "initialize shards" in {
-      runOn(first) {
+    "initialize shards" in
+      runOn(first)
         val shardLocations =
           system.actorOf(Props[ShardLocations], "shardLocations")
-        val locations = (for (n ← 1 to 10) yield {
+        val locations = (for (n ← 1 to 10) yield
           val id = n.toString
           region ! Ping(id)
           id -> expectMsgType[ActorRef]
-        }).toMap
+        ).toMap
         shardLocations ! Locations(locations)
-      }
       enterBarrier("after-3")
-    }
 
-    "recover after leaving coordinator node" in within(30.seconds) {
-      runOn(third) {
+    "recover after leaving coordinator node" in within(30.seconds)
+      runOn(third)
         cluster.leave(node(first).address)
-      }
 
-      runOn(first) {
+      runOn(first)
         watch(region)
         expectTerminated(region, 15.seconds)
-      }
       enterBarrier("stopped")
 
-      runOn(second, third, fourth) {
+      runOn(second, third, fourth)
         system.actorSelection(node(first) / "user" / "shardLocations") ! GetLocations
         val Locations(locations) = expectMsgType[Locations]
         val firstAddress = node(first).address
-        awaitAssert {
+        awaitAssert
           val probe = TestProbe()
-          locations.foreach {
+          locations.foreach
             case (id, ref) ⇒
               region.tell(Ping(id), probe.ref)
               if (ref.path.address == firstAddress)
                 probe.expectMsgType[ActorRef](1.second) should not be (ref)
               else probe.expectMsg(1.second, ref) // should not move
-          }
-        }
-      }
 
       enterBarrier("after-4")
-    }
-  }
-}

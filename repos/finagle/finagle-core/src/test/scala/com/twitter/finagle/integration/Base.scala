@@ -20,54 +20,42 @@ import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 
-trait IntegrationBase extends FunSuite with MockitoSugar {
+trait IntegrationBase extends FunSuite with MockitoSugar
   /*
    * Bootstrap enough to get a basic client connection up & running.
    */
-  class MockChannel {
+  class MockChannel
     val name = "mock_channel"
     val statsReceiver = new InMemoryStatsReceiver
 
     val codec = mock[Codec[String, String]]
     when(codec.prepareConnFactory(any[ServiceFactory[String, String]],
-                                  any[Stack.Params])) thenAnswer {
-      new Answer[ServiceFactory[String, String]] {
+                                  any[Stack.Params])) thenAnswer
+      new Answer[ServiceFactory[String, String]]
         def answer(
-            invocation: InvocationOnMock): ServiceFactory[String, String] = {
+            invocation: InvocationOnMock): ServiceFactory[String, String] =
           val arg = invocation.getArguments.head
           arg.asInstanceOf[ServiceFactory[String, String]]
-        }
-      }
-    }
-    when(codec.prepareServiceFactory(any[ServiceFactory[String, String]])) thenAnswer {
-      new Answer[ServiceFactory[String, String]] {
+    when(codec.prepareServiceFactory(any[ServiceFactory[String, String]])) thenAnswer
+      new Answer[ServiceFactory[String, String]]
         def answer(
-            invocation: InvocationOnMock): ServiceFactory[String, String] = {
+            invocation: InvocationOnMock): ServiceFactory[String, String] =
           val arg = invocation.getArguments.head
           arg.asInstanceOf[ServiceFactory[String, String]]
-        }
-      }
-    }
-    when(codec.newClientTransport(any[Channel], any[StatsReceiver])) thenAnswer {
-      new Answer[ChannelTransport[Any, Any]] {
+    when(codec.newClientTransport(any[Channel], any[StatsReceiver])) thenAnswer
+      new Answer[ChannelTransport[Any, Any]]
         def answer(invocation: InvocationOnMock): ChannelTransport[Any, Any] =
-          invocation.getArguments match {
+          invocation.getArguments match
             case args: Array[Object] =>
               new ChannelTransport[Any, Any](args.head.asInstanceOf[Channel])
-          }
-      }
-    }
     when(codec.newClientDispatcher(any[Transport[Any, Any]],
-                                   any[Stack.Params])) thenAnswer {
-      new Answer[SerialClientDispatcher[String, String]] {
+                                   any[Stack.Params])) thenAnswer
+      new Answer[SerialClientDispatcher[String, String]]
         def answer(invocation: InvocationOnMock)
-          : SerialClientDispatcher[String, String] = {
+          : SerialClientDispatcher[String, String] =
           val arg = invocation.getArguments.head
           new SerialClientDispatcher[String, String](
               arg.asInstanceOf[Transport[String, String]])
-        }
-      }
-    }
 
     when(codec.newTraceInitializer) thenReturn TraceInitializerFilter
       .clientModule[String, String]
@@ -119,7 +107,7 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
             .newStack[String, String],
         params: Stack.Params = StackClient.defaultParams
     )
-        extends StdStackClient[String, String, Client] {
+        extends StdStackClient[String, String, Client]
       def copy1(stack: Stack[ServiceFactory[String, String]] = this.stack,
                 params: Stack.Params = this.params): Client =
         copy(stack, params)
@@ -127,16 +115,14 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
       type In = String
       type Out = String
 
-      def newTransporter(): Transporter[String, String] = {
+      def newTransporter(): Transporter[String, String] =
         Netty3Transporter[String, String](clientPipelineFactory, params)
-      }
 
       def newDispatcher(
           transport: Transport[In, Out]): Service[String, String] =
         new SerialClientDispatcher(transport)
-    }
 
-    def client = {
+    def client =
       val client = Client()
       client.withStack(
           // needed for ClientBuilderTest.ClientBuilderHelper
@@ -144,6 +130,3 @@ trait IntegrationBase extends FunSuite with MockitoSugar {
               StackClient.Role.prepConn,
               (next: ServiceFactory[String, String]) =>
                 codec.prepareConnFactory(next, Stack.Params.empty)))
-    }
-  }
-}

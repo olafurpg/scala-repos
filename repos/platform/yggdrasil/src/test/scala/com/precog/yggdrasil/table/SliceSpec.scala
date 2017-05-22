@@ -32,37 +32,32 @@ import org.specs2.mutable._
 import org.specs2.ScalaCheck
 import org.scalacheck._
 
-class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
+class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck
 
   implicit def cValueOrdering: Ordering[CValue] =
     CValue.CValueOrder.toScalaOrdering
   implicit def listOrdering[A](implicit ord0: Ordering[A]) =
-    new Ordering[List[A]] {
+    new Ordering[List[A]]
       def compare(a: List[A], b: List[A]): Int =
         (a zip b) map ((ord0.compare _).tupled) find (_ != 0) getOrElse
         (a.length - b.length)
-    }
 
-  def extractCValues(colGroups: List[List[Column]], row: Int): List[CValue] = {
-    colGroups map {
+  def extractCValues(colGroups: List[List[Column]], row: Int): List[CValue] =
+    colGroups map
       _ find (_.isDefinedAt(row)) map (_.cValue(row)) getOrElse CUndefined
-    }
-  }
 
-  def columnsByCPath(slice: Slice): Map[CPath, List[Column]] = {
+  def columnsByCPath(slice: Slice): Map[CPath, List[Column]] =
     val byCPath = slice.columns.groupBy(_._1.selector)
     byCPath.mapValues(_.map(_._2).toList)
-  }
 
   def sortableCValues(
       slice: Slice,
-      cpaths: VectorCase[CPath]): List[(List[CValue], List[CValue])] = {
+      cpaths: VectorCase[CPath]): List[(List[CValue], List[CValue])] =
     val byCPath = columnsByCPath(slice)
-    (0 until slice.size).map({ row =>
+    (0 until slice.size).map( row =>
       (extractCValues(cpaths.map(byCPath).toList, row),
        extractCValues(byCPath.values.toList, row))
-    })(collection.breakOut)
-  }
+    )(collection.breakOut)
 
   def toCValues(slice: Slice) =
     sortableCValues(slice, VectorCase.empty) map (_._2)
@@ -70,11 +65,9 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
   def fakeSort(slice: Slice, sortKey: VectorCase[CPath]) =
     sortableCValues(slice, sortKey).sortBy(_._1).map(_._2)
 
-  def fakeConcat(slices: List[Slice]) = {
-    slices.foldLeft(List.empty[List[CValue]]) { (acc, slice) =>
+  def fakeConcat(slices: List[Slice]) =
+    slices.foldLeft(List.empty[List[CValue]])  (acc, slice) =>
       acc ++ toCValues(slice)
-    }
-  }
 
   def stripUndefineds(cvals: List[CValue]): Set[CValue] =
     (cvals filter (_ != CUndefined)).toSet
@@ -144,57 +137,45 @@ class SliceSpec extends Specification with ArbitrarySlice with ScalaCheck {
       ColumnRef(CPath("7"), CNum)
   )
 
-  "concat" should {
-    "concat arbitrary slices together" in {
+  "concat" should
+    "concat arbitrary slices together" in
       implicit def arbSlice = Arbitrary(genSlice(0, concatProjDesc, 23))
 
-      check { slices: List[Slice] =>
+      check  slices: List[Slice] =>
         val slice = Slice.concat(slices)
         toCValues(slice) must_== fakeConcat(slices)
-      }
-    }
 
-    "concat small singleton together" in {
+    "concat small singleton together" in
       implicit def arbSlice = Arbitrary(genSlice(0, concatProjDesc, 1))
 
-      check { slices: List[Slice] =>
+      check  slices: List[Slice] =>
         val slice = Slice.concat(slices)
         toCValues(slice) must_== fakeConcat(slices)
-      }
-    }
 
-    val emptySlice = new Slice {
+    val emptySlice = new Slice
       val size = 0
       val columns: Map[ColumnRef, Column] = Map.empty
-    }
 
-    "concat empty slices correctly" in {
+    "concat empty slices correctly" in
       implicit def arbSlice = Arbitrary(genSlice(0, concatProjDesc, 23))
 
-      check { fullSlices: List[Slice] =>
+      check  fullSlices: List[Slice] =>
         val slices =
-          fullSlices collect {
+          fullSlices collect
             case slice if Random.nextBoolean => slice
             case _ => emptySlice
-          }
         val slice = Slice.concat(slices)
         toCValues(slice) must_== fakeConcat(slices)
-      }
-    }
 
-    "concat heterogeneous slices" in {
+    "concat heterogeneous slices" in
       val pds = List.fill(25)(concatProjDesc filter (_ => Random.nextBoolean))
       val g1 :: g2 :: gs = pds.map(genSlice(0, _, 17))
 
       implicit val arbSlice = Arbitrary(Gen.oneOf(g1, g2, gs: _*))
 
-      check { slices: List[Slice] =>
+      check  slices: List[Slice] =>
         val slice = Slice.concat(slices)
         // This is terrible, but there isn't an immediately easy way to test
         // without duplicating concat.
         toCValues(slice).map(stripUndefineds) must_==
           fakeConcat(slices).map(stripUndefineds)
-      }
-    }
-  }
-}

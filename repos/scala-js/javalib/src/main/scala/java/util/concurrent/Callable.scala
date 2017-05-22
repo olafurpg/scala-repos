@@ -1,5 +1,4 @@
 package java.util.concurrent
 
-trait Callable[V] {
+trait Callable[V]
   def call(): V
-}

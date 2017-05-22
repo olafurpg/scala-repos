@@ -14,7 +14,7 @@ import java.nio.charset._
   *  This is basically the same as [[java.nio.charset.StandardCharsets]], but
   *  it is also available when compiling with a JDK 6.
   */
-object StandardCharsets {
+object StandardCharsets
   import scala.scalajs.niocharset
 
   /** ISO-8859-1, aka latin1. */
@@ -38,4 +38,3 @@ object StandardCharsets {
     *  found, it defaults to Big Endian.
     */
   def UTF_16: Charset = niocharset.UTF_16
-}

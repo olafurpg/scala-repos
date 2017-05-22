@@ -8,25 +8,22 @@ import com.twitter.finagle.redis.util.ReplyFormat
 import com.twitter.util.Future
 import org.jboss.netty.buffer.ChannelBuffer
 
-trait SortedSets { self: BaseClient =>
+trait SortedSets  self: BaseClient =>
   private[this] def parseMBulkReply(
       withScores: JBoolean
-  ): PartialFunction[Reply, Future[Either[ZRangeResults, Seq[ChannelBuffer]]]] = {
+  ): PartialFunction[Reply, Future[Either[ZRangeResults, Seq[ChannelBuffer]]]] =
     val parse: PartialFunction[
-        Reply, Either[ZRangeResults, Seq[ChannelBuffer]]] = {
+        Reply, Either[ZRangeResults, Seq[ChannelBuffer]]] =
       case MBulkReply(messages) => withScoresHelper(withScores)(messages)
       case EmptyMBulkReply() => withScoresHelper(withScores)(Nil)
-    }
     parse andThen Future.value
-  }
 
   private[this] def withScoresHelper(
       withScores: JBoolean
-  )(messages: List[Reply]): Either[ZRangeResults, Seq[ChannelBuffer]] = {
+  )(messages: List[Reply]): Either[ZRangeResults, Seq[ChannelBuffer]] =
     val chanBufs = ReplyFormat.toChannelBuffers(messages)
     if (withScores) Left(ZRangeResults(returnPairs(chanBufs)))
     else Right(chanBufs)
-  }
 
   /**
     * Add a member with score to a sorted set
@@ -37,9 +34,8 @@ trait SortedSets { self: BaseClient =>
     */
   def zAdd(key: ChannelBuffer,
            score: JDouble,
-           member: ChannelBuffer): Future[JLong] = {
+           member: ChannelBuffer): Future[JLong] =
     zAddMulti(key, Seq((score, member)))
-  }
 
   /**
     * Adds member, score pairs to sorted set
@@ -49,13 +45,11 @@ trait SortedSets { self: BaseClient =>
     * @note Adding multiple elements only works with redis 2.4 or later.
     */
   def zAddMulti(key: ChannelBuffer,
-                members: Seq[(JDouble, ChannelBuffer)]): Future[JLong] = {
-    doRequest(ZAdd(key, members.map { m =>
+                members: Seq[(JDouble, ChannelBuffer)]): Future[JLong] =
+    doRequest(ZAdd(key, members.map  m =>
       ZMember(m._1, m._2)
-    })) {
+    ))
       case IntegerReply(n) => Future.value(n)
-    }
-  }
 
   /**
     * Returns sorted set cardinality of the sorted set at key
@@ -64,9 +58,8 @@ trait SortedSets { self: BaseClient =>
     * or 0 if key does not exist
     */
   def zCard(key: ChannelBuffer): Future[JLong] =
-    doRequest(ZCard(key)) {
+    doRequest(ZCard(key))
       case IntegerReply(n) => Future.value(n)
-    }
 
   /**
     * Gets number of elements in sorted set with score between min and max
@@ -77,9 +70,8 @@ trait SortedSets { self: BaseClient =>
     */
   def zCount(
       key: ChannelBuffer, min: ZInterval, max: ZInterval): Future[JLong] =
-    doRequest(ZCount(key, min, max)) {
+    doRequest(ZCount(key, min, max))
       case IntegerReply(n) => Future.value(n)
-    }
 
   /**
     * Gets member, score pairs from sorted set between min and max
@@ -105,9 +97,8 @@ trait SortedSets { self: BaseClient =>
     * @return Number of members removed from sorted set
     */
   def zRem(key: ChannelBuffer, members: Seq[ChannelBuffer]): Future[JLong] =
-    doRequest(ZRem(key, members)) {
+    doRequest(ZRem(key, members))
       case IntegerReply(n) => Future.value(n)
-    }
 
   /**
     * Returns specified range of elements in sorted set at key
@@ -151,11 +142,10 @@ trait SortedSets { self: BaseClient =>
     */
   def zScore(
       key: ChannelBuffer, member: ChannelBuffer): Future[Option[JDouble]] =
-    doRequest(ZScore(key, member)) {
+    doRequest(ZScore(key, member))
       case BulkReply(message) =>
         Future.value(Some(NumberFormat.toDouble(BytesToString(message.array))))
       case EmptyBulkReply() => Future.value(None)
-    }
 
   /**
     * Gets the rank of member in the sorted set, or None if it doesn't exist, from high to low.
@@ -165,10 +155,9 @@ trait SortedSets { self: BaseClient =>
     */
   def zRevRank(
       key: ChannelBuffer, member: ChannelBuffer): Future[Option[JLong]] =
-    doRequest(ZRevRank(key, member)) {
+    doRequest(ZRevRank(key, member))
       case IntegerReply(n) => Future.value(Some(n))
       case EmptyBulkReply() => Future.value(None)
-    }
 
   /**
     * Increment the member in sorted set key by amount.
@@ -182,11 +171,10 @@ trait SortedSets { self: BaseClient =>
   def zIncrBy(key: ChannelBuffer,
               amount: JDouble,
               member: ChannelBuffer): Future[Option[JDouble]] =
-    doRequest(ZIncrBy(key, amount, member)) {
+    doRequest(ZIncrBy(key, amount, member))
       case BulkReply(message) =>
         Future.value(Some(NumberFormat.toDouble(BytesToString(message.array))))
       case EmptyBulkReply() => Future.value(None)
-    }
 
   /**
     * Gets the rank of the member in the sorted set, or None if it doesn't exist, from low to high.
@@ -195,10 +183,9 @@ trait SortedSets { self: BaseClient =>
     * @return the rank of the member
     */
   def zRank(key: ChannelBuffer, member: ChannelBuffer): Future[Option[JLong]] =
-    doRequest(ZRank(key, member)) {
+    doRequest(ZRank(key, member))
       case IntegerReply(n) => Future.value(Some(n))
       case EmptyBulkReply() => Future.value(None)
-    }
 
   /**
     * Removes members from sorted set by sort order, from start to stop, inclusive.
@@ -209,9 +196,8 @@ trait SortedSets { self: BaseClient =>
     */
   def zRemRangeByRank(
       key: ChannelBuffer, start: JLong, stop: JLong): Future[JLong] =
-    doRequest(ZRemRangeByRank(key, start, stop)) {
+    doRequest(ZRemRangeByRank(key, start, stop))
       case IntegerReply(n) => Future.value(n)
-    }
 
   /**
     * Removes members from sorted set by score, from min to max, inclusive.
@@ -222,9 +208,8 @@ trait SortedSets { self: BaseClient =>
     */
   def zRemRangeByScore(
       key: ChannelBuffer, min: ZInterval, max: ZInterval): Future[JLong] =
-    doRequest(ZRemRangeByScore(key, min, max)) {
+    doRequest(ZRemRangeByScore(key, min, max))
       case IntegerReply(n) => Future.value(n)
-    }
 
   /**
     * Returns specified range of elements in sorted set at key.
@@ -238,7 +223,5 @@ trait SortedSets { self: BaseClient =>
       stop: JLong,
       withScores: JBoolean
   ): Future[Either[ZRangeResults, Seq[ChannelBuffer]]] =
-    doRequest(ZRange(key, start, stop, WithScores.option(withScores))) {
+    doRequest(ZRange(key, start, stop, WithScores.option(withScores)))
       parseMBulkReply(withScores)
-    }
-}

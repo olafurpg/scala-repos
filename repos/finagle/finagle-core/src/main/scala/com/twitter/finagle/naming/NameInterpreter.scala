@@ -8,15 +8,14 @@ import com.twitter.util.Activity
   * [[com.twitter.finagle.Namer Namers]] in that the passed in
   * [[com.twitter.finagle.Dtab Dtab]] can affect the resolution process.
   */
-trait NameInterpreter {
+trait NameInterpreter
 
   /**
     * Bind `path` against the given `dtab`.
     */
   def bind(dtab: Dtab, path: Path): Activity[NameTree[Name.Bound]]
-}
 
-object NameInterpreter extends NameInterpreter {
+object NameInterpreter extends NameInterpreter
 
   /**
     * The global interpreter that resolves all names in Finagle.
@@ -26,10 +25,8 @@ object NameInterpreter extends NameInterpreter {
   @volatile var global: NameInterpreter = DefaultInterpreter
 
   /** Java API for setting the interpreter */
-  def setGlobal(nameInterpreter: NameInterpreter) = {
+  def setGlobal(nameInterpreter: NameInterpreter) =
     global = nameInterpreter
-  }
 
   override def bind(dtab: Dtab, tree: Path): Activity[NameTree[Name.Bound]] =
     global.bind(dtab, tree)
-}

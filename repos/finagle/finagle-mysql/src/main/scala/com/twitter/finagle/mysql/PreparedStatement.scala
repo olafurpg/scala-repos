@@ -7,7 +7,7 @@ import com.twitter.util.Future
   * sql statement which may be applied concurrently
   * with varying parameters.
   */
-trait PreparedStatement {
+trait PreparedStatement
 
   /**
     * Executes the prepared statement with the
@@ -22,8 +22,6 @@ trait PreparedStatement {
     * is returned, the function returns an empty Seq.
     */
   def select[T](params: Parameter*)(f: Row => T): Future[Seq[T]] =
-    apply(params: _*) map {
+    apply(params: _*) map
       case rs: ResultSet => rs.rows.map(f)
       case _ => Nil
-    }
-}

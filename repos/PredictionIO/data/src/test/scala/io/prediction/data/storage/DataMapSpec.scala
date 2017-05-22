@@ -16,9 +16,9 @@ package io.prediction.data.storage
 
 import org.specs2.mutable._
 
-class DataMapSpec extends Specification {
+class DataMapSpec extends Specification
 
-  "DataMap" should {
+  "DataMap" should
 
     val properties = DataMap("""
       {
@@ -31,50 +31,41 @@ class DataMapSpec extends Specification {
       }
       """)
 
-    "get Int data" in {
+    "get Int data" in
       properties.get[Int]("prop1") must beEqualTo(1)
       properties.getOpt[Int]("prop1") must beEqualTo(Some(1))
-    }
 
-    "get String data" in {
+    "get String data" in
       properties.get[String]("prop2") must beEqualTo("value2")
       properties.getOpt[String]("prop2") must beEqualTo(Some("value2"))
-    }
 
-    "get List of Int data" in {
+    "get List of Int data" in
       properties.get[List[Int]]("prop3") must beEqualTo(List(1, 2, 3))
       properties.getOpt[List[Int]]("prop3") must beEqualTo(Some(List(1, 2, 3)))
-    }
 
-    "get Boolean data" in {
+    "get Boolean data" in
       properties.get[Boolean]("prop4") must beEqualTo(true)
       properties.getOpt[Boolean]("prop4") must beEqualTo(Some(true))
-    }
 
-    "get List of String data" in {
+    "get List of String data" in
       properties.get[List[String]]("prop5") must beEqualTo(
           List("a", "b", "c", "c"))
       properties.getOpt[List[String]]("prop5") must beEqualTo(
           Some(List("a", "b", "c", "c")))
-    }
 
-    "get Set of String data" in {
+    "get Set of String data" in
       properties.get[Set[String]]("prop5") must beEqualTo(Set("a", "b", "c"))
       properties.getOpt[Set[String]]("prop5") must beEqualTo(
           Some(Set("a", "b", "c")))
-    }
 
-    "get Double data" in {
+    "get Double data" in
       properties.get[Double]("prop6") must beEqualTo(4.56)
       properties.getOpt[Double]("prop6") must beEqualTo(Some(4.56))
-    }
 
-    "get empty optional Int data" in {
+    "get empty optional Int data" in
       properties.getOpt[Int]("prop9999") must beEqualTo(None)
-    }
-  }
 
-  "DataMap with multi-level data" should {
+  "DataMap with multi-level data" should
     val properties = DataMap("""
       {
         "context": {
@@ -88,7 +79,7 @@ class DataMapSpec extends Specification {
       }
       """)
 
-    "get case class data" in {
+    "get case class data" in
       val expected = DataMapSpec.Context(
           ip = "1.23.4.56",
           prop1 = Some(2.345),
@@ -98,24 +89,19 @@ class DataMapSpec extends Specification {
       )
 
       properties.get[DataMapSpec.Context]("context") must beEqualTo(expected)
-    }
 
-    "get empty optional case class data" in {
+    "get empty optional case class data" in
       properties.getOpt[DataMapSpec.Context]("context999") must beEqualTo(None)
-    }
 
-    "get double data" in {
+    "get double data" in
       properties.get[Double]("anotherPropertyA") must beEqualTo(4.567)
-    }
 
-    "get boolean data" in {
+    "get boolean data" in
       properties.get[Boolean]("anotherPropertyB") must beEqualTo(false)
-    }
-  }
 
-  "DataMap extract" should {
+  "DataMap extract" should
 
-    "extract to case class object" in {
+    "extract to case class object" in
       val properties = DataMap("""
         {
           "prop1" : 1,
@@ -138,9 +124,8 @@ class DataMapSpec extends Specification {
       )
 
       result must beEqualTo(expected)
-    }
 
-    "extract with optional fields" in {
+    "extract with optional fields" in
       val propertiesEmpty = DataMap("""{}""")
       val propertiesSome = DataMap("""
         {
@@ -172,9 +157,8 @@ class DataMapSpec extends Specification {
 
       resultEmpty must beEqualTo(expectedEmpty)
       resultSome must beEqualTo(expectedSome)
-    }
 
-    "extract to multi-level object" in {
+    "extract to multi-level object" in
       val properties = DataMap("""
         {
           "context": {
@@ -202,11 +186,8 @@ class DataMapSpec extends Specification {
       )
 
       result must beEqualTo(expected)
-    }
-  }
-}
 
-object DataMapSpec {
+object DataMapSpec
 
   // define this case class inside object to avoid case class name conflict with other tests
   case class Context(
@@ -240,4 +221,3 @@ object DataMapSpec {
       anotherPropertyA: Double,
       anotherPropertyB: Boolean
   )
-}

@@ -25,9 +25,8 @@ import org.apache.commons.math3.distribution.{HypergeometricDistribution => Apac
   */
 class HypergeometricDistribution(
     populationSize: Int, numberOfSuccesses: Int, sampleSize: Int)
-    extends ApacheDiscreteDistribution {
+    extends ApacheDiscreteDistribution
   protected final val inner = new ApacheHypergeometricDistribution(
       populationSize, numberOfSuccesses, sampleSize)
-}
 
 object HypergeometricDistribution

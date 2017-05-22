@@ -11,7 +11,7 @@ import scala.collection.mutable
   * Created by Kate Ustyuzhanina
   * on 11/24/15
   */
-trait IntermediateTreeVisitor {
+trait IntermediateTreeVisitor
   def visit(node: IntermediateNode)
 
   val printer: PrettyPrinter
@@ -22,4 +22,3 @@ trait IntermediateTreeVisitor {
   def stringResult = printer.toString
 
   val rangedElementsMap = new mutable.HashMap[IntermediateNode, TextRange]
-}

@@ -9,6 +9,5 @@ package patterns
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
-trait ScLiteralPattern extends ScPattern {
+trait ScLiteralPattern extends ScPattern
   def getLiteral: ScLiteral = findChildByClassScala(classOf[ScLiteral])
-}

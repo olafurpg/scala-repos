@@ -7,16 +7,16 @@ import akka.cluster.ddata.Replicator.Changed
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
 
-class GSetSpec extends WordSpec with Matchers {
+class GSetSpec extends WordSpec with Matchers
 
   val user1 = """{"username":"john","password":"coltrane"}"""
   val user2 = """{"username":"sonny","password":"rollins"}"""
   val user3 = """{"username":"charlie","password":"parker"}"""
   val user4 = """{"username":"charles","password":"mingus"}"""
 
-  "A GSet" must {
+  "A GSet" must
 
-    "be able to add user" in {
+    "be able to add user" in
       val c1 = GSet.empty[String]
 
       val c2 = c1 + user1
@@ -29,9 +29,8 @@ class GSetSpec extends WordSpec with Matchers {
       c5.elements should contain(user2)
       c5.elements should contain(user3)
       c5.elements should contain(user4)
-    }
 
-    "be able to have its user set correctly merged with another GSet with unique user sets" in {
+    "be able to have its user set correctly merged with another GSet with unique user sets" in
       // set 1
       val c11 = GSet.empty[String]
 
@@ -62,9 +61,8 @@ class GSetSpec extends WordSpec with Matchers {
       merged2.elements should contain(user2)
       merged2.elements should contain(user3)
       merged2.elements should contain(user4)
-    }
 
-    "be able to have its user set correctly merged with another GSet with overlapping user sets" in {
+    "be able to have its user set correctly merged with another GSet with overlapping user sets" in
       // set 1
       val c10 = GSet.empty[String]
 
@@ -99,19 +97,14 @@ class GSetSpec extends WordSpec with Matchers {
       merged2.elements should contain(user2)
       merged2.elements should contain(user3)
       merged2.elements should contain(user4)
-    }
 
-    "have unapply extractor" in {
+    "have unapply extractor" in
       val s1 = GSet.empty + "a" + "b"
       val s2: GSet[String] = s1
       val GSet(elements1) = s1
       val elements2: Set[String] = elements1
-      Changed(GSetKey[String]("key"))(s1) match {
+      Changed(GSetKey[String]("key"))(s1) match
         case c @ Changed(GSetKey("key")) ⇒
           val GSet(elements3) = c.dataValue
           val elements4: Set[String] = elements3
           elements4 should be(Set("a", "b"))
-      }
-    }
-  }
-}

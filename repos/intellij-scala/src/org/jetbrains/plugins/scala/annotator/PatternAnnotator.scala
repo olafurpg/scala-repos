@@ -23,26 +23,21 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Jason Zaugg
   */
-trait PatternAnnotator {
+trait PatternAnnotator
 
   def annotatePattern(
-      pattern: ScPattern, holder: AnnotationHolder, highlightErrors: Boolean) {
-    if (highlightErrors) {
+      pattern: ScPattern, holder: AnnotationHolder, highlightErrors: Boolean)
+    if (highlightErrors)
       PatternAnnotator.checkPattern(pattern, holder)
-    }
-  }
-}
 
-object PatternAnnotator {
+object PatternAnnotator
 
-  def checkPattern(pattern: ScPattern, holder: AnnotationHolder) = {
-    for {
+  def checkPattern(pattern: ScPattern, holder: AnnotationHolder) =
+    for
       pType <- PatternAnnotatorUtil.patternType(pattern)
       eType <- pattern.expectedType
-    } {
+    
       checkPatternType(pType, eType, pattern, holder)
-    }
-  }
 
   /**
     * Logic in this method is mimicked from compiler sources:
@@ -52,7 +47,7 @@ object PatternAnnotator {
   private def checkPatternType(patType: ScType,
                                exprType: ScType,
                                pattern: ScPattern,
-                               holder: AnnotationHolder): Unit = {
+                               holder: AnnotationHolder): Unit =
     val exTp = widen(ScType.expandAliases(exprType).getOrElse(exprType))
     def freeTypeParams = freeTypeParamsOfTerms(exTp)
 
@@ -64,27 +59,22 @@ object PatternAnnotator {
       isNeverSubType(exTp, patType)
 
     def isEliminatedByErasure =
-      (ScType.extractClass(exprType), ScType.extractClass(patType)) match {
+      (ScType.extractClass(exprType), ScType.extractClass(patType)) match
         case (Some(cl1), Some(cl2)) if pattern.isInstanceOf[ScTypedPattern] =>
           !isNeverSubClass(cl1, cl2)
         case _ => false
-      }
 
-    object StableIdResolvesToVar {
-      def unapply(stable: ScStableReferenceElementPattern): Boolean = {
-        stable.getReferenceExpression.orNull match {
+    object StableIdResolvesToVar
+      def unapply(stable: ScStableReferenceElementPattern): Boolean =
+        stable.getReferenceExpression.orNull match
           case ResolvesTo(ScalaPsiUtil.inNameContext(nameCtx)) =>
-            nameCtx match {
+            nameCtx match
               case param: ScClassParameter => param.isVar
               case _: ScVariable => true
               case _ => false
-            }
           case _ => false
-        }
-      }
-    }
 
-    pattern match {
+    pattern match
       case _: ScTypedPattern if Seq(Nothing, Null, AnyVal) contains patType =>
         val message = ScalaBundle.message(
             "type.cannot.be.used.in.type.pattern", patType.presentableText)
@@ -136,46 +126,41 @@ object PatternAnnotator {
       //do not check interpolated patterns for number of arguments
       case (_: ScConstructorPattern | _: ScInfixPattern) =>
         //check number of arguments
-        val (reference, numPatterns) = pattern match {
+        val (reference, numPatterns) = pattern match
           case constr: ScConstructorPattern =>
             (Option(constr.ref), constr.args.patterns.length)
           case infix: ScInfixPattern =>
-            val numPatterns: Int = infix.rightPattern match {
+            val numPatterns: Int = infix.rightPattern match
               case Some(_: ScInfixPattern) => 2
               case Some(right) =>
-                right.subpatterns match {
+                right.subpatterns match
                   case Seq() => 2
                   case s => s.length + 1
-                }
               case _ => 1
-            }
             (Option(infix.reference), numPatterns)
-        }
-        reference match {
+        reference match
           case Some(ref) =>
-            ref.bind() match {
+            ref.bind() match
               case Some(ScalaResolveResult(fun: ScFunction, _))
                   if fun.name == "unapply" =>
-                fun.returnType match {
+                fun.returnType match
                   case Success(rt, _) =>
                     val expected =
                       ScPattern.expectedNumberOfExtractorArguments(
                           rt, pattern, ScPattern.isOneArgCaseClassMethod(fun))
                     val tupleCrushingIsPresent =
                       expected > 0 && numPatterns == 1 && !fun.isSynthetic
-                    if (expected != numPatterns && !tupleCrushingIsPresent) {
+                    if (expected != numPatterns && !tupleCrushingIsPresent)
                       //1 always fits if return type is Option[TupleN]
                       val message = ScalaBundle.message(
                           "wrong.number.arguments.extractor",
                           numPatterns.toString,
                           expected.toString)
                       holder.createErrorAnnotation(pattern, message)
-                    }
                   case _ =>
-                }
               case Some(ScalaResolveResult(fun: ScFunction, _))
                   if fun.name == "unapplySeq" =>
-                fun.returnType match {
+                fun.returnType match
                   case Success(rt, _) =>
                     //subtract 1 because last argument (Seq) may be omitted
                     val expected =
@@ -183,99 +168,79 @@ object PatternAnnotator {
                           rt,
                           pattern,
                           ScPattern.isOneArgCaseClassMethod(fun)) - 1
-                    if (expected > numPatterns) {
+                    if (expected > numPatterns)
                       val message = ScalaBundle.message(
                           "wrong.number.arguments.extractor.unapplySeq",
                           numPatterns.toString,
                           expected.toString)
                       holder.createErrorAnnotation(pattern, message)
-                    }
                   case _ =>
-                }
               case _ =>
-            }
           case _ =>
-        }
       case _ =>
-    }
-  }
 
-  private def widen(scType: ScType): ScType = scType match {
+  private def widen(scType: ScType): ScType = scType match
     case _ if ScType.isSingletonType(scType) =>
       ScType.extractDesignatorSingletonType(scType).getOrElse(scType)
     case _ =>
-      scType.recursiveUpdate {
+      scType.recursiveUpdate
         case ScAbstractType(_, _, upper) => (true, upper)
         case ScTypeParameterType(_, _, _, upper, _) => (true, upper.v)
         case tp => (false, tp)
-      }
-  }
 
-  private def freeTypeParamsOfTerms(tp: ScType): Seq[ScType] = {
+  private def freeTypeParamsOfTerms(tp: ScType): Seq[ScType] =
     val buffer = ArrayBuffer[ScType]()
-    tp.recursiveUpdate {
+    tp.recursiveUpdate
       case tp: ScTypeParameterType =>
         buffer += tp
         (false, tp)
       case _ => (false, tp)
-    }
     buffer.toSeq
-  }
-}
 
-object PatternAnnotatorUtil {
+object PatternAnnotatorUtil
   @tailrec
-  def matchesPattern(matching: ScType, matched: ScType): Boolean = {
+  def matchesPattern(matching: ScType, matched: ScType): Boolean =
     def abstraction(
-        scType: ScType, visited: HashSet[ScType] = HashSet.empty): ScType = {
-      if (visited.contains(scType)) {
+        scType: ScType, visited: HashSet[ScType] = HashSet.empty): ScType =
+      if (visited.contains(scType))
         return scType
-      }
       val newVisited = visited + scType
-      scType.recursiveUpdate {
+      scType.recursiveUpdate
         case tp: ScTypeParameterType =>
           (true,
            ScAbstractType(tp,
                           abstraction(tp.lower.v, newVisited),
                           abstraction(tp.upper.v, newVisited)))
         case tpe => (false, tpe)
-      }
-    }
 
-    object arrayType {
-      def unapply(scType: ScType): Option[ScType] = scType match {
+    object arrayType
+      def unapply(scType: ScType): Option[ScType] = scType match
         case ScParameterizedType(ScDesignatorType(elem: ScClass), Seq(arg))
             if elem.qualifiedName == "scala.Array" =>
           Some(arg)
         case _ => None
-      }
-    }
 
     matching.weakConforms(matched) ||
-    ((matching, matched) match {
+    ((matching, matched) match
           case (arrayType(arg1), arrayType(arg2)) => matchesPattern(arg1, arg2)
           case (_, parameterized: ScParameterizedType) =>
             val newtp = abstraction(parameterized)
             !matched.equiv(newtp) && matching.weakConforms(newtp)
           case _ => false
-        })
-  }
+        )
 
-  def patternType(pattern: ScPattern): Option[ScType] = {
+  def patternType(pattern: ScPattern): Option[ScType] =
     def constrPatternType(
-        patternRef: ScStableCodeReferenceElement): Option[ScType] = {
-      patternRef.advancedResolve match {
+        patternRef: ScStableCodeReferenceElement): Option[ScType] =
+      patternRef.advancedResolve match
         case Some(srr) =>
-          srr.getElement match {
+          srr.getElement match
             case fun: ScFunction if fun.parameters.size == 1 =>
               Some(srr.substitutor.subst(fun.paramTypes.head))
             case _ => None
-          }
         case None => None
-      }
-    }
 
-    pattern match {
+    pattern match
       case c: ScConstructorPattern =>
         constrPatternType(c.ref)
       case inf: ScInfixPattern =>
@@ -297,6 +262,3 @@ object PatternAnnotatorUtil {
         patternType(parenth.subpattern.orNull)
       case null => None
       case _ => pattern.getType(TypingContext.empty).toOption
-    }
-  }
-}

@@ -1,19 +1,16 @@
-object WithSemicolon {
-  def foo(i: Int) {
+object WithSemicolon
+  def foo(i: Int)
     /*start*/
 
     val y = 0
     println(i)
     y + 1
 /*end*/
-  }
 
-  def foofoo() {
+  def foofoo()
     val y = 0
     println(1);
     y + 1
-  }
-}
 /*
 object WithSemicolon {
   def foo(i: Int) {

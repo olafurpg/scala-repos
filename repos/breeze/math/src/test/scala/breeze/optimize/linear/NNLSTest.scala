@@ -4,10 +4,10 @@ import breeze.linalg.{DenseMatrix, DenseVector, norm}
 import breeze.numerics._
 import breeze.optimize.OptimizeTestBase
 
-class NNLSTest extends OptimizeTestBase {
+class NNLSTest extends OptimizeTestBase
 
   /** Generate an NNLS problem whose optimal solution is the all-ones vector. */
-  def genOnesData(n: Int): (DenseMatrix[Double], DenseVector[Double]) = {
+  def genOnesData(n: Int): (DenseMatrix[Double], DenseVector[Double]) =
     val A = DenseMatrix.rand[Double](n, n)
     val b = A * DenseVector.ones[Double](n)
 
@@ -15,9 +15,8 @@ class NNLSTest extends OptimizeTestBase {
     val atb = A.t * b
 
     (ata, atb)
-  }
 
-  test("NNLS: exact solution cases") {
+  test("NNLS: exact solution cases")
     val n = 20
     val nnls = new NNLS()
     var numSolved = 0
@@ -25,7 +24,7 @@ class NNLSTest extends OptimizeTestBase {
     // About 15% of random 20x20 [-1,1]-matrices have a singular value less than 1e-3.  NNLS
     // can legitimately fail to solve these anywhere close to exactly.  So we grab a considerable
     // sample of these matrices and make sure that we solved a substantial fraction of them.    
-    for (k <- 0 until 100) {
+    for (k <- 0 until 100)
       val (ata, atb) = genOnesData(n)
       val x = nnls.minimize(ata, atb)
       atb *= -1.0
@@ -33,11 +32,9 @@ class NNLSTest extends OptimizeTestBase {
       x -= golden
       if ((norm(x, 2) < 1e-2) && (norm(x, inf) < 1e-3))
         numSolved = numSolved + 1
-    }
     assert(numSolved > 50)
-  }
 
-  test("NNLS: nonnegativity constraint active") {
+  test("NNLS: nonnegativity constraint active")
     val n = 5
     val ata = new DenseMatrix[Double](5,
                                       5,
@@ -73,13 +70,11 @@ class NNLSTest extends OptimizeTestBase {
 
     val nnls = new NNLS()
     val x = nnls.minimize(ata, atb)
-    for (i <- 0 until n) {
+    for (i <- 0 until n)
       assert(abs(x(i) - goodx(i)) < 1E-3)
       assert(x(i) >= 0)
-    }
-  }
 
-  test("NNLS: objective value test") {
+  test("NNLS: objective value test")
     val n = 5
     val ata = new DenseMatrix[Double](5,
                                       5,
@@ -121,5 +116,3 @@ class NNLSTest extends OptimizeTestBase {
     val obj = NNLS.computeObjectiveValue(ata, atb, x)
 
     assert(obj < refObj + 1E-5)
-  }
-}

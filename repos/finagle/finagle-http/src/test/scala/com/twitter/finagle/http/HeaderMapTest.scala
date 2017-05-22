@@ -6,21 +6,20 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class HeaderMapTest extends FunSuite {
+class HeaderMapTest extends FunSuite
 
   private[this] val date = new Date(1441322139353L)
   private[this] val formattedDate = "Thu, 03 Sep 2015 23:15:39 GMT"
 
-  test("get") {
+  test("get")
     val request = Request()
     request.headers.add("Host", "api.twitter.com")
 
     assert(request.headerMap.get("Host") == Some("api.twitter.com"))
     assert(request.headerMap.get("HOST") == Some("api.twitter.com"))
     assert(request.headerMap.get("missing") == None)
-  }
 
-  test("set") {
+  test("set")
     val request = Request()
     request.headers.set("key", "initial value")
     assert(request.headerMap.get("key") == Some("initial value"))
@@ -31,9 +30,8 @@ class HeaderMapTest extends FunSuite {
 
     request.headerMap.set("date", date)
     assert(request.headerMap.getAll("date").toSeq == Seq(formattedDate))
-  }
 
-  test("getAll") {
+  test("getAll")
     val request = Request()
     request.headers.add("Cookie", "1")
     request.headers.add("Cookie", "2")
@@ -41,18 +39,16 @@ class HeaderMapTest extends FunSuite {
     assert(request.headerMap.getAll("Cookie").toList.sorted == List("1", "2"))
     assert(request.headerMap.getAll("COOKIE").toList.sorted == List("1", "2"))
     assert(request.headerMap.getAll("missing").toList == Nil)
-  }
 
-  test("iterator") {
+  test("iterator")
     val request = Request()
     request.headers.add("Cookie", "1")
     request.headers.add("Cookie", "2")
 
     assert(request.headerMap.iterator.toList.sorted == ("Cookie", "1") :: (
             "Cookie", "2") :: Nil)
-  }
 
-  test("keys") {
+  test("keys")
     val request = Request()
     request.headers.add("Cookie", "1")
     request.headers.add("Cookie", "2")
@@ -60,18 +56,16 @@ class HeaderMapTest extends FunSuite {
     assert(request.headerMap.keys.toList == List("Cookie"))
     assert(request.headerMap.keySet.toList == List("Cookie"))
     assert(request.headerMap.keysIterator.toList == List("Cookie"))
-  }
 
-  test("contains") {
+  test("contains")
     val request = Request()
     request.headers.add("Cookie", "1")
 
     assert(request.headerMap.contains("Cookie") == true)
     assert(request.headerMap.contains("COOKIE") == true)
     assert(request.headerMap.contains("missing") == false)
-  }
 
-  test("add") {
+  test("add")
     val request = Request()
     request.headers.add("Cookie", "1")
 
@@ -80,9 +74,8 @@ class HeaderMapTest extends FunSuite {
 
     request.headerMap.add("date", date)
     assert(request.headerMap.getAll("date").toSeq == Seq(formattedDate))
-  }
 
-  test("+=") {
+  test("+=")
     val request = Request()
     request.headers.add("Cookie", "1")
 
@@ -91,13 +84,10 @@ class HeaderMapTest extends FunSuite {
 
     request.headerMap += "date" -> date
     assert(request.headerMap.getAll("date").toSeq == Seq(formattedDate))
-  }
 
-  test("-=") {
+  test("-=")
     val request = Request()
     request.headers.add("Cookie", "1")
 
     request.headerMap -= "Cookie"
     assert(request.headerMap.contains("Cookie") == false)
-  }
-}

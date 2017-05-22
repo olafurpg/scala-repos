@@ -23,7 +23,7 @@ import java.util.concurrent.CompletionStage
   * are materialized later, during the runtime of the flow graph processing.
   */
 class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
-        Out, Mat, scaladsl.Flow[In, Out, Mat]#Repr, scaladsl.Sink[In, Mat]]) {
+        Out, Mat, scaladsl.Flow[In, Out, Mat]#Repr, scaladsl.Sink[In, Mat]])
 
   /** Converts this Flow to its Scala DSL counterpart */
   def asScala: scaladsl.SubFlow[Out,
@@ -145,9 +145,9 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
   def mapConcat[T](
       f: function.Function[Out, java.lang.Iterable[T]]): SubFlow[In, T, Mat] =
     new SubFlow(
-        delegate.mapConcat { elem ⇒
+        delegate.mapConcat  elem ⇒
       Util.immutableSeq(f(elem))
-    })
+    )
 
   /**
     * Transform each input element into an `Iterable` of output elements that is
@@ -177,11 +177,11 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
       f: function.Creator[function.Function[Out, java.lang.Iterable[T]]])
     : SubFlow[In, T, Mat] =
     new SubFlow(
-        delegate.statefulMapConcat { () ⇒
+        delegate.statefulMapConcat  () ⇒
       val fun = f.create()
       elem ⇒
         Util.immutableSeq(fun(elem))
-    })
+    )
 
   /**
     * Transform this stream by applying the given function to each of the elements
@@ -362,9 +362,8 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     * See also [[Flow.take]], [[Flow.takeWithin]], [[Flow.takeWhile]]
     */
   def limitWeighted(n: Long)(
-      costFn: function.Function[Out, Long]): javadsl.SubFlow[In, Out, Mat] = {
+      costFn: function.Function[Out, Long]): javadsl.SubFlow[In, Out, Mat] =
     new SubFlow(delegate.limitWeighted(n)(costFn.apply))
-  }
 
   /**
     * Apply a sliding window over the stream and return the windows as groups of elements, with the last group
@@ -909,9 +908,9 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     new SubFlow(
         delegate
           .prefixAndTail(n)
-          .map {
+          .map
         case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
-      })
+      )
 
   /**
     * Transform each input element into a `Source` of output elements that is
@@ -1377,4 +1376,3 @@ class SubFlow[-In, +Out, +Mat](delegate: scaladsl.SubFlow[
     */
   def log(name: String): SubFlow[In, Out, Mat] =
     this.log(name, ConstantFun.javaIdentityFunction[Out], null)
-}

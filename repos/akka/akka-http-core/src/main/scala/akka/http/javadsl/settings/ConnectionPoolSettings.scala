@@ -12,7 +12,7 @@ import akka.http.impl.util.JavaMapping.Implicits._
 /**
   * Public API but not intended for subclassing
   */
-abstract class ConnectionPoolSettings private[akka]() {
+abstract class ConnectionPoolSettings private[akka]()
   self: ConnectionPoolSettingsImpl ⇒
   def getMaxConnections: Int
   def getMaxRetries: Int
@@ -36,12 +36,10 @@ abstract class ConnectionPoolSettings private[akka]() {
   def withConnectionSettings(
       newValue: ClientConnectionSettings): ConnectionPoolSettings =
     self.copy(connectionSettings = newValue.asScala)
-}
 
 object ConnectionPoolSettings
-    extends SettingsCompanion[ConnectionPoolSettings] {
+    extends SettingsCompanion[ConnectionPoolSettings]
   override def create(config: Config): ConnectionPoolSettings =
     ConnectionPoolSettingsImpl(config)
   override def create(configOverrides: String): ConnectionPoolSettings =
     ConnectionPoolSettingsImpl(configOverrides)
-}

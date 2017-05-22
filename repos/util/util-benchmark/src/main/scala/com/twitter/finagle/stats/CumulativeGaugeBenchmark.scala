@@ -8,7 +8,7 @@ import scala.collection.mutable
 
 // ./sbt 'project util-benchmark' 'run .*CumulativeGaugeBenchmark.*'
 @State(Scope.Benchmark)
-class CumulativeGaugeBenchmark extends StdBenchAnnotations {
+class CumulativeGaugeBenchmark extends StdBenchAnnotations
 
   @Param(Array("1", "10", "100"))
   private[this] var num = 1
@@ -21,14 +21,12 @@ class CumulativeGaugeBenchmark extends StdBenchAnnotations {
   private[this] var theGauge: () => Float = _
 
   @Setup(Level.Iteration)
-  def setup(): Unit = {
+  def setup(): Unit =
     getStatsRecv = new CumulativeStatsRecv()
     gauges = new mutable.ArrayBuffer[Gauge](10000)
-    0.until(num).foreach { _ =>
+    0.until(num).foreach  _ =>
       gauges += getStatsRecv.addGauge("get_gauge")(1f)
-    }
     theGauge = getStatsRecv.gauges(Seq("get_gauge"))
-  }
 
   @TearDown(Level.Iteration)
   def teardown(): Unit =
@@ -43,16 +41,14 @@ class CumulativeGaugeBenchmark extends StdBenchAnnotations {
   @Measurement(batchSize = 100)
   @BenchmarkMode(Array(Mode.SingleShotTime))
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  def addGauge(): Gauge = {
+  def addGauge(): Gauge =
     val g = getStatsRecv.addGauge("add_gauge")(2f)
     gauges += g
     g
-  }
-}
 
-object CumulativeGaugeBenchmark {
+object CumulativeGaugeBenchmark
 
-  class CumulativeStatsRecv extends StatsReceiverWithCumulativeGauges {
+  class CumulativeStatsRecv extends StatsReceiverWithCumulativeGauges
     override val repr: AnyRef = this
     override def counter(name: String*): Counter = ???
     override def stat(name: String*): Stat = ???
@@ -65,5 +61,3 @@ object CumulativeGaugeBenchmark {
 
     override protected[this] def deregisterGauge(name: Seq[String]): Unit =
       gauges -= name
-  }
-}

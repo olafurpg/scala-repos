@@ -12,7 +12,7 @@ case class Thread(id: String,
                   posts: List[Post],
                   creatorId: String,
                   invitedId: String,
-                  visibleByUserIds: List[String]) {
+                  visibleByUserIds: List[String])
 
   def +(post: Post) = copy(posts = posts :+ post, updatedAt = post.createdAt)
 
@@ -23,17 +23,16 @@ case class Thread(id: String,
   def isUnReadBy(user: User) = !isReadBy(user)
 
   def nbUnreadBy(user: User): Int =
-    isCreator(user).fold(posts count { post =>
+    isCreator(user).fold(posts count  post =>
       post.isByInvited && post.isUnRead
-    }, posts count { post =>
+    , posts count  post =>
       post.isByCreator && post.isUnRead
-    })
+    )
 
   def nbUnread: Int = posts count (_.isUnRead)
 
-  def firstPostUnreadBy(user: User): Option[Post] = posts find { post =>
+  def firstPostUnreadBy(user: User): Option[Post] = posts find  post =>
     post.isUnRead && post.isByCreator != isCreator(user)
-  }
 
   def userIds = List(creatorId, invitedId)
 
@@ -57,9 +56,8 @@ case class Thread(id: String,
     posts exists (_.isByCreator == (creatorId == userId))
 
   def endsWith(post: Post) = posts.lastOption ?? post.similar
-}
 
-object Thread {
+object Thread
 
   val idSize = 8
 
@@ -85,12 +83,10 @@ object Thread {
   import play.api.libs.json._
 
   private[message] lazy val tube =
-    Post.tube |> { implicit pt =>
+    Post.tube |>  implicit pt =>
       JsTube(
           (__.json update (readDate('createdAt) andThen readDate('updatedAt))) andThen Json
             .reads[Thread],
           Json.writes[Thread] andThen
           (__.json update (writeDate('createdAt) andThen writeDate('updatedAt)))
       )
-    }
-}

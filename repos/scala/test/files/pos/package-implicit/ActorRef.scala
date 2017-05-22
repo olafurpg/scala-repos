@@ -1,8 +1,6 @@
 package t1000647.foo
 
-trait ActorRef {
+trait ActorRef
   def stop(): Unit = {}
-}
 
-trait ScalaActorRef { self: ActorRef =>
-}
+trait ScalaActorRef  self: ActorRef =>

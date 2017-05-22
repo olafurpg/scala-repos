@@ -7,7 +7,7 @@ import akka.actor._
 
 import lila.common.LilaException
 
-trait SequentialActor extends Actor {
+trait SequentialActor extends Actor
 
   type ReceiveAsync = PartialFunction[Any, Funit]
 
@@ -15,23 +15,20 @@ trait SequentialActor extends Actor {
 
   def futureTimeout: Option[FiniteDuration] = none
 
-  private def idle: Receive = {
+  private def idle: Receive =
 
     case msg =>
       context become busy
       processThenDone(msg)
-  }
 
-  private def busy: Receive = {
+  private def busy: Receive =
 
     case Done =>
-      dequeue match {
+      dequeue match
         case None => context become idle
         case Some(msg) => processThenDone(msg)
-      }
 
     case msg => queue enqueue msg
-  }
 
   def receive = idle
 
@@ -42,29 +39,23 @@ trait SequentialActor extends Actor {
 
   private case object Done
 
-  private def fallback: ReceiveAsync = {
+  private def fallback: ReceiveAsync =
     case _ => funit
-  }
 
-  private def processThenDone(work: Any) {
-    work match {
+  private def processThenDone(work: Any)
+    work match
       // we don't want to send Done after actor death
       case SequentialActor.Terminate => self ! PoisonPill
       case msg =>
         val future = (process orElse fallback)(msg)
         futureTimeout
-          .fold(future) { timeout =>
+          .fold(future)  timeout =>
             future.withTimeout(
                 timeout, LilaException(s"Sequential actor timeout: $timeout"))(
                 context.system)
-          }
           .addFailureEffect(onFailure)
           .andThenAnyway { self ! Done }
-    }
-  }
-}
 
-object SequentialActor {
+object SequentialActor
 
   case object Terminate
-}

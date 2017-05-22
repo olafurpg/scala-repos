@@ -8,78 +8,64 @@ import scala.reflect.macros.whitebox
   * Author: Svyatoslav Ilinskiy
   * Date: 9/22/15.
   */
-object CachedMacroUtil {
+object CachedMacroUtil
   val debug: Boolean = false
   //to analyze caches pass in the following compiler flag: "-Xmacro-settings:analyze-caches"
   val ANALYZE_CACHES: String = "analyze-caches"
 
-  def println(a: Any): Unit = {
-    if (debug) {
+  def println(a: Any): Unit =
+    if (debug)
       Console.println(a)
-    }
-  }
 
-  def cachesUtilFQN(implicit c: whitebox.Context): c.universe.Tree = {
+  def cachesUtilFQN(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     q"_root_.org.jetbrains.plugins.scala.caches.CachesUtil"
-  }
 
-  def cachedValueTypeFQN(implicit c: whitebox.Context): c.universe.Tree = {
+  def cachedValueTypeFQN(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     tq"_root_.com.intellij.psi.util.CachedValue"
-  }
 
-  def keyTypeFQN(implicit c: whitebox.Context): c.universe.Tree = {
+  def keyTypeFQN(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     tq"_root_.com.intellij.openapi.util.Key"
-  }
 
-  def cacheStatisticsFQN(implicit c: whitebox.Context): c.universe.Tree = {
+  def cacheStatisticsFQN(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     q"_root_.org.jetbrains.plugins.scala.statistics.CacheStatistics"
-  }
 
-  def getRecursionGuardFQN(implicit c: whitebox.Context): c.universe.Tree = {
+  def getRecursionGuardFQN(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     q"$cachesUtilFQN.getRecursionGuard"
-  }
 
   def psiModificationTrackerFQN(
-      implicit c: whitebox.Context): c.universe.Tree = {
+      implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     q"_root_.com.intellij.psi.util.PsiModificationTracker"
-  }
 
-  def mappedKeyTypeFQN(implicit c: whitebox.Context): c.universe.Tree = {
+  def mappedKeyTypeFQN(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     tq"_root_.org.jetbrains.plugins.scala.caches.CachesUtil.MappedKey"
-  }
 
-  def psiElementType(implicit c: whitebox.Context): c.universe.Tree = {
+  def psiElementType(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     tq"_root_.com.intellij.psi.PsiElement"
-  }
 
-  def scalaPsiManagerFQN(implicit c: whitebox.Context): c.universe.Tree = {
+  def scalaPsiManagerFQN(implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     q"_root_.org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager"
-  }
 
   def thisFunctionFQN(name: String)(
-      implicit c: whitebox.Context): c.universe.Tree = {
+      implicit c: whitebox.Context): c.universe.Tree =
     import c.universe.Quasiquote
     q"""getClass.getName ++ "." ++ $name"""
-  }
 
   def generateTermName(name: String = "")(
-      implicit c: whitebox.Context): c.universe.TermName = {
+      implicit c: whitebox.Context): c.universe.TermName =
     c.universe.TermName(c.freshName(name))
-  }
 
   def generateTypeName(name: String = "")(
-      implicit c: whitebox.Context): c.universe.TypeName = {
+      implicit c: whitebox.Context): c.universe.TypeName =
     c.universe.TypeName(c.freshName(name))
-  }
 
   def abort(s: String)(implicit c: whitebox.Context): Nothing =
     c.abort(c.enclosingPosition, s)
@@ -87,9 +73,9 @@ object CachedMacroUtil {
   def transformRhsToAnalyzeCaches(c: whitebox.Context)(
       cacheStatsName: c.universe.TermName,
       retTp: c.universe.Tree,
-      rhs: c.universe.Tree): c.universe.Tree = {
+      rhs: c.universe.Tree): c.universe.Tree =
     import c.universe.Quasiquote
-    if (analyzeCachesEnabled(c)) {
+    if (analyzeCachesEnabled(c))
       val innerCachedFunName = generateTermName("")(c)
       //have to put it in a separate function because otherwise it falls with NonLocalReturn
       q"""
@@ -108,24 +94,23 @@ object CachedMacroUtil {
         timePrevCacheRanUntilThisCacheStarted.foreach { case time: Long => myStartTimes.push(System.nanoTime - time)}
         res
       """
-    } else q"$rhs"
-  }
+    else q"$rhs"
 
   def analyzeCachesEnabled(c: whitebox.Context): Boolean =
     c.settings.contains(ANALYZE_CACHES)
 
   @tailrec
   def modCountParamToModTracker(c: whitebox.Context)(
-      tree: c.universe.Tree, psiElement: c.universe.Tree): c.universe.Tree = {
+      tree: c.universe.Tree, psiElement: c.universe.Tree): c.universe.Tree =
     implicit val x: c.type = c
     import c.universe._
-    tree match {
+    tree match
       case q"modificationCount = $v" =>
         modCountParamToModTracker(x)(v, psiElement)
       case q"ModCount.$v" =>
         modCountParamToModTracker(x)(q"$v", psiElement)
       case q"$v" =>
-        ModCount.values.find(_.toString == v.toString) match {
+        ModCount.values.find(_.toString == v.toString) match
           case Some(ModCount.getBlockModificationCount) =>
             q"$cachesUtilFQN.enclosingModificationOwner($psiElement)"
           case Some(ModCount.getOutOfCodeBlockModificationCount) =>
@@ -135,12 +120,8 @@ object CachedMacroUtil {
           case Some(ModCount.getJavaStructureModificationCount) =>
             q"$psiModificationTrackerFQN.JAVA_STRUCTURE_MODIFICATION_COUNT"
           case _ => tree
-        }
-    }
-  }
-}
 
-object ModCount extends Enumeration {
+object ModCount extends Enumeration
   type ModCount = Value
   val getModificationCount = Value("getModificationCount")
   val getOutOfCodeBlockModificationCount = Value(
@@ -148,4 +129,3 @@ object ModCount extends Enumeration {
   val getJavaStructureModificationCount = Value(
       "getJavaStructureModificationCount")
   val getBlockModificationCount = Value("getBlockModificationCount")
-}

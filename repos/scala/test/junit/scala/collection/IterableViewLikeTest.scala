@@ -7,10 +7,10 @@ import org.junit.runners.JUnit4
 import language.postfixOps
 
 @RunWith(classOf[JUnit4])
-class IterableViewLikeTest {
+class IterableViewLikeTest
 
   @Test
-  def hasCorrectDropAndTakeMethods() {
+  def hasCorrectDropAndTakeMethods()
     val iter = Iterable(1, 2, 3)
 
     import scala.language.postfixOps
@@ -18,5 +18,3 @@ class IterableViewLikeTest {
     assertEquals(Iterable.empty[Int], iter.view takeRight Int.MinValue force)
     assertEquals(iter, iter.view drop Int.MinValue force)
     assertEquals(iter, iter.view dropRight Int.MinValue force)
-  }
-}

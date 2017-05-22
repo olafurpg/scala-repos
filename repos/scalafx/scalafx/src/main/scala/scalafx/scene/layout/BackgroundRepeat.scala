@@ -33,7 +33,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/BackgroundRepeat.html javafx.scene.layout.BackgroundRepeat]] */
 object BackgroundRepeat
-    extends SFXEnumDelegateCompanion[jfxsl.BackgroundRepeat, BackgroundRepeat] {
+    extends SFXEnumDelegateCompanion[jfxsl.BackgroundRepeat, BackgroundRepeat]
 
   /** The image is placed once and not repeated.     */
   val NoRepeat = new BackgroundRepeat(jfxsl.BackgroundRepeat.NO_REPEAT)
@@ -55,7 +55,6 @@ object BackgroundRepeat
       Round,
       Space
   )
-}
 
 /**
   * Enumeration of options for repeating images in backgrounds

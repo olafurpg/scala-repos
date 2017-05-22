@@ -25,7 +25,7 @@ import org.junit.Assert._
 import org.junit.{Before, Test}
 import org.easymock.EasyMock
 
-class ReplicationUtilsTest extends ZooKeeperTestHarness {
+class ReplicationUtilsTest extends ZooKeeperTestHarness
   val topic = "my-topic-test"
   val partitionId = 0
   val brokerId = 1
@@ -56,13 +56,12 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
       LeaderAndIsr(1, leaderEpoch, List(1, 2), 0), controllerEpoch)
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     zkUtils.createPersistentPath(topicPath, topicData)
-  }
 
   @Test
-  def testUpdateLeaderAndIsr() {
+  def testUpdateLeaderAndIsr()
     val configs =
       TestUtils.createBrokerConfigs(1, zkConnect).map(KafkaConfig.fromProps)
     val log = EasyMock.createMock(classOf[kafka.log.Log])
@@ -129,10 +128,9 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
                                           zkVersion + 1)
     assertFalse(updateSucceeded3)
     assertEquals(newZkVersion3, -1)
-  }
 
   @Test
-  def testGetLeaderIsrAndEpochForPartition() {
+  def testGetLeaderIsrAndEpochForPartition()
     val leaderIsrAndControllerEpoch =
       ReplicationUtils.getLeaderIsrAndEpochForPartition(
           zkUtils, topic, partitionId)
@@ -141,5 +139,3 @@ class ReplicationUtilsTest extends ZooKeeperTestHarness {
     assertEquals(None,
                  ReplicationUtils.getLeaderIsrAndEpochForPartition(
                      zkUtils, topic, partitionId + 1))
-  }
-}

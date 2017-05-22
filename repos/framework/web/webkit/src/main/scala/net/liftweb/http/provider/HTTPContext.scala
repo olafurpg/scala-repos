@@ -26,7 +26,7 @@ import net.liftweb.util._
 /**
   * Represents the service context information. Similar with servlet context.
   */
-trait HTTPContext {
+trait HTTPContext
 
   /**
     * @return - the context path. It always comes first in a request URI. It is
@@ -92,4 +92,3 @@ trait HTTPContext {
     * @param - name. The name ofthe parameter that needs to be removed.
     */
   def removeAttribute(name: String): Unit
-}

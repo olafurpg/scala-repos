@@ -6,9 +6,8 @@
 package scala.tools.nsc
 package interpreter
 
-trait Logger {
+trait Logger
   def isInfo: Boolean
   def isDebug: Boolean
   def isTrace: Boolean
   def out: JPrintWriter
-}

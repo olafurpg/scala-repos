@@ -31,7 +31,7 @@ import javafx.scene.{paint => jfxsp}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Paint {
+object Paint
   implicit def sfxPaint2jfx(p: Paint): jfxsp.Paint =
     if (p != null) p.delegate else null
 
@@ -40,7 +40,6 @@ object Paint {
     * LinearGradient must begin with linear-gradient keyword and string specifying RadialGradient must begin with radial-gradient.
     */
   def valueOf(value: String) = jfxsp.Paint.valueOf(value)
-}
 
 abstract class Paint(override val delegate: jfxsp.Paint)
     extends SFXDelegate[jfxsp.Paint] {}

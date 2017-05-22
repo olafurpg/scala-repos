@@ -32,31 +32,27 @@ import org.apache.spark.sql.types.{ArrayType, DataType, StringType}
 @Experimental
 class Tokenizer(override val uid: String)
     extends UnaryTransformer[String, Seq[String], Tokenizer]
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("tok"))
 
-  override protected def createTransformFunc: String => Seq[String] = {
+  override protected def createTransformFunc: String => Seq[String] =
     _.toLowerCase.split("\\s")
-  }
 
-  override protected def validateInputType(inputType: DataType): Unit = {
+  override protected def validateInputType(inputType: DataType): Unit =
     require(inputType == StringType,
             s"Input type must be string type but got $inputType.")
-  }
 
   override protected def outputDataType: DataType =
     new ArrayType(StringType, true)
 
   override def copy(extra: ParamMap): Tokenizer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object Tokenizer extends DefaultParamsReadable[Tokenizer] {
+object Tokenizer extends DefaultParamsReadable[Tokenizer]
 
   @Since("1.6.0")
   override def load(path: String): Tokenizer = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -68,7 +64,7 @@ object Tokenizer extends DefaultParamsReadable[Tokenizer] {
 @Experimental
 class RegexTokenizer(override val uid: String)
     extends UnaryTransformer[String, Seq[String], RegexTokenizer]
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("regexTok"))
 
@@ -137,7 +133,7 @@ class RegexTokenizer(override val uid: String)
              pattern -> "\\s+",
              toLowercase -> true)
 
-  override protected def createTransformFunc: String => Seq[String] = {
+  override protected def createTransformFunc: String => Seq[String] =
     originStr =>
       val re = $(pattern).r
       val str = if ($(toLowercase)) originStr.toLowerCase() else originStr
@@ -145,22 +141,18 @@ class RegexTokenizer(override val uid: String)
         if ($(gaps)) re.split(str).toSeq else re.findAllIn(str).toSeq
       val minLength = $(minTokenLength)
       tokens.filter(_.length >= minLength)
-  }
 
-  override protected def validateInputType(inputType: DataType): Unit = {
+  override protected def validateInputType(inputType: DataType): Unit =
     require(inputType == StringType,
             s"Input type must be string type but got $inputType.")
-  }
 
   override protected def outputDataType: DataType =
     new ArrayType(StringType, true)
 
   override def copy(extra: ParamMap): RegexTokenizer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object RegexTokenizer extends DefaultParamsReadable[RegexTokenizer] {
+object RegexTokenizer extends DefaultParamsReadable[RegexTokenizer]
 
   @Since("1.6.0")
   override def load(path: String): RegexTokenizer = super.load(path)
-}

@@ -8,7 +8,7 @@ package scalaz
   * @see [[scalaz.Monad.MonadLaw]]
   */
 ////
-trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
+trait Monad[F[_]] extends Applicative[F] with Bind[F]  self =>
   ////
 
   override def map[A, B](fa: F[A])(f: A => B) = bind(fa)(a => point(f(a)))
@@ -19,22 +19,20 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
     * Collects the results into an arbitrary `MonadPlus` value, such as a `List`.
     */
   def whileM[G[_], A](p: F[Boolean], body: => F[A])(
-      implicit G: MonadPlus[G]): F[G[A]] = {
+      implicit G: MonadPlus[G]): F[G[A]] =
     lazy val f = body
     ifM(p,
         bind(f)(x => map(whileM(p, f))(xs => G.plus(G.point(x), xs))),
         point(G.empty))
-  }
 
   /**
     * Execute an action repeatedly as long as the given `Boolean` expression
     * returns `true`. The condition is evaluated before the loop body.
     * Discards results.
     */
-  def whileM_[A](p: F[Boolean], body: => F[A]): F[Unit] = {
+  def whileM_[A](p: F[Boolean], body: => F[A]): F[Unit] =
     lazy val f = body
     ifM(p, bind(f)(_ => whileM_(p, f)), point(()))
-  }
 
   /**
     * Execute an action repeatedly until the `Boolean` condition returns `true`.
@@ -42,19 +40,17 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
     * arbitrary `MonadPlus` value, such as a `List`.
     */
   def untilM[G[_], A](f: F[A], cond: => F[Boolean])(
-      implicit G: MonadPlus[G]): F[G[A]] = {
+      implicit G: MonadPlus[G]): F[G[A]] =
     lazy val p = cond
     bind(f)(x => map(whileM(map(p)(!_), f))(xs => G.plus(G.point(x), xs)))
-  }
 
   /**
     * Execute an action repeatedly until the `Boolean` condition returns `true`.
     * The condition is evaluated after the loop body. Discards results.
     */
-  def untilM_[A](f: F[A], cond: => F[Boolean]): F[Unit] = {
+  def untilM_[A](f: F[A], cond: => F[Boolean]): F[Unit] =
     lazy val p = cond
     bind(f)(_ => whileM_(map(p)(!_), f))
-  }
 
   /**
     * Execute an action repeatedly until its result fails to satisfy the given predicate
@@ -72,12 +68,11 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
 
   /**The product of Monad `F` and `G`, `[x](F[x], G[x]])`, is a Monad */
   def product[G[_]](implicit G0: Monad[G]): Monad[λ[α => (F[α], G[α])]] =
-    new ProductMonad[F, G] {
+    new ProductMonad[F, G]
       def F = self
       def G = G0
-    }
 
-  trait MonadLaw extends ApplicativeLaw with BindLaw {
+  trait MonadLaw extends ApplicativeLaw with BindLaw
 
     /** Lifted `point` is a no-op. */
     def rightIdentity[A](a: F[A])(implicit FA: Equal[F[A]]): Boolean =
@@ -86,13 +81,11 @@ trait Monad[F[_]] extends Applicative[F] with Bind[F] { self =>
     /** Lifted `f` applied to pure `a` is just `f(a)`. */
     def leftIdentity[A, B](a: A, f: A => F[B])(
         implicit FB: Equal[F[B]]): Boolean = FB.equal(bind(point(a))(f), f(a))
-  }
   def monadLaw = new MonadLaw {}
   ////
   val monadSyntax = new scalaz.syntax.MonadSyntax[F] { def F = Monad.this }
-}
 
-object Monad {
+object Monad
   @inline def apply[F[_]](implicit F: Monad[F]): Monad[F] = F
 
   ////
@@ -103,4 +96,3 @@ object Monad {
     t.apply[MAB[A, ?]]
 
   ////
-}

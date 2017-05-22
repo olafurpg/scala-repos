@@ -23,7 +23,7 @@ import org.netlib.util.intW
 /**
   * Compute Cholesky decomposition.
   */
-private[spark] object CholeskyDecomposition {
+private[spark] object CholeskyDecomposition
 
   /**
     * Solves a symmetric positive definite linear system via Cholesky factorization.
@@ -32,14 +32,13 @@ private[spark] object CholeskyDecomposition {
     * @param bx right-hand side
     * @return the solution array
     */
-  def solve(A: Array[Double], bx: Array[Double]): Array[Double] = {
+  def solve(A: Array[Double], bx: Array[Double]): Array[Double] =
     val k = bx.length
     val info = new intW(0)
     lapack.dppsv("U", k, 1, A, bx, k, info)
     val code = info.`val`
     assert(code == 0, s"lapack.dppsv returned $code.")
     bx
-  }
 
   /**
     * Computes the inverse of a real symmetric positive definite matrix A
@@ -49,11 +48,9 @@ private[spark] object CholeskyDecomposition {
     * @param k the dimension of A
     * @return the upper triangle of the (symmetric) inverse of A
     */
-  def inverse(UAi: Array[Double], k: Int): Array[Double] = {
+  def inverse(UAi: Array[Double], k: Int): Array[Double] =
     val info = new intW(0)
     lapack.dpptri("U", k, UAi, info)
     val code = info.`val`
     assert(code == 0, s"lapack.dpptri returned $code.")
     UAi
-  }
-}

@@ -34,15 +34,12 @@ import scalafx.Includes._
 import scalafx.beans.property.BooleanProperty
 import scalafx.delegate.SFXDelegate
 
-object PathElement {
+object PathElement
   implicit def sfxPathElement2jfx(v: PathElement): jfxss.PathElement =
     if (v != null) v.delegate else null
-}
 
 abstract class PathElement(override val delegate: jfxss.PathElement)
-    extends SFXDelegate[jfxss.PathElement] {
+    extends SFXDelegate[jfxss.PathElement]
   def absolute: BooleanProperty = delegate.absoluteProperty
-  def absolute_=(v: Boolean) {
+  def absolute_=(v: Boolean)
     absolute() = v
-  }
-}

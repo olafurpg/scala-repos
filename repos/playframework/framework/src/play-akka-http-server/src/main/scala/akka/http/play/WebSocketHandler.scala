@@ -14,20 +14,19 @@ import play.api.libs.streams.AkkaStreams
 import play.core.server.common.WebSocketFlowHandler
 import play.core.server.common.WebSocketFlowHandler.{MessageType, RawMessage}
 
-object WebSocketHandler {
+object WebSocketHandler
 
   /**
     * Handle a WebSocket
     */
   def handleWebSocket(upgrade: UpgradeToWebSocket,
                       flow: Flow[Message, Message, _],
-                      bufferLimit: Int): HttpResponse = upgrade match {
+                      bufferLimit: Int): HttpResponse = upgrade match
     case lowLevel: UpgradeToWebSocketLowLevel =>
       lowLevel.handleFrames(messageFlowToFrameFlow(flow, bufferLimit))
     case other =>
       throw new IllegalArgumentException(
           "UpgradeToWebsocket is not an Akka HTTP UpgradeToWebsocketLowLevel")
-  }
 
   /**
     * Convert a flow of messages to a flow of frame events.
@@ -37,7 +36,7 @@ object WebSocketHandler {
     */
   def messageFlowToFrameFlow(
       flow: Flow[Message, Message, _],
-      bufferLimit: Int): Flow[FrameEvent, FrameEvent, _] = {
+      bufferLimit: Int): Flow[FrameEvent, FrameEvent, _] =
     // Each of the stages here transforms frames to an Either[Message, ?], where Message is a close message indicating
     // some sort of protocol failure. The handleProtocolFailures function then ensures that these messages skip the
     // flow that we are wrapping, are sent to the client and the close procedure is implemented.
@@ -46,7 +45,6 @@ object WebSocketHandler {
       .via(handleProtocolFailures(
               WebSocketFlowHandler.webSocketProtocol(bufferLimit).join(flow)))
       .map(messageToFrameEvent)
-  }
 
   /**
     * Akka HTTP potentially splits frames into multiple frame events.
@@ -56,14 +54,14 @@ object WebSocketHandler {
     * @param bufferLimit The maximum size of frame data that should be buffered.
     */
   private def aggregateFrames(
-      bufferLimit: Int): Stage[FrameEvent, Either[Message, RawMessage]] = {
-    new PushStage[FrameEvent, Either[Message, RawMessage]] {
+      bufferLimit: Int): Stage[FrameEvent, Either[Message, RawMessage]] =
+    new PushStage[FrameEvent, Either[Message, RawMessage]]
 
       var currentFrameData: ByteString = null
       var currentFrameHeader: FrameHeader = null
 
       def onPush(elem: FrameEvent, ctx: Context[Either[Message, RawMessage]]) =
-        elem match {
+        elem match
           // FrameData error handling first
           case unexpectedData: FrameData if currentFrameHeader == null =>
             // Technically impossible, this indicates a bug in Akka HTTP,
@@ -107,20 +105,16 @@ object WebSocketHandler {
             currentFrameHeader = header
             currentFrameData = data
             ctx.pull()
-        }
-    }
-  }
 
-  private def frameToRawMessage(header: FrameHeader, data: ByteString) = {
+  private def frameToRawMessage(header: FrameHeader, data: ByteString) =
     val unmasked = FrameEventParser.mask(data, header.mask)
     RawMessage(frameOpCodeToMessageType(header.opcode), unmasked, header.fin)
-  }
 
   /**
     * Converts frames to Play messages.
     */
   private def frameOpCodeToMessageType(
-      opcode: Protocol.Opcode): MessageType.Type = opcode match {
+      opcode: Protocol.Opcode): MessageType.Type = opcode match
     case Protocol.Opcode.Binary =>
       MessageType.Binary
     case Protocol.Opcode.Text =>
@@ -133,15 +127,14 @@ object WebSocketHandler {
       MessageType.Pong
     case Protocol.Opcode.Continuation =>
       MessageType.Continuation
-  }
 
   /**
     * Converts Play messages to Akka HTTP frame events.
     */
-  private def messageToFrameEvent(message: Message): FrameEvent = {
+  private def messageToFrameEvent(message: Message): FrameEvent =
     def frameEvent(opcode: Protocol.Opcode, data: ByteString) =
       FrameEvent.fullFrame(opcode, None, data, fin = true)
-    message match {
+    message match
       case TextMessage(data) =>
         frameEvent(Protocol.Opcode.Text, ByteString(data))
       case BinaryMessage(data) => frameEvent(Protocol.Opcode.Binary, data)
@@ -151,22 +144,20 @@ object WebSocketHandler {
         FrameEvent.closeFrame(statusCode, reason)
       case CloseMessage(None, _) =>
         frameEvent(Protocol.Opcode.Close, ByteString.empty)
-    }
-  }
 
   /**
     * Handles the protocol failures by gracefully closing the connection.
     */
   private def handleProtocolFailures: Flow[RawMessage, Message, _] => Flow[
-      Either[Message, RawMessage], Message, _] = {
+      Either[Message, RawMessage], Message, _] =
     AkkaStreams.bypassWith(
         Flow[Either[Message, RawMessage]].transform(() =>
               new PushStage[Either[Message, RawMessage],
-                            Either[RawMessage, Message]] {
+                            Either[RawMessage, Message]]
             var closing = false
             def onPush(elem: Either[Message, RawMessage],
                        ctx: Context[Either[RawMessage, Message]]) =
-              elem match {
+              elem match
                 case _ if closing =>
                   ctx.finish()
                 case Right(message) =>
@@ -174,16 +165,11 @@ object WebSocketHandler {
                 case Left(close) =>
                   closing = true
                   ctx.push(Right(close))
-              }
-        }),
+        ),
         Merge(2, eagerComplete = true))
-  }
 
-  private case class Frame(header: FrameHeader, data: ByteString) {
+  private case class Frame(header: FrameHeader, data: ByteString)
     def unmaskedData = FrameEventParser.mask(data, header.mask)
-  }
 
-  private def close(status: Int, message: String = "") = {
+  private def close(status: Int, message: String = "") =
     Left(new CloseMessage(Some(status), message))
-  }
-}

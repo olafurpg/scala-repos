@@ -3,7 +3,7 @@ package org.scalajs.jasmine
 import scala.scalajs.js
 
 @js.native
-trait JasmineExpectation extends js.Object {
+trait JasmineExpectation extends js.Object
   def toBe(exp: js.Any): Unit = js.native
   def toEqual(exp: js.Any): Unit = js.native
   def toMatch(exp: js.RegExp): Unit = js.native
@@ -19,4 +19,3 @@ trait JasmineExpectation extends js.Object {
   def toBeCloseTo(exp: Double, precision: Int = 2): Unit = js.native
   def toThrow(): Unit = js.native
   val not: JasmineExpectation = js.native
-}

@@ -25,8 +25,7 @@ import scala.reflect.internal.util.Statistics
 // +  final val canEnable = true // _enabled
 //
 // We can commit this change as the first diff reverts a fix for an IDE memory leak.
-private[io] object IOStats {
+private[io] object IOStats
   val fileExistsCount = Statistics.newCounter("# File.exists calls")
   val fileIsDirectoryCount = Statistics.newCounter("# File.isDirectory calls")
   val fileIsFileCount = Statistics.newCounter("# File.isFile calls")
-}

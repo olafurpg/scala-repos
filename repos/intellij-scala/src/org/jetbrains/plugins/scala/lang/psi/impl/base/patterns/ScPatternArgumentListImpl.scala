@@ -15,20 +15,16 @@ import _root_.scala.collection.mutable._
   * @author ilyas
   */
 class ScPatternArgumentListImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScPatternArgumentList {
+    extends ScalaPsiElementImpl(node) with ScPatternArgumentList
 
   override def toString: String = "Pattern Argument List"
 
-  def patterns = {
+  def patterns =
     val children: Seq[ScPattern] =
       findChildrenByClassScala[ScPattern](classOf[ScPattern])
-    val grandChildrenInBlockExpr: Seq[ScPattern] = this.getChildren.filter {
+    val grandChildrenInBlockExpr: Seq[ScPattern] = this.getChildren.filter
       _.isInstanceOf[ScBlockExpr]
-    }.flatMap { s =>
-      s.getChildren.filter(_.isInstanceOf[ScPattern]).map {
+    .flatMap  s =>
+      s.getChildren.filter(_.isInstanceOf[ScPattern]).map
         _.asInstanceOf[ScPattern]
-      }
-    }
     children ++ grandChildrenInBlockExpr
-  }
-}

@@ -18,7 +18,7 @@ import com.typesafe.config.{ConfigFactory, Config}
   * with other bundles in the OSGi Framework.  If you want to set up multiple systems in the same bundle context, look at
   * the [[akka.osgi.OsgiActorSystemFactory]] instead.
   */
-abstract class ActorSystemActivator extends BundleActivator {
+abstract class ActorSystemActivator extends BundleActivator
 
   private var system: Option[ActorSystem] = None
   private var registration: Option[ServiceRegistration[_]] = None
@@ -38,13 +38,12 @@ abstract class ActorSystemActivator extends BundleActivator {
     *
     * @param context the BundleContext
     */
-  def start(context: BundleContext): Unit = {
+  def start(context: BundleContext): Unit =
     system = Some(
         OsgiActorSystemFactory(context, getActorSystemConfiguration(context))
           .createActorSystem(Option(getActorSystemName(context))))
     system foreach (addLogServiceListener(context, _))
     system foreach (configure(context, _))
-  }
 
   /**
     * Adds a LogService Listener that will advertise the ActorSystem on LogService registration and unregistration
@@ -52,29 +51,24 @@ abstract class ActorSystemActivator extends BundleActivator {
     * @param context  the BundleContext
     * @param  system  the ActorSystem to be advertised
     */
-  def addLogServiceListener(context: BundleContext, system: ActorSystem) {
-    val logServiceListner = new ServiceListener {
-      def serviceChanged(event: ServiceEvent) {
-        event.getType match {
+  def addLogServiceListener(context: BundleContext, system: ActorSystem)
+    val logServiceListner = new ServiceListener
+      def serviceChanged(event: ServiceEvent)
+        event.getType match
           case ServiceEvent.REGISTERED ⇒
             system.eventStream.publish(serviceForReference[LogService](
                     context, event.getServiceReference))
           case ServiceEvent.UNREGISTERING ⇒
             system.eventStream.publish(UnregisteringLogService)
-        }
-      }
-    }
     val filter = s"(objectclass=${classOf[LogService].getName})"
     context.addServiceListener(logServiceListner, filter)
 
     //Small trick to create an event if the service is registered before this start listing for
     Option(context.getServiceReference(classOf[LogService].getName)).foreach(
         x ⇒
-          {
         logServiceListner.serviceChanged(
             new ServiceEvent(ServiceEvent.REGISTERED, x))
-    })
-  }
+    )
 
   /**
     * Convenience method to find a service by its reference.
@@ -88,10 +82,9 @@ abstract class ActorSystemActivator extends BundleActivator {
     *
     * @param context the BundleContext
     */
-  def stop(context: BundleContext): Unit = {
+  def stop(context: BundleContext): Unit =
     registration foreach (_.unregister())
     system foreach (_.terminate())
-  }
 
   /**
     * Register the actor system in the OSGi service registry.  The activator itself will ensure that this service
@@ -102,7 +95,7 @@ abstract class ActorSystemActivator extends BundleActivator {
     * @param context the bundle context
     * @param system the actor system
     */
-  def registerService(context: BundleContext, system: ActorSystem): Unit = {
+  def registerService(context: BundleContext, system: ActorSystem): Unit =
     registration.foreach(_.unregister()) //Cleanup
     val properties = new Properties()
     properties.put("name", system.name)
@@ -111,7 +104,6 @@ abstract class ActorSystemActivator extends BundleActivator {
             classOf[ActorSystem].getName,
             system,
             properties.asInstanceOf[Dictionary[String, Any]]))
-  }
 
   /**
     * By default, the [[akka.actor.ActorSystem]] name will be set to `bundle-&lt;bundle id&gt;-ActorSystem`.  Override this
@@ -134,4 +126,3 @@ abstract class ActorSystemActivator extends BundleActivator {
     */
   def getActorSystemConfiguration(context: BundleContext): Config =
     ConfigFactory.empty
-}

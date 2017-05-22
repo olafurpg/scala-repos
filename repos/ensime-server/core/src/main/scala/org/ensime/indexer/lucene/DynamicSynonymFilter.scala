@@ -17,21 +17,17 @@ import scala.collection.mutable
   * `Analyzer` that does no additional (not even lowercasing) other than
   * the term itself and its synonyms.
   */
-trait DynamicSynonymAnalyzer extends Analyzer with SynonymEngine {
-  override final def createComponents(fieldName: String, reader: Reader) = {
+trait DynamicSynonymAnalyzer extends Analyzer with SynonymEngine
+  override final def createComponents(fieldName: String, reader: Reader) =
     val source = new KeywordTokenizer(reader)
     val result = new DynamicSynonymFilter(source, this)
     new TokenStreamComponents(source, result)
-  }
-}
 
-object DynamicSynonymFilter {
-  trait SynonymEngine {
+object DynamicSynonymFilter
+  trait SynonymEngine
 
     /** @return the synonyms of `term` (`term` should not be in the list) */
     def synonyms(term: String): Set[String]
-  }
-}
 
 /**
   * Splits tokens into synonyms at the same position, taking in a
@@ -47,7 +43,7 @@ object DynamicSynonymFilter {
   * mutable Java API.
   */
 class DynamicSynonymFilter(input: TokenStream, engine: SynonymEngine)
-    extends TokenFilter(input) {
+    extends TokenFilter(input)
   private val termAtt = addAttribute(classOf[CharTermAttribute])
   private val posIncrAtt = addAttribute(classOf[PositionIncrementAttribute])
 
@@ -55,32 +51,26 @@ class DynamicSynonymFilter(input: TokenStream, engine: SynonymEngine)
   private var current: State = _
 
   // return false when EOL
-  override def incrementToken(): Boolean = {
-    if (stack.nonEmpty) {
+  override def incrementToken(): Boolean =
+    if (stack.nonEmpty)
       val synonym = stack.pop()
       restoreState(current) // brings us back to the original token in case of multiple synonyms
       termAtt.setEmpty()
       termAtt.append(synonym)
       posIncrAtt.setPositionIncrement(0)
       return true
-    }
 
     if (!input.incrementToken()) return false
 
     val term = termAtt.toString
     val synonyms = engine.synonyms(term)
-    if (synonyms.nonEmpty) {
-      synonyms foreach { synonym =>
+    if (synonyms.nonEmpty)
+      synonyms foreach  synonym =>
         if (!synonym.equals(term)) stack.push(synonym)
-      }
       current = captureState()
-    }
     true
-  }
 
   // Lucene being stupid higher up the hierarchy
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case that: DynamicSynonymFilter => this eq that
     case _ => false
-  }
-}

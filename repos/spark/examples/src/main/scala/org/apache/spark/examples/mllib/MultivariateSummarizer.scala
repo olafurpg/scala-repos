@@ -33,17 +33,17 @@ import org.apache.spark.mllib.util.MLUtils
   * By default, this loads a synthetic dataset from `data/mllib/sample_linear_regression_data.txt`.
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object MultivariateSummarizer {
+object MultivariateSummarizer
 
   case class Params(
       input: String = "data/mllib/sample_linear_regression_data.txt")
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("MultivariateSummarizer") {
+    val parser = new OptionParser[Params]("MultivariateSummarizer")
       head(
           "MultivariateSummarizer: an example app for MultivariateOnlineSummarizer")
       opt[String]("input")
@@ -57,16 +57,13 @@ object MultivariateSummarizer {
         |  examples/target/scala-*/spark-examples-*.jar \
         |  --input data/mllib/sample_linear_regression_data.txt
         """.stripMargin)
-    }
 
-    parser.parse(args, defaultParams).map { params =>
+    parser.parse(args, defaultParams).map  params =>
       run(params)
-    } getOrElse {
+    getOrElse
       sys.exit(1)
-    }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf =
       new SparkConf().setAppName(s"MultivariateSummarizer with $params")
     val sc = new SparkContext(conf)
@@ -95,8 +92,8 @@ object MultivariateSummarizer {
     println(
         s"var\t${labelSummary.variance(0)}\t${featureSummary.variance.toArray.mkString("\t")}")
     println(
-        s"nnz\t${labelSummary.numNonzeros(0)}\t${featureSummary.numNonzeros.toArray
-      .mkString("\t")}")
+        s"nnz\t${labelSummary.numNonzeros(0)}\t$featureSummary.numNonzeros.toArray
+      .mkString("\t")")
     println(
         s"max\t${labelSummary.max(0)}\t${featureSummary.max.toArray.mkString("\t")}")
     println(
@@ -104,6 +101,4 @@ object MultivariateSummarizer {
     println()
 
     sc.stop()
-  }
-}
 // scalastyle:on println

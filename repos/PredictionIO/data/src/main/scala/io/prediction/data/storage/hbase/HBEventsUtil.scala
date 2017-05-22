@@ -43,18 +43,16 @@ import java.security.MessageDigest
 import java.util.UUID
 
 /* common utility function for accessing EventsStore in HBase */
-object HBEventsUtil {
+object HBEventsUtil
 
   implicit val formats = DefaultFormats
 
   def tableName(
-      namespace: String, appId: Int, channelId: Option[Int] = None): String = {
-    channelId.map { ch =>
+      namespace: String, appId: Int, channelId: Option[Int] = None): String =
+    channelId.map  ch =>
       s"${namespace}:events_${appId}_${ch}"
-    }.getOrElse {
+    .getOrElse
       s"${namespace}:events_${appId}"
-    }
-  }
 
   // column names for "e" column family
   val colNames: Map[String, Array[Byte]] = Map(
@@ -71,16 +69,15 @@ object HBEventsUtil {
       "creationTimeZone" -> "ctz"
   ).mapValues(Bytes.toBytes(_))
 
-  def hash(entityType: String, entityId: String): Array[Byte] = {
+  def hash(entityType: String, entityId: String): Array[Byte] =
     val s = entityType + "-" + entityId
     // get a new MessageDigest object each time for thread-safe
     val md5 = MessageDigest.getInstance("MD5")
     md5.digest(Bytes.toBytes(s))
-  }
 
   class RowKey(
       val b: Array[Byte]
-  ) {
+  )
     require((b.size == 32), s"Incorrect b size: ${b.size}")
     lazy val entityHash: Array[Byte] = b.slice(0, 16)
     lazy val millis: Long = Bytes.toLong(b.slice(16, 24))
@@ -88,16 +85,14 @@ object HBEventsUtil {
 
     lazy val toBytes: Array[Byte] = b
 
-    override def toString: String = {
+    override def toString: String =
       Base64.encodeBase64URLSafeString(toBytes)
-    }
-  }
 
-  object RowKey {
+  object RowKey
     def apply(entityType: String,
               entityId: String,
               millis: Long,
-              uuidLow: Long): RowKey = {
+              uuidLow: Long): RowKey =
       // add UUID least significant bits for multiple actions at the same time
       // (UUID's most significant bits are actually timestamp,
       // use eventTime instead).
@@ -105,47 +100,38 @@ object HBEventsUtil {
         hash(entityType, entityId) ++ Bytes.toBytes(millis) ++ Bytes.toBytes(
             uuidLow)
       new RowKey(b)
-    }
 
     // get RowKey from string representation
-    def apply(s: String): RowKey = {
-      try {
+    def apply(s: String): RowKey =
+      try
         apply(Base64.decodeBase64(s))
-      } catch {
+      catch
         case e: Exception =>
           throw new RowKeyException(
               s"Failed to convert String ${s} to RowKey because ${e}", e)
-      }
-    }
 
-    def apply(b: Array[Byte]): RowKey = {
-      if (b.size != 32) {
+    def apply(b: Array[Byte]): RowKey =
+      if (b.size != 32)
         val bString = b.mkString(",")
         throw new RowKeyException(
             s"Incorrect byte array size. Bytes: ${bString}.")
-      }
       new RowKey(b)
-    }
-  }
 
   class RowKeyException(val msg: String, val cause: Exception)
-      extends Exception(msg, cause) {
+      extends Exception(msg, cause)
     def this(msg: String) = this(msg, null)
-  }
 
   case class PartialRowKey(
-      entityType: String, entityId: String, millis: Option[Long] = None) {
-    val toBytes: Array[Byte] = {
+      entityType: String, entityId: String, millis: Option[Long] = None)
+    val toBytes: Array[Byte] =
       hash(entityType, entityId) ++
       (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
-    }
-  }
 
-  def eventToPut(event: Event, appId: Int): (Put, RowKey) = {
+  def eventToPut(event: Event, appId: Int): (Put, RowKey) =
     // generate new rowKey if eventId is None
-    val rowKey = event.eventId.map { id =>
+    val rowKey = event.eventId.map  id =>
       RowKey(id) // create rowKey from eventId
-    }.getOrElse {
+    .getOrElse
       // TOOD: use real UUID. not pseudo random
       val uuidLow: Long = UUID.randomUUID().getLeastSignificantBits
       RowKey(
@@ -154,64 +140,54 @@ object HBEventsUtil {
           millis = event.eventTime.getMillis,
           uuidLow = uuidLow
       )
-    }
 
     val eBytes = Bytes.toBytes("e")
     // use eventTime as HBase's cell timestamp
     val put = new Put(rowKey.toBytes, event.eventTime.getMillis)
 
-    def addStringToE(col: Array[Byte], v: String): Put = {
+    def addStringToE(col: Array[Byte], v: String): Put =
       put.add(eBytes, col, Bytes.toBytes(v))
-    }
 
-    def addLongToE(col: Array[Byte], v: Long): Put = {
+    def addLongToE(col: Array[Byte], v: Long): Put =
       put.add(eBytes, col, Bytes.toBytes(v))
-    }
 
     addStringToE(colNames("event"), event.event)
     addStringToE(colNames("entityType"), event.entityType)
     addStringToE(colNames("entityId"), event.entityId)
 
-    event.targetEntityType.foreach { targetEntityType =>
+    event.targetEntityType.foreach  targetEntityType =>
       addStringToE(colNames("targetEntityType"), targetEntityType)
-    }
 
-    event.targetEntityId.foreach { targetEntityId =>
+    event.targetEntityId.foreach  targetEntityId =>
       addStringToE(colNames("targetEntityId"), targetEntityId)
-    }
 
     // TODO: make properties Option[]
-    if (!event.properties.isEmpty) {
+    if (!event.properties.isEmpty)
       addStringToE(colNames("properties"), write(event.properties.toJObject))
-    }
 
-    event.prId.foreach { prId =>
+    event.prId.foreach  prId =>
       addStringToE(colNames("prId"), prId)
-    }
 
     addLongToE(colNames("eventTime"), event.eventTime.getMillis)
     val eventTimeZone = event.eventTime.getZone
-    if (!eventTimeZone.equals(EventValidation.defaultTimeZone)) {
+    if (!eventTimeZone.equals(EventValidation.defaultTimeZone))
       addStringToE(colNames("eventTimeZone"), eventTimeZone.getID)
-    }
 
     addLongToE(colNames("creationTime"), event.creationTime.getMillis)
     val creationTimeZone = event.creationTime.getZone
-    if (!creationTimeZone.equals(EventValidation.defaultTimeZone)) {
+    if (!creationTimeZone.equals(EventValidation.defaultTimeZone))
       addStringToE(colNames("creationTimeZone"), creationTimeZone.getID)
-    }
 
     // can use zero-length byte array for tag cell value
     (put, rowKey)
-  }
 
-  def resultToEvent(result: Result, appId: Int): Event = {
+  def resultToEvent(result: Result, appId: Int): Event =
     val rowKey = RowKey(result.getRow())
 
     val eBytes = Bytes.toBytes("e")
     // val e = result.getFamilyMap(eBytes)
 
-    def getStringCol(col: String): String = {
+    def getStringCol(col: String): String =
       val r = result.getValue(eBytes, colNames(col))
       require(r != null,
               s"Failed to get value for column ${col}. " +
@@ -219,9 +195,8 @@ object HBEventsUtil {
               s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toString(r)
-    }
 
-    def getLongCol(col: String): Long = {
+    def getLongCol(col: String): Long =
       val r = result.getValue(eBytes, colNames(col))
       require(r != null,
               s"Failed to get value for column ${col}. " +
@@ -229,20 +204,16 @@ object HBEventsUtil {
               s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toLong(r)
-    }
 
-    def getOptStringCol(col: String): Option[String] = {
+    def getOptStringCol(col: String): Option[String] =
       val r = result.getValue(eBytes, colNames(col))
-      if (r == null) {
+      if (r == null)
         None
-      } else {
+      else
         Some(Bytes.toString(r))
-      }
-    }
 
-    def getTimestamp(col: String): Long = {
+    def getTimestamp(col: String): Long =
       result.getColumnLatestCell(eBytes, colNames(col)).getTimestamp()
-    }
 
     val event = getStringCol("event")
     val entityType = getStringCol("entityType")
@@ -276,7 +247,6 @@ object HBEventsUtil {
         prId = prId,
         creationTime = creationTime
     )
-  }
 
   // for mandatory field. None means don't care.
   // for optional field. None means don't care.
@@ -289,19 +259,19 @@ object HBEventsUtil {
                  eventNames: Option[Seq[String]] = None,
                  targetEntityType: Option[Option[String]] = None,
                  targetEntityId: Option[Option[String]] = None,
-                 reversed: Option[Boolean] = None): Scan = {
+                 reversed: Option[Boolean] = None): Scan =
 
     val scan: Scan = new Scan()
 
-    (entityType, entityId) match {
-      case (Some(et), Some(eid)) => {
+    (entityType, entityId) match
+      case (Some(et), Some(eid)) =>
           val start =
             PartialRowKey(et, eid, startTime.map(_.getMillis)).toBytes
           // if no untilTime, stop when reach next bytes of entityTypeAndId
           val stop = PartialRowKey(
               et, eid, untilTime.map(_.getMillis).orElse(Some(-1))).toBytes
 
-          if (reversed.getOrElse(false)) {
+          if (reversed.getOrElse(false))
             // Reversed order.
             // If you specify a startRow and stopRow,
             // to scan in reverse, the startRow needs to be lexicographically
@@ -309,102 +279,81 @@ object HBEventsUtil {
             scan.setStartRow(stop)
             scan.setStopRow(start)
             scan.setReversed(true)
-          } else {
+          else
             scan.setStartRow(start)
             scan.setStopRow(stop)
-          }
-        }
-      case (_, _) => {
+      case (_, _) =>
           val minTime: Long = startTime.map(_.getMillis).getOrElse(0)
           val maxTime: Long =
             untilTime.map(_.getMillis).getOrElse(Long.MaxValue)
           scan.setTimeRange(minTime, maxTime)
-          if (reversed.getOrElse(false)) {
+          if (reversed.getOrElse(false))
             scan.setReversed(true)
-          }
-        }
-    }
 
     val filters = new FilterList(FilterList.Operator.MUST_PASS_ALL)
 
     val eBytes = Bytes.toBytes("e")
 
     def createBinaryFilter(
-        col: String, value: Array[Byte]): SingleColumnValueFilter = {
+        col: String, value: Array[Byte]): SingleColumnValueFilter =
       val comp = new BinaryComparator(value)
       new SingleColumnValueFilter(eBytes, colNames(col), CompareOp.EQUAL, comp)
-    }
 
     // skip the row if the column exists
-    def createSkipRowIfColumnExistFilter(col: String): SkipFilter = {
+    def createSkipRowIfColumnExistFilter(col: String): SkipFilter =
       val comp = new BinaryComparator(colNames(col))
       val q = new QualifierFilter(CompareOp.NOT_EQUAL, comp)
       // filters an entire row if any of the Cell checks do not pass
       new SkipFilter(q)
-    }
 
-    entityType.foreach { et =>
+    entityType.foreach  et =>
       val compType = new BinaryComparator(Bytes.toBytes(et))
       val filterType = new SingleColumnValueFilter(
           eBytes, colNames("entityType"), CompareOp.EQUAL, compType)
       filters.addFilter(filterType)
-    }
 
-    entityId.foreach { eid =>
+    entityId.foreach  eid =>
       val compId = new BinaryComparator(Bytes.toBytes(eid))
       val filterId = new SingleColumnValueFilter(
           eBytes, colNames("entityId"), CompareOp.EQUAL, compId)
       filters.addFilter(filterId)
-    }
 
-    eventNames.foreach { eventsList =>
+    eventNames.foreach  eventsList =>
       // match any of event in the eventsList
       val eventFilters = new FilterList(FilterList.Operator.MUST_PASS_ONE)
-      eventsList.foreach { e =>
+      eventsList.foreach  e =>
         val compEvent = new BinaryComparator(Bytes.toBytes(e))
         val filterEvent = new SingleColumnValueFilter(
             eBytes, colNames("event"), CompareOp.EQUAL, compEvent)
         eventFilters.addFilter(filterEvent)
-      }
-      if (!eventFilters.getFilters().isEmpty) {
+      if (!eventFilters.getFilters().isEmpty)
         filters.addFilter(eventFilters)
-      }
-    }
 
-    targetEntityType.foreach { tetOpt =>
-      if (tetOpt.isEmpty) {
+    targetEntityType.foreach  tetOpt =>
+      if (tetOpt.isEmpty)
         val filter = createSkipRowIfColumnExistFilter("targetEntityType")
         filters.addFilter(filter)
-      } else {
-        tetOpt.foreach { tet =>
+      else
+        tetOpt.foreach  tet =>
           val filter =
             createBinaryFilter("targetEntityType", Bytes.toBytes(tet))
           // the entire row will be skipped if the column is not found.
           filter.setFilterIfMissing(true)
           filters.addFilter(filter)
-        }
-      }
-    }
 
-    targetEntityId.foreach { teidOpt =>
-      if (teidOpt.isEmpty) {
+    targetEntityId.foreach  teidOpt =>
+      if (teidOpt.isEmpty)
         val filter = createSkipRowIfColumnExistFilter("targetEntityId")
         filters.addFilter(filter)
-      } else {
-        teidOpt.foreach { teid =>
+      else
+        teidOpt.foreach  teid =>
           val filter =
             createBinaryFilter("targetEntityId", Bytes.toBytes(teid))
           // the entire row will be skipped if the column is not found.
           filter.setFilterIfMissing(true)
           filters.addFilter(filter)
-        }
-      }
-    }
 
-    if (!filters.getFilters().isEmpty) {
+    if (!filters.getFilters().isEmpty)
       scan.setFilter(filters)
-    }
 
     scan
-  }
-}

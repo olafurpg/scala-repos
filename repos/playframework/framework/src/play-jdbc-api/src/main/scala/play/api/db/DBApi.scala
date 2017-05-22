@@ -6,7 +6,7 @@ package play.api.db
 /**
   * DB API for managing application databases.
   */
-trait DBApi {
+trait DBApi
 
   /**
     * All configured databases.
@@ -24,4 +24,3 @@ trait DBApi {
     * Shutdown all databases, releasing resources.
     */
   def shutdown(): Unit
-}

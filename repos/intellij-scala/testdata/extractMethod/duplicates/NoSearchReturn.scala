@@ -1,5 +1,5 @@
-object NoSearchReturn {
-  def foo(i: Int) {
+object NoSearchReturn
+  def foo(i: Int)
     val y = i
     /*start*/
     println(y)
@@ -7,13 +7,10 @@ object NoSearchReturn {
     /*end*/
 
     println("a")
-  }
 
-  def foofoo(y: Int) {
+  def foofoo(y: Int)
     println(1)
     if (true) return else println(1)
-  }
-}
 /*
 object NoSearchReturn {
   def foo(i: Int) {

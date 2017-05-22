@@ -22,7 +22,7 @@ import diagram._
   *  - abstract type members and type aliases;
   *  - type and value parameters;
   *  - annotations. */
-trait Entity {
+trait Entity
 
   /** The name of the entity. Note that the name does not qualify this entity uniquely; use its `qualifiedName`
     * instead. */
@@ -56,29 +56,25 @@ trait Entity {
 
   /** Indicates whether this entity lives in the types namespace (classes, traits, abstract/alias types) */
   def isType: Boolean
-}
 
-object Entity {
-  private def isDeprecated(x: Entity) = x match {
+object Entity
+  private def isDeprecated(x: Entity) = x match
     case x: MemberEntity => x.deprecation.isDefined
     case _ => false
-  }
 
-  private def isObject(x: Entity) = x match {
+  private def isObject(x: Entity) = x match
     case x: TemplateEntity => x.isObject
     case _ => false
-  }
 
   /** Ordering deprecated things last. */
   implicit lazy val EntityOrdering: Ordering[Entity] =
     Ordering[(Boolean, String, Boolean)] on
     (x => (isDeprecated(x), x.qualifiedName, isObject(x)))
-}
 
 /** A template, which is either a class, trait, object or package. Depending on whether documentation is available
   * or not, the template will be modeled as a [scala.tools.nsc.doc.model.NoDocTemplate] or a
   * [scala.tools.nsc.doc.model.DocTemplateEntity]. */
-trait TemplateEntity extends Entity {
+trait TemplateEntity extends Entity
 
   /** Whether this template is a package (including the root package). */
   def isPackage: Boolean
@@ -103,12 +99,11 @@ trait TemplateEntity extends Entity {
 
   /** The self-type of this template, if it differs from the template type. */
   def selfType: Option[TypeEntity]
-}
 
 /** An entity that is a member of a template. All entities, including templates, are member of another entity
   * except for parameters and annotations. Note that all members of a template are modelled, including those that are
   * inherited and not declared locally. */
-trait MemberEntity extends Entity {
+trait MemberEntity extends Entity
 
   /** The comment attached to this member, if any. */
   def comment: Option[Comment]
@@ -199,38 +194,34 @@ trait MemberEntity extends Entity {
 
   /** Indicates whether the implicitly inherited member is shadowed or ambiguous in its template */
   def isShadowedOrAmbiguousImplicit: Boolean
-}
 
-object MemberEntity {
+object MemberEntity
   // Oh contravariance, contravariance, wherefore art thou contravariance?
   // Note: the above works for both the commonly misunderstood meaning of the line and the real one.
   implicit lazy val MemberEntityOrdering: Ordering[MemberEntity] =
     Entity.EntityOrdering on (x => x)
-}
 
 /** An entity that is parameterized by types */
-trait HigherKinded {
+trait HigherKinded
 
   /** The type parameters of this entity. */
   def typeParams: List[TypeParam]
-}
 
 /** A template (class, trait, object or package) which is referenced in the universe, but for which no further
   * documentation is available. Only templates for which a source file is given are documented by Scaladoc. */
-trait NoDocTemplate extends TemplateEntity {
+trait NoDocTemplate extends TemplateEntity
   def kind =
     if (isClass) "class"
     else if (isTrait) "trait"
     else if (isObject) "object"
     else ""
-}
 
 /** An inherited template that was not documented in its original owner - example:
   *  in classpath:  trait T { class C } -- T (and implicitly C) are not documented
   *  in the source: trait U extends T -- C appears in U as a MemberTemplateImpl
   *    -- that is, U has a member for it but C doesn't get its own page */
 trait MemberTemplateEntity
-    extends TemplateEntity with MemberEntity with HigherKinded {
+    extends TemplateEntity with MemberEntity with HigherKinded
 
   /** The value parameters of this case class, or an empty list if this class is not a case class. As case class value
     * parameters cannot be curried, the outer list has exactly one element. */
@@ -240,11 +231,10 @@ trait MemberTemplateEntity
       e.g: {{{class A extends B[C[Int]] with D[E]}}} will have two direct parents: class B and D
       NOTE: we are dropping the refinement here! */
   def parentTypes: List[(TemplateEntity, TypeEntity)]
-}
 
 /** A template (class, trait, object or package) for which documentation is available. Only templates for which
   * a source file is given are documented by Scaladoc. */
-trait DocTemplateEntity extends MemberTemplateEntity {
+trait DocTemplateEntity extends MemberTemplateEntity
 
   /** The list of templates such that each is a member of the template that follows it; the first template is always
     * this template, the last the root package entity. */
@@ -329,26 +319,22 @@ trait DocTemplateEntity extends MemberTemplateEntity {
 
   /** Returns the group description taken either from this template or its linearizationTypes */
   def groupName(group: String): String
-}
 
 /** A trait template. */
-trait Trait extends MemberTemplateEntity {
+trait Trait extends MemberTemplateEntity
   def kind = "trait"
-}
 
 /** A class template. */
-trait Class extends MemberTemplateEntity {
+trait Class extends MemberTemplateEntity
   override def kind = "class"
-}
 
 /** An object template. */
-trait Object extends MemberTemplateEntity {
+trait Object extends MemberTemplateEntity
   def kind = "object"
-}
 
 /** A package template. A package is in the universe if it is declared as a package object, or if it
   * contains at least one template. */
-trait Package extends DocTemplateEntity {
+trait Package extends DocTemplateEntity
 
   /** The package of which this package is a member. */
   def inTemplate: Package
@@ -361,32 +347,29 @@ trait Package extends DocTemplateEntity {
   def packages: List[Package]
 
   override def kind = "package"
-}
 
 /** The root package, which contains directly or indirectly all members in the universe. A universe
   * contains exactly one root package. */
 trait RootPackage extends Package
 
 /** A non-template member (method, value, lazy value, variable, constructor, alias type, and abstract type). */
-trait NonTemplateMemberEntity extends MemberEntity {
+trait NonTemplateMemberEntity extends MemberEntity
 
   /** Whether this member is a use case. A use case is a member which does not exist in the documented code.
     * It corresponds to a real member, and provides a simplified, yet compatible signature for that member. */
   def isUseCase: Boolean
-}
 
 /** A method (`def`) of a template. */
-trait Def extends NonTemplateMemberEntity with HigherKinded {
+trait Def extends NonTemplateMemberEntity with HigherKinded
 
   /** The value parameters of this method. Each parameter block of a curried method is an element of the list.
     * Each parameter block is a list of value parameters. */
   def valueParams: List[List[ValueParam]]
 
   def kind = "method"
-}
 
 /** A constructor of a class. */
-trait Constructor extends NonTemplateMemberEntity {
+trait Constructor extends NonTemplateMemberEntity
 
   /** Whether this is the primary constructor of a class. The primary constructor is defined syntactically as part of
     * the declaration of the class. */
@@ -397,15 +380,13 @@ trait Constructor extends NonTemplateMemberEntity {
   def valueParams: List[List[ValueParam]]
 
   def kind = "constructor"
-}
 
 /** A value (`val`), lazy val (`lazy val`) or variable (`var`) of a template. */
-trait Val extends NonTemplateMemberEntity {
+trait Val extends NonTemplateMemberEntity
   def kind = "[lazy] value/variable"
-}
 
 /** An abstract type member of a template. */
-trait AbstractType extends MemberTemplateEntity with HigherKinded {
+trait AbstractType extends MemberTemplateEntity with HigherKinded
 
   /** The lower bound for this abstract type, if it has been defined. */
   def lo: Option[TypeEntity]
@@ -414,25 +395,22 @@ trait AbstractType extends MemberTemplateEntity with HigherKinded {
   def hi: Option[TypeEntity]
 
   def kind = "abstract type"
-}
 
 /** An type alias of a template. */
-trait AliasType extends MemberTemplateEntity with HigherKinded {
+trait AliasType extends MemberTemplateEntity with HigherKinded
 
   /** The type aliased by this type alias. */
   def alias: TypeEntity
 
   def kind = "type alias"
-}
 
 /** A parameter to an entity. */
-trait ParameterEntity {
+trait ParameterEntity
 
   def name: String
-}
 
 /** A type parameter to a class, trait, or method. */
-trait TypeParam extends ParameterEntity with HigherKinded {
+trait TypeParam extends ParameterEntity with HigherKinded
 
   /** The variance of this type parameter. Valid values are "+", "-", and the empty string. */
   def variance: String
@@ -442,10 +420,9 @@ trait TypeParam extends ParameterEntity with HigherKinded {
 
   /** The upper bound for this type parameter, if it has been defined. */
   def hi: Option[TypeEntity]
-}
 
 /** A value parameter to a constructor or method. */
-trait ValueParam extends ParameterEntity {
+trait ValueParam extends ParameterEntity
 
   /** The type of this value parameter. */
   def resultType: TypeEntity
@@ -455,10 +432,9 @@ trait ValueParam extends ParameterEntity {
 
   /** Whether this value parameter is implicit. */
   def isImplicit: Boolean
-}
 
 /** An annotation to an entity. */
-trait Annotation extends Entity {
+trait Annotation extends Entity
 
   /** The class of this annotation. */
   def annotationClass: TemplateEntity
@@ -467,10 +443,9 @@ trait Annotation extends Entity {
   def arguments: List[ValueArgument]
 
   def kind = "annotation"
-}
 
 /** A trait that signals the member results from an implicit conversion */
-trait ImplicitConversion {
+trait ImplicitConversion
 
   /** The source of the implicit conversion*/
   def source: DocTemplateEntity
@@ -501,7 +476,6 @@ trait ImplicitConversion {
 
   /** Is this a hidden implicit conversion (as specified in the settings) */
   def isHiddenConversion: Boolean
-}
 
 /** Shadowing captures the information that the member is shadowed by some other members
   *  There are two cases of implicitly added member shadowing:
@@ -511,7 +485,7 @@ trait ImplicitConversion {
   *  2) shadowing from other possible implicit conversions ()
   *     this will result in an ambiguous implicit converion error
   */
-trait ImplicitMemberShadowing {
+trait ImplicitMemberShadowing
 
   /** The members that shadow the current entry use .inTemplate to get to the template name */
   def shadowingMembers: List[MemberEntity]
@@ -523,13 +497,12 @@ trait ImplicitMemberShadowing {
 
   def isShadowed: Boolean = !shadowingMembers.isEmpty
   def isAmbiguous: Boolean = !ambiguatingMembers.isEmpty
-}
 
 /** A trait that encapsulates a constraint necessary for implicit conversion */
 trait Constraint
 
 /** A constraint involving a type parameter which must be in scope */
-trait ImplicitInScopeConstraint extends Constraint {
+trait ImplicitInScopeConstraint extends Constraint
 
   /** The type of the implicit value required */
   def implicitType: TypeEntity
@@ -537,10 +510,9 @@ trait ImplicitInScopeConstraint extends Constraint {
   /** toString for debugging */
   override def toString =
     "an implicit _: " + implicitType.name + " must be in scope"
-}
 
 trait TypeClassConstraint
-    extends ImplicitInScopeConstraint with TypeParamConstraint {
+    extends ImplicitInScopeConstraint with TypeParamConstraint
 
   /** Type class name */
   def typeClassEntity: TemplateEntity
@@ -549,9 +521,8 @@ trait TypeClassConstraint
   override def toString =
     typeParamName + " is a class of type " + typeClassEntity.qualifiedName +
     " (" + typeParamName + ": " + typeClassEntity.name + ")"
-}
 
-trait KnownTypeClassConstraint extends TypeClassConstraint {
+trait KnownTypeClassConstraint extends TypeClassConstraint
 
   /** Type explanation, takes the type parameter name and generates the explanation */
   def typeExplanation: (String) => String
@@ -560,16 +531,14 @@ trait KnownTypeClassConstraint extends TypeClassConstraint {
   override def toString =
     typeExplanation(typeParamName) + " (" + typeParamName + ": " +
     typeClassEntity.name + ")"
-}
 
 /** A constraint involving a type parameter */
-trait TypeParamConstraint extends Constraint {
+trait TypeParamConstraint extends Constraint
 
   /** The type parameter involved */
   def typeParamName: String
-}
 
-trait EqualTypeParamConstraint extends TypeParamConstraint {
+trait EqualTypeParamConstraint extends TypeParamConstraint
 
   /** The rhs */
   def rhs: TypeEntity
@@ -578,9 +547,8 @@ trait EqualTypeParamConstraint extends TypeParamConstraint {
   override def toString =
     typeParamName + " is " + rhs.name + " (" + typeParamName + " =:= " +
     rhs.name + ")"
-}
 
-trait BoundedTypeParamConstraint extends TypeParamConstraint {
+trait BoundedTypeParamConstraint extends TypeParamConstraint
 
   /** The lower bound */
   def lowerBound: TypeEntity
@@ -593,9 +561,8 @@ trait BoundedTypeParamConstraint extends TypeParamConstraint {
     typeParamName + " is a superclass of " + lowerBound.name +
     " and a subclass of " + upperBound.name + " (" + typeParamName + " >: " +
     lowerBound.name + " <: " + upperBound.name + ")"
-}
 
-trait LowerBoundedTypeParamConstraint extends TypeParamConstraint {
+trait LowerBoundedTypeParamConstraint extends TypeParamConstraint
 
   /** The lower bound */
   def lowerBound: TypeEntity
@@ -604,9 +571,8 @@ trait LowerBoundedTypeParamConstraint extends TypeParamConstraint {
   override def toString =
     typeParamName + " is a superclass of " + lowerBound.name + " (" +
     typeParamName + " >: " + lowerBound.name + ")"
-}
 
-trait UpperBoundedTypeParamConstraint extends TypeParamConstraint {
+trait UpperBoundedTypeParamConstraint extends TypeParamConstraint
 
   /** The lower bound */
   def upperBound: TypeEntity
@@ -615,4 +581,3 @@ trait UpperBoundedTypeParamConstraint extends TypeParamConstraint {
   override def toString =
     typeParamName + " is a subclass of " + upperBound.name + " (" +
     typeParamName + " <: " + upperBound.name + ")"
-}

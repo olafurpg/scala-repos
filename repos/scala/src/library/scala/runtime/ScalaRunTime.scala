@@ -22,7 +22,7 @@ import java.lang.reflect.{Method => JMethod}
   *  the scala runtime.  All these methods should be considered
   *  outside the API and subject to change or removal without notice.
   */
-object ScalaRunTime {
+object ScalaRunTime
   def isArray(x: Any, atLevel: Int = 1): Boolean =
     x != null && isArrayClass(x.getClass, atLevel)
 
@@ -35,12 +35,11 @@ object ScalaRunTime {
   // includes specialized subclasses and future proofed against hypothetical TupleN (for N > 22)
   def isTuple(x: Any) =
     x != null && x.getClass.getName.startsWith("scala.Tuple")
-  def isAnyVal(x: Any) = x match {
+  def isAnyVal(x: Any) = x match
     case _: Byte | _: Short | _: Char | _: Int | _: Long | _: Float |
         _: Double | _: Boolean | _: Unit =>
       true
     case _ => false
-  }
 
   // A helper method to make my life in the pattern matcher a lot easier.
   def drop[Repr](coll: Repr, num: Int)(
@@ -49,21 +48,19 @@ object ScalaRunTime {
 
   /** Return the class object representing an array with element class `clazz`.
     */
-  def arrayClass(clazz: jClass[_]): jClass[_] = {
+  def arrayClass(clazz: jClass[_]): jClass[_] =
     // newInstance throws an exception if the erasure is Void.TYPE. see SI-5680
     if (clazz == java.lang.Void.TYPE) classOf[Array[Unit]]
     else java.lang.reflect.Array.newInstance(clazz, 0).getClass
-  }
 
   /** Return the class object representing elements in arrays described by a given schematic.
     */
-  def arrayElementClass(schematic: Any): jClass[_] = schematic match {
+  def arrayElementClass(schematic: Any): jClass[_] = schematic match
     case cls: jClass[_] => cls.getComponentType
     case tag: ClassTag[_] => tag.runtimeClass
     case _ =>
       throw new UnsupportedOperationException(
           s"unsupported schematic $schematic (${schematic.getClass})")
-  }
 
   /** Return the class object representing an unboxed value type,
     *  e.g., classOf[int], not classOf[java.lang.Integer].  The compiler
@@ -73,8 +70,8 @@ object ScalaRunTime {
     classTag[T].runtimeClass.asInstanceOf[jClass[T]]
 
   /** Retrieve generic array element */
-  def array_apply(xs: AnyRef, idx: Int): Any = {
-    xs match {
+  def array_apply(xs: AnyRef, idx: Int): Any =
+    xs match
       case x: Array[AnyRef] => x(idx).asInstanceOf[Any]
       case x: Array[Int] => x(idx).asInstanceOf[Any]
       case x: Array[Double] => x(idx).asInstanceOf[Any]
@@ -86,12 +83,10 @@ object ScalaRunTime {
       case x: Array[Boolean] => x(idx).asInstanceOf[Any]
       case x: Array[Unit] => x(idx).asInstanceOf[Any]
       case null => throw new NullPointerException
-    }
-  }
 
   /** update generic array element */
-  def array_update(xs: AnyRef, idx: Int, value: Any): Unit = {
-    xs match {
+  def array_update(xs: AnyRef, idx: Int, value: Any): Unit =
+    xs match
       case x: Array[AnyRef] => x(idx) = value.asInstanceOf[AnyRef]
       case x: Array[Int] => x(idx) = value.asInstanceOf[Int]
       case x: Array[Double] => x(idx) = value.asInstanceOf[Double]
@@ -103,11 +98,9 @@ object ScalaRunTime {
       case x: Array[Boolean] => x(idx) = value.asInstanceOf[Boolean]
       case x: Array[Unit] => x(idx) = value.asInstanceOf[Unit]
       case null => throw new NullPointerException
-    }
-  }
 
   /** Get generic array length */
-  def array_length(xs: AnyRef): Int = xs match {
+  def array_length(xs: AnyRef): Int = xs match
     case x: Array[AnyRef] => x.length
     case x: Array[Int] => x.length
     case x: Array[Double] => x.length
@@ -119,9 +112,8 @@ object ScalaRunTime {
     case x: Array[Boolean] => x.length
     case x: Array[Unit] => x.length
     case null => throw new NullPointerException
-  }
 
-  def array_clone(xs: AnyRef): AnyRef = xs match {
+  def array_clone(xs: AnyRef): AnyRef = xs match
     case x: Array[AnyRef] => ArrayRuntime.cloneArray(x)
     case x: Array[Int] => ArrayRuntime.cloneArray(x)
     case x: Array[Double] => ArrayRuntime.cloneArray(x)
@@ -133,30 +125,26 @@ object ScalaRunTime {
     case x: Array[Boolean] => ArrayRuntime.cloneArray(x)
     case x: Array[Unit] => x
     case null => throw new NullPointerException
-  }
 
   /** Convert an array to an object array.
     *  Needed to deal with vararg arguments of primitive types that are passed
     *  to a generic Java vararg parameter T ...
     */
-  def toObjectArray(src: AnyRef): Array[Object] = src match {
+  def toObjectArray(src: AnyRef): Array[Object] = src match
     case x: Array[AnyRef] => x
     case _ =>
       val length = array_length(src)
       val dest = new Array[Object](length)
       for (i <- 0 until length) array_update(dest, i, array_apply(src, i))
       dest
-  }
 
-  def toArray[T](xs: scala.collection.Seq[T]) = {
+  def toArray[T](xs: scala.collection.Seq[T]) =
     val arr = new Array[AnyRef](xs.length)
     var i = 0
-    for (x <- xs) {
+    for (x <- xs)
       arr(i) = x.asInstanceOf[AnyRef]
       i += 1
-    }
     arr
-  }
 
   // Java bug: http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4071957
   // More background at ticket #2318.
@@ -172,18 +160,15 @@ object ScalaRunTime {
     scala.util.hashing.MurmurHash3.productHash(x)
 
   /** A helper for case classes. */
-  def typedProductIterator[T](x: Product): Iterator[T] = {
-    new AbstractIterator[T] {
+  def typedProductIterator[T](x: Product): Iterator[T] =
+    new AbstractIterator[T]
       private var c: Int = 0
       private val cmax = x.productArity
       def hasNext = c < cmax
-      def next() = {
+      def next() =
         val result = x.productElement(c)
         c += 1
         result.asInstanceOf[T]
-      }
-    }
-  }
 
   /** Fast path equality method for inlining; used when -optimise is set.
     */
@@ -196,11 +181,10 @@ object ScalaRunTime {
       BoxesRunTime.equalsCharObject(x.asInstanceOf[java.lang.Character], y)
     else x.equals(y)
 
-  def _equals(x: Product, y: Any): Boolean = y match {
+  def _equals(x: Product, y: Any): Boolean = y match
     case y: Product if x.productArity == y.productArity =>
       x.productIterator sameElements y.productIterator
     case _ => false
-  }
 
   // hashcode -----------------------------------------------------------
   //
@@ -213,7 +197,7 @@ object ScalaRunTime {
       BoxesRunTime.hashFromNumber(x.asInstanceOf[java.lang.Number])
     else x.hashCode
 
-  def hash(dv: Double): Int = {
+  def hash(dv: Double): Int =
     val iv = dv.toInt
     if (iv == dv) return iv
 
@@ -222,21 +206,18 @@ object ScalaRunTime {
 
     val fv = dv.toFloat
     if (fv == dv) fv.hashCode else dv.hashCode
-  }
-  def hash(fv: Float): Int = {
+  def hash(fv: Float): Int =
     val iv = fv.toInt
     if (iv == fv) return iv
 
     val lv = fv.toLong
     if (lv == fv) hash(lv)
     else fv.hashCode
-  }
-  def hash(lv: Long): Int = {
+  def hash(lv: Long): Int =
     val low = lv.toInt
     val lowSign = low >>> 31
     val high = (lv >>> 32).toInt
     low ^ (high + lowSign)
-  }
   def hash(x: Number): Int = runtime.BoxesRunTime.hashFromNumber(x)
 
   // The remaining overloads are here for completeness, but the compiler
@@ -270,31 +251,29 @@ object ScalaRunTime {
     * @return        a string representation of arg.
     */
   def stringOf(arg: Any): String = stringOf(arg, scala.Int.MaxValue)
-  def stringOf(arg: Any, maxElements: Int): String = {
-    def packageOf(x: AnyRef) = x.getClass.getPackage match {
+  def stringOf(arg: Any, maxElements: Int): String =
+    def packageOf(x: AnyRef) = x.getClass.getPackage match
       case null => ""
       case p => p.getName
-    }
     def isScalaClass(x: AnyRef) = packageOf(x) startsWith "scala."
     def isScalaCompilerClass(x: AnyRef) =
       packageOf(x) startsWith "scala.tools.nsc."
 
     // We use reflection because the scala.xml package might not be available
     def isSubClassOf(potentialSubClass: Class[_], ofClass: String) =
-      try {
+      try
         val classLoader = potentialSubClass.getClassLoader
         val clazz = Class.forName(ofClass, /*initialize =*/ false, classLoader)
         clazz.isAssignableFrom(potentialSubClass)
-      } catch {
+      catch
         case cnfe: ClassNotFoundException => false
-      }
     def isXmlNode(potentialSubClass: Class[_]) =
       isSubClassOf(potentialSubClass, "scala.xml.Node")
     def isXmlMetaData(potentialSubClass: Class[_]) =
       isSubClassOf(potentialSubClass, "scala.xml.MetaData")
 
     // When doing our own iteration is dangerous
-    def useOwnToString(x: Any) = x match {
+    def useOwnToString(x: Any) = x match
       // Range/NumericRange have a custom toString to avoid walking a gazillion elements
       case _: Range | _: NumericRange[_] => true
       // Sorted collections to the wrong thing (for us) on iteration - ticket #3493
@@ -313,29 +292,26 @@ object ScalaRunTime {
         isXmlNode(x.getClass) || isXmlMetaData(x.getClass)
       // Otherwise, nothing could possibly go wrong
       case _ => false
-    }
 
     // A variation on inner for maps so they print -> instead of bare tuples
-    def mapInner(arg: Any): String = arg match {
+    def mapInner(arg: Any): String = arg match
       case (k, v) => inner(k) + " -> " + inner(v)
       case _ => inner(arg)
-    }
 
     // Special casing Unit arrays, the value class which uses a reference array type.
-    def arrayToString(x: AnyRef) = {
+    def arrayToString(x: AnyRef) =
       if (x.getClass.getComponentType == classOf[BoxedUnit])
         0 until (array_length(x) min maxElements) map (_ => "()") mkString
         ("Array(", ", ", ")")
       else
         WrappedArray make x take maxElements map inner mkString
         ("Array(", ", ", ")")
-    }
 
     // The recursively applied attempt to prettify Array printing.
     // Note that iterator is used if possible and foreach is used as a
     // last resort, because the parallel collections "foreach" in a
     // random order even on sequences.
-    def inner(arg: Any): String = arg match {
+    def inner(arg: Any): String = arg match
       case null => "null"
       case "" => "\"\""
       case x: String =>
@@ -355,24 +331,20 @@ object ScalaRunTime {
       case x: Product if isTuple(x) =>
         x.productIterator map inner mkString ("(", ",", ")")
       case x => x.toString
-    }
 
     // The try/catch is defense against iterables which aren't actually designed
     // to be iterated, such as some scala.tools.nsc.io.AbstractFile derived classes.
-    try inner(arg) catch {
+    try inner(arg) catch
       case _: UnsupportedOperationException | _: AssertionError => "" + arg
-    }
-  }
 
   /** stringOf formatted for use in a repl result. */
-  def replStringOf(arg: Any, maxElements: Int): String = {
+  def replStringOf(arg: Any, maxElements: Int): String =
     val s = stringOf(arg, maxElements)
     val nl = if (s contains "\n") "\n" else ""
 
     nl + s + "\n"
-  }
 
-  def box[T](clazz: jClass[T]): jClass[_] = clazz match {
+  def box[T](clazz: jClass[T]): jClass[_] = clazz match
     case java.lang.Byte.TYPE => classOf[java.lang.Byte]
     case java.lang.Short.TYPE => classOf[java.lang.Short]
     case java.lang.Character.TYPE => classOf[java.lang.Character]
@@ -383,5 +355,3 @@ object ScalaRunTime {
     case java.lang.Void.TYPE => classOf[scala.runtime.BoxedUnit]
     case java.lang.Boolean.TYPE => classOf[java.lang.Boolean]
     case _ => clazz
-  }
-}

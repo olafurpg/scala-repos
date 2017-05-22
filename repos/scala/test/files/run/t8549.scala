@@ -9,67 +9,58 @@ import scala.reflect.io.File
 //    )
 //
 // Use this to re-establish a baseline for serialization compatibility.
-object Test extends App {
+object Test extends App
   val overwrite: Option[File] =
     sys.props.get("overwrite.source").map(s => new File(new java.io.File(s)))
 
-  def serialize(o: AnyRef): String = {
+  def serialize(o: AnyRef): String =
     val bos = new java.io.ByteArrayOutputStream()
     val out = new java.io.ObjectOutputStream(bos)
     out.writeObject(o)
     out.flush()
     printBase64Binary(bos.toByteArray())
-  }
 
-  def amend(file: File)(f: String => String) {
+  def amend(file: File)(f: String => String)
     file.writeAll(f(file.slurp))
-  }
   def quote(s: String) = List("\"", s, "\"").mkString
 
-  def patch(file: File, line: Int, prevResult: String, result: String) {
-    amend(file) { content =>
-      content.lines.toList.zipWithIndex.map {
+  def patch(file: File, line: Int, prevResult: String, result: String)
+    amend(file)  content =>
+      content.lines.toList.zipWithIndex.map
         case (content, i) if i == line - 1 =>
           val newContent =
             content.replaceAllLiterally(quote(prevResult), quote(result))
           if (newContent != content) println(s"- $content\n+ $newContent\n")
           newContent
         case (content, _) => content
-      }.mkString("\n")
-    }
-  }
+      .mkString("\n")
 
-  def updateComment(file: File) {
-    val timestamp = {
+  def updateComment(file: File)
+    val timestamp =
       import java.text.SimpleDateFormat
       val sdf = new SimpleDateFormat("yyyyMMdd-HH:mm:ss")
       sdf.format(new java.util.Date)
-    }
     val newComment =
       s"  // Generated on $timestamp with Scala ${scala.util.Properties.versionString})"
-    amend(file) { content =>
-      content.lines.toList.map { f =>
+    amend(file)  content =>
+      content.lines.toList.map  f =>
         f.replaceAll("""^ +// Generated on.*""", newComment)
-      }.mkString("\n")
-    }
-  }
+      .mkString("\n")
 
-  def deserialize(string: String): AnyRef = {
+  def deserialize(string: String): AnyRef =
     val bis = new java.io.ByteArrayInputStream(parseBase64Binary(string))
     val in = new java.io.ObjectInputStream(bis)
     in.readObject()
-  }
 
-  def checkRoundTrip[T <: AnyRef](instance: T)(f: T => AnyRef) {
+  def checkRoundTrip[T <: AnyRef](instance: T)(f: T => AnyRef)
     val result = serialize(instance)
     val reconstituted = deserialize(result).asInstanceOf[T]
     assert(f(instance) == f(reconstituted), (f(instance), f(reconstituted)))
-  }
 
   def check[T <: AnyRef](instance: => T)(
-      prevResult: String, f: T => AnyRef = (x: T) => x) {
+      prevResult: String, f: T => AnyRef = (x: T) => x)
     val result = serialize(instance)
-    overwrite match {
+    overwrite match
       case Some(f) =>
         val lineNumberOfLiteralString =
           Thread.currentThread.getStackTrace.apply(2).getLineNumber
@@ -81,8 +72,6 @@ object Test extends App {
         assert(
             prevResult == result,
             s"instance = $instance : ${instance.getClass}\n serialization unstable: ${prevResult}\n   found: ${result}")
-    }
-  }
 
   // Generated on 20150925-14:41:27 with Scala version 2.12.0-20150924-125956-fd5994f397)
   overwrite.foreach(updateComment)
@@ -272,4 +261,3 @@ object Test extends App {
   check("...".r)(
       "rO0ABXNyABlzY2FsYS51dGlsLm1hdGNoaW5nLlJlZ2V44u3Vap7wIb8CAAJMAAdwYXR0ZXJudAAZTGphdmEvdXRpbC9yZWdleC9QYXR0ZXJuO0wAJXNjYWxhJHV0aWwkbWF0Y2hpbmckUmVnZXgkJGdyb3VwTmFtZXN0ABZMc2NhbGEvY29sbGVjdGlvbi9TZXE7eHBzcgAXamF2YS51dGlsLnJlZ2V4LlBhdHRlcm5GZ9VrbkkCDQIAAkkABWZsYWdzTAAHcGF0dGVybnQAEkxqYXZhL2xhbmcvU3RyaW5nO3hwAAAAAHQAAy4uLnNyADJzY2FsYS5jb2xsZWN0aW9uLmltbXV0YWJsZS5MaXN0JFNlcmlhbGl6YXRpb25Qcm94eQAAAAAAAAABAwAAeHBzcgAsc2NhbGEuY29sbGVjdGlvbi5pbW11dGFibGUuTGlzdFNlcmlhbGl6ZUVuZCSKXGNb91MLbQIAAHhweA==",
       r => (r.toString))
-}

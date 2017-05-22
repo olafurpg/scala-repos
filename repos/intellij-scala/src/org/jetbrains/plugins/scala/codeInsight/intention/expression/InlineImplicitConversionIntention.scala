@@ -15,17 +15,16 @@ import org.jetbrains.plugins.scala.util.IntentionUtils
   * @author Ksenia.Sautina
   * @since 5/4/12
   */
-object InlineImplicitConversionIntention {
+object InlineImplicitConversionIntention
   def familyName = "Provide implicit conversion"
-}
 
-class InlineImplicitConversionIntention extends PsiElementBaseIntentionAction {
+class InlineImplicitConversionIntention extends PsiElementBaseIntentionAction
   def getFamilyName = InlineImplicitConversionIntention.familyName
 
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val expr: ScExpression =
       PsiTreeUtil.getParentOfType(element, classOf[ScExpression], false)
     if (expr == null) return false
@@ -35,9 +34,8 @@ class InlineImplicitConversionIntention extends PsiElementBaseIntentionAction {
     if (conversionFun == null) return false
 
     true
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val expr: ScExpression =
       PsiTreeUtil.getParentOfType(element, classOf[ScExpression], false)
     if (expr == null || !expr.isValid) return
@@ -53,5 +51,3 @@ class InlineImplicitConversionIntention extends PsiElementBaseIntentionAction {
                                        project,
                                        editor,
                                        secondPart)
-  }
-}

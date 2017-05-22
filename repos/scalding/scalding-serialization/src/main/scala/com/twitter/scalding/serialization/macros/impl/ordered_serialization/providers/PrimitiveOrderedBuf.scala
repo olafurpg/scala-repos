@@ -24,8 +24,8 @@ import CompileTimeLengthTypes._
 import java.nio.ByteBuffer
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object PrimitiveOrderedBuf {
-  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+object PrimitiveOrderedBuf
+  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe if tpe =:= c.universe.typeOf[Boolean] =>
       PrimitiveOrderedBuf(c)(tpe, "Boolean", 1, false)
     case tpe if tpe =:= c.universe.typeOf[java.lang.Boolean] =>
@@ -58,12 +58,11 @@ object PrimitiveOrderedBuf {
       PrimitiveOrderedBuf(c)(tpe, "Double", 8, false)
     case tpe if tpe =:= c.universe.typeOf[java.lang.Double] =>
       PrimitiveOrderedBuf(c)(tpe, "Double", 8, true)
-  }
 
   def apply(c: Context)(outerType: c.Type,
                         javaTypeStr: String,
                         lenInBytes: Int,
-                        boxed: Boolean): TreeOrderedBuf[c.type] = {
+                        boxed: Boolean): TreeOrderedBuf[c.type] =
     import c.universe._
     val javaType = newTermName(javaTypeStr)
 
@@ -79,30 +78,27 @@ object PrimitiveOrderedBuf {
         inputStreamA: TermName, inputStreamB: TermName): Tree =
       q"""_root_.java.lang.$javaType.compare($inputStreamA.$bbGetter, $inputStreamB.$bbGetter)"""
 
-    def accessor(e: c.TermName): c.Tree = {
+    def accessor(e: c.TermName): c.Tree =
       val primitiveAccessor = newTermName(shortName.toLowerCase + "Value")
       if (boxed) q"$e.$primitiveAccessor"
       else q"$e"
-    }
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
           inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
         genBinaryCompare(inputStreamA, inputStreamB)
-      override def hash(element: ctx.TermName): ctx.Tree = {
+      override def hash(element: ctx.TermName): ctx.Tree =
         // This calls out the correctly named item in Hasher
         val typeLowerCase = newTermName(javaTypeStr.toLowerCase)
         q"_root_.com.twitter.scalding.serialization.Hasher.$typeLowerCase.hash(${accessor(element)})"
-      }
       override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         q"$inputStream.$bbPutter(${accessor(element)})"
 
-      override def get(inputStream: ctx.TermName): ctx.Tree = {
+      override def get(inputStream: ctx.TermName): ctx.Tree =
         val unboxed = q"$inputStream.$bbGetter"
         if (boxed) q"_root_.java.lang.$javaType.valueOf($unboxed)" else unboxed
-      }
 
       override def compare(
           elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
@@ -113,6 +109,3 @@ object PrimitiveOrderedBuf {
         ConstantLengthCalculation(c)(lenInBytes)
 
       override val lazyOuterVariables: Map[String, ctx.Tree] = Map.empty
-    }
-  }
-}

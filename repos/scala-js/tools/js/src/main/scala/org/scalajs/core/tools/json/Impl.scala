@@ -6,7 +6,7 @@ import scala.scalajs.js
 
 import java.io.{Writer, Reader}
 
-private[json] object Impl extends AbstractJSONImpl {
+private[json] object Impl extends AbstractJSONImpl
 
   type Repr = js.Any
 
@@ -32,4 +32,3 @@ private[json] object Impl extends AbstractJSONImpl {
 
   def deserialize(reader: Reader): Repr =
     deserialize(IO.readReaderToString(reader))
-}

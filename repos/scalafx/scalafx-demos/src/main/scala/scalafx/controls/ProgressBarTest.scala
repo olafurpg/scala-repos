@@ -34,26 +34,22 @@ import scalafx.scene.control.ProgressBar
 import scalafx.scene.layout.{BorderPane, Priority}
 import scalafx.scene.paint.Color
 
-object ProgressBarTest extends JFXApp {
+object ProgressBarTest extends JFXApp
 
   val progressBar = new ProgressBar
 
   val progressBarController = new ProgressIndicatorControls(progressBar)
 
-  val mainPane = new BorderPane {
+  val mainPane = new BorderPane
     top = progressBar
     center = progressBarController
     vgrow = Priority.Always
     hgrow = Priority.Always
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "ProgressBar Test"
     width = 300
     height = 225
-    scene = new Scene {
+    scene = new Scene
       fill = Color.LightGray
       content = mainPane
-    }
-  }
-}

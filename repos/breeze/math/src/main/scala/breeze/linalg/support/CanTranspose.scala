@@ -23,13 +23,10 @@ package breeze.linalg.support
   * @author dlwh
   */
 // Don't inherit Function1 or you will make kittens cry.
-trait CanTranspose[From, +To] {
+trait CanTranspose[From, +To]
   def apply(from: From): To
-}
 
-object CanTranspose {
+object CanTranspose
   implicit def transposeOfScalarIsScalar[T <: AnyVal]: CanTranspose[T, T] =
-    new CanTranspose[T, T] {
+    new CanTranspose[T, T]
       override def apply(from: T): T = from
-    }
-}

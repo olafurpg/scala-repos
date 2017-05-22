@@ -17,14 +17,13 @@ import mutable.{ArrayBuffer, Builder}
   *  @define Coll `immutable.Stack`
   *  @define coll immutable stack
   */
-object Stack extends SeqFactory[Stack] {
+object Stack extends SeqFactory[Stack]
 
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Stack[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Stack[A]] =
     new ArrayBuffer[A] mapResult (buf => new Stack(buf.toList))
-}
 
 /** This class implements immutable stacks using a list-based data
   *  structure.
@@ -55,7 +54,7 @@ object Stack extends SeqFactory[Stack] {
 class Stack[+A] protected (protected val elems: List[A])
     extends AbstractSeq[A] with LinearSeq[A]
     with GenericTraversableTemplate[A, Stack]
-    with LinearSeqOptimized[A, Stack[A]] with Serializable {
+    with LinearSeqOptimized[A, Stack[A]] with Serializable
   override def companion: GenericCompanion[Stack] = Stack
 
   def this() = this(Nil)
@@ -132,4 +131,3 @@ class Stack[+A] protected (protected val elems: List[A])
   /** Returns a string representation of this stack.
     */
   override def toString() = elems.mkString("Stack(", ", ", ")")
-}

@@ -6,22 +6,20 @@ import scala.tools.nsc.interpreter.IMain
 import scala.tools.nsc.util._
 import scala.reflect.internal.util.AbstractFileClassLoader
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     run()
-  }
 
-  def run(): Unit = {
+  def run(): Unit =
     val settings = new Settings()
     settings.Yreplclassbased.value = true
     settings.usejavacp.value = true
 
     var imain: IMain = null
-    object extract extends ((AnyRef) => Unit) with Serializable {
+    object extract extends ((AnyRef) => Unit) with Serializable
       var value: AnyRef = null
 
       def apply(a: AnyRef) = value = a
-    }
 
     val code =
       """val x = {println("  evaluating x"); 0 }
@@ -47,21 +45,18 @@ object Test {
     val newLoader = new AbstractFileClassLoader(
         virtualFile, getClass.getClassLoader)
 
-    def deserializeInNewLoader(string: Array[Byte]): AnyRef = {
+    def deserializeInNewLoader(string: Array[Byte]): AnyRef =
       val bis = new ByteArrayInputStream(string)
-      val in = new ObjectInputStream(bis) {
+      val in = new ObjectInputStream(bis)
         override def resolveClass(desc: ObjectStreamClass) =
           Class.forName(desc.getName, false, newLoader)
-      }
       in.readObject()
-    }
-    def serialize(o: AnyRef): Array[Byte] = {
+    def serialize(o: AnyRef): Array[Byte] =
       val bos = new ByteArrayOutputStream()
       val out = new ObjectOutputStream(bos)
       out.writeObject(o)
       out.close()
       bos.toByteArray
-    }
     println("== evaluating lambda")
     extract.value.asInstanceOf[() => Any].apply()
     println("== reconstituting into a fresh classloader")
@@ -69,5 +64,3 @@ object Test {
       deserializeInNewLoader(serialize(extract.value)).asInstanceOf[() => Any]
     println("== evaluating reconstituted lambda")
     reconstituted.apply() // should not print("evaluating x") a second time
-  }
-}

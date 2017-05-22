@@ -1,5 +1,5 @@
-class DefEmptyParam {
-  def foo {
+class DefEmptyParam
+  def foo
     def goo(): Int = 435
 
     /*start*/
@@ -8,8 +8,6 @@ class DefEmptyParam {
     val f = goo()
     /*end*/
     f
-  }
-}
 /*
 class DefEmptyParam {
   def foo {

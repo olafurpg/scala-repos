@@ -1,15 +1,13 @@
-object G {
-  object Z {
+object G
+  object Z
     class I
     object I
-  }
 
-  object U {
+  object U
     type I = Z.I
-  }
 
   import Z.I
-  object K {
+  object K
     import U._
 
     def foo(x: I) = 1
@@ -17,6 +15,4 @@ object G {
 
     /*start*/
     foo(new I) /*end*/
-  }
-}
 //Int

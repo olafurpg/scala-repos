@@ -13,7 +13,7 @@ import com.twitter.scalding.mathematics.Matrix
  * 
  */
 
-class FilterOutdegreeJob(args: Args) extends Job(args) {
+class FilterOutdegreeJob(args: Args) extends Job(args)
 
   import Matrix._
 
@@ -34,4 +34,3 @@ class FilterOutdegreeJob(args: Args) extends Job(args) {
   // We multiply on the left hand side with the diagonal matrix created from the column vector
   // to keep only the rows with outdregree smaller than maxOutdegree
   (outdegreeFiltered.diag * adjacencyMatrix).write(Tsv(args("output")))
-}

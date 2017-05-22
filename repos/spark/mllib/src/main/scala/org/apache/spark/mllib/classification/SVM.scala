@@ -37,7 +37,7 @@ import org.apache.spark.rdd.RDD
 class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
                                @Since("0.8.0") override val intercept: Double)
     extends GeneralizedLinearModel(weights, intercept) with ClassificationModel
-    with Serializable with Saveable with PMMLExportable {
+    with Serializable with Saveable with PMMLExportable
 
   private var threshold: Option[Double] = Some(0.0)
 
@@ -47,10 +47,9 @@ class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
     * and negative otherwise. The default value is 0.0.
     */
   @Since("1.0.0")
-  def setThreshold(threshold: Double): this.type = {
+  def setThreshold(threshold: Double): this.type =
     this.threshold = Some(threshold)
     this
-  }
 
   /**
     * Returns the threshold (if any) used for converting raw prediction scores into 0/1 predictions.
@@ -62,22 +61,19 @@ class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
     * Clears the threshold so that `predict` will output raw prediction scores.
     */
   @Since("1.0.0")
-  def clearThreshold(): this.type = {
+  def clearThreshold(): this.type =
     threshold = None
     this
-  }
 
   override protected def predictPoint(
-      dataMatrix: Vector, weightMatrix: Vector, intercept: Double) = {
+      dataMatrix: Vector, weightMatrix: Vector, intercept: Double) =
     val margin = weightMatrix.toBreeze.dot(dataMatrix.toBreeze) + intercept
-    threshold match {
+    threshold match
       case Some(t) => if (margin > t) 1.0 else 0.0
       case None => margin
-    }
-  }
 
   @Since("1.3.0")
-  override def save(sc: SparkContext, path: String): Unit = {
+  override def save(sc: SparkContext, path: String): Unit =
     GLMClassificationModel.SaveLoadV1_0.save(sc,
                                              path,
                                              this.getClass.getName,
@@ -86,24 +82,21 @@ class SVMModel @Since("1.1.0")(@Since("1.0.0") override val weights: Vector,
                                              weights,
                                              intercept,
                                              threshold)
-  }
 
   override protected def formatVersion: String = "1.0"
 
-  override def toString: String = {
+  override def toString: String =
     s"${super.toString}, numClasses = 2, threshold = ${threshold.getOrElse("None")}"
-  }
-}
 
 @Since("1.3.0")
-object SVMModel extends Loader[SVMModel] {
+object SVMModel extends Loader[SVMModel]
 
   @Since("1.3.0")
-  override def load(sc: SparkContext, path: String): SVMModel = {
+  override def load(sc: SparkContext, path: String): SVMModel =
     val (loadedClassName, version, metadata) = Loader.loadMetadata(sc, path)
     // Hard-code class name string in case it changes in the future
     val classNameV1_0 = "org.apache.spark.mllib.classification.SVMModel"
-    (loadedClassName, version) match {
+    (loadedClassName, version) match
       case (className, "1.0") if className == classNameV1_0 =>
         val (numFeatures, numClasses) =
           ClassificationModel.getNumFeaturesClasses(metadata)
@@ -117,19 +110,15 @@ object SVMModel extends Loader[SVMModel] {
         assert(
             numClasses == 2,
             s"SVMModel.load was given numClasses=$numClasses but only supports 2 classes")
-        data.threshold match {
+        data.threshold match
           case Some(t) => model.setThreshold(t)
           case None => model.clearThreshold()
-        }
         model
       case _ =>
         throw new Exception(
             s"SVMModel.load did not recognize model with (className, format version):" +
             s"($loadedClassName, $version).  Supported:\n" +
             s"  ($classNameV1_0, 1.0)")
-    }
-  }
-}
 
 /**
   * Train a Support Vector Machine (SVM) using Stochastic Gradient Descent. By default L2
@@ -141,7 +130,7 @@ class SVMWithSGD private (private var stepSize: Double,
                           private var numIterations: Int,
                           private var regParam: Double,
                           private var miniBatchFraction: Double)
-    extends GeneralizedLinearAlgorithm[SVMModel] with Serializable {
+    extends GeneralizedLinearAlgorithm[SVMModel] with Serializable
 
   private val gradient = new HingeGradient()
   private val updater = new SquaredL2Updater()
@@ -160,16 +149,14 @@ class SVMWithSGD private (private var stepSize: Double,
   @Since("0.8.0")
   def this() = this(1.0, 100, 0.01, 1.0)
 
-  override protected def createModel(weights: Vector, intercept: Double) = {
+  override protected def createModel(weights: Vector, intercept: Double) =
     new SVMModel(weights, intercept)
-  }
-}
 
 /**
   * Top-level methods for calling SVM. NOTE: Labels used in SVM should be {0, 1}.
   */
 @Since("0.8.0")
-object SVMWithSGD {
+object SVMWithSGD
 
   /**
     * Train a SVM model given an RDD of (label, features) pairs. We run a fixed number
@@ -193,10 +180,9 @@ object SVMWithSGD {
             stepSize: Double,
             regParam: Double,
             miniBatchFraction: Double,
-            initialWeights: Vector): SVMModel = {
+            initialWeights: Vector): SVMModel =
     new SVMWithSGD(stepSize, numIterations, regParam, miniBatchFraction)
       .run(input, initialWeights)
-  }
 
   /**
     * Train a SVM model given an RDD of (label, features) pairs. We run a fixed number
@@ -215,10 +201,9 @@ object SVMWithSGD {
             numIterations: Int,
             stepSize: Double,
             regParam: Double,
-            miniBatchFraction: Double): SVMModel = {
+            miniBatchFraction: Double): SVMModel =
     new SVMWithSGD(stepSize, numIterations, regParam, miniBatchFraction)
       .run(input)
-  }
 
   /**
     * Train a SVM model given an RDD of (label, features) pairs. We run a fixed number
@@ -236,9 +221,8 @@ object SVMWithSGD {
   def train(input: RDD[LabeledPoint],
             numIterations: Int,
             stepSize: Double,
-            regParam: Double): SVMModel = {
+            regParam: Double): SVMModel =
     train(input, numIterations, stepSize, regParam, 1.0)
-  }
 
   /**
     * Train a SVM model given an RDD of (label, features) pairs. We run a fixed number
@@ -251,7 +235,5 @@ object SVMWithSGD {
     * @return a SVMModel which has the weights and offset from training.
     */
   @Since("0.8.0")
-  def train(input: RDD[LabeledPoint], numIterations: Int): SVMModel = {
+  def train(input: RDD[LabeledPoint], numIterations: Int): SVMModel =
     train(input, numIterations, 1.0, 0.01, 1.0)
-  }
-}

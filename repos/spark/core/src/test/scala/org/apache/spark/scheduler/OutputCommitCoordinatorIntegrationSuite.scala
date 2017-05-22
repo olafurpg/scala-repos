@@ -30,9 +30,9 @@ import org.apache.spark.util.Utils
   * See also: [[OutputCommitCoordinatorSuite]] for unit tests that use mocks.
   */
 class OutputCommitCoordinatorIntegrationSuite
-    extends SparkFunSuite with LocalSparkContext with Timeouts {
+    extends SparkFunSuite with LocalSparkContext with Timeouts
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     val conf = new SparkConf()
       .set("master", "local[2,4]")
@@ -41,30 +41,22 @@ class OutputCommitCoordinatorIntegrationSuite
           "spark.hadoop.mapred.output.committer.class",
           classOf[ThrowExceptionOnFirstAttemptOutputCommitter].getCanonicalName)
     sc = new SparkContext("local[2, 4]", "test", conf)
-  }
 
-  test("exception thrown in OutputCommitter.commitTask()") {
+  test("exception thrown in OutputCommitter.commitTask()")
     // Regression test for SPARK-10381
-    failAfter(Span(60, Seconds)) {
+    failAfter(Span(60, Seconds))
       val tempDir = Utils.createTempDir()
-      try {
+      try
         sc.parallelize(1 to 4, 2)
           .map(_.toString)
           .saveAsTextFile(tempDir.getAbsolutePath + "/out")
-      } finally {
+      finally
         Utils.deleteRecursively(tempDir)
-      }
-    }
-  }
-}
 
 private class ThrowExceptionOnFirstAttemptOutputCommitter
-    extends FileOutputCommitter {
-  override def commitTask(context: TaskAttemptContext): Unit = {
+    extends FileOutputCommitter
+  override def commitTask(context: TaskAttemptContext): Unit =
     val ctx = TaskContext.get()
-    if (ctx.attemptNumber < 1) {
+    if (ctx.attemptNumber < 1)
       throw new java.io.FileNotFoundException("Intentional exception")
-    }
     super.commitTask(context)
-  }
-}

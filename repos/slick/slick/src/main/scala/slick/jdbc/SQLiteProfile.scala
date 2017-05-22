@@ -73,7 +73,7 @@ import slick.sql.SqlProfile
   *     in the meta data.</li>
   * </ul>
   */
-trait SQLiteProfile extends JdbcProfile {
+trait SQLiteProfile extends JdbcProfile
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.functionDatabase -
@@ -89,44 +89,38 @@ trait SQLiteProfile extends JdbcProfile {
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
-      extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
+      extends JdbcModelBuilder(mTables, ignoreInvalidDefaults)
     override def createColumnBuilder(
         tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
-      new ColumnBuilder(tableBuilder, meta) {
+      new ColumnBuilder(tableBuilder, meta)
 
         /** Regex matcher to extract name and length out of a db type name with length ascription */
         final val TypePattern = "^([A-Z]+)(\\(([0-9]+)\\))?$".r
-        private val (_dbType, _size) = meta.typeName match {
+        private val (_dbType, _size) = meta.typeName match
           case TypePattern(d, _, s) => (d, Option(s).map(_.toInt))
-        }
         override def dbType = Some(_dbType)
         override def length = _size
         override def varying = dbType == Some("VARCHAR")
         override def default =
           meta.columnDef
             .map((_, tpe))
-            .collect {
+            .collect
               case ("null", _) => Some(None) // 3.7.15-M1
-            }
             .getOrElse { super.default }
-        override def tpe = dbType match {
+        override def tpe = dbType match
           case Some("DOUBLE") => "Double"
           case Some("DATE") => "java.sql.Date"
           case Some("TIME") => "java.sql.Time"
           case Some("TIMESTAMP") => "java.sql.Timestamp"
           case Some("BLOB") => "java.sql.Blob"
           case _ => super.tpe
-        }
-      }
     override def createPrimaryKeyBuilder(
         tableBuilder: TableBuilder,
         meta: Seq[MPrimaryKey]): PrimaryKeyBuilder =
-      new PrimaryKeyBuilder(tableBuilder, meta) {
+      new PrimaryKeyBuilder(tableBuilder, meta)
         // in 3.7.15-M1:
         override def columns =
           super.columns.map(_.stripPrefix("\"").stripSuffix("\""))
-      }
-  }
 
   override def createModelBuilder(
       tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
@@ -156,38 +150,36 @@ trait SQLiteProfile extends JdbcProfile {
     new CountingInsertActionComposerImpl[T](compiled)
 
   class QueryBuilder(tree: Node, state: CompilerState)
-      extends super.QueryBuilder(tree, state) {
+      extends super.QueryBuilder(tree, state)
     override protected val supportsTuples = false
     override protected val concatOperator = Some("||")
     override protected val parenthesizeNestedRHSJoin = true
     override protected val alwaysAliasSubqueries = false
     override protected val quotedJdbcFns = Some(Nil)
 
-    override protected def buildOrdering(n: Node, o: Ordering) {
+    override protected def buildOrdering(n: Node, o: Ordering)
       if (o.nulls.last && !o.direction.desc) b"($n) is null,"
       else if (o.nulls.first && o.direction.desc) b"($n) is null desc,"
       expr(n)
       if (o.direction.desc) b" desc"
-    }
 
     override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
+        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match
       case (Some(t), Some(d)) => b"\nlimit $d,$t"
       case (Some(t), None) => b"\nlimit $t"
       case (None, Some(d)) => b"\nlimit $d,-1"
       case _ =>
-    }
 
-    override def expr(c: Node, skipParens: Boolean = false): Unit = c match {
+    override def expr(c: Node, skipParens: Boolean = false): Unit = c match
       case Library.UCase(ch) => b"upper(!$ch)"
       case Library.LCase(ch) => b"lower(!$ch)"
       case Library.Substring(n, start, end) =>
-        b"substr($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-            start, LiteralNode(1).infer())}, ${QueryParameter.constOp[Int](
-            "-")(_ - _)(end, start)})"
+        b"substr($n, $QueryParameter.constOp[Int]("+")(_ + _)(
+            start, LiteralNode(1).infer()), $QueryParameter.constOp[Int](
+            "-")(_ - _)(end, start))"
       case Library.Substring(n, start) =>
-        b"substr($n, ${QueryParameter.constOp[Int]("+")(_ + _)(
-            start, LiteralNode(1).infer())})\)"
+        b"substr($n, $QueryParameter.constOp[Int]("+")(_ + _)(
+            start, LiteralNode(1).infer()))\)"
       case Library.IndexOf(n, str) => b"\(charindex($str, $n) - 1\)"
       case Library.%(l, r) => b"\($l%$r\)"
       case Library.Ceiling(ch) => b"round($ch+0.5)"
@@ -200,66 +192,54 @@ trait SQLiteProfile extends JdbcProfile {
       case Library.Repeat(n, times) =>
         b"replace(substr(quote(zeroblob(($times + 1) / 2)), 3, $times), '0', $n)"
       case _ => super.expr(c, skipParens)
-    }
-  }
 
   /* Extending super.InsertBuilder here instead of super.UpsertBuilder. INSERT OR REPLACE is almost identical to INSERT. */
-  class UpsertBuilder(ins: Insert) extends super.InsertBuilder(ins) {
+  class UpsertBuilder(ins: Insert) extends super.InsertBuilder(ins)
     override protected def buildInsertStart =
       allNames.mkString(s"insert or replace into $tableName (", ",", ") ")
-  }
 
-  class InsertBuilder(ins: Insert) extends super.InsertBuilder(ins) {
+  class InsertBuilder(ins: Insert) extends super.InsertBuilder(ins)
     override protected def emptyInsert: String =
       s"insert into $tableName default values"
-  }
 
-  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table) {
+  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table)
     override protected val foreignKeys =
       Nil // handled directly in addTableOptions
     override protected val primaryKeys =
       Nil // handled directly in addTableOptions
 
-    override protected def addTableOptions(b: StringBuilder) {
-      for (pk <- table.primaryKeys) {
+    override protected def addTableOptions(b: StringBuilder)
+      for (pk <- table.primaryKeys)
         b append ","
         addPrimaryKey(pk, b)
-      }
-      for (fk <- table.foreignKeys) {
+      for (fk <- table.foreignKeys)
         b append ","
         addForeignKey(fk, b)
-      }
-    }
-  }
 
   class ColumnDDLBuilder(column: FieldSymbol)
-      extends super.ColumnDDLBuilder(column) {
-    override protected def appendOptions(sb: StringBuilder) {
+      extends super.ColumnDDLBuilder(column)
+    override protected def appendOptions(sb: StringBuilder)
       if (defaultLiteral ne null) sb append " DEFAULT " append defaultLiteral
       if (autoIncrement) sb append " PRIMARY KEY AUTOINCREMENT"
       else if (primaryKey) sb append " PRIMARY KEY"
       if (notNull) sb append " NOT NULL"
-    }
-  }
 
   class CountingInsertActionComposerImpl[U](compiled: CompiledInsert)
-      extends super.CountingInsertActionComposerImpl[U](compiled) {
+      extends super.CountingInsertActionComposerImpl[U](compiled)
     // SQLite cannot perform server-side insert-or-update with soft insert semantics. We don't have to do
     // the same in ReturningInsertInvoker because SQLite does not allow returning non-AutoInc keys anyway.
     override protected val useServerSideUpsert = compiled.upsert.fields
       .forall(fs => !fs.options.contains(ColumnOption.AutoInc))
     override protected def useTransactionForUpsert = !useServerSideUpsert
-  }
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match
     case java.sql.Types.TINYINT | java.sql.Types.SMALLINT |
         java.sql.Types.BIGINT =>
       "INTEGER"
     case _ => super.defaultSqlTypeName(tmd, sym)
-  }
 
-  class JdbcTypes extends super.JdbcTypes {
+  class JdbcTypes extends super.JdbcTypes
     override val booleanJdbcType = new BooleanJdbcType
     override val dateJdbcType = new DateJdbcType
     override val timeJdbcType = new TimeJdbcType
@@ -268,26 +248,19 @@ trait SQLiteProfile extends JdbcProfile {
 
     /* SQLite does not have a proper BOOLEAN type. The suggested workaround is
      * INTEGER with constants 1 and 0 for TRUE and FALSE. */
-    class BooleanJdbcType extends super.BooleanJdbcType {
+    class BooleanJdbcType extends super.BooleanJdbcType
       override def sqlTypeName(sym: Option[FieldSymbol]) = "INTEGER"
       override def valueToSQLLiteral(value: Boolean) = if (value) "1" else "0"
-    }
     /* The SQLite JDBC driver does not support the JDBC escape syntax for
      * date/time/timestamp literals. SQLite expects these values as milliseconds
      * since epoch. */
-    class DateJdbcType extends super.DateJdbcType {
+    class DateJdbcType extends super.DateJdbcType
       override def valueToSQLLiteral(value: Date) = value.getTime.toString
-    }
-    class TimeJdbcType extends super.TimeJdbcType {
+    class TimeJdbcType extends super.TimeJdbcType
       override def valueToSQLLiteral(value: Time) = value.getTime.toString
-    }
-    class TimestampJdbcType extends super.TimestampJdbcType {
+    class TimestampJdbcType extends super.TimestampJdbcType
       override def valueToSQLLiteral(value: Timestamp) = value.getTime.toString
-    }
-    class UUIDJdbcType extends super.UUIDJdbcType {
+    class UUIDJdbcType extends super.UUIDJdbcType
       override def sqlType = java.sql.Types.BLOB
-    }
-  }
-}
 
 object SQLiteProfile extends SQLiteProfile

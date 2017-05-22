@@ -7,7 +7,7 @@ import util._
 import Buildable._
 import scala.collection.mutable.ArraySeq
 
-object Test extends Properties("Array") {
+object Test extends Properties("Array")
 
   /** At this moment the authentic scalacheck Array Builder/Arb bits are commented out.
     */
@@ -25,15 +25,12 @@ object Test extends Properties("Array") {
   )
 
   // inspired by #1857 and #2352
-  property("eq/ne") = forAll(arrGen, arrGen) { (c1, c2) =>
+  property("eq/ne") = forAll(arrGen, arrGen)  (c1, c2) =>
     (c1 eq c2) || (c1 ne c2)
-  }
 
   // inspired by #2299
   def smallInt = choose(1, 10)
-  property("ofDim") = forAll(smallInt, smallInt, smallInt) { (i1, i2, i3) =>
+  property("ofDim") = forAll(smallInt, smallInt, smallInt)  (i1, i2, i3) =>
     val arr = Array.ofDim[String](i1, i2, i3)
     val flattened = arr flatMap (x => x) flatMap (x => x)
     flattened.length == i1 * i2 * i3
-  }
-}

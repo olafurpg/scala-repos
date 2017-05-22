@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class QualifierAccessTest extends ResolveTestBase {
-  override def folderPath: String = {
+class QualifierAccessTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "qualifier/access/"
-  }
 
   def testClassParameterValue() { doTest() }
   def testClassParameterVariable() { doTest() }
@@ -21,4 +20,3 @@ class QualifierAccessTest extends ResolveTestBase {
   def testQualifiedAccissibility() { doTest() }
   def testSCL3857() { doTest() }
   def testSelfQualifier() { doTest() }
-}

@@ -21,29 +21,27 @@ import scala.xml.NodeSeq
 import net.liftweb.common.{Full, Empty}
 import org.specs2.mutable.Specification
 
-object LiftSessionSpec extends Specification {
+object LiftSessionSpec extends Specification
 
   private var receivedMessages = Vector[Int]()
   private object NoOp
 
-  private class TestCometActor extends CometActor {
+  private class TestCometActor extends CometActor
     def render = NodeSeq.Empty
 
-    override def lowPriority = {
+    override def lowPriority =
       case n: Int =>
         receivedMessages :+= n
       case NoOp =>
         reply(NoOp)
       case _ =>
-    }
-  }
 
-  "A LiftSession" should {
+  "A LiftSession" should
 
-    "Send accumulated messages to a newly-created comet actor in the order in which they arrived" in {
+    "Send accumulated messages to a newly-created comet actor in the order in which they arrived" in
 
       val session = new LiftSession("Test Session", "", Empty)
-      S.init(Empty, session) {
+      S.init(Empty, session)
         val cometName = "TestCometActor"
         val sendingMessages = 1 to 20
         sendingMessages foreach
@@ -57,7 +55,3 @@ object LiftSessionSpec extends Specification {
           .map(comet =>
                 comet !? NoOp /* Block to allow time for all messages to be collected */ )
         receivedMessages mustEqual sendingMessages
-      }
-    }
-  }
-}

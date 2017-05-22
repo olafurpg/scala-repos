@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 
-object Dependencies {
+object Dependencies
   val android = "com.google.android" % "android" % "4.1.1.4" % "provided"
   val android_support_v4 =
     "com.google.android" % "support-v4" % "r7" % "provided"
@@ -12,9 +12,8 @@ object Dependencies {
   val scalaTest = "org.scalatest" %% "scalatest" % "2.2.5" % "test"
   val junit = "junit" % "junit" % "4.12" % "test"
   val junitInterface = "com.novocode" % "junit-interface" % "0.11" % "test"
-}
 
-object ScaloidBuild extends Build {
+object ScaloidBuild extends Build
 
   import ScaloidSettings._
   import Dependencies._
@@ -28,15 +27,15 @@ object ScaloidBuild extends Build {
       crossScalaVersions := Seq("2.11.7"), // only 2.11.x for now
       version := scaloidVersion,
       publishMavenStyle := true,
-      publishTo <<= version { (v: String) =>
+      publishTo <<= version  (v: String) =>
         val nexus = "https://oss.sonatype.org/"
         if (v.trim.endsWith("SNAPSHOT"))
           Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      },
-      pomIncludeRepository := { _ =>
+      ,
+      pomIncludeRepository :=  _ =>
         false
-      },
+      ,
       pomExtra := <url>http://scaloid.org</url>
         <licenses>
           <license>
@@ -71,11 +70,9 @@ object ScaloidBuild extends Build {
 
   // configure prompt to show current project
   override lazy val settings =
-    super.settings :+ {
-      shellPrompt := { s =>
+    super.settings :+
+      shellPrompt :=  s =>
         Project.extract(s).currentProject.id + "> "
-      }
-    }
 
   //  root project
   lazy val parent = Project("parent", file("."))
@@ -109,4 +106,3 @@ object ScaloidBuild extends Build {
     .settings(scaloidSettings: _*)
     .settings(libraryDependencies += scaloid)
     .dependsOn(common)
-}

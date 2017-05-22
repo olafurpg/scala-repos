@@ -36,7 +36,7 @@ import annotation.tailrec
   */
 class ListMap[A, B]
     extends AbstractMap[A, B] with Map[A, B]
-    with MapLike[A, B, ListMap[A, B]] with Serializable {
+    with MapLike[A, B, ListMap[A, B]] with Serializable
 
   override def empty = ListMap.empty[A, B]
 
@@ -49,9 +49,8 @@ class ListMap[A, B]
   @deprecatedOverriding(
       "No sensible way to override += as private remove is used in multiple places internally.",
       "2.11.0")
-  def +=(kv: (A, B)) = {
+  def +=(kv: (A, B)) =
     elems = remove(kv._1, elems, List()); elems = kv :: elems; siz += 1; this
-  }
 
   @deprecatedOverriding(
       "No sensible way to override -= as private remove is used in multiple places internally.",
@@ -60,11 +59,10 @@ class ListMap[A, B]
 
   @tailrec
   private def remove(
-      key: A, elems: List[(A, B)], acc: List[(A, B)]): List[(A, B)] = {
+      key: A, elems: List[(A, B)], acc: List[(A, B)]): List[(A, B)] =
     if (elems.isEmpty) acc
     else if (elems.head._1 == key) { siz -= 1; acc ::: elems.tail } else
       remove(key, elems.tail, elems.head :: acc)
-  }
 
   @deprecatedOverriding(
       "No sensible way to override as this functionality relies upon access to private methods.",
@@ -75,14 +73,12 @@ class ListMap[A, B]
       "No sensible way to override as this functionality relies upon access to private methods.",
       "2.11.0")
   override def size: Int = siz
-}
 
 /** $factoryInfo
   *  @define Coll `mutable.ListMap`
   *  @define coll mutable list map
   */
-object ListMap extends MutableMapFactory[ListMap] {
+object ListMap extends MutableMapFactory[ListMap]
   implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), ListMap[A, B]] =
     new MapCanBuildFrom[A, B]
   def empty[A, B]: ListMap[A, B] = new ListMap[A, B]
-}

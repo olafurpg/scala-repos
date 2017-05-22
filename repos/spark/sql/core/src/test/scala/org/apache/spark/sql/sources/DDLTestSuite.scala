@@ -24,19 +24,17 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
-class DDLScanSource extends RelationProvider {
+class DDLScanSource extends RelationProvider
   override def createRelation(
       sqlContext: SQLContext,
-      parameters: Map[String, String]): BaseRelation = {
+      parameters: Map[String, String]): BaseRelation =
     SimpleDDLScan(parameters("from").toInt,
                   parameters("TO").toInt,
                   parameters("Table"))(sqlContext)
-  }
-}
 
 case class SimpleDDLScan(from: Int, to: Int, table: String)(
     @transient val sqlContext: SQLContext)
-    extends BaseRelation with TableScan {
+    extends BaseRelation with TableScan
 
   override def schema: StructType =
     StructType(
@@ -71,21 +69,18 @@ case class SimpleDDLScan(from: Int, to: Int, table: String)(
 
   override def needConversion: Boolean = false
 
-  override def buildScan(): RDD[Row] = {
+  override def buildScan(): RDD[Row] =
     // Rely on a type erasure hack to pass RDD[InternalRow] back as RDD[Row]
     sqlContext.sparkContext
       .parallelize(from to to)
-      .map { e =>
+      .map  e =>
         InternalRow(UTF8String.fromString(s"people$e"), e * 2)
-      }
       .asInstanceOf[RDD[Row]]
-  }
-}
 
-class DDLTestSuite extends DataSourceTest with SharedSQLContext {
+class DDLTestSuite extends DataSourceTest with SharedSQLContext
   protected override lazy val sql = caseInsensitiveContext.sql _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     sql("""
       |CREATE TEMPORARY TABLE ddlPeople
@@ -96,7 +91,6 @@ class DDLTestSuite extends DataSourceTest with SharedSQLContext {
       |  Table 'test1'
       |)
       """.stripMargin)
-  }
 
   sqlTest("describe ddlPeople",
           Seq(
@@ -119,10 +113,8 @@ class DDLTestSuite extends DataSourceTest with SharedSQLContext {
           ))
 
   test(
-      "SPARK-7686 DescribeCommand should have correct physical plan output attributes") {
+      "SPARK-7686 DescribeCommand should have correct physical plan output attributes")
     val attributes =
       sql("describe ddlPeople").queryExecution.executedPlan.output
     assert(attributes.map(_.name) === Seq("col_name", "data_type", "comment"))
     assert(attributes.map(_.dataType).toSet === Set(StringType))
-  }
-}

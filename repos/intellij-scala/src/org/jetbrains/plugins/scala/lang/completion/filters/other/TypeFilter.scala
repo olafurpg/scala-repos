@@ -14,23 +14,19 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportStmt
   * User: Alexander Podkhalyuzin
   * Date: 05.10.2008
   */
-class TypeFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class TypeFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
     val imp = ScalaPsiUtil.getParentOfType(leaf, classOf[ScImportStmt])
     if (imp != null) return false
-    if (leaf != null) {
+    if (leaf != null)
       val parent = leaf.getParent
-      parent match {
+      parent match
         case _: ScStableCodeReferenceElement => return true
         case _ => return false
-      }
-    }
     false
-  }
 
   override def toString: String = "'type' keyword filter"
 
   def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = true
-}

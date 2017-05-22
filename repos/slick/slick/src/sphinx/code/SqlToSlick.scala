@@ -5,31 +5,28 @@ import scala.concurrent.duration.Duration
 import slick.jdbc.H2Profile.api._
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object SqlToSlick extends App {
+object SqlToSlick extends App
 
-  object Tables {
+  object Tables
     //#tableClasses
     type Person = (Int, String, Int, Int)
-    class People(tag: Tag) extends Table[Person](tag, "PERSON") {
+    class People(tag: Tag) extends Table[Person](tag, "PERSON")
       def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
       def name = column[String]("NAME")
       def age = column[Int]("AGE")
       def addressId = column[Int]("ADDRESS_ID")
       def * = (id, name, age, addressId)
       def address = foreignKey("ADDRESS", addressId, addresses)(_.id)
-    }
     lazy val people = TableQuery[People]
 
     type Address = (Int, String, String)
-    class Addresses(tag: Tag) extends Table[Address](tag, "ADDRESS") {
+    class Addresses(tag: Tag) extends Table[Address](tag, "ADDRESS")
       def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
       def street = column[String]("STREET")
       def city = column[String]("CITY")
       def * = (id, street, city)
-    }
     lazy val addresses = TableQuery[Addresses]
     //#tableClasses
-  }
   import Tables._
 
   lazy val inserts = DBIO.seq(
@@ -41,7 +38,7 @@ object SqlToSlick extends App {
   )
 
   val db = Database.forConfig("h2mem1")
-  try {
+  try
 
     Await.result(db.run(
                      DBIO.seq(
@@ -51,7 +48,7 @@ object SqlToSlick extends App {
                      )),
                  Duration.Inf)
 
-    def _jdbc = {
+    def _jdbc =
       //#jdbc
       import java.sql._
 
@@ -59,28 +56,23 @@ object SqlToSlick extends App {
       val conn = DriverManager.getConnection("jdbc:h2:mem:test1")
       val people =
         new scala.collection.mutable.MutableList[(Int, String, Int)]()
-      try {
+      try
         val stmt = conn.createStatement()
-        try {
+        try
 
           val rs = stmt.executeQuery("select ID, NAME, AGE from PERSON")
-          try {
-            while (rs.next()) {
+          try
+            while (rs.next())
               people += ((rs.getInt(1), rs.getString(2), rs.getInt(3)))
-            }
-          } finally {
+          finally
             rs.close()
-          }
-        } finally {
+        finally
           stmt.close()
-        }
-      } finally {
+      finally
         conn.close()
-      }
       //#jdbc
       people
-    }
-    val slickPlainSql = {
+    val slickPlainSql =
       //#SlickPlainSQL
       import slick.jdbc.H2Profile.api._
 
@@ -95,8 +87,7 @@ object SqlToSlick extends App {
       val action = sql"select ID, NAME, AGE from PERSON".as[(Int, String, Int)]
       db.run(action)
       //#SlickPlainSQL
-    }
-    val slickTypesafeQuery = {
+    val slickTypesafeQuery =
       import Tables.People // <- import auto-generated or hand-written TableQuery
       //#SlickTypesafeQuery
       import slick.jdbc.H2Profile.api._
@@ -112,19 +103,16 @@ object SqlToSlick extends App {
       val query = people.map(p => (p.id, p.name, p.age))
       db.run(query.result)
       //#SlickTypesafeQuery
-    }
     val tRes = Await.result(slickTypesafeQuery, Duration.Inf)
     val pRes = Await.result(slickPlainSql, Duration.Inf)
     assert(tRes == pRes)
     assert(pRes.size > 0);
-    {
       import slick.jdbc.H2Profile.api._
       import Tables.People // <- import auto-generated or hand-written TableQuery
 
       //#slickFunction
-      implicit class MyStringColumnExtensions(i: Rep[Int]) {
+      implicit class MyStringColumnExtensions(i: Rep[Int])
         def squared = i * i
-      }
       //#slickFunction
       val squared = //#slickFunction
 
@@ -144,8 +132,7 @@ object SqlToSlick extends App {
           db.run(squared.to[Set].result.zip(pow.to[Set].result)), Duration.Inf)
       assert(sRes == pRes)
       assert(Set(998001, 1002001) subsetOf pRes)
-    };
-    {
+    ;
       //#overrideSql
       people.map(p => (p.id, p.name, p.age)).result
       // inject hand-written SQL, see https://gist.github.com/cvogt/d9049c63fc395654c4b4
@@ -155,7 +142,6 @@ object SqlToSlick extends App {
             .overrideSql("SELECT id, name, age FROM Person")
       //#overrideSql
        */;
-      {
         val sql = //#sqlQueryProjection*
         sql"select * from PERSON".as[Person]
         //#sqlQueryProjection*
@@ -166,8 +152,7 @@ object SqlToSlick extends App {
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryProjection
         sql"""
             select AGE, concat(concat(concat(NAME,' ('),ID),')')
@@ -183,8 +168,7 @@ object SqlToSlick extends App {
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryFilter
         sql"select * from PERSON where AGE >= 18 AND NAME = 'C. Vogt'"
           .as[Person]
@@ -196,8 +180,7 @@ object SqlToSlick extends App {
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryOrderBy
         sql"select * from PERSON order by AGE asc, NAME".as[Person]
         //#sqlQueryOrderBy
@@ -208,8 +191,7 @@ object SqlToSlick extends App {
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryAggregate
         sql"select max(AGE) from PERSON".as[Option[Int]].head
         //#sqlQueryAggregate
@@ -219,8 +201,7 @@ object SqlToSlick extends App {
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
-      };
-      {
+      ;
         val sql = //#sqlQueryGroupBy
         sql"""
             select ADDRESS_ID, AVG(AGE)
@@ -239,8 +220,7 @@ object SqlToSlick extends App {
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
         assert(sqlRes.exists(_._2 == Some(1000)))
-      };
-      {
+      ;
         val sql = //#sqlQueryHaving
         sql"""
             select ADDRESS_ID
@@ -261,8 +241,7 @@ object SqlToSlick extends App {
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryImplicitJoin
         sql"""
             select P.NAME, A.CITY
@@ -289,8 +268,7 @@ object SqlToSlick extends App {
         assert(sqlRes == slickRes)
         assert(slickRes == slick2Res)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryExplicitJoin
         sql"""
             select P.NAME, A.CITY
@@ -299,16 +277,15 @@ object SqlToSlick extends App {
           """.as[(String, String)]
         //#sqlQueryExplicitJoin
         val slick = //#slickQueryExplicitJoin
-        (people join addresses on (_.addressId === _.id)).map {
+        (people join addresses on (_.addressId === _.id)).map
           case (p, a) => (p.name, a.city)
-        }.result
+        .result
         //#slickQueryExplicitJoin
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryLeftJoin
         sql"""
             select P.NAME,A.CITY
@@ -317,16 +294,15 @@ object SqlToSlick extends App {
           """.as[(Option[String], String)]
         //#sqlQueryLeftJoin
         val slick = //#slickQueryLeftJoin
-        (addresses joinLeft people on (_.id === _.addressId)).map {
+        (addresses joinLeft people on (_.id === _.addressId)).map
           case (a, p) => (p.map(_.name), a.city)
-        }.result
+        .result
         //#slickQueryLeftJoin
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQueryCollectionSubQuery
         sql"""
             select *
@@ -336,20 +312,18 @@ object SqlToSlick extends App {
                            where CITY = 'New York City')
           """.as[Person]
         //#sqlQueryCollectionSubQuery
-        val slick = {
+        val slick =
           //#slickQueryCollectionSubQuery
           val address_ids =
             addresses.filter(_.city === "New York City").map(_.id)
           people.filter(_.id in address_ids).result // <- run as one query
           //#slickQueryCollectionSubQuery
-        }
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
-        val sql = {
+      ;
+        val sql =
           //#sqlQueryInSet
           val (i1, i2) = (1, 2)
           sql"""
@@ -358,18 +332,15 @@ object SqlToSlick extends App {
             where P.ID in ($i1,$i2)
           """.as[Person]
           //#sqlQueryInSet
-        }
-        val slick = {
+        val slick =
           //#slickQueryInSet
           people.filter(_.id inSet Set(1, 2)).result
           //#slickQueryInSet
-        }
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
         assert(sqlRes.size > 0)
-      };
-      {
+      ;
         val sql = //#sqlQuerySemiRandomChoose
         sql"""
             select * from PERSON P,
@@ -379,7 +350,7 @@ object SqlToSlick extends App {
             limit 1
           """.as[Person].head
         //#sqlQuerySemiRandomChoose
-        val slick = {
+        val slick =
           //#slickQuerySemiRandomChoose
           val rand = SimpleFunction.nullary[Double]("RAND")
 
@@ -388,9 +359,7 @@ object SqlToSlick extends App {
 
           people.filter(_.id >= rndId).sortBy(_.id).result.head
           //#slickQuerySemiRandomChoose
-        }
-      };
-      {
+      ;
         val sqlInsert = //#sqlQueryInsert
         sqlu"""
             insert into PERSON (NAME, AGE, ADDRESS_ID) values ('M Odersky', 12345, 1)
@@ -407,25 +376,22 @@ object SqlToSlick extends App {
           """
         //#sqlQueryDelete
 
-        val slickInsert = {
+        val slickInsert =
           //#slickQueryInsert
           people.map(p => (p.name, p.age, p.addressId)) +=
           ("M Odersky", 12345, 1)
           //#slickQueryInsert
-        }
-        val slickUpdate = {
+        val slickUpdate =
           //#slickQueryUpdate
           people
             .filter(_.name === "M Odersky")
             .map(p => (p.name, p.age))
             .update(("M. Odersky", 54321))
           //#slickQueryUpdate
-        }
-        val slickDelete = {
+        val slickDelete =
           //#slickQueryDelete
           people.filter(p => p.name === "M. Odersky").delete
           //#slickQueryDelete
-        }
         val (sqlInsertRes, slickInsertRes) =
           Await.result(db.run(sqlInsert zip slickInsert), Duration.Inf)
         assert(sqlInsertRes == slickInsertRes)
@@ -437,8 +403,7 @@ object SqlToSlick extends App {
           Await.result(db.run(sqlDelete zip slickDelete), Duration.Inf)
         assert(sqlDeleteRes == 2)
         assert(slickDeleteRes == 0)
-      };
-      {
+      ;
         val sql = //#sqlCase
         sql"""
             select
@@ -458,7 +423,4 @@ object SqlToSlick extends App {
         val (sqlRes, slickRes) =
           Await.result(db.run(sql zip slick), Duration.Inf)
         assert(sqlRes == slickRes)
-      }
-    }
-  } finally db.close
-}
+  finally db.close

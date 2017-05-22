@@ -17,7 +17,7 @@ import scala.language.implicitConversions
   *  @version 1.0, 15/07/2003
   *  @since 2.1
   */
-object BigInt {
+object BigInt
 
   private val minCached = -1024
   private val maxCached = 1024
@@ -31,14 +31,13 @@ object BigInt {
     *  @return  the constructed `BigInt`
     */
   def apply(i: Int): BigInt =
-    if (minCached <= i && i <= maxCached) {
+    if (minCached <= i && i <= maxCached)
       val offset = i - minCached
       var n = cache(offset)
-      if (n eq null) {
+      if (n eq null)
         n = new BigInt(BigInteger.valueOf(i.toLong)); cache(offset) = n
-      }
       n
-    } else new BigInt(BigInteger.valueOf(i.toLong))
+    else new BigInt(BigInteger.valueOf(i.toLong))
 
   /** Constructs a `BigInt` whose value is equal to that of the
     *  specified long value.
@@ -105,7 +104,6 @@ object BigInt {
   /** Implicit conversion from `java.math.BigInteger` to `scala.BigInt`.
     */
   implicit def javaBigInteger2bigInt(x: BigInteger): BigInt = apply(x)
-}
 
 /**
   *  @author  Martin Odersky
@@ -113,7 +111,7 @@ object BigInt {
   */
 final class BigInt(val bigInteger: BigInteger)
     extends ScalaNumber with ScalaNumericConversions with Serializable
-    with Ordered[BigInt] {
+    with Ordered[BigInt]
 
   /** Returns the hash code for this BigInt. */
   override def hashCode(): Int =
@@ -122,13 +120,12 @@ final class BigInt(val bigInteger: BigInteger)
 
   /** Compares this BigInt with the specified value for equality.
     */
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: BigInt => this equals that
     case that: BigDecimal => that equals this
     case that: Double => isValidDouble && toDouble == that
     case that: Float => isValidFloat && toFloat == that
     case x => isValidLong && unifiedPrimitiveEquals(x)
-  }
   override def isValidByte = this >= Byte.MinValue && this <= Byte.MaxValue
   override def isValidShort = this >= Short.MinValue && this <= Short.MaxValue
   override def isValidChar = this >= Char.MinValue && this <= Char.MaxValue
@@ -137,39 +134,36 @@ final class BigInt(val bigInteger: BigInteger)
 
   /** Returns `true` iff this can be represented exactly by [[scala.Float]]; otherwise returns `false`.
     */
-  def isValidFloat = {
+  def isValidFloat =
     val bitLen = bitLength
-    (bitLen <= 24 || {
+    (bitLen <= 24 ||
           val lowest = lowestSetBit
           bitLen <= java.lang.Float.MAX_EXPONENT + 1 &&
           // exclude this < -2^128 && this >= 2^128
           lowest >= bitLen - 24 &&
           lowest < java.lang.Float.MAX_EXPONENT + 1 // exclude this == -2^128
-        }) && !bitLengthOverflow
-  }
+        ) && !bitLengthOverflow
 
   /** Returns `true` iff this can be represented exactly by [[scala.Double]]; otherwise returns `false`.
     */
-  def isValidDouble = {
+  def isValidDouble =
     val bitLen = bitLength
-    (bitLen <= 53 || {
+    (bitLen <= 53 ||
           val lowest = lowestSetBit
           bitLen <= java.lang.Double.MAX_EXPONENT + 1 &&
           // exclude this < -2^1024 && this >= 2^1024
           lowest >= bitLen - 53 &&
           lowest < java.lang.Double.MAX_EXPONENT + 1 // exclude this == -2^1024
-        }) && !bitLengthOverflow
-  }
+        ) && !bitLengthOverflow
 
   /** Some implementations of java.math.BigInteger allow huge values with bit length greater than Int.MaxValue .
     * The BigInteger.bitLength method returns truncated bit length in this case .
     * This method tests if result of bitLength is valid.
     * This method will become unnecessary if BigInt constructors reject huge BigIntegers.
     */
-  private def bitLengthOverflow = {
+  private def bitLengthOverflow =
     val shifted = bigInteger.shiftRight(Int.MaxValue)
     (shifted.signum != 0) && !(shifted equals BigInt.minusOne)
-  }
 
   def isWhole() = true
   def underlying = bigInteger
@@ -209,10 +203,9 @@ final class BigInt(val bigInteger: BigInteger)
 
   /** Returns a pair of two BigInts containing (this / that) and (this % that).
     */
-  def /%(that: BigInt): (BigInt, BigInt) = {
+  def /%(that: BigInt): (BigInt, BigInt) =
     val dr = this.bigInteger.divideAndRemainder(that.bigInteger)
     (new BigInt(dr(0)), new BigInt(dr(1)))
-  }
 
   /** Leftshift of BigInt
     */
@@ -418,4 +411,3 @@ final class BigInt(val bigInteger: BigInteger)
     *  least one sign bit.
     */
   def toByteArray: Array[Byte] = this.bigInteger.toByteArray()
-}

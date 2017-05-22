@@ -34,7 +34,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion Object for [[scalafx.print.Paper]].
   */
-object Paper {
+object Paper
 
   /**
     * Converts a ScalaFX Paper to its JavaFX counterpart.
@@ -104,7 +104,6 @@ object Paper {
 
   /** Specifies the tabloid size, 11 inches by 17 inches. */
   val Tabloid = new Paper(jfxp.Paper.TABLOID)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Paper.html JavaFX Paper]].
@@ -115,7 +114,7 @@ object Paper {
   * @since 8.0
   */
 final class Paper(override val delegate: jfxp.Paper)
-    extends SFXDelegate[jfxp.Paper] {
+    extends SFXDelegate[jfxp.Paper]
 
   /**
     * The height of the paper in points (1/72 inch)
@@ -131,4 +130,3 @@ final class Paper(override val delegate: jfxp.Paper)
     * The width of the paper in points (1/72 inch)
     */
   def width: Double = delegate.getWidth
-}

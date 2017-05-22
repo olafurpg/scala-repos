@@ -24,20 +24,18 @@ import org.apache.spark.graphx._
 import org.apache.spark.graphx.util.collection.GraphXPrimitiveKeyOpenHashMap
 import org.apache.spark.util.collection.BitSet
 
-private[graphx] object VertexPartitionBase {
+private[graphx] object VertexPartitionBase
 
   /**
     * Construct the constituents of a VertexPartitionBase from the given vertices, merging duplicate
     * entries arbitrarily.
     */
   def initFrom[VD : ClassTag](iter: Iterator[(VertexId, VD)])
-    : (VertexIdToIndexMap, Array[VD], BitSet) = {
+    : (VertexIdToIndexMap, Array[VD], BitSet) =
     val map = new GraphXPrimitiveKeyOpenHashMap[VertexId, VD]
-    iter.foreach { pair =>
+    iter.foreach  pair =>
       map(pair._1) = pair._2
-    }
     (map.keySet, map._values, map.keySet.getBitSet)
-  }
 
   /**
     * Construct the constituents of a VertexPartitionBase from the given vertices, merging duplicate
@@ -45,14 +43,11 @@ private[graphx] object VertexPartitionBase {
     */
   def initFrom[VD : ClassTag](
       iter: Iterator[(VertexId, VD)],
-      mergeFunc: (VD, VD) => VD): (VertexIdToIndexMap, Array[VD], BitSet) = {
+      mergeFunc: (VD, VD) => VD): (VertexIdToIndexMap, Array[VD], BitSet) =
     val map = new GraphXPrimitiveKeyOpenHashMap[VertexId, VD]
-    iter.foreach { pair =>
+    iter.foreach  pair =>
       map.setMerge(pair._1, pair._2, mergeFunc)
-    }
     (map.keySet, map._values, map.keySet.getBitSet)
-  }
-}
 
 /**
   * An abstract map from vertex id to vertex attribute. [[VertexPartition]] is the corresponding
@@ -63,7 +58,7 @@ private[graphx] object VertexPartitionBase {
   */
 private[graphx] abstract class VertexPartitionBase[
     @specialized(Long, Int, Double) VD : ClassTag]
-    extends Serializable {
+    extends Serializable
 
   def index: VertexIdToIndexMap
   def values: Array[VD]
@@ -76,20 +71,17 @@ private[graphx] abstract class VertexPartitionBase[
   /** Return the vertex attribute for the given vertex ID. */
   def apply(vid: VertexId): VD = values(index.getPos(vid))
 
-  def isDefined(vid: VertexId): Boolean = {
+  def isDefined(vid: VertexId): Boolean =
     val pos = index.getPos(vid)
     pos >= 0 && mask.get(pos)
-  }
 
   def iterator: Iterator[(VertexId, VD)] =
     mask.iterator.map(ind => (index.getValue(ind), values(ind)))
-}
 
 /**
   * A typeclass for subclasses of `VertexPartitionBase` representing the ability to wrap them in a
   * `VertexPartitionBaseOps`.
   */
 private[graphx] trait VertexPartitionBaseOpsConstructor[
-    T[X] <: VertexPartitionBase[X]] {
+    T[X] <: VertexPartitionBase[X]]
   def toOps[VD : ClassTag](partition: T[VD]): VertexPartitionBaseOps[VD, T]
-}

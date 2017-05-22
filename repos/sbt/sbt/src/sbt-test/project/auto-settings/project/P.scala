@@ -4,7 +4,7 @@ import Keys._
 import AddSettings._
 import Import._
 
-object B extends Build {
+object B extends Build
   // version should be from explicit/a.txt
   lazy val root =
     project("root", "1.4") settingSets
@@ -34,8 +34,7 @@ object B extends Build {
 
   def project(id: String, expectedVersion: String): Project =
     Project(id, if (id == "root") file(".") else file(id)) settings
-    (TaskKey[Unit]("check") <<= version map { v =>
+    (TaskKey[Unit]("check") <<= version map  v =>
           assert(v == expectedVersion,
                  "Expected version '" + expectedVersion + "', got: " + v)
-        })
-}
+        )

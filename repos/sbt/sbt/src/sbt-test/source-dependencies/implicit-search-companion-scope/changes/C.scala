@@ -1,3 +1,2 @@
-object Test {
+object Test
   implicitly[M[B]]
-}

@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Roman.Shein
   * @since 29.09.2015.
   */
-class ScalaSubtypesMacro extends Macro {
+class ScalaSubtypesMacro extends Macro
   override def getName: String = MacroUtil.scalaIdPrefix + "subtypes"
 
   override def getPresentableName: String =
@@ -35,12 +35,12 @@ class ScalaSubtypesMacro extends Macro {
 
   override def calculateLookupItems(
       params: Array[Expression],
-      context: ExpressionContext): Array[LookupElement] = {
+      context: ExpressionContext): Array[LookupElement] =
     if (params.length != 1) return Array[LookupElement]()
     val project = context.getProject
-    params(0).calculateResult(context) match {
+    params(0).calculateResult(context) match
       case scTypeRes: ScalaTypeResult =>
-        ScType.extractClass(scTypeRes.myType, Some(context.getProject)) match {
+        ScType.extractClass(scTypeRes.myType, Some(context.getProject)) match
           case Some(x: ScTypeDefinition) =>
             import scala.collection.JavaConversions._
             ClassInheritorsSearch
@@ -54,8 +54,4 @@ class ScalaSubtypesMacro extends Macro {
               .flatMap(MacroUtil.getTypeLookupItem(_, project))
               .toArray
           case _ => Array[LookupElement]()
-        }
       case _ => Array[LookupElement]()
-    }
-  }
-}

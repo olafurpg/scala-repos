@@ -45,7 +45,7 @@ we don't use it.
 For the scald.rb script to work, name the class to match the file,
 and don't use a package.
   **/
-class Tutorial0(args: Args) extends Job(args) {
+class Tutorial0(args: Args) extends Job(args)
 
   /**
   Both input and output data sources are represented by instances of
@@ -70,4 +70,3 @@ class Tutorial0(args: Args) extends Job(args) {
   we call on Pipes will actually be found on RichPipe; in typical scala style,
   the conversion between them is implicit.
   **/
-}

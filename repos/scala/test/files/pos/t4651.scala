@@ -1,5 +1,5 @@
-object Test {
-  def analyze(x: Any) = x match {
+object Test
+  def analyze(x: Any) = x match
     case s: String => println("It's a string: " + s)
     case 1 => println("It's a one")
     case (a: Int, b) =>
@@ -8,5 +8,3 @@ object Test {
     case List(a, b, c) =>
       println("It's a three-element list with " + a + ", " + b + ", " + c)
     case _ => println("It's something different")
-  }
-}

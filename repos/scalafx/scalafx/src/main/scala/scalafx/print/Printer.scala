@@ -37,7 +37,7 @@ import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 /**
   * Companion Object for [[scalafx.print.Printer]].
   */
-object Printer {
+object Printer
 
   /**
     * Converts a ScalaFX Printer to its JavaFX counterpart.
@@ -55,7 +55,7 @@ object Printer {
     */
   object MarginType
       extends SFXEnumDelegateCompanion[
-          jfxp.Printer.MarginType, Printer.MarginType] {
+          jfxp.Printer.MarginType, Printer.MarginType]
 
     /**
       * This requests a default 0.75 inch margin on all sides.
@@ -84,7 +84,6 @@ object Printer {
 
     protected override def unsortedValues: Array[Printer.MarginType] =
       Array(Default, Equal, EqualOpposites, HardwareMinimum)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Printer.MarginType.html JavaFX MarginType]].
@@ -111,7 +110,6 @@ object Printer {
     * Retrieve the default printer or `null`.
     */
   def defaultPrinter: Printer = jfxp.Printer.getDefaultPrinter
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/Printer.html JavaFX Printer]].
@@ -122,7 +120,7 @@ object Printer {
   * @since 8.0
   */
 final class Printer(override val delegate: jfxp.Printer)
-    extends SFXDelegate[jfxp.Printer] {
+    extends SFXDelegate[jfxp.Printer]
 
   /**
     * the default page layout for this printer.
@@ -171,4 +169,3 @@ final class Printer(override val delegate: jfxp.Printer)
                        orient: PageOrientation,
                        mType: jfxp.Printer.MarginType): PageLayout =
     delegate.createPageLayout(paper, orient, mType)
-}

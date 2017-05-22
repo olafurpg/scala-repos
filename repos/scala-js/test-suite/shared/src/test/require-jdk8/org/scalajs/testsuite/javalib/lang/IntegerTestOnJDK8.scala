@@ -12,16 +12,15 @@ import org.junit.Assert._
 
 import org.scalajs.testsuite.utils.AssertThrows._
 
-class IntegerTestOnJDK8 {
+class IntegerTestOnJDK8
 
   // Explicitly define these as `var`'s to avoid any compile-time constant folding
   val MaxValue: Int = Int.MaxValue
   val MinValue: Int = Int.MinValue
 
-  @Test def should_parse_uInt_strings(): Unit = {
-    def test(s: String, v: Int, radix: Int = 10): Unit = {
+  @Test def should_parse_uInt_strings(): Unit =
+    def test(s: String, v: Int, radix: Int = 10): Unit =
       assertEquals(v, Integer.parseUnsignedInt(s, radix))
-    }
 
     test("0", 0)
     test("5", 5)
@@ -34,9 +33,8 @@ class IntegerTestOnJDK8 {
     test("FF", 255, 16)
     test("4000000000", 0xEE6B2800)
     test("4294967295", 0xFFFFFFFF)
-  }
 
-  @Test def should_reject_invalid_uInt_strings_when_parsing(): Unit = {
+  @Test def should_reject_invalid_uInt_strings_when_parsing(): Unit =
     def test(s: String, radix: Int = 10): Unit =
       expectThrows(
           classOf[NumberFormatException], Integer.parseUnsignedInt(s, radix))
@@ -50,12 +48,10 @@ class IntegerTestOnJDK8 {
     test("-")
     test("-0")
     test("0.0")
-  }
 
-  @Test def should_parse_strings_in_base_16(): Unit = {
-    def test(s: String, v: Int): Unit = {
+  @Test def should_parse_strings_in_base_16(): Unit =
+    def test(s: String, v: Int): Unit =
       assertEquals(v, Integer.parseUnsignedInt(s, 16))
-    }
 
     test("0", 0x0)
     test("5", 0x5)
@@ -65,9 +61,8 @@ class IntegerTestOnJDK8 {
     test("90000", 0x90000)
     test("EE6B2800", 0xEE6B2800)
     test("FFFFFFFF", 0xFFFFFFFF)
-  }
 
-  @Test def should_provide_compareUnsigned(): Unit = {
+  @Test def should_provide_compareUnsigned(): Unit =
     def compare(x: Int, y: Int): Int =
       Integer.compareUnsigned(x, y)
 
@@ -79,9 +74,8 @@ class IntegerTestOnJDK8 {
     assertTrue(compare(0xFFFFFFFF, 0xEE6B2800) > 0)
     assertTrue(compare(0xEE6B2800, 3) > 0)
     assertTrue(compare(3, 0xEE6B2800) < 0)
-  }
 
-  @Test def should_provide_toUnsignedLong(): Unit = {
+  @Test def should_provide_toUnsignedLong(): Unit =
     def test(x: Int, y: Long): Unit =
       assertEquals(y, Integer.toUnsignedLong(x))
 
@@ -90,9 +84,8 @@ class IntegerTestOnJDK8 {
     test(43345, 43345L)
     test(0xEE6B2800, 0xEE6B2800L)
     test(0xFFFFFFFF, 0xFFFFFFFFL)
-  }
 
-  @Test def should_provide_divideUnsigned(): Unit = {
+  @Test def should_provide_divideUnsigned(): Unit =
     def test(dividend: Int, divisor: Int, result: Int): Unit =
       assertEquals(result, Integer.divideUnsigned(dividend, divisor))
 
@@ -102,9 +95,8 @@ class IntegerTestOnJDK8 {
     test(0xFFFFFFFF, 7, 613566756)
     test(0xFFFFFFFF, 0xEE6B2800, 1)
     test(0xEE6B2800, 2, 2000000000)
-  }
 
-  @Test def should_provide_remainderUnsigned(): Unit = {
+  @Test def should_provide_remainderUnsigned(): Unit =
     def test(dividend: Int, divisor: Int, result: Int): Unit =
       assertEquals(result, Integer.remainderUnsigned(dividend, divisor))
 
@@ -114,18 +106,16 @@ class IntegerTestOnJDK8 {
     test(0xFFFFFFFF, 7, 3)
     test(0xFFFFFFFF, 0xEE6B2800, 294967295)
     test(0xEE6B2800, 2, 0)
-  }
 
-  @Test def should_provide_toUnsignedString_without_radix(): Unit = {
+  @Test def should_provide_toUnsignedString_without_radix(): Unit =
     assertEquals("0", Integer.toUnsignedString(0))
     assertEquals("12345", Integer.toUnsignedString(12345))
     assertEquals("242134", Integer.toUnsignedString(242134))
     assertEquals("2147483647", Integer.toUnsignedString(Integer.MAX_VALUE))
     assertEquals("4294967295", Integer.toUnsignedString(0xFFFFFFFF))
     assertEquals("4000000000", Integer.toUnsignedString(0xEE6B2800))
-  }
 
-  @Test def should_provide_toUnsignedString_with_radix(): Unit = {
+  @Test def should_provide_toUnsignedString_with_radix(): Unit =
     assertEquals("17777777777", Integer.toUnsignedString(2147483647, 8))
     assertEquals("7fffffff", Integer.toUnsignedString(2147483647, 16))
     assertEquals("1111111111111111111111111111111",
@@ -135,15 +125,13 @@ class IntegerTestOnJDK8 {
     assertEquals("4294967295", Integer.toUnsignedString(0xFFFFFFFF, 10))
     assertEquals("ee6b2800", Integer.toUnsignedString(0xEE6B2800, 16))
     assertEquals("4000000000", Integer.toUnsignedString(0xEE6B2800, 10))
-  }
 
-  @Test def should_provide_hashCode_as_a_static_function(): Unit = {
+  @Test def should_provide_hashCode_as_a_static_function(): Unit =
     for (i <- -256 to 256) assertEquals(i.hashCode(), Integer.hashCode(i))
     assertEquals(Int.MaxValue.hashCode, Integer.hashCode(Int.MaxValue))
     assertEquals(Int.MinValue.hashCode, Integer.hashCode(Int.MinValue))
-  }
 
-  @Test def should_provide_sum_as_a_static_function(): Unit = {
+  @Test def should_provide_sum_as_a_static_function(): Unit =
     // 20 ramdomly generated cases
     assertEquals(-486527733, Integer.sum(1456847510, -1943375243))
     assertEquals(-1777185932, Integer.sum(-1675020769, -102165163))
@@ -165,9 +153,8 @@ class IntegerTestOnJDK8 {
     assertEquals(-1850714324, Integer.sum(-1087866031, -762848293))
     assertEquals(-1545149944, Integer.sum(2107199426, 642617926))
     assertEquals(1312700933, Integer.sum(-928260456, -2054005907))
-  }
 
-  @Test def should_provide_max_as_a_static_function(): Unit = {
+  @Test def should_provide_max_as_a_static_function(): Unit =
     // 20 ramdomly generated cases
     assertEquals(-270277483, Integer.max(-1790671798, -270277483))
     assertEquals(1571368144, Integer.max(1571368144, -695891091))
@@ -189,9 +176,8 @@ class IntegerTestOnJDK8 {
     assertEquals(979958171, Integer.max(979958171, -773699262))
     assertEquals(915015222, Integer.max(915015222, -895428609))
     assertEquals(1214239393, Integer.max(-2023661282, 1214239393))
-  }
 
-  @Test def should_provide_min_as_a_static_function(): Unit = {
+  @Test def should_provide_min_as_a_static_function(): Unit =
     // 20 ramdomly generated cases
     assertEquals(-1360305565, Integer.min(1070612756, -1360305565))
     assertEquals(-1185998566, Integer.min(-1185998566, -943883433))
@@ -213,5 +199,3 @@ class IntegerTestOnJDK8 {
     assertEquals(-1266058648, Integer.min(-1266058648, 1907502126))
     assertEquals(-1750379520, Integer.min(-1750379520, 1293903630))
     assertEquals(-641887949, Integer.min(-335824862, -641887949))
-  }
-}

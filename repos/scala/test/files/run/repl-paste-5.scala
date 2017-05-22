@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   //def code = ":paste < EOF\n" + (
   def code =
     """
@@ -14,4 +14,3 @@ EOF
 new D().d
     """
   //)
-}

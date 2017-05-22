@@ -9,7 +9,7 @@ package types
   * @author Alexander Podkhalyuzin
   * Date: 13.03.2008
   */
-trait ScParameterizedTypeElement extends ScTypeElement {
+trait ScParameterizedTypeElement extends ScTypeElement
 
   def typeArgList: ScTypeArgs
 
@@ -18,14 +18,10 @@ trait ScParameterizedTypeElement extends ScTypeElement {
   def findConstructor: Option[ScConstructor]
 
   def computeDesugarizedType: Option[ScTypeElement]
-}
 
-object ScParameterizedTypeElement {
+object ScParameterizedTypeElement
   def unapply(pte: ScParameterizedTypeElement)
-    : Option[(ScTypeElement, Seq[ScTypeElement])] = {
-    pte match {
+    : Option[(ScTypeElement, Seq[ScTypeElement])] =
+    pte match
       case null => None
       case _ => Some(pte.typeElement, pte.typeArgList.typeArgs)
-    }
-  }
-}

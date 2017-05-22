@@ -10,28 +10,26 @@ import java.lang.{Runtime => JRuntime}
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectOutputStream, ObjectInputStream}
 
 object TraversableIntBenchFreeMem
-    extends scala.pickling.testing.PicklingBenchmark {
+    extends scala.pickling.testing.PicklingBenchmark
   override val enableOutput = false
 
   val coll = (1 to size).toVector
   val runtime = JRuntime.getRuntime
 
-  override def run() {
+  override def run()
     val pickle = coll.pickle
     val res = pickle.unpickle[Vector[Int]]
 
     println(runtime.freeMemory + "\t" + runtime.totalMemory)
-  }
-}
 
 object TraversableJavaIntBenchFreeMem
-    extends scala.pickling.testing.PicklingBenchmark {
+    extends scala.pickling.testing.PicklingBenchmark
   override val enableOutput = false
 
   val coll = (1 to size).toVector
   val runtime = JRuntime.getRuntime
 
-  override def run() {
+  override def run()
     val bos = new ByteArrayOutputStream()
     val out = new ObjectOutputStream(bos)
     out.writeObject(coll)
@@ -42,22 +40,19 @@ object TraversableJavaIntBenchFreeMem
     val res = in.readObject.asInstanceOf[Vector[Int]]
 
     println(runtime.freeMemory + "\t" + runtime.totalMemory)
-  }
-}
 
 object TraversableKryoIntBenchFreeMem
-    extends scala.pickling.testing.PicklingBenchmark {
+    extends scala.pickling.testing.PicklingBenchmark
   override val enableOutput = false
 
   var ser: KryoSerializer = _
   val coll = (1 to size).toVector
   val runtime = JRuntime.getRuntime
 
-  override def tearDown() {
+  override def tearDown()
     ser = null
-  }
 
-  override def run() {
+  override def run()
     val rnd: Int = Random.nextInt(10)
     val arr = Array.ofDim[Byte](32 * 2048 * 2048 + rnd)
     ser = new KryoSerializer
@@ -66,5 +61,3 @@ object TraversableKryoIntBenchFreeMem
     val unpickled = ser.fromBytes[List[Int]](pickled)
 
     println(runtime.freeMemory + "\t" + runtime.totalMemory)
-  }
-}

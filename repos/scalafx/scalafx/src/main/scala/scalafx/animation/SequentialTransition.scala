@@ -40,7 +40,7 @@ import scalafx.scene.Node
   *
   * @define ST `SequentialTransition`
   */
-object SequentialTransition extends AnimationStatics {
+object SequentialTransition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $ST to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/SequentialTransition.html $ST]],
@@ -52,7 +52,6 @@ object SequentialTransition extends AnimationStatics {
   implicit def sfxSequentialTransition2jfx(
       v: SequentialTransition): jfxa.SequentialTransition =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/SequentialTransition.html SequentialTransition]].
@@ -67,7 +66,7 @@ object SequentialTransition extends AnimationStatics {
   */
 class SequentialTransition(
     override val delegate: jfxa.SequentialTransition = new jfxa.SequentialTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.SequentialTransition] {
+    extends Transition(delegate) with SFXDelegate[jfxa.SequentialTransition]
 
   // CONSTRUCTORS
 
@@ -101,9 +100,8 @@ class SequentialTransition(
     * This Node is used in all child Transitions, that do not define a target Node themselves.
     */
   def node: ObjectProperty[jfxs.Node] = delegate.nodeProperty
-  def node_=(n: Node) {
+  def node_=(n: Node)
     node() = n
-  }
 
   /**
     * A list of $ANS that will be played sequentially.
@@ -116,7 +114,5 @@ class SequentialTransition(
     *
     * @param c list of $ANS to replace prior content.
     */
-  def children_=(c: Iterable[Animation]) {
+  def children_=(c: Iterable[Animation])
     fillSFXCollection(this.children, c)
-  }
-}

@@ -14,10 +14,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariable
   */
 class LoopVariableNotUpdatedInspection
     extends AbstractInspection("LoopVariableNotUpdatedInspection",
-                               "Loop variable not updated inside loop") {
+                               "Loop variable not updated inside loop")
   private val ComparisonOperators = Set("==", "!=", ">", "<", ">=", "<=")
 
-  def actionFor(holder: ProblemsHolder) = {
+  def actionFor(holder: ProblemsHolder) =
     case ScWhileStmt(Some(
                      ScInfixExpr((ref: ScReferenceExpression) &&(ResolvesTo(
                                  target @ Parent(Parent(entity: ScVariable)))),
@@ -29,18 +29,14 @@ class LoopVariableNotUpdatedInspection
       holder.registerProblem(ref.asInstanceOf[PsiReference],
                              getDisplayName,
                              ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
-  }
 
   private def isMutatedWithing(
-      scope: ScalaPsiElement, target: PsiElement): Boolean = {
+      scope: ScalaPsiElement, target: PsiElement): Boolean =
     val Target = target
 
-    scope.breadthFirst.exists {
+    scope.breadthFirst.exists
       case ScAssignStmt(left, _) => true
       case e @ ScInfixExpr(ResolvesTo(Target), _, _)
           if e.isAssignmentOperator =>
         true
       case _ => false
-    }
-  }
-}

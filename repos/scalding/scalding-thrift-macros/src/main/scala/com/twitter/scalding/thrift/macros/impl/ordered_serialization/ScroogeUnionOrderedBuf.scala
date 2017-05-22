@@ -21,25 +21,23 @@ import com.twitter.scrooge.ThriftUnion
 import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
-object ScroogeUnionOrderedBuf {
+object ScroogeUnionOrderedBuf
   def dispatch(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
-    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     import c.universe._
 
-    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
       case tpe
           if tpe <:< typeOf[ThriftUnion] &&
           (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isTrait) &&
           !tpe.typeSymbol.asClass.knownDirectSubclasses.isEmpty =>
         ScroogeUnionOrderedBuf(c)(buildDispatcher, tpe)
-    }
     pf
-  }
 
   def apply(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
-      outerType: c.Type): TreeOrderedBuf[c.type] = {
+      outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(s"$id"))
 
@@ -51,17 +49,16 @@ object ScroogeUnionOrderedBuf {
         .toList
 
     val subData: List[(Int, Type, Option[TreeOrderedBuf[c.type]])] =
-      subClasses.map { t =>
-        if (t.typeSymbol.name.toString == "UnknownUnionField") {
+      subClasses.map  t =>
+        if (t.typeSymbol.name.toString == "UnknownUnionField")
           (t, None)
-        } else {
+        else
           (t, Some(dispatcher(t)))
-        }
-      }.zipWithIndex.map { case ((tpe, tbuf), idx) => (idx, tpe, tbuf) }.toList
+      .zipWithIndex.map { case ((tpe, tbuf), idx) => (idx, tpe, tbuf) }.toList
 
     require(subData.size > 0, "Must have some sub types on a union?")
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -80,6 +77,3 @@ object ScroogeUnionOrderedBuf {
         UnionLike.length(c)(element)(subData)
       override val lazyOuterVariables: Map[String, ctx.Tree] =
         subData.flatMap(_._3).map(_.lazyOuterVariables).reduce(_ ++ _)
-    }
-  }
-}

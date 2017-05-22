@@ -23,7 +23,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.{HttpsConnectionContext, Http}
 import PoolFlow._
 
-private object PoolInterfaceActor {
+private object PoolInterfaceActor
   final case class PoolRequest(
       request: HttpRequest, responsePromise: Promise[HttpResponse])
       extends NoSerializationVerificationNeeded
@@ -31,7 +31,6 @@ private object PoolInterfaceActor {
   case object Shutdown extends DeadLetterSuppression
 
   val name = SeqActorName("PoolInterfaceActor")
-}
 
 /**
   * An actor that wraps a completely encapsulated, running connection pool flow.
@@ -52,7 +51,7 @@ private class PoolInterfaceActor(
     shutdownCompletedPromise: Promise[Done],
     gateway: PoolGateway)(implicit fm: Materializer)
     extends ActorSubscriber with ActorPublisher[RequestContext]
-    with ActorLogging {
+    with ActorLogging
   import PoolInterfaceActor._
 
   private[this] val inputBuffer =
@@ -65,12 +64,12 @@ private class PoolInterfaceActor(
   initConnectionFlow()
 
   /** Start the pool flow with this actor acting as source as well as sink */
-  private def initConnectionFlow() = {
+  private def initConnectionFlow() =
     import context.system
     import hcps._
     import setup._
 
-    val connectionFlow = connectionContext match {
+    val connectionFlow = connectionContext match
       case httpsContext: HttpsConnectionContext ⇒
         Http().outgoingConnectionHttps(host,
                                        port,
@@ -81,7 +80,6 @@ private class PoolInterfaceActor(
       case _ ⇒
         Http().outgoingConnection(
             host, port, None, settings.connectionSettings, setup.log)
-    }
 
     val poolFlow =
       PoolFlow(Flow[HttpRequest].viaMat(connectionFlow)(Keep.right),
@@ -93,13 +91,12 @@ private class PoolInterfaceActor(
       .fromPublisher(ActorPublisher(self))
       .via(poolFlow)
       .runWith(Sink.fromSubscriber(ActorSubscriber[ResponseContext](self)))
-  }
 
   activateIdleTimeoutIfNecessary()
 
   def requestStrategy = ZeroRequestStrategy
 
-  def receive = {
+  def receive =
 
     /////////////// COMING UP FROM POOL (SOURCE SIDE) //////////////
 
@@ -134,17 +131,16 @@ private class PoolInterfaceActor(
     /////////////// FROM CLIENT //////////////
 
     case x: PoolRequest if isActive ⇒
-      activeIdleTimeout foreach { timeout ⇒
+      activeIdleTimeout foreach  timeout ⇒
         timeout.cancel()
         activeIdleTimeout = None
-      }
-      if (totalDemand == 0) {
+      if (totalDemand == 0)
         // if we can't dispatch right now we buffer and dispatch when demand from the pool arrives
-        if (inputBuffer.isFull) {
+        if (inputBuffer.isFull)
           x.responsePromise.failure(new BufferOverflowException(
                   s"Exceeded configured max-open-requests value of [${inputBuffer.capacity}]"))
-        } else inputBuffer.enqueue(x)
-      } else dispatchRequest(x) // if we can dispatch right now, do it
+        else inputBuffer.enqueue(x)
+      else dispatchRequest(x) // if we can dispatch right now, do it
       request(1) // for every incoming request we demand one response from the pool
 
     case PoolRequest(request, responsePromise) ⇒
@@ -160,19 +156,16 @@ private class PoolInterfaceActor(
       log.debug(
           "Shutting down host connection pool to {}:{}", hcps.host, hcps.port)
       onComplete()
-      while (!inputBuffer.isEmpty) {
+      while (!inputBuffer.isEmpty)
         val PoolRequest(request, responsePromise) = inputBuffer.dequeue()
         responsePromise.completeWith(gateway(request))
-      }
-  }
 
   @tailrec private def dispatchRequests(): Unit =
-    if (totalDemand > 0 && !inputBuffer.isEmpty) {
+    if (totalDemand > 0 && !inputBuffer.isEmpty)
       dispatchRequest(inputBuffer.dequeue())
       dispatchRequests()
-    }
 
-  def dispatchRequest(pr: PoolRequest): Unit = {
+  def dispatchRequest(pr: PoolRequest): Unit =
     val scheme = Uri.httpScheme(hcps.setup.connectionContext.isSecure)
     val hostHeader =
       headers.Host(hcps.host, Uri.normalizePort(hcps.port, scheme))
@@ -182,14 +175,11 @@ private class PoolInterfaceActor(
     val retries =
       if (pr.request.method.isIdempotent) hcps.setup.settings.maxRetries else 0
     onNext(RequestContext(effectiveRequest, pr.responsePromise, retries))
-  }
 
   def activateIdleTimeoutIfNecessary(): Unit =
-    if (remainingRequested == 0 && hcps.setup.settings.idleTimeout.isFinite) {
+    if (remainingRequested == 0 && hcps.setup.settings.idleTimeout.isFinite)
       import context.dispatcher
       val timeout =
         hcps.setup.settings.idleTimeout.asInstanceOf[FiniteDuration]
       activeIdleTimeout = Some(
           context.system.scheduler.scheduleOnce(timeout)(gateway.shutdown()))
-    }
-}

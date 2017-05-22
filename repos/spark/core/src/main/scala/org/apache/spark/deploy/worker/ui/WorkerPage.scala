@@ -30,16 +30,15 @@ import org.apache.spark.deploy.worker.{DriverRunner, ExecutorRunner}
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 import org.apache.spark.util.Utils
 
-private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
+private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("")
   private val workerEndpoint = parent.worker.self
 
-  override def renderJson(request: HttpServletRequest): JValue = {
+  override def renderJson(request: HttpServletRequest): JValue =
     val workerState =
       workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
     JsonProtocol.writeWorkerState(workerState)
-  }
 
-  def render(request: HttpServletRequest): Seq[Node] = {
+  def render(request: HttpServletRequest): Seq[Node] =
     val workerState =
       workerEndpoint.askWithRetry[WorkerStateResponse](RequestWorkerState)
 
@@ -83,32 +82,28 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
         <div class="span12">
           <h4> Running Executors ({runningExecutors.size}) </h4>
           {runningExecutorTable}
-          {
-            if (runningDrivers.nonEmpty) {
+          
+            if (runningDrivers.nonEmpty)
               <h4> Running Drivers ({runningDrivers.size}) </h4> ++
               runningDriverTable
-            }
-          }
-          {
-            if (finishedExecutors.nonEmpty) {
+          
+          
+            if (finishedExecutors.nonEmpty)
               <h4>Finished Executors ({finishedExecutors.size}) </h4> ++
               finishedExecutorTable
-            }
-          }
-          {
-            if (finishedDrivers.nonEmpty) {
+          
+          
+            if (finishedDrivers.nonEmpty)
               <h4> Finished Drivers ({finishedDrivers.size}) </h4> ++
               finishedDriverTable
-            }
-          }
+          
         </div>
       </div>;
     UIUtils.basicSparkPage(
         content,
         "Spark Worker at %s:%s".format(workerState.host, workerState.port))
-  }
 
-  def executorRow(executor: ExecutorRunner): Seq[Node] = {
+  def executorRow(executor: ExecutorRunner): Seq[Node] =
     <tr>
       <td>{executor.execId}</td>
       <td>{executor.cores}</td>
@@ -124,15 +119,14 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
         </ul>
       </td>
       <td>
-     <a href={"logPage?appId=%s&executorId=%s&logType=stdout"
-        .format(executor.appId, executor.execId)}>stdout</a>
-     <a href={"logPage?appId=%s&executorId=%s&logType=stderr"
-        .format(executor.appId, executor.execId)}>stderr</a>
+     <a href="logPage?appId=%s&executorId=%s&logType=stdout"
+        .format(executor.appId, executor.execId)>stdout</a>
+     <a href="logPage?appId=%s&executorId=%s&logType=stderr"
+        .format(executor.appId, executor.execId)>stderr</a>
       </td>
     </tr>
-  }
 
-  def driverRow(driver: DriverRunner): Seq[Node] = {
+  def driverRow(driver: DriverRunner): Seq[Node] =
     <tr>
       <td>{driver.driverId}</td>
       <td>{driver.driverDesc.command.arguments(2)}</td>
@@ -151,5 +145,3 @@ private[ui] class WorkerPage(parent: WorkerWebUI) extends WebUIPage("") {
         {driver.finalException.getOrElse("")}
       </td>
     </tr>
-  }
-}

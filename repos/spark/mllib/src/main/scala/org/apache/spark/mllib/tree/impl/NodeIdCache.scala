@@ -34,7 +34,7 @@ import org.apache.spark.storage.StorageLevel
   * @param nodeIndex The current node index of a data point that this will update.
   */
 @DeveloperApi
-private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
+private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int)
 
   /**
     * Determine a child node index based on the feature value and the split.
@@ -43,26 +43,21 @@ private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
     * @return Child node index to update to.
     */
   def updateNodeIndex(
-      binnedFeatures: Array[Int], bins: Array[Array[Bin]]): Int = {
-    if (split.featureType == Continuous) {
+      binnedFeatures: Array[Int], bins: Array[Array[Bin]]): Int =
+    if (split.featureType == Continuous)
       val featureIndex = split.feature
       val binIndex = binnedFeatures(featureIndex)
       val featureValueUpperBound =
         bins(featureIndex)(binIndex).highSplit.threshold
-      if (featureValueUpperBound <= split.threshold) {
+      if (featureValueUpperBound <= split.threshold)
         Node.leftChildIndex(nodeIndex)
-      } else {
+      else
         Node.rightChildIndex(nodeIndex)
-      }
-    } else {
-      if (split.categories.contains(binnedFeatures(split.feature).toDouble)) {
+    else
+      if (split.categories.contains(binnedFeatures(split.feature).toDouble))
         Node.leftChildIndex(nodeIndex)
-      } else {
+      else
         Node.rightChildIndex(nodeIndex)
-      }
-    }
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -77,7 +72,7 @@ private[tree] case class NodeIndexUpdater(split: Split, nodeIndex: Int) {
   */
 @DeveloperApi
 private[spark] class NodeIdCache(
-    var nodeIdsForInstances: RDD[Array[Int]], val checkpointInterval: Int) {
+    var nodeIdsForInstances: RDD[Array[Int]], val checkpointInterval: Int)
 
   // Keep a reference to a previous node Ids for instances.
   // Because we will keep on re-persisting updated node Ids,
@@ -100,32 +95,27 @@ private[spark] class NodeIdCache(
   def updateNodeIndices(
       data: RDD[BaggedPoint[TreePoint]],
       nodeIdUpdaters: Array[mutable.Map[Int, NodeIndexUpdater]],
-      bins: Array[Array[Bin]]): Unit = {
-    if (prevNodeIdsForInstances != null) {
+      bins: Array[Array[Bin]]): Unit =
+    if (prevNodeIdsForInstances != null)
       // Unpersist the previous one if one exists.
       prevNodeIdsForInstances.unpersist()
-    }
 
     prevNodeIdsForInstances = nodeIdsForInstances
-    nodeIdsForInstances = data.zip(nodeIdsForInstances).map {
-      case (point, node) => {
+    nodeIdsForInstances = data.zip(nodeIdsForInstances).map
+      case (point, node) =>
           var treeId = 0
-          while (treeId < nodeIdUpdaters.length) {
+          while (treeId < nodeIdUpdaters.length)
             val nodeIdUpdater =
               nodeIdUpdaters(treeId).getOrElse(node(treeId), null)
-            if (nodeIdUpdater != null) {
+            if (nodeIdUpdater != null)
               val newNodeIndex = nodeIdUpdater.updateNodeIndex(
                   binnedFeatures = point.datum.binnedFeatures,
                   bins = bins)
               node(treeId) = newNodeIndex
-            }
 
             treeId += 1
-          }
 
           node
-        }
-    }
 
     // Keep on persisting new ones.
     nodeIdsForInstances.persist(StorageLevel.MEMORY_AND_DISK)
@@ -133,49 +123,40 @@ private[spark] class NodeIdCache(
 
     // Handle checkpointing if the directory is not None.
     if (nodeIdsForInstances.sparkContext.getCheckpointDir.nonEmpty &&
-        (rddUpdateCount % checkpointInterval) == 0) {
+        (rddUpdateCount % checkpointInterval) == 0)
       // Let's see if we can delete previous checkpoints.
       var canDelete = true
-      while (checkpointQueue.size > 1 && canDelete) {
+      while (checkpointQueue.size > 1 && canDelete)
         // We can delete the oldest checkpoint iff
         // the next checkpoint actually exists in the file system.
-        if (checkpointQueue.get(1).get.getCheckpointFile.isDefined) {
+        if (checkpointQueue.get(1).get.getCheckpointFile.isDefined)
           val old = checkpointQueue.dequeue()
 
           // Since the old checkpoint is not deleted by Spark,
           // we'll manually delete it here.
           val fs = FileSystem.get(old.sparkContext.hadoopConfiguration)
           fs.delete(new Path(old.getCheckpointFile.get), true)
-        } else {
+        else
           canDelete = false
-        }
-      }
 
       nodeIdsForInstances.checkpoint()
       checkpointQueue.enqueue(nodeIdsForInstances)
-    }
-  }
 
   /**
     * Call this after training is finished to delete any remaining checkpoints.
     */
-  def deleteAllCheckpoints(): Unit = {
-    while (checkpointQueue.nonEmpty) {
+  def deleteAllCheckpoints(): Unit =
+    while (checkpointQueue.nonEmpty)
       val old = checkpointQueue.dequeue()
-      for (checkpointFile <- old.getCheckpointFile) {
+      for (checkpointFile <- old.getCheckpointFile)
         val fs = FileSystem.get(old.sparkContext.hadoopConfiguration)
         fs.delete(new Path(checkpointFile), true)
-      }
-    }
-    if (prevNodeIdsForInstances != null) {
+    if (prevNodeIdsForInstances != null)
       // Unpersist the previous one if one exists.
       prevNodeIdsForInstances.unpersist()
-    }
-  }
-}
 
 @DeveloperApi
-private[spark] object NodeIdCache {
+private[spark] object NodeIdCache
 
   /**
     * Initialize the node Id cache with initial node Id values.
@@ -189,8 +170,6 @@ private[spark] object NodeIdCache {
   def init(data: RDD[BaggedPoint[TreePoint]],
            numTrees: Int,
            checkpointInterval: Int,
-           initVal: Int = 1): NodeIdCache = {
+           initVal: Int = 1): NodeIdCache =
     new NodeIdCache(
         data.map(_ => Array.fill[Int](numTrees)(initVal)), checkpointInterval)
-  }
-}

@@ -30,14 +30,14 @@ import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 
 class SparkListenerSuite
     extends SparkFunSuite with LocalSparkContext with Matchers
-    with ResetSystemProperties {
+    with ResetSystemProperties
 
   /** Length of time to wait while draining listener events. */
   val WAIT_TIMEOUT_MILLIS = 10000
 
   val jobCompletionTime = 1421191296660L
 
-  test("don't call sc.stop in listener") {
+  test("don't call sc.stop in listener")
     sc = new SparkContext("local", "SparkListenerSuite")
     val listener = new SparkContextStoppingListener(sc)
     val bus = new LiveListenerBus
@@ -50,17 +50,15 @@ class SparkListenerSuite
 
     bus.stop()
     assert(listener.sparkExSeen)
-  }
 
-  test("basic creation and shutdown of LiveListenerBus") {
+  test("basic creation and shutdown of LiveListenerBus")
     val counter = new BasicJobCounter
     val bus = new LiveListenerBus
     bus.addListener(counter)
 
     // Listener bus hasn't started yet, so posting events should not increment counter
-    (1 to 5).foreach { _ =>
+    (1 to 5).foreach  _ =>
       bus.post(SparkListenerJobEnd(0, jobCompletionTime, JobSucceeded))
-    }
     assert(counter.count === 0)
 
     // Starting listener bus should flush all buffered events
@@ -70,26 +68,22 @@ class SparkListenerSuite
 
     // After listener bus has stopped, posting events should not increment counter
     bus.stop()
-    (1 to 5).foreach { _ =>
+    (1 to 5).foreach  _ =>
       bus.post(SparkListenerJobEnd(0, jobCompletionTime, JobSucceeded))
-    }
     assert(counter.count === 5)
 
     // Listener bus must not be started twice
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       val bus = new LiveListenerBus
       bus.start(sc)
       bus.start(sc)
-    }
 
     // ... or stopped before starting
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       val bus = new LiveListenerBus
       bus.stop()
-    }
-  }
 
-  test("bus.stop() waits for the event queue to completely drain") {
+  test("bus.stop() waits for the event queue to completely drain")
     @volatile var drained = false
 
     // When Listener has started
@@ -104,13 +98,11 @@ class SparkListenerSuite
     // When stopper has returned
     val stopperReturned = new Semaphore(0)
 
-    class BlockingListener extends SparkListener {
-      override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = {
+    class BlockingListener extends SparkListener
+      override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit =
         listenerStarted.release()
         listenerWait.acquire()
         drained = true
-      }
-    }
 
     val bus = new LiveListenerBus
     val blockingListener = new BlockingListener
@@ -123,14 +115,13 @@ class SparkListenerSuite
     // Listener should be blocked after start
     assert(!drained)
 
-    new Thread("ListenerBusStopper") {
-      override def run() {
+    new Thread("ListenerBusStopper")
+      override def run()
         stopperStarted.release()
         // stop() will block until notify() is called below
         bus.stop()
         stopperReturned.release()
-      }
-    }.start()
+    .start()
 
     stopperStarted.acquire()
     // Listener should remain blocked after stopper started
@@ -140,9 +131,8 @@ class SparkListenerSuite
     listenerWait.release()
     stopperReturned.acquire()
     assert(drained)
-  }
 
-  test("basic creation of StageInfo") {
+  test("basic creation of StageInfo")
     sc = new SparkContext("local", "SparkListenerSuite")
     val listener = new SaveStageAndTaskInfo
     sc.addSparkListener(listener)
@@ -162,9 +152,8 @@ class SparkListenerSuite
     stageInfo.submissionTime should be('defined)
     stageInfo.completionTime should be('defined)
     taskInfoMetrics.length should be { 4 }
-  }
 
-  test("basic creation of StageInfo with shuffle") {
+  test("basic creation of StageInfo with shuffle")
     sc = new SparkContext("local", "SparkListenerSuite")
     val listener = new SaveStageAndTaskInfo
     sc.addSparkListener(listener)
@@ -200,9 +189,8 @@ class SparkListenerSuite
     stageInfo3.rddInfos.size should be { 1 } // ShuffledRDD
     stageInfo3.rddInfos.forall(_.numPartitions == 4) should be { true }
     stageInfo3.rddInfos.exists(_.name == "Trois") should be { true }
-  }
 
-  test("StageInfo with fewer tasks than partitions") {
+  test("StageInfo with fewer tasks than partitions")
     sc = new SparkContext("local", "SparkListenerSuite")
     val listener = new SaveStageAndTaskInfo
     sc.addSparkListener(listener)
@@ -217,20 +205,17 @@ class SparkListenerSuite
     stageInfo.numTasks should be { 2 }
     stageInfo.rddInfos.size should be { 2 }
     stageInfo.rddInfos.forall(_.numPartitions == 4) should be { true }
-  }
 
-  test("local metrics") {
+  test("local metrics")
     sc = new SparkContext("local", "SparkListenerSuite")
     val listener = new SaveStageAndTaskInfo
     sc.addSparkListener(listener)
     sc.addSparkListener(new StatsReportListener)
     // just to make sure some of the tasks take a noticeable amount of time
-    val w = { i: Int =>
-      if (i == 0) {
+    val w =  i: Int =>
+      if (i == 0)
         Thread.sleep(100)
-      }
       i
-    }
 
     val numSlices = 16
     val d = sc.parallelize(0 to 1e3.toInt, numSlices).map(w)
@@ -238,22 +223,21 @@ class SparkListenerSuite
     sc.listenerBus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
     listener.stageInfos.size should be(1)
 
-    val d2 = d.map { i =>
+    val d2 = d.map  i =>
       w(i) -> i * 2
-    }.setName("shuffle input 1")
-    val d3 = d.map { i =>
+    .setName("shuffle input 1")
+    val d3 = d.map  i =>
       w(i) -> (0 to (i % 5))
-    }.setName("shuffle input 2")
-    val d4 = d2.cogroup(d3, numSlices).map {
+    .setName("shuffle input 2")
+    val d4 = d2.cogroup(d3, numSlices).map
       case (k, (v1, v2)) =>
         w(k) -> (v1.size, v2.size)
-    }
     d4.setName("A Cogroup")
     d4.collectAsMap()
 
     sc.listenerBus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
     listener.stageInfos.size should be(4)
-    listener.stageInfos.foreach {
+    listener.stageInfos.foreach
       case (stageInfo, taskInfoMetrics) =>
         /**
           * Small test, so some tasks might take less than 1 millisecond, but average should be greater
@@ -272,29 +256,24 @@ class SparkListenerSuite
       }
          */
 
-        taskInfoMetrics.foreach {
+        taskInfoMetrics.foreach
           case (taskInfo, taskMetrics) =>
             taskMetrics.resultSize should be > (0L)
             if (stageInfo.rddInfos.exists(
-                    info => info.name == d2.name || info.name == d3.name)) {
+                    info => info.name == d2.name || info.name == d3.name))
               taskMetrics.inputMetrics should not be ('defined)
               taskMetrics.outputMetrics should not be ('defined)
               taskMetrics.shuffleWriteMetrics should be('defined)
               taskMetrics.shuffleWriteMetrics.get.bytesWritten should be > (0L)
-            }
-            if (stageInfo.rddInfos.exists(_.name == d4.name)) {
+            if (stageInfo.rddInfos.exists(_.name == d4.name))
               taskMetrics.shuffleReadMetrics should be('defined)
               val sm = taskMetrics.shuffleReadMetrics.get
               sm.totalBlocksFetched should be(2 * numSlices)
               sm.localBlocksFetched should be(2 * numSlices)
               sm.remoteBlocksFetched should be(0)
               sm.remoteBytesRead should be(0L)
-            }
-        }
-    }
-  }
 
-  test("onTaskGettingResult() called when result fetched remotely") {
+  test("onTaskGettingResult() called when result fetched remotely")
     val conf = new SparkConf().set("spark.rpc.message.maxSize", "1")
     sc = new SparkContext("local", "SparkListenerSuite", conf)
     val listener = new SaveTaskEvents
@@ -305,9 +284,8 @@ class SparkListenerSuite
     assert(maxRpcMessageSize === 1024 * 1024)
     val result = sc
       .parallelize(Seq(1), 1)
-      .map { x =>
+      .map  x =>
         1.to(maxRpcMessageSize).toArray
-      }
       .reduce { case (x, y) => x }
     assert(result === 1.to(maxRpcMessageSize).toArray)
 
@@ -316,9 +294,8 @@ class SparkListenerSuite
     assert(listener.startedTasks.contains(TASK_INDEX))
     assert(listener.startedGettingResultTasks.contains(TASK_INDEX))
     assert(listener.endedTasks.contains(TASK_INDEX))
-  }
 
-  test("onTaskGettingResult() not called when result sent directly") {
+  test("onTaskGettingResult() not called when result sent directly")
     sc = new SparkContext("local", "SparkListenerSuite")
     val listener = new SaveTaskEvents
     sc.addSparkListener(listener)
@@ -333,10 +310,9 @@ class SparkListenerSuite
     assert(listener.startedTasks.contains(TASK_INDEX))
     assert(listener.startedGettingResultTasks.isEmpty)
     assert(listener.endedTasks.contains(TASK_INDEX))
-  }
 
   test(
-      "onTaskEnd() should be called for all started tasks, even after job has been killed") {
+      "onTaskEnd() should be called for all started tasks, even after job has been killed")
     sc = new SparkContext("local", "SparkListenerSuite")
     val WAIT_TIMEOUT_MILLIS = 10000
     val listener = new SaveTaskEvents
@@ -345,38 +321,32 @@ class SparkListenerSuite
     val numTasks = 10
     val f = sc
       .parallelize(1 to 10000, numTasks)
-      .map { i =>
+      .map  i =>
         Thread.sleep(10); i
-      }
       .countAsync()
     // Wait until one task has started (because we want to make sure that any tasks that are started
     // have corresponding end events sent to the listener).
     var finishTime = System.currentTimeMillis + WAIT_TIMEOUT_MILLIS
-    listener.synchronized {
+    listener.synchronized
       var remainingWait = finishTime - System.currentTimeMillis
-      while (listener.startedTasks.isEmpty && remainingWait > 0) {
+      while (listener.startedTasks.isEmpty && remainingWait > 0)
         listener.wait(remainingWait)
         remainingWait = finishTime - System.currentTimeMillis
-      }
       assert(!listener.startedTasks.isEmpty)
-    }
 
     f.cancel()
 
     // Ensure that onTaskEnd is called for all started tasks.
     finishTime = System.currentTimeMillis + WAIT_TIMEOUT_MILLIS
-    listener.synchronized {
+    listener.synchronized
       var remainingWait = finishTime - System.currentTimeMillis
       while (listener.endedTasks.size < listener.startedTasks.size &&
-      remainingWait > 0) {
+      remainingWait > 0)
         listener.wait(finishTime - System.currentTimeMillis)
         remainingWait = finishTime - System.currentTimeMillis
-      }
       assert(listener.endedTasks.size === listener.startedTasks.size)
-    }
-  }
 
-  test("SparkListener moves on if a listener throws an exception") {
+  test("SparkListener moves on if a listener throws an exception")
     val badListener = new BadListener
     val jobCounter1 = new BasicJobCounter
     val jobCounter2 = new BasicJobCounter
@@ -389,18 +359,16 @@ class SparkListenerSuite
     bus.start(sc)
 
     // Post events to all listeners, and wait until the queue is drained
-    (1 to 5).foreach { _ =>
+    (1 to 5).foreach  _ =>
       bus.post(SparkListenerJobEnd(0, jobCompletionTime, JobSucceeded))
-    }
     bus.waitUntilEmpty(WAIT_TIMEOUT_MILLIS)
 
     // The exception should be caught, and the event should be propagated to other listeners
     assert(bus.listenerThreadIsAlive)
     assert(jobCounter1.count === 5)
     assert(jobCounter2.count === 5)
-  }
 
-  test("registering listeners via spark.extraListeners") {
+  test("registering listeners via spark.extraListeners")
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName("test")
@@ -412,71 +380,58 @@ class SparkListenerSuite
         1)
     sc.listenerBus.listeners.asScala
       .count(_.isInstanceOf[ListenerThatAcceptsSparkConf]) should be(1)
-  }
 
   /**
     * Assert that the given list of numbers has an average that is greater than zero.
     */
-  private def checkNonZeroAvg(m: Traversable[Long], msg: String) {
+  private def checkNonZeroAvg(m: Traversable[Long], msg: String)
     assert(m.sum / m.size.toDouble > 0.0, msg)
-  }
 
   /**
     * A simple listener that saves all task infos and task metrics.
     */
-  private class SaveStageAndTaskInfo extends SparkListener {
+  private class SaveStageAndTaskInfo extends SparkListener
     val stageInfos = mutable.Map[StageInfo, Seq[(TaskInfo, TaskMetrics)]]()
     var taskInfoMetrics = mutable.Buffer[(TaskInfo, TaskMetrics)]()
 
-    override def onTaskEnd(task: SparkListenerTaskEnd) {
+    override def onTaskEnd(task: SparkListenerTaskEnd)
       val info = task.taskInfo
       val metrics = task.taskMetrics
-      if (info != null && metrics != null) {
+      if (info != null && metrics != null)
         taskInfoMetrics += ((info, metrics))
-      }
-    }
 
-    override def onStageCompleted(stage: SparkListenerStageCompleted) {
+    override def onStageCompleted(stage: SparkListenerStageCompleted)
       stageInfos(stage.stageInfo) = taskInfoMetrics
       taskInfoMetrics = mutable.Buffer.empty
-    }
-  }
 
   /**
     * A simple listener that saves the task indices for all task events.
     */
-  private class SaveTaskEvents extends SparkListener {
+  private class SaveTaskEvents extends SparkListener
     val startedTasks = new mutable.HashSet[Int]()
     val startedGettingResultTasks = new mutable.HashSet[Int]()
     val endedTasks = new mutable.HashSet[Int]()
 
     override def onTaskStart(taskStart: SparkListenerTaskStart): Unit =
-      synchronized {
+      synchronized
         startedTasks += taskStart.taskInfo.index
         notify()
-      }
 
     override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit =
-      synchronized {
+      synchronized
         endedTasks += taskEnd.taskInfo.index
         notify()
-      }
 
     override def onTaskGettingResult(
-        taskGettingResult: SparkListenerTaskGettingResult) {
+        taskGettingResult: SparkListenerTaskGettingResult)
       startedGettingResultTasks += taskGettingResult.taskInfo.index
-    }
-  }
 
   /**
     * A simple listener that throws an exception on job end.
     */
-  private class BadListener extends SparkListener {
-    override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = {
+  private class BadListener extends SparkListener
+    override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit =
       throw new Exception
-    }
-  }
-}
 
 // These classes can't be declared inside of the SparkListenerSuite class because we don't want
 // their constructors to contain references to SparkListenerSuite:
@@ -484,29 +439,24 @@ class SparkListenerSuite
 /**
   * A simple listener that counts the number of jobs observed.
   */
-private class BasicJobCounter extends SparkListener {
+private class BasicJobCounter extends SparkListener
   var count = 0
   override def onJobEnd(job: SparkListenerJobEnd): Unit = count += 1
-}
 
 /**
   * A simple listener that tries to stop SparkContext.
   */
 private class SparkContextStoppingListener(val sc: SparkContext)
-    extends SparkListener {
+    extends SparkListener
   @volatile var sparkExSeen = false
-  override def onJobEnd(job: SparkListenerJobEnd): Unit = {
-    try {
+  override def onJobEnd(job: SparkListenerJobEnd): Unit =
+    try
       sc.stop()
-    } catch {
+    catch
       case se: SparkException =>
         sparkExSeen = true
-    }
-  }
-}
 
 private class ListenerThatAcceptsSparkConf(conf: SparkConf)
-    extends SparkListener {
+    extends SparkListener
   var count = 0
   override def onJobEnd(job: SparkListenerJobEnd): Unit = count += 1
-}

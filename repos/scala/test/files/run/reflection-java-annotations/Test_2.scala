@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import scala.reflect.runtime.universe._
   val sym = typeOf[JavaAnnottee_1].typeSymbol
   sym.info
@@ -6,4 +6,3 @@ object Test extends App {
   println(sym.annotations)
   println("=======")
   sym.annotations.map(_.tree).map(println)
-}

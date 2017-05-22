@@ -7,7 +7,7 @@ import language.implicitConversions
 
 import org.apache.camel.model.ProcessorDefinition
 
-package object camel {
+package object camel
 
   /**
     * To allow using Actors with the Camel Route DSL:
@@ -19,4 +19,3 @@ package object camel {
   implicit def toActorRouteDefinition[T <: ProcessorDefinition[T]](
       definition: ProcessorDefinition[T]) =
     new ActorRouteDefinition(definition)
-}

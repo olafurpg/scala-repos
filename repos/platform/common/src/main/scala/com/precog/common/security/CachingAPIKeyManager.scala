@@ -43,18 +43,17 @@ case class CachingAPIKeyManagerSettings(
     grantCacheSettings: Seq[Cache.CacheOption[GrantId, Grant]]
 )
 
-object CachingAPIKeyManagerSettings {
+object CachingAPIKeyManagerSettings
   val Default = CachingAPIKeyManagerSettings(
       Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000)),
       Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000)),
       Seq(Cache.ExpireAfterWrite(Duration(5, MINUTES)), Cache.MaxSize(1000))
   )
-}
 
 class CachingAPIKeyManager[M[+ _]](
     manager: APIKeyManager[M],
     settings: CachingAPIKeyManagerSettings = CachingAPIKeyManagerSettings.Default)
-    extends APIKeyManager[M] with Logging {
+    extends APIKeyManager[M] with Logging
   implicit val M = manager.M
 
   private val apiKeyCache =
@@ -64,29 +63,25 @@ class CachingAPIKeyManager[M[+ _]](
   private val grantCache =
     Cache.simple[GrantId, Grant](settings.grantCacheSettings: _*)
 
-  protected def add(r: APIKeyRecord) = IO {
+  protected def add(r: APIKeyRecord) = IO
     @inline def addChildren(k: APIKey, c: Set[APIKeyRecord]) =
       childCache.put(k, childCache.get(k).getOrElse(Set()) union c)
 
     apiKeyCache.put(r.apiKey, r)
     addChildren(r.issuerKey, Set(r))
-  }
 
-  protected def add(g: Grant) = IO {
+  protected def add(g: Grant) = IO
     grantCache.put(g.grantId, g)
-  }
 
-  protected def remove(r: APIKeyRecord) = IO {
+  protected def remove(r: APIKeyRecord) = IO
     @inline def removeChildren(k: APIKey, c: Set[APIKeyRecord]) =
       childCache.put(k, childCache.get(k).getOrElse(Set()) diff c)
 
     apiKeyCache.remove(r.apiKey)
     removeChildren(r.issuerKey, Set(r))
-  }
 
-  protected def remove(g: Grant) = IO {
+  protected def remove(g: Grant) = IO
     grantCache.remove(g.grantId)
-  }
 
   def rootGrantId: M[GrantId] = manager.rootGrantId
   def rootAPIKey: M[APIKey] = manager.rootAPIKey
@@ -95,9 +90,8 @@ class CachingAPIKeyManager[M[+ _]](
                    description: Option[String],
                    issuerKey: APIKey,
                    grants: Set[GrantId]) =
-    manager.createAPIKey(name, description, issuerKey, grants) map {
+    manager.createAPIKey(name, description, issuerKey, grants) map
       _ tap add unsafePerformIO
-    }
 
   def createGrant(name: Option[String],
                   description: Option[String],
@@ -106,34 +100,29 @@ class CachingAPIKeyManager[M[+ _]](
                   perms: Set[Permission],
                   expiration: Option[DateTime]) =
     manager.createGrant(
-        name, description, issuerKey, parentIds, perms, expiration) map {
+        name, description, issuerKey, parentIds, perms, expiration) map
       _ tap add unsafePerformIO
-    }
 
-  def findAPIKey(tid: APIKey) = apiKeyCache.get(tid) match {
+  def findAPIKey(tid: APIKey) = apiKeyCache.get(tid) match
     case None =>
       logger.debug("Cache miss on api key " + tid)
       manager.findAPIKey(tid) map { _.traverse(_ tap add).unsafePerformIO }
 
     case t => M.point(t)
-  }
 
-  def findGrant(gid: GrantId) = grantCache.get(gid) match {
+  def findGrant(gid: GrantId) = grantCache.get(gid) match
     case None =>
       logger.debug("Cache miss on grant " + gid)
       manager.findGrant(gid) map { _.traverse(_ tap add).unsafePerformIO }
 
     case s @ Some(_) => M.point(s)
-  }
 
   def findAPIKeyChildren(apiKey: APIKey): M[Set[APIKeyRecord]] =
-    childCache.get(apiKey) match {
+    childCache.get(apiKey) match
       case None =>
-        manager.findAPIKeyChildren(apiKey) map {
+        manager.findAPIKeyChildren(apiKey) map
           _.toList.traverse(_ tap add).unsafePerformIO.toSet
-        }
       case Some(s) => M.point(s)
-    }
 
   def listAPIKeys = manager.listAPIKeys
   def listGrants = manager.listGrants
@@ -149,20 +138,16 @@ class CachingAPIKeyManager[M[+ _]](
     manager.findDeletedGrantChildren(gid)
 
   def addGrants(tid: APIKey, grants: Set[GrantId]) =
-    manager.addGrants(tid, grants) map {
+    manager.addGrants(tid, grants) map
       _.traverse(_ tap add).unsafePerformIO
-    }
   def removeGrants(tid: APIKey, grants: Set[GrantId]) =
-    manager.removeGrants(tid, grants) map {
+    manager.removeGrants(tid, grants) map
       _.traverse(_ tap remove).unsafePerformIO
-    }
 
   def deleteAPIKey(tid: APIKey) =
     manager.deleteAPIKey(tid) map { _.traverse(_ tap remove).unsafePerformIO }
   def deleteGrant(gid: GrantId) =
-    manager.deleteGrant(gid) map {
+    manager.deleteGrant(gid) map
       _.toList.traverse(_ tap remove).unsafePerformIO.toSet
-    }
-}
 
 // vim: set ts=4 sw=4 et:

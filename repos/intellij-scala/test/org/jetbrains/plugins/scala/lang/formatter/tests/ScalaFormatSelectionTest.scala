@@ -7,25 +7,23 @@ import org.jetbrains.plugins.scala.lang.formatter.AbstractScalaFormatterTestBase
   * @author Roman.Shein
   *         Date: 27.11.2015
   */
-class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
+class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase
 
   val startMarker = "/*start*/"
   val endMarker = "/*end*/"
 
-  override def doTextTest(text: String, textAfter: String): Unit = {
+  override def doTextTest(text: String, textAfter: String): Unit =
     myTextRange = null
     var input = text
-    if (input.contains(startMarker) && input.contains(endMarker)) {
+    if (input.contains(startMarker) && input.contains(endMarker))
       val rangeStart = input.indexOf(startMarker)
       input = input.replace(startMarker, "")
       val rangeEnd = input.indexOf(endMarker)
       input = input.replace(endMarker, "")
       myTextRange = new TextRange(rangeStart, rangeEnd)
-    }
     super.doTextTest(input, textAfter)
-  }
 
-  def testSelection(): Unit = {
+  def testSelection(): Unit =
     val before = """
         |class MyClass {
         |  val a: Int = 1
@@ -45,9 +43,8 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSelectionInParent(): Unit = {
+  def testSelectionInParent(): Unit =
     val before = """
         |class MyClass {
         |  val a: Int = 1
@@ -71,9 +68,8 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSelectionNearScalaDoc(): Unit = {
+  def testSelectionNearScalaDoc(): Unit =
     val before = """
         |class MyClass {
         |/*start*//**
@@ -97,9 +93,8 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSelectionNearScalaDocExtended(): Unit = {
+  def testSelectionNearScalaDocExtended(): Unit =
     val before = """
         |class MyClass {
         |/*start*//**
@@ -123,5 +118,3 @@ class ScalaFormatSelectionTest extends AbstractScalaFormatterTestBase {
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
-}

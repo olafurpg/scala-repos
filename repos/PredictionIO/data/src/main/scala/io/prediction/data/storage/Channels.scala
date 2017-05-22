@@ -29,10 +29,9 @@ case class Channel(
     id: Int,
     name: String, // must be unique within the same app
     appid: Int
-) {
+)
   require(Channel.isValidName(name),
           "Invalid channel name: ${name}. ${Channel.nameConstraint}")
-}
 
 /** :: DeveloperApi ::
   * Companion object of [[Channel]]
@@ -40,7 +39,7 @@ case class Channel(
   * @group Meta Data
   */
 @DeveloperApi
-object Channel {
+object Channel
 
   /** Examine whether the supplied channel name is valid. A valid channel name
     * must consists of 1 to 16 alphanumeric and '-' characters.
@@ -48,15 +47,13 @@ object Channel {
     * @param s Channel name to examine
     * @return true if channel name is valid, false otherwise
     */
-  def isValidName(s: String): Boolean = {
+  def isValidName(s: String): Boolean =
     // note: update channelNameConstraint if this rule is changed
     s.matches("^[a-zA-Z0-9-]{1,16}$")
-  }
 
   /** For consistent error message display */
   val nameConstraint: String =
     "Only alphanumeric and - characters are allowed and max length is 16."
-}
 
 /** :: DeveloperApi ::
   * Base trait of the [[Channel]] data access object
@@ -64,7 +61,7 @@ object Channel {
   * @group Meta Data
   */
 @DeveloperApi
-trait Channels {
+trait Channels
 
   /** Insert a new [[Channel]]. Returns a generated channel ID if original ID is 0. */
   def insert(channel: Channel): Option[Int]
@@ -77,4 +74,3 @@ trait Channels {
 
   /** Delete a [[Channel]] */
   def delete(id: Int): Unit
-}

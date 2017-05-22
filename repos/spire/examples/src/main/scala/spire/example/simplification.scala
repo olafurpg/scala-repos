@@ -18,13 +18,13 @@ import scala.collection.generic.CanBuildFrom
   * all: print the first n rationals, according to diagonalization
   * snap: given y, look for solutions to y = nroot(x, k) / d
   */
-object Simplification {
+object Simplification
 
-  def main(args: Array[String]): Unit = {
-    if (args.isEmpty) {
+  def main(args: Array[String]): Unit =
+    if (args.isEmpty)
       println("usage: %s [nrat | rats | nprime | primes | snap] [number]")
-    } else {
-      args(0) match {
+    else
+      args(0) match
         case "nrat" =>
           val n = if (args.length == 1) 10 else args(1).toInt
           val r: Rational = rationals.drop(n - 1).head
@@ -46,9 +46,6 @@ object Simplification {
             if (args.length == 1) 1.4142135623730951 else args(1).toDouble
           val (base, k, div) = snap(n)
           println("%s =~ nroot(%s, %s) / %s" format (n, base, k, div))
-      }
-    }
-  }
 
   /**
     * Using Cantor's diagonalization method, create an infinite stream
@@ -59,25 +56,21 @@ object Simplification {
     * is not really infinite. Even so, it's unlikely that a user will
     * be able to generate this many values.
     */
-  val rationals: BigStream[Rational] = {
+  val rationals: BigStream[Rational] =
     @tailrec
-    def next(i: Long, n: Long, d: Long): BigStream[Rational] = {
-      if (n == 0L) {
+    def next(i: Long, n: Long, d: Long): BigStream[Rational] =
+      if (n == 0L)
         next(i + 1L, i, 1L)
-      } else {
+      else
         val r = Rational(n, d)
-        if (n == r.numeratorAsLong) {
+        if (n == r.numeratorAsLong)
           new BigCons(r, new BigCons(-r, loop(i, n - 1L, d + 1L)))
-        } else {
+        else
           next(i, n - 1L, d + 1L)
-        }
-      }
-    }
 
     def loop(i: Long, n: Long, d: Long): BigStream[Rational] = next(i, n, d)
 
     Rational.zero #:: loop(2L, 1L, 1L)
-  }
 
   /**
     * Naive prime stream. For each odd number, this method tries
@@ -86,7 +79,7 @@ object Simplification {
     * There are a lot of ways to improve this. For now it's a toy.
     * It can generate the millionth prime in ~9s on my computer.
     */
-  val primes: Stream[Int] = {
+  val primes: Stream[Int] =
     @tailrec
     def next(n: Int, stream: Stream[Int]): Stream[Int] =
       if (stream.isEmpty || (stream.head ** 2) > n) n #:: loop(n + 2, primes)
@@ -96,7 +89,6 @@ object Simplification {
     def loop(n: Int, stream: Stream[Int]): Stream[Int] = next(n, stream)
 
     2 #:: loop(3, primes)
-  }
 
   /**
     * Given a Double y, look for whole numbers x, k, and d such that:
@@ -110,32 +102,26 @@ object Simplification {
     */
   def snap(n: Double,
            limit: Int = 10,
-           epsilon: Double = 0.00000000001): (Double, Int, Int) = {
+           epsilon: Double = 0.00000000001): (Double, Int, Int) =
     @tailrec
-    def loop(i: Int, ex: Int, div: Int): (Double, Int, Int) = {
-      if (i >= limit) {
+    def loop(i: Int, ex: Int, div: Int): (Double, Int, Int) =
+      if (i >= limit)
         (n, 1, 1)
-      } else if (div < 1) {
+      else if (div < 1)
         loop(i + 1, 1, i + 1)
-      } else {
+      else
         val x = math.pow(n * div, ex)
         val m = x % 1.0
         val d = if (m < 0.5) m else m - 1.0
-        if (math.abs(d) < epsilon) {
+        if (math.abs(d) < epsilon)
           (x - m, ex, div)
-        } else {
+        else
           loop(i, ex + 1, div - 1)
-        }
-      }
-    }
-    if (n < 0.0) {
+    if (n < 0.0)
       val (x, k, div) = snap(-n, limit, epsilon)
       (x, k, -div)
-    } else {
+    else
       loop(1, 1, 1)
-    }
-  }
-}
 
 /**
   * BigStream is a non-memoizing stream.
@@ -145,87 +131,73 @@ object Simplification {
   * where re-computing the stream is preferrable to trying to store
   * all the results in memory for next time.
   */
-object BigStream {
+object BigStream
   def empty[A]: BigStream[A] = BigNil[A]()
 
-  implicit class Wrapper[A](t: => BigStream[A]) {
+  implicit class Wrapper[A](t: => BigStream[A])
     def #::(a: A): BigStream[A] = new BigCons(a, t)
-  }
 
   def newBuilder[A]: Builder[A, BigStream[A]] =
-    new Builder[A, BigStream[A]] {
+    new Builder[A, BigStream[A]]
       private var elems: List[A] = Nil
-      def +=(a: A): this.type = {
+      def +=(a: A): this.type =
         elems = a :: elems
         this
-      }
       def clear(): Unit = elems = Nil
       def result: BigStream[A] =
         elems.foldLeft(BigStream.empty[A])((t, a) => new BigCons(a, t))
-    }
 
   implicit def canBuildFrom[A]: CanBuildFrom[Iterable[A], A, BigStream[A]] =
-    new CanBuildFrom[Iterable[A], A, BigStream[A]] {
+    new CanBuildFrom[Iterable[A], A, BigStream[A]]
       def apply(from: Iterable[A]) = newBuilder[A]
       def apply() = newBuilder[A]
-    }
-}
 
-trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]] {
+trait BigStream[A] extends Iterable[A] with IterableLike[A, BigStream[A]]
   self =>
 
   override def take(n: Int): BigStream[A] =
     if (isEmpty || n < 1) BigNil() else new BigCons(head, tail.take(n - 1))
 
-  override def drop(n: Int): BigStream[A] = {
+  override def drop(n: Int): BigStream[A] =
     @tailrec
     def loop(stream: BigStream[A], i: Int): BigStream[A] =
       if (isEmpty || i < 1) stream else loop(stream.tail, i - 1)
     loop(this, n)
-  }
 
-  def iterator: Iterator[A] = new Iterator[A] {
+  def iterator: Iterator[A] = new Iterator[A]
     var stream = self
 
     def hasNext: Boolean = !stream.isEmpty
 
     def next: A =
-      if (stream.isEmpty) {
+      if (stream.isEmpty)
         throw new NoSuchElementException
-      } else {
+      else
         val a = stream.head
         stream = stream.tail
         a
-      }
-  }
 
-  override def foreach[U](f: A => U): Unit = {
+  override def foreach[U](f: A => U): Unit =
     @tailrec
-    def loop(stream: BigStream[A]): Unit = if (!stream.isEmpty) {
+    def loop(stream: BigStream[A]): Unit = if (!stream.isEmpty)
       f(stream.head)
       loop(stream.tail)
-    }
     loop(this)
-  }
 
   override def newBuilder: Builder[A, BigStream[A]] =
     BigStream.newBuilder[A]
-}
 
 class BigCons[A](override val head: A, t: => BigStream[A])
-    extends BigStream[A] {
+    extends BigStream[A]
   override def tail: BigStream[A] = t
   override def isEmpty = false
   override def toString: String = "BigStream(%s, ...)" format head.toString
-  override def equals(rhs: Any): Boolean = rhs match {
+  override def equals(rhs: Any): Boolean = rhs match
     case s: BigStream[_] => !s.isEmpty && tail == s.tail
     case _ => false
-  }
-}
 
-case class BigNil[A]() extends BigStream[A] {
+case class BigNil[A]() extends BigStream[A]
   override def head: A = sys.error("head on nil")
   override def tail: BigStream[A] = sys.error("tail on nil")
   override def isEmpty = true
   override def toString: String = "BigStream()"
-}

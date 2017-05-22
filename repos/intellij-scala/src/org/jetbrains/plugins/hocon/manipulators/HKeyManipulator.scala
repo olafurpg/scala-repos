@@ -9,10 +9,10 @@ import org.jetbrains.plugins.hocon.psi.{HoconPsiElementFactory, HKey}
 /**
   * @author ghik
   */
-class HKeyManipulator extends AbstractElementManipulator[HKey] {
+class HKeyManipulator extends AbstractElementManipulator[HKey]
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
 
-  def handleContentChange(key: HKey, range: TextRange, newContent: String) = {
+  def handleContentChange(key: HKey, range: TextRange, newContent: String) =
     val psiManager = PsiManager.getInstance(key.getProject)
     val allStringTypes = key.keyParts.map(_.stringType).toSet
 
@@ -34,5 +34,3 @@ class HKeyManipulator extends AbstractElementManipulator[HKey] {
       HoconPsiElementFactory.createKey(quotedEscapedContent, psiManager)
     key.replace(newKey)
     newKey
-  }
-}

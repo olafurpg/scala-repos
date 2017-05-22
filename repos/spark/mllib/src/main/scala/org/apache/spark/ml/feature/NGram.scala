@@ -37,7 +37,7 @@ import org.apache.spark.sql.types.{ArrayType, DataType, StringType}
 @Experimental
 class NGram(override val uid: String)
     extends UnaryTransformer[Seq[String], Seq[String], NGram]
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("ngram"))
 
@@ -57,22 +57,18 @@ class NGram(override val uid: String)
 
   setDefault(n -> 2)
 
-  override protected def createTransformFunc: Seq[String] => Seq[String] = {
+  override protected def createTransformFunc: Seq[String] => Seq[String] =
     _.iterator.sliding($(n)).withPartial(false).map(_.mkString(" ")).toSeq
-  }
 
-  override protected def validateInputType(inputType: DataType): Unit = {
+  override protected def validateInputType(inputType: DataType): Unit =
     require(inputType.sameType(ArrayType(StringType)),
             s"Input type must be ArrayType(StringType) but got $inputType.")
-  }
 
   override protected def outputDataType: DataType =
     new ArrayType(StringType, false)
-}
 
 @Since("1.6.0")
-object NGram extends DefaultParamsReadable[NGram] {
+object NGram extends DefaultParamsReadable[NGram]
 
   @Since("1.6.0")
   override def load(path: String): NGram = super.load(path)
-}

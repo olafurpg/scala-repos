@@ -8,7 +8,7 @@ trait Drv extends (Rng => Int)
 /**
   * Create discrete random variables representing arbitrary distributions.
   */
-object Drv {
+object Drv
   private val ε = 0.01
 
   /**
@@ -31,17 +31,15 @@ object Drv {
     * http://doi.acm.org/10.1145/355744.355749
     */
   case class Aliased(alias: IndexedSeq[Int], prob: IndexedSeq[Double])
-      extends Drv {
+      extends Drv
     require(prob.size == alias.size)
     private[this] val N = alias.size
 
-    def apply(rng: Rng): Int = {
+    def apply(rng: Rng): Int =
       val i = rng.nextInt(N)
       val p = prob(i)
       if (p == 1 || rng.nextDouble() < p) i
       else alias(i)
-    }
-  }
 
   /**
     * Generate probability and alias tables in the manner of to Vose
@@ -54,7 +52,7 @@ object Drv {
     * (September 1991), 972-975. DOI=10.1109/32.92917
     * http://dx.doi.org/10.1109/32.92917
     */
-  def newVose(dist: Seq[Double]): Aliased = {
+  def newVose(dist: Seq[Double]): Aliased =
     val N = dist.size
     if (N == 0) return Aliased(Vector.empty, Vector.empty)
 
@@ -66,13 +64,12 @@ object Drv {
     val p = new Array[Double](N)
     dist.copyToArray(p, 0, N)
 
-    for (i <- p.indices) {
+    for (i <- p.indices)
       p(i) *= N
       if (p(i) < 1) small.enqueue(i)
       else large.enqueue(i)
-    }
 
-    while (large.nonEmpty && small.nonEmpty) {
+    while (large.nonEmpty && small.nonEmpty)
       val s = small.dequeue()
       val l = large.dequeue()
 
@@ -82,14 +79,12 @@ object Drv {
       p(l) = (p(s) + p(l)) - 1D // Same as p(l)-(1-p(s)), but more stable
       if (p(l) < 1) small.enqueue(l)
       else large.enqueue(l)
-    }
 
     while (large.nonEmpty) prob(large.dequeue()) = 1
 
     while (small.nonEmpty) prob(small.dequeue()) = 1
 
     Aliased(alias, prob)
-  }
 
   /**
     * Create a new Drv representing the passed in distribution of
@@ -97,20 +92,17 @@ object Drv {
     * reliably test for this due to numerical stability issues: we're
     * operating on the honor's system.
     */
-  def apply(dist: Seq[Double]): Drv = {
+  def apply(dist: Seq[Double]): Drv =
     val sum = dist.sum
     assert(dist.size == 0 || (sum < 1 + ε && sum > 1 - ε),
            "Bad sum %0.001f".format(sum))
     newVose(dist)
-  }
 
   /**
     * Create a probability distribution based on a set of weights
     * (ratios).
     */
-  def fromWeights(weights: Seq[Double]): Drv = {
+  def fromWeights(weights: Seq[Double]): Drv =
     val sum = weights.sum
     if (sum == 0) Drv(Seq.fill(weights.size) { 1D / weights.size })
     else Drv(weights map (_ / sum))
-  }
-}

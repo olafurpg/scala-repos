@@ -5,7 +5,7 @@ package com.twitter.finagle.service
   *
   * @see [[ResponseClassifier]]
   */
-sealed trait ResponseClass {
+sealed trait ResponseClass
 
   /**
     * Accomodates responses that can be partially successful.
@@ -19,9 +19,8 @@ sealed trait ResponseClass {
     * A value of `0.0` indicates a full failure and `1.0` indicates fully successful.
     */
   def fractionalSuccess: Double
-}
 
-object ResponseClass {
+object ResponseClass
 
   /**
     * Represents a successful request/response.
@@ -30,12 +29,10 @@ object ResponseClass {
     *     Must be between `0.0` and `1.0`.
     */
   final case class Successful(override val fractionalSuccess: Double)
-      extends ResponseClass {
-    if (fractionalSuccess <= 0.0 || fractionalSuccess > 1.0) {
+      extends ResponseClass
+    if (fractionalSuccess <= 0.0 || fractionalSuccess > 1.0)
       throw new IllegalArgumentException(
           s"Fraction must be (0.0 and 1.0], was: $fractionalSuccess")
-    }
-  }
 
   /**
     * A fully successful request/response.
@@ -55,9 +52,8 @@ object ResponseClass {
     * @see [[RetryableFailure]] for a failure that has completely
     *     failed and can be retried.
     */
-  final case class Failed(retryable: Boolean) extends ResponseClass {
+  final case class Failed(retryable: Boolean) extends ResponseClass
     def fractionalSuccess: Double = 0.0
-  }
 
   /**
     * A complete failure that is not retryable.
@@ -72,4 +68,3 @@ object ResponseClass {
     * @see `ResponseClasses.RETRYABLE_FAILURE` for a Java friendly API.
     */
   val RetryableFailure: Failed = Failed(retryable = true)
-}

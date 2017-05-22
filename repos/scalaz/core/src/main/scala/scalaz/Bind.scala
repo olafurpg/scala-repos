@@ -9,16 +9,15 @@ package scalaz
   * @see [[scalaz.Bind.BindLaw]]
   */
 ////
-trait Bind[F[_]] extends Apply[F] { self =>
+trait Bind[F[_]] extends Apply[F]  self =>
   ////
 
   /** Equivalent to `join(map(fa)(f))`. */
   def bind[A, B](fa: F[A])(f: A => F[B]): F[B]
 
-  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] = {
+  override def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
     lazy val fa0 = fa
     bind(f)(map(fa0))
-  }
 
   /** Sequence the inner `F` of `FFA` after the outer `F`, forming a
     * single `F[A]`. */
@@ -31,11 +30,10 @@ trait Bind[F[_]] extends Apply[F] { self =>
     * a)`, this will only include context from the chosen of `ifTrue`
     * and `ifFalse`, not the other.
     */
-  def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] = {
+  def ifM[B](value: F[Boolean], ifTrue: => F[B], ifFalse: => F[B]): F[B] =
     lazy val t = ifTrue
     lazy val f = ifFalse
     bind(value)(if (_) t else f)
-  }
 
   /** Pair `A` with the result of function application. */
   def mproduct[A, B](fa: F[A])(f: A => F[B]): F[(A, B)] =
@@ -43,12 +41,11 @@ trait Bind[F[_]] extends Apply[F] { self =>
 
   /**The product of Bind `F` and `G`, `[x](F[x], G[x]])`, is a Bind */
   def product[G[_]](implicit G0: Bind[G]): Bind[λ[α => (F[α], G[α])]] =
-    new ProductBind[F, G] {
+    new ProductBind[F, G]
       def F = self
       def G = G0
-    }
 
-  trait BindLaw extends ApplyLaw {
+  trait BindLaw extends ApplyLaw
 
     /**
       * As with semigroups, monadic effects only change when their
@@ -63,17 +60,14 @@ trait Bind[F[_]] extends Apply[F] { self =>
     def apLikeDerived[A, B](fa: F[A], f: F[A => B])(
         implicit FB: Equal[F[B]]): Boolean =
       FB.equal(ap(fa)(f), bind(f)(f => map(fa)(f)))
-  }
   def bindLaw = new BindLaw {}
 
   ////
   val bindSyntax = new scalaz.syntax.BindSyntax[F] { def F = Bind.this }
-}
 
-object Bind {
+object Bind
   @inline def apply[F[_]](implicit F: Bind[F]): Bind[F] = F
 
   ////
 
   ////
-}

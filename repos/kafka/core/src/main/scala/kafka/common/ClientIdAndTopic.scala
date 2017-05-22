@@ -23,10 +23,8 @@ package kafka.common
 trait ClientIdTopic {}
 
 case class ClientIdAndTopic(clientId: String, topic: String)
-    extends ClientIdTopic {
+    extends ClientIdTopic
   override def toString = "%s-%s".format(clientId, topic)
-}
 
-case class ClientIdAllTopics(clientId: String) extends ClientIdTopic {
+case class ClientIdAllTopics(clientId: String) extends ClientIdTopic
   override def toString = "%s-%s".format(clientId, "AllTopics")
-}

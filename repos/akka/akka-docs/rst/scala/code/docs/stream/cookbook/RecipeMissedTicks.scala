@@ -7,11 +7,11 @@ import scala.concurrent.duration._
 import akka.testkit.TestLatch
 import scala.concurrent.Await
 
-class RecipeMissedTicks extends RecipeSpec {
+class RecipeMissedTicks extends RecipeSpec
 
-  "Recipe for collecting missed ticks" must {
+  "Recipe for collecting missed ticks" must
 
-    "work" in {
+    "work" in
       type Tick = Unit
 
       val pub = TestPublisher.probe[Tick]()
@@ -50,6 +50,3 @@ class RecipeMissedTicks extends RecipeSpec {
       pub.sendComplete()
       subscription.request(1)
       sub.expectComplete()
-    }
-  }
-}

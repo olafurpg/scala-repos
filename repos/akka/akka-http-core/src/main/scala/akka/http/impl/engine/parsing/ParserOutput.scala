@@ -17,7 +17,7 @@ private[http] sealed trait ParserOutput
 /**
   * INTERNAL API
   */
-private[http] object ParserOutput {
+private[http] object ParserOutput
   sealed trait RequestOutput extends ParserOutput
   sealed trait ResponseOutput extends ParserOutput
   sealed trait MessageStart extends ParserOutput
@@ -71,17 +71,13 @@ private[http] object ParserOutput {
       extends (Source[A, NotUsed] ⇒ B)
 
   final case class StrictEntityCreator(entity: HttpEntity.Strict)
-      extends EntityCreator[ParserOutput, HttpEntity.Strict] {
-    def apply(parts: Source[ParserOutput, NotUsed]) = {
+      extends EntityCreator[ParserOutput, HttpEntity.Strict]
+    def apply(parts: Source[ParserOutput, NotUsed]) =
       // We might need to drain stray empty tail streams which will be read by no one.
       SubSource.kill(parts)
       entity
-    }
-  }
   final case class StreamedEntityCreator[
       -A <: ParserOutput, +B >: HttpEntity.Strict <: HttpEntity](
       creator: Source[A, NotUsed] ⇒ B)
-      extends EntityCreator[A, B] {
+      extends EntityCreator[A, B]
     def apply(parts: Source[A, NotUsed]) = creator(parts)
-  }
-}

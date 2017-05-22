@@ -14,15 +14,15 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocInlinedTag
   * User: Dmitry Naidanov
   * Date: 11/21/11
   */
-class ScalaDocInlinedTagInspection extends LocalInspectionTool {
+class ScalaDocInlinedTagInspection extends LocalInspectionTool
   override def isEnabledByDefault: Boolean = true
 
   override def getDisplayName: String = "Inlined Tag"
 
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
-    new ScalaElementVisitor {
-      override def visitInlinedTag(s: ScDocInlinedTag) {
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
+    new ScalaElementVisitor
+      override def visitInlinedTag(s: ScDocInlinedTag)
         holder.registerProblem(
             holder.getManager.createProblemDescriptor(
                 s,
@@ -32,40 +32,31 @@ class ScalaDocInlinedTagInspection extends LocalInspectionTool {
                 isOnTheFly,
                 new ScalaDocInlinedTagDeleteQuickFix(s),
                 new ScalaDocInlinedTagReplaceQuickFix(s)))
-      }
-    }
-  }
-}
 
 class ScalaDocInlinedTagDeleteQuickFix(inlinedTag: ScDocInlinedTag)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("delete.inlined.tag"), inlinedTag) {
+        ScalaBundle.message("delete.inlined.tag"), inlinedTag)
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
-  def doApplyFix(project: Project) {
+  def doApplyFix(project: Project)
     val tag = getElement
     if (!tag.isValid) return
     tag.delete()
-  }
-}
 
 class ScalaDocInlinedTagReplaceQuickFix(inlinedTag: ScDocInlinedTag)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("replace.with.wiki.syntax"), inlinedTag) {
+        ScalaBundle.message("replace.with.wiki.syntax"), inlinedTag)
   override def getFamilyName: String = InspectionsUtil.SCALADOC
 
-  def doApplyFix(project: Project) {
+  def doApplyFix(project: Project)
     val tag = getElement
     if (!tag.isValid) return
 
-    if (tag.getValueElement == null) {
+    if (tag.getValueElement == null)
       tag.replace(ScalaPsiElementFactory.createMonospaceSyntaxFromText(
               "", tag.getManager))
-    } else {
+    else
       val tagText = tag.getValueElement.getText
         .replace("`", MyScaladocParsing.escapeSequencesForWiki.get("`").get)
       tag.replace(ScalaPsiElementFactory.createMonospaceSyntaxFromText(
               tagText, tag.getManager))
-    }
-  }
-}

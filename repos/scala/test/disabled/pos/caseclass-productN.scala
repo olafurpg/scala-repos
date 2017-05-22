@@ -1,4 +1,4 @@
-object Test {
+object Test
   class A
   class B extends A
   class C extends B
@@ -13,8 +13,6 @@ object Test {
 
   def bmethod(x: B) = ()
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     bippies flatMap (_._2) foreach bmethod
     bippies map (_._3) foreach bmethod
-  }
-}

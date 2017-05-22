@@ -39,48 +39,42 @@ import scala.collection.mutable.ArrayBuffer
   * User: Alexander Podkhalyuzin
   * Date: 08.06.2009
   */
-class ScalaInlineHandler extends InlineHandler {
+class ScalaInlineHandler extends InlineHandler
 
   private var occurrenceHighlighters: Seq[RangeHighlighter] = Seq.empty
 
-  def removeDefinition(element: PsiElement, settings: InlineHandler.Settings) {
-    def removeElementWithNonSignificantSibilings(value: PsiElement) = {
+  def removeDefinition(element: PsiElement, settings: InlineHandler.Settings)
+    def removeElementWithNonSignificantSibilings(value: PsiElement) =
       val children = new ArrayBuffer[PsiElement]
       var psiElement = value.getNextSibling
       while (psiElement != null &&
       (psiElement.getNode.getElementType == ScalaTokenTypes.tSEMICOLON ||
-          psiElement.getText.trim == "")) {
+          psiElement.getText.trim == ""))
         children += psiElement
         psiElement = psiElement.getNextSibling
-      }
-      for (child <- children) {
+      for (child <- children)
         child.getParent.getNode.removeChild(child.getNode)
-      }
       value.getParent.getNode.removeChild(value.getNode)
-    }
 
-    element match {
+    element match
       case rp: ScBindingPattern =>
-        PsiTreeUtil.getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match {
+        PsiTreeUtil.getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match
           case v @ (_: ScValue | _: ScVariable)
               if v.declaredElements.length == 1 =>
             removeElementWithNonSignificantSibilings(v)
           case _ =>
-        }
       case funDef: ScFunctionDefinition =>
         CodeEditUtil.removeChild(funDef.getParent.getNode, funDef.getNode)
       case typeAlias: ScTypeAliasDefinition =>
         removeElementWithNonSignificantSibilings(typeAlias)
       case _ =>
-    }
-  }
 
   def createInliner(
       element: PsiElement,
-      settings: InlineHandler.Settings): InlineHandler.Inliner = {
-    val replacementValue = element match {
+      settings: InlineHandler.Settings): InlineHandler.Inliner =
+    val replacementValue = element match
       case rp: ScBindingPattern =>
-        PsiTreeUtil.getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match {
+        PsiTreeUtil.getParentOfType(rp, classOf[ScDeclaredElementsHolder]) match
           case v @ ScPatternDefinition.expr(e)
               if v.declaredElements == Seq(element) =>
             e.getText
@@ -88,17 +82,15 @@ class ScalaInlineHandler extends InlineHandler {
               if v.declaredElements == Seq(element) =>
             e.getText
           case _ => return null
-        }
       case funDef: ScFunctionDefinition if funDef.parameters.isEmpty =>
         funDef.body.orNull.getText
       case typeAlias: ScTypeAliasDefinition =>
         typeAlias.aliasedTypeElement.getText
       case _ => return null
-    }
-    new InlineHandler.Inliner {
-      def inlineUsage(usage: UsageInfo, referenced: PsiElement) {
+    new InlineHandler.Inliner
+      def inlineUsage(usage: UsageInfo, referenced: PsiElement)
         val reference = usage.getReference
-        val replacementOpt = reference.getElement match {
+        val replacementOpt = reference.getElement match
           case Parent(call: ScMethodCall)
               if call.argumentExpressions.isEmpty =>
             Some(call)
@@ -106,16 +98,14 @@ class ScalaInlineHandler extends InlineHandler {
           case Parent(reference: ScTypeElement) =>
             Some(reference)
           case _ => None
-        }
-        replacementOpt.foreach { replacement =>
-          val newValue = replacement match {
+        replacementOpt.foreach  replacement =>
+          val newValue = replacement match
             case expression: ScExpression =>
-              val oldValue = expression match {
+              val oldValue = expression match
                 case _ childOf (_: ScInterpolatedStringLiteral) =>
                   s"{" + replacementValue + "}"
                 case _ =>
                   replacementValue
-              }
               expression.replaceExpression(
                   ScalaPsiElementFactory.createExpressionFromText(
                       oldValue, replacement.getManager),
@@ -124,7 +114,6 @@ class ScalaInlineHandler extends InlineHandler {
               replacement.replace(
                   ScalaPsiElementFactory.createTypeElementFromText(
                       replacementValue, replacement.getManager))
-          }
 
           val project = newValue.getProject
           val manager = FileEditorManager.getInstance(project)
@@ -138,23 +127,19 @@ class ScalaInlineHandler extends InlineHandler {
                 newValue.getTextRange.getStartOffset - 1,
                 newValue.getTextRange.getEndOffset +
                 1) //to prevent situations like this 2 ++2 (+2 was inlined)
-        }
-      }
 
       def getConflicts(reference: PsiReference, referenced: PsiElement)
         : com.intellij.util.containers.MultiMap[PsiElement, String] =
         new com.intellij.util.containers.MultiMap[PsiElement, String]()
-    }
-  }
 
   def prepareInlineElement(
       element: PsiElement,
       editor: Editor,
-      invokedOnReference: Boolean): InlineHandler.Settings = {
+      invokedOnReference: Boolean): InlineHandler.Settings =
     def title(suffix: String) = "Scala Inline " + suffix
 
     def showErrorHint(
-        message: String, titleSuffix: String): InlineHandler.Settings = {
+        message: String, titleSuffix: String): InlineHandler.Settings =
       val inlineTitle = title(titleSuffix)
       CommonRefactoringUtil.showErrorHint(element.getProject,
                                           editor,
@@ -162,12 +147,11 @@ class ScalaInlineHandler extends InlineHandler {
                                           inlineTitle,
                                           HelpID.INLINE_VARIABLE)
       Settings.CANNOT_INLINE_SETTINGS
-    }
 
     def getSettings(
         psiNamedElement: PsiNamedElement,
         inlineTitleSuffix: String,
-        inlineDescriptionSuffix: String): InlineHandler.Settings = {
+        inlineDescriptionSuffix: String): InlineHandler.Settings =
       val refs = ReferencesSearch
         .search(psiNamedElement, psiNamedElement.getUseScope)
         .findAll
@@ -175,9 +159,8 @@ class ScalaInlineHandler extends InlineHandler {
       val inlineTitle = title(inlineTitleSuffix)
       occurrenceHighlighters = ScalaRefactoringUtil.highlightOccurrences(
           element.getProject, refs.map(_.getElement).toArray, editor)
-      val settings = new InlineHandler.Settings {
+      val settings = new InlineHandler.Settings
         def isOnlyOneReferenceToInline: Boolean = false
-      }
       if (refs.isEmpty)
         showErrorHint(
             ScalaBundle.message("cannot.inline.never.used"), inlineTitleSuffix)
@@ -189,11 +172,10 @@ class ScalaInlineHandler extends InlineHandler {
                          classOf[ScStableReferenceElementPattern]) != null))
         showErrorHint(ScalaBundle.message("cannot.inline.stable.reference"),
                       inlineTitleSuffix)
-      else if (!ApplicationManager.getApplication.isUnitTestMode) {
-        val occurences = refs.size match {
+      else if (!ApplicationManager.getApplication.isUnitTestMode)
+        val occurences = refs.size match
           case 1 => "(1 occurrence)"
           case n => s"($n occurrences)"
-        }
 
         val question =
           s"Inline $inlineDescriptionSuffix ${psiNamedElement.name}? $occurences"
@@ -204,43 +186,38 @@ class ScalaInlineHandler extends InlineHandler {
                                                   true,
                                                   element.getProject)
         dialog.show()
-        if (!dialog.isOK) {
+        if (!dialog.isOK)
           occurrenceHighlighters.foreach(_.dispose())
           occurrenceHighlighters = Seq.empty
           InlineHandler.Settings.CANNOT_INLINE_SETTINGS
-        } else settings
-      } else settings
-    }
+        else settings
+      else settings
 
-    def isSimpleTypeAlias(typeAlias: ScTypeAliasDefinition): Boolean = {
-      typeAlias.aliasedTypeElement.depthFirst.forall {
+    def isSimpleTypeAlias(typeAlias: ScTypeAliasDefinition): Boolean =
+      typeAlias.aliasedTypeElement.depthFirst.forall
         case t: ScTypeElement =>
-          t.calcType match {
+          t.calcType match
             case part: ScTypeParameterType => false
             case part: ScProjectionType
                 if !ScalaPsiUtil.hasStablePath(part.element) =>
               false
             case _ => true
-          }
         case _ => true
-      }
-    }
 
     def isParametrizedTypeAlias(typeAlias: ScTypeAliasDefinition): Boolean =
       !typeAlias.typeParameters.isEmpty
 
     UsageTrigger.trigger(ScalaBundle.message("inline.id"))
 
-    element match {
+    element match
       case typedDef: ScTypedDefinition
           if ScFunctionType
             .unapply(typedDef.getType().getOrAny)
             .exists(_._2.nonEmpty) =>
-        val message = typedDef match {
+        val message = typedDef match
           case _: ScFunctionDeclaration | _: ScFunctionDefinition =>
             ScalaBundle.message("cannot.inline.function.with.parameters")
           case _ => ScalaBundle.message("cannot.inline.value.functional.type")
-        }
         showErrorHint(message, "element")
       case named: ScNamedElement
           if named.getContainingFile != PsiDocumentManager
@@ -254,7 +231,7 @@ class ScalaInlineHandler extends InlineHandler {
       case bp: ScBindingPattern =>
         PsiTreeUtil.getParentOfType(bp,
                                     classOf[ScPatternDefinition],
-                                    classOf[ScVariableDefinition]) match {
+                                    classOf[ScVariableDefinition]) match
           case definition: ScPatternDefinition if !definition.isSimple =>
             showErrorHint(
                 ScalaBundle.message("cannot.inline.not.simple.pattern"),
@@ -271,7 +248,6 @@ class ScalaInlineHandler extends InlineHandler {
             else
               getSettings(parent.declaredElements.head, "Variable", "variable")
           case _ => null
-        }
       case funDef: ScFunctionDefinition
           if funDef.recursionType != RecursionType.NoRecursion =>
         showErrorHint(
@@ -288,21 +264,15 @@ class ScalaInlineHandler extends InlineHandler {
       case typeAlias: ScTypeAliasDefinition =>
         getSettings(typeAlias, "Type Alias", "type alias")
       case _ => null
-    }
-  }
 
-  private def usedInSameClassOnly(named: ScNamedElement): Boolean = {
-    ScalaPsiUtil.nameContext(named) match {
+  private def usedInSameClassOnly(named: ScNamedElement): Boolean =
+    ScalaPsiUtil.nameContext(named) match
       case member: ScMember =>
         ReferencesSearch
           .search(named, named.getUseScope)
           .findAll
           .asScala
-          .forall { ref =>
+          .forall  ref =>
             member.containingClass == null || PsiTreeUtil.isAncestor(
                 member.containingClass, ref.getElement, true)
-          }
       case _ => true
-    }
-  }
-}

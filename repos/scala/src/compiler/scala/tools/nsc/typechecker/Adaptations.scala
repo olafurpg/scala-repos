@@ -15,20 +15,19 @@ package typechecker
   *
   *  @author  Paul Phillips
   */
-trait Adaptations { self: Analyzer =>
+trait Adaptations  self: Analyzer =>
 
   import global._
   import definitions._
 
-  trait Adaptation { self: Typer =>
+  trait Adaptation  self: Typer =>
 
     import runDefinitions._
 
-    def checkValidAdaptation(t: Tree, args: List[Tree]): Boolean = {
-      def applyArg = t match {
+    def checkValidAdaptation(t: Tree, args: List[Tree]): Boolean =
+      def applyArg = t match
         case Apply(_, arg :: Nil) => arg
         case _ => EmptyTree
-      }
       def callString = ((if (t.symbol.isConstructor) "new " else "") +
           (t.symbol.owner.decodedName) +
           (if (t.symbol.isConstructor || t.symbol.name == nme.apply) ""
@@ -52,41 +51,38 @@ trait Adaptations { self: Analyzer =>
       // A one-argument method accepting Object (which may look like "Any"
       // at this point if the class is java defined) is a "leaky target" for
       // which we should be especially reluctant to insert () or auto-tuple.
-      def isLeakyTarget = {
-        val oneArgObject = t.symbol.paramss match {
+      def isLeakyTarget =
+        val oneArgObject = t.symbol.paramss match
           case (param :: Nil) :: Nil =>
             ObjectClass isSubClass param.tpe.typeSymbol
           case _ => false
-        }
         // Unfortunately various "universal" methods and the manner in which
         // they are used limits our ability to enforce anything sensible until
         // an opt-in compiler option is given.
         oneArgObject && !(isStringAddition(t.symbol) ||
             isArrowAssoc(t.symbol) || t.symbol.name == nme.equals_ ||
             t.symbol.name == nme.EQ || t.symbol.name == nme.NE)
-      }
 
       if (settings.noAdaptedArgs)
         context.warning(
             t.pos,
             adaptWarningMessage(
                 "No automatic adaptation here: use explicit parentheses."))
-      else if (args.isEmpty) {
+      else if (args.isEmpty)
         if (settings.future)
           context.error(
               t.pos,
               adaptWarningMessage(
                   "Adaptation of argument list by inserting () has been removed.",
                   showAdaptation = false))
-        else {
+        else
           val msg =
             "Adaptation of argument list by inserting () has been deprecated: " +
             (if (isLeakyTarget)
                "leaky (Object-receiving) target makes this especially dangerous."
              else "this is unlikely to be what you want.")
           context.deprecationWarning(t.pos, t.symbol, adaptWarningMessage(msg))
-        }
-      } else if (settings.warnAdaptedArgs)
+      else if (settings.warnAdaptedArgs)
         context.warning(
             t.pos,
             adaptWarningMessage(
@@ -94,6 +90,3 @@ trait Adaptations { self: Analyzer =>
 
       // return `true` if the adaptation should be kept
       !(settings.noAdaptedArgs || (args.isEmpty && settings.future))
-    }
-  }
-}

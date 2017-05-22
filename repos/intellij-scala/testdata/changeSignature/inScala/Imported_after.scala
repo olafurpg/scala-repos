@@ -1,17 +1,14 @@
-object Test {
+object Test
   def foo(i: Int) {}
-}
 
-class A {
+class A
 
   import Test.foo
 
   foo(0)
-}
 
-class B {
+class B
 
   import Test.{foo => baz}
 
   baz(0)
-}

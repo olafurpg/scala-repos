@@ -23,11 +23,11 @@ import org.specs2.mutable.Specification
 
 import common._
 
-class CssHelpersSpec extends Specification {
+class CssHelpersSpec extends Specification
   import CSSHelpers._
 
-  "CSSParser" should {
-    "leave most CSS alone" in {
+  "CSSParser" should
+    "leave most CSS alone" in
       val baseCss = """
       #booyan {
         text-indent: 1em;
@@ -39,9 +39,8 @@ class CssHelpersSpec extends Specification {
       """
 
       CssUrlPrefixer("prefix").fixCss(baseCss) must_== Full(baseCss)
-    }
 
-    "leave relative CSS urls alone" in {
+    "leave relative CSS urls alone" in
       val baseCss =
         """
       #booyan {
@@ -56,9 +55,8 @@ class CssHelpersSpec extends Specification {
       """
 
       CssUrlPrefixer("prefix").fixCss(baseCss) must_== Full(baseCss)
-    }
 
-    "prefix root-relative CSS urls with the specified prefix" in {
+    "prefix root-relative CSS urls with the specified prefix" in
       val baseCss = """
       |#booyan {
       |  background: url(/boom);
@@ -74,25 +72,18 @@ class CssHelpersSpec extends Specification {
           |  image-set: url("prefix/boom.com/magic?bam,'sloop#bam%21bap")
           |}""".stripMargin('|')
       )
-    }
 
-    "fail on mismatched quotes or parens and report where it failed" in {
-      CssUrlPrefixer("prefix").fixCss("#boom { url('ha) }") must beLike {
+    "fail on mismatched quotes or parens and report where it failed" in
+      CssUrlPrefixer("prefix").fixCss("#boom { url('ha) }") must beLike
         case Failure(message, _, _) =>
           message must contain("'ha")
-      }
 
-      CssUrlPrefixer("prefix").fixCss("#boom { url(\"ha) }") must beLike {
+      CssUrlPrefixer("prefix").fixCss("#boom { url(\"ha) }") must beLike
         case Failure(message, _, _) =>
           message must contain("\"ha")
-      }
 
-      CssUrlPrefixer("prefix").fixCss("#boom { url('ha' }") must beLike {
+      CssUrlPrefixer("prefix").fixCss("#boom { url('ha' }") must beLike
         case Failure(message, _, _) =>
           message must contain("ha' }")
-      }
-    }
 
     // Escaped quotes-in-quotes currently fail. Maybe we want to support these?
-  }
-}

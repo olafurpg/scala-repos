@@ -7,7 +7,7 @@ import cats.data.{Xor, XorT}
   *
   * This type class allows one to abstract over error-handling applicatives.
   */
-trait ApplicativeError[F[_], E] extends Applicative[F] {
+trait ApplicativeError[F[_], E] extends Applicative[F]
 
   /**
     * Lift an error into the `F` context.
@@ -75,9 +75,7 @@ trait ApplicativeError[F[_], E] extends Applicative[F] {
     */
   def recoverWith[A](fa: F[A])(pf: PartialFunction[E, F[A]]): F[A] =
     handleErrorWith(fa)(e => pf applyOrElse (e, raiseError))
-}
 
-object ApplicativeError {
+object ApplicativeError
   def apply[F[_], E](
       implicit F: ApplicativeError[F, E]): ApplicativeError[F, E] = F
-}

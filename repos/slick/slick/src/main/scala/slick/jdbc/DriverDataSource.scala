@@ -36,7 +36,7 @@ class DriverDataSource(
     /** The ClassLoader that is used to load `driverClassName` */
     @volatile var classLoader: ClassLoader = ClassLoaderUtil.defaultClassLoader
 )
-    extends DataSource with Closeable with Logging {
+    extends DataSource with Closeable with Logging
 
   def this() = this(null)
 
@@ -50,87 +50,75 @@ class DriverDataSource(
   private[this] var driver: Driver = _
   private[this] var connectionProps: Properties = _
 
-  def init: Unit = if (!initialized) {
-    try {
+  def init: Unit = if (!initialized)
+    try
       initialized = true
       if (url eq null)
         throw new SQLException(
             "Required parameter \"url\" missing in DriverDataSource")
-      driver = if (driverObject eq null) {
-        if (driverClassName ne null) {
+      driver = if (driverObject eq null)
+        if (driverClassName ne null)
           DriverManager.getDrivers.asScala
             .find(_.getClass.getName == driverClassName)
-            .getOrElse {
+            .getOrElse
               logger.debug(
                   s"Driver $driverClassName not already registered; trying to load it")
               val cl = classLoader.loadClass(driverClassName)
               registered = true
               DriverManager.getDrivers.asScala
                 .find(_.getClass.getName == driverClassName)
-                .getOrElse {
+                .getOrElse
                   logger.debug(
                       s"Loaded driver $driverClassName but it did not register with DriverManager; trying to instantiate directly")
-                  try cl.newInstance.asInstanceOf[Driver] catch {
+                  try cl.newInstance.asInstanceOf[Driver] catch
                     case ex: Exception =>
                       logger.debug(
                           s"Instantiating driver class $driverClassName failed; asking DriverManager to handle URL $url",
                           ex)
-                      try DriverManager.getDriver(url) catch {
+                      try DriverManager.getDriver(url) catch
                         case ex: Exception =>
                           throw new SlickException(
                               s"Driver $driverClassName does not know how to handle URL $url",
                               ex)
-                      }
-                  }
-                }
-            }
-        } else
-          try DriverManager.getDriver(url) catch {
+        else
+          try DriverManager.getDriver(url) catch
             case ex: Exception =>
               throw new SlickException(
                   s"No driver specified and DriverManager does not know how to handle URL $url",
                   ex)
-          }
-      } else driverObject
-      if (!driver.acceptsURL(url)) {
+      else driverObject
+      if (!driver.acceptsURL(url))
         close()
         throw new SlickException(
             s"Driver ${driver.getClass.getName} does not know how to handle URL $url")
-      }
       connectionProps = propsWithUserAndPassword(properties, user, password)
-    } catch {
+    catch
       case NonFatal(ex) =>
         try close() catch ignoreFollowOnError
         throw ex
-    } finally initialized = true
-  }
+    finally initialized = true
 
   private[this] def propsWithUserAndPassword(
-      p: Properties, user: String, password: String): Properties = {
+      p: Properties, user: String, password: String): Properties =
     if ((p ne null) && (user eq null) && (password eq null)) p
-    else {
+    else
       val p2 = new Properties(p)
       if (user ne null) p2.setProperty("user", user)
       if (password ne null) p2.setProperty("password", password)
       p2
-    }
-  }
 
-  def getConnection: Connection = {
+  def getConnection: Connection =
     init
     driver.connect(url, connectionProps)
-  }
 
-  def getConnection(username: String, password: String): Connection = {
+  def getConnection(username: String, password: String): Connection =
     init
     driver.connect(
         url, propsWithUserAndPassword(connectionProps, username, password))
-  }
 
-  def close(): Unit = if (registered && deregisterDriver && (driver ne null)) {
+  def close(): Unit = if (registered && deregisterDriver && (driver ne null))
     DriverManager.deregisterDriver(driver)
     registered = false
-  }
 
   def getLoginTimeout: Int = DriverManager.getLoginTimeout
 
@@ -142,12 +130,10 @@ class DriverDataSource(
   def setLogWriter(out: PrintWriter): Unit =
     throw new SQLFeatureNotSupportedException()
 
-  def getParentLogger: Logger = {
-    try driver.asInstanceOf[ { def getParentLogger(): Logger }].getParentLogger catch {
+  def getParentLogger: Logger =
+    try driver.asInstanceOf[ { def getParentLogger(): Logger }].getParentLogger catch
       case _: NoSuchMethodException =>
         throw new SQLFeatureNotSupportedException()
-    }
-  }
 
   def isWrapperFor(iface: Class[_]): Boolean = iface.isInstance(this)
 
@@ -156,4 +142,3 @@ class DriverDataSource(
     else
       throw new SQLException(
           getClass.getName + " is not a wrapper for " + iface)
-}

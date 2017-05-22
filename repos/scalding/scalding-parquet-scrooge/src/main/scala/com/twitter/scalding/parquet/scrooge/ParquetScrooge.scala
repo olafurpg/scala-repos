@@ -6,14 +6,12 @@ import com.twitter.scalding.parquet.thrift.ParquetThriftBase
 import com.twitter.scalding.source.{DailySuffixSource, HourlySuffixSource}
 import com.twitter.scrooge.ThriftStruct
 
-trait ParquetScrooge[T <: ThriftStruct] extends ParquetThriftBase[T] {
+trait ParquetScrooge[T <: ThriftStruct] extends ParquetThriftBase[T]
 
-  override def hdfsScheme = {
+  override def hdfsScheme =
     // See docs in Parquet346ScroogeScheme
     val scheme = new Parquet346ScroogeScheme[T](this.config)
     HadoopSchemeInstance(scheme.asInstanceOf[Scheme[_, _, _, _, _]])
-  }
-}
 
 class DailySuffixParquetScrooge[T <: ThriftStruct](
     path: String, dateRange: DateRange)(implicit override val mf: Manifest[T])

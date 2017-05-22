@@ -12,14 +12,14 @@ import org.scalatest.junit.JUnitRunner
 
 @Ignore
 @RunWith(classOf[JUnitRunner])
-final class SetClientIntegrationSuite extends RedisClientTest {
+final class SetClientIntegrationSuite extends RedisClientTest
 
   private[this] val oneElemAdded = 1
   private[this] val oneElemAddErrorMessage = "Could not add one element"
   private[this] val key = string2ChanBuf("member")
 
-  test("Correctly add, then pop members of a set", RedisTest, ClientTest) {
-    withRedisClient { client =>
+  test("Correctly add, then pop members of a set", RedisTest, ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.sAdd(key, List(bar))) == oneElemAdded,
              oneElemAddErrorMessage)
       assert(Await.result(client.sPop(key)) == Some(bar),
@@ -29,13 +29,11 @@ final class SetClientIntegrationSuite extends RedisClientTest {
              oneElemAddErrorMessage)
       assert(Await.result(client.sPop(key)) == Some(baz),
              "Could not remove baz")
-    }
-  }
 
   test("Correctly add, then pop members from a set while counting them",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.sCard(key)) == 0)
       assert(Await.result(client.sAdd(key, List(bar))) == oneElemAdded,
              oneElemAddErrorMessage)
@@ -49,13 +47,11 @@ final class SetClientIntegrationSuite extends RedisClientTest {
       assert(Await.result(client.sCard(key)) == 1)
       Await.result(client.sPop(key))
       assert(Await.result(client.sCard(key)) == 0)
-    }
-  }
 
   test("Correctly add and pop members from a set, while looking at the set",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.sAdd(key, List(foo))) == oneElemAdded,
              oneElemAddErrorMessage)
       assert(Await.result(client.sIsMember(key, foo)) == true,
@@ -76,14 +72,12 @@ final class SetClientIntegrationSuite extends RedisClientTest {
              "Baz was found in the set")
       assert(Await.result(client.sIsMember(key, foo)) == false,
              "Foo was found in the set")
-    }
-  }
 
   test(
       "Correctly add, examine members of a set, then pop them off and reexamine",
       RedisTest,
-      ClientTest) {
-    withRedisClient { client =>
+      ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.sAdd(key, List(moo))) == oneElemAdded,
              oneElemAddErrorMessage)
       assert(Await.result(client.sAdd(key, List(boo))) == oneElemAdded,
@@ -97,13 +91,11 @@ final class SetClientIntegrationSuite extends RedisClientTest {
       Await.result(client.sPop(key))
       assert(Await.result(client.sMembers(key)) == CollectionSet(),
              "Collection set was not EMPTY")
-    }
-  }
 
   test("Correctly add members to a set, then remove them",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.sAdd(key, List(moo))) == oneElemAdded,
              oneElemAddErrorMessage)
       assert(Await.result(client.sAdd(key, List(boo))) == oneElemAdded,
@@ -115,22 +107,19 @@ final class SetClientIntegrationSuite extends RedisClientTest {
              "Could not remove one Element")
       assert(Await.result(client.sRem(key, List(moo))) == 0,
              "Removed an element when it should " + "not have been possible")
-    }
-  }
 
   test("Correctly add member to a set, and return random",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val allMembers = Seq(foo, bar)
       val empty = Await.result(client.sRandMember(key))
       assert(empty.size == 0, "The empty set was not empty!")
 
       allMembers.foreach(m =>
-            {
           assert(Await.result(client.sAdd(key, List(m))) == oneElemAdded,
                  oneElemAddErrorMessage)
-      })
+      )
 
       val oneMember = Await.result(client.sRandMember(key))
       assert(oneMember.size == 1,
@@ -150,11 +139,9 @@ final class SetClientIntegrationSuite extends RedisClientTest {
 
       val negMembers = Await.result(client.sRandMember(key, count = Some(-4)))
       assert(negMembers.size == 4, "The set did not handle a negative member")
-    }
-  }
 
-  test("Correctly perform set intersection variations", RedisTest, ClientTest) {
-    withRedisClient { client =>
+  test("Correctly perform set intersection variations", RedisTest, ClientTest)
+    withRedisClient  client =>
       val a = StringToChannelBuffer("a")
       val b = StringToChannelBuffer("b")
       val c = StringToChannelBuffer("c")
@@ -185,13 +172,8 @@ final class SetClientIntegrationSuite extends RedisClientTest {
       assert(fooMembers forall (m => fooInter.contains(m)))
 
       // At least one non-empty key is required
-      intercept[ClientError] {
+      intercept[ClientError]
         Await.result(client.sInter(Seq()))
-      }
 
-      intercept[ClientError] {
+      intercept[ClientError]
         Await.result(client.sInter(Seq(StringToChannelBuffer(""))))
-      }
-    }
-  }
-}

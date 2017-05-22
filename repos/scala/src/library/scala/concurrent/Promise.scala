@@ -25,7 +25,7 @@ import scala.util.{Try, Success, Failure}
   *  @define nonDeterministic
   *  Note: Using this method may result in non-deterministic concurrent programs.
   */
-trait Promise[T] {
+trait Promise[T]
 
   /** Future containing the value of this promise.
     */
@@ -68,13 +68,11 @@ trait Promise[T] {
     *
     *  @return   This promise
     */
-  final def tryCompleteWith(other: Future[T]): this.type = {
-    if (other ne this.future) {
+  final def tryCompleteWith(other: Future[T]): this.type =
+    if (other ne this.future)
       // this tryCompleteWith this doesn't make much sense
       other.onComplete(this tryComplete _)(Future.InternalCallbackExecutor)
-    }
     this
-  }
 
   /** Completes the promise with a value.
     *
@@ -112,9 +110,8 @@ trait Promise[T] {
     */
   def tryFailure(@deprecatedName('t) cause: Throwable): Boolean =
     tryComplete(Failure(cause))
-}
 
-object Promise {
+object Promise
 
   /** Creates a promise object which can be completed with a value.
     *
@@ -144,4 +141,3 @@ object Promise {
     */
   def fromTry[T](result: Try[T]): Promise[T] =
     impl.Promise.KeptPromise[T](result)
-}

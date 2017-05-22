@@ -47,11 +47,10 @@ import scala.annotation.{Annotation, StaticAnnotation}
   *
   *@author dlwh
   **/
-class expand extends Annotation with StaticAnnotation {
+class expand extends Annotation with StaticAnnotation
   def macroTransform(annottees: Any*): Any = macro expand.expandImpl
-}
 
-object expand {
+object expand
 
   /** Args are put on type arguments, and the cross product of all types that are so annotated
     * are instantiated.
@@ -69,9 +68,9 @@ object expand {
   /** \@sequence[T](args) associates the term parameter's values with the type argument indicated. */
   class sequence[T](args: Any*) extends Annotation with StaticAnnotation
 
-  def expandImpl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] = {
+  def expandImpl(c: Context)(annottees: c.Expr[Any]*): c.Expr[Any] =
     import c.mirror.universe._
-    annottees.head.tree match {
+    annottees.head.tree match
       case tree @ DefDef(mods, name, targs, vargs, tpt, rhs) =>
         val (typesToExpand, typesLeftAbstract) =
           targs.partition(shouldExpand(c)(_))
@@ -79,10 +78,10 @@ object expand {
         val exclusions = getExclusions(c)(mods, targs.map(_.name))
         val shouldValify = checkValify(c)(mods)
 
-        val typesToUnrollAs: Map[c.Name, List[c.Type]] = typesToExpand.map {
+        val typesToUnrollAs: Map[c.Name, List[c.Type]] = typesToExpand.map
           td =>
             (td.name: Name) -> typeMappings(c)(td)
-        }.toMap
+        .toMap
 
         val (valsToExpand, valsToLeave) =
           vargs.map(_.partition(shouldExpandVarg(c)(_))).unzip
@@ -91,11 +90,11 @@ object expand {
 
         val configurations =
           makeTypeMaps(c)(typesToUnrollAs).filterNot(exclusions.toSet)
-        val valExpansions = valsToExpand2.map { v =>
+        val valExpansions = valsToExpand2.map  v =>
           v.name -> solveSequence(c)(v, typesToUnrollAs)
-        }.asInstanceOf[List[(c.Name, (c.Name, Map[c.Type, c.Tree]))]].toMap
+        .asInstanceOf[List[(c.Name, (c.Name, Map[c.Type, c.Tree]))]].toMap
 
-        val newDefs = configurations.map { typeMap =>
+        val newDefs = configurations.map  typeMap =>
           val grounded = substitute(c)(typeMap, valExpansions, rhs)
           val newvargs = valsToLeave
             .filterNot(_.isEmpty)
@@ -103,7 +102,7 @@ object expand {
                       .asInstanceOf[ValDef]))
           val newtpt = substitute(c)(typeMap, valExpansions, tpt)
           val newName = newTermName(mkName(c)(name, typeMap))
-          if (shouldValify) {
+          if (shouldValify)
             if (typesLeftAbstract.nonEmpty)
               c.error(tree.pos,
                       "Can't valify: Not all types were grounded: " +
@@ -113,47 +112,39 @@ object expand {
                       "Can't valify: Not all arguments were grounded: " +
                       newvargs.map(_.mkString(", ")).mkString("(", ")(", ")"))
             ValDef(mods, newName, newtpt, grounded)
-          } else {
+          else
             val newTargs = typesLeftAbstract
               .map(substitute(c)(typeMap, valExpansions, _))
               .asInstanceOf[List[TypeDef]]
             DefDef(mods, newName, newTargs, newvargs, newtpt, grounded)
-          }
-        }
         val ret = c.Expr(Block(newDefs.toList, Literal(Constant(()))))
         ret
       case _ => ???
-    }
-  }
 
   private def mkName(c: Context)(
-      name: c.Name, typeMap: Map[c.Name, c.Type]): String = {
-    name.toString + "_" + typeMap.map {
+      name: c.Name, typeMap: Map[c.Name, c.Type]): String =
+    name.toString + "_" + typeMap.map
       case (k, v) => v.toString.reverse.takeWhile(_ != '.').reverse
-    }.mkString("_")
-  }
+    .mkString("_")
 
   // valExpansions is a [value identifier -> (
   def substitute(c: Context)(
       typeMap: Map[c.Name, c.Type],
       valExpansions: Map[c.Name, (c.Name, Map[c.Type, c.Tree])],
-      rhs: c.mirror.universe.Tree): c.mirror.universe.Tree = {
+      rhs: c.mirror.universe.Tree): c.mirror.universe.Tree =
     import c.mirror.universe._
 
-    class InlineTerm(name: TermName, value: Tree) extends Transformer {
-      override def transform(tree: Tree): Tree = tree match {
+    class InlineTerm(name: TermName, value: Tree) extends Transformer
+      override def transform(tree: Tree): Tree = tree match
         case Ident(`name`) => value
         case _ => super.transform(tree)
-      }
-    }
 
-    val termTypeMap = typeMap.map {
+    val termTypeMap = typeMap.map
       case (name, tpe) =>
         (name.toTermName: c.Name) -> Ident(tpe.typeSymbol.name.toTermName)
-    }
 
-    new Transformer() {
-      override def transform(tree: Tree): Tree = tree match {
+    new Transformer()
+      override def transform(tree: Tree): Tree = tree match
         case Ident(x) if typeMap.contains(x) =>
           TypeTree(typeMap(x))
         case Ident(x) if termTypeMap.contains(x) =>
@@ -161,43 +152,36 @@ object expand {
         case Apply(aa @ Ident(x), args) if valExpansions.contains(x) =>
           val (tname, tmap) = valExpansions(x)
           val mappedTree = tmap(typeMap(tname))
-          mappedTree match {
+          mappedTree match
             case fn @ Function(fargs, body) =>
-              (fargs zip args).foldLeft(body) { (currentBody, pair) =>
+              (fargs zip args).foldLeft(body)  (currentBody, pair) =>
                 val (fa, a) = pair
                 new InlineTerm(fa.name, a).transform(currentBody)
-              }
             case x => x
-          }
         case Ident(x) if valExpansions.contains(x) =>
           val (tname, tmap) = valExpansions(x)
           tmap(typeMap(tname))
         case _ =>
           super.transform(tree)
-      }
-    } transform rhs
-  }
+    transform rhs
 
   /** for a valdef with a [[breeze.macros.expand.sequence]] annotation, converts the sequence of associations to a Map */
   private def solveSequence(context: Context)(
       v: context.mirror.universe.ValDef,
       typeMappings: Map[context.Name, List[context.Type]])
-    : (context.Name, Map[context.Type, context.Tree]) = {
+    : (context.Name, Map[context.Type, context.Tree]) =
     import context.mirror.universe._
-    val x = v.mods.annotations.collectFirst {
+    val x = v.mods.annotations.collectFirst
       case x @ q"new expand.sequence[${ Ident(nme2) }](...$args)" =>
-        if (args.flatten.length != typeMappings(nme2).length) {
+        if (args.flatten.length != typeMappings(nme2).length)
           context.error(
               x.pos,
               s"@sequence arguments list does not match the expand.args for $nme2")
-        }
         val predef = context.mirror.staticModule("scala.Predef").asModule
         val missing = Select(Ident(predef), newTermName("???"))
         nme2 -> (typeMappings(nme2) zip args.flatten).toMap
           .withDefaultValue(missing)
-    }
     x.get
-  }
 
   /**
     * Returns the set of all types that this type should be unrolled as.
@@ -206,38 +190,33 @@ object expand {
     * @return
     */
   private def typeMappings(c: Context)(
-      td: c.mirror.universe.TypeDef): List[c.mirror.universe.Type] = {
+      td: c.mirror.universe.TypeDef): List[c.mirror.universe.Type] =
     import c.mirror.universe._
 
-    val mods = td.mods.annotations.collect {
+    val mods = td.mods.annotations.collect
       case tree @ q"new expand.args(...$args)" =>
         val flatArgs: Seq[Tree] = args.flatten
-        flatArgs.map(c.typeCheck(_)).map { tree =>
-          try {
+        flatArgs.map(c.typeCheck(_)).map  tree =>
+          try
             tree.symbol.asModule.companionSymbol.asType.toType
-          } catch {
+          catch
             case ex: Exception =>
               c.abort(
                   tree.pos,
                   s"${tree.symbol} does not have a companion. Is it maybe an alias?")
-          }
-        }
-    }.flatten
+    .flatten
     mods
-  }
 
   private def makeTypeMaps(c: Context)(
-      types: Map[c.Name, Seq[c.Type]]): Seq[Map[c.Name, c.Type]] = {
-    types.foldLeft(Seq(Map.empty[c.Name, c.Type])) { (acc, pair) =>
+      types: Map[c.Name, Seq[c.Type]]): Seq[Map[c.Name, c.Type]] =
+    types.foldLeft(Seq(Map.empty[c.Name, c.Type]))  (acc, pair) =>
       val (nme, types) = pair
       for (t <- types; map <- acc) yield map + (nme -> t)
-    }
-  }
 
   private def getExclusions(c: Context)(
-      mods: c.Modifiers, targs: Seq[c.Name]): Seq[Map[c.Name, c.Type]] = {
+      mods: c.Modifiers, targs: Seq[c.Name]): Seq[Map[c.Name, c.Type]] =
     import c.mirror.universe._
-    mods.annotations.collect {
+    mods.annotations.collect
       case t @ q"new expand.exclude(...$args)" =>
         for (aa <- args) if (aa.length != targs.length)
           c.error(
@@ -247,31 +226,24 @@ object expand {
               (targs zip aa
                     .map(c.typeCheck(_))
                     .map(_.symbol.asModule.companionSymbol.asType.toType)).toMap)
-    }.flatten.toSeq
-  }
+    .flatten.toSeq
 
-  private def checkValify(c: Context)(mods: c.Modifiers) = {
+  private def checkValify(c: Context)(mods: c.Modifiers) =
     import c.mirror.universe._
-    mods.annotations.collectFirst {
+    mods.annotations.collectFirst
       case q"new expand.valify" => true
-    }.getOrElse(false)
-  }
+    .getOrElse(false)
 
   private def shouldExpand(c: Context)(
-      td: c.mirror.universe.TypeDef): Boolean = {
+      td: c.mirror.universe.TypeDef): Boolean =
     import c.mirror.universe._
-    td.mods.annotations.exists {
+    td.mods.annotations.exists
       case q"new expand.args(...$args)" => true
       case _ => false
-    }
-  }
 
   private def shouldExpandVarg(c: Context)(
-      td: c.mirror.universe.ValDef): Boolean = {
+      td: c.mirror.universe.ValDef): Boolean =
     import c.mirror.universe._
-    td.mods.annotations.exists {
+    td.mods.annotations.exists
       case x @ q"new expand.sequence[..$targs](...$args)" => true
       case _ => false
-    }
-  }
-}

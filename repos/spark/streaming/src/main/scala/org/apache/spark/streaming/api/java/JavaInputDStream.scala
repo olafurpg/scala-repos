@@ -29,14 +29,12 @@ class JavaInputDStream[T](val inputDStream: InputDStream[T])(
     implicit override val classTag: ClassTag[T])
     extends JavaDStream[T](inputDStream) {}
 
-object JavaInputDStream {
+object JavaInputDStream
 
   /**
     * Convert a scala [[org.apache.spark.streaming.dstream.InputDStream]] to a Java-friendly
     * [[org.apache.spark.streaming.api.java.JavaInputDStream]].
     */
   implicit def fromInputDStream[T : ClassTag](
-      inputDStream: InputDStream[T]): JavaInputDStream[T] = {
+      inputDStream: InputDStream[T]): JavaInputDStream[T] =
     new JavaInputDStream[T](inputDStream)
-  }
-}

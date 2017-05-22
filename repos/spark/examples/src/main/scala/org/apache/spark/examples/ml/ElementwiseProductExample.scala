@@ -25,8 +25,8 @@ import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object ElementwiseProductExample {
-  def main(args: Array[String]): Unit = {
+object ElementwiseProductExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("ElementwiseProductExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -48,6 +48,4 @@ object ElementwiseProductExample {
     transformer.transform(dataFrame).show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

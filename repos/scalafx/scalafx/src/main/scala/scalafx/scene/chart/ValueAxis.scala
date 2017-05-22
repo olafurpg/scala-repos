@@ -35,46 +35,38 @@ import scalafx.beans.property.{BooleanProperty, DoubleProperty, IntegerProperty,
 import scalafx.delegate.SFXDelegate
 import scalafx.util.StringConverter
 
-object ValueAxis {
+object ValueAxis
   implicit def sfxValueAxis2jfx[T <: Number](
       v: ValueAxis[T]): jfxsc.ValueAxis[T] =
     if (v != null) v.delegate else null
-}
 
 abstract class ValueAxis[T <: Number](
     override val delegate: jfxsc.ValueAxis[T])
-    extends Axis[T](delegate) with SFXDelegate[jfxsc.ValueAxis[T]] {
+    extends Axis[T](delegate) with SFXDelegate[jfxsc.ValueAxis[T]]
 
   def lowerBound: DoubleProperty = delegate.lowerBoundProperty
-  def lowerBound_=(v: Double) {
+  def lowerBound_=(v: Double)
     lowerBound() = v
-  }
 
   def minorTickCount: IntegerProperty = delegate.minorTickCountProperty
-  def minorTickCount_=(v: Int) {
+  def minorTickCount_=(v: Int)
     minorTickCount() = v
-  }
 
   def minorTickLength: DoubleProperty = delegate.minorTickLengthProperty
-  def minorTickLength_=(v: Double) {
+  def minorTickLength_=(v: Double)
     minorTickLength() = v
-  }
 
   def minorTickVisible: BooleanProperty = delegate.minorTickVisibleProperty
-  def minorTickVisible_=(v: Boolean) {
+  def minorTickVisible_=(v: Boolean)
     minorTickVisible() = v
-  }
 
   def scale: ReadOnlyDoubleProperty = delegate.scaleProperty
 
   def tickLabelFormatter: ObjectProperty[jfxu.StringConverter[T]] =
     delegate.tickLabelFormatterProperty
-  def tickLabelFormatter_=(v: StringConverter[T]) {
+  def tickLabelFormatter_=(v: StringConverter[T])
     tickLabelFormatter() = v
-  }
 
   def upperBound: DoubleProperty = delegate.upperBoundProperty
-  def upperBound_=(v: Double) {
+  def upperBound_=(v: Double)
     upperBound() = v
-  }
-}

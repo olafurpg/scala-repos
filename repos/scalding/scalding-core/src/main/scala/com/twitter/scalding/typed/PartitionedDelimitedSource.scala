@@ -62,24 +62,22 @@ case class PartitionedDelimitedSource[P, T](
                           val valueConverter: TupleConverter[T],
                           val partitionSetter: TupleSetter[P],
                           val partitionConverter: TupleConverter[P])
-    extends PartitionSchemed[P, T] with Serializable {
+    extends PartitionSchemed[P, T] with Serializable
   assert(
       fields.size == valueSetter.arity,
       "The number of fields needs to be the same as the arity of the value setter")
 
-  val types: Array[Class[_]] = {
-    if (classOf[scala.Product].isAssignableFrom(mt.runtimeClass)) {
+  val types: Array[Class[_]] =
+    if (classOf[scala.Product].isAssignableFrom(mt.runtimeClass))
       //Assume this is a Tuple:
       mt.typeArguments.map { _.runtimeClass }.toArray
-    } else {
+    else
       //Assume there is only a single item
       Array(mt.runtimeClass)
-    }
-  }
 
   // Create the underlying scheme and explicitly set the sink fields to be only the specified fields
   // see sinkFields in PartitionSchemed for other half of this work around.
-  override def hdfsScheme = {
+  override def hdfsScheme =
     val scheme = HadoopSchemeInstance(
         new TextDelimited(fields,
                           null,
@@ -92,24 +90,21 @@ case class PartitionedDelimitedSource[P, T](
                           safe).asInstanceOf[Scheme[_, _, _, _, _]])
     scheme.setSinkFields(fields)
     scheme
-  }
 
   // Create the underlying scheme and explicitly set the sink fields to be only the specified fields
   // see sinkFields in PartitionSchemed for other half of this work around.
-  override def localScheme = {
+  override def localScheme =
     val scheme = new LocalTextDelimited(
         fields, skipHeader, writeHeader, separator, strict, quote, types, safe)
       .asInstanceOf[Scheme[Properties, InputStream, OutputStream, _, _]]
     scheme.setSinkFields(fields)
     scheme
-  }
-}
 
 /**
   * Trait to assist with creating objects such as [[PartitionedTsv]] to read from separated files.
   * Override separator, skipHeader, writeHeader as needed.
   */
-trait PartitionedDelimited extends Serializable {
+trait PartitionedDelimited extends Serializable
   def separator: String
 
   def apply[P : Manifest : TupleConverter : TupleSetter,
@@ -127,24 +122,19 @@ trait PartitionedDelimited extends Serializable {
       template: String,
       fields: Fields): PartitionedDelimitedSource[P, T] =
     PartitionedDelimitedSource(path, template, separator, fields)
-}
 
 /** Partitioned typed tab separated source.*/
-object PartitionedTsv extends PartitionedDelimited {
+object PartitionedTsv extends PartitionedDelimited
   val separator = "\t"
-}
 
 /** Partitioned typed commma separated source.*/
-object PartitionedCsv extends PartitionedDelimited {
+object PartitionedCsv extends PartitionedDelimited
   val separator = ","
-}
 
 /** Partitioned typed pipe separated source.*/
-object PartitionedPsv extends PartitionedDelimited {
+object PartitionedPsv extends PartitionedDelimited
   val separator = "|"
-}
 
 /** Partitioned typed `\1` separated source (commonly used by Pig).*/
-object PartitionedOsv extends PartitionedDelimited {
+object PartitionedOsv extends PartitionedDelimited
   val separator = "\u0001"
-}

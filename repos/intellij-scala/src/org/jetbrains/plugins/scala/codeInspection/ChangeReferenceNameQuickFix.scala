@@ -10,8 +10,6 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class ChangeReferenceNameQuickFix(
     name: String, ref: ScReferenceElement, newRefName: String)
-    extends AbstractFixOnPsiElement(name, ref) {
-  override def doApplyFix(project: Project): Unit = {
+    extends AbstractFixOnPsiElement(name, ref)
+  override def doApplyFix(project: Project): Unit =
     getElement.handleElementRename(newRefName)
-  }
-}

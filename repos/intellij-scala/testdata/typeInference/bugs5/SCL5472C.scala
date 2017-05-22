@@ -1,4 +1,4 @@
-object SCL5472C {
+object SCL5472C
   class ParamDefAux[T]
   implicit def forTuple[T](
       implicit x: ParamDefAux[(T, T, T)]): ParamDefAux[(T, T)] =
@@ -12,5 +12,4 @@ object SCL5472C {
 
   /*start*/
   foo /*end*/
-}
 //Int

@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object PomTest extends Build {
+object PomTest extends Build
   override def settings =
     super.settings :+ (TaskKey[Unit]("check-pom") <<= checkPom)
 
@@ -13,19 +13,15 @@ object PomTest extends Build {
     (publishArtifact in Compile := false)
 
   def art(p: ProjectReference) = makePom in p
-  def checkPom = (art(subJar), art(subWar), art(subParent)) map {
+  def checkPom = (art(subJar), art(subWar), art(subParent)) map
     (jar, war, pom) =>
       checkPackaging(jar, "jar")
       checkPackaging(war, "war")
       checkPackaging(pom, "pom")
-  }
-  def checkPackaging(pom: File, expected: String) = {
+  def checkPackaging(pom: File, expected: String) =
     val packaging = (xml.XML.loadFile(pom) \\ "packaging").text
     if (packaging != expected)
       sys.error("Incorrect packaging for '" + pom + "'.  Expected '" +
           expected + "', but got '" + packaging + "'")
-  }
-  def warArtifact = artifact in (Compile, packageBin) ~= {
+  def warArtifact = artifact in (Compile, packageBin) ~=
     _.copy(`type` = "war", extension = "war")
-  }
-}

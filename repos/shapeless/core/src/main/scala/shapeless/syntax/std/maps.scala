@@ -22,11 +22,10 @@ import shapeless.ops.maps.FromMap
 /**
   * Conversions between `Map` and `Records`.
   */
-object maps {
+object maps
   implicit def mapOps[K, V](m: Map[K, V]) = new MapOps[K, V](m)
-}
 
-final class MapOps[K, V](m: Map[K, V]) {
+final class MapOps[K, V](m: Map[K, V])
 
   /**
     * Extracts value from map to form Record L. Map must contain all the keys and the values
@@ -36,4 +35,3 @@ final class MapOps[K, V](m: Map[K, V]) {
     * @return Some[L] with values from Map or None if map does not match L
     */
   def toRecord[R <: HList](implicit fm: FromMap[R]): Option[R] = fm(m)
-}

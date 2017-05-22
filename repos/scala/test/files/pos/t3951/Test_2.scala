@@ -1,4 +1,3 @@
-object Test {
+object Test
   new Coll
   trait T extends StatDoc
-}

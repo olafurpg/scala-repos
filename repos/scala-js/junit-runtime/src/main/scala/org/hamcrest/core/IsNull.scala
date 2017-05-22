@@ -9,15 +9,14 @@ import org.hamcrest.Matcher
 
 import org.hamcrest.core.IsNot.not
 
-class IsNull[T] extends BaseMatcher[T] {
+class IsNull[T] extends BaseMatcher[T]
   override def matches(o: AnyRef): Boolean =
     o == null
 
   override def describeTo(description: Description): Unit =
     description.appendText("null")
-}
 
-object IsNull {
+object IsNull
   def nullValue(): Matcher[AnyRef] =
     new IsNull[AnyRef]
 
@@ -29,4 +28,3 @@ object IsNull {
 
   def notNullValue[T](typ: Class[T]): Matcher[T] =
     not(nullValue(typ))
-}

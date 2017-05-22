@@ -42,11 +42,9 @@ class TransferModeSpec
     extends SFXEnumDelegateSpec[jfxsi.TransferMode, TransferMode](
         javaClass = classOf[jfxsi.TransferMode],
         scalaClass = classOf[TransferMode],
-        companion = TransferMode) {
+        companion = TransferMode)
 
-  it should "contain all static fields" in {
+  it should "contain all static fields" in
     TransferMode.ANY should be(jfxsi.TransferMode.ANY)
     TransferMode.COPY_OR_MOVE should be(jfxsi.TransferMode.COPY_OR_MOVE)
     TransferMode.NONE should be(jfxsi.TransferMode.NONE)
-  }
-}

@@ -17,7 +17,7 @@ import scala.reflect.ClassTag
   * instead of this.
   *
   */
-trait Injector {
+trait Injector
 
   /**
     * Get an instance of the given class from the injector.
@@ -33,12 +33,11 @@ trait Injector {
     * Get an instance bound to the given binding key.
     */
   def instanceOf[T](key: BindingKey[T]): T
-}
 
 /**
   * An injector that simply creates a new instance of the passed in classes using the classes no-arg constructor.
   */
-object NewInstanceInjector extends Injector {
+object NewInstanceInjector extends Injector
 
   /**
     * Get an instance of the given class from the injector.
@@ -55,7 +54,6 @@ object NewInstanceInjector extends Injector {
     * Get an instance bound to the given binding key.
     */
   def instanceOf[T](key: BindingKey[T]) = instanceOf(key.clazz)
-}
 
 /**
   * A simple map backed injector.
@@ -78,7 +76,7 @@ object NewInstanceInjector extends Injector {
   */
 class SimpleInjector(
     fallback: Injector, components: Map[Class[_], Any] = Map.empty)
-    extends Injector {
+    extends Injector
 
   /**
     * Get an instance of the given class from the injector.
@@ -102,4 +100,3 @@ class SimpleInjector(
     */
   def +[T](component: T)(implicit ct: ClassTag[T]) =
     new SimpleInjector(fallback, components + (ct.runtimeClass -> component))
-}

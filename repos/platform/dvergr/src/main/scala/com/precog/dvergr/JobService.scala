@@ -55,7 +55,7 @@ import scalaz._
 // Job service needs to shutdown whatever at the end.
 
 trait JobService
-    extends BlueEyesServiceBuilder with HttpRequestHandlerCombinators {
+    extends BlueEyesServiceBuilder with HttpRequestHandlerCombinators
 
   def clock: Clock
 
@@ -77,65 +77,48 @@ trait JobService
   // Ugh. Why do I need this?
   implicit def byteArray2chunk(
       r: Future[HttpResponse[Array[Byte]]]): Future[HttpResponse[ByteChunk]] =
-    r map { resp =>
+    r map  resp =>
       resp.copy(content = resp.content map (ByteChunk(_)))
-    }
 
   implicit def executionContext: ExecutionContext
   implicit def M: Monad[Future]
 
-  val jobService = this.service("jobs", "1.0") {
-    requestLogging(timeout) {
-      help("/docs/api") {
-        healthMonitor("/health", timeout, List(eternity)) {
+  val jobService = this.service("jobs", "1.0")
+    requestLogging(timeout)
+      help("/docs/api")
+        healthMonitor("/health", timeout, List(eternity))
           monitor => context =>
-            startup {
+            startup
               import context._
-              M.point {
+              M.point
                 val (resource, jobs) = jobManager(config)
                 JobServiceState(resource, jobs, authService(config), clock)
-              }
-            } -> request {
+            -> request
               case JobServiceState(_, jobs, auth, clock) =>
                 import CORSHeaderHandler.allowOrigin
-                allowOrigin("*", executionContext) {
+                allowOrigin("*", executionContext)
                   // Content type is set by the ResultHandler
-                  path("/jobs/") {
-                    path("'jobId") {
-                      path("/result") {
+                  path("/jobs/")
+                    path("'jobId")
+                      path("/result")
                         put(new CreateResultHandler(jobs)) ~ get(
                             new GetResultHandler(jobs))
-                      }
-                    }
-                  } ~ jsonp {
-                    produce(MimeTypes.application / MimeTypes.json) {
-                      path("/jobs/") {
+                  ~ jsonp
+                    produce(MimeTypes.application / MimeTypes.json)
+                      path("/jobs/")
                         get(new ListJobsHandler(jobs)) ~ post(
                             new CreateJobHandler(jobs, auth, clock)) ~ path(
-                            "'jobId") {
-                          get(new GetJobHandler(jobs)) ~ path("/status") {
+                            "'jobId")
+                          get(new GetJobHandler(jobs)) ~ path("/status")
                             get(new GetJobStatusHandler(jobs)) ~ put(
                                 new UpdateJobStatusHandler(jobs))
-                          } ~ path("/state") {
+                          ~ path("/state")
                             get(new GetJobStateHandler(jobs)) ~ put(
                                 new PutJobStateHandler(jobs))
-                          } ~ path("/messages/") {
+                          ~ path("/messages/")
                             get(new ListChannelsHandler(jobs)) ~ path(
-                                "'channel") {
+                                "'channel")
                               post(new AddMessageHandler(jobs)) ~ get(
                                   new ListMessagesHandler(jobs))
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-            } -> shutdown { state =>
+            -> shutdown  state =>
               close(state.resource)
-            }
-        }
-      }
-    }
-  }
-}

@@ -36,7 +36,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @since 8.0
   */
-object TreeTablePosition {
+object TreeTablePosition
 
   /**
     * Converts a ScalaFX TreeTablePosition to its JavaFX couterpart.
@@ -49,7 +49,6 @@ object TreeTablePosition {
   implicit def sfxTreeTablePosition2jfx[S, T](
       ttp: TreeTablePosition[S, T]): jfxsc.TreeTablePosition[S, T] =
     if (ttp != null) ttp.delegate else null
-}
 
 /**
   * Wraps a $JFX $URL0 $TTP]].
@@ -68,7 +67,7 @@ object TreeTablePosition {
 class TreeTablePosition[S, T](
     override val delegate: jfxsc.TreeTablePosition[S, T])
     extends TablePositionBase[jfxsc.TreeTableColumn[S, T]](delegate)
-    with SFXDelegate[jfxsc.TreeTablePosition[S, T]] {
+    with SFXDelegate[jfxsc.TreeTablePosition[S, T]]
 
   /**
     * Constructs a TreeTablePosition instance to represent the given row/column position in the
@@ -97,4 +96,3 @@ class TreeTablePosition[S, T](
     * @see $URL0#getTreeItem-- $ORIGINALDOC
     */
   def treeItem: jfxsc.TreeItem[S] = delegate.getTreeItem
-}

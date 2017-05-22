@@ -24,7 +24,7 @@ import scala.collection.convert.wrapAsJava
   * User: Dmitry.Naydanov
   * Date: 11.04.14.
   */
-object WorksheetDiffSplitters {
+object WorksheetDiffSplitters
   private val COLOR1 = Color.GRAY
   private val COLOR2 = Color.LIGHT_GRAY
 
@@ -32,13 +32,12 @@ object WorksheetDiffSplitters {
                            viewerEditor: Editor,
                            intervals: Iterable[(Int, Int)],
                            changes: Iterable[(Int, Int)],
-                           prop: Float) = {
+                           prop: Float) =
     new SimpleWorksheetSplitter(
         originalEditor, viewerEditor, intervals, changes, prop)
-  }
 
   class WorksheetEditingSides(originalEditor: Editor, viewerEditor: Editor)
-      extends EditingSides {
+      extends EditingSides
     private val left = new WeakReference(originalEditor)
     private val right = new WeakReference(viewerEditor)
 
@@ -46,65 +45,58 @@ object WorksheetDiffSplitters {
                                                    viewerEditor.getDocument,
                                                    originalEditor.getProject)
 
-    override def getEditor(side: FragmentSide) = side match {
+    override def getEditor(side: FragmentSide) = side match
       case FragmentSide.SIDE1 => left.get()
       case FragmentSide.SIDE2 => right.get()
-    }
 
     override def getLineBlocks: LineBlocks = lineBlocks
-  }
 
   private def createLineBlocks(
       original: Document, viewer: Document, project: Project) =
     ChangeList.build(original, viewer, project).getLineBlocks
 
-  private def getVisibleInterval(editor: Editor) = {
+  private def getVisibleInterval(editor: Editor) =
     val line = editor
       .xyToLogicalPosition(
           new Point(0, editor.getScrollingModel.getVerticalScrollOffset))
       .line
       (line, editor.getComponent.getHeight / editor.getLineHeight + 1)
-  }
 
   class SimpleWorksheetSplitter(editor1: Editor,
                                 editor2: Editor,
                                 private var intervals: Iterable[(Int, Int)],
                                 private var changes: Iterable[(Int, Int)],
                                 prop: Float)
-      extends Splitter(false, prop) with DiffSplitterI {
+      extends Splitter(false, prop) with DiffSplitterI
     setDividerWidth(30)
     setFirstComponent(editor1.getComponent)
     setSecondComponent(editor2.getComponent)
     setHonorComponentsMinimumSize(false)
 
-    getDivider.addMouseListener(new MouseAdapter {
-      override def mouseReleased(mouseEvent: MouseEvent) {
+    getDivider.addMouseListener(new MouseAdapter
+      override def mouseReleased(mouseEvent: MouseEvent)
         val f = getProportion
 
         Option(
-            PsiDocumentManager.getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach {
+            PsiDocumentManager.getInstance(editor1.getProject) getCachedPsiFile editor1.getDocument) foreach
           case file: ScalaFile =>
             WorksheetEditorPrinter.saveOnlyRatio(file, f)
           case _ =>
-        }
-      }
-    })
+    )
 
-    private val visibleAreaListener = new VisibleAreaListener {
+    private val visibleAreaListener = new VisibleAreaListener
       override def visibleAreaChanged(e: VisibleAreaEvent): Unit =
         redrawDiffs()
-    }
 
     def getIntervals = intervals
 
     def getChanges = changes
 
     def update(newIntervals: Iterable[(Int, Int)],
-               newChanges: Iterable[(Int, Int)]) = {
+               newChanges: Iterable[(Int, Int)]) =
       intervals = newIntervals
       changes = newChanges
       redrawDiffs()
-    }
 
     override def getComponent: JComponent = this
 
@@ -113,8 +105,8 @@ object WorksheetDiffSplitters {
 
     override def redrawDiffs(): Unit = getDivider.repaint()
 
-    override def createDivider() = new DividerImpl {
-      override def paint(g: Graphics) {
+    override def createDivider() = new DividerImpl
+      override def paint(g: Graphics)
         super.paint(g)
         val width = getWidth
         val height = getHeight
@@ -132,7 +124,7 @@ object WorksheetDiffSplitters {
         val lineHeight2 = editor2.getLineHeight
 
         val plainPolygons =
-          intervals zip changes collect {
+          intervals zip changes collect
             case ((from, to), (offset, spaces))
                 if spaces != 0 && firstVisible1 <= from &&
                 lastVisible1 >= to && firstVisible2 <= (offset - to + from) &&
@@ -146,7 +138,6 @@ object WorksheetDiffSplitters {
                   if (flag) COLOR1 else COLOR2,
                   false
               )
-          }
 
         DividerPolygon.paintPolygons(
             new util.ArrayList[DividerPolygon](
@@ -154,7 +145,3 @@ object WorksheetDiffSplitters {
             gg,
             width)
         gg.dispose()
-      }
-    }
-  }
-}

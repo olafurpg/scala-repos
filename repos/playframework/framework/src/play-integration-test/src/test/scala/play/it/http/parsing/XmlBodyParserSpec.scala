@@ -12,106 +12,85 @@ import scala.xml.NodeSeq
 import java.io.File
 import org.apache.commons.io.FileUtils
 
-object XmlBodyParserSpec extends PlaySpecification {
+object XmlBodyParserSpec extends PlaySpecification
 
-  "The XML body parser" should {
+  "The XML body parser" should
 
     def parse(xml: String,
               contentType: Option[String],
               encoding: String,
               bodyParser: BodyParser[NodeSeq] = BodyParsers.parse.tolerantXml(
-                    1048576))(implicit mat: Materializer) = {
+                    1048576))(implicit mat: Materializer) =
       await(
           bodyParser(FakeRequest().withHeaders(
                   contentType.map(CONTENT_TYPE -> _).toSeq: _*))
             .run(Source.single(ByteString(xml, encoding)))
       )
-    }
 
-    "parse XML bodies" in new WithApplication() {
-      parse("<foo>bar</foo>", Some("application/xml; charset=utf-8"), "utf-8") must beRight.like {
+    "parse XML bodies" in new WithApplication()
+      parse("<foo>bar</foo>", Some("application/xml; charset=utf-8"), "utf-8") must beRight.like
         case xml => xml.text must_== "bar"
-      }
-    }
 
-    "honour the external charset for application sub types" in new WithApplication() {
+    "honour the external charset for application sub types" in new WithApplication()
       parse("<foo>bär</foo>",
             Some("application/xml; charset=iso-8859-1"),
-            "iso-8859-1") must beRight.like {
+            "iso-8859-1") must beRight.like
         case xml => xml.text must_== "bär"
-      }
       parse("<foo>bär</foo>",
             Some("application/xml; charset=utf-16"),
-            "utf-16") must beRight.like {
+            "utf-16") must beRight.like
         case xml => xml.text must_== "bär"
-      }
-    }
 
-    "honour the external charset for text sub types" in new WithApplication() {
+    "honour the external charset for text sub types" in new WithApplication()
       parse("<foo>bär</foo>",
             Some("text/xml; charset=iso-8859-1"),
-            "iso-8859-1") must beRight.like {
+            "iso-8859-1") must beRight.like
         case xml => xml.text must_== "bär"
-      }
-      parse("<foo>bär</foo>", Some("text/xml; charset=utf-16"), "utf-16") must beRight.like {
+      parse("<foo>bär</foo>", Some("text/xml; charset=utf-16"), "utf-16") must beRight.like
         case xml => xml.text must_== "bär"
-      }
-    }
 
-    "default to iso-8859-1 for text sub types" in new WithApplication() {
-      parse("<foo>bär</foo>", Some("text/xml"), "iso-8859-1") must beRight.like {
+    "default to iso-8859-1 for text sub types" in new WithApplication()
+      parse("<foo>bär</foo>", Some("text/xml"), "iso-8859-1") must beRight.like
         case xml => xml.text must_== "bär"
-      }
-    }
 
-    "default to reading the encoding from the prolog for application sub types" in new WithApplication() {
+    "default to reading the encoding from the prolog for application sub types" in new WithApplication()
       parse("""<?xml version="1.0" encoding="utf-16"?><foo>bär</foo>""",
             Some("application/xml"),
-            "utf-16") must beRight.like {
+            "utf-16") must beRight.like
         case xml => xml.text must_== "bär"
-      }
       parse("""<?xml version="1.0" encoding="iso-8859-1"?><foo>bär</foo>""",
             Some("application/xml"),
-            "iso-8859-1") must beRight.like {
+            "iso-8859-1") must beRight.like
         case xml => xml.text must_== "bär"
-      }
-    }
 
-    "default to reading the encoding from the prolog for no content type" in new WithApplication() {
+    "default to reading the encoding from the prolog for no content type" in new WithApplication()
       parse("""<?xml version="1.0" encoding="utf-16"?><foo>bär</foo>""",
             None,
-            "utf-16") must beRight.like {
+            "utf-16") must beRight.like
         case xml => xml.text must_== "bär"
-      }
       parse("""<?xml version="1.0" encoding="iso-8859-1"?><foo>bär</foo>""",
             None,
-            "iso-8859-1") must beRight.like {
+            "iso-8859-1") must beRight.like
         case xml => xml.text must_== "bär"
-      }
-    }
 
-    "accept all common xml content types" in new WithApplication() {
+    "accept all common xml content types" in new WithApplication()
       parse("<foo>bar</foo>",
             Some("application/xml; charset=utf-8"),
             "utf-8",
-            BodyParsers.parse.xml) must beRight.like {
+            BodyParsers.parse.xml) must beRight.like
         case xml => xml.text must_== "bar"
-      }
       parse("<foo>bar</foo>",
             Some("text/xml; charset=utf-8"),
             "utf-8",
-            BodyParsers.parse.xml) must beRight.like {
+            BodyParsers.parse.xml) must beRight.like
         case xml => xml.text must_== "bar"
-      }
       parse("<foo>bar</foo>",
             Some("application/xml+rdf; charset=utf-8"),
             "utf-8",
-            BodyParsers.parse.xml) must beRight.like {
+            BodyParsers.parse.xml) must beRight.like
         case xml => xml.text must_== "bar"
-      }
-    }
 
-    "reject non XML content types" in new WithApplication() {
+    "reject non XML content types" in new WithApplication()
       parse("<foo>bar</foo>",
             Some("text/plain; charset=utf-8"),
             "utf-8",
@@ -121,16 +100,14 @@ object XmlBodyParserSpec extends PlaySpecification {
             "utf-8",
             BodyParsers.parse.xml) must beLeft
       parse("<foo>bar</foo>", None, "utf-8", BodyParsers.parse.xml) must beLeft
-    }
 
-    "gracefully handle invalid xml" in new WithApplication() {
+    "gracefully handle invalid xml" in new WithApplication()
       parse("<foo",
             Some("text/xml; charset=utf-8"),
             "utf-8",
             BodyParsers.parse.xml) must beLeft
-    }
 
-    "parse XML bodies without loading in a related schema" in new WithApplication() {
+    "parse XML bodies without loading in a related schema" in new WithApplication()
       val f = File.createTempFile("xxe", ".txt")
       FileUtils.writeStringToFile(f, "I shouldn't be there!")
       f.deleteOnExit()
@@ -140,9 +117,8 @@ object XmlBodyParserSpec extends PlaySpecification {
                   |   <!ENTITY xxe SYSTEM "${f.toURI}">]><foo>hello&xxe;</foo>""".stripMargin
 
       parse(xml, Some("text/xml; charset=iso-8859-1"), "iso-8859-1") must beLeft
-    }
 
-    "parse XML bodies without loading in a related schema from a parameter" in new WithApplication() {
+    "parse XML bodies without loading in a related schema from a parameter" in new WithApplication()
       val externalParameterEntity = File.createTempFile("xep", ".dtd")
       val externalGeneralEntity = File.createTempFile("xxe", ".txt")
       FileUtils.writeStringToFile(externalParameterEntity, s"""
@@ -161,9 +137,8 @@ object XmlBodyParserSpec extends PlaySpecification {
                   |   ]><foo>hello&xxe;</foo>""".stripMargin
 
       parse(xml, Some("text/xml; charset=iso-8859-1"), "iso-8859-1") must beLeft
-    }
 
-    "gracefully fail when there are too many nested entities" in new WithApplication() {
+    "gracefully fail when there are too many nested entities" in new WithApplication()
       val nested = for (x <- 1 to 30) yield
         "<!ENTITY laugh" + x + " \"&laugh" + (x - 1) + ";&laugh" + (x - 1) +
         ";\">"
@@ -176,9 +151,8 @@ object XmlBodyParserSpec extends PlaySpecification {
                   | <billion>&laugh30;</billion>""".stripMargin
       parse(xml, Some("text/xml; charset=utf-8"), "utf-8") must beLeft
       success
-    }
 
-    "gracefully fail when an entity expands to be very large" in new WithApplication() {
+    "gracefully fail when an entity expands to be very large" in new WithApplication()
       val as = "a" * 50000
       val entities = "&a;" * 50000
       val xml = s"""<?xml version="1.0"?>
@@ -187,6 +161,3 @@ object XmlBodyParserSpec extends PlaySpecification {
                   | ]>
                   | <kaboom>$entities</kaboom>""".stripMargin
       parse(xml, Some("text/xml; charset=utf-8"), "utf-8") must beLeft
-    }
-  }
-}

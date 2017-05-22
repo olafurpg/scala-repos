@@ -8,9 +8,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ResponseClassifierTest extends FunSuite {
+class ResponseClassifierTest extends FunSuite
 
-  test("Default classification") {
+  test("Default classification")
     assert("DefaultResponseClassifier" == ResponseClassifier.Default.toString)
     assert(Success == ResponseClassifier.Default(ReqRep(null, Return("hi"))))
 
@@ -19,18 +19,15 @@ class ResponseClassifierTest extends FunSuite {
 
     assert(NonRetryableFailure == ResponseClassifier.Default(
             ReqRep(null, Throw(Failure("nope")))))
-  }
 
-  test("composition") {
+  test("composition")
     val aThrow = Throw(Failure("nope"))
     val aReturn = Return("yep")
 
-    val evens: ResponseClassifier = {
+    val evens: ResponseClassifier =
       case ReqRep(i: Int, Throw(_)) if i % 2 == 0 => RetryableFailure
-    }
-    val odds: ResponseClassifier = {
+    val odds: ResponseClassifier =
       case ReqRep(i: Int, Throw(_)) if i % 2 == 1 => NonRetryableFailure
-    }
     val classifier = evens.orElse(odds)
 
     assert(RetryableFailure == classifier(ReqRep(2, aThrow)))
@@ -39,5 +36,3 @@ class ResponseClassifierTest extends FunSuite {
     assert(!classifier.isDefinedAt(ReqRep(0, aReturn)))
     assert(Success == classifier.applyOrElse(ReqRep(0, aReturn),
                                              ResponseClassifier.Default))
-  }
-}

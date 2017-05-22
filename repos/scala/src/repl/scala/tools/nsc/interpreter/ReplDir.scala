@@ -17,14 +17,12 @@ trait ReplDir extends AbstractFile with Clearable {}
 private class ReplVirtualDir()
     extends VirtualDirectory("(memory)", None) with ReplDir {}
 private class ReplRealDir(dir: Directory)
-    extends PlainDirectory(dir) with ReplDir {
-  def clear() = {
+    extends PlainDirectory(dir) with ReplDir
+  def clear() =
     dir.deleteRecursively()
     dir.createDirectory()
-  }
-}
 
-class ReplOutput(val dirSetting: MutableSettings#StringSetting) {
+class ReplOutput(val dirSetting: MutableSettings#StringSetting)
   // outdir for generated classfiles - may be in-memory (the default),
   // a generated temporary directory, or a specified outdir.
   val dir: ReplDir =
@@ -34,14 +32,11 @@ class ReplOutput(val dirSetting: MutableSettings#StringSetting) {
      else new ReplRealDir(Directory(dirSetting.value)))
 
   // print the contents hierarchically
-  def show(out: JPrintWriter) = {
-    def pp(root: AbstractFile, indentLevel: Int) {
+  def show(out: JPrintWriter) =
+    def pp(root: AbstractFile, indentLevel: Int)
       val label = root.name
       val spaces = "    " * indentLevel
       out.println(spaces + label)
       if (root.isDirectory)
         root.toList sortBy (_.name) foreach (x => pp(x, indentLevel + 1))
-    }
     pp(dir, 0)
-  }
-}

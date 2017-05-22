@@ -38,7 +38,7 @@ import org.apache.spark.scheduler.TaskSchedulerImpl
 
 class CoarseMesosSchedulerBackendSuite
     extends SparkFunSuite with LocalSparkContext with MockitoSugar
-    with BeforeAndAfter {
+    with BeforeAndAfter
 
   private var sparkConf: SparkConf = _
   private var driver: SchedulerDriver = _
@@ -47,7 +47,7 @@ class CoarseMesosSchedulerBackendSuite
   private var externalShuffleClient: MesosExternalShuffleClient = _
   private var driverEndpoint: RpcEndpointRef = _
 
-  test("mesos supports killing and limiting executors") {
+  test("mesos supports killing and limiting executors")
     setBackend()
     sparkConf.set("spark.driver.host", "driverHost")
     sparkConf.set("spark.driver.port", "1234")
@@ -74,9 +74,8 @@ class CoarseMesosSchedulerBackendSuite
     backend.doRequestTotalExecutors(2)
     offerResources(offers, 2)
     verifyTaskLaunched("o2")
-  }
 
-  test("mesos supports killing and relaunching tasks with executors") {
+  test("mesos supports killing and relaunching tasks with executors")
     setBackend()
 
     // launches a task on a valid offer
@@ -95,9 +94,8 @@ class CoarseMesosSchedulerBackendSuite
     // Launches a new task on a valid offer from the same slave
     offerResources(List(offer2))
     verifyTaskLaunched("o2")
-  }
 
-  test("mesos supports spark.executor.cores") {
+  test("mesos supports spark.executor.cores")
     val executorCores = 4
     setBackend(Map("spark.executor.cores" -> executorCores.toString))
 
@@ -111,9 +109,8 @@ class CoarseMesosSchedulerBackendSuite
     val cpus =
       backend.getResource(taskInfos.iterator().next().getResourcesList, "cpus")
     assert(cpus == executorCores)
-  }
 
-  test("mesos supports unset spark.executor.cores") {
+  test("mesos supports unset spark.executor.cores")
     setBackend()
 
     val executorMemory = backend.executorMemory(sc)
@@ -126,9 +123,8 @@ class CoarseMesosSchedulerBackendSuite
     val cpus =
       backend.getResource(taskInfos.iterator().next().getResourcesList, "cpus")
     assert(cpus == offerCores)
-  }
 
-  test("mesos does not acquire more than spark.cores.max") {
+  test("mesos does not acquire more than spark.cores.max")
     val maxCores = 10
     setBackend(Map("spark.cores.max" -> maxCores.toString))
 
@@ -141,15 +137,13 @@ class CoarseMesosSchedulerBackendSuite
     val cpus =
       backend.getResource(taskInfos.iterator().next().getResourcesList, "cpus")
     assert(cpus == maxCores)
-  }
 
-  test("mesos declines offers that violate attribute constraints") {
+  test("mesos declines offers that violate attribute constraints")
     setBackend(Map("spark.mesos.constraints" -> "x:true"))
     offerResources(List((backend.executorMemory(sc), 4)))
     verifyDeclinedOffer(driver, createOfferId("o1"), true)
-  }
 
-  test("mesos assigns tasks round-robin on offers") {
+  test("mesos assigns tasks round-robin on offers")
     val executorCores = 4
     val maxCores = executorCores * 2
     setBackend(Map("spark.executor.cores" -> executorCores.toString,
@@ -161,9 +155,8 @@ class CoarseMesosSchedulerBackendSuite
 
     verifyTaskLaunched("o1")
     verifyTaskLaunched("o2")
-  }
 
-  test("mesos creates multiple executors on a single slave") {
+  test("mesos creates multiple executors on a single slave")
     val executorCores = 4
     setBackend(Map("spark.executor.cores" -> executorCores.toString))
 
@@ -174,9 +167,8 @@ class CoarseMesosSchedulerBackendSuite
     // verify two executors were started on a single offer
     val taskInfos = verifyTaskLaunched("o1")
     assert(taskInfos.size() == 2)
-  }
 
-  test("mesos doesn't register twice with the same shuffle service") {
+  test("mesos doesn't register twice with the same shuffle service")
     setBackend(Map("spark.shuffle.service.enabled" -> "true"))
     val (mem, cpu) = (backend.executorMemory(sc), 4)
 
@@ -195,9 +187,8 @@ class CoarseMesosSchedulerBackendSuite
     backend.statusUpdate(driver, status2)
     verify(externalShuffleClient, times(1))
       .registerDriverWithShuffleService(anyString, anyInt, anyLong, anyLong)
-  }
 
-  test("mesos kills an executor when told") {
+  test("mesos kills an executor when told")
     setBackend()
 
     val (mem, cpu) = (backend.executorMemory(sc), 4)
@@ -208,9 +199,8 @@ class CoarseMesosSchedulerBackendSuite
 
     backend.doKillExecutors(List("0"))
     verify(driver, times(1)).killTask(createTaskId("0"))
-  }
 
-  test("weburi is set in created scheduler driver") {
+  test("weburi is set in created scheduler driver")
     setBackend()
     val taskScheduler = mock[TaskSchedulerImpl]
     when(taskScheduler.sc).thenReturn(sc)
@@ -219,7 +209,7 @@ class CoarseMesosSchedulerBackendSuite
     val securityManager = mock[SecurityManager]
 
     val backend = new CoarseMesosSchedulerBackend(
-        taskScheduler, sc, "master", securityManager) {
+        taskScheduler, sc, "master", securityManager)
       override protected def createSchedulerDriver(
           masterUrl: String,
           scheduler: Scheduler,
@@ -229,76 +219,63 @@ class CoarseMesosSchedulerBackendSuite
           webuiUrl: Option[String] = None,
           checkpoint: Option[Boolean] = None,
           failoverTimeout: Option[Double] = None,
-          frameworkId: Option[String] = None): SchedulerDriver = {
+          frameworkId: Option[String] = None): SchedulerDriver =
         markRegistered()
         assert(webuiUrl.isDefined)
         assert(webuiUrl.get.equals("http://webui"))
         driver
-      }
-    }
 
     backend.start()
-  }
 
   private def verifyDeclinedOffer(driver: SchedulerDriver,
                                   offerId: OfferID,
-                                  filter: Boolean = false): Unit = {
-    if (filter) {
+                                  filter: Boolean = false): Unit =
+    if (filter)
       verify(driver, times(1))
         .declineOffer(Matchers.eq(offerId), anyObject[Filters])
-    } else {
+    else
       verify(driver, times(1)).declineOffer(Matchers.eq(offerId))
-    }
-  }
 
   private def offerResources(
-      offers: List[(Int, Int)], startId: Int = 1): Unit = {
-    val mesosOffers = offers.zipWithIndex.map {
+      offers: List[(Int, Int)], startId: Int = 1): Unit =
+    val mesosOffers = offers.zipWithIndex.map
       case (offer, i) =>
         createOffer(s"o${i + startId}", s"s${i + startId}", offer._1, offer._2)
-    }
 
     backend.resourceOffers(driver, mesosOffers.asJava)
-  }
 
   private def verifyTaskLaunched(
-      offerId: String): java.util.Collection[TaskInfo] = {
+      offerId: String): java.util.Collection[TaskInfo] =
     val captor =
       ArgumentCaptor.forClass(classOf[java.util.Collection[TaskInfo]])
     verify(driver, times(1)).launchTasks(
         Matchers.eq(Collections.singleton(createOfferId(offerId))),
         captor.capture())
     captor.getValue
-  }
 
   private def createTaskStatus(
-      taskId: String, slaveId: String, state: TaskState): TaskStatus = {
+      taskId: String, slaveId: String, state: TaskState): TaskStatus =
     TaskStatus
       .newBuilder()
       .setTaskId(TaskID.newBuilder().setValue(taskId).build())
       .setSlaveId(SlaveID.newBuilder().setValue(slaveId).build())
       .setState(state)
       .build
-  }
 
-  private def createOfferId(offerId: String): OfferID = {
+  private def createOfferId(offerId: String): OfferID =
     OfferID.newBuilder().setValue(offerId).build()
-  }
 
-  private def createSlaveId(slaveId: String): SlaveID = {
+  private def createSlaveId(slaveId: String): SlaveID =
     SlaveID.newBuilder().setValue(slaveId).build()
-  }
 
-  private def createExecutorId(executorId: String): ExecutorID = {
+  private def createExecutorId(executorId: String): ExecutorID =
     ExecutorID.newBuilder().setValue(executorId).build()
-  }
 
-  private def createTaskId(taskId: String): TaskID = {
+  private def createTaskId(taskId: String): TaskID =
     TaskID.newBuilder().setValue(taskId).build()
-  }
 
   private def createOffer(
-      offerId: String, slaveId: String, mem: Int, cpu: Int): Offer = {
+      offerId: String, slaveId: String, mem: Int, cpu: Int): Offer =
     val builder = Offer.newBuilder()
     builder
       .addResourcesBuilder()
@@ -316,17 +293,16 @@ class CoarseMesosSchedulerBackendSuite
       .setSlaveId(SlaveID.newBuilder().setValue(slaveId))
       .setHostname(s"host${slaveId}")
       .build()
-  }
 
   private def createSchedulerBackend(
       taskScheduler: TaskSchedulerImpl,
       driver: SchedulerDriver,
       shuffleClient: MesosExternalShuffleClient,
-      endpoint: RpcEndpointRef): CoarseMesosSchedulerBackend = {
+      endpoint: RpcEndpointRef): CoarseMesosSchedulerBackend =
     val securityManager = mock[SecurityManager]
 
     val backend = new CoarseMesosSchedulerBackend(
-        taskScheduler, sc, "master", securityManager) {
+        taskScheduler, sc, "master", securityManager)
       override protected def createSchedulerDriver(
           masterUrl: String,
           scheduler: Scheduler,
@@ -345,28 +321,23 @@ class CoarseMesosSchedulerBackendSuite
           properties: ArrayBuffer[(String, String)]): RpcEndpointRef = endpoint
 
       // override to avoid race condition with the driver thread on `mesosDriver`
-      override def startScheduler(newDriver: SchedulerDriver): Unit = {
+      override def startScheduler(newDriver: SchedulerDriver): Unit =
         mesosDriver = newDriver
-      }
 
       markRegistered()
-    }
     backend.start()
     backend
-  }
 
-  private def setBackend(sparkConfVars: Map[String, String] = null) {
+  private def setBackend(sparkConfVars: Map[String, String] = null)
     sparkConf = (new SparkConf)
       .setMaster("local[*]")
       .setAppName("test-mesos-dynamic-alloc")
       .setSparkHome("/path")
       .set("spark.mesos.driver.webui.url", "http://webui")
 
-    if (sparkConfVars != null) {
-      for (attr <- sparkConfVars) {
+    if (sparkConfVars != null)
+      for (attr <- sparkConfVars)
         sparkConf.set(attr._1, attr._2)
-      }
-    }
 
     sc = new SparkContext(sparkConf)
 
@@ -379,5 +350,3 @@ class CoarseMesosSchedulerBackendSuite
 
     backend = createSchedulerBackend(
         taskScheduler, driver, externalShuffleClient, driverEndpoint)
-  }
-}

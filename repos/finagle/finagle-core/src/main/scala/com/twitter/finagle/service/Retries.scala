@@ -13,7 +13,7 @@ import com.twitter.util._
   * @see The [[https://twitter.github.io/finagle/guide/Servers.html#request-timeout user guide]]
   *      for more details.
   */
-object Retries {
+object Retries
 
   val Role = Stack.Role("Retries")
 
@@ -31,13 +31,11 @@ object Retries {
     *
     * @see [[RetryExceptionsFilter]]
     */
-  private[twitter] case class Policy(retryPolicy: RetryPolicy[Try[Nothing]]) {
+  private[twitter] case class Policy(retryPolicy: RetryPolicy[Try[Nothing]])
     def mk(): (Policy, Stack.Param[Policy]) =
       (this, Policy.param)
-  }
-  private[twitter] object Policy {
+  private[twitter] object Policy
     implicit val param = Stack.Param(Policy(RetryPolicy.Never))
-  }
 
   /**
     * Determines '''how many''' failed requests are eligible for
@@ -53,15 +51,14 @@ object Retries {
     */
   case class Budget(
       retryBudget: RetryBudget,
-      requeueBackoffs: Stream[Duration] = Budget.emptyBackoffSchedule) {
+      requeueBackoffs: Stream[Duration] = Budget.emptyBackoffSchedule)
     def this(retryBudget: RetryBudget) =
       this(retryBudget, Budget.emptyBackoffSchedule)
 
     def mk(): (Budget, Stack.Param[Budget]) =
       (this, Budget)
-  }
 
-  object Budget extends Stack.Param[Budget] {
+  object Budget extends Stack.Param[Budget]
 
     /**
       * Default backoff stream to use for automatic retries.
@@ -72,7 +69,6 @@ object Retries {
     def default: Budget = Budget(RetryBudget(), emptyBackoffSchedule)
 
     implicit val param: Stack.Param[Budget] = this
-  }
 
   /**
     * A single budget needs to be shared across a [[RequeueFilter]] and
@@ -81,11 +77,10 @@ object Retries {
     * swallowing the call to `request` in the second filter.
     */
   private class WithdrawOnlyRetryBudget(underlying: RetryBudget)
-      extends RetryBudget {
+      extends RetryBudget
     def deposit(): Unit = ()
     def tryWithdraw(): Boolean = underlying.tryWithdraw()
     def balance: Long = underlying.balance
-  }
 
   // semi-arbitrary, but we don't want requeues to eat the entire budget
   private[this] val MaxRequeuesPerReq = 0.2
@@ -96,7 +91,7 @@ object Retries {
     */
   private[finagle] def moduleRequeueable[Req, Rep]: Stackable[ServiceFactory[
           Req, Rep]] =
-    new Stack.Module3[Stats, Budget, HighResTimer, ServiceFactory[Req, Rep]] {
+    new Stack.Module3[Stats, Budget, HighResTimer, ServiceFactory[Req, Rep]]
       def role: Stack.Role = Retries.Role
 
       def description: String =
@@ -107,7 +102,7 @@ object Retries {
           budgetP: Budget,
           timerP: HighResTimer,
           next: ServiceFactory[Req, Rep]
-      ): ServiceFactory[Req, Rep] = {
+      ): ServiceFactory[Req, Rep] =
         val statsRecv = statsP.statsReceiver
         val scoped = statsRecv.scope("retries")
         val requeues = scoped.counter("requeues")
@@ -123,8 +118,6 @@ object Retries {
             next
         )
         svcFactory(retryBudget, filters, scoped, requeues, next)
-      }
-    }
 
   /**
     * Retries failures that are guaranteed to be safe to retry
@@ -146,7 +139,7 @@ object Retries {
         Policy,
         HighResTimer,
         ServiceFactory[Req, Rep]
-    ] {
+    ]
       def role: Stack.Role = Retries.Role
 
       def description: String =
@@ -159,7 +152,7 @@ object Retries {
           policyP: Policy,
           timerP: HighResTimer,
           next: ServiceFactory[Req, Rep]
-      ): ServiceFactory[Req, Rep] = {
+      ): ServiceFactory[Req, Rep] =
         val statsRecv = statsP.statsReceiver
         val scoped = statsRecv.scope("retries")
         val requeues = scoped.counter("requeues")
@@ -167,14 +160,14 @@ object Retries {
         val retryPolicy = policyP.retryPolicy
 
         val filters =
-          if (retryPolicy eq RetryPolicy.Never) {
+          if (retryPolicy eq RetryPolicy.Never)
             newRequeueFilter(retryBudget,
                              budgetP.requeueBackoffs,
                              withdrawsOnly = false,
                              scoped,
                              timerP.timer,
                              next)
-          } else {
+          else
             val retryFilter = new RetryExceptionsFilter[Req, Rep](
                 retryPolicy, timerP.timer, statsRecv, retryBudget)
             // note that we wrap the budget, since the retry filter wraps this
@@ -187,11 +180,8 @@ object Retries {
                 next
             )
             retryFilter.andThen(requeueFilter)
-          }
 
         svcFactory(retryBudget, filters, scoped, requeues, next)
-      }
-    }
 
   private[this] def newRequeueFilter[Req, Rep](
       retryBudget: RetryBudget,
@@ -200,7 +190,7 @@ object Retries {
       statsReceiver: StatsReceiver,
       timer: Timer,
       next: ServiceFactory[Req, Rep]
-  ): RequeueFilter[Req, Rep] = {
+  ): RequeueFilter[Req, Rep] =
     val budget =
       if (withdrawsOnly) new WithdrawOnlyRetryBudget(retryBudget)
       else retryBudget
@@ -212,7 +202,6 @@ object Retries {
                                 () => next.status == Status.Open,
                                 MaxRequeuesPerReq,
                                 timer)
-  }
 
   private[this] def svcFactory[Req, Rep](
       retryBudget: RetryBudget,
@@ -220,13 +209,12 @@ object Retries {
       statsReceiver: StatsReceiver,
       requeuesCounter: Counter,
       next: ServiceFactory[Req, Rep]
-  ): ServiceFactory[Req, Rep] = {
-    new ServiceFactoryProxy(next) {
+  ): ServiceFactory[Req, Rep] =
+    new ServiceFactoryProxy(next)
       // We define the gauge inside of the ServiceFactory so that their lifetimes
       // are tied together.
-      private[this] val budgetGauge = statsReceiver.addGauge("budget") {
+      private[this] val budgetGauge = statsReceiver.addGauge("budget")
         retryBudget.balance
-      }
       private[this] val notOpenCounter = statsReceiver.counter("not_open")
 
       private[this] val serviceFn: Service[Req, Rep] => Service[Req, Rep] =
@@ -241,16 +229,14 @@ object Retries {
         */
       private[this] def applySelf(
           conn: ClientConnection, n: Int): Future[Service[Req, Rep]] =
-        self(conn).rescue {
+        self(conn).rescue
           case e @ RetryPolicy.RetryableWriteException(_) if n > 0 =>
-            if (status == Status.Open) {
+            if (status == Status.Open)
               requeuesCounter.incr()
               applySelf(conn, n - 1)
-            } else {
+            else
               notOpenCounter.incr()
               Future.exception(e)
-            }
-        }
 
       /**
         * Note: This may seem like we are always attempting service acquisition
@@ -272,10 +258,6 @@ object Retries {
       override def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
         applySelf(conn, Effort).map(serviceFn)
 
-      override def close(deadline: Time): Future[Unit] = {
+      override def close(deadline: Time): Future[Unit] =
         budgetGauge.remove()
         self.close(deadline)
-      }
-    }
-  }
-}

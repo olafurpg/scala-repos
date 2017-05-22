@@ -4,37 +4,32 @@ import org.scalatest.FunSuite
 
 import scala.pickling._, scala.pickling.Defaults._, json._
 
-class Vertex(val label: String) {
+class Vertex(val label: String)
   var neighbors: List[Vertex] = List()
 
   var graph: Graph = null
 
-  def connectTo(v: Vertex) {
+  def connectTo(v: Vertex)
     neighbors = v +: neighbors
-  }
 
   override def toString = "Vertex(" + label + ")"
-}
 
-class Graph {
+class Graph
   var vertices: List[Vertex] = List()
 
-  def addVertex(v: Vertex): Vertex = {
+  def addVertex(v: Vertex): Vertex =
     v.graph = this
     vertices = v +: vertices
     v
-  }
-}
 
-class GraphJsonTest extends FunSuite {
-  test("main") {
+class GraphJsonTest extends FunSuite
+  test("main")
 
     // NOTE - Gets around diverging implicit expansion issue, temporarily.
-    implicit val pu = {
+    implicit val pu =
       implicit val vu = PicklerUnpickler.generate[Vertex]
       implicit val lvu = Defaults.listPickler[Vertex]
       PicklerUnpickler.generate[Graph]
-    }
 
     val g = new Graph
 
@@ -52,5 +47,3 @@ class GraphJsonTest extends FunSuite {
     val res = pickle.unpickle[Graph]
     assert(
         res.vertices.toString === "List(Vertex(PHILIPP), Vertex(EPFL), Vertex(MS), Vertex(BBC))")
-  }
-}

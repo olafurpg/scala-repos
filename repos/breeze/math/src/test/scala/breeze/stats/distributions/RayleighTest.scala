@@ -25,7 +25,7 @@ import org.scalatest.prop._
 @RunWith(classOf[JUnitRunner])
 class RayleighTest
     extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with HasCdfTestBase {
+    with MomentsTestBase[Double] with HasCdfTestBase
   import org.scalacheck.Arbitrary.arbitrary
 
   override val numSamples = 40000
@@ -34,11 +34,9 @@ class RayleighTest
 
   def fromDouble(x: Double) = x
 
-  implicit def arbDistr = Arbitrary {
-    for (scale <- arbitrary[Double].map { x =>
+  implicit def arbDistr = Arbitrary
+    for (scale <- arbitrary[Double].map  x =>
       math.abs(x) % 8.0 + 1.0
-    }) yield new Rayleigh(scale)(RandBasis.mt0)
-  }
+    ) yield new Rayleigh(scale)(RandBasis.mt0)
 
   override type Distr = Rayleigh
-}

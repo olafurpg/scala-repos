@@ -9,11 +9,9 @@ import spire.algebra.Eq
   * lose all type safety -- for instance, any 2 types can always be compared as
   * `Eq[Any]`.
   */
-object genericEq {
+object genericEq
   @SerialVersionUID(0L)
-  private class GenericEq[@sp A] extends Eq[A] with Serializable {
+  private class GenericEq[@sp A] extends Eq[A] with Serializable
     def eqv(x: A, y: A): Boolean = x == y
-  }
 
   implicit def generic[@sp A]: Eq[A] = new GenericEq[A]
-}

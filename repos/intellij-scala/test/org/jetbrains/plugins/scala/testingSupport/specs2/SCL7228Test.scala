@@ -5,9 +5,9 @@ package testingSupport.specs2
   * @author Roman.Shein
   * @since 16.10.2014.
   */
-abstract class SCL7228Test extends Specs2TestCase {
+abstract class SCL7228Test extends Specs2TestCase
 
-  def testScl7228() {
+  def testScl7228()
     addFileToProject("SCL7228Test.scala",
                      """
     |import org.specs2.mutable.Specification
@@ -24,5 +24,3 @@ abstract class SCL7228Test extends Specs2TestCase {
                       checkResultTreeHasExactNamedPath(
                           _, "[root]", "SCL7228Test", "foo (bar)"),
                       debug = true)
-  }
-}

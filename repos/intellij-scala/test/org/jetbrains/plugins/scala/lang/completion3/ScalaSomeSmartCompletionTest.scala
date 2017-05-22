@@ -6,8 +6,8 @@ import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaSomeSmartCompletionTest extends ScalaCodeInsightTestBase {
-  def testSomeSmart1() {
+class ScalaSomeSmartCompletionTest extends ScalaCodeInsightTestBase
+  def testSomeSmart1()
     val fileText = """
 class TUI {
   class A
@@ -30,9 +30,8 @@ class TUI {
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "z").get)
     checkResultByText(resultText)
-  }
 
-  def testSomeSmart2() {
+  def testSomeSmart2()
     val fileText = """
 class TUI {
   class A
@@ -56,9 +55,8 @@ class TUI {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "z").get, ',')
     checkResultByText(resultText)
-  }
 
-  def testSomeSmart3() {
+  def testSomeSmart3()
     val fileText = """
 class TUI {
   class A
@@ -81,9 +79,8 @@ class TUI {
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "z").get)
     checkResultByText(resultText)
-  }
 
-  def testSomeSmart4() {
+  def testSomeSmart4()
     val fileText = """
 class TUI {
   class A
@@ -104,15 +101,13 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
 
-    if (activeLookup != null) {
+    if (activeLookup != null)
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "z").get)
-    }
 
     checkResultByText(resultText)
-  }
 
-  def testSomeSmart5() {
+  def testSomeSmart5()
     val fileText = """
 class TUI {
   class A
@@ -133,15 +128,13 @@ class TUI {
 }
 """.replaceAll("\r", "").trim()
 
-    if (activeLookup != null) {
+    if (activeLookup != null)
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "z").get)
-    }
 
     checkResultByText(resultText)
-  }
 
-  def testOuterThis() {
+  def testOuterThis()
     val fileText = """
       |class TT {
       |  class GG {
@@ -164,9 +157,8 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "TT.this").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testSomeScalaEnum() {
+  def testSomeScalaEnum()
     val fileText =
       """
       |object Scala extends Enumeration {type Scala = Value; val aaa, bbb, ccc = Value}
@@ -189,5 +181,3 @@ class TUI {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
     checkResultByText(resultText)
-  }
-}

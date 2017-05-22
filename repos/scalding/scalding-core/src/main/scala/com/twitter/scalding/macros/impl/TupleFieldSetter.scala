@@ -22,9 +22,9 @@ import scala.util.Try
 /**
   * Helper class for setting case class fields in cascading Tuple
   */
-object TupleFieldSetter extends CaseClassFieldSetter {
+object TupleFieldSetter extends CaseClassFieldSetter
 
-  override def absent(c: Context)(idx: Int, container: c.TermName): c.Tree = {
+  override def absent(c: Context)(idx: Int, container: c.TermName): c.Tree =
     import c.universe._
     /* A more defensive approach is to set to null, but since
      * we always allocate an empty TupleEntry, which is initially null,
@@ -32,23 +32,21 @@ object TupleFieldSetter extends CaseClassFieldSetter {
      * q"""$container.set($idx, null)"""
      */
     q"""()"""
-  }
 
   override def default(c: Context)(
-      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree = {
+      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree =
     import c.universe._
     q"""$container.set($idx, $fieldValue)"""
-  }
 
   override def from(c: Context)(fieldType: c.Type,
                                 idx: Int,
                                 container: c.TermName,
-                                fieldValue: c.Tree): Try[c.Tree] = Try {
+                                fieldValue: c.Tree): Try[c.Tree] = Try
     import c.universe._
 
     def simpleType(accessor: Tree) = q"""${accessor}(${idx}, $fieldValue)"""
 
-    fieldType match {
+    fieldType match
       case tpe if tpe =:= typeOf[String] => simpleType(q"$container.setString")
       case tpe if tpe =:= typeOf[Boolean] =>
         simpleType(q"$container.setBoolean")
@@ -58,6 +56,3 @@ object TupleFieldSetter extends CaseClassFieldSetter {
       case tpe if tpe =:= typeOf[Float] => simpleType(q"$container.setFloat")
       case tpe if tpe =:= typeOf[Double] => simpleType(q"$container.setDouble")
       case _ => sys.error(s"Unsupported primitive type ${fieldType}")
-    }
-  }
-}

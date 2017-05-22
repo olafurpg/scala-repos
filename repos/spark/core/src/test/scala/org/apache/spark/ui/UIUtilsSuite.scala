@@ -21,10 +21,10 @@ import scala.xml.Elem
 
 import org.apache.spark.SparkFunSuite
 
-class UIUtilsSuite extends SparkFunSuite {
+class UIUtilsSuite extends SparkFunSuite
   import UIUtils._
 
-  test("makeDescription") {
+  test("makeDescription")
     verify(
         """test <a href="/link"> text </a>""",
         <span class="description-input">test <a href="/link"> text </a></span>,
@@ -55,10 +55,9 @@ class UIUtilsSuite extends SparkFunSuite {
         baseUrl = "base",
         errorMsg = "Base URL should be prepended to html links"
     )
-  }
 
   test(
-      "SPARK-11906: Progress bar should not overflow because of speculative tasks") {
+      "SPARK-11906: Progress bar should not overflow because of speculative tasks")
     val generated =
       makeProgressBar(2, 3, 0, 0, 4).head.child.filter(_.label == "div")
     val expected = Seq(
@@ -68,10 +67,9 @@ class UIUtilsSuite extends SparkFunSuite {
     assert(
         generated.sameElements(expected),
         s"\nRunning progress bar should round down\n\nExpected:\n$expected\nGenerated:\n$generated")
-  }
 
   test(
-      "decodeURLParameter (SPARK-12708: Sorting task error in Stages Page when yarn mode.)") {
+      "decodeURLParameter (SPARK-12708: Sorting task error in Stages Page when yarn mode.)")
     val encoded1 = "%252F"
     val decoded1 = "/"
     val encoded2 = "%253Cdriver%253E"
@@ -83,14 +81,11 @@ class UIUtilsSuite extends SparkFunSuite {
     // verify that no affect to decoded URL.
     assert(decoded1 === decodeURLParameter(decoded1))
     assert(decoded2 === decodeURLParameter(decoded2))
-  }
 
   private def verify(desc: String,
                      expected: Elem,
                      errorMsg: String = "",
-                     baseUrl: String = ""): Unit = {
+                     baseUrl: String = ""): Unit =
     val generated = makeDescription(desc, baseUrl)
     assert(generated.sameElements(expected),
            s"\n$errorMsg\n\nExpected:\n$expected\nGenerated:\n$generated")
-  }
-}

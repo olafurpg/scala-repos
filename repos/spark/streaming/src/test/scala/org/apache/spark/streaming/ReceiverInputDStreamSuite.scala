@@ -30,25 +30,22 @@ import org.apache.spark.streaming.receiver.{BlockManagerBasedStoreResult, Receiv
 import org.apache.spark.streaming.scheduler.ReceivedBlockInfo
 import org.apache.spark.streaming.util.{WriteAheadLogRecordHandle, WriteAheadLogUtils}
 
-class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
+class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll
 
-  override def afterAll(): Unit = {
-    try {
+  override def afterAll(): Unit =
+    try
       StreamingContext.getActive().map { _.stop() }
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
-  testWithoutWAL("createBlockRDD creates empty BlockRDD when no block info") {
+  testWithoutWAL("createBlockRDD creates empty BlockRDD when no block info")
     receiverStream =>
       val rdd = receiverStream.createBlockRDD(Time(0), Seq.empty)
       assert(rdd.isInstanceOf[BlockRDD[_]])
       assert(!rdd.isInstanceOf[WriteAheadLogBackedBlockRDD[_]])
       assert(rdd.isEmpty())
-  }
 
-  testWithoutWAL("createBlockRDD creates correct BlockRDD with block info") {
+  testWithoutWAL("createBlockRDD creates correct BlockRDD with block info")
     receiverStream =>
       val blockInfos = Seq.fill(5) { createBlockInfo(withWALInfo = false) }
       val blockIds = blockInfos.map(_.blockId)
@@ -62,10 +59,9 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
       assert(!rdd.isInstanceOf[WriteAheadLogBackedBlockRDD[_]])
       val blockRDD = rdd.asInstanceOf[BlockRDD[_]]
       assert(blockRDD.blockIds.toSeq === blockIds)
-  }
 
   testWithoutWAL(
-      "createBlockRDD filters non-existent blocks before creating BlockRDD") {
+      "createBlockRDD filters non-existent blocks before creating BlockRDD")
     receiverStream =>
       val presentBlockInfos =
         Seq.fill(2)(createBlockInfo(withWALInfo = false, createBlock = true))
@@ -84,18 +80,16 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
       assert(rdd.isInstanceOf[BlockRDD[_]])
       val blockRDD = rdd.asInstanceOf[BlockRDD[_]]
       assert(blockRDD.blockIds.toSeq === presentBlockInfos.map { _.blockId })
-  }
 
   testWithWAL(
-      "createBlockRDD creates empty WALBackedBlockRDD when no block info") {
+      "createBlockRDD creates empty WALBackedBlockRDD when no block info")
     receiverStream =>
       val rdd = receiverStream.createBlockRDD(Time(0), Seq.empty)
       assert(rdd.isInstanceOf[WriteAheadLogBackedBlockRDD[_]])
       assert(rdd.isEmpty())
-  }
 
   testWithWAL(
-      "createBlockRDD creates correct WALBackedBlockRDD with all block info having WAL info") {
+      "createBlockRDD creates correct WALBackedBlockRDD with all block info having WAL info")
     receiverStream =>
       val blockInfos = Seq.fill(5) { createBlockInfo(withWALInfo = true) }
       val blockIds = blockInfos.map(_.blockId)
@@ -103,13 +97,12 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
       assert(rdd.isInstanceOf[WriteAheadLogBackedBlockRDD[_]])
       val blockRDD = rdd.asInstanceOf[WriteAheadLogBackedBlockRDD[_]]
       assert(blockRDD.blockIds.toSeq === blockIds)
-      assert(blockRDD.walRecordHandles.toSeq === blockInfos.map {
+      assert(blockRDD.walRecordHandles.toSeq === blockInfos.map
         _.walRecordHandleOption.get
-      })
-  }
+      )
 
   testWithWAL(
-      "createBlockRDD creates BlockRDD when some block info don't have WAL info") {
+      "createBlockRDD creates BlockRDD when some block info don't have WAL info")
     receiverStream =>
       val blockInfos1 = Seq.fill(2) { createBlockInfo(withWALInfo = true) }
       val blockInfos2 = Seq.fill(3) { createBlockInfo(withWALInfo = false) }
@@ -119,37 +112,29 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
       assert(rdd.isInstanceOf[BlockRDD[_]])
       val blockRDD = rdd.asInstanceOf[BlockRDD[_]]
       assert(blockRDD.blockIds.toSeq === blockIds)
-  }
 
   private def testWithoutWAL(msg: String)(
-      body: ReceiverInputDStream[_] => Unit): Unit = {
-    test(s"Without WAL enabled: $msg") {
+      body: ReceiverInputDStream[_] => Unit): Unit =
+    test(s"Without WAL enabled: $msg")
       runTest(enableWAL = false, body)
-    }
-  }
 
   private def testWithWAL(msg: String)(
-      body: ReceiverInputDStream[_] => Unit): Unit = {
-    test(s"With WAL enabled: $msg") {
+      body: ReceiverInputDStream[_] => Unit): Unit =
+    test(s"With WAL enabled: $msg")
       runTest(enableWAL = true, body)
-    }
-  }
 
   private def runTest(
-      enableWAL: Boolean, body: ReceiverInputDStream[_] => Unit): Unit = {
+      enableWAL: Boolean, body: ReceiverInputDStream[_] => Unit): Unit =
     val conf = new SparkConf()
     conf.setMaster("local[4]").setAppName("ReceiverInputDStreamSuite")
     conf.set(
         WriteAheadLogUtils.RECEIVER_WAL_ENABLE_CONF_KEY, enableWAL.toString)
     require(WriteAheadLogUtils.enableReceiverLog(conf) === enableWAL)
     val ssc = new StreamingContext(conf, Seconds(1))
-    val receiverStream = new ReceiverInputDStream[Int](ssc) {
+    val receiverStream = new ReceiverInputDStream[Int](ssc)
       override def getReceiver(): Receiver[Int] = null
-    }
-    withStreamingContext(ssc) { ssc =>
+    withStreamingContext(ssc)  ssc =>
       body(receiverStream)
-    }
-  }
 
   /**
     * Create a block info for input to the ReceiverInputDStream.createBlockRDD
@@ -158,20 +143,16 @@ class ReceiverInputDStreamSuite extends TestSuiteBase with BeforeAndAfterAll {
     * @return
     */
   private def createBlockInfo(
-      withWALInfo: Boolean, createBlock: Boolean = true): ReceivedBlockInfo = {
+      withWALInfo: Boolean, createBlock: Boolean = true): ReceivedBlockInfo =
     val blockId = new StreamBlockId(0, Random.nextLong())
-    if (createBlock) {
+    if (createBlock)
       SparkEnv.get.blockManager
         .putSingle(blockId, 1, StorageLevel.MEMORY_ONLY, tellMaster = true)
       require(SparkEnv.get.blockManager.master.contains(blockId))
-    }
     val storeResult =
-      if (withWALInfo) {
+      if (withWALInfo)
         new WriteAheadLogBasedStoreResult(
             blockId, None, new WriteAheadLogRecordHandle {})
-      } else {
+      else
         new BlockManagerBasedStoreResult(blockId, None)
-      }
     new ReceivedBlockInfo(0, None, None, storeResult)
-  }
-}

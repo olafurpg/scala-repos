@@ -25,7 +25,7 @@ import tag.@@
   * 
   * @author Miles Sabin
   */
-final class RecordOps[L <: HList](val l: L) extends AnyVal with Serializable {
+final class RecordOps[L <: HList](val l: L) extends AnyVal with Serializable
   import shapeless.labelled._
   import ops.record._
 
@@ -134,14 +134,13 @@ final class RecordOps[L <: HList](val l: L) extends AnyVal with Serializable {
     * Returns a wrapped version of this record that provides `selectDynamic` access to fields.
     */
   def record: DynamicRecordOps[L] = DynamicRecordOps(l)
-}
 
 /**
   * Record wrapper providing `selectDynamic` access to fields.
   * 
   * @author Cody Allen
   */
-final case class DynamicRecordOps[L <: HList](l: L) extends Dynamic {
+final case class DynamicRecordOps[L <: HList](l: L) extends Dynamic
   import ops.record.Selector
 
   /**
@@ -150,4 +149,3 @@ final case class DynamicRecordOps[L <: HList](l: L) extends Dynamic {
   def selectDynamic(key: String)(
       implicit selector: Selector[L, Symbol @@ key.type]): selector.Out =
     selector(l)
-}

@@ -1,6 +1,6 @@
 package mo
 
-object Fourth {
+object Fourth
   def foo(x: Int) = 45
   def foo(x: String) = 45
   def foo(x: Int, y: Int) = 45
@@ -8,5 +8,4 @@ object Fourth {
 
   /*start*/
   foo(23, "") /*end*/
-}
 //Int

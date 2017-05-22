@@ -27,8 +27,8 @@ import scalaz.syntax.comonad._
 import org.specs2.mutable._
 
 trait ToArraySpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with Specification {
-  def testToArrayHomogeneous = {
+    extends ColumnarTableModuleTestSupport[M] with Specification
+  def testToArrayHomogeneous =
     val data: Stream[JValue] = Stream(
         JObject(JField("value", JNum(23.4)) :: JField(
                 "key", JArray(JNum(1) :: Nil)) :: Nil),
@@ -47,9 +47,8 @@ trait ToArraySpec[M[+ _]]
                           JArray(JNum(-12.4) :: Nil))
 
     results.copoint must_== expected
-  }
 
-  def testToArrayHeterogeneous = {
+  def testToArrayHeterogeneous =
     val data: Stream[JValue] = Stream(
         JObject(
             JField("value",
@@ -72,5 +71,3 @@ trait ToArraySpec[M[+ _]]
     val expected = Stream(JArray(JNum(18.8) :: JNum(23.4) :: Nil))
 
     results.copoint must_== expected
-  }
-}

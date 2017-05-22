@@ -33,7 +33,7 @@ import scala.util.control.Exception.allCatch
 /**
   * Tests the H5Store implementation
   */
-class H5StoreSpec extends Specification {
+class H5StoreSpec extends Specification
 
   // We run only one HDF5 test at a time. It would be fine to run multiple
   // tests in parallel, but then the invariant won't hold that at the end
@@ -49,29 +49,24 @@ class H5StoreSpec extends Specification {
   val d3 = new DateTime(2005, 1, 3, 0, 0, 0, 0)
   val d4 = new DateTime(2005, 1, 4, 0, 0, 0, 0)
 
-  private def tmpFilePath(ext: String): String = {
+  private def tmpFilePath(ext: String): String =
     val randomName =
       "tmp" + java.lang.Integer.toHexString(random.nextInt) + ext
     val fn = System.getProperty("java.io.tmpdir") + "/" + randomName
     fn
-  }
 
-  def hdfTest[T : AsResult](test: String)(logic: => T): Fragment = {
-    allCatch either {
+  def hdfTest[T : AsResult](test: String)(logic: => T): Fragment =
+    allCatch either
       java.lang.Runtime.getRuntime.loadLibrary("jhdf5")
-    } match {
+    match
       case Left(exception) => Skipped("Could not import HDF5")
-      case Right(result) => {
-          test in {
+      case Right(result) =>
+          test in
             logic
             H5Store.openResourceCount must_== 0 // check for any resource leaks
-          }
-        }
-    }
-  }
 
-  "H5Store" should {
-    hdfTest("create, open, and close a file") {
+  "H5Store" should
+    hdfTest("create, open, and close a file")
       val tmp = tmpFilePath(".h5")
 
       val fid1 = H5Store.createFile(tmp)
@@ -85,9 +80,8 @@ class H5StoreSpec extends Specification {
       H5Store.closeFile(fid2)
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("reading group names does not leak resources") {
+    hdfTest("reading group names does not leak resources")
       val tmp = tmpFilePath(".h5")
 
       val fid = H5Store.createFile(tmp)
@@ -104,9 +98,8 @@ class H5StoreSpec extends Specification {
       names2 must_== List("s", "t", "u")
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("read, write series") {
+    hdfTest("read, write series")
       val tmp = tmpFilePath(".h5")
 
       val s1 = Series(vec.rand(3), Index(d1, d2, d3))
@@ -156,9 +149,8 @@ class H5StoreSpec extends Specification {
       H5Store.closeFile(fid)
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("write/read non-double Series") {
+    hdfTest("write/read non-double Series")
       val tmp = tmpFilePath(".h5")
 
       val s1 = Series(d1, d2, d3)
@@ -187,9 +179,8 @@ class H5StoreSpec extends Specification {
       H5Store.closeFile(fid)
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("write/read empty Series") {
+    hdfTest("write/read empty Series")
       val tmp = tmpFilePath(".h5")
 
       H5Store.writeSeries(tmp, "s1", Series.empty[DateTime, Double])
@@ -199,9 +190,8 @@ class H5StoreSpec extends Specification {
       res must_== Series.empty[DateTime, Double]
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("read, write Frame") {
+    hdfTest("read, write Frame")
       val tmp = tmpFilePath(".h5")
 
       val df1 = Frame(mat.rand(3, 3), Index(d1, d2, d3), Index(1, 2, 3))
@@ -259,9 +249,8 @@ class H5StoreSpec extends Specification {
       H5Store.closeFile(fid)
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("update/overwrite Frame fails safely") {
+    hdfTest("update/overwrite Frame fails safely")
       val tmp = tmpFilePath(".h5")
 
       val d1 = new DateTime(2005, 1, 1, 0, 0, 0, 0)
@@ -280,9 +269,8 @@ class H5StoreSpec extends Specification {
       H5Store.readFrame[DateTime, Int, Double](tmp, "df1") must_== df1
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("update/overwrite Series fails safely") {
+    hdfTest("update/overwrite Series fails safely")
       val tmp = tmpFilePath(".h5")
 
       val s1 = Series(vec.rand(3), Index(d1, d2, d3))
@@ -295,9 +283,8 @@ class H5StoreSpec extends Specification {
       H5Store.readSeries[DateTime, Double](tmp, "s1") must_== s1
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("write/read empty Frame") {
+    hdfTest("write/read empty Frame")
       val tmp = tmpFilePath(".h5")
 
       H5Store.writeFrame(tmp, "f1", Frame.empty[DateTime, Int, Double])
@@ -307,9 +294,8 @@ class H5StoreSpec extends Specification {
       res must_== Frame.empty[DateTime, Int, Double]
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("write/read to nested groups") {
+    hdfTest("write/read to nested groups")
       val tmp = tmpFilePath(".h5")
 
       val s1 = Series(1, 2, 3)
@@ -330,9 +316,8 @@ class H5StoreSpec extends Specification {
       H5Store.readSeries[Int, Int](tmp, "s1/s2") must_== s2
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("write/read heterogenous Frame") {
+    hdfTest("write/read heterogenous Frame")
       val tmp = tmpFilePath(".h5")
 
       val d1 = new DateTime(2005, 1, 1, 0, 0, 0, 0)
@@ -373,9 +358,8 @@ class H5StoreSpec extends Specification {
       res6 must_== Panel(1 -> s1, 6 -> s6)
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("H5Store exceptions are handled properly") {
+    hdfTest("H5Store exceptions are handled properly")
       val tmp = tmpFilePath(".h5")
 
       H5Store.readSeries[DateTime, Double](tmp, "s1") must throwAn[
@@ -392,9 +376,8 @@ class H5StoreSpec extends Specification {
           H5Store.H5StoreException]
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
 
-    hdfTest("H5Store is thread-safe") {
+    hdfTest("H5Store is thread-safe")
       import scala.collection.JavaConversions._
 
       val tmp = tmpFilePath(".h5")
@@ -412,44 +395,35 @@ class H5StoreSpec extends Specification {
       // simultaneous writes
 
       val taskListW = for (i <- 1 to 100) yield
-        new Callable[Unit] {
-          def call() {
+        new Callable[Unit]
+          def call()
             H5Store.writeFrame(tmp, "f%s".format(i), df1)
             H5Store.writeFrame(tmp, "f%s".format(100 + i), df2)
-          }
-        }
 
       pool.invokeAll(taskListW)
 
       // simultaneous reads
 
       val taskListR = for (i <- 1 to 100) yield
-        new Callable[Unit] {
-          def call() {
+        new Callable[Unit]
+          def call()
             H5Store.readFrame[DateTime, Int, Double](
                 tmp, "f%s".format(100 + i)) must_== df2
             H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
-          }
-        }
 
       pool.invokeAll(taskListR.toSeq)
 
       // interleaved reads & writes
 
       val taskListRW = for (i <- 1 to 100) yield
-        new Callable[Unit] {
-          def call() {
+        new Callable[Unit]
+          def call()
             if (i % 2 == 0) H5Store.writeFrame(tmp, "f%s".format(100 + i), df1)
             else
               H5Store.readFrame[DateTime, Int, Double](tmp, "f%s".format(i)) must_== df1
-          }
-        }
 
       pool.invokeAll(taskListRW.toSeq)
 
       pool.shutdown()
 
       Files.deleteIfExists(Paths.get(tmp))
-    }
-  }
-}

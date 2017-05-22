@@ -34,23 +34,19 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
 /** ReadOnlyIntegerWrapper Spec tests. */
 @RunWith(classOf[JUnitRunner])
-class ReadOnlyIntegerWrapperSpec extends FlatSpec with BeforeAndAfterEach {
+class ReadOnlyIntegerWrapperSpec extends FlatSpec with BeforeAndAfterEach
 
-  "A ReadOnlyIntegerWrapper" should "be an instance of IntegerProperty" in {
+  "A ReadOnlyIntegerWrapper" should "be an instance of IntegerProperty" in
     val p = new ReadOnlyIntegerWrapper()
     assert(p.isInstanceOf[IntegerProperty])
-  }
 
-  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyIntegerProperty`" in {
+  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyIntegerProperty`" in
     val p = new ReadOnlyIntegerWrapper()
     assert(p.readOnlyProperty.isInstanceOf[ReadOnlyIntegerProperty])
-  }
 
-  it should "propagate value changes to `readOnlyProperty`" in {
+  it should "propagate value changes to `readOnlyProperty`" in
     val p = new ReadOnlyIntegerWrapper()
     p.value = -18
     p.readOnlyProperty() should equal(-18)
     p.value = 7896
     p.readOnlyProperty() should equal(7896)
-  }
-}

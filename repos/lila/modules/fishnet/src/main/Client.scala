@@ -8,23 +8,21 @@ case class Client(
     skill: Client.Skill, // what can this client do
     instance: Option[Client.Instance], // last seen instance
     enabled: Boolean,
-    createdAt: DateTime) {
+    createdAt: DateTime)
 
   def key = _id
 
   def fullId = s"$userId:$key"
 
   def updateInstance(i: Client.Instance): Option[Client] =
-    instance.fold(i.some)(_ update i) map { newInstance =>
+    instance.fold(i.some)(_ update i) map  newInstance =>
       copy(instance = newInstance.some)
-    }
 
   def lichess = userId.value == "lichess"
 
   def disabled = !enabled
-}
 
-object Client {
+object Client
 
   val offline = Client(_id = Key("offline"),
                        userId = UserId("offline"),
@@ -42,7 +40,7 @@ object Client {
   case class Instance(version: Version,
                       engine: Engine,
                       ip: IpAddress,
-                      seenAt: DateTime) {
+                      seenAt: DateTime)
 
     def update(i: Instance): Option[Instance] =
       if (i.version != version) i.some
@@ -52,23 +50,18 @@ object Client {
       else none
 
     def seenRecently = seenAt isAfter Instance.recentSince
-  }
 
-  object Instance {
+  object Instance
 
     def recentSince = DateTime.now.minusMinutes(15)
-  }
 
-  sealed trait Skill {
+  sealed trait Skill
     def key = toString.toLowerCase
-  }
-  object Skill {
+  object Skill
     case object Move extends Skill
     case object Analysis extends Skill
     case object All extends Skill
     val all = List(Move, Analysis, All)
     def byKey(key: String) = all.find(_.key == key)
-  }
 
   def makeKey = Key(scala.util.Random.alphanumeric take 8 mkString)
-}

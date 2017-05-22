@@ -29,26 +29,23 @@ import org.apache.spark.sql.functions.col
 
 class InteractionSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
-  test("params") {
+    with DefaultReadWriteTest
+  test("params")
     ParamsSuite.checkParams(new Interaction())
-  }
 
-  test("feature encoder") {
-    def encode(cardinalities: Array[Int], value: Any): Vector = {
+  test("feature encoder")
+    def encode(cardinalities: Array[Int], value: Any): Vector =
       var indices = ArrayBuilder.make[Int]
       var values = ArrayBuilder.make[Double]
       val encoder = new FeatureEncoder(cardinalities)
       encoder.foreachNonzeroOutput(value,
                                    (i, v) =>
-                                     {
                                        indices += i
                                        values += v
-                                   })
+                                   )
       Vectors
         .sparse(encoder.outputSize, indices.result(), values.result())
         .compressed
-    }
     assert(encode(Array(1), 2.2) === Vectors.dense(2.2))
     assert(encode(Array(3), Vectors.dense(1)) === Vectors.dense(0, 1, 0))
     assert(encode(Array(1, 1), Vectors.dense(1.1, 2.2)) === Vectors.dense(1.1,
@@ -63,14 +60,12 @@ class InteractionSuite
     intercept[SparkException] { encode(Array(1), null) }
     intercept[AssertionError] { encode(Array(2), 2.2) }
     intercept[AssertionError] { encode(Array(3), Vectors.dense(2.2)) }
-    intercept[AssertionError] {
+    intercept[AssertionError]
       encode(Array(1), Vectors.dense(1.0, 2.0, 3.0))
-    }
     intercept[AssertionError] { encode(Array(3), Vectors.dense(-1)) }
     intercept[AssertionError] { encode(Array(3), Vectors.dense(3)) }
-  }
 
-  test("numeric interaction") {
+  test("numeric interaction")
     val data = sqlContext
       .createDataFrame(
           Seq((2, Vectors.dense(3.0, 4.0)), (1, Vectors.dense(1.0, 5.0)))
@@ -99,9 +94,8 @@ class InteractionSuite
         Array[Attribute](new NumericAttribute(Some("a:b_foo"), Some(1)),
                          new NumericAttribute(Some("a:b_bar"), Some(2))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("nominal interaction") {
+  test("nominal interaction")
     val data = sqlContext
       .createDataFrame(
           Seq((2, Vectors.dense(3.0, 4.0)), (1, Vectors.dense(1.0, 5.0)))
@@ -136,9 +130,8 @@ class InteractionSuite
                          new NumericAttribute(Some("a_left:b_foo"), Some(5)),
                          new NumericAttribute(Some("a_left:b_bar"), Some(6))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("default attr names") {
+  test("default attr names")
     val data = sqlContext
       .createDataFrame(
           Seq((2, Vectors.dense(0.0, 4.0), 1.0),
@@ -184,12 +177,9 @@ class InteractionSuite
                          new NumericAttribute(Some("a_2:b_0_1:c"), Some(8)),
                          new NumericAttribute(Some("a_2:b_1:c"), Some(9))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new Interaction()
       .setInputCols(Array("myInputCol", "myInputCol2"))
       .setOutputCol("myOutputCol")
     testDefaultReadWrite(t)
-  }
-}

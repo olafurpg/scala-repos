@@ -5,11 +5,11 @@ import org.saddle.Vec
 /**
   * Enriches Boolean Vec with logic methods
   */
-trait VecBoolEnricher {
+trait VecBoolEnricher
 
   // some logic methods. scala.Function1 is not specialized on
   // Boolean input. not sure I care to work around this
-  implicit def vecToBoolLogic(v: Vec[Boolean]) = new {
+  implicit def vecToBoolLogic(v: Vec[Boolean]) = new
 
     /**
       * True if all elements are true
@@ -35,5 +35,3 @@ trait VecBoolEnricher {
       * Number of elements which are false
       */
     def countF: Int = v.foldLeft(0)((a, b) => a + (if (b) 0 else 1))
-  }
-}

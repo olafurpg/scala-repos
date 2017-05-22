@@ -25,25 +25,21 @@ import scalaz._
 import scalaz.syntax.equal._
 import scalaz.std.anyVal._
 
-class PerfTestSuiteSpec extends Specification {
+class PerfTestSuiteSpec extends Specification
   implicit def perfTestEq = Equal.equalA[PerfTest]
 
-  implicit def treeEq[A : Equal] = new Equal[Tree[A]] {
+  implicit def treeEq[A : Equal] = new Equal[Tree[A]]
     def equal(a: Tree[A], b: Tree[A]): Boolean =
       Equal[A].equal(a.rootLabel, b.rootLabel) &&
       a.subForest.size == b.subForest.size &&
       ((a.subForest zip b.subForest) forall (equal _).tupled)
-  }
 
-  object ex extends PerfTestSuite {
-    "a" := {
-      "b" := concurrently {
+  object ex extends PerfTestSuite
+    "a" :=
+      "b" := concurrently
         query("1")
         query("2")
-      }
       query("3")
-    }
-  }
 
   val exInnerTest = Tree.node(
       RunSequential,
@@ -69,62 +65,47 @@ class PerfTestSuiteSpec extends Specification {
               ))
       ))
 
-  "the DSL" should {
-    "create an initial group based on the class" in {
-      object weird extends PerfTestSuite {
+  "the DSL" should
+    "create an initial group based on the class" in
+      object weird extends PerfTestSuite
         query("1")
         query("2")
-      }
 
-      weird.test must beLike {
+      weird.test must beLike
         case Tree.Node(Group(name), _) =>
           name must contain("weird")
-      }
-    }
 
-    "faithfully reprsent the test suite" in {
+    "faithfully reprsent the test suite" in
       ex.test.subForest must have size (1)
 
       treeEq[PerfTest].equal(ex.test.subForest.head, exInnerTest) must beTrue
-    }
 
-    "allow inclusion of other test suites" in {
-      object ex2 extends PerfTestSuite {
+    "allow inclusion of other test suites" in
+      object ex2 extends PerfTestSuite
         include(ex)
-      }
 
-      ex2.test must beLike {
+      ex2.test must beLike
         case Tree.Node(Group(_),
                        Stream(Tree.Node(RunSequential, Stream(inner)))) =>
           treeEq[PerfTest].equal(ex.test, inner) must beTrue
-      }
-    }
-  }
 
-  "the test selector" should {
-    "select whole tree if root is true" in {
+  "the test selector" should
+    "select whole tree if root is true" in
       val t = ex select ((_, _) => true)
-      t must beLike {
+      t must beLike
         case Some(t) =>
           treeEq[PerfTest].equal(t, ex.test) must beTrue
-      }
-    }
 
-    "selecting multiple disjoint tests gives list" in {
+    "selecting multiple disjoint tests gives list" in
       val ts =
-        ex select {
+        ex select
           case (_, _: RunQuery) => true
           case (_, _) => false
-        }
 
-      ts must beLike {
+      ts must beLike
         case Some(Tree.Node(Group(_), ts)) =>
           ts must haveTheSameElementsAs(List(
                   Tree.leaf[PerfTest](RunQuery("1")),
                   Tree.leaf[PerfTest](RunQuery("2")),
                   Tree.leaf[PerfTest](RunQuery("3"))
               )) ^^ (treeEq[PerfTest].equal(_, _))
-      }
-    }
-  }
-}

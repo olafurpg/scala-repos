@@ -39,7 +39,7 @@ import slick.util.MacroSupport.macroSupportInterpolation
   * reserved word), otherwise a bug in the DB2 JDBC driver triggers a SQL
   * Error -206 (SQLState 42703).
   */
-trait DB2Profile extends JdbcProfile {
+trait DB2Profile extends JdbcProfile
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.reverse -
@@ -72,22 +72,21 @@ trait DB2Profile extends JdbcProfile {
       .map(_.filter(_.name.schema.filter(_ == "SYSTOOLS").isEmpty))
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match
     case java.sql.Types.TINYINT =>
       "SMALLINT" // DB2 has no smaller binary integer type
     case _ => super.defaultSqlTypeName(tmd, sym)
-  }
 
   override val scalarFrom = Some("sysibm.sysdummy1")
 
   class QueryBuilder(tree: Node, state: CompilerState)
-      extends super.QueryBuilder(tree, state) {
+      extends super.QueryBuilder(tree, state)
 
     override protected val hasPiFunction = false
     override protected val hasRadDegConversion = false
     override protected val pi = "decfloat(3.1415926535897932384626433832)"
 
-    override def expr(c: Node, skipParens: Boolean = false): Unit = c match {
+    override def expr(c: Node, skipParens: Boolean = false): Unit = c match
       case RowNumber(by) =>
         b += "row_number() over("
         if (!by.isEmpty) buildOrderByClause(by)
@@ -103,28 +102,24 @@ trait DB2Profile extends JdbcProfile {
       case Library.Database() => b += "current server"
       case Library.CountAll(LiteralNode(1)) => b"count(*)"
       case _ => super.expr(c, skipParens)
-    }
 
-    override protected def buildOrdering(n: Node, o: Ordering) {
+    override protected def buildOrdering(n: Node, o: Ordering)
       /* DB2 does not have explicit NULLS FIST/LAST clauses. Nulls are
        * sorted after non-null values by default. */
-      if (o.nulls.first && !o.direction.desc) {
+      if (o.nulls.first && !o.direction.desc)
         b += "case when ("
         expr(n)
         b += ") is null then 0 else 1 end,"
-      } else if (o.nulls.last && o.direction.desc) {
+      else if (o.nulls.last && o.direction.desc)
         b += "case when ("
         expr(n)
         b += ") is null then 1 else 0 end,"
-      }
       expr(n)
       if (o.direction.desc) b += " desc"
-    }
-  }
 
-  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table) {
-    override protected def createIndex(idx: Index) = {
-      if (idx.unique) {
+  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table)
+    override protected def createIndex(idx: Index) =
+      if (idx.unique)
         /* Create a UNIQUE CONSTRAINT (with an automatically generated backing
          * index) because DB2 does not allow a FOREIGN KEY CONSTRAINT to
          * reference columns which have a UNIQUE INDEX but not a nominal UNIQUE
@@ -136,27 +131,22 @@ trait DB2Profile extends JdbcProfile {
         addIndexColumnList(idx.on, sb, idx.table.tableName)
         sb append ")"
         sb.toString
-      } else super.createIndex(idx)
-    }
-  }
+      else super.createIndex(idx)
 
   class ColumnDDLBuilder(column: FieldSymbol)
-      extends super.ColumnDDLBuilder(column) {
-    override def appendColumn(sb: StringBuilder) {
+      extends super.ColumnDDLBuilder(column)
+    override def appendColumn(sb: StringBuilder)
       val qname = quoteIdentifier(column.name)
       sb append qname append ' '
       appendType(sb)
       appendOptions(sb)
-      if (jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType]) {
+      if (jdbcType.isInstanceOf[JdbcTypes#BooleanJdbcType])
         sb append " constraint " + quoteIdentifier(column.name + "__bool") +
         " check (" append qname append " in (0, 1))"
-      }
-    }
-  }
 
   class SequenceDDLBuilder[T](seq: Sequence[T])
-      extends super.SequenceDDLBuilder(seq) {
-    override def buildDDL: DDL = {
+      extends super.SequenceDDLBuilder(seq)
+    override def buildDDL: DDL =
       val b =
         new StringBuilder append "create sequence " append quoteIdentifier(
             seq.name)
@@ -167,26 +157,20 @@ trait DB2Profile extends JdbcProfile {
       seq._maxValue.foreach { b append " maxvalue " append _ }
       if (seq._cycle) b append " cycle"
       DDL(b.toString, "drop sequence " + quoteIdentifier(seq.name))
-    }
-  }
 
-  class JdbcTypes extends super.JdbcTypes {
+  class JdbcTypes extends super.JdbcTypes
     override val booleanJdbcType = new BooleanJdbcType
     override val uuidJdbcType = new UUIDJdbcType
 
-    class UUIDJdbcType extends super.UUIDJdbcType {
+    class UUIDJdbcType extends super.UUIDJdbcType
       override def sqlType = java.sql.Types.CHAR
       override def sqlTypeName(sym: Option[FieldSymbol]) =
         "CHAR(16) FOR BIT DATA"
-    }
 
     /* DB2 does not have a proper BOOLEAN type. The suggested workaround is
      * a constrained CHAR with constants 1 and 0 for TRUE and FALSE. */
-    class BooleanJdbcType extends super.BooleanJdbcType {
+    class BooleanJdbcType extends super.BooleanJdbcType
       override def sqlTypeName(sym: Option[FieldSymbol]) = "CHAR(1)"
       override def valueToSQLLiteral(value: Boolean) = if (value) "1" else "0"
-    }
-  }
-}
 
 object DB2Profile extends DB2Profile

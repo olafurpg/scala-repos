@@ -8,7 +8,7 @@
 
 package org.scalajs.core.tools.linker.backend.emitter
 
-private[linker] object LongImpl {
+private[linker] object LongImpl
   final val RuntimeLongClass = "sjsr_RuntimeLong"
   final val RuntimeLongModuleClass = "sjsr_RuntimeLong$"
 
@@ -157,4 +157,3 @@ private[linker] object LongImpl {
     (value.toInt & MASK,
      (value >> BITS).toInt & MASK,
      (value >> BITS01).toInt & MASK_2)
-}

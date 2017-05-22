@@ -40,19 +40,17 @@ import org.apache.spark.sql.{Row, SQLContext}
 @Since("1.3.0")
 class ChiSqSelectorModel @Since("1.3.0")(
     @Since("1.3.0") val selectedFeatures: Array[Int])
-    extends VectorTransformer with Saveable {
+    extends VectorTransformer with Saveable
 
   require(isSorted(selectedFeatures), "Array has to be sorted asc")
 
-  protected def isSorted(array: Array[Int]): Boolean = {
+  protected def isSorted(array: Array[Int]): Boolean =
     var i = 1
     val len = array.length
-    while (i < len) {
+    while (i < len)
       if (array(i) < array(i - 1)) return false
       i += 1
-    }
     true
-  }
 
   /**
     * Applies transformation on a vector.
@@ -61,9 +59,8 @@ class ChiSqSelectorModel @Since("1.3.0")(
     * @return transformed vector.
     */
   @Since("1.3.0")
-  override def transform(vector: Vector): Vector = {
+  override def transform(vector: Vector): Vector =
     compress(vector, selectedFeatures)
-  }
 
   /**
     * Returns a vector with features filtered.
@@ -72,8 +69,8 @@ class ChiSqSelectorModel @Since("1.3.0")(
     * @param features vector
     * @param filterIndices indices of features to filter, must be ordered asc
     */
-  private def compress(features: Vector, filterIndices: Array[Int]): Vector = {
-    features match {
+  private def compress(features: Vector, filterIndices: Array[Int]): Vector =
+    features match
       case SparseVector(size, indices, values) =>
         val newSize = filterIndices.length
         val newValues = new ArrayBuilder.ofDouble
@@ -82,22 +79,19 @@ class ChiSqSelectorModel @Since("1.3.0")(
         var j = 0
         var indicesIdx = 0
         var filterIndicesIdx = 0
-        while (i < indices.length && j < filterIndices.length) {
+        while (i < indices.length && j < filterIndices.length)
           indicesIdx = indices(i)
           filterIndicesIdx = filterIndices(j)
-          if (indicesIdx == filterIndicesIdx) {
+          if (indicesIdx == filterIndicesIdx)
             newIndices += j
             newValues += values(i)
             j += 1
             i += 1
-          } else {
-            if (indicesIdx > filterIndicesIdx) {
+          else
+            if (indicesIdx > filterIndicesIdx)
               j += 1
-            } else {
+            else
               i += 1
-            }
-          }
-        }
         // TODO: Sparse representation might be ineffective if (newSize ~= newValues.size)
         Vectors.sparse(newSize, newIndices.result(), newValues.result())
       case DenseVector(values) =>
@@ -106,24 +100,19 @@ class ChiSqSelectorModel @Since("1.3.0")(
       case other =>
         throw new UnsupportedOperationException(
             s"Only sparse and dense vectors are supported but got ${other.getClass}.")
-    }
-  }
 
   @Since("1.6.0")
-  override def save(sc: SparkContext, path: String): Unit = {
+  override def save(sc: SparkContext, path: String): Unit =
     ChiSqSelectorModel.SaveLoadV1_0.save(sc, this, path)
-  }
 
   override protected def formatVersion: String = "1.0"
-}
 
-object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
+object ChiSqSelectorModel extends Loader[ChiSqSelectorModel]
   @Since("1.6.0")
-  override def load(sc: SparkContext, path: String): ChiSqSelectorModel = {
+  override def load(sc: SparkContext, path: String): ChiSqSelectorModel =
     ChiSqSelectorModel.SaveLoadV1_0.load(sc, path)
-  }
 
-  private[feature] object SaveLoadV1_0 {
+  private[feature] object SaveLoadV1_0
 
     private val thisFormatVersion = "1.0"
 
@@ -133,7 +122,7 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
     private[feature] val thisClassName =
       "org.apache.spark.mllib.feature.ChiSqSelectorModel"
 
-    def save(sc: SparkContext, model: ChiSqSelectorModel, path: String): Unit = {
+    def save(sc: SparkContext, model: ChiSqSelectorModel, path: String): Unit =
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
       val metadata = compact(
@@ -143,13 +132,11 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
         .saveAsTextFile(Loader.metadataPath(path))
 
       // Create Parquet data.
-      val dataArray = Array.tabulate(model.selectedFeatures.length) { i =>
+      val dataArray = Array.tabulate(model.selectedFeatures.length)  i =>
         Data(model.selectedFeatures(i))
-      }
       sc.parallelize(dataArray, 1).toDF().write.parquet(Loader.dataPath(path))
-    }
 
-    def load(sc: SparkContext, path: String): ChiSqSelectorModel = {
+    def load(sc: SparkContext, path: String): ChiSqSelectorModel =
       implicit val formats = DefaultFormats
       val sqlContext = SQLContext.getOrCreate(sc)
       val (className, formatVersion, metadata) = Loader.loadMetadata(sc, path)
@@ -162,14 +149,11 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
       // Check schema explicitly since erasure makes it hard to use match-case for checking.
       Loader.checkSchema[Data](dataFrame.schema)
 
-      val features = dataArray.rdd.map {
+      val features = dataArray.rdd.map
         case Row(feature: Int) => (feature)
-      }.collect()
+      .collect()
 
       return new ChiSqSelectorModel(features)
-    }
-  }
-}
 
 /**
   * Creates a ChiSquared feature selector.
@@ -180,7 +164,7 @@ object ChiSqSelectorModel extends Loader[ChiSqSelectorModel] {
   */
 @Since("1.3.0")
 class ChiSqSelector @Since("1.3.0")(@Since("1.3.0") val numTopFeatures: Int)
-    extends Serializable {
+    extends Serializable
 
   /**
     * Returns a ChiSquared feature selector.
@@ -190,7 +174,7 @@ class ChiSqSelector @Since("1.3.0")(@Since("1.3.0") val numTopFeatures: Int)
     *             Apply feature discretizer before using this function.
     */
   @Since("1.3.0")
-  def fit(data: RDD[LabeledPoint]): ChiSqSelectorModel = {
+  def fit(data: RDD[LabeledPoint]): ChiSqSelectorModel =
     val indices = Statistics
       .chiSqTest(data)
       .zipWithIndex
@@ -199,5 +183,3 @@ class ChiSqSelector @Since("1.3.0")(@Since("1.3.0") val numTopFeatures: Int)
       .map { case (_, indices) => indices }
       .sorted
     new ChiSqSelectorModel(indices)
-  }
-}

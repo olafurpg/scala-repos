@@ -1,15 +1,14 @@
 import scala.language.reflectiveCalls
 
-object Test extends App {
+object Test extends App
   val str = "ABCDEFGHIJKLMABCDEFGHIJKLM"
   val surrogateStr = "an old Turkic letter: \uD803\uDC22"
 
-  type SB = {
+  type SB =
     def indexOf(str: String): Int
     def indexOf(str: String, fromIndex: Int): Int
     def lastIndexOf(str: String): Int
     def lastIndexOf(str: String, fromIndex: Int): Int
-  }
 
   import scala.collection.mutable.{StringBuilder => ScalaStringBuilder}
   import java.lang.{StringBuilder => JavaStringBuilder}
@@ -39,4 +38,3 @@ object Test extends App {
   val ssb = new ScalaStringBuilder(surrogateStr).reverseContents
 
   assert(jsb.toString == ssb.toString)
-}

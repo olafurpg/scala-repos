@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 /**
   * Converters for interacting with the blocking `java.io` streams APIs
   */
-object StreamConverters {
+object StreamConverters
 
   import Source.{shape ⇒ sourceShape}
   import Sink.{shape ⇒ sinkShape}
@@ -103,4 +103,3 @@ object StreamConverters {
   def asInputStream(
       readTimeout: FiniteDuration = 5.seconds): Sink[ByteString, InputStream] =
     Sink.fromGraph(new InputStreamSinkStage(readTimeout))
-}

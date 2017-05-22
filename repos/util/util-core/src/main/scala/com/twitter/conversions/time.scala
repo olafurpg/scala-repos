@@ -20,8 +20,8 @@ import com.twitter.util.Duration
 import java.util.concurrent.TimeUnit
 import scala.language.implicitConversions
 
-object time {
-  class RichWholeNumber(wrapped: Long) {
+object time
+  class RichWholeNumber(wrapped: Long)
     def nanoseconds: Duration = Duration(wrapped, TimeUnit.NANOSECONDS)
     def nanosecond: Duration = nanoseconds
     def microseconds: Duration = Duration(wrapped, TimeUnit.MICROSECONDS)
@@ -37,9 +37,8 @@ object time {
     def hour: Duration = hours
     def days: Duration = Duration(wrapped, TimeUnit.DAYS)
     def day: Duration = days
-  }
 
-  private val ZeroRichWholeNumber = new RichWholeNumber(0) {
+  private val ZeroRichWholeNumber = new RichWholeNumber(0)
     override def nanoseconds: Duration = Duration.Zero
     override def microseconds: Duration = Duration.Zero
     override def milliseconds: Duration = Duration.Zero
@@ -47,10 +46,8 @@ object time {
     override def minutes: Duration = Duration.Zero
     override def hours: Duration = Duration.Zero
     override def days: Duration = Duration.Zero
-  }
 
   implicit def intToTimeableNumber(i: Int): RichWholeNumber =
     if (i == 0) ZeroRichWholeNumber else new RichWholeNumber(i)
   implicit def longToTimeableNumber(l: Long): RichWholeNumber =
     if (l == 0) ZeroRichWholeNumber else new RichWholeNumber(l)
-}

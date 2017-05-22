@@ -8,11 +8,11 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class HttpResponseClassifierTest extends FunSuite {
+class HttpResponseClassifierTest extends FunSuite
   private val req = Request()
   private def rep(code: Status): Try[Response] = Return(Response(code))
 
-  test("ServerErrorsAsFailures") {
+  test("ServerErrorsAsFailures")
     val classifier = HttpResponseClassifier.ServerErrorsAsFailures
     assert("ServerErrorsAsFailures" == classifier.toString)
 
@@ -24,16 +24,13 @@ class HttpResponseClassifierTest extends FunSuite {
         ResponseClass.NonRetryableFailure == classifier.applyOrElse(
             ReqRep(req, rep(Status.InternalServerError)),
             ResponseClassifier.Default))
-  }
 
-  test("apply") {
-    val ok500 = HttpResponseClassifier {
+  test("apply")
+    val ok500 = HttpResponseClassifier
       case (_, rep: Response) if rep.statusCode == 500 => ResponseClass.Success
-    }
-    val badReqs = HttpResponseClassifier {
+    val badReqs = HttpResponseClassifier
       case (req: Request, _) if req.containsParam("fail") =>
         ResponseClass.NonRetryableFailure
-    }
     val classifier = ok500.orElse(badReqs)
 
     assert(ResponseClass.Success == classifier(
@@ -44,5 +41,3 @@ class HttpResponseClassifierTest extends FunSuite {
     assert(!classifier.isDefinedAt(ReqRep(req, rep(Status.Ok))))
     assert(ResponseClass.Success == classifier.applyOrElse(
             ReqRep(req, rep(Status.Ok)), ResponseClassifier.Default))
-  }
-}

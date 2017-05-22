@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   // test a file instead of a piece of code
   override def resourceFile = "implicits-shadowing-res.scala"
@@ -9,7 +9,7 @@ object Test extends ScaladocModelTest {
   // start implicits
   def scaladocSettings = "-implicits"
 
-  def testModel(root: Package) = {
+  def testModel(root: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -65,5 +65,3 @@ object Test extends ScaladocModelTest {
     assert(conv.members.length == 11)
     assert(conv.members.forall(isShadowed(_)))
     assert(conv.constraints.length == 0)
-  }
-}

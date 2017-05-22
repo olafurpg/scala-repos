@@ -39,7 +39,7 @@ import scalafx.geometry.Side
 import scalafx.scene.Node
 import scalafx.scene.Node._
 
-object MenuButton {
+object MenuButton
   implicit def sfxToggleButton2jfx(mb: MenuButton): jfxsc.MenuButton =
     if (mb != null) mb.delegate else null
 
@@ -54,14 +54,13 @@ object MenuButton {
 
   /** Called after the MenuButton has shown its popup. */
   val OnShown: EventType[jfxe.Event] = jfxsc.MenuButton.ON_SHOWN
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/MenuButton.html]].
   */
 class MenuButton(
     override val delegate: jfxsc.MenuButton = new jfxsc.MenuButton)
-    extends ButtonBase(delegate) with SFXDelegate[jfxsc.MenuButton] {
+    extends ButtonBase(delegate) with SFXDelegate[jfxsc.MenuButton]
 
   /** Creates a toggle button with the specified text as its label. */
   def this(text: String) = this(new jfxsc.MenuButton(text))
@@ -79,21 +78,18 @@ class MenuButton(
     *
     * @param c Items to replace prior content.
     */
-  def items_=(c: Iterable[MenuItem]) {
+  def items_=(c: Iterable[MenuItem])
     fillSFXCollection(this.items, c)
-  }
 
   /** Indicates on which side the ContextMenu should open in relation to the MenuButton. */
   def popupSide: jfxbp.ObjectProperty[jfxg.Side] = delegate.popupSideProperty()
 
-  def popupSide_=(side: Side) {
+  def popupSide_=(side: Side)
     popupSide() = side
-  }
 
   /** Hides the ContextMenu. */
-  def hide() {
+  def hide()
     delegate.hide()
-  }
 
   /** Gets the value of the property showing. */
   def showing: Boolean = delegate.isShowing
@@ -101,7 +97,5 @@ class MenuButton(
   /** If the Menu is not disabled and the ContextMenu is not already showing,
     * then this will cause the ContextMenu to be shown.
     */
-  def show() {
+  def show()
     delegate.show()
-  }
-}

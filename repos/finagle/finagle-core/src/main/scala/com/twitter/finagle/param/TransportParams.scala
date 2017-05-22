@@ -20,7 +20,7 @@ import com.twitter.util.{Duration, StorageUnit}
   *      [[ServerTransportParams]] for server-specific params
   */
 abstract class TransportParams[A <: Stack.Parameterized[A]](
-    self: Stack.Parameterized[A]) {
+    self: Stack.Parameterized[A])
 
   /**
     * Configures this client or server with given TCP send buffer `size` (default: unspecified,
@@ -70,4 +70,3 @@ abstract class TransportParams[A <: Stack.Parameterized[A]](
     */
   def verbose: A =
     self.configured(Transport.Verbose(enabled = true))
-}

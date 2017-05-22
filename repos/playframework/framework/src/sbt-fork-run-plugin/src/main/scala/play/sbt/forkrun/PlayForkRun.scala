@@ -15,8 +15,8 @@ import play.sbt.{run => _, _}
 import play.runsupport.Reloader.CompileResult
 import scala.concurrent.duration._
 
-object Import {
-  object PlayForkRunKeys {
+object Import
+  object PlayForkRunKeys
     val playRun = InputKey[Unit]("playRun", "Play in-process reloading run")
     val playForkRun =
       InputKey[Unit]("playForkRun", "Play forked reloading run")
@@ -38,10 +38,8 @@ object Import {
         "playForkStarted", "Callback for play server start")
     val playForkReload = TaskKey[CompileResult](
         "playForkReload", "Information needed for forked reloads")
-  }
-}
 
-object PlayForkRun extends AutoPlugin {
+object PlayForkRun extends AutoPlugin
 
   override def requires = Play && SerializersPlugin && BackgroundRunPlugin
 
@@ -75,19 +73,17 @@ object PlayForkRun extends AutoPlugin {
           x => RegisteredSerializer(x.serializer, x.unserializer, x.manifest))
   )
 
-  val allInput: Parser[String] = {
+  val allInput: Parser[String] =
     import sbt.complete.DefaultParsers._
     (token(Space) ~> token(any.*.string, "<arg>")).?.map(_.fold("")(" ".+))
-  }
 
-  def selectRunTask = Def.inputTaskDyn[Unit] {
+  def selectRunTask = Def.inputTaskDyn[Unit]
     val input = allInput.parsed
     val forked = (fork in (Compile, run)).value
     val runInput = if (forked) playForkRun else playRun
     runInput.toTask(input)
-  }
 
-  def forkOptionsTask = Def.task[PlayForkOptions] {
+  def forkOptionsTask = Def.task[PlayForkOptions]
     PlayForkOptions(
         workingDirectory = baseDirectory.value,
         jvmOptions = (javaOptions in (Compile, run)).value,
@@ -98,30 +94,27 @@ object PlayForkRun extends AutoPlugin {
         logLevel = ((logLevel in (Compile, run)) ?? Level.Info).value,
         logSbtEvents = playForkLogSbtEvents.value,
         shutdownTimeout = playForkShutdownTimeout.value)
-  }
 
-  def forkRunTask = Def.inputTask[Unit] {
+  def forkRunTask = Def.inputTask[Unit]
     val args = Def.spaceDelimited().parsed
     val jobService = BackgroundJobServiceKeys.jobService.value
-    val handle = jobService.runInBackgroundThread(resolvedScoped.value, {
+    val handle = jobService.runInBackgroundThread(resolvedScoped.value,
       (_, uiContext) =>
         // use normal task streams log rather than the background run logger
         PlayForkProcess(playForkOptions.value, args, streams.value.log)
-    })
+    )
     PlayConsoleInteractionMode.waitForCancel()
     jobService.stop(handle)
     jobService.waitFor(handle)
-  }
 
-  def backgroundForkRunTask = Def.inputTask[BackgroundJobHandle] {
+  def backgroundForkRunTask = Def.inputTask[BackgroundJobHandle]
     val args = Def.spaceDelimited().parsed
     BackgroundJobServiceKeys.jobService.value
-      .runInBackgroundThread(resolvedScoped.value, { (logger, uiContext) =>
+      .runInBackgroundThread(resolvedScoped.value,  (logger, uiContext) =>
       PlayForkProcess(playForkOptions.value, args, logger)
-    })
-  }
+    )
 
-  def forkConfigTask = Def.task[ForkConfig] {
+  def forkConfigTask = Def.task[ForkConfig]
     ForkConfig(
         projectDirectory = baseDirectory.value,
         javaOptions = (javaOptions in Runtime).value,
@@ -144,22 +137,17 @@ object PlayForkRun extends AutoPlugin {
         compileTimeout = playForkCompileTimeout.value.toMillis,
         mainClass = (mainClass in (Compile, run)).value.get
     )
-  }
 
-  def serverStartedTask = Def.inputTask[Unit] {
+  def serverStartedTask = Def.inputTask[Unit]
     val url = allInput.parsed.trim
     playForkStarted.value(url)
-  }
 
-  def publishUrlTask = Def.task[String => Unit] { url =>
+  def publishUrlTask = Def.task[String => Unit]  url =>
     SendEventServiceKeys.sendEventService.value
       .sendEvent(PlayServerStarted(url))(Serializers.playServerStartedPickler)
-  }
 
-  def compileTask = Def.task[CompileResult] {
+  def compileTask = Def.task[CompileResult]
     PlayReload.compile(
         () => PlayInternalKeys.playReload.result.value,
         () => PlayInternalKeys.playReloaderClasspath.result.value,
         () => Option(streamsManager.value))
-  }
-}

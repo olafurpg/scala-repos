@@ -25,7 +25,7 @@ import com.typesafe.tools.mima.core.ProblemFilters._
 import com.typesafe.tools.mima.plugin.MimaKeys.{binaryIssueFilters, previousArtifact}
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 
-object MimaBuild {
+object MimaBuild
 
   def excludeMember(fullName: String) = Seq(
       ProblemFilters.exclude[MissingMethodProblem](fullName),
@@ -49,16 +49,14 @@ object MimaBuild {
   )
 
   // Exclude a Spark class, that is in the package org.apache.spark
-  def excludeSparkClass(className: String) = {
+  def excludeSparkClass(className: String) =
     excludeClass("org.apache.spark." + className)
-  }
 
   // Exclude a Spark package, that is in the package org.apache.spark
-  def excludeSparkPackage(packageName: String) = {
+  def excludeSparkPackage(packageName: String) =
     excludePackage("org.apache.spark." + packageName)
-  }
 
-  def ignoredABIProblems(base: File, currentSparkVersion: String) = {
+  def ignoredABIProblems(base: File, currentSparkVersion: String) =
 
     // Excludes placed here will be used for all Spark versions
     val defaultExcludes = Seq()
@@ -70,24 +68,21 @@ object MimaBuild {
         base.getAbsolutePath + "/.generated-mima-member-excludes")
 
     val ignoredClasses: Seq[String] =
-      if (!classExcludeFilePath.exists()) {
+      if (!classExcludeFilePath.exists())
         Seq()
-      } else {
+      else
         IO.read(classExcludeFilePath).split("\n")
-      }
 
     val ignoredMembers: Seq[String] =
-      if (!memberExcludeFilePath.exists()) {
+      if (!memberExcludeFilePath.exists())
         Seq()
-      } else {
+      else
         IO.read(memberExcludeFilePath).split("\n")
-      }
 
     defaultExcludes ++ ignoredClasses.flatMap(excludeClass) ++ ignoredMembers
       .flatMap(excludeMember) ++ MimaExcludes.excludes(currentSparkVersion)
-  }
 
-  def mimaSettings(sparkHome: File, projectRef: ProjectRef) = {
+  def mimaSettings(sparkHome: File, projectRef: ProjectRef) =
     val organization = "org.apache.spark"
     // The resolvers setting for MQTT Repository is needed for mqttv3(1.0.1)
     // because spark-streaming-mqtt(1.6.0) depends on it.
@@ -99,5 +94,3 @@ object MimaBuild {
         binaryIssueFilters ++= ignoredABIProblems(sparkHome, version.value),
         sbt.Keys.resolvers +=
           "MQTT Repository" at "https://repo.eclipse.org/content/repositories/paho-releases")
-  }
-}

@@ -8,53 +8,44 @@ import java.util.concurrent.{Executors, ThreadFactory, TimeUnit}
 import org.jboss.netty.{util => netty}
 
 // Wrapper around Netty timers.
-private class HashedWheelTimer(underlying: netty.Timer) extends Timer {
-  protected def scheduleOnce(when: Time)(f: => Unit): TimerTask = {
-    val timeout = underlying.newTimeout(new netty.TimerTask {
-      def run(to: netty.Timeout): Unit = {
+private class HashedWheelTimer(underlying: netty.Timer) extends Timer
+  protected def scheduleOnce(when: Time)(f: => Unit): TimerTask =
+    val timeout = underlying.newTimeout(new netty.TimerTask
+      def run(to: netty.Timeout): Unit =
         if (!to.isCancelled) f
-      }
-    }, math.max(0, (when - Time.now).inMilliseconds), TimeUnit.MILLISECONDS)
+    , math.max(0, (when - Time.now).inMilliseconds), TimeUnit.MILLISECONDS)
     toTimerTask(timeout)
-  }
 
   protected def schedulePeriodically(
       when: Time,
       period: Duration
   )(
       f: => Unit
-  ): TimerTask = new TimerTask {
+  ): TimerTask = new TimerTask
     var isCancelled = false
     var ref: TimerTask = schedule(when) { loop() }
 
-    def loop(): Unit = {
+    def loop(): Unit =
       f
-      synchronized {
+      synchronized
         if (!isCancelled) ref = schedule(period.fromNow) { loop() }
-      }
-    }
 
-    def cancel() {
-      synchronized {
+    def cancel()
+      synchronized
         isCancelled = true
         ref.cancel()
-      }
-    }
-  }
 
   def stop(): Unit = underlying.stop()
 
-  private[this] def toTimerTask(task: netty.Timeout) = new TimerTask {
+  private[this] def toTimerTask(task: netty.Timeout) = new TimerTask
     def cancel(): Unit = task.cancel()
-  }
-}
 
 /**
   * A HashedWheelTimer that uses [[org.jboss.netty.util.HashedWheelTimer]] under
   * the hood. Prefer using a single instance per application, the default
   * instance is [[HashedWheelTimer.Default]].
   */
-object HashedWheelTimer {
+object HashedWheelTimer
 
   /**
     * A wheel size of 512 and 10 millisecond ticks provides approximately 5100
@@ -77,13 +68,12 @@ object HashedWheelTimer {
     */
   def apply(threadFactory: ThreadFactory,
             tickDuration: Duration,
-            ticksPerWheel: Int): Timer = {
+            ticksPerWheel: Int): Timer =
     val hwt = new netty.HashedWheelTimer(threadFactory,
                                          tickDuration.inNanoseconds,
                                          TimeUnit.NANOSECONDS,
                                          ticksPerWheel)
     new HashedWheelTimer(hwt)
-  }
 
   /**
     * Create a `HashedWheelTimer` with custom [[ThreadFactory]] and [[Duration]].
@@ -127,12 +117,11 @@ object HashedWheelTimer {
 
   TimerStats.hashedWheelTimerInternals(
       nettyHwt, () => 10.seconds, FinagleStatsReceiver.scope("timer"))
-}
 
 /**
   * Retained for compatibility. Prefer [[HashedWheelTimer]].
   */
-object DefaultTimer {
+object DefaultTimer
   private[finagle] val netty = HashedWheelTimer.nettyHwt
 
   val twitter: Timer = HashedWheelTimer.Default
@@ -140,4 +129,3 @@ object DefaultTimer {
   val get: DefaultTimer.type = this
 
   override def toString: String = "DefaultTimer"
-}

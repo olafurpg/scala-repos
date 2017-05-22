@@ -1,12 +1,12 @@
 package gitbucket.core.model
 
-trait PullRequestComponent extends TemplateComponent { self: Profile =>
+trait PullRequestComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
 
   lazy val PullRequests = TableQuery[PullRequests]
 
   class PullRequests(tag: Tag)
-      extends Table[PullRequest](tag, "PULL_REQUEST") with IssueTemplate {
+      extends Table[PullRequest](tag, "PULL_REQUEST") with IssueTemplate
     val branch = column[String]("BRANCH")
     val requestUserName = column[String]("REQUEST_USER_NAME")
     val requestRepositoryName = column[String]("REQUEST_REPOSITORY_NAME")
@@ -30,8 +30,6 @@ trait PullRequestComponent extends TemplateComponent { self: Profile =>
                      repositoryName: Column[String],
                      issueId: Column[Int]) =
       byIssue(userName, repositoryName, issueId)
-  }
-}
 
 case class PullRequest(
     userName: String,

@@ -18,7 +18,7 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 
 /** Common helper functions */
-object CommonHelperFunctions {
+object CommonHelperFunctions
 
   /** Split a data set into evalK folds for crossvalidation.
     * Apply to data sets supplied to evaluation.
@@ -35,7 +35,7 @@ object CommonHelperFunctions {
       evaluatorInfo: EI,
       trainingDataCreator: RDD[D] => TD,
       queryCreator: D => Q,
-      actualCreator: D => A): Seq[(TD, EI, RDD[(Q, A)])] = {
+      actualCreator: D => A): Seq[(TD, EI, RDD[(Q, A)])] =
 
     val indexedPoints = dataset.zipWithIndex
 
@@ -43,28 +43,21 @@ object CommonHelperFunctions {
                     pt: D,
                     idx: Long,
                     k: Int,
-                    isTraining: Boolean): Option[D] = {
+                    isTraining: Boolean): Option[D] =
       if ((idx % k == foldIdx) ^ isTraining) Some(pt)
       else None
-    }
 
-    (0 until evalK).map { foldIdx =>
-      val trainingPoints = indexedPoints.flatMap {
+    (0 until evalK).map  foldIdx =>
+      val trainingPoints = indexedPoints.flatMap
         case (pt, idx) =>
           selectPoint(foldIdx, pt, idx, evalK, true)
-      }
-      val testingPoints = indexedPoints.flatMap {
+      val testingPoints = indexedPoints.flatMap
         case (pt, idx) =>
           selectPoint(foldIdx, pt, idx, evalK, false)
-      }
 
       (
           trainingDataCreator(trainingPoints),
           evaluatorInfo,
-          testingPoints.map { d =>
+          testingPoints.map  d =>
             (queryCreator(d), actualCreator(d))
-          }
       )
-    }
-  }
-}

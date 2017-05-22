@@ -83,7 +83,7 @@ trait SBTConsolePlatform
     with SecureVFSModule[Future, Slice] with ActorVFSModule
     with IdSourceScannerModule with VFSColumnarTableModule
     with StandaloneActorProjectionSystem with XLightWebHttpClientModule[Future]
-    with LongIdMemoryDatasetConsumer[Future] {
+    with LongIdMemoryDatasetConsumer[Future]
   self =>
 
   type YggConfig = PlatformConfig
@@ -91,25 +91,23 @@ trait SBTConsolePlatform
   trait TableCompanion extends VFSColumnarTableCompanion
 
   object Table extends TableCompanion
-}
 
-object SBTConsole {
+object SBTConsole
   val controlTimeout = Duration(30, "seconds")
 
-  val platform = new SBTConsolePlatform { console =>
+  val platform = new SBTConsolePlatform  console =>
     implicit val actorSystem = ActorSystem("sbtConsoleActorSystem")
     implicit val asyncContext =
       ExecutionContext.defaultExecutionContext(actorSystem)
     implicit val M: Monad[Future] with Comonad[Future] =
       new UnsafeFutureComonad(asyncContext, yggConfig.maxEvalDuration)
 
-    val yggConfig = new PlatformConfig {
+    val yggConfig = new PlatformConfig
       val config =
-        Configuration parse {
-          Option(System.getProperty("precog.storage.root")) map {
+        Configuration parse
+          Option(System.getProperty("precog.storage.root")) map
             "precog.storage.root = " + _
-          } getOrElse { "" }
-        }
+          getOrElse { "" }
 
       val sortWorkDir = scratchDir
       val memoizationBufferSize = sortBufferSize
@@ -128,7 +126,6 @@ object SBTConsole {
 
       //TODO: Get a producer ID
       val idSource = new FreshAtomicIdSource
-    }
 
     val accountFinder = new StaticAccountFinder[Future]("", "")
     val rawAPIKeyFinder = new InMemoryAPIKeyManager[Future](Clock.System)
@@ -173,57 +170,46 @@ object SBTConsole {
 
     def Evaluator[N[+ _]](N0: Monad[N])(
         implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
-      new Evaluator[N](N0) {
+      new Evaluator[N](N0)
         type YggConfig = PlatformConfig
         val yggConfig = console.yggConfig
         val report = LoggingQueryLogger[N](N0)
         def freshIdScanner = console.freshIdScanner
-      }
 
-    def eval(str: String): Set[SValue] = evalE(str) match {
+    def eval(str: String): Set[SValue] = evalE(str) match
       case Success(results) => results.map(_._2)
       case Failure(t) => throw t
-    }
 
-    def evalE(str: String) = {
+    def evalE(str: String) =
       val dag = produceDAG(str)
       consumeEval(dag, evaluationContext)
-    }
 
-    def produceDAG(str: String) = {
+    def produceDAG(str: String) =
       val forest = compile(str)
       val validForest = forest filter { _.errors.isEmpty }
 
-      if (validForest.isEmpty) {
+      if (validForest.isEmpty)
         val strs =
-          forest map { tree =>
+          forest map  tree =>
             tree.errors map showError mkString ("Set(\"", "\", \"", "\")")
-          }
 
         sys.error(strs mkString " | ")
-      }
 
-      if (validForest.size > 1) {
+      if (validForest.size > 1)
         sys.error("ambiguous parse (good luck!)")
-      }
 
       val tree = validForest.head
       val Right(dag) = decorate(emit(tree))
       dag
-    }
 
-    def startup() {
+    def startup()
       // start storage bifrost
-    }
 
-    def shutdown() {
+    def shutdown()
       // stop storage bifrost
       Await.result(
           gracefulStop(projectionsActor, yggConfig.storageTimeout.duration),
           yggConfig.storageTimeout.duration)
       actorSystem.shutdown()
-    }
-  }
-}
 
 // vim: set ts=4 sw=4 et:

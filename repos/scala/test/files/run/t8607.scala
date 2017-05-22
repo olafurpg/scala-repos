@@ -1,15 +1,12 @@
-package p1 {
-  private[p1] trait B extends Any {
+package p1
+  private[p1] trait B extends Any
     def a: Any = ""
-  }
 
-  class C(val value: Int) extends AnyVal with B {
+  class C(val value: Int) extends AnyVal with B
     // def b = ""
-  }
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val c = new p1.C(42)
     c.a
     /*
@@ -32,5 +29,3 @@ object Test {
       ).a();
 
    */
-  }
-}

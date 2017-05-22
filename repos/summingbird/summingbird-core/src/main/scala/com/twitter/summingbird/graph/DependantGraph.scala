@@ -20,7 +20,7 @@ package com.twitter.summingbird.graph
   * Given Dag and a List of immutable nodes, and a function to get
   * dependencies, compute the dependants (reverse the graph)
   */
-abstract class DependantGraph[T] {
+abstract class DependantGraph[T]
   def nodes: List[T]
   def dependenciesOf(t: T): Iterable[T]
 
@@ -51,4 +51,3 @@ abstract class DependantGraph[T] {
     * Does not include itself
     */
   def transitiveDependantsOf(p: T): List[T] = depthFirstOf(p)(graph)
-}

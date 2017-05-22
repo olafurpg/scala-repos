@@ -8,7 +8,7 @@ package directives
 import scala.util.matching.Regex
 import akka.http.impl.util._
 
-trait HostDirectives {
+trait HostDirectives
   import BasicDirectives._
   import RouteDirectives._
 
@@ -36,30 +36,23 @@ trait HostDirectives {
     * If the regex contains a capturing group only the string matched by this group is extracted.
     * If the regex contains more than one capturing group an IllegalArgumentException is thrown.
     */
-  def host(regex: Regex): Directive1[String] = {
-    def forFunc(regexMatch: String ⇒ Option[String]): Directive1[String] = {
-      extractHost.flatMap { name ⇒
-        regexMatch(name) match {
+  def host(regex: Regex): Directive1[String] =
+    def forFunc(regexMatch: String ⇒ Option[String]): Directive1[String] =
+      extractHost.flatMap  name ⇒
+        regexMatch(name) match
           case Some(matched) ⇒ provide(matched)
           case None ⇒ reject
-        }
-      }
-    }
 
-    regex.groupCount match {
+    regex.groupCount match
       case 0 ⇒ forFunc(regex.findPrefixOf(_))
       case 1 ⇒ forFunc(regex.findPrefixMatchOf(_).map(_.group(1)))
       case _ ⇒
         throw new IllegalArgumentException(
             "Path regex '" + regex.pattern.pattern +
             "' must not contain more than one capturing group")
-    }
-  }
-}
 
-object HostDirectives extends HostDirectives {
+object HostDirectives extends HostDirectives
   import BasicDirectives._
 
   private val _extractHost: Directive1[String] = extract(
       _.request.uri.authority.host.address)
-}

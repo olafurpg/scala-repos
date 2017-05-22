@@ -20,9 +20,9 @@ package org.apache.spark.graphx.util
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.graphx.LocalSparkContext
 
-class GraphGeneratorsSuite extends SparkFunSuite with LocalSparkContext {
+class GraphGeneratorsSuite extends SparkFunSuite with LocalSparkContext
 
-  test("GraphGenerators.generateRandomEdges") {
+  test("GraphGenerators.generateRandomEdges")
     val src = 5
     val numEdges10 = 10
     val numEdges20 = 20
@@ -53,32 +53,30 @@ class GraphGeneratorsSuite extends SparkFunSuite with LocalSparkContext {
     assert(
         edges10_round1
           .zip(edges10_round2)
-          .forall {
+          .forall
         case (e1, e2) =>
           e1.srcId == e2.srcId && e1.dstId == e2.dstId && e1.attr == e2.attr
-      })
+      )
 
     val edges10_round3 = GraphGenerators.generateRandomEdges(
         src, numEdges10, maxVertexId, seed = 3467)
     assert(
         !edges10_round1
           .zip(edges10_round3)
-          .forall {
+          .forall
         case (e1, e2) =>
           e1.srcId == e2.srcId && e1.dstId == e2.dstId && e1.attr == e2.attr
-      })
-  }
+      )
 
-  test("GraphGenerators.sampleLogNormal") {
+  test("GraphGenerators.sampleLogNormal")
     val mu = 4.0
     val sigma = 1.3
     val maxVal = 100
 
     val trials = 1000
-    for (i <- 1 to trials) {
+    for (i <- 1 to trials)
       val dstId = GraphGenerators.sampleLogNormal(mu, sigma, maxVal)
       assert(dstId < maxVal)
-    }
 
     val dstId_round1 =
       GraphGenerators.sampleLogNormal(mu, sigma, maxVal, 12345)
@@ -88,10 +86,9 @@ class GraphGeneratorsSuite extends SparkFunSuite with LocalSparkContext {
 
     val dstId_round3 = GraphGenerators.sampleLogNormal(mu, sigma, maxVal, 789)
     assert(dstId_round1 != dstId_round3)
-  }
 
-  test("GraphGenerators.logNormalGraph") {
-    withSpark { sc =>
+  test("GraphGenerators.logNormalGraph")
+    withSpark  sc =>
       val mu = 4.0
       val sigma = 1.3
       val numVertices100 = 100
@@ -111,10 +108,10 @@ class GraphGeneratorsSuite extends SparkFunSuite with LocalSparkContext {
       assert(
           graph_round1_edges
             .zip(graph_round2_edges)
-            .forall {
+            .forall
           case (e1, e2) =>
             e1.srcId == e2.srcId && e1.dstId == e2.dstId && e1.attr == e2.attr
-        })
+        )
 
       val graph_round3 = GraphGenerators.logNormalGraph(
           sc, numVertices100, mu = mu, sigma = sigma, seed = 567)
@@ -124,20 +121,14 @@ class GraphGeneratorsSuite extends SparkFunSuite with LocalSparkContext {
       assert(
           !graph_round1_edges
             .zip(graph_round3_edges)
-            .forall {
+            .forall
           case (e1, e2) =>
             e1.srcId == e2.srcId && e1.dstId == e2.dstId && e1.attr == e2.attr
-        })
-    }
-  }
+        )
 
-  test("SPARK-5064 GraphGenerators.rmatGraph numEdges upper bound") {
-    withSpark { sc =>
+  test("SPARK-5064 GraphGenerators.rmatGraph numEdges upper bound")
+    withSpark  sc =>
       val g1 = GraphGenerators.rmatGraph(sc, 4, 4)
       assert(g1.edges.count() === 4)
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         val g2 = GraphGenerators.rmatGraph(sc, 4, 8)
-      }
-    }
-  }
-}

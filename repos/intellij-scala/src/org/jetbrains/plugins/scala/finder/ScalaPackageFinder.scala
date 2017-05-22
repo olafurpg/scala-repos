@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
   * User: Alefas
   * Date: 10.02.12
   */
-class ScalaPackageFinder(project: Project) extends PsiElementFinder {
+class ScalaPackageFinder(project: Project) extends PsiElementFinder
   def findClass(qualifiedName: String, scope: GlobalSearchScope): PsiClass =
     null
 
@@ -17,8 +17,6 @@ class ScalaPackageFinder(project: Project) extends PsiElementFinder {
       qualifiedName: String, scope: GlobalSearchScope): Array[PsiClass] =
     PsiClass.EMPTY_ARRAY
 
-  override def findPackage(qName: String): PsiPackage = {
+  override def findPackage(qName: String): PsiPackage =
     if (DumbService.isDumb(project)) return null
     ScalaPsiManager.instance(project).syntheticPackage(qName)
-  }
-}

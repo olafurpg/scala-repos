@@ -1,6 +1,6 @@
 package org.scalatra
 
-class UrlGeneratorTestServlet extends ScalatraServlet {
+class UrlGeneratorTestServlet extends ScalatraServlet
   val cat: String = "meea"
 
   val simpleString = get("/foo") {}
@@ -41,7 +41,6 @@ class UrlGeneratorTestServlet extends ScalatraServlet {
   val customMatcher =
     get(new RouteMatcher { def apply(requestPath: String) = None }) {}
 
-  val stringAndCustomMatcher = get("/fail", new RouteMatcher {
+  val stringAndCustomMatcher = get("/fail", new RouteMatcher
     def apply(requestPath: String) = None
-  }) {}
-}
+  ) {}

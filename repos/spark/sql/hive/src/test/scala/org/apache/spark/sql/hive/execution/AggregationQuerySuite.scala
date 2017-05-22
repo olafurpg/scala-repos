@@ -31,7 +31,7 @@ import org.apache.spark.sql.test.SQLTestUtils
 import org.apache.spark.sql.types._
 
 class ScalaAggregateFunction(schema: StructType)
-    extends UserDefinedAggregateFunction {
+    extends UserDefinedAggregateFunction
 
   def inputSchema: StructType = schema
 
@@ -41,35 +41,25 @@ class ScalaAggregateFunction(schema: StructType)
 
   def deterministic: Boolean = true
 
-  def initialize(buffer: MutableAggregationBuffer): Unit = {
-    (0 until schema.length).foreach { i =>
+  def initialize(buffer: MutableAggregationBuffer): Unit =
+    (0 until schema.length).foreach  i =>
       buffer.update(i, null)
-    }
-  }
 
-  def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
-    if (!input.isNullAt(0) && input.getInt(0) == 50) {
-      (0 until schema.length).foreach { i =>
+  def update(buffer: MutableAggregationBuffer, input: Row): Unit =
+    if (!input.isNullAt(0) && input.getInt(0) == 50)
+      (0 until schema.length).foreach  i =>
         buffer.update(i, input.get(i))
-      }
-    }
-  }
 
-  def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
-    if (!buffer2.isNullAt(0) && buffer2.getInt(0) == 50) {
-      (0 until schema.length).foreach { i =>
+  def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit =
+    if (!buffer2.isNullAt(0) && buffer2.getInt(0) == 50)
+      (0 until schema.length).foreach  i =>
         buffer1.update(i, buffer2.get(i))
-      }
-    }
-  }
 
-  def evaluate(buffer: Row): Any = {
+  def evaluate(buffer: Row): Any =
     Row.fromSeq(buffer.toSeq)
-  }
-}
 
 class ScalaAggregateFunctionWithoutInputSchema
-    extends UserDefinedAggregateFunction {
+    extends UserDefinedAggregateFunction
 
   def inputSchema: StructType = StructType(Nil)
 
@@ -80,26 +70,21 @@ class ScalaAggregateFunctionWithoutInputSchema
 
   def deterministic: Boolean = true
 
-  def initialize(buffer: MutableAggregationBuffer): Unit = {
+  def initialize(buffer: MutableAggregationBuffer): Unit =
     buffer.update(0, 0L)
-  }
 
-  def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
+  def update(buffer: MutableAggregationBuffer, input: Row): Unit =
     buffer.update(0,
                   input.getAs[Seq[Row]](0).map(_.getAs[Int]("v")).sum +
                   buffer.getLong(0))
-  }
 
-  def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
+  def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit =
     buffer1.update(0, buffer1.getLong(0) + buffer2.getLong(0))
-  }
 
-  def evaluate(buffer: Row): Any = {
+  def evaluate(buffer: Row): Any =
     buffer.getLong(0)
-  }
-}
 
-class LongProductSum extends UserDefinedAggregateFunction {
+class LongProductSum extends UserDefinedAggregateFunction
   def inputSchema: StructType =
     new StructType().add("a", LongType).add("b", LongType)
 
@@ -109,29 +94,24 @@ class LongProductSum extends UserDefinedAggregateFunction {
 
   def deterministic: Boolean = true
 
-  def initialize(buffer: MutableAggregationBuffer): Unit = {
+  def initialize(buffer: MutableAggregationBuffer): Unit =
     buffer(0) = 0L
-  }
 
-  def update(buffer: MutableAggregationBuffer, input: Row): Unit = {
-    if (!(input.isNullAt(0) || input.isNullAt(1))) {
+  def update(buffer: MutableAggregationBuffer, input: Row): Unit =
+    if (!(input.isNullAt(0) || input.isNullAt(1)))
       buffer(0) = buffer.getLong(0) + input.getLong(0) * input.getLong(1)
-    }
-  }
 
-  def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit = {
+  def merge(buffer1: MutableAggregationBuffer, buffer2: Row): Unit =
     buffer1(0) = buffer1.getLong(0) + buffer2.getLong(0)
-  }
 
   def evaluate(buffer: Row): Any =
     buffer.getLong(0)
-}
 
 abstract class AggregationQuerySuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest with SQLTestUtils with TestHiveSingleton
   import testImplicits._
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     val data1 = Seq[(Integer, Integer)]((1, 10),
                                         (null, -60),
@@ -190,24 +170,21 @@ abstract class AggregationQuerySuite
     sqlContext.udf.register("mydoublesum", new MyDoubleSum)
     sqlContext.udf.register("mydoubleavg", new MyDoubleAvg)
     sqlContext.udf.register("longProductSum", new LongProductSum)
-  }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     sqlContext.sql("DROP TABLE IF EXISTS agg1")
     sqlContext.sql("DROP TABLE IF EXISTS agg2")
     sqlContext.sql("DROP TABLE IF EXISTS agg3")
     sqlContext.dropTempTable("emptyTable")
-  }
 
-  test("group by function") {
+  test("group by function")
     Seq((1, 2)).toDF("a", "b").registerTempTable("data")
 
     checkAnswer(
         sql("SELECT floor(a) AS a, collect_set(b) FROM data GROUP BY floor(a) ORDER BY a"),
         Row(1, Array(2)) :: Nil)
-  }
 
-  test("empty table") {
+  test("empty table")
     // If there is no GROUP BY clause and the table is empty, we will generate a single row.
     checkAnswer(sqlContext.sql("""
           |SELECT
@@ -256,9 +233,8 @@ abstract class AggregationQuerySuite
           |GROUP BY key
         """.stripMargin),
                 Nil)
-  }
 
-  test("null literal") {
+  test("null literal")
     checkAnswer(sqlContext.sql("""
           |SELECT
           |  AVG(null),
@@ -270,9 +246,8 @@ abstract class AggregationQuerySuite
           |  SUM(null)
         """.stripMargin),
                 Row(null, 0, null, null, null, null, null) :: Nil)
-  }
 
-  test("only do grouping") {
+  test("only do grouping")
     checkAnswer(sqlContext.sql("""
           |SELECT key
           |FROM agg1
@@ -322,9 +297,8 @@ abstract class AggregationQuerySuite
             null,
             Seq[Integer](2, 3, 4)) :: Row(100, Seq[Integer](null)) :: Row(
             null, Seq[Integer](3)) :: Row(null, null) :: Nil)
-  }
 
-  test("case in-sensitive resolution") {
+  test("case in-sensitive resolution")
     checkAnswer(sqlContext.sql("""
           |SELECT avg(value), kEY - 100
           |FROM agg1
@@ -349,18 +323,16 @@ abstract class AggregationQuerySuite
         """.stripMargin),
                 Row(-90) :: Row(-80) :: Row(-70) :: Row(-100) :: Row(-102) :: Row(
                     null) :: Nil)
-  }
 
-  test("test average no key in output") {
+  test("test average no key in output")
     checkAnswer(sqlContext.sql("""
           |SELECT avg(value)
           |FROM agg1
           |GROUP BY key
         """.stripMargin),
                 Row(-0.5) :: Row(20.0) :: Row(null) :: Row(10.0) :: Nil)
-  }
 
-  test("test average") {
+  test("test average")
     checkAnswer(
         sqlContext.sql("""
           |SELECT key, avg(value)
@@ -397,12 +369,11 @@ abstract class AggregationQuerySuite
           |SELECT avg(value) FROM agg1
         """.stripMargin),
                 Row(11.125) :: Nil)
-  }
 
-  test("first_value and last_value") {
+  test("first_value and last_value")
     // We force to use a single partition for the sort and aggregate to make result
     // deterministic.
-    withSQLConf(SQLConf.SHUFFLE_PARTITIONS.key -> "1") {
+    withSQLConf(SQLConf.SHUFFLE_PARTITIONS.key -> "1")
       checkAnswer(sqlContext.sql("""
             |SELECT
             |  first_valUE(key),
@@ -431,10 +402,8 @@ abstract class AggregationQuerySuite
             |FROM (SELECT key FROM agg1 ORDER BY key DESC) tmp
           """.stripMargin),
           Row(3, null, 3, null, 3, 1, 3, 1) :: Nil)
-    }
-  }
 
-  test("udaf") {
+  test("udaf")
     checkAnswer(sqlContext.sql("""
           |SELECT
           |  key,
@@ -454,9 +423,8 @@ abstract class AggregationQuerySuite
                                                             null,
                                                             null,
                                                             10.0) :: Nil)
-  }
 
-  test("interpreted aggregate function") {
+  test("interpreted aggregate function")
     checkAnswer(
         sqlContext.sql("""
           |SELECT mydoublesum(value), key
@@ -474,9 +442,8 @@ abstract class AggregationQuerySuite
           |SELECT mydoublesum(null)
         """.stripMargin),
                 Row(null) :: Nil)
-  }
 
-  test("interpreted and expression-based aggregation functions") {
+  test("interpreted and expression-based aggregation functions")
     checkAnswer(
         sqlContext.sql("""
           |SELECT mydoublesum(value), key, avg(value)
@@ -503,9 +470,8 @@ abstract class AggregationQuerySuite
             3,
             null,
             null) :: Row(null, null, null, null, 10.0) :: Nil)
-  }
 
-  test("single distinct column set") {
+  test("single distinct column set")
     // DISTINCT is not meaningful with Max and Min, so we just ignore the DISTINCT keyword.
     checkAnswer(sqlContext.sql("""
           |SELECT
@@ -579,9 +545,8 @@ abstract class AggregationQuerySuite
         """.stripMargin),
         Row(3, 3, 3, 2, 1) :: Row(3, 4, 4, 2, 2) :: Row(0, 2, 2, 0, 3) :: Row(
             3, 4, 4, 3, null) :: Nil)
-  }
 
-  test("single distinct multiple columns set") {
+  test("single distinct multiple columns set")
     checkAnswer(sqlContext.sql("""
           |SELECT
           |  key,
@@ -590,9 +555,8 @@ abstract class AggregationQuerySuite
           |GROUP BY key
         """.stripMargin),
                 Row(null, 3) :: Row(1, 3) :: Row(2, 1) :: Row(3, 0) :: Nil)
-  }
 
-  test("multiple distinct multiple columns sets") {
+  test("multiple distinct multiple columns sets")
     checkAnswer(
         sqlContext.sql("""
           |SELECT
@@ -617,9 +581,8 @@ abstract class AggregationQuerySuite
             1, 2, 40, 3, -10, 3, -100, 3, 70, 3, -10, -100, 3, 3) :: Row(
             2, 2, 0, 1, 1, 1, 1, 3, 1, 3, 3, 2, 4, 4) :: Row(
             3, 0, null, 1, 3, 0, 0, 0, null, 1, 3, 0, 2, 2) :: Nil)
-  }
 
-  test("test count") {
+  test("test count")
     checkAnswer(sqlContext.sql("""
           |SELECT
           |  count(value2),
@@ -652,9 +615,8 @@ abstract class AggregationQuerySuite
                     1, -10, 1, 1, null, 1) :: Row(0, -1, 1, 1, 2, 0) :: Row(
                     1, null, 1, 1, 2, 1) :: Row(1, 100, 1, 1, null, 1) :: Row(
                     1, null, 2, 2, 3, 1) :: Row(0, null, 1, 1, null, 0) :: Nil)
-  }
 
-  test("pearson correlation") {
+  test("pearson correlation")
     val df =
       Seq.tabulate(10)(i => (1.0 * i, 2.0 * i, i * -1.0)).toDF("a", "b", "c")
     val corr1 =
@@ -746,9 +708,8 @@ abstract class AggregationQuerySuite
       .collect()(0)
       .getDouble(0)
     assert(math.abs(corr7 - 0.6633880657639323) < 1e-12)
-  }
 
-  test("covariance: covar_pop and covar_samp") {
+  test("covariance: covar_pop and covar_samp")
     // non-trivial example. To reproduce in python, use:
     // >>> import numpy as np
     // >>> a = np.array(range(20))
@@ -780,9 +741,8 @@ abstract class AggregationQuerySuite
     val df3 = Seq.tabulate(1)(x => (1 * x, x * x * x - 2)).toDF("a", "b")
     checkAnswer(df3.groupBy().agg(covar_samp("a", "b")), Row(Double.NaN))
     checkAnswer(df3.groupBy().agg(covar_pop("a", "b")), Row(0.0))
-  }
 
-  test("no aggregation function (SPARK-11486)") {
+  test("no aggregation function (SPARK-11486)")
     val df = sqlContext
       .range(20)
       .selectExpr("id", "repeat(id, 1) as s")
@@ -791,9 +751,8 @@ abstract class AggregationQuerySuite
       .groupBy()
       .count()
     checkAnswer(df, Row(20) :: Nil)
-  }
 
-  test("udaf with all data types") {
+  test("udaf with all data types")
     val struct = StructType(StructField("f1", FloatType, true) :: StructField(
             "f2", ArrayType(BooleanType), true) :: Nil)
     val dataTypes = Seq(StringType,
@@ -818,12 +777,11 @@ abstract class AggregationQuerySuite
     // UnsafeRow.mutableFieldTypes.asScala.toSeq will trigger SortBasedAggregate to use
     // UnsafeRow as the aggregation buffer. While, dataTypes will trigger
     // SortBasedAggregate to use a safe row as the aggregation buffer.
-    Seq(dataTypes, UnsafeRow.mutableFieldTypes.asScala.toSeq).foreach {
+    Seq(dataTypes, UnsafeRow.mutableFieldTypes.asScala.toSeq).foreach
       dataTypes =>
-        val fields = dataTypes.zipWithIndex.map {
+        val fields = dataTypes.zipWithIndex.map
           case (dataType, index) =>
             StructField(s"col$index", dataType, nullable = true)
-        }
         // The schema used for data generator.
         val schemaForGenerator = StructType(fields)
         // The schema used for the DataFrame df.
@@ -840,16 +798,14 @@ abstract class AggregationQuerySuite
                                       new Random(System.nanoTime()))
         val dataGenerator = maybeDataGenerator.getOrElse(fail(
                 s"Failed to create data generator for schema $schemaForGenerator"))
-        val data = (1 to 50).map { i =>
-          dataGenerator.apply() match {
+        val data = (1 to 50).map  i =>
+          dataGenerator.apply() match
             case row: Row => Row.fromSeq(i +: row.toSeq)
             case null =>
               Row.fromSeq(i +: Seq.fill(schemaForGenerator.length)(null))
             case other =>
               fail(s"Row or null is expected to be generated, " +
                   s"but a ${other.getClass.getCanonicalName} is generated.")
-          }
-        }
 
         // Create a DF for the schema with random data.
         val rdd = sqlContext.sparkContext.parallelize(data, 1)
@@ -864,11 +820,9 @@ abstract class AggregationQuerySuite
             // udaf returns a Row as the output value.
             Row(expectedAnswer)
         )
-    }
-  }
 
-  test("udaf without specifying inputSchema") {
-    withTempTable("noInputSchemaUDAF") {
+  test("udaf without specifying inputSchema")
+    withTempTable("noInputSchemaUDAF")
       sqlContext.udf.register("noInputSchema",
                               new ScalaAggregateFunctionWithoutInputSchema)
 
@@ -894,26 +848,23 @@ abstract class AggregationQuerySuite
             |FROM noInputSchemaUDAF
           """.stripMargin),
                   Row(11) :: Nil)
-    }
-  }
-}
 
 class TungstenAggregationQuerySuite extends AggregationQuerySuite
 
 class TungstenAggregationQueryWithControlledFallbackSuite
-    extends AggregationQuerySuite {
+    extends AggregationQuerySuite
 
   override protected def checkAnswer(
-      actual: => DataFrame, expectedAnswer: Seq[Row]): Unit = {
-    (0 to 2).foreach { fallbackStartsAt =>
+      actual: => DataFrame, expectedAnswer: Seq[Row]): Unit =
+    (0 to 2).foreach  fallbackStartsAt =>
       withSQLConf(
-          "spark.sql.TungstenAggregate.testFallbackStartsAt" -> fallbackStartsAt.toString) {
+          "spark.sql.TungstenAggregate.testFallbackStartsAt" -> fallbackStartsAt.toString)
         // Create a new df to make sure its physical operator picks up
         // spark.sql.TungstenAggregate.testFallbackStartsAt.
         // todo: remove it?
         val newActual = Dataset.newDataFrame(sqlContext, actual.logicalPlan)
 
-        QueryTest.checkAnswer(newActual, expectedAnswer) match {
+        QueryTest.checkAnswer(newActual, expectedAnswer) match
           case Some(errorMessage) =>
             val newErrorMessage = s"""
                 |The following aggregation query failed when using TungstenAggregate with
@@ -926,20 +877,13 @@ class TungstenAggregationQueryWithControlledFallbackSuite
 
             fail(newErrorMessage)
           case None =>
-        }
-      }
-    }
-  }
 
   // Override it to make sure we call the actually overridden checkAnswer.
   override protected def checkAnswer(
-      df: => DataFrame, expectedAnswer: Row): Unit = {
+      df: => DataFrame, expectedAnswer: Row): Unit =
     checkAnswer(df, Seq(expectedAnswer))
-  }
 
   // Override it to make sure we call the actually overridden checkAnswer.
   override protected def checkAnswer(
-      df: => DataFrame, expectedAnswer: DataFrame): Unit = {
+      df: => DataFrame, expectedAnswer: DataFrame): Unit =
     checkAnswer(df, expectedAnswer.collect())
-  }
-}

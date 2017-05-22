@@ -2,7 +2,7 @@ package com.twitter.scalding
 
 import org.scalatest.{Matchers, WordSpec}
 
-class ExecutionUtilTest extends WordSpec with Matchers {
+class ExecutionUtilTest extends WordSpec with Matchers
   import ExecutionUtil._
 
   implicit val tz = DateOps.UTC
@@ -16,23 +16,18 @@ class ExecutionUtilTest extends WordSpec with Matchers {
 
   def testJobFailure(dr: DateRange) = throw new Exception("failed")
 
-  "ExecutionUtil" should {
-    "run multiple jobs" in {
+  "ExecutionUtil" should
+    "run multiple jobs" in
       val days = dateRange.each(Days(1)).toSeq
       val result = runDatesWithParallelism(Days(1))(testJob)
       assert(run(result).get == days.map(d => (d, 1)))
-    }
 
-    "run multiple jobs with executions" in {
+    "run multiple jobs with executions" in
       val days = dateRange.each(Days(1)).toSeq
       val result = runDateRangeWithParallelism(Days(1))(testJob)
       assert(run(result).get == days.map(d => 1))
-    }
 
-    "run multiple jobs with executions and sum results" in {
+    "run multiple jobs with executions and sum results" in
       val days = dateRange.each(Days(1)).toSeq
       val result = runDateRangeWithParallelismSum(Days(1))(testJob)
       assert(run(result).get == days.map(d => 1).sum)
-    }
-  }
-}

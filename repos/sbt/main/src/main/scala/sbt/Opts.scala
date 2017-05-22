@@ -11,8 +11,8 @@ import java.net.URL
 import sbt.io.Path
 
 /** Options for well-known tasks. */
-object Opts {
-  object compile {
+object Opts
+  object compile
     val deprecation = "-deprecation"
     def encoding(enc: String) = Seq("-encoding", enc)
     val explaintypes = "-explaintypes"
@@ -20,8 +20,7 @@ object Opts {
     val optimise = "-optimise"
     val unchecked = "-unchecked"
     val verbose = "-verbose"
-  }
-  object doc {
+  object doc
     def generator(g: String): Seq[String] = Seq("-doc-generator", g)
     def sourceUrl(u: String): Seq[String] = Seq("-doc-source-url", u)
     def title(t: String): Seq[String] = Seq("-doc-title", t)
@@ -29,11 +28,10 @@ object Opts {
     def externalAPI(mappings: Iterable[(File, URL)]): Seq[String] =
       if (mappings.isEmpty) Nil
       else
-        mappings.map {
+        mappings.map
           case (f, u) => s"${f.getAbsolutePath}#${u.toExternalForm}"
-        }.mkString("-doc-external-doc:", ",", "") :: Nil
-  }
-  object resolver {
+        .mkString("-doc-external-doc:", ",", "") :: Nil
+  object resolver
     import Path._
     val sonatypeReleases = Resolver.sonatypeRepo("releases")
     val sonatypeSnapshots = Resolver.sonatypeRepo("snapshots")
@@ -42,10 +40,8 @@ object Opts {
         "https://oss.sonatype.org/service/local/staging/deploy/maven2")
     val mavenLocalFile =
       Resolver.file("Local Repository", userHome / ".m2" / "repository" asFile)
-  }
-}
 
-object DefaultOptions {
+object DefaultOptions
   import Opts._
   import Path._
   import BuildPaths.{getGlobalBase, getGlobalSettingsDirectory}
@@ -59,14 +55,12 @@ object DefaultOptions {
   def scaladoc(name: String, version: String): Seq[String] =
     doc.title(name) ++ doc.version(version)
 
-  def resolvers(snapshot: Boolean): Seq[Resolver] = {
+  def resolvers(snapshot: Boolean): Seq[Resolver] =
     if (snapshot) Seq(Classpaths.typesafeSnapshots, resolver.sonatypeSnapshots)
     else Nil
-  }
-  def pluginResolvers(plugin: Boolean, snapshot: Boolean): Seq[Resolver] = {
+  def pluginResolvers(plugin: Boolean, snapshot: Boolean): Seq[Resolver] =
     if (plugin && snapshot)
       Seq(Classpaths.typesafeSnapshots, Classpaths.sbtPluginSnapshots) else Nil
-  }
   def addResolvers: Setting[_] =
     Keys.resolvers <++= Keys.isSnapshot apply resolvers
   def addPluginResolvers: Setting[_] =
@@ -90,4 +84,3 @@ object DefaultOptions {
                           version)
   def setupShellPrompt: Setting[_] =
     Keys.shellPrompt <<= Keys.version apply shellPrompt
-}

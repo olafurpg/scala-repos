@@ -6,7 +6,7 @@ import profile.simple._
 // TODO Why is direct import required?
 import gitbucket.core.model.Profile.dateColumnType
 
-trait MilestonesService {
+trait MilestonesService
 
   def createMilestone(
       owner: String,
@@ -42,13 +42,12 @@ trait MilestonesService {
     updateMilestone(milestone.copy(closedDate = Some(currentDate)))
 
   def deleteMilestone(owner: String, repository: String, milestoneId: Int)(
-      implicit s: Session): Unit = {
+      implicit s: Session): Unit =
     Issues
       .filter(_.byMilestone(owner, repository, milestoneId))
       .map(_.milestoneId.?)
       .update(None)
     Milestones.filter(_.byPrimaryKey(owner, repository, milestoneId)).delete
-  }
 
   def getMilestone(owner: String, repository: String, milestoneId: Int)(
       implicit s: Session): Option[Milestone] =
@@ -57,19 +56,17 @@ trait MilestonesService {
       .firstOption
 
   def getMilestonesWithIssueCount(owner: String, repository: String)(
-      implicit s: Session): List[(Milestone, Int, Int)] = {
-    val counts = Issues.filter { t =>
+      implicit s: Session): List[(Milestone, Int, Int)] =
+    val counts = Issues.filter  t =>
       (t.byRepository(owner, repository)) && (t.milestoneId.? isDefined)
-    }.groupBy { t =>
+    .groupBy  t =>
       t.milestoneId -> t.closed
-    }.map { case (t1, t2) => t1._1 -> t1._2 -> t2.length }.toMap
+    .map { case (t1, t2) => t1._1 -> t1._2 -> t2.length }.toMap
 
-    getMilestones(owner, repository).map { milestone =>
+    getMilestones(owner, repository).map  milestone =>
       (milestone,
        counts.getOrElse((milestone.milestoneId, false), 0),
        counts.getOrElse((milestone.milestoneId, true), 0))
-    }
-  }
 
   def getMilestones(owner: String, repository: String)(
       implicit s: Session): List[Milestone] =
@@ -77,4 +74,3 @@ trait MilestonesService {
       .filter(_.byRepository(owner, repository))
       .sortBy(_.milestoneId asc)
       .list
-}

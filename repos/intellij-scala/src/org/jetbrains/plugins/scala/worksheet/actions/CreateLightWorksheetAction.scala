@@ -12,8 +12,8 @@ import org.jetbrains.plugins.scala.actions.ScalaActionUtil
   * User: Dmitry.Naydanov
   * Date: 26.05.14.
   */
-class CreateLightWorksheetAction extends AnAction {
-  override def actionPerformed(e: AnActionEvent) {
+class CreateLightWorksheetAction extends AnAction
+  override def actionPerformed(e: AnActionEvent)
     val project = e.getProject
     val editor = e getData CommonDataKeys.EDITOR
     val text = StringUtil.notNullize(
@@ -26,9 +26,6 @@ class CreateLightWorksheetAction extends AnAction {
         text,
         ScratchFileService.Option.create_new_always)
     if (f != null) FileEditorManager.getInstance(project).openFile(f, true)
-  }
 
-  override def update(e: AnActionEvent) {
+  override def update(e: AnActionEvent)
     ScalaActionUtil enableAndShowIfInScalaFile e
-  }
-}

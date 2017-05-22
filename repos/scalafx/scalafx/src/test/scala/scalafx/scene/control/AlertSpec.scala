@@ -43,10 +43,9 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class AlertSpec
     extends SimpleSFXDelegateSpec[jfxsc.Alert, Alert](
-        classOf[jfxsc.Alert], classOf[Alert]) with RunOnApplicationThread {
+        classOf[jfxsc.Alert], classOf[Alert]) with RunOnApplicationThread
 
   override protected def getJavaClassInstance =
     new jfxsc.Alert(jfxsc.Alert.AlertType.CONFIRMATION)
   override protected def getScalaClassInstance =
     new Alert(Alert.AlertType.Confirmation)
-}

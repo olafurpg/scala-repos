@@ -28,97 +28,79 @@ import org.scalatest.concurrent.Timeouts
 
 import org.apache.spark.SparkFunSuite
 
-class EventLoopSuite extends SparkFunSuite with Timeouts {
+class EventLoopSuite extends SparkFunSuite with Timeouts
 
-  test("EventLoop") {
+  test("EventLoop")
     val buffer = new ConcurrentLinkedQueue[Int]
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         buffer.add(event)
-      }
 
       override def onError(e: Throwable): Unit = {}
-    }
     eventLoop.start()
     (1 to 100).foreach(eventLoop.post)
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert((1 to 100) === buffer.asScala.toSeq)
-    }
     eventLoop.stop()
-  }
 
-  test("EventLoop: start and stop") {
-    val eventLoop = new EventLoop[Int]("test") {
+  test("EventLoop: start and stop")
+    val eventLoop = new EventLoop[Int]("test")
 
       override def onReceive(event: Int): Unit = {}
 
       override def onError(e: Throwable): Unit = {}
-    }
     assert(false === eventLoop.isActive)
     eventLoop.start()
     assert(true === eventLoop.isActive)
     eventLoop.stop()
     assert(false === eventLoop.isActive)
-  }
 
-  test("EventLoop: onError") {
+  test("EventLoop: onError")
     val e = new RuntimeException("Oops")
     @volatile var receivedError: Throwable = null
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         throw e
-      }
 
-      override def onError(e: Throwable): Unit = {
+      override def onError(e: Throwable): Unit =
         receivedError = e
-      }
-    }
     eventLoop.start()
     eventLoop.post(1)
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert(e === receivedError)
-    }
     eventLoop.stop()
-  }
 
   test(
-      "EventLoop: error thrown from onError should not crash the event thread") {
+      "EventLoop: error thrown from onError should not crash the event thread")
     val e = new RuntimeException("Oops")
     @volatile var receivedError: Throwable = null
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         throw e
-      }
 
-      override def onError(e: Throwable): Unit = {
+      override def onError(e: Throwable): Unit =
         receivedError = e
         throw new RuntimeException("Oops")
-      }
-    }
     eventLoop.start()
     eventLoop.post(1)
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert(e === receivedError)
       assert(eventLoop.isActive)
-    }
     eventLoop.stop()
-  }
 
-  test("EventLoop: calling stop multiple times should only call onStop once") {
+  test("EventLoop: calling stop multiple times should only call onStop once")
     var onStopTimes = 0
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
       override def onReceive(event: Int): Unit = {}
 
       override def onError(e: Throwable): Unit = {}
 
-      override def onStop(): Unit = {
+      override def onStop(): Unit =
         onStopTimes += 1
-      }
-    }
 
     eventLoop.start()
 
@@ -127,143 +109,110 @@ class EventLoopSuite extends SparkFunSuite with Timeouts {
     eventLoop.stop()
 
     assert(1 === onStopTimes)
-  }
 
-  test("EventLoop: post event in multiple threads") {
+  test("EventLoop: post event in multiple threads")
     @volatile var receivedEventsCount = 0
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         receivedEventsCount += 1
-      }
 
       override def onError(e: Throwable): Unit = {}
-    }
     eventLoop.start()
 
     val threadNum = 5
     val eventsFromEachThread = 100
-    (1 to threadNum).foreach { _ =>
-      new Thread() {
-        override def run(): Unit = {
+    (1 to threadNum).foreach  _ =>
+      new Thread()
+        override def run(): Unit =
           (1 to eventsFromEachThread).foreach(eventLoop.post)
-        }
-      }.start()
-    }
+      .start()
 
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert(threadNum * eventsFromEachThread === receivedEventsCount)
-    }
     eventLoop.stop()
-  }
 
-  test("EventLoop: onReceive swallows InterruptException") {
+  test("EventLoop: onReceive swallows InterruptException")
     val onReceiveLatch = new CountDownLatch(1)
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         onReceiveLatch.countDown()
-        try {
+        try
           Thread.sleep(5000)
-        } catch {
+        catch
           case ie: InterruptedException => // swallow
-        }
-      }
 
       override def onError(e: Throwable): Unit = {}
-    }
     eventLoop.start()
     eventLoop.post(1)
-    failAfter(5 seconds) {
+    failAfter(5 seconds)
       // Wait until we enter `onReceive`
       onReceiveLatch.await()
       eventLoop.stop()
-    }
     assert(false === eventLoop.isActive)
-  }
 
-  test("EventLoop: stop in eventThread") {
-    val eventLoop = new EventLoop[Int]("test") {
+  test("EventLoop: stop in eventThread")
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         stop()
-      }
 
       override def onError(e: Throwable): Unit = {}
-    }
     eventLoop.start()
     eventLoop.post(1)
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert(!eventLoop.isActive)
-    }
-  }
 
-  test("EventLoop: stop() in onStart should call onStop") {
+  test("EventLoop: stop() in onStart should call onStop")
     @volatile var onStopCalled: Boolean = false
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onStart(): Unit = {
+      override def onStart(): Unit =
         stop()
-      }
 
       override def onReceive(event: Int): Unit = {}
 
       override def onError(e: Throwable): Unit = {}
 
-      override def onStop(): Unit = {
+      override def onStop(): Unit =
         onStopCalled = true
-      }
-    }
     eventLoop.start()
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert(!eventLoop.isActive)
-    }
     assert(onStopCalled)
-  }
 
-  test("EventLoop: stop() in onReceive should call onStop") {
+  test("EventLoop: stop() in onReceive should call onStop")
     @volatile var onStopCalled: Boolean = false
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         stop()
-      }
 
       override def onError(e: Throwable): Unit = {}
 
-      override def onStop(): Unit = {
+      override def onStop(): Unit =
         onStopCalled = true
-      }
-    }
     eventLoop.start()
     eventLoop.post(1)
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert(!eventLoop.isActive)
-    }
     assert(onStopCalled)
-  }
 
-  test("EventLoop: stop() in onError should call onStop") {
+  test("EventLoop: stop() in onError should call onStop")
     @volatile var onStopCalled: Boolean = false
-    val eventLoop = new EventLoop[Int]("test") {
+    val eventLoop = new EventLoop[Int]("test")
 
-      override def onReceive(event: Int): Unit = {
+      override def onReceive(event: Int): Unit =
         throw new RuntimeException("Oops")
-      }
 
-      override def onError(e: Throwable): Unit = {
+      override def onError(e: Throwable): Unit =
         stop()
-      }
 
-      override def onStop(): Unit = {
+      override def onStop(): Unit =
         onStopCalled = true
-      }
-    }
     eventLoop.start()
     eventLoop.post(1)
-    eventually(timeout(5 seconds), interval(5 millis)) {
+    eventually(timeout(5 seconds), interval(5 millis))
       assert(!eventLoop.isActive)
-    }
     assert(onStopCalled)
-  }
-}

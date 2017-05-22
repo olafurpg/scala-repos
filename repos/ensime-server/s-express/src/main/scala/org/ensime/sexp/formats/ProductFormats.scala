@@ -5,7 +5,7 @@ package org.ensime.sexp.formats
 import org.ensime.sexp._
 import shapeless._
 
-trait LowPriorityProductFormats {
+trait LowPriorityProductFormats
 
   /*
    Implementation note: this (and the `FamilyFormat`s) is likely to be
@@ -14,35 +14,28 @@ trait LowPriorityProductFormats {
    at the same time (i.e. case classes, tuples, and sealed traits)
    */
 
-  trait HListFormat[L <: HList] {
+  trait HListFormat[L <: HList]
     def write(x: L): List[Sexp]
     def read(values: List[Sexp]): L
-  }
 
-  object HListFormat {
-    implicit val HNilFormat: HListFormat[HNil] = new HListFormat[HNil] {
+  object HListFormat
+    implicit val HNilFormat: HListFormat[HNil] = new HListFormat[HNil]
       def write(x: HNil) = Nil
-      def read(value: List[Sexp]) = value match {
+      def read(value: List[Sexp]) = value match
         case Nil => HNil
         case x => throw new DeserializationException(s"Didn't expect $x")
-      }
-    }
 
     implicit def hListFormat[H, T <: HList](
         implicit h: Lazy[SexpFormat[H]],
         t: Lazy[HListFormat[T]]
-    ): HListFormat[H :: T] = new HListFormat[H :: T] {
+    ): HListFormat[H :: T] = new HListFormat[H :: T]
       def write(x: H :: T) = h.value.write(x.head) :: t.value.write(x.tail)
 
-      def read(values: List[Sexp]): H :: T = {
+      def read(values: List[Sexp]): H :: T =
         import HList.ListCompat._
-        values match {
+        values match
           case head :: tail => h.value.read(head) :: t.value.read(tail)
           case x => throw new DeserializationException("Didn't expect Nil")
-        }
-      }
-    }
-  }
 
   /* We really want to have just `T` and its various representations,
    * e.g. `R <: Generic[T].Repr`, in the type parameters --- but
@@ -59,63 +52,53 @@ trait LowPriorityProductFormats {
       k: ops.record.Keys.Aux[LR, K],
       ltl: ops.hlist.ToList[K, Symbol],
       r: Lazy[HListFormat[R]]
-  ): SexpFormat[T] = new SexpFormat[T] {
+  ): SexpFormat[T] = new SexpFormat[T]
 
-    private val keys = k().toList[Symbol].map { sym =>
+    private val keys = k().toList[Symbol].map  sym =>
       SexpSymbol(":" + toWireName(sym.name))
-    }
 
     def write(x: T): Sexp =
       if (keys.isEmpty) SexpNil
-      else {
+      else
         val pairs = keys zip r.value.write(g.to(x))
         if (skipNilValues) SexpData(pairs.filterNot(_._2 == SexpNil))
         else SexpData(pairs)
-      }
 
-    def read(value: Sexp): T = value match {
+    def read(value: Sexp): T = value match
       case SexpNil => g.from(r.value.read(Nil))
       case SexpData(pairs) =>
-        val els = keys.map { k =>
+        val els = keys.map  k =>
           // missing keys are interpreted as nil
           pairs.getOrElse(k, SexpNil)
-        }
         g.from(r.value.read(els))
 
       case x =>
         deserializationError(x)
-    }
-  }
 
   // capable of overloading for legacy formats
   def toWireName(field: String): String = field
   // capable of overriding to skip nil values in writing out case classes fields
   def skipNilValues: Boolean = false
-}
 
-trait ProductFormats extends LowPriorityProductFormats {
+trait ProductFormats extends LowPriorityProductFormats
   // higher priority so that tuples and case classes are not ambiguous
   implicit def tupleProductFormat[T, R <: HList, T2](
       implicit g: Generic.Aux[T, R],
       t: ops.hlist.Tupler.Aux[R, T2],
       p: T =:= T2,
       r: Lazy[HListFormat[R]]
-  ): SexpFormat[T] = new SexpFormat[T] {
+  ): SexpFormat[T] = new SexpFormat[T]
     def write(x: T): Sexp = SexpList(r.value.write(g.to(x)))
-    def read(value: Sexp): T = value match {
+    def read(value: Sexp): T = value match
       case SexpList(els) => g.from(r.value.read(els))
       case x => deserializationError(x)
-    }
-  }
-}
 
 /**
   * By default, S-Express uses the same field names in the wire format
   * as the code. But some protocols may prefer dashes with Scala code
   * that uses camel case. This mix-in provides that behaviour.
   */
-trait CamelCaseToDashes {
+trait CamelCaseToDashes
   this: LowPriorityProductFormats =>
   override def toWireName(field: String): String =
     field.replaceAll("([A-Z])", "-$1").toLowerCase.replaceAll("^-", "")
-}

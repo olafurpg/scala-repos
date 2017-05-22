@@ -10,7 +10,7 @@ case class Request(id: String,
                    message: String,
                    date: DateTime) {}
 
-object Request {
+object Request
 
   def makeId(team: String, user: String) = user + "@" + team
 
@@ -28,14 +28,12 @@ object Request {
       (__.json update readDate('date)) andThen Json.reads[Request],
       Json.writes[Request] andThen (__.json update writeDate('date))
   )
-}
 
-case class RequestWithUser(request: Request, user: User) {
+case class RequestWithUser(request: Request, user: User)
   def id = request.id
   def message = request.message
   def date = request.date
   def team = request.team
-}
 
 sealed trait Requesting
 case class Joined(team: Team) extends Requesting

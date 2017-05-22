@@ -1,4 +1,4 @@
-object main {
+object main
   // don't do this at home
 
   trait Impl
@@ -9,25 +9,21 @@ object main {
 
   type Both = SizeImpl with ColorImpl
 
-  def info(x: Impl) = x match {
+  def info(x: Impl) = x match
     case x: Both => "size  " + x.size + " color " + x.color // you wish
     case x: SizeImpl => "size  " + x.size
     case x: ColorImpl => "color " + x.color
     case _ => "n.a."
-  }
 
-  def info2(x: Impl) = x match {
+  def info2(x: Impl) = x match
     case x: SizeImpl with ColorImpl =>
       "size  " + x.size + " color " + x.color // you wish
     case x: SizeImpl => "size  " + x.size
     case x: ColorImpl => "color " + x.color
     case _ => "n.a."
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     // make up some class that has a size
     class MyNode extends SizeImpl
     Console.println("hello " + info(new MyNode))
     Console.println("hello " + info2(new MyNode))
-  }
-}

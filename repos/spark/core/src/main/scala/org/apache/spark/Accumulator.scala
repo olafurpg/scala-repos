@@ -67,20 +67,17 @@ class Accumulator[T] private[spark](
     internal: Boolean,
     private[spark] override val countFailedValues: Boolean = false)
     extends Accumulable[T, T](
-        initialValue, param, name, internal, countFailedValues) {
+        initialValue, param, name, internal, countFailedValues)
 
-  def this(initialValue: T, param: AccumulatorParam[T], name: Option[String]) = {
+  def this(initialValue: T, param: AccumulatorParam[T], name: Option[String]) =
     this(initialValue, param, name, false /* internal */ )
-  }
 
-  def this(initialValue: T, param: AccumulatorParam[T]) = {
+  def this(initialValue: T, param: AccumulatorParam[T]) =
     this(initialValue, param, None, false /* internal */ )
-  }
-}
 
 // TODO: The multi-thread support in accumulators is kind of lame; check
 // if there's a more intuitive way of doing it right
-private[spark] object Accumulators extends Logging {
+private[spark] object Accumulators extends Logging
 
   /**
     * This global map holds the original accumulator objects that are created on the driver.
@@ -111,39 +108,31 @@ private[spark] object Accumulators extends Logging {
     * of overwriting it. This happens when we copy accumulators, e.g. when we reconstruct
     * [[org.apache.spark.executor.TaskMetrics]] from accumulator updates.
     */
-  def register(a: Accumulable[_, _]): Unit = synchronized {
-    if (!originals.contains(a.id)) {
+  def register(a: Accumulable[_, _]): Unit = synchronized
+    if (!originals.contains(a.id))
       originals(a.id) = new WeakReference[Accumulable[_, _]](a)
-    }
-  }
 
   /**
     * Unregister the [[Accumulable]] with the given ID, if any.
     */
-  def remove(accId: Long): Unit = synchronized {
+  def remove(accId: Long): Unit = synchronized
     originals.remove(accId)
-  }
 
   /**
     * Return the [[Accumulable]] registered with the given ID, if any.
     */
-  def get(id: Long): Option[Accumulable[_, _]] = synchronized {
-    originals.get(id).map { weakRef =>
+  def get(id: Long): Option[Accumulable[_, _]] = synchronized
+    originals.get(id).map  weakRef =>
       // Since we are storing weak references, we must check whether the underlying data is valid.
-      weakRef.get.getOrElse {
+      weakRef.get.getOrElse
         throw new IllegalAccessError(
             s"Attempted to access garbage collected accumulator $id")
-      }
-    }
-  }
 
   /**
     * Clear all registered [[Accumulable]]s. For testing only.
     */
-  def clear(): Unit = synchronized {
+  def clear(): Unit = synchronized
     originals.clear()
-  }
-}
 
 /**
   * A simpler version of [[org.apache.spark.AccumulableParam]] where the only data type you can add
@@ -152,57 +141,48 @@ private[spark] object Accumulators extends Logging {
   *
   * @tparam T type of value to accumulate
   */
-trait AccumulatorParam[T] extends AccumulableParam[T, T] {
-  def addAccumulator(t1: T, t2: T): T = {
+trait AccumulatorParam[T] extends AccumulableParam[T, T]
+  def addAccumulator(t1: T, t2: T): T =
     addInPlace(t1, t2)
-  }
-}
 
-object AccumulatorParam {
+object AccumulatorParam
 
   // The following implicit objects were in SparkContext before 1.2 and users had to
   // `import SparkContext._` to enable them. Now we move them here to make the compiler find
   // them automatically. However, as there are duplicate codes in SparkContext for backward
   // compatibility, please update them accordingly if you modify the following implicit objects.
 
-  implicit object DoubleAccumulatorParam extends AccumulatorParam[Double] {
+  implicit object DoubleAccumulatorParam extends AccumulatorParam[Double]
     def addInPlace(t1: Double, t2: Double): Double = t1 + t2
     def zero(initialValue: Double): Double = 0.0
-  }
 
-  implicit object IntAccumulatorParam extends AccumulatorParam[Int] {
+  implicit object IntAccumulatorParam extends AccumulatorParam[Int]
     def addInPlace(t1: Int, t2: Int): Int = t1 + t2
     def zero(initialValue: Int): Int = 0
-  }
 
-  implicit object LongAccumulatorParam extends AccumulatorParam[Long] {
+  implicit object LongAccumulatorParam extends AccumulatorParam[Long]
     def addInPlace(t1: Long, t2: Long): Long = t1 + t2
     def zero(initialValue: Long): Long = 0L
-  }
 
-  implicit object FloatAccumulatorParam extends AccumulatorParam[Float] {
+  implicit object FloatAccumulatorParam extends AccumulatorParam[Float]
     def addInPlace(t1: Float, t2: Float): Float = t1 + t2
     def zero(initialValue: Float): Float = 0f
-  }
 
   // Note: when merging values, this param just adopts the newer value. This is used only
   // internally for things that shouldn't really be accumulated across tasks, like input
   // read method, which should be the same across all tasks in the same stage.
   private[spark] object StringAccumulatorParam
-      extends AccumulatorParam[String] {
+      extends AccumulatorParam[String]
     def addInPlace(t1: String, t2: String): String = t2
     def zero(initialValue: String): String = ""
-  }
 
   // Note: this is expensive as it makes a copy of the list every time the caller adds an item.
   // A better way to use this is to first accumulate the values yourself then them all at once.
   private[spark] class ListAccumulatorParam[T]
-      extends AccumulatorParam[Seq[T]] {
+      extends AccumulatorParam[Seq[T]]
     def addInPlace(t1: Seq[T], t2: Seq[T]): Seq[T] = t1 ++ t2
     def zero(initialValue: Seq[T]): Seq[T] = Seq.empty[T]
-  }
 
   // For the internal metric that records what blocks are updated in a particular task
   private[spark] object UpdatedBlockStatusesAccumulatorParam
       extends ListAccumulatorParam[(BlockId, BlockStatus)]
-}

@@ -10,7 +10,7 @@ package cmd
   *  declaratively specifying a command line program, with many attendant
   *  benefits.  See scala.tools.cmd.DemoSpec for an example.
   */
-trait Spec {
+trait Spec
   def referenceSpec: Reference
   def programInfo: Spec.Info
 
@@ -19,35 +19,29 @@ trait Spec {
 
   type OptionMagic <: Opt.Implicit
   protected implicit def optionMagicAdditions(s: String): OptionMagic
-}
 
-object Spec {
+object Spec
   class Info(
       val runner: String,
       val usage: String,
       val mainClass: String
   )
-  object Info {
+  object Info
     def apply(runner: String, help: String, mainClass: String): Info =
       new Info(runner, help, mainClass)
-  }
 
-  class Accumulator[T : FromString]() {
+  class Accumulator[T : FromString]()
     private var _buf: List[T] = Nil
 
     def convert(s: String) = implicitly[FromString[T]] apply s
     def apply(s: String): T = returning(convert(s))(_buf +:= _)
 
     lazy val get = _buf
-  }
 
-  class Choices[T : FromString](val xs: List[T]) {
+  class Choices[T : FromString](val xs: List[T])
     def fs: FromString[T] = implicitly[FromString[T]]
     def contains(x: T) = xs contains x
     override def toString = xs.mkString("{ ", ", ", " }")
-  }
 
-  class EnvironmentVar(val name: String) {
+  class EnvironmentVar(val name: String)
     override def toString = s"$${$name}"
-  }
-}

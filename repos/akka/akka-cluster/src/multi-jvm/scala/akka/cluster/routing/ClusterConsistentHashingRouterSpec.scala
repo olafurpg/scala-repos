@@ -24,13 +24,11 @@ import akka.routing.ActorRefRoutee
 import akka.routing.ConsistentHashingPool
 import akka.routing.Routees
 
-object ClusterConsistentHashingRouterMultiJvmSpec extends MultiNodeConfig {
+object ClusterConsistentHashingRouterMultiJvmSpec extends MultiNodeConfig
 
-  class Echo extends Actor {
-    def receive = {
+  class Echo extends Actor
+    def receive =
       case _ ⇒ sender() ! self
-    }
-  }
 
   val first = role("first")
   val second = role("second")
@@ -53,7 +51,6 @@ object ClusterConsistentHashingRouterMultiJvmSpec extends MultiNodeConfig {
         /router4 = $${common-router-settings}
       }
       """)).withFallback(MultiNodeClusterSpec.clusterConfig))
-}
 
 class ClusterConsistentHashingRouterMultiJvmNode1
     extends ClusterConsistentHashingRouterSpec
@@ -64,7 +61,7 @@ class ClusterConsistentHashingRouterMultiJvmNode3
 
 abstract class ClusterConsistentHashingRouterSpec
     extends MultiNodeSpec(ClusterConsistentHashingRouterMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout
   import ClusterConsistentHashingRouterMultiJvmSpec._
 
   lazy val router1 = system.actorOf(FromConfig.props(Props[Echo]), "router1")
@@ -79,55 +76,47 @@ abstract class ClusterConsistentHashingRouterSpec
     * Fills in self address for local ActorRef
     */
   private def fullAddress(actorRef: ActorRef): Address =
-    actorRef.path.address match {
+    actorRef.path.address match
       case Address(_, _, None, None) ⇒ cluster.selfAddress
       case a ⇒ a
-    }
 
-  "A cluster router with a consistent hashing pool" must {
-    "start cluster with 2 nodes" taggedAs LongRunningTest in {
+  "A cluster router with a consistent hashing pool" must
+    "start cluster with 2 nodes" taggedAs LongRunningTest in
       awaitClusterUp(first, second)
       enterBarrier("after-1")
-    }
 
-    "create routees from configuration" in {
-      runOn(first) {
+    "create routees from configuration" in
+      runOn(first)
         // it may take some time until router receives cluster member events
         awaitAssert { currentRoutees(router1).size should ===(4) }
         val routees = currentRoutees(router1)
         routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
             Set(address(first), address(second)))
-      }
       enterBarrier("after-2")
-    }
 
-    "select destination based on hashKey" in {
-      runOn(first) {
+    "select destination based on hashKey" in
+      runOn(first)
         router1 ! ConsistentHashableEnvelope(message = "A", hashKey = "a")
         val destinationA = expectMsgType[ActorRef]
         router1 ! ConsistentHashableEnvelope(message = "AA", hashKey = "a")
         expectMsg(destinationA)
-      }
       enterBarrier("after-2")
-    }
 
-    "deploy routees to new member nodes in the cluster" taggedAs LongRunningTest in {
+    "deploy routees to new member nodes in the cluster" taggedAs LongRunningTest in
 
       awaitClusterUp(first, second, third)
 
-      runOn(first) {
+      runOn(first)
         // it may take some time until router receives cluster member events
         awaitAssert { currentRoutees(router1).size should ===(6) }
         val routees = currentRoutees(router1)
         routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
             roles.map(address).toSet)
-      }
 
       enterBarrier("after-3")
-    }
 
-    "deploy programatically defined routees to the member nodes in the cluster" taggedAs LongRunningTest in {
-      runOn(first) {
+    "deploy programatically defined routees to the member nodes in the cluster" taggedAs LongRunningTest in
+      runOn(first)
         val router2 = system.actorOf(
             ClusterRouterPool(local = ConsistentHashingPool(nrOfInstances = 0),
                               settings = ClusterRouterPoolSettings(
@@ -141,16 +130,13 @@ abstract class ClusterConsistentHashingRouterSpec
         val routees = currentRoutees(router2)
         routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
             roles.map(address).toSet)
-      }
 
       enterBarrier("after-4")
-    }
 
-    "handle combination of configured router and programatically defined hashMapping" taggedAs LongRunningTest in {
-      runOn(first) {
-        def hashMapping: ConsistentHashMapping = {
+    "handle combination of configured router and programatically defined hashMapping" taggedAs LongRunningTest in
+      runOn(first)
+        def hashMapping: ConsistentHashMapping =
           case s: String ⇒ s
-        }
 
         val router3 =
           system.actorOf(ConsistentHashingPool(
@@ -159,16 +145,13 @@ abstract class ClusterConsistentHashingRouterSpec
                          "router3")
 
         assertHashMapping(router3)
-      }
 
       enterBarrier("after-5")
-    }
 
-    "handle combination of configured router and programatically defined hashMapping and ClusterRouterConfig" taggedAs LongRunningTest in {
-      runOn(first) {
-        def hashMapping: ConsistentHashMapping = {
+    "handle combination of configured router and programatically defined hashMapping and ClusterRouterConfig" taggedAs LongRunningTest in
+      runOn(first)
+        def hashMapping: ConsistentHashMapping =
           case s: String ⇒ s
-        }
 
         val router4 = system.actorOf(
             ClusterRouterPool(
@@ -182,12 +165,10 @@ abstract class ClusterConsistentHashingRouterSpec
             "router4")
 
         assertHashMapping(router4)
-      }
 
       enterBarrier("after-6")
-    }
 
-    def assertHashMapping(router: ActorRef): Unit = {
+    def assertHashMapping(router: ActorRef): Unit =
       // it may take some time until router receives cluster member events
       awaitAssert { currentRoutees(router).size should ===(6) }
       val routees = currentRoutees(router)
@@ -198,6 +179,3 @@ abstract class ClusterConsistentHashingRouterSpec
       val destinationA = expectMsgType[ActorRef]
       router ! "a"
       expectMsg(destinationA)
-    }
-  }
-}

@@ -28,7 +28,7 @@ import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkCont
 import org.apache.spark.mllib.util.TestingUtils._
 
 class LBFGSSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite with MLlibTestSparkContext with Matchers
 
   val nPoints = 10000
   val A = 2.0
@@ -46,15 +46,14 @@ class LBFGSSuite
 
   // Add an extra variable consisting of all 1.0's for the intercept.
   val testData = GradientDescentSuite.generateGDInput(A, B, nPoints, 42)
-  val data = testData.map {
+  val data = testData.map
     case LabeledPoint(label, features) =>
       label -> Vectors.dense(1.0 +: features.toArray)
-  }
 
   lazy val dataRDD = sc.parallelize(data, 2).cache()
 
   test(
-      "LBFGS loss should be decreasing and match the result of Gradient Descent.") {
+      "LBFGS loss should be decreasing and match the result of Gradient Descent.")
     val regParam = 0
 
     val initialWeightsWithIntercept =
@@ -96,10 +95,9 @@ class LBFGSSuite
     // larger than lossLBFGS. This is based on observation, no theoretically guaranteed
     assert(math.abs((lossGD.last - loss.last) / loss.last) < 0.02,
            "LBFGS should match GD result within 2% difference.")
-  }
 
   test(
-      "LBFGS and Gradient Descent with L2 regularization should get the same result.") {
+      "LBFGS and Gradient Descent with L2 regularization should get the same result.")
     val regParam = 0.2
 
     // Prepare another non-zero weights to compare the loss in the first iteration.
@@ -139,9 +137,8 @@ class LBFGSSuite
     assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
            (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
            "The weight differences between LBFGS and GD should be within 2%.")
-  }
 
-  test("The convergence criteria should work as we expect.") {
+  test("The convergence criteria should work as we expect.")
     val regParam = 0.0
 
     /**
@@ -195,9 +192,8 @@ class LBFGSSuite
     // Based on observation, lossLBFGS2 runs 5 iterations, no theoretically guaranteed.
     assert(lossLBFGS3.length == 6)
     assert((lossLBFGS3(4) - lossLBFGS3(5)) / lossLBFGS3(4) < convergenceTol)
-  }
 
-  test("Optimize via class LBFGS.") {
+  test("Optimize via class LBFGS.")
     val regParam = 0.2
 
     // Prepare another non-zero weights to compare the loss in the first iteration.
@@ -231,20 +227,17 @@ class LBFGSSuite
     assert((weightLBFGS(0) ~= weightGD(0) relTol 0.02) &&
            (weightLBFGS(1) ~= weightGD(1) relTol 0.02),
            "The weight differences between LBFGS and GD should be within 2%.")
-  }
-}
 
-class LBFGSClusterSuite extends SparkFunSuite with LocalClusterSparkContext {
+class LBFGSClusterSuite extends SparkFunSuite with LocalClusterSparkContext
 
-  test("task size should be small") {
+  test("task size should be small")
     val m = 10
     val n = 200000
     val examples = sc
       .parallelize(0 until m, 2)
-      .mapPartitionsWithIndex { (idx, iter) =>
+      .mapPartitionsWithIndex  (idx, iter) =>
         val random = new Random(idx)
         iter.map(i => (1.0, Vectors.dense(Array.fill(n)(random.nextDouble))))
-      }
       .cache()
     val lbfgs = new LBFGS(new LogisticGradient, new SquaredL2Updater)
       .setNumCorrections(1)
@@ -256,5 +249,3 @@ class LBFGSClusterSuite extends SparkFunSuite with LocalClusterSparkContext {
     // greater than 1MB and hence Spark would throw an error.
     val weights =
       lbfgs.optimize(examples, Vectors.dense(Array.fill(n)(random.nextDouble)))
-  }
-}

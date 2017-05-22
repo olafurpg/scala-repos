@@ -3,7 +3,7 @@ package scalaz
 import Id._
 
 final class BijectionT[F[_], G[_], A, B] private[scalaz](
-    _to: A => F[B], _from: B => G[A]) { self =>
+    _to: A => F[B], _from: B => G[A])  self =>
   def to(a: A): F[B] = _to(a)
   def from(b: B): G[A] = _from(b)
 
@@ -66,8 +66,7 @@ final class BijectionT[F[_], G[_], A, B] private[scalaz](
   /** alias for `andThen` */
   def >=>[C](that: BijectionT[F, G, B, C])(
       implicit M: Bind[F], GM: Bind[G]): BijectionT[F, G, A, C] = andThen(that)
-}
-object BijectionT extends BijectionTInstances {
+object BijectionT extends BijectionTInstances
   def bijection[F[_], G[_], A, B](
       t: A => F[B], f: B => G[A]): BijectionT[F, G, A, B] =
     new BijectionT[F, G, A, B](t, f)
@@ -93,12 +92,12 @@ object BijectionT extends BijectionTInstances {
 
   // Left is true, Right is false
   def eitherB[A]: Bijection[A \/ A, (Boolean, A)] =
-    bijection[Id, Id, A \/ A, (Boolean, A)](_ match {
+    bijection[Id, Id, A \/ A, (Boolean, A)](_ match
       case -\/(a) => (true, a)
       case \/-(a) => (false, a)
-    }, {
+    ,
       case (p, a) => if (p) -\/(a) else \/-(a)
-    })
+    )
 
   def zipB[X[_], A, B](
       implicit Z: Zip[X], U: Unzip[X]): Bijection[(X[A], X[B]), X[(A, B)]] =
@@ -115,54 +114,49 @@ object BijectionT extends BijectionTInstances {
     zipB[T => ?, A, B]
 
   def tuple3B[A, B, C]: Bijection[(A, B, C), (A, (B, C))] =
-    bijection({ case (a, b, c) => (a, (b, c)) }, {
+    bijection({ case (a, b, c) => (a, (b, c)) },
       case (a, (b, c)) => (a, b, c)
-    })
+    )
 
   def tuple4B[A, B, C, D]: Bijection[(A, B, C, D), (A, (B, (C, D)))] =
-    bijection({ case (a, b, c, d) => (a, (b, (c, d))) }, {
+    bijection({ case (a, b, c, d) => (a, (b, (c, d))) },
       case (a, (b, (c, d))) => (a, b, c, d)
-    })
+    )
 
   def tuple5B[
       A, B, C, D, E]: Bijection[(A, B, C, D, E), (A, (B, (C, (D, E))))] =
-    bijection({ case (a, b, c, d, e) => (a, (b, (c, (d, e)))) }, {
+    bijection({ case (a, b, c, d, e) => (a, (b, (c, (d, e)))) },
       case (a, (b, (c, (d, e)))) => (a, b, c, d, e)
-    })
+    )
 
   def tuple6B[A, B, C, D, E, H]: Bijection[
       (A, B, C, D, E, H), (A, (B, (C, (D, (E, H)))))] =
-    bijection({ case (a, b, c, d, e, h) => (a, (b, (c, (d, (e, h))))) }, {
+    bijection({ case (a, b, c, d, e, h) => (a, (b, (c, (d, (e, h))))) },
       case (a, (b, (c, (d, (e, h))))) => (a, b, c, d, e, h)
-    })
+    )
 
   def tuple7B[A, B, C, D, E, H, I]: Bijection[
       (A, B, C, D, E, H, I), (A, (B, (C, (D, (E, (H, I))))))] =
-    bijection({ case (a, b, c, d, e, h, i) => (a, (b, (c, (d, (e, (h, i)))))) }, {
+    bijection({ case (a, b, c, d, e, h, i) => (a, (b, (c, (d, (e, (h, i)))))) },
       case (a, (b, (c, (d, (e, (h, i)))))) => (a, b, c, d, e, h, i)
-    })
-}
+    )
 
-sealed abstract class BijectionTInstances0 {
+sealed abstract class BijectionTInstances0
   implicit def bijectionTSplit[F[_], G[_]](
       implicit F0: Bind[F], G0: Bind[G]): Split[BijectionT[F, G, ?, ?]] =
-    new BijectionTSplit[F, G] {
+    new BijectionTSplit[F, G]
       implicit def F = F0
       implicit def G = G0
-    }
-}
 
-sealed abstract class BijectionTInstances extends BijectionTInstances0 {
+sealed abstract class BijectionTInstances extends BijectionTInstances0
   implicit def bijectionTCategory[F[_], G[_]](
       implicit F0: Monad[F], G0: Monad[G]): Category[BijectionT[F, G, ?, ?]] =
-    new BijectionTCategory[F, G] {
+    new BijectionTCategory[F, G]
       implicit def F = F0
       implicit def G = G0
-    }
-}
 
 private trait BijectionTSplit[F[_], G[_]]
-    extends Split[BijectionT[F, G, ?, ?]] {
+    extends Split[BijectionT[F, G, ?, ?]]
   implicit def F: Bind[F]
   implicit def G: Bind[G]
 
@@ -173,15 +167,13 @@ private trait BijectionTSplit[F[_], G[_]]
   def split[A, B, C, D](
       ab: BijectionT[F, G, A, B],
       cd: BijectionT[F, G, C, D]): BijectionT[F, G, (A, C), (B, D)] =
-    BijectionT.bijection({ case (a, c) => F.tuple2(ab.to(a), cd.to(c)) }, {
+    BijectionT.bijection({ case (a, c) => F.tuple2(ab.to(a), cd.to(c)) },
       case (b, d) => G.tuple2(ab.from(b), cd.from(d))
-    })
-}
+    )
 
 private trait BijectionTCategory[F[_], G[_]]
-    extends Category[BijectionT[F, G, ?, ?]] with BijectionTSplit[F, G] {
+    extends Category[BijectionT[F, G, ?, ?]] with BijectionTSplit[F, G]
   implicit def F: Monad[F]
   implicit def G: Monad[G]
 
   def id[A] = BijectionT.bijectionId
-}

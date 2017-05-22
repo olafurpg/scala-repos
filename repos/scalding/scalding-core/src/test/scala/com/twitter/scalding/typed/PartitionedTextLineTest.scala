@@ -24,36 +24,32 @@ import com.twitter.scalding._
 
 import TDsl._
 
-object PartitionedTextLineTestSources {
+object PartitionedTextLineTestSources
   val singlePartition = PartitionedTextLine[String]("out", "%s")
   val multiplePartition = PartitionedTextLine[(String, String)]("out", "%s/%s")
-}
 
-class PartitionedTextLineSingleWriteJob(args: Args) extends Job(args) {
+class PartitionedTextLineSingleWriteJob(args: Args) extends Job(args)
   import PartitionedTextLineTestSources._
   TypedCsv[(String, String)]("in").write(singlePartition)
-}
 
-class PartitionedTextLineMultipleWriteJob(args: Args) extends Job(args) {
+class PartitionedTextLineMultipleWriteJob(args: Args) extends Job(args)
   import PartitionedTextLineTestSources._
-  TypedCsv[(String, String, String)]("in").map {
+  TypedCsv[(String, String, String)]("in").map
     case (v1, v2, v3) => ((v1, v2), v3)
-  }.write(multiplePartition)
-}
+  .write(multiplePartition)
 
-class PartitionedTextLineTest extends WordSpec with Matchers {
+class PartitionedTextLineTest extends WordSpec with Matchers
   import PartitionedTextLineTestSources._
 
-  "PartitionedTextLine" should {
-    "be able to split output by a single partition" in {
+  "PartitionedTextLine" should
+    "be able to split output by a single partition" in
       val input = Seq(("A", "1"), ("A", "2"), ("B", "3"))
 
       // Need to save the job to allow, find the temporary directory data was written to
       var job: Job = null;
-      def buildJob(args: Args): Job = {
+      def buildJob(args: Args): Job =
         job = new PartitionedTextLineSingleWriteJob(args)
         job
-      }
 
       JobTest(buildJob(_))
         .source(TypedCsv[(String, String)]("in"), input)
@@ -74,16 +70,14 @@ class PartitionedTextLineTest extends WordSpec with Matchers {
 
       aSource.getLines.toList shouldBe Seq("1", "2")
       bSource.getLines.toList shouldBe Seq("3")
-    }
-    "be able to split output by multiple  partitions" in {
+    "be able to split output by multiple  partitions" in
       val input = Seq(("A", "X", "1"), ("A", "Y", "2"), ("B", "Z", "3"))
 
       // Need to save the job to allow, find the temporary directory data was written to
       var job: Job = null;
-      def buildJob(args: Args): Job = {
+      def buildJob(args: Args): Job =
         job = new PartitionedTextLineMultipleWriteJob(args)
         job
-      }
 
       JobTest(buildJob(_))
         .source(TypedCsv[(String, String, String)]("in"), input)
@@ -109,6 +103,3 @@ class PartitionedTextLineTest extends WordSpec with Matchers {
       axSource.getLines.toList shouldBe Seq("1")
       aySource.getLines.toList shouldBe Seq("2")
       bzSource.getLines.toList shouldBe Seq("3")
-    }
-  }
-}

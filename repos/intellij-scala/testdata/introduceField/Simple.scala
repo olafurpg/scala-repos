@@ -1,7 +1,6 @@
-class Test {
+class Test
   /*start*/
   1 /*end*/
-}
 
 /*
 class Test {

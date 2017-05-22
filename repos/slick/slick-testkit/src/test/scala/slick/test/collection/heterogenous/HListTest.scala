@@ -5,9 +5,9 @@ import slick.collection.heterogeneous._
 import syntax._
 import org.junit.Assert._
 
-class HListTest {
+class HListTest
   @Test
-  def testHList {
+  def testHList
     val l1 = 42 :: "foo" :: Some(1.0) :: "bar" :: HNil
     val l1a = l1.head
     val l1b = l1.tail.head
@@ -42,5 +42,3 @@ class HListTest {
     val l4 = new HCons(42, new HCons(10.0d, HNil))
     println(l4.getClass)
     println(l4.tail.getClass)
-  }
-}

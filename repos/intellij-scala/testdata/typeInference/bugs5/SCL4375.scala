@@ -1,4 +1,4 @@
-class SCL4375 {
+class SCL4375
   var qwe: Int => Unit = i => ()
 
   qwe = _ => ()
@@ -8,5 +8,4 @@ class SCL4375 {
   def asd_=(f: Int => Unit) = 1
 
   asd = /*start*/ _ => () /*end*/
-}
 //(Int) => Unit

@@ -62,7 +62,7 @@ final class TaskDef(_fullyQualifiedName: String,
                     _fingerprint: Fingerprint,
                     _explicitlySpecified: Boolean,
                     _selectors: Array[Selector])
-    extends Serializable {
+    extends Serializable
 
   if (_fullyQualifiedName == null)
     throw new NullPointerException("fullyQualifiedName was null");
@@ -98,7 +98,7 @@ final class TaskDef(_fullyQualifiedName: String,
     */
   def selectors(): Array[Selector] = _selectors
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: TaskDef =>
       this.fullyQualifiedName == that.fullyQualifiedName &&
       this.fingerprint == that.fingerprint &&
@@ -106,9 +106,8 @@ final class TaskDef(_fullyQualifiedName: String,
       Arrays.equals(this.selectors.asInstanceOf[Array[AnyRef]],
                     that.selectors.asInstanceOf[Array[AnyRef]])
     case _ => false
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     var retVal = 17
     retVal = 31 * retVal + _fullyQualifiedName.hashCode()
     retVal = 31 * retVal + _fingerprint.hashCode()
@@ -116,10 +115,7 @@ final class TaskDef(_fullyQualifiedName: String,
     retVal = 31 * retVal + Arrays.hashCode(
         _selectors.asInstanceOf[Array[AnyRef]])
     retVal
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     "TaskDef(" + _fullyQualifiedName + ", " + _fingerprint + ", " +
     _explicitlySpecified + ", " + _selectors.mkString("[", ", ", "]") + ")"
-  }
-}

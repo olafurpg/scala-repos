@@ -2,10 +2,10 @@ package akka.actor
 
 import org.junit._
 
-class BadTest {
+class BadTest
 
   @Test
-  def testCpIssue(): Unit = {
+  def testCpIssue(): Unit =
     // TODO - This is merely the laziest way to run the test.  What we want to do:
     // * Load something from our own classloader that's INSIDE the scala library
     // * Try to load that same something from the THREAD CONTEXT classloader.
@@ -23,5 +23,3 @@ class BadTest {
     Assert.assertEquals("Failed to grab appropriate Akka name",
                         expected,
                         evilGetThreadExectionContextName)
-  }
-}

@@ -18,12 +18,11 @@ package shapeless
 package syntax
 package std
 
-object product {
+object product
   implicit def productOps[P <: Product](p: P): ProductOps[P] =
     new ProductOps[P](p)
-}
 
-final class ProductOps[P](val p: P) extends AnyVal {
+final class ProductOps[P](val p: P) extends AnyVal
   import ops.product._
 
   /**
@@ -68,4 +67,3 @@ final class ProductOps[P](val p: P) extends AnyVal {
     * Returns a sized collection `M` whose elements are typed as the Lub of the elements of this product.
     */
   def toSized[M[_]](implicit toSized: ToSized[P, M]): toSized.Out = toSized(p)
-}

@@ -12,40 +12,37 @@ import scala.runtime.BoxedUnit
 import org.junit.Test
 import org.junit.Assert._
 
-class ReflectArrayTest {
+class ReflectArrayTest
 
   @inline
   private def testBase(clazz: Class[_],
                        length: Int,
                        expectedClazz: Class[_],
-                       sampleElem: Any): Unit = {
+                       sampleElem: Any): Unit =
     val array =
       java.lang.reflect.Array.newInstance(clazz, length).asInstanceOf[Array[_]]
     assertEquals(expectedClazz, array.getClass)
     assertTrue(array.getClass.isArray)
     assertEquals(length, array.length)
     for (i <- 0 until array.length) assertEquals(sampleElem, array(i))
-  }
 
   @noinline
   private def testNewInstanceNoInline(clazz: Class[_],
                                       length: Int,
                                       expectedClazz: Class[_],
-                                      sampleElem: Any): Unit = {
+                                      sampleElem: Any): Unit =
     testBase(clazz, length, expectedClazz, sampleElem)
-  }
 
   @inline
   def testNewInstance(
-      clazz: Class[_], expectedClazz: Class[_], sampleElem: Any): Unit = {
+      clazz: Class[_], expectedClazz: Class[_], sampleElem: Any): Unit =
     testNewInstanceNoInline(clazz, length = 2, expectedClazz, sampleElem)
     testBase(clazz, length = 2, expectedClazz, sampleElem)
 
     testNewInstanceNoInline(clazz, length = 0, expectedClazz, sampleElem)
     testBase(clazz, length = 0, expectedClazz, sampleElem)
-  }
 
-  @Test def newInstance(): Unit = {
+  @Test def newInstance(): Unit =
     testNewInstance(classOf[Int], classOf[Array[Int]], 0)
     testNewInstance(classOf[Char], classOf[Array[Char]], '\0')
     testNewInstance(classOf[Long], classOf[Array[Long]], 0L)
@@ -66,5 +63,3 @@ class ReflectArrayTest {
     testNewInstance(classOf[Array[Int]], classOf[Array[Array[Int]]], null)
     testNewInstance(
         classOf[Array[String]], classOf[Array[Array[String]]], null)
-  }
-}

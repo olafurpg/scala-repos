@@ -15,16 +15,15 @@ import _root_.scala.collection.mutable.ArrayBuffer
 class ScPrimaryConstructorWrapper(val constr: ScPrimaryConstructor,
                                   isJavaVarargs: Boolean = false,
                                   forDefault: Option[Int] = None)
-    extends {
+    extends
   val elementFactory =
     JavaPsiFacade.getInstance(constr.getProject).getElementFactory
-  val containingClass = {
+  val containingClass =
     val res: PsiClass = constr.containingClass
     assert(
         res != null,
         s"Method: ${constr.getText}\nhas null containing class. \nContaining file text: ${constr.getContainingFile.getText}")
     res
-  }
   val methodText = ScFunctionWrapper.methodText(
       constr,
       isStatic = forDefault.isDefined,
@@ -32,17 +31,15 @@ class ScPrimaryConstructorWrapper(val constr: ScPrimaryConstructor,
       None,
       isJavaVarargs,
       forDefault)
-  val method: PsiMethod = {
-    try {
+  val method: PsiMethod =
+    try
       elementFactory.createMethodFromText(methodText, containingClass)
-    } catch {
+    catch
       case e: Exception =>
         elementFactory.createMethodFromText(
             "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
-    }
-  }
-} with LightMethodAdapter(constr.getManager, method, containingClass)
-with LightScalaMethod {
+with LightMethodAdapter(constr.getManager, method, containingClass)
+with LightScalaMethod
 
   override def getNavigationElement: PsiElement = this
 
@@ -61,24 +58,21 @@ with LightScalaMethod {
 
   var returnType: PsiType = null
 
-  override def getReturnType: PsiType = {
-    forDefault match {
+  override def getReturnType: PsiType =
+    forDefault match
       case Some(i) if returnType == null =>
         val param = constr.parameters(i - 1)
         val scalaType = param.getType(TypingContext.empty).getOrAny
         returnType = ScType.toPsi(
             scalaType, constr.getProject, constr.getResolveScope)
       case _ =>
-    }
     returnType
-  }
 
   override def getPrevSibling: PsiElement = constr.getPrevSibling
 
   override def getNextSibling: PsiElement = constr.getNextSibling
 
   override def isWritable: Boolean = getContainingFile.isWritable
-}
 
 object ScPrimaryConstructorWrapper {}
 
@@ -95,39 +89,33 @@ class ScFunctionWrapper(val function: ScFunction,
                         cClass: Option[PsiClass],
                         isJavaVarargs: Boolean = false,
                         forDefault: Option[Int] = None)
-    extends {
+    extends
   val elementFactory =
     JavaPsiFacade.getInstance(function.getProject).getElementFactory
-  val containingClass = {
+  val containingClass =
     if (cClass.isDefined) cClass.get
-    else {
+    else
       var res: PsiClass = function.containingClass
-      if (isStatic) {
-        res match {
+      if (isStatic)
+        res match
           case o: ScObject => res = o.fakeCompanionClassOrCompanionClass
           case _ =>
-        }
-      }
       assert(res != null,
              "Method: " + function.getText +
              "\nhas null containing class. isStatic: " + isStatic +
              "\nContaining file text: " + function.getContainingFile.getText)
       res
-    }
-  }
   val methodText = ScFunctionWrapper.methodText(
       function, isStatic, isInterface, cClass, isJavaVarargs, forDefault)
-  val method: PsiMethod = {
-    try {
+  val method: PsiMethod =
+    try
       elementFactory.createMethodFromText(methodText, containingClass)
-    } catch {
+    catch
       case e: Exception =>
         elementFactory.createMethodFromText(
             "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
-    }
-  }
-} with LightMethodAdapter(function.getManager, method, containingClass)
-with LightScalaMethod {
+with LightMethodAdapter(function.getManager, method, containingClass)
+with LightScalaMethod
 
   override def getNavigationElement: PsiElement = this
 
@@ -144,14 +132,12 @@ with LightScalaMethod {
 
   override def getTextRange: TextRange = function.getTextRange
 
-  override def hasModifierProperty(name: String): Boolean = {
-    name match {
+  override def hasModifierProperty(name: String): Boolean =
+    name match
       case "abstract" if isInterface => true
       case "final" if containingClass.isInstanceOf[ScTrait] =>
         false //fix for SCL-5824
       case _ => super.hasModifierProperty(name)
-    }
-  }
 
   override def getPrevSibling: PsiElement = function.getPrevSibling
 
@@ -160,23 +146,22 @@ with LightScalaMethod {
   @volatile
   private var returnType: PsiType = null
 
-  override def getReturnType: PsiType = {
+  override def getReturnType: PsiType =
     val isConstructor = function.isConstructor && forDefault.isEmpty
-    if (returnType == null && !isConstructor) {
+    if (returnType == null && !isConstructor)
       val typeParameters = function.typeParameters
       val generifySubst: ScSubstitutor =
-        if (typeParameters.nonEmpty) {
+        if (typeParameters.nonEmpty)
           val methodTypeParameters = getTypeParameters
-          if (typeParameters.length == methodTypeParameters.length) {
-            val tvs = typeParameters.zip(methodTypeParameters).map {
+          if (typeParameters.length == methodTypeParameters.length)
+            val tvs = typeParameters.zip(methodTypeParameters).map
               case (param: ScTypeParam, parameter: PsiTypeParameter) =>
                 ((param.name, ScalaPsiUtil.getPsiElementId(param)),
                  ScDesignatorType(parameter))
-            }
             new ScSubstitutor(tvs.toMap, Map.empty, None)
-          } else ScSubstitutor.empty
-        } else ScSubstitutor.empty
-      forDefault match {
+          else ScSubstitutor.empty
+        else ScSubstitutor.empty
+      forDefault match
         case Some(i) =>
           val param = function.parameters(i - 1)
           val scalaType =
@@ -192,22 +177,17 @@ with LightScalaMethod {
               .subst(function.returnType.getOrAny)
           returnType = ScType.toPsi(
               scalaType, function.getProject, function.getResolveScope)
-      }
-    }
     returnType
-  }
 
   override def getNameIdentifier = function.getNameIdentifier
 
   override def isWritable: Boolean = getContainingFile.isWritable
 
-  override def setName(name: String) = {
+  override def setName(name: String) =
     if (forDefault.isEmpty && !function.isConstructor) function.setName(name)
     else this
-  }
-}
 
-object ScFunctionWrapper {
+object ScFunctionWrapper
 
   /**
     * This is for Java only.
@@ -217,7 +197,7 @@ object ScFunctionWrapper {
                  isInterface: Boolean,
                  cClass: Option[PsiClass],
                  isJavaVarargs: Boolean,
-                 forDefault: Option[Int] = None): String = {
+                 forDefault: Option[Int] = None): String =
     val builder = new StringBuilder
 
     builder.append(
@@ -225,26 +205,23 @@ object ScFunctionWrapper {
 
     val subst = getSubstitutor(cClass, function)
 
-    function match {
+    function match
       case function: ScFunction if function.typeParameters.nonEmpty =>
         builder.append(
             function.typeParameters
               .map(tp =>
-                    {
               var res = tp.name
-              tp.upperTypeElement match {
+              tp.upperTypeElement match
                 case Some(tParam) =>
                   val classes = new ArrayBuffer[String]()
-                  tp.upperBound.map(subst.subst) match {
+                  tp.upperBound.map(subst.subst) match
                     case Success(tp: ScCompoundType, _) =>
-                      tp.components.foreach {
+                      tp.components.foreach
                         case tp: ScType =>
-                          ScType.extractClass(tp, Some(function.getProject)) match {
+                          ScType.extractClass(tp, Some(function.getProject)) match
                             case Some(clazz) =>
                               classes += clazz.getQualifiedName
                             case _ =>
-                          }
-                      }
                     case Success(_: StdType, _) =>
                       JavaPsiFacade
                         .getInstance(function.getProject)
@@ -254,69 +231,57 @@ object ScFunctionWrapper {
                     case Success(tpt: ScTypeParameterType, _) =>
                       classes += tpt.canonicalText
                     case Success(scType, _) =>
-                      ScType.extractClass(scType, Some(function.getProject)) match {
+                      ScType.extractClass(scType, Some(function.getProject)) match
                         case Some(clazz) => classes += clazz.getQualifiedName
                         case _ =>
-                      }
                     case _ =>
-                  }
-                  if (classes.nonEmpty) {
+                  if (classes.nonEmpty)
                     res += classes.mkString(" extends ", " & ", "")
-                  }
                 case _ =>
-              }
               res
-          })
+          )
               .mkString("<", ", ", ">"))
       case _ =>
-    }
 
     val params =
       function.effectiveParameterClauses.flatMap(_.effectiveParameters)
 
-    val defaultParam = forDefault match {
+    val defaultParam = forDefault match
       case Some(i) => Some(params(i - 1))
       case None => None
-    }
 
-    def evalType(typeResult: TypeResult[ScType]) {
-      typeResult match {
+    def evalType(typeResult: TypeResult[ScType])
+      typeResult match
         case Success(tp, _) =>
           val typeText = JavaConversionUtil.typeText(
               subst.subst(tp), function.getProject, function.getResolveScope)
           builder.append(typeText)
         case _ => builder.append("java.lang.Object")
-      }
-    }
-    defaultParam match {
+    defaultParam match
       case Some(param) => evalType(param.getType(TypingContext.empty))
       case _ =>
-        function match {
+        function match
           case fun: ScFunction if !fun.isConstructor =>
             if (fun.hasExplicitType) evalType(fun.returnType)
             else builder.append("FromTypeInference")
           case _ =>
-        }
-    }
 
     builder.append(" ")
-    val name = forDefault match {
+    val name = forDefault match
       case Some(i) if function.isConstructor =>
         "$lessinit$greater$default$" + i
       case Some(i) => function.getName + "$default$" + i
       case _ if function.isConstructor => function.containingClass.getName
       case _ => function.getName
-    }
     builder.append(name)
 
     builder.append(
-        function.effectiveParameterClauses.takeWhile { clause =>
-      defaultParam match {
+        function.effectiveParameterClauses.takeWhile  clause =>
+      defaultParam match
         case Some(param) => !clause.effectiveParameters.contains(param)
         case None => true
-      }
-    }.flatMap(_.effectiveParameters)
-          .map {
+    .flatMap(_.effectiveParameters)
+          .map
         case param =>
           val builder = new StringBuilder
           val varargs: Boolean = param.isRepeatedParameter && isJavaVarargs
@@ -327,7 +292,7 @@ object ScFunctionWrapper {
           val tt =
             if (varargs) param.getType(TypingContext.empty)
             else param.getRealParameterType(TypingContext.empty)
-          tt match {
+          tt match
             case Success(tp, _) if param.isCallByNameParameter =>
               builder.append("scala.Function0<")
               val psiType = ScType.toPsi(subst.subst(tp),
@@ -342,43 +307,33 @@ object ScFunctionWrapper {
                                               function.getProject,
                                               function.getResolveScope))
             case _ => builder.append("java.lang.Object")
-          }
 
           if (varargs) builder.append("...")
 
           builder.append(" ").append(param.getName)
           builder.toString()
-      }
           .mkString("(", ", ", ")"))
 
-    function match {
+    function match
       case function: ScFunction =>
         builder.append(LightUtil.getThrowsSection(function))
       case _ =>
-    }
 
-    if (!isInterface) {
+    if (!isInterface)
       builder.append(" {}")
-    } else {
+    else
       builder.append(";")
-    }
 
     builder.toString()
-  }
 
   def getSubstitutor(
-      cClass: Option[PsiClass], function: ScMethodLike): ScSubstitutor = {
-    (cClass, function) match {
+      cClass: Option[PsiClass], function: ScMethodLike): ScSubstitutor =
+    (cClass, function) match
       case (Some(clazz), function: ScFunction) =>
-        clazz match {
+        clazz match
           case td: ScTypeDefinition =>
-            td.signaturesByName(function.name).find(_.method == function) match {
+            td.signaturesByName(function.name).find(_.method == function) match
               case Some(sign) => sign.substitutor
               case _ => ScSubstitutor.empty
-            }
           case _ => ScSubstitutor.empty
-        }
       case _ => ScSubstitutor.empty
-    }
-  }
-}

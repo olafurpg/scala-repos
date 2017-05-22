@@ -15,8 +15,8 @@ import org.junit.Assert._
 
 import BaseCharsetTest._
 
-class Latin1Test extends BaseCharsetTest(Charset.forName("ISO-8859-1")) {
-  @Test def decode(): Unit = {
+class Latin1Test extends BaseCharsetTest(Charset.forName("ISO-8859-1"))
+  @Test def decode(): Unit =
     // Simple tests
 
     testDecode(bb"48 65 6c 6c 6f")(cb"Hello")
@@ -30,9 +30,8 @@ class Latin1Test extends BaseCharsetTest(Charset.forName("ISO-8859-1")) {
 
     testDecode(bb"80 81 8a 90 a0")(cb"\u0080\u0081\u008a\u0090\u00a0")
     testDecode(bb"ff ff")(cb"ÿÿ")
-  }
 
-  @Test def encode(): Unit = {
+  @Test def encode(): Unit =
     // Simple tests
 
     testEncode(cb"Hello")(bb"48 65 6c 6c 6f")
@@ -77,14 +76,11 @@ class Latin1Test extends BaseCharsetTest(Charset.forName("ISO-8859-1")) {
     testEncode(cb"\udbffA")(Malformed(1), bb"41")
     testEncode(cb"\udbff\udb8f")(Malformed(1), Malformed(1))
     testEncode(cb"\udbff\ud835\udcd7")(Malformed(1), Unmappable(2))
-  }
 
-  @Test def isLegalReplacement(): Unit = {
+  @Test def isLegalReplacement(): Unit =
     val encoder = charset.newEncoder
     assertTrue(encoder.isLegalReplacement(Array(0x00.toByte)))
     assertTrue(encoder.isLegalReplacement(Array(0x41.toByte)))
     assertTrue(encoder.isLegalReplacement(Array('?'.toByte)))
     assertTrue(encoder.isLegalReplacement(Array(0x80.toByte)))
     assertTrue(encoder.isLegalReplacement(Array(0xff.toByte)))
-  }
-}

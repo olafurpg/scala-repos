@@ -22,7 +22,7 @@ import java.util.WeakHashMap
   * Immutable state that we attach to the Flow using the FlowStateMap
   */
 case class FlowState(sourceMap: Map[String, Source] = Map.empty,
-                     flowConfigUpdates: Set[(String, String)] = Set()) {
+                     flowConfigUpdates: Set[(String, String)] = Set())
   def addSource(id: String, s: Source): FlowState =
     copy(sourceMap = sourceMap + (id -> s))
 
@@ -35,7 +35,6 @@ case class FlowState(sourceMap: Map[String, Source] = Map.empty,
   def validateSources(mode: Mode): Unit =
     // This can throw a InvalidSourceException
     sourceMap.values.toSet[Source].foreach(_.validateTaps(mode))
-}
 
 /**
   * This is a mutable threadsafe store for attaching scalding
@@ -45,21 +44,19 @@ case class FlowState(sourceMap: Map[String, Source] = Map.empty,
   * with multiple sets of arguments, and their equality.
   * For this reason, we use Source.sourceId as the key in this map
   */
-object FlowStateMap {
+object FlowStateMap
   // Make sure we don't hold FlowState after the FlowDef is gone
   @transient private val flowMap = new WeakHashMap[FlowDef, FlowState]()
 
   /**
     * Function to update a state.
     */
-  def mutate[T](fd: FlowDef)(fn: FlowState => (FlowState, T)): T = {
-    flowMap.synchronized {
+  def mutate[T](fd: FlowDef)(fn: FlowState => (FlowState, T)): T =
+    flowMap.synchronized
       val oldState = Option(flowMap.get(fd)).getOrElse(FlowState())
       val (newState, t) = fn(oldState)
       flowMap.put(fd, newState)
       t
-    }
-  }
   def get(fd: FlowDef): Option[FlowState] =
     flowMap.synchronized { Option(flowMap.get(fd)) }
 
@@ -71,10 +68,9 @@ object FlowStateMap {
      * We don't need to validate if there are no sources, this comes up for
      * cases of no-op jobs
      */
-    if (!flowDef.getSources.isEmpty) {
+    if (!flowDef.getSources.isEmpty)
       get(flowDef)
         .getOrElse(sys.error(
                 "Could not find a flowState for flowDef: %s".format(flowDef)))
         .validateSources(mode)
-    } else ()
-}
+    else ()

@@ -37,7 +37,7 @@ object PropertyIncludes extends PropertyIncludes
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/package-summary.html `javafx.beans.property`]]
   * Classes to their ScalaFX counterparts.
   */
-trait PropertyIncludes extends LowerPriorityIncludes {
+trait PropertyIncludes extends LowerPriorityIncludes
 
   /**
     * Converts a
@@ -286,15 +286,11 @@ trait PropertyIncludes extends LowerPriorityIncludes {
   implicit def jfxReadOnlyStringWrapper2sfx(
       p: jfxbp.ReadOnlyStringWrapper): ReadOnlyStringWrapper =
     if (p != null) new ReadOnlyStringWrapper(p) else null
-}
 
-trait LowerPriorityIncludes {
+trait LowerPriorityIncludes
   implicit def jfxProperty2sfx[T <: AnyRef](
-      p: jfxbp.Property[T]): Property[T, T] = new Property[T, T] {
+      p: jfxbp.Property[T]): Property[T, T] = new Property[T, T]
     override def delegate = p
     override def value = delegate.getValue
-    override def value_=(v: T) {
+    override def value_=(v: T)
       delegate.setValue(v)
-    }
-  }
-}

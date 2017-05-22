@@ -4,7 +4,7 @@ import com.sanoma.cda.geoip.{MaxMindIpGeo, IpLocation}
 
 import scala.concurrent.duration._
 
-final class GeoIP(file: String, cacheTtl: Duration) {
+final class GeoIP(file: String, cacheTtl: Duration)
 
   private val geoIp = MaxMindIpGeo(file, 0)
   private val cache = lila.memo.Builder.cache(cacheTtl, compute)
@@ -15,10 +15,9 @@ final class GeoIP(file: String, cacheTtl: Duration) {
   def apply(ip: String): Option[Location] = cache get ip
 
   def orUnknown(ip: String): Location = apply(ip) | Location.unknown
-}
 
 case class Location(
-    country: String, region: Option[String], city: Option[String]) {
+    country: String, region: Option[String], city: Option[String])
 
   def comparable = (country, ~region, ~city)
 
@@ -26,9 +25,8 @@ case class Location(
 
   override def toString =
     List(shortCountry.some, region, city).flatten mkString " > "
-}
 
-object Location {
+object Location
 
   val unknown = Location("Solar System", none, none)
 
@@ -36,4 +34,3 @@ object Location {
 
   def apply(ipLoc: IpLocation): Location =
     Location(ipLoc.countryName | unknown.country, ipLoc.region, ipLoc.city)
-}

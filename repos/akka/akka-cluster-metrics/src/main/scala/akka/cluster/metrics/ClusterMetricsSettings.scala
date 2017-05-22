@@ -13,15 +13,14 @@ import scala.concurrent.duration.Duration
 /**
   * Metrics extension settings. Documented in: `src/main/resources/reference.conf`.
   */
-case class ClusterMetricsSettings(config: Config) {
+case class ClusterMetricsSettings(config: Config)
 
   private val cc = config.getConfig("akka.cluster.metrics")
 
   // Extension.
-  val MetricsDispatcher: String = cc.getString("dispatcher") match {
+  val MetricsDispatcher: String = cc.getString("dispatcher") match
     case "" ⇒ Dispatchers.DefaultDispatcherId
     case id ⇒ id
-  }
   val PeriodicTasksInitialDelay: FiniteDuration =
     cc.getMillisDuration("periodic-tasks-initial-delay")
   val NativeLibraryExtractFolder: String =
@@ -38,14 +37,13 @@ case class ClusterMetricsSettings(config: Config) {
   val CollectorEnabled: Boolean = cc.getBoolean("collector.enabled")
   val CollectorProvider: String = cc.getString("collector.provider")
   val CollectorFallback: Boolean = cc.getBoolean("collector.fallback")
-  val CollectorSampleInterval: FiniteDuration = {
+  val CollectorSampleInterval: FiniteDuration =
     cc.getMillisDuration("collector.sample-interval")
-  } requiring (_ > Duration.Zero, "collector.sample-interval must be > 0")
-  val CollectorGossipInterval: FiniteDuration = {
+  requiring (_ > Duration.Zero, "collector.sample-interval must be > 0")
+  val CollectorGossipInterval: FiniteDuration =
     cc.getMillisDuration("collector.gossip-interval")
-  } requiring (_ > Duration.Zero, "collector.gossip-interval must be > 0")
-  val CollectorMovingAverageHalfLife: FiniteDuration = {
+  requiring (_ > Duration.Zero, "collector.gossip-interval must be > 0")
+  val CollectorMovingAverageHalfLife: FiniteDuration =
     cc.getMillisDuration("collector.moving-average-half-life")
-  } requiring
+  requiring
   (_ > Duration.Zero, "collector.moving-average-half-life must be > 0")
-}

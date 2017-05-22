@@ -10,10 +10,10 @@ import play.api.libs.json.Json._
 import scala.util.control.Exception._
 import java.text.ParseException
 
-object JsonRichSpec extends Specification {
+object JsonRichSpec extends Specification
 
-  "JSON" should {
-    "create json with rich syntax" in {
+  "JSON" should
+    "create json with rich syntax" in
       val js = Json.obj(
           "key1" -> Json.obj("key11" -> "value11",
                              "key12" -> 123L,
@@ -46,6 +46,3 @@ object JsonRichSpec extends Specification {
                       ))
               ))
       )
-    }
-  }
-}

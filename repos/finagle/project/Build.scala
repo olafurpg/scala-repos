@@ -8,7 +8,7 @@ import sbtunidoc.Plugin.UnidocKeys._
 import sbtunidoc.Plugin.{ScalaUnidoc, unidocSettings}
 import scoverage.ScoverageSbtPlugin
 
-object Finagle extends Build {
+object Finagle extends Build
   val branch =
     Process("git" :: "rev-parse" :: "--abbrev-ref" :: "HEAD" :: Nil).!!.trim
   val suffix = if (branch == "master") "" else "-SNAPSHOT"
@@ -52,7 +52,7 @@ object Finagle extends Build {
         ExclusionRule(organization = "org.scala-tools.testing"),
         ExclusionRule(organization = "org.mockito"))
 
-  def scalacOptionsVersion(sv: String): Seq[String] = {
+  def scalacOptionsVersion(sv: String): Seq[String] =
     Seq(
         // Note: Add -deprecation when deprecated methods are removed
         "-unchecked",
@@ -61,7 +61,7 @@ object Finagle extends Build {
         "-encoding",
         "utf8"
     ) ++
-    (CrossVersion.partialVersion(sv) match {
+    (CrossVersion.partialVersion(sv) match
           case Some((2, x)) if x >= 11 =>
             Seq(
                 "-Xlint:-missing-interpolator",
@@ -69,8 +69,7 @@ object Finagle extends Build {
                 "40"
             )
           case _ => Seq("-Xlint")
-        })
-  }
+        )
 
   val sharedSettings = Seq(
       version := libVersion,
@@ -85,10 +84,10 @@ object Finagle extends Build {
       ),
       resolvers += "twitter-repo" at "https://maven.twttr.com",
       ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
-      (CrossVersion.partialVersion(scalaVersion.value) match {
+      (CrossVersion.partialVersion(scalaVersion.value) match
             case Some((2, 10)) => false
             case _ => true
-          }),
+          ),
       javaOptions in Test := Seq("-DSKIP_FLAKY=1"),
       ivyXML := <dependencies>
         <exclude org="com.sun.jmx" module="jmxri" />
@@ -108,9 +107,9 @@ object Finagle extends Build {
 
       // Sonatype publishing
       publishArtifact in Test := false,
-      pomIncludeRepository := { _ =>
+      pomIncludeRepository :=  _ =>
         false
-      },
+      ,
       publishMavenStyle := true,
       autoAPIMappings := true,
       apiURL := Some(url("https://twitter.github.io/finagle/docs/")),
@@ -132,20 +131,20 @@ object Finagle extends Build {
           <url>https://www.twitter.com/</url>
         </developer>
       </developers>,
-      publishTo <<= version { (v: String) =>
+      publishTo <<= version  (v: String) =>
         val nexus = "https://oss.sonatype.org/"
         if (v.trim.endsWith("SNAPSHOT"))
           Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      },
+      ,
       // Prevent eviction warnings
-      dependencyOverrides <++= scalaVersion { vsn =>
+      dependencyOverrides <++= scalaVersion  vsn =>
         Set(
             "org.apache.thrift" % "libthrift" % libthriftVersion
         )
-      },
+      ,
       resourceGenerators in Compile <+=
-        (resourceManaged in Compile, name, version) map { (dir, name, ver) =>
+        (resourceManaged in Compile, name, version) map  (dir, name, ver) =>
         val file = dir / "com" / "twitter" / name / "build.properties"
         val buildRev = Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
         val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
@@ -154,7 +153,6 @@ object Finagle extends Build {
           s"name=$name\nversion=$ver\nbuild_revision=$buildRev\nbuild_name=$buildName"
         IO.write(file, contents)
         Seq(file)
-      }
   )
 
   val jmockSettings = Seq(
@@ -467,9 +465,9 @@ object Finagle extends Build {
         libraryDependencies ++= Seq(
             util("logging")
         ),
-        testOptions in Test := Seq(Tests.Filter { name =>
+        testOptions in Test := Seq(Tests.Filter  name =>
           !name.startsWith("com.twitter.finagle.redis.integration")
-        })
+        )
     )
     .dependsOn(finagleCore)
 
@@ -501,9 +499,8 @@ object Finagle extends Build {
   ).settings(
         name := "finagle-mysql",
         libraryDependencies ++= Seq(util("logging"), util("cache")),
-        excludeFilter in unmanagedSources := {
+        excludeFilter in unmanagedSources :=
           "EmbeddableMysql.scala" || "ClientTest.scala"
-        }
     )
     .dependsOn(finagleCore)
 
@@ -636,7 +633,5 @@ object Finagle extends Build {
   lazy val DocTest = config("doctest") extend Test
 
   // A dummy partitioning scheme for tests
-  def partitionTests(tests: Seq[TestDefinition]) = {
+  def partitionTests(tests: Seq[TestDefinition]) =
     Seq(new Group("inProcess", tests, InProcess))
-  }
-}

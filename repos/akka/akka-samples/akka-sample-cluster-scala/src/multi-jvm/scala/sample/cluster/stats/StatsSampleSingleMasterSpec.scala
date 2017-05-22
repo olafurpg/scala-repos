@@ -22,7 +22,7 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit.ImplicitSender
 import akka.cluster.singleton.ClusterSingletonProxySettings
 
-object StatsSampleSingleMasterSpecConfig extends MultiNodeConfig {
+object StatsSampleSingleMasterSpecConfig extends MultiNodeConfig
   // register the named roles (nodes) of the test
   val first = role("first")
   val second = role("second")
@@ -31,8 +31,8 @@ object StatsSampleSingleMasterSpecConfig extends MultiNodeConfig {
   def nodeList = Seq(first, second, third)
 
   // Extract individual sigar library for every node.
-  nodeList foreach { role ⇒
-    nodeConfig(role) {
+  nodeList foreach  role ⇒
+    nodeConfig(role)
       ConfigFactory.parseString(s"""
       # Disable legacy metrics in akka-cluster.
       akka.cluster.metrics.enabled=off
@@ -41,8 +41,6 @@ object StatsSampleSingleMasterSpecConfig extends MultiNodeConfig {
       # Sigar native library extract location during tests.
       akka.cluster.metrics.native-library-extract-folder=target/native/${role.name}
       """)
-    }
-  }
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
@@ -65,7 +63,6 @@ object StatsSampleSingleMasterSpecConfig extends MultiNodeConfig {
     }
     #//#router-deploy-config
     """))
-}
 
 // need one concrete test class per node
 class StatsSampleSingleMasterSpecMultiJvmNode1
@@ -77,7 +74,7 @@ class StatsSampleSingleMasterSpecMultiJvmNode3
 
 abstract class StatsSampleSingleMasterSpec
     extends MultiNodeSpec(StatsSampleSingleMasterSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    with Matchers with BeforeAndAfterAll with ImplicitSender
 
   import StatsSampleSingleMasterSpecConfig._
 
@@ -87,8 +84,8 @@ abstract class StatsSampleSingleMasterSpec
 
   override def afterAll() = multiNodeSpecAfterAll()
 
-  "The stats sample with single master" must {
-    "illustrate how to startup cluster" in within(15 seconds) {
+  "The stats sample with single master" must
+    "illustrate how to startup cluster" in within(15 seconds)
       Cluster(system).subscribe(testActor, classOf[MemberUp])
       expectMsgClass(classOf[CurrentClusterState])
 
@@ -117,21 +114,16 @@ abstract class StatsSampleSingleMasterSpec
           name = "statsServiceProxy")
 
       testConductor.enter("all-up")
-    }
 
-    "show usage of the statsServiceProxy" in within(40 seconds) {
+    "show usage of the statsServiceProxy" in within(40 seconds)
       val proxy = system.actorSelection(
           RootActorPath(node(third).address) / "user" / "statsServiceProxy")
 
       // eventually the service should be ok,
       // service and worker nodes might not be up yet
-      awaitAssert {
+      awaitAssert
         proxy ! StatsJob("this is the text that will be analyzed")
         expectMsgType[StatsResult](1.second).meanWordLength should be(
             3.875 +- 0.001)
-      }
 
       testConductor.enter("done")
-    }
-  }
-}

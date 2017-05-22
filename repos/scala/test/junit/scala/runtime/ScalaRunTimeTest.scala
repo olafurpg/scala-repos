@@ -7,13 +7,12 @@ import org.junit.runners.JUnit4
 
 /** Tests for the private class DefaultPromise */
 @RunWith(classOf[JUnit4])
-class ScalaRunTimeTest {
+class ScalaRunTimeTest
   @Test
-  def testIsTuple() {
+  def testIsTuple()
     import ScalaRunTime.isTuple
-    def check(v: Any) = {
+    def check(v: Any) =
       assertTrue(v.toString, isTuple(v))
-    }
 
     val s = ""
     check(Tuple1(s))
@@ -66,10 +65,9 @@ class ScalaRunTimeTest {
     case class C()
     val c = new C()
     assertFalse(c.toString, isTuple(c))
-  }
 
   @Test
-  def testStingOf() {
+  def testStingOf()
     import ScalaRunTime.stringOf
     import scala.collection._
     import parallel.ParIterable
@@ -106,9 +104,8 @@ class ScalaRunTimeTest {
     assertEquals(
         s"""${parIterable.stringPrefix}(a, "")""", stringOf(parIterable, 2))
 
-    val traversable = new Traversable[Int] {
+    val traversable = new Traversable[Int]
       def foreach[U](f: Int => U): Unit = (0 to 3).foreach(f)
-    }
     assertEquals(
         s"${traversable.stringPrefix}(0, 1, 2, 3)", stringOf(traversable))
     assertEquals(
@@ -126,10 +123,7 @@ class ScalaRunTimeTest {
     assertEquals("(0,1,2)", stringOf(tuple3))
     assertEquals("(0,1,2)", stringOf(tuple3, 0))
 
-    val x = new Object {
+    val x = new Object
       override def toString(): String = "this is the stringOf string"
-    }
     assertEquals(stringOf(x), "this is the stringOf string")
     assertEquals(stringOf(x, 2), "this is the stringOf string")
-  }
-}

@@ -10,7 +10,7 @@ import scala.collection.immutable
 import akka.http.scaladsl.model.ws.{UpgradeToWebSocket, Message}
 import akka.stream.scaladsl.Flow
 
-trait WebSocketDirectives {
+trait WebSocketDirectives
   import RouteDirectives._
   import HeaderDirectives._
   import BasicDirectives._
@@ -19,10 +19,9 @@ trait WebSocketDirectives {
     * Extract the [[UpgradeToWebSocket]] header if existent. Rejects with an [[ExpectedWebSocketRequestRejection]], otherwise.
     */
   def extractUpgradeToWebSocket: Directive1[UpgradeToWebSocket] =
-    optionalHeaderValueByType[UpgradeToWebSocket](()).flatMap {
+    optionalHeaderValueByType[UpgradeToWebSocket](()).flatMap
       case Some(upgrade) ⇒ provide(upgrade)
       case None ⇒ reject(ExpectedWebSocketRequestRejection)
-    }
 
   /**
     * Extract the list of WebSocket subprotocols as offered by the client in the [[Sec-WebSocket-Protocol]] header if
@@ -60,11 +59,9 @@ trait WebSocketDirectives {
   def handleWebSocketMessagesForOptionalProtocol(
       handler: Flow[Message, Message, Any],
       subprotocol: Option[String]): Route =
-    extractUpgradeToWebSocket { upgrade ⇒
+    extractUpgradeToWebSocket  upgrade ⇒
       if (subprotocol.forall(
               sub ⇒ upgrade.requestedProtocols.exists(_ equalsIgnoreCase sub)))
         complete(upgrade.handleMessages(handler, subprotocol))
       else
         reject(UnsupportedWebSocketSubprotocolRejection(subprotocol.get)) // None.forall == true
-    }
-}

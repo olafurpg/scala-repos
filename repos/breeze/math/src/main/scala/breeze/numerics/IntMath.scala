@@ -20,7 +20,7 @@ package breeze.numerics
   *
   * @author dlwh
   */
-object IntMath {
+object IntMath
 
   /**
     * Computes base to the exp'th power for Ints by repeated squaring.
@@ -28,21 +28,18 @@ object IntMath {
     * @param exp
     * @return
     */
-  def ipow(base: Int, exp: Int): Int = {
+  def ipow(base: Int, exp: Int): Int =
     var b = base
     if (exp < 0 && base != 1) 0
-    else {
+    else
       var e = exp
       var result = 1
-      while (e != 0) {
+      while (e != 0)
         if ((e & 1) != 0) result *= b
         e >>= 1
         b *= b
-      }
 
       result
-    }
-  }
 
   /**
     * Computes base to the exp'th power for Longs by repeated squaring.
@@ -50,19 +47,15 @@ object IntMath {
     * @param exp
     * @return
     */
-  def ipow(base: Long, exp: Long): Long = {
+  def ipow(base: Long, exp: Long): Long =
     var b = base
     if (exp < 0 && base != 1) 0
-    else {
+    else
       var e = exp
       var result: Long = 1
-      while (e != 0) {
+      while (e != 0)
         if ((e & 1) != 0) result *= b
         e >>= 1
         b *= b
-      }
 
       result
-    }
-  }
-}

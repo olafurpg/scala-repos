@@ -47,13 +47,12 @@ import org.apache.spark.rdd.RDD
   * appropriate constant (the cumulative sum of number of elements in the prior partitions divided by
   * thedata set size). Finally, we take the maximum absolute value, and this is the statistic.
   */
-private[stat] object KolmogorovSmirnovTest extends Logging {
+private[stat] object KolmogorovSmirnovTest extends Logging
 
   // Null hypothesis for the type of KS test to be included in the result.
-  object NullHypothesis extends Enumeration {
+  object NullHypothesis extends Enumeration
     type NullHypothesis = Value
     val OneSampleTwoSided = Value("Sample follows theoretical distribution")
-  }
 
   /**
     * Runs a KS test for 1 set of sample data, comparing it to a theoretical distribution
@@ -63,19 +62,17 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
     *        results (p-value, statistic, and null hypothesis)
     */
   def testOneSample(data: RDD[Double],
-                    cdf: Double => Double): KolmogorovSmirnovTestResult = {
+                    cdf: Double => Double): KolmogorovSmirnovTestResult =
     val n = data.count().toDouble
     val localData = data
       .sortBy(x => x)
-      .mapPartitions { part =>
+      .mapPartitions  part =>
         val partDiffs = oneSampleDifferences(part, n, cdf) // local distances
         searchOneSampleCandidates(partDiffs) // candidates: local extrema
-      }
       .collect()
     val ksStat =
       searchOneSampleStatistic(localData, n) // result: global extreme
     evalOneSampleP(ksStat, n.toLong)
-  }
 
   /**
     * Runs a KS test for 1 set of sample data, comparing it to a theoretical distribution
@@ -85,10 +82,9 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
     *        results (p-value, statistic, and null hypothesis)
     */
   def testOneSample(data: RDD[Double],
-                    distObj: RealDistribution): KolmogorovSmirnovTestResult = {
+                    distObj: RealDistribution): KolmogorovSmirnovTestResult =
     val cdf = (x: Double) => distObj.cumulativeProbability(x)
     testOneSample(data, cdf)
-  }
 
   /**
     * Calculate unadjusted distances between the empirical CDF and the theoretical CDF in a
@@ -105,18 +101,16 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
   private def oneSampleDifferences(
       partData: Iterator[Double],
       n: Double,
-      cdf: Double => Double): Iterator[(Double, Double)] = {
+      cdf: Double => Double): Iterator[(Double, Double)] =
     // zip data with index (within that partition)
     // calculate local (unadjusted) empirical CDF and subtract CDF
-    partData.zipWithIndex.map {
+    partData.zipWithIndex.map
       case (v, ix) =>
         // dp and dl are later adjusted by constant, when global info is available
         val dp = (ix + 1) / n
         val dl = ix / n
         val cdfVal = cdf(v)
         (dl - cdfVal, dp - cdfVal)
-    }
-  }
 
   /**
     * Search the unadjusted differences in a partition and return the
@@ -128,17 +122,15 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
     * @return `Iterator[(Double, Double, Double)]` the local extrema and a count of elements
     */
   private def searchOneSampleCandidates(partDiffs: Iterator[(Double, Double)])
-    : Iterator[(Double, Double, Double)] = {
+    : Iterator[(Double, Double, Double)] =
     val initAcc = (Double.MaxValue, Double.MinValue, 0.0)
-    val pResults = partDiffs.foldLeft(initAcc) {
+    val pResults = partDiffs.foldLeft(initAcc)
       case ((pMin, pMax, pCt), (dl, dp)) =>
         (math.min(pMin, dl), math.max(pMax, dp), pCt + 1)
-    }
     val results =
       if (pResults == initAcc) Array[(Double, Double, Double)]()
       else Array(pResults)
     results.iterator
-  }
 
   /**
     * Find the global maximum distance between empirical CDF and CDF (i.e. the KS statistic) after
@@ -150,20 +142,18 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
     * @return The one-sample Kolmogorov Smirnov Statistic
     */
   private def searchOneSampleStatistic(
-      localData: Array[(Double, Double, Double)], n: Double): Double = {
+      localData: Array[(Double, Double, Double)], n: Double): Double =
     val initAcc = (Double.MinValue, 0.0)
     // adjust differences based on the number of elements preceding it, which should provide
     // the correct distance between empirical CDF and CDF
-    val results = localData.foldLeft(initAcc) {
+    val results = localData.foldLeft(initAcc)
       case ((prevMax, prevCt), (minCand, maxCand, ct)) =>
         val adjConst = prevCt / n
         val dist1 = math.abs(minCand + adjConst)
         val dist2 = math.abs(maxCand + adjConst)
         val maxVal = Array(prevMax, dist1, dist2).max
         (maxVal, prevCt + ct)
-    }
     results._1
-  }
 
   /**
     * A convenience function that allows running the KS test for 1 set of sample data against
@@ -177,35 +167,29 @@ private[stat] object KolmogorovSmirnovTest extends Logging {
   @varargs
   def testOneSample(data: RDD[Double],
                     distName: String,
-                    params: Double*): KolmogorovSmirnovTestResult = {
-    val distObj = distName match {
-      case "norm" => {
-          if (params.nonEmpty) {
+                    params: Double*): KolmogorovSmirnovTestResult =
+    val distObj = distName match
+      case "norm" =>
+          if (params.nonEmpty)
             // parameters are passed, then can only be 2
             require(params.length == 2,
                     "Normal distribution requires mean and standard " +
                     "deviation as parameters")
             new NormalDistribution(params(0), params(1))
-          } else {
+          else
             // if no parameters passed in initializes to standard normal
             logInfo("No parameters specified for normal distribution," +
                 "initialized to standard normal (i.e. N(0, 1))")
             new NormalDistribution(0, 1)
-          }
-        }
       case _ =>
         throw new UnsupportedOperationException(
             s"$distName not yet supported through" +
             s" convenience method. Current options are:['norm'].")
-    }
 
     testOneSample(data, distObj)
-  }
 
   private def evalOneSampleP(
-      ksStat: Double, n: Long): KolmogorovSmirnovTestResult = {
+      ksStat: Double, n: Long): KolmogorovSmirnovTestResult =
     val pval = 1 - new CommonMathKolmogorovSmirnovTest().cdf(ksStat, n.toInt)
     new KolmogorovSmirnovTestResult(
         pval, ksStat, NullHypothesis.OneSampleTwoSided.toString)
-  }
-}

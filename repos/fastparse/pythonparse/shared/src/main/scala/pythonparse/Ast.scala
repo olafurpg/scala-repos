@@ -6,7 +6,7 @@ import acyclic.file
   *
   * Basically transcribed from https://docs.python.org/2/library/ast.html
   */
-object Ast {
+object Ast
   case class identifier(name: String)
   type bool = Boolean
   type int = Int
@@ -14,14 +14,13 @@ object Ast {
   type string = String
 
   sealed trait mod
-  object mod {
+  object mod
     case class Module(body: Seq[stmt]) extends mod
     case class Interactive(body: Seq[stmt]) extends mod
     case class Expression(body: Seq[stmt]) extends mod
-  }
 
   sealed trait stmt
-  object stmt {
+  object stmt
     case class FunctionDef(name: identifier,
                            args: arguments,
                            body: Seq[stmt],
@@ -83,11 +82,10 @@ object Ast {
     // XXX Jython will be different
     // col_offset is the byte offset in the utf8 string the parser uses
     case class attributes(lineno: Int, col_offset: Int)
-  }
 
   // BoolOp() can use left & right?
   sealed trait expr
-  object expr {
+  object expr
     case class BoolOp(op: boolop, values: Seq[expr]) extends expr
     case class BinOp(left: expr, op: operator, right: expr) extends expr
     case class UnaryOp(op: unaryop, operand: expr) extends expr
@@ -126,12 +124,11 @@ object Ast {
     case class Name(id: identifier, ctx: expr_context) extends expr
     case class List(elts: Seq[expr], ctx: expr_context) extends expr
     case class Tuple(elts: Seq[expr], ctx: expr_context) extends expr
-  }
   // col_offset is the byte offset in the utf8 string the parser uses
   case class attributes(lineno: Int, col_offset: Int)
 
   sealed trait expr_context
-  object expr_context {
+  object expr_context
 
     case object Load extends expr_context
     case object Store extends expr_context
@@ -139,9 +136,8 @@ object Ast {
     case object AugLoad extends expr_context
     case object AugStore extends expr_context
     case object Param extends expr_context
-  }
   sealed trait slice
-  object slice {
+  object slice
 
     case object Ellipsis extends slice
     case class Slice(
@@ -149,16 +145,14 @@ object Ast {
         extends slice
     case class ExtSlice(dims: Seq[slice]) extends slice
     case class Index(value: expr) extends slice
-  }
 
   sealed trait boolop
-  object boolop {
+  object boolop
     case object And extends boolop
     case object Or extends boolop
-  }
 
   sealed trait operator
-  case object operator {
+  case object operator
     case object Add extends operator
     case object Sub extends operator
     case object Mult extends operator
@@ -171,18 +165,16 @@ object Ast {
     case object BitXor extends operator
     case object BitAnd extends operator
     case object FloorDiv extends operator
-  }
 
   sealed trait unaryop
-  object unaryop {
+  object unaryop
 
     case object Invert extends unaryop
     case object Not extends unaryop
     case object UAdd extends unaryop
     case object USubextends extends unaryop
-  }
   sealed trait cmpop
-  object cmpop {
+  object cmpop
 
     case object Eq extends cmpop
     case object NotEq extends cmpop
@@ -194,17 +186,15 @@ object Ast {
     case object IsNot extends cmpop
     case object In extends cmpop
     case object NotIn extends cmpop
-  }
 
   case class comprehension(target: expr, iter: expr, ifs: Seq[expr])
 
   // not sure what to call the first argument for raise and except
   sealed trait excepthandler
-  object excepthandler {
+  object excepthandler
     case class ExceptHandler(
         `type`: Option[expr], name: Option[expr], body: Seq[stmt])
         extends excepthandler
-  }
 
   case class arguments(args: Seq[expr],
                        vararg: Option[identifier],
@@ -216,4 +206,3 @@ object Ast {
 
   // import name with optional 'as' alias.
   case class alias(name: identifier, asname: Option[identifier])
-}

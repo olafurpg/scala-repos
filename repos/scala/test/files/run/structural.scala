@@ -1,6 +1,6 @@
 import scala.language.{reflectiveCalls}
 
-object test1 {
+object test1
 
   val o1 = new Object { override def toString = "ohone" }
   val o2 = new Object { override def toString = "ohtwo" }
@@ -8,14 +8,13 @@ object test1 {
   val t1 = new Tata("tieone")
   val t2 = new Tata("tietwo")
 
-  class Tata(name: String) {
+  class Tata(name: String)
     override def toString = name
     def tatMe = "oy"
-  }
 
   class Titi extends Tata("titi")
 
-  object Rec {
+  object Rec
     val a = 1
     val b = 2
     val c = "hey"
@@ -42,9 +41,8 @@ object test1 {
     val x = t1
     val y: Tata = null
     def z(t: Tata) = ()
-  }
 
-  type rt = Object {
+  type rt = Object
     val a: Int;
     val c: String;
     def d(x: AnyRef): AnyRef
@@ -66,9 +64,8 @@ object test1 {
     def u[T](f: T => T, v: T): T
     var v: Int
     val y: Tata
-  }
 
-  def l(r: rt) {
+  def l(r: rt)
     println(" 1. " + r.c)
     println(" 2. " + r.a + 1)
     println(" 3. " + r.d(o1))
@@ -95,31 +92,25 @@ object test1 {
     println("24. " + r.u[Int](_ + 1, 0))
     println("25. " + r.y)
     println("26. " + r.e(null))
-  }
 
   /*def ma[T](r: Object{def e(x: T): T; val x: T}) {
     println("30. " + r.e(r.x)) // static error
   }*/
 
-  def mb(r: Object { def e[T](x: T): T }) {
+  def mb(r: Object { def e[T](x: T): T })
     println("31. " + r.e[Int](4)) // while this is ok
-  }
 
-  def m1(r: Object { def z(x: Tata): Unit }) {
+  def m1(r: Object { def z(x: Tata): Unit })
     println("32. " + r.z(new Titi)) // while this is ok
-  }
 
-  def m2[T](r: Object { def e(x: Tata): T; val x: Tata }) {
+  def m2[T](r: Object { def e(x: Tata): T; val x: Tata })
     println("33. " + r.e(r.x)) // and this too
-  }
 
-  class Rec3[T] {
+  class Rec3[T]
     def e(x: T): T = x
-  }
 
-  def m3[T](r: Rec3[T], x: T) {
+  def m3[T](r: Rec3[T], x: T)
     println("33. " + r.e(x)) // and this too
-  }
 
   Rec.g(11)
 
@@ -128,9 +119,8 @@ object test1 {
   this.m1(Rec)
   this.m2[Tata](Rec)
   this.m3[Tata](new Rec3[Tata], t1)
-}
 
-object test2 {
+object test2
   class C extends { def f() { println("1") } }
   val x1 = new C
   x1.f()
@@ -150,28 +140,24 @@ object test2 {
 
   val x5: T = new { def f() { println("5") } }
   x5.f()
-}
 
-object test3 {
+object test3
 
   case class Exc() extends Exception
 
-  object Rec {
+  object Rec
     def f = throw Exc()
-  }
 
   def m(r: { def f: Nothing }) =
-    try {
+    try
       r.f
-    } catch {
+    catch
       case e: Exc => println("caught")
       case e: Throwable => println(e)
-    }
 
   m(Rec)
-}
 
-object test4 {
+object test4
 
   class A
 
@@ -190,11 +176,9 @@ object test4 {
 
   //h(aar)
   //h(nar)
-}
 
-object Test extends App {
+object Test extends App
   test1
   test2
   test3
   test4
-}

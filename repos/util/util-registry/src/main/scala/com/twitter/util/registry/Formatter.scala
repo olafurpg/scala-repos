@@ -3,7 +3,7 @@ package com.twitter.util.registry
 import com.twitter.util.NoStacktrace
 import java.util.logging.Logger
 
-object Formatter {
+object Formatter
   private[this] val log = Logger.getLogger(getClass.getName)
 
   private[registry] val Eponymous = "__eponymous"
@@ -17,11 +17,11 @@ object Formatter {
       value: String
   ): Map[String, Object] =
     old +
-    (keys match {
+    (keys match
           case Nil => (Eponymous -> value)
-          case head +: tail => {
+          case head +: tail =>
               head ->
-              (old.get(head) match {
+              (old.get(head) match
                     case None =>
                       if (tail.isEmpty) value
                       else makeMap(tail, value)
@@ -33,30 +33,28 @@ object Formatter {
                       if (tail.isEmpty) throw Collision
                       else makeMap(tail, value) + (Eponymous -> string)
                     case Some(_) => throw InvalidType
-                  })
-            }
-        })
+                  )
+        )
 
   /**
     * @param seq is not permitted to be empty
     */
   private[registry] def makeMap(
       seq: Seq[String], value: String): Map[String, Object] =
-    seq.foldRight[Either[Map[String, Object], String]](Right(value)) {
+    seq.foldRight[Either[Map[String, Object], String]](Right(value))
       case (key, Right(string)) => Left(Map(key -> string))
       case (key, Left(map)) => Left(Map(key -> map))
-    } match {
+    match
       case Right(string) => throw Empty
       case Left(map) => map
-    }
 
-  def asMap(registry: Registry): Map[String, Object] = {
+  def asMap(registry: Registry): Map[String, Object] =
     var map: Map[String, Object] = Map.empty[String, Object]
-    registry.foreach {
+    registry.foreach
       case Entry(keys, value) =>
-        try {
+        try
           map = add(map, keys, value)
-        } catch {
+        catch
           case Collision =>
             log.severe(s"collided on (${keys.mkString(",")}) -> $value")
           case InvalidType =>
@@ -65,12 +63,8 @@ object Formatter {
           case Empty =>
             val returnString = s"(${keys.mkString(",")}) -> $value"
             log.severe(s"incorrectly found an empty seq on $returnString")
-        }
-    }
     Map("registry" -> map)
-  }
 
   private[registry] val Collision = new Exception() with NoStacktrace
   private[registry] val InvalidType = new Exception() with NoStacktrace
   private[registry] val Empty = new Exception() with NoStacktrace
-}

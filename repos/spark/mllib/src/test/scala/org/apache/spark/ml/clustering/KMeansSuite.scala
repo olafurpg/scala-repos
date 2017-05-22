@@ -28,18 +28,17 @@ private[clustering] case class TestRow(features: Vector)
 
 class KMeansSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   final val k = 5
   @transient var dataset: DataFrame = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
 
     dataset = KMeansSuite.generateKMeansData(sqlContext, 50, 3, k)
-  }
 
-  test("default parameters") {
+  test("default parameters")
     val kmeans = new KMeans()
 
     assert(kmeans.getK === 2)
@@ -49,9 +48,8 @@ class KMeansSuite
     assert(kmeans.getInitMode === MLlibKMeans.K_MEANS_PARALLEL)
     assert(kmeans.getInitSteps === 5)
     assert(kmeans.getTol === 1e-4)
-  }
 
-  test("set parameters") {
+  test("set parameters")
     val kmeans = new KMeans()
       .setK(9)
       .setFeaturesCol("test_feature")
@@ -70,21 +68,16 @@ class KMeansSuite
     assert(kmeans.getInitSteps === 3)
     assert(kmeans.getSeed === 123)
     assert(kmeans.getTol === 1e-3)
-  }
 
-  test("parameters validation") {
-    intercept[IllegalArgumentException] {
+  test("parameters validation")
+    intercept[IllegalArgumentException]
       new KMeans().setK(1)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new KMeans().setInitMode("no_such_a_mode")
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new KMeans().setInitSteps(0)
-    }
-  }
 
-  test("fit & transform") {
+  test("fit & transform")
     val predictionColName = "kmeans_prediction"
     val kmeans =
       new KMeans().setK(k).setPredictionCol(predictionColName).setSeed(1)
@@ -93,9 +86,8 @@ class KMeansSuite
 
     val transformed = model.transform(dataset)
     val expectedColumns = Array("features", predictionColName)
-    expectedColumns.foreach { column =>
+    expectedColumns.foreach  column =>
       assert(transformed.columns.contains(column))
-    }
     val clusters = transformed
       .select(predictionColName)
       .rdd
@@ -107,28 +99,23 @@ class KMeansSuite
     assert(clusters === Set(0, 1, 2, 3, 4))
     assert(model.computeCost(dataset) < 0.1)
     assert(model.hasParent)
-  }
 
-  test("read/write") {
-    def checkModelData(model: KMeansModel, model2: KMeansModel): Unit = {
+  test("read/write")
+    def checkModelData(model: KMeansModel, model2: KMeansModel): Unit =
       assert(model.clusterCenters === model2.clusterCenters)
-    }
     val kmeans = new KMeans()
     testEstimatorAndModelReadWrite(
         kmeans, dataset, KMeansSuite.allParamSettings, checkModelData)
-  }
-}
 
-object KMeansSuite {
+object KMeansSuite
   def generateKMeansData(
-      sql: SQLContext, rows: Int, dim: Int, k: Int): DataFrame = {
+      sql: SQLContext, rows: Int, dim: Int, k: Int): DataFrame =
     val sc = sql.sparkContext
     val rdd = sc
       .parallelize(1 to rows)
       .map(i => Vectors.dense(Array.fill(dim)((i % k).toDouble)))
       .map(v => new TestRow(v))
     sql.createDataFrame(rdd)
-  }
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -141,4 +128,3 @@ object KMeansSuite {
       "maxIter" -> 2,
       "tol" -> 0.01
   )
-}

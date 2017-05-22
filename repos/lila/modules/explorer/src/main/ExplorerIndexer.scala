@@ -18,7 +18,7 @@ import lila.game.{Game, GameRepo, Query, PgnDump, Player}
 import lila.user.UserRepo
 
 private final class ExplorerIndexer(
-    endpoint: String, massImportEndpoint: String) {
+    endpoint: String, massImportEndpoint: String)
 
   private val maxGames = Int.MaxValue
   private val batchSize = 50
@@ -38,7 +38,7 @@ private final class ExplorerIndexer(
   type GamePGN = (Game, String)
 
   def apply(sinceStr: String): Funit =
-    parseDate(sinceStr).fold(fufail[Unit](s"Invalid date $sinceStr")) {
+    parseDate(sinceStr).fold(fufail[Unit](s"Invalid date $sinceStr"))
       since =>
         logger.info(s"Start indexing since $since")
         val query = $query(
@@ -52,17 +52,16 @@ private final class ExplorerIndexer(
           .cursor[Game](ReadPreference.secondaryPreferred)
           .enumerate(maxGames, stopOnError = true) &> Enumeratee
           .mapM[Game]
-          .apply[Option[GamePGN]] { game =>
-            makeFastPgn(game) map {
+          .apply[Option[GamePGN]]  game =>
+            makeFastPgn(game) map
               _ map { game -> _ }
-            }
-          } &> Enumeratee.collect { case Some(el) => el } &> Enumeratee
+          &> Enumeratee.collect { case Some(el) => el } &> Enumeratee
           .grouped(Iteratee takeUpTo batchSize) |>>> Iteratee
-          .foldM[Seq[GamePGN], Long](nowMillis) {
+          .foldM[Seq[GamePGN], Long](nowMillis)
           case (millis, pairs) =>
             WS.url(massImportEndPointUrl)
               .put(pairs.map(_._2) mkString separator)
-              .flatMap {
+              .flatMap
                 case res if res.status == 200 =>
                   val date =
                     pairs.headOption.map(_._1.createdAt) ?? dateTimeFormatter.print
@@ -73,30 +72,27 @@ private final class ExplorerIndexer(
                   funit
                 case res =>
                   fufail(s"Stop import because of status ${res.status}")
-              } >> {
-              pairs.headOption match {
+              >>
+              pairs.headOption match
                 case None => fufail(s"No games left, import complete!")
                 case Some((g, _))
                     if (g.createdAt.isAfter(DateTime.now.minusMinutes(10))) =>
                   fufail(s"Found a recent game, import complete!")
                 case _ => funit
-              }
-            } inject nowMillis
-        } void
-    }
+            inject nowMillis
+        void
 
-  def apply(game: Game): Funit = makeFastPgn(game) map {
+  def apply(game: Game): Funit = makeFastPgn(game) map
     _ foreach flowBuffer.apply
-  }
 
-  private object flowBuffer {
+  private object flowBuffer
     private val max = 30
     private val buf = scala.collection.mutable.ArrayBuffer.empty[String]
-    def apply(pgn: String) {
+    def apply(pgn: String)
       buf += pgn
       val startAt = nowMillis
-      if (buf.size >= max) {
-        WS.url(endPointUrl).put(buf mkString separator) andThen {
+      if (buf.size >= max)
+        WS.url(endPointUrl).put(buf mkString separator) andThen
           case Success(res) if res.status == 200 =>
             lila.mon.explorer.index.time(((nowMillis - startAt) / max).toInt)
             lila.mon.explorer.index.success(max)
@@ -106,11 +102,7 @@ private final class ExplorerIndexer(
           case Failure(err) =>
             logger.warn(s"$err")
             lila.mon.explorer.index.failure(max)
-        }
         buf.clear
-      }
-    }
-  }
 
   private def valid(game: Game) =
     game.finished && game.rated && game.turns >= 10 &&
@@ -122,9 +114,9 @@ private final class ExplorerIndexer(
     player.rating ifFalse player.provisional
 
   // probability of the game being indexed, between 0 and 1
-  private def probability(game: Game, rating: Int) = {
+  private def probability(game: Game, rating: Int) =
     import lila.rating.PerfType._
-    game.perfType ?? {
+    game.perfType ??
       case Correspondence => 1
       case Classical if rating >= 2000 => 1
       case Classical if rating >= 1800 => 2 / 5f
@@ -138,11 +130,9 @@ private final class ExplorerIndexer(
       case Bullet => 1 / 7f
       case _ if rating >= 1600 => 1 // variant games
       case _ => 1 / 2f // noob variant games
-    }
-  }
 
   private def makeFastPgn(game: Game): Fu[Option[String]] =
-    ~(for {
+    ~(for
       whiteRating <- stableRating(game.whitePlayer)
       blackRating <- stableRating(game.blackPlayer)
       minPlayerRating = if (game.variant.exotic) 1400 else 1500
@@ -153,19 +143,17 @@ private final class ExplorerIndexer(
           if averageRating >= minAverageRating
       if probability(game, averageRating) > nextFloat
       if valid(game)
-    } yield
-      GameRepo initialFen game flatMap { initialFen =>
-        UserRepo.usernamesByIds(game.userIds) map { usernames =>
+    yield
+      GameRepo initialFen game flatMap  initialFen =>
+        UserRepo.usernamesByIds(game.userIds) map  usernames =>
           def username(color: chess.Color) =
-            game.player(color).userId flatMap { id =>
+            game.player(color).userId flatMap  id =>
               usernames.find(_.toLowerCase == id)
-            } orElse game.player(color).userId getOrElse "?"
-          val fenTags = initialFen.?? { fen =>
+            orElse game.player(color).userId getOrElse "?"
+          val fenTags = initialFen.??  fen =>
             List(s"[FEN $fen]")
-          }
-          val timeControl = game.clock.fold("-") { c =>
+          val timeControl = game.clock.fold("-")  c =>
             s"${c.limit}+${c.increment}"
-          }
           val otherTags =
             List(s"[LichessID ${game.id}]",
                  s"[Variant ${game.variant.name}]",
@@ -178,8 +166,6 @@ private final class ExplorerIndexer(
                  s"[Date ${pgnDateFormat.print(game.createdAt)}]")
           val allTags = fenTags ::: otherTags
           s"${allTags.mkString("\n")}\n\n${game.pgnMoves.take(maxPlies).mkString(" ")}".some
-        }
-      })
+      )
 
   private val logger = lila.log("explorer")
-}

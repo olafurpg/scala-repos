@@ -10,21 +10,18 @@ import org.jboss.netty.buffer.ChannelBuffer
   *
   */
 private[thrift] class ChannelBufferToTransport(underlying: ChannelBuffer)
-    extends TTransport {
+    extends TTransport
   override def isOpen = true
   override def open() {}
   override def close() {}
 
-  override def read(buffer: Array[Byte], offset: Int, length: Int): Int = {
+  override def read(buffer: Array[Byte], offset: Int, length: Int): Int =
     val bytesToRead = math.min(length, underlying.readableBytes)
     underlying.readBytes(buffer, offset, bytesToRead)
     bytesToRead
-  }
 
-  override def write(buffer: Array[Byte], offset: Int, length: Int) {
+  override def write(buffer: Array[Byte], offset: Int, length: Int)
     underlying.writeBytes(buffer, offset, length)
-  }
-}
 
 /**
   * Adapts input and output Netty ChannelBuffers to a Thrift TTransport
@@ -35,19 +32,16 @@ private[thrift] class ChannelBufferToTransport(underlying: ChannelBuffer)
   */
 private[thrift] class DuplexChannelBufferTransport(
     input: ChannelBuffer, output: ChannelBuffer)
-    extends TTransport {
+    extends TTransport
   override def isOpen = true
   override def open() {}
   override def close() {}
 
-  override def read(buffer: Array[Byte], offset: Int, length: Int) = {
+  override def read(buffer: Array[Byte], offset: Int, length: Int) =
     val readableBytes = input.readableBytes()
     val bytesToRead = math.min(length, readableBytes)
     input.readBytes(buffer, offset, bytesToRead)
     bytesToRead
-  }
 
-  override def write(buffer: Array[Byte], offset: Int, length: Int) {
+  override def write(buffer: Array[Byte], offset: Int, length: Int)
     output.writeBytes(buffer, offset, length)
-  }
-}

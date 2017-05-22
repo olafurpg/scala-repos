@@ -1,8 +1,7 @@
-object Test {
-  def negativeCharMaker = new (Short => Char) {
+object Test
+  def negativeCharMaker = new (Short => Char)
     def apply(x: Short) = x.toChar
-  }
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     // throws exception if -100 gets to Character.valueOf
     val x = negativeCharMaker(-100)
 
@@ -17,5 +16,3 @@ object Test {
     assert(((-100).toChar: Any) != (-100).toShort)
     assert(((-100).toChar: Any) != (-100).toByte)
     assert(((-100).toByte: Any) != (-100).toChar)
-  }
-}

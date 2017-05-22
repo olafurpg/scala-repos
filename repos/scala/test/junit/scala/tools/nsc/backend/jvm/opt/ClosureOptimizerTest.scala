@@ -27,19 +27,18 @@ import BackendReporting._
 import scala.collection.convert.decorateAsScala._
 import scala.tools.testing.ClearAfterClass
 
-object ClosureOptimizerTest extends ClearAfterClass.Clearable {
+object ClosureOptimizerTest extends ClearAfterClass.Clearable
   var compiler = newCompiler(extraArgs = "-Yopt:l:classpath -Yopt-warnings:_")
   def clear(): Unit = { compiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class ClosureOptimizerTest extends ClearAfterClass {
+class ClosureOptimizerTest extends ClearAfterClass
   ClearAfterClass.stateToClear = ClosureOptimizerTest
 
   val compiler = ClosureOptimizerTest.compiler
 
   @Test
-  def nothingTypedClosureBody(): Unit = {
+  def nothingTypedClosureBody(): Unit =
     val code =
       """abstract class C {
         |  def isEmpty: Boolean
@@ -53,10 +52,9 @@ class ClosureOptimizerTest extends ClearAfterClass {
     val List(bodyCall) = findInstr(
         t, "INVOKESTATIC C.C$$$anonfun$1 ()Lscala/runtime/Nothing$")
     assert(bodyCall.getNext.getOpcode == ATHROW)
-  }
 
   @Test
-  def nullTypedClosureBody(): Unit = {
+  def nullTypedClosureBody(): Unit =
     val code =
       """abstract class C {
         |  def isEmpty: Boolean
@@ -71,10 +69,9 @@ class ClosureOptimizerTest extends ClearAfterClass {
         t, "INVOKESTATIC C.C$$$anonfun$1 ()Lscala/runtime/Null$")
     assert(bodyCall.getNext.getOpcode == POP)
     assert(bodyCall.getNext.getNext.getOpcode == ACONST_NULL)
-  }
 
   @Test
-  def makeLMFCastExplicit(): Unit = {
+  def makeLMFCastExplicit(): Unit =
     val code = """class C {
         |  def t(l: List[String]) = {
         |    val fun: String => String = s => s
@@ -97,10 +94,9 @@ class ClosureOptimizerTest extends ClearAfterClass {
                                "(Ljava/lang/String;)Ljava/lang/String;",
                                false),
                         Op(ARETURN)))
-  }
 
   @Test
-  def closureOptWithUnreachableCode(): Unit = {
+  def closureOptWithUnreachableCode(): Unit =
     // this example used to crash the ProdCons analysis in the closure optimizer - ProdCons
     // expects no unreachable code.
     val code = """class C {
@@ -115,5 +111,3 @@ class ClosureOptimizerTest extends ClearAfterClass {
     val List(c) = compileClasses(compiler)(code)
     assertSameSummary(
         getSingleMethod(c, "t"), List(NEW, DUP, LDC, "<init>", ATHROW))
-  }
-}

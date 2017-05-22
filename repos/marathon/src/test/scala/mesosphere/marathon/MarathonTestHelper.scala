@@ -28,27 +28,25 @@ import play.api.libs.json.Json
 import scala.collection.immutable.Seq
 import scala.util.Random
 
-object MarathonTestHelper {
+object MarathonTestHelper
 
   import mesosphere.mesos.protos.Implicits._
 
   lazy val clock = Clock()
 
-  def makeConfig(args: String*): AllConf = {
-    val opts = new AllConf(args) {
+  def makeConfig(args: String*): AllConf =
+    val opts = new AllConf(args)
       // scallop will trigger sys exit
       override protected def onError(e: Throwable): Unit = throw e
-    }
     opts.afterInit()
     opts
-  }
 
   def defaultConfig(maxTasksPerOffer: Int = 1,
                     minReviveOffersInterval: Long = 100,
                     mesosRole: Option[String] = None,
                     acceptedResourceRoles: Option[Set[String]] = None,
                     envVarsPrefix: Option[String] = None,
-                    principal: Option[String] = None): AllConf = {
+                    principal: Option[String] = None): AllConf =
 
     var args = Seq(
         "--master",
@@ -66,7 +64,6 @@ object MarathonTestHelper {
           args ++= Seq("--default_accepted_resource_roles", v.mkString(",")))
     envVarsPrefix.foreach(args ++ Seq("--env_vars_prefix", _))
     makeConfig(args: _*)
-  }
 
   val frameworkID: FrameworkID = FrameworkID("marathon")
   val frameworkId: FrameworkId = FrameworkId("").mergeFromProto(frameworkID)
@@ -78,13 +75,13 @@ object MarathonTestHelper {
       beginPort: Int = 31000,
       endPort: Int = 32000,
       role: String = "*",
-      reservation: Option[ResourceLabels] = None): Offer.Builder = {
+      reservation: Option[ResourceLabels] = None): Offer.Builder =
 
     require(role != "*" || reservation.isEmpty,
             "reserved resources cannot have role *")
 
-    def heedReserved(resource: Mesos.Resource): Mesos.Resource = {
-      reservation match {
+    def heedReserved(resource: Mesos.Resource): Mesos.Resource =
+      reservation match
         case Some(reservationLabels) =>
           val labels = reservationLabels.mesosLabels
           val reservation = Mesos.Resource.ReservationInfo
@@ -94,8 +91,6 @@ object MarathonTestHelper {
           resource.toBuilder.setReservation(reservation).build()
         case None =>
           resource
-      }
-    }
 
     val cpusResource = heedReserved(
         ScalarResource(Resource.CPUS, cpus, role = role))
@@ -104,16 +99,15 @@ object MarathonTestHelper {
     val diskResource = heedReserved(
         ScalarResource(Resource.DISK, disk, role = role))
     val portsResource =
-      if (beginPort <= endPort) {
+      if (beginPort <= endPort)
         Some(
             heedReserved(RangesResource(
                     Resource.PORTS,
                     Seq(Range(beginPort.toLong, endPort.toLong)),
                     role
                 )))
-      } else {
+      else
         None
-      }
     val offerBuilder = Offer.newBuilder
       .setId(OfferID("1"))
       .setFrameworkId(frameworkID)
@@ -126,13 +120,12 @@ object MarathonTestHelper {
     portsResource.foreach(offerBuilder.addResources(_))
 
     offerBuilder
-  }
 
   def scalarResource(name: String,
                      d: Double,
                      role: String = "*",
                      reservation: Option[ReservationInfo] = None,
-                     disk: Option[DiskInfo] = None): Mesos.Resource = {
+                     disk: Option[DiskInfo] = None): Mesos.Resource =
 
     val builder = Mesos.Resource
       .newBuilder()
@@ -145,13 +138,12 @@ object MarathonTestHelper {
     disk.foreach(builder.setDisk)
 
     builder.build()
-  }
 
   def portsResource(
       begin: Long,
       end: Long,
       role: String = "*",
-      reservation: Option[ReservationInfo] = None): Mesos.Resource = {
+      reservation: Option[ReservationInfo] = None): Mesos.Resource =
 
     val ranges = Mesos.Value.Ranges
       .newBuilder()
@@ -167,29 +159,26 @@ object MarathonTestHelper {
     reservation.foreach(builder.setReservation)
 
     builder.build()
-  }
 
   def reservation(principal: String, labels: Map[String, String] = Map.empty)
-    : Mesos.Resource.ReservationInfo = {
+    : Mesos.Resource.ReservationInfo =
     val labelsBuilder = Mesos.Labels.newBuilder()
-    labels.foreach {
+    labels.foreach
       case (k, v) =>
         labelsBuilder.addLabels(Mesos.Label.newBuilder().setKey(k).setValue(v))
-    }
 
     Mesos.Resource.ReservationInfo
       .newBuilder()
       .setPrincipal(principal)
       .setLabels(labelsBuilder)
       .build()
-  }
 
   def reservedDisk(
       id: String,
       size: Double = 4096,
       role: String = "*",
       principal: String = "test",
-      containerPath: String = "/container"): Mesos.Resource.Builder = {
+      containerPath: String = "/container"): Mesos.Resource.Builder =
     import Mesos.Resource.{DiskInfo, ReservationInfo}
     Mesos.Resource
       .newBuilder()
@@ -205,13 +194,12 @@ object MarathonTestHelper {
                   .newBuilder()
                   .setMode(Mesos.Volume.Mode.RW)
                   .setContainerPath(containerPath)))
-  }
 
   /**
     * @param ranges how many port ranges should be included in this offer
     * @return
     */
-  def makeBasicOfferWithManyPortRanges(ranges: Int): Offer.Builder = {
+  def makeBasicOfferWithManyPortRanges(ranges: Int): Offer.Builder =
     val role = "*"
     val cpusResource = ScalarResource(Resource.CPUS, 4.0, role = role)
     val memResource = ScalarResource(Resource.MEM, 16000, role = role)
@@ -235,14 +223,13 @@ object MarathonTestHelper {
       .addResources(portsResource)
 
     offerBuilder
-  }
 
   def makeBasicOfferWithRole(cpus: Double,
                              mem: Double,
                              disk: Double,
                              beginPort: Int,
                              endPort: Int,
-                             role: String) = {
+                             role: String) =
     val portsResource = RangesResource(
         Resource.PORTS,
         Seq(Range(beginPort.toLong, endPort.toLong)),
@@ -260,9 +247,8 @@ object MarathonTestHelper {
       .addResources(memResource)
       .addResources(diskResource)
       .addResources(portsResource)
-  }
 
-  def makeOneCPUTask(taskId: String): TaskInfo.Builder = {
+  def makeOneCPUTask(taskId: String): TaskInfo.Builder =
     TaskInfo
       .newBuilder()
       .setName("true")
@@ -270,12 +256,11 @@ object MarathonTestHelper {
       .setSlaveId(SlaveID("slave1"))
       .setCommand(CommandInfo.newBuilder().setShell(true).addArguments("true"))
       .addResources(ScalarResource(Resource.CPUS, 1.0, "*"))
-  }
 
   def makeTaskFromTaskInfo(taskInfo: TaskInfo,
                            offer: Offer = makeBasicOffer().build(),
                            version: Timestamp = Timestamp(10),
-                           now: Timestamp = Timestamp(10)): Task = {
+                           now: Timestamp = Timestamp(10)): Task =
     import scala.collection.JavaConverters._
 
     Task.LaunchedEphemeral(
@@ -291,7 +276,6 @@ object MarathonTestHelper {
           ),
         networking = Task.HostPorts(Seq(1, 2, 3))
     )
-  }
 
   def makeBasicApp() = AppDefinition(
       id = "/test-app".toPath,
@@ -301,35 +285,32 @@ object MarathonTestHelper {
       executor = "//cmd"
   )
 
-  lazy val appSchema = {
+  lazy val appSchema =
     val appJson = "/public/api/v2/schema/AppDefinition.json"
     val appDefinition = JsonLoader.fromResource(appJson)
     val factory = JsonSchemaFactory.byDefault()
     factory.getJsonSchema(appDefinition)
-  }
 
-  def validateJsonSchema(app: AppDefinition, valid: Boolean = true) {
+  def validateJsonSchema(app: AppDefinition, valid: Boolean = true)
     import mesosphere.marathon.api.v2.json.Formats._
     // TODO: Revalidate the decision to disallow null values in schema
     // Possible resolution: Do not render null values in our formats by default anymore.
     val appStr =
       Json.prettyPrint(JsonTestHelper.removeNullFieldValues(Json.toJson(app)))
     validateJsonSchemaForString(appStr, valid)
-  }
 
-  def validateJsonSchemaForString(appStr: String, valid: Boolean): Unit = {
+  def validateJsonSchemaForString(appStr: String, valid: Boolean): Unit =
     val appJson = JsonLoader.fromString(appStr)
     val validationResult: ProcessingReport = appSchema.validate(appJson)
     lazy val pretty = Json.prettyPrint(Json.parse(appStr))
     assert(validationResult.isSuccess == valid,
            s"validation errors $validationResult for json:\n$pretty")
-  }
 
   def createTaskTrackerModule(leadershipModule: LeadershipModule,
                               store: PersistentStore = new InMemoryStore,
                               config: MarathonConf = defaultConfig(),
                               metrics: Metrics = new Metrics(
-                                    new MetricRegistry)): TaskTrackerModule = {
+                                    new MetricRegistry)): TaskTrackerModule =
 
     val metrics = new Metrics(new MetricRegistry)
     val taskRepo = new TaskRepository(
@@ -346,20 +327,17 @@ object MarathonTestHelper {
     )
 
     new TaskTrackerModule(
-        clock, metrics, defaultConfig(), leadershipModule, taskRepo) {
+        clock, metrics, defaultConfig(), leadershipModule, taskRepo)
       // some tests create only one actor system but create multiple task trackers
       override protected lazy val taskTrackerActorName: String =
         s"taskTracker_${Random.alphanumeric.take(10).mkString}"
-    }
-  }
 
   def createTaskTracker(
       leadershipModule: LeadershipModule,
       store: PersistentStore = new InMemoryStore,
       config: MarathonConf = defaultConfig(),
-      metrics: Metrics = new Metrics(new MetricRegistry)): TaskTracker = {
+      metrics: Metrics = new Metrics(new MetricRegistry)): TaskTracker =
     createTaskTrackerModule(leadershipModule, store, config, metrics).taskTracker
-  }
 
   def dummyTaskBuilder(appId: PathId) =
     MarathonTask
@@ -376,7 +354,7 @@ object MarathonTestHelper {
     mininimalTask(Task.Id.forApp(appId).idString)
   def mininimalTask(taskId: Task.Id): Task = mininimalTask(taskId.idString)
   def mininimalTask(
-      taskId: String, now: Timestamp = clock.now()): Task.LaunchedEphemeral = {
+      taskId: String, now: Timestamp = clock.now()): Task.LaunchedEphemeral =
     Task.LaunchedEphemeral(
         Task.Id(taskId),
         Task.AgentInfo(
@@ -389,7 +367,6 @@ object MarathonTestHelper {
           ),
         networking = Task.NoNetworking
     )
-  }
 
   def minimalReservedTask(
       appId: PathId, reservation: Task.Reservation): Task.Reserved =
@@ -404,16 +381,14 @@ object MarathonTestHelper {
 
   def taskReservationStateNew = Task.Reservation.State.New(timeout = None)
 
-  def taskLaunched: Task.Launched = {
+  def taskLaunched: Task.Launched =
     val now = Timestamp.now()
     Task.Launched(
         now, status = Task.Status(now), networking = Task.NoNetworking)
-  }
 
-  def taskLaunchedOp: TaskStateOp.Launch = {
+  def taskLaunchedOp: TaskStateOp.Launch =
     val now = Timestamp.now()
     TaskStateOp.Launch(now, Task.Status(now), Task.NoNetworking)
-  }
 
   def startingTaskForApp(appId: PathId,
                          appVersion: Timestamp = Timestamp(1),
@@ -434,13 +409,12 @@ object MarathonTestHelper {
     startingTaskProto(Task.Id.forApp(appId).idString)
   def startingTaskProto(taskId: String,
                         appVersion: Timestamp = Timestamp(1),
-                        stagedAt: Long = 2): Protos.MarathonTask = {
+                        stagedAt: Long = 2): Protos.MarathonTask =
     dummyTaskProto(taskId).toBuilder
       .setVersion(appVersion.toString)
       .setStagedAt(stagedAt)
       .setStatus(statusForState(taskId, Mesos.TaskState.TASK_STARTING))
       .build()
-  }
 
   def stagedTaskForApp(appId: PathId = PathId("/test"),
                        appVersion: Timestamp = Timestamp(1),
@@ -470,11 +444,10 @@ object MarathonTestHelper {
     stagedTaskProto(Task.Id.forApp(appId).idString)
   def stagedTaskProto(taskId: String,
                       appVersion: Timestamp = Timestamp(1),
-                      stagedAt: Long = 2): Protos.MarathonTask = {
+                      stagedAt: Long = 2): Protos.MarathonTask =
     startingTaskProto(taskId, appVersion = appVersion, stagedAt = stagedAt).toBuilder
       .setStatus(statusForState(taskId, Mesos.TaskState.TASK_STAGING))
       .build()
-  }
 
   def runningTaskForApp(appId: PathId = PathId("/test"),
                         appVersion: Timestamp = Timestamp(1),
@@ -504,12 +477,11 @@ object MarathonTestHelper {
   def runningTaskProto(taskId: String,
                        appVersion: Timestamp = Timestamp(1),
                        stagedAt: Long = 2,
-                       startedAt: Long = 3): Protos.MarathonTask = {
+                       startedAt: Long = 3): Protos.MarathonTask =
     stagedTaskProto(taskId, appVersion = appVersion, stagedAt = stagedAt).toBuilder
       .setStartedAt(startedAt)
       .setStatus(statusForState(taskId, Mesos.TaskState.TASK_RUNNING))
       .build()
-  }
 
   def healthyTask(appId: PathId): Task =
     healthyTask(Task.Id.forApp(appId).idString)
@@ -518,12 +490,11 @@ object MarathonTestHelper {
 
   def healthyTaskProto(appId: PathId): Protos.MarathonTask =
     healthyTaskProto(Task.Id.forApp(appId).idString)
-  def healthyTaskProto(taskId: String): Protos.MarathonTask = {
+  def healthyTaskProto(taskId: String): Protos.MarathonTask =
     val task: MarathonTask = runningTaskProto(taskId)
     task.toBuilder
       .setStatus(task.getStatus.toBuilder.setHealthy(true))
       .buildPartial()
-  }
 
   def unhealthyTask(appId: PathId): Task =
     unhealthyTask(Task.Id.forApp(appId).idString)
@@ -532,25 +503,23 @@ object MarathonTestHelper {
 
   def unhealthyTaskProto(appId: PathId): Protos.MarathonTask =
     unhealthyTaskProto(Task.Id.forApp(appId).idString)
-  def unhealthyTaskProto(taskId: String): Protos.MarathonTask = {
+  def unhealthyTaskProto(taskId: String): Protos.MarathonTask =
     val task: MarathonTask = runningTaskProto(taskId)
     task.toBuilder
       .setStatus(task.getStatus.toBuilder.setHealthy(false))
       .buildPartial()
-  }
 
   def statusForState(
-      taskId: String, state: Mesos.TaskState): Mesos.TaskStatus = {
+      taskId: String, state: Mesos.TaskState): Mesos.TaskStatus =
     Mesos.TaskStatus
       .newBuilder()
       .setTaskId(TaskID.newBuilder().setValue(taskId))
       .setState(state)
       .buildPartial()
-  }
 
   def persistentVolumeResources(
       taskId: Task.Id, localVolumeIds: Task.LocalVolumeId*) =
-    localVolumeIds.map { id =>
+    localVolumeIds.map  id =>
       Mesos.Resource
         .newBuilder()
         .setName("disk")
@@ -574,9 +543,8 @@ object MarathonTestHelper {
                     .setContainerPath(id.containerPath)
                     .setMode(Mesos.Volume.Mode.RW)))
         .build()
-    }
 
-  def offerWithVolumes(taskId: String, localVolumeIds: Task.LocalVolumeId*) = {
+  def offerWithVolumes(taskId: String, localVolumeIds: Task.LocalVolumeId*) =
     import scala.collection.JavaConverters._
     MarathonTestHelper
       .makeBasicOffer(
@@ -587,10 +555,9 @@ object MarathonTestHelper {
       .addAllResources(persistentVolumeResources(Task.Id(taskId),
                                                  localVolumeIds: _*).asJava)
       .build()
-  }
 
   def offerWithVolumesOnly(
-      taskId: Task.Id, localVolumeIds: Task.LocalVolumeId*) = {
+      taskId: Task.Id, localVolumeIds: Task.LocalVolumeId*) =
     import scala.collection.JavaConverters._
     MarathonTestHelper
       .makeBasicOffer()
@@ -598,9 +565,8 @@ object MarathonTestHelper {
       .addAllResources(
           persistentVolumeResources(taskId, localVolumeIds: _*).asJava)
       .build()
-  }
 
-  def appWithPersistentVolume(): AppDefinition = {
+  def appWithPersistentVolume(): AppDefinition =
     MarathonTestHelper
       .makeBasicApp()
       .copy(
@@ -609,7 +575,6 @@ object MarathonTestHelper {
                 Residency(Residency.defaultRelaunchEscalationTimeoutSeconds,
                           Residency.defaultTaskLostBehaviour))
       )
-  }
 
   def residentReservedTask(
       appId: PathId, localVolumeIds: Task.LocalVolumeId*) =
@@ -617,7 +582,7 @@ object MarathonTestHelper {
         appId, Task.Reservation(localVolumeIds, taskReservationStateNew))
 
   def residentLaunchedTask(
-      appId: PathId, localVolumeIds: Task.LocalVolumeId*) = {
+      appId: PathId, localVolumeIds: Task.LocalVolumeId*) =
     val now = Timestamp.now()
     Task.LaunchedOnReservation(
         taskId = Task.Id.forApp(appId),
@@ -632,7 +597,6 @@ object MarathonTestHelper {
         networking = Task.NoNetworking,
         reservation = Task.Reservation(
               localVolumeIds, Task.Reservation.State.Launched))
-  }
 
   def mesosContainerWithPersistentVolume = Container(
       `type` = Mesos.ContainerInfo.Type.MESOS,
@@ -647,7 +611,7 @@ object MarathonTestHelper {
   )
 
   def addNetworking(task: Task, networking: Task.Networking): Task =
-    task match {
+    task match
       case launchedEphemeral: Task.LaunchedEphemeral =>
         launchedEphemeral.copy(networking = networking)
       case launchedOnReservation: Task.LaunchedOnReservation =>
@@ -655,12 +619,11 @@ object MarathonTestHelper {
       case reserved: Task.Reserved =>
         throw new scala.RuntimeException(
             "Reserved task cannot have networking")
-    }
 
-  object Implicits {
-    implicit class TaskImprovements(task: Task) {
+  object Implicits
+    implicit class TaskImprovements(task: Task)
       def withAgentInfo(update: Task.AgentInfo => Task.AgentInfo): Task =
-        task match {
+        task match
           case launchedEphemeral: Task.LaunchedEphemeral =>
             launchedEphemeral.copy(
                 agentInfo = update(launchedEphemeral.agentInfo))
@@ -671,9 +634,8 @@ object MarathonTestHelper {
           case launchedOnReservation: Task.LaunchedOnReservation =>
             launchedOnReservation.copy(
                 agentInfo = update(launchedOnReservation.agentInfo))
-        }
 
-      def withNetworking(update: Task.Networking): Task = task match {
+      def withNetworking(update: Task.Networking): Task = task match
         case launchedEphemeral: Task.LaunchedEphemeral =>
           launchedEphemeral.copy(networking = update)
         case launchedOnReservation: Task.LaunchedOnReservation =>
@@ -681,9 +643,8 @@ object MarathonTestHelper {
         case reserved: Task.Reserved =>
           throw new scala.RuntimeException(
               "Reserved task cannot have networking")
-      }
 
-      def withStatus(update: Task.Status => Task.Status): Task = task match {
+      def withStatus(update: Task.Status => Task.Status): Task = task match
         case launchedEphemeral: Task.LaunchedEphemeral =>
           launchedEphemeral.copy(status = update(launchedEphemeral.status))
 
@@ -694,7 +655,3 @@ object MarathonTestHelper {
         case reserved: Task.Reserved =>
           throw new scala.RuntimeException(
               "Reserved task cannot have a status")
-      }
-    }
-  }
-}

@@ -35,28 +35,25 @@ import scalafx.scene.control.{Button, TextField}
 import scalafx.scene.layout.{BorderPane, HBox, Priority}
 import scalafx.scene.web.WebView
 
-class EnsembleWebView extends EnsembleExample {
+class EnsembleWebView extends EnsembleExample
   // @stage-property width = 1020
   // @stage-property height = 700
 
-  def getContent = {
+  def getContent =
     // Default URL to load at first
     val defaultURL = "http://www.scala-lang.org/"
-    val locationField = new TextField {
+    val locationField = new TextField
       text = defaultURL
       hgrow = Priority.Always
-    }
-    val goButton = new Button {
+    val goButton = new Button
       text = "Go"
       defaultButton = true
-    }
-    val webView = new WebView {
+    val webView = new WebView
       // Update location field is page is redirected
       engine.location.onChange(
           (_, _, newValue) => locationField.setText(newValue))
       // Load default page
       engine.load(defaultURL)
-    }
 
     def validUrl(url: String) =
       if (url.startsWith("http://")) url else "http://" + locationField.text()
@@ -66,14 +63,10 @@ class EnsembleWebView extends EnsembleExample {
     goButton.onAction = loadAction
     locationField.onAction = loadAction
 
-    new BorderPane {
+    new BorderPane
       padding = Insets(5)
-      top = new HBox {
+      top = new HBox
         spacing = 5
         margin = Insets(top = 0, right = 0, bottom = 5, left = 0)
         children = List(locationField, goButton)
-      }
       center = webView
-    }
-  }
-}

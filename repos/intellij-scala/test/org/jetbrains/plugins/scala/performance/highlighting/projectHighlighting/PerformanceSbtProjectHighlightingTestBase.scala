@@ -15,8 +15,8 @@ import org.jetbrains.plugins.scala.performance.DownloadingAndImportingTestCase
   * Date: 10/23/15.
   */
 abstract class PerformanceSbtProjectHighlightingTestBase
-    extends DownloadingAndImportingTestCase {
-  def doTest(filename: String, timeoutInMillis: Int): Unit = {
+    extends DownloadingAndImportingTestCase
+  def doTest(filename: String, timeoutInMillis: Int): Unit =
     val file = findFile(filename)
     val fileManager: FileManager = PsiManager
       .getInstance(myProject)
@@ -26,29 +26,23 @@ abstract class PerformanceSbtProjectHighlightingTestBase
       .startPerformanceTest(
           s"Performance test $filename",
           timeoutInMillis,
-          new ThrowableRunnable[Nothing] {
-            override def run(): Unit = {
+          new ThrowableRunnable[Nothing]
+            override def run(): Unit =
               val annotator = new ScalaAnnotator
               val mock = new AnnotatorHolderMock
 
               file.refresh(true, false)
               val psiFile = fileManager.findFile(file)
-              val visitor = new ScalaRecursiveElementVisitor {
-                override def visitElement(element: ScalaPsiElement) {
-                  try {
+              val visitor = new ScalaRecursiveElementVisitor
+                override def visitElement(element: ScalaPsiElement)
+                  try
                     annotator.annotate(element, mock)
                     super.visitElement(element)
-                  } catch {
+                  catch
                     case ignored: Throwable =>
                     //this should be checked in AllProjectHighlightingTest
-                  }
-                }
-              }
               psiFile.accept(visitor)
               fileManager.cleanupForNextTest()
-            }
-          })
+          )
       .cpuBound()
       .assertTiming()
-  }
-}

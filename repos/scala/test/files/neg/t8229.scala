@@ -1,6 +1,5 @@
 import Predef.{any2stringadd => _, _}
 
-object Test {
+object Test
   val o = new Object()
   o + ""
-}

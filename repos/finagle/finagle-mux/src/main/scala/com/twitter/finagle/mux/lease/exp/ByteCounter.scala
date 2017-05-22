@@ -4,13 +4,12 @@ import com.twitter.conversions.time._
 import com.twitter.util._
 import com.twitter.util.Local.Context
 
-private[lease] trait ByteCounter {
+private[lease] trait ByteCounter
   def rate(): Double
 
   def lastGc: Time
 
   def info: JvmInfo
-}
 
 /**
   * WindowedByteCounter is a [[java.lang.Thread]] which sleeps for period P, and
@@ -37,7 +36,7 @@ private[lease] class WindowedByteCounter private[lease](
     val info: JvmInfo,
     ctx: Context
 )
-    extends Thread("WindowedByteClock") with ByteCounter with Closable {
+    extends Thread("WindowedByteClock") with ByteCounter with Closable
 
   import WindowedByteCounter._
 
@@ -60,10 +59,9 @@ private[lease] class WindowedByteCounter private[lease](
   // necessarily contiguous observations, only the last N.
   private[this] val allocs = Array.fill(N) { StorageUnit.zero }
 
-  private[this] def sum(): StorageUnit = {
+  private[this] def sum(): StorageUnit =
     val _ = idx // barrier
     allocs.reduce(_ + _)
-  }
 
   @volatile private[this] var count = info.generation()
   @volatile private[this] var idx = 0
@@ -88,11 +86,11 @@ private[lease] class WindowedByteCounter private[lease](
     * Measures the amount of bytes used since the last sample, and bumps
     * the collection number if necessary.
     */
-  override def run() {
+  override def run()
     Local.restore(ctx)
     var prevUsed = info.used()
 
-    while (running) {
+    while (running)
       Time.sleep(P)
 
       val curUsed = info.used()
@@ -101,37 +99,31 @@ private[lease] class WindowedByteCounter private[lease](
 
       // TODO: Wake up sleepers if the rate changes more than some
       // percentage.
-      if (curCount == count && newlyUsed > StorageUnit.zero) {
+      if (curCount == count && newlyUsed > StorageUnit.zero)
         val nextIdx = (idx + 1) % N
         allocs(idx) = newlyUsed
         idx = nextIdx
-      } else if (curCount == count) {
+      else if (curCount == count)
         // garbage collection race
         lastGc = Time.now
         count = info.generation()
-      } else {
+      else
         // we just garbage collected, can't figure out memory rate
         lastGc = Time.now
         count = curCount
-      }
 
       prevUsed = curUsed
       passCount += 1
-    }
-  }
 
-  def close(deadline: Time): Future[Unit] = {
+  def close(deadline: Time): Future[Unit] =
     running = false
     Future.Done
-  }
 
   setDaemon(true)
-}
 
-private[lease] object WindowedByteCounter {
+private[lease] object WindowedByteCounter
   // TODO: W, P could be configurable--for some servers, 100ms may be too slow
   private[lease] val W = 2000.milliseconds // window size
   private[lease] val P = 100.milliseconds // poll period
   private[lease] val N =
     (W.inMilliseconds / P.inMilliseconds).toInt // # of polls in a window
-}

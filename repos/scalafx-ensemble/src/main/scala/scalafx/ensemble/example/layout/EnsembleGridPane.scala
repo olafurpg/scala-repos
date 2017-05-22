@@ -45,97 +45,83 @@ import scalafx.scene.layout.{ColumnConstraints, GridPane, Priority, RowConstrain
   * @see scalafx.scene.layout.GridPane
   * @resource /scalafx/ensemble/images/icon-48x48.png
   */
-class EnsembleGridPane extends EnsembleExample {
+class EnsembleGridPane extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     // grid1 places the children by specifying the rows and columns in GridPane.setConstraints()
-    val grid1Caption = new Label {
+    val grid1Caption = new Label
       text = "The example below shows GridPane content placement by specifying rows and columns:"
       wrapText = true
-    }
 
-    val label1 = new Label("Name:") {
+    val label1 = new Label("Name:")
       style = "-fx-font-weight:bold"
       alignmentInParent = Pos.BaselineRight
-    }
     GridPane.setConstraints(label1, 0, 0, 1, 1)
 
-    val label11 = new Label("John Q. Public") {
+    val label11 = new Label("John Q. Public")
       alignmentInParent = Pos.BaselineLeft
-    }
     GridPane.setConstraints(label11, 1, 0, 2, 1)
 
-    val label21 = new Label("Address:") {
+    val label21 = new Label("Address:")
       style = "-fx-font-weight:bold"
       alignmentInParent = Pos.BaselineRight
-    }
     GridPane.setConstraints(label21, 0, 1, 1, 1)
 
-    val label22 = new Label("12345 Main Street, Some City, CA") {
+    val label22 = new Label("12345 Main Street, Some City, CA")
       alignmentInParent = Pos.BaselineLeft
-    }
     GridPane.setConstraints(label22, 1, 1, 5, 1)
 
-    val grid1 = new GridPane {
+    val grid1 = new GridPane
       hgap = 4
       vgap = 6
       margin = Insets(18)
       children ++= Seq(label1, label11, label21, label22)
-    }
 
     // grid2 places the child by influencing the rows and columns themselves
     // via GridRowInfo and GridColumnInfo. This grid uses the preferred
     // width/height and max/min width/height.
-    val grid2Caption = new Label {
+    val grid2Caption = new Label
       text = "The example below shows GridPane content placement by influencing the rows and columns themselves."
       wrapText = true
-    }
 
-    val category = new Label {
+    val category = new Label
       text = "Category:"
       style = "-fx-font-weight:bold"
       alignmentInParent = Pos.BaselineRight
-    }
     GridPane.setConstraints(category, 0, 0)
 
-    val categoryValue = new Label {
+    val categoryValue = new Label
       text = "Wines"
       alignmentInParent = Pos.BaselineLeft
-    }
     GridPane.setConstraints(categoryValue, 1, 0)
 
-    val company = new Label {
+    val company = new Label
       text = "Company:"
       style = "-fx-font-weight:bold"
       alignmentInParent = Pos.BaselineRight
-    }
     GridPane.setConstraints(company, 0, 1)
 
-    val companyValue = new Label {
+    val companyValue = new Label
       text = "Acme Winery"
       alignmentInParent = Pos.BaselineLeft
-    }
     GridPane.setConstraints(companyValue, 1, 1)
 
-    val rating = new Label {
+    val rating = new Label
       text = "Rating:"
       style = "-fx-font-weight:bold"
       alignmentInParent = Pos.BaselineRight
-    }
     GridPane.setConstraints(rating, 0, 2)
 
-    val ratingValue = new Label {
+    val ratingValue = new Label
       text = "Excellent"
       alignmentInParent = Pos.BaselineLeft
-    }
     GridPane.setConstraints(ratingValue, 1, 2)
 
-    val imageView = new ImageView {
+    val imageView = new ImageView
       image = new Image(
           this.getClass
             .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
       alignmentInParent = Pos.Center
-    }
     GridPane.setConstraints(imageView, 2, 1)
 
     val rowInfo = new RowConstraints(
@@ -143,12 +129,11 @@ class EnsembleGridPane extends EnsembleExample {
     val colInfo = new ColumnConstraints(
         minWidth = 140, prefWidth = 140, maxWidth = 140)
 
-    val grid2 = new GridPane {
+    val grid2 = new GridPane
       padding = Insets(18)
-      for (i <- 0 until 2) {
+      for (i <- 0 until 2)
         rowConstraints.add(rowInfo)
         columnConstraints.add(colInfo)
-      }
       children ++= Seq(category,
                        categoryValue,
                        company,
@@ -156,16 +141,14 @@ class EnsembleGridPane extends EnsembleExample {
                        imageView,
                        rating,
                        ratingValue)
-    }
 
     // grid3 places the child by influencing the rows and columns
     // via GridRowInfo and GridColumnInfo. This grid uses the percentages
-    val grid3Caption = new Label {
+    val grid3Caption = new Label
       text = "The example below shows GridPane content placement by " + "influencing row and column percentages.  " + "Also, grid lines are made visible in this example.  " + "The lines can be helpful in debugging."
       wrapText = true
-    }
 
-    val grid3 = new GridPane {
+    val grid3 = new GridPane
       padding = Insets(18)
       gridLinesVisible = true
       children ++= Seq(grid3Caption)
@@ -180,7 +163,6 @@ class EnsembleGridPane extends EnsembleExample {
       columnConstraints += colConstr50Perc
       // 25 percent
       columnConstraints += colConstr25Perc
-    }
 
     val condLabel = new Label(" Member Name:")
     GridPane.setHalignment(condLabel, HPos.Right)
@@ -204,7 +186,7 @@ class EnsembleGridPane extends EnsembleExample {
     GridPane.setConstraints(condValue, 1, 0)
     grid3.children ++= Seq(condLabel, condValue, button, acctLabel, textBox)
 
-    new VBox {
+    new VBox
       vgrow = Priority.Always
       hgrow = Priority.Always
       spacing = 10
@@ -216,6 +198,3 @@ class EnsembleGridPane extends EnsembleExample {
           new Separator(),
           new VBox { children = List(grid3Caption, grid3) }
       )
-    }
-  }
-}

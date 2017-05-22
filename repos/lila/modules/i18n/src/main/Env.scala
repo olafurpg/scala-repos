@@ -9,9 +9,9 @@ final class Env(config: Config,
                 system: akka.actor.ActorSystem,
                 messages: Messages,
                 captcher: akka.actor.ActorSelection,
-                appPath: String) {
+                appPath: String)
 
-  private val settings = new {
+  private val settings = new
     val WebPathRelative = config getString "web_path.relative"
     val FilePathRelative = config getString "file_path.relative"
     val UpstreamUrlPattern = config getString "upstream.url_pattern"
@@ -22,7 +22,6 @@ final class Env(config: Config,
     val ContextGitFile = config getString "context.git.file"
     val CdnDomain = config getString "cdn_domain"
     val CallThreshold = config getInt "call.threshold"
-  }
   import settings._
 
   // public settings
@@ -71,26 +70,21 @@ final class Env(config: Config,
   def hideCallsCookieName = HideCallsCookieName
   def hideCallsCookieMaxAge = HideCallsCookieMaxAge
 
-  def jsonFromVersion(v: Int): Fu[JsValue] = {
+  def jsonFromVersion(v: Int): Fu[JsValue] =
     import tube.translationTube
-    TranslationRepo findFrom v map { ts =>
+    TranslationRepo findFrom v map  ts =>
       Json toJson ts
-    }
-  }
 
-  def cli = new lila.common.Cli {
-    def process = {
+  def cli = new lila.common.Cli
+    def process =
       case "i18n" :: "fetch" :: from :: Nil =>
         upstreamFetch(from) flatMap gitWrite.apply inject "Fetched translations from upstream"
       case "i18n" :: "js" :: "dump" :: Nil =>
         jsDump.apply inject "Dumped JavaScript translations"
       case "i18n" :: "file" :: "fix" :: Nil =>
         fileFix.apply inject "Fixed translation files"
-    }
-  }
-}
 
-object Env {
+object Env
 
   import lila.common.PlayApp
 
@@ -103,4 +97,3 @@ object Env {
         captcher = lila.hub.Env.current.actor.captcher,
         appPath = PlayApp withApp (_.path.getCanonicalPath)
     )
-}

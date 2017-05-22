@@ -18,14 +18,14 @@ import io.prediction.data.webhooks.ConnectorTestUtil
 
 import org.specs2.mutable._
 
-class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
+class MailChimpConnectorSpec extends Specification with ConnectorTestUtil
 
   // TOOD: test other events
   // TODO: test different optional fields
 
-  "MailChimpConnector" should {
+  "MailChimpConnector" should
 
-    "convert subscribe to event JSON" in {
+    "convert subscribe to event JSON" in
 
       val subscribe = Map(
           "type" -> "subscribe",
@@ -66,10 +66,9 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(MailChimpConnector, subscribe, expected)
-    }
 
     //check unsubscribe to event Json
-    "convert unsubscribe to event JSON" in {
+    "convert unsubscribe to event JSON" in
 
       val unsubscribe = Map(
           "type" -> "unsubscribe",
@@ -114,10 +113,9 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(MailChimpConnector, unsubscribe, expected)
-    }
 
     //check profile update to event Json 
-    "convert profile update to event JSON" in {
+    "convert profile update to event JSON" in
 
       val profileUpdate = Map(
           "type" -> "profile",
@@ -156,10 +154,9 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(MailChimpConnector, profileUpdate, expected)
-    }
 
     //check email update to event Json 
-    "convert email update to event JSON" in {
+    "convert email update to event JSON" in
 
       val emailUpdate = Map(
           "type" -> "upemail",
@@ -186,10 +183,9 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(MailChimpConnector, emailUpdate, expected)
-    }
 
     //check cleaned email to event Json 
-    "convert cleaned email to event JSON" in {
+    "convert cleaned email to event JSON" in
 
       val cleanedEmail = Map(
           "type" -> "cleaned",
@@ -215,10 +211,9 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(MailChimpConnector, cleanedEmail, expected)
-    }
 
     //check campaign sending status to event Json 
-    "convert campaign sending status to event JSON" in {
+    "convert campaign sending status to event JSON" in
 
       val campaign = Map(
           "type" -> "campaign",
@@ -247,6 +242,3 @@ class MailChimpConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(MailChimpConnector, campaign, expected)
-    }
-  }
-}

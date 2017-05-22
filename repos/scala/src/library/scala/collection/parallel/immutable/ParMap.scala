@@ -31,7 +31,7 @@ trait ParMap[K, +V]
     extends scala.collection /*.immutable*/ .GenMap[K, V]
     with GenericParMapTemplate[K, V, ParMap] with parallel.ParMap[K, V]
     with ParIterable[(K, V)]
-    with ParMapLike[K, V, ParMap[K, V], scala.collection.immutable.Map[K, V]] {
+    with ParMapLike[K, V, ParMap[K, V], scala.collection.immutable.Map[K, V]]
   self =>
 
   override def mapCompanion: GenericParMapCompanion[ParMap] = ParMap
@@ -70,9 +70,8 @@ trait ParMap[K, +V]
   def withDefaultValue[U >: V](
       d: U): scala.collection.parallel.immutable.ParMap[K, U] =
     new ParMap.WithDefault[K, U](this, x => d)
-}
 
-object ParMap extends ParMapFactory[ParMap] {
+object ParMap extends ParMapFactory[ParMap]
   def empty[K, V]: ParMap[K, V] = new ParHashMap[K, V]
 
   def newCombiner[K, V]: Combiner[(K, V), ParMap[K, V]] = HashMapCombiner[K, V]
@@ -82,7 +81,7 @@ object ParMap extends ParMapFactory[ParMap] {
 
   class WithDefault[K, +V](underlying: ParMap[K, V], d: K => V)
       extends scala.collection.parallel.ParMap.WithDefault[K, V](underlying, d)
-      with ParMap[K, V] {
+      with ParMap[K, V]
     override def empty = new WithDefault(underlying.empty, d)
     override def updated[U >: V](key: K, value: U): WithDefault[K, U] =
       new WithDefault[K, U](underlying.updated[U](key, value), d)
@@ -95,5 +94,3 @@ object ParMap extends ParMapFactory[ParMap] {
     override def withDefaultValue[U >: V](d: U): ParMap[K, U] =
       new WithDefault[K, U](underlying, x => d)
     override def seq = underlying.seq.withDefault(d)
-  }
-}

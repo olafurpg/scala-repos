@@ -34,49 +34,42 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.{Label, ToggleButton, ToggleGroup}
 import scalafx.scene.layout.{HBox, Priority, VBox}
 
-class EnsembleToggleButton extends EnsembleExample {
+class EnsembleToggleButton extends EnsembleExample
 
-  val toggleLabel = new Label {
+  val toggleLabel = new Label
     text = ""
     style = "-fx-font-size: 2em;"
-  }
 
   // Radio Button Toggle Group
-  val tog = new ToggleGroup {
+  val tog = new ToggleGroup
     selectedToggle.onChange(
         (_, oldValue, newValue) =>
-          {
             toggleLabel.text = "You selected : " +
             newValue.asInstanceOf[JfxToggleBtn].getText
-        }
     )
-  }
 
-  def getContent = {
-    new VBox {
+  def getContent =
+    new VBox
       vgrow = Priority.Always
       hgrow = Priority.Always
       spacing = 10
       padding = Insets(20)
       children = List(
-          new HBox {
+          new HBox
             spacing = 10
-            children = List(new ToggleButton {
+            children = List(new ToggleButton
               minWidth = 100
               text = "Hi"
               toggleGroup = tog
-            }, new ToggleButton {
+            , new ToggleButton
               minWidth = 100
               text = "ScalaFX"
               toggleGroup = tog
-            }, new ToggleButton {
+            , new ToggleButton
               minWidth = 100
               text = "Ensemble"
               toggleGroup = tog
-            })
-          },
+            )
+          ,
           toggleLabel
       )
-    }
-  }
-}

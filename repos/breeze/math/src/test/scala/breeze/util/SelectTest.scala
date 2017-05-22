@@ -9,9 +9,9 @@ import scala.collection.mutable.ArrayBuffer
   * @author ktakagaki
   * @date 05/10/2014.
   */
-class SelectTest extends FunSuite {
+class SelectTest extends FunSuite
 
-  test("quickSelect") {
+  test("quickSelect")
     var testArray = Array(7, 3, 2, 5, 1, 4, 2, -1)
     assert(
         DenseVector(Range(0, 6).map(quickSelect(testArray, _)).toArray) == DenseVector(
@@ -22,9 +22,8 @@ class SelectTest extends FunSuite {
     assert(testArray(3) == 2)
     assert(2 >= max(DenseVector(testArray.slice(0, 3))))
     assert(2 <= min(DenseVector(testArray.slice(4, testArray.length))))
-  }
 
-  test("quickSelect, collection") {
+  test("quickSelect, collection")
     var testArray = ArrayBuffer(7, 3, 2, 5, 1, 4, 2, -1)
     assert(
         DenseVector(Range(0, 6).map(quickSelect(testArray, _)).toArray) == DenseVector(
@@ -35,5 +34,3 @@ class SelectTest extends FunSuite {
     assert(testArray(3) == 2)
     assert(2 >= max(testArray.slice(0, 3)))
     assert(2 <= min(testArray.slice(4, testArray.length)))
-  }
-}

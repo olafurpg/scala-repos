@@ -25,15 +25,14 @@ import ir.Definitions.{decodeClassName, decodeMethodName}
   *  and applications. Methods and/or fields can be added in subsequent
   *  versions, possibly causing `LinkageError`s if you extend it.
   */
-trait Analysis {
+trait Analysis
   import Analysis._
 
   def allAvailable: Boolean
   def classInfos: scala.collection.Map[String, ClassInfo]
   def errors: Seq[Error]
-}
 
-object Analysis {
+object Analysis
 
   /** Class node in a reachability graph produced by the [[Analyzer]].
     *
@@ -41,7 +40,7 @@ object Analysis {
     *  and applications. Methods and/or fields can be added in subsequent
     *  versions, possibly causing `LinkageError`s if you extend it.
     */
-  trait ClassInfo {
+  trait ClassInfo
     def encodedName: String
     def kind: ClassKind
     def isExported: Boolean
@@ -68,7 +67,6 @@ object Analysis {
     def staticMethodInfos: scala.collection.Map[String, MethodInfo]
 
     def displayName: String = decodeClassName(encodedName)
-  }
 
   /** Method node in a reachability graph produced by the [[Analyzer]].
     *
@@ -76,7 +74,7 @@ object Analysis {
     *  and applications. Methods and/or fields can be added in subsequent
     *  versions, possibly causing `LinkageError`s if you extend it.
     */
-  trait MethodInfo {
+  trait MethodInfo
     def owner: ClassInfo
     def encodedName: String
     def isStatic: Boolean
@@ -89,33 +87,29 @@ object Analysis {
     def nonExistent: Boolean
     def syntheticKind: MethodSyntheticKind
 
-    def displayName: String = {
-      if (isExported) {
+    def displayName: String =
+      if (isExported)
         encodedName
-      } else {
+      else
         import ir.Types._
 
-        def typeDisplayName(tpe: ReferenceType): String = tpe match {
+        def typeDisplayName(tpe: ReferenceType): String = tpe match
           case ClassType(encodedName) => decodeClassName(encodedName)
           case ArrayType(base, dimensions) =>
             "[" * dimensions + decodeClassName(base)
-        }
 
         val (simpleName, paramTypes, resultType) =
           ir.Definitions.decodeMethodName(encodedName)
 
         simpleName + "(" + paramTypes.map(typeDisplayName).mkString(",") +
         ")" + resultType.fold("")(typeDisplayName)
-      }
-    }
 
     def fullDisplayName: String =
       owner.displayName + "." + displayName
-  }
 
   sealed trait MethodSyntheticKind
 
-  object MethodSyntheticKind {
+  object MethodSyntheticKind
 
     /** Not a synthetic method. */
     final case object None extends MethodSyntheticKind
@@ -171,11 +165,9 @@ object Analysis {
       */
     final case class DefaultBridge(targetInterface: String)
         extends MethodSyntheticKind
-  }
 
-  sealed trait Error {
+  sealed trait Error
     def from: From
-  }
 
   final case class MissingJavaLangObjectClass(from: From) extends Error
   final case class CycleInInheritanceChain(cycle: List[ClassInfo], from: From)
@@ -192,8 +184,8 @@ object Analysis {
   final case class FromCore(moduleName: String) extends From
   case object FromExports extends From
 
-  def logError(error: Error, logger: Logger, level: Level): Unit = {
-    val headMsg = error match {
+  def logError(error: Error, logger: Logger, level: Level): Unit =
+    val headMsg = error match
       case MissingJavaLangObjectClass(_) =>
         "Fatal error: java.lang.Object is missing"
       case CycleInInheritanceChain(cycle, _) =>
@@ -207,84 +199,66 @@ object Analysis {
         s"Referring to non-existent method ${info.fullDisplayName}"
       case ConflictingDefaultMethods(infos, _) =>
         s"Conflicting default methods: ${infos.map(_.fullDisplayName).mkString(" ")}"
-    }
 
     logger.log(level, headMsg)
     val csl = new CallStackLogger(logger)
     csl.logCallStack(error.from, level)
-  }
 
-  private class CallStackLogger(logger: Logger) {
+  private class CallStackLogger(logger: Logger)
     private[this] val seenInfos = mutable.Set.empty[AnyRef]
     private[this] var indentation: String = ""
 
-    def logCallStack(from: From, level: Level): Unit = {
+    def logCallStack(from: From, level: Level): Unit =
       logCallStackImpl(level, Some(from))
       seenInfos.clear()
-    }
 
     private def log(level: Level, msg: String) =
       logger.log(level, indentation + msg)
 
-    private def indented[A](body: => A): A = {
+    private def indented[A](body: => A): A =
       indentation += "  "
       try body finally indentation = indentation.substring(2)
-    }
 
     private def logCallStackImpl(
-        level: Level, optFrom: Option[From], verb: String = "called"): Unit = {
+        level: Level, optFrom: Option[From], verb: String = "called"): Unit =
       val involvedClasses = new mutable.ListBuffer[ClassInfo]
 
-      def onlyOnce(level: Level, info: AnyRef): Boolean = {
-        if (seenInfos.add(info)) {
+      def onlyOnce(level: Level, info: AnyRef): Boolean =
+        if (seenInfos.add(info))
           true
-        } else {
+        else
           log(level, "  (already seen, not repeating call stack)")
           false
-        }
-      }
 
       @tailrec
-      def loopTrace(optFrom: Option[From], verb: String = "called"): Unit = {
-        optFrom match {
+      def loopTrace(optFrom: Option[From], verb: String = "called"): Unit =
+        optFrom match
           case None =>
             log(level,
                 s"$verb from ... er ... nowhere!? (this is a bug in dce)")
           case Some(from) =>
-            from match {
+            from match
               case FromMethod(methodInfo) =>
                 log(level, s"$verb from ${methodInfo.fullDisplayName}")
-                if (onlyOnce(level, methodInfo)) {
+                if (onlyOnce(level, methodInfo))
                   involvedClasses ++= methodInfo.instantiatedSubclasses
                   loopTrace(methodInfo.calledFrom.headOption)
-                }
               case FromCore(moduleName) =>
                 log(level, s"$verb from core module $moduleName")
               case FromExports =>
                 log(level, "exported to JavaScript with @JSExport")
-            }
-        }
-      }
 
-      indented {
+      indented
         loopTrace(optFrom, verb = verb)
-      }
 
-      if (involvedClasses.nonEmpty) {
+      if (involvedClasses.nonEmpty)
         log(level, "involving instantiated classes:")
-        indented {
-          for (classInfo <- involvedClasses.result().distinct) {
+        indented
+          for (classInfo <- involvedClasses.result().distinct)
             log(level, classInfo.displayName)
 
             // recurse with Debug log level not to overwhelm the user
-            if (onlyOnce(Level.Debug, classInfo)) {
+            if (onlyOnce(Level.Debug, classInfo))
               logCallStackImpl(Level.Debug,
                                classInfo.instantiatedFrom.headOption,
                                verb = "instantiated")
-            }
-          }
-        }
-      }
-    }
-  }
-}

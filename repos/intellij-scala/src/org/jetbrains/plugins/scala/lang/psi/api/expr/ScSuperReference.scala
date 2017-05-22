@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
   * @author Alexander Podkhalyuzin
   * Date: 14.03.2008
   */
-trait ScSuperReference extends ScExpression with ScPathElement {
+trait ScSuperReference extends ScExpression with ScPathElement
 
   /**
     * @return is reference in decompiled file from Self type class
@@ -27,4 +27,3 @@ trait ScSuperReference extends ScExpression with ScPathElement {
 
   def reference: Option[ScStableCodeReferenceElement] =
     findChild(classOf[ScStableCodeReferenceElement])
-}

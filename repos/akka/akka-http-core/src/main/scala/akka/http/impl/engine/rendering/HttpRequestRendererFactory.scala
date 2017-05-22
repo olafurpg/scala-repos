@@ -24,27 +24,25 @@ import headers._
 private[http] class HttpRequestRendererFactory(
     userAgentHeader: Option[headers.`User-Agent`],
     requestHeaderSizeHint: Int,
-    log: LoggingAdapter) {
+    log: LoggingAdapter)
   import HttpRequestRendererFactory.RequestRenderingOutput
 
   def renderToSource(ctx: RequestRenderingContext): Source[ByteString, Any] =
     render(ctx).byteStream
 
-  def render(ctx: RequestRenderingContext): RequestRenderingOutput = {
+  def render(ctx: RequestRenderingContext): RequestRenderingOutput =
     val r = new ByteStringRendering(requestHeaderSizeHint)
     import ctx.request._
 
-    def renderRequestLine(): Unit = {
+    def renderRequestLine(): Unit =
       r ~~ method ~~ ' '
-      val rawRequestUriRendered = headers.exists {
+      val rawRequestUriRendered = headers.exists
         case `Raw-Request-URI`(rawUri) ⇒
           r ~~ rawUri; true
         case _ ⇒ false
-      }
       if (!rawRequestUriRendered)
         UriRendering.renderUriWithoutFragment(r, uri, UTF8)
       r ~~ ' ' ~~ protocol ~~ CrLf
-    }
 
     def render(h: HttpHeader) = r ~~ h ~~ CrLf
 
@@ -53,9 +51,9 @@ private[http] class HttpRequestRendererFactory(
                       hostHeaderSeen: Boolean = false,
                       userAgentSeen: Boolean = false,
                       transferEncodingSeen: Boolean = false): Unit =
-      remaining match {
+      remaining match
         case head :: tail ⇒
-          head match {
+          head match
             case x: `Content-Length` ⇒
               suppressionWarning(
                   log,
@@ -73,7 +71,7 @@ private[http] class HttpRequestRendererFactory(
                   tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
 
             case x: `Transfer-Encoding` ⇒
-              x.withChunkedPeeled match {
+              x.withChunkedPeeled match
                 case None ⇒
                   suppressionWarning(log, head)
                   renderHeaders(tail,
@@ -89,7 +87,6 @@ private[http] class HttpRequestRendererFactory(
                                 hostHeaderSeen,
                                 userAgentSeen,
                                 transferEncodingSeen = true)
-              }
 
             case x: `Host` ⇒
               render(x)
@@ -128,7 +125,6 @@ private[http] class HttpRequestRendererFactory(
                 log.warning("HTTP header '{}' is not allowed in requests", x)
               renderHeaders(
                   tail, hostHeaderSeen, userAgentSeen, transferEncodingSeen)
-          }
 
         case Nil ⇒
           if (!hostHeaderSeen) r ~~ ctx.hostHeader ~~ CrLf
@@ -137,31 +133,27 @@ private[http] class HttpRequestRendererFactory(
           if (entity.isChunked && !entity.isKnownEmpty &&
               !transferEncodingSeen)
             r ~~ `Transfer-Encoding` ~~ ChunkedBytes ~~ CrLf
-      }
 
     def renderContentLength(contentLength: Long) =
       if (method.isEntityAccepted &&
           (contentLength > 0 || method.requestEntityAcceptance == Expected))
         r ~~ `Content-Length` ~~ contentLength ~~ CrLf else r
 
-    def renderStreamed(body: Source[ByteString, Any]): RequestRenderingOutput = {
+    def renderStreamed(body: Source[ByteString, Any]): RequestRenderingOutput =
       val headerPart = Source.single(r.get)
-      val stream = ctx.sendEntityTrigger match {
+      val stream = ctx.sendEntityTrigger match
         case None ⇒ headerPart ++ body
         case Some(future) ⇒
           val barrier = Source
             .fromFuture(future)
             .drop(1)
             .asInstanceOf[Source[ByteString, Any]]
-            (headerPart ++ barrier ++ body).recoverWith {
+            (headerPart ++ barrier ++ body).recoverWith
             case HttpResponseParser.OneHundredContinueError ⇒ Source.empty
-          }
-      }
       RequestRenderingOutput.Streamed(stream)
-    }
 
     def completeRequestRendering(): RequestRenderingOutput =
-      entity match {
+      entity match
         case x if x.isKnownEmpty ⇒
           renderContentLength(0) ~~ CrLf
           RequestRenderingOutput.Strict(r.get)
@@ -180,24 +172,20 @@ private[http] class HttpRequestRendererFactory(
         case HttpEntity.Chunked(_, chunks) ⇒
           r ~~ CrLf
           renderStreamed(chunks.via(ChunkTransformer.flow))
-      }
 
     renderRequestLine()
     renderHeaders(headers.toList)
     renderEntityContentType(r, entity)
     completeRequestRendering()
-  }
 
   def renderStrict(ctx: RequestRenderingContext): ByteString =
-    render(ctx) match {
+    render(ctx) match
       case RequestRenderingOutput.Strict(bytes) ⇒ bytes
       case _: RequestRenderingOutput.Streamed ⇒
         throw new IllegalArgumentException(
             s"Request entity was not Strict but ${ctx.request.entity.getClass.getSimpleName}")
-    }
-}
 
-private[http] object HttpRequestRendererFactory {
+private[http] object HttpRequestRendererFactory
   def renderStrict(ctx: RequestRenderingContext,
                    settings: ClientConnectionSettings,
                    log: LoggingAdapter): ByteString =
@@ -205,17 +193,13 @@ private[http] object HttpRequestRendererFactory {
                                    settings.requestHeaderSizeHint,
                                    log).renderStrict(ctx)
 
-  sealed trait RequestRenderingOutput {
+  sealed trait RequestRenderingOutput
     def byteStream: Source[ByteString, Any]
-  }
-  object RequestRenderingOutput {
-    case class Strict(bytes: ByteString) extends RequestRenderingOutput {
+  object RequestRenderingOutput
+    case class Strict(bytes: ByteString) extends RequestRenderingOutput
       def byteStream: Source[ByteString, Any] = Source.single(bytes)
-    }
     case class Streamed(byteStream: Source[ByteString, Any])
         extends RequestRenderingOutput
-  }
-}
 
 /**
   * INTERNAL API

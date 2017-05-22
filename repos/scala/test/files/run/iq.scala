@@ -4,17 +4,16 @@
 
 import scala.collection.immutable.Queue
 
-object iq {
-  def main {
+object iq
+  def main
     /* Create an empty queue. */
     val q: Queue[Int] = Queue.empty
 
     /* Test isEmpty.
      * Expected: Empty
      */
-    if (q.isEmpty) {
+    if (q.isEmpty)
       Console.println("Empty")
-    }
 
     /* Test enqueing. */
     val q2 = q.enqueue(42).enqueue(0)
@@ -35,14 +34,13 @@ object iq {
      * Expected: Head: 42
      */
     val q4 =
-      if (q2.isEmpty) {
+      if (q2.isEmpty)
         Console.println("Empty")
         q2
-      } else {
+      else
         val (head, q3) = q2.dequeue
         Console.println("Head: " + head)
         q3
-      }
 
     /* Test sequence enqueing. */
     val q5: Queue[Any] = q4.enqueue(List(1, 2, 3, 4, 5, 6, 7, 8, 9))
@@ -101,11 +99,7 @@ object iq {
      *  Expected: Front: 1
      */
     Console.println("Front: " + q6.front);
-  }
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     iq.main
-  }
-}

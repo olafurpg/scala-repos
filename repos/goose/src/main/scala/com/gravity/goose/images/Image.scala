@@ -24,7 +24,7 @@ import org.jsoup.nodes.Element
   * User: jim
   * Date: 8/18/11
   */
-class Image {
+class Image
 
   /**
     * holds the Element node of the image we think is top dog
@@ -61,7 +61,5 @@ class Image {
     */
   var bytes: Long = 0;
 
-  def getImageSrc = {
+  def getImageSrc =
     imageSrc
-  }
-}

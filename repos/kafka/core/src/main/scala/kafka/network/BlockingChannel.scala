@@ -23,9 +23,8 @@ import kafka.api.RequestOrResponse
 import kafka.utils.{Logging, nonthreadsafe}
 import org.apache.kafka.common.network.NetworkReceive
 
-object BlockingChannel {
+object BlockingChannel
   val UseDefaultBufferSize = -1
-}
 
 /**
   *  A simple blocking channel with timeouts correctly enabled.
@@ -37,7 +36,7 @@ class BlockingChannel(val host: String,
                       val readBufferSize: Int,
                       val writeBufferSize: Int,
                       val readTimeoutMs: Int)
-    extends Logging {
+    extends Logging
   private var connected = false
   private var channel: SocketChannel = null
   private var readChannel: ReadableByteChannel = null
@@ -46,9 +45,9 @@ class BlockingChannel(val host: String,
   private val connectTimeoutMs = readTimeoutMs
   private var connectionId: String = ""
 
-  def connect() = lock synchronized {
-    if (!connected) {
-      try {
+  def connect() = lock synchronized
+    if (!connected)
+      try
         channel = SocketChannel.open()
         if (readBufferSize > 0)
           channel.socket.setReceiveBufferSize(readBufferSize)
@@ -83,49 +82,39 @@ class BlockingChannel(val host: String,
                        channel.socket.getSendBufferSize,
                        writeBufferSize,
                        connectTimeoutMs))
-      } catch {
+      catch
         case e: Throwable => disconnect()
-      }
-    }
-  }
 
-  def disconnect() = lock synchronized {
-    if (channel != null) {
+  def disconnect() = lock synchronized
+    if (channel != null)
       swallow(channel.close())
       swallow(channel.socket.close())
       channel = null
       writeChannel = null
-    }
     // closing the main socket channel *should* close the read channel
     // but let's do it to be sure.
-    if (readChannel != null) {
+    if (readChannel != null)
       swallow(readChannel.close())
       readChannel = null
-    }
     connected = false
-  }
 
   def isConnected = connected
 
-  def send(request: RequestOrResponse): Long = {
+  def send(request: RequestOrResponse): Long =
     if (!connected) throw new ClosedChannelException()
 
     val send = new RequestOrResponseSend(connectionId, request)
     send.writeCompletely(writeChannel)
-  }
 
-  def receive(): NetworkReceive = {
+  def receive(): NetworkReceive =
     if (!connected) throw new ClosedChannelException()
 
     val response = readCompletely(readChannel)
     response.payload().rewind()
 
     response
-  }
 
-  private def readCompletely(channel: ReadableByteChannel): NetworkReceive = {
+  private def readCompletely(channel: ReadableByteChannel): NetworkReceive =
     val response = new NetworkReceive
     while (!response.complete()) response.readFromReadableChannel(channel)
     response
-  }
-}

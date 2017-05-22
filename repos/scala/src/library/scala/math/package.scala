@@ -12,7 +12,7 @@ package scala
   * numeric operations such as elementary exponential, logarithmic, root and
   * trigonometric functions.
   */
-package object math {
+package object math
 
   /** The `double` value that is closer than any other to `e`, the base of
     *  the natural logarithms.
@@ -203,4 +203,3 @@ package object math {
 
   /** Returns the size of an ulp of the given `Float` value. */
   def ulp(x: Float): Float = java.lang.Math.ulp(x)
-}

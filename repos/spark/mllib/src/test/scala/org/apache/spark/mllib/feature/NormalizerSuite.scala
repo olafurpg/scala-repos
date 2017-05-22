@@ -24,7 +24,7 @@ import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vectors}
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
-class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
+class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext
 
   val data = Array(
       Vectors.sparse(3, Seq((0, -2.0), (1, 2.3))),
@@ -37,17 +37,17 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
 
   lazy val dataRDD = sc.parallelize(data, 3)
 
-  test("Normalization using L1 distance") {
+  test("Normalization using L1 distance")
     val l1Normalizer = new Normalizer(1)
 
     val data1 = data.map(l1Normalizer.transform)
     val data1RDD = l1Normalizer.transform(dataRDD)
 
-    assert((data, data1, data1RDD.collect()).zipped.forall {
+    assert((data, data1, data1RDD.collect()).zipped.forall
       case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
       case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
       case _ => false
-    }, "The vector type should be preserved after normalization.")
+    , "The vector type should be preserved after normalization.")
 
     assert((data1, data1RDD.collect()).zipped
           .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
@@ -67,19 +67,18 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(
         data1(4) ~== Vectors.dense(0.625, 0.07894737, 0.29605263) absTol 1E-5)
     assert(data1(5) ~== Vectors.sparse(3, Seq()) absTol 1E-5)
-  }
 
-  test("Normalization using L2 distance") {
+  test("Normalization using L2 distance")
     val l2Normalizer = new Normalizer()
 
     val data2 = data.map(l2Normalizer.transform)
     val data2RDD = l2Normalizer.transform(dataRDD)
 
-    assert((data, data2, data2RDD.collect()).zipped.forall {
+    assert((data, data2, data2RDD.collect()).zipped.forall
       case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
       case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
       case _ => false
-    }, "The vector type should be preserved after normalization.")
+    , "The vector type should be preserved after normalization.")
 
     assert((data2, data2RDD.collect()).zipped
           .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
@@ -99,19 +98,18 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(data2(4) ~==
           Vectors.dense(0.897906166, 0.113419726, 0.42532397) absTol 1E-5)
     assert(data2(5) ~== Vectors.sparse(3, Seq()) absTol 1E-5)
-  }
 
-  test("Normalization using L^Inf distance.") {
+  test("Normalization using L^Inf distance.")
     val lInfNormalizer = new Normalizer(Double.PositiveInfinity)
 
     val dataInf = data.map(lInfNormalizer.transform)
     val dataInfRDD = lInfNormalizer.transform(dataRDD)
 
-    assert((data, dataInf, dataInfRDD.collect()).zipped.forall {
+    assert((data, dataInf, dataInfRDD.collect()).zipped.forall
       case (v1: DenseVector, v2: DenseVector, v3: DenseVector) => true
       case (v1: SparseVector, v2: SparseVector, v3: SparseVector) => true
       case _ => false
-    }, "The vector type should be preserved after normalization.")
+    , "The vector type should be preserved after normalization.")
 
     assert((dataInf, dataInfRDD.collect()).zipped
           .forall((v1, v2) => v1 ~== v2 absTol 1E-5))
@@ -130,5 +128,3 @@ class NormalizerSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(
         dataInf(4) ~== Vectors.dense(1.0, 0.12631579, 0.473684211) absTol 1E-5)
     assert(dataInf(5) ~== Vectors.sparse(3, Seq()) absTol 1E-5)
-  }
-}

@@ -30,7 +30,7 @@ import net.liftweb.json._
 import net.liftweb.common._
 import net.liftweb.http.js._
 
-object MappedPassword {
+object MappedPassword
   val blankPw = "*******"
 
   /**
@@ -38,10 +38,9 @@ object MappedPassword {
     * something more than the default
     */
   var bcryptStrength: Box[Int] = None
-}
 
 abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
-    extends MappedField[String, T] {
+    extends MappedField[String, T]
   override def dbColumnCount = 2
   def dbFieldClass = classOf[String]
 
@@ -64,7 +63,7 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = String } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(name, manifest, new FieldConverter
 
       /**
         * The type of the field
@@ -99,15 +98,15 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
         * @return the field as a sequence of SourceFields
         */
       def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+    )
 
   private var password = FatLazy(defaultValue)
   private val salt_i = FatLazy(util.Safe.randomString(16))
   private var invalidPw = false
   private var invalidMsg = ""
 
-  protected def real_i_set_!(value: String): String = {
-    value match {
+  protected def real_i_set_!(value: String): String =
+    value match
       case "*" | null | MappedPassword.blankPw if (value.length < 3) =>
         invalidPw = true; invalidMsg = S.?("password.must.be.set");
         password.set("*")
@@ -123,20 +122,17 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
       case _ =>
         invalidPw = true; invalidMsg = S.?("password.too.short");
         password.set("*")
-    }
     this.dirty_?(true)
     "*"
-  }
 
   def setList(in: List[String]): Boolean =
-    in match {
+    in match
       case x1 :: x2 :: Nil if x1 == x2 => this.set(x1); true
       case _ =>
         invalidPw = true; invalidMsg = S.?("passwords.do.not.match"); false
-    }
 
-  override def setFromAny(f: Any): String = {
-    f match {
+  override def setFromAny(f: Any): String =
+    f match
       case a: Array[String] if (a.length == 2 && a(0) == a(1)) =>
         this.set(a(0))
       case l: List[_] if (l.length == 2 && l.head == l(1)) =>
@@ -144,9 +140,7 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
       case _ =>
         invalidPw = true
         invalidMsg = S.?("passwords.do.not.match")
-    }
     get
-  }
 
   override def renderJs_? = false
 
@@ -157,17 +151,15 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
     * @param toMatch the password to test
     * @return the matched value
     */
-  def match_?(toMatch: String): Boolean = {
-    if (password.get.startsWith("b;")) {
+  def match_?(toMatch: String): Boolean =
+    if (password.get.startsWith("b;"))
       BCrypt.checkpw(toMatch, password.get.substring(2) + salt_i.get)
-    } else hash("{" + toMatch + "} salt={" + salt_i.get + "}") == password.get
-  }
+    else hash("{" + toMatch + "} salt={" + salt_i.get + "}") == password.get
 
-  override def validate: List[FieldError] = {
+  override def validate: List[FieldError] =
     if (!invalidPw && password.get != "*") Nil
     else if (invalidPw) List(FieldError(this, Text(invalidMsg)))
     else List(FieldError(this, Text(S.?("password.must.be.set"))))
-  }
 
   def real_convertToJDBCFriendly(value: String): Object =
     BCrypt.hashpw(
@@ -198,16 +190,14 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
   /**
     * Create an input field for the item
     */
-  override def _toForm: Box[NodeSeq] = {
-    S.fmapFunc({ s: List[String] =>
+  override def _toForm: Box[NodeSeq] =
+    S.fmapFunc( s: List[String] =>
       this.setFromAny(s)
-    }) { funcName =>
-      Full(<span>{appendFieldId(<input type={formInputType} name={funcName}
-            value={get.toString}/>)}&nbsp;{S.?("repeat")}&nbsp;<input
+    )  funcName =>
+      Full(<span>appendFieldId(<input type={formInputType} name={funcName}
+            value={get.toString}/>)&nbsp;{S.?("repeat")}&nbsp;<input
             type={formInputType} name={funcName}
             value={get.toString}/></span>)
-    }
-  }
 
   /**
     * When building the form field, what's the input element's
@@ -215,100 +205,68 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
     */
   override protected def formInputType = "password"
 
-  def jdbcFriendly(columnName: String) = {
-    if (columnName.endsWith("_slt")) {
+  def jdbcFriendly(columnName: String) =
+    if (columnName.endsWith("_slt"))
       salt_i.get
-    } else if (columnName.endsWith("_pw")) {
+    else if (columnName.endsWith("_pw"))
       password.get
-    } else {
+    else
       null
-    }
-  }
 
   def buildSetLongValue(
-      accessor: Method, columnName: String): (T, Long, Boolean) => Unit = {
-    if (columnName.endsWith("_slt")) {
-      { (inst: T, v: Long, isNull: Boolean) =>
-        {
+      accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
+    if (columnName.endsWith("_slt"))
+      (inst: T, v: Long, isNull: Boolean) =>
           val tv = getField(inst, accessor).asInstanceOf[MappedPassword[T]];
           tv.salt_i() = if (isNull) null else v.toString
-        }
-      }
-    } else if (columnName.endsWith("_pw")) {
-      { (inst: T, v: Long, isNull: Boolean) =>
-        {
+    else if (columnName.endsWith("_pw"))
+      (inst: T, v: Long, isNull: Boolean) =>
           val tv = getField(inst, accessor).asInstanceOf[MappedPassword[T]];
           tv.password() = if (isNull) null else v.toString
-        }
-      }
-    } else {
+    else
       null
-    }
-  }
   def buildSetStringValue(
-      accessor: Method, columnName: String): (T, String) => Unit = {
-    if (columnName.endsWith("_slt")) {
-      { (inst: T, v: String) =>
-        {
+      accessor: Method, columnName: String): (T, String) => Unit =
+    if (columnName.endsWith("_slt"))
+      (inst: T, v: String) =>
           val tv = getField(inst, accessor).asInstanceOf[MappedPassword[T]];
           tv.salt_i() = v
-        }
-      }
-    } else if (columnName.endsWith("_pw")) {
-      { (inst: T, v: String) =>
-        {
+    else if (columnName.endsWith("_pw"))
+      (inst: T, v: String) =>
           val tv = getField(inst, accessor).asInstanceOf[MappedPassword[T]];
           tv.password() = v
-        }
-      }
-    } else {
+    else
       null
-    }
-  }
   def buildSetDateValue(
-      accessor: Method, columnName: String): (T, Date) => Unit = {
+      accessor: Method, columnName: String): (T, Date) => Unit =
     null
-  }
   def buildSetBooleanValue(
-      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit = {
+      accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
     null
-  }
 
   def buildSetActualValue(accessor: Method,
                           inst: AnyRef,
-                          columnName: String): (T, AnyRef) => Unit = {
-    if (columnName.endsWith("_slt")) {
-      inst match {
-        case null => { (inst: T, v: AnyRef) =>
+                          columnName: String): (T, AnyRef) => Unit =
+    if (columnName.endsWith("_slt"))
+      inst match
+        case null =>  (inst: T, v: AnyRef) =>
             {}
-          }
-        case _ => { (inst: T, v: AnyRef) =>
-            {
+        case _ =>  (inst: T, v: AnyRef) =>
               val tv =
                 getField(inst, accessor).asInstanceOf[MappedPassword[T]];
               tv.salt_i() = (if (v == null) null else v.toString);
               tv.resetDirty
-            }
-          }
-      }
-    } else if (columnName.endsWith("_pw")) {
-      inst match {
-        case null => { (inst: T, v: AnyRef) =>
+    else if (columnName.endsWith("_pw"))
+      inst match
+        case null =>  (inst: T, v: AnyRef) =>
             {}
-          }
-        case _ => { (inst: T, v: AnyRef) =>
-            {
+        case _ =>  (inst: T, v: AnyRef) =>
               val tv =
                 getField(inst, accessor).asInstanceOf[MappedPassword[T]];
               tv.password() = (if (v == null) null else v.toString);
               tv.resetDirty
-            }
-          }
-      }
-    } else {
+    else
       null
-    }
-  }
 
   /**
     * Given the driver type, return the string required to create the column in the database
@@ -316,4 +274,3 @@ abstract class MappedPassword[T <: Mapper[T]](val fieldOwner: T)
   def fieldCreatorString(dbType: DriverType, colName: String): String =
     (if (colName.endsWith("_pw")) colName + " VARCHAR(48)"
      else colName + " VARCHAR(20)") + notNullAppender()
-}

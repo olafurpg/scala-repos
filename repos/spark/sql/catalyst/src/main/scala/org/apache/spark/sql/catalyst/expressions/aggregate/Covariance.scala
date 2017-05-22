@@ -26,7 +26,7 @@ import org.apache.spark.sql.types._
   * When applied on empty data (i.e., count is zero), it returns NULL.
   */
 abstract class Covariance(x: Expression, y: Expression)
-    extends DeclarativeAggregate {
+    extends DeclarativeAggregate
 
   override def children: Seq[Expression] = Seq(x, y)
   override def nullable: Boolean = true
@@ -45,7 +45,7 @@ abstract class Covariance(x: Expression, y: Expression)
 
   override val initialValues: Seq[Expression] = Array.fill(4)(Literal(0.0))
 
-  override lazy val updateExpressions: Seq[Expression] = {
+  override lazy val updateExpressions: Seq[Expression] =
     val newN = n + Literal(1.0)
     val dx = x - xAvg
     val dy = y - yAvg
@@ -61,9 +61,8 @@ abstract class Covariance(x: Expression, y: Expression)
         If(isNull, yAvg, newYAvg),
         If(isNull, ck, newCk)
     )
-  }
 
-  override val mergeExpressions: Seq[Expression] = {
+  override val mergeExpressions: Seq[Expression] =
 
     val n1 = n.left
     val n2 = n.right
@@ -77,23 +76,17 @@ abstract class Covariance(x: Expression, y: Expression)
     val newCk = ck.left + ck.right + dx * dyN * n1 * n2
 
     Seq(newN, newXAvg, newYAvg, newCk)
-  }
-}
 
 case class CovPopulation(left: Expression, right: Expression)
-    extends Covariance(left, right) {
-  override val evaluateExpression: Expression = {
+    extends Covariance(left, right)
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0), Literal.create(null, DoubleType), ck / n)
-  }
   override def prettyName: String = "covar_pop"
-}
 
 case class CovSample(left: Expression, right: Expression)
-    extends Covariance(left, right) {
-  override val evaluateExpression: Expression = {
+    extends Covariance(left, right)
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0),
        Literal.create(null, DoubleType),
        If(n === Literal(1.0), Literal(Double.NaN), ck / (n - Literal(1.0))))
-  }
   override def prettyName: String = "covar_samp"
-}

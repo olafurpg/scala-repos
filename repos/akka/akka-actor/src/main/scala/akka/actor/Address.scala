@@ -21,7 +21,7 @@ import scala.collection.immutable
 final case class Address private (protocol: String,
                                   system: String,
                                   host: Option[String],
-                                  port: Option[Int]) {
+                                  port: Option[Int])
   // Please note that local/non-local distinction must be preserved:
   // host.isDefined == hasGlobalScope
   // host.isEmpty == hasLocalScope
@@ -55,7 +55,7 @@ final case class Address private (protocol: String,
     * `protocol://system@host:port`
     */
   @transient
-  override lazy val toString: String = {
+  override lazy val toString: String =
     val sb =
       (new java.lang.StringBuilder(protocol)).append("://").append(system)
 
@@ -63,7 +63,6 @@ final case class Address private (protocol: String,
     if (port.isDefined) sb.append(':').append(port.get)
 
     sb.toString
-  }
 
   /**
     * Returns a String representation formatted as:
@@ -71,9 +70,8 @@ final case class Address private (protocol: String,
     * `system@host:port`
     */
   def hostPort: String = toString.substring(protocol.length + 3)
-}
 
-object Address {
+object Address
 
   /**
     * Constructs a new Address with the specified protocol and system name
@@ -85,22 +83,18 @@ object Address {
     */
   def apply(protocol: String, system: String, host: String, port: Int) =
     new Address(protocol, system, Some(host), Some(port))
-}
 
-private[akka] trait PathUtils {
-  protected def split(s: String, fragment: String): List[String] = {
+private[akka] trait PathUtils
+  protected def split(s: String, fragment: String): List[String] =
     @tailrec
-    def rec(pos: Int, acc: List[String]): List[String] = {
+    def rec(pos: Int, acc: List[String]): List[String] =
       val from = s.lastIndexOf('/', pos - 1)
       val sub = s.substring(from + 1, pos)
       val l =
         if ((fragment ne null) && acc.isEmpty) sub + "#" + fragment :: acc
         else sub :: acc
       if (from == -1) l else rec(from, l)
-    }
     rec(s.length, Nil)
-  }
-}
 
 /**
   * Extractor for so-called “relative actor paths” as in “relative URI”, not in
@@ -109,22 +103,19 @@ private[akka] trait PathUtils {
   *  * "grand/child"
   *  * "/user/hello/world"
   */
-object RelativeActorPath extends PathUtils {
-  def unapply(addr: String): Option[immutable.Seq[String]] = {
-    try {
+object RelativeActorPath extends PathUtils
+  def unapply(addr: String): Option[immutable.Seq[String]] =
+    try
       val uri = new URI(addr)
       if (uri.isAbsolute) None
       else Some(split(uri.getRawPath, uri.getRawFragment))
-    } catch {
+    catch
       case _: URISyntaxException ⇒ None
-    }
-  }
-}
 
 /**
   * This object serves as extractor for Scala and as address parser for Java.
   */
-object AddressFromURIString {
+object AddressFromURIString
   def unapply(addr: String): Option[Address] =
     try unapply(new URI(addr)) catch { case _: URISyntaxException ⇒ None }
 
@@ -132,11 +123,11 @@ object AddressFromURIString {
     if (uri eq null) None
     else if (uri.getScheme == null ||
              (uri.getUserInfo == null && uri.getHost == null)) None
-    else if (uri.getUserInfo == null) {
+    else if (uri.getUserInfo == null)
       // case 1: “akka://system”
       if (uri.getPort != -1) None
       else Some(Address(uri.getScheme, uri.getHost))
-    } else {
+    else
       // case 2: “akka://system@host:port”
       if (uri.getHost == null || uri.getPort == -1) None
       else
@@ -145,37 +136,31 @@ object AddressFromURIString {
             else
               Address(
                   uri.getScheme, uri.getUserInfo, uri.getHost, uri.getPort))
-    }
 
   /**
     * Try to construct an Address from the given String or throw a java.net.MalformedURLException.
     */
-  def apply(addr: String): Address = addr match {
+  def apply(addr: String): Address = addr match
     case AddressFromURIString(address) ⇒ address
     case _ ⇒ throw new MalformedURLException(addr)
-  }
 
   /**
     * Java API: Try to construct an Address from the given String or throw a java.net.MalformedURLException.
     */
   def parse(addr: String): Address = apply(addr)
-}
 
 /**
   * Given an ActorPath it returns the Address and the path elements if the path is well-formed
   */
-object ActorPathExtractor extends PathUtils {
+object ActorPathExtractor extends PathUtils
   def unapply(addr: String): Option[(Address, immutable.Iterable[String])] =
-    try {
+    try
       val uri = new URI(addr)
-      uri.getRawPath match {
+      uri.getRawPath match
         case null ⇒ None
         case path ⇒
           AddressFromURIString
             .unapply(uri)
             .map((_, split(path, uri.getRawFragment).drop(1)))
-      }
-    } catch {
+    catch
       case _: URISyntaxException ⇒ None
-    }
-}

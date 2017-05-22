@@ -7,7 +7,7 @@ import scala.concurrent.stm._
 import scala.concurrent.{ExecutionContext, Future, Promise}
 import akka.util.{SerializedSuspendableExecutionContext}
 
-object Agent {
+object Agent
 
   /**
     * Factory method for creating an Agent.
@@ -26,7 +26,7 @@ object Agent {
     */
   private final class SecretAgent[T](
       initialValue: T, context: ExecutionContext)
-      extends Agent[T] {
+      extends Agent[T]
     private val ref = Ref(initialValue)
     private val updater = SerializedSuspendableExecutionContext(10)(context)
 
@@ -40,53 +40,47 @@ object Agent {
 
     def sendOff(f: T ⇒ T)(implicit ec: ExecutionContext): Unit =
       withinTransaction(
-          new Runnable {
+          new Runnable
         def run =
-          try updater.suspend() finally ec.execute(new Runnable {
+          try updater.suspend() finally ec.execute(new Runnable
             def run = try ref.single.transform(f) finally updater.resume()
-          })
-      })
+          )
+      )
 
     def alter(newValue: T): Future[T] =
       doAlter({ ref.single.update(newValue); newValue })
 
     def alter(f: T ⇒ T): Future[T] = doAlter(ref.single.transformAndGet(f))
 
-    def alterOff(f: T ⇒ T)(implicit ec: ExecutionContext): Future[T] = {
+    def alterOff(f: T ⇒ T)(implicit ec: ExecutionContext): Future[T] =
       val result = Promise[T]()
       withinTransaction(
-          new Runnable {
-        def run = {
+          new Runnable
+        def run =
           updater.suspend()
           result completeWith Future(
               try ref.single.transformAndGet(f) finally updater.resume())
-        }
-      })
+      )
       result.future
-    }
 
     /**
       * Internal helper method
       */
-    private final def withinTransaction(run: Runnable): Unit = {
-      Txn.findCurrent match {
+    private final def withinTransaction(run: Runnable): Unit =
+      Txn.findCurrent match
         case Some(txn) ⇒ Txn.afterCommit(_ ⇒ updater.execute(run))(txn)
         case _ ⇒ updater.execute(run)
-      }
-    }
 
     /**
       * Internal helper method
       */
-    private final def doAlter(f: ⇒ T): Future[T] = {
-      Txn.findCurrent match {
+    private final def doAlter(f: ⇒ T): Future[T] =
+      Txn.findCurrent match
         case Some(txn) ⇒
           val result = Promise[T]()
           Txn.afterCommit(status ⇒ result completeWith Future(f)(updater))(txn)
           result.future
         case _ ⇒ Future(f)(updater)
-      }
-    }
 
     def future(): Future[T] = Future(ref.single.get)(updater)
 
@@ -95,8 +89,6 @@ object Agent {
     def flatMap[B](f: T ⇒ Agent[B]): Agent[B] = f(get)
 
     def foreach[U](f: T ⇒ U): Unit = f(get)
-  }
-}
 
 /**
   * The Agent class was inspired by agents in Clojure.
@@ -164,7 +156,7 @@ object Agent {
   * any dispatches made in a transaction are held until that transaction
   * commits, and are discarded if it is retried or aborted.
   */
-abstract class Agent[T] {
+abstract class Agent[T]
 
   /**
     * Java API: Read the internal state of the agent.
@@ -246,4 +238,3 @@ abstract class Agent[T] {
     * In Java, pass in an instance of `akka.dispatch.Foreach`.
     */
   def foreach[U](f: T ⇒ U): Unit
-}

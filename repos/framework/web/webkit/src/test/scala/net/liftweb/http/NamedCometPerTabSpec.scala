@@ -27,28 +27,24 @@ import js.JsCmds
 /**
   * System under specification for NamedComet* files.
   */
-object NamedCometPerTabSpec extends Specification {
+object NamedCometPerTabSpec extends Specification
   "NamedCometPerTabSpec Specification".title
 
-  class CometA extends NamedCometActorTrait {
-    override def lowPriority = {
+  class CometA extends NamedCometActorTrait
+    override def lowPriority =
       case msg => JsCmds.Noop
-    }
-    def render = {
+    def render =
       "nada" #> Text("nada")
-    }
-  }
 
-  "A NamedCometDispatcher" should {
-    step {
+  "A NamedCometDispatcher" should
+    step
       val cometA = new CometA { override def name = Full("1") }
       cometA.localSetup
 
       // HACK! to ensure tests doesn't fail when trying to access actor before they've been registered
       Thread.sleep(500)
-    }
 
-    "be created for a comet" in {
+    "be created for a comet" in
       NamedCometListener
         .getDispatchersFor(Full("1"))
         .foreach(
@@ -57,8 +53,7 @@ object NamedCometPerTabSpec extends Specification {
                       "net.liftweb.http.NamedCometDispatcher"))
         )
       success
-    }
-    "be created even if no comet is present when calling getOrAddDispatchersFor" in {
+    "be created even if no comet is present when calling getOrAddDispatchersFor" in
       NamedCometListener
         .getOrAddDispatchersFor(Full("3"))
         .foreach(
@@ -67,14 +62,10 @@ object NamedCometPerTabSpec extends Specification {
                   "net.liftweb.http.NamedCometDispatcher")
         )
       success
-    }
-    "not be created for a non existing key" in {
+    "not be created for a non existing key" in
       NamedCometListener
         .getDispatchersFor(Full("2"))
         .foreach(
             actor => actor must_== Empty
         )
       success
-    }
-  }
-}

@@ -13,7 +13,7 @@ import scala.collection.immutable
   * subclass. It can be used to allow a dependency injection framework to
   * determine the actual actor class and how it shall be instantiated.
   */
-trait IndirectActorProducer {
+trait IndirectActorProducer
 
   /**
     * This factory method must produce a fresh actor instance upon each
@@ -32,20 +32,19 @@ trait IndirectActorProducer {
     * later to produce the actor.
     */
   def actorClass: Class[_ <: Actor]
-}
 
-private[akka] object IndirectActorProducer {
+private[akka] object IndirectActorProducer
   val CreatorFunctionConsumerClass = classOf[CreatorFunctionConsumer]
   val CreatorConsumerClass = classOf[CreatorConsumer]
   val TypedCreatorFunctionConsumerClass = classOf[TypedCreatorFunctionConsumer]
 
-  def apply(clazz: Class[_], args: immutable.Seq[Any]): IndirectActorProducer = {
-    if (classOf[IndirectActorProducer].isAssignableFrom(clazz)) {
+  def apply(clazz: Class[_], args: immutable.Seq[Any]): IndirectActorProducer =
+    if (classOf[IndirectActorProducer].isAssignableFrom(clazz))
       def get1stArg[T]: T = args.head.asInstanceOf[T]
       def get2ndArg[T]: T = args.tail.head.asInstanceOf[T]
       // The cost of doing reflection to create these for every props
       // is rather high, so we match on them and do new instead
-      clazz match {
+      clazz match
         case TypedCreatorFunctionConsumerClass ⇒
           new TypedCreatorFunctionConsumer(get1stArg, get2ndArg)
         case CreatorFunctionConsumerClass ⇒
@@ -54,64 +53,56 @@ private[akka] object IndirectActorProducer {
           new CreatorConsumer(get1stArg, get2ndArg)
         case _ ⇒
           Reflect.instantiate(clazz, args).asInstanceOf[IndirectActorProducer]
-      }
-    } else if (classOf[Actor].isAssignableFrom(clazz)) {
+    else if (classOf[Actor].isAssignableFrom(clazz))
       if (args.isEmpty)
         new NoArgsReflectConstructor(clazz.asInstanceOf[Class[_ <: Actor]])
       else
         new ArgsReflectConstructor(clazz.asInstanceOf[Class[_ <: Actor]], args)
-    } else
+    else
       throw new IllegalArgumentException(s"unknown actor creator [$clazz]")
-  }
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class CreatorFunctionConsumer(creator: () ⇒ Actor)
-    extends IndirectActorProducer {
+    extends IndirectActorProducer
   override def actorClass = classOf[Actor]
   override def produce() = creator()
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class CreatorConsumer(
     clazz: Class[_ <: Actor], creator: Creator[Actor])
-    extends IndirectActorProducer {
+    extends IndirectActorProducer
   override def actorClass = clazz
   override def produce() = creator.create()
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class TypedCreatorFunctionConsumer(
     clz: Class[_ <: Actor], creator: () ⇒ Actor)
-    extends IndirectActorProducer {
+    extends IndirectActorProducer
   override def actorClass = clz
   override def produce() = creator()
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class ArgsReflectConstructor(
     clz: Class[_ <: Actor], args: immutable.Seq[Any])
-    extends IndirectActorProducer {
+    extends IndirectActorProducer
   private[this] val constructor = Reflect.findConstructor(clz, args)
   override def actorClass = clz
   override def produce() =
     Reflect.instantiate(constructor, args).asInstanceOf[Actor]
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class NoArgsReflectConstructor(clz: Class[_ <: Actor])
-    extends IndirectActorProducer {
+    extends IndirectActorProducer
   Reflect.findConstructor(clz, List.empty)
   override def actorClass = clz
   override def produce() = Reflect.instantiate(clz)
-}

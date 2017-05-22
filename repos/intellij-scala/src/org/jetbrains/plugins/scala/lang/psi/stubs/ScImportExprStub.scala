@@ -11,8 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportExpr
   * User: Alexander Podkhalyuzin
   * Date: 20.06.2009
   */
-trait ScImportExprStub extends StubElement[ScImportExpr] {
+trait ScImportExprStub extends StubElement[ScImportExpr]
   def reference: Option[ScStableCodeReferenceElement]
 
   def isSingleWildcard: Boolean
-}

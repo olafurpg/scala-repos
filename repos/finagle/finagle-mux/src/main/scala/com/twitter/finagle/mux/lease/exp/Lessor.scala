@@ -16,7 +16,7 @@ import com.twitter.util.Duration
   * The lessee provides an interface that lets the lessor notify the lessee about
   * lease information, and lets the lessor query the lessee for draining info.
   */
-private[twitter] trait Lessee {
+private[twitter] trait Lessee
 
   /**
     * The Lessee is given the lease for d, starting now.
@@ -27,12 +27,11 @@ private[twitter] trait Lessee {
     * The number of pending requests.  Useful for draining.
     */
   def npending(): Int
-}
 
 /**
   * The Lessor is the entity that gives leases.
   */
-private[twitter] trait Lessor {
+private[twitter] trait Lessor
 
   /**
     * The lessor will notify all lessees that have been registered and have not
@@ -55,18 +54,14 @@ private[twitter] trait Lessor {
     * Lessees should call observeArrival when a request arrives.
     */
   def observeArrival()
-}
 
-private[twitter] object Lessor {
+private[twitter] object Lessor
   case class Param(lessor: Lessor)
-  implicit object Param extends Stack.Param[Param] {
+  implicit object Param extends Stack.Param[Param]
     val default = Param(ClockedDrainer.flagged)
-  }
 
-  val nil: Lessor = new Lessor {
+  val nil: Lessor = new Lessor
     def register(lessee: Lessee) = ()
     def unregister(lessee: Lessee) = ()
     def observe(d: Duration) = ()
     def observeArrival() = ()
-  }
-}

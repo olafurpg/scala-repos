@@ -21,7 +21,7 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
-class PEventsSpec extends Specification with TestEvents {
+class PEventsSpec extends Specification with TestEvents
 
   System.clearProperty("spark.driver.port")
   System.clearProperty("spark.hostPort")
@@ -51,9 +51,8 @@ class PEventsSpec extends Specification with TestEvents {
       dbName
   )
 
-  def stopSpark = {
+  def stopSpark =
     sc.stop()
-  }
 
   def is = s2"""
 
@@ -79,10 +78,10 @@ class PEventsSpec extends Specification with TestEvents {
 
     JDBCPEvents should
     - behave like any PEvents implementation ${events(jdbcLocal, jdbcPar)}
-    - (table cleanup) ${Step(
-        StorageTestUtils.dropJDBCTable(s"${dbName}_$appId"))}
-    - (table cleanup) ${Step(
-        StorageTestUtils.dropJDBCTable(s"${dbName}_${appId}_$channelId"))}
+    - (table cleanup) $Step(
+        StorageTestUtils.dropJDBCTable(s"${dbName}_$appId"))
+    - (table cleanup) $Step(
+        StorageTestUtils.dropJDBCTable(s"${dbName}_${appId}_$channelId"))
 
   """
 
@@ -93,10 +92,10 @@ class PEventsSpec extends Specification with TestEvents {
     - (insert test events) ${insertTestEvents(localEventClient)}
     find in default ${find(parEventClient)}
     find in channel ${findChannel(parEventClient)}
-    aggregate user properties in default ${aggregateUserProperties(
-        parEventClient)}
-    aggregate user properties in channel ${aggregateUserPropertiesChannel(
-        parEventClient)}
+    aggregate user properties in default $aggregateUserProperties(
+        parEventClient)
+    aggregate user properties in channel $aggregateUserPropertiesChannel(
+        parEventClient)
     write to default ${write(parEventClient)}
     write to channel ${writeChannel(parEventClient)}
 
@@ -109,21 +108,19 @@ class PEventsSpec extends Specification with TestEvents {
       u1e5, u2e2, u1e3, u1e1, u2e3, u2e1, u1e4, u1e2, r1, r2)
   val listOfEventsChannel = List(u3e1, u3e2, u3e3, r3, r4)
 
-  def initTest(localEventClient: LEvents) = {
+  def initTest(localEventClient: LEvents) =
     localEventClient.init(appId)
     localEventClient.init(appId, Some(channelId))
-  }
 
-  def insertTestEvents(localEventClient: LEvents) = {
+  def insertTestEvents(localEventClient: LEvents) =
     listOfEvents.map(localEventClient.insert(_, appId))
     // insert to channel
     listOfEventsChannel.map(localEventClient.insert(_, appId, Some(channelId)))
     success
-  }
 
   /* following are tests */
 
-  def find(parEventClient: PEvents) = {
+  def find(parEventClient: PEvents) =
     val resultRDD: RDD[Event] = parEventClient.find(
         appId = appId
     )(sc)
@@ -131,9 +128,8 @@ class PEventsSpec extends Specification with TestEvents {
     val results = resultRDD.collect.toList.map { _.copy(eventId = None) } // ignore eventId
 
     results must containTheSameElementsAs(listOfEvents)
-  }
 
-  def findChannel(parEventClient: PEvents) = {
+  def findChannel(parEventClient: PEvents) =
     val resultRDD: RDD[Event] = parEventClient.find(
         appId = appId,
         channelId = Some(channelId)
@@ -142,9 +138,8 @@ class PEventsSpec extends Specification with TestEvents {
     val results = resultRDD.collect.toList.map { _.copy(eventId = None) } // ignore eventId
 
     results must containTheSameElementsAs(listOfEventsChannel)
-  }
 
-  def aggregateUserProperties(parEventClient: PEvents) = {
+  def aggregateUserProperties(parEventClient: PEvents) =
     val resultRDD: RDD[(String, PropertyMap)] =
       parEventClient.aggregateProperties(
           appId = appId,
@@ -158,9 +153,8 @@ class PEventsSpec extends Specification with TestEvents {
     )
 
     result must beEqualTo(expected)
-  }
 
-  def aggregateUserPropertiesChannel(parEventClient: PEvents) = {
+  def aggregateUserPropertiesChannel(parEventClient: PEvents) =
     val resultRDD: RDD[(String, PropertyMap)] =
       parEventClient.aggregateProperties(
           appId = appId,
@@ -174,9 +168,8 @@ class PEventsSpec extends Specification with TestEvents {
     )
 
     result must beEqualTo(expected)
-  }
 
-  def write(parEventClient: PEvents) = {
+  def write(parEventClient: PEvents) =
     val written = List(r5, r6)
     val writtenRDD = sc.parallelize(written)
     parEventClient.write(writtenRDD, appId)(sc)
@@ -191,9 +184,8 @@ class PEventsSpec extends Specification with TestEvents {
     val expected = listOfEvents ++ written
 
     results must containTheSameElementsAs(expected)
-  }
 
-  def writeChannel(parEventClient: PEvents) = {
+  def writeChannel(parEventClient: PEvents) =
     val written = List(r1, r5, r6)
     val writtenRDD = sc.parallelize(written)
     parEventClient.write(writtenRDD, appId, Some(channelId))(sc)
@@ -209,5 +201,3 @@ class PEventsSpec extends Specification with TestEvents {
     val expected = listOfEventsChannel ++ written
 
     results must containTheSameElementsAs(expected)
-  }
-}

@@ -16,8 +16,8 @@ class NewScalaScriptAction
     extends CreateFromTemplateAction(
         FileTemplateManager
           .getDefaultInstance()
-          .getInternalTemplate("Scala Script")) with DumbAware {
-  override def update(e: AnActionEvent) {
+          .getInternalTemplate("Scala Script")) with DumbAware
+  override def update(e: AnActionEvent)
     super.update(e)
     val module: Module = e.getDataContext
       .getData(LangDataKeys.MODULE.getName)
@@ -26,5 +26,3 @@ class NewScalaScriptAction
     e.getPresentation.setEnabled(isEnabled)
     e.getPresentation.setVisible(isEnabled)
     e.getPresentation.setIcon(Icons.SCRIPT_FILE_LOGO)
-  }
-}

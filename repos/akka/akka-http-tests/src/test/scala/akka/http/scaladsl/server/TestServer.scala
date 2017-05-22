@@ -13,7 +13,7 @@ import akka.stream.ActorMaterializer
 import akka.http.scaladsl.Http
 import scala.concurrent.duration._
 
-object TestServer extends App {
+object TestServer extends App
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loglevel = INFO
@@ -27,34 +27,30 @@ object TestServer extends App {
   import ScalaXmlSupport._
   import Directives._
 
-  def auth: AuthenticatorPF[String] = {
+  def auth: AuthenticatorPF[String] =
     case p @ Credentials.Provided(name) if p.verify(name + "-password") ⇒ name
-  }
 
-  val bindingFuture = Http().bindAndHandle({
-    get {
-      path("") {
+  val bindingFuture = Http().bindAndHandle(
+    get
+      path("")
         withRequestTimeout(
             1.milli,
             _ ⇒
               HttpResponse(
                   StatusCodes.EnhanceYourCalm,
-                  entity = "Unable to serve response within time limit, please enchance your calm.")) {
+                  entity = "Unable to serve response within time limit, please enchance your calm."))
           Thread.sleep(1000)
           complete(index)
-        }
-      } ~ path("secure") {
-        authenticateBasicPF("My very secure site", auth) { user ⇒
+      ~ path("secure")
+        authenticateBasicPF("My very secure site", auth)  user ⇒
           complete(
               <html><body>Hello <b>{ user }</b>. Access has been granted!</body></html>)
-        }
-      } ~ path("ping") {
+      ~ path("ping")
         complete("PONG!")
-      } ~ path("crash") {
+      ~ path("crash")
         complete(sys.error("BOOM!"))
-      }
-    } ~ pathPrefix("inner")(getFromResourceDirectory("someDir"))
-  }, interface = "localhost", port = 8080)
+    ~ pathPrefix("inner")(getFromResourceDirectory("someDir"))
+  , interface = "localhost", port = 8080)
 
   println(s"Server online at http://localhost:8080/\nPress RETURN to stop...")
   Console.readLine()
@@ -72,4 +68,3 @@ object TestServer extends App {
         </ul>
       </body>
     </html>
-}

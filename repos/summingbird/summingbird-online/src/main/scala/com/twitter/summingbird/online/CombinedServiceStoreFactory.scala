@@ -25,33 +25,28 @@ trait CombinedServiceStoreFactory[-K, V]
     extends MergeableStoreFactory[(K, BatchID), V]
     with OnlineServiceFactory[K, V]
 
-object CombinedServiceStoreFactory {
+object CombinedServiceStoreFactory
 
   def apply[K, V](
       onlineStore: => MergeableStore[(K, BatchID), V], batchesToKeep: Int)(
-      implicit b: Batcher) = {
+      implicit b: Batcher) =
 
     lazy val clientStore =
       ClientStore[K, V](onlineStore, batchesToKeep)(b, onlineStore.semigroup)
 
-    new CombinedServiceStoreFactory[K, V] {
+    new CombinedServiceStoreFactory[K, V]
       def mergeableStore = () => onlineStore
       def mergeableBatcher = b
       def serviceStore = () => clientStore
-    }
-  }
 
   def apply[K, V](offlineStore: => ReadableStore[K, (BatchID, V)],
                   onlineStore: => MergeableStore[(K, BatchID), V],
-                  batchesToKeep: Int)(implicit b: Batcher) = {
+                  batchesToKeep: Int)(implicit b: Batcher) =
 
     lazy val clientStore = ClientStore[K, V](
         offlineStore, onlineStore, batchesToKeep)(b, onlineStore.semigroup)
 
-    new CombinedServiceStoreFactory[K, V] {
+    new CombinedServiceStoreFactory[K, V]
       def mergeableStore = () => onlineStore
       def mergeableBatcher = b
       def serviceStore = () => clientStore
-    }
-  }
-}

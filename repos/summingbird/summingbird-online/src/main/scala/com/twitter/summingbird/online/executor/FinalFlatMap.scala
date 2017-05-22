@@ -40,10 +40,9 @@ import scala.util.control.NonFatal
 // This is not a user settable variable.
 // Its supplied by the planning system usually to ensure its large enough to cover the space
 // used by the summers times some delta.
-private[summingbird] case class KeyValueShards(get: Int) {
+private[summingbird] case class KeyValueShards(get: Int)
   def summerIdFor[K](k: K): Int =
     math.abs(k.hashCode % get)
-}
 
 class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
     @transient flatMapOp: FlatMapOperation[Event, (Key, Value)],
@@ -55,7 +54,7 @@ class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
     pDecoder: Injection[Event, D],
     pEncoder: Injection[(Int, CMap[Key, Value]), D])
     extends AsyncBase[Event, (Int, CMap[Key, Value]), S, D, RC](
-        maxWaitingFutures, maxWaitingTime, maxEmitPerExec) {
+        maxWaitingFutures, maxWaitingTime, maxEmitPerExec)
 
   type InS = S
   type OutputElement = (Int, CMap[Key, Value])
@@ -76,27 +75,23 @@ class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
   )
 
   private def formatResult(outData: Map[Key, (Seq[S], Value)])
-    : TraversableOnce[(Seq[S], Future[TraversableOnce[OutputElement]])] = {
-    if (outData.isEmpty) {
+    : TraversableOnce[(Seq[S], Future[TraversableOnce[OutputElement]])] =
+    if (outData.isEmpty)
       noData
-    } else {
+    else
       var mmMap = MMap[Int, (ListBuffer[S], MMap[Key, Value])]()
 
-      outData.toIterator.foreach {
+      outData.toIterator.foreach
         case (k, (listS, v)) =>
           val newK = summerShards.summerIdFor(k)
           val (buffer, mmap) =
             mmMap.getOrElseUpdate(newK, (ListBuffer[S](), MMap[Key, Value]()))
           buffer ++= listS
           mmap += k -> v
-      }
 
-      mmMap.toIterator.map {
+      mmMap.toIterator.map
         case (outerKey, (listS, innerMap)) =>
           (listS, Future.value(List((outerKey, innerMap))))
-      }
-    }
-  }
 
   override def tick: Future[TraversableOnce[
           (Seq[S], Future[TraversableOnce[OutputElement]])]] =
@@ -104,33 +99,29 @@ class FinalFlatMap[Event, Key, Value : Semigroup, S <: InputState[_], D, RC](
 
   def cache(state: S, items: TraversableOnce[(Key, Value)]): Future[
       TraversableOnce[(Seq[S], Future[TraversableOnce[OutputElement]])]] =
-    try {
+    try
       val itemL = items.toList
-      if (itemL.size > 0) {
+      if (itemL.size > 0)
         state.fanOut(itemL.size)
         sCache
-          .addAll(itemL.map {
+          .addAll(itemL.map
             case (k, v) =>
               k -> (List(state), v)
-          })
+          )
           .map(formatResult(_))
-      } else {
+      else
         // Here we handle mapping to nothing, option map et. al
         Future.value(
             List(
                 (List(state), Future.value(Nil))
             )
         )
-      }
-    } catch {
+    catch
       case NonFatal(e) => Future.exception(e)
-    }
 
   override def apply(state: S, tup: Event) =
     lockedOp.get.apply(tup).map { cache(state, _) }.flatten
 
-  override def cleanup {
+  override def cleanup
     lockedOp.get.close
     sCache.cleanup
-  }
-}

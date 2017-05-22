@@ -10,7 +10,7 @@ import scala.util.{Try, Failure => Fail, Success => Succ}
 import scalaz.{Failure, _}
 import scalaz.syntax.validation._
 
-trait CommandExecutors {
+trait CommandExecutors
 
   implicit def syncExecutor[T <: Command, S](handler: T => ModelValidation[S])
     : CommandExecutor[T, ModelValidation[S]] =
@@ -32,7 +32,6 @@ trait CommandExecutors {
       implicit executionContext: ExecutionContext,
       vw: T => S): CommandExecutor[T, Future[ModelValidation[S]]] =
     new AsyncModelExecutor[T, S](handler)
-}
 
 object CommandExecutors extends CommandExecutors
 
@@ -47,28 +46,27 @@ object CommandExecutors extends CommandExecutors
 @implicitNotFound(
     "Couldn't find an executor for command of type ${T} and result of type ${S}. Did you import org.scalatra.commands.CommandExecutors._ ? You can also implement your own org.scalatra.CommandExecutor."
 )
-abstract class CommandExecutor[T <: Command, S](handler: T => S) {
+abstract class CommandExecutor[T <: Command, S](handler: T => S)
   def execute(command: T): S
-}
 
 abstract class BlockingExecutor[T <: Command, S](
     handle: T => ModelValidation[S])
-    extends CommandExecutor[T, ModelValidation[S]](handle) {
+    extends CommandExecutor[T, ModelValidation[S]](handle)
   @transient private[this] val logger = Logger(getClass)
 
-  def execute(cmd: T): ModelValidation[S] = {
+  def execute(cmd: T): ModelValidation[S] =
     logger.debug(s"Executing [${cmd.getClass.getName}].\n$cmd")
-    if (cmd.isValid) {
+    if (cmd.isValid)
       val res = Try(handle(cmd))
 
-      res match {
+      res match
         case Succ(r) ⇒
           def plur(count: Int) = if (count == 1) "failure" else "failures"
-          val resultLog = r.fold({ failures ⇒
+          val resultLog = r.fold( failures ⇒
             s"with ${failures.size} ${plur(failures.size)}\n${failures.list}"
-          }, { _ ⇒
+          ,  _ ⇒
             "successfully"
-          })
+          )
           logger.debug(
               s"Command [${cmd.getClass.getName}] executed $resultLog")
           r
@@ -77,19 +75,14 @@ abstract class BlockingExecutor[T <: Command, S](
           ValidationError(
               s"Failed to execute ${cmd.getClass.getSimpleName.underscore.humanize}",
               UnknownError).failureNel[S]
-      }
-    } else {
+    else
       val f =
-        cmd.errors.map(_.validation) collect {
+        cmd.errors.map(_.validation) collect
           case Failure(e) ⇒ e
-        }
       def failures = if (f.size == 1) "failure" else "failures"
       logger.debug(
           s"Command [${cmd.getClass.getName}}] executed with ${f.size} $failures.\n${f.toList}")
       NonEmptyList(f.head, f.tail: _*).failure
-    }
-  }
-}
 
 /**
   * A command executor that can potentially block while executing the command
@@ -122,44 +115,38 @@ class BlockingModelExecutor[T <: Command <% S, S](
 abstract class AsyncExecutor[T <: Command, S](
     handle: T => Future[ModelValidation[S]])(
     implicit executionContext: ExecutionContext)
-    extends CommandExecutor[T, Future[ModelValidation[S]]](handle) {
+    extends CommandExecutor[T, Future[ModelValidation[S]]](handle)
   @transient private[this] val logger = Logger(getClass)
-  def execute(cmd: T): Future[ModelValidation[S]] = {
+  def execute(cmd: T): Future[ModelValidation[S]] =
     logger.debug(s"Executing [${cmd.getClass.getName}].\n$cmd")
-    if (cmd.isValid) {
+    if (cmd.isValid)
       val res = handle(cmd)
 
-      res onSuccess {
+      res onSuccess
         case r ⇒
           def plur(count: Int) = if (count == 1) "failure" else "failures"
-          val resultLog = r.fold({ failures ⇒
+          val resultLog = r.fold( failures ⇒
             s"with ${failures.size} ${plur(failures.size)}.\n${failures.list}"
-          }, { _ ⇒
+          ,  _ ⇒
             "successfully"
-          })
+          )
           logger.debug(
               s"Command [${cmd.getClass.getName}] executed $resultLog")
-      }
 
-      res recover {
+      res recover
         case t: Throwable =>
           logger.error(s"Command [${cmd.getClass.getName}] failed.", t)
           ValidationError(
               s"Failed to execute ${cmd.getClass.getSimpleName.underscore.humanize}",
               UnknownError).failureNel[S]
-      }
-    } else {
+    else
       val f =
-        cmd.errors.map(_.validation) collect {
+        cmd.errors.map(_.validation) collect
           case Failure(e) ⇒ e
-        }
       def failures = if (f.size == 1) "failure" else "failures"
       logger.debug(
           s"Command [${cmd.getClass.getName}] executed with ${f.size} $failures.\n${f.toList}")
       Future.successful(NonEmptyList(f.head, f.tail: _*).failure)
-    }
-  }
-}
 
 /**
   * A command executor that doesn't block while executing the command

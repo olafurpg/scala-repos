@@ -1,4 +1,4 @@
-object Implicit {
+object Implicit
 
   final class AppliedImplicit[A](val x: A)
 
@@ -6,4 +6,3 @@ object Implicit {
     new AppliedImplicit(x)
 
   this. /*!*/ x
-}

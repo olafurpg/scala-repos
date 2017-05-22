@@ -9,9 +9,9 @@ import org.junit.runner.RunWith
 import org.jboss.netty.channel.{Channels, Channel, ChannelHandlerContext, ChannelStateEvent, ChannelPipeline}
 
 @RunWith(classOf[JUnitRunner])
-class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {
+class ChannelClosingHandlerTest extends FunSuite with MockitoSugar
 
-  class ChannelHelper {
+  class ChannelHelper
     val channel = mock[Channel]
     val closeFuture = Channels.future(channel)
     when(channel.close()) thenReturn closeFuture
@@ -24,10 +24,9 @@ class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {
 
     when(ctx.getPipeline) thenReturn pipeline
     when(ctx.getChannel) thenReturn channel
-  }
 
   test(
-      "ChannelClosingHandler should close the channel immediately when channel is already open") {
+      "ChannelClosingHandler should close the channel immediately when channel is already open")
     val h = new ChannelHelper
     import h._
 
@@ -35,10 +34,9 @@ class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {
     verify(channel, times(0)).close()
     handler.close()
     verify(channel, times(1)).close()
-  }
 
   test(
-      "ChannelClosingHandler should close the channel immediately when channel is attached") {
+      "ChannelClosingHandler should close the channel immediately when channel is attached")
     val h = new ChannelHelper
     import h._
 
@@ -46,10 +44,9 @@ class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {
     verify(channel, times(0)).close()
     handler.close()
     verify(channel, times(1)).close()
-  }
 
   test(
-      "ChannelClosingHandler should delay closing until it has been opened before channel has been opened") {
+      "ChannelClosingHandler should delay closing until it has been opened before channel has been opened")
     val h = new ChannelHelper
     import h._
 
@@ -58,10 +55,9 @@ class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {
 
     handler.channelOpen(ctx, e)
     verify(channel, times(1)).close()
-  }
 
   test(
-      "ChannelClosingHandler should delay closing until it has been opened before channel has been attached") {
+      "ChannelClosingHandler should delay closing until it has been opened before channel has been attached")
     val h = new ChannelHelper
     import h._
 
@@ -70,5 +66,3 @@ class ChannelClosingHandlerTest extends FunSuite with MockitoSugar {
 
     handler.beforeAdd(ctx)
     verify(channel, times(1)).close()
-  }
-}

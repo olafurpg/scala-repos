@@ -36,7 +36,7 @@ import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.util.{MutableURLClassLoader, Utils}
 
 /** Factory for `IsolatedClientLoader` with specific versions of hive. */
-private[hive] object IsolatedClientLoader extends Logging {
+private[hive] object IsolatedClientLoader extends Logging
 
   /**
     * Creates isolated Hive client loaders by downloading the requested version from maven.
@@ -50,19 +50,19 @@ private[hive] object IsolatedClientLoader extends Logging {
       ivyPath: Option[String] = None,
       sharedPrefixes: Seq[String] = Seq.empty,
       barrierPrefixes: Seq[String] = Seq.empty): IsolatedClientLoader =
-    synchronized {
+    synchronized
       val resolvedVersion = hiveVersion(hiveMetastoreVersion)
       // We will first try to share Hadoop classes. If we cannot resolve the Hadoop artifact
       // with the given version, we will use Hadoop 2.4.0 and then will not share Hadoop classes.
       var sharesHadoopClasses = true
       val files =
-        if (resolvedVersions.contains((resolvedVersion, hadoopVersion))) {
+        if (resolvedVersions.contains((resolvedVersion, hadoopVersion)))
           resolvedVersions((resolvedVersion, hadoopVersion))
-        } else {
-          val (downloadedFiles, actualHadoopVersion) = try {
+        else
+          val (downloadedFiles, actualHadoopVersion) = try
             (downloadVersion(resolvedVersion, hadoopVersion, ivyPath),
              hadoopVersion)
-          } catch {
+          catch
             case e: RuntimeException if e.getMessage.contains("hadoop") =>
               // If the error message contains hadoop, it is probably because the hadoop
               // version cannot be resolved (e.g. it is a vendor specific version like
@@ -77,11 +77,9 @@ private[hive] object IsolatedClientLoader extends Logging {
                   "spark.sql.hive.metastore.jars in the production environment.")
               sharesHadoopClasses = false
               (downloadVersion(resolvedVersion, "2.4.0", ivyPath), "2.4.0")
-          }
           resolvedVersions.put(
               (resolvedVersion, actualHadoopVersion), downloadedFiles)
           resolvedVersions((resolvedVersion, actualHadoopVersion))
-        }
 
       new IsolatedClientLoader(hiveVersion(hiveMetastoreVersion),
                                sparkConf,
@@ -91,20 +89,18 @@ private[hive] object IsolatedClientLoader extends Logging {
                                sharesHadoopClasses = sharesHadoopClasses,
                                sharedPrefixes = sharedPrefixes,
                                barrierPrefixes = barrierPrefixes)
-    }
 
-  def hiveVersion(version: String): HiveVersion = version match {
+  def hiveVersion(version: String): HiveVersion = version match
     case "12" | "0.12" | "0.12.0" => hive.v12
     case "13" | "0.13" | "0.13.0" | "0.13.1" => hive.v13
     case "14" | "0.14" | "0.14.0" => hive.v14
     case "1.0" | "1.0.0" => hive.v1_0
     case "1.1" | "1.1.0" => hive.v1_1
     case "1.2" | "1.2.0" | "1.2.1" => hive.v1_2
-  }
 
   private def downloadVersion(version: HiveVersion,
                               hadoopVersion: String,
-                              ivyPath: Option[String]): Seq[URL] = {
+                              ivyPath: Option[String]): Seq[URL] =
     val hiveArtifacts =
       version.extraDeps ++ Seq("hive-metastore",
                                "hive-exec",
@@ -115,26 +111,23 @@ private[hive] object IsolatedClientLoader extends Logging {
           "com.google.guava:guava:14.0.1",
           s"org.apache.hadoop:hadoop-client:$hadoopVersion")
 
-    val classpath = quietly {
+    val classpath = quietly
       SparkSubmitUtils.resolveMavenCoordinates(
           hiveArtifacts.mkString(","),
           Some("http://www.datanucleus.org/downloads/maven2"),
           ivyPath,
           exclusions = version.exclusions)
-    }
     val allFiles = classpath.split(",").map(new File(_)).toSet
 
     // TODO: Remove copy logic.
     val tempDir = Utils.createTempDir(namePrefix = s"hive-${version}")
     allFiles.foreach(f => FileUtils.copyFileToDirectory(f, tempDir))
     tempDir.listFiles().map(_.toURI.toURL)
-  }
 
   // A map from a given pair of HiveVersion and Hadoop version to jar files.
   // It is only used by forVersion.
   private val resolvedVersions =
     new scala.collection.mutable.HashMap[(HiveVersion, String), Seq[URL]]
-}
 
 /**
   * Creates a [[HiveClient]] using a classloader that works according to the following rules:
@@ -171,7 +164,7 @@ private[hive] class IsolatedClientLoader(
         .getContextClassLoader,
     val sharedPrefixes: Seq[String] = Seq.empty,
     val barrierPrefixes: Seq[String] = Seq.empty)
-    extends Logging {
+    extends Logging
 
   // Check to make sure that the root classloader does not know about Hive.
   assert(
@@ -180,7 +173,7 @@ private[hive] class IsolatedClientLoader(
   /** All jars used by the hive specific classloader. */
   protected def allJars = execJars.toArray
 
-  protected def isSharedClass(name: String): Boolean = {
+  protected def isSharedClass(name: String): Boolean =
     val isHadoopClass =
       name.startsWith("org.apache.hadoop.") &&
       !name.startsWith("org.apache.hadoop.hive.")
@@ -191,7 +184,6 @@ private[hive] class IsolatedClientLoader(
     (name.startsWith("com.google") && !name.startsWith("com.google.cloud")) ||
     name.startsWith("java.lang.") || name.startsWith("java.net") ||
     sharedPrefixes.exists(name.startsWith)
-  }
 
   /** True if `name` refers to a spark class that must see specific version of Hive. */
   protected def isBarrierClass(name: String): Boolean =
@@ -208,96 +200,83 @@ private[hive] class IsolatedClientLoader(
     * So, when we add jar, we can add this new jar directly through the addURL method
     * instead of stacking a new URLClassLoader on top of it.
     */
-  private[hive] val classLoader: MutableURLClassLoader = {
+  private[hive] val classLoader: MutableURLClassLoader =
     val isolatedClassLoader =
-      if (isolationOn) {
-        new URLClassLoader(allJars, rootClassLoader) {
-          override def loadClass(name: String, resolve: Boolean): Class[_] = {
+      if (isolationOn)
+        new URLClassLoader(allJars, rootClassLoader)
+          override def loadClass(name: String, resolve: Boolean): Class[_] =
             val loaded = findLoadedClass(name)
             if (loaded == null) doLoadClass(name, resolve) else loaded
-          }
-          def doLoadClass(name: String, resolve: Boolean): Class[_] = {
+          def doLoadClass(name: String, resolve: Boolean): Class[_] =
             val classFileName = name.replaceAll("\\.", "/") + ".class"
-            if (isBarrierClass(name)) {
+            if (isBarrierClass(name))
               // For barrier classes, we construct a new copy of the class.
               val bytes = IOUtils.toByteArray(
                   baseClassLoader.getResourceAsStream(classFileName))
               logDebug(
                   s"custom defining: $name - ${util.Arrays.hashCode(bytes)}")
               defineClass(name, bytes, 0, bytes.length)
-            } else if (!isSharedClass(name)) {
+            else if (!isSharedClass(name))
               logDebug(
                   s"hive class: $name - ${getResource(classToPath(name))}")
               super.loadClass(name, resolve)
-            } else {
+            else
               // For shared classes, we delegate to baseClassLoader.
               logDebug(s"shared class: $name")
               baseClassLoader.loadClass(name)
-            }
-          }
-        }
-      } else {
+      else
         baseClassLoader
-      }
     // Right now, we create a URLClassLoader that gives preference to isolatedClassLoader
     // over its own URLs when it loads classes and resources.
     // We may want to use ChildFirstURLClassLoader based on
     // the configuration of spark.executor.userClassPathFirst, which gives preference
     // to its own URLs over the parent class loader (see Executor's createClassLoader method).
     new NonClosableMutableURLClassLoader(isolatedClassLoader)
-  }
 
-  private[hive] def addJar(path: URL): Unit = synchronized {
+  private[hive] def addJar(path: URL): Unit = synchronized
     classLoader.addURL(path)
-  }
 
   /** The isolated client interface to Hive. */
-  private[hive] def createClient(): HiveClient = {
-    if (!isolationOn) {
+  private[hive] def createClient(): HiveClient =
+    if (!isolationOn)
       return new HiveClientImpl(
           version, sparkConf, hadoopConf, config, baseClassLoader, this)
-    }
     // Pre-reflective instantiation setup.
     logDebug("Initializing the logger to avoid disaster...")
     val origLoader = Thread.currentThread().getContextClassLoader
     Thread.currentThread.setContextClassLoader(classLoader)
 
-    try {
+    try
       classLoader
         .loadClass(classOf[HiveClientImpl].getName)
         .getConstructors
         .head
         .newInstance(version, sparkConf, hadoopConf, config, classLoader, this)
         .asInstanceOf[HiveClient]
-    } catch {
+    catch
       case e: InvocationTargetException =>
-        if (e.getCause().isInstanceOf[NoClassDefFoundError]) {
+        if (e.getCause().isInstanceOf[NoClassDefFoundError])
           val cnf = e.getCause().asInstanceOf[NoClassDefFoundError]
           throw new ClassNotFoundException(
               s"$cnf when creating Hive client using classpath: ${execJars.mkString(", ")}\n" +
               "Please make sure that jars for your version of hive and hadoop are included in the " +
               s"paths passed to ${HiveContext.HIVE_METASTORE_JARS}.")
-        } else {
+        else
           throw e
-        }
-    } finally {
+    finally
       Thread.currentThread.setContextClassLoader(origLoader)
-    }
-  }
 
   /**
     * The place holder for shared Hive client for all the HiveContext sessions (they share an
     * IsolatedClientLoader).
     */
   private[hive] var cachedHive: Any = null
-}
 
 /**
   * URL class loader that exposes the `addURL` and `getURLs` methods in URLClassLoader.
   * This class loader cannot be closed (its `close` method is a no-op).
   */
 private[sql] class NonClosableMutableURLClassLoader(parent: ClassLoader)
-    extends MutableURLClassLoader(Array.empty, parent) {
+    extends MutableURLClassLoader(Array.empty, parent)
 
   override def close(): Unit = {}
-}

@@ -10,7 +10,7 @@ import akka.persistence.query.EventEnvelope
 /**
   * A plugin may optionally support this query by implementing this interface.
   */
-trait CurrentEventsByPersistenceIdQuery extends ReadJournal {
+trait CurrentEventsByPersistenceIdQuery extends ReadJournal
 
   /**
     * Same type of query as [[EventsByPersistenceIdQuery#eventsByPersistenceId]]
@@ -22,4 +22,3 @@ trait CurrentEventsByPersistenceIdQuery extends ReadJournal {
       persistenceId: String,
       fromSequenceNr: Long,
       toSequenceNr: Long): Source[EventEnvelope, NotUsed]
-}

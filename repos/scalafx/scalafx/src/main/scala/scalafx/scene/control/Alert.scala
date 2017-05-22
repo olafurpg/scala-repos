@@ -36,7 +36,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 import scalafx.scene.control.Alert.AlertType
 
-object Alert {
+object Alert
 
   /**
     * Converts a ScalaFX Alert to its JavaFX counterpart.
@@ -52,7 +52,7 @@ object Alert {
     * the `Alert` class can use to pre-populate various properties.
     */
   object AlertType
-      extends SFXEnumDelegateCompanion[jfxsc.Alert.AlertType, AlertType] {
+      extends SFXEnumDelegateCompanion[jfxsc.Alert.AlertType, AlertType]
 
     /**
       * The `None` alert type has the effect of not setting any default properties
@@ -98,11 +98,9 @@ object Alert {
     /** Contain constants which will be source for `values` List  */
     override protected def unsortedValues =
       Array(None, Information, Warning, Confirmation, Error)
-  }
 
   sealed case class AlertType(override val delegate: jfxsc.Alert.AlertType)
       extends SFXEnumDelegate[jfxsc.Alert.AlertType]
-}
 
 /**
   * The Alert class subclasses the `Dialog` class, and provides support for a number
@@ -149,7 +147,7 @@ object Alert {
   * @define ORIGINALDOC Original Documentation]].
   */
 class Alert(override val delegate: jfxsc.Alert)
-    extends Dialog[jfxsc.ButtonType](delegate) with SFXDelegate[jfxsc.Alert] {
+    extends Dialog[jfxsc.ButtonType](delegate) with SFXDelegate[jfxsc.Alert]
 
   /**
     * Creates an alert with the given AlertType (refer to the `AlertType`
@@ -198,25 +196,21 @@ class Alert(override val delegate: jfxsc.Alert)
     *
     * @return An `Option` that contains the `result`.
     */
-  def showAndWait(): Option[ButtonType] = {
+  def showAndWait(): Option[ButtonType] =
     super
       .showAndWait((x: jfxsc.ButtonType) => new ButtonType(x))
       .asInstanceOf[Option[ButtonType]]
-  }
 
   def alertType: ObjectProperty[jfxsc.Alert.AlertType] =
     delegate.alertTypeProperty
-  def alertType_=(v: AlertType) {
+  def alertType_=(v: AlertType)
     alertType() = v
-  }
 
   /**
     * Returns an `ObservableBuffer` of all `ButtonType` instances that
     * are currently set inside this Alert instance.
     */
   def buttonTypes: ObservableBuffer[jfxsc.ButtonType] = delegate.getButtonTypes
-  def buttonTypes_=(types: Iterable[ButtonType]): Unit = {
+  def buttonTypes_=(types: Iterable[ButtonType]): Unit =
     buttonTypes.clear()
     buttonTypes ++= types.map(_.delegate)
-  }
-}

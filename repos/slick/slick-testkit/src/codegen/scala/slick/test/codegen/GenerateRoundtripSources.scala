@@ -12,8 +12,8 @@ import slick.jdbc.JdbcProfile
   * works with all backends. If the code was generated using model data where the size is included
   * it would fail in derby and hsqldb. The code is tested using all enabled profiles. We should also
   * diversify generation as well at some point. */
-object GenerateRoundtripSources {
-  def main(args: Array[String]) {
+object GenerateRoundtripSources
+  def main(args: Array[String])
     val profile = slick.jdbc.H2Profile
     val url = "jdbc:h2:mem:test4"
     val jdbcDriver = "org.h2.Driver"
@@ -26,21 +26,19 @@ object GenerateRoundtripSources {
       .createModel(ignoreInvalidDefaults = false)
       .map(
           m =>
-            new SourceCodeGenerator(m) {
-          override def tableName = {
+            new SourceCodeGenerator(m)
+          override def tableName =
             case n if n.toLowerCase == "null" =>
               "null" // testing null as table name
             case n => super.tableName(n)
-          }
-      })
+      )
     val a2 = profile
       .createModel(ignoreInvalidDefaults = false)
       .map(m =>
-            new SourceCodeGenerator(m) {
-          override def Table = new Table(_) {
+            new SourceCodeGenerator(m)
+          override def Table = new Table(_)
             override def autoIncLastAsOption = true
-          }
-      })
+      )
     val db = Database.forURL(
         url = url, driver = jdbcDriver, keepAliveConnection = true)
     val (gen, gen2) = try Await.result(
@@ -48,47 +46,41 @@ object GenerateRoundtripSources {
     val pkg = "slick.test.codegen.roundtrip"
     gen.writeToFile("slick.jdbc.H2Profile", args(0), pkg)
     gen2.writeToFile("slick.jdbc.H2Profile", args(0), pkg + "2")
-  }
-}
 
-class Tables(val profile: JdbcProfile) {
+class Tables(val profile: JdbcProfile)
   import profile.api._
 
   /** Tests single column table, scala keyword type name, non-dentifier column name and all nullable columns table*/
-  class `null`(tag: Tag) extends Table[Option[String]](tag, "null") {
+  class `null`(tag: Tag) extends Table[Option[String]](tag, "null")
     def name = column[Option[String]]("na me")
     def * = name
-  }
   val `null` = TableQuery[`null`]
 
   /** Tests table with self-referring foreign key */
-  class SelfRef(tag: Tag) extends Table[(Int, Option[Int])](tag, "SELF_REF") {
+  class SelfRef(tag: Tag) extends Table[(Int, Option[Int])](tag, "SELF_REF")
     def id = column[Int]("id", O.AutoInc)
     def parent = column[Option[Int]]("parent")
     def parentFK = foreignKey("parent_fk", parent, SelfRef)(_.id.?)
     def * = (id, parent)
-  }
   val SelfRef = TableQuery[SelfRef]
 
   /** Tests single column table, scala keyword type name and all nullable columns table*/
   class SingleNonOptionColumn(tag: Tag)
-      extends Table[String](tag, "SingleNonOptionColumn") {
+      extends Table[String](tag, "SingleNonOptionColumn")
     def name = column[String]("name")
     def * = name
-  }
   val SingleNonOptionColumn = TableQuery[SingleNonOptionColumn]
 
   /** Tests single column table and collision with generated names */
-  class all(tag: Tag) extends Table[String](tag, "all") {
+  class all(tag: Tag) extends Table[String](tag, "all")
     def dynamic = column[String]("dynamic")
     def * = dynamic
-  }
   val all = TableQuery[all]
 
   /** Tests slick term name collision */
   class X(tag: Tag)
       extends Table[(Int, Int, Option[Int], Int, Double, String, Option[Int], Option[
-              Int], Option[String], Option[String], Option[String])](tag, "X") {
+              Int], Option[String], Option[String], Option[String])](tag, "X")
     def pk = column[Int]("pk")
     def pk2 = column[Int]("pk2")
     def pkpk = primaryKey("", (pk, pk2)) // pk column collision
@@ -116,26 +108,23 @@ class Tables(val profile: JdbcProfile) {
     def categoryFK2 = foreignKey("fk2", pk2, categories)(_.id)
     def postsFK =
       foreignKey("fk_to_posts", p, posts)(_.id.?) // fk column name collision
-  }
   val X = TableQuery[X]
 
   case class Category(id: Int, name: String)
-  class Categories(tag: Tag) extends Table[Category](tag, "categories") {
+  class Categories(tag: Tag) extends Table[Category](tag, "categories")
     def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
     def name = column[String]("name", O.Length(254))
     def * = (id, name) <> (Category.tupled, Category.unapply)
     def idx = index("IDX_NAME", name)
-  }
   val categories = TableQuery[Categories]
 
   class Posts(tag: Tag)
-      extends Table[(Int, String, Option[Int])](tag, "POSTS") {
+      extends Table[(Int, String, Option[Int])](tag, "POSTS")
     def id = column[Int]("id")
     def title = column[String]("title")
     def category = column[Option[Int]]("category")
     def * = (id, title, category)
     def categoryFK = foreignKey("_", category, categories)(_.id.?)
-  }
   val posts = TableQuery[Posts]
 
   // Clob disabled because it fails in postgres and mysql, see https://github.com/slick/slick/issues/637
@@ -146,7 +135,7 @@ class Tables(val profile: JdbcProfile) {
               Int], Option[Long], Option[Float], Option[Double], Option[String], Option[
               java.sql.Date], Option[java.sql.Time], Option[java.sql.Timestamp], Option[
               java.util.UUID], Option[java.sql.Blob] //,Option[java.sql.Clob]
-          ))](tag, "TYPE_TEST") {
+          ))](tag, "TYPE_TEST")
     def `type` = column[String]("type") // <- test escaping of keywords
     def Boolean = column[Boolean]("Boolean", O.Default(true))
     def Byte = column[Byte]("Byte")
@@ -230,14 +219,13 @@ class Tables(val profile: JdbcProfile) {
         )
     )
     def pk = primaryKey("PK", (Int, Long))
-  }
   val typeTest = TableQuery[TypeTest]
 
   // testing table larger 22 columns (code gen round trip does not preserve structure of the * projection or names of mapped to classes)
   case class Part(i1: Int, i2: Int, i3: Int, i4: Int, i5: Int, i6: Int)
   case class Whole(
       id: Long, p1: Part, p2: Part, p3: Part, p4: Part, p5: Part, p6: Part)
-  class Large(tag: Tag) extends Table[Whole](tag, "LARGE") {
+  class Large(tag: Tag) extends Table[Whole](tag, "LARGE")
     def id = column[Long]("id", O.PrimaryKey)
     def p1i1 = column[Int]("p1i1", O.Default(11))
     def p1i2 = column[Int]("p1i2", O.Default(12))
@@ -285,7 +273,7 @@ class Tables(val profile: JdbcProfile) {
           (p5i1, p5i2, p5i3, p5i4, p5i5, p5i6),
           (p6i1, p6i2, p6i3, p6i4, p6i5, p6i6)
       ).shaped <>
-      ({
+      (
         case (id, p1, p2, p3, p4, p5, p6) =>
           // We could do this without .shaped but then we'd have to write a type annotation for the parameters
           Whole(id,
@@ -295,10 +283,8 @@ class Tables(val profile: JdbcProfile) {
                 Part.tupled.apply(p4),
                 Part.tupled.apply(p5),
                 Part.tupled.apply(p6))
-      }, { w: Whole =>
+      ,  w: Whole =>
         def f(p: Part) = Part.unapply(p).get
         Some((w.id, f(w.p1), f(w.p2), f(w.p3), f(w.p4), f(w.p5), f(w.p6)))
-      })
-  }
+      )
   val large = TableQuery[Large]
-}

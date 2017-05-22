@@ -15,19 +15,16 @@ import com.codahale.metrics.jvm.FileDescriptorRatioGauge
   */
 private[akka] class FileDescriptorMetricSet(
     os: OperatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean)
-    extends MetricSet {
+    extends MetricSet
 
-  override def getMetrics: util.Map[String, Metric] = {
-    Map[String, Metric](name("file-descriptors", "open") -> new Gauge[Long] {
+  override def getMetrics: util.Map[String, Metric] =
+    Map[String, Metric](name("file-descriptors", "open") -> new Gauge[Long]
       override def getValue: Long = invoke("getOpenFileDescriptorCount")
-    }, name("file-descriptors", "max") -> new Gauge[Long] {
+    , name("file-descriptors", "max") -> new Gauge[Long]
       override def getValue: Long = invoke("getMaxFileDescriptorCount")
-    }, name("file-descriptors", "ratio") -> new FileDescriptorRatioGauge(os)).asJava
-  }
+    , name("file-descriptors", "ratio") -> new FileDescriptorRatioGauge(os)).asJava
 
-  private def invoke(name: String): Long = {
+  private def invoke(name: String): Long =
     val method = os.getClass.getDeclaredMethod(name)
     method.setAccessible(true)
     method.invoke(os).asInstanceOf[Long]
-  }
-}

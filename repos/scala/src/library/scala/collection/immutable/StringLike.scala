@@ -18,13 +18,12 @@ import scala.reflect.ClassTag
 /** A companion object for the `StringLike` containing some constants.
   *  @since 2.8
   */
-object StringLike {
+object StringLike
   // just statics for companion class.
   private final val LF = 0x0A
   private final val FF = 0x0C
   private final val CR = 0x0D
   private final val SU = 0x1A
-}
 
 import StringLike._
 
@@ -42,7 +41,7 @@ import StringLike._
   */
 trait StringLike[+Repr]
     extends Any with scala.collection.IndexedSeqOptimized[Char, Repr]
-    with Ordered[String] {
+    with Ordered[String]
   self =>
 
   /** Creates a string builder buffer as builder for this class */
@@ -57,21 +56,19 @@ trait StringLike[+Repr]
 
   override def mkString = toString
 
-  override def slice(from: Int, until: Int): Repr = {
+  override def slice(from: Int, until: Int): Repr =
     val start = from max 0
     val end = until min length
 
     if (start >= end) newBuilder.result()
     else (newBuilder ++= toString.substring(start, end)).result()
-  }
 
   /** Return the current string concatenated `n` times.
     */
-  def *(n: Int): String = {
+  def *(n: Int): String =
     val buf = new StringBuilder
     for (i <- 0 until n) buf append toString
     buf.toString
-  }
 
   override def compare(other: String) = toString compareTo other
 
@@ -87,18 +84,16 @@ trait StringLike[+Repr]
     *  If a line feed character `LF` is preceded by a carriage return `CR`
     *  (`0x0D` hex), the `CR` character is also stripped (Windows convention).
     */
-  def stripLineEnd: String = {
+  def stripLineEnd: String =
     val len = toString.length
     if (len == 0) toString
-    else {
+    else
       val last = apply(len - 1)
       if (isLineBreak(last))
         toString.substring(0,
                            if (last == LF && len >= 2 && apply(len - 2) == CR)
                              len - 2 else len - 1)
       else toString
-    }
-  }
 
   /** Return all lines in this string in an iterator, including trailing
     *  line end characters.
@@ -109,20 +104,18 @@ trait StringLike[+Repr]
     *  - `LF` - line feed   (`0x0A` hex)
     *  - `FF` - form feed   (`0x0C` hex)
     */
-  def linesWithSeparators: Iterator[String] = new AbstractIterator[String] {
+  def linesWithSeparators: Iterator[String] = new AbstractIterator[String]
     val str = self.toString
     private val len = str.length
     private var index = 0
     def hasNext: Boolean = index < len
-    def next(): String = {
+    def next(): String =
       if (index >= len)
         throw new NoSuchElementException("next on empty iterator")
       val start = index
       while (index < len && !isLineBreak(apply(index))) index += 1
       index += 1
       str.substring(start, index min len)
-    }
-  }
 
   /** Return all lines in this string in an iterator, excluding trailing line
     *  end characters, i.e., apply `.stripLineEnd` to all lines
@@ -146,11 +139,10 @@ trait StringLike[+Repr]
     if (toString == null) null
     else if (toString.length == 0) ""
     else if (toString.charAt(0).isUpper) toString
-    else {
+    else
       val chars = toString.toCharArray
       chars(0) = chars(0).toUpper
       new String(chars)
-    }
 
   /** Returns this string with the given `prefix` stripped. If this string does not
     *  start with `prefix`, it is returned unchanged.
@@ -175,30 +167,27 @@ trait StringLike[+Repr]
     *  @param    replacement the replacement string
     *  @return               the resulting string
     */
-  def replaceAllLiterally(literal: String, replacement: String): String = {
+  def replaceAllLiterally(literal: String, replacement: String): String =
     val arg1 = Regex.quote(literal)
     val arg2 = Regex.quoteReplacement(replacement)
 
     toString.replaceAll(arg1, arg2)
-  }
 
   /** For every line in this string:
     *
     *  Strip a leading prefix consisting of blanks or control characters
     *  followed by `marginChar` from the line.
     */
-  def stripMargin(marginChar: Char): String = {
+  def stripMargin(marginChar: Char): String =
     val buf = new StringBuilder
-    for (line <- linesWithSeparators) {
+    for (line <- linesWithSeparators)
       val len = line.length
       var index = 0
       while (index < len && line.charAt(index) <= ' ') index += 1
       buf append
       (if (index < len && line.charAt(index) == marginChar)
          line.substring(index + 1) else line)
-    }
     buf.toString
-  }
 
   /** For every line in this string:
     *
@@ -265,10 +254,9 @@ trait StringLike[+Repr]
     toString.split(escape(separator))
 
   @throws(classOf[java.util.regex.PatternSyntaxException])
-  def split(separators: Array[Char]): Array[String] = {
+  def split(separators: Array[Char]): Array[String] =
     val re = separators.foldLeft("[")(_ + escape(_)) + "]"
     toString.split(re)
-  }
 
   /** You can follow a string with `.r`, turning it into a `Regex`. E.g.
     *
@@ -324,20 +312,19 @@ trait StringLike[+Repr]
 
   private def parseBoolean(s: String): Boolean =
     if (s != null)
-      s.toLowerCase match {
+      s.toLowerCase match
         case "true" => true
         case "false" => false
         case _ =>
           throw new IllegalArgumentException("For input string: \"" + s + "\"")
-      } else throw new IllegalArgumentException("For input string: \"null\"")
+      else throw new IllegalArgumentException("For input string: \"null\"")
 
   override def toArray[B >: Char : ClassTag]: Array[B] =
     toString.toCharArray.asInstanceOf[Array[B]]
 
-  private def unwrapArg(arg: Any): AnyRef = arg match {
+  private def unwrapArg(arg: Any): AnyRef = arg match
     case x: ScalaNumber => x.underlying
     case x => x.asInstanceOf[AnyRef]
-  }
 
   /** Uses the underlying string as a pattern (in a fashion similar to
     *  printf in C), and uses the supplied arguments to fill in the
@@ -372,4 +359,3 @@ trait StringLike[+Repr]
     */
   def formatLocal(l: java.util.Locale, args: Any*): String =
     java.lang.String.format(l, toString, args map unwrapArg: _*)
-}

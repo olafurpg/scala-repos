@@ -27,14 +27,13 @@ import org.apache.spark.sql.SQLContext
 
 case class Person(name: String, age: Int)
 
-object SparkSqlExample {
+object SparkSqlExample
 
-  def main(args: Array[String]) {
-    val conf = sys.env.get("SPARK_AUDIT_MASTER") match {
+  def main(args: Array[String])
+    val conf = sys.env.get("SPARK_AUDIT_MASTER") match
       case Some(master) =>
         new SparkConf().setAppName("Simple Sql App").setMaster(master)
       case None => new SparkConf().setAppName("Simple Sql App")
-    }
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
 
@@ -48,17 +47,13 @@ object SparkSqlExample {
     val teenagerNames = teenagers.map(t => "Name: " + t(0)).collect()
     teenagerNames.foreach(println)
 
-    def test(f: => Boolean, failureMsg: String) = {
-      if (!f) {
+    def test(f: => Boolean, failureMsg: String) =
+      if (!f)
         println(failureMsg)
         System.exit(-1)
-      }
-    }
 
     test(teenagerNames.size == 7,
          "Unexpected number of selected elements: " + teenagerNames)
     println("Test succeeded")
     sc.stop()
-  }
-}
 // scalastyle:on println

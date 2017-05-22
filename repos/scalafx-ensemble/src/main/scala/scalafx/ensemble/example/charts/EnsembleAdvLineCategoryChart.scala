@@ -42,10 +42,10 @@ import scalafx.scene.chart.XYChart
   * @see scalafx.scene.chart.LineChart
   * @see scalafx.scene.chart.XYChart
   */
-class EnsembleAdvLineCategoryChart extends EnsembleExample {
-  def getContent = {
+class EnsembleAdvLineCategoryChart extends EnsembleExample
+  def getContent =
     // add starting data
-    val series = new XYChart.Series[String, Number] {
+    val series = new XYChart.Series[String, Number]
       name = "Data Series 1"
       // create sample data
       data = Seq(
@@ -56,12 +56,8 @@ class EnsembleAdvLineCategoryChart extends EnsembleExample {
           XYChart.Data[String, Number]("1.0", 120d),
           XYChart.Data[String, Number]("1.1", 20d)
       )
-    }
 
     // setup chart
-    new LineChart[String, Number](CategoryAxis("X Axis"), NumberAxis("Y Axis")) {
+    new LineChart[String, Number](CategoryAxis("X Axis"), NumberAxis("Y Axis"))
       title = "LineChart with Category Axis"
       data() += series
-    }
-  }
-}

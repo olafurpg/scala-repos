@@ -30,30 +30,26 @@ object WithParamVar extends RequestVar[Map[String, NodeSeq]](Map.empty)
   *  This map is used in builtin.snippet.Surround to bind content to named sections.
   *  Note that the WithParam snippet is also mapped to "bind-at"
   */
-object WithParam extends DispatchSnippet {
+object WithParam extends DispatchSnippet
 
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case _ => render _
-  }
 
   /**
     *  Evaluates the body and stores it in the WithParam RequestVar map.
     *  This map is used in builtin.snippet.Surround to bind content to named sections.
     *  Note that the WithParam snippet is also mapped to "bind-at"
     */
-  def render(kids: NodeSeq): NodeSeq = {
-    (for {
+  def render(kids: NodeSeq): NodeSeq =
+    (for
       ctx <- S.session ?~ ("FIX" + "ME: Invalid session")
       req <- S.request ?~ ("FIX" + "ME: Invalid request")
-    } yield {
+    yield
       val name: String = S.attr("name") openOr "main"
       val body = ctx.processSurroundAndInclude(PageName.get, kids)
       WithParamVar.atomicUpdate(_ + (name -> body))
       NodeSeq.Empty
-    }) match {
+    ) match
       case Full(x) => x
       case Empty => Comment("FIX" + "ME: session or request are invalid")
       case Failure(msg, _, _) => Comment(msg)
-    }
-  }
-}

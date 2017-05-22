@@ -4,7 +4,7 @@ package std
 
 import scalaz.std.{string => s}
 
-final class StringOps(val self: String) extends AnyVal {
+final class StringOps(val self: String) extends AnyVal
 
   /**
     * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
@@ -41,8 +41,6 @@ final class StringOps(val self: String) extends AnyVal {
 
   def parseDouble: Validation[NumberFormatException, Double] =
     s.parseDouble(self)
-}
 
-trait ToStringOps {
+trait ToStringOps
   implicit def ToStringOpsFromString(a: String): StringOps = new StringOps(a)
-}

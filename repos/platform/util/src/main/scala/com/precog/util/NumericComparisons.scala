@@ -21,7 +21,7 @@ package com.precog.util
 
 import org.joda.time.DateTime
 
-object NumericComparisons {
+object NumericComparisons
 
   @inline def compare(a: Long, b: Long): Int =
     if (a < b) -1 else if (a == b) 0 else 1
@@ -30,15 +30,13 @@ object NumericComparisons {
 
   @inline def compare(a: Long, b: BigDecimal): Int = BigDecimal(a) compare b
 
-  def compare(a: Double, bl: Long): Int = {
+  def compare(a: Double, bl: Long): Int =
     val b = bl.toDouble
-    if (b.toLong == bl) {
+    if (b.toLong == bl)
       if (a < b) -1 else if (a == b) 0 else 1
-    } else {
+    else
       val error = math.abs(b * 2.220446049250313E-16)
       if (a < b - error) -1 else if (a > b + error) 1 else bl.signum
-    }
-  }
 
   @inline def compare(a: Double, b: Double): Int =
     if (a < b) -1 else if (a == b) 0 else 1
@@ -51,20 +49,18 @@ object NumericComparisons {
 
   @inline def compare(a: BigDecimal, b: BigDecimal): Int = a compare b
 
-  @inline def compare(a: DateTime, b: DateTime): Int = {
+  @inline def compare(a: DateTime, b: DateTime): Int =
     val res: Int = a compareTo b
     if (res < 0) -1
     else if (res > 0) 1
     else 0
-  }
 
   @inline def eps(b: Double): Double = math.abs(b * 2.220446049250313E-16)
 
-  def approxCompare(a: Double, b: Double): Int = {
+  def approxCompare(a: Double, b: Double): Int =
     val aError = eps(a)
     val bError = eps(b)
     if (a + aError < b - bError) -1 else if (a - aError > b + bError) 1 else 0
-  }
 
   import scalaz.Ordering.{LT, GT, EQ}
 
@@ -97,4 +93,3 @@ object NumericComparisons {
 
   @inline def order(a: DateTime, b: DateTime): scalaz.Ordering =
     scalaz.Ordering.fromInt(compare(a, b))
-}

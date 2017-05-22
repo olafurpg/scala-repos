@@ -4,11 +4,11 @@ import junit.framework.TestCase
 import org.jetbrains.plugins.scala.editor.importOptimizer.ScalaImportOptimizer._
 import org.junit.Assert
 
-class ImportTextCreatorTest extends TestCase {
+class ImportTextCreatorTest extends TestCase
 
   val textCreator = new ImportTextCreator()
 
-  def testGetImportText_Root_And_Wildcard(): Unit = {
+  def testGetImportText_Root_And_Wildcard(): Unit =
     val info = ImportInfo("scala.collection",
                           None,
                           Set.empty,
@@ -22,9 +22,8 @@ class ImportTextCreatorTest extends TestCase {
                                                   isUnicodeArrow = false,
                                                   spacesInImports = false,
                                                   sortLexicografically = true))
-  }
 
-  def testGetImportText_Hidden(): Unit = {
+  def testGetImportText_Hidden(): Unit =
     val info = ImportInfo("scala",
                           None,
                           Set.empty,
@@ -38,9 +37,8 @@ class ImportTextCreatorTest extends TestCase {
                                                   isUnicodeArrow = false,
                                                   spacesInImports = false,
                                                   sortLexicografically = true))
-  }
 
-  def testGetImportText_Renames(): Unit = {
+  def testGetImportText_Renames(): Unit =
     val info = ImportInfo("java.lang",
                           None,
                           Set.empty,
@@ -54,9 +52,8 @@ class ImportTextCreatorTest extends TestCase {
                                                   isUnicodeArrow = false,
                                                   spacesInImports = false,
                                                   sortLexicografically = true))
-  }
 
-  def testGetImportText_UnicodeArrowAndSpaces(): Unit = {
+  def testGetImportText_UnicodeArrowAndSpaces(): Unit =
     val info = ImportInfo("java.lang",
                           None,
                           Set.empty,
@@ -70,9 +67,8 @@ class ImportTextCreatorTest extends TestCase {
                                                   isUnicodeArrow = true,
                                                   spacesInImports = true,
                                                   sortLexicografically = true))
-  }
 
-  def testGetImportText_SortSingles(): Unit = {
+  def testGetImportText_SortSingles(): Unit =
     val info = ImportInfo("java.lang",
                           None,
                           Set.empty,
@@ -86,9 +82,8 @@ class ImportTextCreatorTest extends TestCase {
                                                   isUnicodeArrow = false,
                                                   spacesInImports = false,
                                                   sortLexicografically = true))
-  }
 
-  def testGetImportText_Renames_Hidden_Singles_Wildcard_Spaces(): Unit = {
+  def testGetImportText_Renames_Hidden_Singles_Wildcard_Spaces(): Unit =
     val info = ImportInfo("java.lang",
                           None,
                           Set.empty,
@@ -103,9 +98,8 @@ class ImportTextCreatorTest extends TestCase {
                                   isUnicodeArrow = false,
                                   spacesInImports = true,
                                   sortLexicografically = true))
-  }
 
-  def testGetImportText_No_Sorting(): Unit = {
+  def testGetImportText_No_Sorting(): Unit =
     val info = ImportInfo("java.lang",
                           None,
                           Set.empty,
@@ -120,5 +114,3 @@ class ImportTextCreatorTest extends TestCase {
                                   isUnicodeArrow = false,
                                   spacesInImports = false,
                                   sortLexicografically = false))
-  }
-}

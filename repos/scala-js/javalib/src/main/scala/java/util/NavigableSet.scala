@@ -1,6 +1,6 @@
 package java.util
 
-trait NavigableSet[E] extends SortedSet[E] {
+trait NavigableSet[E] extends SortedSet[E]
   def lower(e: E): E
   def floor(e: E): E
   def ceiling(e: E): E
@@ -19,4 +19,3 @@ trait NavigableSet[E] extends SortedSet[E] {
   def subSet(fromElement: E, toElement: E): SortedSet[E]
   def headSet(toElement: E): SortedSet[E]
   def tailSet(fromElement: E): SortedSet[E]
-}

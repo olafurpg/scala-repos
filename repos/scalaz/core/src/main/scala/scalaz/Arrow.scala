@@ -9,7 +9,7 @@ package scalaz
   * functions.
   */
 ////
-trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] {
+trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:]
   self =>
   ////
 
@@ -17,11 +17,10 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] {
   def arr[A, B](f: A => B): A =>: B
 
   override def covariantInstance[C]: Applicative[C =>: ?] =
-    new Applicative[C =>: ?] with SndCovariant[C] {
+    new Applicative[C =>: ?] with SndCovariant[C]
       def point[A](a: => A): C =>: A = arr(_ => a)
       def ap[A, B](fa: => (C =>: A))(f: => (C =>: (A => B))): (C =>: B) =
         <<<(arr((y: (A => B, A)) => y._1(y._2)), combine(f, fa))
-    }
 
   /** Alias for `compose`. */
   final def <<<[A, B, C](fbc: (B =>: C), fab: (A =>: B)): =>:[A, C] =
@@ -32,13 +31,11 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] {
     compose(fbc, fab)
 
   /** Pass `C` through untouched. */
-  def second[A, B, C](f: (A =>: B)): ((C, A) =>: (C, B)) = {
-    def swap[X, Y] = arr[(X, Y), (Y, X)] {
+  def second[A, B, C](f: (A =>: B)): ((C, A) =>: (C, B)) =
+    def swap[X, Y] = arr[(X, Y), (Y, X)]
       case (x, y) => (y, x)
-    }
 
     >>>(<<<(first[A, B, C](f), swap), swap)
-  }
 
   /** Alias for `split`. */
   final def splitA[A, B, C, D](
@@ -67,12 +64,10 @@ trait Arrow[=>:[_, _]] extends Split[=>:] with Strong[=>:] with Category[=>:] {
 
   ////
   val arrowSyntax = new scalaz.syntax.ArrowSyntax[=>:] { def F = Arrow.this }
-}
 
-object Arrow {
+object Arrow
   @inline def apply[F[_, _]](implicit F: Arrow[F]): Arrow[F] = F
 
   ////
 
   ////
-}

@@ -27,7 +27,7 @@ import mutable.StringBuilder
   *  @define coll string
   */
 final class StringOps(override val repr: String)
-    extends AnyVal with StringLike[String] {
+    extends AnyVal with StringLike[String]
 
   override protected[this] def thisCollection: WrappedString =
     new WrappedString(repr)
@@ -38,15 +38,13 @@ final class StringOps(override val repr: String)
   override protected[this] def newBuilder = StringBuilder.newBuilder
 
   override def apply(index: Int): Char = repr charAt index
-  override def slice(from: Int, until: Int): String = {
+  override def slice(from: Int, until: Int): String =
     val start = if (from < 0) 0 else from
     if (until <= start || start >= repr.length) return ""
 
     val end = if (until > length) length else until
     repr.substring(start, end)
-  }
   override def toString = repr
   override def length = repr.length
 
   def seq = new WrappedString(repr)
-}

@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import scala.collection.{LinearSeq, IndexedSeq}
   import scala.collection.Searching.search
 
@@ -11,4 +11,3 @@ object Test extends App {
   println(is.search(3))
   println(is.search(5, 3, 8))
   println(is.search(12))
-}

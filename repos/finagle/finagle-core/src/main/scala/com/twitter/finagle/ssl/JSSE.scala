@@ -9,16 +9,15 @@ import collection.mutable.{Map => MutableMap}
 /*
  * Creates JSSE SSLEngines on behalf of the Ssl singleton
  */
-object JSSE {
+object JSSE
   private[this] val log = Logger.getLogger(getClass.getName)
   private[this] val contextCache: MutableMap[String, SSLContext] =
     MutableMap.empty
   private[this] val protocol = "TLS"
-  private[this] lazy val defaultSSLContext: SSLContext = {
+  private[this] lazy val defaultSSLContext: SSLContext =
     val ctx = SSLContext.getInstance(protocol)
     ctx.init(null, null, null)
     ctx
-  }
 
   /**
     * Get an SSL server via JSSE
@@ -37,8 +36,8 @@ object JSSE {
       keyPath: String,
       caCertPath: Option[String],
       useCache: Boolean = true
-  ): Option[Engine] = {
-    def makeContext: SSLContext = {
+  ): Option[Engine] =
+    def makeContext: SSLContext =
       val context = SSLContext.getInstance(protocol)
       val kms = PEMEncodedKeyManager(certificatePath, keyPath, caCertPath)
       context.init(kms, null, null)
@@ -49,19 +48,16 @@ object JSSE {
           ))
 
       context
-    }
 
-    val context = synchronized {
+    val context = synchronized
       if (useCache)
         contextCache.getOrElseUpdate(
             List(certificatePath, keyPath, caCertPath).mkString(" + "),
             makeContext
         )
       else makeContext
-    }
 
     Some(new Engine(context.createSSLEngine()))
-  }
 
   /**
     * Get a client
@@ -77,20 +73,18 @@ object JSSE {
   /**
     * Get a client from the given Context
     */
-  def client(ctx: SSLContext): Engine = {
+  def client(ctx: SSLContext): Engine =
     val sslEngine = ctx.createSSLEngine();
     sslEngine.setUseClientMode(true);
     new Engine(sslEngine)
-  }
 
   /**
     * Get a client from the given Context
     */
-  def client(ctx: SSLContext, host: String, port: Int): Engine = {
+  def client(ctx: SSLContext, host: String, port: Int): Engine =
     val sslEngine = ctx.createSSLEngine(host, port);
     sslEngine.setUseClientMode(true);
     new Engine(sslEngine)
-  }
 
   /**
     * Get a client that skips verification of certificates.
@@ -108,20 +102,18 @@ object JSSE {
   def clientWithoutCertificateValidation(host: String, port: Int): Engine =
     client(trustAllCertificates(), host, port)
 
-  private[this] def client(trustManagers: Array[TrustManager]): Engine = {
+  private[this] def client(trustManagers: Array[TrustManager]): Engine =
     val ctx = SSLContext.getInstance(protocol)
     ctx.init(null, trustManagers, null)
     val sslEngine = ctx.createSSLEngine()
     new Engine(sslEngine)
-  }
 
   private[this] def client(
-      trustManagers: Array[TrustManager], host: String, port: Int): Engine = {
+      trustManagers: Array[TrustManager], host: String, port: Int): Engine =
     val ctx = SSLContext.getInstance(protocol)
     ctx.init(null, trustManagers, null)
     val sslEngine = ctx.createSSLEngine(host, port)
     new Engine(sslEngine)
-  }
 
   /**
     * @return a trust manager chain that does not validate certificates
@@ -132,16 +124,12 @@ object JSSE {
   /**
     * A trust manager that does not validate anything
     */
-  private[this] class IgnorantTrustManager extends X509TrustManager {
+  private[this] class IgnorantTrustManager extends X509TrustManager
     def getAcceptedIssuers(): Array[X509Certificate] =
       new Array[X509Certificate](0)
 
-    def checkClientTrusted(certs: Array[X509Certificate], authType: String) {
+    def checkClientTrusted(certs: Array[X509Certificate], authType: String)
       // Do nothing.
-    }
 
-    def checkServerTrusted(certs: Array[X509Certificate], authType: String) {
+    def checkServerTrusted(certs: Array[X509Certificate], authType: String)
       // Do nothing.
-    }
-  }
-}

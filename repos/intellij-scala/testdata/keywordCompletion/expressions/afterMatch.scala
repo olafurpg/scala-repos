@@ -1,9 +1,7 @@
-class a {
-  a match {
+class a
+  a match
     case to => from
-  }
   /*caret*/
-}
 /*
 abstract
 case

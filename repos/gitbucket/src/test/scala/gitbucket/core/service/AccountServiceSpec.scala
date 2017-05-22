@@ -4,14 +4,14 @@ import gitbucket.core.model.{Account, GroupMember}
 import java.util.Date
 import org.scalatest.FunSuite
 
-class AccountServiceSpec extends FunSuite with ServiceSpecBase {
+class AccountServiceSpec extends FunSuite with ServiceSpecBase
 
   val RootMailAddress = "root@localhost"
 
-  test("getAllUsers") {
-    withTestDB { implicit session =>
+  test("getAllUsers")
+    withTestDB  implicit session =>
       assert(
-          AccountService.getAllUsers() match {
+          AccountService.getAllUsers() match
         case List(
             Account("root",
                     "root",
@@ -27,26 +27,20 @@ class AccountServiceSpec extends FunSuite with ServiceSpecBase {
                     false)) =>
           true
         case _ => false
-      })
-    }
-  }
+      )
 
-  test("getAccountByUserName") {
-    withTestDB { implicit session =>
+  test("getAccountByUserName")
+    withTestDB  implicit session =>
       assert(
           AccountService.getAccountByUserName("root").get.userName == "root")
       assert(AccountService.getAccountByUserName("invalid user name").isEmpty)
-    }
-  }
 
-  test("getAccountByMailAddress") {
-    withTestDB { implicit session =>
+  test("getAccountByMailAddress")
+    withTestDB  implicit session =>
       assert(AccountService.getAccountByMailAddress(RootMailAddress).isDefined)
-    }
-  }
 
-  test("updateLastLoginDate") {
-    withTestDB { implicit session =>
+  test("updateLastLoginDate")
+    withTestDB  implicit session =>
       val root = "root"
       def user() =
         AccountService
@@ -63,11 +57,9 @@ class AccountServiceSpec extends FunSuite with ServiceSpecBase {
       Thread.sleep(1000)
       AccountService.updateLastLoginDate(root)
       assert(user().lastLoginDate.get.compareTo(date2) > 0)
-    }
-  }
 
-  test("updateAccount") {
-    withTestDB { implicit session =>
+  test("updateAccount")
+    withTestDB  implicit session =>
       val root = "root"
       def user() =
         AccountService
@@ -77,11 +69,9 @@ class AccountServiceSpec extends FunSuite with ServiceSpecBase {
       val newAddress = "new mail address"
       AccountService.updateAccount(user().copy(mailAddress = newAddress))
       assert(user().mailAddress == newAddress)
-    }
-  }
 
-  test("group") {
-    withTestDB { implicit session =>
+  test("group")
+    withTestDB  implicit session =>
       val group1 = "group1"
       val user1 = "root"
       AccountService.createGroup(group1, None)
@@ -99,6 +89,3 @@ class AccountServiceSpec extends FunSuite with ServiceSpecBase {
 
       assert(AccountService.getGroupMembers(group1) == Nil)
       assert(AccountService.getGroupsByUserName(user1) == Nil)
-    }
-  }
-}

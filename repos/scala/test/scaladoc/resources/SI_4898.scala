@@ -1,4 +1,4 @@
-class SI_4898 {
+class SI_4898
 
   /**
 	 * A link to [[__root__
@@ -6,4 +6,3 @@ class SI_4898 {
 	 * @usecase def test(): Int
 	 */
   def test(implicit param: Int): Int = param
-}

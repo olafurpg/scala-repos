@@ -18,9 +18,7 @@ case class CustomPreparatorParams(
     extends Params
 
 class IdentityPreparator(pp: EmptyPreparatorParams)
-    extends PPreparator[TrainingData, TrainingData] {
+    extends PPreparator[TrainingData, TrainingData]
 
-  def prepare(sc: SparkContext, trainingData: TrainingData): TrainingData = {
+  def prepare(sc: SparkContext, trainingData: TrainingData): TrainingData =
     trainingData
-  }
-}

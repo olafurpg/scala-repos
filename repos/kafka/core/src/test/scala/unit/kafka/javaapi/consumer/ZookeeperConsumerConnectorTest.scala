@@ -39,7 +39,7 @@ import org.junit.Assert._
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
 class ZookeeperConsumerConnectorTest
-    extends KafkaServerTestHarness with ZooKeeperTestHarness with Logging {
+    extends KafkaServerTestHarness with ZooKeeperTestHarness with Logging
   val numNodes = 2
   val numParts = 2
   val topic = "topic1"
@@ -57,7 +57,7 @@ class ZookeeperConsumerConnectorTest
   val nMessages = 2
 
   @Test
-  def testBasic() {
+  def testBasic()
     val requestHandlerLogger = Logger.getLogger(classOf[KafkaRequestHandler])
     requestHandlerLogger.setLevel(Level.FATAL)
 
@@ -81,25 +81,23 @@ class ZookeeperConsumerConnectorTest
     assertEquals(sentMessages1.sorted, receivedMessages1.sorted)
 
     // call createMesssageStreams twice should throw MessageStreamsExistException
-    try {
+    try
       val topicMessageStreams2 = zkConsumerConnector1.createMessageStreams(
           toJavaMap(Map(topic -> numNodes * numParts / 2)),
           new StringDecoder(),
           new StringDecoder())
       fail("Should fail with MessageStreamsExistException")
-    } catch {
+    catch
       case e: MessageStreamsExistException => // expected
-    }
     zkConsumerConnector1.shutdown
     info("all consumer connectors stopped")
     requestHandlerLogger.setLevel(Level.ERROR)
-  }
 
   def sendMessages(servers: Seq[KafkaServer],
                    messagesPerNode: Int,
-                   header: String): List[String] = {
+                   header: String): List[String] =
     var messages: List[String] = Nil
-    for (server <- servers) {
+    for (server <- servers)
       val producer: kafka.producer.Producer[Int, String] =
         TestUtils.createProducer(
             TestUtils.getBrokerListStrFromServers(servers),
@@ -107,7 +105,7 @@ class ZookeeperConsumerConnectorTest
             keyEncoder = classOf[IntEncoder].getName)
       val javaProducer: Producer[Int, String] =
         new kafka.javaapi.producer.Producer(producer)
-      for (partition <- 0 until numParts) {
+      for (partition <- 0 until numParts)
         val ms = 0
           .until(messagesPerNode)
           .map(
@@ -118,28 +116,22 @@ class ZookeeperConsumerConnectorTest
                     topic,
                     partition,
                     _)): java.util.List[KeyedMessage[Int, String]])
-      }
       javaProducer.close
-    }
     messages
-  }
 
   def getMessages(nMessagesPerThread: Int,
                   jTopicMessageStreams: java.util.Map[
                       String, java.util.List[KafkaStream[String, String]]])
-    : List[String] = {
+    : List[String] =
     var messages: List[String] = Nil
     import scala.collection.JavaConversions._
     val topicMessageStreams = jTopicMessageStreams.mapValues(_.toList)
     messages = TestUtils.getMessages(topicMessageStreams, nMessagesPerThread)
     messages
-  }
 
   private def toJavaMap(
-      scalaMap: Map[String, Int]): java.util.Map[String, java.lang.Integer] = {
+      scalaMap: Map[String, Int]): java.util.Map[String, java.lang.Integer] =
     val javaMap = new java.util.HashMap[String, java.lang.Integer]()
     scalaMap.foreach(
         m => javaMap.put(m._1, m._2.asInstanceOf[java.lang.Integer]))
     javaMap
-  }
-}

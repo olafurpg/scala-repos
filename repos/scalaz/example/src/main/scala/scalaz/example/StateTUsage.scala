@@ -2,54 +2,47 @@ package scalaz.example
 
 import scalaz._
 
-object StateTUsage extends App {
+object StateTUsage extends App
   import StateT._
 
-  def f[M[_]: Functor] {
+  def f[M[_]: Functor]
     Functor[StateT[M, Int, ?]]
-  }
 
-  def m[M[_]: Monad] {
+  def m[M[_]: Monad]
     Applicative[StateT[M, Int, ?]]
     Monad[StateT[M, Int, ?]]
     MonadState[StateT[M, Int, ?], Int]
-  }
 
-  def state() {
+  def state()
     val state: State[String, Int] = State((x: String) => (x + 1, 0))
     val eval: Int = state.eval("")
     state.flatMap(_ => state)
-  }
-}
 
-object FibStateExample extends App {
+object FibStateExample extends App
   val S = scalaz.StateT.stateMonad[(Int, Int)]
   import S.monadSyntax._
   import scalaz.State._
 
   val initialState = (0, 1)
 
-  val (nextFib: State[(Int, Int), Int]) = for {
+  val (nextFib: State[(Int, Int), Int]) = for
     s <- init: State[(Int, Int), (Int, Int)]
     (a, b) = s
     n = a + b
     _ <- put(b, n)
-  } yield b // if we yield n, getNFibs gives you (1,2,3,5,8...)
+  yield b // if we yield n, getNFibs gives you (1,2,3,5,8...)
   // yield b instead to get (1,1,2,3...)
 
-  def getNFibs(k: Int): State[(Int, Int), List[Int]] = {
+  def getNFibs(k: Int): State[(Int, Int), List[Int]] =
     nextFib.replicateM(k)
-  }
 
-  def getNthFib(k: Int): State[(Int, Int), Int] = {
+  def getNthFib(k: Int): State[(Int, Int), Int] =
     if (k == 0) pure(0) // will be thrown away
     else getNthFib(k - 1) >> nextFib
-  }
 
   // run two examples through the magic of App
   println(getNthFib(5).eval(initialState))
   println(getNFibs(10).eval(initialState))
-}
 
 /** Simple call-by-need (i.e. lazy) interpreter for Lambda Calculus based off of
   * John Launchbury's "A Natural Semantics for Lazy Evaluation"
@@ -57,7 +50,7 @@ object FibStateExample extends App {
   * (i.e. you cannot shadow variable names), and renames variables after substitution
   * to maintain this invariant.
   */
-object LaunchburyInterpreter extends App {
+object LaunchburyInterpreter extends App
   import scala.collection.immutable.HashMap
   import scalaz.std.function._
   import scalaz.std.list._
@@ -93,37 +86,35 @@ object LaunchburyInterpreter extends App {
       )
   // Substitute new variable names in
   // e.g. sub(map("x" -> "y"), Var("x")) => Var("y")
-  private def sub(m: Map[String, String])(e: Expr): Expr = {
+  private def sub(m: Map[String, String])(e: Expr): Expr =
     val subExpr = sub(m) _
     def subName(n: String) = if (m contains n) m(n) else n
-    e match {
+    e match
       case Lambda(z, e2) => Lambda(subName(z), subExpr(e2))
       case Apply(e2, z) => Apply(subExpr(e2), subName(z))
       case Var(z) => Var(subName(z))
       case Let(bs, e2) => Let(bs.map(subName _ *** subExpr), subExpr(e2))
-    }
-  }
 
   // replaces every bound variable with a new, "fresh" variable
   // e.g. freshen(Lambda("x", Var("x"))).eval(initialState) => Lambda("$1", Var("$1"))
-  private def freshen(e: Expr): State[ReduceState, Expr] = {
-    val getFreshVar = for {
+  private def freshen(e: Expr): State[ReduceState, Expr] =
+    val getFreshVar = for
       s <- init: State[ReduceState, ReduceState]
       ReduceState(_, f #:: fs) = s
       _ <- modify((s: ReduceState) => s.copy(freshVars = fs))
-    } yield f
+    yield f
     // Lambda and Let define new bound variables, so we substitute fresh variables into them
     // Var and Apply just recursively traverse the AST
-    e match {
+    e match
       case Lambda(x, e2) =>
-        for {
+        for
           y <- getFreshVar
           e3 <- freshen(sub(HashMap(x -> y))(e2))
-        } yield Lambda(y, e3)
+        yield Lambda(y, e3)
       case Apply(e2, x) => freshen(e2) >>= (e3 => pure(Apply(e3, x)))
       case Var(_) => pure(e)
       case Let(bs, e2) =>
-        for {
+        for
           fs <- getFreshVar.replicateM(bs.size)
           // Seq[((originalVar, Expr), freshVar)]
           newBindings = bs.toSeq.zip(fs)
@@ -134,46 +125,39 @@ object LaunchburyInterpreter extends App {
             .map(tpl => tpl.copy(_2 = tpl._1._2, _1 = tpl._2))
             .toList
           e3 <- freshen(subs(e2))
-          freshendBs <- bs2.traverseS {
+          freshendBs <- bs2.traverseS
             case (x, e) => freshen(subs(e)).map((x, _))
-          }.map(_.toMap)
-        } yield Let(freshendBs, e3)
-    }
-  }
+          .map(_.toMap)
+        yield Let(freshendBs, e3)
 
   /** performs "big-step" reduction: a single call maps a term to its final result
     * reduces lambda-terms to whnf or "weak head normal form".  For our purposes,
     * whnf means a lambda term (generally, it also refers to primitives and constructors,
     * which we've omitted).
     */
-  private def reduce(e: Expr): State[ReduceState, Expr] = {
+  private def reduce(e: Expr): State[ReduceState, Expr] =
 
-    e match {
+    e match
       case Lambda(x, e2) =>
         pure(e) // as defined above, a Lambda is already in whnf
       case Apply(e2, x) =>
-        reduce(e2) >>= {
+        reduce(e2) >>=
           case Lambda(y, e3) => reduce(sub(HashMap(y -> x))(e3))
           case _ => sys.error("Ill-typed lambda term")
-        }
       case Var(x) =>
-        for {
+        for
           state <- init: State[ReduceState, ReduceState]
           e2 = state.heap(x)
           _ <- modify((s: ReduceState) => s.copy(heap = s.heap - x))
           e3 <- reduce(e2)
           _ <- modify((s: ReduceState) => s.copy(heap = s.heap + ((x, e3))))
           freshendE <- freshen(e3)
-        } yield freshendE
-      case Let(bs, e2) => {
+        yield freshendE
+      case Let(bs, e2) =>
           val heapAdd = ((binding: (String, Expr)) =>
             modify((s: ReduceState) => s.copy(heap = s.heap + binding)))
           bs.toList.traverseS(heapAdd) >> reduce(e2)
-        }
-    }
-  }
 
   def evaluate(e: Expr): Expr = reduce(e).eval(initialState)
   // run an example through the magic of App
   println(evaluate(example2))
-}

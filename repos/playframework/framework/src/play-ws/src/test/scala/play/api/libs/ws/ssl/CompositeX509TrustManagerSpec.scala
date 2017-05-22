@@ -13,13 +13,13 @@ import java.security.cert.{CertificateException, X509Certificate}
 
 import play.core.server.ssl.CertificateGenerator
 
-object CompositeX509TrustManagerSpec extends Specification with Mockito {
+object CompositeX509TrustManagerSpec extends Specification with Mockito
 
-  "CompositeX509TrustManager" should {
+  "CompositeX509TrustManager" should
 
-    "with checkClientTrusted" should {
+    "with checkClientTrusted" should
 
-      "throws exception" in {
+      "throws exception" in
         val mockTrustManager1 = mock[X509TrustManager]
         val mockTrustManager2 = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
@@ -38,15 +38,14 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
 
         trustManager
           .checkClientTrusted(chain, authType)
-          .must(throwA[CompositeCertificateException].like {
+          .must(throwA[CompositeCertificateException].like
             case e: CompositeCertificateException =>
               val sourceExceptions = e.getSourceExceptions
               sourceExceptions(0).getMessage must be_==("fake1")
               sourceExceptions(1).getMessage must be_==("fake2")
-          })
-      }
+          )
 
-      "returns true" in {
+      "returns true" in
         val mockTrustManager = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
         val trustManager =
@@ -58,14 +57,13 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
         val authType = ""
 
         trustManager.checkClientTrusted(chain, authType) must not(
-            throwA[Throwable].like {
+            throwA[Throwable].like
           case e: CompositeCertificateException =>
             val sourceExceptions = e.getSourceExceptions
             sourceExceptions(0).getMessage must be_==("fake")
-        })
-      }
+        )
 
-      "returns true eventually" in {
+      "returns true eventually" in
         val mockTrustManager1 = mock[X509TrustManager]
         val mockTrustManager2 = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
@@ -83,11 +81,9 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
 
         trustManager.checkClientTrusted(chain, authType) must not(
             throwA[Throwable])
-      }
-    }
 
-    "getAcceptedIssuers" should {
-      "work fine" in {
+    "getAcceptedIssuers" should
+      "work fine" in
         val mockTrustManager = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
         val trustManager =
@@ -99,9 +95,8 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
 
         val acceptedIssuers = trustManager.getAcceptedIssuers
         acceptedIssuers(0) must_== certificate
-      }
 
-      "throw exception when input exception" in {
+      "throw exception when input exception" in
         val mockTrustManager = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
         val trustManager =
@@ -110,17 +105,15 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
         mockTrustManager.getAcceptedIssuers throws new RuntimeException("fake")
 
         trustManager.getAcceptedIssuers.must(
-            throwA[CompositeCertificateException].like {
+            throwA[CompositeCertificateException].like
           case e: CompositeCertificateException =>
             val sourceExceptions = e.getSourceExceptions
             sourceExceptions(0).getMessage must be_==("fake")
-        })
-      }
-    }
+        )
 
-    "checkServerTrusted" should {
+    "checkServerTrusted" should
 
-      "work fine" in {
+      "work fine" in
         val mockTrustManager = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
         val trustManager =
@@ -132,9 +125,8 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
 
         trustManager.checkServerTrusted(chain, authType) must not(
             throwA[Throwable])
-      }
 
-      "throw an exception when nothing works" in {
+      "throw an exception when nothing works" in
         val mockTrustManager1 = mock[X509TrustManager]
         val mockTrustManager2 = mock[X509TrustManager]
         val algorithmChecker = new AlgorithmChecker(Set(), Set())
@@ -153,13 +145,9 @@ object CompositeX509TrustManagerSpec extends Specification with Mockito {
 
         trustManager
           .checkServerTrusted(chain, authType)
-          .must(throwA[CompositeCertificateException].like {
+          .must(throwA[CompositeCertificateException].like
             case e: CompositeCertificateException =>
               val sourceExceptions = e.getSourceExceptions
               sourceExceptions(0).getMessage must be_==("fake1")
               sourceExceptions(1).getMessage must be_==("fake2")
-          })
-      }
-    }
-  }
-}
+          )

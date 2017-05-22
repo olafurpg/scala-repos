@@ -11,11 +11,11 @@ import Opcodes._
 // these additional attributes. Then it runs a normal compile on Scala source
 // that uses the class with named arguments.
 // Any failure will be dumped to std out.
-object Test extends DirectTest {
+object Test extends DirectTest
   override def extraSettings: String =
     "-usejavacp -d " + testOutput.path + " -cp " + testOutput.path
 
-  def generateCode(): Unit = {
+  def generateCode(): Unit =
     val className = "Foo"
 
     val cw = new ClassWriter(0)
@@ -60,7 +60,6 @@ object Test extends DirectTest {
     val fos = new FileOutputStream(
         new File(s"${testOutput.path}/$className.class"))
     try fos write bytes finally fos.close()
-  }
 
   def code =
     """
@@ -82,14 +81,12 @@ class Driver {
 }
 """
 
-  override def show(): Unit = {
+  override def show(): Unit =
     // redirect err to out, for logging
     val prevErr = System.err
     System.setErr(System.out)
-    try {
+    try
       generateCode()
       compile()
       Class.forName("Driver").newInstance()
-    } finally System.setErr(prevErr)
-  }
-}
+    finally System.setErr(prevErr)

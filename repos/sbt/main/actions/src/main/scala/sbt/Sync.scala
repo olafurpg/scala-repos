@@ -21,13 +21,12 @@ import sbt.io.IO
   * Warning: Specifically, don't mix this with a directory containing manually created files, like sources.
   * It is safe to use for its intended purpose: copying resources to a class output directory.
   */
-object Sync {
+object Sync
   def apply(cacheFile: File,
             inStyle: FileInfo.Style = FileInfo.lastModified,
             outStyle: FileInfo.Style = FileInfo.exists)
     : Traversable[(File, File)] => Relation[File, File] =
     mappings =>
-      {
         val relation = Relation.empty ++ mappings
         noDuplicateTargets(relation)
         val currentInfo = relation._1s.map(s => (s, inStyle(s))).toMap
@@ -52,27 +51,22 @@ object Sync {
 
         writeInfo(cacheFile, relation, currentInfo)(inStyle.format)
         relation
-    }
 
   def copy(source: File, target: File): Unit =
     if (source.isFile) IO.copyFile(source, target, true)
     else if (!target.exists) // we don't want to update the last modified time of an existing directory
-      {
         IO.createDirectory(target)
         IO.copyLastModified(source, target)
-      }
 
-  def noDuplicateTargets(relation: Relation[File, File]) {
+  def noDuplicateTargets(relation: Relation[File, File])
     val dups =
-      relation.reverseMap.filter {
+      relation.reverseMap.filter
         case (target, srcs) =>
           srcs.size >= 2 && srcs.exists(!_.isDirectory)
-      } map {
+      map
         case (target, srcs) =>
           "\n\t" + target + "\nfrom\n\t" + srcs.mkString("\n\t\t")
-      }
     if (dups.nonEmpty) sys.error("Duplicate mappings:" + dups.mkString)
-  }
 
   import java.io.{File, IOException}
   import sbinary._
@@ -90,21 +84,17 @@ object Sync {
   def writeInfo[F <: FileInfo](
       file: File, relation: Relation[File, File], info: Map[File, F])(
       implicit infoFormat: Format[F]): Unit =
-    IO.gzipFileOut(file) { out =>
+    IO.gzipFileOut(file)  out =>
       write(out, (relation, info))
-    }
 
   type RelationInfo[F] = (Relation[File, File], Map[File, F])
 
   def readInfo[F <: FileInfo](
       file: File)(implicit infoFormat: Format[F]): RelationInfo[F] =
-    try { readUncaught(file)(infoFormat) } catch {
+    try { readUncaught(file)(infoFormat) } catch
       case e: IOException => (Relation.empty, Map.empty)
-    }
 
   def readUncaught[F <: FileInfo](file: File)(
       implicit infoFormat: Format[F]): RelationInfo[F] =
-    IO.gzipFileIn(file) { in =>
+    IO.gzipFileIn(file)  in =>
       read[RelationInfo[F]](in)
-    }
-}

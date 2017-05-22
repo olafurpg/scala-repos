@@ -35,7 +35,7 @@ import org.apache.spark.util.collection.OpenHashMap
   * Params for [[CountVectorizer]] and [[CountVectorizerModel]].
   */
 private[feature] trait CountVectorizerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params with HasInputCol with HasOutputCol
 
   /**
     * Max size of the vocabulary.
@@ -73,12 +73,11 @@ private[feature] trait CountVectorizerParams
   def getMinDF: Double = $(minDF)
 
   /** Validates and transforms the input schema. */
-  protected def validateAndTransformSchema(schema: StructType): StructType = {
+  protected def validateAndTransformSchema(schema: StructType): StructType =
     val typeCandidates = List(
         new ArrayType(StringType, true), new ArrayType(StringType, false))
     SchemaUtils.checkColumnTypes(schema, $(inputCol), typeCandidates)
     SchemaUtils.appendColumn(schema, $(outputCol), new VectorUDT)
-  }
 
   /**
     * Filter to ignore rare words in a document. For each document, terms with
@@ -109,7 +108,6 @@ private[feature] trait CountVectorizerParams
 
   /** @group getParam */
   def getMinTF: Double = $(minTF)
-}
 
 /**
   * :: Experimental ::
@@ -118,7 +116,7 @@ private[feature] trait CountVectorizerParams
 @Experimental
 class CountVectorizer(override val uid: String)
     extends Estimator[CountVectorizerModel] with CountVectorizerParams
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("cntVec"))
 
@@ -139,64 +137,56 @@ class CountVectorizer(override val uid: String)
 
   setDefault(vocabSize -> (1 << 18), minDF -> 1)
 
-  override def fit(dataset: DataFrame): CountVectorizerModel = {
+  override def fit(dataset: DataFrame): CountVectorizerModel =
     transformSchema(dataset.schema, logging = true)
     val vocSize = $(vocabSize)
     val input = dataset.select($(inputCol)).rdd.map(_.getAs[Seq[String]](0))
     val minDf =
-      if ($(minDF) >= 1.0) {
+      if ($(minDF) >= 1.0)
         $(minDF)
-      } else {
+      else
         $(minDF) * input.cache().count()
-      }
-    val wordCounts: RDD[(String, Long)] = input.flatMap {
+    val wordCounts: RDD[(String, Long)] = input.flatMap
       case (tokens) =>
         val wc = new OpenHashMap[String, Long]
-        tokens.foreach { w =>
+        tokens.foreach  w =>
           wc.changeValue(w, 1L, _ + 1L)
-        }
         wc.map { case (word, count) => (word, (count, 1)) }
-    }.reduceByKey {
+    .reduceByKey
       case ((wc1, df1), (wc2, df2)) =>
         (wc1 + wc2, df1 + df2)
-    }.filter {
+    .filter
       case (word, (wc, df)) =>
         df >= minDf
-    }.map {
+    .map
       case (word, (count, dfCount)) =>
         (word, count)
-    }.cache()
+    .cache()
     val fullVocabSize = wordCounts.count()
-    val vocab: Array[String] = {
+    val vocab: Array[String] =
       val tmpSortedWC: Array[(String, Long)] =
-        if (fullVocabSize <= vocSize) {
+        if (fullVocabSize <= vocSize)
           // Use all terms
           wordCounts.collect().sortBy(-_._2)
-        } else {
+        else
           // Sort terms to select vocab
           wordCounts.sortBy(_._2, ascending = false).take(vocSize)
-        }
       tmpSortedWC.map(_._1)
-    }
 
     require(vocab.length > 0,
             "The vocabulary size should be > 0. Lower minDF as necessary.")
     copyValues(new CountVectorizerModel(uid, vocab).setParent(this))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
   override def copy(extra: ParamMap): CountVectorizer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object CountVectorizer extends DefaultParamsReadable[CountVectorizer] {
+object CountVectorizer extends DefaultParamsReadable[CountVectorizer]
 
   @Since("1.6.0")
   override def load(path: String): CountVectorizer = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -207,14 +197,13 @@ object CountVectorizer extends DefaultParamsReadable[CountVectorizer] {
 class CountVectorizerModel(
     override val uid: String, val vocabulary: Array[String])
     extends Model[CountVectorizerModel] with CountVectorizerParams
-    with MLWritable {
+    with MLWritable
 
   import CountVectorizerModel._
 
-  def this(vocabulary: Array[String]) = {
+  def this(vocabulary: Array[String]) =
     this(Identifiable.randomUID("cntVecModel"), vocabulary)
     set(vocabSize, vocabulary.length)
-  }
 
   /** @group setParam */
   def setInputCol(value: String): this.type = set(inputCol, value)
@@ -250,60 +239,51 @@ class CountVectorizerModel(
   /** Dictionary created from [[vocabulary]] and its indices, broadcast once for [[transform()]] */
   private var broadcastDict: Option[Broadcast[Map[String, Int]]] = None
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
-    if (broadcastDict.isEmpty) {
+    if (broadcastDict.isEmpty)
       val dict = vocabulary.zipWithIndex.toMap
       broadcastDict = Some(dataset.sqlContext.sparkContext.broadcast(dict))
-    }
     val dictBr = broadcastDict.get
     val minTf = $(minTF)
-    val vectorizer = udf { (document: Seq[String]) =>
+    val vectorizer = udf  (document: Seq[String]) =>
       val termCounts = new OpenHashMap[Int, Double]
       var tokenCount = 0L
-      document.foreach { term =>
-        dictBr.value.get(term) match {
+      document.foreach  term =>
+        dictBr.value.get(term) match
           case Some(index) => termCounts.changeValue(index, 1.0, _ + 1.0)
           case None => // ignore terms not in the vocabulary
-        }
         tokenCount += 1
-      }
       val effectiveMinTF = if (minTf >= 1.0) minTf else tokenCount * minTf
       val effectiveCounts =
-        if ($(binary)) {
+        if ($(binary))
           termCounts.filter(_._2 >= effectiveMinTF).map(p => (p._1, 1.0)).toSeq
-        } else {
+        else
           termCounts.filter(_._2 >= effectiveMinTF).toSeq
-        }
 
       Vectors.sparse(dictBr.value.size, effectiveCounts)
-    }
     dataset.withColumn($(outputCol), vectorizer(col($(inputCol))))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
-  override def copy(extra: ParamMap): CountVectorizerModel = {
+  override def copy(extra: ParamMap): CountVectorizerModel =
     val copied = new CountVectorizerModel(uid, vocabulary).setParent(parent)
     copyValues(copied, extra)
-  }
 
   @Since("1.6.0")
   override def write: MLWriter = new CountVectorizerModelWriter(this)
-}
 
 @Since("1.6.0")
-object CountVectorizerModel extends MLReadable[CountVectorizerModel] {
+object CountVectorizerModel extends MLReadable[CountVectorizerModel]
 
   private[CountVectorizerModel] class CountVectorizerModelWriter(
       instance: CountVectorizerModel)
-      extends MLWriter {
+      extends MLWriter
 
     private case class Data(vocabulary: Seq[String])
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val data = Data(instance.vocabulary)
       val dataPath = new Path(path, "data").toString
@@ -312,15 +292,13 @@ object CountVectorizerModel extends MLReadable[CountVectorizerModel] {
         .repartition(1)
         .write
         .parquet(dataPath)
-    }
-  }
 
   private class CountVectorizerModelReader
-      extends MLReader[CountVectorizerModel] {
+      extends MLReader[CountVectorizerModel]
 
     private val className = classOf[CountVectorizerModel].getName
 
-    override def load(path: String): CountVectorizerModel = {
+    override def load(path: String): CountVectorizerModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
       val data = sqlContext.read.parquet(dataPath).select("vocabulary").head()
@@ -328,8 +306,6 @@ object CountVectorizerModel extends MLReadable[CountVectorizerModel] {
       val model = new CountVectorizerModel(metadata.uid, vocabulary)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
 
   @Since("1.6.0")
   override def read: MLReader[CountVectorizerModel] =
@@ -337,4 +313,3 @@ object CountVectorizerModel extends MLReadable[CountVectorizerModel] {
 
   @Since("1.6.0")
   override def load(path: String): CountVectorizerModel = super.load(path)
-}

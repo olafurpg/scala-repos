@@ -5,7 +5,7 @@ import scala.scalajs.js
 /* This is a hijacked class. Its instances are primitive numbers.
  * Constructors are not emitted.
  */
-final class Double private () extends Number with Comparable[Double] {
+final class Double private () extends Number with Comparable[Double]
 
   def this(value: scala.Double) = this()
   def this(s: String) = this()
@@ -19,14 +19,13 @@ final class Double private () extends Number with Comparable[Double] {
   @inline def longValue(): scala.Long = doubleValue.toLong
   @inline def floatValue(): scala.Float = doubleValue.toFloat
 
-  override def equals(that: Any): scala.Boolean = that match {
+  override def equals(that: Any): scala.Boolean = that match
     case that: Double =>
       val a = doubleValue
       val b = that.doubleValue
       (a == b) || (Double.isNaN(a) && Double.isNaN(b))
     case _ =>
       false
-  }
 
   @inline override def hashCode(): Int =
     scala.scalajs.runtime.Bits.numberHashCode(doubleValue)
@@ -42,9 +41,8 @@ final class Double private () extends Number with Comparable[Double] {
 
   @inline def isInfinite(): scala.Boolean =
     Double.isInfinite(doubleValue)
-}
 
-object Double {
+object Double
   final val TYPE = classOf[scala.Double]
   final val POSITIVE_INFINITY = 1.0 / 0.0
   final val NEGATIVE_INFINITY = 1.0 / -0.0
@@ -71,39 +69,34 @@ object Double {
       "[\\x00-\\x20]*" + // optional whitespace
       "$")
 
-  def parseDouble(s: String): scala.Double = {
+  def parseDouble(s: String): scala.Double =
     if (doubleStrPat.test(s))
       js.Dynamic.global.parseFloat(s).asInstanceOf[scala.Double]
     else throw new NumberFormatException(s"""For input string: "$s"""")
-  }
 
   @inline def toString(d: scala.Double): String =
     "" + d
 
-  def compare(a: scala.Double, b: scala.Double): scala.Int = {
+  def compare(a: scala.Double, b: scala.Double): scala.Int =
     // NaN must equal itself, and be greater than anything else
-    if (isNaN(a)) {
+    if (isNaN(a))
       if (isNaN(b)) 0
       else 1
-    } else if (isNaN(b)) {
+    else if (isNaN(b))
       -1
-    } else {
-      if (a == b) {
+    else
+      if (a == b)
         // -0.0 must be smaller than 0.0
-        if (a == 0.0) {
+        if (a == 0.0)
           val ainf = 1.0 / a
           if (ainf == 1.0 / b) 0
           else if (ainf < 0) -1
           else 1
-        } else {
+        else
           0
-        }
-      } else {
+      else
         if (a < b) -1
         else 1
-      }
-    }
-  }
 
   @inline def isNaN(v: scala.Double): scala.Boolean =
     v != v
@@ -116,4 +109,3 @@ object Double {
 
   @inline def doubleToLongBits(value: scala.Double): scala.Long =
     scala.scalajs.runtime.Bits.doubleToLongBits(value)
-}

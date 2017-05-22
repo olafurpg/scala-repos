@@ -1,9 +1,9 @@
 import scala.reflect.macros.whitebox.Context
 import language.experimental.macros
 
-object Extractor {
+object Extractor
   def unapply(x: Any): Any = macro unapplyImpl
-  def unapplyImpl(c: Context)(x: c.Tree) = {
+  def unapplyImpl(c: Context)(x: c.Tree) =
     import c.universe._
     import internal._
     q"""
@@ -13,5 +13,3 @@ object Extractor {
         def unapply(x: Any) = this
       }.unapply($x)
     """
-  }
-}

@@ -33,19 +33,17 @@ import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceElement
   */
 class TypeAliasUsagesSearcher
     extends QueryExecutorBase[PsiReference, ReferencesSearch.SearchParameters](
-        true) {
+        true)
 
   def processQuery(@NotNull parameters: ReferencesSearch.SearchParameters,
-                   @NotNull consumer: Processor[PsiReference]) {
+                   @NotNull consumer: Processor[PsiReference])
     val target: PsiElement = parameters.getElementToSearch
-    val ta = target match {
+    val ta = target match
       case named: PsiNamedElement =>
-        inReadAction(ScalaPsiUtil.nameContext(named)) match {
+        inReadAction(ScalaPsiUtil.nameContext(named)) match
           case ta: ScTypeAliasDefinition => ta
           case _ => return
-        }
       case _ => return
-    }
     val name: String = ta.name
     if (name == null || StringUtil.isEmptyOrSpaces(name)) return
     val scope: SearchScope =
@@ -57,29 +55,22 @@ class TypeAliasUsagesSearcher
                          UsageSearchContext.IN_CODE,
                          true,
                          new MyProcessor(target, null, session))
-  }
 
   private class MyProcessor(
       myTarget: PsiElement, @Nullable prefix: String, mySession: SearchSession)
-      extends RequestResultProcessor(myTarget, prefix) {
+      extends RequestResultProcessor(myTarget, prefix)
     def processTextOccurrence(
         element: PsiElement,
         offsetInElement: Int,
-        consumer: Processor[PsiReference]): Boolean = inReadAction {
-      ScalaPsiUtil.getParentOfType(element, classOf[ScConstructor]) match {
+        consumer: Processor[PsiReference]): Boolean = inReadAction
+      ScalaPsiUtil.getParentOfType(element, classOf[ScConstructor]) match
         case cons: ScConstructor
             if PsiTreeUtil.isAncestor(cons.typeElement, element, false) =>
-          element match {
+          element match
             case resRef: ResolvableReferenceElement =>
-              resRef.bind().flatMap(_.parentElement) match {
+              resRef.bind().flatMap(_.parentElement) match
                 case Some(`myTarget`) =>
                   consumer.process(resRef)
                 case _ => true
-              }
             case _ => true
-          }
         case _ => true
-      }
-    }
-  }
-}

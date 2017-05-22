@@ -24,8 +24,8 @@ import org.apache.spark.sql.Row
 
 class MaxAbsScalerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
-  test("MaxAbsScaler fit basic case") {
+    with DefaultReadWriteTest
+  test("MaxAbsScaler fit basic case")
     val data = Array(Vectors.dense(1, 0, 100),
                      Vectors.dense(2, 0, 0),
                      Vectors.sparse(3, Array(0, 2), Array(-2, -100)),
@@ -44,28 +44,23 @@ class MaxAbsScalerSuite
       new MaxAbsScaler().setInputCol("features").setOutputCol("scaled")
 
     val model = scaler.fit(df)
-    model.transform(df).select("expected", "scaled").collect().foreach {
+    model.transform(df).select("expected", "scaled").collect().foreach
       case Row(vector1: Vector, vector2: Vector) =>
         assert(vector1.equals(vector2),
                s"MaxAbsScaler ut error: $vector2 should be $vector1")
-    }
 
     // copied model must have the same parent.
     MLTestingUtils.checkCopy(model)
-  }
 
-  test("MaxAbsScaler read/write") {
+  test("MaxAbsScaler read/write")
     val t =
       new MaxAbsScaler().setInputCol("myInputCol").setOutputCol("myOutputCol")
     testDefaultReadWrite(t)
-  }
 
-  test("MaxAbsScalerModel read/write") {
+  test("MaxAbsScalerModel read/write")
     val instance =
       new MaxAbsScalerModel("myMaxAbsScalerModel", Vectors.dense(1.0, 10.0))
         .setInputCol("myInputCol")
         .setOutputCol("myOutputCol")
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.maxAbs === instance.maxAbs)
-  }
-}

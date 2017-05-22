@@ -18,7 +18,7 @@ class ScSelfTypeElementStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScSelfTypeElement](parent, elemType)
-    with ScSelfTypeElementStub {
+    with ScSelfTypeElementStub
   private var name: StringRef = _
   private var typeElementText: StringRef = _
   private var typeNames: Array[String] = Array.empty
@@ -28,7 +28,7 @@ class ScSelfTypeElementStubImpl[ParentPsi <: PsiElement](
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            name: String,
            typeElementText: String,
-           typeNames: Array[String]) = {
+           typeNames: Array[String]) =
     this(
         parent,
         elemType
@@ -36,11 +36,9 @@ class ScSelfTypeElementStubImpl[ParentPsi <: PsiElement](
     this.name = StringRef.fromString(name)
     this.typeElementText = StringRef.fromString(typeElementText)
     this.typeNames = typeNames
-  }
 
   def getName: String = StringRef.toString(name)
 
   def getClassNames = typeNames
 
   def getTypeElementText: String = typeElementText.toString
-}

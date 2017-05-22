@@ -1,4 +1,4 @@
-object Scaladoc1 {
+object Scaladoc1
 
   /**
     * Foo
@@ -6,4 +6,3 @@ object Scaladoc1 {
   val (a, b) = (1, 2)
   a
   b
-}

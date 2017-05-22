@@ -27,14 +27,13 @@ import scala.collection.mutable.HashSet
   */
 abstract class ScSyntheticPackage(name: String, manager: PsiManager)
     extends LightElement(manager, ScalaFileType.SCALA_LANGUAGE)
-    with PsiPackage {
+    with PsiPackage
 
   def handleQualifiedNameChange(newQualifiedName: String) {}
   def getDirectories = PsiDirectory.EMPTY_ARRAY
-  def checkSetName(s: String) {
+  def checkSetName(s: String)
     throw new IncorrectOperationException(
         "cannot set name: nonphysical element")
-  }
   override def getText = ""
   override def toString = "Scala Synthetic Package " + getQualifiedName
   def getDirectories(scope: GlobalSearchScope) = PsiDirectory.EMPTY_ARRAY
@@ -54,31 +53,24 @@ abstract class ScSyntheticPackage(name: String, manager: PsiManager)
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
-    processor match {
+                                   place: PsiElement): Boolean =
+    processor match
       case bp: BaseProcessor =>
-        if (bp.kinds.contains(PACKAGE)) {
+        if (bp.kinds.contains(PACKAGE))
           val subPackages =
             if (lastParent != null) getSubPackages(lastParent.getResolveScope)
             else getSubPackages
-          for (subp <- subPackages) {
+          for (subp <- subPackages)
             if (!processor.execute(subp, state)) return false
-          }
-        }
         if (bp.kinds.contains(CLASS) || bp.kinds.contains(OBJECT) ||
-            bp.kinds.contains(METHOD)) {
-          for (clazz <- getClasses) {
+            bp.kinds.contains(METHOD))
+          for (clazz <- getClasses)
             if (!processor.execute(clazz, state)) return false
-          }
-        }
         true
       case _ => true
-    }
-  }
-}
 
-object ScSyntheticPackage {
-  def get(fqn: String, project: Project): ScSyntheticPackage = {
+object ScSyntheticPackage
+  def get(fqn: String, project: Project): ScSyntheticPackage =
     val i = fqn.lastIndexOf(".")
     val name = if (i < 0) fqn else fqn.substring(i + 1)
 
@@ -94,7 +86,7 @@ object ScSyntheticPackage {
                    classOf[ScPackageContainer])
       .toSeq
 
-    if (packages.isEmpty) {
+    if (packages.isEmpty)
       StubIndex
         .getElements(ScalaIndexKeys.PACKAGE_OBJECT_KEY
                        .asInstanceOf[StubIndexKey[Any, PsiClass]],
@@ -104,12 +96,11 @@ object ScSyntheticPackage {
                      classOf[PsiClass])
         .toSeq
         .find(pc =>
-              {
             pc.qualifiedName == fqn
-        }) match {
+        ) match
         case Some(obj) =>
           val pname = if (i < 0) "" else fqn.substring(0, i)
-          new ScSyntheticPackage(name, PsiManager.getInstance(project)) {
+          new ScSyntheticPackage(name, PsiManager.getInstance(project))
             override def getFiles(
                 globalSearchScope: GlobalSearchScope): Array[PsiFile] =
               Array.empty //todo: ?
@@ -125,100 +116,77 @@ object ScSyntheticPackage {
             def findClassByShortName(
                 name: String, scope: GlobalSearchScope): Array[PsiClass] =
               Array.empty
-          }
         case None => null
-      }
-    } else {
+    else
       val pkgs = packages.filter(
           pc =>
-            {
           pc.fqn.startsWith(fqn) && fqn.startsWith(pc.prefix)
-      })
+      )
 
       if (pkgs.isEmpty) null
-      else {
+      else
         val pname = if (i < 0) "" else fqn.substring(0, i)
-        new ScSyntheticPackage(name, PsiManager.getInstance(project)) {
+        new ScSyntheticPackage(name, PsiManager.getInstance(project))
           override def getFiles(
               globalSearchScope: GlobalSearchScope): Array[PsiFile] =
             Array.empty //todo: ?
 
           def findClassByShortName(
-              name: String, scope: GlobalSearchScope): Array[PsiClass] = {
+              name: String, scope: GlobalSearchScope): Array[PsiClass] =
             getClasses.filter(_.name == name)
-          }
 
-          def containsClassNamed(name: String): Boolean = {
+          def containsClassNamed(name: String): Boolean =
             getClasses.exists(_.name == name)
-          }
 
           def getQualifiedName = fqn
 
-          def getClasses = {
+          def getClasses =
             Array(
                 pkgs.flatMap(p =>
                       if (p.fqn.length == fqn.length)
-                        p.typeDefs.flatMap {
+                        p.typeDefs.flatMap
                   case td @ (c: ScTypeDefinition)
                       if c.fakeCompanionModule.isDefined =>
                     Seq(td, c.fakeCompanionModule.get)
                   case td => Seq(td)
-                } else Seq.empty): _*)
-          }
+                else Seq.empty): _*)
 
           def getClasses(scope: GlobalSearchScope) =
-            getClasses.filter { clazz =>
-              {
+            getClasses.filter  clazz =>
                 val file = clazz.getContainingFile.getVirtualFile
                 file != null && scope.contains(file)
-              }
-            }
 
           def getParentPackage = ScPackageImpl.findPackage(project, pname)
 
-          def getSubPackages = {
+          def getSubPackages =
             val buff = new HashSet[PsiPackage]
-            pkgs.foreach { p =>
-              def addPackage(tail: String) {
+            pkgs.foreach  p =>
+              def addPackage(tail: String)
                 val p = ScPackageImpl.findPackage(project, fqn + "." + tail)
                 if (p != null) buff += p
-              }
 
               val fqn1 = p.fqn
               val tail =
                 if (fqn1.length > fqn.length) fqn1.substring(fqn.length + 1)
                 else ""
-              if (tail.length == 0) {
-                p.packagings.foreach { pack =>
-                  {
+              if (tail.length == 0)
+                p.packagings.foreach  pack =>
                     val own = pack.ownNamePart
                     val i = own.indexOf(".")
                     addPackage(if (i > 0) own.substring(0, i) else own)
-                  }
-                }
-                p.typeDefs.foreach {
+                p.typeDefs.foreach
                   case o: ScObject
                       if o.isPackageObject && o.getName != "`package`" =>
                     addPackage(o.name)
                   case _ =>
-                }
-              } else {
+              else
                 val i = tail.indexOf(".")
                 val next = if (i > 0) tail.substring(0, i) else tail
                 addPackage(next)
-              }
-            }
             buff.toArray
-          }
           def getSubPackages(scope: GlobalSearchScope) = getSubPackages
 
           def getContainer: PsiQualifiedNamedElement = null
-        }
-      }
-    }
-  }
-}
 
-class SyntheticPackageCreator(project: Project) {
+class SyntheticPackageCreator(project: Project)
   def getPackage(fqn: String) = ScSyntheticPackage.get(fqn, project)
-}

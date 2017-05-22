@@ -16,14 +16,14 @@ import scala.util.{Failure, Success, Try}
 
 class TaskOpProcessorImplTest
     extends MarathonActorSupport with MarathonSpec with Mockito
-    with GivenWhenThen with ScalaFutures with Matchers {
+    with GivenWhenThen with ScalaFutures with Matchers
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   // ignored by the TaskOpProcessorImpl
   val deadline = Timestamp.zero
 
-  test("process noop") {
+  test("process noop")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -41,9 +41,8 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("process fail") {
+  test("process fail")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -64,9 +63,8 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("process update with success") {
+  test("process update with success")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -95,10 +93,9 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
   test(
-      "process update with failing taskRepository.store but successful load of existing task") {
+      "process update with failing taskRepository.store but successful load of existing task")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -113,7 +110,7 @@ class TaskOpProcessorImplTest
 
     var result: Try[Unit] =
       Failure(new RuntimeException("test executing failed"))
-    val logs = CaptureLogEvents.forBlock {
+    val logs = CaptureLogEvents.forBlock
       result = Try(
           f.processor
             .process(
@@ -124,7 +121,6 @@ class TaskOpProcessorImplTest
                     TaskOpProcessor.Action.Update(taskState))
             )
             .futureValue) // we need to complete the future here to get all the logs
-    }
 
     Then("it calls store")
     verify(f.taskRepository).store(task)
@@ -145,10 +141,9 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
   test(
-      "process update with failing taskRepository.store but successful load of non-existing task") {
+      "process update with failing taskRepository.store but successful load of non-existing task")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -163,7 +158,7 @@ class TaskOpProcessorImplTest
 
     var result: Try[Unit] =
       Failure(new RuntimeException("test executing failed"))
-    val logs = CaptureLogEvents.forBlock {
+    val logs = CaptureLogEvents.forBlock
       result = Try(
           f.processor
             .process(
@@ -174,7 +169,6 @@ class TaskOpProcessorImplTest
                     TaskOpProcessor.Action.Update(taskState))
             )
             .futureValue) // we need to complete the future here to get all the logs
-    }
 
     Then("it calls store")
     verify(f.taskRepository).store(task)
@@ -198,9 +192,8 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("process update with failing taskRepository.store and load also fails") {
+  test("process update with failing taskRepository.store and load also fails")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -216,7 +209,7 @@ class TaskOpProcessorImplTest
     When("the processor processes an update")
     var result: Try[Unit] =
       Failure(new RuntimeException("test executing failed"))
-    val logs = CaptureLogEvents.forBlock {
+    val logs = CaptureLogEvents.forBlock
       result = Try(
           f.processor
             .process(
@@ -227,7 +220,6 @@ class TaskOpProcessorImplTest
                     TaskOpProcessor.Action.Update(taskState))
             )
             .futureValue) // we need to complete the future here to get all the logs
-    }
 
     Then("it calls store")
     verify(f.taskRepository).store(task)
@@ -246,9 +238,8 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("process expunge with success") {
+  test("process expunge with success")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -276,10 +267,9 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
   test(
-      "process expunge, expunge fails but task reload confirms that task is gone") {
+      "process expunge, expunge fails but task reload confirms that task is gone")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -310,10 +300,9 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
   test(
-      "process expunge, expunge fails but and task reload suggests that task is still there") {
+      "process expunge, expunge fails but and task reload suggests that task is still there")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -352,9 +341,8 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("process statusUpdate with success") {
+  test("process statusUpdate with success")
     val f = new Fixture
     val appId = PathId("/app")
 
@@ -383,9 +371,8 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("process terminated statusUpdate for resident tasks") {
+  test("process terminated statusUpdate for resident tasks")
     import MarathonTestHelper._
 
     Given("a statusUpdateResolver and an update")
@@ -423,9 +410,8 @@ class TaskOpProcessorImplTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  class Fixture {
+  class Fixture
     lazy val config = MarathonTestHelper.defaultConfig()
     lazy val taskTrackerProbe = TestProbe()
     lazy val taskRepository = mock[TaskRepository]
@@ -434,18 +420,14 @@ class TaskOpProcessorImplTest
     lazy val processor = new TaskOpProcessorImpl(
         taskTrackerProbe.ref, taskRepository, statusUpdateResolver)
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       taskTrackerProbe.expectNoMsg(0.seconds)
       noMoreInteractions(taskRepository)
       noMoreInteractions(statusUpdateResolver)
-    }
 
     def toLaunched(task: Task, taskStateOp: TaskStateOp.Launch): Task =
-      task.update(taskStateOp) match {
+      task.update(taskStateOp) match
         case TaskStateChange.Update(launchedTask) => launchedTask
         case _ =>
           throw new scala.RuntimeException(
               "taskStateOp did not result in a launched task")
-      }
-  }
-}

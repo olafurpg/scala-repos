@@ -28,7 +28,7 @@ import scalaz._
 
 trait RandomLibSpecs[M[+ _]]
     extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
+    with LongIdMemoryDatasetConsumer[M]
   self =>
 
   import Function._
@@ -39,14 +39,12 @@ trait RandomLibSpecs[M[+ _]]
 
   val line = Line(1, 1, "")
 
-  def testEval(graph: DepGraph): Set[SEvent] = {
-    consumeEval(graph, defaultEvaluationContext) match {
+  def testEval(graph: DepGraph): Set[SEvent] =
+    consumeEval(graph, defaultEvaluationContext) match
       case Success(results) => results
       case Failure(error) => throw error
-    }
-  }
 
-  "return observed set given a single event with bottom identity" in {
+  "return observed set given a single event with bottom identity" in
     val uniform = dag.Morph1(UniformDistribution, Const(CLong(12))(line))(line)
 
     val input = dag.Observe(Const(CString("foo"))(line), uniform)(line)
@@ -55,14 +53,12 @@ trait RandomLibSpecs[M[+ _]]
 
     result must haveSize(1)
 
-    result must haveAllElementsLike {
+    result must haveAllElementsLike
       case (ids, SDecimal(d)) =>
         ids must haveSize(0)
         d mustEqual (0.2182148468113263)
-    }
-  }
 
-  "fail to observe if seed for distribution is not a long" in {
+  "fail to observe if seed for distribution is not a long" in
     val uniform =
       dag.Morph1(UniformDistribution, Const(CDouble(4.4))(line))(line)
 
@@ -71,9 +67,8 @@ trait RandomLibSpecs[M[+ _]]
     val result = testEval(input)
 
     result must beEmpty
-  }
 
-  "return observed set given 22 heterogeneous events with identities" in {
+  "return observed set given 22 heterogeneous events with identities" in
     val uniform =
       dag.Morph1(UniformDistribution, Const(CLong(100))(line))(line)
 
@@ -110,14 +105,12 @@ trait RandomLibSpecs[M[+ _]]
                        0.7976605648079012)
 
     val actual =
-      result collect {
+      result collect
         case (ids, SDecimal(d)) if ids.size == 1 => d
-      }
 
     actual mustEqual expected
-  }
 
-  "return observed set joined with original" in {
+  "return observed set joined with original" in
     val numbers = dag.AbsoluteLoad(Const(CString("/het/numbers"))(line))(line)
 
     val uniform = dag.Morph1(UniformDistribution, Const(CLong(88))(line))(line)
@@ -147,16 +140,12 @@ trait RandomLibSpecs[M[+ _]]
                        0.6104706956474781,
                        0.8637112992116962)
 
-    result must haveAllElementsLike {
+    result must haveAllElementsLike
       case (ids, SObject(obj)) =>
         ids must haveSize(1)
 
         obj.keys mustEqual (Set("rand", "data"))
-        obj("rand") must beLike {
+        obj("rand") must beLike
           case SDecimal(d) => expected must contain(d)
-        }
-    }
-  }
-}
 
 object RandomLibSpecs extends RandomLibSpecs[test.YId] with test.YIdInstances

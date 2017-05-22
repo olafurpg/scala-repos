@@ -16,7 +16,7 @@ import scala.collection.JavaConverters._
 /**
   * Factories to create sinks and sources from files
   */
-object FileIO {
+object FileIO
 
   /**
     * Creates a Sink that writes incoming [[ByteString]] elements to the given file.
@@ -80,4 +80,3 @@ object FileIO {
       f: File,
       chunkSize: Int): javadsl.Source[ByteString, CompletionStage[IOResult]] =
     new Source(scaladsl.FileIO.fromFile(f, chunkSize).toCompletionStage())
-}

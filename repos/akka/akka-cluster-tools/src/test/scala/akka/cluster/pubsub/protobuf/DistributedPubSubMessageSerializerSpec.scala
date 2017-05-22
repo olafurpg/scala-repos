@@ -11,20 +11,19 @@ import akka.actor.Props
 import scala.collection.immutable.TreeMap
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class DistributedPubSubMessageSerializerSpec extends AkkaSpec {
+class DistributedPubSubMessageSerializerSpec extends AkkaSpec
 
   val serializer = new DistributedPubSubMessageSerializer(
       system.asInstanceOf[ExtendedActorSystem])
 
-  def checkSerialization(obj: AnyRef): Unit = {
+  def checkSerialization(obj: AnyRef): Unit =
     val blob = serializer.toBinary(obj)
     val ref = serializer.fromBinary(blob, serializer.manifest(obj))
     ref should ===(obj)
-  }
 
-  " DistributedPubSubMessages" must {
+  " DistributedPubSubMessages" must
 
-    "be serializable" in {
+    "be serializable" in
       val address1 = Address("akka.tcp", "system", "some.host.org", 4711)
       val address2 = Address("akka.tcp", "system", "other.host.org", 4711)
       val address3 = Address("akka.tcp", "system", "some.host.org", 4712)
@@ -50,6 +49,3 @@ class DistributedPubSubMessageSerializerSpec extends AkkaSpec {
       checkSerialization(Send("/user/u3", "hello", localAffinity = true))
       checkSerialization(SendToAll("/user/u3", "hello", allButSelf = true))
       checkSerialization(Publish("mytopic", "hello"))
-    }
-  }
-}

@@ -5,7 +5,7 @@ import scala.tools.cmd.CommandLineParser
 import scala.tools.nsc.{Global, Settings, CompilerCommand}
 import scala.tools.nsc.reporters.ConsoleReporter
 
-object Test extends DirectTest {
+object Test extends DirectTest
 
   override def extraSettings: String =
     "-usejavacp -Xprint:parser -Ystop-after:parser -d " + testOutput.path
@@ -25,15 +25,14 @@ object Test extends DirectTest {
     object Test extends App {}
   """.trim
 
-  override def show(): Unit = {
+  override def show(): Unit =
     // redirect err to out, for logging
     val prevErr = System.err
     System.setErr(System.out)
     compile()
     System.setErr(prevErr)
-  }
 
-  override def newCompiler(args: String*): Global = {
+  override def newCompiler(args: String*): Global =
 
     val settings = new Settings()
     settings.Xprintpos.value = true
@@ -41,5 +40,3 @@ object Test extends DirectTest {
     val command = new CompilerCommand(
         (CommandLineParser tokenize extraSettings) ++ args.toList, settings)
     Global(command.settings, new ConsoleReporter(settings))
-  }
-}

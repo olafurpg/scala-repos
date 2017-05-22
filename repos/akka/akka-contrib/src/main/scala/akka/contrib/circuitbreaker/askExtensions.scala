@@ -22,7 +22,7 @@ private[circuitbreaker] final object OpenCircuitException
   * `Future` result of an `ask` pattern to fail in case of
   * [[akka.contrib.circuitbreaker.CircuitBreakerProxy.CircuitOpenFailure]] response
   */
-object Implicits {
+object Implicits
 
   /**
     * Import this implicit to enable the methods `failForOpenCircuit` and `failForOpenCircuitWith`
@@ -67,32 +67,27 @@ object Implicits {
       implicit executionContext: ExecutionContext,
       timeout: Timeout): Future[Any] =
     circuitBreakerProxy.internalAskWithCircuitBreaker(message, timeout, sender)
-}
 
 /**
   * Extends [[scala.concurrent.Future]] with the method `failForOpenCircuitWith` to handle
   * [[akka.contrib.circuitbreaker.CircuitBreakerProxy.CircuitOpenFailure]] failure responses throwing
   * an exception built with the given exception builder
   */
-final class CircuitBreakerAwareFuture(val future: Future[Any]) extends AnyVal {
+final class CircuitBreakerAwareFuture(val future: Future[Any]) extends AnyVal
   @throws[OpenCircuitException]
   def failForOpenCircuit(
       implicit executionContext: ExecutionContext): Future[Any] =
     failForOpenCircuitWith(OpenCircuitException)
 
   def failForOpenCircuitWith(throwing: ⇒ Throwable)(
-      implicit executionContext: ExecutionContext): Future[Any] = {
-    future.flatMap {
-      _ match {
+      implicit executionContext: ExecutionContext): Future[Any] =
+    future.flatMap
+      _ match
         case CircuitOpenFailure(_) ⇒ Future.failed(throwing)
         case result ⇒ Future.successful(result)
-      }
-    }
-  }
-}
 
 final class AskeableWithCircuitBreakerActor(val actorRef: ActorRef)
-    extends AnyVal {
+    extends AnyVal
   def askWithCircuitBreaker(
       message: Any)(implicit executionContext: ExecutionContext,
                     timeout: Timeout,
@@ -102,17 +97,15 @@ final class AskeableWithCircuitBreakerActor(val actorRef: ActorRef)
   @throws[OpenCircuitException]
   private[circuitbreaker] def internalAskWithCircuitBreaker(
       message: Any, timeout: Timeout, sender: ActorRef)(
-      implicit executionContext: ExecutionContext) = {
+      implicit executionContext: ExecutionContext) =
     import akka.pattern.ask
     import Implicits.futureExtensions
 
     ask(actorRef, message, sender)(timeout).failForOpenCircuit
-  }
-}
 
 final class AskeableWithCircuitBreakerActorSelection(
     val actorSelection: ActorSelection)
-    extends AnyVal {
+    extends AnyVal
   def askWithCircuitBreaker(
       message: Any)(implicit executionContext: ExecutionContext,
                     timeout: Timeout,
@@ -121,10 +114,8 @@ final class AskeableWithCircuitBreakerActorSelection(
 
   private[circuitbreaker] def internalAskWithCircuitBreaker(
       message: Any, timeout: Timeout, sender: ActorRef)(
-      implicit executionContext: ExecutionContext) = {
+      implicit executionContext: ExecutionContext) =
     import akka.pattern.ask
     import Implicits.futureExtensions
 
     ask(actorSelection, message, sender)(timeout).failForOpenCircuit
-  }
-}

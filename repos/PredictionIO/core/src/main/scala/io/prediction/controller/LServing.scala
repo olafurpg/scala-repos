@@ -23,7 +23,7 @@ import io.prediction.core.BaseServing
   * @tparam P Output prediction class.
   * @group Serving
   */
-abstract class LServing[Q, P] extends BaseServing[Q, P] {
+abstract class LServing[Q, P] extends BaseServing[Q, P]
   def supplementBase(q: Q): Q = supplement(q)
 
   /** :: Experimental ::
@@ -36,9 +36,8 @@ abstract class LServing[Q, P] extends BaseServing[Q, P] {
   @Experimental
   def supplement(q: Q): Q = q
 
-  def serveBase(q: Q, ps: Seq[P]): P = {
+  def serveBase(q: Q, ps: Seq[P]): P =
     serve(q, ps)
-  }
 
   /** Implement this method to combine multiple algorithms' predictions to
     * produce a single final prediction. The query is the original query sent to
@@ -48,4 +47,3 @@ abstract class LServing[Q, P] extends BaseServing[Q, P] {
     * @param predictions A list of algorithms' predictions.
     */
   def serve(query: Q, predictions: Seq[P]): P
-}

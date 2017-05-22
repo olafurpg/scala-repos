@@ -52,23 +52,23 @@ import akka.persistence.journal.leveldb.SharedLeveldbStore
   * to remove data that was stored by Cluster Sharding in Akka 2.3.x using
   * different persistenceId.
   */
-object RemoveInternalClusterShardingData {
+object RemoveInternalClusterShardingData
 
   /**
     * @see [[RemoveInternalClusterShardingData$ RemoveInternalClusterShardingData companion object]]
     */
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     if (args.isEmpty)
       println(
           "Specify the Cluster Sharding type names to remove in program arguments")
-    else {
+    else
       val system = ActorSystem("RemoveInternalClusterShardingData")
       val remove2dot3Data = (args(0) == "-2.3")
       val typeNames = if (remove2dot3Data) args.tail.toSet else args.toSet
       if (typeNames.isEmpty)
         println(
             "Specify the Cluster Sharding type names to remove in program arguments")
-      else {
+      else
         val journalPluginId = system.settings.config
           .getString("akka.cluster.sharding.journal-plugin-id")
         import system.dispatcher
@@ -76,12 +76,8 @@ object RemoveInternalClusterShardingData {
                journalPluginId,
                typeNames,
                terminateSystem = true,
-               remove2dot3Data).onComplete { _ ⇒
+               remove2dot3Data).onComplete  _ ⇒
           system.terminate()
-        }
-      }
-    }
-  }
 
   /**
     * API corresponding to the [[#main]] method as described in the
@@ -91,23 +87,21 @@ object RemoveInternalClusterShardingData {
              journalPluginId: String,
              typeNames: Set[String],
              terminateSystem: Boolean,
-             remove2dot3Data: Boolean): Future[Unit] = {
+             remove2dot3Data: Boolean): Future[Unit] =
 
     val resolvedJournalPluginId =
       if (journalPluginId == "")
         system.settings.config.getString("akka.persistence.journal.plugin")
       else journalPluginId
-    if (resolvedJournalPluginId == "akka.persistence.journal.leveldb-shared") {
+    if (resolvedJournalPluginId == "akka.persistence.journal.leveldb-shared")
       val store = system.actorOf(Props[SharedLeveldbStore], "store")
       SharedLeveldbJournal.setStore(store, system)
-    }
 
     val completion = Promise[Unit]()
     system.actorOf(
         props(journalPluginId, typeNames, completion, remove2dot3Data),
         name = "removeInternalClusterShardingData")
     completion.future
-  }
 
   /**
     * INTERNAL API: `Props` for [[RemoveInternalClusterShardingData]] actor.
@@ -123,7 +117,7 @@ object RemoveInternalClusterShardingData {
   /**
     * INTERNAL API
     */
-  private[akka] object RemoveOnePersistenceId {
+  private[akka] object RemoveOnePersistenceId
     def props(journalPluginId: String,
               persistenceId: String,
               replyTo: ActorRef): Props =
@@ -132,7 +126,6 @@ object RemoveInternalClusterShardingData {
 
     case class Result(removals: Try[Removals])
     case class Removals(events: Boolean, snapshots: Boolean)
-  }
 
   /**
     * INTERNAL API: Remove all events and snapshots for one specific
@@ -143,13 +136,13 @@ object RemoveInternalClusterShardingData {
       override val journalPluginId: String,
       override val persistenceId: String,
       replyTo: ActorRef)
-      extends PersistentActor {
+      extends PersistentActor
 
     import RemoveInternalClusterShardingData.RemoveOnePersistenceId._
 
     var hasSnapshots = false
 
-    override def receiveRecover: Receive = {
+    override def receiveRecover: Receive =
       case event: ShardCoordinator.Internal.DomainEvent ⇒
       case SnapshotOffer(_, _) ⇒
         hasSnapshots = true
@@ -158,42 +151,36 @@ object RemoveInternalClusterShardingData {
         deleteMessages(Long.MaxValue)
         if (hasSnapshots) deleteSnapshots(SnapshotSelectionCriteria())
         else context.become(waitDeleteMessagesSuccess)
-    }
 
     override def receiveCommand: Receive =
-      ({
+      (
         case DeleteSnapshotsSuccess(_) ⇒
           context.become(waitDeleteMessagesSuccess)
         case DeleteMessagesSuccess(_) ⇒
           context.become(waitDeleteSnapshotsSuccess)
-      }: Receive).orElse(handleFailure)
+      : Receive).orElse(handleFailure)
 
     def waitDeleteSnapshotsSuccess: Receive =
-      ({
+      (
         case DeleteSnapshotsSuccess(_) ⇒ done()
-      }: Receive).orElse(handleFailure)
+      : Receive).orElse(handleFailure)
 
     def waitDeleteMessagesSuccess: Receive =
-      ({
+      (
         case DeleteMessagesSuccess(_) ⇒ done()
-      }: Receive).orElse(handleFailure)
+      : Receive).orElse(handleFailure)
 
-    def handleFailure: Receive = {
+    def handleFailure: Receive =
       case DeleteMessagesFailure(cause, _) ⇒ failure(cause)
       case DeleteSnapshotsFailure(_, cause) ⇒ failure(cause)
-    }
 
-    def done(): Unit = {
+    def done(): Unit =
       replyTo ! Result(Success(Removals(lastSequenceNr > 0, hasSnapshots)))
       context.stop(self)
-    }
 
-    def failure(cause: Throwable): Unit = {
+    def failure(cause: Throwable): Unit =
       replyTo ! Result(Failure(cause))
       context.stop(self)
-    }
-  }
-}
 
 /**
   * @see [[RemoveInternalClusterShardingData$ RemoveInternalClusterShardingData companion object]]
@@ -202,7 +189,7 @@ class RemoveInternalClusterShardingData(journalPluginId: String,
                                         typeNames: Set[String],
                                         completion: Promise[Unit],
                                         remove2dot3Data: Boolean)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   import RemoveInternalClusterShardingData._
   import RemoveOnePersistenceId.Result
 
@@ -218,20 +205,18 @@ class RemoveInternalClusterShardingData(journalPluginId: String,
   def persistenceId2dot3(typeName: String): String =
     s"/user/sharding/${typeName}Coordinator/singleton/coordinator"
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     removeNext()
-  }
 
-  def removeNext(): Unit = {
+  def removeNext(): Unit =
     currentPid = remainingPids.head
     log.info("Removing data for persistenceId [{}]", currentPid)
     currentRef = context.actorOf(
         RemoveOnePersistenceId.props(journalPluginId, currentPid, self))
     context.watch(currentRef)
     remainingPids -= currentPid
-  }
 
-  def receive = {
+  def receive =
     case Result(Success(_)) ⇒
       log.info("Removed data for persistenceId [{}]", currentPid)
       if (remainingPids.isEmpty) done()
@@ -242,21 +227,16 @@ class RemoveInternalClusterShardingData(journalPluginId: String,
       failure(cause)
 
     case Terminated(ref) ⇒
-      if (ref == currentRef) {
+      if (ref == currentRef)
         val msg =
           s"Failed to remove data for persistenceId [$currentPid], unexpected termination"
         log.error(msg)
         failure(new IllegalStateException(msg))
-      }
-  }
 
-  def done(): Unit = {
+  def done(): Unit =
     context.stop(self)
     completion.success(())
-  }
 
-  def failure(cause: Throwable): Unit = {
+  def failure(cause: Throwable): Unit =
     context.stop(self)
     completion.failure(cause)
-  }
-}

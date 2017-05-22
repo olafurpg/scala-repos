@@ -1,3 +1,2 @@
-class B extends A {
+class B extends A
   override val x = 3
-}

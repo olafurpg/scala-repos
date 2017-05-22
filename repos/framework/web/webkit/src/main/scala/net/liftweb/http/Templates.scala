@@ -27,7 +27,7 @@ import java.io.InputStream
 /**
   * Contains functions for obtaining templates
   */
-object Templates {
+object Templates
   // Making this lazy to ensure it doesn't accidentally init before Boot completes in case someone touches this class.
   private lazy val parsers = LiftRules.contentParsers
     .flatMap(parser => parser.templateSuffixes.map(_ -> parser))
@@ -36,41 +36,36 @@ object Templates {
   private def checkForLiftView(
       part: List[String],
       last: String,
-      what: LiftRules.ViewDispatchPF): Box[NodeSeq] = {
-    if (what.isDefinedAt(part)) {
-      what(part) match {
+      what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
+    if (what.isDefinedAt(part))
+      what(part) match
         case Right(lv) =>
           if (lv.dispatch.isDefinedAt(last)) lv.dispatch(last)() else Empty
         case _ => Empty
-      }
-    } else Empty
-  }
+    else Empty
 
   private def checkForFunc(
       whole: List[String], what: LiftRules.ViewDispatchPF): Box[NodeSeq] =
     if (what.isDefinedAt(whole))
-      what(whole) match {
+      what(whole) match
         case Left(func) => func()
         case _ => Empty
-      } else Empty
+      else Empty
 
   private def findInViews(whole: List[String],
                           part: List[String],
                           last: String,
                           what: List[LiftRules.ViewDispatchPF]): Box[NodeSeq] =
-    what match {
+    what match
       case Nil => Empty
       case x :: xs =>
-        (checkForLiftView(part, last, x) or checkForFunc(whole, x)) match {
+        (checkForLiftView(part, last, x) or checkForFunc(whole, x)) match
           case Full(ret) => Full(ret)
           case _ => findInViews(whole, part, last, xs)
-        }
-    }
 
   private[http] def findTopLevelTemplate(
-      places: List[String], locale: Locale, needAutoSurround: Boolean) = {
+      places: List[String], locale: Locale, needAutoSurround: Boolean) =
     findRawTemplate0(places, locale, needAutoSurround).map(checkForContentId)
-  }
 
   /**
     * Given a list of paths (e.g. List("foo", "index")),
@@ -101,45 +96,38 @@ object Templates {
     * Check to see if the template is marked designer friendly
     * and lop off the stuff before the first surround
     */
-  def checkForContentId(in: NodeSeq): NodeSeq = {
-    def df(in: MetaData): Option[PrefixedAttribute] = in match {
+  def checkForContentId(in: NodeSeq): NodeSeq =
+    def df(in: MetaData): Option[PrefixedAttribute] = in match
       case Null => None
       case p: PrefixedAttribute
           if (p.pre == "l" || p.pre == "lift") && (p.key == "content_id") =>
         Some(p)
       case n => df(n.next)
-    }
 
-    in.flatMap {
+    in.flatMap
       case e: Elem if e.label == "html" => df(e.attributes)
       case _ => None
-    }.flatMap { md =>
+    .flatMap  md =>
       Helpers.findId(in, md.value.text)
-    }.headOption orElse in.flatMap {
+    .headOption orElse in.flatMap
       case e: Elem if e.label == "html" =>
-        e.child.flatMap {
-          case e: Elem if e.label == "body" => {
+        e.child.flatMap
+          case e: Elem if e.label == "body" =>
               e.attribute("data-lift-content-id").headOption.map(_.text) orElse e
                 .attribute("class")
-                .flatMap { ns =>
-                  {
+                .flatMap  ns =>
                     val clz = ns.text.charSplit(' ')
-                    clz.flatMap {
+                    clz.flatMap
                       case s if s.startsWith("lift:content_id=") =>
                         Some(urlDecode(s.substring("lift:content_id=".length)))
                       case _ => None
-                    }.headOption
-                  }
-                }
-            }
+                    .headOption
 
           case _ => None
-        }
       case _ => None
-    }.flatMap { id =>
+    .flatMap  id =>
       Helpers.findId(in, id)
-    }.headOption getOrElse in
-  }
+    .headOption getOrElse in
 
   /**
     * Given a list of paths (e.g. List("foo", "index")),
@@ -149,13 +137,12 @@ object Templates {
     *
     * @return the template if it can be found
     */
-  def findRawTemplate(places: List[String], locale: Locale): Box[NodeSeq] = {
+  def findRawTemplate(places: List[String], locale: Locale): Box[NodeSeq] =
     findRawTemplate0(places, locale, false)
-  }
 
   private def findRawTemplate0(places: List[String],
                                locale: Locale,
-                               needAutoSurround: Boolean): Box[NodeSeq] = {
+                               needAutoSurround: Boolean): Box[NodeSeq] =
     /*
      From a Scala coding standpoint, this method is ugly.  It's also a performance
      hotspot that needed some tuning.  I've made the code very imperative and
@@ -168,9 +155,9 @@ object Templates {
     val resolver = LiftRules.externalTemplateResolver.vend()
     val key = (locale, places)
 
-    if (resolver.isDefinedAt(key)) {
+    if (resolver.isDefinedAt(key))
       resolver(key)
-    } else {
+    else
       val lrCache = LiftRules.templateCache
       val cache =
         if (lrCache.isDefined) lrCache.openOrThrowException("passes isDefined")
@@ -179,11 +166,11 @@ object Templates {
       val tr = cache.get(key)
 
       if (tr.isDefined) tr
-      else {
+      else
         val part = places.dropRight(1)
         val last = places.last
 
-        findInViews(places, part, last, LiftRules.viewDispatch.toList) match {
+        findInViews(places, part, last, LiftRules.viewDispatch.toList) match
           case Full(lv) =>
             Full(lv)
 
@@ -196,85 +183,73 @@ object Templates {
             var found = false
             var ret: NodeSeq = null
 
-            while (!found && se.hasNext) {
+            while (!found && se.hasNext)
               val (suffix, parser) = se.next
               val le = sl.iterator
-              while (!found && le.hasNext) {
+              while (!found && le.hasNext)
                 val p = le.next
                 val name =
                   pls + p + (if (suffix.length > 0) "." + suffix else "")
                 import scala.xml.dtd.ValidationException
-                val xmlb = try {
-                  LiftRules.doWithResource(name)(parser.parse) match {
+                val xmlb = try
+                  LiftRules.doWithResource(name)(parser.parse) match
                     case Full(seq) => seq
                     case _ => Empty
-                  }
-                } catch {
+                catch
                   case e: ValidationException
                       if Props.devMode | Props.testMode =>
                     return Helpers.errorDiv(
                         <div>Error locating template: <b>{name}</b><br/>
                       Message: <b>{e.getMessage}</b><br/>
-                      {
+                      
                       <pre>{e.toString}{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
-                      }
+                      
                     </div>)
 
                   case e: ValidationException => Empty
-                }
-                if (xmlb.isDefined) {
+                if (xmlb.isDefined)
                   found = true
                   val rawElems = xmlb.openOrThrowException("passes isDefined")
                   val possiblySurrounded =
                     if (needAutoSurround) parser.surround(rawElems)
                     else rawElems
                   ret = (cache(key) = possiblySurrounded)
-                } else if (xmlb.isInstanceOf[Failure] &&
-                           (Props.devMode | Props.testMode)) {
+                else if (xmlb.isInstanceOf[Failure] &&
+                           (Props.devMode | Props.testMode))
                   val msg = xmlb.asInstanceOf[Failure].msg
                   val e = xmlb.asInstanceOf[Failure].exception
                   return Helpers.errorDiv(
-                      <div>Error locating template: <b>{name}</b><br/>Message: <b>{msg}</b><br/>{
-                  {
-                    e match {
+                      <div>Error locating template: <b>{name}</b><br/>Message: <b>{msg}</b><br/>
+                    e match
                       case Full(e) =>
                         <pre>{e.toString}{e.getStackTrace.map(_.toString).mkString("\n")}</pre>
                       case _ => NodeSeq.Empty
-                    }
-                  }}
+                  
                   </div>)
-                }
-              }
-            }
 
             if (found) Full(ret)
             else lookForClasses(places)
-        }
-      }
-    }
-  }
 
-  private def lookForClasses(places: List[String]): Box[NodeSeq] = {
-    val (controller, action) = places match {
+  private def lookForClasses(places: List[String]): Box[NodeSeq] =
+    val (controller, action) = places match
       case ctl :: act :: _ => (ctl, act)
       case ctl :: _ => (ctl, "index")
       case Nil => ("default_template", "index")
-    }
     val trans = List[String => String](n => n, n => camelify(n))
     val toTry = trans.flatMap(f =>
           (LiftRules.buildPackage("view") ::: ("lift.app.view" :: Nil))
             .map(_ + "." + f(controller)))
 
-    first(toTry) { clsName =>
-      try {
+    first(toTry)  clsName =>
+      try
         tryo(List(classOf[ClassNotFoundException]), Empty)(
-            Class.forName(clsName).asInstanceOf[Class[AnyRef]]).flatMap { c =>
-          (c.newInstance match {
+            Class.forName(clsName).asInstanceOf[Class[AnyRef]]).flatMap  c =>
+          (c.newInstance match
             case inst: InsecureLiftView => c.getMethod(action).invoke(inst)
             case inst: LiftView if inst.dispatch.isDefinedAt(action) =>
               inst.dispatch(action)()
             case _ => Empty
-          }) match {
+          ) match
             case null | Empty | None => Empty
             case n: Group => Full(n)
             case n: Elem => Full(n)
@@ -288,25 +263,18 @@ object Templates {
             case Full(n: NodeSeq) => Full(n)
             case Full(SafeNodeSeq(n)) => Full(n)
             case _ => Empty
-          }
-        }
-      } catch {
+      catch
         case ite: java.lang.reflect.InvocationTargetException =>
           throw ite.getCause
         case e: NoClassDefFoundError => Empty
-      }
-    }
-  }
-}
 
 /**
   * Throw this exception if there's a catostrophic failure executing
   * a snippet
   */
 class SnippetExecutionException(msg: String)
-    extends SnippetFailureException(msg) {
+    extends SnippetFailureException(msg)
   def snippetFailure = LiftRules.SnippetFailures.ExecutionFailure
-}
 
 /**
   * An abstract exception that may be thrown during page rendering.
@@ -314,32 +282,25 @@ class SnippetExecutionException(msg: String)
   * is generated
   */
 abstract class SnippetFailureException(msg: String)
-    extends LiftFlowOfControlException(msg) {
+    extends LiftFlowOfControlException(msg)
   def snippetFailure: LiftRules.SnippetFailures.Value
 
   def buildStackTrace: NodeSeq =
-    getStackTrace.toList.dropWhile { e =>
-      {
+    getStackTrace.toList.dropWhile  e =>
         val cn = e.getClassName
         cn.startsWith("net.liftweb.http") ||
         cn.startsWith("net.liftweb.common") ||
         cn.startsWith("net.liftweb.util")
-      }
-    }.filter { e =>
-      {
+    .filter  e =>
         val cn = e.getClassName
         !cn.startsWith("java.lang") && !cn.startsWith("sun.")
-      }
-    }.take(10).toList.map { e =>
+    .take(10).toList.map  e =>
       <code><span><br/>{e.toString}</span></code>
-    }
-}
 
 class StateInStatelessException(msg: String)
-    extends SnippetFailureException(msg) {
+    extends SnippetFailureException(msg)
   def snippetFailure: LiftRules.SnippetFailures.Value =
     LiftRules.SnippetFailures.StateInStateless
-}
 
 // FIXME Needed to due to https://issues.scala-lang.org/browse/SI-6541,
 // which causes existential types to be inferred for the generated
@@ -362,25 +323,22 @@ private sealed trait ConstructorType
   * A unit constructor... just pass in null
   */
 private final case class UnitConstructor(c: java.lang.reflect.Constructor[_])
-    extends ConstructorType {
+    extends ConstructorType
   def makeOne[T]: T = c.newInstance().asInstanceOf[T]
-}
 
 /**
   * A parameter and session constructor
   */
 private final case class PAndSessionConstructor(
     c: java.lang.reflect.Constructor[_])
-    extends ConstructorType {
+    extends ConstructorType
   def makeOne[T](p: Any, s: LiftSession): T =
     c.newInstance(p.asInstanceOf[Object], s).asInstanceOf[T]
-}
 
 /**
   * A parameter constructor
   */
 private final case class PConstructor(c: java.lang.reflect.Constructor[_])
-    extends ConstructorType {
+    extends ConstructorType
   def makeOne[T](p: Any): T =
     c.newInstance(p.asInstanceOf[Object]).asInstanceOf[T]
-}

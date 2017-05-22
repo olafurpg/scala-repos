@@ -19,7 +19,7 @@ package com.twitter.summingbird.viz
 import com.twitter.summingbird._
 import com.twitter.summingbird.planner._
 
-case class DagViz[P <: Platform[P]](dag: Dag[P]) {
+case class DagViz[P <: Platform[P]](dag: Dag[P])
   type BaseLookupTable[T] = (Map[T, String], Map[String, Int])
   type NameLookupTable = BaseLookupTable[Producer[P, _]]
 
@@ -32,35 +32,29 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
   def getName[T](
       curLookupTable: BaseLookupTable[T],
       node: T,
-      requestedName: Option[String] = None): (BaseLookupTable[T], String) = {
+      requestedName: Option[String] = None): (BaseLookupTable[T], String) =
     val nodeLookupTable = curLookupTable._1
     val nameLookupTable = curLookupTable._2
     val preferredName = requestedName.getOrElse(defaultName(node))
-    nodeLookupTable.get(node) match {
+    nodeLookupTable.get(node) match
       case Some(name) => (curLookupTable, name)
-      case None => {
-          nameLookupTable.get(preferredName) match {
-            case Some(count) => {
+      case None =>
+          nameLookupTable.get(preferredName) match
+            case Some(count) =>
                 val newNum = count + 1
                 val newName = preferredName + "[" + newNum + "]"
                 (((nodeLookupTable + (node -> newName)),
                   (nameLookupTable + (preferredName -> newNum))),
                  newName)
-              }
-            case None => {
+            case None =>
                 (((nodeLookupTable + (node -> preferredName)),
                   (nameLookupTable + (preferredName -> 1))),
                  preferredName)
-              }
-          }
-        }
-    }
-  }
 
   def getSubGraphStr(
       nameLookupTable: NameLookupTable,
-      node: Node[P]): (List[String], List[String], NameLookupTable) = {
-    node.members.foldLeft((List[String](), List[String](), nameLookupTable)) {
+      node: Node[P]): (List[String], List[String], NameLookupTable) =
+    node.members.foldLeft((List[String](), List[String](), nameLookupTable))
       case ((definitions, mappings, nameLookupTable), nextNode) =>
         val dependants = dependantState.dependantsOf(nextNode).getOrElse(Set())
 
@@ -69,7 +63,7 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
         val nodeName = "\"" + uniqueNodeName + "\""
 
         val (newMappings, innerNameLookupTable) =
-          dependants.foldLeft((List[String](), updatedLookupTable)) {
+          dependants.foldLeft((List[String](), updatedLookupTable))
             case ((mappings, innerNameLookupTable), childNode) =>
               val (updatedLookupTable2, uniqueChildName) =
                 getName(innerNameLookupTable, childNode)
@@ -77,18 +71,15 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
               val mappingStr = "%s -> %s\n".format(nodeName, childName)
 
               (mappingStr :: mappings, updatedLookupTable2)
-          }
         (nodeName :: definitions,
          newMappings ++ mappings,
          innerNameLookupTable)
-    }
-  }
-  def genClusters(): String = {
+  def genClusters(): String =
     val (clusters, producerMappings, producerNames, nodeToShortLookupTable) =
       dag.nodes.foldLeft((List[String](),
                           List[String](),
                           emptyNameLookupTable(),
-                          Map[Node[P], String]())) {
+                          Map[Node[P], String]()))
         case ((clusters, producerMappings, nameLookupTable, nodeShortName),
               node) =>
           val (nodeDefinitions, mappings, newNameLookupTable) =
@@ -101,20 +92,15 @@ case class DagViz[P <: Platform[P]](dag: Dag[P]) {
            mappings ++ producerMappings,
            newNameLookupTable,
            newNodeShortName)
-      }
 
-    val clusterMappings = dag.nodes.flatMap {
+    val clusterMappings = dag.nodes.flatMap
       case node =>
-        dag.dependantsOf(node).collect {
+        dag.dependantsOf(node).collect
           case n =>
             "cluster_%s -> cluster_%s [style=dashed]".format(
                 node.hashCode.toHexString, n.hashCode.toHexString)
-        }
-    }
 
     "digraph summingbirdGraph {\n" +
     (clusters ++ producerMappings ++ clusterMappings).mkString("\n") + "\n}"
-  }
 
   override def toString(): String = genClusters
-}

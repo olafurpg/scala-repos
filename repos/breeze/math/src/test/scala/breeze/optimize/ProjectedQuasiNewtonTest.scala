@@ -27,50 +27,40 @@ import breeze.optimize.proximal.NonlinearMinimizer.Projection
 @RunWith(classOf[JUnitRunner])
 class ProjectedQuasiNewtonTest
     extends PropSpec with PropertyChecks with OptimizeTestBaseTrait
-    with VectorMatchers with Matchers {
+    with VectorMatchers with Matchers
 
-  property("optimize a simple multivariate gaussian") {
+  property("optimize a simple multivariate gaussian")
     val optimizer = new ProjectedQuasiNewton(tolerance = 1.0E-9)
-    forAll { init: DenseVector[Double] =>
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    forAll  init: DenseVector[Double] =>
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (sum((x - 3.0) :^ 2.0), (x * 2.0) - 6.0)
-        }
-      }
 
       val result = optimizer.minimize(f, init)
       result should beSimilarTo(DenseVector.fill(result.size)(3.0),
                                 allowedDeviation = 1E-5)
-    }
-  }
 
-  property("optimize a simple multivariate gaussian with projection") {
+  property("optimize a simple multivariate gaussian with projection")
     val optimizer = new ProjectedQuasiNewton(
         tolerance = 1.0E-5, projection = _.map(scala.math.min(_, 2.0)))
 
-    forAll { init: DenseVector[Double] =>
+    forAll  init: DenseVector[Double] =>
       init := clip(init, Double.NegativeInfinity, 2.0)
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (sum((x - 3.0) :^ 4.0), (x - 3.0) :^ 3.0 :* 4.0)
-        }
-      }
 
       val result = optimizer.minimize(f, init)
       result should beSimilarTo(DenseVector.fill(result.size)(2.0),
                                 allowedDeviation = 1E-10)
-    }
-  }
 
-  property("optimize a simple multivariate gaussian with l2 regularization") {
+  property("optimize a simple multivariate gaussian with l2 regularization")
     val optimizer = new ProjectedQuasiNewton(tolerance = 1.0E-5)
 
-    forAll { init: DenseVector[Double] =>
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    forAll  init: DenseVector[Double] =>
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (norm((x - 3.0) :^ 2.0, 1), (x * 2.0) - 6.0)
-        }
-      }
 
       val targetValue = 3 / (1.0 / 2 + 1)
       val result =
@@ -78,30 +68,23 @@ class ProjectedQuasiNewtonTest
       result should beSimilarTo(
           DenseVector.ones[Double](init.size) * targetValue,
           allowedDeviation = 3E-3 * result.size)
-    }
-  }
 
-  property("optimize a complicated function without projection") {
+  property("optimize a complicated function without projection")
     val optimizer = new ProjectedQuasiNewton(tolerance = 1.0E-5)
 
-    forAll { a: DenseVector[Double] =>
-      whenever(min(a) >= -3.0 && max(a) <= 3.0) {
+    forAll  a: DenseVector[Double] =>
+      whenever(min(a) >= -3.0 && max(a) <= 3.0)
         val init = DenseVector.rand(a.size)
-        val f = new DiffFunction[DenseVector[Double]] {
-          def calculate(x: DenseVector[Double]) = {
+        val f = new DiffFunction[DenseVector[Double]]
+          def calculate(x: DenseVector[Double]) =
             (sum(exp((x :^ 2.0) :- (a :* x))),
              (x * 2.0 :- a) :* exp(x :^ 2.0 :- a :* x))
-          }
-        }
 
         val result = optimizer.minimize(f, init)
         val minimum = f(a / 2.0)
         f(result) should be(minimum +- abs(minimum) * 1E-2)
-      }
-    }
-  }
 
-  property("simple linear solve without projection") {
+  property("simple linear solve without projection")
     val n = 5
     val H = new DenseMatrix(n,
                             n,
@@ -145,9 +128,8 @@ class ProjectedQuasiNewtonTest
     init := 0.0
     val nlResult = new ProjectedQuasiNewton().minimize(cost, init)
     assert(norm(x - nlResult, inf) < 1e-4)
-  }
 
-  property("simple linear solve with L1 projection compared to Octave") {
+  property("simple linear solve with L1 projection compared to Octave")
     val Hl1 = new DenseMatrix(25,
                               25,
                               Array(
@@ -836,5 +818,3 @@ class ProjectedQuasiNewtonTest
 
     println(s"L1 projection iter ${pqnResult.iter}")
     assert(norm(pqnResult.x - octaveL1, 2) < 1e-4)
-  }
-}

@@ -30,19 +30,18 @@ case class NGramTestData(
 
 class NGramSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
   import org.apache.spark.ml.feature.NGramSuite._
 
-  test("default behavior yields bigram features") {
+  test("default behavior yields bigram features")
     val nGram = new NGram().setInputCol("inputTokens").setOutputCol("nGrams")
     val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
                 Array("Test", "for", "ngram", "."),
                 Array("Test for", "for ngram", "ngram .")
             )))
     testNGram(nGram, dataset)
-  }
 
-  test("NGramLength=4 yields length 4 n-grams") {
+  test("NGramLength=4 yields length 4 n-grams")
     val nGram =
       new NGram().setInputCol("inputTokens").setOutputCol("nGrams").setN(4)
     val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
@@ -50,9 +49,8 @@ class NGramSuite
                 Array("a b c d", "b c d e")
             )))
     testNGram(nGram, dataset)
-  }
 
-  test("empty input yields empty output") {
+  test("empty input yields empty output")
     val nGram =
       new NGram().setInputCol("inputTokens").setOutputCol("nGrams").setN(4)
     val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
@@ -60,9 +58,8 @@ class NGramSuite
                 Array()
             )))
     testNGram(nGram, dataset)
-  }
 
-  test("input array < n yields empty output") {
+  test("input array < n yields empty output")
     val nGram =
       new NGram().setInputCol("inputTokens").setOutputCol("nGrams").setN(6)
     val dataset = sqlContext.createDataFrame(Seq(NGramTestData(
@@ -70,21 +67,15 @@ class NGramSuite
                 Array()
             )))
     testNGram(nGram, dataset)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t =
       new NGram().setInputCol("myInputCol").setOutputCol("myOutputCol").setN(3)
     testDefaultReadWrite(t)
-  }
-}
 
-object NGramSuite extends SparkFunSuite {
+object NGramSuite extends SparkFunSuite
 
-  def testNGram(t: NGram, dataset: DataFrame): Unit = {
-    t.transform(dataset).select("nGrams", "wantedNGrams").collect().foreach {
+  def testNGram(t: NGram, dataset: DataFrame): Unit =
+    t.transform(dataset).select("nGrams", "wantedNGrams").collect().foreach
       case Row(actualNGrams, wantedNGrams) =>
         assert(actualNGrams === wantedNGrams)
-    }
-  }
-}

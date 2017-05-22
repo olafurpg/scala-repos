@@ -2,11 +2,11 @@ package com.typesafe.slick.docs
 
 import slick.jdbc.H2Profile.api._
 
-object JoinsUnions extends App {
+object JoinsUnions extends App
 
   class Suppliers(tag: Tag)
       extends Table[(Int, String, String, String, String, String)](
-          tag, "SUPPLIERS") {
+          tag, "SUPPLIERS")
     def id = column[Int]("SUP_ID", O.PrimaryKey)
     def name = column[String]("SUP_NAME")
     def street = column[String]("STREET")
@@ -14,11 +14,10 @@ object JoinsUnions extends App {
     def state = column[String]("STATE")
     def zip = column[String]("ZIP")
     def * = (id, name, street, city, state, zip)
-  }
   val suppliers = TableQuery[Suppliers]
 
   class Coffees(tag: Tag)
-      extends Table[(String, Int, Double, Int, Int)](tag, "COFFEES") {
+      extends Table[(String, Int, Double, Int, Int)](tag, "COFFEES")
     def name = column[String]("COF_NAME", O.PrimaryKey)
     def supID = column[Int]("SUP_ID")
     def price = column[Double]("PRICE")
@@ -26,14 +25,13 @@ object JoinsUnions extends App {
     def total = column[Int]("TOTAL")
     def * = (name, supID, price, sales, total)
     def supplier = foreignKey("SUP_FK", supID, suppliers)(_.id)
-  }
   val coffees = TableQuery[Coffees]
 
   //#implicitCross
-  val monadicCrossJoin = for {
+  val monadicCrossJoin = for
     c <- coffees
     s <- suppliers
-  } yield (c.name, s.name)
+  yield (c.name, s.name)
   // compiles to SQL:
   //   select x2."COF_NAME", x3."SUP_NAME"
   //     from "COFFEES" x2, "SUPPLIERS" x3
@@ -41,10 +39,10 @@ object JoinsUnions extends App {
   println(monadicCrossJoin.result.statements.head)
 
   //#implicitInner
-  val monadicInnerJoin = for {
+  val monadicInnerJoin = for
     c <- coffees
     s <- suppliers if c.supID === s.id
-  } yield (c.name, s.name)
+  yield (c.name, s.name)
   // compiles to SQL:
   //   select x2."COF_NAME", x3."SUP_NAME"
   //     from "COFFEES" x2, "SUPPLIERS" x3
@@ -53,40 +51,40 @@ object JoinsUnions extends App {
   println(monadicInnerJoin.result.statements.head)
 
   //#explicit
-  val crossJoin = for {
+  val crossJoin = for
     (c, s) <- coffees join suppliers
-  } yield (c.name, s.name)
+  yield (c.name, s.name)
   // compiles to SQL (simplified):
   //   select x2."COF_NAME", x3."SUP_NAME" from "COFFEES" x2
   //     inner join "SUPPLIERS" x3
 
-  val innerJoin = for {
+  val innerJoin = for
     (c, s) <- coffees join suppliers on (_.supID === _.id)
-  } yield (c.name, s.name)
+  yield (c.name, s.name)
   // compiles to SQL (simplified):
   //   select x2."COF_NAME", x3."SUP_NAME" from "COFFEES" x2
   //     inner join "SUPPLIERS" x3
   //     on x2."SUP_ID" = x3."SUP_ID"
 
-  val leftOuterJoin = for {
+  val leftOuterJoin = for
     (c, s) <- coffees joinLeft suppliers on (_.supID === _.id)
-  } yield (c.name, s.map(_.name))
+  yield (c.name, s.map(_.name))
   // compiles to SQL (simplified):
   //   select x2."COF_NAME", x3."SUP_NAME" from "COFFEES" x2
   //     left outer join "SUPPLIERS" x3
   //     on x2."SUP_ID" = x3."SUP_ID"
 
-  val rightOuterJoin = for {
+  val rightOuterJoin = for
     (c, s) <- coffees joinRight suppliers on (_.supID === _.id)
-  } yield (c.map(_.name), s.name)
+  yield (c.map(_.name), s.name)
   // compiles to SQL (simplified):
   //   select x2."COF_NAME", x3."SUP_NAME" from "COFFEES" x2
   //     right outer join "SUPPLIERS" x3
   //     on x2."SUP_ID" = x3."SUP_ID"
 
-  val fullOuterJoin = for {
+  val fullOuterJoin = for
     (c, s) <- coffees joinFull suppliers on (_.supID === _.id)
-  } yield (c.map(_.name), s.map(_.name))
+  yield (c.map(_.name), s.map(_.name))
   // compiles to SQL (simplified):
   //   select x2."COF_NAME", x3."SUP_NAME" from "COFFEES" x2
   //     full outer join "SUPPLIERS" x3
@@ -99,22 +97,22 @@ object JoinsUnions extends App {
   println(fullOuterJoin.result.statements.head)
 
   //#zip
-  val zipJoinQuery = for {
+  val zipJoinQuery = for
     (c, s) <- coffees zip suppliers
-  } yield (c.name, s.name)
+  yield (c.name, s.name)
 
-  val zipWithJoin = for {
+  val zipWithJoin = for
     res <- coffees.zipWith(
         suppliers, (c: Coffees, s: Suppliers) => (c.name, s.name))
-  } yield res
+  yield res
   //#zip
   //println(zipJoinQuery.result.statements.head)
   //println(zipWithJoin.result.statements.head)
 
   //#zipWithIndex
-  val zipWithIndexJoin = for {
+  val zipWithIndexJoin = for
     (c, idx) <- coffees.zipWithIndex
-  } yield (c.name, idx)
+  yield (c.name, idx)
   //#zipWithIndex
   //println(zipWithIndexJoin.result.statements.head)
 
@@ -142,4 +140,3 @@ object JoinsUnions extends App {
   //#union
   println(unionQuery.result.statements.head)
   println(unionAllQuery.result.statements.head)
-}

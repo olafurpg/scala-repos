@@ -9,7 +9,7 @@ import scala.annotation.tailrec
   * INTERNAL API
   */
 private[http] class EnhancedByteArray(val underlying: Array[Byte])
-    extends AnyVal {
+    extends AnyVal
 
   /**
     * Tests two byte arrays for value equality in a way that defends against timing attacks.
@@ -22,11 +22,9 @@ private[http] class EnhancedByteArray(val underlying: Array[Byte])
     * @see [[http://rdist.root.org/2009/05/28/timing-attack-in-google-keyczar-library/]]
     * @see [[http://emerose.com/timing-attacks-explained]]
     */
-  def secure_==(other: Array[Byte]): Boolean = {
+  def secure_==(other: Array[Byte]): Boolean =
     @tailrec def xor(ix: Int = 0, result: Int = 0): Int =
       if (ix < underlying.length)
         xor(ix + 1, result | (underlying(ix) ^ other(ix))) else result
 
     other.length == underlying.length && xor() == 0
-  }
-}

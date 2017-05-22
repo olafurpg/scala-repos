@@ -28,86 +28,73 @@ import org.apache.spark.scheduler._
 import org.apache.spark.util.Utils
 
 class JobProgressListenerSuite
-    extends SparkFunSuite with LocalSparkContext with Matchers {
+    extends SparkFunSuite with LocalSparkContext with Matchers
 
   val jobSubmissionTime = 1421191042750L
   val jobCompletionTime = 1421191296660L
 
-  private def createStageStartEvent(stageId: Int) = {
+  private def createStageStartEvent(stageId: Int) =
     val stageInfo = new StageInfo(
         stageId, 0, stageId.toString, 0, null, null, "")
     SparkListenerStageSubmitted(stageInfo)
-  }
 
-  private def createStageEndEvent(stageId: Int, failed: Boolean = false) = {
+  private def createStageEndEvent(stageId: Int, failed: Boolean = false) =
     val stageInfo = new StageInfo(
         stageId, 0, stageId.toString, 0, null, null, "")
-    if (failed) {
+    if (failed)
       stageInfo.failureReason = Some("Failed!")
-    }
     SparkListenerStageCompleted(stageInfo)
-  }
 
   private def createJobStartEvent(
       jobId: Int,
       stageIds: Seq[Int],
-      jobGroup: Option[String] = None): SparkListenerJobStart = {
-    val stageInfos = stageIds.map { stageId =>
+      jobGroup: Option[String] = None): SparkListenerJobStart =
+    val stageInfos = stageIds.map  stageId =>
       new StageInfo(stageId, 0, stageId.toString, 0, null, null, "")
-    }
-    val properties: Option[Properties] = jobGroup.map { groupId =>
+    val properties: Option[Properties] = jobGroup.map  groupId =>
       val props = new Properties()
       props.setProperty(SparkContext.SPARK_JOB_GROUP_ID, groupId)
       props
-    }
     SparkListenerJobStart(
         jobId, jobSubmissionTime, stageInfos, properties.orNull)
-  }
 
-  private def createJobEndEvent(jobId: Int, failed: Boolean = false) = {
+  private def createJobEndEvent(jobId: Int, failed: Boolean = false) =
     val result =
       if (failed) JobFailed(new Exception("dummy failure")) else JobSucceeded
     SparkListenerJobEnd(jobId, jobCompletionTime, result)
-  }
 
   private def runJob(
-      listener: SparkListener, jobId: Int, shouldFail: Boolean = false) {
+      listener: SparkListener, jobId: Int, shouldFail: Boolean = false)
     val stagesThatWontBeRun = jobId * 200 to jobId * 200 + 10
     val stageIds = jobId * 100 to jobId * 100 + 50
     listener.onJobStart(
         createJobStartEvent(jobId, stageIds ++ stagesThatWontBeRun))
-    for (stageId <- stageIds) {
+    for (stageId <- stageIds)
       listener.onStageSubmitted(createStageStartEvent(stageId))
       listener.onStageCompleted(
           createStageEndEvent(stageId, failed = stageId % 2 == 0))
-    }
     listener.onJobEnd(createJobEndEvent(jobId, shouldFail))
-  }
 
-  private def assertActiveJobsStateIsEmpty(listener: JobProgressListener) {
-    listener.getSizesOfActiveStateTrackingCollections.foreach {
+  private def assertActiveJobsStateIsEmpty(listener: JobProgressListener)
+    listener.getSizesOfActiveStateTrackingCollections.foreach
       case (fieldName, size) =>
         assert(size === 0, s"$fieldName was not empty")
-    }
-  }
 
-  test("test LRU eviction of stages") {
+  test("test LRU eviction of stages")
     val conf = new SparkConf()
     conf.set("spark.ui.retainedStages", 5.toString)
     val listener = new JobProgressListener(conf)
 
-    for (i <- 1 to 50) {
+    for (i <- 1 to 50)
       listener.onStageSubmitted(createStageStartEvent(i))
       listener.onStageCompleted(createStageEndEvent(i))
-    }
     assertActiveJobsStateIsEmpty(listener)
 
     listener.completedStages.size should be(5)
     listener.completedStages.map(_.stageId).toSet should be(
         Set(50, 49, 48, 47, 46))
-  }
 
-  test("test clearing of stageIdToActiveJobs") {
+  test("test clearing of stageIdToActiveJobs")
     val conf = new SparkConf()
     conf.set("spark.ui.retainedStages", 5.toString)
     val listener = new JobProgressListener(conf)
@@ -115,39 +102,34 @@ class JobProgressListenerSuite
     val stageIds = 1 to 50
     // Start a job with 50 stages
     listener.onJobStart(createJobStartEvent(jobId, stageIds))
-    for (stageId <- stageIds) {
+    for (stageId <- stageIds)
       listener.onStageSubmitted(createStageStartEvent(stageId))
-    }
     listener.stageIdToActiveJobIds.size should be > 0
 
     // Complete the stages and job
-    for (stageId <- stageIds) {
+    for (stageId <- stageIds)
       listener.onStageCompleted(createStageEndEvent(stageId, failed = false))
-    }
     listener.onJobEnd(createJobEndEvent(jobId, false))
     assertActiveJobsStateIsEmpty(listener)
     listener.stageIdToActiveJobIds.size should be(0)
-  }
 
-  test("test clearing of jobGroupToJobIds") {
+  test("test clearing of jobGroupToJobIds")
     val conf = new SparkConf()
     conf.set("spark.ui.retainedJobs", 5.toString)
     val listener = new JobProgressListener(conf)
 
     // Run 50 jobs, each with one stage
-    for (jobId <- 0 to 50) {
+    for (jobId <- 0 to 50)
       listener.onJobStart(
           createJobStartEvent(jobId, Seq(0), jobGroup = Some(jobId.toString)))
       listener.onStageSubmitted(createStageStartEvent(0))
       listener.onStageCompleted(createStageEndEvent(0, failed = false))
       listener.onJobEnd(createJobEndEvent(jobId, false))
-    }
     assertActiveJobsStateIsEmpty(listener)
     // This collection won't become empty, but it should be bounded by spark.ui.retainedJobs
     listener.jobGroupToJobIds.size should be(5)
-  }
 
-  test("test LRU eviction of jobs") {
+  test("test LRU eviction of jobs")
     val conf = new SparkConf()
     conf.set("spark.ui.retainedStages", 5.toString)
     conf.set("spark.ui.retainedJobs", 5.toString)
@@ -155,34 +137,30 @@ class JobProgressListenerSuite
 
     // Run a bunch of jobs to get the listener into a state where we've exceeded both the
     // job and stage retention limits:
-    for (jobId <- 1 to 10) {
+    for (jobId <- 1 to 10)
       runJob(listener, jobId, shouldFail = false)
-    }
-    for (jobId <- 200 to 210) {
+    for (jobId <- 200 to 210)
       runJob(listener, jobId, shouldFail = true)
-    }
     assertActiveJobsStateIsEmpty(listener)
     // Snapshot the sizes of various soft- and hard-size-limited collections:
     val softLimitSizes = listener.getSizesOfSoftSizeLimitedCollections
     val hardLimitSizes = listener.getSizesOfHardSizeLimitedCollections
     // Run some more jobs:
-    for (jobId <- 11 to 50) {
+    for (jobId <- 11 to 50)
       runJob(listener, jobId, shouldFail = false)
       // We shouldn't exceed the hard / soft limit sizes after the jobs have finished:
       listener.getSizesOfSoftSizeLimitedCollections should be(softLimitSizes)
       listener.getSizesOfHardSizeLimitedCollections should be(hardLimitSizes)
-    }
 
     listener.completedJobs.size should be(5)
     listener.completedJobs.map(_.jobId).toSet should be(
         Set(50, 49, 48, 47, 46))
 
-    for (jobId <- 51 to 100) {
+    for (jobId <- 51 to 100)
       runJob(listener, jobId, shouldFail = true)
       // We shouldn't exceed the hard / soft limit sizes after the jobs have finished:
       listener.getSizesOfSoftSizeLimitedCollections should be(softLimitSizes)
       listener.getSizesOfHardSizeLimitedCollections should be(hardLimitSizes)
-    }
     assertActiveJobsStateIsEmpty(listener)
 
     // Completed and failed jobs each their own size limits, so this should still be the same:
@@ -191,9 +169,8 @@ class JobProgressListenerSuite
         Set(50, 49, 48, 47, 46))
     listener.failedJobs.size should be(5)
     listener.failedJobs.map(_.jobId).toSet should be(Set(100, 99, 98, 97, 96))
-  }
 
-  test("test executor id to summary") {
+  test("test executor id to summary")
     val conf = new SparkConf()
     val listener = new JobProgressListener(conf)
     val taskMetrics = new TaskMetrics()
@@ -259,9 +236,8 @@ class JobProgressListenerSuite
           .executorSummary
           .getOrElse("exe-2", fail())
           .shuffleRead === 1000)
-  }
 
-  test("test task success vs failure counting for different task end reasons") {
+  test("test task success vs failure counting for different task end reasons")
     val conf = new SparkConf()
     val listener = new JobProgressListener(conf)
     val metrics = new TaskMetrics()
@@ -281,14 +257,13 @@ class JobProgressListenerSuite
           ExecutorLostFailure("0", true, Some("Induced failure")),
           UnknownReason)
     var failCount = 0
-    for (reason <- taskFailedReasons) {
+    for (reason <- taskFailedReasons)
       listener.onTaskEnd(SparkListenerTaskEnd(
               task.stageId, 0, taskType, reason, taskInfo, metrics))
       failCount += 1
       assert(listener.stageIdToData((task.stageId, 0)).numCompleteTasks === 0)
       assert(
           listener.stageIdToData((task.stageId, 0)).numFailedTasks === failCount)
-    }
 
     // Make sure we count success as success.
     listener.onTaskEnd(SparkListenerTaskEnd(
@@ -296,16 +271,15 @@ class JobProgressListenerSuite
     assert(listener.stageIdToData((task.stageId, 1)).numCompleteTasks === 1)
     assert(
         listener.stageIdToData((task.stageId, 0)).numFailedTasks === failCount)
-  }
 
-  test("test update metrics") {
+  test("test update metrics")
     val conf = new SparkConf()
     val listener = new JobProgressListener(conf)
 
     val taskType = Utils.getFormattedClassName(new ShuffleMapTask(0))
     val execId = "exe-1"
 
-    def makeTaskMetrics(base: Int): TaskMetrics = {
+    def makeTaskMetrics(base: Int): TaskMetrics =
       val accums = InternalAccumulator.createAll()
       accums.foreach(Accumulators.register)
       val taskMetrics = new TaskMetrics(accums)
@@ -326,14 +300,12 @@ class JobProgressListenerSuite
       inputMetrics.setBytesRead(base + 7)
       outputMetrics.setBytesWritten(base + 8)
       taskMetrics
-    }
 
-    def makeTaskInfo(taskId: Long, finishTime: Int = 0): TaskInfo = {
+    def makeTaskInfo(taskId: Long, finishTime: Int = 0): TaskInfo =
       val taskInfo = new TaskInfo(
           taskId, 0, 1, 0L, execId, "host1", TaskLocality.NODE_LOCAL, false)
       taskInfo.finishTime = finishTime
       taskInfo
-    }
 
     listener.onTaskStart(SparkListenerTaskStart(0, 0, makeTaskInfo(1234L)))
     listener.onTaskStart(SparkListenerTaskStart(0, 0, makeTaskInfo(1235L)))
@@ -445,5 +417,3 @@ class JobProgressListenerSuite
           .shuffleReadMetrics
           .get
           .totalBlocksFetched == 402)
-  }
-}

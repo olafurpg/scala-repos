@@ -31,15 +31,14 @@ import javafx.scene.{paint => jfxsp}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Stop {
+object Stop
   implicit def sfxStop2jfx(s: Stop): jfxsp.Stop =
     if (s != null) s.delegate else null
 
   def apply(offset: Double, color: Color) =
     new Stop(new jfxsp.Stop(offset, color))
-}
 
-class Stop(override val delegate: jfxsp.Stop) extends SFXDelegate[jfxsp.Stop] {
+class Stop(override val delegate: jfxsp.Stop) extends SFXDelegate[jfxsp.Stop]
 
   /**
     * Gets a number ranging from 0 to 1 that indicates where this gradient stop is placed.
@@ -50,4 +49,3 @@ class Stop(override val delegate: jfxsp.Stop) extends SFXDelegate[jfxsp.Stop] {
     * Gets the color of the gradient at this offset.
     */
   def color = delegate.getColor
-}

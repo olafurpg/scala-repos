@@ -20,9 +20,8 @@ class MyQuery(
 class MyModel(
     val temperatures: HashMap[String, Double]
 )
-    extends Serializable {
+    extends Serializable
   override def toString = temperatures.toString
-}
 
 class MyPredictedResult(
     val temperature: Double
@@ -35,54 +34,45 @@ class MyDataSource
                         EmptyDataParams,
                         MyTrainingData,
                         MyQuery,
-                        EmptyActualResult] {
+                        EmptyActualResult]
 
   /* override this to return Training Data only */
-  override def readTraining(): MyTrainingData = {
+  override def readTraining(): MyTrainingData =
     val lines =
-      Source.fromFile("../data/helloworld/data.csv").getLines().toList.map {
+      Source.fromFile("../data/helloworld/data.csv").getLines().toList.map
         line =>
           val data = line.split(",")
           (data(0), data(1).toDouble)
-      }
 
     new MyTrainingData(lines)
-  }
-}
 
 class MyAlgorithm
     extends LAlgorithm[EmptyAlgorithmParams,
                        MyTrainingData,
                        MyModel,
                        MyQuery,
-                       MyPredictedResult] {
+                       MyPredictedResult]
 
-  override def train(pd: MyTrainingData): MyModel = {
+  override def train(pd: MyTrainingData): MyModel =
     // calculate average value of each day
     val average = pd.temperatures
       .groupBy(_._1) // group by day
-      .mapValues { list =>
+      .mapValues  list =>
         val tempList = list.map(_._2) // get the temperature
         tempList.sum / tempList.size
-      }
 
     // trait Map is not serializable, use concrete class HashMap
     new MyModel(HashMap[String, Double]() ++ average)
-  }
 
-  override def predict(model: MyModel, query: MyQuery): MyPredictedResult = {
+  override def predict(model: MyModel, query: MyQuery): MyPredictedResult =
     val temp = model.temperatures(query.day)
     new MyPredictedResult(temp)
-  }
-}
 
 // factory
-object MyEngineFactory extends IEngineFactory {
-  override def apply() = {
+object MyEngineFactory extends IEngineFactory
+  override def apply() =
     /* SimpleEngine only requires one DataSouce and one Algorithm */
     new SimpleEngine(
         classOf[MyDataSource],
         classOf[MyAlgorithm]
     )
-  }
-}

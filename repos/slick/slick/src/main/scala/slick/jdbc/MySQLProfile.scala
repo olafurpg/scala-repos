@@ -56,7 +56,7 @@ import slick.util.ConfigExtensionMethods.configExtensionMethods
   * old path are *not* used anymore. This deprecation warning will be removed in a
   * future version.
   */
-trait MySQLProfile extends JdbcProfile { profile =>
+trait MySQLProfile extends JdbcProfile  profile =>
   import MySQLProfile.{RowNum, RowNumGen}
 
   override protected def computeCapabilities: Set[Capability] =
@@ -64,47 +64,40 @@ trait MySQLProfile extends JdbcProfile { profile =>
         SqlCapabilities.sequenceLimited - RelationalCapabilities.joinFull -
         JdbcCapabilities.nullableNoDefault)
 
-  override protected[this] def loadProfileConfig: Config = {
+  override protected[this] def loadProfileConfig: Config =
     if (!GlobalConfig.profileConfig("slick.driver.MySQL").entrySet().isEmpty)
       SlickLogger[MySQLProfile].warn(
           "The config key 'slick.driver.MySQL' is deprecated and not used anymore. Use 'slick.jdbc.MySQLProfile' instead.")
     super.loadProfileConfig
-  }
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
-      extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
+      extends JdbcModelBuilder(mTables, ignoreInvalidDefaults)
     override def createPrimaryKeyBuilder(
         tableBuilder: TableBuilder,
         meta: Seq[MPrimaryKey]): PrimaryKeyBuilder =
-      new PrimaryKeyBuilder(tableBuilder, meta) {
+      new PrimaryKeyBuilder(tableBuilder, meta)
         // TODO: this needs a test
         override def name = super.name.filter(_ != "PRIMARY")
-      }
     override def createColumnBuilder(
         tableBuilder: TableBuilder, meta: MColumn): ColumnBuilder =
-      new ColumnBuilder(tableBuilder, meta) {
+      new ColumnBuilder(tableBuilder, meta)
         override def default =
           meta.columnDef
             .map((_, tpe))
-            .collect {
+            .collect
               case (v, "String") => Some(Some(v))
               case ("1", "Boolean") => Some(Some(true))
               case ("0", "Boolean") => Some(Some(false))
-            }
-            .getOrElse {
+            .getOrElse
               val d = super.default
-              if (meta.nullable == Some(true) && d == None) {
+              if (meta.nullable == Some(true) && d == None)
                 Some(None)
-              } else d
-            }
-        override def length: Option[Int] = {
+              else d
+        override def length: Option[Int] =
           val l = super.length
           if (tpe == "String" && varying && l == Some(65535)) None
           else l
-        }
-      }
-  }
 
   override def createModelBuilder(
       tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
@@ -130,13 +123,13 @@ trait MySQLProfile extends JdbcProfile { profile =>
   override def quoteIdentifier(id: String) = '`' + id + '`'
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match
     case java.sql.Types.VARCHAR =>
-      sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length]) match {
+      sym.flatMap(_.findColumnOption[RelationalProfile.ColumnOption.Length]) match
         case Some(l) =>
           if (l.varying) s"VARCHAR(${l.length})" else s"CHAR(${l.length})"
         case None =>
-          defaultStringType match {
+          defaultStringType match
             case Some(s) => s
             case None =>
               if (sym
@@ -145,15 +138,12 @@ trait MySQLProfile extends JdbcProfile { profile =>
                     .isDefined || sym
                     .flatMap(_.findColumnOption[ColumnOption.PrimaryKey.type])
                     .isDefined) "VARCHAR(254)" else "TEXT"
-          }
-      }
     case _ => super.defaultSqlTypeName(tmd, sym)
-  }
 
   protected lazy val defaultStringType =
     profileConfig.getStringOpt("defaultStringType")
 
-  class MySQLResolveZipJoins extends ResolveZipJoins {
+  class MySQLResolveZipJoins extends ResolveZipJoins
     // MySQL does not support ROW_NUMBER() but you can manually increment a variable in the SELECT
     // clause to emulate it. See http://stackoverflow.com/a/1895127/458687 for an example.
     // According to http://dev.mysql.com/doc/refman/5.0/en/user-variables.html this should not be
@@ -163,7 +153,7 @@ trait MySQLProfile extends JdbcProfile { profile =>
                                        from: Node,
                                        defs: ConstArray[(TermSymbol, Node)],
                                        offset: Long,
-                                       p: Node): Node = {
+                                       p: Node): Node =
       val countSym = new AnonSymbol
       val j = Join(new AnonSymbol,
                    new AnonSymbol,
@@ -175,23 +165,21 @@ trait MySQLProfile extends JdbcProfile { profile =>
                    JoinType.Inner,
                    LiteralNode(true))
       var first = true
-      Subquery(Bind(s1, j, p.replace {
+      Subquery(Bind(s1, j, p.replace
         case Select(Ref(s), ElementSymbol(2)) if s == s1 =>
           val r = RowNum(countSym, first)
           first = false
           r
         case r @ Ref(s) if s == s1 => r.untyped
-      }), Subquery.Default).infer()
-    }
-  }
+      ), Subquery.Default).infer()
 
   class QueryBuilder(tree: Node, state: CompilerState)
-      extends super.QueryBuilder(tree, state) {
+      extends super.QueryBuilder(tree, state)
     override protected val supportsCast = false
     override protected val parenthesizeNestedRHSJoin = true
     override protected val quotedJdbcFns = Some(Nil)
 
-    override def expr(n: Node, skipParens: Boolean = false): Unit = n match {
+    override def expr(n: Node, skipParens: Boolean = false): Unit = n match
       case Library.Cast(ch) :@ JdbcType(ti, _) =>
         val tn =
           if (ti == columnTypes.stringJdbcType) "VARCHAR"
@@ -204,58 +192,47 @@ trait MySQLProfile extends JdbcProfile { profile =>
       case RowNum(sym, false) => b"@`$sym"
       case RowNumGen(sym, init) => b"@`$sym := $init"
       case _ => super.expr(n, skipParens)
-    }
 
     override protected def buildFetchOffsetClause(
-        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match {
+        fetch: Option[Node], offset: Option[Node]) = (fetch, offset) match
       case (Some(t), Some(d)) => b"\nlimit $d,$t"
       case (Some(t), None) => b"\nlimit $t"
       case (None, Some(d)) => b"\nlimit $d,18446744073709551615"
       case _ =>
-    }
 
-    override protected def buildOrdering(n: Node, o: Ordering) {
+    override protected def buildOrdering(n: Node, o: Ordering)
       if (o.nulls.last && !o.direction.desc) b"isnull($n),"
       else if (o.nulls.first && o.direction.desc) b"isnull($n) desc,"
       expr(n)
       if (o.direction.desc) b" desc"
-    }
-  }
 
-  class UpsertBuilder(ins: Insert) extends super.UpsertBuilder(ins) {
-    override def buildInsert: InsertBuilderResult = {
+  class UpsertBuilder(ins: Insert) extends super.UpsertBuilder(ins)
+    override def buildInsert: InsertBuilderResult =
       val start = buildInsertStart
       val update = softNames.map(n => s"$n=VALUES($n)").mkString(", ")
       new InsertBuilderResult(
           table,
           s"$start values $allVars on duplicate key update $update",
           syms)
-    }
-  }
 
-  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table) {
-    override protected def dropForeignKey(fk: ForeignKey) = {
+  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table)
+    override protected def dropForeignKey(fk: ForeignKey) =
       "ALTER TABLE " + table.tableName + " DROP FOREIGN KEY " + fk.name
-    }
-    override protected def dropPrimaryKey(pk: PrimaryKey): String = {
+    override protected def dropPrimaryKey(pk: PrimaryKey): String =
       "ALTER TABLE " + table.tableName + " DROP PRIMARY KEY"
-    }
-  }
 
   class ColumnDDLBuilder(column: FieldSymbol)
-      extends super.ColumnDDLBuilder(column) {
-    override protected def appendOptions(sb: StringBuilder) {
+      extends super.ColumnDDLBuilder(column)
+    override protected def appendOptions(sb: StringBuilder)
       if (defaultLiteral ne null) sb append " DEFAULT " append defaultLiteral
       if (notNull) sb append " NOT NULL"
       else if (sqlType.toUpperCase == "TIMESTAMP") sb append " NULL"
       if (autoIncrement) sb append " AUTO_INCREMENT"
       if (primaryKey) sb append " PRIMARY KEY"
-    }
-  }
 
   class SequenceDDLBuilder[T](seq: Sequence[T])
-      extends super.SequenceDDLBuilder(seq) {
-    override def buildDDL: DDL = {
+      extends super.SequenceDDLBuilder(seq)
+    override def buildDDL: DDL =
       import seq.integral._
       val sqlType = profile.jdbcTypeFor(seq.tpe).sqlTypeName(None)
       val t = sqlType + " not null"
@@ -275,16 +252,15 @@ trait MySQLProfile extends JdbcProfile { profile =>
         throw new SlickException(
             "Sequences with limited size and without CYCLE are not supported by MySQLProfile's sequence emulation")
       val incExpr =
-        if (seq._cycle) {
+        if (seq._cycle)
           if (desc)
             "if(id-" + (-increment) + "<" + minValue + "," + maxValue +
             ",id-" + (-increment) + ")"
           else
             "if(id+" + increment + ">" + maxValue + "," + minValue + ",id+" +
             increment + ")"
-        } else {
+        else
           "id+(" + increment + ")"
-        }
       DDL(
           Iterable(
               "create table " + quoteIdentifier(seq.name + "_seq") + " (id " +
@@ -303,17 +279,15 @@ trait MySQLProfile extends JdbcProfile { profile =>
                    "drop function " + quoteIdentifier(seq.name + "_nextval"),
                    "drop table " + quoteIdentifier(seq.name + "_seq"))
       )
-    }
-  }
 
-  class JdbcTypes extends super.JdbcTypes {
-    override val stringJdbcType = new StringJdbcType {
+  class JdbcTypes extends super.JdbcTypes
+    override val stringJdbcType = new StringJdbcType
       override def valueToSQLLiteral(value: String) =
         if (value eq null) "NULL"
-        else {
+        else
           val sb = new StringBuilder
           sb append '\''
-          for (c <- value) c match {
+          for (c <- value) c match
             case '\'' => sb append "\\'"
             case '"' => sb append "\\\""
             case 0 => sb append "\\0"
@@ -324,36 +298,27 @@ trait MySQLProfile extends JdbcProfile { profile =>
             case '\t' => sb append "\\t"
             case '\\' => sb append "\\\\"
             case _ => sb append c
-          }
           sb append '\''
           sb.toString
-        }
-    }
 
     import java.util.UUID
 
-    override val uuidJdbcType = new UUIDJdbcType {
+    override val uuidJdbcType = new UUIDJdbcType
       override def sqlType = java.sql.Types.BINARY
       override def sqlTypeName(sym: Option[FieldSymbol]) = "BINARY(16)"
 
       override def valueToSQLLiteral(value: UUID): String =
         "x'" + value.toString.replace("-", "") + "'"
-    }
-  }
-}
 
-object MySQLProfile extends MySQLProfile {
+object MySQLProfile extends MySQLProfile
   final case class RowNum(sym: AnonSymbol, inc: Boolean)
-      extends NullaryNode with SimplyTypedNode {
+      extends NullaryNode with SimplyTypedNode
     type Self = RowNum
     def buildType = ScalaBaseType.longType
     def rebuild = copy()
-  }
 
   final case class RowNumGen(sym: AnonSymbol, init: Long)
-      extends NullaryNode with SimplyTypedNode {
+      extends NullaryNode with SimplyTypedNode
     type Self = RowNumGen
     def buildType = ScalaBaseType.longType
     def rebuild = copy()
-  }
-}

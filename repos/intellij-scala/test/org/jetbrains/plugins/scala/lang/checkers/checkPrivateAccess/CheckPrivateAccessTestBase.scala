@@ -21,12 +21,12 @@ import org.jetbrains.plugins.scala.lang.resolve.ResolveUtils
   * Date: 08.10.2009
   */
 abstract class CheckPrivateAccessTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   val refMarker = "/*ref*/"
 
   protected def folderPath = baseRootPath() + "checkers/checkPrivateAccess/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
@@ -52,13 +52,10 @@ abstract class CheckPrivateAccessTestBase
 
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
-    }
     assertEquals(output, res.toString)
-  }
-}

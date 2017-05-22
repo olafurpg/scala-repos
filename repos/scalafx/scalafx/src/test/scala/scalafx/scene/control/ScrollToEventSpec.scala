@@ -42,7 +42,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class ScrollToEventSpec[String]
     extends SimpleSFXDelegateSpec[
         jfxsc.ScrollToEvent[String], ScrollToEvent[String]](
-        classOf[jfxsc.ScrollToEvent[String]], classOf[ScrollToEvent[String]]) {
+        classOf[jfxsc.ScrollToEvent[String]], classOf[ScrollToEvent[String]])
 
   override def getScalaClassInstance =
     new ScrollToEvent[String](getJavaClassInstance)
@@ -53,4 +53,3 @@ class ScrollToEventSpec[String]
         null,
         null.asInstanceOf[EventType[jfxsc.ScrollToEvent[String]]],
         "eventTarget".asInstanceOf[String])
-}

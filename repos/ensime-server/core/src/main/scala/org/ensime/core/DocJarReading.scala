@@ -9,16 +9,15 @@ import org.ensime.api.EnsimeConfig
 
 import org.ensime.util.io._
 
-trait DocJarReading {
+trait DocJarReading
   def config: EnsimeConfig
 
   def docJarContent(filename: String, entry: String): Option[ByteString] =
-    for {
+    for
       file <- config.allDocJars.find(_.getName == filename)
       jar = new JarFile(file)
       entry <- Option(jar.getJarEntry(entry))
       stream = jar.getInputStream(entry)
-    } yield ByteString(stream.toByteArray)
+    yield ByteString(stream.toByteArray)
 
   def docJars(): Set[File] = config.allDocJars
-}

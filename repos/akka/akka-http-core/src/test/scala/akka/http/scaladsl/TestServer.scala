@@ -15,7 +15,7 @@ import akka.stream.scaladsl.{Source, Flow}
 import com.typesafe.config.{ConfigFactory, Config}
 import HttpMethods._
 
-object TestServer extends App {
+object TestServer extends App
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loglevel = INFO
@@ -25,36 +25,33 @@ object TestServer extends App {
   implicit val system = ActorSystem("ServerTest", testConf)
   implicit val fm = ActorMaterializer()
 
-  try {
-    val binding = Http().bindAndHandleSync({
+  try
+    val binding = Http().bindAndHandleSync(
       case req @ HttpRequest(GET, Uri.Path("/"), _, _, _)
           if req.header[UpgradeToWebSocket].isDefined ⇒
-        req.header[UpgradeToWebSocket] match {
+        req.header[UpgradeToWebSocket] match
           case Some(upgrade) ⇒
             upgrade.handleMessages(echoWebSocketService) // needed for running the autobahn test suite
           case None ⇒
             HttpResponse(400, entity = "Not a valid websocket request!")
-        }
       case HttpRequest(GET, Uri.Path("/"), _, _, _) ⇒ index
       case HttpRequest(GET, Uri.Path("/ping"), _, _, _) ⇒
         HttpResponse(entity = "PONG!")
       case HttpRequest(GET, Uri.Path("/crash"), _, _, _) ⇒ sys.error("BOOM!")
       case req @ HttpRequest(GET, Uri.Path("/ws-greeter"), _, _, _) ⇒
-        req.header[UpgradeToWebSocket] match {
+        req.header[UpgradeToWebSocket] match
           case Some(upgrade) ⇒ upgrade.handleMessages(greeterWebSocketService)
           case None ⇒
             HttpResponse(400, entity = "Not a valid websocket request!")
-        }
       case _: HttpRequest ⇒ HttpResponse(404, entity = "Unknown resource!")
-    }, interface = "localhost", port = 9001)
+    , interface = "localhost", port = 9001)
 
     Await.result(binding, 1.second) // throws if binding fails
     println("Server online at http://localhost:9001")
     println("Press RETURN to stop...")
     Console.readLine()
-  } finally {
+  finally
     system.terminate()
-  }
 
   ////////////// helpers //////////////
 
@@ -75,10 +72,8 @@ object TestServer extends App {
     Flow[Message] // just let message flow directly to the output
 
   def greeterWebSocketService: Flow[Message, Message, NotUsed] =
-    Flow[Message].collect {
+    Flow[Message].collect
       case TextMessage.Strict(name) ⇒ TextMessage(s"Hello '$name'")
       case tm: TextMessage ⇒
         TextMessage(Source.single("Hello ") ++ tm.textStream)
       // ignore binary messages
-    }
-}

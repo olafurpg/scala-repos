@@ -21,12 +21,12 @@ import scala.compat.java8.OptionConverters._
 import scala.compat.java8.FutureConverters._
 import java.util.concurrent.CompletionStage
 
-object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
+object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider
 
   /**
     * Represents a prospective TCP server binding.
     */
-  class ServerBinding private[akka](delegate: scaladsl.Tcp.ServerBinding) {
+  class ServerBinding private[akka](delegate: scaladsl.Tcp.ServerBinding)
 
     /**
       * The local address of the endpoint bound by the materialization of the `connections` [[Source]].
@@ -40,13 +40,12 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
       * The produced [[java.util.concurrent.CompletionStage]] is fulfilled when the unbinding has been completed.
       */
     def unbind(): CompletionStage[Unit] = delegate.unbind().toJava
-  }
 
   /**
     * Represents an accepted incoming TCP connection.
     */
   class IncomingConnection private[akka](
-      delegate: scaladsl.Tcp.IncomingConnection) {
+      delegate: scaladsl.Tcp.IncomingConnection)
 
     /**
       * The local address this connection is bound to.
@@ -73,13 +72,12 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
       * This flow can be materialized only once.
       */
     def flow: Flow[ByteString, ByteString, NotUsed] = new Flow(delegate.flow)
-  }
 
   /**
     * Represents a prospective outgoing TCP connection.
     */
   class OutgoingConnection private[akka](
-      delegate: scaladsl.Tcp.OutgoingConnection) {
+      delegate: scaladsl.Tcp.OutgoingConnection)
 
     /**
       * The remote address this connection is or will be bound to.
@@ -90,16 +88,14 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
       * The local address of the endpoint bound by the materialization of the connection materialization.
       */
     def localAddress: InetSocketAddress = delegate.localAddress
-  }
 
   override def get(system: ActorSystem): Tcp = super.get(system)
 
   def lookup() = Tcp
 
   def createExtension(system: ExtendedActorSystem): Tcp = new Tcp(system)
-}
 
-class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
+class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension
   import Tcp._
   import akka.dispatch.ExecutionContexts.{sameThreadExecutionContext ⇒ ec}
 
@@ -203,4 +199,3 @@ class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
     Flow.fromGraph(delegate
           .outgoingConnection(new InetSocketAddress(host, port))
           .mapMaterializedValue(_.map(new OutgoingConnection(_))(ec).toJava))
-}

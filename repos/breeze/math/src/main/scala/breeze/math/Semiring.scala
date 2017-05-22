@@ -21,7 +21,7 @@ package breeze.math
   * @author dlwh
   */
 trait Semiring[@specialized(Int, Short, Long, Float, Double) V]
-    extends Serializable {
+    extends Serializable
   def zero: V
 
   def one: V
@@ -32,9 +32,8 @@ trait Semiring[@specialized(Int, Short, Long, Float, Double) V]
   def ==(a: V, b: V): Boolean
   def !=(a: V, b: V): Boolean
   def close(a: V, b: V, tolerance: Double = 1E-4): Boolean = a == b
-}
 
-object Semiring {
+object Semiring
   import breeze.math.Ring._
   implicit val semiringD: Semiring[Double] = ringD
   implicit val semiringFloat: Semiring[Float] = ringFloat
@@ -47,12 +46,10 @@ object Semiring {
   implicit def semiringFromRing[T](implicit ring: Ring[T]): Semiring[T] = ring
 
   @SerialVersionUID(1L)
-  implicit object fieldB extends Semiring[Boolean] {
+  implicit object fieldB extends Semiring[Boolean]
     def zero = false
     def one = true
     def ==(a: Boolean, b: Boolean) = a == b
     def !=(a: Boolean, b: Boolean) = a != b
     def +(a: Boolean, b: Boolean) = a || b
     def *(a: Boolean, b: Boolean) = a && b
-  }
-}

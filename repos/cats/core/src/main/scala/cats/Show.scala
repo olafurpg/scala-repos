@@ -11,25 +11,20 @@ import cats.functor.Contravariant
   * explicitly provided one.
   */
 @typeclass
-trait Show[T] {
+trait Show[T]
   def show(f: T): String
-}
 
-object Show {
+object Show
 
   /** creates an instance of [[Show]] using the provided function */
-  def show[A](f: A => String): Show[A] = new Show[A] {
+  def show[A](f: A => String): Show[A] = new Show[A]
     def show(a: A): String = f(a)
-  }
 
   /** creates an instance of [[Show]] using object toString */
-  def fromToString[A]: Show[A] = new Show[A] {
+  def fromToString[A]: Show[A] = new Show[A]
     def show(a: A): String = a.toString
-  }
 
   implicit val showContravariant: Contravariant[Show] =
-    new Contravariant[Show] {
+    new Contravariant[Show]
       def contramap[A, B](fa: Show[A])(f: B => A): Show[B] =
         show[B](fa.show _ compose f)
-    }
-}

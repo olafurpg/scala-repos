@@ -1,7 +1,5 @@
-class OkTypeAlias2 {
+class OkTypeAlias2
   type Q = Int
 
-  trait B {
+  trait B
     val list: List[ /*begin*/ Q /*end*/ ] = List(45)
-  }
-}

@@ -7,12 +7,12 @@ import lila.hub.actorApi.message.LichessThread
 import lila.hub.actorApi.router._
 
 private[team] final class Notifier(
-    sender: String, messenger: ActorSelection, router: ActorSelection) {
+    sender: String, messenger: ActorSelection, router: ActorSelection)
 
   import makeTimeout.large
 
-  def acceptRequest(team: Team, request: Request) {
-    teamUrl(team.id) foreach { url =>
+  def acceptRequest(team: Team, request: Request)
+    teamUrl(team.id) foreach  url =>
       messenger ! LichessThread(
           from = sender,
           to = request.user,
@@ -21,9 +21,6 @@ private[team] final class Notifier(
 
 Here is the team page: %s""" format url
       )
-    }
-  }
 
   private def teamUrl(id: String) =
     router ? Abs(TeamShow(id)) mapTo manifest[String]
-}

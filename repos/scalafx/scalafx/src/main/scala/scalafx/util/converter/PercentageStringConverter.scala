@@ -32,19 +32,17 @@ import javafx.util.{converter => jfxuc}
 
 import scala.language.implicitConversions
 
-object PercentageStringConverter {
+object PercentageStringConverter
   implicit def sfxPercentageStringConverter2jfx(
       c: PercentageStringConverter): jfxuc.PercentageStringConverter =
     if (c != null) c.delegate else null
-}
 
 class PercentageStringConverter(
     delegate: jfxuc.PercentageStringConverter = new jfxuc.PercentageStringConverter)
     extends NumberStringConverterDelegate[jfxuc.PercentageStringConverter](
-        delegate) {
+        delegate)
 
   def this(locale: Locale) = this(new jfxuc.PercentageStringConverter(locale))
 
   def this(numberFormat: NumberFormat) =
     this(new jfxuc.PercentageStringConverter(numberFormat))
-}

@@ -8,17 +8,15 @@ import org.scalatest.FunSuite
 
 import java.util.{Calendar, TimeZone, Date}
 
-class JsonFormatSpec extends FunSuite {
-  val date1 = {
+class JsonFormatSpec extends FunSuite
+  val date1 =
     val d = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     d.set(2011, 3, 14, 16, 0, 49)
     d.getTime
-  }
-  def date(date: String): Date = {
+  def date(date: String): Date =
     val f = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     f.setTimeZone(TimeZone.getTimeZone("UTC"))
     f.parse(date)
-  }
   val sha1 = "6dcb09b5b57875f334f61aebed695e2e4193db5e"
   val repo1Name = RepositoryName("octocat/Hello-World")
   implicit val context = JsonFormat.Context("http://gitbucket.exmple.com")
@@ -383,66 +381,50 @@ class JsonFormatSpec extends FunSuite {
     }
 }"""
 
-  def assertJson(resultJson: String, expectJson: String) = {
+  def assertJson(resultJson: String, expectJson: String) =
     import java.util.regex.Pattern
     val json2 = Pattern
       .compile("""^\s*//.*$""", Pattern.MULTILINE)
       .matcher(expectJson)
       .replaceAll("")
-    val js2 = try {
+    val js2 = try
       parse(json2)
-    } catch {
-      case e: com.fasterxml.jackson.core.JsonParseException => {
+    catch
+      case e: com.fasterxml.jackson.core.JsonParseException =>
           val p =
             java.lang.Math.max(e.getLocation.getCharOffset() - 10, 0).toInt
           val message =
             json2.substring(p, java.lang.Math.min(p + 100, json2.length))
           throw new com.fasterxml.jackson.core.JsonParseException(
               message + e.getMessage, e.getLocation)
-        }
-    }
     val js1 = parse(resultJson)
     assert(js1 === js2)
-  }
 
-  test("apiUser") {
+  test("apiUser")
     assertJson(JsonFormat(apiUser), apiUserJson)
-  }
-  test("repository") {
+  test("repository")
     assertJson(JsonFormat(repository), repositoryJson)
-  }
-  test("apiPushCommit") {
+  test("apiPushCommit")
     assertJson(JsonFormat(apiPushCommit), apiPushCommitJson)
-  }
-  test("apiComment") {
+  test("apiComment")
     assertJson(JsonFormat(apiComment), apiCommentJson)
     assertJson(JsonFormat(apiCommentPR), apiCommentPRJson)
-  }
-  test("apiCommitListItem") {
+  test("apiCommitListItem")
     assertJson(JsonFormat(apiCommitListItem), apiCommitListItemJson)
-  }
-  test("apiCommitStatus") {
+  test("apiCommitStatus")
     assertJson(JsonFormat(apiCommitStatus), apiCommitStatusJson)
-  }
-  test("apiCombinedCommitStatus") {
+  test("apiCombinedCommitStatus")
     assertJson(
         JsonFormat(apiCombinedCommitStatus), apiCombinedCommitStatusJson)
-  }
-  test("apiLabel") {
+  test("apiLabel")
     assertJson(JsonFormat(apiLabel), apiLabelJson)
-  }
-  test("apiIssue") {
+  test("apiIssue")
     assertJson(JsonFormat(apiIssue), apiIssueJson)
     assertJson(JsonFormat(apiIssuePR), apiIssuePRJson)
-  }
-  test("apiPullRequest") {
+  test("apiPullRequest")
     assertJson(JsonFormat(apiPullRequest), apiPullRequestJson)
-  }
-  test("apiPullRequestReviewComment") {
+  test("apiPullRequestReviewComment")
     assertJson(JsonFormat(apiPullRequestReviewComment),
                apiPullRequestReviewCommentJson)
-  }
-  test("apiBranchProtection") {
+  test("apiBranchProtection")
     assertJson(JsonFormat(apiBranchProtection), apiBranchProtectionJson)
-  }
-}

@@ -23,46 +23,41 @@ import org.apache.spark.sql.execution.joins._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
 
-class JoinSuite extends QueryTest with SharedSQLContext {
+class JoinSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
   setupTestData()
 
-  def statisticSizeInByte(df: DataFrame): BigInt = {
+  def statisticSizeInByte(df: DataFrame): BigInt =
     df.queryExecution.optimizedPlan.statistics.sizeInBytes
-  }
 
-  test("equi-join is hash-join") {
+  test("equi-join is hash-join")
     val x = testData2.as("x")
     val y = testData2.as("y")
     val join =
       x.join(y, $"x.a" === $"y.a", "inner").queryExecution.optimizedPlan
     val planned = sqlContext.sessionState.planner.EquiJoinSelection(join)
     assert(planned.size === 1)
-  }
 
-  def assertJoin(sqlString: String, c: Class[_]): Any = {
+  def assertJoin(sqlString: String, c: Class[_]): Any =
     val df = sql(sqlString)
     val physical = df.queryExecution.sparkPlan
-    val operators = physical.collect {
+    val operators = physical.collect
       case j: BroadcastHashJoin => j
       case j: ShuffledHashJoin => j
       case j: CartesianProduct => j
       case j: BroadcastNestedLoopJoin => j
       case j: SortMergeJoin => j
-    }
 
     assert(operators.size === 1)
-    if (operators(0).getClass() != c) {
+    if (operators(0).getClass() != c)
       fail(
           s"$sqlString expected operator: $c, but got ${operators(0)}\n physical: \n$physical")
-    }
-  }
 
-  test("join operator selection") {
+  test("join operator selection")
     sqlContext.cacheManager.clearCache()
 
-    withSQLConf("spark.sql.autoBroadcastJoinThreshold" -> "0") {
+    withSQLConf("spark.sql.autoBroadcastJoinThreshold" -> "0")
       Seq(
           ("SELECT * FROM testData LEFT SEMI JOIN testData2 ON key = a",
            classOf[ShuffledHashJoin]),
@@ -108,8 +103,6 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           ("SELECT * FROM testData full JOIN testData2 ON (key * a != key + a)",
            classOf[BroadcastNestedLoopJoin])
       ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
-    }
-  }
 
 //  ignore("SortMergeJoin shouldn't work on unsortable columns") {
 //    Seq(
@@ -117,7 +110,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
 //    ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
 //  }
 
-  test("broadcasted hash join operator selection") {
+  test("broadcasted hash join operator selection")
     sqlContext.cacheManager.clearCache()
     sql("CACHE TABLE testData")
     Seq(
@@ -129,9 +122,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
          classOf[BroadcastHashJoin])
     ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
     sql("UNCACHE TABLE testData")
-  }
 
-  test("broadcasted hash outer join operator selection") {
+  test("broadcasted hash outer join operator selection")
     sqlContext.cacheManager.clearCache()
     sql("CACHE TABLE testData")
     sql("CACHE TABLE testData2")
@@ -144,9 +136,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
          classOf[BroadcastHashJoin])
     ).foreach { case (query, joinClass) => assertJoin(query, joinClass) }
     sql("UNCACHE TABLE testData")
-  }
 
-  test("multiple-key equi-join is hash-join") {
+  test("multiple-key equi-join is hash-join")
     val x = testData2.as("x")
     val y = testData2.as("y")
     val join = x
@@ -155,9 +146,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
       .optimizedPlan
     val planned = sqlContext.sessionState.planner.EquiJoinSelection(join)
     assert(planned.size === 1)
-  }
 
-  test("inner join where, one match per row") {
+  test("inner join where, one match per row")
     checkAnswer(upperCaseData.join(lowerCaseData).where('n === 'N),
                 Seq(
                     Row(1, "A", 1, "a"),
@@ -165,9 +155,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
                     Row(3, "C", 3, "c"),
                     Row(4, "D", 4, "d")
                 ))
-  }
 
-  test("inner join ON, one match per row") {
+  test("inner join ON, one match per row")
     checkAnswer(upperCaseData.join(lowerCaseData, $"n" === $"N"),
                 Seq(
                     Row(1, "A", 1, "a"),
@@ -175,9 +164,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
                     Row(3, "C", 3, "c"),
                     Row(4, "D", 4, "d")
                 ))
-  }
 
-  test("inner join, where, multiple matches") {
+  test("inner join, where, multiple matches")
     val x = testData2.where($"a" === 1).as("x")
     val y = testData2.where($"a" === 1).as("y")
     checkAnswer(
@@ -187,15 +175,13 @@ class JoinSuite extends QueryTest with SharedSQLContext {
                                                                      1,
                                                                      2) :: Nil
     )
-  }
 
-  test("inner join, no matches") {
+  test("inner join, no matches")
     val x = testData2.where($"a" === 1).as("x")
     val y = testData2.where($"a" === 2).as("y")
     checkAnswer(x.join(y).where($"x.a" === $"y.a"), Nil)
-  }
 
-  test("big inner join, 4 matches per row") {
+  test("big inner join, 4 matches per row")
     val bigData =
       testData.unionAll(testData).unionAll(testData).unionAll(testData)
     val bigDataX = bigData.as("x")
@@ -206,15 +192,13 @@ class JoinSuite extends QueryTest with SharedSQLContext {
                   .flatMap(row => Seq.fill(16)(Row.merge(row, row)))
                   .collect()
                   .toSeq)
-  }
 
-  test("cartisian product join") {
+  test("cartisian product join")
     checkAnswer(testData3.join(testData3),
                 Row(1, null, 1, null) :: Row(1, null, 2, 2) :: Row(
                     2, 2, 1, null) :: Row(2, 2, 2, 2) :: Nil)
-  }
 
-  test("left outer join") {
+  test("left outer join")
     checkAnswer(upperCaseData.join(lowerCaseData, $"n" === $"N", "left"),
                 Row(1, "A", 1, "a") :: Row(2, "B", 2, "b") :: Row(
                     3, "C", 3, "c") :: Row(4, "D", 4, "d") :: Row(
@@ -256,9 +240,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           |GROUP BY r.a
         """.stripMargin),
         Row(null, 6) :: Nil)
-  }
 
-  test("right outer join") {
+  test("right outer join")
     checkAnswer(lowerCaseData.join(upperCaseData, $"n" === $"N", "right"),
                 Row(1, "a", 1, "A") :: Row(2, "b", 2, "B") :: Row(
                     3, "c", 3, "C") :: Row(4, "d", 4, "D") :: Row(
@@ -297,9 +280,8 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         """.stripMargin),
         Row(1, 1) :: Row(2, 1) :: Row(3, 1) :: Row(4, 1) :: Row(5, 1) :: Row(
             6, 1) :: Nil)
-  }
 
-  test("full outer join") {
+  test("full outer join")
     upperCaseData.where('N <= 4).registerTempTable("left")
     upperCaseData.where('N >= 3).registerTempTable("right")
 
@@ -366,34 +348,28 @@ class JoinSuite extends QueryTest with SharedSQLContext {
         |GROUP BY r.a
       """.stripMargin),
         Row(null, 10))
-  }
 
-  test("broadcasted left semi join operator selection") {
+  test("broadcasted left semi join operator selection")
     sqlContext.cacheManager.clearCache()
     sql("CACHE TABLE testData")
 
-    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "1000000000") {
+    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "1000000000")
       Seq(
           ("SELECT * FROM testData LEFT SEMI JOIN testData2 ON key = a",
            classOf[BroadcastHashJoin])
-      ).foreach {
+      ).foreach
         case (query, joinClass) => assertJoin(query, joinClass)
-      }
-    }
 
-    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "-1") {
+    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "-1")
       Seq(
           ("SELECT * FROM testData LEFT SEMI JOIN testData2 ON key = a",
            classOf[ShuffledHashJoin])
-      ).foreach {
+      ).foreach
         case (query, joinClass) => assertJoin(query, joinClass)
-      }
-    }
 
     sql("UNCACHE TABLE testData")
-  }
 
-  test("cross join with broadcast") {
+  test("cross join with broadcast")
     sql("CACHE TABLE testData")
 
     val sizeInByteOfTestData =
@@ -401,7 +377,7 @@ class JoinSuite extends QueryTest with SharedSQLContext {
 
     // we set the threshold is greater than statistic of the cached table testData
     withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key ->
-        (sizeInByteOfTestData + 1).toString()) {
+        (sizeInByteOfTestData + 1).toString())
 
       assert(
           statisticSizeInByte(sqlContext.table("testData2")) > sqlContext.conf.autoBroadcastJoinThreshold)
@@ -459,16 +435,12 @@ class JoinSuite extends QueryTest with SharedSQLContext {
           """.stripMargin),
                   Row("1", 2, 1) :: Row("1", 2, 2) :: Row("1", 3, 1) :: Row(
                       "1", 3, 2) :: Row("2", 3, 1) :: Row("2", 3, 2) :: Nil)
-    }
 
     sql("UNCACHE TABLE testData")
-  }
 
-  test("left semi join") {
+  test("left semi join")
     val df = sql("SELECT * FROM testData2 LEFT SEMI JOIN testData ON key = a")
     checkAnswer(
         df,
         Row(1, 1) :: Row(1, 2) :: Row(2, 1) :: Row(2, 2) :: Row(3, 1) :: Row(
             3, 2) :: Nil)
-  }
-}

@@ -20,7 +20,7 @@ import org.joda.time._
 /**
   * Enriched DateTime, helps to simplify Date handling API
   */
-case class RichDT(dt: DateTime) {
+case class RichDT(dt: DateTime)
   def +[T <: ReadablePeriod](rp: T): RichDT = dt.plus(rp)
   def -[T <: ReadablePeriod](rp: T): RichDT = dt.minus(rp)
 
@@ -32,4 +32,3 @@ case class RichDT(dt: DateTime) {
   def stripTime: RichDT = RichDT(dt.toDateMidnight.toDateTime(dt.getZone))
 
   override def toString: String = dt.toString
-}

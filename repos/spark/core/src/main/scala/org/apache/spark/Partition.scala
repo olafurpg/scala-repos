@@ -20,7 +20,7 @@ package org.apache.spark
 /**
   * An identifier for a partition in an RDD.
   */
-trait Partition extends Serializable {
+trait Partition extends Serializable
 
   /**
     * Get the partition's index within its parent RDD
@@ -29,4 +29,3 @@ trait Partition extends Serializable {
 
   // A better default implementation of HashCode
   override def hashCode(): Int = index
-}

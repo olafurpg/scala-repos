@@ -10,22 +10,19 @@ import scala.tools.testing.AssertUtil._
 class Misc
 
 @RunWith(classOf[JUnit4])
-class ClassTagTest {
-  def checkNotString[A : ClassTag](a: Any) = a match {
+class ClassTagTest
+  def checkNotString[A : ClassTag](a: Any) = a match
     case x: String => false
     case x: A => true
     case _ => false
-  }
-  def checkNotInt[A : ClassTag](a: Any) = a match {
+  def checkNotInt[A : ClassTag](a: Any) = a match
     case x: Int => false
     case x: A => true
     case _ => false
-  }
-  def checkNotLong[A : ClassTag](a: Any) = a match {
+  def checkNotLong[A : ClassTag](a: Any) = a match
     case x: Long => false
     case x: A => true
     case _ => false
-  }
 
   @Test def checkMisc = assertTrue(checkNotString[Misc](new Misc))
   @Test def checkString = assertTrue(checkNotInt[String]("woele"))
@@ -39,7 +36,7 @@ class ClassTagTest {
   @Test def checkBoolean = assertTrue(checkNotInt[Boolean](false))
   @Test def checkUnit = assertTrue(checkNotInt[Unit]({}))
 
-  @Test def t9534: Unit = {
+  @Test def t9534: Unit =
     val ct = implicitly[scala.reflect.ClassTag[Unit]]
     val a1 = ct.newArray(1)
     a1(0) = ()
@@ -47,5 +44,3 @@ class ClassTagTest {
     a2(0) = a1
     val a3 = ct.newArray2(1)
     a3(0) = a1
-  }
-}

@@ -23,7 +23,7 @@ import scala.runtime.ScalaRunTime._
   *  @since 2.8
   */
 class WrappedArrayBuilder[A](tag: ClassTag[A])
-    extends ReusableBuilder[A, WrappedArray[A]] {
+    extends ReusableBuilder[A, WrappedArray[A]]
 
   @deprecated("use tag instead", "2.10.0")
   val manifest: ClassTag[A] = tag
@@ -32,9 +32,9 @@ class WrappedArrayBuilder[A](tag: ClassTag[A])
   private var capacity: Int = 0
   private var size: Int = 0
 
-  private def mkArray(size: Int): WrappedArray[A] = {
+  private def mkArray(size: Int): WrappedArray[A] =
     val runtimeClass = arrayElementClass(tag)
-    val newelems = runtimeClass match {
+    val newelems = runtimeClass match
       case java.lang.Byte.TYPE =>
         new WrappedArray.ofByte(new Array[Byte](size))
           .asInstanceOf[WrappedArray[A]]
@@ -66,43 +66,34 @@ class WrappedArrayBuilder[A](tag: ClassTag[A])
         new WrappedArray.ofRef[A with AnyRef](
             tag.newArray(size).asInstanceOf[Array[A with AnyRef]])
           .asInstanceOf[WrappedArray[A]]
-    }
     if (this.size > 0) Array.copy(elems.array, 0, newelems.array, 0, this.size)
     newelems
-  }
 
-  private def resize(size: Int) {
+  private def resize(size: Int)
     elems = mkArray(size)
     capacity = size
-  }
 
-  override def sizeHint(size: Int) {
+  override def sizeHint(size: Int)
     if (capacity < size) resize(size)
-  }
 
-  private def ensureSize(size: Int) {
-    if (capacity < size) {
+  private def ensureSize(size: Int)
+    if (capacity < size)
       var newsize = if (capacity == 0) 16 else capacity * 2
       while (newsize < size) newsize *= 2
       resize(newsize)
-    }
-  }
 
-  def +=(elem: A): this.type = {
+  def +=(elem: A): this.type =
     ensureSize(size + 1)
     elems(size) = elem
     size += 1
     this
-  }
 
   def clear() { size = 0 }
 
-  def result() = {
-    if (capacity != 0 && capacity == size) {
+  def result() =
+    if (capacity != 0 && capacity == size)
       capacity = 0
       elems
-    } else mkArray(size)
-  }
+    else mkArray(size)
 
   // todo: add ++=
-}

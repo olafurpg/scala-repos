@@ -2,7 +2,7 @@ package mesosphere.marathon.metrics
 
 import org.rogach.scallop.ScallopConf
 
-trait MetricsReporterConf extends ScallopConf {
+trait MetricsReporterConf extends ScallopConf
 
   lazy val graphite = opt[String](
       "reporter_graphite",
@@ -13,4 +13,3 @@ trait MetricsReporterConf extends ScallopConf {
       "reporter_datadog",
       descr = "URL to dogstatsd agent. e.g. udp://localhost:8125?prefix=marathon-test&tags=marathon&interval=10",
       noshort = true)
-}

@@ -2,9 +2,9 @@ package com.twitter.finagle.mux.lease.exp
 
 import java.lang.management.GarbageCollectorMXBean
 
-class GarbageCollectorAddable(self: GarbageCollectorMXBean) {
+class GarbageCollectorAddable(self: GarbageCollectorMXBean)
   def +(other: GarbageCollectorMXBean): GarbageCollectorMXBean =
-    new GarbageCollectorMXBean {
+    new GarbageCollectorMXBean
       def getCollectionCount() =
         self.getCollectionCount() + other.getCollectionCount()
       def getCollectionTime() =
@@ -14,5 +14,3 @@ class GarbageCollectorAddable(self: GarbageCollectorMXBean) {
       def getName() = self.getName() + "+" + other.getName()
       def isValid() = self.isValid || other.isValid
       def getObjectName = throw new UnsupportedOperationException
-    }
-}

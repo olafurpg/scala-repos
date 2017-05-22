@@ -9,7 +9,7 @@ import akka.routing._
 import com.typesafe.config._
 import akka.ConfigurationException
 
-object RemoteDeployerSpec {
+object RemoteDeployerSpec
   val deployerConf = ConfigFactory.parseString(
       """
       akka.actor.provider = "akka.remote.RemoteActorRefProvider"
@@ -25,17 +25,15 @@ object RemoteDeployerSpec {
       """,
       ConfigParseOptions.defaults)
 
-  class RecipeActor extends Actor {
+  class RecipeActor extends Actor
     def receive = { case _ ⇒ }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class RemoteDeployerSpec extends AkkaSpec(RemoteDeployerSpec.deployerConf) {
+class RemoteDeployerSpec extends AkkaSpec(RemoteDeployerSpec.deployerConf)
 
-  "A RemoteDeployer" must {
+  "A RemoteDeployer" must
 
-    "be able to parse 'akka.actor.deployment._' with specified remote nodes" in {
+    "be able to parse 'akka.actor.deployment._' with specified remote nodes" in
       val service = "/service2"
       val deployment = system
         .asInstanceOf[ActorSystemImpl]
@@ -49,13 +47,9 @@ class RemoteDeployerSpec extends AkkaSpec(RemoteDeployerSpec.deployerConf) {
                       RoundRobinPool(3),
                       RemoteScope(Address("akka", "sys", "wallace", 2552)),
                       "mydispatcher")))
-    }
 
-    "reject remote deployment when the source requires LocalScope" in {
-      intercept[ConfigurationException] {
+    "reject remote deployment when the source requires LocalScope" in
+      intercept[ConfigurationException]
         system.actorOf(Props.empty.withDeploy(Deploy.local), "service2")
-      }.getMessage should ===(
+      .getMessage should ===(
           "configuration requested remote deployment for local-only Props at [akka://RemoteDeployerSpec/user/service2]")
-    }
-  }
-}

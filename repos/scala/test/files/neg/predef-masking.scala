@@ -1,7 +1,7 @@
 // Testing predef masking
 import Predef.{any2stringadd => _, _}
 
-object StringPlusConfusion {
+object StringPlusConfusion
   // Would love to do something about this error message, but by the
   // time we get our hands on it the context is lost.
   def f[T](x: T) = x + 5
@@ -18,4 +18,3 @@ object StringPlusConfusion {
   //  required: String
   //   def f[T](x: T) = x + 5
   //                        ^
-}

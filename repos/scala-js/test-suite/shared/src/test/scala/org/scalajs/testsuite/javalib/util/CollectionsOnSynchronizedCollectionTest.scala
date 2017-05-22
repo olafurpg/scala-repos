@@ -14,59 +14,48 @@ import org.scalajs.testsuite.javalib.util.concurrent.CopyOnWriteArrayListFactory
 import scala.reflect.ClassTag
 
 trait CollectionsSynchronizedCollectionTest
-    extends CollectionsOnCollectionsTest {
+    extends CollectionsOnCollectionsTest
 
   def originalFactory: CollectionFactory
 
-  def factory: CollectionFactory = {
-    new CollectionFactory {
+  def factory: CollectionFactory =
+    new CollectionFactory
       override def implementationName: String =
         s"synchronizedCollection(${originalFactory.implementationName})"
 
       override def empty[E : ClassTag]: ju.Collection[E] =
         ju.Collections.synchronizedCollection(originalFactory.empty[E])
-    }
-  }
-}
 
 class CollectionsOnSynchronizedCollectionAbstractListTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory = new AbstractListFactory
-}
 
 class CollectionsOnSynchronizedCollectionArrayListTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory = new ArrayListFactory
-}
 
 class CollectionsOnSynchronizedCollectionLinkedListTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory = new LinkedListFactory
-}
 
 class CollectionsOnSynchronizedCollectionCopyOnWriteArrayListTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory = new CopyOnWriteArrayListFactory
-}
 
 class CollectionsOnSynchronizedCollectionHashSetFactoryTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory = new HashSetFactory
-}
 
 class CollectionsOnSynchronizedCollectionLinkedHashSetTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory = new LinkedHashSetFactory
-}
 
 class CollectionsOnSynchronizedCollectionConcurrentSkipListSetTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory =
     new concurrent.ConcurrentSkipListSetFactory
-}
 
 class CollectionsOnSynchronizedCollectionArrayDequeTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: CollectionFactory =
     new ArrayDequeFactory
-}

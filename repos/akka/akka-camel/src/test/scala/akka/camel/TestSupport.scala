@@ -16,7 +16,7 @@ import scala.concurrent.Await
 import akka.util.Timeout
 import akka.testkit.{TestKit, AkkaSpec}
 
-private[camel] object TestSupport {
+private[camel] object TestSupport
   def start(actor: ⇒ Actor, name: String)(
       implicit system: ActorSystem, timeout: Timeout): ActorRef =
     Await.result(
@@ -26,81 +26,68 @@ private[camel] object TestSupport {
         timeout.duration)
 
   def stop(actorRef: ActorRef)(
-      implicit system: ActorSystem, timeout: Timeout) {
+      implicit system: ActorSystem, timeout: Timeout)
     system.stop(actorRef)
     Await.result(CamelExtension(system).deactivationFutureFor(actorRef)(
                      timeout, system.dispatcher),
                  timeout.duration)
-  }
 
   private[camel] implicit def camelToTestWrapper(camel: Camel) =
     new CamelTestWrapper(camel)
 
-  class CamelTestWrapper(camel: Camel) {
+  class CamelTestWrapper(camel: Camel)
 
     /**
       * Sends msg to the endpoint and returns response.
       * It only waits for the response until timeout passes.
       * This is to reduce cases when unit-tests block infinitely.
       */
-    def sendTo(to: String, msg: String, timeout: Duration = 1 second): AnyRef = {
-      try {
+    def sendTo(to: String, msg: String, timeout: Duration = 1 second): AnyRef =
+      try
         camel.template
           .asyncRequestBody(to, msg)
           .get(timeout.toNanos, TimeUnit.NANOSECONDS)
-      } catch {
+      catch
         case e: ExecutionException ⇒ throw e.getCause
         case e: TimeoutException ⇒
           throw new AssertionError(
               "Failed to get response to message [%s], send to endpoint [%s], within [%s]"
                 .format(msg, to, timeout))
-      }
-    }
 
     def routeCount = camel.context.getRoutes().size()
     def routes = camel.context.getRoutes
-  }
 
-  trait SharedCamelSystem extends BeforeAndAfterAll {
+  trait SharedCamelSystem extends BeforeAndAfterAll
     this: Suite ⇒
     implicit lazy val system = ActorSystem("test", AkkaSpec.testConf)
     implicit lazy val camel = CamelExtension(system)
 
-    abstract override protected def afterAll() {
+    abstract override protected def afterAll()
       super.afterAll()
       TestKit.shutdownActorSystem(system)
-    }
-  }
 
-  trait NonSharedCamelSystem extends BeforeAndAfterEach {
+  trait NonSharedCamelSystem extends BeforeAndAfterEach
     this: Suite ⇒
     implicit var system: ActorSystem = _
     implicit var camel: Camel = _
 
-    override protected def beforeEach() {
+    override protected def beforeEach()
       super.beforeEach()
       system = ActorSystem("test", AkkaSpec.testConf)
       camel = CamelExtension(system)
-    }
 
-    override protected def afterEach() {
+    override protected def afterEach()
       TestKit.shutdownActorSystem(system)
       super.afterEach()
-    }
-  }
-  def time[A](block: ⇒ A): FiniteDuration = {
+  def time[A](block: ⇒ A): FiniteDuration =
     val start = System.nanoTime()
     block
     val duration = System.nanoTime() - start
     duration nanos
-  }
 
-  def anInstanceOf[T](implicit tag: ClassTag[T]) = {
+  def anInstanceOf[T](implicit tag: ClassTag[T]) =
     val clazz = tag.runtimeClass.asInstanceOf[Class[T]]
-    new BePropertyMatcher[AnyRef] {
+    new BePropertyMatcher[AnyRef]
       def apply(left: AnyRef) =
         BePropertyMatchResult(clazz.isAssignableFrom(left.getClass),
                               "an instance of " + clazz.getName)
-    }
-  }
-}

@@ -34,23 +34,19 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
 /** ReadOnlyBooleanWrapper Spec tests. */
 @RunWith(classOf[JUnitRunner])
-class ReadOnlyBooleanWrapperSpec extends FlatSpec with BeforeAndAfterEach {
+class ReadOnlyBooleanWrapperSpec extends FlatSpec with BeforeAndAfterEach
 
-  "A ReadOnlyBooleanWrapper" should "be an instance of BooleanProperty" in {
+  "A ReadOnlyBooleanWrapper" should "be an instance of BooleanProperty" in
     val p = new ReadOnlyBooleanWrapper()
     assert(p.isInstanceOf[BooleanProperty])
-  }
 
-  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyBooleanProperty`" in {
+  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyBooleanProperty`" in
     val p = new ReadOnlyBooleanWrapper()
     assert(p.readOnlyProperty.isInstanceOf[ReadOnlyBooleanProperty])
-  }
 
-  it should "propagate value changes to `readOnlyProperty`" in {
+  it should "propagate value changes to `readOnlyProperty`" in
     val p = new ReadOnlyBooleanWrapper()
     p.value = false
     p.readOnlyProperty() should equal(false)
     p.value = true
     p.readOnlyProperty() should equal(true)
-  }
-}

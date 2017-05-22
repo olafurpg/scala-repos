@@ -1,7 +1,7 @@
 import scala.reflect.macros.blackbox.Context
 
-object Macros {
-  def impl_with_macros_enabled(c: Context) = {
+object Macros
+  def impl_with_macros_enabled(c: Context) =
     import c.universe._
 
     val ru = Select(
@@ -13,11 +13,10 @@ object Macros {
         Select(ru, TermName("reify")), List(Literal(Constant(2))))
     val ttree1 = c.typecheck(tree1, withMacrosDisabled = false)
     c.Expr[String](Literal(Constant(ttree1.toString)))
-  }
 
   def foo_with_macros_enabled = macro impl_with_macros_enabled
 
-  def impl_with_macros_disabled(c: Context) = {
+  def impl_with_macros_disabled(c: Context) =
     import c.universe._
     import internal._
 
@@ -32,7 +31,5 @@ object Macros {
         Select(Ident(ru), TermName("reify")), List(Literal(Constant(2))))
     val ttree2 = c.typecheck(tree2, withMacrosDisabled = true)
     c.Expr[String](Literal(Constant(ttree2.toString)))
-  }
 
   def foo_with_macros_disabled = macro impl_with_macros_disabled
-}

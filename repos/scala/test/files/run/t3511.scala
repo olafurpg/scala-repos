@@ -1,9 +1,9 @@
 import scala.collection.immutable._
 
 // ticket #3511
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     assert(Stream.from(0).view.force.take(5) == List(0, 1, 2, 3, 4))
 
     val s = Stream.from(0)
@@ -27,5 +27,3 @@ object Test {
 
     val spatch = s.view.patch(1, List(5, 5, 5), 5).force.take(5)
     assert(spatch == List(0, 5, 5, 5, 6))
-  }
-}

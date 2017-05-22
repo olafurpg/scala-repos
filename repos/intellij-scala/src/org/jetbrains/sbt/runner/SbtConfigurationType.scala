@@ -8,7 +8,7 @@ import org.jetbrains.sbt.{SbtBundle, Sbt}
 /**
   * Configuration running of sbt task.
   */
-class SbtConfigurationType extends ConfigurationType {
+class SbtConfigurationType extends ConfigurationType
   val confFactory = new SbtRunConfigurationFactory(this)
 
   def getIcon: Icon = Sbt.Icon
@@ -22,4 +22,3 @@ class SbtConfigurationType extends ConfigurationType {
     Array[ConfigurationFactory](confFactory)
 
   def getId: String = "SbtRunConfiguration"
-}

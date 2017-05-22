@@ -14,16 +14,15 @@ import org.jetbrains.plugins.scala.lang.resolve.{ResolvableStableCodeReferenceEl
 
 class VariablePatternShadowInspection
     extends AbstractInspection("VariablePatternShadow",
-                               "Suspicious shadowing by a Variable Pattern") {
+                               "Suspicious shadowing by a Variable Pattern")
 
-  def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+  def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case refPat: ScReferencePattern => check(refPat, holder)
-  }
 
-  private def check(refPat: ScReferencePattern, holder: ProblemsHolder) {
+  private def check(refPat: ScReferencePattern, holder: ProblemsHolder)
     val isInCaseClause =
       ScalaPsiUtil.nameContext(refPat).isInstanceOf[ScCaseClause]
-    if (isInCaseClause) {
+    if (isInCaseClause)
       val dummyRef: ScStableCodeReferenceElement =
         ScalaPsiElementFactory.createReferenceFromText(
             refPat.name, refPat.getContext.getContext, refPat)
@@ -35,30 +34,23 @@ class VariablePatternShadowInspection
       val results = dummyRef
         .asInstanceOf[ResolvableStableCodeReferenceElement]
         .doResolve(dummyRef, proc)
-      def isAccessible(rr: ResolveResult): Boolean = rr.getElement match {
+      def isAccessible(rr: ResolveResult): Boolean = rr.getElement match
         case named: PsiNamedElement => proc.isAccessible(named, refPat)
         case _ => false
-      }
-      if (results.exists(isAccessible)) {
+      if (results.exists(isAccessible))
         holder.registerProblem(refPat.nameId,
                                getDisplayName,
                                new ConvertToStableIdentifierPatternFix(refPat),
                                new RenameVariablePatternFix(refPat))
-      }
-    }
-  }
-}
 
 class ConvertToStableIdentifierPatternFix(r: ScReferencePattern)
     extends AbstractFixOnPsiElement(
-        "Convert to Stable Identifier Pattern `%s`".format(r.getText), r) {
-  def doApplyFix(project: Project) {
+        "Convert to Stable Identifier Pattern `%s`".format(r.getText), r)
+  def doApplyFix(project: Project)
     val ref = getElement
     val stableIdPattern = ScalaPsiElementFactory.createPatternFromText(
         "`%s`".format(ref.getText), ref.getManager)
     ref.replace(stableIdPattern)
-  }
-}
 
 class RenameVariablePatternFix(ref: ScReferencePattern)
     extends RenameElementQuickfix(ref, "Rename Variable Pattern")

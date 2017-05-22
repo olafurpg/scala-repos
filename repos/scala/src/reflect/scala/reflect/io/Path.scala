@@ -30,20 +30,18 @@ import scala.reflect.internal.util.Statistics
   *
   *  ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-object Path {
+object Path
   def isExtensionJarOrZip(jfile: JFile): Boolean =
     isExtensionJarOrZip(jfile.getName)
-  def isExtensionJarOrZip(name: String): Boolean = {
+  def isExtensionJarOrZip(name: String): Boolean =
     val ext = extension(name)
     ext == "jar" || ext == "zip"
-  }
-  def extension(name: String): String = {
+  def extension(name: String): String =
     var i = name.length - 1
     while (i >= 0 && name.charAt(i) != '.') i -= 1
 
     if (i < 0) ""
     else name.substring(i + 1).toLowerCase
-  }
 
   // not certain these won't be problematic, but looks good so far
   implicit def string2path(s: String): Path = apply(s)
@@ -60,28 +58,25 @@ object Path {
 
   def apply(path: String): Path = apply(new JFile(path))
   def apply(jfile: JFile): Path =
-    try {
-      def isFile = {
+    try
+      def isFile =
         if (Statistics.canEnable)
           Statistics.incCounter(IOStats.fileIsFileCount)
         jfile.isFile
-      }
 
-      def isDirectory = {
+      def isDirectory =
         if (Statistics.canEnable)
           Statistics.incCounter(IOStats.fileIsDirectoryCount)
         jfile.isDirectory
-      }
 
       if (isFile) new File(jfile)
       else if (isDirectory) new Directory(jfile)
       else new Path(jfile)
-    } catch { case ex: SecurityException => new Path(jfile) }
+    catch { case ex: SecurityException => new Path(jfile) }
 
   /** Avoiding any shell/path issues by only using alphanumerics. */
   private[io] def randomPrefix = alphanumeric take 6 mkString ""
   private[io] def fail(msg: String) = throw FileOperationException(msg)
-}
 import Path._
 
 /** The Path constructor is private so we can enforce some
@@ -89,7 +84,7 @@ import Path._
   *
   *  ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-class Path private[io](val jfile: JFile) {
+class Path private[io](val jfile: JFile)
   val separator = java.io.File.separatorChar
   val separatorStr = java.io.File.separator
 
@@ -139,21 +134,18 @@ class Path private[io](val jfile: JFile) {
 
   def resolve(other: Path) =
     if (other.isAbsolute || isEmpty) other else /(other)
-  def relativize(other: Path) = {
+  def relativize(other: Path) =
     assert(isAbsolute == other.isAbsolute,
            "Paths not of same type: " + this + ", " + other)
 
     def createRelativePath(
-        baseSegs: List[String], otherSegs: List[String]): String = {
-      (baseSegs, otherSegs) match {
+        baseSegs: List[String], otherSegs: List[String]): String =
+      (baseSegs, otherSegs) match
         case (b :: bs, o :: os) if b == o => createRelativePath(bs, os)
         case (bs, os) =>
           ((".." + separator) * bs.length) + os.mkString(separatorStr)
-      }
-    }
 
     Path(createRelativePath(segments, other.segments))
-  }
 
   def segments: List[String] =
     (path split separator).toList filterNot (_.length == 0)
@@ -161,38 +153,33 @@ class Path private[io](val jfile: JFile) {
   /**
     * @return The path of the parent directory, or root if path is already root
     */
-  def parent: Directory = path match {
+  def parent: Directory = path match
     case "" | "." => Directory("..")
     case _ =>
       // the only solution <-- a comment which could have used elaboration
       if (segments.nonEmpty && segments.last == "..") (path / "..").toDirectory
       else
-        jfile.getParent match {
+        jfile.getParent match
           case null =>
             if (isAbsolute)
               toDirectory // it should be a root. BTW, don't need to worry about relative pathed root
             else Directory(".") // a dir under pwd
           case x =>
             Directory(x)
-        }
-  }
-  def parents: List[Directory] = {
+  def parents: List[Directory] =
     val p = parent
     if (p isSame this) Nil else p :: p.parents
-  }
   // if name ends with an extension (e.g. "foo.jpg") returns the extension ("jpg"), otherwise ""
-  def extension: String = {
+  def extension: String =
     var i = name.length - 1
     while (i >= 0 && name.charAt(i) != '.') i -= 1
 
     if (i < 0) ""
     else name.substring(i + 1)
-  }
   // compares against extensions in a CASE INSENSITIVE way.
-  def hasExtension(ext: String, exts: String*) = {
+  def hasExtension(ext: String, exts: String*) =
     val lower = extension.toLowerCase
     ext.toLowerCase == lower || exts.exists(_.toLowerCase == lower)
-  }
   // returns the filename without the extension.
   def stripExtension: String = name stripSuffix ("." + extension)
   // returns the Path with the extension.
@@ -212,22 +199,18 @@ class Path private[io](val jfile: JFile) {
   // Boolean tests
   def canRead = jfile.canRead()
   def canWrite = jfile.canWrite()
-  def exists = {
+  def exists =
     if (Statistics.canEnable) Statistics.incCounter(IOStats.fileExistsCount)
     try jfile.exists() catch { case ex: SecurityException => false }
-  }
 
-  def isFile = {
+  def isFile =
     if (Statistics.canEnable) Statistics.incCounter(IOStats.fileIsFileCount)
     try jfile.isFile() catch { case ex: SecurityException => false }
-  }
-  def isDirectory = {
+  def isDirectory =
     if (Statistics.canEnable)
       Statistics.incCounter(IOStats.fileIsDirectoryCount)
-    try jfile.isDirectory() catch {
+    try jfile.isDirectory() catch
       case ex: SecurityException => jfile.getPath == "."
-    }
-  }
   def isAbsolute = jfile.isAbsolute()
   def isEmpty = path.length == 0
 
@@ -242,20 +225,18 @@ class Path private[io](val jfile: JFile) {
 
   // creations
   def createDirectory(
-      force: Boolean = true, failIfExists: Boolean = false): Directory = {
+      force: Boolean = true, failIfExists: Boolean = false): Directory =
     val res = if (force) jfile.mkdirs() else jfile.mkdir()
     if (!res && failIfExists && exists)
       fail("Directory '%s' already exists." format name)
     else if (isDirectory) toDirectory
     else new Directory(jfile)
-  }
-  def createFile(failIfExists: Boolean = false): File = {
+  def createFile(failIfExists: Boolean = false): File =
     val res = jfile.createNewFile()
     if (!res && failIfExists && exists)
       fail("File '%s' already exists." format name)
     else if (isFile) toFile
     else new File(jfile)
-  }
 
   // deletions
   def delete() = jfile.delete()
@@ -264,27 +245,22 @@ class Path private[io](val jfile: JFile) {
     *  Use with caution!
     */
   def deleteRecursively(): Boolean = deleteRecursively(jfile)
-  private def deleteRecursively(f: JFile): Boolean = {
+  private def deleteRecursively(f: JFile): Boolean =
     if (f.isDirectory)
-      f.listFiles match {
+      f.listFiles match
         case null =>
         case xs => xs foreach deleteRecursively
-      }
     f.delete()
-  }
 
   def truncate() =
-    isFile && {
+    isFile &&
       val raf = new RandomAccessFile(jfile, "rw")
       raf setLength 0
       raf.close()
       length == 0
-    }
 
   override def toString() = path
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case x: Path => path == x.path
     case _ => false
-  }
   override def hashCode() = path.hashCode()
-}

@@ -23,7 +23,7 @@ import org.saddle.scalar._
 /**
   * A Mat instance containing elements of type Double
   */
-class MatDouble(r: Int, c: Int, values: Array[Double]) extends Mat[Double] {
+class MatDouble(r: Int, c: Int, values: Array[Double]) extends Mat[Double]
   def repr = this
 
   def numRows = r
@@ -40,14 +40,13 @@ class MatDouble(r: Int, c: Int, values: Array[Double]) extends Mat[Double] {
   // Cache the transpose: it's much faster to transpose and slice a continuous
   // bound than to take large strides, especially on large matrices where it
   // seems to eject cache lines on each stride (something like 10x slowdown)
-  lazy val cachedT = {
+  lazy val cachedT =
     val arrT = values.clone()
 
     if (this.isSquare) MatMath.squareTranspose(numCols, arrT)
     else MatMath.blockTranspose(numRows, numCols, this.toArray, arrT)
 
     new MatDouble(numCols, numRows, arrT)
-  }
 
   def transpose = cachedT
 
@@ -72,20 +71,16 @@ class MatDouble(r: Int, c: Int, values: Array[Double]) extends Mat[Double] {
     values
 
   /** Row-by-row equality check of all values. */
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+      this.numCols == rv.numCols &&
         var i = 0
         var eq = true
-        while (eq && i < length) {
+        while (eq && i < length)
           eq &&=
           (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
               rv.scalarTag.isMissing(rv(i)))
           i += 1
-        }
         eq
-      }
     case _ => super.equals(o)
-  }
-}

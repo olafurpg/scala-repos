@@ -15,9 +15,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-private class ClientSessionTest extends FunSuite {
+private class ClientSessionTest extends FunSuite
 
-  private class Ctx {
+  private class Ctx
     val clientToServer = new AsyncQueue[Message]
     val serverToClient = new AsyncQueue[Message]
 
@@ -28,19 +28,16 @@ private class ClientSessionTest extends FunSuite {
     val session = new ClientSession(
         transport, FailureDetector.NullConfig, "test", stats)
 
-    def send(msg: Message) = {
+    def send(msg: Message) =
       Await.result(session.write(msg))
       Await.result(clientToServer.poll())
-    }
 
-    def recv(msg: Message) = {
+    def recv(msg: Message) =
       serverToClient.offer(msg)
       Await.result(session.read())
-    }
-  }
 
-  test("responds to leases") {
-    Time.withCurrentTimeFrozen { ctl =>
+  test("responds to leases")
+    Time.withCurrentTimeFrozen  ctl =>
       val ctx = new Ctx
       import ctx._
 
@@ -52,11 +49,9 @@ private class ClientSessionTest extends FunSuite {
       assert(transport.status == Status.Open)
       recv(Message.Tlease(Message.Tlease.MaxLease))
       assert(session.status === Status.Open)
-    }
-  }
 
-  test("drains requests") {
-    Time.withCurrentTimeFrozen { ctl =>
+  test("drains requests")
+    Time.withCurrentTimeFrozen  ctl =>
       val ctx = new Ctx
       import ctx._
 
@@ -73,12 +68,11 @@ private class ClientSessionTest extends FunSuite {
       assert(Await.result(clientToServer.poll()) == Message.Rdrain(tag))
       assert(session.status == Status.Busy)
 
-      session.write(req).poll match {
+      session.write(req).poll match
         case Some(Throw(f: Failure)) =>
           assert(f.isFlagged(Failure.Restartable))
           assert(f.getMessage == "The request was Nacked by the server")
         case _ => fail()
-      }
 
       val rep = Message.RdispatchOk(2, Seq.empty, buf)
       recv(rep)
@@ -88,22 +82,19 @@ private class ClientSessionTest extends FunSuite {
 
       assert(stats.counters(Seq("drained")) == 1)
       assert(stats.counters(Seq("draining")) == 1)
-    }
-  }
 
-  test("pings") {
+  test("pings")
     val ctx = new Ctx
     import ctx._
 
     val ping0 = session.ping()
     assert(!ping0.isDefined)
 
-    session.ping().poll match {
+    session.ping().poll match
       case Some(Throw(f: Failure)) =>
         assert(
             f.getMessage == "A ping is already outstanding on this session.")
       case _ => fail()
-    }
 
     recv(Message.Rping(Message.Tags.PingTag))
     assert(ping0.isDefined)
@@ -111,5 +102,3 @@ private class ClientSessionTest extends FunSuite {
     val ping1 = session.ping()
     recv(Message.Rping(Message.Tags.PingTag))
     assert(ping1.isDefined)
-  }
-}

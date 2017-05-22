@@ -6,9 +6,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class CounterDeltasTest extends FunSuite {
+class CounterDeltasTest extends FunSuite
 
-  test("deltas are computed based on last call to update") {
+  test("deltas are computed based on last call to update")
     val metrics = Metrics.createDetached()
     val sr = new MetricsStatsReceiver(metrics)
 
@@ -43,5 +43,3 @@ class CounterDeltasTest extends FunSuite {
     // this `update` should now pick up that earlier increment
     cd.update(metrics.sampleCounters())
     assert(counterDelta == 1)
-  }
-}

@@ -37,32 +37,27 @@ sealed trait TestEvent
   * (see `akka.testkit` `filterEvents` and `filterException`) or on the
   * EventFilter implementations.
   */
-object TestEvent {
-  object Mute {
+object TestEvent
+  object Mute
     def apply(filter: EventFilter, filters: EventFilter*): Mute =
       new Mute(filter +: filters.to[immutable.Seq])
-  }
   final case class Mute(filters: immutable.Seq[EventFilter])
-      extends TestEvent with NoSerializationVerificationNeeded {
+      extends TestEvent with NoSerializationVerificationNeeded
 
     /**
       * Java API: create a Mute command from a list of filters
       */
     def this(filters: JIterable[EventFilter]) = this(immutableSeq(filters))
-  }
-  object UnMute {
+  object UnMute
     def apply(filter: EventFilter, filters: EventFilter*): UnMute =
       new UnMute(filter +: filters.to[immutable.Seq])
-  }
   final case class UnMute(filters: immutable.Seq[EventFilter])
-      extends TestEvent with NoSerializationVerificationNeeded {
+      extends TestEvent with NoSerializationVerificationNeeded
 
     /**
       * Java API: create an UnMute command from a list of filters
       */
     def this(filters: JIterable[EventFilter]) = this(immutableSeq(filters))
-  }
-}
 
 /**
   * Facilities for selectively filtering out expected events from logging so
@@ -73,7 +68,7 @@ object TestEvent {
   *
   * If the `occurrences` is set to Int.MaxValue, no tracking is done.
   */
-abstract class EventFilter(occurrences: Int) {
+abstract class EventFilter(occurrences: Int)
 
   @volatile // JMM does not guarantee visibility for non-final fields
   private var todo = occurrences
@@ -84,18 +79,16 @@ abstract class EventFilter(occurrences: Int) {
     */
   protected def matches(event: LogEvent): Boolean
 
-  final def apply(event: LogEvent): Boolean = {
-    if (matches(event)) {
+  final def apply(event: LogEvent): Boolean =
+    if (matches(event))
       if (todo != Int.MaxValue) todo -= 1
       true
-    } else false
-  }
+    else false
 
-  def awaitDone(max: Duration): Boolean = {
+  def awaitDone(max: Duration): Boolean =
     if (todo != Int.MaxValue && todo > 0)
       TestKit.awaitCond(todo <= 0, max, noThrow = true)
     todo == Int.MaxValue || todo == 0
-  }
 
   /**
     * Assert that this filter has matched as often as requested by its
@@ -110,10 +103,10 @@ abstract class EventFilter(occurrences: Int) {
     * Apply this filter while executing the given code block. Care is taken to
     * remove the filter when the block is finished or aborted.
     */
-  def intercept[T](code: ⇒ T)(implicit system: ActorSystem): T = {
+  def intercept[T](code: ⇒ T)(implicit system: ActorSystem): T =
     system.eventStream publish TestEvent.Mute(this)
     val leeway = TestKitExtension(system).TestEventFilterLeeway.dilated
-    try {
+    try
       val result = code
       if (!awaitDone(leeway))
         if (todo > 0)
@@ -123,8 +116,7 @@ abstract class EventFilter(occurrences: Int) {
           throw new AssertionError(
               s"received ${-todo} excess messages on $this")
       result
-    } finally system.eventStream publish TestEvent.UnMute(this)
-  }
+    finally system.eventStream publish TestEvent.UnMute(this)
 
   /*
    * these default values are just there for easier subclassing
@@ -136,15 +128,13 @@ abstract class EventFilter(occurrences: Int) {
   /**
     * internal implementation helper, no guaranteed API
     */
-  protected def doMatch(src: String, msg: Any) = {
+  protected def doMatch(src: String, msg: Any) =
     val msgstr = if (msg != null) msg.toString else "null"
     (source.isDefined && source.get == src || source.isEmpty) &&
-    (message match {
+    (message match
           case Left(s) ⇒ if (complete) msgstr == s else msgstr.startsWith(s)
           case Right(p) ⇒ p.findFirstIn(msgstr).isDefined
-        })
-  }
-}
+        )
 
 /**
   * Facilities for selectively filtering out expected events from logging so
@@ -163,7 +153,7 @@ abstract class EventFilter(occurrences: Int) {
   *
   * The message object will be converted to a string before matching (`"null"` if it is `null`).
   */
-object EventFilter {
+object EventFilter
 
   /**
     * Create a filter for Error events. Give up to one of <code>start</code> and <code>pattern</code>:
@@ -293,7 +283,6 @@ object EventFilter {
   def custom(test: PartialFunction[LogEvent, Boolean],
              occurrences: Int = Int.MaxValue): EventFilter =
     CustomEventFilter(test)(occurrences)
-}
 
 /**
   * Filter which matches Error events, if they satisfy the given criteria:
@@ -313,17 +302,15 @@ final case class ErrorFilter(throwable: Class[_],
                              override val source: Option[String],
                              override val message: Either[String, Regex],
                              override val complete: Boolean)(occurrences: Int)
-    extends EventFilter(occurrences) {
+    extends EventFilter(occurrences)
 
-  def matches(event: LogEvent) = {
-    event match {
+  def matches(event: LogEvent) =
+    event match
       case Error(cause, src, _, msg) if throwable isInstance cause ⇒
         (msg == null && cause.getMessage == null &&
             cause.getStackTrace.length == 0) || doMatch(src, msg) ||
         doMatch(src, cause.getMessage)
       case _ ⇒ false
-    }
-  }
 
   /**
     * Java API: create an ErrorFilter
@@ -358,7 +345,6 @@ final case class ErrorFilter(throwable: Class[_],
     */
   def this(throwable: Class[_]) =
     this(throwable, null, null, false, false, Int.MaxValue)
-}
 
 /**
   * Filter which matches Warning events, if they satisfy the given criteria:
@@ -372,14 +358,12 @@ final case class WarningFilter(
     override val source: Option[String],
     override val message: Either[String, Regex],
     override val complete: Boolean)(occurrences: Int)
-    extends EventFilter(occurrences) {
+    extends EventFilter(occurrences)
 
-  def matches(event: LogEvent) = {
-    event match {
+  def matches(event: LogEvent) =
+    event match
       case Warning(src, _, msg) ⇒ doMatch(src, msg)
       case _ ⇒ false
-    }
-  }
 
   /**
     * Java API: create a WarningFilter
@@ -406,7 +390,6 @@ final case class WarningFilter(
          else if (pattern) Right(new Regex(message))
          else Left(message),
          complete)(occurrences)
-}
 
 /**
   * Filter which matches Info events, if they satisfy the given criteria:
@@ -419,14 +402,12 @@ final case class WarningFilter(
 final case class InfoFilter(override val source: Option[String],
                             override val message: Either[String, Regex],
                             override val complete: Boolean)(occurrences: Int)
-    extends EventFilter(occurrences) {
+    extends EventFilter(occurrences)
 
-  def matches(event: LogEvent) = {
-    event match {
+  def matches(event: LogEvent) =
+    event match
       case Info(src, _, msg) ⇒ doMatch(src, msg)
       case _ ⇒ false
-    }
-  }
 
   /**
     * Java API: create an InfoFilter
@@ -453,7 +434,6 @@ final case class InfoFilter(override val source: Option[String],
          else if (pattern) Right(new Regex(message))
          else Left(message),
          complete)(occurrences)
-}
 
 /**
   * Filter which matches Debug events, if they satisfy the given criteria:
@@ -466,14 +446,12 @@ final case class InfoFilter(override val source: Option[String],
 final case class DebugFilter(override val source: Option[String],
                              override val message: Either[String, Regex],
                              override val complete: Boolean)(occurrences: Int)
-    extends EventFilter(occurrences) {
+    extends EventFilter(occurrences)
 
-  def matches(event: LogEvent) = {
-    event match {
+  def matches(event: LogEvent) =
+    event match
       case Debug(src, _, msg) ⇒ doMatch(src, msg)
       case _ ⇒ false
-    }
-  }
 
   /**
     * Java API: create a DebugFilter
@@ -500,7 +478,6 @@ final case class DebugFilter(override val source: Option[String],
          else if (pattern) Right(new Regex(message))
          else Left(message),
          complete)(occurrences)
-}
 
 /**
   * Custom event filter when the others do not fit the bill.
@@ -509,16 +486,13 @@ final case class DebugFilter(override val source: Option[String],
   */
 final case class CustomEventFilter(
     test: PartialFunction[LogEvent, Boolean])(occurrences: Int)
-    extends EventFilter(occurrences) {
-  def matches(event: LogEvent) = {
+    extends EventFilter(occurrences)
+  def matches(event: LogEvent) =
     test.isDefinedAt(event) && test(event)
-  }
-}
 
-object DeadLettersFilter {
+object DeadLettersFilter
   def apply[T](implicit t: ClassTag[T]): DeadLettersFilter =
     new DeadLettersFilter(t.runtimeClass.asInstanceOf[Class[T]])(Int.MaxValue)
-}
 
 /**
   * Filter which matches DeadLetter events, if the wrapped message conforms to the
@@ -526,15 +500,12 @@ object DeadLettersFilter {
   */
 final case class DeadLettersFilter(val messageClass: Class[_])(
     occurrences: Int)
-    extends EventFilter(occurrences) {
+    extends EventFilter(occurrences)
 
-  def matches(event: LogEvent) = {
-    event match {
+  def matches(event: LogEvent) =
+    event match
       case Warning(_, _, msg) ⇒ BoxedType(messageClass) isInstance msg
       case _ ⇒ false
-    }
-  }
-}
 
 /**
   * EventListener for running tests, which allows selectively filtering out
@@ -548,12 +519,12 @@ final case class DeadLettersFilter(val messageClass: Class[_])(
   * }
   * </code></pre>
   */
-class TestEventListener extends Logging.DefaultLogger {
+class TestEventListener extends Logging.DefaultLogger
   import TestEvent._
 
   var filters: List[EventFilter] = Nil
 
-  override def receive = {
+  override def receive =
     case InitializeLogger(bus) ⇒
       Seq(classOf[Mute],
           classOf[UnMute],
@@ -564,39 +535,33 @@ class TestEventListener extends Logging.DefaultLogger {
     case UnMute(filters) ⇒ filters foreach removeFilter
     case event: LogEvent ⇒ if (!filter(event)) print(event)
     case DeadLetter(msg, snd, rcp) ⇒
-      if (!msg.isInstanceOf[Terminate]) {
+      if (!msg.isInstanceOf[Terminate])
         val event = Warning(rcp.path.toString, rcp.getClass, msg)
-        if (!filter(event)) {
+        if (!filter(event))
           val msgStr =
             if (msg.isInstanceOf[SystemMessage])
               "received dead system message: " + msg
             else "received dead letter from " + snd + ": " + msg
           val event2 = Warning(rcp.path.toString, rcp.getClass, msgStr)
           if (!filter(event2)) print(event2)
-        }
-      }
     case UnhandledMessage(msg, sender, rcp) ⇒
       val event = Warning(rcp.path.toString,
                           rcp.getClass,
                           "unhandled message from " + sender + ": " + msg)
       if (!filter(event)) print(event)
     case m ⇒ print(Debug(context.system.name, this.getClass, m))
-  }
 
   def filter(event: LogEvent): Boolean =
     filters exists (f ⇒ try { f(event) } catch { case e: Exception ⇒ false })
 
   def addFilter(filter: EventFilter): Unit = filters ::= filter
 
-  def removeFilter(filter: EventFilter) {
+  def removeFilter(filter: EventFilter)
     @scala.annotation.tailrec
     def removeFirst(
         list: List[EventFilter],
-        zipped: List[EventFilter] = Nil): List[EventFilter] = list match {
+        zipped: List[EventFilter] = Nil): List[EventFilter] = list match
       case head :: tail if head == filter ⇒ tail.reverse_:::(zipped)
       case head :: tail ⇒ removeFirst(tail, head :: zipped)
       case Nil ⇒ filters // filter not found, just return original list
-    }
     filters = removeFirst(filters)
-  }
-}

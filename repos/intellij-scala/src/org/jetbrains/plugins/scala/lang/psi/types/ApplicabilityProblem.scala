@@ -12,9 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.{Parameter, TypeParam
 //TODO must be abstract with no description when completed 
 sealed class ApplicabilityProblem(val description: String = "unknown")
 
-object ApplicabilityProblem {
+object ApplicabilityProblem
   def unapply(a: ApplicabilityProblem): Option[String] = Some(a.description)
-}
 
 // definition syntax problems
 case class MalformedDefinition() extends ApplicabilityProblem

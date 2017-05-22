@@ -23,30 +23,27 @@ import org.scalatest.{Matchers, WordSpec}
 import com.twitter.scalding._
 import TDsl._
 
-object PartitionedDelimitedTestSources {
+object PartitionedDelimitedTestSources
   val singlePartition = PartitionedCsv[String, (String, String)]("out", "%s")
-}
 
-class PartitionedDelimitedWriteJob(args: Args) extends Job(args) {
+class PartitionedDelimitedWriteJob(args: Args) extends Job(args)
   import PartitionedDelimitedTestSources._
-  TypedCsv[(String, String, String)]("in").map {
+  TypedCsv[(String, String, String)]("in").map
     case (v1, v2, v3) => (v1, (v2, v3))
-  }.write(singlePartition)
-}
+  .write(singlePartition)
 
-class PartitionedDelimitedTest extends WordSpec with Matchers {
+class PartitionedDelimitedTest extends WordSpec with Matchers
   import PartitionedDelimitedTestSources._
 
-  "PartitionedDelimited" should {
-    "write out CSVs" in {
+  "PartitionedDelimited" should
+    "write out CSVs" in
       val input = Seq(("A", "X", "1"), ("A", "Y", "2"), ("B", "Z", "3"))
 
       // Need to save the job to allow, find the temporary directory data was written to
       var job: Job = null;
-      def buildJob(args: Args): Job = {
+      def buildJob(args: Args): Job =
         job = new PartitionedDelimitedWriteJob(args)
         job
-      }
 
       JobTest(buildJob(_))
         .source(TypedCsv[(String, String, String)]("in"), input)
@@ -66,6 +63,3 @@ class PartitionedDelimitedTest extends WordSpec with Matchers {
 
       aSource.getLines.toList shouldBe Seq("X,1", "Y,2")
       bSource.getLines.toList shouldBe Seq("Z,3")
-    }
-  }
-}

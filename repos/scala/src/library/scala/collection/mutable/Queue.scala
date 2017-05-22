@@ -32,17 +32,16 @@ import generic._
 class Queue[A]
     extends MutableList[A] with LinearSeqOptimized[A, Queue[A]]
     with GenericTraversableTemplate[A, Queue] with Cloneable[Queue[A]]
-    with Serializable {
+    with Serializable
   override def companion: GenericCompanion[Queue] = Queue
 
   override protected[this] def newBuilder = companion.newBuilder[A]
 
-  private[mutable] def this(fst: LinkedList[A], lst: LinkedList[A], lng: Int) {
+  private[mutable] def this(fst: LinkedList[A], lst: LinkedList[A], lng: Int)
     this()
     first0 = fst
     last0 = lst
     len = lng
-  }
 
   /** Adds all elements to the queue.
     *
@@ -58,12 +57,11 @@ class Queue[A]
     */
   def dequeue(): A =
     if (isEmpty) throw new NoSuchElementException("queue empty")
-    else {
+    else
       val res = first0.elem
       first0 = first0.next
       decrementLength()
       res
-    }
 
   /** Returns the first element in the queue which satisfies the
     *  given predicate, and removes this element from the queue.
@@ -73,30 +71,26 @@ class Queue[A]
     */
   def dequeueFirst(p: A => Boolean): Option[A] =
     if (isEmpty) None
-    else if (p(first0.elem)) {
+    else if (p(first0.elem))
       val res: Option[A] = Some(first0.elem)
       first0 = first0.next
       decrementLength()
       res
-    } else {
+    else
       val optElem = removeFromList(p)
       if (optElem != None) decrementLength()
       optElem
-    }
 
-  private def removeFromList(p: A => Boolean): Option[A] = {
+  private def removeFromList(p: A => Boolean): Option[A] =
     var leftlst = first0
     var res: Option[A] = None
-    while (leftlst.next.nonEmpty && !p(leftlst.next.elem)) {
+    while (leftlst.next.nonEmpty && !p(leftlst.next.elem))
       leftlst = leftlst.next
-    }
-    if (leftlst.next.nonEmpty) {
+    if (leftlst.next.nonEmpty)
       res = Some(leftlst.next.elem)
       if (leftlst.next eq last0) last0 = leftlst
       leftlst.next = leftlst.next.next
-    }
     res
-  }
 
   /** Returns all elements in the queue which satisfy the
     *  given predicate, and removes those elements from the queue.
@@ -105,33 +99,28 @@ class Queue[A]
     *  @return    a sequence of all elements in the queue for which
     *             p yields true.
     */
-  def dequeueAll(p: A => Boolean): Seq[A] = {
+  def dequeueAll(p: A => Boolean): Seq[A] =
     if (first0.isEmpty) Seq.empty
-    else {
+    else
       val res = new ArrayBuffer[A]
-      while ((first0.nonEmpty) && p(first0.elem)) {
+      while ((first0.nonEmpty) && p(first0.elem))
         res += first0.elem
         first0 = first0.next
         decrementLength()
-      }
       if (first0.isEmpty) res
       else removeAllFromList(p, res)
-    }
-  }
 
   private def removeAllFromList(
-      p: A => Boolean, res: ArrayBuffer[A]): ArrayBuffer[A] = {
+      p: A => Boolean, res: ArrayBuffer[A]): ArrayBuffer[A] =
     var leftlst = first0
-    while (leftlst.next.nonEmpty) {
-      if (p(leftlst.next.elem)) {
+    while (leftlst.next.nonEmpty)
+      if (p(leftlst.next.elem))
         res += leftlst.next.elem
         if (leftlst.next eq last0) last0 = leftlst
         leftlst.next = leftlst.next.next
         decrementLength()
-      } else leftlst = leftlst.next
-    }
+      else leftlst = leftlst.next
     res
-  }
 
   /** Return the proper suffix of this list which starts with the first element that satisfies `p`.
     *  That element is unlinked from the list. If no element satisfies `p`, return None.
@@ -140,22 +129,18 @@ class Queue[A]
       "extractFirst inappropriately exposes implementation details.  Use dequeue or dequeueAll.",
       "2.11.0")
   def extractFirst(
-      start: LinkedList[A], p: A => Boolean): Option[LinkedList[A]] = {
+      start: LinkedList[A], p: A => Boolean): Option[LinkedList[A]] =
     if (isEmpty) None
-    else {
+    else
       var cell = start
-      while ((cell.next.nonEmpty) && !p(cell.next.elem)) {
+      while ((cell.next.nonEmpty) && !p(cell.next.elem))
         cell = cell.next
-      }
       if (cell.next.isEmpty) None
-      else {
+      else
         val res: Option[LinkedList[A]] = Some(cell.next)
         cell.next = cell.next.next
         decrementLength()
         res
-      }
-    }
-  }
 
   /** Returns the first element in the queue, or throws an error if there
     *  is no element contained in the queue.
@@ -165,29 +150,23 @@ class Queue[A]
   def front: A = head
 
   // TODO - Don't override this just for new to create appropriate type....
-  override def tail: Queue[A] = {
+  override def tail: Queue[A] =
     val tl = new Queue[A]
     tailImpl(tl)
     tl
-  }
 
-  override def clone(): Queue[A] = {
+  override def clone(): Queue[A] =
     val bf = newBuilder
     bf ++= seq
     bf.result()
-  }
 
-  private[this] def decrementLength() {
+  private[this] def decrementLength()
     len -= 1
     if (len == 0) last0 = first0
-  }
-}
 
-object Queue extends SeqFactory[Queue] {
+object Queue extends SeqFactory[Queue]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Queue[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
-  def newBuilder[A]: Builder[A, Queue[A]] = new MutableList[A] mapResult {
+  def newBuilder[A]: Builder[A, Queue[A]] = new MutableList[A] mapResult
     _.toQueue
-  }
-}

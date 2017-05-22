@@ -12,21 +12,20 @@ import com.twitter.util.{Await, Future, Time}
   * Tests the transaction functionality of the MySQL client.
   */
 @RunWith(classOf[JUnitRunner])
-class TransactionTest extends FunSuite with MockitoSugar with MustMatchers {
+class TransactionTest extends FunSuite with MockitoSugar with MustMatchers
   private val sqlQuery = "SELECT * FROM FOO"
 
   test(
-      "transaction test uses a single service repeatedly and closes it upon completion") {
+      "transaction test uses a single service repeatedly and closes it upon completion")
     val service = new MockService()
     val factory = spy(new MockServiceFactory(service))
     val client = Client(factory)
 
-    val result = client.transaction[String] { c =>
-      for {
+    val result = client.transaction[String]  c =>
+      for
         r1 <- c.query(sqlQuery)
         r2 <- c.query(sqlQuery)
-      } yield "success"
-    }
+      yield "success"
 
     Await.result(result) must equal("success")
     service.requests must equal(
@@ -39,29 +38,23 @@ class TransactionTest extends FunSuite with MockitoSugar with MustMatchers {
 
     verify(factory, times(1)).apply()
     verify(factory, times(0)).close(any[Time])
-  }
 
-  test("transaction test rollback") {
+  test("transaction test rollback")
     val service = new MockService()
     val factory = spy(new MockServiceFactory(service))
     val client = Client(factory)
 
-    try {
-      client.transaction[String] { c =>
+    try
+      client.transaction[String]  c =>
         c.query(sqlQuery)
-          .map { r1 =>
+          .map  r1 =>
             throw new RuntimeException("Fake exception to trigger ROLLBACK")
             "first response object"
-          }
-          .flatMap { r2 =>
-            c.query(sqlQuery).map { r3 =>
+          .flatMap  r2 =>
+            c.query(sqlQuery).map  r3 =>
               "final response object"
-            }
-          }
-      }
-    } catch {
+    catch
       case e: Exception =>
-    }
 
     service.requests must equal(
         List(
@@ -72,5 +65,3 @@ class TransactionTest extends FunSuite with MockitoSugar with MustMatchers {
 
     verify(factory, times(1)).apply()
     verify(factory, times(0)).close(any[Time])
-  }
-}

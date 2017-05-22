@@ -4,7 +4,7 @@
 
 //############################################################################
 
-object Test {
+object Test
 
   //##########################################################################
   // Types
@@ -100,69 +100,60 @@ object Test {
 
   var checks: Int = 0;
 
-  def check(test0: Boolean, actual: Any, expected: Any) {
+  def check(test0: Boolean, actual: Any, expected: Any)
     val test1: Boolean = actual == expected;
-    if (!test0 || !test1) {
+    if (!test0 || !test1)
       val s0 = if (test0) "ok" else "KO";
       val s1 = if (test1) "ok" else "KO";
       val s2 = actual.toString();
       val s3 = expected.toString();
       error(s0 + " - " + s1 + ": " + s2 + " != " + s3);
-    }
     checks += 1
-  }
 
-  def check_Ta[T <: Any](xs: Array[T], l: Int, x0: T, c: Check[T]) {
+  def check_Ta[T <: Any](xs: Array[T], l: Int, x0: T, c: Check[T])
     check(xs.length == l, xs.length, l);
     check(xs(0) == x0, xs(0), x0);
     c(xs);
-  }
 
-  def check_Tv[T <: AnyVal](xs: Array[T], l: Int, x0: T, c: Check[T]) {
-    check(xs.length == l, xs.length, l);
-    check(xs(0) == x0, xs(0), x0);
-    check_Ta(xs, l, x0, c);
-    c(xs);
-  }
-
-  def check_Tr[T <: AnyRef](xs: Array[T], l: Int, x0: T, c: Check[T]) {
+  def check_Tv[T <: AnyVal](xs: Array[T], l: Int, x0: T, c: Check[T])
     check(xs.length == l, xs.length, l);
     check(xs(0) == x0, xs(0), x0);
     check_Ta(xs, l, x0, c);
     c(xs);
-  }
 
-  def check_To[T <: Object](xs: Array[T], l: Int, x0: T, c: Check[T]) {
+  def check_Tr[T <: AnyRef](xs: Array[T], l: Int, x0: T, c: Check[T])
+    check(xs.length == l, xs.length, l);
+    check(xs(0) == x0, xs(0), x0);
+    check_Ta(xs, l, x0, c);
+    c(xs);
+
+  def check_To[T <: Object](xs: Array[T], l: Int, x0: T, c: Check[T])
     check(xs.length == l, xs.length, l);
     check(xs(0) == x0, xs(0), x0);
     check_Ta(xs, l, x0, c);
     check_Tr(xs, l, x0, c);
     c(xs);
-  }
 
-  def check_Tm[T <: Map](xs: Array[T], l: Int, x0: T, c: Check[T]) {
+  def check_Tm[T <: Map](xs: Array[T], l: Int, x0: T, c: Check[T])
     check(xs.length == l, xs.length, l)
     check(xs(0) == x0, xs(0), x0)
     check_Ta(xs, l, x0, c)
     check_Tr(xs, l, x0, c)
     check_To(xs, l, x0, c)
     c(xs)
-  }
 
-  def check_Tn[T <: Strings](xs: Array[T], l: Int, x0: T, c: Check[T]) {
+  def check_Tn[T <: Strings](xs: Array[T], l: Int, x0: T, c: Check[T])
     check(xs.length == l, xs.length, l)
     check(xs(0) == x0, xs(0), x0)
     check_Ta(xs, l, x0, c)
     check_Tr(xs, l, x0, c)
     check_To(xs, l, x0, c)
     c(xs)
-  }
 
-  def checkT2368() {
+  def checkT2368()
     val arr = Array(1, 2, 3)
     arr(0) += 1
     assert(arr(0) == 2)
-  }
 
   //##########################################################################
   // Values
@@ -243,68 +234,59 @@ object Test {
   //##########################################################################
   // Specific Checks
 
-  def ucheck(xs: Array[Unit]): Unit = {
+  def ucheck(xs: Array[Unit]): Unit =
     check(xs.length == 2, xs.length, 2);
     check(xs(0) == u0, xs(0), u0);
     check(xs(1) == u1, xs(1), u1);
-  }
 
-  def zcheck(xs: Array[Boolean]): Unit = {
+  def zcheck(xs: Array[Boolean]): Unit =
     check(xs.length == 2, xs.length, 2);
     check(xs(0) == z0, xs(0), z0);
     check(xs(1) == z1, xs(1), z1);
-  }
 
-  def bcheck(xs: Array[Byte]): Unit = {
+  def bcheck(xs: Array[Byte]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == b0, xs(0), b0);
     check(xs(1) == b1, xs(1), b1);
     check(xs(2) == b2, xs(2), b2);
-  }
 
-  def scheck(xs: Array[Short]): Unit = {
+  def scheck(xs: Array[Short]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == s0, xs(0), s0);
     check(xs(1) == s1, xs(1), s1);
     check(xs(2) == s2, xs(2), s2);
-  }
 
-  def ccheck(xs: Array[Char]): Unit = {
+  def ccheck(xs: Array[Char]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == c0, xs(0), c0);
     check(xs(1) == c1, xs(1), c1);
     check(xs(2) == c2, xs(2), c2);
-  }
 
-  def icheck(xs: Array[Int]): Unit = {
+  def icheck(xs: Array[Int]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == i0, xs(0), i0);
     check(xs(1) == i1, xs(1), i1);
     check(xs(2) == i2, xs(2), i2);
-  }
 
-  def lcheck(xs: Array[Long]): Unit = {
+  def lcheck(xs: Array[Long]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == l0, xs(0), l0);
     check(xs(1) == l1, xs(1), l1: Long); // !!! : Long
     check(xs(2) == l2, xs(2), l2);
-  }
 
-  def fcheck(xs: Array[Float]): Unit = {
+  def fcheck(xs: Array[Float]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == f0, xs(0), f0);
     check(xs(1) == f1, xs(1), f1: Float); // !!! : Float
     check(xs(2) == f2, xs(2), f2);
-  }
 
-  def dcheck(xs: Array[Double]): Unit = {
+  def dcheck(xs: Array[Double]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == d0, xs(0), d0);
     check(xs(1) == d1, xs(1), d1: Double); // !!! : Double
     check(xs(2) == d2, xs(2), d2);
-  }
 
-  def rcheck(xs: Array[AnyRef]): Unit = {
+  def rcheck(xs: Array[AnyRef]): Unit =
     check(xs.length == 6, xs.length, 6);
     check(xs(0) == r0, xs(0), r0);
     check(xs(1) == r1, xs(1), r1);
@@ -312,9 +294,8 @@ object Test {
     check(xs(3) == r3, xs(3), r3);
     check(xs(4) == r4, xs(4), r4);
     check(xs(5) == r5, xs(5), r5);
-  }
 
-  def ocheck(xs: Array[Object]): Unit = {
+  def ocheck(xs: Array[Object]): Unit =
     check(xs.length == 6, xs.length, 6);
     check(xs(0) == o0, xs(0), o0);
     check(xs(1) == o1, xs(1), o1);
@@ -322,37 +303,32 @@ object Test {
     check(xs(3) == o3, xs(3), o3);
     check(xs(4) == o4, xs(4), o4);
     check(xs(5) == o5, xs(5), o5);
-  }
 
-  def mcheck(xs: Array[Map]): Unit = {
+  def mcheck(xs: Array[Map]): Unit =
     check(xs.length == 3, xs.length, 3);
     check(xs(0) == m0, xs(0), m0);
     check(xs(1) == m1, xs(1), m1);
     check(xs(2) == m2, xs(2), m2);
-  }
 
-  def ncheck(xs: Array[Strings]) {
+  def ncheck(xs: Array[Strings])
     check(xs.length == 3, xs.length, 3)
     check(xs(0) == n0, xs(0), n0)
     check(xs(1) == n1, xs(1), n1)
     check(xs(2) == n2, xs(2), n2)
-  }
 
   //##########################################################################
   // Miscellaneous checks
 
-  def checkZip {
+  def checkZip
     val zipped = Array("a", "b", "c").zip(Array(1, 2))
     val expected = Array(("a", 1), ("b", 2))
     check(zipped sameElements expected, zipped.toList, expected.toList)
-  }
 
-  def checkConcat {
+  def checkConcat
     // ticket #713
     val x1 = Array.concat(Array(1, 2), Array(3, 4))
     val y1 = Array(1, 2, 3, 4)
     check(x1 sameElements y1, x1.toList, y1.toList)
-  }
 
   //##########################################################################
   // Arrays
@@ -374,7 +350,7 @@ object Test {
   //##########################################################################
   // Main
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     //######################################################################
 
@@ -1015,7 +991,5 @@ object Test {
     println("checks: " + checks)
 
     //######################################################################
-  }
 
   //##########################################################################
-}

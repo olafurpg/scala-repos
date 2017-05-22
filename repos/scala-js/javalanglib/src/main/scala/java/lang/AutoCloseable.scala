@@ -1,5 +1,4 @@
 package java.lang
 
-trait AutoCloseable {
+trait AutoCloseable
   def close(): Unit
-}

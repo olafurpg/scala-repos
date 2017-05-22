@@ -14,7 +14,7 @@
   */
 package io.prediction.data.api
 
-trait EventServerPlugin {
+trait EventServerPlugin
   val pluginName: String
   val pluginDescription: String
   val pluginType: String
@@ -25,9 +25,7 @@ trait EventServerPlugin {
 
   def handleREST(
       appId: Int, channelId: Option[Int], arguments: Seq[String]): String
-}
 
-object EventServerPlugin {
+object EventServerPlugin
   val inputBlocker = "inputblocker"
   val inputSniffer = "inputsniffer"
-}

@@ -1,6 +1,6 @@
-trait T {
+trait T
 
-  def crashy(ma: Any) {
+  def crashy(ma: Any)
     // okay
     val f1 = (u: Unit) => ma
     foo(f1)()
@@ -13,16 +13,13 @@ trait T {
     // auto-tupling which promotes an empty parameter list to `(): Unit`
     foo((u: Any) => ma)()
 
-    {
-      { (u: Any) =>
+      (u: Any) =>
         ma
-      }; this
-    }.foo(0)()
+      ; this
+    .foo(0)()
 
     foo({ def foo = ma; 0 })()
 
     { def foo = ma; this }.foo(0)()
-  }
 
   def foo(f: Any): Any => Any
-}

@@ -1,13 +1,11 @@
-object SCL7192 {
-  object A {
+object SCL7192
+  object A
     class User
-  }
-  object B {
+  object B
     class User
     class M
-  }
 
-  object C {
+  object C
     import A._
     import B.{User, _}
 
@@ -15,6 +13,4 @@ object SCL7192 {
     val y: M = new M
     /*start*/
     x /*end*/
-  }
-}
 //SCL7192.B.User

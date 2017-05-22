@@ -6,9 +6,9 @@ import play.api.libs.json.Reads._
 /**
   * Displays the saved data of [[SingleAppScalingTest]] in a human readable way.
   */
-object DisplayAppScalingResults {
+object DisplayAppScalingResults
 
-  def displayAppInfoScaling(fileName: String): Unit = {
+  def displayAppInfoScaling(fileName: String): Unit =
     val appInfos: Seq[JsObject] =
       ScalingTestResultFiles.readJson[Seq[JsObject]](fileName)
 
@@ -16,7 +16,7 @@ object DisplayAppScalingResults {
         "relative time (ms)", "staged", "running", "newRunning/s", "instances")
     var lastTimestamp: Long = 0
     var lastRunning: Long = 0
-    val rows = appInfos.map { jsObject: JsObject =>
+    val rows = appInfos.map  jsObject: JsObject =>
       val relativeTimestamp =
         (jsObject \ ScalingTestResultFiles.relativeTimestampMs).as[Long]
       val staged = (jsObject \ "tasksStaged").as[Long]
@@ -32,26 +32,22 @@ object DisplayAppScalingResults {
                  running,
                  newRunningPerSecond.round,
                  instances)
-    }
 
     import DisplayHelpers.right
     DisplayHelpers.printTable(Seq(right, right, right, right, right),
                               DisplayHelpers.withUnderline(header) ++ rows)
-  }
 
-  def displayMetrics(fileName: String): Unit = {
+  def displayMetrics(fileName: String): Unit =
     val allMetrics: Seq[JsObject] =
       ScalingTestResultFiles.readJson[Seq[JsObject]](fileName)
 
-    def subMetric(name: String): Map[String, JsObject] = {
+    def subMetric(name: String): Map[String, JsObject] =
       (allMetrics.last \ name)
         .as[JsObject]
         .value
-        .map {
+        .map
           case (name, value) => name -> value.as[JsObject]
-        }
         .toMap
-    }
 
     displayMeters(subMetric("meters"))
 
@@ -62,15 +58,13 @@ object DisplayAppScalingResults {
     println()
 
     displayTimers(subMetric("timers"))
-  }
 
-  def shortenName(name: String): String = {
+  def shortenName(name: String): String =
     name
       .replaceAll("mesosphere\\.marathon", "marathon")
       .replaceAll("org\\.eclipse\\.jetty\\.servlet", "servlet")
-  }
 
-  def displayMeters(meters: Map[String, JsObject]): Unit = {
+  def displayMeters(meters: Map[String, JsObject]): Unit =
     val header = IndexedSeq("meter",
                             "count",
                             "m15_rate",
@@ -78,7 +72,7 @@ object DisplayAppScalingResults {
                             "m1_rate",
                             "mean_rate",
                             "units")
-    val rows: Seq[IndexedSeq[Any]] = meters.map {
+    val rows: Seq[IndexedSeq[Any]] = meters.map
       case (meter: String, jsObject: JsObject) =>
         def d(fieldName: String): Any =
           (jsObject \ fieldName).asOpt[Double].map(_.round).getOrElse("-")
@@ -91,7 +85,7 @@ object DisplayAppScalingResults {
                         d("m1_rate"),
                         d("mean_rate"),
                         units)
-    }.toSeq
+    .toSeq
 
     val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
 
@@ -99,9 +93,8 @@ object DisplayAppScalingResults {
     DisplayHelpers.printTable(
         Seq(left, right, right, right, right, right, left),
         DisplayHelpers.withUnderline(header) ++ sortedRows)
-  }
 
-  def displayHistograms(histograms: Map[String, JsObject]): Unit = {
+  def displayHistograms(histograms: Map[String, JsObject]): Unit =
     val header = IndexedSeq("histogram",
                             "count",
                             "mean",
@@ -114,7 +107,7 @@ object DisplayAppScalingResults {
                             "p999",
                             "max",
                             "stddev")
-    val rows: Seq[IndexedSeq[Any]] = histograms.map {
+    val rows: Seq[IndexedSeq[Any]] = histograms.map
       case (histogram: String, jsObject: JsObject) =>
         def d(fieldName: String): Any =
           (jsObject \ fieldName).asOpt[Double].map(_.round).getOrElse("-")
@@ -131,7 +124,7 @@ object DisplayAppScalingResults {
                         d("p999"),
                         d("max"),
                         d("stddev"))
-    }.toSeq
+    .toSeq
 
     val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
 
@@ -150,9 +143,8 @@ object DisplayAppScalingResults {
             right,
             right),
         DisplayHelpers.withUnderline(header) ++ sortedRows)
-  }
 
-  def displayTimers(timers: Map[String, JsObject]): Unit = {
+  def displayTimers(timers: Map[String, JsObject]): Unit =
     val header = IndexedSeq("timer",
                             "count",
                             "mean",
@@ -167,7 +159,7 @@ object DisplayAppScalingResults {
                             "stddev",
                             "mean_rate",
                             "units")
-    val rows: Seq[IndexedSeq[Any]] = timers.map {
+    val rows: Seq[IndexedSeq[Any]] = timers.map
       case (timer: String, jsObject: JsObject) =>
         def d1000(fieldName: String): Any =
           (jsObject \ fieldName)
@@ -193,7 +185,7 @@ object DisplayAppScalingResults {
                         d1000("stddev"),
                         dFull("mean_rate"),
                         rateUnits)
-    }.toSeq
+    .toSeq
 
     val sortedRows = rows.sortBy(-_ (1).asInstanceOf[Long])
 
@@ -214,12 +206,9 @@ object DisplayAppScalingResults {
             right,
             left),
         DisplayHelpers.withUnderline(header) ++ sortedRows)
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     println()
     displayMetrics(SingleAppScalingTest.metricsFile)
     println()
     displayAppInfoScaling(SingleAppScalingTest.appInfosFile)
-  }
-}

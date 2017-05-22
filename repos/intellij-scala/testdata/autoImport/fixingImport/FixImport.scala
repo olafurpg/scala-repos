@@ -7,9 +7,8 @@ import bin.D
 import tin._
 import bon.G
 
-class FixImport extends G {
+class FixImport extends G
   val x = new /*ref*/ E
-}
 /*
 package pin
 

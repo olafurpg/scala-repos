@@ -4,7 +4,7 @@ package org.ensime.sexp
 
 import org.ensime.util.EnsimeSpec
 
-class SexpParserSpec extends EnsimeSpec {
+class SexpParserSpec extends EnsimeSpec
   import SexpParser.parse
 
   val foo = SexpString("foo")
@@ -18,22 +18,19 @@ class SexpParserSpec extends EnsimeSpec {
   val fookey = SexpSymbol(":foo")
   val barkey = SexpSymbol(":bar")
 
-  "EnrichedString" should "use the parser" in {
+  "EnrichedString" should "use the parser" in
     "nil".parseSexp shouldBe SexpNil
-  }
 
-  "Sexp Parser" should "parse nil" in {
+  "Sexp Parser" should "parse nil" in
     parse("nil") shouldBe SexpNil
     parse("()") shouldBe SexpNil
     parse("( )") shouldBe SexpNil
     parse("(;blah\n)") shouldBe SexpNil
-  }
 
-  it should "parse lists of strings" in {
+  it should "parse lists of strings" in
     parse("""("foo" "bar")""") shouldBe SexpList(foo, bar)
-  }
 
-  it should "parse escaped chars in strings" in {
+  it should "parse escaped chars in strings" in
     parse(""""z \\ \" \t \\t \\\t x\ x"""") shouldBe SexpString(
         "z \\ \" \t \\t \\\t xx")
 
@@ -41,57 +38,44 @@ class SexpParserSpec extends EnsimeSpec {
         "import foo\n\n\nexport bar\n")
 
     parse(""""C:\\my\\folder"""") shouldBe SexpString("""C:\my\folder""")
-  }
 
-  it should "parse unescaped chars in strings" in {
+  it should "parse unescaped chars in strings" in
     parse("\"import foo\n\n\nexport bar\n\"") shouldBe SexpString(
         "import foo\n\n\nexport bar\n")
-  }
 
-  it should "parse lists of chars" in {
+  it should "parse lists of chars" in
     parse("""(?f ?b)""") shouldBe SexpList(SexpChar('f'), SexpChar('b'))
-  }
 
-  it should "parse lists of symbols" in {
+  it should "parse lists of symbols" in
     parse("(foo bar is?)") shouldBe SexpList(foosym, barsym, SexpSymbol("is?"))
-  }
 
-  it should "parse lists of numbers" in {
+  it should "parse lists of numbers" in
     parse("(1 -2 3.14 4e+16)") shouldBe SexpList(one, negtwo, pi, fourexp)
-  }
 
-  it should "parse NaN" in {
+  it should "parse NaN" in
     parse("0.0e+NaN") shouldBe SexpNaN
     parse("-0.0e+NaN") shouldBe SexpNaN
-  }
 
-  it should "parse infinity" in {
+  it should "parse infinity" in
     parse("1.0e+INF") shouldBe SexpPosInf
     parse("-1.0e+INF") shouldBe SexpNegInf
-  }
 
-  it should "parse lists within lists" in {
+  it should "parse lists within lists" in
     parse("""((foo))""") shouldBe SexpList(SexpList(foosym))
     parse("""((foo) foo)""") shouldBe SexpList(SexpList(foosym), foosym)
-  }
 
-  it should "parse quoted expressions" in {
+  it should "parse quoted expressions" in
     parse("""'(:foo "foo" :bar "bar")""") shouldBe SexpCons(
         SexpSymbol("quote"), SexpList(fookey, foo, barkey, bar))
 
     parse("'foo") shouldBe SexpCons(SexpSymbol("quote"), foosym)
-  }
 
-  it should "parse cons" in {
+  it should "parse cons" in
     parse("(foo . bar)") shouldBe SexpCons(foosym, barsym)
-  }
 
-  it should "parse symbols with dots in their name" in {
+  it should "parse symbols with dots in their name" in
     parse("foo.bar") shouldBe SexpSymbol("foo.bar")
     parse(":foo.bar") shouldBe SexpSymbol(":foo.bar")
-  }
 
-  it should "parse symbols starting with nil in their name" in {
+  it should "parse symbols starting with nil in their name" in
     parse("nilsamisanidiot") shouldBe SexpSymbol("nilsamisanidiot")
-  }
-}

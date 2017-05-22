@@ -8,7 +8,7 @@ package macros
   * A slice of [[scala.reflect.macros.blackbox.Context the Scala macros context]] that
   *  exposes functions to save reflection artifacts for runtime.
   */
-trait Reifiers { self: blackbox.Context =>
+trait Reifiers  self: blackbox.Context =>
 
   /** Given a tree, generate a tree that when compiled and executed produces the original tree.
     *  For more information and examples see the documentation for `Universe.reify`.
@@ -79,7 +79,6 @@ trait Reifiers { self: blackbox.Context =>
     *    3) compileAndEval(unreifyTree(reifyTree(tree))) ~ compileAndEval(tree)  // at runtime original and unreified trees are behaviorally equivalent
     */
   def unreifyTree(tree: Tree): Tree
-}
 
 // made these guys non path-dependent, otherwise exception handling quickly becomes a mess
 

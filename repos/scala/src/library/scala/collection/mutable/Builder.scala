@@ -30,7 +30,7 @@ import generic._
   *
   *  @since 2.8
   */
-trait Builder[-Elem, +To] extends Growable[Elem] {
+trait Builder[-Elem, +To] extends Growable[Elem]
 
   /** Adds a single element to the builder.
     *  @param elem the element to be added.
@@ -73,11 +73,9 @@ trait Builder[-Elem, +To] extends Growable[Elem] {
     *
     *  @param coll  the collection which serves as a hint for the result's size.
     */
-  def sizeHint(coll: TraversableLike[_, _]) {
-    if (coll.isInstanceOf[collection.IndexedSeqLike[_, _]]) {
+  def sizeHint(coll: TraversableLike[_, _])
+    if (coll.isInstanceOf[collection.IndexedSeqLike[_, _]])
       sizeHint(coll.size)
-    }
-  }
 
   /** Gives a hint that one expects the `result` of this builder
     *  to have the same size as the given collection, plus some delta. This will
@@ -92,11 +90,9 @@ trait Builder[-Elem, +To] extends Growable[Elem] {
     *  @param coll  the collection which serves as a hint for the result's size.
     *  @param delta a correction to add to the `coll.size` to produce the size hint.
     */
-  def sizeHint(coll: TraversableLike[_, _], delta: Int) {
-    if (coll.isInstanceOf[collection.IndexedSeqLike[_, _]]) {
+  def sizeHint(coll: TraversableLike[_, _], delta: Int)
+    if (coll.isInstanceOf[collection.IndexedSeqLike[_, _]])
       sizeHint(coll.size + delta)
-    }
-  }
 
   /** Gives a hint how many elements are expected to be added
     *  when the next `result` is called, together with an upper bound
@@ -110,10 +106,9 @@ trait Builder[-Elem, +To] extends Growable[Elem] {
     *                       an IndexedSeqLike, then sizes larger
     *                       than collection's size are reduced.
     */
-  def sizeHintBounded(size: Int, boundingColl: TraversableLike[_, _]) {
+  def sizeHintBounded(size: Int, boundingColl: TraversableLike[_, _])
     if (boundingColl.isInstanceOf[collection.IndexedSeqLike[_, _]])
       sizeHint(size min boundingColl.size)
-  }
 
   /** Creates a new builder by applying a transformation function to
     *  the results of this builder.
@@ -125,17 +120,14 @@ trait Builder[-Elem, +To] extends Growable[Elem] {
     *  @note The original builder should no longer be used after `mapResult` is called.
     */
   def mapResult[NewTo](f: To => NewTo): Builder[Elem, NewTo] =
-    new Builder[Elem, NewTo] with Proxy {
+    new Builder[Elem, NewTo] with Proxy
       val self = Builder.this
       def +=(x: Elem): this.type = { self += x; this }
       def clear() = self.clear()
-      override def ++=(xs: TraversableOnce[Elem]): this.type = {
+      override def ++=(xs: TraversableOnce[Elem]): this.type =
         self ++= xs; this
-      }
       override def sizeHint(size: Int) = self.sizeHint(size)
       override def sizeHintBounded(
           size: Int, boundColl: TraversableLike[_, _]) =
         self.sizeHintBounded(size, boundColl)
       def result: NewTo = f(self.result())
-    }
-}

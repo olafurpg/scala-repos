@@ -34,23 +34,19 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
 /** ReadOnlyFloatWrapper Spec tests. */
 @RunWith(classOf[JUnitRunner])
-class ReadOnlyFloatWrapperSpec extends FlatSpec with BeforeAndAfterEach {
+class ReadOnlyFloatWrapperSpec extends FlatSpec with BeforeAndAfterEach
 
-  "A ReadOnlyFloatWrapper" should "be an instance of FloatProperty" in {
+  "A ReadOnlyFloatWrapper" should "be an instance of FloatProperty" in
     val p = new ReadOnlyFloatWrapper()
     assert(p.isInstanceOf[FloatProperty])
-  }
 
-  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyFloatProperty`" in {
+  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyFloatProperty`" in
     val p = new ReadOnlyFloatWrapper()
     assert(p.readOnlyProperty.isInstanceOf[ReadOnlyFloatProperty])
-  }
 
-  it should "propagate value changes to `readOnlyProperty`" in {
+  it should "propagate value changes to `readOnlyProperty`" in
     val p = new ReadOnlyFloatWrapper
     p.value = -6.71f
     p.readOnlyProperty() should equal(-6.71f)
     p.value = 87.978f
     p.readOnlyProperty() should equal(87.978f)
-  }
-}

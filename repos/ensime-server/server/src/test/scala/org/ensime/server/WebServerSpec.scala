@@ -25,7 +25,7 @@ import org.ensime.api._
 
 import org.ensime.util.file._
 
-class WebServerSpec extends HttpFlatSpec with WebServer {
+class WebServerSpec extends HttpFlatSpec with WebServer
 
   import SprayJsonSupport._
 
@@ -45,38 +45,30 @@ class WebServerSpec extends HttpFlatSpec with WebServer {
   def docJars(): Set[File] =
     Set(File("foo-javadoc.jar"), File("bar-javadoc.jar"))
 
-  "WebServer" should "respond to REST queries" in {
-    Post("/rpc", """{"typehint":"ConnectionInfoReq"}""".parseJson) ~> route ~> check {
+  "WebServer" should "respond to REST queries" in
+    Post("/rpc", """{"typehint":"ConnectionInfoReq"}""".parseJson) ~> route ~> check
       status shouldBe StatusCodes.OK
       responseAs[JsValue] shouldBe expected
-    }
-  }
 
-  it should "error to bad REST queries" in {
-    Get("/rpc") ~> route ~> check {
+  it should "error to bad REST queries" in
+    Get("/rpc") ~> route ~> check
       status shouldBe StatusCodes.MethodNotAllowed
-    }
-  }
 
-  it should "respond to WebSocket queries" ignore {
+  it should "respond to WebSocket queries" ignore
     // https://github.com/akka/akka/issues/17914
     fail("no test framework yet")
-  }
 
-  it should "serve contents of documentation archives" in {
-    Get("/docs/foo-1.0-javadoc.jar/bar/Baz.html#thingy()") ~> route ~> check {
+  it should "serve contents of documentation archives" in
+    Get("/docs/foo-1.0-javadoc.jar/bar/Baz.html#thingy()") ~> route ~> check
       status shouldBe StatusCodes.OK
       mediaType shouldBe MediaTypes.`text/html`
       responseAs[String] shouldBe "hello"
-    }
 
-    Get("/docs/foo-1.0-javadoc.jar/bar/Bag.html#thingy()") ~> route ~> check {
+    Get("/docs/foo-1.0-javadoc.jar/bar/Bag.html#thingy()") ~> route ~> check
       status shouldBe StatusCodes.NotFound
-    }
-  }
 
-  it should "provide a list of available documentation" in {
-    Get("/docs") ~> route ~> check {
+  it should "provide a list of available documentation" in
+    Get("/docs") ~> route ~> check
       status shouldBe StatusCodes.OK
       mediaType shouldBe MediaTypes.`text/xml` // hmm
 
@@ -98,9 +90,6 @@ class WebServerSpec extends HttpFlatSpec with WebServer {
             </ul>
           </body>
         </html>
-    }
-  }
-}
 
 /**
   * Equivalent for akka-http-testkit use (non-trivial ordering of mixins)
@@ -109,17 +98,14 @@ class WebServerSpec extends HttpFlatSpec with WebServer {
 abstract class HttpFlatSpec
     extends FlatSpecLike with BeforeAndAfterAll with ScalatestRouteTest
     with TestKitBase with DefaultTimeout with ImplicitSender with Matchers
-    with SLF4JLogging {
+    with SLF4JLogging
   def actorRefFactory = system
   implicit val routeTimeout: RouteTestTimeout = RouteTestTimeout(
       timeout.duration.dilated)
   implicit val mat = ActorMaterializer()
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit =
     super.beforeAll()
-  }
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     super.afterAll()
     TestKit.shutdownActorSystem(system)
-  }
-}

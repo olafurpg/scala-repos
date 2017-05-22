@@ -20,36 +20,30 @@ import java.lang.reflect.{InvocationHandler, Method, Proxy}
 
 import scala.collection.{Map, Set, mutable}
 
-object SignalHandlerFactory {
-  def apply() = {
+object SignalHandlerFactory
+  def apply() =
     // only one actual implementation for now
     SunSignalHandler.instantiate
-  }
-}
 
-trait SignalHandler {
+trait SignalHandler
   def handle(signal: String, handlers: Map[String, Set[String => Unit]])
-}
 
-object SunSignalHandler {
-  def instantiate() = {
-    try {
+object SunSignalHandler
+  def instantiate() =
+    try
       Class.forName("sun.misc.Signal")
       Some(new SunSignalHandler())
-    } catch {
+    catch
       case ex: ClassNotFoundException => None
-    }
-  }
-}
 
-class SunSignalHandler extends SignalHandler {
+class SunSignalHandler extends SignalHandler
   private val signalHandlerClass = Class.forName("sun.misc.SignalHandler")
   private val signalClass = Class.forName("sun.misc.Signal")
   private val handleMethod =
     signalClass.getMethod("handle", signalClass, signalHandlerClass)
   private val nameMethod = signalClass.getMethod("getName")
 
-  def handle(signal: String, handlers: Map[String, Set[String => Unit]]) {
+  def handle(signal: String, handlers: Map[String, Set[String => Unit]])
     val sunSignal = signalClass
       .getConstructor(classOf[String])
       .newInstance(signal)
@@ -58,23 +52,18 @@ class SunSignalHandler extends SignalHandler {
       .newProxyInstance(
           signalHandlerClass.getClassLoader,
           Array[Class[_]](signalHandlerClass),
-          new InvocationHandler {
-            def invoke(proxy: Object, method: Method, args: Array[Object]) = {
-              if (method.getName() == "handle") {
-                handlers(signal).foreach { x =>
+          new InvocationHandler
+            def invoke(proxy: Object, method: Method, args: Array[Object]) =
+              if (method.getName() == "handle")
+                handlers(signal).foreach  x =>
                   x(nameMethod.invoke(args(0)).asInstanceOf[String])
-                }
-              }
               null
-            }
-          })
+          )
       .asInstanceOf[Object]
 
     handleMethod.invoke(null, sunSignal, proxy)
-  }
-}
 
-object HandleSignal {
+object HandleSignal
   private val handlers =
     new mutable.HashMap[String, mutable.Set[String => Unit]]()
 
@@ -82,22 +71,15 @@ object HandleSignal {
     * Set the callback function for a named unix signal.
     * For now, this only works on the Sun^H^H^HOracle JVM.
     */
-  def apply(posixSignal: String)(f: String => Unit) {
-    if (!handlers.contains(posixSignal)) {
-      handlers.synchronized {
+  def apply(posixSignal: String)(f: String => Unit)
+    if (!handlers.contains(posixSignal))
+      handlers.synchronized
         SignalHandlerFactory().foreach { _.handle(posixSignal, handlers) }
         handlers(posixSignal) = mutable.HashSet[String => Unit]()
-      }
-    }
 
-    handlers.synchronized {
+    handlers.synchronized
       handlers(posixSignal) += f
-    }
-  }
 
-  def clear(posixSignal: String) {
-    handlers.synchronized {
+  def clear(posixSignal: String)
+    handlers.synchronized
       handlers(posixSignal).clear()
-    }
-  }
-}

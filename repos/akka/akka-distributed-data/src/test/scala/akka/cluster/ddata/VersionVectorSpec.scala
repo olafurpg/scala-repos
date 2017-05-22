@@ -13,32 +13,29 @@ import org.scalatest.WordSpecLike
 
 class VersionVectorSpec
     extends TestKit(ActorSystem("VersionVectorSpec")) with WordSpecLike
-    with Matchers with BeforeAndAfterAll {
+    with Matchers with BeforeAndAfterAll
 
   val node1 = UniqueAddress(Address("akka.tcp", "Sys", "localhost", 2551), 1)
   val node2 = UniqueAddress(node1.address.copy(port = Some(2552)), 2)
   val node3 = UniqueAddress(node1.address.copy(port = Some(2553)), 3)
   val node4 = UniqueAddress(node1.address.copy(port = Some(2554)), 4)
 
-  override def afterAll {
+  override def afterAll
     shutdown()
-  }
 
-  "A VersionVector" must {
+  "A VersionVector" must
 
-    "have zero versions when created" in {
+    "have zero versions when created" in
       val vv = VersionVector()
       vv.size should be(0)
-    }
 
-    "not happen before itself" in {
+    "not happen before itself" in
       val vv1 = VersionVector()
       val vv2 = VersionVector()
 
       vv1 <> vv2 should be(false)
-    }
 
-    "increment correctly" in {
+    "increment correctly" in
       val vv1 = VersionVector()
       val vv2 = vv1 + node1
       vv2.versionAt(node1) should be > vv1.versionAt(node1)
@@ -48,9 +45,8 @@ class VersionVectorSpec
       val vv4 = vv3 + node2
       vv4.versionAt(node1) should be(vv3.versionAt(node1))
       vv4.versionAt(node2) should be > vv3.versionAt(node2)
-    }
 
-    "pass misc comparison test 1" in {
+    "pass misc comparison test 1" in
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
       val vv3_1 = vv2_1 + node2
@@ -62,9 +58,8 @@ class VersionVectorSpec
       val vv4_2 = vv3_2 + node1
 
       vv4_1 <> vv4_2 should be(false)
-    }
 
-    "pass misc comparison test 2" in {
+    "pass misc comparison test 2" in
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
       val vv3_1 = vv2_1 + node2
@@ -77,9 +72,8 @@ class VersionVectorSpec
       val vv5_2 = vv4_2 + node3
 
       vv4_1 < vv5_2 should be(true)
-    }
 
-    "pass misc comparison test 3" in {
+    "pass misc comparison test 3" in
       var vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
 
@@ -87,9 +81,8 @@ class VersionVectorSpec
       val vv2_2 = vv1_2 + node2
 
       vv2_1 <> vv2_2 should be(true)
-    }
 
-    "pass misc comparison test 4" in {
+    "pass misc comparison test 4" in
       val vv1_3 = VersionVector()
       val vv2_3 = vv1_3 + node1
       val vv3_3 = vv2_3 + node2
@@ -101,9 +94,8 @@ class VersionVectorSpec
       val vv4_4 = vv3_4 + node3
 
       vv4_3 <> vv4_4 should be(true)
-    }
 
-    "pass misc comparison test 5" in {
+    "pass misc comparison test 5" in
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node2
       val vv3_1 = vv2_1 + node2
@@ -116,9 +108,8 @@ class VersionVectorSpec
 
       vv3_1 < vv5_2 should be(true)
       vv5_2 > vv3_1 should be(true)
-    }
 
-    "pass misc comparison test 6" in {
+    "pass misc comparison test 6" in
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
       val vv3_1 = vv2_1 + node2
@@ -129,9 +120,8 @@ class VersionVectorSpec
 
       vv3_1 <> vv3_2 should be(true)
       vv3_2 <> vv3_1 should be(true)
-    }
 
-    "pass misc comparison test 7" in {
+    "pass misc comparison test 7" in
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
       val vv3_1 = vv2_1 + node2
@@ -144,9 +134,8 @@ class VersionVectorSpec
 
       vv5_1 <> vv3_2 should be(true)
       vv3_2 <> vv5_1 should be(true)
-    }
 
-    "pass misc comparison test 8" in {
+    "pass misc comparison test 8" in
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
       val vv3_1 = vv2_1 + node3
@@ -157,9 +146,8 @@ class VersionVectorSpec
 
       vv4_1 <> vv1_2 should be(true)
       vv1_2 <> vv4_1 should be(true)
-    }
 
-    "correctly merge two version vectors" in {
+    "correctly merge two version vectors" in
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
       val vv3_1 = vv2_1 + node2
@@ -189,9 +177,8 @@ class VersionVectorSpec
       vv5_1 < merged2 should be(true)
 
       merged1 == merged2 should be(true)
-    }
 
-    "correctly merge two disjoint version vectors" in {
+    "correctly merge two disjoint version vectors" in
 
       val vv1_1 = VersionVector()
       val vv2_1 = vv1_1 + node1
@@ -224,9 +211,8 @@ class VersionVectorSpec
       vv5_1 < merged2 should be(true)
 
       merged1 == merged2 should be(true)
-    }
 
-    "pass blank version vector incrementing" in {
+    "pass blank version vector incrementing" in
       val v1 = VersionVector()
       val v2 = VersionVector()
 
@@ -241,9 +227,8 @@ class VersionVectorSpec
 
       (vv2 > vv1) should be(false)
       (vv1 > vv2) should be(false)
-    }
 
-    "pass merging behavior" in {
+    "pass merging behavior" in
       val a = VersionVector()
       val b = VersionVector()
 
@@ -256,6 +241,3 @@ class VersionVectorSpec
 
       (c1 > a2) should be(true)
       (c1 > b1) should be(true)
-    }
-  }
-}

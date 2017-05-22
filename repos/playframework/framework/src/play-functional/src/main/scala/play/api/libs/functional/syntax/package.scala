@@ -12,7 +12,7 @@ import play.api.libs.functional._
   * Don't forget to {{{import play.api.libs.functional.syntax._}}} to enable functional combinators
   * when using Json API.
   */
-object `package` {
+object `package`
 
   implicit def toAlternativeOps[M[_], A](a: M[A])(
       implicit app: Alternative[M]): AlternativeOps[M, A] =
@@ -38,9 +38,7 @@ object `package` {
       implicit fu: InvariantFunctor[M]): InvariantFunctorOps[M, A] =
     new InvariantFunctorOps(ma)
 
-  def unapply[B, A](f: B => Option[A]): B => A = { b: B =>
+  def unapply[B, A](f: B => Option[A]): B => A =  b: B =>
     f(b).get
-  }
 
   def unlift[A, B](f: A => Option[B]): A => B = Function.unlift(f)
-}

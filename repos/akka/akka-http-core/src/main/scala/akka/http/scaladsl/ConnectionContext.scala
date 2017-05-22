@@ -13,27 +13,24 @@ import javax.net.ssl._
 import scala.collection.immutable
 import scala.compat.java8.OptionConverters._
 
-trait ConnectionContext extends akka.http.javadsl.ConnectionContext {
+trait ConnectionContext extends akka.http.javadsl.ConnectionContext
   final def defaultPort = getDefaultPort
-}
 
-object ConnectionContext {
+object ConnectionContext
   //#https-context-creation
   def https(sslContext: SSLContext,
             enabledCipherSuites: Option[immutable.Seq[String]] = None,
             enabledProtocols: Option[immutable.Seq[String]] = None,
             clientAuth: Option[TLSClientAuth] = None,
-            sslParameters: Option[SSLParameters] = None) = {
+            sslParameters: Option[SSLParameters] = None) =
     new HttpsConnectionContext(sslContext,
                                enabledCipherSuites,
                                enabledProtocols,
                                clientAuth,
                                sslParameters)
-  }
   //#https-context-creation
 
   def noEncryption() = HttpConnectionContext
-}
 
 final class HttpsConnectionContext(
     val sslContext: SSLContext,
@@ -41,7 +38,7 @@ final class HttpsConnectionContext(
     val enabledProtocols: Option[immutable.Seq[String]] = None,
     val clientAuth: Option[TLSClientAuth] = None,
     val sslParameters: Option[SSLParameters] = None)
-    extends akka.http.javadsl.HttpsConnectionContext with ConnectionContext {
+    extends akka.http.javadsl.HttpsConnectionContext with ConnectionContext
 
   def firstSession =
     NegotiateNewSession(
@@ -54,12 +51,10 @@ final class HttpsConnectionContext(
     enabledProtocols.map(_.asJavaCollection).asJava
   override def getClientAuth: Optional[TLSClientAuth] = clientAuth.asJava
   override def getSslParameters: Optional[SSLParameters] = sslParameters.asJava
-}
 
 sealed class HttpConnectionContext
     extends akka.http.javadsl.HttpConnectionContext with ConnectionContext
-final object HttpConnectionContext extends HttpConnectionContext {
+final object HttpConnectionContext extends HttpConnectionContext
 
   /** Java API */
   def getInstance() = this
-}

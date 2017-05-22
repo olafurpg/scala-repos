@@ -13,8 +13,8 @@ import akka.testkit.AkkaSpec
 import akka.util.ByteString
 import akka.http.scaladsl.model.headers.BasicHttpCredentials
 
-class ModelSpec extends AkkaSpec {
-  "construct request" in {
+class ModelSpec extends AkkaSpec
+  "construct request" in
     //#construct-request
     import HttpMethods._
 
@@ -43,9 +43,8 @@ class ModelSpec extends AkkaSpec {
         headers = List(authorization),
         protocol = `HTTP/1.0`)
     //#construct-request
-  }
 
-  "construct response" in {
+  "construct response" in
     //#construct-response
     import StatusCodes._
 
@@ -64,9 +63,8 @@ class ModelSpec extends AkkaSpec {
     HttpResponse(Found, headers = List(locationHeader))
 
     //#construct-response
-  }
 
-  "deal with headers" in {
+  "deal with headers" in
     //#headers
     import akka.http.scaladsl.model.headers._
 
@@ -81,10 +79,10 @@ class ModelSpec extends AkkaSpec {
 
     // a method that extracts basic HTTP credentials from a request
     def credentialsOfRequest(req: HttpRequest): Option[User] =
-      for {
+      for
         Authorization(BasicHttpCredentials(user, pass)) <- req
           .header[Authorization]
-      } yield User(user, pass)
+      yield User(user, pass)
     //#headers
 
     credentialsOfRequest(HttpRequest(headers = List(auth))) should be(
@@ -94,5 +92,3 @@ class ModelSpec extends AkkaSpec {
         HttpRequest(headers = List(Authorization(GenericHttpCredentials(
                           "Other", Map.empty[String, String]))))) should be(
         None)
-  }
-}

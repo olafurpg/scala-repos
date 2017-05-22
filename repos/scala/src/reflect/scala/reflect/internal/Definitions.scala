@@ -14,7 +14,7 @@ import scala.collection.mutable
 import Flags._
 import scala.reflect.api.{Universe => ApiUniverse}
 
-trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
+trait Definitions extends api.StandardDefinitions  self: SymbolTable =>
 
   import rootMirror.{getModuleByName, getPackage, getClassByName, getRequiredClass, getRequiredModule, getClassIfDefined, getModuleIfDefined, getPackageObject, getPackageIfDefined, getPackageObjectIfDefined, requiredClass, requiredModule}
 
@@ -31,22 +31,20 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
   private def enterNewClass(owner: Symbol,
                             name: TypeName,
                             parents: List[Type],
-                            flags: Long = 0L): ClassSymbol = {
+                            flags: Long = 0L): ClassSymbol =
     val clazz = owner.newClassSymbol(name, NoPosition, flags)
     clazz setInfoAndEnter ClassInfoType(parents, newScope, clazz) markAllCompleted
-  }
   private def newMethod(owner: Symbol,
                         name: TermName,
                         formals: List[Type],
                         restpe: Type,
-                        flags: Long): MethodSymbol = {
+                        flags: Long): MethodSymbol =
     val msym = owner.newMethod(name.encode, NoPosition, flags)
     val params = msym.newSyntheticValueParams(formals)
     val info =
       if (owner.isJavaDefined) JavaMethodType(params, restpe)
       else MethodType(params, restpe)
     msym setInfo info markAllCompleted
-  }
   private def enterNewMethod(owner: Symbol,
                              name: TermName,
                              formals: List[Type],
@@ -55,7 +53,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     owner.info.decls enter newMethod(owner, name, formals, restpe, flags)
 
   // the scala value classes
-  trait ValueClassDefinitions { self: DefinitionsClass =>
+  trait ValueClassDefinitions  self: DefinitionsClass =>
 
     import ClassfileConstants._
 
@@ -86,12 +84,10 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
           "Could not find value classes! This is a catastrophic failure.  scala " +
           scala.util.Properties.versionString)
 
-    private def valueClassSymbol(name: TypeName): ClassSymbol = {
-      getMember(ScalaPackageClass, name) match {
+    private def valueClassSymbol(name: TypeName): ClassSymbol =
+      getMember(ScalaPackageClass, name) match
         case x: ClassSymbol => x
         case _ => catastrophicFailure()
-      }
-    }
 
     private[Definitions] def classesMap[T](f: Name => T) =
       symbolsMap(ScalaValueClassesNoUnit, f)
@@ -115,10 +111,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     lazy val volatileRefClass = classesMap(
         x => getRequiredClass("scala.runtime.Volatile" + x + "Ref"))
 
-    lazy val allRefClasses: Set[Symbol] = {
+    lazy val allRefClasses: Set[Symbol] =
       refClass.values.toSet ++ volatileRefClass.values.toSet ++ Set(
           VolatileObjectRefClass, ObjectRefClass)
-    }
 
     def isNumericSubClass(sub: Symbol, sup: Symbol) =
       ((numericWeight contains sub) && (numericWeight contains sup) &&
@@ -174,10 +169,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
     def underlyingOfValueClass(clazz: Symbol): Type =
       clazz.derivedValueClassUnbox.tpe.resultType
-  }
 
   abstract class DefinitionsClass
-      extends DefinitionsApi with ValueClassDefinitions {
+      extends DefinitionsApi with ValueClassDefinitions
     private var isInitialized = false
     def isDefinitionsInitialized = isInitialized
 
@@ -190,7 +184,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     lazy val RuntimePackage = getPackage(TermName("scala.runtime"))
     lazy val RuntimePackageClass = RuntimePackage.moduleClass.asClass
 
-    def javaTypeToValueClass(jtype: Class[_]): Symbol = jtype match {
+    def javaTypeToValueClass(jtype: Class[_]): Symbol = jtype match
       case java.lang.Void.TYPE => UnitClass
       case java.lang.Byte.TYPE => ByteClass
       case java.lang.Character.TYPE => CharClass
@@ -201,8 +195,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       case java.lang.Double.TYPE => DoubleClass
       case java.lang.Boolean.TYPE => BooleanClass
       case _ => NoSymbol
-    }
-    def valueClassToJavaType(sym: Symbol): Class[_] = sym match {
+    def valueClassToJavaType(sym: Symbol): Class[_] = sym match
       case UnitClass => java.lang.Void.TYPE
       case ByteClass => java.lang.Byte.TYPE
       case CharClass => java.lang.Character.TYPE
@@ -213,11 +206,10 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       case DoubleClass => java.lang.Double.TYPE
       case BooleanClass => java.lang.Boolean.TYPE
       case _ => null
-    }
 
     /** Fully initialize the symbol, type, or scope.
       */
-    def fullyInitializeSymbol(sym: Symbol): Symbol = {
+    def fullyInitializeSymbol(sym: Symbol): Symbol =
       sym.initialize
       // Watch out for those darn raw types on method parameters
       if (sym.owner.initialize.isJavaDefined) sym.cookJavaRawInfo()
@@ -225,16 +217,13 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       fullyInitializeType(sym.info)
       fullyInitializeType(sym.tpe_*)
       sym
-    }
-    def fullyInitializeType(tp: Type): Type = {
+    def fullyInitializeType(tp: Type): Type =
       tp.typeParams foreach fullyInitializeSymbol
       mforeach(tp.paramss)(fullyInitializeSymbol)
       tp
-    }
-    def fullyInitializeScope(scope: Scope): Scope = {
+    def fullyInitializeScope(scope: Scope): Scope =
       scope.sorted foreach fullyInitializeSymbol
       scope
-    }
 
     /** Is this symbol a member of Object or Any? */
     def isUniversalMember(sym: Symbol) = ObjectClass isSubClass sym.owner
@@ -260,22 +249,19 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
     def hasMultipleNonImplicitParamLists(member: Symbol): Boolean =
       hasMultipleNonImplicitParamLists(member.info)
-    def hasMultipleNonImplicitParamLists(info: Type): Boolean = info match {
+    def hasMultipleNonImplicitParamLists(info: Type): Boolean = info match
       case PolyType(_, restpe) => hasMultipleNonImplicitParamLists(restpe)
       case MethodType(_, MethodType(p :: _, _)) if !p.isImplicit => true
       case _ => false
-    }
 
-    private def fixupAsAnyTrait(tpe: Type): Type = tpe match {
+    private def fixupAsAnyTrait(tpe: Type): Type = tpe match
       case ClassInfoType(parents, decls, clazz) =>
         if (parents.head.typeSymbol == AnyClass) tpe
-        else {
+        else
           assert(parents.head.typeSymbol == ObjectClass, parents)
           ClassInfoType(AnyTpe :: parents.tail, decls, clazz)
-        }
       case PolyType(tparams, restpe) =>
         PolyType(tparams, fixupAsAnyTrait(restpe))
-    }
 
     // top types
     lazy val AnyClass = enterNewClass(
@@ -301,13 +287,13 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     lazy val ConstantNull = ConstantType(Constant(null))
 
     lazy val AnyValClass: ClassSymbol =
-      (ScalaPackageClass.info member tpnme.AnyVal orElse {
+      (ScalaPackageClass.info member tpnme.AnyVal orElse
             val anyval = enterNewClass(
                 ScalaPackageClass, tpnme.AnyVal, AnyTpe :: Nil, ABSTRACT)
             val av_constr = anyval.newClassConstructor(NoPosition)
             anyval.info.decls enter av_constr
             anyval markAllCompleted
-          }).asInstanceOf[ClassSymbol]
+          ).asInstanceOf[ClassSymbol]
     def AnyVal_getClass = getMemberMethod(AnyValClass, nme.getClass_)
 
     // bottom types
@@ -315,23 +301,19 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     lazy val RuntimeNullClass = getClassByName(fulltpnme.RuntimeNull)
 
     sealed abstract class BottomClassSymbol(name: TypeName, parent: Symbol)
-        extends ClassSymbol(ScalaPackageClass, NoPosition, name) {
-      locally {
+        extends ClassSymbol(ScalaPackageClass, NoPosition, name)
+      locally
         this initFlags ABSTRACT | FINAL
         this setInfoAndEnter ClassInfoType(List(parent.tpe), newScope, this)
         this markAllCompleted
-      }
       final override def isBottomClass = true
       final override def isThreadsafe(purpose: SymbolOps): Boolean = true
-    }
     final object NothingClass
-        extends BottomClassSymbol(tpnme.Nothing, AnyClass) {
+        extends BottomClassSymbol(tpnme.Nothing, AnyClass)
       override def isSubClass(that: Symbol) = true
-    }
-    final object NullClass extends BottomClassSymbol(tpnme.Null, AnyRefClass) {
+    final object NullClass extends BottomClassSymbol(tpnme.Null, AnyRefClass)
       override def isSubClass(that: Symbol) = ((that eq AnyClass) ||
           (that ne NothingClass) && (that isSubClass ObjectClass))
-    }
 
     // exceptions and other throwables
     lazy val ClassCastExceptionClass = requiredClass[ClassCastException]
@@ -449,21 +431,18 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     def isVarArgTypes(formals: Seq[Type]) =
       formals.nonEmpty && isRepeatedParamType(formals.last)
 
-    def firstParamType(tpe: Type): Type = tpe.paramTypes match {
+    def firstParamType(tpe: Type): Type = tpe.paramTypes match
       case p :: _ => p
       case _ => NoType
-    }
-    def isImplicitParamss(paramss: List[List[Symbol]]) = paramss match {
+    def isImplicitParamss(paramss: List[List[Symbol]]) = paramss match
       case (p :: _) :: _ => p.isImplicit
       case _ => false
-    }
 
-    def hasRepeatedParam(tp: Type): Boolean = tp match {
+    def hasRepeatedParam(tp: Type): Boolean = tp match
       case MethodType(formals, restpe) =>
         isScalaVarArgs(formals) || hasRepeatedParam(restpe)
       case PolyType(_, restpe) => hasRepeatedParam(restpe)
       case _ => false
-    }
 
     // wrapping and unwrapping
     def dropByName(tp: Type): Type =
@@ -670,12 +649,12 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     // The given symbol is a method with the right name and signature to be a runnable java program.
     def isJavaMainMethod(sym: Symbol) =
       (sym.name == nme.main) &&
-      (sym.info match {
+      (sym.info match
             case MethodType(p :: Nil, restpe) =>
               isArrayOfSymbol(p.tpe, StringClass) &&
               restpe.typeSymbol == UnitClass
             case _ => false
-          })
+          )
     // The given class has a main method.
     def hasJavaMainMethod(sym: Symbol): Boolean =
       (sym.tpe member nme.main).alternatives exists isJavaMainMethod
@@ -684,21 +663,19 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
                         maxArity: Int,
                         countFrom: Int = 0,
                         init: Option[ClassSymbol] = None)
-        extends VarArityClassApi {
+        extends VarArityClassApi
       private val offset = countFrom - init.size
       private def isDefinedAt(i: Int) = i < seq.length + offset && i >= offset
       val seq: IndexedSeq[ClassSymbol] = (init ++: countFrom
             .to(maxArity)
-            .map { i =>
+            .map  i =>
               getRequiredClass("scala." + name + i)
-            }).toVector
+            ).toVector
       def apply(i: Int) = if (isDefinedAt(i)) seq(i - offset) else NoSymbol
-      def specificType(args: List[Type], others: Type*): Type = {
+      def specificType(args: List[Type], others: Type*): Type =
         val arity = args.length
         if (!isDefinedAt(arity)) NoType
         else appliedType(apply(arity), args ++ others: _*)
-      }
-    }
     // would be created synthetically for the default args. We call all objects in this method from the generated code
     // in JavaUniverseForce, so it is clearer to define this explicitly define this in source.
     object VarArityClass
@@ -720,7 +697,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     def abstractFunctionType(formals: List[Type], restpe: Type) =
       AbstractFunctionClass.specificType(formals, restpe)
 
-    def wrapArrayMethodName(elemtp: Type): TermName = elemtp.typeSymbol match {
+    def wrapArrayMethodName(elemtp: Type): TermName = elemtp.typeSymbol match
       case ByteClass => nme.wrapByteArray
       case ShortClass => nme.wrapShortArray
       case CharClass => nme.wrapCharArray
@@ -734,7 +711,6 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         if ((elemtp <:< AnyRefTpe) && !isPhantomClass(elemtp.typeSymbol))
           nme.wrapRefArray
         else nme.genericWrapArray
-    }
 
     def isTupleSymbol(sym: Symbol) =
       TupleClass.seq contains unspecializedSymbol(sym)
@@ -743,42 +719,38 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     def isProductNSymbol(sym: Symbol) =
       ProductClass.seq contains unspecializedSymbol(sym)
 
-    def unspecializedSymbol(sym: Symbol): Symbol = {
-      if (sym hasFlag SPECIALIZED) {
+    def unspecializedSymbol(sym: Symbol): Symbol =
+      if (sym hasFlag SPECIALIZED)
         // add initialization from its generic class constructor
         val genericName = nme.unspecializedName(sym.name)
         val member = sym.owner.info.decl(genericName.toTypeName)
         member
-      } else sym
-    }
+      else sym
     def unspecializedTypeArgs(tp: Type): List[Type] =
       (tp baseType unspecializedSymbol(tp.typeSymbolDirect)).typeArgs
 
-    object MacroContextType {
-      def unapply(tp: Type) = {
+    object MacroContextType
+      def unapply(tp: Type) =
         def isOneOfContextTypes(tp: Type) =
           tp =:= BlackboxContextClass.tpe || tp =:= WhiteboxContextClass.tpe
         def isPrefix(sym: Symbol) =
           sym.allOverriddenSymbols.contains(MacroContextPrefixType)
 
-        tp.dealias match {
+        tp.dealias match
           case RefinedType(List(tp), Scope(sym))
               if isOneOfContextTypes(tp) && isPrefix(sym) =>
             Some(tp)
           case tp if isOneOfContextTypes(tp) => Some(tp)
           case _ => None
-        }
-      }
-    }
 
     def isMacroContextType(tp: Type) = MacroContextType.unapply(tp).isDefined
 
     def isWhiteboxContextType(tp: Type) =
       isMacroContextType(tp) && (tp <:< WhiteboxContextClass.tpe)
 
-    private def macroBundleParamInfo(tp: Type) = {
+    private def macroBundleParamInfo(tp: Type) =
       val ctor = tp.erasure.typeSymbol.primaryConstructor
-      ctor.paramss match {
+      ctor.paramss match
         case List(List(c)) =>
           val sym = c.info.typeSymbol
           val isContextCompatible =
@@ -787,28 +759,24 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
           if (isContextCompatible) c.info else NoType
         case _ =>
           NoType
-      }
-    }
 
     def looksLikeMacroBundleType(tp: Type) =
       macroBundleParamInfo(tp) != NoType
 
-    def isMacroBundleType(tp: Type) = {
+    def isMacroBundleType(tp: Type) =
       val isMonomorphic = tp.typeSymbol.typeParams.isEmpty
       val isContextCompatible = isMacroContextType(macroBundleParamInfo(tp))
       val hasSingleConstructor = !tp.declaration(nme.CONSTRUCTOR).isOverloaded
       val nonAbstract = !tp.erasure.typeSymbol.isAbstractClass
       isMonomorphic && isContextCompatible && hasSingleConstructor &&
       nonAbstract
-    }
 
-    def isBlackboxMacroBundleType(tp: Type) = {
+    def isBlackboxMacroBundleType(tp: Type) =
       val isBundle = isMacroBundleType(tp)
       val unwrappedContext =
         MacroContextType.unapply(macroBundleParamInfo(tp)).getOrElse(NoType)
       val isBlackbox = unwrappedContext =:= BlackboxContextClass.tpe
       isBundle && isBlackbox
-    }
 
     def isListType(tp: Type) = tp <:< classExistentialType(ListClass)
     def isIterableType(tp: Type) = tp <:< classExistentialType(IterableClass)
@@ -843,42 +811,38 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     /** if tpe <: ProductN[T1,...,TN], returns List(T1,...,TN) else Nil */
     @deprecated("No longer used", "2.11.0")
     def getProductArgs(tpe: Type): List[Type] =
-      tpe.baseClasses find isProductNSymbol match {
+      tpe.baseClasses find isProductNSymbol match
         case Some(x) => tpe.baseType(x).typeArgs
         case _ => Nil
-      }
 
     @deprecated("No longer used", "2.11.0")
-    def unapplyUnwrap(tpe: Type) = tpe.finalResultType.dealiasWiden match {
+    def unapplyUnwrap(tpe: Type) = tpe.finalResultType.dealiasWiden match
       case RefinedType(p :: _, _) => p.dealiasWiden
       case tp => tp
-    }
 
     def getterMemberTypes(tpe: Type, getters: List[Symbol]): List[Type] =
       getters map (m => dropNullaryMethod(tpe memberType m))
 
-    def dropNullaryMethod(tp: Type) = tp match {
+    def dropNullaryMethod(tp: Type) = tp match
       case NullaryMethodType(restpe) => restpe
       case _ => tp
-    }
 
     /** An implementation of finalResultType which does only what
       *  finalResultType is documented to do. Defining it externally to
       *  Type helps ensure people can't come to depend on accidental
       *  aspects of its behavior. This is all of it!
       */
-    def finalResultType(tp: Type): Type = tp match {
+    def finalResultType(tp: Type): Type = tp match
       case PolyType(_, restpe) => finalResultType(restpe)
       case MethodType(_, restpe) => finalResultType(restpe)
       case NullaryMethodType(restpe) => finalResultType(restpe)
       case _ => tp
-    }
 
     /** Similarly, putting all the isStable logic in one place.
       *  This makes it like 1000x easier to see the overall logic
       *  of the method.
       */
-    def isStable(tp: Type): Boolean = tp match {
+    def isStable(tp: Type): Boolean = tp match
       case _: SingletonType => true
       case NoPrefix => true
       case TypeRef(_, NothingClass | SingletonClass, _) => true
@@ -890,13 +854,12 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       case AnnotatedType(_, atp) => isStable(atp) // Really?
       case _: SimpleTypeProxy => isStable(tp.underlying)
       case _ => false
-    }
-    def isVolatile(tp: Type): Boolean = {
+    def isVolatile(tp: Type): Boolean =
       // need to be careful not to fall into an infinite recursion here
       // because volatile checking is done before all cycles are detected.
       // the case to avoid is an abstract type directly or
       // indirectly upper-bounded by itself. See #2918
-      def isVolatileAbstractType: Boolean = {
+      def isVolatileAbstractType: Boolean =
         def sym = tp.typeSymbol
         def volatileUpperBound = isVolatile(tp.bounds.hi)
         def safeIsVolatile =
@@ -905,13 +868,12 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
            // we can return true when pendingVolatiles contains sym, because
            // a cycle will be detected afterwards and an error will result anyway.
            else
-             pendingVolatiles(sym) || {
+             pendingVolatiles(sym) ||
                pendingVolatiles += sym
                try volatileUpperBound finally pendingVolatiles -= sym
-             })
+             )
         volatileRecursions += 1
         try safeIsVolatile finally volatileRecursions -= 1
-      }
 
       /** A refined type P1 with ... with Pn { decls } is volatile if
         *  one of the parent types Pi is an abstract type, and
@@ -922,7 +884,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         *  an abstract member if it has an abstract definition which is also
         *  a member of the whole type.
         */
-      def isVolatileRefinedType: Boolean = {
+      def isVolatileRefinedType: Boolean =
         val RefinedType(parents, decls) = tp
         def isVisibleDeferred(m: Symbol) =
           m.isDeferred &&
@@ -932,17 +894,14 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         def dropConcreteParents =
           parents dropWhile (p => !p.typeSymbol.isAbstractType)
 
-        (parents exists isVolatile) || {
-          dropConcreteParents match {
+        (parents exists isVolatile) ||
+          dropConcreteParents match
             case Nil => false
             case ps =>
               (ps ne parents) || (ps.tail exists contributesAbstractMembers) ||
               (decls exists isVisibleDeferred)
-          }
-        }
-      }
 
-      tp match {
+      tp match
         case ThisType(_) => false
         case SingleType(_, sym) =>
           isVolatile(tp.underlying) && (sym.hasVolatileType || !sym.isStable)
@@ -954,25 +913,20 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         case TypeVar(origin, _) => isVolatile(origin)
         case _: SimpleTypeProxy => isVolatile(tp.underlying)
         case _ => false
-      }
-    }
 
     private[this] var volatileRecursions: Int = 0
     private[this] val pendingVolatiles = mutable.HashSet[Symbol]()
-    def abstractFunctionForFunctionType(tp: Type) = {
+    def abstractFunctionForFunctionType(tp: Type) =
       assert(isFunctionType(tp), tp)
       abstractFunctionType(tp.typeArgs.init, tp.typeArgs.last)
-    }
     def functionNBaseType(tp: Type): Type =
-      tp.baseClasses find isFunctionSymbol match {
+      tp.baseClasses find isFunctionSymbol match
         case Some(sym) => tp baseType unspecializedSymbol(sym)
         case _ => tp
-      }
 
-    def isPartialFunctionType(tp: Type): Boolean = {
+    def isPartialFunctionType(tp: Type): Boolean =
       val sym = tp.typeSymbol
       (sym eq PartialFunctionClass) || (sym eq AbstractPartialFunctionClass)
-    }
 
     /** The single abstract method declared by type `tp` (or `NoSymbol` if it cannot be found).
       *
@@ -983,7 +937,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     def samOf(tp: Type): Symbol =
       if (!settings.Xexperimental) NoSymbol else findSam(tp)
 
-    def findSam(tp: Type): Symbol = {
+    def findSam(tp: Type): Symbol =
       // if tp has a constructor, it must be public and must not take any arguments
       // (not even an implicit argument list -- to keep it simple for now)
       val tpSym = tp.typeSymbol
@@ -993,7 +947,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         (!ctor.isOverloaded && ctor.isPublic && ctor.info.params.isEmpty &&
             ctor.info.paramSectionCount <= 1)
 
-      if (tpSym.exists && ctorOk) {
+      if (tpSym.exists && ctorOk)
         // find the single abstract member, if there is one
         // don't go out requiring DEFERRED members, as you will get them even if there's a concrete override:
         //    scala> abstract class X { def m: Int }
@@ -1019,8 +973,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
             deferredMembers.head.info.paramSectionCount == 1)
           deferredMembers.head
         else NoSymbol
-      } else NoSymbol
-    }
+      else NoSymbol
 
     def arrayType(arg: Type) = appliedType(ArrayClass, arg)
     def byNameType(arg: Type) = appliedType(ByNameParamClass, arg)
@@ -1052,13 +1005,12 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     //         extractor to limit exposure to regressions like the reported problem with existentials.
     //         TODO fix the existential problem in the general case, see test/pending/pos/t8128.scala
     private def typeArgOfBaseTypeOr(tp: Type, baseClass: Symbol)(
-        or: => Type): Type = (tp baseType baseClass).typeArgs match {
+        or: => Type): Type = (tp baseType baseClass).typeArgs match
       case x :: Nil =>
         val x1 = x
         val x2 = repackExistential(x1)
         x2
       case _ => or
-    }
 
     // Can't only check for _1 thanks to pos/t796.
     def hasSelectors(tp: Type) = ((tp.members containsName nme._1) &&
@@ -1067,16 +1019,14 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     /** Returns the method symbols for members _1, _2, ..., _N
       *  which exist in the given type.
       */
-    def productSelectors(tpe: Type): List[Symbol] = {
-      def loop(n: Int): List[Symbol] = tpe member TermName("_" + n) match {
+    def productSelectors(tpe: Type): List[Symbol] =
+      def loop(n: Int): List[Symbol] = tpe member TermName("_" + n) match
         case NoSymbol => Nil
         case m if m.paramss.nonEmpty => Nil
         case m => m :: loop(n + 1)
-      }
       // Since ErrorType always returns a symbol from a call to member, we
       // had better not start looking for _1, _2, etc. expecting it to run out.
       if (tpe.isErroneous) Nil else loop(1)
-    }
 
     /** If `tp` has a term member `name`, the first parameter list of which
       *  matches `paramTypes`, and which either has no further parameter
@@ -1084,18 +1034,15 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       *  method. Otherwise, NoType.
       */
     def resultOfMatchingMethod(tp: Type, name: TermName)(
-        paramTypes: Type*): Type = {
-      def matchesParams(member: Symbol) = member.paramss match {
+        paramTypes: Type*): Type =
+      def matchesParams(member: Symbol) = member.paramss match
         case Nil => paramTypes.isEmpty
         case ps :: rest =>
           (rest.isEmpty || isImplicitParamss(rest)) &&
           (ps corresponds paramTypes)(_.tpe =:= _)
-      }
-      tp member name filter matchesParams match {
+      tp member name filter matchesParams match
         case NoSymbol => NoType
         case member => (tp memberType member).finalResultType
-      }
-    }
 
     def ClassType(arg: Type) =
       if (phase.erasedTypes) ClassClass.tpe else appliedType(ClassClass, arg)
@@ -1103,22 +1050,20 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     /** Can we tell by inspecting the symbol that it will never
       *  at any phase have type parameters?
       */
-    def neverHasTypeParameters(sym: Symbol) = sym match {
+    def neverHasTypeParameters(sym: Symbol) = sym match
       case _: RefinementClassSymbol => true
       case _: ModuleClassSymbol => true
       case _ =>
         (sym.isPrimitiveValueClass || sym.isAnonymousClass ||
             sym.initialize.isMonomorphicType)
-    }
 
-    def EnumType(sym: Symbol) = {
+    def EnumType(sym: Symbol) =
       // given (in java): "class A { enum E { VAL1 } }"
       //  - sym: the symbol of the actual enumeration value (VAL1)
       //  - .owner: the ModuleClassSymbol of the enumeration (object E)
       //  - .linkedClassOfClass: the ClassSymbol of the enumeration (class E)
       // SI-6613 Subsequent runs of the resident compiler demand the phase discipline here.
       enteringPhaseNotLaterThan(picklerPhase)(sym.owner.linkedClassOfClass).tpe
-    }
 
     /** Given a class symbol C with type parameters T1, T2, ... Tn
       *  which have upper/lower bounds LB1/UB1, LB1/UB2, ..., LBn/UBn,
@@ -1195,12 +1140,12 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     // class object is that of java.lang.Integer, not Int.
     //
     // TODO: If T is final, return type could be Class[T].  Should it?
-    def getClassReturnType(tp: Type): Type = {
+    def getClassReturnType(tp: Type): Type =
       val sym = tp.typeSymbol
 
       if (phase.erasedTypes) ClassClass.tpe
       else if (isPrimitiveValueClass(sym)) ClassType(tp.widen)
-      else {
+      else
         val eparams = typeParamsToExistentials(
             ClassClass, ClassClass.typeParams)
         val upperBound =
@@ -1212,41 +1157,35 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
             eparams,
             ClassType((eparams.head setInfo TypeBounds.upper(upperBound)).tpe)
         )
-      }
-    }
 
     /** Remove references to class Object (other than the head) in a list of parents */
-    def removeLaterObjects(tps: List[Type]): List[Type] = tps match {
+    def removeLaterObjects(tps: List[Type]): List[Type] = tps match
       case Nil => Nil
       case x :: xs => x :: xs.filterNot(_.typeSymbol == ObjectClass)
-    }
 
     /** Remove all but one reference to class Object from a list of parents. */
-    def removeRedundantObjects(tps: List[Type]): List[Type] = tps match {
+    def removeRedundantObjects(tps: List[Type]): List[Type] = tps match
       case Nil => Nil
       case x :: xs =>
         if (x.typeSymbol == ObjectClass)
           x :: xs.filterNot(_.typeSymbol == ObjectClass)
         else x :: removeRedundantObjects(xs)
-    }
 
     /** The following transformations applied to a list of parents.
       *  If any parent is a class/trait, all parents which normalize to
       *  Object are discarded.  Otherwise, all parents which normalize
       *  to Object except the first one found are discarded.
       */
-    def normalizedParents(parents: List[Type]): List[Type] = {
+    def normalizedParents(parents: List[Type]): List[Type] =
       if (parents exists
           (t => (t.typeSymbol ne ObjectClass) && t.typeSymbol.isClass))
         parents filterNot (_.typeSymbol eq ObjectClass)
       else removeRedundantObjects(parents)
-    }
 
     /** Flatten curried parameter lists of a method type. */
-    def allParameters(tpe: Type): List[Symbol] = tpe match {
+    def allParameters(tpe: Type): List[Symbol] = tpe match
       case MethodType(params, res) => params ::: allParameters(res)
       case _ => Nil
-    }
 
     def typeStringNoPackage(tp: Type) =
       "" + tp stripPrefix tp.typeSymbol.enclosingPackage.fullName + "."
@@ -1257,11 +1196,10 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     def parentsString(parents: List[Type]) =
       normalizedParents(parents) mkString " with "
 
-    def valueParamsString(tp: Type) = tp match {
+    def valueParamsString(tp: Type) = tp match
       case MethodType(params, _) =>
         params map (_.defString) mkString ("(", ",", ")")
       case _ => ""
-    }
 
     // members of class java.lang.{ Object, String }
     lazy val Object_## = enterNewMethod(
@@ -1408,7 +1346,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     // * By default, annotations on (`val`-, `var`- or plain) constructor parameters
     // * end up on the parameter, not on any other entity. Annotations on fields
     // * by default only end up on the field.
-    def defaultAnnotationTarget(t: Tree): Symbol = t match {
+    def defaultAnnotationTarget(t: Tree): Symbol = t match
       case ClassDef(_, _, _, _) => ClassTargetClass
       case ModuleDef(_, _, _) => ObjectTargetClass
       case vd @ ValDef(_, _, _, _) if vd.symbol.isParamAccessor =>
@@ -1418,14 +1356,13 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       case ValDef(_, _, _, _) => FieldTargetClass
       case DefDef(_, _, _, _, _, _) => MethodTargetClass
       case _ => GetterTargetClass
-    }
 
-    lazy val AnnotationDefaultAttr: ClassSymbol = {
+    lazy val AnnotationDefaultAttr: ClassSymbol =
       val sym = RuntimePackageClass.newClassSymbol(
           tpnme.AnnotationDefaultATTR, NoPosition, 0L)
       sym setInfo ClassInfoType(List(AnnotationClass.tpe), newScope, sym)
       markAllCompleted(sym)
-      RuntimePackageClass.info.decls.toList.filter(_.name == sym.name) match {
+      RuntimePackageClass.info.decls.toList.filter(_.name == sym.name) match
         case existing :: _ =>
           existing.asInstanceOf[ClassSymbol]
         case _ =>
@@ -1433,16 +1370,13 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
           // This attribute needs a constructor so that modifiers in parsed Java code make sense
           sym.info.decls enter sym.newClassConstructor(NoPosition)
           sym
-      }
-    }
 
     private def fatalMissingSymbol(owner: Symbol,
                                    name: Name,
                                    what: String = "member",
-                                   addendum: String = "") = {
+                                   addendum: String = "") =
       throw new FatalError(
           owner + " does not have a " + what + " " + name + addendum)
-    }
 
     def getLanguageFeature(
         name: String, owner: Symbol = languageFeatureModule): Symbol =
@@ -1451,33 +1385,28 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
     def termMember(owner: Symbol, name: String): Symbol =
       owner.info.member(newTermName(name))
 
-    def findNamedMember(fullName: Name, root: Symbol): Symbol = {
+    def findNamedMember(fullName: Name, root: Symbol): Symbol =
       val segs = nme.segments(fullName.toString, fullName.isTermName)
       if (segs.isEmpty || segs.head != root.simpleName) NoSymbol
       else findNamedMember(segs.tail, root)
-    }
     def findNamedMember(segs: List[Name], root: Symbol): Symbol =
       if (segs.isEmpty) root
       else findNamedMember(segs.tail, root.info member segs.head)
 
-    def getMember(owner: Symbol, name: Name): Symbol = {
-      getMemberIfDefined(owner, name) orElse {
+    def getMember(owner: Symbol, name: Name): Symbol =
+      getMemberIfDefined(owner, name) orElse
         if (phase.flatClasses && name.isTypeName &&
-            !owner.isPackageObjectOrClass) {
+            !owner.isPackageObjectOrClass)
           val pkg = owner.owner
           val flatname = tpnme.flattenedName(owner.name, name)
           getMember(pkg, flatname)
-        } else fatalMissingSymbol(owner, name)
-      }
-    }
-    def getMemberValue(owner: Symbol, name: Name): TermSymbol = {
-      getMember(owner, name.toTermName) match {
+        else fatalMissingSymbol(owner, name)
+    def getMemberValue(owner: Symbol, name: Name): TermSymbol =
+      getMember(owner, name.toTermName) match
         case x: TermSymbol => x
         case _ => fatalMissingSymbol(owner, name, "member value")
-      }
-    }
-    def getMemberModule(owner: Symbol, name: Name): ModuleSymbol = {
-      getMember(owner, name.toTermName) match {
+    def getMemberModule(owner: Symbol, name: Name): ModuleSymbol =
+      getMember(owner, name.toTermName) match
         case x: ModuleSymbol => x
         case NoSymbol => fatalMissingSymbol(owner, name, "member object")
         case other =>
@@ -1486,26 +1415,18 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
               name,
               "member object",
               addendum = s". A symbol ${other} of kind ${other.accurateKindString} already exists.")
-      }
-    }
-    def getTypeMember(owner: Symbol, name: Name): TypeSymbol = {
-      getMember(owner, name.toTypeName) match {
+    def getTypeMember(owner: Symbol, name: Name): TypeSymbol =
+      getMember(owner, name.toTypeName) match
         case x: TypeSymbol => x
         case _ => fatalMissingSymbol(owner, name, "type member")
-      }
-    }
-    def getMemberClass(owner: Symbol, name: Name): ClassSymbol = {
-      getMember(owner, name.toTypeName) match {
+    def getMemberClass(owner: Symbol, name: Name): ClassSymbol =
+      getMember(owner, name.toTypeName) match
         case x: ClassSymbol => x
         case _ => fatalMissingSymbol(owner, name, "member class")
-      }
-    }
-    def getMemberMethod(owner: Symbol, name: Name): TermSymbol = {
-      getMember(owner, name.toTermName) match {
+    def getMemberMethod(owner: Symbol, name: Name): TermSymbol =
+      getMember(owner, name.toTermName) match
         case x: TermSymbol => x
         case _ => fatalMissingSymbol(owner, name, "method")
-      }
-    }
 
     private lazy val erasurePhase = findPhaseWithName("erasure")
     def getMemberIfDefined(owner: Symbol, name: Name): Symbol =
@@ -1522,10 +1443,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       *  OverloadedTypes turning up when you don't want them, if you
       *  know the method in question is uniquely declared in the given owner.
       */
-    def getDecl(owner: Symbol, name: Name): Symbol = {
+    def getDecl(owner: Symbol, name: Name): Symbol =
       getDeclIfDefined(owner, name) orElse fatalMissingSymbol(
           owner, name, "decl")
-    }
     def getDeclIfDefined(owner: Symbol, name: Name): Symbol =
       owner.info.nonPrivateDecl(name)
 
@@ -1534,7 +1454,7 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       owner.newAliasType(name) setInfoAndEnter alias
 
     private def specialPolyClass(name: TypeName, flags: Long)(
-        parentFn: Symbol => Type): ClassSymbol = {
+        parentFn: Symbol => Type): ClassSymbol =
       val clazz = enterNewClass(ScalaPackageClass, name, Nil)
       val tparam = clazz.newSyntheticTypeParam("T0", flags)
       val parents = List(AnyRefTpe, parentFn(tparam))
@@ -1542,34 +1462,29 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
       clazz setInfo GenPolyType(
           List(tparam),
           ClassInfoType(parents, newScope, clazz)) markAllCompleted
-    }
 
     def newPolyMethod(
         typeParamCount: Int, owner: Symbol, name: TermName, flags: Long)(
-        createFn: PolyMethodCreator): MethodSymbol = {
+        createFn: PolyMethodCreator): MethodSymbol =
       val msym = owner.newMethod(name.encode, NoPosition, flags)
       val tparams = msym.newSyntheticTypeParams(typeParamCount)
-      val mtpe = createFn(tparams) match {
+      val mtpe = createFn(tparams) match
         case (Some(formals), restpe) =>
           MethodType(msym.newSyntheticValueParams(formals), restpe)
         case (_, restpe) => NullaryMethodType(restpe)
-      }
 
       msym setInfoAndEnter genPolyType(tparams, mtpe) markAllCompleted
-    }
 
     /** T1 means one type parameter.
       */
     def newT1NullaryMethod(owner: Symbol, name: TermName, flags: Long)(
-        createFn: Symbol => Type): MethodSymbol = {
+        createFn: Symbol => Type): MethodSymbol =
       newPolyMethod(1, owner, name, flags)(
           tparams => (None, createFn(tparams.head)))
-    }
     def newT1NoParamsMethod(owner: Symbol, name: TermName, flags: Long)(
-        createFn: Symbol => Type): MethodSymbol = {
+        createFn: Symbol => Type): MethodSymbol =
       newPolyMethod(1, owner, name, flags)(
           tparams => (Some(Nil), createFn(tparams.head)))
-    }
 
     /** Is symbol a phantom class for which no runtime representation exists? */
     lazy val isPhantomClass =
@@ -1651,18 +1566,16 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
           .getOrElse(sym, NoSymbol)
 
     /** Is type's symbol a numeric value class? */
-    def isNumericValueType(tp: Type): Boolean = tp match {
+    def isNumericValueType(tp: Type): Boolean = tp match
       case TypeRef(_, sym, _) => isNumericValueClass(sym)
       case _ => false
-    }
 
     // todo: reconcile with javaSignature!!!
-    def signature(tp: Type): String = {
-      def erasure(tp: Type): Type = tp match {
+    def signature(tp: Type): String =
+      def erasure(tp: Type): Type = tp match
         case st: SubType => erasure(st.supertype)
         case RefinedType(parents, _) => erasure(parents.head)
         case _ => tp
-      }
       def flatNameString(sym: Symbol, separator: Char): String =
         if (sym == NoSymbol)
           "" // be more resistant to error conditions, e.g. neg/t3222.scala
@@ -1670,29 +1583,27 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         else
           flatNameString(sym.owner, separator) + nme.NAME_JOIN_STRING +
           sym.simpleName
-      def signature1(etp: Type): String = {
+      def signature1(etp: Type): String =
         if (etp.typeSymbol == ArrayClass)
           "[" + signature1(erasure(etp.dealiasWiden.typeArgs.head))
         else if (isPrimitiveValueClass(etp.typeSymbol))
           abbrvTag(etp.typeSymbol).toString()
         else "L" + flatNameString(etp.typeSymbol, '/') + ";"
-      }
       val etp = erasure(tp)
       if (etp.typeSymbol == ArrayClass) signature1(etp)
       else flatNameString(etp.typeSymbol, '.')
-    }
 
     // documented in JavaUniverse.init
-    def init() {
+    def init()
       if (isInitialized) return
       ObjectClass.initialize
       ScalaPackageClass.initialize
       symbolsNotPresentInBytecode
       NoSymbol
       isInitialized = true
-    } //init
+    //init
 
-    class UniverseDependentTypes(universe: Tree) {
+    class UniverseDependentTypes(universe: Tree)
       lazy val nameType = universeMemberType(tpnme.Name)
       lazy val modsType = universeMemberType(tpnme.Modifiers)
       lazy val flagsType = universeMemberType(tpnme.FlagSet)
@@ -1707,10 +1618,9 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
       def universeMemberType(name: TypeName) =
         universe.tpe.memberType(getTypeMember(universe.symbol, name))
-    }
 
     /** Efficient access to member symbols which must be looked up each run. Access via `currentRun.runDefinitions` */
-    final class RunDefinitions {
+    final class RunDefinitions
       lazy val StringAdd_+ = getMemberMethod(StringAddClass, nme.PLUS)
 
       // The given symbol represents either String.+ or StringAdd.+
@@ -1726,12 +1636,10 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
           BoxesRunTimeClass, nme.isBoxedNumberOrBoolean)
       lazy val Boxes_isNumber = getDecl(BoxesRunTimeClass, nme.isBoxedNumber)
 
-      private def valueClassCompanion(name: TermName): ModuleSymbol = {
-        getMember(ScalaPackageClass, name) match {
+      private def valueClassCompanion(name: TermName): ModuleSymbol =
+        getMember(ScalaPackageClass, name) match
           case x: ModuleSymbol => x
           case _ => catastrophicFailure()
-        }
-      }
 
       private def valueCompanionMember(
           className: Name, methodName: TermName): TermSymbol =
@@ -1835,19 +1743,16 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
 
       lazy val TreesTreeType =
         TreesClass.map(sym => getTypeMember(sym, tpnme.Tree))
-      object TreeType {
+      object TreeType
         def unapply(tpe: Type): Boolean =
           tpe.typeSymbol.overrideChain contains TreesTreeType
-      }
-      object SubtreeType {
+      object SubtreeType
         def unapply(tpe: Type): Boolean =
           tpe.typeSymbol.overrideChain exists (_.tpe <:< TreesTreeType.tpe)
-      }
 
-      object ExprClassOf {
+      object ExprClassOf
         def unapply(tp: Type): Option[Type] =
           elementExtractOption(ExprClass, tp)
-      }
 
       lazy val PartialManifestClass = getTypeMember(
           ReflectPackage, tpnme.ClassManifest)
@@ -1866,6 +1771,3 @@ trait Definitions extends api.StandardDefinitions { self: SymbolTable =>
         (i =>
               getMemberIfDefined(Scala_Java8_CompatPackage.moduleClass,
                                  TypeName("JFunction" + i)))
-    }
-  }
-}

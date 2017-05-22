@@ -29,30 +29,27 @@ import scala.annotation.tailrec
 import scalaz._
 import scalaz.Ordering.{LT, EQ, GT}
 
-object CPathUtils {
+object CPathUtils
   def cPathToJPaths(cpath: CPath, value: CValue): List[(JPath, CValue)] =
-    (cpath.nodes, value) match {
+    (cpath.nodes, value) match
       case (CPathField(name) :: tail, _) =>
         addComponent(JPathField(name), cPathToJPaths(CPath(tail), value))
       case (CPathIndex(i) :: tail, _) =>
         addComponent(JPathIndex(i), cPathToJPaths(CPath(tail), value))
       case (CPathArray :: tail, es: CArray[_]) =>
         val CArrayType(elemType) = es.cType
-        es.value.toList.zipWithIndex flatMap {
+        es.value.toList.zipWithIndex flatMap
           case (e, i) =>
             addComponent(
                 JPathIndex(i), cPathToJPaths(CPath(tail), elemType(e)))
-        }
       // case (CPathMeta(_) :: _, _) => Nil
       case (Nil, _) => List((JPath.Identity, value))
       case (path, _) => sys.error("Bad news, bob! " + path)
-    }
 
   private def addComponent(
       c: JPathNode, xs: List[(JPath, CValue)]): List[(JPath, CValue)] =
-    xs map {
+    xs map
       case (path, value) => (JPath(c :: path.nodes), value)
-    }
 
   /**
     * Returns the intersection of `cPath1` and `cPath2`. If there are no
@@ -64,12 +61,12 @@ object CPathUtils {
     *
     * For instance, `intersect(CPath("a.b[*].c[0]"), CPath(CPath("a.b[3].c[*]")) === CPath("a.b[3].c[0]")`.
     */
-  def intersect(cPath1: CPath, cPath2: CPath): Option[CPath] = {
+  def intersect(cPath1: CPath, cPath2: CPath): Option[CPath] =
 
     @scala.annotation.tailrec
     def loop(ps1: List[CPathNode],
              ps2: List[CPathNode],
-             matches: List[CPathNode]): Option[CPath] = (ps1, ps2) match {
+             matches: List[CPathNode]): Option[CPath] = (ps1, ps2) match
       case (Nil, Nil) =>
         Some(CPath(matches.reverse))
       case (p1 :: ps1, p2 :: ps2) if p1 == p2 =>
@@ -80,16 +77,14 @@ object CPathUtils {
         loop(ps1, ps2, p1 :: matches)
       case _ =>
         None
-    }
 
     loop(cPath1.nodes, cPath2.nodes, Nil)
-  }
 
   // TODO Not really a union.
-  def union(cPath1: CPath, cPath2: CPath): Option[CPath] = {
+  def union(cPath1: CPath, cPath2: CPath): Option[CPath] =
     def loop(ps1: List[CPathNode],
              ps2: List[CPathNode],
-             acc: List[CPathNode]): Option[CPath] = (ps1, ps2) match {
+             acc: List[CPathNode]): Option[CPath] = (ps1, ps2) match
       case (Nil, Nil) =>
         Some(CPath(acc.reverse))
       case (p1 :: ps1, p2 :: ps2) if p1 == p2 =>
@@ -100,10 +95,8 @@ object CPathUtils {
         loop(ps1, ps2, CPathArray :: acc)
       case _ =>
         None
-    }
 
     loop(cPath1.nodes, cPath2.nodes, Nil)
-  }
 
   /**
     * Returns a list of possible "next" `CPath`s from `cPath`, by incrementing
@@ -111,37 +104,33 @@ object CPathUtils {
     * candidates returned are `a[1].b[3].c[1]`, `a[1].b[4].c[0]`, and
     * `a[2].b[0].c[0]`.
     */
-  def incIndices(cPath: CPath): List[CPath] = {
+  def incIndices(cPath: CPath): List[CPath] =
 
     // zero out the remainin indices in ps.
     @tailrec
     def zero(
         ps: List[CPathNode], acc: List[CPathNode] = Nil): List[CPathNode] =
-      ps match {
+      ps match
         case CPathIndex(i) :: ps => zero(ps, CPathIndex(0) :: acc)
         case p :: ps => zero(ps, p :: acc)
         case Nil => acc.reverse
-      }
 
     @tailrec
     def cand(left: List[CPathNode],
              right: List[CPathNode],
-             candidates: List[CPath]): List[CPath] = right match {
+             candidates: List[CPath]): List[CPath] = right match
       case (p @ CPathIndex(i)) :: right =>
         cand(
             p :: left,
             right,
-            CPath(left.foldLeft(CPathIndex(i + 1) :: zero(right)) { (acc, p) =>
+            CPath(left.foldLeft(CPathIndex(i + 1) :: zero(right))  (acc, p) =>
               p :: acc
-            }) :: candidates)
+            ) :: candidates)
 
       case p :: right =>
         cand(p :: left, right, candidates)
 
       case Nil =>
         candidates
-    }
 
     cand(Nil, cPath.nodes, Nil)
-  }
-}

@@ -27,23 +27,21 @@ import org.apache.spark.util.{SparkConfWithEnv, Utils}
 /**
   * Tests for the spark.local.dir and SPARK_LOCAL_DIRS configuration options.
   */
-class LocalDirsSuite extends SparkFunSuite with BeforeAndAfter {
+class LocalDirsSuite extends SparkFunSuite with BeforeAndAfter
 
-  before {
+  before
     Utils.clearLocalRootDirs()
-  }
 
   test(
-      "Utils.getLocalDir() returns a valid directory, even if some local dirs are missing") {
+      "Utils.getLocalDir() returns a valid directory, even if some local dirs are missing")
     // Regression test for SPARK-2974
     assert(!new File("/NONEXISTENT_DIR").exists())
     val conf = new SparkConf(false).set(
         "spark.local.dir",
         s"/NONEXISTENT_PATH,${System.getProperty("java.io.tmpdir")}")
     assert(new File(Utils.getLocalDir(conf)).exists())
-  }
 
-  test("SPARK_LOCAL_DIRS override also affects driver") {
+  test("SPARK_LOCAL_DIRS override also affects driver")
     // Regression test for SPARK-2975
     assert(!new File("/NONEXISTENT_DIR").exists())
     // spark.local.dir only contains invalid directories, but that's not a problem since
@@ -52,5 +50,3 @@ class LocalDirsSuite extends SparkFunSuite with BeforeAndAfter {
         Map("SPARK_LOCAL_DIRS" -> System.getProperty("java.io.tmpdir")))
       .set("spark.local.dir", "/NONEXISTENT_PATH")
     assert(new File(Utils.getLocalDir(conf)).exists())
-  }
-}

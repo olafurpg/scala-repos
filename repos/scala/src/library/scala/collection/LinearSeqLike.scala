@@ -28,7 +28,7 @@ import scala.annotation.tailrec
   *  @tparam Repr the type of the actual $coll containing the elements.
   */
 trait LinearSeqLike[+A, +Repr <: LinearSeqLike[A, Repr]]
-    extends SeqLike[A, Repr] { self: Repr =>
+    extends SeqLike[A, Repr]  self: Repr =>
 
   override protected[this] def thisCollection: LinearSeq[A] =
     this.asInstanceOf[LinearSeq[A]]
@@ -41,15 +41,15 @@ trait LinearSeqLike[+A, +Repr <: LinearSeqLike[A, Repr]]
     scala.util.hashing.MurmurHash3.seqHash(seq) // TODO - can we get faster via "linearSeqHash" ?
 
   override /*IterableLike*/
-  def iterator: Iterator[A] = new AbstractIterator[A] {
+  def iterator: Iterator[A] = new AbstractIterator[A]
     var these = self
     def hasNext: Boolean = !these.isEmpty
     def next(): A =
-      if (hasNext) {
+      if (hasNext)
         val result = these.head; these = these.tail; result
-      } else Iterator.empty.next()
+      else Iterator.empty.next()
 
-    override def toList: List[A] = {
+    override def toList: List[A] =
       /* Have to clear `these` so the iterator is exhausted like
        * it would be without the optimization.
        *
@@ -62,12 +62,8 @@ trait LinearSeqLike[+A, +Repr <: LinearSeqLike[A, Repr]]
       val xs = these.toList
       these = these.take(0)
       xs
-    }
-  }
 
   @tailrec override final def corresponds[B](that: GenSeq[B])(
-      p: (A, B) => Boolean): Boolean = {
+      p: (A, B) => Boolean): Boolean =
     if (this.isEmpty) that.isEmpty
     else that.nonEmpty && p(head, that.head) && (tail corresponds that.tail)(p)
-  }
-}

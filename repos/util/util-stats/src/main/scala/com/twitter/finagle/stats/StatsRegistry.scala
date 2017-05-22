@@ -4,11 +4,10 @@ package com.twitter.finagle.stats
   * Interface used via the LoadService mechanism to obtain an
   * efficient mechanism to sample stats.
   */
-private[twitter] trait StatsRegistry {
+private[twitter] trait StatsRegistry
   def apply(): Map[String, StatEntry]
-}
 
-private[twitter] trait StatEntry {
+private[twitter] trait StatEntry
 
   /**
     * The delta since the entry was last sampled.
@@ -19,4 +18,3 @@ private[twitter] trait StatEntry {
 
   /** The instantaneous value of the entry. */
   val value: Double
-}

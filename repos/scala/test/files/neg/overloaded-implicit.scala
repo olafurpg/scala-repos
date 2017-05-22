@@ -1,4 +1,4 @@
-object Test {
+object Test
   implicit def imp1[T](x: List[T]): Map[T, T] = Map()
   implicit def imp1[T](x: Set[T]): Map[T, T] = Map()
 
@@ -10,8 +10,6 @@ object Test {
 
   def g[T <% String](x: T): Double = 2.0d
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     // println(f(List(1)))
     println(g(List(1)))
-  }
-}

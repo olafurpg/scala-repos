@@ -21,8 +21,8 @@ import org.scalatest.Assertions
 
 import org.apache.spark.storage.StorageLevel
 
-class SparkContextInfoSuite extends SparkFunSuite with LocalSparkContext {
-  test("getPersistentRDDs only returns RDDs that are marked as cached") {
+class SparkContextInfoSuite extends SparkFunSuite with LocalSparkContext
+  test("getPersistentRDDs only returns RDDs that are marked as cached")
     sc = new SparkContext("local", "test")
     assert(sc.getPersistentRDDs.isEmpty === true)
 
@@ -32,9 +32,8 @@ class SparkContextInfoSuite extends SparkFunSuite with LocalSparkContext {
     rdd.cache()
     assert(sc.getPersistentRDDs.size === 1)
     assert(sc.getPersistentRDDs.values.head === rdd)
-  }
 
-  test("getPersistentRDDs returns an immutable map") {
+  test("getPersistentRDDs returns an immutable map")
     sc = new SparkContext("local", "test")
     val rdd1 = sc.makeRDD(Array(1, 2, 3, 4), 2).cache()
     val myRdds = sc.getPersistentRDDs
@@ -53,9 +52,8 @@ class SparkContextInfoSuite extends SparkFunSuite with LocalSparkContext {
     assert(myRdds.size === 1)
     assert(myRdds(0) === rdd1)
     assert(myRdds(0).getStorageLevel === StorageLevel.MEMORY_ONLY)
-  }
 
-  test("getRDDStorageInfo only reports on RDDs that actually persist data") {
+  test("getRDDStorageInfo only reports on RDDs that actually persist data")
     sc = new SparkContext("local", "test")
     val rdd = sc.makeRDD(Array(1, 2, 3, 4), 2).cache()
     assert(sc.getRDDStorageInfo.size === 0)
@@ -64,40 +62,31 @@ class SparkContextInfoSuite extends SparkFunSuite with LocalSparkContext {
     assert(sc.getRDDStorageInfo.head.isCached)
     assert(sc.getRDDStorageInfo.head.memSize > 0)
     assert(sc.getRDDStorageInfo.head.storageLevel === StorageLevel.MEMORY_ONLY)
-  }
 
-  test("call sites report correct locations") {
+  test("call sites report correct locations")
     sc = new SparkContext("local", "test")
     testPackage.runCallSiteTest(sc)
-  }
-}
 
 /** Call site must be outside of usual org.apache.spark packages (see Utils#SPARK_CLASS_REGEX). */
-package object testPackage extends Assertions {
+package object testPackage extends Assertions
   private val CALL_SITE_REGEX = "(.+) at (.+):([0-9]+)".r
 
-  def runCallSiteTest(sc: SparkContext) {
+  def runCallSiteTest(sc: SparkContext)
     val rdd = sc.makeRDD(Array(1, 2, 3, 4), 2)
     val rddCreationSite = rdd.getCreationSite
     val curCallSite =
       sc.getCallSite().shortForm // note: 2 lines after definition of "rdd"
 
-    val rddCreationLine = rddCreationSite match {
-      case CALL_SITE_REGEX(func, file, line) => {
+    val rddCreationLine = rddCreationSite match
+      case CALL_SITE_REGEX(func, file, line) =>
           assert(func === "makeRDD")
           assert(file === "SparkContextInfoSuite.scala")
           line.toInt
-        }
       case _ => fail("Did not match expected call site format")
-    }
 
-    curCallSite match {
-      case CALL_SITE_REGEX(func, file, line) => {
+    curCallSite match
+      case CALL_SITE_REGEX(func, file, line) =>
           assert(func === "getCallSite") // this is correct because we called it from outside of Spark
           assert(file === "SparkContextInfoSuite.scala")
           assert(line.toInt === rddCreationLine.toInt + 2)
-        }
       case _ => fail("Did not match expected call site format")
-    }
-  }
-}

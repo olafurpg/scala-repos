@@ -25,32 +25,27 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.types.StructType
 
 /** A trait that holds shared code between DataFrames and Datasets. */
-private[sql] trait Queryable {
+private[sql] trait Queryable
   def schema: StructType
   def queryExecution: QueryExecution
   def sqlContext: SQLContext
 
-  override def toString: String = {
-    try {
+  override def toString: String =
+    try
       val builder = new StringBuilder
-      val fields = schema.take(2).map {
+      val fields = schema.take(2).map
         case f => s"${f.name}: ${f.dataType.simpleString(2)}"
-      }
       builder.append("[")
       builder.append(fields.mkString(", "))
-      if (schema.length > 2) {
-        if (schema.length - fields.size == 1) {
+      if (schema.length > 2)
+        if (schema.length - fields.size == 1)
           builder.append(" ... 1 more field")
-        } else {
+        else
           builder.append(" ... " + (schema.length - 2) + " more fields")
-        }
-      }
       builder.append("]").toString()
-    } catch {
+    catch
       case NonFatal(e) =>
         s"Invalid tree; ${e.getMessage}:\n$queryExecution"
-    }
-  }
 
   def printSchema(): Unit
 
@@ -71,7 +66,7 @@ private[sql] trait Queryable {
   private[sql] def formatString(rows: Seq[Seq[String]],
                                 numRows: Int,
                                 hasMoreData: Boolean,
-                                truncate: Boolean = true): String = {
+                                truncate: Boolean = true): String =
     val sb = new StringBuilder
     val numCols = schema.fieldNames.length
 
@@ -79,48 +74,40 @@ private[sql] trait Queryable {
     val colWidths = Array.fill(numCols)(3)
 
     // Compute the width of each column
-    for (row <- rows) {
-      for ((cell, i) <- row.zipWithIndex) {
+    for (row <- rows)
+      for ((cell, i) <- row.zipWithIndex)
         colWidths(i) = math.max(colWidths(i), cell.length)
-      }
-    }
 
     // Create SeparateLine
     val sep: String =
       colWidths.map("-" * _).addString(sb, "+", "+", "+\n").toString()
 
     // column names
-    rows.head.zipWithIndex.map {
+    rows.head.zipWithIndex.map
       case (cell, i) =>
-        if (truncate) {
+        if (truncate)
           StringUtils.leftPad(cell, colWidths(i))
-        } else {
+        else
           StringUtils.rightPad(cell, colWidths(i))
-        }
-    }.addString(sb, "|", "|", "|\n")
+    .addString(sb, "|", "|", "|\n")
 
     sb.append(sep)
 
     // data
-    rows.tail.map {
-      _.zipWithIndex.map {
+    rows.tail.map
+      _.zipWithIndex.map
         case (cell, i) =>
-          if (truncate) {
+          if (truncate)
             StringUtils.leftPad(cell.toString, colWidths(i))
-          } else {
+          else
             StringUtils.rightPad(cell.toString, colWidths(i))
-          }
-      }.addString(sb, "|", "|", "|\n")
-    }
+      .addString(sb, "|", "|", "|\n")
 
     sb.append(sep)
 
     // For Data that has more than "numRows" records
-    if (hasMoreData) {
+    if (hasMoreData)
       val rowsString = if (numRows == 1) "row" else "rows"
       sb.append(s"only showing top $numRows $rowsString\n")
-    }
 
     sb.toString()
-  }
-}

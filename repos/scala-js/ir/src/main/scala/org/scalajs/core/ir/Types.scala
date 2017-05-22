@@ -12,7 +12,7 @@ import scala.annotation.tailrec
 
 import Trees._
 
-object Types {
+object Types
 
   /** Type of an term (expression or statement) in the IR.
     *
@@ -27,14 +27,12 @@ object Types {
     *  non-null variants of `java.lang.String` and `scala.runtime.BoxedUnit`,
     *  respectively.
     */
-  abstract sealed class Type {
-    def show(): String = {
+  abstract sealed class Type
+    def show(): String =
       val writer = new java.io.StringWriter
       val printer = new Printers.IRTreePrinter(writer)
       printer.print(this)
       writer.toString()
-    }
-  }
 
   /** Any type (the top type of this type system).
     *  A variable of this type can contain any value, including `undefined`
@@ -118,12 +116,10 @@ object Types {
   final case class ArrayType(baseClassName: String, dimensions: Int)
       extends Type with ReferenceType
 
-  object ArrayType {
-    def apply(innerType: ReferenceType): ArrayType = innerType match {
+  object ArrayType
+    def apply(innerType: ReferenceType): ArrayType = innerType match
       case ClassType(className) => ArrayType(className, 1)
       case ArrayType(className, dim) => ArrayType(className, dim + 1)
-    }
-  }
 
   /** Record type.
     *  Used by the optimizer to inline classes as records with multiple fields.
@@ -132,23 +128,21 @@ object Types {
     *  the type of fields or parameters, nor as result types of methods.
     *  The compiler itself never generates record types.
     */
-  final case class RecordType(fields: List[RecordType.Field]) extends Type {
+  final case class RecordType(fields: List[RecordType.Field]) extends Type
     def findField(name: String): RecordType.Field =
       fields.find(_.name == name).get
-  }
 
-  object RecordType {
+  object RecordType
     final case class Field(name: String,
                            originalName: Option[String],
                            tpe: Type,
                            mutable: Boolean)
-  }
 
   /** No type. */
   case object NoType extends Type
 
   /** Generates a literal zero of the given type. */
-  def zeroOf(tpe: Type)(implicit pos: Position): Literal = tpe match {
+  def zeroOf(tpe: Type)(implicit pos: Position): Literal = tpe match
     case BooleanType => BooleanLiteral(false)
     case IntType => IntLiteral(0)
     case LongType => LongLiteral(0L)
@@ -157,7 +151,6 @@ object Types {
     case StringType => StringLiteral("")
     case UndefType => Undefined()
     case _ => Null()
-  }
 
   /** Tests whether a type `lhs` is a subtype of `rhs` (or equal).
     *  [[NoType]] is never a subtype or supertype of anything (including
@@ -166,12 +159,12 @@ object Types {
     *                    subclass of another class/interface.
     */
   def isSubtype(lhs: Type, rhs: Type)(
-      isSubclass: (String, String) => Boolean): Boolean = {
+      isSubclass: (String, String) => Boolean): Boolean =
     import Definitions._
 
-    (lhs != NoType && rhs != NoType) && {
+    (lhs != NoType && rhs != NoType) &&
       (lhs == rhs) ||
-      ((lhs, rhs) match {
+      ((lhs, rhs) match
             case (_, AnyType) => true
             case (NothingType, _) => true
 
@@ -201,30 +194,25 @@ object Types {
             case (FloatType, DoubleType) => true
 
             case (ArrayType(lhsBase, lhsDims), ArrayType(rhsBase, rhsDims)) =>
-              if (lhsDims < rhsDims) {
+              if (lhsDims < rhsDims)
                 false // because Array[A] </: Array[Array[A]]
-              } else if (lhsDims > rhsDims) {
+              else if (lhsDims > rhsDims)
                 rhsBase == ObjectClass // because Array[Array[A]] <: Array[Object]
-              } else {
+              else
                 // lhsDims == rhsDims
                 // lhsBase must be <: rhsBase
-                if (isPrimitiveClass(lhsBase) || isPrimitiveClass(rhsBase)) {
+                if (isPrimitiveClass(lhsBase) || isPrimitiveClass(rhsBase))
                   lhsBase == rhsBase
-                } else {
+                else
                   /* All things must be considered subclasses of Object for this
                    * purpose, even raw JS types and interfaces, which do not have
                    * Object in their ancestors.
                    */
                   rhsBase == ObjectClass || isSubclass(lhsBase, rhsBase)
-                }
-              }
 
             case (ArrayType(_, _), ClassType(cls)) =>
               AncestorsOfPseudoArrayClass.contains(cls)
 
             case _ =>
               false
-          })
-    }
-  }
-}
+          )

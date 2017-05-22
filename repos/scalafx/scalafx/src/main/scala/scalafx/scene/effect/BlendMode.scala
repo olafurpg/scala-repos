@@ -32,7 +32,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[scalafx.scene.effect.BlendMode]] */
-object BlendMode extends SFXEnumDelegateCompanion[jfxse.BlendMode, BlendMode] {
+object BlendMode extends SFXEnumDelegateCompanion[jfxse.BlendMode, BlendMode]
 
   val Add = new BlendMode(jfxse.BlendMode.ADD)
   @deprecated("Use Add; ADD will be removed in a future release", "2.2.60")
@@ -119,7 +119,6 @@ object BlendMode extends SFXEnumDelegateCompanion[jfxse.BlendMode, BlendMode] {
       Green,
       Blue
   )
-}
 
 sealed case class BlendMode(override val delegate: jfxse.BlendMode)
     extends SFXEnumDelegate[jfxse.BlendMode]

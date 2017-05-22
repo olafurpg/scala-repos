@@ -21,19 +21,15 @@ import java.io.{InputStream, IOException}
 
 import scala.sys.process.BasicIO
 
-object ProcessTestUtils {
+object ProcessTestUtils
   class ProcessOutputCapturer(stream: InputStream, capture: String => Unit)
-      extends Thread {
+      extends Thread
     this.setDaemon(true)
 
-    override def run(): Unit = {
-      try {
+    override def run(): Unit =
+      try
         BasicIO.processFully(capture)(stream)
-      } catch {
+      catch
         case _: IOException =>
         // Ignores the IOException thrown when the process termination, which closes the input
         // stream abruptly.
-      }
-    }
-  }
-}

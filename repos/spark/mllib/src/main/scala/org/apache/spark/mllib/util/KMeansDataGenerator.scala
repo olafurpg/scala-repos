@@ -31,7 +31,7 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 @Since("0.8.0")
-object KMeansDataGenerator {
+object KMeansDataGenerator
 
   /**
     * Generate an RDD containing test data for KMeans.
@@ -49,27 +49,24 @@ object KMeansDataGenerator {
                         k: Int,
                         d: Int,
                         r: Double,
-                        numPartitions: Int = 2): RDD[Array[Double]] = {
+                        numPartitions: Int = 2): RDD[Array[Double]] =
     // First, generate some centers
     val rand = new Random(42)
     val centers = Array.fill(k)(Array.fill(d)(rand.nextGaussian() * r))
     // Then generate points around each center
-    sc.parallelize(0 until numPoints, numPartitions).map { idx =>
+    sc.parallelize(0 until numPoints, numPartitions).map  idx =>
       val center = centers(idx % k)
       val rand2 = new Random(42 + idx)
       Array.tabulate(d)(i => center(i) + rand2.nextGaussian())
-    }
-  }
 
   @Since("0.8.0")
-  def main(args: Array[String]) {
-    if (args.length < 6) {
+  def main(args: Array[String])
+    if (args.length < 6)
       // scalastyle:off println
       println("Usage: KMeansGenerator " +
           "<master> <output_dir> <num_points> <k> <d> <r> [<num_partitions>]")
       // scalastyle:on println
       System.exit(1)
-    }
 
     val sparkMaster = args(0)
     val outputPath = args(1)
@@ -84,5 +81,3 @@ object KMeansDataGenerator {
     data.map(_.mkString(" ")).saveAsTextFile(outputPath)
 
     System.exit(0)
-  }
-}

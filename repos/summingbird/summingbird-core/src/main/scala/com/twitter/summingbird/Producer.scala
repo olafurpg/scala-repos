@@ -18,7 +18,7 @@ package com.twitter.summingbird
 
 import com.twitter.algebird.Semigroup
 
-object Producer {
+object Producer
 
   /**
     * return this and the recursively reachable nodes in depth first, left first order
@@ -26,22 +26,19 @@ object Producer {
     * and it returns the input node.
     */
   def entireGraphOf[P <: Platform[P]](
-      p: Producer[P, Any]): List[Producer[P, Any]] = {
+      p: Producer[P, Any]): List[Producer[P, Any]] =
     val above = graph.depthFirstOf(p)(parentsOf)
     p :: above
-  }
 
   /**
     * The parents of the current node, possibly not its dependencies
     *  It differs from dependencies in that it will also return the predecessor of an AlsoProducer
     */
   def parentsOf[P <: Platform[P]](
-      in: Producer[P, Any]): List[Producer[P, Any]] = {
-    in match {
+      in: Producer[P, Any]): List[Producer[P, Any]] =
+    in match
       case AlsoProducer(l, r) => List(l, r)
       case _ => dependenciesOf(in)
-    }
-  }
 
   /** Returns the first Summer of the provided list of Producers */
   def retrieveSummer[P <: Platform[P]](
@@ -79,7 +76,7 @@ object Producer {
   /** the list of the Producers, this producer directly depends on */
   def dependenciesOf[P <: Platform[P]](
       p: Producer[P, Any]): List[Producer[P, Any]] =
-    p match {
+    p match
       case Source(_) => List()
       case AlsoProducer(_, producer) => List(producer)
       case NamedProducer(producer, _) => List(producer)
@@ -92,12 +89,11 @@ object Producer {
       case LeftJoinedProducer(producer, _) => List(producer)
       case Summer(producer, _, _) => List(producer)
       case MergedProducer(l, r) => List(l, r)
-    }
 
   /**
     * Returns true if this node does not directly change the data (does not apply any transformation)
     */
-  def isNoOp[P <: Platform[P]](p: Producer[P, Any]): Boolean = p match {
+  def isNoOp[P <: Platform[P]](p: Producer[P, Any]): Boolean = p match
     case IdentityKeyedProducer(_) => true
     case NamedProducer(_, _) => true
     case MergedProducer(_, _) => true
@@ -111,30 +107,26 @@ object Producer {
     case WrittenProducer(_, _) => false
     case LeftJoinedProducer(_, _) => false
     case Summer(_, _, _) => false
-  }
 
   /** returns true if this Producer is an output of the DAG (Summer and WrittenProducer) */
-  def isOutput[P <: Platform[P]](p: Producer[P, Any]): Boolean = p match {
+  def isOutput[P <: Platform[P]](p: Producer[P, Any]): Boolean = p match
     case Summer(_, _, _) | WrittenProducer(_, _) => true
     case _ => false
-  }
 
   /**
     * Return all dependencies of a given node in depth first, left first order.
     */
   def transitiveDependenciesOf[P <: Platform[P]](
-      p: Producer[P, Any]): List[Producer[P, Any]] = {
+      p: Producer[P, Any]): List[Producer[P, Any]] =
     val nfn = dependenciesOf[P](_)
     graph.depthFirstOf(p)(nfn)
-  }
-}
 
 /**
   * A Producer is a node in our tree, able to generate new items and
   * have operations applied to it. In Storm, this might be an
   * in-progress TopologyBuilder.
   */
-sealed trait Producer[P <: Platform[P], +T] {
+sealed trait Producer[P <: Platform[P], +T]
 
   /** Exactly the same as merge. Here by analogy with the scala.collections API */
   def ++[U >: T](r: Producer[P, U]): Producer[P, U] = MergedProducer(this, r)
@@ -200,14 +192,13 @@ sealed trait Producer[P <: Platform[P], +T] {
   /** Merge a different type of Producer into a single stream */
   def either[U](other: Producer[P, U]): Producer[P, Either[T, U]] =
     map(Left(_): Either[T, U]).merge(other.map(Right(_): Either[T, U]))
-}
 
 /** Wraps the sources of the given Platform */
 case class Source[P <: Platform[P], T](source: P#Source[T])
     extends Producer[P, T]
 
 /** Only TailProducers can be planned. There is nothing after a tail */
-sealed trait TailProducer[P <: Platform[P], +T] extends Producer[P, T] {
+sealed trait TailProducer[P <: Platform[P], +T] extends Producer[P, T]
 
   /**
     * Ensure this is scheduled, but return something equivalent to the argument
@@ -223,7 +214,6 @@ sealed trait TailProducer[P <: Platform[P], +T] extends Producer[P, T] {
 
   override def name(id: String): TailProducer[P, T] =
     new TPNamedProducer[P, T](this, id)
-}
 
 class AlsoTailProducer[P <: Platform[P], +T, +R](
     ensure: TailProducer[P, T], result: TailProducer[P, R])
@@ -278,7 +268,7 @@ case class Summer[P <: Platform[P], K, V](producer: Producer[P, (K, V)],
   * to attempt the most efficient run of your code.
   */
 sealed trait KeyedProducer[P <: Platform[P], K, V]
-    extends Producer[P, (K, V)] {
+    extends Producer[P, (K, V)]
 
   /** Builds a new KeyedProvider by applying a partial function to keys of elements of this one on which the function is defined.*/
   def collectKeys[K2](pf: PartialFunction[K, K2]): KeyedProducer[P, K2, V] =
@@ -287,9 +277,8 @@ sealed trait KeyedProducer[P <: Platform[P], K, V]
 
   /** Builds a new KeyedProvider by applying a partial function to values of elements of this one on which the function is defined.*/
   def collectValues[V2](pf: PartialFunction[V, V2]): KeyedProducer[P, K, V2] =
-    flatMapValues { v =>
+    flatMapValues  v =>
       if (pf.isDefinedAt(v)) Iterator(pf(v)) else Iterator.empty
-    }
 
   /**
     * Prefer this to filter or flatMap/flatMapKeys if you are filtering.
@@ -307,9 +296,8 @@ sealed trait KeyedProducer[P <: Platform[P], K, V]
     * the partition.
     */
   def filterValues(pred: V => Boolean): KeyedProducer[P, K, V] =
-    flatMapValues { v =>
+    flatMapValues  v =>
       if (pred(v)) Iterator(v) else Iterator.empty
-    }
 
   /**
     * Prefer to call this method to flatMap if you are expanding only keys.
@@ -352,9 +340,8 @@ sealed trait KeyedProducer[P <: Platform[P], K, V]
 
   /** Prefer this to a raw map as this may be optimized to avoid a key reshuffle */
   def mapValues[U](fn: V => U): KeyedProducer[P, K, U] =
-    flatMapValues { v =>
+    flatMapValues  v =>
       Iterator(fn(v))
-    }
 
   /**
     * emits a KeyedProducer with a value that is the store value, just BEFORE a merge,
@@ -374,7 +361,6 @@ sealed trait KeyedProducer[P <: Platform[P], K, V]
 
   /** Keep only the values */
   def values: Producer[P, V] = map(_._2)
-}
 
 case class KeyFlatMappedProducer[P <: Platform[P], K, V, K2](
     producer: Producer[P, (K, V)], fn: K => TraversableOnce[K2])

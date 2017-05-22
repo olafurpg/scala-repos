@@ -8,7 +8,7 @@ package macros
   *  A slice of [[scala.reflect.macros.blackbox.Context the Scala macros context]] that defines shorthands for the
   *  most frequently used types and functions of the underlying compiler universe.
   */
-trait Aliases { self: blackbox.Context =>
+trait Aliases  self: blackbox.Context =>
 
   /** The type of symbols representing declarations. */
   type Symbol = universe.Symbol
@@ -124,4 +124,3 @@ trait Aliases { self: blackbox.Context =>
     * Type symbol of `x` as derived from a type tag.
     */
   def symbolOf[T : WeakTypeTag]: universe.TypeSymbol = universe.symbolOf[T]
-}

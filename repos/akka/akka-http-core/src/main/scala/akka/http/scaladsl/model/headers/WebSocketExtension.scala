@@ -12,14 +12,11 @@ import akka.http.impl.util.{Rendering, ValueRenderable}
   */
 final case class WebSocketExtension(
     name: String, params: immutable.Map[String, String] = Map.empty)
-    extends ValueRenderable {
-  def render[R <: Rendering](r: R): r.type = {
+    extends ValueRenderable
+  def render[R <: Rendering](r: R): r.type =
     r ~~ name
     if (params.nonEmpty)
-      params.foreach {
+      params.foreach
         case (k, "") ⇒ r ~~ "; " ~~ k
         case (k, v) ⇒ r ~~ "; " ~~ k ~~ '=' ~~# v
-      }
     r
-  }
-}

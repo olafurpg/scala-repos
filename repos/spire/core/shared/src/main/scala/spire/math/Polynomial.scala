@@ -20,20 +20,18 @@ import spire.syntax.std.seq._
   * exponents given by Int values. Some operations require a Field[C]
   * to be in scope.
   */
-object Polynomial extends PolynomialInstances {
+object Polynomial extends PolynomialInstances
 
   def dense[@sp(Double) C : Semiring : Eq : ClassTag](
-      coeffs: Array[C]): PolyDense[C] = {
+      coeffs: Array[C]): PolyDense[C] =
     var i = coeffs.length
     while (i > 0 && (coeffs(i - 1) === Semiring[C].zero)) i -= 1
-    if (i == coeffs.length) {
+    if (i == coeffs.length)
       new PolyDense(coeffs)
-    } else {
+    else
       val cs = new Array[C](i)
       System.arraycopy(coeffs, 0, cs, 0, i)
       new PolyDense(cs)
-    }
-  }
 
   def sparse[@sp(Double) C : Semiring : Eq : ClassTag](
       data: Map[Int, C]): PolySparse[C] =
@@ -90,21 +88,20 @@ object Polynomial extends PolynomialInstances {
 
   private[this] val operRe = " *([+-]) *".r
 
-  private[spire] def parse(s: String): Polynomial[Rational] = {
+  private[spire] def parse(s: String): Polynomial[Rational] =
 
     // represents a term, plus a named variable v
     case class T(c: Rational, v: String, e: Int)
 
     // parse all the terms and operators out of the string
     @tailrec def parse(s: String, ts: List[T]): List[T] =
-      if (s.isEmpty) {
+      if (s.isEmpty)
         ts
-      } else {
-        val (op, s2) = operRe.findPrefixMatchOf(s) match {
+      else
+        val (op, s2) = operRe.findPrefixMatchOf(s) match
           case Some(m) => (m.group(1), s.substring(m.end))
           case None =>
             if (ts.isEmpty) ("+", s) else throw new IllegalArgumentException(s)
-        }
 
         val m2 = termRe
           .findPrefixMatchOf(s2)
@@ -115,14 +112,12 @@ object Polynomial extends PolynomialInstances {
         val e0 = Option(m2.group(3)).getOrElse("")
         val e = if (e0 != "") e0 else if (v == "") "0" else "1"
 
-        val t = try {
+        val t = try
           T(Rational(c), v, e.toInt)
-        } catch {
+        catch
           case _: Exception =>
             throw new IllegalArgumentException(s"illegal term: $c*x^$e")
-        }
         parse(s2.substring(m2.end), if (t.c == 0) ts else t :: ts)
-      }
 
     // do some pre-processing to remove whitespace/outer parens
     val t = s.trim
@@ -142,36 +137,29 @@ object Polynomial extends PolynomialInstances {
 
     // we're done!
     (Polynomial.zero[Rational] /: ts)((a, t) => a + Polynomial(t.c, t.e))
-  }
 
   private final def split[@sp(Double) C : ClassTag](
-      poly: Polynomial[C]): (Array[Int], Array[C]) = {
+      poly: Polynomial[C]): (Array[Int], Array[C]) =
     val es = ArrayBuilder.make[Int]()
     val cs = ArrayBuilder.make[C]()
-    poly foreach { (e, c) =>
+    poly foreach  (e, c) =>
       es += e
       cs += c
-    }
     (es.result(), cs.result())
-  }
 
-  def interpolate[C : Field : Eq : ClassTag](points: (C, C)*): Polynomial[C] = {
+  def interpolate[C : Field : Eq : ClassTag](points: (C, C)*): Polynomial[C] =
     def loop(p: Polynomial[C], xs: List[C], pts: List[(C, C)]): Polynomial[C] =
-      pts match {
+      pts match
         case Nil =>
           p
         case (x, y) :: tail =>
           val c = Polynomial.constant((y - p(x)) / xs.map(x - _).qproduct)
-          val prod = xs.foldLeft(Polynomial.one[C]) { (prod, xn) =>
+          val prod = xs.foldLeft(Polynomial.one[C])  (prod, xn) =>
             prod * (Polynomial.x[C] - constant(xn))
-          }
           loop(p + c * prod, x :: xs, tail)
-      }
     loop(Polynomial.zero[C], Nil, points.toList)
-  }
-}
 
-trait Polynomial[@sp(Double) C] { lhs =>
+trait Polynomial[@sp(Double) C]  lhs =>
   implicit def ct: ClassTag[C]
 
   /** Returns a polynmial that has a dense representation. */
@@ -194,9 +182,8 @@ trait Polynomial[@sp(Double) C] { lhs =>
     */
   def foreachNonZero[U](
       f: (Int, C) => U)(implicit ring: Semiring[C], eq: Eq[C]): Unit =
-    foreach { (e, c) =>
+    foreach  (e, c) =>
       if (c =!= ring.zero) f(e, c)
-    }
 
   /**
     * Returns the coefficients in little-endian order. So, the i-th element is
@@ -207,13 +194,11 @@ trait Polynomial[@sp(Double) C] { lhs =>
   /**
     * Returns a list of non-zero terms.
     */
-  def terms(implicit ring: Semiring[C], eq: Eq[C]): List[Term[C]] = {
+  def terms(implicit ring: Semiring[C], eq: Eq[C]): List[Term[C]] =
     val lb = new scala.collection.mutable.ListBuffer[Term[C]]
-    foreachNonZero { (e, c) =>
+    foreachNonZero  (e, c) =>
       lb += Term(c, e)
-    }
     lb.result()
-  }
 
   /**
     * Return an iterator of non-zero terms.
@@ -227,14 +212,12 @@ trait Polynomial[@sp(Double) C] { lhs =>
   def termsIterator: Iterator[Term[C]]
 
   /** Returns a map from exponent to coefficient of this polynomial. */
-  def data(implicit ring: Semiring[C], eq: Eq[C]): Map[Int, C] = {
+  def data(implicit ring: Semiring[C], eq: Eq[C]): Map[Int, C] =
     val bldr = new scala.collection.mutable.MapBuilder[Int, C, Map[Int, C]](
         Map.empty[Int, C])
-    foreachNonZero { (e, c) =>
+    foreachNonZero  (e, c) =>
       bldr += ((e, c))
-    }
     bldr.result()
-  }
 
   /**
     * Returns the real roots of this polynomial.
@@ -268,12 +251,10 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * Returns the non-zero term of the minimum degree in this polynomial, unless
     * it is zero. If this polynomial is zero, then this returns a zero term.
     */
-  def minTerm(implicit ring: Semiring[C], eq: Eq[C]): Term[C] = {
-    foreachNonZero { (n, c) =>
+  def minTerm(implicit ring: Semiring[C], eq: Eq[C]): Term[C] =
+    foreachNonZero  (n, c) =>
       return Term(c, n)
-    }
     Term(ring.zero, 0)
-  }
 
   /** Returns `true` iff this polynomial is constant. */
   def isConstant: Boolean =
@@ -301,14 +282,12 @@ trait Polynomial[@sp(Double) C] { lhs =>
 
   /** Compose this polynomial with another. */
   def compose(y: Polynomial[C])(
-      implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
+      implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] =
     var polynomial: Polynomial[C] = Polynomial.zero[C]
-    foreachNonZero { (e, c) =>
+    foreachNonZero  (e, c) =>
       val z: Polynomial[C] = y.pow(e) :* c
       polynomial = polynomial + z
-    }
     polynomial
-  }
 
   /**
     * Returns this polynomial as a monic polynomial, where the leading
@@ -326,26 +305,22 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * is indicated when the terms have differing signs.
     */
   def signVariations(
-      implicit ring: Semiring[C], eq: Eq[C], signed: Signed[C]): Int = {
+      implicit ring: Semiring[C], eq: Eq[C], signed: Signed[C]): Int =
     var prevSign: Sign = Sign.Zero
     var variations = 0
-    foreachNonZero { (_, c) =>
+    foreachNonZero  (_, c) =>
       val sign = signed.sign(c)
-      if (Sign.Zero != prevSign && sign != prevSign) {
+      if (Sign.Zero != prevSign && sign != prevSign)
         variations += 1
-      }
       prevSign = sign
-    }
     variations
-  }
 
   /**
     * Removes all zero roots from this polynomial.
     */
-  def removeZeroRoots(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] = {
+  def removeZeroRoots(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
     val Term(_, k) = minTerm
     mapTerms { case Term(c, n) => Term(c, n - k) }
-  }
 
   def map[D : Semiring : Eq : ClassTag](f: C => D)(
       implicit ring: Semiring[C], eq: Eq[C]): Polynomial[D] =
@@ -374,11 +349,10 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * flip/mirror the polynomial about the y-axis.
     */
   def flip(implicit ring: Rng[C], eq: Eq[C]): Polynomial[C] =
-    mapTerms {
+    mapTerms
       case term @ Term(coeff, exp) =>
         if (exp % 2 == 0) term
         else Term(-coeff, exp)
-    }
 
   /**
     * Returns the reciprocal of this polynomial. Essentially, if this polynomial
@@ -387,10 +361,9 @@ trait Polynomial[@sp(Double) C] { lhs =>
     * @see http://en.wikipedia.org/wiki/Reciprocal_polynomial
     */
   def reciprocal(implicit ring: Semiring[C], eq: Eq[C]): Polynomial[C] =
-    mapTerms {
+    mapTerms
       case term @ Term(coeff, exp) =>
         Term(coeff, degree - exp)
-    }
 
   // EuclideanRing ops.
 
@@ -410,21 +383,19 @@ trait Polynomial[@sp(Double) C] { lhs =>
 
   def **(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = pow(k)
 
-  def pow(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] = {
+  def pow(k: Int)(implicit ring: Rig[C], eq: Eq[C]): Polynomial[C] =
     def loop(b: Polynomial[C], k: Int, extra: Polynomial[C]): Polynomial[C] =
       if (k == 1) b * extra
       else loop(b * b, k >>> 1, if ((k & 1) == 1) b * extra else extra)
 
-    if (k < 0) {
+    if (k < 0)
       throw new IllegalArgumentException("negative exponent")
-    } else if (k == 0) {
+    else if (k == 0)
       Polynomial.one[C]
-    } else if (k == 1) {
+    else if (k == 1)
       this
-    } else {
+    else
       loop(this, k - 1, this)
-    }
-  }
 
   // VectorSpace ops.
 
@@ -433,27 +404,25 @@ trait Polynomial[@sp(Double) C] { lhs =>
   def :/(k: C)(implicit field: Field[C], eq: Eq[C]): Polynomial[C] =
     this :* k.reciprocal
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     val it = lhs.termsIterator
     @tailrec def loop(n: Int): Int =
-      if (it.hasNext) {
+      if (it.hasNext)
         val term = it.next
         loop(n ^ (0xfeed1257 * term.exp ^ term.coeff.##))
-      } else n
+      else n
     loop(0)
-  }
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case rhs: Polynomial[_] if lhs.degree == rhs.degree =>
       val it1 = lhs.termsIterator
       val it2 = rhs.termsIterator
-      @tailrec def loop(): Boolean = {
+      @tailrec def loop(): Boolean =
         val has1 = it1.hasNext
         val has2 = it2.hasNext
-        if (has1 && has2) {
+        if (has1 && has2)
           if (it1.next == it2.next) loop() else false
-        } else has1 == has2
-      }
+        else has1 == has2
       loop()
 
     case rhs: Polynomial[_] =>
@@ -468,25 +437,21 @@ trait Polynomial[@sp(Double) C] { lhs =>
 
     case _ =>
       false
-  }
 
   override def toString: String =
-    if (isZero) {
+    if (isZero)
       "(0)"
-    } else {
+    else
       val bldr = ArrayBuilder.make[Term[C]]()
-      foreach { (e, c) =>
+      foreach  (e, c) =>
         bldr += Term(c, e)
-      }
 
       val ts = bldr.result()
       QuickSort.sort(ts)(Order[Term[C]].reverse, implicitly[ClassTag[Term[C]]])
       val s = ts.mkString
       "(" + (if (s.take(3) == " - ") "-" + s.drop(3) else s.drop(3)) + ")"
-    }
-}
 
-trait PolynomialSemiring[@sp(Double) C] extends Semiring[Polynomial[C]] {
+trait PolynomialSemiring[@sp(Double) C] extends Semiring[Polynomial[C]]
   implicit def scalar: Semiring[C]
   implicit def eq: Eq[C]
   implicit def ct: ClassTag[C]
@@ -494,33 +459,29 @@ trait PolynomialSemiring[@sp(Double) C] extends Semiring[Polynomial[C]] {
   def zero: Polynomial[C] = Polynomial.zero[C]
   def plus(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x + y
   def times(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = x * y
-}
 
 trait PolynomialRig[@sp(Double) C]
-    extends PolynomialSemiring[C] with Rig[Polynomial[C]] {
+    extends PolynomialSemiring[C] with Rig[Polynomial[C]]
   implicit override val scalar: Rig[C]
 
   def one: Polynomial[C] = Polynomial.one[C]
-}
 
 trait PolynomialRng[@sp(Double) C]
-    extends PolynomialSemiring[C] with RingAlgebra[Polynomial[C], C] {
+    extends PolynomialSemiring[C] with RingAlgebra[Polynomial[C], C]
   implicit override val scalar: Rng[C]
 
   def timesl(r: C, v: Polynomial[C]): Polynomial[C] = r *: v
   def negate(x: Polynomial[C]): Polynomial[C] = -x
-}
 
 trait PolynomialRing[@sp(Double) C]
-    extends PolynomialRng[C] with Ring[Polynomial[C]] {
+    extends PolynomialRng[C] with Ring[Polynomial[C]]
   implicit override val scalar: Ring[C]
 
   def one: Polynomial[C] = Polynomial.one[C]
-}
 
 trait PolynomialEuclideanRing[@sp(Double) C]
     extends PolynomialRing[C] with EuclideanRing[Polynomial[C]]
-    with VectorSpace[Polynomial[C], C] {
+    with VectorSpace[Polynomial[C], C]
   implicit override val scalar: Field[C]
 
   override def divr(x: Polynomial[C], k: C): Polynomial[C] = x :/ k
@@ -530,71 +491,58 @@ trait PolynomialEuclideanRing[@sp(Double) C]
       x: Polynomial[C], y: Polynomial[C]): (Polynomial[C], Polynomial[C]) =
     x /% y
 
-  final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] = {
+  final def gcd(x: Polynomial[C], y: Polynomial[C]): Polynomial[C] =
     val k = spire.math.gcd(x.coeffsArray ++ y.coeffsArray)
     k *: euclid(x :/ k, y :/ k)(Polynomial.eq).monic
-  }
-}
 
-trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]] {
+trait PolynomialEq[@sp(Double) C] extends Eq[Polynomial[C]]
   implicit def scalar: Semiring[C]
   implicit def eq: Eq[C]
   implicit def ct: ClassTag[C]
 
   def eqv(x: Polynomial[C], y: Polynomial[C]): Boolean =
     x.coeffsArray === y.coeffsArray // TODO: This is bad for sparse arrays. Do better.
-}
 
-trait PolynomialInstances0 {
+trait PolynomialInstances0
   implicit def semiring[
       @sp(Double) C : ClassTag : Semiring : Eq]: PolynomialSemiring[C] =
-    new PolynomialSemiring[C] {
+    new PolynomialSemiring[C]
       val scalar = Semiring[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
-    }
 
   implicit def eq[@sp(Double) C : ClassTag : Semiring : Eq]: PolynomialEq[C] =
-    new PolynomialEq[C] {
+    new PolynomialEq[C]
       val scalar = Semiring[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
-    }
-}
 
-trait PolynomialInstances1 extends PolynomialInstances0 {
+trait PolynomialInstances1 extends PolynomialInstances0
   implicit def rig[@sp(Double) C : ClassTag : Rig : Eq]: PolynomialRig[C] =
-    new PolynomialRig[C] {
+    new PolynomialRig[C]
       val scalar = Rig[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
-    }
 
   implicit def rng[@sp(Double) C : ClassTag : Rng : Eq]: PolynomialRng[C] =
-    new PolynomialRng[C] {
+    new PolynomialRng[C]
       val scalar = Rng[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
-    }
-}
 
-trait PolynomialInstances2 extends PolynomialInstances1 {
+trait PolynomialInstances2 extends PolynomialInstances1
   implicit def ring[@sp(Double) C : ClassTag : Ring : Eq]: PolynomialRing[C] =
-    new PolynomialRing[C] {
+    new PolynomialRing[C]
       val scalar = Ring[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
-    }
-}
 
-trait PolynomialInstances3 extends PolynomialInstances2 {
+trait PolynomialInstances3 extends PolynomialInstances2
   implicit def euclideanRing[
       @sp(Double) C : ClassTag : Field : Eq]: PolynomialEuclideanRing[C] =
-    new PolynomialEuclideanRing[C] {
+    new PolynomialEuclideanRing[C]
       val scalar = Field[C]
       val eq = Eq[C]
       val ct = implicitly[ClassTag[C]]
-    }
-}
 
 trait PolynomialInstances extends PolynomialInstances3

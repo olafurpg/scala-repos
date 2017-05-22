@@ -10,7 +10,7 @@ package scala.tools.docutil
 // - http://www.linuxfocus.org/English/November2003/article309.shtml
 // - http://www.schweikhardt.net/man_page_howto.html
 
-object EmitManPage {
+object EmitManPage
   import ManPage._
 
   val out = Console
@@ -18,13 +18,12 @@ object EmitManPage {
   def escape(text: String) =
     text.replaceAll("-", "\\-")
 
-  def emitSection(section: Section, depth: Int) {
-    def emitPara(text: AbstractText) {
+  def emitSection(section: Section, depth: Int)
+    def emitPara(text: AbstractText)
       emitText(text)
       out println "\n.IP"
-    }
-    def emitText(text: AbstractText) {
-      text match {
+    def emitText(text: AbstractText)
+      text match
         case seq: SeqText =>
           seq.components foreach emitText
 
@@ -67,24 +66,21 @@ object EmitManPage {
 
         case DefinitionList(definitions @ _ *) =>
           var n = definitions.length
-          for (d <- definitions) {
+          for (d <- definitions)
             out println ".TP"
             emitText(d.term)
             out.println
             emitText(d.description)
             if (n > 1) { out.println; n -= 1 }
-          }
 
         case Link(label, url) =>
           emitText(label)
 
         case _ =>
           sys.error("unknown text node: " + text)
-      }
-    }
 
-    def emitParagraph(para: Paragraph) {
-      para match {
+    def emitParagraph(para: Paragraph)
+      para match
         case TextParagraph(text) =>
           out println ".PP"
           emitText(text)
@@ -101,21 +97,19 @@ object EmitManPage {
           out println "\n.fi"
 
         case lst: BulletList =>
-          for (item <- lst.items) {
+          for (item <- lst.items)
             out println ".IP"
             emitText(item)
             out.println
-          }
 
         case lst: NumberedList =>
-          for {
+          for
             idx <- List.range(0, lst.items.length)
-          } {
+          
             val item = lst.items(idx)
             out.println(".IP \"   " + (idx + 1) + ".\"")
             emitText(item)
             out.println
-          }
 
         case TitledPara(title, text) =>
           out println ".PP"
@@ -129,8 +123,6 @@ object EmitManPage {
 
         case _ =>
           sys.error("unknown paragraph node: " + para)
-      }
-    }
 
     out println ".\\\""
     out.println(".\\\" ############################## " + section.title +
@@ -143,9 +135,8 @@ object EmitManPage {
     out.println(tag + " " + title)
 
     section.paragraphs foreach emitParagraph
-  }
 
-  def emitDocument(doc: Document) {
+  def emitDocument(doc: Document)
     out println ".\\\" ##########################################################################"
     out println ".\\\" #                      __                                                #"
     out println ".\\\" #      ________ ___   / /  ___     Scala 2 On-line Manual Pages          #"
@@ -162,29 +153,24 @@ object EmitManPage {
         "\" \"version " + doc.version + "\" \"" + doc.category + "\"")
 
     doc.sections foreach (s => emitSection(s, 1))
-  }
 
-  def main(args: Array[String]) = args match {
+  def main(args: Array[String]) = args match
     case Array(classname) => emitManPage(classname)
     case Array(classname, file, _ *) =>
       emitManPage(classname, new java.io.FileOutputStream(file))
     case _ => sys.exit(1)
-  }
 
   def emitManPage(
-      classname: String, outStream: java.io.OutputStream = out.out) {
+      classname: String, outStream: java.io.OutputStream = out.out)
     if (outStream != out.out) out setOut outStream
-    try {
+    try
       val cl = this.getClass.getClassLoader()
       val clasz = cl loadClass classname
       val meth = clasz getDeclaredMethod "manpage"
       val doc = meth.invoke(null).asInstanceOf[Document]
       emitDocument(doc)
-    } catch {
+    catch
       case ex: Exception =>
         ex.printStackTrace()
         System.err println "Error in EmitManPage"
         sys.exit(1)
-    }
-  }
-}

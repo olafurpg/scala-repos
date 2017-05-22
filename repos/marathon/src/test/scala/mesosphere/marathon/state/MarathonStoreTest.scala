@@ -18,14 +18,13 @@ import scala.concurrent._
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class MarathonStoreTest extends MarathonSpec with Matchers {
+class MarathonStoreTest extends MarathonSpec with Matchers
   var metrics: Metrics = _
 
-  before {
+  before
     metrics = new Metrics(new MetricRegistry)
-  }
 
-  test("Fetch") {
+  test("Fetch")
     val state = mock[PersistentStore]
     val variable = mock[PersistentEntity]
     val now = Timestamp.now()
@@ -46,9 +45,8 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
     verify(state).load("app:testApp")
     assert(Some(appDef) == Await.result(res, 5.seconds),
            "Should return the expected AppDef")
-  }
 
-  test("FetchFail") {
+  test("FetchFail")
     val state = mock[PersistentStore]
 
     when(state.load("app:testApp"))
@@ -62,12 +60,10 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
 
     verify(state).load("app:testApp")
 
-    intercept[StoreCommandFailedException] {
+    intercept[StoreCommandFailedException]
       Await.result(res, 5.seconds)
-    }
-  }
 
-  test("Modify") {
+  test("Modify")
     val state = mock[PersistentStore]
     val variable = mock[PersistentEntity]
     val now = Timestamp.now()
@@ -90,17 +86,15 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
 
     val store = new MarathonStore[AppDefinition](
         state, metrics, () => AppDefinition(), "app:")
-    val res = store.modify("testApp") { _ =>
+    val res = store.modify("testApp")  _ =>
       newAppDef
-    }
 
     assert(newAppDef == Await.result(res, 5.seconds),
            "Should return the new AppDef")
     verify(state).load("app:testApp")
     verify(state).update(newVariable)
-  }
 
-  test("ModifyFail") {
+  test("ModifyFail")
     val state = mock[PersistentStore]
     val variable = mock[PersistentEntity]
     val appDef = AppDefinition(id = "testApp".toPath, args = Some(Seq("arg")))
@@ -120,16 +114,13 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
 
     val store = new MarathonStore[AppDefinition](
         state, metrics, () => AppDefinition(), "app:")
-    val res = store.modify("testApp") { _ =>
+    val res = store.modify("testApp")  _ =>
       newAppDef
-    }
 
-    intercept[StoreCommandFailedException] {
+    intercept[StoreCommandFailedException]
       Await.result(res, 5.seconds)
-    }
-  }
 
-  test("Expunge") {
+  test("Expunge")
     val state = mock[PersistentStore]
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
@@ -141,9 +132,8 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
 
     Await.ready(res, 5.seconds)
     verify(state).delete("app:testApp")
-  }
 
-  test("ExpungeFail") {
+  test("ExpungeFail")
     val state = mock[PersistentStore]
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
@@ -156,22 +146,18 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
 
     val res = store.expunge("testApp")
 
-    intercept[StoreCommandFailedException] {
+    intercept[StoreCommandFailedException]
       Await.result(res, 5.seconds)
-    }
-  }
 
-  test("Names") {
+  test("Names")
     val state = new InMemoryStore
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
 
-    def populate(key: String, value: Array[Byte]) = {
-      state.load(key).futureValue match {
+    def populate(key: String, value: Array[Byte]) =
+      state.load(key).futureValue match
         case Some(ent) => state.update(ent.withNewContent(value)).futureValue
         case None => state.create(key, value).futureValue
-      }
-    }
 
     populate("app:foo", Array())
     populate("app:bar", Array())
@@ -183,9 +169,8 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
 
     assert(Set("foo", "bar") == Await.result(res, 5.seconds).toSet,
            "Should return all application keys")
-  }
 
-  test("NamesFail") {
+  test("NamesFail")
     val state = mock[PersistentStore]
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
@@ -198,9 +183,8 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
     val res = store.names()
 
     whenReady(res.failed) { _ shouldBe a[StoreCommandFailedException] }
-  }
 
-  test("ConcurrentModifications") {
+  test("ConcurrentModifications")
     val state = new InMemoryStore
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
@@ -212,12 +196,10 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
       .store("foo", AppDefinition(id = "foo".toPath, instances = 0))
       .futureValue
 
-    def plusOne() = {
-      store.modify("foo") { f =>
+    def plusOne() =
+      store.modify("foo")  f =>
         val appDef = f()
         appDef.copy(instances = appDef.instances + 1)
-      }
-    }
 
     val results = for (_ <- 0 until 1000) yield plusOne()
 
@@ -231,19 +213,15 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
              .map(_.instances)
              .getOrElse(0),
            "Instances of 'foo' should be set to 1000")
-  }
 
   // regression test for #1481
-  ignore("names() correctly uses timeouts") {
-    val state = new InMemoryStore() {
+  ignore("names() correctly uses timeouts")
+    val state = new InMemoryStore()
 
-      override def allIds(): Future[scala.Seq[ID]] = Future {
-        synchronized {
+      override def allIds(): Future[scala.Seq[ID]] = Future
+        synchronized
           blocking(wait())
-        }
         Seq.empty
-      }
-    }
     val config =
       new ScallopConf(Seq("--master", "foo", "--marathon_store_timeout", "1"))
       with MarathonConf
@@ -252,79 +230,64 @@ class MarathonStoreTest extends MarathonSpec with Matchers {
     val store = new MarathonStore[AppDefinition](
         state, metrics, () => AppDefinition(), "app:")
 
-    noException should be thrownBy {
+    noException should be thrownBy
       Await.result(store.names(), 1.second)
-    }
-  }
 
   // regression test for #1507
   test(
-      "state.names() throwing exception is treated as empty iterator (ExecutionException without cause)") {
-    val state = new InMemoryStore() {
+      "state.names() throwing exception is treated as empty iterator (ExecutionException without cause)")
+    val state = new InMemoryStore()
       override def allIds(): Future[scala.Seq[ID]] = super.allIds()
-    }
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
 
     val store = new MarathonStore[AppDefinition](
         state, metrics, () => AppDefinition(), "app:")
 
-    noException should be thrownBy {
+    noException should be thrownBy
       Await.result(store.names(), 1.second)
-    }
-  }
 
   class MyWeirdExecutionException
       extends ExecutionException("weird without cause")
 
   // regression test for #1507
   test(
-      "state.names() throwing exception is treated as empty iterator (ExecutionException with itself as cause)") {
-    val state = new InMemoryStore() {
+      "state.names() throwing exception is treated as empty iterator (ExecutionException with itself as cause)")
+    val state = new InMemoryStore()
       override def allIds(): Future[scala.Seq[ID]] = super.allIds()
-    }
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
 
     val store = new MarathonStore[AppDefinition](
         state, metrics, () => AppDefinition(), "app:")
 
-    noException should be thrownBy {
+    noException should be thrownBy
       Await.result(store.names(), 1.second)
-    }
-  }
 
   test(
-      "state.names() throwing exception is treated as empty iterator (direct)") {
-    val state = new InMemoryStore() {
+      "state.names() throwing exception is treated as empty iterator (direct)")
+    val state = new InMemoryStore()
       override def allIds(): Future[scala.Seq[ID]] = super.allIds()
-    }
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
 
     val store = new MarathonStore[AppDefinition](
         state, metrics, () => AppDefinition(), "app:")
 
-    noException should be thrownBy {
+    noException should be thrownBy
       Await.result(store.names(), 1.second)
-    }
-  }
 
   test(
-      "state.names() throwing exception is treated as empty iterator (RuntimeException in ExecutionException)") {
-    val state = new InMemoryStore() {
+      "state.names() throwing exception is treated as empty iterator (RuntimeException in ExecutionException)")
+    val state = new InMemoryStore()
       override def allIds(): Future[scala.Seq[ID]] = super.allIds()
-    }
     val config = new ScallopConf(Seq("--master", "foo")) with MarathonConf
     config.afterInit()
 
     val store = new MarathonStore[AppDefinition](
         state, metrics, () => AppDefinition(), "app:")
 
-    noException should be thrownBy {
+    noException should be thrownBy
       Await.result(store.names(), 1.second)
-    }
-  }
 
   def registry: MetricRegistry = new MetricRegistry
-}

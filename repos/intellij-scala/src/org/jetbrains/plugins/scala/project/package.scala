@@ -24,8 +24,8 @@ import scala.util.matching.Regex
 /**
   * @author Pavel Fatin
   */
-package object project {
-  implicit class LibraryExt(library: Library) {
+package object project
+  implicit class LibraryExt(library: Library)
     def isScalaSdk: Boolean = libraryEx.getKind.isInstanceOf[ScalaLibraryKind]
 
     def scalaVersion: Option[Version] =
@@ -40,7 +40,7 @@ package object project {
     private def libraryEx = library.asInstanceOf[LibraryEx]
 
     def convertToScalaSdkWith(languageLevel: ScalaLanguageLevel,
-                              compilerClasspath: Seq[File]): ScalaSdk = {
+                              compilerClasspath: Seq[File]): ScalaSdk =
       val properties = new ScalaLibraryProperties()
       properties.languageLevel = languageLevel
       properties.compilerClasspath = compilerClasspath
@@ -51,16 +51,14 @@ package object project {
       editor.commit()
 
       new ScalaSdk(library)
-    }
 
     def classes: Set[File] =
       library
         .getFiles(OrderRootType.CLASSES)
         .toSet
         .map(VfsUtilCore.virtualToIoFile)
-  }
 
-  implicit class ModuleExt(module: Module) {
+  implicit class ModuleExt(module: Module)
     def hasScala: Boolean = scalaSdk.isDefined
 
     def hasDotty: Boolean = scalaSdk.exists(_.isDottySdk)
@@ -70,7 +68,7 @@ package object project {
         .instanceIn(module.getProject)
         .getOrUpdate(module)(scalaSdk0)
 
-    private def scalaSdk0: Option[ScalaSdk] = {
+    private def scalaSdk0: Option[ScalaSdk] =
       var result: Option[ScalaSdk] = None
 
       // TODO breadth-first search is preferable
@@ -82,73 +80,63 @@ package object project {
         .exportedOnly()
 
       enumerator.forEachLibrary(
-          new Processor[Library] {
-        override def process(library: Library) = {
-          if (library.isScalaSdk) {
+          new Processor[Library]
+        override def process(library: Library) =
+          if (library.isScalaSdk)
             result = Some(new ScalaSdk(library))
             false
-          } else {
+          else
             true
-          }
-        }
-      })
+      )
 
       result
-    }
 
-    def libraries: Set[Library] = {
+    def libraries: Set[Library] =
       val collector = new CollectProcessor[Library]()
       OrderEnumerator
         .orderEntries(module)
         .librariesOnly()
         .forEachLibrary(collector)
       collector.getResults.asScala.toSet
-    }
 
     def scalaLibraries: Set[Library] =
       libraries.filter(_.getName.contains(ScalaLibraryName))
 
-    def attach(library: Library) {
+    def attach(library: Library)
       val model = ModuleRootManager.getInstance(module).getModifiableModel
       model.addLibraryEntry(library)
       model.commit()
-    }
 
-    def attach(libraries: Seq[Library]) = {
+    def attach(libraries: Seq[Library]) =
       val model = ModuleRootManager.getInstance(module).getModifiableModel
       libraries.foreach(model.addLibraryEntry)
       model.commit()
-    }
 
-    def detach(library: Library) {
+    def detach(library: Library)
       val model = ModuleRootManager.getInstance(module).getModifiableModel
       val entry = model.findLibraryOrderEntry(library)
       model.removeOrderEntry(entry)
       model.commit()
-    }
 
-    def createLibraryFromJar(urls: Seq[String], name: String): Library = {
+    def createLibraryFromJar(urls: Seq[String], name: String): Library =
       val lib =
         ProjectLibraryTable.getInstance(module.getProject).createLibrary(name)
       val model = lib.getModifiableModel
       urls.foreach(url => model.addRoot(url, OrderRootType.CLASSES))
       model.commit()
       lib
-    }
 
     def scalaCompilerSettings: ScalaCompilerSettings =
       compilerConfiguration.getSettingsForModule(module)
 
     def configureScalaCompilerSettingsFrom(
-        source: String, options: Seq[String]) {
+        source: String, options: Seq[String])
       compilerConfiguration.configureSettingsForModule(module, source, options)
-    }
 
     private def compilerConfiguration =
       ScalaCompilerConfiguration.instanceIn(module.getProject)
-  }
 
-  implicit class ProjectExt(project: Project) {
+  implicit class ProjectExt(project: Project)
     private def modules: Seq[Module] =
       ModuleManager.getInstance(project).getModules.toSeq
 
@@ -181,16 +169,15 @@ package object project {
                        sources: Seq[File],
                        docs: Seq[File],
                        compilerClasspath: Seq[File],
-                       languageLevel: ScalaLanguageLevel): ScalaSdk = {
+                       languageLevel: ScalaLanguageLevel): ScalaSdk =
       val library =
         ProjectLibraryTable.getInstance(project).createLibrary(name)
 
       val editor = new NewLibraryEditor()
 
-      def addRoots(files: Seq[File], rootType: OrderRootType) {
+      def addRoots(files: Seq[File], rootType: OrderRootType)
         files.foreach(file =>
               editor.addRoot(VfsUtil.findFileByIoFile(file, false), rootType))
-      }
 
       addRoots(classes, OrderRootType.CLASSES)
       addRoots(sources, OrderRootType.SOURCES)
@@ -208,30 +195,23 @@ package object project {
       libraryModel.commit()
 
       new ScalaSdk(library)
-    }
 
-    def remove(library: Library) {
+    def remove(library: Library)
       ProjectLibraryTable.getInstance(project).removeLibrary(library)
-    }
-  }
 
-  class ScalaModule(val module: Module) {
-    def sdk: ScalaSdk = module.scalaSdk.map(new ScalaSdk(_)).getOrElse {
+  class ScalaModule(val module: Module)
+    def sdk: ScalaSdk = module.scalaSdk.map(new ScalaSdk(_)).getOrElse
       throw new IllegalStateException(
           "Module has no Scala SDK: " + module.getName)
-    }
-  }
 
-  object ScalaModule {
+  object ScalaModule
     implicit def toModule(v: ScalaModule): Module = v.module
-  }
 
-  class ScalaSdk(val library: Library) {
+  class ScalaSdk(val library: Library)
     private def properties: ScalaLibraryProperties =
-      library.scalaProperties.getOrElse {
+      library.scalaProperties.getOrElse
         throw new IllegalStateException(
             "Library is not Scala SDK: " + library.getName)
-      }
 
     def compilerVersion: Option[String] =
       LibraryVersion.findFirstIn(library.getName)
@@ -241,32 +221,28 @@ package object project {
     def languageLevel: ScalaLanguageLevel = properties.languageLevel
 
     def isDottySdk: Boolean = languageLevel.isDotty
-  }
 
-  object ScalaSdk {
+  object ScalaSdk
     implicit def toLibrary(v: ScalaSdk): Library = v.library
 
     def documentationUrlFor(version: Option[Version]): String =
       "http://www.scala-lang.org/api/" +
       version.map(_.number).getOrElse("current") + "/"
-  }
 
-  implicit class ProjectPsiElementExt(element: PsiElement) {
+  implicit class ProjectPsiElementExt(element: PsiElement)
     def module: Option[Module] =
       Option(ModuleUtilCore.findModuleForPsiElement(element))
 
     def isInScalaModule: Boolean = module.exists(_.hasScala)
 
     @deprecated("legacy code, use scalaLanguageLevelOrDefault", "14.10.14")
-    def languageLevel: ScalaLanguageLevel = {
+    def languageLevel: ScalaLanguageLevel =
       @tailrec
-      def getContainingFileByContext(element: PsiElement): PsiFile = {
-        element match {
+      def getContainingFileByContext(element: PsiElement): PsiFile =
+        element match
           case file: PsiFile => file
           case null => null
           case elem => getContainingFileByContext(elem.getContext)
-        }
-      }
       val file: PsiFile = getContainingFileByContext(element)
       if (file == null || file.getVirtualFile == null)
         return ScalaLanguageLevel.Default
@@ -277,18 +253,15 @@ package object project {
       module.scalaSdk
         .map(_.languageLevel)
         .getOrElse(ScalaLanguageLevel.Default)
-    }
 
     def scalaLanguageLevel: Option[ScalaLanguageLevel] =
       module.flatMap(_.scalaSdk.map(_.languageLevel))
 
     def scalaLanguageLevelOrDefault: ScalaLanguageLevel =
       scalaLanguageLevel.getOrElse(ScalaLanguageLevel.Default)
-  }
 
   val LibraryVersion: Regex = """(?<=:|-)\d+\.\d+\.\d+[^:\s]*""".r
 
   val JarVersion: Regex = """(?<=-)\d+\.\d+\.\d+\S*(?=\.jar$)""".r
 
   val ScalaLibraryName: String = "scala-library"
-}

@@ -28,7 +28,7 @@ import org.joda.time.{DateTime, Period}
 /**
   * Defines a base set of codecs that are often used in `RowFormat`s.
   */
-trait StdCodecs {
+trait StdCodecs
   implicit def LongCodec: Codec[Long]
   implicit def DoubleCodec: Codec[Double]
   implicit def BigDecimalCodec: Codec[BigDecimal]
@@ -43,14 +43,13 @@ trait StdCodecs {
   implicit def ArrayCodec[A](
       implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]]
 
-  def codecForCType(cType: CType): Codec[_] = cType match {
+  def codecForCType(cType: CType): Codec[_] = cType match
     case cType: CValueType[_] => codecForCValueType(cType)
     case _: CNullType => Codec.ConstCodec(true)
-  }
 
   def codecForCValueType[A](cType: CValueType[A]): Codec[A] =
-    try {
-      cType match {
+    try
+      cType match
         case CBoolean => BooleanCodec
         case CString => StringCodec
         case CLong => LongCodec
@@ -60,15 +59,12 @@ trait StdCodecs {
         case CPeriod => PeriodCodec
         case CArrayType(elemType) =>
           ArrayCodec(codecForCValueType(elemType), elemType.manifest)
-      }
-    } catch {
+    catch
       case ex: Throwable =>
         println(cType)
         throw ex
-    }
-}
 
-trait RowFormatCodecs extends StdCodecs { self: RowFormat =>
+trait RowFormatCodecs extends StdCodecs  self: RowFormat =>
   implicit def LongCodec: Codec[Long] = Codec.PackedLongCodec
   implicit def DoubleCodec: Codec[Double] = Codec.DoubleCodec
   implicit def BigDecimalCodec: Codec[BigDecimal] = Codec.BigDecimalCodec
@@ -88,4 +84,3 @@ trait RowFormatCodecs extends StdCodecs { self: RowFormat =>
   implicit def ArrayCodec[A](
       implicit elemCodec: Codec[A], m: Manifest[A]): Codec[Array[A]] =
     Codec.ArrayCodec(elemCodec)(m)
-}

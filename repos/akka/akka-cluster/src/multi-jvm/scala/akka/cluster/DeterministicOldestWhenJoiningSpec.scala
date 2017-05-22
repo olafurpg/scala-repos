@@ -14,7 +14,7 @@ import akka.actor.Address
 import akka.cluster.ClusterEvent.MemberUp
 import akka.cluster.ClusterEvent.CurrentClusterState
 
-object DeterministicOldestWhenJoiningMultiJvmSpec extends MultiNodeConfig {
+object DeterministicOldestWhenJoiningMultiJvmSpec extends MultiNodeConfig
   val seed1 = role("seed1")
   val seed2 = role("seed2")
   val seed3 = role("seed3")
@@ -27,7 +27,6 @@ object DeterministicOldestWhenJoiningMultiJvmSpec extends MultiNodeConfig {
     akka.cluster.gossip-interval = 500 ms
     """))
         .withFallback(MultiNodeClusterSpec.clusterConfig))
-}
 
 class DeterministicOldestWhenJoiningMultiJvmNode1
     extends DeterministicOldestWhenJoiningSpec
@@ -38,7 +37,7 @@ class DeterministicOldestWhenJoiningMultiJvmNode3
 
 abstract class DeterministicOldestWhenJoiningSpec
     extends MultiNodeSpec(DeterministicOldestWhenJoiningMultiJvmSpec)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import DeterministicOldestWhenJoiningMultiJvmSpec._
 
@@ -51,30 +50,24 @@ abstract class DeterministicOldestWhenJoiningSpec
                           address(seed2) -> seed2,
                           address(seed3) -> seed3)
 
-  "Joining a cluster" must {
-    "result in deterministic oldest node" taggedAs LongRunningTest in {
+  "Joining a cluster" must
+    "result in deterministic oldest node" taggedAs LongRunningTest in
       cluster.subscribe(testActor, classOf[MemberUp])
       expectMsgType[CurrentClusterState]
 
-      runOn(roleByAddress(seedNodes.head)) {
+      runOn(roleByAddress(seedNodes.head))
         cluster.joinSeedNodes(seedNodes)
-      }
       enterBarrier("first-seed-joined")
 
       runOn(roleByAddress(seedNodes(1)),
-            roleByAddress(roleByAddress(seedNodes(2)))) {
+            roleByAddress(roleByAddress(seedNodes(2))))
         cluster.joinSeedNodes(seedNodes)
-      }
 
-      within(10.seconds) {
+      within(10.seconds)
         val ups = List(expectMsgType[MemberUp],
                        expectMsgType[MemberUp],
                        expectMsgType[MemberUp])
         ups.map(_.member).sorted(Member.ageOrdering).head.address should ===(
             seedNodes.head)
-      }
 
       enterBarrier("after-1")
-    }
-  }
-}

@@ -17,68 +17,58 @@ import org.jetbrains.plugins.scala.project._
 /**
   * Pavel Fatin
   */
-class ServerMediator(project: Project) extends ProjectComponent {
+class ServerMediator(project: Project) extends ProjectComponent
 
   private def isScalaProject = project.hasScala
   private val settings = ScalaCompileServerSettings.getInstance
 
   private val connection = project.getMessageBus.connect
-  private val serverLauncher = new BuildManagerListener {
+  private val serverLauncher = new BuildManagerListener
     override def beforeBuildProcessStarted(
         project: Project, uuid: UUID): Unit = {}
 
     override def buildStarted(
-        project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {
-      if (settings.COMPILE_SERVER_ENABLED && isScalaProject) {
-        invokeAndWait {
+        project: Project, sessionId: UUID, isAutomake: Boolean): Unit =
+      if (settings.COMPILE_SERVER_ENABLED && isScalaProject)
+        invokeAndWait
           CompileServerManager.instance(project).configureWidget()
-        }
 
-        if (CompileServerLauncher.needRestart(project)) {
+        if (CompileServerLauncher.needRestart(project))
           CompileServerLauncher.instance.stop()
-        }
 
-        if (!CompileServerLauncher.instance.running) {
-          invokeAndWait {
+        if (!CompileServerLauncher.instance.running)
+          invokeAndWait
             CompileServerLauncher.instance.tryToStart(project)
-          }
-        }
-      }
-    }
 
     override def buildFinished(
         project: Project, sessionId: UUID, isAutomake: Boolean): Unit = {}
-  }
 
   connection.subscribe(BuildManagerListener.TOPIC, serverLauncher)
 
-  private val checkSettingsTask = new CompileTask {
-    def execute(context: CompileContext): Boolean = {
-      if (isScalaProject) {
+  private val checkSettingsTask = new CompileTask
+    def execute(context: CompileContext): Boolean =
+      if (isScalaProject)
         if (!checkCompilationSettings()) false
         else true
-      } else true
-    }
-  }
+      else true
 
   CompilerManager.getInstance(project).addBeforeTask(checkSettingsTask)
 
-  private def checkCompilationSettings(): Boolean = {
-    def hasClashes(module: Module) = module.hasScala && {
+  private def checkCompilationSettings(): Boolean =
+    def hasClashes(module: Module) = module.hasScala &&
       val extension = CompilerModuleExtension.getInstance(module)
       val production = extension.getCompilerOutputUrl
       val test = extension.getCompilerOutputUrlForTests
       production == test
-    }
     val modulesWithClashes =
       ModuleManager.getInstance(project).getModules.toSeq.filter(hasClashes)
 
     var result = true
 
-    if (modulesWithClashes.nonEmpty) {
-      invokeAndWait {
+    if (modulesWithClashes.nonEmpty)
+      invokeAndWait
         val choice =
-          if (!ApplicationManager.getApplication.isUnitTestMode) {
+          if (!ApplicationManager.getApplication.isUnitTestMode)
             Messages.showYesNoDialog(
                 project,
                 "Production and test output paths are shared in: " +
@@ -87,22 +77,21 @@ class ServerMediator(project: Project) extends ProjectComponent {
                 "Split output path(s) automatically",
                 "Cancel compilation",
                 Messages.getErrorIcon)
-          } else Messages.YES
+          else Messages.YES
 
         val splitAutomatically = choice == Messages.YES
 
-        if (splitAutomatically) {
-          inWriteAction {
-            modulesWithClashes.foreach { module =>
+        if (splitAutomatically)
+          inWriteAction
+            modulesWithClashes.foreach  module =>
               val model =
                 ModuleRootManager.getInstance(module).getModifiableModel
               val extension =
                 model.getModuleExtension(classOf[CompilerModuleExtension])
 
-              val outputUrlParts = extension.getCompilerOutputUrl match {
+              val outputUrlParts = extension.getCompilerOutputUrl match
                 case null => Seq.empty
                 case url => url.split("/").toSeq
-              }
               val nameForTests =
                 if (outputUrlParts.lastOption.contains("classes"))
                   "test-classes" else "test"
@@ -112,18 +101,12 @@ class ServerMediator(project: Project) extends ProjectComponent {
                   (outputUrlParts.dropRight(1) :+ nameForTests).mkString("/"))
 
               model.commit()
-            }
 
             project.save()
-          }
-        }
 
         result = splitAutomatically
-      }
-    }
 
     result
-  }
 
   def getComponentName = getClass.getSimpleName
 
@@ -134,4 +117,3 @@ class ServerMediator(project: Project) extends ProjectComponent {
   def projectOpened() {}
 
   def projectClosed() {}
-}

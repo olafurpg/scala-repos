@@ -19,7 +19,7 @@ class MarathonLeaderInfo @Inject()(
     @Named(ModuleNames.LEADER_ATOMIC_BOOLEAN) leader: AtomicBoolean,
     @Named(EventModule.busName) eventStream: EventStream,
     metrics: MarathonLeaderInfoMetrics)
-    extends LeaderInfo {
+    extends LeaderInfo
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
@@ -27,20 +27,16 @@ class MarathonLeaderInfo @Inject()(
   override def elected: Boolean = leader.get()
 
   override def currentLeaderHostPort(): Option[String] =
-    metrics.getLeaderDataTimer {
-      candidate.flatMap { c =>
-        val maybeLeaderData: Option[Array[Byte]] = try {
+    metrics.getLeaderDataTimer
+      candidate.flatMap  c =>
+        val maybeLeaderData: Option[Array[Byte]] = try
           Option(c.getLeaderData.orNull())
-        } catch {
+        catch
           case NonFatal(e) =>
             log.error("error while getting current leader", e)
             None
-        }
-        maybeLeaderData.map { data =>
+        maybeLeaderData.map  data =>
           new String(data, "UTF-8")
-        }
-      }
-    }
 
   /**
     * Subscribe to leadership change events.
@@ -49,21 +45,17 @@ class MarathonLeaderInfo @Inject()(
     * [[mesosphere.marathon.event.LocalLeadershipEvent]] message and will
     * be informed of changes after that.
     */
-  override def subscribe(self: ActorRef): Unit = {
+  override def subscribe(self: ActorRef): Unit =
     eventStream.subscribe(self, classOf[LocalLeadershipEvent])
     val currentState =
       if (elected) LocalLeadershipEvent.ElectedAsLeader
       else LocalLeadershipEvent.Standby
     self ! currentState
-  }
 
   /** Unsubscribe to any leadership change events to this actor ref. */
-  override def unsubscribe(self: ActorRef): Unit = {
+  override def unsubscribe(self: ActorRef): Unit =
     eventStream.unsubscribe(self, classOf[LocalLeadershipEvent])
-  }
-}
 
-class MarathonLeaderInfoMetrics @Inject()(metrics: Metrics) {
+class MarathonLeaderInfoMetrics @Inject()(metrics: Metrics)
   val getLeaderDataTimer: Timer = metrics.timer(metrics.name(
           MetricPrefixes.SERVICE, getClass, "current-leader-host-port"))
-}

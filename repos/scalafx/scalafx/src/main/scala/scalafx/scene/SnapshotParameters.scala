@@ -35,11 +35,10 @@ import scalafx.geometry.Rectangle2D
 import scalafx.scene.paint.Paint
 import scalafx.scene.transform.Transform
 
-object SnapshotParameters {
+object SnapshotParameters
   implicit def sfxSnapshotParameters2jfx(
       sp: SnapshotParameters): jfxs.SnapshotParameters =
     if (sp != null) sp.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/SnapshotParameters.html]]
@@ -48,45 +47,39 @@ object SnapshotParameters {
   */
 class SnapshotParameters(
     override val delegate: jfxs.SnapshotParameters = new jfxs.SnapshotParameters)
-    extends SFXDelegate[jfxs.SnapshotParameters] {
+    extends SFXDelegate[jfxs.SnapshotParameters]
 
   /**
     * The current camera.
     */
   def camera: Camera = delegate.getCamera
-  def camera_=(c: Camera) {
+  def camera_=(c: Camera)
     delegate.setCamera(c)
-  }
 
   /**
     * The current depthBuffer flag.
     */
   def depthBuffer = delegate.isDepthBuffer
-  def depthBuffer_=(db: Boolean) {
+  def depthBuffer_=(db: Boolean)
     delegate.setDepthBuffer(db)
-  }
 
   /**
     * The current fill.
     */
   def fill: Paint = delegate.getFill
-  def fill_=(p: Paint) {
+  def fill_=(p: Paint)
     delegate.setFill(p)
-  }
 
   /**
     * The current transform.
     */
   def transform: Transform = delegate.getTransform
-  def transform_=(t: Transform) {
+  def transform_=(t: Transform)
     delegate.setTransform(t)
-  }
 
   /**
     * The current viewport.
     */
   def viewport: Rectangle2D = delegate.getViewport
-  def viewport_=(v: Rectangle2D) {
+  def viewport_=(v: Rectangle2D)
     delegate.setViewport(v)
-  }
-}

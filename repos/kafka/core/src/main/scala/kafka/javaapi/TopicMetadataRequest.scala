@@ -27,13 +27,12 @@ class TopicMetadataRequest(val versionId: Short,
                            val correlationId: Int,
                            val clientId: String,
                            val topics: java.util.List[String])
-    extends RequestOrResponse(Some(ApiKeys.METADATA.id)) {
+    extends RequestOrResponse(Some(ApiKeys.METADATA.id))
 
-  val underlying: kafka.api.TopicMetadataRequest = {
+  val underlying: kafka.api.TopicMetadataRequest =
     import scala.collection.JavaConversions._
     new kafka.api.TopicMetadataRequest(
         versionId, correlationId, clientId, topics: mutable.Buffer[String])
-  }
 
   def this(topics: java.util.List[String]) =
     this(kafka.api.TopicMetadataRequest.CurrentVersion,
@@ -51,25 +50,20 @@ class TopicMetadataRequest(val versionId: Short,
 
   def sizeInBytes: Int = underlying.sizeInBytes()
 
-  override def toString(): String = {
+  override def toString(): String =
     describe(true)
-  }
 
-  override def describe(details: Boolean): String = {
+  override def describe(details: Boolean): String =
     val topicMetadataRequest = new StringBuilder
     topicMetadataRequest.append("Name: " + this.getClass.getSimpleName)
     topicMetadataRequest.append("; Version: " + versionId)
     topicMetadataRequest.append("; CorrelationId: " + correlationId)
     topicMetadataRequest.append("; ClientId: " + clientId)
-    if (details) {
+    if (details)
       topicMetadataRequest.append("; Topics: ")
       val topicIterator = topics.iterator()
-      while (topicIterator.hasNext) {
+      while (topicIterator.hasNext)
         val topic = topicIterator.next()
         topicMetadataRequest.append("%s".format(topic))
         if (topicIterator.hasNext) topicMetadataRequest.append(",")
-      }
-    }
     topicMetadataRequest.toString()
-  }
-}

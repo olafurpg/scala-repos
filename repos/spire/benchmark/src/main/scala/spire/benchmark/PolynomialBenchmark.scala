@@ -13,15 +13,14 @@ import org.apache.commons.math3.analysis.UnivariateFunction
 
 object PolynomialBenchmarks extends MyRunner(classOf[PolynomialBenchmarks])
 
-class PolynomialBenchmarks extends MyBenchmark {
+class PolynomialBenchmarks extends MyBenchmark
 
   @Param(Array("1", "2", "4", "8", "16"))
   var size: Int = 0
 
-  def arbitraryRational = {
+  def arbitraryRational =
     val d = nextLong() % 100
     Rational(nextLong(), if (d == 0L) 1L else d)
-  }
 
   var spireDenseRationalPolys: Array[Polynomial[Rational]] = null
   var spireSparseRationalPolys: Array[Polynomial[Rational]] = null
@@ -29,7 +28,7 @@ class PolynomialBenchmarks extends MyBenchmark {
   var spireSparseDoublePolys: Array[Polynomial[Double]] = null
   var commonsDoublePolys: Array[PolynomialFunction] = null
 
-  override protected def setUp(): Unit = {
+  override protected def setUp(): Unit =
 
     val coeffs: Array[Array[Rational]] =
       init(100)(init(size)(arbitraryRational))
@@ -41,135 +40,120 @@ class PolynomialBenchmarks extends MyBenchmark {
     spireSparseDoublePolys = spireDenseDoublePolys.map(_.toSparse)
     commonsDoublePolys = coeffs.map(
         cs => new PolynomialFunction(cs.map(_.toDouble)))
-  }
 
   def addSpireRationalPolynomials(
-      data: Array[Polynomial[Rational]]): Polynomial[Rational] = {
+      data: Array[Polynomial[Rational]]): Polynomial[Rational] =
     var total: Polynomial[Rational] = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0) + data(i); i += 1 }
     total
-  }
 
   def addSpireDoublePolynomials(
-      data: Array[Polynomial[Double]]): Polynomial[Double] = {
+      data: Array[Polynomial[Double]]): Polynomial[Double] =
     var total: Polynomial[Double] = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0) + data(i); i += 1 }
     total
-  }
 
   def addCommonsDoublePolynomials(
-      data: Array[PolynomialFunction]): PolynomialFunction = {
+      data: Array[PolynomialFunction]): PolynomialFunction =
     var total: PolynomialFunction = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0).add(data(i)); i += 1 }
     total
-  }
 
   def multiplySpireRationalPolynomials(
-      data: Array[Polynomial[Rational]]): Polynomial[Rational] = {
+      data: Array[Polynomial[Rational]]): Polynomial[Rational] =
     var total: Polynomial[Rational] = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0) * data(i); i += 1 }
     total
-  }
 
   def multiplySpireDoublePolynomials(
-      data: Array[Polynomial[Double]]): Polynomial[Double] = {
+      data: Array[Polynomial[Double]]): Polynomial[Double] =
     var total: Polynomial[Double] = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0) * data(i); i += 1 }
     total
-  }
 
   def multiplyCommonsDoublePolynomials(
-      data: Array[PolynomialFunction]): PolynomialFunction = {
+      data: Array[PolynomialFunction]): PolynomialFunction =
     var total: PolynomialFunction = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0).multiply(data(i)); i += 1 }
     total
-  }
 
   def derivativeSpireRationalPolynomials(
-      data: Array[Polynomial[Rational]]): Polynomial[Rational] = {
+      data: Array[Polynomial[Rational]]): Polynomial[Rational] =
     var total: Polynomial[Rational] = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(i).derivative; i += 1 }
     total
-  }
 
   def derivativeSpireDoublePolynomials(
-      data: Array[Polynomial[Double]]): Polynomial[Double] = {
+      data: Array[Polynomial[Double]]): Polynomial[Double] =
     var total: Polynomial[Double] = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(i).derivative; i += 1 }
     total
-  }
 
   def derivativeCommonsDoublePolynomials(
-      data: Array[PolynomialFunction]): PolynomialFunction = {
+      data: Array[PolynomialFunction]): PolynomialFunction =
     var total: PolynomialFunction = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(i).polynomialDerivative; i += 1 }
     total
-  }
 
   def evaluateSpireRationalPolynomials(
-      data: Array[Polynomial[Rational]]): Rational = {
+      data: Array[Polynomial[Rational]]): Rational =
     val testVariable = Rational(2, 1)
     var total: Rational = Rational(1, 1)
     var i = 0
     val len = data.length
     while (i < len) { total = data(i).apply(testVariable); i += 1 }
     total
-  }
 
-  def evaluateSpireDoublePolynomials(data: Array[Polynomial[Double]]): Double = {
+  def evaluateSpireDoublePolynomials(data: Array[Polynomial[Double]]): Double =
     val testVariable = 2.0
     var total: Double = 0.0
     var i = 0
     val len = data.length
     while (i < len) { total = data(i).apply(testVariable); i += 1 }
     total
-  }
 
   def evaluateCommonsDoublePolynomials(
-      data: Array[PolynomialFunction]): Double = {
+      data: Array[PolynomialFunction]): Double =
     val testVariable = 2.0
     var total: Double = 0.0
     var i = 0
     val len = data.length
     while (i < len) { total = data(i).value(testVariable); i += 1 }
     total
-  }
 
   def quotModSpireRationalPolynomials(data: Array[Polynomial[Rational]])
-    : (Polynomial[Rational], Polynomial[Rational]) = {
+    : (Polynomial[Rational], Polynomial[Rational]) =
     var total: (Polynomial[Rational], Polynomial[Rational]) = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0) /% data(i); i += 1 }
     total
-  }
 
   def quotModSpireDoublePolynomials(data: Array[Polynomial[Double]])
-    : (Polynomial[Double], Polynomial[Double]) = {
+    : (Polynomial[Double], Polynomial[Double]) =
     var total: (Polynomial[Double], Polynomial[Double]) = null
     var i = 0
     val len = data.length
     while (i < len) { total = data(0) /% data(i); i += 1 }
     total
-  }
 
   def timeAddSpireRationalPolysSparse(reps: Int) =
     run(reps)(addSpireRationalPolynomials(spireSparseRationalPolys))
@@ -223,4 +207,3 @@ class PolynomialBenchmarks extends MyBenchmark {
     run(reps)(quotModSpireDoublePolynomials(spireSparseDoublePolys))
   def timeQuotModSpireDoublePolysDense(reps: Int) =
     run(reps)(quotModSpireDoublePolynomials(spireDenseDoublePolys))
-}

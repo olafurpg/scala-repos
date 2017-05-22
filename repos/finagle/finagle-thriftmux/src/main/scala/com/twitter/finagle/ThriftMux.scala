@@ -47,7 +47,7 @@ import org.jboss.netty.buffer.ChannelBuffer
   */
 object ThriftMux
     extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient
-    with Server[Array[Byte], Array[Byte]] with ThriftRichServer {
+    with Server[Array[Byte], Array[Byte]] with ThriftRichServer
 
   /**
     * Base [[com.twitter.finagle.Stack]] for ThriftMux clients.
@@ -71,31 +71,27 @@ object ThriftMux
       .replace(StackServer.Role.preparer, Server.ExnHandler)
 
   private[this] def recordRpc(buffer: Array[Byte]): Unit =
-    try {
+    try
       val inputTransport = new TMemoryInputTransport(buffer)
       val iprot = protocolFactory.getProtocol(inputTransport)
       val msg = iprot.readMessageBegin()
       Trace.recordRpc(msg.name)
-    } catch {
+    catch
       case NonFatal(_) =>
-    }
 
-  private object ClientRpcTracing extends Mux.ClientProtoTracing {
-    private[this] val rpcTracer = new SimpleFilter[mux.Request, mux.Response] {
+  private object ClientRpcTracing extends Mux.ClientProtoTracing
+    private[this] val rpcTracer = new SimpleFilter[mux.Request, mux.Response]
       def apply(
           request: mux.Request,
           svc: Service[mux.Request, mux.Response]
-      ): Future[mux.Response] = {
+      ): Future[mux.Response] =
         // we're reasonably sure that this filter sits just after the ThriftClientRequest's
         // message array is wrapped by a ChannelBuffer
         recordRpc(Buf.ByteArray.Owned.extract(request.body))
         svc(request)
-      }
-    }
 
     override def make(next: ServiceFactory[mux.Request, mux.Response]) =
       rpcTracer andThen super.make(next)
-  }
 
   case class Client(
       muxer: StackClient[mux.Request, mux.Response] = Mux.client
@@ -106,7 +102,7 @@ object ThriftMux
       with CommonParams[Client] with ClientParams[Client]
       with WithClientTransport[Client] with WithClientAdmissionControl[Client]
       with WithSession[Client] with WithSessionQualifier[Client]
-      with WithDefaultLoadBalancer[Client] with ThriftRichClient {
+      with WithDefaultLoadBalancer[Client] with ThriftRichClient
 
     def stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
       muxer.stack
@@ -145,10 +141,10 @@ object ThriftMux
 
     private[this] object ThriftMuxToMux
         extends Filter[
-            ThriftClientRequest, Array[Byte], mux.Request, mux.Response] {
+            ThriftClientRequest, Array[Byte], mux.Request, mux.Response]
       def apply(
           req: ThriftClientRequest,
-          service: Service[mux.Request, mux.Response]): Future[Array[Byte]] = {
+          service: Service[mux.Request, mux.Response]): Future[Array[Byte]] =
         if (req.oneway)
           return Future.exception(
               new Exception("ThriftMux does not support one-way messages"))
@@ -156,17 +152,14 @@ object ThriftMux
         // We do a dance here to ensure that the proper ClientId is set when
         // `service` is applied because Mux relies on
         // com.twitter.finagle.thrift.ClientIdContext to propagate ClientIds.
-        ClientId.let(clientId) {
+        ClientId.let(clientId)
           // TODO set the Path here.
           val muxreq =
             mux.Request(Path.empty, Buf.ByteArray.Owned(req.message))
           service(muxreq).map(rep => Buf.ByteArray.Owned.extract(rep.body))
-        }
-      }
-    }
 
     private[this] def deserializingClassifier: StackClient[
-        mux.Request, mux.Response] = {
+        mux.Request, mux.Response] =
       // Note: what type of deserializer used is important if none is specified
       // so that we keep the prior behavior of Thrift exceptions
       // being counted as a success. Otherwise, even using the default
@@ -175,15 +168,13 @@ object ThriftMux
       // classifier is used to make when deserialization happens in the stack
       // uniform whether or not a `ResponseClassifier` is wired up.
       val classifier =
-        if (params.contains[param.ResponseClassifier]) {
+        if (params.contains[param.ResponseClassifier])
           ThriftMuxResponseClassifier.usingDeserializeCtx(
               params[param.ResponseClassifier].responseClassifier
           )
-        } else {
+        else
           ThriftMuxResponseClassifier.DeserializeCtxOnly
-        }
       muxer.configured(param.ResponseClassifier(classifier))
-    }
 
     def newService(
         dest: Name, label: String): Service[ThriftClientRequest, Array[Byte]] =
@@ -227,7 +218,6 @@ object ThriftMux
 
     override def configured[P](psp: (P, Stack.Param[P])): Client =
       super.configured(psp)
-  }
 
   val client: ThriftMux.Client =
     Client().configured(Label("thrift")).configured(Stats(ClientStatsReceiver))
@@ -288,22 +278,21 @@ object ThriftMux
   case class ServerMuxer(
       stack: Stack[ServiceFactory[mux.Request, mux.Response]] = BaseServerStack,
       params: Stack.Params = Mux.server.params + ProtocolLibrary("thriftmux"))
-      extends StdStackServer[mux.Request, mux.Response, ServerMuxer] {
+      extends StdStackServer[mux.Request, mux.Response, ServerMuxer]
 
     protected type In = ChannelBuffer
     protected type Out = ChannelBuffer
 
-    private[this] val muxStatsReceiver = {
+    private[this] val muxStatsReceiver =
       val Stats(statsReceiver) = params[Stats]
       statsReceiver.scope("mux")
-    }
 
     protected def copy1(
         stack: Stack[ServiceFactory[mux.Request, mux.Response]] = this.stack,
         params: Stack.Params = this.params
     ) = copy(stack, params)
 
-    protected def newListener(): Listener[In, Out] = {
+    protected def newListener(): Listener[In, Out] =
       val Stats(sr) = params[Stats]
       val scoped = sr.scope("thriftmux")
       val Thrift.param.ProtocolFactory(pf) =
@@ -311,7 +300,7 @@ object ThriftMux
 
       // Create a Listener with a pipeline that can downgrade the connection
       // to vanilla thrift.
-      new Listener[In, Out] {
+      new Listener[In, Out]
         private[this] val underlying = Netty3Listener[In, Out](
             new thriftmux.PipelineFactory(scoped, pf),
             params
@@ -320,13 +309,11 @@ object ThriftMux
         def listen(addr: SocketAddress)(
             serveTransport: Transport[In, Out] => Unit
         ): ListeningServer = underlying.listen(addr)(serveTransport)
-      }
-    }
 
     protected def newDispatcher(
         transport: Transport[In, Out],
         service: Service[mux.Request, mux.Response]
-    ): Closable = {
+    ): Closable =
       val param.Tracer(tracer) = params[param.Tracer]
 
       val negotiatedTrans = mux.Handshake.server(
@@ -341,64 +328,54 @@ object ThriftMux
           mux.lease.exp.ClockedDrainer.flagged,
           tracer,
           muxStatsReceiver)
-    }
-  }
 
   val serverMuxer = ServerMuxer()
 
-  object Server {
+  object Server
     private val MuxToArrayFilter =
-      new Filter[mux.Request, mux.Response, Array[Byte], Array[Byte]] {
+      new Filter[mux.Request, mux.Response, Array[Byte], Array[Byte]]
         def apply(
             request: mux.Request,
             service: Service[Array[Byte], Array[Byte]]
-        ): Future[mux.Response] = {
+        ): Future[mux.Response] =
           val reqBytes = Buf.ByteArray.Owned.extract(request.body)
-          service(reqBytes) map { repBytes =>
+          service(reqBytes) map  repBytes =>
             mux.Response(Buf.ByteArray.Owned(repBytes))
-          }
-        }
-      }
 
     private[this] class ExnFilter(protocolFactory: TProtocolFactory)
-        extends SimpleFilter[mux.Request, mux.Response] {
+        extends SimpleFilter[mux.Request, mux.Response]
       def apply(
           request: mux.Request,
           service: Service[mux.Request, mux.Response]
       ): Future[mux.Response] =
-        service(request).rescue {
+        service(request).rescue
           case e @ RetryPolicy.RetryableWriteException(_) =>
             Future.exception(e)
           case e if !e.isInstanceOf[TException] =>
             val msg = UncaughtAppExceptionFilter.writeExceptionMessage(
                 request.body, e, protocolFactory)
             Future.value(mux.Response(msg))
-        }
-    }
 
     private[ThriftMux] val ExnHandler =
       new Stack.Module1[Thrift.param.ProtocolFactory,
-                        ServiceFactory[mux.Request, mux.Response]] {
+                        ServiceFactory[mux.Request, mux.Response]]
         val role = Stack.Role("appExceptionHandling")
         val description =
           "Translates uncaught application exceptions into Thrift messages"
         def make(
             _pf: Thrift.param.ProtocolFactory,
             next: ServiceFactory[mux.Request, mux.Response]
-        ) = {
+        ) =
           val Thrift.param.ProtocolFactory(pf) = _pf
           val exnFilter = new ExnFilter(pf)
           exnFilter.andThen(next)
-        }
-      }
-  }
 
   case class Server(
       muxer: StackServer[mux.Request, mux.Response] = serverMuxer)
       extends StackBasedServer[Array[Byte], Array[Byte]] with ThriftRichServer
       with Stack.Parameterized[Server]
       with CommonParams[Server] with WithServerTransport[Server]
-      with WithServerAdmissionControl[Server] {
+      with WithServerAdmissionControl[Server]
 
     import Server.MuxToArrayFilter
 
@@ -438,22 +415,19 @@ object ThriftMux
       copy(muxer = muxer.withParams(ps))
 
     private[this] val tracingFilter =
-      new SimpleFilter[Array[Byte], Array[Byte]] {
+      new SimpleFilter[Array[Byte], Array[Byte]]
         def apply(
             request: Array[Byte],
-            svc: Service[Array[Byte], Array[Byte]]): Future[Array[Byte]] = {
+            svc: Service[Array[Byte], Array[Byte]]): Future[Array[Byte]] =
           recordRpc(request)
           svc(request)
-        }
-      }
 
     def serve(
         addr: SocketAddress,
         factory: ServiceFactory[Array[Byte], Array[Byte]]
-    ): ListeningServer = {
+    ): ListeningServer =
       muxer.serve(
           addr, MuxToArrayFilter.andThen(tracingFilter).andThen(factory))
-    }
 
     // Java-friendly forwarders
     // See https://issues.scala-lang.org/browse/SI-8905
@@ -476,7 +450,6 @@ object ThriftMux
 
     override def configured[P](psp: (P, Stack.Param[P])): Server =
       super.configured(psp)
-  }
 
   val server: Server =
     Server().configured(Label("thrift")).configured(Stats(ServerStatsReceiver))
@@ -486,4 +459,3 @@ object ThriftMux
       factory: ServiceFactory[Array[Byte], Array[Byte]]
   ): ListeningServer =
     server.serve(addr, factory)
-}

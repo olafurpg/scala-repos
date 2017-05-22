@@ -4,11 +4,10 @@ case class TypeClass(name: String,
                      kind: Kind,
                      pack: Seq[String] = Seq("scalaz"),
                      extendsList: Seq[TypeClass] = Seq(),
-                     createSyntax: Boolean = true) {
+                     createSyntax: Boolean = true)
   require(pack.head == "scalaz")
-  def syntaxPack = {
+  def syntaxPack =
     Seq("scalaz", "syntax") ++ pack.drop(1)
-  }
 
   def packageString0 = pack.map("package " + _).mkString("\n")
   def packageString = pack.mkString(".")
@@ -18,9 +17,8 @@ case class TypeClass(name: String,
     (if (extendsList.nonEmpty)
        " extends " +
        extendsList.map(tc => "[[" + tc.fqn + "]]").mkString(" with ") else "")
-}
 
-object TypeClass {
+object TypeClass
   import Kind._
 
   lazy val semigroup = TypeClass("Semigroup", *)
@@ -170,11 +168,10 @@ object TypeClass {
          bindRec)
   lazy val concurrent = Seq[TypeClass]()
   def effect = Seq(liftIO, monadIO, liftControlIO, monadControlIO, resource)
-}
 
 sealed abstract class Kind(val multipleParam: Boolean)
 
-object Kind {
+object Kind
 
   case object * extends Kind(false)
 
@@ -183,75 +180,65 @@ object Kind {
   case object *^*->* extends Kind(false)
 
   case object |*->*|->* extends Kind(true)
-}
 
 sealed trait FileStatus
 
-object FileStatus {
+object FileStatus
   case object NoChange extends FileStatus
   case object Updated extends FileStatus
   case object Created extends FileStatus
-}
 
-object GenTypeClass {
+object GenTypeClass
   val useDependentMethodTypes = true
 
   case class SourceFile(
-      packages: Seq[String], fileName: String, source: String) {
+      packages: Seq[String], fileName: String, source: String)
     def file(scalaSource: File): File =
       packages.foldLeft(scalaSource)((file, p) => file / p) / fileName
 
     def createOrUpdate(
-        scalaSource: File, log: Logger): (FileStatus, sbt.File) = {
+        scalaSource: File, log: Logger): (FileStatus, sbt.File) =
       val f = file(scalaSource)
       val (status, updatedSource) =
-        if (f.exists()) {
+        if (f.exists())
           val old = IO.read(f)
           val updated = updateSource(old)
-          if (updated == old) {
+          if (updated == old)
             log.debug("No changed %s".format(f))
             (FileStatus.NoChange, updated)
-          } else {
+          else
             log.info("Updating %s".format(f))
             (FileStatus.Updated, updated)
-          }
-        } else {
+        else
           log.info("Creating %s".format(f))
           (FileStatus.Created, source)
-        }
       log.debug("Contents: %s".format(updatedSource))
       IO.delete(f)
       IO.write(f, updatedSource)
       (status, f)
-    }
 
-    def updateSource(oldSource: String): String = {
+    def updateSource(oldSource: String): String =
       val delimiter = "////"
-      def parse(text: String): Seq[String] = {
+      def parse(text: String): Seq[String] =
         text.split(delimiter)
-      }
       val oldChunks: Seq[String] = parse(oldSource)
       val newChunks: Seq[String] = parse(source)
       if (oldChunks.length != newChunks.length)
         sys.error(
             "different number of chunks in old and new source: " + fileName)
 
-      val updatedChunks = for {
+      val updatedChunks = for
         ((o, n), i) <- oldChunks.zip(newChunks).zipWithIndex
-      } yield {
+      yield
         val useOld = i % 2 == 1
         if (useOld) o else n
-      }
       updatedChunks.mkString(delimiter)
-    }
-  }
 
   case class TypeClassSource(
-      mainFile: SourceFile, syntaxFile: Option[SourceFile]) {
+      mainFile: SourceFile, syntaxFile: Option[SourceFile])
     def sources: List[SourceFile] = mainFile :: syntaxFile.toList
-  }
 
-  def typeclassSource(tc: TypeClass): TypeClassSource = {
+  def typeclassSource(tc: TypeClass): TypeClassSource =
     val typeClassName = tc.name
     val kind = tc.kind
     val extendsList = tc.extendsList.toList.map(_.name)
@@ -269,39 +256,35 @@ object GenTypeClass {
               proChoice)(tc)) "=>:"
       else "F"
 
-    val typeShape: String = kind match {
+    val typeShape: String = kind match
       case Kind.* => ""
       case Kind.*->* => "[_]"
       case Kind.*^*->* => "[_, _]"
       case Kind.|*->*|->* => "[_], S"
-    }
     val classifiedType = classifiedTypeIdent + typeShape
 
     val classifiedTypeF = "F" + typeShape
 
     def extendsListText(suffix: String,
                         parents: Seq[String] = extendsList,
-                        cti: String = classifiedTypeIdent) = parents match {
+                        cti: String = classifiedTypeIdent) = parents match
       case Seq() => ""
       case es =>
         es.map(n => n + suffix + "[" + cti + "]")
           .mkString("extends ", " with ", "")
-    }
-    def extendsToSyntaxListText = kind match {
+    def extendsToSyntaxListText = kind match
       case Kind.*->* | Kind.*^*->* =>
         "extends To" + typeClassName + "Ops0" +
-        (extendsList match {
+        (extendsList match
               case Seq() => ""
               case es =>
                 es.map(n => "To" + n + "Ops").mkString(" with ", " with ", "")
-            })
+            )
       case _ =>
-        extendsList match {
+        extendsList match
           case Seq() => ""
           case es =>
             es.map(n => "To" + n + "Ops").mkString("extends ", " with ", "")
-        }
-    }
     val extendsLikeList = extendsListText("")
 
     val syntaxPackString =
@@ -310,20 +293,18 @@ object GenTypeClass {
        else "\n\n" + "import " + (tc.pack :+ tc.name).mkString("."))
     val syntaxPackString1 = tc.syntaxPack.mkString(".")
     val syntaxMember =
-      if (tc.createSyntax) {
-        if (kind.multipleParam) {
+      if (tc.createSyntax)
+        if (kind.multipleParam)
           s"  val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent, S] { def F = $typeClassName.this }"
-        } else {
+        else
           s"  val ${Util.initLower(typeClassName)}Syntax = new $syntaxPackString1.${typeClassName}Syntax[$classifiedTypeIdent] { def F = $typeClassName.this }"
-        }
-      } else ""
+      else ""
 
     val applyMethod =
-      if (kind.multipleParam) {
+      if (kind.multipleParam)
         s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F, S]): $typeClassName[F, S] = F"""
-      } else {
+      else
         s"""@inline def apply[$classifiedTypeF](implicit F: $typeClassName[F]): $typeClassName[F] = F"""
-      }
 
     val mainSource = s"""${tc.packageString0}
 
@@ -350,7 +331,7 @@ object $typeClassName {
     val mainSourceFile = SourceFile(
         tc.pack, typeClassName + ".scala", mainSource)
 
-    val syntaxSource = kind match {
+    val syntaxSource = kind match
       case Kind.* =>
         s"""$syntaxPackString
 
@@ -495,13 +476,10 @@ trait ${typeClassName}Syntax[F[_], S] ${extendsListText("Syntax", cti = "F")} {
   ////
 }
 """
-    }
     val syntaxSourceFile =
-      if (tc.createSyntax) {
+      if (tc.createSyntax)
         Some(SourceFile(
                 tc.syntaxPack, typeClassName + "Syntax.scala", syntaxSource))
-      } else None
+      else None
 
     TypeClassSource(mainSourceFile, syntaxSourceFile)
-  }
-}

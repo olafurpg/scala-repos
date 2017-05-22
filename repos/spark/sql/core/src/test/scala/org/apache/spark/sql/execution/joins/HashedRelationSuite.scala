@@ -27,14 +27,13 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{IntegerType, StructField, StructType}
 import org.apache.spark.util.collection.CompactBuffer
 
-class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
+class HashedRelationSuite extends SparkFunSuite with SharedSQLContext
 
   // Key is simply the record itself
-  private val keyProjection = new Projection {
+  private val keyProjection = new Projection
     override def apply(row: InternalRow): InternalRow = row
-  }
 
-  test("GeneralHashedRelation") {
+  test("GeneralHashedRelation")
     val data =
       Array(InternalRow(0), InternalRow(1), InternalRow(2), InternalRow(2))
     val hashed = HashedRelation(data.iterator, keyProjection)
@@ -47,9 +46,8 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     val data2 = CompactBuffer[InternalRow](data(2))
     data2 += data(2)
     assert(hashed.get(data(2)) === data2)
-  }
 
-  test("UniqueKeyHashedRelation") {
+  test("UniqueKeyHashedRelation")
     val data = Array(InternalRow(0), InternalRow(1), InternalRow(2))
     val hashed = HashedRelation(data.iterator, keyProjection)
     assert(hashed.isInstanceOf[UniqueKeyHashedRelation])
@@ -64,9 +62,8 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     assert(uniqHashed.getValue(data(1)) === data(1))
     assert(uniqHashed.getValue(data(2)) === data(2))
     assert(uniqHashed.getValue(InternalRow(10)) === null)
-  }
 
-  test("UnsafeHashedRelation") {
+  test("UnsafeHashedRelation")
     val schema = StructType(StructField("a", IntegerType, true) :: Nil)
     val data =
       Array(InternalRow(0), InternalRow(1), InternalRow(2), InternalRow(2))
@@ -109,9 +106,8 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     // This depends on that the order of items in BytesToBytesMap.iterator() is exactly the same
     // as they are inserted
     assert(java.util.Arrays.equals(os2.toByteArray, os.toByteArray))
-  }
 
-  test("test serialization empty hash map") {
+  test("test serialization empty hash map")
     val os = new ByteArrayOutputStream()
     val out = new ObjectOutputStream(os)
     val hashed = new UnsafeHashedRelation(
@@ -132,9 +128,8 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     hashed2.writeExternal(out2)
     out2.flush()
     assert(java.util.Arrays.equals(os2.toByteArray, os.toByteArray))
-  }
 
-  test("LongArrayRelation") {
+  test("LongArrayRelation")
     val unsafeProj =
       UnsafeProjection.create(Seq(BoundReference(0, IntegerType, false),
                                   BoundReference(1, IntegerType, true)))
@@ -144,11 +139,10 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     val longRelation = LongHashedRelation(rows.iterator, keyProj, 100)
     assert(longRelation.isInstanceOf[LongArrayRelation])
     val longArrayRelation = longRelation.asInstanceOf[LongArrayRelation]
-    (0 until 100).foreach { i =>
+    (0 until 100).foreach  i =>
       val row = longArrayRelation.getValue(i)
       assert(row.getInt(0) === i)
       assert(row.getInt(1) === i + 1)
-    }
 
     val os = new ByteArrayOutputStream()
     val out = new ObjectOutputStream(os)
@@ -157,10 +151,7 @@ class HashedRelationSuite extends SparkFunSuite with SharedSQLContext {
     val in = new ObjectInputStream(new ByteArrayInputStream(os.toByteArray))
     val relation = new LongArrayRelation()
     relation.readExternal(in)
-    (0 until 100).foreach { i =>
+    (0 until 100).foreach  i =>
       val row = longArrayRelation.getValue(i)
       assert(row.getInt(0) === i)
       assert(row.getInt(1) === i + 1)
-    }
-  }
-}

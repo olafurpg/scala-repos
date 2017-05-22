@@ -12,31 +12,29 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
   * User: Dmitry Naidanov
   * Date: 11/19/11
   */
-class ScalaDocParserErrorInspection extends LocalInspectionTool {
+class ScalaDocParserErrorInspection extends LocalInspectionTool
   override def isEnabledByDefault: Boolean = true
 
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
 
-    new ScalaElementVisitor {
-      override def visitDocComment(s: ScDocComment) {
+    new ScalaElementVisitor
+      override def visitDocComment(s: ScDocComment)
         visitScaladocElement(s)
-      }
 
-      override def visitScaladocElement(element: ScalaPsiElement) {
-        for (child <- element.getChildren) {
-          child match {
+      override def visitScaladocElement(element: ScalaPsiElement)
+        for (child <- element.getChildren)
+          child match
             case a: PsiErrorElement =>
               val startElement: PsiElement =
                 if (a.getPrevSibling == null) a else a.getPrevSibling
               val endElement: PsiElement =
-                if (a.getPrevSibling != null) {
+                if (a.getPrevSibling != null)
                   a
-                } else if (a.getNextSibling != null) {
+                else if (a.getNextSibling != null)
                   a.getNextSibling
-                } else {
+                else
                   a.getParent
-                }
               holder.registerProblem(
                   holder.getManager.createProblemDescriptor(
                       startElement,
@@ -47,9 +45,3 @@ class ScalaDocParserErrorInspection extends LocalInspectionTool {
             case b: ScalaPsiElement if b.getChildren.nonEmpty =>
               visitScaladocElement(b)
             case _ => //do nothing
-          }
-        }
-      }
-    }
-  }
-}

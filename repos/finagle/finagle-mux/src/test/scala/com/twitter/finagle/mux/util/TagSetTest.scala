@@ -5,9 +5,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TagSetTest extends FunSuite {
+class TagSetTest extends FunSuite
   val range = 0 until 10
-  test("assign contiguous, small tags in the range") {
+  test("assign contiguous, small tags in the range")
     val set = TagSet(range)
     for (i <- range) assert(set.acquire() == Some(i))
 
@@ -24,9 +24,8 @@ class TagSetTest extends FunSuite {
     assert(set.acquire() == Some(8))
 
     assert(set.acquire() == None)
-  }
 
-  test("iterate over current tags") {
+  test("iterate over current tags")
     val set = TagSet(range)
 
     for (i <- range) assert(set.acquire() == Some(i))
@@ -37,5 +36,3 @@ class TagSetTest extends FunSuite {
     assert(set.sameElements(range filter (_ != 2)))
     set.release(8)
     assert(set.sameElements(range filter (e => e != 2 && e != 8)))
-  }
-}

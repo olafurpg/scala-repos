@@ -43,17 +43,15 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 class ValueAxisSpec[T <: Number]
     extends SimpleSFXDelegateSpec[jfxsc.ValueAxis[T], ValueAxis[T]](
         classOf[jfxsc.ValueAxis[T]], classOf[ValueAxis[T]])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override def getScalaClassInstance =
     new ValueAxis[T](getJavaClassInstance) {}
 
-  override def getJavaClassInstance = new jfxsc.ValueAxis[T] {
+  override def getJavaClassInstance = new jfxsc.ValueAxis[T]
     protected def calculateMinorTickMarks = new java.util.ArrayList[T]
     protected def calculateTickValues(length: Double, range: Any) =
       new java.util.ArrayList[T]
     protected def getRange = null
     protected def getTickMarkLabel(value: T) = ""
     protected def setRange(range: Any, animate: Boolean) {}
-  }
-}

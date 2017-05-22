@@ -12,10 +12,10 @@ import org.jetbrains.plugins.scala.extensions._
   * User: Dmitry Naydanov
   * Date: 12/9/11
   */
-class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
+class ScalaDocCompletionTest extends ScalaCodeInsightTestBase
   protected def genericCompletionComparison(initialText: String,
                                             finalText: String,
-                                            filter: LookupElement => Boolean) {
+                                            filter: LookupElement => Boolean)
     val fileText = initialText.stripMargin('|').replaceAll("\r", "").trim()
     val resultText = finalText.stripMargin('|').replaceAll("\r", "").trim()
 
@@ -24,17 +24,15 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
 
     completeLookupItem(activeLookup.find(cv => filter(cv)).get)
     checkResultByText(resultText)
-  }
 
   protected def genericCompletionComprasion(
-      initialText: String, finalText: String, preferedLookupString: String) {
+      initialText: String, finalText: String, preferedLookupString: String)
     genericCompletionComparison(
         initialText,
         finalText,
         (le: LookupElement) => le.getLookupString == preferedLookupString)
-  }
 
-  def testTagNameCompletion() {
+  def testTagNameCompletion()
     genericCompletionComprasion(
         """
       | /**
@@ -50,9 +48,8 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       """,
         "param"
     )
-  }
 
-  def testTagValueCompletion() {
+  def testTagValueCompletion()
     genericCompletionComprasion(
         """
       | /**
@@ -68,9 +65,8 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       """,
         "param"
     )
-  }
 
-  def testLinkCodeCompletion() {
+  def testLinkCodeCompletion()
     genericCompletionComparison(
         """
       | /**
@@ -87,9 +83,8 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
         (al: LookupElement) =>
           al.getObject.asInstanceOf[PsiClass].qualifiedName == "java.util.HashMap"
     )
-  }
 
-  def testTagValueFilteredCompletion() {
+  def testTagValueFilteredCompletion()
     genericCompletionComprasion(
         """
       |/**
@@ -107,5 +102,3 @@ class ScalaDocCompletionTest extends ScalaCodeInsightTestBase {
       """,
         "ikk"
     )
-  }
-}

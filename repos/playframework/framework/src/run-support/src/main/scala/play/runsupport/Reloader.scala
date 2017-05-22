@@ -12,7 +12,7 @@ import play.core.{Build, BuildLink, BuildDocHandler}
 import play.runsupport.classloader.{ApplicationClassLoaderProvider, DelegatingClassLoader}
 import sbt._
 
-object Reloader {
+object Reloader
 
   sealed trait CompileResult
   case class CompileSuccess(sources: SourceMap, classpath: Classpath)
@@ -33,44 +33,38 @@ object Reloader {
   /**
     * Execute f with context ClassLoader of Reloader
     */
-  private def withReloaderContextClassLoader[T](f: => T): T = {
+  private def withReloaderContextClassLoader[T](f: => T): T =
     val thread = Thread.currentThread
     val oldLoader = thread.getContextClassLoader
     // we use accessControlContext & AccessController to avoid a ClassLoader leak (ProtectionDomain class)
-    AccessController.doPrivileged(new PrivilegedAction[T]() {
-      def run: T = {
-        try {
+    AccessController.doPrivileged(new PrivilegedAction[T]()
+      def run: T =
+        try
           thread.setContextClassLoader(classOf[Reloader].getClassLoader)
           f
-        } finally {
+        finally
           thread.setContextClassLoader(oldLoader)
-        }
-      }
-    }, accessControlContext)
-  }
+    , accessControlContext)
 
   /**
     * Take all the options in javaOptions of the format "-Dfoo=bar" and return them as a Seq of key value pairs of the format ("foo" -> "bar")
     */
   def extractSystemProperties(
-      javaOptions: Seq[String]): Seq[(String, String)] = {
+      javaOptions: Seq[String]): Seq[(String, String)] =
     javaOptions.collect { case SystemProperty(key, value) => key -> value }
-  }
 
-  def parsePort(portString: String): Int = {
-    try {
+  def parsePort(portString: String): Int =
+    try
       Integer.parseInt(portString)
-    } catch {
+    catch
       case e: NumberFormatException =>
         sys.error("Invalid port argument: " + portString)
-    }
-  }
 
   def filterArgs(args: Seq[String],
                  defaultHttpPort: Int,
                  defaultHttpAddress: String,
                  devSettings: Seq[(String, String)])
-    : (Seq[(String, String)], Option[Int], Option[Int], String) = {
+    : (Seq[(String, String)], Option[Int], Option[Int], String) =
     val (propertyArgs, otherArgs) = args.partition(_.startsWith("-D"))
 
     val properties =
@@ -81,13 +75,11 @@ object Reloader {
       props.get(key) orElse sys.props.get(key)
 
     def parsePortValue(portValue: Option[String],
-                       defaultValue: Option[Int] = None): Option[Int] = {
-      portValue match {
+                       defaultValue: Option[Int] = None): Option[Int] =
+      portValue match
         case None => defaultValue
         case Some("disabled") => None
         case Some(s) => Some(parsePort(s))
-      }
-    }
 
     // http port can be defined as the first non-property argument, or a -Dhttp.port argument or system property
     // the http port can be disabled (set to None) by setting any of the input methods to "disabled"
@@ -109,7 +101,6 @@ object Reloader {
           "play.server.http.address") getOrElse defaultHttpAddress
 
     (properties, httpPort, httpsPort, httpAddress)
-  }
 
   def urls(cp: Classpath): Array[URL] = cp.map(_.toURI.toURL).toArray
 
@@ -123,26 +114,22 @@ object Reloader {
       parent: ClassLoader): ClassLoader =
     new AssetsClassLoader(parent, allAssets)
 
-  def commonClassLoader(classpath: Classpath) = {
-    lazy val commonJars: PartialFunction[java.io.File, java.net.URL] = {
+  def commonClassLoader(classpath: Classpath) =
+    lazy val commonJars: PartialFunction[java.io.File, java.net.URL] =
       case jar if jar.getName.startsWith("h2-") || jar.getName == "h2.jar" =>
         jar.toURI.toURL
-    }
 
     new java.net.URLClassLoader(
         classpath.collect(commonJars).toArray,
-        null /* important here, don't depend of the sbt classLoader! */ ) {
+        null /* important here, don't depend of the sbt classLoader! */ )
       override def toString =
         "Common ClassLoader: " + getURLs.map(_.toString).mkString(",")
-    }
-  }
 
   /**
     * Play dev server
     */
-  trait PlayDevServer extends Closeable {
+  trait PlayDevServer extends Closeable
     val buildLink: BuildLink
-  }
 
   /**
     * Start the Play server in dev mode
@@ -167,7 +154,7 @@ object Reloader {
                    devSettings: Seq[(String, String)],
                    args: Seq[String],
                    runSbtTask: String => AnyRef,
-                   mainClassName: String): PlayDevServer = {
+                   mainClassName: String): PlayDevServer =
 
     val (properties, httpPort, httpsPort, httpAddress) = filterArgs(
         args, defaultHttpPort, defaultHttpAddress, devSettings)
@@ -177,9 +164,8 @@ object Reloader {
             "You have to specify https.port when http.port is disabled")
 
     // Set Java properties
-    (properties ++ systemProperties).foreach {
+    (properties ++ systemProperties).foreach
       case (key, value) => System.setProperty(key, value)
-    }
 
     println()
 
@@ -236,9 +222,9 @@ object Reloader {
         commonClassLoader,
         Build.sharedClasses,
         buildLoader,
-        new ApplicationClassLoaderProvider {
+        new ApplicationClassLoaderProvider
           def get: ClassLoader = { reloader.getClassLoader.orNull }
-        })
+        )
 
     lazy val applicationLoader = dependencyClassLoader(
         "PlayDependencyClassLoader",
@@ -255,7 +241,7 @@ object Reloader {
                                      fileWatchService,
                                      runSbtTask)
 
-    try {
+    try
       // Now we're about to start, let's call the hooks:
       runHooks.run(_.beforeStarted())
 
@@ -264,12 +250,11 @@ object Reloader {
       val docsLoader = new URLClassLoader(
           urls(docsClasspath), applicationLoader)
       val maybeDocsJarFile =
-        docsJar map { f =>
+        docsJar map  f =>
           new JarFile(f)
-        }
       val docHandlerFactoryClass =
         docsLoader.loadClass("play.docs.BuildDocHandlerFactory")
-      val buildDocHandler = maybeDocsJarFile match {
+      val buildDocHandler = maybeDocsJarFile match
         case Some(docsJarFile) =>
           val factoryMethod = docHandlerFactoryClass.getMethod(
               "fromJar", classOf[JarFile], classOf[String])
@@ -279,11 +264,10 @@ object Reloader {
         case None =>
           val factoryMethod = docHandlerFactoryClass.getMethod("empty")
           factoryMethod.invoke(null).asInstanceOf[BuildDocHandler]
-      }
 
-      val server = {
+      val server =
         val mainClass = applicationLoader.loadClass(mainClassName)
-        if (httpPort.isDefined) {
+        if (httpPort.isDefined)
           val mainDev = mainClass.getMethod("mainDevHttpMode",
                                             classOf[BuildLink],
                                             classOf[BuildDocHandler],
@@ -296,7 +280,7 @@ object Reloader {
                     httpPort.get: java.lang.Integer,
                     httpAddress)
             .asInstanceOf[play.core.server.ServerWithStop]
-        } else {
+        else
           val mainDev = mainClass.getMethod("mainDevOnlyHttpsMode",
                                             classOf[BuildLink],
                                             classOf[BuildDocHandler],
@@ -309,16 +293,14 @@ object Reloader {
                     httpsPort.get: java.lang.Integer,
                     httpAddress)
             .asInstanceOf[play.core.server.ServerWithStop]
-        }
-      }
 
       // Notify hooks
       runHooks.run(_.afterStarted(server.mainAddress))
 
-      new PlayDevServer {
+      new PlayDevServer
         val buildLink = reloader
 
-        def close() = {
+        def close() =
           server.stop()
           maybeDocsJarFile.foreach(_.close())
           reloader.close()
@@ -327,32 +309,23 @@ object Reloader {
           runHooks.run(_.afterStopped())
 
           // Remove Java properties
-          properties.foreach {
+          properties.foreach
             case (key, _) => System.clearProperty(key)
-          }
-        }
-      }
-    } catch {
+    catch
       case e: Throwable =>
         // Let hooks clean up
-        runHooks.foreach { hook =>
-          try {
+        runHooks.foreach  hook =>
+          try
             hook.onError()
-          } catch {
+          catch
             case e: Throwable =>
             // Swallow any exceptions so that all `onError`s get called.
-          }
-        }
         // Convert play-server exceptions to our to our ServerStartException
         def getRootCause(t: Throwable): Throwable =
           if (t.getCause == null) t else getRootCause(t.getCause)
-        if (getRootCause(e).getClass.getName == "play.core.server.ServerListenException") {
+        if (getRootCause(e).getClass.getName == "play.core.server.ServerListenException")
           throw new ServerStartException(e)
-        }
         throw e
-    }
-  }
-}
 
 import Reloader.{CompileResult, CompileSuccess, CompileFailure}
 import Reloader.{ClassLoaderCreator, SourceMap}
@@ -365,7 +338,7 @@ class Reloader(reloadCompile: () => CompileResult,
                monitoredFiles: Seq[File],
                fileWatchService: FileWatchService,
                runSbtTask: String => AnyRef)
-    extends BuildLink {
+    extends BuildLink
 
   // The current classloader for the application
   @volatile private var currentApplicationClassLoader: Option[ClassLoader] =
@@ -385,9 +358,8 @@ class Reloader(reloadCompile: () => CompileResult,
   // Create the watcher, updates the changed boolean when a file has changed.
   private val watcher = fileWatchService.watch(monitoredFiles,
                                                () =>
-                                                 {
                                                    changed = true
-                                               })
+                                               )
   private val classLoaderVersion =
     new java.util.concurrent.atomic.AtomicInteger(0)
 
@@ -403,10 +375,10 @@ class Reloader(reloadCompile: () => CompileResult,
     * - ClassLoader - If the classloader has changed, and the application should be reloaded.
     * - null - If nothing changed.
     */
-  def reload: AnyRef = {
-    Reloader.synchronized {
+  def reload: AnyRef =
+    Reloader.synchronized
       if (changed || forceReloadNextTime || currentSourceMap.isEmpty ||
-          currentApplicationClassLoader.isEmpty) {
+          currentApplicationClassLoader.isEmpty)
 
         val shouldReload = forceReloadNextTime
 
@@ -414,9 +386,9 @@ class Reloader(reloadCompile: () => CompileResult,
         forceReloadNextTime = false
 
         // use Reloader context ClassLoader to avoid ClassLoader leaks in sbt/scala-compiler threads
-        Reloader.withReloaderContextClassLoader {
+        Reloader.withReloaderContextClassLoader
           // Run the reload task, which will trigger everything to compile
-          reloadCompile() match {
+          reloadCompile() match
             case CompileFailure(exception) =>
               // We force reload next time because compilation failed this time
               forceReloadNextTime = true
@@ -435,7 +407,7 @@ class Reloader(reloadCompile: () => CompileResult,
               watchState = newState
 
               if (triggered || shouldReload ||
-                  currentApplicationClassLoader.isEmpty) {
+                  currentApplicationClassLoader.isEmpty)
                 // Create a new classloader
                 val version = classLoaderVersion.incrementAndGet
                 val name = "ReloadableClassLoader(v" + version + ")"
@@ -443,43 +415,31 @@ class Reloader(reloadCompile: () => CompileResult,
                 val loader = createClassLoader(name, urls, baseLoader)
                 currentApplicationClassLoader = Some(loader)
                 loader
-              } else {
+              else
                 null // null means nothing changed
-              }
-          }
-        }
-      } else {
+      else
         null // null means nothing changed
-      }
-    }
-  }
 
-  lazy val settings = {
+  lazy val settings =
     import scala.collection.JavaConverters._
     devSettings.toMap.asJava
-  }
 
-  def forceReload() {
+  def forceReload()
     forceReloadNextTime = true
-  }
 
   def findSource(
-      className: String, line: java.lang.Integer): Array[java.lang.Object] = {
+      className: String, line: java.lang.Integer): Array[java.lang.Object] =
     val topType = className.split('$').head
-    currentSourceMap.flatMap { sources =>
-      sources.get(topType).map { source =>
+    currentSourceMap.flatMap  sources =>
+      sources.get(topType).map  source =>
         Array[java.lang.Object](source.original.getOrElse(source.file), line)
-      }
-    }.orNull
-  }
+    .orNull
 
   def runTask(task: String): AnyRef = runSbtTask(task)
 
-  def close() = {
+  def close() =
     currentApplicationClassLoader = None
     currentSourceMap = None
     watcher.stop()
-  }
 
   def getClassLoader = currentApplicationClassLoader
-}

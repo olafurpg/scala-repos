@@ -24,50 +24,42 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext
 class ScValueDeclarationImpl private (
     stub: StubElement[ScValue], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScValueDeclaration {
+    with ScValueDeclaration
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScValueStub) = {
+  def this(stub: ScValueStub) =
     this(stub, ScalaElementTypes.VALUE_DECLARATION, null)
-  }
 
   override def toString: String =
     "ScValueDeclaration: " + declaredElements.map(_.name).mkString(", ")
 
   def declaredElements = getIdList.fieldIds
 
-  override def getType(ctx: TypingContext) = typeElement match {
+  override def getType(ctx: TypingContext) = typeElement match
     case None =>
       Failure(
           ScalaBundle.message("no.type.element.found", getText), Some(this))
     case Some(te) => te.getType(ctx)
-  }
 
-  def typeElement: Option[ScTypeElement] = {
+  def typeElement: Option[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScValueStub].getTypeElement
-    } else findChild(classOf[ScTypeElement])
-  }
+    else findChild(classOf[ScTypeElement])
 
-  def getIdList: ScIdList = {
+  def getIdList: ScIdList =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub
         .getChildrenByType(ScalaElementTypes.IDENTIFIER_LIST,
                            JavaArrayFactoryUtil.ScIdListFactory)
         .apply(0)
-    } else findChildByClass(classOf[ScIdList])
-  }
+    else findChildByClass(classOf[ScIdList])
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitValueDeclaration(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitValueDeclaration(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

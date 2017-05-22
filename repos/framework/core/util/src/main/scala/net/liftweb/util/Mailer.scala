@@ -33,7 +33,7 @@ import Mailer._
 /**
   * Utilities for sending email.
   */
-object Mailer extends Mailer {
+object Mailer extends Mailer
 
   sealed abstract class MailTypes
 
@@ -65,10 +65,9 @@ object Mailer extends Mailer {
       extends MailBodyType
 
   sealed abstract class RoutingType extends MailTypes
-  sealed abstract class AddressType extends RoutingType {
+  sealed abstract class AddressType extends RoutingType
     def address: String
     def name: Box[String]
-  }
   final case class From(address: String, name: Box[String] = Empty)
       extends AddressType
   final case class To(address: String, name: Box[String] = Empty)
@@ -83,25 +82,22 @@ object Mailer extends Mailer {
 
   final case class MessageInfo(
       from: From, subject: Subject, info: List[MailTypes])
-}
 
 /**
   * This trait implmenets the mail sending.  You can create subclasses of this class/trait and
   * implement your own mailer functionality
   */
-trait Mailer extends SimpleInjector {
+trait Mailer extends SimpleInjector
   private val logger = Logger(classOf[Mailer])
 
   implicit def xmlToMailBodyType(html: NodeSeq): MailBodyType =
     XHTMLMailBodyType(html)
 
-  implicit def addressToAddress(in: AddressType): Address = {
+  implicit def addressToAddress(in: AddressType): Address =
     val ret = new InternetAddress(in.address)
-    in.name.foreach { n =>
+    in.name.foreach  n =>
       ret.setPersonal(n)
-    }
     ret
-  }
 
   implicit def adListToAdArray(in: List[AddressType]): Array[Address] =
     in.map(addressToAddress).toArray
@@ -123,25 +119,23 @@ trait Mailer extends SimpleInjector {
     */
   var customProperties: Map[String, String] = Map()
 
-  lazy val jndiSession: Box[Session] = for {
+  lazy val jndiSession: Box[Session] = for
     name <- jndiName
     contextObj <- Helpers.tryo(new InitialContext().lookup("java:comp/env"))
     context <- Box.asA[Context](contextObj)
     sessionObj <- Helpers.tryo(context.lookup(name))
     session <- Box.asA[Session](sessionObj)
-  } yield session
+  yield session
 
-  lazy val properties: Properties = {
+  lazy val properties: Properties =
     val p = System.getProperties.clone.asInstanceOf[Properties]
     customProperties.foreach { case (name, value) => p.put(name, value) }
     // allow the properties file to set/override system properties
 
-    Props.props.foreach {
+    Props.props.foreach
       case (name, value) =>
         p.setProperty(name, value)
-    }
     p
-  }
 
   /**
     * The host that should be used to send mail.
@@ -154,54 +148,46 @@ trait Mailer extends SimpleInjector {
     */
   var hostFunc: () => String = _host _
 
-  private def _host = properties.getProperty("mail.smtp.host") match {
+  private def _host = properties.getProperty("mail.smtp.host") match
     case null => "localhost"
     case s => s
-  }
 
-  def buildProps: Properties = {
+  def buildProps: Properties =
     val p = properties.clone.asInstanceOf[Properties]
-    p.getProperty("mail.smtp.host") match {
+    p.getProperty("mail.smtp.host") match
       case null => p.put("mail.smtp.host", host)
       case _ =>
-    }
 
     p
-  }
 
   /**
     * Set the mail.charset property to something other than UTF-8 for non-UTF-8
     * mail.
     */
-  lazy val charSet = properties.getProperty("mail.charset") match {
+  lazy val charSet = properties.getProperty("mail.charset") match
     case null => "UTF-8"
     case x => x
-  }
 
   // def host_=(hostname: String) = System.setProperty("mail.smtp.host", hostname)
 
-  protected class MsgSender extends SpecializedLiftActor[MessageInfo] {
-    protected def messageHandler = {
+  protected class MsgSender extends SpecializedLiftActor[MessageInfo]
+    protected def messageHandler =
       case MessageInfo(from, subject, info) =>
-        try {
+        try
           msgSendImpl(from, subject, info)
-        } catch {
+        catch
           case e: Exception => logger.error("Couldn't send mail", e)
-        }
-    }
-  }
 
-  protected def performTransportSend(msg: MimeMessage) = {
+  protected def performTransportSend(msg: MimeMessage) =
     import Props.RunModes._
-    (Props.mode match {
+    (Props.mode match
       case Development => devModeSend.vend
       case Test => testModeSend.vend
       case Staging => stagingModeSend.vend
       case Production => productionModeSend.vend
       case Pilot => pilotModeSend.vend
       case Profile => profileModeSend.vend
-    }).apply(msg)
-  }
+    ).apply(msg)
 
   /**
     * How to send a message in dev mode.  By default, use Transport.send(msg)
@@ -243,61 +229,54 @@ trait Mailer extends SimpleInjector {
   /**
     * Synchronously send an email.
     */
-  def blockingSendMail(from: From, subject: Subject, rest: MailTypes*) {
+  def blockingSendMail(from: From, subject: Subject, rest: MailTypes*)
     msgSendImpl(from, subject, rest.toList)
-  }
 
-  def msgSendImpl(from: From, subject: Subject, info: List[MailTypes]) {
-    val session = authenticator match {
+  def msgSendImpl(from: From, subject: Subject, info: List[MailTypes])
+    val session = authenticator match
       case Full(a) => jndiSession openOr Session.getInstance(buildProps, a)
       case _ => jndiSession openOr Session.getInstance(buildProps)
-    }
     val subj = MimeUtility.encodeText(subject.subject, "utf-8", "Q")
     val message = new MimeMessage(session)
     message.setFrom(from)
-    message.setRecipients(Message.RecipientType.TO, info.flatMap {
+    message.setRecipients(Message.RecipientType.TO, info.flatMap
       case x: To => Some[To](x)
       case _ => None
-    })
-    message.setRecipients(Message.RecipientType.CC, info.flatMap {
+    )
+    message.setRecipients(Message.RecipientType.CC, info.flatMap
       case x: CC => Some[CC](x)
       case _ => None
-    })
-    message.setRecipients(Message.RecipientType.BCC, info.flatMap {
+    )
+    message.setRecipients(Message.RecipientType.BCC, info.flatMap
       case x: BCC => Some[BCC](x)
       case _ => None
-    })
+    )
     message.setSentDate(new java.util.Date())
     // message.setReplyTo(filter[MailTypes, ReplyTo](info, {case x @ ReplyTo(_) => Some(x); case _ => None}))
     message.setReplyTo(
-        info.flatMap {
+        info.flatMap
       case x: ReplyTo => Some[ReplyTo](x)
       case _ => None
-    })
+    )
     message.setSubject(subj)
-    info.foreach {
+    info.foreach
       case MessageHeader(name, value) => message.addHeader(name, value)
       case _ =>
-    }
 
-    val bodyTypes = info.flatMap {
+    val bodyTypes = info.flatMap
       case x: MailBodyType => Some[MailBodyType](x); case _ => None
-    }
-    bodyTypes match {
+    bodyTypes match
       case PlainMailBodyType(txt) :: Nil =>
         message.setText(txt)
 
       case _ =>
         val multiPart = new MimeMultipart("alternative")
-        bodyTypes.foreach { tab =>
+        bodyTypes.foreach  tab =>
           val bp = buildMailBody(tab)
           multiPart.addBodyPart(bp)
-        }
         message.setContent(multiPart);
-    }
 
     Mailer.this.performTransportSend(message)
-  }
 
   protected lazy val msgSender = new MsgSender
 
@@ -307,25 +286,23 @@ trait Mailer extends SimpleInjector {
   protected def encodeHtmlBodyPart(in: NodeSeq): String =
     Html5.toString(firstNode(in))
 
-  protected def firstNode(in: NodeSeq): Node = in match {
+  protected def firstNode(in: NodeSeq): Node = in match
     case n: Node => n
     case ns =>
-      ns.toList.collect {
+      ns.toList.collect
         case e: Elem => e
-      } match {
+      match
         case Nil => if (ns.length == 0) Text("") else ns(0)
         case x :: xs => x
-      }
-  }
 
   /**
     * Given a MailBodyType, convert it to a javax.mail.BodyPart.  You can override this method if you
     * add custom MailBodyTypes
     */
-  protected def buildMailBody(tab: MailBodyType): BodyPart = {
+  protected def buildMailBody(tab: MailBodyType): BodyPart =
     val bp = new MimeBodyPart
 
-    tab match {
+    tab match
       case PlainMailBodyType(txt) =>
         bp.setText(txt, "UTF-8")
 
@@ -345,13 +322,12 @@ trait Mailer extends SimpleInjector {
             encodeHtmlBodyPart(html), "text/html; charset=" + charSet)
         relatedMultipart.addBodyPart(htmlBodyPart)
 
-        images.foreach { image =>
+        images.foreach  image =>
           relatedMultipart.addBodyPart(buildAttachment(image))
-        }
 
-        if (attachments.isEmpty) {
+        if (attachments.isEmpty)
           bp.setContent(relatedMultipart)
-        } else {
+        else
           // Some old versions of Exchange server will not behave correclty without
           // a mixed multipart wrapping file attachments. This appears to be linked to
           // specific versions of Exchange and Outlook. See the discussion at
@@ -362,18 +338,14 @@ trait Mailer extends SimpleInjector {
           relatedMultipartBodypart.setContent(relatedMultipart)
           mixedMultipart.addBodyPart(relatedMultipartBodypart)
 
-          attachments.foreach { attachment =>
+          attachments.foreach  attachment =>
             mixedMultipart.addBodyPart(buildAttachment(attachment))
-          }
 
           bp.setContent(mixedMultipart)
-        }
-    }
 
     bp
-  }
 
-  private def buildAttachment(holder: PlusImageHolder) = {
+  private def buildAttachment(holder: PlusImageHolder) =
     val part = new MimeBodyPart
 
     part.setFileName(holder.name)
@@ -381,22 +353,19 @@ trait Mailer extends SimpleInjector {
     part.setDisposition(
         if (holder.attachment) Part.ATTACHMENT else Part.INLINE)
     part.setDataHandler(
-        new javax.activation.DataHandler(new javax.activation.DataSource {
+        new javax.activation.DataHandler(new javax.activation.DataSource
       def getContentType = holder.mimeType
       def getInputStream = new java.io.ByteArrayInputStream(holder.bytes)
       def getName = holder.name
       def getOutputStream =
         throw new java.io.IOException("Unable to write to item")
-    }))
+    ))
 
     part
-  }
 
   /**
     * Asynchronously send an email.
     */
-  def sendMail(from: From, subject: Subject, rest: MailTypes*) {
+  def sendMail(from: From, subject: Subject, rest: MailTypes*)
     // forward it to an actor so there's no time on this thread spent sending the message
     msgSender ! MessageInfo(from, subject, rest.toList)
-  }
-}

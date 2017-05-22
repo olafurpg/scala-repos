@@ -36,7 +36,7 @@ import java.util
   *
   */
 final class Well1024a protected[random](state: Array[Int], i0: Int)
-    extends IntBasedGenerator {
+    extends IntBasedGenerator
 
   import Well1024a.{R, R_1, BYTES, M1, M2, M3, mat0pos, mat0neg}
 
@@ -52,29 +52,25 @@ final class Well1024a protected[random](state: Array[Int], i0: Int)
 
   def copyInit: Well1024a = new Well1024a(state.clone(), i)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes(): Array[Byte] =
     val bytes: Array[Byte] = new Array[Byte](BYTES)
     val bb: ByteBuffer = ByteBuffer.wrap(bytes)
 
-    cfor(0)(_ < R, _ + 1) { i =>
+    cfor(0)(_ < R, _ + 1)  i =>
       bb.putInt(state(i))
-    }
     bb.putInt(i)
     bytes
-  }
 
-  def setSeedBytes(bytes: Array[Byte]): Unit = {
+  def setSeedBytes(bytes: Array[Byte]): Unit =
     val bs: Array[Byte] =
       if (bytes.length < BYTES) util.Arrays.copyOf(bytes, BYTES) else bytes
     val bb: ByteBuffer = ByteBuffer.wrap(bs)
 
-    cfor(0)(_ < R, _ + 1) { i =>
+    cfor(0)(_ < R, _ + 1)  i =>
       state(i) = bb.getInt
-    }
     i = bb.getInt
-  }
 
-  def nextInt(): Int = {
+  def nextInt(): Int =
 
     @inline def map(r: Int): Int = (i + r) & R_1
 
@@ -95,10 +91,8 @@ final class Well1024a protected[random](state: Array[Int], i0: Int)
     // i = (i + R_1) & R_1
 
     state(i)
-  }
-}
 
-object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
+object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)]
 
   // Number of bits in the pool.
   @inline private final val K: Int = 1024
@@ -128,11 +122,10 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
     (Utils.seedFromInt(R, Utils.intFromTime()), 0)
 
   def fromSeed(seed: (Array[Int], Int)): Well1024a =
-    seed match {
+    seed match
       case (state, stateIndex) =>
         assert(state.length == R)
         new Well1024a(state, stateIndex)
-    }
 
   def fromArray(arr: Array[Int]): Well1024a =
     fromSeed((Utils.seedFromArray(R, arr), 0))
@@ -142,4 +135,3 @@ object Well1024a extends GeneratorCompanion[Well1024a, (Array[Int], Int)] {
 
   def fromTime(time: Long = System.nanoTime): Well1024a =
     fromSeed((Utils.seedFromInt(R, Utils.intFromTime(time)), 0))
-}

@@ -1,4 +1,4 @@
-object test {
+object test
   def bug(x: Any) = x
 
   def go() =
@@ -28,4 +28,3 @@ object test {
         "a",
         "a",
         "a")
-}

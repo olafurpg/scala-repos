@@ -5,7 +5,7 @@ import play.api.libs.json._
 import reactivemongo.bson._
 import Types._
 
-object $update {
+object $update
   import play.modules.reactivemongo.json._
 
   def apply[ID : Writes, A <: Identified[ID]: JsTubeInColl](doc: A): Funit =
@@ -25,15 +25,13 @@ object $update {
 
   def doc[ID : Writes, A <: Identified[ID]: TubeInColl](id: ID)(
       op: A => JsObject): Funit =
-    $find byId id flatten "[db] cannot update missing doc" flatMap { doc =>
+    $find byId id flatten "[db] cannot update missing doc" flatMap  doc =>
       apply($select(id), op(doc))
-    }
 
   def docBson[ID : Writes, A <: Identified[ID]: TubeInColl](id: ID)(
       op: A => BSONDocument): Funit =
-    $find byId id flatten "[db] cannot update missing doc" flatMap { doc =>
+    $find byId id flatten "[db] cannot update missing doc" flatMap  doc =>
       apply($select(id), op(doc))
-    }
 
   def field[ID : Writes, A : InColl, B : Writes](
       id: ID, name: String, value: B, upsert: Boolean = false): Funit =
@@ -50,13 +48,10 @@ object $update {
   def unchecked[A : InColl, B : BSONDocumentWriter](selector: JsObject,
                                                     update: B,
                                                     upsert: Boolean = false,
-                                                    multi: Boolean = false) {
+                                                    multi: Boolean = false)
     implicitly[InColl[A]].coll
       .uncheckedUpdate(selector, update, upsert = upsert, multi = multi)
-  }
 
   def fieldUnchecked[ID : Writes, A : InColl, B : Writes](
-      id: ID, name: String, value: B, upsert: Boolean = false) {
+      id: ID, name: String, value: B, upsert: Boolean = false)
     unchecked($select(id), $set(name -> value), upsert = upsert)
-  }
-}

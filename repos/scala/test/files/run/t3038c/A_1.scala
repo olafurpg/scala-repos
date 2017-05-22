@@ -1,4 +1,4 @@
-class A {
+class A
   lazy val a0 = 1
   lazy val a1 = 2
   lazy val a2 = 3
@@ -70,7 +70,7 @@ class A {
   private lazy val a68 = 69
   private lazy val a69 = 70
 
-  def run = {
+  def run =
     println(
         List(a0,
              a1,
@@ -142,5 +142,3 @@ class A {
              a67,
              a68,
              a69))
-  }
-}

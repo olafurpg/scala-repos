@@ -4,7 +4,7 @@ import com.intellij.json.JsonFileType
 import com.intellij.lang.properties.PropertiesFileType
 import org.jetbrains.plugins.hocon.lang.HoconFileType
 
-object HoconConstants {
+object HoconConstants
   final val UrlQualifier = "url("
   final val FileQualifier = "file("
   final val ClasspathQualifier = "classpath("
@@ -19,4 +19,3 @@ object HoconConstants {
   final val ConfExt = "." + HoconFileType.DefaultExtension
   final val JsonExt = "." + JsonFileType.DEFAULT_EXTENSION
   final val PropsExt = "." + PropertiesFileType.DEFAULT_EXTENSION
-}

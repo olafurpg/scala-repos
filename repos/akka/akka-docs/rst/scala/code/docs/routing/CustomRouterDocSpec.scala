@@ -13,7 +13,7 @@ import akka.actor.ActorSystem
 import akka.routing.FromConfig
 import akka.actor.ActorRef
 
-object CustomRouterDocSpec {
+object CustomRouterDocSpec
 
   val config = """
 #//#config
@@ -47,29 +47,23 @@ akka.actor.deployment {
   import akka.routing.Routee
   import akka.routing.SeveralRoutees
 
-  class RedundancyRoutingLogic(nbrCopies: Int) extends RoutingLogic {
+  class RedundancyRoutingLogic(nbrCopies: Int) extends RoutingLogic
     val roundRobin = RoundRobinRoutingLogic()
-    def select(message: Any, routees: immutable.IndexedSeq[Routee]): Routee = {
+    def select(message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
       val targets =
         (1 to nbrCopies).map(_ => roundRobin.select(message, routees))
       SeveralRoutees(targets)
-    }
-  }
   //#routing-logic
 
-  class Storage extends Actor {
-    def receive = {
+  class Storage extends Actor
+    def receive =
       case x => sender() ! x
-    }
-  }
 
   //#unit-test-logic
-  final case class TestRoutee(n: Int) extends Routee {
+  final case class TestRoutee(n: Int) extends Routee
     override def send(message: Any, sender: ActorRef): Unit = ()
-  }
 
   //#unit-test-logic
-}
 
 //#group
 import akka.dispatch.Dispatchers
@@ -80,7 +74,7 @@ import com.typesafe.config.Config
 
 final case class RedundancyGroup(
     routeePaths: immutable.Iterable[String], nbrCopies: Int)
-    extends Group {
+    extends Group
 
   def this(config: Config) =
     this(routeePaths = immutableSeq(config.getStringList("routees.paths")),
@@ -93,16 +87,15 @@ final case class RedundancyGroup(
     new Router(new RedundancyRoutingLogic(nbrCopies))
 
   override val routerDispatcher: String = Dispatchers.DefaultDispatcherId
-}
 //#group
 
 class CustomRouterDocSpec
-    extends AkkaSpec(CustomRouterDocSpec.config) with ImplicitSender {
+    extends AkkaSpec(CustomRouterDocSpec.config) with ImplicitSender
 
   import CustomRouterDocSpec._
   import akka.routing.SeveralRoutees
 
-  "unit test routing logic" in {
+  "unit test routing logic" in
     //#unit-test-logic
     val logic = new RedundancyRoutingLogic(nbrCopies = 3)
 
@@ -120,9 +113,8 @@ class CustomRouterDocSpec
     r3.asInstanceOf[SeveralRoutees].routees should be(
         Vector(TestRoutee(7), TestRoutee(1), TestRoutee(2)))
     //#unit-test-logic
-  }
 
-  "demonstrate usage of custom router" in {
+  "demonstrate usage of custom router" in
     //#usage-1
     for (n <- 1 to 10) system.actorOf(Props[Storage], "s" + n)
 
@@ -141,5 +133,3 @@ class CustomRouterDocSpec
     //#usage-2
 
     for (_ <- 1 to 5) expectMsg("very important")
-  }
-}

@@ -27,7 +27,7 @@ import scala.xml.{NodeSeq, Elem, Text}
 /**
   * Surface a user interface on top of Wiring
   */
-object WiringUI {
+object WiringUI
 
   /**
     * Given a NodeSeq, a Cell and a function that can generate
@@ -133,11 +133,10 @@ object WiringUI {
   def history[T](
       cell: Cell[T])(f: (Box[T], T, NodeSeq) => JsCmd): NodeSeq => NodeSeq =
     in =>
-      {
-        val myElem: Elem = in.find {
+        val myElem: Elem = in.find
           case e: Elem => true
           case _ => false
-        }.map(_.asInstanceOf[Elem])
+        .map(_.asInstanceOf[Elem])
           .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
         addHistJsFunc(cell, (old: Box[T], nw: T) => f(old, nw, in))
@@ -147,7 +146,6 @@ object WiringUI {
                  myElem.attributes,
                  myElem.scope,
                  myElem.minimizeEmpty)
-    }
 
   /**
     * Given a NodeSeq, a Cell and a function that can generate
@@ -262,21 +260,19 @@ object WiringUI {
     */
   def toNode[T](
       in: NodeSeq, cell: Cell[T], jsEffect: (String, Boolean, JsCmd) => JsCmd)(
-      f: (T, NodeSeq) => NodeSeq): NodeSeq = {
-    val myElem: Elem = in.find {
+      f: (T, NodeSeq) => NodeSeq): NodeSeq =
+    val myElem: Elem = in.find
       case e: Elem => true
       case _ => false
-    }.map(_.asInstanceOf[Elem])
+    .map(_.asInstanceOf[Elem])
       .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
     val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)
     addJsFunc(cell,
               (t: T, first: Boolean) =>
-                {
                   jsEffect(id, first, SetHtml(id, f(t, elem.child)))
-              })
+              )
     elem
-  }
 
   /**
     * Given a Cell and a function that can generate
@@ -301,21 +297,18 @@ object WiringUI {
   def toNode[T](cell: Cell[T], jsEffect: (String, Boolean, JsCmd) => JsCmd)(
       f: (T, NodeSeq) => NodeSeq): NodeSeq => NodeSeq =
     in =>
-      {
-        val myElem: Elem = in.find {
+        val myElem: Elem = in.find
           case e: Elem => true
           case _ => false
-        }.map(_.asInstanceOf[Elem])
+        .map(_.asInstanceOf[Elem])
           .getOrElse(<span id={Helpers.nextFuncName}>{in}</span>)
 
         val (elem: Elem, id: String) = Helpers.findOrAddId(myElem)
         addJsFunc(cell,
                   (t: T, first: Boolean) =>
-                    {
                       jsEffect(id, first, SetHtml(id, f(t, elem.child)))
-                  })
+                  )
         elem
-    }
 
   /**
     * Associate a Cell and a function that converts from the
@@ -326,28 +319,26 @@ object WiringUI {
     * @param f the function that takes the cell's value and a flag indicating
     * if this is the first time 
     */
-  def addJsFunc[T](cell: Cell[T], f: (T, Boolean) => JsCmd) {
-    for {
+  def addJsFunc[T](cell: Cell[T], f: (T, Boolean) => JsCmd)
+    for
       cometActor <- S.currentCometActor
-    } cell.addDependent(cometActor)
+    cell.addDependent(cometActor)
 
     val trc = TransientRequestCell(cell)
     var lastTime: Long = 0L
     var lastValue: T = null.asInstanceOf[T]
-    for {
+    for
       sess <- S.session
-    } sess.addPostPageJavaScript(
+    sess.addPostPageJavaScript(
         () =>
-          {
         val (value, ct) = trc.get
         val first = lastTime == 0L
-        if (first || (ct > lastTime && value != lastValue)) {
+        if (first || (ct > lastTime && value != lastValue))
           lastValue = value
           lastTime = ct
           f(value, first)
-        } else Noop
-    })
-  }
+        else Noop
+    )
 
   /**
     * Associate a Cell and a function that converts from the
@@ -358,35 +349,31 @@ object WiringUI {
     * @param f the function that takes the cell's value and a flag indicating
     * if this is the first time 
     */
-  def addHistJsFunc[T](cell: Cell[T], f: (Box[T], T) => JsCmd) {
-    for {
+  def addHistJsFunc[T](cell: Cell[T], f: (Box[T], T) => JsCmd)
+    for
       cometActor <- S.currentCometActor
-    } cell.addDependent(cometActor)
+    cell.addDependent(cometActor)
 
     val trc = TransientRequestCell(cell)
     var lastTime: Long = 0L
     var lastValue: Box[T] = Empty
-    for {
+    for
       sess <- S.session
-    } sess.addPostPageJavaScript(
+    sess.addPostPageJavaScript(
         () =>
-          {
         val (value, ct) = trc.get
         val first = lastTime == 0L
-        if (first || (ct > lastTime && Full(value) != lastValue)) {
+        if (first || (ct > lastTime && Full(value) != lastValue))
           val oldValue = lastValue
           lastValue = Full(value)
           lastTime = ct
           f(oldValue, value)
-        } else Noop
-    })
-  }
-}
+        else Noop
+    )
 
 /**
   * Cache the value of the cell for the duration of the transient request
   */
 private final case class TransientRequestCell[T](cell: Cell[T])
-    extends TransientRequestVar[(T, Long)](cell.currentValue) {
+    extends TransientRequestVar[(T, Long)](cell.currentValue)
   override val __nameSalt = Helpers.nextFuncName
-}

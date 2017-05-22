@@ -8,10 +8,9 @@ import org.apache.commons.math3.random.RandomGenerator
   * @author dlwh
   **/
 class ThreadLocalRandomGenerator(genThunk: => RandomGenerator)
-    extends RandomGenerator {
-  private val genTL = new ThreadLocal[RandomGenerator] {
+    extends RandomGenerator
+  private val genTL = new ThreadLocal[RandomGenerator]
     override def initialValue(): RandomGenerator = genThunk
-  }
   def nextBytes(bytes: Array[Byte]) = genTL.get().nextBytes(bytes)
 
   def setSeed(seed: Long) = genTL.get().setSeed(seed)
@@ -33,4 +32,3 @@ class ThreadLocalRandomGenerator(genThunk: => RandomGenerator)
   def nextDouble(): Double = genTL.get().nextDouble()
 
   def nextGaussian(): Double = genTL.get().nextGaussian()
-}

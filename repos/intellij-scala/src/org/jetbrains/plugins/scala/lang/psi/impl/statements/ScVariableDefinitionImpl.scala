@@ -24,59 +24,49 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, TypingContext
 class ScVariableDefinitionImpl private (
     stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScVariableDefinition {
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+    with ScVariableDefinition
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
-  def expr: Option[ScExpression] = {
+  def expr: Option[ScExpression] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScVariableStub].getBodyExpr
-    }
     Option(findChildByClassScala(classOf[ScExpression]))
-  }
 
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScVariableStub) = {
+  def this(stub: ScVariableStub) =
     this(stub, ScalaElementTypes.VARIABLE_DEFINITION, null)
-  }
 
   override def toString: String = "ScVariableDefinition"
 
-  def bindings: Seq[ScBindingPattern] = {
+  def bindings: Seq[ScBindingPattern] =
     val plist = this.pList
     if (plist != null) plist.patterns.flatMap((p: ScPattern) => p.bindings)
     else Seq.empty
-  }
 
-  def getType(ctx: TypingContext) = typeElement match {
+  def getType(ctx: TypingContext) = typeElement match
     case Some(te) => te.getType(ctx)
     case None =>
       expr
         .map(_.getType(TypingContext.empty))
         .getOrElse(
             Failure("Cannot infer type without an expression", Some(this)))
-  }
 
-  def typeElement: Option[ScTypeElement] = {
+  def typeElement: Option[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScVariableStub].getTypeElement
-    } else findChild(classOf[ScTypeElement])
-  }
+    else findChild(classOf[ScTypeElement])
 
-  def pList: ScPatternList = {
+  def pList: ScPatternList =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub
         .getChildrenByType(ScalaElementTypes.PATTERN_LIST,
                            JavaArrayFactoryUtil.ScPatternListFactory)
         .apply(0)
-    } else findChildByClass(classOf[ScPatternList])
-  }
-}
+    else findChildByClass(classOf[ScPatternList])

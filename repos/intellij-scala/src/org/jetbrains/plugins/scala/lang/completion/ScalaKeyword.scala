@@ -6,7 +6,7 @@ package completion
   * Represents a Scala keyword. Constants defined in this trait represent all
   * keywords of the Scala language.
   */
-object ScalaKeyword {
+object ScalaKeyword
 
   val TRUE = "true"
   val FALSE = "false"
@@ -48,4 +48,3 @@ object ScalaKeyword {
   val WHILE = "while"
   val WITH = "with"
   val YIELD = "yield"
-}

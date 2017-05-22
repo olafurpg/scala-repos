@@ -4,18 +4,16 @@
 
 //############################################################################
 
-abstract class IntMap[A] {
-  def lookup(key: Int): A = this match {
+abstract class IntMap[A]
+  def lookup(key: Int): A = this match
     case Empty() => sys.error("KO")
     case _ => sys.error("ok")
-  }
-}
 
 case class Empty[A]() extends IntMap[A];
 
-object exceptions {
+object exceptions
 
-  def check(what: String, actual: Any, expected: Any): Unit = {
+  def check(what: String, actual: Any, expected: Any): Unit =
     val success: Boolean = actual == expected;
     Console.print(if (success) "ok" else "KO");
     var value: String = if (actual == null) "null" else actual.toString();
@@ -24,27 +22,21 @@ object exceptions {
     if (!success) Console.print(" != " + expected);
     Console.println;
     Console.flush;
-  }
 
-  def test: Unit = {
+  def test: Unit =
     val key = 2000;
     val map: IntMap[String] = new Empty[String];
-    val value = try {
+    val value = try
       map.lookup(key)
-    } catch {
+    catch
       case e: Throwable => e.getMessage()
-    }
     check("lookup(" + key + ")", value, "KO");
-  }
-}
 
 //############################################################################
 
-object Test {
+object Test
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     exceptions.test;
-  }
-}
 
 //############################################################################

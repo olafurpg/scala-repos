@@ -8,8 +8,8 @@ import scala.concurrent.Promise
 import scala.util.Try
 
 class MetricsTimerTest
-    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures {
-  test("time crashing call") {
+    extends FunSuite with Matchers with GivenWhenThen with ScalaFutures
+  test("time crashing call")
     When("doing the call (but the future is delayed)")
     val metrics = new Metrics(new MetricRegistry)
     val timer = metrics.timer("timer")
@@ -22,9 +22,8 @@ class MetricsTimerTest
 
     And("the original failure is preserved")
     attempt.failed.get should be(failure)
-  }
 
-  test("time delayed successful future") {
+  test("time delayed successful future")
     When("doing the call (but the future is delayed)")
     val metrics = new Metrics(new MetricRegistry)
     val timer = metrics.timer("timer")
@@ -43,9 +42,8 @@ class MetricsTimerTest
 
     And("the original result is preserved")
     result.futureValue should be(())
-  }
 
-  test("time delayed failed future") {
+  test("time delayed failed future")
     When("doing the call (but the future is delayed)")
     val metrics = new Metrics(new MetricRegistry)
     val timer = metrics.timer("timer")
@@ -66,5 +64,3 @@ class MetricsTimerTest
 
     And("the failure should be preserved")
     result.failed.futureValue should be(failure)
-  }
-}

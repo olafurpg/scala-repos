@@ -26,7 +26,7 @@ package org.apache.spark.sql.execution.streaming
   * This contract allows Spark to process data with exactly-once semantics, even in the case
   * of failures that require the computation to be restarted.
   */
-trait Sink {
+trait Sink
 
   /**
     * Returns the [[Offset]] for all data that is currently present in the sink, if any. This
@@ -45,4 +45,3 @@ trait Sink {
     * transactionally as data is eventually persisted.
     */
   def addBatch(batch: Batch): Unit
-}

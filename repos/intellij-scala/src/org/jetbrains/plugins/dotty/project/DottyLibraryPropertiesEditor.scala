@@ -16,28 +16,24 @@ import scala.util.Failure
   */
 class DottyLibraryPropertiesEditor(
     editorComponent: LibraryEditorComponent[ScalaLibraryProperties])
-    extends LibraryPropertiesEditor {
+    extends LibraryPropertiesEditor
 
-  private val updateSnapshotAction = new ActionListener {
+  private val updateSnapshotAction = new ActionListener
 
-    override def actionPerformed(e: ActionEvent): Unit = {
+    override def actionPerformed(e: ActionEvent): Unit =
       val version: String = ScalaLanguageLevel.Dotty.version
       val result = extensions.withProgressSynchronouslyTry(
-          s"Downloading Dotty $version (via SBT)") {
+          s"Downloading Dotty $version (via SBT)")
         case listener =>
           DottyDownloader.downloadDotty(version, s => listener(s))
           BoxedUnit.UNIT
-      }
 
-      result match {
+      result match
         case Failure(exc) =>
           Messages.showErrorDialog(editorComponent.getProject,
                                    exc.getMessage,
                                    s"Error downloading Dotty $version")
         case _ =>
-      }
-    }
-  }
 
   private val form = new DottyLibraryEditorForm()
   form.setUpdateSnapshotAction(updateSnapshotAction)
@@ -46,13 +42,10 @@ class DottyLibraryPropertiesEditor(
 
   def isModified = form.getState != properties.getState
 
-  def reset() {
+  def reset()
     form.setState(properties.getState)
-  }
 
-  def apply() {
+  def apply()
     properties.loadState(form.getState)
-  }
 
   private def properties = editorComponent.getProperties
-}

@@ -11,7 +11,7 @@ import org.specs2.mutable.Specification
 import scala.None
 import scala.util.control.NonFatal
 
-object ConfigurationSpec extends Specification {
+object ConfigurationSpec extends Specification
 
   def exampleConfig = Configuration.from(
       Map(
@@ -31,9 +31,9 @@ object ConfigurationSpec extends Specification {
       )
   )
 
-  "Configuration" should {
+  "Configuration" should
 
-    "be accessible as an entry set" in {
+    "be accessible as an entry set" in
       val map = Map(exampleConfig.entrySet.toList: _*)
       map.keySet must contain(
           allOf("foo.bar1",
@@ -44,9 +44,8 @@ object ConfigurationSpec extends Specification {
                 "blah.3",
                 "blah.4",
                 "blah2.blah3.blah4"))
-    }
 
-    "make all paths accessible" in {
+    "make all paths accessible" in
       exampleConfig.keys must contain(
           allOf("foo.bar1",
                 "foo.bar2",
@@ -56,9 +55,8 @@ object ConfigurationSpec extends Specification {
                 "blah.3",
                 "blah.4",
                 "blah2.blah3.blah4"))
-    }
 
-    "make all sub keys accessible" in {
+    "make all sub keys accessible" in
       exampleConfig.subKeys must contain(allOf("foo", "blah", "blah2"))
       exampleConfig.subKeys must not(
           contain(anyOf("foo.bar1",
@@ -69,9 +67,8 @@ object ConfigurationSpec extends Specification {
                         "blah.3",
                         "blah.4",
                         "blah2.blah3.blah4")))
-    }
 
-    "make all get accessible using scala" in {
+    "make all get accessible using scala" in
       exampleConfig.getBooleanSeq("blah.0").get must ===(
           Seq(true, false, true))
       exampleConfig.getIntSeq("blah.1").get must ===(Seq(1, 2, 3))
@@ -79,16 +76,14 @@ object ConfigurationSpec extends Specification {
       exampleConfig.getLongSeq("blah.3").get must ===(Seq(1L, 2L, 3L))
       exampleConfig.getStringSeq("blah.4").get must contain(
           exactly("one", "two", "three"))
-    }
 
-    "handle invalid and null configuration values" in {
+    "handle invalid and null configuration values" in
       exampleConfig.getBooleanSeq("foo.bar1").get must throwA[PlayException]
       exampleConfig.getBoolean("foo.bar3") must throwA[PlayException]
-    }
 
-    "throw serialisable exceptions" in {
+    "throw serialisable exceptions" in
       // from Typesafe Config
-      def copyViaSerialize(o: java.io.Serializable): AnyRef = {
+      def copyViaSerialize(o: java.io.Serializable): AnyRef =
         val byteStream = new ByteArrayOutputStream()
         val objectStream = new ObjectOutputStream(byteStream)
         objectStream.writeObject(o)
@@ -98,57 +93,42 @@ object ConfigurationSpec extends Specification {
         val copy = inObjectStream.readObject()
         inObjectStream.close()
         copy
-      }
       val conf = Configuration.from(
           Map("item" -> "uhoh, it's gonna blow")
       );
-      {
-        try {
+        try
           conf.getStringList("item")
-        } catch {
+        catch
           case NonFatal(e) => copyViaSerialize(e)
-        }
-      } must not(throwA[Exception])
-    }
+      must not(throwA[Exception])
 
-    "fail if application.conf is not found" in {
-      def load(mode: Mode.Mode) = {
+    "fail if application.conf is not found" in
+      def load(mode: Mode.Mode) =
         // system classloader should not have an application.conf
         Configuration.load(
             Environment(new File("."), ClassLoader.getSystemClassLoader, mode))
-      }
-      "in dev mode" in {
+      "in dev mode" in
         load(Mode.Dev) must throwA[PlayException]
-      }
-      "in prod mode" in {
+      "in prod mode" in
         load(Mode.Prod) must throwA[PlayException]
-      }
-      "but not in test mode" in {
+      "but not in test mode" in
         load(Mode.Test) must not(throwA[PlayException])
-      }
-    }
-  }
-}
 
-object PlayConfigSpec extends Specification {
+object PlayConfigSpec extends Specification
 
   def config(data: (String, Any)*) = PlayConfig(Configuration.from(data.toMap))
 
-  "PlayConfig" should {
-    "support getting optional values" in {
-      "when null" in {
+  "PlayConfig" should
+    "support getting optional values" in
+      "when null" in
         config("foo.bar" -> null).get[Option[String]]("foo.bar") must beNone
-      }
-      "when set" in {
+      "when set" in
         config("foo.bar" -> "bar").get[Option[String]]("foo.bar") must beSome(
             "bar")
-      }
-      "when undefined" in {
+      "when undefined" in
         config().get[Option[String]]("foo.bar") must throwA[
             ConfigException.Missing]
-      }
-    }
-    "support getting prototyped seqs" in {
+    "support getting prototyped seqs" in
       val seq = config(
           "bars" -> Seq(Map("a" -> "different a")),
           "prototype.bars" -> Map("a" -> "some a", "b" -> "some b")
@@ -156,8 +136,7 @@ object PlayConfigSpec extends Specification {
       seq must haveSize(1)
       seq.head.get[String]("a") must_== "different a"
       seq.head.get[String]("b") must_== "some b"
-    }
-    "support getting prototyped maps" in {
+    "support getting prototyped maps" in
       val map = config(
           "bars" -> Map("foo" -> Map("a" -> "different a")),
           "prototype.bars" -> Map("a" -> "some a", "b" -> "some b")
@@ -166,6 +145,3 @@ object PlayConfigSpec extends Specification {
       val foo = map("foo")
       foo.get[String]("a") must_== "different a"
       foo.get[String]("b") must_== "some b"
-    }
-  }
-}

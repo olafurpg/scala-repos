@@ -49,7 +49,7 @@ object SwingIncludes extends SwingIncludes
   * @define JPN JFXPanel
   * @define SND SwingNode
   */
-trait SwingIncludes {
+trait SwingIncludes
 
   /**
     * $START$JPN$.html $JPN$END
@@ -68,4 +68,3 @@ trait SwingIncludes {
     */
   implicit def jfxSwingNode2sfx(n: jfxes.SwingNode): SwingNode =
     if (n != null) new SwingNode(n) else null
-}

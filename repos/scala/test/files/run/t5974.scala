@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import scala.collection.JavaConverters._
 
   def ser(a: AnyRef) =
@@ -8,4 +8,3 @@ object Test extends App {
   val l = java.util.Arrays.asList("pigdog").asScala
   ser(l)
   println("ok")
-}

@@ -1,13 +1,12 @@
 package lila.security
 
 sealed abstract class Permission(
-    val name: String, val children: List[Permission] = Nil) {
+    val name: String, val children: List[Permission] = Nil)
 
   final def is(p: Permission): Boolean =
     this == p || (children exists (_ is p))
-}
 
-object Permission {
+object Permission
 
   case object ViewBlurs extends Permission("ROLE_VIEW_BLURS")
   case object StaffForum extends Permission("ROLE_STAFF_FORUM")
@@ -89,13 +88,12 @@ object Permission {
                                                 CloseTeam,
                                                 TerminateTournament)
 
-  private lazy val allByName: Map[String, Permission] = all map { p =>
+  private lazy val allByName: Map[String, Permission] = all map  p =>
     (p.name, p)
-  } toMap
+  toMap
 
   def apply(name: String): Option[Permission] = allByName get name
 
   def apply(names: List[String]): List[Permission] = (names map apply).flatten
 
   def exists(name: String) = allByName contains name
-}

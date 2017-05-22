@@ -29,7 +29,7 @@ private class DeploymentActor(parent: ActorRef,
                               storage: StorageProvider,
                               healthCheckManager: HealthCheckManager,
                               eventBus: EventStream)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   import context.dispatcher
   import mesosphere.marathon.upgrade.DeploymentActor._
@@ -38,15 +38,13 @@ private class DeploymentActor(parent: ActorRef,
   var currentStep: Option[DeploymentStep] = None
   var currentStepNr: Int = 0
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     self ! NextStep
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     parent ! DeploymentFinished(plan)
-  }
 
-  def receive: Receive = {
+  def receive: Receive =
     case NextStep if steps.hasNext =>
       val step = steps.next()
       currentStepNr += 1
@@ -54,10 +52,9 @@ private class DeploymentActor(parent: ActorRef,
       parent ! DeploymentStepInfo(
           plan, currentStep.getOrElse(DeploymentStep(Nil)), currentStepNr)
 
-      performStep(step) onComplete {
+      performStep(step) onComplete
         case Success(_) => self ! NextStep
         case Failure(t) => self ! Fail(t)
-      }
 
     case NextStep =>
       // no more steps, we're done
@@ -71,34 +68,28 @@ private class DeploymentActor(parent: ActorRef,
     case Fail(t) =>
       receiver ! DeploymentFailed(plan, t)
       context.stop(self)
-  }
 
-  def performStep(step: DeploymentStep): Future[Unit] = {
-    if (step.actions.isEmpty) {
+  def performStep(step: DeploymentStep): Future[Unit] =
+    if (step.actions.isEmpty)
       Future.successful(())
-    } else {
+    else
       eventBus.publish(DeploymentStatus(plan, step))
 
-      val futures = step.actions.map { action =>
+      val futures = step.actions.map  action =>
         healthCheckManager.addAllFor(action.app) // ensure health check actors are in place before tasks are launched
-        action match {
+        action match
           case StartApplication(app, scaleTo) => startApp(app, scaleTo)
           case ScaleApplication(app, scaleTo, toKill) =>
             scaleApp(app, scaleTo, toKill)
           case RestartApplication(app) => restartApp(app)
           case StopApplication(app) => stopApp(app.copy(instances = 0))
           case ResolveArtifacts(app, urls) => resolveArtifacts(app, urls)
-        }
-      }
 
-      Future.sequence(futures).map(_ => ()) andThen {
+      Future.sequence(futures).map(_ => ()) andThen
         case Success(_) => eventBus.publish(DeploymentStepSuccess(plan, step))
         case Failure(_) => eventBus.publish(DeploymentStepFailure(plan, step))
-      }
-    }
-  }
 
-  def startApp(app: AppDefinition, scaleTo: Int): Future[Unit] = {
+  def startApp(app: AppDefinition, scaleTo: Int): Future[Unit] =
     val promise = Promise[Unit]()
     context.actorOf(
         Props(
@@ -114,11 +105,10 @@ private class DeploymentActor(parent: ActorRef,
         )
     )
     promise.future
-  }
 
   def scaleApp(app: AppDefinition,
                scaleTo: Int,
-               toKill: Option[Iterable[Task]]): Future[Unit] = {
+               toKill: Option[Iterable[Task]]): Future[Unit] =
     val runningTasks = taskTracker.appTasksLaunchedSync(app.id)
     def killToMeetConstraints(
         notSentencedAndRunning: Iterable[Task], toKillCount: Int) =
@@ -129,12 +119,11 @@ private class DeploymentActor(parent: ActorRef,
           runningTasks, toKill, killToMeetConstraints, scaleTo)
 
     def killTasksIfNeeded: Future[Unit] =
-      tasksToKill.fold(Future.successful(())) {
+      tasksToKill.fold(Future.successful(()))
         killTasks(app.id, _)
-      }
 
     def startTasksIfNeeded: Future[Unit] =
-      tasksToStart.fold(Future.successful(())) { _ =>
+      tasksToStart.fold(Future.successful(()))  _ =>
         val promise = Promise[Unit]()
         context.actorOf(
             Props(
@@ -150,12 +139,10 @@ private class DeploymentActor(parent: ActorRef,
             )
         )
         promise.future
-      }
 
     killTasksIfNeeded.flatMap(_ => startTasksIfNeeded)
-  }
 
-  def killTasks(appId: PathId, tasks: Seq[Task]): Future[Unit] = {
+  def killTasks(appId: PathId, tasks: Seq[Task]): Future[Unit] =
     val promise = Promise[Unit]()
     context.actorOf(
         TaskKillActor.props(driver,
@@ -165,9 +152,8 @@ private class DeploymentActor(parent: ActorRef,
                             tasks.map(_.taskId),
                             promise))
     promise.future
-  }
 
-  def stopApp(app: AppDefinition): Future[Unit] = {
+  def stopApp(app: AppDefinition): Future[Unit] =
     val promise = Promise[Unit]()
     context.actorOf(
         Props(classOf[AppStopActor],
@@ -176,15 +162,13 @@ private class DeploymentActor(parent: ActorRef,
               eventBus,
               app,
               promise))
-    promise.future.andThen {
+    promise.future.andThen
       case Success(_) => scheduler.stopApp(driver, app)
-    }
-  }
 
-  def restartApp(app: AppDefinition): Future[Unit] = {
-    if (app.instances == 0) {
+  def restartApp(app: AppDefinition): Future[Unit] =
+    if (app.instances == 0)
       Future.successful(())
-    } else {
+    else
       val promise = Promise[Unit]()
       context.actorOf(
           Props(new TaskReplaceActor(driver,
@@ -194,19 +178,15 @@ private class DeploymentActor(parent: ActorRef,
                                      app,
                                      promise)))
       promise.future
-    }
-  }
 
   def resolveArtifacts(
-      app: AppDefinition, urls: Map[URL, String]): Future[Unit] = {
+      app: AppDefinition, urls: Map[URL, String]): Future[Unit] =
     val promise = Promise[Boolean]()
     context.actorOf(
         Props(classOf[ResolveArtifactsActor], app, urls, promise, storage))
     promise.future.map(_ => ())
-  }
-}
 
-object DeploymentActor {
+object DeploymentActor
   case object NextStep
   case object Finished
   final case class Cancel(reason: Throwable)
@@ -222,7 +202,7 @@ object DeploymentActor {
             taskQueue: LaunchQueue,
             storage: StorageProvider,
             healthCheckManager: HealthCheckManager,
-            eventBus: EventStream): Props = {
+            eventBus: EventStream): Props =
     // scalastyle:on parameter.number
 
     Props(
@@ -238,5 +218,3 @@ object DeploymentActor {
             healthCheckManager,
             eventBus
         ))
-  }
-}

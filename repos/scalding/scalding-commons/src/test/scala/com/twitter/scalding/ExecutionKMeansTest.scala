@@ -22,10 +22,10 @@ import scala.util.Try
 
 import com.twitter.scalding.examples.KMeans
 
-class ExecutionKMeansTest extends WordSpec with Matchers {
+class ExecutionKMeansTest extends WordSpec with Matchers
 
-  "Execution K-means" should {
-    "find the correct clusters for trivial cases" in {
+  "Execution K-means" should
+    "find the correct clusters for trivial cases" in
       val dim = 20
       val k = 20
       val rng = new java.util.Random
@@ -37,14 +37,14 @@ class ExecutionKMeansTest extends WordSpec with Matchers {
 
       // To have the seeds stay sane for kmeans k == vectorCount
       val vectorCount = k
-      val vectors = TypedPipe.from((0 until vectorCount).map { i =>
+      val vectors = TypedPipe.from((0 until vectorCount).map  i =>
         randVect(i % k)
-      })
+      )
 
-      val labels = KMeans(k, vectors).flatMap {
+      val labels = KMeans(k, vectors).flatMap
         case (_, _, labeledPipe) =>
           labeledPipe.toIterableExecution
-      }.waitFor(Config.default, Local(false)).get.toList
+      .waitFor(Config.default, Local(false)).get.toList
 
       def clusterOf(v: Vector[Double]): Int = v.indexWhere(_ > 0.0)
 
@@ -52,11 +52,7 @@ class ExecutionKMeansTest extends WordSpec with Matchers {
 
       // The rule is this: if two vectors share the same prefix,
       // the should be in the same cluster
-      byCluster.foreach {
+      byCluster.foreach
         case (clusterId, vs) =>
           val id = vs.head._1
           vs.foreach { case (thisId, _) => id shouldBe thisId }
-      }
-    }
-  }
-}

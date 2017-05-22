@@ -31,9 +31,8 @@ trait Message[+A]
   *  @version 1.0, 08/07/2003
   */
 @deprecated("Scripting is deprecated.", "2.11.0")
-case class Include[+A](location: Location, elem: A) extends Message[A] {
+case class Include[+A](location: Location, elem: A) extends Message[A]
   def this(elem: A) = this(NoLo, elem)
-}
 
 /** This observable update refers to destructive modification operations
   *  of elements from collection classes.
@@ -42,9 +41,8 @@ case class Include[+A](location: Location, elem: A) extends Message[A] {
   *  @version 1.0, 08/07/2003
   */
 @deprecated("Scripting is deprecated.", "2.11.0")
-case class Update[+A](location: Location, elem: A) extends Message[A] {
+case class Update[+A](location: Location, elem: A) extends Message[A]
   def this(elem: A) = this(NoLo, elem)
-}
 
 /** This observable update refers to removal operations of elements
   *  from collection classes.
@@ -53,9 +51,8 @@ case class Update[+A](location: Location, elem: A) extends Message[A] {
   *  @version 1.0, 08/07/2003
   */
 @deprecated("Scripting is deprecated.", "2.11.0")
-case class Remove[+A](location: Location, elem: A) extends Message[A] {
+case class Remove[+A](location: Location, elem: A) extends Message[A]
   def this(elem: A) = this(NoLo, elem)
-}
 
 /** This command refers to reset operations.
   *
@@ -72,17 +69,14 @@ case class Reset[+A]() extends Message[A]
   *  @version 1.0, 10/05/2004
   */
 @deprecated("Scripting is deprecated.", "2.11.0")
-class Script[A] extends ArrayBuffer[Message[A]] with Message[A] {
+class Script[A] extends ArrayBuffer[Message[A]] with Message[A]
 
-  override def toString(): String = {
+  override def toString(): String =
     var res = "Script("
     val it = this.iterator
     var i = 1
-    while (it.hasNext) {
+    while (it.hasNext)
       if (i > 1) res = res + ", "
       res = res + "[" + i + "] " + it.next
       i += 1
-    }
     res + ")"
-  }
-}

@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * User: Alexander Podkhalyuzin
   * Date: 17.06.2009
   */
-trait ScTemplateParentsStub extends StubElement[ScTemplateParents] {
+trait ScTemplateParentsStub extends StubElement[ScTemplateParents]
   def getTemplateParentsTypeElements: Seq[ScTypeElement]
 
   def getTemplateParentsTypesTexts: Seq[String]
@@ -20,4 +20,3 @@ trait ScTemplateParentsStub extends StubElement[ScTemplateParents] {
   def getTemplateParentsTypes: Seq[ScType]
 
   def getConstructor: Option[String]
-}

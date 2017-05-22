@@ -11,12 +11,10 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * 5/28/13
   */
 class OperationOnCollectionQuickFix(expr: ScExpression, simpl: Simplification)
-    extends AbstractFixOnPsiElement(simpl.hint, expr) {
-  def doApplyFix(project: Project) {
+    extends AbstractFixOnPsiElement(simpl.hint, expr)
+  def doApplyFix(project: Project)
     val toReplace = simpl.exprToReplace.getElement
     if (!toReplace.isValid) return
     val newExpr = ScalaPsiElementFactory.createExpressionFromText(
         simpl.replacementText, toReplace.getManager)
     toReplace.replaceExpression(newExpr, removeParenthesis = true)
-  }
-}

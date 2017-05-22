@@ -36,7 +36,7 @@ import org.apache.spark.sql.{Row, SQLContext}
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object LDAExample {
+object LDAExample
 
   private case class Params(input: Seq[String] = Seq.empty,
                             k: Int = 20,
@@ -50,10 +50,10 @@ object LDAExample {
                             checkpointInterval: Int = 10)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("LDAExample") {
+    val parser = new OptionParser[Params]("LDAExample")
       head("LDAExample: an example LDA app for plain text data.")
       opt[Int]("k")
         .text(s"number of topics. default: ${defaultParams.k}")
@@ -97,20 +97,16 @@ object LDAExample {
         .unbounded()
         .required()
         .action((x, c) => c.copy(input = c.input :+ x))
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         parser.showUsageAsError
         sys.exit(1)
-      }
-  }
 
-  private def run(params: Params) {
+  private def run(params: Params)
     val conf = new SparkConf().setAppName(s"LDAExample with $params")
     val sc = new SparkContext(conf)
 
@@ -136,7 +132,7 @@ object LDAExample {
     // Run LDA.
     val lda = new LDA()
 
-    val optimizer = params.algorithm.toLowerCase match {
+    val optimizer = params.algorithm.toLowerCase match
       case "em" => new EMLDAOptimizer
       // add (1.0 / actualCorpusSize) to MiniBatchFraction be more robust on tiny datasets.
       case "online" =>
@@ -145,7 +141,6 @@ object LDAExample {
       case _ =>
         throw new IllegalArgumentException(
             s"Only em, online are supported but got ${params.algorithm}.")
-    }
 
     lda
       .setOptimizer(optimizer)
@@ -154,9 +149,8 @@ object LDAExample {
       .setDocConcentration(params.docConcentration)
       .setTopicConcentration(params.topicConcentration)
       .setCheckpointInterval(params.checkpointInterval)
-    if (params.checkpointDir.nonEmpty) {
+    if (params.checkpointDir.nonEmpty)
       sc.setCheckpointDir(params.checkpointDir.get)
-    }
     val startTime = System.nanoTime()
     val ldaModel = lda.run(corpus)
     val elapsed = (System.nanoTime() - startTime) / 1e9
@@ -164,34 +158,28 @@ object LDAExample {
     println(s"Finished training LDA model.  Summary:")
     println(s"\t Training time: $elapsed sec")
 
-    if (ldaModel.isInstanceOf[DistributedLDAModel]) {
+    if (ldaModel.isInstanceOf[DistributedLDAModel])
       val distLDAModel = ldaModel.asInstanceOf[DistributedLDAModel]
       val avgLogLikelihood =
         distLDAModel.logLikelihood / actualCorpusSize.toDouble
       println(s"\t Training data average log likelihood: $avgLogLikelihood")
       println()
-    }
 
     // Print the topics, showing the top-weighted terms for each topic.
     val topicIndices = ldaModel.describeTopics(maxTermsPerTopic = 10)
-    val topics = topicIndices.map {
+    val topics = topicIndices.map
       case (terms, termWeights) =>
-        terms.zip(termWeights).map {
+        terms.zip(termWeights).map
           case (term, weight) => (vocabArray(term.toInt), weight)
-        }
-    }
     println(s"${params.k} topics:")
-    topics.zipWithIndex.foreach {
+    topics.zipWithIndex.foreach
       case (topic, i) =>
         println(s"TOPIC $i")
-        topic.foreach {
+        topic.foreach
           case (term, weight) =>
             println(s"$term\t$weight")
-        }
         println()
-    }
     sc.stop()
-  }
 
   /**
     * Load documents, tokenize them, create vocabulary, and prepare documents as term count vectors.
@@ -201,7 +189,7 @@ object LDAExample {
       sc: SparkContext,
       paths: Seq[String],
       vocabSize: Int,
-      stopwordFile: String): (RDD[(Long, Vector)], Array[String], Long) = {
+      stopwordFile: String): (RDD[(Long, Vector)], Array[String], Long) =
 
     val sqlContext = SQLContext.getOrCreate(sc)
     import sqlContext.implicits._
@@ -212,12 +200,11 @@ object LDAExample {
     // In this case, consider using coalesce() to create fewer, larger partitions.
     val df = sc.textFile(paths.mkString(",")).toDF("docs")
     val customizedStopWords: Array[String] =
-      if (stopwordFile.isEmpty) {
+      if (stopwordFile.isEmpty)
         Array.empty[String]
-      } else {
+      else
         val stopWordText = sc.textFile(stopwordFile).collect()
         stopWordText.flatMap(_.stripMargin.split("\\s+"))
-      }
     val tokenizer =
       new RegexTokenizer().setInputCol("docs").setOutputCol("rawTokens")
     val stopWordsRemover =
@@ -244,6 +231,4 @@ object LDAExample {
       (documents,
        model.stages(2).asInstanceOf[CountVectorizerModel].vocabulary, // vocabulary
        documents.map(_._2.numActives).sum().toLong) // total token count
-  }
-}
 // scalastyle:on println

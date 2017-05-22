@@ -1,3 +1,2 @@
-object Test extends Serializable {
+object Test extends Serializable
   private def readResolve: AnyRef = this
-}

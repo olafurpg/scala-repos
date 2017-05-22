@@ -17,19 +17,17 @@ class ScImportSelectorsStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScImportSelectors](parent, elemType)
-    with ScImportSelectorsStub {
+    with ScImportSelectorsStub
   var singleWildcard: Boolean = _
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           singleWildcard: Boolean) {
+           singleWildcard: Boolean)
     this(
         parent,
         elemType
           .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.singleWildcard = singleWildcard
-  }
 
   def hasWildcard: Boolean = singleWildcard
-}

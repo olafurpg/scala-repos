@@ -1,4 +1,4 @@
-class SCL4823 {
+class SCL4823
   trait A
 
   def fooz(x: Array[A]): Int = 1
@@ -6,5 +6,4 @@ class SCL4823 {
 
   /*start*/
   fooz(Array(new Object with A)) /*end*/
-}
 //Int

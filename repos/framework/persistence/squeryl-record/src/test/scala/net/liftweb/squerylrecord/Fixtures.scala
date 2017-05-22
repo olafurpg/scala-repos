@@ -32,9 +32,9 @@ import java.math.MathContext
 import java.sql.DriverManager
 import java.util.Calendar
 
-object DBHelper {
-  def initSquerylRecordWithInMemoryDB() {
-    SquerylRecord.initWithSquerylSession {
+object DBHelper
+  def initSquerylRecordWithInMemoryDB()
+    SquerylRecord.initWithSquerylSession
       // TODO: Use mapper.StandardDBVendor
       Class.forName("org.h2.Driver")
       val session = Session.create(
@@ -43,33 +43,27 @@ object DBHelper {
           new H2Adapter)
       //session.setLogger(statement => println(statement))
       session
-    }
-  }
 
   /**
     * Creates the test schema in a new transaction. Drops an old schema if
     * it exists.
     */
-  def createSchema() {
-    inTransaction {
-      try {
+  def createSchema()
+    inTransaction
+      try
         //MySchema.printDdl
         MySchema.dropAndCreate
         MySchema.createTestData
-      } catch {
+      catch
         case e: Exception =>
           e.printStackTrace()
           throw e;
-      }
-    }
-  }
-}
 
 /**
   * Test Record: Company. It has many different field types for test purposes.
   */
 class Company private ()
-    extends Record[Company] with KeyedRecord[Long] with Optimistic {
+    extends Record[Company] with KeyedRecord[Long] with Optimistic
 
   override def meta = Company
 
@@ -85,21 +79,18 @@ class Company private ()
       this, new MathContext(10), 5)
 
   lazy val employees = MySchema.companyToEmployees.left(this)
-}
 object Company
-    extends Company with MetaRecord[Company] with CRUDify[Long, Company] {
+    extends Company with MetaRecord[Company] with CRUDify[Long, Company]
 
   def table = MySchema.companies
 
   def idFromString(in: String) = in.toLong
-}
 
-object EmployeeRole extends Enumeration {
+object EmployeeRole extends Enumeration
 
   type EmployeeRole = Value
 
   val Programmer, Manager = Value
-}
 
 /**
   * A field type that works just like a String field.
@@ -108,27 +99,25 @@ object EmployeeRole extends Enumeration {
   */
 class SpecialField[OwnerType <: Record[OwnerType]](rec: OwnerType)
     extends Field[String, OwnerType] with TypedField[String]
-    with SquerylRecordField with MandatoryTypedField[String] {
+    with SquerylRecordField with MandatoryTypedField[String]
 
   override def owner = rec
   override def classOfPersistentField = classOf[String]
   override def defaultValue = ""
   override def setFromString(s: String) = setBox(Full(s))
-  override def setFromAny(c: Any) = c match {
+  override def setFromAny(c: Any) = c match
     case Full(v) => setBox(Full(v.toString))
     case None => setBox(None)
     case v => setBox(Full(v.toString))
-  }
   override def setFromJValue(jValue: JValue) = setBox(Full(jValue.toString))
   override def asJValue: JValue = JString(get)
   override def asJs = Str(get)
   override def toForm = Full(scala.xml.Text(get))
-}
 
 /**
   * Test record: An employee belongs to a company.
   */
-class Employee private () extends Record[Employee] with KeyedRecord[Long] {
+class Employee private () extends Record[Employee] with KeyedRecord[Long]
 
   override def meta = Employee
 
@@ -149,13 +138,12 @@ class Employee private () extends Record[Employee] with KeyedRecord[Long] {
 
   lazy val company = MySchema.companyToEmployees.right(this)
   lazy val rooms = MySchema.roomAssignments.left(this)
-}
 object Employee extends Employee with MetaRecord[Employee]
 
 /**
   * Test record: One or more employees can have a room (one-to-many-relation).
   */
-class Room private () extends Record[Room] with KeyedRecord[Long] {
+class Room private () extends Record[Room] with KeyedRecord[Long]
   override def meta = Room
 
   override val idField = new LongField(this)
@@ -163,7 +151,6 @@ class Room private () extends Record[Room] with KeyedRecord[Long] {
   val name = new StringField(this, 50)
 
   lazy val employees = MySchema.roomAssignments.right(this)
-}
 
 object Room extends Room with MetaRecord[Room]
 
@@ -174,14 +161,13 @@ object Room extends Room with MetaRecord[Room]
   * a web form or similar.
   */
 class RoomAssignment(val employeeId: Long, val roomId: Long)
-    extends KeyedEntity[CompositeKey2[Long, Long]] {
+    extends KeyedEntity[CompositeKey2[Long, Long]]
   def id = compositeKey(employeeId, roomId)
-}
 
 /**
   * Schema for the test database.
   */
-object MySchema extends Schema {
+object MySchema extends Schema
   val companies = table[Company]
   val employees = table[Employee]
   val rooms = table[Room]
@@ -202,16 +188,15 @@ object MySchema extends Schema {
     * Drops an old schema if exists and then creates
     * the new schema.
     */
-  def dropAndCreate {
+  def dropAndCreate
     drop
     create
-  }
 
   /**
     * Creates some test instances of companies and employees
     * and saves them in the database.
     */
-  def createTestData {
+  def createTestData
     import TestData._
 
     allCompanies.foreach(companies.insert(_))
@@ -220,9 +205,8 @@ object MySchema extends Schema {
 
     e1.rooms.associate(r1)
     e1.rooms.associate(r2)
-  }
 
-  object TestData {
+  object TestData
 
     val c1 = Company.createRecord
       .name("First Company USA")
@@ -292,5 +276,3 @@ object MySchema extends Schema {
     val r3 = Room.createRecord.name("Room 3")
 
     val allRooms = List(r1, r2, r3)
-  }
-}

@@ -22,7 +22,7 @@ import xml.NodeSeq
 /**
   * The util package object
   */
-package object util {
+package object util
   type CssBindFunc = CssSel
 
   /**
@@ -43,4 +43,3 @@ package object util {
     * @return an IterableConst
     */
   def itConst[T](ic: T)(implicit f: T => IterableConst): IterableConst = f(ic)
-}

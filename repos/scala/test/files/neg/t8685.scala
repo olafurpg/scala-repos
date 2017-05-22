@@ -9,27 +9,22 @@ case class E(i: Int)
 object E
 
 @deprecated("module F is depr", since = "now")
-object F {
+object F
   case class G(i: Int)
-}
 
-object G {
+object G
   case class H(i: Int)
-}
 
-object Extra {
+object Extra
   @deprecated("Extra module F is depr", since = "now")
-  object F {
+  object F
     case class G(i: Int)
-  }
-}
 
-object J {
+object J
   @deprecated("Inner K is depr", since = "now")
   case class K(i: Int)
-}
 
-trait Applies {
+trait Applies
   def f = C(42)
   def g = D(42)
   def h = E(42)
@@ -41,12 +36,10 @@ trait Applies {
   def k = this.gg.H(0)
 
   def l = J.K(42)
-}
-trait News {
+trait News
   def f = new C(42)
   def g = new D(42)
   def h = new E(42)
   def i = new F.G(42)
   def j = new Extra.F.G(42)
   def l = new J.K(42)
-}

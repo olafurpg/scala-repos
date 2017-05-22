@@ -12,10 +12,10 @@ import akka.testkit.AkkaSpec
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class SubstreamSubscriptionTimeoutSpec(conf: String) extends AkkaSpec(conf) {
+class SubstreamSubscriptionTimeoutSpec(conf: String) extends AkkaSpec(conf)
   import FlowGroupBySpec._
 
-  def this(subscriptionTimeout: FiniteDuration) {
+  def this(subscriptionTimeout: FiniteDuration)
     this(s"""
           |akka.stream.materializer {
           |  subscription-timeout {
@@ -24,11 +24,9 @@ class SubstreamSubscriptionTimeoutSpec(conf: String) extends AkkaSpec(conf) {
           |    timeout = ${subscriptionTimeout.toMillis}ms
           |  }
           |}""".stripMargin)
-  }
 
-  def this() {
+  def this()
     this(300.millis)
-  }
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 2)
@@ -36,9 +34,9 @@ class SubstreamSubscriptionTimeoutSpec(conf: String) extends AkkaSpec(conf) {
   implicit val dispatcher = system.dispatcher
   implicit val materializer = ActorMaterializer(settings)
 
-  "groupBy and splitwhen" must {
+  "groupBy and splitwhen" must
 
-    "timeout and cancel substream publishers when no-one subscribes to them after some time (time them out)" in assertAllStagesStopped {
+    "timeout and cancel substream publishers when no-one subscribes to them after some time (time them out)" in assertAllStagesStopped
       val subscriber = TestSubscriber.manualProbe[(Int, Source[Int, _])]()
       val publisherProbe = TestPublisher.probe[Int]()
       val publisher = Source
@@ -76,15 +74,13 @@ class SubstreamSubscriptionTimeoutSpec(conf: String) extends AkkaSpec(conf) {
       Thread.sleep(1500)
 
       // Must be a Sink.seq, otherwise there is a race due to the concat in the `lift` implementation
-      val f = s3.runWith(Sink.seq).recover {
+      val f = s3.runWith(Sink.seq).recover
         case _: SubscriptionTimeoutException ⇒ "expected"
-      }
       Await.result(f, 300.millis) should equal("expected")
 
       publisherProbe.sendComplete()
-    }
 
-    "timeout and stop groupBy parent actor if none of the substreams are actually consumed" in assertAllStagesStopped {
+    "timeout and stop groupBy parent actor if none of the substreams are actually consumed" in assertAllStagesStopped
       val publisherProbe = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[(Int, Source[Int, _])]()
       val publisher = Source
@@ -103,9 +99,8 @@ class SubstreamSubscriptionTimeoutSpec(conf: String) extends AkkaSpec(conf) {
 
       val (_, s1) = subscriber.expectNext()
       val (_, s2) = subscriber.expectNext()
-    }
 
-    "not timeout and cancel substream publishers when they have been subscribed to" in {
+    "not timeout and cancel substream publishers when they have been subscribed to" in
       val publisherProbe = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[(Int, Source[Int, _])]()
       val publisher = Source
@@ -144,6 +139,3 @@ class SubstreamSubscriptionTimeoutSpec(conf: String) extends AkkaSpec(conf) {
       publisherProbe.sendNext(4)
       s1SubscriberProbe.expectNext(3)
       s2SubscriberProbe.expectNext(4)
-    }
-  }
-}

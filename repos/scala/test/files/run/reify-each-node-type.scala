@@ -1,36 +1,32 @@
 import scala.language.{existentials, postfixOps}
 import scala.reflect.runtime.universe._
 
-object r {
+object r
   class A
   class B
   class List[+A]
   object List { def apply[A](xs: A*): List[A] = new List[A] }
   object Nil extends List[Nothing]
 
-  trait OuterP[A] {
+  trait OuterP[A]
     trait Inner
     trait InnerP[B]
-  }
-  trait Outer {
+  trait Outer
     trait Inner
     trait InnerP[B]
-  }
   object Un { def unapply(x: Any) = Some(5) }
   object UnSeq { def unapplySeq(x: Any) = Some(Seq(5)) }
   class C[T]
   class D
   trait E
 
-  trait SN {
+  trait SN
     def q: Any = null
-  }
-}
 
-object s {
+object s
   import r._
 
-  trait NN extends SN {
+  trait NN extends SN
     def act[T](expr: Expr[T]): Unit
 
     act(reify { s /* Ident */ })
@@ -53,9 +49,9 @@ object s {
     act(reify { type CC[T <: D] = C[T] /* TypeBoundsTree */ })
     act(reify { try 0 finally println("") /* Try */ })
     act(
-        reify { (x: Int) =>
+        reify  (x: Int) =>
       x /* Function */
-    })
+    )
     act(reify { var v = 1; v = 2 /* Assign */ })
     act(reify { class A() { def this(x: A) = this() } /* This */ })
     act(reify { new List[Int] /* New */ })
@@ -93,15 +89,13 @@ object s {
     //     act(reify { List[OuterP[Int]#InnerP[Byte]]() })
     //               ^
     // one error found
-  }
-}
 
-object Test {
+object Test
   var idx = 0
   val seen = scala.collection.mutable.Set[String]()
 
-  object N extends s.NN {
-    def act[T](expr: Expr[T]): Unit = {
+  object N extends s.NN
+    def act[T](expr: Expr[T]): Unit =
       idx += 1
       val ts = expr.tree filter (_ => true) map
       (_.getClass.getName split "[.$]" last) filterNot seen distinct;
@@ -111,7 +105,4 @@ object Test {
               expr.tree.toString.replaceAll("""\s+""", " ").take(60),
               ts mkString " "))
       seen ++= ts
-    }
-  }
   def main(args: Array[String]): Unit = N
-}

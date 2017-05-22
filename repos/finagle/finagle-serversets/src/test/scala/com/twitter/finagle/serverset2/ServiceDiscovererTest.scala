@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference
 @RunWith(classOf[JUnitRunner])
 class ServiceDiscovererTest
     extends FunSuite with MockitoSugar with Eventually
-    with IntegrationPatience {
+    with IntegrationPatience
 
   class ServiceDiscovererWithExposedCache(
       varZkSession: Var[ZkSession],
@@ -32,16 +32,14 @@ class ServiceDiscovererTest
       timer: Timer = DefaultTimer.twitter
   )
       extends ServiceDiscoverer(
-          varZkSession, statsReceiver, ForeverEpoch, timer) {
+          varZkSession, statsReceiver, ForeverEpoch, timer)
     val cache = new ZkEntryCache("/foo/bar", NullStatsReceiver)
     cache.setSession(varZkSession.sample)
-    override val entriesOf = Memoize { path: String =>
+    override val entriesOf = Memoize  path: String =>
       entitiesOf(path,
                  cache,
                  NullStatsReceiver.stat("meh"),
                  ServiceDiscoverer.EndpointGlob)
-    }
-  }
 
   def ep(port: Int) =
     Endpoint(Array(null),
@@ -53,7 +51,7 @@ class ServiceDiscovererTest
   val ForeverEpoch = Epoch(Duration.Top)(new MockTimer)
   val retryStream = RetryStream()
 
-  def createEntry(id: Int): Buf = {
+  def createEntry(id: Int): Buf =
     val jsonCodec = JsonCodec.create(classOf[ServiceInstance])
     val serviceInstance = new ServiceInstance()
     serviceInstance.setShard(1)
@@ -62,9 +60,8 @@ class ServiceDiscovererTest
         new thrift.Endpoint(s"$id.0.0.12", 32123))
     ByteArray.Owned(
         ServerSets.serializeServiceInstance(serviceInstance, jsonCodec))
-  }
 
-  test("ServiceDiscoverer.zipWithWeights") {
+  test("ServiceDiscoverer.zipWithWeights")
     val port1 = 80 // not bound
     val port2 = 53 // ditto
     val ents = Seq[Entry](ep(port1), ep(port2), ep(3), ep(4))
@@ -81,9 +78,8 @@ class ServiceDiscovererTest
             ep(port2) -> 2.8,
             ep(3) -> 3.1,
             ep(4) -> 1.0))
-  }
 
-  test("New observation do not cause reads; entries are cached") {
+  test("New observation do not cause reads; entries are cached")
     implicit val timer = new MockTimer
     val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
     val sd = new ServiceDiscoverer(
@@ -112,9 +108,8 @@ class ServiceDiscovererTest
 
     val f2 = sd("/foo/bar").states.filter(_ != Activity.Pending).toFuture()
     assert(f2.isDefined)
-  }
 
-  test("Removed entries are removed from cache") {
+  test("Removed entries are removed from cache")
     implicit val timer = new MockTimer
     val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
     val sd = new ServiceDiscovererWithExposedCache(
@@ -169,9 +164,8 @@ class ServiceDiscovererTest
     gd4.res() = Return(Node.Data(None, null))
 
     assert(cache.keys == Set("member_3", "member_4"))
-  }
 
-  test("If all reads fail the serverset is in Failed state") {
+  test("If all reads fail the serverset is in Failed state")
     implicit val timer = new MockTimer
     val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
     val sd = new ServiceDiscovererWithExposedCache(
@@ -198,15 +192,13 @@ class ServiceDiscovererTest
     val gd2 @ GetData("/foo/bar/member_2") = watchedZk.value.opq(3)
     gd2.res() = Throw(new Exception)
 
-    Await.result(f1, 1.second) match {
+    Await.result(f1, 1.second) match
       case Activity.Failed(ServiceDiscoverer.EntryLookupFailureException) =>
       // great!
       case other => fail(s"Expected entry lookup exception. Received $other")
-    }
-  }
 
-  test("Partial failures are successful and retried") {
-    Time.withCurrentTimeFrozen { timeControl =>
+  test("Partial failures are successful and retried")
+    Time.withCurrentTimeFrozen  timeControl =>
       implicit val timer = new MockTimer
       val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
       val sd = new ServiceDiscovererWithExposedCache(
@@ -238,34 +230,28 @@ class ServiceDiscovererTest
       gd2.res() = Return(Node.Data(Some(createEntry(1)), null))
 
       // Should succeed with only 1 resolved value
-      eventually {
-        currentValue.get match {
+      eventually
+        currentValue.get match
           case Activity.Ok(seq) =>
             assert(seq.size == 1) // member_2 has good data
           case other =>
             fail(s"Expected entry lookup exception. Received $other")
-        }
-      }
 
       // member_1 will be requeried for eventually
-      eventually {
+      eventually
         timeControl.advance(2.minutes)
         timer.tick()
 
         val gd3 @ GetData("/foo/bar/member_1") = watchedZk.value.opq(4)
         gd3.res() = Return(Node.Data(Some(createEntry(2)), null))
-      }
 
       // Then we should see 2 values in the serverset
-      currentValue.get match {
+      currentValue.get match
         case Activity.Ok(seq) =>
           assert(seq.size == 2) // both have good values now
         case other => fail(s"Expected entry lookup exception. Received $other")
-      }
-    }
-  }
 
-  test("Consecutive observations do not cause reads; entries are cached") {
+  test("Consecutive observations do not cause reads; entries are cached")
     implicit val timer = new MockTimer
     val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
     val sd = new ServiceDiscoverer(
@@ -296,9 +282,8 @@ class ServiceDiscovererTest
     // GetData only once, the two observations are fulfilled.
     assert(f1.isDefined)
     assert(f2.isDefined)
-  }
 
-  test("New sessions are used") {
+  test("New sessions are used")
     implicit val timer = new MockTimer
     val fakeWatchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
     val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
@@ -332,19 +317,17 @@ class ServiceDiscovererTest
     // GetData only once, the two observations are fulfilled.
     assert(f1.isDefined)
     assert(f2.isDefined)
-  }
 
-  def newZkSession(): (ZkSession, Witness[WatchState]) = {
+  def newZkSession(): (ZkSession, Witness[WatchState]) =
     val mockZkSession = mock[ZkSession]
     val watchStateEvent = Event[WatchState]()
     val watchStateVar = Var[WatchState](WatchState.Pending, watchStateEvent)
     when(mockZkSession.state).thenReturn(watchStateVar)
 
     (mockZkSession, watchStateEvent)
-  }
 
-  test("ServiceDiscoverer stable health is reported correctly") {
-    Time.withCurrentTimeFrozen { timeControl =>
+  test("ServiceDiscoverer stable health is reported correctly")
+    Time.withCurrentTimeFrozen  timeControl =>
       val zkSession = Event[ZkSession]()
       val varZkSession = Var[ZkSession](ZkSession.nil, zkSession)
       val period = 1.second
@@ -354,9 +337,9 @@ class ServiceDiscovererTest
 
       val stabilizedHealth =
         new AtomicReference[ClientHealth](ClientHealth.Healthy)
-      sd.health.changes.register(Witness {
+      sd.health.changes.register(Witness
         stabilizedHealth
-      })
+      )
 
       // should start as healthy until updated otherwise
       assert(stabilizedHealth.get == ClientHealth.Healthy)
@@ -380,19 +363,17 @@ class ServiceDiscovererTest
       state2.notify(WatchState.SessionState(SessionState.SyncConnected))
       zkSession.notify(session2)
       assert(stabilizedHealth.get == ClientHealth.Healthy)
-    }
-  }
 
-  test("ServiceDiscoverer rawHealth is reported correctly") {
+  test("ServiceDiscoverer rawHealth is reported correctly")
     val zkSession = Event[ZkSession]()
     val varZkSession = Var[ZkSession](ZkSession.nil, zkSession)
     val sd = new ServiceDiscoverer(
         varZkSession, NullStatsReceiver, ForeverEpoch, DefaultTimer.twitter)
 
     val health = new AtomicReference[ClientHealth](ClientHealth.Healthy)
-    sd.rawHealth.changes.register(Witness {
+    sd.rawHealth.changes.register(Witness
       health
-    })
+    )
 
     // should start as healthy until updated otherwise
     assert(health.get == ClientHealth.Healthy)
@@ -418,5 +399,3 @@ class ServiceDiscovererTest
     // pulse the current session with an event that should be ignored
     state2.notify(WatchState.Pending)
     assert(health.get == ClientHealth.Healthy)
-  }
-}

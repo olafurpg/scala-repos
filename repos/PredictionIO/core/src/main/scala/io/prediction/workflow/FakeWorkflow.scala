@@ -26,42 +26,36 @@ import org.apache.spark.rdd.RDD
 
 @Experimental
 private[prediction] class FakeEngine
-    extends BaseEngine[EmptyParams, EmptyParams, EmptyParams, EmptyParams] {
+    extends BaseEngine[EmptyParams, EmptyParams, EmptyParams, EmptyParams]
   @transient lazy val logger = Logger[this.type]
 
   def train(sc: SparkContext,
             engineParams: EngineParams,
             engineInstanceId: String,
-            params: WorkflowParams): Seq[Any] = {
+            params: WorkflowParams): Seq[Any] =
     throw new StopAfterReadInterruption()
-  }
 
   def eval(
       sc: SparkContext, engineParams: EngineParams, params: WorkflowParams)
-    : Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])] = {
+    : Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])] =
     return Seq[(EmptyParams, RDD[(EmptyParams, EmptyParams, EmptyParams)])]()
-  }
-}
 
 @Experimental
 private[prediction] class FakeRunner(f: (SparkContext => Unit))
     extends BaseEvaluator[
-        EmptyParams, EmptyParams, EmptyParams, EmptyParams, FakeEvalResult] {
+        EmptyParams, EmptyParams, EmptyParams, EmptyParams, FakeEvalResult]
   @transient private lazy val logger = Logger[this.type]
   def evaluateBase(sc: SparkContext,
                    evaluation: Evaluation,
                    engineEvalDataSet: Seq[(EngineParams, Seq[(EmptyParams, RDD[
                                (EmptyParams, EmptyParams, EmptyParams)])])],
-                   params: WorkflowParams): FakeEvalResult = {
+                   params: WorkflowParams): FakeEvalResult =
     f(sc)
     FakeEvalResult()
-  }
-}
 
 @Experimental
-private[prediction] case class FakeEvalResult() extends BaseEvaluatorResult {
+private[prediction] case class FakeEvalResult() extends BaseEvaluatorResult
   override val noSave: Boolean = true
-}
 
 /** FakeRun allows user to implement custom function under the exact enviroment
   * as other PredictionIO workflow. 
@@ -84,19 +78,15 @@ private[prediction] case class FakeEvalResult() extends BaseEvaluatorResult {
   * 
   */
 @Experimental
-trait FakeRun extends Evaluation with EngineParamsGenerator {
+trait FakeRun extends Evaluation with EngineParamsGenerator
   private[this] var _runner: FakeRunner = _
 
   def runner: FakeRunner = _runner
-  def runner_=(r: FakeRunner) {
+  def runner_=(r: FakeRunner)
     engineEvaluator = (new FakeEngine(), r)
     engineParamsList = Seq(new EngineParams())
-  }
 
-  def func: (SparkContext => Unit) = { (sc: SparkContext) =>
+  def func: (SparkContext => Unit) =  (sc: SparkContext) =>
     Unit
-  }
-  def func_=(f: SparkContext => Unit) {
+  def func_=(f: SparkContext => Unit)
     runner = new FakeRunner(f)
-  }
-}

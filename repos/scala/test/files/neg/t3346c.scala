@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   //
   // An attempt to workaround SI-2712, foiled by SI-3346
   //
@@ -23,33 +23,29 @@ object Test extends App {
   //
   // This is the approach taken by scalaz7.
 
-  trait TCValue[M[_], A] {
+  trait TCValue[M[_], A]
     implicit def self: M[A]
     def M: TC[M]
 
     // instead of `foo(eii)`, we'll try `eii.foo`
     def foo[M[_], A] = ()
-  }
 
   implicit def ToTCValue[M[_], A](ma: M[A])(implicit M0: TC[M]) =
-    new TCValue[M, A] {
+    new TCValue[M, A]
       implicit val M = M0
       val self = ma
-    }
   implicit def ToTCValueBin1[M[_, _], A, B](
       ma: M[A, B])(implicit M0: TC[({ type λ[α] = M[A, α] })#λ])
     : TCValue[({ type λ[α] = M[A, α] })#λ, B] =
-    new TCValue[({ type λ[α] = M[A, α] })#λ, B] {
+    new TCValue[({ type λ[α] = M[A, α] })#λ, B]
       implicit val M = M0
       val self = ma
-    }
   implicit def ToTCValueBin2[M[_, _], A, B](
       ma: M[A, B])(implicit M0: TC[({ type λ[α] = M[α, B] })#λ])
     : TCValue[({ type λ[α] = M[α, B] })#λ, A] =
-    new TCValue[({ type λ[α] = M[α, B] })#λ, A] {
+    new TCValue[({ type λ[α] = M[α, B] })#λ, A]
       implicit val M = M0
       val self = ma
-    }
 
   ToTCValueBin1(eii).foo
 
@@ -63,4 +59,3 @@ object Test extends App {
   // Works if we remove ToTCValueBin2
   //
   eii.bar
-}

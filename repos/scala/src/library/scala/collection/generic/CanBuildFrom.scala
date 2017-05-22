@@ -27,7 +27,7 @@ import scala.annotation.implicitNotFound
   */
 @implicitNotFound(
     msg = "Cannot construct a collection of type ${To} with elements of type ${Elem} based on a collection of type ${From}.")
-trait CanBuildFrom[-From, -Elem, +To] {
+trait CanBuildFrom[-From, -Elem, +To]
 
   /** Creates a new builder on request of a collection.
     *  @param from  the collection requesting the builder to be created.
@@ -44,4 +44,3 @@ trait CanBuildFrom[-From, -Elem, +To] {
     *  @see scala.collection.breakOut
     */
   def apply(): Builder[Elem, To]
-}

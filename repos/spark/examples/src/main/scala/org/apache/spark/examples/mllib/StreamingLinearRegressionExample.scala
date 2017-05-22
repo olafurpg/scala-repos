@@ -26,14 +26,13 @@ import org.apache.spark.mllib.regression.StreamingLinearRegressionWithSGD
 // $example off$
 import org.apache.spark.streaming._
 
-object StreamingLinearRegressionExample {
+object StreamingLinearRegressionExample
 
-  def main(args: Array[String]): Unit = {
-    if (args.length != 2) {
+  def main(args: Array[String]): Unit =
+    if (args.length != 2)
       System.err.println(
           "Usage: StreamingLinearRegressionExample <trainingDir> <testDir>")
       System.exit(1)
-    }
 
     val conf = new SparkConf().setAppName("StreamingLinearRegressionExample")
     val ssc = new StreamingContext(conf, Seconds(1))
@@ -55,6 +54,4 @@ object StreamingLinearRegressionExample {
     // $example off$
 
     ssc.stop()
-  }
-}
 // scalastyle:on println

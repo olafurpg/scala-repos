@@ -1,4 +1,4 @@
-object coinv {
+object coinv
   def up[F[+ _]](fa: F[String]): F[Object] = fa
   def down[F[- _]](fa: F[Object]): F[String] = fa
 
@@ -21,4 +21,3 @@ object coinv {
   // scala> oops2(Some(33))
   // java.lang.ClassCastException: scala.Some cannot be cast to java.lang.String
   //         at com.nocandysw.coinv$$anonfun$oops2$1.apply(coinv.scala:20)
-}

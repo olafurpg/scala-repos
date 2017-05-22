@@ -43,46 +43,39 @@ import com.gravity.goose.network.HtmlFetcher
   *
   * @author Jim Plush
   */
-object ImageSaver extends Logging {
+object ImageSaver extends Logging
   private def getFileExtension(
-      config: Configuration, fileName: String): String = {
+      config: Configuration, fileName: String): String =
     var fileExtension: String = ""
     var mimeType: String = null
-    try {
+    try
       val imageDims: ImageDetails =
         ImageUtils.getImageDimensions(config.imagemagickIdentifyPath, fileName)
       mimeType = imageDims.getMimeType
-      if (mimeType == "GIF") {
-        if (logger.isDebugEnabled) {
+      if (mimeType == "GIF")
+        if (logger.isDebugEnabled)
           logger.debug("SNEAKY GIF! " + fileName)
-        }
         throw new SecretGifException
-      }
-      if (mimeType == "JPEG") {
+      if (mimeType == "JPEG")
         fileExtension = ".jpg"
-      } else if (mimeType == "PNG") {
+      else if (mimeType == "PNG")
         fileExtension = ".png"
-      } else {
+      else
         throw new IOException(
             "BAD MIME TYPE: " + mimeType + " FILENAME:" + fileName)
-      }
-    } catch {
-      case e: SecretGifException => {
+    catch
+      case e: SecretGifException =>
           throw e
-        }
-      case e: FileNotFoundException => {
+      case e: FileNotFoundException =>
           logger.error(e.getMessage)
-        }
-      case e: IOException => {
+      case e: IOException =>
           logger.error(e.getMessage)
           throw e
-        }
-    } finally {}
+    finally {}
     fileExtension
-  }
 
   def fetchEntity(
-      httpClient: HttpClient, imageSrc: String): Option[HttpEntity] = {
+      httpClient: HttpClient, imageSrc: String): Option[HttpEntity] =
 
     val localContext: HttpContext = new BasicHttpContext
     localContext.setAttribute(
@@ -90,58 +83,49 @@ object ImageSaver extends Logging {
     val httpget = new HttpGet(imageSrc)
     val response = httpClient.execute(httpget, localContext)
     val respStatus: String = response.getStatusLine.toString
-    if (!respStatus.contains("200")) {
+    if (!respStatus.contains("200"))
       None
-    } else {
-      try {
+    else
+      try
         Some(response.getEntity)
-      } catch {
+      catch
         case e: Exception => warn(e, e.toString); None
-      } finally {
+      finally
         httpget.abort()
-      }
-    }
-  }
 
   def copyInputStreamToLocalImage(
-      entity: HttpEntity, linkhash: String, config: Configuration): String = {
+      entity: HttpEntity, linkhash: String, config: Configuration): String =
     val generator: Random = new Random
     val randInt: Int = generator.nextInt
     val localSrcPath = config.localStoragePath + "/" + linkhash + "_" + randInt
     val instream: InputStream = entity.getContent
     val outstream: OutputStream = new FileOutputStream(localSrcPath)
-    try {
+    try
       trace("Storing image locally: " + localSrcPath)
       IOUtils.copy(instream, outstream)
       val fileExtension = ImageSaver.getFileExtension(config, localSrcPath)
-      if (fileExtension == "" || fileExtension == null) {
+      if (fileExtension == "" || fileExtension == null)
         trace("EMPTY FILE EXTENSION: " + localSrcPath)
         return null
-      }
       val f: File = new File(localSrcPath)
-      if (f.length < config.minBytesForImages) {
-        if (logger.isDebugEnabled) {
+      if (f.length < config.minBytesForImages)
+        if (logger.isDebugEnabled)
           logger.debug(
               "TOO SMALL AN IMAGE: " + localSrcPath + " bytes: " + f.length)
-        }
         return null
-      }
       val newFilename = localSrcPath + fileExtension
       val newFile: File = new File(newFilename)
       f.renameTo(newFile)
       //      localSrcPath = localSrcPath + fileExtension
       trace("Image successfully Written to Disk")
       newFilename
-    } catch {
-      case e: Exception => {
+    catch
+      case e: Exception =>
           throw e
-        }
-    } finally {
+    finally
       //            entity.consumeContent
       instream.close()
       outstream.close()
-    }
-  }
 
   /**
     * stores an image to disk and returns the path where the file was written
@@ -152,50 +136,38 @@ object ImageSaver extends Logging {
   def storeTempImage(httpClient: HttpClient,
                      linkhash: String,
                      imageSrcMaster: String,
-                     config: Configuration): String = {
+                     config: Configuration): String =
     var imageSrc = imageSrcMaster
 
-    try {
+    try
       imageSrc = imageSrc.replace(" ", "%20")
       trace("Starting to download image: " + imageSrc)
 
-      fetchEntity(httpClient, imageSrc) match {
-        case Some(entity) => {
+      fetchEntity(httpClient, imageSrc) match
+        case Some(entity) =>
 
-            try {
+            try
               return copyInputStreamToLocalImage(entity, linkhash, config)
-            } catch {
-              case e: SecretGifException => {
+            catch
+              case e: SecretGifException =>
                   throw e
-                }
-              case e: Exception => {
+              case e: Exception =>
                   logger.error(e.getMessage); null
-                }
-            }
-          }
         case None => trace("Unable to get entity for: " + imageSrc); null
-      }
-    } catch {
-      case e: IllegalArgumentException => {
+    catch
+      case e: IllegalArgumentException =>
           logger.warn(e.getMessage)
-        }
-      case e: SecretGifException => {
+      case e: SecretGifException =>
           raise(e)
-        }
-      case e: ClientProtocolException => {
+      case e: ClientProtocolException =>
           logger.error(e.toString)
-        }
-      case e: IOException => {
+      case e: IOException =>
           logger.error(e.toString)
-        }
-      case e: Exception => {
+      case e: Exception =>
           e.printStackTrace()
           logger.error(e.toString)
           e.printStackTrace()
-        }
-    } finally {}
+    finally {}
     null
-  }
 
   private def raise(e: SecretGifException): Unit = {}
-}

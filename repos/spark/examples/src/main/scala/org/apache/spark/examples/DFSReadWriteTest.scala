@@ -35,54 +35,48 @@ import org.apache.spark.{SparkConf, SparkContext}
   *   5. Computes word count on the file using Spark
   *   6. Compares the word count results
   */
-object DFSReadWriteTest {
+object DFSReadWriteTest
 
   private var localFilePath: File = new File(".")
   private var dfsDirPath: String = ""
 
   private val NPARAMS = 2
 
-  private def readFile(filename: String): List[String] = {
+  private def readFile(filename: String): List[String] =
     val lineIter: Iterator[String] = fromFile(filename).getLines()
     val lineList: List[String] = lineIter.toList
     lineList
-  }
 
-  private def printUsage(): Unit = {
+  private def printUsage(): Unit =
     val usage: String =
       "DFS Read-Write Test\n" + "\n" + "Usage: localFile dfsDir\n" + "\n" +
       "localFile - (string) local file to use in test\n" +
       "dfsDir - (string) DFS directory for read/write tests\n"
 
     println(usage)
-  }
 
-  private def parseArgs(args: Array[String]): Unit = {
-    if (args.length != NPARAMS) {
+  private def parseArgs(args: Array[String]): Unit =
+    if (args.length != NPARAMS)
       printUsage()
       System.exit(1)
-    }
 
     var i = 0
 
     localFilePath = new File(args(i))
-    if (!localFilePath.exists) {
+    if (!localFilePath.exists)
       System.err.println("Given path (" + args(i) + ") does not exist.\n")
       printUsage()
       System.exit(1)
-    }
 
-    if (!localFilePath.isFile) {
+    if (!localFilePath.isFile)
       System.err.println("Given path (" + args(i) + ") is not a file.\n")
       printUsage()
       System.exit(1)
-    }
 
     i += 1
     dfsDirPath = args(i)
-  }
 
-  def runLocalWordCount(fileContents: List[String]): Int = {
+  def runLocalWordCount(fileContents: List[String]): Int =
     fileContents
       .flatMap(_.split(" "))
       .flatMap(_.split("\t"))
@@ -91,9 +85,8 @@ object DFSReadWriteTest {
       .mapValues(_.size)
       .values
       .sum
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     parseArgs(args)
 
     println("Performing local word count")
@@ -125,15 +118,12 @@ object DFSReadWriteTest {
 
     sc.stop()
 
-    if (localWordCount == dfsWordCount) {
+    if (localWordCount == dfsWordCount)
       println(
           s"Success! Local Word Count ($localWordCount) " +
           s"and DFS Word Count ($dfsWordCount) agree.")
-    } else {
+    else
       println(
           s"Failure! Local Word Count ($localWordCount) " +
           s"and DFS Word Count ($dfsWordCount) disagree.")
-    }
-  }
-}
 // scalastyle:on println

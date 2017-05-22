@@ -44,77 +44,66 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary._
 
 trait CogroupSpec[M[+ _]]
-    extends TableModuleTestSupport[M] with Specification with ScalaCheck {
+    extends TableModuleTestSupport[M] with Specification with ScalaCheck
   import SampleData._
   import trans._
   import trans.constants._
   import TableModule.paths._
 
   implicit val cogroupData = Arbitrary(
-      for {
+      for
         depth <- choose(1, 2)
         cschema <- Gen.oneOf(arraySchema(depth, 2), objectSchema(depth, 2))
         (idCount, data) <- genEventColumns(cschema)
-      } yield {
+      yield
         val (lschema, rschema) =
-          Bifunctor[Tuple2].umap(cschema.splitAt(cschema.size / 2)) {
+          Bifunctor[Tuple2].umap(cschema.splitAt(cschema.size / 2))
             _.map(_._1).toSet
-          }
-        val (l, r) = data map {
+        val (l, r) = data map
           case (ids, values) =>
-            val (d1, d2) = values.partition {
+            val (d1, d2) = values.partition
               case (cpath, _) => lschema.contains(cpath)
-            }
             (toRecord(ids, assemble(d1)), toRecord(ids, assemble(d2)))
-        } unzip
+        unzip
 
         (SampleData(l.sortBy(_ \ "key").toStream),
          SampleData(r.sortBy(_ \ "key").toStream))
-      }
   )
 
   type CogroupResult[A] = Stream[Either3[A, (A, A), A]]
 
   @tailrec protected final def computeCogroup[A](
       l: Stream[A], r: Stream[A], acc: CogroupResult[A])(
-      implicit ord: Order[A]): CogroupResult[A] = {
-    (l, r) match {
+      implicit ord: Order[A]): CogroupResult[A] =
+    (l, r) match
       case (lh #:: lt, rh #:: rt) =>
-        ord.order(lh, rh) match {
-          case EQ => {
+        ord.order(lh, rh) match
+          case EQ =>
               val (leftSpan, leftRemain) = l.partition(ord.order(_, lh) == EQ)
               val (rightSpan, rightRemain) =
                 r.partition(ord.order(_, rh) == EQ)
 
-              val cartesian = leftSpan.flatMap { lv =>
-                rightSpan.map { rv =>
+              val cartesian = leftSpan.flatMap  lv =>
+                rightSpan.map  rv =>
                   middle3((lv, rv))
-                }
-              }
 
               computeCogroup(leftRemain, rightRemain, acc ++ cartesian)
-            }
-          case LT => {
+          case LT =>
               val (leftRun, leftRemain) = l.partition(ord.order(_, rh) == LT)
 
-              computeCogroup(leftRemain, r, acc ++ leftRun.map {
+              computeCogroup(leftRemain, r, acc ++ leftRun.map
                 case v => left3(v)
-              })
-            }
-          case GT => {
+              )
+          case GT =>
               val (rightRun, rightRemain) = r.partition(ord.order(lh, _) == GT)
 
-              computeCogroup(l, rightRemain, acc ++ rightRun.map {
+              computeCogroup(l, rightRemain, acc ++ rightRun.map
                 case v => right3(v)
-              })
-            }
-        }
+              )
       case (Stream.Empty, _) => acc ++ r.map { case v => right3(v) }
       case (_, Stream.Empty) => acc ++ l.map { case v => left3(v) }
-    }
-  }
 
-  def testCogroup(l: SampleData, r: SampleData) = {
+  def testCogroup(l: SampleData, r: SampleData) =
     val ltable = fromSample(l)
     val rtable = fromSample(r)
 
@@ -123,14 +112,13 @@ trait CogroupSpec[M[+ _]]
     import scala.math.max
 
     val expected =
-      computeCogroup(l.data, r.data, Stream())(keyOrder) map {
+      computeCogroup(l.data, r.data, Stream())(keyOrder) map
         case Left3(jv) => jv
         case Middle3((jv1, jv2)) =>
           JObject(JField("key", jv1 \ "key"),
                   JField("valueLeft", jv1 \ "value"),
                   JField("valueRight", jv2 \ "value"))
         case Right3(jv) => jv
-      }
 
     val result: Table =
       ltable.cogroup(SourceKey.Single, SourceKey.Single, rtable)(
@@ -144,9 +132,8 @@ trait CogroupSpec[M[+ _]]
     val jsonResult = toJson(result)
 
     jsonResult.copoint must_== expected
-  }
 
-  def testTrivialCogroup(f: Table => Table = identity[Table]) = {
+  def testTrivialCogroup(f: Table => Table = identity[Table]) =
     def recl = toRecord(Array(0), JArray(JNum(12) :: Nil))
     def recr = toRecord(Array(0), JArray(JUndefined :: JNum(13) :: Nil))
 
@@ -168,9 +155,8 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(f(result))
     jsonResult.copoint must_== expected
-  }
 
-  def testSimpleCogroup(f: Table => Table = identity[Table]) = {
+  def testSimpleCogroup(f: Table => Table = identity[Table]) =
     def recl(i: Int) =
       toRecord(Array(i), JObject(List(JField("left", JString(i.toString)))))
     def recr(i: Int) =
@@ -231,9 +217,8 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(f(result))
     jsonResult.copoint must_== expected
-  }
 
-  def testUnionCogroup = {
+  def testUnionCogroup =
     def recl(i: Int, j: Int) =
       toRecord(Array(i), JObject(List(JField("left", JNum(j)))))
     def recr(i: Int, j: Int) =
@@ -281,9 +266,8 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(result)
     jsonResult.copoint must_== expected
-  }
 
-  def testAnotherSimpleCogroup = {
+  def testAnotherSimpleCogroup =
     def recl(i: Int) =
       toRecord(Array(i), JObject(List(JField("left", JString(i.toString)))))
     def recr(i: Int) =
@@ -321,9 +305,8 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(result)
     jsonResult.copoint must_== expected
-  }
 
-  def testAnotherSimpleCogroupSwitched = {
+  def testAnotherSimpleCogroupSwitched =
     def recl(i: Int) =
       toRecord(Array(i), JObject(List(JField("left", JString(i.toString)))))
     def recr(i: Int) =
@@ -361,9 +344,8 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(result)
     jsonResult.copoint must_== expected
-  }
 
-  def testUnsortedInputs = {
+  def testUnsortedInputs =
     def recl(i: Int) =
       toRecord(Array(i), JObject(List(JField("left", JString(i.toString)))))
     def recr(i: Int) =
@@ -385,9 +367,8 @@ trait CogroupSpec[M[+ _]]
                                                            SourceValue.Right),
                                          "value"))
         )).copoint must throwAn[Exception]
-  }
 
-  def testCogroupPathology1 = {
+  def testCogroupPathology1 =
     import JParser.parseUnsafe
     val s1 = SampleData(
         Stream(toRecord(Array(1, 1, 1), parseUnsafe("""{ "a":[] }"""))))
@@ -395,9 +376,8 @@ trait CogroupSpec[M[+ _]]
         Stream(toRecord(Array(1, 1, 1), parseUnsafe("""{ "b":0 }"""))))
 
     testCogroup(s1, s2)
-  }
 
-  def testCogroupSliceBoundaries = {
+  def testCogroupSliceBoundaries =
     import JParser.parseUnsafe
 
     val s1 = SampleData(
@@ -455,9 +435,8 @@ trait CogroupSpec[M[+ _]]
         ))
 
     testCogroup(s1, s2)
-  }
 
-  def testCogroupPathology2 = {
+  def testCogroupPathology2 =
     val s1 = SampleData(
         Stream(
             toRecord(
@@ -552,9 +531,8 @@ trait CogroupSpec[M[+ _]]
         ))
 
     testCogroup(s1, s2)
-  }
 
-  def testCogroupPathology3 = {
+  def testCogroupPathology3 =
     import JParser.parseUnsafe
     val s1 = SampleData(
         Stream(
@@ -607,9 +585,8 @@ trait CogroupSpec[M[+ _]]
         ))
 
     testCogroup(s1, s2)
-  }
 
-  def testPartialUndefinedCogroup = {
+  def testPartialUndefinedCogroup =
     import JParser.parseUnsafe
 
     val ltable = fromSample(
@@ -638,15 +615,14 @@ trait CogroupSpec[M[+ _]]
                        "right")))
 
     toJson(result).copoint must_== expected
-  }
 
-  def testLongEqualSpansOnRight = {
+  def testLongEqualSpansOnRight =
     val record = JParser.parseUnsafe("""{"key":"Bob","value":42}""")
     val ltable = fromSample(SampleData(Stream(record)))
     val rtable = fromSample(
-        SampleData(Stream.tabulate(22) { i =>
+        SampleData(Stream.tabulate(22)  i =>
       JParser.parseUnsafe("""{"key":"Bob","value":%d}""" format i)
-    }))
+    ))
 
     val expected = Stream.tabulate(22)(JNum(_))
 
@@ -659,14 +635,13 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(result).copoint
     jsonResult must_== expected
-  }
 
-  def testLongEqualSpansOnLeft = {
+  def testLongEqualSpansOnLeft =
     val record = JParser.parseUnsafe("""{"key":"Bob","value":42}""")
     val ltable = fromSample(
-        SampleData(Stream.tabulate(22) { i =>
+        SampleData(Stream.tabulate(22)  i =>
       JParser.parseUnsafe("""{"key":"Bob","value":%d}""" format i)
-    }))
+    ))
     val rtable = fromSample(SampleData(Stream(record)))
 
     val expected = Stream.tabulate(22)(JNum(_))
@@ -680,21 +655,20 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(result).copoint
     jsonResult must_== expected
-  }
 
-  def testLongEqualSpansOnBoth = {
+  def testLongEqualSpansOnBoth =
     val table = fromSample(
-        SampleData(Stream.tabulate(22) { i =>
+        SampleData(Stream.tabulate(22)  i =>
       JParser.parseUnsafe("""{"key":"Bob","value":%d}""" format i)
-    }))
+    ))
 
-    val expected = (for {
+    val expected = (for
       left <- 0 until 22
       right <- 0 until 22
-    } yield {
+    yield
       JParser.parseUnsafe(
           """{ "left": %d, "right": %d }""" format (left, right))
-    }).toStream
+    ).toStream
 
     val keySpec = DerefObjectStatic(Leaf(Source), CPathField("key"))
     val result: Table = table.cogroup(keySpec, keySpec, table)(
@@ -712,13 +686,12 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(result).copoint
     jsonResult must_== expected
-  }
 
-  def testLongLeftSpanWithIncreasingRight = {
+  def testLongLeftSpanWithIncreasingRight =
     val ltable = fromSample(
-        SampleData(Stream.tabulate(12) { i =>
+        SampleData(Stream.tabulate(12)  i =>
       JParser.parseUnsafe("""{"key":"Bob","value":%d}""" format i)
-    }))
+    ))
     val rtable = fromSample(
         SampleData(Stream(
                 JParser.parseUnsafe("""{"key":"Bob","value":50}"""),
@@ -726,9 +699,9 @@ trait CogroupSpec[M[+ _]]
             )))
 
     val expected =
-      Stream.tabulate(12) { i =>
+      Stream.tabulate(12)  i =>
         JParser.parseUnsafe("""{ "left": %d, "right": 50 }""" format i)
-      } ++ Stream(JParser.parseUnsafe("""{ "right": 60 }"""))
+      ++ Stream(JParser.parseUnsafe("""{ "right": 60 }"""))
 
     val keySpec = DerefObjectStatic(Leaf(Source), CPathField("key"))
     val result: Table = ltable.cogroup(keySpec, keySpec, rtable)(
@@ -748,5 +721,3 @@ trait CogroupSpec[M[+ _]]
 
     val jsonResult = toJson(result).copoint
     jsonResult must_== expected
-  }
-}

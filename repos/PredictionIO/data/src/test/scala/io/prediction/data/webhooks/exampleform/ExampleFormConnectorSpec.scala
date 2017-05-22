@@ -19,11 +19,11 @@ import io.prediction.data.webhooks.ConnectorTestUtil
 import org.specs2.mutable._
 
 /** Test the ExampleFormConnector */
-class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
+class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil
 
-  "ExampleFormConnector" should {
+  "ExampleFormConnector" should
 
-    "convert userAction to Event JSON" in {
+    "convert userAction to Event JSON" in
       // webhooks input
       val userAction = Map(
           "type" -> "userAction",
@@ -57,9 +57,8 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleFormConnector, userAction, expected)
-    }
 
-    "convert userAction without optional fields to Event JSON" in {
+    "convert userAction without optional fields to Event JSON" in
       // webhooks input
       val userAction = Map(
           "type" -> "userAction",
@@ -83,9 +82,8 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleFormConnector, userAction, expected)
-    }
 
-    "convert userActionItem to Event JSON" in {
+    "convert userActionItem to Event JSON" in
       // webhooks input
       val userActionItem = Map(
           "type" -> "userActionItem",
@@ -122,9 +120,8 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleFormConnector, userActionItem, expected)
-    }
 
-    "convert userActionItem without optional fields to Event JSON" in {
+    "convert userActionItem without optional fields to Event JSON" in
       // webhooks input
       val userActionItem = Map(
           "type" -> "userActionItem",
@@ -157,6 +154,3 @@ class ExampleFormConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(ExampleFormConnector, userActionItem, expected)
-    }
-  }
-}

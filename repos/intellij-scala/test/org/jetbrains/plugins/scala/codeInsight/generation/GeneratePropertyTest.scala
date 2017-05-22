@@ -7,11 +7,11 @@ import com.intellij.lang.LanguageCodeInsightActionHandler
   * Nikolay.Tropin
   * 2014-09-22
   */
-class GeneratePropertyTest extends ScalaGenerateTestBase {
+class GeneratePropertyTest extends ScalaGenerateTestBase
   override val handler: LanguageCodeInsightActionHandler =
     new ScalaGeneratePropertyHandler
 
-  def testSimple() {
+  def testSimple()
     val text = s"""class A {
                  |  ${CARET_MARKER}var a: Int = 0
                  |}"""
@@ -27,9 +27,8 @@ class GeneratePropertyTest extends ScalaGenerateTestBase {
                    |}"""
     checkIsAvailable(text)
     testInvoke(text, result, checkCaret = false)
-  }
 
-  def testWithoutType() {
+  def testWithoutType()
     val text = s"""object A {
                  |  ${CARET_MARKER}var a = 0
                  |}"""
@@ -45,9 +44,8 @@ class GeneratePropertyTest extends ScalaGenerateTestBase {
                    |}"""
     checkIsAvailable(text)
     testInvoke(text, result, checkCaret = false)
-  }
 
-  def testWithModifiers(): Unit = {
+  def testWithModifiers(): Unit =
     val text = s"""class A {
                  |  protected ${CARET_MARKER}var a = 0
                  |}"""
@@ -63,5 +61,3 @@ class GeneratePropertyTest extends ScalaGenerateTestBase {
                    |}"""
     checkIsAvailable(text)
     testInvoke(text, result, checkCaret = false)
-  }
-}

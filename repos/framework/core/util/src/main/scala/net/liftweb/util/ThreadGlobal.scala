@@ -24,7 +24,7 @@ import common._
   * convenience methods to transform the variable to a Box and execute
   * functions in a "scope" wherein the variable may hold a different value.
   */
-class ThreadGlobal[T] {
+class ThreadGlobal[T]
   private val threadLocal = new ThreadLocal[T]
 
   /**
@@ -42,10 +42,9 @@ class ThreadGlobal[T] {
     * Sets the value of this ThreadGlobal.
     * @param v the value to set.
     */
-  def set(v: T): ThreadGlobal[T] = {
+  def set(v: T): ThreadGlobal[T] =
     threadLocal.set(v)
     this
-  }
 
   /**
     * Alias for <code>set(v: T)</code>
@@ -63,18 +62,15 @@ class ThreadGlobal[T] {
     * @param x the value to temporarily set in this ThreadGlobal
     * @param f the function to execute
     */
-  def doWith[R](x: T)(f: => R): R = {
+  def doWith[R](x: T)(f: => R): R =
     val original = value
-    try {
+    try
       threadLocal.set(x)
       f
-    } finally {
+    finally
       threadLocal.set(original)
-    }
-  }
-}
 
-trait DynoVar[T] {
+trait DynoVar[T]
   private val threadLocal = new ThreadLocal[T]
   // threadLocal.set(Empty)
 
@@ -82,18 +78,14 @@ trait DynoVar[T] {
 
   def get = is
 
-  def set(v: T): this.type = {
+  def set(v: T): this.type =
     threadLocal.set(v)
     this
-  }
 
-  def run[S](x: T)(f: => S): S = {
+  def run[S](x: T)(f: => S): S =
     val original = threadLocal.get
-    try {
+    try
       threadLocal.set(x)
       f
-    } finally {
+    finally
       threadLocal.set(original)
-    }
-  }
-}

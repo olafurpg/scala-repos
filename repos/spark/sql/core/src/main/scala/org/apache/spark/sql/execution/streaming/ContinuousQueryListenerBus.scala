@@ -31,7 +31,7 @@ import org.apache.spark.util.ListenerBus
   */
 class ContinuousQueryListenerBus(sparkListenerBus: LiveListenerBus)
     extends SparkListener
-    with ListenerBus[ContinuousQueryListener, ContinuousQueryListener.Event] {
+    with ListenerBus[ContinuousQueryListener, ContinuousQueryListener.Event]
 
   sparkListenerBus.addListener(this)
 
@@ -39,27 +39,23 @@ class ContinuousQueryListenerBus(sparkListenerBus: LiveListenerBus)
     * Post a ContinuousQueryListener event to the Spark listener bus asynchronously. This event will
     * be dispatched to all ContinuousQueryListener in the thread of the Spark listener bus.
     */
-  def post(event: ContinuousQueryListener.Event) {
-    event match {
+  def post(event: ContinuousQueryListener.Event)
+    event match
       case s: QueryStarted =>
         postToAll(s)
       case _ =>
         sparkListenerBus.post(new WrappedContinuousQueryListenerEvent(event))
-    }
-  }
 
-  override def onOtherEvent(event: SparkListenerEvent): Unit = {
-    event match {
+  override def onOtherEvent(event: SparkListenerEvent): Unit =
+    event match
       case WrappedContinuousQueryListenerEvent(e) =>
         postToAll(e)
       case _ =>
-    }
-  }
 
   override protected def doPostEvent(
       listener: ContinuousQueryListener,
-      event: ContinuousQueryListener.Event): Unit = {
-    event match {
+      event: ContinuousQueryListener.Event): Unit =
+    event match
       case queryStarted: QueryStarted =>
         listener.onQueryStarted(queryStarted)
       case queryProgress: QueryProgress =>
@@ -67,8 +63,6 @@ class ContinuousQueryListenerBus(sparkListenerBus: LiveListenerBus)
       case queryTerminated: QueryTerminated =>
         listener.onQueryTerminated(queryTerminated)
       case _ =>
-    }
-  }
 
   /**
     * Wrapper for StreamingListenerEvent as SparkListenerEvent so that it can be posted to Spark
@@ -76,9 +70,7 @@ class ContinuousQueryListenerBus(sparkListenerBus: LiveListenerBus)
     */
   private case class WrappedContinuousQueryListenerEvent(
       streamingListenerEvent: ContinuousQueryListener.Event)
-      extends SparkListenerEvent {
+      extends SparkListenerEvent
 
     // Do not log streaming events in event log as history server does not support these events.
     protected[spark] override def logEvent: Boolean = false
-  }
-}

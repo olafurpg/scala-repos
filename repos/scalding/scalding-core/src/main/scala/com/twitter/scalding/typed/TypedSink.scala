@@ -22,7 +22,7 @@ import cascading.flow.FlowDef
 import cascading.pipe.Pipe
 import cascading.tuple.Fields
 
-object TypedSink extends java.io.Serializable {
+object TypedSink extends java.io.Serializable
 
   /**
     * Build a TypedSink by declaring a concrete type for the Source
@@ -30,17 +30,15 @@ object TypedSink extends java.io.Serializable {
     * easier to port legacy code
     */
   def apply[T](s: Source)(implicit tset: TupleSetter[T]): TypedSink[T] =
-    new TypedSink[T] {
+    new TypedSink[T]
       def setter[U <: T] = TupleSetter.asSubSetter[T, U](tset)
       def writeFrom(pipe: Pipe)(implicit flowDef: FlowDef, mode: Mode): Pipe =
         s.writeFrom(pipe)
-    }
-}
 
 /**
   * Opposite of TypedSource, used for writing into
   */
-trait TypedSink[-T] extends java.io.Serializable {
+trait TypedSink[-T] extends java.io.Serializable
   def setter[U <: T]: TupleSetter[U]
   // These are the fields the write function is expecting
   def sinkFields: Fields = Dsl.intFields(0 until setter.arity)
@@ -54,16 +52,13 @@ trait TypedSink[-T] extends java.io.Serializable {
   /**
     * Transform this sink into another type by applying a function first
     */
-  def contraMap[U](fn: U => T): TypedSink[U] = {
+  def contraMap[U](fn: U => T): TypedSink[U] =
     val self =
       this // compiler generated self can cause problems with serialization
-    new TypedSink[U] {
+    new TypedSink[U]
       override def sinkFields = self.sinkFields
       def setter[V <: U]: TupleSetter[V] = self.setter.contraMap(fn)
       def writeFrom(pipe: Pipe)(implicit fd: FlowDef, mode: Mode): Pipe =
         self.writeFrom(pipe)
       override def contraMap[U1](fn2: U1 => U) =
         self.contraMap(fn2.andThen(fn))
-    }
-  }
-}

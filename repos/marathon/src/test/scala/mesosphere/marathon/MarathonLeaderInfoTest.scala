@@ -10,8 +10,8 @@ import org.mockito.Mockito
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class MarathonLeaderInfoTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
-  class Fixture {
+    extends MarathonSpec with GivenWhenThen with Matchers
+  class Fixture
     lazy val candidate = mock[Candidate]
     lazy val maybeCandidate = Some(candidate)
     lazy val leader = new AtomicBoolean(false)
@@ -21,12 +21,10 @@ class MarathonLeaderInfoTest
     lazy val leaderInfo = new MarathonLeaderInfo(
         maybeCandidate, leader, eventStream, metrics)
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       Mockito.verifyNoMoreInteractions(candidate)
-    }
-  }
 
-  test("currentLeaderHostPort handles exceptions and returns None") {
+  test("currentLeaderHostPort handles exceptions and returns None")
     Given("a leaderInfo with a candidate which throws exceptions")
     val f = new Fixture
     Mockito
@@ -38,5 +36,3 @@ class MarathonLeaderInfoTest
 
     Then("it should return none")
     currentLeaderHostPort should be(None)
-  }
-}

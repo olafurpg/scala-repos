@@ -20,20 +20,18 @@ import scala.collection.JavaConversions._
   * [[mesosphere.mesos.simulation.DriverActor]].
   * Unimplemented methods throw [[scala.NotImplementedError]]s.
   */
-class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
+class SimulatedDriver(driverProps: Props) extends SchedulerDriver
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  private[this] def driverCmd(cmd: AnyRef): Status = {
-    driverActorRefOpt match {
+  private[this] def driverCmd(cmd: AnyRef): Status =
+    driverActorRefOpt match
       case Some(driverActor) =>
         log.debug(s"send driver cmd $cmd")
         driverActor ! cmd
       case None =>
         log.debug("no driver actor configured")
-    }
     status
-  }
 
   override def declineOffer(offerId: OfferID): Status =
     driverCmd(DriverActor.DeclineOffer(offerId))
@@ -50,9 +48,8 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
 
   override def killTask(taskId: TaskID): Status =
     driverCmd(DriverActor.KillTask(taskId))
-  override def reconcileTasks(statuses: util.Collection[TaskStatus]): Status = {
+  override def reconcileTasks(statuses: util.Collection[TaskStatus]): Status =
     driverCmd(DriverActor.ReconcileTask(statuses.toSeq))
-  }
 
   override def suppressOffers(): Status = driverCmd(DriverActor.SuppressOffers)
 
@@ -83,12 +80,11 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
   @volatile
   var driverActorRefOpt: Option[ActorRef] = None
 
-  private def status: Status = system match {
+  private def status: Status = system match
     case None => Status.DRIVER_STOPPED
     case Some(_) => Status.DRIVER_RUNNING
-  }
 
-  override def start(): Status = {
+  override def start(): Status =
     log.info("Starting simulated Mesos")
     val config: Config =
       ConfigFactory.load(getClass.getClassLoader, "mesos-simulation.conf")
@@ -98,26 +94,22 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
     driverCmd(this)
 
     Status.DRIVER_RUNNING
-  }
 
   override def stop(failover: Boolean): Status = stop()
   override def stop(): Status = abort()
-  override def abort(): Status = {
-    system match {
+  override def abort(): Status =
+    system match
       case None => Status.DRIVER_NOT_STARTED
       case Some(sys) =>
         sys.shutdown()
         Status.DRIVER_ABORTED
-    }
-  }
 
-  override def run(): Status = {
+  override def run(): Status =
     start()
     join()
-  }
 
-  override def join(): Status = {
-    system match {
+  override def join(): Status =
+    system match
       case None => Status.DRIVER_NOT_STARTED
       case Some(sys) =>
         sys.awaitTermination()
@@ -125,6 +117,3 @@ class SimulatedDriver(driverProps: Props) extends SchedulerDriver {
         system = None
         log.info("Stopped simulated Mesos")
         Status.DRIVER_STOPPED
-    }
-  }
-}

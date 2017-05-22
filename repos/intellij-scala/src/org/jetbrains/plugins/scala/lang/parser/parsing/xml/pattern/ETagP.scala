@@ -16,26 +16,23 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  * ETagP ::= </ Name [S] >
  */
 
-object ETagP {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ETagP
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val tagMarker = builder.mark()
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_END_TAG_START =>
         builder.advanceLexer()
       case _ =>
         tagMarker.drop()
         return false
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_NAME =>
         builder.advanceLexer()
       case _ => builder error ErrMsg("xml.name.expected")
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case XmlTokenType.XML_WHITE_SPACE => builder.advanceLexer()
       case _ =>
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_TAG_END =>
         builder.advanceLexer()
         tagMarker.done(ScalaElementTypes.XML_END_TAG)
@@ -44,6 +41,3 @@ object ETagP {
         builder error ErrMsg("xml.tag.end.expected")
         tagMarker.done(ScalaElementTypes.XML_END_TAG)
         true
-    }
-  }
-}

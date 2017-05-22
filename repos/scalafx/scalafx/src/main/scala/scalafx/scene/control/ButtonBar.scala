@@ -40,7 +40,7 @@ import scalafx.scene.Node
 /**
   * Object companion for [[scalafx.scene.control.ButtonBar]].
   */
-object ButtonBar {
+object ButtonBar
 
   /**
     * The default button ordering on Windows.
@@ -82,9 +82,8 @@ object ButtonBar {
     * @param button The button to annotate with the given { @link ButtonData} value.
     * @param buttonData The ButtonData to designate the button as.
     */
-  def setButtonData(button: Node, buttonData: ButtonBar.ButtonData) {
+  def setButtonData(button: Node, buttonData: ButtonBar.ButtonData)
     jfxsc.ButtonBar.setButtonData(button, buttonData)
-  }
 
   /**
     * Returns the previously set ButtonData property on the given button. If this
@@ -110,18 +109,16 @@ object ButtonBar {
     * @param uniformSize Boolean true to force uniform sizing on the button,
     *                    false to exclude the button from uniform sizing.
     */
-  def setButtonUniformSize(button: Node, uniformSize: Boolean) {
+  def setButtonUniformSize(button: Node, uniformSize: Boolean)
     jfxsc.ButtonBar.setButtonUniformSize(button, uniformSize)
-  }
 
   /**
     * Returns whether the given node is part of the uniform sizing calculations
     * or not. By default all nodes that have not opted out (via
     * [[scalafx.scene.control.ButtonBar.setButtonUniformSize( N o d e, b o o l e a n]]) will return true here.
     */
-  def isButtonUniformSize(button: Node): Boolean = {
+  def isButtonUniformSize(button: Node): Boolean =
     jfxsc.ButtonBar.isButtonUniformSize(button)
-  }
 
   /**
     * Wraps a $JFX $URL0 $FC]].
@@ -131,9 +128,8 @@ object ButtonBar {
     */
   sealed case class ButtonData(
       override val delegate: jfxsc.ButtonBar.ButtonData)
-      extends SFXEnumDelegate[jfxsc.ButtonBar.ButtonData] {
+      extends SFXEnumDelegate[jfxsc.ButtonBar.ButtonData]
     def typeCode: String = delegate.getTypeCode
-  }
 
   /**
     * Wraps a $JFX $URL0 $FC]].
@@ -144,7 +140,7 @@ object ButtonBar {
     * @define ORIGINALDOC Original Documentation]].
     */
   object ButtonData
-      extends SFXEnumDelegateCompanion[jfxsc.ButtonBar.ButtonData, ButtonData] {
+      extends SFXEnumDelegateCompanion[jfxsc.ButtonBar.ButtonData, ButtonData]
 
     /**
       * Buttons with this style tag will statically end up on the left end of the bar.
@@ -274,8 +270,6 @@ object ButtonBar {
             Other,
             BigGap,
             SmallGap)
-  }
-}
 
 /**
   * A ButtonBar is essentially a HBox, with the additional functionality for operating system specific button placement.
@@ -291,7 +285,7 @@ object ButtonBar {
 
   */
 class ButtonBar(override val delegate: jfxsc.ButtonBar = new jfxsc.ButtonBar())
-    extends Control(delegate) with SFXDelegate[jfxsc.ButtonBar] {
+    extends Control(delegate) with SFXDelegate[jfxsc.ButtonBar]
 
   /**
     * Creates a ButtonBar with the given button order (refer to
@@ -302,12 +296,10 @@ class ButtonBar(override val delegate: jfxsc.ButtonBar = new jfxsc.ButtonBar())
   def this(buttonOrder: String) = this(new jfxsc.ButtonBar(buttonOrder))
 
   def buttons: ObservableBuffer[jfxs.Node] = delegate.getButtons
-  def buttons_=(c: Node) = {
+  def buttons_=(c: Node) =
     fillSFXCollectionWithOne(delegate.getButtons, c)
-  }
-  def buttons_=(c: Iterable[Node]) = {
+  def buttons_=(c: Iterable[Node]) =
     fillSFXCollection(delegate.getButtons, c)
-  }
 
   /**
     * The order for the typical buttons in a standard button bar. It is
@@ -316,15 +308,12 @@ class ButtonBar(override val delegate: jfxsc.ButtonBar = new jfxsc.ButtonBar())
     * [[scalafx.scene.control.ButtonBar.ButtonOrderMacOs]], and [[scalafx.scene.control.ButtonBar.ButtonOrderLinux]].
     */
   def buttonOrder: StringProperty = delegate.buttonOrderProperty
-  def buttonOrder_=(v: String) {
+  def buttonOrder_=(v: String)
     buttonOrder() = v
-  }
 
   /**
     * Specifies the minimum width of all buttons placed in this button bar.
     */
   def buttonMinWidth: DoubleProperty = delegate.buttonMinWidthProperty
-  def buttonMinWidth_=(v: Double) {
+  def buttonMinWidth_=(v: Double)
     buttonMinWidth() = v
-  }
-}

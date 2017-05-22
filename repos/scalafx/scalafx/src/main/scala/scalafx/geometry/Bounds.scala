@@ -31,13 +31,12 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Bounds {
+object Bounds
   implicit def sfxBounds2jfx(b: Bounds): jfxg.Bounds =
     if (b != null) b.delegate else null
-}
 
 abstract class Bounds protected (override val delegate: jfxg.Bounds)
-    extends SFXDelegate[jfxg.Bounds] {
+    extends SFXDelegate[jfxg.Bounds]
 
   /*
    * Creates a new instance of Bounds class.
@@ -149,4 +148,3 @@ abstract class Bounds protected (override val delegate: jfxg.Bounds)
     * The width of this Bounds.
     */
   def width = delegate.getWidth
-}

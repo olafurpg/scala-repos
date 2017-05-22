@@ -26,23 +26,20 @@ import org.apache.spark.{SparkContext, SparkFunSuite}
 import org.apache.commons.lang3.StringEscapeUtils
 import org.apache.spark.util.Utils
 
-class ReplSuite extends SparkFunSuite {
+class ReplSuite extends SparkFunSuite
 
-  def runInterpreter(master: String, input: String): String = {
+  def runInterpreter(master: String, input: String): String =
     val CONF_EXECUTOR_CLASSPATH = "spark.executor.extraClassPath"
 
     val in = new BufferedReader(new StringReader(input + "\n"))
     val out = new StringWriter()
     val cl = getClass.getClassLoader
     var paths = new ArrayBuffer[String]
-    if (cl.isInstanceOf[URLClassLoader]) {
+    if (cl.isInstanceOf[URLClassLoader])
       val urlLoader = cl.asInstanceOf[URLClassLoader]
-      for (url <- urlLoader.getURLs) {
-        if (url.getProtocol == "file") {
+      for (url <- urlLoader.getURLs)
+        if (url.getProtocol == "file")
           paths += url.getFile
-        }
-      }
-    }
     val classpath = paths.mkString(File.pathSeparator)
 
     val oldExecutorClasspath = System.getProperty(CONF_EXECUTOR_CLASSPATH)
@@ -52,40 +49,33 @@ class ReplSuite extends SparkFunSuite {
     org.apache.spark.repl.Main.interp = interp
     interp.process(Array("-classpath", classpath))
     org.apache.spark.repl.Main.interp = null
-    if (interp.sparkContext != null) {
+    if (interp.sparkContext != null)
       interp.sparkContext.stop()
-    }
-    if (oldExecutorClasspath != null) {
+    if (oldExecutorClasspath != null)
       System.setProperty(CONF_EXECUTOR_CLASSPATH, oldExecutorClasspath)
-    } else {
+    else
       System.clearProperty(CONF_EXECUTOR_CLASSPATH)
-    }
     return out.toString
-  }
 
-  def assertContains(message: String, output: String) {
+  def assertContains(message: String, output: String)
     val isContain = output.contains(message)
     assert(isContain,
            "Interpreter output did not contain '" + message + "':\n" + output)
-  }
 
-  def assertDoesNotContain(message: String, output: String) {
+  def assertDoesNotContain(message: String, output: String)
     val isContain = output.contains(message)
     assert(!isContain,
            "Interpreter output contained '" + message + "':\n" + output)
-  }
 
-  test("propagation of local properties") {
+  test("propagation of local properties")
     // A mock ILoop that doesn't install the SIGINT handler.
-    class ILoop(out: PrintWriter) extends SparkILoop(None, out, None) {
+    class ILoop(out: PrintWriter) extends SparkILoop(None, out, None)
       settings = new scala.tools.nsc.Settings
       settings.usejavacp.value = true
       org.apache.spark.repl.Main.interp = this
-      override def createInterpreter() {
+      override def createInterpreter()
         intp = new SparkILoopInterpreter
         intp.setContextClassLoader()
-      }
-    }
 
     val out = new StringWriter()
     val interp = new ILoop(new PrintWriter(out))
@@ -102,9 +92,8 @@ class ReplSuite extends SparkFunSuite {
 
     interp.sparkContext.stop()
     System.clearProperty("spark.driver.port")
-  }
 
-  test("simple foreach with accumulator") {
+  test("simple foreach with accumulator")
     val output =
       runInterpreter("local",
                      """
@@ -115,9 +104,8 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res1: Int = 55", output)
-  }
 
-  test("external vars") {
+  test("external vars")
     val output = runInterpreter(
         "local",
         """
@@ -130,9 +118,8 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 70", output)
     assertContains("res1: Int = 100", output)
-  }
 
-  test("external classes") {
+  test("external classes")
     val output = runInterpreter(
         "local",
         """
@@ -144,9 +131,8 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 50", output)
-  }
 
-  test("external functions") {
+  test("external functions")
     val output = runInterpreter(
         "local",
         """
@@ -156,9 +142,8 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 110", output)
-  }
 
-  test("external functions that access vars") {
+  test("external functions that access vars")
     val output = runInterpreter(
         "local",
         """
@@ -172,9 +157,8 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("Exception", output)
     assertContains("res0: Int = 70", output)
     assertContains("res1: Int = 100", output)
-  }
 
-  test("broadcast vars") {
+  test("broadcast vars")
     // Test that the value that a broadcast var had when it was created is used,
     // even if that variable is then modified in the driver program
     // TODO: This doesn't actually work for arrays when we run in local mode!
@@ -191,9 +175,8 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("Exception", output)
     assertContains("res0: Array[Int] = Array(0, 0, 0, 0, 0)", output)
     assertContains("res2: Array[Int] = Array(5, 0, 0, 0, 0)", output)
-  }
 
-  test("interacting with files") {
+  test("interacting with files")
     val tempDir = Utils.createTempDir()
     val out = new FileWriter(tempDir + "/input")
     out.write("Hello world!\n")
@@ -215,9 +198,8 @@ class ReplSuite extends SparkFunSuite {
     assertContains("res1: Long = 3", output)
     assertContains("res2: Long = 3", output)
     Utils.deleteRecursively(tempDir)
-  }
 
-  test("local-cluster mode") {
+  test("local-cluster mode")
     val output = runInterpreter(
         "local-cluster[1,1,1024]",
         """
@@ -238,9 +220,8 @@ class ReplSuite extends SparkFunSuite {
     assertContains("res1: Int = 100", output)
     assertContains("res2: Array[Int] = Array(0, 0, 0, 0, 0)", output)
     assertContains("res4: Array[Int] = Array(0, 0, 0, 0, 0)", output)
-  }
 
-  test("SPARK-1199 two instances of same class don't type check.") {
+  test("SPARK-1199 two instances of same class don't type check.")
     val output = runInterpreter(
         "local-cluster[1,1,1024]",
         """
@@ -251,9 +232,8 @@ class ReplSuite extends SparkFunSuite {
       """.stripMargin)
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
-  }
 
-  test("SPARK-2452 compound statements.") {
+  test("SPARK-2452 compound statements.")
     val output = runInterpreter("local",
                                 """
         |val x = 4 ; def f() = x
@@ -261,9 +241,8 @@ class ReplSuite extends SparkFunSuite {
       """.stripMargin)
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
-  }
 
-  test("SPARK-2576 importing SQLContext.implicits._") {
+  test("SPARK-2576 importing SQLContext.implicits._")
     // We need to use local-cluster to test this case.
     val output = runInterpreter(
         "local-cluster[1,1,1024]",
@@ -278,9 +257,8 @@ class ReplSuite extends SparkFunSuite {
       """.stripMargin)
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
-  }
 
-  test("SPARK-8461 SQL with codegen") {
+  test("SPARK-8461 SQL with codegen")
     val output =
       runInterpreter("local",
                      """
@@ -290,9 +268,8 @@ class ReplSuite extends SparkFunSuite {
     """.stripMargin)
     assertContains("Long = 49", output)
     assertDoesNotContain("java.lang.ClassNotFoundException", output)
-  }
 
-  test("Datasets and encoders") {
+  test("Datasets and encoders")
     val output = runInterpreter(
         "local",
         """
@@ -312,10 +289,9 @@ class ReplSuite extends SparkFunSuite {
       """.stripMargin)
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
-  }
 
   test(
-      "SPARK-2632 importing a method from non serializable class and not using it.") {
+      "SPARK-2632 importing a method from non serializable class and not using it.")
     val output = runInterpreter(
         "local",
         """
@@ -327,10 +303,9 @@ class ReplSuite extends SparkFunSuite {
     """.stripMargin)
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
-  }
 
-  if (System.getenv("MESOS_NATIVE_JAVA_LIBRARY") != null) {
-    test("running on Mesos") {
+  if (System.getenv("MESOS_NATIVE_JAVA_LIBRARY") != null)
+    test("running on Mesos")
       val output = runInterpreter(
           "localquiet",
           """
@@ -351,10 +326,8 @@ class ReplSuite extends SparkFunSuite {
       assertContains("res1: Int = 100", output)
       assertContains("res2: Array[Int] = Array(0, 0, 0, 0, 0)", output)
       assertContains("res4: Array[Int] = Array(0, 0, 0, 0, 0)", output)
-    }
-  }
 
-  test("Datasets agg type-inference") {
+  test("Datasets agg type-inference")
     val output = runInterpreter(
         "local",
         """
@@ -377,9 +350,8 @@ class ReplSuite extends SparkFunSuite {
       """.stripMargin)
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
-  }
 
-  test("collecting objects of class defined in repl") {
+  test("collecting objects of class defined in repl")
     val output = runInterpreter(
         "local[2]",
         """
@@ -389,9 +361,8 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("ret: Array[Foo] = Array(Foo(1),", output)
-  }
 
-  test("collecting objects of class defined in repl - shuffling") {
+  test("collecting objects of class defined in repl - shuffling")
     val output =
       runInterpreter("local-cluster[1,1,1024]",
                      """
@@ -402,5 +373,3 @@ class ReplSuite extends SparkFunSuite {
     assertDoesNotContain("error:", output)
     assertDoesNotContain("Exception", output)
     assertContains("ret: Array[(Int, Iterable[Foo])] = Array((1,", output)
-  }
-}

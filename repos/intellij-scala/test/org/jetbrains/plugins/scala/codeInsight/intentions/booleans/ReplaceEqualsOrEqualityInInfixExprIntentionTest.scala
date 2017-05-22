@@ -9,20 +9,17 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @since 4/20/12
   */
 class ReplaceEqualsOrEqualityInInfixExprIntentionTest
-    extends ScalaIntentionTestBase {
+    extends ScalaIntentionTestBase
   val familyName = ReplaceEqualsOrEqualityInInfixExprIntention.familyName
 
-  def testReplaceQuality() {
+  def testReplaceQuality()
     val text = "if (a ==<caret> b) return"
     val resultText = "if (a <caret>equals b) return"
 
     doTest(text, resultText)
-  }
 
-  def testReplaceQuality2() {
+  def testReplaceQuality2()
     val text = "if (a <caret>equals false) return"
     val resultText = "if (a <caret>== false) return"
 
     doTest(text, resultText)
-  }
-}

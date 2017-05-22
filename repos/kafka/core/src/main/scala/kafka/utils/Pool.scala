@@ -23,15 +23,14 @@ import collection.JavaConversions
 import kafka.common.KafkaException
 
 class Pool[K, V](valueFactory: Option[(K) => V] = None)
-    extends Iterable[(K, V)] {
+    extends Iterable[(K, V)]
 
   private val pool: ConcurrentMap[K, V] = new ConcurrentHashMap[K, V]
   private val createLock = new Object
 
-  def this(m: collection.Map[K, V]) {
+  def this(m: collection.Map[K, V])
     this()
     m.foreach(kv => pool.put(kv._1, kv._2))
-  }
 
   def put(k: K, v: V) = pool.put(k, v)
 
@@ -48,18 +47,16 @@ class Pool[K, V](valueFactory: Option[(K) => V] = None)
     *         the value created by the factory if another thread successfully
     *         put a value.
     */
-  def getAndMaybePut(key: K) = {
+  def getAndMaybePut(key: K) =
     if (valueFactory.isEmpty)
       throw new KafkaException("Empty value factory in pool.")
     val curr = pool.get(key)
-    if (curr == null) {
-      createLock synchronized {
+    if (curr == null)
+      createLock synchronized
         val curr = pool.get(key)
         if (curr == null) pool.put(key, valueFactory.get(key))
         pool.get(key)
-      }
-    } else curr
-  }
+    else curr
 
   def contains(id: K) = pool.containsKey(id)
 
@@ -69,29 +66,24 @@ class Pool[K, V](valueFactory: Option[(K) => V] = None)
 
   def remove(key: K, value: V): Boolean = pool.remove(key, value)
 
-  def keys: mutable.Set[K] = {
+  def keys: mutable.Set[K] =
     import JavaConversions._
     pool.keySet()
-  }
 
-  def values: Iterable[V] = {
+  def values: Iterable[V] =
     import JavaConversions._
     new ArrayList[V](pool.values())
-  }
 
   def clear() { pool.clear() }
 
   override def size = pool.size
 
-  override def iterator = new Iterator[(K, V)]() {
+  override def iterator = new Iterator[(K, V)]()
 
     private val iter = pool.entrySet.iterator
 
     def hasNext: Boolean = iter.hasNext
 
-    def next: (K, V) = {
+    def next: (K, V) =
       val n = iter.next
       (n.getKey, n.getValue)
-    }
-  }
-}

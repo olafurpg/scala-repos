@@ -69,7 +69,7 @@ object EffectIncludes extends EffectIncludes
   * @define SPT SepiaTone
   * @define SHW Shadow
   */
-trait EffectIncludes {
+trait EffectIncludes
 
   /**
     * $START$BLE.html $BLE$END
@@ -297,4 +297,3 @@ trait EffectIncludes {
     */
   implicit def jfxShadow2sfx(s: jfxse.Shadow): Shadow =
     if (s != null) new Shadow(s) else null
-}

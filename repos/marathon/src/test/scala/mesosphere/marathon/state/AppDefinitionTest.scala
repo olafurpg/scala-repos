@@ -9,11 +9,11 @@ import org.scalatest.Matchers
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
-class AppDefinitionTest extends MarathonSpec with Matchers {
+class AppDefinitionTest extends MarathonSpec with Matchers
 
   val fullVersion = AppDefinition.VersionInfo.forNewConfig(Timestamp(1))
 
-  test("ToProto") {
+  test("ToProto")
     val app1 = AppDefinition(
         id = "play".toPath,
         cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
@@ -78,9 +78,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     assert(0.7 == proto2.getUpgradeStrategy.getMinimumHealthCapacity)
     assert(0.4 == proto2.getUpgradeStrategy.getMaximumOverCapacity)
     assert(!proto2.hasAcceptedResourceRoles)
-  }
 
-  test("CMD to proto and back again") {
+  test("CMD to proto and back again")
     val app = AppDefinition(
         id = "play".toPath,
         cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
@@ -95,9 +94,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     val read = AppDefinition().mergeFromProto(proto)
     read should be(app)
-  }
 
-  test("ARGS to proto and back again") {
+  test("ARGS to proto and back again")
     val app = AppDefinition(
         id = "play".toPath,
         args = Some(Seq("bash", "foo-*/start", "-Dhttp.port=$PORT")),
@@ -114,9 +112,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     val read = AppDefinition().mergeFromProto(proto)
     read should be(app)
-  }
 
-  test("ipAddress to proto and back again") {
+  test("ipAddress to proto and back again")
     val app = AppDefinition(
         id = "app-with-ip-address".toPath,
         cmd = Some("sleep 30"),
@@ -138,9 +135,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
 
     val read = AppDefinition().mergeFromProto(proto)
     read should be(app)
-  }
 
-  test("ipAddress discovery to proto and back again") {
+  test("ipAddress discovery to proto and back again")
     val app = AppDefinition(
         id = "app-with-ip-address".toPath,
         cmd = Some("sleep 30"),
@@ -167,9 +163,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     proto.getIpAddress.getDiscoveryInfo.getPortsList.size() should be(1)
     val read = AppDefinition().mergeFromProto(proto)
     read should equal(app)
-  }
 
-  test("MergeFromProto") {
+  test("MergeFromProto")
     val cmd = mesos.CommandInfo.newBuilder
       .setValue("bash foo-*/start -Dhttp.port=$PORT")
 
@@ -187,9 +182,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     assert(3 == app1.instances)
     assert("//cmd" == app1.executor)
     assert(Some("bash foo-*/start -Dhttp.port=$PORT") == app1.cmd)
-  }
 
-  test("Read obsolete ports from proto") {
+  test("Read obsolete ports from proto")
     val cmd = mesos.CommandInfo.newBuilder
       .setValue("bash foo-*/start -Dhttp.port=$PORT")
 
@@ -206,9 +200,8 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     val app = AppDefinition().mergeFromProto(proto1)
 
     assert(PortDefinitions(1000, 1001) == app.portDefinitions)
-  }
 
-  test("ProtoRoundtrip") {
+  test("ProtoRoundtrip")
     val app1 = AppDefinition(
         id = "play".toPath,
         cmd = Some("bash foo-*/start -Dhttp.port=$PORT"),
@@ -234,13 +227,10 @@ class AppDefinitionTest extends MarathonSpec with Matchers {
     )
     val result2 = AppDefinition().mergeFromProto(app2.toProto)
     assert(result2 == app2)
-  }
 
-  def getScalarResourceValue(proto: ServiceDefinition, name: String) = {
+  def getScalarResourceValue(proto: ServiceDefinition, name: String) =
     proto.getResourcesList.asScala
       .find(_.getName == name)
       .get
       .getScalar
       .getValue
-  }
-}

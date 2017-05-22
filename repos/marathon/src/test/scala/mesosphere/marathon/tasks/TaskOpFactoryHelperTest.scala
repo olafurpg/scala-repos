@@ -7,9 +7,9 @@ import org.apache.mesos.{Protos => Mesos}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class TaskOpFactoryHelperTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers
 
-  test("exception when newTask.taskId and taskInfo.id don't match") {
+  test("exception when newTask.taskId and taskInfo.id don't match")
     val f = new Fixture
 
     Given("A non-matching task and taskInfo")
@@ -17,15 +17,13 @@ class TaskOpFactoryHelperTest
     val taskInfo = Mesos.TaskInfo.getDefaultInstance
 
     When("We create a launch operation")
-    val error = intercept[AssertionError] {
+    val error = intercept[AssertionError]
       f.helper.launch(taskInfo, task)
-    }
 
     Then("An exception is thrown")
     error.getMessage shouldEqual "assumption failed: marathon task id and mesos task id must be equal"
-  }
 
-  test("Create a launch TaskOp") {
+  test("Create a launch TaskOp")
     val f = new Fixture
 
     Given("a task and a taskInfo")
@@ -42,9 +40,6 @@ class TaskOpFactoryHelperTest
     launch.oldTask shouldBe empty
     launch.offerOperations should have size 1
     launch.offerOperations.head.getType shouldEqual Mesos.Offer.Operation.Type.LAUNCH
-  }
 
-  class Fixture {
+  class Fixture
     val helper = new TaskOpFactoryHelper(Some("principal"), Some("role"))
-  }
-}

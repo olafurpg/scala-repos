@@ -33,35 +33,32 @@ import org.apache.spark.util.collection.OpenHashMap
   */
 private[spark] class GroupedCountEvaluator[T : ClassTag](
     totalOutputs: Int, confidence: Double)
-    extends ApproximateEvaluator[OpenHashMap[T, Long], Map[T, BoundedDouble]] {
+    extends ApproximateEvaluator[OpenHashMap[T, Long], Map[T, BoundedDouble]]
 
   var outputsMerged = 0
   var sums = new OpenHashMap[T, Long]() // Sum of counts for each key
 
-  override def merge(outputId: Int, taskResult: OpenHashMap[T, Long]) {
+  override def merge(outputId: Int, taskResult: OpenHashMap[T, Long])
     outputsMerged += 1
-    taskResult.foreach {
+    taskResult.foreach
       case (key, value) =>
         sums.changeValue(key, value, _ + value)
-    }
-  }
 
-  override def currentResult(): Map[T, BoundedDouble] = {
-    if (outputsMerged == totalOutputs) {
+  override def currentResult(): Map[T, BoundedDouble] =
+    if (outputsMerged == totalOutputs)
       val result = new JHashMap[T, BoundedDouble](sums.size)
-      sums.foreach {
+      sums.foreach
         case (key, sum) =>
           result.put(key, new BoundedDouble(sum, 1.0, sum, sum))
-      }
       result.asScala
-    } else if (outputsMerged == 0) {
+    else if (outputsMerged == 0)
       new HashMap[T, BoundedDouble]
-    } else {
+    else
       val p = outputsMerged.toDouble / totalOutputs
       val confFactor = new NormalDistribution()
         .inverseCumulativeProbability(1 - (1 - confidence) / 2)
       val result = new JHashMap[T, BoundedDouble](sums.size)
-      sums.foreach {
+      sums.foreach
         case (key, sum) =>
           val mean = (sum + 1 - p) / p
           val variance = (sum + 1) * (1 - p) / (p * p)
@@ -69,8 +66,4 @@ private[spark] class GroupedCountEvaluator[T : ClassTag](
           val low = mean - confFactor * stdev
           val high = mean + confFactor * stdev
           result.put(key, new BoundedDouble(mean, confidence, low, high))
-      }
       result.asScala
-    }
-  }
-}

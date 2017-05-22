@@ -32,10 +32,9 @@ import org.I0Itec.zkclient.{IZkStateListener, IZkChildListener, ZkClient}
 /**
   * Represents all the entities that can be configured via ZK
   */
-object ConfigType {
+object ConfigType
   val Topic = "topics"
   val Client = "clients"
-}
 
 /**
   * This class initiates and carries out config changes for all entities defined in ConfigType.
@@ -76,34 +75,32 @@ class DynamicConfigManager(
     private val configHandlers: Map[String, ConfigHandler],
     private val changeExpirationMs: Long = 15 * 60 * 1000,
     private val time: Time = SystemTime)
-    extends Logging {
+    extends Logging
   private var lastExecutedChange = -1L
 
-  object ConfigChangedNotificationHandler extends NotificationHandler {
-    override def processNotification(json: String) = {
-      Json.parseFull(json) match {
+  object ConfigChangedNotificationHandler extends NotificationHandler
+    override def processNotification(json: String) =
+      Json.parseFull(json) match
         case None => // There are no config overrides.
         // Ignore non-json notifications because they can be from the deprecated TopicConfigManager
         case Some(mapAnon: Map[_, _]) =>
           val map = mapAnon collect { case (k: String, v: Any) => k -> v }
           require(map("version") == 1)
 
-          val entityType = map.get("entity_type") match {
+          val entityType = map.get("entity_type") match
             case Some(ConfigType.Topic) => ConfigType.Topic
             case Some(ConfigType.Client) => ConfigType.Client
             case _ =>
               throw new IllegalArgumentException(
                   "Config change notification must have 'entity_type' set to either 'client' or 'topic'." +
                   " Received: " + json)
-          }
 
-          val entity = map.get("entity_name") match {
+          val entity = map.get("entity_name") match
             case Some(value: String) => value
             case _ =>
               throw new IllegalArgumentException(
                   "Config change notification does not specify 'entity_name'. Received: " +
                   json)
-          }
           val entityConfig =
             AdminUtils.fetchEntityConfig(zkUtils, entityType, entity)
           logger.info(
@@ -116,9 +113,6 @@ class DynamicConfigManager(
               "{\"version\" : 1," + " \"entity_type\":\"topic/client\"," +
               " \"entity_name\" : \"topic_name/client_id\"}." + " Received: " +
               json)
-      }
-    }
-  }
 
   private val configChangeListener = new ZkNodeChangeNotificationListener(
       zkUtils,
@@ -129,7 +123,5 @@ class DynamicConfigManager(
   /**
     * Begin watching for config changes
     */
-  def startup(): Unit = {
+  def startup(): Unit =
     configChangeListener.init()
-  }
-}

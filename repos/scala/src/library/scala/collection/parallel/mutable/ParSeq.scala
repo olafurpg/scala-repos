@@ -26,7 +26,7 @@ trait ParSeq[T]
     extends scala.collection /*.mutable*/ .GenSeq[T] // was: scala.collection.mutable.Seq[T]
     with ParIterable[T]
     with scala.collection.parallel.ParSeq[T] with GenericParTemplate[T, ParSeq]
-    with ParSeqLike[T, ParSeq[T], scala.collection.mutable.Seq[T]] {
+    with ParSeqLike[T, ParSeq[T], scala.collection.mutable.Seq[T]]
   self =>
   override def companion: GenericCompanion[ParSeq] with GenericParCompanion[
       ParSeq] = ParSeq
@@ -37,17 +37,15 @@ trait ParSeq[T]
   def seq: scala.collection.mutable.Seq[T]
 
   override def toSeq: ParSeq[T] = this
-}
 
 /** $factoryInfo
   *  @define Coll `mutable.ParSeq`
   *  @define coll mutable parallel sequence
   */
-object ParSeq extends ParFactory[ParSeq] {
+object ParSeq extends ParFactory[ParSeq]
   implicit def canBuildFrom[T]: CanCombineFrom[Coll, T, ParSeq[T]] =
     new GenericCanCombineFrom[T]
 
   def newBuilder[T]: Combiner[T, ParSeq[T]] = ParArrayCombiner[T]
 
   def newCombiner[T]: Combiner[T, ParSeq[T]] = ParArrayCombiner[T]
-}

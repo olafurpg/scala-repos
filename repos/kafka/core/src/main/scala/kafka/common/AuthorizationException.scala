@@ -24,16 +24,13 @@ abstract class AuthorizationException(message: String)
     extends RuntimeException(message) {}
 
 class TopicAuthorizationException(message: String)
-    extends AuthorizationException(message) {
+    extends AuthorizationException(message)
   def this() = this(null)
-}
 
 class GroupAuthorizationException(message: String)
-    extends AuthorizationException(message) {
+    extends AuthorizationException(message)
   def this() = this(null)
-}
 
 class ClusterAuthorizationException(message: String)
-    extends AuthorizationException(message) {
+    extends AuthorizationException(message)
   def this() = this(null)
-}

@@ -1,6 +1,6 @@
 package lila.game
 
-private[game] final class GameJs(path: String, useCache: Boolean) {
+private[game] final class GameJs(path: String, useCache: Boolean)
 
   def unsigned: String = useCache.fold(cached, readFromSource)
 
@@ -10,10 +10,7 @@ private[game] final class GameJs(path: String, useCache: Boolean) {
 
   private lazy val cached: String = readFromSource
 
-  private def readFromSource = {
+  private def readFromSource =
     val source = scala.io.Source fromFile path
-    source.mkString ~ { _ =>
+    source.mkString ~  _ =>
       source.close
-    }
-  }
-}

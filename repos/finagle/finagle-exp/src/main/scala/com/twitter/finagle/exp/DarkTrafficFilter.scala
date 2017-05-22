@@ -17,7 +17,7 @@ class DarkTrafficFilter[Req, Rep](darkService: Service[Req, Rep],
                                   enableSampling: Req => Boolean,
                                   statsReceiver: StatsReceiver,
                                   forwardAfterService: Boolean)
-    extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep]
 
   def this(
       darkService: Service[Req, Rep],
@@ -34,29 +34,22 @@ class DarkTrafficFilter[Req, Rep](darkService: Service[Req, Rep],
   private[this] val failedCounter = scopedStatsReceiver.counter("failed")
   private[this] val log = Logger.get("DarkTrafficFilter")
 
-  override def apply(request: Req, service: Service[Req, Rep]): Future[Rep] = {
-    if (forwardAfterService) {
-      service(request).ensure {
+  override def apply(request: Req, service: Service[Req, Rep]): Future[Rep] =
+    if (forwardAfterService)
+      service(request).ensure
         darkRequest(request)
-      }
-    } else {
+    else
       val rep = service(request)
       darkRequest(request)
       rep
-    }
-  }
 
-  private[this] def darkRequest(request: Req): Unit = {
-    if (enableSampling(request)) {
+  private[this] def darkRequest(request: Req): Unit =
+    if (enableSampling(request))
       requestsForwardedCounter.incr()
-      darkService(request).onFailure { t: Throwable =>
+      darkService(request).onFailure  t: Throwable =>
         // This may not count if you're using a one-way service
         failedCounter.incr()
 
         log.error(t, t.getMessage)
-      }
-    } else {
+    else
       requestsSkippedCounter.incr()
-    }
-  }
-}

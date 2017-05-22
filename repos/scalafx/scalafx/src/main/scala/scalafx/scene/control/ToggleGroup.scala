@@ -34,17 +34,16 @@ import scalafx.beans.property.ReadOnlyObjectProperty
 import scalafx.collections._
 import scalafx.delegate.SFXDelegate
 
-object ToggleGroup {
+object ToggleGroup
   implicit def sfxToggleGroup2jfx(v: ToggleGroup): jfxsc.ToggleGroup =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ToggleGroup.html]].
   */
 class ToggleGroup(
     override val delegate: jfxsc.ToggleGroup = new jfxsc.ToggleGroup)
-    extends SFXDelegate[jfxsc.ToggleGroup] {
+    extends SFXDelegate[jfxsc.ToggleGroup]
 
   /**
     * The selected toggle.
@@ -63,7 +62,5 @@ class ToggleGroup(
     *
     * @param c list of toggles to replace prior toggles.
     */
-  def toggles_=(c: Iterable[Toggle]) {
+  def toggles_=(c: Iterable[Toggle])
     fillSFXCollection(this.toggles, c)
-  }
-}

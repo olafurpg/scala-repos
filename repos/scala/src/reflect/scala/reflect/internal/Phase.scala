@@ -7,7 +7,7 @@ package scala
 package reflect
 package internal
 
-abstract class Phase(val prev: Phase) {
+abstract class Phase(val prev: Phase)
   if ((prev ne null) && (prev ne NoPhase)) prev.nx = this
 
   type Id = Int
@@ -61,19 +61,15 @@ abstract class Phase(val prev: Phase) {
 
   override def toString() = name
   override def hashCode = id.## + name.##
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case x: Phase => id == x.id && name == x.name
     case _ => false
-  }
-}
 
-object NoPhase extends Phase(null) {
+object NoPhase extends Phase(null)
   def name = "<no phase>"
   override def keepsTypeParams = false
   def run() { throw new Error("NoPhase.run") }
-}
 
-object SomePhase extends Phase(NoPhase) {
+object SomePhase extends Phase(NoPhase)
   def name = "<some phase>"
   def run() { throw new Error("SomePhase.run") }
-}

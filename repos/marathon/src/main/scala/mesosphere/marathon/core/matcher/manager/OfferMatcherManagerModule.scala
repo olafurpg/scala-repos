@@ -20,7 +20,7 @@ class OfferMatcherManagerModule(clock: Clock,
                                 random: Random,
                                 metrics: Metrics,
                                 offerMatcherConfig: OfferMatcherManagerConfig,
-                                leadershipModule: LeadershipModule) {
+                                leadershipModule: LeadershipModule)
 
   private[this] lazy val offersWanted: Subject[Boolean] =
     PublishSubject[Boolean]()
@@ -28,14 +28,13 @@ class OfferMatcherManagerModule(clock: Clock,
   private[this] lazy val offerMatcherManagerMetrics =
     new OfferMatcherManagerActorMetrics(metrics)
 
-  private[this] val offerMatcherMultiplexer: ActorRef = {
+  private[this] val offerMatcherMultiplexer: ActorRef =
     val props = OfferMatcherManagerActor.props(offerMatcherManagerMetrics,
                                                random,
                                                clock,
                                                offerMatcherConfig,
                                                offersWanted)
     leadershipModule.startWhenLeader(props, "offerMatcherManager")
-  }
 
   /**
     * Signals `true` if we are interested in (new) offers, signals `false` if we are currently not interested in
@@ -46,4 +45,3 @@ class OfferMatcherManagerModule(clock: Clock,
       clock, offerMatcherMultiplexer, None)
   val subOfferMatcherManager: OfferMatcherManager =
     new OfferMatcherManagerDelegate(offerMatcherMultiplexer)
-}

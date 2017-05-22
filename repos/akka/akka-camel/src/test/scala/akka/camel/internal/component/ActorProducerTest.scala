@@ -31,140 +31,111 @@ import akka.testkit._
 
 class ActorProducerTest
     extends TestKit(ActorSystem("test")) with WordSpecLike with Matchers
-    with ActorProducerFixture {
+    with ActorProducerFixture
   implicit val timeout = Timeout(10 seconds)
 
-  "ActorProducer" when {
+  "ActorProducer" when
 
-    "synchronous" when {
+    "synchronous" when
 
-      "consumer actor doesnt exist" must {
-        "set failure message on exchange" in {
+      "consumer actor doesnt exist" must
+        "set failure message on exchange" in
           producer = given(actor = null)
           producer.processExchangeAdapter(exchange)
 
           verify(exchange).setFailure(any[FailureResult])
-        }
-      }
 
-      "in-only" must {
+      "in-only" must
         def producer = given(outCapable = false)
 
-        "pass the message to the consumer" taggedAs TimingTest in {
+        "pass the message to the consumer" taggedAs TimingTest in
           producer.processExchangeAdapter(exchange)
           within(1 second)(probe.expectMsg(message))
-        }
 
-        "not expect response and not block" taggedAs TimingTest in {
+        "not expect response and not block" taggedAs TimingTest in
           time(producer.processExchangeAdapter(exchange)) should be <
           (200 millis)
-        }
-      }
 
-      "manualAck" when {
+      "manualAck" when
 
-        "response is Ack" must {
-          "process the exchange" in {
+        "response is Ack" must
+          "process the exchange" in
             producer = given(outCapable = false, autoAck = false)
             import system.dispatcher
             val future = Future { producer.processExchangeAdapter(exchange) }
-            within(1 second) {
+            within(1 second)
               probe.expectMsgType[CamelMessage]
               info("message sent to consumer")
               probe.sender() ! Ack
-            }
             verify(exchange, never()).setResponse(any[CamelMessage])
             info("no response forwarded to exchange")
             Await.ready(future, timeout.duration)
-          }
-        }
-        "the consumer does not respond wit Ack" must {
-          "not block forever" in {
+        "the consumer does not respond wit Ack" must
+          "not block forever" in
             producer = given(outCapable = false, autoAck = false)
             import system.dispatcher
-            val future = Future {
+            val future = Future
               producer.processExchangeAdapter(exchange)
-            }
-            within(1 second) {
+            within(1 second)
               probe.expectMsgType[CamelMessage]
               info("message sent to consumer")
-            }
             verify(exchange, never()).setResponse(any[CamelMessage])
             info("no response forwarded to exchange")
-            intercept[TimeoutException] {
+            intercept[TimeoutException]
               Await.ready(future, camel.settings.ReplyTimeout - (1 seconds))
-            }
-          }
-        }
-      }
 
-      "out capable" when {
-        "response is sent back by actor" must {
+      "out capable" when
+        "response is sent back by actor" must
 
-          "get a response" in {
+          "get a response" in
             producer = given(actor = echoActor, outCapable = true)
 
             producer.processExchangeAdapter(exchange)
 
             verify(exchange).setResponse(msg("received " + message))
-          }
-        }
 
-        "response is not sent by actor" must {
+        "response is not sent by actor" must
           val latch = TestLatch(1)
-          val callback = new AsyncCallback {
-            def done(doneSync: Boolean) {
+          val callback = new AsyncCallback
+            def done(doneSync: Boolean)
               latch.countDown()
-            }
-          }
-          def process() = {
+          def process() =
             producer = given(outCapable = true, replyTimeout = 100 millis)
-            val duration = time {
+            val duration = time
               producer.processExchangeAdapter(exchange, callback)
               // wait for the actor to complete the callback
               Await.ready(latch, 1.seconds.dilated)
-            }
             latch.reset()
             duration
-          }
 
-          "timeout after replyTimeout" taggedAs TimingTest in {
+          "timeout after replyTimeout" taggedAs TimingTest in
             val duration = process()
             duration should (be >= (100 millis) and be < (2000 millis))
-          }
 
-          "never set the response on exchange" in {
+          "never set the response on exchange" in
             process()
             verify(exchange, Mockito.never()).setResponse(any[CamelMessage])
-          }
 
-          "set failure message to timeout" in {
+          "set failure message to timeout" in
             process()
             verify(exchange).setFailure(any[FailureResult])
-          }
-        }
-      }
-    }
 
-    "asynchronous" when {
+    "asynchronous" when
 
-      def verifyFailureIsSet(): Unit = {
+      def verifyFailureIsSet(): Unit =
         producer.processExchangeAdapter(exchange, asyncCallback)
         asyncCallback.awaitCalled()
         verify(exchange).setFailure(any[FailureResult])
-      }
 
-      "out-capable" when {
+      "out-capable" when
 
-        "consumer actor doesnt exist" must {
-          "set failure message on exchange" in {
+        "consumer actor doesnt exist" must
+          "set failure message on exchange" in
             producer = given(actor = null, outCapable = true)
             verifyFailureIsSet()
-          }
-        }
 
-        "response is ok" must {
-          "get a response and async callback as soon as it gets the response (but not before)" in {
+        "response is ok" must
+          "get a response and async callback as soon as it gets the response (but not before)" in
             producer = given(outCapable = true)
 
             val doneSync =
@@ -173,10 +144,9 @@ class ActorProducerTest
             asyncCallback.expectNoCallWithin(100 millis)
             info("no async callback before response")
 
-            within(1 second) {
+            within(1 second)
               probe.expectMsgType[CamelMessage]
               probe.sender() ! "some message"
-            }
             doneSync should ===(false)
             info("done async")
 
@@ -184,11 +154,9 @@ class ActorProducerTest
             info("async callback received")
             verify(exchange).setResponse(msg("some message"))
             info("response as expected")
-          }
-        }
 
-        "response is Failure" must {
-          "set an exception on exchange" in {
+        "response is Failure" must
+          "set an exception on exchange" in
             val exception = new RuntimeException("some failure")
             val failure = Failure(exception)
 
@@ -196,45 +164,36 @@ class ActorProducerTest
 
             producer.processExchangeAdapter(exchange, asyncCallback)
 
-            within(1 second) {
+            within(1 second)
               probe.expectMsgType[CamelMessage]
               probe.sender() ! failure
               asyncCallback.awaitCalled(remaining)
-            }
 
             verify(exchange).setFailure(FailureResult(exception))
-          }
-        }
 
-        "no response is sent within timeout" must {
-          "set TimeoutException on exchange" in {
+        "no response is sent within timeout" must
+          "set TimeoutException on exchange" in
             producer = given(outCapable = true, replyTimeout = 10 millis)
             producer.processExchangeAdapter(exchange, asyncCallback)
             asyncCallback.awaitCalled(100 millis)
             verify(exchange).setFailure(
-                MMatchers.argThat(new ArgumentMatcher[FailureResult] {
-              def matches(failure: AnyRef) = {
+                MMatchers.argThat(new ArgumentMatcher[FailureResult]
+              def matches(failure: AnyRef) =
                 failure.asInstanceOf[FailureResult].cause should be(
                     anInstanceOf[TimeoutException])
                 true
-              }
-            }))
-          }
-        }
-      }
+            ))
 
-      "in-only" when {
+      "in-only" when
 
-        "consumer actor doesnt exist" must {
-          "set failure message on exchange" in {
+        "consumer actor doesnt exist" must
+          "set failure message on exchange" in
             producer = given(actor = null, outCapable = false)
             verifyFailureIsSet()
-          }
-        }
 
-        "autoAck" must {
+        "autoAck" must
 
-          "get sync callback as soon as it sends a message" in {
+          "get sync callback as soon as it sends a message" in
 
             producer = given(outCapable = false, autoAck = true)
             val doneSync =
@@ -246,53 +205,45 @@ class ActorProducerTest
             info("async callback called")
             verify(exchange, never()).setResponse(any[CamelMessage])
             info("no response forwarded to exchange")
-          }
-        }
 
-        "manualAck" when {
+        "manualAck" when
 
-          "response is Ack" must {
-            "get async callback" in {
+          "response is Ack" must
+            "get async callback" in
               producer = given(outCapable = false, autoAck = false)
 
               val doneSync =
                 producer.processExchangeAdapter(exchange, asyncCallback)
 
               doneSync should ===(false)
-              within(1 second) {
+              within(1 second)
                 probe.expectMsgType[CamelMessage]
                 info("message sent to consumer")
                 probe.sender() ! Ack
                 asyncCallback.expectDoneAsyncWithin(remaining)
                 info("async callback called")
-              }
               verify(exchange, never()).setResponse(any[CamelMessage])
               info("no response forwarded to exchange")
-            }
-          }
 
-          "expecting Ack or Failure message and some other message is sent as a response" must {
-            "fail" in {
+          "expecting Ack or Failure message and some other message is sent as a response" must
+            "fail" in
               producer = given(outCapable = false, autoAck = false)
 
               producer.processExchangeAdapter(exchange, asyncCallback)
 
-              within(1 second) {
+              within(1 second)
                 probe.expectMsgType[CamelMessage]
                 info("message sent to consumer")
                 probe.sender() ! "some neither Ack nor Failure response"
                 asyncCallback.expectDoneAsyncWithin(remaining)
                 info("async callback called")
-              }
               verify(exchange, never()).setResponse(any[CamelMessage])
               info("no response forwarded to exchange")
               verify(exchange).setFailure(any[FailureResult])
               info("failure set")
-            }
-          }
 
-          "no Ack is sent within timeout" must {
-            "set failure on exchange" in {
+          "no Ack is sent within timeout" must
+            "set failure on exchange" in
               producer = given(outCapable = false,
                                replyTimeout = 10 millis,
                                autoAck = false)
@@ -300,37 +251,27 @@ class ActorProducerTest
               producer.processExchangeAdapter(exchange, asyncCallback)
               asyncCallback.awaitCalled(100 millis)
               verify(exchange).setFailure(any[FailureResult])
-            }
-          }
 
-          "response is Failure" must {
-            "set an exception on exchange" in {
+          "response is Failure" must
+            "set an exception on exchange" in
               producer = given(outCapable = false, autoAck = false)
 
               val doneSync =
                 producer.processExchangeAdapter(exchange, asyncCallback)
 
               doneSync should ===(false)
-              within(1 second) {
+              within(1 second)
                 probe.expectMsgType[CamelMessage]
                 info("message sent to consumer")
                 probe.sender() ! Failure(new Exception)
                 asyncCallback.awaitCalled(remaining)
-              }
               verify(exchange, never()).setResponse(any[CamelMessage])
               info("no response forwarded to exchange")
               verify(exchange).setFailure(any[FailureResult])
               info("failure set")
-            }
-          }
-        }
-      }
-    }
-  }
-}
 
 private[camel] trait ActorProducerFixture
-    extends MockitoSugar with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends MockitoSugar with BeforeAndAfterAll with BeforeAndAfterEach
   self: TestKit with Matchers with Suite ⇒
   var camel: Camel = _
   var exchange: CamelExchangeAdapter = _
@@ -343,7 +284,7 @@ private[camel] trait ActorProducerFixture
   var actorEndpointPath: ActorEndpointPath = _
   var actorComponent: ActorComponent = _
 
-  override protected def beforeEach() {
+  override protected def beforeEach()
     asyncCallback = createAsyncCallback
 
     probe = TestProbe()
@@ -358,7 +299,7 @@ private[camel] trait ActorProducerFixture
     (new Settings(this.getClass.getClassLoader, config, "mocksystem"))
     when(sys.name) thenReturn ("mocksystem")
 
-    def camelWithMocks = new DefaultCamel(sys) {
+    def camelWithMocks = new DefaultCamel(sys)
       override val log = mock[LoggingAdapter]
       override lazy val template = mock[ProducerTemplate]
       override lazy val context = mock[DefaultCamelContext]
@@ -377,7 +318,6 @@ private[camel] trait ActorProducerFixture
           }
         """).withFallback(config),
           sys.dynamicAccess)
-    }
     camel = camelWithMocks
 
     exchange = mock[CamelExchangeAdapter]
@@ -386,26 +326,23 @@ private[camel] trait ActorProducerFixture
     actorComponent = mock[ActorComponent]
     producer = new ActorProducer(configure(), camel)
     message = CamelMessage(null, null)
-  }
 
-  override protected def afterAll() {
+  override protected def afterAll()
     shutdown()
-  }
 
   def msg(s: String) = CamelMessage(s, Map.empty)
 
   def given(actor: ActorRef = probe.ref,
             outCapable: Boolean = true,
             autoAck: Boolean = true,
-            replyTimeout: FiniteDuration = 20 seconds) = {
+            replyTimeout: FiniteDuration = 20 seconds) =
     prepareMocks(actor, outCapable = outCapable)
     new ActorProducer(
         configure(isAutoAck = autoAck, _replyTimeout = replyTimeout), camel)
-  }
 
   def createAsyncCallback = new TestAsyncCallback
 
-  class TestAsyncCallback extends AsyncCallback {
+  class TestAsyncCallback extends AsyncCallback
     def expectNoCallWithin(duration: Duration): Unit =
       if (callbackReceived.await(duration.length, duration.unit))
         fail("NOT expected callback, but received one!")
@@ -414,10 +351,9 @@ private[camel] trait ActorProducerFixture
     val callbackReceived = new CountDownLatch(1)
     val callbackValue = new AtomicBoolean()
 
-    def done(doneSync: Boolean) {
+    def done(doneSync: Boolean)
       callbackValue set doneSync
       callbackReceived.countDown()
-    }
 
     private[this] def valueWithin(implicit timeout: FiniteDuration) =
       if (!callbackReceived.await(timeout.length, timeout.unit))
@@ -428,28 +364,24 @@ private[camel] trait ActorProducerFixture
       if (!valueWithin(timeout)) fail("Expected to be done Synchronously")
     def expectDoneAsyncWithin(implicit timeout: FiniteDuration): Unit =
       if (valueWithin(timeout)) fail("Expected to be done Asynchronously")
-  }
 
   def configure(endpointUri: String = "test-uri",
                 isAutoAck: Boolean = true,
-                _replyTimeout: FiniteDuration = 20 seconds) = {
+                _replyTimeout: FiniteDuration = 20 seconds) =
     val endpoint = new ActorEndpoint(
         endpointUri, actorComponent, actorEndpointPath, camel)
     endpoint.autoAck = isAutoAck
     endpoint.replyTimeout = _replyTimeout
     endpoint
-  }
 
   def prepareMocks(
-      actor: ActorRef, message: CamelMessage = message, outCapable: Boolean) {
+      actor: ActorRef, message: CamelMessage = message, outCapable: Boolean)
     when(actorEndpointPath.findActorIn(any[ActorSystem])) thenReturn Option(
         actor)
     when(exchange.toRequestMessage(any[Map[String, Any]])) thenReturn message
     when(exchange.isOutCapable) thenReturn outCapable
-  }
 
   def echoActor =
-    system.actorOf(Props(new Actor {
+    system.actorOf(Props(new Actor
       def receive = { case msg ⇒ sender() ! "received " + msg }
-    }), name = "echoActor")
-}
+    ), name = "echoActor")

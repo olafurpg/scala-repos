@@ -12,7 +12,7 @@ import java.net.InetSocketAddress
 import com.twitter.finagle.Service
 import com.twitter.finagle.redis.Client
 
-trait RedisTest extends FunSuite {
+trait RedisTest extends FunSuite
   protected def wrap(s: String): ChannelBuffer = StringToChannelBuffer(s)
   protected def string2ChanBuf(s: String): ChannelBuffer = wrap(s)
   protected def chanBuf2String(cb: ChannelBuffer): String = CBToString(cb)
@@ -23,42 +23,36 @@ trait RedisTest extends FunSuite {
   protected val boo = StringToChannelBuffer("boo")
   protected val moo = StringToChannelBuffer("moo")
   protected val num = StringToChannelBuffer("num")
-}
 
-trait RedisResponseTest extends RedisTest {
+trait RedisResponseTest extends RedisTest
   protected val replyCodec = new ReplyCodec
   protected val (codec, counter) = TestCodec(
       replyCodec.decode, replyCodec.encode)
-}
 
-trait RedisRequestTest extends RedisTest {
+trait RedisRequestTest extends RedisTest
   protected val commandCodec = new CommandCodec
   protected val (codec, counter) = TestCodec(
       commandCodec.decode, commandCodec.encode)
 
   def unwrap(list: Seq[AnyRef])(fn: PartialFunction[Command, Unit]) =
-    list.toList match {
+    list.toList match
       case head :: Nil =>
-        head match {
+        head match
           case c: Command =>
-            fn.isDefinedAt(c) match {
+            fn.isDefinedAt(c) match
               case true => fn(c)
               case false =>
                 fail(
                     "Didn't find expected type in list: %s".format(c.getClass))
-            }
           case _ => fail("Expected to find a command in the list")
-        }
       case _ => fail("Expected single element list")
-    }
-}
 
-trait RedisClientTest extends RedisTest with BeforeAndAfterAll {
+trait RedisClientTest extends RedisTest with BeforeAndAfterAll
 
   override def beforeAll(): Unit = RedisCluster.start()
   override def afterAll(): Unit = RedisCluster.stop()
 
-  protected def withRedisClient(testCode: TransactionalClient => Any) {
+  protected def withRedisClient(testCode: TransactionalClient => Any)
     val client = TransactionalClient(
         ClientBuilder()
           .codec(new Redis())
@@ -66,16 +60,13 @@ trait RedisClientTest extends RedisTest with BeforeAndAfterAll {
           .hostConnectionLimit(1)
           .buildFactory())
     Await.result(client.flushAll)
-    try {
+    try
       testCode(client)
-    } finally {
+    finally
       client.release
-    }
-  }
-}
 
 trait RedisClientServerIntegrationTest
-    extends RedisTest with BeforeAndAfterAll {
+    extends RedisTest with BeforeAndAfterAll
 
   private[this] lazy val svcClient = ClientBuilder()
     .name("redis-client")
@@ -85,11 +76,9 @@ trait RedisClientServerIntegrationTest
     .retries(2)
     .build()
 
-  private[this] val service = new Service[Command, Reply] {
-    def apply(cmd: Command): Future[Reply] = {
+  private[this] val service = new Service[Command, Reply]
+    def apply(cmd: Command): Future[Reply] =
       svcClient(cmd)
-    }
-  }
 
   private[this] val server = ServerBuilder()
     .name("redis-server")
@@ -102,7 +91,7 @@ trait RedisClientServerIntegrationTest
 
   protected val OKStatusReply = StatusReply("OK")
 
-  protected def withRedisClient(testCode: Service[Command, Reply] => Any) {
+  protected def withRedisClient(testCode: Service[Command, Reply] => Any)
     val client = ClientBuilder()
       .name("redis-client")
       .codec(Redis())
@@ -111,46 +100,39 @@ trait RedisClientServerIntegrationTest
       .retries(2)
       .build()
     Await.result(client(FlushAll))
-    try {
+    try
       testCode(client)
-    } finally {
+    finally
       client.close()
-    }
-  }
 
   protected def assertMBulkReply(
       reply: Future[Reply], expects: List[String], contains: Boolean = false) =
-    Await.result(reply) match {
+    Await.result(reply) match
       case MBulkReply(msgs) =>
-        contains match {
+        contains match
           case true =>
             assert(expects.isEmpty == false,
                    "Test did no supply a list of expected replies.")
             val newMsgs = ReplyFormat.toString(msgs)
-            expects.foreach({ msg =>
+            expects.foreach( msg =>
               val doesMBulkReplyContainMessage = newMsgs.contains(msg)
               assert(doesMBulkReplyContainMessage == true)
-            })
+            )
           case false =>
             val actualMessages = ReplyFormat
               .toChannelBuffers(msgs)
-              .map({ msg =>
+              .map( msg =>
                 chanBuf2String(msg)
-              })
+              )
             assert(actualMessages == expects)
-        }
-      case EmptyMBulkReply() => {
+      case EmptyMBulkReply() =>
           val isEmpty = true
           val actualReply = expects.isEmpty
           assert(actualReply == isEmpty)
-        }
       case r: Reply => fail("Expected MBulkReply, got %s".format(r))
       case _ => fail("Expected MBulkReply")
-    }
 
   def assertBulkReply(reply: Future[Reply], expects: String) =
-    Await.result(reply) match {
+    Await.result(reply) match
       case BulkReply(msg) => assert(BytesToString(msg.array) == expects)
       case _ => fail("Expected BulkReply")
-    }
-}

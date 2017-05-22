@@ -18,28 +18,24 @@ package org.saddle.buffer
 import it.unimi.dsi.fastutil.ints.IntArrays
 import org.saddle.Buffer
 
-class BufferInt(sz: Int = Buffer.INIT_CAPACITY) extends Buffer[Int] {
+class BufferInt(sz: Int = Buffer.INIT_CAPACITY) extends Buffer[Int]
   var list = Array.ofDim[Int](sz)
   var count = 0
   var remain = sz
 
   def apply(loc: Int) = list(loc)
 
-  def add(i: Int) {
-    if (remain == 0) {
+  def add(i: Int)
+    if (remain == 0)
       remain = list.length
       list = IntArrays.grow(list, remain * 2)
-    }
 
     list(count) = i
     count += 1
     remain -= 1
-  }
 
   def toArray: Array[Int] = IntArrays.copy(list, 0, count)
-}
 
-object BufferInt {
+object BufferInt
   def apply(sz: Int) = new BufferInt(sz)
   def apply() = new BufferInt()
-}

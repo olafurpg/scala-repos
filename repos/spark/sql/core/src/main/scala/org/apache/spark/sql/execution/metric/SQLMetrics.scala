@@ -29,11 +29,11 @@ import org.apache.spark.util.Utils
   */
 private[sql] abstract class SQLMetric[R <: SQLMetricValue[T], T](
     name: String, val param: SQLMetricParam[R, T])
-    extends Accumulable[R, T](param.zero, param, Some(name), internal = true) {
+    extends Accumulable[R, T](param.zero, param, Some(name), internal = true)
 
   // Provide special identifier as metadata so we can tell that this is a `SQLMetric` later
   override def toInfo(
-      update: Option[Any], value: Option[Any]): AccumulableInfo = {
+      update: Option[Any], value: Option[Any]): AccumulableInfo =
     new AccumulableInfo(id,
                         Some(name),
                         update,
@@ -41,19 +41,16 @@ private[sql] abstract class SQLMetric[R <: SQLMetricValue[T], T](
                         isInternal,
                         countFailedValues,
                         Some(SQLMetrics.ACCUM_IDENTIFIER))
-  }
 
-  def reset(): Unit = {
+  def reset(): Unit =
     this.value = param.zero
-  }
-}
 
 /**
   * Create a layer for specialized metric. We cannot add `@specialized` to
   * `Accumulable/AccumulableParam` because it will break Java source compatibility.
   */
 private[sql] trait SQLMetricParam[R <: SQLMetricValue[T], T]
-    extends AccumulableParam[R, T] {
+    extends AccumulableParam[R, T]
 
   /**
     * A function that defines how we aggregate the final accumulator results among all tasks,
@@ -62,41 +59,35 @@ private[sql] trait SQLMetricParam[R <: SQLMetricValue[T], T]
   val stringValue: Seq[T] => String
 
   def zero: R
-}
 
 /**
   * Create a layer for specialized metric. We cannot add `@specialized` to
   * `Accumulable/AccumulableParam` because it will break Java source compatibility.
   */
-private[sql] trait SQLMetricValue[T] extends Serializable {
+private[sql] trait SQLMetricValue[T] extends Serializable
 
   def value: T
 
   override def toString: String = value.toString
-}
 
 /**
   * A wrapper of Long to avoid boxing and unboxing when using Accumulator
   */
 private[sql] class LongSQLMetricValue(private var _value: Long)
-    extends SQLMetricValue[Long] {
+    extends SQLMetricValue[Long]
 
-  def add(incr: Long): LongSQLMetricValue = {
+  def add(incr: Long): LongSQLMetricValue =
     _value += incr
     this
-  }
 
   // Although there is a boxing here, it's fine because it's only called in SQLListener
   override def value: Long = _value
 
   // Needed for SQLListenerSuite
-  override def equals(other: Any): Boolean = {
-    other match {
+  override def equals(other: Any): Boolean =
+    other match
       case o: LongSQLMetricValue => value == o.value
       case _ => false
-    }
-  }
-}
 
 /**
   * A specialized long Accumulable to avoid boxing and unboxing when using Accumulator's
@@ -104,20 +95,17 @@ private[sql] class LongSQLMetricValue(private var _value: Long)
   */
 private[sql] class LongSQLMetric private[metric](
     name: String, param: LongSQLMetricParam)
-    extends SQLMetric[LongSQLMetricValue, Long](name, param) {
+    extends SQLMetric[LongSQLMetricValue, Long](name, param)
 
-  override def +=(term: Long): Unit = {
+  override def +=(term: Long): Unit =
     localValue.add(term)
-  }
 
-  override def add(term: Long): Unit = {
+  override def add(term: Long): Unit =
     localValue.add(term)
-  }
-}
 
 private class LongSQLMetricParam(
     val stringValue: Seq[Long] => String, initialValue: Long)
-    extends SQLMetricParam[LongSQLMetricValue, Long] {
+    extends SQLMetricParam[LongSQLMetricValue, Long]
 
   override def addAccumulator(
       r: LongSQLMetricValue, t: Long): LongSQLMetricValue = r.add(t)
@@ -130,81 +118,71 @@ private class LongSQLMetricParam(
     zero
 
   override def zero: LongSQLMetricValue = new LongSQLMetricValue(initialValue)
-}
 
 private object LongSQLMetricParam
     extends LongSQLMetricParam(_.sum.toString, 0L)
 
 private object StaticsLongSQLMetricParam
     extends LongSQLMetricParam((values: Seq[Long]) =>
-                                 {
                                    // This is a workaround for SPARK-11013.
                                    // We use -1 as initial value of the accumulator, if the accumulator is valid, we will update
                                    // it at the end of task and the value will be at least 0.
                                    val validValues = values.filter(_ >= 0)
-                                   val Seq(sum, min, med, max) = {
+                                   val Seq(sum, min, med, max) =
                                      val metric =
-                                       if (validValues.length == 0) {
+                                       if (validValues.length == 0)
                                          Seq.fill(4)(0L)
-                                       } else {
+                                       else
                                          val sorted = validValues.sorted
                                          Seq(sorted.sum,
                                              sorted(0),
                                              sorted(validValues.length / 2),
                                              sorted(validValues.length - 1))
-                                       }
                                      metric.map(Utils.bytesToString)
-                                   }
                                    s"\n$sum ($min, $med, $max)"
-                               },
+                               ,
                                -1L)
 
-private[sql] object SQLMetrics {
+private[sql] object SQLMetrics
 
   // Identifier for distinguishing SQL metrics from other accumulators
   private[sql] val ACCUM_IDENTIFIER = "sql"
 
   private def createLongMetric(sc: SparkContext,
                                name: String,
-                               param: LongSQLMetricParam): LongSQLMetric = {
+                               param: LongSQLMetricParam): LongSQLMetric =
     val acc = new LongSQLMetric(name, param)
     // This is an internal accumulator so we need to register it explicitly.
     Accumulators.register(acc)
     sc.cleaner.foreach(_.registerAccumulatorForCleanup(acc))
     acc
-  }
 
-  def createLongMetric(sc: SparkContext, name: String): LongSQLMetric = {
+  def createLongMetric(sc: SparkContext, name: String): LongSQLMetric =
     createLongMetric(sc, name, LongSQLMetricParam)
-  }
 
   /**
     * Create a metric to report the size information (including total, min, med, max) like data size,
     * spill size, etc.
     */
-  def createSizeMetric(sc: SparkContext, name: String): LongSQLMetric = {
+  def createSizeMetric(sc: SparkContext, name: String): LongSQLMetric =
     // The final result of this metric in physical operator UI may looks like:
     // data size total (min, med, max):
     // 100GB (100MB, 1GB, 10GB)
     createLongMetric(
         sc, s"$name total (min, med, max)", StaticsLongSQLMetricParam)
-  }
 
   def getMetricParam(
-      metricParamName: String): SQLMetricParam[SQLMetricValue[Any], Any] = {
+      metricParamName: String): SQLMetricParam[SQLMetricValue[Any], Any] =
     val longSQLMetricParam = Utils.getFormattedClassName(LongSQLMetricParam)
     val staticsSQLMetricParam =
       Utils.getFormattedClassName(StaticsLongSQLMetricParam)
-    val metricParam = metricParamName match {
+    val metricParam = metricParamName match
       case `longSQLMetricParam` => LongSQLMetricParam
       case `staticsSQLMetricParam` => StaticsLongSQLMetricParam
-    }
     metricParam.asInstanceOf[SQLMetricParam[SQLMetricValue[Any], Any]]
-  }
 
   /**
     * A metric that its value will be ignored. Use this one when we need a metric parameter but don't
     * care about the value.
     */
   val nullLongMetric = new LongSQLMetric("null", LongSQLMetricParam)
-}

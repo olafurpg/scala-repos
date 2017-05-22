@@ -23,25 +23,22 @@ private[kafka] abstract class GenericRequestAndHeader(
     val body: AbstractRequestResponse,
     val name: String,
     override val requestId: Option[Short] = None)
-    extends RequestOrResponse(requestId) {
+    extends RequestOrResponse(requestId)
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     buffer.putShort(versionId)
     buffer.putInt(correlationId)
     writeShortString(buffer, clientId)
     body.writeTo(buffer)
-  }
 
-  def sizeInBytes(): Int = {
+  def sizeInBytes(): Int =
     2 /* version id */ + 4 /* correlation id */ + (2 + clientId.length) /* client id */ +
     body.sizeOf()
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     describe(true)
-  }
 
-  override def describe(details: Boolean): String = {
+  override def describe(details: Boolean): String =
     val strBuffer = new StringBuilder
     strBuffer.append("Name: " + name)
     strBuffer.append("; Version: " + versionId)
@@ -49,5 +46,3 @@ private[kafka] abstract class GenericRequestAndHeader(
     strBuffer.append("; ClientId: " + clientId)
     strBuffer.append("; Body: " + body.toString)
     strBuffer.toString()
-  }
-}

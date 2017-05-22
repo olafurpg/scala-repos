@@ -28,14 +28,14 @@ import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.util.Utils
 
 /** A singleton object for the master program. The slaves should not access this. */
-private[hive] object SparkSQLEnv extends Logging {
+private[hive] object SparkSQLEnv extends Logging
   logDebug("Initializing SparkSQLEnv")
 
   var hiveContext: HiveContext = _
   var sparkContext: SparkContext = _
 
-  def init() {
-    if (hiveContext == null) {
+  def init()
+    if (hiveContext == null)
       val sparkConf = new SparkConf(loadDefaults = true)
       val maybeSerializer = sparkConf.getOption("spark.serializer")
       val maybeKryoReferenceTracking =
@@ -69,23 +69,16 @@ private[hive] object SparkSQLEnv extends Logging {
       hiveContext.setConf(
           "spark.sql.hive.version", HiveContext.hiveExecutionVersion)
 
-      if (log.isDebugEnabled) {
-        hiveContext.hiveconf.getAllProperties.asScala.toSeq.sorted.foreach {
+      if (log.isDebugEnabled)
+        hiveContext.hiveconf.getAllProperties.asScala.toSeq.sorted.foreach
           case (k, v) =>
             logDebug(s"HiveConf var: $k=$v")
-        }
-      }
-    }
-  }
 
   /** Cleans up and shuts down the Spark SQL environments. */
-  def stop() {
+  def stop()
     logDebug("Shutting down Spark SQL Environment")
     // Stop the SparkContext
-    if (SparkSQLEnv.sparkContext != null) {
+    if (SparkSQLEnv.sparkContext != null)
       sparkContext.stop()
       sparkContext = null
       hiveContext = null
-    }
-  }
-}

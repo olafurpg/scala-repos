@@ -7,29 +7,26 @@ package play.api.libs.ws.ssl.debug
 
 import play.api.libs.ws.ssl.{JavaxNetDebugBuilder, JavaSecurityDebugBuilder, SSLDebugConfig}
 
-class DebugConfiguration {
+class DebugConfiguration
 
   private val logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
 
-  def configure(d: SSLDebugConfig) {
+  def configure(d: SSLDebugConfig)
     configureJavaxNetDebug(d)
     configureJavaSecurityDebug(d)
-  }
 
-  def configureJavaxNetDebug(d: SSLDebugConfig) {
+  def configureJavaxNetDebug(d: SSLDebugConfig)
     val netDebugOptions = new JavaxNetDebugBuilder(d).build()
     logger.debug(
         s"configureJavaxNetDebug: d = $d, netDebugOptions = $netDebugOptions")
     FixInternalDebugLogging(netDebugOptions)
-  }
 
-  def configureJavaSecurityDebug(d: SSLDebugConfig) {
+  def configureJavaSecurityDebug(d: SSLDebugConfig)
     val securityOptions = new JavaSecurityDebugBuilder(d).build()
     logger.debug(
         s"configureJavaSecurityDebug: d = $d, securityOptions = $securityOptions")
     System.setProperty("java.security.debug", securityOptions)
     FixCertpathDebugLogging(securityOptions)
-  }
 
   //  val certpathLogger = org.slf4j.LoggerFactory.getLogger("java.security.debug")
   //  val newDebug = new SunSecurityUtilDebugLogger(certpathLogger)
@@ -43,4 +40,3 @@ class DebugConfiguration {
   //    val logbackLogger = slf4jLogger.asInstanceOf[ch.qos.logback.classic.Logger]
   //    logbackLogger.setLevel(ch.qos.logback.classic.Level.DEBUG)
   //  }
-}

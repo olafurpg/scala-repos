@@ -1,5 +1,4 @@
 package a
 
-class B {
+class B
   def x = A.x
-}

@@ -1,4 +1,4 @@
-class A {
+class A
   def f(x: String) = x
   def g(x: String)(y: String): Int = x.length + y.length
   def h(x: String) = x.length
@@ -9,4 +9,3 @@ class A {
 
   // a perverse piece of code from a perverse coder
   ({ "ab".reverse; "ba".equals })(0): String
-}

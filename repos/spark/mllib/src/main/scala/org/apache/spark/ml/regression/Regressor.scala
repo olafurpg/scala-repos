@@ -34,10 +34,9 @@ private[spark] abstract class Regressor[
     FeaturesType,
     Learner <: Regressor[FeaturesType, Learner, M],
     M <: RegressionModel[FeaturesType, M]]
-    extends Predictor[FeaturesType, Learner, M] with PredictorParams {
+    extends Predictor[FeaturesType, Learner, M] with PredictorParams
 
   // TODO: defaultEvaluator (follow-up PR)
-}
 
 /**
   * :: DeveloperApi ::
@@ -50,7 +49,6 @@ private[spark] abstract class Regressor[
 @DeveloperApi
 abstract class RegressionModel[
     FeaturesType, M <: RegressionModel[FeaturesType, M]]
-    extends PredictionModel[FeaturesType, M] with PredictorParams {
+    extends PredictionModel[FeaturesType, M] with PredictorParams
 
   // TODO: defaultEvaluator (follow-up PR)
-}

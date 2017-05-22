@@ -1,11 +1,8 @@
-object Test extends App {
+object Test extends App
 
-  "foo" match {
+  "foo" match
     case Matcher(result) => println(result)
-  }
 
-  object Matcher {
+  object Matcher
     def unapply(s: String)(implicit secondParam: Option[String] = None) =
       Some("Got: " + s + " and " + secondParam)
-  }
-}

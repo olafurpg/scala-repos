@@ -49,61 +49,46 @@ import scalafx.scene.shape.Rectangle
   *   me: MouseEvent => ...
   * }}}
   */
-object RectangleDrawingDemo extends JFXApp {
+object RectangleDrawingDemo extends JFXApp
 
   /** Encapsulate handle updates to the rectangle */
-  object Updater {
+  object Updater
     private var _start = new Point2D(0, 0)
     private var _end = new Point2D(0, 0)
 
-    val rectangle = new Rectangle {
+    val rectangle = new Rectangle
       fill = Color.Blue
-    }
 
     /** Update location of the rectangle proving two defining point (along the diameter) */
-    def update(start: Point2D = _start, end: Point2D = _end) {
+    def update(start: Point2D = _start, end: Point2D = _end)
       _start = start
       _end = end
       rectangle.x = math.min(_start.x, _end.x)
       rectangle.y = math.min(_start.y, _end.y)
       rectangle.width = math.abs(_start.x - _end.x)
       rectangle.height = math.abs(_start.y - _end.y)
-    }
-  }
 
-  val pane = new Pane {
+  val pane = new Pane
     // Add rectangle that will be updated with user interactions
     children += Updater.rectangle
-  }
 
   // Define handling of mouse events
-  pane.handleEvent(MouseEvent.Any) { me: MouseEvent =>
-    {
-      me.eventType match {
-        case MouseEvent.MousePressed => {
+  pane.handleEvent(MouseEvent.Any)  me: MouseEvent =>
+      me.eventType match
+        case MouseEvent.MousePressed =>
             // Reset the shape
             val p = new Point2D(me.x, me.y)
             Updater.update(p, p)
-          }
-        case MouseEvent.MouseDragged => {
+        case MouseEvent.MouseDragged =>
             // Adjust the shape
             Updater.update(end = new Point2D(me.x, me.y))
-          }
         case _ => {}
-      }
-    }
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Draw Rectangle Demo"
-    scene = new Scene(600, 400) {
-      root = new BorderPane {
-        top = new Label {
+    scene = new Scene(600, 400)
+      root = new BorderPane
+        top = new Label
           text = "Drag the mouse below to draw a rectangle"
           alignmentInParent = Pos.Center
-        }
         center = pane
-      }
-    }
-  }
-}

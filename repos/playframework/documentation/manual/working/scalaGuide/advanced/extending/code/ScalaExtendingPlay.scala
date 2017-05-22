@@ -10,9 +10,9 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Result
 import play.mvc.Http.RequestHeader
 
-object ScalaExtendingPlay extends Specification {
+object ScalaExtendingPlay extends Specification
 
-  class MyMessagesApi extends MessagesApi {
+  class MyMessagesApi extends MessagesApi
     override def messages: Map[String, Map[String, String]] = ???
     override def preferred(candidates: Seq[Lang]): Messages = ???
     override def preferred(request: mvc.RequestHeader): Messages = ???
@@ -29,49 +29,39 @@ object ScalaExtendingPlay extends Specification {
     override def isDefinedAt(key: String)(implicit lang: Lang): Boolean = ???
     override def translate(key: String, args: Seq[Any])(
         implicit lang: Lang): Option[String] = ???
-  }
 
   // #module-definition
-  class MyCode {
+  class MyCode
     // add functionality here
-  }
 
-  class MyModule extends play.api.inject.Module {
-    def bindings(environment: Environment, configuration: Configuration) = {
+  class MyModule extends play.api.inject.Module
+    def bindings(environment: Environment, configuration: Configuration) =
       Seq(bind[MyCode].toInstance(new MyCode))
-    }
-  }
   // #module-definition
 
   // #builtin-module-definition
-  class MyI18nModule extends play.api.inject.Module {
-    def bindings(environment: Environment, configuration: Configuration) = {
+  class MyI18nModule extends play.api.inject.Module
+    def bindings(environment: Environment, configuration: Configuration) =
       Seq(
           bind[Langs].to[DefaultLangs],
           bind[MessagesApi].to[MyMessagesApi]
       )
-    }
-  }
   // #builtin-module-definition
 
-  "Extending Play" should {
+  "Extending Play" should
 
-    "adds a module" in {
+    "adds a module" in
       // #module-bindings
       val application =
         new GuiceApplicationBuilder().bindings(new MyModule).build()
       val myCode = application.injector.instanceOf(classOf[MyCode])
       myCode must beAnInstanceOf[MyCode]
       // #module-bindings
-    }
 
-    "overrides a built-in module" in {
+    "overrides a built-in module" in
       // #builtin-module-overrides
       val application =
         new GuiceApplicationBuilder().overrides(new MyI18nModule).build()
       // #builtin-module-overrides
       val messageApi = application.injector.instanceOf(classOf[MessagesApi])
       messageApi must beAnInstanceOf[MyMessagesApi]
-    }
-  }
-}

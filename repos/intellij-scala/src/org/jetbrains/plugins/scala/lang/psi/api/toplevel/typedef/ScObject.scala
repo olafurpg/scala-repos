@@ -16,13 +16,12 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.TypeDefinition
   */
 trait ScObject
     extends ScTypeDefinition with ScTypedDefinition with ScMember
-    with ScDeclaredElementsHolder {
+    with ScDeclaredElementsHolder
   //Is this object generated as case class companion module
   private var isSyntheticCaseClassCompanion: Boolean = false
   def isSyntheticObject: Boolean = isSyntheticCaseClassCompanion
-  def setSyntheticObject() {
+  def setSyntheticObject()
     isSyntheticCaseClassCompanion = true
-  }
 
   def getObjectToken: PsiElement =
     findFirstChildByType(ScalaTokenTypes.kOBJECT)
@@ -38,11 +37,10 @@ trait ScObject
   def fakeCompanionClassOrCompanionClass: PsiClass
 
   /** Is this object accessible from a stable path from the root package? */
-  def isStatic: Boolean = containingClass match {
+  def isStatic: Boolean = containingClass match
     case obj: ScObject => obj.isStatic
     case null => true
     case _ => false
-  }
 
   /**
     * @return returns every time the same result, even after modification
@@ -61,4 +59,3 @@ trait ScObject
     *         so it's reaonable to use it only for Predef and scala classes
     */
   def getHardSignatures: TypeDefinitionMembers.SignatureNodes.Map
-}

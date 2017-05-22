@@ -42,75 +42,64 @@ import android.os._
 import scala.reflect._
 import scala.language.experimental.macros
 
-class EventSource0[T] {
+class EventSource0[T]
   var events: Vector[() => T] = Vector()
-  def apply(e: => T): Unit = {
+  def apply(e: => T): Unit =
     require(e != null)
     events :+= (() => e)
-  }
 
   def run(): Unit = events.map(_ ())
 
   def clear(): Unit = events = Vector()
-}
 
-class EventSource1[Arg1, Ret] {
+class EventSource1[Arg1, Ret]
   var events: Vector[Arg1 => Ret] = Vector()
-  def apply(e: Arg1 => Ret): Unit = {
+  def apply(e: Arg1 => Ret): Unit =
     require(e != null)
     events :+= e
-  }
 
   def run(arg: Arg1): Unit = events.map(_ (arg))
 
   def clear(): Unit = events = Vector()
-}
 
-class EventSource2[Arg1, Arg2, Ret] {
+class EventSource2[Arg1, Arg2, Ret]
   var events: Vector[(Arg1, Arg2) => Ret] = Vector()
-  def apply(e: (Arg1, Arg2) => Ret): Unit = {
+  def apply(e: (Arg1, Arg2) => Ret): Unit =
     require(e != null)
     events :+= e
-  }
 
   def run(arg1: Arg1, arg2: Arg2): Unit = events.map(_ (arg1, arg2))
 
   def clear(): Unit = events = Vector()
-}
 
 /**
   * Callback handler for classes that can be destroyed.
   */
-trait Destroyable {
+trait Destroyable
   protected var onDestroyBodies = Vector[() => Any]()
 
-  def onDestroy(body: => Any) = {
+  def onDestroy(body: => Any) =
     val el = body _
     onDestroyBodies :+= el
     el
-  }
-}
 
 /**
   * Callback handler for classes that can be created.
   */
-trait Creatable {
+trait Creatable
   protected var onCreateBodies = Vector[() => Any]()
 
-  def onCreate(body: => Any) = {
+  def onCreate(body: => Any) =
     val el = body _
     onCreateBodies :+= el
     el
-  }
-}
 
 /**
   * Callback handler for classes that can be registered and unregistered.
   */
-trait Registerable {
+trait Registerable
   def onRegister(body: => Any): () => Any
   def onUnregister(body: => Any): () => Any
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/content/Context.html android.content.Context]]`.
@@ -121,7 +110,7 @@ class RichContext[This <: android.content.Context](val basis: This)
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/content/Context.html android.content.Context]]`. This contains several property accessors.
   */
-trait TraitContext[This <: android.content.Context] {
+trait TraitContext[This <: android.content.Context]
 
   def basis: This
 
@@ -233,9 +222,8 @@ trait TraitContext[This <: android.content.Context] {
     * Shortcut for `[[https://developer.android.com/reference/android/content/Context.html#setWallpaper(android.graphics.Bitmap) setWallpaper(android.graphics.Bitmap)]]`
     */
   @deprecated("", "")
-  @inline def wallpaper_=(p: android.graphics.Bitmap) = {
+  @inline def wallpaper_=(p: android.graphics.Bitmap) =
     basis.setWallpaper(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/content/Context.html#setWallpaper(java.io.InputStream) setWallpaper(java.io.InputStream)]]`
@@ -247,9 +235,8 @@ trait TraitContext[This <: android.content.Context] {
     * Shortcut for `[[https://developer.android.com/reference/android/content/Context.html#setWallpaper(java.io.InputStream) setWallpaper(java.io.InputStream)]]`
     */
   @deprecated("", "")
-  @inline def wallpaper_=(p: java.io.InputStream) = {
+  @inline def wallpaper_=(p: java.io.InputStream) =
     basis.setWallpaper(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/content/Context.html#getWallpaperDesiredMinimumHeight() getWallpaperDesiredMinimumHeight()]]`
@@ -324,7 +311,6 @@ trait TraitContext[This <: android.content.Context] {
 
   @inline def stopService[T : ClassTag](implicit context: Context): Boolean =
     basis.stopService(SIntent[T])
-}
 
 /**
   * Enriched trait of the class android.content.Context. To enable Scaloid support for subclasses android.content.Context, extend this trait.
@@ -334,9 +320,8 @@ trait TraitContext[This <: android.content.Context] {
   * [[https://github.com/pocorall/scaloid/?134#trait-scontext]]
   *
   */
-trait SContext extends Context with TraitContext[SContext] with TagUtil {
+trait SContext extends Context with TraitContext[SContext] with TagUtil
   def basis: SContext = this
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/content/ContextWrapper.html android.content.ContextWrapper]]`.
@@ -349,31 +334,27 @@ class RichContextWrapper[This <: android.content.ContextWrapper](
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/content/ContextWrapper.html android.content.ContextWrapper]]`. This contains several property accessors.
   */
 trait TraitContextWrapper[This <: android.content.ContextWrapper]
-    extends TraitContext[This] {
+    extends TraitContext[This]
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/content/ContextWrapper.html#getBaseContext() getBaseContext()]]`
     */
   @inline def baseContext = basis.getBaseContext
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/content/ContextWrapper.html android.content.ContextWrapper]]`.
   */
 class SContextWrapper()(implicit base: android.content.Context)
     extends android.content.ContextWrapper(base)
-    with TraitContextWrapper[SContextWrapper] {
+    with TraitContextWrapper[SContextWrapper]
 
   def basis = this
-}
 
-object SContextWrapper {
-  def apply()(implicit base: android.content.Context): SContextWrapper = {
+object SContextWrapper
+  def apply()(implicit base: android.content.Context): SContextWrapper =
     val v = new SContextWrapper
 
     v
-  }
-}
 
 /**
   * When you register BroadcastReceiver with Context.registerReceiver() you have to unregister it to prevent memory leak.
@@ -392,28 +373,24 @@ object SContextWrapper {
   * See also: [[https://github.com/pocorall/scaloid/wiki/Basics#trait-unregisterreceiver]]
   */
 @deprecated("Use ContentHelper.registerReceiver instead", "4.0")
-trait UnregisterReceiver extends ContextWrapper with Destroyable {
+trait UnregisterReceiver extends ContextWrapper with Destroyable
 
   /**
     * Internal implementation for (un)registering the receiver. You do not need to call this method.
     */
   override def registerReceiver(
       receiver: BroadcastReceiver,
-      filter: IntentFilter): android.content.Intent = {
-    onDestroy {
+      filter: IntentFilter): android.content.Intent =
+    onDestroy
       Log.i("ScalaUtils", "Unregister BroadcastReceiver: " + receiver)
-      try {
+      try
         unregisterReceiver(receiver)
-      } catch {
+      catch
         // Suppress "Receiver not registered" exception
         // Refer to http://stackoverflow.com/questions/2682043/how-to-check-if-receiver-is-registered-in-android
         case e: IllegalArgumentException => e.printStackTrace()
-      }
-    }
 
     super.registerReceiver(receiver, filter)
-  }
-}
 
 /**
   * Provides shortcuts for intent creation.
@@ -423,7 +400,7 @@ trait UnregisterReceiver extends ContextWrapper with Destroyable {
   * }}}
   *
   */
-object SIntent {
+object SIntent
   @inline def apply[T](implicit context: Context, mt: ClassTag[T]) =
     new Intent(context, mt.runtimeClass)
 
@@ -431,23 +408,19 @@ object SIntent {
   def apply[T](action: String)(
       implicit context: Context, mt: ClassTag[T]): Intent =
     SIntent[T].setAction(action)
-}
 
-class RichIntent(val intent: Intent) {
+class RichIntent(val intent: Intent)
   @inline
-  def start[T <: Activity](implicit context: Context, mt: ClassTag[T]) = {
+  def start[T <: Activity](implicit context: Context, mt: ClassTag[T]) =
     val clazz = mt.runtimeClass
     intent.setClass(context, clazz)
-    clazz match {
+    clazz match
       case c if classOf[Activity].isAssignableFrom(c) =>
         context.startActivity(intent)
       case c if classOf[android.app.Service].isAssignableFrom(c) =>
         context.startService(intent)
-    }
-  }
 
   def put(values: Any*): Intent = macro org.scaloid.util.MacroImpl.put_impl
-}
 
 /**
   * An in-process service connector that can bound [[LocalService]]. This yields far more concise code than that uses plain-old Android API.
@@ -459,7 +432,7 @@ class RichIntent(val intent: Intent) {
 class LocalServiceConnection[S <: LocalService](
     bindFlag: Int = Context.BIND_AUTO_CREATE)(
     implicit ctx: Context, reg: Registerable, mf: ClassTag[S])
-    extends ServiceConnection {
+    extends ServiceConnection
   var service: Option[S] = None
   var componentName: ComponentName = _
   var binder: IBinder = _
@@ -508,7 +481,7 @@ class LocalServiceConnection[S <: LocalService](
   /**
     * Internal implementation for handling the service connection. You do not need to call this method.
     */
-  def onServiceConnected(p1: ComponentName, b: IBinder) {
+  def onServiceConnected(p1: ComponentName, b: IBinder)
     val svc =
       b.asInstanceOf[LocalService#ScaloidServiceBinder].service.asInstanceOf[S]
     service = Option(svc)
@@ -516,31 +489,25 @@ class LocalServiceConnection[S <: LocalService](
     binder = b
     onConnected.run(svc)
     onConnected.clear()
-  }
 
   /**
     * Internal implementation for handling the service connection. You do not need to call this method.
     */
-  def onServiceDisconnected(p1: ComponentName) {
+  def onServiceDisconnected(p1: ComponentName)
     service.foreach(onDisconnected.run)
     onDisconnected.clear()
     service = None
-  }
 
   /**
     * Returns true if the service is currently connected.
     */
   def connected: Boolean = service.isDefined
 
-  reg.onRegister {
+  reg.onRegister
     ctx.bindService(SIntent[S], this, bindFlag)
-  }
 
-  reg.onUnregister {
-    if (connected) {
+  reg.onUnregister
+    if (connected)
       service = None // prevents apply(...) methods access this after unbound
       ctx.unbindService(this)
       onConnected.clear() // not to be called at the next binding
-    }
-  }
-}

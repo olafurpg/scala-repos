@@ -28,7 +28,7 @@ case class MessageAndMetadata[K, V](
     timestamp: Long = Message.NoTimestamp,
     timestampType: TimestampType = TimestampType.CREATE_TIME,
     keyDecoder: Decoder[K],
-    valueDecoder: Decoder[V]) {
+    valueDecoder: Decoder[V])
 
   /**
     * Return the decoded message key and payload
@@ -40,4 +40,3 @@ case class MessageAndMetadata[K, V](
   def message(): V =
     if (rawMessage.isNull) null.asInstanceOf[V]
     else valueDecoder.fromBytes(Utils.readBytes(rawMessage.payload))
-}

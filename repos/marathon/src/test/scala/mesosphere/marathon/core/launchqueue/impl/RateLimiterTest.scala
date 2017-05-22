@@ -10,19 +10,18 @@ import org.scalatest.Matchers
 import scala.concurrent.duration._
 
 class RateLimiterTest
-    extends MarathonActorSupport with MarathonSpec with Matchers {
+    extends MarathonActorSupport with MarathonSpec with Matchers
   val clock = ConstantClock(Timestamp.now())
 
-  test("addDelay") {
+  test("addDelay")
     val limiter = new RateLimiter(clock)
     val app = AppDefinition(id = "test".toPath, backoff = 10.seconds)
 
     limiter.addDelay(app)
 
     limiter.getDelay(app) should be(clock.now() + 10.seconds)
-  }
 
-  test("addDelay for existing delay") {
+  test("addDelay for existing delay")
     val limiter = new RateLimiter(clock)
     val app = AppDefinition(
         id = "test".toPath, backoff = 10.seconds, backoffFactor = 2.0)
@@ -31,9 +30,8 @@ class RateLimiterTest
     limiter.addDelay(app)
 
     limiter.getDelay(app) should be(clock.now() + 20.seconds)
-  }
 
-  test("cleanupOverdueDelays") {
+  test("cleanupOverdueDelays")
     val limiter = new RateLimiter(clock)
     val overdue = AppDefinition(id = "overdue".toPath, backoff = 10.seconds)
     limiter.addDelay(overdue)
@@ -46,9 +44,8 @@ class RateLimiterTest
 
     limiter.getDelay(overdue) should be(clock.now())
     limiter.getDelay(stillWaiting) should be(clock.now() + 9.seconds)
-  }
 
-  test("resetDelay") {
+  test("resetDelay")
     val limiter = new RateLimiter(clock)
     val app = AppDefinition(id = "test".toPath, backoff = 10.seconds)
 
@@ -57,5 +54,3 @@ class RateLimiterTest
     limiter.resetDelay(app)
 
     limiter.getDelay(app) should be(clock.now())
-  }
-}

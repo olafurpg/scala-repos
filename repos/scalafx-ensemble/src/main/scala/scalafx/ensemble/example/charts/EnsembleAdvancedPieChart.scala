@@ -35,19 +35,16 @@ import scalafx.scene.chart.PieChart
   * @see scalafx.scene.chart.PieChart
   * @see scalafx.scene.chart.Chart
   */
-class EnsembleAdvancedPieChart extends EnsembleExample {
+class EnsembleAdvancedPieChart extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     val data1 = PieChart.Data("Sun", 20)
     val data2 = PieChart.Data("IBM", 12)
     val data3 = PieChart.Data("HP", 25)
     val data4 = PieChart.Data("Dell", 22)
     val data5 = PieChart.Data("Apple", 30)
 
-    new PieChart {
+    new PieChart
       data = Seq(data1, data2, data3, data4, data5)
       id = "Advanced Pie Chart"
       title = "Pie Chart Sample"
-    }
-  }
-}

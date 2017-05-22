@@ -5,37 +5,35 @@ import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.junit.Test
 import org.junit.Assert._
 
-class NodeJSTest extends TimeoutComTests {
+class NodeJSTest extends TimeoutComTests
 
   protected def newJSEnv: NodeJSEnv = new NodeJSEnv
 
   /** Node.js strips double percentage signs - #500 */
   @Test
-  def percentageTest: Unit = {
+  def percentageTest: Unit =
     val counts = 1 to 15
     val argcs = 1 to 3
     val strings = counts.map("%" * _)
 
-    val strlists = for {
+    val strlists = for
       count <- argcs
       string <- strings
-    } yield List.fill(count)(string)
+    yield List.fill(count)(string)
 
-    val codes = for {
+    val codes = for
       strlist <- strlists
-    } yield {
+    yield
       val args = strlist.map(s => s""""$s"""").mkString(", ")
       s"console.log($args);\n"
-    }
 
     val result = strlists.map(_.mkString(" ") + "\n").mkString("")
 
     codes.mkString("").hasOutput(result)
-  }
 
   /** Node.js console.log hack didn't allow to log non-Strings - #561 */
   @Test
-  def nonStringTest: Unit = {
+  def nonStringTest: Unit =
 
     """
     console.log(1);
@@ -49,10 +47,9 @@ class NodeJSTest extends TimeoutComTests {
        |[object Object]
        |1,2
        |""".stripMargin
-  }
 
   @Test
-  def slowJSEnvTest: Unit = {
+  def slowJSEnvTest: Unit =
     val com = comRunner("""
       setTimeout(function() {
         scalajsCom.init(function(msg) {
@@ -71,5 +68,3 @@ class NodeJSTest extends TimeoutComTests {
 
     com.close()
     com.await(DefaultTimeout)
-  }
-}

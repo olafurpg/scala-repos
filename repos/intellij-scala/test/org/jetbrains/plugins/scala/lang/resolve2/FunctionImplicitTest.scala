@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class FunctionImplicitTest extends ResolveTestBase {
-  override def folderPath: String = {
+class FunctionImplicitTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "function/implicit/"
-  }
 
   def testClashHierarchy() = doTest()
   //TODO implicitparameter
@@ -52,4 +51,3 @@ class FunctionImplicitTest extends ResolveTestBase {
 //  def testValueOrdinary = doTest
   def testVariableImplicit() = doTest()
   def testViewBoundImplicit() = doTest()
-}

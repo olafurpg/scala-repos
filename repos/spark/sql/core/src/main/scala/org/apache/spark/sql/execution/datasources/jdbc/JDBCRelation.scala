@@ -35,7 +35,7 @@ private[sql] case class JDBCPartitioningInfo(column: String,
                                              upperBound: Long,
                                              numPartitions: Int)
 
-private[sql] object JDBCRelation {
+private[sql] object JDBCRelation
 
   /**
     * Given a partitioning schematic (a column of integral type, a number of
@@ -51,7 +51,7 @@ private[sql] object JDBCRelation {
     * @param partitioning partition information to generate the where clause for each partition
     * @return an array of partitions with where clause for each partition
     */
-  def columnPartition(partitioning: JDBCPartitioningInfo): Array[Partition] = {
+  def columnPartition(partitioning: JDBCPartitioningInfo): Array[Partition] =
     if (partitioning == null) return Array[Partition](JDBCPartition(null, 0))
 
     val numPartitions = partitioning.numPartitions
@@ -65,25 +65,21 @@ private[sql] object JDBCRelation {
     var i: Int = 0
     var currentValue: Long = partitioning.lowerBound
     var ans = new ArrayBuffer[Partition]()
-    while (i < numPartitions) {
+    while (i < numPartitions)
       val lowerBound = if (i != 0) s"$column >= $currentValue" else null
       currentValue += stride
       val upperBound =
         if (i != numPartitions - 1) s"$column < $currentValue" else null
       val whereClause =
-        if (upperBound == null) {
+        if (upperBound == null)
           lowerBound
-        } else if (lowerBound == null) {
+        else if (lowerBound == null)
           s"$upperBound or $column is null"
-        } else {
+        else
           s"$lowerBound AND $upperBound"
-        }
       ans += JDBCPartition(whereClause, i)
       i = i + 1
-    }
     ans.toArray
-  }
-}
 
 private[sql] case class JDBCRelation(url: String,
                                      table: String,
@@ -91,7 +87,7 @@ private[sql] case class JDBCRelation(url: String,
                                      properties: Properties = new Properties(
                                            ))(
     @transient val sqlContext: SQLContext)
-    extends BaseRelation with PrunedFilteredScan with InsertableRelation {
+    extends BaseRelation with PrunedFilteredScan with InsertableRelation
 
   override val needConversion: Boolean = false
 
@@ -99,12 +95,11 @@ private[sql] case class JDBCRelation(url: String,
     JDBCRDD.resolveTable(url, table, properties)
 
   // Check if JDBCRDD.compileFilter can accept input filters
-  override def unhandledFilters(filters: Array[Filter]): Array[Filter] = {
+  override def unhandledFilters(filters: Array[Filter]): Array[Filter] =
     filters.filter(JDBCRDD.compileFilter(_).isEmpty)
-  }
 
   override def buildScan(
-      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
+      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] =
     // Rely on a type erasure hack to pass RDD[InternalRow] back as RDD[Row]
     JDBCRDD
       .scanTable(sqlContext.sparkContext,
@@ -116,16 +111,12 @@ private[sql] case class JDBCRelation(url: String,
                  filters,
                  parts)
       .asInstanceOf[RDD[Row]]
-  }
 
-  override def insert(data: DataFrame, overwrite: Boolean): Unit = {
+  override def insert(data: DataFrame, overwrite: Boolean): Unit =
     data.write
       .mode(if (overwrite) SaveMode.Overwrite else SaveMode.Append)
       .jdbc(url, table, properties)
-  }
 
-  override def toString: String = {
+  override def toString: String =
     // credentials should not be included in the plan output, table information is sufficient.
     s"JDBCRelation(${table})"
-  }
-}

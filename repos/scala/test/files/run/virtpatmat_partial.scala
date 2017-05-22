@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   val a = Map("a" -> Some(1), "b" -> None)
   println(a)
 
@@ -8,7 +8,7 @@ object Test extends App {
 // variations: const target -> switch, non-const -> normal match, char target --> scrut needs toInt,
 // eta-expanded --> work is done by typedFunction, non-eta-expanded --> typedMatch
 
-  object nonConstCharEta {
+  object nonConstCharEta
     final val GT: Char = 'a'
     final val GTGT: Char = 'b'
     final val GTGTGT: Char = 'c'
@@ -17,25 +17,21 @@ object Test extends App {
     final val GTGTGTEQ: Char = 'f'
     final val ASSIGN: Char = 'g'
 
-    def acceptClosingAngle(in: Char) {
-      val closers: PartialFunction[Char, Char] = {
+    def acceptClosingAngle(in: Char)
+      val closers: PartialFunction[Char, Char] =
         case GTGTGTEQ => GTGTEQ
         case GTGTGT => GTGT
         case GTGTEQ => GTEQ
         case GTGT => GT
         case GTEQ => ASSIGN
-      }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
-    }
 
-    def test() = {
+    def test() =
       acceptClosingAngle(GTGT)
       acceptClosingAngle(ASSIGN)
-    }
-  }
 
-  object nonConstChar {
+  object nonConstChar
     final val GT: Char = 'a'
     final val GTGT: Char = 'b'
     final val GTGTGT: Char = 'c'
@@ -44,26 +40,22 @@ object Test extends App {
     final val GTGTGTEQ: Char = 'f'
     final val ASSIGN: Char = 'g'
 
-    def acceptClosingAngle(in: Char) {
+    def acceptClosingAngle(in: Char)
       val closers: PartialFunction[Char, Char] = x =>
-        x match {
+        x match
           case GTGTGTEQ => GTGTEQ
           case GTGTGT => GTGT
           case GTGTEQ => GTEQ
           case GTGT => GT
           case GTEQ => ASSIGN
-      }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
-    }
 
-    def test() = {
+    def test() =
       acceptClosingAngle(GTGT)
       acceptClosingAngle(ASSIGN)
-    }
-  }
 
-  object constCharEta {
+  object constCharEta
     final val GT = 'a'
     final val GTGT = 'b'
     final val GTGTGT = 'c'
@@ -72,26 +64,22 @@ object Test extends App {
     final val GTGTGTEQ = 'f'
     final val ASSIGN = 'g'
 
-    def acceptClosingAngle(in: Char) {
+    def acceptClosingAngle(in: Char)
       val closers: PartialFunction[Char, Char] = x =>
-        x match {
+        x match
           case GTGTGTEQ => GTGTEQ
           case GTGTGT => GTGT
           case GTGTEQ => GTEQ
           case GTGT => GT
           case GTEQ => ASSIGN
-      }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
-    }
 
-    def test() = {
+    def test() =
       acceptClosingAngle(GTGT)
       acceptClosingAngle(ASSIGN)
-    }
-  }
 
-  object constChar {
+  object constChar
     final val GT = 'a'
     final val GTGT = 'b'
     final val GTGTGT = 'c'
@@ -100,25 +88,21 @@ object Test extends App {
     final val GTGTGTEQ = 'f'
     final val ASSIGN = 'g'
 
-    def acceptClosingAngle(in: Char) {
-      val closers: PartialFunction[Char, Char] = {
+    def acceptClosingAngle(in: Char)
+      val closers: PartialFunction[Char, Char] =
         case GTGTGTEQ => GTGTEQ
         case GTGTGT => GTGT
         case GTGTEQ => GTEQ
         case GTGT => GT
         case GTEQ => ASSIGN
-      }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
-    }
 
-    def test() = {
+    def test() =
       acceptClosingAngle(GTGT)
       acceptClosingAngle(ASSIGN)
-    }
-  }
 
-  object constIntEta {
+  object constIntEta
     final val GT = 1
     final val GTGT = 2
     final val GTGTGT = 3
@@ -127,26 +111,22 @@ object Test extends App {
     final val GTGTGTEQ = 6
     final val ASSIGN = 7
 
-    def acceptClosingAngle(in: Int) {
+    def acceptClosingAngle(in: Int)
       val closers: PartialFunction[Int, Int] = x =>
-        { println("hai!"); (x + 1) } match {
+        { println("hai!"); (x + 1) } match
           case GTGTGTEQ => GTGTEQ
           case GTGTGT => GTGT
           case GTGTEQ => GTEQ
           case GTGT => GT
           case GTEQ => ASSIGN
-      }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
-    }
 
-    def test() = {
+    def test() =
       acceptClosingAngle(GTGT)
       acceptClosingAngle(ASSIGN)
-    }
-  }
 
-  object constInt {
+  object constInt
     final val GT = 1
     final val GTGT = 2
     final val GTGTGT = 3
@@ -155,23 +135,19 @@ object Test extends App {
     final val GTGTGTEQ = 6
     final val ASSIGN = 7
 
-    def acceptClosingAngle(in: Int) {
-      val closers: PartialFunction[Int, Int] = {
+    def acceptClosingAngle(in: Int)
+      val closers: PartialFunction[Int, Int] =
         case GTGTGTEQ => GTGTEQ
         case GTGTGT => GTGT
         case GTGTEQ => GTEQ
         case GTGT => GT
         case GTEQ => ASSIGN
-      }
       if (closers isDefinedAt in) println(closers(in))
       else println("undefined")
-    }
 
-    def test() = {
+    def test() =
       acceptClosingAngle(GTGT)
       acceptClosingAngle(ASSIGN)
-    }
-  }
 
   println(res) // prints "Map(a -> 1)"
 
@@ -181,4 +157,3 @@ object Test extends App {
   constChar.test()
   constIntEta.test()
   constInt.test()
-}

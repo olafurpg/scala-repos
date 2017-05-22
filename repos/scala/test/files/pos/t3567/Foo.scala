@@ -1,3 +1,2 @@
-class Foo {
+class Foo
   val foo = Outer.f()
-}

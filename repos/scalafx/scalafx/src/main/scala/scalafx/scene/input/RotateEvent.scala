@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventType
 
-object RotateEvent {
+object RotateEvent
   implicit def sfxRotateEvent2jfx(re: RotateEvent): jfxsi.RotateEvent =
     if (re != null) re.delegate else null
 
@@ -71,13 +71,12 @@ object RotateEvent {
       "Use RotationStarted; ROTATION_STARTED will be removed in a future release",
       "8.0.60-R10")
   val ROTATION_STARTED = RotationStarted
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/RotateEvent.html]]
   */
 class RotateEvent(override val delegate: jfxsi.RotateEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.RotateEvent] {
+    extends InputEvent(delegate) with SFXDelegate[jfxsi.RotateEvent]
 
   /**
     * Gets the rotation angle of this event.
@@ -88,4 +87,3 @@ class RotateEvent(override val delegate: jfxsi.RotateEvent)
     * Gets the cumulative rotation angle of this gesture.
     */
   def totalAngle: Double = delegate.getTotalAngle
-}

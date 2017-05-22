@@ -8,7 +8,7 @@ import scala.reflect.internal.util.StringOps
 import scala.tools.nsc.interpreter.Completion.Candidates
 import scala.util.control.NonFatal
 
-class PresentationCompilerCompleter(intp: IMain) extends Completion {
+class PresentationCompilerCompleter(intp: IMain) extends Completion
   import PresentationCompilerCompleter._
   import intp.{PresentationCompileResult => Result}
 
@@ -23,67 +23,59 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
   // A convenience for testing
   def complete(before: String, after: String = ""): Candidates =
     complete(before + after, before.length)
-  override def complete(buf: String, cursor: Int): Candidates = {
+  override def complete(buf: String, cursor: Int): Candidates =
     val request = Request(buf, cursor)
     if (request == lastRequest) tabCount += 1
-    else {
+    else
       tabCount = 0
       lastRequest = request
-    }
 
     // secret handshakes
     val slashPrint = """.*// *print *""".r
     val slashTypeAt = """.*// *typeAt *(\d+) *(\d+) *""".r
     val Cursor = IMain.DummyCursorFragment + " "
 
-    def print(result: Result) = {
+    def print(result: Result) =
       val offset = result.preambleLength
       val pos1 =
         result.unit.source.position(offset).withEnd(offset + buf.length)
       import result.compiler._
-      val tree = new Locator(pos1) locateIn result.unit.body match {
+      val tree = new Locator(pos1) locateIn result.unit.body match
         case Template(_, _, constructor :: (rest :+ last)) =>
           if (rest.isEmpty) last else Block(rest, last)
         case t => t
-      }
       val printed = showCode(tree) + " // : " + tree.tpe.safeToString
       Candidates(cursor, "" :: printed :: Nil)
-    }
-    def typeAt(result: Result, start: Int, end: Int) = {
+    def typeAt(result: Result, start: Int, end: Int) =
       val tpString = result.compiler.exitingTyper(
           result.typedTreeAt(buf, start, end).tpe.toString)
       Candidates(cursor, "" :: tpString :: Nil)
-    }
-    def candidates(result: Result): Candidates = {
+    def candidates(result: Result): Candidates =
       import result.compiler._
       import CompletionResult._
-      def defStringCandidates(matching: List[Member], name: Name): Candidates = {
-        val defStrings = for {
+      def defStringCandidates(matching: List[Member], name: Name): Candidates =
+        val defStrings = for
           member <- matching if member.symNameDropLocal == name
           sym <- member.sym.alternatives
           sugared = sym.sugaredSymbolOrSelf
-        } yield {
+        yield
           val tp = member.prefix memberType sym
           sugared.defStringSeenAs(tp)
-        }
         Candidates(cursor, "" :: defStrings.distinct)
-      }
-      val found = result.completionsAt(cursor) match {
+      val found = result.completionsAt(cursor) match
         case NoResults => Completion.NoCandidates
         case r =>
-          def shouldHide(m: Member): Boolean = {
+          def shouldHide(m: Member): Boolean =
             val isUniversal = definitions.isUniversalMember(m.sym)
-            def viaUniversalExtensionMethod = m match {
+            def viaUniversalExtensionMethod = m match
               case t: TypeMember
                   if t.implicitlyAdded &&
                   t.viaView.info.params.head.info.bounds.isEmptyBounds =>
                 true
               case _ => false
-            }
             (isUniversal && nme.isReplWrapperName(m.prefix.typeSymbol.name) ||
                 isUniversal && tabCount == 0 && r.name.isEmpty ||
                 viaUniversalExtensionMethod && tabCount == 0 && r.name.isEmpty)
-          }
 
           val matching = r.matchingResults().filterNot(shouldHide)
           val tabAfterCommonPrefixCompletion =
@@ -93,7 +85,7 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
             tabCount > 0 && matching.forall(_.symNameDropLocal == r.name)
           if (tabAfterCommonPrefixCompletion || doubleTab)
             defStringCandidates(matching, r.name)
-          else if (matching.isEmpty) {
+          else if (matching.isEmpty)
             // Lenient matching based on camel case and on eliding JavaBean "get" / "is" boilerplate
             val camelMatches: List[Member] = r
               .matchingResults(CompletionResult.camelMatch(_))
@@ -107,16 +99,14 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
             else if (allowCompletion)
               Candidates(cursor - r.positionDelta, memberCompletions)
             else Candidates(cursor, "" :: memberCompletions)
-          } else if (matching.nonEmpty &&
+          else if (matching.nonEmpty &&
                      matching.forall(_.symNameDropLocal == r.name))
             Completion.NoCandidates // don't offer completion if the only option has been fully typed already
-          else {
+          else
             // regular completion
             val memberCompletions: List[String] =
               matching.map(_.symNameDropLocal.decoded).distinct.sorted
             Candidates(cursor - r.positionDelta, memberCompletions)
-          }
-      }
       lastCommonPrefixCompletion = if (found != Completion.NoCandidates &&
                                        buf.length >= found.cursor)
         Some(
@@ -124,29 +114,22 @@ class PresentationCompilerCompleter(intp: IMain) extends Completion {
             StringOps.longestCommonPrefix(found.candidates))
       else None
       found
-    }
     val buf1 = buf.patch(cursor, Cursor, 0)
-    try {
-      intp.presentationCompile(buf1) match {
+    try
+      intp.presentationCompile(buf1) match
         case Left(_) => Completion.NoCandidates
         case Right(result) =>
-          try {
-            buf match {
+          try
+            buf match
               case slashPrint() if cursor == buf.length => print(result)
               case slashTypeAt(start, end) if cursor == buf.length =>
                 typeAt(result, start.toInt, end.toInt)
               case _ => candidates(result)
-            }
-          } finally result.cleanup()
-      }
-    } catch {
+          finally result.cleanup()
+    catch
       case NonFatal(e) =>
         if (isReplDebug) e.printStackTrace()
         Completion.NoCandidates
-    }
-  }
-}
-object PresentationCompilerCompleter {
+object PresentationCompilerCompleter
   private case class Request(line: String, cursor: Int)
   private val NoRequest = Request("", -1)
-}

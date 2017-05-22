@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import reflect.runtime.universe._ // not using the XML library in compiler tests
 
   def show(code: String, t: Tree) = println(s"\n$code\n$t")
@@ -11,4 +11,3 @@ object Test extends App {
 
   // `identity(foo)` used to match the overly permissive match in SymbolXMLBuilder
   // which was intended to more specifically match `_root_.scala.xml.Text(...)`
-}

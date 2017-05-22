@@ -12,21 +12,19 @@ import org.jetbrains.plugins.scala.extensions._
 import org.jetbrains.plugins.scala.lang.psi.api.expr.ScForStatement
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
-class DesugarForIntention extends PsiElementBaseIntentionAction {
+class DesugarForIntention extends PsiElementBaseIntentionAction
   def getFamilyName = "Convert to desugared expression"
 
   override def getText = "Convert for comprehension to desugared expression"
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
-    element match {
+  def isAvailable(project: Project, editor: Editor, element: PsiElement) =
+    element match
       case e @ Parent(_: ScForStatement) => true
       case _ => false
-    }
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val statement = element.getParent.asInstanceOf[ScForStatement]
-    statement.getDesugarizedExprText(forDisplay = true) match {
+    statement.getDesugarizedExprText(forDisplay = true) match
       case Some(expText) =>
         val desugared =
           ScalaPsiElementFactory.createExpressionWithContextFromText(
@@ -35,6 +33,3 @@ class DesugarForIntention extends PsiElementBaseIntentionAction {
         val manager: CodeStyleManager = CodeStyleManager.getInstance(project)
         manager.reformat(result)
       case None =>
-    }
-  }
-}

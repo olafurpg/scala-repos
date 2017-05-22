@@ -10,9 +10,9 @@ import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ScalaJsonCombinatorsSpec extends Specification {
+class ScalaJsonCombinatorsSpec extends Specification
 
-  val sampleJson = {
+  val sampleJson =
     //#sample-json
     import play.api.libs.json._
 
@@ -36,20 +36,18 @@ class ScalaJsonCombinatorsSpec extends Specification {
       """)
     //#sample-json
     json
-  }
 
-  object SampleModel {
+  object SampleModel
     //#sample-model
     case class Location(lat: Double, long: Double)
     case class Resident(name: String, age: Int, role: Option[String])
     case class Place(
         name: String, location: Location, residents: Seq[Resident])
     //#sample-model
-  }
 
-  "Scala JSON" should {
+  "Scala JSON" should
 
-    "allow using JsPath" in {
+    "allow using JsPath" in
 
       //#jspath-define
       import play.api.libs.json._
@@ -80,9 +78,8 @@ class ScalaJsonCombinatorsSpec extends Specification {
       latPath.toString === "/location/lat"
       namesPath.toString === "//name"
       firstResidentPath.toString === "/residents(0)"
-    }
 
-    "allow creating simple Reads" in {
+    "allow creating simple Reads" in
 
       //#reads-imports
       import play.api.libs.json._ // JSON library
@@ -97,12 +94,10 @@ class ScalaJsonCombinatorsSpec extends Specification {
       val nameReads: Reads[String] = (JsPath \ "name").read[String]
       //#reads-simple
 
-      json.validate(nameReads) must beLike {
+      json.validate(nameReads) must beLike
         case x: JsSuccess[String] => x.get === "Watership Down"
-      }
-    }
 
-    "allow creating complex Reads" in {
+    "allow creating complex Reads" in
       import SampleModel._
 
       import play.api.libs.json._
@@ -121,12 +116,10 @@ class ScalaJsonCombinatorsSpec extends Specification {
       //#reads-complex-buildertoreads
 
       val locationResult = (json \ "location").validate[Location]
-      locationResult must beLike {
+      locationResult must beLike
         case x: JsSuccess[Location] => x.get.lat === 51.235685
-      }
-    }
 
-    "allow creating complex Reads in a single statement" in {
+    "allow creating complex Reads in a single statement" in
       import SampleModel._
 
       import play.api.libs.json._
@@ -141,12 +134,10 @@ class ScalaJsonCombinatorsSpec extends Specification {
       //#reads-complex-statement
 
       val locationResult = (json \ "location").validate[Location]
-      locationResult must beLike {
+      locationResult must beLike
         case x: JsSuccess[Location] => x.get.lat === 51.235685
-      }
-    }
 
-    "allow validation with Reads" in {
+    "allow validation with Reads" in
       import SampleModel._
 
       import play.api.libs.json._
@@ -161,25 +152,21 @@ class ScalaJsonCombinatorsSpec extends Specification {
 
       val nameResult: JsResult[String] = json.validate[String](nameReads)
 
-      nameResult match {
+      nameResult match
         case s: JsSuccess[String] => println("Name: " + s.get)
         case e: JsError => println("Errors: " + JsError.toJson(e).toString())
-      }
       //#reads-validation-simple
-      nameResult must beLike {
+      nameResult must beLike
         case x: JsSuccess[String] => x.get === "Watership Down"
-      }
 
       //#reads-validation-custom
       val improvedNameReads =
         (JsPath \ "name").read[String](minLength[String](2))
       //#reads-validation-custom
-      json.validate[String](improvedNameReads) must beLike {
+      json.validate[String](improvedNameReads) must beLike
         case x: JsSuccess[String] => x.get === "Watership Down"
-      }
-    }
 
-    "allow creating Reads for model" in {
+    "allow creating Reads for model" in
       import SampleModel._
 
       //#reads-model
@@ -205,23 +192,18 @@ class ScalaJsonCombinatorsSpec extends Specification {
       //###replace: val json = { ... }
       val json: JsValue = sampleJson
 
-      json.validate[Place] match {
-        case s: JsSuccess[Place] => {
+      json.validate[Place] match
+        case s: JsSuccess[Place] =>
             val place: Place = s.get
             // do something with place
-          }
-        case e: JsError => {
+        case e: JsError =>
             // error handling flow
-          }
-      }
       //#reads-model
 
-      json.validate[Place] must beLike {
+      json.validate[Place] must beLike
         case x: JsSuccess[Place] => x.get.name === "Watership Down"
-      }
-    }
 
-    "allow creating Writes for model" in {
+    "allow creating Writes for model" in
       import SampleModel._
 
       //#writes-model
@@ -257,9 +239,8 @@ class ScalaJsonCombinatorsSpec extends Specification {
       val placeSome = Place.unapply(place)
 
       (json \ "name").get === JsString("Watership Down")
-    }
 
-    "allow creating Reads/Writes for recursive types" in {
+    "allow creating Reads/Writes for recursive types" in
 
       import play.api.libs.json._
       import play.api.libs.json.Reads._
@@ -291,16 +272,14 @@ class ScalaJsonCombinatorsSpec extends Specification {
       }
       """)
       val userResult = json.validate[User]
-      userResult must beLike {
+      userResult must beLike
         case x: JsSuccess[User] => x.get.name === "Fiver"
-      }
 
       // Use Writes for model -> JSON
       val jsonFromUser = Json.toJson(userResult.get)
       (jsonFromUser \ "name").as[String] === "Fiver"
-    }
 
-    "allow creating Format from components" in {
+    "allow creating Format from components" in
       import SampleModel._
 
       import play.api.libs.json._
@@ -334,9 +313,8 @@ class ScalaJsonCombinatorsSpec extends Specification {
       // Use Writes for model -> JSON
       val jsonFromLocation = Json.toJson(location)
       (jsonFromLocation \ "lat").as[Double] === 51.235685
-    }
 
-    "allow creating Format from combinators" in {
+    "allow creating Format from combinators" in
       import SampleModel._
 
       import play.api.libs.json._
@@ -363,6 +341,3 @@ class ScalaJsonCombinatorsSpec extends Specification {
       // Use Writes for model -> JSON
       val jsonFromLocation = Json.toJson(location)
       (jsonFromLocation \ "lat").as[Double] === 51.235685
-    }
-  }
-}

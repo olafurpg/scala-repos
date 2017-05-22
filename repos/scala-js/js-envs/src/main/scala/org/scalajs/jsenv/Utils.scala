@@ -10,9 +10,9 @@ package org.scalajs.jsenv
 
 import scala.concurrent.duration._
 
-private[jsenv] object Utils {
+private[jsenv] object Utils
   final class OptDeadline private (val deadline: Deadline /* nullable */ )
-      extends AnyVal {
+      extends AnyVal
     // scalastyle:ignore
     def millisLeft: Long =
       if (deadline == null) 0
@@ -21,15 +21,11 @@ private[jsenv] object Utils {
     def isOverdue: Boolean =
       if (deadline == null) false
       else deadline.isOverdue
-  }
 
-  object OptDeadline {
-    def apply(timeout: Duration): OptDeadline = {
+  object OptDeadline
+    def apply(timeout: Duration): OptDeadline =
       new OptDeadline(
-          timeout match {
+          timeout match
         case timeout: FiniteDuration => timeout.fromNow
         case _ => null
-      })
-    }
-  }
-}
+      )

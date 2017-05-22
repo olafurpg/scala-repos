@@ -1,6 +1,4 @@
-class A {
+class A
   object Ding
-  class B {
+  class B
     (null: Any) match { case _: Ding.type => () }
-  }
-}

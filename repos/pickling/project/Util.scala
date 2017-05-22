@@ -1,16 +1,16 @@
 import sbt._
 import Keys._
 
-object Util {
+object Util
   val buildScalaVersion = System.getProperty("scala.version", "2.10.4")
   val buildScalaVersions = Seq("2.11.7", "2.10.4")
   val javaVersion = System.getProperty("java.version")
 
-  def loadCredentials(): List[Credentials] = {
+  def loadCredentials(): List[Credentials] =
     val mavenSettingsFile = System.getProperty("maven.settings.file")
-    if (mavenSettingsFile != null) {
+    if (mavenSettingsFile != null)
       println("Loading Sonatype credentials from " + mavenSettingsFile)
-      try {
+      try
         import scala.xml._
         val settings = XML.loadFile(mavenSettingsFile)
         def readServerConfig(key: String) =
@@ -22,15 +22,11 @@ object Util {
                 readServerConfig("username"),
                 readServerConfig("password")
             ))
-      } catch {
+      catch
         case ex: Exception =>
           println("Failed to load Maven settings from " + mavenSettingsFile +
               ": " + ex)
           Nil
-      }
-    } else {
+    else
       // println("Sonatype credentials cannot be loaded: -Dmaven.settings.file is not specified.")
       Nil
-    }
-  }
-}

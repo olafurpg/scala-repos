@@ -30,7 +30,7 @@ import org.apache.spark.util.Utils
 
 private[streaming] class DStreamCheckpointData[T : ClassTag](
     dstream: DStream[T])
-    extends Serializable with Logging {
+    extends Serializable with Logging
   protected val data = new HashMap[Time, AnyRef]()
 
   // Mapping of the batch time to the checkpointed RDD file of that time
@@ -49,7 +49,7 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
     * the graph checkpoint is initiated. Default implementation records the
     * checkpoint files to which the generate RDDs of the DStream has been saved.
     */
-  def update(time: Time) {
+  def update(time: Time)
 
     // Get the checkpointed RDDs from the generated RDDs
     val checkpointFiles = dstream.generatedRDDs
@@ -59,7 +59,7 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
         "Current checkpoint files:\n" + checkpointFiles.toSeq.mkString("\n"))
 
     // Add the checkpoint files to the data to be serialized
-    if (!checkpointFiles.isEmpty) {
+    if (!checkpointFiles.isEmpty)
       currentCheckpointFiles.clear()
       currentCheckpointFiles ++= checkpointFiles
       // Add the current checkpoint files to the map of all checkpoint files
@@ -68,17 +68,15 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
       // Remember the time of the oldest checkpoint RDD in current state
       timeToOldestCheckpointFileTime(time) = currentCheckpointFiles.keys.min(
           Time.ordering)
-    }
-  }
 
   /**
     * Cleanup old checkpoint data. This gets called after a checkpoint of `time` has been
     * written to the checkpoint directory.
     */
-  def cleanup(time: Time) {
+  def cleanup(time: Time)
     // Get the time of the oldest checkpointed RDD that was written as part of the
     // checkpoint of `time`
-    timeToOldestCheckpointFileTime.remove(time) match {
+    timeToOldestCheckpointFileTime.remove(time) match
       case Some(lastCheckpointFileTime) =>
         // Find all the checkpointed RDDs (i.e. files) that are older than `lastCheckpointFileTime`
         // This is because checkpointed RDDs older than this are not going to be needed
@@ -86,62 +84,53 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
         val filesToDelete =
           timeToCheckpointFile.filter(_._1 < lastCheckpointFileTime)
         logDebug("Files to delete:\n" + filesToDelete.mkString(","))
-        filesToDelete.foreach {
+        filesToDelete.foreach
           case (time, file) =>
-            try {
+            try
               val path = new Path(file)
-              if (fileSystem == null) {
+              if (fileSystem == null)
                 fileSystem = path.getFileSystem(
                     dstream.ssc.sparkContext.hadoopConfiguration)
-              }
               fileSystem.delete(path, true)
               timeToCheckpointFile -= time
               logInfo(
                   "Deleted checkpoint file '" + file + "' for time " + time)
-            } catch {
+            catch
               case e: Exception =>
                 logWarning("Error deleting old checkpoint file '" + file +
                            "' for time " + time,
                            e)
                 fileSystem = null
-            }
-        }
       case None =>
         logDebug("Nothing to delete")
-    }
-  }
 
   /**
     * Restore the checkpoint data. This gets called once when the DStream graph
     * (along with its DStreams) are being restored from a graph checkpoint file.
     * Default implementation restores the RDDs from their checkpoint files.
     */
-  def restore() {
+  def restore()
     // Create RDDs from the checkpoint data
-    currentCheckpointFiles.foreach {
-      case (time, file) => {
+    currentCheckpointFiles.foreach
+      case (time, file) =>
           logInfo("Restoring checkpointed RDD for time " + time +
               " from file '" + file + "'")
           dstream.generatedRDDs +=
           ((time, dstream.context.sparkContext.checkpointFile[T](file)))
-        }
-    }
-  }
 
-  override def toString: String = {
+  override def toString: String =
     "[\n" + currentCheckpointFiles.size + " checkpoint files \n" +
     currentCheckpointFiles.mkString("\n") + "\n]"
-  }
 
   @throws(classOf[IOException])
   private def writeObject(oos: ObjectOutputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       logDebug(this.getClass().getSimpleName + ".writeObject used")
-      if (dstream.context.graph != null) {
-        dstream.context.graph.synchronized {
-          if (dstream.context.graph.checkpointInProgress) {
+      if (dstream.context.graph != null)
+        dstream.context.graph.synchronized
+          if (dstream.context.graph.checkpointInProgress)
             oos.defaultWriteObject()
-          } else {
+          else
             val msg =
               "Object of " + this.getClass.getName + " is being serialized " +
               " possibly as a part of closure of an RDD operation. This is because " +
@@ -150,20 +139,14 @@ private[streaming] class DStreamCheckpointData[T : ClassTag](
               " This has been enforced to avoid bloating of Spark tasks " +
               " with unnecessary objects."
             throw new java.io.NotSerializableException(msg)
-          }
-        }
-      } else {
+      else
         throw new java.io.NotSerializableException(
             "Graph is unexpectedly null when DStream is being serialized.")
-      }
-    }
 
   @throws(classOf[IOException])
   private def readObject(ois: ObjectInputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       logDebug(this.getClass().getSimpleName + ".readObject used")
       ois.defaultReadObject()
       timeToOldestCheckpointFileTime = new HashMap[Time, Time]
       timeToCheckpointFile = new HashMap[Time, String]
-    }
-}

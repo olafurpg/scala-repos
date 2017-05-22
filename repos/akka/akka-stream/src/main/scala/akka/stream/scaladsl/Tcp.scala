@@ -18,15 +18,14 @@ import scala.collection.immutable
 import scala.concurrent.Future
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
-object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
+object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider
 
   /**
     * * Represents a successful TCP server binding.
     */
   final case class ServerBinding(localAddress: InetSocketAddress)(
-      private val unbindAction: () ⇒ Future[Unit]) {
+      private val unbindAction: () ⇒ Future[Unit])
     def unbind(): Future[Unit] = unbindAction()
-  }
 
   /**
     * Represents an accepted incoming TCP connection.
@@ -34,7 +33,7 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   final case class IncomingConnection(
       localAddress: InetSocketAddress,
       remoteAddress: InetSocketAddress,
-      flow: Flow[ByteString, ByteString, NotUsed]) {
+      flow: Flow[ByteString, ByteString, NotUsed])
 
     /**
       * Handles the connection using the given flow, which is materialized exactly once and the respective
@@ -45,7 +44,6 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
     def handleWith[Mat](handler: Flow[ByteString, ByteString, Mat])(
         implicit materializer: Materializer): Mat =
       flow.joinMat(handler)(Keep.right).run()
-  }
 
   /**
     * Represents a prospective outgoing TCP connection.
@@ -60,9 +58,8 @@ object Tcp extends ExtensionId[Tcp] with ExtensionIdProvider {
   def lookup() = Tcp
 
   def createExtension(system: ExtendedActorSystem): Tcp = new Tcp(system)
-}
 
-final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
+final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension
   import Tcp._
 
   // TODO maybe this should be a new setting, like `akka.stream.tcp.bind.timeout` / `shutdown-timeout` instead?
@@ -136,13 +133,12 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
                     options: immutable.Traversable[SocketOption] = Nil,
                     halfClose: Boolean = false,
                     idleTimeout: Duration = Duration.Inf)(
-      implicit m: Materializer): Future[ServerBinding] = {
+      implicit m: Materializer): Future[ServerBinding] =
     bind(interface, port, backlog, options, halfClose, idleTimeout)
-      .to(Sink.foreach { conn: IncomingConnection ⇒
+      .to(Sink.foreach  conn: IncomingConnection ⇒
         conn.flow.join(handler).run()
-      })
+      )
       .run()
-  }
 
   /**
     * Creates an [[Tcp.OutgoingConnection]] instance representing a prospective TCP client connection to the given endpoint.
@@ -166,7 +162,7 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
                          halfClose: Boolean = true,
                          connectTimeout: Duration = Duration.Inf,
                          idleTimeout: Duration = Duration.Inf)
-    : Flow[ByteString, ByteString, Future[OutgoingConnection]] = {
+    : Flow[ByteString, ByteString, Future[OutgoingConnection]] =
 
     val tcpFlow = Flow
       .fromGraph(
@@ -178,13 +174,11 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
                                       connectTimeout))
       .via(detacher[ByteString]) // must read ahead for proper completions
 
-    idleTimeout match {
+    idleTimeout match
       case d: FiniteDuration ⇒
         tcpFlow.join(
             BidiFlow.bidirectionalIdleTimeout[ByteString, ByteString](d))
       case _ ⇒ tcpFlow
-    }
-  }
 
   /**
     * Creates an [[Tcp.OutgoingConnection]] without specifying options.
@@ -194,4 +188,3 @@ final class Tcp(system: ExtendedActorSystem) extends akka.actor.Extension {
       host: String,
       port: Int): Flow[ByteString, ByteString, Future[OutgoingConnection]] =
     outgoingConnection(new InetSocketAddress(host, port))
-}

@@ -6,17 +6,16 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.WordSpecG
   * @author Roman.Shein
   * @since 05.05.2015.
   */
-trait WordSpecScopeTest extends WordSpecGenerator {
-  def testWordSpecEmptyScope() = {
+trait WordSpecScopeTest extends WordSpecGenerator
+  def testWordSpecEmptyScope() =
     addWordSpec()
 
     assert(
         checkConfigAndSettings(
             createTestFromLocation(13, 10, wordSpecFileName),
             wordSpecClassName))
-  }
 
-  def testWordSpecScope() {
+  def testWordSpecScope()
     addWordSpec()
 
     val testNames = Seq("WordSpecTest should Run single test",
@@ -35,5 +34,3 @@ trait WordSpecScopeTest extends WordSpecGenerator {
           checkResultTreeHasExactNamedPath(root, path1: _*) &&
           checkResultTreeHasExactNamedPath(root, path2: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "outer"))
-  }
-}

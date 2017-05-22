@@ -29,9 +29,8 @@ import org.apache.spark.shuffle.ShuffleHandle
   * Base class for dependencies.
   */
 @DeveloperApi
-abstract class Dependency[T] extends Serializable {
+abstract class Dependency[T] extends Serializable
   def rdd: RDD[T]
-}
 
 /**
   * :: DeveloperApi ::
@@ -39,7 +38,7 @@ abstract class Dependency[T] extends Serializable {
   * of partitions of the parent RDD. Narrow dependencies allow for pipelined execution.
   */
 @DeveloperApi
-abstract class NarrowDependency[T](_rdd: RDD[T]) extends Dependency[T] {
+abstract class NarrowDependency[T](_rdd: RDD[T]) extends Dependency[T]
 
   /**
     * Get the parent partitions for a child partition.
@@ -49,7 +48,6 @@ abstract class NarrowDependency[T](_rdd: RDD[T]) extends Dependency[T] {
   def getParents(partitionId: Int): Seq[Int]
 
   override def rdd: RDD[T] = _rdd
-}
 
 /**
   * :: DeveloperApi ::
@@ -73,7 +71,7 @@ class ShuffleDependency[K : ClassTag, V : ClassTag, C : ClassTag](
     val keyOrdering: Option[Ordering[K]] = None,
     val aggregator: Option[Aggregator[K, V, C]] = None,
     val mapSideCombine: Boolean = false)
-    extends Dependency[Product2[K, V]] {
+    extends Dependency[Product2[K, V]]
 
   override def rdd: RDD[Product2[K, V]] =
     _rdd.asInstanceOf[RDD[Product2[K, V]]]
@@ -93,16 +91,14 @@ class ShuffleDependency[K : ClassTag, V : ClassTag, C : ClassTag](
     .registerShuffle(shuffleId, _rdd.partitions.length, this)
 
   _rdd.sparkContext.cleaner.foreach(_.registerShuffleForCleanup(this))
-}
 
 /**
   * :: DeveloperApi ::
   * Represents a one-to-one dependency between partitions of the parent and child RDDs.
   */
 @DeveloperApi
-class OneToOneDependency[T](rdd: RDD[T]) extends NarrowDependency[T](rdd) {
+class OneToOneDependency[T](rdd: RDD[T]) extends NarrowDependency[T](rdd)
   override def getParents(partitionId: Int): List[Int] = List(partitionId)
-}
 
 /**
   * :: DeveloperApi ::
@@ -114,13 +110,10 @@ class OneToOneDependency[T](rdd: RDD[T]) extends NarrowDependency[T](rdd) {
   */
 @DeveloperApi
 class RangeDependency[T](rdd: RDD[T], inStart: Int, outStart: Int, length: Int)
-    extends NarrowDependency[T](rdd) {
+    extends NarrowDependency[T](rdd)
 
-  override def getParents(partitionId: Int): List[Int] = {
-    if (partitionId >= outStart && partitionId < outStart + length) {
+  override def getParents(partitionId: Int): List[Int] =
+    if (partitionId >= outStart && partitionId < outStart + length)
       List(partitionId - outStart + inStart)
-    } else {
+    else
       Nil
-    }
-  }
-}

@@ -17,11 +17,10 @@ package scala
   *  runtime system. A method with return type `Unit` is analogous to a Java
   *  method which is declared `void`.
   */
-final abstract class Unit private extends AnyVal {
+final abstract class Unit private extends AnyVal
   override def getClass(): Class[Unit] = null
-}
 
-object Unit extends AnyValCompanion {
+object Unit extends AnyValCompanion
 
   /** Transform a value type into a boxed reference type.
     *
@@ -42,4 +41,3 @@ object Unit extends AnyValCompanion {
 
   /** The String representation of the scala.Unit companion object. */
   override def toString = "object scala.Unit"
-}

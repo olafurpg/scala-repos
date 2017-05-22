@@ -6,7 +6,7 @@ import lila.db.BSON._
 import lila.user.User
 
 private[message] final class UnreadCache(
-    mongoCache: lila.memo.MongoCache.Builder) {
+    mongoCache: lila.memo.MongoCache.Builder)
 
   // userId => thread IDs
   private val cache = mongoCache[String, List[String]](
@@ -21,4 +21,3 @@ private[message] final class UnreadCache(
     (cache remove userId) >> apply(userId)
 
   def clear(userId: String) = cache remove userId
-}

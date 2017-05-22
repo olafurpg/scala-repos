@@ -20,13 +20,12 @@
 package com.precog
 package mimir
 
-trait CondRewriter extends DAG {
+trait CondRewriter extends DAG
   import instructions._
   import dag._
 
-  def rewriteConditionals(node: DepGraph): DepGraph = {
-    node mapDown { recurse =>
-      {
+  def rewriteConditionals(node: DepGraph): DepGraph =
+    node mapDown  recurse =>
         case peer @ IUI(true,
                         Filter(leftJoin, left, pred1),
                         Filter(rightJoin, right, Operate(Comp, pred2)))
@@ -36,7 +35,3 @@ trait CondRewriter extends DAG {
                leftJoin,
                recurse(right),
                rightJoin)(peer.loc)
-      }
-    }
-  }
-}

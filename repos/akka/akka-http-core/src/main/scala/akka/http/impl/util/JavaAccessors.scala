@@ -14,7 +14,7 @@ import akka.http.scaladsl.model
   *
   *  Accessors for constructors with default arguments to be used from the Java implementation
   */
-object JavaAccessors {
+object JavaAccessors
 
   /** INTERNAL API */
   def HttpRequest(): HttpRequest = model.HttpRequest()
@@ -28,4 +28,3 @@ object JavaAccessors {
   /** INTERNAL API */
   def HttpEntity(contentType: ContentType, file: File): UniversalEntity =
     model.HttpEntity(contentType.asScala, file)
-}

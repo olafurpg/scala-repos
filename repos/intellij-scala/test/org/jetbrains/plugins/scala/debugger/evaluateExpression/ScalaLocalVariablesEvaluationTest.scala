@@ -12,7 +12,7 @@ class ScalaLocalVariablesEvaluationTest_212
     extends ScalaLocalVariablesEvaluationTestBase with ScalaVersion_2_12
 
 abstract class ScalaLocalVariablesEvaluationTestBase
-    extends ScalaDebuggerTestCase {
+    extends ScalaDebuggerTestCase
   addFileWithBreakpoints("Local.scala",
                          s"""
        |object Local {
@@ -22,12 +22,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocal() {
-    runDebugger() {
+  def testLocal()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalClassParam.scala",
                          s"""
@@ -48,12 +46,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalClassParam() {
-    runDebugger() {
+  def testLocalClassParam()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalFromForStatement.scala",
                          s"""
@@ -67,12 +63,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalFromForStatement() {
-    runDebugger() {
+  def testLocalFromForStatement()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalFromForStmtFromOut.scala",
                          s"""
@@ -86,12 +80,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalFromForStmtFromOut() {
-    runDebugger() {
+  def testLocalFromForStmtFromOut()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("Param.scala",
                          s"""
@@ -106,12 +98,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testParam() {
-    runDebugger() {
+  def testParam()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalParam.scala",
                          s"""
@@ -124,12 +114,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalParam() {
-    runDebugger() {
+  def testLocalParam()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalOuter.scala",
                          s"""
@@ -146,12 +134,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalOuter() {
-    runDebugger() {
+  def testLocalOuter()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalOuterOuter.scala",
                          s"""
@@ -174,13 +160,11 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalOuterOuter() {
-    runDebugger() {
+  def testLocalOuterOuter()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
       evalEquals("y", "a")
-    }
-  }
 
   addFileWithBreakpoints("LocalObjectOuter.scala",
                          s"""
@@ -202,12 +186,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalObjectOuter() {
-    runDebugger() {
+  def testLocalObjectOuter()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("x", "LocalObjectOuter$x")
-    }
-  }
 
   addFileWithBreakpoints("LocalFromClosureAndClass.scala",
                          s"""
@@ -233,13 +215,11 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalFromClosureAndClass() {
-    runDebugger() {
+  def testLocalFromClosureAndClass()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
       evalEquals("y", "a")
-    }
-  }
 
   addFileWithBreakpoints("LocalMethodLocal.scala",
                          s"""
@@ -255,13 +235,11 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalMethodLocal() {
-    runDebugger() {
+  def testLocalMethodLocal()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
       evalEquals("s", "a")
-    }
-  }
 
   addFileWithBreakpoints("LocalMethodLocalObject.scala",
                          s"""
@@ -276,12 +254,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalMethodLocalObject() {
-    runDebugger() {
+  def testLocalMethodLocalObject()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("x", "LocalMethodLocalObject$x")
-    }
-  }
 
   addFileWithBreakpoints("LocalMethodLocalMethodLocal.scala",
                          s"""
@@ -300,13 +276,11 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalMethodLocalMethodLocal() {
-    runDebugger() {
+  def testLocalMethodLocalMethodLocal()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
       evalEquals("s", "a")
-    }
-  }
 
   addFileWithBreakpoints("LocalMethodLocalMethodLocalClass.scala",
                          s"""
@@ -330,13 +304,11 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalMethodLocalMethodLocalClass() {
-    runDebugger() {
+  def testLocalMethodLocalMethodLocalClass()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
       evalEquals("s", "a")
-    }
-  }
 
   addFileWithBreakpoints("LocMethLocMethLocClassLocMeth.scala",
                          s"""
@@ -367,12 +339,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocMethLocMethLocClassLocMeth() {
-    runDebugger() {
+  def testLocMethLocMethLocClassLocMeth()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalObjectInside.scala",
                          s"""
@@ -389,12 +359,10 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalObjectInside() {
-    runDebugger() {
+  def testLocalObjectInside()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
-    }
-  }
 
   addFileWithBreakpoints("LocalObjectInsideClassLevel.scala",
                          s"""
@@ -417,11 +385,8 @@ abstract class ScalaLocalVariablesEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalObjectInsideClassLevel() {
-    runDebugger() {
+  def testLocalObjectInsideClassLevel()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x", "1")
       evalEquals("s", "a")
-    }
-  }
-}

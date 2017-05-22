@@ -8,14 +8,13 @@ import lila.common.PimpedConfig._
 final class Env(config: Config,
                 renderer: ActorSelection,
                 system: ActorSystem,
-                lifecycle: play.api.inject.ApplicationLifecycle) {
+                lifecycle: play.api.inject.ApplicationLifecycle)
 
-  private val settings = new {
+  private val settings = new
     val CollectionPuzzle = config getString "collection.puzzle"
     val CollectionAttempt = config getString "collection.attempt"
     val ApiToken = config getString "api.token"
     val PngExecPath = config getString "png.exec_path"
-  }
   import settings._
 
   val AnimationDuration = config duration "animation.duration"
@@ -46,28 +45,22 @@ final class Env(config: Config,
 
   lazy val pngExport = PngExport(PngExecPath) _
 
-  def cli = new lila.common.Cli {
-    def process = {
+  def cli = new lila.common.Cli
+    def process =
       case "puzzle" :: "export" :: nbStr :: Nil =>
-        parseIntOption(nbStr) ?? { nb =>
+        parseIntOption(nbStr) ??  nb =>
           Export(api, nb)
-        }
       case "puzzle" :: "disable" :: id :: Nil =>
-        parseIntOption(id) ?? { id =>
+        parseIntOption(id) ??  id =>
           api.puzzle disable id inject "Done"
-        }
-    }
-  }
 
   private[puzzle] lazy val puzzleColl = db(CollectionPuzzle)
   private[puzzle] lazy val attemptColl = db(CollectionAttempt)
-}
 
-object Env {
+object Env
 
   lazy val current: Env =
     "puzzle" boot new Env(config = lila.common.PlayApp loadConfig "puzzle",
                           renderer = lila.hub.Env.current.actor.renderer,
                           system = lila.common.PlayApp.system,
                           lifecycle = lila.common.PlayApp.lifecycle)
-}

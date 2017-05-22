@@ -19,31 +19,25 @@ class AppStartActor(val driver: SchedulerDriver,
                     val app: AppDefinition,
                     val scaleTo: Int,
                     promise: Promise[Unit])
-    extends Actor with ActorLogging with StartingBehavior {
+    extends Actor with ActorLogging with StartingBehavior
 
   val nrToStart: Int = scaleTo
 
-  def initializeStart(): Unit = {
+  def initializeStart(): Unit =
     scheduler.startApp(driver, app.copy(instances = scaleTo))
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     eventBus.unsubscribe(self)
-    if (!promise.isCompleted) {
+    if (!promise.isCompleted)
       if (promise.tryFailure(new AppStartCanceledException(
-                  "The app start has been cancelled"))) {
+                  "The app start has been cancelled")))
         scheduler
           .stopApp(driver, app)
-          .onFailure {
+          .onFailure
             case NonFatal(e) => log.error(s"while stopping app ${app.id}", e)
-          }(context.dispatcher)
-      }
-    }
-  }
+          (context.dispatcher)
 
-  def success(): Unit = {
+  def success(): Unit =
     log.info(s"Successfully started $scaleTo instances of ${app.id}")
     promise.success(())
     context.stop(self)
-  }
-}

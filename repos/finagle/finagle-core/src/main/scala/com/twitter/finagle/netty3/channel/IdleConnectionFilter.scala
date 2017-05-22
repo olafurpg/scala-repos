@@ -10,48 +10,41 @@ import com.twitter.util.{Future, Duration}
 import java.util.concurrent.atomic.AtomicInteger
 
 case class OpenConnectionsThresholds(
-    lowWaterMark: Int, highWaterMark: Int, idleTimeout: Duration) {
+    lowWaterMark: Int, highWaterMark: Int, idleTimeout: Duration)
   require(
       lowWaterMark <= highWaterMark, "lowWaterMark must be <= highWaterMark")
-}
 
-object IdleConnectionFilter {
+object IdleConnectionFilter
   val role = Stack.Role("IdleConnectionAssasin")
 
   /**
     * A class eligible for configuring a [[com.twitter.finagle.Stackable]]
     * [[com.twitter.finagle.netty3.channel.IdleConnectionFilter]].
     */
-  case class Param(thres: Option[OpenConnectionsThresholds]) {
+  case class Param(thres: Option[OpenConnectionsThresholds])
     def mk(): (Param, Stack.Param[Param]) =
       (this, Param.param)
-  }
-  object Param {
+  object Param
     implicit val param = Stack.Param(Param(None))
-  }
 
   /**
     * Creates a [[com.twitter.finagle.Stackable]]
     * [[com.twitter.finagle.netty3.channel.IdleConnectionFilter]].
     */
   private[finagle] def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module2[Param, param.Stats, ServiceFactory[Req, Rep]] {
+    new Stack.Module2[Param, param.Stats, ServiceFactory[Req, Rep]]
       val role = IdleConnectionFilter.role
       val description =
         "Refuse requests and try to close idle connections " +
         "based on the number of active connections"
       def make(_param: Param,
                _stats: param.Stats,
-               next: ServiceFactory[Req, Rep]) = {
-        _param match {
+               next: ServiceFactory[Req, Rep]) =
+        _param match
           case Param(Some(thres)) =>
             val param.Stats(sr) = _stats
             new IdleConnectionFilter(next, thres, sr.scope("idle"))
           case _ => next
-        }
-      }
-    }
-}
 
 /**
   * Filter responsible for tracking idle connection, it will refuse requests and try to close idle
@@ -74,33 +67,29 @@ class IdleConnectionFilter[Req, Rep](
     threshold: OpenConnectionsThresholds,
     statsReceiver: StatsReceiver = NullStatsReceiver
 )
-    extends ServiceFactoryProxy[Req, Rep](self) {
+    extends ServiceFactoryProxy[Req, Rep](self)
   private[this] val queue =
     new BucketGenerationalQueue[ClientConnection](threshold.idleTimeout)
   private[this] val connectionCounter = new AtomicInteger(0)
-  private[this] val idle = statsReceiver.addGauge("idle") {
+  private[this] val idle = statsReceiver.addGauge("idle")
     queue.collectAll(threshold.idleTimeout).size
-  }
   private[this] val refused = statsReceiver.counter("refused")
   private[this] val closed = statsReceiver.counter("closed")
 
   def openConnections = connectionCounter.get()
 
-  override def apply(c: ClientConnection) = {
+  override def apply(c: ClientConnection) =
     c.onClose ensure { connectionCounter.decrementAndGet() }
-    if (accept(c)) {
+    if (accept(c))
       queue.add(c)
-      c.onClose ensure {
+      c.onClose ensure
         queue.remove(c)
-      }
       self(c) map { filterFactory(c) andThen _ }
-    } else {
+    else
       refused.incr()
       val address = c.remoteAddress
       c.close()
       Future.value(new FailedService(new ConnectionRefusedException(address)))
-    }
-  }
 
   // This filter is responsible for adding/removing a connection to/from the idle tracking
   // system during the phase when the server is computing the result.
@@ -109,17 +98,14 @@ class IdleConnectionFilter[Req, Rep](
 
   // TODO: this should be connection (service acquire/release) based, not request based.
   private[channel] def filterFactory(c: ClientConnection) =
-    new SimpleFilter[Req, Rep] {
-      def apply(request: Req, service: Service[Req, Rep]) = {
+    new SimpleFilter[Req, Rep]
+      def apply(request: Req, service: Service[Req, Rep]) =
         queue.remove(c)
-        service(request) ensure {
+        service(request) ensure
           queue.touch(c)
-        }
-      }
-    }
 
   private[channel] def closeIdleConnections() =
-    queue.collect(threshold.idleTimeout) match {
+    queue.collect(threshold.idleTimeout) match
       case Some(conn) =>
         conn.close()
         closed.incr()
@@ -127,17 +113,13 @@ class IdleConnectionFilter[Req, Rep](
 
       case None =>
         false
-    }
 
-  private[this] def accept(c: ClientConnection): Boolean = {
+  private[this] def accept(c: ClientConnection): Boolean =
     val connectionCount = connectionCounter.incrementAndGet()
     if (connectionCount <= threshold.lowWaterMark) true
-    else if (connectionCount <= threshold.highWaterMark) {
+    else if (connectionCount <= threshold.highWaterMark)
       closeIdleConnections() // whatever the result of this, we accept the connection
       true
-    } else {
+    else
       // Try to close idle connections, if we don't find any, then we refuse the connection
       closeIdleConnections()
-    }
-  }
-}

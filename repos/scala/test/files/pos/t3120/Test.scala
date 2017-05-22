@@ -1,3 +1,2 @@
-object Test {
+object Test
   Q.passInner(null)
-}

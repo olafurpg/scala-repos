@@ -1,18 +1,15 @@
-abstract class BulkSearch {
+abstract class BulkSearch
   type R <: Row
   type Rel <: Relation[R]
   type Corr <: Correspondence[R]
 
-  def searchFor(input: Rel): Mapping[Corr] = {
+  def searchFor(input: Rel): Mapping[Corr] =
     println("BulkSearch.searchFor called."); null
-  }
-}
 
-object BulkSearchInstance extends BulkSearch {
+object BulkSearchInstance extends BulkSearch
   type R = UpRow
   type Rel = UpRelation
   type Corr = UpCorrespondence
-}
 
 class Row
 class UpRow extends Row

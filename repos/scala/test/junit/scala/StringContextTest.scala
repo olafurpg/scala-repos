@@ -11,114 +11,96 @@ import org.junit.runners.JUnit4
 
 import scala.tools.testing.AssertUtil._
 
-object StringContextTestUtils {
+object StringContextTestUtils
   private val decimalSeparator: Char =
     new DecimalFormat().getDecimalFormatSymbols().getDecimalSeparator()
   private val numberPattern = """(\d+)\.(\d+.*)""".r
 
-  implicit class StringContextOps(val sc: StringContext) extends AnyVal {
+  implicit class StringContextOps(val sc: StringContext) extends AnyVal
     // Use this String interpolator to avoid problems with a locale-dependent decimal mark.
-    def locally(numbers: String*): String = {
+    def locally(numbers: String*): String =
       val numbersWithCorrectLocale = numbers.map(applyProperLocale)
       sc.s(numbersWithCorrectLocale: _*)
-    }
 
     // Handles cases like locally"3.14" - it's prettier than locally"${"3.14"}".
     def locally(): String = sc.parts.map(applyProperLocale).mkString
 
-    private def applyProperLocale(number: String): String = {
+    private def applyProperLocale(number: String): String =
       val numberPattern(intPart, fractionalPartAndSuffix) = number
       s"$intPart$decimalSeparator$fractionalPartAndSuffix"
-    }
-  }
-}
 
 @RunWith(classOf[JUnit4])
-class StringContextTest {
+class StringContextTest
 
   import StringContext._
   import StringContextTestUtils.StringContextOps
 
-  @Test def noEscape() = {
+  @Test def noEscape() =
     val s = "string"
     val res = processEscapes(s)
     assertEquals(s, res)
-  }
-  @Test def tabbed() = {
+  @Test def tabbed() =
     val s = """a\tb"""
     val res = processEscapes(s)
     assertEquals("a\tb", res)
-  }
-  @Test def quoted() = {
+  @Test def quoted() =
     val s = """hello, \"world\""""
     val res = processEscapes(s)
     assertEquals("""hello, "world"""", res)
-  }
-  @Test def octal() = {
+  @Test def octal() =
     val s = """\123cala"""
     val res = treatEscapes(s)
     assertEquals("Scala", res)
-  }
-  @Test def doubled() = {
+  @Test def doubled() =
     val s = """\123cala\123yntax"""
     val res = treatEscapes(s)
     assertEquals("ScalaSyntax", res)
-  }
-  @Test def badly() = assertThrows[InvalidEscapeException] {
+  @Test def badly() = assertThrows[InvalidEscapeException]
     val s = """Scala\"""
     val res = treatEscapes(s)
     assertEquals("Scala", res)
-  }
-  @Test def noOctal() = assertThrows[InvalidEscapeException] {
+  @Test def noOctal() = assertThrows[InvalidEscapeException]
     val s = """\123cala"""
     val res = processEscapes(s)
     assertEquals("Scala", res)
-  }
 
   @Test def t6631_baseline() = assertEquals("\f\r\n\t", s"""\f\r\n\t""")
 
-  @Test def t6631_badEscape() = assertThrows[InvalidEscapeException] {
+  @Test def t6631_badEscape() = assertThrows[InvalidEscapeException]
     s"""\x"""
-  }
 
   // verifying that the standard interpolators can be supplanted
-  @Test def antiHijack_?() = {
-    object AllYourStringsAreBelongToMe {
+  @Test def antiHijack_?() =
+    object AllYourStringsAreBelongToMe
       case class StringContext(args: Any*) { def s(args: Any) = "!!!!" }
-    }
     import AllYourStringsAreBelongToMe._
     //assertEquals("????", s"????")
     assertEquals("!!!!", s"????") // OK to hijack core interpolator ids
-  }
 
-  @Test def fIf() = {
+  @Test def fIf() =
     val res = f"${if (true) 2.5 else 2.5}%.2f"
     val expected = locally"2.50"
     assertEquals(expected, res)
-  }
 
-  @Test def fIfNot() = {
+  @Test def fIfNot() =
     val res = f"${if (false) 2.5 else 3.5}%.2f"
     val expected = locally"3.50"
     assertEquals(expected, res)
-  }
 
-  @Test def fHeteroArgs() = {
+  @Test def fHeteroArgs() =
     val res = f"${3.14}%.2f rounds to ${3}%d"
     val expected = locally"${"3.14"} rounds to 3"
     assertEquals(expected, res)
-  }
 
-  @Test def `f interpolator baseline`(): Unit = {
+  @Test def `f interpolator baseline`(): Unit =
 
     implicit def stringToBoolean(s: String): Boolean =
       java.lang.Boolean.parseBoolean(s)
     implicit def stringToChar(s: String): Char = s(0)
     implicit def str2fmt(s: String): java.util.Formattable =
-      new java.util.Formattable {
+      new java.util.Formattable
         def formatTo(f: java.util.Formatter, g: Int, w: Int, p: Int) =
           f.format("%s", s)
-      }
 
     val b_true = true
     val b_false = false
@@ -130,10 +112,9 @@ class StringContextTest {
 
     val s = "Scala"
 
-    val fff = new java.util.Formattable {
+    val fff = new java.util.Formattable
       def formatTo(f: java.util.Formatter, g: Int, w: Int, p: Int) =
         f.format("4")
-    }
     import java.util.{Calendar, Locale}
     val c = Calendar.getInstance(Locale.US)
     c.set(2012, Calendar.MAY, 26)
@@ -207,12 +188,12 @@ class StringContextTest {
         f"${new java.math.BigInteger("120")}%d" -> "120",
         f"${4}%#10X" -> "       0X4",
         f"She is ${fff}%#s feet tall." -> "She is 4 feet tall.",
-        f"Just want to say ${"hello, world"}%#s..." -> "Just want to say hello, world...", {
+        f"Just want to say ${"hello, world"}%#s..." -> "Just want to say hello, world...",
           implicit val strToShort =
             (s: String) => java.lang.Short.parseShort(s); f"${"120"}%d"
-        } -> "120", {
+        -> "120",
           implicit val strToInt = (s: String) => 42; f"${"120"}%d"
-        } -> "42",
+        -> "42",
         // 'e' | 'E' | 'g' | 'G' | 'f' | 'a' | 'A' (category: floating point)
         // ------------------------------------------------------------------
         f"${3.4f}%e" -> locally"3.400000e+00",
@@ -245,5 +226,3 @@ class StringContextTest {
     )
 
     for ((f, s) <- ss) assertEquals(s, f)
-  }
-}

@@ -55,7 +55,7 @@ import org.apache.spark.util.Utils
   * @tparam T Type of the data contained in the broadcast variable.
   */
 abstract class Broadcast[T : ClassTag](val id: Long)
-    extends Serializable with Logging {
+    extends Serializable with Logging
 
   /**
     * Flag signifying whether the broadcast variable is valid
@@ -66,58 +66,52 @@ abstract class Broadcast[T : ClassTag](val id: Long)
   private var _destroySite = ""
 
   /** Get the broadcasted value. */
-  def value: T = {
+  def value: T =
     assertValid()
     getValue()
-  }
 
   /**
     * Asynchronously delete cached copies of this broadcast on the executors.
     * If the broadcast is used after this is called, it will need to be re-sent to each executor.
     */
-  def unpersist() {
+  def unpersist()
     unpersist(blocking = false)
-  }
 
   /**
     * Delete cached copies of this broadcast on the executors. If the broadcast is used after
     * this is called, it will need to be re-sent to each executor.
     * @param blocking Whether to block until unpersisting has completed
     */
-  def unpersist(blocking: Boolean) {
+  def unpersist(blocking: Boolean)
     assertValid()
     doUnpersist(blocking)
-  }
 
   /**
     * Destroy all data and metadata related to this broadcast variable. Use this with caution;
     * once a broadcast variable has been destroyed, it cannot be used again.
     * This method blocks until destroy has completed
     */
-  def destroy() {
+  def destroy()
     destroy(blocking = true)
-  }
 
   /**
     * Destroy all data and metadata related to this broadcast variable. Use this with caution;
     * once a broadcast variable has been destroyed, it cannot be used again.
     * @param blocking Whether to block until destroy has completed
     */
-  private[spark] def destroy(blocking: Boolean) {
+  private[spark] def destroy(blocking: Boolean)
     assertValid()
     _isValid = false
     _destroySite = Utils.getCallSite().shortForm
     logInfo("Destroying %s (from %s)".format(toString, _destroySite))
     doDestroy(blocking)
-  }
 
   /**
     * Whether this Broadcast is actually usable. This should be false once persisted state is
     * removed from the driver.
     */
-  private[spark] def isValid: Boolean = {
+  private[spark] def isValid: Boolean =
     _isValid
-  }
 
   /**
     * Actually get the broadcasted value. Concrete implementations of Broadcast class must
@@ -139,13 +133,10 @@ abstract class Broadcast[T : ClassTag](val id: Long)
   protected def doDestroy(blocking: Boolean)
 
   /** Check if this broadcast is valid. If not valid, exception is thrown. */
-  protected def assertValid() {
-    if (!_isValid) {
+  protected def assertValid()
+    if (!_isValid)
       throw new SparkException(
           "Attempted to use %s after it was destroyed (%s) ".format(
               toString, _destroySite))
-    }
-  }
 
   override def toString: String = "Broadcast(" + id + ")"
-}

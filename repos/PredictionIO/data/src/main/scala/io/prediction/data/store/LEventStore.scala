@@ -26,7 +26,7 @@ import scala.concurrent.duration.Duration
 /** This object provides a set of operation to access Event Store
   * without going through Spark's parallelization
   */
-object LEventStore {
+object LEventStore
 
   private val defaultTimeout = Duration(60, "seconds")
 
@@ -65,7 +65,7 @@ object LEventStore {
                    untilTime: Option[DateTime] = None,
                    limit: Option[Int] = None,
                    latest: Boolean = true,
-                   timeout: Duration = defaultTimeout): Iterator[Event] = {
+                   timeout: Duration = defaultTimeout): Iterator[Event] =
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
@@ -81,7 +81,6 @@ object LEventStore {
                                      limit = limit,
                                      reversed = Some(latest)),
                  timeout)
-  }
 
   /** Reads events generically. If entityType or entityId is not specified, it
     * results in table scan. 
@@ -118,7 +117,7 @@ object LEventStore {
            startTime: Option[DateTime] = None,
            untilTime: Option[DateTime] = None,
            limit: Option[Int] = None,
-           timeout: Duration = defaultTimeout): Iterator[Event] = {
+           timeout: Duration = defaultTimeout): Iterator[Event] =
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
@@ -133,5 +132,3 @@ object LEventStore {
                                      targetEntityId = targetEntityId,
                                      limit = limit),
                  timeout)
-  }
-}

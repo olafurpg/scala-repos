@@ -11,15 +11,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
 class UnitMethodDefinedWithEqualsSignInspection
     extends AbstractMethodSignatureInspection(
         "ScalaUnitMethodDefinedWithEqualsSign",
-        "Method with Unit result type defined with equals sign") {
+        "Method with Unit result type defined with equals sign")
 
-  def actionFor(holder: ProblemsHolder) = {
+  def actionFor(holder: ProblemsHolder) =
     case f: ScFunctionDefinition
         if !f.hasExplicitType && f.hasUnitResultType &&
         !f.isSecondaryConstructor =>
-      f.assignment.foreach { assignment =>
+      f.assignment.foreach  assignment =>
         holder.registerProblem(
             assignment, getDisplayName, new RemoveEqualsSign(f))
-      }
-  }
-}

@@ -40,7 +40,7 @@ private[spark] class UnionPartition[T : ClassTag](
     @transient private val rdd: RDD[T],
     val parentRddIndex: Int,
     @transient private val parentRddPartitionIndex: Int)
-    extends Partition {
+    extends Partition
 
   var parentPartition: Partition = rdd.partitions(parentRddPartitionIndex)
 
@@ -51,48 +51,39 @@ private[spark] class UnionPartition[T : ClassTag](
 
   @throws(classOf[IOException])
   private def writeObject(oos: ObjectOutputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       // Update the reference to parent split at the time of task serialization
       parentPartition = rdd.partitions(parentRddPartitionIndex)
       oos.defaultWriteObject()
-    }
-}
 
 @DeveloperApi
 class UnionRDD[T : ClassTag](sc: SparkContext, var rdds: Seq[RDD[T]])
-    extends RDD[T](sc, Nil) {
+    extends RDD[T](sc, Nil)
   // Nil since we implement getDependencies
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     val array = new Array[Partition](rdds.map(_.partitions.length).sum)
     var pos = 0
-    for ((rdd, rddIndex) <- rdds.zipWithIndex; split <- rdd.partitions) {
+    for ((rdd, rddIndex) <- rdds.zipWithIndex; split <- rdd.partitions)
       array(pos) = new UnionPartition(pos, rdd, rddIndex, split.index)
       pos += 1
-    }
     array
-  }
 
-  override def getDependencies: Seq[Dependency[_]] = {
+  override def getDependencies: Seq[Dependency[_]] =
     val deps = new ArrayBuffer[Dependency[_]]
     var pos = 0
-    for (rdd <- rdds) {
+    for (rdd <- rdds)
       deps += new RangeDependency(rdd, 0, pos, rdd.partitions.length)
       pos += rdd.partitions.length
-    }
     deps
-  }
 
-  override def compute(s: Partition, context: TaskContext): Iterator[T] = {
+  override def compute(s: Partition, context: TaskContext): Iterator[T] =
     val part = s.asInstanceOf[UnionPartition[T]]
     parent[T](part.parentRddIndex).iterator(part.parentPartition, context)
-  }
 
   override def getPreferredLocations(s: Partition): Seq[String] =
     s.asInstanceOf[UnionPartition[T]].preferredLocations()
 
-  override def clearDependencies() {
+  override def clearDependencies()
     super.clearDependencies()
     rdds = null
-  }
-}

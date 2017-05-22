@@ -10,9 +10,9 @@ import play.api.libs.json.Json
 import scala.concurrent.duration._
 
 class TaskStatsByVersionTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec with GivenWhenThen with Matchers
 
-  test("no tasks") {
+  test("no tasks")
     Given("no tasks")
     When("calculating stats")
     val stats = TaskStatsByVersion(
@@ -30,9 +30,8 @@ class TaskStatsByVersionTest
             maybeTotalSummary = None
         )
     )
-  }
 
-  test("tasks are correctly split along categories") {
+  test("tasks are correctly split along categories")
     Given("various tasks")
     taskIdCounter = 0
     val outdatedTasks = Vector(
@@ -61,7 +60,7 @@ class TaskStatsByVersionTest
     )
     Then("we get the correct stats")
     import mesosphere.marathon.api.v2.json.Formats._
-    withClue(Json.prettyPrint(Json.obj("stats" -> stats, "tasks" -> tasks))) {
+    withClue(Json.prettyPrint(Json.obj("stats" -> stats, "tasks" -> tasks)))
       stats.maybeWithOutdatedConfig should not be empty
       stats.maybeWithLatestConfig should not be empty
       stats.maybeStartedAfterLastScaling should not be empty
@@ -88,8 +87,6 @@ class TaskStatsByVersionTest
               maybeTotalSummary = TaskStats.forSomeTasks(now, tasks, statuses)
           )
       )
-    }
-  }
 
   private[this] val now: Timestamp = ConstantClock().now()
   private val lastScalingAt: Timestamp = now - 10.seconds
@@ -102,14 +99,11 @@ class TaskStatsByVersionTest
       lastConfigChangeAt = lastConfigChangeAt
   )
   private[this] var taskIdCounter = 0
-  private[this] def newTaskId(): String = {
+  private[this] def newTaskId(): String =
     taskIdCounter += 1
     s"task$taskIdCounter"
-  }
   private[this] def runningTaskStartedAt(
-      version: Timestamp, startingDelay: FiniteDuration): Task = {
+      version: Timestamp, startingDelay: FiniteDuration): Task =
     val startedAt = (version + startingDelay).toDateTime.getMillis
     MarathonTestHelper.runningTask(
         newTaskId(), appVersion = version, startedAt = startedAt)
-  }
-}

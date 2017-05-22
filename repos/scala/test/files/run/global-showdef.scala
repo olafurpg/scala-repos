@@ -1,7 +1,7 @@
 import scala.tools.partest.DirectTest
 import scala.tools.nsc.util.stringFromStream
 
-object Test extends DirectTest {
+object Test extends DirectTest
   override def extraSettings: String =
     "-usejavacp -Yshow:typer -Ystop-after:typer"
 
@@ -34,7 +34,7 @@ object Bippy {
 }
   """
 
-  override def show(): Unit = {
+  override def show(): Unit =
     val classes = List("Bippy",
                        "Bippy#BippyType",
                        "Bippy.BippyType",
@@ -48,18 +48,12 @@ object Bippy {
     def run(args: String*) =
       slurp(args: _*).lines filter interesting foreach println
 
-    classes.zipAll(objects, "", "") foreach {
+    classes.zipAll(objects, "", "") foreach
       case (c, "") => run("-Xshow-class", c)
       case (c, o) => run("-Xshow-class", c, "-Xshow-object", o)
-    }
-  }
 
   // slurp the compilation result
-  def slurp(args: String*): String = stringFromStream { stream =>
-    Console.withOut(stream) {
-      Console.withErr(stream) {
+  def slurp(args: String*): String = stringFromStream  stream =>
+    Console.withOut(stream)
+      Console.withErr(stream)
         compile(args: _*)
-      }
-    }
-  }
-}

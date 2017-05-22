@@ -24,7 +24,7 @@ import util.Concat.Promoter
 /**
   * Vec of Any
   */
-class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
+class VecAny[T : ST](values: Array[T]) extends Vec[T]  self =>
   def length = values.length
 
   def scalarTag = implicitly[ST[T]]
@@ -82,40 +82,37 @@ class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
       f: (T, B) => C): Vec[C] =
     VecImpl.zipMap(this, other)(f)
 
-  def slice(from: Int, until: Int, stride: Int = 1) = {
+  def slice(from: Int, until: Int, stride: Int = 1) =
     val b = math.max(from, 0)
     val e = math.min(until, self.length)
 
     if (e <= b) Vec.empty
     else
-      new VecAny(values) {
+      new VecAny(values)
         private val ub = math.min(self.length, e)
 
         override def length = math.ceil((ub - b) / stride.toDouble).toInt
 
-        override def apply(i: Int): T = {
+        override def apply(i: Int): T =
           val loc = b + i * stride
           if (loc >= ub)
             throw new ArrayIndexOutOfBoundsException(
                 "Cannot access location %d >= length %d".format(loc, ub))
           self.apply(loc)
-        }
 
         override def needsCopy = true
-      }
-  }
 
   // ex. shift(1)  : [1 2 3 4] => [NA 1 2 3]
   //     shift(-1) : [1 2 3 4] => [2 3 4 NA]
-  def shift(n: Int) = {
+  def shift(n: Int) =
     val m = math.min(n, self.length)
     val b = -m
     val e = self.length - m
 
-    new VecAny(values) {
+    new VecAny(values)
       override def length = self.length
 
-      override def apply(i: Int): T = {
+      override def apply(i: Int): T =
         val loc = b + i
         if (loc >= e || loc < b)
           throw new ArrayIndexOutOfBoundsException(
@@ -123,40 +120,30 @@ class VecAny[T : ST](values: Array[T]) extends Vec[T] { self =>
                   i, self.length))
         else if (loc >= self.length || loc < 0) scalarTag.missing
         else self.apply(loc)
-      }
 
       override def needsCopy = true
-    }
-  }
 
-  private[saddle] def toArray: Array[T] = {
+  private[saddle] def toArray: Array[T] =
     // need to check if we're a view on an array
     if (!needsCopy) values
-    else {
+    else
       val buf = new Array[T](length)
       var i = 0
-      while (i < length) {
+      while (i < length)
         buf(i) = apply(i)
         i += 1
-      }
       buf
-    }
-  }
 
   /** Default equality does an iterative, element-wise equality check of all values. */
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case rv: VecAny[_] =>
-      (this eq rv) || (this.length == rv.length) && {
+      (this eq rv) || (this.length == rv.length) &&
         var i = 0
         var eq = true
-        while (eq && i < this.length) {
+        while (eq && i < this.length)
           eq &&=
           (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
               rv.scalarTag.isMissing(rv(i)))
           i += 1
-        }
         eq
-      }
     case _ => super.equals(o)
-  }
-}

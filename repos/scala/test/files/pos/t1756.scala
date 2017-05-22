@@ -18,22 +18,19 @@ To solve this, I added a fallback scheme similar to implicit arguments:
 When an implicit view that adds a method matching given arguments and result
 type fails, try again without the result type.
   */
-trait Ring[T <: Ring[T]] {
+trait Ring[T <: Ring[T]]
   def +(that: T): T
   def *(that: T): T
-}
 
-class A extends Ring[A] {
+class A extends Ring[A]
   def +(that: A) = new A
   def *(that: A) = new A
-}
 
-class Poly[C <: Ring[C]](val c: C) extends Ring[Poly[C]] {
+class Poly[C <: Ring[C]](val c: C) extends Ring[Poly[C]]
   def +(that: Poly[C]) = new Poly(this.c + that.c)
   def *(that: Poly[C]) = new Poly(this.c * that.c)
-}
 
-object Test extends App {
+object Test extends App
 
   implicit def coef2poly[C <: Ring[C]](c: C): Poly[C] = new Poly(c)
 
@@ -50,4 +47,3 @@ object Test extends App {
   println(y * x + x) // works
 
   println(x + x * y) // failed before
-}

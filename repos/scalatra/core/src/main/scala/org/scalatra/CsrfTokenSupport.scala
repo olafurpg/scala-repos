@@ -3,33 +3,29 @@ package org.scalatra
 import java.security.SecureRandom
 import javax.servlet.http.HttpServletRequest
 
-object GenerateId {
+object GenerateId
 
   def apply(): String = generateCsrfToken()
 
-  private[this] def hexEncode(bytes: Array[Byte]): String = {
-    ( (new StringBuilder(bytes.length * 2) /: bytes) { (sb, b) =>
+  private[this] def hexEncode(bytes: Array[Byte]): String =
+    ( (new StringBuilder(bytes.length * 2) /: bytes)  (sb, b) =>
       if ((b.toInt & 0xff) < 0x10) sb.append("0")
       sb.append(Integer.toString(b.toInt & 0xff, 16))
-    }).toString
-  }
+    ).toString
 
-  protected def generateCsrfToken(): String = {
+  protected def generateCsrfToken(): String =
     val tokenVal = new Array[Byte](20)
     (new SecureRandom).nextBytes(tokenVal)
     hexEncode(tokenVal)
-  }
 
   @deprecated("Use generateCsrfToken()", "2.0.0")
   protected def generateCSRFToken(): String = generateCsrfToken()
-}
 
-object CsrfTokenSupport {
+object CsrfTokenSupport
 
   val DefaultKey = "org.scalatra.CsrfTokenSupport.key"
 
   val HeaderNames = Vector("X-CSRF-TOKEN")
-}
 
 /**
   * Provides cross-site request forgery protection.
@@ -38,7 +34,7 @@ object CsrfTokenSupport {
   * `handleForgery()` hook is invoked.  Otherwise, a token for the next
   * request is prepared with `prepareCsrfToken`.
   */
-trait CsrfTokenSupport {
+trait CsrfTokenSupport
   this: ScalatraBase =>
 
   before(isForged) { handleForgery() }
@@ -63,17 +59,15 @@ trait CsrfTokenSupport {
     * Take an action when a forgery is detected. The default action
     * halts further request processing and returns a 403 HTTP status code.
     */
-  protected def handleForgery(): Unit = {
+  protected def handleForgery(): Unit =
     halt(403, "Request tampering detected!")
-  }
 
   /**
     * Prepares a CSRF token.  The default implementation uses `GenerateId`
     * and stores it on the session.
     */
-  protected def prepareCsrfToken(): String = {
+  protected def prepareCsrfToken(): String =
     session.getOrElseUpdate(csrfKey, GenerateId()).toString
-  }
 
   @deprecated("Use prepareCsrfToken()", "2.0.0")
   protected def prepareCSRFToken(): String = prepareCsrfToken()
@@ -90,9 +84,8 @@ trait CsrfTokenSupport {
   protected[scalatra] def csrfToken(
       implicit request: HttpServletRequest): String =
     request.getSession.getAttribute(csrfKey).asInstanceOf[String]
-}
 
-trait XsrfTokenSupport {
+trait XsrfTokenSupport
   this: ScalatraBase =>
 
   import org.scalatra.XsrfTokenSupport._
@@ -109,11 +102,9 @@ trait XsrfTokenSupport {
   def xsrfToken(implicit request: HttpServletRequest): String =
     request.getSession.getAttribute(xsrfKey).asInstanceOf[String]
 
-  def xsrfGuard(only: RouteTransformer*): Unit = {
-    before((only.toSeq ++ Seq[RouteTransformer](isForged)): _*) {
+  def xsrfGuard(only: RouteTransformer*): Unit =
+    before((only.toSeq ++ Seq[RouteTransformer](isForged)): _*)
       handleForgery()
-    }
-  }
 
   before() { prepareXsrfToken() }
 
@@ -134,28 +125,23 @@ trait XsrfTokenSupport {
     * Take an action when a forgery is detected. The default action
     * halts further request processing and returns a 403 HTTP status code.
     */
-  protected def handleForgery(): Unit = {
+  protected def handleForgery(): Unit =
     halt(403, "Request tampering detected!")
-  }
 
   /**
     * Prepares a XSRF token.  The default implementation uses `GenerateId`
     * and stores it on the session.
     */
-  protected def prepareXsrfToken(): Unit = {
+  protected def prepareXsrfToken(): Unit =
     session.getOrElseUpdate(xsrfKey, GenerateId())
     val cookieOpt = cookies.get(CookieKey)
-    if (cookieOpt.isEmpty || cookieOpt != session.get(xsrfKey)) {
+    if (cookieOpt.isEmpty || cookieOpt != session.get(xsrfKey))
       cookies += CookieKey -> xsrfToken
-    }
-  }
-}
 
-object XsrfTokenSupport {
+object XsrfTokenSupport
 
   val DefaultKey = "org.scalatra.XsrfTokenSupport.key"
 
   val HeaderNames = Vector("X-XSRF-TOKEN")
 
   val CookieKey = "XSRF-TOKEN"
-}

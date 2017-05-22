@@ -15,11 +15,11 @@ import common._
 
 import js.JE.JsObj
 
-class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
+class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito
   val eventAttributeMatcher = "(?s).*\\W(on[a-zA-Z]+)=.*".r
 
-  "HtmlNormalizer when normalizing HTML and event handlers" should {
-    "leave the HTML structure unchanged" in {
+  "HtmlNormalizer when normalizing HTML and event handlers" should
+    "leave the HTML structure unchanged" in
       val result = HtmlNormalizer
         .normalizeHtmlAndEventHandlers(
             <html>
@@ -63,9 +63,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
           </body>
         </html>
       )
-    }
 
-    "extract events from all elements at any depth" in {
+    "extract events from all elements at any depth" in
       val NodesAndEventJs(html, js) =
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <html onevent="testJs1">
@@ -100,15 +99,13 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
            "testJs9",
            "testJs10").foreach(js.toJsCmd must contain(_))
 
-      html.toString must beLike {
+      html.toString must beLike
         case eventAttributeMatcher(eventAttribute) =>
           ko(s"Contained unexpected event: ${eventAttribute}")
         case _ =>
           ok
-      }
-    }
 
-    "reuse ids when they are already on an element with an event" in {
+    "reuse ids when they are already on an element with an event" in
       val NodesAndEventJs(html, js) =
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <myelement id="testid" onevent="doStuff" />,
@@ -118,9 +115,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
 
       html must ==/(<myelement id="testid" />)
       js.toJsCmd must_== """lift.onEvent("testid","event",function(event) {doStuff;});"""
-    }
 
-    "generate ids for elements with events if they don't have one" in {
+    "generate ids for elements with events if they don't have one" in
       val NodesAndEventJs(html, js) =
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <myelement onevent="doStuff" />,
@@ -133,9 +129,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
       id must not be empty
       js.toJsCmd must_==
         s"""lift.onEvent("$id","event",function(event) {doStuff;});"""
-    }
 
-    "extract event js correctly for multiple elements" in {
+    "extract event js correctly for multiple elements" in
       val NodesAndEventJs(_, js) =
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <div>
@@ -155,9 +150,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             .lines
             .mkString("\n")
             .r)
-    }
 
-    "extract events from hrefs and actions" in {
+    "extract events from hrefs and actions" in
       val NodesAndEventJs(html, js) =
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <div>
@@ -184,9 +178,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
             .lines
             .mkString("\n")
             .r)
-    }
 
-    "not extract events from hrefs and actions without the proper prefix" in {
+    "not extract events from hrefs and actions without the proper prefix" in
       val NodesAndEventJs(html, js) =
         HtmlNormalizer.normalizeHtmlAndEventHandlers(
             <div>
@@ -204,9 +197,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
       (html \ "myelement").map(_ \@ "action").filter(_.nonEmpty) must_==
         List("javascrip:doStuff2", "doStuff4")
       js.toJsCmd.trim must beEmpty
-    }
 
-    "normalize absolute link hrefs everywhere" in {
+    "normalize absolute link hrefs everywhere" in
       val result = HtmlNormalizer
         .normalizeHtmlAndEventHandlers(
             <html>
@@ -233,9 +225,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
 
         (result \\ "link").map(_ \@ "href") must_==
         "/context-path/testlink" :: "/context-path/testlink2" :: "/context-path/testlink3" :: Nil
-    }
 
-    "normalize absolute script srcs everywhere" in {
+    "normalize absolute script srcs everywhere" in
       val result = HtmlNormalizer
         .normalizeHtmlAndEventHandlers(
             <html>
@@ -263,9 +254,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
 
         (result \\ "script").map(_ \@ "src") must_==
         "/context-path/testscript" :: "/context-path/testscript2" :: Nil
-    }
 
-    "normalize absolute a hrefs everywhere" in {
+    "normalize absolute a hrefs everywhere" in
       val result = HtmlNormalizer
         .normalizeHtmlAndEventHandlers(
             <html>
@@ -293,9 +283,8 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
 
         (result \\ "a").map(_ \@ "href") must_==
         "/context-path/testa1" :: "/context-path/testa2" :: "testa3" :: "testa4" :: "/context-path/testa5" :: "/context-path/testa6" :: Nil
-    }
 
-    "normalize absolute form actions everywhere" in {
+    "normalize absolute form actions everywhere" in
       val result = HtmlNormalizer
         .normalizeHtmlAndEventHandlers(
             <html>
@@ -323,10 +312,9 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
 
         (result \\ "form").map(_ \@ "action") must_==
         "/context-path/testform1" :: "/context-path/testform2" :: "testform3" :: "testform4" :: "/context-path/testform5" :: "/context-path/testform6" :: Nil
-    }
 
-    "not rewrite script srcs anywhere" in {
-      val result = URLRewriter.doWith((_: String) => "rewritten") {
+    "not rewrite script srcs anywhere" in
+      val result = URLRewriter.doWith((_: String) => "rewritten")
         HtmlNormalizer
           .normalizeHtmlAndEventHandlers(
               <html>
@@ -349,14 +337,12 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               false
           )
           .nodes
-      }
 
       (result \\ "script").map(_ \@ "src") must_==
         "testscript" :: "testscript2" :: "testscript3" :: Nil
-    }
 
-    "not rewrite link hrefs anywhere" in {
-      val result = URLRewriter.doWith((_: String) => "rewritten") {
+    "not rewrite link hrefs anywhere" in
+      val result = URLRewriter.doWith((_: String) => "rewritten")
         HtmlNormalizer
           .normalizeHtmlAndEventHandlers(
               <html>
@@ -379,14 +365,12 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               false
           )
           .nodes
-      }
 
       (result \\ "link").map(_ \@ "href") must_==
         "testlink" :: "testlink2" :: "testlink3" :: Nil
-    }
 
-    "rewrite a hrefs everywhere" in {
-      val result = URLRewriter.doWith((_: String) => "rewritten") {
+    "rewrite a hrefs everywhere" in
+      val result = URLRewriter.doWith((_: String) => "rewritten")
         HtmlNormalizer
           .normalizeHtmlAndEventHandlers(
               <html>
@@ -409,14 +393,12 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               false
           )
           .nodes
-      }
 
       (result \\ "a").map(_ \@ "href") must_==
         "rewritten" :: "rewritten" :: "rewritten" :: Nil
-    }
 
-    "rewrite form actions everywhere" in {
-      val result = URLRewriter.doWith((_: String) => "rewritten") {
+    "rewrite form actions everywhere" in
+      val result = URLRewriter.doWith((_: String) => "rewritten")
         HtmlNormalizer
           .normalizeHtmlAndEventHandlers(
               <html>
@@ -439,10 +421,6 @@ class HtmlNormalizerSpec extends Specification with XmlMatchers with Mockito {
               false
           )
           .nodes
-      }
 
       (result \\ "form").map(_ \@ "action") must_==
         "rewritten" :: "rewritten" :: "rewritten" :: Nil
-    }
-  }
-}

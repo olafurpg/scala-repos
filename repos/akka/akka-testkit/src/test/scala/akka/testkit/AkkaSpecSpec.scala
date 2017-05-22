@@ -15,23 +15,20 @@ import akka.actor.DeadLetter
 import akka.pattern.ask
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class AkkaSpecSpec extends WordSpec with Matchers {
+class AkkaSpecSpec extends WordSpec with Matchers
 
-  "An AkkaSpec" must {
+  "An AkkaSpec" must
 
-    "warn about unhandled messages" in {
+    "warn about unhandled messages" in
       implicit val system = ActorSystem("AkkaSpec0", AkkaSpec.testConf)
-      try {
+      try
         val a = system.actorOf(Props.empty)
-        EventFilter.warning(start = "unhandled message", occurrences = 1) intercept {
+        EventFilter.warning(start = "unhandled message", occurrences = 1) intercept
           a ! 42
-        }
-      } finally {
+      finally
         TestKit.shutdownActorSystem(system)
-      }
-    }
 
-    "terminate all actors" in {
+    "terminate all actors" in
       // verbose config just for demonstration purposes, please leave in in case of debugging
       import scala.collection.JavaConverters._
       val conf = Map("akka.actor.debug.lifecycle" -> true,
@@ -42,15 +39,13 @@ class AkkaSpecSpec extends WordSpec with Matchers {
           "AkkaSpec1",
           ConfigFactory.parseMap(conf.asJava).withFallback(AkkaSpec.testConf))
       var refs = Seq.empty[ActorRef]
-      val spec = new AkkaSpec(system) {
+      val spec = new AkkaSpec(system)
         refs = Seq(testActor, system.actorOf(Props.empty, "name"))
-      }
       refs foreach (_.isTerminated should not be true)
       TestKit.shutdownActorSystem(system)
       spec.awaitCond(refs forall (_.isTerminated), 2 seconds)
-    }
 
-    "stop correctly when sending PoisonPill to rootGuardian" in {
+    "stop correctly when sending PoisonPill to rootGuardian" in
       val system = ActorSystem("AkkaSpec2", AkkaSpec.testConf)
       val spec = new AkkaSpec(system) {}
       val latch = new TestLatch(1)(system)
@@ -59,20 +54,18 @@ class AkkaSpecSpec extends WordSpec with Matchers {
       system.actorSelection("/") ! PoisonPill
 
       Await.ready(latch, 2 seconds)
-    }
 
-    "enqueue unread messages from testActor to deadLetters" in {
+    "enqueue unread messages from testActor to deadLetters" in
       val system, otherSystem = ActorSystem("AkkaSpec3", AkkaSpec.testConf)
 
-      try {
+      try
         var locker = Seq.empty[DeadLetter]
         implicit val timeout = TestKitExtension(system).DefaultTimeout
-        val davyJones = otherSystem.actorOf(Props(new Actor {
-          def receive = {
+        val davyJones = otherSystem.actorOf(Props(new Actor
+          def receive =
             case m: DeadLetter ⇒ locker :+= m
             case "Die!" ⇒ sender() ! "finally gone"; context.stop(self)
-          }
-        }), "davyJones")
+        ), "davyJones")
 
         system.eventStream.subscribe(davyJones, classOf[DeadLetter])
 
@@ -83,9 +76,8 @@ class AkkaSpecSpec extends WordSpec with Matchers {
          * may happen that the system.stop() suspends the testActor before it had
          * a chance to put the message into its private queue
          */
-        probe.receiveWhile(1 second) {
+        probe.receiveWhile(1 second)
           case null ⇒
-        }
 
         val latch = new TestLatch(1)(system)
         system.registerOnTermination(latch.countDown())
@@ -96,10 +88,6 @@ class AkkaSpecSpec extends WordSpec with Matchers {
 
         // this will typically also contain log messages which were sent after the logger shutdown
         locker should contain(DeadLetter(42, davyJones, probe.ref))
-      } finally {
+      finally
         TestKit.shutdownActorSystem(system)
         TestKit.shutdownActorSystem(otherSystem)
-      }
-    }
-  }
-}

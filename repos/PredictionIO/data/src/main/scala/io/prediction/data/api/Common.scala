@@ -27,51 +27,42 @@ import spray.httpx.Json4sSupport
 import org.json4s.Formats
 import org.json4s.DefaultFormats
 
-object Common {
+object Common
 
-  object Json4sProtocol extends Json4sSupport {
+  object Json4sProtocol extends Json4sSupport
     implicit def json4sFormats: Formats = DefaultFormats
-  }
 
   import Json4sProtocol._
 
-  val rejectionHandler = RejectionHandler {
+  val rejectionHandler = RejectionHandler
     case MalformedRequestContentRejection(msg, _) :: _ =>
       complete(StatusCodes.BadRequest, Map("message" -> msg))
     case MissingQueryParamRejection(msg) :: _ =>
       complete(StatusCodes.NotFound,
                Map("message" -> s"missing required query parameter ${msg}."))
-    case AuthenticationFailedRejection(cause, challengeHeaders) :: _ => {
-        val msg = cause match {
+    case AuthenticationFailedRejection(cause, challengeHeaders) :: _ =>
+        val msg = cause match
           case AuthenticationFailedRejection.CredentialsRejected =>
             "Invalid accessKey."
           case AuthenticationFailedRejection.CredentialsMissing =>
             "Missing accessKey."
-        }
         complete(
             StatusCodes.Unauthorized, challengeHeaders, Map("message" -> msg))
-      }
     case ChannelRejection(msg) :: _ =>
       complete(StatusCodes.Unauthorized, Map("message" -> msg))
     case NonExistentAppRejection(msg) :: _ =>
       complete(StatusCodes.Unauthorized, Map("message" -> msg))
-  }
 
-  val exceptionHandler = ExceptionHandler {
-    case e: ConnectorException => {
+  val exceptionHandler = ExceptionHandler
+    case e: ConnectorException =>
         val msg = s"${e.getMessage()}"
         complete(StatusCodes.BadRequest, Map("message" -> msg))
-      }
-    case e: StorageException => {
+    case e: StorageException =>
         val msg = s"${e.getMessage()}"
         complete(StatusCodes.InternalServerError, Map("message" -> msg))
-      }
-    case e: Exception => {
+    case e: Exception =>
         val msg = s"${e.getMessage()}"
         complete(StatusCodes.InternalServerError, Map("message" -> msg))
-      }
-  }
-}
 
 /** invalid channel */
 case class ChannelRejection(msg: String) extends Rejection

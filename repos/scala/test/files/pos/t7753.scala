@@ -2,13 +2,12 @@ import scala.language.{higherKinds, implicitConversions}
 
 trait Foo { type Out }
 
-trait SI {
+trait SI
   val instance: Foo
   type Out
-}
 
-object Test {
-  def test {
+object Test
+  def test
     def indirect(si: SI)(v: si.instance.Out) = v
 
     val foo: Foo { type Out = Int } = ???
@@ -32,5 +31,3 @@ object Test {
       23{<error>}
     ){<error>};
    */
-  }
-}

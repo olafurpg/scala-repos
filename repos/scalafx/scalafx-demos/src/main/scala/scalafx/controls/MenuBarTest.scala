@@ -33,21 +33,16 @@ import scalafx.scene.control.{Menu, MenuBar}
 import scalafx.scene.layout.BorderPane
 import scalafx.scene.paint.Color
 
-object MenuBarTest extends JFXApp {
+object MenuBarTest extends JFXApp
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "MenuBar Test"
     width = 300
     height = 225
-    scene = new Scene {
+    scene = new Scene
       fill = Color.LightGray
-      root = new BorderPane {
-        top = new MenuBar {
+      root = new BorderPane
+        top = new MenuBar
           useSystemMenuBar = true
           minWidth = 100
           menus.add(new Menu("test"))
-        }
-      }
-    }
-  }
-}

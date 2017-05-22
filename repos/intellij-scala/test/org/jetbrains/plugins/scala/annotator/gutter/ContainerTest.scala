@@ -3,7 +3,7 @@ package org.jetbrains.plugins.scala.annotator.gutter
 /**
   * Pavel.Fatin, 21.01.2010
   */
-class ContainerTest extends LineMarkerTestBase {
+class ContainerTest extends LineMarkerTestBase
   protected override def getBasePath = super.getBasePath + "/container/"
 
   def testAnanymousClass() = doTest()
@@ -15,4 +15,3 @@ class ContainerTest extends LineMarkerTestBase {
   def testPackageContainer() = doTest()
   def testStatement() = doTest()
   def testTrait() = doTest()
-}

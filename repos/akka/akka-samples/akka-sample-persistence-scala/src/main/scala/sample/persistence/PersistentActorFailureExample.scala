@@ -3,25 +3,21 @@ package sample.persistence
 import akka.actor._
 import akka.persistence._
 
-object PersistentActorFailureExample extends App {
-  class ExamplePersistentActor extends PersistentActor {
+object PersistentActorFailureExample extends App
+  class ExamplePersistentActor extends PersistentActor
     override def persistenceId = "sample-id-2"
 
     var received: List[String] = Nil // state
 
-    def receiveCommand: Receive = {
+    def receiveCommand: Receive =
       case "print" => println(s"received ${received.reverse}")
       case "boom" => throw new Exception("boom")
       case payload: String =>
-        persist(payload) { p =>
+        persist(payload)  p =>
           received = p :: received
-        }
-    }
 
-    def receiveRecover: Receive = {
+    def receiveRecover: Receive =
       case s: String => received = s :: received
-    }
-  }
 
   val system = ActorSystem("example")
   val persistentActor =
@@ -52,4 +48,3 @@ object PersistentActorFailureExample extends App {
 
   Thread.sleep(1000)
   system.terminate()
-}

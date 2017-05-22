@@ -39,7 +39,7 @@ import scalafx.util.Duration
   *
   * @define PT `PauseTransition`
   */
-object PauseTransition extends AnimationStatics {
+object PauseTransition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $PT to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/PauseTransition.html $PT]],
@@ -51,7 +51,6 @@ object PauseTransition extends AnimationStatics {
   implicit def sfxPauseTransition2jfx(
       v: PauseTransition): jfxa.PauseTransition =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/PauseTransition.html $PT]].
@@ -63,7 +62,7 @@ object PauseTransition extends AnimationStatics {
   */
 class PauseTransition(
     override val delegate: jfxa.PauseTransition = new jfxa.PauseTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.PauseTransition] {
+    extends Transition(delegate) with SFXDelegate[jfxa.PauseTransition]
 
   /**
     * The constructor of $PT.
@@ -76,7 +75,5 @@ class PauseTransition(
     * The duration of this `Transition`. Default value: 400ms
     */
   def duration: ObjectProperty[jfxu.Duration] = delegate.durationProperty
-  def duration_=(d: Duration) {
+  def duration_=(d: Duration)
     duration() = d
-  }
-}

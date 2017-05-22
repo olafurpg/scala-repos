@@ -1,6 +1,6 @@
 package lila.security
 
-case object Fixtures {
+case object Fixtures
 
   def json =
     """
@@ -1202,4 +1202,3 @@ case object Fixtures {
   "zzz.com"
 ]
   """
-}

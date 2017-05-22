@@ -7,7 +7,7 @@ import mesosphere.marathon.state.{AppDefinition, PathId, Timestamp}
 import scala.collection.immutable.Seq
 import scala.concurrent.Future
 
-object LaunchQueue {
+object LaunchQueue
 
   /**
     * @param app the currently used app definition
@@ -21,7 +21,7 @@ object LaunchQueue {
       tasksLeftToLaunch: Int,
       taskLaunchesInFlight: Int, // FIXME (217): rename to taskOpsInFlight
       tasksLaunched: Int,
-      backOffUntil: Timestamp) {
+      backOffUntil: Timestamp)
 
     /**
       * Indicates if the launch queue tries to launch tasks for this app.
@@ -34,13 +34,11 @@ object LaunchQueue {
       */
     def finalTaskCount: Int =
       tasksLaunched + taskLaunchesInFlight + tasksLeftToLaunch
-  }
-}
 
 /**
   * The LaunchQueue contains requests to launch new tasks for an application.
   */
-trait LaunchQueue {
+trait LaunchQueue
 
   /** Returns all entries of the queue. */
   def list: Seq[QueuedTaskInfo]
@@ -69,4 +67,3 @@ trait LaunchQueue {
   /** Notify queue about TaskUpdate */
   def notifyOfTaskUpdate(
       update: TaskStatusUpdate): Future[Option[QueuedTaskInfo]]
-}

@@ -4,7 +4,7 @@ package compiler
 import scala.compat.Platform.EOL
 import scala.reflect.macros.util.Traces
 
-trait Errors extends Traces { self: DefaultMacroCompiler =>
+trait Errors extends Traces  self: DefaultMacroCompiler =>
 
   import global._
   import analyzer._
@@ -14,19 +14,16 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
   import runDefinitions._
   def globalSettings = global.settings
 
-  private def implRefError(message: String) = {
+  private def implRefError(message: String) =
     val Applied(culprit, _, _) = macroDdef.rhs
     abort(culprit.pos, message)
-  }
 
-  private def bundleRefError(message: String) = {
+  private def bundleRefError(message: String) =
     val Applied(core, _, _) = macroDdef.rhs
-    val culprit = core match {
+    val culprit = core match
       case Select(Applied(core, _, _), _) => core
       case _ => core
-    }
     abort(culprit.pos, message)
-  }
 
   def MacroImplAmbiguousError() =
     implRefError(
@@ -40,7 +37,7 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
     bundleRefError(
         "macro bundles must be concrete monomorphic classes having a single constructor with a `val c: Context` parameter")
 
-  trait Error { self: MacroImplRefCompiler =>
+  trait Error  self: MacroImplRefCompiler =>
 
     // sanity check errors
 
@@ -50,14 +47,13 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
           "macro [<static object>].<method name>[[<type args>]] or\n" +
           "macro [<macro bundle>].<method name>[[<type args>]]")
 
-    def MacroImplWrongNumberOfTypeArgumentsError() = {
+    def MacroImplWrongNumberOfTypeArgumentsError() =
       val diagnostic =
         if (macroImpl.typeParams.length > targs.length)
           "has too few type arguments" else "has too many arguments"
       implRefError(
           s"macro implementation reference $diagnostic for " + treeSymTypeMsg(
               macroImplRef))
-    }
 
     private def macroImplementationWording =
       if (isImplBundle) "bundle implementation"
@@ -77,24 +73,22 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
 
     // helpers
 
-    private def lengthMsg(flavor: String, violation: String, extra: Symbol) = {
+    private def lengthMsg(flavor: String, violation: String, extra: Symbol) =
       val noun = if (flavor == "value") "parameter" else "type parameter"
       val message =
         noun + " lists have different length, " + violation + " extra " + noun
       val suffix = if (extra ne NoSymbol) " " + extra.defString else ""
       message + suffix
-    }
 
-    private def abbreviateCoreAliases(s: String): String = {
+    private def abbreviateCoreAliases(s: String): String =
       val coreAliases = List("WeakTypeTag", "Expr", "Tree")
       coreAliases.foldLeft(s)(
           (res, x) => res.replace("c.universe." + x, "c." + x))
-    }
 
     private def showMeth(pss: List[List[Symbol]],
                          restpe: Type,
                          abbreviate: Boolean,
-                         untype: Boolean) = {
+                         untype: Boolean) =
       def preprocess(tpe: Type) = if (untype) untypeMetalevel(tpe) else tpe
       var pssPart = (pss map
           (ps =>
@@ -105,18 +99,16 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
       if (abbreviate || macroDdef.tpt.tpe == null)
         retPart = abbreviateCoreAliases(retPart)
       pssPart + ": " + retPart
-    }
 
     // not exactly an error generator, but very related
     // and I dearly wanted to push it away from Macros.scala
-    private def checkConforms(slot: String, rtpe: Type, atpe: Type) = {
+    private def checkConforms(slot: String, rtpe: Type, atpe: Type) =
       val verbose = macroDebugVerbose
 
-      def check(rtpe: Type, atpe: Type): Boolean = {
-        def success() = {
+      def check(rtpe: Type, atpe: Type): Boolean =
+        def success() =
           if (verbose) println(rtpe + " <: " + atpe + "?" + EOL + "true"); true
-        }
-        (rtpe, atpe) match {
+        (rtpe, atpe) match
           case _ if rtpe eq atpe => success()
           case (TypeRef(_, RepeatedParamClass, rtpe :: Nil),
                 TypeRef(_, RepeatedParamClass, atpe :: Nil)) =>
@@ -127,21 +119,16 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
               if rtpe.prefix =:= atpe.prefix =>
             success()
           case _ => rtpe <:< atpe
-        }
-      }
 
       val ok =
         if (verbose) withTypesExplained(check(rtpe, atpe))
         else check(rtpe, atpe)
-      if (!ok) {
+      if (!ok)
         if (!verbose) explainTypes(rtpe, atpe)
-        val msg = {
+        val msg =
           val ss = Seq(rtpe, atpe) map (this abbreviateCoreAliases _.toString)
           s"type mismatch for $slot: ${ss(0)} does not conform to ${ss(1)}"
-        }
         compatibilityError(msg)
-      }
-    }
 
     private def compatibilityError(message: String) =
       implRefError(
@@ -177,13 +164,12 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
       compatibilityError(
           "parameter names differ: " + rparam.name + " != " + aparam.name)
 
-    def MacroImplVarargMismatchError(aparam: Symbol, rparam: Symbol) = {
+    def MacroImplVarargMismatchError(aparam: Symbol, rparam: Symbol) =
       def fail(paramName: Name) =
         compatibilityError("types incompatible for parameter " + paramName +
             ": corresponding is not a vararg parameter")
       if (isRepeated(rparam) && !isRepeated(aparam)) fail(rparam.name)
       if (!isRepeated(rparam) && isRepeated(aparam)) fail(aparam.name)
-    }
 
     def MacroImplTargMismatchError(
         atargs: List[Type], atparams: List[Symbol]) =
@@ -195,10 +181,7 @@ trait Errors extends Traces { self: DefaultMacroCompiler =>
                                       settings.explaintypes.value))
 
     def MacroImplTparamInstantiationError(
-        atparams: List[Symbol], e: NoInstance) = {
+        atparams: List[Symbol], e: NoInstance) =
       val badps = atparams map (_.defString) mkString ", "
       compatibilityError(
           f"type parameters $badps cannot be instantiated%n${e.getMessage}")
-    }
-  }
-}

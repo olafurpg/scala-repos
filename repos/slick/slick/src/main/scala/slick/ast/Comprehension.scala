@@ -16,7 +16,7 @@ final case class Comprehension(
     distinct: Option[Node] = None,
     fetch: Option[Node] = None,
     offset: Option[Node] = None)
-    extends DefNode {
+    extends DefNode
   type Self = Comprehension
   lazy val children =
     (ConstArray.newBuilder() + from + select ++ where ++ groupBy ++ orderBy
@@ -26,7 +26,7 @@ final case class Comprehension(
         _ => "groupBy") ++ orderBy.map("orderBy " + _._2).toSeq ++ having.map(
         _ => "having") ++ distinct.map(_ => "distinct") ++ fetch.map(
         _ => "fetch") ++ offset.map(_ => "offset")
-  protected[this] def rebuild(ch: ConstArray[Node]) = {
+  protected[this] def rebuild(ch: ConstArray[Node]) =
     val newFrom = ch(0)
     val newSelect = ch(1)
     val whereOffset = 2
@@ -56,11 +56,10 @@ final case class Comprehension(
         fetch = newFetch.headOption,
         offset = newOffset.headOption
     )
-  }
   def generators = ConstArray((sym, from))
   protected[this] def rebuildWithSymbols(gen: ConstArray[TermSymbol]) =
     copy(sym = gen.head)
-  def withInferredType(scope: Type.Scope, typeChildren: Boolean): Self = {
+  def withInferredType(scope: Type.Scope, typeChildren: Boolean): Self =
     // Assign type to "from" Node and compute the resulting scope
     val f2 = from.infer(scope, typeChildren)
     val genScope = scope + (sym -> f2.nodeType.asCollectionType.elementType)
@@ -84,7 +83,7 @@ final case class Comprehension(
                        s2.nodeType.asCollectionType.elementType)
       else nodeType
     if (same && newType == nodeType) this
-    else {
+    else
       copy(
           from = f2,
           select = s2,
@@ -97,13 +96,10 @@ final case class Comprehension(
           fetch = fetch2.orElse(fetch),
           offset = offset2.orElse(offset)
       ) :@ newType
-    }
-  }
-}
 
 /** The row_number window function */
 final case class RowNumber(by: ConstArray[(Node, Ordering)] = ConstArray.empty)
-    extends SimplyTypedNode {
+    extends SimplyTypedNode
   type Self = RowNumber
   def buildType = ScalaBaseType.longType
   lazy val children = by.map(_._1)
@@ -111,4 +107,3 @@ final case class RowNumber(by: ConstArray[(Node, Ordering)] = ConstArray.empty)
     copy(by = by.zip(ch).map { case ((_, o), n) => (n, o) })
   override def childNames = by.zipWithIndex.map("by" + _._2).toSeq
   override def getDumpInfo = super.getDumpInfo.copy(mainInfo = "")
-}

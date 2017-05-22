@@ -42,16 +42,15 @@ import org.apache.spark.util.Utils
   * `batchDuration` seconds until the test becomes significant (p-value < 0.05) or the number of
   * batches processed exceeds `numBatchesTimeout`.
   */
-object StreamingTestExample {
+object StreamingTestExample
 
-  def main(args: Array[String]) {
-    if (args.length != 3) {
+  def main(args: Array[String])
+    if (args.length != 3)
       // scalastyle:off println
       System.err.println("Usage: StreamingTestExample " +
           "<dataDir> <batchDuration> <numBatchesTimeout>")
       // scalastyle:on println
       System.exit(1)
-    }
     val dataDir = args(0)
     val batchDuration = Seconds(args(1).toLong)
     val numBatchesTimeout = args(2).toInt
@@ -59,19 +58,19 @@ object StreamingTestExample {
     val conf =
       new SparkConf().setMaster("local").setAppName("StreamingTestExample")
     val ssc = new StreamingContext(conf, batchDuration)
-    ssc.checkpoint({
+    ssc.checkpoint(
       val dir = Utils.createTempDir()
       dir.toString
-    })
+    )
 
     // $example on$
     val data = ssc
       .textFileStream(dataDir)
       .map(line =>
-            line.split(",") match {
+            line.split(",") match
           case Array(label, value) =>
             BinarySample(label.toBoolean, value.toDouble)
-      })
+      )
 
     val streamingTest = new StreamingTest()
       .setPeacePeriod(0)
@@ -84,13 +83,10 @@ object StreamingTestExample {
 
     // Stop processing if test becomes significant or we time out
     var timeoutCounter = numBatchesTimeout
-    out.foreachRDD { rdd =>
+    out.foreachRDD  rdd =>
       timeoutCounter -= 1
       val anySignificant = rdd.map(_.pValue < 0.05).fold(false)(_ || _)
       if (timeoutCounter == 0 || anySignificant) rdd.context.stop()
-    }
 
     ssc.start()
     ssc.awaitTermination()
-  }
-}

@@ -33,15 +33,14 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object GaussianBlur {
+object GaussianBlur
   implicit def sfxGaussianBlur2jfx(gb: GaussianBlur): jfxse.GaussianBlur =
     if (gb != null) gb.delegate else null
-}
 
 class GaussianBlur(
     override val delegate: jfxse.GaussianBlur = new jfxse.GaussianBlur)
     extends Effect(delegate) with InputDelegate[jfxse.GaussianBlur]
-    with SFXDelegate[jfxse.GaussianBlur] {
+    with SFXDelegate[jfxse.GaussianBlur]
 
   def this(radius: Double) = this(new jfxse.GaussianBlur(radius))
 
@@ -49,7 +48,5 @@ class GaussianBlur(
     * The radius of the blur kernel.
     */
   def radius: DoubleProperty = delegate.radiusProperty
-  def radius_=(v: Double) {
+  def radius_=(v: Double)
     radius() = v
-  }
-}

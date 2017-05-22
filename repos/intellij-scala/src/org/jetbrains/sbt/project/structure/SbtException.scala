@@ -11,19 +11,19 @@ import com.intellij.openapi.util.io.FileUtil
   */
 class SbtException(message: String) extends Exception(message)
 
-object SbtException {
+object SbtException
 
   val ACCEPTABLE_TO_DISPLAY_LOG_SIZE = 20
 
   import Utils._
 
-  def fromSbtLog(log: String): SbtException = {
+  def fromSbtLog(log: String): SbtException =
     val lines = log.lines.toSeq
 
     if (lines.exists(_.startsWith("sbt.ResolveException")))
       return handleUnresolvedDeps(lines)
 
-    trimLogIfNecessary(lines) match {
+    trimLogIfNecessary(lines) match
       case NotTrimmed =>
         new SbtException(SbtBundle("sbt.import.error", log))
       case Trimmed(whatsLeft) =>
@@ -31,26 +31,22 @@ object SbtException {
             SbtBundle("sbt.import.errorLogIsTooLong",
                       whatsLeft,
                       dumpLog(log).getAbsolutePath))
-    }
-  }
 
-  private def handleUnresolvedDeps(lines: Seq[String]): SbtException = {
-    val dependencies = lines.foldLeft("") { (acc, line) =>
-      if (line.startsWith("[warn]")) {
+  private def handleUnresolvedDeps(lines: Seq[String]): SbtException =
+    val dependencies = lines.foldLeft("")  (acc, line) =>
+      if (line.startsWith("[warn]"))
         val trimmed = line.substring(6).trim
         if (trimmed.startsWith(":: ") &&
             !trimmed.contains("UNRESOLVED DEPENDENCIES"))
           acc + s"<li>${trimmed.substring(2)}</li>"
         else acc
-      } else acc
-    }
+      else acc
     new SbtException(
         SbtBundle("sbt.import.unresolvedDependencies",
                   dependencies,
                   dumpLog(joinLines(lines)).getAbsolutePath))
-  }
 
-  private object Utils {
+  private object Utils
     def joinLines(lines: Seq[String]): String =
       lines.mkString(System.getProperty("line.separator"))
 
@@ -63,11 +59,8 @@ object SbtException {
         Trimmed(joinLines(lines.takeRight(ACCEPTABLE_TO_DISPLAY_LOG_SIZE)))
       else NotTrimmed
 
-    def dumpLog(log: String): File = {
+    def dumpLog(log: String): File =
       val file = new File(PathManager.getLogPath, "sbt.last.log")
       file.createNewFile()
       file.write(log)
       file
-    }
-  }
-}

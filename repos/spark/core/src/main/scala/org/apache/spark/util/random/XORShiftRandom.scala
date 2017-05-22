@@ -35,7 +35,7 @@ import org.apache.spark.util.Utils.timeIt
   * uses a regular Long. We can forgo thread safety since we use a new instance of the RNG
   * for each thread.
   */
-private[spark] class XORShiftRandom(init: Long) extends JavaRandom(init) {
+private[spark] class XORShiftRandom(init: Long) extends JavaRandom(init)
 
   def this() = this(System.nanoTime)
 
@@ -43,51 +43,45 @@ private[spark] class XORShiftRandom(init: Long) extends JavaRandom(init) {
 
   // we need to just override next - this will be called by nextInt, nextDouble,
   // nextGaussian, nextLong, etc.
-  override protected def next(bits: Int): Int = {
+  override protected def next(bits: Int): Int =
     var nextSeed = seed ^ (seed << 21)
     nextSeed ^= (nextSeed >>> 35)
     nextSeed ^= (nextSeed << 4)
     seed = nextSeed
     (nextSeed & ((1L << bits) - 1)).asInstanceOf[Int]
-  }
 
-  override def setSeed(s: Long) {
+  override def setSeed(s: Long)
     seed = XORShiftRandom.hashSeed(s)
-  }
-}
 
 /** Contains benchmark method and main method to run benchmark of the RNG */
-private[spark] object XORShiftRandom {
+private[spark] object XORShiftRandom
 
   /** Hash seeds to have 0/1 bits throughout. */
-  private[random] def hashSeed(seed: Long): Long = {
+  private[random] def hashSeed(seed: Long): Long =
     val bytes = ByteBuffer.allocate(java.lang.Long.SIZE).putLong(seed).array()
     val lowBits = MurmurHash3.bytesHash(bytes)
     val highBits = MurmurHash3.bytesHash(bytes, lowBits)
     (highBits.toLong << 32) | (lowBits.toLong & 0xFFFFFFFFL)
-  }
 
   /**
     * Main method for running benchmark
     * @param args takes one argument - the number of random numbers to generate
     */
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     // scalastyle:off println
-    if (args.length != 1) {
+    if (args.length != 1)
       println("Benchmark of XORShiftRandom vis-a-vis java.util.Random")
       println("Usage: XORShiftRandom number_of_random_numbers_to_generate")
       System.exit(1)
-    }
     println(benchmark(args(0).toInt))
     // scalastyle:on println
-  }
 
   /**
     * @param numIters Number of random numbers to generate while running the benchmark
     * @return Map of execution times for {@link java.util.Random java.util.Random}
     * and XORShift
     */
-  def benchmark(numIters: Int): Map[String, Long] = {
+  def benchmark(numIters: Int): Map[String, Long] =
 
     val seed = 1L
     val million = 1e6.toInt
@@ -95,14 +89,11 @@ private[spark] object XORShiftRandom {
     val xorRand = new XORShiftRandom(seed)
 
     // this is just to warm up the JIT - we're not timing anything
-    timeIt(million) {
+    timeIt(million)
       javaRand.nextInt()
       xorRand.nextInt()
-    }
 
     /* Return results as a map instead of just printing to screen
     in case the user wants to do something with them */
     Map("javaTime" -> timeIt(numIters) { javaRand.nextInt() },
         "xorTime" -> timeIt(numIters) { xorRand.nextInt() })
-  }
-}

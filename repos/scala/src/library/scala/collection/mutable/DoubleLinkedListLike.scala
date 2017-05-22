@@ -59,7 +59,7 @@ import scala.annotation.migration
     "2.11.0")
 trait DoubleLinkedListLike[
     A, This <: Seq[A] with DoubleLinkedListLike[A, This]]
-    extends SeqLike[A, This] with LinkedListLike[A, This] { self =>
+    extends SeqLike[A, This] with LinkedListLike[A, This]  self =>
 
   /** A reference to the node in the linked list preceding the current node. */
   var prev: This = _
@@ -68,21 +68,18 @@ trait DoubleLinkedListLike[
   // otherwise modifies this list
   override def append(that: This): This =
     if (isEmpty) that
-    else {
-      if (next.isEmpty) {
+    else
+      if (next.isEmpty)
         next = that
         if (that.nonEmpty) that.prev = repr
-      } else {
+      else
         next.append(that)
-      }
       repr
-    }
 
   // cannot be called on empty lists
-  override def insert(that: This): Unit = {
+  override def insert(that: This): Unit =
     super.insert(that)
     if (that.nonEmpty) that.prev = repr
-  }
 
   /** Removes the current node from the double linked list.
     *  If the node was chained into a double linked list, it will no longer
@@ -96,23 +93,20 @@ trait DoubleLinkedListLike[
     */
   @migration("Double linked list now removes the current node from the list.",
              "2.9.0")
-  def remove(): Unit = if (nonEmpty) {
+  def remove(): Unit = if (nonEmpty)
     next.prev = prev
     if (prev ne null) prev.next = next // because this could be the first node
-  }
 
   private def atLocation[T](n: Int)(f: This => T)(onOutOfBounds: => T) =
     if (isEmpty) onOutOfBounds
-    else {
+    else
       var loc = repr
       var left = n
-      while (left > 0) {
+      while (left > 0)
         loc = loc.next
         left -= 1
         if (loc.isEmpty) onOutOfBounds
-      }
       f(loc)
-    }
 
   private def outofbounds(n: Int) =
     throw new IndexOutOfBoundsException(n.toString)
@@ -124,4 +118,3 @@ trait DoubleLinkedListLike[
     atLocation(n)(_.elem = x)(outofbounds(n))
   override def get(n: Int): Option[A] =
     atLocation[Option[A]](n)(x => Some(x.elem))(None)
-}

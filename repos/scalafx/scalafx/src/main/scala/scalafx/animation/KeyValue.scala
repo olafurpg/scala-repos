@@ -38,7 +38,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @define KV `KeyValue`
   */
-object KeyValue {
+object KeyValue
 
   /**
     * Converts a ScalaFX $KV to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyValue.html $KV]],
@@ -164,7 +164,6 @@ object KeyValue {
                       endValue: T,
                       interpolator: jfxa.Interpolator) =
     new KeyValue[T, T](new jfxa.KeyValue(target, endValue, interpolator))
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyValue.html $KV]].
@@ -180,7 +179,7 @@ object KeyValue {
   * @define KV `KeyValue`
   */
 class KeyValue[T, J](override val delegate: jfxa.KeyValue)
-    extends SFXDelegate[jfxa.KeyValue] {
+    extends SFXDelegate[jfxa.KeyValue]
   // need to fix the types on these returns since JavaFX KeyValue is not genericized
 
   /**
@@ -198,7 +197,6 @@ class KeyValue[T, J](override val delegate: jfxa.KeyValue)
     * Interpolator to be used for calculating the key value along the particular interval.
     */
   def interpolator = delegate.getInterpolator
-}
 
 /**
   * Companion Object for [[scalafx.animation.Tweenable]].
@@ -206,7 +204,7 @@ class KeyValue[T, J](override val delegate: jfxa.KeyValue)
   * @define TW `Tweenable`
   * @define KV `KeyValue`
   */
-object Tweenable {
+object Tweenable
 
   /**
     * Converts a ScalaFX $TW to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyValue.html $KV]].
@@ -216,7 +214,6 @@ object Tweenable {
     */
   implicit def tweenable2KeyFrame[T <: Any, J <: Any](
       t: Tweenable[T, J]): KeyValue[J, J] = t.linear
-}
 
 /**
   * Class factory for new [[scalafx.animation.KeyValue]]s.
@@ -231,7 +228,7 @@ object Tweenable {
   * @define KV `KeyValue`
   */
 class Tweenable[T <: Any, J <: Any](
-    target: jfxbv.WritableValue[J], endValue: J) {
+    target: jfxbv.WritableValue[J], endValue: J)
 
   /**
     * Returns a new [[scalafx.animation.KeyValue]] with a determinate Interpolator.
@@ -245,4 +242,3 @@ class Tweenable[T <: Any, J <: Any](
     * Returns a new [[scalafx.animation.KeyValue]] with [[scalafx.animation.Interpolator.LINEAR]] Interpolator.
     */
   def linear: KeyValue[J, J] = KeyValue[J](target, endValue)
-}

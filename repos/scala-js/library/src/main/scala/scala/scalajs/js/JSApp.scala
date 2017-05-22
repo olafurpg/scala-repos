@@ -14,7 +14,6 @@ import annotation.{JSExport, JSExportDescendentObjects}
   *  [[main]] method of one specific [[JSApp]] object.
   */
 @JSExportDescendentObjects
-trait JSApp {
+trait JSApp
   @JSExport
   def main(): Unit
-}

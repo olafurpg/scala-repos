@@ -45,7 +45,7 @@ class ArraySeq[A](override val length: Int)
     extends AbstractSeq[A]
     with IndexedSeq[A] with GenericTraversableTemplate[A, ArraySeq]
     with IndexedSeqOptimized[A, ArraySeq[A]]
-    with CustomParallelizable[A, ParArray[A]] with Serializable {
+    with CustomParallelizable[A, ParArray[A]] with Serializable
 
   override def companion: GenericCompanion[ArraySeq] = ArraySeq
 
@@ -53,23 +53,19 @@ class ArraySeq[A](override val length: Int)
 
   override def par = ParArray.handoff(array.asInstanceOf[Array[A]], length)
 
-  def apply(idx: Int): A = {
+  def apply(idx: Int): A =
     if (idx >= length) throw new IndexOutOfBoundsException(idx.toString)
     array(idx).asInstanceOf[A]
-  }
 
-  def update(idx: Int, elem: A) {
+  def update(idx: Int, elem: A)
     if (idx >= length) throw new IndexOutOfBoundsException(idx.toString)
     array(idx) = elem.asInstanceOf[AnyRef]
-  }
 
-  override def foreach[U](f: A => U) {
+  override def foreach[U](f: A => U)
     var i = 0
-    while (i < length) {
+    while (i < length)
       f(array(i).asInstanceOf[A])
       i += 1
-    }
-  }
 
   /** Fills the given array `xs` with at most `len` elements of
     *  this traversable starting at position `start`.
@@ -80,32 +76,26 @@ class ArraySeq[A](override val length: Int)
     *  @param  start starting index.
     *  @param  len number of elements to copy
     */
-  override def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) {
+  override def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
     val len1 = len min (xs.length - start) min length
     if (len1 > 0) Array.copy(array, 0, xs, start, len1)
-  }
 
-  override def clone(): ArraySeq[A] = {
+  override def clone(): ArraySeq[A] =
     val cloned = array.clone().asInstanceOf[Array[AnyRef]]
-    new ArraySeq[A](length) {
+    new ArraySeq[A](length)
       override val array = cloned
-    }
-  }
-}
 
 /** $factoryInfo
   *  @define coll array sequence
   *  @define Coll `ArraySeq`
   */
-object ArraySeq extends SeqFactory[ArraySeq] {
+object ArraySeq extends SeqFactory[ArraySeq]
 
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, ArraySeq[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, ArraySeq[A]] =
-    new ArrayBuffer[A] mapResult { buf =>
+    new ArrayBuffer[A] mapResult  buf =>
       val result = new ArraySeq[A](buf.length)
       buf.copyToArray(result.array.asInstanceOf[Array[Any]], 0)
       result
-    }
-}

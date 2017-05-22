@@ -34,7 +34,7 @@ import scalafx.beans.property.BooleanProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object AreaChart {
+object AreaChart
   implicit def sfxAreaChart2jfx[X, Y](
       v: AreaChart[X, Y]): jfxsc.AreaChart[X, Y] =
     if (v != null) v.delegate else null
@@ -46,24 +46,19 @@ object AreaChart {
                   yAxis: Axis[Y],
                   data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new AreaChart[X, Y](new jfxsc.AreaChart[X, Y](xAxis, yAxis, data))
-}
 
 class AreaChart[X, Y](override val delegate: jfxsc.AreaChart[X, Y])
-    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.AreaChart[X, Y]] {
+    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.AreaChart[X, Y]]
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y]) {
+  def this(xAxis: Axis[X], yAxis: Axis[Y])
     this(new jfxsc.AreaChart[X, Y](xAxis, yAxis))
-  }
 
   def this(xAxis: Axis[X],
            yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]])
     this(new jfxsc.AreaChart[X, Y](xAxis, yAxis, data))
-  }
 
   /** When true, CSS styleable symbols are created for any data items that don't have a symbol node specified. */
   def createSymbols: BooleanProperty = delegate.createSymbolsProperty
-  def createSymbols_=(v: Boolean) {
+  def createSymbols_=(v: Boolean)
     createSymbols() = v
-  }
-}

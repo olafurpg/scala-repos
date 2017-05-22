@@ -1,3 +1,2 @@
-case object CaseObject {
+case object CaseObject
   def bar = 239
-}

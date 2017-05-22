@@ -22,9 +22,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.util.Utils
 
-class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
+class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext
 
-  test("FP-Growth using String type") {
+  test("FP-Growth using String type")
     val transactions = Seq("r z h k p",
                            "z y x w v u t s",
                            "s x o n r",
@@ -55,9 +55,8 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(model6.freqItemsets.count() === 0)
 
     val model3 = fpg.setMinSupport(0.5).setNumPartitions(2).run(rdd)
-    val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
+    val freqItemsets3 = model3.freqItemsets.collect().map  itemset =>
       (itemset.items.toSet, itemset.freq)
-    }
 
     /* Verify results using the `R` code:
        fp = eclat(transactions, parameter = list(support = 0.5))
@@ -128,9 +127,8 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
        [1] 625
      */
     assert(model1.freqItemsets.count() === 625)
-  }
 
-  test("FP-Growth String type association rule generation") {
+  test("FP-Growth String type association rule generation")
     val transactions = Seq("r z h k p",
                            "z y x w v u t s",
                            "s x o n r",
@@ -168,9 +166,8 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     assert(rules.size === 23)
     assert(rules.count(rule => math.abs(rule.confidence - 1.0D) < 1e-6) == 23)
-  }
 
-  test("FP-Growth using Int type") {
+  test("FP-Growth using Int type")
     val transactions = Seq("1 2 3",
                            "1 2 3 4",
                            "5 4 3 2 1",
@@ -205,9 +202,8 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
     val model3 = fpg.setMinSupport(0.5).setNumPartitions(2).run(rdd)
     assert(model3.freqItemsets.first().items.getClass === Array(1).getClass,
            "frequent itemsets should use primitive arrays")
-    val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
+    val freqItemsets3 = model3.freqItemsets.collect().map  itemset =>
       (itemset.items.toSet, itemset.freq)
-    }
 
     /* Verify results using the `R` code:
        fp = eclat(transactions, parameter = list(support = 0.5))
@@ -260,9 +256,8 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
        [1] 65
      */
     assert(model1.freqItemsets.count() === 65)
-  }
 
-  test("model save/load with String type") {
+  test("model save/load with String type")
     val transactions = Seq("r z h k p",
                            "z y x w v u t s",
                            "s x o n r",
@@ -272,25 +267,21 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(transactions, 2).cache()
 
     val model3 = new FPGrowth().setMinSupport(0.5).setNumPartitions(2).run(rdd)
-    val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
+    val freqItemsets3 = model3.freqItemsets.collect().map  itemset =>
       (itemset.items.toSet, itemset.freq)
-    }
 
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
-    try {
+    try
       model3.save(sc, path)
       val newModel = FPGrowthModel.load(sc, path)
-      val newFreqItemsets = newModel.freqItemsets.collect().map { itemset =>
+      val newFreqItemsets = newModel.freqItemsets.collect().map  itemset =>
         (itemset.items.toSet, itemset.freq)
-      }
       assert(freqItemsets3.toSet === newFreqItemsets.toSet)
-    } finally {
+    finally
       Utils.deleteRecursively(tempDir)
-    }
-  }
 
-  test("model save/load with Int type") {
+  test("model save/load with Int type")
     val transactions = Seq("1 2 3",
                            "1 2 3 4",
                            "5 4 3 2 1",
@@ -301,21 +292,16 @@ class FPGrowthSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rdd = sc.parallelize(transactions, 2).cache()
 
     val model3 = new FPGrowth().setMinSupport(0.5).setNumPartitions(2).run(rdd)
-    val freqItemsets3 = model3.freqItemsets.collect().map { itemset =>
+    val freqItemsets3 = model3.freqItemsets.collect().map  itemset =>
       (itemset.items.toSet, itemset.freq)
-    }
 
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
-    try {
+    try
       model3.save(sc, path)
       val newModel = FPGrowthModel.load(sc, path)
-      val newFreqItemsets = newModel.freqItemsets.collect().map { itemset =>
+      val newFreqItemsets = newModel.freqItemsets.collect().map  itemset =>
         (itemset.items.toSet, itemset.freq)
-      }
       assert(freqItemsets3.toSet === newFreqItemsets.toSet)
-    } finally {
+    finally
       Utils.deleteRecursively(tempDir)
-    }
-  }
-}

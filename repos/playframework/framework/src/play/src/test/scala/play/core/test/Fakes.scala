@@ -18,7 +18,7 @@ import scala.xml.NodeSeq
 /**
   * Utilities to help with testing
   */
-object Fakes {
+object Fakes
 
   /**
     * Create an injector from the given bindings.
@@ -26,10 +26,8 @@ object Fakes {
     * @param bindings The bindings
     * @return The injector
     */
-  def injectorFromBindings(bindings: Seq[Binding[_]]): Injector = {
+  def injectorFromBindings(bindings: Seq[Binding[_]]): Injector =
     new GuiceInjectorBuilder().bindings(bindings).injector
-  }
-}
 
 /**
   * Fake HTTP headers implementation.
@@ -50,7 +48,7 @@ case class FakeRequest[A](
     tags: Map[String, String] = Map.empty[String, String],
     secure: Boolean = false,
     clientCertificateChain: Option[Seq[X509Certificate]] = None)
-    extends Request[A] {
+    extends Request[A]
 
   private def _copy[B](
       id: Long = this.id,
@@ -63,7 +61,7 @@ case class FakeRequest[A](
       remoteAddress: String = this.remoteAddress,
       secure: Boolean = this.secure,
       clientCertificateChain: Option[Seq[X509Certificate]] = this.clientCertificateChain,
-      body: B = this.body): FakeRequest[B] = {
+      body: B = this.body): FakeRequest[B] =
     new FakeRequest[B](
         method,
         uri,
@@ -76,7 +74,6 @@ case class FakeRequest[A](
         secure,
         clientCertificateChain
     )
-  }
 
   /**
     * The request path.
@@ -92,121 +89,105 @@ case class FakeRequest[A](
   /**
     * Constructs a new request with additional headers. Any existing headers of the same name will be replaced.
     */
-  def withHeaders(newHeaders: (String, String)*): FakeRequest[A] = {
+  def withHeaders(newHeaders: (String, String)*): FakeRequest[A] =
     _copy(headers = headers.replace(newHeaders: _*))
-  }
 
   /**
     * Constructs a new request with additional Flash.
     */
-  def withFlash(data: (String, String)*): FakeRequest[A] = {
+  def withFlash(data: (String, String)*): FakeRequest[A] =
     withHeaders(
         play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
             headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
             Seq(Flash.encodeAsCookie(new Flash(flash.data ++ data)))))
-  }
 
   /**
     * Constructs a new request with additional Cookies.
     */
-  def withCookies(cookies: Cookie*): FakeRequest[A] = {
+  def withCookies(cookies: Cookie*): FakeRequest[A] =
     withHeaders(
         play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
             headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
             cookies))
-  }
 
   /**
     * Constructs a new request with additional session.
     */
-  def withSession(newSessions: (String, String)*): FakeRequest[A] = {
+  def withSession(newSessions: (String, String)*): FakeRequest[A] =
     withHeaders(
         play.api.http.HeaderNames.COOKIE -> Cookies.mergeCookieHeader(
             headers.get(play.api.http.HeaderNames.COOKIE).getOrElse(""),
             Seq(Session.encodeAsCookie(
                     new Session(session.data ++ newSessions)))))
-  }
 
   /**
     * Set a Form url encoded body to this request.
     */
   def withFormUrlEncodedBody(
-      data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] = {
+      data: (String, String)*): FakeRequest[AnyContentAsFormUrlEncoded] =
     _copy(body = AnyContentAsFormUrlEncoded(
               play.utils.OrderPreserving.groupBy(data.toSeq)(_._1)))
-  }
 
   def certs = Future.successful(IndexedSeq.empty)
 
   /**
     * Adds a JSON body to the request.
     */
-  def withJsonBody(json: JsValue): FakeRequest[AnyContentAsJson] = {
+  def withJsonBody(json: JsValue): FakeRequest[AnyContentAsJson] =
     _copy(body = AnyContentAsJson(json))
-  }
 
   /**
     * Adds an XML body to the request.
     */
-  def withXmlBody(xml: NodeSeq): FakeRequest[AnyContentAsXml] = {
+  def withXmlBody(xml: NodeSeq): FakeRequest[AnyContentAsXml] =
     _copy(body = AnyContentAsXml(xml))
-  }
 
   /**
     * Adds a text body to the request.
     */
-  def withTextBody(text: String): FakeRequest[AnyContentAsText] = {
+  def withTextBody(text: String): FakeRequest[AnyContentAsText] =
     _copy(body = AnyContentAsText(text))
-  }
 
   /**
     * Adds a raw body to the request
     */
-  def withRawBody(bytes: ByteString): FakeRequest[AnyContentAsRaw] = {
+  def withRawBody(bytes: ByteString): FakeRequest[AnyContentAsRaw] =
     _copy(body = AnyContentAsRaw(RawBuffer(bytes.size, bytes)))
-  }
 
   /**
     * Adds a multipart form data body to the request
     */
-  def withMultipartFormDataBody(form: MultipartFormData[TemporaryFile]) = {
+  def withMultipartFormDataBody(form: MultipartFormData[TemporaryFile]) =
     _copy(body = AnyContentAsMultipartFormData(form))
-  }
 
   /**
     * Adds a body to the request.
     */
-  def withBody[B](body: B): FakeRequest[B] = {
+  def withBody[B](body: B): FakeRequest[B] =
     _copy(body = body)
-  }
 
   /**
     * Returns the current method
     */
   def getMethod: String = method
-}
 
 /**
   * Helper utilities to build FakeRequest values.
   */
-object FakeRequest {
+object FakeRequest
 
   /**
     * Constructs a new GET / fake request.
     */
-  def apply(): FakeRequest[AnyContentAsEmpty.type] = {
+  def apply(): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest("GET", "/", FakeHeaders(), AnyContentAsEmpty)
-  }
 
   /**
     * Constructs a new request.
     */
   def apply(
-      method: String, path: String): FakeRequest[AnyContentAsEmpty.type] = {
+      method: String, path: String): FakeRequest[AnyContentAsEmpty.type] =
     FakeRequest(method, path, FakeHeaders(), AnyContentAsEmpty)
-  }
 
-  def apply(call: Call): FakeRequest[AnyContentAsEmpty.type] = {
+  def apply(call: Call): FakeRequest[AnyContentAsEmpty.type] =
     apply(call.method, call.url)
-  }
-}

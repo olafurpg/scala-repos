@@ -45,17 +45,16 @@ import scala.util.Try
   * @author Sung-Ho Lee
   */
 package object common
-    extends Logger with SystemServices with Helpers with Implicits {
+    extends Logger with SystemServices with Helpers with Implicits
 
   val idSequence = new java.util.concurrent.atomic.AtomicInteger(0)
 
-  def getUniqueId(implicit activity: Activity): Int = {
+  def getUniqueId(implicit activity: Activity): Int =
     var candidate: Int = 0
-    do {
+    do
       candidate = idSequence.incrementAndGet
-    } while (activity.findViewById(candidate) != null)
+    while (activity.findViewById(candidate) != null)
     candidate
-  }
 
   /**
     * Provides handler instance and runOnUiThread() utility method.
@@ -64,33 +63,26 @@ package object common
 
   lazy val uiThread = Looper.getMainLooper.getThread
 
-  def runOnUiThread(f: => Unit): Unit = {
-    if (uiThread == Thread.currentThread) {
+  def runOnUiThread(f: => Unit): Unit =
+    if (uiThread == Thread.currentThread)
       f
-    } else {
+    else
       handler.post(
-          new Runnable() {
-        def run() {
+          new Runnable()
+        def run()
           f
-        }
-      })
-    }
-  }
+      )
 
-  def evalOnUiThread[T](f: => T): Future[T] = {
-    if (uiThread == Thread.currentThread) {
+  def evalOnUiThread[T](f: => T): Future[T] =
+    if (uiThread == Thread.currentThread)
       Future.fromTry(Try(f))
-    } else {
+    else
       val p = Promise[T]()
       handler.post(
-          new Runnable() {
-        def run() {
+          new Runnable()
+        def run()
           p.complete(Try(f))
-        }
-      })
+      )
       p.future
-    }
-  }
 
   private[scaloid] trait NoGetterForThisProperty
-}

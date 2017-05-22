@@ -12,7 +12,7 @@ import scala.collection.immutable
   *
   * Messages exchanged between persistent actors, views and a journal.
   */
-private[persistence] object JournalProtocol {
+private[persistence] object JournalProtocol
 
   /** Marker trait shared by internal journal messages. */
   sealed trait Message extends Protocol.Message
@@ -141,4 +141,3 @@ private[persistence] object JournalProtocol {
     */
   final case class ReplayMessagesFailure(cause: Throwable)
       extends Response with DeadLetterSuppression
-}

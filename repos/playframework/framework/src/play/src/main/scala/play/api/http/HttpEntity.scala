@@ -17,7 +17,7 @@ import scala.concurrent.Future
   *
   * HTTP entities come in three flavors, [[HttpEntity.Strict]], [[HttpEntity.Streamed]] and [[HttpEntity.Chunked]].
   */
-sealed trait HttpEntity {
+sealed trait HttpEntity
 
   /**
     * The content type of the entity, if known.
@@ -44,9 +44,8 @@ sealed trait HttpEntity {
   /**
     * Consume the data from this entity.
     */
-  def consumeData(implicit mat: Materializer): Future[ByteString] = {
+  def consumeData(implicit mat: Materializer): Future[ByteString] =
     dataStream.runFold(ByteString.empty)(_ ++ _)
-  }
 
   /**
     * Convert this entity to its Java counterpart.
@@ -57,9 +56,8 @@ sealed trait HttpEntity {
     * Return this entity as the given content type.
     */
   def as(contentType: String): HttpEntity
-}
 
-object HttpEntity {
+object HttpEntity
 
   /**
     * No entity.
@@ -75,7 +73,7 @@ object HttpEntity {
     * @param contentType The content type, if known.
     */
   final case class Strict(data: ByteString, contentType: Option[String])
-      extends HttpEntity {
+      extends HttpEntity
     def isKnownEmpty = data.isEmpty
     def contentLength = Some(data.size)
     def dataStream =
@@ -85,7 +83,6 @@ object HttpEntity {
     def asJava =
       new JHttpEntity.Strict(data, OptionConverters.toJava(contentType))
     def as(contentType: String) = copy(contentType = Some(contentType))
-  }
 
   /**
     * A streamed entity.
@@ -98,7 +95,7 @@ object HttpEntity {
   final case class Streamed(data: Source[ByteString, _],
                             contentLength: Option[Long],
                             contentType: Option[String])
-      extends HttpEntity {
+      extends HttpEntity
     def isKnownEmpty = false
     def dataStream = data
     def asJava =
@@ -108,7 +105,6 @@ object HttpEntity {
               contentLength.asInstanceOf[Option[java.lang.Long]]),
           OptionConverters.toJava(contentType))
     def as(contentType: String) = copy(contentType = Some(contentType))
-  }
 
   /**
     * A chunked entity.
@@ -121,18 +117,15 @@ object HttpEntity {
     */
   final case class Chunked(
       chunks: Source[HttpChunk, _], contentType: Option[String])
-      extends HttpEntity {
+      extends HttpEntity
     def isKnownEmpty = false
     def contentLength = None
-    def dataStream = chunks.collect {
+    def dataStream = chunks.collect
       case HttpChunk.Chunk(data) => data
-    }
     def asJava =
       new JHttpEntity.Chunked(
           chunks.asJava, OptionConverters.toJava(contentType))
     def as(contentType: String) = copy(contentType = Some(contentType))
-  }
-}
 
 /**
   * An HTTP chunk.
@@ -142,16 +135,15 @@ object HttpEntity {
   */
 sealed trait HttpChunk {}
 
-object HttpChunk {
+object HttpChunk
 
   /**
     * A chunk.
     *
     * @param data The data for the chunk.
     */
-  final case class Chunk(data: ByteString) extends HttpChunk {
+  final case class Chunk(data: ByteString) extends HttpChunk
     assert(data.nonEmpty, "Http chunks must not be empty")
-  }
 
   /**
     * The last chunk.
@@ -159,4 +151,3 @@ object HttpChunk {
     * @param trailers The trailers.
     */
   final case class LastChunk(trailers: Headers) extends HttpChunk
-}

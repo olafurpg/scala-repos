@@ -37,19 +37,18 @@ import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.delegate.SFXDelegate
 import scalafx.stage.FileChooser.ExtensionFilter
 
-object FileChooser {
+object FileChooser
   implicit def sfxFileChooser2jfx(fc: FileChooser): jfxs.FileChooser =
     if (fc != null) fc.delegate else null
 
-  object ExtensionFilter {
+  object ExtensionFilter
     implicit def sfxExtensionFilter2jfx(
         ef: ExtensionFilter): jfxs.FileChooser.ExtensionFilter =
       if (ef != null) ef.delegate else null
-  }
 
   class ExtensionFilter(
       override val delegate: jfxs.FileChooser.ExtensionFilter)
-      extends SFXDelegate[jfxs.FileChooser.ExtensionFilter] {
+      extends SFXDelegate[jfxs.FileChooser.ExtensionFilter]
 
     /**
       * Creates an ExtensionFilter with the specified description and the file name extensions.
@@ -79,8 +78,6 @@ object FileChooser {
     def description = delegate.getDescription
 
     def extensions: Seq[String] = delegate.getExtensions
-  }
-}
 
 /**
   * Provides support for standard platform file dialogs.
@@ -105,40 +102,36 @@ object FileChooser {
   */
 class FileChooser(
     override val delegate: jfxs.FileChooser = new jfxs.FileChooser)
-    extends SFXDelegate[jfxs.FileChooser] {
+    extends SFXDelegate[jfxs.FileChooser]
 
   /**
     * The initial directory for the displayed dialog.
     */
   def initialDirectory: ObjectProperty[File] =
     delegate.initialDirectoryProperty
-  def initialDirectory_=(v: File) {
+  def initialDirectory_=(v: File)
     ObjectProperty.fillProperty[File](initialDirectory, v)
-  }
 
   /** The initial file name for the displayed dialog. */
   def initialFileName: ObjectProperty[String] =
     delegate.initialFileNameProperty
-  def initialFileName_=(v: String) {
+  def initialFileName_=(v: String)
     ObjectProperty.fillProperty[String](initialFileName, v)
-  }
 
   /** This property is used to pre-select the extension filter for the next displayed dialog
     * and to read the user-selected extension filter from the dismissed dialog. */
   def selectedExtensionFilter: ObjectProperty[jfxs.FileChooser.ExtensionFilter] =
     delegate.selectedExtensionFilterProperty
-  def selectedExtensionFilter_=(v: ExtensionFilter) {
+  def selectedExtensionFilter_=(v: ExtensionFilter)
     ObjectProperty.fillProperty[jfxs.FileChooser.ExtensionFilter](
         selectedExtensionFilter, v)
-  }
 
   /**
     * The title of the displayed dialog.
     */
   def title: StringProperty = delegate.titleProperty
-  def title_=(v: String) {
+  def title_=(v: String)
     title() = v
-  }
 
   /**
     * Gets the extension filters used in the displayed file dialog.
@@ -158,10 +151,9 @@ class FileChooser(
     *
     * @return the selected files or null if no file has been selected
     */
-  def showOpenMultipleDialog(ownerWindow: Window): Seq[File] = {
+  def showOpenMultipleDialog(ownerWindow: Window): Seq[File] =
     val selection = delegate.showOpenMultipleDialog(ownerWindow)
     if (selection != null) selection else null.asInstanceOf[Seq[File]]
-  }
 
   /**
     * Shows a new file save dialog.
@@ -170,4 +162,3 @@ class FileChooser(
     */
   def showSaveDialog(ownerWindow: Window): File =
     delegate.showSaveDialog(ownerWindow)
-}

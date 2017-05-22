@@ -26,7 +26,7 @@ final class BasicLinkerBackend(
     withSourceMap: Boolean,
     config: LinkerBackend.Config
 )
-    extends LinkerBackend(semantics, outputMode.esLevel, withSourceMap, config) {
+    extends LinkerBackend(semantics, outputMode.esLevel, withSourceMap, config)
 
   private[this] val emitter = new Emitter(semantics, outputMode)
 
@@ -39,32 +39,26 @@ final class BasicLinkerBackend(
     */
   def emit(unit: LinkingUnit,
            output: WritableVirtualJSFile,
-           logger: Logger): Unit = {
+           logger: Logger): Unit =
     verifyUnit(unit)
 
     val builder = newBuilder(output)
 
-    try {
-      logger.time("Emitter (write output)") {
+    try
+      logger.time("Emitter (write output)")
         emitter.emitCustomHeader(config.customOutputWrapper._1, builder)
         emitter.emitAll(unit, builder, logger)
         emitter.emitCustomFooter(config.customOutputWrapper._2, builder)
-      }
 
       builder.complete()
-    } finally {
+    finally
       builder.closeWriters()
-    }
-  }
 
-  private def newBuilder(output: WritableVirtualJSFile): JSFileBuilder = {
-    if (withSourceMap) {
+  private def newBuilder(output: WritableVirtualJSFile): JSFileBuilder =
+    if (withSourceMap)
       new JSFileBuilderWithSourceMap(output.name,
                                      output.contentWriter,
                                      output.sourceMapWriter,
                                      config.relativizeSourceMapBase)
-    } else {
+    else
       new JSFileBuilder(output.name, output.contentWriter)
-    }
-  }
-}

@@ -3,7 +3,7 @@
  */
 package play.runsupport
 
-trait LoggerProxy {
+trait LoggerProxy
   def verbose(message: => String): Unit
   def debug(message: => String): Unit
   def info(message: => String): Unit
@@ -11,4 +11,3 @@ trait LoggerProxy {
   def error(message: => String): Unit
   def trace(t: => Throwable): Unit
   def success(message: => String): Unit
-}

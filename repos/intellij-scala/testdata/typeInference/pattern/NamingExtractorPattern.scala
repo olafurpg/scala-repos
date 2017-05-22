@@ -1,10 +1,7 @@
-object NamingExtractorPattern {
+object NamingExtractorPattern
   class A
-  object A {
+  object A
     def unapply(a: A): Option[Int] = Some(3)
-  }
-  new A match {
+  new A match
     case a @ A(3) => /*start*/ a /*end*/
-  }
-}
 //NamingExtractorPattern.A

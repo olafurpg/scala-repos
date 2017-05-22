@@ -21,7 +21,7 @@ import akka.stream.impl.fusing.GraphStages.MaterializedValueSource
   *
   * (See the class for the documentation of the internals)
   */
-private[akka] object GraphInterpreter {
+private[akka] object GraphInterpreter
 
   /**
     * Compile time constant, enable it for debug logging to the console.
@@ -56,14 +56,12 @@ private[akka] object GraphInterpreter {
   final case class Failed(ex: Throwable, previousElem: Any)
 
   abstract class UpstreamBoundaryStageLogic[T]
-      extends GraphStageLogic(inCount = 0, outCount = 1) {
+      extends GraphStageLogic(inCount = 0, outCount = 1)
     def out: Outlet[T]
-  }
 
   abstract class DownstreamBoundaryStageLogic[T]
-      extends GraphStageLogic(inCount = 1, outCount = 0) {
+      extends GraphStageLogic(inCount = 1, outCount = 0)
     def in: Inlet[T]
-  }
 
   val singleNoAttribute: Array[Attributes] = Array(Attributes.none)
 
@@ -108,7 +106,7 @@ private[akka] object GraphInterpreter {
       val ins: Array[Inlet[_]],
       val inOwners: Array[Int],
       val outs: Array[Outlet[_]],
-      val outOwners: Array[Int]) {
+      val outOwners: Array[Int])
     require(ins.length == inOwners.length && inOwners.length == outs.length &&
         outs.length == outOwners.length)
 
@@ -128,43 +126,40 @@ private[akka] object GraphInterpreter {
                     copiedModules: Array[Module],
                     matVal: ju.Map[Module, Any],
                     register: MaterializedValueSource[Any] ⇒ Unit)
-      : (Array[InHandler], Array[OutHandler], Array[GraphStageLogic]) = {
+      : (Array[InHandler], Array[OutHandler], Array[GraphStageLogic]) =
       val logics = Array.ofDim[GraphStageLogic](stages.length)
 
       var i = 0
-      while (i < stages.length) {
+      while (i < stages.length)
         // Port initialization loops, these must come first
         val shape = stages(i).shape
 
         var idx = 0
         val inletItr = shape.inlets.iterator
-        while (inletItr.hasNext) {
+        while (inletItr.hasNext)
           val inlet = inletItr.next()
           require(
               inlet.id == -1 || inlet.id == idx,
               s"Inlet $inlet was shared among multiple stages. This is illegal.")
           inlet.id = idx
           idx += 1
-        }
 
         idx = 0
         val outletItr = shape.outlets.iterator
-        while (outletItr.hasNext) {
+        while (outletItr.hasNext)
           val outlet = outletItr.next()
           require(
               outlet.id == -1 || outlet.id == idx,
               s"Outlet $outlet was shared among multiple stages. This is illegal.")
           outlet.id = idx
           idx += 1
-        }
 
-        val stage = stages(i) match {
+        val stage = stages(i) match
           case mv: MaterializedValueSource[_] ⇒
             val copy = mv.copySrc.asInstanceOf[MaterializedValueSource[Any]]
             register(copy)
             copy
           case x ⇒ x
-        }
 
         val logicAndMat = stage.createLogicAndMaterializedValue(
             inheritedAttributes and originalAttributes(i))
@@ -172,53 +167,43 @@ private[akka] object GraphInterpreter {
 
         logics(i) = logicAndMat._1
         i += 1
-      }
 
       val inHandlers = Array.ofDim[InHandler](connectionCount)
       val outHandlers = Array.ofDim[OutHandler](connectionCount)
 
       i = 0
-      while (i < connectionCount) {
-        if (ins(i) ne null) {
+      while (i < connectionCount)
+        if (ins(i) ne null)
           val logic = logics(inOwners(i))
-          logic.handlers(ins(i).id) match {
+          logic.handlers(ins(i).id) match
             case null ⇒
               throw new IllegalStateException(
                   s"no handler defined in stage $logic for port ${ins(i)}")
             case h: InHandler ⇒ inHandlers(i) = h
-          }
           logics(inOwners(i)).portToConn(ins(i).id) = i
-        }
-        if (outs(i) ne null) {
+        if (outs(i) ne null)
           val logic = logics(outOwners(i))
           val inCount = logic.inCount
-          logic.handlers(outs(i).id + inCount) match {
+          logic.handlers(outs(i).id + inCount) match
             case null ⇒
               throw new IllegalStateException(
                   s"no handler defined in stage $logic for port ${outs(i)}")
             case h: OutHandler ⇒ outHandlers(i) = h
-          }
           logic.portToConn(outs(i).id + inCount) = i
-        }
         i += 1
-      }
 
       (inHandlers, outHandlers, logics)
-    }
 
-    override def toString: String = {
-      val stageList = stages.iterator.zip(originalAttributes.iterator).map {
+    override def toString: String =
+      val stageList = stages.iterator.zip(originalAttributes.iterator).map
         case (stage, attr) ⇒
           s"${stage.module}    [${attr.attributeList.mkString(", ")}]"
-      }
       "GraphAssembly\n  " + stageList.mkString("[ ", "\n    ", "\n  ]") +
       "\n  " + ins.mkString("[", ",", "]") + "\n  " +
       inOwners.mkString("[", ",", "]") + "\n  " +
       outs.mkString("[", ",", "]") + "\n  " + outOwners.mkString("[", ",", "]")
-    }
-  }
 
-  object GraphAssembly {
+  object GraphAssembly
 
     /**
       * INTERNAL API
@@ -226,19 +211,18 @@ private[akka] object GraphInterpreter {
     final def apply(
         inlets: immutable.Seq[Inlet[_]],
         outlets: immutable.Seq[Outlet[_]],
-        stages: GraphStageWithMaterializedValue[Shape, _]*): GraphAssembly = {
+        stages: GraphStageWithMaterializedValue[Shape, _]*): GraphAssembly =
       // add the contents of an iterator to an array starting at idx
       @tailrec def add[T](i: Iterator[T], a: Array[T], idx: Int): Array[T] =
-        if (i.hasNext) {
+        if (i.hasNext)
           a(idx) = i.next()
           add(i, a, idx + 1)
-        } else a
+        else a
 
       // fill array slots with Boundary
-      def markBoundary(owners: Array[Int], from: Int, to: Int): Array[Int] = {
+      def markBoundary(owners: Array[Int], from: Int, to: Int): Array[Int] =
         Arrays.fill(owners, from, to, Boundary)
         owners
-      }
 
       val inletsSize = inlets.size
       val outletsSize = outlets.size
@@ -257,20 +241,17 @@ private[akka] object GraphInterpreter {
           markBoundary(Array.ofDim(connectionCount), 0, inletsSize))
 
       assembly
-    }
-  }
 
   /**
     * INTERNAL API
     */
-  private val _currentInterpreter = new ThreadLocal[Array[AnyRef]] {
+  private val _currentInterpreter = new ThreadLocal[Array[AnyRef]]
     /*
      * Using an Object-array avoids holding on to the GraphInterpreter class
      * when this accidentally leaks onto threads that are not stopped when this
      * class should be unloaded.
      */
     override def initialValue = new Array(1)
-  }
 
   /**
     * INTERNAL API
@@ -284,7 +265,6 @@ private[akka] object GraphInterpreter {
     */
   private[akka] def currentInterpreterOrNull: GraphInterpreter =
     _currentInterpreter.get()(0).asInstanceOf[GraphInterpreter]
-}
 
 /**
   * INTERNAL API
@@ -370,7 +350,7 @@ private[stream] final class GraphInterpreter(
     val logics: Array[GraphStageLogic], // Array of stage logics
     val onAsyncInput: (GraphStageLogic, Any, (Any) ⇒ Unit) ⇒ Unit,
     val fuzzingMode: Boolean,
-    val context: ActorRef) {
+    val context: ActorRef)
   import GraphInterpreter._
 
   // Maintains additional information for events, basically elements in-flight, or failure.
@@ -391,11 +371,10 @@ private[stream] final class GraphInterpreter(
   private[this] var runningStages = assembly.stages.length
 
   // Counts how many active connections a stage has. Once it reaches zero, the stage is automatically stopped.
-  private[this] val shutdownCounter = Array.tabulate(assembly.stages.length) {
+  private[this] val shutdownCounter = Array.tabulate(assembly.stages.length)
     i ⇒
       val shape = assembly.stages(i).shape
       shape.inlets.size + shape.outlets.size
-  }
 
   private var _subFusingMaterializer: Materializer = _
   def subFusingMaterializer: Materializer = _subFusingMaterializer
@@ -408,21 +387,19 @@ private[stream] final class GraphInterpreter(
   private[this] var queueHead: Int = 0
   private[this] var queueTail: Int = 0
 
-  private def queueStatus: String = {
+  private def queueStatus: String =
     val contents = (queueHead until queueTail).map(
         idx ⇒
-          {
         val conn = eventQueue(idx & mask)
         (conn, portStates(conn), connectionSlots(conn))
-    })
+    )
     s"(${eventQueue.length}, $queueHead, $queueTail)(${contents.mkString(", ")})"
-  }
   private[this] var _Name: String = _
   def Name: String =
-    if (_Name eq null) {
+    if (_Name eq null)
       _Name = f"${System.identityHashCode(this)}%08X"
       _Name
-    } else _Name
+    else _Name
 
   /**
     * INTERNAL API
@@ -434,40 +411,36 @@ private[stream] final class GraphInterpreter(
     * (outside the interpreter) to process and inject events.
     */
   def attachUpstreamBoundary(
-      connection: Int, logic: UpstreamBoundaryStageLogic[_]): Unit = {
+      connection: Int, logic: UpstreamBoundaryStageLogic[_]): Unit =
     logic.portToConn(logic.out.id + logic.inCount) = connection
     logic.interpreter = this
     outHandlers(connection) = logic.handlers(0).asInstanceOf[OutHandler]
-  }
 
   /**
     * Assign the boundary logic to a given connection. This will serve as the interface to the external world
     * (outside the interpreter) to process and inject events.
     */
   def attachDownstreamBoundary(
-      connection: Int, logic: DownstreamBoundaryStageLogic[_]): Unit = {
+      connection: Int, logic: DownstreamBoundaryStageLogic[_]): Unit =
     logic.portToConn(logic.in.id) = connection
     logic.interpreter = this
     inHandlers(connection) = logic.handlers(0).asInstanceOf[InHandler]
-  }
 
   /**
     * Dynamic handler changes are communicated from a GraphStageLogic by this method.
     */
-  def setHandler(connection: Int, handler: InHandler): Unit = {
+  def setHandler(connection: Int, handler: InHandler): Unit =
     if (Debug)
       println(s"$Name SETHANDLER ${inOwnerName(connection)} (in) $handler")
     inHandlers(connection) = handler
-  }
 
   /**
     * Dynamic handler changes are communicated from a GraphStageLogic by this method.
     */
-  def setHandler(connection: Int, handler: OutHandler): Unit = {
+  def setHandler(connection: Int, handler: OutHandler): Unit =
     if (Debug)
       println(s"$Name SETHANDLER ${outOwnerName(connection)} (out) $handler")
     outHandlers(connection) = handler
-  }
 
   /**
     * Returns true if there are pending unprocessed events in the event queue.
@@ -486,67 +459,58 @@ private[stream] final class GraphInterpreter(
     * such materializer is available, passing in `null` will reuse the normal
     * materializer for the GraphInterpreter—fusing is only an optimization.
     */
-  def init(subMat: Materializer): Unit = {
+  def init(subMat: Materializer): Unit =
     _subFusingMaterializer = if (subMat == null) materializer else subMat
     var i = 0
-    while (i < logics.length) {
+    while (i < logics.length)
       val logic = logics(i)
       logic.stageId = i
       logic.interpreter = this
-      try {
+      try
         logic.beforePreStart()
         logic.preStart()
-      } catch {
+      catch
         case NonFatal(e) ⇒
           log.error(e,
                     "Error during preStart in [{}]",
                     assembly.stages(logic.stageId))
           logic.failStage(e)
-      }
       afterStageHasRun(logic)
       i += 1
-    }
-  }
 
   /**
     * Finalizes the state of all stages by calling postStop() (if necessary).
     */
-  def finish(): Unit = {
+  def finish(): Unit =
     var i = 0
-    while (i < logics.length) {
+    while (i < logics.length)
       val logic = logics(i)
       if (!isStageCompleted(logic)) finalizeStage(logic)
       i += 1
-    }
-  }
 
   // Debug name for a connections input part
   private def inOwnerName(connection: Int): String =
-    assembly.inOwners(connection) match {
+    assembly.inOwners(connection) match
       case Boundary ⇒ "DownstreamBoundary"
       case owner ⇒ assembly.stages(owner).toString
-    }
 
   // Debug name for a connections output part
   private def outOwnerName(connection: Int): String =
-    assembly.outOwners(connection) match {
+    assembly.outOwners(connection) match
       case Boundary ⇒ "UpstreamBoundary"
       case owner ⇒ assembly.stages(owner).toString
-    }
 
   // Debug name for a connections input part
   private def inLogicName(connection: Int): String =
-    assembly.inOwners(connection) match {
+    assembly.inOwners(connection) match
       case Boundary ⇒ "DownstreamBoundary"
       case owner ⇒ logics(owner).toString
-    }
 
   // Debug name for a connections output part
   private def outLogicName(connection: Int): String =
-    assembly.outOwners(connection) match {
+    assembly.outOwners(connection) match
       case Boundary ⇒ "UpstreamBoundary"
       case owner ⇒ logics(owner).toString
-    }
 
   private def shutdownCounters: String =
     shutdownCounter
@@ -559,7 +523,7 @@ private[stream] final class GraphInterpreter(
     * Executes pending events until the given limit is met. If there were remaining events, isSuspended will return
     * true.
     */
-  def execute(eventLimit: Int): Int = {
+  def execute(eventLimit: Int): Int =
     if (Debug)
       println(
           s"$Name ---------------- EXECUTE $queueStatus (running=$runningStages, shutdown=$shutdownCounters)")
@@ -567,65 +531,57 @@ private[stream] final class GraphInterpreter(
     val previousInterpreter = currentInterpreterHolder(0)
     currentInterpreterHolder(0) = this
     var eventsRemaining = eventLimit
-    try {
-      while (eventsRemaining > 0 && queueTail != queueHead) {
+    try
+      while (eventsRemaining > 0 && queueTail != queueHead)
         val connection = dequeue()
-        try processEvent(connection) catch {
+        try processEvent(connection) catch
           case NonFatal(e) ⇒
             if (activeStage == null) throw e
-            else {
+            else
               val stage = assembly.stages(activeStage.stageId)
 
               log.error(e, "Error in stage [{}]: {}", stage, e.getMessage)
               activeStage.failStage(e)
-            }
-        }
         afterStageHasRun(activeStage)
         eventsRemaining -= 1
-      }
-    } finally {
+    finally
       currentInterpreterHolder(0) = previousInterpreter
-    }
     if (Debug)
       println(
           s"$Name ---------------- $queueStatus (running=$runningStages, shutdown=$shutdownCounters)")
     // TODO: deadlock detection
     eventsRemaining
-  }
 
   def runAsyncInput(
       logic: GraphStageLogic, evt: Any, handler: (Any) ⇒ Unit): Unit =
-    if (!isStageCompleted(logic)) {
+    if (!isStageCompleted(logic))
       if (GraphInterpreter.Debug)
         println(s"$Name ASYNC $evt ($handler) [$logic]")
       val currentInterpreterHolder = _currentInterpreter.get()
       val previousInterpreter = currentInterpreterHolder(0)
       currentInterpreterHolder(0) = this
-      try {
+      try
         activeStage = logic
-        try handler(evt) catch {
+        try handler(evt) catch
           case NonFatal(ex) ⇒ logic.failStage(ex)
-        }
         afterStageHasRun(logic)
-      } finally currentInterpreterHolder(0) = previousInterpreter
-    }
+      finally currentInterpreterHolder(0) = previousInterpreter
 
   // Decodes and processes a single event for the given connection
-  private def processEvent(connection: Int): Unit = {
+  private def processEvent(connection: Int): Unit =
     def safeLogics(id: Int) =
       if (id == Boundary) null
       else logics(id)
 
-    def processElement(): Unit = {
+    def processElement(): Unit =
       if (Debug)
         println(
-            s"$Name PUSH ${outOwnerName(connection)} -> ${inOwnerName(
-            connection)}, ${connectionSlots(connection)} (${inHandlers(
-            connection)}) [${inLogicName(connection)}]")
+            s"$Name PUSH ${outOwnerName(connection)} -> $inOwnerName(
+            connection), ${connectionSlots(connection)} ($inHandlers(
+            connection)) [${inLogicName(connection)}]")
       activeStage = safeLogics(assembly.inOwners(connection))
       portStates(connection) ^= PushEndFlip
       inHandlers(connection).onPush()
-    }
 
     // this must be the state after returning without delivering any signals, to avoid double-finalization of some unlucky stage
     // (this can happen if a stage completes voluntarily while connection close events are still queued)
@@ -634,39 +590,39 @@ private[stream] final class GraphInterpreter(
 
     // Manual fast decoding, fast paths are PUSH and PULL
     //   PUSH
-    if ((code & (Pushing | InClosed | OutClosed)) == Pushing) {
+    if ((code & (Pushing | InClosed | OutClosed)) == Pushing)
       processElement()
 
       // PULL
-    } else if ((code & (Pulling | OutClosed | InClosed)) == Pulling) {
+    else if ((code & (Pulling | OutClosed | InClosed)) == Pulling)
       if (Debug)
         println(
-            s"$Name PULL ${inOwnerName(connection)} -> ${outOwnerName(
-            connection)} (${outHandlers(connection)}) [${outLogicName(connection)}]")
+            s"$Name PULL ${inOwnerName(connection)} -> $outOwnerName(
+            connection) (${outHandlers(connection)}) [${outLogicName(connection)}]")
       portStates(connection) ^= PullEndFlip
       activeStage = safeLogics(assembly.outOwners(connection))
       outHandlers(connection).onPull()
 
       // CANCEL
-    } else if ((code & (OutClosed | InClosed)) == InClosed) {
+    else if ((code & (OutClosed | InClosed)) == InClosed)
       val stageId = assembly.outOwners(connection)
       activeStage = safeLogics(stageId)
       if (Debug)
         println(
-            s"$Name CANCEL ${inOwnerName(connection)} -> ${outOwnerName(
-            connection)} (${outHandlers(connection)}) [${outLogicName(connection)}]")
+            s"$Name CANCEL ${inOwnerName(connection)} -> $outOwnerName(
+            connection) (${outHandlers(connection)}) [${outLogicName(connection)}]")
       portStates(connection) |= OutClosed
       completeConnection(stageId)
       outHandlers(connection).onDownstreamFinish()
-    } else if ((code & (OutClosed | InClosed)) == OutClosed) {
+    else if ((code & (OutClosed | InClosed)) == OutClosed)
       // COMPLETIONS
 
-      if ((code & Pushing) == 0) {
+      if ((code & Pushing) == 0)
         // Normal completion (no push pending)
         if (Debug)
           println(
-              s"$Name COMPLETE ${outOwnerName(connection)} -> ${inOwnerName(
-              connection)} (${inHandlers(connection)}) [${inLogicName(connection)}]")
+              s"$Name COMPLETE ${outOwnerName(connection)} -> $inOwnerName(
+              connection) (${inHandlers(connection)}) [${inLogicName(connection)}]")
         portStates(connection) |= InClosed
         val stageId = assembly.inOwners(connection)
         activeStage = safeLogics(stageId)
@@ -676,31 +632,26 @@ private[stream] final class GraphInterpreter(
         else
           inHandlers(connection).onUpstreamFailure(
               connectionSlots(connection).asInstanceOf[Failed].ex)
-      } else {
+      else
         // Push is pending, first process push, then re-enqueue closing event
         processElement()
         enqueue(connection)
-      }
-    }
-  }
 
-  private def dequeue(): Int = {
+  private def dequeue(): Int =
     val idx = queueHead & mask
-    if (fuzzingMode) {
+    if (fuzzingMode)
       val swapWith =
         (ThreadLocalRandom.current.nextInt(queueTail - queueHead) +
             queueHead) & mask
       val ev = eventQueue(swapWith)
       eventQueue(swapWith) = eventQueue(idx)
       eventQueue(idx) = ev
-    }
     val elem = eventQueue(idx)
     eventQueue(idx) = NoEvent
     queueHead += 1
     elem
-  }
 
-  private def enqueue(connection: Int): Unit = {
+  private def enqueue(connection: Int): Unit =
     if (Debug)
       if (queueTail - queueHead > mask)
         new Exception(
@@ -708,13 +659,11 @@ private[stream] final class GraphInterpreter(
           .printStackTrace()
     eventQueue(queueTail & mask) = connection
     queueTail += 1
-  }
 
   def afterStageHasRun(logic: GraphStageLogic): Unit =
-    if (isStageCompleted(logic)) {
+    if (isStageCompleted(logic))
       runningStages -= 1
       finalizeStage(logic)
-    }
 
   // Returns true if the given stage is already completed
   def isStageCompleted(stage: GraphStageLogic): Boolean =
@@ -722,50 +671,42 @@ private[stream] final class GraphInterpreter(
 
   // Register that a connection in which the given stage participated has been completed and therefore the stage
   // itself might stop, too.
-  private def completeConnection(stageId: Int): Unit = {
-    if (stageId != Boundary) {
+  private def completeConnection(stageId: Int): Unit =
+    if (stageId != Boundary)
       val activeConnections = shutdownCounter(stageId)
       if (activeConnections > 0)
         shutdownCounter(stageId) = activeConnections - 1
-    }
-  }
 
   private[stream] def setKeepGoing(
       logic: GraphStageLogic, enabled: Boolean): Unit =
     if (enabled) shutdownCounter(logic.stageId) |= KeepGoingFlag
     else shutdownCounter(logic.stageId) &= KeepGoingMask
 
-  private def finalizeStage(logic: GraphStageLogic): Unit = {
-    try {
+  private def finalizeStage(logic: GraphStageLogic): Unit =
+    try
       logic.postStop()
       logic.afterPostStop()
-    } catch {
+    catch
       case NonFatal(e) ⇒
         log.error(e,
                   s"Error during postStop in [{}]: {}",
                   assembly.stages(logic.stageId),
                   e.getMessage)
-    }
-  }
 
-  private[stream] def push(connection: Int, elem: Any): Unit = {
+  private[stream] def push(connection: Int, elem: Any): Unit =
     val currentState = portStates(connection)
     portStates(connection) = currentState ^ PushStartFlip
-    if ((currentState & InClosed) == 0) {
+    if ((currentState & InClosed) == 0)
       connectionSlots(connection) = elem
       enqueue(connection)
-    }
-  }
 
-  private[stream] def pull(connection: Int): Unit = {
+  private[stream] def pull(connection: Int): Unit =
     val currentState = portStates(connection)
     portStates(connection) = currentState ^ PullStartFlip
-    if ((currentState & OutClosed) == 0) {
+    if ((currentState & OutClosed) == 0)
       enqueue(connection)
-    }
-  }
 
-  private[stream] def complete(connection: Int): Unit = {
+  private[stream] def complete(connection: Int): Unit =
     val currentState = portStates(connection)
     if (Debug) println(s"$Name   complete($connection) [$currentState]")
     portStates(connection) = currentState | OutClosed
@@ -773,33 +714,28 @@ private[stream] final class GraphInterpreter(
       enqueue(connection)
     if ((currentState & OutClosed) == 0)
       completeConnection(assembly.outOwners(connection))
-  }
 
-  private[stream] def fail(connection: Int, ex: Throwable): Unit = {
+  private[stream] def fail(connection: Int, ex: Throwable): Unit =
     val currentState = portStates(connection)
     if (Debug) println(s"$Name   fail($connection, $ex) [$currentState]")
     portStates(connection) = currentState | OutClosed
-    if ((currentState & (InClosed | OutClosed)) == 0) {
+    if ((currentState & (InClosed | OutClosed)) == 0)
       portStates(connection) = currentState | (OutClosed | InFailed)
       connectionSlots(connection) = Failed(ex, connectionSlots(connection))
       if ((currentState & (Pulling | Pushing)) == 0) enqueue(connection)
-    }
     if ((currentState & OutClosed) == 0)
       completeConnection(assembly.outOwners(connection))
-  }
 
-  private[stream] def cancel(connection: Int): Unit = {
+  private[stream] def cancel(connection: Int): Unit =
     val currentState = portStates(connection)
     if (Debug) println(s"$Name   cancel($connection) [$currentState]")
     portStates(connection) = currentState | InClosed
-    if ((currentState & OutClosed) == 0) {
+    if ((currentState & OutClosed) == 0)
       connectionSlots(connection) = Empty
       if ((currentState & (Pulling | Pushing | InClosed)) == 0)
         enqueue(connection)
-    }
     if ((currentState & InClosed) == 0)
       completeConnection(assembly.inOwners(connection))
-  }
 
   /**
     * Debug utility to dump the "waits-on" relationships in DOT format to the console for analysis of deadlocks.
@@ -809,26 +745,24 @@ private[stream] final class GraphInterpreter(
     */
   def dumpWaits(): Unit = println(toString)
 
-  override def toString: String = {
+  override def toString: String =
     val builder = new StringBuilder("digraph waits {\n")
 
     for (i ← assembly.stages.indices) builder.append(
         s"""N$i [label="${assembly.stages(i)}"]""" + "\n")
 
-    def nameIn(port: Int): String = {
+    def nameIn(port: Int): String =
       val owner = assembly.inOwners(port)
       if (owner == Boundary) "Out" + port
       else "N" + owner
-    }
 
-    def nameOut(port: Int): String = {
+    def nameOut(port: Int): String =
       val owner = assembly.outOwners(port)
       if (owner == Boundary) "In" + port
       else "N" + owner
-    }
 
-    for (i ← portStates.indices) {
-      portStates(i) match {
+    for (i ← portStates.indices)
+      portStates(i) match
         case InReady ⇒
           builder.append(
               s"""  ${nameIn(i)} -> ${nameOut(i)} [label=shouldPull; color=blue]""")
@@ -839,13 +773,9 @@ private[stream] final class GraphInterpreter(
           builder.append(
               s"""  ${nameIn(i)} -> ${nameOut(i)} [style=dotted; label=closed dir=both];""")
         case _ ⇒
-      }
       builder.append("\n")
-    }
 
     builder.append("}\n")
     builder.append(
         s"// $queueStatus (running=$runningStages, shutdown=${shutdownCounter.mkString(",")})")
     builder.toString()
-  }
-}

@@ -33,13 +33,11 @@ import scala.xml.{NodeSeq, Text}
   * specific Mapper class.
   * @author nafg
   */
-trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet {
+trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet
   import mapper.view.{ModelView => MV}
-  class ModelView(e: T, snippet: ModelSnippet[T]) extends MV[T](e, snippet) {
-    def this(e: T) {
+  class ModelView(e: T, snippet: ModelSnippet[T]) extends MV[T](e, snippet)
+    def this(e: T)
       this(e, this)
-    }
-  }
 
   /**
     * The instance of ModelView that wraps the currently loaded entity
@@ -50,9 +48,7 @@ trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet {
     * Action when save is successful. Defaults to using the ModelView's redirectOnSave
     */
   var onSave = (view: MV[T]) =>
-    {
       view.redirectOnSave.foreach(redirectTo)
-  }
 
   /**
     * The list snippet
@@ -66,11 +62,10 @@ trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet {
 
   def load(entity: T) = view.entity = entity
 
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case "list" => list _
     case "edit" => edit _
     case "newOrEdit" => view.newOrEdit
-  }
 
   /**
     * A ".edit" CssSel
@@ -83,13 +78,12 @@ trait ModelSnippet[T <: Mapper[T]] extends StatefulSnippet {
     */
   def removeAction(e: T) =
     ".remove" #> link("list", () => e.delete_!, Text(?("Remove")))
-}
 
 /**
   * A wrapper around a Mapper that provides view-related utilities. Belongs to a parent ModelSnippet.
   * @author nafg
   */
-class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
+class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T])
 
   /**
     * If Some(string), will redirect to string on a successful save.
@@ -116,10 +110,9 @@ class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
     * existing entity is being edited or a new one is being
     * created.
     */
-  def newOrEdit = {
+  def newOrEdit =
     if (entity.saved_?) ".edit ^^" #> "ignored"
     else ".new ^^" #> "ignored"
-  }
 
   /**
     * This method checks whether the entity
@@ -130,15 +123,13 @@ class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
     * appropriate message(s) is/are displayed
     * and no redirect is performed.
     */
-  def save {
-    entity.validate match {
+  def save
+    entity.validate match
       case Nil =>
         if (entity.save) snippet.onSave(this)
         else S.error("Save failed")
       case errors =>
         S.error(errors)
-    }
-  }
 
   /**
     * returns a string that represents the id, or &lt;new&gt;
@@ -150,11 +141,11 @@ class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
     */
   def idString =
     if (entity.saved_?)
-      entity match {
+      entity match
         case e: net.liftweb.mapper.KeyedMapper[_, T] =>
           e.primaryKeyField.toString
         case _ => entity.fieldByName("id").toString
-      } else "<new>"
+      else "<new>"
 
   /**
     * Returns a CssSel that binds a link to ".edit" to load and edit this entity
@@ -174,13 +165,10 @@ class ModelView[T <: Mapper[T]](var entity: T, val snippet: ModelSnippet[T]) {
     * If the field has a Full toForm implementation then that is used;
     * otherwise its asHtml is called.
     */
-  def edit(name: String) = {
+  def edit(name: String) =
     entity
       .fieldByName(name)
-      .map { (field: net.liftweb.mapper.MappedField[_, _]) =>
+      .map  (field: net.liftweb.mapper.MappedField[_, _]) =>
         s".$name *" #> field.toForm.openOr(field.asHtml)
-      }
       .openOrThrowException(
           "If nobody has complained about this giving a NPE, I'll assume it is safe")
-  }
-}

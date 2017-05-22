@@ -27,15 +27,14 @@ import net.liftweb.util
 import common.Full
 import common.Full
 
-trait BaseMapper extends FieldContainer {
+trait BaseMapper extends FieldContainer
   type MapperType <: Mapper[MapperType]
 
   def dbName: String
   def save: Boolean
-}
 
 trait Mapper[A <: Mapper[A]]
-    extends BaseMapper with Serializable with SourceInfo { self: A =>
+    extends BaseMapper with Serializable with SourceInfo  self: A =>
   type MapperType = A
 
   private var was_deleted_? = false
@@ -44,23 +43,20 @@ trait Mapper[A <: Mapper[A]]
   @volatile private[mapper] var persisted_? = false
 
   def getSingleton: MetaMapper[A];
-  final def safe_? : Boolean = {
+  final def safe_? : Boolean =
     util.Safe.safe_?(System.identityHashCode(this))
-  }
 
   def dbName: String = getSingleton.dbName
 
   implicit def thisToMappee(in: Mapper[A]): A = this.asInstanceOf[A]
 
-  def runSafe[T](f: => T): T = {
+  def runSafe[T](f: => T): T =
     util.Safe.runSafe(System.identityHashCode(this))(f)
-  }
 
-  def connectionIdentifier(id: ConnectionIdentifier): A = {
+  def connectionIdentifier(id: ConnectionIdentifier): A =
     if (id != getSingleton.dbDefaultConnectionIdentifier ||
         dbConnectionIdentifier.isDefined) dbConnectionIdentifier = Full(id)
     thisToMappee(this)
-  }
 
   def connectionIdentifier = dbConnectionIdentifier openOr calcDbId
 
@@ -76,32 +72,26 @@ trait Mapper[A <: Mapper[A]]
     * Append a function to perform after the commit happens
     * @param func - the function to perform after the commit happens
     */
-  def doPostCommit(func: () => Unit): A = {
+  def doPostCommit(func: () => Unit): A =
     DB.appendPostTransaction(connectionIdentifier, dontUse => func())
     this
-  }
 
   /**
     * Save the instance and return the instance
     */
-  def saveMe(): A = {
+  def saveMe(): A =
     this.save
     this
-  }
 
-  def save(): Boolean = {
-    runSafe {
+  def save(): Boolean =
+    runSafe
       getSingleton.save(this)
-    }
-  }
 
-  def htmlLine: NodeSeq = {
+  def htmlLine: NodeSeq =
     getSingleton.doHtmlLine(this)
-  }
 
-  def asHtml: NodeSeq = {
+  def asHtml: NodeSeq =
     getSingleton.asHtml(this)
-  }
 
   /**
     * If the instance calculates any additional
@@ -110,21 +100,18 @@ trait Mapper[A <: Mapper[A]]
     */
   def suplementalJs(ob: Box[KeyObfuscator]): List[(String, JsExp)] = Nil
 
-  def validate: List[FieldError] = {
-    runSafe {
+  def validate: List[FieldError] =
+    runSafe
       getSingleton.validate(this)
-    }
-  }
 
   /**
     * Returns the instance in a Full Box if the instance is valid, otherwise
     * returns a Failure with the validation errors
     */
-  def asValid: Box[A] = validate match {
+  def asValid: Box[A] = validate match
     case Nil => Full(this)
     case xs =>
       ParamFailure(xs.map(_.msg.text).mkString(", "), Empty, Empty, xs)
-  }
 
   /**
     * Convert the model to a JavaScript object
@@ -137,10 +124,10 @@ trait Mapper[A <: Mapper[A]]
     * @return the metadata
     */
   def findSourceField(name: String): Box[SourceFieldInfo] =
-    for {
+    for
       mf <- getSingleton.fieldNamesAsMap.get(name.toLowerCase)
       f <- fieldByName[mf.ST](name)
-    } yield
+    yield
       SourceFieldInfoRep[mf.ST](f.get.asInstanceOf[mf.ST], mf)
         .asInstanceOf[SourceFieldInfo]
 
@@ -154,14 +141,12 @@ trait Mapper[A <: Mapper[A]]
   /**
     * Delete the model from the RDBMS
     */
-  def delete_! : Boolean = {
+  def delete_! : Boolean =
     if (!db_can_delete_?) false
     else
-      runSafe {
+      runSafe
         was_deleted_? = getSingleton.delete_!(this)
         was_deleted_?
-      }
-  }
 
   /**
     * Get the fields (in order) for displaying a form
@@ -206,12 +191,10 @@ trait Mapper[A <: Mapper[A]]
   def toForm(button: Box[String], onSuccess: String): NodeSeq =
     toForm(button,
            (what: A) =>
-             {
-               what.validate match {
+               what.validate match
                  case Nil => what.save; S.redirectTo(onSuccess)
                  case xs => S.error(xs)
-               }
-           })
+           )
 
   /**
     * Present the model as a HTML using the same formatting as toForm
@@ -230,9 +213,9 @@ trait Mapper[A <: Mapper[A]]
     */
   def toForm(button: Box[String], f: A => Any): NodeSeq =
     getSingleton.toForm(this) ++ S
-      .fmapFunc((ignore: List[String]) => f(this)) { (name: String) =>
+      .fmapFunc((ignore: List[String]) => f(this))  (name: String) =>
       ( <input type='hidden' name={name} value="n/a" />)
-    } ++
+    ++
     (button.map(b =>
               getSingleton.formatFormElement(
                   <xml:group>&nbsp;</xml:group>,
@@ -240,16 +223,14 @@ trait Mapper[A <: Mapper[A]]
 
   def toForm(button: Box[String],
              redoSnippet: NodeSeq => NodeSeq,
-             onSuccess: A => Unit): NodeSeq = {
+             onSuccess: A => Unit): NodeSeq =
     val snipName = S.currentSnippet
-    def doSubmit() {
-      this.validate match {
+    def doSubmit()
+      this.validate match
         case Nil => onSuccess(this)
         case xs =>
           S.error(xs)
           snipName.foreach(n => S.mapSnippet(n, redoSnippet))
-      }
-    }
 
     getSingleton.toForm(this) ++ S.fmapFunc(
         (ignore: List[String]) => doSubmit())(
@@ -258,7 +239,6 @@ trait Mapper[A <: Mapper[A]]
               getSingleton.formatFormElement(
                   <xml:group>&nbsp;</xml:group>,
                   <input type="submit" value={b}/>)) openOr scala.xml.Text(""))
-  }
 
   def saved_? : Boolean = getSingleton.saved_?(this)
 
@@ -269,7 +249,7 @@ trait Mapper[A <: Mapper[A]]
 
   def dirty_? : Boolean = getSingleton.dirty_?(this)
 
-  override def toString = {
+  override def toString =
     val ret = new StringBuilder
 
     ret.append(this.getClass.getName)
@@ -281,20 +261,15 @@ trait Mapper[A <: Mapper[A]]
     ret.append("}")
 
     ret.toString
-  }
 
-  def toXml: Elem = {
+  def toXml: Elem =
     getSingleton.toXml(this)
-  }
 
-  def checkNames {
-    runSafe {
-      getSingleton match {
+  def checkNames
+    runSafe
+      getSingleton match
         case null =>
         case s => s.checkFieldNames(this)
-      }
-    }
-  }
 
   def comparePrimaryKeys(other: A) = false
 
@@ -317,9 +292,8 @@ trait Mapper[A <: Mapper[A]]
     */
   def fieldMapperTransforms(
       fieldTransform: (BaseOwnedMappedField[A] => NodeSeq))
-    : scala.collection.Seq[CssSel] = {
+    : scala.collection.Seq[CssSel] =
     getSingleton.fieldMapperTransforms(fieldTransform, this)
-  }
 
   private var fieldTransforms_i: scala.collection.Seq[CssSel] = Vector()
 
@@ -329,13 +303,11 @@ trait Mapper[A <: Mapper[A]]
     */
   def fieldTransforms = fieldTransforms_i
 
-  def appendFieldTransform(transform: CssSel) {
+  def appendFieldTransform(transform: CssSel)
     fieldTransforms_i = fieldTransforms_i :+ transform
-  }
 
-  def prependFieldTransform(transform: CssSel) {
+  def prependFieldTransform(transform: CssSel)
     fieldTransforms_i = transform +: fieldTransforms_i
-  }
 
   /**
     * If there's a field in this record that defines the locale, return it
@@ -345,14 +317,12 @@ trait Mapper[A <: Mapper[A]]
   def timeZoneField: Box[MappedTimeZone[A]] = Empty
 
   def countryField: Box[MappedCountry[A]] = Empty
-}
 
 trait LongKeyedMapper[OwnerType <: LongKeyedMapper[OwnerType]]
-    extends KeyedMapper[Long, OwnerType] with BaseLongKeyedMapper {
+    extends KeyedMapper[Long, OwnerType] with BaseLongKeyedMapper
   self: OwnerType =>
-}
 
-trait BaseKeyedMapper extends BaseMapper {
+trait BaseKeyedMapper extends BaseMapper
   type TheKeyType
   type KeyedMapperType <: KeyedMapper[TheKeyType, KeyedMapperType]
 
@@ -363,22 +333,19 @@ trait BaseKeyedMapper extends BaseMapper {
     * Delete the model from the RDBMS
     */
   def delete_! : Boolean
-}
 
-trait BaseLongKeyedMapper extends BaseKeyedMapper {
+trait BaseLongKeyedMapper extends BaseKeyedMapper
   override type TheKeyType = Long
-}
 
-trait IdPK /* extends BaseLongKeyedMapper */ { self: BaseLongKeyedMapper =>
+trait IdPK /* extends BaseLongKeyedMapper */  self: BaseLongKeyedMapper =>
   def primaryKeyField: MappedLongIndex[MapperType] = id
   object id extends MappedLongIndex[MapperType](this.asInstanceOf[MapperType])
-}
 
 /**
   * A trait you can mix into a Mapper class that gives you
   * a createdat column
   */
-trait CreatedTrait { self: BaseMapper =>
+trait CreatedTrait  self: BaseMapper =>
 
   import net.liftweb.util._
 
@@ -399,17 +366,15 @@ trait CreatedTrait { self: BaseMapper =>
   lazy val createdAt: MappedDateTime[MapperType] = new MyCreatedAt(this)
 
   protected class MyCreatedAt(obj: self.type)
-      extends MappedDateTime[MapperType](obj.asInstanceOf[MapperType]) {
+      extends MappedDateTime[MapperType](obj.asInstanceOf[MapperType])
     override def defaultValue = Helpers.now
     override def dbIndexed_? = createdAtIndexed_?
-  }
-}
 
 /**
   * A trait you can mix into a Mapper class that gives you
   * an updatedat column
   */
-trait UpdatedTrait { self: BaseMapper =>
+trait UpdatedTrait  self: BaseMapper =>
 
   import net.liftweb.util._
 
@@ -431,22 +396,19 @@ trait UpdatedTrait { self: BaseMapper =>
 
   protected class MyUpdatedAt(obj: self.type)
       extends MappedDateTime(obj.asInstanceOf[MapperType])
-      with LifecycleCallbacks {
+      with LifecycleCallbacks
     override def beforeSave() { super.beforeSave; this.set(Helpers.now) }
     override def defaultValue = Helpers.now
     override def dbIndexed_? = updatedAtIndexed_?
-  }
-}
 
 /**
   * Mix this trait into your Mapper instance to get createdAt and updatedAt fields.
   */
-trait CreatedUpdated extends CreatedTrait with UpdatedTrait {
+trait CreatedUpdated extends CreatedTrait with UpdatedTrait
   self: BaseMapper =>
-}
 
 trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
-    extends Mapper[OwnerType] with BaseKeyedMapper { self: OwnerType =>
+    extends Mapper[OwnerType] with BaseKeyedMapper  self: OwnerType =>
 
   type TheKeyType = KeyType
   type KeyedMapperType = OwnerType
@@ -465,17 +427,14 @@ trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
 
   override def hashCode(): Int = primaryKeyField.get.hashCode
 
-  override def equals(other: Any): Boolean = {
-    other match {
+  override def equals(other: Any): Boolean =
+    other match
       case null => false
       case km: KeyedMapper[_, _]
           if this.getClass.isAssignableFrom(km.getClass) ||
           km.getClass.isAssignableFrom(this.getClass) =>
         this.primaryKeyField == km.primaryKeyField
       case k => super.equals(k)
-    }
-  }
-}
 
 /**
   * If this trait is mixed into a validation function, the validation for a field
@@ -483,16 +442,13 @@ trait KeyedMapper[KeyType, OwnerType <: KeyedMapper[KeyType, OwnerType]]
   */
 trait StopValidationOnError[T] extends Function1[T, List[FieldError]]
 
-object StopValidationOnError {
+object StopValidationOnError
   def apply[T](f: T => List[FieldError]): StopValidationOnError[T] =
-    new StopValidationOnError[T] {
+    new StopValidationOnError[T]
       def apply(in: T): List[FieldError] = f(in)
-    }
 
   def apply[T](f: PartialFunction[T, List[FieldError]])
     : PartialFunction[T, List[FieldError]] with StopValidationOnError[T] =
-    new PartialFunction[T, List[FieldError]] with StopValidationOnError[T] {
+    new PartialFunction[T, List[FieldError]] with StopValidationOnError[T]
       def apply(in: T): List[FieldError] = f(in)
       def isDefinedAt(in: T): Boolean = f.isDefinedAt(in)
-    }
-}

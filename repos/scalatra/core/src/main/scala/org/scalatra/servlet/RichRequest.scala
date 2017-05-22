@@ -14,12 +14,11 @@ import scala.collection.immutable.DefaultMap
 import scala.collection.{Map => CMap}
 import scala.io.Source
 
-object RichRequest {
+object RichRequest
 
   private val cachedBodyKey: String = "org.scalatra.RichRequest.cachedBody"
-}
 
-case class RichRequest(r: HttpServletRequest) extends AttributesMap {
+case class RichRequest(r: HttpServletRequest) extends AttributesMap
 
   import org.scalatra.servlet.RichRequest.cachedBodyKey
 
@@ -29,20 +28,18 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * be used by the application to determine how to treat any HTTP request
     * headers.
     */
-  def serverProtocol: HttpVersion = r.getProtocol match {
+  def serverProtocol: HttpVersion = r.getProtocol match
     case "HTTP/1.1" => Http11
     case "HTTP/1.0" => Http10
-  }
 
   def uri: URI = new URI(r.getRequestURL.toString)
 
   /**
     * Http or Https, depending on the request URL.
     */
-  def urlScheme: Scheme = r.getScheme match {
+  def urlScheme: Scheme = r.getScheme match
     case "http" => Http
     case "https" => Https
-  }
 
   /**
     * The HTTP request method, such as GET or POST
@@ -79,55 +76,45 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * A Map of the parameters of this request. Parameters are contained in
     * the query string or posted form data.
     */
-  def multiParameters: MultiParams = {
-    val bodyParams: Map[String, Seq[String]] = {
+  def multiParameters: MultiParams =
+    val bodyParams: Map[String, Seq[String]] =
       if (r.getParameterMap.isEmpty && r.getMethod != null &&
           !HttpMethod(r.getMethod).isSafe &&
           r.getHeader("Content-Type") != null && r
             .getHeader("Content-Type")
             .split(";")(0)
-            .equalsIgnoreCase("APPLICATION/X-WWW-FORM-URLENCODED")) {
+            .equalsIgnoreCase("APPLICATION/X-WWW-FORM-URLENCODED"))
         rl.MapQueryString.parseString(body)
-      } else {
+      else
         Map.empty
-      }
-    }
     // At the very least in jetty 8 we see problems under load related to this
-    if (r.getQueryString.nonBlank && r.getParameterMap.isEmpty) {
+    if (r.getQueryString.nonBlank && r.getParameterMap.isEmpty)
       val queryStringParams: Map[String, Seq[String]] =
         rl.MapQueryString.parseString(r.getQueryString)
       queryStringParams ++ bodyParams
-    } else {
-      val paramMap = r.getParameterMap.asScala.toMap.transform { (k, v) =>
+    else
+      val paramMap = r.getParameterMap.asScala.toMap.transform  (k, v) =>
         v: Seq[String]
-      }
       paramMap ++ bodyParams
-    }
-  }
 
-  object parameters extends MultiMapHeadView[String, String] {
+  object parameters extends MultiMapHeadView[String, String]
 
     protected def multiMap: MultiParams = multiParameters
-  }
 
   /**
     * A map of headers.  Multiple header values are separated by a ','
     * character.  The keys of this map are case-insensitive.
     */
-  object headers extends DefaultMap[String, String] {
+  object headers extends DefaultMap[String, String]
 
     def get(name: String): Option[String] = Option(r.getHeader(name))
 
-    private[scalatra] def getMulti(key: String): Seq[String] = {
+    private[scalatra] def getMulti(key: String): Seq[String] =
       get(key).map(_.split(",").toSeq.map(_.trim)).getOrElse(Seq.empty)
-    }
 
-    def iterator: Iterator[(String, String)] = {
-      r.getHeaderNames.asScala map { name =>
+    def iterator: Iterator[(String, String)] =
+      r.getHeaderNames.asScala map  name =>
         (name, r.getHeader(name))
-      }
-    }
-  }
 
   def header(name: String): Option[String] = Option(r.getHeader(name))
 
@@ -137,9 +124,8 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     */
   def characterEncoding: Option[String] = Option(r.getCharacterEncoding)
 
-  def characterEncoding_=(encoding: Option[String]): Unit = {
+  def characterEncoding_=(encoding: Option[String]): Unit =
     r.setCharacterEncoding(encoding getOrElse null)
-  }
 
   /**
     * The content of the Content-Type header, or None if absent.
@@ -149,10 +135,9 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
   /**
     * Returns the length, in bytes, of the body, or None if not known.
     */
-  def contentLength: Option[Long] = r.getContentLength match {
+  def contentLength: Option[Long] = r.getContentLength match
     case -1 => None
     case length => Some(length)
-  }
 
   /**
     * When combined with scriptName, pathInfo, and serverPort, can be used to
@@ -181,10 +166,9 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     *
     * @return the `Referer` header, or None if not set
     */
-  def referrer: Option[String] = r.getHeader("Referer") match {
+  def referrer: Option[String] = r.getHeader("Referer") match
     case s: String => Some(s)
     case null => None
-  }
 
   @deprecated("Use referrer", "2.0.0")
   def referer: Option[String] = referrer
@@ -197,21 +181,19 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * @return the message body as a string according to the request's encoding
     * (defult ISO-8859-1).
     */
-  def body: String = {
-    cachedBody getOrElse {
+  def body: String =
+    cachedBody getOrElse
       val encoding = r.getCharacterEncoding
       val enc =
-        if (encoding == null || encoding.trim.length == 0) {
+        if (encoding == null || encoding.trim.length == 0)
           if (contentType.exists(_ equalsIgnoreCase "application/json"))
             "UTF-8" else "ISO-8859-1"
-        } else encoding
-      val body: String = try {
+        else encoding
+      val body: String = try
         Source.fromInputStream(r.getInputStream, enc).mkString
-      } catch { case e: java.io.IOException => "" }
+      catch { case e: java.io.IOException => "" }
       update(cachedBodyKey, body)
       body
-    }
-  }
 
   private def cachedBody: Option[String] =
     get(cachedBodyKey).flatMap(_.asInstanceOf[String].blankOption)
@@ -230,7 +212,7 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
     * Returns a map of cookie names to lists of their values.  The default
     * value of the map is the empty sequence.
     */
-  def multiCookies: MultiMap = {
+  def multiCookies: MultiMap =
     val rr = Option(r.getCookies)
       .getOrElse(Array())
       .toSeq
@@ -238,17 +220,14 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
       .transform { case (k, v) => v map { _.getValue } }
       .withDefaultValue(Seq.empty)
     MultiMap(rr)
-  }
 
   /**
     * Returns a map of cookie names to values.  If multiple values are present
     * for a given cookie, the value is the first cookie of that name.
     */
-  def cookies: CMap[String, String] = {
-    new MultiMapHeadView[String, String] {
+  def cookies: CMap[String, String] =
+    new MultiMapHeadView[String, String]
       override protected def multiMap = multiCookies
-    }
-  }
 
   protected[scalatra] def attributes: HttpServletRequest = r
 
@@ -270,10 +249,8 @@ case class RichRequest(r: HttpServletRequest) extends AttributesMap {
 
   def locale: Locale = r.getLocale
 
-  def locales: Seq[Locale] = {
+  def locales: Seq[Locale] =
     // Although javadoc says "If the client request doesn't provide an Accept-Language header,
     // this method returns an Enumeration containing one Locale, the default locale for the server.",
     // just to be safe, care about null value here
     Option(r.getLocales).map(_.asScala.toSeq).getOrElse(Nil)
-  }
-}

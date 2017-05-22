@@ -4,8 +4,8 @@ import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.state.AppDefinition.VersionInfo.FullVersionInfo
 import org.scalatest.{Matchers, GivenWhenThen}
 
-class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
-  test("NoVersion upgrades to FullVersion on a scaling change") {
+class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers
+  test("NoVersion upgrades to FullVersion on a scaling change")
     Given("NoVersion")
     val versionInfo = AppDefinition.VersionInfo.NoVersion
     val versionOfNoVersion = versionInfo.version
@@ -21,9 +21,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
             lastConfigChangeAt = versionOfNoVersion
         )
     )
-  }
 
-  test("NoVersion upgrades to FullVersion on a config change") {
+  test("NoVersion upgrades to FullVersion on a config change")
     Given("NoVersion")
     val versionInfo = AppDefinition.VersionInfo.NoVersion
 
@@ -38,9 +37,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
             lastConfigChangeAt = Timestamp(1)
         )
     )
-  }
 
-  test("OnlyVersion upgrades to FullVersion on a scaling change") {
+  test("OnlyVersion upgrades to FullVersion on a scaling change")
     Given("An OnlyVersion info")
     val versionInfo = AppDefinition.VersionInfo.OnlyVersion(Timestamp(1))
 
@@ -55,9 +53,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
             lastConfigChangeAt = Timestamp(1)
         )
     )
-  }
 
-  test("OnlyVersion upgrades to FullVersion on a config change") {
+  test("OnlyVersion upgrades to FullVersion on a config change")
     Given("An OnlyVersion info")
     val versionInfo = AppDefinition.VersionInfo.OnlyVersion(Timestamp(1))
 
@@ -72,9 +69,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
             lastConfigChangeAt = Timestamp(2)
         )
     )
-  }
 
-  test("A scaling change on FullVersion only changes scalingAt") {
+  test("A scaling change on FullVersion only changes scalingAt")
     Given("A FullVersionInfo")
     val versionInfo = AppDefinition.VersionInfo.FullVersionInfo(
         version = Timestamp(2),
@@ -93,9 +89,8 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
             lastConfigChangeAt = Timestamp(1)
         )
     )
-  }
 
-  test("A config change on FullVersion changes scalingAt, lastConfigChangeAt") {
+  test("A config change on FullVersion changes scalingAt, lastConfigChangeAt")
     Given("A FullVersionInfo")
     val versionInfo = AppDefinition.VersionInfo.FullVersionInfo(
         version = Timestamp(2),
@@ -114,5 +109,3 @@ class VersionInfoTest extends MarathonSpec with GivenWhenThen with Matchers {
             lastConfigChangeAt = Timestamp(3)
         )
     )
-  }
-}

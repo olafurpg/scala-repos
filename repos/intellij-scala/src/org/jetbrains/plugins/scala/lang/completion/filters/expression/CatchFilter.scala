@@ -14,12 +14,12 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
-class CatchFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class CatchFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val (leaf, _) = processPsiLeafForFilter(
         getLeafByOffset(context.getTextRange.getStartOffset, context))
-    if (leaf != null) {
+    if (leaf != null)
       var i = getPrevNotWhitespaceAndComment(
           context.getTextRange.getStartOffset - 1, context)
       var leaf1 = getLeafByOffset(i, context)
@@ -32,17 +32,15 @@ class CatchFilter extends ElementFilter {
       if (Array("catch").contains(getLeafByOffset(i, context).getText))
         return false
       return true
-    }
 
     false
-  }
 
   def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = true
 
   @NonNls
   override def toString = "statements keyword filter"
 
-  def getPrevNotWhitespaceAndComment(index: Int, context: PsiElement): Int = {
+  def getPrevNotWhitespaceAndComment(index: Int, context: PsiElement): Int =
     var i = index
     if (i < 0) return 0
     while (i > 0 &&
@@ -54,9 +52,8 @@ class CatchFilter extends ElementFilter {
           leaf.getTextRange.getStartOffset - 1, context)
 
     i
-  }
 
-  def getNextNotWhitespaceAndComment(index: Int, context: PsiElement): Int = {
+  def getNextNotWhitespaceAndComment(index: Int, context: PsiElement): Int =
     var i = index
     if (i >= context.getContainingFile.getTextLength - 1)
       return context.getContainingFile.getTextLength - 2
@@ -69,5 +66,3 @@ class CatchFilter extends ElementFilter {
           leaf.getTextRange.getEndOffset, context)
 
     i
-  }
-}

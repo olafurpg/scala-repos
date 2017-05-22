@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   def cm1[T : ClassManifest] = ???
   def cm2[T](implicit evidence$1: ClassManifest[T]) = ???
   val cm3: ClassManifest[Int] = null
@@ -34,4 +34,3 @@ object Test extends App {
   def arm1[T : RM] = ???
   def arm2[T](implicit evidence$1: RM[T]) = ???
   val arm3: RM[Int] = null
-}

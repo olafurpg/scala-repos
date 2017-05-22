@@ -18,14 +18,13 @@ import scala.math.Ordering
   *  we override the `MapLike.++` overload in `collection.SortedMap` to return
   *  the proper type `SortedMap`.
   */
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     testCollectionSorted()
     testImmutableSorted()
-  }
 
-  def testCollectionSorted() {
+  def testCollectionSorted()
     import collection._
     val order = implicitly[Ordering[Int]].reverse
     var m1: SortedMap[Int, String] = SortedMap.empty[Int, String](order)
@@ -44,9 +43,8 @@ object Test {
     println(m3)
 
     println(m1 + (3 -> "?"))
-  }
 
-  def testImmutableSorted() {
+  def testImmutableSorted()
     import collection.immutable._
     val order = implicitly[Ordering[Int]].reverse
     var m1: SortedMap[Int, String] = SortedMap.empty[Int, String](order)
@@ -65,5 +63,3 @@ object Test {
     println(m3)
 
     println(m1 + (3 -> "?"))
-  }
-}

@@ -1,19 +1,14 @@
-package library.x {
-  class X {
+package library.x
+  class X
     class Foo
     implicit val foo: Foo = new Foo
-  }
-}
-package library {
+package library
   package object y extends library.x.X
-}
 
-object ko {
+object ko
   import library.y.{Foo, foo}
   implicitly[Foo]
-}
 
-object ko2 {
+object ko2
   import library.y._
   implicitly[Foo]
-}

@@ -12,7 +12,7 @@ import akka.http.impl.server.RouteStructure.{DynamicDirectiveRoute2, Validated, 
 import scala.annotation.varargs
 import akka.japi.function.{Function2, Function}
 
-abstract class MiscDirectives extends MethodDirectives {
+abstract class MiscDirectives extends MethodDirectives
 
   /**
     * Returns a Route which checks the given condition on the request context before running its inner Route.
@@ -39,10 +39,9 @@ abstract class MiscDirectives extends MethodDirectives {
                   errorMsg: String,
                   innerRoute: Route,
                   moreInnerRoutes: Route*): Route =
-    new DynamicDirectiveRoute1[T](value)(innerRoute, moreInnerRoutes.toList) {
+    new DynamicDirectiveRoute1[T](value)(innerRoute, moreInnerRoutes.toList)
       def createDirective(t1: T): Directive =
         Directives.custom(Validated(check.apply(t1), errorMsg))
-    }
 
   /**
     * Returns a Route which checks the given condition before running its inner Route. If the condition fails the
@@ -56,8 +55,6 @@ abstract class MiscDirectives extends MethodDirectives {
                        innerRoute: Route,
                        moreInnerRoutes: Route*): Route =
     new DynamicDirectiveRoute2[T1, T2](value1, value2)(
-        innerRoute, moreInnerRoutes.toList) {
+        innerRoute, moreInnerRoutes.toList)
       def createDirective(t1: T1, t2: T2): Directive =
         Directives.custom(Validated(check.apply(t1, t2), errorMsg))
-    }
-}

@@ -31,7 +31,7 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 class LinearRegressionSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   private val seed: Int = 42
   @transient var datasetWithDenseFeature: DataFrame = _
@@ -41,7 +41,7 @@ class LinearRegressionSuite
   @transient var datasetWithWeightConstantLabel: DataFrame = _
   @transient var datasetWithWeightZeroLabel: DataFrame = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     datasetWithDenseFeature = sqlContext.createDataFrame(
         sc.parallelize(LinearDataGenerator.generateLinearInput(
@@ -129,42 +129,39 @@ class LinearRegressionSuite
                 Instance(0.0, 4.0, Vectors.dense(3.0, 13.0))
             ),
             2))
-  }
 
   /**
     * Enable the ignored test to export the dataset into CSV format,
     * so we can validate the training accuracy compared with R's glmnet package.
     */
-  ignore("export test data into CSV format") {
-    datasetWithDenseFeature.rdd.map {
+  ignore("export test data into CSV format")
+    datasetWithDenseFeature.rdd.map
       case Row(label: Double, features: Vector) =>
         label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    .repartition(1)
       .saveAsTextFile(
           "target/tmp/LinearRegressionSuite/datasetWithDenseFeature")
 
-    datasetWithDenseFeatureWithoutIntercept.rdd.map {
+    datasetWithDenseFeatureWithoutIntercept.rdd.map
       case Row(label: Double, features: Vector) =>
         label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    .repartition(1)
       .saveAsTextFile(
           "target/tmp/LinearRegressionSuite/datasetWithDenseFeatureWithoutIntercept")
 
-    datasetWithSparseFeature.rdd.map {
+    datasetWithSparseFeature.rdd.map
       case Row(label: Double, features: Vector) =>
         label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    .repartition(1)
       .saveAsTextFile(
           "target/tmp/LinearRegressionSuite/datasetWithSparseFeature")
-  }
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new LinearRegression)
     val model = new LinearRegressionModel("linearReg", Vectors.dense(0.0), 0.0)
     ParamsSuite.checkParams(model)
-  }
 
-  test("linear regression: default params") {
+  test("linear regression: default params")
     val lir = new LinearRegression
     assert(lir.getLabelCol === "label")
     assert(lir.getFeaturesCol === "features")
@@ -190,10 +187,9 @@ class LinearRegressionSuite
     val numFeatures =
       datasetWithDenseFeature.select("features").first().getAs[Vector](0).size
     assert(model.numFeatures === numFeatures)
-  }
 
-  test("linear regression with intercept without regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression with intercept without regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 = new LinearRegression().setSolver(solver)
       // The result should be the same regardless of standardization without regularization
       val trainer2 =
@@ -228,18 +224,15 @@ class LinearRegressionSuite
         .transform(datasetWithDenseFeature)
         .select("features", "prediction")
         .collect()
-        .foreach {
+        .foreach
           case Row(features: DenseVector, prediction1: Double) =>
             val prediction2 =
               features(0) * model1.coefficients(0) +
               features(1) * model1.coefficients(1) + model1.intercept
             assert(prediction1 ~== prediction2 relTol 1E-5)
-        }
-    }
-  }
 
-  test("linear regression without intercept without regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression without intercept without regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 =
         (new LinearRegression).setFitIntercept(false).setSolver(solver)
       // Without regularization the results should be the same
@@ -288,11 +281,9 @@ class LinearRegressionSuite
       assert(modelWithoutIntercept2.intercept ~== 0 absTol 1E-3)
       assert(modelWithoutIntercept2.coefficients ~=
             coefficientsWithourInterceptR relTol 1E-3)
-    }
-  }
 
-  test("linear regression with intercept with L1 regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression with intercept with L1 regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 = (new LinearRegression)
         .setElasticNetParam(1.0)
         .setRegParam(0.57)
@@ -304,12 +295,11 @@ class LinearRegressionSuite
         .setStandardization(false)
 
       // Normal optimizer is not supported with only L1 regularization case.
-      if (solver == "normal") {
-        intercept[IllegalArgumentException] {
+      if (solver == "normal")
+        intercept[IllegalArgumentException]
           trainer1.fit(datasetWithDenseFeature)
           trainer2.fit(datasetWithDenseFeature)
-        }
-      } else {
+      else
         val model1 = trainer1.fit(datasetWithDenseFeature)
         val model2 = trainer2.fit(datasetWithDenseFeature)
 
@@ -348,19 +338,15 @@ class LinearRegressionSuite
           .transform(datasetWithDenseFeature)
           .select("features", "prediction")
           .collect()
-          .foreach {
+          .foreach
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
                 features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
-          }
-      }
-    }
-  }
 
-  test("linear regression without intercept with L1 regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression without intercept with L1 regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 = (new LinearRegression)
         .setElasticNetParam(1.0)
         .setRegParam(0.57)
@@ -374,12 +360,11 @@ class LinearRegressionSuite
         .setSolver(solver)
 
       // Normal optimizer is not supported with only L1 regularization case.
-      if (solver == "normal") {
-        intercept[IllegalArgumentException] {
+      if (solver == "normal")
+        intercept[IllegalArgumentException]
           trainer1.fit(datasetWithDenseFeature)
           trainer2.fit(datasetWithDenseFeature)
-        }
-      } else {
+      else
         val model1 = trainer1.fit(datasetWithDenseFeature)
         val model2 = trainer2.fit(datasetWithDenseFeature)
 
@@ -419,19 +404,15 @@ class LinearRegressionSuite
           .transform(datasetWithDenseFeature)
           .select("features", "prediction")
           .collect()
-          .foreach {
+          .foreach
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
                 features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
-          }
-      }
-    }
-  }
 
-  test("linear regression with intercept with L2 regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression with intercept with L2 regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 = (new LinearRegression)
         .setElasticNetParam(0.0)
         .setRegParam(2.3)
@@ -479,18 +460,15 @@ class LinearRegressionSuite
         .transform(datasetWithDenseFeature)
         .select("features", "prediction")
         .collect()
-        .foreach {
+        .foreach
           case Row(features: DenseVector, prediction1: Double) =>
             val prediction2 =
               features(0) * model1.coefficients(0) +
               features(1) * model1.coefficients(1) + model1.intercept
             assert(prediction1 ~== prediction2 relTol 1E-5)
-        }
-    }
-  }
 
-  test("linear regression without intercept with L2 regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression without intercept with L2 regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 = (new LinearRegression)
         .setElasticNetParam(0.0)
         .setRegParam(2.3)
@@ -541,18 +519,15 @@ class LinearRegressionSuite
         .transform(datasetWithDenseFeature)
         .select("features", "prediction")
         .collect()
-        .foreach {
+        .foreach
           case Row(features: DenseVector, prediction1: Double) =>
             val prediction2 =
               features(0) * model1.coefficients(0) +
               features(1) * model1.coefficients(1) + model1.intercept
             assert(prediction1 ~== prediction2 relTol 1E-5)
-        }
-    }
-  }
 
-  test("linear regression with intercept with ElasticNet regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression with intercept with ElasticNet regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 = (new LinearRegression)
         .setElasticNetParam(0.3)
         .setRegParam(1.6)
@@ -564,12 +539,11 @@ class LinearRegressionSuite
         .setSolver(solver)
 
       // Normal optimizer is not supported with non-zero elasticnet parameter.
-      if (solver == "normal") {
-        intercept[IllegalArgumentException] {
+      if (solver == "normal")
+        intercept[IllegalArgumentException]
           trainer1.fit(datasetWithDenseFeature)
           trainer2.fit(datasetWithDenseFeature)
-        }
-      } else {
+      else
         val model1 = trainer1.fit(datasetWithDenseFeature)
         val model2 = trainer2.fit(datasetWithDenseFeature)
 
@@ -609,19 +583,15 @@ class LinearRegressionSuite
           .transform(datasetWithDenseFeature)
           .select("features", "prediction")
           .collect()
-          .foreach {
+          .foreach
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
                 features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
-          }
-      }
-    }
-  }
 
-  test("linear regression without intercept with ElasticNet regularization") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression without intercept with ElasticNet regularization")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer1 = (new LinearRegression)
         .setElasticNetParam(0.3)
         .setRegParam(1.6)
@@ -635,12 +605,11 @@ class LinearRegressionSuite
         .setSolver(solver)
 
       // Normal optimizer is not supported with non-zero elasticnet parameter.
-      if (solver == "normal") {
-        intercept[IllegalArgumentException] {
+      if (solver == "normal")
+        intercept[IllegalArgumentException]
           trainer1.fit(datasetWithDenseFeature)
           trainer2.fit(datasetWithDenseFeature)
-        }
-      } else {
+      else
         val model1 = trainer1.fit(datasetWithDenseFeature)
         val model2 = trainer2.fit(datasetWithDenseFeature)
 
@@ -681,18 +650,14 @@ class LinearRegressionSuite
           .transform(datasetWithDenseFeature)
           .select("features", "prediction")
           .collect()
-          .foreach {
+          .foreach
             case Row(features: DenseVector, prediction1: Double) =>
               val prediction2 =
                 features(0) * model1.coefficients(0) +
                 features(1) * model1.coefficients(1) + model1.intercept
               assert(prediction1 ~== prediction2 relTol 1E-5)
-          }
-      }
-    }
-  }
 
-  test("linear regression model with constant label") {
+  test("linear regression model with constant label")
     /*
        R code:
        for (formula in c(b.const ~ . -1, b.const ~ .)) {
@@ -705,9 +670,9 @@ class LinearRegressionSuite
     val expected = Seq(Vectors.dense(0.0, -9.221298, 3.394343),
                        Vectors.dense(17.0, 0.0, 0.0))
 
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       var idx = 0
-      for (fitIntercept <- Seq(false, true)) {
+      for (fitIntercept <- Seq(false, true))
         val model1 = new LinearRegression()
           .setFitIntercept(fitIntercept)
           .setWeightCol("weight")
@@ -726,56 +691,45 @@ class LinearRegressionSuite
             model2.intercept, model2.coefficients(0), model2.coefficients(1))
         assert(actual2 ~== Vectors.dense(0.0, 0.0, 0.0) absTol 1e-4)
         idx += 1
-      }
-    }
-  }
 
-  test("regularized linear regression through origin with constant label") {
+  test("regularized linear regression through origin with constant label")
     // The problem is ill-defined if fitIntercept=false, regParam is non-zero.
     // An exception is thrown in this case.
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
-      for (standardization <- Seq(false, true)) {
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
+      for (standardization <- Seq(false, true))
         val model = new LinearRegression()
           .setFitIntercept(false)
           .setRegParam(0.1)
           .setStandardization(standardization)
           .setSolver(solver)
-        intercept[IllegalArgumentException] {
+        intercept[IllegalArgumentException]
           model.fit(datasetWithWeightConstantLabel)
-        }
-      }
-    }
-  }
 
-  test("linear regression with l-bfgs when training is not needed") {
+  test("linear regression with l-bfgs when training is not needed")
     // When label is constant, l-bfgs solver returns results without training.
     // There are two possibilities: If the label is non-zero but constant,
     // and fitIntercept is true, then the model return yMean as intercept without training.
     // If label is all zeros, then all coefficients are zero regardless of fitIntercept, so
     // no training is needed.
-    for (fitIntercept <- Seq(false, true)) {
-      for (standardization <- Seq(false, true)) {
+    for (fitIntercept <- Seq(false, true))
+      for (standardization <- Seq(false, true))
         val model1 = new LinearRegression()
           .setFitIntercept(fitIntercept)
           .setStandardization(standardization)
           .setWeightCol("weight")
           .setSolver("l-bfgs")
           .fit(datasetWithWeightConstantLabel)
-        if (fitIntercept) {
+        if (fitIntercept)
           assert(model1.summary.objectiveHistory(0) ~== 0.0 absTol 1e-4)
-        }
         val model2 = new LinearRegression()
           .setFitIntercept(fitIntercept)
           .setWeightCol("weight")
           .setSolver("l-bfgs")
           .fit(datasetWithWeightZeroLabel)
         assert(model2.summary.objectiveHistory(0) ~== 0.0 absTol 1e-4)
-      }
-    }
-  }
 
-  test("linear regression model training summary") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression model training summary")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer = new LinearRegression().setSolver(solver)
       val model = trainer.fit(datasetWithDenseFeature)
       val trainerNoPredictionCol = trainer.setPredictionCol("")
@@ -801,19 +755,17 @@ class LinearRegressionSuite
       val expectedResiduals = datasetWithDenseFeature
         .select("features", "label")
         .rdd
-        .map {
+        .map
           case Row(features: DenseVector, label: Double) =>
             val prediction =
               features(0) * model.coefficients(0) +
               features(1) * model.coefficients(1) + model.intercept
             label - prediction
-        }
         .zip(model.summary.residuals.rdd.map(_.getDouble(0)))
         .collect()
-        .foreach {
+        .foreach
           case (manualResidual: Double, resultResidual: Double) =>
             assert(manualResidual ~== resultResidual relTol 1E-5)
-        }
 
       /*
          # Use the following R code to generate model training results.
@@ -860,12 +812,12 @@ class LinearRegressionSuite
 
       // Normal solver uses "WeightedLeastSquares". This algorithm does not generate
       // objective history because it does not run through iterations.
-      if (solver == "l-bfgs") {
+      if (solver == "l-bfgs")
         // Objective function should be monotonically decreasing for linear regression
         assert(model.summary.objectiveHistory
               .sliding(2)
               .forall(x => x(0) >= x(1)))
-      } else {
+      else
         // To clalify that the normal solver is used here.
         assert(model.summary.objectiveHistory.length == 1)
         assert(model.summary.objectiveHistory(0) == 0.0)
@@ -873,24 +825,17 @@ class LinearRegressionSuite
         val seCoefR = Array(0.0011805, 0.0009044, 0.0018600)
         val tValsR = Array(3980, 7961, 3388)
         val pValsR = Array(0, 0, 0)
-        model.summary.devianceResiduals.zip(devianceResidualsR).foreach { x =>
+        model.summary.devianceResiduals.zip(devianceResidualsR).foreach  x =>
           assert(x._1 ~== x._2 absTol 1E-4)
-        }
-        model.summary.coefficientStandardErrors.zip(seCoefR).foreach { x =>
+        model.summary.coefficientStandardErrors.zip(seCoefR).foreach  x =>
           assert(x._1 ~== x._2 absTol 1E-4)
-        }
-        model.summary.tValues.map(_.round).zip(tValsR).foreach { x =>
+        model.summary.tValues.map(_.round).zip(tValsR).foreach  x =>
           assert(x._1 === x._2)
-        }
-        model.summary.pValues.map(_.round).zip(pValsR).foreach { x =>
+        model.summary.pValues.map(_.round).zip(pValsR).foreach  x =>
           assert(x._1 === x._2)
-        }
-      }
-    }
-  }
 
-  test("linear regression model testset evaluation summary") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
+  test("linear regression model testset evaluation summary")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
       val trainer = new LinearRegression().setSolver(solver)
       val model = trainer.fit(datasetWithDenseFeature)
 
@@ -903,15 +848,12 @@ class LinearRegressionSuite
         .select("residuals")
         .collect()
         .zip(testSummary.residuals.select("residuals").collect())
-        .forall {
+        .forall
           case (Row(r1: Double), Row(r2: Double)) => r1 ~== r2 relTol 1E-5
-        }
-    }
-  }
 
-  test("linear regression with weighted samples") {
-    Seq("auto", "l-bfgs", "normal").foreach { solver =>
-      val (data, weightedData) = {
+  test("linear regression with weighted samples")
+    Seq("auto", "l-bfgs", "normal").foreach  solver =>
+      val (data, weightedData) =
         val activeData =
           LinearDataGenerator.generateLinearInput(6.3,
                                                   Array(4.7, 7.2),
@@ -922,17 +864,15 @@ class LinearRegressionSuite
                                                   0.1)
 
         val rnd = new Random(8392)
-        val signedData = activeData.map {
+        val signedData = activeData.map
           case p: LabeledPoint =>
             (rnd.nextGaussian() > 0.0, p)
-        }
 
-        val data1 = signedData.flatMap {
+        val data1 = signedData.flatMap
           case (true, p) => Iterator(p, p)
           case (false, p) => Iterator(p)
-        }
 
-        val weightedSignedData = signedData.flatMap {
+        val weightedSignedData = signedData.flatMap
           case (true, LabeledPoint(label, features)) =>
             Iterator(
                 Instance(label, weight = 1.2, features),
@@ -944,19 +884,16 @@ class LinearRegressionSuite
                 Instance(label, weight = 0.1, features),
                 Instance(label, weight = 0.6, features)
             )
-        }
 
         val noiseData = LinearDataGenerator.generateLinearInput(
             2, Array(1, 3), Array(0.9, -1.3), Array(0.7, 1.2), 500, 1, 0.1)
-        val weightedNoiseData = noiseData.map {
+        val weightedNoiseData = noiseData.map
           case LabeledPoint(label, features) =>
             Instance(label, weight = 0, features)
-        }
         val data2 = weightedSignedData ++ weightedNoiseData
 
         (sqlContext.createDataFrame(sc.parallelize(data1, 4)),
          sqlContext.createDataFrame(sc.parallelize(data2, 4)))
-      }
 
       val trainer1a = (new LinearRegression)
         .setFitIntercept(true)
@@ -1040,10 +977,8 @@ class LinearRegressionSuite
       val model4b = trainer4b.fit(weightedData)
       assert(model4a0.coefficients !~= model4a1.coefficients absTol 1E-3)
       assert(model4a0.coefficients ~== model4b.coefficients absTol 1E-3)
-    }
-  }
 
-  test("linear regression model with l-bfgs with big feature datasets") {
+  test("linear regression model with l-bfgs with big feature datasets")
     val trainer = new LinearRegression().setSolver("auto")
     val model = trainer.fit(datasetWithSparseFeature)
 
@@ -1051,10 +986,9 @@ class LinearRegressionSuite
     assert(model.hasSummary)
     // When LBFGS is used as optimizer, objective history can be restored.
     assert(model.summary.objectiveHistory.sliding(2).forall(x => x(0) >= x(1)))
-  }
 
   test(
-      "linear regression summary with weighted samples and intercept by normal solver") {
+      "linear regression summary with weighted samples and intercept by normal solver")
     /*
        R code:
 
@@ -1096,22 +1030,17 @@ class LinearRegressionSuite
 
     assert(model.coefficients ~== coefficientsR absTol 1E-3)
     assert(model.intercept ~== interceptR absTol 1E-3)
-    model.summary.devianceResiduals.zip(devianceResidualsR).foreach { x =>
+    model.summary.devianceResiduals.zip(devianceResidualsR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-    model.summary.coefficientStandardErrors.zip(seCoefR).foreach { x =>
+    model.summary.coefficientStandardErrors.zip(seCoefR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-    model.summary.tValues.zip(tValsR).foreach { x =>
+    model.summary.tValues.zip(tValsR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-    model.summary.pValues.zip(pValsR).foreach { x =>
+    model.summary.pValues.zip(pValsR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-  }
 
   test(
-      "linear regression summary with weighted samples and w/o intercept by normal solver") {
+      "linear regression summary with weighted samples and w/o intercept by normal solver")
     /*
        R code:
 
@@ -1155,35 +1084,27 @@ class LinearRegressionSuite
 
     assert(model.coefficients ~== coefficientsR absTol 1E-3)
     assert(model.intercept === interceptR)
-    model.summary.devianceResiduals.zip(devianceResidualsR).foreach { x =>
+    model.summary.devianceResiduals.zip(devianceResidualsR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-    model.summary.coefficientStandardErrors.zip(seCoefR).foreach { x =>
+    model.summary.coefficientStandardErrors.zip(seCoefR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-    model.summary.tValues.zip(tValsR).foreach { x =>
+    model.summary.tValues.zip(tValsR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-    model.summary.pValues.zip(pValsR).foreach { x =>
+    model.summary.pValues.zip(pValsR).foreach  x =>
       assert(x._1 ~== x._2 absTol 1E-3)
-    }
-  }
 
-  test("read/write") {
+  test("read/write")
     def checkModelData(
-        model: LinearRegressionModel, model2: LinearRegressionModel): Unit = {
+        model: LinearRegressionModel, model2: LinearRegressionModel): Unit =
       assert(model.intercept === model2.intercept)
       assert(model.coefficients === model2.coefficients)
-    }
     val lr = new LinearRegression()
     testEstimatorAndModelReadWrite(lr,
                                    datasetWithWeight,
                                    LinearRegressionSuite.allParamSettings,
                                    checkModelData)
-  }
-}
 
-object LinearRegressionSuite {
+object LinearRegressionSuite
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -1200,4 +1121,3 @@ object LinearRegressionSuite {
       "standardization" -> false,
       "solver" -> "l-bfgs"
   )
-}

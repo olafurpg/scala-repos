@@ -15,12 +15,10 @@ import scala.collection.JavaConverters._
   *
   * The journal will unwrap the event and store the `payload`.
   */
-case class Tagged(payload: Any, tags: Set[String]) {
+case class Tagged(payload: Any, tags: Set[String])
 
   /**
     * Java API
     */
-  def this(payload: Any, tags: java.util.Set[String]) = {
+  def this(payload: Any, tags: java.util.Set[String]) =
     this(payload, tags.asScala.toSet)
-  }
-}

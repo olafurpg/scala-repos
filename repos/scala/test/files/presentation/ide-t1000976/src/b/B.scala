@@ -2,6 +2,5 @@ package b
 
 import c.C
 
-class B {
+class B
   new C("")
-}

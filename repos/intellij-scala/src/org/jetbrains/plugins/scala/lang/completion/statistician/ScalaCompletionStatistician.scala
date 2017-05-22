@@ -14,23 +14,22 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
   * @author Alefas
   * @since 06.07.12
   */
-class ScalaCompletionStatistician extends CompletionStatistician {
+class ScalaCompletionStatistician extends CompletionStatistician
   def serialize(
-      element: LookupElement, location: CompletionLocation): StatisticsInfo = {
+      element: LookupElement, location: CompletionLocation): StatisticsInfo =
     val currentElement =
       Option(element.as(LookupItem.CLASS_CONDITION_KEY)).getOrElse(return null)
 
-    ScalaLookupItem.original(currentElement) match {
+    ScalaLookupItem.original(currentElement) match
       case s: ScalaLookupItem
           if s.isLocalVariable || s.isNamedParameter || s.isDeprecated =>
         StatisticsInfo.EMPTY
       case s: ScalaLookupItem =>
-        s.element match {
+        s.element match
           case withImplicit: ScModifierListOwner
               if withImplicit.hasModifierPropertyScala("implicit") =>
             StatisticsInfo.EMPTY
           case _ => helper(s.element, location)
-        }
       // return empty statistic when using  scala completion but ScalaLookupItem didn't use.
       // otherwise will be computed java statistic that may lead to ClassCastError
       case e
@@ -39,30 +38,23 @@ class ScalaCompletionStatistician extends CompletionStatistician {
         StatisticsInfo.EMPTY
       case _ =>
         null //don't impact on java Lookups, no statistics for scala keyword elements
-    }
-  }
 
   def helper(element: PsiNamedElement,
-             location: CompletionLocation): StatisticsInfo = {
-    element match {
+             location: CompletionLocation): StatisticsInfo =
+    element match
       case member: PsiMember =>
         val key = ScalaStatisticManager
           .memberKey(member)
           .getOrElse(return StatisticsInfo.EMPTY)
-        member match {
+        member match
           case (_: ScTypeAlias) | (_: ScTypeDefinition) | (_: PsiClass) =>
             new StatisticsInfo("scalaMember", key)
           case _ =>
             val containingClass = member.getContainingClass
-            if (containingClass != null) {
+            if (containingClass != null)
               val context =
                 ScalaStatisticManager.memberKey(containingClass).getOrElse("")
               new StatisticsInfo("scalaMember#" + context, key)
-            } else {
+            else
               StatisticsInfo.EMPTY
-            }
-        }
       case _ => StatisticsInfo.EMPTY
-    }
-  }
-}

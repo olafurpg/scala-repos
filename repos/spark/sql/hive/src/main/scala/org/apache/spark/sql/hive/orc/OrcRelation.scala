@@ -44,7 +44,7 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.util.SerializableConfiguration
 import org.apache.spark.util.collection.BitSet
 
-private[sql] class DefaultSource extends FileFormat with DataSourceRegister {
+private[sql] class DefaultSource extends FileFormat with DataSourceRegister
 
   override def shortName(): String = "orc"
 
@@ -52,55 +52,47 @@ private[sql] class DefaultSource extends FileFormat with DataSourceRegister {
 
   override def inferSchema(sqlContext: SQLContext,
                            options: Map[String, String],
-                           files: Seq[FileStatus]): Option[StructType] = {
+                           files: Seq[FileStatus]): Option[StructType] =
     OrcFileOperator.readSchema(
         files.map(_.getPath.toUri.toString),
         Some(sqlContext.sparkContext.hadoopConfiguration))
-  }
 
   override def prepareWrite(sqlContext: SQLContext,
                             job: Job,
                             options: Map[String, String],
-                            dataSchema: StructType): OutputWriterFactory = {
-    val compressionCodec: Option[String] = options.get("compression").map {
+                            dataSchema: StructType): OutputWriterFactory =
+    val compressionCodec: Option[String] = options.get("compression").map
       codecName =>
         // Validate if given compression codec is supported or not.
         val shortOrcCompressionCodecNames =
           OrcRelation.shortOrcCompressionCodecNames
-        if (!shortOrcCompressionCodecNames.contains(codecName.toLowerCase)) {
+        if (!shortOrcCompressionCodecNames.contains(codecName.toLowerCase))
           val availableCodecs =
             shortOrcCompressionCodecNames.keys.map(_.toLowerCase)
           throw new IllegalArgumentException(s"Codec [$codecName] " +
               s"is not available. Available codecs are ${availableCodecs.mkString(", ")}.")
-        }
         codecName.toLowerCase
-    }
 
-    compressionCodec.foreach { codecName =>
+    compressionCodec.foreach  codecName =>
       job.getConfiguration.set(OrcTableProperties.COMPRESSION.getPropName,
                                OrcRelation.shortOrcCompressionCodecNames
                                  .getOrElse(codecName, CompressionKind.NONE)
                                  .name())
-    }
 
-    job.getConfiguration match {
+    job.getConfiguration match
       case conf: JobConf =>
         conf.setOutputFormat(classOf[OrcOutputFormat])
       case conf =>
         conf.setClass("mapred.output.format.class",
                       classOf[OrcOutputFormat],
                       classOf[MapRedOutputFormat[_, _]])
-    }
 
-    new OutputWriterFactory {
+    new OutputWriterFactory
       override def newInstance(path: String,
                                bucketId: Option[Int],
                                dataSchema: StructType,
-                               context: TaskAttemptContext): OutputWriter = {
+                               context: TaskAttemptContext): OutputWriter =
         new OrcOutputWriter(path, bucketId, dataSchema, context)
-      }
-    }
-  }
 
   override def buildInternalScan(
       sqlContext: SQLContext,
@@ -110,46 +102,42 @@ private[sql] class DefaultSource extends FileFormat with DataSourceRegister {
       bucketSet: Option[BitSet],
       inputFiles: Seq[FileStatus],
       broadcastedConf: Broadcast[SerializableConfiguration],
-      options: Map[String, String]): RDD[InternalRow] = {
+      options: Map[String, String]): RDD[InternalRow] =
     val output = StructType(requiredColumns.map(dataSchema(_))).toAttributes
     OrcTableScan(sqlContext, output, filters, inputFiles).execute()
-  }
-}
 
 private[orc] class OrcOutputWriter(path: String,
                                    bucketId: Option[Int],
                                    dataSchema: StructType,
                                    context: TaskAttemptContext)
-    extends OutputWriter with HiveInspectors {
+    extends OutputWriter with HiveInspectors
 
-  private val serializer = {
+  private val serializer =
     val table = new Properties()
     table.setProperty("columns", dataSchema.fieldNames.mkString(","))
-    table.setProperty("columns.types", dataSchema.map { f =>
+    table.setProperty("columns.types", dataSchema.map  f =>
       HiveMetastoreTypes.toMetastoreType(f.dataType)
-    }.mkString(":"))
+    .mkString(":"))
 
     val serde = new OrcSerde
     val configuration = context.getConfiguration
     serde.initialize(configuration, table)
     serde
-  }
 
   // Object inspector converted from the schema of the relation to be written.
-  private val structOI = {
+  private val structOI =
     val typeInfo = TypeInfoUtils.getTypeInfoFromTypeString(
         HiveMetastoreTypes.toMetastoreType(dataSchema))
 
     OrcStruct
       .createObjectInspector(typeInfo.asInstanceOf[StructTypeInfo])
       .asInstanceOf[SettableStructObjectInspector]
-  }
 
   // `OrcRecordWriter.close()` creates an empty file if no rows are written at all.  We use this
   // flag to decide whether `OrcRecordWriter.close()` needs to be called.
   private var recordWriterInstantiated = false
 
-  private lazy val recordWriter: RecordWriter[NullWritable, Writable] = {
+  private lazy val recordWriter: RecordWriter[NullWritable, Writable] =
     recordWriterInstantiated = true
 
     val conf = context.getConfiguration
@@ -158,10 +146,9 @@ private[orc] class OrcOutputWriter(path: String,
     val partition = taskAttemptId.getTaskID.getId
     val bucketString =
       bucketId.map(BucketingUtils.bucketIdToString).getOrElse("")
-    val compressionExtension = {
+    val compressionExtension =
       val name = conf.get(OrcTableProperties.COMPRESSION.getPropName)
       OrcRelation.extensionsForCompressionCodecNames.getOrElse(name, "")
-    }
     // It has the `.orc` extension at the end because (de)compression tools
     // such as gunzip would not be able to decompress this as the compression
     // is not applied on this whole file but on each "stream" in ORC format.
@@ -176,17 +163,16 @@ private[orc] class OrcOutputWriter(path: String,
           Reporter.NULL
       )
       .asInstanceOf[RecordWriter[NullWritable, Writable]]
-  }
 
   override def write(row: Row): Unit =
     throw new UnsupportedOperationException("call writeInternal")
 
   private def wrapOrcStruct(struct: OrcStruct,
                             oi: SettableStructObjectInspector,
-                            row: InternalRow): Unit = {
+                            row: InternalRow): Unit =
     val fieldRefs = oi.getAllStructFieldRefs
     var i = 0
-    while (i < fieldRefs.size) {
+    while (i < fieldRefs.size)
 
       oi.setStructFieldData(struct,
                             fieldRefs.get(i),
@@ -194,45 +180,38 @@ private[orc] class OrcOutputWriter(path: String,
                                  fieldRefs.get(i).getFieldObjectInspector,
                                  dataSchema(i).dataType))
       i += 1
-    }
-  }
 
   val cachedOrcStruct = structOI.create().asInstanceOf[OrcStruct]
 
-  override protected[sql] def writeInternal(row: InternalRow): Unit = {
+  override protected[sql] def writeInternal(row: InternalRow): Unit =
     wrapOrcStruct(cachedOrcStruct, structOI, row)
 
     recordWriter.write(
         NullWritable.get(), serializer.serialize(cachedOrcStruct, structOI))
-  }
 
-  override def close(): Unit = {
-    if (recordWriterInstantiated) {
+  override def close(): Unit =
+    if (recordWriterInstantiated)
       recordWriter.close(Reporter.NULL)
-    }
-  }
-}
 
 private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
                                      attributes: Seq[Attribute],
                                      filters: Array[Filter],
                                      @transient inputPaths: Seq[FileStatus])
-    extends Logging with HiveInspectors {
+    extends Logging with HiveInspectors
 
   private def addColumnIds(dataSchema: StructType,
                            output: Seq[Attribute],
-                           conf: Configuration): Unit = {
+                           conf: Configuration): Unit =
     val ids = output.map(a => dataSchema.fieldIndex(a.name): Integer)
     val (sortedIds, sortedNames) = ids.zip(attributes.map(_.name)).sorted.unzip
     HiveShim.appendReadColumns(conf, sortedIds, sortedNames)
-  }
 
   // Transform all given raw `Writable`s into `InternalRow`s.
   private def fillObject(
       path: String,
       conf: Configuration,
       iterator: Iterator[Writable],
-      nonPartitionKeyAttrs: Seq[Attribute]): Iterator[InternalRow] = {
+      nonPartitionKeyAttrs: Seq[Attribute]): Iterator[InternalRow] =
     val deserializer = new OrcSerde
     val maybeStructOI = OrcFileOperator.getObjectInspector(path, Some(conf))
     val mutableRow = new SpecificMutableRow(attributes.map(_.dataType))
@@ -242,43 +221,36 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
     // SPARK-8501: ORC writes an empty schema ("struct<>") to an ORC file if the file contains zero
     // rows, and thus couldn't give a proper ObjectInspector.  In this case we just return an empty
     // partition since we know that this file is empty.
-    maybeStructOI.map { soi =>
-      val (fieldRefs, fieldOrdinals) = nonPartitionKeyAttrs.zipWithIndex.map {
+    maybeStructOI.map  soi =>
+      val (fieldRefs, fieldOrdinals) = nonPartitionKeyAttrs.zipWithIndex.map
         case (attr, ordinal) =>
           soi.getStructFieldRef(attr.name) -> ordinal
-      }.unzip
+      .unzip
       val unwrappers = fieldRefs.map(unwrapperFor)
       // Map each tuple to a row object
-      iterator.map { value =>
+      iterator.map  value =>
         val raw = deserializer.deserialize(value)
         var i = 0
-        while (i < fieldRefs.length) {
+        while (i < fieldRefs.length)
           val fieldValue = soi.getStructFieldData(raw, fieldRefs(i))
-          if (fieldValue == null) {
+          if (fieldValue == null)
             mutableRow.setNullAt(fieldOrdinals(i))
-          } else {
+          else
             unwrappers(i)(fieldValue, mutableRow, fieldOrdinals(i))
-          }
           i += 1
-        }
         unsafeProjection(mutableRow)
-      }
-    }.getOrElse {
+    .getOrElse
       Iterator.empty
-    }
-  }
 
-  def execute(): RDD[InternalRow] = {
+  def execute(): RDD[InternalRow] =
     val job = Job.getInstance(sqlContext.sparkContext.hadoopConfiguration)
     val conf = job.getConfiguration
 
     // Tries to push down filters if ORC filter push-down is enabled
-    if (sqlContext.conf.orcFilterPushDown) {
-      OrcFilters.createFilter(filters).foreach { f =>
+    if (sqlContext.conf.orcFilterPushDown)
+      OrcFilters.createFilter(filters).foreach  f =>
         conf.set(OrcTableScan.SARG_PUSHDOWN, f.toKryo)
         conf.setBoolean(ConfVars.HIVEOPTINDEXFILTER.varname, true)
-      }
-    }
 
     // Figure out the actual schema from the ORC source (without partition columns) so that we
     // can pick the correct ordinals.  Note that this assumes that all files have the same schema.
@@ -289,10 +261,9 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
     // Sets requested columns
     addColumnIds(dataSchema, attributes, conf)
 
-    if (inputPaths.isEmpty) {
+    if (inputPaths.isEmpty)
       // the input path probably be pruned, return an empty RDD.
       return sqlContext.sparkContext.emptyRDD[InternalRow]
-    }
     FileInputFormat.setInputPaths(job, inputPaths.map(_.getPath): _*)
 
     val inputFormatClass = classOf[OrcInputFormat]
@@ -309,23 +280,19 @@ private[orc] case class OrcTableScan(@transient sqlContext: SQLContext,
 
     val wrappedConf = new SerializableConfiguration(conf)
 
-    rdd.mapPartitionsWithInputSplit {
+    rdd.mapPartitionsWithInputSplit
       case (split: OrcSplit, iterator) =>
         val writableIterator = iterator.map(_._2)
         fillObject(split.getPath.toString,
                    wrappedConf.value,
                    writableIterator,
                    attributes)
-    }
-  }
-}
 
-private[orc] object OrcTableScan {
+private[orc] object OrcTableScan
   // This constant duplicates `OrcInputFormat.SARG_PUSHDOWN`, which is unfortunately not public.
   private[orc] val SARG_PUSHDOWN = "sarg.pushdown"
-}
 
-private[orc] object OrcRelation {
+private[orc] object OrcRelation
   // The ORC compression short names
   val shortOrcCompressionCodecNames = Map(
       "none" -> CompressionKind.NONE,
@@ -341,4 +308,3 @@ private[orc] object OrcRelation {
       CompressionKind.ZLIB.name -> ".zlib",
       CompressionKind.LZO.name -> ".lzo"
   )
-}

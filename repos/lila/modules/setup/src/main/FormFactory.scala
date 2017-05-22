@@ -8,15 +8,14 @@ import play.api.data._
 import play.api.data.Forms._
 import tube.{userConfigTube, anonConfigTube}
 
-private[setup] final class FormFactory(casualOnly: Boolean) {
+private[setup] final class FormFactory(casualOnly: Boolean)
 
   import Mappings._
 
   def filterFilled(
       implicit ctx: UserContext): Fu[(Form[FilterConfig], FilterConfig)] =
-    filterConfig map { f =>
+    filterConfig map  f =>
       filter(ctx).fill(f) -> f
-    }
 
   def filter(ctx: UserContext) = Form(
       mapping(
@@ -32,11 +31,9 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
 
   def aiFilled(
       fen: Option[String])(implicit ctx: UserContext): Fu[Form[AiConfig]] =
-    aiConfig map { config =>
-      ai(ctx) fill fen.fold(config) { f =>
+    aiConfig map  config =>
+      ai(ctx) fill fen.fold(config)  f =>
         config.copy(fen = f.some, variant = chess.variant.FromPosition)
-      }
-    }
 
   def ai(ctx: UserContext) = Form(
       mapping(
@@ -56,11 +53,9 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
 
   def friendFilled(
       fen: Option[String])(implicit ctx: UserContext): Fu[Form[FriendConfig]] =
-    friendConfig map { config =>
-      friend(ctx) fill fen.fold(config) { f =>
+    friendConfig map  config =>
+      friend(ctx) fill fen.fold(config)  f =>
         config.copy(fen = f.some, variant = chess.variant.FromPosition)
-      }
-    }
 
   def friend(ctx: UserContext) = Form(
       mapping(
@@ -105,4 +100,3 @@ private[setup] final class FormFactory(casualOnly: Boolean) {
 
   def savedConfig(implicit ctx: UserContext): Fu[UserConfig] =
     ctx.me.fold(AnonConfigRepo config ctx.req)(UserConfigRepo.config)
-}

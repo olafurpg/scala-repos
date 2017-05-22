@@ -20,7 +20,7 @@ package macros
   *  for macro writers, providing a way to coordinate multiple macros operating on the same code. Therefore the `attachments`
   *  field is only declared in trees and symbols belonging to [[scala.reflect.macros.Universe]].
   */
-abstract class Attachments { self =>
+abstract class Attachments  self =>
 
   /** The position type of this attachment */
   type Pos >: Null
@@ -53,21 +53,18 @@ abstract class Attachments { self =>
     new NonemptyAttachments[Pos](this.pos, remove[T].all + attachment)
 
   /** Creates a copy of this attachment with the payload of the given class type `T` removed. */
-  def remove[T : ClassTag]: Attachments { type Pos = self.Pos } = {
+  def remove[T : ClassTag]: Attachments { type Pos = self.Pos } =
     val newAll = all filterNot matchesTag[T]
     if (newAll.isEmpty) pos.asInstanceOf[Attachments { type Pos = self.Pos }]
     else new NonemptyAttachments[Pos](this.pos, newAll)
-  }
 
   def isEmpty: Boolean = true
-}
 
 // SI-7018: This used to be an inner class of `Attachments`, but that led to a memory leak in the
 // IDE via $outer pointers.
 private final class NonemptyAttachments[P >: Null](
     override val pos: P, override val all: Set[Any])
-    extends Attachments {
+    extends Attachments
   type Pos = P
   def withPos(newPos: Pos) = new NonemptyAttachments(newPos, all)
   override def isEmpty: Boolean = false
-}

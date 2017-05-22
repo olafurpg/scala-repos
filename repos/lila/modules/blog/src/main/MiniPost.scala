@@ -9,19 +9,18 @@ case class MiniPost(id: String,
                     date: DateTime,
                     image: String)
 
-object MiniPost {
+object MiniPost
 
   def fromDocument(coll: String)(doc: io.prismic.Document): Option[MiniPost] =
-    for {
+    for
       title <- doc getText s"$coll.title"
       shortlede = ~(doc getText s"$coll.shortlede")
       date <- doc getDate s"$coll.date" map (_.value)
       image = ~doc.getImage(s"$coll.image", "column").map(_.url)
-    } yield
+    yield
       MiniPost(doc.id,
                doc.slug,
                title,
                shortlede,
                date.toDateTimeAtStartOfDay,
                image)
-}

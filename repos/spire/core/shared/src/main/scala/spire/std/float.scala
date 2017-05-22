@@ -8,7 +8,7 @@ import java.lang.Math
 import java.lang.Integer.{numberOfTrailingZeros, numberOfLeadingZeros}
 import java.lang.Float.{intBitsToFloat, floatToIntBits}
 
-trait FloatIsField extends Field[Float] {
+trait FloatIsField extends Field[Float]
   override def minus(a: Float, b: Float): Float = a - b
   def negate(a: Float): Float = -a
   def one: Float = 1.0F
@@ -22,13 +22,13 @@ trait FloatIsField extends Field[Float] {
   def quot(a: Float, b: Float): Float = (a - (a % b)) / b
   def mod(a: Float, b: Float): Float = a % b
 
-  final def gcd(a: Float, b: Float): Float = {
+  final def gcd(a: Float, b: Float): Float =
     def value(bits: Int): Int = bits & 0x007FFFFF | 0x00800000
 
     def exp(bits: Int): Int = ((bits >> 23) & 0xFF).toInt
 
     // Computes the GCD of 2 fp values. Here, we are guaranteed that exp0 < exp1.
-    def gcd0(val0: Int, exp0: Int, val1: Int, exp1: Int): Float = {
+    def gcd0(val0: Int, exp0: Int, val1: Int, exp1: Int): Float =
       val tz0 = numberOfTrailingZeros(val0)
       val tz1 = numberOfTrailingZeros(val1)
       val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
@@ -44,11 +44,10 @@ trait FloatIsField extends Field[Float] {
       // If exp < 0, then we have underflowed; not much we can do but return 0.
       if (exp < 0) 0F
       else intBitsToFloat((exp << 23) | mantissa)
-    }
 
     if (a == 0F) b
     else if (b == 0F) a
-    else {
+    else
       val aBits = floatToIntBits(a)
       val aVal = value(aBits)
       val aExp = exp(aBits)
@@ -59,21 +58,17 @@ trait FloatIsField extends Field[Float] {
 
       if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
       else gcd0(bVal, bExp, aVal, aExp)
-    }
-  }
 
   override def fromDouble(n: Double): Float = n.toFloat
 
   def div(a: Float, b: Float): Float = a / b
-}
 
-trait FloatIsNRoot extends NRoot[Float] {
+trait FloatIsNRoot extends NRoot[Float]
   def nroot(a: Float, k: Int): Float = Math.pow(a, 1 / k.toDouble).toFloat
   override def sqrt(a: Float): Float = Math.sqrt(a).toFloat
   def fpow(a: Float, b: Float): Float = Math.pow(a, b).toFloat
-}
 
-trait FloatIsTrig extends Trig[Float] {
+trait FloatIsTrig extends Trig[Float]
   def e: Float = Math.E.toFloat
   def pi: Float = Math.PI.toFloat
 
@@ -98,14 +93,12 @@ trait FloatIsTrig extends Trig[Float] {
 
   def toRadians(a: Float): Float = (a * 2 * pi) / 360
   def toDegrees(a: Float): Float = (a * 360) / (2 * pi)
-}
 
-trait FloatIsSigned extends Signed[Float] {
+trait FloatIsSigned extends Signed[Float]
   def signum(a: Float): Int = Math.signum(a).toInt
   def abs(a: Float): Float = if (a < 0.0f) -a else a
-}
 
-trait FloatOrder extends Order[Float] {
+trait FloatOrder extends Order[Float]
   override def eqv(x: Float, y: Float): Boolean = x == y
   override def neqv(x: Float, y: Float): Boolean = x != y
   override def gt(x: Float, y: Float): Boolean = x > y
@@ -115,30 +108,26 @@ trait FloatOrder extends Order[Float] {
   override def min(x: Float, y: Float): Float = Math.min(x, y)
   override def max(x: Float, y: Float): Float = Math.max(x, y)
   def compare(x: Float, y: Float): Int = java.lang.Float.compare(x, y)
-}
 
 trait FloatIsReal
-    extends IsRational[Float] with FloatOrder with FloatIsSigned {
+    extends IsRational[Float] with FloatOrder with FloatIsSigned
   def toDouble(x: Float): Double = x.toDouble
   def ceil(a: Float): Float = Math.ceil(a).toFloat
   def floor(a: Float): Float = Math.floor(a).toFloat
   def round(a: Float): Float = spire.math.round(a)
   def isWhole(a: Float): Boolean = a % 1.0 == 0.0
   def toRational(a: Float): Rational = Rational(a)
-}
 
 @SerialVersionUID(0L)
 class FloatAlgebra
     extends FloatIsField with FloatIsNRoot with FloatIsTrig with FloatIsReal
     with Serializable
 
-trait FloatInstances {
+trait FloatInstances
   implicit final val FloatAlgebra = new FloatAlgebra
   import Float._
   import spire.math.NumberTag._
   implicit final val FloatTag = new BuiltinFloatTag(
-      0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+      0F, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity)
     def isInfinite(a: Float): Boolean = java.lang.Float.isInfinite(a)
     def isNaN(a: Float): Boolean = java.lang.Float.isNaN(a)
-  }
-}

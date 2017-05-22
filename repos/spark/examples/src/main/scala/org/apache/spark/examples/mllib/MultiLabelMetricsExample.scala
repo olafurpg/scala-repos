@@ -24,8 +24,8 @@ import org.apache.spark.mllib.evaluation.MultilabelMetrics
 import org.apache.spark.rdd.RDD
 // $example off$
 
-object MultiLabelMetricsExample {
-  def main(args: Array[String]): Unit = {
+object MultiLabelMetricsExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("MultiLabelMetricsExample")
     val sc = new SparkContext(conf)
     // $example on$
@@ -67,6 +67,4 @@ object MultiLabelMetricsExample {
     // Subset accuracy
     println(s"Subset accuracy = ${metrics.subsetAccuracy}")
     // $example off$
-  }
-}
 // scalastyle:on println

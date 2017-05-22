@@ -20,11 +20,10 @@ package io.prediction.data.webhooks
   * @param cause the cause
   */
 private[prediction] class ConnectorException(message: String, cause: Throwable)
-    extends Exception(message, cause) {
+    extends Exception(message, cause)
 
   /** Webhooks Connnector Exception with cause being set to null
     *
     * @param message the detail message
     */
   def this(message: String) = this(message, null)
-}

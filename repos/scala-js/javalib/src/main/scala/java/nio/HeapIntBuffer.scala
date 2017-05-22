@@ -6,7 +6,7 @@ private[nio] final class HeapIntBuffer private (_capacity: Int,
                                                 _initialPosition: Int,
                                                 _initialLimit: Int,
                                                 _readOnly: Boolean)
-    extends IntBuffer(_capacity, _array0, _arrayOffset0) {
+    extends IntBuffer(_capacity, _array0, _arrayOffset0)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -78,25 +78,22 @@ private[nio] final class HeapIntBuffer private (_capacity: Int,
   override private[nio] def store(
       startIndex: Int, src: Array[Int], offset: Int, length: Int): Unit =
     GenHeapBuffer(this).generic_store(startIndex, src, offset, length)
-}
 
-private[nio] object HeapIntBuffer {
+private[nio] object HeapIntBuffer
   private[nio] implicit object NewHeapIntBuffer
-      extends GenHeapBuffer.NewHeapBuffer[IntBuffer, Int] {
+      extends GenHeapBuffer.NewHeapBuffer[IntBuffer, Int]
     def apply(capacity: Int,
               array: Array[Int],
               arrayOffset: Int,
               initialPosition: Int,
               initialLimit: Int,
-              readOnly: Boolean): IntBuffer = {
+              readOnly: Boolean): IntBuffer =
       new HeapIntBuffer(capacity,
                         array,
                         arrayOffset,
                         initialPosition,
                         initialLimit,
                         readOnly)
-    }
-  }
 
   @noinline
   private[nio] def wrap(array: Array[Int],
@@ -104,12 +101,10 @@ private[nio] object HeapIntBuffer {
                         capacity: Int,
                         initialPosition: Int,
                         initialLength: Int,
-                        isReadOnly: Boolean): IntBuffer = {
+                        isReadOnly: Boolean): IntBuffer =
     GenHeapBuffer.generic_wrap(array,
                                arrayOffset,
                                capacity,
                                initialPosition,
                                initialLength,
                                isReadOnly)
-  }
-}

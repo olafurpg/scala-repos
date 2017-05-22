@@ -25,8 +25,8 @@ import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object VectorAssemblerExample {
-  def main(args: Array[String]): Unit = {
+object VectorAssemblerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("VectorAssemblerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -46,6 +46,4 @@ object VectorAssemblerExample {
     println(output.select("features", "clicked").first())
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

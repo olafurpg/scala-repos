@@ -29,11 +29,10 @@ import blueeyes.persistence.mongo._
 import scalaz._
 import scalaz.syntax.monad._
 
-class GridFSFileStorageSpec extends Specification with RealMongoSpecSupport {
+class GridFSFileStorageSpec extends Specification with RealMongoSpecSupport
   include(
-      new FileStorageSpec[Need] {
+      new FileStorageSpec[Need]
     val M: Monad[Need] with Comonad[Need] = Need.need
     lazy val fs =
       GridFSFileStorage(realMongo.getDB("gridFsFileStorageSpec"))(M)
-  })
-}
+  )

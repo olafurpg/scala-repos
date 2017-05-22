@@ -19,16 +19,15 @@ package org.apache.spark.sql
 
 import org.apache.spark.sql.test.SharedSQLContext
 
-class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
+class JsonFunctionsSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("function get_json_object") {
+  test("function get_json_object")
     val df: DataFrame =
       Seq(("""{"name": "alice", "age": 5}""", "")).toDF("a", "b")
     checkAnswer(df.selectExpr("get_json_object(a, '$.name')",
                               "get_json_object(a, '$.age')"),
                 Row("alice", "5"))
-  }
 
   val tuples: Seq[(String, String)] =
     ("1", """{"f1": "value1", "f2": "value2", "f3": 3, "f5": 5.23}""") :: (
@@ -38,7 +37,7 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
         "4", null) :: ("5", """{"f1": "", "f5": null}""") :: (
         "6", "[invalid JSON string]") :: Nil
 
-  test("function get_json_object - null") {
+  test("function get_json_object - null")
     val df: DataFrame = tuples.toDF("key", "jstring")
     val expected =
       Row("1", "value1", "value2", "3", null, "5.23") :: Row(
@@ -59,9 +58,8 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
                           functions.get_json_object($"jstring", "$.f4"),
                           functions.get_json_object($"jstring", "$.f5")),
                 expected)
-  }
 
-  test("json_tuple select") {
+  test("json_tuple select")
     val df: DataFrame = tuples.toDF("key", "jstring")
     val expected =
       Row("1", "value1", "value2", "3", null, "5.23") :: Row(
@@ -85,9 +83,8 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
         df.selectExpr("key",
                       "json_tuple(jstring, 'f1', 'f2', 'f3', 'f4', 'f5')"),
         expected)
-  }
 
-  test("json_tuple filter and group") {
+  test("json_tuple filter and group")
     val df: DataFrame = tuples.toDF("key", "jstring")
     val expr = df
       .select(functions.json_tuple($"jstring", "f1", "f2"))
@@ -98,5 +95,3 @@ class JsonFunctionsSuite extends QueryTest with SharedSQLContext {
     val expected = Row(null, 1) :: Row("2", 2) :: Row("value2", 1) :: Nil
 
     checkAnswer(expr, expected)
-  }
-}

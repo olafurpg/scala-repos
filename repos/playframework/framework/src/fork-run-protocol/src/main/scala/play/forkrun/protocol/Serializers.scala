@@ -8,7 +8,7 @@ import play.runsupport.Reloader.{Source, CompileSuccess, CompileFailure, Compile
 import sbt.protocol._
 import sbt.serialization._
 
-object Serializers {
+object Serializers
 
   implicit def tuple2Pickler[A, B](implicit picklerA: Pickler[A],
                                    picklerB: Pickler[B],
@@ -18,10 +18,10 @@ object Serializers {
                                    aTag: FastTypeTag[A],
                                    bTag: FastTypeTag[B])
     : Pickler[Tuple2[A, B]] with Unpickler[Tuple2[A, B]] =
-    new Pickler[Tuple2[A, B]] with Unpickler[Tuple2[A, B]] {
+    new Pickler[Tuple2[A, B]] with Unpickler[Tuple2[A, B]]
       override def tag: FastTypeTag[Tuple2[A, B]] = tupleTag
 
-      override def pickle(picklee: Tuple2[A, B], builder: PBuilder): Unit = {
+      override def pickle(picklee: Tuple2[A, B], builder: PBuilder): Unit =
         builder.pushHints()
         builder.hintTag(tag)
         builder.hintStaticallyElidedType()
@@ -36,9 +36,8 @@ object Serializers {
 
         builder.endEntry()
         builder.popHints()
-      }
 
-      override def unpickle(tpe: String, reader: PReader): Any = {
+      override def unpickle(tpe: String, reader: PReader): Any =
         reader.pushHints()
         reader.hintStaticallyElidedType()
         reader.hintTag(tag)
@@ -58,8 +57,6 @@ object Serializers {
         reader.endEntry()
         reader.popHints()
         (a, b)
-      }
-    }
 
   implicit val defaultWatchServicePickler: Pickler[
       ForkConfig.DefaultWatchService.type] =
@@ -105,7 +102,7 @@ object Serializers {
       Map[String, Source]] = stringMapPickler[Source]
 
   implicit object playExceptionPickler
-      extends Pickler[PlayException] with Unpickler[PlayException] {
+      extends Pickler[PlayException] with Unpickler[PlayException]
     override def tag: FastTypeTag[PlayException] =
       implicitly[FastTypeTag[PlayException]]
     private val stringOptUnpickler = implicitly[Unpickler[Option[String]]]
@@ -115,38 +112,33 @@ object Serializers {
     private val throwableOptUnpickler =
       implicitly[Unpickler[Option[Throwable]]]
 
-    override def pickle(picklee: PlayException, builder: PBuilder): Unit = {
-      def writeIntField(key: String, value: Int): Unit = {
-        builder.putField(key, { b =>
+    override def pickle(picklee: PlayException, builder: PBuilder): Unit =
+      def writeIntField(key: String, value: Int): Unit =
+        builder.putField(key,  b =>
           b.hintTag(intPickler.tag)
           intPickler.pickle(value, b)
-        })
-      }
-      def writeIntOptField(key: String, value: Integer): Unit = {
-        builder.putField(key, { b =>
+        )
+      def writeIntOptField(key: String, value: Integer): Unit =
+        builder.putField(key,  b =>
           b.hintTag(intOptPickler.tag)
           intOptPickler.pickle(
               if (value == null) None else Some(value.intValue), b)
-        })
-      }
-      def writeStringField(key: String, value: String): Unit = {
-        builder.putField(key, { b =>
+        )
+      def writeStringField(key: String, value: String): Unit =
+        builder.putField(key,  b =>
           b.hintTag(stringPickler.tag)
           stringPickler.pickle(value, b)
-        })
-      }
-      def writeStringOptField(key: String, value: String): Unit = {
-        builder.putField(key, { b =>
+        )
+      def writeStringOptField(key: String, value: String): Unit =
+        builder.putField(key,  b =>
           b.hintTag(stringOptPickler.tag)
           stringOptPickler.pickle(Option(value), b)
-        })
-      }
-      def writeThrowableField(key: String, value: Throwable): Unit = {
-        builder.putField(key, { b =>
+        )
+      def writeThrowableField(key: String, value: Throwable): Unit =
+        builder.putField(key,  b =>
           b.hintTag(throwablePicklerUnpickler.tag)
           throwablePicklerUnpickler.pickle(value, b)
-        })
-      }
+        )
 
       builder.pushHints()
       builder.hintTag(tag)
@@ -156,19 +148,17 @@ object Serializers {
       writeStringField("title", picklee.title)
       writeStringField("description", picklee.description)
       if (picklee.cause != null) writeThrowableField("cause", picklee.cause)
-      picklee match {
+      picklee match
         case x: PlayException.ExceptionSource =>
           writeIntOptField("line", x.line)
           writeIntOptField("position", x.position)
           writeStringOptField("input", x.input)
           writeStringOptField("sourceName", x.sourceName)
         case _ =>
-      }
       builder.endEntry()
       builder.popHints()
-    }
 
-    override def unpickle(tpe: String, reader: PReader): Any = {
+    override def unpickle(tpe: String, reader: PReader): Any =
       def readIntField(key: String): Int =
         intPickler.unpickleEntry(reader.readField(key)).asInstanceOf[Int]
       def readIntOptField(key: String): Option[Int] =
@@ -196,23 +186,19 @@ object Serializers {
       val description = readStringField("description")
       val cause = readThrowableOptField("cause")
       val line = readIntOptField("line")
-      val result = line match {
+      val result = line match
         case Some(l) =>
-          new PlayException.ExceptionSource(title, description, cause.orNull) {
+          new PlayException.ExceptionSource(title, description, cause.orNull)
             val line: java.lang.Integer = l
             val position: java.lang.Integer =
               readIntOptField("position").map(new Integer(_)).orNull
             val input: String = readStringOptField("input").orNull
             val sourceName: String = readStringOptField("sourceName").orNull
-          }
         case None => new PlayException(title, description, cause.orNull)
-      }
       result.id = id
       reader.endEntry()
       reader.popHints()
       result
-    }
-  }
 
   implicit val compileFailurePickler: Pickler[CompileFailure] =
     genPickler[CompileFailure]
@@ -234,24 +220,21 @@ object Serializers {
   implicit val playServerStartedUnpickler: Unpickler[PlayServerStarted] =
     genUnpickler[PlayServerStarted]
 
-  sealed trait LocalRegisteredSerializer {
+  sealed trait LocalRegisteredSerializer
     type T
     def manifest: Manifest[T]
     def serializer: Pickler[T]
     def unserializer: Unpickler[T]
-  }
 
-  object LocalRegisteredSerializer {
+  object LocalRegisteredSerializer
     def fromSbtSerializer[U](
         _serializer: Pickler[U], _unserializer: Unpickler[U])(
         implicit mf: Manifest[U]): LocalRegisteredSerializer =
-      new LocalRegisteredSerializer {
+      new LocalRegisteredSerializer
         type T = U
         val manifest = mf
         val serializer = _serializer
         val unserializer = _unserializer
-      }
-  }
 
   val serializers: Seq[LocalRegisteredSerializer] = List(
       LocalRegisteredSerializer.fromSbtSerializer(
@@ -260,4 +243,3 @@ object Serializers {
           compileResultPickler, compileResultUnpickler),
       LocalRegisteredSerializer.fromSbtSerializer(
           playServerStartedPickler, playServerStartedUnpickler))
-}

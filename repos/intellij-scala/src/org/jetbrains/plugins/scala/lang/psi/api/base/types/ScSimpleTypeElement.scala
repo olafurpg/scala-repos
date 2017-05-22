@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * Author: Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-trait ScSimpleTypeElement extends ScTypeElement with ImplicitParametersOwner {
+trait ScSimpleTypeElement extends ScTypeElement with ImplicitParametersOwner
 
   def reference: Option[ScStableCodeReferenceElement] =
     findChild(classOf[ScStableCodeReferenceElement])
@@ -33,15 +33,12 @@ trait ScSimpleTypeElement extends ScTypeElement with ImplicitParametersOwner {
     * this method will return ClassManifest with substitutor of type T.
     * @return implicit parameters used for this expression
     */
-  def findImplicitParameters: Option[Seq[ScalaResolveResult]] = {
+  def findImplicitParameters: Option[Seq[ScalaResolveResult]] =
     ProgressManager.checkCanceled()
     getNonValueType(TypingContext.empty, withUnnecessaryImplicitsUpdate = true) //to update implicitParameters field
     implicitParameters
-  }
-}
 
-object ScSimpleTypeElement {
+object ScSimpleTypeElement
   def unapply(
       te: ScSimpleTypeElement): Option[Option[ScStableCodeReferenceElement]] =
     Some(te.reference)
-}

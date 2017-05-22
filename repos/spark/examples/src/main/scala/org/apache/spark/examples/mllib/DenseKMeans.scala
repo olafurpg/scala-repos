@@ -32,12 +32,11 @@ import org.apache.spark.mllib.linalg.Vectors
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object DenseKMeans {
+object DenseKMeans
 
-  object InitializationMode extends Enumeration {
+  object InitializationMode extends Enumeration
     type InitializationMode = Value
     val Random, Parallel = Value
-  }
 
   import InitializationMode._
 
@@ -47,10 +46,10 @@ object DenseKMeans {
                     initializationMode: InitializationMode = Parallel)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("DenseKMeans") {
+    val parser = new OptionParser[Params]("DenseKMeans")
       head("DenseKMeans: an example k-means app for dense data.")
       opt[Int]('k', "k")
         .required()
@@ -69,19 +68,15 @@ object DenseKMeans {
         .text("input paths to examples")
         .required()
         .action((x, c) => c.copy(input = x))
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"DenseKMeans with $params")
     val sc = new SparkContext(conf)
 
@@ -89,19 +84,17 @@ object DenseKMeans {
 
     val examples = sc
       .textFile(params.input)
-      .map { line =>
+      .map  line =>
         Vectors.dense(line.split(' ').map(_.toDouble))
-      }
       .cache()
 
     val numExamples = examples.count()
 
     println(s"numExamples = $numExamples.")
 
-    val initMode = params.initializationMode match {
+    val initMode = params.initializationMode match
       case Random => KMeans.RANDOM
       case Parallel => KMeans.K_MEANS_PARALLEL
-    }
 
     val model = new KMeans()
       .setInitializationMode(initMode)
@@ -114,6 +107,4 @@ object DenseKMeans {
     println(s"Total cost = $cost.")
 
     sc.stop()
-  }
-}
 // scalastyle:on println

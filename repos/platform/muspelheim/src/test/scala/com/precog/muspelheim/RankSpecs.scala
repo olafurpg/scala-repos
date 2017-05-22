@@ -22,10 +22,10 @@ package muspelheim
 
 import com.precog.yggdrasil._
 
-trait RankSpecs extends EvalStackSpecs {
+trait RankSpecs extends EvalStackSpecs
   import stack._
-  "Rank processing" should {
-    "perform filter based on rank" >> {
+  "Rank processing" should
+    "perform filter based on rank" >>
       val input = """
         clicks := //clicks
 
@@ -46,15 +46,13 @@ trait RankSpecs extends EvalStackSpecs {
       val actual =
         result collect { case (ids, SDecimal(d)) if ids.size == 1 => d.toInt }
       val expected =
-        evalE("(//clicks).time") collect {
+        evalE("(//clicks).time") collect
           case (ids, SDecimal(d)) if ids.size == 1 => d.toInt
-        }
 
       result must haveSize(size.head)
       actual mustEqual expected
-    }
 
-    "perform filter on distinct set based on rank with a solve" >> {
+    "perform filter on distinct set based on rank with a solve" >>
       val input = """
         clicks := //clicks
 
@@ -77,15 +75,13 @@ trait RankSpecs extends EvalStackSpecs {
       val actual =
         result collect { case (ids, SDecimal(d)) if ids.size == 1 => d.toInt }
       val expected =
-        evalE("distinct((//clicks).time)") collect {
+        evalE("distinct((//clicks).time)") collect
           case (ids, SDecimal(d)) if ids.size == 1 => d.toInt
-        }
 
       result must haveSize(size.head)
       actual mustEqual expected
-    }
 
-    "perform another filter with rank" in {
+    "perform another filter with rank" in
       val input = """
         data := //summer_games/athletes 
         
@@ -117,18 +113,15 @@ trait RankSpecs extends EvalStackSpecs {
 
       result must haveSize(size)
 
-      result must haveAllElementsLike {
-        case (ids, SObject(obj)) => {
+      result must haveAllElementsLike
+        case (ids, SObject(obj)) =>
             ids.length must_== 1
             obj must haveSize(3)
             obj must haveKey("rank")
             obj must haveKey("country")
             obj must haveKey("athletesPerMillion")
-          }
-      }
-    }
 
-    "perform filter on distinct set based on rank without a solve" >> {
+    "perform filter on distinct set based on rank without a solve" >>
       val input = """
         clicks := //clicks
 
@@ -148,15 +141,13 @@ trait RankSpecs extends EvalStackSpecs {
       val actual =
         result collect { case (ids, SDecimal(d)) if ids.size == 1 => d.toInt }
       val expected =
-        evalE("distinct((//clicks).time)") collect {
+        evalE("distinct((//clicks).time)") collect
           case (ids, SDecimal(d)) if ids.size == 1 => d.toInt
-        }
 
       result must haveSize(size.head)
       actual mustEqual expected
-    }
 
-    "perform filter on new set based on rank without a solve" >> {
+    "perform filter on new set based on rank without a solve" >>
       val input = """
         clicks := //clicks
 
@@ -176,16 +167,14 @@ trait RankSpecs extends EvalStackSpecs {
       val actual =
         result collect { case (ids, SDecimal(d)) if ids.size == 1 => d.toInt }
       val expected =
-        evalE("(//clicks).time") collect {
+        evalE("(//clicks).time") collect
           case (ids, SDecimal(d)) if ids.size == 1 => d.toInt
-        }
 
       result must not(beEmpty)
       result must haveSize(size.head)
       actual mustEqual expected
-    }
 
-    "ensure rows of rank 1 exist" >> {
+    "ensure rows of rank 1 exist" >>
       val input = """
         clicks := //clicks
 
@@ -206,16 +195,14 @@ trait RankSpecs extends EvalStackSpecs {
       val actual =
         result collect { case (ids, SDecimal(d)) if ids.size == 1 => d.toInt }
       val expected =
-        evalE("(//clicks).time where (//clicks).time = min((//clicks).time)") collect {
+        evalE("(//clicks).time where (//clicks).time = min((//clicks).time)") collect
           case (ids, SDecimal(d)) if ids.size == 1 => d.toInt
-        }
 
       result must haveSize(size.head)
       actual mustEqual expected
-    }
 
-    "evaluate rank" >> {
-      "of the product of two sets" >> {
+    "evaluate rank" >>
+      "of the product of two sets" >>
         val input =
           """
           | campaigns := //campaigns 
@@ -225,17 +212,14 @@ trait RankSpecs extends EvalStackSpecs {
 
         results must haveSize(2)
 
-        results must haveAllElementsLike {
-          case (ids, SObject(obj)) => {
+        results must haveAllElementsLike
+          case (ids, SObject(obj)) =>
               ids.length must_== 1
               obj must haveSize(5)
               obj must contain("cpm" -> SDecimal(6))
-            }
           case r => failure("Result has wrong shape: " + r)
-        }
-      }
 
-      "using where" >> {
+      "using where" >>
         val input = """
           | campaigns := //campaigns 
           | campaigns where std::stats::rank(campaigns.cpm) = 36""".stripMargin
@@ -244,17 +228,14 @@ trait RankSpecs extends EvalStackSpecs {
 
         results must haveSize(2)
 
-        results must haveAllElementsLike {
-          case (ids, SObject(obj)) => {
+        results must haveAllElementsLike
+          case (ids, SObject(obj)) =>
               ids.length must_== 1
               obj must haveSize(5)
               obj must contain("cpm" -> SDecimal(6))
-            }
           case r => failure("Result has wrong shape: " + r)
-        }
-      }
 
-      "using where and with" >> {
+      "using where and with" >>
         val input =
           """
           | campaigns := //campaigns
@@ -264,9 +245,8 @@ trait RankSpecs extends EvalStackSpecs {
         val results = eval(input)
 
         results mustEqual Set(SDecimal(38))
-      }
 
-      "using a solve" >> {
+      "using a solve" >>
         val input =
           """
           | import std::stats::denseRank
@@ -281,9 +261,8 @@ trait RankSpecs extends EvalStackSpecs {
         val results = eval(input)
 
         results must not be empty
-      }
 
-      "on a set of strings" >> {
+      "on a set of strings" >>
         val input = """
           | std::stats::rank((//campaigns).campaign)""".stripMargin
 
@@ -297,9 +276,8 @@ trait RankSpecs extends EvalStackSpecs {
         results must not be empty
 
         sanityCheck must not be empty
-      }
 
-      "using a solve more than once" >> {
+      "using a solve more than once" >>
         val input = """
           | medals := //summer_games/london_medals
           |
@@ -316,11 +294,9 @@ trait RankSpecs extends EvalStackSpecs {
         val results = eval(input)
 
         results must not be empty
-      }
-    }
 
-    "evaluate denseRank" >> {
-      "using where" >> {
+    "evaluate denseRank" >>
+      "using where" >>
         val input =
           """
           | campaigns := //campaigns 
@@ -330,17 +306,14 @@ trait RankSpecs extends EvalStackSpecs {
 
         results must haveSize(2)
 
-        results must haveAllElementsLike {
-          case (ids, SObject(obj)) => {
+        results must haveAllElementsLike
+          case (ids, SObject(obj)) =>
               ids.length must_== 1
               obj must haveSize(5)
               obj must contain("cpm" -> SDecimal(6))
-            }
           case r => failure("Result has wrong shape: " + r)
-        }
-      }
 
-      "using where and with" >> {
+      "using where and with" >>
         val input =
           """
           | campaigns := //campaigns
@@ -350,9 +323,8 @@ trait RankSpecs extends EvalStackSpecs {
         val results = eval(input)
 
         results mustEqual Set(SDecimal(39))
-      }
 
-      "on a set of strings" >> {
+      "on a set of strings" >>
         val input = """
           | std::stats::denseRank((//campaigns).campaign)""".stripMargin
 
@@ -366,10 +338,8 @@ trait RankSpecs extends EvalStackSpecs {
         results must not be empty
 
         sanityCheck must not be empty
-      }
-    }
 
-    "handle another case of solving on an object with denseRank" in {
+    "handle another case of solving on an object with denseRank" in
       val input =
         """
         | import std::stats::*
@@ -402,6 +372,3 @@ trait RankSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(throwAn[Exception])
-    }
-  }
-}

@@ -34,15 +34,14 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 
-object PixelWriter {
+object PixelWriter
   implicit def sfxPixelWriter2jfx(pw: PixelWriter): jfxsi.PixelWriter =
     if (pw != null) pw.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/PixelWriter.html]]
   */
-trait PixelWriter extends SFXDelegate[jfxsi.PixelWriter] {
+trait PixelWriter extends SFXDelegate[jfxsi.PixelWriter]
 
   /**
     * This method returns the PixelFormat in which the surface stores its pixels, or a roughly equivalent pixel format
@@ -53,16 +52,14 @@ trait PixelWriter extends SFXDelegate[jfxsi.PixelWriter] {
   /**
     * Stores pixel data for a color into the specified coordinates of the surface.
     */
-  def setArgb(x: Int, y: Int, argb: Int) {
+  def setArgb(x: Int, y: Int, argb: Int)
     delegate.setArgb(x, y, argb)
-  }
 
   /**
     * Stores pixel data for a Color into the specified coordinates of the surface.
     */
-  def setColor(x: Int, y: Int, c: Color) {
+  def setColor(x: Int, y: Int, c: Color)
     delegate.setColor(x, y, c)
-  }
 
   /**
     * Stores pixel data from a byte array into a rectangular region of the surface.
@@ -74,9 +71,8 @@ trait PixelWriter extends SFXDelegate[jfxsi.PixelWriter] {
                 pixelformat: PixelFormat[java.nio.ByteBuffer],
                 buffer: Array[Byte],
                 offset: Int,
-                scanlineStride: Int) {
+                scanlineStride: Int)
     delegate.setPixels(x, y, w, h, pixelformat, buffer, offset, scanlineStride)
-  }
 
   /**
     * Stores pixel data from an int array into a rectangular region of the surface.
@@ -88,9 +84,8 @@ trait PixelWriter extends SFXDelegate[jfxsi.PixelWriter] {
                 pixelformat: PixelFormat[java.nio.IntBuffer],
                 buffer: Array[Int],
                 offset: Int,
-                scanlineStride: Int) {
+                scanlineStride: Int)
     delegate.setPixels(x, y, w, h, pixelformat, buffer, offset, scanlineStride)
-  }
 
   /**
     * Stores pixel data from a buffer into a rectangular region of the surface.
@@ -101,9 +96,8 @@ trait PixelWriter extends SFXDelegate[jfxsi.PixelWriter] {
                              h: Int,
                              pixelformat: PixelFormat[B],
                              buffer: B,
-                             scanlineStride: Int) {
+                             scanlineStride: Int)
     delegate.setPixels(x, y, w, h, pixelformat, buffer, scanlineStride)
-  }
 
   /**
     * Stores pixel data retrieved from a PixelReader instance into a rectangular region of the surface.
@@ -114,7 +108,5 @@ trait PixelWriter extends SFXDelegate[jfxsi.PixelWriter] {
                 h: Int,
                 reader: PixelReader,
                 srcx: Int,
-                srcy: Int) {
+                srcy: Int)
     delegate.setPixels(dstx, dsty, w, h, reader, srcx, srcy)
-  }
-}

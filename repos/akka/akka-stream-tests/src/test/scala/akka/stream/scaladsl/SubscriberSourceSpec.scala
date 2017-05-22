@@ -10,13 +10,13 @@ import scala.concurrent.duration._
 
 import scala.concurrent.Await
 
-class SubscriberSourceSpec extends AkkaSpec {
+class SubscriberSourceSpec extends AkkaSpec
 
   implicit val materializer = ActorMaterializer()
 
-  "A SubscriberSource" must {
+  "A SubscriberSource" must
 
-    "be able to use Subscriber in materialized value transformation" in {
+    "be able to use Subscriber in materialized value transformation" in
       val f = Source
         .asSubscriber[Int]
         .mapMaterializedValue(
@@ -24,6 +24,3 @@ class SubscriberSourceSpec extends AkkaSpec {
         .runWith(Sink.fold[Int, Int](0)(_ + _))
 
       Await.result(f, 3.seconds) should be(6)
-    }
-  }
-}

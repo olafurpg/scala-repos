@@ -28,51 +28,47 @@ import org.apache.kafka.common.utils.Utils
 /**
   *  A utility that updates the offset of every broker partition to the offset of earliest or latest log segment file, in ZK.
   */
-object UpdateOffsetsInZK {
+object UpdateOffsetsInZK
   val Earliest = "earliest"
   val Latest = "latest"
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     if (args.length < 3) usage
     val config = new ConsumerConfig(Utils.loadProps(args(1)))
     val zkUtils = ZkUtils(config.zkConnect,
                           config.zkSessionTimeoutMs,
                           config.zkConnectionTimeoutMs,
                           JaasUtils.isZkSecurityEnabled())
-    args(0) match {
+    args(0) match
       case Earliest =>
         getAndSetOffsets(zkUtils, OffsetRequest.EarliestTime, config, args(2))
       case Latest =>
         getAndSetOffsets(zkUtils, OffsetRequest.LatestTime, config, args(2))
       case _ => usage
-    }
-  }
 
   private def getAndSetOffsets(zkUtils: ZkUtils,
                                offsetOption: Long,
                                config: ConsumerConfig,
-                               topic: String): Unit = {
+                               topic: String): Unit =
     val partitionsPerTopicMap = zkUtils.getPartitionsForTopics(List(topic))
     var partitions: Seq[Int] = Nil
 
-    partitionsPerTopicMap.get(topic) match {
+    partitionsPerTopicMap.get(topic) match
       case Some(l) => partitions = l.sortWith((s, t) => s < t)
       case _ => throw new RuntimeException("Can't find topic " + topic)
-    }
 
     var numParts = 0
-    for (partition <- partitions) {
+    for (partition <- partitions)
       val brokerHostingPartition =
         zkUtils.getLeaderForPartition(topic, partition)
 
-      val broker = brokerHostingPartition match {
+      val broker = brokerHostingPartition match
         case Some(b) => b
         case None =>
           throw new KafkaException("Broker " + brokerHostingPartition +
               " is unavailable. Cannot issue " + "getOffsetsBefore request")
-      }
 
-      zkUtils.getBrokerInfo(broker) match {
+      zkUtils.getBrokerInfo(broker) match
         case Some(brokerInfo) =>
           val consumer = new SimpleConsumer(
               brokerInfo.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).host,
@@ -101,14 +97,9 @@ object UpdateOffsetsInZK {
           throw new KafkaException(
               "Broker information for broker id %d does not exist in ZK"
                 .format(broker))
-      }
-    }
     println("updated the offset for " + numParts + " partitions")
-  }
 
-  private def usage() = {
+  private def usage() =
     println("USAGE: " + UpdateOffsetsInZK.getClass.getName +
         " [earliest | latest] consumer.properties topic")
     System.exit(1)
-  }
-}

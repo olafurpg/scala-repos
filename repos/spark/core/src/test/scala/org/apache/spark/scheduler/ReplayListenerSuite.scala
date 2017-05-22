@@ -31,20 +31,18 @@ import org.apache.spark.util.{JsonProtocol, JsonProtocolSuite, Utils}
 /**
   * Test whether ReplayListenerBus replays events from logs correctly.
   */
-class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
+class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter
   private val fileSystem = Utils.getHadoopFileSystem(
       "/", SparkHadoopUtil.get.newConfiguration(new SparkConf()))
   private var testDir: File = _
 
-  before {
+  before
     testDir = Utils.createTempDir()
-  }
 
-  after {
+  after
     Utils.deleteRecursively(testDir)
-  }
 
-  test("Simple replay") {
+  test("Simple replay")
     val logFilePath = Utils.getFilePath(testDir, "events.txt")
     val fstream = fileSystem.create(logFilePath)
     val writer = new PrintWriter(fstream)
@@ -62,31 +60,26 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     val conf = EventLoggingListenerSuite.getLoggingConf(logFilePath)
     val logData = fileSystem.open(logFilePath)
     val eventMonster = new EventMonster(conf)
-    try {
+    try
       val replayer = new ReplayListenerBus()
       replayer.addListener(eventMonster)
       replayer.replay(logData, logFilePath.toString)
-    } finally {
+    finally
       logData.close()
-    }
     assert(eventMonster.loggedEvents.size === 2)
     assert(eventMonster.loggedEvents(0) === JsonProtocol.sparkEventToJson(
             applicationStart))
     assert(eventMonster.loggedEvents(1) === JsonProtocol.sparkEventToJson(
             applicationEnd))
-  }
 
   // This assumes the correctness of EventLoggingListener
-  test("End-to-end replay") {
+  test("End-to-end replay")
     testApplicationReplay()
-  }
 
   // This assumes the correctness of EventLoggingListener
-  test("End-to-end replay with compression") {
-    CompressionCodec.ALL_COMPRESSION_CODECS.foreach { codec =>
+  test("End-to-end replay with compression")
+    CompressionCodec.ALL_COMPRESSION_CODECS.foreach  codec =>
       testApplicationReplay(Some(codec))
-    }
-  }
 
   /* ----------------- *
    * Actual test logic *
@@ -99,7 +92,7 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     * event to the corresponding event replayed from the event logs. This test makes the
     * assumption that the event logging behavior is correct (tested in a separate suite).
     */
-  private def testApplicationReplay(codecName: Option[String] = None) {
+  private def testApplicationReplay(codecName: Option[String] = None)
     val logDirPath = Utils.getFilePath(testDir, "test-replay")
     fileSystem.mkdirs(logDirPath)
 
@@ -123,25 +116,22 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     val logData =
       EventLoggingListener.openEventLog(eventLog.getPath(), fileSystem)
     val eventMonster = new EventMonster(conf)
-    try {
+    try
       val replayer = new ReplayListenerBus()
       replayer.addListener(eventMonster)
       replayer.replay(logData, eventLog.getPath().toString)
-    } finally {
+    finally
       logData.close()
-    }
 
     // Verify the same events are replayed in the same order
     assert(sc.eventLogger.isDefined)
     val originalEvents = sc.eventLogger.get.loggedEvents
     val replayedEvents = eventMonster.loggedEvents
-    originalEvents.zip(replayedEvents).foreach {
+    originalEvents.zip(replayedEvents).foreach
       case (e1, e2) =>
         // Don't compare the JSON here because accumulators in StageInfo may be out of order
         JsonProtocolSuite.assertEquals(JsonProtocol.sparkEventFromJson(e1),
                                        JsonProtocol.sparkEventFromJson(e2))
-    }
-  }
 
   /**
     * A simple listener that buffers all the events it receives.
@@ -156,8 +146,6 @@ class ReplayListenerSuite extends SparkFunSuite with BeforeAndAfter {
     * log the events.
     */
   private class EventMonster(conf: SparkConf)
-      extends EventLoggingListener("test", None, new URI("testdir"), conf) {
+      extends EventLoggingListener("test", None, new URI("testdir"), conf)
 
     override def start() {}
-  }
-}

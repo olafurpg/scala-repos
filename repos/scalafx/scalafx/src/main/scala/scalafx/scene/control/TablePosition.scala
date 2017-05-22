@@ -35,7 +35,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Object companion for [[scalafx.scene.control.TablePosition]]
   */
-object TablePosition {
+object TablePosition
 
   /**
     * Converts a ScalaFX TablePosition into a JavaFX version.
@@ -48,7 +48,6 @@ object TablePosition {
   implicit def sfxTablePosition2jfx[S, T](
       tp: TablePosition[S, T]): jfxsc.TablePosition[S, T] =
     if (tp != null) tp.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TablePosition.html]].
@@ -60,7 +59,7 @@ object TablePosition {
   */
 class TablePosition[S, T](override val delegate: jfxsc.TablePosition[S, T])
     extends TablePositionBase[jfxsc.TableColumn[S, T]](delegate)
-    with SFXDelegate[jfxsc.TablePosition[S, T]] {
+    with SFXDelegate[jfxsc.TablePosition[S, T]]
 
   /**
     * Constructs a TablePosition instance to represent the given row/column position in the given TableView instance.
@@ -72,4 +71,3 @@ class TablePosition[S, T](override val delegate: jfxsc.TablePosition[S, T])
     * The TableView that this TablePosition is related to.
     */
   def tableView: TableView[S] = delegate.getTableView
-}

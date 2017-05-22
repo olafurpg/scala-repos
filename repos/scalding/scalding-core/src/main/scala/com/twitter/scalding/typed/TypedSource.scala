@@ -22,7 +22,7 @@ import cascading.flow.FlowDef
 import cascading.pipe.Pipe
 import cascading.tuple.Fields
 
-trait TypedSource[+T] extends java.io.Serializable {
+trait TypedSource[+T] extends java.io.Serializable
 
   /**
     * Because TupleConverter cannot be covariant, we need to jump through this hoop.
@@ -41,14 +41,11 @@ trait TypedSource[+T] extends java.io.Serializable {
     * Transform this TypedSource into another by mapping after.
     * We don't call this map because of conflicts with Mappable, unfortunately
     */
-  def andThen[U](fn: T => U): TypedSource[U] = {
+  def andThen[U](fn: T => U): TypedSource[U] =
     val self =
       this // compiler generated self can cause problems with serialization
-    new TypedSource[U] {
+    new TypedSource[U]
       override def sourceFields = self.sourceFields
       def converter[V >: U]: TupleConverter[V] = self.converter.andThen(fn)
       def read(implicit fd: FlowDef, mode: Mode): Pipe = self.read
       override def andThen[U1](fn2: U => U1) = self.andThen(fn.andThen(fn2))
-    }
-  }
-}

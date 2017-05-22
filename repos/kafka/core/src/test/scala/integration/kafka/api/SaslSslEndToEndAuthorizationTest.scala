@@ -19,7 +19,7 @@ package kafka.api
 import kafka.server.KafkaConfig
 import org.apache.kafka.common.protocol.SecurityProtocol
 
-class SaslSslEndToEndAuthorizationTest extends EndToEndAuthorizationTest {
+class SaslSslEndToEndAuthorizationTest extends EndToEndAuthorizationTest
   override protected def securityProtocol = SecurityProtocol.SASL_SSL
   override val clientPrincipal = "client"
   override val kafkaPrincipal = "kafka"
@@ -28,4 +28,3 @@ class SaslSslEndToEndAuthorizationTest extends EndToEndAuthorizationTest {
   // client doesn't have a keystore. We want to cover the scenario where a broker requires either SSL client
   // authentication or SASL authentication with SSL as the transport layer (but not both).
   serverConfig.put(KafkaConfig.SslClientAuthProp, "required")
-}

@@ -22,7 +22,7 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types._
 
-case class Max(child: Expression) extends DeclarativeAggregate {
+case class Max(child: Expression) extends DeclarativeAggregate
 
   override def children: Seq[Expression] = child :: Nil
 
@@ -49,11 +49,9 @@ case class Max(child: Expression) extends DeclarativeAggregate {
       /* max = */ Greatest(Seq(max, child))
   )
 
-  override lazy val mergeExpressions: Seq[Expression] = {
+  override lazy val mergeExpressions: Seq[Expression] =
     Seq(
         /* max = */ Greatest(Seq(max.left, max.right))
     )
-  }
 
   override lazy val evaluateExpression: AttributeReference = max
-}

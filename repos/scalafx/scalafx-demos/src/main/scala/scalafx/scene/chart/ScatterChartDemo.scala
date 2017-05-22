@@ -32,13 +32,13 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Side
 import scalafx.scene.Scene
 
-object ScatterChartDemo extends JFXApp {
+object ScatterChartDemo extends JFXApp
 
-  stage = new JFXApp.PrimaryStage {
+  stage = new JFXApp.PrimaryStage
     title = "ScatterChartDemo"
-    scene = new Scene {
+    scene = new Scene
       root = new ScatterChart(
-          NumberAxis("X", 0, 6, 1), NumberAxis("Y", 0, 6, 1)) {
+          NumberAxis("X", 0, 6, 1), NumberAxis("Y", 0, 6, 1))
         title = "Scatter Chart"
         legendSide = Side.Right
         data = ObservableBuffer(
@@ -55,9 +55,6 @@ object ScatterChartDemo extends JFXApp {
             xySeries(
                 "Series 3",
                 Seq((0, 1), (1, 2.55), (2, 4), (3, 3), (4, 4.5), (5, 5.5))))
-      }
-    }
-  }
 
   /** Create XYChart.Series from a sequence of number pairs. */
   def xySeries(name: String, data: Seq[(Double, Double)]) =
@@ -66,4 +63,3 @@ object ScatterChartDemo extends JFXApp {
         ObservableBuffer(
             data.map { case (x, y) => XYChart.Data[Number, Number](x, y) })
     )
-}

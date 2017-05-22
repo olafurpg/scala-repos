@@ -11,8 +11,8 @@ import scala.concurrent.Future
 
 class TaskLoaderImplTest
     extends FunSuite with MarathonSpec with Mockito with GivenWhenThen
-    with ScalaFutures with Matchers {
-  test("loading no tasks") {
+    with ScalaFutures with Matchers
+  test("loading no tasks")
     val f = new Fixture
 
     Given("no tasks")
@@ -29,9 +29,8 @@ class TaskLoaderImplTest
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("loading multiple tasks for multiple apps") {
+  test("loading multiple tasks for multiple apps")
     val f = new Fixture
 
     Given("tasks for multiple apps")
@@ -43,9 +42,8 @@ class TaskLoaderImplTest
     val tasks = Iterable(app1task1, app1task2, app2task1)
 
     f.taskRepository.allIds() returns Future.successful(tasks.map(_.getId))
-    for (task <- tasks) {
+    for (task <- tasks)
       f.taskRepository.task(task.getId) returns Future.successful(Some(task))
-    }
 
     When("loadTasks is called")
     val loaded = f.loader.loadTasks()
@@ -56,12 +54,9 @@ class TaskLoaderImplTest
     val appData2 = TaskTracker.AppTasks(app2Id, Iterable(app2task1))
     val expectedData = TaskTracker.TasksByApp.of(appData1, appData2)
     loaded.futureValue should equal(expectedData)
-  }
 
-  class Fixture {
+  class Fixture
     lazy val taskRepository = mock[TaskRepository]
     lazy val loader = new TaskLoaderImpl(taskRepository)
 
     def verifyNoMoreInteractions(): Unit = noMoreInteractions(taskRepository)
-  }
-}

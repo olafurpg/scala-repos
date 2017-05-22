@@ -1,18 +1,17 @@
 package java.nio
 
-private[nio] object ByteArrayBits {
+private[nio] object ByteArrayBits
   def apply(array: Array[Byte],
             arrayOffset: Int,
             isBigEndian: Boolean,
             indexMultiplier: Int = 1): ByteArrayBits =
     new ByteArrayBits(array, arrayOffset, isBigEndian, indexMultiplier)
-}
 
 @inline
 private[nio] final class ByteArrayBits(array: Array[Byte],
                                        arrayOffset: Int,
                                        isBigEndian: Boolean,
-                                       indexMultiplier: Int) {
+                                       indexMultiplier: Int)
 
   /* We use tuples of bytes instead of, say, arrays, because they can be
    * completely stack-allocated.
@@ -106,10 +105,9 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
                          b4: Byte,
                          b5: Byte,
                          b6: Byte,
-                         b7: Byte): Long = {
+                         b7: Byte): Long =
     (makeIntBE(b0, b1, b2, b3).toLong << 32) |
     (makeIntBE(b4, b5, b6, b7).toLong & 0xffffffffL)
-  }
 
   @inline
   private def makeFloat(bs: (Byte, Byte, Byte, Byte)): Float =
@@ -136,33 +134,30 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
     java.lang.Double.longBitsToDouble(makeLong(b0, b1, b2, b3, b4, b5, b6, b7))
 
   @inline
-  private def unmakeChar(c: Char): (Byte, Byte) = {
+  private def unmakeChar(c: Char): (Byte, Byte) =
     val bs = unmakeCharBE(c)
     if (isBigEndian) bs
     else (bs._2, bs._1)
-  }
 
   @inline
   private def unmakeCharBE(c: Char): (Byte, Byte) =
     ((c >> 8).toByte, c.toByte)
 
   @inline
-  private def unmakeShort(s: Short): (Byte, Byte) = {
+  private def unmakeShort(s: Short): (Byte, Byte) =
     val bs = unmakeShortBE(s)
     if (isBigEndian) bs
     else (bs._2, bs._1)
-  }
 
   @inline
   private def unmakeShortBE(s: Short): (Byte, Byte) =
     ((s >> 8).toByte, s.toByte)
 
   @inline
-  private def unmakeInt(i: Int): (Byte, Byte, Byte, Byte) = {
+  private def unmakeInt(i: Int): (Byte, Byte, Byte, Byte) =
     val bs = unmakeIntBE(i)
     if (isBigEndian) bs
     else (bs._4, bs._3, bs._2, bs._1)
-  }
 
   @inline
   private def unmakeIntBE(i: Int): (Byte, Byte, Byte, Byte) =
@@ -170,13 +165,12 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
 
   @inline
   private def unmakeLong(
-      l: Long): (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte) = {
+      l: Long): (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte) =
     val bs0 = unmakeIntBE((l >>> 32).toInt)
     val bs1 = unmakeIntBE(l.toInt)
     if (isBigEndian)
       (bs0._1, bs0._2, bs0._3, bs0._4, bs1._1, bs1._2, bs1._3, bs1._4)
     else (bs1._4, bs1._3, bs1._2, bs1._1, bs0._4, bs0._3, bs0._2, bs0._1)
-  }
 
   @inline
   private def unmakeFloat(f: Float): (Byte, Byte, Byte, Byte) =
@@ -190,20 +184,18 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
   // Loading and storing bytes
 
   @inline
-  private def load2Bytes(index: Int): (Byte, Byte) = {
+  private def load2Bytes(index: Int): (Byte, Byte) =
     val idx = indexMultiplier * index + arrayOffset
     (array(idx), array(idx + 1))
-  }
 
   @inline
-  private def load4Bytes(index: Int): (Byte, Byte, Byte, Byte) = {
+  private def load4Bytes(index: Int): (Byte, Byte, Byte, Byte) =
     val idx = indexMultiplier * index + arrayOffset
     (array(idx), array(idx + 1), array(idx + 2), array(idx + 3))
-  }
 
   @inline
   private def load8Bytes(
-      index: Int): (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte) = {
+      index: Int): (Byte, Byte, Byte, Byte, Byte, Byte, Byte, Byte) =
     val idx = indexMultiplier * index + arrayOffset
     (array(idx),
      array(idx + 1),
@@ -213,28 +205,25 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
      array(idx + 5),
      array(idx + 6),
      array(idx + 7))
-  }
 
   @inline
-  private def store2Bytes(index: Int, bs: (Byte, Byte)): Unit = {
+  private def store2Bytes(index: Int, bs: (Byte, Byte)): Unit =
     val idx = indexMultiplier * index + arrayOffset
     array(idx) = bs._1
     array(idx + 1) = bs._2
-  }
 
   @inline
-  private def store4Bytes(index: Int, bs: (Byte, Byte, Byte, Byte)): Unit = {
+  private def store4Bytes(index: Int, bs: (Byte, Byte, Byte, Byte)): Unit =
     val idx = indexMultiplier * index + arrayOffset
     array(idx) = bs._1
     array(idx + 1) = bs._2
     array(idx + 2) = bs._3
     array(idx + 3) = bs._4
-  }
 
   @inline
   private def store8Bytes(index: Int,
                           bs: (Byte, Byte, Byte, Byte, Byte, Byte, Byte,
-                          Byte)): Unit = {
+                          Byte)): Unit =
     val idx = indexMultiplier * index + arrayOffset
     array(idx) = bs._1
     array(idx + 1) = bs._2
@@ -244,5 +233,3 @@ private[nio] final class ByteArrayBits(array: Array[Byte],
     array(idx + 5) = bs._6
     array(idx + 6) = bs._7
     array(idx + 7) = bs._8
-  }
-}

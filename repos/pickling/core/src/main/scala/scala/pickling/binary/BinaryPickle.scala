@@ -8,85 +8,79 @@ import scala.reflect.runtime.universe.Mirror
 import java.io.InputStream
 import java.nio.ByteBuffer
 
-abstract class BinaryPickle extends Pickle {
+abstract class BinaryPickle extends Pickle
   type PickleFormatType = BinaryPickleFormat
   type ValueType = Array[Byte]
 
   val value: Array[Byte]
 
   def createReader(format: BinaryPickleFormat): PReader
-}
 
-case class BinaryPickleArray(data: Array[Byte]) extends BinaryPickle {
+case class BinaryPickleArray(data: Array[Byte]) extends BinaryPickle
   val value: Array[Byte] = data
 
   def createReader(format: BinaryPickleFormat): PReader =
     new BinaryPickleReader(new ByteArrayInput(data), format)
 
   override def toString = s"""BinaryPickle(${value.mkString("[", ",", "]")})"""
-}
 
-case class BinaryInputPickle(input: BinaryInput) extends BinaryPickle {
+case class BinaryInputPickle(input: BinaryInput) extends BinaryPickle
   val value: Array[Byte] = Array.ofDim[Byte](0)
 
   def createReader(format: BinaryPickleFormat): PReader =
     new BinaryPickleReader(input, format)
 
   /* Do not override def toString to avoid traversing the input stream. */
-}
 
-object BinaryPickle {
+object BinaryPickle
   def apply(a: Array[Byte]): BinaryPickle = new BinaryPickleArray(a)
   def apply(a: BinaryInput): BinaryPickle = new BinaryInputPickle(a)
   def apply(a: InputStream): BinaryPickle =
     new BinaryInputPickle(new StreamInput(a))
   def apply(a: ByteBuffer): BinaryPickle =
     new BinaryInputPickle(new ByteBufferInput(a))
-}
 
 class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
-    extends BinaryPBuilder with PickleTools {
+    extends BinaryPBuilder with PickleTools
   import format._
 
   private var output: BinaryOutput = out
   private var isIgnoringFields = false
 
-  @inline private[this] def mkOutput(knownSize: Int): Unit = {
+  @inline private[this] def mkOutput(knownSize: Int): Unit =
     if (output == null)
       output = if (knownSize != -1) new FixedByteArrayOutput(knownSize)
       else new ByteArrayOutput
     else output.ensureCapacity(knownSize)
-  }
 
   private def ignoringSharedRefs(action: => PBuilder): PBuilder =
     if (isIgnoringFields) this
     else action
 
   @inline def beginEntry(picklee: Any, tag: FastTypeTag[_]): PBuilder =
-    withHints { hints =>
+    withHints  hints =>
       mkOutput(hints.knownSize)
 
-      if (picklee == null) {
+      if (picklee == null)
         output.putByte(NULL_TAG)
-      } else if (hints.isSharedReference) {
+      else if (hints.isSharedReference)
         output.putByte(REF_TAG)
         output.putInt(hints.oid)
         isIgnoringFields = true
-      } else {
-        if (!hints.isElidedType) {
+      else
+        if (!hints.isElidedType)
           // quickly decide whether we should use picklee.getClass instead
           val ts =
             if (tag.key.contains("anonfun$")) picklee.getClass.getName
             else tag.key
           output.putString(ts)
-        }
 
         // NOTE: it looks like we don't have to write object ids at all
         // traversals employed by pickling and unpickling are exactly the same
         // hence when unpickling it's enough to just increment the nextUnpicklee counter
         // and everything will work out automatically!
 
-        tag.key match {
+        tag.key match
           // PERF: should store typestring once in hints.
           case KEY_UNIT =>
             output.putByte(UNIT_TAG)
@@ -128,69 +122,58 @@ class BinaryPickleBuilder(format: BinaryPickleFormat, out: BinaryOutput)
             output.putDoubleArray(picklee.asInstanceOf[Array[Double]])
           case _ =>
             if (hints.isElidedType) output.putByte(ELIDED_TAG)
-        }
-      }
       this
-    }
 
   @inline def putField(name: String, pickler: PBuilder => Unit): PBuilder =
-    ignoringSharedRefs {
+    ignoringSharedRefs
       // can skip writing name if we pickle/unpickle in the same order
       pickler(this)
       this
-    }
 
-  @inline def endEntry(): Unit = {
+  @inline def endEntry(): Unit =
     /* do nothing */
     // We always reset this:
     isIgnoringFields = false
-  }
 
-  @inline def beginCollection(length: Int): PBuilder = ignoringSharedRefs {
+  @inline def beginCollection(length: Int): PBuilder = ignoringSharedRefs
     output.putInt(length)
     this
-  }
 
   @inline def putElement(pickler: PBuilder => Unit): PBuilder =
-    ignoringSharedRefs {
+    ignoringSharedRefs
       pickler(this)
       this
-    }
 
   @inline def endCollection(): Unit = {}
 
-  @inline def result() = {
+  @inline def result() =
     BinaryPickle(output.result)
-  }
-}
 
-abstract class AbstractBinaryReader() {
+abstract class AbstractBinaryReader()
   protected var _lastTypeStringRead: String = null
   // TODO - ok to hack this?
   def lastTagRead: String = _lastTypeStringRead
-}
 
 class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
-    extends AbstractBinaryReader() with PReader with PickleTools {
+    extends AbstractBinaryReader() with PReader with PickleTools
   import format._
 
-  def beginEntry: String = {
-    val res: Any = withHints { hints =>
+  def beginEntry: String =
+    val res: Any = withHints  hints =>
       if (hints.isElidedType &&
-          nullablePrimitives.contains(hints.elidedType.get.key)) {
+          nullablePrimitives.contains(hints.elidedType.get.key))
         val lookahead = in.getByte()
-        lookahead match {
+        lookahead match
           case UNIT_TAG => FastTypeTag.Unit
           case NULL_TAG => FastTypeTag.Null
           case REF_TAG => FastTypeTag.Ref
           case _ => in.setLookahead(lookahead); hints.elidedType.get
-        }
-      } else if (hints.isElidedType &&
-                 primitives.contains(hints.elidedType.get.key)) {
+      else if (hints.isElidedType &&
+                 primitives.contains(hints.elidedType.get.key))
         hints.elidedType.get
-      } else {
+      else
         val lookahead = in.getByte()
-        lookahead match {
+        lookahead match
           case NULL_TAG =>
             FastTypeTag.Null
           case ELIDED_TAG =>
@@ -200,25 +183,19 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
             FastTypeTag.Ref
           case _ =>
             // do not consume lookahead byte
-            val res = try {
+            val res = try
               in.getStringWithLookahead(lookahead)
-            } catch {
+            catch
               case PicklingException(msg, cause) =>
                 throw PicklingException(
                     s"error decoding type string. debug info: $hints\ncause:$msg")
-            }
             res
-        }
-      }
-    }
-    if (res.isInstanceOf[String]) {
+    if (res.isInstanceOf[String])
       _lastTypeStringRead = res.asInstanceOf[String]
       _lastTypeStringRead
-    } else {
+    else
       _lastTypeStringRead = res.asInstanceOf[FastTypeTag[_]].key
       _lastTypeStringRead
-    }
-  }
 
   //def beginEntry(): FastTypeTag[_] = {
   //  beginEntryNoTag()
@@ -227,8 +204,8 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
 
   def atPrimitive: Boolean = primitives.contains(lastTagRead)
 
-  def readPrimitive(): Any = {
-    val res = lastTagRead match {
+  def readPrimitive(): Any =
+    val res = lastTagRead match
       case KEY_NULL => null
       case KEY_REF => lookupUnpicklee(in.getInt)
       case KEY_BYTE => in.getByte
@@ -250,9 +227,7 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
       case KEY_ARRAY_BOOLEAN => in.getBooleanArray
       case KEY_ARRAY_FLOAT => in.getFloatArray
       case KEY_ARRAY_DOUBLE => in.getDoubleArray
-    }
     res
-  }
 
   def atObject: Boolean = !atPrimitive
 
@@ -268,4 +243,3 @@ class BinaryPickleReader(in: BinaryInput, format: BinaryPickleFormat)
   def readElement(): PReader = this
 
   def endCollection(): Unit = { /* do nothing */ }
-}

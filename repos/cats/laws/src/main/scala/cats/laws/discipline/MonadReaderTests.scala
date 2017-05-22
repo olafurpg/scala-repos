@@ -6,7 +6,7 @@ import cats.laws.discipline.CartesianTests.Isomorphisms
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
-trait MonadReaderTests[F[_], R] extends MonadTests[F] {
+trait MonadReaderTests[F[_], R] extends MonadTests[F]
   def laws: MonadReaderLaws[F, R]
 
   def monadReader[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
@@ -21,8 +21,8 @@ trait MonadReaderTests[F[_], R] extends MonadTests[F] {
       EqFC: Eq[F[C]],
       EqFR: Eq[F[R]],
       EqFABC: Eq[F[(A, B, C)]],
-      iso: Isomorphisms[F]): RuleSet = {
-    new RuleSet {
+      iso: Isomorphisms[F]): RuleSet =
+    new RuleSet
       def name: String = "monadReader"
       def bases: Seq[(String, RuleSet)] = Nil
       def parents: Seq[RuleSet] = Seq(monad[A, B, C])
@@ -33,13 +33,8 @@ trait MonadReaderTests[F[_], R] extends MonadTests[F] {
           "monadReader local flatMap" -> forAll(
               laws.monadReaderLocalFlatMap[A, B] _)
       )
-    }
-  }
-}
 
-object MonadReaderTests {
+object MonadReaderTests
   def apply[F[_], R](implicit FR: MonadReader[F, R]): MonadReaderTests[F, R] =
-    new MonadReaderTests[F, R] {
+    new MonadReaderTests[F, R]
       def laws: MonadReaderLaws[F, R] = MonadReaderLaws[F, R]
-    }
-}

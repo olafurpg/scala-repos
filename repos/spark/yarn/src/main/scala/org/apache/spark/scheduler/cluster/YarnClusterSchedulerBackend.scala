@@ -27,19 +27,18 @@ import org.apache.spark.util.Utils
 
 private[spark] class YarnClusterSchedulerBackend(
     scheduler: TaskSchedulerImpl, sc: SparkContext)
-    extends YarnSchedulerBackend(scheduler, sc) {
+    extends YarnSchedulerBackend(scheduler, sc)
 
-  override def start() {
+  override def start()
     val attemptId = ApplicationMaster.getAttemptId
     bindToYarn(attemptId.getApplicationId(), Some(attemptId))
     super.start()
     totalExpectedExecutors = YarnSparkHadoopUtil
       .getInitialTargetExecutorNumber(sc.conf)
-  }
 
-  override def getDriverLogUrls: Option[Map[String, String]] = {
+  override def getDriverLogUrls: Option[Map[String, String]] =
     var driverLogs: Option[Map[String, String]] = None
-    try {
+    try
       val yarnConf = new YarnConfiguration(sc.hadoopConfiguration)
       val containerId = YarnSparkHadoopUtil.get.getContainerId
 
@@ -60,12 +59,9 @@ private[spark] class YarnClusterSchedulerBackend(
       driverLogs = Some(
           Map("stderr" -> s"$baseUrl/stderr?start=-4096",
               "stdout" -> s"$baseUrl/stdout?start=-4096"))
-    } catch {
+    catch
       case e: Exception =>
         logInfo("Error while building AM log links, so AM" +
                 " logs link will not appear in application UI",
                 e)
-    }
     driverLogs
-  }
-}

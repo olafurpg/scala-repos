@@ -42,16 +42,16 @@ import scalafx.scene.shape.Circle
 /**
   * Vanishing Circles
   */
-object VanishingCircles extends JFXApp {
+object VanishingCircles extends JFXApp
   var circles: Seq[Circle] = null
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Vanishing Circles"
     width = 800
     height = 600
-    scene = new Scene {
+    scene = new Scene
       fill = Black
       circles = for (i <- 0 until 50) yield
-        new Circle {
+        new Circle
           centerX = random * 800
           centerY = random * 600
           radius = 150
@@ -61,23 +61,17 @@ object VanishingCircles extends JFXApp {
           strokeWidth <== when(hover) choose 4 otherwise 0
           stroke = White
           // add this for event listeners:
-          onMouseClicked = handle {
+          onMouseClicked = handle
             Timeline(at(3 s) { radius -> 0 }).play()
-          }
-        }
       content = circles
-    }
-  }
   // add this for animation:
-  new Timeline {
+  new Timeline
     cycleCount = Indefinite
     autoReverse = true
     keyFrames = for (circle <- circles) yield
-      at(40 s) {
+      at(40 s)
         Set(
             circle.centerX -> random * stage.width(),
             circle.centerY -> random * stage.height()
         )
-      }
-  }.play()
-}
+  .play()

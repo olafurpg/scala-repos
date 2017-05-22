@@ -22,7 +22,7 @@ import java.io.File
 /**
   * Resolves paths to files added through `SparkContext.addFile()`.
   */
-object SparkFiles {
+object SparkFiles
 
   /**
     * Get the absolute path of a file added through `SparkContext.addFile()`.
@@ -35,4 +35,3 @@ object SparkFiles {
     */
   def getRootDirectory(): String =
     SparkEnv.get.sparkFilesDir
-}

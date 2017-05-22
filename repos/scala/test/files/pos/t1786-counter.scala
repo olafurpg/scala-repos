@@ -1,40 +1,34 @@
 trait ShapeLevel
 
-object Fail {
+object Fail
   abstract class ProductNodeShape[
       Level <: ShapeLevel, C, M <: C, U <: C, P <: C]
-      extends Shape[Level, M, U, P] {
+      extends Shape[Level, M, U, P]
     def copy(shapes: Seq[Shape[_, _, _, _]]): Shape[Level, _, _, _]
-  }
 
   abstract class Shape[Level <: ShapeLevel, -Mixed_, Unpacked_, Packed_]
 
   final class TupleShape[
       Level <: ShapeLevel, M <: Product, U <: Product, P <: Product](
       val shapes: Shape[_, _, _, _]*)
-      extends ProductNodeShape[Level, Product, M, U, P] {
+      extends ProductNodeShape[Level, Product, M, U, P]
     def copy(shapes: Seq[Shape[_, _, _, _]]): Shape[Level, _, _, _] = ???
-  }
 
   trait ShapeLevel
-}
 
-object Ok {
+object Ok
   abstract class Shape[Level <: ShapeLevel, -Mixed_, Unpacked_, Packed_]
 
   abstract class ProductNodeShape[
       Level <: ShapeLevel, C, M <: C, U <: C, P <: C]
-      extends Shape[Level, M, U, P] {
+      extends Shape[Level, M, U, P]
     def copy(shapes: Seq[Shape[_, _, _, _]]): Shape[Level, _, _, _]
-  }
 
   final class TupleShape[
       Level <: ShapeLevel, M <: Product, U <: Product, P <: Product](
       val shapes: Shape[_, _, _, _]*)
-      extends ProductNodeShape[Level, Product, M, U, P] {
+      extends ProductNodeShape[Level, Product, M, U, P]
     def copy(shapes: Seq[Shape[_, _, _, _]]): Shape[Level, _, _, _] = ???
-  }
-}
 
 // This is why we reverted the fix for SI-1786 -- see SI-6169 for a potential alternative that could be extended to cover this.
 // both objects type check on 2.10.3, but only Ok was accepted by 2.11 after the original fix to SI-1786.

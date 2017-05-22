@@ -29,7 +29,7 @@ import org.apache.spark.streaming.util.{FileBasedWriteAheadLogSegment, FileBased
 import org.apache.spark.util.Utils
 
 class WriteAheadLogBackedBlockRDDSuite
-    extends SparkFunSuite with BeforeAndAfterAll with BeforeAndAfterEach {
+    extends SparkFunSuite with BeforeAndAfterAll with BeforeAndAfterEach
 
   val conf = new SparkConf()
     .setMaster("local[2]")
@@ -41,73 +41,60 @@ class WriteAheadLogBackedBlockRDDSuite
   var blockManager: BlockManager = null
   var dir: File = null
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
     dir = Utils.createTempDir()
-  }
 
-  override def afterEach(): Unit = {
-    try {
+  override def afterEach(): Unit =
+    try
       Utils.deleteRecursively(dir)
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     sparkContext = new SparkContext(conf)
     blockManager = sparkContext.env.blockManager
-  }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     // Copied from LocalSparkContext, simpler than to introduced test dependencies to core tests.
-    try {
+    try
       sparkContext.stop()
       System.clearProperty("spark.driver.port")
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
-  test("Read data available in both block manager and write ahead log") {
+  test("Read data available in both block manager and write ahead log")
     testRDD(numPartitions = 5, numPartitionsInBM = 5, numPartitionsInWAL = 5)
-  }
 
-  test("Read data available only in block manager, not in write ahead log") {
+  test("Read data available only in block manager, not in write ahead log")
     testRDD(numPartitions = 5, numPartitionsInBM = 5, numPartitionsInWAL = 0)
-  }
 
-  test("Read data available only in write ahead log, not in block manager") {
+  test("Read data available only in write ahead log, not in block manager")
     testRDD(numPartitions = 5, numPartitionsInBM = 0, numPartitionsInWAL = 5)
-  }
 
   test(
-      "Read data with partially available in block manager, and rest in write ahead log") {
+      "Read data with partially available in block manager, and rest in write ahead log")
     testRDD(numPartitions = 5, numPartitionsInBM = 3, numPartitionsInWAL = 2)
-  }
 
-  test("Test isBlockValid skips block fetching from BlockManager") {
+  test("Test isBlockValid skips block fetching from BlockManager")
     testRDD(numPartitions = 5,
             numPartitionsInBM = 5,
             numPartitionsInWAL = 0,
             testIsBlockValid = true)
-  }
 
-  test("Test whether RDD is valid after removing blocks from block manager") {
+  test("Test whether RDD is valid after removing blocks from block manager")
     testRDD(numPartitions = 5,
             numPartitionsInBM = 5,
             numPartitionsInWAL = 5,
             testBlockRemove = true)
-  }
 
   test(
-      "Test storing of blocks recovered from write ahead log back into block manager") {
+      "Test storing of blocks recovered from write ahead log back into block manager")
     testRDD(numPartitions = 5,
             numPartitionsInBM = 0,
             numPartitionsInWAL = 5,
             testStoreInBM = true)
-  }
 
   /**
     * Test the WriteAheadLogBackedRDD, by writing some partitions of the data to block manager
@@ -145,7 +132,7 @@ class WriteAheadLogBackedBlockRDDSuite
       testIsBlockValid: Boolean = false,
       testBlockRemove: Boolean = false,
       testStoreInBM: Boolean = false
-  ) {
+  )
     require(numPartitionsInBM <= numPartitions,
             "Can't put more partitions in BlockManager than that in RDD")
     require(numPartitionsInWAL <= numPartitions,
@@ -155,11 +142,10 @@ class WriteAheadLogBackedBlockRDDSuite
     // Put the necessary blocks in the block manager
     val blockIds = Array.fill(numPartitions)(
         StreamBlockId(Random.nextInt(), Random.nextInt()))
-    data.zip(blockIds).take(numPartitionsInBM).foreach {
+    data.zip(blockIds).take(numPartitionsInBM).foreach
       case (block, blockId) =>
         blockManager.putIterator(
             blockId, block.iterator, StorageLevel.MEMORY_ONLY_SER)
-    }
 
     // Generate write ahead log record handles
     val recordHandles =
@@ -205,7 +191,7 @@ class WriteAheadLogBackedBlockRDDSuite
     // This is done by using a RDD whose data is only in memory but is set to skip block fetching
     // Using that RDD will throw exception, as it skips block fetching even if the blocks are in
     // in BlockManager.
-    if (testIsBlockValid) {
+    if (testIsBlockValid)
       require(numPartitionsInBM === numPartitions,
               "All partitions must be in BlockManager")
       require(numPartitionsInWAL === 0, "No partitions must be in WAL")
@@ -214,23 +200,20 @@ class WriteAheadLogBackedBlockRDDSuite
           blockIds.toArray,
           recordHandles.toArray,
           isBlockIdValid = Array.fill(blockIds.length)(false))
-      intercept[SparkException] {
+      intercept[SparkException]
         rdd2.collect()
-      }
-    }
 
     // Verify that the RDD is not invalid after the blocks are removed and can still read data
     // from write ahead log
-    if (testBlockRemove) {
+    if (testBlockRemove)
       require(numPartitions === numPartitionsInWAL,
               "All partitions must be in WAL for this test")
       require(numPartitionsInBM > 0,
               "Some partitions must be in BlockManager for this test")
       rdd.removeBlocks()
       assert(rdd.collect() === data.flatten)
-    }
 
-    if (testStoreInBM) {
+    if (testStoreInBM)
       val rdd2 = new WriteAheadLogBackedBlockRDD[String](
           sparkContext,
           blockIds.toArray,
@@ -242,27 +225,21 @@ class WriteAheadLogBackedBlockRDDSuite
           blockIds.forall(blockManager.get(_).nonEmpty),
           "All blocks not found in block manager"
       )
-    }
-  }
 
   private def generateWALRecordHandles(
       blockData: Seq[Seq[String]],
       blockIds: Seq[BlockId]
-  ): Seq[FileBasedWriteAheadLogSegment] = {
+  ): Seq[FileBasedWriteAheadLogSegment] =
     require(blockData.size === blockIds.size)
     val writer = new FileBasedWriteAheadLogWriter(
         new File(dir, "logFile").toString, hadoopConf)
-    val segments = blockData.zip(blockIds).map {
+    val segments = blockData.zip(blockIds).map
       case (data, id) =>
         writer.write(
             blockManager.dataSerialize(id, data.iterator).toByteBuffer)
-    }
     writer.close()
     segments
-  }
 
   private def generateFakeRecordHandles(
-      count: Int): Seq[FileBasedWriteAheadLogSegment] = {
+      count: Int): Seq[FileBasedWriteAheadLogSegment] =
     Array.fill(count)(new FileBasedWriteAheadLogSegment("random", 0L, 0))
-  }
-}

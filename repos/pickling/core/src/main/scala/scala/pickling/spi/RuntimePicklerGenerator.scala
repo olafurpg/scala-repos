@@ -6,7 +6,7 @@ import scala.reflect.runtime.universe.Mirror
 /**
   * An interface for things which can generate picklers/unpicklers at runtime.
   */
-trait RuntimePicklerGenerator {
+trait RuntimePicklerGenerator
 
   /** Create a new pickler using the given tagKey. */
   def genPickler(
@@ -16,4 +16,3 @@ trait RuntimePicklerGenerator {
   /** Create a new unpickler using the given tagKey. */
   def genUnpickler(mirror: Mirror, key: String)(
       implicit share: refs.Share): Unpickler[_]
-}

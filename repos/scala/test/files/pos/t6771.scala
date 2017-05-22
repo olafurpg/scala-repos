@@ -1,9 +1,7 @@
-object Test {
+object Test
   type Id[X] = X
   val a: Id[Option[Int]] = None
 
-  a match {
+  a match
     case Some(x) => println(x)
     case None =>
-  }
-}

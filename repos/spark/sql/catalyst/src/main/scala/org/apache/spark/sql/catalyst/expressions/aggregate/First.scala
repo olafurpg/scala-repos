@@ -29,16 +29,15 @@ import org.apache.spark.sql.types._
   * a single partition, and we use a single reducer to do the aggregation.).
   */
 case class First(child: Expression, ignoreNullsExpr: Expression)
-    extends DeclarativeAggregate {
+    extends DeclarativeAggregate
 
   def this(child: Expression) = this(child, Literal.create(false, BooleanType))
 
-  private val ignoreNulls: Boolean = ignoreNullsExpr match {
+  private val ignoreNulls: Boolean = ignoreNullsExpr match
     case Literal(b: Boolean, BooleanType) => b
     case _ =>
       throw new AnalysisException(
           "The second argument of First should be a boolean literal.")
-  }
 
   override def children: Seq[Expression] = child :: Nil
 
@@ -65,21 +64,19 @@ case class First(child: Expression, ignoreNullsExpr: Expression)
       /* valueSet = */ Literal.create(false, BooleanType)
   )
 
-  override lazy val updateExpressions: Seq[Expression] = {
-    if (ignoreNulls) {
+  override lazy val updateExpressions: Seq[Expression] =
+    if (ignoreNulls)
       Seq(
           /* first = */ If(Or(valueSet, IsNull(child)), first, child),
           /* valueSet = */ Or(valueSet, IsNotNull(child))
       )
-    } else {
+    else
       Seq(
           /* first = */ If(valueSet, first, child),
           /* valueSet = */ Literal.create(true, BooleanType)
       )
-    }
-  }
 
-  override lazy val mergeExpressions: Seq[Expression] = {
+  override lazy val mergeExpressions: Seq[Expression] =
     // For first, we can just check if valueSet.left is set to true. If it is set
     // to true, we use first.right. If not, we use first.right (even if valueSet.right is
     // false, we are safe to do so because first.right will be null in this case).
@@ -87,10 +84,8 @@ case class First(child: Expression, ignoreNullsExpr: Expression)
         /* first = */ If(valueSet.left, first.left, first.right),
         /* valueSet = */ Or(valueSet.left, valueSet.right)
     )
-  }
 
   override lazy val evaluateExpression: AttributeReference = first
 
   override def toString: String =
     s"first($child)${if (ignoreNulls) " ignore nulls"}"
-}

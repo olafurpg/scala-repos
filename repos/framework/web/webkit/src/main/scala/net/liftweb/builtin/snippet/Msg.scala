@@ -61,18 +61,17 @@ import JsCmds._
   * @see net.liftweb.http.S#error(String,NodeSeq)
   * @see net.liftweb.http.LiftRules#noticesEffects
   */
-object Msg extends DispatchSnippet {
-  def dispatch: DispatchIt = {
+object Msg extends DispatchSnippet
+  def dispatch: DispatchIt =
     case _ => render
-  }
 
   /**
     * This method performs extraction of the CSS class attributes
     * as well as rendering of any messages for the given id.
     */
-  def render(styles: NodeSeq): NodeSeq = {
-    attr("id") match {
-      case Full(id) => {
+  def render(styles: NodeSeq): NodeSeq =
+    attr("id") match
+      case Full(id) =>
           // Extract the currently set CSS
           (attr("errorClass") or attr("errorclass"))
             .map(cls => MsgErrorMeta += (id -> cls))
@@ -82,10 +81,7 @@ object Msg extends DispatchSnippet {
             .map(cls => MsgNoticeMeta += (id -> cls))
 
           <span id={id}>{renderIdMsgs(id)}</span> ++ effects(id)
-        }
       case _ => NodeSeq.Empty
-    }
-  }
 
   /**
     * This method renders the &lt;span/> for a given id's notices,
@@ -95,32 +91,26 @@ object Msg extends DispatchSnippet {
     * @see net.liftweb.http.S#error(String,NodeSeq)
     * @see net.liftweb.http.LiftRules#noticesEffects
     */
-  def renderIdMsgs(id: String): NodeSeq = {
+  def renderIdMsgs(id: String): NodeSeq =
     val msgs: List[NodeSeq] = List(
         (S.messagesById(id)(S.errors), MsgErrorMeta.get.get(id)),
         (S.messagesById(id)(S.warnings), MsgWarningMeta.get.get(id)),
-        (S.messagesById(id)(S.notices), MsgNoticeMeta.get.get(id))).flatMap {
+        (S.messagesById(id)(S.notices), MsgNoticeMeta.get.get(id))).flatMap
       case (msg, style) =>
-        msg.toList match {
+        msg.toList match
           case Nil => Nil
           case msgList =>
-            style match {
+            style match
               case Some(s) =>
                 msgList.flatMap(t => <span>{t}</span> % ("class" -> s))
               case _ => msgList flatMap (n => n)
-            }
-        }
-    }
 
     // Join multiple messages together with a comma
-    msgs match {
+    msgs match
       case Nil => Text("")
       case spans =>
-        spans.reduceLeft { (output, span) =>
+        spans.reduceLeft  (output, span) =>
           output ++ Text(", ") ++ span
-        }
-    }
-  }
 
   /** 
     * This method produces and appends a script element to lift's page script 
@@ -130,29 +120,25 @@ object Msg extends DispatchSnippet {
     */
   def effects(id: String): NodeSeq =
     Msgs.effects(Empty, id, NodeSeq.Empty, Msgs.appendScript)
-}
 
 /**
   * This SessionVar holds a map of per-id CSS classes for error notices
   * so that the AJAX and static renderers use the same formatting.
   */
-object MsgErrorMeta extends SessionVar[HashMap[String, String]](new HashMap) {
+object MsgErrorMeta extends SessionVar[HashMap[String, String]](new HashMap)
   override private[liftweb] def magicSessionVar_? = true
-}
 
 /**
   * This SessionVar holds a map of per-id CSS classes for warning notices
   * so that the AJAX and static renderers use the same formatting.
   */
 object MsgWarningMeta
-    extends SessionVar[HashMap[String, String]](new HashMap) {
+    extends SessionVar[HashMap[String, String]](new HashMap)
   override private[liftweb] def magicSessionVar_? = true
-}
 
 /**
   * This SessionVar holds a map of per-id CSS classes for notice notices
   * so that the AJAX and static renderers use the same formatting.
   */
-object MsgNoticeMeta extends SessionVar[HashMap[String, String]](new HashMap) {
+object MsgNoticeMeta extends SessionVar[HashMap[String, String]](new HashMap)
   override private[liftweb] def magicSessionVar_? = true
-}

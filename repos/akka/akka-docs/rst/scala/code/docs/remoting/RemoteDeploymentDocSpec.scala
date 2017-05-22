@@ -10,12 +10,10 @@ import akka.actor.{Props, Deploy, Address, AddressFromURIString}
 import akka.remote.RemoteScope
 //#import
 
-object RemoteDeploymentDocSpec {
+object RemoteDeploymentDocSpec
 
-  class SampleActor extends Actor {
+  class SampleActor extends Actor
     def receive = { case _ => sender() ! self }
-  }
-}
 
 class RemoteDeploymentDocSpec
     extends AkkaSpec("""
@@ -23,7 +21,7 @@ class RemoteDeploymentDocSpec
     akka.remote.netty.tcp {
       port = 0
     }
-""") with ImplicitSender {
+""") with ImplicitSender
 
   import RemoteDeploymentDocSpec._
 
@@ -36,7 +34,7 @@ class RemoteDeploymentDocSpec
 
   override def afterTermination() { shutdown(other) }
 
-  "demonstrate programmatic deployment" in {
+  "demonstrate programmatic deployment" in
     //#deploy
     val ref = system.actorOf(
         Props[SampleActor].withDeploy(Deploy(scope = RemoteScope(address))))
@@ -44,21 +42,17 @@ class RemoteDeploymentDocSpec
     ref.path.address should be(address)
     ref ! "test"
     expectMsgType[ActorRef].path.address should be(address)
-  }
 
-  "demonstrate address extractor" in {
+  "demonstrate address extractor" in
     //#make-address
     val one = AddressFromURIString("akka.tcp://sys@host:1234")
     val two = Address("akka.tcp", "sys", "host", 1234) // this gives the same
     //#make-address
     one should be(two)
-  }
 
-  "demonstrate sampleActor" in {
+  "demonstrate sampleActor" in
     //#sample-actor
 
     val actor = system.actorOf(Props[SampleActor], "sampleActor")
     actor ! "Pretty slick"
     //#sample-actor
-  }
-}

@@ -33,11 +33,11 @@ import javafx.{event => jfxe}
 import scala.language.implicitConversions
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 
-object KeyCombination {
+object KeyCombination
 
   object ModifierValue
       extends SFXEnumDelegateCompanion[
-          jfxsi.KeyCombination.ModifierValue, ModifierValue] {
+          jfxsi.KeyCombination.ModifierValue, ModifierValue]
 
     /**
       * Constant which indicates that the modifier key can be either up or down.
@@ -64,7 +64,6 @@ object KeyCombination {
 
     protected override def unsortedValues: Array[ModifierValue] =
       Array(Any, Down, Up)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/KeyCombination.ModifierValue.html]]
@@ -73,13 +72,12 @@ object KeyCombination {
       override val delegate: jfxsi.KeyCombination.ModifierValue)
       extends SFXEnumDelegate[jfxsi.KeyCombination.ModifierValue]
 
-  object Modifier {
+  object Modifier
     implicit def sfxModifier2jfx(m: Modifier): jfxsi.KeyCombination.Modifier =
       if (m != null) m.delegate else null
-  }
 
   class Modifier(override val delegate: jfxsi.KeyCombination.Modifier)
-      extends SFXDelegate[jfxsi.KeyCombination.Modifier] {
+      extends SFXDelegate[jfxsi.KeyCombination.Modifier]
 
     /**
       * Gets the modifier key of this Modifier.
@@ -90,7 +88,6 @@ object KeyCombination {
       * Gets the modifier value of this Modifier.
       */
     def value: ModifierValue = ModifierValue.jfxEnum2sfx(delegate.getValue)
-  }
 
   implicit def sfxKeyCombination2jfx(
       kc: KeyCombination): jfxsi.KeyCombination =
@@ -163,11 +160,10 @@ object KeyCombination {
     */
   def apply(value: String): KeyCombination =
     new KeyCombination(jfxsi.KeyCombination.valueOf(value)) {}
-}
 
 abstract class KeyCombination protected (
     override val delegate: jfxsi.KeyCombination)
-    extends SFXDelegate[jfxsi.KeyCombination] {
+    extends SFXDelegate[jfxsi.KeyCombination]
 
   /**
     * The state of the alt key in this key combination.
@@ -216,4 +212,3 @@ abstract class KeyCombination protected (
     * Tests whether this key combination matches the combination in the given KeyEvent.
     */
   def `match`(event: KeyEvent) = delegate.`match`(event)
-}

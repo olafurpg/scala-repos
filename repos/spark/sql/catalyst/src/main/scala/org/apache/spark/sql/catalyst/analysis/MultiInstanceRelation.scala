@@ -28,6 +28,5 @@ import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
   * During analysis, operators that include this trait may be asked to produce a new version
   * of itself with globally unique expression ids.
   */
-trait MultiInstanceRelation {
+trait MultiInstanceRelation
   def newInstance(): LogicalPlan
-}

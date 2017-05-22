@@ -8,18 +8,17 @@ package reflect
 package io
 
 /** ''Note:  This library is considered experimental and should not be used unless you know what you are doing.'' */
-class PlainDirectory(givenPath: Directory) extends PlainFile(givenPath) {
+class PlainDirectory(givenPath: Directory) extends PlainFile(givenPath)
   override def isDirectory = true
   override def iterator =
     givenPath.list filter (_.exists) map (x => new PlainFile(x))
   override def delete(): Unit = givenPath.deleteRecursively()
-}
 
 /** This class implements an abstract file backed by a File.
   *
   * ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-class PlainFile(val givenPath: Path) extends AbstractFile {
+class PlainFile(val givenPath: Path) extends AbstractFile
   assert(path ne null)
 
   val file = givenPath.jfile
@@ -43,10 +42,9 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
 
   override def toString = path
   override def hashCode(): Int = fpath.hashCode()
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case x: PlainFile => fpath == x.fpath
     case _ => false
-  }
 
   /** Is this abstract file a directory? */
   def isDirectory: Boolean = givenPath.isDirectory
@@ -55,16 +53,14 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
   def lastModified: Long = givenPath.lastModified
 
   /** Returns all abstract subfiles of this abstract directory. */
-  def iterator: Iterator[AbstractFile] = {
+  def iterator: Iterator[AbstractFile] =
     // Optimization: Assume that the file was not deleted and did not have permissions changed
     // between the call to `list` and the iteration. This saves a call to `exists`.
-    def existsFast(path: Path) = path match {
+    def existsFast(path: Path) = path match
       case (_: Directory | _: io.File) => true
       case _ => path.exists
-    }
     if (!isDirectory) Iterator.empty
     else givenPath.toDirectory.list filter existsFast map (new PlainFile(_))
-  }
 
   /**
     * Returns the abstract file in this abstract directory with the
@@ -72,12 +68,11 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
     * argument "directory" tells whether to look for a directory or
     * or a regular file.
     */
-  def lookupName(name: String, directory: Boolean): AbstractFile = {
+  def lookupName(name: String, directory: Boolean): AbstractFile =
     val child = givenPath / name
     if ((child.isDirectory && directory) || (child.isFile && !directory))
       new PlainFile(child)
     else null
-  }
 
   /** Does this abstract file denote an existing file? */
   def create(): Unit = if (!exists) givenPath.createFile()
@@ -92,4 +87,3 @@ class PlainFile(val givenPath: Path) extends AbstractFile {
     */
   def lookupNameUnchecked(name: String, directory: Boolean): AbstractFile =
     new PlainFile(givenPath / name)
-}

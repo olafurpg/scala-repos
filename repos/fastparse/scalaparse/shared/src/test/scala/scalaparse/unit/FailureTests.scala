@@ -3,8 +3,8 @@ package scalaparse.unit
 import scalaparse.TestUtil
 import utest._
 import TestUtil._
-object FailureTests extends TestSuite {
-  val tests = TestSuite {
+object FailureTests extends TestSuite
+  val tests = TestSuite
 
     * - checkNeg("package package", "PkgBlock | PkgObj", "package")
 
@@ -862,5 +862,3 @@ object FailureTests extends TestSuite {
         expected = """ "\"\"\"" | StringChars | Interp | NonTripleQuoteChar """,
         found = ""
     )
-  }
-}

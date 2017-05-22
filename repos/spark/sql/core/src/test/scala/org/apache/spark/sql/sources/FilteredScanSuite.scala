@@ -28,18 +28,16 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
-class FilteredScanSource extends RelationProvider {
+class FilteredScanSource extends RelationProvider
   override def createRelation(
       sqlContext: SQLContext,
-      parameters: Map[String, String]): BaseRelation = {
+      parameters: Map[String, String]): BaseRelation =
     SimpleFilteredScan(parameters("from").toInt, parameters("to").toInt)(
         sqlContext)
-  }
-}
 
 case class SimpleFilteredScan(from: Int, to: Int)(
     @transient val sqlContext: SQLContext)
-    extends BaseRelation with PrunedFilteredScan {
+    extends BaseRelation with PrunedFilteredScan
 
   override def schema: StructType =
     StructType(
@@ -47,9 +45,9 @@ case class SimpleFilteredScan(from: Int, to: Int)(
             "b", IntegerType, nullable = false) :: StructField(
             "c", StringType, nullable = false) :: Nil)
 
-  override def unhandledFilters(filters: Array[Filter]): Array[Filter] = {
-    def unhandled(filter: Filter): Boolean = {
-      filter match {
+  override def unhandledFilters(filters: Array[Filter]): Array[Filter] =
+    def unhandled(filter: Filter): Boolean =
+      filter match
         case EqualTo(col, v) => col == "b"
         case EqualNullSafe(col, v) => col == "b"
         case LessThan(col, v: Int) => col == "b"
@@ -63,15 +61,12 @@ case class SimpleFilteredScan(from: Int, to: Int)(
         case And(left, right) => unhandled(left) || unhandled(right)
         case Or(left, right) => unhandled(left) || unhandled(right)
         case _ => false
-      }
-    }
 
     filters.filter(unhandled)
-  }
 
   override def buildScan(
-      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] = {
-    val rowBuilders = requiredColumns.map {
+      requiredColumns: Array[String], filters: Array[Filter]): RDD[Row] =
+    val rowBuilders = requiredColumns.map
       case "a" =>
         (i: Int) =>
           Seq(i)
@@ -82,13 +77,12 @@ case class SimpleFilteredScan(from: Int, to: Int)(
         (i: Int) =>
           val c = (i - 1 + 'a').toChar.toString
           Seq(c * 5 + c.toUpperCase * 5)
-    }
 
     FiltersPushed.list = filters
     ColumnsRequired.set = requiredColumns.toSet
 
     // Predicate test on integer column
-    def translateFilterOnA(filter: Filter): Int => Boolean = filter match {
+    def translateFilterOnA(filter: Filter): Int => Boolean = filter match
       case EqualTo("a", v) =>
         (a: Int) =>
           a == v
@@ -128,10 +122,9 @@ case class SimpleFilteredScan(from: Int, to: Int)(
         case _ =>
         (a: Int) =>
           true
-    }
 
     // Predicate test on string column
-    def translateFilterOnC(filter: Filter): String => Boolean = filter match {
+    def translateFilterOnC(filter: Filter): String => Boolean = filter match
       case StringStartsWith("c", v) => _.startsWith(v)
       case StringEndsWith("c", v) => _.endsWith(v)
       case StringContains("c", v) => _.contains(v)
@@ -144,14 +137,12 @@ case class SimpleFilteredScan(from: Int, to: Int)(
         case _ =>
         (c: String) =>
           true
-    }
 
-    def eval(a: Int) = {
+    def eval(a: Int) =
       val c =
         (a - 1 + 'a').toChar.toString * 5 + (a - 1 + 'a').toChar.toString.toUpperCase * 5
       filters.forall(translateFilterOnA(_)(a)) &&
       filters.forall(translateFilterOnC(_)(c))
-    }
 
     sqlContext.sparkContext
       .parallelize(from to to)
@@ -161,24 +152,20 @@ case class SimpleFilteredScan(from: Int, to: Int)(
                   .map(_ (i))
                   .reduceOption(_ ++ _)
                   .getOrElse(Seq.empty)))
-  }
-}
 
 // A hack for better error messages when filter pushdown fails.
-object FiltersPushed {
+object FiltersPushed
   var list: Seq[Filter] = Nil
-}
 
 // Used together with `SimpleFilteredScan` to check pushed columns.
-object ColumnsRequired {
+object ColumnsRequired
   var set: Set[String] = Set.empty
-}
 
 class FilteredScanSuite
-    extends DataSourceTest with SharedSQLContext with PredicateHelper {
+    extends DataSourceTest with SharedSQLContext with PredicateHelper
   protected override lazy val sql = caseInsensitiveContext.sql _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     sql("""
         |CREATE TEMPORARY TABLE oneToTenFiltered
@@ -188,7 +175,6 @@ class FilteredScanSuite
         |  to '10'
         |)
       """.stripMargin)
-  }
 
   sqlTest(
       "SELECT * FROM oneToTenFiltered",
@@ -362,50 +348,43 @@ class FilteredScanSuite
 
   def testPushDown(sqlString: String,
                    expectedCount: Int,
-                   requiredColumnNames: Set[String]): Unit = {
+                   requiredColumnNames: Set[String]): Unit =
     testPushDown(
         sqlString, expectedCount, requiredColumnNames, Set.empty[Filter])
-  }
 
   def testPushDown(sqlString: String,
                    expectedCount: Int,
                    requiredColumnNames: Set[String],
-                   expectedUnhandledFilters: Set[Filter]): Unit = {
+                   expectedUnhandledFilters: Set[Filter]): Unit =
 
-    test(s"PushDown Returns $expectedCount: $sqlString") {
+    test(s"PushDown Returns $expectedCount: $sqlString")
       // These tests check a particular plan, disable whole stage codegen.
       caseInsensitiveContext.conf.setConf(
           SQLConf.WHOLESTAGE_CODEGEN_ENABLED, false)
-      try {
+      try
         val queryExecution = sql(sqlString).queryExecution
-        val rawPlan = queryExecution.executedPlan.collect {
+        val rawPlan = queryExecution.executedPlan.collect
           case p: execution.DataSourceScan => p
-        } match {
+        match
           case Seq(p) => p
           case _ => fail(s"More than one PhysicalRDD found\n$queryExecution")
-        }
         val rawCount = rawPlan.execute().count()
         assert(ColumnsRequired.set === requiredColumnNames)
 
         val table = caseInsensitiveContext.table("oneToTenFiltered")
-        val relation = table.queryExecution.logical.collectFirst {
+        val relation = table.queryExecution.logical.collectFirst
           case LogicalRelation(r, _, _) => r
-        }.get
+        .get
 
         assert(
             relation.unhandledFilters(FiltersPushed.list.toArray).toSet === expectedUnhandledFilters)
 
-        if (rawCount != expectedCount) {
+        if (rawCount != expectedCount)
           fail(
               s"Wrong # of results for pushed filter. Got $rawCount, Expected $expectedCount\n" +
               s"Filters pushed: ${FiltersPushed.list.mkString(",")}\n" +
               queryExecution)
-        }
-      } finally {
+      finally
         caseInsensitiveContext.conf.setConf(
             SQLConf.WHOLESTAGE_CODEGEN_ENABLED,
             SQLConf.WHOLESTAGE_CODEGEN_ENABLED.defaultValue.get)
-      }
-    }
-  }
-}

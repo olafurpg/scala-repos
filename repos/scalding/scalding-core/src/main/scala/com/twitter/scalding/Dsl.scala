@@ -28,7 +28,7 @@ import cascading.flow.FlowDef
   * It's useful to import Dsl._ when you are writing scalding code outside
   * of a Job.
   */
-object Dsl extends FieldConversions with java.io.Serializable {
+object Dsl extends FieldConversions with java.io.Serializable
   implicit def pipeToRichPipe(pipe: Pipe): RichPipe = new RichPipe(pipe)
 
   /**
@@ -36,4 +36,3 @@ object Dsl extends FieldConversions with java.io.Serializable {
     */
   implicit def flowDefToRichFlowDef(fd: FlowDef): RichFlowDef =
     new RichFlowDef(fd)
-}

@@ -43,12 +43,11 @@ import org.apache.spark.util.Utils
   * Note: This script treats all features as real-valued (not categorical).
   *       To include categorical features, modify categoricalFeaturesInfo.
   */
-object DecisionTreeRunner {
+object DecisionTreeRunner
 
-  object ImpurityType extends Enumeration {
+  object ImpurityType extends Enumeration
     type ImpurityType = Value
     val Gini, Entropy, Variance = Value
-  }
 
   import ImpurityType._
 
@@ -69,10 +68,10 @@ object DecisionTreeRunner {
                     checkpointInterval: Int = 10)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("DecisionTreeRunner") {
+    val parser = new OptionParser[Params]("DecisionTreeRunner")
       head("DecisionTreeRunner: an example decision tree app.")
       opt[String]("algo")
         .text(
@@ -116,10 +115,10 @@ object DecisionTreeRunner {
       opt[String]("checkpointDir")
         .text(
             s"checkpoint directory where intermediate node Id caches will be stored, " +
-            s"default: ${defaultParams.checkpointDir match {
+            s"default: $defaultParams.checkpointDir match
           case Some(strVal) => strVal
           case None => "None"
-        }}")
+        ")
         .action((x, c) => c.copy(checkpointDir = Some(x)))
       opt[Int]("checkpointInterval")
         .text(s"how often to checkpoint the node Id cache, " +
@@ -137,34 +136,27 @@ object DecisionTreeRunner {
         .text("input path to labeled examples")
         .required()
         .action((x, c) => c.copy(input = x))
-      checkConfig { params =>
-        if (params.fracTest < 0 || params.fracTest > 1) {
+      checkConfig  params =>
+        if (params.fracTest < 0 || params.fracTest > 1)
           failure(
               s"fracTest ${params.fracTest} value incorrect; should be in [0,1].")
-        } else {
+        else
           if (params.algo == Classification &&
-              (params.impurity == Gini || params.impurity == Entropy)) {
+              (params.impurity == Gini || params.impurity == Entropy))
             success
-          } else if (params.algo == Regression &&
-                     params.impurity == Variance) {
+          else if (params.algo == Regression &&
+                     params.impurity == Variance)
             success
-          } else {
+          else
             failure(
                 s"Algo ${params.algo} is not compatible with impurity ${params.impurity}.")
-          }
-        }
-      }
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
   /**
     * Load training and test data from files.
@@ -182,81 +174,67 @@ object DecisionTreeRunner {
       dataFormat: String,
       testInput: String,
       algo: Algo,
-      fracTest: Double): (RDD[LabeledPoint], RDD[LabeledPoint], Int) = {
+      fracTest: Double): (RDD[LabeledPoint], RDD[LabeledPoint], Int) =
     // Load training data and cache it.
-    val origExamples = dataFormat match {
+    val origExamples = dataFormat match
       case "dense" => MLUtils.loadLabeledPoints(sc, input).cache()
       case "libsvm" => MLUtils.loadLibSVMFile(sc, input).cache()
-    }
     // For classification, re-index classes if needed.
-    val (examples, classIndexMap, numClasses) = algo match {
-      case Classification => {
+    val (examples, classIndexMap, numClasses) = algo match
+      case Classification =>
           // classCounts: class --> # examples in class
           val classCounts = origExamples.map(_.label).countByValue()
           val sortedClasses = classCounts.keys.toList.sorted
           val numClasses = classCounts.size
           // classIndexMap: class --> index in 0,...,numClasses-1
-          val classIndexMap = {
-            if (classCounts.keySet != Set(0.0, 1.0)) {
+          val classIndexMap =
+            if (classCounts.keySet != Set(0.0, 1.0))
               sortedClasses.zipWithIndex.toMap
-            } else {
+            else
               Map[Double, Int]()
-            }
-          }
-          val examples = {
-            if (classIndexMap.isEmpty) {
+          val examples =
+            if (classIndexMap.isEmpty)
               origExamples
-            } else {
+            else
               origExamples.map(
                   lp => LabeledPoint(classIndexMap(lp.label), lp.features))
-            }
-          }
           val numExamples = examples.count()
           println(s"numClasses = $numClasses.")
           println(s"Per-class example fractions, counts:")
           println(s"Class\tFrac\tCount")
-          sortedClasses.foreach { c =>
+          sortedClasses.foreach  c =>
             val frac = classCounts(c) / numExamples.toDouble
             println(s"$c\t$frac\t${classCounts(c)}")
-          }
           (examples, classIndexMap, numClasses)
-        }
       case Regression =>
         (origExamples, null, 0)
       case _ =>
         throw new IllegalArgumentException(
             "Algo ${params.algo} not supported.")
-    }
 
     // Create training, test sets.
     val splits =
-      if (testInput != "") {
+      if (testInput != "")
         // Load testInput.
         val numFeatures = examples.take(1)(0).features.size
-        val origTestExamples = dataFormat match {
+        val origTestExamples = dataFormat match
           case "dense" => MLUtils.loadLabeledPoints(sc, testInput)
           case "libsvm" => MLUtils.loadLibSVMFile(sc, testInput, numFeatures)
-        }
-        algo match {
-          case Classification => {
+        algo match
+          case Classification =>
               // classCounts: class --> # examples in class
-              val testExamples = {
-                if (classIndexMap.isEmpty) {
+              val testExamples =
+                if (classIndexMap.isEmpty)
                   origTestExamples
-                } else {
+                else
                   origTestExamples.map(
                       lp => LabeledPoint(classIndexMap(lp.label), lp.features))
-                }
-              }
               Array(examples, testExamples)
-            }
           case Regression =>
             Array(examples, origTestExamples)
-        }
-      } else {
+      else
         // Split input into training, test.
         examples.randomSplit(Array(1.0 - fracTest, fracTest))
-      }
     val training = splits(0).cache()
     val test = splits(1).cache()
 
@@ -267,9 +245,8 @@ object DecisionTreeRunner {
     examples.unpersist(blocking = false)
 
     (training, test, numClasses)
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
 
     val conf = new SparkConf().setAppName(s"DecisionTreeRunner with $params")
     val sc = new SparkContext(conf)
@@ -284,11 +261,10 @@ object DecisionTreeRunner {
                                                     params.algo,
                                                     params.fracTest)
 
-    val impurityCalculator = params.impurity match {
+    val impurityCalculator = params.impurity match
       case Gini => impurity.Gini
       case Entropy => impurity.Entropy
       case Variance => impurity.Variance
-    }
 
     params.checkpointDir.foreach(sc.setCheckpointDir)
 
@@ -302,33 +278,30 @@ object DecisionTreeRunner {
         minInfoGain = params.minInfoGain,
         useNodeIdCache = params.useNodeIdCache,
         checkpointInterval = params.checkpointInterval)
-    if (params.numTrees == 1) {
+    if (params.numTrees == 1)
       val startTime = System.nanoTime()
       val model = DecisionTree.train(training, strategy)
       val elapsedTime = (System.nanoTime() - startTime) / 1e9
       println(s"Training time: $elapsedTime seconds")
-      if (model.numNodes < 20) {
+      if (model.numNodes < 20)
         println(model.toDebugString) // Print full model.
-      } else {
+      else
         println(model) // Print model summary.
-      }
-      if (params.algo == Classification) {
+      if (params.algo == Classification)
         val trainAccuracy = new MulticlassMetrics(training.map(
                 lp => (model.predict(lp.features), lp.label))).precision
         println(s"Train accuracy = $trainAccuracy")
         val testAccuracy = new MulticlassMetrics(
             test.map(lp => (model.predict(lp.features), lp.label))).precision
         println(s"Test accuracy = $testAccuracy")
-      }
-      if (params.algo == Regression) {
+      if (params.algo == Regression)
         val trainMSE = meanSquaredError(model, training)
         println(s"Train mean squared error = $trainMSE")
         val testMSE = meanSquaredError(model, test)
         println(s"Test mean squared error = $testMSE")
-      }
-    } else {
+    else
       val randomSeed = Utils.random.nextInt()
-      if (params.algo == Classification) {
+      if (params.algo == Classification)
         val startTime = System.nanoTime()
         val model = RandomForest.trainClassifier(training,
                                                  strategy,
@@ -337,19 +310,17 @@ object DecisionTreeRunner {
                                                  randomSeed)
         val elapsedTime = (System.nanoTime() - startTime) / 1e9
         println(s"Training time: $elapsedTime seconds")
-        if (model.totalNumNodes < 30) {
+        if (model.totalNumNodes < 30)
           println(model.toDebugString) // Print full model.
-        } else {
+        else
           println(model) // Print model summary.
-        }
         val trainAccuracy = new MulticlassMetrics(training.map(
                 lp => (model.predict(lp.features), lp.label))).precision
         println(s"Train accuracy = $trainAccuracy")
         val testAccuracy = new MulticlassMetrics(
             test.map(lp => (model.predict(lp.features), lp.label))).precision
         println(s"Test accuracy = $testAccuracy")
-      }
-      if (params.algo == Regression) {
+      if (params.algo == Regression)
         val startTime = System.nanoTime()
         val model = RandomForest.trainRegressor(training,
                                                 strategy,
@@ -358,20 +329,16 @@ object DecisionTreeRunner {
                                                 randomSeed)
         val elapsedTime = (System.nanoTime() - startTime) / 1e9
         println(s"Training time: $elapsedTime seconds")
-        if (model.totalNumNodes < 30) {
+        if (model.totalNumNodes < 30)
           println(model.toDebugString) // Print full model.
-        } else {
+        else
           println(model) // Print model summary.
-        }
         val trainMSE = meanSquaredError(model, training)
         println(s"Train mean squared error = $trainMSE")
         val testMSE = meanSquaredError(model, test)
         println(s"Test mean squared error = $testMSE")
-      }
-    }
 
     sc.stop()
-  }
 
   /**
     * Calculates the mean squared error for regression.
@@ -380,14 +347,12 @@ object DecisionTreeRunner {
     * due to the use of structural types, which leads to one reflection call per record.
     */
   // scalastyle:off structural.type
-  private[mllib] def meanSquaredError(model: {
+  private[mllib] def meanSquaredError(model:
     def predict(features: Vector): Double
-  }, data: RDD[LabeledPoint]): Double = {
-    data.map { y =>
+  , data: RDD[LabeledPoint]): Double =
+    data.map  y =>
       val err = model.predict(y.features) - y.label
       err * err
-    }.mean()
-  }
+    .mean()
   // scalastyle:on structural.type
-}
 // scalastyle:on println

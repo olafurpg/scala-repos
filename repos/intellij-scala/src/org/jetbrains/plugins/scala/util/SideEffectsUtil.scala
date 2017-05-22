@@ -19,7 +19,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, ScType}
 /**
   * @author Nikolay.Tropin
   */
-object SideEffectsUtil {
+object SideEffectsUtil
 
   private val immutableClasses = listImmutableClasses
 
@@ -29,7 +29,7 @@ object SideEffectsUtil {
       "notifyAll",
       "notify").map("java.lang.Object." + _).toArray
 
-  def hasNoSideEffects(expr: ScExpression): Boolean = expr match {
+  def hasNoSideEffects(expr: ScExpression): Boolean = expr match
     case lit: ScInterpolatedStringLiteral =>
       import org.jetbrains.plugins.scala.lang.psi.api.base.InterpolatedStringType._
       Seq(STANDART, FORMAT, RAW).contains(lit.getType)
@@ -40,9 +40,9 @@ object SideEffectsUtil {
     case typed: ScTypedStmt => hasNoSideEffects(typed.expr)
     case ref: ScReferenceExpression =>
       if (hasImplicitConversion(ref)) false
-      else {
+      else
         ref.qualifier.forall(hasNoSideEffects) &&
-        (ref.resolve() match {
+        (ref.resolve() match
               case Both(b: ScBindingPattern,
                         ScalaPsiUtil.inNameContext(pd: ScPatternDefinition))
                   if pd.hasModifierProperty("lazy") =>
@@ -61,28 +61,25 @@ object SideEffectsUtil {
                 methodHasNoSideEffects(
                     m, ref.qualifier.flatMap(_.getType().toOption))
               case _ => false
-            })
-      }
+            )
     case t: ScTuple => t.exprs.forall(hasNoSideEffects)
     case inf: ScInfixExpr if inf.isAssignmentOperator => false
     case ScSugarCallExpr(baseExpr, operation, args) =>
-      val checkOperation = operation match {
+      val checkOperation = operation match
         case ref if hasImplicitConversion(ref) => false
         case ref if ref.refName.endsWith("_=") => false
         case ResolvesTo(_: ScSyntheticFunction) => true
         case ResolvesTo(m: PsiMethod) =>
           methodHasNoSideEffects(m, baseExpr.getType().toOption)
         case _ => false
-      }
       checkOperation && hasNoSideEffects(baseExpr) &&
       args.forall(hasNoSideEffects)
     case ScMethodCall(baseExpr, args) =>
-      val (checkQual, typeOfQual) = baseExpr match {
+      val (checkQual, typeOfQual) = baseExpr match
         case ScReferenceExpression.withQualifier(qual) =>
           (hasNoSideEffects(qual), qual.getType().toOption)
         case _ => (true, None)
-      }
-      val checkBaseExpr = baseExpr match {
+      val checkBaseExpr = baseExpr match
         case _ if hasImplicitConversion(baseExpr) => false
         case ResolvesTo(m: PsiMethod) => methodHasNoSideEffects(m, typeOfQual)
         case ResolvesTo(_: ScSyntheticFunction) => true
@@ -93,18 +90,15 @@ object SideEffectsUtil {
           val withApply =
             ScalaPsiElementFactory.createExpressionWithContextFromText(
                 withApplyText, expr.getContext, expr)
-          withApply match {
+          withApply match
             case ScMethodCall(ResolvesTo(m: PsiMethod), _) =>
               methodHasNoSideEffects(m, typeOfQual)
             case _ => false
-          }
         case _ => hasNoSideEffects(baseExpr)
-      }
       checkQual && checkBaseExpr && args.forall(hasNoSideEffects)
     case _ => false
-  }
 
-  private def listImmutableClasses = {
+  private def listImmutableClasses =
     val excludeNonString =
       Seq("StringBuffer._", "StringBuilder._").map("exclude:java.lang." + _)
 
@@ -138,10 +132,9 @@ object SideEffectsUtil {
     val immutableCollections = Seq("scala.collection.immutable._")
 
     (excludeNonString ++: javaWrappers ++: otherJavaClasses ++: scalaValueClasses ++: otherFromScalaPackage ++: fromScalaUtil ++: fromScalaMath ++: immutableCollections).toArray
-  }
 
-  private def hasImplicitConversion(refExpr: ScExpression) = {
-    refExpr match {
+  private def hasImplicitConversion(refExpr: ScExpression) =
+    refExpr match
       case ref: ScReferenceExpression =>
         ref
           .bind()
@@ -149,32 +142,25 @@ object SideEffectsUtil {
                 rr.implicitConversionClass.isDefined ||
                 rr.implicitFunction.isDefined)
       case _ => false
-    }
-  }
 
   private def methodHasNoSideEffects(
-      m: PsiMethod, typeOfQual: Option[ScType] = None): Boolean = {
+      m: PsiMethod, typeOfQual: Option[ScType] = None): Boolean =
     val methodClazzName = Option(m.containingClass).map(_.qualifiedName)
 
-    methodClazzName match {
+    methodClazzName match
       case Some(fqn) =>
         val name = fqn + "." + m.name
         if (ScalaCodeStyleSettings.nameFitToPatterns(
                 name, methodsFromObjectWithSideEffects)) return false
       case _ =>
-    }
 
     val clazzName = typeOfQual
       .flatMap(ScType.extractDesignatorSingletonType)
-      .orElse(typeOfQual) match {
+      .orElse(typeOfQual) match
       case Some(tp) => ScType.extractClass(tp).map(_.qualifiedName)
       case None => methodClazzName
-    }
 
-    clazzName.map(_ + "." + m.name) match {
+    clazzName.map(_ + "." + m.name) match
       case Some(name) =>
         ScalaCodeStyleSettings.nameFitToPatterns(name, immutableClasses)
       case None => false
-    }
-  }
-}

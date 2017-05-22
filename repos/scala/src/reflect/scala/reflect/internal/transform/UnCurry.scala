@@ -5,7 +5,7 @@ package transform
 
 import Flags._
 
-trait UnCurry {
+trait UnCurry
 
   val global: SymbolTable
   import global._
@@ -22,16 +22,15 @@ trait UnCurry {
   private def expandAlias(tp: Type): Type =
     if (!tp.isHigherKinded) tp.normalize else tp
 
-  val uncurry: TypeMap = new TypeMap {
-    def apply(tp0: Type): Type = {
+  val uncurry: TypeMap = new TypeMap
+    def apply(tp0: Type): Type =
       val tp = expandAlias(tp0)
-      tp match {
+      tp match
         case MethodType(params, MethodType(params1, restpe)) =>
           // This transformation is described in UnCurryTransformer.dependentParamTypeErasure
-          val packSymbolsMap = new TypeMap {
+          val packSymbolsMap = new TypeMap
             // Wrapping in a TypeMap to reuse the code that opts for a fast path if the function is an identity.
             def apply(tp: Type): Type = packSymbols(params, tp)
-          }
           val existentiallyAbstractedParam1s = packSymbolsMap.mapOver(params1)
           val substitutedResult =
             restpe.substSym(params1, existentiallyAbstractedParam1s)
@@ -49,12 +48,9 @@ trait UnCurry {
           apply(desugaredTpe)
         case _ =>
           expandAlias(mapOver(tp))
-      }
-    }
-  }
 
-  object DesugaredParameterType {
-    def unapply(tpe: Type): Option[Type] = tpe match {
+  object DesugaredParameterType
+    def unapply(tpe: Type): Option[Type] = tpe match
       case TypeRef(pre, ByNameParamClass, arg :: Nil) =>
         Some(functionType(List(), arg))
       case TypeRef(pre, RepeatedParamClass, arg :: Nil) =>
@@ -63,13 +59,11 @@ trait UnCurry {
         Some(arrayType(if (isUnboundedGeneric(arg)) ObjectTpe else arg))
       case _ =>
         None
-    }
-  }
 
-  private val uncurryType = new TypeMap {
-    def apply(tp0: Type): Type = {
+  private val uncurryType = new TypeMap
+    def apply(tp0: Type): Type =
       val tp = expandAlias(tp0)
-      tp match {
+      tp match
         case ClassInfoType(parents, decls, clazz) =>
           val parents1 = parents mapConserve uncurry
           if (parents1 eq parents) tp
@@ -79,9 +73,6 @@ trait UnCurry {
           mapOver(tp)
         case _ =>
           tp
-      }
-    }
-  }
 
   /** - return symbol's transformed type,
     *  - if symbol is a def parameter with transformed type T, return () => T
@@ -90,4 +81,3 @@ trait UnCurry {
     */
   def transformInfo(sym: Symbol, tp: Type): Type =
     if (sym.isType) uncurryType(tp) else uncurry(tp)
-}

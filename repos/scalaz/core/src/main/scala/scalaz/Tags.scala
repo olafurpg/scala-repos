@@ -5,7 +5,7 @@ package scalaz
   *
   * @see [[scalaz.Tag]] and, `@@` in the package object [[scalaz]] .
   */
-object Tags {
+object Tags
 
   /** Type tag to choose a [[scalaz.Semigroup]] instance that selects the first operand to append. */
   sealed trait FirstVal
@@ -91,4 +91,3 @@ object Tags {
   sealed trait Parallel
 
   val Parallel = Tag.of[Parallel]
-}

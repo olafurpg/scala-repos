@@ -1,6 +1,6 @@
 package scalaz.example
 
-object ApplyUsage extends App {
+object ApplyUsage extends App
   import scalaz.Apply
   import scalaz.std.option._
   import scalaz.std.list._
@@ -166,4 +166,3 @@ object ApplyUsage extends App {
                                  Some("3c")))
 
   assert(deepResult === expectedDeep)
-}

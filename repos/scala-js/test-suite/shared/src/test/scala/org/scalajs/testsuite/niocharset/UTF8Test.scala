@@ -17,8 +17,8 @@ import BaseCharsetTest._
 
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
-class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
-  @Test def decode(): Unit = {
+class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8"))
+  @Test def decode(): Unit =
     def OutSeq(elems: OutPart[CharBuffer]*): Seq[OutPart[CharBuffer]] =
       Seq[OutPart[CharBuffer]](elems: _*)
 
@@ -66,10 +66,9 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
     // Here begin the sequences with at least one error
 
     // Code point too big
-    if (!executingInJVM) {
+    if (!executingInJVM)
       testDecode(bb"f4 90 80 80")(Malformed(4))
       testDecode(bb"41 f4 90 80 80 42")(cb"A", Malformed(4), cb"B")
-    }
 
     // Unexpected continuation bytes (each is reported separately)
     testDecode(bb"80")(Malformed(1))
@@ -84,10 +83,9 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
         cb"A", Malformed(1), Malformed(1), cb"B", Malformed(1), cb"C")
 
     // Lonely start characters, separated by spaces
-    if (!executingInJVM) {
+    if (!executingInJVM)
       testDecode(bb"${(0xc0 to 0xf4).flatMap(c => Seq(c, 32))}")(
           (0xc0 to 0xf4).flatMap(i => OutSeq(Malformed(1), cb" ")): _*)
-    }
 
     // Sequences with some continuation bytes missing
     testDecode(bb"c2")(Malformed(1))
@@ -114,7 +112,7 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
     testDecode(bb"fe fe ff ff")(
         Malformed(1), Malformed(1), Malformed(1), Malformed(1))
     // Old 5-byte and 6-byte starts
-    if (!executingInJVM) {
+    if (!executingInJVM)
       testDecode(bb"f8 80 80 80 af")(
           Malformed(1), Malformed(1), Malformed(1), Malformed(1), Malformed(1))
       testDecode(bb"fc 80 80 80 80 af")(Malformed(1),
@@ -156,10 +154,8 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
       testDecode(bb"ed ae 80 ed bf bf")(Malformed(3), Malformed(3))
       testDecode(bb"ed af bf ed b0 80")(Malformed(3), Malformed(3))
       testDecode(bb"ed af bf ed bf bf")(Malformed(3), Malformed(3))
-    }
-  }
 
-  @Test def encode(): Unit = {
+  @Test def encode(): Unit =
     def OutSeq(elems: OutPart[ByteBuffer]*): Seq[OutPart[ByteBuffer]] =
       Seq[OutPart[ByteBuffer]](elems: _*)
 
@@ -221,9 +217,8 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
     testEncode(cb"\udbffA")(Malformed(1), bb"41")
     testEncode(cb"\udbff\udb8f")(Malformed(1), Malformed(1))
     testEncode(cb"\udbff\ud835\udcd7")(Malformed(1), bb"f0 9d 93 97")
-  }
 
-  @Test def isLegalReplacement(): Unit = {
+  @Test def isLegalReplacement(): Unit =
     val encoder = charset.newEncoder
 
     // The good ones
@@ -261,5 +256,3 @@ class UTF8Test extends BaseCharsetTest(Charset.forName("UTF-8")) {
     assertFalse(encoder.isLegalReplacement(Array(0xf4.toByte)))
 
     assertFalse(encoder.isLegalReplacement(Array(0xe0.toByte, 0x80.toByte)))
-  }
-}

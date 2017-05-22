@@ -42,7 +42,7 @@ import scalafx.scene.layout.{Region, TilePane}
   * Object to load examples as Map which in turn is used
   * to create TreeItem in the UI
   */
-object EnsembleTree {
+object EnsembleTree
 
   private val exampleListPath = ExampleInfo.examplesDir + "example.tree"
   private val examplListURL = getClass.getResource(exampleListPath)
@@ -54,65 +54,51 @@ object EnsembleTree {
     * build a map by iterating through the examples folder.
     * This is used in UI
     */
-  private def createTree(): Map[String, List[TreeItem[String]]] = {
-    val pairs = for ((dirName, examples) <- loadExampleNames()) yield {
-      val leaves = for (leafName <- examples) yield {
+  private def createTree(): Map[String, List[TreeItem[String]]] =
+    val pairs = for ((dirName, examples) <- loadExampleNames()) yield
+      val leaves = for (leafName <- examples) yield
         new TreeItem(ExampleInfo.formatAddSpaces(leafName))
-      }
       dirName -> leaves.toList.sortWith(SortUtils.treeItemSort)
-    }
     TreeMap(pairs: _*)
-  }
 
-  private def loadExampleNames(): Array[(String, Array[String])] = {
+  private def loadExampleNames(): Array[(String, Array[String])] =
 
     require(examplListURL != null,
             "Failed to locate resource in classpath: " + exampleListPath)
 
     val lines = scala.io.Source.fromURL(examplListURL).getLines()
 
-    for (line <- lines.toArray) yield {
+    for (line <- lines.toArray) yield
       val v = line.split("->")
       assert(v.length == 2)
       val dirName = v.head.trim
       val examples = v(1).split(",").map(_.trim())
       dirName -> examples
-    }
-  }
 
-  private def createThumbnails() = {
-    val pairs = for ((dirName, examples) <- loadExampleNames()) yield {
+  private def createThumbnails() =
+    val pairs = for ((dirName, examples) <- loadExampleNames()) yield
       val groupName = dirName
-      val thumbs = for (leafName <- examples) yield {
+      val thumbs = for (leafName <- examples) yield
         val sampleName = ExampleInfo.formatAddSpaces(leafName)
-        val img = new ImageView {
+        val img = new ImageView
           val filePath = ExampleInfo.thumbnailPath(leafName, groupName)
           val inputStream = this.getClass.getResourceAsStream(filePath)
-          if (inputStream == null) {
+          if (inputStream == null)
             throw new IOException("Unable to locate resource: " + filePath)
-          }
           image = new Image(inputStream)
-        }
-        val button = new Button(sampleName, img) {
+        val button = new Button(sampleName, img)
           prefWidth = 140
           prefHeight = 145
           contentDisplay = ContentDisplay.Top
           styleClass.clear()
           styleClass += "sample-tile"
           onAction = (ae: ActionEvent) =>
-            {
               Ensemble.splitPane.items.remove(1)
               Ensemble.splitPane.items.add(
                   1, PageDisplayer.choosePage(groupName + " > " + sampleName))
-          }
-        }
         EnsembleThumbNail(button)
-      }
       dirName.capitalize -> thumbs.toList.sortWith(SortUtils.thumbNailsSort)
-    }
     TreeMap(pairs: _*)
-  }
-}
 
 case class EnsembleThumbNail(button: Button)
 
@@ -121,7 +107,7 @@ case class EnsembleThumbNail(button: Button)
   * underlying map
   */
 class EnsembleTree(tree: Map[String, List[TreeItem[String]]],
-                   thumbnails: Map[String, List[EnsembleThumbNail]]) {
+                   thumbnails: Map[String, List[EnsembleThumbNail]])
 
   def getLeaves(keyName: String) = tree(keyName)
 
@@ -129,20 +115,18 @@ class EnsembleTree(tree: Map[String, List[TreeItem[String]]],
     * returns the entire tree
     */
   def getTree: List[TreeItem[String]] =
-    tree.map {
+    tree.map
       case (name, items) =>
-        new TreeItem[String](name) {
+        new TreeItem[String](name)
           expanded = true
           children = items
-        }
-    }.toList
+    .toList
 
   def getThumbs(keyName: String) = thumbnails(keyName)
 
   def getDashThumbsCtrl =
-    thumbnails.flatMap {
+    thumbnails.flatMap
       case (heading, ts) => Seq(createCategoryLabel(heading), createTiles(ts))
-    }
 
   def getDashThumb(ctrlGrpName: String) =
     Seq(
@@ -151,14 +135,13 @@ class EnsembleTree(tree: Map[String, List[TreeItem[String]]],
     )
 
   private def createCategoryLabel(value: String) =
-    new Label {
+    new Label
       text = value
       maxWidth = Double.MaxValue
       minHeight = Region.USE_PREF_SIZE
       styleClass += "category-header"
-    }
 
-  private def createTiles(value: List[EnsembleThumbNail]) = new TilePane {
+  private def createTiles(value: List[EnsembleThumbNail]) = new TilePane
     prefColumns = 1
     hgap = 4
     vgap = 4
@@ -166,5 +149,3 @@ class EnsembleTree(tree: Map[String, List[TreeItem[String]]],
     orientation = Orientation.HORIZONTAL
     styleClass += "category-page-flow"
     children = value.map(_.button)
-  }
-}

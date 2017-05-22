@@ -4,11 +4,11 @@ package org.jetbrains.plugins.scala.testingSupport.specs2
   * @author Roman.Shein
   * @since 03.07.2015.
   */
-abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
+abstract class Specs2RegExpTestNameTest extends Specs2TestCase
   protected val regExpClassName = "SpecsRegExpTest"
   protected val regExpFileName = regExpClassName + ".scala"
 
-  def addRegExpTest() {
+  def addRegExpTest()
     addFileToProject(regExpFileName,
                      """
         |import org.specs2.mutable.Specification
@@ -33,9 +33,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
         |  }
         |}
       """.stripMargin.trim)
-  }
 
-  def testInnerMost() = {
+  def testInnerMost() =
     addRegExpTest()
 
     runTestByLocation(
@@ -50,9 +49,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                            "The RegExpTest should",
                                            "test") &&
           checkResultTreeDoesNotHaveNodes(root, "testtest", "testtesttest"))
-  }
 
-  def testMiddle() = {
+  def testMiddle() =
     addRegExpTest()
 
     runTestByLocation(
@@ -67,9 +65,8 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                            "The RegExpTest should",
                                            "testtest") &&
           checkResultTreeDoesNotHaveNodes(root, "test", "testtesttest"))
-  }
 
-  def testOuterMost() = {
+  def testOuterMost() =
     addRegExpTest()
 
     runTestByLocation(
@@ -84,10 +81,9 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
                                            "The RegExpTest should",
                                            "testtesttest") &&
           checkResultTreeDoesNotHaveNodes(root, "test", "testtest"))
-  }
 
   //TODO: enable the test once I find a way to run different tests with same description in specs2
-  def __IGNORE_testDifferentScopes() = {
+  def __IGNORE_testDifferentScopes() =
     addRegExpTest()
 
     runTestByLocation(
@@ -109,5 +105,3 @@ abstract class Specs2RegExpTestNameTest extends Specs2TestCase {
           checkResultTreeHasExactNamedPath(
               root, "[root]", regExpClassName, "Second should", "run") &&
           checkResultTreeDoesNotHaveNodes(root, "First should"))
-  }
-}

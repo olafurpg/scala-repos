@@ -10,24 +10,23 @@ import akka.remote.testconductor.Controller.NodeInfo
 import java.net.InetSocketAddress
 import java.net.InetAddress
 
-object ControllerSpec {
+object ControllerSpec
   val config = """
     akka.testconductor.barrier-timeout = 5s
     akka.actor.provider = akka.remote.RemoteActorRefProvider
     akka.actor.debug.fsm = on
     akka.actor.debug.lifecycle = on
     """
-}
 
 class ControllerSpec
-    extends AkkaSpec(ControllerSpec.config) with ImplicitSender {
+    extends AkkaSpec(ControllerSpec.config) with ImplicitSender
 
   val A = RoleName("a")
   val B = RoleName("b")
 
-  "A Controller" must {
+  "A Controller" must
 
-    "publish its nodes" in {
+    "publish its nodes" in
       val c = system.actorOf(
           Props(classOf[Controller],
                 1,
@@ -39,6 +38,3 @@ class ControllerSpec
       c ! Controller.GetNodes
       expectMsgType[Iterable[RoleName]].toSet should ===(Set(A, B))
       c ! PoisonPill // clean up so network connections don't accumulate during test run
-    }
-  }
-}

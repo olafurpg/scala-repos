@@ -34,7 +34,7 @@ import org.apache.spark.util.Utils
 /**
   * Test suite for [[GBTClassifier]].
   */
-class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
+class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext
 
   import GBTClassifierSuite.compareAPIs
 
@@ -46,7 +46,7 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
   private var trainData: RDD[LabeledPoint] = _
   private var validationData: RDD[LabeledPoint] = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     data = sc.parallelize(
         EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 10, 100),
@@ -57,9 +57,8 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
     validationData = sc.parallelize(
         EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 80),
         2)
-  }
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new GBTClassifier)
     val model = new GBTClassificationModel(
         "gbtc",
@@ -68,11 +67,10 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
         Array(1.0),
         1)
     ParamsSuite.checkParams(model)
-  }
 
-  test("Binary classification with continuous features: Log Loss") {
+  test("Binary classification with continuous features: Log Loss")
     val categoricalFeatures = Map.empty[Int, Int]
-    testCombinations.foreach {
+    testCombinations.foreach
       case (maxIter, learningRate, subsamplingRate) =>
         val gbt = new GBTClassifier()
           .setMaxDepth(2)
@@ -81,10 +79,8 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
           .setMaxIter(maxIter)
           .setStepSize(learningRate)
         compareAPIs(data, None, gbt, categoricalFeatures)
-    }
-  }
 
-  test("Checkpointing") {
+  test("Checkpointing")
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
     sc.setCheckpointDir(path)
@@ -105,7 +101,6 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     sc.checkpointDir = None
     Utils.deleteRecursively(tempDir)
-  }
 
   // TODO: Reinstate test once runWithValidation is implemented   SPARK-7132
   /*
@@ -150,9 +145,8 @@ class GBTClassifierSuite extends SparkFunSuite with MLlibTestSparkContext {
     }
   }
  */
-}
 
-private object GBTClassifierSuite extends SparkFunSuite {
+private object GBTClassifierSuite extends SparkFunSuite
 
   /**
     * Train 2 models on the given dataset, one using the old API and one using the new API.
@@ -161,7 +155,7 @@ private object GBTClassifierSuite extends SparkFunSuite {
   def compareAPIs(data: RDD[LabeledPoint],
                   validationData: Option[RDD[LabeledPoint]],
                   gbt: GBTClassifier,
-                  categoricalFeatures: Map[Int, Int]): Unit = {
+                  categoricalFeatures: Map[Int, Int]): Unit =
     val numFeatures = data.first().features.size
     val oldBoostingStrategy =
       gbt.getOldBoostingStrategy(categoricalFeatures, OldAlgo.Classification)
@@ -179,5 +173,3 @@ private object GBTClassifierSuite extends SparkFunSuite {
     TreeTests.checkEqual(oldModelAsNew, newModel)
     assert(newModel.numFeatures === numFeatures)
     assert(oldModelAsNew.numFeatures === numFeatures)
-  }
-}

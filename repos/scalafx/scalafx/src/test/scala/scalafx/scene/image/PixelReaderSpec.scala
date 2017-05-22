@@ -42,13 +42,12 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PixelReaderSpec
     extends SimpleSFXDelegateSpec[jfxsi.PixelReader, PixelReader](
-        classOf[jfxsi.PixelReader], classOf[PixelReader]) {
+        classOf[jfxsi.PixelReader], classOf[PixelReader])
 
-  override protected def getScalaClassInstance = new PixelReader {
+  override protected def getScalaClassInstance = new PixelReader
     override val delegate = getJavaClassInstance
-  }
 
-  override protected def getJavaClassInstance = new jfxsi.PixelReader {
+  override protected def getJavaClassInstance = new jfxsi.PixelReader
     def getArgb(x: Int, y: Int) = 0
     def getColor(x: Int, y: Int) = null
     def getPixelFormat = null
@@ -75,5 +74,3 @@ class PixelReaderSpec
                                pixelformat: jfxsi.WritablePixelFormat[B],
                                buffer: B,
                                scanlineStride: Int) {}
-  }
-}

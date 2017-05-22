@@ -8,13 +8,12 @@ import gitbucket.core.util.StringUtil
 
 import scala.util.Random
 
-trait AccessTokenService {
+trait AccessTokenService
 
-  def makeAccessTokenString: String = {
+  def makeAccessTokenString: String =
     val bytes = new Array[Byte](20)
     Random.nextBytes(bytes)
     bytes.map("%02x".format(_)).mkString
-  }
 
   def tokenToHash(token: String): String = StringUtil.sha1(token)
 
@@ -22,30 +21,28 @@ trait AccessTokenService {
     * @retuen (TokenId, Token)
     */
   def generateAccessToken(userName: String, note: String)(
-      implicit s: Session): (Int, String) = {
+      implicit s: Session): (Int, String) =
     var token: String = null
     var hash: String = null
-    do {
+    do
       token = makeAccessTokenString
       hash = tokenToHash(token)
-    } while (AccessTokens.filter(_.tokenHash === hash.bind).exists.run)
+    while (AccessTokens.filter(_.tokenHash === hash.bind).exists.run)
     val newToken = AccessToken(
         userName = userName, note = note, tokenHash = hash)
     val tokenId =
       (AccessTokens returning AccessTokens.map(_.accessTokenId)) += newToken
     (tokenId, token)
-  }
 
   def getAccountByAccessToken(
       token: String)(implicit s: Session): Option[Account] =
     Accounts
       .innerJoin(AccessTokens)
-      .filter {
+      .filter
         case (ac, t) =>
           (ac.userName === t.userName) &&
           (t.tokenHash === tokenToHash(token).bind) &&
           (ac.removed === false.bind)
-      }
       .map { case (ac, t) => ac }
       .firstOption
 
@@ -62,6 +59,5 @@ trait AccessTokenService {
     (t =>
           t.userName === userName.bind &&
           t.accessTokenId === accessTokenId) delete
-}
 
 object AccessTokenService extends AccessTokenService

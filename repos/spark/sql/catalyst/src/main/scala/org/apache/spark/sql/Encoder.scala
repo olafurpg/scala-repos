@@ -74,14 +74,13 @@ import org.apache.spark.sql.types._
     "(Int, String, etc) and Product types (case classes) are supported by importing " +
     "sqlContext.implicits._  Support for serializing other types will be added in future " +
     "releases.")
-trait Encoder[T] extends Serializable {
+trait Encoder[T] extends Serializable
 
   /** Returns the schema of encoding this type of object as a Row. */
   def schema: StructType
 
   /** A ClassTag that can be used to construct and Array to contain a collection of `T`. */
   def clsTag: ClassTag[T]
-}
 
 /**
   * :: Experimental ::
@@ -90,7 +89,7 @@ trait Encoder[T] extends Serializable {
   * @since 1.6.0
   */
 @Experimental
-object Encoders {
+object Encoders
 
   /**
     * An encoder for nullable boolean type.
@@ -230,20 +229,17 @@ object Encoders {
     javaSerialization(ClassTag[T](clazz))
 
   /** Throws an exception if T is not a public class. */
-  private def validatePublicClass[T : ClassTag](): Unit = {
-    if (!Modifier.isPublic(classTag[T].runtimeClass.getModifiers)) {
+  private def validatePublicClass[T : ClassTag](): Unit =
+    if (!Modifier.isPublic(classTag[T].runtimeClass.getModifiers))
       throw new UnsupportedOperationException(
           s"${classTag[T].runtimeClass.getName} is not a public class. " +
           "Only public classes are supported.")
-    }
-  }
 
   /** A way to construct encoders using generic serializers. */
-  private def genericSerializer[T : ClassTag](useKryo: Boolean): Encoder[T] = {
-    if (classTag[T].runtimeClass.isPrimitive) {
+  private def genericSerializer[T : ClassTag](useKryo: Boolean): Encoder[T] =
+    if (classTag[T].runtimeClass.isPrimitive)
       throw new UnsupportedOperationException(
           "Primitive types are not supported.")
-    }
 
     validatePublicClass[T]()
 
@@ -261,15 +257,13 @@ object Encoders {
               kryo = useKryo),
         clsTag = classTag[T]
     )
-  }
 
   /**
     * An encoder for 2-ary tuples.
     * @since 1.6.0
     */
-  def tuple[T1, T2](e1: Encoder[T1], e2: Encoder[T2]): Encoder[(T1, T2)] = {
+  def tuple[T1, T2](e1: Encoder[T1], e2: Encoder[T2]): Encoder[(T1, T2)] =
     ExpressionEncoder.tuple(encoderFor(e1), encoderFor(e2))
-  }
 
   /**
     * An encoder for 3-ary tuples.
@@ -277,9 +271,8 @@ object Encoders {
     */
   def tuple[T1, T2, T3](e1: Encoder[T1],
                         e2: Encoder[T2],
-                        e3: Encoder[T3]): Encoder[(T1, T2, T3)] = {
+                        e3: Encoder[T3]): Encoder[(T1, T2, T3)] =
     ExpressionEncoder.tuple(encoderFor(e1), encoderFor(e2), encoderFor(e3))
-  }
 
   /**
     * An encoder for 4-ary tuples.
@@ -288,10 +281,9 @@ object Encoders {
   def tuple[T1, T2, T3, T4](e1: Encoder[T1],
                             e2: Encoder[T2],
                             e3: Encoder[T3],
-                            e4: Encoder[T4]): Encoder[(T1, T2, T3, T4)] = {
+                            e4: Encoder[T4]): Encoder[(T1, T2, T3, T4)] =
     ExpressionEncoder.tuple(
         encoderFor(e1), encoderFor(e2), encoderFor(e3), encoderFor(e4))
-  }
 
   /**
     * An encoder for 5-ary tuples.
@@ -302,11 +294,9 @@ object Encoders {
       e2: Encoder[T2],
       e3: Encoder[T3],
       e4: Encoder[T4],
-      e5: Encoder[T5]): Encoder[(T1, T2, T3, T4, T5)] = {
+      e5: Encoder[T5]): Encoder[(T1, T2, T3, T4, T5)] =
     ExpressionEncoder.tuple(encoderFor(e1),
                             encoderFor(e2),
                             encoderFor(e3),
                             encoderFor(e4),
                             encoderFor(e5))
-  }
-}

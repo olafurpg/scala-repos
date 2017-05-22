@@ -37,7 +37,7 @@ import SieveUtil._
   * it's probably better to use methods on the companion object, which
   * will instantiate a Siever for you with reasonable parameters.
   */
-case class Siever(chunkSize: Int, cutoff: SafeLong) {
+case class Siever(chunkSize: Int, cutoff: SafeLong)
   require(chunkSize % 480 == 0, "chunkSize must be a multiple of 480")
 
   val arr = BitSet.alloc(chunkSize)
@@ -48,7 +48,7 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
   var sieve: SieveSegment = SieveSegment(start, arr, cutoff)
   sieve.init(fastq, slowq)
 
-  def largestBelow(n: SafeLong): SafeLong = {
+  def largestBelow(n: SafeLong): SafeLong =
     if (n < 3)
       throw new IllegalArgumentException("invalid argument: %s" format n)
     if (n == 3) return SafeLong(2)
@@ -56,49 +56,41 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     var i = 3
     var k = n - 1
     var last = SafeLong(2)
-    while (true) {
+    while (true)
       val primes = sieve.primes
       val len = primes.length
-      if (n - start < len) {
+      if (n - start < len)
         var i = 1
         val goal = (n - start).toInt
-        while (i < goal) {
+        while (i < goal)
           if (primes(i)) last = start + i
           i += 2
-        }
         return last
-      } else {
+      else
         var i = len - 1
         while (1 <= i && !primes(i)) i -= 2
         if (1 <= i) last = start + i
-      }
       initNextSieve()
       i = 1
-    }
     return SafeLong(0) // impossible
-  }
 
-  def nth(n: Long): SafeLong = {
+  def nth(n: Long): SafeLong =
     if (n == 1) return SafeLong(2)
     var i = 3
     var k = n - 1
-    while (true) {
+    while (true)
       val primes = sieve.primes
       val len = primes.length
-      while (i < len) {
-        if (primes(i)) {
+      while (i < len)
+        if (primes(i))
           k -= 1
           if (k < 1) return sieve.start + i
-        }
         i += 2
-      }
       initNextSieve()
       i = 1
-    }
     return SafeLong(0) // impossible
-  }
 
-  private def initNextSieve(): Unit = {
+  private def initNextSieve(): Unit =
     start += chunkSize
     limit += chunkSize
     val csq = cutoff ** 2
@@ -107,30 +99,23 @@ case class Siever(chunkSize: Int, cutoff: SafeLong) {
     arr.clear()
     sieve = SieveSegment(start, arr, cutoff)
     sieve.init(fastq, slowq)
-  }
 
-  def nextAfter(n: SafeLong): SafeLong = {
+  def nextAfter(n: SafeLong): SafeLong =
     var nn = sieve.nextAfter(n)
-    while (nn == -1L) {
+    while (nn == -1L)
       initNextSieve()
       nn = sieve.nextAfter(start - 1)
-    }
     nn
-  }
 
-  def streamAfter(p0: SafeLong): Stream[SafeLong] = {
+  def streamAfter(p0: SafeLong): Stream[SafeLong] =
     val p = nextAfter(p0)
     p #:: streamAfter(p)
-  }
 
-  def arrayAt(p: SafeLong, size: Int): Array[SafeLong] = {
+  def arrayAt(p: SafeLong, size: Int): Array[SafeLong] =
     val arr = new Array[SafeLong](size)
     def loop(i: Int, p: SafeLong): Unit =
-      if (i < arr.length) {
+      if (i < arr.length)
         arr(i) = p
         loop(i + 1, nextAfter(p))
-      }
     loop(0, p)
     arr
-  }
-}

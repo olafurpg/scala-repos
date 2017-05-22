@@ -33,15 +33,14 @@ import scalafx.Includes.jfxReadOnlyIntegerProperty2sfx
 import scalafx.beans.property.{ReadOnlyIntegerProperty, ReadOnlyObjectProperty}
 import scalafx.delegate.SFXDelegate
 
-object SelectionModel {
+object SelectionModel
   implicit def sfxSelectionModel2jfx[T](
       v: SelectionModel[T]): jfxsc.SelectionModel[T] =
     if (v != null) v.delegate else null
-}
 
 abstract class SelectionModel[T](
     override val delegate: jfxsc.SelectionModel[T])
-    extends SFXDelegate[jfxsc.SelectionModel[T]] {
+    extends SFXDelegate[jfxsc.SelectionModel[T]]
 
   /**
     * Refers to the selected index property, which is used to indicate the
@@ -60,23 +59,20 @@ abstract class SelectionModel[T](
     * A method that clears any selection prior to setting the selection to the
     * given index.
     */
-  def clearAndSelect(index: Int) {
+  def clearAndSelect(index: Int)
     delegate.clearAndSelect(index)
-  }
 
   /**
     * Clears the selection model of all selected indices.
     */
-  def clearSelection() {
+  def clearSelection()
     delegate.clearSelection()
-  }
 
   /**
     * This method will clear the selection of the item in the given index.
     */
-  def clearSelection(index: Int) {
+  def clearSelection(index: Int)
     delegate.clearSelection(index)
-  }
 
   /**
     * This method is available to test whether there are any selected
@@ -93,43 +89,36 @@ abstract class SelectionModel[T](
     * This will select the given index in the selection model, assuming the
     * index is within the valid range (i.e.
     */
-  def select(index: Int) {
+  def select(index: Int)
     delegate.select(index)
-  }
 
   /**
     * This method will attempt to select the index that contains the given object.
     */
-  def select(obj: T) {
+  def select(obj: T)
     delegate.select(obj)
-  }
 
   /**
     * This method will attempt to select the first index in the control.
     */
-  def selectFirst() {
+  def selectFirst()
     delegate.selectFirst()
-  }
 
   /**
     * This method will attempt to select the last index in the control.
     */
-  def selectLast() {
+  def selectLast()
     delegate.selectLast()
-  }
 
   /**
     * This method will attempt to select the index directly after the current
     * focused index.
     */
-  def selectNext() {
+  def selectNext()
     delegate.selectNext()
-  }
 
   /**
     * This method will attempt to select the index directly before the current focused index.
     */
-  def selectPrevious() {
+  def selectPrevious()
     delegate.selectPrevious()
-  }
-}

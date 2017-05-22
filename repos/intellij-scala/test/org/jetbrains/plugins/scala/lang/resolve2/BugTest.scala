@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class BugTest extends ResolveTestBase {
-  override def folderPath: String = {
+class BugTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "bug/"
-  }
   def testBug1() { doTest() }
 
   //TODO answer?
@@ -63,4 +62,3 @@ class BugTest extends ResolveTestBase {
   def testThisTypeSelfType() { doTest() }
 
   def testImplicitsOverloading() { doTest() }
-}

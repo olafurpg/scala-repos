@@ -17,7 +17,7 @@
 
 package org.apache.spark.util
 
-private[spark] object SparkExitCode {
+private[spark] object SparkExitCode
 
   /** The default uncaught exception handler was reached. */
   val UNCAUGHT_EXCEPTION = 50
@@ -29,4 +29,3 @@ private[spark] object SparkExitCode {
   /** The default uncaught exception handler was reached, and the uncaught exception was an
       OutOfMemoryError. */
   val OOM = 52
-}

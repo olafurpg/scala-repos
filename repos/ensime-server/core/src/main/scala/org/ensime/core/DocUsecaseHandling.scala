@@ -19,32 +19,29 @@ import scala.io.Source
 // Instead of doing things the 'right' way, which would be hard, we use heuristics
 // to determine if the link is likely to be a @usecase, and then go digging
 // through the html content to find the anchor.
-trait DocUsecaseHandling { self: DocResolver =>
+trait DocUsecaseHandling  self: DocResolver =>
 
   val PrefixRegexp = """^([A-Za-z:_\+-]+).*""".r
-  protected def maybeReplaceWithUsecase(jar: File, sig: DocSig): DocSig = {
-    if (sig.fqn.scalaStdLib) {
-      sig.member match {
+  protected def maybeReplaceWithUsecase(jar: File, sig: DocSig): DocSig =
+    if (sig.fqn.scalaStdLib)
+      sig.member match
         case Some(PrefixRegexp(prefix)) if UseCasePrefixes.contains(prefix) =>
-          try {
+          try
             val jarFile = new JarFile(jar)
-            try {
+            try
               val is = jarFile.getInputStream(
                   jarFile.getEntry(scalaFqnToPath(sig.fqn)))
               val html = Source.fromInputStream(is).mkString
               val re = s"""<a id="(${Pattern.quote(prefix)}.+?)"""".r
               re.findFirstMatchIn(html)
-                .map { m =>
+                .map  m =>
                   sig.copy(member = Some(
                             StringEscapeUtils.unescapeHtml(m.group(1))))
-                }
                 .getOrElse(sig)
-            } finally jarFile.close()
-          } catch { case e: IOException => sig }
+            finally jarFile.close()
+          catch { case e: IOException => sig }
         case _ => sig
-      }
-    } else sig
-  }
+    else sig
 
   private val UseCasePrefixes = Set(
       "+",
@@ -90,4 +87,3 @@ trait DocUsecaseHandling { self: DocResolver =>
       "zipAll",
       "zipWithIndex"
   )
-}

@@ -1,4 +1,4 @@
-object SCL4513 {
+object SCL4513
   trait A
   trait B
   class C
@@ -9,5 +9,4 @@ object SCL4513 {
 
   /*start*/
   foo(new B {}) /*end*/
-}
 //SCL4513.C

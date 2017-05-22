@@ -14,20 +14,18 @@ import scala.collection.mutable
 /** The internal implementation of scala.sys.Prop.
   */
 private[sys] class PropImpl[+T](val key: String, valueFn: String => T)
-    extends Prop[T] {
+    extends Prop[T]
   def value: T = if (isSet) valueFn(get) else zero
   def isSet = underlying contains key
-  def set(newValue: String): String = {
+  def set(newValue: String): String =
     val old = if (isSet) get else null
     underlying(key) = newValue
     old
-  }
-  def setValue[T1 >: T](newValue: T1): T = {
+  def setValue[T1 >: T](newValue: T1): T =
     val old = value
     if (newValue == null) set(null)
     else set("" + newValue)
     old
-  }
   def get: String =
     if (isSet) underlying.getOrElse(key, "")
     else ""
@@ -41,9 +39,7 @@ private[sys] class PropImpl[+T](val key: String, valueFn: String => T)
   protected def zero: T = null.asInstanceOf[T]
   private def getString = if (isSet) "currently: " + get else "unset"
   override def toString = "%s (%s)".format(key, getString)
-}
 
 private[sys] abstract class CreatorImpl[+T](f: String => T)
-    extends Prop.Creator[T] {
+    extends Prop.Creator[T]
   def apply(key: String): Prop[T] = new PropImpl[T](key, f)
-}

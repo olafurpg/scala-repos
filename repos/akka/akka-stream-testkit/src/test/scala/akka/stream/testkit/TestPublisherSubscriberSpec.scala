@@ -11,16 +11,16 @@ import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import org.reactivestreams.Subscription
 import akka.testkit.AkkaSpec
 
-class TestPublisherSubscriberSpec extends AkkaSpec {
+class TestPublisherSubscriberSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "TestPublisher and TestSubscriber" must {
+  "TestPublisher and TestSubscriber" must
 
-    "have all events accessible from manual probes" in assertAllStagesStopped {
+    "have all events accessible from manual probes" in assertAllStagesStopped
       val upstream = TestPublisher.manualProbe[Int]()
       val downstream = TestSubscriber.manualProbe[Int]()
       Source
@@ -29,9 +29,8 @@ class TestPublisherSubscriberSpec extends AkkaSpec {
         .subscribe(downstream)
 
       val upstreamSubscription = upstream.expectSubscription()
-      val downstreamSubscription: Subscription = downstream.expectEventPF {
+      val downstreamSubscription: Subscription = downstream.expectEventPF
         case OnSubscribe(sub) ⇒ sub
-      }
 
       upstreamSubscription.sendNext(1)
       downstreamSubscription.request(1)
@@ -43,13 +42,11 @@ class TestPublisherSubscriberSpec extends AkkaSpec {
       downstream.expectNextPF[Int] { case e: Int ⇒ e } should ===(1)
 
       upstreamSubscription.sendComplete()
-      downstream.expectEventPF {
+      downstream.expectEventPF
         case OnComplete ⇒
         case _ ⇒ fail()
-      }
-    }
 
-    "handle gracefully partial function that is not suitable" in assertAllStagesStopped {
+    "handle gracefully partial function that is not suitable" in assertAllStagesStopped
       val upstream = TestPublisher.manualProbe[Int]()
       val downstream = TestSubscriber.manualProbe[Int]()
       Source
@@ -57,20 +54,14 @@ class TestPublisherSubscriberSpec extends AkkaSpec {
         .runWith(Sink.asPublisher(false))(materializer)
         .subscribe(downstream)
       val upstreamSubscription = upstream.expectSubscription()
-      val downstreamSubscription: Subscription = downstream.expectEventPF {
+      val downstreamSubscription: Subscription = downstream.expectEventPF
         case OnSubscribe(sub) ⇒ sub
-      }
 
       upstreamSubscription.sendNext(1)
       downstreamSubscription.request(1)
-      an[AssertionError] should be thrownBy upstream.expectEventPF {
+      an[AssertionError] should be thrownBy upstream.expectEventPF
         case Subscribe(e) ⇒ e
-      }
-      an[AssertionError] should be thrownBy downstream.expectNextPF[String] {
+      an[AssertionError] should be thrownBy downstream.expectNextPF[String]
         case e: String ⇒ e
-      }
 
       upstreamSubscription.sendComplete()
-    }
-  }
-}

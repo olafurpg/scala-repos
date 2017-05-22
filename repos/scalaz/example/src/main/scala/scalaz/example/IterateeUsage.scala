@@ -1,6 +1,6 @@
 package scalaz.example
 
-object IterateeUsage extends App {
+object IterateeUsage extends App
   import scalaz._, Scalaz._, MonadPartialOrder._
   import iteratee._, Iteratee._
   import effect._
@@ -65,10 +65,10 @@ object IterateeUsage extends App {
   (m1 &= stream123).run assert_=== Some(1 -> 2)
 
   // As a monad using for comprehension (same as 'm1' example above)
-  val m2 = for {
+  val m2 = for
     b <- head[Int, Id]
     b2 <- head[Int, Id]
-  } yield b tuple b2
+  yield b tuple b2
   (m2 &= stream123).run assert_=== Some(1 -> 2)
 
   val colc =
@@ -81,4 +81,3 @@ object IterateeUsage extends App {
     (ab => head[Int, Id] map (h => (ab, h)))
   (take10And5ThenHead &= enumStream((1 to 20).toStream)).run assert_===
   (((1 to 10).toList, (1 to 5).toList), Some(11))
-}

@@ -6,45 +6,38 @@ import scala.util.Random
 import breeze.linalg.{SparseVector, DenseVector, DenseMatrix}
 import breeze.math.Complex
 
-class DescriptiveStatsTest extends WordSpec with Matchers {
-  "DescriptiveStats" should {
-    "percentile should not explode when p = 1" in {
+class DescriptiveStatsTest extends WordSpec with Matchers
+  "DescriptiveStats" should
+    "percentile should not explode when p = 1" in
       val a = List.fill(100)(1.0)
       DescriptiveStats.percentile(a, 1.0) should be(1.0)
-    }
-    "variance should not explode when size of list is 1" in {
+    "variance should not explode when size of list is 1" in
       val a = List(1.0)
       meanAndVariance(a) should be(MeanAndVariance(1.0, 0, 1))
-    }
-    "mean should give correct value" in {
+    "mean should give correct value" in
       val a = List(1.0, 2.0, 3.0, 4.0)
       mean(a) should be(2.5)
-    }
-    "mean should give correct value for SparseVectors" in {
+    "mean should give correct value for SparseVectors" in
       val a = SparseVector.zeros[Double](1000)
       a(10) = 100.0
       mean(a) should be(0.1)
-    }
-    "covariance should not explode when size of list is 1" in {
+    "covariance should not explode when size of list is 1" in
       val a = List(1.0)
       val b = List(2.0)
       DescriptiveStats.meanAndCov(a, b) should be((1.0, 2.0, 0))
-    }
-    "covariance should produce correct values" in {
+    "covariance should produce correct values" in
       val a = List(1.0, 2.0, 3.0, 4)
       val b = List(2.0, -3, 4.0, 5)
       DescriptiveStats.cov(a, b) should be(2 + (2.0 / 3))
-    }
-    "covmat should produce correct values for matrix" in {
+    "covmat should produce correct values for matrix" in
       val d = DenseMatrix((1.0, 2.0), (2.0, -3.0), (3.0, 4.0), (4.0, 5.0))
       val result: DenseMatrix[Double] = covmat(d)
       assert(math.abs(result(0, 1) - 2.66666667) < 1e-7)
       assert(math.abs(result(1, 0) - 2.66666667) < 1e-7)
       assert(math.abs(result(0, 0) - 1.66666667) < 1e-7)
       assert(math.abs(result(1, 1) - 12.66666667) < 1e-7)
-    }
 
-    "covmat should produce correct values for seq of vectors" in {
+    "covmat should produce correct values for seq of vectors" in
       val d = Seq(DenseVector(1.0, 2.0),
                   DenseVector(2.0, -3.0),
                   DenseVector(3.0, 4.0),
@@ -54,17 +47,15 @@ class DescriptiveStatsTest extends WordSpec with Matchers {
       assert(math.abs(result(1, 0) - 2.66666667) < 1e-7)
       assert(math.abs(result(0, 0) - 1.66666667) < 1e-7)
       assert(math.abs(result(1, 1) - 12.66666667) < 1e-7)
-    }
 
-    "corrcoeff should produce correct values" in {
+    "corrcoeff should produce correct values" in
       val d = DenseMatrix((1.0, 2.0), (2.0, -3.0), (3.0, 4.0), (4.0, 5.0))
       val result: DenseMatrix[Double] = corrcoeff(d)
       assert(math.abs(result(0, 1) - 0.580381) < 1e-7)
       assert(math.abs(result(1, 0) - 0.580381) < 1e-7)
       assert(math.abs(result(0, 0) - 1.0) < 1e-7)
       assert(math.abs(result(1, 1) - 1.0) < 1e-7)
-    }
-    "corrcoeff should produce correct values for list of vectors" in {
+    "corrcoeff should produce correct values for list of vectors" in
       val d = Seq(DenseVector(1.0, 2.0),
                   DenseVector(2.0, -3.0),
                   DenseVector(3.0, 4.0),
@@ -74,83 +65,70 @@ class DescriptiveStatsTest extends WordSpec with Matchers {
       assert(math.abs(result(1, 0) - 0.580381) < 1e-7)
       assert(math.abs(result(0, 0) - 1.0) < 1e-7)
       assert(math.abs(result(1, 1) - 1.0) < 1e-7)
-    }
 
-    "mode should produce the correct values" in {
+    "mode should produce the correct values" in
       val vector = DenseVector(1.0, 2.0, 3.0, 2.0, 3.0, 3.0)
       val result = mode(vector)
       assert(result.mode == 3.0)
       assert(result.frequency == 3)
-    }
-    "mode should return Double.NaN for an empty collection" in {
+    "mode should return Double.NaN for an empty collection" in
       val vector = DenseVector[Double]()
       val result = mode(vector)
       assert(result.mode.isNaN)
       assert(result.frequency == 0)
-    }
-    "digitize should return proper bins" in {
+    "digitize should return proper bins" in
       val x = DenseVector[Double](-0.5, 0.5, 1.5, 2, 0, 2.5)
       val bins = DenseVector[Double](0.0, 1.0, 2.0)
       val result = digitize(x, bins)
       val desiredResult = DenseVector[Int](0, 1, 2, 2, 0, 3)
       assert(result == desiredResult)
-    }
 
-    "bincount should compute bins for DenseVector" in {
+    "bincount should compute bins for DenseVector" in
       val x = DenseVector[Int](0, 1, 2, 3, 1)
       val result = DenseVector[Int](1, 2, 1, 1)
       assert(result == bincount(x))
-    }
 
-    "bincount should compute bins for DenseVector with weights" in {
+    "bincount should compute bins for DenseVector with weights" in
       val x = DenseVector[Int](0, 1, 2, 3, 1)
       val weights = DenseVector[Double](1.0, 2.0, 1.0, 7.0, 1.0)
       val result = DenseVector[Double](1.0, 3.0, 1, 7.0)
       assert(result == bincount(x, weights))
-    }
 
-    "bincount should compute bins for DenseMatrix" in {
+    "bincount should compute bins for DenseMatrix" in
       val x = DenseMatrix((1, 2), (2, 3), (3, 4), (4, 5))
       val result = DenseVector[Int](0, 1, 2, 2, 2, 1)
       assert(result == bincount(x))
-    }
 
-    "bincountSparse should compute bins for DenseVector" in {
+    "bincountSparse should compute bins for DenseVector" in
       val x = DenseVector[Int](0, 10, 20, 300, 10)
       val result = new SparseVector[Int](
           Array[Int](0, 10, 20, 300), Array[Int](1, 2, 1, 1), 301)
       assert(result == bincount.sparse(x))
-    }
 
-    "bincountSparse should compute bins for other container with CanTraverseValues" in {
+    "bincountSparse should compute bins for other container with CanTraverseValues" in
       val x = List[Int](0, 10, 20, 300, 10)
       val result = new SparseVector[Int](
           Array[Int](0, 10, 20, 300), Array[Int](1, 2, 1, 1), 301)
       assert(result == bincount.sparse(x))
-    }
 
-    "bincountSparse should compute weighted bins for DenseVector" in {
+    "bincountSparse should compute weighted bins for DenseVector" in
       val x = DenseVector[Int](0, 10, 20, 300, 10)
       val weights = DenseVector[Double](1.0, 3.0, 1.0, 7.0, 1.0)
       val result = new SparseVector[Double](
           Array[Int](0, 10, 20, 300), Array[Double](1.0, 4.0, 1.0, 7.0), 301)
       assert(result == bincount.sparse(x, weights))
-    }
-  }
-}
 
-class DescriptiveStatsTest2 extends FunSuite {
+class DescriptiveStatsTest2 extends FunSuite
   //Tests copied over from LinearAlgebraTests.scala
 
-  test("complex mean") {
+  test("complex mean")
     import breeze.{math => bmath}
     import breeze.math.Complex
     val data = DenseVector[Complex](
         (0.0 + 1.0 * bmath.i), (1.0 + 0.0 * bmath.i), (2.0 + 2.0 * bmath.i))
     assert(mean(data) === (1.0 + 1.0 * bmath.i))
-  }
 
-  test("mean and variance") {
+  test("mean and variance")
     val r = new Random(0)
     val data = Array.fill(100000)(r.nextGaussian)
     val mav = meanAndVariance(data)
@@ -160,9 +138,8 @@ class DescriptiveStatsTest2 extends FunSuite {
     assert(breeze.numerics.closeTo(mav.variance, 1.0, 1E-2),
            mav.variance + " should be 1")
     assert(mav == mav2)
-  }
 
-  test("mean and variance addition") {
+  test("mean and variance addition")
     val r = new Random(0)
     val data = Array.fill(100000)(r.nextGaussian)
     val data2 = Array.fill(100000)(r.nextGaussian * 5 + 3)
@@ -173,9 +150,8 @@ class DescriptiveStatsTest2 extends FunSuite {
     assert(breeze.numerics.closeTo(mavTotal.mean, mavSum.mean, 1E-5))
     assert(breeze.numerics.closeTo(mavTotal.variance, mavSum.variance, 1E-5))
     assert(mavSum.count == mavTotal.count)
-  }
 
-  test("median") {
+  test("median")
     val dataOdd = DenseVector(0, 1, 2, 3, 400000)
     val dataOddDuplicate = DenseVector(0, 0, 0, 1, 2, 2, 2, 3, 400000)
     val dataEven = DenseVector(0f, 1f, 2f, 100f)
@@ -219,5 +195,3 @@ class DescriptiveStatsTest2 extends FunSuite {
     assert(median(dataEvenDuplicate2Seq) == 450,
            "median (even length with duplicate) should be 450 instead of " +
            median(dataEvenDuplicate2))
-  }
-}

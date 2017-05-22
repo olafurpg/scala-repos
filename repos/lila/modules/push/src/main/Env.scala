@@ -11,7 +11,7 @@ final class Env(config: Config,
                 getLightUser: String => Option[lila.common.LightUser],
                 roundSocketHub: ActorSelection,
                 appleCertificate: String => InputStream,
-                system: ActorSystem) {
+                system: ActorSystem)
 
   private val CollectionDevice = config getString "collection.device"
   private val GooglePushUrl = config getString "google.url"
@@ -40,22 +40,19 @@ final class Env(config: Config,
   private lazy val pushApi = new PushApi(
       googlePush, applePush, getLightUser, roundSocketHub)
 
-  system.actorOf(Props(new Actor {
-    override def preStart() {
+  system.actorOf(Props(new Actor
+    override def preStart()
       system.lilaBus.subscribe(self, 'finishGame, 'moveEvent, 'challenge)
-    }
     import akka.pattern.pipe
-    def receive = {
+    def receive =
       case lila.game.actorApi.FinishGame(game, _, _) => pushApi finish game
       case move: lila.hub.actorApi.round.MoveEvent => pushApi move move
       case lila.challenge.Event.Create(c) => pushApi challengeCreate c
       case lila.challenge.Event.Accept(c, joinerId) =>
         pushApi.challengeAccept(c, joinerId)
-    }
-  }))
-}
+  ))
 
-object Env {
+object Env
 
   lazy val current: Env =
     "push" boot new Env(db = lila.db.Env.current,
@@ -63,8 +60,7 @@ object Env {
                         getLightUser = lila.user.Env.current.lightUser,
                         roundSocketHub = lila.hub.Env.current.socket.round,
                         appleCertificate = path =>
-                            lila.common.PlayApp.withApp {
+                            lila.common.PlayApp.withApp
                             _.classloader.getResourceAsStream(path)
-                        },
+                        ,
                         config = lila.common.PlayApp loadConfig "push")
-}

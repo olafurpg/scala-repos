@@ -20,16 +20,14 @@ package org.apache.spark.sql.hive
 import org.apache.spark.sql.{QueryTest, Row}
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 
-class HiveDataFrameJoinSuite extends QueryTest with TestHiveSingleton {
+class HiveDataFrameJoinSuite extends QueryTest with TestHiveSingleton
   import hiveContext.implicits._
 
   // We should move this into SQL package if we make case sensitivity configurable in SQL.
-  test("join - self join auto resolve ambiguity with case insensitivity") {
+  test("join - self join auto resolve ambiguity with case insensitivity")
     val df = Seq((1, "1"), (2, "2")).toDF("key", "value")
     checkAnswer(df.join(df, df("key") === df("Key")),
                 Row(1, "1", 1, "1") :: Row(2, "2", 2, "2") :: Nil)
 
     checkAnswer(df.join(df.filter($"value" === "2"), df("key") === df("Key")),
                 Row(2, "2", 2, "2") :: Nil)
-  }
-}

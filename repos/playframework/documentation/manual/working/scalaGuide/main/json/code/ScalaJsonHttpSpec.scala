@@ -13,10 +13,10 @@ import play.api.mvc._
 import play.api.test._
 
 @RunWith(classOf[JUnitRunner])
-class ScalaJsonHttpSpec extends PlaySpecification with Results {
+class ScalaJsonHttpSpec extends PlaySpecification with Results
 
-  "JSON with HTTP" should {
-    "allow serving JSON" in {
+  "JSON with HTTP" should
+    "allow serving JSON" in
 
       //#serve-json-imports
       //###insert: import play.api.mvc._
@@ -35,19 +35,17 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
       //#serve-json-implicits
 
       //#serve-json
-      def listPlaces = Action {
+      def listPlaces = Action
         val json = Json.toJson(Place.list)
         Ok(json)
-      }
       //#serve-json
 
       val result: Future[Result] = listPlaces().apply(FakeRequest())
       status(result) === OK
       contentType(result) === Some("application/json")
       contentAsString(result) === """[{"name":"Sandleford","location":{"lat":51.377797,"long":-1.318965}},{"name":"Watership Down","location":{"lat":51.235685,"long":-1.309197}}]"""
-    }
 
-    "allow handling JSON" in {
+    "allow handling JSON" in
 
       //#handle-json-imports
       import play.api.libs.json._
@@ -64,28 +62,23 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
       //#handle-json-implicits
 
       //#handle-json
-      def savePlace = Action { request =>
-        request.body.asJson.map { json =>
+      def savePlace = Action  request =>
+        request.body.asJson.map  json =>
           val placeResult = json.validate[Place]
           placeResult.fold(
               errors =>
-                {
                   BadRequest(Json.obj("status" -> "KO",
                                       "message" -> JsError.toJson(errors)))
-              },
+              ,
               place =>
-                {
                   Place.save(place)
                   Ok(Json.obj("status" -> "OK",
                               "message" ->
                               ("Place '" + place.name + "' saved.")))
-              }
           )
-        }.getOrElse {
+        .getOrElse
           BadRequest(
               Json.obj("status" -> "KO", "message" -> "Expecting JSON data."))
-        }
-      }
       //#handle-json
 
       val body = Json.parse("""
@@ -105,9 +98,8 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
       status(result) === OK
       contentType(result) === Some("application/json")
       contentAsString(result) === """{"status":"OK","message":"Place 'Nuthanger Farm' saved."}"""
-    }
 
-    "allow handling JSON with BodyParser" in {
+    "allow handling JSON with BodyParser" in
 
       import play.api.libs.json._
       import play.api.libs.functional.syntax._
@@ -120,23 +112,19 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
               .read[Location])(Place.apply _)
 
       //#handle-json-bodyparser
-      def savePlace = Action(BodyParsers.parse.json) { request =>
+      def savePlace = Action(BodyParsers.parse.json)  request =>
         val placeResult = request.body.validate[Place]
         placeResult.fold(
             errors =>
-              {
                 BadRequest(Json.obj("status" -> "KO",
                                     "message" -> JsError.toJson(errors)))
-            },
+            ,
             place =>
-              {
                 Place.save(place)
                 Ok(Json.obj(
                         "status" -> "OK",
                         "message" -> ("Place '" + place.name + "' saved.")))
-            }
         )
-      }
       //#handle-json-bodyparser
 
       val body: JsValue = Json.parse("""
@@ -156,18 +144,15 @@ class ScalaJsonHttpSpec extends PlaySpecification with Results {
       status(result) === OK
       contentType(result) === Some("application/json")
       contentAsString(result) === """{"status":"OK","message":"Place 'Nuthanger Farm' saved."}"""
-    }
-  }
-}
 
 //#model
 case class Location(lat: Double, long: Double)
 
 case class Place(name: String, location: Location)
 
-object Place {
+object Place
 
-  var list: List[Place] = {
+  var list: List[Place] =
     List(
         Place(
             "Sandleford",
@@ -178,12 +163,9 @@ object Place {
             Location(51.235685, -1.309197)
         )
     )
-  }
 
-  def save(place: Place) = {
+  def save(place: Place) =
     list = list ::: List(place)
-  }
-}
 //#model
 
 //#controller

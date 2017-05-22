@@ -10,19 +10,16 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Arbitrary._
 import org.scalacheck.Prop._
 
-object RingLaws {
+object RingLaws
   def apply[A : Eq : Arbitrary](implicit _pred: Predicate[A]) =
-    new RingLaws[A] {
+    new RingLaws[A]
       def Arb = implicitly[Arbitrary[A]]
       def pred = _pred
-      val nonZeroLaws = new GroupLaws[A] {
+      val nonZeroLaws = new GroupLaws[A]
         def Arb = Arbitrary(arbitrary[A] filter _pred)
         def Equ = Eq[A]
-      }
-    }
-}
 
-trait RingLaws[A] extends GroupLaws[A] {
+trait RingLaws[A] extends GroupLaws[A]
 
   // must be a val (stable identifier)
   val nonZeroLaws: GroupLaws[A]
@@ -136,9 +133,8 @@ trait RingLaws[A] extends GroupLaws[A] {
         al = additiveAbGroup,
         ml = multiplicativeAbGroup,
         parents = Seq(euclideanRing)
-    ) {
+    )
       override def nonZero = true
-    }
 
   // property classes
 
@@ -147,18 +143,16 @@ trait RingLaws[A] extends GroupLaws[A] {
       val parent: Option[MultiplicativeProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet with HasOneParent {
+      extends RuleSet with HasOneParent
     private val _base = base(RingLaws.this)
 
     val name = _base.name
     val bases = Seq("base" → _base)
-  }
 
-  object RingProperties {
+  object RingProperties
     def fromParent(
         name: String, parent: RingProperties, props: (String, Prop)*) =
       new RingProperties(name, parent.al, parent.ml, Seq(parent), props: _*)
-  }
 
   class RingProperties(
       val name: String,
@@ -167,20 +161,18 @@ trait RingLaws[A] extends GroupLaws[A] {
       val parents: Seq[RingProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet {
+      extends RuleSet
     def nonZero: Boolean = false
 
     def _ml =
       if (nonZero)
-        new RuleSet with HasOneParent {
+        new RuleSet with HasOneParent
           val name = ml.name
           val bases = Seq("base-nonzero" → ml.base(nonZeroLaws))
           val parent = ml.parent
           val props = ml.props
-        } else ml
+        else ml
 
     def bases = Seq("additive" → al, "multiplicative" → _ml)
-  }
-}
 
 // vim: expandtab:ts=2:sw=2

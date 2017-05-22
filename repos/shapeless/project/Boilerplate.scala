@@ -23,18 +23,16 @@ import sbt._
   * @author Miles Sabin
   * @author Kevin Wright
   */
-object Boilerplate {
+object Boilerplate
 
   import scala.StringContext._
 
-  implicit class BlockHelper(val sc: StringContext) extends AnyVal {
-    def block(args: Any*): String = {
+  implicit class BlockHelper(val sc: StringContext) extends AnyVal
+    def block(args: Any*): String =
       val interpolated = sc.standardInterpolator(treatEscapes, args)
       val rawLines = interpolated split '\n'
       val trimmedLines = rawLines map { _ dropWhile (_.isWhitespace) }
       trimmedLines mkString "\n"
-    }
-  }
 
   val templates: Seq[Template] = List(
       GenTuplerInstances,
@@ -53,11 +51,10 @@ object Boilerplate {
   )
 
   /** Returns a seq of the generated files.  As a side-effect, it actually generates them... */
-  def gen(dir: File) = for (t <- templates) yield {
+  def gen(dir: File) = for (t <- templates) yield
     val tgtFile = dir / "shapeless" / t.filename
     IO.write(tgtFile, t.body)
     tgtFile
-  }
 
   val header =
     """
@@ -80,7 +77,7 @@ object Boilerplate {
     |package shapeless
   """.stripMargin
 
-  class TemplateVals(val arity: Int) {
+  class TemplateVals(val arity: Int)
     val synTypes = (0 until arity) map (n => (n + 'A').toChar)
     val synVals = (0 until arity) map (n => (n + 'a').toChar)
     val synTypedVals =
@@ -100,18 +97,16 @@ object Boilerplate {
     val `(a..n)` =
       if (arity == 1) "Tuple1(a)" else synVals.mkString("(", ", ", ")")
     val `a:A..n:N` = synTypedVals mkString ", "
-  }
 
-  trait Template {
+  trait Template
     def filename: String
     def content(tv: TemplateVals): String
     def range = 1 to 22
-    def body: String = {
+    def body: String =
       val headerLines = header split '\n'
       val rawContents =
-        range map { n =>
+        range map  n =>
           content(new TemplateVals(n)) split '\n' filterNot (_.isEmpty)
-        }
       val preBody = rawContents.head takeWhile (_ startsWith "|") map (_.tail)
       val instances =
         rawContents flatMap { _ filter (_ startsWith "-") map (_.tail) }
@@ -119,8 +114,6 @@ object Boilerplate {
         rawContents.head dropWhile (_ startsWith "|") dropWhile
         (_ startsWith "-") map (_.tail)
       (headerLines ++ preBody ++ instances ++ postBody) mkString "\n"
-    }
-  }
 
   /*
     Blocks in the templates below use a custom interpolator, combined with post-processing to produce the body
@@ -137,9 +130,9 @@ object Boilerplate {
     The block otherwise behaves as a standard interpolated string with regards to variable substitution.
    */
 
-  object GenTuplerInstances extends Template {
+  object GenTuplerInstances extends Template
     val filename = "tupler.scala"
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       block"""
         |package ops
@@ -161,15 +154,13 @@ object Boilerplate {
         -    }        
         |}
       """
-    }
-  }
 
-  object GenFnToProductInstances extends Template {
+  object GenFnToProductInstances extends Template
     val filename = "fntoproduct.scala"
 
     override val range = 0 to 22
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       val fnType = s"(${`A..N`}) => Res"
       val hlistFnType = s"(${`A::N`}) => Res"
@@ -199,15 +190,13 @@ object Boilerplate {
         -    }
         |}
       """
-    }
-  }
 
-  object GenFnFromProductInstances extends Template {
+  object GenFnFromProductInstances extends Template
     val filename = "fnfromproduct.scala"
 
     override val range = 0 to 22
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       val fnType = s"(${`A..N`}) => Res"
       val hlistFnType = s"(${`A::N`}) => Res"
@@ -235,13 +224,11 @@ object Boilerplate {
         -
         |}
       """
-    }
-  }
 
-  object GenCaseInst extends Template {
+  object GenCaseInst extends Template
     val filename = "caseinst.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       block"""
         |
@@ -257,13 +244,11 @@ object Boilerplate {
         -
         |}
       """
-    }
-  }
 
-  object GenPolyApply extends Template {
+  object GenPolyApply extends Template
     val filename = "polyapply.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       block"""
         |
@@ -278,13 +263,11 @@ object Boilerplate {
         -
         |}
       """
-    }
-  }
 
-  object GenPolyInst extends Template {
+  object GenPolyInst extends Template
     val filename = "polyinst.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       block"""
         |
@@ -299,13 +282,11 @@ object Boilerplate {
         -
         |}
       """
-    }
-  }
 
-  object GenCases extends Template {
+  object GenCases extends Template
     val filename = "cases.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       block"""
         |
@@ -335,13 +316,11 @@ object Boilerplate {
         -
         |}
       """
-    }
-  }
 
-  object GenPolyNTraits extends Template {
+  object GenPolyNTraits extends Template
     val filename = "polyntraits.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       val fnBody =
         if (arity == 0) "fn()"
@@ -373,13 +352,11 @@ object Boilerplate {
         -}
         |
       """
-    }
-  }
 
-  object GenNats extends Template {
+  object GenNats extends Template
     val filename = "nats.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       val n = tv.arity
       block"""
         |
@@ -389,20 +366,18 @@ object Boilerplate {
         -  val _${n}: _${n} = new _${n}
         |}
       """
-    }
-  }
 
-  object GenTupleTypeableInstances extends Template {
+  object GenTupleTypeableInstances extends Template
     val filename = "tupletypeables.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       val implicitArgs =
         (synTypes map (a => s"cast${a}:Typeable[${a}]")) mkString ", "
       val enumerators =
-        synTypes.zipWithIndex map {
+        synTypes.zipWithIndex map
           case (a, idx) => s"_ <- p._${idx + 1}.cast[${a}]"
-        } mkString "; "
+        mkString "; "
       val castVals =
         (synTypes map (a => s"$${cast${a}.describe}")) mkString ", "
 
@@ -428,13 +403,11 @@ object Boilerplate {
         -
         |}
       """
-    }
-  }
 
-  object GenSizedBuilder extends Template {
+  object GenSizedBuilder extends Template
     val filename = "sizedbuilder.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       val `a:T..n:T` = synVals map (_ + ":T") mkString ", "
 
@@ -451,13 +424,11 @@ object Boilerplate {
         -
         |}
       """
-    }
-  }
 
-  object GenHMapBuilder extends Template {
+  object GenHMapBuilder extends Template
     val filename = "hmapbuilder.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       val typeArgs = (0 until arity) map (n => s"K${n}, V${n}") mkString ", "
       val args =
@@ -477,12 +448,10 @@ object Boilerplate {
         -    = new HMap[R](Map(${mapArgs}))
         |}
       """
-    }
-  }
 
-  object GenUnpackInstances extends Template {
+  object GenUnpackInstances extends Template
     val filename = "unpack.scala"
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
       val typeblock = "FF[" + `A..N` + "], FF, " + `A..N`
       val hktypeblock = "FF[" + `_.._` + "], " + `A..N`
@@ -502,6 +471,3 @@ object Boilerplate {
         -}
         |
       """
-    }
-  }
-}

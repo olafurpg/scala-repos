@@ -12,7 +12,7 @@ import org.scalajs.core.tools.io.VirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.linker.LinkingUnit
 
-trait LinkingUnitAsyncJSEnv extends LinkingUnitJSEnv with AsyncJSEnv {
+trait LinkingUnitAsyncJSEnv extends LinkingUnitJSEnv with AsyncJSEnv
   def asyncRunner(preLibs: Seq[ResolvedJSDependency],
                   linkingUnit: LinkingUnit,
                   postLibs: Seq[ResolvedJSDependency],
@@ -27,20 +27,15 @@ trait LinkingUnitAsyncJSEnv extends LinkingUnitJSEnv with AsyncJSEnv {
 
   private[jsenv] trait LinkingUnitAsyncLoadedLibs
       extends LinkingUnitLoadedLibs with AsyncLoadedLibs
-      with LinkingUnitAsyncJSEnv {
+      with LinkingUnitAsyncJSEnv
     def asyncRunner(preLibs: Seq[ResolvedJSDependency],
                     linkingUnit: LinkingUnit,
                     postLibs: Seq[ResolvedJSDependency],
-                    code: VirtualJSFile): AsyncJSRunner = {
+                    code: VirtualJSFile): AsyncJSRunner =
       LinkingUnitAsyncJSEnv.this.asyncRunner(
           loadedLibs ++ preLibs, linkingUnit, postLibs, code)
-    }
-  }
 
-  private[jsenv] trait AsyncLoadedUnit extends LoadedUnit with AsyncJSEnv {
+  private[jsenv] trait AsyncLoadedUnit extends LoadedUnit with AsyncJSEnv
     def asyncRunner(libs: Seq[ResolvedJSDependency],
-                    code: VirtualJSFile): AsyncJSRunner = {
+                    code: VirtualJSFile): AsyncJSRunner =
       LinkingUnitAsyncJSEnv.this.asyncRunner(Nil, loadedUnit, libs, code)
-    }
-  }
-}

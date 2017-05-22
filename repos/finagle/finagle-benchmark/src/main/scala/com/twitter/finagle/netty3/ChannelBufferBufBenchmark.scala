@@ -8,7 +8,7 @@ import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
 @State(Scope.Benchmark)
-class ChannelBufferBufBenchmark extends StdBenchAnnotations {
+class ChannelBufferBufBenchmark extends StdBenchAnnotations
 
   @Param(Array("1000"))
   var size: Int = 1000
@@ -18,7 +18,7 @@ class ChannelBufferBufBenchmark extends StdBenchAnnotations {
   private[this] var all: Array[Buf] = _
 
   @Setup(Level.Iteration)
-  def setup(): Unit = {
+  def setup(): Unit =
     val cap = size * 2
     val start = cap / 4
     val end = start + size
@@ -34,17 +34,14 @@ class ChannelBufferBufBenchmark extends StdBenchAnnotations {
       .slice(0, size / 2)
       .concat(byteArrayBuf.slice(size / 2, size))
     all = Array(byteArrayBuf, byteBufferBuf, concatBuf, channelBufferBuf)
-  }
 
   @Benchmark
-  def equality(hole: Blackhole): Unit = {
+  def equality(hole: Blackhole): Unit =
     var i = 0
-    while (i < all.length) {
+    while (i < all.length)
       hole.consume(channelBufferBuf == all(i))
       hole.consume(all(i) == channelBufferBuf)
       i += 1
-    }
-  }
 
   @Benchmark
   def hash(): Int =
@@ -65,4 +62,3 @@ class ChannelBufferBufBenchmark extends StdBenchAnnotations {
   @Benchmark
   def length(): Int =
     channelBufferBuf.length
-}

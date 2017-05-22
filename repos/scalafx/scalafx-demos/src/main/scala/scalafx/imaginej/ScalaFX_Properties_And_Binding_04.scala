@@ -52,8 +52,8 @@ import scalafx.beans.property.IntegerProperty
   *         http://docs.oracle.com/javafx/2.0/binding/jfxpub-binding.htm
   *
   */
-object ScalaFX_Properties_And_Binding_04 {
-  def main(args: Array[String]) {
+object ScalaFX_Properties_And_Binding_04
+  def main(args: Array[String])
     val num1 = new IntegerProperty(null, "num1")
     val num2 = new IntegerProperty(null, "num2")
     val num3 = new IntegerProperty(null, "num3")
@@ -65,5 +65,3 @@ object ScalaFX_Properties_And_Binding_04 {
     num3() = 3
     num4() = 4
     println("after  property changes: max = " + max())
-  }
-}

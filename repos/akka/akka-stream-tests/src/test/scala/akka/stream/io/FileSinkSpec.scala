@@ -22,13 +22,13 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import akka.testkit.AkkaSpec
 
-class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
+class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig)
 
   val settings = ActorMaterializerSettings(system).withDispatcher(
       "akka.actor.default-dispatcher")
   implicit val materializer = ActorMaterializer(settings)
 
-  val TestLines = {
+  val TestLines =
     val b = ListBuffer[String]()
     b.append("a" * 1000 + "\n")
     b.append("b" * 1000 + "\n")
@@ -37,33 +37,29 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
     b.append("e" * 1000 + "\n")
     b.append("f" * 1000 + "\n")
     b.toList
-  }
 
   val TestByteStrings = TestLines.map(ByteString(_))
 
-  "SynchronousFile Sink" must {
-    "write lines to a file" in assertAllStagesStopped {
-      targetFile { f ⇒
+  "SynchronousFile Sink" must
+    "write lines to a file" in assertAllStagesStopped
+      targetFile  f ⇒
         val completion = Source(TestByteStrings).runWith(FileIO.toFile(f))
 
         val result = Await.result(completion, 3.seconds)
         result.count should equal(6006)
         checkFileContents(f, TestLines.mkString(""))
-      }
-    }
 
-    "create new file if not exists" in assertAllStagesStopped {
-      targetFile({ f ⇒
+    "create new file if not exists" in assertAllStagesStopped
+      targetFile( f ⇒
         val completion = Source(TestByteStrings).runWith(FileIO.toFile(f))
 
         val result = Await.result(completion, 3.seconds)
         result.count should equal(6006)
         checkFileContents(f, TestLines.mkString(""))
-      }, create = false)
-    }
+      , create = false)
 
-    "by default write into existing file" in assertAllStagesStopped {
-      targetFile { f ⇒
+    "by default write into existing file" in assertAllStagesStopped
+      targetFile  f ⇒
         def write(lines: List[String]) =
           Source(lines).map(ByteString(_)).runWith(FileIO.toFile(f))
 
@@ -77,11 +73,9 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         result.count should ===(lastWrite.flatten.length)
         checkFileContents(
             f, lastWrite.mkString("") + TestLines.mkString("").drop(100))
-      }
-    }
 
-    "allow appending to file" in assertAllStagesStopped {
-      targetFile { f ⇒
+    "allow appending to file" in assertAllStagesStopped
+      targetFile  f ⇒
         def write(lines: List[String] = TestLines) =
           Source(lines)
             .map(ByteString(_))
@@ -97,16 +91,14 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
         f.length() should ===(result1.count + result2.count)
         checkFileContents(
             f, TestLines.mkString("") + lastWrite.mkString("") + "\n")
-      }
-    }
 
-    "use dedicated blocking-io-dispatcher by default" in assertAllStagesStopped {
-      targetFile { f ⇒
+    "use dedicated blocking-io-dispatcher by default" in assertAllStagesStopped
+      targetFile  f ⇒
         val sys = ActorSystem("dispatcher-testing", UnboundedMailboxConfig)
         val materializer = ActorMaterializer()(sys)
         implicit val timeout = Timeout(3.seconds)
 
-        try {
+        try
           Source
             .fromIterator(() ⇒ Iterator.continually(TestByteStrings.head))
             .runWith(FileIO.toFile(f))(materializer)
@@ -119,19 +111,17 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
             .find(_.path.toString contains "fileSource")
             .get
           assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher")
-        } finally shutdown(sys)
-      }
-    }
+        finally shutdown(sys)
 
     // FIXME: overriding dispatcher should be made available with dispatcher alias support in materializer (#17929)
-    "allow overriding the dispatcher using Attributes" in assertAllStagesStopped {
+    "allow overriding the dispatcher using Attributes" in assertAllStagesStopped
       pending
-      targetFile { f ⇒
+      targetFile  f ⇒
         val sys = ActorSystem("dispatcher-testing", UnboundedMailboxConfig)
         val materializer = ActorMaterializer()(sys)
         implicit val timeout = Timeout(3.seconds)
 
-        try {
+        try
           Source
             .fromIterator(() ⇒ Iterator.continually(TestByteStrings.head))
             .to(FileIO.toFile(f))
@@ -147,21 +137,15 @@ class FileSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
             .find(_.path.toString contains "File")
             .get
           assertDispatcher(ref, "akka.actor.default-dispatcher")
-        } finally shutdown(sys)
-      }
-    }
-  }
+        finally shutdown(sys)
 
-  private def targetFile(block: File ⇒ Unit, create: Boolean = true) {
+  private def targetFile(block: File ⇒ Unit, create: Boolean = true)
     val targetFile = File.createTempFile("synchronous-file-sink", ".tmp")
     if (!create) targetFile.delete()
     try block(targetFile) finally targetFile.delete()
-  }
 
-  def checkFileContents(f: File, contents: String): Unit = {
+  def checkFileContents(f: File, contents: String): Unit =
     val s = scala.io.Source.fromFile(f)
     val out = s.getLines().mkString("\n") + "\n"
     s.close()
     out should ===(contents)
-  }
-}

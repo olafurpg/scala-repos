@@ -42,7 +42,7 @@ import scala.compat.java8.FunctionConverters._
 @Singleton
 class GzipFilter @Inject()(
     config: GzipFilterConfig)(implicit mat: Materializer)
-    extends EssentialFilter {
+    extends EssentialFilter
 
   import play.api.http.HeaderNames._
 
@@ -52,23 +52,20 @@ class GzipFilter @Inject()(
       implicit mat: Materializer) =
     this(GzipFilterConfig(bufferSize, chunkedThreshold, shouldGzip))
 
-  def apply(next: EssentialAction) = new EssentialAction {
-    def apply(request: RequestHeader) = {
-      if (mayCompress(request)) {
+  def apply(next: EssentialAction) = new EssentialAction
+    def apply(request: RequestHeader) =
+      if (mayCompress(request))
         next(request).mapFuture(result => handleResult(request, result))
-      } else {
+      else
         next(request)
-      }
-    }
-  }
 
   private def handleResult(
-      request: RequestHeader, result: Result): Future[Result] = {
-    if (shouldCompress(result) && config.shouldGzip(request, result)) {
+      request: RequestHeader, result: Result): Future[Result] =
+    if (shouldCompress(result) && config.shouldGzip(request, result))
       val header =
         result.header.copy(headers = setupHeader(result.header.headers))
 
-      result.body match {
+      result.body match
 
         case HttpEntity.Strict(data, contentType) =>
           Future.successful(
@@ -77,9 +74,8 @@ class GzipFilter @Inject()(
         case entity @ HttpEntity.Streamed(_, Some(contentLength), contentType)
             if contentLength <= config.chunkedThreshold =>
           // It's below the chunked threshold, so buffer then compress and send
-          entity.consumeData.map { data =>
+          entity.consumeData.map  data =>
             Result(header, compressStrictEntity(data, contentType))
-          }
 
         case HttpEntity.Streamed(data, _, contentType) =>
           // It's above the chunked threshold, compress through the gzip flow, and send as chunked
@@ -91,7 +87,7 @@ class GzipFilter @Inject()(
 
         case HttpEntity.Chunked(chunks, contentType) =>
           val gzipFlow = Flow.fromGraph(
-              GraphDSL.create[FlowShape[HttpChunk, HttpChunk]]() {
+              GraphDSL.create[FlowShape[HttpChunk, HttpChunk]]()
             implicit builder =>
               import GraphDSL.Implicits._
 
@@ -117,26 +113,22 @@ class GzipFilter @Inject()(
               broadcast.out(1) ~> filterLastChunk ~> concat.in(1)
 
               new FlowShape(broadcast.in, concat.out)
-          })
+          )
 
           Future.successful(
               Result(header,
                      HttpEntity.Chunked(chunks via gzipFlow, contentType)))
-      }
-    } else {
+    else
       Future.successful(result)
-    }
-  }
 
   private def compressStrictEntity(
-      data: ByteString, contentType: Option[String]) = {
+      data: ByteString, contentType: Option[String]) =
     val builder = ByteString.newBuilder
     val gzipOs = new GZIPOutputStream(
         builder.asOutputStream, config.bufferSize, true)
     gzipOs.write(data.toArray)
     gzipOs.close()
     HttpEntity.Strict(builder.result(), contentType)
-  }
 
   /**
     * Whether this request may be compressed.
@@ -144,11 +136,10 @@ class GzipFilter @Inject()(
   private def mayCompress(request: RequestHeader) =
     request.method != "HEAD" && gzipIsAcceptedAndPreferredBy(request)
 
-  private def gzipIsAcceptedAndPreferredBy(request: RequestHeader) = {
+  private def gzipIsAcceptedAndPreferredBy(request: RequestHeader) =
     val codings = acceptHeader(request.headers, ACCEPT_ENCODING)
-    def explicitQValue(coding: String) = codings collectFirst {
+    def explicitQValue(coding: String) = codings collectFirst
       case (q, c) if c equalsIgnoreCase coding => q
-    }
     def defaultQValue(coding: String) =
       if (coding == "identity") 0.001d else 0d
     def qvalue(coding: String) =
@@ -156,7 +147,6 @@ class GzipFilter @Inject()(
           coding)
 
     qvalue("gzip") > 0d && qvalue("gzip") >= qvalue("identity")
-  }
 
   /**
     * Whether this response should be compressed.  Responses that may not contain content won't be compressed, nor will
@@ -180,18 +170,17 @@ class GzipFilter @Inject()(
   private def isNotAlreadyCompressed(header: ResponseHeader) =
     header.headers.get(CONTENT_ENCODING).isEmpty
 
-  private def setupHeader(header: Map[String, String]): Map[String, String] = {
+  private def setupHeader(header: Map[String, String]): Map[String, String] =
     header + (CONTENT_ENCODING -> "gzip") + addToVaryHeader(
         header, VARY, ACCEPT_ENCODING)
-  }
 
   /**
     * There may be an existing Vary value, which we must add to (comma separated)
     */
   private def addToVaryHeader(existingHeaders: Map[String, String],
                               headerName: String,
-                              headerValue: String): (String, String) = {
-    existingHeaders.get(headerName) match {
+                              headerValue: String): (String, String) =
+    existingHeaders.get(headerName) match
       case None => (headerName, headerValue)
       case Some(existing)
           if existing
@@ -199,9 +188,6 @@ class GzipFilter @Inject()(
             .exists(_.trim.equalsIgnoreCase(headerValue)) =>
         (headerName, existing)
       case Some(existing) => (headerName, s"$existing,$headerValue")
-    }
-  }
-}
 
 /**
   * Configuration for the gzip filter
@@ -214,7 +200,7 @@ class GzipFilter @Inject()(
 case class GzipFilterConfig(bufferSize: Int = 8192,
                             chunkedThreshold: Int = 102400,
                             shouldGzip: (RequestHeader,
-                            Result) => Boolean = (_, _) => true) {
+                            Result) => Boolean = (_, _) => true)
 
   // alternate constructor and builder methods for Java
   def this() = this(shouldGzip = (_, _) => true)
@@ -234,11 +220,10 @@ case class GzipFilterConfig(bufferSize: Int = 8192,
     copy(chunkedThreshold = threshold)
 
   def withBufferSize(size: Int): GzipFilterConfig = copy(bufferSize = size)
-}
 
-object GzipFilterConfig {
+object GzipFilterConfig
 
-  def fromConfiguration(conf: Configuration) = {
+  def fromConfiguration(conf: Configuration) =
     val config = PlayConfig(conf).get[PlayConfig]("play.filters.gzip")
 
     GzipFilterConfig(
@@ -248,32 +233,28 @@ object GzipFilterConfig {
             .toBytes
             .toInt
       )
-  }
-}
 
 /**
   * The gzip filter configuration provider.
   */
 @Singleton
 class GzipFilterConfigProvider @Inject()(config: Configuration)
-    extends Provider[GzipFilterConfig] {
+    extends Provider[GzipFilterConfig]
   lazy val get = GzipFilterConfig.fromConfiguration(config)
-}
 
 /**
   * The gzip filter module.
   */
-class GzipFilterModule extends Module {
+class GzipFilterModule extends Module
   def bindings(environment: Environment, configuration: Configuration) = Seq(
       bind[GzipFilterConfig].toProvider[GzipFilterConfigProvider],
       bind[GzipFilter].toSelf
   )
-}
 
 /**
   * The gzip filter components.
   */
-trait GzipFilterComponents {
+trait GzipFilterComponents
   def configuration: Configuration
   def materializer: Materializer
 
@@ -281,4 +262,3 @@ trait GzipFilterComponents {
     GzipFilterConfig.fromConfiguration(configuration)
   lazy val gzipFilter: GzipFilter =
     new GzipFilter(gzipFilterConfig)(materializer)
-}

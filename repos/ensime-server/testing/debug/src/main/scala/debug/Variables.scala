@@ -2,9 +2,9 @@ package debug
 
 import Helper.noop
 
-object Variables {
+object Variables
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val a = true
     val b = 'c'
     val c = 3.asInstanceOf[Short]
@@ -19,13 +19,9 @@ object Variables {
     val l = NullToString
 
     noop(None)
-  }
-}
 
-case class One(s: String) {
+case class One(s: String)
   override def toString() = s
-}
 
-object NullToString {
+object NullToString
   override def toString() = null
-}

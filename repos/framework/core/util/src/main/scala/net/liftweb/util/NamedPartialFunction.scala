@@ -24,21 +24,19 @@ import common._
   * associated metadata, a name that allows the NamedPartialFunction
   * to be looked up dynamically.
   */
-trait NamedPartialFunction[-A, +B] extends PartialFunction[A, B] {
+trait NamedPartialFunction[-A, +B] extends PartialFunction[A, B]
   def functionName: String
-}
 
 /**
   * This class is the base implementation of the NamedPartialFunction trait.
   */
 class NamedPF[-A, +B](name: String, f: PartialFunction[A, B])
-    extends NamedPartialFunction[A, B] {
+    extends NamedPartialFunction[A, B]
   override def isDefinedAt(x: A): Boolean = f.isDefinedAt(x)
   override def apply(x: A): B = f(x)
   def functionName = name
-}
 
-object NamedPF {
+object NamedPF
 
   /**
     * Curried constructor for NamedPF
@@ -82,10 +80,9 @@ object NamedPF {
     * @throws MatchError on failure to find such a PartialFunction
     */
   def apply[A, B](value: A, lst: Seq[PartialFunction[A, B]]): B =
-    find(value, lst) match {
+    find(value, lst) match
       case Full(pf) => pf.apply(value)
       case _ => throw new MatchError(value)
-    }
 
   /**
     * Find the first PartialFunction in the specified sequence that is defined
@@ -99,4 +96,3 @@ object NamedPF {
     */
   def applyBox[A, B](value: A, lst: Seq[PartialFunction[A, B]]): Box[B] =
     find(value, lst).map(_.apply(value))
-}

@@ -31,7 +31,7 @@ import java.util.{Iterator => JavaIterator, ArrayList => JavaArrayList}
   * from Java, as well as access to the `[[Empty]]` singleton so that empty
   * values can be created easily from Java.
   */
-class BoxJBridge {
+class BoxJBridge
 
   /**
     * Get the Box companion object
@@ -42,7 +42,6 @@ class BoxJBridge {
     * Get the `[[Empty]]` singleton.
     */
   def empty: EmptyBox = Empty
-}
 
 /**
   * The Box companion object provides methods to create a Box from:
@@ -54,14 +53,14 @@ class BoxJBridge {
   * It also provides implicit methods to transform `Option` to `Box`, `Box` to
   * `[[scala.collection.Iterable Iterable]]`, and `Box` to `Option`.
   */
-object Box extends BoxTrait with Tryo {
+object Box extends BoxTrait with Tryo
 
   /**
     * Helper class to provide an easy way for converting a `List[Box[T]]` into
     * a `Box[List[T]]`.
     **/
   implicit class ListOfBoxes[T](val theListOfBoxes: List[Box[T]])
-      extends AnyVal {
+      extends AnyVal
 
     /**
       * Convert a `List` of `Box`es into a single `Box` containting a `List[T]`,
@@ -86,13 +85,12 @@ object Box extends BoxTrait with Tryo {
       * @param failureErrorMessage The string that should be placed in the message for the Failure.
       * @return A `Full[List[T]]` if no `Failure`s were present. `ParamFailure[List[Box[T]]]` otherwise.
       **/
-    def toSingleBox(failureErrorMessage: String): Box[List[T]] = {
-      if (theListOfBoxes.exists(_.isInstanceOf[Failure])) {
-        val failureChain = theListOfBoxes.collect {
+    def toSingleBox(failureErrorMessage: String): Box[List[T]] =
+      if (theListOfBoxes.exists(_.isInstanceOf[Failure]))
+        val failureChain = theListOfBoxes.collect
           case fail: Failure => fail
-        }.reduceRight { (topmostFailure, latestFailure) =>
+        .reduceRight  (topmostFailure, latestFailure) =>
           topmostFailure.copy(chain = Full(latestFailure))
-        }
 
         ParamFailure(
             failureErrorMessage,
@@ -100,17 +98,13 @@ object Box extends BoxTrait with Tryo {
             Full(failureChain),
             theListOfBoxes
         )
-      } else {
+      else
         Full(theListOfBoxes.flatten)
-      }
-    }
-  }
-}
 
 /**
   * Implementation for the `[[Box$ Box]]` singleton.
   */
-sealed trait BoxTrait {
+sealed trait BoxTrait
   val primitiveMap: Map[Class[_], Class[_]] = Map(
       java.lang.Boolean.TYPE -> classOf[java.lang.Boolean],
       java.lang.Character.TYPE -> classOf[java.lang.Character],
@@ -130,10 +124,9 @@ sealed trait BoxTrait {
     * @return `Full` with the contents if the `Option` is `Some`
     *         and `Empty` otherwise.
     */
-  def apply[T](in: Option[T]) = in match {
+  def apply[T](in: Option[T]) = in match
     case Some(x) => Full(x)
     case _ => Empty
-  }
 
   /**
     * Create a `Box` from the specified `Box`, checking for `null`.
@@ -141,11 +134,10 @@ sealed trait BoxTrait {
     * @return `Full(in)` if `in` is a `Full` box and its value is non-null,
     *         `Empty` otherwise.
     */
-  def apply[T](in: Box[T]) = in match {
+  def apply[T](in: Box[T]) = in match
     case Full(x) => legacyNullTest(x)
     case x: EmptyBox => x
     case _ => Empty
-  }
 
   /**
     * Transform a `List` with zero or more elements to a `Box`, losing all but
@@ -154,10 +146,9 @@ sealed trait BoxTrait {
     * @return `Full(x)` with the head of the list if it contains at least one
     *         element and `Empty` otherwise.
     */
-  def apply[T](in: List[T]) = in match {
+  def apply[T](in: List[T]) = in match
     case x :: _ => Full(x)
     case _ => Empty
-  }
 
   /**
     * Apply the specified `PartialFunction` to the specified `value` and return the result
@@ -222,10 +213,9 @@ sealed trait BoxTrait {
     *
     * @return `Full` if `in` is not null and `Empty` otherwise.
     */
-  def legacyNullTest[T](in: T): Box[T] = in match {
+  def legacyNullTest[T](in: T): Box[T] = in match
     case null => Empty
     case _ => Full(in)
-  }
 
   /**
     * Alias for `[[legacyNullTest]]`.
@@ -248,9 +238,8 @@ sealed trait BoxTrait {
     * res1: net.liftweb.common.Box[Int] = Full(5)
     * }}}
     */
-  def isA[A, B](in: A, clz: Class[B]): Box[B] = {
+  def isA[A, B](in: A, clz: Class[B]): Box[B] =
     (Box !! in).isA(clz)
-  }
 
   // NOTE: We use an existential type here so that you can invoke asA with
   // just one type parameter. To wit, this lets you do:
@@ -275,10 +264,8 @@ sealed trait BoxTrait {
     * res1: net.liftweb.common.Box[Int] = Full(5)
     * }}}
     */
-  def asA[B](in: T forSome { type T })(implicit m: Manifest[B]): Box[B] = {
+  def asA[B](in: T forSome { type T })(implicit m: Manifest[B]): Box[B] =
     (Box !! in).asA[B]
-  }
-}
 
 /**
   * Used as a return type for certain methods that should not be called. One
@@ -387,7 +374,7 @@ final class DoNotCallThisMethod
   *    (loggedInUser === mockUser) must beTrue
   *    }}}
   */
-sealed abstract class Box[+A] extends Product with Serializable { self =>
+sealed abstract class Box[+A] extends Product with Serializable  self =>
 
   /**
     * Returns `true` if this `Box` contains no value (i.e., it is `Empty` or
@@ -430,10 +417,9 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
     *
     * This method '''always''' throws an exception.
     */
-  final def get: DoNotCallThisMethod = {
+  final def get: DoNotCallThisMethod =
     throw new Exception(
         "Attempted to open a Box incorrectly. Please use openOrThrowException.")
-  }
 
   /**
     * Return the value contained in this `Box` if it is full; otherwise return
@@ -475,13 +461,12 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
   /**
     * Makes `Box` play better with Scala `for` comprehensions.
     */
-  class WithFilter(p: A => Boolean) {
+  class WithFilter(p: A => Boolean)
     def map[B](f: A => B): Box[B] = self.filter(p).map(f)
     def flatMap[B](f: A => Box[B]): Box[B] = self.filter(p).flatMap(f)
     def foreach[U](f: A => U): Unit = self.filter(p).foreach(f)
     def withFilter(q: A => Boolean): WithFilter =
       new WithFilter(x => p(x) && q(x))
-  }
 
   /**
     * If this `Box` contains a value and it satisfies the specified `func`,
@@ -562,11 +547,10 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
   /**
     * Get a `java.util.Iterator` from the Box.
     */
-  def javaIterator[B >: A]: JavaIterator[B] = {
+  def javaIterator[B >: A]: JavaIterator[B] =
     val ar = new JavaArrayList[B]()
     foreach(v => ar.add(v))
     ar.iterator()
-  }
 
   /**
     * Returns an `[[scala.collection.Iterator Iterator]]` over the value
@@ -699,20 +683,18 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
     * Full("magic") != Failure("something's gone wrong")
     * }}}
     */
-  override def equals(other: Any): Boolean = (this, other) match {
+  override def equals(other: Any): Boolean = (this, other) match
     case (Full(x), Full(y)) => x == y
     case (Full(x), y) => x == y
     case (x, y: AnyRef) => x eq y
     case _ => false
-  }
 
   /**
     * Equivalent to `flatMap(f1).or(alternative)`.
     */
-  def choice[B](f1: A => Box[B])(alternative: => Box[B]): Box[B] = this match {
+  def choice[B](f1: A => Box[B])(alternative: => Box[B]): Box[B] = this match
     case Full(x) => f1(x)
     case _ => alternative
-  }
 
   /**
     * Returns true if the value contained in this box is equal to the specified
@@ -770,12 +752,11 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
     * If the partial function is defined at the current Box's value, apply the
     * partial function.
     */
-  final def collect[B](pf: PartialFunction[A, B]): Box[B] = {
+  final def collect[B](pf: PartialFunction[A, B]): Box[B] =
     flatMap(
         value =>
           if (pf.isDefinedAt(value)) Full(pf(value))
           else Empty)
-  }
 
   /**
     * An alias for `collect`.
@@ -783,15 +764,13 @@ sealed abstract class Box[+A] extends Product with Serializable { self =>
     * Although this function is different for true collections, because `Box` is
     * really a collection of 1, the two functions are identical.
     */
-  final def collectFirst[B](pf: PartialFunction[A, B]): Box[B] = {
+  final def collectFirst[B](pf: PartialFunction[A, B]): Box[B] =
     collect(pf)
-  }
-}
 
 /**
   * `Full` is a `[[Box]]` that contains a value.
   */
-final case class Full[+A](value: A) extends Box[A] {
+final case class Full[+A](value: A) extends Box[A]
   def isEmpty: Boolean = false
 
   def openOrThrowException(justification: String): A = value
@@ -826,17 +805,15 @@ final case class Full[+A](value: A) extends Box[A] {
 
   override def toLeft[B](right: => B): Either[A, B] = Left(value)
 
-  override def isA[B](clsOrg: Class[B]): Box[B] = value match {
+  override def isA[B](clsOrg: Class[B]): Box[B] = value match
     case value: AnyRef =>
-      val cls = Box.primitiveMap.get(clsOrg) match {
+      val cls = Box.primitiveMap.get(clsOrg) match
         case Some(c) => c
         case _ => clsOrg
-      }
 
       if (cls.isAssignableFrom(value.getClass)) Full(value.asInstanceOf[B])
       else Empty
     case _ => Empty
-  }
 
   override def asA[B](implicit m: Manifest[B]): Box[B] =
     this.isA(m.runtimeClass).asInstanceOf[Box[B]]
@@ -844,7 +821,6 @@ final case class Full[+A](value: A) extends Box[A] {
   override def ===[B >: A](to: B): Boolean = value == to
 
   override def dmap[B](dflt: => B)(f: A => B): B = f(value)
-}
 
 /**
   * Singleton object representing a completely empty `Box` with no value or
@@ -856,7 +832,7 @@ case object Empty extends EmptyBox
   * An `EmptyBox` is a `Box` containing no value. It can sometimes carry
   * additional failure information, as in `[[Failure]]` and `[[ParamFailure]]`.
   */
-sealed abstract class EmptyBox extends Box[Nothing] with Serializable {
+sealed abstract class EmptyBox extends Box[Nothing] with Serializable
 
   def isEmpty: Boolean = true
 
@@ -877,15 +853,13 @@ sealed abstract class EmptyBox extends Box[Nothing] with Serializable {
 
   override def ~>[T](errorCode: => T): ParamFailure[T] =
     ParamFailure("", Empty, Empty, errorCode)
-}
 
 /**
   * Companion object used to simplify the creation of a simple `Failure` with
   * just a message.
   */
-object Failure {
+object Failure
   def apply(msg: String) = new Failure(msg, Empty, Empty)
-}
 
 /**
   * A `Failure` is an `[[EmptyBox]]` with an additional failure message
@@ -895,16 +869,15 @@ object Failure {
   */
 sealed case class Failure(
     msg: String, exception: Box[Throwable], chain: Box[Failure])
-    extends EmptyBox {
+    extends EmptyBox
   type A = Nothing
 
   override def openOrThrowException(justification: String) =
     throw new NullPointerException(
         "An Failure Box was opened.  Failure Message: " + msg +
         ".  The justification for allowing the openOrThrowException was " +
-        justification) {
+        justification)
       override def getCause() = exception openOr null
-    }
 
   override def map[B](f: A => B): Box[B] = this
 
@@ -914,10 +887,9 @@ sealed case class Failure(
 
   override def asA[B](implicit m: Manifest[B]): Box[B] = this
 
-  private def chainList: List[Failure] = chain match {
+  private def chainList: List[Failure] = chain match
     case Full(f) => f :: f.chainList
     case _ => Nil
-  }
 
   /**
     * Return a list of the exceptions that led to this `Failure`. First, unflattens
@@ -928,27 +900,24 @@ sealed case class Failure(
     * @return A single list of `Throwable`s from the most direct cause to the
     *         least direct cause of this `Failure`.
     */
-  def exceptionChain: List[Throwable] = {
+  def exceptionChain: List[Throwable] =
     import scala.collection.mutable.ListBuffer
     val ret = new ListBuffer[Throwable]()
     var e: Throwable = exception openOr null
 
-    while (e ne null) {
+    while (e ne null)
       ret += e
       e = e.getCause
-    }
 
     ret ++= chain.toList.flatMap(_.exceptionChain)
     ret.toList
-  }
 
   /**
     * Gets the deepest exception cause, if any, which is ostensibly the root
     * cause of this `Failure`.
     */
-  def rootExceptionCause: Box[Throwable] = {
+  def rootExceptionCause: Box[Throwable] =
     exceptionChain.lastOption
-  }
 
   /**
     * Flatten the `Failure` chain to a List where this Failure is at the head.
@@ -973,11 +942,10 @@ sealed case class Failure(
     */
   def messageChain: String = (this :: chainList).map(_.msg).mkString(" <- ")
 
-  override def equals(other: Any): Boolean = (this, other) match {
+  override def equals(other: Any): Boolean = (this, other) match
     case (Failure(x, y, z), Failure(x1, y1, z1)) => (x, y, z) == (x1, y1, z1)
     case (x, y: AnyRef) => x eq y
     case _ => false
-  }
 
   override def ?~(msg: => String): Failure = this
 
@@ -985,13 +953,12 @@ sealed case class Failure(
 
   override def ~>[T](errorCode: => T): ParamFailure[T] =
     ParamFailure(msg, exception, chain, errorCode)
-}
 
 /**
   * Companion object used to simplify the creation of simple `ParamFailure`s, as
   * well as allow pattern-matching on the `ParamFailure`.
   */
-object ParamFailure {
+object ParamFailure
   def apply[T](
       msg: String, exception: Box[Throwable], chain: Box[Failure], param: T) =
     new ParamFailure(msg, exception, chain, param)
@@ -1001,12 +968,10 @@ object ParamFailure {
 
   def unapply(
       in: Box[_]): Option[(String, Box[Throwable], Box[Failure], Any)] =
-    in match {
+    in match
       case pf: ParamFailure[_] =>
         Some((pf.msg, pf.exception, pf.chain, pf.param))
       case _ => None
-    }
-}
 
 /**
   * A `ParamFailure` is a `[[Failure]]` with an additional type-safe parameter
@@ -1041,63 +1006,56 @@ final class ParamFailure[T](override val msg: String,
                             override val exception: Box[Throwable],
                             override val chain: Box[Failure],
                             val param: T)
-    extends Failure(msg, exception, chain) with Serializable {
+    extends Failure(msg, exception, chain) with Serializable
   override def toString(): String =
     "ParamFailure(" + msg + ", " + exception + ", " + chain + ", " + param +
     ")"
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case ParamFailure(m, e, c, p) =>
       m == msg && e == exception && c == chain && p == param
     case _ => false
-  }
 
   override def hashCode(): Int =
     super.hashCode() +
-    (param match {
+    (param match
           case null => 0
           case x => x.hashCode()
-        })
+        )
 
   override def ~>[T](errorCode: => T): ParamFailure[T] =
     ParamFailure(msg, exception, Full(this), errorCode)
-}
 
 /**
   * A trait that a class can mix into itself to indicate that it can convert
   * itself into a `Box`.
   */
-trait Boxable[T] {
+trait Boxable[T]
   def asBox: Box[T]
-}
 
 /**
   * Sometimes it's convenient to access either a `[[Box]][T]` or a `T`.  If you
   * specify `BoxOrRaw[T]`, either a `T` or a `Box[T]` can be passed and the
   * "right thing" will happen, including `null`s being treated as `Empty`.
   */
-sealed trait BoxOrRaw[T] {
+sealed trait BoxOrRaw[T]
   def box: Box[T]
-}
 
 /**
   * Companion object with implicit conversions to allow `BoxOrRaw[T]` to
   * masquerade as the appropriate types.
   */
-object BoxOrRaw {
+object BoxOrRaw
   implicit def rawToBoxOrRaw[T, Q <: T](r: Q): BoxOrRaw[T] =
     RawBoxOrRaw(r: T)
 
-  implicit def boxToBoxOrRaw[T, Q <% T](r: Box[Q]): BoxOrRaw[T] = {
+  implicit def boxToBoxOrRaw[T, Q <% T](r: Box[Q]): BoxOrRaw[T] =
     BoxedBoxOrRaw(r.map(v => v: T))
-  }
 
-  implicit def optionToBoxOrRaw[T, Q <% T](r: Option[Q]): BoxOrRaw[T] = {
+  implicit def optionToBoxOrRaw[T, Q <% T](r: Option[Q]): BoxOrRaw[T] =
     BoxedBoxOrRaw(r.map(v => v: T))
-  }
 
   implicit def borToBox[T](in: BoxOrRaw[T]): Box[T] = in.box
-}
 
 /**
   * The `[[BoxOrRaw]]` that represents a boxed value.
@@ -1107,9 +1065,8 @@ final case class BoxedBoxOrRaw[T](box: Box[T]) extends BoxOrRaw[T]
 /**
   * The `[[BoxOrRaw]]` that represents a raw value.
   */
-final case class RawBoxOrRaw[T](raw: T) extends BoxOrRaw[T] {
+final case class RawBoxOrRaw[T](raw: T) extends BoxOrRaw[T]
   def box: Box[T] =
     if (raw.asInstanceOf[Object] ne null) Full(raw) else Empty
-}
 
 // vim: set ts=2 sw=2 et:

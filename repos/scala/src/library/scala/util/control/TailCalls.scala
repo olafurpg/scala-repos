@@ -38,11 +38,11 @@ package util.control
   *  fib(40).result
   *  }}}
   */
-object TailCalls {
+object TailCalls
 
   /** This class represents a tailcalling computation
     */
-  abstract class TailRec[+A] {
+  abstract class TailRec[+A]
 
     /** Continue the computation with `f`. */
     final def map[B](f: A => B): TailRec[B] =
@@ -51,41 +51,35 @@ object TailCalls {
     /** Continue the computation with `f` and merge the trampolining
       * of this computation with that of `f`. */
     final def flatMap[B](f: A => TailRec[B]): TailRec[B] =
-      this match {
+      this match
         case Done(a) => Call(() => f(a))
         case c @ Call(_) => Cont(c, f)
         // Take advantage of the monad associative law to optimize the size of the required stack
         case c: Cont[a1, b1] => Cont(c.a, (x: a1) => c.f(x) flatMap f)
-      }
 
     /** Returns either the next step of the tailcalling computation,
       * or the result if there are no more steps. */
     @annotation.tailrec
-    final def resume: Either[() => TailRec[A], A] = this match {
+    final def resume: Either[() => TailRec[A], A] = this match
       case Done(a) => Right(a)
       case Call(k) => Left(k)
       case Cont(a, f) =>
-        a match {
+        a match
           case Done(v) => f(v).resume
           case Call(k) => Left(() => k().flatMap(f))
           case Cont(b, g) => b.flatMap(x => g(x) flatMap f).resume
-        }
-    }
 
     /** Returns the result of the tailcalling computation.
       */
     @annotation.tailrec
-    final def result: A = this match {
+    final def result: A = this match
       case Done(a) => a
       case Call(t) => t().result
       case Cont(a, f) =>
-        a match {
+        a match
           case Done(v) => f(v).result
           case Call(t) => t().flatMap(f).result
           case Cont(b, g) => b.flatMap(x => g(x) flatMap f).result
-        }
-    }
-  }
 
   /** Internal class representing a tailcall */
   protected case class Call[A](rest: () => TailRec[A]) extends TailRec[A]
@@ -111,4 +105,3 @@ object TailCalls {
     *          returns `result`
     */
   def done[A](result: A): TailRec[A] = Done(result)
-}

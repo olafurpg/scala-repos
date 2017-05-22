@@ -32,7 +32,7 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 @Since("0.8.0")
-object LogisticRegressionDataGenerator {
+object LogisticRegressionDataGenerator
 
   /**
     * Generate an RDD containing test data for LogisticRegression.
@@ -50,29 +50,25 @@ object LogisticRegressionDataGenerator {
                           nfeatures: Int,
                           eps: Double,
                           nparts: Int = 2,
-                          probOne: Double = 0.5): RDD[LabeledPoint] = {
-    val data = sc.parallelize(0 until nexamples, nparts).map { idx =>
+                          probOne: Double = 0.5): RDD[LabeledPoint] =
+    val data = sc.parallelize(0 until nexamples, nparts).map  idx =>
       val rnd = new Random(42 + idx)
 
       val y = if (idx % 2 == 0) 0.0 else 1.0
-      val x = Array.fill[Double](nfeatures) {
+      val x = Array.fill[Double](nfeatures)
         rnd.nextGaussian() + (y * eps)
-      }
       LabeledPoint(y, Vectors.dense(x))
-    }
     data
-  }
 
   @Since("0.8.0")
-  def main(args: Array[String]) {
-    if (args.length != 5) {
+  def main(args: Array[String])
+    if (args.length != 5)
       // scalastyle:off println
       println(
           "Usage: LogisticRegressionGenerator " +
           "<master> <output_dir> <num_examples> <num_features> <num_partitions>")
       // scalastyle:on println
       System.exit(1)
-    }
 
     val sparkMaster: String = args(0)
     val outputPath: String = args(1)
@@ -87,5 +83,3 @@ object LogisticRegressionDataGenerator {
     data.saveAsTextFile(outputPath)
 
     sc.stop()
-  }
-}

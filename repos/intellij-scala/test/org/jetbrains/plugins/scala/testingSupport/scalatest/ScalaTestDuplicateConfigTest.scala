@@ -4,8 +4,8 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   * @author Roman.Shein
   * @since 17.01.2015.
   */
-trait ScalaTestDuplicateConfigTest extends ScalaTestTestCase {
-  def testDuplicateConfig() {
+trait ScalaTestDuplicateConfigTest extends ScalaTestTestCase
+  def testDuplicateConfig()
     addFileToProject(
         "DuplicateConfigTest.scala",
         """
@@ -26,5 +26,3 @@ trait ScalaTestDuplicateConfigTest extends ScalaTestTestCase {
             _,
             "DuplicateConfigTest",
             "A DuplicateConfigTest should create only one run configuration"))
-  }
-}

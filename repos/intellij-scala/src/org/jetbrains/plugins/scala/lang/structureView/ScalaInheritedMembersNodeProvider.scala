@@ -23,19 +23,19 @@ import org.jetbrains.plugins.scala.lang.structureView.elements.impl._
   * @since 04.05.12
   */
 class ScalaInheritedMembersNodeProvider
-    extends FileStructureNodeProvider[TreeElement] {
-  def provideNodes(node: TreeElement): util.Collection[TreeElement] = {
-    node match {
+    extends FileStructureNodeProvider[TreeElement]
+  def provideNodes(node: TreeElement): util.Collection[TreeElement] =
+    node match
       case td: ScalaTypeDefinitionStructureViewElement =>
         val children = new util.ArrayList[TreeElement]()
         val clazz = td.element
-        try {
+        try
           if (!clazz.isValid) return children
           val signs = clazz.allSignatures
-          for (sign <- signs) {
-            sign match {
+          for (sign <- signs)
+            sign match
               case sign: PhysicalSignature =>
-                sign.method match {
+                sign.method match
                   case x if x.name == "$tag" || x.name == "$init$" =>
                   case x
                       if x.containingClass.qualifiedName == "java.lang.Object" =>
@@ -45,11 +45,10 @@ class ScalaInheritedMembersNodeProvider
                         new ScalaFunctionStructureViewElement(x, true))
                   case x: PsiMethod =>
                     children.add(new PsiMethodTreeElement(x, true))
-                }
               case _ =>
-                sign.namedElement match {
+                sign.namedElement match
                   case named: ScNamedElement =>
-                    ScalaPsiUtil.nameContext(named) match {
+                    ScalaPsiUtil.nameContext(named) match
                       case x: ScValue if x.containingClass != clazz =>
                         children.add(new ScalaValueStructureViewElement(
                                 named.nameId, true))
@@ -57,26 +56,19 @@ class ScalaInheritedMembersNodeProvider
                         children.add(new ScalaVariableStructureViewElement(
                                 named.nameId, true))
                       case _ =>
-                    }
                   case _ =>
-                }
-            }
-          }
           val types = clazz.allTypeAliases
-          for {
+          for
             typex <- types
             t = typex._1 if t.isInstanceOf[ScTypeAlias]
             alias = t.asInstanceOf[ScTypeAlias]
                 if alias.containingClass != clazz
-          } children.add(new ScalaTypeAliasStructureViewElement(alias, true))
+          children.add(new ScalaTypeAliasStructureViewElement(alias, true))
 
           children
-        } catch {
+        catch
           case e: IndexNotReadyException => new util.ArrayList[TreeElement]()
-        }
       case _ => new util.ArrayList[TreeElement]()
-    }
-  }
 
   def getCheckBoxText: String =
     IdeBundle.message("file.structure.toggle.show.inherited")
@@ -92,4 +84,3 @@ class ScalaInheritedMembersNodeProvider
         IconLoader.getIcon("/hierarchy/supertypes.png"))
 
   def getName: String = "SCALA_SHOW_INHERITED"
-}

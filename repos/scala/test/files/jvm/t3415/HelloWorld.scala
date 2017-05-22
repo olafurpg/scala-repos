@@ -1,4 +1,3 @@
-object Test extends App {
+object Test extends App
   @Hello
   def foo() {}
-}

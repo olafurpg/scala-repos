@@ -35,45 +35,35 @@ case class FileToEventsArgs(env: String = "",
                             verbose: Boolean = false,
                             debug: Boolean = false)
 
-object FileToEvents extends Logging {
-  def main(args: Array[String]): Unit = {
-    val parser = new scopt.OptionParser[FileToEventsArgs]("FileToEvents") {
-      opt[String]("env") action { (x, c) =>
+object FileToEvents extends Logging
+  def main(args: Array[String]): Unit =
+    val parser = new scopt.OptionParser[FileToEventsArgs]("FileToEvents")
+      opt[String]("env") action  (x, c) =>
         c.copy(env = x)
-      }
-      opt[String]("log-file") action { (x, c) =>
+      opt[String]("log-file") action  (x, c) =>
         c.copy(logFile = x)
-      }
-      opt[Int]("appid") action { (x, c) =>
+      opt[Int]("appid") action  (x, c) =>
         c.copy(appId = x)
-      }
-      opt[String]("channel") action { (x, c) =>
+      opt[String]("channel") action  (x, c) =>
         c.copy(channel = Some(x))
-      }
-      opt[String]("input") action { (x, c) =>
+      opt[String]("input") action  (x, c) =>
         c.copy(inputPath = x)
-      }
-      opt[Unit]("verbose") action { (x, c) =>
+      opt[Unit]("verbose") action  (x, c) =>
         c.copy(verbose = true)
-      }
-      opt[Unit]("debug") action { (x, c) =>
+      opt[Unit]("debug") action  (x, c) =>
         c.copy(debug = true)
-      }
-    }
-    parser.parse(args, FileToEventsArgs()) map { args =>
+    parser.parse(args, FileToEventsArgs()) map  args =>
       // get channelId
       val channels = Storage.getMetaDataChannels
       val channelMap =
         channels.getByAppid(args.appId).map(c => (c.name, c.id)).toMap
 
-      val channelId: Option[Int] = args.channel.map { ch =>
-        if (!channelMap.contains(ch)) {
+      val channelId: Option[Int] = args.channel.map  ch =>
+        if (!channelMap.contains(ch))
           error(s"Channel ${ch} doesn't exist in this app.")
           sys.exit(1)
-        }
 
         channelMap(ch)
-      }
 
       val channelStr = args.channel.map(n => " Channel " + n).getOrElse("")
 
@@ -83,18 +73,14 @@ object FileToEvents extends Logging {
       val sc = WorkflowContext(mode = "Import",
                                batch = "App ID " + args.appId + channelStr,
                                executorEnv = Runner.envStringToMap(args.env))
-      val rdd = sc.textFile(args.inputPath).filter(_.trim.nonEmpty).map {
+      val rdd = sc.textFile(args.inputPath).filter(_.trim.nonEmpty).map
         json =>
-          Try(read[Event](json)).recoverWith {
+          Try(read[Event](json)).recoverWith
             case e: Throwable =>
               error(s"\nmalformed json => $json")
               Failure(e)
-          }.get
-      }
+          .get
       val events = Storage.getPEvents()
       events.write(events = rdd, appId = args.appId, channelId = channelId)(sc)
       info("Events are imported.")
       info("Done.")
-    }
-  }
-}

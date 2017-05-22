@@ -29,23 +29,21 @@ import org.apache.spark.serializer.{JavaSerializer, KryoSerializer, Serializer}
   * Tests for the fallback logic in UnsafeShuffleManager. Actual tests of shuffling data are
   * performed in other suites.
   */
-class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
+class SortShuffleManagerSuite extends SparkFunSuite with Matchers
 
   import SortShuffleManager.canUseSerializedShuffle
 
-  private class RuntimeExceptionAnswer extends Answer[Object] {
-    override def answer(invocation: InvocationOnMock): Object = {
+  private class RuntimeExceptionAnswer extends Answer[Object]
+    override def answer(invocation: InvocationOnMock): Object =
       throw new RuntimeException(
           "Called non-stubbed method, " + invocation.getMethod.getName)
-    }
-  }
 
   private def shuffleDep(
       partitioner: Partitioner,
       serializer: Serializer,
       keyOrdering: Option[Ordering[Any]],
       aggregator: Option[Aggregator[Any, Any, Any]],
-      mapSideCombine: Boolean): ShuffleDependency[Any, Any, Any] = {
+      mapSideCombine: Boolean): ShuffleDependency[Any, Any, Any] =
     val dep = mock(classOf[ShuffleDependency[Any, Any, Any]],
                    new RuntimeExceptionAnswer())
     doReturn(0).when(dep).shuffleId
@@ -55,9 +53,8 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
     doReturn(aggregator).when(dep).aggregator
     doReturn(mapSideCombine).when(dep).mapSideCombine
     dep
-  }
 
-  test("supported shuffle dependencies for serialized shuffle") {
+  test("supported shuffle dependencies for serialized shuffle")
     val kryo = new KryoSerializer(new SparkConf())
 
     assert(
@@ -89,9 +86,8 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 aggregator = None,
                 mapSideCombine = false
             )))
-  }
 
-  test("unsupported shuffle dependencies for serialized shuffle") {
+  test("unsupported shuffle dependencies for serialized shuffle")
     val kryo = new KryoSerializer(new SparkConf())
     val java = new JavaSerializer(new SparkConf())
 
@@ -135,5 +131,3 @@ class SortShuffleManagerSuite extends SparkFunSuite with Matchers {
                 aggregator = Some(mock(classOf[Aggregator[Any, Any, Any]])),
                 mapSideCombine = true
             )))
-  }
-}

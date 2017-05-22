@@ -1,14 +1,10 @@
 import scala.reflect.macros.blackbox.Context
 
-object Impls {
-  def impl(c: Context) = {
+object Impls
+  def impl(c: Context) =
     import c.universe._
-    reify {
+    reify
       println(c.Expr[String](Literal(Constant(c.settings.toString))).splice)
-    }
-  }
-}
 
-object Macros {
+object Macros
   def foo = macro Impls.impl
-}

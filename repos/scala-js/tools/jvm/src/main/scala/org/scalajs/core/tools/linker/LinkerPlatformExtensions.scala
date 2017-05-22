@@ -15,7 +15,7 @@ import org.scalajs.core.tools.linker.frontend.optimizer.{ParIncOptimizer, IncOpt
 import org.scalajs.core.tools.linker.backend._
 import org.scalajs.core.tools.linker.backend.closure.ClosureLinkerBackend
 
-trait LinkerPlatformExtensions {
+trait LinkerPlatformExtensions
   this: Linker.type =>
   def apply(
       semantics: Semantics = Semantics.Defaults,
@@ -25,13 +25,12 @@ trait LinkerPlatformExtensions {
       parallel: Boolean = true,
       useClosureCompiler: Boolean = false,
       frontendConfig: LinkerFrontend.Config = LinkerFrontend.Config(),
-      backendConfig: LinkerBackend.Config = LinkerBackend.Config()): Linker = {
+      backendConfig: LinkerBackend.Config = LinkerBackend.Config()): Linker =
 
-    val optOptimizerFactory = {
+    val optOptimizerFactory =
       if (disableOptimizer) None
       else if (parallel) Some(ParIncOptimizer.factory)
       else Some(IncOptimizer.factory)
-    }
 
     val frontend = new LinkerFrontend(semantics,
                                       outputMode.esLevel,
@@ -39,18 +38,14 @@ trait LinkerPlatformExtensions {
                                       frontendConfig,
                                       optOptimizerFactory)
 
-    val backend = {
-      if (useClosureCompiler) {
+    val backend =
+      if (useClosureCompiler)
         require(
             outputMode == OutputMode.ECMAScript51Isolated,
             s"Cannot use output mode $outputMode with the Closure Compiler")
         new ClosureLinkerBackend(semantics, withSourceMap, backendConfig)
-      } else {
+      else
         new BasicLinkerBackend(
             semantics, outputMode, withSourceMap, backendConfig)
-      }
-    }
 
     new Linker(frontend, backend)
-  }
-}

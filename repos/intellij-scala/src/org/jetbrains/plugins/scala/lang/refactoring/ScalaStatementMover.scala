@@ -16,13 +16,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 /**
   * Pavel Fatin
   */
-class ScalaStatementMover extends LineMover {
+class ScalaStatementMover extends LineMover
   private type ElementClass = Class[_ <: PsiElement]
 
   override def checkAvailable(editor: Editor,
                               file: PsiFile,
                               info: MoveInfo,
-                              down: Boolean): Boolean = {
+                              down: Boolean): Boolean =
     if (!super.checkAvailable(editor, file, info, down)) return false
     if (editor.getSelectionModel.hasSelection) return false
 
@@ -31,21 +31,18 @@ class ScalaStatementMover extends LineMover {
     def aim(sourceClass: ElementClass,
             predicate: PsiElement => Boolean,
             canUseLineAsTarget: Boolean = true)
-      : Option[(PsiElement, LineRange)] = {
-      findSourceOf(sourceClass).map { source =>
-        val targetRange = findTargetRangeFor(source, predicate).getOrElse {
+      : Option[(PsiElement, LineRange)] =
+      findSourceOf(sourceClass).map  source =>
+        val targetRange = findTargetRangeFor(source, predicate).getOrElse
           if (canUseLineAsTarget) nextLineRangeFor(source) else null
-        }
         (source, targetRange)
-      }
-    }
 
     def findSourceOf(aClass: ElementClass) =
       findElementAt(aClass, editor, file, info.toMove.startLine)
 
     def findTargetRangeFor(
         source: PsiElement,
-        predicate: PsiElement => Boolean): Option[LineRange] = {
+        predicate: PsiElement => Boolean): Option[LineRange] =
       val siblings = if (down) source.nextSiblings else source.prevSiblings
       siblings
         .filter(!_.isInstanceOf[PsiComment])
@@ -54,19 +51,16 @@ class ScalaStatementMover extends LineMover {
               it.isInstanceOf[ScImportStmt] || predicate(it))
         .find(predicate)
         .map(rangeOf(_, editor))
-    }
 
-    def nextLineRangeFor(source: PsiElement): LineRange = {
+    def nextLineRangeFor(source: PsiElement): LineRange =
       val range = rangeOf(source, editor)
-      if (down) {
+      if (down)
         val maxLine =
           editor.offsetToLogicalPosition(editor.getDocument.getTextLength).line
         if (range.endLine < maxLine)
           new LineRange(range.endLine, range.endLine + 1) else null
-      } else {
+      else
         new LineRange(range.startLine - 1, range.startLine)
-      }
-    }
 
     val pair = aim(classOf[ScCaseClause],
                    _.isInstanceOf[ScCaseClause],
@@ -82,33 +76,29 @@ class ScalaStatementMover extends LineMover {
       .orElse(aim(classOf[ScMethodCall], isControlStructureLikeCall)
             .filter(p => isControlStructureLikeCall(p._1)))
 
-    pair.foreach { it =>
+    pair.foreach  it =>
       info.toMove = rangeOf(it._1, editor)
       info.toMove2 = it._2
-    }
 
     pair.isDefined
-  }
 
   private def isControlStructureLikeCall(element: PsiElement): Boolean =
-    element match {
+    element match
       case call: ScMethodCall =>
         call.argumentExpressions.lastOption.exists(_.isInstanceOf[ScBlockExpr])
       case _ => false
-    }
 
-  private def rangeOf(e: PsiElement, editor: Editor) = {
+  private def rangeOf(e: PsiElement, editor: Editor) =
     val begin =
       editor.offsetToLogicalPosition(e.getTextRange.getStartOffset).line
     val end =
       editor.offsetToLogicalPosition(e.getTextRange.getEndOffset).line + 1
     new LineRange(begin, end)
-  }
 
   private def findElementAt(cl: ElementClass,
                             editor: Editor,
                             file: PsiFile,
-                            line: Int): Option[PsiElement] = {
+                            line: Int): Option[PsiElement] =
     val edges = edgeLeafsOf(line, editor, file)
 
     val left =
@@ -122,12 +112,11 @@ class ScalaStatementMover extends LineMover {
       .map(_._2)
       .find(it =>
             editor.offsetToLogicalPosition(it.getTextOffset).line == line)
-  }
 
   private def edgeLeafsOf(
       line: Int,
       editor: Editor,
-      file: PsiFile): (Option[PsiElement], Option[PsiElement]) = {
+      file: PsiFile): (Option[PsiElement], Option[PsiElement]) =
     val document = editor.getDocument
 
     val start = document.getLineStartOffset(line)
@@ -143,5 +132,3 @@ class ScalaStatementMover extends LineMover {
         .headOption
 
       (firstLeafOf(span), firstLeafOf(span.reverse))
-  }
-}

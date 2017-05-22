@@ -43,46 +43,39 @@ import scalafx.beans.property.DoubleProperty
   *
   */
 @RunWith(classOf[JUnitRunner])
-class ObservableSpec extends FlatSpec with BeforeAndAfterEach {
+class ObservableSpec extends FlatSpec with BeforeAndAfterEach
   var property: DoubleProperty = null
 
-  override def beforeEach() {
+  override def beforeEach()
     property = new DoubleProperty(null, "observable test")
-  }
 
-  "Observable" should "support anonymous invalidation listeners" in {
+  "Observable" should "support anonymous invalidation listeners" in
     var invalidateCalled = false
-    property onInvalidate {
+    property onInvalidate
       invalidateCalled = true
-    }
     invalidateCalled should be(false)
     property() = 100
     invalidateCalled should be(true)
-  }
 
-  it should "support anonymous invalidation listeners with parameters" in {
+  it should "support anonymous invalidation listeners with parameters" in
     var invalidateCalled = false
-    property onInvalidate { obs =>
+    property onInvalidate  obs =>
       invalidateCalled = true
       obs should equal(property)
-    }
     invalidateCalled should be(false)
     property() = 100
     invalidateCalled should be(true)
-  }
 
-  it should "support adding explicit listeners as a clojure" in {
+  it should "support adding explicit listeners as a clojure" in
     var invalidateCalled = false
-    property addListener { (obs: JFXObservable) =>
+    property addListener  (obs: JFXObservable) =>
       invalidateCalled = true
       obs should equal(property.delegate)
-    }
     invalidateCalled should be(false)
     property() = 100
     invalidateCalled should be(true)
-  }
 
-  it should "support removing explict listeners" in {
+  it should "support removing explict listeners" in
     var invalidateCalled = false
     val listener = (obs: JFXObservable) => invalidateCalled = true
     property addListener listener
@@ -93,5 +86,3 @@ class ObservableSpec extends FlatSpec with BeforeAndAfterEach {
     property removeListener listener
     property() = 200
     invalidateCalled should be(false)
-  }
-}

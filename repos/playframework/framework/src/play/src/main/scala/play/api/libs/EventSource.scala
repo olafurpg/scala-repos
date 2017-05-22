@@ -39,7 +39,7 @@ import play.api.libs.json.{Json, JsValue}
   *   }
   * }}}
   */
-object EventSource {
+object EventSource
 
   /**
     * Makes an `Enumeratee[E, Event]`, that is an [[iteratee.Enumeratee]] transforming `E` values
@@ -57,9 +57,8 @@ object EventSource {
   @deprecated("Use apply with an Akka source instead", "2.5.0")
   def apply[E : EventDataExtractor : EventNameExtractor : EventIdExtractor](
       ): Enumeratee[E, Event] =
-    Enumeratee.map[E] { e =>
+    Enumeratee.map[E]  e =>
       Event(e)
-    }
 
   /**
     * Makes a `Flow[E, Event, _]`, given an input source.
@@ -73,9 +72,8 @@ object EventSource {
     */
   def flow[
       E : EventDataExtractor : EventNameExtractor : EventIdExtractor]: Flow[
-      E, Event, _] = {
+      E, Event, _] =
     Flow[E].map(Event(_))
-  }
 
   //------------------
   // Event
@@ -84,24 +82,21 @@ object EventSource {
   /**
     * An event encoded with the SSE protocol..
     */
-  case class Event(data: String, id: Option[String], name: Option[String]) {
+  case class Event(data: String, id: Option[String], name: Option[String])
 
     /**
       * This event, formatted according to the EventSource protocol.
       */
-    lazy val formatted = {
+    lazy val formatted =
       val sb = new StringBuilder
       name.foreach(sb.append("event: ").append(_).append('\n'))
       id.foreach(sb.append("id: ").append(_).append('\n'))
-      for (line <- data.split("(\r?\n)|\r")) {
+      for (line <- data.split("(\r?\n)|\r"))
         sb.append("data: ").append(line).append('\n')
-      }
       sb.append('\n')
       sb.toString()
-    }
-  }
 
-  object Event {
+  object Event
 
     /**
       * Creates an event from a single input, using implicit extractors to provide raw values.
@@ -113,20 +108,16 @@ object EventSource {
       */
     def apply[A](a: A)(implicit dataExtractor: EventDataExtractor[A],
                        nameExtractor: EventNameExtractor[A],
-                       idExtractor: EventIdExtractor[A]): Event = {
+                       idExtractor: EventIdExtractor[A]): Event =
       Event(dataExtractor.eventData(a),
             idExtractor.eventId(a),
             nameExtractor.eventName(a))
-    }
 
-    implicit def writeable(implicit codec: Codec): Writeable[Event] = {
+    implicit def writeable(implicit codec: Codec): Writeable[Event] =
       Writeable(event => codec.encode(event.formatted))
-    }
 
-    implicit def contentType(implicit codec: Codec): ContentTypeOf[Event] = {
+    implicit def contentType(implicit codec: Codec): ContentTypeOf[Event] =
       ContentTypeOf(Some(ContentTypes.EVENT_STREAM))
-    }
-  }
 
   //------------------
   // Event Data Extractor
@@ -134,13 +125,12 @@ object EventSource {
 
   case class EventDataExtractor[A](eventData: A => String)
 
-  trait LowPriorityEventEncoder {
+  trait LowPriorityEventEncoder
     implicit val stringEvents: EventDataExtractor[String] = EventDataExtractor(
         identity)
 
     implicit val jsonEvents: EventDataExtractor[JsValue] = EventDataExtractor(
         Json.stringify)
-  }
 
   object EventDataExtractor extends LowPriorityEventEncoder
 
@@ -150,9 +140,8 @@ object EventSource {
 
   case class EventIdExtractor[E](eventId: E => Option[String])
 
-  trait LowPriorityEventIdExtractor {
+  trait LowPriorityEventIdExtractor
     implicit def non[E]: EventIdExtractor[E] = EventIdExtractor[E](_ => None)
-  }
 
   object EventIdExtractor extends LowPriorityEventIdExtractor
 
@@ -162,13 +151,10 @@ object EventSource {
 
   case class EventNameExtractor[E](eventName: E => Option[String])
 
-  trait LowPriorityEventNameExtractor {
+  trait LowPriorityEventNameExtractor
     implicit def non[E]: EventNameExtractor[E] =
       EventNameExtractor[E](_ => None)
-  }
 
-  object EventNameExtractor extends LowPriorityEventNameExtractor {
+  object EventNameExtractor extends LowPriorityEventNameExtractor
     implicit def pair[E]: EventNameExtractor[(String, E)] =
       EventNameExtractor[(String, E)](p => Some(p._1))
-  }
-}

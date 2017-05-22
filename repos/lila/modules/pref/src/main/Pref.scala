@@ -36,7 +36,7 @@ case class Pref(_id: String, // user id
                 submitMove: Int,
                 confirmResign: Int,
                 insightShare: Int,
-                tags: Map[String, String] = Map.empty) {
+                tags: Map[String, String] = Map.empty)
 
   import Pref._
 
@@ -54,7 +54,7 @@ case class Pref(_id: String, // user id
 
   def hasSeenVerifyTitle = tags contains Tag.verifyTitle
 
-  def get(name: String): Option[String] = name match {
+  def get(name: String): Option[String] = name match
     case "bg" => transp.fold("transp", dark.fold("dark", "light")).some
     case "bgImg" => bgImg
     case "theme" => theme.some
@@ -64,78 +64,65 @@ case class Pref(_id: String, // user id
     case "is3d" => is3d.toString.some
     case "soundSet" => soundSet.some
     case _ => none
-  }
-  def set(name: String, value: String): Option[Pref] = name match {
+  def set(name: String, value: String): Option[Pref] = name match
     case "bg" =>
       if (value == "transp") copy(dark = true, transp = true).some
       else
-        Pref.bgs get value map { b =>
+        Pref.bgs get value map  b =>
           copy(dark = b, transp = false)
-        }
     case "bgImg" => copy(bgImg = value.some).some
     case "theme" =>
-      Theme.allByName get value map { t =>
+      Theme.allByName get value map  t =>
         copy(theme = t.name)
-      }
     case "pieceSet" =>
-      PieceSet.allByName get value map { p =>
+      PieceSet.allByName get value map  p =>
         copy(pieceSet = p.name)
-      }
     case "theme3d" =>
-      Theme3d.allByName get value map { t =>
+      Theme3d.allByName get value map  t =>
         copy(theme3d = t.name)
-      }
     case "pieceSet3d" =>
-      PieceSet3d.allByName get value map { p =>
+      PieceSet3d.allByName get value map  p =>
         copy(pieceSet3d = p.name)
-      }
     case "is3d" => copy(is3d = value == "true").some
     case "soundSet" =>
-      SoundSet.allByKey get value map { s =>
+      SoundSet.allByKey get value map  s =>
         copy(soundSet = s.name)
-      }
     case _ => none
-  }
 
-  def animationFactor = animation match {
+  def animationFactor = animation match
     case Animation.NONE => 0
     case Animation.FAST => 0.5f
     case Animation.NORMAL => 1
     case Animation.SLOW => 2
     case _ => 1
-  }
 
   def isBlindfold = blindfold == Pref.Blindfold.YES
 
   def bgImgOrDefault = bgImg | Pref.defaultBgImg
-}
 
-object Pref {
+object Pref
 
   val defaultBgImg =
     "http://lichess1.org/assets/images/background/landscape.jpg"
 
-  object Tag {
+  object Tag
     val verifyTitle = "verifyTitle"
-  }
 
-  object Difficulty {
+  object Difficulty
     val EASY = 1
     val NORMAL = 2
     val HARD = 3
 
     val choices = Seq(EASY -> "Easy", NORMAL -> "Normal", HARD -> "Hard")
-  }
 
-  object Color {
+  object Color
     val WHITE = 1
     val RANDOM = 2
     val BLACK = 3
 
     val choices = Seq(WHITE -> "White", RANDOM -> "Random", BLACK -> "Black")
-  }
 
-  object AutoQueen {
+  object AutoQueen
     val NEVER = 1
     val PREMOVE = 2
     val ALWAYS = 3
@@ -143,9 +130,8 @@ object Pref {
     val choices = Seq(NEVER -> "Never",
                       ALWAYS -> "Always",
                       PREMOVE -> "When premoving")
-  }
 
-  object SubmitMove {
+  object SubmitMove
     val NEVER = 0
     val CORRESPONDENCE_ONLY = 4
     val CORRESPONDENCE_UNLIMITED = 1
@@ -156,16 +142,14 @@ object Pref {
         CORRESPONDENCE_ONLY -> "Correspondence games only",
         CORRESPONDENCE_UNLIMITED -> "Correspondence and unlimited",
         ALWAYS -> "Always")
-  }
 
-  object ConfirmResign {
+  object ConfirmResign
     val NO = 0
     val YES = 1
 
     val choices = Seq(NO -> "No", YES -> "Yes")
-  }
 
-  object InsightShare {
+  object InsightShare
     val NOBODY = 0
     val FRIENDS = 1
     val EVERYBODY = 2
@@ -173,16 +157,14 @@ object Pref {
     val choices = Seq(NOBODY -> "With nobody",
                       FRIENDS -> "With friends",
                       EVERYBODY -> "With everybody")
-  }
 
-  object Blindfold {
+  object Blindfold
     val NO = 0
     val YES = 1
 
     val choices = Seq(NO -> "What? No!", YES -> "Yes, hide the pieces")
-  }
 
-  object AutoThreefold {
+  object AutoThreefold
     val NEVER = 1
     val TIME = 2
     val ALWAYS = 3
@@ -190,9 +172,8 @@ object Pref {
     val choices = Seq(NEVER -> "Never",
                       ALWAYS -> "Always",
                       TIME -> "When time remaining < 30 seconds")
-  }
 
-  object Takeback {
+  object Takeback
     val NEVER = 1
     val CASUAL = 2
     val ALWAYS = 3
@@ -200,9 +181,8 @@ object Pref {
     val choices = Seq(NEVER -> "Never",
                       ALWAYS -> "Always",
                       CASUAL -> "In casual games only")
-  }
 
-  object Animation {
+  object Animation
     val NONE = 0
     val FAST = 1
     val NORMAL = 2
@@ -212,9 +192,8 @@ object Pref {
                       FAST -> "Fast",
                       NORMAL -> "Normal",
                       SLOW -> "Slow")
-  }
 
-  object Coords {
+  object Coords
     val NONE = 0
     val INSIDE = 1
     val OUTSIDE = 2
@@ -222,18 +201,16 @@ object Pref {
     val choices = Seq(NONE -> "No",
                       INSIDE -> "Inside the board",
                       OUTSIDE -> "Outside the board")
-  }
 
-  object Replay {
+  object Replay
     val NEVER = 0
     val SLOW = 1
     val ALWAYS = 2
 
     val choices = Seq(
         NEVER -> "Never", SLOW -> "On slow games", ALWAYS -> "Always")
-  }
 
-  object ClockTenths {
+  object ClockTenths
     val NEVER = 0
     val LOWTIME = 1
     val ALWAYS = 2
@@ -241,9 +218,8 @@ object Pref {
     val choices = Seq(NEVER -> "Never",
                       LOWTIME -> "When time remaining < 10 seconds",
                       ALWAYS -> "Always")
-  }
 
-  object Challenge {
+  object Challenge
     val NEVER = 1
     val RATING = 2
     val FRIEND = 3
@@ -260,7 +236,7 @@ object Pref {
               to: User,
               pref: Int,
               follow: Boolean,
-              fromCheat: Boolean): Option[String] = pref match {
+              fromCheat: Boolean): Option[String] = pref match
       case NEVER => "{{user}} doesn't accept challenges.".some
       case _ if fromCheat && !follow =>
         "{{user}} only accepts challenges from friends.".some
@@ -271,17 +247,14 @@ object Pref {
       case FRIEND if !follow =>
         "{{user}} only accepts challenges from friends.".some
       case _ => none
-    }
-  }
 
-  object Message {
+  object Message
     val NEVER = 1
     val FRIEND = 2
     val ALWAYS = 3
 
     val choices = Seq(
         NEVER -> "Never", FRIEND -> "Only friends", ALWAYS -> "Always")
-  }
 
   def create(id: String) = default.copy(_id = id)
 
@@ -323,4 +296,3 @@ object Pref {
   implicit def PrefZero: Zero[Pref] = Zero.instance(default)
 
   private val bgs = Map("light" -> false, "dark" -> true)
-}

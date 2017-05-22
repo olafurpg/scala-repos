@@ -26,21 +26,19 @@ import scala.reflect.macros.Context
   An inner one like this puts an outer implicit variable in the current closure.
   The next pass from the compiler will trigger the macro again to build a new class for it.
  */
-object ScroogeOuterOrderedBuf {
+object ScroogeOuterOrderedBuf
   // This intentionally handles thrift structs, but not unions, since we want to break out in the struct but not the union
   // That way we can inject all the sub types of the union as implicits into the outer thrift struct.
-  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     import c.universe._
 
-    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
       case tpe
           if tpe <:< typeOf[ThriftStruct] && !(tpe <:< typeOf[ThriftUnion]) =>
         ScroogeOuterOrderedBuf(c)(tpe)
-    }
     pf
-  }
 
-  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
@@ -51,7 +49,7 @@ object ScroogeOuterOrderedBuf {
     val implicitInstanciator =
       q"""implicitly[_root_.com.twitter.scalding.serialization.OrderedSerialization[$outerType]]"""
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -85,6 +83,3 @@ object ScroogeOuterOrderedBuf {
         q"$variableName.compare($elementA, $elementB)"
       override val lazyOuterVariables = Map(
           variableNameStr -> implicitInstanciator)
-    }
-  }
-}

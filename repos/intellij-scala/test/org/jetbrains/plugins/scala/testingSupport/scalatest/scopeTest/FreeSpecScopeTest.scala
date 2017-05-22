@@ -6,17 +6,16 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FreeSpecG
   * @author Roman.Shein
   * @since 05.05.2015.
   */
-trait FreeSpecScopeTest extends FreeSpecGenerator {
-  def testFreeSpecEmptyScope() {
+trait FreeSpecScopeTest extends FreeSpecGenerator
+  def testFreeSpecEmptyScope()
     addComplexFreeSpec()
 
     assert(
         checkConfigAndSettings(
             createTestFromLocation(31, 7, "ComplexFreeSpec.scala"),
             "ComplexFreeSpec"))
-  }
 
-  def testFreeSpecScope() {
+  def testFreeSpecScope()
     addComplexFreeSpec()
 
     val testNames = Seq(
@@ -43,5 +42,3 @@ trait FreeSpecScopeTest extends FreeSpecGenerator {
           checkResultTreeHasExactNamedPath(root, path2: _*) &&
           checkResultTreeDoesNotHaveNodes(
               root, "Innermost scope", "Outer scope 3"))
-  }
-}

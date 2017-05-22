@@ -23,7 +23,7 @@ import scala.reflect.{classTag, ClassTag}
   * Rather than use string keys, the .getClass of the option is used.
   * It is up to you to have classes that make sense and match what is consumed.
   */
-object Options {
+object Options
   def apply(opts: Map[Class[_], Any] = Map.empty): Options = new Options(opts)
 
   /**
@@ -33,10 +33,10 @@ object Options {
   def getFirst[T <: AnyRef : ClassTag](
       options: Map[String, Options],
       names: List[String]): Option[(String, T)] =
-    (for {
+    (for
       id <- names :+ "DEFAULT"
       option <- get[T](options, id)
-    } yield (id, option)).headOption
+    yield (id, option)).headOption
 
   /**
     * Get the option of type T for the given name
@@ -44,8 +44,7 @@ object Options {
   def get[T <: AnyRef : ClassTag](
       options: Map[String, Options], name: String): Option[T] =
     options.get(name).flatMap(_.get[T])
-}
-class Options(val opts: Map[Class[_], Any]) {
+class Options(val opts: Map[Class[_], Any])
   def set(opt: Any) = Options(opts + (opt.getClass -> opt))
 
   def get[T](klass: Class[T]): Option[T] =
@@ -61,4 +60,3 @@ class Options(val opts: Map[Class[_], Any]) {
   def getOrElse[T : ClassTag](default: T): T = getOrElse(klass[T], default)
 
   override def toString = "Options(%s)".format(opts.toString)
-}

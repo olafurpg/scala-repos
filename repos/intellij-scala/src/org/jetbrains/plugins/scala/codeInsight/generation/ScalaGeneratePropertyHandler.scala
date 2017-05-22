@@ -14,31 +14,26 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * Nikolay.Tropin
   * 2014-09-18
   */
-class ScalaGeneratePropertyHandler extends LanguageCodeInsightActionHandler {
-  override def isValidFor(editor: Editor, file: PsiFile): Boolean = {
-    def isOnVar: Boolean = {
+class ScalaGeneratePropertyHandler extends LanguageCodeInsightActionHandler
+  override def isValidFor(editor: Editor, file: PsiFile): Boolean =
+    def isOnVar: Boolean =
       GenerationUtil.elementOfTypeAtCaret(
-          editor, file, classOf[ScVariableDefinition]) match {
+          editor, file, classOf[ScVariableDefinition]) match
         case Some(v) if v.isSimple && v.containingClass != null => true
         case _ => false
-      }
-    }
     file != null && ScalaFileType.SCALA_FILE_TYPE == file.getFileType &&
     isOnVar
-  }
 
-  override def invoke(project: Project, editor: Editor, file: PsiFile): Unit = {
+  override def invoke(project: Project, editor: Editor, file: PsiFile): Unit =
     val varDef = GenerationUtil.elementOfTypeAtCaret(
-        editor, file, classOf[ScVariableDefinition]) match {
+        editor, file, classOf[ScVariableDefinition]) match
       case Some(x) if x.isSimple && x.containingClass != null => x
       case _ => return
-    }
 
     addPropertyMembers(varDef)
     varDef.delete()
-  }
 
-  private def addPropertyMembers(varDef: ScVariableDefinition) = {
+  private def addPropertyMembers(varDef: ScVariableDefinition) =
     val name = varDef.bindings.head.name
     val typeText = varDef.getType(TypingContext.empty).getOrAny.canonicalText
     val defaultValue = varDef.expr.fold("???")(_.getText)
@@ -60,13 +55,10 @@ class ScalaGeneratePropertyHandler extends LanguageCodeInsightActionHandler {
     val setter_0 = createDefinition(setterText)
 
     val parent = varDef.getParent
-    val added = Seq(backingVar_0, getter_0, setter_0).map { elem =>
+    val added = Seq(backingVar_0, getter_0, setter_0).map  elem =>
       parent.addBefore(
           ScalaPsiElementFactory.createNewLine(varDef.getManager), varDef)
       parent.addBefore(elem, varDef)
-    }
     TypeAdjuster.adjustFor(added)
-  }
 
   override def startInWriteAction(): Boolean = true
-}

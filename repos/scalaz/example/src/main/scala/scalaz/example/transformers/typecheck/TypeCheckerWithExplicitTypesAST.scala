@@ -2,7 +2,7 @@ package scalaz.example
 package transformers
 package typecheck
 
-object TypeCheckerWithExplicitTypesAST {
+object TypeCheckerWithExplicitTypesAST
 
   trait Literal
   case class Num(i: Int) extends Literal
@@ -25,10 +25,9 @@ object TypeCheckerWithExplicitTypesAST {
   val numT = TyBuiltin("Num")
   val boolT = TyBuiltin("Bool")
 
-  def litToTy(l: Literal): Type = l match {
+  def litToTy(l: Literal): Type = l match
     case Num(_) => numT
     case Bool(_) => boolT
-  }
 
   val predef: TypeEnv = Map(
       "+" -> (TyLam(numT, TyLam(numT, numT))),
@@ -37,4 +36,3 @@ object TypeCheckerWithExplicitTypesAST {
       "&&" -> (TyLam(boolT, TyLam(boolT, boolT))),
       "||" -> (TyLam(boolT, TyLam(boolT, boolT)))
   )
-}

@@ -17,7 +17,7 @@ abstract class ScalaMemberSelectionPanelBase[
     M <: PsiElement, I <: ScalaMemberInfoBase[M]](title: String,
                                                   memberInfo: util.List[I],
                                                   abstractColumnHeader: String)
-    extends AbstractMemberSelectionPanel[M, I] {
+    extends AbstractMemberSelectionPanel[M, I]
 
   setLayout(new BorderLayout)
   private val myTable = createMemberSelectionTable(
@@ -31,4 +31,3 @@ abstract class ScalaMemberSelectionPanelBase[
       abstractColumnHeader: String): ScalaMemberSelectionTableBase[M, I]
 
   def getTable: ScalaMemberSelectionTableBase[M, I] = myTable
-}

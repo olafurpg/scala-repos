@@ -13,8 +13,8 @@ import java.net.{ConnectException, Socket, InetSocketAddress}
   * message boundaries, it can easily multiplex requests (e.g., for cache
   * replication) or load-balance across replicas.
   */
-object MemcachedProxy {
-  def main(args: Array[String]) {
+object MemcachedProxy
+  def main(args: Array[String])
     assertMemcachedRunning()
 
     val client: Service[Command, Response] = ClientBuilder()
@@ -23,24 +23,19 @@ object MemcachedProxy {
       .hostConnectionLimit(1)
       .build()
 
-    val proxyService = new Service[Command, Response] {
+    val proxyService = new Service[Command, Response]
       def apply(request: Command) = client(request)
-    }
 
     val server: Server = ServerBuilder()
       .codec(Memcached())
       .bindTo(new InetSocketAddress(8080))
       .name("memcachedproxy")
       .build(proxyService)
-  }
 
-  private[this] def assertMemcachedRunning() {
-    try {
+  private[this] def assertMemcachedRunning()
+    try
       new Socket("localhost", 11211)
-    } catch {
+    catch
       case e: ConnectException =>
         println("Error: memcached must be running on port 11211")
         System.exit(1)
-    }
-  }
-}

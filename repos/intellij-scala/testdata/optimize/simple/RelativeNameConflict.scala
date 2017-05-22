@@ -1,23 +1,19 @@
-package a {
+package a
 
   import test.A
   import test.test
   import A.AA
 
-  class Usages {
+  class Usages
     val aa = AA
     val t = test
-  }
-}
 
-package test {
+package test
 
-  object A {
+  object A
     object AA
-  }
 
   object test
-}
 /*
 package a {
 

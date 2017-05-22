@@ -27,7 +27,7 @@ import scala.util.control.NonFatal
 
 import org.apache.spark.internal.Logging
 
-private[spark] object SerializationDebugger extends Logging {
+private[spark] object SerializationDebugger extends Logging
 
   /**
     * Improve the given NotSerializableException with the serialization path leading from the given
@@ -35,22 +35,19 @@ private[spark] object SerializationDebugger extends Logging {
     * `sun.io.serialization.extendedDebugInfo` flag is turned on for the JVM.
     */
   def improveException(
-      obj: Any, e: NotSerializableException): NotSerializableException = {
-    if (enableDebugging && reflect != null) {
-      try {
+      obj: Any, e: NotSerializableException): NotSerializableException =
+    if (enableDebugging && reflect != null)
+      try
         new NotSerializableException(
             e.getMessage + "\nSerialization stack:\n" +
             find(obj).map("\t- " + _).mkString("\n"))
-      } catch {
+      catch
         case NonFatal(t) =>
           // Fall back to old exception
           logWarning("Exception in serialization debugger", t)
           e
-      }
-    } else {
+    else
       e
-    }
-  }
 
   /**
     * Find the path leading to a not serializable object. This method is modeled after OpenJDK's
@@ -65,18 +62,16 @@ private[spark] object SerializationDebugger extends Logging {
     *
     * It does not yet handle writeObject override, but that shouldn't be too hard to do either.
     */
-  private[serializer] def find(obj: Any): List[String] = {
+  private[serializer] def find(obj: Any): List[String] =
     new SerializationDebugger().visit(obj, List.empty)
-  }
 
-  private[serializer] var enableDebugging: Boolean = {
+  private[serializer] var enableDebugging: Boolean =
     !AccessController
       .doPrivileged(new sun.security.action.GetBooleanAction(
               "sun.io.serialization.extendedDebugInfo"))
       .booleanValue()
-  }
 
-  private class SerializationDebugger {
+  private class SerializationDebugger
 
     /** A set to track the list of objects we have visited, to avoid cycles in the graph. */
     private val visited = new mutable.HashSet[Any]
@@ -85,14 +80,14 @@ private[spark] object SerializationDebugger extends Logging {
       * Visit the object and its fields and stop when we find an object that is not serializable.
       * Return the path as a list. If everything can be serialized, return an empty list.
       */
-    def visit(o: Any, stack: List[String]): List[String] = {
-      if (o == null) {
+    def visit(o: Any, stack: List[String]): List[String] =
+      if (o == null)
         List.empty
-      } else if (visited.contains(o)) {
+      else if (visited.contains(o))
         List.empty
-      } else {
+      else
         visited += o
-        o match {
+        o match
           // Primitive value, string, and primitive arrays are always serializable
           case _ if o.getClass.isPrimitive => List.empty
           case _: String => List.empty
@@ -120,21 +115,15 @@ private[spark] object SerializationDebugger extends Logging {
           case _ =>
             // Found an object that is not serializable!
             s"object not serializable (class: ${o.getClass.getName}, value: $o)" :: stack
-        }
-      }
-    }
 
-    private def visitArray(o: Array[_], stack: List[String]): List[String] = {
+    private def visitArray(o: Array[_], stack: List[String]): List[String] =
       var i = 0
-      while (i < o.length) {
+      while (i < o.length)
         val childStack = visit(o(i), s"element of array (index: $i)" :: stack)
-        if (childStack.nonEmpty) {
+        if (childStack.nonEmpty)
           return childStack
-        }
         i += 1
-      }
       return List.empty
-    }
 
     /**
       * Visit an externalizable object.
@@ -143,34 +132,30 @@ private[spark] object SerializationDebugger extends Logging {
       * dummy ObjectOutput that collects all the relevant objects for further testing.
       */
     private def visitExternalizable(
-        o: java.io.Externalizable, stack: List[String]): List[String] = {
+        o: java.io.Externalizable, stack: List[String]): List[String] =
       val fieldList = new ListObjectOutput
       o.writeExternal(fieldList)
       val childObjects = fieldList.outputArray
       var i = 0
-      while (i < childObjects.length) {
+      while (i < childObjects.length)
         val childStack = visit(childObjects(i), "writeExternal data" :: stack)
-        if (childStack.nonEmpty) {
+        if (childStack.nonEmpty)
           return childStack
-        }
         i += 1
-      }
       return List.empty
-    }
 
     private def visitSerializable(
-        o: Object, stack: List[String]): List[String] = {
+        o: Object, stack: List[String]): List[String] =
       // An object contains multiple slots in serialization.
       // Get the slots and visit fields in all of them.
       val (finalObj, desc) = findObjectAndDescriptor(o)
 
       // If the object has been replaced using writeReplace(),
       // then call visit() on it again to test its type again.
-      if (!finalObj.eq(o)) {
+      if (!finalObj.eq(o))
         return visit(
             finalObj,
             s"writeReplace data (class: ${finalObj.getClass.getName})" :: stack)
-      }
 
       // Every class is associated with one or more "slots", each slot refers to the parent
       // classes of this class. These slots are used by the ObjectOutputStream
@@ -192,19 +177,18 @@ private[spark] object SerializationDebugger extends Logging {
       //
       val slotDescs = desc.getSlotDescs
       var i = 0
-      while (i < slotDescs.length) {
+      while (i < slotDescs.length)
         val slotDesc = slotDescs(i)
-        if (slotDesc.hasWriteObjectMethod) {
+        if (slotDesc.hasWriteObjectMethod)
           // If the class type corresponding to current slot has writeObject() defined,
           // then its not obvious which fields of the class will be serialized as the writeObject()
           // can choose arbitrary fields for serialization. This case is handled separately.
           val elem = s"writeObject data (class: ${slotDesc.getName})"
           val childStack = visitSerializableWithWriteObjectMethod(
               finalObj, elem :: stack)
-          if (childStack.nonEmpty) {
+          if (childStack.nonEmpty)
             return childStack
-          }
-        } else {
+        else
           // Visit all the fields objects of the class corresponding to the current slot.
           val fields: Array[ObjectStreamField] = slotDesc.getFields
           val objFieldValues: Array[Object] =
@@ -213,23 +197,18 @@ private[spark] object SerializationDebugger extends Logging {
           slotDesc.getObjFieldValues(finalObj, objFieldValues)
 
           var j = 0
-          while (j < objFieldValues.length) {
+          while (j < objFieldValues.length)
             val fieldDesc = fields(numPrims + j)
             val elem =
               s"field (class: ${slotDesc.getName}" +
               s", name: ${fieldDesc.getName}" +
               s", type: ${fieldDesc.getType})"
             val childStack = visit(objFieldValues(j), elem :: stack)
-            if (childStack.nonEmpty) {
+            if (childStack.nonEmpty)
               return childStack
-            }
             j += 1
-          }
-        }
         i += 1
-      }
       return List.empty
-    }
 
     /**
       * Visit a serializable object which has the writeObject() defined.
@@ -239,35 +218,29 @@ private[spark] object SerializationDebugger extends Logging {
       * This is similar to how externalizable objects are visited.
       */
     private def visitSerializableWithWriteObjectMethod(
-        o: Object, stack: List[String]): List[String] = {
+        o: Object, stack: List[String]): List[String] =
       val innerObjectsCatcher = new ListObjectOutputStream
       var notSerializableFound = false
-      try {
+      try
         innerObjectsCatcher.writeObject(o)
-      } catch {
+      catch
         case io: IOException =>
           notSerializableFound = true
-      }
 
       // If something was not serializable, then visit the captured objects.
       // Otherwise, all the captured objects are safely serializable, so no need to visit them.
       // As an optimization, just added them to the visited list.
-      if (notSerializableFound) {
+      if (notSerializableFound)
         val innerObjects = innerObjectsCatcher.outputArray
         var k = 0
-        while (k < innerObjects.length) {
+        while (k < innerObjects.length)
           val childStack = visit(innerObjects(k), stack)
-          if (childStack.nonEmpty) {
+          if (childStack.nonEmpty)
             return childStack
-          }
           k += 1
-        }
-      } else {
+      else
         visited ++= innerObjectsCatcher.outputArray
-      }
       return List.empty
-    }
-  }
 
   /**
     * Find the object to serialize and the associated [[ObjectStreamClass]]. This method handles
@@ -275,22 +248,20 @@ private[spark] object SerializationDebugger extends Logging {
     * writeReplace method until there is no more.
     */
   @tailrec
-  private def findObjectAndDescriptor(o: Object): (Object, ObjectStreamClass) = {
+  private def findObjectAndDescriptor(o: Object): (Object, ObjectStreamClass) =
     val cl = o.getClass
     val desc = ObjectStreamClass.lookupAny(cl)
-    if (!desc.hasWriteReplaceMethod) {
+    if (!desc.hasWriteReplaceMethod)
       (o, desc)
-    } else {
+    else
       // write place
       findObjectAndDescriptor(desc.invokeWriteReplace(o))
-    }
-  }
 
   /**
     * A dummy [[ObjectOutput]] that simply saves the list of objects written by a writeExternal
     * call, and returns them through `outputArray`.
     */
-  private class ListObjectOutput extends ObjectOutput {
+  private class ListObjectOutput extends ObjectOutput
     private val output = new mutable.ArrayBuffer[Any]
     def outputArray: Array[Any] = output.toArray
     override def writeObject(o: Any): Unit = output += o
@@ -310,12 +281,10 @@ private[spark] object SerializationDebugger extends Logging {
     override def writeChar(i: Int): Unit = {}
     override def writeLong(l: Long): Unit = {}
     override def writeByte(i: Int): Unit = {}
-  }
 
   /** An output stream that emulates /dev/null */
-  private class NullOutputStream extends OutputStream {
+  private class NullOutputStream extends OutputStream
     override def write(b: Int) {}
-  }
 
   /**
     * A dummy [[ObjectOutputStream]] that saves the list of objects written to it and returns
@@ -326,112 +295,95 @@ private[spark] object SerializationDebugger extends Logging {
     * [[NullOutputStream]], which acts like a /dev/null.
     */
   private class ListObjectOutputStream
-      extends ObjectOutputStream(new NullOutputStream) {
+      extends ObjectOutputStream(new NullOutputStream)
     private val output = new mutable.ArrayBuffer[Any]
     this.enableReplaceObject(true)
 
     def outputArray: Array[Any] = output.toArray
 
-    override def replaceObject(obj: Object): Object = {
+    override def replaceObject(obj: Object): Object =
       output += obj
       obj
-    }
-  }
 
   /** An implicit class that allows us to call private methods of ObjectStreamClass. */
   implicit class ObjectStreamClassMethods(val desc: ObjectStreamClass)
-      extends AnyVal {
-    def getSlotDescs: Array[ObjectStreamClass] = {
-      reflect.GetClassDataLayout.invoke(desc).asInstanceOf[Array[Object]].map {
+      extends AnyVal
+    def getSlotDescs: Array[ObjectStreamClass] =
+      reflect.GetClassDataLayout.invoke(desc).asInstanceOf[Array[Object]].map
         classDataSlot =>
           reflect.DescField.get(classDataSlot).asInstanceOf[ObjectStreamClass]
-      }
-    }
 
-    def hasWriteObjectMethod: Boolean = {
+    def hasWriteObjectMethod: Boolean =
       reflect.HasWriteObjectMethod.invoke(desc).asInstanceOf[Boolean]
-    }
 
-    def hasWriteReplaceMethod: Boolean = {
+    def hasWriteReplaceMethod: Boolean =
       reflect.HasWriteReplaceMethod.invoke(desc).asInstanceOf[Boolean]
-    }
 
-    def invokeWriteReplace(obj: Object): Object = {
+    def invokeWriteReplace(obj: Object): Object =
       reflect.InvokeWriteReplace.invoke(desc, obj)
-    }
 
-    def getNumObjFields: Int = {
+    def getNumObjFields: Int =
       reflect.GetNumObjFields.invoke(desc).asInstanceOf[Int]
-    }
 
-    def getObjFieldValues(obj: Object, out: Array[Object]): Unit = {
+    def getObjFieldValues(obj: Object, out: Array[Object]): Unit =
       reflect.GetObjFieldValues.invoke(desc, obj, out)
-    }
-  }
 
   /**
     * Object to hold all the reflection objects. If we run on a JVM that we cannot understand,
     * this field will be null and this the debug helper should be disabled.
     */
-  private val reflect: ObjectStreamClassReflection = try {
+  private val reflect: ObjectStreamClassReflection = try
     new ObjectStreamClassReflection
-  } catch {
+  catch
     case e: Exception =>
       logWarning("Cannot find private methods using reflection", e)
       null
-  }
 
-  private class ObjectStreamClassReflection {
+  private class ObjectStreamClassReflection
 
     /** ObjectStreamClass.getClassDataLayout */
-    val GetClassDataLayout: Method = {
+    val GetClassDataLayout: Method =
       val f =
         classOf[ObjectStreamClass].getDeclaredMethod("getClassDataLayout")
       f.setAccessible(true)
       f
-    }
 
     /** ObjectStreamClass.hasWriteObjectMethod */
-    val HasWriteObjectMethod: Method = {
+    val HasWriteObjectMethod: Method =
       val f =
         classOf[ObjectStreamClass].getDeclaredMethod("hasWriteObjectMethod")
       f.setAccessible(true)
       f
-    }
 
     /** ObjectStreamClass.hasWriteReplaceMethod */
-    val HasWriteReplaceMethod: Method = {
+    val HasWriteReplaceMethod: Method =
       val f =
         classOf[ObjectStreamClass].getDeclaredMethod("hasWriteReplaceMethod")
       f.setAccessible(true)
       f
-    }
 
     /** ObjectStreamClass.invokeWriteReplace */
-    val InvokeWriteReplace: Method = {
+    val InvokeWriteReplace: Method =
       val f = classOf[ObjectStreamClass].getDeclaredMethod(
           "invokeWriteReplace", classOf[Object])
       f.setAccessible(true)
       f
-    }
 
     /** ObjectStreamClass.getNumObjFields */
-    val GetNumObjFields: Method = {
+    val GetNumObjFields: Method =
       val f = classOf[ObjectStreamClass].getDeclaredMethod("getNumObjFields")
       f.setAccessible(true)
       f
-    }
 
     /** ObjectStreamClass.getObjFieldValues */
-    val GetObjFieldValues: Method = {
+    val GetObjFieldValues: Method =
       val f = classOf[ObjectStreamClass].getDeclaredMethod(
           "getObjFieldValues", classOf[Object], classOf[Array[Object]])
       f.setAccessible(true)
       f
-    }
 
     /** ObjectStreamClass$ClassDataSlot.desc field */
-    val DescField: Field = {
+    val DescField: Field =
       // scalastyle:off classforname
       val f = Class
         .forName("java.io.ObjectStreamClass$ClassDataSlot")
@@ -439,6 +391,3 @@ private[spark] object SerializationDebugger extends Logging {
       // scalastyle:on classforname
       f.setAccessible(true)
       f
-    }
-  }
-}

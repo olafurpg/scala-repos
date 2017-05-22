@@ -38,69 +38,59 @@ import org.apache.spark.network.shuffle.BlockFetchingListener
 import org.apache.spark.storage.{BlockId, ShuffleBlockId}
 
 class NettyBlockTransferSecuritySuite
-    extends SparkFunSuite with MockitoSugar with ShouldMatchers {
-  test("security default off") {
+    extends SparkFunSuite with MockitoSugar with ShouldMatchers
+  test("security default off")
     val conf = new SparkConf().set("spark.app.id", "app-id")
-    testConnection(conf, conf) match {
+    testConnection(conf, conf) match
       case Success(_) => // expected
       case Failure(t) => fail(t)
-    }
-  }
 
-  test("security on same password") {
+  test("security on same password")
     val conf = new SparkConf()
       .set("spark.authenticate", "true")
       .set("spark.authenticate.secret", "good")
       .set("spark.app.id", "app-id")
-    testConnection(conf, conf) match {
+    testConnection(conf, conf) match
       case Success(_) => // expected
       case Failure(t) => fail(t)
-    }
-  }
 
-  test("security on mismatch password") {
+  test("security on mismatch password")
     val conf0 = new SparkConf()
       .set("spark.authenticate", "true")
       .set("spark.authenticate.secret", "good")
       .set("spark.app.id", "app-id")
     val conf1 = conf0.clone.set("spark.authenticate.secret", "bad")
-    testConnection(conf0, conf1) match {
+    testConnection(conf0, conf1) match
       case Success(_) => fail("Should have failed")
       case Failure(t) => t.getMessage should include("Mismatched response")
-    }
-  }
 
-  test("security mismatch auth off on server") {
+  test("security mismatch auth off on server")
     val conf0 = new SparkConf()
       .set("spark.authenticate", "true")
       .set("spark.authenticate.secret", "good")
       .set("spark.app.id", "app-id")
     val conf1 = conf0.clone.set("spark.authenticate", "false")
-    testConnection(conf0, conf1) match {
+    testConnection(conf0, conf1) match
       case Success(_) => fail("Should have failed")
       case Failure(t) =>
       // any funny error may occur, sever will interpret SASL token as RPC
-    }
-  }
 
-  test("security mismatch auth off on client") {
+  test("security mismatch auth off on client")
     val conf0 = new SparkConf()
       .set("spark.authenticate", "false")
       .set("spark.authenticate.secret", "good")
       .set("spark.app.id", "app-id")
     val conf1 = conf0.clone.set("spark.authenticate", "true")
-    testConnection(conf0, conf1) match {
+    testConnection(conf0, conf1) match
       case Success(_) => fail("Should have failed")
       case Failure(t) => t.getMessage should include("Expected SaslMessage")
-    }
-  }
 
   /**
     * Creates two servers with different configurations and sees if they can talk.
     * Returns Success() if they can transfer a block, and Failure() if the block transfer was failed
     * properly. We will throw an out-of-band exception if something other than that goes wrong.
     */
-  private def testConnection(conf0: SparkConf, conf1: SparkConf): Try[Unit] = {
+  private def testConnection(conf0: SparkConf, conf1: SparkConf): Try[Unit] =
     val blockManager = mock[BlockDataManager]
     val blockId = ShuffleBlockId(0, 1, 2)
     val blockString = "Hello, world!"
@@ -118,7 +108,7 @@ class NettyBlockTransferSecuritySuite
         conf1, securityManager1, numCores = 1)
     exec1.init(blockManager)
 
-    val result = fetchBlock(exec0, exec1, "1", blockId) match {
+    val result = fetchBlock(exec0, exec1, "1", blockId) match
       case Success(buf) =>
         val actualString = CharStreams.toString(new InputStreamReader(
                 buf.createInputStream(), StandardCharsets.UTF_8))
@@ -127,17 +117,15 @@ class NettyBlockTransferSecuritySuite
         Success(())
       case Failure(t) =>
         Failure(t)
-    }
     exec0.close()
     exec1.close()
     result
-  }
 
   /** Synchronously fetches a single block, acting as the given executor fetching from another. */
   private def fetchBlock(self: BlockTransferService,
                          from: BlockTransferService,
                          execId: String,
-                         blockId: BlockId): Try[ManagedBuffer] = {
+                         blockId: BlockId): Try[ManagedBuffer] =
 
     val promise = Promise[ManagedBuffer]()
 
@@ -145,19 +133,15 @@ class NettyBlockTransferSecuritySuite
                      from.port,
                      execId,
                      Array(blockId.toString),
-                     new BlockFetchingListener {
+                     new BlockFetchingListener
                        override def onBlockFetchFailure(
-                           blockId: String, exception: Throwable): Unit = {
+                           blockId: String, exception: Throwable): Unit =
                          promise.failure(exception)
-                       }
 
                        override def onBlockFetchSuccess(
-                           blockId: String, data: ManagedBuffer): Unit = {
+                           blockId: String, data: ManagedBuffer): Unit =
                          promise.success(data.retain())
-                       }
-                     })
+                     )
 
     Await.ready(promise.future, FiniteDuration(10, TimeUnit.SECONDS))
     promise.future.value.get
-  }
-}

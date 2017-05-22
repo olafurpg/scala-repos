@@ -1,14 +1,11 @@
 package test
 
-package p {
+package p
   class A(a: String = "")
-}
 
-package object po {
+package object po
   type A = p.A
-}
 
 import po._
-class C {
+class C
   val a = new A() //p.A.init$default$1)
-}

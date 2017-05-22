@@ -24,14 +24,13 @@ import kafka.common.KafkaException
 import org.apache.kafka.common.protocol.SecurityProtocol
 import org.apache.kafka.common.utils.Utils
 
-object EndPoint {
+object EndPoint
 
-  def readFrom(buffer: ByteBuffer): EndPoint = {
+  def readFrom(buffer: ByteBuffer): EndPoint =
     val port = buffer.getInt()
     val host = readShortString(buffer)
     val protocol = buffer.getShort()
     EndPoint(host, port, SecurityProtocol.forId(protocol))
-  }
 
   /**
     * Create EndPoint object from connectionString
@@ -41,9 +40,9 @@ object EndPoint {
     *                         Negative ports are also accepted, since they are used in some unit tests
     * @return
     */
-  def createEndPoint(connectionString: String): EndPoint = {
+  def createEndPoint(connectionString: String): EndPoint =
     val uriParseExp = """^(.*)://\[?([0-9a-zA-Z\-.:]*)\]?:(-?[0-9]+)""".r
-    connectionString match {
+    connectionString match
       case uriParseExp(protocol, "", port) =>
         new EndPoint(null, port.toInt, SecurityProtocol.forName(protocol))
       case uriParseExp(protocol, host, port) =>
@@ -51,29 +50,23 @@ object EndPoint {
       case _ =>
         throw new KafkaException(
             "Unable to parse " + connectionString + " to a broker endpoint")
-    }
-  }
-}
 
 /**
   * Part of the broker definition - matching host/port pair to a protocol
   */
-case class EndPoint(host: String, port: Int, protocolType: SecurityProtocol) {
+case class EndPoint(host: String, port: Int, protocolType: SecurityProtocol)
 
-  def connectionString(): String = {
+  def connectionString(): String =
     val hostport =
       if (host == null) ":" + port
       else Utils.formatAddress(host, port)
     protocolType + "://" + hostport
-  }
 
-  def writeTo(buffer: ByteBuffer): Unit = {
+  def writeTo(buffer: ByteBuffer): Unit =
     buffer.putInt(port)
     writeShortString(buffer, host)
     buffer.putShort(protocolType.id)
-  }
 
   def sizeInBytes: Int =
     4 + /* port */
     shortStringLength(host) + 2 /* protocol id */
-}

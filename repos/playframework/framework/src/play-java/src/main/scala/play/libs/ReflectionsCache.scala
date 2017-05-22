@@ -11,7 +11,7 @@ package play.libs
   * classloader for @Entity annotated classes in a given package.  Profiling shows that without this cache, over 90%
   * of a tests time might be spent in classpath scanning.
   */
-object ReflectionsCache {
+object ReflectionsCache
   import ref.SoftReference
   import org.reflections.{scanners, util, Reflections}
   import scala.collection.concurrent._
@@ -22,23 +22,19 @@ object ReflectionsCache {
   @volatile private var reflectionsMapRef: Option[SoftReference[
           (ClassLoader, Map[String, Reflections])]] = None
 
-  def getReflections(classLoader: ClassLoader, pkg: String) = {
+  def getReflections(classLoader: ClassLoader, pkg: String) =
     // Detect if the classloader is different from last time, if it is, create a new cache and replace the old
     val reflectionsMap = reflectionsMapRef
       .flatMap(_.get)
       .filter(_._1 == classLoader)
       .map(_._2)
-      .getOrElse {
+      .getOrElse
         val map = TrieMap.empty[String, Reflections]
         reflectionsMapRef = Some(new SoftReference((classLoader, map), null))
         map
-      }
-    reflectionsMap.get(pkg).getOrElse {
+    reflectionsMap.get(pkg).getOrElse
 
       val reflections = new Reflections(
           Classpath.getReflectionsConfiguration(pkg, classLoader))
 
       reflectionsMap.putIfAbsent(pkg, reflections).getOrElse(reflections)
-    }
-  }
-}

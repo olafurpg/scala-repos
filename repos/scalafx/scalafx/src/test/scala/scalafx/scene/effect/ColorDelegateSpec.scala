@@ -36,11 +36,11 @@ import scalafx.scene.paint.Color
 /**
   * Trait to test ColorDelegate subclasses
   */
-trait ColorDelegateSpec[D <: ColorDelegate[_]] extends FlatSpec {
+trait ColorDelegateSpec[D <: ColorDelegate[_]] extends FlatSpec
 
   protected val colorDelegate: D
 
-  it should "allow observe changes in Color" in {
+  it should "allow observe changes in Color" in
     var changed = false
     val initialColor = Color.White
     val finalColor = Color.Black
@@ -49,15 +49,12 @@ trait ColorDelegateSpec[D <: ColorDelegate[_]] extends FlatSpec {
 
     colorDelegate.color.onChange(
         (ov, oldColor, newColor) =>
-          {
         oldColor should be(initialColor.delegate)
         newColor should be(finalColor.delegate)
         changed = true
-    })
+    )
 
     colorDelegate.color = finalColor
 
     changed should be(true)
     colorDelegate.color.value should be(finalColor.delegate)
-  }
-}

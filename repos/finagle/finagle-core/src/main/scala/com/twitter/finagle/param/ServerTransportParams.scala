@@ -15,7 +15,7 @@ import com.twitter.util.StorageUnit
   */
 class ServerTransportParams[A <: Stack.Parameterized[A]](
     self: Stack.Parameterized[A])
-    extends TransportParams(self) {
+    extends TransportParams(self)
 
   /**
     * Enables the TLS/SSL support (connection encrypting) on this server.
@@ -50,4 +50,3 @@ class ServerTransportParams[A <: Stack.Parameterized[A]](
                       nextProtocols.orNull
                 ))
         ))
-}

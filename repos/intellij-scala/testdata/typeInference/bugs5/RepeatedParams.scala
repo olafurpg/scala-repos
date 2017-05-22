@@ -1,7 +1,5 @@
-object A {
-  def foo(s: String*) {
+object A
+  def foo(s: String*)
     /*start*/
     s(12) /*end*/
-  }
-}
 //String

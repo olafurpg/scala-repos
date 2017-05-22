@@ -27,7 +27,7 @@ import org.apache.kafka.common.config.{AbstractConfig, ConfigDef}
 import org.apache.kafka.common.record.TimestampType
 import org.apache.kafka.common.utils.Utils
 
-object Defaults {
+object Defaults
   val SegmentSize = kafka.server.Defaults.LogSegmentBytes
   val SegmentMs = kafka.server.Defaults.LogRollHours * 60 * 60 * 1000L
   val SegmentJitterMs =
@@ -52,10 +52,9 @@ object Defaults {
   val MessageTimestampType = kafka.server.Defaults.LogMessageTimestampType
   val MessageTimestampDifferenceMaxMs =
     kafka.server.Defaults.LogMessageTimestampDifferenceMaxMs
-}
 
 case class LogConfig(props: java.util.Map[_, _])
-    extends AbstractConfig(LogConfig.configDef, props, false) {
+    extends AbstractConfig(LogConfig.configDef, props, false)
 
   /**
     * Important note: Any configuration parameter that is passed along from KafkaConfig to LogConfig
@@ -93,13 +92,11 @@ case class LogConfig(props: java.util.Map[_, _])
     else
       Utils.abs(scala.util.Random.nextInt()) % math.min(
           segmentJitterMs, segmentMs)
-}
 
-object LogConfig {
+object LogConfig
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     System.out.println(configDef.toHtmlTable)
-  }
 
   val Delete = "delete"
   val Compact = "compact"
@@ -171,7 +168,7 @@ object LogConfig {
   val MessageTimestampDifferenceMaxMsDoc =
     KafkaConfig.LogMessageTimestampDifferenceMaxMsDoc
 
-  private val configDef = {
+  private val configDef =
     import org.apache.kafka.common.config.ConfigDef.Importance._
     import org.apache.kafka.common.config.ConfigDef.Range._
     import org.apache.kafka.common.config.ConfigDef.Type._
@@ -300,7 +297,6 @@ object LogConfig {
               atLeast(0),
               MEDIUM,
               MessageTimestampDifferenceMaxMsDoc)
-  }
 
   def apply(): LogConfig = LogConfig(new Properties())
 
@@ -310,27 +306,23 @@ object LogConfig {
     * Create a log config instance using the given properties and defaults
     */
   def fromProps(defaults: java.util.Map[_ <: Object, _ <: Object],
-                overrides: Properties): LogConfig = {
+                overrides: Properties): LogConfig =
     val props = new Properties()
     props.putAll(defaults)
     props.putAll(overrides)
     LogConfig(props)
-  }
 
   /**
     * Check that property names are valid
     */
-  def validateNames(props: Properties) {
+  def validateNames(props: Properties)
     val names = configNames
     for (name <- props.keys.asScala) require(
         names.contains(name), s"Unknown configuration `$name`.")
-  }
 
   /**
     * Check that the given properties contain only valid log config names and that all values can be parsed and are valid
     */
-  def validate(props: Properties) {
+  def validate(props: Properties)
     validateNames(props)
     configDef.parse(props)
-  }
-}

@@ -1,6 +1,5 @@
 package org
 
-package object example {
+package object example
   case object Blip
   case class Blop()
-}

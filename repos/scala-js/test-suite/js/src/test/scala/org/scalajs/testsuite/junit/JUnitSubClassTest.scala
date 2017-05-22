@@ -3,49 +3,40 @@ package org.scalajs.testsuite.junit
 import org.junit.Assert._
 import org.junit.Test
 
-class JUnitSubClassTest {
+class JUnitSubClassTest
   @Test def test1(): Unit = ()
-}
 
 class JUnitSubClassExtended1Test extends JUnitSubClassTest
 
-class JUnitSubClassExtended2Test extends JUnitSubClassTest {
+class JUnitSubClassExtended2Test extends JUnitSubClassTest
   @Test def test2(): Unit = ()
-}
 
-class JUnitSubClassTestCheck {
+class JUnitSubClassTestCheck
 
-  @Test def testSubClass0(): Unit = {
+  @Test def testSubClass0(): Unit =
     val boot = JUnitUtil.loadBootstrapper(
         "org.scalajs.testsuite.junit.JUnitSubClassTest")
-    try {
+    try
       boot.invoke(boot.newInstance(), "test1")
-    } catch {
+    catch
       case e: Throwable =>
         fail(s"Could not invoke a test: ${e.getMessage}")
-    }
-  }
 
-  @Test def testSubClass1(): Unit = {
+  @Test def testSubClass1(): Unit =
     val boot = JUnitUtil.loadBootstrapper(
         "org.scalajs.testsuite.junit.JUnitSubClassExtended1Test")
-    try {
+    try
       boot.invoke(boot.newInstance(), "test1")
-    } catch {
+    catch
       case e: Throwable =>
         fail(s"Could not invoke a test: ${e.getMessage}")
-    }
-  }
 
-  @Test def testSubClass2(): Unit = {
+  @Test def testSubClass2(): Unit =
     val boot = JUnitUtil.loadBootstrapper(
         "org.scalajs.testsuite.junit.JUnitSubClassExtended2Test")
-    try {
+    try
       boot.invoke(boot.newInstance(), "test1")
       boot.invoke(boot.newInstance(), "test2")
-    } catch {
+    catch
       case e: Throwable =>
         fail(s"Could not invoke a test: ${e.getMessage}")
-    }
-  }
-}

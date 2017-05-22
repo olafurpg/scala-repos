@@ -3,7 +3,7 @@ package org.jetbrains.plugins.hocon
 import scala.collection.JavaConversions
 import scala.collection.convert.{DecorateAsJava, DecorateAsScala}
 
-object JavaInterop extends DecorateAsJava with DecorateAsScala {
+object JavaInterop extends DecorateAsJava with DecorateAsScala
   type JIterator[A] = java.util.Iterator[A]
   type JIterable[A] = java.lang.Iterable[A]
   type JCollection[A] = java.util.Collection[A]
@@ -22,8 +22,6 @@ object JavaInterop extends DecorateAsJava with DecorateAsScala {
   type JNavigableMap[K, V] = java.util.NavigableMap[K, V]
   type JTreeMap[K, V] = java.util.TreeMap[K, V]
 
-  object JList {
+  object JList
     def apply[A](values: A*): JList[A] =
       JavaConversions.seqAsJavaList(values)
-  }
-}

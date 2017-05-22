@@ -1,6 +1,6 @@
 import scala.reflect.runtime.universe._
 
-object Test extends App {
+object Test extends App
   def inferredType[T : TypeTag](v: T) = println(typeOf[T])
 
   trait A
@@ -10,4 +10,3 @@ object Test extends App {
 
   val name = new A with B
   inferredType(name)
-}

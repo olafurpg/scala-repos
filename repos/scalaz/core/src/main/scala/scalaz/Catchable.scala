@@ -16,7 +16,7 @@ package scalaz
   * total.
   */
 ////
-trait Catchable[F[_]] { self =>
+trait Catchable[F[_]]  self =>
   ////
 
   def attempt[A](f: F[A]): F[Throwable \/ A]
@@ -24,15 +24,12 @@ trait Catchable[F[_]] { self =>
   // derived functions
 
   ////
-  val catchableSyntax = new scalaz.syntax.CatchableSyntax[F] {
+  val catchableSyntax = new scalaz.syntax.CatchableSyntax[F]
     def F = Catchable.this
-  }
-}
 
-object Catchable {
+object Catchable
   @inline def apply[F[_]](implicit F: Catchable[F]): Catchable[F] = F
 
   ////
 
   ////
-}

@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventType
 
-object SwipeEvent {
+object SwipeEvent
   implicit def sfxSwipeEvent2jfx(se: SwipeEvent): jfxsi.SwipeEvent =
     if (se != null) se.delegate else null
 
@@ -76,16 +76,14 @@ object SwipeEvent {
   @deprecated("Use SwipeUp; SWIPE_UP will be removed in a future release",
               "8.0.60-R10")
   val SWIPE_UP = SwipeUp
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/SwipeEvent.html]]
   */
 class SwipeEvent(override val delegate: jfxsi.SwipeEvent)
-    extends GestureEvent(delegate) with SFXDelegate[jfxsi.SwipeEvent] {
+    extends GestureEvent(delegate) with SFXDelegate[jfxsi.SwipeEvent]
 
   /**
     * Gets number of touch points that caused this event.
     */
   def touchCount: Int = delegate.getTouchCount
-}

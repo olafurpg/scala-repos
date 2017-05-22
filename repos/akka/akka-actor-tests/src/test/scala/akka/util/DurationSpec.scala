@@ -9,11 +9,11 @@ import scala.concurrent.duration._
 
 import akka.testkit.AkkaSpec
 
-class DurationSpec extends AkkaSpec {
+class DurationSpec extends AkkaSpec
 
-  "Duration" must {
+  "Duration" must
 
-    "form a one-dimensional vector field" in {
+    "form a one-dimensional vector field" in
       val zero = 0 seconds
       val one = 1 second
       val two = one + one
@@ -25,9 +25,8 @@ class DurationSpec extends AkkaSpec {
       (two / one) should ===(2)
       (one + zero) should ===(one)
       (one / 1000000) should ===(1.micro)
-    }
 
-    "respect correct treatment of infinities" in {
+    "respect correct treatment of infinities" in
       val one = 1.second
       val inf = Duration.Inf
       val minf = Duration.MinusInf
@@ -51,7 +50,6 @@ class DurationSpec extends AkkaSpec {
       assert(minf != inf)
       assert(one != inf)
       assert(minf != one)
-    }
 
     /*"check its range" in {
       for (unit ← Seq(DAYS, HOURS, MINUTES, SECONDS, MILLISECONDS, MICROSECONDS, NANOSECONDS)) {
@@ -82,7 +80,7 @@ class DurationSpec extends AkkaSpec {
       }
     }*/
 
-    "support fromNow" in {
+    "support fromNow" in
       val dead = 2.seconds.fromNow
       val dead2 = 2 seconds fromNow
       // view bounds vs. very local type inference vs. operator precedence: sigh
@@ -91,6 +89,3 @@ class DurationSpec extends AkkaSpec {
       Thread.sleep(1.second.toMillis)
       dead.timeLeft should be < (1 second: Duration)
       dead2.timeLeft should be < (1 second: Duration)
-    }
-  }
-}

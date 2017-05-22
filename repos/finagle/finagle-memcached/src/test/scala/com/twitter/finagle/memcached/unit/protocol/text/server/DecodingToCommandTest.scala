@@ -12,14 +12,13 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 @RunWith(classOf[JUnitRunner])
-class DecodingToCommandTest extends FunSuite {
+class DecodingToCommandTest extends FunSuite
 
-  class Context {
+  class Context
     val decodingToCommand = new DecodingToCommand
     case class ExpectedTimeTable(expireTime: Int, expirationTime: Time)
-  }
 
-  test("parseCommand SET with expire times") {
+  test("parseCommand SET with expire times")
     val context = new Context
     import context._
 
@@ -28,7 +27,7 @@ class DecodingToCommandTest extends FunSuite {
     val data = "Hello World"
     val dataSize = data.length.toString
 
-    Time.withCurrentTimeFrozen { _ =>
+    Time.withCurrentTimeFrozen  _ =>
       val expireTimeTableData =
         Table(
             "expectedTime" -> "allowedDelta",
@@ -38,7 +37,7 @@ class DecodingToCommandTest extends FunSuite {
             ExpectedTimeTable(200, 200.seconds.fromNow) -> 1.seconds
         )
 
-      forAll(expireTimeTableData) {
+      forAll(expireTimeTableData)
         (expectedTime: ExpectedTimeTable, allowedDelta: Duration) =>
           val buffer = TokensWithData(
               Seq("set",
@@ -56,27 +55,19 @@ class DecodingToCommandTest extends FunSuite {
           assert(set.value == Buf.Utf8(data))
           assert(set.expiry.moreOrLessEquals(expectedTime.expirationTime,
                                              allowedDelta))
-      }
-    }
-  }
 
-  test("parseCommand STAT") {
+  test("parseCommand STAT")
     val context = new Context
     import context._
 
-    Seq(None, Some("slabs"), Some("items")).foreach { arg =>
-      val cmd = arg match {
+    Seq(None, Some("slabs"), Some("items")).foreach  arg =>
+      val cmd = arg match
         case None => Seq("stats") map { Buf.Utf8(_) }
         case Some(s) => Seq("stats", s) map { Buf.Utf8(_) }
-      }
       val buffer = Tokens(cmd)
       val command = decodingToCommand.decode(null, null, buffer)
       assert(command.getClass == classOf[Stats])
       val stats = command.asInstanceOf[Stats]
-      stats.args.headOption match {
+      stats.args.headOption match
         case None => assert(arg == None)
         case Some(Buf.Utf8(cb)) => assert(cb == arg.get)
-      }
-    }
-  }
-}

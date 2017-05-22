@@ -21,9 +21,9 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 @RunWith(classOf[JUnitRunner])
 class ClientBuilderTest
     extends FunSuite with Eventually with IntegrationPatience with MockitoSugar
-    with IntegrationBase {
+    with IntegrationBase
 
-  trait ClientBuilderHelper {
+  trait ClientBuilderHelper
     val preparedFactory = mock[ServiceFactory[String, String]]
     val preparedServicePromise = new Promise[Service[String, String]]
     when(preparedFactory.status) thenReturn Status.Open
@@ -36,10 +36,9 @@ class ClientBuilderTest
     when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]],
                                     any[Stack.Params]))
       .thenReturn(preparedFactory)
-  }
 
-  test("ClientBuilder should invoke prepareConnFactory on connection") {
-    new ClientBuilderHelper {
+  test("ClientBuilder should invoke prepareConnFactory on connection")
+    new ClientBuilderHelper
       val client = m.build()
       val requestFuture = client("123")
 
@@ -55,14 +54,12 @@ class ClientBuilderTest
 
       verify(service)("123")
       assert(requestFuture.poll == Some(Return("321")))
-    }
-  }
 
   def verifyProtocolRegistry(name: String, expected: String)(
-      build: => Service[String, String]) = {
-    test(name + " registers protocol library") {
+      build: => Service[String, String]) =
+    test(name + " registers protocol library")
       val simple = new SimpleRegistry()
-      GlobalRegistry.withRegistry(simple) {
+      GlobalRegistry.withRegistry(simple)
         build
 
         val entries = GlobalRegistry.get.toSet
@@ -73,11 +70,8 @@ class ClientBuilderTest
         val specified =
           entries.count(_.key.startsWith(Seq("client", expected)))
         assert(specified > 0, "did not see expected protocol registry keys")
-      }
-    }
-  }
 
-  verifyProtocolRegistry("#codec(Codec)", expected = "fancy") {
+  verifyProtocolRegistry("#codec(Codec)", expected = "fancy")
     val ctx = new ClientBuilderHelper {}
     when(ctx.m.codec.protocolLibraryName).thenReturn("fancy")
 
@@ -87,15 +81,13 @@ class ClientBuilderTest
       .codec(ctx.m.codec)
       .hosts("")
       .build()
-  }
 
-  verifyProtocolRegistry("#codec(CodecFactory)", expected = "fancy") {
+  verifyProtocolRegistry("#codec(CodecFactory)", expected = "fancy")
     val ctx = new ClientBuilderHelper {}
-    val cf = new CodecFactory[String, String] {
+    val cf = new CodecFactory[String, String]
       def client: Client = (_: ClientCodecConfig) => ctx.m.codec
       def server: Server = ???
       override def protocolLibraryName = "fancy"
-    }
 
     ClientBuilder()
       .name("test")
@@ -103,16 +95,14 @@ class ClientBuilderTest
       .codec(cf)
       .hosts("")
       .build()
-  }
 
-  verifyProtocolRegistry("#codec(CodecFactory#Client)", expected = "fancy") {
+  verifyProtocolRegistry("#codec(CodecFactory#Client)", expected = "fancy")
     val ctx = new ClientBuilderHelper {}
     when(ctx.m.codec.protocolLibraryName).thenReturn("fancy")
 
-    val cfClient: CodecFactory[String, String]#Client = {
+    val cfClient: CodecFactory[String, String]#Client =
       (_: ClientCodecConfig) =>
         ctx.m.codec
-    }
 
     ClientBuilder()
       .name("test")
@@ -120,16 +110,14 @@ class ClientBuilderTest
       .codec(cfClient)
       .hosts("")
       .build()
-  }
 
-  verifyProtocolRegistry("configured protocol", expected = "extra fancy") {
+  verifyProtocolRegistry("configured protocol", expected = "extra fancy")
     val ctx = new ClientBuilderHelper {}
     when(ctx.m.codec.protocolLibraryName).thenReturn("fancy")
 
-    val cfClient: CodecFactory[String, String]#Client = {
+    val cfClient: CodecFactory[String, String]#Client =
       (_: ClientCodecConfig) =>
         ctx.m.codec
-    }
 
     val stk = ClientBuilder.stackClientOfCodec(cfClient)
     ClientBuilder()
@@ -138,18 +126,14 @@ class ClientBuilderTest
       .hosts("")
       .stack(stk.configured(ProtocolLibrary("extra fancy")))
       .build()
-  }
 
-  test("ClientBuilder should close properly") {
-    new ClientBuilderHelper {
+  test("ClientBuilder should close properly")
+    new ClientBuilderHelper
       val svc =
         ClientBuilder().hostConnectionLimit(1).codec(m.codec).hosts("").build()
       val f = svc.close()
-      eventually {
+      eventually
         f.isDefined
-      }
-    }
-  }
 
   private class MyException extends Exception
 
@@ -157,8 +141,8 @@ class ClientBuilderTest
       2, // 2 tries == 1 attempt + 1 retry
       { case Throw(_: MyException) => true })
 
-  test("ClientBuilder should collect stats on 'tries' for retrypolicy") {
-    new ClientBuilderHelper {
+  test("ClientBuilder should collect stats on 'tries' for retrypolicy")
+    new ClientBuilderHelper
       val inMemory = new InMemoryStatsReceiver
       val builder = ClientBuilder()
         .name("test")
@@ -183,11 +167,9 @@ class ClientBuilderTest
           // 1 request and 1 retry
           inMemory.counters(Seq("test", "requests")) == 2
       )
-    }
-  }
 
-  test("ClientBuilder should collect stats on 'tries' with no retrypolicy") {
-    new ClientBuilderHelper {
+  test("ClientBuilder should collect stats on 'tries' with no retrypolicy")
+    new ClientBuilderHelper
       val inMemory = new InMemoryStatsReceiver
       val builder = ClientBuilder()
         .name("test")
@@ -214,12 +196,10 @@ class ClientBuilderTest
       // failure accrual marks the only node in the balancer as Busy which in turn caps requeues
       // this relies on a retry budget that allows for `numFailures` requeues
       assert(inMemory.counters(Seq("test", "requests")) == numFailures)
-    }
-  }
 
   test(
-      "ClientBuilder with stack should collect stats on 'tries' for retrypolicy") {
-    new ClientBuilderHelper {
+      "ClientBuilder with stack should collect stats on 'tries' for retrypolicy")
+    new ClientBuilderHelper
       val inMemory = new InMemoryStatsReceiver
       val builder = ClientBuilder()
         .name("test")
@@ -243,12 +223,10 @@ class ClientBuilderTest
 
       // 1 request + 1 retry
       assert(inMemory.counters(Seq("test", "requests")) == 2)
-    }
-  }
 
   test(
-      "ClientBuilder with stack should collect stats on 'tries' with no retrypolicy") {
-    new ClientBuilderHelper {
+      "ClientBuilder with stack should collect stats on 'tries' with no retrypolicy")
+    new ClientBuilderHelper
       val inMemory = new InMemoryStatsReceiver
       val numFailures = 21 // There will be 20 requeues by default
       val builder = ClientBuilder()
@@ -275,17 +253,14 @@ class ClientBuilderTest
       // failure accrual marks the only node in the balancer as Busy which in turn caps requeues
       // this relies on a retry budget that allows for `numFailures` requeues
       assert(inMemory.counters(Seq("test", "requests")) == numFailures)
-    }
-  }
 
   private class SpecificException extends RuntimeException
 
-  test("Retries have locals propagated") {
+  test("Retries have locals propagated")
 
-    new ClientBuilderHelper {
-      val specificExceptionRetry: PartialFunction[Try[Nothing], Boolean] = {
+    new ClientBuilderHelper
+      val specificExceptionRetry: PartialFunction[Try[Nothing], Boolean] =
         case Throw(e: SpecificException) => true
-      }
       val builder = ClientBuilder()
         .name("test")
         .hostConnectionLimit(1)
@@ -302,21 +277,15 @@ class ClientBuilderTest
 
       // 1st call fails and triggers a retry which
       // captures the value of the local
-      val service = Service.mk[String, String] { str: String =>
-        if (first.compareAndSet(false, true)) {
+      val service = Service.mk[String, String]  str: String =>
+        if (first.compareAndSet(false, true))
           Future.exception(new SpecificException())
-        } else {
+        else
           localOnRetry.set(aLocal().getOrElse(-1))
           Future(str)
-        }
-      }
       preparedServicePromise() = Return(service)
 
-      aLocal.let(999) {
+      aLocal.let(999)
         val rep = client("hi")
         assert("hi" == Await.result(rep, Duration.fromSeconds(5)))
-      }
       assert(999 == localOnRetry.get)
-    }
-  }
-}

@@ -17,11 +17,10 @@ import java.util.IdentityHashMap
   * `schema1.Field[A]` and `schema2.Field[A]` are distinct, and can only be used with the
   * corresponding Record.
   */
-final class RecordSchema {
+final class RecordSchema
 
-  private[RecordSchema] final class Entry(var value: Any) {
+  private[RecordSchema] final class Entry(var value: Any)
     var locked: Boolean = false
-  }
 
   /**
     * Record is an instance of a [[com.twitter.collection.RecordSchema RecordSchema]] declaration.
@@ -35,16 +34,14 @@ final class RecordSchema {
     */
   final class Record private[RecordSchema](
       fields: IdentityHashMap[Field[_], Entry] = new IdentityHashMap[
-            Field[_], Entry]) {
+            Field[_], Entry])
 
-    private[this] def getOrInitializeEntry(field: Field[_]): Entry = {
+    private[this] def getOrInitializeEntry(field: Field[_]): Entry =
       var entry = fields.get(field)
-      if (entry eq null) {
+      if (entry eq null)
         entry = new Entry(field.default())
         fields.put(field, entry)
-      }
       entry
-    }
 
     /**
       * Returns the current value assigned to `field` in this record. If there is no value currently
@@ -77,10 +74,9 @@ final class RecordSchema {
       * @throws IllegalStateException
       */
     @throws(classOf[IllegalStateException])
-    def lock(field: Field[_]): Record = {
+    def lock(field: Field[_]): Record =
       getOrInitializeEntry(field).locked = true
       this
-    }
 
     /**
       * Assigns (or reassigns) a `value` to a `field` in this record. If this field was previously
@@ -99,18 +95,16 @@ final class RecordSchema {
       * @throws IllegalStateException
       */
     @throws(classOf[IllegalStateException])
-    def update[A](field: Field[A], value: A): Record = {
+    def update[A](field: Field[A], value: A): Record =
       val entry = fields.get(field)
-      if (entry eq null) {
+      if (entry eq null)
         fields.put(field, new Entry(value))
-      } else if (entry.locked) {
+      else if (entry.locked)
         throw new IllegalStateException(
             s"attempt to assign $value to a locked field (with current value ${entry.value})")
-      } else {
+      else
         entry.value = value
-      }
       this
-    }
 
     /**
       * Assigns (or reassigns) a `value` to a `field` in this record, and locks it to prevent further
@@ -130,18 +124,16 @@ final class RecordSchema {
     def updateAndLock[A](field: Field[A], value: A): Record =
       update(field, value).lock(field)
 
-    private[this] def copyFields(): IdentityHashMap[Field[_], Entry] = {
+    private[this] def copyFields(): IdentityHashMap[Field[_], Entry] =
       val newFields = new IdentityHashMap[Field[_], Entry]
       val iter = fields.entrySet().iterator()
-      while (iter.hasNext()) {
+      while (iter.hasNext())
         val kv = iter.next()
         val entry = kv.getValue()
         val newEntry = new Entry(entry.value)
         newEntry.locked = entry.locked
         newFields.put(kv.getKey(), newEntry)
-      }
       newFields
-    }
 
     /**
       * Create a copy of this record.  Fields are locked in the copy iff they were locked in the
@@ -149,9 +141,8 @@ final class RecordSchema {
       *
       * @return a copy of this record
       */
-    def copy(): Record = {
+    def copy(): Record =
       new Record(copyFields())
-    }
 
     /**
       * Create a copy of this record with `value` assigned to `field`.  `field` will be locked in the
@@ -167,17 +158,14 @@ final class RecordSchema {
       * @param value the value to assign to `field` in the copy
       * @return a copy of this record
       */
-    def copy[A](field: Field[A], value: A): Record = {
+    def copy[A](field: Field[A], value: A): Record =
       val newFields = copyFields()
       val entry = newFields.get(field)
-      if (entry eq null) {
+      if (entry eq null)
         newFields.put(field, new Entry(value))
-      } else {
+      else
         entry.value = value
-      }
       new Record(newFields)
-    }
-  }
 
   /**
     * Creates a new [[com.twitter.collection.RecordSchema.Record Record]] from this Schema.
@@ -191,9 +179,8 @@ final class RecordSchema {
     * [[com.twitter.collection.RecordSchema.Record Record]]. A field may also declare a default,
     * which is computed for each record it is associated with, at most once per record instance.
     */
-  sealed trait Field[A] {
+  sealed trait Field[A]
     def default(): A
-  }
 
   /**
     * Creates a new [[com.twitter.collection.RecordSchema.Field Field]] with no default value, to be
@@ -201,10 +188,9 @@ final class RecordSchema {
     *
     * @return a [[com.twitter.collection.RecordSchema.Field Field]] with no default value
     */
-  def newField[A](): Field[A] = new Field[A] {
+  def newField[A](): Field[A] = new Field[A]
     override def default(): A =
       throw new IllegalStateException("attempt to access uninitialized field")
-  }
 
   /**
     * Creates a new [[com.twitter.collection.RecordSchema.Field Field]] with the given
@@ -215,7 +201,5 @@ final class RecordSchema {
     *        previously assigned to this field in a given record.
     * @return a [[com.twitter.collection.RecordSchema.Field Field]] with the given `defaultSupplier`
     */
-  def newField[A](defaultSupplier: => A): Field[A] = new Field[A] {
+  def newField[A](defaultSupplier: => A): Field[A] = new Field[A]
     override def default(): A = defaultSupplier
-  }
-}

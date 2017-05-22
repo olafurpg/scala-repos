@@ -33,7 +33,7 @@ import scalaz._
 
 object MongoJobServer
     extends BlueEyesServer with JobService with ManagedMongoJobManagerModule
-    with AkkaDefaults {
+    with AkkaDefaults
   implicit val executionContext = defaultFutureDispatch
   implicit val M: Monad[Future] = new FutureMonad(defaultFutureDispatch)
 
@@ -43,7 +43,7 @@ object MongoJobServer
 
   def close(mongo: Mongo) = mongo.close
 
-  def authService(config0: Configuration): AuthService[Future] = {
+  def authService(config0: Configuration): AuthService[Future] =
     import WebJobManager._
 
     val config = config0.detach("auth")
@@ -53,5 +53,3 @@ object MongoJobServer
     val path = config[String]("service.path", "/security/v1/")
 
     WebAuthService(protocol, host, port, path).withM[Future]
-  }
-}

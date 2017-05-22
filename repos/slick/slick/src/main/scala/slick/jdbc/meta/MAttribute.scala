@@ -18,19 +18,18 @@ case class MAttribute(typeName: MQName,
                       ordinalPosition: Int,
                       isNullable: Option[Boolean],
                       scope: Option[MQName],
-                      sourceSqlType: Option[Int]) {
+                      sourceSqlType: Option[Int])
 
   def sqlTypeName = JdbcTypesComponent.typeNames.get(sqlType)
   def sourceSqlTypeName = sourceSqlType.map(JdbcTypesComponent.typeNames.get _)
-}
 
-object MAttribute {
+object MAttribute
   def getAttributes(typePattern: MQName, attributeNamePattern: String = "%") =
     ResultSetAction[MAttribute](
         _.metaData.getAttributes(typePattern.catalog_?,
                                  typePattern.schema_?,
                                  typePattern.name,
-                                 attributeNamePattern)) { r =>
+                                 attributeNamePattern))  r =>
       MAttribute(MQName.from(r),
                  r.<<,
                  r.<<,
@@ -38,11 +37,11 @@ object MAttribute {
                  r.<<,
                  r.<<,
                  r.<<,
-                 r.nextInt match {
+                 r.nextInt match
                    case DatabaseMetaData.attributeNoNulls => Some(false)
                    case DatabaseMetaData.attributeNullable => Some(true)
                    case _ => None
-                 },
+                 ,
                  r.<<,
                  r.<<,
                  r.skip.skip.<<,
@@ -50,5 +49,3 @@ object MAttribute {
                  DatabaseMeta.yesNoOpt(r),
                  MQName.optionalFrom(r),
                  r.<<)
-    }
-}

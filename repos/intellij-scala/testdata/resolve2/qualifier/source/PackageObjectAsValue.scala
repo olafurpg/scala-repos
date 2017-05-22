@@ -1,5 +1,4 @@
 package object p
 
-object O {
+object O
   println( /* line: 1*/ p. /* resolved: false */ getClass)
-}

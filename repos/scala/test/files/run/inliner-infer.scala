@@ -1,24 +1,19 @@
 /** Test that the inliner is not inferring that `xs' is
   *  always Nil, removing the call to isEmpty.
   */
-object Test extends App {
+object Test extends App
 
   @annotation.tailrec
-  def walk(xs: MyList): Unit = {
+  def walk(xs: MyList): Unit =
     if (xs.isEmpty) println("empty")
-    else {
+    else
       println("non-empty")
       walk(MyNil)
-    }
-  }
 
   walk(new MyList)
-}
 
-class MyList {
+class MyList
   def isEmpty = false
-}
 
-object MyNil extends MyList {
+object MyNil extends MyList
   override def isEmpty = true
-}

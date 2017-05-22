@@ -8,15 +8,12 @@ import com.twitter.util.{Await, Future}
 /**
   * Thrift server for [[HelloClient]] (thrift allocations benchmark).
   */
-object HelloServer {
-  def main(args: Array[String]): Unit = {
+object HelloServer
+  def main(args: Array[String]): Unit =
     val server =
-      ThriftMux.server.serveIface("localhost:1234", new Hello[Future] {
-        def echo(m: String) = {
+      ThriftMux.server.serveIface("localhost:1234", new Hello[Future]
+        def echo(m: String) =
           Future.value(m)
-        }
-      })
+      )
 
     Await.ready(server)
-  }
-}

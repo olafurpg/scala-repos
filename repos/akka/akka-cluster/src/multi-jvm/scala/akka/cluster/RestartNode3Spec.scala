@@ -19,7 +19,7 @@ import akka.remote.transport.ThrottlerTransportAdapter.Direction
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
 
-object RestartNode3MultiJvmSpec extends MultiNodeConfig {
+object RestartNode3MultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -31,7 +31,6 @@ object RestartNode3MultiJvmSpec extends MultiNodeConfig {
         .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
-}
 
 class RestartNode3MultiJvmNode1 extends RestartNode3Spec
 class RestartNode3MultiJvmNode2 extends RestartNode3Spec
@@ -39,7 +38,7 @@ class RestartNode3MultiJvmNode3 extends RestartNode3Spec
 
 abstract class RestartNode3Spec
     extends MultiNodeSpec(RestartNode3MultiJvmSpec) with MultiNodeClusterSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import RestartNode3MultiJvmSpec._
 
@@ -57,95 +56,77 @@ abstract class RestartNode3Spec
             secondUniqueAddress.address.port.get)
         .withFallback(system.settings.config))
 
-  override def afterAll(): Unit = {
-    runOn(second) {
+  override def afterAll(): Unit =
+    runOn(second)
       if (secondSystem.whenTerminated.isCompleted)
         shutdown(restartedSecondSystem)
       else shutdown(secondSystem)
-    }
     super.afterAll()
-  }
 
   override def expectedTestDuration = 2.minutes
 
-  "Cluster nodes" must {
+  "Cluster nodes" must
     "be able to restart and join again when Down before Up" taggedAs LongRunningTest in within(
-        60.seconds) {
+        60.seconds)
       // secondSystem is a separate ActorSystem, to be able to simulate restart
       // we must transfer its address to first
-      runOn(first, third) {
-        system.actorOf(Props(new Actor {
-          def receive = {
+      runOn(first, third)
+        system.actorOf(Props(new Actor
+          def receive =
             case a: UniqueAddress ⇒
               secondUniqueAddress = a
               sender() ! "ok"
-          }
-        }).withDeploy(Deploy.local), name = "address-receiver")
+        ).withDeploy(Deploy.local), name = "address-receiver")
         enterBarrier("second-address-receiver-ready")
-      }
 
-      runOn(second) {
+      runOn(second)
         enterBarrier("second-address-receiver-ready")
         secondUniqueAddress = Cluster(secondSystem).selfUniqueAddress
-        List(first, third) foreach { r ⇒
+        List(first, third) foreach  r ⇒
           system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! secondUniqueAddress
           expectMsg(5.seconds, "ok")
-        }
-      }
       enterBarrier("second-address-transfered")
 
       // now we can join first, third together
-      runOn(first, third) {
+      runOn(first, third)
         cluster.joinSeedNodes(seedNodes)
         awaitMembersUp(2)
-      }
       enterBarrier("first-third-up")
 
       // make third unreachable, so that leader can't perform its duties
-      runOn(first) {
+      runOn(first)
         testConductor.blackhole(first, third, Direction.Both).await
         val thirdAddress = address(third)
         awaitAssert(clusterView.unreachableMembers.map(_.address) should ===(
                 Set(thirdAddress)))
-      }
       enterBarrier("third-unreachable")
 
-      runOn(second) {
+      runOn(second)
         Cluster(secondSystem).joinSeedNodes(seedNodes)
         awaitAssert(Cluster(secondSystem).readView.members.size should ===(3))
-        awaitAssert(Cluster(secondSystem).readView.members.collectFirst {
+        awaitAssert(Cluster(secondSystem).readView.members.collectFirst
           case m if m.address == Cluster(secondSystem).selfAddress ⇒ m.status
-        } should ===(Some(Joining)))
-      }
+        should ===(Some(Joining)))
       enterBarrier("second-joined")
 
       // shutdown secondSystem
-      runOn(second) {
+      runOn(second)
         shutdown(secondSystem, remaining)
-      }
       enterBarrier("second-shutdown")
 
       // then immediately start restartedSecondSystem, which has the same address as secondSystem
-      runOn(first) {
+      runOn(first)
         testConductor.passThrough(first, third, Direction.Both).await
-      }
-      runOn(second) {
+      runOn(second)
         Cluster(restartedSecondSystem).joinSeedNodes(seedNodes)
         awaitAssert(
             Cluster(restartedSecondSystem).readView.members.size should ===(3))
         awaitAssert(Cluster(restartedSecondSystem).readView.members
               .map(_.status) should ===(Set(Up)))
-      }
-      runOn(first, third) {
-        awaitAssert {
+      runOn(first, third)
+        awaitAssert
           Cluster(system).readView.members.size should ===(3)
-          Cluster(system).readView.members.exists { m ⇒
+          Cluster(system).readView.members.exists  m ⇒
             m.address == secondUniqueAddress.address &&
             m.uniqueAddress.uid != secondUniqueAddress.uid
-          }
-        }
-      }
       enterBarrier("second-restarted")
-    }
-  }
-}

@@ -6,10 +6,10 @@ import mesosphere.mesos.protos.SlaveID
 import org.scalatest.Matchers
 import play.api.libs.json.Json
 
-class TaskFailureTest extends MarathonSpec with Matchers {
+class TaskFailureTest extends MarathonSpec with Matchers
   import TaskFailureTestHelper.taskFailure
 
-  test("ToProto") {
+  test("ToProto")
     val proto = taskFailure.toProto
     assert(proto.getAppId == taskFailure.appId.toString)
     assert(proto.getTaskId == taskFailure.taskId)
@@ -18,9 +18,8 @@ class TaskFailureTest extends MarathonSpec with Matchers {
     assert(proto.getHost == taskFailure.host)
     assert(Timestamp(proto.getVersion) == taskFailure.version)
     assert(Timestamp(proto.getTimestamp) == taskFailure.timestamp)
-  }
 
-  test("ConstructFromProto") {
+  test("ConstructFromProto")
     val proto = Protos.TaskFailure.newBuilder
       .setAppId(taskFailure.appId.toString)
       .setTaskId(taskFailure.taskId)
@@ -33,9 +32,8 @@ class TaskFailureTest extends MarathonSpec with Matchers {
 
     val taskFailureFromProto = TaskFailure(proto)
     assert(taskFailureFromProto == taskFailure)
-  }
 
-  test("ConstructFromProto with SlaveID") {
+  test("ConstructFromProto with SlaveID")
     val taskFailureFixture =
       taskFailure.copy(slaveId = Some(slaveIDToProto(SlaveID("slave id"))))
 
@@ -52,9 +50,8 @@ class TaskFailureTest extends MarathonSpec with Matchers {
 
     val taskFailureFromProto = TaskFailure(proto)
     assert(taskFailureFromProto == taskFailureFixture)
-  }
 
-  test("Json serialization") {
+  test("Json serialization")
     import mesosphere.marathon.api.v2.json.Formats._
 
     val json = Json.toJson(
@@ -73,5 +70,3 @@ class TaskFailureTest extends MarathonSpec with Matchers {
         |}
       """.stripMargin)
     assert(expectedJson == json)
-  }
-}

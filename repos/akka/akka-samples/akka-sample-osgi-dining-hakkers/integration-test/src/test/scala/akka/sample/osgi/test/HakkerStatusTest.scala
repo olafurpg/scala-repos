@@ -31,7 +31,7 @@ import org.apache.karaf.tooling.exam.options.LogLevelOption
   */
 @RunWith(classOf[JUnit4TestRunner])
 class HakkerStatusTest
-    extends JUnitSuite with Matchers with AssertionsForJUnit {
+    extends JUnitSuite with Matchers with AssertionsForJUnit
 
   @Inject
   @Filter(timeout = 30000)
@@ -52,12 +52,11 @@ class HakkerStatusTest
   // Junit @Before and @After can be used as well
 
   @Before
-  def setupAkkaTestkit() {
+  def setupAkkaTestkit()
     testProbe = new TestProbe(actorSystem)
-  }
 
   @Test
-  def verifyObtainingAHakkerViaTheTheDiningHakkersService() {
+  def verifyObtainingAHakkerViaTheTheDiningHakkersService()
 
     val name = "TestHakker"
     val hakker = Option(service.getHakker(name, 2))
@@ -65,7 +64,7 @@ class HakkerStatusTest
             "No Hakker was created via DiningHakkerService"))
 
     // takes some time for the first message to get through
-    testProbe.within(10.seconds) {
+    testProbe.within(10.seconds)
       testProbe.send(hakker, Identify)
       val Identification(fromHakker, busyWith) =
         testProbe.expectMsgType[Identification]
@@ -74,25 +73,18 @@ class HakkerStatusTest
           "---------------> %s is busy with %s.".format(fromHakker, busyWith))
       fromHakker should be("TestHakker")
       busyWith should not be (null)
-    }
-  }
 
   @Test
-  def verifyHakkerTracker() {
+  def verifyHakkerTracker()
 
     val name = "TestHakker"
     val hakker = service.getHakker(name, 3)
     val tracker = service.getTracker()
     tracker ! TrackHakker(hakker)
-    testProbe.within(10.seconds) {
-      testProbe.awaitAssert {
-        testProbe.within(1.second) {
+    testProbe.within(10.seconds)
+      testProbe.awaitAssert
+        testProbe.within(1.second)
           tracker.tell(GetEatingCount(name), testProbe.ref)
           val reply = testProbe.expectMsgType[EatingCount]
           reply.hakkerName should be(name)
           reply.count should be > (0)
-        }
-      }
-    }
-  }
-}

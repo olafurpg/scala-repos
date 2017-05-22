@@ -18,8 +18,8 @@ package com.twitter.scalding.db.extensions
 
 import com.twitter.scalding.db._
 
-object VerticaExtensions {
-  def verticaMutator: PartialFunction[DBColumnDefinition, DBColumnDefinition] = {
+object VerticaExtensions
+  def verticaMutator: PartialFunction[DBColumnDefinition, DBColumnDefinition] =
     case t @ DBColumnDefinition(BIGINT, _, _, None, _, _) =>
       t.copy(sizeOpt = None)
     case t @ DBColumnDefinition(INT, _, _, None, _, _) =>
@@ -32,5 +32,3 @@ object VerticaExtensions {
       t.copy(sizeOpt = None)
     case t @ DBColumnDefinition(DOUBLE, _, _, _, _, _) =>
       t.copy(sqlType = SqlTypeName("DOUBLE PRECISION"))
-  }
-}

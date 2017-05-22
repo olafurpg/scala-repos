@@ -1,18 +1,15 @@
-object DifferentType {
-  def foo(i: Int) {
+object DifferentType
+  def foo(i: Int)
     val q = i
     /*start*/
 
     val x = i
     println(i)
 /*end*/
-  }
 
-  def foofoo(y: Int) {
+  def foofoo(y: Int)
     val x = "i"
     println("i")
-  }
-}
 /*
 object DifferentType {
   def foo(i: Int) {

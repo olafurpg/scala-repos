@@ -10,7 +10,7 @@ import scala.collection.immutable.HashSet
   *
   * @author ilyas
   */
-trait TypingContextOwner {
+trait TypingContextOwner
 
   /**
     * This method may be called only in a chain of typing calls between different entities of
@@ -19,9 +19,8 @@ trait TypingContextOwner {
     * @param ctx Context (possibly) augmented with informations about duplications
     */
   def getType(ctx: TypingContext = TypingContext.empty): TypeResult[ScType]
-}
 
-trait TypingContext { self =>
+trait TypingContext  self =>
 
   /**
     * Set of visited elements to prevent cycles
@@ -30,19 +29,15 @@ trait TypingContext { self =>
 
   def isUndefined = false
 
-  def apply(named: ScNamedElement): TypingContext = new TypingContext {
+  def apply(named: ScNamedElement): TypingContext = new TypingContext
     def visited = HashSet(self.visited.toSeq: _*) + named
-  }
 
   def apply(seq: Seq[ScNamedElement]): TypingContext =
     seq.foldLeft(TypingContext.empty)((ctx, elem) => ctx(elem))
-}
 
-object TypingContext {
+object TypingContext
   val empty = new TypingContext { def visited = Set() }
 
-  val undefined = new TypingContext {
+  val undefined = new TypingContext
     def visited = Set()
     override def isUndefined = true
-  }
-}

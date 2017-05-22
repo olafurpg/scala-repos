@@ -21,18 +21,17 @@ import BytecodeUtils._
 import scala.collection.convert.decorateAsScala._
 import scala.tools.testing.ClearAfterClass
 
-object AnalyzerTest extends ClearAfterClass.Clearable {
+object AnalyzerTest extends ClearAfterClass.Clearable
   var noOptCompiler = newCompiler(extraArgs = "-Yopt:l:none")
   def clear(): Unit = { noOptCompiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class AnalyzerTest extends ClearAfterClass {
+class AnalyzerTest extends ClearAfterClass
   ClearAfterClass.stateToClear = AnalyzerTest
   val noOptCompiler = AnalyzerTest.noOptCompiler
 
   @Test
-  def aliasingOfPrimitives(): Unit = {
+  def aliasingOfPrimitives(): Unit =
     val code = """class C {
         |  def f(a: Int, b: Long) = {
         |    val c = a - b // a is converted with i2l
@@ -58,5 +57,3 @@ class AnalyzerTest extends ClearAfterClass {
     val aliasesAtAdd = a.frameAt(add, f).asInstanceOf[AliasingFrame[_]].aliases
     assertEquals(aliasesAtAdd(1).iterator.toList, List(1, 8)) // after i2l the value on the stack is no longer an alias
     assertEquals(aliasesAtAdd(4).iterator.toList, List(4, 6, 10)) // c, d and stack top
-  }
-}

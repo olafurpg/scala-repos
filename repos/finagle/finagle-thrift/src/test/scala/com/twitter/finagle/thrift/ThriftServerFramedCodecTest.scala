@@ -14,14 +14,14 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ThriftServerFramedCodecTest extends FunSuite with MockitoSugar {
+class ThriftServerFramedCodecTest extends FunSuite with MockitoSugar
   val protocolFactory = new TBinaryProtocol.Factory()
 
-  test("ThriftServerTracingFilter read header correctly") {
+  test("ThriftServerTracingFilter read header correctly")
     val traceId =
       TraceId(Some(SpanId(1L)), None, SpanId(2L), Some(true), Flags().setDebug)
     val bufferingTracer = new BufferingTracer
-    Trace.letTracer(bufferingTracer) {
+    Trace.letTracer(bufferingTracer)
       val filter = new TTwitterServerFilter("service", protocolFactory)
 
       val upgradeMsg = new OutputBuffer(protocolFactory)
@@ -56,10 +56,6 @@ class ThriftServerFramedCodecTest extends FunSuite with MockitoSugar {
                  ignoreMsg.toArray),
              service)
 
-      bufferingTracer.iterator foreach { record =>
+      bufferingTracer.iterator foreach  record =>
         assert(record.traceId == traceId)
         assert(record.traceId.flags == traceId.flags)
-      }
-    }
-  }
-}

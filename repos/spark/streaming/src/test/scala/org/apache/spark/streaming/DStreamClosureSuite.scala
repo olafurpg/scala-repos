@@ -29,29 +29,25 @@ import org.apache.spark.util.ReturnStatementInClosureException
 /**
   * Test that closures passed to DStream operations are actually cleaned.
   */
-class DStreamClosureSuite extends SparkFunSuite with BeforeAndAfterAll {
+class DStreamClosureSuite extends SparkFunSuite with BeforeAndAfterAll
   private var ssc: StreamingContext = null
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     val sc = new SparkContext("local", "test")
     ssc = new StreamingContext(sc, Seconds(1))
-  }
 
-  override def afterAll(): Unit = {
-    try {
+  override def afterAll(): Unit =
+    try
       ssc.stop(stopSparkContext = true)
       ssc = null
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
-  test("user provided closures are actually cleaned") {
+  test("user provided closures are actually cleaned")
     val dstream = new DummyInputDStream(ssc)
-    val pairDstream = dstream.map { i =>
+    val pairDstream = dstream.map  i =>
       (i, i)
-    }
     // DStream
     testMap(dstream)
     testFlatMap(dstream)
@@ -71,7 +67,6 @@ class DStreamClosureSuite extends SparkFunSuite with BeforeAndAfterAll {
     testFlatMapValues(pairDstream)
     // StreamingContext
     testTransform2(ssc, dstream)
-  }
 
   /**
     * Verify that the expected exception is thrown.
@@ -79,153 +74,115 @@ class DStreamClosureSuite extends SparkFunSuite with BeforeAndAfterAll {
     * We use return statements as an indication that a closure is actually being cleaned.
     * We expect closure cleaner to find the return statements in the user provided closures.
     */
-  private def expectCorrectException(body: => Unit): Unit = {
-    try {
+  private def expectCorrectException(body: => Unit): Unit =
+    try
       body
-    } catch {
+    catch
       case rse: ReturnStatementInClosureException => // Success!
       case e @ (_: NotSerializableException | _: SparkException) =>
         throw new TestException(
             s"Expected ReturnStatementInClosureException, but got $e.\n" +
             "This means the closure provided by user is not actually cleaned.")
-    }
-  }
 
   // DStream operations
-  private def testMap(ds: DStream[Int]): Unit = expectCorrectException {
-    ds.map { _ =>
+  private def testMap(ds: DStream[Int]): Unit = expectCorrectException
+    ds.map  _ =>
       return; 1
-    }
-  }
-  private def testFlatMap(ds: DStream[Int]): Unit = expectCorrectException {
-    ds.flatMap { _ =>
+  private def testFlatMap(ds: DStream[Int]): Unit = expectCorrectException
+    ds.flatMap  _ =>
       return; Seq.empty
-    }
-  }
-  private def testFilter(ds: DStream[Int]): Unit = expectCorrectException {
-    ds.filter { _ =>
+  private def testFilter(ds: DStream[Int]): Unit = expectCorrectException
+    ds.filter  _ =>
       return; true
-    }
-  }
   private def testMapPartitions(ds: DStream[Int]): Unit =
-    expectCorrectException {
-      ds.mapPartitions { _ =>
+    expectCorrectException
+      ds.mapPartitions  _ =>
         return; Seq.empty.toIterator
-      }
-    }
-  private def testReduce(ds: DStream[Int]): Unit = expectCorrectException {
+  private def testReduce(ds: DStream[Int]): Unit = expectCorrectException
     ds.reduce { case (_, _) => return; 1 }
-  }
-  private def testForeachRDD(ds: DStream[Int]): Unit = {
+  private def testForeachRDD(ds: DStream[Int]): Unit =
     val foreachRDDF1 = (rdd: RDD[Int], t: Time) => return
     val foreachRDDF2 = (rdd: RDD[Int]) => return
     expectCorrectException { ds.foreachRDD(foreachRDDF1) }
     expectCorrectException { ds.foreachRDD(foreachRDDF2) }
-  }
-  private def testTransform(ds: DStream[Int]): Unit = {
+  private def testTransform(ds: DStream[Int]): Unit =
     val transformF1 = (rdd: RDD[Int]) => { return; rdd }
     val transformF2 = (rdd: RDD[Int], time: Time) => { return; rdd }
     expectCorrectException { ds.transform(transformF1) }
     expectCorrectException { ds.transform(transformF2) }
-  }
-  private def testTransformWith(ds: DStream[Int]): Unit = {
+  private def testTransformWith(ds: DStream[Int]): Unit =
     val transformF1 = (rdd1: RDD[Int], rdd2: RDD[Int]) => { return; rdd1 }
     val transformF2 = (rdd1: RDD[Int], rdd2: RDD[Int], time: Time) =>
       { return; rdd2 }
     expectCorrectException { ds.transformWith(ds, transformF1) }
     expectCorrectException { ds.transformWith(ds, transformF2) }
-  }
-  private def testReduceByWindow(ds: DStream[Int]): Unit = {
+  private def testReduceByWindow(ds: DStream[Int]): Unit =
     val reduceF = (_: Int, _: Int) => { return; 1 }
-    expectCorrectException {
+    expectCorrectException
       ds.reduceByWindow(reduceF, Seconds(1), Seconds(2))
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.reduceByWindow(reduceF, reduceF, Seconds(1), Seconds(2))
-    }
-  }
 
   // PairDStreamFunctions operations
-  private def testReduceByKey(ds: DStream[(Int, Int)]): Unit = {
+  private def testReduceByKey(ds: DStream[(Int, Int)]): Unit =
     val reduceF = (_: Int, _: Int) => { return; 1 }
     expectCorrectException { ds.reduceByKey(reduceF) }
     expectCorrectException { ds.reduceByKey(reduceF, 5) }
     expectCorrectException { ds.reduceByKey(reduceF, new HashPartitioner(5)) }
-  }
-  private def testCombineByKey(ds: DStream[(Int, Int)]): Unit = {
-    expectCorrectException {
-      ds.combineByKey[Int]({ _: Int =>
+  private def testCombineByKey(ds: DStream[(Int, Int)]): Unit =
+    expectCorrectException
+      ds.combineByKey[Int]( _: Int =>
         return; 1
-      }, { case (_: Int, _: Int) => return; 1 }, {
+      , { case (_: Int, _: Int) => return; 1 },
         case (_: Int, _: Int) => return; 1
-      }, new HashPartitioner(5))
-    }
-  }
-  private def testReduceByKeyAndWindow(ds: DStream[(Int, Int)]): Unit = {
+      , new HashPartitioner(5))
+  private def testReduceByKeyAndWindow(ds: DStream[(Int, Int)]): Unit =
     val reduceF = (_: Int, _: Int) => { return; 1 }
     val filterF = (_: (Int, Int)) => { return; false }
     expectCorrectException { ds.reduceByKeyAndWindow(reduceF, Seconds(1)) }
-    expectCorrectException {
+    expectCorrectException
       ds.reduceByKeyAndWindow(reduceF, Seconds(1), Seconds(2))
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.reduceByKeyAndWindow(reduceF, Seconds(1), Seconds(2), 5)
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.reduceByKeyAndWindow(
           reduceF, Seconds(1), Seconds(2), new HashPartitioner(5))
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.reduceByKeyAndWindow(reduceF, reduceF, Seconds(2))
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.reduceByKeyAndWindow(reduceF,
                               reduceF,
                               Seconds(2),
                               Seconds(3),
                               new HashPartitioner(5),
                               filterF)
-    }
-  }
-  private def testUpdateStateByKey(ds: DStream[(Int, Int)]): Unit = {
+  private def testUpdateStateByKey(ds: DStream[(Int, Int)]): Unit =
     val updateF1 = (_: Seq[Int], _: Option[Int]) => { return; Some(1) }
     val updateF2 = (_: Iterator[(Int, Seq[Int], Option[Int])]) =>
       { return; Seq((1, 1)).toIterator }
-    val initialRDD = ds.ssc.sparkContext.emptyRDD[Int].map { i =>
+    val initialRDD = ds.ssc.sparkContext.emptyRDD[Int].map  i =>
       (i, i)
-    }
     expectCorrectException { ds.updateStateByKey(updateF1) }
     expectCorrectException { ds.updateStateByKey(updateF1, 5) }
-    expectCorrectException {
+    expectCorrectException
       ds.updateStateByKey(updateF1, new HashPartitioner(5))
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.updateStateByKey(updateF1, new HashPartitioner(5), initialRDD)
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.updateStateByKey(updateF2, new HashPartitioner(5), true)
-    }
-    expectCorrectException {
+    expectCorrectException
       ds.updateStateByKey(updateF2, new HashPartitioner(5), true, initialRDD)
-    }
-  }
   private def testMapValues(ds: DStream[(Int, Int)]): Unit =
-    expectCorrectException {
-      ds.mapValues { _ =>
+    expectCorrectException
+      ds.mapValues  _ =>
         return; 1
-      }
-    }
   private def testFlatMapValues(ds: DStream[(Int, Int)]): Unit =
-    expectCorrectException {
-      ds.flatMapValues { _ =>
+    expectCorrectException
+      ds.flatMapValues  _ =>
         return; Seq.empty
-      }
-    }
 
   // StreamingContext operations
-  private def testTransform2(ssc: StreamingContext, ds: DStream[Int]): Unit = {
+  private def testTransform2(ssc: StreamingContext, ds: DStream[Int]): Unit =
     val transformF = (rdds: Seq[RDD[_]], time: Time) =>
       { return; ssc.sparkContext.emptyRDD[Int] }
     expectCorrectException { ssc.transform(Seq(ds), transformF) }
-  }
-}

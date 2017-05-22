@@ -18,66 +18,59 @@ import scala.tools.nsc.io.Jar
   * It can test also current, recursive classpath. Just right now we force
   * flat classpath to test it also when the recursive one would be set as a default.
   */
-object Test {
+object Test
 
-  private implicit class JFileOps(file: JFile) {
+  private implicit class JFileOps(file: JFile)
 
-    def createDir(newDirName: String) = {
+    def createDir(newDirName: String) =
       val newDir = new JFile(file, newDirName)
       newDir.mkdir()
       newDir
-    }
 
     def createSrcFile(newFileName: String) = createFile(newFileName + ".scala")
 
-    def createFile(fullFileName: String) = {
+    def createFile(fullFileName: String) =
       val newFile = new JFile(file, fullFileName)
       newFile.createNewFile()
       newFile
-    }
 
     def writeAll(text: String): Unit = File(file) writeAll text
 
-    def moveContentToZip(zipName: String): Unit = {
+    def moveContentToZip(zipName: String): Unit =
       val newZip = zipsDir createFile s"$zipName.zip"
       val outputStream = new ZipOutputStream(new FileOutputStream(newZip))
 
       def addFileToZip(dirPrefix: String = "")(fileToAdd: JFile): Unit =
-        if (fileToAdd.isDirectory) {
+        if (fileToAdd.isDirectory)
           val dirEntryName = fileToAdd.getName + "/"
           outputStream.putNextEntry(new ZipEntry(dirEntryName))
           fileToAdd.listFiles() foreach addFileToZip(dirEntryName)
-        } else {
+        else
           val inputStream = new FileInputStream(fileToAdd)
           outputStream.putNextEntry(
               new ZipEntry(dirPrefix + fileToAdd.getName))
 
           val buffer = new Array[Byte](1024)
           var count = inputStream.read(buffer)
-          while (count > 0) {
+          while (count > 0)
             outputStream.write(buffer, 0, count)
             count = inputStream.read(buffer)
-          }
 
           inputStream.close()
-        }
 
       file.listFiles() foreach addFileToZip()
       outputStream.close()
 
       cleanDir(file)
-    }
 
-    def moveContentToJar(jarName: String): Unit = {
+    def moveContentToJar(jarName: String): Unit =
       val newJar = jarsDir createFile s"$jarName.jar"
       Jar.create(file = File(newJar),
                  sourceDir = Directory(file),
                  mainClass = "won't be used")
       cleanDir(file)
-    }
 
     def path: String = file.getAbsolutePath
-  }
 
   private case class DirRep(name: String,
                             nestedDirs: Seq[DirRep] = Nil,
@@ -100,7 +93,7 @@ object Test {
   private val binDir = testDir createDir "bin"
   private val outDir = testDir createDir "out"
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     createClassesZipInZipsDir()
     createClassesJarInJarsDir()
     createClassesInBinDir()
@@ -110,42 +103,36 @@ object Test {
     compileFinalApp()
     runApp()
     // at the end all created files will be deleted automatically
-  }
 
-  private def createClassesZipInZipsDir(): Unit = {
+  private def createClassesZipInZipsDir(): Unit =
     val baseFileName = "ZipBin"
     createStandardSrcHierarchy(baseFileName)
     compileSrc(baseFileName)
     outDir moveContentToZip "Bin"
     cleanDir(srcDir)
-  }
 
-  private def createClassesJarInJarsDir(): Unit = {
+  private def createClassesJarInJarsDir(): Unit =
     val baseFileName = "JarBin"
     createStandardSrcHierarchy(baseFileName)
     compileSrc(baseFileName)
     outDir moveContentToJar "Bin"
     cleanDir(srcDir)
-  }
 
-  private def createClassesInBinDir(): Unit = {
+  private def createClassesInBinDir(): Unit =
     val baseFileName = "DirBin"
     createStandardSrcHierarchy(baseFileName)
     compileSrc(baseFileName, destination = binDir)
     cleanDir(srcDir)
-  }
 
-  private def createSourcesZipInZipsDir(): Unit = {
+  private def createSourcesZipInZipsDir(): Unit =
     createStandardSrcHierarchy(baseFileName = "ZipSrc")
     srcDir moveContentToZip "Src"
-  }
 
-  private def createSourcesJarInJarsDir(): Unit = {
+  private def createSourcesJarInJarsDir(): Unit =
     createStandardSrcHierarchy(baseFileName = "JarSrc")
     srcDir moveContentToJar "Src"
-  }
 
-  private def createSourcesInSrcDir(): Unit = {
+  private def createSourcesInSrcDir(): Unit =
     createStandardSrcHierarchy(baseFileName = "DirSrc")
 
     val appFile = srcDir createSrcFile "Main"
@@ -166,9 +153,8 @@ object Test {
          |   println(new NestedDirSrc)
          | }
        """.stripMargin
-  }
 
-  private def compileFinalApp(): Unit = {
+  private def compileFinalApp(): Unit =
     val classPath = mkPath(javaClassPath,
                            binDir.path,
                            zipsDir.path + "/Bin.zip",
@@ -185,16 +171,14 @@ object Test {
               "-d",
               outDir.path,
               s"${srcDir.path}/Main.scala"))
-  }
 
-  private def runApp(): Unit = {
+  private def runApp(): Unit =
     val classPath = mkPath(javaClassPath,
                            outDir.path,
                            binDir.path,
                            zipsDir.path + "/Bin.zip",
                            jarsDir.path + "/Bin.jar")
     appRunner.process(Array(classPathImplFlag, "-cp", classPath, "Main"))
-  }
 
   private def createStandardSrcHierarchy(baseFileName: String): Unit =
     createSources(
@@ -207,23 +191,20 @@ object Test {
                sourceFiles = Seq(baseFileName)))
 
   private def createSources(
-      pkg: String, dirFile: JFile, dirRep: DirRep): Unit = {
-    dirRep.nestedDirs foreach { rep =>
+      pkg: String, dirFile: JFile, dirRep: DirRep): Unit =
+    dirRep.nestedDirs foreach  rep =>
       val nestedDir = dirFile createDir rep.name
       val nestedPkg = PackageNameUtils.packagePrefix(pkg) + rep.name
       createSources(nestedPkg, nestedDir, rep)
-    }
 
     val pkgHeader = if (pkg == RootPackage) "" else s"package $pkg\n\n"
-    dirRep.sourceFiles foreach { srcName =>
+    dirRep.sourceFiles foreach  srcName =>
       val text = s"""${pkgHeader}case class $srcName(x: String = "")"""
       val srcFile = dirFile createSrcFile srcName
       srcFile writeAll text
-    }
-  }
 
   private def compileSrc(
-      baseFileName: String, destination: JFile = outDir): Unit = {
+      baseFileName: String, destination: JFile = outDir): Unit =
     val srcDirPath = srcDir.path
     compiler.process(
         Array(classPathImplFlag,
@@ -233,14 +214,11 @@ object Test {
               destination.path,
               s"$srcDirPath/$baseFileName.scala",
               s"$srcDirPath/nested/Nested$baseFileName.scala"))
-  }
 
   private def cleanDir(dir: JFile): Unit =
-    dir.listFiles().foreach { file =>
+    dir.listFiles().foreach  file =>
       if (file.isDirectory) cleanDir(file)
       file.delete()
-    }
 
   private def mkPath(pathEntries: String*) =
     pathEntries.mkString(File.pathSeparator)
-}

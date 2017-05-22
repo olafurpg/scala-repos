@@ -2,12 +2,10 @@
 //
 // Apply( // sym=method while$1, tpe=Unit, tpe.sym=class Unit, tpe.sym.owner=package scala
 //   Ident("while$1"), // sym=method while$1, sym.owner=method f, sym.tpe=()Unit, tpe=()Unit, tpe.sym=<none>,
-class Erasure {
-  def f(b: Boolean) = {
+class Erasure
+  def f(b: Boolean) =
     if (b) "abc"
     else while (b) ()
-  }
-}
 
 // % work/check all -Xprint:erasure work/fail6.scala  
 // TypeStack init: REFERENCE(type AnyRef)

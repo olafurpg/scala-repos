@@ -22,25 +22,24 @@ import scala.annotation.tailrec
  *             | ScalaExpr
  */
 
-object Content {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object Content
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val contentMarker = builder.mark()
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_DATA_CHARACTERS =>
         builder.advanceLexer()
       case ScalaXmlTokenTypes.XML_CHAR_ENTITY_REF =>
         builder.advanceLexer()
       case _ =>
-    }
 
     val patcher = ParserPatcher.getSuitablePatcher(builder)
 
     @tailrec
-    def subparse() {
+    def subparse()
       var isReturn = false
       if (!XmlContent.parse(builder) && !Reference.parse(builder) &&
           !ScalaExpr.parse(builder) && !patcher.parse(builder)) isReturn = true
-      builder.getTokenType match {
+      builder.getTokenType match
         case ScalaXmlTokenTypes.XML_DATA_CHARACTERS =>
           builder.advanceLexer()
         case ScalaXmlTokenTypes.XML_CHAR_ENTITY_REF =>
@@ -48,11 +47,7 @@ object Content {
         case ScalaXmlTokenTypes.XML_ENTITY_REF_TOKEN => builder.advanceLexer()
         case _ =>
           if (isReturn) return
-      }
       subparse()
-    }
     subparse()
     contentMarker.drop()
     true
-  }
-}

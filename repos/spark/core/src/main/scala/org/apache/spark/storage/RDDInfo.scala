@@ -29,7 +29,7 @@ class RDDInfo(val id: Int,
               val parentIds: Seq[Int],
               val callSite: String = "",
               val scope: Option[RDDOperationScope] = None)
-    extends Ordered[RDDInfo] {
+    extends Ordered[RDDInfo]
 
   var numCachedPartitions = 0
   var memSize = 0L
@@ -38,7 +38,7 @@ class RDDInfo(val id: Int,
 
   def isCached: Boolean = (memSize + diskSize > 0) && numCachedPartitions > 0
 
-  override def toString: String = {
+  override def toString: String =
     import Utils.bytesToString
     ("RDD \"%s\" (%d) StorageLevel: %s; CachedPartitions: %d; TotalPartitions: %d; " +
         "MemorySize: %s; DiskSize: %s").format(name,
@@ -48,15 +48,12 @@ class RDDInfo(val id: Int,
                                                numPartitions,
                                                bytesToString(memSize),
                                                bytesToString(diskSize))
-  }
 
-  override def compare(that: RDDInfo): Int = {
+  override def compare(that: RDDInfo): Int =
     this.id - that.id
-  }
-}
 
-private[spark] object RDDInfo {
-  def fromRdd(rdd: RDD[_]): RDDInfo = {
+private[spark] object RDDInfo
+  def fromRdd(rdd: RDD[_]): RDDInfo =
     val rddName = Option(rdd.name).getOrElse(Utils.getFormattedClassName(rdd))
     val parentIds = rdd.dependencies.map(_.rdd.id)
     new RDDInfo(rdd.id,
@@ -66,5 +63,3 @@ private[spark] object RDDInfo {
                 parentIds,
                 rdd.creationSite.shortForm,
                 rdd.scope)
-  }
-}

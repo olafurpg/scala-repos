@@ -16,8 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * Pavel Fatin
   */
 class ScalaRedundantConversionInspection
-    extends AbstractInspection("Redundant conversion") {
-  def actionFor(holder: ProblemsHolder) = {
+    extends AbstractInspection("Redundant conversion")
+  def actionFor(holder: ProblemsHolder) =
     case element @ ScReferenceExpression.withQualifier(qualifier) && PsiReferenceEx
           .resolve(target) =>
       process(element, qualifier, target, qualifier.getTextLength, holder)
@@ -25,14 +25,13 @@ class ScalaRedundantConversionInspection
         operand, operator @ PsiReferenceEx.resolve(target)) =>
       process(
           element, operand, target, operator.getStartOffsetInParent, holder)
-  }
 
   private def process(element: PsiElement,
                       left: ScExpression,
                       target: PsiElement,
                       offset: Int,
-                      holder: ProblemsHolder) {
-    target match {
+                      holder: ProblemsHolder)
+    target match
       case f: ScSyntheticFunction if f.name.startsWith("to") =>
         for (leftType <- left.getType(TypingContext.empty);
         conversionType = f.retType
@@ -47,15 +46,13 @@ class ScalaRedundantConversionInspection
                             if leftType.canonicalText == "_root_.java.lang.String") registerProblem(
             element, left, "java.lang.String", offset, holder)
       case _ =>
-    }
-  }
 
   private def registerProblem(element: PsiElement,
                               left: ScExpression,
                               conversionType: String,
                               offset: Int,
-                              holder: ProblemsHolder) {
-    val descriptor = {
+                              holder: ProblemsHolder)
+    val descriptor =
       val range = new TextRange(offset, element.getTextLength)
 
       val message = "Casting '%s' to '%s' is redundant".format(
@@ -71,20 +68,15 @@ class ScalaRedundantConversionInspection
           range,
           null,
           false)
-    }
 
     holder.registerProblem(descriptor)
-  }
 
   private class RemoveConversionQuickFix(
       element: PsiElement, expr: ScExpression)
       extends AbstractFixOnTwoPsiElements(
-          "Remove Redundant Conversion", element, expr) {
-    def doApplyFix(project: Project) {
+          "Remove Redundant Conversion", element, expr)
+    def doApplyFix(project: Project)
       val elem = getFirstElement
       val scExpr = getSecondElement
       elem.getParent.addBefore(scExpr, elem)
       elem.delete()
-    }
-  }
-}

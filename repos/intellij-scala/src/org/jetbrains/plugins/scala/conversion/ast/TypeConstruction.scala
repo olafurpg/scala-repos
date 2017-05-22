@@ -11,29 +11,26 @@ import scala.collection.mutable.ArrayBuffer
   * on 10/22/15
   */
 case class TypeConstruction(inType: String)
-    extends IntermediateNode with TypedElement {
-  def getDefaultTypeValue: String = {
-    inType match {
+    extends IntermediateNode with TypedElement
+  def getDefaultTypeValue: String =
+    inType match
       case "Int" | "Byte" | "Short" | "Char" => "0"
       case "Double" | "Float" => ".0"
       case "Boolean" => "false"
       case "Long" => "0L"
       case "Unit" => "{}"
       case _ => "null"
-    }
-  }
 
   override def getType: TypeConstruction = this.asInstanceOf[TypeConstruction]
-}
 
-object TypeConstruction {
+object TypeConstruction
   def createStringTypePresentation(
-      inType: PsiType, inProject: Project): IntermediateNode = {
+      inType: PsiType, inProject: Project): IntermediateNode =
     val buffer = new ArrayBuffer[(IntermediateNode, Option[String])]()
     val result = getParts(
         ScType.create(inType, inProject, paramTopLevel = true), buffer)
 
-    result match {
+    result match
       case parametrized: ParametrizedConstruction =>
         parametrized.assocoationMap = buffer.toSeq
         parametrized
@@ -41,14 +38,12 @@ object TypeConstruction {
         array.assocoationMap = buffer.toSeq
         array
       case _ => result
-    }
-  }
 
   // get simple parts of type if type is array or parametrized
   def getParts(
       scType: ScType, buffer: ArrayBuffer[(IntermediateNode, Option[String])])
-    : IntermediateNode = {
-    scType match {
+    : IntermediateNode =
+    scType match
       case p @ ScParameterizedType(des, args) =>
         val typeConstruction: IntermediateNode = TypeConstruction(
             des.presentableText)
@@ -68,34 +63,27 @@ object TypeConstruction {
             .extractClass(otherType)
             .flatMap(el => Option(el.getQualifiedName))))
         typeConstruction
-    }
-  }
-}
 
 case class ParametrizedConstruction(
     iNode: IntermediateNode, parts: Seq[IntermediateNode])
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode with TypedElement
   var assocoationMap = Seq[(IntermediateNode, Option[String])]()
 
-  def getAssociations = assocoationMap.collect {
+  def getAssociations = assocoationMap.collect
     case (n, Some(value)) => (n, value)
-  }
 
   override def getType: TypeConstruction =
     iNode.asInstanceOf[TypedElement].getType
-}
 
 case class ArrayConstruction(iNode: IntermediateNode)
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode with TypedElement
   var assocoationMap = Seq[(IntermediateNode, Option[String])]()
 
-  def getAssociations = assocoationMap.collect {
+  def getAssociations = assocoationMap.collect
     case (n, Some(value)) => (n, value)
-  }
 
   override def getType: TypeConstruction =
     iNode.asInstanceOf[TypedElement].getType
-}
 
 case class TypeParameterConstruction(
     name: String, typez: Seq[IntermediateNode])

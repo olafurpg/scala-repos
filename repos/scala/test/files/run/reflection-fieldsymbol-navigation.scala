@@ -1,10 +1,9 @@
 import scala.reflect.runtime.universe._
 
-class C {
+class C
   var x = 2
-}
 
-object Test extends App {
+object Test extends App
   val x = typeOf[C].member(TermName("x")).asTerm
   println(x)
   println(x.isVar)
@@ -12,4 +11,3 @@ object Test extends App {
   println(x.accessed.asTerm.isVar)
   println(x.getter)
   println(x.setter)
-}

@@ -1,5 +1,4 @@
 package rawObject
 
-object RawObject3 {
+object RawObject3
   var globalVariable = 1
-}

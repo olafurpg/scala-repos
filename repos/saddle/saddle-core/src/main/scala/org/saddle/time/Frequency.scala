@@ -20,9 +20,9 @@ import org.joda.time.{Period, Duration}
 /**
   * Enumeration of frequency base for utilizing with an RRule
   */
-sealed trait Frequency {
+sealed trait Frequency
   this: Frequency =>
-  protected[time] def toICal: com.google.ical.values.Frequency = this match {
+  protected[time] def toICal: com.google.ical.values.Frequency = this match
     case SECONDLY => com.google.ical.values.Frequency.SECONDLY
     case MINUTELY => com.google.ical.values.Frequency.MINUTELY
     case HOURLY => com.google.ical.values.Frequency.HOURLY
@@ -30,9 +30,8 @@ sealed trait Frequency {
     case WEEKLY => com.google.ical.values.Frequency.WEEKLY
     case MONTHLY => com.google.ical.values.Frequency.MONTHLY
     case YEARLY => com.google.ical.values.Frequency.YEARLY
-  }
 
-  protected[time] def toDur: Period = this match {
+  protected[time] def toDur: Period = this match
     case SECONDLY => Period.seconds(1)
     case MINUTELY => Period.minutes(1)
     case HOURLY => Period.hours(1)
@@ -40,8 +39,6 @@ sealed trait Frequency {
     case WEEKLY => Period.weeks(1)
     case MONTHLY => Period.months(1)
     case YEARLY => Period.years(1)
-  }
-}
 
 case object SECONDLY extends Frequency
 case object MINUTELY extends Frequency

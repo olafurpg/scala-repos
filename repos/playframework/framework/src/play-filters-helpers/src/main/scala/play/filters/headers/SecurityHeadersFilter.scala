@@ -30,7 +30,7 @@ import play.api.{Environment, PlayConfig, Configuration}
   * @see <a href="http://www.html5rocks.com/en/tutorials/security/content-security-policy/">Content-Security-Policy</a>
   * @see <a href="http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html">Cross Domain Policy File Specification</a>
   */
-object SecurityHeadersFilter {
+object SecurityHeadersFilter
   val X_FRAME_OPTIONS_HEADER = "X-Frame-Options"
   val X_XSS_PROTECTION_HEADER = "X-XSS-Protection"
   val X_CONTENT_TYPE_OPTIONS_HEADER = "X-Content-Type-Options"
@@ -45,9 +45,8 @@ object SecurityHeadersFilter {
     * @return a configured SecurityHeadersFilter.
     */
   def apply(config: SecurityHeadersConfig = SecurityHeadersConfig())
-    : SecurityHeadersFilter = {
+    : SecurityHeadersFilter =
     new SecurityHeadersFilter(config)
-  }
 
   /**
     * Convenience method for creating a filter using play.api.Configuration.  Good for testing.
@@ -55,10 +54,8 @@ object SecurityHeadersFilter {
     * @param config a configuration object that may contain string settings.
     * @return a configured SecurityHeadersFilter.
     */
-  def apply(config: Configuration): SecurityHeadersFilter = {
+  def apply(config: Configuration): SecurityHeadersFilter =
     new SecurityHeadersFilter(SecurityHeadersConfig.fromConfiguration(config))
-  }
-}
 
 /**
   * A type safe configuration object for setting security headers.
@@ -74,10 +71,9 @@ case class SecurityHeadersConfig(
     xssProtection: Option[String] = Some("1; mode=block"),
     contentTypeOptions: Option[String] = Some("nosniff"),
     permittedCrossDomainPolicies: Option[String] = Some("master-only"),
-    contentSecurityPolicy: Option[String] = Some("default-src 'self'")) {
-  def this() {
+    contentSecurityPolicy: Option[String] = Some("default-src 'self'"))
+  def this()
     this(frameOptions = Some("DENY"))
-  }
 
   import scala.compat.java8.OptionConverters._
   import java.{util => ju}
@@ -98,14 +94,13 @@ case class SecurityHeadersConfig(
   def withContentSecurityPolicy(
       contentSecurityPolicy: ju.Optional[String]): SecurityHeadersConfig =
     copy(contentSecurityPolicy = contentSecurityPolicy.asScala)
-}
 
 /**
   * Parses out a SecurityHeadersConfig from play.api.Configuration (usually this means application.conf).
   */
-object SecurityHeadersConfig {
+object SecurityHeadersConfig
 
-  def fromConfiguration(conf: Configuration): SecurityHeadersConfig = {
+  def fromConfiguration(conf: Configuration): SecurityHeadersConfig =
     val config = PlayConfig(conf).get[PlayConfig]("play.filters.headers")
 
     SecurityHeadersConfig(
@@ -116,8 +111,6 @@ object SecurityHeadersConfig {
             .get[Option[String]]("permittedCrossDomainPolicies"),
         contentSecurityPolicy = config.get[Option[String]](
               "contentSecurityPolicy"))
-  }
-}
 
 /**
   * The case class that implements the filter.  This gives you the most control, but you may want to use the apply()
@@ -125,7 +118,7 @@ object SecurityHeadersConfig {
   */
 @Singleton
 class SecurityHeadersFilter @Inject()(config: SecurityHeadersConfig)
-    extends EssentialFilter {
+    extends EssentialFilter
   import SecurityHeadersFilter._
 
   /**
@@ -145,39 +138,34 @@ class SecurityHeadersFilter @Inject()(config: SecurityHeadersConfig)
   /**
     * Applies the filter to an action, appending the headers to the result so it shows in the HTTP response.
     */
-  def apply(next: EssentialAction) = EssentialAction { req =>
+  def apply(next: EssentialAction) = EssentialAction  req =>
     import play.api.libs.iteratee.Execution.Implicits.trampoline
     next(req).map(_.withHeaders(headers(req): _*))
-  }
-}
 
 /**
   * Provider for security headers configuration.
   */
 @Singleton
 class SecurityHeadersConfigProvider @Inject()(configuration: Configuration)
-    extends Provider[SecurityHeadersConfig] {
+    extends Provider[SecurityHeadersConfig]
   lazy val get = SecurityHeadersConfig.fromConfiguration(configuration)
-}
 
 /**
   * The security headers module.
   */
-class SecurityHeadersModule extends Module {
+class SecurityHeadersModule extends Module
   def bindings(environment: Environment, configuration: Configuration) = Seq(
       bind[SecurityHeadersConfig].toProvider[SecurityHeadersConfigProvider],
       bind[SecurityHeadersFilter].toSelf
   )
-}
 
 /**
   * The security headers components.
   */
-trait SecurityHeadersComponents {
+trait SecurityHeadersComponents
   def configuration: Configuration
 
   lazy val securityHeadersConfig: SecurityHeadersConfig =
     SecurityHeadersConfig.fromConfiguration(configuration)
   lazy val securityHeadersFilter: SecurityHeadersFilter =
     SecurityHeadersFilter(securityHeadersConfig)
-}

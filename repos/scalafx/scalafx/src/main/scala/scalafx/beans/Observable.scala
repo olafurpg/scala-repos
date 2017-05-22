@@ -32,10 +32,9 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 import scalafx.event.subscriptions.Subscription
 
-object Observable {
+object Observable
   implicit def sfxObservable2jfx(o: Observable): jfxb.Observable =
     if (o != null) o.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/Observable.html `Observable`]].
@@ -45,7 +44,7 @@ object Observable {
   * @define IVURL [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/InvalidationListener.html `InvalidationListener`]]
   * @define SUBRET A new [[scalafx.event.subscriptions.Subscription]] to remove $JFX $IV.
   */
-trait Observable extends SFXDelegate[jfxb.Observable] {
+trait Observable extends SFXDelegate[jfxb.Observable]
 
   /**
     * Adds a function as a $JFX $IVURL. This function has all arguments from
@@ -55,21 +54,16 @@ trait Observable extends SFXDelegate[jfxb.Observable] {
     * @param op Function that receives a ScalaFX `Observable`. It will be called when value was invalidated.
     * @return $SUBRET
     */
-  def onInvalidate(op: Observable => Unit): Subscription = {
-    val listener = new jfxb.InvalidationListener {
-      def invalidated(observable: jfxb.Observable) {
+  def onInvalidate(op: Observable => Unit): Subscription =
+    val listener = new jfxb.InvalidationListener
+      def invalidated(observable: jfxb.Observable)
         op(Observable.this)
-      }
-    }
 
     delegate.addListener(listener)
 
-    new Subscription {
-      def cancel() {
+    new Subscription
+      def cancel()
         delegate.removeListener(listener)
-      }
-    }
-  }
 
   /**
     * Adds a no argument function as a $JFX $IVURL. This function has no arguments because it will not handle
@@ -78,19 +72,13 @@ trait Observable extends SFXDelegate[jfxb.Observable] {
     * @param op A Function with no arguments. It will be called when value was invalidated.
     * @return $SUBRET
     */
-  def onInvalidate(op: => Unit): Subscription = {
-    val listener = new jfxb.InvalidationListener {
-      def invalidated(observable: jfxb.Observable) {
+  def onInvalidate(op: => Unit): Subscription =
+    val listener = new jfxb.InvalidationListener
+      def invalidated(observable: jfxb.Observable)
         op
-      }
-    }
 
     delegate.addListener(listener)
 
-    new Subscription {
-      def cancel() {
+    new Subscription
+      def cancel()
         delegate.removeListener(listener)
-      }
-    }
-  }
-}

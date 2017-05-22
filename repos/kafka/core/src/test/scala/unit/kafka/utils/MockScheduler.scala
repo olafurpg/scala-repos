@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit
   *   
   * Incrementing the time to the exact next execution time of a task will result in that task executing (it as if execution itself takes no time).
   */
-class MockScheduler(val time: Time) extends Scheduler {
+class MockScheduler(val time: Time) extends Scheduler
 
   /* a priority queue of tasks ordered by next execution time */
   var tasks = new PriorityQueue[MockTask]()
@@ -41,55 +41,44 @@ class MockScheduler(val time: Time) extends Scheduler {
 
   def startup() {}
 
-  def shutdown() {
-    this synchronized {
+  def shutdown()
+    this synchronized
       tasks.foreach(_.fun())
       tasks.clear()
-    }
-  }
 
   /**
     * Check for any tasks that need to execute. Since this is a mock scheduler this check only occurs
     * when this method is called and the execution happens synchronously in the calling thread.
     * If you are using the scheduler associated with a MockTime instance this call be triggered automatically.
     */
-  def tick() {
-    this synchronized {
+  def tick()
+    this synchronized
       val now = time.milliseconds
-      while (!tasks.isEmpty && tasks.head.nextExecution <= now) {
+      while (!tasks.isEmpty && tasks.head.nextExecution <= now)
         /* pop and execute the task with the lowest next execution time */
         val curr = tasks.dequeue
         curr.fun()
         /* if the task is periodic, reschedule it and re-enqueue */
-        if (curr.periodic) {
+        if (curr.periodic)
           curr.nextExecution += curr.period
           this.tasks += curr
-        }
-      }
-    }
-  }
 
   def schedule(name: String,
                fun: () => Unit,
                delay: Long = 0,
                period: Long = -1,
-               unit: TimeUnit = TimeUnit.MILLISECONDS) {
-    this synchronized {
+               unit: TimeUnit = TimeUnit.MILLISECONDS)
+    this synchronized
       tasks += MockTask(name, fun, time.milliseconds + delay, period = period)
       tick()
-    }
-  }
-}
 
 case class MockTask(val name: String,
                     val fun: () => Unit,
                     var nextExecution: Long,
                     val period: Long)
-    extends Ordered[MockTask] {
+    extends Ordered[MockTask]
   def periodic = period >= 0
-  def compare(t: MockTask): Int = {
+  def compare(t: MockTask): Int =
     if (t.nextExecution == nextExecution) 0
     else if (t.nextExecution < nextExecution) -1
     else 1
-  }
-}

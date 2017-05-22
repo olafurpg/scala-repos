@@ -22,75 +22,62 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 // please note that the META-INF/services had to be modified for the test directory for this to work
-class DDLSourceLoadSuite extends DataSourceTest with SharedSQLContext {
+class DDLSourceLoadSuite extends DataSourceTest with SharedSQLContext
 
-  test("data sources with the same name") {
-    intercept[RuntimeException] {
+  test("data sources with the same name")
+    intercept[RuntimeException]
       caseInsensitiveContext.read.format("Fluet da Bomb").load()
-    }
-  }
 
-  test("load data source from format alias") {
+  test("load data source from format alias")
     caseInsensitiveContext.read.format("gathering quorum").load().schema == StructType(
         Seq(StructField("stringType", StringType, nullable = false)))
-  }
 
-  test("specify full classname with duplicate formats") {
+  test("specify full classname with duplicate formats")
     caseInsensitiveContext.read
       .format("org.apache.spark.sql.sources.FakeSourceOne")
       .load()
       .schema == StructType(
         Seq(StructField("stringType", StringType, nullable = false)))
-  }
 
-  test("should fail to load ORC without HiveContext") {
-    intercept[ClassNotFoundException] {
+  test("should fail to load ORC without HiveContext")
+    intercept[ClassNotFoundException]
       caseInsensitiveContext.read.format("orc").load()
-    }
-  }
-}
 
-class FakeSourceOne extends RelationProvider with DataSourceRegister {
+class FakeSourceOne extends RelationProvider with DataSourceRegister
 
   def shortName(): String = "Fluet da Bomb"
 
   override def createRelation(
       cont: SQLContext, param: Map[String, String]): BaseRelation =
-    new BaseRelation {
+    new BaseRelation
       override def sqlContext: SQLContext = cont
 
       override def schema: StructType =
         StructType(
             Seq(StructField("stringType", StringType, nullable = false)))
-    }
-}
 
-class FakeSourceTwo extends RelationProvider with DataSourceRegister {
+class FakeSourceTwo extends RelationProvider with DataSourceRegister
 
   def shortName(): String = "Fluet da Bomb"
 
   override def createRelation(
       cont: SQLContext, param: Map[String, String]): BaseRelation =
-    new BaseRelation {
+    new BaseRelation
       override def sqlContext: SQLContext = cont
 
       override def schema: StructType =
         StructType(
             Seq(StructField("stringType", StringType, nullable = false)))
-    }
-}
 
-class FakeSourceThree extends RelationProvider with DataSourceRegister {
+class FakeSourceThree extends RelationProvider with DataSourceRegister
 
   def shortName(): String = "gathering quorum"
 
   override def createRelation(
       cont: SQLContext, param: Map[String, String]): BaseRelation =
-    new BaseRelation {
+    new BaseRelation
       override def sqlContext: SQLContext = cont
 
       override def schema: StructType =
         StructType(
             Seq(StructField("stringType", StringType, nullable = false)))
-    }
-}

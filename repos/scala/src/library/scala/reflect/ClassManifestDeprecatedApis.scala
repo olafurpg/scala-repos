@@ -13,34 +13,29 @@ import scala.collection.mutable.{WrappedArray, ArrayBuilder}
 import java.lang.{Class => jClass}
 
 @deprecated("Use scala.reflect.ClassTag instead", "2.10.0")
-trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
+trait ClassManifestDeprecatedApis[T] extends OptManifest[T]
   self: ClassManifest[T] =>
 
   // Still in use in target test.junit.comp.
   @deprecated("Use runtimeClass instead", "2.10.0")
   def erasure: jClass[_] = runtimeClass
 
-  private def subtype(sub: jClass[_], sup: jClass[_]): Boolean = {
-    def loop(left: Set[jClass[_]], seen: Set[jClass[_]]): Boolean = {
-      left.nonEmpty && {
+  private def subtype(sub: jClass[_], sup: jClass[_]): Boolean =
+    def loop(left: Set[jClass[_]], seen: Set[jClass[_]]): Boolean =
+      left.nonEmpty &&
         val next = left.head
         val supers = next.getInterfaces.toSet ++ Option(next.getSuperclass)
-        supers(sup) || {
+        supers(sup) ||
           val xs = left ++ supers filterNot seen
           loop(xs - next, seen + next)
-        }
-      }
-    }
     loop(Set(sub), Set())
-  }
 
   private def subargs(
       args1: List[OptManifest[_]], args2: List[OptManifest[_]]) =
-    (args1 corresponds args2) {
+    (args1 corresponds args2)
       // !!! [Martin] this is wrong, need to take variance into account
       case (x: ClassManifest[_], y: ClassManifest[_]) => x <:< y
       case (x, y) => (x eq NoManifest) && (y eq NoManifest)
-    }
 
   /** Tests whether the type represented by this manifest is a subtype
     * of the type represented by `that` manifest, subject to the limitations
@@ -49,13 +44,12 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
   @deprecated(
       "Use scala.reflect.runtime.universe.TypeTag for subtype checking instead",
       "2.10.0")
-  def <:<(that: ClassManifest[_]): Boolean = {
+  def <:<(that: ClassManifest[_]): Boolean =
     // All types which could conform to these types will override <:<.
-    def cannotMatch = {
+    def cannotMatch =
       import Manifest._
       that.isInstanceOf[AnyValManifest[_]] || (that eq AnyVal) ||
       (that eq Nothing) || (that eq Null)
-    }
 
     // This is wrong, and I don't know how it can be made right
     // without more development of Manifests, due to arity-defying
@@ -68,7 +62,7 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
     // supertype has single type argument (A, B) ? I don't see how we
     // can say whether X <:< Y when type arguments are involved except
     // when the erasure is the same, even before considering variance.
-    !cannotMatch && {
+    !cannotMatch &&
       // this part is wrong for not considering variance
       if (this.runtimeClass == that.runtimeClass)
         subargs(this.typeArguments, that.typeArguments)
@@ -77,8 +71,6 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
       else
         that.typeArguments.isEmpty &&
         subtype(this.runtimeClass, that.runtimeClass)
-    }
-  }
 
   /** Tests whether the type represented by this manifest is a supertype
     * of the type represented by `that` manifest, subject to the limitations
@@ -90,10 +82,9 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
   def >:>(that: ClassManifest[_]): Boolean =
     that <:< this
 
-  override def canEqual(other: Any) = other match {
+  override def canEqual(other: Any) = other match
     case _: ClassManifest[_] => true
     case _ => false
-  }
 
   protected def arrayClass[T](tp: jClass[_]): jClass[Array[T]] =
     java.lang.reflect.Array
@@ -163,7 +154,6 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
     else if (runtimeClass.isArray)
       "[" + ClassManifest.fromClass(runtimeClass.getComponentType) + "]"
     else ""
-}
 
 /** `ClassManifestFactory` defines factory methods for manifests.
   *  It is intended for use by the compiler and should not be used in client code.
@@ -177,7 +167,7 @@ trait ClassManifestDeprecatedApis[T] extends OptManifest[T] {
   *  so we need to somehow nudge them into migrating prior to removing stuff out of the blue.
   *  Hence we've introduced this design decision as the lesser of two evils.
   */
-object ClassManifestFactory {
+object ClassManifestFactory
   val Byte = ManifestFactory.Byte
   val Short = ManifestFactory.Short
   val Char = ManifestFactory.Char
@@ -193,7 +183,7 @@ object ClassManifestFactory {
   val Nothing = ManifestFactory.Nothing
   val Null = ManifestFactory.Null
 
-  def fromClass[T](clazz: jClass[T]): ClassManifest[T] = clazz match {
+  def fromClass[T](clazz: jClass[T]): ClassManifest[T] = clazz match
     case java.lang.Byte.TYPE => Byte.asInstanceOf[ClassManifest[T]]
     case java.lang.Short.TYPE => Short.asInstanceOf[ClassManifest[T]]
     case java.lang.Character.TYPE => Char.asInstanceOf[ClassManifest[T]]
@@ -204,7 +194,6 @@ object ClassManifestFactory {
     case java.lang.Boolean.TYPE => Boolean.asInstanceOf[ClassManifest[T]]
     case java.lang.Void.TYPE => Unit.asInstanceOf[ClassManifest[T]]
     case _ => classType[T with AnyRef](clazz).asInstanceOf[ClassManifest[T]]
-  }
 
   def singleType[T <: AnyRef](value: AnyRef): Manifest[T] =
     Manifest.singleType(value)
@@ -234,10 +223,9 @@ object ClassManifestFactory {
                    args: OptManifest[_]*): ClassManifest[T] =
     new ClassTypeManifest[T](Some(prefix), clazz, args.toList)
 
-  def arrayType[T](arg: OptManifest[_]): ClassManifest[Array[T]] = arg match {
+  def arrayType[T](arg: OptManifest[_]): ClassManifest[Array[T]] = arg match
     case NoManifest => Object.asInstanceOf[ClassManifest[Array[T]]]
     case m: ClassManifest[_] => m.asInstanceOf[ClassManifest[T]].arrayManifest
-  }
 
   /** ClassManifest for the abstract type `prefix # name`. `upperBound` is not
     * strictly necessary as it could be obtained by reflection. It was
@@ -246,11 +234,10 @@ object ClassManifestFactory {
                       name: String,
                       clazz: jClass[_],
                       args: OptManifest[_]*): ClassManifest[T] =
-    new ClassManifest[T] {
+    new ClassManifest[T]
       override def runtimeClass = clazz
       override val typeArguments = args.toList
       override def toString = prefix.toString + "#" + name + argString
-    }
 
   /** ClassManifest for the abstract type `prefix # name`. `upperBound` is not
     * strictly necessary as it could be obtained by reflection. It was
@@ -261,12 +248,10 @@ object ClassManifestFactory {
                       name: String,
                       upperbound: ClassManifest[_],
                       args: OptManifest[_]*): ClassManifest[T] =
-    new ClassManifest[T] {
+    new ClassManifest[T]
       override def runtimeClass = upperbound.runtimeClass
       override val typeArguments = args.toList
       override def toString = prefix.toString + "#" + name + argString
-    }
-}
 
 /** Manifest for the class type `clazz[args]`, where `clazz` is
   * a top-level or static class */
@@ -274,8 +259,7 @@ private class ClassTypeManifest[T](
     prefix: Option[OptManifest[_]],
     val runtimeClass: jClass[_],
     override val typeArguments: List[OptManifest[_]])
-    extends ClassManifest[T] {
+    extends ClassManifest[T]
   override def toString =
     (if (prefix.isEmpty) "" else prefix.get.toString + "#") +
     (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
-}

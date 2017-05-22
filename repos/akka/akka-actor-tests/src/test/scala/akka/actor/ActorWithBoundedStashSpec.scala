@@ -14,10 +14,10 @@ import akka.actor.ActorSystem.Settings
 import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.BeforeAndAfterEach
 
-object ActorWithBoundedStashSpec {
+object ActorWithBoundedStashSpec
 
-  class StashingActor extends Actor with Stash {
-    def receive = {
+  class StashingActor extends Actor with Stash
+    def receive =
       case msg: String if msg.startsWith("hello") ⇒
         stash()
         sender() ! "ok"
@@ -25,30 +25,23 @@ object ActorWithBoundedStashSpec {
       case "world" ⇒
         context.become(afterWorldBehaviour)
         unstashAll()
-    }
 
-    def afterWorldBehaviour: Receive = {
+    def afterWorldBehaviour: Receive =
       case _ ⇒ stash()
-    }
-  }
 
-  class StashingActorWithOverflow extends Actor with Stash {
+  class StashingActorWithOverflow extends Actor with Stash
     var numStashed = 0
 
-    def receive = {
+    def receive =
       case msg: String if msg.startsWith("hello") ⇒
         numStashed += 1
-        try { stash(); sender() ! "ok" } catch {
+        try { stash(); sender() ! "ok" } catch
           case _: StashOverflowException ⇒
-            if (numStashed == 21) {
+            if (numStashed == 21)
               sender() ! "STASHOVERFLOW"
               context stop self
-            } else {
+            else
               sender() ! "Unexpected StashOverflowException: " + numStashed
-            }
-        }
-    }
-  }
 
   // bounded deque-based mailbox with capacity 10
   class Bounded10(settings: Settings, config: Config)
@@ -80,18 +73,16 @@ object ActorWithBoundedStashSpec {
       stash-capacity = 20
     }
     """)
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ActorWithBoundedStashSpec
     extends AkkaSpec(ActorWithBoundedStashSpec.testConf)
-    with BeforeAndAfterEach with DefaultTimeout with ImplicitSender {
+    with BeforeAndAfterEach with DefaultTimeout with ImplicitSender
   import ActorWithBoundedStashSpec._
 
-  override def atStartup: Unit = {
+  override def atStartup: Unit =
     system.eventStream.publish(Mute(EventFilter.warning(
                 pattern = ".*received dead letter from.*hello.*")))
-  }
 
   override def beforeEach(): Unit =
     system.eventStream.subscribe(testActor, classOf[DeadLetter])
@@ -99,12 +90,11 @@ class ActorWithBoundedStashSpec
   override def afterEach(): Unit =
     system.eventStream.unsubscribe(testActor, classOf[DeadLetter])
 
-  def testDeadLetters(stasher: ActorRef): Unit = {
+  def testDeadLetters(stasher: ActorRef): Unit =
     // fill up stash
-    for (n ← 1 to 11) {
+    for (n ← 1 to 11)
       stasher ! "hello" + n
       expectMsg("ok")
-    }
 
     // cause unstashAll with capacity violation
     stasher ! "world"
@@ -113,46 +103,37 @@ class ActorWithBoundedStashSpec
     stasher ! PoisonPill
     // stashed messages are sent to deadletters when stasher is stopped
     for (n ← 2 to 11) expectMsg(DeadLetter("hello" + n, testActor, stasher))
-  }
 
-  def testStashOverflowException(stasher: ActorRef): Unit = {
+  def testStashOverflowException(stasher: ActorRef): Unit =
     // fill up stash
-    for (n ← 1 to 20) {
+    for (n ← 1 to 20)
       stasher ! "hello" + n
       expectMsg("ok")
-    }
 
     stasher ! "hello21"
     expectMsg("STASHOVERFLOW")
 
     // stashed messages are sent to deadletters when stasher is stopped,
     for (n ← 1 to 20) expectMsg(DeadLetter("hello" + n, testActor, stasher))
-  }
 
-  "An Actor with Stash" must {
+  "An Actor with Stash" must
 
-    "end up in DeadLetters in case of a capacity violation when configured via dispatcher" in {
+    "end up in DeadLetters in case of a capacity violation when configured via dispatcher" in
       val stasher =
         system.actorOf(Props[StashingActor].withDispatcher(dispatcherId1))
       testDeadLetters(stasher)
-    }
 
-    "end up in DeadLetters in case of a capacity violation when configured via mailbox" in {
+    "end up in DeadLetters in case of a capacity violation when configured via mailbox" in
       val stasher =
         system.actorOf(Props[StashingActor].withMailbox(mailboxId1))
       testDeadLetters(stasher)
-    }
 
-    "throw a StashOverflowException in case of a stash capacity violation when configured via dispatcher" in {
+    "throw a StashOverflowException in case of a stash capacity violation when configured via dispatcher" in
       val stasher = system.actorOf(
           Props[StashingActorWithOverflow].withDispatcher(dispatcherId2))
       testStashOverflowException(stasher)
-    }
 
-    "throw a StashOverflowException in case of a stash capacity violation when configured via mailbox" in {
+    "throw a StashOverflowException in case of a stash capacity violation when configured via mailbox" in
       val stasher = system.actorOf(
           Props[StashingActorWithOverflow].withMailbox(mailboxId2))
       testStashOverflowException(stasher)
-    }
-  }
-}

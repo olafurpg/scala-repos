@@ -15,20 +15,18 @@ import breeze.storage.Zero
   * @author ktakagaki
   * @date 04/30/2014.
   */
-object randomDouble extends RandomGeneratorUFunc[Double] {
+object randomDouble extends RandomGeneratorUFunc[Double]
   protected def gen(implicit basis: RandBasis = Rand): Rand[Double] =
     basis.uniform
   protected def genRange(low: Double, high: Double)(
-      implicit basis: RandBasis = Rand): Rand[Double] = {
+      implicit basis: RandBasis = Rand): Rand[Double] =
     require(
         high >= low, s"High term must be greater than low term. ($low, $high)")
     val range = (high - low)
     basis.uniform.map(_ * range + low)
-  }
 
   protected val _classTag: ClassTag[Double] = scala.reflect.classTag[Double]
   protected val _zero = Zero[Double](0.0)
-}
 
 /**Gives a random Int.
   * +  randomInt()... returns a random Int, in [0, 1]
@@ -40,20 +38,18 @@ object randomDouble extends RandomGeneratorUFunc[Double] {
   * @author ktakagaki
   * @date 04/30/2014.
   */
-object randomInt extends RandomGeneratorUFunc[Int] {
+object randomInt extends RandomGeneratorUFunc[Int]
 
   protected def gen(implicit basis: RandBasis = Rand): Rand[Int] =
     genRange(0, 1)
   protected def genRange(low: Int, high: Int)(
-      implicit basis: RandBasis = Rand): Rand[Int] = {
+      implicit basis: RandBasis = Rand): Rand[Int] =
     require(
         high >= low, s"High term must be greater than low term. ($low, $high)")
     basis.randInt(high - low + 1).map(_ + low)
-  }
 
   protected val _classTag: ClassTag[Int] = scala.reflect.classTag[Int]
   protected val _zero = Zero[Int](0)
-}
 
 /**Gives Gaussian-distributed random Double(s)
   * +  randn()... returns a Gaussian random variable with mean 0, variance 1
@@ -63,7 +59,7 @@ object randomInt extends RandomGeneratorUFunc[Int] {
   * @author ktakagaki
   * @date 04/30/2014.
   */
-object randn extends RandomGeneratorUFunc[Double] {
+object randn extends RandomGeneratorUFunc[Double]
 
   protected def gen(implicit basis: RandBasis = Rand): Rand[Double] =
     basis.gaussian
@@ -73,9 +69,8 @@ object randn extends RandomGeneratorUFunc[Double] {
 
   protected val _classTag: ClassTag[Double] = scala.reflect.classTag[Double]
   protected val _zero = Zero.DoubleZero
-}
 
-trait RandomGeneratorUFunc[T] extends UFunc {
+trait RandomGeneratorUFunc[T] extends UFunc
   protected def gen(implicit basis: RandBasis = Rand): Rand[T]
   protected def genRange(low: T, high: T)(
       implicit basis: RandBasis = Rand): Rand[T]
@@ -86,33 +81,25 @@ trait RandomGeneratorUFunc[T] extends UFunc {
 
   implicit def implRandomT_1D(
       implicit basis: RandBasis = Rand): Impl[Int, DenseVector[T]] =
-    new Impl[Int, DenseVector[T]] {
+    new Impl[Int, DenseVector[T]]
       def apply(dimensions1: Int): DenseVector[T] =
         DenseVector.rand(dimensions1, gen)
-    }
 
   implicit def implRandomT_1DRange(
       implicit basis: RandBasis = Rand): Impl2[Int, (T, T), DenseVector[T]] =
-    new Impl2[Int, (T, T), DenseVector[T]] {
-      def apply(dimensions1: Int, range: (T, T)): DenseVector[T] = {
+    new Impl2[Int, (T, T), DenseVector[T]]
+      def apply(dimensions1: Int, range: (T, T)): DenseVector[T] =
         DenseVector.rand(dimensions1, genRange(range._1, range._2))
-      }
-    }
 
   implicit def implRandomT_2D(
       implicit basis: RandBasis = Rand): Impl[(Int, Int), DenseMatrix[T]] =
-    new Impl[(Int, Int), DenseMatrix[T]] {
-      def apply(dimensions2: (Int, Int)): DenseMatrix[T] = {
+    new Impl[(Int, Int), DenseMatrix[T]]
+      def apply(dimensions2: (Int, Int)): DenseMatrix[T] =
         DenseMatrix.rand(dimensions2._1, dimensions2._2, gen)
-      }
-    }
 
   implicit def implRandomT_2DRange(implicit basis: RandBasis = Rand)
     : Impl2[(Int, Int), (T, T), DenseMatrix[T]] =
-    new Impl2[(Int, Int), (T, T), DenseMatrix[T]] {
-      def apply(dimensions2: (Int, Int), range: (T, T)): DenseMatrix[T] = {
+    new Impl2[(Int, Int), (T, T), DenseMatrix[T]]
+      def apply(dimensions2: (Int, Int), range: (T, T)): DenseMatrix[T] =
         DenseMatrix.rand(
             dimensions2._1, dimensions2._2, genRange(range._1, range._2))
-      }
-    }
-}

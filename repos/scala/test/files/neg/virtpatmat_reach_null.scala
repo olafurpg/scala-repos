@@ -1,6 +1,6 @@
-sealed abstract class Const {
+sealed abstract class Const
   final def excludes(other: Const) =
-    (this, other) match {
+    (this, other) match
       case (_, NullConst) =>
       case (NullConst, _) =>
       case (_: ValueConst, _: ValueConst) =>
@@ -11,8 +11,6 @@ sealed abstract class Const {
       case (_, null) =>
       case null =>
       case _ => // unreachable
-    }
-}
 
 sealed class TypeConst extends Const
 sealed class ValueConst extends Const

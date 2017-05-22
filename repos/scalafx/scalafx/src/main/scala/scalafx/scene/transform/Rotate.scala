@@ -36,7 +36,7 @@ import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Point3D
 import scalafx.geometry.Point3D._
 
-object Rotate {
+object Rotate
   implicit def sfxRotate2jfx(v: Rotate): jfxst.Rotate =
     if (v != null) v.delegate else null
 
@@ -54,13 +54,12 @@ object Rotate {
     * Specifies the Z-axis as the axis of rotation.
     */
   val ZAxis = new Point3D(jfxst.Rotate.Z_AXIS)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Rotate.html]]
   */
 class Rotate(override val delegate: jfxst.Rotate = new jfxst.Rotate)
-    extends Transform(delegate) with SFXDelegate[jfxst.Rotate] {
+    extends Transform(delegate) with SFXDelegate[jfxst.Rotate]
 
   /**
     * Creates a two-dimensional Rotate transform.
@@ -98,39 +97,33 @@ class Rotate(override val delegate: jfxst.Rotate = new jfxst.Rotate)
     * Defines the angle of rotation measured in degrees.
     */
   def angle: DoubleProperty = delegate.angleProperty()
-  def angle_=(v: Double) {
+  def angle_=(v: Double)
     angle() = v
-  }
 
   /**
     * Defines the axis of rotation at the pivot point.
     */
   def axis: ObjectProperty[jfxg.Point3D] = delegate.axisProperty()
-  def axis_=(v: Point3D) {
+  def axis_=(v: Point3D)
     axis() = v
-  }
 
   /**
     * Defines the X coordinate of the rotation pivot point.
     */
   def pivotX: DoubleProperty = delegate.pivotXProperty()
-  def pivotX_=(v: Double) {
+  def pivotX_=(v: Double)
     pivotX() = v
-  }
 
   /**
     * Defines the Y coordinate of the rotation pivot point.
     */
   def pivotY: DoubleProperty = delegate.pivotYProperty()
-  def pivotY_=(v: Double) {
+  def pivotY_=(v: Double)
     pivotY() = v
-  }
 
   /**
     * Defines the Z coordinate of the rotation pivot point.
     */
   def pivotZ: DoubleProperty = delegate.pivotZProperty()
-  def pivotZ_=(v: Double) {
+  def pivotZ_=(v: Double)
     pivotZ() = v
-  }
-}

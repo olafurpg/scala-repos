@@ -17,16 +17,15 @@ import scala.annotation._
     "Cannot write an instance of ${A} to HTTP response. Try to define a Writeable[${A}]"
 )
 class Writeable[-A](
-    val transform: A => ByteString, val contentType: Option[String]) {
+    val transform: A => ByteString, val contentType: Option[String])
   def toEntity(a: A): HttpEntity = HttpEntity.Strict(transform(a), contentType)
   def map[B](f: B => A): Writeable[B] =
     new Writeable(b => transform(f(b)), contentType)
-}
 
 /**
   * Helper utilities for `Writeable`.
   */
-object Writeable extends DefaultWriteables {
+object Writeable extends DefaultWriteables
 
   def apply[A](transform: (A => ByteString),
                contentType: Option[String]): Writeable[A] =
@@ -39,57 +38,51 @@ object Writeable extends DefaultWriteables {
   def apply[A](transform: A => ByteString)(
       implicit ct: ContentTypeOf[A]): Writeable[A] =
     new Writeable(transform, ct.mimeType)
-}
 
 /**
   * Default Writeable with lowwe priority.
   */
-trait LowPriorityWriteables {
+trait LowPriorityWriteables
 
   /**
     * `Writeable` for `play.twirl.api.Content` values.
     */
   implicit def writeableOf_Content[C <: play.twirl.api.Content](
-      implicit codec: Codec, ct: ContentTypeOf[C]): Writeable[C] = {
+      implicit codec: Codec, ct: ContentTypeOf[C]): Writeable[C] =
     Writeable(content => codec.encode(content.body))
-  }
-}
 
 /**
   * Default Writeable.
   */
-trait DefaultWriteables extends LowPriorityWriteables {
+trait DefaultWriteables extends LowPriorityWriteables
 
   /**
     * `Writeable` for `play.twirl.api.Xml` values. Trims surrounding whitespace.
     */
   implicit def writeableOf_XmlContent(
       implicit codec: Codec,
-      ct: ContentTypeOf[play.twirl.api.Xml]): Writeable[play.twirl.api.Xml] = {
+      ct: ContentTypeOf[play.twirl.api.Xml]): Writeable[play.twirl.api.Xml] =
     Writeable(xml => codec.encode(xml.body.trim))
-  }
 
   /**
     * `Writeable` for `NodeSeq` values - literal Scala XML.
     */
   implicit def writeableOf_NodeSeq[C <: scala.xml.NodeSeq](
-      implicit codec: Codec): Writeable[C] = {
+      implicit codec: Codec): Writeable[C] =
     Writeable(xml => codec.encode(xml.toString))
-  }
 
   /**
     * `Writeable` for `NodeBuffer` values - literal Scala XML.
     */
   implicit def writeableOf_NodeBuffer(
-      implicit codec: Codec): Writeable[scala.xml.NodeBuffer] = {
+      implicit codec: Codec): Writeable[scala.xml.NodeBuffer] =
     Writeable(xml => codec.encode(xml.toString))
-  }
 
   /**
     * `Writeable` for `urlEncodedForm` values
     */
   implicit def writeableOf_urlEncodedForm(
-      implicit codec: Codec): Writeable[Map[String, Seq[String]]] = {
+      implicit codec: Codec): Writeable[Map[String, Seq[String]]] =
     import java.net.URLEncoder
     Writeable(
         formData =>
@@ -99,14 +92,12 @@ trait DefaultWriteables extends LowPriorityWriteables {
                           c => item._1 + "=" + URLEncoder.encode(c, "UTF-8")))
                 .flatten
                 .mkString("&")))
-  }
 
   /**
     * `Writeable` for `JsValue` values - Json
     */
-  implicit def writeableOf_JsValue(implicit codec: Codec): Writeable[JsValue] = {
+  implicit def writeableOf_JsValue(implicit codec: Codec): Writeable[JsValue] =
     Writeable(a => codec.encode(Json.stringify(a)))
-  }
 
   /**
     * `Writeable` for empty responses.
@@ -130,4 +121,3 @@ trait DefaultWriteables extends LowPriorityWriteables {
     * Straightforward `Writeable` for ByteString values.
     */
   implicit val wBytes: Writeable[ByteString] = Writeable(identity)
-}

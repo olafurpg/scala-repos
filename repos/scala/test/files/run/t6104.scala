@@ -1,8 +1,6 @@
-class A { Self =>
+class A  Self =>
   val ok = "ok"
-  this match {
+  this match
     case me @ Self => println(me.ok)
-  }
-}
 
 object Test extends A with App

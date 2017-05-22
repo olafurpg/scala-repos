@@ -8,7 +8,7 @@ package expr
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
-trait ScDoStmt extends ScExpression {
+trait ScDoStmt extends ScExpression
   def condition: Option[ScExpression]
 
   /**
@@ -25,10 +25,8 @@ trait ScDoStmt extends ScExpression {
 
   override def accept(visitor: ScalaElementVisitor) =
     visitor.visitDoStatement(this)
-}
 
-object ScDoStmt {
+object ScDoStmt
   def unapply(
       doStmt: ScDoStmt): Option[(Option[ScExpression], Option[ScExpression])] =
     Some(doStmt.getExprBody, doStmt.condition)
-}

@@ -35,10 +35,10 @@ import org.apache.spark.util.collection.OpenHashMap
   * Base trait for [[StringIndexer]] and [[StringIndexerModel]].
   */
 private[feature] trait StringIndexerBase
-    extends Params with HasInputCol with HasOutputCol with HasHandleInvalid {
+    extends Params with HasInputCol with HasOutputCol with HasHandleInvalid
 
   /** Validates and transforms the input schema. */
-  protected def validateAndTransformSchema(schema: StructType): StructType = {
+  protected def validateAndTransformSchema(schema: StructType): StructType =
     val inputColName = $(inputCol)
     val inputDataType = schema(inputColName).dataType
     require(
@@ -52,8 +52,6 @@ private[feature] trait StringIndexerBase
     val attr = NominalAttribute.defaultAttr.withName($(outputCol))
     val outputFields = inputFields :+ attr.toStructField()
     StructType(outputFields)
-  }
-}
 
 /**
   * :: Experimental ::
@@ -67,7 +65,7 @@ private[feature] trait StringIndexerBase
 @Experimental
 class StringIndexer(override val uid: String)
     extends Estimator[StringIndexerModel] with StringIndexerBase
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("strIdx"))
 
@@ -81,7 +79,7 @@ class StringIndexer(override val uid: String)
   /** @group setParam */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  override def fit(dataset: DataFrame): StringIndexerModel = {
+  override def fit(dataset: DataFrame): StringIndexerModel =
     val counts = dataset
       .select(col($(inputCol)).cast(StringType))
       .rdd
@@ -89,21 +87,17 @@ class StringIndexer(override val uid: String)
       .countByValue()
     val labels = counts.toSeq.sortBy(-_._2).map(_._1).toArray
     copyValues(new StringIndexerModel(uid, labels).setParent(this))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
   override def copy(extra: ParamMap): StringIndexer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object StringIndexer extends DefaultParamsReadable[StringIndexer] {
+object StringIndexer extends DefaultParamsReadable[StringIndexer]
 
   @Since("1.6.0")
   override def load(path: String): StringIndexer = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -117,23 +111,21 @@ object StringIndexer extends DefaultParamsReadable[StringIndexer] {
   */
 @Experimental
 class StringIndexerModel(override val uid: String, val labels: Array[String])
-    extends Model[StringIndexerModel] with StringIndexerBase with MLWritable {
+    extends Model[StringIndexerModel] with StringIndexerBase with MLWritable
 
   import StringIndexerModel._
 
   def this(labels: Array[String]) =
     this(Identifiable.randomUID("strIdx"), labels)
 
-  private val labelToIndex: OpenHashMap[String, Double] = {
+  private val labelToIndex: OpenHashMap[String, Double] =
     val n = labels.length
     val map = new OpenHashMap[String, Double](n)
     var i = 0
-    while (i < n) {
+    while (i < n)
       map.update(labels(i), i)
       i += 1
-    }
     map
-  }
 
   /** @group setParam */
   def setHandleInvalid(value: String): this.type = set(handleInvalid, value)
@@ -145,70 +137,59 @@ class StringIndexerModel(override val uid: String, val labels: Array[String])
   /** @group setParam */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  override def transform(dataset: DataFrame): DataFrame = {
-    if (!dataset.schema.fieldNames.contains($(inputCol))) {
+  override def transform(dataset: DataFrame): DataFrame =
+    if (!dataset.schema.fieldNames.contains($(inputCol)))
       logInfo(
           s"Input column ${$(inputCol)} does not exist during transformation. " +
           "Skip StringIndexerModel.")
       return dataset
-    }
     validateAndTransformSchema(dataset.schema)
 
-    val indexer = udf { label: String =>
-      if (labelToIndex.contains(label)) {
+    val indexer = udf  label: String =>
+      if (labelToIndex.contains(label))
         labelToIndex(label)
-      } else {
+      else
         throw new SparkException(s"Unseen label: $label.")
-      }
-    }
 
     val metadata = NominalAttribute.defaultAttr
       .withName($(inputCol))
       .withValues(labels)
       .toMetadata()
     // If we are skipping invalid records, filter them out.
-    val filteredDataset = (getHandleInvalid) match {
-      case "skip" => {
-          val filterer = udf { label: String =>
+    val filteredDataset = (getHandleInvalid) match
+      case "skip" =>
+          val filterer = udf  label: String =>
             labelToIndex.contains(label)
-          }
           dataset.where(filterer(dataset($(inputCol))))
-        }
       case _ => dataset
-    }
     filteredDataset.select(col("*"),
                            indexer(dataset($(inputCol)).cast(StringType))
                              .as($(outputCol), metadata))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
-    if (schema.fieldNames.contains($(inputCol))) {
+  override def transformSchema(schema: StructType): StructType =
+    if (schema.fieldNames.contains($(inputCol)))
       validateAndTransformSchema(schema)
-    } else {
+    else
       // If the input column does not exist during transformation, we skip StringIndexerModel.
       schema
-    }
-  }
 
-  override def copy(extra: ParamMap): StringIndexerModel = {
+  override def copy(extra: ParamMap): StringIndexerModel =
     val copied = new StringIndexerModel(uid, labels)
     copyValues(copied, extra).setParent(parent)
-  }
 
   @Since("1.6.0")
   override def write: StringIndexModelWriter = new StringIndexModelWriter(this)
-}
 
 @Since("1.6.0")
-object StringIndexerModel extends MLReadable[StringIndexerModel] {
+object StringIndexerModel extends MLReadable[StringIndexerModel]
 
   private[StringIndexerModel] class StringIndexModelWriter(
       instance: StringIndexerModel)
-      extends MLWriter {
+      extends MLWriter
 
     private case class Data(labels: Array[String])
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val data = Data(instance.labels)
       val dataPath = new Path(path, "data").toString
@@ -217,14 +198,12 @@ object StringIndexerModel extends MLReadable[StringIndexerModel] {
         .repartition(1)
         .write
         .parquet(dataPath)
-    }
-  }
 
-  private class StringIndexerModelReader extends MLReader[StringIndexerModel] {
+  private class StringIndexerModelReader extends MLReader[StringIndexerModel]
 
     private val className = classOf[StringIndexerModel].getName
 
-    override def load(path: String): StringIndexerModel = {
+    override def load(path: String): StringIndexerModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
       val data = sqlContext.read.parquet(dataPath).select("labels").head()
@@ -232,8 +211,6 @@ object StringIndexerModel extends MLReadable[StringIndexerModel] {
       val model = new StringIndexerModel(metadata.uid, labels)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
 
   @Since("1.6.0")
   override def read: MLReader[StringIndexerModel] =
@@ -241,7 +218,6 @@ object StringIndexerModel extends MLReadable[StringIndexerModel] {
 
   @Since("1.6.0")
   override def load(path: String): StringIndexerModel = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -255,7 +231,7 @@ object StringIndexerModel extends MLReadable[StringIndexerModel] {
 @Experimental
 class IndexToString private[ml](override val uid: String)
     extends Transformer with HasInputCol with HasOutputCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() =
     this(Identifiable.randomUID("idxToStr"))
@@ -285,7 +261,7 @@ class IndexToString private[ml](override val uid: String)
   /** @group getParam */
   final def getLabels: Array[String] = $(labels)
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val inputColName = $(inputCol)
     val inputDataType = schema(inputColName).dataType
     require(inputDataType.isInstanceOf[NumericType],
@@ -297,43 +273,35 @@ class IndexToString private[ml](override val uid: String)
             s"Output column $outputColName already exists.")
     val outputFields = inputFields :+ StructField($(outputCol), StringType)
     StructType(outputFields)
-  }
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val inputColSchema = dataset.schema($(inputCol))
     // If the labels array is empty use column metadata
     val values =
-      if ($(labels).isEmpty) {
+      if ($(labels).isEmpty)
         Attribute
           .fromStructField(inputColSchema)
           .asInstanceOf[NominalAttribute]
           .values
           .get
-      } else {
+      else
         $(labels)
-      }
-    val indexer = udf { index: Double =>
+    val indexer = udf  index: Double =>
       val idx = index.toInt
-      if (0 <= idx && idx < values.length) {
+      if (0 <= idx && idx < values.length)
         values(idx)
-      } else {
+      else
         throw new SparkException(s"Unseen index: $index ??")
-      }
-    }
     val outputColName = $(outputCol)
     dataset.select(
         col("*"),
         indexer(dataset($(inputCol)).cast(DoubleType)).as(outputColName))
-  }
 
-  override def copy(extra: ParamMap): IndexToString = {
+  override def copy(extra: ParamMap): IndexToString =
     defaultCopy(extra)
-  }
-}
 
 @Since("1.6.0")
-object IndexToString extends DefaultParamsReadable[IndexToString] {
+object IndexToString extends DefaultParamsReadable[IndexToString]
 
   @Since("1.6.0")
   override def load(path: String): IndexToString = super.load(path)
-}

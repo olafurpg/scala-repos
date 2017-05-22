@@ -7,7 +7,7 @@ import com.twitter.finagle.memcached.protocol.text.{Decoding, Tokens, TokensWith
 import com.twitter.io.Buf
 import com.twitter.util.{Time, Duration}
 
-object ResponseToEncoding {
+object ResponseToEncoding
   private val ZERO = "0"
   private val VALUE = "VALUE"
   private val ZeroCb = Buf.Utf8(ZERO)
@@ -22,30 +22,25 @@ object ResponseToEncoding {
   private val NotFoundTokens = Tokens(Seq(Buf.Utf8(NOT_FOUND)))
   private val DeletedTokens = Tokens(Seq(Buf.Utf8(DELETED)))
   private val ErrorTokens = Tokens(Seq(Buf.Utf8(ERROR)))
-}
 
-private[kestrel] class ResponseToEncoding extends OneToOneEncoder {
+private[kestrel] class ResponseToEncoding extends OneToOneEncoder
   import ResponseToEncoding._
 
   def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding = {
-    message match {
+      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
+    message match
       case Stored() => StoredTokens
       case Deleted() => DeletedTokens
       case NotFound() => NotFoundTokens
       case Error() => ErrorTokens
       case Values(values) =>
         val tokensWithData =
-          values map {
+          values map
             case Value(key, value) =>
               TokensWithData(Seq(ValueCb, key, ZeroCb), value)
-          }
         ValueLines(tokensWithData)
-    }
-  }
-}
 
-object CommandToEncoding {
+object CommandToEncoding
   private val ZERO = Buf.Utf8("0")
 
   private val OPEN = Buf.Utf8("/open")
@@ -60,39 +55,34 @@ object CommandToEncoding {
   private val FLUSH = Buf.Utf8("flush")
 
   private val SET = Buf.Utf8("set")
-}
 
-private[kestrel] class CommandToEncoding extends OneToOneEncoder {
+private[kestrel] class CommandToEncoding extends OneToOneEncoder
   import CommandToEncoding._
 
   // kestrel supports only 32-bit timeouts
-  private[this] def encodeTimeout(timeout: Duration): Buf = {
+  private[this] def encodeTimeout(timeout: Duration): Buf =
     val timeInMillis = math.min(timeout.inMilliseconds, Int.MaxValue)
     TIMEOUT.concat(Buf.Utf8(timeInMillis.toString))
-  }
 
   private[this] def keyWithSuffix(
       queueName: Buf,
       suffix: Buf,
       timeout: Option[Duration]
-  ): Buf = {
-    timeout match {
+  ): Buf =
+    timeout match
       case Some(t) => queueName.concat(suffix).concat(encodeTimeout(t))
       case None => queueName.concat(suffix)
-    }
-  }
 
   def encode(
-      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding = {
-    message match {
+      ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
+    message match
       case Set(key, expiry, value) =>
         TokensWithData(
             Seq(SET, key, ZERO, Buf.Utf8(expiry.inSeconds.toString)), value)
       case Get(queueName, timeout) =>
-        val key = timeout match {
+        val key = timeout match
           case Some(t) => queueName.concat(encodeTimeout(t))
           case None => queueName
-        }
         Tokens(Seq(GET, key))
       case Open(queueName, timeout) =>
         val key = keyWithSuffix(queueName, OPEN, timeout)
@@ -113,6 +103,3 @@ private[kestrel] class CommandToEncoding extends OneToOneEncoder {
         Tokens(Seq(DELETE, key))
       case Flush(key) =>
         Tokens(Seq(FLUSH, key))
-    }
-  }
-}

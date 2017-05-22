@@ -34,9 +34,9 @@ import org.apache.spark.SparkConf
   *    $ bin/run-example streaming.DirectKafkaWordCount broker1-host:port,broker2-host:port \
   *    topic1,topic2
   */
-object DirectKafkaWordCount {
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+object DirectKafkaWordCount
+  def main(args: Array[String])
+    if (args.length < 2)
       System.err.println(s"""
         |Usage: DirectKafkaWordCount <brokers> <topics>
         |  <brokers> is a list of one or more Kafka brokers
@@ -44,7 +44,6 @@ object DirectKafkaWordCount {
         |
         """.stripMargin)
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -70,6 +69,4 @@ object DirectKafkaWordCount {
     // Start the computation
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 // scalastyle:on println

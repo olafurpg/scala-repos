@@ -6,7 +6,7 @@ import com.twitter.io.Buf
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.util.events.Events]].
   */
-object Event {
+object Event
 
   val NoObject: AnyRef = new Object()
   val NoLong: Long = Long.MinValue
@@ -21,7 +21,7 @@ object Event {
     * in the companion object and use that for all events
     * of that type.
     */
-  abstract class Type {
+  abstract class Type
 
     /**
       * An identifier for this Type construction. These should be unique across
@@ -40,22 +40,18 @@ object Event {
     def deserialize(buf: Buf): Try[Event]
 
     protected def serializeTrace(
-        traceId: Long, spanId: Long): (Option[Long], Option[Long]) = {
+        traceId: Long, spanId: Long): (Option[Long], Option[Long]) =
       val sid = if (spanId == NoSpanId) None else Some(spanId)
       val tid = if (traceId == NoTraceId) None else Some(traceId)
       (tid, sid)
-    }
 
     override def toString() = id
-  }
 
   // Note: Not a val so we can discriminate between constructions in tests.
-  private[twitter] def nullType: Type = new Type {
+  private[twitter] def nullType: Type = new Type
     val id = "Null"
     def serialize(event: Event) = Return(Buf.Empty)
     def deserialize(buf: Buf) = Return(Event(this, Time.Bottom))
-  }
-}
 
 /**
   * A somewhat flexible schema representing various event types.
@@ -73,7 +69,7 @@ case class Event(etype: Event.Type,
                  objectVal: Object = Event.NoObject,
                  doubleVal: Double = Event.NoDouble,
                  traceIdVal: Long = Event.NoTraceId,
-                 spanIdVal: Long = Event.NoSpanId) {
+                 spanIdVal: Long = Event.NoSpanId)
 
   def getLong: Option[Long] =
     if (Event.NoLong == longVal) None else Some(longVal)
@@ -89,4 +85,3 @@ case class Event(etype: Event.Type,
 
   def getSpanId: Option[Long] =
     if (Event.NoSpanId == spanIdVal) None else Some(spanIdVal)
-}

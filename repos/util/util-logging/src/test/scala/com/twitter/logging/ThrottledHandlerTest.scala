@@ -25,23 +25,21 @@ import com.twitter.util.{TempFolder, Time}
 
 @RunWith(classOf[JUnitRunner])
 class ThrottledHandlerTest
-    extends WordSpec with BeforeAndAfter with TempFolder {
+    extends WordSpec with BeforeAndAfter with TempFolder
   private var handler: StringHandler = null
 
-  "ThrottledHandler" should {
-    before {
+  "ThrottledHandler" should
+    before
       Logger.clearHandlers
       handler = new StringHandler(BareFormatter, None)
-    }
 
-    after {
+    after
       Logger.clearHandlers
-    }
 
-    "throttle keyed log messages" in {
+    "throttle keyed log messages" in
       val log = Logger()
       val throttledLog = new ThrottledHandler(handler, 1.second, 3)
-      Time.withCurrentTimeFrozen { timeCtrl =>
+      Time.withCurrentTimeFrozen  timeCtrl =>
         log.addHandler(throttledLog)
 
         log.error("apple: %s", "help!")
@@ -63,11 +61,9 @@ class ThrottledHandlerTest
                 "apple: help 3!",
                 "(swallowed 2 repeating messages)",
                 "apple: done."))
-      }
-    }
 
-    "log the summary even if nothing more is logged with that name" in {
-      Time.withCurrentTimeFrozen { time =>
+    "log the summary even if nothing more is logged with that name" in
+      Time.withCurrentTimeFrozen  time =>
         val log = Logger()
         val throttledLog = new ThrottledHandler(handler, 1.second, 3)
         log.addHandler(throttledLog)
@@ -87,7 +83,3 @@ class ThrottledHandlerTest
                 "apple: help!",
                 "(swallowed 2 repeating messages)",
                 "hello."))
-      }
-    }
-  }
-}

@@ -6,7 +6,6 @@ trait PIn[N2, +E2[X <: N2]] extends P[Int, Any]
 trait EI extends PIn[Int, Nothing]
 trait NI extends PIn[Int, Nothing]
 
-object Test {
+object Test
   val lub = if (true) ??? : EI else ??? : NI
   val pin: PIn[Int, Nothing] = lub
-}

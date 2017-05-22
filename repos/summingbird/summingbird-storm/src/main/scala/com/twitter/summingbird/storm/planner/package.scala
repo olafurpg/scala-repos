@@ -17,6 +17,5 @@
 package com.twitter.summingbird.storm
 import com.twitter.summingbird.planner.Node
 
-package object planner {
+package object planner
   type StormNode = Node[Storm]
-}

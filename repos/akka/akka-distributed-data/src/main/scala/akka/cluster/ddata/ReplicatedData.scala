@@ -23,7 +23,7 @@ import akka.cluster.UniqueAddress
   * ReplicatedData types should be immutable, i.e. "modifying" methods should return
   * a new instance.
   */
-trait ReplicatedData {
+trait ReplicatedData
 
   /**
     * The type of the concrete implementation, e.g. `GSet[A]`.
@@ -35,7 +35,6 @@ trait ReplicatedData {
     * Monotonic merge function.
     */
   def merge(that: T): T
-}
 
 /**
   * Java API: Interface for implementing a [[ReplicatedData]] in Java.
@@ -45,7 +44,7 @@ trait ReplicatedData {
   * E.g. `class TwoPhaseSet extends AbstractReplicatedData&lt;TwoPhaseSet&gt;`
   */
 abstract class AbstractReplicatedData[D <: AbstractReplicatedData[D]]
-    extends ReplicatedData {
+    extends ReplicatedData
 
   override type T = ReplicatedData
 
@@ -59,7 +58,6 @@ abstract class AbstractReplicatedData[D <: AbstractReplicatedData[D]]
     * Java API: Monotonic merge function.
     */
   def mergeData(that: D): D
-}
 
 /**
   * [[ReplicatedData]] that has support for pruning of data
@@ -68,7 +66,7 @@ abstract class AbstractReplicatedData[D <: AbstractReplicatedData[D]]
   * used by the [[Replicator]] to collapse data from the removed node
   * into some other node in the cluster.
   */
-trait RemovedNodePruning extends ReplicatedData {
+trait RemovedNodePruning extends ReplicatedData
 
   /**
     * Does it have any state changes from a specific node,
@@ -88,7 +86,6 @@ trait RemovedNodePruning extends ReplicatedData {
     * and already been pruned.
     */
   def pruningCleanup(removedNode: UniqueAddress): T
-}
 
 /**
   * Marker trait for `ReplicatedData` serialized by

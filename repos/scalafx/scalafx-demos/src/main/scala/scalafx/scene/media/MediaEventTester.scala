@@ -37,12 +37,11 @@ import scalafx.scene.control.Label
 import scalafx.scene.layout.StackPane
 
 /** Plays a video an displays text related at set video duration. */
-object MediaEventTester extends JFXApp {
+object MediaEventTester extends JFXApp
 
-  val markerText = new Label {
+  val markerText = new Label
     alignmentInParent = Pos.TopCenter
     style = "-fx-padding: 20; -fx-font-size: 24pt; -fx-text-fill: white;"
-  }
 
   val url = "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv"
   val media = new Media(url)
@@ -58,18 +57,14 @@ object MediaEventTester extends JFXApp {
   mediaPlayer.onMarker = (event: MediaMarkerEvent) =>
     Platform.runLater { markerText.text = event.marker.getKey }
 
-  val mediaView = new MediaView(mediaPlayer) {
+  val mediaView = new MediaView(mediaPlayer)
     onError = (event: MediaErrorEvent) => println("Media view error: " + event)
-  }
-  val root = new StackPane {
+  val root = new StackPane
     children += (mediaView, markerText)
     style = "-fx-background-color: black;"
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "MediaEventTester"
     scene = new Scene(root, 540, 320)
-  }
 
   mediaPlayer.play()
-}

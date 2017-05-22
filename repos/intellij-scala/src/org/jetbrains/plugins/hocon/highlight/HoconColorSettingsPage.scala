@@ -8,7 +8,7 @@ import org.jetbrains.plugins.hocon.lang.HoconLanguage
 
 import scala.collection.JavaConverters._
 
-class HoconColorSettingsPage extends ColorSettingsPage {
+class HoconColorSettingsPage extends ColorSettingsPage
   def getIcon =
     AllIcons.FileTypes.Config
 
@@ -70,9 +70,8 @@ class HoconColorSettingsPage extends ColorSettingsPage {
 
   def getAttributeDescriptors =
     HoconColorSettingsPage.Attrs
-}
 
-object HoconColorSettingsPage {
+object HoconColorSettingsPage
   final val Attrs = Array(
       "Bad character" -> HHC.BadCharacter,
       "Hash comment" -> HHC.HashComment,
@@ -98,7 +97,6 @@ object HoconColorSettingsPage {
       "Path separator" -> HHC.PathSeparator,
       "Key" -> HHC.EntryKey,
       "Key in substitution" -> HHC.SubstitutionKey
-  ).map({
+  ).map(
     case (displayName, key) => new AttributesDescriptor(displayName, key)
-  })
-}
+  )

@@ -13,6 +13,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.xml._
   * Date: 21.04.2008
   */
 class ScXmlPIImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlPI {
+    extends ScalaPsiElementImpl(node) with ScXmlPI
   override def toString: String = "XmlProcessingInstructions"
-}

@@ -10,11 +10,11 @@ import akka.http.scaladsl.model.MediaTypes._
 /**
   * Simple model for `application/x-www-form-urlencoded` form data.
   */
-final case class FormData(fields: Uri.Query) {
+final case class FormData(fields: Uri.Query)
   def toEntity: akka.http.scaladsl.model.RequestEntity =
     toEntity(HttpCharsets.`UTF-8`)
 
-  def toEntity(charset: HttpCharset): akka.http.scaladsl.model.RequestEntity = {
+  def toEntity(charset: HttpCharset): akka.http.scaladsl.model.RequestEntity =
     val render: StringRendering = UriRendering.renderQuery(
         new StringRendering,
         this.fields,
@@ -22,10 +22,8 @@ final case class FormData(fields: Uri.Query) {
         CharacterClasses.unreserved)
     HttpEntity(
         `application/x-www-form-urlencoded` withCharset charset, render.get)
-  }
-}
 
-object FormData {
+object FormData
   val Empty = FormData(Uri.Query.Empty)
 
   def apply(fields: Map[String, String]): FormData =
@@ -33,4 +31,3 @@ object FormData {
 
   def apply(fields: (String, String)*): FormData =
     if (fields.isEmpty) Empty else FormData(Uri.Query(fields: _*))
-}

@@ -6,7 +6,7 @@ import scala.scalajs.js
   *  A [[TypedArray]] of signed 32-bit integers
   */
 @js.native
-class Int32Array private extends TypedArray[Int, Int32Array] {
+class Int32Array private extends TypedArray[Int, Int32Array]
 
   /** Constructs a Int32Array with the given length. Initialized to all 0 */
   def this(length: Int) = this()
@@ -23,7 +23,6 @@ class Int32Array private extends TypedArray[Int, Int32Array] {
   /** Creates a Int32Array view on the given ArrayBuffer */
   def this(buffer: ArrayBuffer, byteOffset: Int = 0, length: Int = ???) =
     this()
-}
 
 /** <span class="badge badge-ecma6" style="float: right;">ECMAScript 6</span>
   *  [[Int32Array]] companion

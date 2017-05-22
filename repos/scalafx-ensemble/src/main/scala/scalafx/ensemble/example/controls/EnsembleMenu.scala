@@ -41,49 +41,43 @@ import scalafx.scene.layout.BorderPane
   * @see scalafx.scene.control.MenuItem
   * @resource /scalafx/ensemble/images/crumb-selected-focused.png
   */
-class EnsembleMenu extends EnsembleExample {
+class EnsembleMenu extends EnsembleExample
 
   // @stage-property width = 400
   // @stage-property height = 200
 
   val fooMenuItem = new MenuItem("foo")
 
-  def getContent = new BorderPane {
-    top = new MenuBar {
+  def getContent = new BorderPane
+    top = new MenuBar
       maxWidth = 400
       useSystemMenuBar = true
-      menus = List(new Menu("Scala") {
+      menus = List(new Menu("Scala")
         items = List(
-            new Menu("Author Info") {
-              graphic = new ImageView {
+            new Menu("Author Info")
+              graphic = new ImageView
                 image = new Image(this.getClass.getResourceAsStream(
                         "/scalafx/ensemble/images/crumb-selected-focused.png"))
                 margin = Insets(0, 0, 0, 5)
-              }
               items = List(
                   new MenuItem("Type Safe"),
                   new MenuItem("Martin Odersky")
               )
-            },
-            new Menu("Features") {
+            ,
+            new Menu("Features")
               items = List(
                   new MenuItem("Object Oriented"),
                   new MenuItem("Functional"),
                   fooMenuItem,
-                  new CheckMenuItem("""Show "foo" item""") {
+                  new CheckMenuItem("""Show "foo" item""")
                     selected = true
-                    selected.onInvalidate {
+                    selected.onInvalidate
                       fooMenuItem.setVisible(selected())
                       println("""Menu item "foo" is now """ +
                           (if (fooMenuItem.visible())
                              "" else "not") + " visible")
-                    }
-                  }
               )
-            },
+            ,
             new MenuItem("ScalaFX")
         )
-      })
-    }
-  }
-}
+      )

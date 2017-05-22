@@ -5,6 +5,5 @@ import com.intellij.psi.{PsiElement, PsiReference}
 /**
   * Pavel Fatin
   */
-object ReferenceTarget {
+object ReferenceTarget
   def unapply(e: PsiReference): Option[PsiElement] = Option(e.resolve)
-}

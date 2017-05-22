@@ -11,7 +11,7 @@ import java.util.Enumeration
   *  [[java.lang.ClassLoader]] is typing.
   */
 final class ScalaJSClassLoader(val namespace: js.Dynamic)
-    extends ClassLoader(null) {
+    extends ClassLoader(null)
 
   private def nimp: Nothing =
     throw new NotImplementedError("A ScalaJSClassLoader is a dummy. " +
@@ -27,4 +27,3 @@ final class ScalaJSClassLoader(val namespace: js.Dynamic)
   override def setDefaultAssertionStatus(enabled: Boolean): Unit = nimp
   override def setPackageAssertionStatus(
       packageName: String, enabled: Boolean): Unit = nimp
-}

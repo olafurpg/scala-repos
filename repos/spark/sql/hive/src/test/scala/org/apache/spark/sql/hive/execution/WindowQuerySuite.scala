@@ -26,9 +26,9 @@ import org.apache.spark.sql.test.SQLTestUtils
   * numerical differences or due semantic differences between Hive and Spark.
   */
 class WindowQuerySuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest with SQLTestUtils with TestHiveSingleton
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     sql("DROP TABLE IF EXISTS part")
     sql("""
         |CREATE TABLE part(
@@ -47,13 +47,11 @@ class WindowQuerySuite
     sql(s"""
          |LOAD DATA LOCAL INPATH '$testData1' overwrite into table part
       """.stripMargin)
-  }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     sql("DROP TABLE IF EXISTS part")
-  }
 
-  test("windowing.q -- 15. testExpressions") {
+  test("windowing.q -- 15. testExpressions")
     // Moved because:
     // - Spark uses a different default stddev (sample instead of pop)
     // - Tiny numerical differences in stddev results.
@@ -441,9 +439,8 @@ class WindowQuerySuite
                         23,
                         2)))
     // scalastyle:on
-  }
 
-  test("windowing.q -- 20. testSTATs") {
+  test("windowing.q -- 20. testSTATs")
     // Moved because:
     // - Spark uses a different default stddev/variance (sample instead of pop)
     // - Tiny numerical differences in aggregation results.
@@ -1339,9 +1336,8 @@ class WindowQuerySuite
                 -0.9978877469246935,
                 -5664.856666666666)))
     // scalastyle:on
-  }
 
-  test("null arguments") {
+  test("null arguments")
     checkAnswer(
         sql("""
         |select  p_mfgr, p_name, p_size,
@@ -1355,5 +1351,3 @@ class WindowQuerySuite
         |null as avg
         |from part
         """.stripMargin))
-  }
-}

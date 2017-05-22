@@ -32,7 +32,7 @@ import org.apache.spark.sql.types._
   * A set of tests for the filter conversion logic used when pushing partition pruning into the
   * metastore
   */
-class FiltersSuite extends SparkFunSuite with Logging {
+class FiltersSuite extends SparkFunSuite with Logging
   private val shim = new Shim_v0_13
 
   private val testTable =
@@ -67,16 +67,12 @@ class FiltersSuite extends SparkFunSuite with Logging {
       "skip varchar", (Literal("") === a("varchar", StringType)) :: Nil, "")
 
   private def filterTest(
-      name: String, filters: Seq[Expression], result: String) = {
-    test(name) {
+      name: String, filters: Seq[Expression], result: String) =
+    test(name)
       val converted = shim.convertFilters(testTable, filters)
-      if (converted != result) {
+      if (converted != result)
         fail(
             s"Expected filters ${filters.mkString(",")} to convert to '$result' but got '$converted'")
-      }
-    }
-  }
 
   private def a(name: String, dataType: DataType) =
     AttributeReference(name, dataType)()
-}

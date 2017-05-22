@@ -6,17 +6,16 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class NetUtilTest extends FunSuite {
-  test("NetUtil should isIpv4Address") {
+class NetUtilTest extends FunSuite
+  test("NetUtil should isIpv4Address")
     import NetUtil.isIpv4Address
 
-    for (i <- 0.to(255)) {
+    for (i <- 0.to(255))
       assert(isIpv4Address("%d.0.0.0".format(i)))
       assert(isIpv4Address("0.%d.0.0".format(i)))
       assert(isIpv4Address("0.0.%d.0".format(i)))
       assert(isIpv4Address("0.0.0.%d".format(i)))
       assert(isIpv4Address("%d.%d.%d.%d".format(i, i, i, i)))
-    }
 
     assert(!isIpv4Address(""))
     assert(!isIpv4Address("no"))
@@ -26,5 +25,3 @@ class NetUtilTest extends FunSuite {
     assert(!isIpv4Address("0.256.0.0"))
     assert(!isIpv4Address("0.0.256.0"))
     assert(!isIpv4Address("0.0.0.256"))
-  }
-}

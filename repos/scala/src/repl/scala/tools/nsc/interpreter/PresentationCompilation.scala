@@ -12,7 +12,7 @@ import scala.tools.nsc.reporters.StoreReporter
 import scala.tools.nsc.util.ClassPath.DefaultJavaContext
 import scala.tools.nsc.util.{DirectoryClassPath, MergedClassPath}
 
-trait PresentationCompilation { self: IMain =>
+trait PresentationCompilation  self: IMain =>
 
   /** Typecheck a line of REPL input, suitably wrapped with "interpreter wrapper" objects/classes, with the
     * presentation compiler. The result of this method gives access to the typechecked tree and to autocompletion
@@ -21,9 +21,9 @@ trait PresentationCompilation { self: IMain =>
     * The caller is responsible for calling [[PresentationCompileResult#cleanup]] to dispose of the compiler instance.
     */
   private[scala] def presentationCompile(
-      line: String): Either[IR.Result, PresentationCompileResult] = {
+      line: String): Either[IR.Result, PresentationCompileResult] =
     if (global == null) Left(IR.Error)
-    else {
+    else
       // special case for:
       //
       // scala> 1
@@ -32,9 +32,9 @@ trait PresentationCompilation { self: IMain =>
       // and for multi-line input.
       val line1 =
         partialInput +
-        (if (Completion.looksLikeInvocation(line)) {
+        (if (Completion.looksLikeInvocation(line))
            self.mostRecentVar + line
-         } else line)
+         else line)
       val compiler = newPresentationCompiler()
       val trees = compiler.newUnitParser(line1).parseStats()
       val importer = global.mkImporter(compiler)
@@ -51,8 +51,6 @@ trait PresentationCompilation { self: IMain =>
           richUnit,
           request.ObjectSourceCode.preambleLength + line1.length - line.length)
       Right(result)
-    }
-  }
 
   /** Create an instance of the presentation compiler with a classpath comprising the REPL's configured classpath
     * and the classes output by previously compiled REPL lines.
@@ -62,66 +60,55 @@ trait PresentationCompilation { self: IMain =>
     *
     * You may downcast the `reporter` to `StoreReporter` to access type errors.
     */
-  def newPresentationCompiler(): interactive.Global = {
+  def newPresentationCompiler(): interactive.Global =
     val replOutClasspath: DirectoryClassPath = new DirectoryClassPath(
         replOutput.dir, DefaultJavaContext)
     val mergedClasspath = new MergedClassPath[AbstractFile](
         replOutClasspath :: global.platform.classPath :: Nil,
         DefaultJavaContext)
-    def copySettings: Settings = {
+    def copySettings: Settings =
       val s = new Settings(_ => () /* ignores "bad option -nc" errors, etc */ )
       s.processArguments(global.settings.recreateArgs, processAll = false)
       s.YpresentationAnyThread.value = true
       s
-    }
     val storeReporter: StoreReporter = new StoreReporter
     val interactiveGlobal =
-      new interactive.Global(copySettings, storeReporter) { self =>
-        override lazy val platform: ThisPlatform = new JavaPlatform {
+      new interactive.Global(copySettings, storeReporter)  self =>
+        override lazy val platform: ThisPlatform = new JavaPlatform
           val global: self.type = self
 
           override def classPath: PlatformClassPath = mergedClasspath
-        }
-      }
     new interactiveGlobal.TyperRun()
     interactiveGlobal
-  }
 
-  abstract class PresentationCompileResult {
+  abstract class PresentationCompileResult
     val compiler: scala.tools.nsc.interactive.Global
     def unit: compiler.RichCompilationUnit
 
     /** The length of synthetic code the precedes the user written code */
     def preambleLength: Int
-    def cleanup(): Unit = {
+    def cleanup(): Unit =
       compiler.askShutdown()
-    }
     import compiler.CompletionResult
 
-    def completionsAt(cursor: Int): CompletionResult = {
+    def completionsAt(cursor: Int): CompletionResult =
       val pos = unit.source.position(preambleLength + cursor)
       compiler.completionsAt(pos)
-    }
     def typedTreeAt(code: String,
                     selectionStart: Int,
-                    selectionEnd: Int): compiler.Tree = {
+                    selectionEnd: Int): compiler.Tree =
       val start = selectionStart + preambleLength
       val end = selectionEnd + preambleLength
       val pos = new RangePosition(unit.source, start, start, end)
       compiler.typedTreeAt(pos)
-    }
-  }
 
-  object PresentationCompileResult {
+  object PresentationCompileResult
     def apply(compiler0: interactive.Global)(
         unit0: compiler0.RichCompilationUnit, preambleLength0: Int) =
-      new PresentationCompileResult {
+      new PresentationCompileResult
 
         override val compiler = compiler0
 
         override def unit = unit0.asInstanceOf[compiler.RichCompilationUnit]
 
         override def preambleLength = preambleLength0
-      }
-  }
-}

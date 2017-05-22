@@ -33,7 +33,7 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 abstract class BaseEvaluator[EI, Q, P, A, ER <: BaseEvaluatorResult]
-    extends AbstractDoer {
+    extends AbstractDoer
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by
@@ -51,10 +51,9 @@ abstract class BaseEvaluator[EI, Q, P, A, ER <: BaseEvaluatorResult]
       evaluation: Evaluation,
       engineEvalDataSet: Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])],
       params: WorkflowParams): ER
-}
 
 /** Base trait of evaluator result */
-trait BaseEvaluatorResult extends Serializable {
+trait BaseEvaluatorResult extends Serializable
 
   /** A short description of the result */
   def toOneLiner(): String = ""
@@ -70,4 +69,3 @@ trait BaseEvaluatorResult extends Serializable {
     */
   @Experimental
   val noSave: Boolean = false
-}

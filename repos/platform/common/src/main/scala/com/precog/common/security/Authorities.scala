@@ -35,7 +35,7 @@ import scalaz.syntax.std.boolean._
 
 import scala.annotation.tailrec
 
-case class Authorities private (accountIds: Set[AccountId]) {
+case class Authorities private (accountIds: Set[AccountId])
   def expand(ownerAccountId: AccountId) =
     this.copy(accountIds = this.accountIds + ownerAccountId)
 
@@ -46,9 +46,8 @@ case class Authorities private (accountIds: Set[AccountId]) {
       .toString
 
   def render = accountIds.mkString("[", ", ", "]")
-}
 
-object Authorities {
+object Authorities
   def apply(accountIds: NonEmptyList[AccountId]): Authorities =
     apply(accountIds.list.toSet)
 
@@ -59,24 +58,18 @@ object Authorities {
     accountIds.nonEmpty.option(apply(accountIds))
 
   implicit val AuthoritiesDecomposer: Decomposer[Authorities] =
-    new Decomposer[Authorities] {
-      override def decompose(authorities: Authorities): JValue = {
+    new Decomposer[Authorities]
+      override def decompose(authorities: Authorities): JValue =
         JObject(
             JField(
                 "uids",
                 JArray(authorities.accountIds.map(JString(_)).toList)) :: Nil)
-      }
-    }
 
   implicit val AuthoritiesExtractor: Extractor[Authorities] =
-    new Extractor[Authorities] {
+    new Extractor[Authorities]
       override def validated(obj: JValue): Validation[Error, Authorities] =
         (obj \ "uids").validated[Set[String]].map(Authorities(_))
-    }
 
-  implicit object AuthoritiesSemigroup extends Semigroup[Authorities] {
-    def append(a: Authorities, b: => Authorities): Authorities = {
+  implicit object AuthoritiesSemigroup extends Semigroup[Authorities]
+    def append(a: Authorities, b: => Authorities): Authorities =
       Authorities(a.accountIds ++ b.accountIds)
-    }
-  }
-}

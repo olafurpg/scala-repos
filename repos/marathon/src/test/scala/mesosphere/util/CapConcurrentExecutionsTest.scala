@@ -14,47 +14,43 @@ import scala.concurrent.{Future, Promise}
 
 class CapConcurrentExecutionsTest
     extends MarathonActorSupport with MarathonSpec with Matchers
-    with GivenWhenThen with ScalaFutures {
+    with GivenWhenThen with ScalaFutures
   def capMetrics: CapConcurrentExecutionsMetrics =
     new CapConcurrentExecutionsMetrics(
         new Metrics(new MetricRegistry),
         classOf[CapConcurrentExecutionsTest]
     )
 
-  test("submit successful futures after each other") {
+  test("submit successful futures after each other")
     val serialize = CapConcurrentExecutions(
         capMetrics, system, "serialize1", maxParallel = 1, maxQueued = 10)
-    try {
+    try
       val result1 = serialize(Future.successful(1)).futureValue
       result1 should be(1)
       val result2 = serialize(Future.successful(2)).futureValue
       result2 should be(2)
       val result3 = serialize(Future.successful(3)).futureValue
       result3 should be(3)
-    } finally {
+    finally
       serialize.close()
-    }
-  }
 
-  test("submit successful futures after a failure") {
+  test("submit successful futures after a failure")
     val serialize = CapConcurrentExecutions(
         capMetrics, system, "serialize2", maxParallel = 1, maxQueued = 10)
-    try {
+    try
       serialize(Future.failed(new IllegalStateException())).failed.futureValue.getClass should be(
           classOf[IllegalStateException])
       val result2 = serialize(Future.successful(2)).futureValue
       result2 should be(2)
       val result3 = serialize(Future.successful(3)).futureValue
       result3 should be(3)
-    } finally {
+    finally
       serialize.close()
-    }
-  }
 
-  test("submit successful futures after a failure to return future") {
+  test("submit successful futures after a failure to return future")
     val serialize = CapConcurrentExecutions(
         capMetrics, system, "serialize3", maxParallel = 1, maxQueued = 10)
-    try {
+    try
       serialize(throw new IllegalStateException()).failed.futureValue.getClass should be(
           classOf[IllegalStateException])
 
@@ -62,22 +58,19 @@ class CapConcurrentExecutionsTest
       result2 should be(2)
       val result3 = serialize(Future.successful(3)).futureValue
       result3 should be(3)
-    } finally {
+    finally
       serialize.close()
-    }
-  }
 
-  test("concurrent executions are serialized if maxParallel has been reached") {
+  test("concurrent executions are serialized if maxParallel has been reached")
     val metrics = capMetrics
     val serialize = CapConcurrentExecutions(
         metrics, system, "serialize4", maxParallel = 2, maxQueued = 10)
-    def submitPromise(): (Promise[Unit], Future[Unit]) = {
+    def submitPromise(): (Promise[Unit], Future[Unit]) =
       val promise = Promise[Unit]()
       val result = serialize.apply(promise.future)
       (promise, result)
-    }
 
-    try {
+    try
       When("three promises are submitted but do not finish")
       val (promise1, result1) = submitPromise()
       val (promise2, result2) = submitPromise()
@@ -119,23 +112,20 @@ class CapConcurrentExecutionsTest
 
       And("all futures have been timed")
       metrics.processingTimer.invocationCount should be(3)
-    } finally {
+    finally
       serialize.close()
-    }
-  }
 
   test(
-      "queued executions are failed on stop, results of already executing futures are left untouched") {
+      "queued executions are failed on stop, results of already executing futures are left untouched")
     val metrics = capMetrics
     val serialize = CapConcurrentExecutions(
         metrics, system, "serialize5", maxParallel = 2, maxQueued = 10)
-    def submitPromise(): (Promise[Unit], Future[Unit]) = {
+    def submitPromise(): (Promise[Unit], Future[Unit]) =
       val promise = Promise[Unit]()
       val result = serialize.apply(promise.future)
       (promise, result)
-    }
 
-    try {
+    try
       When("three promises are submitted but do not finish")
       val (promise1, result1) = submitPromise()
       val (promise2, result2) = submitPromise()
@@ -167,8 +157,5 @@ class CapConcurrentExecutionsTest
 
       result1.futureValue should be(())
       result2.futureValue should be(())
-    } finally {
+    finally
       serialize.close()
-    }
-  }
-}

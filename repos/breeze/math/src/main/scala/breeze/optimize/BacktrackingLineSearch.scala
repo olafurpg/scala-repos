@@ -18,7 +18,7 @@ class BacktrackingLineSearch(initfval: Double,
                              maxAlpha: Double = 1E10,
                              enforceWolfeConditions: Boolean = true,
                              enforceStrongWolfeConditions: Boolean = true)
-    extends ApproximateLineSearch {
+    extends ApproximateLineSearch
   require(shrinkStep * growStep != 1.0,
           "Can't do a line search with growStep * shrinkStep == 1.0")
   require(cArmijo < 0.5)
@@ -26,39 +26,33 @@ class BacktrackingLineSearch(initfval: Double,
   require(cWolfe > cArmijo)
   require(cWolfe < 1.0)
   def iterations(
-      f: DiffFunction[Double], init: Double = 1.0): Iterator[State] = {
+      f: DiffFunction[Double], init: Double = 1.0): Iterator[State] =
     val (f0, df0) = f.calculate(0.0)
     val initfderiv = f.calculate(init)._2
     //val (initfval, initfderiv) = f.calculate(init)
     Iterator
-      .iterate((State(init, initfval, initfderiv), false, 0)) {
+      .iterate((State(init, initfval, initfderiv), false, 0))
         case (state @ State(alpha, fval, fderiv), _, iter) =>
           val multiplier =
-            if (fval > f0 + alpha * df0 * cArmijo) {
+            if (fval > f0 + alpha * df0 * cArmijo)
               shrinkStep
-            } else if (enforceWolfeConditions && (fderiv < cWolfe * df0)) {
+            else if (enforceWolfeConditions && (fderiv < cWolfe * df0))
               growStep
-            } else if (enforceStrongWolfeConditions && (fderiv > -cWolfe * df0)) {
+            else if (enforceStrongWolfeConditions && (fderiv > -cWolfe * df0))
               shrinkStep
-            } else {
+            else
               1.0
-            }
-          if (multiplier == 1.0) {
+          if (multiplier == 1.0)
             (state, true, iter)
-          } else {
+          else
             val newAlpha = alpha * multiplier
-            if (iter >= maxIterations) {
+            if (iter >= maxIterations)
               throw new LineSearchFailed(0.0, 0.0)
-            } else if (newAlpha < minAlpha) {
+            else if (newAlpha < minAlpha)
               throw new StepSizeUnderflow()
-            } else if (newAlpha > maxAlpha) {
+            else if (newAlpha > maxAlpha)
               throw new StepSizeOverflow()
-            }
             val (fvalnew, fderivnew) = f.calculate(newAlpha)
             (State(newAlpha, fvalnew, fderivnew), false, iter + 1)
-          }
-      }
       .takeWhile(triple => !triple._2 && (triple._3 < maxIterations))
       .map(_._1)
-  }
-}

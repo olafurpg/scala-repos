@@ -31,11 +31,11 @@ import scala.language.postfixOps
 
 class AppsResourceTest
     extends MarathonSpec with MarathonActorSupport with Matchers with Mockito
-    with GivenWhenThen {
+    with GivenWhenThen
 
   import mesosphere.marathon.api.v2.json.Formats._
 
-  test("Create a new app successfully") {
+  test("Create a new app successfully")
     Given("An app and group")
     val app = AppDefinition(id = PathId("/app"),
                             cmd = Some("cmd"),
@@ -66,9 +66,8 @@ class AppsResourceTest
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
       .correspondsToJsonOf(expected)
-  }
 
-  test("Create a new app fails with Validation errors for negative resources") {
+  test("Create a new app fails with Validation errors for negative resources")
     Given("An app with negative resources")
     var app = AppDefinition(id = PathId("/app"),
                             cmd = Some("cmd"),
@@ -112,9 +111,8 @@ class AppsResourceTest
 
     response = appsResource.create(body, false, auth.request)
     response.getStatus should be(422)
-  }
 
-  test("Create a new app successfully using ports instead of portDefinitions") {
+  test("Create a new app successfully using ports instead of portDefinitions")
     Given("An app and group")
     val app = AppDefinition(
         id = PathId("/app"),
@@ -152,9 +150,8 @@ class AppsResourceTest
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
       .correspondsToJsonOf(expected)
-  }
 
-  test("Create a new app fails with Validation errors") {
+  test("Create a new app fails with Validation errors")
     Given("An app with validation errors")
     val app = AppDefinition(id = PathId("/app"))
     val group = Group(PathId("/"), Set(app))
@@ -166,9 +163,8 @@ class AppsResourceTest
     Then("A constraint violation exception is thrown")
     val response = appsResource.create(body, false, auth.request)
     response.getStatus should be(422)
-  }
 
-  test("Create a new app with float instance count fails") {
+  test("Create a new app with float instance count fails")
     Given("The json of an invalid application")
     val invalidAppJson = Json.stringify(
         Json.obj("id" -> "/foo", "cmd" -> "cmd", "instances" -> 0.1))
@@ -180,12 +176,10 @@ class AppsResourceTest
 
     Then("A constraint violation exception is thrown")
     val body = invalidAppJson.getBytes("UTF-8")
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       appsResource.create(body, false, auth.request)
-    }
-  }
 
-  test("Replace an existing application") {
+  test("Replace an existing application")
     Given("An app and group")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -201,10 +195,9 @@ class AppsResourceTest
 
     Then("The application is updated")
     response.getStatus should be(200)
-  }
 
   test(
-      "Replace an existing application using ports instead of portDefinitions") {
+      "Replace an existing application using ports instead of portDefinitions")
     Given("An app and group")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -225,10 +218,9 @@ class AppsResourceTest
 
     Then("The application is updated")
     response.getStatus should be(200)
-  }
 
   test(
-      "Replace an existing application fails due to docker container validation") {
+      "Replace an existing application fails due to docker container validation")
     Given("An app update with an invalid container (missing docker field)")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -250,10 +242,9 @@ class AppsResourceTest
     response.getStatus should be(422)
     response.getEntity.toString should include("/container/docker")
     response.getEntity.toString should include("must not be empty")
-  }
 
   test(
-      "Creating an app with broken volume definition fails with readable error message") {
+      "Creating an app with broken volume definition fails with readable error message")
     Given("An app update with an invalid volume (wrong field name)")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -287,10 +278,9 @@ class AppsResourceTest
     response.getEntity.toString should include(
         "/container/volumes(0)/hostPath")
     response.getEntity.toString should include("must not be empty")
-  }
 
   test(
-      "Replace an existing application fails due to mesos container validation") {
+      "Replace an existing application fails due to mesos container validation")
     Given("An app update with an invalid container (missing docker field)")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val group = Group(PathId("/"), Set(app))
@@ -315,9 +305,8 @@ class AppsResourceTest
     response.getStatus should be(422)
     response.getEntity.toString should include("/container/docker")
     response.getEntity.toString should include("must be empty")
-  }
 
-  test("Restart an existing app") {
+  test("Restart an existing app")
     val app = AppDefinition(id = PathId("/app"))
     val group = Group(PathId("/"), Set(app))
     val plan = DeploymentPlan(group, group)
@@ -329,21 +318,18 @@ class AppsResourceTest
     val response =
       appsResource.restart(app.id.toString, force = true, auth.request)
     response.getStatus should be(200)
-  }
 
-  test("Restart a non existing app will fail") {
+  test("Restart a non existing app will fail")
     val missing = PathId("/app")
     groupManager.app(PathId("/app")) returns Future.successful(None)
 
     groupManager.updateApp(any, any, any, any, any) returns Future.failed(
         new UnknownAppException(missing))
 
-    intercept[UnknownAppException] {
+    intercept[UnknownAppException]
       appsResource.restart(missing.toString, force = true, auth.request)
-    }
-  }
 
-  test("Index has counts and deployments by default (regression for #2171)") {
+  test("Index has counts and deployments by default (regression for #2171)")
     Given("An app and group")
     val app = AppDefinition(id = PathId("/app"), cmd = Some("foo"))
     val expectedEmbeds: Set[Embed] = Set(Embed.Counts, Embed.Deployments)
@@ -363,9 +349,8 @@ class AppsResourceTest
     (appJson \ "apps" \\ "deployments" head) should be(
         Json.arr(Json.obj("id" -> "deployment-123")))
     (appJson \ "apps" \\ "tasksStaged" head) should be(JsNumber(1))
-  }
 
-  test("Search apps can be filtered") {
+  test("Search apps can be filtered")
     val app1 = AppDefinition(id = PathId("/app/service-a"),
                              cmd = Some("party hard"),
                              labels = Map("a" -> "1", "b" -> "2"))
@@ -376,10 +361,9 @@ class AppsResourceTest
 
     def search(cmd: Option[String],
                id: Option[String],
-               label: Option[String]): Set[AppDefinition] = {
+               label: Option[String]): Set[AppDefinition] =
       val selector = appsResource.search(cmd, id, label)
       apps.filter(selector.matches)
-    }
 
     search(cmd = None, id = None, label = None) should be(Set(app1, app2))
     search(cmd = Some(""), id = None, label = None) should be(Set(app1, app2))
@@ -411,9 +395,8 @@ class AppsResourceTest
         Set(app1))
     search(cmd = Some(""), id = Some(""), label = Some("")) should be(
         Set(app1, app2))
-  }
 
-  test("access without authentication is denied") {
+  test("access without authentication is denied")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -456,9 +439,8 @@ class AppsResourceTest
     val restart = appsResource.restart("", false, req)
     Then("we receive a NotAuthenticated response")
     restart.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
-  test("access without authorization is denied") {
+  test("access without authorization is denied")
     Given("A real Group Manager with one app")
     useRealGroupManager()
     val group = Group(PathId.empty, apps = Set(AppDefinition("/a".toRootPath)))
@@ -504,18 +486,14 @@ class AppsResourceTest
     val restart = appsResource.restart("/a", false, req)
     Then("we receive a NotAuthorized response")
     restart.getStatus should be(auth.UnauthorizedStatus)
-  }
 
-  test("access with limited authorization gives a filtered apps listing") {
+  test("access with limited authorization gives a filtered apps listing")
     Given("An authorized identity with limited ACL's")
     auth.authFn = (resource: Any) =>
-      {
-        val id = resource match {
+        val id = resource match
           case app: AppDefinition => app.id.toString
           case _ => resource.asInstanceOf[Group].id.toString
-        }
         id.startsWith("/visible")
-    }
     implicit val identity = auth.identity
     val selector = appsResource.selectAuthorized(AppSelector.forall(Seq.empty))
     val apps = Seq(
@@ -533,9 +511,8 @@ class AppsResourceTest
     filtered should have size 2
     filtered.head should be(AppDefinition("/visible/app".toPath))
     filtered(1) should be(AppDefinition("/visible/other/foo/app".toPath))
-  }
 
-  test("delete with authorization gives a 404 if the app doesn't exist") {
+  test("delete with authorization gives a 404 if the app doesn't exist")
     Given("An authenticated identity with full access")
     auth.authenticated = true
     auth.authorized = false
@@ -549,7 +526,6 @@ class AppsResourceTest
 
     Then("A 404 is returned")
     intercept[UnknownAppException] { appsResource.delete(false, "/foo", req) }
-  }
 
   var clock: ConstantClock = _
   var eventBus: EventStream = _
@@ -567,7 +543,7 @@ class AppsResourceTest
   var appTaskResource: AppTasksResource = _
   var groupRepository: GroupRepository = _
 
-  before {
+  before
     clock = ConstantClock()
     auth = new TestAuthFixture
     eventBus = mock[EventStream]
@@ -592,9 +568,8 @@ class AppsResourceTest
         auth.auth,
         groupManager
     )
-  }
 
-  private[this] def useRealGroupManager(): Unit = {
+  private[this] def useRealGroupManager(): Unit =
     val f = new TestGroupManagerFixture()
     service = f.service
     config = f.config
@@ -613,5 +588,3 @@ class AppsResourceTest
         auth.auth,
         groupManager
     )
-  }
-}

@@ -9,48 +9,42 @@ import akka.event.Logging._
 import akka.event.LoggingAdapter
 import akka.http.scaladsl.model._
 
-trait DebuggingDirectives {
+trait DebuggingDirectives
   import BasicDirectives._
 
   /**
     * Produces a log entry for every incoming request.
     */
   def logRequest(magnet: LoggingMagnet[HttpRequest ⇒ Unit]): Directive0 =
-    extractRequestContext.flatMap { ctx ⇒
+    extractRequestContext.flatMap  ctx ⇒
       magnet.f(ctx.log)(ctx.request)
       pass
-    }
 
   /**
     * Produces a log entry for every [[RouteResult]].
     */
   def logResult(magnet: LoggingMagnet[RouteResult ⇒ Unit]): Directive0 =
-    extractRequestContext.flatMap { ctx ⇒
-      mapRouteResult { result ⇒
+    extractRequestContext.flatMap  ctx ⇒
+      mapRouteResult  result ⇒
         magnet.f(ctx.log)(result)
         result
-      }
-    }
 
   /**
     * Produces a log entry for every incoming request and [[RouteResult]].
     */
   def logRequestResult(
       magnet: LoggingMagnet[HttpRequest ⇒ RouteResult ⇒ Unit]): Directive0 =
-    extractRequestContext.flatMap { ctx ⇒
+    extractRequestContext.flatMap  ctx ⇒
       val logResult = magnet.f(ctx.log)(ctx.request)
-      mapRouteResult { result ⇒
+      mapRouteResult  result ⇒
         logResult(result)
         result
-      }
-    }
-}
 
 object DebuggingDirectives extends DebuggingDirectives
 
 case class LoggingMagnet[T](f: LoggingAdapter ⇒ T) // # logging-magnet
 
-object LoggingMagnet {
+object LoggingMagnet
   implicit def forMessageFromMarker[T](
       marker: String): LoggingMagnet[T ⇒ Unit] =
     // # message-magnets
@@ -59,11 +53,10 @@ object LoggingMagnet {
   implicit def forMessageFromMarkerAndLevel[T](
       markerAndLevel: (String, LogLevel)): LoggingMagnet[T ⇒ Unit] =
     // # message-magnets
-    forMessageFromFullShow[T] {
+    forMessageFromFullShow[T]
       val (marker, level) = markerAndLevel
       Message ⇒
         LogEntry(Message, marker, level)
-    }
 
   implicit def forMessageFromShow[T](
       show: T ⇒ String): LoggingMagnet[T ⇒ Unit] =
@@ -83,7 +76,7 @@ object LoggingMagnet {
   implicit def forRequestResponseFromMarkerAndLevel(markerAndLevel: (String,
       LogLevel)): LoggingMagnet[HttpRequest ⇒ RouteResult ⇒ Unit] =
     // # request-response-magnets
-    forRequestResponseFromFullShow {
+    forRequestResponseFromFullShow
       val (marker, level) = markerAndLevel
       request ⇒ response ⇒
         Some(
@@ -91,26 +84,20 @@ object LoggingMagnet {
                      "\n  Response: " + response,
                      marker,
                      level))
-    }
 
   implicit def forRequestResponseFromFullShow(
       show: HttpRequest ⇒ RouteResult ⇒ Option[LogEntry])
     : LoggingMagnet[HttpRequest ⇒ RouteResult ⇒ Unit] =
     // # request-response-magnets
-    LoggingMagnet { log ⇒ request ⇒
+    LoggingMagnet  log ⇒ request ⇒
       val showResult = show(request)
       result ⇒
         showResult(result).foreach(_.logTo(log))
-    }
-}
 
-case class LogEntry(obj: Any, level: LogLevel = DebugLevel) {
-  def logTo(log: LoggingAdapter): Unit = {
+case class LogEntry(obj: Any, level: LogLevel = DebugLevel)
+  def logTo(log: LoggingAdapter): Unit =
     log.log(level, obj.toString)
-  }
-}
 
-object LogEntry {
+object LogEntry
   def apply(obj: Any, marker: String, level: LogLevel): LogEntry =
     LogEntry(if (marker.isEmpty) obj else marker + ": " + obj, level)
-}

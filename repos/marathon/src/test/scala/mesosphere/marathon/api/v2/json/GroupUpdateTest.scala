@@ -5,9 +5,9 @@ import com.wix.accord.validate
 import org.scalatest.{GivenWhenThen, Matchers, FunSuite}
 import PathId._
 
-class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
+class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen
 
-  test("A group update can be applied to an empty group") {
+  test("A group update can be applied to an empty group")
     Given("An empty group with updates")
     val group = Group.empty
     val update = GroupUpdate(
@@ -48,9 +48,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     app.id.toString should be("/apps/app1")
     app.dependencies should be(
         Set("/apps/d1".toPath, "/test/foo".toPath, "/test".toPath))
-  }
 
-  test("A group update can be applied to existing entries") {
+  test("A group update can be applied to existing entries")
     Given("A group with updates of existing nodes")
     val actual = Group(
         PathId.empty,
@@ -101,9 +100,8 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     app.id.toString should be("/apps/app1")
     app.dependencies should be(
         Set("/apps/d1".toPath, "/test/foo".toPath, "/test".toPath))
-  }
 
-  test("GroupUpdate will update a Group correctly") {
+  test("GroupUpdate will update a Group correctly")
     Given("An existing group with two subgroups")
     val current = Group(
         "/test".toPath,
@@ -151,24 +149,19 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     group1.apps.head.id should be("/test/group1/app3".toPath)
     group3.id should be("/test/group3".toPath)
     group3.apps should be('empty)
-  }
 
-  test("A group update should not contain a version") {
+  test("A group update should not contain a version")
     val update = GroupUpdate(None, version = Some(Timestamp.now()))
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       update(Group.empty, Timestamp.now())
-    }
-  }
 
-  test("A group update should not contain a scaleBy") {
+  test("A group update should not contain a scaleBy")
     val update = GroupUpdate(None, scaleBy = Some(3))
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       update(Group.empty, Timestamp.now())
-    }
-  }
 
   test(
-      "Relative path of a dependency, should be relative to group and not to the app") {
+      "Relative path of a dependency, should be relative to group and not to the app")
     Given("A group with two apps. Second app is dependend of first.")
     val update = GroupUpdate(
         PathId.empty,
@@ -194,5 +187,3 @@ class GroupUpdateTest extends FunSuite with Matchers with GivenWhenThen {
     group.get.apps should have size 2
     val dependentApp = group.get.app("/test-group/test-app2".toPath).get
     dependentApp.dependencies should be(Set("/test-group/test-app1".toPath))
-  }
-}

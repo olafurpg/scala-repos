@@ -14,9 +14,9 @@ final class Env(config: Config,
                 shutup: ActorSelection,
                 hub: lila.hub.Env,
                 detectLanguage: DetectLanguage,
-                system: ActorSystem) {
+                system: ActorSystem)
 
-  private val settings = new {
+  private val settings = new
     val TopicMaxPerPage = config getInt "topic.max_per_page"
     val PostMaxPerPage = config getInt "post.max_per_page"
     val RecentTtl = config duration "recent.ttl"
@@ -27,7 +27,6 @@ final class Env(config: Config,
     val ActorName = config getString "actor.name"
     import scala.collection.JavaConversions._
     val PublicCategIds = (config getStringList "public_categ_ids").toList
-  }
   import settings._
 
   lazy val categApi = new CategApi(env = this)
@@ -51,26 +50,22 @@ final class Env(config: Config,
   lazy val forms = new DataForm(hub.actor.captcher)
   lazy val recent = new Recent(postApi, RecentTtl, RecentNb, PublicCategIds)
 
-  def cli = new lila.common.Cli {
+  def cli = new lila.common.Cli
     import tube._
-    def process = {
+    def process =
       case "forum" :: "denormalize" :: Nil =>
         topicApi.denormalize >> categApi.denormalize inject "Forum denormalized"
-    }
-  }
 
-  system.actorOf(Props(new Actor {
-    def receive = {
+  system.actorOf(Props(new Actor
+    def receive =
       case MakeTeam(id, name) => categApi.makeTeam(id, name)
-    }
-  }), name = ActorName)
+  ), name = ActorName)
 
   private[forum] lazy val categColl = db(CollectionCateg)
   private[forum] lazy val topicColl = db(CollectionTopic)
   private[forum] lazy val postColl = db(CollectionPost)
-}
 
-object Env {
+object Env
 
   private def hub = lila.hub.Env.current
 
@@ -84,4 +79,3 @@ object Env {
         detectLanguage = DetectLanguage(
               lila.common.PlayApp loadConfig "detectlanguage"),
         system = lila.common.PlayApp.system)
-}

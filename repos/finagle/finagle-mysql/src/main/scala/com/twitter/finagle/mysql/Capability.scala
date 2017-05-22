@@ -1,6 +1,6 @@
 package com.twitter.finagle.exp.mysql
 
-object Capability {
+object Capability
   val LongPassword = 0x1 // new more secure passwords
   val FoundRows = 0x2 // Found instead of affected rows
   val LongFlag = 0x4 // Get all column flags
@@ -56,25 +56,21 @@ object Capability {
       Capability.LocalFiles
   )
 
-  def apply(flags: Int*): Capability = {
+  def apply(flags: Int*): Capability =
     val m = flags.foldLeft(0)(_ | _)
     Capability(m)
-  }
-}
 
-case class Capability(mask: Int) {
+case class Capability(mask: Int)
   def +(flag: Int) = Capability(mask, flag)
   def -(flag: Int) = Capability(mask & ~flag)
   def has(flag: Int) = hasAll(flag)
   def hasAll(flags: Int*) =
-    flags map { f: Int =>
+    flags map  f: Int =>
       (f & mask) > 0
-    } reduceLeft { _ && _ }
-  override def toString() = {
+    reduceLeft { _ && _ }
+  override def toString() =
     val cs =
-      Capability.CapabilityMap filter { t =>
+      Capability.CapabilityMap filter  t =>
         has(t._2)
-      } map { _._1 } mkString (", ")
+      map { _._1 } mkString (", ")
     "Capability(" + mask + ": " + cs + ")"
-  }
-}

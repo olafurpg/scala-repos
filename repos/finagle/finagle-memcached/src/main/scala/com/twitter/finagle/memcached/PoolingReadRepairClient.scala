@@ -16,33 +16,30 @@ class PoolingReadRepairClient(
     readRepairCount: Int = 1,
     futurePool: FuturePool = new ExecutorServiceFuturePool(
           Executors.newCachedThreadPool()))
-    extends Client {
+    extends Client
 
   val rand = new Random()
 
-  def getResult(keys: Iterable[String]) = {
+  def getResult(keys: Iterable[String]) =
     val clients = getSubsetOfClients()
     val futures = clients.map(_.getResult(keys))
-    if (futures.size == 1) {
+    if (futures.size == 1)
       // Don't bother being fancy, just GTFO
       futures.head
-    } else {
+    else
       // We construct a return value future that we will update manually ourselves
       // to accomodate the more complicated logic.
       val answer = new Promise[GetResult]
 
       // First pass: return the first complete, correct answer from the clients
-      val futureAttempts = futures.map { future =>
-        future.map { result =>
-          if (result.hits.size == keys.size) {
+      val futureAttempts = futures.map  future =>
+        future.map  result =>
+          if (result.hits.size == keys.size)
             answer.updateIfEmpty(Try(result))
-          }
           result
-        }
-      }
 
       // Second pass
-      Future.collect(futureAttempts).map { results =>
+      Future.collect(futureAttempts).map  results =>
         // Generate the union of the clients answers, and call it truth
         val canon = results.foldLeft(new GetResult())(_ ++ _)
 
@@ -50,35 +47,27 @@ class PoolingReadRepairClient(
         answer.updateIfEmpty(Try(canon))
 
         // Read-repair clients that had partial values
-        results.zip(clients).map { tuple =>
+        results.zip(clients).map  tuple =>
           val missing = canon.hits -- tuple._1.hits.keys
-          missing.map { hit =>
+          missing.map  hit =>
             set(hit._1, hit._2.value)
-          }
-        }
-      }
 
       answer
-    }
-  }
 
-  def getSubsetOfClients() = {
+  def getSubsetOfClients() =
     val num =
       if (rand.nextFloat < readRepairProbability) readRepairCount + 1 else 1
     val buf = new ArrayBuffer[BaseClient[Buf]]
     allClients.copyToBuffer(buf)
-    while (buf.size > num) {
+    while (buf.size > num)
       buf.remove(rand.nextInt(buf.size))
-    }
     buf.toSeq
-  }
 
   def release() = allClients.map(_.release())
-  def set(key: String, flags: Int, expiry: Time, value: Buf) = {
+  def set(key: String, flags: Int, expiry: Time, value: Buf) =
     val futures = allClients.map(_.set(key, flags, expiry, value))
     val base = futures.head
     futures.tail.foldLeft(base)(_.or(_))
-  }
 
   def delete(key: String) =
     Future.collect(allClients.map(_.delete(key))).map(_.exists(x => x))
@@ -95,4 +84,3 @@ class PoolingReadRepairClient(
   def append(key: String, flags: Int, expiry: Time, value: Buf) = unsupported
   def add(key: String, flags: Int, expiry: Time, value: Buf) = unsupported
   private def unsupported = throw new UnsupportedOperationException
-}

@@ -13,25 +13,21 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   */
 class RemoveBracesForSingleImportQuickFix(importExpr: ScImportExpr)
     extends AbstractFixOnPsiElement(
-        ScalaBundle.message("remove.braces.from.import"), importExpr) {
-  def doApplyFix(project: Project) {
+        ScalaBundle.message("remove.braces.from.import"), importExpr)
+  def doApplyFix(project: Project)
     val iExpr = getElement
     if (!iExpr.isValid) return
 
     val buf = new StringBuilder
     buf.append(iExpr.qualifier.getText).append(".")
 
-    if (iExpr.singleWildcard) {
+    if (iExpr.singleWildcard)
       buf.append("_")
-    } else {
+    else
       buf.append(iExpr.getNames(0))
-    }
 
     val newImportExpr = ScalaPsiElementFactory.createImportExprFromText(
         buf.toString(), iExpr.getManager)
 
-    inWriteAction {
+    inWriteAction
       iExpr.replace(newImportExpr)
-    }
-  }
-}

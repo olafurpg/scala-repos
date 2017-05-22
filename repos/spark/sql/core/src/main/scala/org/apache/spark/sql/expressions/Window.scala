@@ -36,48 +36,42 @@ import org.apache.spark.sql.catalyst.expressions._
   * @since 1.4.0
   */
 @Experimental
-object Window {
+object Window
 
   /**
     * Creates a [[WindowSpec]] with the partitioning defined.
     * @since 1.4.0
     */
   @scala.annotation.varargs
-  def partitionBy(colName: String, colNames: String*): WindowSpec = {
+  def partitionBy(colName: String, colNames: String*): WindowSpec =
     spec.partitionBy(colName, colNames: _*)
-  }
 
   /**
     * Creates a [[WindowSpec]] with the partitioning defined.
     * @since 1.4.0
     */
   @scala.annotation.varargs
-  def partitionBy(cols: Column*): WindowSpec = {
+  def partitionBy(cols: Column*): WindowSpec =
     spec.partitionBy(cols: _*)
-  }
 
   /**
     * Creates a [[WindowSpec]] with the ordering defined.
     * @since 1.4.0
     */
   @scala.annotation.varargs
-  def orderBy(colName: String, colNames: String*): WindowSpec = {
+  def orderBy(colName: String, colNames: String*): WindowSpec =
     spec.orderBy(colName, colNames: _*)
-  }
 
   /**
     * Creates a [[WindowSpec]] with the ordering defined.
     * @since 1.4.0
     */
   @scala.annotation.varargs
-  def orderBy(cols: Column*): WindowSpec = {
+  def orderBy(cols: Column*): WindowSpec =
     spec.orderBy(cols: _*)
-  }
 
-  private def spec: WindowSpec = {
+  private def spec: WindowSpec =
     new WindowSpec(Seq.empty, Seq.empty, UnspecifiedFrame)
-  }
-}
 
 /**
   * :: Experimental ::

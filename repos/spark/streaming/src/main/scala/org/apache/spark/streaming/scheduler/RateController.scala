@@ -33,7 +33,7 @@ import org.apache.spark.util.{ThreadUtils, Utils}
   */
 private[streaming] abstract class RateController(
     val streamUID: Int, rateEstimator: RateEstimator)
-    extends StreamingListener with Serializable {
+    extends StreamingListener with Serializable
 
   init()
 
@@ -48,47 +48,40 @@ private[streaming] abstract class RateController(
   /**
     * An initialization method called both from the constructor and Serialization code.
     */
-  private def init() {
+  private def init()
     executionContext = ExecutionContext.fromExecutorService(
         ThreadUtils.newDaemonSingleThreadExecutor("stream-rate-update"))
     rateLimit = new AtomicLong(-1L)
-  }
 
   private def readObject(ois: ObjectInputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       ois.defaultReadObject()
       init()
-    }
 
   /**
     * Compute the new rate limit and publish it asynchronously.
     */
   private def computeAndPublish(
       time: Long, elems: Long, workDelay: Long, waitDelay: Long): Unit =
-    Future[Unit] {
+    Future[Unit]
       val newRate = rateEstimator.compute(time, elems, workDelay, waitDelay)
-      newRate.foreach { s =>
+      newRate.foreach  s =>
         rateLimit.set(s.toLong)
         publish(getLatestRate())
-      }
-    }
 
   def getLatestRate(): Long = rateLimit.get()
 
   override def onBatchCompleted(
-      batchCompleted: StreamingListenerBatchCompleted) {
+      batchCompleted: StreamingListenerBatchCompleted)
     val elements = batchCompleted.batchInfo.streamIdToInputInfo
 
-    for {
+    for
       processingEnd <- batchCompleted.batchInfo.processingEndTime
       workDelay <- batchCompleted.batchInfo.processingDelay
       waitDelay <- batchCompleted.batchInfo.schedulingDelay
       elems <- elements.get(streamUID).map(_.numRecords)
-    } computeAndPublish(processingEnd, elems, workDelay, waitDelay)
-  }
-}
+    computeAndPublish(processingEnd, elems, workDelay, waitDelay)
 
-object RateController {
+object RateController
   def isBackPressureEnabled(conf: SparkConf): Boolean =
     conf.getBoolean("spark.streaming.backpressure.enabled", false)
-}

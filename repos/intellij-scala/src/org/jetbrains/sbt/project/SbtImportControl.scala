@@ -16,7 +16,7 @@ class SbtImportControl
         SbtProjectSystem.Id,
         SbtSystemSettings.getInstance(
             ProjectManager.getInstance.getDefaultProject),
-        SbtProjectSettings.default) {
+        SbtProjectSettings.default)
 
   def getLinkedProjectChooserDescriptor =
     new FileChooserDescriptor(true, true, true, true, true, true)
@@ -28,4 +28,3 @@ class SbtImportControl
 
   def createSystemSettingsControl(settings: SbtSystemSettings) =
     new SbtSystemSettingsControl(settings)
-}

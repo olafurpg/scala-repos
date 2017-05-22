@@ -32,41 +32,31 @@ import org.apache.spark.util.IntParam
 /**
   * Use this singleton to get or register a Broadcast variable.
   */
-object WordBlacklist {
+object WordBlacklist
 
   @volatile private var instance: Broadcast[Seq[String]] = null
 
-  def getInstance(sc: SparkContext): Broadcast[Seq[String]] = {
-    if (instance == null) {
-      synchronized {
-        if (instance == null) {
+  def getInstance(sc: SparkContext): Broadcast[Seq[String]] =
+    if (instance == null)
+      synchronized
+        if (instance == null)
           val wordBlacklist = Seq("a", "b", "c")
           instance = sc.broadcast(wordBlacklist)
-        }
-      }
-    }
     instance
-  }
-}
 
 /**
   * Use this singleton to get or register an Accumulator.
   */
-object DroppedWordsCounter {
+object DroppedWordsCounter
 
   @volatile private var instance: Accumulator[Long] = null
 
-  def getInstance(sc: SparkContext): Accumulator[Long] = {
-    if (instance == null) {
-      synchronized {
-        if (instance == null) {
+  def getInstance(sc: SparkContext): Accumulator[Long] =
+    if (instance == null)
+      synchronized
+        if (instance == null)
           instance = sc.accumulator(0L, "WordsInBlacklistCounter")
-        }
-      }
-    }
     instance
-  }
-}
 
 /**
   * Counts words in text encoded with UTF8 received from the network every second. This example also
@@ -96,12 +86,12 @@ object DroppedWordsCounter {
   *
   * Refer to the online documentation for more details.
   */
-object RecoverableNetworkWordCount {
+object RecoverableNetworkWordCount
 
   def createContext(ip: String,
                     port: Int,
                     outputPath: String,
-                    checkpointDirectory: String): StreamingContext = {
+                    checkpointDirectory: String): StreamingContext =
 
     // If you do not see this printed, that means the StreamingContext has been loaded
     // from the new checkpoint
@@ -120,33 +110,30 @@ object RecoverableNetworkWordCount {
     val wordCounts = words.map(x => (x, 1)).reduceByKey(_ + _)
     wordCounts.foreachRDD(
         (rdd: RDD[(String, Int)], time: Time) =>
-          {
         // Get or register the blacklist Broadcast
         val blacklist = WordBlacklist.getInstance(rdd.sparkContext)
         // Get or register the droppedWordsCounter Accumulator
         val droppedWordsCounter =
           DroppedWordsCounter.getInstance(rdd.sparkContext)
         // Use blacklist to drop words and use droppedWordsCounter to count them
-        val counts = rdd.filter {
+        val counts = rdd.filter
           case (word, count) =>
-            if (blacklist.value.contains(word)) {
+            if (blacklist.value.contains(word))
               droppedWordsCounter += count
               false
-            } else {
+            else
               true
-            }
-        }.collect().mkString("[", ", ", "]")
+        .collect().mkString("[", ", ", "]")
         val output = "Counts at time " + time + " " + counts
         println(output)
         println("Dropped " + droppedWordsCounter.value + " word(s) totally")
         println("Appending to " + outputFile.getAbsolutePath)
         Files.append(output + "\n", outputFile, Charset.defaultCharset())
-    })
+    )
     ssc
-  }
 
-  def main(args: Array[String]) {
-    if (args.length != 4) {
+  def main(args: Array[String])
+    if (args.length != 4)
       System.err.println("You arguments were " + args.mkString("[", ", ", "]"))
       System.err.println(
           """
@@ -161,16 +148,12 @@ object RecoverableNetworkWordCount {
         """.stripMargin
       )
       System.exit(1)
-    }
     val Array(ip, IntParam(port), checkpointDirectory, outputPath) = args
     val ssc = StreamingContext.getOrCreate(
         checkpointDirectory,
         () =>
-          {
             createContext(ip, port, outputPath, checkpointDirectory)
-        })
+        )
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 // scalastyle:on println

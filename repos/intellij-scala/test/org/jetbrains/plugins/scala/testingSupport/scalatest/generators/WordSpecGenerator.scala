@@ -6,12 +6,12 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 10.02.2015.
   */
-trait WordSpecGenerator extends ScalaTestTestCase {
+trait WordSpecGenerator extends ScalaTestTestCase
   def wordSpecClassName = "WordSpecTest"
 
   def wordSpecFileName = wordSpecClassName + ".scala"
 
-  def addWordSpec() {
+  def addWordSpec()
     addFileToProject("WordSpecTest.scala",
                      """
         |import org.scalatest._
@@ -34,5 +34,3 @@ trait WordSpecGenerator extends ScalaTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
-}

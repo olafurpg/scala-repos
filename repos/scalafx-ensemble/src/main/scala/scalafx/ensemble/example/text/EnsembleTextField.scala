@@ -32,21 +32,18 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.TextField
 import scalafx.scene.layout.VBox
 
-class EnsembleTextField extends EnsembleExample {
+class EnsembleTextField extends EnsembleExample
 
-  def getContent = new VBox {
+  def getContent = new VBox
     spacing = 10
     padding = Insets(20)
     children = List(
-        new TextField {
+        new TextField
           promptText = "Hi! I am Scalafx TextField"
           maxWidth = 200
-        },
-        new TextField {
+        ,
+        new TextField
           promptText = "So Sad! I am disabled"
           disable = true
           maxWidth = 200
-        }
     )
-  }
-}

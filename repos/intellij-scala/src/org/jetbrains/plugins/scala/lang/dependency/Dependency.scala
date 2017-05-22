@@ -16,48 +16,40 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * Pavel Fatin
   */
 case class Dependency(
-    kind: DependencyKind, source: PsiElement, target: PsiElement, path: Path) {
+    kind: DependencyKind, source: PsiElement, target: PsiElement, path: Path)
   def isExternal = source.getContainingFile != target.getContainingFile
 
   // It's better to re-bind references rather than to add imports
   // directly and re-resolve references afterwards.
   // However, current implementation of "bindToElement" can handle only Class references
-  def restoreFor(source: ScReferenceElement) {
-    if (source.resolve() != target) {
+  def restoreFor(source: ScReferenceElement)
+    if (source.resolve() != target)
       source.bindToElement(target)
-    }
-  }
-}
 
-object Dependency {
-  def dependenciesIn(scope: PsiElement): Seq[Dependency] = {
+object Dependency
+  def dependenciesIn(scope: PsiElement): Seq[Dependency] =
     scope.depthFirst
       .filterByType(classOf[ScReferenceElement])
       .toList
       .flatMap(reference => dependencyFor(reference).toList)
-  }
 
   // While we can rely on result.actualElement, there are several bugs related to unapply(Seq)
   // and it's impossible to rebind such targets later (if needed)
-  def dependencyFor(reference: ScReferenceElement): Option[Dependency] = {
-    if (isPrimary(reference)) {
-      reference.bind().flatMap { result =>
+  def dependencyFor(reference: ScReferenceElement): Option[Dependency] =
+    if (isPrimary(reference))
+      reference.bind().flatMap  result =>
         dependencyFor(reference, result.element, result.fromType)
-      }
-    } else {
+    else
       None
-    }
-  }
 
-  private def isPrimary(ref: ScReferenceElement) = ref match {
+  private def isPrimary(ref: ScReferenceElement) = ref match
     case it @ Parent(postfix: ScPostfixExpr) => it == postfix.operand
     case it @ Parent(infix: ScInfixExpr) => it == infix.lOp
     case it => it.qualifier.isEmpty
-  }
 
   private def dependencyFor(reference: ScReferenceElement,
                             target: PsiElement,
-                            fromType: Option[ScType]): Option[Dependency] = {
+                            fromType: Option[ScType]): Option[Dependency] =
     def withEntity(entity: String) =
       Some(new Dependency(
               DependencyKind.Reference, reference, target, Path(entity)))
@@ -69,16 +61,15 @@ object Dependency {
                          target,
                          Path(entity, Some(member))))
 
-    reference match {
+    reference match
       case Parent(_: ScConstructorPattern) =>
-        target match {
+        target match
           case ContainingClass(aClass) =>
             withEntity(aClass.qualifiedName)
           case aClass: ScSyntheticClass => None
           case _ => None
-        }
       case _ =>
-        target match {
+        target match
           case e: ScSyntheticClass =>
             None
           case e: PsiClass =>
@@ -93,10 +84,9 @@ object Dependency {
               function.name == "unapply" =>
             withEntity(obj.qualifiedName)
           case (member: ScMember) && ContainingClass(obj: ScObject) =>
-            val memberName = member match {
+            val memberName = member match
               case named: ScNamedElement => named.name
               case _ => member.getName
-            }
             withMember(obj.qualifiedName, memberName)
           case (pattern: ScReferencePattern) && Parent(
               Parent(ContainingClass(obj: ScObject))) =>
@@ -111,17 +101,11 @@ object Dependency {
               if method.getModifierList.hasModifierProperty("static") =>
             withMember(e.qualifiedName, method.getName)
           case (member: PsiMember) && ContainingClass(e: PsiClass) =>
-            fromType.flatMap(it => ScType.extractClass(it, Some(e.getProject))) match {
+            fromType.flatMap(it => ScType.extractClass(it, Some(e.getProject))) match
               case Some(entity: ScObject) =>
-                val memberName = member match {
+                val memberName = member match
                   case named: ScNamedElement => named.name
                   case _ => member.getName
-                }
                 withMember(entity.qualifiedName, memberName)
               case _ => None
-            }
           case _ => None
-        }
-    }
-  }
-}

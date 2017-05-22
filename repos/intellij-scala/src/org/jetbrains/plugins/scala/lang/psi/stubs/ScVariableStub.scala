@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariable
   * User: Alexander Podkhalyuzin
   * Date: 17.10.2008
   */
-trait ScVariableStub extends StubElement[ScVariable] with ScMemberOrLocal {
+trait ScVariableStub extends StubElement[ScVariable] with ScMemberOrLocal
   def isDeclaration: Boolean
   def getNames: Array[String]
   def getBodyText: String
@@ -23,4 +23,3 @@ trait ScVariableStub extends StubElement[ScVariable] with ScMemberOrLocal {
   def getBodyExpr: Option[ScExpression]
   def getIdsContainer: Option[ScIdList]
   def getPatternsContainer: Option[ScPatternList]
-}

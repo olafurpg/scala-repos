@@ -11,17 +11,15 @@ sealed abstract class Metric(val key: String,
                              val dataType: Metric.DataType,
                              val description: Html)
 
-object Metric {
+object Metric
 
-  sealed trait DataType {
+  sealed trait DataType
     def name = toString.toLowerCase
-  }
-  object DataType {
+  object DataType
     case object Seconds extends DataType
     case object Count extends DataType
     case object Average extends DataType
     case object Percent extends DataType
-  }
 
   import BSONHandlers._
   import DataType._
@@ -150,45 +148,37 @@ object Metric {
                  Opportunism,
                  Luck,
                  Material)
-  val byKey = all map { p =>
+  val byKey = all map  p =>
     (p.key, p)
-  } toMap
+  toMap
 
-  def requiresAnalysis(m: Metric) = m match {
+  def requiresAnalysis(m: Metric) = m match
     case MeanCpl => true
     case _ => false
-  }
 
-  def requiresStableRating(m: Metric) = m match {
+  def requiresStableRating(m: Metric) = m match
     case RatingDiff => true
     case OpponentRating => true
     case _ => false
-  }
 
-  def isStacked(m: Metric) = m match {
+  def isStacked(m: Metric) = m match
     case Result => true
     case Termination => true
     case PieceRole => true
     case _ => false
-  }
 
-  def valuesOf(metric: Metric): List[MetricValue] = metric match {
+  def valuesOf(metric: Metric): List[MetricValue] = metric match
     case Result =>
-      lila.insight.Result.all.map { r =>
+      lila.insight.Result.all.map  r =>
         MetricValue(BSONInteger(r.id), MetricValueName(r.name))
-      }
     case Termination =>
-      lila.insight.Termination.all.map { r =>
+      lila.insight.Termination.all.map  r =>
         MetricValue(BSONInteger(r.id), MetricValueName(r.name))
-      }
     case PieceRole =>
-      chess.Role.all.reverse.map { r =>
+      chess.Role.all.reverse.map  r =>
         MetricValue(
             BSONString(r.forsyth.toString), MetricValueName(r.toString))
-      }
     case _ => Nil
-  }
 
   case class MetricValueName(name: String)
   case class MetricValue(key: BSONValue, name: MetricValueName)
-}

@@ -46,7 +46,6 @@ class BooleanStringConverterSpec
                                                 BooleanStringConverter](
         classOf[jfxuc.BooleanStringConverter],
         classOf[BooleanStringConverter],
-        classOf[Boolean]) {
+        classOf[Boolean])
 
   val examples = List((true, "true"), (false, "false"))
-}

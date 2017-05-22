@@ -36,7 +36,7 @@ import scalafx.scene.shape.ArcType
 /**
   * Example adapted from code showed in [[http://docs.oracle.com/javafx/2/canvas/jfxpub-canvas.htm]].
   */
-object BasicOpsTest extends JFXApp {
+object BasicOpsTest extends JFXApp
 
   val canvas = new Canvas(300, 300)
   val gc = canvas.graphicsContext2D
@@ -59,10 +59,7 @@ object BasicOpsTest extends JFXApp {
   gc.strokePolygon(Seq((60.0, 210), (90, 210), (60, 240), (90, 240)))
   gc.strokePolyline(Seq((110.0, 210), (140, 210), (110, 240), (140, 240)))
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Drawing Operations Test"
-    scene = new Scene {
+    scene = new Scene
       content = canvas
-    }
-  }
-}

@@ -7,25 +7,20 @@ import scala.reflect.{ClassTag, classTag}
 
 trait Tree
 
-object Bip {
+object Bip
   def ??? = sys.error("")
-}
 import Bip._
 
-case class Queryable[T]() {
+case class Queryable[T]()
   def treeFilter(t: Tree): Queryable[T] = ???
-}
 
-object Queryable {
+object Queryable
   def apply[T : ClassTag] = ???
   def apply[T : ClassTag](t: Tree) = ???
-}
 
-trait CoffeesTable {
+trait CoffeesTable
   def sales: Int
-}
 
-object Test extends App {
+object Test extends App
   val q = new Queryable[CoffeesTable]
   Queryable[CoffeesTable](q.treeFilter(null))
-}

@@ -13,18 +13,16 @@ import org.apache.camel.processor.SendProcessor
 /**
   * Support trait for producing messages to Camel endpoints.
   */
-trait ProducerSupport extends Actor with CamelSupport {
+trait ProducerSupport extends Actor with CamelSupport
   private[this] var messages = Vector.empty[(ActorRef, Any)]
   private[this] var producerChild: Option[ActorRef] = None
 
-  override def preStart() {
+  override def preStart()
     super.preStart()
     register()
-  }
 
-  private[this] def register() {
+  private[this] def register()
     camel.supervisor ! Register(self, endpointUri)
-  }
 
   /**
     * CamelMessage headers to copy by default from request message to response-message.
@@ -58,17 +56,15 @@ trait ProducerSupport extends Actor with CamelSupport {
     *
     * @see Producer#produce
     */
-  protected def produce: Receive = {
+  protected def produce: Receive =
     case CamelProducerObjects(endpoint, processor) ⇒
-      if (producerChild.isEmpty) {
+      if (producerChild.isEmpty)
         producerChild = Some(
             context.actorOf(Props(new ProducerChild(endpoint, processor))))
-        messages = {
+        messages =
           for (child ← producerChild;
           (snd, msg) ← messages) child.tell(transformOutgoingMessage(msg), snd)
           Vector.empty
-        }
-      }
     case res: MessageResult ⇒ routeResponse(res.message)
     case res: FailureResult ⇒
       val e = new AkkaCamelException(res.cause, res.headers)
@@ -76,11 +72,9 @@ trait ProducerSupport extends Actor with CamelSupport {
       throw e
 
     case msg ⇒
-      producerChild match {
+      producerChild match
         case Some(child) ⇒ child forward transformOutgoingMessage(msg)
         case None ⇒ messages :+= ((sender(), msg))
-      }
-  }
 
   /**
     * Called before the message is sent to the endpoint specified by <code>endpointUri</code>. The original
@@ -107,8 +101,8 @@ trait ProducerSupport extends Actor with CamelSupport {
     if (!oneway) sender() ! transformResponse(msg)
 
   private class ProducerChild(endpoint: Endpoint, processor: SendProcessor)
-      extends Actor {
-    def receive = {
+      extends Actor
+    def receive =
       case msg @ (_: FailureResult | _: MessageResult) ⇒
         context.parent forward msg
       case msg ⇒
@@ -116,7 +110,6 @@ trait ProducerSupport extends Actor with CamelSupport {
                 processor,
                 msg,
                 if (oneway) ExchangePattern.InOnly else ExchangePattern.InOut)
-    }
 
     /**
       * Initiates a message exchange of given <code>pattern</code> with the endpoint specified by
@@ -136,7 +129,7 @@ trait ProducerSupport extends Actor with CamelSupport {
     protected def produce(endpoint: Endpoint,
                           processor: SendProcessor,
                           msg: Any,
-                          pattern: ExchangePattern): Unit = {
+                          pattern: ExchangePattern): Unit =
       // Need copies of sender reference here since the callback could be done
       // later by another thread.
       val producer = self
@@ -145,7 +138,7 @@ trait ProducerSupport extends Actor with CamelSupport {
       val cmsg = CamelMessage.canonicalize(msg)
       xchg.setRequest(cmsg)
 
-      processor.process(xchg.exchange, new AsyncCallback {
+      processor.process(xchg.exchange, new AsyncCallback
         // Ignoring doneSync, sending back async uniformly.
         def done(doneSync: Boolean): Unit =
           producer.tell(if (xchg.exchange.isFailed)
@@ -154,15 +147,12 @@ trait ProducerSupport extends Actor with CamelSupport {
                           MessageResult(xchg.toResponseMessage(
                                   cmsg.headers(headersToCopy))),
                         originalSender)
-      })
-    }
-  }
-}
+      )
 
 /**
   * Mixed in by Actor implementations to produce messages to Camel endpoints.
   */
-trait Producer extends ProducerSupport {
+trait Producer extends ProducerSupport
   this: Actor ⇒
 
   /**
@@ -170,7 +160,6 @@ trait Producer extends ProducerSupport {
     * will be produced to the endpoint specified by <code>endpointUri</code>.
     */
   final def receive: Actor.Receive = produce
-}
 
 /**
   * INTERNAL API
@@ -190,7 +179,6 @@ private final case class FailureResult(
   *
   *
   */
-trait Oneway extends Producer {
+trait Oneway extends Producer
   this: Actor ⇒
   override def oneway: Boolean = true
-}

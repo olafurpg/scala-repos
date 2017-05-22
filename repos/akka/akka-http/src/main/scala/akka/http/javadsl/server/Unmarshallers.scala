@@ -12,7 +12,7 @@ import akka.util.ByteString
 
 import scala.reflect.ClassTag
 
-object Unmarshallers {
+object Unmarshallers
   def String: Unmarshaller[String] = implicitInstance
   def ByteString: Unmarshaller[ByteString] = implicitInstance
   def ByteArray: Unmarshaller[Array[Byte]] = implicitInstance
@@ -33,4 +33,3 @@ object Unmarshallers {
   private def implicitInstance[T : ClassTag](
       implicit um: FromMessageUnmarshaller[T]): Unmarshaller[T] =
     new UnmarshallerImpl[T](um)
-}

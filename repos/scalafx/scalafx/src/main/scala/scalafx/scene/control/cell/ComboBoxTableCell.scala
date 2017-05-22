@@ -47,7 +47,7 @@ import scalafx.util.StringConverter
   * @define CONVPARAM A [[scalafx.util.StringConverter]] to convert the given item (of type T) to a String for displaying to the user.
   * @define RET A function that will return a TableCell that is able to work on the type of element contained within the TableColumn.
   */
-object ComboBoxTableCell {
+object ComboBoxTableCell
 
   /**
     * Converts a ScalaFX $CBTC to its JavaFX counterpart.
@@ -146,7 +146,6 @@ object ComboBoxTableCell {
   @deprecated(message = "Use forTableColumn[S, T](T*)", since = "1.0")
   def forTableColumn[S, T](items: Array[T]) =
     jfxscc.ComboBoxTableCell.forTableColumn[S, T](items: _*)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ComboBoxListCell.html $CBTC]]
@@ -171,7 +170,7 @@ class ComboBoxTableCell[S, T](override val delegate: jfxscc.ComboBoxTableCell[
     with ComboBoxEditableCell[jfxscc.ComboBoxTableCell[S, T], T]
     with UpdatableCell[jfxscc.ComboBoxTableCell[S, T], T]
     with ItemableCell[jfxscc.ComboBoxTableCell[S, T], T]
-    with SFXDelegate[jfxscc.ComboBoxTableCell[S, T]] {
+    with SFXDelegate[jfxscc.ComboBoxTableCell[S, T]]
 
   /**
     * $CONSTITEMS
@@ -205,4 +204,3 @@ class ComboBoxTableCell[S, T](override val delegate: jfxscc.ComboBoxTableCell[
     * @param items $ITEMSPARAM
     */
   def this(items: T*) = this(new jfxscc.ComboBoxTableCell[S, T](items: _*))
-}

@@ -8,11 +8,11 @@ import scalaz.effect.IO
 import scala.util.Random
 
 // Example usage of free monad
-object FreeUsage extends App {
+object FreeUsage extends App
 
   // An algebra of primitive operations in the context of a random number generator
   sealed trait RngOp[A]
-  object RngOp {
+  object RngOp
     case object NextBoolean extends RngOp[Boolean]
     case object NextDouble extends RngOp[Double]
     case object NextFloat extends RngOp[Float]
@@ -23,7 +23,6 @@ object FreeUsage extends App {
     case object NextPrintableChar extends RngOp[Char]
     case class NextString(length: Int) extends RngOp[String]
     case class SetSeed(seed: Long) extends RngOp[Unit]
-  }
 
   // Free monad over the free functor of RngOp. The instance is not inferrable.
   type Rng[A] = Free[RngOp, A]
@@ -48,9 +47,9 @@ object FreeUsage extends App {
 
   // Natural transformation to (Random => A)
   type RandomReader[A] = Random => A
-  val toState: RngOp ~> RandomReader = new (RngOp ~> RandomReader) {
+  val toState: RngOp ~> RandomReader = new (RngOp ~> RandomReader)
     def apply[A](fa: RngOp[A]) =
-      fa match {
+      fa match
         case RngOp.NextBoolean => _.nextBoolean
         case RngOp.NextDouble => _.nextDouble
         case RngOp.NextFloat => _.nextFloat
@@ -61,25 +60,22 @@ object FreeUsage extends App {
         case RngOp.NextPrintableChar => _.nextPrintableChar
         case RngOp.NextString(n) => _.nextString(n)
         case RngOp.SetSeed(n) => _.setSeed(n)
-      }
-  }
 
   // Now we have enough structure to run a program
   def runRng[A](program: Rng[A], seed: Long): A =
     program.foldMap(toState).apply(new Random(seed))
 
   // Syntax
-  implicit class RngOps[A](ma: Rng[A]) {
+  implicit class RngOps[A](ma: Rng[A])
     def exec(seed: Long): A = runRng(ma, seed)
     def liftIO: IO[A] = IO(System.currentTimeMillis).map(exec)
-  }
 
   // An example that returns a pair of integers, a < 100, b < a and a color
-  val prog: Rng[(Int, Int, String)] = for {
+  val prog: Rng[(Int, Int, String)] = for
     a <- nextIntInRange(100)
     b <- nextIntInRange(a)
     c <- choose("red", "green", "blue")
-  } yield (a, b, c)
+  yield (a, b, c)
 
   // Run that baby
   println(prog.exec(0L)) // pure! always returns (60,28,green)
@@ -89,4 +85,3 @@ object FreeUsage extends App {
 
   // Of course all the normal combinators work
   println(nextBoolean.replicateM(10).exec(0L))
-}

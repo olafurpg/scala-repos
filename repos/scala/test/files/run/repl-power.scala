@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def tripleQuote(s: String) = "\"\"\"" + s + "\"\"\""
 
   def code = s"""
@@ -13,4 +13,3 @@ val m = LIT(10)                           // treedsl
 typed(m).tpe                              // typed is in scope
 ${tripleQuote("escaping is hard, m'kah")}
   """.trim
-}

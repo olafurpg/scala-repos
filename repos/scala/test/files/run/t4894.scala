@@ -1,6 +1,6 @@
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     import collection._
     val hs = mutable.HashSet[Int]()
     hs ++= 1 to 10
@@ -17,5 +17,3 @@ object Test {
     for (i <- 1 to 10) assert(phm(i) == i)
     phm --= 1 to 10
     assert(phm.isEmpty)
-  }
-}

@@ -1,4 +1,4 @@
-class T9572 {
+class T9572
   val term22 = (1,
                 2,
                 3,
@@ -48,4 +48,3 @@ class T9572 {
   Int, Int, Int, Int, Int, Int, Int, Int, Int) = null
   val type23: (Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int, Int,
   Int, Int, Int, Int, Int, Int, Int, Int, Int, Int) = null
-}

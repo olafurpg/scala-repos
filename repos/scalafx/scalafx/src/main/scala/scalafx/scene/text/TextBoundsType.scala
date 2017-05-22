@@ -33,7 +33,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/text/TextBoundsType.html javafx.scene.text.TextBoundsType]] */
 object TextBoundsType
-    extends SFXEnumDelegateCompanion[jfxst.TextBoundsType, TextBoundsType] {
+    extends SFXEnumDelegateCompanion[jfxst.TextBoundsType, TextBoundsType]
 
   val Logical = new TextBoundsType(jfxst.TextBoundsType.LOGICAL)
   @deprecated(
@@ -54,7 +54,6 @@ object TextBoundsType
 
   protected override def unsortedValues: Array[TextBoundsType] =
     Array(Logical, Visual, LogicalVerticalCenter)
-}
 
 sealed case class TextBoundsType(override val delegate: jfxst.TextBoundsType)
     extends SFXEnumDelegate[jfxst.TextBoundsType]

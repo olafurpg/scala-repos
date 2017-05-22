@@ -13,18 +13,17 @@ import js.Dynamic.global
 import js.typedarray
 
 /** Low-level stuff. */
-object Bits {
+object Bits
 
   import scala.scalajs.LinkingInfo.assumingES6
 
-  private[this] val _areTypedArraysSupported = {
+  private[this] val _areTypedArraysSupported =
     // Here we use `assumingES6` to dce the 4 subsequent tests
     assumingES6 || js.DynamicImplicits.truthValue(global.ArrayBuffer &&
         global.Int32Array && global.Float32Array && global.Float64Array)
-  }
 
   @inline
-  def areTypedArraysSupported: Boolean = {
+  def areTypedArraysSupported: Boolean =
     /* We have a forwarder to the internal `val _areTypedArraysSupported` to
      * be able to inline it. This achieves the following:
      * * If we emit ES6, dce `|| _areTypedArraysSupported` and replace
@@ -34,7 +33,6 @@ object Bits {
      *   `_areTypedArraysSupported` so we do not calculate it multiple times.
      */
     assumingES6 || _areTypedArraysSupported
-  }
 
   private val arrayBuffer =
     if (areTypedArraysSupported) new typedarray.ArrayBuffer(8)
@@ -52,14 +50,12 @@ object Bits {
     if (areTypedArraysSupported) new typedarray.Float64Array(arrayBuffer, 0, 1)
     else null
 
-  val areTypedArraysBigEndian = {
-    if (areTypedArraysSupported) {
+  val areTypedArraysBigEndian =
+    if (areTypedArraysSupported)
       int32Array(0) = 0x01020304
       (new typedarray.Int8Array(arrayBuffer, 0, 8))(0) == 0x01
-    } else {
+    else
       true // as good a value as any
-    }
-  }
 
   private val highOffset = if (areTypedArraysBigEndian) 0 else 1
   private val lowOffset = if (areTypedArraysBigEndian) 1 else 0
@@ -77,49 +73,40 @@ object Bits {
     *  the Double version should typically be faster on VMs without fround
     *  support because we avoid several fround operations.
     */
-  def numberHashCode(value: Double): Int = {
+  def numberHashCode(value: Double): Int =
     val iv = rawToInt(value)
     if (iv == value && 1.0 / value != Double.NegativeInfinity) iv
     else doubleToLongBits(value).hashCode()
-  }
 
-  def intBitsToFloat(bits: Int): Float = {
-    if (areTypedArraysSupported) {
+  def intBitsToFloat(bits: Int): Float =
+    if (areTypedArraysSupported)
       int32Array(0) = bits
       float32Array(0)
-    } else {
+    else
       intBitsToFloatPolyfill(bits).toFloat
-    }
-  }
 
-  def floatToIntBits(value: Float): Int = {
-    if (areTypedArraysSupported) {
+  def floatToIntBits(value: Float): Int =
+    if (areTypedArraysSupported)
       float32Array(0) = value
       int32Array(0)
-    } else {
+    else
       floatToIntBitsPolyfill(value.toDouble)
-    }
-  }
 
-  def longBitsToDouble(bits: Long): Double = {
-    if (areTypedArraysSupported) {
+  def longBitsToDouble(bits: Long): Double =
+    if (areTypedArraysSupported)
       int32Array(highOffset) = (bits >>> 32).toInt
       int32Array(lowOffset) = bits.toInt
       float64Array(0)
-    } else {
+    else
       longBitsToDoublePolyfill(bits)
-    }
-  }
 
-  def doubleToLongBits(value: Double): Long = {
-    if (areTypedArraysSupported) {
+  def doubleToLongBits(value: Double): Long =
+    if (areTypedArraysSupported)
       float64Array(0) = value
       ((int32Array(highOffset).toLong << 32) |
           (int32Array(lowOffset).toLong & 0xffffffffL))
-    } else {
+    else
       doubleToLongBitsPolyfill(value)
-    }
-  }
 
   /* --- Polyfills for floating point bit manipulations ---
    *
@@ -133,23 +120,21 @@ object Bits {
    * predictable, since the results do not depend on strict floats semantics.
    */
 
-  private def intBitsToFloatPolyfill(bits: Int): Double = {
+  private def intBitsToFloatPolyfill(bits: Int): Double =
     val ebits = 8
     val fbits = 23
     val s = bits < 0
     val e = (bits >> fbits) & ((1 << ebits) - 1)
     val f = bits & ((1 << fbits) - 1)
     decodeIEEE754(ebits, fbits, s, e, f)
-  }
 
-  private def floatToIntBitsPolyfill(value: Double): Int = {
+  private def floatToIntBitsPolyfill(value: Double): Int =
     val ebits = 8
     val fbits = 23
     val (s, e, f) = encodeIEEE754(ebits, fbits, value)
     (if (s) 0x80000000 else 0) | (e << fbits) | rawToInt(f)
-  }
 
-  private def longBitsToDoublePolyfill(bits: Long): Double = {
+  private def longBitsToDoublePolyfill(bits: Long): Double =
     import js.JSNumberOps._
 
     val ebits = 11
@@ -161,9 +146,8 @@ object Bits {
     val e = (hi >> hifbits) & ((1 << ebits) - 1)
     val f = (hi & ((1 << hifbits) - 1)).toDouble * 0x100000000L.toDouble + lo
     decodeIEEE754(ebits, fbits, s, e, f)
-  }
 
-  private def doubleToLongBitsPolyfill(value: Double): Long = {
+  private def doubleToLongBitsPolyfill(value: Double): Long =
     val ebits = 11
     val fbits = 52
     val hifbits = fbits - 32
@@ -172,89 +156,79 @@ object Bits {
     val hi = (if (s) 0x80000000 else 0) | (e << hifbits) | hif
     val lo = rawToInt(f)
     (hi.toLong << 32) | (lo.toLong & 0xffffffffL)
-  }
 
   @inline private def decodeIEEE754(
-      ebits: Int, fbits: Int, s: Boolean, e: Int, f: Double): Double = {
+      ebits: Int, fbits: Int, s: Boolean, e: Int, f: Double): Double =
 
     import Math.pow
 
     val bias = (1 << (ebits - 1)) - 1 // constant
 
-    if (e == (1 << ebits) - 1) {
+    if (e == (1 << ebits) - 1)
       // Special
       if (f != 0.0) Double.NaN
       else if (s) Double.NegativeInfinity
       else Double.PositiveInfinity
-    } else if (e > 0) {
+    else if (e > 0)
       // Normalized
       val x = pow(2, e - bias) * (1 + f / pow(2, fbits))
       if (s) -x else x
-    } else if (f != 0.0) {
+    else if (f != 0.0)
       // Subnormal
       val x = pow(2, -(bias - 1)) * (f / pow(2, fbits))
       if (s) -x else x
-    } else {
+    else
       // Zero
       if (s) -0.0 else 0.0
-    }
-  }
 
   @inline private def encodeIEEE754(
-      ebits: Int, fbits: Int, v: Double): (Boolean, Int, Double) = {
+      ebits: Int, fbits: Int, v: Double): (Boolean, Int, Double) =
 
     import Math._
 
     val bias = (1 << (ebits - 1)) - 1 // constant
 
-    if (v.isNaN) {
+    if (v.isNaN)
       // http://dev.w3.org/2006/webapi/WebIDL/#es-type-mapping
       (false, (1 << ebits) - 1, pow(2, fbits - 1))
-    } else if (v.isInfinite) {
+    else if (v.isInfinite)
       (v < 0, (1 << ebits) - 1, 0.0)
-    } else if (v == 0.0) {
+    else if (v == 0.0)
       (1 / v == Double.NegativeInfinity, 0, 0.0)
-    } else {
+    else
       val LN2 = 0.6931471805599453
 
       val s = v < 0
       val av = if (s) -v else v
 
-      if (av >= pow(2, 1 - bias)) {
+      if (av >= pow(2, 1 - bias))
         val twoPowFbits = pow(2, fbits)
 
         var e = min(rawToInt(floor(log(av) / LN2)), 1023)
         var f = roundToEven(av / pow(2, e) * twoPowFbits)
-        if (f / twoPowFbits >= 2) {
+        if (f / twoPowFbits >= 2)
           e = e + 1
           f = 1
-        }
-        if (e > bias) {
+        if (e > bias)
           // Overflow
           e = (1 << ebits) - 1
           f = 0
-        } else {
+        else
           // Normalized
           e = e + bias
           f = f - twoPowFbits
-        }
         (s, e, f)
-      } else {
+      else
         // Subnormal
         (s, 0, roundToEven(av / pow(2, 1 - bias - fbits)))
-      }
-    }
-  }
 
   @inline private def rawToInt(x: Double): Int =
     (x.asInstanceOf[js.Dynamic] | 0.asInstanceOf[js.Dynamic]).asInstanceOf[Int]
 
-  @inline private[runtime] def roundToEven(n: Double): Double = {
+  @inline private[runtime] def roundToEven(n: Double): Double =
     val w = Math.floor(n)
     val f = n - w
     if (f < 0.5) w
     else if (f > 0.5) w + 1
     else if (w % 2 != 0) w + 1
     else w
-  }
-}

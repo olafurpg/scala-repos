@@ -7,8 +7,8 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class NameTest extends FunSuite {
-  test("Name.fromGroup") {
+class NameTest extends FunSuite
+  test("Name.fromGroup")
     val g = Group.mutable[SocketAddress]()
     val n = Name.fromGroup(g)
 
@@ -26,9 +26,8 @@ class NameTest extends FunSuite {
     g() = Set(new SocketAddress {})
     val Addr.Failed(e) = addr
     assert(e.isInstanceOf[IllegalArgumentException])
-  }
 
-  test("Name.Bound maintains equality as per 'id'") {
+  test("Name.Bound maintains equality as per 'id'")
     val id1, id2 = new {}
     val a1, a2 = Var(Addr.Pending)
 
@@ -38,12 +37,9 @@ class NameTest extends FunSuite {
     // It sucks that this is not symmetric, oh well.
     assert(Name.Bound(a1, id1) == id1)
     assert(Name.Bound(a1, id1) != id2)
-  }
 
-  test("Name.all maintains equality") {
+  test("Name.all maintains equality")
     val names = Seq.fill(10) { Name.Bound.singleton(Var(Addr.Pending)) }.toSet
 
     assert(Name.all(names) == Name.all(names))
     assert(Name.all(names) != Name.all(names drop 1))
-  }
-}

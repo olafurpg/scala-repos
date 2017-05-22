@@ -9,13 +9,13 @@ import scala.util.Random
 
 /* Test for SI-8988 */
 @RunWith(classOf[JUnit4])
-class StringLikeTest {
+class StringLikeTest
   @Test
-  def testStringSplitWithChar: Unit = {
+  def testStringSplitWithChar: Unit =
     val chars = (0 to 255).map(_.toChar)
     def randString = Random.nextString(30)
 
-    for (c <- chars) {
+    for (c <- chars)
       val s = randString
       val jString = new java.lang.String(s)
 
@@ -26,11 +26,9 @@ class StringLikeTest {
           jSplit,
           sSplit,
           s"Not same result as Java split for char $c in string $s")
-    }
-  }
 
   @Test
-  def testSplitEdgeCases: Unit = {
+  def testSplitEdgeCases: Unit =
     val high = 0xD852.toChar
     val low = 0xDF62.toChar
     val surrogatepair = List(high, low).mkString
@@ -44,5 +42,3 @@ class StringLikeTest {
         "--ch--omp--".split("-"),
         Array("", "", "ch", "", "omp")) // All the cases!
     AssertUtil.assertSameElements(twopairs.split(high), Array(twopairs)) //don't split on characters that are half a surrogate pair
-  }
-}

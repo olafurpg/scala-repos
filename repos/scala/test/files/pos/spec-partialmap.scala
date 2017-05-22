@@ -3,7 +3,7 @@ import scala.collection.{Traversable, TraversableLike};
 import scala.collection.generic.CanBuildFrom;
 
 trait PartialMap[@specialized A, @specialized B]
-    extends PartialFunction[A, B] with Iterable[(A, B)] {
+    extends PartialFunction[A, B] with Iterable[(A, B)]
 
   // commenting out this declaration gives a different exception.
   /** Getter for all values for which the given key function returns true. */
@@ -13,4 +13,3 @@ trait PartialMap[@specialized A, @specialized B]
   // if this is commented, it compiles fine:
   def apply[This <: Traversable[A], That](keys: TraversableLike[A, This])(
       implicit bf: CanBuildFrom[This, B, That]): That = keys.map(apply);
-}

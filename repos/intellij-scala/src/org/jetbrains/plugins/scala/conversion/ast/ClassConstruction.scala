@@ -6,13 +6,11 @@ import org.jetbrains.plugins.scala.conversion.ast.ClassConstruction.ClassType.Cl
   * Created by Kate Ustyuzhanina
   * on 10/22/15
   */
-object ClassConstruction {
+object ClassConstruction
 
-  object ClassType extends Enumeration {
+  object ClassType extends Enumeration
     type ClassType = Value
     val CLASS, OBJECT, INTERFACE, ENUM, ANONYMOUS = Value
-  }
-}
 
 case class ClassConstruction(name: String,
                              primaryConstructor: Option[IntermediateNode],
@@ -29,10 +27,9 @@ case class AnonymousClass(mType: IntermediateNode,
                           args: IntermediateNode,
                           body: Seq[IntermediateNode],
                           extendsList: Seq[IntermediateNode])
-    extends IntermediateNode with TypedElement {
+    extends IntermediateNode with TypedElement
   override def getType: TypeConstruction =
     mType.asInstanceOf[TypedElement].getType
-}
 
 case class Enum(
     name: String, modifiers: IntermediateNode, enumConstants: Seq[String])

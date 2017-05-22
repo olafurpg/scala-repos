@@ -7,7 +7,7 @@ import java.io.File
 
 import org.specs2.mutable.Specification
 
-object CompileTimeDependencyInjection extends Specification {
+object CompileTimeDependencyInjection extends Specification
 
   import play.api._
 
@@ -16,8 +16,8 @@ object CompileTimeDependencyInjection extends Specification {
       CompileTimeDependencyInjection.getClass.getClassLoader,
       Mode.Test)
 
-  "compile time dependency injection" should {
-    "allow creating an application with the built in components from context" in {
+  "compile time dependency injection" should
+    "allow creating an application with the built in components from context" in
       val context = ApplicationLoader
         .createContext(environment,
                        Map("play.application.loader" -> classOf[
@@ -25,55 +25,43 @@ object CompileTimeDependencyInjection extends Specification {
       val application = ApplicationLoader(context).load(context)
       application must beAnInstanceOf[Application]
       application.routes.documentation must beEmpty
-    }
-    "allow using other components" in {
+    "allow using other components" in
       val context = ApplicationLoader.createContext(environment)
       val components = new messages.MyComponents(context)
       components.application must beAnInstanceOf[Application]
       components.myComponent must beAnInstanceOf[messages.MyComponent]
-    }
-    "allow declaring a custom router" in {
+    "allow declaring a custom router" in
       val context = ApplicationLoader.createContext(environment)
       val components = new routers.MyComponents(context)
       components.application must beAnInstanceOf[Application]
       components.router must beAnInstanceOf[
           scalaguide.dependencyinjection.Routes]
-    }
-  }
-}
 
-package basic {
+package basic
 
 //#basic
   import play.api._
   import play.api.ApplicationLoader.Context
   import play.api.routing.Router
 
-  class MyApplicationLoader extends ApplicationLoader {
-    def load(context: Context) = {
+  class MyApplicationLoader extends ApplicationLoader
+    def load(context: Context) =
       new MyComponents(context).application
-    }
-  }
 
   class MyComponents(context: Context)
-      extends BuiltInComponentsFromContext(context) {
+      extends BuiltInComponentsFromContext(context)
     lazy val router = Router.empty
-  }
 //#basic
 
 //#basicextended
-  class MyApplicationLoaderWithInitialization extends ApplicationLoader {
-    def load(context: Context) = {
-      LoggerConfigurator(context.environment.classLoader).foreach {
+  class MyApplicationLoaderWithInitialization extends ApplicationLoader
+    def load(context: Context) =
+      LoggerConfigurator(context.environment.classLoader).foreach
         _.configure(context.environment)
-      }
       new MyComponents(context).application
-    }
-  }
 //#basicextended
-}
 
-package messages {
+package messages
 
   import play.api._
   import play.api.ApplicationLoader.Context
@@ -83,40 +71,34 @@ package messages {
   import play.api.i18n._
 
   class MyComponents(context: Context)
-      extends BuiltInComponentsFromContext(context) with I18nComponents {
+      extends BuiltInComponentsFromContext(context) with I18nComponents
     lazy val router = Router.empty
 
     lazy val myComponent = new MyComponent(messagesApi)
-  }
 
-  class MyComponent(messages: MessagesApi) {
+  class MyComponent(messages: MessagesApi)
     // ...
-  }
 //#messages
-}
 
-package routers {
+package routers
 
   import scalaguide.dependencyinjection.controllers
   import scalaguide.dependencyinjection.bar
 
-  object router {
+  object router
     type Routes = scalaguide.dependencyinjection.Routes
-  }
 
 //#routers
   import play.api._
   import play.api.ApplicationLoader.Context
   import router.Routes
 
-  class MyApplicationLoader extends ApplicationLoader {
-    def load(context: Context) = {
+  class MyApplicationLoader extends ApplicationLoader
+    def load(context: Context) =
       new MyComponents(context).application
-    }
-  }
 
   class MyComponents(context: Context)
-      extends BuiltInComponentsFromContext(context) {
+      extends BuiltInComponentsFromContext(context)
 
     lazy val router = new Routes(
         httpErrorHandler, applicationController, barRoutes, assets)
@@ -124,20 +106,16 @@ package routers {
     lazy val barRoutes = new bar.Routes(httpErrorHandler)
     lazy val applicationController = new controllers.Application()
     lazy val assets = new controllers.Assets(httpErrorHandler)
-  }
 //#routers
-}
 
-package controllers {
+package controllers
 
   import play.api.http.HttpErrorHandler
   import play.api.mvc._
 
-  class Application extends Controller {
+  class Application extends Controller
     def index = Action(Ok)
     def foo = Action(Ok)
-  }
 
   class Assets(errorHandler: HttpErrorHandler)
       extends _root_.controllers.AssetsBuilder(errorHandler)
-}

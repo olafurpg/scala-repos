@@ -27,33 +27,31 @@ import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.DoubleType
 
-class DataFrameStatSuite extends QueryTest with SharedSQLContext {
+class DataFrameStatSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
   private def toLetter(i: Int): String = (i + 97).toChar.toString
 
-  test("sample with replacement") {
+  test("sample with replacement")
     val n = 100
     val data = sparkContext.parallelize(1 to n, 2).toDF("id")
     checkAnswer(
         data.sample(withReplacement = true, 0.05, seed = 13),
         Seq(5, 10, 52, 73).map(Row(_))
     )
-  }
 
-  test("sample without replacement") {
+  test("sample without replacement")
     val n = 100
     val data = sparkContext.parallelize(1 to n, 2).toDF("id")
     checkAnswer(
         data.sample(withReplacement = false, 0.05, seed = 13),
         Seq(3, 17, 27, 58, 62).map(Row(_))
     )
-  }
 
-  test("randomSplit") {
+  test("randomSplit")
     val n = 600
     val data = sparkContext.parallelize(1 to n, 2).toDF("id")
-    for (seed <- 1 to 5) {
+    for (seed <- 1 to 5)
       val splits = data.randomSplit(Array[Double](1, 2, 3), seed)
       assert(splits.length == 3, "wrong number of splits")
 
@@ -67,10 +65,8 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
       assert(math.abs(s(0) - 100) < 50) // std =  9.13
       assert(math.abs(s(1) - 200) < 50) // std = 11.55
       assert(math.abs(s(2) - 300) < 50) // std = 12.25
-    }
-  }
 
-  test("randomSplit on reordered partitions") {
+  test("randomSplit on reordered partitions")
     // This test ensures that randomSplit does not create overlapping splits even when the
     // underlying dataframe (such as the one below) doesn't guarantee a deterministic ordering of
     // rows in each partition.
@@ -95,9 +91,8 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
       .toSeq
       .map(_.collect().toSeq)
     assert(firstRun == secondRun)
-  }
 
-  test("pearson correlation") {
+  test("pearson correlation")
     val df = Seq.tabulate(10)(i => (i, 2 * i, i * -1.0)).toDF("a", "b", "c")
     val corr1 = df.stat.corr("a", "b", "pearson")
     assert(math.abs(corr1 - 1.0) < 1e-12)
@@ -118,26 +113,23 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val df2 = Seq.tabulate(20)(x => (x, x * x - 2 * x + 3.5)).toDF("a", "b")
     val corr3 = df2.stat.corr("a", "b", "pearson")
     assert(math.abs(corr3 - 0.95723391394758572) < 1e-12)
-  }
 
-  test("covariance") {
+  test("covariance")
     val df = Seq
       .tabulate(10)(i => (i, 2.0 * i, toLetter(i)))
       .toDF("singles", "doubles", "letters")
 
     val results = df.stat.cov("singles", "doubles")
     assert(math.abs(results - 55.0 / 3) < 1e-12)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       df.stat.cov("singles", "letters") // doesn't accept non-numerical dataTypes
-    }
     val decimalData = Seq
       .tabulate(6)(i => (BigDecimal(i % 3), BigDecimal(i % 2)))
       .toDF("a", "b")
     val decimalRes = decimalData.stat.cov("a", "b")
     assert(math.abs(decimalRes) < 1e-12)
-  }
 
-  test("approximate quantile") {
+  test("approximate quantile")
     val n = 1000
     val df = Seq.tabulate(n)(i => (i, 2.0 * i)).toDF("singles", "doubles")
 
@@ -145,7 +137,7 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val q2 = 0.8
     val epsilons = List(0.1, 0.05, 0.001)
 
-    for (epsilon <- epsilons) {
+    for (epsilon <- epsilons)
       val Array(single1) =
         df.stat.approxQuantile("singles", Array(q1), epsilon)
       val Array(double2) =
@@ -165,10 +157,8 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
       assert(math.abs(s2 - q2 * n) < error_single)
       assert(math.abs(d1 - 2 * q1 * n) < error_double)
       assert(math.abs(d2 - 2 * q2 * n) < error_double)
-    }
-  }
 
-  test("crosstab") {
+  test("crosstab")
     val rng = new Random()
     val data = Seq.tabulate(25)(i => (rng.nextInt(5), rng.nextInt(10)))
     val df = data.toDF("a", "b")
@@ -178,16 +168,13 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     // reduce by key
     val expected = data.map(t => (t, 1)).groupBy(_._1).mapValues(_.length)
     val rows = crosstab.collect()
-    rows.foreach { row =>
+    rows.foreach  row =>
       val i = row.getString(0).toInt
-      for (col <- 1 until columnNames.length) {
+      for (col <- 1 until columnNames.length)
         val j = columnNames(col).toInt
         assert(row.getLong(col) === expected.getOrElse((i, j), 0).toLong)
-      }
-    }
-  }
 
-  test("special crosstab elements (., '', null, ``)") {
+  test("special crosstab elements (., '', null, ``)")
     val data = Seq(
         ("a", Double.NaN, "ho"),
         (null, 2.0, "ho"),
@@ -215,12 +202,10 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     assert(ct4.schema.fieldNames.contains("null"))
     assert(ct4.schema.fieldNames.contains("a.b"))
     assert(ct4.collect().length === 4)
-  }
 
-  test("Frequent Items") {
-    val rows = Seq.tabulate(1000) { i =>
+  test("Frequent Items")
+    val rows = Seq.tabulate(1000)  i =>
       if (i % 3 == 0) (1, toLetter(1), -1.0) else (i, toLetter(i), i * -1.0)
-    }
     val df = rows.toDF("numbers", "letters", "negDoubles")
 
     val results = df.stat.freqItems(Array("numbers", "letters"), 0.1)
@@ -231,38 +216,34 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val singleColResults = df.stat.freqItems(Array("negDoubles"), 0.1)
     val items2 = singleColResults.collect().head
     assert(items2.getSeq[Double](0).contains(-1.0))
-  }
 
-  test("Frequent Items 2") {
+  test("Frequent Items 2")
     val rows = sparkContext.parallelize(Seq.empty[Int], 4)
     // this is a regression test, where when merging partitions, we omitted values with higher
     // counts than those that existed in the map when the map was full. This test should also fail
     // if anything like SPARK-9614 is observed once again
-    val df = rows.mapPartitionsWithIndex { (idx, iter) =>
-      if (idx == 3) {
+    val df = rows.mapPartitionsWithIndex  (idx, iter) =>
+      if (idx == 3)
         // must come from one of the later merges, therefore higher partition index
         Iterator("3", "3", "3", "3", "3")
-      } else {
+      else
         Iterator("0", "1", "2", "3", "4")
-      }
-    }.toDF("a")
+    .toDF("a")
     val results = df.stat.freqItems(Array("a"), 0.25)
     val items = results.collect().head.getSeq[String](0)
     assert(items.contains("3"))
     assert(items.length === 1)
-  }
 
-  test("sampleBy") {
+  test("sampleBy")
     val df = sqlContext.range(0, 100).select((col("id") % 3).as("key"))
     val sampled = df.stat.sampleBy("key", Map(0 -> 0.1, 1 -> 0.2), 0L)
     checkAnswer(sampled.groupBy("key").count().orderBy("key"),
                 Seq(Row(0, 6), Row(1, 11)))
-  }
 
   // This test case only verifies that `DataFrame.countMinSketch()` methods do return
   // `CountMinSketch`es that meet required specs.  Test cases for `CountMinSketch` can be found in
   // `CountMinSketchSuite` in project spark-sketch.
-  test("countMinSketch") {
+  test("countMinSketch")
     val df = sqlContext.range(1000)
 
     val sketch1 =
@@ -289,16 +270,14 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     assert(sketch4.relativeError() === 0.001 +- 1e04)
     assert(sketch4.confidence() === 0.99 +- 5e-3)
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       df.select('id cast DoubleType as 'id)
         .stat
         .countMinSketch('id, depth = 10, width = 20, seed = 42)
-    }
-  }
 
   // This test only verifies some basic requirements, more correctness tests can be found in
   // `BloomFilterSuite` in project spark-sketch.
-  test("Bloom filter") {
+  test("Bloom filter")
     val df = sqlContext.range(1000)
 
     val filter1 = df.stat.bloomFilter("id", 1000, 0.03)
@@ -316,42 +295,34 @@ class DataFrameStatSuite extends QueryTest with SharedSQLContext {
     val filter4 = df.stat.bloomFilter($"id" * 3, 1000, 64 * 5)
     assert(filter4.bitSize() == 64 * 5)
     assert(0.until(1000).forall(i => filter4.mightContain(i * 3)))
-  }
-}
 
 class DataFrameStatPerfSuite
-    extends QueryTest with SharedSQLContext with Logging {
+    extends QueryTest with SharedSQLContext with Logging
 
   // Turn on this test if you want to test the performance of approximate quantiles.
-  ignore("computing quantiles should not take much longer than describe()") {
+  ignore("computing quantiles should not take much longer than describe()")
     val df = sqlContext.range(5000000L).toDF("col1").cache()
-    def seconds(f: => Any): Double = {
+    def seconds(f: => Any): Double =
       // Do some warmup
       logDebug("warmup...")
-      for (i <- 1 to 10) {
+      for (i <- 1 to 10)
         df.count()
         f
-      }
       logDebug("execute...")
       // Do it 10 times and report median
-      val times = (1 to 10).map { i =>
+      val times = (1 to 10).map  i =>
         val start = System.nanoTime()
         f
         val end = System.nanoTime()
         (end - start) / 1e9
-      }
       logDebug("execute done")
       times.sum / times.length.toDouble
-    }
 
     logDebug("*** Normal describe ***")
     val t1 = seconds { df.describe() }
     logDebug(s"T1 = $t1")
     logDebug("*** Just quantiles ***")
-    val t2 = seconds {
+    val t2 = seconds
       StatFunctions.multipleApproxQuantiles(
           df, Seq("col1"), Seq(0.1, 0.25, 0.5, 0.75, 0.9), 0.01)
-    }
     logDebug(s"T1 = $t1, T2 = $t2")
-  }
-}

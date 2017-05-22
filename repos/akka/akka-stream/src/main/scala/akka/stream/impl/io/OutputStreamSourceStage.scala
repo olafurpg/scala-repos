@@ -19,7 +19,7 @@ import scala.concurrent.{Await, Future, Promise}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Success, Try}
 
-private[stream] object OutputStreamSourceStage {
+private[stream] object OutputStreamSourceStage
   sealed trait AdapterToStageMessage
   case object Flush extends AdapterToStageMessage
   case object Close extends AdapterToStageMessage
@@ -28,21 +28,19 @@ private[stream] object OutputStreamSourceStage {
   case object Ok extends DownstreamStatus
   case object Canceled extends DownstreamStatus
 
-  sealed trait StageWithCallback {
+  sealed trait StageWithCallback
     def wakeUp(msg: AdapterToStageMessage): Future[Unit]
-  }
-}
 
 final private[stream] class OutputStreamSourceStage(
     writeTimeout: FiniteDuration)
     extends GraphStageWithMaterializedValue[
-        SourceShape[ByteString], OutputStream] {
+        SourceShape[ByteString], OutputStream]
   val out = Outlet[ByteString]("OutputStreamSource.out")
   override def initialAttributes = DefaultAttributes.outputStreamSource
   override val shape: SourceShape[ByteString] = SourceShape.of(out)
 
   override def createLogicAndMaterializedValue(
-      inheritedAttributes: Attributes): (GraphStageLogic, OutputStream) = {
+      inheritedAttributes: Attributes): (GraphStageLogic, OutputStream) =
     val maxBuffer = inheritedAttributes
       .getAttribute(classOf[InputBuffer], InputBuffer(16, 16))
       .max
@@ -51,94 +49,83 @@ final private[stream] class OutputStreamSourceStage(
     val dataQueue = new LinkedBlockingQueue[ByteString](maxBuffer)
     val downstreamStatus = new AtomicReference[DownstreamStatus](Ok)
 
-    val logic = new GraphStageLogic(shape) with StageWithCallback {
+    val logic = new GraphStageLogic(shape) with StageWithCallback
       var flush: Option[Promise[Unit]] = None
       var close: Option[Promise[Unit]] = None
 
       private val downstreamCallback: AsyncCallback[Try[ByteString]] =
-        getAsyncCallback {
+        getAsyncCallback
           case Success(elem) ⇒ onPush(elem)
           case Failure(ex) ⇒ failStage(ex)
-        }
 
       private val upstreamCallback: AsyncCallback[
           (AdapterToStageMessage, Promise[Unit])] = getAsyncCallback(
           onAsyncMessage)
 
-      override def wakeUp(msg: AdapterToStageMessage): Future[Unit] = {
+      override def wakeUp(msg: AdapterToStageMessage): Future[Unit] =
         val p = Promise[Unit]()
         upstreamCallback.invoke((msg, p))
         p.future
-      }
 
       private def onAsyncMessage(
           event: (AdapterToStageMessage, Promise[Unit])): Unit =
-        event._1 match {
+        event._1 match
           case Flush ⇒
             flush = Some(event._2)
             sendResponseIfNeed()
           case Close ⇒
             close = Some(event._2)
-            if (dataQueue.isEmpty) {
+            if (dataQueue.isEmpty)
               downstreamStatus.set(Canceled)
               completeStage()
               unblockUpstream()
-            } else sendResponseIfNeed()
-        }
+            else sendResponseIfNeed()
 
       private def unblockUpstream(): Boolean =
-        flush match {
+        flush match
           case Some(p) ⇒
             p.complete(Success(()))
             flush = None
             true
           case None ⇒
-            close match {
+            close match
               case Some(p) ⇒
                 p.complete(Success(()))
                 close = None
                 true
               case None ⇒ false
-            }
-        }
 
       private def sendResponseIfNeed(): Unit =
         if (downstreamStatus.get() == Canceled || dataQueue.isEmpty)
           unblockUpstream()
 
       private def onPush(data: ByteString): Unit =
-        if (downstreamStatus.get() == Ok) {
+        if (downstreamStatus.get() == Ok)
           push(out, data)
           sendResponseIfNeed()
-        }
 
-      setHandler(out, new OutHandler {
-        override def onDownstreamFinish(): Unit = {
+      setHandler(out, new OutHandler
+        override def onDownstreamFinish(): Unit =
           //assuming there can be no further in messages
           downstreamStatus.set(Canceled)
           dataQueue.clear()
           // if blocked reading, make sure the take() completes
           dataQueue.put(ByteString())
           completeStage()
-        }
-        override def onPull(): Unit = {
+        override def onPull(): Unit =
           implicit val ex = interpreter.materializer.executionContext
           Future(dataQueue.take()).onComplete(downstreamCallback.invoke)
-        }
-      })
-    }
+      )
     (logic,
      new OutputStreamAdapter(
          dataQueue, downstreamStatus, logic.wakeUp, writeTimeout))
-  }
-}
 
 private[akka] class OutputStreamAdapter(
     dataQueue: BlockingQueue[ByteString],
     downstreamStatus: AtomicReference[DownstreamStatus],
     sendToStage: (AdapterToStageMessage) ⇒ Future[Unit],
     writeTimeout: FiniteDuration)
-    extends OutputStream {
+    extends OutputStream
 
   var isActive = true
   var isPublisherAlive = true
@@ -146,60 +133,52 @@ private[akka] class OutputStreamAdapter(
       "Reactive stream is terminated, no writes are possible")
 
   @scala.throws(classOf[IOException])
-  private[this] def send(sendAction: () ⇒ Unit): Unit = {
-    if (isActive) {
+  private[this] def send(sendAction: () ⇒ Unit): Unit =
+    if (isActive)
       if (isPublisherAlive) sendAction()
       else throw publisherClosedException
-    } else throw new IOException("OutputStream is closed")
-  }
+    else throw new IOException("OutputStream is closed")
 
   @scala.throws(classOf[IOException])
   private[this] def sendData(data: ByteString): Unit =
     send(
         () ⇒
-          {
-        try {
+        try
           dataQueue.put(data)
-        } catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
-        if (downstreamStatus.get() == Canceled) {
+        catch { case NonFatal(ex) ⇒ throw new IOException(ex) }
+        if (downstreamStatus.get() == Canceled)
           isPublisherAlive = false
           throw publisherClosedException
-        }
-    })
+    )
 
   @scala.throws(classOf[IOException])
   private[this] def sendMessage(
       message: AdapterToStageMessage, handleCancelled: Boolean = true) =
     send(
         () ⇒
-          try {
+          try
         Await.ready(sendToStage(message), writeTimeout)
-        if (downstreamStatus.get() == Canceled && handleCancelled) {
+        if (downstreamStatus.get() == Canceled && handleCancelled)
           //Publisher considered to be terminated at earliest convenience to minimize messages sending back and forth
           isPublisherAlive = false
           throw publisherClosedException
-        }
-      } catch {
+      catch
         case e: IOException ⇒ throw e
         case NonFatal(e) ⇒ throw new IOException(e)
-    })
+    )
 
   @scala.throws(classOf[IOException])
-  override def write(b: Int): Unit = {
+  override def write(b: Int): Unit =
     sendData(ByteString(b))
-  }
 
   @scala.throws(classOf[IOException])
-  override def write(b: Array[Byte], off: Int, len: Int): Unit = {
+  override def write(b: Array[Byte], off: Int, len: Int): Unit =
     sendData(ByteString.fromArray(b, off, len))
-  }
 
   @scala.throws(classOf[IOException])
   override def flush(): Unit = sendMessage(Flush)
 
   @scala.throws(classOf[IOException])
-  override def close(): Unit = {
+  override def close(): Unit =
     sendMessage(Close, handleCancelled = false)
     isActive = false
-  }
-}

@@ -2,20 +2,18 @@ package io.prediction.e2.fixture
 
 import org.apache.spark.mllib.linalg.distributed.MatrixEntry
 
-trait MarkovChainFixture {
-  def twoByTwoMatrix = {
-    new {
+trait MarkovChainFixture
+  def twoByTwoMatrix =
+    new
       val matrixEntries = Seq(
           MatrixEntry(0, 0, 3),
           MatrixEntry(0, 1, 7),
           MatrixEntry(1, 0, 10),
           MatrixEntry(1, 1, 10)
       )
-    }
-  }
 
-  def fiveByFiveMatrix = {
-    new {
+  def fiveByFiveMatrix =
+    new
       val matrixEntries = Seq(
           MatrixEntry(0, 1, 12),
           MatrixEntry(0, 2, 8),
@@ -34,6 +32,3 @@ trait MarkovChainFixture {
           MatrixEntry(4, 3, 8),
           MatrixEntry(4, 4, 10)
       )
-    }
-  }
-}

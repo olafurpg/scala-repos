@@ -3,11 +3,11 @@ package java.nio
 import scala.scalajs.js.Dynamic.{literal => lit}
 import scala.scalajs.js.typedarray._
 
-private[nio] object GenDataViewBuffer {
+private[nio] object GenDataViewBuffer
   def apply[B <: Buffer](self: B): GenDataViewBuffer[B] =
     new GenDataViewBuffer(self)
 
-  trait NewDataViewBuffer[BufferType <: Buffer] {
+  trait NewDataViewBuffer[BufferType <: Buffer]
     def bytesPerElem: Int
 
     def apply(dataView: DataView,
@@ -15,13 +15,12 @@ private[nio] object GenDataViewBuffer {
               initialLimit: Int,
               readOnly: Boolean,
               isBigEndian: Boolean): BufferType
-  }
 
   @inline
   def generic_fromTypedArrayByteBuffer[BufferType <: Buffer](
       byteBuffer: TypedArrayByteBuffer)(
       implicit newDataViewBuffer: NewDataViewBuffer[BufferType])
-    : BufferType = {
+    : BufferType =
     val byteArray = byteBuffer._typedArray
     val byteBufferPos = byteBuffer.position
     val byteBufferLimit = byteBuffer.limit
@@ -35,7 +34,6 @@ private[nio] object GenDataViewBuffer {
                       viewCapacity,
                       byteBuffer.isReadOnly,
                       byteBuffer.isBigEndian)
-  }
 
   /* Work around for https://github.com/joyent/node/issues/6051
    * node 0.10 does not like creating a DataView whose byteOffset is equal to
@@ -43,16 +41,14 @@ private[nio] object GenDataViewBuffer {
    */
   @inline
   private def newDataView(
-      buffer: ArrayBuffer, byteOffset: Int, byteLength: Int): DataView = {
+      buffer: ArrayBuffer, byteOffset: Int, byteLength: Int): DataView =
     if (byteLength == 0)
       lit(buffer = buffer, byteOffset = byteOffset, byteLength = byteLength)
         .asInstanceOf[DataView]
     else new DataView(buffer, byteOffset, byteLength)
-  }
-}
 
 private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
-    extends AnyVal {
+    extends AnyVal
   import self._
 
   import GenDataViewBuffer.newDataView
@@ -61,7 +57,7 @@ private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
 
   @inline
   def generic_slice()(
-      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType = {
+      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType =
     val bytesPerElem = newDataViewBuffer.bytesPerElem
     val dataView = _dataView
     val pos = position
@@ -70,29 +66,26 @@ private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
                                      dataView.byteOffset + bytesPerElem * pos,
                                      bytesPerElem * newCapacity)
     newDataViewBuffer(slicedDataView, 0, newCapacity, isReadOnly, isBigEndian)
-  }
 
   @inline
   def generic_duplicate()(
-      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType = {
+      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType =
     val result = newDataViewBuffer(
         _dataView, position, limit, isReadOnly, isBigEndian)
     result._mark = _mark
     result
-  }
 
   @inline
   def generic_asReadOnlyBuffer()(
-      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType = {
+      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType =
     val result = newDataViewBuffer(
         _dataView, position, limit, true, isBigEndian)
     result._mark = _mark
     result
-  }
 
   @inline
   def generic_compact()(
-      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType = {
+      implicit newDataViewBuffer: NewThisDataViewBuffer): BufferType =
     if (isReadOnly) throw new ReadOnlyBufferException
 
     val dataView = _dataView
@@ -106,7 +99,6 @@ private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
     limit(capacity)
     position(lim - pos)
     self
-  }
 
   @inline
   def generic_order(): ByteOrder =
@@ -120,4 +112,3 @@ private[nio] final class GenDataViewBuffer[B <: Buffer](val self: B)
   @inline
   def generic_arrayBufferOffset: Int =
     _dataView.byteOffset
-}

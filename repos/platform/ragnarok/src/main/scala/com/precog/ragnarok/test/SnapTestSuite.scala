@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object SnapTestSuite extends PerfTestSuite {
+object SnapTestSuite extends PerfTestSuite
   query("""
 import std::stats::*
 import std::time::*
@@ -55,4 +55,3 @@ results := solve 'agent
 
 results where results.end > lowerBound
     """)
-}

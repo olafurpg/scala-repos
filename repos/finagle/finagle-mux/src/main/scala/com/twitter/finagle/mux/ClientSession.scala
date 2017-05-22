@@ -53,16 +53,15 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
                                      detectorConfig: FailureDetector.Config,
                                      name: String,
                                      sr: StatsReceiver)
-    extends Transport[Message, Message] {
+    extends Transport[Message, Message]
   import ClientSession._
 
   // Maintain the sessions's state, whose access is mediated
   // by the readLk and writeLk.
   @volatile private[this] var state: State = Dispatching
-  private[this] val (readLk, writeLk) = {
+  private[this] val (readLk, writeLk) =
     val lk = new ReentrantReadWriteLock
     (lk.readLock, lk.writeLock)
-  }
 
   // keeps track of outstanding Rmessages.
   private[this] val outstanding = new AtomicInteger()
@@ -72,16 +71,13 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
 
   private[this] val log = Logger.getLogger(getClass.getName)
   private[this] def safeLog(msg: String, level: Level = Level.INFO): Unit =
-    try log.log(level, msg) catch {
+    try log.log(level, msg) catch
       case _: Throwable =>
-    }
 
-  private[this] val leaseGauge = sr.addGauge("current_lease_ms") {
-    state match {
+  private[this] val leaseGauge = sr.addGauge("current_lease_ms")
+    state match
       case l: Leasing => l.remaining.inMilliseconds
       case _ => (Time.Top - Time.now).inMilliseconds
-    }
-  }
 
   private[this] val leaseCounter = sr.counter("leased")
   private[this] val drainingCounter = sr.counter("draining")
@@ -91,27 +87,26 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
     * Processes mux control messages and transitions the state accordingly.
     * The transitions are synchronized with and reflected in `status`.
     */
-  def processControlMsg(m: Message): Unit = m match {
+  def processControlMsg(m: Message): Unit = m match
     case Message.Tdrain(tag) =>
       if (log.isLoggable(Level.FINE))
         safeLog(s"Started draining a connection to $name", Level.FINE)
       drainingCounter.incr()
 
       writeLk.lockInterruptibly()
-      try {
+      try
         state = if (outstanding.get() > 0) Draining
-        else {
+        else
           if (log.isLoggable(Level.FINE))
             safeLog(s"Finished draining a connection to $name", Level.FINE)
           drainedCounter.incr()
           Drained
-        }
         trans.write(Message.Rdrain(tag))
-      } finally writeLk.unlock()
+      finally writeLk.unlock()
 
     case Message.Tlease(Message.Tlease.MillisDuration, millis) =>
       writeLk.lock()
-      try state match {
+      try state match
         case Leasing(_) | Dispatching =>
           state = Leasing(Time.now + millis.milliseconds)
           if (log.isLoggable(Level.FINE))
@@ -120,14 +115,13 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
         case Draining | Drained =>
         // Ignore the lease if we're closed, since these are anyway
         // a irrecoverable states.
-      } finally writeLk.unlock()
+      finally writeLk.unlock()
 
     case Message.Tping(tag) => trans.write(Message.Rping(tag))
 
     case _ => // do nothing
-  }
 
-  private[this] def processRmsg(msg: Message): Unit = msg match {
+  private[this] def processRmsg(msg: Message): Unit = msg match
     case Message.Rping(Message.Tags.PingTag) =>
       val p = pingPromise.getAndSet(null)
       if (p != null) p.setDone()
@@ -140,50 +134,44 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
     // if we were `Draining` our session.
     case Message.Rmessage(_) =>
       readLk.lock()
-      if (outstanding.decrementAndGet() == 0 && state == Draining) {
+      if (outstanding.decrementAndGet() == 0 && state == Draining)
         readLk.unlock()
         writeLk.lock()
-        try {
+        try
           drainedCounter.incr()
           if (log.isLoggable(Level.FINE))
             safeLog(s"Finished draining a connection to $name", Level.FINE)
           state = Drained
-        } finally writeLk.unlock()
-      } else {
+        finally writeLk.unlock()
+      else
         readLk.unlock()
-      }
 
     case _ => // do nothing.
-  }
 
-  private[this] val processTwriteFail: Throwable => Unit = { _ =>
+  private[this] val processTwriteFail: Throwable => Unit =  _ =>
     outstanding.decrementAndGet()
-  }
 
-  private[this] def processAndWrite(msg: Message): Future[Unit] = msg match {
+  private[this] def processAndWrite(msg: Message): Future[Unit] = msg match
     case _: Message.Treq | _: Message.Tdispatch =>
       outstanding.incrementAndGet()
       trans.write(msg).onFailure(processTwriteFail)
     case _ => trans.write(msg)
-  }
 
-  private[this] def processRead(msg: Message) = msg match {
+  private[this] def processRead(msg: Message) = msg match
     case m @ Message.Rmessage(_) => processRmsg(m)
     case m @ Message.ControlMessage(_) => processControlMsg(m)
     case _ => // do nothing.
-  }
 
   /**
     * Write to the underlying transport if our state permits,
     * otherwise return a nack.
     */
-  def write(msg: Message): Future[Unit] = {
+  def write(msg: Message): Future[Unit] =
     readLk.lock()
-    try state match {
+    try state match
       case Dispatching | Leasing(_) => processAndWrite(msg)
       case Draining | Drained => FutureNackException
-    } finally readLk.unlock()
-  }
+    finally readLk.unlock()
 
   def read(): Future[Message] = trans.read().onSuccess(processRead)
 
@@ -191,44 +179,40 @@ private[twitter] class ClientSession(trans: Transport[Message, Message],
     * Send a mux Tping to our peer. Note, only one outstanding ping is
     * permitted, subsequent calls to ping are failed fast.
     */
-  def ping(): Future[Unit] = {
+  def ping(): Future[Unit] =
     val done = new Promise[Unit]
-    if (pingPromise.compareAndSet(null, done)) {
+    if (pingPromise.compareAndSet(null, done))
       trans.write(pingMessage).before(done)
-    } else {
+    else
       FuturePingNack
-    }
-  }
 
   private[this] val detector = FailureDetector(
       detectorConfig, ping, sr.scope("failuredetector"))
 
   override def status: Status =
-    Status.worst(detector.status, trans.status match {
+    Status.worst(detector.status, trans.status match
       case Status.Closed => Status.Closed
       case Status.Busy => Status.Busy
       case Status.Open =>
         readLk.lock()
-        try state match {
+        try state match
           case Draining => Status.Busy
           case Drained => Status.Closed
           case leased @ Leasing(_) if leased.expired => Status.Busy
           case Leasing(_) | Dispatching => Status.Open
-        } finally readLk.unlock()
-    })
+        finally readLk.unlock()
+    )
 
   val onClose = trans.onClose
   def localAddress = trans.localAddress
   def remoteAddress = trans.remoteAddress
   def peerCertificate = trans.peerCertificate
 
-  def close(deadline: Time): Future[Unit] = {
+  def close(deadline: Time): Future[Unit] =
     leaseGauge.remove()
     trans.close(deadline)
-  }
-}
 
-private object ClientSession {
+private object ClientSession
   val FutureNackException =
     Future.exception(Failure.rejected("The request was Nacked by the server"))
 
@@ -239,8 +223,6 @@ private object ClientSession {
   case object Dispatching extends State
   case object Draining extends State
   case object Drained extends State
-  case class Leasing(end: Time) extends State {
+  case class Leasing(end: Time) extends State
     def remaining: Duration = end.sinceNow
     def expired: Boolean = end < Time.now
-  }
-}

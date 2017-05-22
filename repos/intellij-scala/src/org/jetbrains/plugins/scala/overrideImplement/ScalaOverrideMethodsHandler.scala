@@ -10,14 +10,12 @@ import com.intellij.psi.PsiFile
   * User: Alexander Podkhalyuzin
   * Date: 08.07.2008
   */
-class ScalaOverrideMethodsHandler extends LanguageCodeInsightActionHandler {
+class ScalaOverrideMethodsHandler extends LanguageCodeInsightActionHandler
   def startInWriteAction: Boolean = false
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     ScalaOIUtil.invokeOverrideImplement(
         project, editor, file, isImplement = false)
-  }
 
   def isValidFor(editor: Editor, file: PsiFile): Boolean =
     file != null && ScalaFileType.SCALA_FILE_TYPE == file.getFileType
-}

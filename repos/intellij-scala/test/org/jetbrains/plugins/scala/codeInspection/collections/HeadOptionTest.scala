@@ -5,30 +5,28 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 /**
   * @author Nikolay.Tropin
   */
-class HeadOptionTest extends OperationsOnCollectionInspectionTest {
+class HeadOptionTest extends OperationsOnCollectionInspectionTest
   override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
     classOf[HeadOrLastOptionInspection]
 
   override def hint: String =
     InspectionBundle.message("replace.with.headOption")
 
-  def test1(): Unit = {
+  def test1(): Unit =
     doTest(
         s"val seq = Seq(0); ${START}if (seq.size != 0) Some(seq.head) else None$END",
         "val seq = Seq(0); if (seq.size != 0) Some(seq.head) else None",
         "val seq = Seq(0); seq.headOption"
     )
-  }
 
-  def test2(): Unit = {
+  def test2(): Unit =
     doTest(
         s"val seq = Seq(0); ${START}if (seq.nonEmpty) Some(seq.head) else None$END",
         "val seq = Seq(0); if (seq.nonEmpty) Some(seq.head) else None",
         "val seq = Seq(0); seq.headOption"
     )
-  }
 
-  def test3(): Unit = {
+  def test3(): Unit =
     doTest(
         s"""val seq = Seq(0)
          |${START}if (seq.isEmpty)
@@ -43,41 +41,36 @@ class HeadOptionTest extends OperationsOnCollectionInspectionTest {
         """val seq = Seq(0)
         |seq.headOption""".stripMargin
     )
-  }
 
-  def test4(): Unit = {
+  def test4(): Unit =
     doTest(
         s"val seq = Seq(0); seq.${START}lift(0)$END",
         "val seq = Seq(0); seq.lift(0)",
         "val seq = Seq(0); seq.headOption"
     )
-  }
-}
 
-class LastOptionTest extends OperationsOnCollectionInspectionTest {
+class LastOptionTest extends OperationsOnCollectionInspectionTest
   override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
     classOf[HeadOrLastOptionInspection]
 
   override def hint: String =
     InspectionBundle.message("replace.with.lastOption")
 
-  def test1(): Unit = {
+  def test1(): Unit =
     doTest(
         s"val seq = Seq(0); ${START}if (seq.size != 0) Some(seq.last) else None$END",
         "val seq = Seq(0); if (seq.size != 0) Some(seq.last) else None",
         "val seq = Seq(0); seq.lastOption"
     )
-  }
 
-  def test2(): Unit = {
+  def test2(): Unit =
     doTest(
         s"val seq = Seq(0); ${START}if (seq.nonEmpty) Some(seq.last) else None$END",
         "val seq = Seq(0); if (seq.nonEmpty) Some(seq.last) else None",
         "val seq = Seq(0); seq.lastOption"
     )
-  }
 
-  def test3(): Unit = {
+  def test3(): Unit =
     doTest(
         s"""val seq = Seq(0)
          |${START}if (seq.isEmpty)
@@ -92,13 +85,10 @@ class LastOptionTest extends OperationsOnCollectionInspectionTest {
         """val seq = Seq(0)
         |seq.lastOption""".stripMargin
     )
-  }
 
-  def test4(): Unit = {
+  def test4(): Unit =
     doTest(
         s"val seq = Seq(0); seq.${START}lift(seq.size - 1)$END",
         "val seq = Seq(0); seq.lift(seq.size - 1)",
         "val seq = Seq(0); seq.lastOption"
     )
-  }
-}

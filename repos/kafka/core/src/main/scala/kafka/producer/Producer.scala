@@ -32,7 +32,7 @@ import kafka.utils._
 class Producer[K, V](
     val config: ProducerConfig,
     private val eventHandler: EventHandler[K, V]) // only for unit testing
-    extends Logging {
+    extends Logging
 
   private val hasShutdown = new AtomicBoolean(false)
   private val queue = new LinkedBlockingQueue[KeyedMessage[K, V]](
@@ -42,7 +42,7 @@ class Producer[K, V](
   private var producerSendThread: ProducerSendThread[K, V] = null
   private val lock = new Object()
 
-  config.producerType match {
+  config.producerType match
     case "sync" =>
     case "async" =>
       sync = false
@@ -54,7 +54,6 @@ class Producer[K, V](
           config.batchNumMessages,
           config.clientId)
       producerSendThread.start()
-  }
 
   private val producerTopicStats =
     ProducerTopicStatsRegistry.getProducerTopicStats(config.clientId)
@@ -79,32 +78,27 @@ class Producer[K, V](
     * synchronous or the asynchronous producer
     * @param messages the producer data object that encapsulates the topic, key and message data
     */
-  def send(messages: KeyedMessage[K, V]*) {
-    lock synchronized {
+  def send(messages: KeyedMessage[K, V]*)
+    lock synchronized
       if (hasShutdown.get) throw new ProducerClosedException
       recordStats(messages)
-      sync match {
+      sync match
         case true => eventHandler.handle(messages)
         case false => asyncSend(messages)
-      }
-    }
-  }
 
-  private def recordStats(messages: Seq[KeyedMessage[K, V]]) {
-    for (message <- messages) {
+  private def recordStats(messages: Seq[KeyedMessage[K, V]])
+    for (message <- messages)
       producerTopicStats.getProducerTopicStats(message.topic).messageRate.mark()
       producerTopicStats.getProducerAllTopicsStats.messageRate.mark()
-    }
-  }
 
-  private def asyncSend(messages: Seq[KeyedMessage[K, V]]) {
-    for (message <- messages) {
-      val added = config.queueEnqueueTimeoutMs match {
+  private def asyncSend(messages: Seq[KeyedMessage[K, V]])
+    for (message <- messages)
+      val added = config.queueEnqueueTimeoutMs match
         case 0 =>
           queue.offer(message)
         case _ =>
-          try {
-            config.queueEnqueueTimeoutMs < 0 match {
+          try
+            config.queueEnqueueTimeoutMs < 0 match
               case true =>
                 queue.put(message)
                 true
@@ -112,13 +106,10 @@ class Producer[K, V](
                 queue.offer(message,
                             config.queueEnqueueTimeoutMs,
                             TimeUnit.MILLISECONDS)
-            }
-          } catch {
+          catch
             case e: InterruptedException =>
               false
-          }
-      }
-      if (!added) {
+      if (!added)
         producerTopicStats
           .getProducerTopicStats(message.topic)
           .droppedMessageRate
@@ -127,21 +118,18 @@ class Producer[K, V](
         throw new QueueFullException(
             "Event queue is full of unsent messages, could not send event: " +
             message.toString)
-      } else {
+      else
         trace("Added to send queue an event: " + message.toString)
         trace("Remaining queue size: " + queue.remainingCapacity)
-      }
-    }
-  }
 
   /**
     * Close API to close the producer pool connections to all Kafka brokers. Also closes
     * the zookeeper client connection if one exists
     */
-  def close() = {
-    lock synchronized {
+  def close() =
+    lock synchronized
       val canShutdown = hasShutdown.compareAndSet(false, true)
-      if (canShutdown) {
+      if (canShutdown)
         info("Shutting down producer")
         val startTime = System.nanoTime()
         KafkaMetricsGroup.removeAllProducerMetrics(config.clientId)
@@ -149,7 +137,3 @@ class Producer[K, V](
         eventHandler.close
         info("Producer shutdown completed in " +
             (System.nanoTime() - startTime) / 1000000 + " ms")
-      }
-    }
-  }
-}

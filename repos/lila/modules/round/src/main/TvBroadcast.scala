@@ -7,19 +7,18 @@ import lila.socket.Socket.makeMessage
 import play.api.libs.iteratee._
 import play.api.libs.json._
 
-private final class TvBroadcast extends Actor {
+private final class TvBroadcast extends Actor
 
   context.system.lilaBus.subscribe(self, 'moveEvent, 'changeFeaturedGame)
 
-  override def postStop() {
+  override def postStop()
     context.system.lilaBus.unsubscribe(self)
-  }
 
   private val (enumerator, channel) = Concurrent.broadcast[JsValue]
 
   private var featuredId = none[String]
 
-  def receive = {
+  def receive =
 
     case TvBroadcast.GetEnumerator => sender ! enumerator
 
@@ -33,12 +32,9 @@ private final class TvBroadcast extends Actor {
                                    "fen" -> move.fen,
                                    "lm" -> move.move
                                ))
-  }
-}
 
-object TvBroadcast {
+object TvBroadcast
 
   type EnumeratorType = Enumerator[JsValue]
 
   case object GetEnumerator
-}

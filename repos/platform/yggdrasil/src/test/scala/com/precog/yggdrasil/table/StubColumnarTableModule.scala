@@ -45,7 +45,7 @@ import scalaz.std.anyVal._
 import TableModule._
 
 trait StubColumnarTableModule[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] {
+    extends ColumnarTableModuleTestSupport[M]
   import trans._
 
   implicit def M: Monad[M] with Comonad[M]
@@ -57,20 +57,19 @@ trait StubColumnarTableModule[M[+ _]]
   private val indexLock =
     new AnyRef // if we were doing this for real: DIE IN A FIRE!!!
 
-  trait TableCompanion extends ColumnarTableCompanion {
+  trait TableCompanion extends ColumnarTableCompanion
     def apply(slices: StreamT[M, Slice], size: TableSize): Table =
       new Table(slices, size)
     def align(sourceLeft: Table,
               alignOnL: TransSpec1,
               sourceRight: Table,
               alignOnR: TransSpec1): M[(Table, Table)] = sys.error("todo")
-  }
 
   class Table(slices: StreamT[M, Slice], size: TableSize)
-      extends ColumnarTable(slices, size) { self: Table =>
+      extends ColumnarTable(slices, size)  self: Table =>
     def sort(sortKey: TransSpec1,
              sortOrder: DesiredSortOrder,
-             unique: Boolean = false): M[Table] = {
+             unique: Boolean = false): M[Table] =
       // We use the sort transspec1 to compute a new table with a combination of the 
       // original data and the new sort columns, referenced under the sortkey namespace
       val tableWithSortKey = transform(
@@ -78,35 +77,32 @@ trait StubColumnarTableModule[M[+ _]]
                             WrapObject(Leaf(Source), "1")))
 
       implicit val jValueOrdering =
-        if (sortOrder.isAscending) {
+        if (sortOrder.isAscending)
           JValue.order.toScalaOrdering
-        } else {
+        else
           JValue.order.toScalaOrdering.reverse
-        }
 
-      tableWithSortKey.toJson.map { jvals =>
+      tableWithSortKey.toJson.map  jvals =>
         fromJson(jvals.toList.sortBy(_ \ "0").toStream)
-      }.map(_.transform(DerefObjectStatic(Leaf(Source), CPathField("1"))))
-    }
+      .map(_.transform(DerefObjectStatic(Leaf(Source), CPathField("1"))))
 
-    override def load(apiKey: APIKey, jtpe: JType) = EitherT {
-      self.toJson map { events =>
+    override def load(apiKey: APIKey, jtpe: JType) = EitherT
+      self.toJson map  events =>
         val parsedV =
-          events.toStream.traverse[({
+          events.toStream.traverse[(
                                      type λ[α] = Validation[ResourceError, α]
-                                   })#λ,
-                                   Stream[JObject]] {
+                                   )#λ,
+                                   Stream[JObject]]
             case JString(pathStr) =>
-              success {
-                indexLock synchronized {
+              success
+                indexLock synchronized
                   // block the WHOLE WORLD
                   val path = Path(pathStr)
 
                   val index =
-                    initialIndices get path getOrElse {
+                    initialIndices get path getOrElse
                       initialIndices += (path -> currentIndex)
                       currentIndex
-                    }
 
                   val target = path.path.replaceAll("/$", ".json")
                   val src =
@@ -116,23 +112,17 @@ trait StubColumnarTableModule[M[+ _]]
 
                   currentIndex += parsed.length
 
-                  parsed zip (Stream from index) map {
+                  parsed zip (Stream from index) map
                     case (value, id) =>
                       JObject(JField("key", JArray(JNum(id) :: Nil)) :: JField(
                               "value", value) :: Nil)
-                  }
-                }
-              }
 
             case x =>
               failure(ResourceError.corrupt(
                       "Attempted to load JSON as a table from something that wasn't a string: " +
                       x))
-          }
 
         parsedV.map(_.flatten).disjunction.map(fromJson(_))
-      }
-    }
 
     def groupByN(groupKeys: Seq[TransSpec1],
                  valueSpec: TransSpec1,
@@ -140,5 +130,3 @@ trait StubColumnarTableModule[M[+ _]]
                  unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
 
     override def toString = toStrings.copoint.mkString("\n")
-  }
-}

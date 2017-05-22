@@ -21,7 +21,7 @@ case class CpuProfile(
     count: Int,
     // The number of samples missed.
     missed: Int
-) {
+)
 
   /**
     * Write a Google pprof-compatible profile to `out`. The format is
@@ -29,43 +29,37 @@ case class CpuProfile(
     *
     *   http://google-perftools.googlecode.com/svn/trunk/doc/cpuprofile-fileformat.html
     */
-  def writeGoogleProfile(out: OutputStream) {
+  def writeGoogleProfile(out: OutputStream)
     var next = 1
     val uniq = mutable.HashMap[StackTraceElement, Int]()
     val word = ByteBuffer.allocate(8)
     word.order(ByteOrder.LITTLE_ENDIAN)
-    def putWord(n: Long) {
+    def putWord(n: Long)
       word.clear()
       word.putLong(n)
       out.write(word.array())
-    }
 
-    def putString(s: String) {
+    def putString(s: String)
       out.write(s.getBytes)
-    }
 
     putString("--- symbol\nbinary=%s\n".format(Jvm().mainClassName))
-    for ((stack, _) <- counts; frame <- stack if !uniq.contains(frame)) {
+    for ((stack, _) <- counts; frame <- stack if !uniq.contains(frame))
       putString("0x%016x %s\n".format(next, frame.toString))
       uniq(frame) = next
       next += 1
-    }
     putString("---\n--- profile\n")
     for (w <- Seq(0, 3, 0, 1, 0)) putWord(w)
 
-    for ((stack, n) <- counts if stack.nonEmpty) {
+    for ((stack, n) <- counts if stack.nonEmpty)
       putWord(n)
       putWord(stack.size)
       for (frame <- stack) putWord(uniq(frame))
-    }
     putWord(0)
     putWord(1)
     putWord(0)
     out.flush()
-  }
-}
 
-object CpuProfile {
+object CpuProfile
 
   // (class name, method names) that say they are runnable, but are actually doing nothing.
   private[this] val IdleClassAndMethod: Set[(String, String)] = Set(
@@ -109,7 +103,7 @@ object CpuProfile {
     *   - Limit stack depth?
     */
   def record(
-      howlong: Duration, frequency: Int, state: Thread.State): CpuProfile = {
+      howlong: Duration, frequency: Int, state: Thread.State): CpuProfile =
     require(frequency < 1000)
 
     // TODO: it may make sense to write a custom hash function here
@@ -126,31 +120,26 @@ object CpuProfile {
     var n = 0
     var nmissed = 0
 
-    while (Time.now < end) {
+    while (Time.now < end)
       for (thread <- bean.dumpAllThreads(false, false)
                         if thread.getThreadState() == state &&
-                    thread.getThreadId() != myId) {
+                    thread.getThreadId() != myId)
         val s = thread.getStackTrace().toSeq
-        if (s.nonEmpty) {
+        if (s.nonEmpty)
           val include = state != Thread.State.RUNNABLE || isRunnable(s.head)
           if (include) counts(s) = counts.getOrElse(s, 0L) + 1L
-        }
-      }
 
       n += 1
       next += period
 
-      while (next < Time.now && next < end) {
+      while (next < Time.now && next < end)
         nmissed += 1
         next += period
-      }
 
       val sleep = math.max((next - Time.now).inMilliseconds, 0)
       Thread.sleep(sleep)
-    }
 
     CpuProfile(counts.toMap, elapsed(), n, nmissed)
-  }
 
   def record(howlong: Duration, frequency: Int): CpuProfile =
     record(howlong, frequency, Thread.State.RUNNABLE)
@@ -161,17 +150,13 @@ object CpuProfile {
     */
   def recordInThread(howlong: Duration,
                      frequency: Int,
-                     state: Thread.State): Future[CpuProfile] = {
+                     state: Thread.State): Future[CpuProfile] =
     val p = new Promise[CpuProfile]
-    val thr = new Thread("CpuProfile") {
-      override def run() {
+    val thr = new Thread("CpuProfile")
+      override def run()
         p.setValue(record(howlong, frequency, state))
-      }
-    }
     thr.start()
     p
-  }
 
   def recordInThread(howlong: Duration, frequency: Int): Future[CpuProfile] =
     recordInThread(howlong, frequency, Thread.State.RUNNABLE)
-}

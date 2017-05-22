@@ -37,16 +37,15 @@ import scalaz.Scalaz._
 
 object EmitterSpecs
     extends Specification with StubPhases with CompilerUtils with Compiler
-    with Emitter with RawErrors with StaticLibrarySpec {
+    with Emitter with RawErrors with StaticLibrarySpec
 
   import instructions._
   import library._
 
-  def compileEmit(input: String) = {
+  def compileEmit(input: String) =
     val tree = compileSingle(input.stripMargin)
     tree.errors filterNot isWarning must beEmpty
     emit(tree)
-  }
 
   def testEmit(v: String)(
       head: Vector[Instruction], streams: Vector[Instruction]*) =
@@ -57,38 +56,31 @@ object EmitterSpecs
       head: Vector[Instruction], streams: Vector[Instruction]*) =
     compileEmit(v) must beOneOf((head +: streams): _*)
 
-  "emitter" should {
-    "emit literal string" in {
+  "emitter" should
+    "emit literal string" in
       testEmit("\"foo\"")(Vector(PushString("foo")))
-    }
 
-    "emit literal boolean" in {
+    "emit literal boolean" in
       testEmit("true")(Vector(PushTrue))
 
       testEmit("false")(Vector(PushFalse))
-    }
 
-    "emit literal number" in {
+    "emit literal number" in
       testEmit("23.23123")(Vector(PushNum("23.23123")))
-    }
 
-    "emit literal null" in {
+    "emit literal null" in
       testEmit("null")(Vector(PushNull))
-    }
 
-    "emit literal undefined" in {
+    "emit literal undefined" in
       testEmit("undefined")(Vector(PushUndefined))
-    }
 
-    "emit child of import" in {
+    "emit child of import" in
       testEmit("import std 42")(Vector(PushNum("42")))
-    }
 
-    "emit assert" in {
+    "emit assert" in
       testEmit("assert true 42")(Vector(PushTrue, PushNum("42"), Assert))
-    }
 
-    "emit cond" in {
+    "emit cond" in
       testEmit("if true then 1 else 2")(
           Vector(PushNum("1"),
                  PushTrue,
@@ -98,133 +90,110 @@ object EmitterSpecs
                  Map1(Comp),
                  FilterCross,
                  IUnion))
-    }
 
-    "emit filter of two where'd loads with value provenance" >> {
-      "which are numerics" >> {
+    "emit filter of two where'd loads with value provenance" >>
+      "which are numerics" >>
         testEmit("5 where 2")(Vector(PushNum("5"), PushNum("2"), FilterCross))
-      }
 
-      "which are null and string" >> {
+      "which are null and string" >>
         testEmit("""null where "foo" """)(
             Vector(PushNull, PushString("foo"), FilterCross))
-      }
-    }
 
-    "emit cross-join of two with'ed loads with value provenance" in {
+    "emit cross-join of two with'ed loads with value provenance" in
       testEmit("5 with 2")(
           Vector(PushNum("5"), PushNum("2"), Map2Cross(JoinObject)))
-    }
 
-    "emit instruction for two unioned loads" in {
+    "emit instruction for two unioned loads" in
       testEmit("""load("foo") union load("bar")""")(
           Vector(PushString("foo"),
                  AbsoluteLoad,
                  PushString("bar"),
                  AbsoluteLoad,
                  IUnion))
-    }
 
-    "emit instruction for two unioned relative loads" in {
+    "emit instruction for two unioned relative loads" in
       testEmit("""relativeLoad("foo") union relativeLoad("bar")""")(
           Vector(PushString("foo"),
                  RelativeLoad,
                  PushString("bar"),
                  RelativeLoad,
                  IUnion))
-    }
 
-    "emit instruction for two intersected loads" in {
+    "emit instruction for two intersected loads" in
       testEmit("""load("foo") intersect load("foo")""")(
           Vector(PushString("foo"),
                  AbsoluteLoad,
                  PushString("foo"),
                  AbsoluteLoad,
                  IIntersect))
-    }
 
-    "emit instruction for two intersected relative loads" in {
+    "emit instruction for two intersected relative loads" in
       testEmit("""relativeLoad("foo") intersect relativeLoad("foo")""")(
           Vector(PushString("foo"),
                  RelativeLoad,
                  PushString("foo"),
                  RelativeLoad,
                  IIntersect))
-    }
 
-    "emit instruction for two set differenced loads" in {
+    "emit instruction for two set differenced loads" in
       testEmit("""load("foo") difference load("foo")""")(
           Vector(PushString("foo"),
                  AbsoluteLoad,
                  PushString("foo"),
                  AbsoluteLoad,
                  SetDifference))
-    }
 
-    "emit instruction for two set differenced relative loads" in {
+    "emit instruction for two set differenced relative loads" in
       testEmit("""relativeLoad("foo") difference relativeLoad("foo")""")(
           Vector(PushString("foo"),
                  RelativeLoad,
                  PushString("foo"),
                  RelativeLoad,
                  SetDifference))
-    }
 
-    "emit cross-addition of two added loads with value provenance" in {
+    "emit cross-addition of two added loads with value provenance" in
       testEmit("5 + 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(Add)))
-    }
 
-    "emit cross < for loads with value provenance" in {
+    "emit cross < for loads with value provenance" in
       testEmit("5 < 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(Lt)))
-    }
 
-    "emit cross <= for loads with value provenance" in {
+    "emit cross <= for loads with value provenance" in
       testEmit("5 <= 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(LtEq)))
-    }
 
-    "emit cross > for loads with value provenance" in {
+    "emit cross > for loads with value provenance" in
       testEmit("5 > 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(Gt)))
-    }
 
-    "emit cross >= for loads with value provenance" in {
+    "emit cross >= for loads with value provenance" in
       testEmit("5 >= 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(GtEq)))
-    }
 
-    "emit cross != for loads with value provenance" in {
+    "emit cross != for loads with value provenance" in
       testEmit("5 != 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(NotEq)))
-    }
 
-    "emit cross = for loads with value provenance" in {
+    "emit cross = for loads with value provenance" in
       testEmit("5 = 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(Eq)))
-    }
 
-    "emit cross ! for load with value provenance" in {
+    "emit cross ! for load with value provenance" in
       testEmit("!true")(Vector(PushTrue, Map1(Comp)))
-    }
 
-    "emit cross-subtraction of two subtracted loads with value provenance" in {
+    "emit cross-subtraction of two subtracted loads with value provenance" in
       testEmit("5 - 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(Sub)))
-    }
 
-    "emit cross-division of two divided loads with value provenance" in {
+    "emit cross-division of two divided loads with value provenance" in
       testEmit("5 / 2")(Vector(PushNum("5"), PushNum("2"), Map2Cross(Div)))
-    }
 
-    "emit cross for division of load in static provenance with load in value provenance" in {
+    "emit cross for division of load in static provenance with load in value provenance" in
       testEmit("load(\"foo\") * 2")(Vector(PushString("foo"),
                                            AbsoluteLoad,
                                            PushNum("2"),
                                            Map2Cross(Mul)))
-    }
 
-    "emit cross for division of relative load in static provenance with load in value provenance" in {
+    "emit cross for division of relative load in static provenance with load in value provenance" in
       testEmit("relativeLoad(\"foo\") * 2")(Vector(PushString("foo"),
                                                    RelativeLoad,
                                                    PushNum("2"),
                                                    Map2Cross(Mul)))
-    }
 
-    "emit line information for cross for division of load in static provenance with load in value provenance" in {
+    "emit line information for cross for division of load in static provenance with load in value provenance" in
       testEmitLine("load(\"foo\") * 2")(
           Vector(Line(1, 6, "load(\"foo\") * 2"),
                  PushString("foo"),
@@ -234,55 +203,46 @@ object EmitterSpecs
                  PushNum("2"),
                  Line(1, 1, "load(\"foo\") * 2"),
                  Map2Cross(Mul)))
-    }
 
-    "emit cross for division of load in static provenance with load in value provenance" in {
+    "emit cross for division of load in static provenance with load in value provenance" in
       testEmit("2 * load(\"foo\")")(Vector(PushNum("2"),
                                            PushString("foo"),
                                            AbsoluteLoad,
                                            Map2Cross(Mul)))
-    }
 
-    "emit cross for division of relative load in static provenance with load in value provenance" in {
+    "emit cross for division of relative load in static provenance with load in value provenance" in
       testEmit("2 * relativeLoad(\"foo\")")(Vector(PushNum("2"),
                                                    PushString("foo"),
                                                    RelativeLoad,
                                                    Map2Cross(Mul)))
-    }
 
-    "emit negation of literal numeric load with value provenance" in {
+    "emit negation of literal numeric load with value provenance" in
       testEmit("neg 5")(
           Vector(PushNum("5"), Map1(Neg))
       )
-    }
 
-    "emit negation of sum of two literal numeric loads with value provenance" in {
+    "emit negation of sum of two literal numeric loads with value provenance" in
       testEmit("neg (5 + 2)")(Vector(PushNum("5"),
                                      PushNum("2"),
                                      Map2Cross(Add),
                                      Map1(Neg)))
-    }
 
-    "emit and mark new expression" in {
+    "emit and mark new expression" in
       testEmit("new 5")(Vector(PushNum("5"), Map1(New)))
-    }
 
-    "emit empty object" in {
+    "emit empty object" in
       testEmit("{}")(Vector(PushObject))
-    }
 
-    "emit wrap object for object with single field having constant numeric value" in {
+    "emit wrap object for object with single field having constant numeric value" in
       testEmit("{foo: 1}")(Vector(PushString("foo"),
                                   PushNum("1"),
                                   Map2Cross(WrapObject)))
-    }
 
-    "emit wrap object for object with single field having null value" in {
+    "emit wrap object for object with single field having null value" in
       testEmit("{foo: null}")(
           Vector(PushString("foo"), PushNull, Map2Cross(WrapObject)))
-    }
 
-    "emit join of wrapped object for object with two fields having constant values" in {
+    "emit join of wrapped object for object with two fields having constant values" in
       testEmit("{foo: 2, bar: true}")(
           Vector(PushString("foo"),
                  PushNum("2"),
@@ -291,9 +251,8 @@ object EmitterSpecs
                  PushTrue,
                  Map2Cross(WrapObject),
                  Map2Cross(JoinObject)))
-    }
 
-    "emit nested dispatches of the same function" in {
+    "emit nested dispatches of the same function" in
       val input = """
         | not(x) := !x
         | not(not(true))
@@ -304,9 +263,8 @@ object EmitterSpecs
               Map1(Comp),
               Map1(Comp)
           ))
-    }
 
-    "emit a match after a cross in a join-object" in {
+    "emit a match after a cross in a join-object" in
       val input = """
         | medals := //summer_games/london_medals
         | five := new 5 
@@ -335,9 +293,8 @@ object EmitterSpecs
                  Map2Cross(Add),
                  Map2Cross(WrapObject),
                  Map2Match(JoinObject)))
-    }
 
-    "emit match and cross after a cross in a join-object" in {
+    "emit match and cross after a cross in a join-object" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -382,9 +339,8 @@ object EmitterSpecs
                  Map2Cross(WrapObject),
                  Map2Match(JoinObject),
                  Map2Match(JoinObject)))
-    }
 
-    "emit a match and a cross in the correct order, after a cross, in a join-object" in {
+    "emit a match and a cross in the correct order, after a cross, in a join-object" in
       val input = """
         | medals := //summer_games/london_medals
         | five := new 5 
@@ -422,9 +378,8 @@ object EmitterSpecs
                  Map2Cross(WrapObject),
                  Map2Cross(JoinObject),
                  Map2Match(JoinObject)))
-    }
 
-    "emit a match and a cross in the correct order, after a cross, from a dispatch, in a join-object" in {
+    "emit a match and a cross in the correct order, after a cross, from a dispatch, in a join-object" in
       val input = """
         | medals := //summer_games/london_medals
         |
@@ -464,9 +419,8 @@ object EmitterSpecs
                  Map2Cross(WrapObject),
                  Map2Cross(JoinObject),
                  Map2Match(JoinObject)))
-    }
 
-    "emit a match after a cross in a join-array" in {
+    "emit a match after a cross in a join-array" in
       val input = """
         | medals := //summer_games/london_medals
         | five := new 5 
@@ -493,9 +447,8 @@ object EmitterSpecs
                  Map2Cross(Add),
                  Map1(WrapArray),
                  Map2Match(JoinArray)))
-    }
 
-    "emit two distinct callsites of the same function" in {
+    "emit two distinct callsites of the same function" in
       val input = """
         | medals := //summer_games/london_medals 
         |   stats(x) := max(x) 
@@ -518,9 +471,8 @@ object EmitterSpecs
                  Reduce(BuiltInReduction(Reduction(Vector(), "max", 0x2001))),
                  Map1(WrapArray),
                  Map2Cross(JoinArray)))
-    }
 
-    "solve with a generic where inside a function" in {
+    "solve with a generic where inside a function" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -566,9 +518,8 @@ object EmitterSpecs
               PushGroup(0),
               Reduce(BuiltInReduction(Reduction(Vector(), "count", 0x2000))),
               Merge))
-    }
 
-    "emit two distinct callsites of the same function version 2" in {
+    "emit two distinct callsites of the same function version 2" in
       val input = """
         | medals := //summer_games/london_medals 
         | stats(x) := max(x) + min(x)
@@ -600,18 +551,16 @@ object EmitterSpecs
                  Reduce(BuiltInReduction(Reduction(Vector(), "min", 0x2004))),
                  Map2Cross(Add),
                  Map2Cross(Sub)))
-    }
 
-    "emit wrapped object as right side of Let" in {
+    "emit wrapped object as right side of Let" in
       testEmit("clicks := //clicks {foo: clicks}")(
           Vector(PushString("foo"),
                  PushString("/clicks"),
                  Morph1(BuiltInMorphism1(expandGlob)),
                  AbsoluteLoad,
                  Map2Cross(WrapObject)))
-    }
 
-    "emit matched join of wrapped object for object with two fields having same provenance" in {
+    "emit matched join of wrapped object for object with two fields having same provenance" in
       testEmit("clicks := //clicks {foo: clicks, bar: clicks}")(
           Vector(PushString("foo"),
                  PushString("/clicks"),
@@ -626,30 +575,25 @@ object EmitterSpecs
                  Swap(2),
                  Map2Cross(WrapObject),
                  Map2Match(JoinObject)))
-    }
 
-    "emit empty array" in {
+    "emit empty array" in
       testEmit("[]")(Vector(PushArray))
-    }
 
-    "emit wrap array for array with single element having constant string value" in {
+    "emit wrap array for array with single element having constant string value" in
       testEmit("[\"foo\"]")(Vector(PushString("foo"), Map1(WrapArray)))
-    }
 
-    "emit wrap array for array with single element having null value" in {
+    "emit wrap array for array with single element having null value" in
       testEmit("[null]")(Vector(PushNull, Map1(WrapArray)))
-    }
 
-    "emit join of wrapped arrays for array with two elements having constant values" in {
+    "emit join of wrapped arrays for array with two elements having constant values" in
       testEmit("[\"foo\", true]")(
           Vector(PushString("foo"),
                  Map1(WrapArray),
                  PushTrue,
                  Map1(WrapArray),
                  Map2Cross(JoinArray)))
-    }
 
-    "emit join of wrapped arrays for array with four elements having either value provenance or static provenance" in {
+    "emit join of wrapped arrays for array with four elements having either value provenance or static provenance" in
       val input = """
         | a := new 4
         | [a, 5, a, 5]
@@ -678,9 +622,8 @@ object EmitterSpecs
                  Map2Cross(ArraySwap),
                  PushNum("2"),
                  Map2Cross(ArraySwap)))
-    }
 
-    "emit join of wrapped arrays for array with four elements having values from two static provenances" in {
+    "emit join of wrapped arrays for array with four elements having values from two static provenances" in
       testEmit(
           "foo := //foo bar := //bar foo ~ bar [foo.a, bar.a, foo.b, bar.b]")(
           Vector(PushString("/bar"),
@@ -717,46 +660,40 @@ object EmitterSpecs
                  Map2Cross(ArraySwap),
                  PushNum("2"),
                  Map2Cross(ArraySwap)))
-    }
 
-    "emit descent for object load" in {
+    "emit descent for object load" in
       testEmit("clicks := //clicks clicks.foo")(
           Vector(PushString("/clicks"),
                  Morph1(BuiltInMorphism1(expandGlob)),
                  AbsoluteLoad,
                  PushString("foo"),
                  Map2Cross(DerefObject)))
-    }
 
-    "emit meta descent for object load" in {
+    "emit meta descent for object load" in
       testEmit("clicks := //clicks clicks@foo")(
           Vector(PushString("/clicks"),
                  Morph1(BuiltInMorphism1(expandGlob)),
                  AbsoluteLoad,
                  PushString("foo"),
                  Map2Cross(DerefMetadata)))
-    }
 
-    "emit descent for array load" in {
+    "emit descent for array load" in
       testEmit("clicks := //clicks clicks[1]")(
           Vector(PushString("/clicks"),
                  Morph1(BuiltInMorphism1(expandGlob)),
                  AbsoluteLoad,
                  PushNum("1"),
                  Map2Cross(DerefArray)))
-    }
 
-    "emit load of literal load" in {
+    "emit load of literal load" in
       testEmit("""load("foo")""")(
           Vector(PushString("foo"), AbsoluteLoad)
       )
-    }
 
-    "emit filter cross for where loads from value provenance" in {
+    "emit filter cross for where loads from value provenance" in
       testEmit("""1 where true""")(Vector(PushNum("1"), PushTrue, FilterCross))
-    }
 
-    "emit filter cross for where loads from value provenance" in {
+    "emit filter cross for where loads from value provenance" in
       testEmit("""//clicks where (//clicks).foo = null""")(
           Vector(PushString("/clicks"),
                  Morph1(BuiltInMorphism1(expandGlob)),
@@ -769,9 +706,8 @@ object EmitterSpecs
                  PushNull,
                  Map2Cross(Eq),
                  FilterMatch))
-    }
 
-    "emit descent for array load with non-constant indices" in {
+    "emit descent for array load with non-constant indices" in
       testEmit("clicks := //clicks clicks[clicks]")(
           Vector(PushString("/clicks"),
                  Morph1(BuiltInMorphism1(expandGlob)),
@@ -779,18 +715,16 @@ object EmitterSpecs
                  Dup,
                  Swap(1),
                  Map2Match(DerefArray)))
-    }
 
-    "emit filter match for where loads from same provenance" in {
+    "emit filter match for where loads from same provenance" in
       testEmit("""foo := load("foo") foo where foo""")(
           Vector(PushString("foo"),
                  AbsoluteLoad,
                  Dup,
                  Swap(1),
                  FilterMatch))
-    }
 
-    "emit filter match for loads from same provenance when performing equality filter" in {
+    "emit filter match for loads from same provenance when performing equality filter" in
       testEmit("foo := //foo foo where foo.id = 2")(
           Vector(PushString("/foo"),
                  Morph1(BuiltInMorphism1(expandGlob)),
@@ -802,18 +736,16 @@ object EmitterSpecs
                  PushNum("2"),
                  Map2Cross(Eq),
                  FilterMatch))
-    }
 
-    "use dup bytecode to duplicate the same load" in {
+    "use dup bytecode to duplicate the same load" in
       testEmit("""clicks := load("foo") clicks + clicks""")(
           Vector(PushString("foo"),
                  AbsoluteLoad,
                  Dup,
                  Swap(1),
                  Map2Match(Add)))
-    }
 
-    "use dup bytecode non-locally" in {
+    "use dup bytecode non-locally" in
       testEmit("""clicks := load("foo") two := 2 * clicks two + clicks""")(
           Vector(PushNum("2"),
                  PushString("foo"),
@@ -824,42 +756,34 @@ object EmitterSpecs
                  Map2Cross(Mul),
                  Swap(1),
                  Map2Match(Add)))
-    }
 
-    "emit morphism1" in {
+    "emit morphism1" in
       // std::random::foobar(12) is not valid Quirrel and results in a compiler error
       val rand = Morphism1(Vector("std", "random"), "foobar", 0x0006)
 
-      forall(libMorphism1 - rand) { f =>
+      forall(libMorphism1 - rand)  f =>
         testEmit("""%s(4224)""".format(f.fqn))(
             Vector(PushNum("4224"), Morph1(BuiltInMorphism1(f))))
-      }
-    }
 
-    "emit morphism2" in {
-      forall(libMorphism2) { f =>
+    "emit morphism2" in
+      forall(libMorphism2)  f =>
         testEmit("""%s(4224, 17)""".format(f.fqn))(
             Vector(PushNum("4224"),
                    PushNum("17"),
                    Morph2(BuiltInMorphism2(f))))
-      }
-    }
 
-    "emit count reduction" in {
+    "emit count reduction" in
       testEmit("count(1)")(Vector(
               PushNum("1"),
               Reduce(BuiltInReduction(Reduction(Vector(), "count", 0x2000)))))
-    }
 
-    "emit arbitrary reduction" in {
-      forall(libReduction) { f =>
+    "emit arbitrary reduction" in
+      forall(libReduction)  f =>
         testEmit("""%s(4224)""".format(f.fqn))(
             Vector(PushNum("4224"), Reduce(BuiltInReduction(f))))
-      }
-    }
 
-    "emit unary non-reduction with object deref" in {
-      forall(lib1) { f =>
+    "emit unary non-reduction with object deref" in
+      forall(lib1)  f =>
         testEmit("""%s((//foobar).baz)""".format(f.fqn))(
             Vector(PushString("/foobar"),
                    Morph1(BuiltInMorphism1(expandGlob)),
@@ -867,19 +791,15 @@ object EmitterSpecs
                    PushString("baz"),
                    Map2Cross(DerefObject),
                    Map1(BuiltInFunction1Op(f))))
-      }
-    }
 
-    "emit unary non-reduction" in {
-      forall(lib1) { f =>
+    "emit unary non-reduction" in
+      forall(lib1)  f =>
         testEmit("""%s("2012-02-29T00:44:52.599+08:00")""".format(f.fqn))(
             Vector(PushString("2012-02-29T00:44:52.599+08:00"),
                    Map1(BuiltInFunction1Op(f))))
-      }
-    }
 
-    "emit binary non-reduction" in {
-      forall(lib2) { f =>
+    "emit binary non-reduction" in
+      forall(lib2)  f =>
         testEmit("""%s((//foo).time, (//foo).timeZone)""".format(f.fqn))(
             Vector(PushString("/foo"),
                    Morph1(BuiltInMorphism1(expandGlob)),
@@ -892,10 +812,8 @@ object EmitterSpecs
                    PushString("timeZone"),
                    Map2Cross(DerefObject),
                    Map2Match(BuiltInFunction2Op(f))))
-      }
-    }
 
-    "emit body of fully applied characteristic function" in {
+    "emit body of fully applied characteristic function" in
       testEmit(
           "clicks := //clicks clicksFor(userId) := clicks where clicks.userId = userId clicksFor(\"foo\")")(
           Vector(PushString("/clicks"),
@@ -908,9 +826,8 @@ object EmitterSpecs
                  PushString("foo"),
                  Map2Cross(Eq),
                  FilterMatch))
-    }
 
-    "emit body of a fully applied characteristic function with two variables" in {
+    "emit body of a fully applied characteristic function with two variables" in
       testEmit("""
         | fun(a, b) := 
         |   //campaigns where (//campaigns).ageRange = a & (//campaigns).gender = b
@@ -939,9 +856,8 @@ object EmitterSpecs
                  Map2Cross(Eq),
                  Map2Match(And),
                  FilterMatch))
-    }
 
-    "emit match for first-level union provenance" in {
+    "emit match for first-level union provenance" in
       testEmit("a := //a b := //b a ~ b (b.x - a.x) * (a.y - b.y)")(
           Vector(PushString("/b"),
                  Morph1(BuiltInMorphism1(expandGlob)),
@@ -1019,9 +935,8 @@ object EmitterSpecs
                  Map2Cross(DerefObject),
                  Map2Cross(Sub),
                  Map2Match(Mul)))
-    }
 
-    "emit split and merge for trivial cf example" in {
+    "emit split and merge for trivial cf example" in
       testEmit(
           "clicks := //clicks onDay := solve 'day clicks where clicks.day = 'day onDay")(
           Vector(PushString("/clicks"),
@@ -1036,9 +951,8 @@ object EmitterSpecs
                  Split,
                  PushGroup(0),
                  Merge))
-    }
 
-    "emit split and merge for solve with constraint" in {
+    "emit split and merge for solve with constraint" in
       testEmit("""
         | foo := //foo
         | bar := //bar
@@ -1075,9 +989,8 @@ object EmitterSpecs
               PushGroup(0),
               Reduce(BuiltInReduction(Reduction(Vector(), "count", 0x2000))),
               Merge))
-    }
 
-    "emit merge_buckets & for trivial cf example with conjunction" in {
+    "emit merge_buckets & for trivial cf example with conjunction" in
       testEmit(
           "clicks := //clicks onDay := solve 'day clicks where clicks.day = 'day & clicks.din = 'day onDay")(
           Vector(PushString("/clicks"),
@@ -1098,9 +1011,8 @@ object EmitterSpecs
                  Split,
                  PushGroup(0),
                  Merge))
-    }
 
-    "emit merge_buckets | for trivial cf example with disjunction" in {
+    "emit merge_buckets | for trivial cf example with disjunction" in
       testEmit(
           "clicks := //clicks onDay := solve 'day clicks where clicks.day = 'day | clicks.din = 'day onDay")(
           Vector(PushString("/clicks"),
@@ -1121,9 +1033,8 @@ object EmitterSpecs
                  Split,
                  PushGroup(0),
                  Merge))
-    }
 
-    "emit split and merge for cf example with paired tic variables in critical condition" in {
+    "emit split and merge for cf example with paired tic variables in critical condition" in
       testEmit("""
         | clicks := //clicks
         | solve 'a, 'b
@@ -1148,9 +1059,8 @@ object EmitterSpecs
                  Split,
                  PushGroup(0),
                  Merge))
-    }
 
-    "emit split and merge for cf example with consecutively-constrained paired tic variables on a single set" in {
+    "emit split and merge for cf example with consecutively-constrained paired tic variables on a single set" in
       testEmit("""
         | organizations := //organizations
         | 
@@ -1161,9 +1071,9 @@ object EmitterSpecs
         |   organizations''
         |   
         | hist""".stripMargin)(Vector())
-    }.pendingUntilFixed
+    .pendingUntilFixed
 
-    "emit split and merge for cf example with single, multiply constrained tic variable" in {
+    "emit split and merge for cf example with single, multiply constrained tic variable" in
       testEmit("""
         | clicks := //clicks
         | foo := solve 'a
@@ -1201,9 +1111,8 @@ object EmitterSpecs
                  Map2Cross(DerefObject),
                  Map2Match(Add),
                  Merge))
-    }
 
-    "emit split and merge for cf example with independent tic variables on same set" in {
+    "emit split and merge for cf example with independent tic variables on same set" in
       testEmit("""
         | clicks := //clicks
         | 
@@ -1242,9 +1151,8 @@ object EmitterSpecs
                  Map2Cross(DerefObject),
                  Map2Match(Add),
                  Merge))
-    }
 
-    "emit split and merge for cf example with independent tic variables on different sets" in {
+    "emit split and merge for cf example with independent tic variables on different sets" in
       testEmit("""
         | clicks := //clicks
         | imps := //impressions
@@ -1288,9 +1196,8 @@ object EmitterSpecs
                  Map2Cross(DerefObject),
                  Map2Cross(Add),
                  Merge))
-    }
 
-    "emit split and merge for cf example with extra sets" in {
+    "emit split and merge for cf example with extra sets" in
       testEmit("""
         | clicks := //clicks
         | foo := solve 'a clicks where clicks = 'a & clicks.b = 42
@@ -1313,9 +1220,8 @@ object EmitterSpecs
                  Split,
                  PushGroup(0),
                  Merge))
-    }
 
-    "emit split and merge for rr cf example" in {
+    "emit split and merge for rr cf example" in
       testEmit("""
         | clicks := //clicks
         | 
@@ -1324,9 +1230,9 @@ object EmitterSpecs
         |     clicks where clicks.externalSessionId = 'time & clicks.datetime = sessionId
         |   
         | totalPairs("fubar")""".stripMargin)(Vector())
-    }.pendingUntilFixed // TODO this *really* should be working
+    .pendingUntilFixed // TODO this *really* should be working
 
-    "emit split and merge for ctr example" in {
+    "emit split and merge for ctr example" in
       testEmit("""
         | clicks := //clicks
         | imps := //impressions
@@ -1363,9 +1269,8 @@ object EmitterSpecs
               Reduce(BuiltInReduction(Reduction(Vector(), "count", 0x2000))),
               Map2Cross(Div),
               Merge))
-    }
 
-    "emit dup for merge results" in {
+    "emit dup for merge results" in
       val input = """
         | clicks := //clicks
         | f := solve 'c count(clicks where clicks = 'c)
@@ -1391,9 +1296,8 @@ object EmitterSpecs
               PushString("b"),
               Map2Cross(DerefObject),
               Map2Match(Add)))
-    }
 
-    "emit code for an unquantified characteristic function" in {
+    "emit code for an unquantified characteristic function" in
       val input = """
         | campaigns := //campaigns
         | nums := distinct(campaigns.cpm where campaigns.cpm < 10)
@@ -1433,9 +1337,8 @@ object EmitterSpecs
                  Reduce(BuiltInReduction(Reduction(Vector(), "max", 0x2001))),
                  Map2Cross(Add),
                  Merge))
-    }
 
-    "determine a histogram of a composite key of revenue and campaign" >> {
+    "determine a histogram of a composite key of revenue and campaign" >>
       testEmit("""
         | campaigns := //campaigns
         | organizations := //organizations
@@ -1497,9 +1400,8 @@ object EmitterSpecs
               Map2Cross(WrapObject),
               Map2Cross(JoinObject),
               Merge))
-    }
 
-    "emit code in case when an error is supressed" in {
+    "emit code in case when an error is supressed" in
       val input = """
         | clicks := //clicks
         | views := //views
@@ -1547,10 +1449,9 @@ object EmitterSpecs
                  Map2Cross(WrapObject),
                  Map2Cross(JoinObject),
                  Merge))
-    }
 
-    "emit code for examples" in {
-      "deviant-durations.qrl" >> {
+    "emit code for examples" in
+      "deviant-durations.qrl" >>
         testEmit("""
           | interactions := //interactions
           | 
@@ -1622,9 +1523,8 @@ object EmitterSpecs
                 Map2Cross(WrapObject),
                 Map2Cross(JoinObject),
                 Merge))
-      }
 
-      "first-conversion.qrl" >> {
+      "first-conversion.qrl" >>
         testEmit("""
           | solve 'userId
           |   conversions' := //conversions
@@ -1733,9 +1633,8 @@ object EmitterSpecs
                 Map2Cross(JoinObject),
                 Merge,
                 Merge))
-      }
 
-      "histogram.qrl" >> {
+      "histogram.qrl" >>
         testEmit("""
           | clicks := //clicks
           | 
@@ -1762,11 +1661,9 @@ object EmitterSpecs
                 Map2Cross(WrapObject),
                 Map2Cross(JoinObject),
                 Merge))
-      }
-    }
 
     // Regression test for #PLATFORM-503 (Pivotal #39652091)
-    "not emit dups inside functions (might have let bindings with formals)" in {
+    "not emit dups inside functions (might have let bindings with formals)" in
       val input =
         """
         |
@@ -1881,10 +1778,9 @@ object EmitterSpecs
                  Map2Cross(Eq),
                  FilterMatch,
                  IUnion))
-    }
 
     // Regression test for #PLATFORM-652
-    "if/then/else compiles into match instead of cross" in {
+    "if/then/else compiles into match instead of cross" in
       val input =
         """
         | conversions := //conversions
@@ -1926,10 +1822,9 @@ object EmitterSpecs
                  IUnion,
                  Map2Cross(WrapObject),
                  Map2Match(JoinObject)))
-    }
 
     // regression test for PLATFORM-909
-    "produce valid bytecode for double-constrained group set should produce" in {
+    "produce valid bytecode for double-constrained group set should produce" in
       val input = """
         | foo := //foo
         | 
@@ -1956,9 +1851,8 @@ object EmitterSpecs
               FilterMatch,
               Reduce(BuiltInReduction(Reduction(Vector(), "count", 0x2000))),
               Merge))
-    }
 
-    "emit constraints defined within an inner parametric function" in {
+    "emit constraints defined within an inner parametric function" in
       val input = """
         | foo := //foo
         |
@@ -1968,9 +1862,8 @@ object EmitterSpecs
         | """.stripMargin
 
       emit(compileSingle(input)) must not(throwA[Throwable])
-    }
 
-    "not explode on consecutive solves with name-bound constraints" in {
+    "not explode on consecutive solves with name-bound constraints" in
       val input = """
         | train := //train
         | 
@@ -1985,9 +1878,8 @@ object EmitterSpecs
         | """.stripMargin
 
       emit(compileSingle(input)) must not(throwA[Throwable])
-    }
 
-    "not explode on cond in solve" in {
+    "not explode on cond in solve" in
       val input = """
         | foo := //foo
         | solve 'a
@@ -2023,9 +1915,8 @@ object EmitterSpecs
                  Split,
                  PushGroup(0),
                  Merge))
-    }
 
-    "not explode on an assert inside a solve" in {
+    "not explode on an assert inside a solve" in
       val input = """
         | data := //clicks
         |  
@@ -2035,9 +1926,8 @@ object EmitterSpecs
         | """.stripMargin
 
       emit(compileSingle(input)) must not(throwA[Throwable])
-    }
 
-    "correctly emit a matched binary operation on the results of a flatten" in {
+    "correctly emit a matched binary operation on the results of a flatten" in
       val input = """
         | foo := flatten([{ a: 1, b: 2 }, { a: 3, b: 4 }])
         | foo where foo.a = 1
@@ -2069,9 +1959,8 @@ object EmitterSpecs
                  PushNum("1"),
                  Map2Cross(Eq),
                  FilterMatch))
-    }
 
-    "emit match in join of if-then-else inside user defined function" in {
+    "emit match in join of if-then-else inside user defined function" in
       val input =
         """
         | clicks := //clicks2
@@ -2128,8 +2017,6 @@ object EmitterSpecs
                  Map2Cross(DerefObject),
                  Map1(WrapArray),
                  Map2Match(JoinArray)))
-    }
-  }
 
   /* val exampleDir = new File("quirrel/examples")
   
@@ -2156,4 +2043,3 @@ object EmitterSpecs
   } else {
     "specification examples" >> skipped
   } */
-}

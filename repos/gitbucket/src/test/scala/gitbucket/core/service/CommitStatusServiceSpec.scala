@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 
 class CommitStatusServiceSpec
     extends FunSuite with ServiceSpecBase with CommitStatusService
-    with RepositoryService with AccountService {
+    with RepositoryService with AccountService
   val now = new java.util.Date()
   val fixture1 = CommitStatus(
       userName = "root",
@@ -32,8 +32,8 @@ class CommitStatusServiceSpec
                        description = fixture1.description,
                        creator = tester,
                        now = fixture1.registeredDate)
-  test("createCommitState can insert and update") {
-    withTestDB { implicit session =>
+  test("createCommitState can insert and update")
+    withTestDB  implicit session =>
       val tester = generateNewAccount(fixture1.creator)
       insertRepository(fixture1.repositoryName, fixture1.userName, None, false)
       val id = generateFixture1(tester: Account)
@@ -61,11 +61,9 @@ class CommitStatusServiceSpec
                             targetUrl = Some("http://example.com/target2"),
                             description = Some("description2"),
                             updatedDate = time2)))
-    }
-  }
 
-  test("getCommitStatus can find by commitId and context") {
-    withTestDB { implicit session =>
+  test("getCommitStatus can find by commitId and context")
+    withTestDB  implicit session =>
       val tester = generateNewAccount(fixture1.creator)
       insertRepository(fixture1.repositoryName, fixture1.userName, None, false)
       val id = generateFixture1(tester: Account)
@@ -75,17 +73,12 @@ class CommitStatusServiceSpec
                           fixture1.commitId,
                           fixture1.context) == Some(
               fixture1.copy(commitStatusId = id)))
-    }
-  }
 
-  test("getCommitStatus can find by commitStatusId") {
-    withTestDB { implicit session =>
+  test("getCommitStatus can find by commitStatusId")
+    withTestDB  implicit session =>
       val tester = generateNewAccount(fixture1.creator)
       insertRepository(fixture1.repositoryName, fixture1.userName, None, false)
       val id = generateFixture1(tester: Account)
       assert(
           getCommitStatus(fixture1.userName, fixture1.repositoryName, id) == Some(
               fixture1.copy(commitStatusId = id)))
-    }
-  }
-}

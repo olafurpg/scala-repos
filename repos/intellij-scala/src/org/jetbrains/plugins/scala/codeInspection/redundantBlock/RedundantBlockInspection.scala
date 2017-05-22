@@ -15,9 +15,9 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
 /**
   * Pavel Fatin
   */
-class RedundantBlockInspection extends AbstractInspection {
+class RedundantBlockInspection extends AbstractInspection
 
-  def actionFor(holder: ProblemsHolder) = {
+  def actionFor(holder: ProblemsHolder) =
     case (block: ScBlock) childOf ((blockOfExpr: ScBlock) childOf (_: ScCaseClause))
         if block.hasRBrace && block.getFirstChild.getText == "{" &&
         blockOfExpr.getChildren.length == 1 &&
@@ -27,45 +27,36 @@ class RedundantBlockInspection extends AbstractInspection {
                              "Remove redundant braces",
                              new InCaseClauseQuickFix(block))
     case block: ScBlockExpr if block.getChildren.length == 3 =>
-      if (RedundantBlockInspection.isRedundantBlock(block)) {
+      if (RedundantBlockInspection.isRedundantBlock(block))
         holder.registerProblem(
             block, "The enclosing block is redundant", new QuickFix(block))
-      }
-  }
 
   private class QuickFix(e: PsiElement)
-      extends AbstractFixOnPsiElement("Unwrap the expression", e) {
-    def doApplyFix(project: Project) {
+      extends AbstractFixOnPsiElement("Unwrap the expression", e)
+    def doApplyFix(project: Project)
       val elem = getElement
       elem.replace(elem.getChildren.apply(1))
-    }
-  }
 
   private class InCaseClauseQuickFix(block: ScBlock)
-      extends AbstractFixOnPsiElement("Remove redundant braces", block) {
-    def doApplyFix(project: Project): Unit = {
+      extends AbstractFixOnPsiElement("Remove redundant braces", block)
+    def doApplyFix(project: Project): Unit =
       val bl = getElement
       val children = bl.getChildren.drop(1).dropRight(1)
-      for (child <- children) {
+      for (child <- children)
         bl.getParent.addBefore(child, bl)
-      }
       bl.delete()
-    }
-  }
-}
 
-object RedundantBlockInspection {
-  def isRedundantBlock(block: ScBlock): Boolean = {
+object RedundantBlockInspection
+  def isRedundantBlock(block: ScBlock): Boolean =
     val child: PsiElement = block.getChildren.apply(1)
-    val probablyRedundant = child match {
+    val probablyRedundant = child match
       case ref: ScReferenceExpression if ref.qualifier.isEmpty => true
       case t: ScThisReference if t.reference.isEmpty => true
       case _ => false
-    }
-    if (probablyRedundant) {
+    if (probablyRedundant)
       val next: PsiElement = block.getNextSibling
       val parent = block.getParent
-      parent match {
+      parent match
         case _: ScArgumentExprList => false
         case _ if next == null => true
         case _: ScInterpolatedStringLiteral =>
@@ -78,7 +69,4 @@ object RedundantBlockInspection {
           checkId && !text.startsWith("_") && !text.exists(_ == '$') &&
           !text.startsWith("`")
         case _ => false
-      }
-    } else false
-  }
-}
+    else false

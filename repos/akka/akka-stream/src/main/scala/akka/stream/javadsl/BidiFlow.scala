@@ -9,7 +9,7 @@ import akka.stream._
 
 import scala.concurrent.duration.FiniteDuration
 
-object BidiFlow {
+object BidiFlow
 
   private[this] val _identity: BidiFlow[
       Object, Object, Object, Object, NotUsed] =
@@ -24,10 +24,9 @@ object BidiFlow {
     */
   def fromGraph[I1, O1, I2, O2, M](
       g: Graph[BidiShape[I1, O1, I2, O2], M]): BidiFlow[I1, O1, I2, O2, M] =
-    g match {
+    g match
       case bidi: BidiFlow[I1, O1, I2, O2, M] ⇒ bidi
       case other ⇒ new BidiFlow(scaladsl.BidiFlow.fromGraph(other))
-    }
 
   /**
     * Wraps two Flows to create a ''BidiFlow''. The materialized value of the resulting BidiFlow is determined
@@ -51,10 +50,9 @@ object BidiFlow {
   def fromFlowsMat[I1, O1, I2, O2, M1, M2, M](
       flow1: Graph[FlowShape[I1, O1], M1],
       flow2: Graph[FlowShape[I2, O2], M2],
-      combine: function.Function2[M1, M2, M]): BidiFlow[I1, O1, I2, O2, M] = {
+      combine: function.Function2[M1, M2, M]): BidiFlow[I1, O1, I2, O2, M] =
     new BidiFlow(
         scaladsl.BidiFlow.fromFlowsMat(flow1, flow2)(combinerToScala(combine)))
-  }
 
   /**
     * Wraps two Flows to create a ''BidiFlow''. The materialized value of the resulting BidiFlow is NotUsed.
@@ -100,11 +98,10 @@ object BidiFlow {
   def bidirectionalIdleTimeout[I, O](
       timeout: FiniteDuration): BidiFlow[I, I, O, O, NotUsed] =
     new BidiFlow(scaladsl.BidiFlow.bidirectionalIdleTimeout(timeout))
-}
 
 final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     delegate: scaladsl.BidiFlow[I1, O1, I2, O2, Mat])
-    extends Graph[BidiShape[I1, O1, I2, O2], Mat] {
+    extends Graph[BidiShape[I1, O1, I2, O2], Mat]
   private[stream] override def module = delegate.module
   override def shape = delegate.shape
 
@@ -239,4 +236,3 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     */
   override def named(name: String): BidiFlow[I1, O1, I2, O2, Mat] =
     new BidiFlow(delegate.named(name))
-}

@@ -27,19 +27,17 @@ import org.scalatest.concurrent.Eventually._
 
 import org.apache.spark._
 
-class LauncherBackendSuite extends SparkFunSuite with Matchers {
+class LauncherBackendSuite extends SparkFunSuite with Matchers
 
   private val tests = Seq(
       "local" -> "local", "standalone/client" -> "local-cluster[1,1,1024]")
 
-  tests.foreach {
+  tests.foreach
     case (name, master) =>
-      test(s"$name: launcher handle") {
+      test(s"$name: launcher handle")
         testWithMaster(master)
-      }
-  }
 
-  private def testWithMaster(master: String): Unit = {
+  private def testWithMaster(master: String): Unit =
     val env = new java.util.HashMap[String, String]()
     env.put("SPARK_PRINT_LAUNCH_COMMAND", "1")
     val handle = new SparkLauncher(env)
@@ -54,27 +52,19 @@ class LauncherBackendSuite extends SparkFunSuite with Matchers {
       .setMainClass(TestApp.getClass.getName().stripSuffix("$"))
       .startApplication()
 
-    try {
-      eventually(timeout(30 seconds), interval(100 millis)) {
+    try
+      eventually(timeout(30 seconds), interval(100 millis))
         handle.getAppId() should not be (null)
-      }
 
       handle.stop()
 
-      eventually(timeout(30 seconds), interval(100 millis)) {
+      eventually(timeout(30 seconds), interval(100 millis))
         handle.getState() should be(SparkAppHandle.State.KILLED)
-      }
-    } finally {
+    finally
       handle.kill()
-    }
-  }
-}
 
-object TestApp {
+object TestApp
 
-  def main(args: Array[String]): Unit = {
-    new SparkContext(new SparkConf()).parallelize(Seq(1)).foreach { i =>
+  def main(args: Array[String]): Unit =
+    new SparkContext(new SparkConf()).parallelize(Seq(1)).foreach  i =>
       Thread.sleep(TimeUnit.SECONDS.toMillis(20))
-    }
-  }
-}

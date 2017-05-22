@@ -31,13 +31,13 @@ import scala.collection.immutable.Map
 
 case class PartitionFetchInfo(offset: Long, fetchSize: Int)
 
-object FetchRequest {
+object FetchRequest
   val CurrentVersion = 2.shortValue
   val DefaultMaxWait = 0
   val DefaultMinBytes = 0
   val DefaultCorrelationId = 0
 
-  def readFrom(buffer: ByteBuffer): FetchRequest = {
+  def readFrom(buffer: ByteBuffer): FetchRequest =
     val versionId = buffer.getShort
     val correlationId = buffer.getInt
     val clientId = readShortString(buffer)
@@ -46,18 +46,16 @@ object FetchRequest {
     val minBytes = buffer.getInt
     val topicCount = buffer.getInt
     val pairs = (1 to topicCount).flatMap(_ =>
-          {
         val topic = readShortString(buffer)
         val partitionCount = buffer.getInt
         (1 to partitionCount).map(_ =>
-              {
             val partitionId = buffer.getInt
             val offset = buffer.getLong
             val fetchSize = buffer.getInt
             (TopicAndPartition(topic, partitionId),
              PartitionFetchInfo(offset, fetchSize))
-        })
-    })
+        )
+    )
     FetchRequest(versionId,
                  correlationId,
                  clientId,
@@ -65,8 +63,6 @@ object FetchRequest {
                  maxWait,
                  minBytes,
                  Map(pairs: _*))
-  }
-}
 
 case class FetchRequest(
     versionId: Short = FetchRequest.CurrentVersion,
@@ -76,7 +72,7 @@ case class FetchRequest(
     maxWait: Int = FetchRequest.DefaultMaxWait,
     minBytes: Int = FetchRequest.DefaultMinBytes,
     requestInfo: Map[TopicAndPartition, PartitionFetchInfo])
-    extends RequestOrResponse(Some(ApiKeys.FETCH.id)) {
+    extends RequestOrResponse(Some(ApiKeys.FETCH.id))
 
   /**
     * Partitions the request info into a map of maps (one for each topic).
@@ -90,7 +86,7 @@ case class FetchRequest(
            clientId: String,
            maxWait: Int,
            minBytes: Int,
-           requestInfo: Map[TopicAndPartition, PartitionFetchInfo]) {
+           requestInfo: Map[TopicAndPartition, PartitionFetchInfo])
     this(versionId = FetchRequest.CurrentVersion,
          correlationId = correlationId,
          clientId = clientId,
@@ -98,9 +94,8 @@ case class FetchRequest(
          maxWait = maxWait,
          minBytes = minBytes,
          requestInfo = requestInfo)
-  }
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     buffer.putShort(versionId)
     buffer.putInt(correlationId)
     writeShortString(buffer, clientId)
@@ -108,21 +103,18 @@ case class FetchRequest(
     buffer.putInt(maxWait)
     buffer.putInt(minBytes)
     buffer.putInt(requestInfoGroupedByTopic.size) // topic count
-    requestInfoGroupedByTopic.foreach {
+    requestInfoGroupedByTopic.foreach
       case (topic, partitionFetchInfos) =>
         writeShortString(buffer, topic)
         buffer.putInt(partitionFetchInfos.size) // partition count
-        partitionFetchInfos.foreach {
+        partitionFetchInfos.foreach
           case (TopicAndPartition(_, partition),
                 PartitionFetchInfo(offset, fetchSize)) =>
             buffer.putInt(partition)
             buffer.putLong(offset)
             buffer.putInt(fetchSize)
-        }
-    }
-  }
 
-  def sizeInBytes: Int = {
+  def sizeInBytes: Int =
     2 + /* versionId */
     4 + /* correlationId */
     shortStringLength(clientId) + 4 + /* replicaId */
@@ -130,7 +122,6 @@ case class FetchRequest(
     4 + /* minBytes */
     4 + /* topic count */
     requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) =>
-          {
         val (topic, partitionFetchInfos) = currTopic
         foldedTopics + shortStringLength(topic) + 4 + /* partition count */
         partitionFetchInfos.size *
@@ -138,8 +129,7 @@ case class FetchRequest(
             8 + /* offset */
             4 /* fetch size */
             )
-    })
-  }
+    )
 
   def isFromFollower = Request.isValidBrokerId(replicaId)
 
@@ -149,19 +139,17 @@ case class FetchRequest(
 
   def numPartitions = requestInfo.size
 
-  override def toString(): String = {
+  override def toString(): String =
     describe(true)
-  }
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
-    val fetchResponsePartitionData = requestInfo.map {
+                           request: RequestChannel.Request): Unit =
+    val fetchResponsePartitionData = requestInfo.map
       case (topicAndPartition, data) =>
         (topicAndPartition,
          FetchResponsePartitionData(
              Errors.forException(e).code, -1, MessageSet.Empty))
-    }
     val fetchRequest = request.requestObj.asInstanceOf[FetchRequest]
     val errorResponse = FetchResponse(
         correlationId, fetchResponsePartitionData, fetchRequest.versionId)
@@ -169,9 +157,8 @@ case class FetchRequest(
     requestChannel.sendResponse(new RequestChannel.Response(
             request,
             new FetchResponseSend(request.connectionId, errorResponse)))
-  }
 
-  override def describe(details: Boolean): String = {
+  override def describe(details: Boolean): String =
     val fetchRequest = new StringBuilder
     fetchRequest.append("Name: " + this.getClass.getSimpleName)
     fetchRequest.append("; Version: " + versionId)
@@ -183,11 +170,9 @@ case class FetchRequest(
     if (details)
       fetchRequest.append("; RequestInfo: " + requestInfo.mkString(","))
     fetchRequest.toString()
-  }
-}
 
 @nonthreadsafe
-class FetchRequestBuilder() {
+class FetchRequestBuilder()
   private val correlationId = new AtomicInteger(0)
   private var versionId = FetchRequest.CurrentVersion
   private var clientId = ConsumerConfig.DefaultClientId
@@ -197,41 +182,35 @@ class FetchRequestBuilder() {
   private val requestMap =
     new collection.mutable.HashMap[TopicAndPartition, PartitionFetchInfo]
 
-  def addFetch(topic: String, partition: Int, offset: Long, fetchSize: Int) = {
+  def addFetch(topic: String, partition: Int, offset: Long, fetchSize: Int) =
     requestMap.put(TopicAndPartition(topic, partition),
                    PartitionFetchInfo(offset, fetchSize))
     this
-  }
 
-  def clientId(clientId: String): FetchRequestBuilder = {
+  def clientId(clientId: String): FetchRequestBuilder =
     this.clientId = clientId
     this
-  }
 
   /**
     * Only for internal use. Clients shouldn't set replicaId.
     */
-  private[kafka] def replicaId(replicaId: Int): FetchRequestBuilder = {
+  private[kafka] def replicaId(replicaId: Int): FetchRequestBuilder =
     this.replicaId = replicaId
     this
-  }
 
-  def maxWait(maxWait: Int): FetchRequestBuilder = {
+  def maxWait(maxWait: Int): FetchRequestBuilder =
     this.maxWait = maxWait
     this
-  }
 
-  def minBytes(minBytes: Int): FetchRequestBuilder = {
+  def minBytes(minBytes: Int): FetchRequestBuilder =
     this.minBytes = minBytes
     this
-  }
 
-  def requestVersion(versionId: Short): FetchRequestBuilder = {
+  def requestVersion(versionId: Short): FetchRequestBuilder =
     this.versionId = versionId
     this
-  }
 
-  def build() = {
+  def build() =
     val fetchRequest = FetchRequest(versionId,
                                     correlationId.getAndIncrement,
                                     clientId,
@@ -241,5 +220,3 @@ class FetchRequestBuilder() {
                                     requestMap.toMap)
     requestMap.clear()
     fetchRequest
-  }
-}

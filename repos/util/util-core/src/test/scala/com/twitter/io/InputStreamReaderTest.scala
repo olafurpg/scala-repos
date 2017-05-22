@@ -9,29 +9,27 @@ import org.scalatest.junit.JUnitRunner
 import com.twitter.util.Await
 
 @RunWith(classOf[JUnitRunner])
-class InputStreamReaderTest extends FunSuite {
+class InputStreamReaderTest extends FunSuite
   def arr(i: Int, j: Int) = Array.range(i, j).map(_.toByte)
   def buf(i: Int, j: Int) = Buf.ByteArray.Owned(arr(i, j))
 
-  test("InputStreamReader - read empty") {
+  test("InputStreamReader - read empty")
     val a = Array.empty[Byte]
     val s = new ByteArrayInputStream(a)
     val r = new InputStreamReader(s, 4096)
 
     val f = r.read(10)
     assert(Await.result(f).isEmpty)
-  }
 
-  test("InputStreamReader - read 0 bytes") {
+  test("InputStreamReader - read 0 bytes")
     val a = arr(0, 25)
     val s = new ByteArrayInputStream(a)
     val r = new InputStreamReader(s, 4096)
 
     val f1 = r.read(0)
     assert(Await.result(f1).get.isEmpty)
-  }
 
-  test("InputStreamReader - read positive bytes") {
+  test("InputStreamReader - read positive bytes")
     val a = arr(0, 25)
     val s = new ByteArrayInputStream(a)
     val r = new InputStreamReader(s, 4096)
@@ -47,9 +45,8 @@ class InputStreamReaderTest extends FunSuite {
 
     val f4 = r.read(10)
     assert(Await.result(f4).isEmpty)
-  }
 
-  test("InputStreamReader - read up to maxBufferSize") {
+  test("InputStreamReader - read up to maxBufferSize")
     val a = arr(0, 250)
     val s = new ByteArrayInputStream(a)
     val r = new InputStreamReader(s, 100)
@@ -65,9 +62,8 @@ class InputStreamReaderTest extends FunSuite {
 
     val f4 = r.read(1000)
     assert(Await.result(f4).isEmpty)
-  }
 
-  test("InputStreamReader - Reader.readAll") {
+  test("InputStreamReader - Reader.readAll")
     val a = arr(0, 250)
     val s1 = new ByteArrayInputStream(a)
     val s2 = new ByteArrayInputStream(a)
@@ -85,9 +81,8 @@ class InputStreamReaderTest extends FunSuite {
 
     val f4 = Reader.readAll(r2)
     assert(Await.result(f4).isEmpty)
-  }
 
-  test("InputStreamReader - discard") {
+  test("InputStreamReader - discard")
     val a = arr(0, 25)
     val s = new ByteArrayInputStream(a)
     val r = new InputStreamReader(s, 4096)
@@ -99,5 +94,3 @@ class InputStreamReaderTest extends FunSuite {
 
     val f2 = r.read(10)
     intercept[Reader.ReaderDiscarded] { Await.result(f2) }
-  }
-}

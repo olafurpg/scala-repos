@@ -21,83 +21,68 @@ import play.server.api.SSLEngineProvider
 class WrongSSLEngineProvider {}
 
 class RightSSLEngineProvider(appPro: ApplicationProvider)
-    extends SSLEngineProvider with Mockito {
-  override def createSSLEngine: SSLEngine = {
+    extends SSLEngineProvider with Mockito
+  override def createSSLEngine: SSLEngine =
     require(appPro != null)
     mock[SSLEngine]
-  }
-}
 
 class JavaSSLEngineProvider(appPro: play.server.ApplicationProvider)
-    extends play.server.SSLEngineProvider with Mockito {
-  override def createSSLEngine: SSLEngine = {
+    extends play.server.SSLEngineProvider with Mockito
+  override def createSSLEngine: SSLEngine =
     require(appPro != null)
     mock[SSLEngine]
-  }
-}
 
-class ServerSSLEngineSpec extends Specification with Mockito {
+class ServerSSLEngineSpec extends Specification with Mockito
 
   sequential
 
   trait ApplicationContext
       extends Mockito with Scope with MustThrownExpectations {}
 
-  trait TempConfDir extends After {
+  trait TempConfDir extends After
     val tempDir = File.createTempFile("ServerSSLEngine", ".tmp")
     tempDir.delete()
     val confDir = new File(tempDir, "conf")
     confDir.mkdirs()
 
-    def after = {
+    def after =
       confDir.listFiles().foreach(f => f.delete())
       tempDir.listFiles().foreach(f => f.delete())
       tempDir.delete()
-    }
-  }
 
   val javaAppProvider = mock[play.core.ApplicationProvider]
 
-  def serverConfig(tempDir: File, engineProvider: Option[String]) = {
+  def serverConfig(tempDir: File, engineProvider: Option[String]) =
     val props = new Properties()
     engineProvider.foreach(props.put("play.server.https.engineProvider", _))
     ServerConfig(rootDir = tempDir, port = Some(9000), properties = props)
-  }
 
   def createEngine(
-      engineProvider: Option[String], tempDir: Option[File] = None) = {
+      engineProvider: Option[String], tempDir: Option[File] = None) =
     val app = mock[ApplicationProvider]
     app.get returns Failure(new Exception("no app"))
     ServerSSLEngine
       .createSSLEngineProvider(
           serverConfig(tempDir.getOrElse(new File(".")), engineProvider), app)
       .createSSLEngine()
-  }
 
-  "ServerSSLContext" should {
+  "ServerSSLContext" should
 
     "default create a SSL engine suitable for development" in new ApplicationContext
-    with TempConfDir {
+    with TempConfDir
       createEngine(None, Some(tempDir)) must beAnInstanceOf[SSLEngine]
-    }
 
-    "fail to load a non existing SSLEngineProvider" in new ApplicationContext {
+    "fail to load a non existing SSLEngineProvider" in new ApplicationContext
       createEngine(Some("bla bla")) must throwA[ClassNotFoundException]
-    }
 
-    "fail to load an existing SSLEngineProvider with the wrong type" in new ApplicationContext {
+    "fail to load an existing SSLEngineProvider with the wrong type" in new ApplicationContext
       createEngine(Some(classOf[WrongSSLEngineProvider].getName)) must throwA[
           ClassCastException]
-    }
 
-    "load a custom SSLContext from a SSLEngineProvider" in new ApplicationContext {
+    "load a custom SSLContext from a SSLEngineProvider" in new ApplicationContext
       createEngine(Some(classOf[RightSSLEngineProvider].getName)) must beAnInstanceOf[
           SSLEngine]
-    }
 
-    "load a custom SSLContext from a java SSLEngineProvider" in new ApplicationContext {
+    "load a custom SSLContext from a java SSLEngineProvider" in new ApplicationContext
       createEngine(Some(classOf[JavaSSLEngineProvider].getName)) must beAnInstanceOf[
           SSLEngine]
-    }
-  }
-}

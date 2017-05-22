@@ -3,7 +3,7 @@ package reflect
 package internal
 package util
 
-trait StripMarginInterpolator {
+trait StripMarginInterpolator
   def stringContext: StringContext
 
   /**
@@ -26,17 +26,13 @@ trait StripMarginInterpolator {
     * "
     * }}}
     */
-  final def sm(args: Any*): String = {
+  final def sm(args: Any*): String =
     def isLineBreak(c: Char) =
       c == '\n' || c == '\f' // compatible with StringLike#isLineBreak
-    def stripTrailingPart(s: String) = {
+    def stripTrailingPart(s: String) =
       val (pre, post) = s.span(c => !isLineBreak(c))
       pre + post.stripMargin
-    }
-    val stripped: List[String] = stringContext.parts.toList match {
+    val stripped: List[String] = stringContext.parts.toList match
       case head :: tail => head.stripMargin :: (tail map stripTrailingPart)
       case Nil => Nil
-    }
     new StringContext(stripped: _*).raw(args: _*)
-  }
-}

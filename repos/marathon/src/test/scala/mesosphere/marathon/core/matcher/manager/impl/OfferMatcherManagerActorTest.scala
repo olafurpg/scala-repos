@@ -23,18 +23,17 @@ import scala.util.Random
 
 class OfferMatcherManagerActorTest
     extends MarathonActorSupport with FunSuiteLike with Matchers
-    with GivenWhenThen with Mockito {
+    with GivenWhenThen with Mockito
 
-  test("The list of OfferMatchers is random without precedence") {
+  test("The list of OfferMatchers is random without precedence")
     Given("OfferMatcher with num normal matchers")
     val num = 5
     val f = new Fixture
     val appId = PathId("/some/app")
     val manager = f.offerMatcherManager
     val matchers = 1.to(num).map(_ => f.matcher())
-    matchers.map { matcher =>
+    matchers.map  matcher =>
       manager ? OfferMatcherManagerDelegate.AddOrUpdateMatcher(matcher)
-    }
 
     When("The list of offer matchers is fetched")
     val orderedMatchers =
@@ -43,19 +42,17 @@ class OfferMatcherManagerActorTest
     Then("The list is sorted in the correct order")
     orderedMatchers should have size num.toLong
     orderedMatchers should contain theSameElementsAs matchers
-  }
 
-  test("The list of OfferMatchers is sorted by precedence") {
+  test("The list of OfferMatchers is sorted by precedence")
     Given(
         "OfferMatcher with num precedence and num normal matchers, registered in mixed order")
     val num = 5
     val f = new Fixture
     val appId = PathId("/some/app")
     val manager = f.offerMatcherManager
-    1.to(num).flatMap(_ => Seq(f.matcher(), f.matcher(Some(appId)))).map {
+    1.to(num).flatMap(_ => Seq(f.matcher(), f.matcher(Some(appId)))).map
       matcher =>
         manager ? OfferMatcherManagerDelegate.AddOrUpdateMatcher(matcher)
-    }
 
     When("The list of offer matchers is fetched")
     val sortedMatchers =
@@ -66,10 +63,9 @@ class OfferMatcherManagerActorTest
     val (left, right) = sortedMatchers.splitAt(num)
     left.count(_.precedenceFor.isDefined) should be(num)
     right.count(_.precedenceFor.isDefined) should be(0)
-  }
 
   implicit val timeout = Timeout(3, TimeUnit.SECONDS)
-  class Fixture {
+  class Fixture
     val metricRegistry = mock[Metrics]
     val metrics = new OfferMatcherManagerActorMetrics(metricRegistry)
     val random = new Random(new util.Random())
@@ -81,18 +77,14 @@ class OfferMatcherManagerActorTest
         OfferMatcherManagerActor.props(
             metrics, random, clock, Config, observer))
 
-    def matcher(precedence: Option[PathId] = None): OfferMatcher = {
+    def matcher(precedence: Option[PathId] = None): OfferMatcher =
       val matcher = mock[OfferMatcher]
       matcher.precedenceFor returns precedence
       matcher
-    }
 
-    def reservedOffer(appId: PathId, path: String = "test"): Offer = {
+    def reservedOffer(appId: PathId, path: String = "test"): Offer =
       import MarathonTestHelper._
       makeBasicOffer()
         .addResources(reservedDisk(LocalVolumeId(appId, path, "uuid").idString,
                                    containerPath = path))
         .build()
-    }
-  }
-}

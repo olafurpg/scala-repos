@@ -101,7 +101,7 @@ package io.prediction
   * [[P2LAlgorithm.makePersistentModel]], and [[PAlgorithm.makePersistentModel]]
   * for descriptions on different strategies.
   */
-package object controller {
+package object controller
 
   /** Base class of several helper types that represent emptiness
     *
@@ -163,4 +163,3 @@ package object controller {
     * @group Helper
     */
   type EmptyActualResult = SerializableClass
-}

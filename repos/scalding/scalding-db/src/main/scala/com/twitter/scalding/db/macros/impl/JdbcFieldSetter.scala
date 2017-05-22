@@ -24,30 +24,28 @@ import com.twitter.scalding.macros.impl.CaseClassFieldSetter
 /**
   * Helper class for setting case class fields in java.sql.Statement
   */
-private[macros] object JdbcFieldSetter extends CaseClassFieldSetter {
+private[macros] object JdbcFieldSetter extends CaseClassFieldSetter
 
-  override def absent(c: Context)(idx: Int, container: c.TermName): c.Tree = {
+  override def absent(c: Context)(idx: Int, container: c.TermName): c.Tree =
     import c.universe._
     q"""$container.setObject($idx + 1, null)"""
-  }
 
   override def default(c: Context)(
-      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree = {
+      idx: Int, container: c.TermName, fieldValue: c.Tree): c.Tree =
     import c.universe._
     q"""$container.setObject($idx + 1, $fieldValue)"""
-  }
 
   override def from(c: Context)(fieldType: c.Type,
                                 idx: Int,
                                 container: c.TermName,
-                                fieldValue: c.Tree): Try[c.Tree] = Try {
+                                fieldValue: c.Tree): Try[c.Tree] = Try
     import c.universe._
 
     // jdbc Statement indexes are one-based, hence +1 here
     def simpleType(accessor: Tree) =
       q"""${accessor}(${idx + 1}, $fieldValue)"""
 
-    fieldType match {
+    fieldType match
       case tpe if tpe =:= typeOf[String] => simpleType(q"$container.setString")
       case tpe if tpe =:= typeOf[Boolean] =>
         simpleType(q"$container.setBoolean")
@@ -57,6 +55,3 @@ private[macros] object JdbcFieldSetter extends CaseClassFieldSetter {
       case tpe if tpe =:= typeOf[Float] => simpleType(q"$container.setFloat")
       case tpe if tpe =:= typeOf[Double] => simpleType(q"$container.setDouble")
       case _ => sys.error(s"Unsupported primitive type ${fieldType}")
-    }
-  }
-}

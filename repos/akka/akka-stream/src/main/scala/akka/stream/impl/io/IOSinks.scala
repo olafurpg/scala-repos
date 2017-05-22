@@ -23,11 +23,11 @@ private[akka] final class FileSink(f: File,
                                    options: Set[StandardOpenOption],
                                    val attributes: Attributes,
                                    shape: SinkShape[ByteString])
-    extends SinkModule[ByteString, Future[IOResult]](shape) {
+    extends SinkModule[ByteString, Future[IOResult]](shape)
 
   override protected def label: String = s"FileSink($f, $options)"
 
-  override def create(context: MaterializationContext) = {
+  override def create(context: MaterializationContext) =
     val materializer = ActorMaterializer.downcast(context.materializer)
     val settings = materializer.effectiveSettings(context.effectiveAttributes)
 
@@ -40,7 +40,6 @@ private[akka] final class FileSink(f: File,
     val ref = materializer.actorOf(context, props.withDispatcher(dispatcher))
     (akka.stream.actor.ActorSubscriber[ByteString](ref),
      ioResultPromise.future)
-  }
 
   override protected def newInstance(
       shape: SinkShape[ByteString]): SinkModule[ByteString, Future[IOResult]] =
@@ -48,7 +47,6 @@ private[akka] final class FileSink(f: File,
 
   override def withAttributes(attr: Attributes): Module =
     new FileSink(f, options, attr, amendShape(attr))
-}
 
 /**
   * INTERNAL API
@@ -59,9 +57,9 @@ private[akka] final class OutputStreamSink(createOutput: () ⇒ OutputStream,
                                            val attributes: Attributes,
                                            shape: SinkShape[ByteString],
                                            autoFlush: Boolean)
-    extends SinkModule[ByteString, Future[IOResult]](shape) {
+    extends SinkModule[ByteString, Future[IOResult]](shape)
 
-  override def create(context: MaterializationContext) = {
+  override def create(context: MaterializationContext) =
     val materializer = ActorMaterializer.downcast(context.materializer)
     val settings = materializer.effectiveSettings(context.effectiveAttributes)
     val ioResultPromise = Promise[IOResult]()
@@ -74,7 +72,6 @@ private[akka] final class OutputStreamSink(createOutput: () ⇒ OutputStream,
     val ref = materializer.actorOf(context, props)
     (akka.stream.actor.ActorSubscriber[ByteString](ref),
      ioResultPromise.future)
-  }
 
   override protected def newInstance(
       shape: SinkShape[ByteString]): SinkModule[ByteString, Future[IOResult]] =
@@ -82,4 +79,3 @@ private[akka] final class OutputStreamSink(createOutput: () ⇒ OutputStream,
 
   override def withAttributes(attr: Attributes): Module =
     new OutputStreamSink(createOutput, attr, amendShape(attr), autoFlush)
-}

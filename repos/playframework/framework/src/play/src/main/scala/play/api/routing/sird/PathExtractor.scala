@@ -24,7 +24,7 @@ import scala.util.matching.Regex
   * @param regex The regex that is used to extract the raw parts.
   * @param partDescriptors Descriptors saying whether each part should be decoded or not.
   */
-class PathExtractor(regex: Regex, partDescriptors: Seq[PathPart.Value]) {
+class PathExtractor(regex: Regex, partDescriptors: Seq[PathPart.Value])
   def unapplySeq(path: String): Option[List[String]] = extract(path)
   def unapplySeq(request: RequestHeader): Option[List[String]] =
     extract(request.path)
@@ -33,18 +33,14 @@ class PathExtractor(regex: Regex, partDescriptors: Seq[PathPart.Value]) {
   def unapplySeq(uri: URI): Option[List[String]] =
     Option(uri.getRawPath).flatMap(extract)
 
-  private def extract(path: String): Option[List[String]] = {
-    regex.unapplySeq(path).map { parts =>
-      parts.zip(partDescriptors).map {
+  private def extract(path: String): Option[List[String]] =
+    regex.unapplySeq(path).map  parts =>
+      parts.zip(partDescriptors).map
         case (part, PathPart.Decoded) =>
           UriEncoding.decodePathSegment(part, "utf-8")
         case (part, PathPart.Raw) => part
-      }
-    }
-  }
-}
 
-object PathExtractor {
+object PathExtractor
   // Memoizes all the routes, so that the route doesn't have to be parsed, and the resulting regex compiled,
   // on each invocation.
   // There is a possible memory leak here, especially if RouteContext is instantiated dynamically. But,
@@ -57,35 +53,31 @@ object PathExtractor {
   /**
     * Lookup the PathExtractor from the cache, or create and store a new one if not found.
     */
-  def cached(parts: Seq[String]): PathExtractor = {
-    cache.getOrElseUpdate(parts, {
+  def cached(parts: Seq[String]): PathExtractor =
+    cache.getOrElseUpdate(parts,
 
       // "parse" the path
-      val (regexParts, descs) = parts.tail.map {
+      val (regexParts, descs) = parts.tail.map
         part =>
-          if (part.startsWith("*")) {
+          if (part.startsWith("*"))
             // It's a .* matcher
             "(.*)" + Pattern.quote(part.drop(1)) -> PathPart.Raw
-          } else if (part.startsWith("<") && part.contains(">")) {
+          else if (part.startsWith("<") && part.contains(">"))
             // It's a regex matcher
             val splitted = part.split(">", 2)
             val regex = splitted(0).drop(1)
             "(" + regex + ")" + Pattern.quote(splitted(1)) -> PathPart.Raw
-          } else {
+          else
             // It's an ordinary path part matcher
             "([^/]*)" + Pattern.quote(part) -> PathPart.Decoded
-          }
-      }.unzip
+      .unzip
 
       new PathExtractor(
           regexParts.mkString(Pattern.quote(parts.head), "", "/?").r, descs)
-    })
-  }
-}
+    )
 
 /**
   * A path part descriptor. Describes whether the path part should be decoded, or left as is.
   */
-private object PathPart extends Enumeration {
+private object PathPart extends Enumeration
   val Decoded, Raw = Value
-}

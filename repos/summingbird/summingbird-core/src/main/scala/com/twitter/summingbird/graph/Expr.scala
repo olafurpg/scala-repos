@@ -44,14 +44,12 @@ final case class Id[T](id: Int)
   * Which seems to show a way to do currying, so we can handle general
   * arity
   */
-sealed trait Expr[T, N[_]] {
+sealed trait Expr[T, N[_]]
   def evaluate(idToExp: HMap[Id, ({ type E[t] = Expr[t, N] })#E]): N[T] =
     Expr.evaluate(idToExp, this)
-}
-case class Const[T, N[_]](value: N[T]) extends Expr[T, N] {
+case class Const[T, N[_]](value: N[T]) extends Expr[T, N]
   override def evaluate(
       idToExp: HMap[Id, ({ type E[t] = Expr[t, N] })#E]): N[T] = value
-}
 case class Var[T, N[_]](name: Id[T]) extends Expr[T, N]
 case class Unary[T1, T2, N[_]](arg: Id[T1], fn: N[T1] => N[T2])
     extends Expr[T2, N]
@@ -59,7 +57,7 @@ case class Binary[T1, T2, T3, N[_]](
     arg1: Id[T1], arg2: Id[T2], fn: (N[T1], N[T2]) => N[T3])
     extends Expr[T3, N]
 
-object Expr {
+object Expr
   def evaluate[T, N[_]](idToExp: HMap[Id, ({ type E[t] = Expr[t, N] })#E],
                         expr: Expr[T, N]): N[T] =
     evaluate(idToExp, HMap.empty[({ type E[t] = Expr[t, N] })#E, N], expr)._2
@@ -68,10 +66,10 @@ object Expr {
       idToExp: HMap[Id, ({ type E[t] = Expr[t, N] })#E],
       cache: HMap[({ type E[t] = Expr[t, N] })#E, N],
       expr: Expr[T, N]): (HMap[({ type E[t] = Expr[t, N] })#E, N], N[T]) =
-    cache.get(expr) match {
+    cache.get(expr) match
       case Some(node) => (cache, node)
       case None =>
-        expr match {
+        expr match
           case Const(n) => (cache + (expr -> n), n)
           case Var(id) =>
             val (c1, n) = evaluate(idToExp, cache, idToExp(id))
@@ -85,6 +83,3 @@ object Expr {
             val (c2, n2) = evaluate(idToExp, c1, idToExp(id2))
             val n3 = fn(n1, n2)
             (c2 + (expr -> n3), n3)
-        }
-    }
-}

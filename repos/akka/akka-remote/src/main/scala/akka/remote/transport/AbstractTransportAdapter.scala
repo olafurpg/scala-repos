@@ -16,49 +16,44 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
 import akka.remote.transport.AssociationHandle.DisassociateInfo
 import akka.actor.DeadLetterSuppression
 
-trait TransportAdapterProvider {
+trait TransportAdapterProvider
 
   /**
     * Create the transport adapter that wraps an underlying transport.
     */
   def create(
       wrappedTransport: Transport, system: ExtendedActorSystem): Transport
-}
 
-class TransportAdapters(system: ExtendedActorSystem) extends Extension {
+class TransportAdapters(system: ExtendedActorSystem) extends Extension
   val settings = RARP(system).provider.remoteSettings
 
   private val adaptersTable: Map[String, TransportAdapterProvider] =
-    for ((name, fqn) ← settings.Adapters) yield {
+    for ((name, fqn) ← settings.Adapters) yield
       name -> system.dynamicAccess
         .createInstanceFor[TransportAdapterProvider](fqn, immutable.Seq.empty)
-        .recover({
+        .recover(
           case e ⇒
             throw new IllegalArgumentException(
                 s"Cannot instantiate transport adapter [${fqn}]", e)
-        })
+        )
         .get
-    }
 
   def getAdapterProvider(name: String): TransportAdapterProvider =
-    adaptersTable.get(name) match {
+    adaptersTable.get(name) match
       case Some(provider) ⇒ provider
       case None ⇒
         throw new IllegalArgumentException(
             s"There is no registered transport adapter provider with name: [${name}]")
-    }
-}
 
 object TransportAdaptersExtension
-    extends ExtensionId[TransportAdapters] with ExtensionIdProvider {
+    extends ExtensionId[TransportAdapters] with ExtensionIdProvider
   override def get(system: ActorSystem): TransportAdapters = super.get(system)
   override def lookup = TransportAdaptersExtension
   override def createExtension(
       system: ExtendedActorSystem): TransportAdapters =
     new TransportAdapters(system)
-}
 
-trait SchemeAugmenter {
+trait SchemeAugmenter
   protected def addedSchemeIdentifier: String
 
   protected def augmentScheme(originalScheme: String): String =
@@ -74,7 +69,6 @@ trait SchemeAugmenter {
 
   protected def removeScheme(address: Address): Address =
     address.copy(protocol = removeScheme(address.protocol))
-}
 
 /**
   * An adapter that wraps a transport and provides interception
@@ -82,7 +76,7 @@ trait SchemeAugmenter {
 abstract class AbstractTransportAdapter(
     protected val wrappedTransport: Transport)(
     implicit val ec: ExecutionContext)
-    extends Transport with SchemeAugmenter {
+    extends Transport with SchemeAugmenter
 
   protected def maximumOverhead: Int
 
@@ -103,10 +97,10 @@ abstract class AbstractTransportAdapter(
   override def maximumPayloadBytes: Int =
     wrappedTransport.maximumPayloadBytes - maximumOverhead
 
-  override def listen: Future[(Address, Promise[AssociationEventListener])] = {
+  override def listen: Future[(Address, Promise[AssociationEventListener])] =
     val upstreamListenerPromise: Promise[AssociationEventListener] = Promise()
 
-    for {
+    for
       (listenAddress, listenerPromise) ← wrappedTransport.listen
       // Enforce ordering between the signalling of "listen ready" to upstream
       // and initialization happening in interceptListen
@@ -114,40 +108,36 @@ abstract class AbstractTransportAdapter(
         .tryCompleteWith(
             interceptListen(listenAddress, upstreamListenerPromise.future))
         .future
-    } yield (augmentScheme(listenAddress), upstreamListenerPromise)
-  }
+    yield (augmentScheme(listenAddress), upstreamListenerPromise)
 
   /**
     * INTERNAL API
     * @return
     *  The address this Transport is listening to.
     */
-  private[akka] def boundAddress: Address = wrappedTransport match {
+  private[akka] def boundAddress: Address = wrappedTransport match
     // Need to do like this in the backport of #15007 to 2.3.x for binary compatibility reasons
     case t: AbstractTransportAdapter ⇒ t.boundAddress
     case t: netty.NettyTransport ⇒ t.boundAddress
     case t: TestTransport ⇒ t.boundAddress
     case _ ⇒ null
-  }
 
-  override def associate(remoteAddress: Address): Future[AssociationHandle] = {
+  override def associate(remoteAddress: Address): Future[AssociationHandle] =
     // Prepare a future, and pass its promise to the manager
     val statusPromise: Promise[AssociationHandle] = Promise()
 
     interceptAssociate(removeScheme(remoteAddress), statusPromise)
 
     statusPromise.future
-  }
 
   override def shutdown(): Future[Boolean] = wrappedTransport.shutdown()
-}
 
 abstract class AbstractTransportAdapterHandle(
     val originalLocalAddress: Address,
     val originalRemoteAddress: Address,
     val wrappedHandle: AssociationHandle,
     val addedSchemeIdentifier: String)
-    extends AssociationHandle with SchemeAugmenter {
+    extends AssociationHandle with SchemeAugmenter
 
   def this(wrappedHandle: AssociationHandle, addedSchemeIdentifier: String) =
     this(wrappedHandle.localAddress,
@@ -157,9 +147,8 @@ abstract class AbstractTransportAdapterHandle(
 
   override val localAddress = augmentScheme(originalLocalAddress)
   override val remoteAddress = augmentScheme(originalRemoteAddress)
-}
 
-object ActorTransportAdapter {
+object ActorTransportAdapter
   sealed trait TransportOperation extends NoSerializationVerificationNeeded
 
   final case class ListenerRegistered(listener: AssociationEventListener)
@@ -176,11 +165,10 @@ object ActorTransportAdapter {
       extends TransportOperation with DeadLetterSuppression
 
   implicit val AskTimeout = Timeout(5.seconds)
-}
 
 abstract class ActorTransportAdapter(
     wrappedTransport: Transport, system: ActorSystem)
-    extends AbstractTransportAdapter(wrappedTransport)(system.dispatcher) {
+    extends AbstractTransportAdapter(wrappedTransport)(system.dispatcher)
 
   import ActorTransportAdapter._
 
@@ -196,16 +184,14 @@ abstract class ActorTransportAdapter(
   override def interceptListen(
       listenAddress: Address,
       listenerPromise: Future[AssociationEventListener])
-    : Future[AssociationEventListener] = {
-    registerManager().map { mgr ⇒
+    : Future[AssociationEventListener] =
+    registerManager().map  mgr ⇒
       // Side effecting: storing the manager instance in volatile var
       // This is done only once: during the initialization of the protocol stack. The variable manager is not read
       // before listen is called.
       manager = mgr
       manager ! ListenUnderlying(listenAddress, listenerPromise)
       ActorAssociationEventListener(manager)
-    }
-  }
 
   override def interceptAssociate(
       remoteAddress: Address,
@@ -213,15 +199,14 @@ abstract class ActorTransportAdapter(
     manager ! AssociateUnderlying(remoteAddress, statusPromise)
 
   override def shutdown(): Future[Boolean] =
-    for {
+    for
       stopResult ← gracefulStop(
           manager, RARP(system).provider.remoteSettings.FlushWait)
       wrappedStopResult ← wrappedTransport.shutdown()
-    } yield stopResult && wrappedStopResult
-}
+    yield stopResult && wrappedStopResult
 
 abstract class ActorTransportAdapterManager
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics]
   import ActorTransportAdapter.{ListenUnderlying, ListenerRegistered}
 
   private var delayedEvents = immutable.Queue.empty[Any]
@@ -230,14 +215,13 @@ abstract class ActorTransportAdapterManager
   protected var localAddress: Address = _
   private var uniqueId = 0L
 
-  protected def nextId(): Long = {
+  protected def nextId(): Long =
     uniqueId += 1
     uniqueId
-  }
 
   import context.dispatcher
 
-  def receive: Receive = {
+  def receive: Receive =
     case ListenUnderlying(listenAddress, upstreamListenerFuture) ⇒
       localAddress = listenAddress
       upstreamListenerFuture.future.map { ListenerRegistered(_) } pipeTo self
@@ -253,7 +237,5 @@ abstract class ActorTransportAdapterManager
      * These messages will be processed in the ready state.
      */
     case otherEvent ⇒ delayedEvents = delayedEvents enqueue otherEvent
-  }
 
   protected def ready: Receive
-}

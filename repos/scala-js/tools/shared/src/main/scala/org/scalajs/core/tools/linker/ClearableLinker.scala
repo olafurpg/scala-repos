@@ -24,57 +24,51 @@ import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
   *  This class is not thread-safe.
   */
 final class ClearableLinker(newLinker: () => GenLinker, batchMode: Boolean)
-    extends GenLinker {
+    extends GenLinker
 
   private[this] var _semantics: Semantics = _
   private[this] var _esLevel: ESLevel = _
   private[this] var _linker: GenLinker = _
 
-  def semantics: Semantics = {
+  def semantics: Semantics =
     ensureLinker()
     _semantics
-  }
 
-  def esLevel: ESLevel = {
+  def esLevel: ESLevel =
     ensureLinker()
     _esLevel
-  }
 
   def linkUnit(irFiles: Seq[VirtualScalaJSIRFile],
                symbolRequirements: SymbolRequirement,
-               logger: Logger): LinkingUnit = {
+               logger: Logger): LinkingUnit =
     linkerOp(_.linkUnit(irFiles, symbolRequirements, logger))
-  }
 
   def link(irFiles: Seq[VirtualScalaJSIRFile],
            output: WritableVirtualJSFile,
-           logger: Logger): Unit = {
+           logger: Logger): Unit =
     linkerOp(_.link(irFiles, output, logger))
-  }
 
   def clear(): Unit =
     _linker = null
 
   @inline
-  private[this] def linkerOp[T](op: GenLinker => T): T = {
+  private[this] def linkerOp[T](op: GenLinker => T): T =
     ensureLinker()
 
-    try {
+    try
       op(_linker)
-    } catch {
+    catch
       // Clear if we throw
       case t: Throwable =>
         clear()
         throw t
-    } finally {
+    finally
       // Clear if we are in batch mode
       if (batchMode) clear()
-    }
-  }
 
-  private def ensureLinker(): Unit = {
+  private def ensureLinker(): Unit =
     // Ensure we have a linker
-    if (_linker == null) {
+    if (_linker == null)
       val candidate = newLinker()
 
       if (_semantics == null) _semantics = candidate.semantics
@@ -85,6 +79,3 @@ final class ClearableLinker(newLinker: () => GenLinker, batchMode: Boolean)
       else require(_esLevel == candidate.esLevel, "Linker changed ESLevel")
 
       _linker = candidate
-    }
-  }
-}

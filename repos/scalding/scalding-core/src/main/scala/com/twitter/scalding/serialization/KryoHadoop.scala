@@ -26,7 +26,7 @@ import com.twitter.chill.algebird._
 import com.twitter.chill.config.Config
 import com.twitter.chill.{SingletonSerializer, ScalaKryoInstantiator, KryoInstantiator}
 
-class KryoHadoop(@transient config: Config) extends KryoInstantiator {
+class KryoHadoop(@transient config: Config) extends KryoInstantiator
   // keeping track of references is costly for memory, and often triggers OOM on Hadoop
   val useRefs = config.getBoolean("scalding.kryo.setreferences", false)
 
@@ -41,7 +41,7 @@ class KryoHadoop(@transient config: Config) extends KryoInstantiator {
     *
     * We must identify each and fix these bugs.
     */
-  override def newKryo: Kryo = {
+  override def newKryo: Kryo =
     val newK = (new ScalaKryoInstantiator).newKryo
     // These are scalding objects:
     newK.register(classOf[RichDate], new RichDateSerializer())
@@ -98,5 +98,3 @@ class KryoHadoop(@transient config: Config) extends KryoInstantiator {
     newK.setClassLoader(classLoader)
 
     newK
-  }
-}

@@ -9,19 +9,18 @@ package session
 
 import scala.collection.mutable.{Buffer, ListBuffer}
 
-class SimpleHistory extends History {
+class SimpleHistory extends History
   private var _index: Int = 0
   protected val buf: Buffer[String] = new ListBuffer[String]
   private def setTo(num: Int) = { _index = num; true }
   private def minusOne = { _index -= 1; true }
   private def plusOne = { _index += 1; true }
   private def lastIndex = size - 1
-  private def fail(msg: String): String = {
+  private def fail(msg: String): String =
     repldbg(
         "Internal error in history(size %d, index %d): %s".format(
             size, index, msg))
     ""
-  }
 
   def maxSize: Int = 2500
   def last = if (isEmpty) fail("last") else buf.last
@@ -32,10 +31,9 @@ class SimpleHistory extends History {
   def clear() = buf.clear()
   def get(idx: Int): CharSequence = buf(idx)
   def add(item: CharSequence): Unit = buf += item
-  def replace(item: CharSequence): Unit = {
+  def replace(item: CharSequence): Unit =
     buf trimEnd 1
     add(item)
-  }
 
   def remove(idx: Int): CharSequence = buf remove idx
   def removeFirst(): CharSequence = buf remove 0
@@ -52,4 +50,3 @@ class SimpleHistory extends History {
   def moveToEnd(): Unit = setTo(size)
 
   def asStrings = buf.toList
-}

@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Side
 
-object BackgroundPosition {
+object BackgroundPosition
   implicit def sfxBackgroundPosition2jfx(
       v: BackgroundPosition): jfxsl.BackgroundPosition =
     if (v != null) v.delegate else null
@@ -43,7 +43,6 @@ object BackgroundPosition {
 
   /** The default BackgroundPosition for any BackgroundImage. */
   val Default = jfxsl.BackgroundPosition.DEFAULT
-}
 
 /**
   * Represents the position of a BackgroundImage within the Region's drawing area.
@@ -51,7 +50,7 @@ object BackgroundPosition {
   * Wrapper for [[http://docs.oracle.com/javafx/8/api/javafx/scene/layout/BackgroundPosition]]
   */
 class BackgroundPosition(override val delegate: jfxsl.BackgroundPosition)
-    extends SFXDelegate[jfxsl.BackgroundPosition] {
+    extends SFXDelegate[jfxsl.BackgroundPosition]
 
   /** Creates a new BackgroundPosition. */
   def this(horizontalSide: Side,
@@ -89,4 +88,3 @@ class BackgroundPosition(override val delegate: jfxsl.BackgroundPosition)
     * The side along the vertical axis to which the BackgroundImage is anchored.
     */
   def verticalSide: Side = delegate.getVerticalSide
-}

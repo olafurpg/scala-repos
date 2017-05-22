@@ -19,6 +19,5 @@
  */
 package com.precog.yggdrasil
 
-package object vfs {
+package object vfs
   type VersionId = java.util.UUID
-}

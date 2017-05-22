@@ -21,7 +21,7 @@ import org.jetbrains.sbt.project.modifier.SimpleBuildFileModifier
   * @author Ksenia.Sautina
   * @since 5/18/12
   */
-abstract class AbstractTestFramework extends JavaTestFramework {
+abstract class AbstractTestFramework extends JavaTestFramework
   def isTestMethod(element: PsiElement): Boolean = false
 
   def getTestMethodFileTemplateDescriptor: FileTemplateDescriptor = null
@@ -40,11 +40,11 @@ abstract class AbstractTestFramework extends JavaTestFramework {
 
   def findSetUpMethod(clazz: PsiClass): PsiMethod = null
 
-  def isTestClass(clazz: PsiClass, canBePotential: Boolean): Boolean = {
-    val parent: ScTypeDefinition = PsiTreeUtil.getParentOfType(clazz match {
+  def isTestClass(clazz: PsiClass, canBePotential: Boolean): Boolean =
+    val parent: ScTypeDefinition = PsiTreeUtil.getParentOfType(clazz match
       case wrapper: PsiClassWrapper => wrapper.definition
       case _ => clazz
-    }, classOf[ScTypeDefinition], false)
+    , classOf[ScTypeDefinition], false)
     if (parent == null) return false
     val project = clazz.getProject
     val suiteClazz: PsiClass = ScalaPsiManager
@@ -54,7 +54,6 @@ abstract class AbstractTestFramework extends JavaTestFramework {
                       ScalaPsiManager.ClassCategory.TYPE)
     if (suiteClazz == null) return false
     ScalaPsiUtil.cachedDeepIsInheritor(parent, suiteClazz)
-  }
 
   override def getLanguage: Language = ScalaFileType.SCALA_LANGUAGE
 
@@ -68,9 +67,9 @@ abstract class AbstractTestFramework extends JavaTestFramework {
   protected def getAdditionalBuildCommands(
       scalaVersion: Option[String]): Seq[String]
 
-  override def setupLibrary(module: Module) {
+  override def setupLibrary(module: Module)
     import org.jetbrains.plugins.scala.project._
-    val (libraries, resolvers, options) = module.scalaSdk match {
+    val (libraries, resolvers, options) = module.scalaSdk match
       case Some(scalaSdk) =>
         val compilerVersion = scalaSdk.compilerVersion
         (getLibraryDependencies(compilerVersion),
@@ -80,8 +79,5 @@ abstract class AbstractTestFramework extends JavaTestFramework {
         throw new RuntimeException(
             "Failed to download test library jars: scala SDK is not specified to module" +
             module.getName)
-    }
     val modifier = new SimpleBuildFileModifier(libraries, resolvers, options)
     modifier.modify(module, needPreviewChanges = true)
-  }
-}

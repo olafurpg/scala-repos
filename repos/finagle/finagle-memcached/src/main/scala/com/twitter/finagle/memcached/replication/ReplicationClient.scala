@@ -47,37 +47,33 @@ case class SCasUnique(casUnique: Buf) extends ReplicaCasUnique
 /**
   * Replication client helper
   */
-object ReplicationClient {
+object ReplicationClient
   def newBaseReplicationClient(
       pools: Seq[Cluster[CacheNode]],
       clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] = None,
       hashName: Option[String] = None,
       failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
-  ) = {
+  ) =
     val underlyingClients =
-      pools map { pool =>
+      pools map  pool =>
         Await.result(pool.ready)
         KetamaClientBuilder(Group.fromCluster(pool),
                             hashName,
                             clientBuilder,
                             failureAccrualParams).build()
-      }
     val repStatsReceiver =
       clientBuilder map { _.statsReceiver.scope("cache_replication") } getOrElse
       (NullStatsReceiver)
     new BaseReplicationClient(underlyingClients, repStatsReceiver)
-  }
 
   def newSimpleReplicationClient(
       pools: Seq[Cluster[CacheNode]],
       clientBuilder: Option[ClientBuilder[_, _, _, _, ClientConfig.Yes]] = None,
       hashName: Option[String] = None,
       failureAccrualParams: (Int, () => Duration) = (5, () => 30.seconds)
-  ) = {
+  ) =
     new SimpleReplicationClient(newBaseReplicationClient(
             pools, clientBuilder, hashName, failureAccrualParams))
-  }
-}
 
 /**
   * Base replication client. This client manages a list of base memcached clients representing
@@ -87,7 +83,7 @@ object ReplicationClient {
   * @param statsReceiver
   */
 class BaseReplicationClient(
-    clients: Seq[Client], statsReceiver: StatsReceiver = NullStatsReceiver) {
+    clients: Seq[Client], statsReceiver: StatsReceiver = NullStatsReceiver)
   private[this] val inconsistentContentCounter =
     statsReceiver.counter("inconsistent_content_count")
   private[this] val failedCounter =
@@ -103,28 +99,25 @@ class BaseReplicationClient(
     * TODO: introducing BackupRequestFilter to shorten the waiting period for secondary requests
     */
   private[memcached] def getResult(
-      keys: Iterable[String], useRandomOrder: Boolean): Future[GetResult] = {
+      keys: Iterable[String], useRandomOrder: Boolean): Future[GetResult] =
     val clientsInOrder =
       if (useRandomOrder) Random.shuffle(clients) else clients
 
     def loopGet(
         clients: Seq[Client], currentRes: GetResult): Future[GetResult] =
-      clients match {
+      clients match
         case _ if currentRes.misses.isEmpty && currentRes.failures.isEmpty =>
           Future.value(currentRes)
         case Seq() => Future.value(currentRes)
         case Seq(c, tail @ _ *) =>
           val missing = currentRes.misses ++ currentRes.failures.keySet
-          c.getResult(missing) flatMap {
+          c.getResult(missing) flatMap
             case res =>
               val newRes =
                 GetResult.merged(Seq(GetResult(currentRes.hits), res))
               loopGet(tail, newRes)
-          }
-      }
 
     loopGet(clientsInOrder, GetResult(Map.empty, keys.toSet))
-  }
 
   /**
     * Get one value for the input keys from the underlying replicas.
@@ -137,11 +130,10 @@ class BaseReplicationClient(
 
   def getOne(keys: Iterable[String],
              useRandomOrder: Boolean): Future[Map[String, Buf]] =
-    getResult(keys, useRandomOrder) flatMap { result =>
+    getResult(keys, useRandomOrder) flatMap  result =>
       if (result.failures.nonEmpty)
         Future.exception(result.failures.values.head)
       else Future.value(result.values)
-    }
 
   /**
     * Get replication status for the input keys from the underlying replicas.
@@ -152,23 +144,20 @@ class BaseReplicationClient(
     getAll(Seq(key)) map { _.values.head }
 
   def getAll(keys: Iterable[String])
-    : Future[Map[String, ReplicationStatus[Option[Buf]]]] = {
+    : Future[Map[String, ReplicationStatus[Option[Buf]]]] =
     val keySet = keys.toSet
-    Future.collect(clients map { _.getResult(keySet) }) map {
+    Future.collect(clients map { _.getResult(keySet) }) map
       results: Seq[GetResult] =>
-        keySet.map { k =>
+        keySet.map  k =>
           val replicasResult =
-            results map {
+            results map
               case r if (r.hits.contains(k)) =>
                 Return(Some(r.hits.get(k).get.value))
               case r if (r.misses.contains(k)) => Return(None)
               case r if (r.failures.contains(k)) =>
                 Throw(r.failures.get(k).get)
-            }
           k -> toReplicationStatus(replicasResult)
-        }.toMap
-    }
-  }
+        .toMap
 
   /**
     * Get replication status for the input keys and their checksum. The aggregated results returned
@@ -186,24 +175,21 @@ class BaseReplicationClient(
     getsAll(Seq(key)) map { _.values.head }
 
   def getsAll(keys: Iterable[String]): Future[Map[
-          String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] = {
+          String, ReplicationStatus[Option[(Buf, ReplicaCasUnique)]]]] =
     val keySet = keys.toSet
-    Future.collect(clients map { _.getsResult(keySet) }) map {
+    Future.collect(clients map { _.getsResult(keySet) }) map
       results: Seq[GetsResult] =>
-        keySet.map { k =>
+        keySet.map  k =>
           val replicasResult =
-            results map {
+            results map
               case r if (r.hits.contains(k)) =>
                 Return(Some(r.hits.get(k).get.value))
               case r if (r.misses.contains(k)) => Return(None)
               case r if (r.failures.contains(k)) =>
                 Throw(r.failures.get(k).get)
-            }
 
           k -> attachCas(toReplicationStatus(replicasResult), results, k)
-        }.toMap
-    }
-  }
+        .toMap
 
   // attach replication cas unique to the result for clients to do following CAS;
   // if all replicas are consistent, a RCasUnique is attached,
@@ -213,7 +199,7 @@ class BaseReplicationClient(
       underlyingResults: Seq[GetsResult],
       key: String
   ): ReplicationStatus[Option[(Buf, ReplicaCasUnique)]] =
-    valueStatus match {
+    valueStatus match
       case ConsistentReplication(Some(v)) =>
         val allReplicasCas =
           underlyingResults map { _.hits.get(key).get.casUnique.get }
@@ -221,20 +207,18 @@ class BaseReplicationClient(
       case ConsistentReplication(None) => ConsistentReplication(None)
       case InconsistentReplication(rs) =>
         val transformed =
-          rs.zip(underlyingResults) map {
+          rs.zip(underlyingResults) map
             case (Return(Some(v)), r: GetsResult) =>
               val singleReplicaCas = r.hits.get(key).get.casUnique.get
               Return(Some((v, SCasUnique(singleReplicaCas))))
             case (Return(None), _) => Return(None)
             case (Throw(e), _) => Throw(e)
-          }
         InconsistentReplication(transformed)
       case FailedReplication(fs) =>
         FailedReplication(
-            fs map { t =>
+            fs map  t =>
           Throw(t.e)
-        })
-    }
+        )
 
   /**
     * Stores a key in all replicas and returns the aggregated replication status.
@@ -261,15 +245,14 @@ class BaseReplicationClient(
       flags: Int,
       expiry: Time,
       value: Buf,
-      casUniques: Seq[Buf]): Future[ReplicationStatus[CasResult]] = {
+      casUniques: Seq[Buf]): Future[ReplicationStatus[CasResult]] =
     assert(clients.size == casUniques.size)
 
     // cannot use collectAndResolve helper here as this is the only case where there's no common op
-    Future.collect((clients zip casUniques) map {
+    Future.collect((clients zip casUniques) map
       case (c, u) =>
         c.checkAndSet(key, flags, expiry, value, u).transform(Future.value)
-    }) map { toReplicationStatus }
-  }
+    ) map { toReplicationStatus }
 
   /**
     * Remove a key and returns the aggregated replication status.
@@ -353,9 +336,8 @@ class BaseReplicationClient(
     throw new UnsupportedOperationException(
         "stats is not supported for cache replication client.")
 
-  def release() {
+  def release()
     clients foreach { _.release() }
-  }
 
   /**
     * Translating the results sequence from all replicas into aggregated results, which can be
@@ -371,8 +353,8 @@ class BaseReplicationClient(
     * of failures from all replicas;
     */
   private[this] def toReplicationStatus[T](
-      results: Seq[Try[T]]): ReplicationStatus[T] = {
-    results match {
+      results: Seq[Try[T]]): ReplicationStatus[T] =
+    results match
       case _ if (results.forall(_.isReturn)) && (results.distinct.size == 1) =>
         ConsistentReplication(results.head.get())
       case _ if (results.exists(_.isReturn)) =>
@@ -381,18 +363,15 @@ class BaseReplicationClient(
       case _ =>
         failedCounter.incr()
         FailedReplication(results collect { case t @ Throw(_) => t })
-    }
-  }
 
   /**
     * Private helper to collect all underlying clients result for a given operation
     * and resolve them to the ReplicationStatus to tell the consistency
     */
   private[this] def collectAndResolve[T](op: Client => Future[T]) =
-    Future.collect(clients map {
+    Future.collect(clients map
       op(_).transform(Future.value)
-    }) map { toReplicationStatus }
-}
+    ) map { toReplicationStatus }
 
 /**
   * Simple replication client wrapper that's compatible with base memcached client.
@@ -405,7 +384,7 @@ class BaseReplicationClient(
 case class SimpleReplicationFailure(msg: String) extends Throwable(msg)
 
 class SimpleReplicationClient(underlying: BaseReplicationClient)
-    extends Client {
+    extends Client
   def this(
       clients: Seq[Client], statsReceiver: StatsReceiver = NullStatsReceiver) =
     this(new BaseReplicationClient(clients, statsReceiver))
@@ -424,9 +403,9 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
     * as there's a great chance the check-and-set won't succeed.
     */
   def getsResult(keys: Iterable[String]): Future[GetsResult] =
-    underlyingClient.getsAll(keys) map { resultsMap =>
+    underlyingClient.getsAll(keys) map  resultsMap =>
       val getsResultSeq =
-        resultsMap map {
+        resultsMap map
           case (key,
                 ConsistentReplication(Some((value, RCasUnique(uniques))))) =>
             val newCas = uniques map { case Buf.Utf8(s) => s } mkString ("|")
@@ -441,9 +420,7 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
             GetsResult(
                 GetResult(failures = Map(key -> SimpleReplicationFailure(
                               "One or more underlying replica failed gets"))))
-        }
       GetResult.merged(getsResultSeq.toSeq)
-    }
 
   /**
     * Store a key in all replicas, succeed only if all replicas succeed.
@@ -458,13 +435,12 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
                   flags: Int,
                   expiry: Time,
                   value: Buf,
-                  casUnique: Buf): Future[CasResult] = {
+                  casUnique: Buf): Future[CasResult] =
     val Buf.Utf8(casUniqueStr) = casUnique
     val casUniqueBufs = casUniqueStr.split('|') map { Buf.Utf8(_) }
     resolve[CasResult]("checkAndSet",
                        _.checkAndSet(key, flags, expiry, value, casUniqueBufs),
                        CasResult.Stored)
-  }
 
   /**
     * Delete a key from all replicas, succeed only if all replicas succeed.
@@ -504,7 +480,7 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
       name: String,
       op: BaseReplicationClient => Future[ReplicationStatus[T]],
       default: T): Future[T] =
-    op(underlyingClient) flatMap {
+    op(underlyingClient) flatMap
       case ConsistentReplication(r) => Future.value(r)
       case InconsistentReplication(resultsSeq)
           if resultsSeq.forall(_.isReturn) =>
@@ -512,7 +488,6 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
       case _ =>
         Future.exception(SimpleReplicationFailure(
                 "One or more underlying replica failed op: " + name))
-    }
 
   def append(
       key: String, flags: Int, expiry: Time, value: Buf): Future[JBoolean] =
@@ -528,7 +503,5 @@ class SimpleReplicationClient(underlying: BaseReplicationClient)
     throw new UnsupportedOperationException(
         "No logical way to perform stats without a key")
 
-  def release() {
+  def release()
     underlyingClient.release()
-  }
-}

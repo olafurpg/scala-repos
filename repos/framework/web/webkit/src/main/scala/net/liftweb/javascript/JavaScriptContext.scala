@@ -17,37 +17,35 @@ import net.liftweb.common._
   * and you get a JavaScript execution context around
   * all HTTP requests.
   */
-object JavaScriptContext {
+object JavaScriptContext
 
   /**
     * Hook into LiftRules to put a JavaScript
     * execution loanwrapper around everything and
     * also slurp in <script> tags with the data-lift-server attribute.
     */
-  def install() {
+  def install()
     LiftRules.allAround.append(JSWrapper)
-    LiftRules.tagProcessor.prepend {
+    LiftRules.tagProcessor.prepend
       case ("script", e, session)
           if e.attribute("data-lift-server").isDefined =>
         exec(e.text)
         NodeSeq.Empty
-    }
 
-    LiftRules.dataAttributeProcessor.append {
+    LiftRules.dataAttributeProcessor.append
       case ("jssource", value, elem, session) =>
         val (rule, v2): (NodeSeq => NodeSeq,
-        Box[String]) = value.roboSplit("\\#\\>") match {
+        Box[String]) = value.roboSplit("\\#\\>") match
           case x :: Nil => (PassThru, Full(x))
           case x :: "it" :: Nil => session.buildXformer(x, Nil) -> Empty
           case x :: str :: Nil if str.startsWith("it.") =>
             session.buildXformer(x, str.roboSplit("\\.").filter(_ != "it")) -> Empty
           case x :: xs => session.buildXformer(x, Nil) -> Full(xs.mkString)
           case _ => (PassThru, Full(value))
-        }
 
-        v2 match {
+        v2 match
           case Full(v22) =>
-            exec(v22) match {
+            exec(v22) match
               case fut: LAFuture[_] =>
                 val ret = new LAFuture[NodeSeq]
                 fut.foreach(
@@ -56,29 +54,20 @@ object JavaScriptContext {
 
               case func: Function0[_] =>
                 () =>
-                  {
                     session.runSourceContext(func(), rule, elem)
-                  }
 
                 case x => session.runSourceContext(x, rule, elem)
-            }
 
           case _ => rule(elem)
-        }
-    }
-  }
 
   private object currentScript
-      extends TransientRequestVar[JSScope](new JSScope) {
+      extends TransientRequestVar[JSScope](new JSScope)
     registerCleanupFunc(in => get.bye())
-  }
 
-  private object JSWrapper extends LoanWrapper {
-    def apply[T](f: => T): T = {
+  private object JSWrapper extends LoanWrapper
+    def apply[T](f: => T): T =
       currentScript.get
       f
-    }
-  }
 
   /**
     * Execute some JavaScript in the current context
@@ -87,26 +76,20 @@ object JavaScriptContext {
     */
   def exec(str: String): AnyRef = currentScript.get.exec(str)
 
-  private class JSScope {
+  private class JSScope
     private var initted = false
     private var context: Context = null
     private var scope: ScriptableObject = null
 
-    def init() {
+    def init()
       context = Context.enter()
       scope = context.initStandardObjects()
-    }
 
-    def bye() {
+    def bye()
       if (initted) Context.exit()
-    }
 
-    def exec(str: String): AnyRef = synchronized {
+    def exec(str: String): AnyRef = synchronized
       if (!initted) init()
-      context.evaluateString(scope, str, "Lift", 0, null) match {
+      context.evaluateString(scope, str, "Lift", 0, null) match
         case njo: NativeJavaObject => njo.unwrap()
         case x => x
-      }
-    }
-  }
-}

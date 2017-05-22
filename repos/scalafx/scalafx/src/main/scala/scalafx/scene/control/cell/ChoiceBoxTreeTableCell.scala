@@ -59,7 +59,7 @@ import scalafx.util.StringConverter
   * @define ORIGINALDOC Original Documentation]].
   * @define SATISFY Added just to satisfy Spec tests.
   */
-object ChoiceBoxTreeTableCell {
+object ChoiceBoxTreeTableCell
 
   /**
     * Converts a ScalaFX $CBTTC to its JavaFX counterpart.
@@ -168,7 +168,6 @@ object ChoiceBoxTreeTableCell {
   @deprecated(message = "Use forTreeTableColumn[S, T](T*)", since = "1.0")
   def forTreeTableColumn[S, T](items: Array[T]) =
     jfxscc.ChoiceBoxTreeTableCell.forTreeTableColumn[S, T](items: _*)
-}
 
 /**
   * Wraps $JFX $URL0 $CBTTC]]
@@ -198,7 +197,7 @@ class ChoiceBoxTreeTableCell[S, T](override val delegate: jfxscc.ChoiceBoxTreeTa
     with ConvertableCell[jfxscc.ChoiceBoxTreeTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.ChoiceBoxTreeTableCell[S, T], T]
     with ItemableCell[jfxscc.ChoiceBoxTreeTableCell[S, T], T]
-    with SFXDelegate[jfxscc.ChoiceBoxTreeTableCell[S, T]] {
+    with SFXDelegate[jfxscc.ChoiceBoxTreeTableCell[S, T]]
 
   /**
     * $CONSCOMPL
@@ -237,4 +236,3 @@ class ChoiceBoxTreeTableCell[S, T](override val delegate: jfxscc.ChoiceBoxTreeTa
     */
   def this(items: T*) =
     this(new jfxscc.ChoiceBoxTreeTableCell[S, T](items: _*))
-}

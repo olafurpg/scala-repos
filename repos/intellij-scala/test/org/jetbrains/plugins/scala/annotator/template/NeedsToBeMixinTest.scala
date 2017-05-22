@@ -7,8 +7,8 @@ import org.jetbrains.plugins.scala.annotator.{AnnotatorTestBase, Error}
   * @author Alefas
   * @since 17.10.12
   */
-class NeedsToBeMixinTest extends AnnotatorTestBase(NeedsToBeMixin) {
-  def testProblem() {
+class NeedsToBeMixinTest extends AnnotatorTestBase(NeedsToBeMixin)
+  def testProblem()
     val Message = NeedsToBeMixin.message("Class", "C", ("base", "T"))
 
     assertMatches(messages(
@@ -21,12 +21,10 @@ class NeedsToBeMixinTest extends AnnotatorTestBase(NeedsToBeMixin) {
         |}
         |class C extends T
       """.stripMargin
-        )) {
+        ))
       case Error("C", Message) :: Nil =>
-    }
-  }
 
-  def testFine() {
+  def testFine()
     assertNothing(
         messages(
             """
@@ -42,5 +40,3 @@ class NeedsToBeMixinTest extends AnnotatorTestBase(NeedsToBeMixin) {
         |class C extends Impl with T
       """.stripMargin
         ))
-  }
-}

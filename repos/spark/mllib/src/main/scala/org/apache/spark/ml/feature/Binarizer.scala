@@ -37,7 +37,7 @@ import org.apache.spark.sql.types._
 @Experimental
 final class Binarizer(override val uid: String)
     extends Transformer with HasInputCol with HasOutputCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("binarizer"))
 
@@ -65,32 +65,28 @@ final class Binarizer(override val uid: String)
   /** @group setParam */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val outputSchema = transformSchema(dataset.schema, logging = true)
     val schema = dataset.schema
     val inputType = schema($(inputCol)).dataType
     val td = $(threshold)
 
-    val binarizerDouble = udf { in: Double =>
+    val binarizerDouble = udf  in: Double =>
       if (in > td) 1.0 else 0.0
-    }
-    val binarizerVector = udf { (data: Vector) =>
+    val binarizerVector = udf  (data: Vector) =>
       val indices = ArrayBuilder.make[Int]
       val values = ArrayBuilder.make[Double]
 
-      data.foreachActive { (index, value) =>
-        if (value > td) {
+      data.foreachActive  (index, value) =>
+        if (value > td)
           indices += index
           values += 1.0
-        }
-      }
 
       Vectors.sparse(data.size, indices.result(), values.result()).compressed
-    }
 
     val metadata = outputSchema($(outputCol)).metadata
 
-    inputType match {
+    inputType match
       case DoubleType =>
         dataset.select(
             col("*"),
@@ -99,14 +95,12 @@ final class Binarizer(override val uid: String)
         dataset.select(
             col("*"),
             binarizerVector(col($(inputCol))).as($(outputCol), metadata))
-    }
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val inputType = schema($(inputCol)).dataType
     val outputColName = $(outputCol)
 
-    val outCol: StructField = inputType match {
+    val outCol: StructField = inputType match
       case DoubleType =>
         BinaryAttribute.defaultAttr.withName(outputColName).toStructField()
       case _: VectorUDT =>
@@ -114,21 +108,16 @@ final class Binarizer(override val uid: String)
       case other =>
         throw new IllegalArgumentException(
             s"Data type $other is not supported.")
-    }
 
-    if (schema.fieldNames.contains(outputColName)) {
+    if (schema.fieldNames.contains(outputColName))
       throw new IllegalArgumentException(
           s"Output column $outputColName already exists.")
-    }
     StructType(schema.fields :+ outCol)
-  }
 
   override def copy(extra: ParamMap): Binarizer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object Binarizer extends DefaultParamsReadable[Binarizer] {
+object Binarizer extends DefaultParamsReadable[Binarizer]
 
   @Since("1.6.0")
   override def load(path: String): Binarizer = super.load(path)
-}

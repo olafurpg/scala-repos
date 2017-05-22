@@ -36,15 +36,13 @@ import scalaz.syntax.std.boolean._
 
 case class PathMetadata(path: Path, pathType: PathMetadata.PathType)
 
-object PathMetadata {
+object PathMetadata
   sealed trait PathType
   case class DataDir(contentType: MimeType) extends PathType
   case class DataOnly(contentType: MimeType) extends PathType
   case object PathOnly extends PathType
-}
 
 case class PathStructure(types: Map[CType, Long], children: Set[CPath])
 
-object PathStructure {
+object PathStructure
   val Empty = PathStructure(Map.empty, Set.empty)
-}

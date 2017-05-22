@@ -12,8 +12,7 @@ class ScalaPrintlnPostfixTemplate
     extends ScalaStringBasedPostfixTemplate(
         "sout",
         "println(expr)",
-        new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost))
 
   override def getTemplateString(element: PsiElement): String =
     "println($expr$)"
-}

@@ -2,7 +2,7 @@ import scala.tools.nsc._
 import util.stringFromStream
 
 // Testing "scripts" without the platform delights which accompany actual scripts.
-object Scripts {
+object Scripts
 
   val test1 = """#!/bin/sh 
   exec scala $0 $@ 
@@ -34,9 +34,8 @@ bob.scala:8: error: illegal start of simple expression
 val z "line 8"
              ^
 two errors found"""
-}
 
-object Test {
+object Test
   import Scripts._
 
   def settings = new GenericRunnerSettings(println _)
@@ -45,11 +44,10 @@ object Test {
   def runScript(code: String): String =
     stringFromStream(
         stream =>
-          Console.withOut(stream) {
-        Console.withErr(stream) {
+          Console.withOut(stream)
+        Console.withErr(stream)
           ScriptRunner.runCommand(settings, code, Nil)
-        }
-    })
+    )
 
   val tests: List[(String, String)] = List(
       test1 -> output1,
@@ -59,14 +57,13 @@ object Test {
   def lines(s: String) = s split "\\n" toList
 
   // strip the random temp filename from error msgs
-  def stripFilename(s: String) = (s indexOf ".scala:") match {
+  def stripFilename(s: String) = (s indexOf ".scala:") match
     case -1 => s
     case idx => s drop (idx + 7)
-  }
   def toLines(text: String) = lines(text) map stripFilename
 
-  def main(args: Array[String]): Unit = {
-    for ((code, expected) <- tests) {
+  def main(args: Array[String]): Unit =
+    for ((code, expected) <- tests)
       val out = toLines(runScript(code))
       val exp = toLines(expected)
       val nomatch = out zip exp filter { case (x, y) => x != y }
@@ -77,6 +74,3 @@ object Test {
           "Output doesn't match expected:\n" + "Expected:\n" + expected +
           "Actual:\n" + out.mkString("\n")
       )
-    }
-  }
-}

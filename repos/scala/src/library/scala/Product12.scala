@@ -9,18 +9,17 @@
 
 package scala
 
-object Product12 {
+object Product12
   def unapply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12](
       x: Product12[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12])
     : Option[Product12[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12]] =
     Some(x)
-}
 
 /** Product12 is a cartesian product of 12 components.
   *  @since 2.3
   */
 trait Product12[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11, +T12]
-    extends Any with Product {
+    extends Any with Product
 
   /** The arity of this product.
     *  @return 12
@@ -35,7 +34,7 @@ trait Product12[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11, +T12]
     *  @throws  IndexOutOfBoundsException
     */
   @throws(classOf[IndexOutOfBoundsException])
-  override def productElement(n: Int) = n match {
+  override def productElement(n: Int) = n match
     case 0 => _1
     case 1 => _2
     case 2 => _3
@@ -49,7 +48,6 @@ trait Product12[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11, +T12]
     case 10 => _11
     case 11 => _12
     case _ => throw new IndexOutOfBoundsException(n.toString())
-  }
 
   /** A projection of element 1 of this Product.
     *  @return   A projection of element 1.
@@ -110,4 +108,3 @@ trait Product12[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11, +T12]
     *  @return   A projection of element 12.
     */
   def _12: T12
-}

@@ -26,14 +26,14 @@ import org.apache.spark.mllib.regression.LassoModel
 import org.apache.spark.mllib.regression.LinearRegressionModel
 import org.apache.spark.mllib.regression.RidgeRegressionModel
 
-private[mllib] object PMMLModelExportFactory {
+private[mllib] object PMMLModelExportFactory
 
   /**
     * Factory object to help creating the necessary PMMLModelExport implementation
     * taking as input the machine learning model (for example KMeansModel).
     */
-  def createPMMLModelExport(model: Any): PMMLModelExport = {
-    model match {
+  def createPMMLModelExport(model: Any): PMMLModelExport =
+    model match
       case kmeans: KMeansModel =>
         new KMeansPMMLModelExport(kmeans)
       case linear: LinearRegressionModel =>
@@ -49,19 +49,15 @@ private[mllib] object PMMLModelExportFactory {
             RegressionNormalizationMethodType.NONE,
             svm.getThreshold.getOrElse(0.0))
       case logistic: LogisticRegressionModel =>
-        if (logistic.numClasses == 2) {
+        if (logistic.numClasses == 2)
           new BinaryClassificationPMMLModelExport(
               logistic,
               "logistic regression",
               RegressionNormalizationMethodType.LOGIT,
               logistic.getThreshold.getOrElse(0.5))
-        } else {
+        else
           throw new IllegalArgumentException(
               "PMML Export not supported for Multinomial Logistic Regression")
-        }
       case _ =>
         throw new IllegalArgumentException(
             "PMML Export not supported for model: " + model.getClass.getName)
-    }
-  }
-}

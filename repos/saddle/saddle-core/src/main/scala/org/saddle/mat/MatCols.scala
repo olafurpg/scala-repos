@@ -23,7 +23,7 @@ import org.saddle.scalar._
   * 2D data for a Frame.
   */
 class MatCols[A : ST](cols: IndexedSeq[Vec[A]])
-    extends IndexedSeq[Vec[A]] with Serializable {
+    extends IndexedSeq[Vec[A]] with Serializable
   require(cols.length < 2 || cols.forall(_.length == cols(0).length),
           "Vecs must all be the same length")
 
@@ -45,42 +45,36 @@ class MatCols[A : ST](cols: IndexedSeq[Vec[A]])
   def at(r: Int, c: Int): Scalar[A] = cols(c)(r)
 
   // take vectors at particular locations
-  def take(locs: Array[Int]): MatCols[A] = {
-    lazy val nullVec = {
+  def take(locs: Array[Int]): MatCols[A] =
+    lazy val nullVec =
       val arr = array.empty[A](numRows)
       array.fill(arr, scalarTag.missing)
       Vec(arr)
-    }
     val res = Array.ofDim[Vec[A]](locs.length)
     var i = 0
-    while (i < locs.length) {
+    while (i < locs.length)
       val idx = locs(i)
       if (idx == -1) res(i) = nullVec
       else res(i) = cols(idx)
       i += 1
-    }
     MatCols(res)
-  }
 
   // take all vectors except those at points in loc
   def without(locs: Array[Int]): MatCols[A] =
     MatCols(array.remove(this.toArray, locs))
 
   // take all vecs that match provided type, along with their locations
-  private[saddle] def takeType[B : ST]: (IndexedSeq[Vec[B]], Array[Int]) = {
+  private[saddle] def takeType[B : ST]: (IndexedSeq[Vec[B]], Array[Int]) =
     val bSt = implicitly[ST[B]]
-    val filt = cols.zipWithIndex.filter {
+    val filt = cols.zipWithIndex.filter
       case (col, ix) =>
         col.scalarTag.runtimeClass.isPrimitive && (bSt.isAny || bSt.isAnyVal) ||
         !bSt.isAnyVal &&
         bSt.runtimeClass.isAssignableFrom(col.scalarTag.runtimeClass)
-    }
     val (vecs, locs) = filt.unzip
     (vecs.asInstanceOf[IndexedSeq[Vec[B]]], locs.toArray)
-  }
-}
 
-object MatCols {
+object MatCols
   def empty[A : ST]: MatCols[A] = apply(Array.empty[Vec[A]])
 
   def apply[A : ST](cols: Vec[A]*): MatCols[A] =
@@ -96,21 +90,17 @@ object MatCols {
 
   // Logic to get string widths of columns in a sequence of vectors
   private[saddle] def colLens[A : ST](
-      cols: MatCols[A], numCols: Int, len: Int): Map[Int, Int] = {
+      cols: MatCols[A], numCols: Int, len: Int): Map[Int, Int] =
     val half = len / 2
     val maxf = (a: Int, b: String) => a.max(b.length)
 
-    if (numCols <= len) {
-      Range(0, numCols) zip cols.map { v =>
+    if (numCols <= len)
+      Range(0, numCols) zip cols.map  v =>
         val takeCol = v.head(half) concat v.tail(half)
         takeCol.map(k => v.scalarTag.show(k)).foldLeft(2)(maxf)
-      }
-    } else {
+    else
       val colnums = Range(0, half) ++ Range(numCols - half, numCols)
-      colnums zip (cols.take(half) ++ cols.takeRight(half)).map { v =>
+      colnums zip (cols.take(half) ++ cols.takeRight(half)).map  v =>
         val takeCol = v.head(half) concat v.tail(half)
         takeCol.map(k => v.scalarTag.show(k)).foldLeft(2)(maxf)
-      }
-    }
-  }.toMap
-}
+  .toMap

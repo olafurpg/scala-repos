@@ -21,7 +21,7 @@ package collection
     "Proxying is deprecated due to lack of use and compiler-level support.",
     "2.11.0")
 trait SetProxyLike[A, +This <: SetLike[A, This] with Set[A]]
-    extends SetLike[A, This] with IterableProxyLike[A, This] {
+    extends SetLike[A, This] with IterableProxyLike[A, This]
   def empty: This
   override def contains(elem: A): Boolean = self.contains(elem)
   override def +(elem: A) = self.+(elem)
@@ -35,4 +35,3 @@ trait SetProxyLike[A, +This <: SetLike[A, This] with Set[A]]
   override def diff(that: GenSet[A]): This = self.diff(that)
   override def &~(that: GenSet[A]): This = self.&~(that)
   override def subsetOf(that: GenSet[A]): Boolean = self.subsetOf(that)
-}

@@ -27,56 +27,47 @@ object FAILED extends State
   * override makeNext and call allDone() when there is no more items
   */
 abstract class IteratorTemplate[T]
-    extends Iterator[T] with java.util.Iterator[T] {
+    extends Iterator[T] with java.util.Iterator[T]
 
   private var state: State = NOT_READY
   private var nextItem = null.asInstanceOf[T]
 
-  def next(): T = {
+  def next(): T =
     if (!hasNext()) throw new NoSuchElementException()
     state = NOT_READY
     if (nextItem == null)
       throw new IllegalStateException("Expected item but none found.")
     nextItem
-  }
 
-  def peek(): T = {
+  def peek(): T =
     if (!hasNext()) throw new NoSuchElementException()
     nextItem
-  }
 
-  def hasNext(): Boolean = {
+  def hasNext(): Boolean =
     if (state == FAILED)
       throw new IllegalStateException("Iterator is in failed state")
-    state match {
+    state match
       case DONE => false
       case READY => true
       case _ => maybeComputeNext()
-    }
-  }
 
   protected def makeNext(): T
 
-  def maybeComputeNext(): Boolean = {
+  def maybeComputeNext(): Boolean =
     state = FAILED
     nextItem = makeNext()
-    if (state == DONE) {
+    if (state == DONE)
       false
-    } else {
+    else
       state = READY
       true
-    }
-  }
 
-  protected def allDone(): T = {
+  protected def allDone(): T =
     state = DONE
     null.asInstanceOf[T]
-  }
 
   def remove =
     throw new UnsupportedOperationException("Removal not supported")
 
-  protected def resetState() {
+  protected def resetState()
     state = NOT_READY
-  }
-}

@@ -15,25 +15,21 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  * SelfInvocation ::= 'this' ArgumentExprs {ArgumentExprs}
  */
 
-object SelfInvocation {
+object SelfInvocation
 
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val selfMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kTHIS =>
         builder.advanceLexer() //Ate this
       case _ =>
         //error moved to ScalaAnnotator to differentiate with compiled files
         selfMarker.drop()
         return true
-    }
-    if (!ArgumentExprs.parse(builder)) {
+    if (!ArgumentExprs.parse(builder))
       selfMarker.done(ScalaElementTypes.SELF_INVOCATION)
       return true
-    }
     while (!builder.newlineBeforeCurrentToken &&
     ArgumentExprs.parse(builder)) {}
     selfMarker.done(ScalaElementTypes.SELF_INVOCATION)
     true
-  }
-}

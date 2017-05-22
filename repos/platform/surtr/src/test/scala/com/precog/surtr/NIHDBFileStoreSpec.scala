@@ -48,8 +48,8 @@ import scalaz._
 import scalaz.syntax.comonad._
 
 class NIHDBFileStoreSpec
-    extends NIHDBTestActors with Specification with Logging {
-  class YggConfig extends NIHDBTestActorsConfig {
+    extends NIHDBTestActors with Specification with Logging
+  class YggConfig extends NIHDBTestActorsConfig
     val tmpDir = IOUtils.createTmpDir("filestorespec").unsafePerformIO
     val config =
       Configuration parse { "precog.storage.root = %s".format(tmpDir) }
@@ -57,7 +57,6 @@ class NIHDBFileStoreSpec
     val maxSliceSize = 10
 
     logger.info("Running NIHDBFileStoreSpec under " + tmpDir)
-  }
 
   object yggConfig extends YggConfig
 
@@ -68,8 +67,8 @@ class NIHDBFileStoreSpec
 
   import TestStack._
 
-  "NIHDBPlatform storage" should {
-    "Properly store and retrieve files" in {
+  "NIHDBPlatform storage" should
+    "Properly store and retrieve files" in
       val testPath = Path("/store/this/somewhere")
 
       (projectionsActor ? IngestData(
@@ -86,19 +85,16 @@ class NIHDBFileStoreSpec
                                     Clock.System.instant,
                                     StreamRef.Create(
                                         UUID.randomUUID,
-                                        true)))))).copoint must beLike {
+                                        true)))))).copoint must beLike
         case UpdateSuccess(_) => ok
-      }
 
       (projectionsActor ? Read(testPath, Version.Current))
         .mapTo[ReadResult]
-        .copoint must beLike {
+        .copoint must beLike
         case ReadSuccess(_, blob: BlobResource) =>
           blob.asString.run.copoint must beSome(loremIpsum)
-      }
-    }
 
-    "Properly handle atomic version updates" in {
+    "Properly handle atomic version updates" in
       import ResourceError._
       val testPath = Path("/versioned/blob")
 
@@ -114,16 +110,14 @@ class NIHDBFileStoreSpec
                                         JString("Foo!"))),
                        None,
                        Clock.System.instant,
-                       StreamRef.Create(streamId, false)))))).copoint must beLike {
+                       StreamRef.Create(streamId, false)))))).copoint must beLike
         case UpdateSuccess(_) => ok
-      }
 
       // We haven't terminated the stream yet, so it shouldn't find anything
       (projectionsActor ? Read(testPath, Version.Current))
         .mapTo[ReadResult]
-        .copoint must beLike {
+        .copoint must beLike
         case PathOpFailure(_, NotFound(_)) => ok
-      }
 
       (projectionsActor ? IngestData(
               Seq((1L,
@@ -135,22 +129,16 @@ class NIHDBFileStoreSpec
                                         JString("Foo!"))),
                        None,
                        Clock.System.instant,
-                       StreamRef.Create(streamId, true)))))).copoint must beLike {
+                       StreamRef.Create(streamId, true)))))).copoint must beLike
         case UpdateSuccess(_) => ok
-      }
 
       (projectionsActor ? Read(testPath, Version.Current))
         .mapTo[ReadResult]
-        .copoint must beLike {
+        .copoint must beLike
         case ReadSuccess(_, proj: NIHDBResource) =>
           proj.db.length.copoint mustEqual 2
-      }
-    }
-  }
 
-  override def map(fs: => Fragments): Fragments = fs ^ step {
+  override def map(fs: => Fragments): Fragments = fs ^ step
     logger.info("Unlocking actor")
     //projectionSystem.release
     IOUtils.recursiveDelete(yggConfig.tmpDir).unsafePerformIO
-  }
-}

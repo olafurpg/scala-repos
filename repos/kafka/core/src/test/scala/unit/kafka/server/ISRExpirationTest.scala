@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kafka.message.MessageSet
 import org.apache.kafka.common.utils.{MockTime => JMockTime}
 
-class IsrExpirationTest {
+class IsrExpirationTest
 
   var topicPartitionIsr: Map[(String, Int), Seq[Int]] =
     new HashMap[(String, Int), Seq[Int]]()
@@ -55,7 +55,7 @@ class IsrExpirationTest {
   var replicaManager: ReplicaManager = null
 
   @Before
-  def setUp() {
+  def setUp()
     replicaManager = new ReplicaManager(configs.head,
                                         metrics,
                                         time,
@@ -64,19 +64,17 @@ class IsrExpirationTest {
                                         null,
                                         null,
                                         new AtomicBoolean(false))
-  }
 
   @After
-  def tearDown() {
+  def tearDown()
     replicaManager.shutdown(false)
     metrics.close()
-  }
 
   /*
    * Test the case where a follower is caught up but stops making requests to the leader. Once beyond the configured time limit, it should fall out of ISR
    */
   @Test
-  def testIsrExpirationForStuckFollowers() {
+  def testIsrExpirationForStuckFollowers()
     val log =
       getLogWithLogEndOffset(15L, 2) // set logEndOffset for leader to 15L
 
@@ -113,13 +111,12 @@ class IsrExpirationTest {
                  Set(configs.last.brokerId),
                  partition0OSR.map(_.brokerId))
     EasyMock.verify(log)
-  }
 
   /*
    * Test the case where a follower never makes a fetch request. It should fall out of ISR because it will be declared stuck
    */
   @Test
-  def testIsrExpirationIfNoFetchRequestMade() {
+  def testIsrExpirationIfNoFetchRequestMade()
     val log =
       getLogWithLogEndOffset(15L, 1) // set logEndOffset for leader to 15L
 
@@ -140,14 +137,13 @@ class IsrExpirationTest {
                  Set(configs.last.brokerId),
                  partition0OSR.map(_.brokerId))
     EasyMock.verify(log)
-  }
 
   /*
    * Test the case where a follower continually makes fetch requests but is unable to catch up. It should fall out of the ISR
    * However, any time it makes a request to the LogEndOffset it should be back in the ISR
    */
   @Test
-  def testIsrExpirationForSlowFollowers() {
+  def testIsrExpirationForSlowFollowers()
     // create leader replica
     val log = getLogWithLogEndOffset(15L, 4)
     // add one partition
@@ -212,13 +208,12 @@ class IsrExpirationTest {
                  partition0OSR.map(_.brokerId))
 
     EasyMock.verify(log)
-  }
 
   private def getPartitionWithAllReplicasInIsr(topic: String,
                                                partitionId: Int,
                                                time: Time,
                                                config: KafkaConfig,
-                                               localLog: Log): Partition = {
+                                               localLog: Log): Partition =
     val leaderId = config.brokerId
     val partition = replicaManager.getOrCreatePartition(topic, partitionId)
     val leaderReplica = new Replica(
@@ -232,10 +227,9 @@ class IsrExpirationTest {
     // set the leader and its hw and the hw update time
     partition.leaderReplicaIdOpt = Some(leaderId)
     partition
-  }
 
   private def getLogWithLogEndOffset(
-      logEndOffset: Long, expectedCalls: Int): Log = {
+      logEndOffset: Long, expectedCalls: Int): Log =
     val log1 = EasyMock.createMock(classOf[kafka.log.Log])
     EasyMock
       .expect(log1.logEndOffsetMetadata)
@@ -244,12 +238,8 @@ class IsrExpirationTest {
     EasyMock.replay(log1)
 
     log1
-  }
 
   private def getFollowerReplicas(
-      partition: Partition, leaderId: Int, time: Time): Seq[Replica] = {
-    configs.filter(_.brokerId != leaderId).map { config =>
+      partition: Partition, leaderId: Int, time: Time): Seq[Replica] =
+    configs.filter(_.brokerId != leaderId).map  config =>
       new Replica(config.brokerId, partition, time)
-    }
-  }
-}

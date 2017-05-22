@@ -10,24 +10,22 @@ import scala.util.{Failure, Success, Try}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class PromiseSubscriberSpec extends Specification {
+class PromiseSubscriberSpec extends Specification
 
   import PublisherEvents._
   case class OnComplete(result: Try[Any])
 
   class TestEnv[T]
       extends EventRecorder(ScalaFiniteDuration(2, SECONDS))
-      with PublisherEvents[T] {
+      with PublisherEvents[T]
 
     val prom = Promise[T]()
     val subr = new PromiseSubscriber(prom)
-    prom.future.onComplete { result =>
+    prom.future.onComplete  result =>
       record(OnComplete(result))
-    }
-  }
 
-  "PromiseSubscriber" should {
-    "consume 1 item" in {
+  "PromiseSubscriber" should
+    "consume 1 item" in
       val testEnv = new TestEnv[Int]
       import testEnv._
       isEmptyAfterDelay() must beTrue
@@ -40,8 +38,7 @@ class PromiseSubscriberSpec extends Specification {
       onNext(3)
       next must_== OnComplete(Success(3))
       isEmptyAfterDelay() must beTrue
-    }
-    "consume an error" in {
+    "consume an error" in
       val testEnv = new TestEnv[Int]
       import testEnv._
       isEmptyAfterDelay() must beTrue
@@ -55,8 +52,7 @@ class PromiseSubscriberSpec extends Specification {
       onError(e)
       next must_== OnComplete(Failure(e))
       isEmptyAfterDelay() must beTrue
-    }
-    "fail when completed too early" in {
+    "fail when completed too early" in
       val testEnv = new TestEnv[Int]
       import testEnv._
       isEmptyAfterDelay() must beTrue
@@ -67,10 +63,6 @@ class PromiseSubscriberSpec extends Specification {
       isEmptyAfterDelay() must beTrue
 
       onComplete()
-      next must beLike {
+      next must beLike
         case OnComplete(Failure(_: IllegalStateException)) => ok
-      }
       isEmptyAfterDelay() must beTrue
-    }
-  }
-}

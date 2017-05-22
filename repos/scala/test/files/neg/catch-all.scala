@@ -1,4 +1,4 @@
-object CatchAll {
+object CatchAll
   try { "warn" } catch { case _ => }
 
   try { "warn" } catch { case x => }
@@ -26,6 +26,5 @@ object CatchAll {
   try { "okay" } catch { case _ if "".isEmpty => }
 
   "okay" match { case _ => "" }
-}
 
 object T extends Throwable

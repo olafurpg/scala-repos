@@ -27,48 +27,43 @@ import org.apache.spark.rpc.{RpcEndpoint, RpcEnv}
 import org.apache.spark.serializer.{JavaSerializer, Serializer}
 import org.apache.spark.util.Utils
 
-class PersistenceEngineSuite extends SparkFunSuite {
+class PersistenceEngineSuite extends SparkFunSuite
 
-  test("FileSystemPersistenceEngine") {
+  test("FileSystemPersistenceEngine")
     val dir = Utils.createTempDir()
-    try {
+    try
       val conf = new SparkConf()
       testPersistenceEngine(
           conf,
           serializer =>
             new FileSystemPersistenceEngine(dir.getAbsolutePath, serializer))
-    } finally {
+    finally
       Utils.deleteRecursively(dir)
-    }
-  }
 
-  test("ZooKeeperPersistenceEngine") {
+  test("ZooKeeperPersistenceEngine")
     val conf = new SparkConf()
     // TestingServer logs the port conflict exception rather than throwing an exception.
     // So we have to find a free port by ourselves. This approach cannot guarantee always starting
     // zkTestServer successfully because there is a time gap between finding a free port and
     // starting zkTestServer. But the failure possibility should be very low.
     val zkTestServer = new TestingServer(findFreePort(conf))
-    try {
+    try
       testPersistenceEngine(
           conf,
           serializer =>
-            {
               conf.set("spark.deploy.zookeeper.url",
                        zkTestServer.getConnectString)
               new ZooKeeperPersistenceEngine(conf, serializer)
-          })
-    } finally {
+          )
+    finally
       zkTestServer.stop()
-    }
-  }
 
   private def testPersistenceEngine(
       conf: SparkConf,
-      persistenceEngineCreator: Serializer => PersistenceEngine): Unit = {
+      persistenceEngineCreator: Serializer => PersistenceEngine): Unit =
     val serializer = new JavaSerializer(conf)
     val persistenceEngine = persistenceEngineCreator(serializer)
-    try {
+    try
       persistenceEngine.persist("test_1", "test_1_value")
       assert(Seq("test_1_value") === persistenceEngine.read[String]("test_"))
       persistenceEngine.persist("test_2", "test_2_value")
@@ -84,12 +79,12 @@ class PersistenceEngineSuite extends SparkFunSuite {
       // Test deserializing objects that contain RpcEndpointRef
       val testRpcEnv = RpcEnv.create(
           "test", "localhost", 12345, conf, new SecurityManager(conf))
-      try {
+      try
         // Create a real endpoint so that we can test RpcEndpointRef deserialization
         val workerEndpoint =
-          testRpcEnv.setupEndpoint("worker", new RpcEndpoint {
+          testRpcEnv.setupEndpoint("worker", new RpcEndpoint
             override val rpcEnv: RpcEnv = testRpcEnv
-          })
+          )
 
         val workerToPersist = new WorkerInfo(
             id = "test_worker",
@@ -119,26 +114,20 @@ class PersistenceEngineSuite extends SparkFunSuite {
         assert(workerToPersist.endpoint === recoveryWorkerInfo.endpoint)
         assert(
             workerToPersist.webUiAddress === recoveryWorkerInfo.webUiAddress)
-      } finally {
+      finally
         testRpcEnv.shutdown()
         testRpcEnv.awaitTermination()
-      }
-    } finally {
+    finally
       persistenceEngine.close()
-    }
-  }
 
-  private def findFreePort(conf: SparkConf): Int = {
+  private def findFreePort(conf: SparkConf): Int =
     val candidatePort = RandomUtils.nextInt(1024, 65536)
     Utils
       .startServiceOnPort(candidatePort,
                           (trialPort: Int) =>
-                            {
                               val socket = new ServerSocket(trialPort)
                               socket.close()
                               (null, trialPort)
-                          },
+                          ,
                           conf)
       ._2
-  }
-}

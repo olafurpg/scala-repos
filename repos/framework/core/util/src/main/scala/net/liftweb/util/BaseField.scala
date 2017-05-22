@@ -23,31 +23,27 @@ import xml.NodeSeq
 /**
   * Defines the association of this reference with a markup tag ID
   */
-trait FieldIdentifier {
+trait FieldIdentifier
   def uniqueFieldId: Box[String] = Empty
-}
 
 /**
   * Associate a FieldIdentifier with a NodeSeq
   */
-case class FieldError(field: FieldIdentifier, msg: NodeSeq) {
+case class FieldError(field: FieldIdentifier, msg: NodeSeq)
   override def toString = field.uniqueFieldId + " : " + msg
-}
 
-object FieldError {
+object FieldError
   import scala.xml.Text
   def apply(field: FieldIdentifier, msg: String) =
     new FieldError(field, Text(msg))
-}
 
-trait FieldContainer {
+trait FieldContainer
   def allFields: Seq[BaseField]
-}
 
 /**
   * A field that can be displayed but not edited
   */
-trait ReadableField extends FieldIdentifier with ValueHolder with Bindable {
+trait ReadableField extends FieldIdentifier with ValueHolder with Bindable
   import scala.xml.Text
 
   /**
@@ -73,12 +69,11 @@ trait ReadableField extends FieldIdentifier with ValueHolder with Bindable {
     * Given the current context, should this field be displayed
     */
   def shouldDisplay_? = true
-}
 
 /**
   * A field that can be set
   */
-trait SettableField extends ReadableField with SettableValueHolder {
+trait SettableField extends ReadableField with SettableValueHolder
 
   /**
     * A list of functions that transform the value before it is set.  The transformations
@@ -119,13 +114,11 @@ trait SettableField extends ReadableField with SettableValueHolder {
     * Given the current state of things, should this field be shown
     */
   def show_? = true
-}
 
-trait BaseField extends SettableField with FieldContainer {
+trait BaseField extends SettableField with FieldContainer
   def allFields: Seq[BaseField] = List(this)
-}
 
-trait StringValidators { self: FieldIdentifier =>
+trait StringValidators  self: FieldIdentifier =>
 
   import scala.xml.Text
   import java.util.regex.Pattern
@@ -139,86 +132,81 @@ trait StringValidators { self: FieldIdentifier =>
 
   def crop(in: ValueType): ValueType =
     boxStrToValType(
-        valueTypeToBoxString(in).map {
+        valueTypeToBoxString(in).map
       case null => null
       case s => s.substring(0, math.min(s.length, maxLen))
-    })
+    )
 
   def removeRegExChars(regEx: String)(in: ValueType): ValueType =
     boxStrToValType(
-        valueTypeToBoxString(in).map {
+        valueTypeToBoxString(in).map
       case null => null
       case s => s.replaceAll(regEx, "")
-    })
+    )
 
   def toLower(in: ValueType): ValueType =
     boxStrToValType(
-        valueTypeToBoxString(in).map {
+        valueTypeToBoxString(in).map
       case null => null
       case s => s.toLowerCase
-    })
+    )
 
   def toUpper(in: ValueType): ValueType =
     boxStrToValType(
-        valueTypeToBoxString(in).map {
+        valueTypeToBoxString(in).map
       case null => null
       case s => s.toUpperCase
-    })
+    )
 
   def trim(in: ValueType): ValueType =
     boxStrToValType(
-        valueTypeToBoxString(in).map {
+        valueTypeToBoxString(in).map
       case null => null
       case s => s.trim
-    })
+    )
 
   def notNull(in: ValueType): ValueType =
     boxStrToValType(
-        valueTypeToBoxString(in) match {
+        valueTypeToBoxString(in) match
       case Full(str) if null ne str => Full(str)
       case _ => Full("")
-    })
+    )
 
   /**
     * A validation helper.  Make sure the string is at least a particular
     * length and generate a validation issue if not.
     */
   def valMinLen(len: Int, msg: => String)(value: ValueType): List[FieldError] =
-    valueTypeToBoxString(value) match {
+    valueTypeToBoxString(value) match
       case Full(str) if (null ne str) && str.length >= len => Nil
       case _ => List(FieldError(this, Text(msg)))
-    }
 
   /**
     * A validation helper.  Make sure the string is no more than a particular
     * length and generate a validation issue if not.
     */
   def valMaxLen(len: Int, msg: => String)(value: ValueType): List[FieldError] =
-    valueTypeToBoxString(value) match {
+    valueTypeToBoxString(value) match
       case Full(str) if (null eq str) || str.length <= len => Nil
       case _ => List(FieldError(this, Text(msg)))
-    }
 
   /**
     * Make sure the field matches a regular expression
     */
   def valRegex(pat: Pattern, msg: => String)(
       value: ValueType): List[FieldError] =
-    valueTypeToBoxString(value).flatMap { str =>
+    valueTypeToBoxString(value).flatMap  str =>
       if (pat.matcher(str).matches) Full(true) else Empty
-    } match {
+    match
       case Full(true) => Nil
       case _ => List(FieldError(this, Text(msg)))
-    }
-}
 
 /**
   * A base field that also has a confirm method
   */
-trait ConfirmField extends BaseField {
+trait ConfirmField extends BaseField
 
   /**
     * Is this field on the confirm screen
     */
   def onConfirm_? : Boolean
-}

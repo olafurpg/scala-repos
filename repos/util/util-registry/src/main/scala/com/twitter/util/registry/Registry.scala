@@ -11,9 +11,8 @@ final case class Entry(key: Seq[String], value: String)
 /**
   * This is an expert-level API; it is not meant for end-users.
   */
-object Entry {
+object Entry
   val TupledMethod: ((Seq[String], String)) => Entry = (Entry.apply _).tupled
-}
 
 /**
   * This is an expert-level API; it is not meant for end-users.
@@ -25,7 +24,7 @@ object Entry {
   * with an invalid character, the character will silently be removed.  If this
   * makes your key clash with another key, it will overwrite.
   */
-trait Registry extends Iterable[Entry] {
+trait Registry extends Iterable[Entry]
 
   /**
     * Provides an iterator over the registry.
@@ -50,55 +49,47 @@ trait Registry extends Iterable[Entry] {
     * Note: This is a Java-friendly version of `Registry.put(Seq[String, String])`.
     */
   @varargs
-  def put(value: String*): Option[String] = {
+  def put(value: String*): Option[String] =
     require(value.nonEmpty)
     put(value.init, value.last)
-  }
 
   /**
     * Removes a key from the registry, if it was registered, and returns the old value (if any).
     */
   def remove(key: Seq[String]): Option[String]
-}
 
 /**
   * This is an expert-level API; it is not meant for end-users.
   */
-class SimpleRegistry extends Registry {
+class SimpleRegistry extends Registry
   private[this] var registry = Map.empty[Seq[String], String]
 
   def iterator: Iterator[Entry] =
     synchronized(registry).iterator.map(Entry.TupledMethod)
 
-  def put(key: Seq[String], value: String): Option[String] = {
+  def put(key: Seq[String], value: String): Option[String] =
     val sanitizedKey = key.map(sanitize)
     val sanitizedValue = sanitize(value)
-    synchronized {
+    synchronized
       val result = registry.get(sanitizedKey)
       registry += sanitizedKey -> sanitizedValue
       result
-    }
-  }
 
-  def remove(key: Seq[String]): Option[String] = {
+  def remove(key: Seq[String]): Option[String] =
     val sanitizedKey = key.map(sanitize)
-    synchronized {
+    synchronized
       val result = registry.get(sanitizedKey)
       registry -= sanitizedKey
       result
-    }
-  }
 
   private[this] def sanitize(key: String): String =
-    key.filter { char =>
+    key.filter  char =>
       char > 31 && char < 127
-    }
-}
 
 /**
   * This is an expert-level API; it is not meant for end-users.
   */
-object GlobalRegistry {
+object GlobalRegistry
   private[this] val registry: Registry = new SimpleRegistry
 
   /**
@@ -107,10 +98,9 @@ object GlobalRegistry {
     * If it's call inside of a `withRegistry` context then it's a temporary
     * registry, useful for writing isolated tests.
     */
-  def get: Registry = localRegistry() match {
+  def get: Registry = localRegistry() match
     case None => registry
     case Some(local) => local
-  }
 
   /**
     * Note, this should only ever be updated by methods used for testing.
@@ -125,7 +115,5 @@ object GlobalRegistry {
     * [[com.twitter.util.Future]].
     */
   def withRegistry[A](replacement: Registry)(fn: => A): A =
-    localRegistry.let(replacement) {
+    localRegistry.let(replacement)
       fn
-    }
-}

@@ -19,17 +19,14 @@ case class MTypeInfo(typeName: String,
                      localTypeName: Option[String],
                      minScale: Short,
                      maxScale: Short,
-                     numPrecRadix: Int) {
+                     numPrecRadix: Int)
 
   def sqlTypeName = JdbcTypesComponent.typeNames.get(sqlType)
-}
 
-object MTypeInfo {
-  def getTypeInfo = ResultSetAction[MTypeInfo](_.metaData.getTypeInfo()) { r =>
-    MTypeInfo(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.nextInt match {
+object MTypeInfo
+  def getTypeInfo = ResultSetAction[MTypeInfo](_.metaData.getTypeInfo())  r =>
+    MTypeInfo(r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.nextInt match
       case DatabaseMetaData.columnNoNulls => Some(false)
       case DatabaseMetaData.columnNullable => Some(true)
       case _ => None
-    }, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)
-  }
-}
+    , r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.<<)

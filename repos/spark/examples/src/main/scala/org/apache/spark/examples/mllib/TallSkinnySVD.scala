@@ -34,21 +34,19 @@ import org.apache.spark.mllib.linalg.Vectors
   * }}}
   * represents a 3-by-2 matrix, whose first row is (0.5, 1.0).
   */
-object TallSkinnySVD {
-  def main(args: Array[String]) {
-    if (args.length != 1) {
+object TallSkinnySVD
+  def main(args: Array[String])
+    if (args.length != 1)
       System.err.println("Usage: TallSkinnySVD <input>")
       System.exit(1)
-    }
 
     val conf = new SparkConf().setAppName("TallSkinnySVD")
     val sc = new SparkContext(conf)
 
     // Load and parse the data file.
-    val rows = sc.textFile(args(0)).map { line =>
+    val rows = sc.textFile(args(0)).map  line =>
       val values = line.split(' ').map(_.toDouble)
       Vectors.dense(values)
-    }
     val mat = new RowMatrix(rows)
 
     // Compute SVD.
@@ -57,6 +55,4 @@ object TallSkinnySVD {
     println("Singular values are " + svd.s)
 
     sc.stop()
-  }
-}
 // scalastyle:on println

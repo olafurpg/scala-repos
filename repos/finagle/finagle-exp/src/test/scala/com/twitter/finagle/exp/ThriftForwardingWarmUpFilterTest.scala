@@ -12,9 +12,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar {
+class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar
 
-  def newCtx() = new {
+  def newCtx() = new
     val service = mock[Service[Array[Byte], Array[Byte]]]
     val forwardService = mock[Service[ThriftClientRequest, Array[Byte]]]
     val numRequests = 9
@@ -30,14 +30,12 @@ class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar {
 
     def mockService[A](service: Service[A, Array[Byte]]) =
       when(service(any[A])) thenReturn Future.value(rep)
-    def sendRequests() = 0 until numRequests foreach { _ =>
+    def sendRequests() = 0 until numRequests foreach  _ =>
       filter(req, service)
-    }
-  }
 
-  test("forward all at time zero") {
-    ClientId("someClient.prod").asCurrent {
-      Time.withCurrentTimeFrozen { ctl =>
+  test("forward all at time zero")
+    ClientId("someClient.prod").asCurrent
+      Time.withCurrentTimeFrozen  ctl =>
         val ctx = newCtx()
         import ctx._
 
@@ -46,13 +44,10 @@ class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar {
         sendRequests()
         verify(forwardService, times(numRequests + 1))(
             any[ThriftClientRequest])
-      }
-    }
-  }
 
-  test("forward none once passed duration") {
-    ClientId("someClient.prod").asCurrent {
-      Time.withCurrentTimeFrozen { ctl =>
+  test("forward none once passed duration")
+    ClientId("someClient.prod").asCurrent
+      Time.withCurrentTimeFrozen  ctl =>
         val ctx = newCtx()
         import ctx._
 
@@ -63,31 +58,22 @@ class ThriftForwardingWarmUpFilterTest extends FunSuite with MockitoSugar {
         sendRequests()
         verify(forwardService, times(1))(any[ThriftClientRequest])
         verify(service, times(numRequests))(any[Array[Byte]])
-      }
-    }
-  }
 
-  test("don't forward for bypassed clients") {
-    ClientId("bypassMe.prod").asCurrent {
-      Time.withCurrentTimeFrozen { ctl =>
+  test("don't forward for bypassed clients")
+    ClientId("bypassMe.prod").asCurrent
+      Time.withCurrentTimeFrozen  ctl =>
         val ctx = newCtx()
         import ctx._
 
         mockService(service)
         sendRequests()
         verify(service, times(numRequests))(any[Array[Byte]])
-      }
-    }
-  }
 
-  test("don't forward for unidentified clients") {
-    Time.withCurrentTimeFrozen { ctl =>
+  test("don't forward for unidentified clients")
+    Time.withCurrentTimeFrozen  ctl =>
       val ctx = newCtx()
       import ctx._
 
       mockService(service)
       sendRequests()
       verify(service, times(numRequests))(any[Array[Byte]])
-    }
-  }
-}

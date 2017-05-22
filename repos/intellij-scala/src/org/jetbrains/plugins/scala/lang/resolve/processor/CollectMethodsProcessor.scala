@@ -10,28 +10,25 @@ import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
   * @author Alexander Podkhalyuzin
   */
 class CollectMethodsProcessor(place: PsiElement, name: String)
-    extends ResolveProcessor(StdKinds.methodsOnly, place, name) {
-  override def execute(element: PsiElement, state: ResolveState): Boolean = {
+    extends ResolveProcessor(StdKinds.methodsOnly, place, name)
+  override def execute(element: PsiElement, state: ResolveState): Boolean =
     val named = element.asInstanceOf[PsiNamedElement]
     val implicitConversionClass: Option[PsiClass] =
-      state.get(ScImplicitlyConvertible.IMPLICIT_RESOLUTION_KEY) match {
+      state.get(ScImplicitlyConvertible.IMPLICIT_RESOLUTION_KEY) match
         case null => None
         case x => Some(x)
-      }
     val implFunction: Option[PsiNamedElement] =
-      state.get(CachesUtil.IMPLICIT_FUNCTION) match {
+      state.get(CachesUtil.IMPLICIT_FUNCTION) match
         case null => None
         case x => Some(x)
-      }
-    val implType: Option[ScType] = state.get(CachesUtil.IMPLICIT_TYPE) match {
+    val implType: Option[ScType] = state.get(CachesUtil.IMPLICIT_TYPE) match
       case null => None
       case x => Some(x)
-    }
-    if (nameAndKindMatch(named, state)) {
+    if (nameAndKindMatch(named, state))
       val accessible = isAccessible(named, ref)
       if (accessibility && !accessible) return true
       val s = getSubst(state)
-      element match {
+      element match
         case m: PsiMethod =>
           addResult(
               new ScalaResolveResult(m,
@@ -43,8 +40,4 @@ class CollectMethodsProcessor(place: PsiElement, name: String)
                                      implicitType = implType,
                                      isAccessible = accessible))
         case _ =>
-      }
-    }
     true
-  }
-}

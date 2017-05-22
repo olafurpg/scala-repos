@@ -20,34 +20,28 @@ import com.twitter.bijection.{Injection, Inversion, AbstractInjection}
 import java.util.{List => JList, ArrayList => JAList}
 import scala.util.Try
 
-class SingleItemInjection[T] extends Injection[T, JList[AnyRef]] {
+class SingleItemInjection[T] extends Injection[T, JList[AnyRef]]
 
-  override def apply(t: T) = {
+  override def apply(t: T) =
     val list = new JAList[AnyRef](1)
     list.add(t.asInstanceOf[AnyRef])
     list
-  }
 
-  override def invert(vin: JList[AnyRef]) = Inversion.attempt(vin) { v =>
+  override def invert(vin: JList[AnyRef]) = Inversion.attempt(vin)  v =>
     v.get(0).asInstanceOf[T]
-  }
-}
 
-class KeyValueInjection[K, V] extends Injection[(K, V), JList[AnyRef]] {
+class KeyValueInjection[K, V] extends Injection[(K, V), JList[AnyRef]]
 
-  override def apply(item: (K, V)) = {
+  override def apply(item: (K, V)) =
     val (key, v) = item
     val list = new JAList[AnyRef](2)
     list.add(key.asInstanceOf[AnyRef])
     list.add(v.asInstanceOf[AnyRef])
     list
-  }
 
-  override def invert(vin: JList[AnyRef]) = Inversion.attempt(vin) { v =>
+  override def invert(vin: JList[AnyRef]) = Inversion.attempt(vin)  v =>
     val key = v.get(0).asInstanceOf[K]
     val value = v
       .get(1)
       .asInstanceOf[V]
       (key, value)
-  }
-}

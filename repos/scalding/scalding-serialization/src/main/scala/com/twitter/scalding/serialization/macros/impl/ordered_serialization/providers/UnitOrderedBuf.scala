@@ -24,15 +24,14 @@ import CompileTimeLengthTypes._
 import java.nio.ByteBuffer
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object UnitOrderedBuf {
-  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+object UnitOrderedBuf
+  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe if tpe =:= c.universe.typeOf[Unit] => UnitOrderedBuf(c)(tpe)
-  }
 
-  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
 
@@ -56,6 +55,3 @@ object UnitOrderedBuf {
         ConstantLengthCalculation(c)(0)
 
       override val lazyOuterVariables: Map[String, ctx.Tree] = Map.empty
-    }
-  }
-}

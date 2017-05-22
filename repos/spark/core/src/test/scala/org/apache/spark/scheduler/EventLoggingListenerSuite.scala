@@ -42,7 +42,7 @@ import org.apache.spark.util.{JsonProtocol, Utils}
   */
 class EventLoggingListenerSuite
     extends SparkFunSuite with LocalSparkContext with BeforeAndAfter
-    with Logging {
+    with Logging
   import EventLoggingListenerSuite._
 
   private val fileSystem = Utils.getHadoopFileSystem(
@@ -50,17 +50,15 @@ class EventLoggingListenerSuite
   private var testDir: File = _
   private var testDirPath: Path = _
 
-  before {
+  before
     testDir = Utils.createTempDir()
     testDir.deleteOnExit()
     testDirPath = new Path(testDir.getAbsolutePath())
-  }
 
-  after {
+  after
     Utils.deleteRecursively(testDir)
-  }
 
-  test("Verify log file exist") {
+  test("Verify log file exist")
     // Verify logging directory exists
     val conf = getLoggingConf(testDirPath)
     val eventLogger =
@@ -77,31 +75,24 @@ class EventLoggingListenerSuite
     eventLogger.stop()
     assert(
         !fileSystem.getFileStatus(new Path(eventLogger.logPath)).isDirectory)
-  }
 
-  test("Basic event logging") {
+  test("Basic event logging")
     testEventLogging()
-  }
 
-  test("Basic event logging with compression") {
-    CompressionCodec.ALL_COMPRESSION_CODECS.foreach { codec =>
+  test("Basic event logging with compression")
+    CompressionCodec.ALL_COMPRESSION_CODECS.foreach  codec =>
       testEventLogging(
           compressionCodec = Some(CompressionCodec.getShortName(codec)))
-    }
-  }
 
-  test("End-to-end event logging") {
+  test("End-to-end event logging")
     testApplicationEventLogging()
-  }
 
-  test("End-to-end event logging with compression") {
-    CompressionCodec.ALL_COMPRESSION_CODECS.foreach { codec =>
+  test("End-to-end event logging with compression")
+    CompressionCodec.ALL_COMPRESSION_CODECS.foreach  codec =>
       testApplicationEventLogging(
           compressionCodec = Some(CompressionCodec.getShortName(codec)))
-    }
-  }
 
-  test("Log overwriting") {
+  test("Log overwriting")
     val logUri = EventLoggingListener.getLogPath(testDir.toURI, "test", None)
     val logPath = new URI(logUri).getPath
     // Create file before writing the event log
@@ -110,9 +101,8 @@ class EventLoggingListenerSuite
     intercept[IOException] { testEventLogging() }
     // Try again, but enable overwriting.
     testEventLogging(extraConf = Map("spark.eventLog.overwrite" -> "true"))
-  }
 
-  test("Event log name") {
+  test("Event log name")
     // without compression
     assert(s"file:/base-dir/app1" === EventLoggingListener.getLogPath(
             Utils.resolveURI("/base-dir"), "app1", None))
@@ -132,7 +122,6 @@ class EventLoggingListenerSuite
                       "a fine:mind$dollar{bills}.1",
                       None,
                       Some("lz4")))
-  }
 
   /* ----------------- *
    * Actual test logic *
@@ -147,7 +136,7 @@ class EventLoggingListenerSuite
     * exactly these two events are logged in the expected file.
     */
   private def testEventLogging(compressionCodec: Option[String] = None,
-                               extraConf: Map[String, String] = Map()) {
+                               extraConf: Map[String, String] = Map())
     val conf = getLoggingConf(testDirPath, compressionCodec)
     extraConf.foreach { case (k, v) => conf.set(k, v) }
     val logName = compressionCodec.map("test-" + _).getOrElse("test")
@@ -169,7 +158,7 @@ class EventLoggingListenerSuite
     // Verify file contains exactly the two events logged
     val logData = EventLoggingListener.openEventLog(
         new Path(eventLogger.logPath), fileSystem)
-    try {
+    try
       val lines = readLines(logData)
       val logStart = SparkListenerLogStart(SPARK_VERSION)
       assert(lines.size === 3)
@@ -181,17 +170,15 @@ class EventLoggingListenerSuite
           JsonProtocol.sparkEventFromJson(parse(lines(1))) === applicationStart)
       assert(
           JsonProtocol.sparkEventFromJson(parse(lines(2))) === applicationEnd)
-    } finally {
+    finally
       logData.close()
-    }
-  }
 
   /**
     * Test end-to-end event logging functionality in an application.
     * This runs a simple Spark job and asserts that the expected events are logged when expected.
     */
   private def testApplicationEventLogging(
-      compressionCodec: Option[String] = None) {
+      compressionCodec: Option[String] = None)
     // Set defaultFS to something that would cause an exception, to make sure we don't run
     // into SPARK-6688.
     val conf = getLoggingConf(testDirPath, compressionCodec).set(
@@ -237,72 +224,57 @@ class EventLoggingListenerSuite
            SparkListenerTaskEnd,
            SparkListenerApplicationEnd)
       .map(Utils.getFormattedClassName)
-    lines.foreach { line =>
-      eventSet.foreach { event =>
-        if (line.contains(event)) {
+    lines.foreach  line =>
+      eventSet.foreach  event =>
+        if (line.contains(event))
           val parsedEvent = JsonProtocol.sparkEventFromJson(parse(line))
           val eventType = Utils.getFormattedClassName(parsedEvent)
-          if (eventType == event) {
+          if (eventType == event)
             eventSet.remove(event)
-          }
-        }
-      }
-    }
     assert(JsonProtocol.sparkEventFromJson(parse(lines(0))) === logStart)
     assert(eventSet.isEmpty,
            "The following events are missing: " + eventSet.toSeq)
-  }
 
-  private def readLines(in: InputStream): Seq[String] = {
+  private def readLines(in: InputStream): Seq[String] =
     Source.fromInputStream(in).getLines().toSeq
-  }
 
   /**
     * A listener that asserts certain events are logged by the given EventLoggingListener.
     * This is necessary because events are posted asynchronously in a different thread.
     */
   private class EventExistenceListener(eventLogger: EventLoggingListener)
-      extends SparkListener {
+      extends SparkListener
     var jobStarted = false
     var jobEnded = false
     var appEnded = false
 
-    override def onJobStart(jobStart: SparkListenerJobStart) {
+    override def onJobStart(jobStart: SparkListenerJobStart)
       jobStarted = true
-    }
 
-    override def onJobEnd(jobEnd: SparkListenerJobEnd) {
+    override def onJobEnd(jobEnd: SparkListenerJobEnd)
       jobEnded = true
-    }
 
     override def onApplicationEnd(
-        applicationEnd: SparkListenerApplicationEnd) {
+        applicationEnd: SparkListenerApplicationEnd)
       appEnded = true
-    }
 
-    def assertAllCallbacksInvoked() {
+    def assertAllCallbacksInvoked()
       assert(jobStarted, "JobStart callback not invoked!")
       assert(jobEnded, "JobEnd callback not invoked!")
       assert(appEnded, "ApplicationEnd callback not invoked!")
-    }
-  }
-}
 
-object EventLoggingListenerSuite {
+object EventLoggingListenerSuite
 
   /** Get a SparkConf with event logging enabled. */
   def getLoggingConf(
-      logDir: Path, compressionCodec: Option[String] = None): SparkConf = {
+      logDir: Path, compressionCodec: Option[String] = None): SparkConf =
     val conf = new SparkConf
     conf.set("spark.eventLog.enabled", "true")
     conf.set("spark.eventLog.testing", "true")
     conf.set("spark.eventLog.dir", logDir.toString)
-    compressionCodec.foreach { codec =>
+    compressionCodec.foreach  codec =>
       conf.set("spark.eventLog.compress", "true")
       conf.set("spark.io.compression.codec", codec)
-    }
     conf
-  }
 
   def getUniqueApplicationId: String = "test-" + System.currentTimeMillis
-}

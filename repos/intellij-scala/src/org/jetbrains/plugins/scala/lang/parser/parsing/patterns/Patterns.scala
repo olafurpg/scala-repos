@@ -12,65 +12,53 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
   * @author Alexander Podkhalyuzin
   * Date: 29.02.2008
   */
-object Patterns {
+object Patterns
   def parse(builder: ScalaPsiBuilder): Boolean =
     parse(builder, underParams = false)
-  def parse(builder: ScalaPsiBuilder, underParams: Boolean): Boolean = {
+  def parse(builder: ScalaPsiBuilder, underParams: Boolean): Boolean =
     val patternsMarker = builder.mark
-    if (!Pattern.parse(builder)) {
-      builder.getTokenType match {
+    if (!Pattern.parse(builder))
+      builder.getTokenType match
         case ScalaTokenTypes.tUNDER =>
           builder.advanceLexer()
-          builder.getTokenText match {
-            case "*" => {
+          builder.getTokenText match
+            case "*" =>
                 builder.advanceLexer
                 patternsMarker.done(ScalaElementTypes.SEQ_WILDCARD)
                 return true
-              }
             case _ =>
-          }
         case _ =>
-      }
       patternsMarker.rollbackTo()
       return false
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tCOMMA =>
         builder.advanceLexer //Ate ,
         var end = false
-        while ( (!end || !underParams) && Pattern.parse(builder)) {
-          builder.getTokenType match {
-            case ScalaTokenTypes.tCOMMA => {
+        while ( (!end || !underParams) && Pattern.parse(builder))
+          builder.getTokenType match
+            case ScalaTokenTypes.tCOMMA =>
                 builder.advanceLexer //Ate ,
                 if (ParserUtils.eatSeqWildcardNext(builder) && underParams)
                   end = true
-              }
-            case _ => {
+            case _ =>
                 patternsMarker.done(ScalaElementTypes.PATTERNS)
                 return true
-              }
-          }
-        }
-        if (underParams) {
+        if (underParams)
           ParserUtils.eatSeqWildcardNext(builder)
-        }
         patternsMarker.done(ScalaElementTypes.PATTERNS)
         return true
       case _ =>
         patternsMarker.rollbackTo
         return false
-    }
-  }
-}
 
-object XmlPatterns extends ParserNode {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object XmlPatterns extends ParserNode
+  def parse(builder: ScalaPsiBuilder): Boolean =
     def isVarId =
       builder.getTokenText.substring(0, 1).toLowerCase == builder.getTokenText
         .substring(0, 1) && !(builder.getTokenText.apply(0) == '`' &&
           builder.getTokenText.apply(builder.getTokenText.length - 1) == '`')
     val args = builder.mark
-    def parseSeqWildcard(withComma: Boolean): Boolean = {
+    def parseSeqWildcard(withComma: Boolean): Boolean =
       if (if (withComma)
             lookAhead(builder,
                       ScalaTokenTypes.tCOMMA,
@@ -79,26 +67,23 @@ object XmlPatterns extends ParserNode {
           else
             lookAhead(builder,
                       ScalaTokenTypes.tUNDER,
-                      ScalaTokenTypes.tIDENTIFIER)) {
+                      ScalaTokenTypes.tIDENTIFIER))
         if (withComma) builder.advanceLexer()
         val wild = builder.mark
         builder.getTokenType
         builder.advanceLexer()
         if (builder.getTokenType == ScalaTokenTypes.tIDENTIFIER &&
-            "*".equals(builder.getTokenText)) {
+            "*".equals(builder.getTokenText))
           builder.advanceLexer()
           wild.done(ScalaElementTypes.SEQ_WILDCARD)
           true
-        } else {
+        else
           wild.rollbackTo()
           false
-        }
-      } else {
+      else
         false
-      }
-    }
 
-    def parseSeqWildcardBinding(withComma: Boolean): Boolean = {
+    def parseSeqWildcardBinding(withComma: Boolean): Boolean =
       if (if (withComma)
             lookAhead(builder,
                       ScalaTokenTypes.tCOMMA,
@@ -111,39 +96,31 @@ object XmlPatterns extends ParserNode {
                       ScalaTokenTypes.tIDENTIFIER,
                       ScalaTokenTypes.tAT,
                       ScalaTokenTypes.tUNDER,
-                      ScalaTokenTypes.tIDENTIFIER)) {
+                      ScalaTokenTypes.tIDENTIFIER))
         if (withComma) builder.advanceLexer() // ,
         val wild = builder.mark
         builder.getTokenType
-        if (isVarId) {
+        if (isVarId)
           builder.advanceLexer() // id
-        } else {
+        else
           wild.rollbackTo()
           return false
-        }
         builder.getTokenType
         builder.advanceLexer() // @
         builder.getTokenType
-        if (ParserUtils.eatSeqWildcardNext(builder)) {
+        if (ParserUtils.eatSeqWildcardNext(builder))
           wild.done(ScalaElementTypes.NAMING_PATTERN)
           return true
-        } else {
+        else
           wild.rollbackTo()
           return false
-        }
-      }
       return false
-    }
 
     if (!parseSeqWildcard(false) && !parseSeqWildcardBinding(false) &&
-        Pattern.parse(builder)) {
+        Pattern.parse(builder))
       while (builder.getTokenType == ScalaTokenTypes.tCOMMA &&
-      !parseSeqWildcard(true) && !parseSeqWildcardBinding(true)) {
+      !parseSeqWildcard(true) && !parseSeqWildcardBinding(true))
         builder.advanceLexer() // eat comma
         Pattern.parse(builder)
-      }
-    }
     args.done(ScalaElementTypes.PATTERNS)
     return true
-  }
-}

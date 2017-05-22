@@ -28,7 +28,7 @@ import org.apache.spark.sql.types.AbstractDataType
   *
   * Most function expressions (e.g. [[Substring]] should extends [[ImplicitCastInputTypes]]) instead.
   */
-trait ExpectsInputTypes extends Expression {
+trait ExpectsInputTypes extends Expression
 
   /**
     * Expected input types from child expressions. The i-th position in the returned seq indicates
@@ -40,24 +40,19 @@ trait ExpectsInputTypes extends Expression {
     */
   def inputTypes: Seq[AbstractDataType]
 
-  override def checkInputDataTypes(): TypeCheckResult = {
-    val mismatches = children.zip(inputTypes).zipWithIndex.collect {
+  override def checkInputDataTypes(): TypeCheckResult =
+    val mismatches = children.zip(inputTypes).zipWithIndex.collect
       case ((child, expected), idx) if !expected.acceptsType(child.dataType) =>
         s"argument ${idx + 1} requires ${expected.simpleString} type, " +
         s"however, '${child.sql}' is of ${child.dataType.simpleString} type."
-    }
 
-    if (mismatches.isEmpty) {
+    if (mismatches.isEmpty)
       TypeCheckResult.TypeCheckSuccess
-    } else {
+    else
       TypeCheckResult.TypeCheckFailure(mismatches.mkString(" "))
-    }
-  }
-}
 
 /**
   * A mixin for the analyzer to perform implicit type casting using [[ImplicitTypeCasts]].
   */
-trait ImplicitCastInputTypes extends ExpectsInputTypes {
+trait ImplicitCastInputTypes extends ExpectsInputTypes
   // No other methods
-}

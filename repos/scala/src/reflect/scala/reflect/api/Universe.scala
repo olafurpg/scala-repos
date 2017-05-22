@@ -63,7 +63,7 @@ abstract class Universe
     with Constants with Annotations with Positions with Exprs with TypeTags
     with ImplicitTags with StandardDefinitions with StandardNames
     with StandardLiftables with Mirrors with Printers with Liftables
-    with Quasiquotes with Internals {
+    with Quasiquotes with Internals
 
   /** Use `reify` to produce the abstract syntax tree representing a given Scala expression.
     *
@@ -83,4 +83,3 @@ abstract class Universe
   // implementation is hardwired to `scala.reflect.reify.Taggers`
   // using the mechanism implemented in `scala.tools.reflect.FastTrack`
   def reify[T](expr: T): Expr[T] = macro ???
-}

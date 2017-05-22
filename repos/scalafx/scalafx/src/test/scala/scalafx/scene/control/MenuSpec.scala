@@ -37,10 +37,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class MenuSpec
     extends SimpleSFXDelegateSpec[jfxsc.Menu, Menu](
-        classOf[jfxsc.Menu], classOf[Menu]) {
+        classOf[jfxsc.Menu], classOf[Menu])
 
   override protected def getScalaClassInstance =
     new Menu(new jfxsc.Menu("default"))
 
   override protected def getJavaClassInstance = new jfxsc.Menu("default")
-}

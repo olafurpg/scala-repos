@@ -21,9 +21,8 @@ import org.apache.spark.sql.ExperimentalMethods
 import org.apache.spark.sql.catalyst.optimizer.Optimizer
 
 class SparkOptimizer(experimentalMethods: ExperimentalMethods)
-    extends Optimizer {
+    extends Optimizer
   override def batches: Seq[Batch] =
     super.batches :+ Batch("User Provided Optimizers",
                            FixedPoint(100),
                            experimentalMethods.extraOptimizations: _*)
-}

@@ -15,7 +15,7 @@ import scala.util.Try
   * This is an internal facility and users are not expected to encounter it
   * unless they are extending Akka in ways which go beyond simple Extensions.
   */
-abstract class DynamicAccess {
+abstract class DynamicAccess
 
   /**
     * Convenience method which given a `Class[_]` object and a constructor description
@@ -54,4 +54,3 @@ abstract class DynamicAccess {
     * other factory method are not applicable (e.g. when constructing a ClassLoaderBinaryInputStream).
     */
   def classLoader: ClassLoader
-}

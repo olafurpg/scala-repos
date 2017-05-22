@@ -42,15 +42,14 @@ import org.apache.spark.streaming.{Seconds, StreamingContext}
   * Anytime you add text files to `testDir`, you'll see predictions from the current model.
   *
   */
-object StreamingLinearRegression {
+object StreamingLinearRegression
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
-    if (args.length != 4) {
+    if (args.length != 4)
       System.err.println(
           "Usage: StreamingLinearRegression <trainingDir> <testDir> <batchDuration> <numFeatures>")
       System.exit(1)
-    }
 
     val conf = new SparkConf()
       .setMaster("local")
@@ -68,6 +67,4 @@ object StreamingLinearRegression {
 
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 // scalastyle:on println

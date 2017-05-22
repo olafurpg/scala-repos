@@ -26,30 +26,26 @@ import java.io.{InputStreamReader, StringWriter}
   * Mix this trait in if you want more control over the output (like switching verbatim xml on/off or using
   * different opening/closing tags for the output).
   */
-trait Transformer {
+trait Transformer
 
   /**
     * Overwrite this method to return a custom decorator if you want modified output.
     */
   def deco(): Decorator = Decorator
 
-  private object lineTokenizer extends LineTokenizer {
+  private object lineTokenizer extends LineTokenizer
     override def allowXmlBlocks() = Transformer.this.deco().allowVerbatimXml()
-  }
-  private object blockParser extends BlockParsers {
+  private object blockParser extends BlockParsers
     override def deco() = Transformer.this.deco()
-  }
 
   /**
     * This is the method that turns markdown source into xhtml.
     */
-  def apply(s: String) = {
+  def apply(s: String) =
     //first, run the input through the line tokenizer
     val lineReader = lineTokenizer.tokenize(s)
     //then, run it through the block parser
     blockParser(lineReader)
-  }
-}
 
 class SingleThreadedTransformer extends Transformer
 
@@ -63,12 +59,10 @@ class SingleThreadedTransformer extends Transformer
   * class instantiates a SingleThreadedTransformer for each thread.
   * You'll need to write your own pooled implementation if this isn't efficient for your usage.
   */
-class ThreadLocalTransformer extends Transformer {
+class ThreadLocalTransformer extends Transformer
 
   private[this] val threadLocalTransformer =
-    new ThreadLocal[SingleThreadedTransformer] {
+    new ThreadLocal[SingleThreadedTransformer]
       override def initialValue = new SingleThreadedTransformer
-    }
 
   override def apply(s: String) = threadLocalTransformer.get()(s)
-}

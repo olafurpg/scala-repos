@@ -28,7 +28,7 @@ import scala.language.implicitConversions
   */
 trait IndexedSeqView[A, +Coll]
     extends IndexedSeq[A] with IndexedSeqOptimized[A, IndexedSeqView[A, Coll]]
-    with SeqView[A, Coll] with SeqViewLike[A, Coll, IndexedSeqView[A, Coll]] {
+    with SeqView[A, Coll] with SeqViewLike[A, Coll, IndexedSeqView[A, Coll]]
   self =>
 
   private[this] type This = IndexedSeqView[A, Coll]
@@ -36,42 +36,36 @@ trait IndexedSeqView[A, +Coll]
   def update(idx: Int, elem: A): Unit
 
   trait Transformed[B]
-      extends IndexedSeqView[B, Coll] with super.Transformed[B] {
+      extends IndexedSeqView[B, Coll] with super.Transformed[B]
     def update(idx: Int, elem: B): Unit
     override def toString = viewToString
-  }
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[B]
       extends super.AbstractTransformed[B] with Transformed[B]
 
   // pre: until <= self.length
-  trait Sliced extends super.Sliced with Transformed[A] {
+  trait Sliced extends super.Sliced with Transformed[A]
     override def length = endpoints.width
     def update(idx: Int, elem: A) =
       if (idx >= 0 && idx + from < until) self.update(idx + from, elem)
       else throw new IndexOutOfBoundsException(idx.toString)
-  }
 
-  trait Filtered extends super.Filtered with Transformed[A] {
+  trait Filtered extends super.Filtered with Transformed[A]
     def update(idx: Int, elem: A) = self.update(index(idx), elem)
-  }
 
-  trait TakenWhile extends super.TakenWhile with Transformed[A] {
+  trait TakenWhile extends super.TakenWhile with Transformed[A]
     def update(idx: Int, elem: A) =
       if (idx < len) self.update(idx, elem)
       else throw new IndexOutOfBoundsException(idx.toString)
-  }
 
-  trait DroppedWhile extends super.DroppedWhile with Transformed[A] {
+  trait DroppedWhile extends super.DroppedWhile with Transformed[A]
     def update(idx: Int, elem: A) =
       if (idx >= 0) self.update(idx + start, elem)
       else throw new IndexOutOfBoundsException(idx.toString)
-  }
 
-  trait Reversed extends super.Reversed with Transformed[A] {
+  trait Reversed extends super.Reversed with Transformed[A]
     def update(idx: Int, elem: A) = self.update(self.length - 1 - idx, elem)
-  }
 
   /** Boilerplate method, to override in each subclass
     *  This method could be eliminated if Scala had virtual classes
@@ -102,7 +96,6 @@ trait IndexedSeqView[A, +Coll]
   override def reverse: This = newReversed
   override def tail: IndexedSeqView[A, Coll] =
     if (isEmpty) super.tail else slice(1, length)
-}
 
 /** An object containing the necessary implicit definitions to make
   *  `SeqView`s work. Its definitions are generally not accessed directly by clients.
@@ -112,17 +105,14 @@ trait IndexedSeqView[A, +Coll]
   * For instance, `map` just gives a `SeqView`, which reflects the fact that
   * `map` cannot do its work and maintain a pointer into the original indexed sequence.
   */
-object IndexedSeqView {
+object IndexedSeqView
   type Coll = TraversableView[_, C] forSome { type C <: Traversable[_] }
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, SeqView[A, Seq[_]]] =
-    new CanBuildFrom[Coll, A, SeqView[A, Seq[_]]] {
+    new CanBuildFrom[Coll, A, SeqView[A, Seq[_]]]
       def apply(from: Coll) = new NoBuilder
       def apply() = new NoBuilder
-    }
   implicit def arrCanBuildFrom[A]: CanBuildFrom[
       TraversableView[_, Array[_]], A, SeqView[A, Array[A]]] =
-    new CanBuildFrom[TraversableView[_, Array[_]], A, SeqView[A, Array[A]]] {
+    new CanBuildFrom[TraversableView[_, Array[_]], A, SeqView[A, Array[A]]]
       def apply(from: TraversableView[_, Array[_]]) = new NoBuilder
       def apply() = new NoBuilder
-    }
-}

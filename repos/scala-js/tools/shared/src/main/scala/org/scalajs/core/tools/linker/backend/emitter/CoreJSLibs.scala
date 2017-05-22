@@ -20,7 +20,7 @@ import scala.collection.immutable.Seq
 import scala.collection.mutable
 
 // The only reason this is not private[backend] is that Rhino needs it
-private[scalajs] object CoreJSLibs {
+private[scalajs] object CoreJSLibs
 
   private type Config = (Semantics, OutputMode)
 
@@ -31,23 +31,20 @@ private[scalajs] object CoreJSLibs {
   private val gitHubBaseURI = new URI(
       "https://raw.githubusercontent.com/scala-js/scala-js/")
 
-  def lib(semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
-    synchronized {
+  def lib(semantics: Semantics, outputMode: OutputMode): VirtualJSFile =
+    synchronized
       cachedLibByConfig.getOrElseUpdate(
           (semantics, outputMode), makeLib(semantics, outputMode))
-    }
-  }
 
   private def makeLib(
-      semantics: Semantics, outputMode: OutputMode): VirtualJSFile = {
+      semantics: Semantics, outputMode: OutputMode): VirtualJSFile =
     new ScalaJSEnvVirtualJSFile(makeContent(semantics, outputMode))
-  }
 
   private def makeContent(
-      semantics: Semantics, outputMode: OutputMode): String = {
+      semantics: Semantics, outputMode: OutputMode): String =
     // This is a basic sort-of-C-style preprocessor
 
-    def getOption(name: String): String = name match {
+    def getOption(name: String): String = name match
       case "asInstanceOfs" =>
         semantics.asInstanceOfs.toString()
       case "moduleInit" =>
@@ -59,60 +56,52 @@ private[scalajs] object CoreJSLibs {
         semantics.productionMode.toString()
       case "outputMode" =>
         outputMode.toString()
-    }
 
     val originalLines = ScalaJSEnvLines
 
     var skipping = false
     var skipDepth = 0
-    val lines = for (line <- originalLines) yield {
+    val lines = for (line <- originalLines) yield
       val includeThisLine =
-        if (skipping) {
-          if (line == "//!else" && skipDepth == 1) {
+        if (skipping)
+          if (line == "//!else" && skipDepth == 1)
             skipping = false
             skipDepth = 0
-          } else if (line == "//!endif") {
+          else if (line == "//!endif")
             skipDepth -= 1
             if (skipDepth == 0) skipping = false
-          } else if (line.startsWith("//!if ")) {
+          else if (line.startsWith("//!if "))
             skipDepth += 1
-          }
           false
-        } else {
-          if (line.startsWith("//!")) {
-            if (line.startsWith("//!if ")) {
+        else
+          if (line.startsWith("//!"))
+            if (line.startsWith("//!if "))
               val Array(_, option, op, value) = line.split(" ")
               val optionValue = getOption(option)
-              val success = op match {
+              val success = op match
                 case "==" => optionValue == value
                 case "!=" => optionValue != value
-              }
-              if (!success) {
+              if (!success)
                 skipping = true
                 skipDepth = 1
-              }
-            } else if (line == "//!else") {
+            else if (line == "//!else")
               skipping = true
               skipDepth = 1
-            } else if (line == "//!endif") {
+            else if (line == "//!endif")
               // nothing to do
-            } else {
+            else
               throw new MatchError(line)
-            }
             false
-          } else {
+          else
             true
-          }
-        }
       if (includeThisLine) line
       else "" // blank line preserves line numbers in source maps
-    }
 
     val content = lines
       .mkString("", "\n", "\n")
       .replace("{{LINKER_VERSION}}", ScalaJSVersions.current)
 
-    val content1 = outputMode match {
+    val content1 = outputMode match
       case OutputMode.ECMAScript51Global =>
         content
 
@@ -130,27 +119,21 @@ private[scalajs] object CoreJSLibs {
           .replaceAll("ScalaJS\\.asArrayOf\\.", "\\$asArrayOf_")
           .replaceAll("ScalaJS\\.", "\\$")
           .replaceAll("\n(\\$[A-Za-z0-9_]+) =", "\nconst $1 =")
-    }
 
-    outputMode match {
+    outputMode match
       case OutputMode.ECMAScript51Global | OutputMode.ECMAScript51Isolated =>
         content1.replaceAll(raw"\b(let|const)\b", "var")
 
       case OutputMode.ECMAScript6 =>
         content1
-    }
-  }
 
   private class ScalaJSEnvVirtualJSFile(override val content: String)
-      extends VirtualJSFile {
+      extends VirtualJSFile
     override def path: String = "scalajsenv.js"
     override def version: Option[String] = Some("")
     override def exists: Boolean = true
 
-    override def toURI: URI = {
+    override def toURI: URI =
       if (!ScalaJSVersions.currentIsSnapshot)
         gitHubBaseURI.resolve(s"v${ScalaJSVersions.current}/tools/$path")
       else super.toURI
-    }
-  }
-}

@@ -5,23 +5,18 @@ import org.openjdk.jmh.annotations._
 
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Array(Mode.AverageTime))
-class StopwatchBenchmark {
+class StopwatchBenchmark
   import StopwatchBenchmark._
 
   @Benchmark
-  def timeMakeCallback(): () => Duration = {
+  def timeMakeCallback(): () => Duration =
     Stopwatch.start()
-  }
 
   @Benchmark
-  def timeTime(state: StopwatchState): Duration = {
+  def timeTime(state: StopwatchState): Duration =
     state.elapsed()
-  }
-}
 
-object StopwatchBenchmark {
+object StopwatchBenchmark
   @State(Scope.Benchmark)
-  class StopwatchState {
+  class StopwatchState
     val elapsed = Stopwatch.start()
-  }
-}

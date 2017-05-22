@@ -8,22 +8,22 @@ import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
 
-class GraphBroadcastSpec extends AkkaSpec {
+class GraphBroadcastSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "A broadcast" must {
+  "A broadcast" must
     import GraphDSL.Implicits._
 
-    "broadcast to other subscriber" in assertAllStagesStopped {
+    "broadcast to other subscriber" in assertAllStagesStopped
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val bcast = b.add(Broadcast[Int](2))
           Source(List(1, 2, 3)) ~> bcast.in
           bcast.out(0) ~> Flow[Int].buffer(16, OverflowStrategy.backpressure) ~> Sink
@@ -31,7 +31,7 @@ class GraphBroadcastSpec extends AkkaSpec {
           bcast.out(1) ~> Flow[Int].buffer(16, OverflowStrategy.backpressure) ~> Sink
             .fromSubscriber(c2)
           ClosedShape
-        })
+        )
         .run()
 
       val sub1 = c1.expectSubscription()
@@ -50,24 +50,22 @@ class GraphBroadcastSpec extends AkkaSpec {
       sub2.request(3)
       c2.expectNext(3)
       c2.expectComplete()
-    }
 
-    "work with one-way broadcast" in assertAllStagesStopped {
+    "work with one-way broadcast" in assertAllStagesStopped
       val result = Source
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val broadcast = b.add(Broadcast[Int](1))
           val source = b.add(Source(1 to 3))
 
           source ~> broadcast.in
 
           SourceShape(broadcast.out(0))
-        })
+        )
         .runFold(Seq[Int]())(_ :+ _)
 
       Await.result(result, 3.seconds) should ===(Seq(1, 2, 3))
-    }
 
-    "work with n-way broadcast" in assertAllStagesStopped {
+    "work with n-way broadcast" in assertAllStagesStopped
       val headSink = Sink.head[Seq[Int]]
 
       import system.dispatcher
@@ -77,7 +75,7 @@ class GraphBroadcastSpec extends AkkaSpec {
                                    headSink,
                                    headSink,
                                    headSink)((fut1, fut2, fut3, fut4,
-                fut5) ⇒ Future.sequence(List(fut1, fut2, fut3, fut4, fut5))) {
+                fut5) ⇒ Future.sequence(List(fut1, fut2, fut3, fut4, fut5)))
           implicit b ⇒ (p1, p2, p3, p4, p5) ⇒
             val bcast = b.add(Broadcast[Int](5))
             Source(List(1, 2, 3)) ~> bcast.in
@@ -87,13 +85,12 @@ class GraphBroadcastSpec extends AkkaSpec {
             bcast.out(3).grouped(5) ~> p4.in
             bcast.out(4).grouped(5) ~> p5.in
             ClosedShape
-        })
+        )
         .run()
 
       Await.result(result, 3.seconds) should be(List.fill(5)(List(1, 2, 3)))
-    }
 
-    "work with 22-way broadcast" in assertAllStagesStopped {
+    "work with 22-way broadcast" in assertAllStagesStopped
       type T = Seq[Int]
       type FT = Future[Seq[Int]]
       val headSink: Sink[T, FT] = Sink.head[T]
@@ -150,7 +147,7 @@ class GraphBroadcastSpec extends AkkaSpec {
                             headSink,
                             headSink,
                             headSink,
-                            headSink)(combine) {
+                            headSink)(combine)
           implicit b ⇒
             (p1, p2, p3, p4, p5, p6, p7, p8, p9,
             p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22) ⇒
@@ -179,24 +176,23 @@ class GraphBroadcastSpec extends AkkaSpec {
               bcast.out(20).grouped(5) ~> p21.in
               bcast.out(21).grouped(5) ~> p22.in
               ClosedShape
-        })
+        )
         .run()
 
       Await.result(result, 3.seconds) should be(List.fill(22)(List(1, 2, 3)))
-    }
 
-    "produce to other even though downstream cancels" in assertAllStagesStopped {
+    "produce to other even though downstream cancels" in assertAllStagesStopped
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val bcast = b.add(Broadcast[Int](2))
           Source(List(1, 2, 3)) ~> bcast.in
           bcast.out(0) ~> Flow[Int] ~> Sink.fromSubscriber(c1)
           bcast.out(1) ~> Flow[Int] ~> Sink.fromSubscriber(c2)
           ClosedShape
-        })
+        )
         .run()
 
       val sub1 = c1.expectSubscription()
@@ -207,14 +203,13 @@ class GraphBroadcastSpec extends AkkaSpec {
       c2.expectNext(2)
       c2.expectNext(3)
       c2.expectComplete()
-    }
 
-    "produce to downstream even though other cancels" in assertAllStagesStopped {
+    "produce to downstream even though other cancels" in assertAllStagesStopped
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val bcast = b.add(Broadcast[Int](2))
           Source(List(1, 2, 3)) ~> bcast.in
           bcast.out(0) ~> Flow[Int].named("identity-a") ~> Sink.fromSubscriber(
@@ -222,7 +217,7 @@ class GraphBroadcastSpec extends AkkaSpec {
           bcast.out(1) ~> Flow[Int].named("identity-b") ~> Sink.fromSubscriber(
               c2)
           ClosedShape
-        })
+        )
         .run()
 
       val sub1 = c1.expectSubscription()
@@ -233,21 +228,20 @@ class GraphBroadcastSpec extends AkkaSpec {
       c1.expectNext(2)
       c1.expectNext(3)
       c1.expectComplete()
-    }
 
-    "cancel upstream when downstreams cancel" in assertAllStagesStopped {
+    "cancel upstream when downstreams cancel" in assertAllStagesStopped
       val p1 = TestPublisher.manualProbe[Int]()
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val bcast = b.add(Broadcast[Int](2))
           Source.fromPublisher(p1.getPublisher) ~> bcast.in
           bcast.out(0) ~> Flow[Int] ~> Sink.fromSubscriber(c1)
           bcast.out(1) ~> Flow[Int] ~> Sink.fromSubscriber(c2)
           ClosedShape
-        })
+        )
         .run()
 
       val bsub = p1.expectSubscription()
@@ -265,18 +259,17 @@ class GraphBroadcastSpec extends AkkaSpec {
       sub1.cancel()
       sub2.cancel()
       bsub.expectCancellation()
-    }
 
-    "pass along early cancellation" in assertAllStagesStopped {
+    "pass along early cancellation" in assertAllStagesStopped
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[Int]()
 
-      val sink = Sink.fromGraph(GraphDSL.create() { implicit b ⇒
+      val sink = Sink.fromGraph(GraphDSL.create()  implicit b ⇒
         val bcast = b.add(Broadcast[Int](2))
         bcast.out(0) ~> Sink.fromSubscriber(c1)
         bcast.out(1) ~> Sink.fromSubscriber(c2)
         SinkShape(bcast.in)
-      })
+      )
 
       val s = Source.asSubscriber[Int].to(sink).run()
 
@@ -290,9 +283,8 @@ class GraphBroadcastSpec extends AkkaSpec {
       up.subscribe(s)
       val upsub = up.expectSubscription()
       upsub.expectCancellation()
-    }
 
-    "alsoTo must broadcast" in assertAllStagesStopped {
+    "alsoTo must broadcast" in assertAllStagesStopped
       val p, p2 = TestSink.probe[Int](system)
       val (ps1, ps2) =
         Source(1 to 6).alsoToMat(p)(Keep.right).toMat(p2)(Keep.both).run()
@@ -302,9 +294,8 @@ class GraphBroadcastSpec extends AkkaSpec {
       ps2.expectNext(1, 2, 3, 4, 5, 6)
       ps1.expectComplete()
       ps2.expectComplete()
-    }
 
-    "alsoTo must continue if sink cancels" in assertAllStagesStopped {
+    "alsoTo must continue if sink cancels" in assertAllStagesStopped
       val p, p2 = TestSink.probe[Int](system)
       val (ps1, ps2) =
         Source(1 to 6).alsoToMat(p)(Keep.right).toMat(p2)(Keep.both).run()
@@ -312,6 +303,3 @@ class GraphBroadcastSpec extends AkkaSpec {
       ps1.cancel()
       ps2.expectNext(1, 2, 3, 4, 5, 6)
       ps2.expectComplete()
-    }
-  }
-}

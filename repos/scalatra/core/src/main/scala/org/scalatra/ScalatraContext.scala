@@ -5,16 +5,15 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.scalatra.servlet.{HttpServletRequestReadOnly, ServletApiImplicits}
 
-object ScalatraContext {
+object ScalatraContext
 
   private class StableValuesContext(implicit val request: HttpServletRequest,
                                     val response: HttpServletResponse,
                                     val servletContext: ServletContext)
       extends ScalatraContext
-}
 
 trait ScalatraContext
-    extends ServletApiImplicits with SessionSupport with CookieContext {
+    extends ServletApiImplicits with SessionSupport with CookieContext
 
   import org.scalatra.ScalatraContext.StableValuesContext
 
@@ -37,9 +36,8 @@ trait ScalatraContext
   /**
     * Sets the content type of the current response.
     */
-  def contentType_=(contentType: String): Unit = {
+  def contentType_=(contentType: String): Unit =
     response.contentType = Option(contentType)
-  }
 
   @deprecated("Use status_=(Int) instead", "2.1.0")
   def status(code: Int): Unit = { status_=(code) }
@@ -53,20 +51,16 @@ trait ScalatraContext
     * Explicitly sets the request-scoped format.  This takes precedence over
     * whatever was inferred from the request.
     */
-  def format_=(formatValue: Symbol): Unit = {
+  def format_=(formatValue: Symbol): Unit =
     request(ApiFormats.FormatKey) = formatValue.name
-  }
 
   /**
     * Explicitly sets the request-scoped format.  This takes precedence over
     * whatever was inferred from the request.
     */
-  def format_=(formatValue: String): Unit = {
+  def format_=(formatValue: String): Unit =
     request(ApiFormats.FormatKey) = formatValue
-  }
 
-  protected[this] implicit def scalatraContext: ScalatraContext = {
+  protected[this] implicit def scalatraContext: ScalatraContext =
     new StableValuesContext()(
         HttpServletRequestReadOnly(request), response, servletContext)
-  }
-}

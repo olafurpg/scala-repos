@@ -7,9 +7,9 @@ import mesosphere.mesos.protos.Implicits._
 import mesosphere.mesos.protos.TextAttribute
 import org.scalatest.{GivenWhenThen, Matchers}
 
-class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
+class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers
 
-  test("toProto returns the encapsulated MarathonTask") {
+  test("toProto returns the encapsulated MarathonTask")
     Given("A state created from a task")
     val encapsulatedTask =
       makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
@@ -20,9 +20,8 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
 
     Then("The returned proto equals the one passed in")
     proto shouldEqual encapsulatedTask
-  }
 
-  test("mergeFromProto returns a sane instance") {
+  test("mergeFromProto returns a sane instance")
     Given("A state created from a task with version")
     val dummy =
       makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
@@ -34,9 +33,8 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
 
     Then("The 'merged' state does not have a version because mergeFromProto does not merge but create a new instance based on the given proto")
     merged.toProto shouldEqual proto
-  }
 
-  test("mergeFromProto bytes returns a sane instance") {
+  test("mergeFromProto bytes returns a sane instance")
     Given("A state created from a task with version")
     val dummy =
       makeTask("app/dummy", "dummyhost", 42000, version = Some("123"))
@@ -48,10 +46,9 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
 
     Then("The 'merged' state does not have a version because mergeFromProto does not merge but cerate a new instance based on the given proto")
     merged.toProto shouldEqual proto
-  }
 
   private[this] def makeTask(
-      id: String, host: String, port: Int, version: Option[String]) = {
+      id: String, host: String, port: Int, version: Option[String]) =
     val builder = MarathonTask
       .newBuilder()
       .setHost(host)
@@ -62,5 +59,3 @@ class MarathonTaskTest extends MarathonSpec with GivenWhenThen with Matchers {
     version.map(builder.setVersion)
 
     builder.build()
-  }
-}

@@ -24,9 +24,9 @@ import com.twitter.scalding.Dsl._
 
 import WeightedPageRankFromMatrixSpec._
 
-class WeightedPageRankFromMatrixSpec extends WordSpec with Matchers {
+class WeightedPageRankFromMatrixSpec extends WordSpec with Matchers
 
-  "Weighted PageRank from Matrix job" should {
+  "Weighted PageRank from Matrix job" should
 
     // 0.0 0.0 0.0 0.0 1.0
     // 0.5 0.0 0.0 0.0 0.0
@@ -59,7 +59,7 @@ class WeightedPageRankFromMatrixSpec extends WordSpec with Matchers {
       .source(TypedTsv[(Int, Double)]("root/onesVector"), onesVector)
       .source(TypedTsv[(Int, Double)]("root/iterations/0"),
               iterationZeroVector)
-      .sink[(Int, Int, Double)](Tsv("root/constants/M_hat")) { outputBuffer =>
+      .sink[(Int, Int, Double)](Tsv("root/constants/M_hat"))  outputBuffer =>
         outputBuffer should have size 7
         val outputMap = toSparseMap(outputBuffer)
         outputMap((0 -> 1)) shouldBe 0.4
@@ -69,21 +69,18 @@ class WeightedPageRankFromMatrixSpec extends WordSpec with Matchers {
         outputMap((2 -> 4)) shouldBe 0.13333 +- 0.00001
         outputMap((3 -> 4)) shouldBe 0.26666 +- 0.00001
         outputMap((4 -> 0)) shouldBe 0.4
-      }
-      .sink[(Int, Double)](Tsv("root/constants/priorVector")) { outputBuffer =>
+      .sink[(Int, Double)](Tsv("root/constants/priorVector"))  outputBuffer =>
         outputBuffer should have size 5
         val expectedValue = ((1 - d) / 2) * d
-        assertVectorsEqual(new Array[Double](5).map { v =>
+        assertVectorsEqual(new Array[Double](5).map  v =>
           expectedValue
-        }, outputBuffer.map(_._2).toArray)
-      }
-      .sink[(Int, Double)](Tsv("root/iterations/1")) { outputBuffer =>
+        , outputBuffer.map(_._2).toArray)
+      .sink[(Int, Double)](Tsv("root/iterations/1"))  outputBuffer =>
         outputBuffer should have size 5
         assertVectorsEqual(expectedSolution,
                            outputBuffer.map(_._2).toArray,
                            0.00001)
-      }
-      .typedSink(TypedTsv[Double]("root/diff")) { outputBuffer =>
+      .typedSink(TypedTsv[Double]("root/diff"))  outputBuffer =>
         outputBuffer should have size 1
 
         val expectedDiff = expectedSolution
@@ -91,45 +88,35 @@ class WeightedPageRankFromMatrixSpec extends WordSpec with Matchers {
           .map { case (a, b) => math.abs(a - b) }
           .sum
         outputBuffer.head shouldBe expectedDiff +- 0.00001
-      }
       .run
       .finish
-  }
 
   private def assertVectorsEqual(
-      expected: Array[Double], actual: Array[Double], variance: Double) {
-    actual.zipWithIndex.foreach {
+      expected: Array[Double], actual: Array[Double], variance: Double)
+    actual.zipWithIndex.foreach
       case (value, i) =>
         value shouldBe(expected(i)) +- variance
-    }
-  }
 
   private def assertVectorsEqual(
-      expected: Array[Double], actual: Array[Double]) {
-    actual.zipWithIndex.foreach {
+      expected: Array[Double], actual: Array[Double])
+    actual.zipWithIndex.foreach
       case (value, i) =>
         value shouldBe (expected(i))
-    }
-  }
-}
 
-object WeightedPageRankFromMatrixSpec {
+object WeightedPageRankFromMatrixSpec
 
   def toSparseMap[Row, Col, V](
       iterable: Iterable[(Row, Col, V)]): Map[(Row, Col), V] =
-    iterable.map { entry =>
+    iterable.map  entry =>
       ((entry._1, entry._2), entry._3)
-    }.toMap
+    .toMap
 
-  def filledColumnVector(value: Double, size: Int): List[(Int, Double)] = {
+  def filledColumnVector(value: Double, size: Int): List[(Int, Double)] =
     val vector = mutable.ListBuffer[(Int, Double)]()
-    (0 until size).foreach { row =>
+    (0 until size).foreach  row =>
       vector += new Tuple2(row, value)
-    }
 
     vector.toList
-  }
-}
 
 /**
   * Octave/Matlab implementations to provide the expected ranks. This comes from

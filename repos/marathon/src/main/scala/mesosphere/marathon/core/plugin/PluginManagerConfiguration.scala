@@ -2,7 +2,7 @@ package mesosphere.marathon.core.plugin
 
 import org.rogach.scallop.ScallopConf
 
-trait PluginManagerConfiguration extends ScallopConf {
+trait PluginManagerConfiguration extends ScallopConf
 
   lazy val pluginConf = opt[String](
       "plugin_conf", descr = "The plugin configuration file.", noshort = true)
@@ -13,4 +13,3 @@ trait PluginManagerConfiguration extends ScallopConf {
       noshort = true)
 
   codependent(pluginConf, pluginDir)
-}

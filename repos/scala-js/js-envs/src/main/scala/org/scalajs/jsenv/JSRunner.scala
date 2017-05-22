@@ -10,8 +10,7 @@ package org.scalajs.jsenv
 
 import org.scalajs.core.tools.logging.Logger
 
-trait JSRunner {
+trait JSRunner
 
   /** Run the associated JS code. Throw if an error occurs. */
   def run(logger: Logger, console: JSConsole): Unit
-}

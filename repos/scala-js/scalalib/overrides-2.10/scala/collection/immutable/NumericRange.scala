@@ -41,7 +41,7 @@ import generic._
 abstract class NumericRange[T](
     val start: T, val end: T, val step: T, val isInclusive: Boolean)(
     implicit num: Integral[T])
-    extends AbstractSeq[T] with IndexedSeq[T] with Serializable {
+    extends AbstractSeq[T] with IndexedSeq[T] with Serializable
 
   /** Note that NumericRange must be invariant so that constructs
     *  such as "1L to 10 by 5" do not infer the range type as AnyVal.
@@ -67,31 +67,27 @@ abstract class NumericRange[T](
     */
   def copy(start: T, end: T, step: T): NumericRange[T]
 
-  override def foreach[U](f: T => U) {
+  override def foreach[U](f: T => U)
     var count = 0
     var current = start
-    while (count < length) {
+    while (count < length)
       f(current)
       current += step
       count += 1
-    }
-  }
 
   // TODO: these private methods are straight copies from Range, duplicated
   // to guard against any (most likely illusory) performance drop.  They should
   // be eliminated one way or another.
 
   // Counts how many elements from the start meet the given test.
-  private def skipCount(p: T => Boolean): Int = {
+  private def skipCount(p: T => Boolean): Int =
     var current = start
     var counted = 0
 
-    while (counted < length && p(current)) {
+    while (counted < length && p(current))
       counted += 1
       current += step
-    }
     counted
-  }
   // Tests whether a number is within the endpoints, without testing
   // whether it is a member of the sequence (i.e. when step > 1.)
   private def isWithinBoundaries(elem: T) =
@@ -118,25 +114,24 @@ abstract class NumericRange[T](
      else if (n >= length) newEmptyRange(end)
      else copy(locationAfterN(n), end, step))
 
-  def apply(idx: Int): T = {
+  def apply(idx: Int): T =
     if (idx < 0 || idx >= length)
       throw new IndexOutOfBoundsException(idx.toString)
     else locationAfterN(idx)
-  }
 
   import NumericRange.defaultOrdering
 
   override def min[T1 >: T](implicit ord: Ordering[T1]): T =
-    if (ord eq defaultOrdering(num)) {
+    if (ord eq defaultOrdering(num))
       if (num.signum(step) > 0) start
       else last
-    } else super.min(ord)
+    else super.min(ord)
 
   override def max[T1 >: T](implicit ord: Ordering[T1]): T =
-    if (ord eq defaultOrdering(num)) {
+    if (ord eq defaultOrdering(num))
       if (num.signum(step) > 0) last
       else start
-    } else super.max(ord)
+    else super.max(ord)
 
   // Motivated by the desire for Double ranges with BigDecimal precision,
   // we need some way to map a Range and get another Range.  This can't be
@@ -161,46 +156,41 @@ abstract class NumericRange[T](
   //   (0.1 to 0.3 by 0.1 contains 0.3) == true
   //
   private[immutable] def mapRange[A](fm: T => A)(
-      implicit unum: Integral[A]): NumericRange[A] = {
+      implicit unum: Integral[A]): NumericRange[A] =
     val self = this
 
     // XXX This may be incomplete.
-    new NumericRange[A](fm(start), fm(end), fm(step), isInclusive) {
+    new NumericRange[A](fm(start), fm(end), fm(step), isInclusive)
       def copy(start: A, end: A, step: A): NumericRange[A] =
         if (isInclusive) NumericRange.inclusive(start, end, step)
         else NumericRange(start, end, step)
 
       private lazy val underlyingRange: NumericRange[T] = self
-      override def foreach[U](f: A => U) {
+      override def foreach[U](f: A => U)
         underlyingRange foreach (x => f(fm(x)))
-      }
       override def isEmpty = underlyingRange.isEmpty
       override def apply(idx: Int): A = fm(underlyingRange(idx))
       override def containsTyped(el: A) =
         underlyingRange exists (x => fm(x) == el)
-    }
-  }
 
   // a well-typed contains method.
   def containsTyped(x: T): Boolean =
     isWithinBoundaries(x) && (((x - start) % step) == zero)
 
   override def contains(x: Any): Boolean =
-    try containsTyped(x.asInstanceOf[T]) catch {
+    try containsTyped(x.asInstanceOf[T]) catch
       case _: ClassCastException => false
-    }
 
-  final override def sum[B >: T](implicit num: Numeric[B]): B = {
+  final override def sum[B >: T](implicit num: Numeric[B]): B =
     import num.Ops
     if (isEmpty) this.num fromInt 0
     else if (numRangeElements == 1) head
     else
       ((this.num fromInt numRangeElements) * (head + last) /
           (this.num fromInt 2))
-  }
 
   override lazy val hashCode = super.hashCode()
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case x: NumericRange[_] =>
       (x canEqual this) && (length == x.length) &&
       ((length == 0) || // all empty sequences are equal
@@ -209,24 +199,21 @@ abstract class NumericRange[T](
           )
     case _ =>
       super.equals(other)
-  }
 
-  override def toString() = {
+  override def toString() =
     val endStr = if (length > Range.MAX_PRINT) ", ... )" else ")"
     take(Range.MAX_PRINT).mkString("NumericRange(", ", ", endStr)
-  }
-}
 
 /** A companion object for numeric ranges.
   */
-object NumericRange {
+object NumericRange
 
   /** Calculates the number of elements in a range given start, end, step, and
     *  whether or not it is inclusive.  Throws an exception if step == 0 or
     *  the number of elements exceeds the maximum Int.
     */
   def count[T](start: T, end: T, step: T, isInclusive: Boolean)(
-      implicit num: Integral[T]): Int = {
+      implicit num: Integral[T]): Int =
     val zero = num.zero
     val upward = num.lt(start, end)
     val posStep = num.gt(step, zero)
@@ -234,7 +221,7 @@ object NumericRange {
     if (step == zero) throw new IllegalArgumentException("step cannot be 0.")
     else if (start == end) if (isInclusive) 1 else 0
     else if (upward != posStep) 0
-    else {
+    else
       val diff = num.minus(end, start)
       val jumps = num.toLong(num.quot(diff, step))
       val remainder = num.rem(diff, step)
@@ -249,32 +236,27 @@ object NumericRange {
       val isOverflow =
         longCount == 0 && num.lt(num.plus(start, step), end) == upward
 
-      if (longCount > scala.Int.MaxValue || longCount < 0L || isOverflow) {
+      if (longCount > scala.Int.MaxValue || longCount < 0L || isOverflow)
         val word = if (isInclusive) "to" else "until"
         val descr = List(start, word, end, "by", step) mkString " "
 
         throw new IllegalArgumentException(
             descr + ": seqs cannot contain more than Int.MaxValue elements.")
-      }
       longCount.toInt
-    }
-  }
 
   class Inclusive[T](start: T, end: T, step: T)(implicit num: Integral[T])
-      extends NumericRange(start, end, step, true) {
+      extends NumericRange(start, end, step, true)
     def copy(start: T, end: T, step: T): Inclusive[T] =
       NumericRange.inclusive(start, end, step)
 
     def exclusive: Exclusive[T] = NumericRange(start, end, step)
-  }
 
   class Exclusive[T](start: T, end: T, step: T)(implicit num: Integral[T])
-      extends NumericRange(start, end, step, false) {
+      extends NumericRange(start, end, step, false)
     def copy(start: T, end: T, step: T): Exclusive[T] =
       NumericRange(start, end, step)
 
     def inclusive: Inclusive[T] = NumericRange.inclusive(start, end, step)
-  }
 
   def apply[T](start: T, end: T, step: T)(
       implicit num: Integral[T]): Exclusive[T] =
@@ -290,4 +272,3 @@ object NumericRange {
       Numeric.CharIsIntegral -> Ordering.Char,
       Numeric.LongIsIntegral -> Ordering.Long
   )
-}

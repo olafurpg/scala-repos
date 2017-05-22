@@ -7,11 +7,11 @@ import scala.tools.partest.TestUtil.intercept
 
 import scala.language.{postfixOps}
 
-object Test extends App {
+object Test extends App
 
-  implicit class Assert(val left: Any) extends AnyVal {
+  implicit class Assert(val left: Any) extends AnyVal
     import Duration.Undefined
-    def mustBe(right: Any) = right match {
+    def mustBe(right: Any) = right match
       case r: Double if r.isNaN =>
         assert(left.asInstanceOf[Double].isNaN, s"$left was not NaN")
       case r: Double if r == 0 && r.compareTo(0) == -1 =>
@@ -21,8 +21,6 @@ object Test extends App {
         assert(
             left.asInstanceOf[AnyRef] eq Undefined, s"$left was not Undefined")
       case _ => assert(left == right, s"$left was not equal to $right")
-    }
-  }
 
   val zero = 0 seconds
   val one = 1 second
@@ -64,10 +62,9 @@ object Test extends App {
   minf - inf mustBe minf
   minf + minf mustBe minf
 
-  for (i <- Seq(zero, one, two, three)) {
+  for (i <- Seq(zero, one, two, three))
     i - inf mustBe minf
     i - minf mustBe inf
-  }
 
   inf.compareTo(inf) mustBe 0
   inf.compareTo(one) mustBe 1
@@ -141,17 +138,16 @@ object Test extends App {
                   SECONDS,
                   MILLISECONDS,
                   MICROSECONDS,
-                  NANOSECONDS)) {
+                  NANOSECONDS))
     val x = unit.convert(Long.MaxValue, NANOSECONDS)
     val dur = Duration(x, unit)
     val mdur = Duration(-x, unit)
     -mdur mustBe (dur)
     intercept[IllegalArgumentException] { Duration(x + 10000000d, unit) }
     intercept[IllegalArgumentException] { Duration(-x - 10000000d, unit) }
-    if (unit != NANOSECONDS) {
+    if (unit != NANOSECONDS)
       intercept[IllegalArgumentException] { Duration(x + 1, unit) }
       intercept[IllegalArgumentException] { Duration(-x - 1, unit) }
-    }
     intercept[IllegalArgumentException] { dur + 1.day }
     intercept[IllegalArgumentException] { mdur - 1.day }
     intercept[IllegalArgumentException] { dur * 1.1 }
@@ -164,13 +160,10 @@ object Test extends App {
     intercept[IllegalArgumentException] { mdur / 0.4 }
     Duration(x + unit.toString.toLowerCase)
     Duration("-" + x + unit.toString.toLowerCase)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       Duration("%.0f".format(x + 10000000d) + unit.toString.toLowerCase)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       Duration("-%.0f".format(x + 10000000d) + unit.toString.toLowerCase)
-    }
-  }
   intercept[IllegalArgumentException] { Duration.fromNanos(1e20) }
   intercept[IllegalArgumentException] { Duration.fromNanos(-1e20) }
 
@@ -212,4 +205,3 @@ object Test extends App {
   finite2 mustBe 8.seconds
   ( (2 seconds fromNow).timeLeft: FiniteDuration) < 4.seconds mustBe true
   val finite3: FiniteDuration = 3.5 seconds span
-}

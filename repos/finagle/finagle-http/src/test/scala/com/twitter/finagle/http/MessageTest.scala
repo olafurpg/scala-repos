@@ -7,14 +7,13 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class MessageTest extends FunSuite {
-  test("empty message") {
+class MessageTest extends FunSuite
+  test("empty message")
     val response = Response()
     assert(response.length == 0)
     assert(response.contentString == "")
-  }
 
-  test("headers") {
+  test("headers")
     val response = Request()
     response.allow.toList == Nil
     response.allow = Method.Get :: Method.Head :: Nil
@@ -27,9 +26,8 @@ class MessageTest extends FunSuite {
     response.accept = "A,,c;param,;d,;"
     assert(response.accept.toList == "A" :: "c;param" :: ";d" :: ";" :: Nil)
     assert(response.acceptMediaTypes.toList == "a" :: "c" :: Nil)
-  }
 
-  test("charset") {
+  test("charset")
     val tests = Map(
         "x; charset=a" -> "a",
         "x;charset=a" -> "a",
@@ -41,15 +39,13 @@ class MessageTest extends FunSuite {
         "x" -> null,
         ";;;;;;" -> null
     )
-    tests.foreach {
+    tests.foreach
       case (header, expected) =>
         val request = Request()
         request.headers.set("Content-Type", header)
         assert(request.charset == Option(expected))
-    }
-  }
 
-  test("charset=") {
+  test("charset=")
     val tests = Map(
         ("x; charset=a" -> "b") -> "x;charset=b",
         ("x" -> "b") -> "x;charset=b",
@@ -60,16 +56,14 @@ class MessageTest extends FunSuite {
         (";" -> "b") -> ";charset=b",
         ("" -> "b") -> ";charset=b"
     )
-    tests.foreach {
+    tests.foreach
       case ((header, charset), expected) =>
         val request = Request()
         request.headers.set("Content-Type", header)
         request.charset = charset
         assert(request.headers.get("Content-Type") == expected)
-    }
-  }
 
-  test("mediaType") {
+  test("mediaType")
     val tests = Map(
         "application/json" -> "application/json",
         "application/json;charset=utf-8" -> "application/json",
@@ -80,22 +74,19 @@ class MessageTest extends FunSuite {
         "  application/json  ;  charset=utf-8  " -> "application/json",
         "APPLICATION/JSON" -> "application/json"
     )
-    tests.foreach {
+    tests.foreach
       case (header, expected) =>
         val request = Request()
         request.headers.set("Content-Type", header)
         // shorthand for empty mediaTypes really being returned as None after being parsed.
         assert(request.mediaType ==
             (if (expected.isEmpty) None else Some(expected)))
-    }
-  }
 
-  test("empty mediaType") {
+  test("empty mediaType")
     val request = Request()
     request.mediaType == None
-  }
 
-  test("mediaType=") {
+  test("mediaType=")
     val tests = Map(
         ("x" -> "y") -> "y",
         ("x; charset=a" -> "y") -> "y; charset=a",
@@ -104,16 +95,14 @@ class MessageTest extends FunSuite {
         (";" -> "y") -> "y",
         ("" -> "y") -> "y"
     )
-    tests.foreach {
+    tests.foreach
       case ((header, mediaType), expected) =>
         val request = Request()
         request.headers.set("Content-Type", header)
         request.mediaType = mediaType
         assert(request.headers.get("Content-Type") == expected)
-    }
-  }
 
-  test("clearContent") {
+  test("clearContent")
     val response = Response()
 
     response.write("hello")
@@ -121,50 +110,42 @@ class MessageTest extends FunSuite {
 
     assert(response.contentString == "")
     assert(response.length == 0)
-  }
 
-  test("contentString") {
+  test("contentString")
     val response = Response()
     response.content = Buf.Utf8("hello")
     assert(response.contentString == "hello")
     assert(response.contentString == "hello")
-  }
 
-  test("cacheControl") {
+  test("cacheControl")
     val response = Response()
 
     response.cacheControl = 15123.milliseconds
     assert(response.cacheControl == Some("max-age=15, must-revalidate"))
-  }
 
-  test("withInputStream") {
+  test("withInputStream")
     val response = Response()
     response.content = Buf.Utf8("hello")
-    response.withInputStream { inputStream =>
+    response.withInputStream  inputStream =>
       val bytes = new Array[Byte](5)
       inputStream.read(bytes)
       assert(new String(bytes) == "hello")
-    }
-  }
 
-  test("withReader") {
+  test("withReader")
     val response = Response()
     response.content = Buf.Utf8("hello")
-    response.withReader { reader =>
+    response.withReader  reader =>
       val bytes = new Array[Char](5)
       reader.read(bytes)
       assert(new String(bytes) == "hello")
-    }
-  }
 
-  test("write(String)") {
+  test("write(String)")
     val response = Response()
     response.write("hello")
     assert(response.length == 5)
     assert(response.contentString == "hello")
-  }
 
-  test("write(String), multiple writes") {
+  test("write(String), multiple writes")
     val response = Response()
     response.write("h")
     response.write("e")
@@ -173,51 +154,41 @@ class MessageTest extends FunSuite {
     response.write("o")
     assert(response.contentString == "hello")
     assert(response.length == 5)
-  }
 
-  test("withOutputStream") {
+  test("withOutputStream")
     val response = Response()
-    response.withOutputStream { outputStream =>
+    response.withOutputStream  outputStream =>
       outputStream.write("hello".getBytes)
-    }
 
     assert(response.contentString == "hello")
     assert(response.length == 5)
-  }
 
-  test("withOutputStream, multiple writes") {
+  test("withOutputStream, multiple writes")
     val response = Response()
     response.write("h")
-    response.withOutputStream { outputStream =>
+    response.withOutputStream  outputStream =>
       outputStream.write("e".getBytes)
       outputStream.write("ll".getBytes)
-    }
     response.write("o")
 
     assert(response.contentString == "hello")
     assert(response.length == 5)
-  }
 
-  test("withWriter") {
+  test("withWriter")
     val response = Response()
-    response.withWriter { writer =>
+    response.withWriter  writer =>
       writer.write("hello")
-    }
 
     assert(response.contentString == "hello")
     assert(response.length == 5)
-  }
 
-  test("withWriter, multiple writes") {
+  test("withWriter, multiple writes")
     val response = Response()
     response.write("h")
-    response.withWriter { writer =>
+    response.withWriter  writer =>
       writer.write("e")
       writer.write("ll")
-    }
     response.write("o")
 
     assert(response.contentString == "hello")
     assert(response.length == 5)
-  }
-}

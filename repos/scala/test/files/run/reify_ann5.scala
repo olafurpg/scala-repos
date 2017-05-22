@@ -6,11 +6,11 @@ import scala.annotation._
 import scala.annotation.meta._
 import scala.beans._
 
-object Test extends App {
+object Test extends App
   // test 1: reify
-  val tree = reify {
+  val tree = reify
     class C(@BeanProperty @(inline @beanGetter) val x: Int)
-  }.tree
+  .tree
   println(tree.toString)
 
   // test 2: import and typecheck
@@ -20,4 +20,3 @@ object Test extends App {
 
   // test 3: import and compile
   toolbox.eval(tree)
-}

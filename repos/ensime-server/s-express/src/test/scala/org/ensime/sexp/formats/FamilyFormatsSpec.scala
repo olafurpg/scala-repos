@@ -4,15 +4,14 @@ package org.ensime.sexp.formats
 
 import org.ensime.sexp._
 
-class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
+class FamilyFormatsSpec extends FormatSpec with FamilyFormats
 
   case object Bloo
 
-  "FamilyFormats" should "support case objects" in {
+  "FamilyFormats" should "support case objects" in
     assertFormat(Bloo, SexpNil)
-  }
 
-  it should "support an example ADT" in {
+  it should "support an example ADT" in
     import DefaultSexpProtocol._
     import ExampleAst._
 
@@ -28,7 +27,7 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
     // implicit val QualifierTokenF = SexpFormat[QualifierToken]
 
     /////////////////// START OF BOILERPLATE /////////////////
-    implicit object TokenTreeFormat extends TraitFormat[TokenTree] {
+    implicit object TokenTreeFormat extends TraitFormat[TokenTree]
       // get a performance improvement by creating as many implicit vals
       // for TypeHint[T] as possible, e.g.
       // implicit val FieldTermTH = typehint[FieldTerm]
@@ -43,7 +42,7 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
       // implicit val PreferTokenTH = typehint[PreferToken]
       // implicit val QualifierTokenTH = typehint[QualifierToken]
 
-      def write(obj: TokenTree): Sexp = obj match {
+      def write(obj: TokenTree): Sexp = obj match
         case f: FieldTerm => wrap(f)
         case b: BoundedTerm => wrap(b)
         case u: Unparsed => wrap(u)
@@ -56,9 +55,8 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
         case prefer: PreferToken => wrap(prefer)
         case q: QualifierToken => wrap(q)
         case SpecialToken => wrap(SpecialToken)
-      }
 
-      def read(hint: SexpSymbol, value: Sexp): TokenTree = hint match {
+      def read(hint: SexpSymbol, value: Sexp): TokenTree = hint match
         case s if s == implicitly[TypeHint[FieldTerm]].hint =>
           value.convertTo[FieldTerm]
         case s if s == implicitly[TypeHint[BoundedTerm]].hint =>
@@ -85,8 +83,6 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
           value.convertTo[SpecialToken.type]
         // SAD FACE --- compiler doesn't catch typos on matches or missing impls
         case _ => deserializationError(hint)
-      }
-    }
     /////////////////// END OF BOILERPLATE /////////////////
 
     assertFormat(SpecialToken, SexpNil)
@@ -123,5 +119,3 @@ class FamilyFormatsSpec extends FormatSpec with FamilyFormats {
 
     // and that the recursive type works as a trait
     assertFormat(and: TokenTree, expectAndTree)
-  }
-}

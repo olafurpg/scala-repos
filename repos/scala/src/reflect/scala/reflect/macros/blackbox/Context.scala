@@ -36,7 +36,7 @@ package blackbox
 trait Context
     extends Aliases with Enclosures with Names with Reifiers with FrontEnds
     with Infrastructure with Typers with Parsers with Evals with ExprUtils
-    with Internals {
+    with Internals
 
   /** The compile-time universe. */
   val universe: Universe
@@ -87,4 +87,3 @@ trait Context
     *  type that is used to stress that the macro implementation works with prefixes of type `Coll[T]`.
     */
   val prefix: Expr[PrefixType]
-}

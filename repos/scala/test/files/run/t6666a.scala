@@ -1,16 +1,15 @@
 class A(a: Any)
 
-object Test {
+object Test
   def main(args: Array[String]): Unit = {}
 
-  val x: Unit = {
+  val x: Unit =
     object InVal
-        extends A({
+        extends A(
           new {} // okay
           val o = { new {} } // nesting triggers a VerifyError.
           null
-        });
+        );
     InVal;
     ()
-  };
-}
+  ;

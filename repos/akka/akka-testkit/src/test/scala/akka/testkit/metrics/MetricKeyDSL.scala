@@ -3,9 +3,9 @@
   */
 package akka.testkit.metrics
 
-trait MetricKeyDSL {
+trait MetricKeyDSL
 
-  case class MetricKey private[MetricKeyDSL](path: String) {
+  case class MetricKey private[MetricKeyDSL](path: String)
 
     import MetricKey._
 
@@ -13,9 +13,8 @@ trait MetricKeyDSL {
       MetricKey(path + "." + sanitizeMetricKeyPart(key))
 
     override def toString = path
-  }
 
-  object MetricKey {
+  object MetricKey
     def fromString(root: String) = MetricKey(sanitizeMetricKeyPart(root))
 
     // todo not sure what else needs replacing, while keeping key as readable as can be
@@ -26,7 +25,5 @@ trait MetricKeyDSL {
         .replaceAll("""[\]\[\(\)\<\>]""", "|")
         .replaceAll(" ", "-")
         .replaceAll("/", "-")
-  }
-}
 
 object MetricKeyDSL extends MetricKeyDSL

@@ -3,15 +3,14 @@ package org.scalajs.testsuite.junit
 import org.junit._
 import org.junit.Assert._
 
-object JUnitAnnotationsTest {
+object JUnitAnnotationsTest
   @BeforeClass
   def beforeClassTest(): Unit = ()
 
   @AfterClass
   def afterClassTest(): Unit = ()
-}
 
-class JUnitAnnotationsTest {
+class JUnitAnnotationsTest
   @Before
   def beforeTest(): Unit = ()
 
@@ -29,13 +28,10 @@ class JUnitAnnotationsTest {
 
   @Ignore
   @Test
-  def testIgnore(): Unit = {
+  def testIgnore(): Unit =
     assertTrue(false)
-  }
 
   @Ignore("This is the @Ignore message.")
   @Test
-  def testIgnoreWithMessage(): Unit = {
+  def testIgnoreWithMessage(): Unit =
     assertTrue(false)
-  }
-}

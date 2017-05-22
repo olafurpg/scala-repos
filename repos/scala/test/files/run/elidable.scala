@@ -1,7 +1,7 @@
 import annotation._
 import elidable._
 
-trait T {
+trait T
   @elidable(FINEST)
   def f1()
   @elidable(SEVERE)
@@ -9,16 +9,14 @@ trait T {
   @elidable(FINEST)
   def f3() = assert(false, "Should have been elided.")
   def f4()
-}
 
-class C extends T {
+class C extends T
   def f1() = println("Good for me, I was not elided. C.f1")
   def f2() = println("Good for me, I was not elided. C.f2")
   @elidable(FINEST)
   def f4() = assert(false, "Should have been elided.")
-}
 
-object O {
+object O
   @elidable(FINEST)
   def f1() = assert(false, "Should have been elided.")
   @elidable(INFO)
@@ -27,9 +25,8 @@ object O {
   def f3() = println("Good for me, I was not elided. O.f3")
   @elidable(INFO)
   def f4 = assert(false, "Should have been elided (no parens).")
-}
 
-object Test {
+object Test
   @elidable(FINEST)
   def f1() = assert(false, "Should have been elided.")
   @elidable(INFO)
@@ -60,7 +57,7 @@ object Test {
   @elidable(FINEST)
   def fe() = "s"
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     f1()
     f2()
     f3()
@@ -92,16 +89,10 @@ object Test {
     (c: T).f1()
 
     // Test whether the method definitions are still available.
-    List("Test", "Test$", "O", "O$", "C", "T") foreach { className =>
-      List("f1", "f2", "f3", "f4") foreach { methodName =>
+    List("Test", "Test$", "O", "O$", "C", "T") foreach  className =>
+      List("f1", "f2", "f3", "f4") foreach  methodName =>
         Class.forName(className).getMethod(methodName)
-      }
-    }
-    List("Test", "Test$") foreach { className =>
-      List("f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe") foreach {
+    List("Test", "Test$") foreach  className =>
+      List("f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe") foreach
         methodName =>
           Class.forName(className).getMethod(methodName)
-      }
-    }
-  }
-}

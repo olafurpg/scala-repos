@@ -36,9 +36,8 @@ import org.apache.spark.sql.types.StructType
   * differs significantly, the concept is similar to the exchange operator described in
   * "Volcano -- An Extensible and Parallel Query Evaluation System" by Goetz Graefe.
   */
-abstract class Exchange extends UnaryNode {
+abstract class Exchange extends UnaryNode
   override def output: Seq[Attribute] = child.output
-}
 
 /**
   * A wrapper for reused exchange to have different output, because two exchanges which produce
@@ -46,53 +45,43 @@ abstract class Exchange extends UnaryNode {
   * preserve the original ids because they're what downstream operators are expecting.
   */
 case class ReusedExchange(override val output: Seq[Attribute], child: Exchange)
-    extends LeafNode {
+    extends LeafNode
 
-  override def sameResult(plan: SparkPlan): Boolean = {
+  override def sameResult(plan: SparkPlan): Boolean =
     // Ignore this wrapper. `plan` could also be a ReusedExchange, so we reverse the order here.
     plan.sameResult(child)
-  }
 
-  def doExecute(): RDD[InternalRow] = {
+  def doExecute(): RDD[InternalRow] =
     child.execute()
-  }
 
-  override protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] = {
+  override protected[sql] def doExecuteBroadcast[T](): broadcast.Broadcast[T] =
     child.executeBroadcast()
-  }
 
   // Do not repeat the same tree in explain.
   override def treeChildren: Seq[SparkPlan] = Nil
-}
 
 /**
   * Find out duplicated exchanges in the spark plan, then use the same exchange for all the
   * references.
   */
-case class ReuseExchange(conf: SQLConf) extends Rule[SparkPlan] {
+case class ReuseExchange(conf: SQLConf) extends Rule[SparkPlan]
 
-  def apply(plan: SparkPlan): SparkPlan = {
-    if (!conf.exchangeReuseEnabled) {
+  def apply(plan: SparkPlan): SparkPlan =
+    if (!conf.exchangeReuseEnabled)
       return plan
-    }
     // Build a hash map using schema of exchanges to avoid O(N*N) sameResult calls.
     val exchanges = mutable.HashMap[StructType, ArrayBuffer[Exchange]]()
-    plan.transformUp {
+    plan.transformUp
       case exchange: Exchange =>
         // the exchanges that have same results usually also have same schemas (same column names).
         val sameSchema =
           exchanges.getOrElseUpdate(exchange.schema, ArrayBuffer[Exchange]())
-        val samePlan = sameSchema.find { e =>
+        val samePlan = sameSchema.find  e =>
           exchange.sameResult(e)
-        }
-        if (samePlan.isDefined) {
+        if (samePlan.isDefined)
           // Keep the output of this exchange, the following plans require that to resolve
           // attributes.
           ReusedExchange(exchange.output, samePlan.get)
-        } else {
+        else
           sameSchema += exchange
           exchange
-        }
-    }
-  }
-}

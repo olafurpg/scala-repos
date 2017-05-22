@@ -17,27 +17,24 @@ import scala.util.Try
 import org.scalajs.testsuite.utils.AssertThrows._
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
-class DoubleTest {
+class DoubleTest
 
-  @Test def proper_equals(): Unit = {
+  @Test def proper_equals(): Unit =
     assertTrue(0.0.equals(0.0))
     assertTrue((-0.0).equals(-0.0))
     assertFalse(0.0.equals(-0.0))
     assertTrue(Double.NaN.equals(Double.NaN))
-  }
 
-  @Test def hashCodeTest(): Unit = {
-    def hashCodeNotInlined(x: Any): Int = {
+  @Test def hashCodeTest(): Unit =
+    def hashCodeNotInlined(x: Any): Int =
       var y = x // do not inline
       y.hashCode
-    }
 
-    def test(x: Double, expected: Int): Unit = {
+    def test(x: Double, expected: Int): Unit =
       assertEquals(expected, x.hashCode)
       assertEquals(expected, hashCodeNotInlined(x))
-    }
 
-    if (!executingInJVM) {
+    if (!executingInJVM)
       test(0.0, 0)
       test(-0.0, -2147483648)
       test(1234.0, 1234)
@@ -52,40 +49,34 @@ class DoubleTest {
       test(Double.NaN, 2146959360)
       test(Double.PositiveInfinity, 2146435072)
       test(Double.NegativeInfinity, -1048576)
-    }
-  }
 
-  @Test def toString_with_integer_values_when_an_integer(): Unit = {
-    if (executingInJVM) {
+  @Test def toString_with_integer_values_when_an_integer(): Unit =
+    if (executingInJVM)
       assertEquals("0.0", 0.0.toString)
       assertEquals("-0.0", (-0.0).toString)
-    } else {
+    else
       assertEquals("0", 0.0.toString)
       assertEquals("0", (-0.0).toString)
-    }
     assertEquals("NaN", Double.NaN.toString)
     assertEquals("Infinity", Double.PositiveInfinity.toString)
     assertEquals("-Infinity", Double.NegativeInfinity.toString)
-    if (executingInJVM) {
+    if (executingInJVM)
       assertEquals("5.0", 5.0.toString)
       assertEquals("-5.0", (-5.0).toString)
-    } else {
+    else
       assertEquals("5", 5.0.toString)
       assertEquals("-5", (-5.0).toString)
-    }
     assertEquals("1.2", 1.2.toString)
-  }
 
-  @Test def should_parse_strings(): Unit = {
+  @Test def should_parse_strings(): Unit =
     assertEquals(0.0, "0.0".toDouble, 0.0)
     assertTrue("NaN".toDouble.isNaN)
     assertTrue(Try("asdf".toDouble).isFailure)
 
-    def test(s: String, v: Double): Unit = {
+    def test(s: String, v: Double): Unit =
       assertEquals(v, JDouble.parseDouble(s), 0.01)
       assertEquals(v, JDouble.valueOf(s).doubleValue(), 0.01)
       assertEquals(v, new JDouble(s).doubleValue(), 0.01)
-    }
 
     test("0", 0.0)
     test("5.3", 5.3)
@@ -96,9 +87,8 @@ class DoubleTest {
     test("65432.1", 65432.10)
     test("-87654.321", -87654.321)
     test("+.3f", 0.3)
-  }
 
-  @Test def should_reject_invalid_strings_when_parsing(): Unit = {
+  @Test def should_reject_invalid_strings_when_parsing(): Unit =
     def test(s: String): Unit =
       expectThrows(classOf[NumberFormatException], JDouble.parseDouble(s))
 
@@ -107,9 +97,8 @@ class DoubleTest {
     test("hello world")
     test("--4")
     test("4E-3.2")
-  }
 
-  @Test def compareTo(): Unit = {
+  @Test def compareTo(): Unit =
     def compare(x: Double, y: Double): Int =
       new JDouble(x).compareTo(new JDouble(y))
 
@@ -124,9 +113,8 @@ class DoubleTest {
     // And -0.0 < 0.0
     assertTrue(compare(-0.0, 0.0) < 0)
     assertTrue(compare(0.0, -0.0) > 0)
-  }
 
-  @Test def should_be_a_Comparable(): Unit = {
+  @Test def should_be_a_Comparable(): Unit =
     def compare(x: Any, y: Any): Int =
       x.asInstanceOf[Comparable[Any]].compareTo(y)
 
@@ -141,21 +129,18 @@ class DoubleTest {
     // And -0.0 < 0.0
     assertTrue(compare(-0.0, 0.0) < 0)
     assertTrue(compare(0.0, -0.0) > 0)
-  }
 
-  @Test def `isInfinite_- #515`(): Unit = {
+  @Test def `isInfinite_- #515`(): Unit =
     assertTrue(Double.PositiveInfinity.isInfinite)
     assertTrue(Double.NegativeInfinity.isInfinite)
     assertTrue((1.0 / 0).isInfinite)
     assertTrue((-1.0 / 0).isInfinite)
     assertFalse((0.0).isInfinite)
-  }
 
-  @Test def isNaNTest(): Unit = {
-    def f(v: Double): Boolean = {
+  @Test def isNaNTest(): Unit =
+    def f(v: Double): Boolean =
       var v2 = v // do not inline
       v2.isNaN
-    }
 
     assertTrue(f(Double.NaN))
 
@@ -166,15 +151,13 @@ class DoubleTest {
     assertFalse(f(0.0))
     assertFalse(f(3.0))
     assertFalse(f(-1.5))
-  }
 
-  @Test def longBitsToDouble(): Unit = {
-    def isZero(v: Double, neg: Boolean): Boolean = {
+  @Test def longBitsToDouble(): Unit =
+    def isZero(v: Double, neg: Boolean): Boolean =
       (v == 0.0) &&
       (1 / v ==
           (if (neg) Double.NegativeInfinity
            else Double.PositiveInfinity))
-    }
 
     import JDouble.{longBitsToDouble => f}
 
@@ -208,9 +191,8 @@ class DoubleTest {
     assertEquals(-Double.MinPositiveValue, f(0x8000000000000001L), 0.0) // smallest neg subnormal form
     assertEquals(-2.225073858507201e-308, f(0x800fffffffffffffL), 0.0) // largest neg subnormal form
     assertEquals(-1.719471609939382e-308, f(0x800c5d44ae45cb60L), 0.0) // an arbitrary neg subnormal form
-  }
 
-  @Test def doubleToLongBits(): Unit = {
+  @Test def doubleToLongBits(): Unit =
     import JDouble.{doubleToLongBits => f}
 
     // Specials
@@ -235,5 +217,3 @@ class DoubleTest {
     assertEquals(0x8000000000000001L, f(-Double.MinPositiveValue)) // smallest neg subnormal form
     assertEquals(0x800fffffffffffffL, f(-2.225073858507201e-308)) // largest neg subnormal form
     assertEquals(0x800c5d44ae45cb60L, f(-1.719471609939382e-308)) // an arbitrary neg subnormal form
-  }
-}

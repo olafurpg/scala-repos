@@ -1,3 +1,2 @@
-trait B extends A {
+trait B extends A
   def x = 2
-}

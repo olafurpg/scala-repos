@@ -24,7 +24,6 @@ import java.io.Serializable
   * if check fails, it will throw an unrecoverable exception stopping the job
   * TODO: probably belongs in Bijection
   */
-trait CheckedInversion[T, U] extends Serializable {
+trait CheckedInversion[T, U] extends Serializable
   def injection: Injection[T, U]
   def apply(input: U): Option[T]
-}

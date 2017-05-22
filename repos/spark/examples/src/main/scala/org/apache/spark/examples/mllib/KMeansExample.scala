@@ -24,9 +24,9 @@ import org.apache.spark.mllib.clustering.{KMeans, KMeansModel}
 import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 
-object KMeansExample {
+object KMeansExample
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val conf = new SparkConf().setAppName("KMeansExample")
     val sc = new SparkContext(conf)
@@ -53,6 +53,4 @@ object KMeansExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

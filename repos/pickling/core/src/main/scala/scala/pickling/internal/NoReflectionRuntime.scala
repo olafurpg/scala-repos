@@ -11,13 +11,13 @@ import scala.reflect.runtime
 /**
   * An implementation of the pickling runtime that tries to avoid ALL runtime picklers.
   */
-final class NoReflectionRuntime() extends PicklingRuntime {
+final class NoReflectionRuntime() extends PicklingRuntime
 
   /** The current reflection mirror to use when doing runtime unpickling/pickling. */
   override def currentMirror: runtime.universe.Mirror = runtime.currentMirror
 
   // TODO - we should allow registered picklers, just no reflective pickler generation...
-  object picklers extends PicklerRegistry {
+  object picklers extends PicklerRegistry
     override def genUnpickler(mirror: runtime.universe.Mirror, tagKey: String)(
         implicit share: refs.Share): _root_.scala.pickling.Unpickler[_] =
       throw new UnsupportedOperationException(
@@ -42,9 +42,7 @@ final class NoReflectionRuntime() extends PicklingRuntime {
     override def registerUnpickler[T](key: String, p: Unpickler[T]): Unit = ()
     override def registerPicklerUnpickler[T](
         key: String, p: Pickler[T] with Unpickler[T]): Unit = ()
-  }
   override val refRegistry: RefRegistry = new DefaultRefRegistry()
   override val GRL: ReentrantLock = new ReentrantLock()
   override def makeFastTag[T](tagKey: String): FastTypeTag[T] =
     FastTypeTag.apply(currentMirror, tagKey).asInstanceOf[FastTypeTag[T]]
-}

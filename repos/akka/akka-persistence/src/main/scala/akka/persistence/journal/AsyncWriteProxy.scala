@@ -20,7 +20,7 @@ import scala.concurrent.duration.Duration
   * A journal that delegates actual storage to a target actor. For testing only.
   */
 private[persistence] trait AsyncWriteProxy
-    extends AsyncWriteJournal with Stash with ActorLogging {
+    extends AsyncWriteJournal with Stash with ActorLogging
   import AsyncWriteProxy._
   import AsyncWriteTarget._
   import context.dispatcher
@@ -32,17 +32,16 @@ private[persistence] trait AsyncWriteProxy
       new TimeoutException("Store not initialized. " +
           "Use `SharedLeveldbJournal.setStore(sharedStore, system)`"))
 
-  override protected[akka] def aroundPreStart(): Unit = {
+  override protected[akka] def aroundPreStart(): Unit =
     context.system.scheduler.scheduleOnce(timeout.duration, self, InitTimeout)
     super.aroundPreStart()
-  }
 
   override protected[akka] def aroundReceive(
       receive: Receive, msg: Any): Unit =
-    if (isInitialized) {
+    if (isInitialized)
       if (msg != InitTimeout) super.aroundReceive(receive, msg)
-    } else
-      msg match {
+    else
+      msg match
         case SetStore(ref) ⇒
           store = Some(ref)
           unstashAll()
@@ -52,32 +51,29 @@ private[persistence] trait AsyncWriteProxy
           unstashAll() // will trigger appropriate failures
         case _ if isInitTimedOut ⇒ super.aroundReceive(receive, msg)
         case _ ⇒ stash()
-      }
 
   implicit def timeout: Timeout
 
   def asyncWriteMessages(
       messages: immutable.Seq[AtomicWrite]): Future[immutable.Seq[Try[Unit]]] =
-    store match {
+    store match
       case Some(s) ⇒
         (s ? WriteMessages(messages)).mapTo[immutable.Seq[Try[Unit]]]
       case None ⇒ storeNotInitialized
-    }
 
   def asyncDeleteMessagesTo(
       persistenceId: String, toSequenceNr: Long): Future[Unit] =
-    store match {
+    store match
       case Some(s) ⇒
         (s ? DeleteMessagesTo(persistenceId, toSequenceNr)).mapTo[Unit]
       case None ⇒ storeNotInitialized
-    }
 
   def asyncReplayMessages(persistenceId: String,
                           fromSequenceNr: Long,
                           toSequenceNr: Long,
                           max: Long)(
       replayCallback: PersistentRepr ⇒ Unit): Future[Unit] =
-    store match {
+    store match
       case Some(s) ⇒
         val replayCompletionPromise = Promise[Unit]()
         val mediator = context.actorOf(
@@ -90,34 +86,29 @@ private[persistence] trait AsyncWriteProxy
             mediator)
         replayCompletionPromise.future
       case None ⇒ storeNotInitialized
-    }
 
   def asyncReadHighestSequenceNr(
       persistenceId: String, fromSequenceNr: Long): Future[Long] =
-    store match {
+    store match
       case Some(s) ⇒
         (s ? ReplayMessages(persistenceId,
                             fromSequenceNr = 0L,
                             toSequenceNr = 0L,
-                            max = 0L)).map {
+                            max = 0L)).map
           case ReplaySuccess(highest) ⇒ highest
-        }
       case None ⇒ storeNotInitialized
-    }
-}
 
 /**
   * INTERNAL API.
   */
-private[persistence] object AsyncWriteProxy {
+private[persistence] object AsyncWriteProxy
   final case class SetStore(ref: ActorRef)
   final case object InitTimeout
-}
 
 /**
   * INTERNAL API.
   */
-private[persistence] object AsyncWriteTarget {
+private[persistence] object AsyncWriteTarget
   @SerialVersionUID(1L)
   final case class WriteMessages(messages: immutable.Seq[AtomicWrite])
 
@@ -135,7 +126,6 @@ private[persistence] object AsyncWriteTarget {
 
   @SerialVersionUID(1L)
   final case class ReplayFailure(cause: Throwable)
-}
 
 /**
   * Thrown if replay inactivity exceeds a specified timeout.
@@ -146,12 +136,12 @@ class AsyncReplayTimeoutException(msg: String) extends AkkaException(msg)
 private class ReplayMediator(replayCallback: PersistentRepr ⇒ Unit,
                              replayCompletionPromise: Promise[Unit],
                              replayTimeout: Duration)
-    extends Actor {
+    extends Actor
   import AsyncWriteTarget._
 
   context.setReceiveTimeout(replayTimeout)
 
-  def receive = {
+  def receive =
     case p: PersistentRepr ⇒ replayCallback(p)
     case _: ReplaySuccess ⇒
       replayCompletionPromise.success(())
@@ -163,5 +153,3 @@ private class ReplayMediator(replayCallback: PersistentRepr ⇒ Unit,
       replayCompletionPromise.failure(new AsyncReplayTimeoutException(
               s"replay timed out after ${replayTimeout.toSeconds} seconds inactivity"))
       context.stop(self)
-  }
-}

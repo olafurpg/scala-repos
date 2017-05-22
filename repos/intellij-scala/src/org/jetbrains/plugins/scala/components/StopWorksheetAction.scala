@@ -13,14 +13,12 @@ import org.jetbrains.plugins.scala.worksheet.actions.TopComponentAction
   * Date: 2/17/14
   */
 class StopWorksheetAction(exec: CompilationProcess)
-    extends AnAction with TopComponentAction {
-  override def actionPerformed(e: AnActionEvent) {
+    extends AnAction with TopComponentAction
+  override def actionPerformed(e: AnActionEvent)
     exec.stop()
-  }
 
   override def update(e: AnActionEvent): Unit = super.update(e)
 
   override def actionIcon: Icon = AllIcons.Actions.Suspend
 
   override def bundleKey = "worksheet.stop.button"
-}

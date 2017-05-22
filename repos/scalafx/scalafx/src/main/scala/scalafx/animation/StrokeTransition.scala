@@ -42,7 +42,7 @@ import scalafx.util.Duration
   *
   * @define ST `StrokeTransition`
   */
-object StrokeTransition extends AnimationStatics {
+object StrokeTransition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $ST to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/StrokeTransition.html $ST]],
@@ -54,7 +54,6 @@ object StrokeTransition extends AnimationStatics {
   implicit def sfxStrokeTransition2jfx(
       v: StrokeTransition): jfxa.StrokeTransition =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/StrokeTransition.html StrokeTransition]].
@@ -69,7 +68,7 @@ object StrokeTransition extends AnimationStatics {
   */
 class StrokeTransition(
     override val delegate: jfxa.StrokeTransition = new jfxa.StrokeTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.StrokeTransition] {
+    extends Transition(delegate) with SFXDelegate[jfxa.StrokeTransition]
 
   // CONSTRUCTORS
 
@@ -117,31 +116,26 @@ class StrokeTransition(
     * The target shape of this $ST.
     */
   def shape: ObjectProperty[jfxss.Shape] = delegate.shapeProperty
-  def shape_=(s: Shape) {
+  def shape_=(s: Shape)
     shape() = s
-  }
 
   /**
     * $DUR. $DV 400ms
     */
   def duration: ObjectProperty[jfxu.Duration] = delegate.durationProperty
-  def duration_=(d: Duration) {
+  def duration_=(d: Duration)
     duration() = d
-  }
 
   /**
     * Specifies the start color value for this $ST. $DV `null`
     */
   def fromValue: ObjectProperty[jfxsp.Color] = delegate.fromValueProperty
-  def fromValue_=(from: Color) {
+  def fromValue_=(from: Color)
     fromValue() = from
-  }
 
   /**
     * Specifies the stop color value for this $ST. $DV `null`
     */
   def toValue: ObjectProperty[jfxsp.Color] = delegate.toValueProperty
-  def toValue_=(to: Color) {
+  def toValue_=(to: Color)
     toValue() = to
-  }
-}

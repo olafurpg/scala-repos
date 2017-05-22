@@ -16,10 +16,8 @@ package breeze.integrate
  limitations under the License.
  */
 
-package object quasimontecarlo extends ProvidesTransformedQuasiMonteCarlo {
+package object quasimontecarlo extends ProvidesTransformedQuasiMonteCarlo
   implicit class ToQuasi(
       val icdfProvider: breeze.stats.distributions.HasInverseCdf)
-      extends AnyVal {
+      extends AnyVal
     def toQuasi = DistributionRandomVariableSpec(icdfProvider)
-  }
-}

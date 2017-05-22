@@ -23,7 +23,7 @@ import com.twitter.util.{Future, Time}
 
 // Cannot use a MergeableProxy here since we change the type.
 class WrappedTSInMergeable[K, V](self: Mergeable[K, V])
-    extends Mergeable[K, (Timestamp, V)] {
+    extends Mergeable[K, (Timestamp, V)]
   // Since we don't keep a timestamp in the store
   // this makes it clear that the 'right' or newest timestamp from the stream
   // will always be the timestamp outputted
@@ -34,17 +34,14 @@ class WrappedTSInMergeable[K, V](self: Mergeable[K, V])
 
   override def multiMerge[K1 <: K](
       kvs: Map[K1, (Timestamp, V)]): Map[K1, Future[Option[(Timestamp, V)]]] =
-    self.multiMerge(kvs.mapValues(_._2)).map {
+    self.multiMerge(kvs.mapValues(_._2)).map
       case (k, futOpt) =>
-        (k, futOpt.map { opt =>
-          opt.map { v =>
+        (k, futOpt.map  opt =>
+          opt.map  v =>
             (kvs(k)._1, v)
-          }
-        })
-    }
-}
+        )
 
-object MergeableStoreFactoryAlgebra {
+object MergeableStoreFactoryAlgebra
   /*
       Our tuples that we hand to the store are of the form ((K, BatchID), (Timestamp, V))
       but in our store we only store ((K, BatchID), V). That is we don't include the timestamp.
@@ -55,11 +52,9 @@ object MergeableStoreFactoryAlgebra {
       Then looks back up the timestamp handed from the stream and outputs with that.
    */
   def wrapOnlineFactory[K, V](supplier: MergeableStoreFactory[K, V])
-    : MergeableStoreFactory[K, (Timestamp, V)] = {
+    : MergeableStoreFactory[K, (Timestamp, V)] =
     val mergeable: () => Mergeable[K, (Timestamp, V)] = () =>
       { new WrappedTSInMergeable(supplier.mergeableStore()) }
 
     MergeableStoreFactory[K, (Timestamp, V)](
         mergeable, supplier.mergeableBatcher)
-  }
-}

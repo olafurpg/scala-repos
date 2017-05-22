@@ -34,15 +34,15 @@ import scalaz._
 
 trait TypeInferencerSpecs[M[+ _]]
     extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
+    with LongIdMemoryDatasetConsumer[M]
 
   import dag._
   import instructions.{Line, BuiltInFunction2Op, Add, Neg, DerefArray, DerefObject, ArraySwap, WrapObject, JoinObject, Map2Cross, Map2Match}
   import bytecode._
   import library._
 
-  def flattenType(jtpe: JType): Map[JPath, Set[CType]] = {
-    def flattenAux(jtpe: JType): Set[(JPath, Option[CType])] = jtpe match {
+  def flattenType(jtpe: JType): Map[JPath, Set[CType]] =
+    def flattenAux(jtpe: JType): Set[(JPath, Option[CType])] = jtpe match
       case p: JPrimitiveType =>
         Schema.ctypes(p).map(tpe => (JPath.Identity, Some(tpe)))
 
@@ -58,30 +58,24 @@ trait TypeInferencerSpecs[M[+ _]]
 
       case u @ (JArrayUnfixedT | JObjectUnfixedT) =>
         Set((JPath.Identity, None))
-    }
 
     flattenAux(jtpe).groupBy(_._1).mapValues(_.flatMap(_._2))
-  }
 
-  def extractLoads(graph: DepGraph): Map[String, Map[JPath, Set[CType]]] = {
+  def extractLoads(graph: DepGraph): Map[String, Map[JPath, Set[CType]]] =
 
     def merge(left: Map[String, Map[JPath, Set[CType]]],
               right: Map[String, Map[JPath, Set[CType]]])
-      : Map[String, Map[JPath, Set[CType]]] = {
+      : Map[String, Map[JPath, Set[CType]]] =
       def mergeAux(left: Map[JPath, Set[CType]],
-                   right: Map[JPath, Set[CType]]): Map[JPath, Set[CType]] = {
-        left ++ right.map {
+                   right: Map[JPath, Set[CType]]): Map[JPath, Set[CType]] =
+        left ++ right.map
           case (path, ctpes) => path -> (ctpes ++ left.getOrElse(path, Set()))
-        }
-      }
-      left ++ right.map {
+      left ++ right.map
         case (file, jtpes) =>
           file -> mergeAux(jtpes, left.getOrElse(file, Map()))
-      }
-    }
 
     def extractSpecLoads(
-        spec: BucketSpec): Map[String, Map[JPath, Set[CType]]] = spec match {
+        spec: BucketSpec): Map[String, Map[JPath, Set[CType]]] = spec match
       case UnionBucketSpec(left, right) =>
         merge(extractSpecLoads(left), extractSpecLoads(right))
 
@@ -96,9 +90,8 @@ trait TypeInferencerSpecs[M[+ _]]
 
       case Extra(target) =>
         extractLoads(target)
-    }
 
-    graph match {
+    graph match
       case _: Root => Map()
 
       case New(parent) => extractLoads(parent)
@@ -131,14 +124,12 @@ trait TypeInferencerSpecs[M[+ _]]
         merge(extractSpecLoads(spec), extractLoads(child))
 
       case _: SplitGroup | _: SplitParam => Map()
-    }
-  }
 
   val cLiterals = Set(
       CBoolean, CLong, CDouble, CNum, CString, CNull, CDate, CPeriod)
 
-  "type inference" should {
-    "propagate structure/type information through a trivial Join/DerefObject node" in {
+  "type inference" should
+    "propagate structure/type information through a trivial Join/DerefObject node" in
       val line = Line(1, 1, "")
 
       val input = Join(DerefObject,
@@ -153,9 +144,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through New nodes" in {
+    "propagate structure/type information through New nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -172,9 +162,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Operate nodes" in {
+    "propagate structure/type information through Operate nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -191,9 +180,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Reduce nodes" in {
+    "propagate structure/type information through Reduce nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -210,9 +198,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Morph1 nodes" in {
+    "propagate structure/type information through Morph1 nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -229,9 +216,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Morph2 nodes" in {
+    "propagate structure/type information through Morph2 nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -253,9 +239,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through DerefArray Join nodes" in {
+    "propagate structure/type information through DerefArray Join nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -272,9 +257,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through ArraySwap Join nodes" in {
+    "propagate structure/type information through ArraySwap Join nodes" in
       val line = Line(1, 1, "")
 
       val input = Join(ArraySwap,
@@ -296,9 +280,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through WrapObject Join nodes" in {
+    "propagate structure/type information through WrapObject Join nodes" in
       val line = Line(1, 1, "")
 
       val input = Join(WrapObject,
@@ -320,9 +303,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Op2 Join nodes" in {
+    "propagate structure/type information through Op2 Join nodes" in
       val line = Line(1, 1, "")
 
       val input = Join(BuiltInFunction2Op(min),
@@ -346,9 +328,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Filter nodes" in {
+    "propagate structure/type information through Filter nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -370,9 +351,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through AddSortKey nodes" in {
+    "propagate structure/type information through AddSortKey nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -394,9 +374,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Memoize nodes" in {
+    "propagate structure/type information through Memoize nodes" in
       val line = Line(1, 1, "")
 
       val input =
@@ -416,9 +395,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Distinct nodes" in {
+    "propagate structure/type information through Distinct nodes" in
       val line = Line(1, 1, "")
 
       val input = Operate(
@@ -435,9 +413,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Split nodes (1)" in {
+    "propagate structure/type information through Split nodes (1)" in
       val line = Line(1, 1, "")
 
       def clicks = AbsoluteLoad(Const(CString("/file"))(line))(line)
@@ -475,9 +452,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result mustEqual expected
-    }
 
-    "propagate structure/type information through Split nodes (2)" in {
+    "propagate structure/type information through Split nodes (2)" in
       val line = Line(1, 1, "")
       def clicks = AbsoluteLoad(Const(CString("/clicks"))(line))(line)
 
@@ -517,9 +493,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "propagate structure/type information through Split nodes (3)" in {
+    "propagate structure/type information through Split nodes (3)" in
       val line = Line(1, 1, "")
       def clicks = AbsoluteLoad(Const(CString("/clicks"))(line))(line)
 
@@ -570,9 +545,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "rewrite loads for a trivial but complete DAG such that they will restrict the columns loaded" in {
+    "rewrite loads for a trivial but complete DAG such that they will restrict the columns loaded" in
       val line = Line(1, 1, "")
 
       val input = Join(
@@ -596,9 +570,8 @@ trait TypeInferencerSpecs[M[+ _]]
       )
 
       result must_== expected
-    }
 
-    "negate type inference from deref by wrap" in {
+    "negate type inference from deref by wrap" in
       val line = Line(1, 1, "")
 
       val clicks = AbsoluteLoad(Const(CString("/clicks"))(line))(line)
@@ -616,9 +589,8 @@ trait TypeInferencerSpecs[M[+ _]]
       val expected = Map("/clicks" -> Map(JPath.Identity -> cLiterals))
 
       result mustEqual expected
-    }
 
-    "propagate type information through split->wrap->deref" in {
+    "propagate type information through split->wrap->deref" in
       val line = Line(1, 1, "")
 
       val clicks = AbsoluteLoad(Const(CString("/clicks"))(line))(line)
@@ -657,9 +629,6 @@ trait TypeInferencerSpecs[M[+ _]]
                                           JPath("time") -> cLiterals))
 
       result mustEqual expected
-    }
-  }
-}
 
 object TypeInferencerSpecs
     extends TypeInferencerSpecs[test.YId] with test.YIdInstances

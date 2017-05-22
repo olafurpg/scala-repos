@@ -1,5 +1,5 @@
-object Test {
-  "" match {
+object Test
+  "" match
     case Unapply(a, b) =>
       a: Int
       b: String
@@ -7,6 +7,4 @@ object Test {
       a: Int
       b1: String
       b2: String
-  }
-}
 // These used to fail `too many patterns` under -Ymacro-expand:discard

@@ -19,7 +19,7 @@ import scala.collection.mutable.ArrayBuffer
   */
 class ScalaChangeSignatureRowEditor(
     item: ScalaParameterTableModelItem, dialog: ScalaChangeSignatureDialog)
-    extends JBTableRowEditor {
+    extends JBTableRowEditor
 
   private val project = dialog.project
   private val fileType = dialog.getFileType
@@ -42,98 +42,81 @@ class ScalaChangeSignatureRowEditor(
   val myDefaultValueEditor = new EditorTextField(
       defaultValueDoc, project, fileType)
 
-  def prepareEditor(table: JTable, row: Int) {
+  def prepareEditor(table: JTable, row: Int)
     setLayout(new BorderLayout)
     addNameEditor()
     addTypeEditor()
     val color = if (item.startsNewClause) separatorColor else backgroundColor
     setBorder(new MatteBorder(2, 0, 0, 0, color))
 
-    if (!item.isEllipsisType && item.parameter.getOldIndex == -1) {
+    if (!item.isEllipsisType && item.parameter.getOldIndex == -1)
       val additionalPanel: JPanel = new JPanel(new BorderLayout)
       addDefaultValueEditor(additionalPanel)
       add(additionalPanel, BorderLayout.SOUTH)
-    }
-  }
 
-  def addNameEditor() {
+  def addNameEditor()
     myNameEditor.addDocumentListener(signatureUpdater)
     myNameEditor.setPreferredWidth(table.getWidth / 3)
     myNameEditor.addDocumentListener(new this.RowEditorChangeListener(0))
     add(createLabeledPanel("Name:", myNameEditor), BorderLayout.WEST)
-  }
 
-  def addTypeEditor() {
+  def addTypeEditor()
     myTypeEditor.addDocumentListener(signatureUpdater)
     myTypeEditor.addDocumentListener(
-        new DocumentAdapter {
-      override def documentChanged(e: DocumentEvent): Unit = {
+        new DocumentAdapter
+      override def documentChanged(e: DocumentEvent): Unit =
         item.typeText = myTypeEditor.getText
-      }
-    })
+    )
     myTypeEditor.addDocumentListener(new this.RowEditorChangeListener(1))
     add(createLabeledPanel("Type:", myTypeEditor), BorderLayout.CENTER)
-  }
 
-  def getColumnWidth(letters: Int): Int = {
+  def getColumnWidth(letters: Int): Int =
     val editorFont: Font = EditorColorsManager.getInstance.getGlobalScheme
       .getFont(EditorFontType.PLAIN)
     val font = new Font(editorFont.getFontName, editorFont.getStyle, 12)
     letters * Toolkit.getDefaultToolkit.getFontMetrics(font).stringWidth("W")
-  }
 
   def getTypesColumnWidth: Int =
     getColumnWidth(dialog.getNamesMaxLength + 2 + dialog.getTypesMaxLength)
 
   def getNamesColumnWidth: Int = getColumnWidth(dialog.getNamesMaxLength + 2)
 
-  def addDefaultValueEditor(additionalPanel: JPanel) {
+  def addDefaultValueEditor(additionalPanel: JPanel)
     myDefaultValueEditor.setPreferredWidth(table.getWidth / 2)
     myDefaultValueEditor.addDocumentListener(
         new this.RowEditorChangeListener(2))
     myDefaultValueEditor.addDocumentListener(
-        new DocumentAdapter {
-      override def documentChanged(e: DocumentEvent): Unit = {
+        new DocumentAdapter
+      override def documentChanged(e: DocumentEvent): Unit =
         item.parameter.defaultValue = myDefaultValueEditor.getText.trim
-      }
-    })
+    )
     additionalPanel.add(
         createLabeledPanel("Default value:", myDefaultValueEditor),
         BorderLayout.WEST)
-  }
 
-  def getValue: JBTableRow = {
-    new JBTableRow {
-      def getValueAt(column: Int): AnyRef = {
-        column match {
+  def getValue: JBTableRow =
+    new JBTableRow
+      def getValueAt(column: Int): AnyRef =
+        column match
           case 0 => myNameEditor.getText.trim
           case 1 => myTypeEditor.getText.trim
           case 2 => myDefaultValueEditor.getText.trim
           case _ => null
-        }
-      }
-    }
-  }
 
-  def getPreferredFocusedComponent: JComponent = {
+  def getPreferredFocusedComponent: JComponent =
     val me: MouseEvent = getMouseEvent
-    if (me == null) {
+    if (me == null)
       return myNameEditor.getFocusTarget
-    }
     val x: Double = me.getPoint.getX
     if (x <= getNamesColumnWidth) myNameEditor.getFocusTarget
     else if (myDefaultValueEditor == null || x <= getTypesColumnWidth)
       myTypeEditor.getFocusTarget
     else myDefaultValueEditor.getFocusTarget
-  }
 
-  def getFocusableComponents: Array[JComponent] = {
+  def getFocusableComponents: Array[JComponent] =
     val focusable = ArrayBuffer[JComponent]()
     focusable += myNameEditor.getFocusTarget
     focusable += myTypeEditor.getFocusTarget
-    if (myDefaultValueEditor != null) {
+    if (myDefaultValueEditor != null)
       focusable += myDefaultValueEditor.getFocusTarget
-    }
     focusable.toArray
-  }
-}

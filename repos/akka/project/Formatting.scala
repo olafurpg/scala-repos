@@ -8,7 +8,7 @@ import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 import com.typesafe.sbt.SbtScalariform
 import com.typesafe.sbt.SbtScalariform.ScalariformKeys
 
-object Formatting {
+object Formatting
   lazy val formatSettings =
     SbtScalariform.scalariformSettings ++ Seq(
         ScalariformKeys.preferences in Compile := formattingPreferences,
@@ -23,19 +23,16 @@ object Formatting {
         ScalariformKeys.preferences in MultiJvm := docFormattingPreferences
     )
 
-  def formattingPreferences = {
+  def formattingPreferences =
     import scalariform.formatter.preferences._
     FormattingPreferences()
       .setPreference(RewriteArrowSymbols, true)
       .setPreference(AlignParameters, true)
       .setPreference(AlignSingleLineCaseStatements, true)
-  }
 
-  def docFormattingPreferences = {
+  def docFormattingPreferences =
     import scalariform.formatter.preferences._
     FormattingPreferences()
       .setPreference(RewriteArrowSymbols, false)
       .setPreference(AlignParameters, true)
       .setPreference(AlignSingleLineCaseStatements, true)
-  }
-}

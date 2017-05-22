@@ -21,7 +21,7 @@ package shapeless.examples
   * 
   * @author George Leontiev
   */
-object FactorialExamples {
+object FactorialExamples
   import shapeless._
   import nat._
   import ops.nat._
@@ -29,7 +29,7 @@ object FactorialExamples {
 
   trait Factorial[I <: Nat] { type Out <: Nat }
 
-  object Factorial {
+  object Factorial
     def factorial[N <: Nat](i: Nat)(
         implicit fact: Factorial.Aux[i.N, N], wn: Witness.Aux[N]): N = wn.value
 
@@ -40,7 +40,6 @@ object FactorialExamples {
         implicit f: Factorial.Aux[N, F1],
         t: Prod.Aux[Succ[N], F1, F]): Aux[Succ[N], F] =
       new Factorial[Succ[N]] { type Out = F }
-  }
 
   import Factorial._
 
@@ -55,4 +54,3 @@ object FactorialExamples {
 
   val f3 = factorial(3)
   typed[_6](f3)
-}

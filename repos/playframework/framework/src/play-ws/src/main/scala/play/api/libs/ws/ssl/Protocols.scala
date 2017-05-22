@@ -5,7 +5,7 @@
  */
 package play.api.libs.ws.ssl
 
-object Protocols {
+object Protocols
 
   /**
     * Protocols which are known to be insecure.
@@ -17,4 +17,3 @@ object Protocols {
   // Use 1.2 as a default in 1.7, use 1.0 in 1.6
   // https://docs.fedoraproject.org/en-US/Fedora_Security_Team//html/Defensive_Coding/sect-Defensive_Coding-TLS-Client-OpenJDK.html
   def recommendedProtocol = foldVersion(run16 = "TLSv1", runHigher = "TLSv1.2")
-}

@@ -1,8 +1,8 @@
 import collection._
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val m = scala.collection.mutable.LinkedHashMap(
         "one" -> 1, "two" -> 2, "three" -> 3, "four" -> 4, "five" -> 5)
     val expected = List("one", "two", "three", "four", "five")
@@ -38,5 +38,3 @@ object Test {
     assert(mapped.drop(3).keys.toList == expected.drop(3))
     assert(mapped.drop(4).keys.toList == expected.drop(4))
     assert(mapped.drop(5).keys.toList == expected.drop(5))
-  }
-}

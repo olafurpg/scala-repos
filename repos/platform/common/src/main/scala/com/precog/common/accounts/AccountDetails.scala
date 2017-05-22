@@ -44,8 +44,8 @@ case class AccountDetails(accountId: AccountId,
                           lastPasswordChangeTime: Option[DateTime] = None,
                           profile: Option[JValue] = None)
 
-object AccountDetails {
-  def from(account: Account): AccountDetails = {
+object AccountDetails
+  def from(account: Account): AccountDetails =
     import account._
     AccountDetails(accountId,
                    email,
@@ -55,7 +55,6 @@ object AccountDetails {
                    plan,
                    lastPasswordChangeTime,
                    profile)
-  }
 
   implicit val accountDetailsIso =
     Iso.hlist(AccountDetails.apply _, AccountDetails.unapply _)
@@ -67,4 +66,3 @@ object AccountDetails {
     decomposerV[AccountDetails](schema, None)
   implicit val accountDetailsExtractor =
     extractorV[AccountDetails](schema, None)
-}

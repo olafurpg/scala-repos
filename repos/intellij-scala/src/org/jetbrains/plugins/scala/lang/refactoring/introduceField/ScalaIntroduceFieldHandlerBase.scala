@@ -25,7 +25,7 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil._
   * 6/28/13
   */
 abstract class ScalaIntroduceFieldHandlerBase
-    extends RefactoringActionHandler {
+    extends RefactoringActionHandler
 
   val REFACTORING_NAME = ScalaBundle.message("introduce.field.title")
 
@@ -38,15 +38,14 @@ abstract class ScalaIntroduceFieldHandlerBase
                                           editor: Editor,
                                           file: PsiFile,
                                           title: String)(
-      action: IntroduceFieldContext[T] => Unit) {
-    try {
+      action: IntroduceFieldContext[T] => Unit)
+    try
       val classes = ScalaPsiUtil
         .getParents(elem, file)
-        .collect {
+        .collect
           case t: ScTemplateDefinition if isSuitableClass(elem, t) => t
-        }
         .toArray[PsiClass]
-      classes.size match {
+      classes.size match
         case 0 =>
         case 1 =>
           action(
@@ -59,8 +58,8 @@ abstract class ScalaIntroduceFieldHandlerBase
                   classes(0).asInstanceOf[ScTemplateDefinition]))
         case _ =>
           val selection = classes(0)
-          val processor = new PsiElementProcessor[PsiClass] {
-            def execute(aClass: PsiClass): Boolean = {
+          val processor = new PsiElementProcessor[PsiClass]
+            def execute(aClass: PsiClass): Boolean =
               action(
                   new IntroduceFieldContext[T](
                       project,
@@ -70,58 +69,47 @@ abstract class ScalaIntroduceFieldHandlerBase
                       types,
                       aClass.asInstanceOf[ScTemplateDefinition]))
               false
-            }
-          }
           NavigationUtil
-            .getPsiElementPopup(classes, new PsiClassListCellRenderer() {
+            .getPsiElementPopup(classes, new PsiClassListCellRenderer()
               override def getElementText(element: PsiClass): String =
                 super.getElementText(element).replace("$", "")
-            }, title, processor, selection)
+            , title, processor, selection)
             .showInBestPositionFor(editor)
-      }
-    } catch {
+    catch
       case _: IntroduceException => return
-    }
-  }
 
   protected def anchorForNewDeclaration(
       expr: ScExpression,
       occurrences: Array[TextRange],
-      aClass: ScTemplateDefinition): PsiElement = {
+      aClass: ScTemplateDefinition): PsiElement =
     val commonParent = ScalaRefactoringUtil.commonParent(
         aClass.getContainingFile, occurrences: _*)
     val firstOccOffset = occurrences.map(_.getStartOffset).min
     val anchor = ScalaRefactoringUtil
       .statementsAndMembersInClass(aClass)
       .find(_.getTextRange.getEndOffset >= firstOccOffset)
-    anchor.getOrElse {
+    anchor.getOrElse
       if (PsiTreeUtil.isAncestor(
               aClass.extendsBlock.templateBody.orNull, commonParent, false))
         null
-      else {
-        aClass.extendsBlock match {
+      else
+        aClass.extendsBlock match
           case ScExtendsBlock.EarlyDefinitions(earlyDef) =>
             earlyDef.lastChild.orNull
           case extBl => extBl.templateParents.orNull
-        }
-      }
-    }
-  }
-}
 
-object ScalaIntroduceFieldHandlerBase {
+object ScalaIntroduceFieldHandlerBase
 
   def canBeInitializedInDeclaration(
-      expr: ScExpression, aClass: ScTemplateDefinition): Boolean = {
+      expr: ScExpression, aClass: ScTemplateDefinition): Boolean =
     val stmtsAndMmbrs = ScalaRefactoringUtil.statementsAndMembersInClass(
         aClass)
     (Iterator(expr) ++ expr.parents)
       .find(stmtsAndMmbrs.contains(_))
       .forall(ScalaRefactoringUtil.checkForwardReferences(expr, _))
-  }
 
   def canBeInitInLocalScope[T <: PsiElement](
-      ifc: IntroduceFieldContext[T], replaceAll: Boolean): Boolean = {
+      ifc: IntroduceFieldContext[T], replaceAll: Boolean): Boolean =
     val occurrences =
       if (replaceAll) ifc.occurrences else Array(ifc.element.getTextRange)
     val parExpr: ScExpression = ScalaRefactoringUtil.findParentExpr(
@@ -132,16 +120,13 @@ object ScalaIntroduceFieldHandlerBase {
     val containerIsLocal = (Iterator(container) ++ new ParentsIterator(
             container)).exists(stmtsAndMmbrs.contains(_))
     if (!containerIsLocal) false
-    else {
-      ifc.element match {
+    else
+      ifc.element match
         case expr: ScExpression => checkForwardReferences(expr, parExpr)
         case _ => false
-      }
-    }
-  }
 
   def anchorForInitializer(
-      occurences: Array[TextRange], file: PsiFile): Option[PsiElement] = {
+      occurences: Array[TextRange], file: PsiFile): Option[PsiElement] =
     var firstRange = occurences(0)
     val commonParent = ScalaRefactoringUtil.commonParent(file, occurences: _*)
 
@@ -152,14 +137,12 @@ object ScalaIntroduceFieldHandlerBase {
       !parExpr.isInstanceOf[ScBlock] && ScalaRefactoringUtil.needBraces(
           parExpr, ScalaRefactoringUtil.nextParent(parExpr, file))
     val parent =
-      if (needBraces) {
+      if (needBraces)
         firstRange = firstRange.shiftRight(1)
         parExpr.replaceExpression(
             ScalaPsiElementFactory.createExpressionFromText(
                 "{" + parExpr.getText + "}", file.getManager),
             removeParenthesis = false)
-      } else container
+      else container
     if (parent == null) None
     else parent.getChildren.find(_.getTextRange.contains(firstRange))
-  }
-}

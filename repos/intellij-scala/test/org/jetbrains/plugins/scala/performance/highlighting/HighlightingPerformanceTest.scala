@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * User: Alexander Podkhalyuzin
   * Date: 03.08.2009
   */
-class HighlightingPerformanceTest extends ScalaFixtureTestCase {
-  def doTest(text: String, TIMEOUT: Int) {
+class HighlightingPerformanceTest extends ScalaFixtureTestCase
+  def doTest(text: String, TIMEOUT: Int)
     val file = PsiFileFactory
       .getInstance(myFixture.getProject)
       .createFileFromText(
@@ -20,18 +20,15 @@ class HighlightingPerformanceTest extends ScalaFixtureTestCase {
           true,
           false)
     TestUtils.assertTiming(
-        "Failed highlighting performance test", TIMEOUT, new Runnable {
-      def run() {
-        try {
+        "Failed highlighting performance test", TIMEOUT, new Runnable
+      def run()
+        try
           myFixture.testHighlighting(false, false, false, file.getVirtualFile)
-        } catch {
+        catch
           case e: RuntimeException =>
-        }
-      }
-    })
-  }
+    )
 
-  def testPerformance() {
+  def testPerformance()
     val text =
       """
 object addressbook {
@@ -101,9 +98,8 @@ object addressbook {
 """
     val TIMEOUT: Int = 15000
     doTest(text, TIMEOUT)
-  }
 
-  def testLotsOfArguments() {
+  def testLotsOfArguments()
     val text =
       """
         |val x: List[Int] = List(79,59,12,2,79,35,8,28,20,2,3,68,8,9,68,45,0,12,9,67,68,4,7,5,23,27,1,21,79,85,78,79,85,71,38,10,71,27
@@ -137,5 +133,3 @@ object addressbook {
     val TIMEOUT = 13000
 
     doTest(text, TIMEOUT)
-  }
-}

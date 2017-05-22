@@ -9,22 +9,22 @@ import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
 
-class GraphUnzipSpec extends AkkaSpec {
+class GraphUnzipSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 16)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "A unzip" must {
+  "A unzip" must
     import GraphDSL.Implicits._
 
-    "unzip to two subscribers" in assertAllStagesStopped {
+    "unzip to two subscribers" in assertAllStagesStopped
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() {
+        .fromGraph(GraphDSL.create()
           implicit b ⇒
             val unzip = b.add(Unzip[Int, String]())
             Source(List(1 -> "a", 2 -> "b", 3 -> "c")) ~> unzip.in
@@ -34,7 +34,7 @@ class GraphUnzipSpec extends AkkaSpec {
               .buffer(16, OverflowStrategy.backpressure)
               .map(_ * 2) ~> Sink.fromSubscriber(c1)
             ClosedShape
-        })
+        )
         .run()
 
       val sub1 = c1.expectSubscription()
@@ -53,20 +53,19 @@ class GraphUnzipSpec extends AkkaSpec {
       sub2.request(3)
       c2.expectNext("c")
       c2.expectComplete()
-    }
 
-    "produce to right downstream even though left downstream cancels" in {
+    "produce to right downstream even though left downstream cancels" in
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val unzip = b.add(Unzip[Int, String]())
           Source(List(1 -> "a", 2 -> "b", 3 -> "c")) ~> unzip.in
           unzip.out0 ~> Sink.fromSubscriber(c1)
           unzip.out1 ~> Sink.fromSubscriber(c2)
           ClosedShape
-        })
+        )
         .run()
 
       val sub1 = c1.expectSubscription()
@@ -77,20 +76,19 @@ class GraphUnzipSpec extends AkkaSpec {
       c2.expectNext("b")
       c2.expectNext("c")
       c2.expectComplete()
-    }
 
-    "produce to left downstream even though right downstream cancels" in {
+    "produce to left downstream even though right downstream cancels" in
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val unzip = b.add(Unzip[Int, String]())
           Source(List(1 -> "a", 2 -> "b", 3 -> "c")) ~> unzip.in
           unzip.out0 ~> Sink.fromSubscriber(c1)
           unzip.out1 ~> Sink.fromSubscriber(c2)
           ClosedShape
-        })
+        )
         .run()
 
       val sub1 = c1.expectSubscription()
@@ -101,21 +99,20 @@ class GraphUnzipSpec extends AkkaSpec {
       c1.expectNext(2)
       c1.expectNext(3)
       c1.expectComplete()
-    }
 
-    "cancel upstream when downstreams cancel" in {
+    "cancel upstream when downstreams cancel" in
       val p1 = TestPublisher.manualProbe[(Int, String)]()
       val c1 = TestSubscriber.manualProbe[Int]()
       val c2 = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val unzip = b.add(Unzip[Int, String]())
           Source.fromPublisher(p1.getPublisher) ~> unzip.in
           unzip.out0 ~> Sink.fromSubscriber(c1)
           unzip.out1 ~> Sink.fromSubscriber(c2)
           ClosedShape
-        })
+        )
         .run()
 
       val p1Sub = p1.expectSubscription()
@@ -133,12 +130,11 @@ class GraphUnzipSpec extends AkkaSpec {
       sub1.cancel()
       sub2.cancel()
       p1Sub.expectCancellation()
-    }
 
-    "work with zip" in assertAllStagesStopped {
+    "work with zip" in assertAllStagesStopped
       val c1 = TestSubscriber.manualProbe[(Int, String)]()
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val zip = b.add(Zip[Int, String]())
           val unzip = b.add(Unzip[Int, String]())
           Source(List(1 -> "a", 2 -> "b", 3 -> "c")) ~> unzip.in
@@ -146,7 +142,7 @@ class GraphUnzipSpec extends AkkaSpec {
           unzip.out1 ~> zip.in1
           zip.out ~> Sink.fromSubscriber(c1)
           ClosedShape
-        })
+        )
         .run()
 
       val sub1 = c1.expectSubscription()
@@ -155,6 +151,3 @@ class GraphUnzipSpec extends AkkaSpec {
       c1.expectNext(2 -> "b")
       c1.expectNext(3 -> "c")
       c1.expectComplete()
-    }
-  }
-}

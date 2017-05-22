@@ -24,35 +24,29 @@ import org.scalacheck.Prop._
 /**
   * Test properties of array package
   */
-class ArrayCheck extends Specification with ScalaCheck {
+class ArrayCheck extends Specification with ScalaCheck
 
-  "sum works for" in {
-    "array of doubles" in {
+  "sum works for" in
+    "array of doubles" in
       def arrAndLocs =
-        for {
+        for
           arr <- Gen.listOf(Gen.choose(-3d, 3d))
           loc <- Gen.listOf(Gen.choose(-1, arr.length - 1))
-        } yield (arr.toArray, loc.toArray)
+        yield (arr.toArray, loc.toArray)
 
-      forAll(arrAndLocs) {
+      forAll(arrAndLocs)
         case (arr: Array[Double], locs: Array[Int]) =>
           val v = Vec(array.take(arr, locs, 0d))
           array.sum(arr, locs, 0d) must_== v.sum
-      }
-    }
 
-    "array of ints" in {
+    "array of ints" in
       def arrAndLocs =
-        for {
+        for
           arr <- Gen.listOf(Gen.choose(-3, 3))
           loc <- Gen.listOf(Gen.choose(-1, arr.length - 1))
-        } yield (arr.toArray, loc.toArray)
+        yield (arr.toArray, loc.toArray)
 
-      forAll(arrAndLocs) {
+      forAll(arrAndLocs)
         case (arr: Array[Int], locs: Array[Int]) =>
           val v = Vec(array.take(arr, locs, 0))
           array.sum(arr, locs, 0) must_== v.sum
-      }
-    }
-  }
-}

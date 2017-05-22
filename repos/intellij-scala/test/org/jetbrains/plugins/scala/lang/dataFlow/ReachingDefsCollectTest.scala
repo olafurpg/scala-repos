@@ -15,19 +15,18 @@ import scala.util.Sorting
 /**
   * @author ilyas
   */
-class ReachingDefsCollectTest extends LightScalaTestCase {
+class ReachingDefsCollectTest extends LightScalaTestCase
   override protected def getBasePath: String =
     TestUtils.getTestDataPath + "/dataFlow/reachingDefsCollect/"
 
-  override def setUp() {
+  override def setUp()
     super.setUp()
     myFixture.setTestDataPath(getBasePath)
-  }
 
   def readInput =
     TestUtils.readInput(getBasePath + getTestName(true) + ".test")
 
-  def doTest() {
+  def doTest()
     val input = readInput
     myFixture.configureByText(ScalaFileType.SCALA_FILE_TYPE, input.get(0))
     val file: ScalaFile = myFixture.getFile.asInstanceOf[ScalaFile]
@@ -48,9 +47,8 @@ class ReachingDefsCollectTest extends LightScalaTestCase {
     val infos = collectVariableInfo(range, scope)
     val cf = dumpDefInfos(infos)
     Assert.assertEquals(input.get(1).trim, cf.trim)
-  }
 
-  protected def dumpDefInfos(infos: FragmentVariableInfos): String = {
+  protected def dumpDefInfos(infos: FragmentVariableInfos): String =
     def variablesText(info: Iterable[VariableInfo]): String =
       Sorting
         .stableSort(info.map(p => p.element.toString).toSeq)
@@ -61,12 +59,8 @@ class ReachingDefsCollectTest extends LightScalaTestCase {
        |$inputElements
        |OUTPUT:
        |$outputElements""".stripMargin.replace("\r", "")
-  }
 
-  def testSimpleFragment() {
+  def testSimpleFragment()
     doTest()
-  }
-  def testClosure1() {
+  def testClosure1()
     doTest()
-  }
-}

@@ -84,7 +84,7 @@ import org.apache.spark.storage.StorageLevel
   */
 @DeveloperApi
 abstract class Receiver[T](val storageLevel: StorageLevel)
-    extends Serializable {
+    extends Serializable
 
   /**
     * This method is called by the system when the receiver is started. This function
@@ -116,74 +116,64 @@ abstract class Receiver[T](val storageLevel: StorageLevel)
     * These single items will be aggregated together into data blocks before
     * being pushed into Spark's memory.
     */
-  def store(dataItem: T) {
+  def store(dataItem: T)
     supervisor.pushSingle(dataItem)
-  }
 
   /** Store an ArrayBuffer of received data as a data block into Spark's memory. */
-  def store(dataBuffer: ArrayBuffer[T]) {
+  def store(dataBuffer: ArrayBuffer[T])
     supervisor.pushArrayBuffer(dataBuffer, None, None)
-  }
 
   /**
     * Store an ArrayBuffer of received data as a data block into Spark's memory.
     * The metadata will be associated with this block of data
     * for being used in the corresponding InputDStream.
     */
-  def store(dataBuffer: ArrayBuffer[T], metadata: Any) {
+  def store(dataBuffer: ArrayBuffer[T], metadata: Any)
     supervisor.pushArrayBuffer(dataBuffer, Some(metadata), None)
-  }
 
   /** Store an iterator of received data as a data block into Spark's memory. */
-  def store(dataIterator: Iterator[T]) {
+  def store(dataIterator: Iterator[T])
     supervisor.pushIterator(dataIterator, None, None)
-  }
 
   /**
     * Store an iterator of received data as a data block into Spark's memory.
     * The metadata will be associated with this block of data
     * for being used in the corresponding InputDStream.
     */
-  def store(dataIterator: java.util.Iterator[T], metadata: Any) {
+  def store(dataIterator: java.util.Iterator[T], metadata: Any)
     supervisor.pushIterator(dataIterator.asScala, Some(metadata), None)
-  }
 
   /** Store an iterator of received data as a data block into Spark's memory. */
-  def store(dataIterator: java.util.Iterator[T]) {
+  def store(dataIterator: java.util.Iterator[T])
     supervisor.pushIterator(dataIterator.asScala, None, None)
-  }
 
   /**
     * Store an iterator of received data as a data block into Spark's memory.
     * The metadata will be associated with this block of data
     * for being used in the corresponding InputDStream.
     */
-  def store(dataIterator: Iterator[T], metadata: Any) {
+  def store(dataIterator: Iterator[T], metadata: Any)
     supervisor.pushIterator(dataIterator, Some(metadata), None)
-  }
 
   /**
     * Store the bytes of received data as a data block into Spark's memory. Note
     * that the data in the ByteBuffer must be serialized using the same serializer
     * that Spark is configured to use.
     */
-  def store(bytes: ByteBuffer) {
+  def store(bytes: ByteBuffer)
     supervisor.pushBytes(bytes, None, None)
-  }
 
   /**
     * Store the bytes of received data as a data block into Spark's memory.
     * The metadata will be associated with this block of data
     * for being used in the corresponding InputDStream.
     */
-  def store(bytes: ByteBuffer, metadata: Any) {
+  def store(bytes: ByteBuffer, metadata: Any)
     supervisor.pushBytes(bytes, Some(metadata), None)
-  }
 
   /** Report exceptions in receiving data. */
-  def reportError(message: String, throwable: Throwable) {
+  def reportError(message: String, throwable: Throwable)
     supervisor.reportError(message, throwable)
-  }
 
   /**
     * Restart the receiver. This method schedules the restart and returns
@@ -193,9 +183,8 @@ abstract class Receiver[T](val storageLevel: StorageLevel)
     * is defined by the Spark configuration `spark.streaming.receiverRestartDelay`.
     * The `message` will be reported to the driver.
     */
-  def restart(message: String) {
+  def restart(message: String)
     supervisor.restartReceiver(message)
-  }
 
   /**
     * Restart the receiver. This method schedules the restart and returns
@@ -205,9 +194,8 @@ abstract class Receiver[T](val storageLevel: StorageLevel)
     * is defined by the Spark configuration `spark.streaming.receiverRestartDelay`.
     * The `message` and `exception` will be reported to the driver.
     */
-  def restart(message: String, error: Throwable) {
+  def restart(message: String, error: Throwable)
     supervisor.restartReceiver(message, Some(error))
-  }
 
   /**
     * Restart the receiver. This method schedules the restart and returns
@@ -215,32 +203,27 @@ abstract class Receiver[T](val storageLevel: StorageLevel)
     * (by calling `onStop()` and `onStart()`) is performed asynchronously
     * in a background thread.
     */
-  def restart(message: String, error: Throwable, millisecond: Int) {
+  def restart(message: String, error: Throwable, millisecond: Int)
     supervisor.restartReceiver(message, Some(error), millisecond)
-  }
 
   /** Stop the receiver completely. */
-  def stop(message: String) {
+  def stop(message: String)
     supervisor.stop(message, None)
-  }
 
   /** Stop the receiver completely due to an exception */
-  def stop(message: String, error: Throwable) {
+  def stop(message: String, error: Throwable)
     supervisor.stop(message, Some(error))
-  }
 
   /** Check if the receiver has started or not. */
-  def isStarted(): Boolean = {
+  def isStarted(): Boolean =
     supervisor.isReceiverStarted()
-  }
 
   /**
     * Check if receiver has been marked for stopping. Use this to identify when
     * the receiving of data should be stopped.
     */
-  def isStopped(): Boolean = {
+  def isStopped(): Boolean =
     supervisor.isReceiverStopped()
-  }
 
   /**
     * Get the unique identifier the receiver input stream that this
@@ -261,22 +244,18 @@ abstract class Receiver[T](val storageLevel: StorageLevel)
   @transient private var _supervisor: ReceiverSupervisor = null
 
   /** Set the ID of the DStream that this receiver is associated with. */
-  private[streaming] def setReceiverId(_id: Int) {
+  private[streaming] def setReceiverId(_id: Int)
     id = _id
-  }
 
   /** Attach Network Receiver executor to this receiver. */
-  private[streaming] def attachSupervisor(exec: ReceiverSupervisor) {
+  private[streaming] def attachSupervisor(exec: ReceiverSupervisor)
     assert(_supervisor == null)
     _supervisor = exec
-  }
 
   /** Get the attached supervisor. */
-  private[streaming] def supervisor: ReceiverSupervisor = {
+  private[streaming] def supervisor: ReceiverSupervisor =
     assert(
         _supervisor != null,
         "A ReceiverSupervisor has not been attached to the receiver yet. Maybe you are starting " +
         "some computation in the receiver before the Receiver.onStart() has been called.")
     _supervisor
-  }
-}

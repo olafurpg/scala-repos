@@ -13,27 +13,23 @@ import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
   * Tries to use first evaluator first. If gets exception or null, uses second one.
   */
 case class ScalaDuplexEvaluator(first: Evaluator, second: Evaluator)
-    extends Evaluator {
+    extends Evaluator
   private var myModifier: Modifier = null
 
-  def evaluate(context: EvaluationContextImpl): AnyRef = {
+  def evaluate(context: EvaluationContextImpl): AnyRef =
     var result: AnyRef = null
-    try {
+    try
       result = first.evaluate(context)
       myModifier = first.getModifier
-    } catch {
+    catch
       case e1: Exception if first != second =>
-        try {
+        try
           result = second.evaluate(context)
           myModifier = second.getModifier
-        } catch {
+        catch
           case e2: Exception =>
             throw EvaluationException(e1.getMessage + "\n " + e2.getMessage)
-        }
       case e: Exception => throw EvaluationException(e)
-    }
     result
-  }
 
   def getModifier: Modifier = myModifier
-}

@@ -11,7 +11,7 @@ import play.twirl.api.Html
 
 import lila.api.Context
 
-trait DateHelper { self: I18nHelper =>
+trait DateHelper  self: I18nHelper =>
 
   private val dateTimeStyle = "MS"
   private val dateStyle = "M-"
@@ -41,10 +41,10 @@ trait DateHelper { self: I18nHelper =>
             lang(ctx).language))
 
   private def periodFormatter(ctx: Context): PeriodFormatter =
-    periodFormatters.getOrElseUpdate(lang(ctx).language, {
+    periodFormatters.getOrElseUpdate(lang(ctx).language,
       Locale setDefault Locale.ENGLISH
       PeriodFormat wordBased new Locale(lang(ctx).language)
-    })
+    )
 
   def showDateTime(date: DateTime)(implicit ctx: Context): String =
     dateTimeFormatter(ctx) print date
@@ -55,9 +55,8 @@ trait DateHelper { self: I18nHelper =>
   def showEnglishDate(date: DateTime): String =
     englishDateFormatter print date
 
-  def semanticDate(date: DateTime)(implicit ctx: Context) = Html {
+  def semanticDate(date: DateTime)(implicit ctx: Context) = Html
     s"""<time datetime="${isoDate(date)}">${showDate(date)}</time>"""
-  }
 
   def showPeriod(period: Period)(implicit ctx: Context): String =
     periodFormatter(ctx) print period.normalizedStandard(periodType)
@@ -67,18 +66,15 @@ trait DateHelper { self: I18nHelper =>
 
   def isoDate(date: DateTime): String = isoFormatter print date
 
-  def momentFormat(date: DateTime, format: String): Html = Html {
+  def momentFormat(date: DateTime, format: String): Html = Html
     s"""<time class="moment" datetime="${isoDate(date)}" data-format="$format"></time>"""
-  }
   def momentFormat(date: DateTime): Html = momentFormat(date, "calendar")
 
-  def momentFromNow(date: DateTime)(implicit ctx: Context) = Html {
-    s"""<time class="moment-from-now" title="${showDate(date)}" datetime="${isoDate(
-        date)}"></time>"""
-  }
-  def momentFromNowNoCtx(date: DateTime) = Html {
+  def momentFromNow(date: DateTime)(implicit ctx: Context) = Html
+    s"""<time class="moment-from-now" title="${showDate(date)}" datetime="$isoDate(
+        date)"></time>"""
+  def momentFromNowNoCtx(date: DateTime) = Html
     s"""<time class="moment-from-now" datetime="${isoDate(date)}"></time>"""
-  }
 
   def secondsFromNow(seconds: Int)(implicit ctx: Context) =
     momentFromNow(DateTime.now plusSeconds seconds)
@@ -87,4 +83,3 @@ trait DateHelper { self: I18nHelper =>
   def atomDate(date: DateTime): String = atomDateFormatter print date
   def atomDate(field: String)(doc: io.prismic.Document): Option[String] =
     doc getDate field map (_.value.toDateTimeAtStartOfDay) map atomDate
-}

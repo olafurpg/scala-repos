@@ -28,7 +28,7 @@ abstract class AbstractDoer extends Serializable
   * Provides facility to instantiate controller classes
   */
 @DeveloperApi
-object Doer extends Logging {
+object Doer extends Logging
 
   /** :: DeveloperApi ::
     * Instantiates a controller class using supplied controller parameters as
@@ -40,28 +40,24 @@ object Doer extends Logging {
     * @return An instance of the controller class
     */
   @DeveloperApi
-  def apply[C <: AbstractDoer](cls: Class[_ <: C], params: Params): C = {
+  def apply[C <: AbstractDoer](cls: Class[_ <: C], params: Params): C =
 
     // Subclasses only allows two kind of constructors.
     // 1. Constructor with P <: Params.
     // 2. Emtpy constructor.
     // First try (1), if failed, try (2).
-    try {
+    try
       val constr = cls.getConstructor(params.getClass)
       constr.newInstance(params)
-    } catch {
+    catch
       case e: NoSuchMethodException =>
-        try {
+        try
           val zeroConstr = cls.getConstructor()
           zeroConstr.newInstance()
-        } catch {
+        catch
           case e: NoSuchMethodException =>
             error(
                 s"${params.getClass.getName} was used as the constructor " +
                 s"argument to ${e.getMessage}, but no constructor can handle it. " +
                 "Aborting.")
             sys.exit(1)
-        }
-    }
-  }
-}

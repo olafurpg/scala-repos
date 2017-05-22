@@ -19,7 +19,7 @@ import sbtunidoc.Plugin.ScalaUnidoc
 import sbtunidoc.Plugin.JavaUnidoc
 import sbtunidoc.Plugin.UnidocKeys._
 
-object AkkaBuild extends Build {
+object AkkaBuild extends Build
   System.setProperty("akka.mode", "test") // Is there better place for this?
 
   // Load system properties from a file to make configuration from Jenkins easier
@@ -49,12 +49,11 @@ object AkkaBuild extends Build {
         S3.host in S3.upload := "downloads.typesafe.com.s3.amazonaws.com",
         S3.progress in S3.upload := true,
         mappings in S3.upload <<=
-          (Release.releaseDirectory, version) map { (d, v) =>
+          (Release.releaseDirectory, version) map  (d, v) =>
           val downloads = d / "downloads"
           val archivesPathFinder = downloads * s"*$v.zip"
           archivesPathFinder.get.map(
               file => (file -> ("akka/" + file.getName)))
-        }
     )
 
   lazy val root = Project(
@@ -518,10 +517,9 @@ object AkkaBuild extends Build {
                                 publishM2 in persistence,
                                 compile in Compile) map
         ((_, _, _, _, _, _, _, c) => c),
-        test in Test ~= { x =>
-          {
-            def executeMvnCommands(failureMessage: String, commands: String*) = {
-              if ({
+        test in Test ~=  x =>
+            def executeMvnCommands(failureMessage: String, commands: String*) =
+              if (
                 List(
                     "sh",
                     "-c",
@@ -529,12 +527,9 @@ object AkkaBuild extends Build {
                         "cd akka-samples/akka-sample-osgi-dining-hakkers; mvn ",
                         " ",
                         "")) !
-              } != 0) throw new Exception(failureMessage)
-            }
+              != 0) throw new Exception(failureMessage)
             executeMvnCommands(
                 "Osgi sample Dining hakkers test failed", "clean", "install")
-          }
-        }
     )
     .settings(dontPublishSettings: _*)
 
@@ -550,9 +545,8 @@ object AkkaBuild extends Build {
 
   override lazy val settings =
     super.settings ++ buildSettings ++ Seq(
-        shellPrompt := { s =>
+        shellPrompt :=  s =>
           Project.extract(s).currentProject.id + " > "
-        }
     ) ++ resolverSettings
 
   lazy val parentSettings =
@@ -575,7 +569,7 @@ object AkkaBuild extends Build {
   )
 
   val (mavenLocalResolver, mavenLocalResolverSettings) =
-    System.getProperty("akka.build.M2Dir") match {
+    System.getProperty("akka.build.M2Dir") match
       case null => (Resolver.mavenLocal, Seq.empty)
       case path =>
         // Maven resolver settings
@@ -590,21 +584,20 @@ object AkkaBuild extends Build {
                  checksums = checksums.in(publishM2).value,
                  logging = ivyLoggingLevel.value)
          ))
-    }
 
-  lazy val resolverSettings = {
+  lazy val resolverSettings =
     // should we be allowed to use artifacts published to the local maven repository
     if (System
           .getProperty("akka.build.useLocalMavenResolver", "false")
           .toBoolean) Seq(resolvers += mavenLocalResolver)
     else Seq.empty
-  } ++ {
+  ++
     // should we be allowed to use artifacts from sonatype snapshots
     if (System
           .getProperty("akka.build.useSnapshotSonatypeResolver", "false")
           .toBoolean) Seq(resolvers += Resolver.sonatypeRepo("snapshots"))
     else Seq.empty
-  } ++ Seq(
+  ++ Seq(
       pomIncludeRepository := (_ => false) // do not leak internal repositories during staging
   )
 
@@ -672,9 +665,9 @@ object AkkaBuild extends Build {
         testOptions in Test += Tests.Argument("-oDF"),
         // don't save test output to a file
         testListeners in (Test, test) :=
-          Seq(TestLogger(streams.value.log, { _ =>
+          Seq(TestLogger(streams.value.log,  _ =>
           streams.value.log
-        }, logBuffered.value)),
+        , logBuffered.value)),
         // -v Log "test run started" / "test started" / "test run finished" events on log level "info" instead of "debug".
         // -a Show stack traces and exception class name for AssertionErrors.
         testOptions += Tests.Argument(TestFrameworks.JUnit, "-v", "-a")
@@ -687,9 +680,9 @@ object AkkaBuild extends Build {
   )
 
   def akkaPreviousArtifacts(id: String): Def.Initialize[Set[sbt.ModuleID]] =
-    Def.setting {
-      if (enableMiMa) {
-        val versions = {
+    Def.setting
+      if (enableMiMa)
+        val versions =
           val akka23Versions = Seq("2.3.11", "2.3.12", "2.3.13", "2.3.14")
           val akka24Versions = Seq("2.4.0", "2.4.1", "2.4.2")
           val akka24NewArtifacts = Seq(
@@ -700,45 +693,37 @@ object AkkaBuild extends Build {
               "akka-distributed-data-experimental",
               "akka-persistence-query-experimental"
           )
-          scalaBinaryVersion.value match {
+          scalaBinaryVersion.value match
             case "2.11" if !akka24NewArtifacts.contains(id) =>
               akka23Versions ++ akka24Versions
             case _ => akka24Versions // Only Akka 2.4.x for scala > than 2.11
-          }
-        }
 
         // check against all binary compatible artifacts
         versions.map(organization.value %% id % _).toSet
-      } else Set.empty
-    }
+      else Set.empty
 
   def akkaStreamAndHttpPreviousArtifacts(
-      id: String): Def.Initialize[Set[sbt.ModuleID]] = Def.setting {
-    if (enableMiMa) {
-      val versions = {
+      id: String): Def.Initialize[Set[sbt.ModuleID]] = Def.setting
+    if (enableMiMa)
+      val versions =
         val akka24Versions = Seq("2.4.2")
         val akka24NewArtifacts = Seq(
             "akka-http-core"
         )
 
         akka24Versions
-      }
 
       // check against all binary compatible artifacts
       versions.map(organization.value %% id % _).toSet
-    } else Set.empty
-  }
+    else Set.empty
 
-  def loadSystemProperties(fileName: String): Unit = {
+  def loadSystemProperties(fileName: String): Unit =
     import scala.collection.JavaConverters._
     val file = new File(fileName)
-    if (file.exists()) {
+    if (file.exists())
       println("Loading system properties from file `" + fileName + "`")
       val in = new InputStreamReader(new FileInputStream(file), "UTF-8")
       val props = new Properties
       props.load(in)
       in.close()
       sys.props ++ props.asScala
-    }
-  }
-}

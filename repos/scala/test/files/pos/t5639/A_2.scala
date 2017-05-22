@@ -2,10 +2,8 @@ import Implicits._
 
 class Baz
 
-object Test {
+object Test
   implicitly[Int]
-}
 
-object Implicits {
+object Implicits
   implicit val Baz: Int = 0
-}

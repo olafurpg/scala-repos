@@ -10,7 +10,7 @@ import lila.db.api._
 import lila.user.User
 import tube.teamTube
 
-object TeamRepo {
+object TeamRepo
 
   type ID = String
 
@@ -47,4 +47,3 @@ object TeamRepo {
   val enabledQuery = Json.obj("enabled" -> true)
 
   val sortPopular = $sort desc "nbMembers"
-}

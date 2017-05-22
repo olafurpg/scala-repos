@@ -34,15 +34,14 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 import scalafx.scene.image.Image
 
-object ImageInput {
+object ImageInput
   implicit def sfxImageInput2jfx(ii: ImageInput): jfxse.ImageInput =
     if (ii != null) ii.delegate else null
-}
 
 class ImageInput(
     override val delegate: jfxse.ImageInput = new jfxse.ImageInput)
     extends Effect(delegate) with PositionDelegate[jfxse.ImageInput]
-    with SFXDelegate[jfxse.ImageInput] {
+    with SFXDelegate[jfxse.ImageInput]
 
   /**
     * Creates a new instance of ImageInput with the specified source.
@@ -59,7 +58,5 @@ class ImageInput(
     * The source Image.
     */
   def source: ObjectProperty[jfxsi.Image] = delegate.sourceProperty
-  def source_=(v: Image) {
+  def source_=(v: Image)
     source() = v
-  }
-}

@@ -9,7 +9,7 @@ import akka.actor.Props
 import akka.cluster.sharding.ShardCoordinator
 import akka.cluster.sharding.Shard
 
-class ClusterShardingMessageSerializerSpec extends AkkaSpec {
+class ClusterShardingMessageSerializerSpec extends AkkaSpec
   import ShardCoordinator.Internal._
 
   val serializer = new ClusterShardingMessageSerializer(
@@ -21,15 +21,14 @@ class ClusterShardingMessageSerializerSpec extends AkkaSpec {
   val regionProxy1 = system.actorOf(Props.empty, "regionProxy1")
   val regionProxy2 = system.actorOf(Props.empty, "regionProxy2")
 
-  def checkSerialization(obj: AnyRef): Unit = {
+  def checkSerialization(obj: AnyRef): Unit =
     val blob = serializer.toBinary(obj)
     val ref = serializer.fromBinary(blob, serializer.manifest(obj))
     ref should ===(obj)
-  }
 
-  "ClusterShardingMessageSerializer" must {
+  "ClusterShardingMessageSerializer" must
 
-    "be able to serializable ShardCoordinator snapshot State" in {
+    "be able to serializable ShardCoordinator snapshot State" in
       val state =
         State(shards = Map("a" -> region1, "b" -> region2, "c" -> region2),
               regions = Map(region1 -> Vector("a"),
@@ -38,18 +37,16 @@ class ClusterShardingMessageSerializerSpec extends AkkaSpec {
               regionProxies = Set(regionProxy1, regionProxy2),
               unallocatedShards = Set("d"))
       checkSerialization(state)
-    }
 
-    "be able to serializable ShardCoordinator domain events" in {
+    "be able to serializable ShardCoordinator domain events" in
       checkSerialization(ShardRegionRegistered(region1))
       checkSerialization(ShardRegionProxyRegistered(regionProxy1))
       checkSerialization(ShardRegionTerminated(region1))
       checkSerialization(ShardRegionProxyTerminated(regionProxy1))
       checkSerialization(ShardHomeAllocated("a", region1))
       checkSerialization(ShardHomeDeallocated("a"))
-    }
 
-    "be able to serializable ShardCoordinator remote messages" in {
+    "be able to serializable ShardCoordinator remote messages" in
       checkSerialization(Register(region1))
       checkSerialization(RegisterProxy(regionProxy1))
       checkSerialization(RegisterAck(region1))
@@ -62,23 +59,16 @@ class ClusterShardingMessageSerializerSpec extends AkkaSpec {
       checkSerialization(HandOff("a"))
       checkSerialization(ShardStopped("a"))
       checkSerialization(GracefulShutdownReq(region1))
-    }
 
-    "be able to serializable PersistentShard snapshot state" in {
+    "be able to serializable PersistentShard snapshot state" in
       checkSerialization(Shard.State(Set("e1", "e2", "e3")))
-    }
 
-    "be able to serializable PersistentShard domain events" in {
+    "be able to serializable PersistentShard domain events" in
       checkSerialization(Shard.EntityStarted("e1"))
       checkSerialization(Shard.EntityStopped("e1"))
-    }
 
-    "be able to serializable GetShardStats" in {
+    "be able to serializable GetShardStats" in
       checkSerialization(Shard.GetShardStats)
-    }
 
-    "be able to serializable ShardStats" in {
+    "be able to serializable ShardStats" in
       checkSerialization(Shard.ShardStats("a", 23))
-    }
-  }
-}

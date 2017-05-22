@@ -24,7 +24,7 @@ private[handler] sealed trait TextAnno
 private[handler] case object WithText extends TextAnno
 private[handler] case object WithoutText extends TextAnno
 
-private[handler] abstract class AnnotationHelper {
+private[handler] abstract class AnnotationHelper
   val ctx: Context
   val cfieldName: FieldName
   val cannotationInfo: List[(ctx.universe.Type, Option[Int])]
@@ -47,38 +47,32 @@ private[handler] abstract class AnnotationHelper {
         _.map(_ => WithDate).getOrElse(WithoutDate))
 
   def consume[T](t: ctx.universe.Type)(
-      fn: Option[Option[Int]] => T): scala.util.Try[(AnnotationHelper, T)] = {
+      fn: Option[Option[Int]] => T): scala.util.Try[(AnnotationHelper, T)] =
     val (matchedAnnotations, remainingAnnotations) =
-      cannotationInfo.partition {
+      cannotationInfo.partition
         case (tpe, _) => tpe =:= t
-      }
 
-    val newHelper = new {
+    val newHelper = new
       val ctx: this.ctx.type = this.ctx
       val cfieldName = this.cfieldName
       val cannotationInfo: List[(this.ctx.universe.Type, Option[Int])] =
         remainingAnnotations
-    } with AnnotationHelper
+    with AnnotationHelper
 
-    matchedAnnotations match {
+    matchedAnnotations match
       case h :: Nil => Success((newHelper, fn(Some(h._2))))
       case h :: t =>
         Failure(
             new Exception(
                 s"Error more than one annotation when looking for $t"))
       case Nil => Success((newHelper, fn(None)))
-    }
-  }
 
-  def validateFinished: scala.util.Try[Unit] = {
-    if (cannotationInfo.isEmpty) {
+  def validateFinished: scala.util.Try[Unit] =
+    if (cannotationInfo.isEmpty)
       Success(())
-    } else {
+    else
       val msg = s"""
         Finished consuming annotations for field ${cfieldName.toStr}, but have remaining annotations:
         ${cannotationInfo.map(_._1).mkString("\n")}
         """
       Failure(new Exception(msg))
-    }
-  }
-}

@@ -25,12 +25,11 @@ import scala.util.Try
  * Common BinaryConverters to be used with GenericSource / GenericScheme.
  */
 
-case object IdentityBinaryConverter extends BinaryConverter[Array[Byte]] {
+case object IdentityBinaryConverter extends BinaryConverter[Array[Byte]]
   override def fromBytes(messageBuffer: Array[Byte]) = messageBuffer
   override def toBytes(message: Array[Byte]) = message
-}
 
-object ScroogeBinaryConverter {
+object ScroogeBinaryConverter
 
   // codec code borrowed from chill's ScroogeThriftStructSerializer class
   private[this] def codecForNormal[T <: ThriftStruct](
@@ -49,16 +48,12 @@ object ScroogeBinaryConverter {
           .getField("MODULE$")
           .get(null)).map(_.asInstanceOf[ThriftStructCodec[T]])
 
-  def apply[T <: ThriftStruct : ClassTag]: BinaryConverter[T] = {
+  def apply[T <: ThriftStruct : ClassTag]: BinaryConverter[T] =
     val ct = implicitly[ClassTag[T]]
-    new BinaryConverter[T] {
-      val serializer = BinaryThriftStructSerializer[T] {
+    new BinaryConverter[T]
+      val serializer = BinaryThriftStructSerializer[T]
         val clazz = ct.runtimeClass.asInstanceOf[Class[T]]
         codecForNormal[T](clazz).orElse(codecForUnion[T](clazz)).get
-      }
       override def toBytes(struct: T) = serializer.toBytes(struct)
       override def fromBytes(bytes: Array[Byte]): T =
         serializer.fromBytes(bytes)
-    }
-  }
-}

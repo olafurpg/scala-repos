@@ -26,7 +26,7 @@ import org.apache.spark.util.SerializableBuffer
 
 private[spark] sealed trait CoarseGrainedClusterMessage extends Serializable
 
-private[spark] object CoarseGrainedClusterMessages {
+private[spark] object CoarseGrainedClusterMessages
 
   case object RetrieveSparkProps extends CoarseGrainedClusterMessage
 
@@ -58,16 +58,14 @@ private[spark] object CoarseGrainedClusterMessages {
                           data: SerializableBuffer)
       extends CoarseGrainedClusterMessage
 
-  object StatusUpdate {
+  object StatusUpdate
 
     /** Alternate factory method that takes a ByteBuffer directly for the data field */
     def apply(executorId: String,
               taskId: Long,
               state: TaskState,
-              data: ByteBuffer): StatusUpdate = {
+              data: ByteBuffer): StatusUpdate =
       StatusUpdate(executorId, taskId, state, new SerializableBuffer(data))
-    }
-  }
 
   // Internal messages in driver
   case object ReviveOffers extends CoarseGrainedClusterMessage
@@ -112,4 +110,3 @@ private[spark] object CoarseGrainedClusterMessages {
 
   // Used internally by executors to shut themselves down.
   case object Shutdown extends CoarseGrainedClusterMessage
-}

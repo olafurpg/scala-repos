@@ -34,32 +34,23 @@ import scalafx.scene.layout.BorderPane
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
 
-object BorderPaneTest extends JFXApp {
-  stage = new PrimaryStage {
-    scene = new Scene {
+object BorderPaneTest extends JFXApp
+  stage = new PrimaryStage
+    scene = new Scene
       fill = Color.LightGray
-      content = new BorderPane {
-        top = new Circle {
+      content = new BorderPane
+        top = new Circle
           fill = Color.Red
           radius = 120
-        }
-        bottom = new Circle {
+        bottom = new Circle
           fill = Color.Green
           radius = 120
-        }
-        left = new Circle {
+        left = new Circle
           fill = Color.Yellow
           radius = 40
-        }
-        right = new Circle {
+        right = new Circle
           fill = Color.Orange
           radius = 40
-        }
-        center = new Circle {
+        center = new Circle
           fill = Color.Blue
           radius = 40
-        }
-      }
-    }
-  }
-}

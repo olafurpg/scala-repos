@@ -8,7 +8,7 @@ private[nio] final class DataViewCharBuffer private (
     _initialLimit: Int,
     _readOnly: Boolean,
     override private[nio] val isBigEndian: Boolean)
-    extends CharBuffer(_dataView.byteLength / 2, null, -1) {
+    extends CharBuffer(_dataView.byteLength / 2, null, -1)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -32,12 +32,11 @@ private[nio] final class DataViewCharBuffer private (
   def asReadOnlyBuffer(): CharBuffer =
     GenDataViewBuffer(this).generic_asReadOnlyBuffer()
 
-  def subSequence(start: Int, end: Int): CharBuffer = {
+  def subSequence(start: Int, end: Int): CharBuffer =
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
     new DataViewCharBuffer(
         _dataView, position + start, position + end, isReadOnly, isBigEndian)
-  }
 
   @noinline
   def get(): Char =
@@ -97,24 +96,20 @@ private[nio] final class DataViewCharBuffer private (
   override private[nio] def store(
       startIndex: Int, src: Array[Char], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}
 
-private[nio] object DataViewCharBuffer {
+private[nio] object DataViewCharBuffer
   private[nio] implicit object NewDataViewCharBuffer
-      extends GenDataViewBuffer.NewDataViewBuffer[CharBuffer] {
+      extends GenDataViewBuffer.NewDataViewBuffer[CharBuffer]
     def bytesPerElem: Int = 2
 
     def apply(dataView: DataView,
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean,
-              isBigEndian: Boolean): CharBuffer = {
+              isBigEndian: Boolean): CharBuffer =
       new DataViewCharBuffer(
           dataView, initialPosition, initialLimit, readOnly, isBigEndian)
-    }
-  }
 
   @inline
   def fromTypedArrayByteBuffer(byteBuffer: TypedArrayByteBuffer): CharBuffer =
     GenDataViewBuffer.generic_fromTypedArrayByteBuffer(byteBuffer)
-}

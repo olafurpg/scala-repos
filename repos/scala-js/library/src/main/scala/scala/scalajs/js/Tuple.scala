@@ -42,14 +42,13 @@ import scala.language.implicitConversions
   *  }}}
   */
 @native
-sealed trait Tuple2[+T1, +T2] extends Object {
+sealed trait Tuple2[+T1, +T2] extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
   val _2: T2 = native
-}
 
-object Tuple2 {
+object Tuple2
   @inline def apply[T1, T2](_1: T1, _2: T2): Tuple2[T1, T2] =
     Array(_1, _2).asInstanceOf[Tuple2[T1, T2]]
 
@@ -61,7 +60,6 @@ object Tuple2 {
 
   @inline implicit def toScalaTuple2[T1, T2](t: Tuple2[T1, T2]): (T1, T2) =
     (t._1, t._2)
-}
 
 /**
   *  A tuple "view" of 3 elements of a JavaScript [[Array]].
@@ -69,16 +67,15 @@ object Tuple2 {
   *  @see [[Tuple2]]
   */
 @native
-sealed trait Tuple3[+T1, +T2, +T3] extends Object {
+sealed trait Tuple3[+T1, +T2, +T3] extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
   val _2: T2 = native
   @JSName("2")
   val _3: T3 = native
-}
 
-object Tuple3 {
+object Tuple3
   @inline def apply[T1, T2, T3](_1: T1, _2: T2, _3: T3): Tuple3[T1, T2, T3] =
     Array(_1, _2, _3).asInstanceOf[Tuple3[T1, T2, T3]]
 
@@ -93,7 +90,6 @@ object Tuple3 {
   @inline implicit def toScalaTuple3[T1, T2, T3](
       t: Tuple3[T1, T2, T3]): (T1, T2, T3) =
     (t._1, t._2, t._3)
-}
 
 /**
   *  A tuple "view" of 4 elements of a JavaScript [[Array]].
@@ -101,7 +97,7 @@ object Tuple3 {
   *  @see [[Tuple2]]
   */
 @native
-sealed trait Tuple4[+T1, +T2, +T3, +T4] extends Object {
+sealed trait Tuple4[+T1, +T2, +T3, +T4] extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -110,9 +106,8 @@ sealed trait Tuple4[+T1, +T2, +T3, +T4] extends Object {
   val _3: T3 = native
   @JSName("3")
   val _4: T4 = native
-}
 
-object Tuple4 {
+object Tuple4
   @inline
   def apply[T1, T2, T3, T4](
       _1: T1, _2: T2, _3: T3, _4: T4): Tuple4[T1, T2, T3, T4] =
@@ -130,7 +125,6 @@ object Tuple4 {
   @inline implicit def toScalaTuple4[T1, T2, T3, T4](
       t: Tuple4[T1, T2, T3, T4]): (T1, T2, T3, T4) =
     (t._1, t._2, t._3, t._4)
-}
 
 /**
   *  A tuple "view" of 5 elements of a JavaScript [[Array]].
@@ -138,7 +132,7 @@ object Tuple4 {
   *  @see [[Tuple2]]
   */
 @native
-sealed trait Tuple5[+T1, +T2, +T3, +T4, +T5] extends Object {
+sealed trait Tuple5[+T1, +T2, +T3, +T4, +T5] extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -149,9 +143,8 @@ sealed trait Tuple5[+T1, +T2, +T3, +T4, +T5] extends Object {
   val _4: T4 = native
   @JSName("4")
   val _5: T5 = native
-}
 
-object Tuple5 {
+object Tuple5
   @inline
   def apply[T1, T2, T3, T4, T5](
       _1: T1, _2: T2, _3: T3, _4: T4, _5: T5): Tuple5[T1, T2, T3, T4, T5] =
@@ -169,7 +162,6 @@ object Tuple5 {
   @inline implicit def toScalaTuple5[T1, T2, T3, T4, T5](
       t: Tuple5[T1, T2, T3, T4, T5]): (T1, T2, T3, T4, T5) =
     (t._1, t._2, t._3, t._4, t._5)
-}
 
 /**
   *  A tuple "view" of 6 elements of a JavaScript [[Array]].
@@ -177,7 +169,7 @@ object Tuple5 {
   *  @see [[Tuple2]]
   */
 @native
-sealed trait Tuple6[+T1, +T2, +T3, +T4, +T5, +T6] extends Object {
+sealed trait Tuple6[+T1, +T2, +T3, +T4, +T5, +T6] extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -190,9 +182,8 @@ sealed trait Tuple6[+T1, +T2, +T3, +T4, +T5, +T6] extends Object {
   val _5: T5 = native
   @JSName("5")
   val _6: T6 = native
-}
 
-object Tuple6 {
+object Tuple6
   @inline
   def apply[T1, T2, T3, T4, T5, T6](_1: T1,
                                     _2: T2,
@@ -214,7 +205,6 @@ object Tuple6 {
   @inline implicit def toScalaTuple6[T1, T2, T3, T4, T5, T6](
       t: Tuple6[T1, T2, T3, T4, T5, T6]): (T1, T2, T3, T4, T5, T6) =
     (t._1, t._2, t._3, t._4, t._5, t._6)
-}
 
 /**
   *  A tuple "view" of 7 elements of a JavaScript [[Array]].
@@ -222,7 +212,7 @@ object Tuple6 {
   *  @see [[Tuple2]]
   */
 @native
-sealed trait Tuple7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Object {
+sealed trait Tuple7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -237,9 +227,8 @@ sealed trait Tuple7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Object {
   val _6: T6 = native
   @JSName("6")
   val _7: T7 = native
-}
 
-object Tuple7 {
+object Tuple7
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7](
       _1: T1,
@@ -265,7 +254,6 @@ object Tuple7 {
   @inline implicit def toScalaTuple7[T1, T2, T3, T4, T5, T6, T7](
       t: Tuple7[T1, T2, T3, T4, T5, T6, T7]): (T1, T2, T3, T4, T5, T6, T7) =
     (t._1, t._2, t._3, t._4, t._5, t._6, t._7)
-}
 
 /**
   *  A tuple "view" of 8 elements of a JavaScript [[Array]].
@@ -273,7 +261,7 @@ object Tuple7 {
   *  @see [[Tuple2]]
   */
 @native
-sealed trait Tuple8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8] extends Object {
+sealed trait Tuple8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8] extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -290,9 +278,8 @@ sealed trait Tuple8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8] extends Object {
   val _7: T7 = native
   @JSName("7")
   val _8: T8 = native
-}
 
-object Tuple8 {
+object Tuple8
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8](
       _1: T1,
@@ -321,7 +308,6 @@ object Tuple8 {
       t: Tuple8[T1, T2, T3, T4, T5, T6, T7, T8])
     : (T1, T2, T3, T4, T5, T6, T7, T8) =
     (t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8)
-}
 
 /**
   *  A tuple "view" of 9 elements of a JavaScript [[Array]].
@@ -330,7 +316,7 @@ object Tuple8 {
   */
 @native
 sealed trait Tuple9[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -349,9 +335,8 @@ sealed trait Tuple9[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9]
   val _8: T8 = native
   @JSName("8")
   val _9: T9 = native
-}
 
-object Tuple9 {
+object Tuple9
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9](
       _1: T1, _2: T2, _3: T3, _4: T4, _5: T5, _6: T6, _7: T7, _8: T8, _9: T9)
@@ -374,7 +359,6 @@ object Tuple9 {
       t: Tuple9[T1, T2, T3, T4, T5, T6, T7, T8, T9])
     : (T1, T2, T3, T4, T5, T6, T7, T8, T9) =
     (t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9)
-}
 
 /**
   *  A tuple "view" of 10 elements of a JavaScript [[Array]].
@@ -383,7 +367,7 @@ object Tuple9 {
   */
 @native
 sealed trait Tuple10[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -404,9 +388,8 @@ sealed trait Tuple10[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10]
   val _9: T9 = native
   @JSName("9")
   val _10: T10 = native
-}
 
-object Tuple10 {
+object Tuple10
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10](
       _1: T1,
@@ -438,7 +421,6 @@ object Tuple10 {
       t: Tuple10[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10])
     : (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10) =
     (t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10)
-}
 
 /**
   *  A tuple "view" of 11 elements of a JavaScript [[Array]].
@@ -447,7 +429,7 @@ object Tuple10 {
   */
 @native
 sealed trait Tuple11[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -470,9 +452,8 @@ sealed trait Tuple11[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11]
   val _10: T10 = native
   @JSName("10")
   val _11: T11 = native
-}
 
-object Tuple11 {
+object Tuple11
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11](
       _1: T1,
@@ -506,7 +487,6 @@ object Tuple11 {
       t: Tuple11[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11])
     : (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11) =
     (t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11)
-}
 
 /**
   *  A tuple "view" of 12 elements of a JavaScript [[Array]].
@@ -516,7 +496,7 @@ object Tuple11 {
 @native
 sealed trait Tuple12[
     +T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11, +T12]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -541,9 +521,8 @@ sealed trait Tuple12[
   val _11: T11 = native
   @JSName("11")
   val _12: T12 = native
-}
 
-object Tuple12 {
+object Tuple12
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12](
       _1: T1,
@@ -589,7 +568,6 @@ object Tuple12 {
       t: Tuple12[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12])
     : (T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12) =
     (t._1, t._2, t._3, t._4, t._5, t._6, t._7, t._8, t._9, t._10, t._11, t._12)
-}
 
 /**
   *  A tuple "view" of 13 elements of a JavaScript [[Array]].
@@ -599,7 +577,7 @@ object Tuple12 {
 @native
 sealed trait Tuple13[
     +T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11, +T12, +T13]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -626,9 +604,8 @@ sealed trait Tuple13[
   val _12: T12 = native
   @JSName("12")
   val _13: T13 = native
-}
 
-object Tuple13 {
+object Tuple13
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13](_1: T1,
                                                                     _2: T2,
@@ -689,7 +666,6 @@ object Tuple13 {
      t._11,
      t._12,
      t._13)
-}
 
 /**
   *  A tuple "view" of 14 elements of a JavaScript [[Array]].
@@ -699,7 +675,7 @@ object Tuple13 {
 @native
 sealed trait Tuple14[
     +T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8, +T9, +T10, +T11, +T12, +T13, +T14]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -728,9 +704,8 @@ sealed trait Tuple14[
   val _13: T13 = native
   @JSName("13")
   val _14: T14 = native
-}
 
-object Tuple14 {
+object Tuple14
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14](
       _1: T1,
@@ -795,7 +770,6 @@ object Tuple14 {
      t._12,
      t._13,
      t._14)
-}
 
 /**
   *  A tuple "view" of 15 elements of a JavaScript [[Array]].
@@ -818,7 +792,7 @@ sealed trait Tuple15[+T1,
                      +T13,
                      +T14,
                      +T15]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -849,9 +823,8 @@ sealed trait Tuple15[+T1,
   val _14: T14 = native
   @JSName("14")
   val _15: T15 = native
-}
 
-object Tuple15 {
+object Tuple15
   @inline
   def apply[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15](
       _1: T1,
@@ -924,7 +897,6 @@ object Tuple15 {
      t._13,
      t._14,
      t._15)
-}
 
 /**
   *  A tuple "view" of 16 elements of a JavaScript [[Array]].
@@ -948,7 +920,7 @@ sealed trait Tuple16[+T1,
                      +T14,
                      +T15,
                      +T16]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -981,9 +953,8 @@ sealed trait Tuple16[+T1,
   val _15: T15 = native
   @JSName("15")
   val _16: T16 = native
-}
 
-object Tuple16 {
+object Tuple16
   @inline
   def apply[
       T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16](
@@ -1102,7 +1073,6 @@ object Tuple16 {
      t._14,
      t._15,
      t._16)
-}
 
 /**
   *  A tuple "view" of 17 elements of a JavaScript [[Array]].
@@ -1127,7 +1097,7 @@ sealed trait Tuple17[+T1,
                      +T15,
                      +T16,
                      +T17]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -1162,9 +1132,8 @@ sealed trait Tuple17[+T1,
   val _16: T16 = native
   @JSName("16")
   val _17: T17 = native
-}
 
-object Tuple17 {
+object Tuple17
   @inline
   def apply[T1,
             T2,
@@ -1347,7 +1316,6 @@ object Tuple17 {
      t._15,
      t._16,
      t._17)
-}
 
 /**
   *  A tuple "view" of 18 elements of a JavaScript [[Array]].
@@ -1373,7 +1341,7 @@ sealed trait Tuple18[+T1,
                      +T16,
                      +T17,
                      +T18]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -1410,9 +1378,8 @@ sealed trait Tuple18[+T1,
   val _17: T17 = native
   @JSName("17")
   val _18: T18 = native
-}
 
-object Tuple18 {
+object Tuple18
   @inline
   def apply[T1,
             T2,
@@ -1605,7 +1572,6 @@ object Tuple18 {
      t._16,
      t._17,
      t._18)
-}
 
 /**
   *  A tuple "view" of 19 elements of a JavaScript [[Array]].
@@ -1632,7 +1598,7 @@ sealed trait Tuple19[+T1,
                      +T17,
                      +T18,
                      +T19]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -1671,9 +1637,8 @@ sealed trait Tuple19[+T1,
   val _18: T18 = native
   @JSName("18")
   val _19: T19 = native
-}
 
-object Tuple19 {
+object Tuple19
   @inline
   def apply[T1,
             T2,
@@ -1876,7 +1841,6 @@ object Tuple19 {
      t._17,
      t._18,
      t._19)
-}
 
 /**
   *  A tuple "view" of 20 elements of a JavaScript [[Array]].
@@ -1904,7 +1868,7 @@ sealed trait Tuple20[+T1,
                      +T18,
                      +T19,
                      +T20]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -1945,9 +1909,8 @@ sealed trait Tuple20[+T1,
   val _19: T19 = native
   @JSName("19")
   val _20: T20 = native
-}
 
-object Tuple20 {
+object Tuple20
   @inline
   def apply[T1,
             T2,
@@ -2160,7 +2123,6 @@ object Tuple20 {
      t._18,
      t._19,
      t._20)
-}
 
 /**
   *  A tuple "view" of 21 elements of a JavaScript [[Array]].
@@ -2189,7 +2151,7 @@ sealed trait Tuple21[+T1,
                      +T19,
                      +T20,
                      +T21]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -2232,9 +2194,8 @@ sealed trait Tuple21[+T1,
   val _20: T20 = native
   @JSName("20")
   val _21: T21 = native
-}
 
-object Tuple21 {
+object Tuple21
   @inline
   def apply[T1,
             T2,
@@ -2457,7 +2418,6 @@ object Tuple21 {
      t._19,
      t._20,
      t._21)
-}
 
 /**
   *  A tuple "view" of 22 elements of a JavaScript [[Array]].
@@ -2487,7 +2447,7 @@ sealed trait Tuple22[+T1,
                      +T20,
                      +T21,
                      +T22]
-    extends Object {
+    extends Object
   @JSName("0")
   val _1: T1 = native
   @JSName("1")
@@ -2532,9 +2492,8 @@ sealed trait Tuple22[+T1,
   val _21: T21 = native
   @JSName("21")
   val _22: T22 = native
-}
 
-object Tuple22 {
+object Tuple22
   @inline
   def apply[T1,
             T2,
@@ -2767,6 +2726,5 @@ object Tuple22 {
      t._20,
      t._21,
      t._22)
-}
 
 // scalastyle:on line.size.limit

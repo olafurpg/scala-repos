@@ -21,7 +21,7 @@ package provider
 /**
   * The representation of a HTTP session
   */
-trait HTTPSession {
+trait HTTPSession
 
   /**
     * @return - the HTTP session ID
@@ -90,4 +90,3 @@ trait HTTPSession {
     * Terminates this session
     */
   def terminate: Unit
-}

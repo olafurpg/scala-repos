@@ -18,9 +18,9 @@ import scala.concurrent.duration._
 class HttpEventStreamActorTest
     extends MarathonActorSupport with MarathonSpec with Matchers
     with GivenWhenThen with MockitoSugar with ImplicitSender
-    with BeforeAndAfter {
+    with BeforeAndAfter
 
-  test("Register Handler") {
+  test("Register Handler")
     Given("A handler that wants to connect and we have an active streamActor")
     val handle = mock[HttpEventStreamHandle]
     call(handle.id).thenReturn("1")
@@ -33,9 +33,8 @@ class HttpEventStreamActorTest
     streamActor.underlyingActor.streamHandleActors should have size 1
     streamActor.underlyingActor.streamHandleActors.get(handle) should be(
         'nonEmpty)
-  }
 
-  test("Unregister handlers when switching to standby mode") {
+  test("Unregister handlers when switching to standby mode")
     Given(
         "A handler that wants to connect and we have an active streamActor with one connection")
     val handle = mock[HttpEventStreamHandle]
@@ -56,9 +55,8 @@ class HttpEventStreamActorTest
     streamActor.underlyingActor.streamHandleActors.get(handle) should be(
         'empty)
     verify(handle).close()
-  }
 
-  test("Close connection immediately if we are in standby mode") {
+  test("Close connection immediately if we are in standby mode")
     Given("A handler that wants to connect")
     val handle = mock[HttpEventStreamHandle]("handle")
 
@@ -72,9 +70,8 @@ class HttpEventStreamActorTest
         'empty)
     verify(handle).close()
     verifyNoMoreInteractions(handle)
-  }
 
-  test("Unregister an already registered Handler") {
+  test("Unregister an already registered Handler")
     Given("A registered handler")
     val handle = mock[HttpEventStreamHandle]
     call(handle.id).thenReturn("1")
@@ -87,14 +84,13 @@ class HttpEventStreamActorTest
 
     Then("The actor is unsubscribed from the event stream")
     streamActor.underlyingActor.streamHandleActors should have size 0
-  }
 
   var streamActor: TestActorRef[HttpEventStreamActor] = _
   var leaderInfo: LeaderInfo = _
   var stream: EventStream = _
   var metrics: HttpEventStreamActorMetrics = _
 
-  before {
+  before
     leaderInfo = mock[LeaderInfo]
     stream = mock[EventStream]
     metrics = new HttpEventStreamActorMetrics(new Metrics(new MetricRegistry))
@@ -104,5 +100,3 @@ class HttpEventStreamActorTest
         Props(
             new HttpEventStreamActor(leaderInfo, metrics, handleStreamProps)
         ))
-  }
-}

@@ -55,13 +55,12 @@ import scala.collection.immutable.TreeMap
 
 import TableModule._
 
-trait RawJsonStorageModule[M[+ _]] { self =>
+trait RawJsonStorageModule[M[+ _]]  self =>
   implicit def M: Monad[M]
 
-  protected def projectionData(path: Path) = {
+  protected def projectionData(path: Path) =
     if (!projections.contains(path)) load(path)
     projections(path)
-  }
 
   private implicit val ordering = IdentitiesOrder.toScalaOrdering
 
@@ -69,35 +68,31 @@ trait RawJsonStorageModule[M[+ _]] { self =>
   private var projections: Map[Path, List[JValue]] = Map()
   private var structures: Map[Path, Set[ColumnRef]] = Map.empty
 
-  private def load(path: Path) = {
+  private def load(path: Path) =
     val resourceName =
       ("/test_data" + path.toString.init + ".json").replaceAll("/+", "/")
 
-    using(getClass.getResourceAsStream(resourceName)) { in =>
+    using(getClass.getResourceAsStream(resourceName))  in =>
       // FIXME: Refactor as soon as JParser can parse from InputStreams
       val reader = new InputStreamReader(in)
       val buffer = new Array[Char](8192)
       val builder = new java.lang.StringBuilder
       var read = 0
-      do {
+      do
         read = reader.read(buffer)
-        if (read >= 0) {
+        if (read >= 0)
           builder.append(buffer, 0, read)
-        }
-      } while (read >= 0)
+      while (read >= 0)
 
       val json = JParser.parse(builder.toString) --> classOf[JArray]
 
       projections += (path -> json.elements)
 
       val structure: Set[ColumnRef] = json.elements
-        .foldLeft(Map.empty[ColumnRef, ArrayColumn[_]]) { (acc, jv) =>
+        .foldLeft(Map.empty[ColumnRef, ArrayColumn[_]])  (acc, jv) =>
           Slice.withIdsAndValues(jv, acc, 0, 1)
-        }
         .keySet
       structures += (path -> structure)
-    }
-  }
 
   import org.reflections.util._
   import org.reflections.scanners._
@@ -112,54 +107,47 @@ trait RawJsonStorageModule[M[+ _]] { self =>
   for (resource <- jsonFiles.asScala) load(
       Path(resource.replaceAll("test_data/", "").replaceAll("\\.json", "")))
 
-  val vfs: VFSMetadata[M] = new VFSMetadata[M] {
+  val vfs: VFSMetadata[M] = new VFSMetadata[M]
     import com.precog.yggdrasil.metadata._
     import PathMetadata._
     def findDirectChildren(
         apiKey: APIKey,
         path: Path): EitherT[M, ResourceError, Set[PathMetadata]] =
-      EitherT.right {
+      EitherT.right
         M.point(
             projections.keySet
               .filter(_.isDirectChildOf(path))
               .map(PathMetadata(_, DataOnly(FileContent.XQuirrelData)))
           )
-      }
 
     def pathStructure(
         apiKey: APIKey,
         path: Path,
         property: CPath,
         version: Version): EitherT[M, ResourceError, PathStructure] =
-      EitherT.right {
-        M.point {
+      EitherT.right
+        M.point
           val structs = structures.getOrElse(path, Set.empty[ColumnRef])
-          val types: Map[CType, Long] = structs.collect {
+          val types: Map[CType, Long] = structs.collect
             // FIXME: This should use real counts
             case ColumnRef(selector, ctype) if selector.hasPrefix(selector) =>
               (ctype, 0L)
-          }.groupBy(_._1).map {
+          .groupBy(_._1).map
             case (tpe, values) => (tpe, values.map(_._2).sum)
-          }
 
           PathStructure(types, structs.map(_.selector))
-        }
-      }
 
     def size(apiKey: APIKey,
              path: Path,
-             version: Version): EitherT[M, ResourceError, Long] = {
+             version: Version): EitherT[M, ResourceError, Long] =
       EitherT.right(M.point(0l))
-    }
-  }
-}
 
 trait RawJsonColumnarTableStorageModule[M[+ _]]
-    extends RawJsonStorageModule[M] with ColumnarTableModuleTestSupport[M] {
+    extends RawJsonStorageModule[M] with ColumnarTableModuleTestSupport[M]
   import trans._
   import TableModule._
 
-  trait TableCompanion extends ColumnarTableCompanion {
+  trait TableCompanion extends ColumnarTableCompanion
     def apply(slices: StreamT[M, Slice], size: TableSize = UnknownSize) =
       new Table(slices, size)
     def align(sourceLeft: Table,
@@ -170,10 +158,9 @@ trait RawJsonColumnarTableStorageModule[M[+ _]]
     // FIXME: There should be some way to make SingletonTable work here, too
     def singleton(slice: Slice) =
       new Table(slice :: StreamT.empty[M, Slice], ExactSize(1))
-  }
 
   class Table(slices: StreamT[M, Slice], size: TableSize)
-      extends ColumnarTable(slices, size) {
+      extends ColumnarTable(slices, size)
     import trans._
     def sort(sortKey: TransSpec1,
              sortOrder: DesiredSortOrder,
@@ -186,23 +173,15 @@ trait RawJsonColumnarTableStorageModule[M[+ _]]
                  unique: Boolean = false): M[Seq[Table]] =
       sys.error("Feature not implemented in test stub.")
 
-    def load(apiKey: APIKey, tpe: JType) = EitherT.right {
-      val pathsM = this.reduce {
-        new CReducer[Set[Path]] {
-          def reduce(schema: CSchema, range: Range): Set[Path] = {
-            schema.columns(JObjectFixedT(Map("value" -> JTextT))) flatMap {
+    def load(apiKey: APIKey, tpe: JType) = EitherT.right
+      val pathsM = this.reduce
+        new CReducer[Set[Path]]
+          def reduce(schema: CSchema, range: Range): Set[Path] =
+            schema.columns(JObjectFixedT(Map("value" -> JTextT))) flatMap
               case s: StrColumn =>
                 range.filter(s.isDefinedAt).map(i => Path(s(i)))
               case _ => Set()
-            }
-          }
-        }
-      }
 
-      for (paths <- pathsM) yield {
+      for (paths <- pathsM) yield
         fromJson(paths.toList.map(projectionData).flatten.toStream)
-      }
-    }
-  }
-}
 // vim: set ts=4 sw=4 et:

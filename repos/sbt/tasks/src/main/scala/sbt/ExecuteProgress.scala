@@ -10,7 +10,7 @@ import sbt.internal.util.RMap
   *
   * This class is experimental and subject to binary and source incompatible changes at any time.
   */
-private[sbt] trait ExecuteProgress[A[_]] {
+private[sbt] trait ExecuteProgress[A[_]]
   type S
   def initial: S
 
@@ -56,11 +56,10 @@ private[sbt] trait ExecuteProgress[A[_]] {
 
   /** All tasks have completed with the final `results` provided. */
   def allCompleted(state: S, results: RMap[A, Result]): S
-}
 
 /** This module is experimental and subject to binary and source incompatible changes at any time. */
-private[sbt] object ExecuteProgress {
-  def empty[A[_]]: ExecuteProgress[A] = new ExecuteProgress[A] {
+private[sbt] object ExecuteProgress
+  def empty[A[_]]: ExecuteProgress[A] = new ExecuteProgress[A]
     type S = Unit
     def initial = ()
     def registered(state: Unit,
@@ -72,5 +71,3 @@ private[sbt] object ExecuteProgress {
     def workFinished[T](task: A[T], result: Either[A[T], Result[T]]) = ()
     def completed[T](state: Unit, task: A[T], result: Result[T]) = ()
     def allCompleted(state: Unit, results: RMap[A, Result]) = ()
-  }
-}

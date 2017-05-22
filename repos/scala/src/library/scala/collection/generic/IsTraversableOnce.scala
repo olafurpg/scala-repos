@@ -38,29 +38,25 @@ package generic
   * @author J. Suereth
   * @since 2.10
   */
-trait IsTraversableOnce[Repr] {
+trait IsTraversableOnce[Repr]
 
   /** The type of elements we can traverse over. */
   type A
 
   /** A conversion from the representation type `Repr` to a `GenTraversableOnce[A]`. */
   val conversion: Repr => GenTraversableOnce[A]
-}
 
-object IsTraversableOnce {
+object IsTraversableOnce
   import scala.language.higherKinds
 
   implicit val stringRepr: IsTraversableOnce[String] { type A = Char } =
-    new IsTraversableOnce[String] {
+    new IsTraversableOnce[String]
       type A = Char
       val conversion = implicitly[String => GenTraversableOnce[Char]]
-    }
 
   implicit def genTraversableLikeRepr[C[_], A0](
       implicit conv: C[A0] => GenTraversableOnce[A0])
     : IsTraversableOnce[C[A0]] { type A = A0 } =
-    new IsTraversableOnce[C[A0]] {
+    new IsTraversableOnce[C[A0]]
       type A = A0
       val conversion = conv
-    }
-}

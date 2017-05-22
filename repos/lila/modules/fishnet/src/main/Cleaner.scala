@@ -11,7 +11,7 @@ private final class Cleaner(repo: FishnetRepo,
                             moveDb: MoveDB,
                             analysisColl: Coll,
                             monitor: Monitor,
-                            scheduler: lila.common.Scheduler) {
+                            scheduler: lila.common.Scheduler)
 
   import BSONHandlers._
 
@@ -22,15 +22,13 @@ private final class Cleaner(repo: FishnetRepo,
   private def durationAgo(d: FiniteDuration) =
     DateTime.now.minusSeconds(d.toSeconds.toInt)
 
-  private def cleanMoves: Unit = {
+  private def cleanMoves: Unit =
     val since = durationAgo(moveTimeout)
-    moveDb.find(_ acquiredBefore since).map { move =>
+    moveDb.find(_ acquiredBefore since).map  move =>
       moveDb updateOrGiveUp move.timeout
       clientTimeout(move)
       logger.warn(s"Timeout move ${move.game.id}")
-    }
     scheduleMoves
-  }
 
   private def cleanAnalysis: Funit =
     analysisColl
@@ -41,28 +39,24 @@ private final class Cleaner(repo: FishnetRepo,
       .sort(BSONDocument("acquired.date" -> 1))
       .cursor[Work.Analysis]()
       .collect[List](100)
-      .flatMap {
-        _.filter { ana =>
+      .flatMap
+        _.filter  ana =>
           ana.acquiredAt.??(_ isBefore durationAgo(analysisTimeout(ana.nbPly)))
-        }.map { ana =>
-          repo.updateOrGiveUpAnalysis(ana.timeout) >>- {
+        .map  ana =>
+          repo.updateOrGiveUpAnalysis(ana.timeout) >>-
             clientTimeout(ana)
             logger.warn(s"Timeout analysis ${ana.game.id}")
-          }
-        }.sequenceFu.void
-      } andThenAnyway scheduleAnalysis
+        .sequenceFu.void
+      andThenAnyway scheduleAnalysis
 
   private def clientTimeout(work: Work) =
-    work.acquiredByKey ?? repo.getClient foreach {
-      _ foreach { client =>
+    work.acquiredByKey ?? repo.getClient foreach
+      _ foreach  client =>
         monitor.timeout(work, client)
         logger.warn(s"Timeout client ${client.fullId}")
-      }
-    }
 
   private def scheduleMoves = scheduler.once(1 second)(cleanMoves)
   private def scheduleAnalysis = scheduler.once(5 second)(cleanAnalysis)
 
   scheduler.once(3 seconds)(cleanMoves)
   scheduler.once(10 seconds)(cleanAnalysis)
-}

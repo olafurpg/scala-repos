@@ -8,10 +8,8 @@ import org.junit.runners.AllTests
 object HoconParserTest extends TestSuiteCompanion[HoconParserTest]
 
 @RunWith(classOf[AllTests])
-class HoconParserTest extends HoconFileSetTestCase("parser") {
-  def transform(data: Seq[String]) = {
+class HoconParserTest extends HoconFileSetTestCase("parser")
+  def transform(data: Seq[String]) =
     val psiFile =
       HoconTestUtils.createPseudoPhysicalHoconFile(getProject, data.head)
     DebugUtil.psiToString(psiFile, false).replace(":" + psiFile.getName, "")
-  }
-}

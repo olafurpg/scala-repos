@@ -35,15 +35,14 @@ import scala.collection.JavaConversions._
   *
   * e.g. [localhost:9092 test 10000 1 20]
   */
-object EndToEndLatency {
+object EndToEndLatency
   private val timeout: Long = 60000
 
-  def main(args: Array[String]) {
-    if (args.length != 5 && args.length != 6) {
+  def main(args: Array[String])
+    if (args.length != 5 && args.length != 6)
       System.err.println("USAGE: java " + getClass.getName +
           " broker_list topic num_messages producer_acks message_size_bytes [optional] ssl_properties_file")
       System.exit(1)
-    }
 
     val brokerList = args(0)
     val topic = args(1)
@@ -91,11 +90,10 @@ object EndToEndLatency {
         "org.apache.kafka.common.serialization.ByteArraySerializer")
     val producer = new KafkaProducer[Array[Byte], Array[Byte]](producerProps)
 
-    def finalise() {
+    def finalise()
       consumer.commitSync()
       producer.close()
       consumer.close()
-    }
 
     //Ensure we are at latest offset. seekToEnd evaluates lazily, that is to say actually performs the seek only when
     //a poll() or position() request is issued. Hence we need to poll after we seek to ensure we see our first write.
@@ -105,7 +103,7 @@ object EndToEndLatency {
     var totalTime = 0.0
     val latencies = new Array[Long](numMessages)
 
-    for (i <- 0 until numMessages) {
+    for (i <- 0 until numMessages)
       val message = randomBytesOfLen(messageLen)
       val begin = System.nanoTime
 
@@ -118,34 +116,30 @@ object EndToEndLatency {
       val elapsed = System.nanoTime - begin
 
       //Check we got results
-      if (!recordIter.hasNext) {
+      if (!recordIter.hasNext)
         finalise()
         throw new RuntimeException(
             s"poll() timed out before finding a result (timeout:[$timeout])")
-      }
 
       //Check result matches the original record
       val sent = new String(message)
       val read = new String(recordIter.next().value())
-      if (!read.equals(sent)) {
+      if (!read.equals(sent))
         finalise()
         throw new RuntimeException(
             s"The message read [$read] did not match the message sent [$sent]")
-      }
 
       //Check we only got the one message
-      if (recordIter.hasNext) {
+      if (recordIter.hasNext)
         var count = 1
         for (elem <- recordIter) count += 1
         throw new RuntimeException(
             s"Only one result was expected during this test. We found [$count]")
-      }
 
       //Report progress
       if (i % 1000 == 0) println(i + "\t" + elapsed / 1000.0 / 1000.0)
       totalTime += elapsed
       latencies(i) = elapsed / 1000 / 1000
-    }
 
     //Results
     println(
@@ -160,9 +154,6 @@ object EndToEndLatency {
             p50, p99, p999))
 
     finalise()
-  }
 
-  def randomBytesOfLen(len: Int): Array[Byte] = {
+  def randomBytesOfLen(len: Int): Array[Byte] =
     Array.fill(len)((scala.util.Random.nextInt(26) + 65).toByte)
-  }
-}

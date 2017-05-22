@@ -22,44 +22,41 @@ import scala.tools.nsc.interpreter.IR
 import scala.tools.nsc.interpreter.JPrintWriter
 import scala.tools.nsc.GenericRunnerSettings
 
-object ScaldingILoop {
+object ScaldingILoop
 
   /**
     * Search for files with the given name in all directories from current directory
     * up to root.
     */
   private[scalding] def findAllUpPath(currentDir: String)(
-      filename: String): List[File] = {
-    val matchingFiles = for {
+      filename: String): List[File] =
+    val matchingFiles = for
       ancestor <- Iterator
         .iterate(currentDir)(new File(_).getParent)
         .takeWhile(_ != "/")
 
-      children: Array[File] = Option(new File(ancestor).listFiles).getOrElse {
+      children: Array[File] = Option(new File(ancestor).listFiles).getOrElse
         println(
             s"The directory '$ancestor' could not be accessed while looking for '$filename'")
         Array.empty
-      }
 
       child <- children if child.toString.endsWith(filename)
-    } yield child
+    yield child
 
     matchingFiles.toList
-  }
-}
 
 /**
   * A class providing Scalding specific commands for inclusion in the Scalding REPL.
   */
 class ScaldingILoop(in: Option[BufferedReader], out: JPrintWriter)
-    extends ILoopCompat(in, out) {
+    extends ILoopCompat(in, out)
   def this() = this(None, new JPrintWriter(Console.out, true))
 
-  settings = new GenericRunnerSettings({ s =>
+  settings = new GenericRunnerSettings( s =>
     echo(s)
-  })
+  )
 
-  override def printWelcome() {
+  override def printWelcome()
     val fc = Console.YELLOW
     val wc = Console.RED
     def wrapFlames(s: String) = s.replaceAll("[()]+", fc + "$0" + wc)
@@ -74,7 +71,6 @@ class ScaldingILoop(in: Option[BufferedReader], out: JPrintWriter)
         wrapFlames("\\__ \\/ _| / _` || |/ _` | | || ' \\))/ _` \\  \n") +
         "|___/\\__| \\__,_||_|\\__,_| |_||_||_| \\__, |  \n" +
         "                                    |___/   ")
-  }
 
   /**
     * Commands specific to the Scalding REPL. To define a new command use one of the following
@@ -109,21 +105,16 @@ class ScaldingILoop(in: Option[BufferedReader], out: JPrintWriter)
          "com.twitter.scalding.ReplImplicitContext._",
          "com.twitter.scalding.ReplState._")
 
-  override def createInterpreter() {
+  override def createInterpreter()
     super.createInterpreter()
-    intp.beQuietDuring {
+    intp.beQuietDuring
       addImports(imports: _*)
 
-      settings match {
+      settings match
         case s: GenericRunnerSettings =>
           val cwd = System.getProperty("user.dir")
 
-          ScaldingILoop.findAllUpPath(cwd)(".scalding_repl").reverse.foreach {
+          ScaldingILoop.findAllUpPath(cwd)(".scalding_repl").reverse.foreach
             f =>
               s.loadfiles.appendToValue(f.toString)
-          }
         case _ => ()
-      }
-    }
-  }
-}

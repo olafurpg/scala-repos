@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicReference
   * The HealthStabilizer takes changing health status and hides 'unhealthy' status
   * changes until the client has been 'unhealthy' for at least one probation period.
   */
-private[serverset2] object HealthStabilizer {
+private[serverset2] object HealthStabilizer
 
   // A superset of ClientHealth used to track probation in addition to healthy/unhealthy
   private sealed trait Status
@@ -29,12 +29,12 @@ private[serverset2] object HealthStabilizer {
       va: Var[ClientHealth],
       probationEpoch: Epoch,
       statsReceiver: StatsReceiver
-  ): Var[ClientHealth] = {
+  ): Var[ClientHealth] =
 
-    Var.async[ClientHealth](ClientHealth.Healthy) { u =>
+    Var.async[ClientHealth](ClientHealth.Healthy)  u =>
       val stateChanges = va.changes.dedup
         .select(probationEpoch.event)
-        .foldLeft[Status](Unknown) {
+        .foldLeft[Status](Unknown)
           // always take the first update as our status
           case (Unknown, Left(ClientHealth.Healthy)) => Healthy
           case (Unknown, Left(ClientHealth.Unhealthy)) => Unhealthy
@@ -54,30 +54,24 @@ private[serverset2] object HealthStabilizer {
 
           // any other change is ignored
           case (v, _) => v
-        }
 
       val currentStatus = new AtomicReference[Status]()
       val gaugeListener =
         stateChanges.dedup.register(Witness { currentStatus })
-      val gauge = statsReceiver.addGauge("zkHealth") {
-        currentStatus.get() match {
+      val gauge = statsReceiver.addGauge("zkHealth")
+        currentStatus.get() match
           case Unknown => 0
           case Healthy => 1
           case Unhealthy => 2
           case Probation(_) => 3
-        }
-      }
 
-      val notify = stateChanges.collect {
+      val notify = stateChanges.collect
         // re-map to the underlying health status
         case Healthy | Probation(_) => ClientHealth.Healthy
         case Unhealthy => ClientHealth.Unhealthy
-      }.dedup.register(Witness(u))
+      .dedup.register(Witness(u))
 
-      Closable.all(notify, gaugeListener, Closable.make { _ =>
+      Closable.all(notify, gaugeListener, Closable.make  _ =>
         gauge.remove()
         Future.Done
-      })
-    }
-  }
-}
+      )

@@ -6,12 +6,12 @@ package akka.testkit.metrics
 import com.codahale.metrics._
 import com.codahale.metrics.jvm
 
-private[akka] trait MemoryUsageSnapshotting extends MetricsPrefix {
+private[akka] trait MemoryUsageSnapshotting extends MetricsPrefix
   this: jvm.MemoryUsageGaugeSet ⇒
 
   // accessing metrics in order to not to duplicate mxBean access too much
 
-  def getHeapSnapshot = {
+  def getHeapSnapshot =
     val metrics = getMetrics
     HeapMemoryUsage(
         metrics.get(key("heap-init")).asInstanceOf[Gauge[Long]].getValue,
@@ -19,18 +19,16 @@ private[akka] trait MemoryUsageSnapshotting extends MetricsPrefix {
         metrics.get(key("heap-max")).asInstanceOf[Gauge[Long]].getValue,
         metrics.get(key("heap-committed")).asInstanceOf[Gauge[Long]].getValue,
         metrics.get(key("heap-usage")).asInstanceOf[RatioGauge].getValue)
-  }
 
-  def getTotalSnapshot = {
+  def getTotalSnapshot =
     val metrics = getMetrics
     TotalMemoryUsage(
         metrics.get(key("total-init")).asInstanceOf[Gauge[Long]].getValue,
         metrics.get(key("total-used")).asInstanceOf[Gauge[Long]].getValue,
         metrics.get(key("total-max")).asInstanceOf[Gauge[Long]].getValue,
         metrics.get(key("total-committed")).asInstanceOf[Gauge[Long]].getValue)
-  }
 
-  def getNonHeapSnapshot = {
+  def getNonHeapSnapshot =
     val metrics = getMetrics
     NonHeapMemoryUsage(
         metrics.get(key("non-heap-init")).asInstanceOf[Gauge[Long]].getValue,
@@ -41,23 +39,20 @@ private[akka] trait MemoryUsageSnapshotting extends MetricsPrefix {
           .asInstanceOf[Gauge[Long]]
           .getValue,
         metrics.get(key("non-heap-usage")).asInstanceOf[RatioGauge].getValue)
-  }
 
   private def key(k: String) = prefix + "." + k
-}
 
 private[akka] case class TotalMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long) {
+    init: Long, used: Long, max: Long, comitted: Long)
 
   def diff(other: TotalMemoryUsage): TotalMemoryUsage =
     TotalMemoryUsage(this.init - other.init,
                      this.used - other.used,
                      this.max - other.max,
                      this.comitted - other.comitted)
-}
 
 private[akka] case class HeapMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long, usage: Double) {
+    init: Long, used: Long, max: Long, comitted: Long, usage: Double)
 
   def diff(other: HeapMemoryUsage): HeapMemoryUsage =
     HeapMemoryUsage(this.init - other.init,
@@ -65,10 +60,9 @@ private[akka] case class HeapMemoryUsage(
                     this.max - other.max,
                     this.comitted - other.comitted,
                     this.usage - other.usage)
-}
 
 private[akka] case class NonHeapMemoryUsage(
-    init: Long, used: Long, max: Long, comitted: Long, usage: Double) {
+    init: Long, used: Long, max: Long, comitted: Long, usage: Double)
 
   def diff(other: NonHeapMemoryUsage): NonHeapMemoryUsage =
     NonHeapMemoryUsage(this.init - other.init,
@@ -76,4 +70,3 @@ private[akka] case class NonHeapMemoryUsage(
                        this.max - other.max,
                        this.comitted - other.comitted,
                        this.usage - other.usage)
-}

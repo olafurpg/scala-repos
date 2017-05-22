@@ -29,53 +29,43 @@ import org.apache.spark.deploy.master._
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 import org.apache.spark.util.Utils
 
-private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
+private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("")
   private val master = parent.masterEndpointRef
 
-  def getMasterState: MasterStateResponse = {
+  def getMasterState: MasterStateResponse =
     master.askWithRetry[MasterStateResponse](RequestMasterState)
-  }
 
-  override def renderJson(request: HttpServletRequest): JValue = {
+  override def renderJson(request: HttpServletRequest): JValue =
     JsonProtocol.writeMasterState(getMasterState)
-  }
 
-  def handleAppKillRequest(request: HttpServletRequest): Unit = {
+  def handleAppKillRequest(request: HttpServletRequest): Unit =
     handleKillRequest(
         request,
         id =>
-          {
-            parent.master.idToApp.get(id).foreach { app =>
+            parent.master.idToApp.get(id).foreach  app =>
               parent.master.removeApplication(app, ApplicationState.KILLED)
-            }
-        })
-  }
+        )
 
-  def handleDriverKillRequest(request: HttpServletRequest): Unit = {
+  def handleDriverKillRequest(request: HttpServletRequest): Unit =
     handleKillRequest(request,
                       id =>
-                        {
                           master.ask[KillDriverResponse](RequestKillDriver(id))
-                      })
-  }
+                      )
 
   private def handleKillRequest(
-      request: HttpServletRequest, action: String => Unit): Unit = {
+      request: HttpServletRequest, action: String => Unit): Unit =
     if (parent.killEnabled && parent.master.securityMgr.checkModifyPermissions(
-            request.getRemoteUser)) {
+            request.getRemoteUser))
       val killFlag =
         Option(request.getParameter("terminate")).getOrElse("false").toBoolean
       val id = Option(request.getParameter("id"))
-      if (id.isDefined && killFlag) {
+      if (id.isDefined && killFlag)
         action(id.get)
-      }
 
       Thread.sleep(100)
-    }
-  }
 
   /** Index view listing applications and executors */
-  def render(request: HttpServletRequest): Seq[Node] = {
+  def render(request: HttpServletRequest): Seq[Node] =
     val state = getMasterState
 
     val workerHeaders = Seq("Worker Id", "Address", "State", "Cores", "Memory")
@@ -120,14 +110,14 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
           <div class="span12">
             <ul class="unstyled">
               <li><strong>URL:</strong> {state.uri}</li>
-              {
-                state.restUri.map { uri =>
+              
+                state.restUri.map  uri =>
                   <li>
                     <strong>REST URL:</strong> {uri}
                     <span class="rest-uri"> (cluster mode)</span>
                   </li>
-                }.getOrElse { Seq.empty }
-              }
+                .getOrElse { Seq.empty }
+              
               <li><strong>Alive Workers:</strong> {aliveWorkers.length}</li>
               <li><strong>Cores in use:</strong> {aliveWorkers.map(_.cores).sum} Total,
                 {aliveWorkers.map(_.coresUsed).sum} Used</li>
@@ -160,15 +150,14 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
         </div>
 
         <div>
-          {if (hasDrivers) {
+          if (hasDrivers)
              <div class="row-fluid">
                <div class="span12">
                  <h4> Running Drivers </h4>
                  {activeDriversTable}
                </div>
              </div>
-           }
-          }
+          
         </div>
 
         <div class="row-fluid">
@@ -179,22 +168,20 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
         </div>
 
         <div>
-          {
-            if (hasDrivers) {
+          
+            if (hasDrivers)
               <div class="row-fluid">
                 <div class="span12">
                   <h4> Completed Drivers </h4>
                   {completedDriversTable}
                 </div>
               </div>
-            }
-          }
+          
         </div>;
 
     UIUtils.basicSparkPage(content, "Spark Master at " + state.uri)
-  }
 
-  private def workerRow(worker: WorkerInfo): Seq[Node] = {
+  private def workerRow(worker: WorkerInfo): Seq[Node] =
     <tr>
       <td>
         <a href={worker.webUiAddress}>{worker.id}</a>
@@ -207,13 +194,12 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
         ({Utils.megabytesToString(worker.memoryUsed)} Used)
       </td>
     </tr>
-  }
 
-  private def appRow(app: ApplicationInfo): Seq[Node] = {
+  private def appRow(app: ApplicationInfo): Seq[Node] =
     val killLink =
       if (parent.killEnabled &&
           (app.state == ApplicationState.RUNNING ||
-              app.state == ApplicationState.WAITING)) {
+              app.state == ApplicationState.WAITING))
         val confirm =
           s"if (window.confirm('Are you sure you want to kill application ${app.id} ?')) " +
           "{ this.parentNode.submit(); return true; } else { return false; }"
@@ -222,7 +208,6 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
         <input type="hidden" name="terminate" value="true"/>
         <a href="#" onclick={confirm} class="kill-link">(kill)</a>
       </form>
-      }
     <tr>
       <td>
         <a href={"app?appId=" + app.id}>{app.id}</a>
@@ -242,14 +227,13 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
       <td>{app.state.toString}</td>
       <td>{UIUtils.formatDuration(app.duration)}</td>
     </tr>
-  }
 
-  private def driverRow(driver: DriverInfo): Seq[Node] = {
+  private def driverRow(driver: DriverInfo): Seq[Node] =
     val killLink =
       if (parent.killEnabled &&
           (driver.state == DriverState.RUNNING ||
               driver.state == DriverState.SUBMITTED ||
-              driver.state == DriverState.RELAUNCHING)) {
+              driver.state == DriverState.RELAUNCHING))
         val confirm =
           s"if (window.confirm('Are you sure you want to kill driver ${driver.id} ?')) " +
           "{ this.parentNode.submit(); return true; } else { return false; }"
@@ -258,7 +242,6 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
         <input type="hidden" name="terminate" value="true"/>
         <a href="#" onclick={confirm} class="kill-link">(kill)</a>
       </form>
-      }
     <tr>
       <td>{driver.id} {killLink}</td>
       <td>{driver.submitDate}</td>
@@ -273,5 +256,3 @@ private[ui] class MasterPage(parent: MasterWebUI) extends WebUIPage("") {
       </td>
       <td>{driver.desc.command.arguments(2)}</td>
     </tr>
-  }
-}

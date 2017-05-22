@@ -16,7 +16,7 @@ import Def.Setting
   *  - `Test`
   *  - `Compile`
   */
-object JvmPlugin extends AutoPlugin {
+object JvmPlugin extends AutoPlugin
   // We are automatically enabled for any IvyModule project.  We also require its settings
   // for ours to work.
   override def requires = IvyPlugin
@@ -28,4 +28,3 @@ object JvmPlugin extends AutoPlugin {
 
   override def projectConfigurations: Seq[Configuration] =
     Configurations.default
-}

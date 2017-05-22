@@ -10,7 +10,7 @@ import akka.actor.ActorSystem
 import akka.serialization.{Serializer, SerializationExtension}
 import akka.testkit.TestKit
 
-class PersistenceSerializerDocSpec extends WordSpec {
+class PersistenceSerializerDocSpec extends WordSpec
 
   val customSerializerConfig =
     """
@@ -30,26 +30,22 @@ class PersistenceSerializerDocSpec extends WordSpec {
 
   val system = ActorSystem("PersistenceSerializerDocSpec",
                            ConfigFactory.parseString(customSerializerConfig))
-  try {
+  try
     SerializationExtension(system)
-  } finally {
+  finally
     TestKit.shutdownActorSystem(system, 10.seconds, false)
-  }
-}
 
 class MyPayload
 class MySnapshot
 
-class MyPayloadSerializer extends Serializer {
+class MyPayloadSerializer extends Serializer
   def identifier: Int = 77124
   def includeManifest: Boolean = false
   def toBinary(o: AnyRef): Array[Byte] = ???
   def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = ???
-}
 
-class MySnapshotSerializer extends Serializer {
+class MySnapshotSerializer extends Serializer
   def identifier: Int = 77125
   def includeManifest: Boolean = false
   def toBinary(o: AnyRef): Array[Byte] = ???
   def fromBinary(bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = ???
-}

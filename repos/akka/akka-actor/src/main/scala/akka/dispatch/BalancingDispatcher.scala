@@ -42,15 +42,15 @@ class BalancingDispatcher(
                        throughput,
                        throughputDeadlineTime,
                        _executorServiceFactoryProvider,
-                       _shutdownTimeout) {
+                       _shutdownTimeout)
 
   /**
     * INTERNAL API
     */
   private[akka] val team = new ConcurrentSkipListSet[ActorCell](
-      Helpers.identityHashComparator(new Comparator[ActorCell] {
+      Helpers.identityHashComparator(new Comparator[ActorCell]
     def compare(l: ActorCell, r: ActorCell) = l.self.path compareTo r.self.path
-  }))
+  ))
 
   /**
     * INTERNAL API
@@ -60,52 +60,44 @@ class BalancingDispatcher(
 
   private class SharingMailbox(
       val system: ActorSystemImpl, _messageQueue: MessageQueue)
-      extends Mailbox(_messageQueue) with DefaultSystemMessageQueue {
-    override def cleanUp(): Unit = {
+      extends Mailbox(_messageQueue) with DefaultSystemMessageQueue
+    override def cleanUp(): Unit =
       val dlq = mailboxes.deadLetterMailbox
       //Don't call the original implementation of this since it scraps all messages, and we don't want to do that
       var messages = systemDrain(new LatestFirstSystemMessageList(NoMessage))
-      while (messages.nonEmpty) {
+      while (messages.nonEmpty)
         // message must be “virgin” before being able to systemEnqueue again
         val message = messages.head
         messages = messages.tail
         message.unlink()
         dlq.systemEnqueue(system.deadLetters, message)
-      }
-    }
-  }
 
   protected[akka] override def createMailbox(
       actor: akka.actor.Cell, mailboxType: MailboxType): Mailbox =
     new SharingMailbox(actor.systemImpl, messageQueue)
 
-  protected[akka] override def register(actor: ActorCell): Unit = {
+  protected[akka] override def register(actor: ActorCell): Unit =
     super.register(actor)
     team.add(actor)
-  }
 
-  protected[akka] override def unregister(actor: ActorCell): Unit = {
+  protected[akka] override def unregister(actor: ActorCell): Unit =
     team.remove(actor)
     super.unregister(actor)
     teamWork()
-  }
 
   override protected[akka] def dispatch(
-      receiver: ActorCell, invocation: Envelope) = {
+      receiver: ActorCell, invocation: Envelope) =
     messageQueue.enqueue(receiver.self, invocation)
     if (!registerForExecution(receiver.mailbox, false, false)) teamWork()
-  }
 
   protected def teamWork(): Unit =
-    if (attemptTeamWork) {
+    if (attemptTeamWork)
       @tailrec def scheduleOne(i: Iterator[ActorCell] = team.iterator): Unit =
         if (messageQueue.hasMessages && i.hasNext &&
-            (executorService.executor match {
+            (executorService.executor match
                   case lm: LoadMetrics ⇒ lm.atFullThrottle == false
                   case other ⇒ true
-                }) && !registerForExecution(i.next.mailbox, false, false))
+                ) && !registerForExecution(i.next.mailbox, false, false))
           scheduleOne(i)
 
       scheduleOne()
-    }
-}

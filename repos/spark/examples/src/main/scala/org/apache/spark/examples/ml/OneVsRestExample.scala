@@ -48,7 +48,7 @@ import org.apache.spark.sql.SQLContext
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object OneVsRestExample {
+object OneVsRestExample
 
   case class Params private[ml](input: String = null,
                                 testInput: Option[String] = None,
@@ -60,10 +60,10 @@ object OneVsRestExample {
                                 fracTest: Double = 0.2)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("OneVsRest Example") {
+    val parser = new OptionParser[Params]("OneVsRest Example")
       head("OneVsRest Example: multiclass to binary reduction using OneVsRest")
       opt[String]("input")
         .text("input path to labeled examples. This path must be specified")
@@ -96,26 +96,20 @@ object OneVsRestExample {
       opt[Double]("elasticNetParam")
         .text(s"the ElasticNet mixing parameter for Logistic Regression.")
         .action((x, c) => c.copy(elasticNetParam = Some(x)))
-      checkConfig { params =>
-        if (params.fracTest < 0 || params.fracTest >= 1) {
+      checkConfig  params =>
+        if (params.fracTest < 0 || params.fracTest >= 1)
           failure(
               s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
-        } else {
+        else
           success
-        }
-      }
-    }
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  private def run(params: Params) {
+  private def run(params: Params)
     val conf = new SparkConf().setAppName(s"OneVsRestExample with $params")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -123,8 +117,8 @@ object OneVsRestExample {
     // $example on$
     val inputData = sqlContext.read.format("libsvm").load(params.input)
     // compute the train/test split: if testInput is not provided use part of input.
-    val data = params.testInput match {
-      case Some(t) => {
+    val data = params.testInput match
+      case Some(t) =>
           // compute the number of features in the training set.
           val numFeatures = inputData.first().getAs[Vector](1).size
           val testData = sqlContext.read
@@ -132,12 +126,9 @@ object OneVsRestExample {
             .format("libsvm")
             .load(t)
           Array[DataFrame](inputData, testData)
-        }
-      case None => {
+      case None =>
           val f = params.fracTest
           inputData.randomSplit(Array(1 - f, f), seed = 12345)
-        }
-    }
     val Array(train, test) = data.map(_.cache())
 
     // instantiate the base classifier
@@ -190,13 +181,10 @@ object OneVsRestExample {
     // $example off$
 
     sc.stop()
-  }
 
-  private def time[R](block: => R): (Long, R) = {
+  private def time[R](block: => R): (Long, R) =
     val t0 = System.nanoTime()
     val result = block // call-by-name
     val t1 = System.nanoTime()
     (NANO.toSeconds(t1 - t0), result)
-  }
-}
 // scalastyle:on println

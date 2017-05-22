@@ -14,7 +14,7 @@ class CachingFactory(delegate: CompilerFactory,
                      compilersLimit: Int,
                      analysisLimit: Int,
                      scalacLimit: Int)
-    extends CompilerFactory {
+    extends CompilerFactory
   private val compilerCache = new Cache[CompilerData, Compiler](compilersLimit)
 
   private val analysisCache = new Cache[File, AnalysisStore](analysisLimit)
@@ -25,20 +25,15 @@ class CachingFactory(delegate: CompilerFactory,
 
   def createCompiler(compilerData: CompilerData,
                      client: Client,
-                     fileToStore: File => AnalysisStore): Compiler = {
+                     fileToStore: File => AnalysisStore): Compiler =
     val cachingFileToStore = (file: File) =>
       analysisCache.getOrUpdate(file)(fileToStore(file))
 
-    compilerCache.getOrUpdate(compilerData) {
+    compilerCache.getOrUpdate(compilerData)
       delegate.createCompiler(compilerData, client, cachingFileToStore)
-    }
-  }
 
   def getScalac(sbtData: SbtData,
                 compilerJars: Option[CompilerJars],
-                client: Client): Option[AnalyzingCompiler] = {
-    scalacCache.getOrUpdate((sbtData, compilerJars)) {
+                client: Client): Option[AnalyzingCompiler] =
+    scalacCache.getOrUpdate((sbtData, compilerJars))
       delegate.getScalac(sbtData, compilerJars, client)
-    }
-  }
-}

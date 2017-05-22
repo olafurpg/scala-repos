@@ -21,7 +21,6 @@ import org.saddle.array.Sorter
 /**
   * Byte ScalarTag
   */
-object ScalarTagByte extends ScalarTagAny[Byte] {
+object ScalarTagByte extends ScalarTagAny[Byte]
   override def makeSorter(implicit ord: ORD[Byte]): Sorter[Byte] =
     Sorter.byteSorter
-}

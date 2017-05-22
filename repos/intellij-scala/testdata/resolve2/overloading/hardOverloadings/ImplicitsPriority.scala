@@ -1,14 +1,11 @@
-object Test extends Application {
+object Test extends Application
   class C
-  class A {
+  class A
     val foo: C = new C
-  }
-  class B {
+  class B
     def foo(x: String) = print("test")
-  }
 
   val a = new A
   implicit def c2fun = (c: C) => (x: String) => print("no")
   implicit def a2b: A => B = p => new B
   a. /* line: 4 */ foo("")
-}

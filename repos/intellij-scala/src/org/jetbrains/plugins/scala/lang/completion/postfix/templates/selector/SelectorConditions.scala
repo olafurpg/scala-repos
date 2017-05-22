@@ -14,26 +14,25 @@ import scala.language.implicitConversions
   * @author Roman.Shein
   * @since 08.09.2015.
   */
-object SelectorConditions {
+object SelectorConditions
 
   val BOOLEAN_EXPR = typedCondition(BooleanType)
 
-  val ANY_EXPR = new Condition[PsiElement] {
+  val ANY_EXPR = new Condition[PsiElement]
     override def value(t: PsiElement): Boolean = t.isInstanceOf[ScExpression]
-  }
 
   val THROWABLE = isDescendantCondition("java.lang.Throwable")
 
-  def isDescendantCondition(ancestorFqn: String) = new Condition[PsiElement] {
-    override def value(t: PsiElement): Boolean = t match {
+  def isDescendantCondition(ancestorFqn: String) = new Condition[PsiElement]
+    override def value(t: PsiElement): Boolean = t match
       case expr: ScExpression =>
         val project = t.getProject
         val manager = ScalaPsiManager.instance(project)
         expr
           .getTypeIgnoreBaseType()
           .toOption
-          .flatMap { exprType =>
-            ScType.extractClass(exprType, Option(project)).map { psiClass =>
+          .flatMap  exprType =>
+            ScType.extractClass(exprType, Option(project)).map  psiClass =>
               val base =
                 manager.getCachedClass(ancestorFqn,
                                        GlobalSearchScope.allScope(project),
@@ -41,39 +40,27 @@ object SelectorConditions {
               (psiClass != null && base != null &&
                   ScEquivalenceUtil.areClassesEquivalent(psiClass, base)) ||
               manager.cachedDeepIsInheritor(psiClass, base)
-            }
-          }
           .getOrElse(false)
       case _ => false
-    }
-  }
 
-  def typedCondition(myType: ValType) = new Condition[PsiElement] {
+  def typedCondition(myType: ValType) = new Condition[PsiElement]
 
-    override def value(t: PsiElement): Boolean = t match {
+    override def value(t: PsiElement): Boolean = t match
       case expr: ScExpression =>
         expr.getTypeIgnoreBaseType().getOrAny == myType
       case _ => false
-    }
-  }
 
-  class ExpandedCondition[T](source: Condition[T]) extends Condition[T] {
+  class ExpandedCondition[T](source: Condition[T]) extends Condition[T]
     override def value(t: T): Boolean = source.value(t)
 
-    def ||(other: Condition[_ >: T]) = {
+    def ||(other: Condition[_ >: T]) =
       def f(t: T) = value(t) || other.value(t)
-      new Condition[T] {
+      new Condition[T]
         override def value(t: T) = f(t)
-      }
-    }
 
-    def &&(other: Condition[_ >: T]) = {
+    def &&(other: Condition[_ >: T]) =
       def f(t: T) = value(t) && other.value(t)
-      new Condition[T] {
+      new Condition[T]
         override def value(t: T) = f(t)
-      }
-    }
 
     def a: Boolean = false
-  }
-}

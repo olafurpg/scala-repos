@@ -35,7 +35,7 @@ import scalafx.delegate.SFXDelegate
 import scalafx.geometry.{Point2D, Point3D}
 import scalafx.scene.Node
 
-object PickResult {
+object PickResult
   implicit def sfxPickResult2jfx(m: PickResult): jfxsi.PickResult =
     if (m != null) m.delegate else null
 
@@ -45,12 +45,11 @@ object PickResult {
       "Use FaceUndefined; FACE_UNDEFINED will be removed in a future release",
       "8.0.60-R10")
   val FACE_UNDEFINED = FaceUndefined
-}
 
 /** A container for the result of a pick event. Wrapper for JavaFX's
   * [[http://download.java.net/jdk8/jfxdocs/javafx/scene/input/PickResult.html PickResult]]. */
 class PickResult(override val delegate: jfxsi.PickResult)
-    extends SFXDelegate[jfxsi.PickResult] {
+    extends SFXDelegate[jfxsi.PickResult]
 
   /** Creates a pick result for a 2D case where no additional information is needed.
     *
@@ -62,9 +61,8 @@ class PickResult(override val delegate: jfxsi.PickResult)
     * @param sceneX - The scene X coordinate
     * @param sceneY - The scene Y coordinate
     */
-  def this(target: jfxe.EventTarget, sceneX: Double, sceneY: Double) {
+  def this(target: jfxe.EventTarget, sceneX: Double, sceneY: Double)
     this(new jfxsi.PickResult(target, sceneX, sceneY))
-  }
 
   /** Creates a new instance of PickResult for a non-3d-shape target.
     *
@@ -74,9 +72,8 @@ class PickResult(override val delegate: jfxsi.PickResult)
     * @param point - The intersected point in local coordinate of the picked Node
     * @param distance - The intersected distance between camera position and the picked Node
     */
-  def this(node: Node, point: Point3D, distance: Double) {
+  def this(node: Node, point: Point3D, distance: Double)
     this(new jfxsi.PickResult(node, point, distance))
-  }
 
   /** Creates a new instance of PickResult.
     * @param node - The intersected node
@@ -89,9 +86,8 @@ class PickResult(override val delegate: jfxsi.PickResult)
            point: Point3D,
            distance: Double,
            face: Int,
-           texCoord: Point2D) {
+           texCoord: Point2D)
     this(new jfxsi.PickResult(node, point, distance, face, texCoord))
-  }
 
   /** Returns the intersected distance between camera position and the intersected point. */
   def intersectedDistance: Double = delegate.getIntersectedDistance
@@ -102,10 +98,9 @@ class PickResult(override val delegate: jfxsi.PickResult)
   def intersectedFace: Int = delegate.getIntersectedFace
 
   /** Returns the intersected node. Returns `None` if there was no intersection with any node and the scene was picked. */
-  def intersectedNode: Option[Node] = delegate.getIntersectedNode match {
+  def intersectedNode: Option[Node] = delegate.getIntersectedNode match
     case null => None
     case v => Some[Node](v)
-  }
 
   /** Returns the intersected point in local coordinate of the picked Node. */
   def intersectedPoint: Point3D = delegate.getIntersectedPoint
@@ -114,8 +109,6 @@ class PickResult(override val delegate: jfxsi.PickResult)
     * If the picked target is not Shape3D or has pickOnBounds==true, it returns `None`.
     */
   def intersectedTexCoord: Option[Point2D] =
-    delegate.getIntersectedTexCoord match {
+    delegate.getIntersectedTexCoord match
       case null => None
       case v => Some[Point2D](v)
-    }
-}

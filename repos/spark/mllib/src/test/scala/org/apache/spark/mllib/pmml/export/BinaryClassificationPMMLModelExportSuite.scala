@@ -25,9 +25,9 @@ import org.apache.spark.mllib.classification.LogisticRegressionModel
 import org.apache.spark.mllib.classification.SVMModel
 import org.apache.spark.mllib.util.LinearDataGenerator
 
-class BinaryClassificationPMMLModelExportSuite extends SparkFunSuite {
+class BinaryClassificationPMMLModelExportSuite extends SparkFunSuite
 
-  test("logistic regression PMML export") {
+  test("logistic regression PMML export")
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
     val logisticRegressionModel = new LogisticRegressionModel(
@@ -67,9 +67,8 @@ class BinaryClassificationPMMLModelExportSuite extends SparkFunSuite {
     // ensure logistic regression has normalization method set to LOGIT
     assert(
         pmmlRegressionModel.getNormalizationMethod() == RegressionNormalizationMethodType.LOGIT)
-  }
 
-  test("linear SVM PMML export") {
+  test("linear SVM PMML export")
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
     val svmModel = new SVMModel(linearInput(0).features, linearInput(0).label)
@@ -106,5 +105,3 @@ class BinaryClassificationPMMLModelExportSuite extends SparkFunSuite {
     // ensure linear SVM has normalization method set to NONE
     assert(
         pmmlRegressionModel.getNormalizationMethod() == RegressionNormalizationMethodType.NONE)
-  }
-}

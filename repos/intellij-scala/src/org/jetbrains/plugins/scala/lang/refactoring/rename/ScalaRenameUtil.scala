@@ -25,51 +25,46 @@ import org.jetbrains.plugins.scala.lang.resolve.ResolvableReferenceElement
 
 import scala.collection.JavaConversions._
 
-object ScalaRenameUtil {
+object ScalaRenameUtil
   def filterAliasedReferences(allReferences: util.Collection[PsiReference])
-    : util.ArrayList[PsiReference] = {
+    : util.ArrayList[PsiReference] =
     val filtered = allReferences.filterNot(isAliased)
     new util.ArrayList(filtered)
-  }
 
-  def isAliased(ref: PsiReference): Boolean = ref match {
+  def isAliased(ref: PsiReference): Boolean = ref match
     case resolvableReferenceElement: ResolvableReferenceElement =>
-      resolvableReferenceElement.bind() match {
+      resolvableReferenceElement.bind() match
         case Some(result) =>
           val renamed = result.isRenamed
           renamed.nonEmpty
         case None => false
-      }
     case _ => false
-  }
 
   def isIndirectReference(ref: PsiReference, element: PsiElement): Boolean =
-    ref match {
+    ref match
       case scRef: ScReferenceElement =>
         scRef.isIndirectReferenceTo(ref.resolve(), element)
       case _ => false
-    }
 
-  def findReferences(element: PsiElement): util.ArrayList[PsiReference] = {
+  def findReferences(element: PsiElement): util.ArrayList[PsiReference] =
     val allRefs =
       ReferencesSearch.search(element, element.getUseScope).findAll()
     val filtered =
       allRefs.filterNot(isAliased).filterNot(isIndirectReference(_, element))
     new util.ArrayList[PsiReference](filtered)
-  }
 
   def replaceImportClassReferences(
       allReferences: util.Collection[PsiReference])
-    : util.Collection[PsiReference] = {
-    val result = allReferences.map {
+    : util.Collection[PsiReference] =
+    val result = allReferences.map
       case ref: ScStableCodeReferenceElement =>
         val isInImport =
           PsiTreeUtil.getParentOfType(ref, classOf[ScImportStmt]) != null
-        if (isInImport && ref.resolve() == null) {
+        if (isInImport && ref.resolve() == null)
           val multiResolve = ref.multiResolve(false)
           if (multiResolve.length > 1 && multiResolve.forall(
-                  _.getElement.isInstanceOf[ScTypeDefinition])) {
-            new PsiReference {
+                  _.getElement.isInstanceOf[ScTypeDefinition]))
+            new PsiReference
               def getVariants: Array[AnyRef] = ref.getVariants
 
               def getCanonicalText: String = ref.getCanonicalText
@@ -90,86 +85,71 @@ object ScalaRenameUtil {
               def getRangeInElement: TextRange = ref.getRangeInElement
 
               def resolve(): PsiElement = multiResolve.apply(0).getElement
-            }
-          } else ref
-        } else ref
+          else ref
+        else ref
       case ref: PsiReference => ref
-    }
     result
-  }
 
-  def findSubstituteElement(elementToRename: PsiElement): PsiNamedElement = {
-    elementToRename match {
+  def findSubstituteElement(elementToRename: PsiElement): PsiNamedElement =
+    elementToRename match
       case primConstr: ScPrimaryConstructor => primConstr.containingClass
       case fun: ScFunction if fun.isConstructor => fun.containingClass
       case fun: ScFunction
           if Seq("apply", "unapply", "unapplySeq") contains fun.name =>
-        fun.containingClass match {
+        fun.containingClass match
           case newTempl: ScNewTemplateDefinition =>
             ScalaPsiUtil.findInstanceBinding(newTempl).orNull
           case obj: ScObject if obj.isSyntheticObject =>
             obj.fakeCompanionClassOrCompanionClass
           case clazz => clazz
-        }
       case named: PsiNamedElement => named
       case _ => null
-    }
-  }
 
   def doRenameGenericNamedElement(
       namedElement: PsiElement,
       newName: String,
       usages: Array[UsageInfo],
-      listener: RefactoringElementListener): Unit = {
+      listener: RefactoringElementListener): Unit =
     case class UsagesWithName(name: String, usages: Array[UsageInfo])
 
-    val encodeNames: UsagesWithName => Seq[UsagesWithName] = {
+    val encodeNames: UsagesWithName => Seq[UsagesWithName] =
       case UsagesWithName(name, usagez) =>
         if (usagez.isEmpty) Nil
-        else {
+        else
           val encodedName = ScalaNamesUtil.toJavaName(newName)
           if (encodedName == name) Seq(UsagesWithName(name, usagez))
-          else {
-            val needEncodedName: UsageInfo => Boolean = { u =>
+          else
+            val needEncodedName: UsageInfo => Boolean =  u =>
               val ref = u.getReference.getElement
               !ref.getLanguage.isInstanceOf[ScalaLanguage] //todo more concise condition?
-            }
             val (usagesEncoded, usagesPlain) =
               usagez.partition(needEncodedName)
             Seq(UsagesWithName(encodedName, usagesEncoded),
                 UsagesWithName(name, usagesPlain))
-          }
-        }
-    }
 
-    val modifyScObjectName: UsagesWithName => Seq[UsagesWithName] = {
+    val modifyScObjectName: UsagesWithName => Seq[UsagesWithName] =
       case UsagesWithName(name, usagez) =>
         if (usagez.isEmpty) Nil
-        else {
-          val needDollarSign: UsageInfo => Boolean = { u =>
+        else
+          val needDollarSign: UsageInfo => Boolean =  u =>
             !u.getReference.isInstanceOf[ResolvableReferenceElement]
-          }
           val (usagesWithDS, usagesPlain) = usagez.partition(needDollarSign)
           Seq(UsagesWithName(name + "$", usagesWithDS),
               UsagesWithName(name, usagesPlain))
-        }
-    }
 
-    val modifySetterName: UsagesWithName => Seq[UsagesWithName] = {
+    val modifySetterName: UsagesWithName => Seq[UsagesWithName] =
       case arg @ UsagesWithName(name, usagez) =>
         if (usagez.isEmpty) Nil
-        else {
+        else
           val newNameWithoutSuffix = name.stripSuffix(setterSuffix(name))
           val grouped = usagez.groupBy(u => setterSuffix(u.getElement.getText))
           grouped
             .map(entry =>
                   UsagesWithName(newNameWithoutSuffix + entry._1, entry._2))
             .toSeq
-        }
-    }
 
     val encoded = encodeNames(UsagesWithName(newName, usages))
-    val modified = namedElement match {
+    val modified = namedElement match
       case _: ScObject => encoded.flatMap(modifyScObjectName)
       case _: PsiTypedDefinitionWrapper | _: FakePsiMethod =>
         encoded.flatMap(modifySetterName)
@@ -177,29 +157,23 @@ object ScalaRenameUtil {
         encoded.flatMap(modifySetterName)
       case variable: ScReferencePattern => encoded.flatMap(modifySetterName)
       case _ => encoded
-    }
-    modified.foreach {
+    modified.foreach
       case UsagesWithName(name, usagez) if usagez.nonEmpty =>
         RenameUtil.doRenameGenericNamedElement(
             namedElement, name, usagez, listener)
       case _ =>
-    }
     //to guarantee correct name of namedElement itself
     RenameUtil.doRenameGenericNamedElement(
         namedElement, newName, Array.empty[UsageInfo], listener)
-  }
 
-  def setterSuffix(name: String) = {
+  def setterSuffix(name: String) =
     if (name.endsWith("_=")) "_="
     else if (name.endsWith("_$eq")) "_$eq"
     else ""
-  }
 
-  def sameElement(range: RangeMarker, element: PsiElement): Boolean = {
+  def sameElement(range: RangeMarker, element: PsiElement): Boolean =
     val newElemRange = Option(ScalaRenameUtil.findSubstituteElement(element))
       .map(_.getTextRange)
     newElemRange.exists(nr =>
           nr.getStartOffset == range.getStartOffset &&
           nr.getEndOffset == range.getEndOffset)
-  }
-}

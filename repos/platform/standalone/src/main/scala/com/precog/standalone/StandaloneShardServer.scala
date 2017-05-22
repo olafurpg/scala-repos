@@ -54,7 +54,7 @@ import com.precog.yggdrasil.vfs.NoopVFS
 import java.awt.Desktop
 import java.net.URI
 
-trait StandaloneShardServer extends BlueEyesServer with ShardService {
+trait StandaloneShardServer extends BlueEyesServer with ShardService
   val clock = Clock.System
 
   implicit def executionContext: ExecutionContext
@@ -65,31 +65,28 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
                   apiKeyManager: APIKeyFinder[Future],
                   jobManager: JobManager[Future]): (ManagedPlatform, Stoppable)
 
-  def configureShardState(config: Configuration) = M.point {
+  def configureShardState(config: Configuration) = M.point
     val apiKey = config[String]("security.masterAccount.apiKey")
     val apiKeyFinder = new StaticAPIKeyFinder[Future](apiKey)
     val accountFinder =
       new StaticAccountFinder[Future]("root", apiKey, Some("/"))
 
     val jobManager =
-      config.get[String]("jobs.jobdir").map { jobdir =>
+      config.get[String]("jobs.jobdir").map  jobdir =>
         val dir = new File(jobdir)
 
-        if (!dir.isDirectory) {
+        if (!dir.isDirectory)
           throw new Exception(
               "Configured job dir %s is not a directory".format(dir))
-        }
 
-        if (!dir.canWrite) {
+        if (!dir.canWrite)
           throw new Exception(
               "Configured job dir %s is not writeable".format(dir))
-        }
 
         FileJobManager(dir, M)
-      } getOrElse {
+      getOrElse
         new ExpiringJobManager(
             Duration(config[Int]("jobs.ttl", 300), TimeUnit.SECONDS))
-      }
 
     val (platform, stoppable) = platformFor(config, apiKeyFinder, jobManager)
 
@@ -103,10 +100,9 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
                jobManager,
                Clock.System,
                stoppable)
-  }
 
-  val jettyService = this.service("labcoat", "1.0") { context =>
-    startup {
+  val jettyService = this.service("labcoat", "1.0")  context =>
+    startup
       val rootConfig = context.rootConfig
       val config = rootConfig.detach("services.analytics.v2")
       val serverPort = config[Int]("labcoat.port", 8000)
@@ -128,33 +124,28 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
       resourceHandler.setResourceBase(
           this.getClass.getClassLoader.getResource("web").toString)
 
-      val corsHandler = new HandlerWrapper {
+      val corsHandler = new HandlerWrapper
         override def handle(target: String,
                             baseRequest: Request,
                             request: HttpServletRequest,
-                            response: HttpServletResponse): Unit = {
+                            response: HttpServletResponse): Unit =
           response.addHeader("Access-Control-Allow-Origin", "*")
           _handler.handle(target, baseRequest, request, response)
-        }
-      }
 
       corsHandler.setHandler(resourceHandler)
 
-      val rootHandler = new AbstractHandler {
+      val rootHandler = new AbstractHandler
         def handle(target: String,
                    baseRequest: Request,
                    request: HttpServletRequest,
-                   response: HttpServletResponse): Unit = {
-          if (target == "/") {
+                   response: HttpServletResponse): Unit =
+          if (target == "/")
             val requestedHost = Option(request.getHeader("Host"))
               .map(_.toLowerCase.split(':').head)
               .getOrElse("localhost")
             response.sendRedirect(
                 "http://%1$s:%2$d/index.html?apiKey=%3$s&analyticsService=http://%1$s:%4$d/&version=2"
                   .format(requestedHost, serverPort, rootKey, quirrelPort))
-          }
-        }
-      }
 
       val handlers = new HandlerList
 
@@ -166,12 +157,8 @@ trait StandaloneShardServer extends BlueEyesServer with ShardService {
       server.start()
 
       Future(server)(executionContext)
-    } -> request { (server: Server) =>
-      get { (req: HttpRequest[ByteChunk]) =>
+    -> request  (server: Server) =>
+      get  (req: HttpRequest[ByteChunk]) =>
         Promise.successful(HttpResponse[ByteChunk]())(executionContext)
-      }
-    } -> shutdown { (server: Server) =>
+    -> shutdown  (server: Server) =>
       Future(server.stop())(executionContext)
-    }
-  }
-}

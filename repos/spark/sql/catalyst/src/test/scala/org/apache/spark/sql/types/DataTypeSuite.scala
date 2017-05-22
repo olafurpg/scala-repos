@@ -19,30 +19,27 @@ package org.apache.spark.sql.types
 
 import org.apache.spark.{SparkException, SparkFunSuite}
 
-class DataTypeSuite extends SparkFunSuite {
+class DataTypeSuite extends SparkFunSuite
 
-  test("construct an ArrayType") {
+  test("construct an ArrayType")
     val array = ArrayType(StringType)
 
     assert(ArrayType(StringType, true) === array)
-  }
 
-  test("construct an MapType") {
+  test("construct an MapType")
     val map = MapType(StringType, IntegerType)
 
     assert(MapType(StringType, IntegerType, true) === map)
-  }
 
-  test("construct with add") {
+  test("construct with add")
     val struct = (new StructType)
       .add("a", IntegerType, true)
       .add("b", LongType, false)
       .add("c", StringType, true)
 
     assert(StructField("b", LongType, false) === struct("b"))
-  }
 
-  test("construct with add from StructField") {
+  test("construct with add from StructField")
     // Test creation from StructField type
     val struct = (new StructType)
       .add(StructField("a", IntegerType, true))
@@ -50,9 +47,8 @@ class DataTypeSuite extends SparkFunSuite {
       .add(StructField("c", StringType, true))
 
     assert(StructField("b", LongType, false) === struct("b"))
-  }
 
-  test("construct with String DataType") {
+  test("construct with String DataType")
     // Test creation with DataType as String
     val struct = (new StructType)
       .add("a", "int", true)
@@ -62,9 +58,8 @@ class DataTypeSuite extends SparkFunSuite {
     assert(StructField("a", IntegerType, true) === struct("a"))
     assert(StructField("b", LongType, false) === struct("b"))
     assert(StructField("c", StringType, true) === struct("c"))
-  }
 
-  test("extract fields from a StructType") {
+  test("extract fields from a StructType")
     val struct = StructType(
         StructField("a", IntegerType, true) :: StructField(
             "b",
@@ -74,33 +69,28 @@ class DataTypeSuite extends SparkFunSuite {
 
     assert(StructField("b", LongType, false) === struct("b"))
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       struct("e")
-    }
 
     val expectedStruct =
       StructType(StructField("b", LongType, false) :: StructField(
               "d", FloatType, true) :: Nil)
 
     assert(expectedStruct === struct(Set("b", "d")))
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       struct(Set("b", "d", "e", "f"))
-    }
-  }
 
-  test("extract field index from a StructType") {
+  test("extract field index from a StructType")
     val struct = StructType(
         StructField("a", LongType) :: StructField("b", FloatType) :: Nil)
 
     assert(struct.fieldIndex("a") === 0)
     assert(struct.fieldIndex("b") === 1)
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       struct.fieldIndex("non_existent")
-    }
-  }
 
-  test("fieldsMap returns map of name to StructField") {
+  test("fieldsMap returns map of name to StructField")
     val struct = StructType(
         StructField("a", LongType) :: StructField("b", FloatType) :: Nil)
 
@@ -110,9 +100,8 @@ class DataTypeSuite extends SparkFunSuite {
         "a" -> StructField("a", LongType), "b" -> StructField("b", FloatType))
 
     assert(mapped === expected)
-  }
 
-  test("merge where right is empty") {
+  test("merge where right is empty")
     val left = StructType(
         StructField("a", LongType) :: StructField("b", FloatType) :: Nil)
 
@@ -124,9 +113,8 @@ class DataTypeSuite extends SparkFunSuite {
           .getBoolean(StructType.metadataKeyForOptionalField))
     assert(merged("b").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
-  }
 
-  test("merge where left is empty") {
+  test("merge where left is empty")
 
     val left = StructType(List())
 
@@ -140,9 +128,8 @@ class DataTypeSuite extends SparkFunSuite {
           .getBoolean(StructType.metadataKeyForOptionalField))
     assert(merged("b").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
-  }
 
-  test("merge where both are non-empty") {
+  test("merge where both are non-empty")
     val left = StructType(
         StructField("a", LongType) :: StructField("b", FloatType) :: Nil)
 
@@ -160,20 +147,17 @@ class DataTypeSuite extends SparkFunSuite {
           .getBoolean(StructType.metadataKeyForOptionalField))
     assert(merged("c").metadata
           .getBoolean(StructType.metadataKeyForOptionalField))
-  }
 
-  test("merge where right contains type conflict") {
+  test("merge where right contains type conflict")
     val left = StructType(
         StructField("a", LongType) :: StructField("b", FloatType) :: Nil)
 
     val right = StructType(StructField("b", LongType) :: Nil)
 
-    intercept[SparkException] {
+    intercept[SparkException]
       left.merge(right)
-    }
-  }
 
-  test("existsRecursively") {
+  test("existsRecursively")
     val struct = StructType(
         StructField("a", LongType) :: StructField("b", FloatType) :: Nil)
     assert(struct.existsRecursively(_.isInstanceOf[LongType]))
@@ -194,13 +178,10 @@ class DataTypeSuite extends SparkFunSuite {
     assert(arrayType.existsRecursively(_.isInstanceOf[MapType]))
     assert(arrayType.existsRecursively(_.isInstanceOf[ArrayType]))
     assert(!arrayType.existsRecursively(_.isInstanceOf[IntegerType]))
-  }
 
-  def checkDataTypeJsonRepr(dataType: DataType): Unit = {
-    test(s"JSON - $dataType") {
+  def checkDataTypeJsonRepr(dataType: DataType): Unit =
+    test(s"JSON - $dataType")
       assert(DataType.fromJson(dataType.json) === dataType)
-    }
-  }
 
   checkDataTypeJsonRepr(NullType)
   checkDataTypeJsonRepr(BooleanType)
@@ -228,11 +209,9 @@ class DataTypeSuite extends SparkFunSuite {
           StructField("c", DoubleType, nullable = false, metadata)))
   checkDataTypeJsonRepr(structType)
 
-  def checkDefaultSize(dataType: DataType, expectedDefaultSize: Int): Unit = {
-    test(s"Check the default size of ${dataType}") {
+  def checkDefaultSize(dataType: DataType, expectedDefaultSize: Int): Unit =
+    test(s"Check the default size of ${dataType}")
       assert(dataType.defaultSize === expectedDefaultSize)
-    }
-  }
 
   checkDefaultSize(NullType, 1)
   checkDefaultSize(BooleanType, 1)
@@ -255,13 +234,11 @@ class DataTypeSuite extends SparkFunSuite {
   checkDefaultSize(structType, 812)
 
   def checkEqualsIgnoreCompatibleNullability(
-      from: DataType, to: DataType, expected: Boolean): Unit = {
+      from: DataType, to: DataType, expected: Boolean): Unit =
     val testName =
       s"equalsIgnoreCompatibleNullability: (from: ${from}, to: ${to})"
-    test(testName) {
+    test(testName)
       assert(DataType.equalsIgnoreCompatibleNullability(from, to) === expected)
-    }
-  }
 
   checkEqualsIgnoreCompatibleNullability(
       from = ArrayType(DoubleType, containsNull = true),
@@ -341,4 +318,3 @@ class DataTypeSuite extends SparkFunSuite {
             StructField("a", StringType, nullable = false) :: StructField(
                 "b", StringType, nullable = false) :: Nil),
       expected = false)
-}

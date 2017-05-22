@@ -45,9 +45,8 @@ class RectangleSpec
     extends SimpleSFXDelegateSpec[jfxss.Rectangle, Rectangle](
         classOf[jfxss.Rectangle], classOf[Rectangle])
     with PositionDelegateSpec[Rectangle]
-    with DimensionDelegateSpec[Rectangle] {
+    with DimensionDelegateSpec[Rectangle]
 
   val positionDelegate = getScalaClassInstance
 
   val dimensionDelegate = getScalaClassInstance
-}

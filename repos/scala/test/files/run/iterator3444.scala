@@ -1,7 +1,7 @@
 // ticked #3444
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val it = (1 to 12).toSeq.iterator
 
     assert(it.next == 1)
@@ -16,5 +16,3 @@ object Test {
 
     val mt = (1 until 5).toSeq.iterator
     assert(mt.take(50).toList == List(1, 2, 3, 4))
-  }
-}

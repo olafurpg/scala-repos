@@ -7,15 +7,14 @@ package scala.tools.nsc
 package interpreter
 
 class AbstractOrMissingHandler[T](onError: String => Unit, value: T)
-    extends PartialFunction[Throwable, T] {
-  def isDefinedAt(t: Throwable) = t match {
+    extends PartialFunction[Throwable, T]
+  def isDefinedAt(t: Throwable) = t match
     case _: AbstractMethodError => true
     case _: NoSuchMethodError => true
     case _: MissingRequirementError => true
     case _: NoClassDefFoundError => true
     case _ => false
-  }
-  def apply(t: Throwable) = t match {
+  def apply(t: Throwable) = t match
     case x @ (_: AbstractMethodError | _: NoSuchMethodError |
         _: NoClassDefFoundError) =>
       onError("""
@@ -35,10 +34,7 @@ class AbstractOrMissingHandler[T](onError: String => Unit, value: T)
         |** object programmatically, settings.usejavacp.value = true.""".stripMargin
             .format(x.req))
       value
-  }
-}
 
-object AbstractOrMissingHandler {
+object AbstractOrMissingHandler
   def apply[T]() =
     new AbstractOrMissingHandler[T](Console println _, null.asInstanceOf[T])
-}

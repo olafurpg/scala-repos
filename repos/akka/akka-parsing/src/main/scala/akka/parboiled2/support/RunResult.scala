@@ -20,20 +20,18 @@ import akka.shapeless._
 import akka.parboiled2._
 
 // phantom type, only used for rule DSL typing
-sealed trait RunResult[T] {
+sealed trait RunResult[T]
   type Out <: RuleX
-}
 
-object RunResult {
+object RunResult
   implicit def fromAux[T, Out0 <: RuleX](
       implicit aux: Aux[T, Out0]): RunResult[T] { type Out = Out0 } = `n/a`
 
   sealed trait Aux[T, Out]
-  object Aux extends Aux1 {
+  object Aux extends Aux1
     implicit def forRule[R <: RuleX]: Aux[R, R] = `n/a`
     //implicit def forFHList[I <: HList, R, In0 <: HList, Out0 <: HList](implicit x: JA[I, R, In0, Out0]): Aux[I ⇒ R, Rule[In0, Out0]] = `n/a`
-  }
-  abstract class Aux1 extends Aux2 {
+  abstract class Aux1 extends Aux2
     implicit def forF1[Z, R, In0 <: HList, Out0 <: HList](
         implicit x: JA[Z :: HNil, R, In0, Out0]): Aux[Z ⇒ R, Rule[In0, Out0]] =
       `n/a`
@@ -49,11 +47,8 @@ object RunResult {
     implicit def forF5[V, W, X, Y, Z, R, In0 <: HList, Out0 <: HList](
         implicit x: JA[V :: W :: X :: Y :: Z :: HNil, R, In0, Out0])
       : Aux[(V, W, X, Y, Z) ⇒ R, Rule[In0, Out0]] = `n/a`
-  }
 
-  abstract class Aux2 {
+  abstract class Aux2
     protected type JA[I <: HList, R, In0 <: HList, Out0 <: HList] = Join.Aux[
         I, HNil, HNil, R, HNil, In0, Out0]
     implicit def forAny[T]: Aux[T, Rule0] = `n/a`
-  }
-}

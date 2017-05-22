@@ -1,3 +1,2 @@
-object Use {
+object Use
   val x = A.x
-}

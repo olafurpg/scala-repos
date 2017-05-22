@@ -33,7 +33,7 @@ import com.precog.util.IdGen
 
 trait StringLibSpecs[M[+ _]]
     extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
+    with LongIdMemoryDatasetConsumer[M]
   self =>
 
   import Function._
@@ -48,39 +48,33 @@ trait StringLibSpecs[M[+ _]]
   private def hetStrings(line: Line) =
     dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line)
 
-  def testEval(graph: DepGraph): Set[SEvent] = {
-    consumeEval(graph, defaultEvaluationContext) match {
+  def testEval(graph: DepGraph): Set[SEvent] =
+    consumeEval(graph, defaultEvaluationContext) match
       case Success(results) => results
       case Failure(error) => throw error
-    }
-  }
 
-  def op1Input(op: Op1, loadFrom: Line => dag.AbsoluteLoad) = {
+  def op1Input(op: Op1, loadFrom: Line => dag.AbsoluteLoad) =
     dag.Operate(BuiltInFunction1Op(op), loadFrom(line))(line)
-  }
 
-  def op2Input(op: Op2, const: RValue, loadFrom: Line => dag.AbsoluteLoad) = {
+  def op2Input(op: Op2, const: RValue, loadFrom: Line => dag.AbsoluteLoad) =
     Join(BuiltInFunction2Op(op),
          Cross(None),
          loadFrom(line),
          Const(const)(line))(line)
-  }
 
-  "for homogeneous sets, the appropriate string function" should {
-    "determine length" in {
+  "for homogeneous sets, the appropriate string function" should
+    "determine length" in
       val input = op1Input(library.length, homStrings)
       val result = testEval(input)
 
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(6, 12, 16, 26, 42, 0)
-    }
-    "determine trim" in {
+    "determine trim" in
       val input = op1Input(trim, homStrings)
 
       val result = testEval(input)
@@ -88,9 +82,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky",
                            "solstice + 7",
@@ -98,8 +91,7 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")""",
                            "Whitespace       is   awesome  !!!1!!",
                            "")
-    }
-    "determine toUpperCase" in {
+    "determine toUpperCase" in
       val input = op1Input(toUpperCase, homStrings)
 
       val result = testEval(input)
@@ -107,9 +99,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("QUIRKY",
                            "SOLSTICE + 7",
@@ -117,8 +108,7 @@ trait StringLibSpecs[M[+ _]]
                            """("ALPHA", "BETA", "GAMMA")""",
                            "  WHITESPACE       IS   AWESOME  !!!1!!   ",
                            "")
-    }
-    "determine toLowerCase" in {
+    "determine toLowerCase" in
       val input = op1Input(toLowerCase, homStrings)
 
       val result = testEval(input)
@@ -126,9 +116,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky",
                            "solstice + 7",
@@ -136,8 +125,7 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")""",
                            "  whitespace       is   awesome  !!!1!!   ",
                            "")
-    }
-    "determine isEmpty" in {
+    "determine isEmpty" in
       val input = op1Input(isEmpty, homStrings)
 
       val result = testEval(input)
@@ -145,13 +133,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine intern" in {
+    "determine intern" in
       val input = op1Input(intern, homStrings)
 
       val result = testEval(input)
@@ -159,9 +145,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky",
                            "solstice + 7",
@@ -169,9 +154,8 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")""",
                            "  Whitespace       is   awesome  !!!1!!   ",
                            "")
-    }
 
-    "determine codePointAt with valid integer" in {
+    "determine codePointAt with valid integer" in
       val input = op2Input(codePointAt, CLong(7), homStrings)
 
       val result = testEval(input)
@@ -179,13 +163,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(4)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(101, 32, 34, 115)
-    }
-    "determine codePointAt with invalid integer" in {
+    "determine codePointAt with invalid integer" in
       val input = op2Input(codePointAt, CNum(7.5), homStrings)
 
       val result = testEval(input)
@@ -193,13 +175,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(0)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain()
-    }
-    "determine startsWith" in {
+    "determine startsWith" in
       val input = op2Input(startsWith, CString("s"), homStrings)
 
       val result = testEval(input)
@@ -207,13 +187,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine lastIndexOf" in {
+    "determine lastIndexOf" in
       val input = op2Input(lastIndexOf, CString("s"), homStrings)
 
       val result = testEval(input)
@@ -221,13 +199,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(-1, 3, 14, 27)
-    }
-    "determine concat" in {
+    "determine concat" in
       val input = op2Input(concat, CString("7"), homStrings)
 
       val result = testEval(input)
@@ -235,9 +211,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky7",
                            "solstice + 77",
@@ -245,8 +220,7 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")7""",
                            "  Whitespace       is   awesome  !!!1!!   7",
                            "7")
-    }
-    "determine endsWith" in {
+    "determine endsWith" in
       val input = op2Input(endsWith, CString("y"), homStrings)
 
       val result = testEval(input)
@@ -254,13 +228,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine codePointBefore with valid integer" in {
+    "determine codePointBefore with valid integer" in
       val input = op2Input(codePointBefore, CLong(7), homStrings)
 
       val result = testEval(input)
@@ -268,13 +240,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(4)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(99, 58, 97, 101)
-    }
-    "determine codePointBefore with invalid integer" in {
+    "determine codePointBefore with invalid integer" in
       val input = op2Input(codePointBefore, CNum(7.5), homStrings)
 
       val result = testEval(input)
@@ -282,90 +252,76 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(0)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain()
-    }
-    "determine takeLeft with valid integer" in {
+    "determine takeLeft with valid integer" in
       val input = op2Input(takeLeft, CLong(8), homStrings)
 
       val result = testEval(input)
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(
           "", "quirky", "solstice", "Monkey: ", "(\"alpha\"", "  Whites").only
-    }
-    "determine takeRight with valid integer" in {
+    "determine takeRight with valid integer" in
       val input = op2Input(takeRight, CLong(8), homStrings)
 
       val result = testEval(input)
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(
           "", "quirky", "tice + 7", "[Brains]", "\"gamma\")", "!!1!!   ").only
-    }
-    "determine dropLeft with valid integer" in {
+    "determine dropLeft with valid integer" in
       val input = op2Input(dropLeft, CLong(8), homStrings)
 
       val result = testEval(input)
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("",
                            " + 7",
                            "[Brains]",
                            ", \"beta\", \"gamma\")",
                            "pace       is   awesome  !!!1!!   ").only
-    }
-    "determine dropRight with valid integer" in {
+    "determine dropRight with valid integer" in
       val input = op2Input(dropRight, CLong(8), homStrings)
       val result = testEval(input)
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("",
                            "sols",
                            "Monkey: ",
                            "(\"alpha\", \"beta\", ",
                            "  Whitespace       is   awesome  !").only
-    }
-    "determine takeLeft with invalid integer" in {
+    "determine takeLeft with invalid integer" in
       val input = op2Input(takeLeft, CNum(7.5), homStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine takeRight with invalid integer" in {
+    "determine takeRight with invalid integer" in
       val input = op2Input(takeRight, CNum(7.5), homStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine dropLeft with invalid integer" in {
+    "determine dropLeft with invalid integer" in
       val input = op2Input(dropLeft, CNum(7.5), homStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine dropRight with invalid integer" in {
+    "determine dropRight with invalid integer" in
       val input = op2Input(dropRight, CNum(7.5), homStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine matches" in {
+    "determine matches" in
       val input =
         op2Input(matches, CString("quirky"), homStrings) //todo put regex here!
 
@@ -374,13 +330,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine matches with capture" in {
+    "determine matches with capture" in
       val input =
         op2Input(regexMatch, CString(""".*(e)[^a]*(a)?[^a]*.*"""), homStrings)
 
@@ -388,14 +342,12 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(4)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SArray(vec)) if ids.length == 1 => vec
-        }
 
       result2 must contain(Vector(SString("e"), SString("a")),
                            Vector(SString("e"), SString("")))
-    }
-    "determine compareTo" in {
+    "determine compareTo" in
       val input =
         op2Input(compareTo, CString("quirky"), homStrings) //todo put regex here!
 
@@ -404,13 +356,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -36, -73, -81, -6)
-    }
-    "determine compareToIgnoreCase" in {
+    "determine compareToIgnoreCase" in
       val input =
         Join(BuiltInFunction2Op(compareToIgnoreCase),
              Cross(None),
@@ -422,13 +372,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -4, -73, -81, -6)
-    }
-    "determine compare" in {
+    "determine compare" in
       val input =
         op2Input(compare, CString("quirky"), homStrings) //todo put regex here!
 
@@ -437,13 +385,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -36, -73, -81, -6)
-    }
-    "determine compareIgnoreCase" in {
+    "determine compareIgnoreCase" in
       val input =
         Join(BuiltInFunction2Op(compareIgnoreCase),
              Cross(None),
@@ -455,13 +401,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -4, -73, -81, -6)
-    }
-    "determine equals" in {
+    "determine equals" in
       val input =
         Join(BuiltInFunction2Op(library.equals),
              Cross(None),
@@ -473,13 +417,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine indexOf" in {
+    "determine indexOf" in
       val input =
         Join(BuiltInFunction2Op(indexOf),
              Cross(None),
@@ -491,13 +433,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(-1, 7, 4, 12, 6)
-    }
-    "determine equalsIgnoreCase" in {
+    "determine equalsIgnoreCase" in
       val input =
         Join(BuiltInFunction2Op(equalsIgnoreCase),
              Cross(None),
@@ -509,16 +449,13 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-  }
 
-  "for heterogeneous sets, the appropriate string function" should {
-    "determine length" in {
+  "for heterogeneous sets, the appropriate string function" should
+    "determine length" in
       val input = dag.Operate(
           BuiltInFunction1Op(library.length),
           dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
@@ -528,13 +465,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(6, 12, 16, 26, 42, 0)
-    }
-    "determine trim" in {
+    "determine trim" in
       val input = dag.Operate(
           BuiltInFunction1Op(trim),
           dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
@@ -544,9 +479,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky",
                            "solstice + 7",
@@ -554,8 +488,7 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")""",
                            "Whitespace       is   awesome  !!!1!!",
                            "")
-    }
-    "determine toUpperCase" in {
+    "determine toUpperCase" in
       val input = dag.Operate(
           BuiltInFunction1Op(toUpperCase),
           dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
@@ -565,9 +498,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("QUIRKY",
                            "SOLSTICE + 7",
@@ -575,8 +507,7 @@ trait StringLibSpecs[M[+ _]]
                            """("ALPHA", "BETA", "GAMMA")""",
                            "  WHITESPACE       IS   AWESOME  !!!1!!   ",
                            "")
-    }
-    "determine toLowerCase" in {
+    "determine toLowerCase" in
       val input = dag.Operate(
           BuiltInFunction1Op(toLowerCase),
           dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
@@ -586,9 +517,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky",
                            "solstice + 7",
@@ -596,8 +526,7 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")""",
                            "  whitespace       is   awesome  !!!1!!   ",
                            "")
-    }
-    "determine isEmpty" in {
+    "determine isEmpty" in
       val input = dag.Operate(
           BuiltInFunction1Op(isEmpty),
           dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
@@ -607,13 +536,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine intern" in {
+    "determine intern" in
       val input = dag.Operate(
           BuiltInFunction1Op(intern),
           dag.AbsoluteLoad(Const(CString("/het/strings"))(line))(line))(line)
@@ -623,9 +550,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky",
                            "solstice + 7",
@@ -633,9 +559,8 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")""",
                            "  Whitespace       is   awesome  !!!1!!   ",
                            "")
-    }
 
-    "determine codePointAt with valid integer" in {
+    "determine codePointAt with valid integer" in
       val input =
         Join(BuiltInFunction2Op(codePointAt),
              Cross(None),
@@ -647,13 +572,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(4)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(101, 32, 34, 115)
-    }
-    "determine codePointAt with invalid integer" in {
+    "determine codePointAt with invalid integer" in
       val input =
         Join(BuiltInFunction2Op(codePointAt),
              Cross(None),
@@ -665,13 +588,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(0)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain()
-    }
-    "determine startsWith" in {
+    "determine startsWith" in
       val input =
         Join(BuiltInFunction2Op(startsWith),
              Cross(None),
@@ -683,13 +604,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine lastIndexOf" in {
+    "determine lastIndexOf" in
       val input =
         Join(BuiltInFunction2Op(lastIndexOf),
              Cross(None),
@@ -701,13 +620,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(-1, 3, 14, 27)
-    }
-    "determine concat" in {
+    "determine concat" in
       val input =
         Join(BuiltInFunction2Op(concat),
              Cross(None),
@@ -719,9 +636,8 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("quirky7",
                            "solstice + 77",
@@ -729,8 +645,7 @@ trait StringLibSpecs[M[+ _]]
                            """("alpha", "beta", "gamma")7""",
                            "  Whitespace       is   awesome  !!!1!!   7",
                            "7")
-    }
-    "determine endsWith" in {
+    "determine endsWith" in
       val input =
         Join(BuiltInFunction2Op(endsWith),
              Cross(None),
@@ -742,13 +657,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine codePointBefore with valid integer" in {
+    "determine codePointBefore with valid integer" in
       val input =
         Join(BuiltInFunction2Op(codePointBefore),
              Cross(None),
@@ -760,13 +673,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(4)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(99, 58, 97, 101)
-    }
-    "determine codePointBefore with invalid integer" in {
+    "determine codePointBefore with invalid integer" in
       val input =
         Join(BuiltInFunction2Op(codePointBefore),
              Cross(None),
@@ -778,13 +689,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(0)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain()
-    }
-    "determine takeLeft with valid integer" in {
+    "determine takeLeft with valid integer" in
       val input =
         Join(BuiltInFunction2Op(takeLeft),
              Cross(None),
@@ -795,14 +704,12 @@ trait StringLibSpecs[M[+ _]]
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(
           "", "quirky", "solstice", "Monkey: ", "(\"alpha\"", "  Whites").only
-    }
-    "determine takeRight with valid integer" in {
+    "determine takeRight with valid integer" in
       val input =
         Join(BuiltInFunction2Op(takeRight),
              Cross(None),
@@ -813,14 +720,12 @@ trait StringLibSpecs[M[+ _]]
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(
           "", "quirky", "tice + 7", "[Brains]", "\"gamma\")", "!!1!!   ").only
-    }
-    "determine dropLeft with valid integer" in {
+    "determine dropLeft with valid integer" in
       val input =
         Join(BuiltInFunction2Op(dropLeft),
              Cross(None),
@@ -831,17 +736,15 @@ trait StringLibSpecs[M[+ _]]
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("",
                            " + 7",
                            "[Brains]",
                            ", \"beta\", \"gamma\")",
                            "pace       is   awesome  !!!1!!   ").only
-    }
-    "determine dropRight with valid integer" in {
+    "determine dropRight with valid integer" in
       val input =
         Join(BuiltInFunction2Op(dropRight),
              Cross(None),
@@ -852,33 +755,27 @@ trait StringLibSpecs[M[+ _]]
 
       result must haveSize(6)
       val result2 =
-        result collect {
+        result collect
           case (ids, SString(d)) if ids.length == 1 => d
-        }
 
       result2 must contain("",
                            "sols",
                            "Monkey: ",
                            "(\"alpha\", \"beta\", ",
                            "  Whitespace       is   awesome  !").only
-    }
-    "determine takeLeft with invalid integer" in {
+    "determine takeLeft with invalid integer" in
       val input = op2Input(takeLeft, CNum(7.5), hetStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine takeRight with invalid integer" in {
+    "determine takeRight with invalid integer" in
       val input = op2Input(takeRight, CNum(7.5), hetStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine dropLeft with invalid integer" in {
+    "determine dropLeft with invalid integer" in
       val input = op2Input(dropLeft, CNum(7.5), hetStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine dropRight with invalid integer" in {
+    "determine dropRight with invalid integer" in
       val input = op2Input(dropRight, CNum(7.5), hetStrings)
       testEval(input) must haveSize(0)
-    }
-    "determine matches" in {
+    "determine matches" in
       val input =
         op2Input(matches, CString("quirky"), hetStrings) //todo put regex here!
       val result = testEval(input)
@@ -886,78 +783,66 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine compareTo" in {
+    "determine compareTo" in
       val input = op2Input(compareTo, CString("quirky"), hetStrings)
       val result = testEval(input)
 
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -36, -73, -81, -6)
-    }
-    "determine compareToIgnoreCase" in {
+    "determine compareToIgnoreCase" in
       val input = op2Input(compareToIgnoreCase, CString("QUIRKY"), hetStrings)
       val result = testEval(input)
 
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -4, -73, -81, -6)
-    }
-    "determine compare" in {
+    "determine compare" in
       val input = op2Input(compare, CString("quirky"), hetStrings)
       val result = testEval(input)
 
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -36, -73, -81, -6)
-    }
-    "determine compareIgnoreCase" in {
+    "determine compareIgnoreCase" in
       val input = op2Input(compareIgnoreCase, CString("QUIRKY"), hetStrings)
       val result = testEval(input)
 
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(0, 2, -4, -73, -81, -6)
-    }
-    "determine equals" in {
+    "determine equals" in
       val input = op2Input(library.equals, CString("quirky"), hetStrings)
       val result = testEval(input)
 
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-    "determine indexOf" in {
+    "determine indexOf" in
       val input =
         Join(BuiltInFunction2Op(indexOf),
              Cross(None),
@@ -969,13 +854,11 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(-1, 7, 4, 12, 6)
-    }
-    "determine equalsIgnoreCase" in {
+    "determine equalsIgnoreCase" in
       val input =
         Join(BuiltInFunction2Op(equalsIgnoreCase),
              Cross(None),
@@ -987,16 +870,13 @@ trait StringLibSpecs[M[+ _]]
       result must haveSize(6)
 
       val result2 =
-        result collect {
+        result collect
           case (ids, SBoolean(d)) if ids.length == 1 => d
-        }
 
       result2 must contain(true, false)
-    }
-  }
 
-  "parseNum" should {
-    "handle valid and invalid inputs" in {
+  "parseNum" should
+    "handle valid and invalid inputs" in
       val input =
         dag.Operate(BuiltInFunction1Op(parseNum),
                     dag.AbsoluteLoad(Const(CString("/het/stringNums"))(line))(
@@ -1006,9 +886,8 @@ trait StringLibSpecs[M[+ _]]
 
       result must haveSize(8)
 
-      val ns = result.toList.collect {
+      val ns = result.toList.collect
         case (_, SDecimal(n)) => n
-      }
 
       ns must contain(
           BigDecimal("42"),
@@ -1020,11 +899,9 @@ trait StringLibSpecs[M[+ _]]
           BigDecimal("2.23532235235235353252352343636953295923"),
           BigDecimal("1.2e3")
       ).only
-    }
-  }
 
-  "toString" should {
-    "convert values to strings" in {
+  "toString" should
+    "convert values to strings" in
       val input = dag.Operate(
           BuiltInFunction1Op(numToString),
           dag.AbsoluteLoad(Const(CString("/het/random"))(line))(line))(line)
@@ -1033,9 +910,8 @@ trait StringLibSpecs[M[+ _]]
 
       result must haveSize(6)
 
-      val ss = result.toList.collect {
+      val ss = result.toList.collect
         case (_, SString(s)) => s
-      }
 
       ss must contain(
           "4",
@@ -1045,9 +921,8 @@ trait StringLibSpecs[M[+ _]]
           "3",
           "4"
       ).only
-    }
 
-    "trim the trailing '.0' in round double conversion" in {
+    "trim the trailing '.0' in round double conversion" in
       val input =
         dag.Operate(BuiltInFunction1Op(numToString),
                     dag.Operate(BuiltInFunction1Op(round),
@@ -1056,22 +931,19 @@ trait StringLibSpecs[M[+ _]]
       val resultE = testEval(input)
       resultE must haveSize(1)
 
-      val result = resultE.collect {
+      val result = resultE.collect
         case (_, SString(s)) => s
-      }
 
       result must contain("3")
-    }
-  }
 
-  "split" should {
+  "split" should
 
     val o = scala.math.Ordering.by[(SValue, _), SValue](_._1)
 
     def mogrify(result: Set[(Vector[SValue], SValue)]): List[Vector[String]] =
-      result.toList.map {
+      result.toList.map
         case (Vector(n), SArray(elems)) => (n, elems)
-      }.sorted(o).map(_._2.map { case SString(s) => s })
+      .sorted(o).map(_._2.map { case SString(s) => s })
 
     def mktree(f: Op2, path: String, sep: String) =
       Join(BuiltInFunction2Op(f),
@@ -1096,26 +968,23 @@ trait StringLibSpecs[M[+ _]]
         Vector("something", "basically", "reasonable")
     )
 
-    "quote a regular expression in a split" in {
+    "quote a regular expression in a split" in
       val input = Join(BuiltInFunction2Op(split),
                        Cross(None),
                        Const(CString("foo{bar"))(line),
                        Const(CString("{"))(line))(line)
 
-      testEval(input) collect {
+      testEval(input) collect
         case (_, SArray(vec)) => vec collect { case SString(str) => str }
-      } mustEqual Set(Vector("foo", "bar"))
-    }
+      mustEqual Set(Vector("foo", "bar"))
 
-    "split heterogenous data on ," in {
+    "split heterogenous data on ," in
       tester(split, "/het/strings2", ",") must_== commaSplitString2
-    }
 
-    "splitRegex heterogenous data on ," in {
+    "splitRegex heterogenous data on ," in
       tester(splitRegex, "/het/strings2", ",") must_== commaSplitString2
-    }
 
-    "splitRegex heterogenous data on ,,+" in {
+    "splitRegex heterogenous data on ,,+" in
       tester(splitRegex, "/het/strings2", ",,+") must_== List(
           Vector("this,is,delimited"),
           Vector("this is a string"),
@@ -1129,12 +998,8 @@ trait StringLibSpecs[M[+ _]]
           Vector("", "crazy", ""),
           Vector("something,basically,reasonable")
       )
-    }
 
-    "splitRegex heterogenous data on invalid regex" in {
+    "splitRegex heterogenous data on invalid regex" in
       tester(splitRegex, "/het/strings2", "(99") must_== List()
-    }
-  }
-}
 
 object StringLibSpecs extends StringLibSpecs[test.YId] with test.YIdInstances

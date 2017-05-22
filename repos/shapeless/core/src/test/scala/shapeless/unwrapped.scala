@@ -18,34 +18,30 @@ package shapeless
 
 import org.junit.Test
 
-object WrappedTests {
+object WrappedTests
   trait TestTag
   case class AvWrapper(stringValue: String) extends AnyVal
-}
 import WrappedTests._
 
-class UnwrappedTests {
+class UnwrappedTests
 
-  sealed trait Pass[T] {
+  sealed trait Pass[T]
     type U
     def actual(t: T): T
     def unwrapped(t: T): U
     def wrapped(u: U): T
-  }
-  object Pass {
+  object Pass
     type Aux[T, U0] = Pass[T] { type U = U0 }
     implicit def unwrappedPasses[W, U0](
         implicit uw: Unwrapped.Aux[W, U0]): Pass.Aux[W, U0] =
-      new Pass[W] {
+      new Pass[W]
         type U = U0
         def actual(w: W): W = w
         def unwrapped(w: W): U = uw.unwrap(w)
         def wrapped(u: U): W = uw.wrap(u)
-      }
-  }
 
   @Test
-  def testAnyVal: Unit = {
+  def testAnyVal: Unit =
     val pass = the[Pass[AvWrapper]]
     the[pass.U =:= String]
     val avw = AvWrapper("testing")
@@ -55,14 +51,12 @@ class UnwrappedTests {
     assert((actual: AvWrapper) == avw)
     assert((wrapped: AvWrapper) == avw)
     assert((unwrapped: String) == avw.stringValue)
-  }
 
   @Test
-  def testNewtype: Unit = {
+  def testNewtype: Unit =
     import newtype._
-    case class MyStringOps(s: String) {
+    case class MyStringOps(s: String)
       def stringValue: String = s
-    }
     type MyString = Newtype[String, MyStringOps]
     def MyString(s: String): MyString = newtype(s)
     implicit val mkOps = MyStringOps
@@ -76,27 +70,24 @@ class UnwrappedTests {
     assert((actual: MyString) == ms)
     assert((wrapped: MyString) == ms)
     assert((unwrapped: String) == ms.stringValue)
-  }
 
   @Test
-  def testScalazTagged: Unit = {
+  def testScalazTagged: Unit =
 
     type Tagged[A, T] = { type Tag = T; type Self = A }
     type @@[T, Tag] = Tagged[T, Tag]
 
     def tag[U] = new Tagger[U]
-    class Tagger[U] {
+    class Tagger[U]
       def apply[T](t: T): T @@ U = t.asInstanceOf[T @@ U]
-    }
     def value[T](t: Tagged[T, _]): T = t.asInstanceOf[T]
 
     implicit def taggedUnwrapped[UI, T, UF](
         implicit chain: Lazy[Unwrapped.Aux[UI, UF]]) =
-      new Unwrapped[UI @@ T] {
+      new Unwrapped[UI @@ T]
         type U = UF
         def unwrap(w: UI @@ T) = chain.value.unwrap(value(w))
         def wrap(u: UF) = tag[T](chain.value.wrap(u))
-      }
 
     val pass = the[Pass[String @@ TestTag]]
     the[pass.U =:= String]
@@ -108,10 +99,9 @@ class UnwrappedTests {
     assert((wrapped: String @@ TestTag) == tagged)
     assert((unwrapped: String) == value(tagged))
     test.illTyped("unwrapped: String @@ TestTag")
-  }
 
   @Test
-  def testAlreadyUnwrapped: Unit = {
+  def testAlreadyUnwrapped: Unit =
 
     val pass = the[Pass[String]]
     the[pass.U =:= String]
@@ -122,15 +112,13 @@ class UnwrappedTests {
     assert((actual: String) == raw)
     assert((wrapped: String) == raw)
     assert((unwrapped: String) == raw)
-  }
 
   @Test
-  def unwrapsChain: Unit = {
+  def unwrapsChain: Unit =
     import newtype._
 
-    case class MyStringOps(s: AvWrapper) {
+    case class MyStringOps(s: AvWrapper)
       def stringValue: String = s.stringValue
-    }
     type MyString = Newtype[AvWrapper, MyStringOps]
     def MyString(a: AvWrapper): MyString = newtype(a)
     implicit val mkOps = MyStringOps
@@ -145,14 +133,11 @@ class UnwrappedTests {
     assert((actual: MyString) == ms)
     assert((wrapped: MyString) == ms)
     assert((unwrapped: String) == ms.stringValue)
-  }
 
   @Test
-  def testSyntax: Unit = {
+  def testSyntax: Unit =
     import syntax.unwrapped._
     val w = "testing".wrap[AvWrapper]
     test.typed(w: AvWrapper)
     val u = w.unwrap
     test.typed(u: String)
-  }
-}

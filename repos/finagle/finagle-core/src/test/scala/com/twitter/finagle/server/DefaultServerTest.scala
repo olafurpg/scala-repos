@@ -17,27 +17,25 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class DefaultServerTest extends FunSpec with MockitoSugar {
-  describe("DefaultServer") {
+class DefaultServerTest extends FunSpec with MockitoSugar
+  describe("DefaultServer")
     val name = "name"
 
-    it("should successfully add sourcedexception") {
+    it("should successfully add sourcedexception")
       val qIn = new AsyncQueue[Try[Int]]()
       val qOut = new AsyncQueue[Try[Int]]()
       val listener = new FakeListener[Try[Int]](qIn, qOut)
       val clientTransport = new QueueTransport(qOut, qIn)
 
       val serviceTransport: (Transport[Try[Int], Try[Int]],
-      Service[Try[Int], Try[Int]]) => Closable = {
+      Service[Try[Int], Try[Int]]) => Closable =
         case (transport, service) =>
           val f =
-            transport.read() flatMap { num =>
+            transport.read() flatMap  num =>
               service(num)
-            } respond { result =>
+            respond  result =>
               transport.write(result.flatten)
-            }
           service
-      }
 
       val server: Server[Try[Int], Try[Int]] =
         DefaultServer[Try[Int], Try[Int], Try[Int], Try[Int]](
@@ -45,20 +43,18 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
 
       val socket = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
       val factory =
-        ServiceFactory.const(Service.mk[Try[Int], Try[Int]] { num =>
+        ServiceFactory.const(Service.mk[Try[Int], Try[Int]]  num =>
           Future.exception(new SourcedException {})
-        })
+        )
 
       val listeningServer: ListeningServer = server.serve(socket, factory)
 
       Await.result(clientTransport.write(Return(3)))
-      val e = intercept[SourcedException] {
+      val e = intercept[SourcedException]
         Await.result(clientTransport.read())()
-      }
       assert(e.serviceName == name)
-    }
 
-    it("should close ServiceFactory and any dispatcher(s) on closure") {
+    it("should close ServiceFactory and any dispatcher(s) on closure")
       val qIn = new AsyncQueue[Try[Int]]()
       val qOut = new AsyncQueue[Try[Int]]()
       val listener = new FakeListener[Try[Int]](qIn, qOut)
@@ -87,9 +83,8 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       Await.result(listeningServer.close(deadline))
       verify(factory).close(deadline)
       verify(mockConnHandle).close(deadline)
-    }
 
-    it("should drain outstanding request on closure") {
+    it("should drain outstanding request on closure")
       val qIn = new AsyncQueue[Try[Int]]()
       val qOut = new AsyncQueue[Try[Int]]()
       val listener = new FakeListener[Try[Int]](qIn, qOut)
@@ -108,9 +103,8 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       val socket = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
 
       val p = Promise[Try[Int]]
-      val svc = Service.mk[Try[Int], Try[Int]] { _ =>
+      val svc = Service.mk[Try[Int], Try[Int]]  _ =>
         p
-      }
       val factory = ServiceFactory.const(svc)
       val listeningServer: ListeningServer = server.serve(socket, factory)
 
@@ -134,16 +128,11 @@ class DefaultServerTest extends FunSpec with MockitoSugar {
       p.setValue(Return(3))
       assert(f.isDefined == true)
       assert(closed.isDefined == true)
-    }
-  }
-}
 
 class FakeListener[T](qIn: AsyncQueue[T], qOut: AsyncQueue[T])
-    extends Listener[T, T] {
+    extends Listener[T, T]
   override def listen(addr: SocketAddress)(
-      serveTransport: Transport[T, T] => Unit): ListeningServer = {
+      serveTransport: Transport[T, T] => Unit): ListeningServer =
     val transport = new QueueTransport(qIn, qOut)
     serveTransport(transport)
     NullServer
-  }
-}

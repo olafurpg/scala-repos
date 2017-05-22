@@ -1,6 +1,6 @@
 package com.twitter.finagle.http
 
-object MediaType {
+object MediaType
   // Common media types
   val Atom = "application/atom+xml"
   val Csv = "application/csv"
@@ -19,4 +19,3 @@ object MediaType {
   val Xls = "application/vnd.ms-excel"
   val Xml = "application/xml"
   val Zip = "application/zip"
-}

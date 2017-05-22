@@ -9,20 +9,16 @@ import org.scalatest.WordSpec;
   *
   * This is required to make Akka Exceptions be friends with serialization/deserialization.
   */
-class AkkaExceptionSpec extends WordSpec with Matchers {
+class AkkaExceptionSpec extends WordSpec with Matchers
 
-  "AkkaException" must {
-    "have a AkkaException(String msg) constructor to be serialization friendly" in {
+  "AkkaException" must
+    "have a AkkaException(String msg) constructor to be serialization friendly" in
       //if the call to this method completes, we know what there is at least a single constructor which has
       //the expected argument type.
       verify(classOf[AkkaException])
 
       //lets also try it for the exception that triggered this bug to be discovered.
       verify(classOf[ActorKilledException])
-    }
-  }
 
-  def verify(clazz: java.lang.Class[_]) {
+  def verify(clazz: java.lang.Class[_])
     clazz.getConstructor(Array(classOf[String]): _*)
-  }
-}

@@ -30,11 +30,10 @@ import java.util.concurrent.TimeoutException
 @SerialVersionUID(1L)
 final case class ScatterGatherFirstCompletedRoutingLogic(
     within: FiniteDuration)
-    extends RoutingLogic {
+    extends RoutingLogic
   override def select(
       message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
     ScatterGatherFirstCompletedRoutees(routees, within)
-}
 
 /**
   * INTERNAL API
@@ -42,29 +41,26 @@ final case class ScatterGatherFirstCompletedRoutingLogic(
 @SerialVersionUID(1L)
 private[akka] final case class ScatterGatherFirstCompletedRoutees(
     routees: immutable.IndexedSeq[Routee], within: FiniteDuration)
-    extends Routee {
+    extends Routee
 
   override def send(message: Any, sender: ActorRef): Unit =
-    if (routees.isEmpty) {
+    if (routees.isEmpty)
       implicit val ec = ExecutionContexts.sameThreadExecutionContext
       val reply =
         Future.failed(new TimeoutException("Timeout due to no routees"))
       reply.pipeTo(sender)
-    } else {
+    else
       implicit val ec = ExecutionContexts.sameThreadExecutionContext
       implicit val timeout = Timeout(within)
       val promise = Promise[Any]()
-      routees.foreach {
+      routees.foreach
         case ActorRefRoutee(ref) ⇒
           promise.tryCompleteWith(ref.ask(message))
         case ActorSelectionRoutee(sel) ⇒
           promise.tryCompleteWith(sel.ask(message))
         case _ ⇒
-      }
 
       promise.future.pipeTo(sender)
-    }
-}
 
 /**
   * A router pool that broadcasts the message to all routees, and replies with the first response.
@@ -108,7 +104,7 @@ final case class ScatterGatherFirstCompletedPool(
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
     extends Pool
-    with PoolOverrideUnsetConfig[ScatterGatherFirstCompletedPool] {
+    with PoolOverrideUnsetConfig[ScatterGatherFirstCompletedPool]
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),
@@ -157,7 +153,6 @@ final case class ScatterGatherFirstCompletedPool(
     */
   override def withFallback(other: RouterConfig): RouterConfig =
     this.overrideUnsetConfig(other)
-}
 
 /**
   * A router group that broadcasts the message to all routees, and replies with the first response.
@@ -180,7 +175,7 @@ final case class ScatterGatherFirstCompletedGroup(
     override val paths: immutable.Iterable[String],
     within: FiniteDuration,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
-    extends Group {
+    extends Group
 
   def this(config: Config) =
     this(paths = immutableSeq(config.getStringList("routees.paths")),
@@ -208,4 +203,3 @@ final case class ScatterGatherFirstCompletedGroup(
     */
   def withDispatcher(dispatcherId: String): ScatterGatherFirstCompletedGroup =
     copy(routerDispatcher = dispatcherId)
-}

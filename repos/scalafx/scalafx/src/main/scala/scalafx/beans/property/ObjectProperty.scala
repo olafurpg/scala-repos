@@ -39,7 +39,7 @@ import scalafx.delegate.SFXDelegate
   *                 [[https://github.com/scalafx/scalafx/issues/14]]. Created object property will have value type
   *                 of the wrapped JavaFX type to simplify use with binding.
   */
-object ObjectProperty {
+object ObjectProperty
 
   /**
     * Implicit conversion from a ScalaFX's $OP to a JavaFX's
@@ -119,13 +119,11 @@ object ObjectProperty {
     * @param value Value to be injected in $OP, to avoid implicit conversion and NPE is `value` is `null`.
     */
   def fillProperty[J <: AnyRef](
-      property: ObjectProperty[J], value: SFXDelegate[J]) {
-    if (value == null) {
+      property: ObjectProperty[J], value: SFXDelegate[J])
+    if (value == null)
       property.delegate.setValue(null.asInstanceOf[J])
-    } else {
+    else
       property() = value.delegate
-    }
-  }
 
   /**
     * Helper method for setting a value of an `ObjectProperty`,
@@ -138,14 +136,11 @@ object ObjectProperty {
     * @param property $OP to be filled.
     * @param value Value to be injected in $OP.
     */
-  def fillProperty[J <: AnyRef](property: ObjectProperty[J], value: J) {
-    if (value == null) {
+  def fillProperty[J <: AnyRef](property: ObjectProperty[J], value: J)
+    if (value == null)
       property.delegate.setValue(null.asInstanceOf[J])
-    } else {
+    else
       property() = value
-    }
-  }
-}
 
 /**
   * This class provides a full implementation of a Property wrapping an arbitrary Object.
@@ -164,7 +159,7 @@ class ObjectProperty[T <: Any](
     override val delegate: jfxbp.ObjectProperty[T] = new jfxbp.SimpleObjectProperty[
           T])
     extends ReadOnlyObjectProperty[T](delegate) with Property[T, T]
-    with SFXDelegate[jfxbp.ObjectProperty[T]] {
+    with SFXDelegate[jfxbp.ObjectProperty[T]]
 
   def this(bean: Object, name: String) =
     this(new jfxbp.SimpleObjectProperty[T](bean, name))
@@ -172,7 +167,5 @@ class ObjectProperty[T <: Any](
   def this(bean: Object, name: String, initialValue: T) =
     this(new jfxbp.SimpleObjectProperty[T](bean, name, initialValue))
 
-  def value_=(v: T) {
+  def value_=(v: T)
     delegate.set(v)
-  }
-}

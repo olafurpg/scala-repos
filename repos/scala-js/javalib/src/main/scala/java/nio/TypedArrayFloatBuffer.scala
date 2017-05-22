@@ -7,7 +7,7 @@ private[nio] final class TypedArrayFloatBuffer private (
     _initialPosition: Int,
     _initialLimit: Int,
     _readOnly: Boolean)
-    extends FloatBuffer(_typedArray.length, null, -1) {
+    extends FloatBuffer(_typedArray.length, null, -1)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -93,27 +93,23 @@ private[nio] final class TypedArrayFloatBuffer private (
   override private[nio] def store(
       startIndex: Int, src: Array[Float], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}
 
-private[nio] object TypedArrayFloatBuffer {
+private[nio] object TypedArrayFloatBuffer
   private[nio] implicit object NewTypedArrayFloatBuffer
-      extends GenTypedArrayBuffer.NewTypedArrayBuffer[FloatBuffer] {
+      extends GenTypedArrayBuffer.NewTypedArrayBuffer[FloatBuffer]
     def bytesPerElem: Int = 4
 
     def apply(typedArray: Float32Array,
               initialPosition: Int,
               initialLimit: Int,
-              readOnly: Boolean): TypedArrayFloatBuffer = {
+              readOnly: Boolean): TypedArrayFloatBuffer =
       new TypedArrayFloatBuffer(
           typedArray, initialPosition, initialLimit, readOnly)
-    }
 
     @inline
     def newTypedArray(
-        buffer: ArrayBuffer, byteOffset: Int, length: Int): Float32Array = {
+        buffer: ArrayBuffer, byteOffset: Int, length: Int): Float32Array =
       new Float32Array(buffer, byteOffset, length)
-    }
-  }
 
   @inline
   def fromTypedArrayByteBuffer(byteBuffer: TypedArrayByteBuffer): FloatBuffer =
@@ -121,4 +117,3 @@ private[nio] object TypedArrayFloatBuffer {
 
   def wrap(array: Float32Array): FloatBuffer =
     new TypedArrayFloatBuffer(array, 0, array.length, false)
-}

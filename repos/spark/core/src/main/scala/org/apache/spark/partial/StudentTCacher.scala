@@ -24,7 +24,7 @@ import org.apache.commons.math3.distribution.{NormalDistribution, TDistribution}
   * and various sample sizes. This is used by the MeanEvaluator to efficiently calculate
   * confidence intervals for many keys.
   */
-private[spark] class StudentTCacher(confidence: Double) {
+private[spark] class StudentTCacher(confidence: Double)
 
   val NORMAL_APPROX_SAMPLE_SIZE =
     100 // For samples bigger than this, use Gaussian approximation
@@ -33,17 +33,13 @@ private[spark] class StudentTCacher(confidence: Double) {
     .inverseCumulativeProbability(1 - (1 - confidence) / 2)
   val cache = Array.fill[Double](NORMAL_APPROX_SAMPLE_SIZE)(-1.0)
 
-  def get(sampleSize: Long): Double = {
-    if (sampleSize >= NORMAL_APPROX_SAMPLE_SIZE) {
+  def get(sampleSize: Long): Double =
+    if (sampleSize >= NORMAL_APPROX_SAMPLE_SIZE)
       normalApprox
-    } else {
+    else
       val size = sampleSize.toInt
-      if (cache(size) < 0) {
+      if (cache(size) < 0)
         val tDist = new TDistribution(size - 1)
         cache(size) = tDist.inverseCumulativeProbability(
             1 - (1 - confidence) / 2)
-      }
       cache(size)
-    }
-  }
-}

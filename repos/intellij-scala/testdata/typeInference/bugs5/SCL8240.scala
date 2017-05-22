@@ -1,15 +1,14 @@
-object SCL8240 {
+object SCL8240
 
-  trait A {
+  trait A
 
     trait B
 
     def c: B
-  }
 
   trait D
 
-  trait E {
+  trait E
     val f: A with D
 
     def foo(b: f.B) = 1
@@ -20,6 +19,4 @@ object SCL8240 {
     foo(f.c)
     /*end*/
     val g: f.B = f.c
-  }
-}
 //Int

@@ -13,9 +13,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
   * 11/6/13
   */
 class MakeNonPrivateQuickFix(member: ScModifierListOwner, toProtected: Boolean)
-    extends IntentionAction {
+    extends IntentionAction
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     member.setModifierProperty("private", value = false)
     if (toProtected) member.setModifierProperty("protected", value = true)
     PsiDocumentManager
@@ -25,7 +25,6 @@ class MakeNonPrivateQuickFix(member: ScModifierListOwner, toProtected: Boolean)
       .getInstance(project)
       .adjustLineIndent(
           file, member.getModifierList.getTextRange.getStartOffset)
-  }
 
   def getText: String =
     if (toProtected) "Make field protected" else "Make field public"
@@ -37,4 +36,3 @@ class MakeNonPrivateQuickFix(member: ScModifierListOwner, toProtected: Boolean)
     member.getManager.isInProject(file)
 
   def startInWriteAction(): Boolean = true
-}

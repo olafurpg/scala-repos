@@ -8,7 +8,7 @@ import spire.math.LinearMerge
 
 import ichi.bench.Thyme
 
-object MergeBenchmark extends App {
+object MergeBenchmark extends App
 
   val th = Thyme.warmed(verbose = println)
   // val th = new Thyme()
@@ -22,4 +22,3 @@ object MergeBenchmark extends App {
   val bi = (1000 until 1001).toArray
   th.pbenchOffWarm("binary merge vs. linear merge (Int)")(
       th.Warm(LinearMerge.merge(ai, bi)))(th.Warm(BinaryMerge.merge(ai, bi)))
-}

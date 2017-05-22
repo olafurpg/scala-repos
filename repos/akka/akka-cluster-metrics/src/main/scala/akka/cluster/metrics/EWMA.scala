@@ -25,7 +25,7 @@ import scala.concurrent.duration.FiniteDuration
   *
   */
 @SerialVersionUID(1L)
-final case class EWMA(value: Double, alpha: Double) {
+final case class EWMA(value: Double, alpha: Double)
 
   require(0.0 <= alpha && alpha <= 1.0, "alpha must be between 0.0 and 1.0")
 
@@ -35,14 +35,12 @@ final case class EWMA(value: Double, alpha: Double) {
     * @param xn the new data point
     * @return a new EWMA with the updated value
     */
-  def :+(xn: Double): EWMA = {
+  def :+(xn: Double): EWMA =
     val newValue = (alpha * xn) + (1 - alpha) * value
     if (newValue == value) this // no change
     else copy(value = newValue)
-  }
-}
 
-object EWMA {
+object EWMA
 
   /**
     * math.log(2)
@@ -59,10 +57,8 @@ object EWMA {
     * 1 – 0.5 ^ (collect-interval / half-life).
     */
   def alpha(
-      halfLife: FiniteDuration, collectInterval: FiniteDuration): Double = {
+      halfLife: FiniteDuration, collectInterval: FiniteDuration): Double =
     val halfLifeMillis = halfLife.toMillis
     require(halfLife.toMillis > 0, "halfLife must be > 0 s")
     val decayRate = LogOf2 / halfLifeMillis
     1 - math.exp(-decayRate * collectInterval.toMillis)
-  }
-}

@@ -18,7 +18,7 @@ import akka.remote.testconductor.RoleName
 import akka.actor.Identify
 import scala.concurrent.Await
 
-object RemoteNodeShutdownAndComesBackSpec extends MultiNodeConfig {
+object RemoteNodeShutdownAndComesBackSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -33,13 +33,10 @@ object RemoteNodeShutdownAndComesBackSpec extends MultiNodeConfig {
 
   testTransport(on = true)
 
-  class Subject extends Actor {
-    def receive = {
+  class Subject extends Actor
+    def receive =
       case "shutdown" ⇒ context.system.terminate()
       case msg ⇒ sender() ! msg
-    }
-  }
-}
 
 class RemoteNodeShutdownAndComesBackMultiJvmNode1
     extends RemoteNodeShutdownAndComesBackSpec
@@ -48,22 +45,21 @@ class RemoteNodeShutdownAndComesBackMultiJvmNode2
 
 abstract class RemoteNodeShutdownAndComesBackSpec
     extends MultiNodeSpec(RemoteNodeShutdownAndComesBackSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec with ImplicitSender
 
   import RemoteNodeShutdownAndComesBackSpec._
 
   override def initialParticipants = roles.size
 
-  def identify(role: RoleName, actorName: String): ActorRef = {
+  def identify(role: RoleName, actorName: String): ActorRef =
     system.actorSelection(node(role) / "user" / actorName) ! Identify(
         actorName)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  "RemoteNodeShutdownAndComesBack" must {
+  "RemoteNodeShutdownAndComesBack" must
 
-    "properly reset system message buffer state when new system with same Address comes up" taggedAs LongRunningTest in {
-      runOn(first) {
+    "properly reset system message buffer state when new system with same Address comes up" taggedAs LongRunningTest in
+      runOn(first)
         val secondAddress = node(second).address
         system.actorOf(Props[Subject], "subject1")
         enterBarrier("actors-started")
@@ -99,19 +95,16 @@ abstract class RemoteNodeShutdownAndComesBackSpec
         // the system message send state
 
         // Now wait until second system becomes alive again
-        within(30.seconds) {
+        within(30.seconds)
           // retry because the Subject actor might not be started yet
-          awaitAssert {
+          awaitAssert
             val p = TestProbe()
             system
               .actorSelection(
                   RootActorPath(secondAddress) / "user" / "subject")
               .tell(Identify("subject"), p.ref)
-            p.expectMsgPF(1 second) {
+            p.expectMsgPF(1 second)
               case ActorIdentity("subject", Some(ref)) ⇒ true
-            }
-          }
-        }
 
         expectTerminated(subject)
 
@@ -126,12 +119,10 @@ abstract class RemoteNodeShutdownAndComesBackSpec
 
         subjectNew ! "shutdown"
         // we are waiting for a Terminated here, but it is ok if it does not arrive
-        receiveWhile(5.seconds) {
+        receiveWhile(5.seconds)
           case _: ActorIdentity ⇒ true
-        }
-      }
 
-      runOn(second) {
+      runOn(second)
         val addr =
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         system.actorOf(Props[Subject], "subject")
@@ -153,7 +144,3 @@ abstract class RemoteNodeShutdownAndComesBackSpec
         freshSystem.actorOf(Props[Subject], "subject")
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)
-      }
-    }
-  }
-}

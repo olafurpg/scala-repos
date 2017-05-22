@@ -10,7 +10,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class SamplingTracerTest extends FunSuite with MockitoSugar {
+class SamplingTracerTest extends FunSuite with MockitoSugar
 
   private val traceId = TraceId(
       None,
@@ -27,7 +27,7 @@ class SamplingTracerTest extends FunSuite with MockitoSugar {
       None
   )
 
-  test("sends sampled events to Sink") {
+  test("sends sampled events to Sink")
     val sink = mock[Sink]
     when(sink.recording).thenReturn(true)
     val tracer = mock[Tracer]
@@ -36,14 +36,11 @@ class SamplingTracerTest extends FunSuite with MockitoSugar {
 
     verify(sink, times(1))
       .event(ZipkinTracer.Trace, objectVal = record.annotation)
-  }
 
-  test("does not send events to sink when not sampled") {
+  test("does not send events to sink when not sampled")
     val sink = mock[Sink]
     val tracer = mock[Tracer]
     val samplingTracer = new SamplingTracer(tracer, 0f, sink)
     samplingTracer.record(record)
 
     verifyNoMoreInteractions(sink)
-  }
-}

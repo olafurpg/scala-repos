@@ -9,23 +9,22 @@ import com.twitter.common.io.FileUtils.createTempDir
 import com.twitter.common.quantity.{Amount, Time}
 import com.twitter.zk.ServerCnxnFactory
 
-class ZkInstance {
+class ZkInstance
   var connectionFactory: ServerCnxnFactory = null
   var zookeeperServer: ZooKeeperServer = null
   var zookeeperClient: ZooKeeperClient = null
   var started = false
 
-  lazy val zookeeperAddress = {
+  lazy val zookeeperAddress =
     if (!started)
       throw new IllegalStateException(
           "can't get address until instance is started")
     new InetSocketAddress(zookeeperServer.getClientPort)
-  }
 
   lazy val zookeeperConnectString =
     zookeeperAddress.getHostName() + ":" + zookeeperAddress.getPort();
 
-  def start() {
+  def start()
     started = true
 
     val txn = new FileTxnSnapLog(createTempDir(), createTempDir())
@@ -42,10 +41,7 @@ class ZkInstance {
 
     // Disable noise from zookeeper logger
 //    java.util.logging.LogManager.getLogManager().reset();
-  }
 
-  def stop() {
+  def stop()
     connectionFactory.shutdown()
     zookeeperClient.close()
-  }
-}

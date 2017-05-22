@@ -43,8 +43,8 @@ import SieveUtil._
   * interesting, besides report prime numbers. Currently its internals
   * are made available to the Siever.
   */
-object SieveSegment {
-  val wheel30: Array[Int] = {
+object SieveSegment
+  val wheel30: Array[Int] =
     var b: Long = 0L
     b |= (1 << 1)
     b |= (1 << 7)
@@ -56,56 +56,47 @@ object SieveSegment {
     b |= (1 << 29)
     val n: Long = b | (b << 30L)
     val arr = new Array[Int](15)
-    cfor(0)(_ < 15, _ + 1) { i =>
+    cfor(0)(_ < 15, _ + 1)  i =>
       arr(i) = ((n >>> (i * 2)) & 0xffffffffL).toInt
-    }
     arr
-  }
-}
 
-case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
+case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong)
   def isPrime(n: SafeLong): Boolean = primes((n - start).toInt)
   def isComposite(n: SafeLong): Boolean = !primes((n - start).toInt)
   def set(n: SafeLong): Unit = primes += (n - start).toInt
   def unset(n: SafeLong): Unit = primes -= (n - start).toInt
 
-  def nextAfter(n: SafeLong): SafeLong = {
+  def nextAfter(n: SafeLong): SafeLong =
     var i = (n - start + 2).toInt
     val len = primes.length
-    while (i < len) {
+    while (i < len)
       if (primes(i)) return start + i
       i += 2
-    }
     SafeLong(-1L) // fail
-  }
 
-  def init(fastq: FastFactors, slowq: FactorHeap): Unit = {
+  def init(fastq: FastFactors, slowq: FactorHeap): Unit =
     initMod30()
-    if (start == 0) {
+    if (start == 0)
       initFirst(fastq, slowq)
-    } else {
+    else
       val limit = min(cutoff ** 2, start + primes.length)
       initFromArray(fastq)
       initFromQueue(limit, slowq)
       initRest(slowq)
-    }
-  }
 
-  def initMod30(): Unit = {
+  def initMod30(): Unit =
     val arr = primes.array
     assert(arr.length % 15 == 0)
     val limit = arr.length
     val wheel = SieveSegment.wheel30
     cfor(0)(_ < limit, _ + 15)(i => arraycopy(wheel, 0, arr, i, 15))
-    if (start == 0L) {
+    if (start == 0L)
       primes -= 1
       primes += 2
       primes += 3
       primes += 5
-    }
-  }
 
-  private def initFromArray(fastq: FastFactors): Unit = {
+  private def initFromArray(fastq: FastFactors): Unit =
     val arr = fastq.arr
     var i = 0
 
@@ -113,76 +104,65 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
       if (start + primes.length < cutoff) (cutoff - start).toLong
       else primes.length
 
-    while (i < arr.length) {
+    while (i < arr.length)
       val factor = arr(i)
       var j = (factor.m - start).toInt
       val k = factor.p
       val kk = k + k
       val lim = len - kk
       primes -= j
-      while (j < lim) {
+      while (j < lim)
         j += kk
         primes -= j
-      }
       factor.m = start + j + kk
       i += 1
-    }
-  }
 
-  @tailrec private def initFromQueue(limit: SafeLong, q: FactorHeap): Unit = {
+  @tailrec private def initFromQueue(limit: SafeLong, q: FactorHeap): Unit =
     if (q.isEmpty) return ()
 
     val factor = q.dequeue
     val m = factor.next
-    if (m < limit) {
+    if (m < limit)
       val p = factor.p
       val len = primes.length
       var i = (m - start).toInt
       val m2 =
-        if (p < len) {
+        if (p < len)
           val k = p.toInt
           val kk = k + k
           while (i < len) { primes -= i; i += kk }
           start + i
-        } else {
+        else
           primes -= i
           m + p
-        }
       factor.next = m2
       q += factor
       initFromQueue(limit, q)
-    } else {
+    else
       q += factor
-    }
-  }
 
-  def initFirst(fastq: FastFactors, slowq: FactorHeap): Unit = {
+  def initFirst(fastq: FastFactors, slowq: FactorHeap): Unit =
     var p: Int = 1
     val len = primes.length
     val buf = ArrayBuffer.empty[FastFactor]
-    while (p < len) {
-      if (primes(p)) {
+    while (p < len)
+      if (primes(p))
         var m = p.toLong * p.toLong
-        if (m < len) {
+        if (m < len)
           val pp = p + p
           var k = m.toInt
           primes -= k
           val lim = len - pp
           while (k < lim) { k += pp; primes -= k }
           m = k.toLong + pp
-        }
-        if (p < 7) {} else if (m - primes.length < primes.length) {
+        if (p < 7) {} else if (m - primes.length < primes.length)
           buf += FastFactor(p, SafeLong(m))
-        } else if (cutoff > p) {
+        else if (cutoff > p)
           slowq += Factor(SafeLong(p), SafeLong(m))
-        }
-      }
       p += 2
-    }
     fastq.arr = buf.toArray
-  }
 
-  def initRest(slowq: FactorHeap): Unit = {
+  def initRest(slowq: FactorHeap): Unit =
     if (start >= cutoff) return ()
 
     val len: Long =
@@ -190,12 +170,8 @@ case class SieveSegment(start: SafeLong, primes: BitSet, cutoff: SafeLong) {
       else primes.length
 
     var i = 1
-    while (i < len) {
-      if (primes(i)) {
+    while (i < len)
+      if (primes(i))
         val p: SafeLong = start + i
         slowq += Factor(p, p ** 2)
-      }
       i += 2
-    }
-  }
-}

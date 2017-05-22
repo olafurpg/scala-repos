@@ -8,19 +8,18 @@ import java.io.{ObjectInputStream, ByteArrayInputStream, ByteArrayOutputStream, 
 
 @RunWith(classOf[JUnit4])
 /* Test for SI-7568  */
-class PriorityQueueTest {
+class PriorityQueueTest
   val priorityQueue = new mutable.PriorityQueue[Int]()
   val elements = List.fill(1000)(scala.util.Random.nextInt(Int.MaxValue))
   priorityQueue.enqueue(elements: _*)
 
   @Test
-  def canSerialize() {
+  def canSerialize()
     val outputStream = new ByteArrayOutputStream()
     new ObjectOutputStream(outputStream).writeObject(priorityQueue)
-  }
 
   @Test
-  def maintainsStateWhenDeserialized() {
+  def maintainsStateWhenDeserialized()
     val outputStream = new ByteArrayOutputStream()
     new ObjectOutputStream(outputStream).writeObject(priorityQueue)
     val bytes = outputStream.toByteArray
@@ -30,5 +29,3 @@ class PriorityQueueTest {
     val deserializedPriorityQueue =
       objectInputStream.readObject().asInstanceOf[PriorityQueue[Int]]
     assert(deserializedPriorityQueue.dequeueAll == elements.sorted.reverse)
-  }
-}

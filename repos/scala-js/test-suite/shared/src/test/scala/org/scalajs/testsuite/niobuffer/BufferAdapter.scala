@@ -2,7 +2,7 @@ package org.scalajs.testsuite.niobuffer
 
 import java.nio._
 
-sealed abstract class BufferAdapter[BT <: Buffer, ET] {
+sealed abstract class BufferAdapter[BT <: Buffer, ET]
   type BufferType = BT
   type ElementType = ET
 
@@ -23,11 +23,10 @@ sealed abstract class BufferAdapter[BT <: Buffer, ET] {
   def arrayOffset(): Int
   def compact(): BufferType
   def order(): ByteOrder
-}
 
-object BufferAdapter {
+object BufferAdapter
   class ByteBufferAdapater(val buffer: ByteBuffer)
-      extends BufferAdapter[ByteBuffer, Byte] {
+      extends BufferAdapter[ByteBuffer, Byte]
     def slice(): BufferType = buffer.slice()
     def duplicate(): BufferType = buffer.duplicate()
     def asReadOnlyBuffer(): BufferType = buffer.asReadOnlyBuffer()
@@ -49,10 +48,9 @@ object BufferAdapter {
     def arrayOffset(): Int = buffer.arrayOffset()
     def compact(): BufferType = buffer.compact()
     def order(): ByteOrder = buffer.order()
-  }
 
   class CharBufferAdapater(val buffer: CharBuffer)
-      extends BufferAdapter[CharBuffer, Char] {
+      extends BufferAdapter[CharBuffer, Char]
     def slice(): BufferType = buffer.slice()
     def duplicate(): BufferType = buffer.duplicate()
     def asReadOnlyBuffer(): BufferType = buffer.asReadOnlyBuffer()
@@ -74,10 +72,9 @@ object BufferAdapter {
     def arrayOffset(): Int = buffer.arrayOffset()
     def compact(): BufferType = buffer.compact()
     def order(): ByteOrder = buffer.order()
-  }
 
   class ShortBufferAdapater(val buffer: ShortBuffer)
-      extends BufferAdapter[ShortBuffer, Short] {
+      extends BufferAdapter[ShortBuffer, Short]
     def slice(): BufferType = buffer.slice()
     def duplicate(): BufferType = buffer.duplicate()
     def asReadOnlyBuffer(): BufferType = buffer.asReadOnlyBuffer()
@@ -99,10 +96,9 @@ object BufferAdapter {
     def arrayOffset(): Int = buffer.arrayOffset()
     def compact(): BufferType = buffer.compact()
     def order(): ByteOrder = buffer.order()
-  }
 
   class IntBufferAdapater(val buffer: IntBuffer)
-      extends BufferAdapter[IntBuffer, Int] {
+      extends BufferAdapter[IntBuffer, Int]
     def slice(): BufferType = buffer.slice()
     def duplicate(): BufferType = buffer.duplicate()
     def asReadOnlyBuffer(): BufferType = buffer.asReadOnlyBuffer()
@@ -124,10 +120,9 @@ object BufferAdapter {
     def arrayOffset(): Int = buffer.arrayOffset()
     def compact(): BufferType = buffer.compact()
     def order(): ByteOrder = buffer.order()
-  }
 
   class LongBufferAdapater(val buffer: LongBuffer)
-      extends BufferAdapter[LongBuffer, Long] {
+      extends BufferAdapter[LongBuffer, Long]
     def slice(): BufferType = buffer.slice()
     def duplicate(): BufferType = buffer.duplicate()
     def asReadOnlyBuffer(): BufferType = buffer.asReadOnlyBuffer()
@@ -149,10 +144,9 @@ object BufferAdapter {
     def arrayOffset(): Int = buffer.arrayOffset()
     def compact(): BufferType = buffer.compact()
     def order(): ByteOrder = buffer.order()
-  }
 
   class FloatBufferAdapater(val buffer: FloatBuffer)
-      extends BufferAdapter[FloatBuffer, Float] {
+      extends BufferAdapter[FloatBuffer, Float]
     def slice(): BufferType = buffer.slice()
     def duplicate(): BufferType = buffer.duplicate()
     def asReadOnlyBuffer(): BufferType = buffer.asReadOnlyBuffer()
@@ -174,10 +168,9 @@ object BufferAdapter {
     def arrayOffset(): Int = buffer.arrayOffset()
     def compact(): BufferType = buffer.compact()
     def order(): ByteOrder = buffer.order()
-  }
 
   class DoubleBufferAdapater(val buffer: DoubleBuffer)
-      extends BufferAdapter[DoubleBuffer, Double] {
+      extends BufferAdapter[DoubleBuffer, Double]
     def slice(): BufferType = buffer.slice()
     def duplicate(): BufferType = buffer.duplicate()
     def asReadOnlyBuffer(): BufferType = buffer.asReadOnlyBuffer()
@@ -199,5 +192,3 @@ object BufferAdapter {
     def arrayOffset(): Int = buffer.arrayOffset()
     def compact(): BufferType = buffer.compact()
     def order(): ByteOrder = buffer.order()
-  }
-}

@@ -1,16 +1,12 @@
-object test {
+object test
 
-  abstract class Base() {
+  abstract class Base()
     val x: String;
     val y = 1.0;
-  }
 
-  case class Sub() extends Base() {
+  case class Sub() extends Base()
     val x = "hello";
     override val y = 2.0;
-  }
 
-  abstract class Sub2() extends Base() {
+  abstract class Sub2() extends Base()
     override val (x, y) = ("abc", 2.0);
-  }
-}

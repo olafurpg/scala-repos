@@ -20,8 +20,8 @@ import org.specs2.mutable.Specification
 import java.io._
 import org.saddle.{na, Index, Vec, Frame, UTF8}
 
-class CsvCheck extends Specification with ScalaCheck {
-  "csv string parsing works" in {
+class CsvCheck extends Specification with ScalaCheck
+  "csv string parsing works" in
     val data = """a,"b,c,d",e
         |1,25,36,
         |4,55, "6"
@@ -31,9 +31,8 @@ class CsvCheck extends Specification with ScalaCheck {
     val buf = new BufferedReader(
         new InputStreamReader(new ByteArrayInputStream(data.getBytes(UTF8))))
 
-    val src = new CsvSource {
+    val src = new CsvSource
       def readLine = buf.readLine()
-    }
 
     val frame = CsvParser.parse()(src).withColIndex(0).resetRowIndex
     val expect =
@@ -42,9 +41,8 @@ class CsvCheck extends Specification with ScalaCheck {
             Vec("36", "6", "38", "9")).setColIndex(Index("a", "b,c,d", "e"))
 
     frame must_== expect
-  }
 
-  "csv int parsing works" in {
+  "csv int parsing works" in
     val data = """a,"b,c,d",e
         |1,2,3
         |4,5,"test",
@@ -53,9 +51,8 @@ class CsvCheck extends Specification with ScalaCheck {
     val buf = new BufferedReader(
         new InputStreamReader(new ByteArrayInputStream(data.getBytes(UTF8))))
 
-    val src = new CsvSource {
+    val src = new CsvSource
       def readLine = buf.readLine()
-    }
 
     val frame = CsvParser
       .parse()(src)
@@ -66,9 +63,8 @@ class CsvCheck extends Specification with ScalaCheck {
       .setColIndex(Index("a", "b,c,d", "e"))
 
     frame must_== expect
-  }
 
-  "csv fails on irregular row" in {
+  "csv fails on irregular row" in
     val data = """a,"b,c,d",e
         |1,2,3
         |4,5
@@ -77,24 +73,19 @@ class CsvCheck extends Specification with ScalaCheck {
     val buf = new BufferedReader(
         new InputStreamReader(new ByteArrayInputStream(data.getBytes(UTF8))))
 
-    val src = new CsvSource {
+    val src = new CsvSource
       def readLine = buf.readLine()
-    }
 
     CsvParser.parse()(src) must throwAn[ArrayIndexOutOfBoundsException]
-  }
 
-  "csv parsing still works when final field is empty" in {
+  "csv parsing still works when final field is empty" in
     val data = """1,2,3
        |1,2,""".stripMargin
 
     val buf = new BufferedReader(
         new InputStreamReader(new ByteArrayInputStream(data.getBytes(UTF8))))
 
-    val src = new CsvSource {
+    val src = new CsvSource
       def readLine = buf.readLine()
-    }
 
     CsvParser.parse()(src) must throwAn[ArrayIndexOutOfBoundsException].not
-  }
-}

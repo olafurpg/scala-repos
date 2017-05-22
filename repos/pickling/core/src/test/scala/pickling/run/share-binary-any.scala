@@ -5,7 +5,7 @@ import scala.pickling._, scala.pickling.Defaults._, binary._
 
 class C(val name: String, val desc: String, var c: C, val arr: Array[Int])
 
-class ShareBinaryAnyTest extends FunSuite {
+class ShareBinaryAnyTest extends FunSuite
   val c1 = new C("c1", "desc", null, Array(1))
   val c2 = new C("c2", "desc", c1, Array(1))
   val c3 = new C("c3", "desc", c2, Array(1))
@@ -30,13 +30,11 @@ class ShareBinaryAnyTest extends FunSuite {
     assert(c12.c === c11)
   }*/
 
-  test("loop-share-nothing") {
-    intercept[StackOverflowError] {
+  test("loop-share-nothing")
+    intercept[StackOverflowError]
       import shareNothing._
       c1.c = c3
       (c2: Any).pickle
-    }
-  }
 
   /*test("loop-share-everything") {
     import shareEverything._
@@ -58,7 +56,7 @@ class ShareBinaryAnyTest extends FunSuite {
     assert(c12.c === c11)
   }*/
 
-  test("noloop-share-non-primitives") {
+  test("noloop-share-non-primitives")
     import shareNothing._
     c1.c = null
     val pickle = (c3: Any).pickle
@@ -76,5 +74,3 @@ class ShareBinaryAnyTest extends FunSuite {
     assert(c21.name === "c1")
     assert(c21.desc === "desc")
     assert(c21.arr.toList === List(1))
-  }
-}

@@ -2,7 +2,7 @@ package lila.user
 
 import scala._
 
-object Countries {
+object Countries
 
   val all = List(
       "AD" -> "Andorra",
@@ -218,4 +218,3 @@ object Countries {
 
   def info(code: String): Option[(String, String)] =
     map get code map { code -> _ }
-}

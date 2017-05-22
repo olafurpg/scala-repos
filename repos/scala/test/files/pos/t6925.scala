@@ -1,4 +1,4 @@
-class Test {
+class Test
   def f[T](xs: Set[T]) /* no expected type to trigger inference */ =
     xs collect { case x => x }
 
@@ -7,4 +7,3 @@ class Test {
 
   // check that this type checks:
   List(1).flatMap(n => Set(1).collect { case w => w })
-}

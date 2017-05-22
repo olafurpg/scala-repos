@@ -40,20 +40,17 @@ private[kinesis] case class SequenceNumberRange(streamName: String,
 
 /** Class representing an array of Kinesis sequence number ranges */
 private[kinesis] case class SequenceNumberRanges(
-    ranges: Seq[SequenceNumberRange]) {
+    ranges: Seq[SequenceNumberRange])
   def isEmpty(): Boolean = ranges.isEmpty
 
   def nonEmpty(): Boolean = ranges.nonEmpty
 
   override def toString(): String =
     ranges.mkString("SequenceNumberRanges(", ", ", ")")
-}
 
-private[kinesis] object SequenceNumberRanges {
-  def apply(range: SequenceNumberRange): SequenceNumberRanges = {
+private[kinesis] object SequenceNumberRanges
+  def apply(range: SequenceNumberRange): SequenceNumberRanges =
     new SequenceNumberRanges(Seq(range))
-  }
-}
 
 /** Partition storing the information of the ranges of Kinesis sequence numbers to read */
 private[kinesis] class KinesisBackedBlockRDDPartition(
@@ -79,7 +76,7 @@ private[kinesis] class KinesisBackedBlockRDD[T : ClassTag](
     val messageHandler: Record => T = KinesisUtils.defaultMessageHandler _,
     val awsCredentialsOption: Option[SerializableAWSCredentials] = None
 )
-    extends BlockRDD[T](sc, _blockIds) {
+    extends BlockRDD[T](sc, _blockIds)
 
   require(
       _blockIds.length == arrayOfseqNumberRanges.length,
@@ -87,44 +84,35 @@ private[kinesis] class KinesisBackedBlockRDD[T : ClassTag](
 
   override def isValid(): Boolean = true
 
-  override def getPartitions: Array[Partition] = {
-    Array.tabulate(_blockIds.length) { i =>
+  override def getPartitions: Array[Partition] =
+    Array.tabulate(_blockIds.length)  i =>
       val isValid = if (isBlockIdValid.length == 0) true else isBlockIdValid(i)
       new KinesisBackedBlockRDDPartition(
           i, _blockIds(i), isValid, arrayOfseqNumberRanges(i))
-    }
-  }
 
-  override def compute(split: Partition, context: TaskContext): Iterator[T] = {
+  override def compute(split: Partition, context: TaskContext): Iterator[T] =
     val blockManager = SparkEnv.get.blockManager
     val partition = split.asInstanceOf[KinesisBackedBlockRDDPartition]
     val blockId = partition.blockId
 
-    def getBlockFromBlockManager(): Option[Iterator[T]] = {
+    def getBlockFromBlockManager(): Option[Iterator[T]] =
       logDebug(
           s"Read partition data of $this from block manager, block $blockId")
       blockManager.get(blockId).map(_.data.asInstanceOf[Iterator[T]])
-    }
 
-    def getBlockFromKinesis(): Iterator[T] = {
-      val credentials = awsCredentialsOption.getOrElse {
+    def getBlockFromKinesis(): Iterator[T] =
+      val credentials = awsCredentialsOption.getOrElse
         new DefaultAWSCredentialsProviderChain().getCredentials()
-      }
-      partition.seqNumberRanges.ranges.iterator.flatMap { range =>
+      partition.seqNumberRanges.ranges.iterator.flatMap  range =>
         new KinesisSequenceRangeIterator(credentials,
                                          endpointUrl,
                                          regionName,
                                          range,
                                          retryTimeoutMs).map(messageHandler)
-      }
-    }
-    if (partition.isBlockIdValid) {
+    if (partition.isBlockIdValid)
       getBlockFromBlockManager().getOrElse { getBlockFromKinesis() }
-    } else {
+    else
       getBlockFromKinesis()
-    }
-  }
-}
 
 /**
   * An iterator that return the Kinesis data based on the given range of sequence numbers.
@@ -137,7 +125,7 @@ private[kinesis] class KinesisSequenceRangeIterator(
     regionId: String,
     range: SequenceNumberRange,
     retryTimeoutMs: Int)
-    extends NextIterator[Record] with Logging {
+    extends NextIterator[Record] with Logging
 
   private val client = new AmazonKinesisClient(credentials)
   private val streamName = range.streamName
@@ -149,34 +137,33 @@ private[kinesis] class KinesisSequenceRangeIterator(
 
   client.setEndpoint(endpointUrl, "kinesis", regionId)
 
-  override protected def getNext(): Record = {
+  override protected def getNext(): Record =
     var nextRecord: Record = null
-    if (toSeqNumberReceived) {
+    if (toSeqNumberReceived)
       finished = true
-    } else {
+    else
 
-      if (internalIterator == null) {
+      if (internalIterator == null)
 
         // If the internal iterator has not been initialized,
         // then fetch records from starting sequence number
         internalIterator = getRecords(
             ShardIteratorType.AT_SEQUENCE_NUMBER, range.fromSeqNumber)
-      } else if (!internalIterator.hasNext) {
+      else if (!internalIterator.hasNext)
 
         // If the internal iterator does not have any more records,
         // then fetch more records after the last consumed sequence number
         internalIterator = getRecords(
             ShardIteratorType.AFTER_SEQUENCE_NUMBER, lastSeqNumber)
-      }
 
-      if (!internalIterator.hasNext) {
+      if (!internalIterator.hasNext)
 
         // If the internal iterator still does not have any data, then throw exception
         // and terminate this iterator
         finished = true
         throw new SparkException(
             s"Could not read until the end sequence number of the range: $range")
-      } else {
+      else
 
         // Get the record, copy the data into a byte array and remember its sequence number
         nextRecord = internalIterator.next()
@@ -184,53 +171,45 @@ private[kinesis] class KinesisSequenceRangeIterator(
 
         // If the this record's sequence number matches the stopping sequence number, then make sure
         // the iterator is marked finished next time getNext() is called
-        if (nextRecord.getSequenceNumber == range.toSeqNumber) {
+        if (nextRecord.getSequenceNumber == range.toSeqNumber)
           toSeqNumberReceived = true
-        }
-      }
-    }
     nextRecord
-  }
 
-  override protected def close(): Unit = {
+  override protected def close(): Unit =
     client.shutdown()
-  }
 
   /**
     * Get records starting from or after the given sequence number.
     */
   private def getRecords(
-      iteratorType: ShardIteratorType, seqNum: String): Iterator[Record] = {
+      iteratorType: ShardIteratorType, seqNum: String): Iterator[Record] =
     val shardIterator = getKinesisIterator(iteratorType, seqNum)
     val result = getRecordsAndNextKinesisIterator(shardIterator)
     result._1
-  }
 
   /**
     * Get the records starting from using a Kinesis shard iterator (which is a progress handle
     * to get records from Kinesis), and get the next shard iterator for next consumption.
     */
   private def getRecordsAndNextKinesisIterator(
-      shardIterator: String): (Iterator[Record], String) = {
+      shardIterator: String): (Iterator[Record], String) =
     val getRecordsRequest = new GetRecordsRequest
     getRecordsRequest.setRequestCredentials(credentials)
     getRecordsRequest.setShardIterator(shardIterator)
     val getRecordsResult = retryOrTimeout[GetRecordsResult](
-        s"getting records using shard iterator") {
+        s"getting records using shard iterator")
       client.getRecords(getRecordsRequest)
-    }
     // De-aggregate records, if KPL was used in producing the records. The KCL automatically
     // handles de-aggregation during regular operation. This code path is used during recovery
     val recordIterator = UserRecord.deaggregate(getRecordsResult.getRecords)
     (recordIterator.iterator().asScala, getRecordsResult.getNextShardIterator)
-  }
 
   /**
     * Get the Kinesis shard iterator for getting records starting from or after the given
     * sequence number.
     */
   private def getKinesisIterator(
-      iteratorType: ShardIteratorType, sequenceNumber: String): String = {
+      iteratorType: ShardIteratorType, sequenceNumber: String): String =
     val getShardIteratorRequest = new GetShardIteratorRequest
     getShardIteratorRequest.setRequestCredentials(credentials)
     getShardIteratorRequest.setStreamName(streamName)
@@ -238,14 +217,12 @@ private[kinesis] class KinesisSequenceRangeIterator(
     getShardIteratorRequest.setShardIteratorType(iteratorType.toString)
     getShardIteratorRequest.setStartingSequenceNumber(sequenceNumber)
     val getShardIteratorResult = retryOrTimeout[GetShardIteratorResult](
-        s"getting shard iterator from sequence number $sequenceNumber") {
+        s"getting shard iterator from sequence number $sequenceNumber")
       client.getShardIterator(getShardIteratorRequest)
-    }
     getShardIteratorResult.getShardIterator
-  }
 
   /** Helper method to retry Kinesis API request with exponential backoff and timeouts */
-  private def retryOrTimeout[T](message: String)(body: => T): T = {
+  private def retryOrTimeout[T](message: String)(body: => T): T =
     import KinesisSequenceRangeIterator._
 
     var startTimeMs = System.currentTimeMillis()
@@ -258,42 +235,33 @@ private[kinesis] class KinesisSequenceRangeIterator(
       (System.currentTimeMillis() - startTimeMs) >= retryTimeoutMs
     def isMaxRetryDone = retryCount >= MAX_RETRIES
 
-    while (result.isEmpty && !isTimedOut && !isMaxRetryDone) {
-      if (retryCount > 0) {
+    while (result.isEmpty && !isTimedOut && !isMaxRetryDone)
+      if (retryCount > 0)
         // wait only if this is a retry
         Thread.sleep(waitTimeMs)
         waitTimeMs *= 2 // if you have waited, then double wait time for next round
-      }
-      try {
+      try
         result = Some(body)
-      } catch {
+      catch
         case NonFatal(t) =>
           lastError = t
-          t match {
+          t match
             case ptee: ProvisionedThroughputExceededException =>
               logWarning(
                   s"Error while $message [attempt = ${retryCount + 1}]", ptee)
             case e: Throwable =>
               throw new SparkException(s"Error while $message", e)
-          }
-      }
       retryCount += 1
-    }
-    result.getOrElse {
-      if (isTimedOut) {
+    result.getOrElse
+      if (isTimedOut)
         throw new SparkException(
             s"Timed out after $retryTimeoutMs ms while $message, last exception: ",
             lastError)
-      } else {
+      else
         throw new SparkException(
             s"Gave up after $retryCount retries while $message, last exception: ",
             lastError)
-      }
-    }
-  }
-}
 
-private[streaming] object KinesisSequenceRangeIterator {
+private[streaming] object KinesisSequenceRangeIterator
   val MAX_RETRIES = 3
   val MIN_RETRY_WAIT_TIME_MS = 100
-}

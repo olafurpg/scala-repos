@@ -29,7 +29,7 @@ case class PythonUDF(name: String,
                      func: PythonFunction,
                      dataType: DataType,
                      children: Seq[Expression])
-    extends Expression with Unevaluable with NonSQLExpression with Logging {
+    extends Expression with Unevaluable with NonSQLExpression with Logging
 
   override def toString: String =
     s"PythonUDF#$name(${children.mkString(", ")})"
@@ -37,4 +37,3 @@ case class PythonUDF(name: String,
   override def nullable: Boolean = true
 
   override def sql: String = s"$name(${children.mkString(", ")})"
-}

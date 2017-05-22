@@ -1,6 +1,5 @@
 package somepkg
 
-class C {
+class C
   println( /* resolved: false */ somepkg.getClass)
   println(classOf[ /* resolved: false */ somepkg])
-}

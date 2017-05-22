@@ -1,12 +1,10 @@
-object Test {
+object Test
   trait Engine1
 
-  implicit class EngineTools1[Params, R](e: Engine1) {
+  implicit class EngineTools1[Params, R](e: Engine1)
     def asRequirement: Requirement1[Params, R] = ???
-  }
-  trait Requirement1[Params, R] {
+  trait Requirement1[Params, R]
     def pathsIncludingSelf: Traversable[List[Reportable1[Params, R]]]
-  }
   trait Reportable1[Params, R]
 
   // "missing parameter type" error was swallowed in 2.11.0 leading to a crash
@@ -16,7 +14,5 @@ object Test {
   // specifically in SI-7944. The type parameters to the implicit view
   // `EngineTools1` are undetermined, and are now treated as type variables
   // in the expected type of the closure argument to `withFilter`.
-  for (path: List[Any] <- (null: Engine1).asRequirement.pathsIncludingSelf.toList) {
+  for (path: List[Any] <- (null: Engine1).asRequirement.pathsIncludingSelf.toList)
     ???
-  }
-}

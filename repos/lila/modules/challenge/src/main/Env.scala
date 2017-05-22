@@ -16,27 +16,26 @@ final class Env(config: Config,
                 lightUser: String => Option[lila.common.LightUser],
                 hub: lila.hub.Env,
                 db: lila.db.Env,
-                scheduler: lila.common.Scheduler) {
+                scheduler: lila.common.Scheduler)
 
-  private val settings = new {
+  private val settings = new
     val CollectionChallenge = config getString "collection.challenge"
     val MaxPerUser = config getInt "max_per_user"
     val HistoryMessageTtl = config duration "history.message.ttl"
     val UidTimeout = config duration "uid.timeout"
     val SocketTimeout = config duration "socket.timeout"
     val SocketName = config getString "socket.name"
-  }
   import settings._
 
   private val socketHub =
-    system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
+    system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket]
       def mkActor(challengeId: String) =
         new Socket(challengeId = challengeId,
                    history = new lila.socket.History(ttl = HistoryMessageTtl),
                    getChallenge = repo.byId,
                    uidTimeout = UidTimeout,
                    socketTimeout = SocketTimeout)
-    }), name = SocketName)
+    ), name = SocketName)
 
   def version(challengeId: Challenge.ID): Fu[Int] =
     socketHub ? Ask(challengeId, GetVersion) mapTo manifest[Int]
@@ -56,12 +55,10 @@ final class Env(config: Config,
 
   lazy val jsonView = new JsonView(lightUser)
 
-  scheduler.future(3 seconds, "sweep challenges") {
+  scheduler.future(3 seconds, "sweep challenges")
     api.sweep
-  }
-}
 
-object Env {
+object Env
 
   lazy val current: Env =
     "challenge" boot new Env(
@@ -72,4 +69,3 @@ object Env {
         lightUser = lila.user.Env.current.lightUser,
         db = lila.db.Env.current,
         scheduler = lila.common.PlayApp.scheduler)
-}

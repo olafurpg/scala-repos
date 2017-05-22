@@ -12,11 +12,10 @@ private[serverset2] object Reader extends Capability
 private[serverset2] object Writer extends Capability
 private[serverset2] object Multi extends Capability
 
-private[serverset2] trait ClientFactory[T <: ZooKeeperClient] {
+private[serverset2] trait ClientFactory[T <: ZooKeeperClient]
   val capabilities: Seq[Capability]
   val priority: Int
   def newClient(config: ClientConfig): Watched[T]
-}
 
 private[client] case class ClientConfig(val hosts: String,
                                         val sessionTimeout: Duration,
@@ -24,7 +23,7 @@ private[client] case class ClientConfig(val hosts: String,
                                         val readOnlyOK: Boolean,
                                         val sessionId: Option[Long],
                                         val password: Option[Buf],
-                                        val timer: Timer) {
+                                        val timer: Timer)
   def toMap: Map[String, Any] = Map(
       "hosts" -> hosts,
       "sessionTimeout" -> sessionTimeout,
@@ -35,16 +34,14 @@ private[client] case class ClientConfig(val hosts: String,
       "timer" -> timer
   )
 
-  override def toString = {
+  override def toString =
     "ClientConfig(%s)".format(
-        toMap flatMap {
+        toMap flatMap
       case (k, Some(v)) =>
         Some("%s=%s".format(k, v))
       case _ =>
         None
-    } mkString (", "))
-  }
-}
+    mkString (", "))
 
 /**
   * Build a ZooKeeper Client.
@@ -65,7 +62,7 @@ private[client] case class ClientConfig(val hosts: String,
   * writer() builds Read/Write client.
   * multi() builds Read/Write/Multi client.
   */
-private[serverset2] object ClientBuilder {
+private[serverset2] object ClientBuilder
   private val DefaultConfig: ClientConfig = ClientConfig(
       hosts = "localhost:2181",
       sessionTimeout = 10.seconds,
@@ -82,17 +79,15 @@ private[serverset2] object ClientBuilder {
     * Used for Java access.
     */
   def get() = apply()
-}
 
-private[client] class ClientBuilder(config: ClientConfig) {
+private[client] class ClientBuilder(config: ClientConfig)
   private def resolve[T <: ZooKeeperClient](cap: Capability) =
     LoadService[ClientFactory[T]]()
       .filter(_.capabilities.contains(cap))
-      .sortBy(_.priority) match {
+      .sortBy(_.priority) match
       case Seq() =>
         throw new RuntimeException("No ZooKeeper ClientFactory Found")
       case Seq(f, _ *) => f
-    }
 
   override def toString() = "ClientBuilder(%s)".format(config.toString)
 
@@ -146,9 +141,9 @@ private[client] class ClientBuilder(config: ClientConfig) {
     */
   def hosts(zkHosts: Seq[InetSocketAddress]): ClientBuilder =
     hosts(
-        zkHosts.map { h =>
+        zkHosts.map  h =>
       "%s:%d,".format(h.getHostName, h.getPort)
-    }.mkString)
+    .mkString)
 
   /**
     * Configure builder with a session timeout.
@@ -208,4 +203,3 @@ private[client] class ClientBuilder(config: ClientConfig) {
     */
   def timer(timer: Timer): ClientBuilder =
     withConfig(_.copy(timer = timer))
-}

@@ -29,26 +29,24 @@ import kafka.utils.{ZkUtils, SystemTime, KafkaScheduler, TestUtils, MockTime, Co
 import java.util.concurrent.atomic.AtomicBoolean
 import org.apache.kafka.common.utils.{MockTime => JMockTime}
 
-class HighwatermarkPersistenceTest {
+class HighwatermarkPersistenceTest
 
   val configs = TestUtils
     .createBrokerConfigs(2, TestUtils.MockZkConnect)
     .map(KafkaConfig.fromProps)
   val topic = "foo"
   val logManagers =
-    configs map { config =>
+    configs map  config =>
       TestUtils.createLogManager(
           logDirs = config.logDirs.map(new File(_)).toArray,
           cleanerConfig = CleanerConfig())
-    }
 
   @After
-  def teardown() {
+  def teardown()
     for (manager <- logManagers; dir <- manager.logDirs) CoreUtils.rm(dir)
-  }
 
   @Test
-  def testHighWatermarkPersistenceSinglePartition() {
+  def testHighWatermarkPersistenceSinglePartition()
     // mock zkclient
     val zkUtils = EasyMock.createMock(classOf[ZkUtils])
     EasyMock.replay(zkUtils)
@@ -67,7 +65,7 @@ class HighwatermarkPersistenceTest {
                                             logManagers(0),
                                             new AtomicBoolean(false))
     replicaManager.startup()
-    try {
+    try
       replicaManager.checkpointHighWatermarks()
       var fooPartition0Hw = hwmFor(replicaManager, topic, 0)
       assertEquals(0L, fooPartition0Hw)
@@ -92,16 +90,14 @@ class HighwatermarkPersistenceTest {
       assertEquals(
           leaderReplicaPartition0.highWatermark.messageOffset, fooPartition0Hw)
       EasyMock.verify(zkUtils)
-    } finally {
+    finally
       // shutdown the replica manager upon test completion
       replicaManager.shutdown(false)
       metrics.close()
       scheduler.shutdown()
-    }
-  }
 
   @Test
-  def testHighWatermarkPersistenceMultiplePartitions() {
+  def testHighWatermarkPersistenceMultiplePartitions()
     val topic1 = "foo1"
     val topic2 = "foo2"
     // mock zkclient
@@ -121,7 +117,7 @@ class HighwatermarkPersistenceTest {
                                             logManagers(0),
                                             new AtomicBoolean(false))
     replicaManager.startup()
-    try {
+    try
       replicaManager.checkpointHighWatermarks()
       var topic1Partition0Hw = hwmFor(replicaManager, topic1, 0)
       assertEquals(0L, topic1Partition0Hw)
@@ -182,20 +178,16 @@ class HighwatermarkPersistenceTest {
       topic1Partition0Hw = hwmFor(replicaManager, topic1, 0)
       assertEquals(10L, topic1Partition0Hw)
       EasyMock.verify(zkUtils)
-    } finally {
+    finally
       // shutdown the replica manager upon test completion
       replicaManager.shutdown(false)
       metrics.close()
       scheduler.shutdown()
-    }
-  }
 
   def hwmFor(
-      replicaManager: ReplicaManager, topic: String, partition: Int): Long = {
+      replicaManager: ReplicaManager, topic: String, partition: Int): Long =
     replicaManager
       .highWatermarkCheckpoints(
           new File(replicaManager.config.logDirs(0)).getAbsolutePath)
       .read
       .getOrElse(TopicAndPartition(topic, partition), 0L)
-  }
-}

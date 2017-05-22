@@ -33,7 +33,7 @@ class TaskInfo(val taskId: Long,
                val executorId: String,
                val host: String,
                val taskLocality: TaskLocality.TaskLocality,
-               val speculative: Boolean) {
+               val speculative: Boolean)
 
   /**
     * The time when the task started remotely getting the result. Will not be set if the
@@ -57,18 +57,15 @@ class TaskInfo(val taskId: Long,
 
   var failed = false
 
-  private[spark] def markGettingResult(time: Long = System.currentTimeMillis) {
+  private[spark] def markGettingResult(time: Long = System.currentTimeMillis)
     gettingResultTime = time
-  }
 
-  private[spark] def markSuccessful(time: Long = System.currentTimeMillis) {
+  private[spark] def markSuccessful(time: Long = System.currentTimeMillis)
     finishTime = time
-  }
 
-  private[spark] def markFailed(time: Long = System.currentTimeMillis) {
+  private[spark] def markFailed(time: Long = System.currentTimeMillis)
     finishTime = time
     failed = true
-  }
 
   def gettingResult: Boolean = gettingResultTime != 0
 
@@ -78,33 +75,27 @@ class TaskInfo(val taskId: Long,
 
   def running: Boolean = !finished
 
-  def status: String = {
-    if (running) {
-      if (gettingResult) {
+  def status: String =
+    if (running)
+      if (gettingResult)
         "GET RESULT"
-      } else {
+      else
         "RUNNING"
-      }
-    } else if (failed) {
+    else if (failed)
       "FAILED"
-    } else if (successful) {
+    else if (successful)
       "SUCCESS"
-    } else {
+    else
       "UNKNOWN"
-    }
-  }
 
   def id: String = s"$index.$attemptNumber"
 
-  def duration: Long = {
-    if (!finished) {
+  def duration: Long =
+    if (!finished)
       throw new UnsupportedOperationException(
           "duration() called on unfinished task")
-    } else {
+    else
       finishTime - launchTime
-    }
-  }
 
   private[spark] def timeRunning(currentTime: Long): Long =
     currentTime - launchTime
-}

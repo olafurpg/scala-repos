@@ -5,7 +5,7 @@ package akka.util
 
 import java.security.{MessageDigest, SecureRandom}
 @deprecated(message = "Not in use.", since = "2.4-M1")
-object Crypt {
+object Crypt
   val hex = "0123456789ABCDEF"
   val lineSeparator = System.getProperty("line.separator")
 
@@ -23,27 +23,22 @@ object Crypt {
   def sha1(bytes: Array[Byte]): String =
     digest(bytes, MessageDigest.getInstance("SHA1"))
 
-  def generateSecureCookie: String = {
+  def generateSecureCookie: String =
     val bytes = Array.fill(32)(0.byteValue)
     random.nextBytes(bytes)
     sha1(bytes)
-  }
 
-  def digest(bytes: Array[Byte], md: MessageDigest): String = {
+  def digest(bytes: Array[Byte], md: MessageDigest): String =
     md.update(bytes)
     hexify(md.digest)
-  }
 
-  def hexify(bytes: Array[Byte]): String = {
+  def hexify(bytes: Array[Byte]): String =
     val builder = new java.lang.StringBuilder(bytes.length * 2)
-    bytes.foreach { byte ⇒
+    bytes.foreach  byte ⇒
       builder
         .append(hex.charAt((byte & 0xF0) >> 4))
         .append(hex.charAt(byte & 0xF))
-    }
     builder.toString
-  }
 
   private def unifyLineSeparator(text: String): String =
     text.replaceAll(lineSeparator, "\n")
-}

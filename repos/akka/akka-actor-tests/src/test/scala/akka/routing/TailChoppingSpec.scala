@@ -11,61 +11,55 @@ import akka.actor.{ActorRef, Props, Actor, ActorSystem}
 import akka.pattern.{AskTimeoutException, ask}
 import akka.testkit._
 
-object TailChoppingSpec {
+object TailChoppingSpec
   def newActor(id: Int, sleepTime: Duration)(implicit system: ActorSystem) =
-    system.actorOf(Props(new Actor {
+    system.actorOf(Props(new Actor
       var times: Int = _
 
-      def receive = {
+      def receive =
         case "stop" ⇒ context.stop(self)
         case "times" ⇒ sender() ! times
         case x ⇒
           times += 1
           Thread sleep sleepTime.toMillis
           sender ! "ack"
-      }
-    }), "Actor:" + id)
-}
+    ), "Actor:" + id)
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class TailChoppingSpec
-    extends AkkaSpec with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec with DefaultTimeout with ImplicitSender
   import TailChoppingSpec._
 
   def oneOfShouldEqual(what: Any, default: Any, ref: ActorRef*)(
-      f: ActorRef ⇒ Any) {
+      f: ActorRef ⇒ Any)
     val results = ref.map(p ⇒ f(p))
     results.count(_ == what) should equal(1)
     results.count(_ == default) should equal(results.size - 1)
-  }
 
-  def allShouldEqual(what: Any, ref: ActorRef*)(f: ActorRef ⇒ Any) {
+  def allShouldEqual(what: Any, ref: ActorRef*)(f: ActorRef ⇒ Any)
     val results = ref.map(p ⇒ f(p))
     results.count(_ == what) should equal(results.size)
-  }
 
-  "Tail-chopping group" must {
+  "Tail-chopping group" must
 
-    "deliver a broadcast message using the !" in {
+    "deliver a broadcast message using the !" in
       val doneLatch = new TestLatch(2)
 
       val counter1 = new AtomicInteger
       val actor1 = system.actorOf(
-          Props(new Actor {
-        def receive = {
+          Props(new Actor
+        def receive =
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter1.addAndGet(msg)
-        }
-      }))
+      ))
 
       val counter2 = new AtomicInteger
       val actor2 = system.actorOf(
-          Props(new Actor {
-        def receive = {
+          Props(new Actor
+        def receive =
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter2.addAndGet(msg)
-        }
-      }))
+      ))
 
       val paths = List(actor1, actor2).map(_.path.toString)
       val routedActor = system.actorOf(TailChoppingGroup(
@@ -77,9 +71,8 @@ class TailChoppingSpec
 
       counter1.get should ===(1)
       counter2.get should ===(1)
-    }
 
-    "return response from second actor after inactivity from first one" in {
+    "return response from second actor after inactivity from first one" in
       val actor1 = newActor(1, 1.millis)
       val actor2 = newActor(2, 1.millis)
       val probe = TestProbe()
@@ -94,9 +87,8 @@ class TailChoppingSpec
           ref ⇒ Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
-    }
 
-    "throw exception if no result will arrive within given time" in {
+    "throw exception if no result will arrive within given time" in
       val actor1 = newActor(3, 500.millis)
       val actor2 = newActor(4, 500.millis)
       val probe = TestProbe()
@@ -107,17 +99,15 @@ class TailChoppingSpec
                                          interval = 50.milliseconds).props())
 
       probe.send(routedActor, "")
-      probe.expectMsgPF() {
+      probe.expectMsgPF()
         case Failure(timeoutEx: AskTimeoutException) ⇒
-      }
 
       allShouldEqual(1, actor1, actor2)(
           ref ⇒ Await.result(ref ? "times", timeout.duration))
 
       routedActor ! Broadcast("stop")
-    }
 
-    "reply ASAP" in {
+    "reply ASAP" in
       val actor1 = newActor(5, 1.seconds)
       val actor2 = newActor(6, 4.seconds)
       val probe = TestProbe()
@@ -129,6 +119,3 @@ class TailChoppingSpec
       probe.expectMsg(max = 2.seconds, "ack")
 
       routedActor ! Broadcast("stop")
-    }
-  }
-}

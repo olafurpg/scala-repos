@@ -1,4 +1,4 @@
-object Holder {
+object Holder
   def f {}
   class C
   case class CC
@@ -8,9 +8,8 @@ object Holder {
   val v1: Int = 1
   var v2: Int = 2
   type A = Int
-}
 
-class C1 {
+class C1
   import Holder.f
   import Holder.C
   import Holder.CC
@@ -20,9 +19,8 @@ class C1 {
   import Holder.A
   import Holder.v1
   import Holder.v2
-}
 
-class C2 extends C1 {
+class C2 extends C1
   println( /* resolved: false */ f)
   println( /* resolved: false */ C)
   println( /* resolved: false */ CC)
@@ -32,4 +30,3 @@ class C2 extends C1 {
   println( /* resolved: false */ A)
   println( /* resolved: false */ v1)
   println( /* resolved: false */ v2)
-}

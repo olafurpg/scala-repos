@@ -1,10 +1,8 @@
 /*initLocally*/
-class Test {
-  def foo() {
+class Test
+  def foo()
     /*start*/
     1 /*end*/
-  }
-}
 /*
 /*initLocally*/
 class Test {

@@ -14,9 +14,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScValue
   * Date: 17.10.2008
   */
 class ScValueDefinitionElementType
-    extends ScValueElementType[ScValue]("value definition") {
+    extends ScValueElementType[ScValue]("value definition")
   def createElement(node: ASTNode): PsiElement =
     new ScPatternDefinitionImpl(node)
 
   def createPsi(stub: ScValueStub) = new ScPatternDefinitionImpl(stub)
-}

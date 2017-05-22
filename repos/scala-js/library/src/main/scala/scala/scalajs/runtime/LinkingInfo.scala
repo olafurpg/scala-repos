@@ -4,7 +4,7 @@ import scala.scalajs.js
 
 /** Information about link-time configuration of Scala.js. */
 @js.native
-trait LinkingInfo extends js.Object {
+trait LinkingInfo extends js.Object
 
   /** Environment info. */
   val envInfo: EnvironmentInfo = js.native
@@ -17,13 +17,12 @@ trait LinkingInfo extends js.Object {
 
   /** Version of the linker */
   val linkerVersion: js.UndefOr[String] = js.native
-}
 
-object LinkingInfo {
+object LinkingInfo
 
   /** Semantics configuration. */
   @js.native
-  trait Semantics extends js.Object {
+  trait Semantics extends js.Object
 
     /** Compliance level of asInstanceOfs. */
     val asInstanceOfs: Int = js.native
@@ -36,11 +35,8 @@ object LinkingInfo {
 
     /** Whether we are linking in production mode. */
     val productionMode: Boolean = js.native
-  }
 
-  object Semantics {
+  object Semantics
     final val Compliant = 0
     final val Fatal = 1
     final val Unchecked = 2
-  }
-}

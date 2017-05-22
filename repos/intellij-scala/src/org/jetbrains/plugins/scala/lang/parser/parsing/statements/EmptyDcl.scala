@@ -9,15 +9,14 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Annotation
 /**
   * @author Alexander Podkhalyuzin
   */
-object EmptyDcl {
+object EmptyDcl
   def parse(builder: ScalaPsiBuilder): Boolean = parse(builder, isMod = true)
-  def parse(builder: ScalaPsiBuilder, isMod: Boolean): Boolean = {
+  def parse(builder: ScalaPsiBuilder, isMod: Boolean): Boolean =
     val dclMarker = builder.mark
-    if (isMod) {
+    if (isMod)
       while (Annotation.parse(builder)) {}
       while (Modifier.parse(builder)) {}
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kDEF | ScalaTokenTypes.kVAL | ScalaTokenTypes.kVAR |
           ScalaTokenTypes.kTYPE =>
         builder.advanceLexer
@@ -27,6 +26,3 @@ object EmptyDcl {
       case _ =>
         dclMarker.rollbackTo
         return false
-    }
-  }
-}

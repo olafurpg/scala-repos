@@ -10,7 +10,7 @@ package scala
 
 import scala.annotation.meta
 
-object languageFeature {
+object languageFeature
 
   @meta.languageFeature(
       "extension of type scala.Dynamic", enableRequired = true)
@@ -39,9 +39,7 @@ object languageFeature {
   sealed trait existentials
   object existentials extends existentials
 
-  object experimental {
+  object experimental
     @meta.languageFeature("macro definition", enableRequired = true)
     sealed trait macros
     object macros extends macros
-  }
-}

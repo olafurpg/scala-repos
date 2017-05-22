@@ -35,7 +35,7 @@ import org.apache.spark.sql.types.{DoubleType, FloatType}
 final class RegressionEvaluator @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Evaluator with HasPredictionCol with HasLabelCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("regEval"))
@@ -49,14 +49,13 @@ final class RegressionEvaluator @Since("1.4.0")(
     * @group param
     */
   @Since("1.4.0")
-  val metricName: Param[String] = {
+  val metricName: Param[String] =
     val allowedParams =
       ParamValidators.inArray(Array("mse", "rmse", "r2", "mae"))
     new Param(this,
               "metricName",
               "metric name in evaluation (mse|rmse|r2|mae)",
               allowedParams)
-  }
 
   /** @group getParam */
   @Since("1.4.0")
@@ -77,7 +76,7 @@ final class RegressionEvaluator @Since("1.4.0")(
   setDefault(metricName -> "rmse")
 
   @Since("1.4.0")
-  override def evaluate(dataset: DataFrame): Double = {
+  override def evaluate(dataset: DataFrame): Double =
     val schema = dataset.schema
     val predictionColName = $(predictionCol)
     val predictionType = schema($(predictionCol)).dataType
@@ -95,35 +94,29 @@ final class RegressionEvaluator @Since("1.4.0")(
       .select(col($(predictionCol)).cast(DoubleType),
               col($(labelCol)).cast(DoubleType))
       .rdd
-      .map {
+      .map
         case Row(prediction: Double, label: Double) =>
           (prediction, label)
-      }
     val metrics = new RegressionMetrics(predictionAndLabels)
-    val metric = $(metricName) match {
+    val metric = $(metricName) match
       case "rmse" => metrics.rootMeanSquaredError
       case "mse" => metrics.meanSquaredError
       case "r2" => metrics.r2
       case "mae" => metrics.meanAbsoluteError
-    }
     metric
-  }
 
   @Since("1.4.0")
-  override def isLargerBetter: Boolean = $(metricName) match {
+  override def isLargerBetter: Boolean = $(metricName) match
     case "rmse" => false
     case "mse" => false
     case "r2" => true
     case "mae" => false
-  }
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): RegressionEvaluator = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object RegressionEvaluator extends DefaultParamsReadable[RegressionEvaluator] {
+object RegressionEvaluator extends DefaultParamsReadable[RegressionEvaluator]
 
   @Since("1.6.0")
   override def load(path: String): RegressionEvaluator = super.load(path)
-}

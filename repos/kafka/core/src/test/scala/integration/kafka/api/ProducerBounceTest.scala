@@ -23,7 +23,7 @@ import org.apache.kafka.clients.producer.internals.ErrorLoggingCallback
 import org.junit.Assert._
 import org.junit.{After, Before, Test}
 
-class ProducerBounceTest extends KafkaServerTestHarness {
+class ProducerBounceTest extends KafkaServerTestHarness
   private val producerBufferSize = 30000
   private val serverMessageMaxBytes = producerBufferSize / 2
 
@@ -46,12 +46,11 @@ class ProducerBounceTest extends KafkaServerTestHarness {
   //
   // Since such quick rotation of servers is incredibly unrealistic, we allow this one test to preallocate ports, leaving
   // a small risk of hitting errors due to port conflicts. Hopefully this is infrequent enough to not cause problems.
-  override def generateConfigs() = {
+  override def generateConfigs() =
     FixedPortTestUtils
       .createBrokerConfigs(
           numServers, zkConnect, enableControlledShutdown = false)
       .map(KafkaConfig.fromProps(_, overridingProps))
-  }
 
   private var consumer1: SimpleConsumer = null
   private var consumer2: SimpleConsumer = null
@@ -65,7 +64,7 @@ class ProducerBounceTest extends KafkaServerTestHarness {
   private val topic2 = "topic-2"
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     producer1 = TestUtils.createNewProducer(
@@ -74,23 +73,21 @@ class ProducerBounceTest extends KafkaServerTestHarness {
         brokerList, acks = 1, bufferSize = producerBufferSize)
     producer3 = TestUtils.createNewProducer(
         brokerList, acks = -1, bufferSize = producerBufferSize)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     if (producer1 != null) producer1.close
     if (producer2 != null) producer2.close
     if (producer3 != null) producer3.close
     if (producer4 != null) producer4.close
 
     super.tearDown()
-  }
 
   /**
     * With replication, producer should able able to find new leader after it detects broker failure
     */
   @Test
-  def testBrokerFailure() {
+  def testBrokerFailure()
     val numPartitions = 3
     val leaders = TestUtils.createTopic(
         zkUtils, topic1, numPartitions, numServers, servers)
@@ -101,13 +98,12 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     scheduler.start
 
     // rolling bounce brokers
-    for (i <- 0 until numServers) {
-      for (server <- servers) {
+    for (i <- 0 until numServers)
+      for (server <- servers)
         server.shutdown()
         server.awaitShutdown()
         server.startup()
         Thread.sleep(2000)
-      }
 
       // Make sure the producer do not see any exception
       // in returned metadata due to broker failures
@@ -117,7 +113,6 @@ class ProducerBounceTest extends KafkaServerTestHarness {
       (0 until numPartitions).foreach(partition =>
             TestUtils.waitUntilLeaderIsElectedOrChanged(
                 zkUtils, topic1, partition))
-    }
 
     scheduler.shutdown
 
@@ -128,7 +123,7 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     // double check that the leader info has been propagated after consecutive bounces
     val newLeaders = (0 until numPartitions).map(
         i => TestUtils.waitUntilMetadataIsPropagated(servers, topic1, i))
-    val fetchResponses = newLeaders.zipWithIndex.map {
+    val fetchResponses = newLeaders.zipWithIndex.map
       case (leader, partition) =>
         // Consumers must be instantiated after all the restarts since they use random ports each time they start up
         val consumer = new SimpleConsumer(
@@ -140,7 +135,6 @@ class ProducerBounceTest extends KafkaServerTestHarness {
           .messageSet(topic1, partition)
         consumer.close
         response
-    }
     val messages =
       fetchResponses.flatMap(r => r.iterator.toList.map(_.message))
     val uniqueMessages = messages.toSet
@@ -149,10 +143,9 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     assertEquals("Should have fetched " + scheduler.sent + " unique messages",
                  scheduler.sent,
                  uniqueMessageSize)
-  }
 
   private class ProducerScheduler
-      extends ShutdownableThread("daemon-producer", false) {
+      extends ShutdownableThread("daemon-producer", false)
     val numRecords = 1000
     var sent = 0
     var failed = false
@@ -160,24 +153,19 @@ class ProducerBounceTest extends KafkaServerTestHarness {
     val producer = TestUtils.createNewProducer(
         brokerList, bufferSize = producerBufferSize, retries = 10)
 
-    override def doWork(): Unit = {
+    override def doWork(): Unit =
       val responses = for (i <- sent + 1 to sent + numRecords) yield
         producer.send(new ProducerRecord[Array[Byte], Array[Byte]](
                           topic1, null, null, i.toString.getBytes),
                       new ErrorLoggingCallback(topic1, null, null, true))
       val futures = responses.toList
 
-      try {
+      try
         futures.map(_.get)
         sent += numRecords
-      } catch {
+      catch
         case e: Exception => failed = true
-      }
-    }
 
-    override def shutdown() {
+    override def shutdown()
       super.shutdown()
       producer.close
-    }
-  }
-}

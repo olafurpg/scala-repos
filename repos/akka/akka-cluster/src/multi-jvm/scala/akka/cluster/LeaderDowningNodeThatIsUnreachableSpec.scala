@@ -15,7 +15,7 @@ import scala.collection.immutable
 
 final case class LeaderDowningNodeThatIsUnreachableMultiNodeConfig(
     failureDetectorPuppet: Boolean)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -27,7 +27,6 @@ final case class LeaderDowningNodeThatIsUnreachableMultiNodeConfig(
                 "akka.cluster.auto-down-unreachable-after = 2s"))
         .withFallback(
             MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
-}
 
 class LeaderDowningNodeThatIsUnreachableWithFailureDetectorPuppetMultiJvmNode1
     extends LeaderDowningNodeThatIsUnreachableSpec(
@@ -57,7 +56,7 @@ class LeaderDowningNodeThatIsUnreachableWithAccrualFailureDetectorMultiJvmNode4
 
 abstract class LeaderDowningNodeThatIsUnreachableSpec(
     multiNodeConfig: LeaderDowningNodeThatIsUnreachableMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec
 
   def this(failureDetectorPuppet: Boolean) =
     this(
@@ -68,15 +67,15 @@ abstract class LeaderDowningNodeThatIsUnreachableSpec(
 
   muteMarkingAsUnreachable()
 
-  "The Leader in a 4 node cluster" must {
+  "The Leader in a 4 node cluster" must
 
-    "be able to DOWN a 'last' node that is UNREACHABLE" taggedAs LongRunningTest in {
+    "be able to DOWN a 'last' node that is UNREACHABLE" taggedAs LongRunningTest in
       awaitClusterUp(first, second, third, fourth)
 
       val fourthAddress = address(fourth)
 
       enterBarrier("before-exit-fourth-node")
-      runOn(first) {
+      runOn(first)
         // kill 'fourth' node
         testConductor.exit(fourth, 0).await
         enterBarrier("down-fourth-node")
@@ -89,28 +88,24 @@ abstract class LeaderDowningNodeThatIsUnreachableSpec(
         awaitMembersUp(numberOfMembers = 3,
                        canNotBePartOfMemberRing = Set(fourthAddress),
                        30.seconds)
-      }
 
-      runOn(fourth) {
+      runOn(fourth)
         enterBarrier("down-fourth-node")
-      }
 
-      runOn(second, third) {
+      runOn(second, third)
         enterBarrier("down-fourth-node")
 
         awaitMembersUp(numberOfMembers = 3,
                        canNotBePartOfMemberRing = Set(fourthAddress),
                        30.seconds)
-      }
 
       enterBarrier("await-completion-1")
-    }
 
-    "be able to DOWN a 'middle' node that is UNREACHABLE" taggedAs LongRunningTest in {
+    "be able to DOWN a 'middle' node that is UNREACHABLE" taggedAs LongRunningTest in
       val secondAddress = address(second)
 
       enterBarrier("before-down-second-node")
-      runOn(first) {
+      runOn(first)
         // kill 'second' node
         testConductor.exit(second, 0).await
         enterBarrier("down-second-node")
@@ -123,21 +118,15 @@ abstract class LeaderDowningNodeThatIsUnreachableSpec(
         awaitMembersUp(numberOfMembers = 2,
                        canNotBePartOfMemberRing = Set(secondAddress),
                        30.seconds)
-      }
 
-      runOn(second) {
+      runOn(second)
         enterBarrier("down-second-node")
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("down-second-node")
 
         awaitMembersUp(numberOfMembers = 2,
                        canNotBePartOfMemberRing = Set(secondAddress),
                        30 seconds)
-      }
 
       enterBarrier("await-completion-2")
-    }
-  }
-}

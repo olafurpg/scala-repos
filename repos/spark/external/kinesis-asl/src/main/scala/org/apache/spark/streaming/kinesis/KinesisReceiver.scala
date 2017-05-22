@@ -36,10 +36,9 @@ import org.apache.spark.util.Utils
 
 private[kinesis] case class SerializableAWSCredentials(
     accessKeyId: String, secretKey: String)
-    extends AWSCredentials {
+    extends AWSCredentials
   override def getAWSAccessKeyId: String = accessKeyId
   override def getAWSSecretKey: String = secretKey
-}
 
 /**
   * Custom AWS Kinesis-specific implementation of Spark Streaming's Receiver.
@@ -91,7 +90,7 @@ private[kinesis] class KinesisReceiver[T](
     storageLevel: StorageLevel,
     messageHandler: Record => T,
     awsCredentialsOption: Option[SerializableAWSCredentials])
-    extends Receiver[T](storageLevel) with Logging { receiver =>
+    extends Receiver[T](storageLevel) with Logging  receiver =>
 
   /*
    * =================================================================================
@@ -144,7 +143,7 @@ private[kinesis] class KinesisReceiver[T](
     * This is called when the KinesisReceiver starts and must be non-blocking.
     * The KCL creates and manages the receiving/processing thread pool through Worker.run().
     */
-  override def onStart() {
+  override def onStart()
     blockGenerator = supervisor.createBlockGenerator(new GeneratedBlockHandler)
 
     workerId = Utils.localHostName() + ":" + UUID.randomUUID()
@@ -166,22 +165,18 @@ private[kinesis] class KinesisReceiver[T](
      *  IRecordProcessor.processRecords() method.
      *  We're using our custom KinesisRecordProcessor in this case.
      */
-    val recordProcessorFactory = new IRecordProcessorFactory {
+    val recordProcessorFactory = new IRecordProcessorFactory
       override def createProcessor: IRecordProcessor =
         new KinesisRecordProcessor(receiver, workerId)
-    }
 
     worker = new Worker(recordProcessorFactory, kinesisClientLibConfiguration)
-    workerThread = new Thread() {
-      override def run(): Unit = {
-        try {
+    workerThread = new Thread()
+      override def run(): Unit =
+        try
           worker.run()
-        } catch {
+        catch
           case NonFatal(e) =>
             restart("Error running the KCL worker in Receiver", e)
-        }
-      }
-    }
 
     blockIdToSeqNumRanges.clear()
     blockGenerator.start()
@@ -191,34 +186,29 @@ private[kinesis] class KinesisReceiver[T](
     workerThread.start()
 
     logInfo(s"Started receiver with workerId $workerId")
-  }
 
   /**
     * This is called when the KinesisReceiver stops.
     * The KCL worker.shutdown() method stops the receiving/processing threads.
     * The KCL will do its best to drain and checkpoint any in-flight records upon shutdown.
     */
-  override def onStop() {
-    if (workerThread != null) {
-      if (worker != null) {
+  override def onStop()
+    if (workerThread != null)
+      if (worker != null)
         worker.shutdown()
         worker = null
-      }
       workerThread.join()
       workerThread = null
       logInfo(s"Stopped receiver for workerId $workerId")
-    }
     workerId = null
-    if (kinesisCheckpointer != null) {
+    if (kinesisCheckpointer != null)
       kinesisCheckpointer.shutdown()
       kinesisCheckpointer = null
-    }
-  }
 
   /** Add records of the given shard to the current block being generated */
   private[kinesis] def addRecords(
-      shardId: String, records: java.util.List[Record]): Unit = {
-    if (records.size > 0) {
+      shardId: String, records: java.util.List[Record]): Unit =
+    if (records.size > 0)
       val dataIterator = records.iterator().asScala.map(messageHandler)
       val metadata = SequenceNumberRange(
           streamName,
@@ -226,25 +216,21 @@ private[kinesis] class KinesisReceiver[T](
           records.get(0).getSequenceNumber(),
           records.get(records.size() - 1).getSequenceNumber())
       blockGenerator.addMultipleDataWithCallback(dataIterator, metadata)
-    }
-  }
 
   /** Get the latest sequence number for the given shard that can be checkpointed through KCL */
   private[kinesis] def getLatestSeqNumToCheckpoint(
-      shardId: String): Option[String] = {
+      shardId: String): Option[String] =
     Option(shardIdToLatestStoredSeqNum.get(shardId))
-  }
 
   /**
     * Set the checkpointer that will be used to checkpoint sequence numbers to DynamoDB for the
     * given shardId.
     */
   def setCheckpointer(
-      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit = {
+      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit =
     assert(
         kinesisCheckpointer != null, "Kinesis Checkpointer not initialized!")
     kinesisCheckpointer.setCheckpointer(shardId, checkpointer)
-  }
 
   /**
     * Remove the checkpointer for the given shardId. The provided checkpointer will be used to
@@ -252,85 +238,73 @@ private[kinesis] class KinesisReceiver[T](
     * checkpoint.
     */
   def removeCheckpointer(
-      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit = {
+      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit =
     assert(
         kinesisCheckpointer != null, "Kinesis Checkpointer not initialized!")
     kinesisCheckpointer.removeCheckpointer(shardId, checkpointer)
-  }
 
   /**
     * Remember the range of sequence numbers that was added to the currently active block.
     * Internally, this is synchronized with `finalizeRangesForCurrentBlock()`.
     */
-  private def rememberAddedRange(range: SequenceNumberRange): Unit = {
+  private def rememberAddedRange(range: SequenceNumberRange): Unit =
     seqNumRangesInCurrentBlock += range
-  }
 
   /**
     * Finalize the ranges added to the block that was active and prepare the ranges buffer
     * for next block. Internally, this is synchronized with `rememberAddedRange()`.
     */
-  private def finalizeRangesForCurrentBlock(blockId: StreamBlockId): Unit = {
+  private def finalizeRangesForCurrentBlock(blockId: StreamBlockId): Unit =
     blockIdToSeqNumRanges.put(
         blockId, SequenceNumberRanges(seqNumRangesInCurrentBlock.toArray))
     seqNumRangesInCurrentBlock.clear()
     logDebug(s"Generated block $blockId has $blockIdToSeqNumRanges")
-  }
 
   /** Store the block along with its associated ranges */
   private def storeBlockWithRanges(
-      blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[T]): Unit = {
+      blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[T]): Unit =
     val rangesToReportOption = Option(blockIdToSeqNumRanges.remove(blockId))
-    if (rangesToReportOption.isEmpty) {
+    if (rangesToReportOption.isEmpty)
       stop(
           "Error while storing block into Spark, could not find sequence number ranges " +
           s"for block $blockId")
       return
-    }
 
     val rangesToReport = rangesToReportOption.get
     var attempt = 0
     var stored = false
     var throwable: Throwable = null
-    while (!stored && attempt <= 3) {
-      try {
+    while (!stored && attempt <= 3)
+      try
         store(arrayBuffer, rangesToReport)
         stored = true
-      } catch {
+      catch
         case NonFatal(th) =>
           attempt += 1
           throwable = th
-      }
-    }
-    if (!stored) {
+    if (!stored)
       stop("Error while storing block into Spark", throwable)
-    }
 
     // Update the latest sequence number that have been successfully stored for each shard
     // Note that we are doing this sequentially because the array of sequence number ranges
     // is assumed to be
-    rangesToReport.ranges.foreach { range =>
+    rangesToReport.ranges.foreach  range =>
       shardIdToLatestStoredSeqNum.put(range.shardId, range.toSeqNumber)
-    }
-  }
 
   /**
     * If AWS credential is provided, return a AWSCredentialProvider returning that credential.
     * Otherwise, return the DefaultAWSCredentialsProviderChain.
     */
-  private def resolveAWSCredentialsProvider(): AWSCredentialsProvider = {
-    awsCredentialsOption match {
+  private def resolveAWSCredentialsProvider(): AWSCredentialsProvider =
+    awsCredentialsOption match
       case Some(awsCredentials) =>
         logInfo("Using provided AWS credentials")
-        new AWSCredentialsProvider {
+        new AWSCredentialsProvider
           override def getCredentials: AWSCredentials = awsCredentials
           override def refresh(): Unit = {}
-        }
       case None =>
         logInfo("Using DefaultAWSCredentialsProviderChain")
         new DefaultAWSCredentialsProviderChain()
-    }
-  }
 
   /**
     * Class to handle blocks generated by this receiver's block generator. Specifically, in
@@ -341,36 +315,30 @@ private[kinesis] class KinesisReceiver[T](
     * - When the currently active block is ready to sealed (not more records), this handler
     *   keep track of the list of ranges added into this block in another H
     */
-  private class GeneratedBlockHandler extends BlockGeneratorListener {
+  private class GeneratedBlockHandler extends BlockGeneratorListener
 
     /**
       * Callback method called after a data item is added into the BlockGenerator.
       * The data addition, block generation, and calls to onAddData and onGenerateBlock
       * are all synchronized through the same lock.
       */
-    def onAddData(data: Any, metadata: Any): Unit = {
+    def onAddData(data: Any, metadata: Any): Unit =
       rememberAddedRange(metadata.asInstanceOf[SequenceNumberRange])
-    }
 
     /**
       * Callback method called after a block has been generated.
       * The data addition, block generation, and calls to onAddData and onGenerateBlock
       * are all synchronized through the same lock.
       */
-    def onGenerateBlock(blockId: StreamBlockId): Unit = {
+    def onGenerateBlock(blockId: StreamBlockId): Unit =
       finalizeRangesForCurrentBlock(blockId)
-    }
 
     /** Callback method called when a block is ready to be pushed / stored. */
     def onPushBlock(
-        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit =
       storeBlockWithRanges(
           blockId, arrayBuffer.asInstanceOf[mutable.ArrayBuffer[T]])
-    }
 
     /** Callback called in case of any error in internal of the BlockGenerator */
-    def onError(message: String, throwable: Throwable): Unit = {
+    def onError(message: String, throwable: Throwable): Unit =
       reportError(message, throwable)
-    }
-  }
-}

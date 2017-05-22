@@ -1,4 +1,3 @@
 import scala.beans.BeanProperty;
-trait beanpropertytrait {
+trait beanpropertytrait
   @BeanProperty var myVariable: Long = -1l;
-}

@@ -7,20 +7,18 @@ import com.twitter.jsr166e.LongAdder
 import com.twitter.util.{Try, Future, Stopwatch, Throw}
 import java.util.concurrent.TimeUnit
 
-object StatsFilter {
+object StatsFilter
   val role = Stack.Role("RequestStats")
 
   /**
     * Configures a [[StatsFilter.module]] to track latency using the
     * given [[TimeUnit]].
     */
-  case class Param(unit: TimeUnit) {
+  case class Param(unit: TimeUnit)
     def mk(): (Param, Stack.Param[Param]) = (this, Param.param)
-  }
 
-  object Param {
+  object Param
     implicit val param = Stack.Param(Param(TimeUnit.MILLISECONDS))
-  }
 
   /**
     * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.StatsFilter]].
@@ -32,7 +30,7 @@ object StatsFilter {
         param.ResponseClassifier,
         Param,
         ServiceFactory[Req, Rep]
-    ] {
+    ]
       val role = StatsFilter.role
       val description = "Report request statistics"
       def make(
@@ -41,7 +39,7 @@ object StatsFilter {
           _classifier: param.ResponseClassifier,
           _param: Param,
           next: ServiceFactory[Req, Rep]
-      ): ServiceFactory[Req, Rep] = {
+      ): ServiceFactory[Req, Rep] =
         val param.Stats(statsReceiver) = _stats
         val param.ExceptionStatsHandler(handler) = _exceptions
         val classifier = _classifier.responseClassifier
@@ -49,8 +47,6 @@ object StatsFilter {
         else
           new StatsFilter(statsReceiver, classifier, handler, _param.unit)
             .andThen(next)
-      }
-    }
 
   /** Basic categorizer with all exceptions under 'failures'. */
   val DefaultExceptions = new MultiCategorizingExceptionStatsHandler(
@@ -62,11 +58,9 @@ object StatsFilter {
   def typeAgnostic(
       statsReceiver: StatsReceiver,
       exceptionStatsHandler: ExceptionStatsHandler
-  ): TypeAgnostic = new TypeAgnostic {
+  ): TypeAgnostic = new TypeAgnostic
     override def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep] =
       new StatsFilter[Req, Rep](statsReceiver, exceptionStatsHandler)
-  }
-}
 
 /**
   * A `StatsFilter` reports request statistics including number of requests,
@@ -93,7 +87,7 @@ class StatsFilter[Req, Rep](statsReceiver: StatsReceiver,
                             responseClassifier: ResponseClassifier,
                             exceptionStatsHandler: ExceptionStatsHandler,
                             timeUnit: TimeUnit)
-    extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep]
   import StatsFilter.SyntheticException
 
   def this(
@@ -113,28 +107,25 @@ class StatsFilter[Req, Rep](statsReceiver: StatsReceiver,
   def this(statsReceiver: StatsReceiver) =
     this(statsReceiver, StatsFilter.DefaultExceptions)
 
-  private[this] def latencyStatSuffix: String = {
-    timeUnit match {
+  private[this] def latencyStatSuffix: String =
+    timeUnit match
       case TimeUnit.NANOSECONDS => "ns"
       case TimeUnit.MICROSECONDS => "us"
       case TimeUnit.MILLISECONDS => "ms"
       case TimeUnit.SECONDS => "secs"
       case _ => timeUnit.toString.toLowerCase
-    }
-  }
 
   private[this] val outstandingRequestCount = new LongAdder()
   private[this] val dispatchCount = statsReceiver.counter("requests")
   private[this] val successCount = statsReceiver.counter("success")
   private[this] val latencyStat =
     statsReceiver.stat(s"request_latency_$latencyStatSuffix")
-  private[this] val loadGauge = statsReceiver.addGauge("load") {
+  private[this] val loadGauge = statsReceiver.addGauge("load")
     outstandingRequestCount.sum()
-  }
   private[this] val outstandingRequestCountGauge =
     statsReceiver.addGauge("pending") { outstandingRequestCount.sum() }
 
-  private[this] def isBlackholeResponse(rep: Try[Rep]): Boolean = rep match {
+  private[this] def isBlackholeResponse(rep: Try[Rep]): Boolean = rep match
     case Throw(BackupRequestLost) | Throw(WriteException(BackupRequestLost)) =>
       // We blackhole this request. It doesn't count for anything.
       // After the Failure() patch, this should no longer need to
@@ -146,60 +137,48 @@ class StatsFilter[Req, Rep](statsReceiver: StatsReceiver,
       true
     case _ =>
       false
-  }
 
-  def apply(request: Req, service: Service[Req, Rep]): Future[Rep] = {
+  def apply(request: Req, service: Service[Req, Rep]): Future[Rep] =
     val elapsed = Stopwatch.start()
 
     outstandingRequestCount.increment()
-    service(request).respond { response =>
+    service(request).respond  response =>
       outstandingRequestCount.decrement()
-      if (!isBlackholeResponse(response)) {
+      if (!isBlackholeResponse(response))
         dispatchCount.incr()
         responseClassifier.applyOrElse(
             ReqRep(request, response),
             ResponseClassifier.Default
-        ) match {
+        ) match
           case ResponseClass.Failed(_) =>
             latencyStat.add(elapsed().inUnit(timeUnit))
-            response match {
+            response match
               case Throw(e) =>
                 exceptionStatsHandler.record(statsReceiver, e)
               case _ =>
                 exceptionStatsHandler.record(statsReceiver, SyntheticException)
-            }
           case ResponseClass.Successful(_) =>
             successCount.incr()
             latencyStat.add(elapsed().inUnit(timeUnit))
-        }
-      }
-    }
-  }
-}
 
-private[finagle] object StatsServiceFactory {
+private[finagle] object StatsServiceFactory
   val role = Stack.Role("FactoryStats")
 
   /**
     * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.StatsServiceFactory]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module1[param.Stats, ServiceFactory[Req, Rep]] {
+    new Stack.Module1[param.Stats, ServiceFactory[Req, Rep]]
       val role = StatsServiceFactory.role
       val description = "Report connection statistics"
       def make(_stats: param.Stats,
-               next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] = {
+               next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] =
         val param.Stats(statsReceiver) = _stats
         if (statsReceiver.isNull) next
         else new StatsServiceFactory(next, statsReceiver)
-      }
-    }
-}
 
 class StatsServiceFactory[Req, Rep](
     factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver)
-    extends ServiceFactoryProxy[Req, Rep](factory) {
-  private[this] val availableGauge = statsReceiver.addGauge("available") {
+    extends ServiceFactoryProxy[Req, Rep](factory)
+  private[this] val availableGauge = statsReceiver.addGauge("available")
     if (isAvailable) 1F else 0F
-  }
-}

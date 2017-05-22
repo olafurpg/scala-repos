@@ -22,17 +22,17 @@ import scala.reflect.runtime.{universe => ru}
 [error] 	scala.pickling.test.runtime.array.RuntimeArrayTest
   */
 class DefaultRuntimePicklerGenerator(reflectionLock: ReentrantLock)
-    extends spi.RuntimePicklerGenerator {
+    extends spi.RuntimePicklerGenerator
 
   /** Create a new pickler using the given tagKey. */
   def genPickler(
       classLoader: ClassLoader, clazz: Class[_], tag: FastTypeTag[_])(
-      implicit share: refs.Share): Pickler[_] = {
+      implicit share: refs.Share): Pickler[_] =
     reflectionLock.lock()
-    try {
+    try
       // debug(s"!!! could not find registered pickler for class $className, tag ${tag.key} !!!")
       val pickler: Pickler[_] =
-        if (clazz.isArray) {
+        if (clazz.isArray)
           val mirror = ru.runtimeMirror(classLoader)
           val elemClass = clazz.getComponentType()
           val elemTag = FastTypeTag.mkRaw(elemClass, mirror)
@@ -40,21 +40,19 @@ class DefaultRuntimePicklerGenerator(reflectionLock: ReentrantLock)
             currentRuntime.picklers.genPickler(classLoader, elemClass, elemTag)
           mkRuntimeTravPickler[Array[AnyRef]](
               elemClass, elemTag, tag, elemPickler, null)
-        } else {
+        else
           val runtime = new RuntimePickler(classLoader, clazz, tag)
           runtime.mkPickler
-        }
       pickler
-    } finally reflectionLock.unlock()
-  }
+    finally reflectionLock.unlock()
 
   /** Create a new unpickler using the given tagKey. */
   override def genUnpickler(mirror: Mirror, tagKey: String)(
-      implicit share: refs.Share): Unpickler[_] = {
+      implicit share: refs.Share): Unpickler[_] =
     reflectionLock.lock()
-    try {
+    try
       val unpickler =
-        if (tagKey.startsWith("scala.Array")) {
+        if (tagKey.startsWith("scala.Array"))
           // debug(s"runtime unpickling of an array: $tagKey")
           val elemTypeString = tagKey.substring(12, tagKey.length - 1)
           // debug(s"creating tag for element type: $elemTypeString")
@@ -67,20 +65,16 @@ class DefaultRuntimePicklerGenerator(reflectionLock: ReentrantLock)
           val tag = FastTypeTag(currentRuntime.currentMirror, tagKey)
           mkRuntimeTravPickler[Array[AnyRef]](
               elemClass, elemTag, tag, null, elemUnpickler)
-        } else {
+        else
           val runtime =
-            if (share.isInstanceOf[refs.ShareNothing]) {
+            if (share.isInstanceOf[refs.ShareNothing])
               // debug(s"@@@ creating ShareNothingInterpretedUnpicklerRuntime for type $tagKey")
               new ShareNothingInterpretedUnpicklerRuntime(
                   currentRuntime.currentMirror, tagKey)
-            } else {
+            else
               // debug(s"@@@ creating InterpretedUnpicklerRuntime for type $tagKey")
               new InterpretedUnpicklerRuntime(
                   currentRuntime.currentMirror, tagKey)
-            }
           runtime.genUnpickler
-        }
       unpickler
-    } finally reflectionLock.unlock()
-  }
-}
+    finally reflectionLock.unlock()

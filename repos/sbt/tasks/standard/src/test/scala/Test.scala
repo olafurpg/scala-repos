@@ -8,7 +8,7 @@ import sbt.internal.util.AList
 import Task._
 import Execute._
 
-object Test extends std.TaskExtra {
+object Test extends std.TaskExtra
   def t2[A, B](a: Task[A], b: Task[B]) =
     multInputTask[({ type l[L[x]] = (L[A], L[B]) })#l]((a, b))(AList.tuple2)
   def t3[A, B, C](a: Task[A], b: Task[B], c: Task[C]) =
@@ -25,29 +25,25 @@ object Test extends std.TaskExtra {
 
   type Values = (Result[Int], Result[Boolean], Result[String])
 
-  val f: Values => Any = {
+  val f: Values => Any =
     case (Value(aa), Value(bb), Value(cc)) => aa + " " + bb + " " + cc
     case x =>
       val cs = x.productIterator.toList.collect { case Inc(x) => x } // workaround for double definition bug
       throw Incomplete(None, causes = cs)
-  }
   val d2 = t3(a, b2, c) mapR f
-  val f2: Values => Task[Any] = {
+  val f2: Values => Task[Any] =
     case (Value(aa), Value(bb), Value(cc)) => task(aa + " " + bb + " " + cc)
     case x => d3
-  }
   lazy val d = t3(a, b, c) flatMapR f2
-  val f3: Values => Task[Any] = {
+  val f3: Values => Task[Any] =
     case (Value(aa), Value(bb), Value(cc)) => task(aa + " " + bb + " " + cc)
     case x => d2
-  }
   lazy val d3 = t3(a, b, c) flatMapR f3
 
-  def d4(i: Int): Task[Int] = nop flatMap { _ =>
+  def d4(i: Int): Task[Int] = nop flatMap  _ =>
     val x = math.random; if (x < 0.01) task(i); else d4(i + 1)
-  }
 
-  def go(): Unit = {
+  def go(): Unit =
     def run[T](root: Task[T]) =
       println("Result : " + TaskGen.run(root, true, 2))
 
@@ -60,5 +56,3 @@ object Test extends std.TaskExtra {
     run(d4(0))
     run(h1)
     run(h2)
-  }
-}

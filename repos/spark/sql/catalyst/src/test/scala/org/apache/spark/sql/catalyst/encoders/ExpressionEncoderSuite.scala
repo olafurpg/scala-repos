@@ -34,14 +34,12 @@ import org.apache.spark.sql.types.{ArrayType, ObjectType, StructType}
 
 case class RepeatedStruct(s: Seq[PrimitiveData])
 
-case class NestedArray(a: Array[Array[Int]]) {
-  override def equals(other: Any): Boolean = other match {
+case class NestedArray(a: Array[Array[Int]])
+  override def equals(other: Any): Boolean = other match
     case NestedArray(otherArray) =>
       java.util.Arrays.deepEquals(a.asInstanceOf[Array[AnyRef]],
                                   otherArray.asInstanceOf[Array[AnyRef]])
     case _ => false
-  }
-}
 
 case class BoxedData(intField: java.lang.Integer,
                      longField: java.lang.Long,
@@ -61,20 +59,16 @@ case class RepeatedData(
 case class SpecificCollection(l: List[Int])
 
 /** For testing Kryo serialization based encoder. */
-class KryoSerializable(val value: Int) {
-  override def equals(other: Any): Boolean = {
+class KryoSerializable(val value: Int)
+  override def equals(other: Any): Boolean =
     this.value == other.asInstanceOf[KryoSerializable].value
-  }
-}
 
 /** For testing Java serialization based encoder. */
-class JavaSerializable(val value: Int) extends Serializable {
-  override def equals(other: Any): Boolean = {
+class JavaSerializable(val value: Int) extends Serializable
+  override def equals(other: Any): Boolean =
     this.value == other.asInstanceOf[JavaSerializable].value
-  }
-}
 
-class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
+class ExpressionEncoderSuite extends PlanTest with AnalysisTest
   OuterScopes.addOuterScope(this)
 
   implicit def encoder[T : TypeTag]: ExpressionEncoder[T] = ExpressionEncoder()
@@ -148,9 +142,8 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       encoderFor(Encoders.javaSerialization[JavaSerializable]))
 
   // test product encoders
-  private def productTest[T <: Product : ExpressionEncoder](input: T): Unit = {
+  private def productTest[T <: Product : ExpressionEncoder](input: T): Unit =
     encodeDecodeTest(input, input.getClass.getSimpleName)
-  }
 
   case class InnerClass(i: Int)
   productTest(InnerClass(1))
@@ -235,19 +228,17 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       "tuple with product encoder and flat encoder")(ExpressionEncoder.tuple(
           ExpressionEncoder[Int], ExpressionEncoder[PrimitiveData]))
 
-  encodeDecodeTest((1, (10, 100L)), "nested tuple encoder") {
+  encodeDecodeTest((1, (10, 100L)), "nested tuple encoder")
     val intEnc = ExpressionEncoder[Int]
     val longEnc = ExpressionEncoder[Long]
     ExpressionEncoder.tuple(intEnc, ExpressionEncoder.tuple(intEnc, longEnc))
-  }
 
   productTest(("UDT", new ExamplePoint(0.1, 0.2)))
 
-  test("nullable of encoder schema") {
-    def checkNullable[T : ExpressionEncoder](nullable: Boolean*): Unit = {
+  test("nullable of encoder schema")
+    def checkNullable[T : ExpressionEncoder](nullable: Boolean*): Unit =
       assert(
           implicitly[ExpressionEncoder[T]].schema.map(_.nullable) === nullable.toSeq)
-    }
 
     // test for flat encoders
     checkNullable[Int](false)
@@ -260,16 +251,13 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
     checkNullable[(Int, java.lang.Long)](false, true)
 
     // test for nested product encoders
-    {
       val schema = ExpressionEncoder[(Int, (String, Int))].schema
       assert(schema(0).nullable === false)
       assert(schema(1).nullable === true)
       assert(schema(1).dataType.asInstanceOf[StructType](0).nullable === true)
       assert(schema(1).dataType.asInstanceOf[StructType](1).nullable === false)
-    }
 
     // test for tupled encoders
-    {
       val schema = ExpressionEncoder
         .tuple(ExpressionEncoder[Int], ExpressionEncoder[(String, Int)])
         .schema
@@ -277,17 +265,15 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
       assert(schema(1).nullable === true)
       assert(schema(1).dataType.asInstanceOf[StructType](0).nullable === true)
       assert(schema(1).dataType.asInstanceOf[StructType](1).nullable === false)
-    }
-  }
 
   private def encodeDecodeTest[T : ExpressionEncoder](
-      input: T, testName: String): Unit = {
-    test(s"encode/decode for $testName: $input") {
+      input: T, testName: String): Unit =
+    test(s"encode/decode for $testName: $input")
       val encoder = implicitly[ExpressionEncoder[T]]
       val row = encoder.toRow(input)
       val schema = encoder.schema.toAttributes
       val boundEncoder = encoder.defaultBinding
-      val convertedBack = try boundEncoder.fromRow(row) catch {
+      val convertedBack = try boundEncoder.fromRow(row) catch
         case e: Exception =>
           fail(s"""Exception thrown while decoding
               |Converted: $row
@@ -298,7 +284,6 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
               |$boundEncoder
               |
             """.stripMargin, e)
-      }
 
       // Test the correct resolution of serialization / deserialization.
       val attr =
@@ -308,7 +293,7 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
                          Project(encoder.namedExpressions, inputPlan))
       assertAnalysisSuccess(plan)
 
-      val isCorrect = (input, convertedBack) match {
+      val isCorrect = (input, convertedBack) match
         case (b1: Array[Byte], b2: Array[Byte]) => Arrays.equals(b1, b2)
         case (b1: Array[Int], b2: Array[Int]) => Arrays.equals(b1, b2)
         case (b1: Array[Array[_]], b2: Array[Array[_]]) =>
@@ -318,33 +303,29 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
           Arrays.equals(
               b1.asInstanceOf[Array[AnyRef]], b2.asInstanceOf[Array[AnyRef]])
         case _ => input == convertedBack
-      }
 
-      if (!isCorrect) {
-        val types = convertedBack match {
+      if (!isCorrect)
+        val types = convertedBack match
           case c: Product =>
             c.productIterator
               .filter(_ != null)
               .map(_.getClass.getName)
               .mkString(",")
           case other => other.getClass.getName
-        }
 
-        val encodedData = try {
+        val encodedData = try
           row
             .toSeq(encoder.schema)
             .zip(schema)
-            .map {
+            .map
               case (a: ArrayData,
                     AttributeReference(_, ArrayType(et, _), _, _)) =>
                 a.toArray[Any](et).toSeq
               case (other, _) =>
                 other
-            }
             .mkString("[", ",", "]")
-        } catch {
+        catch
           case e: Throwable => s"Failed to toSeq: $e"
-        }
 
         fail(s"""Encoded/Decoded data does not match input data
              |
@@ -359,7 +340,3 @@ class ExpressionEncoderSuite extends PlanTest with AnalysisTest {
              |fromRow Expressions:
              |${boundEncoder.fromRowExpression.treeString}
          """.stripMargin)
-      }
-    }
-  }
-}

@@ -1,8 +1,8 @@
 /*initInDeclaration*/
 class A(i: Int)
-class Test extends {
+class Test extends
   val x = 0
-} with A( /*start*/ 1 /*end*/ )
+with A( /*start*/ 1 /*end*/ )
 /*
 /*initInDeclaration*/
 class A(i: Int)

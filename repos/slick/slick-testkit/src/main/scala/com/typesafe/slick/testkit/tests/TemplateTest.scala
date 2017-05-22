@@ -2,47 +2,45 @@ package com.typesafe.slick.testkit.tests
 
 import com.typesafe.slick.testkit.util.{RelationalTestDB, AsyncTest}
 
-class TemplateTest extends AsyncTest[RelationalTestDB] {
+class TemplateTest extends AsyncTest[RelationalTestDB]
   import tdb.profile.api._
 
-  def testParameters = {
-    class Users(tag: Tag) extends Table[(Int, String)](tag, "users") {
+  def testParameters =
+    class Users(tag: Tag) extends Table[(Int, String)](tag, "users")
       def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
       def first = column[String]("first")
       def * = (id, first)
-    }
     lazy val users = TableQuery[Users]
 
-    class Orders(tag: Tag) extends Table[(Int, Int, String)](tag, "orders") {
+    class Orders(tag: Tag) extends Table[(Int, Int, String)](tag, "orders")
       def userID = column[Int]("userID")
       def orderID = column[Int]("orderID", O.PrimaryKey, O.AutoInc)
       def product = column[String]("product")
       def * = (userID, orderID, product)
-    }
     lazy val orders = TableQuery[Orders]
 
     def userNameByID1(id: Int) =
       for (u <- users if u.id === id.bind) yield u.first
     def q1 = userNameByID1(3)
 
-    val userNameByID2 = for {
+    val userNameByID2 = for
       id <- Parameters[Int]
       u <- users if u.id === id
-    } yield u.first
+    yield u.first
     val q2 = userNameByID2(3)
 
-    val userNameByIDRange = for {
+    val userNameByIDRange = for
       (min, max) <- Parameters[(Int, Int)]
       u <- users if u.id >= min && u.id <= max
-    } yield u.first
+    yield u.first
     val q3 = userNameByIDRange(2, 5)
 
-    val userNameByIDRangeAndProduct = for {
+    val userNameByIDRangeAndProduct = for
       (min, (max, product)) <- Parameters[(Int, (Int, String))]
       u <- users if u.id >= min && u.id <= max && orders
             .filter(o => (u.id === o.userID) && (o.product === product))
             .exists
-    } yield u.first
+    yield u.first
     val q4 = userNameByIDRangeAndProduct(2, (5, "Product A"))
 
     def userNameByIDOrAll(id: Option[Int]) =
@@ -52,7 +50,7 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
     val q5a = userNameByIDOrAll(Some(3))
     val q5b = userNameByIDOrAll(None)
 
-    for {
+    for
       _ <- (users.schema ++ orders.schema).create
       _ <- users.map(_.first) ++= Seq("Homer", "Marge", "Apu", "Carl", "Lenny")
       uids <- users.map(_.id).result
@@ -67,35 +65,29 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
       _ <- q5a.result.map(_ shouldBe List("Apu"))
       _ <- q5b.result.map(
           _.toSet shouldBe Set("Homer", "Marge", "Apu", "Carl", "Lenny"))
-    } yield ()
-  }
+    yield ()
 
-  def testCompiled = {
-    class T(tag: Tag) extends Table[(Int, String)](tag, "t_lifted") {
+  def testCompiled =
+    class T(tag: Tag) extends Table[(Int, String)](tag, "t_lifted")
       def id = column[Int]("id", O.PrimaryKey)
       def s = column[String]("s")
       def * = (id, s)
-    }
     def ts = TableQuery[T]
 
-    val byIdAndS = { (id: Rep[Int], s: ConstColumn[String]) =>
+    val byIdAndS =  (id: Rep[Int], s: ConstColumn[String]) =>
       ts.filter(t => t.id === id && t.s === s)
-    }
     val byIdAndSC = Compiled(byIdAndS)
     val byIdAndFixedSC = byIdAndSC.map(f => f((_: Rep[Int]), "b"))
-    val byIdC = Compiled { id: Rep[Int] =>
+    val byIdC = Compiled  id: Rep[Int] =>
       ts.filter(_.id === id)
-    }
     val byId = byIdC.extract
     val byIdC3 = byIdC(3)
     val byId3 = byIdC3.extract
-    val countBelow = { (id: Rep[Int]) =>
+    val countBelow =  (id: Rep[Int]) =>
       ts.filter(_.id < id).length
-    }
     val countBelowC = Compiled(countBelow)
-    val joinC = Compiled { id: Rep[Int] =>
+    val joinC = Compiled  id: Rep[Int] =>
       ts.filter(_.id === id).join(ts.filter(_.id === id))
-    }
 
     implicitly[slick.lifted.Executable[(Rep[Int], Rep[Int]), _]]
     implicitly[slick.lifted.Compilable[(Rep[Int], Rep[Int]), _]]
@@ -125,5 +117,3 @@ class TemplateTest extends AsyncTest[RelationalTestDB] {
         impShapedC.result.map((r: (Int, Int)) => r shouldBe (3, 3)),
         expShapedC.result.map((r: (Int, Int)) => r shouldBe (3, 3))
     )
-  }
-}

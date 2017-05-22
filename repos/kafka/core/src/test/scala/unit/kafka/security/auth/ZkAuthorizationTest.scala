@@ -28,52 +28,46 @@ import scala.collection.JavaConverters._
 import scala.util.{Try, Success, Failure}
 import javax.security.auth.login.Configuration
 
-class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
+class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging
   val jaasFile: String = kafka.utils.JaasTestUtils.genZkFile
   val authProvider: String = "zookeeper.authProvider.1"
   @Before
-  override def setUp() {
+  override def setUp()
     Configuration.setConfiguration(null)
     System.setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile)
     System.setProperty(
         authProvider,
         "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
     super.setUp()
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     super.tearDown()
     System.clearProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM)
     System.clearProperty(authProvider)
     Configuration.setConfiguration(null)
-  }
 
   /**
     * Tests the method in JaasUtils that checks whether to use
     * secure ACLs and authentication with ZooKeeper.
     */
   @Test
-  def testIsZkSecurityEnabled() {
+  def testIsZkSecurityEnabled()
     assertTrue(JaasUtils.isZkSecurityEnabled())
     Configuration.setConfiguration(null)
     System.clearProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM)
     assertFalse(JaasUtils.isZkSecurityEnabled())
-    try {
+    try
       Configuration.setConfiguration(null)
       System.setProperty(
           JaasUtils.JAVA_LOGIN_CONFIG_PARAM, "no-such-file-exists.conf")
       JaasUtils.isZkSecurityEnabled()
       fail("Should have thrown an exception")
-    } catch {
-      case e: KafkaException => {
+    catch
+      case e: KafkaException =>
           // Expected
-        }
-      case e: Exception => {
+      case e: Exception =>
           fail(e.toString)
-        }
-    }
-  }
 
   /**
     * Exercises the code in ZkUtils. The goal is mainly
@@ -81,18 +75,15 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
     * when isSecure is set to true.
     */
   @Test
-  def testZkUtils() {
+  def testZkUtils()
     assertTrue(zkUtils.isSecure)
-    for (path <- zkUtils.persistentZkPaths) {
+    for (path <- zkUtils.persistentZkPaths)
       zkUtils.makeSurePersistentPathExists(path)
-      if (!path.equals(ZkUtils.ConsumersPath)) {
+      if (!path.equals(ZkUtils.ConsumersPath))
         val aclList = (zkUtils.zkConnection.getAcl(path)).getKey
         assertTrue(aclList.size == 2)
-        for (acl: ACL <- aclList.asScala) {
+        for (acl: ACL <- aclList.asScala)
           assertTrue(isAclSecure(acl))
-        }
-      }
-    }
     // Test that can create: createEphemeralPathExpectConflict
     zkUtils.createEphemeralPathExpectConflict("/a", "")
     verify("/a")
@@ -112,227 +103,193 @@ class ZkAuthorizationTest extends ZooKeeperTestHarness with Logging {
     assertTrue(valueB.equals("updated"))
 
     info("Leaving testZkUtils")
-  }
 
   /**
     * Tests the migration tool when making an unsecure
     * cluster secure.
     */
   @Test
-  def testZkMigration() {
+  def testZkMigration()
     val unsecureZkUtils = ZkUtils(zkConnect, 6000, 6000, false)
-    try {
+    try
       testMigration(zkConnect, unsecureZkUtils, zkUtils)
-    } finally {
+    finally
       unsecureZkUtils.close()
-    }
-  }
 
   /**
     * Tests the migration tool when making a secure
     * cluster unsecure.
     */
   @Test
-  def testZkAntiMigration() {
+  def testZkAntiMigration()
     val unsecureZkUtils = ZkUtils(zkConnect, 6000, 6000, false)
-    try {
+    try
       testMigration(zkConnect, zkUtils, unsecureZkUtils)
-    } finally {
+    finally
       unsecureZkUtils.close()
-    }
-  }
 
   /**
     * Tests that the persistent paths cannot be deleted.
     */
   @Test
-  def testDelete() {
+  def testDelete()
     info(s"zkConnect string: $zkConnect")
     ZkSecurityMigrator.run(
         Array("--zookeeper.acl=secure", s"--zookeeper.connect=$zkConnect"))
     deleteAllUnsecure()
-  }
 
   /**
     * Tests that znodes cannot be deleted when the 
     * persistent paths have children.
     */
   @Test
-  def testDeleteRecursive() {
+  def testDeleteRecursive()
     info(s"zkConnect string: $zkConnect")
-    for (path <- zkUtils.securePersistentZkPaths) {
+    for (path <- zkUtils.securePersistentZkPaths)
       info(s"Creating $path")
       zkUtils.makeSurePersistentPathExists(path)
       zkUtils.createPersistentPath(s"$path/fpjwashere", "")
-    }
     zkUtils.zkConnection.setAcl("/", zkUtils.DefaultAcls, -1)
     deleteAllUnsecure()
-  }
 
   /**
     * Tests the migration tool when chroot is being used.
     */
   @Test
-  def testChroot {
+  def testChroot
     val zkUrl = zkConnect + "/kafka"
     zkUtils.createPersistentPath("/kafka")
     val unsecureZkUtils = ZkUtils(zkUrl, 6000, 6000, false)
     val secureZkUtils = ZkUtils(zkUrl, 6000, 6000, true)
-    try {
+    try
       testMigration(zkUrl, unsecureZkUtils, secureZkUtils)
-    } finally {
+    finally
       unsecureZkUtils.close()
       secureZkUtils.close()
-    }
-  }
 
   /**
     * Exercises the migration tool. It is used in these test cases:
     * testZkMigration, testZkAntiMigration, testChroot.
     */
   private def testMigration(
-      zkUrl: String, firstZk: ZkUtils, secondZk: ZkUtils) {
+      zkUrl: String, firstZk: ZkUtils, secondZk: ZkUtils)
     info(s"zkConnect string: $zkUrl")
-    for (path <- firstZk.securePersistentZkPaths) {
+    for (path <- firstZk.securePersistentZkPaths)
       info(s"Creating $path")
       firstZk.makeSurePersistentPathExists(path)
       // Create a child for each znode to exercise the recurrent
       // traversal of the data tree
       firstZk.createPersistentPath(s"$path/fpjwashere", "")
-    }
     // Getting security option to determine how to verify ACLs.
     // Additionally, we create the consumers znode (not in
     // securePersistentZkPaths) to make sure that we don't
     // add ACLs to it.
-    val secureOpt: String = secondZk.isSecure match {
+    val secureOpt: String = secondZk.isSecure match
       case true =>
         firstZk.createPersistentPath(ZkUtils.ConsumersPath)
         "secure"
       case false =>
         secondZk.createPersistentPath(ZkUtils.ConsumersPath)
         "unsecure"
-    }
     ZkSecurityMigrator.run(
         Array(s"--zookeeper.acl=$secureOpt", s"--zookeeper.connect=$zkUrl"))
     info("Done with migration")
-    for (path <- secondZk.securePersistentZkPaths) {
+    for (path <- secondZk.securePersistentZkPaths)
       val listParent = (secondZk.zkConnection.getAcl(path)).getKey
       assertTrue(path, isAclCorrect(listParent, secondZk.isSecure))
 
       val childPath = path + "/fpjwashere"
       val listChild = (secondZk.zkConnection.getAcl(childPath)).getKey
       assertTrue(childPath, isAclCorrect(listChild, secondZk.isSecure))
-    }
     // Check consumers path.
     val consumersAcl =
       (firstZk.zkConnection.getAcl(ZkUtils.ConsumersPath)).getKey
     assertTrue(ZkUtils.ConsumersPath, isAclCorrect(consumersAcl, false))
-  }
 
   /**
     * Verifies that the path has the appropriate secure ACL.
     */
-  private def verify(path: String): Boolean = {
+  private def verify(path: String): Boolean =
     val list = (zkUtils.zkConnection.getAcl(path)).getKey
     list.asScala.forall(isAclSecure)
-  }
 
   /**
     * Verifies ACL.
     */
   private def isAclCorrect(
-      list: java.util.List[ACL], secure: Boolean): Boolean = {
-    val isListSizeCorrect = secure match {
+      list: java.util.List[ACL], secure: Boolean): Boolean =
+    val isListSizeCorrect = secure match
       case true => list.size == 2
       case false => list.size == 1
-    }
-    isListSizeCorrect && list.asScala.forall(secure match {
+    isListSizeCorrect && list.asScala.forall(secure match
       case true => isAclSecure
       case false => isAclUnsecure
-    })
-  }
+    )
 
   /**
     * Verifies that this ACL is the secure one. The
     * values are based on the constants used in the 
     * ZooKeeper code base.
     */
-  private def isAclSecure(acl: ACL): Boolean = {
+  private def isAclSecure(acl: ACL): Boolean =
     info(s"ACL $acl")
-    acl.getPerms match {
-      case 1 => {
+    acl.getPerms match
+      case 1 =>
           acl.getId.getScheme.equals("world")
-        }
-      case 31 => {
+      case 31 =>
           acl.getId.getScheme.equals("sasl")
-        }
-      case _: Int => {
+      case _: Int =>
           false
-        }
-    }
-  }
 
   /**
     * Verifies that the ACL corresponds to the unsecure one.
     */
-  private def isAclUnsecure(acl: ACL): Boolean = {
+  private def isAclUnsecure(acl: ACL): Boolean =
     info(s"ACL $acl")
-    acl.getPerms match {
-      case 31 => {
+    acl.getPerms match
+      case 31 =>
           acl.getId.getScheme.equals("world")
-        }
-      case _: Int => {
+      case _: Int =>
           false
-        }
-    }
-  }
 
   /**
     * Sets up and starts the recursive execution of deletes.
     * This is used in the testDelete and testDeleteRecursive
     * test cases.
     */
-  private def deleteAllUnsecure() {
+  private def deleteAllUnsecure()
     System.setProperty(JaasUtils.ZK_SASL_CLIENT, "false")
     val unsecureZkUtils = ZkUtils(zkConnect, 6000, 6000, false)
-    val result: Try[Boolean] = {
+    val result: Try[Boolean] =
       deleteRecursive(unsecureZkUtils, "/")
-    }
     // Clean up before leaving the test case
     unsecureZkUtils.close()
     System.clearProperty(JaasUtils.ZK_SASL_CLIENT)
 
     // Fail the test if able to delete
-    result match {
+    result match
       case Success(v) => // All done
       case Failure(e) => fail(e.getMessage)
-    }
-  }
 
   /**
     * Tries to delete znodes recursively
     */
-  private def deleteRecursive(zkUtils: ZkUtils, path: String): Try[Boolean] = {
+  private def deleteRecursive(zkUtils: ZkUtils, path: String): Try[Boolean] =
     info(s"Deleting $path")
     var result: Try[Boolean] = Success(true)
-    for (child <- zkUtils.getChildren(path)) result = (path match {
+    for (child <- zkUtils.getChildren(path)) result = (path match
       case "/" => deleteRecursive(zkUtils, s"/$child")
       case path => deleteRecursive(zkUtils, s"$path/$child")
-    }) match {
+    ) match
       case Success(v) => result
       case Failure(e) => Failure(e)
-    }
-    path match {
+    path match
       // Do not try to delete the root
       case "/" => result
       // For all other paths, try to delete it
       case path =>
-        try {
+        try
           zkUtils.deletePath(path)
           Failure(new Exception(s"Have been able to delete $path"))
-        } catch {
+        catch
           case e: Exception => result
-        }
-    }
-  }
-}

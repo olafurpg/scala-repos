@@ -12,22 +12,20 @@ import java.nio.ByteBuffer
 private[leveldb] final case class Key(
     persistenceId: Int, sequenceNr: Long, mappingId: Int)
 
-private[leveldb] object Key {
-  def keyToBytes(key: Key): Array[Byte] = {
+private[leveldb] object Key
+  def keyToBytes(key: Key): Array[Byte] =
     val bb = ByteBuffer.allocate(20)
     bb.putInt(key.persistenceId)
     bb.putLong(key.sequenceNr)
     bb.putInt(key.mappingId)
     bb.array
-  }
 
-  def keyFromBytes(bytes: Array[Byte]): Key = {
+  def keyFromBytes(bytes: Array[Byte]): Key =
     val bb = ByteBuffer.wrap(bytes)
     val aid = bb.getInt
     val snr = bb.getLong
     val mid = bb.getInt
     new Key(aid, snr, mid)
-  }
 
   def counterKey(persistenceId: Int): Key = Key(persistenceId, 0L, 0)
   def counterToBytes(ctr: Long): Array[Byte] =
@@ -41,4 +39,3 @@ private[leveldb] object Key {
   def deletionKey(persistenceId: Int, sequenceNr: Long): Key =
     Key(persistenceId, sequenceNr, 1)
   def isDeletionKey(key: Key): Boolean = key.mappingId == 1
-}

@@ -10,7 +10,7 @@ import akka.cluster.Cluster
 import akka.cluster.ddata.PNCounterMap
 import akka.cluster.ddata.Flag
 
-object VotingService {
+object VotingService
   case object Open
   case object OpenAck
   case object Close
@@ -20,9 +20,8 @@ object VotingService {
   final case class Votes(result: Map[String, BigInt], open: Boolean)
 
   private final case class GetVotesReq(replyTo: ActorRef)
-}
 
-class VotingService extends Actor {
+class VotingService extends Actor
   import akka.cluster.ddata.Replicator._
   import VotingService._
 
@@ -34,7 +33,7 @@ class VotingService extends Actor {
 
   replicator ! Subscribe(OpenedKey, self)
 
-  def receive = {
+  def receive =
     case Open ⇒
       replicator ! Update(OpenedKey, Flag(), WriteAll(5.seconds))(_.switchOn)
       becomeOpen()
@@ -44,20 +43,17 @@ class VotingService extends Actor {
 
     case GetVotes ⇒
       sender() ! Votes(Map.empty, open = false)
-  }
 
-  def becomeOpen(): Unit = {
+  def becomeOpen(): Unit =
     replicator ! Unsubscribe(OpenedKey, self)
     replicator ! Subscribe(ClosedKey, self)
     context.become(open orElse getVotes(open = true))
-  }
 
-  def open: Receive = {
+  def open: Receive =
     case v @ Vote(participant) ⇒
       val update =
-        Update(CountersKey, PNCounterMap(), WriteLocal, request = Some(v)) {
+        Update(CountersKey, PNCounterMap(), WriteLocal, request = Some(v))
           _.increment(participant, 1)
-        }
       replicator ! update
 
     case _: UpdateSuccess[_] ⇒
@@ -67,9 +63,8 @@ class VotingService extends Actor {
 
     case c @ Changed(ClosedKey) if c.get(ClosedKey).enabled ⇒
       context.become(getVotes(open = false))
-  }
 
-  def getVotes(open: Boolean): Receive = {
+  def getVotes(open: Boolean): Receive =
     case GetVotes ⇒
       replicator ! Get(
           CountersKey, ReadAll(3.seconds), Some(GetVotesReq(sender())))
@@ -83,5 +78,3 @@ class VotingService extends Actor {
 
     case _: GetFailure[_] ⇒
     case _: UpdateSuccess[_] ⇒
-  }
-}

@@ -13,36 +13,33 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alexander Podkhalyuzin
   */
 class ScalaLanguageCodeStyleSettingsProvider
-    extends LanguageCodeStyleSettingsProvider {
-  def getCodeSample(settingsType: SettingsType): String = {
-    settingsType match {
+    extends LanguageCodeStyleSettingsProvider
+  def getCodeSample(settingsType: SettingsType): String =
+    settingsType match
       case SettingsType.BLANK_LINES_SETTINGS => BLANK_LINES_CODE_SAMPLE
       case SettingsType.LANGUAGE_SPECIFIC => GENERAL_CODE_SAMPLE //todo:
       case SettingsType.SPACING_SETTINGS => GENERAL_CODE_SAMPLE //todo:
       case SettingsType.WRAPPING_AND_BRACES_SETTINGS =>
         WRAPPING_AND_BRACES_SAMPLE
       case _ => GENERAL_CODE_SAMPLE //todo:
-    }
-  }
 
   def getLanguage: Language = ScalaFileType.SCALA_LANGUAGE
 
   override def customizeSettings(
-      consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
+      consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType)
     def showCustomOption(fieldName: String,
                          title: String,
                          groupName: String,
-                         options: AnyRef*) {
+                         options: AnyRef*)
       consumer.showCustomOption(classOf[ScalaCodeStyleSettings],
                                 fieldName,
                                 title,
                                 groupName,
                                 options: _*)
-    }
 
     val buffer: ArrayBuffer[String] = new ArrayBuffer
     //spacing
-    if (settingsType == SettingsType.SPACING_SETTINGS) {
+    if (settingsType == SettingsType.SPACING_SETTINGS)
       buffer ++= Seq("SPACE_AFTER_COMMA",
                      "SPACE_BEFORE_IF_PARENTHESES",
                      "SPACE_BEFORE_FOR_PARENTHESES",
@@ -67,10 +64,9 @@ class ScalaLanguageCodeStyleSettingsProvider
                      "SPACE_BEFORE_WHILE_PARENTHESES",
                      "SPACE_AFTER_SEMICOLON",
                      "SPACE_BEFORE_ELSE_LBRACE")
-    }
 
     //blank lines
-    if (settingsType == SettingsType.BLANK_LINES_SETTINGS) {
+    if (settingsType == SettingsType.BLANK_LINES_SETTINGS)
       buffer ++= Seq("KEEP_BLANK_LINES_IN_CODE",
                      "BLANK_LINES_AFTER_CLASS_HEADER",
                      "KEEP_BLANK_LINES_BEFORE_RBRACE",
@@ -86,9 +82,8 @@ class ScalaLanguageCodeStyleSettingsProvider
                      "BLANK_LINES_AROUND_METHOD_IN_INTERFACE",
                      "BLANK_LINES_AROUND_METHOD",
                      "BLANK_LINES_BEFORE_METHOD_BODY")
-    }
 
-    if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
+    if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS)
       consumer.renameStandardOption(
           "BINARY_OPERATION_WRAP",
           "Wrap infix expressions, patterns and types ")
@@ -167,12 +162,11 @@ class ScalaLanguageCodeStyleSettingsProvider
       buffer ++= Seq("KEEP_SIMPLE_BLOCKS_IN_ONE_LINE",
                      "KEEP_SIMPLE_METHODS_IN_ONE_LINE",
                      "KEEP_FIRST_COLUMN_COMMENT")
-    }
 
     consumer.showStandardOptions(buffer.toArray: _*)
 
     //Custom options
-    if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS) {
+    if (settingsType == SettingsType.WRAPPING_AND_BRACES_SETTINGS)
       showCustomOption(
           "WRAP_BEFORE_WITH_KEYWORD",
           "Wrap before 'with' keyword",
@@ -237,9 +231,8 @@ class ScalaLanguageCodeStyleSettingsProvider
           "DO_NOT_ALIGN_BLOCK_EXPR_PARAMS",
           "Do not align block expression parameters",
           CodeStyleSettingsCustomizable.WRAPPING_METHOD_ARGUMENTS_WRAPPING)
-    }
 
-    if (settingsType == SettingsType.SPACING_SETTINGS) {
+    if (settingsType == SettingsType.SPACING_SETTINGS)
       showCustomOption("SPACE_AFTER_MODIFIERS_CONSTRUCTOR",
                        "Constructor parameters with modifiers",
                        CodeStyleSettingsCustomizable.SPACES_BEFORE_PARENTHESES)
@@ -276,9 +269,8 @@ class ScalaLanguageCodeStyleSettingsProvider
       showCustomOption("NEWLINE_AFTER_ANNOTATIONS",
                        "Newline after annotations",
                        CodeStyleSettingsCustomizable.SPACES_OTHER)
-    }
 
-    if (settingsType == SettingsType.LANGUAGE_SPECIFIC) {
+    if (settingsType == SettingsType.LANGUAGE_SPECIFIC)
       showCustomOption("SD_ALIGN_PARAMETERS_COMMENTS",
                        "Align parameter descriptions",
                        ScalaDocFormattingPanel.ALIGNMENT_GROUP)
@@ -315,8 +307,6 @@ class ScalaLanguageCodeStyleSettingsProvider
       showCustomOption("SD_PRESERVE_SPACES_IN_TAGS",
                        "Preserve spaces in tags",
                        ScalaDocFormattingPanel.OTHER_GROUP)
-    }
-  }
 
   //custom groups
   private val METHOD_DEFINITION = "Method definition"
@@ -324,7 +314,7 @@ class ScalaLanguageCodeStyleSettingsProvider
   private val CLASS_DEFINITION = "Class definition"
   private val XML_FORMATTING = "Xml formatting"
 
-  override def getDefaultCommonSettings: CommonCodeStyleSettings = {
+  override def getDefaultCommonSettings: CommonCodeStyleSettings =
     val commonCodeStyleSettings: CommonCodeStyleSettings =
       new CommonCodeStyleSettings(getLanguage)
     val indentOptions: CommonCodeStyleSettings.IndentOptions =
@@ -334,7 +324,6 @@ class ScalaLanguageCodeStyleSettingsProvider
     indentOptions.CONTINUATION_INDENT_SIZE = 2
     commonCodeStyleSettings.KEEP_FIRST_COLUMN_COMMENT = false //added here to comply with prior default behavior
     commonCodeStyleSettings
-  }
 
   override def getDisplayPriority = DisplayPriority.COMMON_SETTINGS
 
@@ -372,4 +361,3 @@ class ScalaLanguageCodeStyleSettingsProvider
     "\n" + "trait B {\n" + "  \n" + "  def foo\n" + "  def goo\n" +
     "  def too = {\n" + "    \n" + "    \n" + "    val x = 2\n" +
     "    new J {\n" + "      def goo = 1\n" + "    }\n" + "  }\n" + "}"
-}

@@ -25,14 +25,13 @@ import org.apache.kafka.common.record.TimestampType
 import org.junit.Assert._
 import org.junit.Test
 
-class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
+class ByteBufferMessageSetTest extends BaseMessageSetTestCases
 
   override def createMessageSet(messages: Seq[Message]): ByteBufferMessageSet =
     new ByteBufferMessageSet(NoCompressionCodec, messages: _*)
 
   @Test
-  def testValidBytes() {
-    {
+  def testValidBytes()
       val messages = new ByteBufferMessageSet(NoCompressionCodec,
                                               new Message("hello".getBytes),
                                               new Message("there".getBytes))
@@ -43,19 +42,15 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
       assertEquals("Adding invalid bytes shouldn't change byte count",
                    messages.validBytes,
                    messagesPlus.validBytes)
-    }
 
     // test valid bytes on empty ByteBufferMessageSet
-    {
       assertEquals(
           "Valid bytes on an empty ByteBufferMessageSet should return 0",
           0,
           MessageSet.Empty.asInstanceOf[ByteBufferMessageSet].validBytes)
-    }
-  }
 
   @Test
-  def testValidBytesWithCompression() {
+  def testValidBytesWithCompression()
     val messages = new ByteBufferMessageSet(DefaultCompressionCodec,
                                             new Message("hello".getBytes),
                                             new Message("there".getBytes))
@@ -66,10 +61,9 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
     assertEquals("Adding invalid bytes shouldn't change byte count",
                  messages.validBytes,
                  messagesPlus.validBytes)
-  }
 
   @Test
-  def testEquals() {
+  def testEquals()
     var messages = new ByteBufferMessageSet(DefaultCompressionCodec,
                                             new Message("hello".getBytes),
                                             new Message("there".getBytes))
@@ -87,10 +81,9 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                                             new Message("there".getBytes))
 
     assertTrue(messages.equals(moreMessages))
-  }
 
   @Test
-  def testIterator() {
+  def testIterator()
     val messageList = List(
         new Message("msg1".getBytes),
         new Message("msg2".getBytes),
@@ -98,7 +91,6 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
     )
 
     // test for uncompressed regular messages
-    {
       val messageSet = new ByteBufferMessageSet(
           NoCompressionCodec, messageList: _*)
       TestUtils.checkEquals[Message](
@@ -113,10 +105,8 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
       TestUtils.checkEquals[Message](
           TestUtils.getMessageIterator(messageSet.shallowIterator),
           TestUtils.getMessageIterator(messageSet.iterator))
-    }
 
     // test for compressed regular messages
-    {
       val messageSet = new ByteBufferMessageSet(
           DefaultCompressionCodec, messageList: _*)
       TestUtils.checkEquals[Message](
@@ -127,10 +117,8 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
           messageList.iterator,
           TestUtils.getMessageIterator(messageSet.iterator))
       verifyShallowIterator(messageSet)
-    }
 
     // test for mixed empty and non-empty messagesets uncompressed
-    {
       val emptyMessageList: List[Message] = Nil
       val emptyMessageSet = new ByteBufferMessageSet(
           NoCompressionCodec, emptyMessageList: _*)
@@ -153,10 +141,8 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
       TestUtils.checkEquals[Message](
           TestUtils.getMessageIterator(mixedMessageSet.shallowIterator),
           TestUtils.getMessageIterator(mixedMessageSet.iterator))
-    }
 
     // test for mixed empty and non-empty messagesets compressed
-    {
       val emptyMessageList: List[Message] = Nil
       val emptyMessageSet = new ByteBufferMessageSet(
           DefaultCompressionCodec, emptyMessageList: _*)
@@ -176,11 +162,9 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
           messageList.iterator,
           TestUtils.getMessageIterator(mixedMessageSet.iterator))
       verifyShallowIterator(mixedMessageSet)
-    }
-  }
 
   @Test
-  def testMessageWithProvidedOffsetSeq() {
+  def testMessageWithProvidedOffsetSeq()
     val offsets = Seq(0L, 2L)
     val messages = new ByteBufferMessageSet(
         compressionCodec = NoCompressionCodec,
@@ -190,10 +174,9 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
     val iter = messages.iterator
     assertEquals("first offset should be 0", 0L, iter.next().offset)
     assertEquals("second offset should be 2", 2L, iter.next().offset)
-  }
 
   @Test
-  def testLogAppendTime() {
+  def testLogAppendTime()
     val startTime = System.currentTimeMillis()
     // The timestamps should be overwritten
     val messages = getMessages(magicValue = Message.MagicValue_V1,
@@ -262,17 +245,15 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                  .message
                  .isValid)
 
-    def validateLogAppendTime(message: Message) {
+    def validateLogAppendTime(message: Message)
       message.ensureValid()
       assertTrue(
           s"Timestamp of message $message should be between $startTime and $now",
           message.timestamp >= startTime && message.timestamp <= now)
       assertEquals(TimestampType.LOG_APPEND_TIME, message.timestampType)
-    }
-  }
 
   @Test
-  def testCreateTime() {
+  def testCreateTime()
     val now = System.currentTimeMillis()
     val messages = getMessages(magicValue = Message.MagicValue_V1,
                                timestamp = now,
@@ -300,22 +281,19 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
           messageTimestampType = TimestampType.CREATE_TIME,
           messageTimestampDiffMaxMs = 1000L)
 
-    for (messageAndOffset <- validatedMessages) {
+    for (messageAndOffset <- validatedMessages)
       messageAndOffset.message.ensureValid()
       assertEquals(messageAndOffset.message.timestamp, now)
       assertEquals(
           messageAndOffset.message.timestampType, TimestampType.CREATE_TIME)
-    }
-    for (messageAndOffset <- validatedCompressedMessages) {
+    for (messageAndOffset <- validatedCompressedMessages)
       messageAndOffset.message.ensureValid()
       assertEquals(messageAndOffset.message.timestamp, now)
       assertEquals(
           messageAndOffset.message.timestampType, TimestampType.CREATE_TIME)
-    }
-  }
 
   @Test
-  def testInvalidCreateTime() {
+  def testInvalidCreateTime()
     val now = System.currentTimeMillis()
     val messages = getMessages(magicValue = Message.MagicValue_V1,
                                timestamp = now - 1001L,
@@ -324,7 +302,7 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                                          timestamp = now - 1001L,
                                          codec = DefaultCompressionCodec)
 
-    try {
+    try
       messages.validateMessagesAndAssignOffsets(
           offsetCounter = new LongRef(0),
           now = System.currentTimeMillis(),
@@ -334,11 +312,10 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
           messageTimestampType = TimestampType.CREATE_TIME,
           messageTimestampDiffMaxMs = 1000L)
       fail("Should throw InvalidMessageException.")
-    } catch {
+    catch
       case e: InvalidTimestampException =>
-    }
 
-    try {
+    try
       compressedMessages.validateMessagesAndAssignOffsets(
           offsetCounter = new LongRef(0),
           now = System.currentTimeMillis(),
@@ -348,13 +325,11 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
           messageTimestampType = TimestampType.CREATE_TIME,
           messageTimestampDiffMaxMs = 1000L)
       fail("Should throw InvalidMessageException.")
-    } catch {
+    catch
       case e: InvalidTimestampException =>
-    }
-  }
 
   @Test
-  def testAbsoluteOffsetAssignment() {
+  def testAbsoluteOffsetAssignment()
     val messages = getMessages(
         magicValue = Message.MagicValue_V0, codec = NoCompressionCodec)
     val compressedMessages = getMessages(
@@ -387,10 +362,9 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                        messageTimestampDiffMaxMs = 1000L)
                    ._1,
                  offset)
-  }
 
   @Test
-  def testRelativeOffsetAssignment() {
+  def testRelativeOffsetAssignment()
     val now = System.currentTimeMillis()
     val messages = getMessages(magicValue = Message.MagicValue_V1,
                                timestamp = now,
@@ -422,10 +396,9 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
           messageTimestampType = TimestampType.CREATE_TIME,
           messageTimestampDiffMaxMs = 5000L)
     checkOffsets(compressedMessagesWithOffset, offset)
-  }
 
   @Test
-  def testOffsetAssignmentAfterMessageFormatConversion() {
+  def testOffsetAssignmentAfterMessageFormatConversion()
     // Check up conversion
     val messagesV0 = getMessages(
         magicValue = Message.MagicValue_V0, codec = NoCompressionCodec)
@@ -494,33 +467,29 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                        messageTimestampDiffMaxMs = 5000L)
                    ._1,
                  offset)
-  }
 
   /* check that offsets are assigned based on byte offset from the given base offset */
-  def checkOffsets(messages: ByteBufferMessageSet, baseOffset: Long) {
+  def checkOffsets(messages: ByteBufferMessageSet, baseOffset: Long)
     assertTrue("Message set should not be empty", messages.size > 0)
     var offset = baseOffset
-    for (entry <- messages) {
+    for (entry <- messages)
       assertEquals(
           "Unexpected offset in message set iterator", offset, entry.offset)
       offset += 1
-    }
-  }
 
-  def verifyShallowIterator(messageSet: ByteBufferMessageSet) {
+  def verifyShallowIterator(messageSet: ByteBufferMessageSet)
     //make sure the offsets returned by a shallow iterator is a subset of that of a deep iterator
     val shallowOffsets =
       messageSet.shallowIterator.map(msgAndOff => msgAndOff.offset).toSet
     val deepOffsets =
       messageSet.iterator.map(msgAndOff => msgAndOff.offset).toSet
     assertTrue(shallowOffsets.subsetOf(deepOffsets))
-  }
 
   private def getMessages(
       magicValue: Byte = Message.CurrentMagicValue,
       timestamp: Long = Message.NoTimestamp,
-      codec: CompressionCodec = NoCompressionCodec): ByteBufferMessageSet = {
-    if (magicValue == Message.MagicValue_V0) {
+      codec: CompressionCodec = NoCompressionCodec): ByteBufferMessageSet =
+    if (magicValue == Message.MagicValue_V0)
       new ByteBufferMessageSet(
           codec,
           new Message(
@@ -530,7 +499,7 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
           new Message("beautiful".getBytes,
                       Message.NoTimestamp,
                       Message.MagicValue_V0))
-    } else {
+    else
       new ByteBufferMessageSet(codec,
                                new Message("hello".getBytes,
                                            timestamp = timestamp,
@@ -541,6 +510,3 @@ class ByteBufferMessageSetTest extends BaseMessageSetTestCases {
                                new Message("beautiful".getBytes,
                                            timestamp = timestamp,
                                            magicValue = Message.MagicValue_V1))
-    }
-  }
-}

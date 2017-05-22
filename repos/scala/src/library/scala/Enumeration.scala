@@ -51,7 +51,7 @@ import scala.util.matching.Regex
   *  @author  Matthias Zenger
   */
 @SerialVersionUID(8476000850333817230L)
-abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
+abstract class Enumeration(initial: Int) extends Serializable  thisenum =>
 
   def this() = this(0)
 
@@ -81,13 +81,11 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
 
   /** The values of this enumeration as a set.
     */
-  def values: ValueSet = {
-    if (!vsetDefined) {
+  def values: ValueSet =
+    if (!vsetDefined)
       vset = (ValueSet.newBuilder ++= vmap.values).result()
       vsetDefined = true
-    }
     vset
-  }
 
   /** The integer to use to identify the next created value. */
   protected var nextId: Int = initial
@@ -156,7 +154,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     */
   protected final def Value(i: Int, name: String): Value = new Val(i, name)
 
-  private def populateNameMap() {
+  private def populateNameMap()
     val fields: Array[JField] = getClass.getDeclaredFields
     def isValDef(m: JMethod): Boolean =
       fields exists
@@ -169,28 +167,24 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
             m.getParameterTypes.isEmpty &&
             classOf[Value].isAssignableFrom(m.getReturnType) &&
             m.getDeclaringClass != classOf[Enumeration] && isValDef(m))
-    methods foreach { m =>
+    methods foreach  m =>
       val name = m.getName
       // invoke method to obtain actual `Value` instance
       val value = m.invoke(this).asInstanceOf[Value]
       // verify that outer points to the correct Enumeration: ticket #3616.
-      if (value.outerEnum eq thisenum) {
+      if (value.outerEnum eq thisenum)
         val id = Int.unbox(classOf[Val] getMethod "id" invoke value)
         nmap += ((id, name))
-      }
-    }
-  }
 
   /* Obtains the name for the value with id `i`. If no name is cached
    * in `nmap`, it populates `nmap` using reflection.
    */
-  private def nameOf(i: Int): String = synchronized {
+  private def nameOf(i: Int): String = synchronized
     nmap.getOrElse(i, { populateNameMap(); nmap(i) })
-  }
 
   /** The type of the enumerated values. */
   @SerialVersionUID(7091335633555234129L)
-  abstract class Value extends Ordered[Value] with Serializable {
+  abstract class Value extends Ordered[Value] with Serializable
 
     /** the id and bit location of this enumeration value */
     def id: Int
@@ -202,23 +196,21 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
       if (this.id < that.id) -1
       else if (this.id == that.id) 0
       else 1
-    override def equals(other: Any) = other match {
+    override def equals(other: Any) = other match
       case that: Enumeration#Value =>
         (outerEnum eq that.outerEnum) && (id == that.id)
       case _ => false
-    }
     override def hashCode: Int = id.##
 
     /** Create a ValueSet which contains this value and another one */
     def +(v: Value) = ValueSet(this, v)
-  }
 
   /** A class implementing the [[scala.Enumeration.Value]] type. This class
     *  can be overridden to change the enumeration's naming and integer
     *  identification behaviour.
     */
   @SerialVersionUID(0 - 3501153230598116017L)
-  protected class Val(i: Int, name: String) extends Value with Serializable {
+  protected class Val(i: Int, name: String) extends Value with Serializable
     def this(i: Int) = this(i, nextNameOrNull)
     def this(name: String) = this(nextId, name)
     def this() = this(nextId)
@@ -233,22 +225,18 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     override def toString() =
       if (name != null) name
       else
-        try thisenum.nameOf(i) catch {
+        try thisenum.nameOf(i) catch
           case _: NoSuchElementException =>
             "<Invalid enum: no field for #" + i + ">"
-        }
 
-    protected def readResolve(): AnyRef = {
+    protected def readResolve(): AnyRef =
       val enum = thisenum.readResolve().asInstanceOf[Enumeration]
       if (enum.vmap == null) this
       else enum.vmap(i)
-    }
-  }
 
   /** An ordering by id for values of this set */
-  object ValueOrdering extends Ordering[Value] {
+  object ValueOrdering extends Ordering[Value]
     def compare(x: Value, y: Value): Int = x compare y
-  }
 
   /** A class for sets of values.
     *  Iterating through this set will yield values in increasing order of their ids.
@@ -259,7 +247,7 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     */
   class ValueSet private[ValueSet](private[this] var nnIds: immutable.BitSet)
       extends AbstractSet[Value] with immutable.SortedSet[Value]
-      with SortedSetLike[Value, ValueSet] with Serializable {
+      with SortedSetLike[Value, ValueSet] with Serializable
 
     implicit def ordering: Ordering[Value] = ValueOrdering
     def rangeImpl(from: Option[Value], until: Option[Value]): ValueSet =
@@ -279,10 +267,9 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
     /** Creates a bit mask for the zero-adjusted ids in this set as a
       *  new array of longs */
     def toBitMask: Array[Long] = nnIds.toBitMask
-  }
 
   /** A factory object for value sets */
-  object ValueSet {
+  object ValueSet
     import generic.CanBuildFrom
 
     /** The empty value set */
@@ -298,18 +285,14 @@ abstract class Enumeration(initial: Int) extends Serializable { thisenum =>
 
     /** A builder object for value sets */
     def newBuilder: mutable.Builder[Value, ValueSet] =
-      new mutable.Builder[Value, ValueSet] {
+      new mutable.Builder[Value, ValueSet]
         private[this] val b = new mutable.BitSet
         def +=(x: Value) = { b += (x.id - bottomId); this }
         def clear() = b.clear()
         def result() = new ValueSet(b.toImmutable)
-      }
 
     /** The implicit builder for value sets */
     implicit def canBuildFrom: CanBuildFrom[ValueSet, Value, ValueSet] =
-      new CanBuildFrom[ValueSet, Value, ValueSet] {
+      new CanBuildFrom[ValueSet, Value, ValueSet]
         def apply(from: ValueSet) = newBuilder
         def apply() = newBuilder
-      }
-  }
-}

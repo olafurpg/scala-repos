@@ -37,7 +37,7 @@ class MongoMapField[OwnerType <: BsonRecord[OwnerType], MapValueType](
     rec: OwnerType)
     extends Field[Map[String, MapValueType], OwnerType]
     with MandatoryTypedField[Map[String, MapValueType]]
-    with MongoFieldFlavor[Map[String, MapValueType]] {
+    with MongoFieldFlavor[Map[String, MapValueType]]
 
   import Meta.Reflection._
 
@@ -45,8 +45,8 @@ class MongoMapField[OwnerType <: BsonRecord[OwnerType], MapValueType](
 
   def defaultValue = Map[String, MapValueType]()
 
-  def setFromAny(in: Any): Box[Map[String, MapValueType]] = {
-    in match {
+  def setFromAny(in: Any): Box[Map[String, MapValueType]] =
+    in match
       case dbo: DBObject => setFromDBObject(dbo)
       case map: Map[_, _] =>
         setBox(Full(map.asInstanceOf[Map[String, MapValueType]]))
@@ -62,10 +62,8 @@ class MongoMapField[OwnerType <: BsonRecord[OwnerType], MapValueType](
       case null | None | Empty => setBox(defaultValueBox)
       case f: Failure => setBox(f)
       case o => setFromString(o.toString)
-    }
-  }
 
-  def setFromJValue(jvalue: JValue) = jvalue match {
+  def setFromJValue(jvalue: JValue) = jvalue match
     case JNothing | JNull if optional_? => setBox(Empty)
     case JObject(obj) =>
       setBox(
@@ -74,52 +72,45 @@ class MongoMapField[OwnerType <: BsonRecord[OwnerType], MapValueType](
                   jf => (jf.name, jf.value.values.asInstanceOf[MapValueType]))
           ))
     case other => setBox(FieldHelpers.expectedA("JObject", other))
-  }
 
   def setFromString(in: String): Box[Map[String, MapValueType]] =
-    tryo(JsonParser.parse(in)) match {
+    tryo(JsonParser.parse(in)) match
       case Full(jv: JValue) => setFromJValue(jv)
       case f: Failure => setBox(f)
       case other =>
         setBox(Failure("Error parsing String into a JValue: " + in))
-    }
 
   def toForm: Box[NodeSeq] = Empty
 
   def asJValue: JValue =
     JObject(
-        value.keys.map {
+        value.keys.map
       k =>
-        JField(k, value(k).asInstanceOf[AnyRef] match {
+        JField(k, value(k).asInstanceOf[AnyRef] match
           case x if primitive_?(x.getClass) => primitive2jvalue(x)
           case x if mongotype_?(x.getClass) =>
             mongotype2jvalue(x)(owner.meta.formats)
           case x if datetype_?(x.getClass) =>
             datetype2jvalue(x)(owner.meta.formats)
           case _ => JNothing
-        })
-    }.toList)
+        )
+    .toList)
 
   /*
    * Convert this field's value into a DBObject so it can be stored in Mongo.
    */
-  def asDBObject: DBObject = {
+  def asDBObject: DBObject =
     val dbo = new BasicDBObject
-    value.keys.foreach { k =>
+    value.keys.foreach  k =>
       dbo.put(k.toString, value.getOrElse(k, ""))
-    }
     dbo
-  }
 
   // set this field's value using a DBObject returned from Mongo.
-  def setFromDBObject(dbo: DBObject): Box[Map[String, MapValueType]] = {
+  def setFromDBObject(dbo: DBObject): Box[Map[String, MapValueType]] =
     import scala.collection.JavaConversions._
 
     setBox(
         Full(
-            Map() ++ dbo.keySet.map { k =>
+            Map() ++ dbo.keySet.map  k =>
           (k.toString, dbo.get(k).asInstanceOf[MapValueType])
-        }
         ))
-  }
-}

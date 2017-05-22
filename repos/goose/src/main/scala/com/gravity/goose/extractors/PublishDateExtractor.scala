@@ -32,7 +32,7 @@ import org.jsoup.nodes.Element
   * Date: 5/19/11
   * Time: 2:50 PM
   */
-abstract class PublishDateExtractor extends Extractor[Date] {
+abstract class PublishDateExtractor extends Extractor[Date]
 
   /**
     * Intended to search the DOM and identify the {@link Date} of when this article was published.
@@ -42,9 +42,8 @@ abstract class PublishDateExtractor extends Extractor[Date] {
     * @return {@link Date} of when this particular article was published or <code>null</code> if no date could be found.
     */
   def extract(rootElement: Element): Date
-}
 
-object PublishDateExtractor extends Logging {
+object PublishDateExtractor extends Logging
   val logPrefix = "PublishDateExtractor: "
 
   lazy val datatypeFactory: DatatypeFactory = DatatypeFactory.newInstance()
@@ -52,28 +51,24 @@ object PublishDateExtractor extends Logging {
   /**
     * Helper function to return the minimum of two non-null Java Dates.
     */
-  def minDate(lhs: java.util.Date, rhs: java.util.Date): java.util.Date = {
+  def minDate(lhs: java.util.Date, rhs: java.util.Date): java.util.Date =
     if (lhs.getTime < rhs.getTime) lhs
     else rhs
-  }
 
   /**
     * Helper function to parse ISO 8601 date/time strings safely.
     */
-  def safeParseISO8601Date(txt: String): Option[java.util.Date] = {
+  def safeParseISO8601Date(txt: String): Option[java.util.Date] =
     if (txt == null || txt.isEmpty) return None
 
-    try {
+    try
       Option(
           datatypeFactory
             .newXMLGregorianCalendar(txt)
             .toGregorianCalendar
             .getTime)
-    } catch {
+    catch
       case ex: Exception =>
         info(
             s"`$txt` could not be parsed to date as it did not meet the ISO 8601 spec")
         None
-    }
-  }
-}

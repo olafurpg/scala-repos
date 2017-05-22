@@ -18,10 +18,9 @@
 package org.apache.spark
 
 class SparkException(message: String, cause: Throwable)
-    extends Exception(message, cause) {
+    extends Exception(message, cause)
 
   def this(message: String) = this(message, null)
-}
 
 /**
   * Exception thrown when execution of some user code in the driver process fails, e.g.

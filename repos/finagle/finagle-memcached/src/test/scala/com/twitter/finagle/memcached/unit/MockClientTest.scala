@@ -9,16 +9,15 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class MockClientTest extends FunSuite {
+class MockClientTest extends FunSuite
 
-  test("correctly perform the GET command") {
+  test("correctly perform the GET command")
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(Await.result(memcache.get("key")) == Some("value"))
     assert(Await.result(memcache.get("unknown")) == None)
-  }
 
-  test("correctly perform the SET command") {
+  test("correctly perform the SET command")
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(
@@ -32,9 +31,8 @@ class MockClientTest extends FunSuite {
     assert(
         Await.result(memcache.set("key2", "value3").liftToTry) == Return.Unit)
     assert(Await.result(memcache.get("key2")) == Some("value3"))
-  }
 
-  test("correctly perform the ADD command") {
+  test("correctly perform the ADD command")
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(!Await.result(memcache.add("key", "new value")))
@@ -45,9 +43,8 @@ class MockClientTest extends FunSuite {
 
     assert(!Await.result(memcache.add("key2", "value3")))
     assert(Await.result(memcache.get("key2")) == Some("value2"))
-  }
 
-  test("correctly perform the APPEND command") {
+  test("correctly perform the APPEND command")
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(Await.result(memcache.append("key", "More")))
@@ -55,9 +52,8 @@ class MockClientTest extends FunSuite {
 
     assert(!Await.result(memcache.append("unknown", "value")))
     assert(Await.result(memcache.get("unknown")) == None)
-  }
 
-  test("correctly perform the PREPEND command") {
+  test("correctly perform the PREPEND command")
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(Await.result(memcache.prepend("key", "More")))
@@ -65,9 +61,8 @@ class MockClientTest extends FunSuite {
 
     assert(!Await.result(memcache.prepend("unknown", "value")))
     assert(Await.result(memcache.get("unknown")) == None)
-  }
 
-  test("correctly perform the REPLACE command") {
+  test("correctly perform the REPLACE command")
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(Await.result(memcache.replace("key", "new value")))
@@ -75,9 +70,8 @@ class MockClientTest extends FunSuite {
 
     assert(!Await.result(memcache.replace("unknown", "value")))
     assert(Await.result(memcache.get("unknown")) == None)
-  }
 
-  test("correctly perform the DELETE command") {
+  test("correctly perform the DELETE command")
     val memcache = new MockClient(Map("key" -> "value")).withStrings
 
     assert(Await.result(memcache.delete("key")))
@@ -85,9 +79,8 @@ class MockClientTest extends FunSuite {
 
     assert(!Await.result(memcache.delete("unknown")))
     assert(Await.result(memcache.get("unknown")) == None)
-  }
 
-  test("correctly perform the INCR command") {
+  test("correctly perform the INCR command")
     val memcache =
       new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
 
@@ -100,9 +93,8 @@ class MockClientTest extends FunSuite {
 
     assert(Await.result(memcache.incr("unknown")) == None)
     assert(Await.result(memcache.get("unknown")) == None)
-  }
 
-  test("correctly perform the DECR command") {
+  test("correctly perform the DECR command")
     val memcache =
       new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
 
@@ -117,18 +109,16 @@ class MockClientTest extends FunSuite {
 
     assert(Await.result(memcache.decr("unknown")) == None)
     assert(Await.result(memcache.get("unknown")) == None)
-  }
 
-  test("`getResults` command populates the `casUnique` value") {
+  test("`getResults` command populates the `casUnique` value")
     val memcache =
       new MockClient(Map("key" -> "value", "count" -> "1")).withStrings
 
     val result = Await.result(memcache.getResult(Seq("key")))
 
     assert(result.hits("key").casUnique.isDefined)
-  }
 
-  test("`contents` produces immutable copies") {
+  test("`contents` produces immutable copies")
     val memcache = new MockClient()
     val emptyContents = memcache.contents
 
@@ -138,5 +128,3 @@ class MockClientTest extends FunSuite {
     // ensure that contents of emptyContents has not changed: check it after set
     assert(emptyContents == Map())
     assert(oneKey == Map("key" -> Buf.Utf8("value")))
-  }
-}

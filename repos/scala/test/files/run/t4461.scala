@@ -2,14 +2,14 @@ import scala.collection.mutable._
 import scala.collection.script._
 
 // #4461
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val buf = new ArrayBuffer[Int] with ObservableBuffer[Int]
     buf.subscribe(
-        new Subscriber[Message[Int], ObservableBuffer[Int]] {
+        new Subscriber[Message[Int], ObservableBuffer[Int]]
       def notify(pub: ObservableBuffer[Int], event: Message[Int]) =
         println(event)
-    })
+    )
 
     buf += 1 // works
     buf ++= Array(2) // works
@@ -20,5 +20,3 @@ object Test {
     0 +=: buf
     List(-2, -1) ++=: buf
     buf remove 0
-  }
-}

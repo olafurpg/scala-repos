@@ -1,13 +1,13 @@
 package org.scalajs.core.tools.io
 
-object CacheUtils {
+object CacheUtils
 
-  def joinVersions(vs: Option[String]*): Option[String] = {
+  def joinVersions(vs: Option[String]*): Option[String] =
     val bld = new StringBuilder
 
     @scala.annotation.tailrec
-    def loop(vs: Seq[Option[String]]): Option[String] = {
-      vs match {
+    def loop(vs: Seq[Option[String]]): Option[String] =
+      vs match
         case Some(v) :: vss =>
           bld.append(mangleVersionString(v))
           loop(vss)
@@ -15,11 +15,8 @@ object CacheUtils {
           None
         case Nil =>
           Some(bld.toString)
-      }
-    }
 
     loop(vs.toList)
-  }
 
   def joinVersions(vs: String*): String =
     vs.map(mangleVersionString _).mkString
@@ -28,23 +25,19 @@ object CacheUtils {
 
   def cached(version: Option[String],
              output: VirtualFile,
-             cache: Option[WritableVirtualTextFile])(action: => Unit): Unit = {
+             cache: Option[WritableVirtualTextFile])(action: => Unit): Unit =
 
     val upToDate =
-      output.exists && (for {
+      output.exists && (for
         v <- version
         c <- cache if c.exists
-      } yield c.content == v).getOrElse(false)
+      yield c.content == v).getOrElse(false)
 
     // Are we outdated?
-    if (!upToDate) {
+    if (!upToDate)
       action
 
       // Write cache
-      for (c <- cache; v <- version) {
+      for (c <- cache; v <- version)
         val w = c.contentWriter
         try w.write(v) finally w.close()
-      }
-    }
-  }
-}

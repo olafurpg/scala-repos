@@ -18,16 +18,15 @@ import scala.concurrent.Future
 /**
   * FileSystem utilities.
   */
-object Files {
+object Files
 
   /**
     * Logic for creating a temporary file. Users should try to clean up the
     * file themselves, but this TemporaryFileCreator implementation may also
     * try to clean up any leaked files, e.g. when the Application or JVM stops.
     */
-  trait TemporaryFileCreator {
+  trait TemporaryFileCreator
     def create(prefix: String, suffix: String): File
-  }
 
   /**
     * Creates temporary folders inside a single temporary folder. The folder
@@ -36,83 +35,71 @@ object Files {
   @Singleton
   class DefaultTemporaryFileCreator @Inject()(
       applicationLifecycle: ApplicationLifecycle)
-      extends TemporaryFileCreator {
+      extends TemporaryFileCreator
     private lazy val playTempFolder = JFiles.createTempDirectory("playtemp")
 
     /**
       * Application stop hook which deletes the temporary folder recursively (including subfolders).
       */
-    applicationLifecycle.addStopHook { () =>
+    applicationLifecycle.addStopHook  () =>
       Future.successful(
-          JFiles.walkFileTree(playTempFolder, new SimpleFileVisitor[Path] {
-        override def visitFile(file: Path, attrs: BasicFileAttributes) = {
+          JFiles.walkFileTree(playTempFolder, new SimpleFileVisitor[Path]
+        override def visitFile(file: Path, attrs: BasicFileAttributes) =
           JFiles.deleteIfExists(file)
           FileVisitResult.CONTINUE
-        }
-        override def postVisitDirectory(dir: Path, exc: IOException) = {
+        override def postVisitDirectory(dir: Path, exc: IOException) =
           JFiles.deleteIfExists(dir)
           FileVisitResult.CONTINUE
-        }
-      }))
-    }
+      ))
 
-    def create(prefix: String, suffix: String): File = {
+    def create(prefix: String, suffix: String): File =
       JFiles.createTempFile(playTempFolder, prefix, suffix).toFile
-    }
-  }
 
   /**
     * Creates temporary folders using the default JRE method. Files
     * created by this method will not be cleaned up with the application
     * or JVM stops.
     */
-  object SingletonTemporaryFileCreator extends TemporaryFileCreator {
-    def create(prefix: String, suffix: String): File = {
+  object SingletonTemporaryFileCreator extends TemporaryFileCreator
+    def create(prefix: String, suffix: String): File =
       JFiles.createTempFile(prefix, suffix).toFile
-    }
-  }
 
   /**
     * A temporary file hold a reference to a real file, and will delete
     * it when the reference is garbaged.
     */
-  case class TemporaryFile(file: File) {
+  case class TemporaryFile(file: File)
 
     /**
       * Clean this temporary file now.
       */
-    def clean(): Boolean = {
+    def clean(): Boolean =
       JFiles.deleteIfExists(file.toPath)
-    }
 
     /**
       * Move the file.
       */
-    def moveTo(to: File, replace: Boolean = false): File = {
-      try {
+    def moveTo(to: File, replace: Boolean = false): File =
+      try
         if (replace)
           JFiles.move(
               file.toPath, to.toPath, StandardCopyOption.REPLACE_EXISTING)
         else JFiles.move(file.toPath, to.toPath)
-      } catch {
+      catch
         case ex: FileAlreadyExistsException => to
-      }
 
       to
-    }
 
     /**
       * Delete this file on garbage collection.
       */
-    override def finalize() {
+    override def finalize()
       clean()
-    }
-  }
 
   /**
     * Utilities to manage temporary files.
     */
-  object TemporaryFile {
+  object TemporaryFile
 
     /**
       * Cache the current Application's TemporaryFileCreator
@@ -140,8 +127,5 @@ object Files {
       * @param suffix The suffix used for the temporary file name.
       * @return A temporary file instance.
       */
-    def apply(prefix: String = "", suffix: String = ""): TemporaryFile = {
+    def apply(prefix: String = "", suffix: String = ""): TemporaryFile =
       TemporaryFile(currentCreator.create(prefix, suffix))
-    }
-  }
-}

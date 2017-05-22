@@ -18,13 +18,13 @@ import scala.concurrent.duration._
 import ZKStore._
 
 class ZKStoreTest
-    extends PersistentStoreTest with StartedZookeeper with Matchers {
+    extends PersistentStoreTest with StartedZookeeper with Matchers
 
   //
   // See PersistentStoreTests for general store tests
   //
 
-  test("Compatibility to mesos state storage. Write zk read mesos.") {
+  test("Compatibility to mesos state storage. Write zk read mesos.")
     val created = persistentStore.create("foo", "Hello".getBytes).futureValue
     val mesosLoaded = mesosStore.load("foo").futureValue
     mesosLoaded should be('defined)
@@ -36,9 +36,8 @@ class ZKStoreTest
     val mesosLoadUpdated = mesosStore.load("foo").futureValue
     mesosLoadUpdated should be('defined)
     mesosLoadUpdated.get.bytes should be("Hello again".getBytes)
-  }
 
-  test("Compatibility to mesos state storage. Write mesos read zk.") {
+  test("Compatibility to mesos state storage. Write mesos read zk.")
     val created = mesosStore.create("foo", "Hello".getBytes).futureValue
     val zkLoaded = persistentStore.load("foo").futureValue
     zkLoaded should be('defined)
@@ -50,18 +49,16 @@ class ZKStoreTest
     val zkLoadUpdated = persistentStore.load("foo").futureValue
     zkLoadUpdated should be('defined)
     zkLoadUpdated.get.bytes should be("Hello again".getBytes)
-  }
 
-  test("Deeply nested paths are created") {
+  test("Deeply nested paths are created")
     val client = persistentStore.client
     val path = client("/s/o/m/e/d/e/e/p/ly/n/e/s/t/e/d/p/a/t/h")
     val store = new ZKStore(client, path, conf)
     path.exists().asScala.failed.futureValue shouldBe a[NoNodeException]
     store.initialize().futureValue
     path.exists().asScala.futureValue.stat.getVersion should be(0)
-  }
 
-  test("Already existing paths are not created") {
+  test("Already existing paths are not created")
     val client = persistentStore.client
     val path = client("/some/deeply/nested/path")
     path.exists().asScala.failed.futureValue shouldBe a[NoNodeException]
@@ -69,9 +66,8 @@ class ZKStoreTest
     path.exists().asScala.futureValue.stat.getVersion should be(0)
     new ZKStore(client, path, conf).initialize().futureValue
     path.exists().asScala.futureValue.stat.getVersion should be(0)
-  }
 
-  test("Entity nodes greater than the compression limit get compressed") {
+  test("Entity nodes greater than the compression limit get compressed")
     import ZKStore._
 
     val compress = CompressionConf(true, 0)
@@ -102,18 +98,16 @@ class ZKStoreTest
     val loaded = store.load("big").futureValue
     loaded should be('defined)
     loaded.get.bytes should be(content)
-  }
 
-  lazy val persistentStore: ZKStore = {
+  lazy val persistentStore: ZKStore =
     implicit val timer = com.twitter.util.Timer.Nil
     val timeout =
       com.twitter.util.TimeConversions.intToTimeableNumber(10).minutes
     val client = ZkClient(config.zkHostAndPort, timeout)
       .withAcl(Ids.OPEN_ACL_UNSAFE.asScala)
     new ZKStore(client, client(config.zkPath), conf)
-  }
 
-  lazy val mesosStore: MesosStateStore = {
+  lazy val mesosStore: MesosStateStore =
     val duration = 30.seconds
     val state = new ZooKeeperState(
         config.zkHostAndPort,
@@ -122,16 +116,12 @@ class ZKStoreTest
         config.zkPath
     )
     new MesosStateStore(state, duration)
-  }
 
   val conf = CompressionConf(false, 0)
 
-  override protected def beforeAll(configMap: ConfigMap): Unit = {
+  override protected def beforeAll(configMap: ConfigMap): Unit =
     super.beforeAll(configMap + ("zkPort" -> "2185"))
-  }
 
-  override protected def afterAll(configMap: ConfigMap): Unit = {
+  override protected def afterAll(configMap: ConfigMap): Unit =
     Await.ready(persistentStore.client.release())
     super.afterAll(configMap)
-  }
-}

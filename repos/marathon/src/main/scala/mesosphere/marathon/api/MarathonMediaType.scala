@@ -1,6 +1,6 @@
 package mesosphere.marathon.api
 
-object MarathonMediaType {
+object MarathonMediaType
 
   /**
     * JSON media type plus a weight which prefers this media type over alternatives if there are multiple
@@ -13,4 +13,3 @@ object MarathonMediaType {
     * with a matching @Produces value.
     */
   final val PREFERRED_APPLICATION_JSON = "application/json;qs=2"
-}

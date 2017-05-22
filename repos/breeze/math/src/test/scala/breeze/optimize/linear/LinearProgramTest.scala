@@ -8,7 +8,7 @@ import breeze.linalg.{norm, DenseVector}
   *
   * @author dlwh
   **/
-class LinearProgramTest extends FunSuite {
+class LinearProgramTest extends FunSuite
 
   /*
   test("ILP Test") {
@@ -26,7 +26,7 @@ class LinearProgramTest extends FunSuite {
     assert(result.valueOf(x2) === 78)
   }*/
 
-  test("maximize") {
+  test("maximize")
     //    http://www.tu-chemnitz.de/mathematik/discrete/manuals/cplex/doc/getstart/html/cpxGSilocplex13.0html
     val lp = new LinearProgram()
     import lp._
@@ -41,9 +41,8 @@ class LinearProgramTest extends FunSuite {
     val result = maximize(lpp)
 
     assert(norm(result.result - DenseVector(40.0, 17.5, 42.5), 2) < 1E-4)
-  }
 
-  test("minimize") {
+  test("minimize")
     val lp = new LinearProgram
     import lp._
     val x0 = Real()
@@ -59,7 +58,6 @@ class LinearProgramTest extends FunSuite {
     val res = minimize(lpp)
     println(res.result)
     assert(norm(res.result - DenseVector(10.0, 0.0, 0.0, 10.0), 2) < 1E-4)
-  }
 
   /*
   test("Binary ILP Test") {
@@ -77,4 +75,3 @@ class LinearProgramTest extends FunSuite {
     assert(result.valueOf(x2) === 1)
   }
  */
-}

@@ -5,23 +5,22 @@ import org.scalajs.jasminetest.JasmineTest
 import java.io._
 import java.util.zip._
 
-object ZipInputStreamTest extends JasmineTest {
+object ZipInputStreamTest extends JasmineTest
 
-  when("typedarray").describe("java.util.zip.ZipInputStream") {
+  when("typedarray").describe("java.util.zip.ZipInputStream")
 
-    it("should read zip archives") {
+    it("should read zip archives")
       val in = new ZipInputStream(new ByteArrayInputStream(binZip))
 
-      def expectBinEntry(name: String, data: Seq[Int]): Unit = {
+      def expectBinEntry(name: String, data: Seq[Int]): Unit =
         val e = in.getNextEntry()
         expect(e.getName()).toEqual(name)
 
         for (d <- data) expect(in.read()).toBe(d)
 
         expect(in.read()).toBe(-1)
-      }
 
-      def expectStrEntry(name: String, content: String): Unit = {
+      def expectStrEntry(name: String, content: String): Unit =
         val e = in.getNextEntry()
         expect(e.getName()).toEqual(name)
 
@@ -30,7 +29,6 @@ object ZipInputStreamTest extends JasmineTest {
         for (c <- content) expect(r.read().toChar).toBe(c)
 
         expect(r.read()).toBe(-1)
-      }
 
       expectBinEntry("greetings/", Seq())
       expectStrEntry("greetings/en.txt", "Hello World, how are you doing?\n")
@@ -42,8 +40,6 @@ object ZipInputStreamTest extends JasmineTest {
 
       expect(in.getNextEntry() == null).toBeTruthy
       in.close()
-    }
-  }
 
   /** A zip archive for testing:
     *
@@ -1363,4 +1359,3 @@ object ZipInputStreamTest extends JasmineTest {
       0,
       0,
       0)
-}

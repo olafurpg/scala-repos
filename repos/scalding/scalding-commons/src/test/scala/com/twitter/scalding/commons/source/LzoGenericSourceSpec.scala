@@ -19,12 +19,9 @@ import com.twitter.bijection.JavaSerializationInjection
 import org.scalatest.{Matchers, WordSpec}
 import scala.util.Success
 
-class LzoGenericSourceSpec extends WordSpec with Matchers {
-  "LzoGenericScheme" should {
-    "be serializable" in {
+class LzoGenericSourceSpec extends WordSpec with Matchers
+  "LzoGenericScheme" should
+    "be serializable" in
       val scheme = LzoGenericScheme[Array[Byte]](IdentityBinaryConverter)
       val inj = JavaSerializationInjection[LzoGenericScheme[Array[Byte]]]
       inj.invert(inj.apply(scheme)) shouldBe Success(scheme)
-    }
-  }
-}

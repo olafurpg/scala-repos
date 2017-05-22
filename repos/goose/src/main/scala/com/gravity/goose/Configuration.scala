@@ -28,7 +28,7 @@ import com.gravity.goose.extractors.{StandardContentExtractor, ContentExtractor,
   * User: jim
   * Date: 8/16/11
   */
-class Configuration {
+class Configuration
 
   /**
     * this is the local storage path used to place images to inspect them, should be writable
@@ -77,22 +77,20 @@ class Configuration {
 
   var contentExtractor: ContentExtractor = StandardContentExtractor
 
-  var publishDateExtractor: PublishDateExtractor = new PublishDateExtractor {
+  var publishDateExtractor: PublishDateExtractor = new PublishDateExtractor
     import PublishDateExtractor._
 
     def extractCandidate(
-        rootElement: Element, selector: String): Seq[java.util.Date] = {
+        rootElement: Element, selector: String): Seq[java.util.Date] =
       import scala.collection.JavaConversions._
 
-      try {
+      try
         rootElement
           .select(selector)
           .flatMap(item => safeParseISO8601Date(item.attr("content")))
-      } catch {
+      catch
         case e: Exception =>
           Nil
-      }
-    }
 
     final val pubSelectors = Seq(
         "meta[property~=article:published_time]"
@@ -103,7 +101,7 @@ class Configuration {
         "meta[property~=og:updated_time]"
     )
 
-    def extract(rootElement: Element): java.util.Date = {
+    def extract(rootElement: Element): java.util.Date =
       // A few different ways to get a date.
       def bestPubDate =
         pubSelectors
@@ -116,52 +114,43 @@ class Configuration {
 
       // Return the oldest 'published' date, or else the oldest 'modified' date, or null if none.
       bestPubDate.orElse(bestModDate).getOrElse(null)
-    }
-  }
 
   var additionalDataExtractor: AdditionalDataExtractor =
     new AdditionalDataExtractor
 
-  def getPublishDateExtractor: PublishDateExtractor = {
+  def getPublishDateExtractor: PublishDateExtractor =
     publishDateExtractor
-  }
 
-  def setContentExtractor(extractor: ContentExtractor) {
+  def setContentExtractor(extractor: ContentExtractor)
     if (extractor == null)
       throw new IllegalArgumentException("extractor must not be null!")
     contentExtractor = extractor
-  }
 
   /**
     * Pass in to extract article publish dates.
     * @param extractor a concrete instance of {@link PublishDateExtractor}
     * @throws IllegalArgumentException if the instance passed in is <code>null</code>
     */
-  def setPublishDateExtractor(extractor: PublishDateExtractor) {
+  def setPublishDateExtractor(extractor: PublishDateExtractor)
     if (extractor == null)
       throw new IllegalArgumentException("extractor must not be null!")
     this.publishDateExtractor = extractor
-  }
 
-  def getAdditionalDataExtractor: AdditionalDataExtractor = {
+  def getAdditionalDataExtractor: AdditionalDataExtractor =
     additionalDataExtractor
-  }
 
   /**
     * Pass in to extract any additional data not defined within {@link Article}
     * @param extractor a concrete instance of {@link AdditionalDataExtractor}
     * @throws IllegalArgumentException if the instance passed in is <code>null</code>
     */
-  def setAdditionalDataExtractor(extractor: AdditionalDataExtractor) {
+  def setAdditionalDataExtractor(extractor: AdditionalDataExtractor)
     this.additionalDataExtractor = extractor
-  }
 
   var htmlFetcher: AbstractHtmlFetcher = HtmlFetcher
 
-  def setHtmlFetcher(fetcher: AbstractHtmlFetcher) {
+  def setHtmlFetcher(fetcher: AbstractHtmlFetcher)
     require(fetcher != null, "fetcher MUST NOT be null!")
     this.htmlFetcher = fetcher
-  }
 
   def getHtmlFetcher: AbstractHtmlFetcher = htmlFetcher
-}

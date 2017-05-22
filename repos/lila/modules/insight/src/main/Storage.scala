@@ -12,7 +12,7 @@ import lila.db.Implicits._
 import lila.user.UserRepo
 import lila.rating.PerfType
 
-private final class Storage(coll: Coll) {
+private final class Storage(coll: Coll)
 
   import Storage._
   import BSONHandlers._
@@ -55,17 +55,15 @@ private final class Storage(coll: Coll) {
           Match(BSONDocument(F.userId -> userId)),
           List(GroupField(F.perf)("nb" -> SumValue(1)))
       )
-      .map {
-        _.documents.flatMap { doc =>
-          for {
+      .map
+        _.documents.flatMap  doc =>
+          for
             perfType <- doc.getAs[PerfType]("_id")
             nb <- doc.getAs[Int]("nb")
-          } yield perfType -> nb
-        }.toMap
-      }
-}
+          yield perfType -> nb
+        .toMap
 
-private object Storage {
+private object Storage
 
   import Entry.{BSONFields => F}
 
@@ -74,7 +72,5 @@ private object Storage {
   val sortChronological = BSONDocument(F.date -> 1)
   val sortAntiChronological = BSONDocument(F.date -> -1)
 
-  def combineDocs(docs: List[BSONDocument]) = docs.foldLeft(BSONDocument()) {
+  def combineDocs(docs: List[BSONDocument]) = docs.foldLeft(BSONDocument())
     case (acc, doc) => acc ++ doc
-  }
-}

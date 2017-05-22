@@ -2,7 +2,7 @@ package scalaz.example
 package transformers
 package typecheck
 
-object TypeCheckerWithExplicitTypes_Monadic {
+object TypeCheckerWithExplicitTypes_Monadic
 
   import TypeCheckerWithExplicitTypesAST._
   import scalaz.{\/, \/-, -\/}
@@ -22,13 +22,13 @@ object TypeCheckerWithExplicitTypes_Monadic {
 
   // the real type check function, which works with the type environment.
   def typeCheck(expr: Exp, env: TypeEnv = predef): String \/ Type =
-    expr match {
+    expr match
       case Lit(v) => success(litToTy(v))
       case Id(x) => find(x, env)
       // make sure the first branch is a boolean and then
       // make sure the second and third branches have the same type
       case If(tst, texp, fexp) =>
-        for {
+        for
           t <- typeCheck(tst, env)
           _ <- compare(t,
                        boolT,
@@ -38,18 +38,18 @@ object TypeCheckerWithExplicitTypes_Monadic {
           rt <- typeCheck(fexp, env)
           res <- compare(
               lt, rt, lt, "if branches not the same type, got: " + (lt, rt))
-        } yield res
+        yield res
       case Fun(arg, argType, body) =>
-        for {
+        for
           t <- typeCheck(body, env + (arg -> argType))
-        } yield TyLam(argType, t)
+        yield TyLam(argType, t)
       // make sure the first argument to function application is indeed a function
       // then make sure that the arguments match the explicit declarations
       case App(operator, operand) =>
-        for {
+        for
           operatorType <- typeCheck(operator, env)
           operandType <- typeCheck(operand, env)
-          res <- operatorType match {
+          res <- operatorType match
             case TyLam(argType, resultType) =>
               compare(argType,
                       operandType,
@@ -59,7 +59,4 @@ object TypeCheckerWithExplicitTypes_Monadic {
             case _ =>
               typeError("function application expected function, but got: " +
                   operatorType)
-          }
-        } yield res
-    }
-}
+        yield res

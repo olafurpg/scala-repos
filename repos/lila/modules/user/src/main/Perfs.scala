@@ -20,7 +20,7 @@ case class Perfs(standard: Perf,
                  classical: Perf,
                  correspondence: Perf,
                  puzzle: Perf,
-                 opening: Perf) {
+                 opening: Perf)
 
   def perfs =
     List("standard" -> standard,
@@ -39,46 +39,38 @@ case class Perfs(standard: Perf,
          "puzzle" -> puzzle,
          "opening" -> opening)
 
-  def bestPerf: Option[(PerfType, Perf)] = {
+  def bestPerf: Option[(PerfType, Perf)] =
     val ps =
-      PerfType.nonPuzzle map { pt =>
+      PerfType.nonPuzzle map  pt =>
         pt -> apply(pt)
-      }
     val minNb = math.max(1, ps.foldLeft(0)(_ + _._2.nb) / 10)
-    ps.foldLeft(none[(PerfType, Perf)]) {
+    ps.foldLeft(none[(PerfType, Perf)])
       case (ro, p) if p._2.nb >= minNb =>
-        ro.fold(p.some) { r =>
+        ro.fold(p.some)  r =>
           Some(if (p._2.intRating > r._2.intRating) p else r)
-        }
       case (ro, _) => ro
-    }
-  }
 
   def bestPerfType: Option[PerfType] = bestPerf.map(_._1)
 
   def bestRating: Int = bestRatingIn(PerfType.leaderboardable)
 
-  def bestRatingIn(types: List[PerfType]): Int = {
-    val ps = types map apply match {
+  def bestRatingIn(types: List[PerfType]): Int =
+    val ps = types map apply match
       case Nil => List(standard)
       case x => x
-    }
     val minNb = ps.foldLeft(0)(_ + _.nb) / 10
-    ps.foldLeft(none[Int]) {
+    ps.foldLeft(none[Int])
       case (ro, p) if p.nb >= minNb =>
-        ro.fold(p.intRating.some) { r =>
+        ro.fold(p.intRating.some)  r =>
           Some(if (p.intRating > r) p.intRating else r)
-        }
       case (ro, _) => ro
-    } | Perf.default.intRating
-  }
+    | Perf.default.intRating
 
   def bestProgress: Int = bestProgressIn(PerfType.leaderboardable)
 
-  def bestProgressIn(types: List[PerfType]): Int = types map apply match {
+  def bestProgressIn(types: List[PerfType]): Int = types map apply match
     case Nil => 0
     case perfs => perfs.map(_.progress).max
-  }
 
   lazy val perfsMap: Map[String, Perf] = Map(
       "chess960" -> chess960,
@@ -102,7 +94,7 @@ case class Perfs(standard: Perf,
 
   def apply(key: String): Option[Perf] = perfsMap get key
 
-  def apply(perfType: PerfType): Perf = perfType match {
+  def apply(perfType: PerfType): Perf = perfType match
     case PerfType.Standard => standard
     case PerfType.Bullet => bullet
     case PerfType.Blitz => blitz
@@ -118,17 +110,16 @@ case class Perfs(standard: Perf,
     case PerfType.Crazyhouse => crazyhouse
     case PerfType.Puzzle => puzzle
     case PerfType.Opening => opening
-  }
 
   def inShort =
-    perfs map {
+    perfs map
       case (name, perf) => s"$name:${perf.intRating}"
-    } mkString ", "
+    mkString ", "
 
   def updateStandard = copy(
-      standard = {
+      standard =
         val subs = List(bullet, blitz, classical, correspondence)
-        subs.maxBy(_.latest.fold(0l)(_.getMillis)).latest.fold(standard) {
+        subs.maxBy(_.latest.fold(0l)(_.getMillis)).latest.fold(standard)
           date =>
             val nb = subs.map(_.nb).sum
             val glicko =
@@ -145,20 +136,16 @@ case class Perfs(standard: Perf,
                  nb = nb,
                  recent = Nil,
                  latest = date.some)
-        }
-      }
   )
-}
 
-case object Perfs {
+case object Perfs
 
-  val default = {
+  val default =
     val p = Perf.default
     Perfs(p, p, p, p, p, p, p, p, p, p, p, p, p, p, p)
-  }
 
   def variantLens(variant: chess.variant.Variant): Option[Perfs => Perf] =
-    variant match {
+    variant match
       case chess.variant.Standard => Some(_.standard)
       case chess.variant.Chess960 => Some(_.chess960)
       case chess.variant.KingOfTheHill => Some(_.kingOfTheHill)
@@ -169,9 +156,8 @@ case object Perfs {
       case chess.variant.RacingKings => Some(_.racingKings)
       case chess.variant.Crazyhouse => Some(_.crazyhouse)
       case _ => none
-    }
 
-  def speedLens(speed: Speed): Perfs => Perf = speed match {
+  def speedLens(speed: Speed): Perfs => Perf = speed match
     case Speed.Bullet =>
       perfs =>
         perfs.bullet
@@ -184,14 +170,13 @@ case object Perfs {
       case Speed.Correspondence =>
       perfs =>
         perfs.correspondence
-  }
 
-  val perfsBSONHandler = new BSON[Perfs] {
+  val perfsBSONHandler = new BSON[Perfs]
 
     implicit def perfHandler = Perf.perfBSONHandler
     import BSON.MapDocument._
 
-    def reads(r: BSON.Reader): Perfs = {
+    def reads(r: BSON.Reader): Perfs =
       def perf(key: String) = r.getO[Perf](key) getOrElse Perf.default
       Perfs(standard = perf("standard"),
             chess960 = perf("chess960"),
@@ -208,7 +193,6 @@ case object Perfs {
             correspondence = perf("correspondence"),
             puzzle = perf("puzzle"),
             opening = perf("opening"))
-    }
 
     private def notNew(p: Perf): Option[Perf] = p.nb > 0 option p
 
@@ -228,7 +212,6 @@ case object Perfs {
                    "correspondence" -> notNew(o.correspondence),
                    "puzzle" -> notNew(o.puzzle),
                    "opening" -> notNew(o.opening))
-  }
 
   case class Leaderboards(bullet: List[User.LightPerf],
                           blitz: List[User.LightPerf],
@@ -241,4 +224,3 @@ case object Perfs {
                           atomic: List[User.LightPerf],
                           horde: List[User.LightPerf],
                           racingKings: List[User.LightPerf])
-}

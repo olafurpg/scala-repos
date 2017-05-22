@@ -20,9 +20,9 @@ package org.apache.spark.storage
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.scheduler._
 
-class BlockStatusListenerSuite extends SparkFunSuite {
+class BlockStatusListenerSuite extends SparkFunSuite
 
-  test("basic functions") {
+  test("basic functions")
     val blockManagerId = BlockManagerId("0", "localhost", 10000)
     val listener = new BlockStatusListener()
 
@@ -116,5 +116,3 @@ class BlockStatusListenerSuite extends SparkFunSuite {
         SparkListenerBlockManagerRemoved(0, blockManagerId))
     // No block manager now so we should dop all block managers
     assert(listener.allExecutorStreamBlockStatus.isEmpty)
-  }
-}

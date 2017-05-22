@@ -31,18 +31,17 @@ import org.json4s.native.Serialization.write
 
 class ESEvaluationInstances(
     client: Client, config: StorageClientConfig, index: String)
-    extends EvaluationInstances with Logging {
+    extends EvaluationInstances with Logging
   implicit val formats = DefaultFormats + new EvaluationInstanceSerializer
   private val estype = "evaluation_instances"
 
   val indices = client.admin.indices
   val indexExistResponse = indices.prepareExists(index).get
-  if (!indexExistResponse.isExists) {
+  if (!indexExistResponse.isExists)
     indices.prepareCreate(index).get
-  }
   val typeExistResponse =
     indices.prepareTypesExists(index).setTypes(estype).get
-  if (!typeExistResponse.isExists) {
+  if (!typeExistResponse.isExists)
     val json =
       (estype ->
           ("properties" ->
@@ -64,73 +63,58 @@ class ESEvaluationInstances(
       .setType(estype)
       .setSource(compact(render(json)))
       .get
-  }
 
-  def insert(i: EvaluationInstance): String = {
-    try {
+  def insert(i: EvaluationInstance): String =
+    try
       val response = client.prepareIndex(index, estype).setSource(write(i)).get
       response.getId
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         ""
-    }
-  }
 
-  def get(id: String): Option[EvaluationInstance] = {
-    try {
+  def get(id: String): Option[EvaluationInstance] =
+    try
       val response = client.prepareGet(index, estype, id).get
-      if (response.isExists) {
+      if (response.isExists)
         Some(read[EvaluationInstance](response.getSourceAsString))
-      } else {
+      else
         None
-      }
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         None
-    }
-  }
 
-  def getAll(): Seq[EvaluationInstance] = {
-    try {
+  def getAll(): Seq[EvaluationInstance] =
+    try
       val builder = client.prepareSearch(index).setTypes(estype)
       ESUtils.getAll[EvaluationInstance](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq()
-    }
-  }
 
-  def getCompleted(): Seq[EvaluationInstance] = {
-    try {
+  def getCompleted(): Seq[EvaluationInstance] =
+    try
       val builder = client
         .prepareSearch(index)
         .setTypes(estype)
         .setPostFilter(termFilter("status", "EVALCOMPLETED"))
         .addSort("startTime", SortOrder.DESC)
       ESUtils.getAll[EvaluationInstance](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq()
-    }
-  }
 
-  def update(i: EvaluationInstance): Unit = {
-    try {
+  def update(i: EvaluationInstance): Unit =
+    try
       client.prepareUpdate(index, estype, i.id).setDoc(write(i)).get
-    } catch {
+    catch
       case e: ElasticsearchException => error(e.getMessage)
-    }
-  }
 
-  def delete(id: String): Unit = {
-    try {
+  def delete(id: String): Unit =
+    try
       client.prepareDelete(index, estype, id).get
-    } catch {
+    catch
       case e: ElasticsearchException => error(e.getMessage)
-    }
-  }
-}

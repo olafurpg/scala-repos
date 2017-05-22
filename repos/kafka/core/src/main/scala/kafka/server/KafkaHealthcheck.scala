@@ -39,20 +39,19 @@ class KafkaHealthcheck(
     private val zkUtils: ZkUtils,
     private val rack: Option[String],
     private val interBrokerProtocolVersion: ApiVersion)
-    extends Logging {
+    extends Logging
 
   val brokerIdPath = ZkUtils.BrokerIdsPath + "/" + brokerId
   val sessionExpireListener = new SessionExpireListener
 
-  def startup() {
+  def startup()
     zkUtils.zkClient.subscribeStateChanges(sessionExpireListener)
     register()
-  }
 
   /**
     * Register this broker as "alive" in zookeeper
     */
-  def register() {
+  def register()
     val jmxPort =
       System.getProperty("com.sun.management.jmxremote.port", "-1").toInt
     val updatedEndpoints = advertisedEndpoints.mapValues(
@@ -75,13 +74,12 @@ class KafkaHealthcheck(
                                jmxPort,
                                rack,
                                interBrokerProtocolVersion)
-  }
 
   /**
     *  When we get a SessionExpired event, we lost all ephemeral nodes and zkclient has reestablished a
     *  connection for us. We need to re-register this broker in the broker registry.
     */
-  class SessionExpireListener() extends IZkStateListener {
+  class SessionExpireListener() extends IZkStateListener
     @throws(classOf[Exception])
     def handleStateChanged(state: KeeperState) {}
 
@@ -93,17 +91,13 @@ class KafkaHealthcheck(
       *             On any error.
       */
     @throws(classOf[Exception])
-    def handleNewSession() {
+    def handleNewSession()
       info("re-registering broker info in ZK for broker " + brokerId)
       register()
       info("done re-registering broker")
       info(
           "Subscribing to %s path to watch for new topics".format(
               ZkUtils.BrokerTopicsPath))
-    }
 
-    override def handleSessionEstablishmentError(error: Throwable): Unit = {
+    override def handleSessionEstablishmentError(error: Throwable): Unit =
       fatal("Could not establish session with zookeeper", error)
-    }
-  }
-}

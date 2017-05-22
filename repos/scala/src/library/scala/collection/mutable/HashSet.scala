@@ -38,7 +38,7 @@ import scala.collection.parallel.mutable.ParHashSet
 class HashSet[A] private[collection](contents: FlatHashTable.Contents[A])
     extends AbstractSet[A] with Set[A] with GenericSetTemplate[A, HashSet]
     with SetLike[A, HashSet[A]] with FlatHashTable[A]
-    with CustomParallelizable[A, ParHashSet[A]] with Serializable {
+    with CustomParallelizable[A, ParHashSet[A]] with Serializable
   initWithContents(contents)
 
   def this() = this(null)
@@ -63,40 +63,34 @@ class HashSet[A] private[collection](contents: FlatHashTable.Contents[A])
 
   override def iterator: Iterator[A] = super [FlatHashTable].iterator
 
-  override def foreach[U](f: A => U) {
+  override def foreach[U](f: A => U)
     var i = 0
     val len = table.length
-    while (i < len) {
+    while (i < len)
       val curEntry = table(i)
       if (curEntry ne null) f(entryToElem(curEntry))
       i += 1
-    }
-  }
 
   override def clone() = new HashSet[A] ++= this
 
-  private def writeObject(s: java.io.ObjectOutputStream) {
+  private def writeObject(s: java.io.ObjectOutputStream)
     serializeTo(s)
-  }
 
-  private def readObject(in: java.io.ObjectInputStream) {
+  private def readObject(in: java.io.ObjectInputStream)
     init(in, x => ())
-  }
 
   /** Toggles whether a size map is used to track hash map statistics.
     */
   def useSizeMap(t: Boolean) =
-    if (t) {
+    if (t)
       if (!isSizeMapDefined) sizeMapInitAndRebuild()
-    } else sizeMapDisable()
-}
+    else sizeMapDisable()
 
 /** $factoryInfo
   *  @define Coll `mutable.HashSet`
   *  @define coll mutable hash set
   */
-object HashSet extends MutableSetFactory[HashSet] {
+object HashSet extends MutableSetFactory[HashSet]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, HashSet[A]] =
     setCanBuildFrom[A]
   override def empty[A]: HashSet[A] = new HashSet[A]
-}

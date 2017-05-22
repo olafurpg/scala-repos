@@ -47,7 +47,7 @@ class PercentageStringConverterSpec
         Number,
         PercentageStringConverter](classOf[jfxuc.PercentageStringConverter],
                                    classOf[PercentageStringConverter],
-                                   classOf[Number]) {
+                                   classOf[Number])
 
   val examples = List((new java.lang.Integer(10), "1,000%"),
                       (new java.lang.Integer(0), "0%"),
@@ -55,4 +55,3 @@ class PercentageStringConverterSpec
 
   override protected def getScalaClassInstance =
     new PercentageStringConverter(Locale.US)
-}

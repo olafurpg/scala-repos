@@ -15,8 +15,8 @@
  */
 
 // Don't lose the braces here, we use nested packages in this source
-package net.liftweb {
-  package mockweb {
+package net.liftweb
+  package mockweb
 
     import javax.servlet.http.HttpServletRequest
 
@@ -47,7 +47,7 @@ package net.liftweb {
       * </ul>
       *   
       */
-    object MockWeb {
+    object MockWeb
 
       /**
         * Setting this var to <code>true</code>
@@ -61,11 +61,9 @@ package net.liftweb {
       private def liftRulesEnabled =
         useLiftRulesGlobally || useLiftRules.box == Full(true)
 
-      private def withLiftRules[T](f: => T) = {
-        if (liftRulesEnabled) {
+      private def withLiftRules[T](f: => T) =
+        if (liftRulesEnabled)
           f
-        }
-      }
 
       /**
         * Executes a given function against a new Req constructed
@@ -74,9 +72,8 @@ package net.liftweb {
         * testReq(HttpServletRequest) for more details on
         * how the Req is processed.
         */
-      def testReq[T](url: String, contextPath: String = "")(f: Req => T): T = {
+      def testReq[T](url: String, contextPath: String = "")(f: Req => T): T =
         testReq(new MockHttpServletRequest(url, contextPath))(f)
-      }
 
       /**
         * Executes a given function against a new Req constructed
@@ -84,30 +81,26 @@ package net.liftweb {
         * is set to true, then LiftRules.early, LiftRules.statelessRewrite,
         * and LiftRules.statelessTest rules are applied.
         */
-      def testReq[T](request: HttpServletRequest)(f: Req => T): T = {
+      def testReq[T](request: HttpServletRequest)(f: Req => T): T =
         // TODO : Confirm that we can pass in a null provider without issue
         val req = new HTTPRequestServlet(request, null)
 
-        withLiftRules {
-          tryo {
+        withLiftRules
+          tryo
             LiftRules.early.toList.foreach(_ (req))
-          }
-        }
 
         val r =
-          if (liftRulesEnabled) {
+          if (liftRulesEnabled)
             // Apply stateless rewrites
             Req(req,
                 LiftRules.statelessRewrite.toList,
                 Nil,
                 LiftRules.statelessReqTest.toList,
                 System.nanoTime)
-          } else {
+          else
             Req(req, Nil, System.nanoTime)
-          }
 
         f(r)
-      }
 
       /**
         * Sets up S based on the provided url, contextPath
@@ -182,12 +175,10 @@ package net.liftweb {
         * code duplication.
         */
       private def realTestS[T](newSession: Box[LiftSession])(f: () => T)(
-          req: Req): T = {
+          req: Req): T =
         val session = newSession openOr LiftSession(req)
-        S.init(Box !! req, session) {
+        S.init(Box !! req, session)
           f()
-        }
-      }
 
       /**
         * This is a utility method to allow you to set the
@@ -204,19 +195,13 @@ package net.liftweb {
         * 
         */
       def withSnippet[T](name: String, attrs: MetaData = Null)(f: => T): T =
-        S.withAttrs(attrs) {
+        S.withAttrs(attrs)
           http.httpPackageProxy.doSnippet(name)(f)
-        }
-    }
-  }
 
 // This is a bridge to allow use to use the http-private
 // S.doSnippet method
-  package http {
-    private[liftweb] object httpPackageProxy {
-      def doSnippet[T](name: String)(f: => T): T = {
+  package http
+    private[liftweb] object httpPackageProxy
+      def doSnippet[T](name: String)(f: => T): T =
         S.doSnippet(name)(f)
-      }
-    }
-  }
-} // end package net.liftweb
+// end package net.liftweb

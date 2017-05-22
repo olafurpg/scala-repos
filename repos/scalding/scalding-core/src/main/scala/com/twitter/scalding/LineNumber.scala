@@ -15,7 +15,7 @@ limitations under the License.
  */
 package com.twitter.scalding
 
-object LineNumber {
+object LineNumber
 
   /**
     * depth 0 means the StackTraceElement for the caller
@@ -38,11 +38,9 @@ object LineNumber {
       stack: Seq[StackTraceElement]): Option[StackTraceElement] =
     stack
       .drop(2)
-      .dropWhile { ste =>
-        classPrefixes.exists { prefix =>
+      .dropWhile  ste =>
+        classPrefixes.exists  prefix =>
           ste.getClassName.startsWith(prefix)
-        }
-      }
       .headOption
 
   /*
@@ -56,7 +54,7 @@ object LineNumber {
     tryNonScaldingCaller(Thread.currentThread().getStackTrace)
 
   def tryNonScaldingCaller(
-      stack: Array[StackTraceElement]): Option[StackTraceElement] = {
+      stack: Array[StackTraceElement]): Option[StackTraceElement] =
     /* depth = 1:
      * depth 0 => tryNonScaldingCaller
      * depth 1 => caller of this method
@@ -76,13 +74,11 @@ object LineNumber {
       else None
 
     val scaldingJobCaller = headOption(
-        stack.iterator.filter { se =>
+        stack.iterator.filter  se =>
       se.getClassName.startsWith(scaldingPrefix)
-    }.filter { se =>
+    .filter  se =>
       val cls = Class.forName(se.getClassName)
       jobClass.isAssignableFrom(cls)
-    })
+    )
 
     scaldingJobCaller.orElse(nonScalding)
-  }
-}

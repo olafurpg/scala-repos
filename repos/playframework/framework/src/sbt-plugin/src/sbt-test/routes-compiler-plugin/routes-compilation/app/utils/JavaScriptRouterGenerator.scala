@@ -5,7 +5,7 @@ package utils
 
 import java.nio.file.{Files, Paths}
 
-object JavaScriptRouterGenerator extends App {
+object JavaScriptRouterGenerator extends App
 
   import controllers.routes.javascript._
 
@@ -27,4 +27,3 @@ object JavaScriptRouterGenerator extends App {
   val path = Paths.get(args(0))
   Files.createDirectories(path.getParent)
   Files.write(path, jsModule.getBytes("UTF-8"))
-}

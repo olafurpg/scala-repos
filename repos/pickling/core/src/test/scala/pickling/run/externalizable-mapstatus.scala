@@ -40,24 +40,22 @@ class BlockManagerId private (
     private var port_ : Int,
     private var nettyPort_ : Int
 )
-    extends Externalizable {
+    extends Externalizable
 
   private def this() = this(null, null, 0, 0) // For deserialization only
 
   def executorId: String = executorId_
 
-  if (null != host_) {
+  if (null != host_)
     // Utils.checkHost(host_, "Expected hostname")
     assert(port_ > 0)
-  }
 
-  def hostPort: String = {
+  def hostPort: String =
     // DEBUG code
     // Utils.checkHost(host)
     assert(port > 0)
 
     host + ":" + port
-  }
 
   def host: String = host_
 
@@ -65,19 +63,17 @@ class BlockManagerId private (
 
   def nettyPort: Int = nettyPort_
 
-  override def writeExternal(out: ObjectOutput) {
+  override def writeExternal(out: ObjectOutput)
     out.writeUTF(executorId_)
     out.writeUTF(host_)
     out.writeInt(port_)
     out.writeInt(nettyPort_)
-  }
 
-  override def readExternal(in: ObjectInput) {
+  override def readExternal(in: ObjectInput)
     executorId_ = in.readUTF()
     host_ = in.readUTF()
     port_ = in.readInt()
     nettyPort_ = in.readInt()
-  }
 
   @throws(classOf[IOException])
   private def readResolve(): Object =
@@ -89,16 +85,14 @@ class BlockManagerId private (
   override def hashCode: Int =
     (executorId.hashCode * 41 + host.hashCode) * 41 + port + nettyPort
 
-  override def equals(that: Any) = that match {
+  override def equals(that: Any) = that match
     case id: BlockManagerId =>
       executorId == id.executorId && port == id.port && host == id.host &&
       nettyPort == id.nettyPort
     case _ =>
       false
-  }
-}
 
-object BlockManagerId {
+object BlockManagerId
 
   /**
     * Returns a [[org.apache.spark.storage.BlockManagerId]] for the given configuraiton.
@@ -112,20 +106,17 @@ object BlockManagerId {
   def apply(execId: String, host: String, port: Int, nettyPort: Int) =
     getCachedBlockManagerId(new BlockManagerId(execId, host, port, nettyPort))
 
-  def apply(in: ObjectInput) = {
+  def apply(in: ObjectInput) =
     val obj = new BlockManagerId()
     obj.readExternal(in)
     getCachedBlockManagerId(obj)
-  }
 
   val blockManagerIdCache =
     new ConcurrentHashMap[BlockManagerId, BlockManagerId]()
 
-  def getCachedBlockManagerId(id: BlockManagerId): BlockManagerId = {
+  def getCachedBlockManagerId(id: BlockManagerId): BlockManagerId =
     blockManagerIdCache.putIfAbsent(id, id)
     blockManagerIdCache.get(id)
-  }
-}
 
 /**
   * Result returned by a ShuffleMapTask to a scheduler. Includes the block manager address that the
@@ -133,38 +124,34 @@ object BlockManagerId {
   * The map output sizes are compressed using MapOutputTracker.compressSize.
   */
 class MapStatus(var location: BlockManagerId, var compressedSizes: Array[Byte])
-    extends Externalizable {
+    extends Externalizable
 
   def this() = this(null, null) // For deserialization only
 
-  def writeExternal(out: ObjectOutput) {
+  def writeExternal(out: ObjectOutput)
     location.writeExternal(out)
     val len = compressedSizes.length
     out.writeInt(len)
     out.write(compressedSizes)
-  }
 
-  def readExternal(in: ObjectInput) {
+  def readExternal(in: ObjectInput)
     location = BlockManagerId(in)
     val len = in.readInt()
     compressedSizes = new Array[Byte](len)
     in.readFully(compressedSizes)
-  }
-}
 
-class MapStatusTest extends FunSuite {
-  def register[T : ClassTag : Pickler : Unpickler : FastTypeTag](): Unit = {
+class MapStatusTest extends FunSuite
+  def register[T : ClassTag : Pickler : Unpickler : FastTypeTag](): Unit =
     val clazz = classTag[T].runtimeClass
     val p = implicitly[Pickler[T]]
     val up = implicitly[Unpickler[T]]
     val tagKey = implicitly[FastTypeTag[T]].key
     internal.currentRuntime.picklers.registerPickler(tagKey, p)
     internal.currentRuntime.picklers.registerUnpickler(tagKey, up)
-  }
 
   register[MapStatus]
 
-  test("main") {
+  test("main")
     val bid = BlockManagerId("0", "localhost", 8080, 8090)
     val ms = new MapStatus(bid, Array[Byte](1, 2, 3, 4))
     val sizes: String = ms.compressedSizes.mkString(",")
@@ -175,5 +162,3 @@ class MapStatusTest extends FunSuite {
     val ms2 = up.asInstanceOf[MapStatus]
     val sizes2: String = ms2.compressedSizes.mkString(",")
     assert(sizes == sizes2, "same array expected")
-  }
-}

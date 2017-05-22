@@ -47,7 +47,7 @@ import scalafx.util.StringConverter
   * @define SP A Callback that, given an object of type TableColumn[S,T], will return an ObservableValue[Boolean] that
   *         represents whether the given item is selected or not.
   */
-object CheckBoxTableCell {
+object CheckBoxTableCell
 
   /**
     * Converts a ScalaFX $CBTC to its JavaFX counterpart.
@@ -63,9 +63,8 @@ object CheckBoxTableCell {
     : jfxu.Callback[
         java.lang.Integer, jfxbv.ObservableValue[java.lang.Boolean]] =
     new jfxu.Callback[
-        java.lang.Integer, jfxbv.ObservableValue[java.lang.Boolean]] {
+        java.lang.Integer, jfxbv.ObservableValue[java.lang.Boolean]]
       def call(x: java.lang.Integer) = selectedProperty(x)
-    }
 
   /**
     * Creates a cell factory for use in a `TableColumn` cell factory.
@@ -162,7 +161,6 @@ object CheckBoxTableCell {
     */
   def forTableColumn[S](column: jfxsc.TableColumn[S, java.lang.Boolean]) =
     jfxscc.CheckBoxTableCell.forTableColumn(column)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/CheckBoxTableCell.html $CBTC]]
@@ -181,7 +179,7 @@ class CheckBoxTableCell[S, T](override val delegate: jfxscc.CheckBoxTableCell[
     with StateSelectableCell[
         jfxscc.CheckBoxTableCell[S, T], T, java.lang.Integer]
     with UpdatableCell[jfxscc.CheckBoxTableCell[S, T], T]
-    with SFXDelegate[jfxscc.CheckBoxTableCell[S, T]] {
+    with SFXDelegate[jfxscc.CheckBoxTableCell[S, T]]
 
   /**
     * Creates a default CheckBoxTableCell with a custom `Callback` to retrieve an ObservableValue for a given cell index.
@@ -202,4 +200,3 @@ class CheckBoxTableCell[S, T](override val delegate: jfxscc.CheckBoxTableCell[
       selectedProperty: Int => ObservableValue[Boolean, java.lang.Boolean],
       converter: StringConverter[T]) =
     this(new jfxscc.CheckBoxTableCell[S, T](selectedProperty, converter))
-}

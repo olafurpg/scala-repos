@@ -24,21 +24,19 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 
-object LDASuite {
+object LDASuite
   def generateLDAData(
-      sql: SQLContext, rows: Int, k: Int, vocabSize: Int): DataFrame = {
+      sql: SQLContext, rows: Int, k: Int, vocabSize: Int): DataFrame =
     val avgWC = 1 // average instances of each word in a doc
     val sc = sql.sparkContext
     val rng = new java.util.Random()
     rng.setSeed(1)
     val rdd = sc
       .parallelize(1 to rows)
-      .map { i =>
+      .map  i =>
         Vectors.dense(Array.fill(vocabSize)(rng.nextInt(2 * avgWC).toDouble))
-      }
       .map(v => new TestRow(v))
     sql.createDataFrame(rdd)
-  }
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -54,22 +52,20 @@ object LDASuite {
       "subsamplingRate" -> 0.051,
       "docConcentration" -> Array(2.0)
   )
-}
 
 class LDASuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   val k: Int = 5
   val vocabSize: Int = 30
   @transient var dataset: DataFrame = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     dataset = LDASuite.generateLDAData(sqlContext, 50, k, vocabSize)
-  }
 
-  test("default parameters") {
+  test("default parameters")
     val lda = new LDA()
 
     assert(lda.getFeaturesCol === "features")
@@ -85,9 +81,8 @@ class LDASuite
     assert(lda.getSubsamplingRate === 0.05)
     assert(lda.getOptimizeDocConcentration)
     assert(lda.getTopicDistributionCol === "topicDistribution")
-  }
 
-  test("set parameters") {
+  test("set parameters")
     val lda = new LDA()
       .setFeaturesCol("test_feature")
       .setMaxIter(33)
@@ -118,24 +113,19 @@ class LDASuite
     assert(lda.getSubsamplingRate === 0.06)
     lda.setOptimizeDocConcentration(false)
     assert(!lda.getOptimizeDocConcentration)
-  }
 
-  test("parameters validation") {
+  test("parameters validation")
     val lda = new LDA()
 
     // misc Params
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setK(1)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setOptimizer("no_such_optimizer")
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setDocConcentration(-1.1)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setTopicConcentration(-1.1)
-    }
 
     val dummyDF = sqlContext
       .createDataFrame(Seq((1, Vectors.dense(1.0, 2.0))))
@@ -147,28 +137,21 @@ class LDASuite
     lda.setDocConcentration(Range(0, lda.getK).map(_ + 2.0).toArray)
     lda.transformSchema(dummyDF.schema)
     lda.setDocConcentration(Range(0, lda.getK - 1).map(_ + 2.0).toArray)
-    withClue("LDA docConcentration validity check failed for bad array length") {
-      intercept[IllegalArgumentException] {
+    withClue("LDA docConcentration validity check failed for bad array length")
+      intercept[IllegalArgumentException]
         lda.transformSchema(dummyDF.schema)
-      }
-    }
 
     // Online LDA
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setLearningOffset(0)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setLearningDecay(0)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setSubsamplingRate(0)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LDA().setSubsamplingRate(1.1)
-    }
-  }
 
-  test("fit & transform with Online LDA") {
+  test("fit & transform with Online LDA")
     val lda = new LDA().setK(k).setSeed(1).setOptimizer("online").setMaxIter(2)
     val model = lda.fit(dataset)
 
@@ -184,14 +167,12 @@ class LDASuite
     // transform()
     val transformed = model.transform(dataset)
     val expectedColumns = Array("features", lda.getTopicDistributionCol)
-    expectedColumns.foreach { column =>
+    expectedColumns.foreach  column =>
       assert(transformed.columns.contains(column))
-    }
-    transformed.select(lda.getTopicDistributionCol).collect().foreach { r =>
+    transformed.select(lda.getTopicDistributionCol).collect().foreach  r =>
       val topicDistribution = r.getAs[Vector](0)
       assert(topicDistribution.size === k)
       assert(topicDistribution.toArray.forall(w => w >= 0.0 && w <= 1.0))
-    }
 
     // logLikelihood, logPerplexity
     val ll = model.logLikelihood(dataset)
@@ -205,20 +186,17 @@ class LDASuite
     assert(
         topics.select("topic").rdd.map(_.getInt(0)).collect().toSet === Range(
             0, k).toSet)
-    topics.select("termIndices").collect().foreach {
+    topics.select("termIndices").collect().foreach
       case r: Row =>
         val termIndices = r.getAs[Seq[Int]](0)
         assert(termIndices.length === 3 && termIndices.toSet.size === 3)
-    }
-    topics.select("termWeights").collect().foreach {
+    topics.select("termWeights").collect().foreach
       case r: Row =>
         val termWeights = r.getAs[Seq[Double]](0)
         assert(termWeights.length === 3 &&
             termWeights.forall(w => w >= 0.0 && w <= 1.0))
-    }
-  }
 
-  test("fit & transform with EM LDA") {
+  test("fit & transform with EM LDA")
     val lda = new LDA().setK(k).setSeed(1).setOptimizer("em").setMaxIter(2)
     val model_ = lda.fit(dataset)
 
@@ -240,34 +218,28 @@ class LDASuite
     assert(ll <= 0.0 && ll != Double.NegativeInfinity)
     val lp = model.logPrior
     assert(lp <= 0.0 && lp != Double.NegativeInfinity)
-  }
 
-  test("read/write LocalLDAModel") {
-    def checkModelData(model: LDAModel, model2: LDAModel): Unit = {
+  test("read/write LocalLDAModel")
+    def checkModelData(model: LDAModel, model2: LDAModel): Unit =
       assert(model.vocabSize === model2.vocabSize)
       assert(Vectors.dense(model.topicsMatrix.toArray) ~==
             Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
       assert(Vectors.dense(model.getDocConcentration) ~==
             Vectors.dense(model2.getDocConcentration) absTol 1e-6)
-    }
     val lda = new LDA()
     testEstimatorAndModelReadWrite(
         lda, dataset, LDASuite.allParamSettings, checkModelData)
-  }
 
-  test("read/write DistributedLDAModel") {
-    def checkModelData(model: LDAModel, model2: LDAModel): Unit = {
+  test("read/write DistributedLDAModel")
+    def checkModelData(model: LDAModel, model2: LDAModel): Unit =
       assert(model.vocabSize === model2.vocabSize)
       assert(Vectors.dense(model.topicsMatrix.toArray) ~==
             Vectors.dense(model2.topicsMatrix.toArray) absTol 1e-6)
       assert(Vectors.dense(model.getDocConcentration) ~==
             Vectors.dense(model2.getDocConcentration) absTol 1e-6)
-    }
     val lda = new LDA()
     testEstimatorAndModelReadWrite(
         lda,
         dataset,
         LDASuite.allParamSettings ++ Map("optimizer" -> "em"),
         checkModelData)
-  }
-}

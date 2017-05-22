@@ -14,7 +14,7 @@ import akka.testkit.TestEvent
 import akka.testkit.EventFilter
 import org.testng.annotations.BeforeClass
 
-trait ActorSystemLifecycle {
+trait ActorSystemLifecycle
 
   protected var _system: ActorSystem = _
 
@@ -23,24 +23,20 @@ trait ActorSystemLifecycle {
   def shutdownTimeout: FiniteDuration = 10.seconds
 
   @BeforeClass
-  def createActorSystem(): Unit = {
+  def createActorSystem(): Unit =
     _system = ActorSystem(Logging.simpleName(getClass), AkkaSpec.testConf)
     _system.eventStream.publish(
         TestEvent.Mute(EventFilter[RuntimeException]("Test exception")))
-  }
 
   @AfterClass
-  def shutdownActorSystem(): Unit = {
-    try {
+  def shutdownActorSystem(): Unit =
+    try
       system.terminate()
       system.awaitTermination(shutdownTimeout)
-    } catch {
+    catch
       case _: TimeoutException ⇒
         val msg = "Failed to stop [%s] within [%s] \n%s".format(
             system.name,
             shutdownTimeout,
             system.asInstanceOf[ActorSystemImpl].printTree)
         throw new RuntimeException(msg)
-    }
-  }
-}

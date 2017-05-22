@@ -39,7 +39,7 @@ import org.apache.spark.streaming.util.WriteAheadLogSuite._
 import org.apache.spark.util.{Clock, ManualClock, SystemClock, Utils}
 
 class ReceivedBlockTrackerSuite
-    extends SparkFunSuite with BeforeAndAfter with Matchers with Logging {
+    extends SparkFunSuite with BeforeAndAfter with Matchers with Logging
 
   val hadoopConf = new Configuration()
   val streamId = 1
@@ -48,19 +48,17 @@ class ReceivedBlockTrackerSuite
   var checkpointDirectory: File = null
   var conf: SparkConf = null
 
-  before {
+  before
     conf = new SparkConf()
       .setMaster("local[2]")
       .setAppName("ReceivedBlockTrackerSuite")
     checkpointDirectory = Utils.createTempDir()
-  }
 
-  after {
+  after
     allReceivedBlockTrackers.foreach { _.stop() }
     Utils.deleteRecursively(checkpointDirectory)
-  }
 
-  test("block addition, and block to batch allocation") {
+  test("block addition, and block to batch allocation")
     val receivedBlockTracker = createTracker(setCheckpointDir = false)
     receivedBlockTracker.isWriteAheadLogEnabled should be(false) // should be disable by default
     receivedBlockTracker.getUnallocatedBlocks(streamId) shouldEqual Seq.empty
@@ -95,33 +93,29 @@ class ReceivedBlockTrackerSuite
     receivedBlockTracker.allocateBlocksToBatch(2)
     receivedBlockTracker.getBlocksOfBatchAndStream(2, streamId) shouldBe empty
     receivedBlockTracker.getUnallocatedBlocks(streamId) shouldEqual blockInfos
-  }
 
-  test("recovery and cleanup with write ahead logs") {
+  test("recovery and cleanup with write ahead logs")
     val manualClock = new ManualClock
     // Set the time increment level to twice the rotation interval so that every increment creates
     // a new log file
 
-    def incrementTime() {
+    def incrementTime()
       val timeIncrementMillis = 2000L
       manualClock.advance(timeIncrementMillis)
-    }
 
     // Generate and add blocks to the given tracker
-    def addBlockInfos(tracker: ReceivedBlockTracker): Seq[ReceivedBlockInfo] = {
+    def addBlockInfos(tracker: ReceivedBlockTracker): Seq[ReceivedBlockInfo] =
       val blockInfos = generateBlockInfos()
       blockInfos.map(tracker.addBlock)
       blockInfos
-    }
 
     // Print the data present in the log ahead files in the log directory
-    def printLogFiles(message: String) {
-      val fileContents = getWriteAheadLogFiles().map { file =>
+    def printLogFiles(message: String)
+      val fileContents = getWriteAheadLogFiles().map  file =>
         ( s"\n>>>>> $file: <<<<<\n${getWrittenLogData(file).mkString("\n")}")
-      }.mkString("\n")
+      .mkString("\n")
       logInfo(
           s"\n\n=====================\n$message\n$fileContents\n=====================\n")
-    }
 
     // Set WAL configuration
     conf.set("spark.streaming.driver.writeAheadLog.rollingIntervalSecs", "1")
@@ -153,9 +147,8 @@ class ReceivedBlockTrackerSuite
       createTracker(clock = manualClock, recoverFromWriteAheadLog = true)
     val unallocatedBlocks = tracker2.getUnallocatedBlocks(streamId).toList
     unallocatedBlocks shouldEqual blockInfos1
-    unallocatedBlocks.foreach { block =>
+    unallocatedBlocks.foreach  block =>
       block.isBlockIdValid() should be(false)
-    }
 
     // Allocate blocks to batch and verify whether the unallocated blocks got allocated
     val batchTime1 = manualClock.getTimeMillis()
@@ -198,9 +191,8 @@ class ReceivedBlockTrackerSuite
         createBatchCleanup(batchTime1))
 
     // Verify that at least one log file gets deleted
-    eventually(timeout(10 seconds), interval(10 millisecond)) {
+    eventually(timeout(10 seconds), interval(10 millisecond))
       getWriteAheadLogFiles() should not contain oldestLogFile
-    }
     printLogFiles("After clean")
 
     // Restart tracker and verify recovered state, specifically whether info about the first
@@ -211,16 +203,14 @@ class ReceivedBlockTrackerSuite
     tracker4.getUnallocatedBlocks(streamId) shouldBe empty
     tracker4.getBlocksOfBatchAndStream(batchTime1, streamId) shouldBe empty // should be cleaned
     tracker4.getBlocksOfBatchAndStream(batchTime2, streamId) shouldEqual blockInfos2
-  }
 
-  test("disable write ahead log when checkpoint directory is not set") {
+  test("disable write ahead log when checkpoint directory is not set")
     // When checkpoint is disabled, then the write ahead log is disabled
     val tracker1 = createTracker(setCheckpointDir = false)
     tracker1.isWriteAheadLogEnabled should be(false)
-  }
 
   test(
-      "parallel file deletion in FileBasedWriteAheadLog is robust to deletion error") {
+      "parallel file deletion in FileBasedWriteAheadLog is robust to deletion error")
     conf.set("spark.streaming.driver.writeAheadLog.rollingIntervalSecs", "1")
     require(
         WriteAheadLogUtils.getRollingIntervalSecs(conf, isDriver = true) === 1)
@@ -264,13 +254,12 @@ class ReceivedBlockTrackerSuite
         recoverFromWriteAheadLog = true, clock = new ManualClock(t(4)))
 
     def compareTrackers(
-        base: ReceivedBlockTracker, subject: ReceivedBlockTracker): Unit = {
+        base: ReceivedBlockTracker, subject: ReceivedBlockTracker): Unit =
       subject.getBlocksOfBatchAndStream(t(3), streamId) should be(
           base.getBlocksOfBatchAndStream(t(3), streamId))
       subject.getBlocksOfBatchAndStream(t(1), streamId) should be(
           base.getBlocksOfBatchAndStream(t(1), streamId))
       subject.getBlocksOfBatchAndStream(t(0), streamId) should be(Nil)
-    }
 
     // ask the tracker to clean up some old files
     tracker.cleanupOldBatches(t(3), waitForCompletion = true)
@@ -296,7 +285,6 @@ class ReceivedBlockTrackerSuite
     val tracker4 = createTracker(
         recoverFromWriteAheadLog = true, clock = new ManualClock(t(4)))
     compareTrackers(tracker, tracker4)
-  }
 
   /**
     * Create tracker object with the optional provided clock. Use fake clock if you
@@ -304,7 +292,7 @@ class ReceivedBlockTrackerSuite
     */
   def createTracker(setCheckpointDir: Boolean = true,
                     recoverFromWriteAheadLog: Boolean = false,
-                    clock: Clock = new SystemClock): ReceivedBlockTracker = {
+                    clock: Clock = new SystemClock): ReceivedBlockTracker =
     val cpDirOption =
       if (setCheckpointDir) Some(checkpointDirectory.toString) else None
     val tracker = new ReceivedBlockTracker(conf,
@@ -315,10 +303,9 @@ class ReceivedBlockTrackerSuite
                                            cpDirOption)
     allReceivedBlockTrackers += tracker
     tracker
-  }
 
   /** Generate blocks infos using random ids */
-  def generateBlockInfos(): Seq[ReceivedBlockInfo] = {
+  def generateBlockInfos(): Seq[ReceivedBlockInfo] =
     List.fill(5)(
         ReceivedBlockInfo(
             streamId,
@@ -326,74 +313,63 @@ class ReceivedBlockTrackerSuite
             None,
             BlockManagerBasedStoreResult(
                 StreamBlockId(streamId, math.abs(Random.nextInt)), Some(0L))))
-  }
 
   /**
     * Write received block tracker events to a file manually.
     */
   def writeEventsManually(
-      filePath: String, events: Seq[ReceivedBlockTrackerLogEvent]): Unit = {
+      filePath: String, events: Seq[ReceivedBlockTrackerLogEvent]): Unit =
     val writer = HdfsUtils.getOutputStream(filePath, hadoopConf)
-    events.foreach { event =>
+    events.foreach  event =>
       val bytes = Utils.serialize(event)
       writer.writeInt(bytes.size)
       writer.write(bytes)
-    }
     writer.close()
-  }
 
   /** Get all the data written in the given write ahead log file. */
-  def getWrittenLogData(logFile: String): Seq[ReceivedBlockTrackerLogEvent] = {
+  def getWrittenLogData(logFile: String): Seq[ReceivedBlockTrackerLogEvent] =
     getWrittenLogData(Seq(logFile))
-  }
 
   /** Get the log file name for the given log start time. */
-  def getLogFileName(time: Long, rollingIntervalSecs: Int = 1): String = {
+  def getLogFileName(time: Long, rollingIntervalSecs: Int = 1): String =
     checkpointDirectory.toString + File.separator + "receivedBlockMetadata" +
     File.separator + s"log-$time-${time + rollingIntervalSecs * 1000}"
-  }
 
   /**
     * Get all the data written in the given write ahead log files. By default, it will read all
     * files in the test log directory.
     */
   def getWrittenLogData(logFiles: Seq[String] = getWriteAheadLogFiles)
-    : Seq[ReceivedBlockTrackerLogEvent] = {
-    logFiles.flatMap { file =>
+    : Seq[ReceivedBlockTrackerLogEvent] =
+    logFiles.flatMap  file =>
       new FileBasedWriteAheadLogReader(file, hadoopConf).toSeq
-    }.flatMap { byteBuffer =>
+    .flatMap  byteBuffer =>
       val validBuffer =
-        if (WriteAheadLogUtils.isBatchingEnabled(conf, isDriver = true)) {
+        if (WriteAheadLogUtils.isBatchingEnabled(conf, isDriver = true))
           Utils
             .deserialize[Array[Array[Byte]]](byteBuffer.array())
             .map(ByteBuffer.wrap)
-        } else {
+        else
           Array(byteBuffer)
-        }
       validBuffer.map(
           b => Utils.deserialize[ReceivedBlockTrackerLogEvent](b.array()))
-    }.toList
-  }
+    .toList
 
   /** Get all the write ahead log files in the test directory */
-  def getWriteAheadLogFiles(): Seq[String] = {
+  def getWriteAheadLogFiles(): Seq[String] =
     import ReceivedBlockTracker._
     val logDir = checkpointDirToLogDir(checkpointDirectory.toString)
     getLogFilesInDirectory(logDir).map { _.toString }
-  }
 
   /** Create batch allocation object from the given info */
   def createBatchAllocation(
-      time: Long, blockInfos: Seq[ReceivedBlockInfo]): BatchAllocationEvent = {
+      time: Long, blockInfos: Seq[ReceivedBlockInfo]): BatchAllocationEvent =
     BatchAllocationEvent(time, AllocatedBlocks(Map((streamId -> blockInfos))))
-  }
 
   /** Create batch clean object from the given info */
-  def createBatchCleanup(time: Long, moreTimes: Long*): BatchCleanupEvent = {
+  def createBatchCleanup(time: Long, moreTimes: Long*): BatchCleanupEvent =
     BatchCleanupEvent((Seq(time) ++ moreTimes).map(Time.apply))
-  }
 
   implicit def millisToTime(milliseconds: Long): Time = Time(milliseconds)
 
   implicit def timeToMillis(time: Time): Long = time.milliseconds
-}

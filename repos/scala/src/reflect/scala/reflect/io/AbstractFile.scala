@@ -20,7 +20,7 @@ import scala.reflect.internal.util.Statistics
   * @author Philippe Altherr
   * @version 1.0, 23/03/2004
   */
-object AbstractFile {
+object AbstractFile
 
   /** Returns "getFile(new File(path))". */
   def getFile(path: String): AbstractFile = getFile(File(path))
@@ -53,14 +53,13 @@ object AbstractFile {
     * Otherwise, returns `null`.
     */
   def getURL(url: URL): AbstractFile =
-    if (url.getProtocol == "file") {
+    if (url.getProtocol == "file")
       val f = new java.io.File(url.getPath)
       if (f.isDirectory) getDirectory(f)
       else getFile(f)
-    } else null
+    else null
 
   def getResources(url: URL): AbstractFile = ZipArchive fromManifestURL url
-}
 
 /**
   * <p>
@@ -88,7 +87,7 @@ object AbstractFile {
   *
   * ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-abstract class AbstractFile extends Iterable[AbstractFile] {
+abstract class AbstractFile extends Iterable[AbstractFile]
 
   /** Returns the name of this abstract file. */
   def name: String
@@ -116,10 +115,9 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
   def underlyingSource: Option[AbstractFile] = None
 
   /** Does this abstract file denote an existing file? */
-  def exists: Boolean = {
+  def exists: Boolean =
     if (Statistics.canEnable) Statistics.incCounter(IOStats.fileExistsCount)
     (file eq null) || file.exists
-  }
 
   /** Does this abstract file represent something which can contain classfiles? */
   def isClassContainer =
@@ -164,30 +162,26 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
   /** Returns contents of file (if applicable) in a byte array.
     */
   @throws(classOf[IOException])
-  def toByteArray: Array[Byte] = {
+  def toByteArray: Array[Byte] =
     val in = input
-    sizeOption match {
+    sizeOption match
       case Some(size) =>
         var rest = size
         val arr = new Array[Byte](rest)
-        while (rest > 0) {
+        while (rest > 0)
           val res = in.read(arr, arr.length - rest, rest)
           if (res == -1) throw new IOException("read error")
           rest -= res
-        }
         in.close()
         arr
       case None =>
         val out = new ByteArrayOutputStream()
         var c = in.read()
-        while (c != -1) {
+        while (c != -1)
           out.write(c)
           c = in.read()
-        }
         in.close()
         out.toByteArray()
-    }
-  }
 
   /** Returns all abstract subfiles of this abstract directory. */
   def iterator: Iterator[AbstractFile]
@@ -207,13 +201,12 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
   /** Return an abstract file that does not check that `path` denotes
     *  an existing file.
     */
-  def lookupPathUnchecked(path: String, directory: Boolean): AbstractFile = {
+  def lookupPathUnchecked(path: String, directory: Boolean): AbstractFile =
     lookup((f, p, dir) => f.lookupNameUnchecked(p, dir), path, directory)
-  }
 
   private def lookup(getFile: (AbstractFile, String, Boolean) => AbstractFile,
                      path0: String,
-                     directory: Boolean): AbstractFile = {
+                     directory: Boolean): AbstractFile =
     val separator = java.io.File.separatorChar
     // trim trailing '/'s
     val path: String =
@@ -222,49 +215,43 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
     assert(length > 0 && !(path.last == separator), path)
     var file = this
     var start = 0
-    while (true) {
+    while (true)
       val index = path.indexOf(separator, start)
       assert(index < 0 || start < index, ((path, directory, start, index)))
       val name = path.substring(start, if (index < 0) length else index)
       file = getFile(file, name, if (index < 0) directory else true)
       if ((file eq null) || index < 0) return file
       start = index + 1
-    }
     file
-  }
 
   private def fileOrSubdirectoryNamed(
-      name: String, isDir: Boolean): AbstractFile = {
+      name: String, isDir: Boolean): AbstractFile =
     val lookup = lookupName(name, isDir)
     if (lookup != null) lookup
-    else {
+    else
       val jfile = new JFile(file, name)
       if (isDir) jfile.mkdirs() else jfile.createNewFile()
       new PlainFile(jfile)
-    }
-  }
 
   /**
     * Get the file in this directory with the given name,
     * creating an empty file if it does not already existing.
     */
-  def fileNamed(name: String): AbstractFile = {
+  def fileNamed(name: String): AbstractFile =
     assert(isDirectory,
            "Tried to find '%s' in '%s' but it is not a directory".format(
                name, path))
     fileOrSubdirectoryNamed(name, isDir = false)
-  }
 
   /**
     * Get the subdirectory with a given name, creating it if it
     * does not already exist.
     */
-  def subdirectoryNamed(name: String): AbstractFile = {
+  def subdirectoryNamed(name: String): AbstractFile =
     assert(isDirectory,
            "Tried to find '%s' in '%s' but it is not a directory".format(
                name, path))
     fileOrSubdirectoryNamed(name, isDir = true)
-  }
 
   protected def unsupported(): Nothing = unsupported(null)
   protected def unsupported(msg: String): Nothing =
@@ -272,4 +259,3 @@ abstract class AbstractFile extends Iterable[AbstractFile] {
 
   /** Returns the path of this abstract file. */
   override def toString() = path
-}

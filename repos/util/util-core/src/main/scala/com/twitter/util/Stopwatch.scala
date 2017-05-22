@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit
 /**
   * A stopwatch may be used to measure elapsed time.
   */
-trait Stopwatch {
+trait Stopwatch
   type Elapsed = () => Duration
 
   /**
@@ -13,7 +13,6 @@ trait Stopwatch {
     * returning the duration of time elapsed since start.
     */
   def start(): Elapsed
-}
 
 /**
   * The system [[Stopwatch]] measures elapsed time using `System.nanoTime`.
@@ -23,7 +22,7 @@ trait Stopwatch {
   *
   * @see [[Stopwatches]] for Java APIs.
   */
-object Stopwatch extends Stopwatch {
+object Stopwatch extends Stopwatch
 
   /**
     * A function that returns a Long that can be used for measuring elapsed time
@@ -87,7 +86,7 @@ object Stopwatch extends Stopwatch {
     */
   val timeMillis: () => Long = () => Time.now.inMilliseconds
 
-  def start(): Elapsed = Time.localGetTime() match {
+  def start(): Elapsed = Time.localGetTime() match
     case Some(local) =>
       val startAt: Time = local()
       () =>
@@ -96,22 +95,19 @@ object Stopwatch extends Stopwatch {
       val startAt: Long = systemNanos()
       () =>
         Duration.fromNanoseconds(systemNanos() - startAt)
-  }
 
   /**
     * A [[Stopwatch]] that always returns `dur` for the
     * elapsed [[Duration duration]].
     */
-  def const(dur: Duration): Stopwatch = new Stopwatch {
+  def const(dur: Duration): Stopwatch = new Stopwatch
     private[this] val fn = () => dur
     def start(): Elapsed = fn
-  }
-}
 
 /**
   * Java APIs for [[Stopwatch]].
   */
-object Stopwatches {
+object Stopwatches
   import Stopwatch.Elapsed
 
   /** @see [[Stopwatch.start()]] */
@@ -145,7 +141,6 @@ object Stopwatches {
   /** @see [[Stopwatch.timeMillis]] */
   def timeMillis: () => Long =
     Stopwatch.timeMillis
-}
 
 /**
   * A trivial implementation of [[Stopwatch]] for use as a null
@@ -156,11 +151,10 @@ object Stopwatches {
   *
   * @see `NilStopwatch.get` for accessing this instance from Java.
   */
-object NilStopwatch extends Stopwatch {
+object NilStopwatch extends Stopwatch
   private[this] val fn = () => Duration.Bottom
 
   def start(): Elapsed = fn
 
   /** Java API for getting an instance of this [[Stopwatch]]. */
   def get: Stopwatch = this
-}

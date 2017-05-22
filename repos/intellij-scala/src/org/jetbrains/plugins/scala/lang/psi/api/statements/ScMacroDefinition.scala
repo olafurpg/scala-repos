@@ -7,6 +7,5 @@ package statements
 /**
   * @author Jason Zaugg
   */
-trait ScMacroDefinition extends ScFunction {
+trait ScMacroDefinition extends ScFunction
   def typeElement = returnTypeElement
-}

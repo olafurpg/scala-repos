@@ -7,7 +7,7 @@ import com.twitter.util.Throwables
   * Typical implementations may report any cancellations or validation
   * errors separately so success rate can from valid non cancelled requests.
   */
-object ExceptionStatsHandler {
+object ExceptionStatsHandler
   private[stats] val Failures = "failures"
   private[stats] val SourcedFailures = "sourcedfailures"
 
@@ -23,30 +23,24 @@ object ExceptionStatsHandler {
       t: Throwable,
       labels: Seq[Seq[String]],
       rollup: Boolean
-  ): Seq[Seq[String]] = {
+  ): Seq[Seq[String]] =
     val exceptionChain = Throwables.mkString(t)
 
     val suffixes =
-      if (rollup) {
+      if (rollup)
         exceptionChain.inits.toSeq
-      } else {
+      else
         Seq(exceptionChain, Nil)
-      }
 
-    labels.flatMap { prefix =>
-      suffixes.map { suffix =>
+    labels.flatMap  prefix =>
+      suffixes.map  suffix =>
         prefix ++ suffix
-      }
-    }
-  }
-}
 
 /**
   * Exception Stats Recorder.
   */
-trait ExceptionStatsHandler {
+trait ExceptionStatsHandler
   def record(statsReceiver: StatsReceiver, t: Throwable): Unit
-}
 
 /**
   * Basic implementation of exception stat recording that
@@ -60,18 +54,16 @@ class CategorizingExceptionStatsHandler(
     categorizer: Throwable => Option[String] = _ => None,
     sourceFunction: Throwable => Option[String] = _ => None,
     rollup: Boolean = true)
-    extends ExceptionStatsHandler {
+    extends ExceptionStatsHandler
   import ExceptionStatsHandler._
 
-  private[this] val underlying: ExceptionStatsHandler = {
+  private[this] val underlying: ExceptionStatsHandler =
     val mkLabel: Throwable => String = t => categorizer(t).getOrElse(Failures)
     new MultiCategorizingExceptionStatsHandler(
         mkLabel, _ => Set.empty, sourceFunction, rollup)
-  }
 
   def record(statsReceiver: StatsReceiver, t: Throwable): Unit =
     underlying.record(statsReceiver, t)
-}
 
 /**
   * Basic implementation of exception stat recording that
@@ -124,10 +116,10 @@ private[finagle] class MultiCategorizingExceptionStatsHandler(
     mkFlags: Throwable => Set[String] = _ => Set.empty,
     mkSource: Throwable => Option[String] = _ => None,
     rollup: Boolean = true)
-    extends ExceptionStatsHandler {
+    extends ExceptionStatsHandler
   import ExceptionStatsHandler._
 
-  def record(statsReceiver: StatsReceiver, t: Throwable): Unit = {
+  def record(statsReceiver: StatsReceiver, t: Throwable): Unit =
     val parentLabel: String = mkLabel(t)
 
     val flags = mkFlags(t)
@@ -135,16 +127,12 @@ private[finagle] class MultiCategorizingExceptionStatsHandler(
       if (flags.isEmpty) Seq(Seq(parentLabel))
       else flags.toSeq.map(Seq(parentLabel, _))
 
-    val labels: Seq[Seq[String]] = mkSource(t) match {
+    val labels: Seq[Seq[String]] = mkSource(t) match
       case Some(service) => flagLabels :+ Seq(SourcedFailures, service)
       case None => flagLabels
-    }
 
     val paths: Seq[Seq[String]] = statPaths(t, labels, rollup)
 
     if (flags.nonEmpty) statsReceiver.counter(parentLabel).incr()
-    paths.foreach { path =>
+    paths.foreach  path =>
       statsReceiver.counter(path: _*).incr()
-    }
-  }
-}

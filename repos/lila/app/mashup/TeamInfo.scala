@@ -17,29 +17,28 @@ case class TeamInfo(mine: Boolean,
                     bestUserIds: List[User.ID],
                     toints: Int,
                     forumNbPosts: Int,
-                    forumPosts: List[MiniForumPost]) {
+                    forumPosts: List[MiniForumPost])
 
   def hasRequests = requests.nonEmpty
-}
 
-object TeamInfo {
+object TeamInfo
 
   private case class Cachable(bestUserIds: List[User.ID], toints: Int)
 
   private val cache = lila.memo.AsyncCache[String, Cachable](
       teamId =>
-        for {
+        for
           userIds ← MemberRepo userIdsByTeam teamId
           bestUserIds ← UserRepo.idsByIdsSortRating(userIds, 10)
           toints ← UserRepo.idsSumToints(userIds)
-        } yield Cachable(bestUserIds, toints),
+        yield Cachable(bestUserIds, toints),
       timeToLive = 10 minutes)
 
   def apply(api: TeamApi,
             getForumNbPosts: String => Fu[Int],
             getForumPosts: String => Fu[List[MiniForumPost]])(
       team: Team, me: Option[User]): Fu[TeamInfo] =
-    for {
+    for
       requests ← (team.enabled && me.??(m => team.isCreator(m.id))) ?? api
         .requestsWithUsers(team)
       mine = me.??(m => api.belongsTo(team.id, m.id))
@@ -47,7 +46,7 @@ object TeamInfo {
       cachable <- cache(team.id)
       forumNbPosts ← getForumNbPosts(team.id)
       forumPosts ← getForumPosts(team.id)
-    } yield
+    yield
       TeamInfo(mine = mine,
                createdByMe = ~me.map(m => team.isCreator(m.id)),
                requestedByMe = requestedByMe,
@@ -56,4 +55,3 @@ object TeamInfo {
                toints = cachable.toints,
                forumNbPosts = forumNbPosts,
                forumPosts = forumPosts)
-}

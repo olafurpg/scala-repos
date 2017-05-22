@@ -21,7 +21,7 @@ import scala.collection.mutable
   * @author Roman.Shein
   * @since 16.03.2015.
   */
-trait BuildFileModifier {
+trait BuildFileModifier
 
   /**
     * Performs some specific modification(s) of sbt build file(s) (library dependencies, resolvers, sbt options, etc.)
@@ -36,57 +36,51 @@ trait BuildFileModifier {
     * Performs modification(s) of sbt build file(s) associated with the module and refreshes external system.
     * @param module - module within IJ project to modify build file(s) for
     */
-  def modify(module: IJModule, needPreviewChanges: Boolean): Boolean = {
+  def modify(module: IJModule, needPreviewChanges: Boolean): Boolean =
 
     var res = false
     val project = module.getProject
     val vfsFileToCopy = mutable.Map[VirtualFile, LightVirtualFile]()
-    CommandProcessor.getInstance.executeCommand(project, new Runnable {
-      def run(): Unit = {
-        modifyInner(module, vfsFileToCopy) match {
+    CommandProcessor.getInstance.executeCommand(project, new Runnable
+      def run(): Unit =
+        modifyInner(module, vfsFileToCopy) match
           case Some(changes) =>
-            if (!needPreviewChanges) {
+            if (!needPreviewChanges)
               applyChanges(changes, project, vfsFileToCopy)
               res = true
-            } else {
-              previewChanges(module.getProject, changes, vfsFileToCopy) match {
+            else
+              previewChanges(module.getProject, changes, vfsFileToCopy) match
                 case Some(acceptedChanges) if acceptedChanges.nonEmpty =>
                   applyChanges(acceptedChanges, project, vfsFileToCopy)
                   res = true
                 case _ =>
                   res = false
-              }
-            }
           case None =>
             res = false
-        }
-      }
-    }, "Sbt build file modification", this)
+    , "Sbt build file modification", this)
     if (res)
       ExternalSystemUtil.refreshProjects(
           new ImportSpecBuilder(project, SbtProjectSystem.Id))
     res
-  }
 
   def previewChanges(
       project: IJProject,
       changes: List[VirtualFile],
       filesToWorkingCopies: mutable.Map[VirtualFile, LightVirtualFile])
-    : Option[List[VirtualFile]] = {
+    : Option[List[VirtualFile]] =
     //first, create changes and set their initial status
     val fileStatusMap =
       mutable.Map[VirtualFile, (BuildFileModifiedStatus, Long)]()
     val documentManager = FileDocumentManager.getInstance()
-    val vcsChanges = filesToWorkingCopies.toSeq.map {
+    val vcsChanges = filesToWorkingCopies.toSeq.map
       case (original, copy) =>
         val originalRevision =
           new SimpleContentRevision(VfsUtilCore.loadText(original),
                                     VcsUtil getFilePath original,
                                     "original")
         val copyRevision =
-          new CurrentContentRevision(VcsUtil getFilePath copy) {
+          new CurrentContentRevision(VcsUtil getFilePath copy)
             override def getVirtualFile = copy
-          }
         val isModified = changes.contains(copy)
         assert(!fileStatusMap.contains(copy))
         val buildFileStatus =
@@ -96,33 +90,27 @@ trait BuildFileModifier {
           documentManager.getDocument(copy).getModificationStamp
         fileStatusMap.put(copy, (buildFileStatus, buildFileModificationStamp))
         new BuildFileChange(originalRevision, copyRevision, buildFileStatus)
-    }
     val changesToWorkingCopies = (vcsChanges zip changes).toMap
     val dialog = ChangesConfirmationDialog(
         project, vcsChanges.toList, fileStatusMap)
     dialog.setModal(true)
     val isOk = dialog.showAndGet()
-    if (isOk) {
+    if (isOk)
       val selectedChanges = dialog.selectedChanges
       Some(
           for (change <- selectedChanges) yield
             changesToWorkingCopies(change.asInstanceOf[BuildFileChange]))
-    } else None
-  }
+    else None
 
   def applyChanges(
       changes: List[VirtualFile],
       project: IJProject,
-      vfsFileToCopy: mutable.Map[VirtualFile, LightVirtualFile]): Unit = {
+      vfsFileToCopy: mutable.Map[VirtualFile, LightVirtualFile]): Unit =
     val manager = FileDocumentManager.getInstance()
-    for ((originalFile, changedFile) <- vfsFileToCopy) {
-      if (changes.contains(changedFile)) {
+    for ((originalFile, changedFile) <- vfsFileToCopy)
+      if (changes.contains(changedFile))
         //we only want to rewrite files that actually changed
         val changedDocument = manager.getDocument(changedFile)
 //        val originalDocument = manager.getDocument(originalFile)
 //        originalDocument.setText(changedDocument.getText)
         VfsUtil.saveText(originalFile, changedDocument.getText)
-      }
-    }
-  }
-}

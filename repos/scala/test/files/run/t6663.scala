@@ -1,11 +1,10 @@
 import language.dynamics
 
-class C(v: Any) extends Dynamic {
+class C(v: Any) extends Dynamic
   def selectDynamic[T](n: String): Option[T] = Option(v.asInstanceOf[T])
   def applyDynamic[T](n: String)(): Option[T] = Option(v.asInstanceOf[T])
-}
 
-object Test extends App {
+object Test extends App
   // this should be converted to
   // C(42).selectDynamic[Int]("foo").get
   // but, before fixing SI-6663, became
@@ -13,4 +12,3 @@ object Test extends App {
   // leading to a ClassCastException
   var v = new C(42).foo[Int].get
   println(v)
-}

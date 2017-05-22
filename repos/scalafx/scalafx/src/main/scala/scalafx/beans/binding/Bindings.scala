@@ -38,7 +38,7 @@ object Bindings extends Bindings
   *
   * @define JFX JavaFX
   */
-trait Bindings {
+trait Bindings
 
   /**
     * Returns the highest value among a collection of $JFX
@@ -85,7 +85,7 @@ trait Bindings {
   def when(condition: => jfxbv.ObservableBooleanValue) =
     new ConditionBuilder(new jfxbb.When(condition))
 
-  protected class ConditionBuilder(whenBuilder: jfxbb.When) {
+  protected class ConditionBuilder(whenBuilder: jfxbb.When)
     @deprecated(
         message = "`then` is a reserved word in Scala 2.10+, use `choose` instead. `then` will be removed in ScalaFX 1.0.0-m3",
         since = "1.0.0-m1")
@@ -193,10 +193,9 @@ trait Bindings {
     def choose[J <: Object](chooseExpression: SFXDelegate[J]) =
       new ObjectConditionBuilder[J](
           whenBuilder.`then`(chooseExpression.delegate))
-  }
 
   protected class NumberConditionBuilder(
-      whenBuilder: jfxbb.When#NumberConditionBuilder) {
+      whenBuilder: jfxbb.When#NumberConditionBuilder)
     def otherwise(otherwiseExpression: jfxbv.ObservableNumberValue) =
       whenBuilder.otherwise(otherwiseExpression)
     def otherwise(otherwiseExpression: Int) =
@@ -207,26 +206,23 @@ trait Bindings {
       whenBuilder.otherwise(otherwiseExpression)
     def otherwise(otherwiseExpression: Double) =
       whenBuilder.otherwise(otherwiseExpression)
-  }
 
   protected class BooleanConditionBuilder(
-      whenBuilder: jfxbb.When#BooleanConditionBuilder) {
+      whenBuilder: jfxbb.When#BooleanConditionBuilder)
     def otherwise(otherwiseExpression: jfxbv.ObservableBooleanValue) =
       whenBuilder.otherwise(otherwiseExpression)
     def otherwise(otherwiseExpression: Boolean) =
       whenBuilder.otherwise(otherwiseExpression)
-  }
 
   protected class StringConditionBuilder(
-      whenBuilder: jfxbb.When#StringConditionBuilder) {
+      whenBuilder: jfxbb.When#StringConditionBuilder)
     def otherwise(otherwiseExpression: jfxbv.ObservableStringValue) =
       whenBuilder.otherwise(otherwiseExpression)
     def otherwise(otherwiseExpression: String) =
       whenBuilder.otherwise(otherwiseExpression)
-  }
 
   protected class ObjectConditionBuilder[T](
-      whenBuilder: jfxbb.When#ObjectConditionBuilder[T]) {
+      whenBuilder: jfxbb.When#ObjectConditionBuilder[T])
     // explicit conversion needed due to T(Any) typed method
     def otherwise(otherwiseExpression: ObservableValue[T, T]) =
       whenBuilder.otherwise(ObservableValue
@@ -235,5 +231,3 @@ trait Bindings {
       whenBuilder.otherwise(otherwiseExpression)
     def otherwise(otherwiseExpression: T) =
       whenBuilder.otherwise(otherwiseExpression)
-  }
-}

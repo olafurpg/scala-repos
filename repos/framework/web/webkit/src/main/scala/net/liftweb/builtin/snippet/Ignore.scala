@@ -21,11 +21,9 @@ package snippet
 import scala.xml._
 import net.liftweb.http._
 
-object Ignore extends DispatchSnippet {
+object Ignore extends DispatchSnippet
 
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case _ => render _
-  }
 
   def render(kids: NodeSeq): NodeSeq = NodeSeq.Empty
-}

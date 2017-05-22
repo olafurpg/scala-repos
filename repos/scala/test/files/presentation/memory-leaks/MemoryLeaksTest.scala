@@ -23,25 +23,22 @@ import scala.tools.nsc.doc
   * directory. Use the cool graph-it.R (https://github.com/scala-ide/scala-ide/blob/master/org.scala-ide.sdt.core.tests/graph-it.R)
   *  script to see the memory curve for the given test run.
   */
-object Test extends InteractiveTest {
+object Test extends InteractiveTest
   final val mega = 1024 * 1024
 
   import interactive.Global
   trait InteractiveScaladocAnalyzer
-      extends interactive.InteractiveAnalyzer with doc.ScaladocAnalyzer {
+      extends interactive.InteractiveAnalyzer with doc.ScaladocAnalyzer
     val global: Global
     override def newTyper(context: Context) =
-      new Typer(context) with InteractiveTyper with ScaladocTyper {
+      new Typer(context) with InteractiveTyper with ScaladocTyper
         override def canAdaptConstantTypeToLiteral = false
-      }
-  }
 
   private class ScaladocEnabledGlobal
-      extends Global(settings, compilerReporter) {
-    override lazy val analyzer = new {
+      extends Global(settings, compilerReporter)
+    override lazy val analyzer = new
       val global: ScaladocEnabledGlobal.this.type = ScaladocEnabledGlobal.this
-    } with InteractiveScaladocAnalyzer
-  }
+    with InteractiveScaladocAnalyzer
 
   override def createGlobal: Global = new ScaladocEnabledGlobal
 
@@ -50,7 +47,7 @@ object Test extends InteractiveTest {
   def batchSource(name: String) =
     new BatchSourceFile(AbstractFile.getFile(name))
 
-  def memoryConsumptionTest() {
+  def memoryConsumptionTest()
     val N = 50
     val filename = "usedmem-%tF.txt".format(Calendar.getInstance.getTime)
 
@@ -74,15 +71,13 @@ object Test extends InteractiveTest {
       originalTyper.splitAt(originalTyper.indexOf("import global._"))
     val changedTyper = prefix + " a\n " + postfix
 
-    val usedMem = for (i <- 1 to N) yield {
+    val usedMem = for (i <- 1 to N) yield
       val src = if (i % 2 == 0) originalTyper else changedTyper
 
-      val usedMem = withGC {
+      val usedMem = withGC
         typeCheckWith(typerUnit, src)
-      }
 
       usedMem / mega // report size in MB
-    }
 
     //dumpDataToFile(filename, usedMem)
     // drop the first two measurements, since the compiler needs some memory when initializing
@@ -92,22 +87,18 @@ object Test extends InteractiveTest {
     if (b > 1.0)
       println("Rate of memory consumption is alarming! %.4f MB/run".format(b))
     else println("No leaks detected.")
-  }
 
-  private def typeCheckWith(file: AbstractFile, src: String) = {
+  private def typeCheckWith(file: AbstractFile, src: String) =
     val sourceFile = new BatchSourceFile(file, src.toCharArray)
     askReload(Seq(sourceFile))
     askLoadedTyped(sourceFile).get // block until it's here
-  }
 
-  private def dumpDataToFile(filename: String, usedMem: Seq[Long]) {
+  private def dumpDataToFile(filename: String, usedMem: Seq[Long])
     val outputFile = new PrintWriter(new FileOutputStream(filename))
     outputFile.println("\tusedMem")
-    for ((dataPoint, i) <- usedMem.zipWithIndex) {
+    for ((dataPoint, i) <- usedMem.zipWithIndex)
       outputFile.println("%d\t%d".format(i, dataPoint))
-    }
     outputFile.close()
-  }
 
   /** Return the linear model of these values, (a, b). First value is the constant factor,
     *  second value is the slope, i.e. `y = a + bx`
@@ -117,7 +108,7 @@ object Test extends InteractiveTest {
     *
     *  See: http://en.wikipedia.org/wiki/Simple_linear_regression
     */
-  def linearModel(xs: Seq[Long], ys: Seq[Long]): (Double, Double) = {
+  def linearModel(xs: Seq[Long], ys: Seq[Long]): (Double, Double) =
     require(xs.length == ys.length)
 
     def mean(v: Seq[Long]): Double = v.sum.toDouble / v.length
@@ -131,13 +122,12 @@ object Test extends InteractiveTest {
     val alfa = meanYs - beta * meanXs
 
     (alfa, beta)
-  }
 
   /** Run the given closure and return the amount of used memory at the end of its execution.
     *
     *  Runs the GC before and after the execution of `f'.
     */
-  def withGC(f: => Unit): Long = {
+  def withGC(f: => Unit): Long =
     val r = Runtime.getRuntime
     System.gc()
 
@@ -146,5 +136,3 @@ object Test extends InteractiveTest {
     System.gc()
 
     r.totalMemory() - r.freeMemory()
-  }
-}

@@ -1,5 +1,4 @@
 package example
 
-object B {
+object B
   val y: String = "4"
-}

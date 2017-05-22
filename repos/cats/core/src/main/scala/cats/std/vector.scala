@@ -7,10 +7,10 @@ import scala.annotation.tailrec
 import scala.collection.+:
 import scala.collection.immutable.VectorBuilder
 
-trait VectorInstances {
+trait VectorInstances
   implicit val vectorInstance: Traverse[Vector] with MonadCombine[Vector] with CoflatMap[
       Vector] = new Traverse[Vector] with MonadCombine[Vector]
-  with CoflatMap[Vector] {
+  with CoflatMap[Vector]
 
     def empty[A]: Vector[A] = Vector.empty[A]
 
@@ -28,24 +28,21 @@ trait VectorInstances {
         f: (A, B) => Z): Vector[Z] =
       fa.flatMap(a => fb.map(b => f(a, b)))
 
-    def coflatMap[A, B](fa: Vector[A])(f: Vector[A] => B): Vector[B] = {
+    def coflatMap[A, B](fa: Vector[A])(f: Vector[A] => B): Vector[B] =
       @tailrec def loop(builder: VectorBuilder[B], as: Vector[A]): Vector[B] =
-        as match {
+        as match
           case _ +: rest => loop(builder += f(as), rest)
           case _ => builder.result()
-        }
       loop(new VectorBuilder[B], fa)
-    }
 
     def foldLeft[A, B](fa: Vector[A], b: B)(f: (B, A) => B): B =
       fa.foldLeft(b)(f)
 
     def foldRight[A, B](fa: Vector[A], lb: Eval[B])(
-        f: (A, Eval[B]) => Eval[B]): Eval[B] = {
+        f: (A, Eval[B]) => Eval[B]): Eval[B] =
       def loop(i: Int): Eval[B] =
         if (i < fa.length) f(fa(i), Eval.defer(loop(i + 1))) else lb
       Eval.defer(loop(0))
-    }
 
     def traverse[G[_], A, B](fa: Vector[A])(f: A => G[B])(
         implicit G: Applicative[G]): G[Vector[B]] =
@@ -56,25 +53,20 @@ trait VectorInstances {
       fa.exists(p)
 
     override def isEmpty[A](fa: Vector[A]): Boolean = fa.isEmpty
-  }
 
   implicit def vectorShow[A : Show]: Show[Vector[A]] =
-    new Show[Vector[A]] {
+    new Show[Vector[A]]
       def show(fa: Vector[A]): String =
         fa.map(_.show).mkString("Vector(", ", ", ")")
-    }
 
   // TODO: eventually use algebra's instances (which will deal with
   // implicit priority between Eq/PartialOrder/Order).
 
   implicit def eqVector[A](implicit ev: Eq[A]): Eq[Vector[A]] =
-    new Eq[Vector[A]] {
-      def eqv(x: Vector[A], y: Vector[A]): Boolean = {
+    new Eq[Vector[A]]
+      def eqv(x: Vector[A], y: Vector[A]): Boolean =
         @tailrec def loop(to: Int): Boolean =
           if (to == -1) true
           else ev.eqv(x(to), y(to)) && loop(to - 1)
 
         (x.size == y.size) && loop(x.size - 1)
-      }
-    }
-}

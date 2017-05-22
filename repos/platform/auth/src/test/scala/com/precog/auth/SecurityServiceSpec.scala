@@ -58,7 +58,7 @@ import DefaultBijections._
 
 trait TestAPIKeyService
     extends BlueEyesServiceSpecification with SecurityService
-    with AkkaDefaults {
+    with AkkaDefaults
   self =>
 
   val asyncContext = defaultFutureDispatch
@@ -83,10 +83,9 @@ trait TestAPIKeyService
 
   override def APIKeyManager(config: Configuration) =
     (apiKeyManager, Stoppable.Noop)
-}
 
 class SecurityServiceSpec
-    extends TestAPIKeyService with FutureMatchers with Tags {
+    extends TestAPIKeyService with FutureMatchers with Tags
   import Permission._
 
   val authService: HttpClient[JValue] = client
@@ -95,11 +94,10 @@ class SecurityServiceSpec
   val apiKeyManager =
     new InMemoryAPIKeyManager[Future](blueeyes.util.Clock.System)
 
-  val tc = new AsyncHttpTranscoder[JValue, JValue] {
+  val tc = new AsyncHttpTranscoder[JValue, JValue]
     def apply(a: HttpRequest[JValue]): HttpRequest[JValue] = a
     def unapply(
         fb: Future[HttpResponse[JValue]]): Future[HttpResponse[JValue]] = fb
-  }
 
   def getAPIKeys(authAPIKey: String) =
     authService.query("apiKey", authAPIKey).get("/apikeys/")
@@ -171,12 +169,11 @@ class SecurityServiceSpec
     (g1.grantId == g2.grantId) && (g1.permissions == g2.permissions) &&
     (g1.expirationDate == g2.expirationDate)
 
-  def mkNewGrantRequest(grant: Grant) = grant match {
+  def mkNewGrantRequest(grant: Grant) = grant match
     case Grant(
         _, name, description, _, parentIds, permissions, _, expirationDate) =>
       v1.NewGrantRequest(
           name, description, parentIds, permissions, expirationDate)
-  }
 
   def standardGrant(accountId: AccountId) =
     mkNewGrantRequest(
@@ -253,7 +250,7 @@ class SecurityServiceSpec
       DeletePermission(Path.Root, WrittenByAny)
   )
 
-  val rootGrants = {
+  val rootGrants =
     Set(
         Grant(
             rootGrantId,
@@ -265,226 +262,174 @@ class SecurityServiceSpec
             new Instant(0L),
             None
         ))
-  }
 
   val rootGrantRequests = rootGrants map mkNewGrantRequest
 
-  "Security service" should {
-    "get existing API key" in {
-      getAPIKeyDetails(user1.apiKey) must awaited(to) {
-        beLike {
+  "Security service" should
+    "get existing API key" in
+      getAPIKeyDetails(user1.apiKey) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jtd), _) =>
-            jtd.validated[v1.APIKeyDetails] must beLike {
+            jtd.validated[v1.APIKeyDetails] must beLike
               case Success(details) =>
                 details.apiKey must_== user1.apiKey
                 details.name must_== user1.name
                 details.description must_== user1.description
                 details.grants.map(_.grantId) must_== user1.grants
-            }
-        }
-      }
-    }
 
-    "get existing API key without issuer" in {
-      getAPIKeyDetails(user5.apiKey) must awaited(to) {
-        beLike {
+    "get existing API key without issuer" in
+      getAPIKeyDetails(user5.apiKey) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jtd), _) =>
-            jtd.validated[v1.APIKeyDetails] must beLike {
+            jtd.validated[v1.APIKeyDetails] must beLike
               case Success(details) =>
                 details.apiKey must_== user5.apiKey
                 details.name must_== user5.name
                 details.description must_== user5.description
                 details.grants.map(_.grantId) must_== user5.grants
                 details.issuerChain must beEmpty
-            }
-        }
-      }
-    }
-    "get existing API key with issuer" in {
-      getFullAPIKeyDetails(user5.apiKey, rootAPIKey) must awaited(to) {
-        beLike {
+    "get existing API key with issuer" in
+      getFullAPIKeyDetails(user5.apiKey, rootAPIKey) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jtd), _) =>
-            jtd.validated[v1.APIKeyDetails] must beLike {
+            jtd.validated[v1.APIKeyDetails] must beLike
               case Success(details) =>
                 details.apiKey must_== user5.apiKey
                 details.name must_== user5.name
                 details.description must_== user5.description
                 details.grants.map(_.grantId) must_== user5.grants
                 details.issuerChain mustEqual List(user1.apiKey, rootAPIKey)
-            }
-        }
-      }
-    }
 
-    "return error on get and API key not found" in {
-      getAPIKeyDetails("not-gonna-find-it") must awaited(to) {
-        beLike {
+    "return error on get and API key not found" in
+      getAPIKeyDetails("not-gonna-find-it") must awaited(to)
+        beLike
           case HttpResponse(
               HttpStatus(NotFound, _),
               _,
               Some(JString("Unable to find API key not-gonna-find-it")),
               _) =>
             ok
-        }
-      }
-    }
 
-    "enumerate existing API keys" in {
-      getAPIKeys(user1.apiKey) must awaited(to) {
-        beLike {
+    "enumerate existing API keys" in
+      getAPIKeys(user1.apiKey) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jts), _) =>
             val ks = jts.deserialize[Set[v1.APIKeyDetails]]
             ks must haveSize(3)
             ks.map(_.apiKey) must containAllOf(
                 List(user5.apiKey, user6.apiKey))
           // ks.map(_.apiKey) must haveTheSameElementsAs(allAPIKeys.filter(_.issuerKey.exists(_ == user1.apiKey)).map(_.apiKey))
-        }
-      }
-    }
 
-    "create root-like API key with defaults" in {
+    "create root-like API key with defaults" in
       val request =
         v1.NewAPIKeyRequest(Some("root-like"), None, rootGrantRequests)
-      createAPIKey(rootAPIKey, request) must awaited(to) {
-        beLike {
+      createAPIKey(rootAPIKey, request) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jid), _) =>
             val id = jid.deserialize[v1.APIKeyDetails]
             id.apiKey.length must be_>(0)
-        }
-      }
-    }
 
-    "create non-root API key with defaults" in {
+    "create non-root API key with defaults" in
       val request = v1.NewAPIKeyRequest(
           Some("non-root-1"), None, Set(standardGrant("non-root-1")))
-      createAPIKey(rootAPIKey, request) must awaited(to) {
-        beLike {
+      createAPIKey(rootAPIKey, request) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jid), _) =>
             val id = jid.deserialize[v1.APIKeyDetails]
             id.apiKey.length must be_>(0)
-        }
-      }
-    }
 
-    "create derived non-root API key" in {
+    "create derived non-root API key" in
       val request = v1.NewAPIKeyRequest(
           Some("non-root-2"), None, Set(mkNewGrantRequest(user1Grant)))
-      val result = for {
+      val result = for
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- createAPIKey(
             user1.apiKey, request)
         apiKey = jid.deserialize[v1.APIKeyDetails].apiKey
         HttpResponse(HttpStatus(OK, _), _, Some(jtd), _) <- getAPIKeyDetails(
             apiKey)
-      } yield jtd.deserialize[v1.APIKeyDetails]
+      yield jtd.deserialize[v1.APIKeyDetails]
 
-      result must awaited(to) {
-        beLike {
+      result must awaited(to)
+        beLike
           case v1.APIKeyDetails(apiKey, name, description, grants, _) =>
             grants.flatMap(_.permissions) must haveTheSameElementsAs(
                 user1Grant.permissions)
-        }
-      }
-    }
 
-    "don't create when new API key is invalid" in {
+    "don't create when new API key is invalid" in
       val request = JObject(List(JField("create", JString("invalid"))))
-      createAPIKeyRaw(rootAPIKey, request) must awaited(to) {
-        beLike {
+      createAPIKeyRaw(rootAPIKey, request) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(BadRequest, msg),
                             _,
                             Some(JObject(elems)),
                             _) if elems.contains("error") =>
             msg must startWith("Invalid new API key request body")
-        }
-      }
-    }
 
-    "don't create if API key is expired" in {
+    "don't create if API key is expired" in
       val request = v1.NewAPIKeyRequest(
           Some("expired-2"), None, Set(mkNewGrantRequest(expiredGrant)))
-      createAPIKey(expired.apiKey, request) must awaited(to) {
-        beLike {
+      createAPIKey(expired.apiKey, request) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(BadRequest, _),
                             _,
                             Some(JObject(elems)),
                             _) if elems.contains("error") =>
-            elems("error") must beLike {
+            elems("error") must beLike
               case JString(
                   "Unable to create API key with expired permission") =>
                 ok
-            }
-        }
-      }
-    }
 
-    "don't create if API key cannot grant permissions" in {
+    "don't create if API key cannot grant permissions" in
       val request = v1.NewAPIKeyRequest(
           Some("unauthorized"), None, Set(mkNewGrantRequest(user1Grant)))
-      createAPIKey(user2.apiKey, request) must awaited(to) {
-        beLike {
+      createAPIKey(user2.apiKey, request) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(BadRequest, _),
                             _,
                             Some(JObject(elems)),
                             _) if elems.contains("error") =>
-            elems("error") must beLike {
+            elems("error") must beLike
               case JString(msg) =>
                 msg must startWith(
                     "Requestor lacks permission to assign given grants to API key")
-            }
-        }
-      }
-    }
 
-    "retrieve the grants associated with a given API key" in {
-      getAPIKeyGrants(user1.apiKey) must awaited(to) {
-        beLike {
+    "retrieve the grants associated with a given API key" in
+      getAPIKeyGrants(user1.apiKey) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) =>
             val gs = jgs.deserialize[Set[v1.GrantDetails]]
             gs.map(_.grantId) must haveTheSameElementsAs(
                 Seq(user1Grant.grantId))
-        }
-      }
-    }
 
-    "add a specified grant to an API key" in {
+    "add a specified grant to an API key" in
       addAPIKeyGrant(user1.apiKey, user2.apiKey, user1Grant.grantId) must awaited(
-          to) {
-        beLike {
+          to)
+        beLike
           case HttpResponse(HttpStatus(Created, _), _, None, _) => ok
-        }
-      }
-    }
 
-    "get existing grant" in {
-      getGrantDetails(user1.apiKey, user1Grant.grantId) must awaited(to) {
-        beLike {
+    "get existing grant" in
+      getGrantDetails(user1.apiKey, user1Grant.grantId) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jgd), _) =>
-            jgd.deserialize[v1.GrantDetails] must beLike {
+            jgd.deserialize[v1.GrantDetails] must beLike
               case v1.GrantDetails(gid, gname, gdesc, perms, _, exp) =>
                 gid must_== user1Grant.grantId
                 gname must_== user1Grant.name
                 gdesc must_== user1Grant.description
                 perms must_== user1Grant.permissions
                 exp must_== user1Grant.expirationDate
-            }
-        }
-      }
-    }
 
-    "report an error on get and grant not found" in {
-      getGrantDetails(user1.apiKey, "not-gonna-find-it") must awaited(to) {
-        beLike {
+    "report an error on get and grant not found" in
+      getGrantDetails(user1.apiKey, "not-gonna-find-it") must awaited(to)
+        beLike
           case HttpResponse(
               HttpStatus(NotFound, _),
               _,
               Some(JString("Unable to find grant not-gonna-find-it")),
               _) =>
             ok
-        }
-      }
-    }
 
-    "create a new grant derived from the grants of the authorization API key" in {
+    "create a new grant derived from the grants of the authorization API key" in
       createAPIKeyGrant(
           user1.apiKey,
           v1.NewGrantRequest(None,
@@ -492,16 +437,13 @@ class SecurityServiceSpec
                              Set.empty[GrantId],
                              Set(ReadPermission(Path("/user1/read-me"),
                                                 WrittenByAccount("user1"))),
-                             None)) must awaited(to) {
-        beLike {
+                             None)) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jid), _) =>
             val id = jid.deserialize[v1.GrantDetails]
             id.grantId.length must be_>(0)
-        }
-      }
-    }
 
-    "don't create a new grant if it can't be derived from the authorization API keys grants" in {
+    "don't create a new grant if it can't be derived from the authorization API keys grants" in
       createAPIKeyGrant(
           user1.apiKey,
           v1.NewGrantRequest(None,
@@ -509,41 +451,31 @@ class SecurityServiceSpec
                              Set.empty[GrantId],
                              Set(ReadPermission(Path("/user2/secret"),
                                                 WrittenByAccount("user2"))),
-                             None)) must awaited(to) {
-        beLike {
+                             None)) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(BadRequest, _),
                             _,
                             Some(JObject(elems)),
                             _) if elems.contains("error") =>
-            elems("error") must beLike {
+            elems("error") must beLike
               case JString(msg) =>
                 msg must startWith(
                     "Requestor lacks permissions to create grant")
-            }
-        }
-      }
-    }
 
-    "remove a specified grant from an API key" in {
+    "remove a specified grant from an API key" in
       removeAPIKeyGrant(user3.apiKey, user3.apiKey, user3Grant.grantId) must awaited(
-          to) {
-        beLike {
+          to)
+        beLike
           case HttpResponse(HttpStatus(NoContent, _), _, None, _) => ok
-        }
-      }
-    }
 
-    "retrieve the child grants of the given grant" in {
-      getGrantChildren(user4.apiKey, user4Grant.grantId) must awaited(to) {
-        beLike {
+    "retrieve the child grants of the given grant" in
+      getGrantChildren(user4.apiKey, user4Grant.grantId) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) =>
             val gs = jgs.deserialize[Set[v1.GrantDetails]]
             gs.map(_.grantId) must_== Set(user4DerivedGrant.grantId)
-        }
-      }
-    }
 
-    "add a child grant to the given grant" in {
+    "add a child grant to the given grant" in
       addGrantChild(
           user1.apiKey,
           user1Grant.grantId,
@@ -552,17 +484,14 @@ class SecurityServiceSpec
                              Set.empty[GrantId],
                              Set(ReadPermission(Path("/user1/secret"),
                                                 WrittenByAccount("user1"))),
-                             None)) must awaited(to) {
-        beLike {
+                             None)) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jid), _) =>
             val id = jid.deserialize[v1.GrantDetails]
             id.grantId.length must be_>(0)
-        }
-      }
-    }
 
-    "delete a grant" in {
-      (for {
+    "delete a grant" in
+      (for
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- addGrantChild(
             user1.apiKey,
             user1Grant.grantId,
@@ -582,26 +511,21 @@ class SecurityServiceSpec
         HttpResponse(HttpStatus(OK, _), _, Some(jgs), _) <- getGrantChildren(
             user1.apiKey, user1Grant.grantId)
         afterDelete = jgs.deserialize[Set[v1.GrantDetails]]
-      } yield
-        !afterDelete.exists(_.grantId == details.grantId)) must awaited(to) {
+      yield
+        !afterDelete.exists(_.grantId == details.grantId)) must awaited(to)
         beTrue
-      }
-    }
 
-    "retrieve permissions for a given path owned by user" in {
-      getPermissions(user1.apiKey, Path("/user1")) must awaited(to) {
-        beLike {
+    "retrieve permissions for a given path owned by user" in
+      getPermissions(user1.apiKey, Path("/user1")) must awaited(to)
+        beLike
           case HttpResponse(HttpStatus(OK, _), _, Some(jperms), _) =>
             val perms =
               jperms.deserialize[Set[Permission]] map Permission.accessType
             val types = Set("read", "write", "delete")
             perms must_== types
-        }
-      }
-    }
 
-    "retrieve permissions for a path we don't own" in {
-      val permsM = for {
+    "retrieve permissions for a path we don't own" in
+      val permsM = for
         HttpResponse(HttpStatus(OK, _), _, Some(jid), _) <- createAPIKeyGrant(
             user1.apiKey,
             v1.NewGrantRequest(None,
@@ -615,13 +539,8 @@ class SecurityServiceSpec
                             jid.deserialize[v1.GrantDetails].grantId)
         HttpResponse(HttpStatus(OK, _), _, Some(jperms), _) <- getPermissions(
             user4.apiKey, Path("/user1/public"))
-      } yield jperms.deserialize[Set[Permission]]
+      yield jperms.deserialize[Set[Permission]]
 
-      permsM must awaited(to) {
-        haveOneElementLike {
+      permsM must awaited(to)
+        haveOneElementLike
           case ReadPermission(_, _) => ok
-        }
-      }
-    }
-  }
-}

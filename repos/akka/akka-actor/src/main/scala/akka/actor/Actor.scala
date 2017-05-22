@@ -35,13 +35,12 @@ abstract class PoisonPill
   * A message all Actors will understand, that when processed will terminate the Actor permanently.
   */
 @SerialVersionUID(1L)
-case object PoisonPill extends PoisonPill {
+case object PoisonPill extends PoisonPill
 
   /**
     * Java API: get the singleton instance
     */
   def getInstance = this
-}
 
 abstract class Kill extends AutoReceivedMessage with PossiblyHarmful
 
@@ -50,13 +49,12 @@ abstract class Kill extends AutoReceivedMessage with PossiblyHarmful
   * which will trigger supervision.
   */
 @SerialVersionUID(1L)
-case object Kill extends Kill {
+case object Kill extends Kill
 
   /**
     * Java API: get the singleton instance
     */
   def getInstance = this
-}
 
 /**
   * A message all Actors will understand, that when processed will reply with
@@ -74,14 +72,13 @@ final case class Identify(messageId: Any) extends AutoReceivedMessage
   * the `Identify` message.
   */
 @SerialVersionUID(1L)
-final case class ActorIdentity(correlationId: Any, ref: Option[ActorRef]) {
+final case class ActorIdentity(correlationId: Any, ref: Option[ActorRef])
 
   /**
     * Java API: `ActorRef` of the actor replying to the request or
     * null if no actor matched the request.
     */
   def getRef: ActorRef = ref.orNull
-}
 
 /**
   * When Death Watch is used, the watcher will receive a Terminated(watched)
@@ -123,13 +120,12 @@ abstract class ReceiveTimeout extends PossiblyHarmful
   * to the Actor when there hasn't been any message for that long.
   */
 @SerialVersionUID(1L)
-case object ReceiveTimeout extends ReceiveTimeout {
+case object ReceiveTimeout extends ReceiveTimeout
 
   /**
     * Java API: get the singleton instance
     */
   def getInstance = this
-}
 
 /**
   * Marker trait to indicate that a message should not reset the receive timeout.
@@ -173,10 +169,9 @@ final case class InvalidActorNameException(message: String)
 @SerialVersionUID(1L)
 class ActorInitializationException protected (
     actor: ActorRef, message: String, cause: Throwable)
-    extends AkkaException(message, cause) {
+    extends AkkaException(message, cause)
   def getActor: ActorRef = actor
-}
-object ActorInitializationException {
+object ActorInitializationException
   private[akka] def apply(
       actor: ActorRef,
       message: String,
@@ -187,7 +182,6 @@ object ActorInitializationException {
   def unapply(ex: ActorInitializationException)
     : Option[(ActorRef, String, Throwable)] =
     Some((ex.getActor, ex.getMessage, ex.getCause))
-}
 
 /**
   * A PreRestartException is thrown when the preRestart() method failed; this
@@ -210,9 +204,9 @@ final case class PreRestartException private[akka](actor: ActorRef,
         "exception in preRestart(" +
         (if (originalCause == null)
            "null" else originalCause.getClass) + ", " +
-        (messageOption match {
+        (messageOption match
               case Some(m: AnyRef) ⇒ m.getClass; case _ ⇒ "None"
-            }) + ")",
+            ) + ")",
         cause)
 
 /**
@@ -239,15 +233,12 @@ final case class PostRestartException private[akka](
   * non-PostRestartException type.
   */
 @SerialVersionUID(1L)
-object OriginalRestartException {
-  def unapply(ex: PostRestartException): Option[Throwable] = {
-    @tailrec def rec(ex: PostRestartException): Option[Throwable] = ex match {
+object OriginalRestartException
+  def unapply(ex: PostRestartException): Option[Throwable] =
+    @tailrec def rec(ex: PostRestartException): Option[Throwable] = ex match
       case PostRestartException(_, _, e: PostRestartException) ⇒ rec(e)
       case PostRestartException(_, _, e) ⇒ Some(e)
-    }
     rec(ex)
-  }
-}
 
 /**
   * InvalidMessageException is thrown when an invalid message is sent to an Actor;
@@ -286,7 +277,7 @@ final case class UnhandledMessage(@BeanProperty message: Any,
   * Classes for passing status back to the sender.
   * Used for internal ACKing protocol. But exposed as utility class for user-specific ACKing protocols as well.
   */
-object Status {
+object Status
   sealed trait Status extends Serializable
 
   /**
@@ -301,7 +292,6 @@ object Status {
     */
   @SerialVersionUID(1L)
   final case class Failure(cause: Throwable) extends Status
-}
 
 /**
   * Scala API: Mix in ActorLogging into your Actor to easily obtain a reference to a logger,
@@ -315,16 +305,14 @@ object Status {
   * }
   * }}}
   */
-trait ActorLogging {
+trait ActorLogging
   this: Actor ⇒
   private var _log: LoggingAdapter = _
 
-  def log: LoggingAdapter = {
+  def log: LoggingAdapter =
     // only used in Actor, i.e. thread safe
     if (_log eq null) _log = akka.event.Logging(context.system, this)
     _log
-  }
-}
 
 /**
   * Scala API: Mix in DiagnosticActorLogging into your Actor to easily obtain a reference to a logger with MDC support,
@@ -344,22 +332,20 @@ trait ActorLogging {
   * }
   * }}}
   */
-trait DiagnosticActorLogging extends Actor {
+trait DiagnosticActorLogging extends Actor
   import akka.event.Logging._
   val log = akka.event.Logging(this)
   def mdc(currentMessage: Any): MDC = emptyMDC
 
   override protected[akka] def aroundReceive(
       receive: Actor.Receive, msg: Any): Unit =
-    try {
+    try
       log.mdc(mdc(msg))
       super.aroundReceive(receive, msg)
-    } finally {
+    finally
       log.clearMDC()
-    }
-}
 
-object Actor {
+object Actor
 
   /**
     * Type alias representing a Receive-expression for Akka Actors.
@@ -373,27 +359,24 @@ object Actor {
     * emptyBehavior is a Receive-expression that matches no messages at all, ever.
     */
   @SerialVersionUID(1L)
-  object emptyBehavior extends Receive {
+  object emptyBehavior extends Receive
     def isDefinedAt(x: Any) = false
     def apply(x: Any) =
       throw new UnsupportedOperationException("Empty behavior apply()")
-  }
 
   /**
     * ignoringBehavior is a Receive-expression that consumes and ignores all messages.
     */
   @SerialVersionUID(1L)
-  object ignoringBehavior extends Receive {
+  object ignoringBehavior extends Receive
     def isDefinedAt(x: Any): Boolean = true
     def apply(x: Any): Unit = ()
-  }
 
   /**
     * Default placeholder (null) used for "!" to indicate that there is no sender of the message,
     * that will be translated to the receiving system's deadLetters.
     */
   final val noSender: ActorRef = null
-}
 
 /**
   * Actor base trait that should be extended by or mixed to create an Actor with the semantics of the 'Actor Model':
@@ -447,7 +430,7 @@ object Actor {
   * direct access to `actorOf`, `stop` etc. This is not default in order to keep
   * the name-space clean.
   */
-trait Actor {
+trait Actor
 
   // to make type Receive known in subclasses without import
   type Receive = Actor.Receive
@@ -463,7 +446,7 @@ trait Actor {
     * [[akka.actor.UntypedActorContext]], which is the Java API of the actor
     * context.
     */
-  implicit val context: ActorContext = {
+  implicit val context: ActorContext =
     val contextStack = ActorCell.contextStack.get
     if ((contextStack.isEmpty) || (contextStack.head eq null))
       throw ActorInitializationException(
@@ -472,7 +455,6 @@ trait Actor {
     val c = contextStack.head
     ActorCell.contextStack.set(null :: contextStack)
     c
-  }
 
   /**
     * The 'self' field holds the ActorRef for this actor.
@@ -578,13 +560,11 @@ trait Actor {
     */
   @throws(classOf[Exception]) // when changing this you MUST also change UntypedActorDocTest
   //#lifecycle-hooks
-  def preRestart(reason: Throwable, message: Option[Any]): Unit = {
-    context.children foreach { child ⇒
+  def preRestart(reason: Throwable, message: Option[Any]): Unit =
+    context.children foreach  child ⇒
       context.unwatch(child)
       context.stop(child)
-    }
     postStop()
-  }
 
   //#lifecycle-hooks
 
@@ -596,9 +576,8 @@ trait Actor {
     */
   @throws(classOf[Exception]) // when changing this you MUST also change UntypedActorDocTest
   //#lifecycle-hooks
-  def postRestart(reason: Throwable): Unit = {
+  def postRestart(reason: Throwable): Unit =
     preStart()
-  }
   //#lifecycle-hooks
 
   /**
@@ -609,12 +588,9 @@ trait Actor {
     * case of an unhandled [[akka.actor.Terminated]] message) or publishes an [[akka.actor.UnhandledMessage]]
     * to the actor's system's [[akka.event.EventStream]]
     */
-  def unhandled(message: Any): Unit = {
-    message match {
+  def unhandled(message: Any): Unit =
+    message match
       case Terminated(dead) ⇒ throw new DeathPactException(dead)
       case _ ⇒
         context.system.eventStream
           .publish(UnhandledMessage(message, sender(), self))
-    }
-  }
-}

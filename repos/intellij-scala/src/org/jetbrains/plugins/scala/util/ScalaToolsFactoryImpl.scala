@@ -17,7 +17,7 @@ import org.jetbrains.plugins.scala.lang.surroundWith.descriptors.ScalaSurroundDe
   * Date: 09.10.2006
   *
   */
-class ScalaToolsFactoryImpl extends ScalaToolsFactory {
+class ScalaToolsFactoryImpl extends ScalaToolsFactory
   def createScalaParserDefinition: ParserDefinition =
     new ScalaParserDefinition()
 
@@ -33,4 +33,3 @@ class ScalaToolsFactoryImpl extends ScalaToolsFactory {
   def createStructureViewBuilder(psiFile: PsiFile): StructureViewBuilder = null
 
   def createFindUsagesProvider = new ScalaFindUsagesProvider
-}

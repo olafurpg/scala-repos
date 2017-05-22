@@ -1,17 +1,15 @@
 package idea
 
-abstract class Specification {
+abstract class Specification
   class Description
-}
 
 trait SpecificationBuilder extends Specification
 
-abstract class Client {
-  val builder = new Specification with SpecificationBuilder {
+abstract class Client
+  val builder = new Specification with SpecificationBuilder
     type Den = String
     val popa = 56
     class Yole
-  }
   import builder._
 
   // Class in named element
@@ -25,4 +23,3 @@ abstract class Client {
 
   // Inner class in refinements
   val y: Yole
-}

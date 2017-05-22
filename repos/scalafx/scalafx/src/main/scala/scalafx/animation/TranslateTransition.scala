@@ -40,7 +40,7 @@ import scalafx.util.Duration
   *
   * @define TT `TranslateTransition`
   */
-object TranslateTransition extends AnimationStatics {
+object TranslateTransition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $TT to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/TranslateTransition.html $TT]],
@@ -52,7 +52,6 @@ object TranslateTransition extends AnimationStatics {
   implicit def sfxTranslateTransition2jfx(
       v: TranslateTransition): jfxa.TranslateTransition =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/TranslateTransition.html TranslateTransition]].
@@ -68,7 +67,7 @@ object TranslateTransition extends AnimationStatics {
 class TranslateTransition(
     override val delegate: jfxa.TranslateTransition = new jfxa.TranslateTransition(
           ))
-    extends Transition(delegate) with SFXDelegate[jfxa.TranslateTransition] {
+    extends Transition(delegate) with SFXDelegate[jfxa.TranslateTransition]
 
   // CONSTRUCTORS
 
@@ -94,87 +93,75 @@ class TranslateTransition(
     * $DUR. $DV 400ms
     */
   def duration: ObjectProperty[jfxu.Duration] = delegate.durationProperty
-  def duration_=(d: Duration) {
+  def duration_=(d: Duration)
     duration() = d
-  }
 
   /**
     * The target node of this $TT.
     */
   def node: ObjectProperty[jfxs.Node] = delegate.nodeProperty
-  def node_=(n: Node) {
+  def node_=(n: Node)
     node() = n
-  }
 
   /**
     * Specifies the incremented stop X coordinate value, from the start, of this $TT.
     */
   def byX: DoubleProperty = delegate.byXProperty
-  def byX_=(x: Double) {
+  def byX_=(x: Double)
     byX() = x
-  }
 
   /**
     * Specifies the incremented stop Y coordinate value, from the start, of this $TT.
     */
   def byY: DoubleProperty = delegate.byYProperty
-  def byY_=(y: Double) {
+  def byY_=(y: Double)
     byY() = y
-  }
 
   /**
     * Specifies the incremented stop Z coordinate value, from the start, of this $TT.
     */
   def byZ: DoubleProperty = delegate.byZProperty
-  def byZ_=(z: Double) {
+  def byZ_=(z: Double)
     byZ() = z
-  }
 
   /**
     * Specifies the start X coordinate value of this $TT. $DV `Double.NaN`
     */
   def fromX: DoubleProperty = delegate.fromXProperty
-  def fromX_=(x: Double) {
+  def fromX_=(x: Double)
     fromX() = x
-  }
 
   /**
     * Specifies the start Y coordinate value of this $TT. $DV `Double.NaN`
     */
   def fromY: DoubleProperty = delegate.fromYProperty
-  def fromY_=(y: Double) {
+  def fromY_=(y: Double)
     fromY() = y
-  }
 
   /**
     * Specifies the start Z coordinate value of this $TT. $DV `Double.NaN`
     */
   def fromZ: DoubleProperty = delegate.fromZProperty
-  def fromZ_=(z: Double) {
+  def fromZ_=(z: Double)
     fromZ() = z
-  }
 
   /**
     * Specifies the stop X coordinate value of this $TT. $DV `Double.NaN`
     */
   def toX: DoubleProperty = delegate.toXProperty
-  def toX_=(x: Double) {
+  def toX_=(x: Double)
     toX() = x
-  }
 
   /**
     * Specifies the stop Y coordinate value of this $TT. $DV `Double.NaN`
     */
   def toY: DoubleProperty = delegate.toYProperty
-  def toY_=(y: Double) {
+  def toY_=(y: Double)
     toY() = y
-  }
 
   /**
     * Specifies the stop Z coordinate value of this $TT. $DV `Double.NaN`
     */
   def toZ: DoubleProperty = delegate.toZProperty
-  def toZ_=(z: Double) {
+  def toZ_=(z: Double)
     toZ() = z
-  }
-}

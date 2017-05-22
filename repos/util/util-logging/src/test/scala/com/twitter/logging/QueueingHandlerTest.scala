@@ -24,68 +24,57 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class QueueingHandlerTest
-    extends WordSpec with Eventually with IntegrationPatience {
+    extends WordSpec with Eventually with IntegrationPatience
 
-  class MockHandler extends Handler(BareFormatter, None) {
+  class MockHandler extends Handler(BareFormatter, None)
     def publish(record: javalog.LogRecord) = ()
     def close() = ()
     def flush() = ()
-  }
 
-  def freshLogger(): Logger = {
+  def freshLogger(): Logger =
     val logger = Logger.get("test")
     logger.clearHandlers()
     logger.setLevel(Logger.INFO)
     logger.setUseParentHandlers(false)
     logger
-  }
 
-  "QueueingHandler" should {
-    "publish" in {
+  "QueueingHandler" should
+    "publish" in
       val logger = freshLogger()
       val stringHandler = new StringHandler(BareFormatter, Some(Logger.INFO))
       val queueHandler = new QueueingHandler(stringHandler)
       logger.addHandler(queueHandler)
 
       logger.warning("oh noes!")
-      eventually {
+      eventually
         // let thread log
         assert(stringHandler.get == "oh noes!\n")
-      }
-    }
 
-    "publish, drop on overflow" in {
+    "publish, drop on overflow" in
       val logger = freshLogger()
-      val blockingHandler = new MockHandler {
-        override def publish(record: javalog.LogRecord) {
+      val blockingHandler = new MockHandler
+        override def publish(record: javalog.LogRecord)
           Thread.sleep(100000)
-        }
-      }
       @volatile var droppedCount = 0
 
-      val queueHandler = new QueueingHandler(blockingHandler, 1) {
-        override protected def onOverflow(record: javalog.LogRecord) {
+      val queueHandler = new QueueingHandler(blockingHandler, 1)
+        override protected def onOverflow(record: javalog.LogRecord)
           droppedCount += 1
-        }
-      }
       logger.addHandler(queueHandler)
 
       logger.warning("1")
       logger.warning("2")
       logger.warning("3")
 
-      eventually {
+      eventually
         // let thread log and block
         assert(droppedCount >= 1) // either 1 or 2, depending on race
-      }
-    }
 
-    "flush" in {
+    "flush" in
       val logger = freshLogger()
       var wasFlushed = false
-      val handler = new MockHandler {
+      val handler = new MockHandler
         override def flush() { wasFlushed = true }
-      }
       val queueHandler = new QueueingHandler(handler, 1)
       logger.addHandler(queueHandler)
 
@@ -93,39 +82,32 @@ class QueueingHandlerTest
       logger.warning("oh noes!")
       queueHandler.flush()
       assert(wasFlushed == true)
-    }
 
-    "close" in {
+    "close" in
       val logger = freshLogger()
       var wasClosed = false
-      val handler = new MockHandler {
+      val handler = new MockHandler
         override def close() { wasClosed = true }
-      }
       val queueHandler = new QueueingHandler(handler)
       logger.addHandler(queueHandler)
 
       logger.warning("oh noes!")
-      eventually {
+      eventually
         // let thread log
         queueHandler.close()
         assert(wasClosed == true)
-      }
-    }
 
-    "handle exceptions in the underlying handler" in {
+    "handle exceptions in the underlying handler" in
       val logger = freshLogger()
       @volatile var mustError = true
       @volatile var didLog = false
-      val handler = new MockHandler {
-        override def publish(record: javalog.LogRecord) {
-          if (mustError) {
+      val handler = new MockHandler
+        override def publish(record: javalog.LogRecord)
+          if (mustError)
             mustError = false
             throw new Exception("Unable to log for whatever reason.")
-          } else {
+          else
             didLog = true
-          }
-        }
-      }
 
       val queueHandler = new QueueingHandler(handler)
       logger.addHandler(queueHandler)
@@ -133,13 +115,11 @@ class QueueingHandlerTest
       logger.info("fizz")
       logger.info("buzz")
 
-      eventually {
+      eventually
         // let thread log
         assert(didLog == true)
-      }
-    }
 
-    "forward formatter to the underlying handler" in {
+    "forward formatter to the underlying handler" in
       val handler = new MockHandler {}
 
       val queueHandler = new QueueingHandler(handler)
@@ -148,20 +128,17 @@ class QueueingHandlerTest
       queueHandler.setFormatter(formatter)
 
       assert(handler.getFormatter eq formatter)
-    }
 
-    "obey flag to force or not force class and method name inference" in {
-      val formatter = new Formatter() {
-        override def format(record: javalog.LogRecord) = {
+    "obey flag to force or not force class and method name inference" in
+      val formatter = new Formatter()
+        override def format(record: javalog.LogRecord) =
           val prefix =
             if (record.getSourceClassName != null)
               record.getSourceClassName + ": "
             else ""
 
           prefix + formatText(record) + lineTerminator
-        }
-      }
-      for (infer <- Seq(true, false)) {
+      for (infer <- Seq(true, false))
         val logger = freshLogger()
         val stringHandler = new StringHandler(formatter, Some(Logger.INFO))
         val queueHandler =
@@ -174,16 +151,10 @@ class QueueingHandlerTest
           if (infer) helper.getClass.getName + ": " else ""
         val expectedMessage = expectedMessagePrefix + helper.message + "\n"
 
-        eventually {
+        eventually
           // let thread log
           assert(stringHandler.get == expectedMessage)
-        }
-      }
-    }
-  }
-}
 
-class QueueingHandlerTestHelper {
+class QueueingHandlerTestHelper
   def message = "A message"
   def logSomething(logger: Logger) = logger.info(message)
-}

@@ -1,6 +1,6 @@
 package lila.tournament
 
-object GreatPlayer {
+object GreatPlayer
 
   val all: Map[String, String] = Map(
       "Aagaard" -> "Jacob_Aagaard",
@@ -603,7 +603,5 @@ object GreatPlayer {
 
   def randomName: String = names(scala.util.Random nextInt size)
 
-  def wikiUrl(name: String) = all get name map { s =>
+  def wikiUrl(name: String) = all get name map  s =>
     s"https://wikipedia.org/wiki/$s"
-  }
-}

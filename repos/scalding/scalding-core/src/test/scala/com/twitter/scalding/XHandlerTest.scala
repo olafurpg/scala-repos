@@ -18,10 +18,10 @@ package com.twitter.scalding
 import org.scalatest.{Matchers, WordSpec}
 import cascading.flow.planner.PlannerException
 
-class XHandlerTest extends WordSpec with Matchers {
+class XHandlerTest extends WordSpec with Matchers
 
-  "Throwable classes" should {
-    "be handled if exist in default mapping" in {
+  "Throwable classes" should
+    "be handled if exist in default mapping" in
       val rxh = RichXHandler()
       rxh.handlers.find(h => h(new PlannerException)) should not be empty
       rxh.handlers.find(h => h(new InvalidSourceException("Invalid Source"))) should not be empty
@@ -30,19 +30,16 @@ class XHandlerTest extends WordSpec with Matchers {
       rxh.handlers.find(h => h(new NoClassDefFoundError)) should not be empty
       rxh.handlers.find(h =>
             h(new ModeLoadException("dummy", new ClassNotFoundException))) should not be empty
-    }
-    "be handled if exist in custom mapping" in {
+    "be handled if exist in custom mapping" in
       val cRxh = RichXHandler(
           RichXHandler.mapping ++ Map(classOf[NullPointerException] -> "NPE"))
       cRxh.handlers.find(h => h(new NullPointerException)) should not be empty
       cRxh.mapping(classOf[NullPointerException]) shouldBe "NPE"
-    }
-    "not be handled if missing in mapping" in {
+    "not be handled if missing in mapping" in
       val rxh = RichXHandler()
       rxh.handlers.find(h => h(new NullPointerException)) shouldBe empty
       rxh.handlers.find(h => h(new IndexOutOfBoundsException)) shouldBe empty
-    }
-    "be valid keys in mapping if defined" in {
+    "be valid keys in mapping if defined" in
       val rxh = RichXHandler()
       rxh.mapping(classOf[ModeLoadException]) shouldBe RichXHandler.RequiredCascadingFabricNotInClassPath
       rxh.mapping(classOf[PlannerException]) shouldBe RichXHandler.RequireSinks
@@ -51,8 +48,7 @@ class XHandlerTest extends WordSpec with Matchers {
       rxh.mapping(classOf[AbstractMethodError]) shouldBe RichXHandler.BinaryProblem
       rxh.mapping(classOf[NoClassDefFoundError]) shouldBe RichXHandler.BinaryProblem
       rxh.mapping(classOf[NullPointerException]) shouldBe RichXHandler.Default
-    }
-    "create a URL link in GitHub wiki" in {
+    "create a URL link in GitHub wiki" in
       val NoClassDefFoundErrorString = "javalangnoclassdeffounderror"
       val AbstractMethodErrorString = "javalangabstractmethoderror"
       val NoSuchMethodErrorString = "javalangnosuchmethoderror"
@@ -73,6 +69,3 @@ class XHandlerTest extends WordSpec with Matchers {
       RichXHandler.createXUrl(
           ModeLoadException("dummy", new ClassNotFoundException)) shouldBe
       (RichXHandler.gitHubUrl + ModeLoadExceptionString)
-    }
-  }
-}

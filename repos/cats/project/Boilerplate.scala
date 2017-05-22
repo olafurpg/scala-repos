@@ -9,17 +9,15 @@ import sbt._
   * @author Miles Sabin
   * @author Kevin Wright
   */
-object Boilerplate {
+object Boilerplate
   import scala.StringContext._
 
-  implicit final class BlockHelper(val sc: StringContext) extends AnyVal {
-    def block(args: Any*): String = {
+  implicit final class BlockHelper(val sc: StringContext) extends AnyVal
+    def block(args: Any*): String =
       val interpolated = sc.standardInterpolator(treatEscapes, args)
       val rawLines = interpolated split '\n'
       val trimmedLines = rawLines map { _ dropWhile (_.isWhitespace) }
       trimmedLines mkString "\n"
-    }
-  }
 
   val templates: Seq[Template] = Seq(
       GenCartesianBuilders,
@@ -31,15 +29,14 @@ object Boilerplate {
     "// auto-generated boilerplate" // TODO: put something meaningful here?
 
   /** Returns a seq of the generated files.  As a side-effect, it actually generates them... */
-  def gen(dir: File) = for (t <- templates) yield {
+  def gen(dir: File) = for (t <- templates) yield
     val tgtFile = t.filename(dir)
     IO.write(tgtFile, t.body)
     tgtFile
-  }
 
   val maxArity = 22
 
-  final class TemplateVals(val arity: Int) {
+  final class TemplateVals(val arity: Int)
     val synTypes = (0 until arity) map (n => s"A$n")
     val synVals = (0 until arity) map (n => s"a$n")
     val synTypedVals =
@@ -55,18 +52,16 @@ object Boilerplate {
     val `(a..n)` =
       if (arity == 1) "Tuple1(a)" else synVals.mkString("(", ", ", ")")
     val `a:A..n:N` = synTypedVals mkString ", "
-  }
 
-  trait Template {
+  trait Template
     def filename(root: File): File
     def content(tv: TemplateVals): String
     def range = 1 to maxArity
-    def body: String = {
+    def body: String =
       val headerLines = header split '\n'
       val rawContents =
-        range map { n =>
+        range map  n =>
           content(new TemplateVals(n)) split '\n' filterNot (_.isEmpty)
-        }
       val preBody = rawContents.head takeWhile (_ startsWith "|") map (_.tail)
       val instances =
         rawContents flatMap { _ filter (_ startsWith "-") map (_.tail) }
@@ -74,8 +69,6 @@ object Boilerplate {
         rawContents.head dropWhile (_ startsWith "|") dropWhile
         (_ startsWith "-") map (_.tail)
       (headerLines ++ preBody ++ instances ++ postBody) mkString "\n"
-    }
-  }
 
   /*
     Blocks in the templates below use a custom interpolator, combined with post-processing to produce the body
@@ -92,26 +85,24 @@ object Boilerplate {
     The block otherwise behaves as a standard interpolated string with regards to variable substitution.
    */
 
-  object GenCartesianBuilders extends Template {
+  object GenCartesianBuilders extends Template
     def filename(root: File) =
       root / "cats" / "syntax" / "CartesianBuilder.scala"
 
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
 
       val tpes =
-        synTypes map { tpe =>
+        synTypes map  tpe =>
           s"F[$tpe]"
-        }
       val tpesString = synTypes mkString ", "
       val params =
         (synVals zip tpes) map { case (v, t) => s"$v:$t" } mkString ", "
       val next =
-        if (arity + 1 <= maxArity) {
+        if (arity + 1 <= maxArity)
           s"def |@|[Z](z: F[Z]) = new CartesianBuilder${arity + 1}(${`a..n`}, z)"
-        } else {
+        else
           ""
-        }
 
       val n = if (arity == 1) { "" } else { arity.toString }
 
@@ -134,11 +125,10 @@ object Boilerplate {
           s"def imap[Z](f: (${`A..N`}) => Z)(g: Z => (${`A..N`}))(implicit invariant: Invariant[F], cartesian: Cartesian[F]): F[Z] = Cartesian.imap$n(${`a..n`})(f)(g)"
 
       val tupled =
-        if (arity != 1) {
+        if (arity != 1)
           s"def tupled(implicit invariant: Invariant[F], cartesian: Cartesian[F]): F[(${`A..N`})] = Cartesian.tuple$n(${`a..n`})"
-        } else {
+        else
           ""
-        }
 
       block"""
         |package cats
@@ -159,19 +149,16 @@ object Boilerplate {
         - }
         |}
       """
-    }
-  }
 
-  object GenApplyArityFunctions extends Template {
+  object GenApplyArityFunctions extends Template
     def filename(root: File) = root / "cats" / "ApplyArityFunctions.scala"
     override def range = 3 to maxArity
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
 
       val tpes =
-        synTypes map { tpe =>
+        synTypes map  tpe =>
           s"F[$tpe]"
-        }
       val fargs = (0 until arity) map { "f" + _ }
       val fparams =
         (fargs zip tpes) map { case (v, t) => s"$v:$t" } mkString ", "
@@ -182,13 +169,13 @@ object Boilerplate {
       val fArgsA = (0 until a) map { "f" + _ } mkString ","
       val fArgsB = (a until arity) map { "f" + _ } mkString ","
       val argsA =
-        (0 until a) map { n =>
+        (0 until a) map  n =>
           "a" + n + ":A" + n
-        } mkString ","
+        mkString ","
       val argsB =
-        (a until arity) map { n =>
+        (a until arity) map  n =>
           "a" + n + ":A" + n
-        } mkString ","
+        mkString ","
       def apN(n: Int) = if (n == 1) { "ap" } else { s"ap$n" }
       def allArgs = (0 until arity) map { "a" + _ } mkString ","
 
@@ -207,19 +194,16 @@ object Boilerplate {
         -  def tuple$arity[${`A..N`}, Z]($fparams): F[(${`A..N`})] = Cartesian.tuple$arity($fparams)(self, self)
         |}
       """
-    }
-  }
 
-  object GenCartesianArityFunctions extends Template {
+  object GenCartesianArityFunctions extends Template
     def filename(root: File) = root / "cats" / "CartesianArityFunctions.scala"
     override def range = 2 to maxArity
-    def content(tv: TemplateVals) = {
+    def content(tv: TemplateVals) =
       import tv._
 
       val tpes =
-        synTypes map { tpe =>
+        synTypes map  tpe =>
           s"F[$tpe]"
-        }
       val fargs = (0 until arity) map { "f" + _ }
       val fparams =
         (fargs zip tpes) map { case (v, t) => s"$v:$t" } mkString ", "
@@ -244,6 +228,3 @@ object Boilerplate {
         -    imap$arity($fargsS)((${`_.._`}))(identity)
          |}
       """
-    }
-  }
-}

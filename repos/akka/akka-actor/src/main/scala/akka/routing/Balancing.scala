@@ -16,21 +16,19 @@ import akka.dispatch.Dispatchers
 /**
   * INTERNAL API
   */
-private[akka] object BalancingRoutingLogic {
+private[akka] object BalancingRoutingLogic
   def apply(): BalancingRoutingLogic = new BalancingRoutingLogic
-}
 
 /**
   * INTERNAL API
   * Selects the first routee, balancing will be done by the dispatcher.
   */
 @SerialVersionUID(1L)
-private[akka] final class BalancingRoutingLogic extends RoutingLogic {
+private[akka] final class BalancingRoutingLogic extends RoutingLogic
   override def select(
       message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else routees.head
-}
 
 /**
   * A router pool that will try to redistribute work from busy routees to idle routees.
@@ -70,7 +68,7 @@ final case class BalancingPool(
     override val nrOfInstances: Int,
     override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
-    extends Pool {
+    extends Pool
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"))
@@ -103,19 +101,18 @@ final case class BalancingPool(
     * INTERNAL API
     */
   override private[akka] def newRoutee(
-      routeeProps: Props, context: ActorContext): Routee = {
+      routeeProps: Props, context: ActorContext): Routee =
 
     val rawDeployPath =
       context.self.path.elements.drop(1).mkString("/", "/", "")
     val deployPath =
-      BalancingPoolDeploy.invalidConfigKeyChars.foldLeft(rawDeployPath) {
+      BalancingPoolDeploy.invalidConfigKeyChars.foldLeft(rawDeployPath)
         (replaced, c) ⇒
           replaced.replace(c, '_')
-      }
     val dispatcherId = s"BalancingPool-$deployPath"
     def dispatchers = context.system.dispatchers
 
-    if (!dispatchers.hasDispatcher(dispatcherId)) {
+    if (!dispatchers.hasDispatcher(dispatcherId))
       // dynamically create the config and register the dispatcher configurator for the
       // dispatcher of this pool
       val deployDispatcherConfigPath =
@@ -132,11 +129,9 @@ final case class BalancingPool(
           dispatcherId,
           new BalancingDispatcherConfigurator(
               dispatcherConfig, dispatchers.prerequisites))
-    }
 
     val routeePropsWithDispatcher = routeeProps.withDispatcher(dispatcherId)
     ActorRefRoutee(context.actorOf(routeePropsWithDispatcher))
-  }
 
   /**
     * Uses the supervisor strategy of the given RouterConfig
@@ -144,9 +139,9 @@ final case class BalancingPool(
     */
   override def withFallback(other: RouterConfig): RouterConfig =
     if (other == NoRouter) this // NoRouter is the default, hence “neutral”
-    else {
+    else
 
-      other match {
+      other match
         case p: Pool ⇒
           if ((this.supervisorStrategy eq Pool.defaultSupervisorStrategy) &&
               (p.supervisorStrategy ne Pool.defaultSupervisorStrategy))
@@ -154,19 +149,15 @@ final case class BalancingPool(
           else this
 
         case _ ⇒ this
-      }
-    }
 
   /**
     * Resizer cannot be used together with BalancingPool
     */
   override val resizer: Option[Resizer] = None
-}
 
 /**
   * INTERNAL API
   * Can't be in the `BalancingPool` companion for binary compatibility reasons.
   */
-private[akka] object BalancingPoolDeploy {
+private[akka] object BalancingPoolDeploy
   val invalidConfigKeyChars = List('$', '@', ':')
-}

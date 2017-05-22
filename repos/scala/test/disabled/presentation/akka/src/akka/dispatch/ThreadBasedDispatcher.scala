@@ -23,7 +23,7 @@ class ThreadBasedDispatcher(_actor: ActorRef, _mailboxType: MailboxType)
         Dispatchers.THROUGHPUT,
         -1,
         _mailboxType,
-        ThreadBasedDispatcher.oneThread) {
+        ThreadBasedDispatcher.oneThread)
 
   private[akka] val owner = new AtomicReference[ActorRef](_actor)
 
@@ -37,22 +37,18 @@ class ThreadBasedDispatcher(_actor: ActorRef, _mailboxType: MailboxType)
     //For Java API
     this(actor, BoundedMailbox(capacity, pushTimeOut))
 
-  override def register(actorRef: ActorRef) = {
+  override def register(actorRef: ActorRef) =
     val actor = owner.get()
     if ((actor ne null) && actorRef != actor)
       throw new IllegalArgumentException(
           "Cannot register to anyone but " + actor)
     owner.compareAndSet(null, actorRef) //Register if unregistered
     super.register(actorRef)
-  }
 
-  override def unregister(actorRef: ActorRef) = {
+  override def unregister(actorRef: ActorRef) =
     super.unregister(actorRef)
     owner.compareAndSet(actorRef, null) //Unregister (prevent memory leak)
-  }
-}
 
-object ThreadBasedDispatcher {
+object ThreadBasedDispatcher
   val oneThread: ThreadPoolConfig = ThreadPoolConfig(
       allowCorePoolTimeout = true, corePoolSize = 1, maxPoolSize = 1)
-}

@@ -12,12 +12,12 @@ package cmd
   *  specification knows enough to perform the substitutions.  Warrants
   *  expansion.
   */
-trait Interpolation { self: Spec =>
+trait Interpolation  self: Spec =>
 
   private lazy val reference = referenceSpec
   import reference._
 
-  object interpolate {
+  object interpolate
     def mapper: Map[String, () => String] = Map(
         "PROGRAM" -> (() => programInfo.runner),
         "ALLOPTIONS" -> (() => options.all mkString " "),
@@ -25,13 +25,10 @@ trait Interpolation { self: Spec =>
     )
 
     private def mark(key: String) = "@@" + key + "@@"
-    def apply(template: String) = mapper.foldLeft(template) {
+    def apply(template: String) = mapper.foldLeft(template)
       case (s, (key, f)) => s.replaceAll(mark(key), f())
-    }
-  }
-}
 
-object Interpolation {
+object Interpolation
 
   /** A simple template for generating bash completion functions.
     */
@@ -57,4 +54,3 @@ object Interpolation {
     |
     |scala @@MAINCLASS@@ "$@"
     |""".stripMargin.trim + "\n"
-}

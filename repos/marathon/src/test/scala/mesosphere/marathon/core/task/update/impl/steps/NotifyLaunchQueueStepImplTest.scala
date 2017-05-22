@@ -15,12 +15,11 @@ import scala.concurrent.Future
 
 class NotifyLaunchQueueStepImplTest
     extends FunSuite with Matchers with GivenWhenThen with Mockito
-    with ScalaFutures {
-  test("name") {
+    with ScalaFutures
+  test("name")
     new Fixture().step.name should equal("notifyLaunchQueue")
-  }
 
-  test("notifying launch queue") {
+  test("notifying launch queue")
     val f = new Fixture
     val status = runningTaskStatus
     val expectedUpdate = TaskStatusUpdate(
@@ -41,7 +40,6 @@ class NotifyLaunchQueueStepImplTest
 
     Then("the update is passed to the LaunchQueue")
     verify(f.launchQueue).notifyOfTaskUpdate(expectedUpdate)
-  }
 
   private[this] val slaveId = SlaveID.newBuilder().setValue("slave1")
   private[this] val appId = PathId("/test")
@@ -57,8 +55,6 @@ class NotifyLaunchQueueStepImplTest
     .setMessage(taskStatusMessage)
     .build()
 
-  class Fixture {
+  class Fixture
     val launchQueue = mock[LaunchQueue]
     val step = new NotifyLaunchQueueStepImpl(launchQueue = launchQueue)
-  }
-}

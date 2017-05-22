@@ -19,7 +19,7 @@ import Configuration.{CipherConfig, getCipherConfig}
 import org.uncommons.maths.random.RandomDotOrgSeedGenerator
 import scala.util.control.NonFatal
 
-object Configuration {
+object Configuration
   // set this in your JAVA_OPTS to see all ssl debug info: "-Djavax.net.debug=ssl,keymanager"
   // The certificate will expire in 2109
   private val trustStore =
@@ -60,11 +60,10 @@ object Configuration {
                                 localPort: Int,
                                 remotePort: Int)
 
-  def getCipherConfig(cipher: String, enabled: String*): CipherConfig = {
-    val localPort, remotePort = {
+  def getCipherConfig(cipher: String, enabled: String*): CipherConfig =
+    val localPort, remotePort =
       val s = new java.net.ServerSocket(0); try s.getLocalPort finally s.close()
-    }
-    try {
+    try
       //if (true) throw new IllegalArgumentException("Ticket1978*Spec isn't enabled")
 
       val config = ConfigFactory.parseString(conf.format(
@@ -79,9 +78,8 @@ object Configuration {
           settings.SSLRandomNumberGenerator, NoLogging)
 
       rng.nextInt() // Has to work
-      settings.SSLRandomNumberGenerator foreach { sRng ⇒
+      settings.SSLRandomNumberGenerator foreach  sRng ⇒
         rng.getAlgorithm == sRng || (throw new NoSuchAlgorithmException(sRng))
-      }
 
       val engine =
         NettySSLSupport.initializeClientSSL(settings, NoLogging).getEngine
@@ -100,12 +98,9 @@ object Configuration {
               "Protocol not supported: " + settings.SSLProtocol.get))
 
       CipherConfig(true, config, cipher, localPort, remotePort)
-    } catch {
+    catch
       case (_: IllegalArgumentException) | (_: NoSuchAlgorithmException) ⇒
         CipherConfig(false, AkkaSpec.testConf, cipher, localPort, remotePort) // Cannot match against the message since the message might be localized :S
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class Ticket1978SHA1PRNGSpec
@@ -144,20 +139,18 @@ class Ticket1978AES256CounterInetRNGSpec
             "AES256CounterInetRNG", "TLS_RSA_WITH_AES_256_CBC_SHA"))
     with InetRNGSpec
 
-trait InetRNGSpec {
+trait InetRNGSpec
   this: Ticket1978CommunicationSpec ⇒
   override def preCondition =
-    try {
+    try
       (new RandomDotOrgSeedGenerator).generateSeed(128)
       true
-    } catch {
+    catch
       case NonFatal(e) ⇒
         log.warning("random.org not available: {}", e.getMessage())
         false
-    }
 
   override implicit val timeout: Timeout = Timeout(90.seconds)
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class Ticket1978DefaultRNGSecureSpec
@@ -175,7 +168,7 @@ class Ticket1978NonExistingRNGSecureSpec
         CipherConfig(false, AkkaSpec.testConf, "NonExistingRNG", 12345, 12346))
 
 abstract class Ticket1978CommunicationSpec(val cipherConfig: CipherConfig)
-    extends AkkaSpec(cipherConfig.config) with ImplicitSender {
+    extends AkkaSpec(cipherConfig.config) with ImplicitSender
 
   implicit val timeout: Timeout = Timeout(10.seconds)
 
@@ -185,21 +178,18 @@ abstract class Ticket1978CommunicationSpec(val cipherConfig: CipherConfig)
         .parseString("akka.remote.netty.ssl.port = " + cipherConfig.remotePort)
         .withFallback(system.settings.config))
 
-  override def afterTermination() {
-    if (cipherConfig.runTest) {
+  override def afterTermination()
+    if (cipherConfig.runTest)
       shutdown(other)
-    }
-  }
 
   def preCondition: Boolean = true
 
-  ("-") must {
-    if (cipherConfig.runTest && preCondition) {
-      val ignoreMe = other.actorOf(Props(new Actor {
-        def receive = {
+  ("-") must
+    if (cipherConfig.runTest && preCondition)
+      val ignoreMe = other.actorOf(Props(new Actor
+        def receive =
           case ("ping", x) ⇒ sender() ! ((("pong", x), sender()))
-        }
-      }), "echo")
+      ), "echo")
       val otherAddress = other
         .asInstanceOf[ExtendedActorSystem]
         .provider
@@ -207,36 +197,27 @@ abstract class Ticket1978CommunicationSpec(val cipherConfig: CipherConfig)
         .transport
         .defaultAddress
 
-      "support tell" in within(timeout.duration) {
-        val here = {
+      "support tell" in within(timeout.duration)
+        val here =
           system.actorSelection(otherAddress.toString + "/user/echo") ! Identify(
               None)
           expectMsgType[ActorIdentity].ref.get
-        }
 
         for (i ← 1 to 1000) here ! (("ping", i))
-        for (i ← 1 to 1000) expectMsgPF() {
+        for (i ← 1 to 1000) expectMsgPF()
           case (("pong", i), `testActor`) ⇒ true
-        }
-      }
 
-      "support ask" in within(timeout.duration) {
+      "support ask" in within(timeout.duration)
         import system.dispatcher
-        val here = {
+        val here =
           system.actorSelection(otherAddress.toString + "/user/echo") ! Identify(
               None)
           expectMsgType[ActorIdentity].ref.get
-        }
 
         val f = for (i ← 1 to 1000) yield
           here ? (("ping", i)) mapTo classTag[((String, Int), ActorRef)]
         Await.result(Future.sequence(f), remaining).map(_._1._1).toSet should ===(
             Set("pong"))
-      }
-    } else {
-      "not be run when the cipher is not supported by the platform this test is currently being executed on" in {
+    else
+      "not be run when the cipher is not supported by the platform this test is currently being executed on" in
         pending
-      }
-    }
-  }
-}

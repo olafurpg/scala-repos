@@ -10,26 +10,25 @@ import com.twitter.util.NonFatal
   * span, while TraceIds contain a span ID as well as context (parentId
   * and traceId).
   */
-final class SpanId(val self: Long) extends Proxy {
+final class SpanId(val self: Long) extends Proxy
   def toLong = self
 
   override def toString: String = SpanId.toString(self)
-}
 
-object SpanId {
+object SpanId
   // StringBuilder.appendAll(char..) seems to be faster than
   // StringBuilder.append(string..)
   private val lut: Array[Array[Char]] =
-    (for (b <- Byte.MinValue to Byte.MaxValue) yield {
+    (for (b <- Byte.MinValue to Byte.MaxValue) yield
       val bb = if (b < 0) b + 256 else b
       val s = "%02x".format(bb)
       Array(s(0), s(1))
-    }).toArray
+    ).toArray
 
   private def byteToChars(b: Byte): Array[Char] = lut(b + 128)
 
   // This is invoked a lot, so they need to be fast.
-  def toString(l: Long): String = {
+  def toString(l: Long): String =
     val b = new StringBuilder(16)
     b.appendAll(byteToChars((l >> 56 & 0xff).toByte))
     b.appendAll(byteToChars((l >> 48 & 0xff).toByte))
@@ -40,19 +39,16 @@ object SpanId {
     b.appendAll(byteToChars((l >> 8 & 0xff).toByte))
     b.appendAll(byteToChars((l & 0xff).toByte))
     b.toString
-  }
 
   def apply(spanId: Long): SpanId = new SpanId(spanId)
 
   def fromString(spanId: String): Option[SpanId] =
-    try {
+    try
       Some(SpanId(new RichU64String(spanId).toU64Long))
-    } catch {
+    catch
       case NonFatal(_) => None
-    }
-}
 
-object TraceId {
+object TraceId
 
   /**
     * Creates a TraceId with no flags set. See case class for more info.
@@ -68,15 +64,14 @@ object TraceId {
   /**
     * Serialize a TraceId into an array of bytes.
     */
-  def serialize(traceId: TraceId): Array[Byte] = {
-    val flags = traceId._sampled match {
+  def serialize(traceId: TraceId): Array[Byte] =
+    val flags = traceId._sampled match
       case None =>
         traceId.flags
       case Some(true) =>
         traceId.flags.setFlag(Flags.SamplingKnown | Flags.Sampled)
       case Some(false) =>
         traceId.flags.setFlag(Flags.SamplingKnown)
-    }
 
     val bytes = new Array[Byte](32)
     ByteArrays.put64be(bytes, 0, traceId.spanId.toLong)
@@ -84,15 +79,14 @@ object TraceId {
     ByteArrays.put64be(bytes, 16, traceId.traceId.toLong)
     ByteArrays.put64be(bytes, 24, flags.toLong)
     bytes
-  }
 
   /**
     * Deserialize a TraceId from an array of bytes.
     */
-  def deserialize(bytes: Array[Byte]): Try[TraceId] = {
-    if (bytes.length != 32) {
+  def deserialize(bytes: Array[Byte]): Try[TraceId] =
+    if (bytes.length != 32)
       Throw(new IllegalArgumentException("Expected 32 bytes"))
-    } else {
+    else
       val span64 = ByteArrays.get64be(bytes, 0)
       val parent64 = ByteArrays.get64be(bytes, 8)
       val trace64 = ByteArrays.get64be(bytes, 16)
@@ -100,9 +94,9 @@ object TraceId {
 
       val flags = Flags(flags64)
       val sampled =
-        if (flags.isFlagSet(Flags.SamplingKnown)) {
+        if (flags.isFlagSet(Flags.SamplingKnown))
           Some(flags.isFlagSet(Flags.Sampled))
-        } else None
+        else None
 
       val traceId = TraceId(
           if (trace64 == parent64) None else Some(SpanId(trace64)),
@@ -111,9 +105,6 @@ object TraceId {
           sampled,
           flags)
       Return(traceId)
-    }
-  }
-}
 
 /**
   * A trace id represents one particular trace for one request.
@@ -129,29 +120,25 @@ final case class TraceId(_traceId: Option[SpanId],
                          _parentId: Option[SpanId],
                          spanId: SpanId,
                          _sampled: Option[Boolean],
-                         flags: Flags) {
-  def traceId: SpanId = _traceId match {
+                         flags: Flags)
+  def traceId: SpanId = _traceId match
     case None => parentId
     case Some(id) => id
-  }
 
-  def parentId: SpanId = _parentId match {
+  def parentId: SpanId = _parentId match
     case None => spanId
     case Some(id) => id
-  }
 
   // debug flag overrides sampled to be true
   lazy val sampled = if (flags.isDebug) Some(true) else _sampled
 
   private[TraceId] def ids = (traceId, parentId, spanId)
 
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case other: TraceId => this.ids equals other.ids
     case _ => false
-  }
 
   override def hashCode(): Int =
     ids.hashCode()
 
   override def toString = s"$traceId.$spanId<:$parentId"
-}

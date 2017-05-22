@@ -38,16 +38,15 @@ import scalafx.Includes._
 import scalafx.testutil.RunOnApplicationThread
 
 @RunWith(classOf[JUnitRunner])
-class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
+class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread
 
-  "Platform" should "declare all public static methods of javafx.application.Platform" in {
+  "Platform" should "declare all public static methods of javafx.application.Platform" in
     val javaMethods = classOf[jfxa.Platform].getMethods
     val scalaMethods = Platform.getClass.getMethods
     for (jm <- javaMethods if Modifier.isPublic(jm.getModifiers) &&
-              Modifier.isStatic(jm.getModifiers)) {
+              Modifier.isStatic(jm.getModifiers))
       val found = scalaMethods.exists(
           sm =>
-            {
               def firstToUpper(s: String) = s.head.toUpper + s.tail
 
               val javaName = jm.getName
@@ -57,19 +56,15 @@ class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
               "get" + firstToUpper(scalaName) == javaName ||
               "set" + firstToUpper(scalaName) == javaName ||
               scalaName + "Property" == javaName
-          }
       )
 
       assert(found, "Declares equivalent of `" + jm.getName + "`")
-    }
-  }
 
-  it should "support isFxApplicationThread" in {
+  it should "support isFxApplicationThread" in
     Platform.isFxApplicationThread should equal(
         jfxa.Platform.isFxApplicationThread)
-  }
 
-  it should "support implicitExit read/write" in {
+  it should "support implicitExit read/write" in
     val oldImplicitExit = jfxa.Platform.isImplicitExit
     val newImplicitExit = !oldImplicitExit
 
@@ -81,34 +76,26 @@ class PlatformSpec extends FlatSpec with Matchers with RunOnApplicationThread {
     Platform.implicitExit = oldImplicitExit
     Platform.implicitExit should equal(oldImplicitExit)
     jfxa.Platform.isImplicitExit should equal(oldImplicitExit)
-  }
 
-  it should "support isSupported(ConditionalFeature)" in {
+  it should "support isSupported(ConditionalFeature)" in
     // Check values for each ConditionalFeature
-    for (cf <- jfxa.ConditionalFeature.values()) {
+    for (cf <- jfxa.ConditionalFeature.values())
       Platform.isSupported(cf) should equal(jfxa.Platform.isSupported(cf))
-    }
-  }
 
-  it should "support runLater(Runnable)" in {
+  it should "support runLater(Runnable)" in
     hasMethodWithSingleArgument("runLater", classOf[java.lang.Runnable]) should equal(
         true)
-  }
 
-  it should "support runLater(op: => Unit)" in {
+  it should "support runLater(op: => Unit)" in
     hasMethodWithSingleArgument("runLater", classOf[() => Unit]) should equal(
         true)
-  }
 
   /** Check if Platform has a `method` with exactly one parameter of a given `parameterType`. */
   def hasMethodWithSingleArgument(
-      method: String, parameterType: Class[_]): Boolean = {
+      method: String, parameterType: Class[_]): Boolean =
     val methods = Platform.getClass.getMethods.filter(m => m.getName == method)
     methods.exists(
         m =>
-          {
         val parameterTypes = m.getParameterTypes
         parameterTypes.length == 1 && parameterTypes(0) == parameterType
-    })
-  }
-}
+    )

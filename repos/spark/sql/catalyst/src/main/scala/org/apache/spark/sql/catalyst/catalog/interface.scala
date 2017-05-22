@@ -33,14 +33,12 @@ import org.apache.spark.sql.catalyst.plans.logical.{LeafNode, LogicalPlan}
   *
   * Implementations should throw [[AnalysisException]] when table or database don't exist.
   */
-abstract class ExternalCatalog {
+abstract class ExternalCatalog
   import ExternalCatalog._
 
-  protected def requireDbExists(db: String): Unit = {
-    if (!databaseExists(db)) {
+  protected def requireDbExists(db: String): Unit =
+    if (!databaseExists(db))
       throw new AnalysisException(s"Database $db does not exist")
-    }
-  }
 
   // --------------------------------------------------------------------------
   // Databases
@@ -159,7 +157,6 @@ abstract class ExternalCatalog {
   def getFunction(db: String, funcName: String): CatalogFunction
 
   def listFunctions(db: String, pattern: String): Seq[String]
-}
 
 /**
   * A function defined in the catalog.
@@ -214,12 +211,11 @@ case class CatalogTable(name: TableIdentifier,
                         lastAccessTime: Long = System.currentTimeMillis,
                         properties: Map[String, String] = Map.empty,
                         viewOriginalText: Option[String] = None,
-                        viewText: Option[String] = None) {
+                        viewText: Option[String] = None)
 
   /** Return the database this table was specified to belong to, assuming it exists. */
-  def database: String = name.database.getOrElse {
+  def database: String = name.database.getOrElse
     throw new AnalysisException(s"table $name did not specify database")
-  }
 
   /** Return the fully qualified name of this table, assuming the database was specified. */
   def qualifiedName: String = name.unquotedString
@@ -231,19 +227,16 @@ case class CatalogTable(name: TableIdentifier,
       outputFormat: Option[String] = storage.outputFormat,
       serde: Option[String] = storage.serde,
       serdeProperties: Map[String, String] = storage.serdeProperties)
-    : CatalogTable = {
+    : CatalogTable =
     copy(storage = CatalogStorageFormat(
               locationUri, inputFormat, outputFormat, serde, serdeProperties))
-  }
-}
 
 case class CatalogTableType private (name: String)
-object CatalogTableType {
+object CatalogTableType
   val EXTERNAL_TABLE = new CatalogTableType("EXTERNAL_TABLE")
   val MANAGED_TABLE = new CatalogTableType("MANAGED_TABLE")
   val INDEX_TABLE = new CatalogTableType("INDEX_TABLE")
   val VIRTUAL_VIEW = new CatalogTableType("VIRTUAL_VIEW")
-}
 
 /**
   * A database defined in the catalog.
@@ -253,20 +246,19 @@ case class CatalogDatabase(name: String,
                            locationUri: String,
                            properties: Map[String, String])
 
-object ExternalCatalog {
+object ExternalCatalog
 
   /**
     * Specifications of a table partition. Mapping column name to column value.
     */
   type TablePartitionSpec = Map[String, String]
-}
 
 /**
   * A [[LogicalPlan]] that wraps [[CatalogTable]].
   */
 case class CatalogRelation(
     db: String, metadata: CatalogTable, alias: Option[String] = None)
-    extends LeafNode {
+    extends LeafNode
 
   // TODO: implement this
   override def output: Seq[Attribute] = Seq.empty
@@ -274,4 +266,3 @@ case class CatalogRelation(
   require(
       metadata.name.database == Some(db),
       "provided database does not much the one specified in the table definition")
-}

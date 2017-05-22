@@ -3,46 +3,39 @@ package akka.persistence
 import akka.actor.{ActorLogging, ActorRef, Props}
 import akka.testkit.ImplicitSender
 
-object SnapshotRecoveryLocalStoreSpec {
+object SnapshotRecoveryLocalStoreSpec
   val persistenceId = "europe"
   val extendedName = persistenceId + "italy"
 
   case object TakeSnapshot
 
   class SaveSnapshotTestPersistentActor(name: String, probe: ActorRef)
-      extends NamedPersistentActor(name) {
+      extends NamedPersistentActor(name)
     var state = s"State for actor ${name}"
-    def receiveCommand = {
+    def receiveCommand =
       case TakeSnapshot ⇒ saveSnapshot(state)
       case SaveSnapshotSuccess(md) ⇒ probe ! md.sequenceNr
       case GetState ⇒ probe ! state
-    }
-    def receiveRecover = {
+    def receiveRecover =
       case _ ⇒
-    }
-  }
 
   class LoadSnapshotTestPersistentActor(name: String, probe: ActorRef)
       extends NamedPersistentActor(name) with TurnOffRecoverOnStart
-      with ActorLogging {
+      with ActorLogging
 
-    def receiveCommand = {
+    def receiveCommand =
       case _ ⇒
-    }
-    def receiveRecover = {
+    def receiveRecover =
       case other ⇒ probe ! other
-    }
-  }
-}
 
 class SnapshotRecoveryLocalStoreSpec
     extends PersistenceSpec(
         PersistenceSpec.config("inmem", "SnapshotRecoveryLocalStoreSpec"))
-    with ImplicitSender {
+    with ImplicitSender
 
   import SnapshotRecoveryLocalStoreSpec._
 
-  override protected def beforeEach() {
+  override protected def beforeEach()
     super.beforeEach()
 
     val persistentActor1 = system.actorOf(
@@ -54,21 +47,16 @@ class SnapshotRecoveryLocalStoreSpec
     persistentActor1 ! TakeSnapshot
     persistentActor2 ! TakeSnapshot
     expectMsgAllOf(0L, 0L)
-  }
 
-  "A persistent actor which is persisted at the same time as another actor whose persistenceId is an extension of the first " must {
-    "recover state only from its own correct snapshot file" in {
+  "A persistent actor which is persisted at the same time as another actor whose persistenceId is an extension of the first " must
+    "recover state only from its own correct snapshot file" in
 
       val recoveringActor =
         system.actorOf(Props(classOf[LoadSnapshotTestPersistentActor],
                              persistenceId,
                              testActor))
 
-      expectMsgPF() {
+      expectMsgPF()
         case SnapshotOffer(SnapshotMetadata(`persistenceId`, seqNo, timestamp),
                            state) ⇒
-      }
       expectMsg(RecoveryCompleted)
-    }
-  }
-}

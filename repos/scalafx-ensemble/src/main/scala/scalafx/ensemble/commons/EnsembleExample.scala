@@ -32,6 +32,5 @@ import scalafx.scene.Node
 /**
   * @author Jarek Sacha 
   */
-trait EnsembleExample {
+trait EnsembleExample
   def getContent: Node
-}

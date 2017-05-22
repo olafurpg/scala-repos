@@ -7,7 +7,7 @@ import play.api.{PlayConfig, Environment, PlayException}
 import play.api.inject.{BindingKey, Binding}
 import scala.reflect.ClassTag
 
-object Reflect {
+object Reflect
 
   /**
     * Lookup the given key from the given configuration, and provide bindings for the ScalaTrait to a class by that key.
@@ -52,13 +52,13 @@ object Reflect {
       javaInterface: SubClassOf[JavaInterface],
       javaAdapter: ClassTag[JavaAdapter],
       javaDelegate: ClassTag[JavaDelegate],
-      default: ClassTag[Default]): Seq[Binding[_]] = {
+      default: ClassTag[Default]): Seq[Binding[_]] =
 
     def bind[T : SubClassOf]: BindingKey[T] =
       BindingKey(implicitly[SubClassOf[T]].runtimeClass)
 
     configuredClass[ScalaTrait, JavaInterface, Default](
-        environment, config, key, defaultClassName) match {
+        environment, config, key, defaultClassName) match
 
       // Directly implements the scala trait
       case Some(Left(direct)) =>
@@ -74,8 +74,6 @@ object Reflect {
         )
 
       case None => Nil
-    }
-  }
 
   /**
     * Lookup the given key from the given configuration, and load it either as an instance of ScalaTrait, or JavaInterface.
@@ -109,23 +107,21 @@ object Reflect {
       defaultClassName: String)(implicit scalaTrait: SubClassOf[ScalaTrait],
                                 javaInterface: SubClassOf[JavaInterface],
                                 default: ClassTag[Default])
-    : Option[Either[Class[_ <: ScalaTrait], Class[_ <: JavaInterface]]] = {
+    : Option[Either[Class[_ <: ScalaTrait], Class[_ <: JavaInterface]]] =
 
     def loadClass(
-        className: String, notFoundFatal: Boolean): Option[Class[_]] = {
-      try {
+        className: String, notFoundFatal: Boolean): Option[Class[_]] =
+      try
         Some(environment.classLoader.loadClass(className))
-      } catch {
+      catch
         case e: ClassNotFoundException if !notFoundFatal => None
         case e: VirtualMachineError => throw e
         case e: ThreadDeath => throw e
         case e: Throwable =>
           throw new PlayException(
               s"Cannot load $key", s"$key [$className] was not loaded.", e)
-      }
-    }
 
-    val maybeClass = config.get[Option[String]](key) match {
+    val maybeClass = config.get[Option[String]](key) match
       // If provided, don't bind anything
       case Some("provided") => None
       // If empty, use the default
@@ -135,9 +131,8 @@ object Reflect {
           .orElse(Some(default.runtimeClass))
       // If a value, load that class
       case Some(className) => loadClass(className, notFoundFatal = true)
-    }
 
-    maybeClass.map {
+    maybeClass.map
 
       // Directly implements the scala trait
       case scalaTrait(scalaClass) =>
@@ -150,57 +145,45 @@ object Reflect {
         throw new PlayException(
             s"Cannot load $key",
             s"$key [${unknown.getClass}}] does not implement ${scalaTrait.runtimeClass} or ${javaInterface.runtimeClass}.")
-    }
-  }
 
-  def createInstance[T : ClassTag](fqcn: String, classLoader: ClassLoader): T = {
-    try {
+  def createInstance[T : ClassTag](fqcn: String, classLoader: ClassLoader): T =
+    try
       createInstance(getClass(fqcn, classLoader))
-    } catch {
+    catch
       case e: VirtualMachineError => throw e
       case e: ThreadDeath => throw e
       case e: Throwable =>
         val name = simpleName(implicitly[ClassTag[T]].runtimeClass)
         throw new PlayException(
             s"Cannot load $name", s"$name [$fqcn] cannot be instantiated.", e)
-    }
-  }
 
   def getClass[T : ClassTag](
-      fqcn: String, classLoader: ClassLoader): Class[_ <: T] = {
+      fqcn: String, classLoader: ClassLoader): Class[_ <: T] =
     val c = Class.forName(fqcn, false, classLoader).asInstanceOf[Class[_ <: T]]
     val t = implicitly[ClassTag[T]].runtimeClass
     if (t.isAssignableFrom(c)) c
     else throw new ClassCastException(t + " is not assignable from " + c)
-  }
 
-  def createInstance[T : ClassTag](clazz: Class[_]): T = {
+  def createInstance[T : ClassTag](clazz: Class[_]): T =
     val o = clazz.newInstance
     val t = implicitly[ClassTag[T]].runtimeClass
     if (t.isInstance(o)) o.asInstanceOf[T]
     else
       throw new ClassCastException(
           clazz.getName + " is not an instance of " + t)
-  }
 
-  def simpleName(clazz: Class[_]): String = {
+  def simpleName(clazz: Class[_]): String =
     val name = clazz.getName
     name.substring(name.lastIndexOf('.') + 1)
-  }
 
-  class SubClassOf[T](val runtimeClass: Class[T]) {
-    def unapply(clazz: Class[_]): Option[Class[_ <: T]] = {
-      if (runtimeClass.isAssignableFrom(clazz)) {
+  class SubClassOf[T](val runtimeClass: Class[T])
+    def unapply(clazz: Class[_]): Option[Class[_ <: T]] =
+      if (runtimeClass.isAssignableFrom(clazz))
         Some(clazz.asInstanceOf[Class[_ <: T]])
-      } else {
+      else
         None
-      }
-    }
-  }
 
-  object SubClassOf {
+  object SubClassOf
     implicit def provide[T : ClassTag]: SubClassOf[T] =
       new SubClassOf[T](
           implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
-  }
-}

@@ -28,7 +28,7 @@ import net.liftweb.common._
 import net.liftweb.util._
 import Helpers._
 
-class HTTPServletContext(val ctx: ServletContext) extends HTTPContext {
+class HTTPServletContext(val ctx: ServletContext) extends HTTPContext
   def path: String = ctx.getContextPath
 
   def resource(path: String): URL = ctx getResource path
@@ -52,11 +52,8 @@ class HTTPServletContext(val ctx: ServletContext) extends HTTPContext {
         ctx.getAttributeNames.asInstanceOf[java.util.Enumeration[String]])
       .map(n => (n, attribute(n) openOr ""))
 
-  def setAttribute(name: String, value: Any) {
+  def setAttribute(name: String, value: Any)
     ctx.setAttribute(name, value)
-  }
 
-  def removeAttribute(name: String) {
+  def removeAttribute(name: String)
     ctx.removeAttribute(name)
-  }
-}

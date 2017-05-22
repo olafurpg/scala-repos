@@ -18,27 +18,25 @@ import scala.concurrent.TimeoutException
 
 @Provider
 @Singleton
-class MarathonExceptionMapper extends ExceptionMapper[Exception] {
+class MarathonExceptionMapper extends ExceptionMapper[Exception]
 
   private[this] val log = LoggerFactory.getLogger(getClass.getName)
 
-  def toResponse(exception: Exception): Response = {
+  def toResponse(exception: Exception): Response =
     // WebApplicationException are things like invalid requests etc, no need to log a stack trace
-    if (!exception.isInstanceOf[WebApplicationException]) {
+    if (!exception.isInstanceOf[WebApplicationException])
       log.warn("mapping exception to status code", exception)
-    } else {
+    else
       log.info("mapping exception to status code", exception)
-    }
 
     Response
       .status(statusCode(exception))
       .entity(Json.stringify(entity(exception)))
       .`type`(MediaType.APPLICATION_JSON)
       .build
-  }
 
   //scalastyle:off magic.number cyclomatic.complexity
-  private def statusCode(exception: Exception): Int = exception match {
+  private def statusCode(exception: Exception): Int = exception match
     //scalastyle:off magic.number
     case e: TimeoutException => 503 // Service Unavailable
     case e: UnknownAppException => 404 // Not found
@@ -54,9 +52,8 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
     case e: WebApplicationException => e.getResponse.getStatus
     case _ => 500 // Internal server error
     //scalastyle:on
-  }
 
-  private def entity(exception: Exception): JsValue = exception match {
+  private def entity(exception: Exception): JsValue = exception match
     case e: NotFoundException =>
       Json.obj("message" -> s"URI not found: ${e.getNotFoundUri.getRawPath}")
     case e: AppLockedException =>
@@ -75,10 +72,9 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
           "details" -> e.getMessage
       )
     case e: JsResultException =>
-      val errors = e.errors.map {
+      val errors = e.errors.map
         case (path, errs) =>
           Json.obj("path" -> path.toString(), "errors" -> errs.map(_.message))
-      }
       Json.obj(
           "message" -> s"Invalid JSON",
           "details" -> errors
@@ -86,14 +82,11 @@ class MarathonExceptionMapper extends ExceptionMapper[Exception] {
     case ValidationFailedException(obj, failure) => Json.toJson(failure)
     case e: WebApplicationException =>
       //scalastyle:off null
-      if (Status.fromStatusCode(e.getResponse.getStatus) != null) {
+      if (Status.fromStatusCode(e.getResponse.getStatus) != null)
         Json.obj("message" -> Status
               .fromStatusCode(e.getResponse.getStatus)
               .getReasonPhrase)
-      } else {
+      else
         Json.obj("message" -> e.getMessage)
-      }
     case _ =>
       Json.obj("message" -> exception.getMessage)
-  }
-}

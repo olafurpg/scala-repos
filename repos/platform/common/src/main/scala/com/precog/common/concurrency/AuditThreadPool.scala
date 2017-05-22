@@ -32,11 +32,11 @@ class AuditExecutor(val name: String,
                     maxThreads: Int,
                     maxQueueDepth: Option[Int],
                     idleTimeout: Long)
-    extends Executor {
-  private[this] val workQueue: BlockingQueue[Runnable] = maxQueueDepth.map {
+    extends Executor
+  private[this] val workQueue: BlockingQueue[Runnable] = maxQueueDepth.map
     depth =>
       new ArrayBlockingQueue[Runnable](depth)
-  }.getOrElse(new LinkedBlockingQueue[Runnable]())
+  .getOrElse(new LinkedBlockingQueue[Runnable]())
 
   private[this] val threadCount = new AtomicInteger(minThreads)
   private[this] val activeThreadCount = new AtomicInteger(0)
@@ -44,9 +44,9 @@ class AuditExecutor(val name: String,
 
   private[this] final val threadUpdateLock = new AnyRef()
 
-  private[this] var workers = (1 to minThreads).map { i =>
+  private[this] var workers = (1 to minThreads).map  i =>
     new WorkerThread(i)
-  }.toSet
+  .toSet
   workers.foreach(_.start())
 
   private val threadMXBean = ManagementFactory.getThreadMXBean
@@ -54,91 +54,71 @@ class AuditExecutor(val name: String,
   def size = threadCount.get
   def activeSize = activeThreadCount.get
 
-  def execute(task: Runnable): Unit = {
-    if (!workQueue.offer(task)) {
+  def execute(task: Runnable): Unit =
+    if (!workQueue.offer(task))
       throw new RejectedExecutionException()
-    }
 
     // We may be able to allocate a new WorkerThread if all threads are currently active and we have room to grow
-    if (activeThreadCount.get == threadCount.get) {
-      threadUpdateLock.synchronized {
-        if (threadCount.get < maxThreads) {
+    if (activeThreadCount.get == threadCount.get)
+      threadUpdateLock.synchronized
+        if (threadCount.get < maxThreads)
           val worker = new WorkerThread(threadCount.incrementAndGet)
           workers += worker
           worker.start()
-        }
-      }
-    }
-  }
 
-  def cpuDelta: Long = {
+  def cpuDelta: Long =
     val currentDelta = workers.map(_.cpuDelta).filterNot(_ < 0).sum
     cumulativeCpuTime.addAndGet(currentDelta)
     currentDelta
-  }
 
   def totalTime: Long = cumulativeCpuTime.get
 
-  private def workerFinished(worker: WorkerThread): Unit = {
-    threadUpdateLock.synchronized {
+  private def workerFinished(worker: WorkerThread): Unit =
+    threadUpdateLock.synchronized
       workers -= worker
       cumulativeCpuTime.addAndGet(worker.cpuDelta)
       threadCount.decrementAndGet
-    }
-  }
 
   /**
     Called by threads to determine if they should continue waiting when the queue has no work for them
     */
-  private def shouldContinue: Boolean = {
+  private def shouldContinue: Boolean =
     val currentCount = threadCount.get
-    if (currentCount > minThreads) {
-      threadUpdateLock.synchronized {
-        try {
+    if (currentCount > minThreads)
+      threadUpdateLock.synchronized
+        try
           // If this is the first thread to volunteer for reaping, let it go
-          if (threadCount.compareAndSet(currentCount, currentCount - 1)) {
+          if (threadCount.compareAndSet(currentCount, currentCount - 1))
             false
-          } else {
+          else
             true
-          }
-        }
-      }
-    } else {
+    else
       true
-    }
-  }
 
-  private class WorkerThread(id: Int) extends Thread(name + "-" + id) {
+  private class WorkerThread(id: Int) extends Thread(name + "-" + id)
     private[this] var lastCpuTime = 0l
 
-    def cpuDelta = synchronized {
+    def cpuDelta = synchronized
       val newTime = threadMXBean.getThreadCpuTime(this.getId)
       val delta = newTime - lastCpuTime
       lastCpuTime = newTime
       delta
-    }
 
     override def run(): Unit =
-      try {
+      try
         @tailrec
-        def processQueue: Unit = {
+        def processQueue: Unit =
           val nextJob = workQueue.poll(idleTimeout, TimeUnit.MILLISECONDS)
-          if (nextJob != null) {
+          if (nextJob != null)
             activeThreadCount.incrementAndGet()
-            try {
+            try
               nextJob.run()
-            } finally {
+            finally
               activeThreadCount.decrementAndGet()
-            }
             processQueue
-          } else if (shouldContinue) {
+          else if (shouldContinue)
             processQueue
-          }
-        }
 
         processQueue
-      } finally {
+      finally
         workerFinished(this)
-      }
-  }
-}

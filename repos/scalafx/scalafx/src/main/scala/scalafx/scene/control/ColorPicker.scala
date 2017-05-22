@@ -34,7 +34,7 @@ import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.sfxColor2jfx
 
-object ColorPicker {
+object ColorPicker
   implicit def sfxColorPicker2jfx(cp: ColorPicker): jfxsc.ColorPicker =
     if (cp != null) cp.delegate else null
 
@@ -49,7 +49,6 @@ object ColorPicker {
       "Use StyleClassSplitButton; STYLE_CLASS_SPLIT_BUTTON will be removed in a future release",
       "8.0.60-R10")
   val STYLE_CLASS_SPLIT_BUTTON = StyleClassSplitButton
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Pagination.html]]
@@ -57,9 +56,8 @@ object ColorPicker {
 class ColorPicker(
     override val delegate: jfxsc.ColorPicker = new jfxsc.ColorPicker)
     extends ComboBoxBase[jfxsp.Color](delegate)
-    with SFXDelegate[jfxsc.ColorPicker] {
+    with SFXDelegate[jfxsc.ColorPicker]
 
   def this(color: Color) = this(new jfxsc.ColorPicker(color))
 
   def customColors = new ObservableBuffer(delegate.getCustomColors)
-}

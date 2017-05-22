@@ -1,7 +1,7 @@
 class SomeClass
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     val cls: Predef.Class[SomeClass] = classOf[SomeClass]
     println("Value types:")
     println(classOf[Unit])
@@ -28,5 +28,3 @@ object Test {
     println("Functions:")
     println(classOf[(Int, Int) => Unit])
     println(classOf[Int => Boolean])
-  }
-}

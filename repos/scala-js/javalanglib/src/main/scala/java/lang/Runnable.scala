@@ -1,5 +1,4 @@
 package java.lang
 
-trait Runnable {
+trait Runnable
   def run(): Unit
-}

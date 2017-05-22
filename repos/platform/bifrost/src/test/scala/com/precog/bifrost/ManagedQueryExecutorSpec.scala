@@ -51,7 +51,7 @@ import scalaz.std.option._
 import scalaz.syntax.monad._
 import scalaz.syntax.comonad._
 
-class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
+class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification
   import JobState._
 
   val JSON = MimeTypes.application / MimeTypes.json
@@ -76,125 +76,105 @@ class ManagedQueryExecutorSpec extends TestManagedPlatform with Specification {
   val ticker = actorSystem.actorOf(Props(new Ticker(ticks)))
 
   def execute(
-      numTicks: Int, ticksToTimeout: Option[Int] = None): Future[JobId] = {
+      numTicks: Int, ticksToTimeout: Option[Int] = None): Future[JobId] =
     val timeout =
-      ticksToTimeout map { t =>
+      ticksToTimeout map  t =>
         Duration(clock.duration * t, TimeUnit.MILLISECONDS)
-      }
-    val executionResult = for {
-      executor <- asyncExecutorFor(apiKey) leftMap {
+    val executionResult = for
+      executor <- asyncExecutorFor(apiKey) leftMap
         EvaluationError.invalidState
-      }
       ctx = EvaluationContext(
           apiKey, account, Path("/\\\\/\\///\\/"), Path.Root, clock.now())
       result <- executor.execute(
           numTicks.toString, ctx, QueryOptions(timeout = timeout))
-    } yield result
+    yield result
 
     executionResult.valueOr(err => sys.error(err.toString))
-  }
 
-  def cancel(jobId: JobId, ticks: Int): Future[Boolean] = schedule(ticks) {
+  def cancel(jobId: JobId, ticks: Int): Future[Boolean] = schedule(ticks)
     jobManager
       .cancel(jobId, "Yarrrr", yggConfig.clock.now())
       .map(_.fold(_ => false, _ => true))
       .copoint
-  }
 
-  def poll(jobId: JobId): Future[Option[(Option[MimeType], String)]] = {
-    jobManager.getResult(jobId) flatMap {
+  def poll(jobId: JobId): Future[Option[(Option[MimeType], String)]] =
+    jobManager.getResult(jobId) flatMap
       case Left(_) =>
         Future(None)
       case Right((mimeType, stream)) =>
-        stream.foldLeft(new Array[Byte](0))(_ ++ _) map { data =>
+        stream.foldLeft(new Array[Byte](0))(_ ++ _) map  data =>
           Some(mimeType -> new String(data, "UTF-8"))
-        }
-    }
-  }
 
-  def waitForJobCompletion(jobId: JobId): Future[Job] = {
+  def waitForJobCompletion(jobId: JobId): Future[Job] =
     import JobState._
 
-    for {
+    for
       _ <- waitFor(1)
       Some(job) <- jobManager.findJob(jobId)
-      finalJob <- job.state match {
+      finalJob <- job.state match
         case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
           waitForJobCompletion(jobId)
         case _ =>
           Future(job)
-      }
-    } yield finalJob
-  }
+    yield finalJob
 
-  step {
+  step
     actorSystem.scheduler.schedule(Duration(0, "milliseconds"),
-                                   Duration(clock.duration, "milliseconds")) {
+                                   Duration(clock.duration, "milliseconds"))
       ticker ! Tick
-    }
 
     startup.copoint
-  }
 
-  "An asynchronous query" should {
-    "return a job ID" in {
+  "An asynchronous query" should
+    "return a job ID" in
       execute(1).copoint must not(throwA[Exception])
-    }
 
-    "return the results of a completed job" in {
-      val result = for {
+    "return the results of a completed job" in
+      val result = for
         jobId <- execute(3)
         _ <- waitForJobCompletion(jobId)
         _ <- waitFor(3)
         result <- poll(jobId)
-      } yield result
+      yield result
 
       result.copoint must_== Some((Some(JSON), """[".",".","."]"""))
-    }
 
-    "not return results if the job is still running" in {
-      val results = for {
+    "not return results if the job is still running" in
+      val results = for
         jobId <- execute(20)
         _ <- waitFor(1)
         results <- poll(jobId)
-      } yield results
+      yield results
 
       results.copoint must_== None
-    }
 
-    "be in the finished state if the job has finished" in {
-      val result = for {
+    "be in the finished state if the job has finished" in
+      val result = for
         jobId <- execute(1)
         job <- waitForJobCompletion(jobId)
-      } yield job
+      yield job
 
-      result.copoint must beLike {
+      result.copoint must beLike
         case Job(_, _, _, _, _, Finished(_, _)) => ok
-      }
-    }
 
-    "not return the results of an aborted job" in {
-      val result = for {
+    "not return the results of an aborted job" in
+      val result = for
         jobId <- execute(8)
         _ <- cancel(jobId, 1)
         _ <- waitForJobCompletion(jobId)
         result <- poll(jobId)
-      } yield result
+      yield result
 
       result.copoint must_== None
-    }
-  }
 
-  step {
+  step
     shutdown.copoint
     actorSystem.shutdown()
     actorSystem.awaitTermination()
-  }
-}
 
 trait TestManagedPlatform
     extends ManagedExecution with ManagedQueryModule
-    with SchedulableFuturesModule {
+    with SchedulableFuturesModule
   self =>
   def actorSystem: ActorSystem
   implicit def executionContext: ExecutionContext
@@ -204,57 +184,48 @@ trait TestManagedPlatform
 
   type YggConfig = ManagedQueryModuleConfig
 
-  object yggConfig extends ManagedQueryModuleConfig {
+  object yggConfig extends ManagedQueryModuleConfig
     val jobPollFrequency: Duration = Duration(10, "milliseconds")
     val clock = self.clock
-  }
 
   protected def executor(implicit shardQueryMonad: JobQueryTFMonad)
-    : QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] = {
-    new QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] {
+    : QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] =
+    new QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]]
 
       import UserQuery.Serialization._
 
-      def execute(query: String, ctx: EvaluationContext, opts: QueryOptions) = {
+      def execute(query: String, ctx: EvaluationContext, opts: QueryOptions) =
         val numTicks = query.toInt
         EitherT
-          .right[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]] {
-          schedule(0) {
-            StreamT.unfoldM[JobQueryTF, Slice, Int](0) {
+          .right[JobQueryTF, EvaluationError, StreamT[JobQueryTF, Slice]]
+          schedule(0)
+            StreamT.unfoldM[JobQueryTF, Slice, Int](0)
               case i if i < numTicks =>
-                schedule(1) {
+                schedule(1)
                   Some((Slice.fromJValues(
                             Stream(JObject("value" -> JString(".")))),
                         i + 1))
-                }.liftM[JobQueryT]
+                .liftM[JobQueryT]
 
               case _ =>
                 shardQueryMonad.point { None }
-            }
-          }.liftM[JobQueryT]
-        }
-      }
-    }
-  }
+          .liftM[JobQueryT]
 
   def asyncExecutorFor(apiKey: APIKey)
-    : EitherT[Future, String, QueryExecutor[Future, JobId]] = {
+    : EitherT[Future, String, QueryExecutor[Future, JobId]] =
     EitherT.right(
-        Future(new AsyncQueryExecutor {
+        Future(new AsyncQueryExecutor
       val executionContext = self.executionContext
-    }))
-  }
+    ))
 
   def syncExecutorFor(apiKey: APIKey): EitherT[
       Future,
       String,
-      QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] = {
+      QueryExecutor[Future, (Option[JobId], StreamT[Future, Slice])]] =
     EitherT.right(
-        Future(new SyncQueryExecutor {
+        Future(new SyncQueryExecutor
       val executionContext = self.executionContext
-    }))
-  }
+    ))
 
   def startup = Future { true }
   def shutdown = Future { actorSystem.shutdown; true }
-}

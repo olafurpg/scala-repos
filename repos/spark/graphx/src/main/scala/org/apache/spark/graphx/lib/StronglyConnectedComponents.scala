@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
 import org.apache.spark.graphx._
 
 /** Strongly connected components algorithm implementation. */
-object StronglyConnectedComponents {
+object StronglyConnectedComponents
 
   /**
     * Compute the strongly connected component (SCC) of each vertex and return a graph with the
@@ -36,7 +36,7 @@ object StronglyConnectedComponents {
     * @return a graph with vertex attributes containing the smallest vertex id in each SCC
     */
   def run[VD : ClassTag, ED : ClassTag](
-      graph: Graph[VD, ED], numIter: Int): Graph[VertexId, ED] = {
+      graph: Graph[VD, ED], numIter: Int): Graph[VertexId, ED] =
     require(numIter > 0,
             s"Number of iterations must be greater than 0," +
             s" but got ${numIter}")
@@ -49,42 +49,37 @@ object StronglyConnectedComponents {
 
     var numVertices = sccWorkGraph.numVertices
     var iter = 0
-    while (sccWorkGraph.numVertices > 0 && iter < numIter) {
+    while (sccWorkGraph.numVertices > 0 && iter < numIter)
       iter += 1
-      do {
+      do
         numVertices = sccWorkGraph.numVertices
         sccWorkGraph = sccWorkGraph
-          .outerJoinVertices(sccWorkGraph.outDegrees) {
+          .outerJoinVertices(sccWorkGraph.outDegrees)
             (vid, data, degreeOpt) =>
               if (degreeOpt.isDefined) data else (vid, true)
-          }
-          .outerJoinVertices(sccWorkGraph.inDegrees) {
+          .outerJoinVertices(sccWorkGraph.inDegrees)
             (vid, data, degreeOpt) =>
               if (degreeOpt.isDefined) data else (vid, true)
-          }
           .cache()
 
         // get all vertices to be removed
-        val finalVertices = sccWorkGraph.vertices.filter {
+        val finalVertices = sccWorkGraph.vertices.filter
           case (vid, (scc, isFinal)) => isFinal
-        }.mapValues { (vid, data) =>
+        .mapValues  (vid, data) =>
           data._1
-        }
 
         // write values to sccGraph
-        sccGraph = sccGraph.outerJoinVertices(finalVertices) {
+        sccGraph = sccGraph.outerJoinVertices(finalVertices)
           (vid, scc, opt) =>
             opt.getOrElse(scc)
-        }
         // only keep vertices that are not final
         sccWorkGraph = sccWorkGraph
           .subgraph(vpred = (vid, data) => !data._2)
           .cache()
-      } while (sccWorkGraph.numVertices < numVertices)
+      while (sccWorkGraph.numVertices < numVertices)
 
-      sccWorkGraph = sccWorkGraph.mapVertices {
+      sccWorkGraph = sccWorkGraph.mapVertices
         case (vid, (color, isFinal)) => (vid, isFinal)
-      }
 
       // collect min of all my neighbor's scc values, update if it's smaller than mine
       // then notify any neighbors with scc values larger than mine
@@ -93,13 +88,11 @@ object StronglyConnectedComponents {
           (vid, myScc,
           neighborScc) => (math.min(myScc._1, neighborScc), myScc._2),
           e =>
-            {
-              if (e.srcAttr._1 < e.dstAttr._1) {
+              if (e.srcAttr._1 < e.dstAttr._1)
                 Iterator((e.dstId, e.srcAttr._1))
-              } else {
+              else
                 Iterator()
-              }
-          },
+          ,
           (vid1, vid2) => math.min(vid1, vid2))
 
       // start at root of SCCs. Traverse values in reverse, notify all my neighbors
@@ -109,24 +102,18 @@ object StronglyConnectedComponents {
           // vertex is final if it is the root of a color
           // or it has the same color as a neighbor that is final
           (vid, myScc, existsSameColorFinalNeighbor) =>
-            {
               val isColorRoot = vid == myScc._1
               (myScc._1,
                myScc._2 || isColorRoot || existsSameColorFinalNeighbor)
-          },
+          ,
           // activate neighbor if they are not final, you are, and you have the same color
           e =>
-            {
               val sameColor = e.dstAttr._1 == e.srcAttr._1
               val onlyDstIsFinal = e.dstAttr._2 && !e.srcAttr._2
-              if (sameColor && onlyDstIsFinal) {
+              if (sameColor && onlyDstIsFinal)
                 Iterator((e.srcId, e.dstAttr._2))
-              } else {
+              else
                 Iterator()
-              }
-          },
+          ,
           (final1, final2) => final1 || final2)
-    }
     sccGraph
-  }
-}

@@ -4,7 +4,7 @@ import com.twitter.finagle.benchmark.StdBenchAnnotations
 import org.openjdk.jmh.annotations._
 
 @State(Scope.Benchmark)
-class NotFoundBenchmark extends StdBenchAnnotations {
+class NotFoundBenchmark extends StdBenchAnnotations
 
   private[this] val Text =
     "Beard you probably haven't heard of them artisan cronut fanny pack Bespoke organic wolf put " +
@@ -24,14 +24,13 @@ class NotFoundBenchmark extends StdBenchAnnotations {
 
   private[this] val Keys: Set[String] = Text.split(" ").toSet.take(25)
 
-  private[this] val KVs: Map[String, String] = Keys.map { k =>
+  private[this] val KVs: Map[String, String] = Keys.map  k =>
     k -> k
-  }.toMap
+  .toMap
 
-  private def pick(percent: Double): Set[String] = {
+  private def pick(percent: Double): Set[String] =
     val num = (Keys.size * percent).toInt
     Keys.take(num)
-  }
 
   private[this] val Hits90 = pick(0.9)
   private[this] val HitsCutoff = pick(NotFound.cutoff)
@@ -81,4 +80,3 @@ class NotFoundBenchmark extends StdBenchAnnotations {
   @Benchmark
   def map_Cutoff_NotFound: Map[String, String] =
     notFoundMap(HitsCutoff)
-}

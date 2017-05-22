@@ -7,13 +7,12 @@ import javax.servlet.ServletContext
   * constructor.  Useful for unifying the initialization process of an
   * HttpServlet and a Filter.
   */
-trait Initializable {
+trait Initializable
   type ConfigT
 
-  trait Config {
+  trait Config
     def context: ServletContext
     def initParameters: Map[String, String]
-  }
   protected implicit def configWrapper(config: ConfigT): Config
 
   /**
@@ -30,4 +29,3 @@ trait Initializable {
     * destroy and filter's destroy.
     */
   protected def shutdown(): Unit = {}
-}

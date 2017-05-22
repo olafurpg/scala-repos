@@ -10,7 +10,7 @@ import scala.reflect.ClassTag
   * @author dlwh
   */
 trait ExpFamTest[D <: Density[T] with Rand[T], T]
-    extends FunSuite with Checkers {
+    extends FunSuite with Checkers
   val expFam: ExponentialFamily[D, T]
   import expFam._
 
@@ -18,38 +18,32 @@ trait ExpFamTest[D <: Density[T] with Rand[T], T]
 
   def paramsClose(p: Parameter, b: Parameter): Boolean
 
-  test("MLE is consistent") {
-    check(Prop.forAll { (p: expFam.Parameter) =>
-      try {
+  test("MLE is consistent")
+    check(Prop.forAll  (p: expFam.Parameter) =>
+      try
         val dist = expFam.distribution(p)
         val suffstat =
           dist.sample(10000).map(sufficientStatisticFor).reduce(_ + _)
         val mle = expFam.mle(suffstat)
-        if (!paramsClose(mle, p)) {
+        if (!paramsClose(mle, p))
           println("Got " + mle + " expected " + p)
           false
-        } else {
+        else
           true
-        }
-      } catch {
+      catch
         case ex: Exception => ex.printStackTrace(); throw ex
-      }
-    })
-  }
+    )
 
-  test("Rescale doesn't affect MLE") {
+  test("Rescale doesn't affect MLE")
     check(
-        Prop.forAll { (p: expFam.Parameter) =>
+        Prop.forAll  (p: expFam.Parameter) =>
       val dist: D = expFam.distribution(p)
       val suffstat = dist.sample(100).map(sufficientStatisticFor).reduce(_ + _)
       val mle = expFam.mle(suffstat)
       val mle2 = expFam.mle(suffstat * .5)
-      if (!paramsClose(mle, mle2)) {
+      if (!paramsClose(mle, mle2))
         println("Got " + mle2 + " expected " + mle)
         false
-      } else {
+      else
         true
-      }
-    })
-  }
-}
+    )

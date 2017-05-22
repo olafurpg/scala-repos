@@ -18,7 +18,7 @@ import scala.reflect.ClassTag
   *
   * See diffByGroup for comparing typed pipes of objects that have no ordering *and* an unstable hash code.
   */
-object TypedPipeDiff {
+object TypedPipeDiff
 
   /**
     * Returns a mapping from T to a count of the occurrences of T in the left and right pipes,
@@ -30,19 +30,15 @@ object TypedPipeDiff {
   def diff[T : Ordering](
       left: TypedPipe[T],
       right: TypedPipe[T],
-      reducers: Option[Int] = None): UnsortedGrouped[T, (Long, Long)] = {
-    val lefts = left.map { x =>
+      reducers: Option[Int] = None): UnsortedGrouped[T, (Long, Long)] =
+    val lefts = left.map  x =>
       (x, (1L, 0L))
-    }
-    val rights = right.map { x =>
+    val rights = right.map  x =>
       (x, (0L, 1L))
-    }
     val counts = (lefts ++ rights).sumByKey
-    val diff = counts.filter {
+    val diff = counts.filter
       case (key, (lCount, rCount)) => lCount != rCount
-    }
     reducers.map(diff.withReducers).getOrElse(diff)
-  }
 
   /**
     * Same as diffByHashCode, but takes care to wrap the Array[T] in a wrapper,
@@ -52,15 +48,13 @@ object TypedPipeDiff {
   def diffArrayPipes[T : ClassTag](
       left: TypedPipe[Array[T]],
       right: TypedPipe[Array[T]],
-      reducers: Option[Int] = None): TypedPipe[(Array[T], (Long, Long))] = {
+      reducers: Option[Int] = None): TypedPipe[(Array[T], (Long, Long))] =
 
     // cache this instead of reflecting on every single array
     val wrapFn = HashEqualsArrayWrapper.wrapByClassTagFn[T]
 
-    diffByHashCode(left.map(wrapFn), right.map(wrapFn), reducers).map {
+    diffByHashCode(left.map(wrapFn), right.map(wrapFn), reducers).map
       case (k, counts) => (k.wrapped, counts)
-    }
-  }
 
   /**
     * NOTE: Prefer diff over this method if you can find or construct an Ordering[T].
@@ -87,21 +81,17 @@ object TypedPipeDiff {
     */
   def diffByGroup[T, K : Ordering](
       left: TypedPipe[T], right: TypedPipe[T], reducers: Option[Int] = None)(
-      groupByFn: T => K): TypedPipe[(T, (Long, Long))] = {
+      groupByFn: T => K): TypedPipe[(T, (Long, Long))] =
 
-    val lefts = left.map { t =>
+    val lefts = left.map  t =>
       (groupByFn(t), Map(t -> (1L, 0L)))
-    }
-    val rights = right.map { t =>
+    val rights = right.map  t =>
       (groupByFn(t), Map(t -> (0L, 1L)))
-    }
 
-    val diff = (lefts ++ rights).sumByKey.flattenValues.filter {
+    val diff = (lefts ++ rights).sumByKey.flattenValues.filter
       case (k, (t, (lCount, rCount))) => lCount != rCount
-    }
 
     reducers.map(diff.withReducers).getOrElse(diff).values
-  }
 
   /**
     * NOTE: Prefer diff over this method if you can find or construct an Ordering[T].
@@ -116,9 +106,9 @@ object TypedPipeDiff {
       reducers: Option[Int] = None): TypedPipe[(T, (Long, Long))] =
     diffByGroup(left, right, reducers)(_.hashCode)
 
-  object Enrichments {
+  object Enrichments
 
-    implicit class Diff[T](val left: TypedPipe[T]) extends AnyVal {
+    implicit class Diff[T](val left: TypedPipe[T]) extends AnyVal
 
       def diff(right: TypedPipe[T], reducers: Option[Int] = None)(
           implicit ev: Ordering[T]): UnsortedGrouped[T, (Long, Long)] =
@@ -133,14 +123,10 @@ object TypedPipeDiff {
           right: TypedPipe[T],
           reducers: Option[Int] = None): TypedPipe[(T, (Long, Long))] =
         TypedPipeDiff.diffByHashCode(left, right, reducers)
-    }
 
-    implicit class DiffArray[T](val left: TypedPipe[Array[T]]) extends AnyVal {
+    implicit class DiffArray[T](val left: TypedPipe[Array[T]]) extends AnyVal
 
       def diffArrayPipes(
           right: TypedPipe[Array[T]], reducers: Option[Int] = None)(
           implicit ev: ClassTag[T]): TypedPipe[(Array[T], (Long, Long))] =
         TypedPipeDiff.diffArrayPipes(left, right, reducers)
-    }
-  }
-}

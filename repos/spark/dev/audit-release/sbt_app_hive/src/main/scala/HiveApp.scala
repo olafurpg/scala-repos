@@ -27,14 +27,13 @@ import org.apache.spark.sql.hive.HiveContext
 
 case class Person(name: String, age: Int)
 
-object SparkSqlExample {
+object SparkSqlExample
 
-  def main(args: Array[String]) {
-    val conf = sys.env.get("SPARK_AUDIT_MASTER") match {
+  def main(args: Array[String])
+    val conf = sys.env.get("SPARK_AUDIT_MASTER") match
       case Some(master) =>
         new SparkConf().setAppName("Simple Sql App").setMaster(master)
       case None => new SparkConf().setAppName("Simple Sql App")
-    }
     val sc = new SparkContext(conf)
     val hiveContext = new HiveContext(sc)
 
@@ -46,17 +45,13 @@ object SparkSqlExample {
       sql("FROM src SELECT key, value WHERE key >= 0 AND KEY < 5").collect()
     results.foreach(println)
 
-    def test(f: => Boolean, failureMsg: String) = {
-      if (!f) {
+    def test(f: => Boolean, failureMsg: String) =
+      if (!f)
         println(failureMsg)
         System.exit(-1)
-      }
-    }
 
     test(results.size == 5,
          "Unexpected number of selected elements: " + results)
     println("Test succeeded")
     sc.stop()
-  }
-}
 // scalastyle:on println

@@ -29,130 +29,101 @@ private[this] case object ReducedQR extends QRMode // Q and R have dimensions (m
   *         R - The upper-triangular matrix
   *
   */
-object qr extends UFunc {
+object qr extends UFunc
 
   case class QR[M](q: M, r: M)
 
   type DenseQR = QR[DenseMatrix[Double]]
   type SDenseQR = QR[DenseMatrix[Float]]
 
-  implicit object impl_DM_Double extends Impl[DenseMatrix[Double], DenseQR] {
-    def apply(v: DenseMatrix[Double]): DenseQR = {
+  implicit object impl_DM_Double extends Impl[DenseMatrix[Double], DenseQR]
+    def apply(v: DenseMatrix[Double]): DenseQR =
       val (q, r) = doQr(v, skipQ = false)(mode = CompleteQR)
       QR(q, r)
-    }
-  }
 
-  implicit object impl_DM_Float extends Impl[DenseMatrix[Float], SDenseQR] {
-    def apply(v: DenseMatrix[Float]): SDenseQR = {
+  implicit object impl_DM_Float extends Impl[DenseMatrix[Float], SDenseQR]
+    def apply(v: DenseMatrix[Float]): SDenseQR =
       val (q, r) = doQr_Float(v, skipQ = false)(mode = CompleteQR)
       QR(q, r)
-    }
-  }
 
   /**
     * QR that just returns R.
     */
-  object justR extends UFunc {
+  object justR extends UFunc
 
     implicit object impl_DM_Double
-        extends Impl[DenseMatrix[Double], DenseMatrix[Double]] {
-      def apply(v: DenseMatrix[Double]): DenseMatrix[Double] = {
+        extends Impl[DenseMatrix[Double], DenseMatrix[Double]]
+      def apply(v: DenseMatrix[Double]): DenseMatrix[Double] =
         doQr(v, skipQ = true)(mode = CompleteQR)._2
-      }
-    }
 
     implicit object impl_DM_Float
-        extends Impl[DenseMatrix[Float], DenseMatrix[Float]] {
-      def apply(v: DenseMatrix[Float]): DenseMatrix[Float] = {
+        extends Impl[DenseMatrix[Float], DenseMatrix[Float]]
+      def apply(v: DenseMatrix[Float]): DenseMatrix[Float] =
         doQr_Float(v, skipQ = true)(mode = CompleteQR)._2
-      }
-    }
 
     implicit def canJustQIfWeCanQR[T, M](
-        implicit qrImpl: qr.Impl[T, QR[M]]): Impl[T, M] = {
-      new Impl[T, M] {
+        implicit qrImpl: qr.Impl[T, QR[M]]): Impl[T, M] =
+      new Impl[T, M]
         def apply(v: T): M = qrImpl(v).r
-      }
-    }
-  }
 
   /**
     * QR that just returns Q.
     */
-  object justQ extends UFunc {
+  object justQ extends UFunc
 
     implicit def canJustQIfWeCanQR[T, M](
-        implicit qrImpl: qr.Impl[T, QR[M]]): Impl[T, M] = {
-      new Impl[T, M] {
+        implicit qrImpl: qr.Impl[T, QR[M]]): Impl[T, M] =
+      new Impl[T, M]
         def apply(v: T): M = qrImpl(v).q
-      }
-    }
-  }
 
   /**
     * QR Factorization that returns Q and R with dimensions (m, k), (k, n) where k = min(m, n)
     */
-  object reduced extends UFunc {
+  object reduced extends UFunc
 
     implicit object impl_reduced_DM_Double
-        extends Impl[DenseMatrix[Double], DenseQR] {
-      def apply(v: DenseMatrix[Double]): DenseQR = {
+        extends Impl[DenseMatrix[Double], DenseQR]
+      def apply(v: DenseMatrix[Double]): DenseQR =
         val (q, r) = doQr(v, skipQ = false)(mode = ReducedQR)
         QR(q, r)
-      }
-    }
 
     implicit object impl_reduced_DM_Float
-        extends Impl[DenseMatrix[Float], SDenseQR] {
-      def apply(v: DenseMatrix[Float]): SDenseQR = {
+        extends Impl[DenseMatrix[Float], SDenseQR]
+      def apply(v: DenseMatrix[Float]): SDenseQR =
         val (q, r) = doQr_Float(v, skipQ = false)(mode = ReducedQR)
         QR(q, r)
-      }
-    }
 
     /**
       * QR that just returns R with reduced size.
       */
-    object justR extends UFunc {
+    object justR extends UFunc
 
       implicit object impl_reduced_DM_Double
-          extends Impl[DenseMatrix[Double], DenseMatrix[Double]] {
-        def apply(v: DenseMatrix[Double]): DenseMatrix[Double] = {
+          extends Impl[DenseMatrix[Double], DenseMatrix[Double]]
+        def apply(v: DenseMatrix[Double]): DenseMatrix[Double] =
           doQr(v, skipQ = true)(mode = ReducedQR)._2
-        }
-      }
 
       implicit object impl_reduced_DM_Float
-          extends Impl[DenseMatrix[Float], DenseMatrix[Float]] {
-        def apply(v: DenseMatrix[Float]): DenseMatrix[Float] = {
+          extends Impl[DenseMatrix[Float], DenseMatrix[Float]]
+        def apply(v: DenseMatrix[Float]): DenseMatrix[Float] =
           doQr_Float(v, skipQ = true)(mode = ReducedQR)._2
-        }
-      }
 
       implicit def canJustQIfWeCanQR[T, M](
-          implicit qrImpl: qr.reduced.Impl[T, QR[M]]): Impl[T, M] = {
-        new Impl[T, M] {
+          implicit qrImpl: qr.reduced.Impl[T, QR[M]]): Impl[T, M] =
+        new Impl[T, M]
           def apply(v: T): M = qrImpl(v).r
-        }
-      }
-    }
 
     /**
       * QR that just returns Q with reduced size.
       */
-    object justQ extends UFunc {
+    object justQ extends UFunc
       implicit def canJustQIfWeCanQR[T, M](
-          implicit qrImpl: qr.reduced.Impl[T, QR[M]]): Impl[T, M] = {
-        new Impl[T, M] {
+          implicit qrImpl: qr.reduced.Impl[T, QR[M]]): Impl[T, M] =
+        new Impl[T, M]
           def apply(v: T): M = qrImpl(v).q
-        }
-      }
-    }
-  }
 
   private def doQr(M: DenseMatrix[Double], skipQ: Boolean)(
-      mode: QRMode): (DenseMatrix[Double], DenseMatrix[Double]) = {
+      mode: QRMode): (DenseMatrix[Double], DenseMatrix[Double]) =
 
     val A = M.copy
 
@@ -180,7 +151,7 @@ object qr extends UFunc {
 
     // Handle mode that don't return Q
     if (skipQ) (null, upperTriangular(A(0 until mn, ::)))
-    else {
+    else
       val Q =
         if (mode == CompleteQR && m > n) DenseMatrix.zeros[Double](m, m)
         else DenseMatrix.zeros[Double](m, n)
@@ -202,18 +173,14 @@ object qr extends UFunc {
       else if (info.`val` < 0) throw new IllegalArgumentException()
 
       // Upper triangle
-      cforRange(0 until mc) { i =>
-        cforRange(0 until min(i, A.cols)) { j =>
+      cforRange(0 until mc)  i =>
+        cforRange(0 until min(i, A.cols))  j =>
           A(i, j) = 0.0
-        }
-      }
 
       (Q(::, 0 until mc), A(0 until mc, ::))
-    }
-  }
 
   private def doQr_Float(M: DenseMatrix[Float], skipQ: Boolean)(
-      mode: QRMode): (DenseMatrix[Float], DenseMatrix[Float]) = {
+      mode: QRMode): (DenseMatrix[Float], DenseMatrix[Float]) =
 
     val A = M.copy
 
@@ -241,7 +208,7 @@ object qr extends UFunc {
 
     // Handle mode that don't return Q
     if (skipQ) (null, upperTriangular(A(0 until mn, ::)))
-    else {
+    else
       val Q =
         if (mode == CompleteQR && m > n) DenseMatrix.zeros[Float](m, m)
         else DenseMatrix.zeros[Float](m, n)
@@ -263,16 +230,11 @@ object qr extends UFunc {
       else if (info.`val` < 0) throw new IllegalArgumentException()
 
       // Upper triangle
-      cforRange(0 until mc) { i =>
-        cforRange(0 until min(i, A.cols)) { j =>
+      cforRange(0 until mc)  i =>
+        cforRange(0 until min(i, A.cols))  j =>
           A(i, j) = 0.0f
-        }
-      }
 
       (Q(::, 0 until mc), A(0 until mc, ::))
-    }
-  }
-}
 
 /**
   * QR Factorization with pivoting
@@ -284,14 +246,14 @@ object qr extends UFunc {
   *   P: n x n : permutation matrix (P(pvt(i),i) = 1)
   *   pvt : pivot indices
   */
-object qrp extends UFunc {
+object qrp extends UFunc
   case class QRP[M, PivotMatrix](
       q: M, r: M, pivotMatrix: PivotMatrix, pivotIndices: Array[Int])
 
   type DenseQRP = QRP[DenseMatrix[Double], DenseMatrix[Int]]
 
-  implicit object impl_DM_Double extends Impl[DenseMatrix[Double], DenseQRP] {
-    def apply(A: DenseMatrix[Double]): DenseQRP = {
+  implicit object impl_DM_Double extends Impl[DenseMatrix[Double], DenseQRP]
+    def apply(A: DenseMatrix[Double]): DenseQRP =
       val m = A.rows
       val n = A.cols
 
@@ -313,9 +275,8 @@ object qrp extends UFunc {
       val pvt = new Array[Int](n)
       val tau = new Array[Double](scala.math.min(m, n))
 
-      cforRange2(0 until m, 0 until n) { (r, c) =>
+      cforRange2(0 until m, 0 until n)  (r, c) =>
         AFact(r, c) = A(r, c)
-      }
 
       lapack.dgeqp3(
           m, n, AFact.data, m, pvt, tau, workspace, workspace.length, info)
@@ -328,11 +289,9 @@ object qrp extends UFunc {
       //Get R
       val R = DenseMatrix.zeros[Double](m, n)
 
-      cforRange(0 until min(n, maxd)) { c =>
-        cforRange(0 to min(m, c)) { r =>
+      cforRange(0 until min(n, maxd))  c =>
+        cforRange(0 to min(m, c))  r =>
           R(r, c) = AFact(r, c)
-        }
-      }
 
       //Get Q from the matrix returned by dgep3
       val Q = DenseMatrix.zeros[Double](m, m)
@@ -346,9 +305,8 @@ object qrp extends UFunc {
                     workspace.length,
                     info)
 
-      cforRange2(0 until m, 0 until min(m, maxd)) { (r, c) =>
+      cforRange2(0 until m, 0 until min(m, maxd))  (r, c) =>
         Q(r, c) = AFact(r, c)
-      }
 
       //Error check
       if (info.`val` > 0)
@@ -360,11 +318,7 @@ object qrp extends UFunc {
       pvt -= 1
       val P = DenseMatrix.zeros[Int](n, n)
 
-      cforRange(0 until n) { i =>
+      cforRange(0 until n)  i =>
         P(pvt(i), i) = 1
-      }
 
       QRP(Q, R, P, pvt)
-    }
-  }
-}

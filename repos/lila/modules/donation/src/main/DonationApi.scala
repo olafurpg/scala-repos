@@ -9,7 +9,7 @@ import reactivemongo.bson._
 final class DonationApi(coll: Coll,
                         weeklyGoal: Int,
                         serverDonors: Set[String],
-                        bus: lila.common.Bus) {
+                        bus: lila.common.Bus)
 
   private implicit val donationBSONHandler = Macros.handler[Donation]
 
@@ -25,9 +25,8 @@ final class DonationApi(coll: Coll,
                  List(
                      Group(BSONNull)("net" -> SumField("net"))
                  ))
-      .map {
+      .map
         ~_.documents.headOption.flatMap { _.getAs[Int]("net") }
-      }
 
   private val decentAmount = BSONDocument(
       "gross" -> BSONDocument("$gte" -> BSONInteger(minAmount)))
@@ -46,18 +45,17 @@ final class DonationApi(coll: Coll,
           List(GroupField("userId")("total" -> SumField("net")),
                Sort(Descending("total")),
                Limit(nb)))
-      .map {
+      .map
         _.documents.flatMap { _.getAs[String]("_id") }
-      }
 
   def isDonor(userId: String) =
     if (serverDonors contains userId) fuccess(true)
     else donorCache(userId)
 
-  def create(donation: Donation) = {
+  def create(donation: Donation) =
     coll insert donation recover lila.db.recoverDuplicateKey(
         e => println(e.getMessage)) void
-  } >> donation.userId.??(donorCache.remove) >>- progress.foreach { prog =>
+  >> donation.userId.??(donorCache.remove) >>- progress.foreach  prog =>
     bus.publish(lila.hub.actorApi.DonationEvent(
                     userId = donation.userId,
                     gross = donation.gross,
@@ -65,9 +63,8 @@ final class DonationApi(coll: Coll,
                     message = donation.message.trim.some.filter(_.nonEmpty),
                     progress = prog.percent),
                 'donation)
-  }
 
-  def progress: Fu[Progress] = {
+  def progress: Fu[Progress] =
     val from =
       DateTime.now withDayOfWeek 1 withHourOfDay 0 withMinuteOfHour 0 withSecondOfMinute 0
     val to = from plusWeeks 1
@@ -80,14 +77,11 @@ final class DonationApi(coll: Coll,
           BSONDocument("net" -> true, "_id" -> false)
       )
       .cursor[BSONDocument]()
-      .collect[List]() map2 { (obj: BSONDocument) =>
+      .collect[List]() map2  (obj: BSONDocument) =>
       ~obj.getAs[Int]("net")
-    } map (_.sum) map { amount =>
+    map (_.sum) map  amount =>
       Progress(from, weeklyGoal, amount)
-    } addEffect { prog =>
+    addEffect  prog =>
       lila.mon.donation.goal(prog.goal)
       lila.mon.donation.current(prog.current)
       lila.mon.donation.percent(prog.percent)
-    }
-  }
-}

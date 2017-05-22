@@ -17,8 +17,8 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class GroupsResourceTest
-    extends MarathonSpec with Matchers with Mockito with GivenWhenThen {
-  test("dry run update") {
+    extends MarathonSpec with Matchers with Mockito with GivenWhenThen
+  test("dry run update")
     Given("A real Group Manager with no groups")
     useRealGroupManager()
     groupRepository.group(GroupRepository.zkRootName) returns Future
@@ -46,9 +46,8 @@ class GroupsResourceTest
     val secondStep = (steps.last \ "actions").as[Seq[JsObject]].head
     assert((secondStep \ "type").as[String] == "ScaleApplication")
     assert((secondStep \ "app").as[String] == "/test/app")
-  }
 
-  test("access without authentication is denied") {
+  test("access without authentication is denied")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -98,9 +97,8 @@ class GroupsResourceTest
     val delete = groupsResource.delete("", false, req)
     Then("we receive a NotAuthenticated response")
     delete.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
-  test("access without authorization is denied if the resource exists") {
+  test("access without authorization is denied if the resource exists")
     Given("A real group manager with one app")
     useRealGroupManager()
     val group = Group(PathId.empty, apps = Set(AppDefinition("/a".toRootPath)))
@@ -146,10 +144,9 @@ class GroupsResourceTest
     val delete = groupsResource.delete("", false, req)
     Then("we receive a Not Authorized response")
     delete.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   test(
-      "authenticated delete without authorization leads to a 404 if the resource doesn't exist") {
+      "authenticated delete without authorization leads to a 404 if the resource doesn't exist")
     Given("A real group manager with no apps")
     useRealGroupManager()
     groupRepository.group("/") returns Future.successful(None)
@@ -165,13 +162,11 @@ class GroupsResourceTest
     When(s"the group is deleted")
     Then("we get a 404")
     // FIXME (gkleiman): this leads to an ugly stack trace
-    intercept[UnknownGroupException] {
+    intercept[UnknownGroupException]
       groupsResource.delete("/foo", false, req)
-    }
-  }
 
   test(
-      "Group Versions for root are transferred as simple json string array (Fix #2329)") {
+      "Group Versions for root are transferred as simple json string array (Fix #2329)")
     Given("Specific Group versions")
     val groupVersions = Seq(Timestamp.now(), Timestamp.now())
     groupManager.versions(PathId.empty) returns Future.successful(
@@ -187,10 +182,9 @@ class GroupsResourceTest
     rootVersionsResponse.getStatus should be(200)
     rootVersionsResponse.getEntity should be(
         Json.toJson(groupVersions).toString())
-  }
 
   test(
-      "Group Versions for path are transferred as simple json string array (Fix #2329)") {
+      "Group Versions for path are transferred as simple json string array (Fix #2329)")
     Given("Specific group versions")
     val groupVersions = Seq(Timestamp.now(), Timestamp.now())
     groupManager.versions(any) returns Future.successful(
@@ -208,10 +202,9 @@ class GroupsResourceTest
     rootVersionsResponse.getStatus should be(200)
     rootVersionsResponse.getEntity should be(
         Json.toJson(groupVersions).toString())
-  }
 
   test(
-      "Creation of a group with same path as an existing app should be prohibited (fixes #3385)") {
+      "Creation of a group with same path as an existing app should be prohibited (fixes #3385)")
     Given("A real group manager with one app")
     useRealGroupManager()
     val group = Group("/group".toRootPath,
@@ -225,13 +218,11 @@ class GroupsResourceTest
         Json.toJson(GroupUpdate(id = Some("/group/app".toRootPath))))
 
     Then("we get a 409")
-    intercept[ConflictingChangeException] {
+    intercept[ConflictingChangeException]
       groupsResource.create(false, body.getBytes, auth.request)
-    }
-  }
 
   test(
-      "Creation of a group with same path as an existing group should be prohibited") {
+      "Creation of a group with same path as an existing group should be prohibited")
     Given("A real group manager with one app")
     useRealGroupManager()
     val group = Group("/group".toRootPath)
@@ -244,10 +235,8 @@ class GroupsResourceTest
       Json.stringify(Json.toJson(GroupUpdate(id = Some("/group".toRootPath))))
 
     Then("we get a 409")
-    intercept[ConflictingChangeException] {
+    intercept[ConflictingChangeException]
       groupsResource.create(false, body.getBytes, auth.request)
-    }
-  }
 
   var config: MarathonConf = _
   var groupManager: GroupManager = _
@@ -257,7 +246,7 @@ class GroupsResourceTest
   var groupInfo: GroupInfoService = _
   val embed: java.util.Set[String] = Collections.emptySet()
 
-  before {
+  before
     auth = new TestAuthFixture
     config = mock[MarathonConf]
     groupManager = mock[GroupManager]
@@ -265,9 +254,8 @@ class GroupsResourceTest
         groupManager, groupInfo, auth.auth, auth.auth, config)
 
     config.zkTimeoutDuration returns 1.second
-  }
 
-  private[this] def useRealGroupManager(): Unit = {
+  private[this] def useRealGroupManager(): Unit =
     val f = new TestGroupManagerFixture()
     config = f.config
     groupRepository = f.groupRepository
@@ -277,5 +265,3 @@ class GroupsResourceTest
 
     groupsResource = new GroupsResource(
         groupManager, groupInfo, auth.auth, auth.auth, config)
-  }
-}

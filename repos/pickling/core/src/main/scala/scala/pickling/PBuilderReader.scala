@@ -4,7 +4,7 @@ import scala.language.experimental.macros
 
 import scala.reflect.runtime.universe._
 // TODO - Document this, specifically what pinHints means.
-trait Hintable {
+trait Hintable
 
   /** Hints at the expected (byte) size of the entry we're about to write.. */
   def hintKnownSize(knownSize: Int): this.type
@@ -35,7 +35,6 @@ trait Hintable {
 
   /** Pops to the previously saved set of hints. */
   def popHints(): this.type
-}
 
 /**
   * A builder of pickled content.  This is a mutable API, intended to be called in certain specific ways.
@@ -79,7 +78,7 @@ trait Hintable {
   *   - ArrayFloat
   *   - ArrayDouble
   */
-trait PBuilder extends Hintable {
+trait PBuilder extends Hintable
 
   /** Called to denote that an object is about to be serialized.
     * @param picklee
@@ -130,7 +129,6 @@ trait PBuilder extends Hintable {
 
   /** Return the resulting pickle of this builder. */
   def result(): Pickle
-}
 // Abstract shim for Java.
 abstract class AbtsractPBuilder extends PBuilder with PickleTools
 
@@ -174,7 +172,7 @@ abstract class AbtsractPBuilder extends PBuilder with PickleTools
   *   - ArrayFloat
   *   - ArrayDouble
   */
-trait PReader extends Hintable {
+trait PReader extends Hintable
 
   /** Start reading a pickled value.  
     *  This will return any serialized type tag key string.   This string can be used
@@ -217,7 +215,6 @@ trait PReader extends Hintable {
 
   /** Denote that we are done reading a collection. */
   def endCollection(): Unit
-}
 
 // Abstract class for Java implementors of picklers.
 abstract class AbstractPReader extends PReader with PickleTools

@@ -31,6 +31,5 @@ package scala.scalajs.js.annotation
   *  }}}
   *  @see [[http://www.scala-js.org/doc/export-to-javascript.html Export Scala.js APIs to JavaScript]]
   */
-class JSExportNamed extends scala.annotation.StaticAnnotation {
+class JSExportNamed extends scala.annotation.StaticAnnotation
   def this(name: String) = this()
-}

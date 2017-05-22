@@ -16,7 +16,7 @@
 
 package net.liftweb
 
-package object json {
+package object json
   import java.io.Reader
 
   type JValue = JsonAST.JValue
@@ -54,4 +54,3 @@ package object json {
 
   def prettyRender(value: JValue): String = JsonAST.prettyRender(value)
   def compactRender(value: JValue): String = JsonAST.compactRender(value)
-}

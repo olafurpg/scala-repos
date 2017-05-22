@@ -10,6 +10,5 @@ package org.scalajs
 
 import scala.concurrent.duration._
 
-package object testadapter {
+package object testadapter
   private[testadapter] final val VMTermTimeout = 5.seconds
-}

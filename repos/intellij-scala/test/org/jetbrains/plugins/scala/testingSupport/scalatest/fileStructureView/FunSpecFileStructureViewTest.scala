@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 20.04.2015.
   */
-trait FunSpecFileStructureViewTest extends ScalaTestTestCase {
+trait FunSpecFileStructureViewTest extends ScalaTestTestCase
   private val className = "FunSpecViewTest"
 
-  def addFunSpecViewTest(): Unit = {
+  def addFunSpecViewTest(): Unit =
     addFileToProject(className + ".scala",
                      """
         |import org.scalatest._
@@ -28,37 +28,30 @@ trait FunSpecFileStructureViewTest extends ScalaTestTestCase {
         |  ignore("pending_and_ignore") (pending)
         |}
       """.stripMargin)
-  }
 
-  def testFunSpecNormal() {
+  def testFunSpecNormal()
     addFunSpecViewTest()
     runFileStructureViewTest(
         className, normalStatusId, "describe(\"parent\")", "it (\"child1\")")
-  }
 
-  def testFunSpecHierarchy(): Unit = {
+  def testFunSpecHierarchy(): Unit =
     addFunSpecViewTest()
     runFileStructureViewTest(
         className, "it (\"child1\")", Some("describe(\"parent\")"))
-  }
 
-  def testFunSpecIgnored(): Unit = {
+  def testFunSpecIgnored(): Unit =
     addFunSpecViewTest()
     runFileStructureViewTest(
         className, ignoredStatusId, "ignore (\"ignore1\")")
-  }
 
-  def testFunSpecIgnoredAndPending(): Unit = {
+  def testFunSpecIgnoredAndPending(): Unit =
     addFunSpecViewTest()
     runFileStructureViewTest(
         className, ignoredStatusId, "ignore(\"pending_and_ignore\")")
-  }
 
-  def testFunSpecPending(): Unit = {
+  def testFunSpecPending(): Unit =
     addFunSpecViewTest()
     runFileStructureViewTest(className,
                              pendingStatusId,
                              "describe(\"pending\")",
                              "they (\"child2\")")
-  }
-}

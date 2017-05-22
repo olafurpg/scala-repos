@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Boolean]] => [[scala.runtime.RichBoolean]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Boolean private extends AnyVal {
+final abstract class Boolean private extends AnyVal
 
   /** Negates a Boolean expression.
     *
@@ -104,9 +104,8 @@ final abstract class Boolean private extends AnyVal {
   def ^(x: Boolean): Boolean
 
   override def getClass(): Class[Boolean] = null
-}
 
-object Boolean extends AnyValCompanion {
+object Boolean extends AnyValCompanion
 
   /** Transform a value type into a boxed reference type.
     *
@@ -132,4 +131,3 @@ object Boolean extends AnyValCompanion {
 
   /** The String representation of the scala.Boolean companion object. */
   override def toString = "object scala.Boolean"
-}

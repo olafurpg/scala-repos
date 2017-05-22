@@ -1,11 +1,7 @@
-object Test extends App {
+object Test extends App
   test.Test.test
-}
 
-package test {
-  object Test {
-    def test = {
+package test
+  object Test
+    def test =
       Macros.foo
-    }
-  }
-}

@@ -39,7 +39,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class InputMethodTextRunSpec
     extends SimpleSFXDelegateSpec[
         jfxsi.InputMethodTextRun, InputMethodTextRun](
-        classOf[jfxsi.InputMethodTextRun], classOf[InputMethodTextRun]) {
+        classOf[jfxsi.InputMethodTextRun], classOf[InputMethodTextRun])
 
   override protected def getJavaClassInstance =
     new jfxsi.InputMethodTextRun(
@@ -47,4 +47,3 @@ class InputMethodTextRunSpec
   override protected def getScalaClassInstance =
     new InputMethodTextRun(
         "Coffee rules", InputMethodHighlight.SELECTED_CONVERTED)
-}

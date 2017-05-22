@@ -12,7 +12,7 @@ import scala.reflect.internal.util.{Position, SourceFile, FreshNameCreator}
 /** Methods for building trees, used in the parser.  All the trees
   *  returned by this class must be untyped.
   */
-abstract class TreeBuilder {
+abstract class TreeBuilder
   val global: Global
   import global._
 
@@ -50,33 +50,27 @@ abstract class TreeBuilder {
     ValDef(Modifiers(PRIVATE), name, tpt, EmptyTree)
 
   /** Tree for `od op`, start is start0 if od.pos is borked. */
-  def makePostfixSelect(start0: Int, end: Int, od: Tree, op: Name): Tree = {
+  def makePostfixSelect(start0: Int, end: Int, od: Tree, op: Name): Tree =
     val start = if (od.pos.isDefined) od.pos.start else start0
-    atPos(r2p(start, end, end + op.length)) {
+    atPos(r2p(start, end, end + op.length))
       new PostfixSelect(od, op.encode)
-    }
-  }
 
   /** Create tree representing a while loop */
-  def makeWhile(startPos: Int, cond: Tree, body: Tree): Tree = {
+  def makeWhile(startPos: Int, cond: Tree, body: Tree): Tree =
     val lname = freshTermName(nme.WHILE_PREFIX)
-    def default = wrappingPos(List(cond, body)) match {
+    def default = wrappingPos(List(cond, body)) match
       case p if p.isDefined => p.end
       case _ => startPos
-    }
-    val continu = atPos(o2p(body.pos pointOrElse default)) {
+    val continu = atPos(o2p(body.pos pointOrElse default))
       Apply(Ident(lname), Nil)
-    }
     val rhs = If(cond, Block(List(body), continu), Literal(Constant(())))
     LabelDef(lname, Nil, rhs)
-  }
 
   /** Create tree representing a do-while loop */
-  def makeDoWhile(lname: TermName, body: Tree, cond: Tree): Tree = {
+  def makeDoWhile(lname: TermName, body: Tree, cond: Tree): Tree =
     val continu = Apply(Ident(lname), Nil)
     val rhs = Block(List(body), If(cond, continu, Literal(Constant(()))))
     LabelDef(lname, Nil, rhs)
-  }
 
   /** Create block of statements `stats`  */
   def makeBlock(stats: List[Tree]): Tree = gen.mkBlock(stats)
@@ -88,13 +82,11 @@ abstract class TreeBuilder {
     TypeDef(Modifiers(DEFERRED | SYNTHETIC), pname, Nil, bounds)
 
   /** Create tree for a pattern alternative */
-  def makeAlternative(ts: List[Tree]): Tree = {
-    def alternatives(t: Tree): List[Tree] = t match {
+  def makeAlternative(ts: List[Tree]): Tree =
+    def alternatives(t: Tree): List[Tree] = t match
       case Alternative(ts) => ts
       case _ => List(t)
-    }
     Alternative(ts flatMap alternatives)
-  }
 
   /** Create tree for case definition <case pat if guard => rhs> */
   def makeCaseDef(pat: Tree, guard: Tree, rhs: Tree): CaseDef =
@@ -106,7 +98,7 @@ abstract class TreeBuilder {
     *        if (catchFn isDefinedAt x) catchFn(x) else throw x
     *    }
     */
-  def makeCatchFromExpr(catchExpr: Tree): CaseDef = {
+  def makeCatchFromExpr(catchExpr: Tree): CaseDef =
     val binder = freshTermName()
     val pat = Bind(binder, Typed(Ident(nme.WILDCARD), Ident(tpnme.Throwable)))
     val catchDef = ValDef(
@@ -122,7 +114,6 @@ abstract class TreeBuilder {
             )
         ))
     makeCaseDef(pat, EmptyTree, body)
-  }
 
   /** Create a tree representing the function type (argtpes) => restpe */
   def makeFunctionTypeTree(argtpes: List[Tree], restpe: Tree): Tree =
@@ -131,9 +122,9 @@ abstract class TreeBuilder {
   /** Append implicit parameter section if `contextBounds` nonempty */
   def addEvidenceParams(owner: Name,
                         vparamss: List[List[ValDef]],
-                        contextBounds: List[Tree]): List[List[ValDef]] = {
+                        contextBounds: List[Tree]): List[List[ValDef]] =
     if (contextBounds.isEmpty) vparamss
-    else {
+    else
       val mods = Modifiers(
           if (owner.isTypeName) PARAMACCESSOR | LOCAL | PRIVATE else PARAM)
       def makeEvidenceParam(tpt: Tree) =
@@ -147,9 +138,6 @@ abstract class TreeBuilder {
       if (vparamssLast.nonEmpty && vparamssLast.head.mods.hasFlag(IMPLICIT))
         vparamss.init ::: List(evidenceParams ::: vparamssLast)
       else vparamss ::: List(evidenceParams)
-    }
-  }
 
   def makePatDef(mods: Modifiers, pat: Tree, rhs: Tree) =
     gen.mkPatDef(mods, pat, rhs)
-}

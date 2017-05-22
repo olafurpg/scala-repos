@@ -41,16 +41,15 @@ import scalafx.util.StringConverter
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/package-summary.html `javafx.scene.control.cell`]] package.
   */
-package object cell {
+package object cell
 
   /**
     * Types that contains the method `converterProperty(): jfxbp.ObjectProperty[jfxu.StringConverter[T]]`
     *
     * @tparam J Original Java type used by converter.
     */
-  type Convertable[J] = {
+  type Convertable[J] =
     def converterProperty(): jfxbp.ObjectProperty[jfxu.StringConverter[J]]
-  }
 
   /**
     * Cells which delegate contains the method `converterProperty(): jfxbp.ObjectProperty[jfxu.StringConverter[T]]`
@@ -60,24 +59,21 @@ package object cell {
     * @tparam J Original Java type used by converter.
     */
   trait ConvertableCell[C <: jfxsc.Cell[T] with Convertable[J], T, J]
-      extends SFXDelegate[C] {
+      extends SFXDelegate[C]
 
     /**
       * The `StringConverter` property.
       */
     def converter: ObjectProperty[StringConverter[J]] =
       ObjectProperty(delegate.converterProperty().getValue)
-    def converter_=(v: StringConverter[J]) {
+    def converter_=(v: StringConverter[J])
       converter() = v
-    }
-  }
 
   /**
     * Types that contains the method `comboBoxEditableProperty(): jfxbp.BooleanProperty`
     */
-  type ComboBoxEditable = {
+  type ComboBoxEditable =
     def comboBoxEditableProperty(): jfxbp.BooleanProperty
-  }
 
   /**
     * Cells which delegate contains the method `comboBoxEditableProperty(): jfxbp.BooleanProperty`.
@@ -86,16 +82,14 @@ package object cell {
     * @tparam C  Derivated type from JavaFX Cell
     */
   trait ComboBoxEditableCell[C <: jfxsc.Cell[T] with ComboBoxEditable, T]
-      extends SFXDelegate[C] {
+      extends SFXDelegate[C]
 
     /**
       * A property representing whether the `ComboBox`, when shown to the user, is editable or not.
       */
     def comboBoxEditable: BooleanProperty = delegate.comboBoxEditableProperty()
-    def comboBoxEditable_=(v: Boolean) {
+    def comboBoxEditable_=(v: Boolean)
       comboBoxEditable() = v
-    }
-  }
 
   /**
     * Cells which delegate contains the method `updateItem(item: Any, empty: Boolean): Unit`.
@@ -103,7 +97,7 @@ package object cell {
     * @tparam T The type of the elements contained within the inner element inside the Cell.
     * @tparam C  Derivated type from JavaFX Cell
     */
-  trait UpdatableCell[C <: jfxsc.Cell[T], T] extends SFXDelegate[C] {
+  trait UpdatableCell[C <: jfxsc.Cell[T], T] extends SFXDelegate[C]
     /* IMPLEMENTATION NOTE: 
      * Unlike to what happened with other traits of this package object, it was not possible create a type like 
      * "type Updated[T] = { def updateItem(item: T, empty: Boolean): Unit }". In this case, the compiler shows this 
@@ -115,9 +109,8 @@ package object cell {
     /**
       * Types that contains the method `updateItem(item: Any, empty: Boolean): Unit`
       */
-    type Updated = {
+    type Updated =
       def updateItem(item: Any, empty: Boolean)
-    }
 
     /**
       * Updates the item associated with this Cell.
@@ -126,19 +119,16 @@ package object cell {
       * @param empty whether or not this cell represents data from the list. If it is empty, then it does not
       *              represent any domain data, but is a cell being used to render an "empty" row.
       */
-    def updateItem(item: T, empty: Boolean) {
+    def updateItem(item: T, empty: Boolean)
       delegate.asInstanceOf[Updated].updateItem(item, empty)
-    }
-  }
 
   /**
     * Types that contains the method `getItems(): ObservableList[T]`.
     *
     * @tparam T The type of the elements contained within the inner element inside the Cell.
     */
-  type Itemable[T] = {
+  type Itemable[T] =
     def getItems(): jfxc.ObservableList[T]
-  }
 
   /**
     * [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Cell.html javafx.scene.control.Cell]]s that contains the method `getItems(): ObservableList[T]`.
@@ -147,13 +137,12 @@ package object cell {
     * @tparam C  Derived type from JavaFX Cell
     */
   trait ItemableCell[C <: jfxsc.Cell[T] with Itemable[T], T]
-      extends SFXDelegate[C] {
+      extends SFXDelegate[C]
 
     /**
       * Returns the items to be displayed in the ChoiceBox when it is showing.
       */
     def items = delegate.getItems()
-  }
 
   /**
     * Converts a Function of type `T => ObservableValue[Boolean, java.lang.Boolean]` to a JavaFX `Callback` of type
@@ -164,19 +153,17 @@ package object cell {
   private[cell] implicit def selectedBooleanPropertyToGetSelectedProperty[T](
       selectedProperty: T => ObservableValue[Boolean, java.lang.Boolean])
     : jfxu.Callback[T, jfxbv.ObservableValue[java.lang.Boolean]] =
-    new jfxu.Callback[T, jfxbv.ObservableValue[java.lang.Boolean]] {
+    new jfxu.Callback[T, jfxbv.ObservableValue[java.lang.Boolean]]
       def call(x: T) = selectedProperty(x)
-    }
 
   /**
     * Types that contains the property `selectedStateCallback`.
     *
     * @tparam J Original Java type used by converter.
     */
-  type StateSelectable[J] = {
+  type StateSelectable[J] =
     def selectedStateCallbackProperty(): jfxbp.ObjectProperty[jfxu.Callback[
             J, jfxbv.ObservableValue[java.lang.Boolean]]]
-  }
 
   /**
     * Cells which delegate contains the property `selectedStateCallback`.
@@ -190,15 +177,12 @@ package object cell {
     * @tparam J Original Java type used by converter.
     */
   trait StateSelectableCell[C <: jfxsc.Cell[T] with StateSelectable[J], T, J]
-      extends SFXDelegate[C] {
+      extends SFXDelegate[C]
 
     /**
       * Property representing the Callback that is bound to by the element inside the Cell shown on screen.
       */
     def selectedStateCallback = delegate.selectedStateCallbackProperty()
     def selectedStateCallback_=(
-        v: J => ObservableValue[Boolean, java.lang.Boolean]) {
+        v: J => ObservableValue[Boolean, java.lang.Boolean])
       selectedStateCallback() = v
-    }
-  }
-}

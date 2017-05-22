@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventType
 
-object KeyEvent {
+object KeyEvent
   implicit def sfxKeyEvent2jfx(ke: KeyEvent): jfxsi.KeyEvent =
     if (ke != null) ke.delegate else null
 
@@ -61,10 +61,9 @@ object KeyEvent {
     * This event occurs when a key has been typed (pressed and released).
     */
   val KeyTyped: EventType[jfxsi.KeyEvent] = jfxsi.KeyEvent.KEY_TYPED
-}
 
 class KeyEvent(override val delegate: jfxsi.KeyEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.KeyEvent] {
+    extends InputEvent(delegate) with SFXDelegate[jfxsi.KeyEvent]
 
   /**
     * The unicode character associated with the key typed event.
@@ -106,4 +105,3 @@ class KeyEvent(override val delegate: jfxsi.KeyEvent)
     * Returns whether or not the host platform common shortcut modifier is down on this event.
     */
   def shortcutDown: Boolean = delegate.isShortcutDown
-}

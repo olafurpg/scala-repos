@@ -35,37 +35,31 @@ import scala.reflect.ClassTag
 @SerialVersionUID(1)
 class ArrayMap[@specialized V](defValue: => V, private val arr: ArrayBuffer[V])
     extends scala.collection.mutable.Map[Int, V]
-    with MapLike[Int, V, ArrayMap[V]] with Serializable {
+    with MapLike[Int, V, ArrayMap[V]] with Serializable
   def this(defValue: => V = ArrayMap.error) =
     this(defValue, new ArrayBuffer[V]())
   override def default(i: Int): V = defValue
-  override def apply(i: Int) = {
-    if (i < arr.length) {
+  override def apply(i: Int) =
+    if (i < arr.length)
       arr(i)
-    } else {
+    else
       update(i, default(i))
       arr(i)
-    }
-  }
   override def get(i: Int) = if (i < arr.length) Some(arr(i)) else None
   override def +=(k: (Int, V)): this.type = { update(k._1, k._2); this }
   override def clear = arr.clear()
 
-  override def getOrElseUpdate(i: Int, v: => V) = {
-    if (i >= arr.length) {
+  override def getOrElseUpdate(i: Int, v: => V) =
+    if (i >= arr.length)
       update(i, v)
-    }
     arr(i)
-  }
 
-  override def update(i: Int, v: V) {
-    while (i > arr.length) {
+  override def update(i: Int, v: V)
+    while (i > arr.length)
       arr += default(arr.length)
-    }
 
     if (i == arr.length) arr += v
     else arr(i) = v;
-  }
 
   override def empty = new ArrayMap(defValue)
 
@@ -76,7 +70,7 @@ class ArrayMap[@specialized V](defValue: => V, private val arr: ArrayBuffer[V])
   override def size = arr.size
   def iterator = keysIterator zip valuesIterator
   override def keysIterator = (0 until arr.length).iterator
-  override def keys: Set[Int] = new Set[Int] {
+  override def keys: Set[Int] = new Set[Int]
     def iterator = keysIterator
 
     def -(elem: Int) = if (!contains(elem)) this else Set.empty ++ keys - elem
@@ -84,16 +78,13 @@ class ArrayMap[@specialized V](defValue: => V, private val arr: ArrayBuffer[V])
     def +(elem: Int) = if (contains(elem)) this else Set.empty ++ keys + elem
 
     def contains(i: Int) = i < arr.length && i > 0
-  }
   override def valuesIterator = arr.iterator
 
   /**
     * Returns the array we're holding on to.
     */
   def innerArray(implicit w: ClassTag[V]): Array[V] = arr.toArray
-}
 
-object ArrayMap {
+object ArrayMap
   def error =
     throw new NoSuchElementException("Key not found, and no default value")
-}

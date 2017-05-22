@@ -2,7 +2,7 @@ package lila.lobby
 
 import org.joda.time.DateTime
 
-object HookRepo {
+object HookRepo
 
   private var hooks = Vector[Hook]()
 
@@ -13,11 +13,10 @@ object HookRepo {
   def findCompatible(hook: Hook): Vector[Hook] =
     hooks filter (_ compatibleWith hook)
 
-  def truncateIfNeeded = if (size >= hardLimit) {
+  def truncateIfNeeded = if (size >= hardLimit)
     logger.warn(s"Found ${size} hooks, cleaning up!")
     cleanupOld
     hooks = hooks.take(hardLimit / 2)
-  }
 
   def vector = hooks
 
@@ -30,25 +29,20 @@ object HookRepo {
   def notInUids(uids: Set[String]): Vector[Hook] =
     hooks.filterNot(h => uids(h.uid))
 
-  def save(hook: Hook) {
+  def save(hook: Hook)
     hooks = hooks.filterNot(_.id == hook.id) :+ hook
-  }
 
-  def remove(hook: Hook) {
+  def remove(hook: Hook)
     hooks = hooks filterNot (_.id == hook.id)
-  }
 
   // returns removed hooks
-  def cleanupOld = {
+  def cleanupOld =
     val limit = DateTime.now minusMinutes 10
     partition(_.createdAt isAfter limit)
-  }
 
   // keeps hooks that hold true
   // returns removed hooks
-  private def partition(f: Hook => Boolean): Vector[Hook] = {
+  private def partition(f: Hook => Boolean): Vector[Hook] =
     val (kept, removed) = hooks partition f
     hooks = kept
     removed
-  }
-}

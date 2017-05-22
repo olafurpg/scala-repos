@@ -1,7 +1,7 @@
 /**
   *  Testing scaladoc implicits chaining
   */
-package scala.test.scaladoc.implicits {
+package scala.test.scaladoc.implicits
 
   import language.implicitConversions // according to SIP18
 
@@ -12,7 +12,7 @@ package scala.test.scaladoc.implicits {
   class Implicit2[T](c: Implicit3[T])
   class Implicit3[T]( /* and so on */ )
 
-  object chaining {
+  object chaining
 
     // the base conversion
     implicit def convertToZ[T](a: A[T])(implicit b: Implicit1[T]): Z[A[T]] =
@@ -52,10 +52,7 @@ package scala.test.scaladoc.implicits {
     /** no conversion */
     class F extends A[Intermediate[String, Double]]
 
-    object scalacTest {
+    object scalacTest
       (new B).a
       (new D).a
       (new E).a
-    }
-  }
-}

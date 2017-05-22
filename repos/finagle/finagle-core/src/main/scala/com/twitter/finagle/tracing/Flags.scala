@@ -1,6 +1,6 @@
 package com.twitter.finagle.tracing
 
-object Flags {
+object Flags
   /*
    * The debug flag is used to ensure this the current trace passes
    * all of the sampling stages.
@@ -20,13 +20,12 @@ object Flags {
     * @return a flags instance with no flags set.
     */
   def apply(): Flags = Empty
-}
 
 /**
   * Represents flags that can be passed along in request headers.
   * @param flags Initial flag state. May be 0.
   */
-case class Flags(flags: Long) {
+case class Flags(flags: Long)
 
   /**
     * @param field Is this flag set or not? Pass a field identifier from the Flags object.
@@ -43,9 +42,8 @@ case class Flags(flags: Long) {
     * @param fields Fields to set. Pass field identifiers from the Flags object.
     * @return a new Flags object with the flags set
     */
-  def setFlags(fields: Seq[Long]): Flags = {
+  def setFlags(fields: Seq[Long]): Flags =
     Flags(fields.reduceLeft((a, b) => a | b))
-  }
 
   /**
     * Convenience method to check if the debug flag is set.
@@ -61,4 +59,3 @@ case class Flags(flags: Long) {
     * @return a long that we can use to pass in the tracing header
     */
   def toLong = flags
-}

@@ -32,12 +32,12 @@ import net.liftweb.common.Failure
 /**
   * System under specification for MongoDirect.
   */
-class MongoDirectSpec extends Specification with MongoTestKit {
+class MongoDirectSpec extends Specification with MongoTestKit
   "MongoDirect Specification".title
 
   def date(s: String) = DefaultFormats.dateFormat.parse(s).get
 
-  "Mongo tutorial example" in {
+  "Mongo tutorial example" in
 
     checkMongoIsRunning
 
@@ -57,7 +57,6 @@ class MongoDirectSpec extends Specification with MongoTestKit {
 
     // use the Mongo instance directly
     MongoDB.use(DefaultConnectionIdentifier)(db =>
-          {
         val coll = db.getCollection("testCollection")
 
         // save the doc to the db
@@ -90,30 +89,26 @@ class MongoDirectSpec extends Specification with MongoTestKit {
         coll.findOne.get("type") must_== "docdb"
         coll.findOne.get("count") must_== 3
 
-        if (!debug) {
+        if (!debug)
           // delete it
           coll.remove(new BasicDBObject("_id", doc.get("_id")))
           coll.find.count must_== 0
           coll.drop
-        }
 
         // server-side eval
         val six = db.eval(" function() { return 3+3; } ")
         six must_== 6
-    })
-  }
+    )
 
-  "Mongo tutorial 2 example" in {
+  "Mongo tutorial 2 example" in
 
     checkMongoIsRunning
 
     // use a DBCollection directly
     MongoDB.useCollection("iDoc")(coll =>
-          {
         // insert multiple documents
-        for (i <- List.range(1, 101)) {
+        for (i <- List.range(1, 101))
           coll.insert(new BasicDBObject().append("i", i))
-        }
 
         // create an index
         coll.createIndex(new BasicDBObject("i", 1)) // create index on "i", ascending
@@ -156,10 +151,9 @@ class MongoDirectSpec extends Specification with MongoTestKit {
           .limit(3)
 
         var cntr5 = 0
-        while (cur5.hasNext) {
+        while (cur5.hasNext)
           cur5.next
           cntr5 += 1
-        }
         cntr5 must_== 3
 
         // skip
@@ -168,53 +162,47 @@ class MongoDirectSpec extends Specification with MongoTestKit {
           .skip(10)
 
         var cntr6 = 0
-        while (cur6.hasNext) {
+        while (cur6.hasNext)
           cntr6 += 1
           cur6.next.get("i") must_== 60 + cntr6
-        }
         cntr6 must_== 40
 
         /* skip and limit */
         val cur7 = coll.find.skip(10).limit(20)
 
         var cntr7 = 0
-        while (cur7.hasNext) {
+        while (cur7.hasNext)
           cntr7 += 1
           cur7.next.get("i") must_== 10 + cntr7
-        }
         cntr7 must_== 20
 
         // sorting
         val cur8 = coll.find.sort(new BasicDBObject("i", -1)) // descending
 
         var cntr8 = 100
-        while (cur8.hasNext) {
+        while (cur8.hasNext)
           cur8.next.get("i") must_== cntr8
           cntr8 -= 1
-        }
 
         // remove some docs by a query
         coll.remove(new BasicDBObject("i", new BasicDBObject("$gt", 50)))
 
         coll.find.count must_== 50
 
-        if (!debug) {
+        if (!debug)
           // delete the rest of the rows
           coll.remove(new BasicDBObject("i", new BasicDBObject("$lte", 50)))
           coll.find.count must_== 0
           coll.drop
-        }
-    })
+    )
     success
-  }
 
-  "Mongo more examples" in {
+  "Mongo more examples" in
 
     checkMongoIsRunning
 
     // use a Mongo instance directly
     MongoDB.use(db =>
-          {
         val coll = db.getCollection("testCollection")
 
         // create a unique index on name
@@ -241,10 +229,9 @@ class MongoDirectSpec extends Specification with MongoTestKit {
         // save the docs to the db
         Helpers.tryo(coll.save(doc, WriteConcern.SAFE)).toOption must beSome
         coll.save(doc2, WriteConcern.SAFE) must throwA[MongoException]
-        Helpers.tryo(coll.save(doc2, WriteConcern.SAFE)) must beLike {
+        Helpers.tryo(coll.save(doc2, WriteConcern.SAFE)) must beLike
           case Failure(msg, _, _) =>
             msg must contain("E11000")
-        }
         Helpers.tryo(coll.save(doc3, WriteConcern.SAFE)).toOption must beSome
 
         // query for the docs by type
@@ -274,21 +261,19 @@ class MongoDirectSpec extends Specification with MongoTestKit {
               .get)
         cur2.count must_== 1
 
-        if (!debug) {
+        if (!debug)
           // delete them
           coll.remove(new BasicDBObject("type", "db")).getN must_== 2
           coll.find.count must_== 0
           coll.drop
-        }
-    })
+    )
     success
-  }
 
-  "UUID Example" in {
+  "UUID Example" in
 
     checkMongoIsRunning
 
-    MongoDB.useCollection("examples.uuid") { coll =>
+    MongoDB.useCollection("examples.uuid")  coll =>
       val uuid = UUID.randomUUID
       val dbo = new BasicDBObject("_id", uuid).append("name", "dbo")
       coll.save(dbo)
@@ -298,6 +283,3 @@ class MongoDirectSpec extends Specification with MongoTestKit {
 
       dbo2.get("_id") must_== dbo.get("_id")
       dbo2.get("name") must_== dbo.get("name")
-    }
-  }
-}

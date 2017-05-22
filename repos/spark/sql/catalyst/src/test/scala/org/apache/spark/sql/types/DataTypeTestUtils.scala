@@ -20,7 +20,7 @@ package org.apache.spark.sql.types
 /**
   * Utility functions for working with DataTypes in tests.
   */
-object DataTypeTestUtils {
+object DataTypeTestUtils
 
   /**
     * Instances of all [[IntegralType]]s.
@@ -88,4 +88,3 @@ object DataTypeTestUtils {
     */
   val atomicArrayTypes: Set[ArrayType] =
     atomicTypes.map(ArrayType(_, containsNull = true))
-}

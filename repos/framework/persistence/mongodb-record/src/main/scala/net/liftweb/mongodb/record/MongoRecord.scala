@@ -26,7 +26,7 @@ import com.mongodb.{BasicDBObject, DBObject, DBRef, WriteConcern}
 import org.bson.types.ObjectId
 import common.{Full, Box}
 
-trait MongoRecord[MyType <: MongoRecord[MyType]] extends BsonRecord[MyType] {
+trait MongoRecord[MyType <: MongoRecord[MyType]] extends BsonRecord[MyType]
   self: MyType =>
 
   /*
@@ -46,12 +46,10 @@ trait MongoRecord[MyType <: MongoRecord[MyType]] extends BsonRecord[MyType] {
   /**
     * Save the instance and return the instance
     */
-  def save(concern: WriteConcern): MyType = {
-    runSafe {
+  def save(concern: WriteConcern): MyType =
+    runSafe
       meta.save(this, concern)
-    }
     this
-  }
 
   /**
     * Save the instance and return the instance
@@ -62,55 +60,43 @@ trait MongoRecord[MyType <: MongoRecord[MyType]] extends BsonRecord[MyType] {
     * Save the instance and return the instance
     * @param safe - if true will use WriteConcern ACKNOWLEDGED else UNACKNOWLEDGED
     */
-  def save(safe: Boolean = true): MyType = {
+  def save(safe: Boolean = true): MyType =
     save(if (safe) WriteConcern.ACKNOWLEDGED else WriteConcern.UNACKNOWLEDGED)
-  }
 
   /**
     * Try to save the instance and return the instance in a Box.
     */
-  def saveBox(): Box[MyType] = tryo {
-    runSafe {
+  def saveBox(): Box[MyType] = tryo
+    runSafe
       meta.save(this)
-    }
     this
-  }
 
   /**
     * Update only the dirty fields
     */
-  def update: MyType = {
-    runSafe {
+  def update: MyType =
+    runSafe
       meta.update(this)
-    }
     this
-  }
 
   /**
     * Try to update only the dirty fields
     */
-  def updateBox: Box[MyType] = tryo {
-    runSafe {
+  def updateBox: Box[MyType] = tryo
+    runSafe
       meta.update(this)
-    }
     this
-  }
 
   /**
     * Delete the instance from backing store
     */
-  def delete_! : Boolean = {
-    runSafe {
+  def delete_! : Boolean =
+    runSafe
       meta.delete_!(this)
-    }
-  }
 
   /**
     * Try to delete the instance from backing store
     */
-  def deleteBox_! : Box[Boolean] = tryo {
-    runSafe {
+  def deleteBox_! : Box[Boolean] = tryo
+    runSafe
       meta.delete_!(this)
-    }
-  }
-}

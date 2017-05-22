@@ -1,15 +1,14 @@
 import scala.tools.partest._
 import java.io.File
 
-object Test extends StoreReporterDirectTest {
+object Test extends StoreReporterDirectTest
   def code = ???
 
-  def compileCode(code: String) = {
+  def compileCode(code: String) =
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(code)
-  }
 
   def library1 = """
     package pack1
@@ -32,7 +31,7 @@ object Test extends StoreReporterDirectTest {
     trait V extends U
   """
 
-  def show(): Unit = {
+  def show(): Unit =
     Seq(library1, library2) foreach compileCode
     assert(filteredInfos.isEmpty, filteredInfos)
 
@@ -46,5 +45,3 @@ object Test extends StoreReporterDirectTest {
     // should report ambiguous import, despite the fact that a parent of pack2.U is absent
     compileCode(app)
     println(filteredInfos.mkString("\n"))
-  }
-}

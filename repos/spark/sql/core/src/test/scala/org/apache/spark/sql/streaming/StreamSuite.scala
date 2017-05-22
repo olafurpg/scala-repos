@@ -21,11 +21,11 @@ import org.apache.spark.sql.{Row, StreamTest}
 import org.apache.spark.sql.execution.streaming._
 import org.apache.spark.sql.test.SharedSQLContext
 
-class StreamSuite extends StreamTest with SharedSQLContext {
+class StreamSuite extends StreamTest with SharedSQLContext
 
   import testImplicits._
 
-  test("map with recovery") {
+  test("map with recovery")
     val inputData = MemoryStream[Int]
     val mapped = inputData.toDS().map(_ + 1)
 
@@ -36,9 +36,8 @@ class StreamSuite extends StreamTest with SharedSQLContext {
                        AddData(inputData, 4, 5, 6),
                        StartStream,
                        CheckAnswer(2, 3, 4, 5, 6, 7))
-  }
 
-  test("join") {
+  test("join")
     // Make a table and ensure it will be broadcast.
     val smallTable =
       Seq((1, "one"), (2, "two"), (4, "four")).toDF("number", "word")
@@ -53,9 +52,8 @@ class StreamSuite extends StreamTest with SharedSQLContext {
         CheckAnswer(Row(1, 1, "one"), Row(2, 2, "two")),
         AddData(inputData, 4),
         CheckAnswer(Row(1, 1, "one"), Row(2, 2, "two"), Row(4, 4, "four")))
-  }
 
-  test("union two streams") {
+  test("union two streams")
     val inputData1 = MemoryStream[Int]
     val inputData2 = MemoryStream[Int]
 
@@ -70,13 +68,10 @@ class StreamSuite extends StreamTest with SharedSQLContext {
                         StartStream,
                         AddData(inputData2, 8),
                         CheckAnswer(1, 2, 3, 4, 5, 6, 7, 8))
-  }
 
-  test("sql queries") {
+  test("sql queries")
     val inputData = MemoryStream[Int]
     inputData.toDF().registerTempTable("stream")
     val evens = sql("SELECT * FROM stream WHERE value % 2 = 0")
 
     testStream(evens)(AddData(inputData, 1, 2, 3, 4), CheckAnswer(2, 4))
-  }
-}

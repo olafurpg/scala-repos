@@ -3,7 +3,7 @@ package lila.team
 import lila.memo.{MixedCache, AsyncCache}
 import scala.concurrent.duration._
 
-private[team] final class Cached {
+private[team] final class Cached
 
   private val nameCache = MixedCache[String, Option[String]](
       TeamRepo.name,
@@ -25,4 +25,3 @@ private[team] final class Cached {
       (userId: String) =>
         TeamRepo teamIdsByCreator userId flatMap RequestRepo.countByTeams,
       maxCapacity = 20000)
-}

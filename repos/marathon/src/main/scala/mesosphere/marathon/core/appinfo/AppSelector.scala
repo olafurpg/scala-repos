@@ -2,15 +2,13 @@ package mesosphere.marathon.core.appinfo
 
 import mesosphere.marathon.state.AppDefinition
 
-trait AppSelector {
+trait AppSelector
   def matches(app: AppDefinition): Boolean
-}
 
-object AppSelector {
+object AppSelector
   def apply(matchesFunc: AppDefinition => Boolean): AppSelector =
-    new AppSelector {
+    new AppSelector
       override def matches(app: AppDefinition): Boolean = matchesFunc(app)
-    }
 
   def all: AppSelector = AppSelector(_ => true)
 
@@ -19,8 +17,6 @@ object AppSelector {
 
   private[appinfo] class AllAppSelectorsMustMatch(
       selectors: Iterable[AppSelector])
-      extends AppSelector {
+      extends AppSelector
     override def matches(app: AppDefinition): Boolean =
       selectors.forall(_.matches(app))
-  }
-}

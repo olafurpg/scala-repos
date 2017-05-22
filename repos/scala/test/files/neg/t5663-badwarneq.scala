@@ -39,8 +39,8 @@ trait InThing extends SomeThing
 class MyThing extends InThing
  */
 
-object Test {
-  def main(a: Array[String]) {
+object Test
+  def main(a: Array[String])
     // nothing to do with Gavin
     println(new Some(1) == new Some(1)) // OK, true
     println(new Some(1) == None) // Should complain on type, was: spuriously complains on fresh object
@@ -89,5 +89,3 @@ object Test {
     println(mine == other) // OK, two Anything?
     println(mine == t1) // false
    */
-  }
-}

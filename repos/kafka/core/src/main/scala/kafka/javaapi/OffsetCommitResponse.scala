@@ -22,20 +22,17 @@ import kafka.common.TopicAndPartition
 import collection.JavaConversions
 
 class OffsetCommitResponse(
-    private val underlying: kafka.api.OffsetCommitResponse) {
+    private val underlying: kafka.api.OffsetCommitResponse)
 
-  def errors: java.util.Map[TopicAndPartition, Short] = {
+  def errors: java.util.Map[TopicAndPartition, Short] =
     import JavaConversions._
     underlying.commitStatus
-  }
 
   def hasError = underlying.hasError
 
   def errorCode(topicAndPartition: TopicAndPartition) =
     underlying.commitStatus(topicAndPartition)
-}
 
-object OffsetCommitResponse {
+object OffsetCommitResponse
   def readFrom(buffer: ByteBuffer) =
     new OffsetCommitResponse(kafka.api.OffsetCommitResponse.readFrom(buffer))
-}

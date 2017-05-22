@@ -7,7 +7,7 @@ import comment._
 /** This trait extracts all required information for documentation from compilation units.
   *  The base trait has been extracted to allow getting light-weight documentation
   * for a particular symbol in the IDE.*/
-trait MemberLookupBase {
+trait MemberLookupBase
 
   val global: Global
   import global._
@@ -31,7 +31,7 @@ trait MemberLookupBase {
 
   private var showExplanation = true
   private def explanation: String =
-    if (showExplanation) {
+    if (showExplanation)
       showExplanation = false
       """
       |Quick crash course on using Scaladoc links
@@ -46,9 +46,9 @@ trait MemberLookupBase {
       | - you can use any number of matching square brackets to avoid interference with the signature
       | - you can use \\. to escape dots in prefixes (don't forget to use * at the end to match the signature!)
       | - you can use \\# to escape hashes, otherwise they will be considered as delimiters, like dots.""".stripMargin
-    } else ""
+    else ""
 
-  def memberLookup(pos: Position, query: String, site: Symbol): LinkTo = {
+  def memberLookup(pos: Position, query: String, site: Symbol): LinkTo =
     val members = breakMembers(query)
 
     // (1) First look in the root package, as most of the links are qualified
@@ -61,13 +61,13 @@ trait MemberLookupBase {
 
     val syms = (fromRoot +: fromParents) find (!_.isEmpty) getOrElse Nil
 
-    val links = syms flatMap { case (sym, site) => internalLink(sym, site) } match {
+    val links = syms flatMap { case (sym, site) => internalLink(sym, site) } match
       case Nil =>
         // (3) Look at external links
-        syms.flatMap {
+        syms.flatMap
           case (sym, owner) =>
             // reconstruct the original link
-            def linkName(sym: Symbol) = {
+            def linkName(sym: Symbol) =
               def nameString(s: Symbol) =
                 s.nameString +
                 (if ((s.isModule || s.isModuleClass) && !s.hasPackageFlag) "$"
@@ -78,7 +78,6 @@ trait MemberLookupBase {
                 .filterNot(isRoot(_))
                 .map(nameString(_))
                 .mkString(".") + packageSuffix
-            }
 
             if (sym.isClass || sym.isModule || sym.isTrait ||
                 sym.hasPackageFlag) findExternalLink(sym, linkName(sym))
@@ -87,10 +86,8 @@ trait MemberLookupBase {
               findExternalLink(
                   sym, linkName(owner) + "@" + externalSignature(sym))
             else None
-        }
       case links => links
-    }
-    links match {
+    links match
       case Nil =>
         if (warnNoLink)
           reporter.warning(
@@ -100,21 +97,17 @@ trait MemberLookupBase {
       case List(l) => l
       case links =>
         val chosen = chooseLink(links)
-        def linkToString(link: LinkTo) = {
+        def linkToString(link: LinkTo) =
           val chosenInfo = if (link == chosen) " [chosen]" else ""
           toString(link) + chosenInfo + "\n"
-        }
-        if (warnNoLink) {
+        if (warnNoLink)
           val allLinks = links.map(linkToString).mkString
           reporter.warning(
               pos,
               s"""The link target \"$query\" is ambiguous. Several members fit the target:
             |$allLinks
             |$explanation""".stripMargin)
-        }
         chosen
-    }
-  }
 
   private sealed trait SearchStrategy
   private case object BothTypeAndTerm extends SearchStrategy
@@ -127,7 +120,7 @@ trait MemberLookupBase {
 
   private def lookupInTemplate(pos: Position,
                                members: List[String],
-                               container: Symbol): List[(Symbol, Symbol)] = {
+                               container: Symbol): List[(Symbol, Symbol)] =
     // Maintaining compatibility with previous links is a bit tricky here:
     // we have a preference for term names for all terms except for the last, where we prefer a class:
     // How to do this:
@@ -135,7 +128,7 @@ trait MemberLookupBase {
     //  - if the search doesn't return any members, we backtrack on the last decision
     //     * we look for terms with the last member's name
     //     * we look for types with the same name, all the way up
-    val result = members match {
+    val result = members match
       case Nil => Nil
       case mbrName :: Nil =>
         var syms =
@@ -150,20 +143,17 @@ trait MemberLookupBase {
         def completeSearch(syms: List[Symbol]) =
           syms flatMap (lookupInTemplate(pos, rest, _))
 
-        completeSearch(lookupInTemplate(pos, tplName, container, OnlyTerm)) match {
+        completeSearch(lookupInTemplate(pos, tplName, container, OnlyTerm)) match
           case Nil =>
             completeSearch(lookupInTemplate(pos, tplName, container, OnlyType))
           case syms => syms
-        }
-    }
     //println("lookupInTemplate(" + members + ", " + container + ") => " + result)
     result
-  }
 
   private def lookupInTemplate(pos: Position,
                                member: String,
                                container: Symbol,
-                               strategy: SearchStrategy): List[Symbol] = {
+                               strategy: SearchStrategy): List[Symbol] =
     val name = member.stripSuffix("$").stripSuffix("!").stripSuffix("*")
     def signatureMatch(sym: Symbol): Boolean =
       externalSignature(sym).startsWith(name)
@@ -171,9 +161,8 @@ trait MemberLookupBase {
     // We need to cleanup the bogus classes created by the .class file parser. For example, [[scala.Predef]] resolves
     // to (bogus) class scala.Predef loaded by the class loader -- which we need to eliminate by looking at the info
     // and removing NoType classes
-    def cleanupBogusClasses(syms: List[Symbol]) = {
+    def cleanupBogusClasses(syms: List[Symbol]) =
       syms.filter(_.info != NoType)
-    }
 
     def syms(name: Name) =
       container.info.nonPrivateMember(name.encodedName).alternatives
@@ -186,17 +175,15 @@ trait MemberLookupBase {
       else if (member.endsWith("*"))
         cleanupBogusClasses(container.info.nonPrivateDecls) filter signatureMatch
       else
-        strategy match {
+        strategy match
           case BothTypeAndTerm => termSyms ::: typeSyms
           case OnlyType => typeSyms
           case OnlyTerm => termSyms
-        }
 
     //println("lookupInTemplate(" + member + ", " + container + ") => " + result)
     result
-  }
 
-  private def breakMembers(query: String): List[String] = {
+  private def breakMembers(query: String): List[String] =
     // Okay, how does this work? Well: you split on . but you don't want to split on \. => thus the ugly regex
     // query.split((?<=[^\\\\])\\.).map(_.replaceAll("\\."))
     // The same code, just faster:
@@ -204,9 +191,9 @@ trait MemberLookupBase {
     var index = 0
     var last_index = 0
     val length = query.length
-    while (index < length) {
+    while (index < length)
       if ((query.charAt(index) == '.' || query.charAt(index) == '#') &&
-          ((index == 0) || (query.charAt(index - 1) != '\\'))) {
+          ((index == 0) || (query.charAt(index - 1) != '\\')))
 
         val member =
           query.substring(last_index, index).replaceAll("\\\\([#\\.])", "$1")
@@ -214,17 +201,12 @@ trait MemberLookupBase {
         // elemnt in the list
         if ((member != "") || (!members.isEmpty)) members ::= member
         last_index = index + 1
-      }
       index += 1
-    }
     if (last_index < length)
       members ::=
         query.substring(last_index, length).replaceAll("\\\\\\.", ".")
     members.reverse
-  }
 
-  def externalSignature(sym: Symbol) = {
+  def externalSignature(sym: Symbol) =
     sym.info // force it, otherwise we see lazy types
     (sym.nameString + sym.signatureString).replaceAll("\\s", "")
-  }
-}

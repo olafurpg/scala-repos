@@ -4,9 +4,9 @@ import com.twitter.io.Buf
 import com.twitter.io.Buf.ByteArray
 import io.netty.buffer._
 
-private[finagle] object ByteBufAsBuf {
+private[finagle] object ByteBufAsBuf
 
-  object Owned {
+  object Owned
 
     /**
       * Construct a [[Buf]] wrapper for ``ByteBuf``.
@@ -25,9 +25,8 @@ private[finagle] object ByteBufAsBuf {
       * Extract a read-only `ByteBuf` from [[Buf]] potentially without copying.
       */
     def extract(buf: Buf): ByteBuf = BufAsByteBuf.Owned(buf)
-  }
 
-  object Shared {
+  object Shared
 
     /**
       * Construct a [[Buf]] by copying `ByteBuf`.
@@ -46,30 +45,27 @@ private[finagle] object ByteBufAsBuf {
       * Extract a read-only `ByteBuf` copy from [[Buf]].
       */
     def extract(buf: Buf): ByteBuf = BufAsByteBuf.Shared(buf)
-  }
-}
 
 /**
   * a [[Buf]] wrapper for Netty `ByteBuf`s.
   */
 private[finagle] class ByteBufAsBuf(private val underlying: ByteBuf)
-    extends Buf {
-  def write(bytes: Array[Byte], off: Int): Unit = {
+    extends Buf
+  def write(bytes: Array[Byte], off: Int): Unit =
     val dup = underlying.duplicate()
     dup.readBytes(bytes, off, dup.readableBytes)
-  }
 
   protected def unsafeByteArrayBuf: Option[ByteArray] =
-    if (underlying.hasArray) {
+    if (underlying.hasArray)
       val bytes = underlying.array
       val begin = underlying.arrayOffset + underlying.readerIndex
       val end = begin + underlying.readableBytes
       Some(new Buf.ByteArray(bytes, begin, end))
-    } else None
+    else None
 
   def length: Int = underlying.readableBytes
 
-  def slice(from: Int, until: Int): Buf = {
+  def slice(from: Int, until: Int): Buf =
     if (from < 0 || until < 0)
       throw new IndexOutOfBoundsException(
           s"slice indexes must be >= 0, saw from: $from until: $until")
@@ -79,11 +75,8 @@ private[finagle] class ByteBufAsBuf(private val underlying: ByteBuf)
     else
       new ByteBufAsBuf(
           underlying.slice(from, Math.min((until - from), (length - from))))
-  }
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case ByteBufAsBuf.Owned(otherBB) => underlying.equals(otherBB)
     case other: Buf => Buf.equals(this, other)
     case _ => false
-  }
-}

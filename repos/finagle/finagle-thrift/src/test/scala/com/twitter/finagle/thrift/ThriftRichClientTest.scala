@@ -13,9 +13,9 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class ThriftRichClientTest
-    extends FunSuite with MockitoSugar with OneInstancePerTest {
+    extends FunSuite with MockitoSugar with OneInstancePerTest
   object ThriftRichClientMock
-      extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient {
+      extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient
     override val protocolFactory: TProtocolFactory = Protocols.binaryFactory()
     override val defaultClientName = "mock_client"
 
@@ -32,10 +32,9 @@ class ThriftRichClientTest
         label: String
     ): ServiceFactory[ThriftClientRequest, Array[Byte]] =
       mock[ServiceFactory[ThriftClientRequest, Array[Byte]]]
-  }
 
   test(
-      "ThriftRichClientTest newServiceIface takes dest String and stats scoping label arguments") {
+      "ThriftRichClientTest newServiceIface takes dest String and stats scoping label arguments")
     val captor = ArgumentCaptor.forClass(classOf[StatsReceiver])
     val mockBuilder = mock[ServiceIfaceBuilder[String]]
     doReturn("mockServiceIface")
@@ -49,10 +48,9 @@ class ThriftRichClientTest
     assert(
         captor.getValue.toString == "NullStatsReceiver/clnt/tweetypie_client")
     verify(client).newService("/s/tweetypie/tweetypie", "tweetypie_client")
-  }
 
   test(
-      "ThriftRichClientTest newServiceIface takes dest Name and stats scoping label arguments") {
+      "ThriftRichClientTest newServiceIface takes dest Name and stats scoping label arguments")
     val captor = ArgumentCaptor.forClass(classOf[StatsReceiver])
     val mockBuilder = mock[ServiceIfaceBuilder[String]]
     doReturn("mockServiceIface")
@@ -66,5 +64,3 @@ class ThriftRichClientTest
     assert(
         captor.getValue.toString == "NullStatsReceiver/clnt/tweetypie_client")
     verify(client).newService(name, "tweetypie_client")
-  }
-}

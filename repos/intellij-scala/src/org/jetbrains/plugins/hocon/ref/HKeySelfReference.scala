@@ -6,7 +6,7 @@ import org.jetbrains.plugins.hocon.psi.HKey
 /**
   * @author ghik
   */
-class HKeySelfReference(key: HKey) extends PsiReference {
+class HKeySelfReference(key: HKey) extends PsiReference
   def getVariants = Array.empty
 
   def getCanonicalText = key.stringValue
@@ -28,4 +28,3 @@ class HKeySelfReference(key: HKey) extends PsiReference {
   def getRangeInElement = ElementManipulators.getValueTextRange(key)
 
   def resolve(): PsiElement = key
-}

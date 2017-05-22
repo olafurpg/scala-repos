@@ -19,10 +19,10 @@ import scala.concurrent.Future
   */
 class StatusUpdateActionResolverTest
     extends FunSuite with Mockito with GivenWhenThen with ScalaFutures
-    with Matchers {
+    with Matchers
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  test("an update for a non-existing tasks is mapped to fail") {
+  test("an update for a non-existing tasks is mapped to fail")
     val f = new Fixture
     Given("a taskID without task")
     val appId = PathId("/app")
@@ -44,15 +44,11 @@ class StatusUpdateActionResolverTest
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  class Fixture {
+  class Fixture
     val clock = ConstantClock()
     val taskTracker = mock[TaskTracker]
     val actionResolver = new StatusUpdateActionResolver(clock, taskTracker)
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       noMoreInteractions(taskTracker)
-    }
-  }
-}

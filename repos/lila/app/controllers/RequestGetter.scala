@@ -5,7 +5,7 @@ import lila.user.UserContext
 
 import play.api.mvc.RequestHeader
 
-trait RequestGetter {
+trait RequestGetter
 
   protected def get(name: String)(implicit ctx: UserContext): Option[String] =
     get(name, ctx.req)
@@ -30,4 +30,3 @@ trait RequestGetter {
 
   protected def getBoolOpt(name: String, req: RequestHeader) =
     getInt(name, req) map (1 ==)
-}

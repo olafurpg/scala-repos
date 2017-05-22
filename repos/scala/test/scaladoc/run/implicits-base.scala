@@ -2,7 +2,7 @@ import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 import language._
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   // test a file instead of a piece of code
   override def resourceFile = "implicits-base-res.scala"
@@ -10,7 +10,7 @@ object Test extends ScaladocModelTest {
   // start implicits
   def scaladocSettings = "-implicits -implicits-show-all"
 
-  def testModel(root: Package) = {
+  def testModel(root: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -225,5 +225,3 @@ object Test extends ScaladocModelTest {
     assert(conv.members.length == 1)
     assert(conv.constraints.length == 1)
     assert(conv._member("convToMyNumericA").resultType.name == "String")
-  }
-}

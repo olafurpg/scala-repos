@@ -8,7 +8,7 @@ import internal._
 // have accidentally changed the way type tags reify.  If so, validate
 // that your changes are accurate and update the check file.
 
-object Test extends App {
+object Test extends App
   val toolbox = cm.mkToolBox()
   val rupkg = cm.staticModule("scala.reflect.runtime.package")
   val rusym = reificationSupport.selectTerm(rupkg, "universe")
@@ -25,4 +25,3 @@ object Test extends App {
       Select(Ident(ru), TermName("reify")), List(Literal(Constant(2))))
   val ttree2 = toolbox.typecheck(tree2, withMacrosDisabled = true)
   println(ttree2)
-}

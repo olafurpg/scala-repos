@@ -1,4 +1,3 @@
 // a.scala
-package object pkg {
+package object pkg
   class AnyOps(val x: Any) extends AnyVal
-}

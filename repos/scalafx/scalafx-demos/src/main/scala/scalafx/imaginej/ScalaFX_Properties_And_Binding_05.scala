@@ -51,17 +51,16 @@ import scalafx.beans.property.DoubleProperty
   *         http://docs.oracle.com/javafx/2.0/binding/jfxpub-binding.htm
   *
   */
-object ScalaFX_Properties_And_Binding_05 {
-  def main(args: Array[String]) {
+object ScalaFX_Properties_And_Binding_05
+  def main(args: Array[String])
     val bill1 = new Bill(new DoubleProperty(null, "Bill 1"))
     val bill2 = new Bill(new DoubleProperty(null, "Bill 2"))
     val bill3 = new Bill(new DoubleProperty(null, "Bill 3"))
 
     val total = Bindings.add(bill1.amountDue, bill2.amountDue, bill3.amountDue)
 
-    total onInvalidate { observable =>
+    total onInvalidate  observable =>
       println("the total double binding has been invalidated")
-    }
 
     bill1.amountDue() = 100.0
     bill2.amountDue() = 200.0
@@ -72,5 +71,3 @@ object ScalaFX_Properties_And_Binding_05 {
     bill2.amountDue() = 400.0
 
     println(total())
-  }
-}

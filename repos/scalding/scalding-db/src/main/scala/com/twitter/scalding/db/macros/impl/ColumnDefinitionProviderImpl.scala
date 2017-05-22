@@ -11,24 +11,22 @@ import com.twitter.scalding.db.macros._
 import com.twitter.scalding.db.macros.impl.handler._
 
 // Simple wrapper to pass around the string name format of fields
-private[impl] case class FieldName(toStr: String) {
+private[impl] case class FieldName(toStr: String)
   override def toString = toStr
-}
 
-object ColumnDefinitionProviderImpl {
+object ColumnDefinitionProviderImpl
 
   // Takes a type and its companion objects apply method
   // based on the args it takes gives back out a field name to symbol
   private[this] def getDefaultArgs(c: Context)(
-      tpe: c.Type): Map[String, c.Expr[String]] = {
+      tpe: c.Type): Map[String, c.Expr[String]] =
     import c.universe._
     val classSym = tpe.typeSymbol
     val moduleSym = classSym.companionSymbol
-    if (moduleSym == NoSymbol) {
+    if (moduleSym == NoSymbol)
       c.abort(
           c.enclosingPosition,
           s"No companion for case class ${tpe} available. Possibly a nested class? These do not work with this macro.")
-    }
     // pick the last apply method which (anecdotally) gives us the defaults
     // set in the case class declaration, not the companion object
     val applyList = moduleSym.typeSignature
@@ -41,20 +39,17 @@ object ColumnDefinitionProviderImpl {
     apply.paramss.head
       .map(_.asTerm)
       .zipWithIndex
-      .flatMap {
+      .flatMap
         case (p, i) =>
           if (!p.isParamWithDefault) None
-          else {
+          else
             val getterName = newTermName("apply$default$" + (i + 1))
             Some(p.name.toString -> c.Expr(
                     q"${moduleSym}.$getterName.toString"))
-          }
-      }
       .toMap
-  }
 
   private[scalding] def getColumnFormats[T](c: Context)(
-      implicit T: c.WeakTypeTag[T]): List[ColumnFormat[c.type]] = {
+      implicit T: c.WeakTypeTag[T]): List[ColumnFormat[c.type]] =
     import c.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(c)(T.tpe))
@@ -70,8 +65,8 @@ object ColumnDefinitionProviderImpl {
         fieldName: FieldName,
         defaultValOpt: Option[c.Expr[String]],
         annotationInfo: List[(Type, Option[Int])],
-        nullable: Boolean): scala.util.Try[List[ColumnFormat[c.type]]] = {
-      oTpe match {
+        nullable: Boolean): scala.util.Try[List[ColumnFormat[c.type]]] =
+      oTpe match
         // String handling
         case tpe if tpe =:= typeOf[String] =>
           StringTypeHandler(c)(
@@ -123,14 +118,13 @@ object ColumnDefinitionProviderImpl {
           if (defaultValOpt.isDefined)
             Failure(new Exception(
                     s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, with a default value. Options cannot have default values"))
-          else {
+          else
             matchField(accessorTree,
                        tpe.asInstanceOf[TypeRefApi].args.head,
                        fieldName,
                        None,
                        annotationInfo,
                        true)
-          }
         case tpe if IsCaseClassImpl.isCaseClassType(c)(tpe) =>
           expandMethod(accessorTree, tpe)
 
@@ -139,12 +133,10 @@ object ColumnDefinitionProviderImpl {
           Failure(
               new Exception(
                   s"Case class ${T.tpe} has field ${fieldName}: ${oTpe.toString}, which is not supported for talking to JDBC"))
-      }
-    }
 
     def expandMethod(
         outerAccessorTree: List[MethodSymbol],
-        outerTpe: Type): scala.util.Try[List[ColumnFormat[c.type]]] = {
+        outerTpe: Type): scala.util.Try[List[ColumnFormat[c.type]]] =
       val defaultArgs = getDefaultArgs(c)(outerTpe)
 
       // Intializes the type info
@@ -153,28 +145,26 @@ object ColumnDefinitionProviderImpl {
       // We have to build this up front as if the case class definition moves to another file
       // the annotation moves from the value onto the getter method?
       val annotationData: Map[String, List[(Type, List[Tree])]] =
-        outerTpe.declarations.map { m =>
+        outerTpe.declarations.map  m =>
           val mappedAnnotations = m.annotations.map(t => (t.tpe, t.scalaArgs))
           m.name.toString.trim -> mappedAnnotations
-        }.groupBy(_._1)
-          .map {
+        .groupBy(_._1)
+          .map
             case (k, l) =>
               (k, l.map(_._2).reduce(_ ++ _))
-          }
-          .filter {
+          .filter
             case (k, v) =>
               !v.isEmpty
-          }
 
-      outerTpe.declarations.collect {
+      outerTpe.declarations.collect
         case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { m =>
+      .map  m =>
         val fieldName = m.name.toTermName.toString.trim
         val defaultVal = defaultArgs.get(fieldName)
 
         val annotationInfo: List[(Type, Option[Int])] = annotationData
           .getOrElse(m.name.toString.trim, Nil)
-          .collect {
+          .collect
             case (tpe, List(Literal(Constant(siz: Int))))
                 if tpe =:= typeOf[com.twitter.scalding.db.macros.size] =>
               (tpe, Some(siz))
@@ -186,9 +176,8 @@ object ColumnDefinitionProviderImpl {
                 if tpe <:< typeOf[
                     com.twitter.scalding.db.macros.ScaldingDBAnnotation] =>
               (tpe, None)
-          }
           (m, fieldName, defaultVal, annotationInfo)
-      }.map {
+      .map
         case (accessorMethod, fieldName, defaultVal, annotationInfo) =>
           matchField(outerAccessorTree :+ accessorMethod,
                      accessorMethod.returnType,
@@ -196,43 +185,37 @@ object ColumnDefinitionProviderImpl {
                      defaultVal,
                      annotationInfo,
                      false)
-      }.toList
+      .toList
       // This algorithm returns the error from the first exception we run into.
-        .foldLeft(scala.util.Try[List[ColumnFormat[c.type]]](Nil)) {
+        .foldLeft(scala.util.Try[List[ColumnFormat[c.type]]](Nil))
         case (pTry, nxt) =>
-          (pTry, nxt) match {
+          (pTry, nxt) match
             case (Success(l), Success(r)) => Success(l ::: r)
             case (f @ Failure(_), _) => f
             case (_, f @ Failure(_)) => f
-          }
-      }
-    }
 
-    val formats = expandMethod(Nil, T.tpe) match {
+    val formats = expandMethod(Nil, T.tpe) match
       case Success(s) => s
       case Failure(e) => (c.abort(c.enclosingPosition, e.getMessage))
-    }
 
     val duplicateFields =
       formats.map(_.fieldName).groupBy(identity).filter(_._2.size > 1).keys
 
-    if (duplicateFields.nonEmpty) {
+    if (duplicateFields.nonEmpty)
       c.abort(c.enclosingPosition, s"""
         Duplicate field names found: ${duplicateFields.mkString(",")}.
         Please check your nested case classes.
         """)
-    } else {
+    else
       formats
-    }
-  }
 
   def getColumnDefn[T](c: Context)(
-      implicit T: c.WeakTypeTag[T]): List[c.Expr[ColumnDefinition]] = {
+      implicit T: c.WeakTypeTag[T]): List[c.Expr[ColumnDefinition]] =
     import c.universe._
 
     val columnFormats = getColumnFormats[T](c)
 
-    columnFormats.map {
+    columnFormats.map
       case cf: ColumnFormat[_] =>
         val nullableVal =
           if (cf.nullable) q"_root_.com.twitter.scalding.db.Nullable"
@@ -247,11 +230,9 @@ object ColumnDefinitionProviderImpl {
         ${cf.defaultValue})
         """
         c.Expr[ColumnDefinition](res)
-    }
-  }
 
   def getExtractor[T](c: Context)(
-      implicit T: c.WeakTypeTag[T]): c.Expr[ResultSetExtractor[T]] = {
+      implicit T: c.WeakTypeTag[T]): c.Expr[ResultSetExtractor[T]] =
     import c.universe._
 
     val columnFormats = getColumnFormats[T](c)
@@ -260,7 +241,7 @@ object ColumnDefinitionProviderImpl {
     // we validate two things from ResultSetMetadata
     // 1. the column types match with actual DB schema
     // 2. all non-nullable fields are indeed non-nullable in DB schema
-    val checks = columnFormats.zipWithIndex.map {
+    val checks = columnFormats.zipWithIndex.map
       case (cf: ColumnFormat[_], pos: Int) =>
         val fieldName = cf.fieldName.toStr
         val typeNameTerm = newTermName(c.fresh(s"colTypeName_$pos"))
@@ -270,14 +251,13 @@ object ColumnDefinitionProviderImpl {
         // certain types have synonyms, so we group them together here
         // note: this is mysql specific
         // http://dev.mysql.com/doc/refman/5.0/en/numeric-type-overview.html
-        val typeValidation = cf.fieldType match {
+        val typeValidation = cf.fieldType match
           case "VARCHAR" =>
             q"""List("VARCHAR", "CHAR").contains($typeNameTerm)"""
           case "BOOLEAN" | "TINYINT" =>
             q"""List("BOOLEAN", "BOOL", "TINYINT").contains($typeNameTerm)"""
           case "INT" => q"""List("INTEGER", "INT").contains($typeNameTerm)"""
           case f => q"""$f == $typeNameTerm"""
-        }
         val typeAssert = q"""
         if (!$typeValidation) {
           throw new _root_.com.twitter.scalding.db.JdbcValidationException(
@@ -298,14 +278,13 @@ object ColumnDefinitionProviderImpl {
         $typeAssert
         $nullableValidation
         """
-    }
 
     val rsTerm = newTermName(c.fresh("rs"))
-    val formats = columnFormats.map {
-      case cf: ColumnFormat[_] => {
+    val formats = columnFormats.map
+      case cf: ColumnFormat[_] =>
           val fieldName = cf.fieldName.toStr
           // java boxed types needed below to populate cascading's Tuple
-          cf.fieldType match {
+          cf.fieldType match
             case "VARCHAR" | "TEXT" => q"""$rsTerm.getString($fieldName)"""
             case "BOOLEAN" | "TINYINT" =>
               q"""_root_.java.lang.Boolean.valueOf($rsTerm.getBoolean($fieldName))"""
@@ -321,10 +300,7 @@ object ColumnDefinitionProviderImpl {
               q"""_root_.java.lang.Integer.valueOf($rsTerm.getInt($fieldName))"""
             case f =>
               q"""sys.error("Invalid format " + $f + " for " + $fieldName)"""
-          }
           // note: UNSIGNED BIGINT is currently unsupported
-        }
-    }
     val tcTerm = newTermName(c.fresh("conv"))
     val res = q"""
     new _root_.com.twitter.scalding.db.ResultSetExtractor[$T] {
@@ -335,10 +311,9 @@ object ColumnDefinitionProviderImpl {
     """
     // ResultSet -> TupleEntry -> case class
     c.Expr[ResultSetExtractor[T]](res)
-  }
 
   def apply[T](c: Context)(
-      implicit T: c.WeakTypeTag[T]): c.Expr[ColumnDefinitionProvider[T]] = {
+      implicit T: c.WeakTypeTag[T]): c.Expr[ColumnDefinitionProvider[T]] =
     import c.universe._
 
     val columns = getColumnDefn[T](c)
@@ -351,5 +326,3 @@ object ColumnDefinitionProviderImpl {
     }
     """
     c.Expr[ColumnDefinitionProvider[T]](res)
-  }
-}

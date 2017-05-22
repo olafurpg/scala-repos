@@ -8,7 +8,7 @@ class AdamsMoultonIntegrator(order: Int,
                              maxStep: Double,
                              relTol: DenseVector[Double] = null,
                              absTol: DenseVector[Double] = null)
-    extends ApacheAdamsIntegrator(relTol, absTol) {
+    extends ApacheAdamsIntegrator(relTol, absTol)
 
   type T = ApacheAdamsMoultonIntegrator
 
@@ -19,4 +19,3 @@ class AdamsMoultonIntegrator(order: Int,
         maxStep,
         ApacheAdaptiveStepIntegrator.defaultAbsTol,
         ApacheAdaptiveStepIntegrator.defaultRelTol)
-}

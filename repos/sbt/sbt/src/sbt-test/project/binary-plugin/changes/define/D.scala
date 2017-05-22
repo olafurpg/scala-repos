@@ -2,9 +2,7 @@
 
 import sbt._
 
-object D extends AutoPlugin {
+object D extends AutoPlugin
 
-  object autoImport {
+  object autoImport
     lazy val dKey = settingKey[String]("Test key")
-  }
-}

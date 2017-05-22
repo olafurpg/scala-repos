@@ -28,47 +28,40 @@ import org.apache.spark.annotation.DeveloperApi
 sealed abstract class AttributeType(val name: String)
 
 @DeveloperApi
-object AttributeType {
+object AttributeType
 
   /** Numeric type. */
-  val Numeric: AttributeType = {
+  val Numeric: AttributeType =
     case object Numeric extends AttributeType("numeric")
     Numeric
-  }
 
   /** Nominal type. */
-  val Nominal: AttributeType = {
+  val Nominal: AttributeType =
     case object Nominal extends AttributeType("nominal")
     Nominal
-  }
 
   /** Binary type. */
-  val Binary: AttributeType = {
+  val Binary: AttributeType =
     case object Binary extends AttributeType("binary")
     Binary
-  }
 
   /** Unresolved type. */
-  val Unresolved: AttributeType = {
+  val Unresolved: AttributeType =
     case object Unresolved extends AttributeType("unresolved")
     Unresolved
-  }
 
   /**
     * Gets the [[AttributeType]] object from its name.
     * @param name attribute type name: "numeric", "nominal", or "binary"
     */
-  def fromName(name: String): AttributeType = {
-    if (name == Numeric.name) {
+  def fromName(name: String): AttributeType =
+    if (name == Numeric.name)
       Numeric
-    } else if (name == Nominal.name) {
+    else if (name == Nominal.name)
       Nominal
-    } else if (name == Binary.name) {
+    else if (name == Binary.name)
       Binary
-    } else if (name == Unresolved.name) {
+    else if (name == Unresolved.name)
       Unresolved
-    } else {
+    else
       throw new IllegalArgumentException(s"Cannot recognize type $name.")
-    }
-  }
-}

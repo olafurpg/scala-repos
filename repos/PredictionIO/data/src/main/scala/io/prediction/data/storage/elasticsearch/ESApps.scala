@@ -29,19 +29,18 @@ import org.json4s.native.Serialization.write
 
 /** Elasticsearch implementation of Items. */
 class ESApps(client: Client, config: StorageClientConfig, index: String)
-    extends Apps with Logging {
+    extends Apps with Logging
   implicit val formats = DefaultFormats.lossless
   private val estype = "apps"
   private val seq = new ESSequences(client, config, index)
 
   val indices = client.admin.indices
   val indexExistResponse = indices.prepareExists(index).get
-  if (!indexExistResponse.isExists) {
+  if (!indexExistResponse.isExists)
     indices.prepareCreate(index).get
-  }
   val typeExistResponse =
     indices.prepareTypesExists(index).setTypes(estype).get
-  if (!typeExistResponse.isExists) {
+  if (!typeExistResponse.isExists)
     val json =
       (estype ->
           ("properties" ->
@@ -51,81 +50,67 @@ class ESApps(client: Client, config: StorageClientConfig, index: String)
       .setType(estype)
       .setSource(compact(render(json)))
       .get
-  }
 
-  def insert(app: App): Option[Int] = {
+  def insert(app: App): Option[Int] =
     val id =
-      if (app.id == 0) {
+      if (app.id == 0)
         var roll = seq.genNext("apps")
         while (!get(roll).isEmpty) roll = seq.genNext("apps")
         roll
-      } else app.id
+      else app.id
     val realapp = app.copy(id = id)
     update(realapp)
     Some(id)
-  }
 
-  def get(id: Int): Option[App] = {
-    try {
+  def get(id: Int): Option[App] =
+    try
       val response = client.prepareGet(index, estype, id.toString).get()
       Some(read[App](response.getSourceAsString))
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         None
       case e: NullPointerException => None
-    }
-  }
 
-  def getByName(name: String): Option[App] = {
-    try {
+  def getByName(name: String): Option[App] =
+    try
       val response = client
         .prepareSearch(index)
         .setTypes(estype)
         .setPostFilter(termFilter("name", name))
         .get
       val hits = response.getHits().hits()
-      if (hits.size > 0) {
+      if (hits.size > 0)
         Some(read[App](hits.head.getSourceAsString))
-      } else {
+      else
         None
-      }
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         None
-    }
-  }
 
-  def getAll(): Seq[App] = {
-    try {
+  def getAll(): Seq[App] =
+    try
       val builder = client.prepareSearch(index).setTypes(estype)
       ESUtils.getAll[App](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq[App]()
-    }
-  }
 
-  def update(app: App): Unit = {
-    try {
+  def update(app: App): Unit =
+    try
       val response = client
         .prepareIndex(index, estype, app.id.toString)
         .setSource(write(app))
         .get()
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
-    }
-  }
 
-  def delete(id: Int): Unit = {
-    try {
+  def delete(id: Int): Unit =
+    try
       client.prepareDelete(index, estype, id.toString).get
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
-    }
-  }
-}

@@ -2,7 +2,7 @@ package sbt
 
 import java.lang.{Process => JProcess, ProcessBuilder => JProcessBuilder}
 
-trait ProcessExtra {
+trait ProcessExtra
   import scala.sys.process._
   import scala.sys.process.Process._
   implicit def builderToProcess(builder: JProcessBuilder): ProcessBuilder =
@@ -21,4 +21,3 @@ trait ProcessExtra {
     apply(command)
   implicit def stringSeqToProcess(command: Seq[String]): ProcessBuilder =
     apply(command)
-}

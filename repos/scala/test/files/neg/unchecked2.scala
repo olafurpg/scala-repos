@@ -1,4 +1,4 @@
-object Test {
+object Test
   // These warn because it can be statically shown they won't match.
 
   /*   warn */
@@ -52,4 +52,3 @@ object Test {
   (Some(123): Any).isInstanceOf[Some[_]]
   /* nowarn */
   (Some(123): Any).isInstanceOf[AnyRef]
-}

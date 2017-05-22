@@ -23,7 +23,7 @@ import org.json4s.JObject
 import org.json4s.native.Serialization.read
 import org.json4s.native.Serialization.write
 
-private[prediction] object ConnectorUtil {
+private[prediction] object ConnectorUtil
 
   implicit val eventJson4sFormats: Formats =
     DefaultFormats + new EventJson4sSupport.APISerializer
@@ -33,11 +33,8 @@ private[prediction] object ConnectorUtil {
   // Event object so that the Event object formation is consistent
   // by enforcing JSON format
 
-  def toEvent(connector: JsonConnector, data: JObject): Event = {
+  def toEvent(connector: JsonConnector, data: JObject): Event =
     read[Event](write(connector.toEventJson(data)))
-  }
 
-  def toEvent(connector: FormConnector, data: Map[String, String]): Event = {
+  def toEvent(connector: FormConnector, data: Map[String, String]): Event =
     read[Event](write(connector.toEventJson(data)))
-  }
-}

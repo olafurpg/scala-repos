@@ -12,9 +12,9 @@ import ch.qos.logback.classic.{Logger, LoggerContext, Level}
 /**
   * Test utility for testing Play logs
   */
-object LogTester {
+object LogTester
 
-  def withLogBuffer[T](block: LogBuffer => T) = {
+  def withLogBuffer[T](block: LogBuffer => T) =
     val ctx = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     val root = ctx.getLogger("ROOT")
     val rootLevel = root.getLevel
@@ -22,41 +22,32 @@ object LogTester {
     val playLevel = playLogger.getLevel
     val appender = new LogBuffer()
     appender.start()
-    try {
+    try
       root.addAppender(appender)
       root.setLevel(Level.ALL)
       playLogger.addAppender(appender)
       playLogger.setLevel(Level.ALL)
       block(appender)
-    } finally {
+    finally
       root.detachAppender(appender)
       root.setLevel(rootLevel)
       playLogger.detachAppender(appender)
       playLogger.setLevel(playLevel)
-    }
-  }
-}
 
-class LogBuffer extends AppenderBase[ILoggingEvent] {
+class LogBuffer extends AppenderBase[ILoggingEvent]
   private val buffer = ListBuffer.empty[ILoggingEvent]
 
-  def append(eventObject: ILoggingEvent) = buffer.synchronized {
+  def append(eventObject: ILoggingEvent) = buffer.synchronized
     buffer.append(eventObject)
-  }
 
   def find(level: Option[Level] = None,
            logger: Option[String] = None,
            messageContains: Option[String] = None): List[ILoggingEvent] =
-    buffer.synchronized {
-      val byLevel = level.fold(buffer) { l =>
+    buffer.synchronized
+      val byLevel = level.fold(buffer)  l =>
         buffer.filter(_.getLevel == l)
-      }
-      val byLogger = logger.fold(byLevel) { l =>
+      val byLogger = logger.fold(byLevel)  l =>
         byLevel.filter(_.getLoggerName == l)
-      }
-      val byMessageContains = logger.fold(byLogger) { m =>
+      val byMessageContains = logger.fold(byLogger)  m =>
         byLogger.filter(_.getMessage.contains(m))
-      }
       byMessageContains.toList
-    }
-}

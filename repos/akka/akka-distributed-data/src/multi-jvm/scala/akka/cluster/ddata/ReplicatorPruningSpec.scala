@@ -14,7 +14,7 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
 
-object ReplicatorPruningSpec extends MultiNodeConfig {
+object ReplicatorPruningSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -24,7 +24,6 @@ object ReplicatorPruningSpec extends MultiNodeConfig {
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.log-dead-letters-during-shutdown = off
     """))
-}
 
 class ReplicatorPruningSpecMultiJvmNode1 extends ReplicatorPruningSpec
 class ReplicatorPruningSpecMultiJvmNode2 extends ReplicatorPruningSpec
@@ -32,7 +31,7 @@ class ReplicatorPruningSpecMultiJvmNode3 extends ReplicatorPruningSpec
 
 class ReplicatorPruningSpec
     extends MultiNodeSpec(ReplicatorPruningSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
   import ReplicatorPruningSpec._
   import Replicator._
 
@@ -51,42 +50,36 @@ class ReplicatorPruningSpec
   val KeyB = ORSetKey[String]("B")
   val KeyC = PNCounterMapKey("C")
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       cluster join node(to).address
-    }
     enterBarrier(from.name + "-joined")
-  }
 
-  "Pruning of CRDT" must {
+  "Pruning of CRDT" must
 
-    "move data from removed node" in {
+    "move data from removed node" in
       join(first, first)
       join(second, first)
       join(third, first)
 
-      within(5.seconds) {
-        awaitAssert {
+      within(5.seconds)
+        awaitAssert
           replicator ! GetReplicaCount
           expectMsg(ReplicaCount(3))
-        }
-      }
 
       // we need the UniqueAddress
       val memberProbe = TestProbe()
       cluster.subscribe(memberProbe.ref,
                         initialStateMode = InitialStateAsEvents,
                         classOf[MemberUp])
-      val thirdUniqueAddress = {
+      val thirdUniqueAddress =
         val member = memberProbe
-          .fishForMessage(3.seconds) {
+          .fishForMessage(3.seconds)
             case MemberUp(m) if m.address == node(third).address ⇒ true
             case _ ⇒ false
-          }
           .asInstanceOf[MemberUp]
           .member
         member.uniqueAddress
-      }
 
       replicator ! Update(KeyA, GCounter(), WriteAll(timeout))(_ + 3)
       expectMsg(UpdateSuccess(KeyA, None))
@@ -116,93 +109,70 @@ class ReplicatorPruningSpec
 
       enterBarrier("get-old")
 
-      runOn(first) {
+      runOn(first)
         cluster.leave(node(third).address)
-      }
 
-      runOn(first, second) {
-        within(15.seconds) {
-          awaitAssert {
+      runOn(first, second)
+        within(15.seconds)
+          awaitAssert
             replicator ! GetReplicaCount
             expectMsg(ReplicaCount(2))
-          }
-        }
-      }
       enterBarrier("third-removed")
 
-      runOn(first, second) {
-        within(15.seconds) {
-          awaitAssert {
+      runOn(first, second)
+        within(15.seconds)
+          awaitAssert
             replicator ! Get(KeyA, ReadLocal)
-            expectMsgPF() {
+            expectMsgPF()
               case g @ GetSuccess(KeyA, _) ⇒
                 g.get(KeyA).value should be(9)
                 g.get(KeyA).needPruningFrom(thirdUniqueAddress) should be(
                     false)
-            }
-          }
-        }
-        within(5.seconds) {
-          awaitAssert {
+        within(5.seconds)
+          awaitAssert
             replicator ! Get(KeyB, ReadLocal)
-            expectMsgPF() {
+            expectMsgPF()
               case g @ GetSuccess(KeyB, _) ⇒
                 g.get(KeyB).elements should be(Set("a", "b", "c"))
                 g.get(KeyB).needPruningFrom(thirdUniqueAddress) should be(
                     false)
-            }
-          }
-        }
-        within(5.seconds) {
-          awaitAssert {
+        within(5.seconds)
+          awaitAssert
             replicator ! Get(KeyC, ReadLocal)
-            expectMsgPF() {
+            expectMsgPF()
               case g @ GetSuccess(KeyC, _) ⇒
                 g.get(KeyC).entries should be(Map("x" -> 3L, "y" -> 3L))
                 g.get(KeyC).needPruningFrom(thirdUniqueAddress) should be(
                     false)
-            }
-          }
-        }
-      }
       enterBarrier("pruning-done")
 
       // on one of the nodes the data has been updated by the pruning,
       // client can update anyway
-      def updateAfterPruning(expectedValue: Int): Unit = {
+      def updateAfterPruning(expectedValue: Int): Unit =
         replicator ! Update(KeyA, GCounter(), WriteAll(timeout), None)(_ + 1)
-        expectMsgPF() {
+        expectMsgPF()
           case UpdateSuccess(KeyA, _) ⇒
             replicator ! Get(KeyA, ReadLocal)
             val retrieved = expectMsgType[GetSuccess[GCounter]].dataValue
             retrieved.value should be(expectedValue)
-        }
-      }
-      runOn(first) {
+      runOn(first)
         updateAfterPruning(expectedValue = 10)
-      }
       enterBarrier("update-first-after-pruning")
 
-      runOn(second) {
+      runOn(second)
         updateAfterPruning(expectedValue = 11)
-      }
       enterBarrier("update-second-after-pruning")
 
       // after pruning performed and maxDissemination it is tombstoned
       // and we should still not be able to update with data from removed node
       expectNoMsg(maxPruningDissemination + 3.seconds)
 
-      runOn(first) {
+      runOn(first)
         updateAfterPruning(expectedValue = 12)
-      }
       enterBarrier("update-first-after-tombstone")
 
-      runOn(second) {
+      runOn(second)
         updateAfterPruning(expectedValue = 13)
-      }
       enterBarrier("update-second-after-tombstone")
 
       enterBarrier("after-1")
-    }
-  }
-}

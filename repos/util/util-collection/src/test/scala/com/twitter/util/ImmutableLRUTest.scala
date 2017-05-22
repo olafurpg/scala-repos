@@ -8,14 +8,14 @@ import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks {
+class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks
 
   // don't waste too much time testing this and keep things small
   implicit override val generatorDrivenConfig = PropertyCheckConfig(
       minSuccessful = 5, minSize = 2, maxSize = 10)
 
-  test("ImmutableLRU insertion") {
-    forAll(Gen.zip(Gen.identifier, arbitrary[Int])) {
+  test("ImmutableLRU insertion")
+    forAll(Gen.zip(Gen.identifier, arbitrary[Int]))
       case (s: String, i: Int) =>
         val lru = ImmutableLRU[String, Int](50)
 
@@ -26,36 +26,30 @@ class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks {
         // test get method
         val (key2, _) = lru2.get(s)
         assert(key2 == Some(i))
-    }
-  }
 
   // given a list of entries, build an LRU containing them
   private def buildLRU[V](
       lru: ImmutableLRU[String, V],
-      entries: List[(String, V)]): ImmutableLRU[String, V] = {
-    entries match {
+      entries: List[(String, V)]): ImmutableLRU[String, V] =
+    entries match
       case Nil => lru
       case head :: tail => buildLRU((lru + head)._2, tail)
-    }
-  }
 
-  test("ImmutableLRU eviction") {
-    forAll(LRUEntriesGenerator[Int]) { entries =>
+  test("ImmutableLRU eviction")
+    forAll(LRUEntriesGenerator[Int])  entries =>
       val lru = buildLRU(ImmutableLRU[String, Int](4), entries)
       assert(lru.keySet == entries
             .map(_._1)
             .slice(entries.size - 4, entries.size)
             .toSet)
-    }
-  }
 
-  test("ImmutableLRU removal") {
-    val gen = for {
+  test("ImmutableLRU removal")
+    val gen = for
       entries <- LRUEntriesGenerator[Double]
       entry <- Gen.oneOf(entries)
-    } yield (entries, entry._1, entry._2)
+    yield (entries, entry._1, entry._2)
 
-    forAll(gen) {
+    forAll(gen)
       case (entries, k, v) =>
         val lru =
           buildLRU(ImmutableLRU[String, Double](entries.size + 1), entries)
@@ -74,6 +68,3 @@ class ImmutableLRUTest extends FunSuite with GeneratorDrivenPropertyChecks {
         // still should be able to get it out of the original
         val (key3, _) = lru.remove(k)
         assert(key3 == Some(v))
-    }
-  }
-}

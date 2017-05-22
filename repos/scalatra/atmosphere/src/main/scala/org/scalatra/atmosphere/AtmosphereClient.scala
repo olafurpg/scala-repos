@@ -11,42 +11,34 @@ import org.scalatra.util.RicherString._
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 
-object AtmosphereClient {
-  def lookupAll(): Seq[ScalatraBroadcaster] = {
-    BroadcasterFactory.getDefault.lookupAll().asScala.toSeq collect {
+object AtmosphereClient
+  def lookupAll(): Seq[ScalatraBroadcaster] =
+    BroadcasterFactory.getDefault.lookupAll().asScala.toSeq collect
       case b: ScalatraBroadcaster => b
-    }
-  }
 
-  def lookup(path: String): Option[ScalatraBroadcaster] = {
+  def lookup(path: String): Option[ScalatraBroadcaster] =
     val pth = path.blankOption getOrElse "/*"
     val norm =
-      if (!pth.endsWith("/*")) {
+      if (!pth.endsWith("/*"))
         if (!pth.endsWith("/")) pth + "/*" else "*"
-      } else pth
+      else pth
     val res: Broadcaster = BroadcasterFactory.getDefault.lookup(norm)
-    if (res != null && res.isInstanceOf[ScalatraBroadcaster]) {
+    if (res != null && res.isInstanceOf[ScalatraBroadcaster])
       Some(res.asInstanceOf[ScalatraBroadcaster])
-    } else {
+    else
       None
-    }
-  }
 
   def broadcast(path: String,
                 message: OutboundMessage,
                 filter: ClientFilter = new Everyone)(
-      implicit executionContext: ExecutionContext) = {
+      implicit executionContext: ExecutionContext) =
     lookup(path) foreach { _.broadcast(message, filter) }
-  }
 
   def broadcastAll(
       message: OutboundMessage, filter: ClientFilter = new Everyone)(
-      implicit executionContext: ExecutionContext) = {
-    lookupAll() foreach {
+      implicit executionContext: ExecutionContext) =
+    lookupAll() foreach
       _ broadcast (message, filter)
-    }
-  }
-}
 
 /**
   * Provides a handle for a single Atmosphere connection.
@@ -57,17 +49,16 @@ object AtmosphereClient {
   * Subclasses may define their own ClientFilter logic in addition to the
   * stock ClientFilters already defined, in order to segment message delivery.
   */
-trait AtmosphereClient extends AtmosphereClientFilters {
+trait AtmosphereClient extends AtmosphereClientFilters
 
   @volatile private[atmosphere] var resource: AtmosphereResource = _
   @transient private[this] val internalLogger = Logger[AtmosphereClient]
   @transient private[this] def broadcaster =
     resource.getBroadcaster.asInstanceOf[ScalatraBroadcaster]
 
-  protected def requestUri = {
+  protected def requestUri =
     val u = resource.getRequest.getRequestURI.blankOption getOrElse "/"
     if (u.endsWith("/")) u + "*" else u + "/*"
-  }
 
   private var scalatraContext: ScalatraContext = null
 
@@ -78,10 +69,9 @@ trait AtmosphereClient extends AtmosphereClientFilters {
   def servletContext: ServletContext = scalatraContext.servletContext
 
   def receiveWithScalatraContext(
-      scalatraContext: ScalatraContext): AtmoReceive = {
+      scalatraContext: ScalatraContext): AtmoReceive =
     this.scalatraContext = scalatraContext
     receive
-  }
 
   /**
     * A unique identifier for a given connection. Can be used for filtering
@@ -116,7 +106,7 @@ trait AtmosphereClient extends AtmosphereClientFilters {
     * deliver the message to by applying a filter.
     */
   final def broadcast(msg: OutboundMessage, to: ClientFilter = Others)(
-      implicit executionContext: ExecutionContext) = {
+      implicit executionContext: ExecutionContext) =
     if (resource == null)
       internalLogger.warn("The resource is null, can't publish")
 
@@ -124,7 +114,6 @@ trait AtmosphereClient extends AtmosphereClientFilters {
       internalLogger.warn("The broadcaster is null, can't publish")
 
     broadcaster.broadcast(msg, to)
-  }
 
   /**
     * Broadcast a message to all clients, skipping the current client by default
@@ -134,4 +123,3 @@ trait AtmosphereClient extends AtmosphereClientFilters {
   final def ><(msg: OutboundMessage, to: ClientFilter = Others)(
       implicit executionContext: ExecutionContext) =
     broadcast(msg, to)(executionContext)
-}

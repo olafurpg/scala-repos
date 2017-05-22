@@ -1,5 +1,4 @@
 import m._
 
-object Test extends App {
+object Test extends App
   Logger.error("err")
-}

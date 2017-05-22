@@ -11,12 +11,11 @@ import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import scala.concurrent.Await
 
-trait CodecSpecSupport extends Matchers with BeforeAndAfterAll { self: Suite ⇒
+trait CodecSpecSupport extends Matchers with BeforeAndAfterAll  self: Suite ⇒
 
   def readAs(string: String, charset: String = "UTF8") =
-    equal(string).matcher[String] compose {
+    equal(string).matcher[String] compose
       (_: ByteString).decodeString(charset)
-    }
   def hexDump(bytes: ByteString) = bytes.map("%02x".format(_)).mkString
   def fromHexDump(dump: String) =
     dump
@@ -24,13 +23,12 @@ trait CodecSpecSupport extends Matchers with BeforeAndAfterAll { self: Suite ⇒
       .toArray
       .map(chars ⇒ Integer.parseInt(new String(chars), 16).toByte)
 
-  def printBytes(i: Int, id: String) = {
+  def printBytes(i: Int, id: String) =
     def byte(i: Int) = (i & 0xFF).toHexString
     println(
         id + ": " + byte(i) + ":" + byte(i >> 8) + ":" + byte(i >> 16) + ":" +
         byte(i >> 24))
     i
-  }
 
   lazy val emptyTextBytes = ByteString(emptyText, "UTF8")
   lazy val smallTextBytes = ByteString(smallText, "UTF8")
@@ -83,7 +81,5 @@ est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscin
   implicit val system = ActorSystem(getClass.getSimpleName)
   implicit val materializer = ActorMaterializer()
 
-  override def afterAll() = {
+  override def afterAll() =
     Await.result(system.terminate(), 10.seconds)
-  }
-}

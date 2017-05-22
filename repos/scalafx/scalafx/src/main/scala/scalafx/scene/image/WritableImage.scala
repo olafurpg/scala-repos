@@ -32,16 +32,15 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object WritableImage {
+object WritableImage
   implicit def sfxWritableImage2jfx(wi: WritableImage): jfxsi.WritableImage =
     if (null == wi) null else wi.delegate
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/WritableImage.html]]
   */
 class WritableImage(override val delegate: jfxsi.WritableImage)
-    extends Image(delegate) with SFXDelegate[jfxsi.WritableImage] {
+    extends Image(delegate) with SFXDelegate[jfxsi.WritableImage]
 
   /**
     * Construct an empty image of the specified dimensions.
@@ -69,4 +68,3 @@ class WritableImage(override val delegate: jfxsi.WritableImage)
   def pixelWriter: PixelWriter = delegate.getPixelWriter
   @deprecated("Method name is incorrect use `pixelWriter`.", "8.0.60-R10")
   def pixelWrit: PixelWriter = delegate.getPixelWriter
-}

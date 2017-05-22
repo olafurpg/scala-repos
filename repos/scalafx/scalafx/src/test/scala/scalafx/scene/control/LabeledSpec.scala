@@ -42,9 +42,8 @@ class LabeledSpec
     extends SimpleSFXDelegateSpec[jfxsc.Labeled, Labeled](
         classOf[jfxsc.Labeled], classOf[Labeled])
     with AlignmentDelegateSpec[jfxsc.Labeled, Labeled]
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override protected def getScalaClassInstance = new Labeled(new Label) {}
 
   protected override def getJavaClassInstance = new jfxsc.Labeled {}
-}

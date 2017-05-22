@@ -53,7 +53,7 @@ object ImageIncludes extends ImageIncludes
   * @define WRI WritableImage
   * @define WPF WritablePixelFormat
   */
-trait ImageIncludes {
+trait ImageIncludes
 
   /**
     * $START$IMG.html $IMG$END
@@ -100,9 +100,9 @@ trait ImageIncludes {
     */
   implicit def jfxPixelReader2sfx(pr: jfxsi.PixelReader): PixelReader =
     if (pr != null)
-      new PixelReader {
+      new PixelReader
         override val delegate = pr
-      } else null
+      else null
 
   /**
     * $START$PXW.html $PXW$END
@@ -112,9 +112,9 @@ trait ImageIncludes {
     */
   implicit def jfxPixelWriter2sfx(pw: jfxsi.PixelWriter): PixelWriter =
     if (pw != null)
-      new PixelWriter {
+      new PixelWriter
         override val delegate = pw
-      } else null
+      else null
 
   /**
     * $START$WRI.html $WRI$END
@@ -134,4 +134,3 @@ trait ImageIncludes {
   implicit def jfxWritablePixelFormat2sfx[B <: Buffer](
       pf: jfxsi.WritablePixelFormat[B]): WritablePixelFormat[B] =
     new WritablePixelFormat[B](pf) {}
-}

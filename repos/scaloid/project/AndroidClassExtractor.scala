@@ -9,10 +9,10 @@ import org.reflections.scanners._
 import org.reflections.util._
 import scala.collection.JavaConversions._
 
-object AndroidClassExtractor extends JavaConversionHelpers {
+object AndroidClassExtractor extends JavaConversionHelpers
 
   private val sourceJars: List[JarFile] =
-    getClass.getClassLoader.getResources("android").toList.map { binUrl =>
+    getClass.getClassLoader.getResources("android").toList.map  binUrl =>
       val binFile = new File(binUrl.toString
             .split("/|!")
             .tail
@@ -20,36 +20,32 @@ object AndroidClassExtractor extends JavaConversionHelpers {
             .mkString("/", "/", ""))
       val basePath = binFile.getParentFile.getParentFile
       new JarFile(basePath / "srcs" / (binFile.base + "-sources.jar"))
-    }
 
-  private def sourceInputStream(cls: Class[_]): Option[java.io.InputStream] = {
+  private def sourceInputStream(cls: Class[_]): Option[java.io.InputStream] =
     val filename = cls.getName.split('$').head.replace(".", "/") + ".java"
-    sourceJars.map { sourceJar =>
-      sourceJar.getJarEntry(filename) match {
+    sourceJars.map  sourceJar =>
+      sourceJar.getJarEntry(filename) match
         case null => Nil
         case entry => List(sourceJar.getInputStream(entry))
-      }
-    }.flatten.headOption
-  }
+    .flatten.headOption
 
   private def sourceExists(cls: Class[_]) = sourceInputStream(cls).isDefined
 
-  private def extractSource(cls: Class[_]): String = {
+  private def extractSource(cls: Class[_]): String =
     val is = sourceInputStream(cls).get
     val bytes =
       Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
     new String(bytes)
-  }
 
   private def fixClassParamedType(tpe: ScalaType) =
     tpe.copy(
-        params = tpe.params.map { t =>
-      if (t.isVar && t.bounds.head.name == "Any") {
+        params = tpe.params.map  t =>
+      if (t.isVar && t.bounds.head.name == "Any")
         t.copy(bounds = List(ScalaType("AnyRef")))
-      } else t
-    })
+      else t
+    )
 
-  private def toAndroidClass(cls: Class[_]) = {
+  private def toAndroidClass(cls: Class[_]) =
 
     val source = extractSource(cls)
 
@@ -64,19 +60,19 @@ object AndroidClassExtractor extends JavaConversionHelpers {
       .map(toScalaType)
       .filter(_.name.startsWith("android"))
 
-    val superProps: Set[String] = superClass.map {
+    val superProps: Set[String] = superClass.map
       Introspector
         .getBeanInfo(_)
         .getPropertyDescriptors
         .map(propDescSignature)
         .toSet[String]
-    }.getOrElse(Set())
+    .getOrElse(Set())
 
-    val superMethods: Set[String] = superClass.map {
+    val superMethods: Set[String] = superClass.map
       _.getMethods.map(methodSignature).toSet
-    }.getOrElse(Set())
+    .getOrElse(Set())
 
-    def toAndroidMethod(m: Method): AndroidMethod = {
+    def toAndroidMethod(m: Method): AndroidMethod =
       val name = m.getName
       val retType = AndroidClassExtractor.toScalaType(m.getGenericReturnType)
       val argTypes = m.getGenericParameterTypes.toList
@@ -90,21 +86,18 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                     isAbstract(m),
                     isOverride(m),
                     isDeprecated(m))
-    }
 
-    def isListenerSetterOrAdder(m: Method): Boolean = {
+    def isListenerSetterOrAdder(m: Method): Boolean =
       val name = m.getName
       name.matches("^(set|add).+Listener$") &&
       !superMethods(methodSignature(m))
-    }
 
-    def hasIntentAsParam(m: Method): Boolean = {
+    def hasIntentAsParam(m: Method): Boolean =
       val params = m.getParameterTypes
       if (params.length > 0)
         "android.content.Intent".equals(m.getParameterTypes.apply(0).getName) &&
         !superMethods(methodSignature(m))
       else false
-    }
 
     def isCallbackMethod(m: Method): Boolean =
       isAbstract(m) && !m.getName.startsWith("get")
@@ -117,24 +110,23 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         .toList
         .sortBy(_.name)
 
-    def propName(name: String) = {
+    def propName(name: String) =
       val s = "^(get|is|set)".r.replaceAllIn(name, "")
       if (s.take(3).matches("[A-Z]{3}")) s
       else s.head.toLower + s.tail
-    }
 
     def isGetter(name: String) = name.matches("^(get|is)[^a-z].*")
 
     def isSetter(name: String) = name.matches("^set[^a-z].*")
 
-    val props: List[AndroidProperty] = {
+    val props: List[AndroidProperty] =
       val clsMethods = cls.getMethods
-      val accessors = clsMethods.filter { m =>
+      val accessors = clsMethods.filter  m =>
         val name = m.getName
         val arity = m.getParameterTypes.length
         !superMethods(methodSignature(m)) &&
         ((arity == 0 && isGetter(name)) || (arity == 1 && isSetter(name)))
-      }.filter { m =>
+      .filter  m =>
         (!cls.getName.endsWith("Service") ||
             !m.getName.equals("setForeground")) &&
         // Android 2.1.1 has a weird undocumented method. manually ignore this.
@@ -143,17 +135,16 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         //https://github.com/pocorall/scaloid/issues/56
         (!cls.getName.endsWith("View") ||
             !m.getName.equals("setBackground")) // manually specifies this method
-      }
 
       val allMethodNames = clsMethods.map(_.getName).toSet
 
       accessors
         .groupBy(m => propName(m.getName))
-        .map {
+        .map
           case (name, methods) =>
-            val (_setters, _getters) = methods.filter {
+            val (_setters, _getters) = methods.filter
               !_.toGenericString.contains("static")
-            }.partition(_.getName.startsWith("set"))
+            .partition(_.getName.startsWith("set"))
             val setters =
               _setters.map(toAndroidMethod).sortBy(_.argTypes.head.name).toList
             val getter = _getters.map(toAndroidMethod).headOption
@@ -165,7 +156,7 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
             if (setters.isEmpty &&
                 (getter.isEmpty || getter.get.name.startsWith("is"))) None
-            else {
+            else
               val nameClashes = allMethodNames(name) || superGetterExists
               val tpe =
                 getter.map(_.retType).getOrElse(setters.head.argTypes.head)
@@ -176,14 +167,11 @@ object AndroidClassExtractor extends JavaConversionHelpers {
 
               Some(AndroidProperty(
                       name, tpe, getter, setters, switch, nameClashes))
-            }
-        }
         .flatten
         .toList
         .sortBy(_.name)
-    }
 
-    def toAndroidIntentMethods(method: Method): AndroidIntentMethod = {
+    def toAndroidIntentMethods(method: Method): AndroidIntentMethod =
       val am = toAndroidMethod(method)
       val args = am.argTypes.tail
       AndroidIntentMethod(method.getName,
@@ -191,21 +179,19 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                           args,
                           args.length == 0,
                           isDeprecated(method))
-    }
 
-    def toAndroidListeners(method: Method): List[AndroidListener] = {
+    def toAndroidListeners(method: Method): List[AndroidListener] =
       val setter = method.getName
       val setterArgTypes = method.getGenericParameterTypes.toList
-      val listenerCls: Class[_] = setterArgTypes.collectFirst {
+      val listenerCls: Class[_] = setterArgTypes.collectFirst
         case c: Class[_]
             if c.getName.matches(".+(Listener|Manager|Observer|Watcher).*") =>
           c
-      } match {
+      match
         case Some(c) => c
         case None => classOf[Any] // Failed to find listener argument by type
-      }
       val callbackMethods = extractMethodsFromListener(listenerCls)
-      val androidCallbackMethods = callbackMethods.map { cm =>
+      val androidCallbackMethods = callbackMethods.map  cm =>
         AndroidCallbackMethod(
             cm.name,
             cm.retType,
@@ -213,13 +199,12 @@ object AndroidClassExtractor extends JavaConversionHelpers {
             false,
             cm.isDeprecated
         )
-      }
 
       def listenerName(am: AndroidMethod,
                        callbacks: List[AndroidCallbackMethod],
-                       setter: String) = {
+                       setter: String) =
         if (callbacks.length != 1) am.name
-        else {
+        else
           val transforms = List[String => String](
               _.replace("$", "."),
               "(^set|^add|Listener$|ElementListener$)".r.replaceAllIn(_, ""),
@@ -233,10 +218,8 @@ object AndroidClassExtractor extends JavaConversionHelpers {
           if (specificName.length > am.name.length &&
               specificName.contains(generalName)) specificName
           else am.name
-        }
-      }
 
-      callbackMethods.map { cm =>
+      callbackMethods.map  cm =>
         AndroidListener(
             listenerName(cm, androidCallbackMethods, setter),
             callbackMethods.find(_.name == cm.name).get.retType,
@@ -245,26 +228,24 @@ object AndroidClassExtractor extends JavaConversionHelpers {
             setter,
             setterArgTypes.map(toScalaType),
             toScalaType(listenerCls).name,
-            androidCallbackMethods.map { icm =>
+            androidCallbackMethods.map  icm =>
               if (icm.name == cm.name) icm.copy(hasBody = true) else icm
-            },
+            ,
             cm.isDeprecated
         )
-      }.filter(_.isSafe)
-    }
+      .filter(_.isSafe)
 
     def resolveListenerDuplication(listeners: List[AndroidListener]) =
-      listeners map { l =>
+      listeners map  l =>
         if (listeners
               .filter(l2 =>
                     l.name == l2.name && l.setterArgTypes == l2.setterArgTypes)
-              .length > 1) {
+              .length > 1)
           val t = "(^set|^add|Listener$)".r.replaceAllIn(l.setter, "")
           l.copy(name = t.head.toLower + t.tail)
-        } else l
-      }
+        else l
 
-    val constructorNames: Map[List[String], List[String]] = {
+    val constructorNames: Map[List[String], List[String]] =
       val constRegex = ("public +" + clsName +
           """(?:\<[\w\<\>\[\]]+)? *\(([^)]*)\) *(?:\{?|[^;])""").r
       val argRegex = """(.+?) +([a-z][^\[,. ]*)(?:,|$)""".r
@@ -274,58 +255,49 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         .matchData
         .map(_.group(1))
         .filter(_.nonEmpty)
-        .map { cGroup =>
+        .map  cGroup =>
           argRegex
             .findAllIn(cGroup)
             .matchData
-            .map { pMatch =>
+            .map  pMatch =>
               val List(tpe, name) = List(1, 2).map(pMatch.group(_).trim)
               (tpe, name)
-            }
             .toList
             .unzip
-        }
         .toMap
-    }
 
     // Find constructor not by fully qualified name
     def looseConstructorLookup(types: List[String]): Option[List[String]] =
-      constructorNames.find {
+      constructorNames.find
         case (key, _) =>
-          types.zip(key).forall {
+          types.zip(key).forall
             case (t, k) => t.endsWith(k)
-          }
-      }.map(_._2)
+      .map(_._2)
 
-    def toScalaConstructor(cons: Constructor[_]): ScalaConstructor = {
+    def toScalaConstructor(cons: Constructor[_]): ScalaConstructor =
 
       val isVarArgs = cons.isVarArgs
 
-      def isImplicit(a: Argument) = {
+      def isImplicit(a: Argument) =
         a.tpe.simpleName == "Context"
-      }
 
       val javaTypes = cons.getGenericParameterTypes.toList
-      val typeStrs = javaTypes.reverse match {
+      val typeStrs = javaTypes.reverse match
         case Nil => Nil
         case last :: init =>
           (toTypeStr(last, isVarArgs, true) :: init.map(
                   toTypeStr(_, isVarArgs, false))).reverse
-      }
 
-      val args = typeStrs match {
+      val args = typeStrs match
         case Nil => Nil
         case _ =>
-          val paramNames = constructorNames.get(typeStrs) match {
+          val paramNames = constructorNames.get(typeStrs) match
             case Some(ns) => ns
             case None => looseConstructorLookup(typeStrs).get
-          }
           val types = javaTypes.map(toScalaType)
 
-          paramNames.zip(types).map {
+          paramNames.zip(types).map
             case (n, t) => Argument(n, t)
-          }
-      }
 
       val (implicits, explicits) = args.partition(isImplicit)
       val paramedTypes =
@@ -337,7 +309,6 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                        paramedTypes,
                        cons.isVarArgs,
                        isDeprecated(cons))
-    }
 
     def getHierarchy(c: Class[_], accu: List[String] = Nil): List[String] =
       if (c == null) accu
@@ -379,12 +350,11 @@ object AndroidClassExtractor extends JavaConversionHelpers {
                  isFinal(cls),
                  hasBlankConstructor,
                  isDeprecated(cls))
-  }
 
-  def extractTask = (moduleName, baseDirectory, streams) map {
+  def extractTask = (moduleName, baseDirectory, streams) map
     (mName, baseDir, s) =>
       if (mName == "parent") Map[String, AndroidClass]()
-      else {
+      else
         s.log.info("Extracting class info from Android...")
 
         val classLoaders = List(ClasspathHelper.contextClassLoader(),
@@ -405,17 +375,14 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         val clss = asScalaSet(r.getSubTypesOf(classOf[java.lang.Object]))
         val res = clss.toList
           .filter(isPublic)
-          .filter {
+          .filter
             !_.getName.contains("$") // excludes inner classes for now - let's deal with it later
-          }
-          .filter { n =>
+          .filter  n =>
             val name = n.toString
             !name.contains("webkit") ||
             name.contains("WebView") // excludes android.webkit.* in Android 2.1.1, which is deprecated
-          }
-          .filter {
+          .filter
             !_.getName.contains("RemoteViewsService") // excludes RemoteViewsService, because it is packaged weird place "android.view"
-          }
           .filter(sourceExists)
           .map(toAndroidClass)
           .map(c => c.tpe.name -> c)
@@ -429,6 +396,3 @@ object AndroidClassExtractor extends JavaConversionHelpers {
         s.log.info(
             "Constructors: " + values.map(_.constructors).flatten.length)
         res
-      }
-  }
-}

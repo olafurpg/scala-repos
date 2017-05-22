@@ -6,10 +6,10 @@ import org.specs2.mutable._
 import org.specs2.specification._
 import ornicar.scalalib.test._
 
-class DataFormTest extends Specification with ScalazValidationMatchers {
+class DataFormTest extends Specification with ScalazValidationMatchers
 
-  "Import from position" should {
-    "preserve initial FEN" in {
+  "Import from position" should
+    "preserve initial FEN" in
       val pgn =
         """[Event "Casual game"]
 [Result "1-0"]
@@ -21,9 +21,5 @@ class DataFormTest extends Specification with ScalazValidationMatchers {
 
 1. Bd7 b4 2. Kf7 b3 3. Ke8 b2 4. Kd8 g6 5. Bxc7# { Black is checkmated } 1-0"""
 
-      ImportData(pgn, None).preprocess(None) must beSuccess.like {
+      ImportData(pgn, None).preprocess(None) must beSuccess.like
         case s => s.game.toChess.board.history.castles must_== Castles.none
-      }
-    }
-  }
-}

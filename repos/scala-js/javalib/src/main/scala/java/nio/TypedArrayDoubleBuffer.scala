@@ -7,7 +7,7 @@ private[nio] final class TypedArrayDoubleBuffer private (
     _initialPosition: Int,
     _initialLimit: Int,
     _readOnly: Boolean)
-    extends DoubleBuffer(_typedArray.length, null, -1) {
+    extends DoubleBuffer(_typedArray.length, null, -1)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -95,27 +95,23 @@ private[nio] final class TypedArrayDoubleBuffer private (
   override private[nio] def store(
       startIndex: Int, src: Array[Double], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}
 
-private[nio] object TypedArrayDoubleBuffer {
+private[nio] object TypedArrayDoubleBuffer
   private[nio] implicit object NewTypedArrayDoubleBuffer
-      extends GenTypedArrayBuffer.NewTypedArrayBuffer[DoubleBuffer] {
+      extends GenTypedArrayBuffer.NewTypedArrayBuffer[DoubleBuffer]
     def bytesPerElem: Int = 8
 
     def apply(typedArray: Float64Array,
               initialPosition: Int,
               initialLimit: Int,
-              readOnly: Boolean): TypedArrayDoubleBuffer = {
+              readOnly: Boolean): TypedArrayDoubleBuffer =
       new TypedArrayDoubleBuffer(
           typedArray, initialPosition, initialLimit, readOnly)
-    }
 
     @inline
     def newTypedArray(
-        buffer: ArrayBuffer, byteOffset: Int, length: Int): Float64Array = {
+        buffer: ArrayBuffer, byteOffset: Int, length: Int): Float64Array =
       new Float64Array(buffer, byteOffset, length)
-    }
-  }
 
   @inline
   def fromTypedArrayByteBuffer(
@@ -124,4 +120,3 @@ private[nio] object TypedArrayDoubleBuffer {
 
   def wrap(array: Float64Array): DoubleBuffer =
     new TypedArrayDoubleBuffer(array, 0, array.length, false)
-}

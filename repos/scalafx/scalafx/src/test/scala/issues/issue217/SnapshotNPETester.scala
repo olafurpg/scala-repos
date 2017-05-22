@@ -39,7 +39,7 @@ import scalafx.scene.media.{Media, MediaPlayer, MediaView}
   * Illustration ofd Issue 217. Originallu reported on ScalaFX Users
   * [[https://groups.google.com/forum/#!topic/scalafx-users/-NWgd40U_W0 snapshot problem after upgrade to scalafx 8.0.60-R9]]
   */
-object SnapshotNPETester extends JFXApp {
+object SnapshotNPETester extends JFXApp
   val movie =
     "http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv"
   val mediaView = new MediaView(
@@ -47,20 +47,15 @@ object SnapshotNPETester extends JFXApp {
 
   test(mediaView)
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     width = 500
     height = 300
-    scene = new Scene(0, 0, true, SceneAntialiasing.Balanced) {
+    scene = new Scene(0, 0, true, SceneAntialiasing.Balanced)
       camera = new PerspectiveCamera
       root = new BorderPane { center = mediaView }
-    }
-  }
 
-  def test(mediaNode: Node) = {
-    val param = new SnapshotParameters {
+  def test(mediaNode: Node) =
+    val param = new SnapshotParameters
       viewport = new Rectangle2D(0, 0, 200, 200)
-    }
     // This call was resulting in NPE - Issue #217.
     val textureImage: WritableImage = mediaNode.snapshot(param, null)
-  }
-}

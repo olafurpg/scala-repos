@@ -22,59 +22,51 @@ import scala.compat.java8.OptionConverters._
 import scala.util.Try
 
 /** INTERNAL API */
-private[http] trait J2SMapping[J] {
+private[http] trait J2SMapping[J]
   type S
   def toScala(javaObject: J): S
-}
 
 /** INTERNAL API */
-private[http] object J2SMapping {
+private[http] object J2SMapping
   implicit def fromJavaMapping[J](implicit mapping: JavaMapping[J, _])
     : J2SMapping[J] { type S = mapping.S } = mapping
 
   implicit def fromJavaSeqMapping[J](implicit mapping: J2SMapping[J])
     : J2SMapping[Seq[J]] { type S = immutable.Seq[mapping.S] } =
-    new J2SMapping[Seq[J]] {
+    new J2SMapping[Seq[J]]
       type S = immutable.Seq[mapping.S]
       def toScala(javaObject: Seq[J]): S =
         javaObject.map(mapping.toScala(_)).toList
-    }
-}
 
 /** INTERNAL API */
-private[http] trait S2JMapping[S] {
+private[http] trait S2JMapping[S]
   type J
   def toJava(scalaObject: S): J
-}
 
 /** INTERNAL API */
-private[http] object S2JMapping {
+private[http] object S2JMapping
   implicit def fromScalaMapping[S](implicit mapping: JavaMapping[_, S])
     : S2JMapping[S] { type J = mapping.J } = mapping
-}
 
 /** INTERNAL API */
 private[http] trait JavaMapping[_J, _S]
-    extends J2SMapping[_J] with S2JMapping[_S] {
+    extends J2SMapping[_J] with S2JMapping[_S]
   type J = _J
   type S = _S
-}
 
 /** INTERNAL API */
-private[http] object JavaMapping {
-  trait AsScala[S] {
+private[http] object JavaMapping
+  trait AsScala[S]
     def asScala: S
-  }
-  trait AsJava[J] {
+  trait AsJava[J]
     def asJava: J
-  }
 
   def toJava[J, S](s: S)(implicit mapping: JavaMapping[J, S]): J =
     mapping.toJava(s)
   def toScala[J, S](j: J)(implicit mapping: JavaMapping[J, S]): S =
     mapping.toScala(j)
 
-  object Implicits {
+  object Implicits
     import scala.language.implicitConversions
 
     implicit def convertToScala[J](j: J)(
@@ -85,26 +77,22 @@ private[http] object JavaMapping {
 
     implicit def AddAsScala[J](
         javaObject: J)(implicit mapping: J2SMapping[J]): AsScala[mapping.S] =
-      new AsScala[mapping.S] {
+      new AsScala[mapping.S]
         def asScala = convertToScala(javaObject)
-      }
     implicit def AddAsJava[S](
         scalaObject: S)(implicit mapping: S2JMapping[S]): AsJava[mapping.J] =
-      new AsJava[mapping.J] {
+      new AsJava[mapping.J]
         def asJava = mapping.toJava(scalaObject)
-      }
-  }
 
   /** This trivial mapping isn't enabled by default to prevent it from conflicting with the `Inherited` ones */
   def identity[T]: JavaMapping[T, T] =
-    new JavaMapping[T, T] {
+    new JavaMapping[T, T]
       def toJava(scalaObject: T): J = scalaObject
       def toScala(javaObject: T): S = javaObject
-    }
 
   implicit def iterableMapping[_J, _S](implicit mapping: JavaMapping[_J, _S])
     : JavaMapping[jl.Iterable[_J], immutable.Seq[_S]] =
-    new JavaMapping[jl.Iterable[_J], immutable.Seq[_S]] {
+    new JavaMapping[jl.Iterable[_J], immutable.Seq[_S]]
       import collection.JavaConverters._
 
       def toJava(scalaObject: immutable.Seq[_S]): jl.Iterable[_J] =
@@ -112,29 +100,26 @@ private[http] object JavaMapping {
       def toScala(javaObject: jl.Iterable[_J]): immutable.Seq[_S] =
         Implicits.convertSeqToScala(
             iterableAsScalaIterableConverter(javaObject).asScala.toSeq)
-    }
   implicit def map[K, V]: JavaMapping[ju.Map[K, V], immutable.Map[K, V]] =
-    new JavaMapping[ju.Map[K, V], immutable.Map[K, V]] {
+    new JavaMapping[ju.Map[K, V], immutable.Map[K, V]]
       import scala.collection.JavaConverters._
       def toScala(javaObject: ju.Map[K, V]): immutable.Map[K, V] =
         javaObject.asScala.toMap
       def toJava(scalaObject: immutable.Map[K, V]): ju.Map[K, V] =
         scalaObject.asJava
-    }
   implicit def option[_J, _S](implicit mapping: JavaMapping[_J, _S])
     : JavaMapping[Optional[_J], Option[_S]] =
-    new JavaMapping[Optional[_J], Option[_S]] {
+    new JavaMapping[Optional[_J], Option[_S]]
       def toScala(javaObject: Optional[_J]): Option[_S] =
         javaObject.asScala.map(mapping.toScala)
       def toJava(scalaObject: Option[_S]): Optional[_J] =
         scalaObject.map(mapping.toJava).asJava
-    }
 
   implicit def flowMapping[JIn, SIn, JOut, SOut, M](
       implicit inMapping: JavaMapping[JIn, SIn],
       outMapping: JavaMapping[JOut, SOut])
     : JavaMapping[javadsl.Flow[JIn, JOut, M], scaladsl.Flow[SIn, SOut, M]] =
-    new JavaMapping[javadsl.Flow[JIn, JOut, M], scaladsl.Flow[SIn, SOut, M]] {
+    new JavaMapping[javadsl.Flow[JIn, JOut, M], scaladsl.Flow[SIn, SOut, M]]
       def toScala(javaObject: javadsl.Flow[JIn, JOut, M]): S =
         scaladsl
           .Flow[SIn]
@@ -142,21 +127,19 @@ private[http] object JavaMapping {
           .viaMat(javaObject)(scaladsl.Keep.right)
           .map(outMapping.toScala)
       def toJava(scalaObject: scaladsl.Flow[SIn, SOut, M]): J =
-        javadsl.Flow.fromGraph {
+        javadsl.Flow.fromGraph
           scaladsl
             .Flow[JIn]
             .map(inMapping.toScala)
             .viaMat(scalaObject)(scaladsl.Keep.right)
             .map(outMapping.toJava)
-        }
-    }
 
   implicit def graphFlowMapping[JIn, SIn, JOut, SOut, M](
       implicit inMapping: JavaMapping[JIn, SIn],
       outMapping: JavaMapping[JOut, SOut]): JavaMapping[
       Graph[FlowShape[JIn, JOut], M], Graph[FlowShape[SIn, SOut], M]] =
     new JavaMapping[
-        Graph[FlowShape[JIn, JOut], M], Graph[FlowShape[SIn, SOut], M]] {
+        Graph[FlowShape[JIn, JOut], M], Graph[FlowShape[SIn, SOut], M]]
       def toScala(javaObject: Graph[FlowShape[JIn, JOut], M]): S =
         scaladsl
           .Flow[SIn]
@@ -164,14 +147,12 @@ private[http] object JavaMapping {
           .viaMat(javaObject)(scaladsl.Keep.right)
           .map(outMapping.toScala)
       def toJava(scalaObject: Graph[FlowShape[SIn, SOut], M]): J =
-        javadsl.Flow.fromGraph {
+        javadsl.Flow.fromGraph
           scaladsl
             .Flow[JIn]
             .map(inMapping.toScala)
             .viaMat(scalaObject)(scaladsl.Keep.right)
             .map(outMapping.toJava)
-        }
-    }
 
   def scalaToJavaAdapterFlow[J, S](
       implicit mapping: JavaMapping[J, S]): scaladsl.Flow[S, J, NotUsed] =
@@ -190,38 +171,33 @@ private[http] object JavaMapping {
   implicit def pairMapping[J1, J2, S1, S2](
       implicit _1Mapping: JavaMapping[J1, S1],
       _2Mapping: JavaMapping[J2, S2]): JavaMapping[Pair[J1, J2], (S1, S2)] =
-    new JavaMapping[Pair[J1, J2], (S1, S2)] {
+    new JavaMapping[Pair[J1, J2], (S1, S2)]
       def toJava(scalaObject: (S1, S2)): J =
         Pair(
             _1Mapping.toJava(scalaObject._1), _2Mapping.toJava(scalaObject._2))
       def toScala(javaObject: Pair[J1, J2]): (S1, S2) =
         (_1Mapping.toScala(javaObject.first),
          _2Mapping.toScala(javaObject.second))
-    }
   implicit def tryMapping[_J, _S](
       implicit mapping: JavaMapping[_J, _S]): JavaMapping[Try[_J], Try[_S]] =
-    new JavaMapping[Try[_J], Try[_S]] {
+    new JavaMapping[Try[_J], Try[_S]]
       def toScala(javaObject: Try[_J]): S = javaObject.map(mapping.toScala)
       def toJava(scalaObject: Try[_S]): J = scalaObject.map(mapping.toJava)
-    }
 
   implicit object StringIdentity extends Identity[String]
 
-  implicit object LongMapping extends JavaMapping[jl.Long, Long] {
+  implicit object LongMapping extends JavaMapping[jl.Long, Long]
     def toScala(javaObject: jl.Long): Long = javaObject
     def toJava(scalaObject: Long): jl.Long = scalaObject
-  }
   implicit object InetAddressIdentity extends Identity[InetAddress]
 
-  class Identity[T] extends JavaMapping[T, T] {
+  class Identity[T] extends JavaMapping[T, T]
     def toScala(javaObject: T): T = javaObject
     def toJava(scalaObject: T): T = scalaObject
-  }
   class Inherited[J <: AnyRef, S <: J](implicit classTag: ClassTag[S])
-      extends JavaMapping[J, S] {
+      extends JavaMapping[J, S]
     def toJava(scalaObject: S): J = scalaObject
     def toScala(javaObject: J): S = cast[S](javaObject)
-  }
 
   implicit object ConnectionContext
       extends Inherited[
@@ -352,29 +328,24 @@ private[http] object JavaMapping {
   implicit object RangeUnit
       extends Inherited[jm.headers.RangeUnit, sm.headers.RangeUnit]
 
-  implicit object WsMessage extends JavaMapping[jm.ws.Message, sm.ws.Message] {
+  implicit object WsMessage extends JavaMapping[jm.ws.Message, sm.ws.Message]
     def toScala(javaObject: J): WsMessage.S = javaObject.asScala
     def toJava(scalaObject: S): WsMessage.J = jm.ws.Message.adapt(scalaObject)
-  }
 
-  implicit object Uri extends JavaMapping[jm.Uri, sm.Uri] {
+  implicit object Uri extends JavaMapping[jm.Uri, sm.Uri]
     def toScala(javaObject: J): Uri.S = cast[JavaUri](javaObject).uri
     def toJava(scalaObject: S): Uri.J = JavaUri(scalaObject)
-  }
   implicit object UriParsingMode
       extends Inherited[
           jm.Uri.ParsingMode, akka.http.scaladsl.model.Uri.ParsingMode]
 
-  implicit object Query extends JavaMapping[jm.Query, sm.Uri.Query] {
+  implicit object Query extends JavaMapping[jm.Query, sm.Uri.Query]
     def toScala(javaObject: J): Query.S = cast[JavaQuery](javaObject).query
     def toJava(scalaObject: S): Query.J = JavaQuery(scalaObject)
-  }
 
   private def cast[T](obj: AnyRef)(implicit classTag: ClassTag[T]): T =
-    try classTag.runtimeClass.cast(obj).asInstanceOf[T] catch {
+    try classTag.runtimeClass.cast(obj).asInstanceOf[T] catch
       case exp: ClassCastException ⇒
         throw new IllegalArgumentException(
             s"Illegal custom subclass of $classTag. " +
             s"Please use only the provided factories in akka.http.javadsl.model.Http")
-    }
-}

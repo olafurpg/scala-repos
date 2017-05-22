@@ -43,58 +43,50 @@ import org.apache.spark.sql.SQLContext
   * files in a directory always shows the latest files.
   */
 class HDFSMetadataLog[T : ClassTag](sqlContext: SQLContext, path: String)
-    extends MetadataLog[T] {
+    extends MetadataLog[T]
 
   private val metadataPath = new Path(path)
 
   private val fc =
-    if (metadataPath.toUri.getScheme == null) {
+    if (metadataPath.toUri.getScheme == null)
       FileContext.getFileContext(sqlContext.sparkContext.hadoopConfiguration)
-    } else {
+    else
       FileContext.getFileContext(
           metadataPath.toUri, sqlContext.sparkContext.hadoopConfiguration)
-    }
 
-  if (!fc.util().exists(metadataPath)) {
+  if (!fc.util().exists(metadataPath))
     fc.mkdir(metadataPath, FsPermission.getDirDefault, true)
-  }
 
   /**
     * A `PathFilter` to filter only batch files
     */
-  private val batchFilesFilter = new PathFilter {
+  private val batchFilesFilter = new PathFilter
     override def accept(path: Path): Boolean =
-      try {
+      try
         path.getName.toLong
         true
-      } catch {
+      catch
         case _: NumberFormatException => false
-      }
-  }
 
   private val serializer =
     new JavaSerializer(sqlContext.sparkContext.conf).newInstance()
 
-  private def batchFile(batchId: Long): Path = {
+  private def batchFile(batchId: Long): Path =
     new Path(metadataPath, batchId.toString)
-  }
 
-  override def add(batchId: Long, metadata: T): Boolean = {
-    get(batchId).map(_ => false).getOrElse {
+  override def add(batchId: Long, metadata: T): Boolean =
+    get(batchId).map(_ => false).getOrElse
       // Only write metadata when the batch has not yet been written.
       val buffer = serializer.serialize(metadata)
-      try {
+      try
         writeBatch(batchId, JavaUtils.bufferToArray(buffer))
         true
-      } catch {
+      catch
         case e: IOException
             if "java.lang.InterruptedException" == e.getMessage =>
           // create may convert InterruptedException to IOException. Let's convert it back to
           // InterruptedException so that this failure won't crash StreamExecution
           throw new InterruptedException("Creating file is interrupted")
-      }
-    }
-  }
 
   /**
     * Write a batch to a temp file then rename it to the batch file.
@@ -102,25 +94,24 @@ class HDFSMetadataLog[T : ClassTag](sqlContext: SQLContext, path: String)
     * There may be multiple [[HDFSMetadataLog]] using the same metadata path. Although it is not a
     * valid behavior, we still need to prevent it from destroying the files.
     */
-  private def writeBatch(batchId: Long, bytes: Array[Byte]): Unit = {
+  private def writeBatch(batchId: Long, bytes: Array[Byte]): Unit =
     // Use nextId to create a temp file
     var nextId = 0
-    while (true) {
+    while (true)
       val tempPath = new Path(metadataPath, s".${batchId}_$nextId.tmp")
       fc.deleteOnExit(tempPath)
-      try {
+      try
         val output = fc.create(tempPath, EnumSet.of(CreateFlag.CREATE))
-        try {
+        try
           output.write(bytes)
-        } finally {
+        finally
           output.close()
-        }
-        try {
+        try
           // Try to commit the batch
           // It will fail if there is an existing file (someone has committed the batch)
           fc.rename(tempPath, batchFile(batchId), Options.Rename.NONE)
           return
-        } catch {
+        catch
           case e: IOException if isFileAlreadyExistsException(e) =>
             // If "rename" fails, it means some other "HDFSMetadataLog" has committed the batch.
             // So throw an exception to tell the user this is not a valid behavior.
@@ -132,8 +123,7 @@ class HDFSMetadataLog[T : ClassTag](sqlContext: SQLContext, path: String)
             // FileNotFoundException because the first writer has removed it.
             throw new ConcurrentModificationException(
                 s"Multiple HDFSMetadataLog are using $path", e)
-        }
-      } catch {
+      catch
         case e: IOException if isFileAlreadyExistsException(e) =>
           // Failed to create "tempPath". There are two cases:
           // 1. Someone is creating "tempPath" too.
@@ -148,58 +138,45 @@ class HDFSMetadataLog[T : ClassTag](sqlContext: SQLContext, path: String)
           // metadata path. In addition, the old Streaming also have this issue, people can create
           // malicious checkpoint files to crash a Streaming application too.
           nextId += 1
-      }
-    }
-  }
 
-  private def isFileAlreadyExistsException(e: IOException): Boolean = {
+  private def isFileAlreadyExistsException(e: IOException): Boolean =
     e.isInstanceOf[FileAlreadyExistsException] ||
     // Old Hadoop versions don't throw FileAlreadyExistsException. Although it's fixed in
     // HADOOP-9361, we still need to support old Hadoop versions.
     (e.getMessage != null && e.getMessage.startsWith("File already exists: "))
-  }
 
-  override def get(batchId: Long): Option[T] = {
+  override def get(batchId: Long): Option[T] =
     val batchMetadataFile = batchFile(batchId)
-    if (fc.util().exists(batchMetadataFile)) {
+    if (fc.util().exists(batchMetadataFile))
       val input = fc.open(batchMetadataFile)
       val bytes = IOUtils.toByteArray(input)
       Some(serializer.deserialize[T](ByteBuffer.wrap(bytes)))
-    } else {
+    else
       None
-    }
-  }
 
-  override def get(startId: Option[Long], endId: Long): Array[(Long, T)] = {
+  override def get(startId: Option[Long], endId: Long): Array[(Long, T)] =
     val batchIds = fc
       .util()
       .listStatus(metadataPath, batchFilesFilter)
       .map(_.getPath.getName.toLong)
-      .filter { batchId =>
+      .filter  batchId =>
         batchId <= endId && (startId.isEmpty || batchId >= startId.get)
-      }
     batchIds.sorted
       .map(batchId => (batchId, get(batchId)))
       .filter(_._2.isDefined)
-      .map {
+      .map
         case (batchId, metadataOption) =>
           (batchId, metadataOption.get)
-      }
-  }
 
-  override def getLatest(): Option[(Long, T)] = {
+  override def getLatest(): Option[(Long, T)] =
     val batchIds = fc
       .util()
       .listStatus(metadataPath, batchFilesFilter)
       .map(_.getPath.getName.toLong)
       .sorted
       .reverse
-    for (batchId <- batchIds) {
+    for (batchId <- batchIds)
       val batch = get(batchId)
-      if (batch.isDefined) {
+      if (batch.isDefined)
         return Some((batchId, batch.get))
-      }
-    }
     None
-  }
-}

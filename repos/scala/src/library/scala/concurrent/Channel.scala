@@ -15,11 +15,10 @@ package scala.concurrent
   *  @author  Martin Odersky
   *  @version 1.0, 10/03/2003
   */
-class Channel[A] {
-  class LinkedList[A] {
+class Channel[A]
+  class LinkedList[A]
     var elem: A = _
     var next: LinkedList[A] = null
-  }
   private var written = new LinkedList[A] // FIFO queue, realized through
   private var lastWritten = written // aliasing of a linked list
   private var nreaders = 0
@@ -29,27 +28,23 @@ class Channel[A] {
     *
     * @param x object to enqueue to this channel
     */
-  def write(x: A) = synchronized {
+  def write(x: A) = synchronized
     lastWritten.elem = x
     lastWritten.next = new LinkedList[A]
     lastWritten = lastWritten.next
     if (nreaders > 0) notify()
-  }
 
   /** Retrieve the next waiting object from the FIFO queue,
     *  blocking if necessary until an object is available.
     *
     * @return next object dequeued from this channel
     */
-  def read: A = synchronized {
-    while (written.next == null) {
-      try {
+  def read: A = synchronized
+    while (written.next == null)
+      try
         nreaders += 1
         wait()
-      } finally nreaders -= 1
-    }
+      finally nreaders -= 1
     val x = written.elem
     written = written.next
     x
-  }
-}

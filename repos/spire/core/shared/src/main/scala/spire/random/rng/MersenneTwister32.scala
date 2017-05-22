@@ -37,7 +37,7 @@ import java.util.Arrays
   */
 final class MersenneTwister32 protected[random](
     mt: Array[Int], mti0: Int = 625)
-    extends IntBasedGenerator {
+    extends IntBasedGenerator
   // N + 1 == 625
 
   import MersenneTwister32.{UpperMask, LowerMask, N, M, N_M, N_1, M_N, M_1, BYTES, mag01}
@@ -46,50 +46,43 @@ final class MersenneTwister32 protected[random](
 
   def copyInit: MersenneTwister32 = new MersenneTwister32(mt.clone, mti)
 
-  def getSeedBytes(): Array[Byte] = {
+  def getSeedBytes(): Array[Byte] =
     val bytes = new Array[Byte](BYTES)
     val bb = ByteBuffer.wrap(bytes)
 
-    cfor(0)(_ < N, _ + 1) { i =>
+    cfor(0)(_ < N, _ + 1)  i =>
       bb.putInt(mt(i))
-    }
     bb.putInt(mti)
     bytes
-  }
 
-  def setSeedBytes(bytes: Array[Byte]): Unit = {
+  def setSeedBytes(bytes: Array[Byte]): Unit =
     val bs = if (bytes.length < BYTES) Arrays.copyOf(bytes, BYTES) else bytes
     val bb = ByteBuffer.wrap(bs)
-    cfor(0)(_ < N, _ + 1) { i =>
+    cfor(0)(_ < N, _ + 1)  i =>
       mt(i) = bb.getInt()
-    }
     mti = bb.getInt
-  }
 
   // Generates the next random integer in the sequence
-  def nextInt(): Int = {
+  def nextInt(): Int =
     var y = 0
 
-    if (mti >= N) {
+    if (mti >= N)
       var kk = 0
 
-      while (kk < N_M) {
+      while (kk < N_M)
         y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
         mt(kk) = mt(kk + M) ^ (y >>> 1) ^ mag01(y)
         kk += 1
-      }
 
-      while (kk < N_1) {
+      while (kk < N_1)
         y = (mt(kk) & UpperMask) | (mt(kk + 1) & LowerMask)
         mt(kk) = mt(kk + (M_N)) ^ (y >>> 1) ^ mag01(y)
         kk += 1
-      }
 
       y = (mt(N_1) & UpperMask) | (mt(0) & LowerMask)
       mt(N_1) = mt(M_1) ^ (y >>> 1) ^ mag01(y)
 
       mti = 0
-    }
 
     y = mt(mti)
     mti += 1
@@ -101,11 +94,9 @@ final class MersenneTwister32 protected[random](
     y ^= (y >>> 18)
 
     y
-  }
-}
 
 object MersenneTwister32
-    extends GeneratorCompanion[MersenneTwister32, (Array[Int], Int)] {
+    extends GeneratorCompanion[MersenneTwister32, (Array[Int], Int)]
 
   @inline private val UpperMask =
     0x80000000 // = Int.MinValue = 0xFFFFFFFF ^ Int.MaxValue
@@ -129,11 +120,10 @@ object MersenneTwister32
     (Utils.seedFromInt(N, Utils.intFromTime()), N + 1)
 
   def fromSeed(seed: (Array[Int], Int)): MersenneTwister32 =
-    seed match {
+    seed match
       case (mt, mti) =>
         assert(mt.length == N)
         new MersenneTwister32(mt, mti)
-    }
 
   def fromArray(arr: Array[Int]): MersenneTwister32 =
     fromSeed((Utils.seedFromArray(N, arr), N + 1))
@@ -143,4 +133,3 @@ object MersenneTwister32
 
   def fromTime(time: Long = System.nanoTime): MersenneTwister32 =
     fromSeed((Utils.seedFromInt(N, Utils.intFromTime(time)), N + 1))
-}

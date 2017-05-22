@@ -26,7 +26,7 @@ import breeze.linalg.{softmax, logDiff}
   *
   * @author dlwh
   */
-class LogDouble(val logValue: Double) {
+class LogDouble(val logValue: Double)
   def value = exp(logValue)
 
   def *(other: LogDouble) = new LogDouble(logValue + other.logValue)
@@ -47,16 +47,14 @@ class LogDouble(val logValue: Double) {
 
   override def toString = "LogDouble(" + logValue + ")"
 
-  override def equals(o: Any) = o match {
+  override def equals(o: Any) = o match
     case ld: LogDouble => logValue == ld.logValue
     case _ => false
-  }
 
   override def hashCode = logValue.hashCode
-}
 
-object LogDouble {
-  implicit def doubleExtra(d: Double) = new {
+object LogDouble
+  implicit def doubleExtra(d: Double) = new
 
     /**
       * Assumes the double is already logged.
@@ -78,7 +76,6 @@ object LogDouble {
     def +(o: LogDouble) = new LogDouble(softmax(o.logValue, scala.math.log(d)))
 
     def -(o: LogDouble) = new LogDouble(logDiff(scala.math.log(d), o.logValue))
-  }
 
   implicit def logDoubleToDouble(d: LogDouble) = d.value
 
@@ -90,7 +87,7 @@ object LogDouble {
 
   def pow(d: LogDouble, p: LogDouble) = new LogDouble(d.logValue * p.value)
 
-  implicit object SemiringLogDouble extends Semiring[LogDouble] {
+  implicit object SemiringLogDouble extends Semiring[LogDouble]
     def zero: LogDouble = new LogDouble(Double.NegativeInfinity)
 
     def one: LogDouble = new LogDouble(0)
@@ -102,5 +99,3 @@ object LogDouble {
     def ==(a: LogDouble, b: LogDouble): Boolean = a == b
 
     def !=(a: LogDouble, b: LogDouble): Boolean = a != b
-  }
-}

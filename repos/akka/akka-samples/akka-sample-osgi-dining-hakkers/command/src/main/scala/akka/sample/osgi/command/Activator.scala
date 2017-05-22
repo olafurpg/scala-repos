@@ -20,11 +20,11 @@ import akka.sample.osgi.api.DiningHakkersService
 import akka.actor.{ActorRef, PoisonPill}
 import org.osgi.util.tracker.ServiceTracker
 
-class Activator extends BundleActivator {
+class Activator extends BundleActivator
   println("Command Activator created")
   var hakker: Option[ActorRef] = None
 
-  def start(context: BundleContext) {
+  def start(context: BundleContext)
     val logServiceTracker = new ServiceTracker(
         context, classOf[DiningHakkersService].getName, null)
     logServiceTracker.open()
@@ -34,13 +34,9 @@ class Activator extends BundleActivator {
         startHakker(_,
                     context.getBundle.getSymbolicName + ":" +
                     context.getBundle.getBundleId))
-  }
 
-  def startHakker(service: DiningHakkersService, name: String) {
+  def startHakker(service: DiningHakkersService, name: String)
     hakker = Some(service.getHakker(name, 4))
-  }
 
-  def stop(context: BundleContext) {
+  def stop(context: BundleContext)
     hakker.foreach(_ ! PoisonPill)
-  }
-}

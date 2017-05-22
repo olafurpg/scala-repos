@@ -8,41 +8,34 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
   * Date: 2/25/12
   */
 class WikiTagAutoCompletionTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
 
-  def testCodeLinkAC() {
+  def testCodeLinkAC()
     val text = "/** [" + CARET_MARKER + " */"
     val assumedStub = "/** [[]] */"
     checkGeneratedTextAfterTyping(text, assumedStub, '[')
-  }
 
-  def testInnerCodeAC() {
+  def testInnerCodeAC()
     val text = "/** {{" + CARET_MARKER + " */"
     val assumedStub = "/** {{{}}} */"
     checkGeneratedTextAfterTyping(text, assumedStub, '{')
-  }
 
-  def testMonospaceAC() {
+  def testMonospaceAC()
     val text = "/** " + CARET_MARKER + " */"
     val assumedStub = "/** `` */"
     checkGeneratedTextAfterTyping(text, assumedStub, '`')
-  }
 
-  def testSuperscriptAC() {
+  def testSuperscriptAC()
     val text = "/** " + CARET_MARKER + " */"
     val assumedStub = "/** ^^ */"
     checkGeneratedTextAfterTyping(text, assumedStub, '^')
-  }
 
-  def testSubscriptAC() {
+  def testSubscriptAC()
     val text = "/** ," + CARET_MARKER + " */"
     val assumedStub = "/** ,,,, */"
     checkGeneratedTextAfterTyping(text, assumedStub, ',')
-  }
 
-  def testBoldSimpleAC() {
+  def testBoldSimpleAC()
     val text = "/** ''" + CARET_MARKER + "'' */"
     val assumedStub = "/** '''''' */"
     checkGeneratedTextAfterTyping(text, assumedStub, '\'')
-  }
-}

@@ -7,9 +7,9 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.headers.{BasicHttpCredentials, Authorization}
 import org.scalatest.{Matchers, WordSpec}
 
-class WebSocketClientExampleSpec extends WordSpec with Matchers {
+class WebSocketClientExampleSpec extends WordSpec with Matchers
 
-  "singleWebSocket-request-example" in {
+  "singleWebSocket-request-example" in
     pending // compile-time only test
     //#single-WebSocket-request
     import akka.{Done, NotUsed}
@@ -26,10 +26,9 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
     import system.dispatcher
 
     // print each incoming strict text message
-    val printSink: Sink[Message, Future[Done]] = Sink.foreach {
+    val printSink: Sink[Message, Future[Done]] = Sink.foreach
       case message: TextMessage.Strict =>
         println(message.text)
-    }
 
     val helloSource: Source[Message, NotUsed] =
       Source.single(TextMessage("hello world!"))
@@ -45,16 +44,14 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
     val (upgradeResponse, closed) = Http().singleWebSocketRequest(
         WebSocketRequest("ws://echo.websocket.org"), flow)
 
-    val connected = upgradeResponse.map { upgrade =>
+    val connected = upgradeResponse.map  upgrade =>
       // just like a regular http request we can get 404 NotFound,
       // with a response body, that will be available from upgrade.response
-      if (upgrade.response.status == StatusCodes.OK) {
+      if (upgrade.response.status == StatusCodes.OK)
         Done
-      } else {
+      else
         throw new RuntimeException(
             s"Connection failed: ${upgrade.response.status}")
-      }
-    }
 
     // in a real application you would not side effect here
     // and handle errors more carefully
@@ -62,9 +59,8 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
     closed.foreach(_ => println("closed"))
 
     //#single-WebSocket-request
-  }
 
-  "authorized-singleWebSocket-request-example" in {
+  "authorized-singleWebSocket-request-example" in
     pending // compile-time only test
     import akka.NotUsed
     import akka.http.scaladsl.Http
@@ -85,9 +81,8 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
                           "johan", "correcthorsebatterystaple")))),
         flow)
     //#authorized-single-WebSocket-request
-  }
 
-  "WebSocketClient-flow-example" in {
+  "WebSocketClient-flow-example" in
     pending // compile-time only test
 
     //#WebSocket-client-flow
@@ -106,10 +101,9 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
 
     // Future[Done] is the materialized value of Sink.foreach,
     // emitted when the stream completes
-    val incoming: Sink[Message, Future[Done]] = Sink.foreach[Message] {
+    val incoming: Sink[Message, Future[Done]] = Sink.foreach[Message]
       case message: TextMessage.Strict =>
         println(message.text)
-    }
 
     // send this as a message over the WebSocket
     val outgoing = Source.single(TextMessage("hello world!"))
@@ -129,19 +123,15 @@ class WebSocketClientExampleSpec extends WordSpec with Matchers {
 
     // just like a regular http request we can get 404 NotFound etc.
     // that will be available from upgrade.response
-    val connected = upgradeResponse.flatMap { upgrade =>
-      if (upgrade.response.status == StatusCodes.OK) {
+    val connected = upgradeResponse.flatMap  upgrade =>
+      if (upgrade.response.status == StatusCodes.OK)
         Future.successful(Done)
-      } else {
+      else
         throw new RuntimeException(
             s"Connection failed: ${upgrade.response.status}")
-      }
-    }
 
     // in a real application you would not side effect here
     connected.onComplete(println)
     closed.foreach(_ => println("closed"))
 
     //#WebSocket-client-flow
-  }
-}

@@ -10,7 +10,7 @@ import akka.stream.QueueOfferResult
 /**
   * This trait allows to have the queue as a data source for some stream.
   */
-trait SourceQueue[T] {
+trait SourceQueue[T]
 
   /**
     * Method offers next element to a stream and returns future that:
@@ -29,12 +29,11 @@ trait SourceQueue[T] {
     * Method returns future that completes when stream is completed and fails when stream failed
     */
   def watchCompletion(): Future[Done]
-}
 
 /**
   * This trait adds completion support to [[SourceQueue]].
   */
-trait SourceQueueWithComplete[T] extends SourceQueue[T] {
+trait SourceQueueWithComplete[T] extends SourceQueue[T]
 
   /**
     * Complete the stream normally. Use `watchCompletion` to be notified of this
@@ -47,13 +46,12 @@ trait SourceQueueWithComplete[T] extends SourceQueue[T] {
     * operation’s success.
     */
   def fail(ex: Throwable): Unit
-}
 
 /**
   * Trait allows to have the queue as a sink for some stream.
   * "SinkQueue" pulls data from stream with backpressure mechanism.
   */
-trait SinkQueue[T] {
+trait SinkQueue[T]
 
   /**
     * Method pulls elements from stream and returns future that:
@@ -62,4 +60,3 @@ trait SinkQueue[T] {
     * - completes with `Some(element)` in case next element is available from stream.
     */
   def pull(): Future[Option[T]]
-}

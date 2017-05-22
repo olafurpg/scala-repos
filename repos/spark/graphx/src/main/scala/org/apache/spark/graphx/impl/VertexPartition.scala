@@ -22,14 +22,13 @@ import scala.reflect.ClassTag
 import org.apache.spark.graphx._
 import org.apache.spark.util.collection.BitSet
 
-private[graphx] object VertexPartition {
+private[graphx] object VertexPartition
 
   /** Construct a `VertexPartition` from the given vertices. */
   def apply[VD : ClassTag](
-      iter: Iterator[(VertexId, VD)]): VertexPartition[VD] = {
+      iter: Iterator[(VertexId, VD)]): VertexPartition[VD] =
     val (index, values, mask) = VertexPartitionBase.initFrom(iter)
     new VertexPartition(index, values, mask)
-  }
 
   import scala.language.implicitConversions
 
@@ -47,11 +46,9 @@ private[graphx] object VertexPartition {
     * evidence parameter, as in [[VertexPartitionBaseOps]].
     */
   implicit object VertexPartitionOpsConstructor
-      extends VertexPartitionBaseOpsConstructor[VertexPartition] {
+      extends VertexPartitionBaseOpsConstructor[VertexPartition]
     def toOps[VD : ClassTag](partition: VertexPartition[VD])
       : VertexPartitionBaseOps[VD, VertexPartition] = partitionToOps(partition)
-  }
-}
 
 /** A map from vertex id to vertex attribute. */
 private[graphx] class VertexPartition[VD : ClassTag](
@@ -62,17 +59,13 @@ private[graphx] class VertexPartition[VD : ClassTag](
 
 private[graphx] class VertexPartitionOps[VD : ClassTag](
     self: VertexPartition[VD])
-    extends VertexPartitionBaseOps[VD, VertexPartition](self) {
+    extends VertexPartitionBaseOps[VD, VertexPartition](self)
 
-  def withIndex(index: VertexIdToIndexMap): VertexPartition[VD] = {
+  def withIndex(index: VertexIdToIndexMap): VertexPartition[VD] =
     new VertexPartition(index, self.values, self.mask)
-  }
 
-  def withValues[VD2 : ClassTag](values: Array[VD2]): VertexPartition[VD2] = {
+  def withValues[VD2 : ClassTag](values: Array[VD2]): VertexPartition[VD2] =
     new VertexPartition(self.index, values, self.mask)
-  }
 
-  def withMask(mask: BitSet): VertexPartition[VD] = {
+  def withMask(mask: BitSet): VertexPartition[VD] =
     new VertexPartition(self.index, self.values, mask)
-  }
-}

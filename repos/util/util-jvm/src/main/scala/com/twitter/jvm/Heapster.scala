@@ -23,7 +23,7 @@ import com.twitter.util.Duration
   *
   * https://github.com/mariusaeriksen/heapster
   */
-class Heapster(klass: Class[_]) {
+class Heapster(klass: Class[_])
   private val startM = klass.getDeclaredMethod("start")
   private val stopM = klass.getDeclaredMethod("stop")
   private val dumpProfileM =
@@ -34,16 +34,15 @@ class Heapster(klass: Class[_]) {
 
   def start() { startM.invoke(null) }
   def shutdown() { stopM.invoke(null) }
-  def setSamplingPeriod(period: java.lang.Integer) {
+  def setSamplingPeriod(period: java.lang.Integer)
     setSamplingPeriodM.invoke(null, period)
-  }
   def clearProfile() { clearProfileM.invoke(null) }
   def dumpProfile(forceGC: java.lang.Boolean): Array[Byte] =
     dumpProfileM.invoke(null, forceGC).asInstanceOf[Array[Byte]]
 
   def profile(howlong: Duration,
               samplingPeriod: Int = 10 << 19,
-              forceGC: Boolean = true) = {
+              forceGC: Boolean = true) =
     clearProfile()
     setSamplingPeriod(samplingPeriod)
 
@@ -51,17 +50,12 @@ class Heapster(klass: Class[_]) {
     Thread.sleep(howlong.inMilliseconds)
     shutdown()
     dumpProfile(forceGC)
-  }
-}
 
-object Heapster {
-  val instance: Option[Heapster] = {
+object Heapster
+  val instance: Option[Heapster] =
     val loader = ClassLoader.getSystemClassLoader()
-    try {
+    try
       Some(new Heapster(loader.loadClass("Heapster")))
-    } catch {
+    catch
       case _: ClassNotFoundException =>
         None
-    }
-  }
-}

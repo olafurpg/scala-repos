@@ -1,6 +1,6 @@
 package scalaz.example
 
-object EnumUsage extends App {
+object EnumUsage extends App
   import scalaz._, Scalaz._, Digit._
 
   assert(!true.succ)
@@ -18,4 +18,3 @@ object EnumUsage extends App {
   assert(('m' |=> 'u').toList === List(
           'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u'))
   assert(('m' |--> (2, 'u')) === List('m', 'o', 'q', 's', 'u'))
-}

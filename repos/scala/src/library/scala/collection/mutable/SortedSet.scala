@@ -24,11 +24,10 @@ import generic._
 trait SortedSet[A]
     extends scala.collection.SortedSet[A]
     with scala.collection.SortedSetLike[A, SortedSet[A]] with mutable.Set[A]
-    with mutable.SetLike[A, SortedSet[A]] {
+    with mutable.SetLike[A, SortedSet[A]]
 
   /** Needs to be overridden in subclasses. */
   override def empty: SortedSet[A] = SortedSet.empty[A]
-}
 
 /**
   * A template for mutable sorted set companion objects.
@@ -43,7 +42,7 @@ trait SortedSet[A]
   * @author Lucien Pereira
   *
   */
-object SortedSet extends MutableSortedSetFactory[SortedSet] {
+object SortedSet extends MutableSortedSetFactory[SortedSet]
   def canBuildFrom[A](
       implicit ord: Ordering[A]): CanBuildFrom[Coll, A, SortedSet[A]] =
     new SortedSetCanBuildFrom[A]
@@ -54,7 +53,6 @@ object SortedSet extends MutableSortedSetFactory[SortedSet] {
   override implicit def newCanBuildFrom[A](
       implicit ord: Ordering[A]): CanBuildFrom[Coll, A, SortedSet[A]] =
     super.newCanBuildFrom
-}
 
 /** Explicit instantiation of the `SortedSet` trait to reduce class file size in subclasses. */
 abstract class AbstractSortedSet[A]

@@ -10,7 +10,7 @@ import akka.http.impl.server.RouteStructure
 import scala.annotation.varargs
 import scala.reflect.ClassTag
 
-abstract class ExecutionDirectives extends CookieDirectives {
+abstract class ExecutionDirectives extends CookieDirectives
 
   /**
     * Handles exceptions in the inner routes using the specified handler.
@@ -40,13 +40,11 @@ abstract class ExecutionDirectives extends CookieDirectives {
                           handler: Handler1[T],
                           innerRoute: Route,
                           moreInnerRoutes: Route*): Route =
-    RouteStructure.HandleRejections(new RejectionHandler {
+    RouteStructure.HandleRejections(new RejectionHandler
       implicit def tTag: ClassTag[T] = ClassTag(tClass)
       override def handleCustomRejection(
           ctx: RequestContext, rejection: CustomRejection): RouteResult =
-        rejection match {
+        rejection match
           case t: T ⇒ handler.apply(ctx, t)
           case _ ⇒ passRejection()
-        }
-    })(innerRoute, moreInnerRoutes.toList)
-}
+    )(innerRoute, moreInnerRoutes.toList)

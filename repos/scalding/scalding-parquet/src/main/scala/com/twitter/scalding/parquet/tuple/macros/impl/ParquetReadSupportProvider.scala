@@ -5,7 +5,7 @@ import com.twitter.scalding.parquet.tuple.scheme._
 
 import scala.reflect.macros.Context
 
-object ParquetReadSupportProvider {
+object ParquetReadSupportProvider
   private[this] sealed trait CollectionType
   private[this] case object NOT_A_COLLECTION extends CollectionType
   private[this] case object OPTION extends CollectionType
@@ -14,7 +14,7 @@ object ParquetReadSupportProvider {
   private[this] case object MAP extends CollectionType
 
   def toParquetReadSupportImpl[T](ctx: Context)(
-      implicit T: ctx.WeakTypeTag[T]): ctx.Expr[ParquetReadSupport[T]] = {
+      implicit T: ctx.WeakTypeTag[T]): ctx.Expr[ParquetReadSupport[T]] =
     import ctx.universe._
 
     if (!IsCaseClassImpl.isCaseClassType(ctx)(T.tpe))
@@ -47,10 +47,10 @@ object ParquetReadSupportProvider {
     def matchField(
         idx: Int,
         fieldType: Type,
-        collectionType: CollectionType): (Tree, Tree, Tree, Tree) = {
+        collectionType: CollectionType): (Tree, Tree, Tree, Tree) =
       def fieldConverter(converterName: TermName,
                          converter: Tree,
-                         isPrimitive: Boolean = false): Tree = {
+                         isPrimitive: Boolean = false): Tree =
         def primitiveCollectionElementConverter: Tree =
           q"""override val child: _root_.com.twitter.scalding.parquet.tuple.scheme.TupleFieldConverter[$fieldType] =
                 new _root_.com.twitter.scalding.parquet.tuple.scheme.CollectionElementPrimitiveConverter[$fieldType](this) {
@@ -65,7 +65,7 @@ object ParquetReadSupportProvider {
                 }
           """
 
-        collectionType match {
+        collectionType match
           case OPTION =>
             val child =
               if (isPrimitive) primitiveCollectionElementConverter
@@ -96,8 +96,6 @@ object ParquetReadSupportProvider {
             """
           case MAP => converter
           case _ => q"val $converterName = $converter"
-        }
-      }
 
       def createMapFieldConverter(converterName: TermName,
                                   K: Type,
@@ -115,38 +113,34 @@ object ParquetReadSupportProvider {
          """
 
       def createFieldMatchResult(converterName: TermName,
-                                 converter: Tree): (Tree, Tree, Tree, Tree) = {
+                                 converter: Tree): (Tree, Tree, Tree, Tree) =
         val converterGetter: Tree = q"if($idx == i) return $converterName"
         val converterResetCall: Tree = q"$converterName.reset()"
         val converterFieldValue: Tree = q"$converterName.currentValue"
         (converter, converterGetter, converterResetCall, converterFieldValue)
-      }
 
-      def matchPrimitiveField(converterType: Type): (Tree, Tree, Tree, Tree) = {
+      def matchPrimitiveField(converterType: Type): (Tree, Tree, Tree, Tree) =
         val converterName = newTermName(ctx.fresh(s"fieldConverter"))
         val innerConverter: Tree = q"new $converterType()"
         val converter: Tree = fieldConverter(
             converterName, innerConverter, isPrimitive = true)
         createFieldMatchResult(converterName, converter)
-      }
 
-      def matchCaseClassField(groupConverter: Tree): (Tree, Tree, Tree, Tree) = {
+      def matchCaseClassField(groupConverter: Tree): (Tree, Tree, Tree, Tree) =
         val converterName = newTermName(ctx.fresh(s"fieldConverter"))
         val converter: Tree = fieldConverter(converterName, groupConverter)
         createFieldMatchResult(converterName, converter)
-      }
 
       def matchMapField(K: Type,
                         V: Type,
                         keyConverter: Tree,
-                        valueConverter: Tree): (Tree, Tree, Tree, Tree) = {
+                        valueConverter: Tree): (Tree, Tree, Tree, Tree) =
         val converterName = newTermName(ctx.fresh(s"fieldConverter"))
         val mapConverter = createMapFieldConverter(
             converterName, K, V, keyConverter, valueConverter)
         createFieldMatchResult(converterName, mapConverter)
-      }
 
-      fieldType match {
+      fieldType match
         case tpe if tpe =:= typeOf[String] =>
           matchPrimitiveField(typeOf[StringConverter])
         case tpe if tpe =:= typeOf[Boolean] =>
@@ -193,36 +187,31 @@ object ParquetReadSupportProvider {
         case _ =>
           ctx.abort(ctx.enclosingPosition,
                     s"Case class $T has unsupported field type : $fieldType ")
-      }
-    }
 
     def expandMethod(outerTpe: Type): List[(Tree, Tree, Tree, Tree)] =
-      outerTpe.declarations.collect {
+      outerTpe.declarations.collect
         case m: MethodSymbol if m.isCaseAccessor => m
-      }.zipWithIndex.map {
+      .zipWithIndex.map
         case (accessorMethod, idx) =>
           val fieldType = accessorMethod.returnType
           matchField(idx, fieldType, NOT_A_COLLECTION)
-      }.toList
+      .toList
 
     def unzip(treeTuples: List[(Tree, Tree, Tree, Tree)])
-      : (List[Tree], List[Tree], List[Tree], List[Tree]) = {
+      : (List[Tree], List[Tree], List[Tree], List[Tree]) =
       val emptyTreeList = List[Tree]()
       treeTuples.foldRight(
-          emptyTreeList, emptyTreeList, emptyTreeList, emptyTreeList) {
+          emptyTreeList, emptyTreeList, emptyTreeList, emptyTreeList)
         case ((t1, t2, t3, t4), (l1, l2, l3, l4)) =>
           (t1 :: l1, t2 :: l2, t3 :: l3, t4 :: l4)
-      }
-    }
 
-    def buildTupleValue(tpe: Type, fieldValueBuilders: List[Tree]): Tree = {
+    def buildTupleValue(tpe: Type, fieldValueBuilders: List[Tree]): Tree =
       if (fieldValueBuilders.isEmpty)
         ctx.abort(
             ctx.enclosingPosition,
             s"Case class $tpe has no primitive types we were able to extract")
       val companion = tpe.typeSymbol.companionSymbol
       q"$companion(..$fieldValueBuilders)"
-    }
 
     val (converters, converterGetters, convertersResetCalls, fieldValues) =
       unzip(expandMethod(T.tpe))
@@ -240,5 +229,3 @@ object ParquetReadSupportProvider {
       }
     """
     ctx.Expr[ParquetReadSupport[T]](readSupport)
-  }
-}

@@ -15,16 +15,15 @@ import akka.util.TypedMultiMap
   * Actors need only know the Receptionist’s identity in order to be able to use
   * the services of the registered Actors.
   */
-object Receptionist {
+object Receptionist
 
   /**
     * Internal representation of [[Receptionist.ServiceKey]] which is needed
     * in order to use a TypedMultiMap (using keys with a type parameter does not
     * work in Scala 2.x).
     */
-  trait AbstractServiceKey {
+  trait AbstractServiceKey
     type Type
-  }
 
   /**
     * A service key is an object that implements this trait for a given protocol
@@ -32,9 +31,8 @@ object Receptionist {
     * protocol spoken by that service (think of it as the set of first messages
     * that a client could send).
     */
-  trait ServiceKey[T] extends AbstractServiceKey {
+  trait ServiceKey[T] extends AbstractServiceKey
     final override type Type = T
-  }
 
   /**
     * The set of commands accepted by a Receptionist.
@@ -81,7 +79,7 @@ object Receptionist {
   private type KV[K <: AbstractServiceKey] = ActorRef[K#Type]
 
   private def behavior(
-      map: TypedMultiMap[AbstractServiceKey, KV]): Behavior[Command] = Full {
+      map: TypedMultiMap[AbstractServiceKey, KV]): Behavior[Command] = Full
     case Msg(ctx, r: Register[t]) ⇒
       ctx.watch(r.address)
       r.replyTo ! Registered(r.key, r.address)
@@ -92,7 +90,5 @@ object Receptionist {
       Same
     case Sig(ctx, Terminated(ref)) ⇒
       behavior(map valueRemoved ref)
-  }
-}
 
 abstract class Receptionist

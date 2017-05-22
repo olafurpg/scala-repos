@@ -12,9 +12,9 @@ import scala.language.implicitConversions
 import org.junit.Test
 import org.junit.Assert._
 
-class AtomicTest {
+class AtomicTest
 
-  @Test def atomicLongTest(): Unit = {
+  @Test def atomicLongTest(): Unit =
     val atomic = new java.util.concurrent.atomic.AtomicLong(10)
     assertEquals(10L, atomic.get())
     atomic.set(20)
@@ -39,9 +39,8 @@ class AtomicTest {
     assertEquals(10L, atomic.get())
     assertTrue(atomic.compareAndSet(10, 20))
     assertEquals(20L, atomic.get())
-  }
 
-  @Test def atomicIntegerTest(): Unit = {
+  @Test def atomicIntegerTest(): Unit =
     val atomic = new java.util.concurrent.atomic.AtomicInteger(10)
     assertEquals(10, atomic.get())
     atomic.set(20)
@@ -66,9 +65,8 @@ class AtomicTest {
     assertEquals(10, atomic.get())
     assertTrue(atomic.compareAndSet(10, 20))
     assertEquals(20, atomic.get())
-  }
 
-  @Test def atomicBooleanTest(): Unit = {
+  @Test def atomicBooleanTest(): Unit =
     val atomic = new java.util.concurrent.atomic.AtomicBoolean(true)
     assertTrue(atomic.get())
     atomic.set(false)
@@ -79,9 +77,8 @@ class AtomicTest {
     assertTrue(atomic.get())
     assertTrue(atomic.getAndSet(false))
     assertFalse(atomic.get())
-  }
 
-  @Test def atomicReferenceTest(): Unit = {
+  @Test def atomicReferenceTest(): Unit =
     val thing1 = Foo(5)
     val thing1bis = Foo(5) // equals(), but not the same reference
     val thing2 = Foo(10)
@@ -104,9 +101,8 @@ class AtomicTest {
     assertFalse(atomic.compareAndSet(thing1bis, thing2))
     assertSame(thing1, atomic.getAndSet(thing2))
     assertSame(thing2, atomic.get())
-  }
 
-  @Test def atomicReferenceArrayTest(): Unit = {
+  @Test def atomicReferenceArrayTest(): Unit =
     val thing1 = Foo(5)
     val thing1bis = Foo(5) // equals(), but not the same reference
     val thing2 = Foo(10)
@@ -131,7 +127,5 @@ class AtomicTest {
       new java.util.concurrent.atomic.AtomicReferenceArray[Foo](initArray)
     assertSame(thing1, atomic2.get(0))
     assertSame(thing2, atomic2.get(1))
-  }
-}
 
 case class Foo(i: Int)

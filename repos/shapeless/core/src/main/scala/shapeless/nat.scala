@@ -26,34 +26,31 @@ import scala.reflect.macros.whitebox
   *
   * @author Miles Sabin
   */
-trait Nat {
+trait Nat
   type N <: Nat
-}
 
 /**
   * Encoding of successor.
   *
   * @author Miles Sabin
   */
-case class Succ[P <: Nat]() extends Nat {
+case class Succ[P <: Nat]() extends Nat
   type N = Succ[P]
-}
 
 /**
   * Encoding of zero.
   *
   * @author Miles Sabin
   */
-class _0 extends Nat with Serializable {
+class _0 extends Nat with Serializable
   type N = _0
-}
 
 /**
   * Type level encoding of the natural numbers.
   *
   * @author Miles Sabin
   */
-object Nat extends Nats {
+object Nat extends Nats
   import ops.nat._
   import syntax.NatOps
 
@@ -68,61 +65,51 @@ object Nat extends Nats {
   def toInt(n: Nat)(implicit toIntN: ToInt[n.N]) = toIntN()
 
   implicit def natOps[N <: Nat](n: N): NatOps[N] = new NatOps(n)
-}
 
 @macrocompat.bundle
-class NatMacros(val c: whitebox.Context) extends NatMacroDefns {
+class NatMacros(val c: whitebox.Context) extends NatMacroDefns
   import c.universe._
 
   def materializeWidened(i: Tree): Tree =
-    i match {
+    i match
       case NatLiteral(n) => mkNatValue(n)
       case _ =>
         c.abort(
             c.enclosingPosition,
             s"Expression $i does not evaluate to a non-negative Int literal")
-    }
-}
 
 @macrocompat.bundle
-trait NatMacroDefns {
+trait NatMacroDefns
   val c: whitebox.Context
   import c.universe._
 
-  object NatLiteral {
+  object NatLiteral
     def unapply(i: Tree): Option[Int] =
-      i match {
+      i match
         case Literal(Constant(n: Int)) if n >= 0 => Some(n)
         case _ => None
-      }
-  }
 
-  def mkNatTpt(i: Int): Tree = {
+  def mkNatTpt(i: Int): Tree =
     val succSym = typeOf[Succ[_]].typeConstructor.typeSymbol
     val _0Sym = typeOf[_0].typeSymbol
 
     @tailrec
-    def loop(i: Int, acc: Tree): Tree = {
+    def loop(i: Int, acc: Tree): Tree =
       if (i == 0) acc
       else loop(i - 1, AppliedTypeTree(Ident(succSym), List(acc)))
-    }
 
     loop(i, Ident(_0Sym))
-  }
 
-  def mkNatTpe(i: Int): Type = {
+  def mkNatTpe(i: Int): Type =
     val succTpe = typeOf[Succ[_]].typeConstructor
     val _0Tpe = typeOf[_0]
 
     @tailrec
-    def loop(i: Int, acc: Type): Type = {
+    def loop(i: Int, acc: Type): Type =
       if (i == 0) acc
       else loop(i - 1, appliedType(succTpe, acc))
-    }
 
     loop(i, _0Tpe)
-  }
 
   def mkNatValue(i: Int): Tree =
     q""" new ${mkNatTpt(i)} """
-}

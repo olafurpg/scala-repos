@@ -22,14 +22,13 @@ class IntroduceFieldContext[T <: PsiElement](
     val file: PsiFile,
     val element: T,
     val types: Array[ScType],
-    val aClass: ScTemplateDefinition) {
+    val aClass: ScTemplateDefinition)
 
-  val occurrences = element match {
+  val occurrences = element match
     case expr: ScExpression =>
       ScalaRefactoringUtil.getOccurrenceRanges(
           ScalaRefactoringUtil.unparExpr(expr), aClass.extendsBlock)
     case _ => null
-  }
 
   val validator = ScalaVariableValidator(new DialogConflictsReporter {},
                                          project,
@@ -38,16 +37,13 @@ class IntroduceFieldContext[T <: PsiElement](
                                          element,
                                          occurrences)
 
-  val canBeInitInDecl = element match {
+  val canBeInitInDecl = element match
     case expr: ScExpression => canBeInitializedInDeclaration(expr, aClass)
     case _ => throw new IntroduceException
-  }
 
-  val possibleNames = element match {
+  val possibleNames = element match
     case expr: ScExpression => NameSuggester.suggestNames(expr, validator)
     case _ => throw new IntroduceException
-  }
 
   def canBeInitLocally(replaceAll: Boolean) =
     ScalaIntroduceFieldHandlerBase.canBeInitInLocalScope(this, replaceAll)
-}

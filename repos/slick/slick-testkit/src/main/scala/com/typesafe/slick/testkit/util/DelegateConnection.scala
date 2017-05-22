@@ -6,7 +6,7 @@ import java.util.Properties
 import java.util.concurrent.Executor
 
 /** A delegating wrapper for java.sql.Connection. */
-class DelegateConnection(conn: Connection) extends Connection {
+class DelegateConnection(conn: Connection) extends Connection
   def createStatement(): Statement = conn.createStatement()
   def setAutoCommit(autoCommit: Boolean): Unit = conn.setAutoCommit(autoCommit)
   def setHoldability(holdability: Int): Unit = conn.setHoldability(holdability)
@@ -98,4 +98,3 @@ class DelegateConnection(conn: Connection) extends Connection {
   def commit(): Unit = conn.commit()
   def unwrap[T](iface: Class[T]): T = conn.unwrap[T](iface)
   def isWrapperFor(iface: Class[_]): Boolean = conn.isWrapperFor(iface)
-}

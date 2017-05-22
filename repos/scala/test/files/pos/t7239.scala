@@ -1,28 +1,24 @@
-object Test {
+object Test
   def BrokenMethod(): HasFilter[(Int, String)] = ???
 
-  trait HasFilter[B] {
+  trait HasFilter[B]
     def filter(p: B => Boolean) = ???
-  }
 
-  trait HasWithFilter {
+  trait HasWithFilter
     def withFilter = ???
-  }
 
-  object addWithFilter {
+  object addWithFilter
     trait NoImplicit
     implicit def enrich(v: Any)(implicit F0: NoImplicit): HasWithFilter = ???
-  }
 
   BrokenMethod().withFilter(_ => true) // okay
   BrokenMethod().filter(_ => true) // okay
 
-  locally {
+  locally
     import addWithFilter._
     BrokenMethod().withFilter((_: (Int, String)) => true) // okay
-  }
 
-  locally {
+  locally
     import addWithFilter._
     // adaptToMemberWithArgs sets the type of the tree `x`
     // to ErrorType (while in silent mode, so the error is not
@@ -33,5 +29,3 @@ object Test {
     // defensive check for erroneous types in the tree pick up
     // the problem.
     BrokenMethod().withFilter(x => true) // erroneous or inaccessible type.
-  }
-}

@@ -32,7 +32,7 @@ import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object LinearGradient {
+object LinearGradient
   implicit def sfxLinearGradient2jfx(
       lg: LinearGradient): jfxsp.LinearGradient =
     if (lg != null) lg.delegate else null
@@ -93,13 +93,12 @@ object LinearGradient {
     * Creates a linear gradient value from a string representation.
     */
   def valueOf(value: String) = jfxsp.LinearGradient.valueOf(value)
-}
 
 /**
   *
   */
 class LinearGradient(override val delegate: jfxsp.LinearGradient)
-    extends Paint(delegate) with SFXDelegate[jfxsp.LinearGradient] {
+    extends Paint(delegate) with SFXDelegate[jfxsp.LinearGradient]
 
   /**
     * Creates a new instance of LinearGradient.
@@ -168,4 +167,3 @@ class LinearGradient(override val delegate: jfxsp.LinearGradient)
     * Indicates whether start and end locations are proportional or absolute.
     */
   def proportional = delegate.isProportional
-}

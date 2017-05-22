@@ -1,14 +1,12 @@
 import org.scalacheck._, Prop._, Gen._, Arbitrary._
 import scala.reflect.runtime.universe._, internal._, Flag._
 
-trait ArbitraryTreesAndNames {
-  def smallList[T](size: Int, g: Gen[T]) = {
-    val n: Int = choose(0, size / 2 + 1).sample match {
+trait ArbitraryTreesAndNames
+  def smallList[T](size: Int, g: Gen[T]) =
+    val n: Int = choose(0, size / 2 + 1).sample match
       case Some(i) => i
       case None => 0
-    }
     containerOfN[List, T](n, g)
-  }
 
   def shortIdent(len: Int) =
     for (name <- identifier) yield
@@ -334,4 +332,3 @@ trait ArbitraryTreesAndNames {
       genTreeIsTermWrapped)
   implicit val arbTreeIsType: Arbitrary[TreeIsType] = arbitrarySized(
       genTreeIsTypeWrapped)
-}

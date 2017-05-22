@@ -1,10 +1,8 @@
-trait Foo {
-  def bla = {
+trait Foo
+  def bla =
     val tvs = "tvs"
     Nil.foreach(
         x =>
-          x match {
+          x match
         case _ => println(tvs)
-    })
-  }
-}
+    )

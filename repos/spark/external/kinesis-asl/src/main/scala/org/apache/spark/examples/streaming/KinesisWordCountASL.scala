@@ -73,10 +73,10 @@ import org.apache.spark.streaming.kinesis.KinesisUtils
   * See http://spark.apache.org/docs/latest/streaming-kinesis-integration.html for more details on
   * the Kinesis Spark Streaming integration.
   */
-object KinesisWordCountASL extends Logging {
-  def main(args: Array[String]) {
+object KinesisWordCountASL extends Logging
+  def main(args: Array[String])
     // Check that all required args were passed in.
-    if (args.length != 3) {
+    if (args.length != 3)
       System.err.println("""
           |Usage: KinesisWordCountASL <app-name> <stream-name> <endpoint-url> <region-name>
           |
@@ -90,7 +90,6 @@ object KinesisWordCountASL extends Logging {
           |details.
         """.stripMargin)
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -135,7 +134,7 @@ object KinesisWordCountASL extends Logging {
     val ssc = new StreamingContext(sparkConfig, batchInterval)
 
     // Create the Kinesis DStreams
-    val kinesisStreams = (0 until numStreams).map { i =>
+    val kinesisStreams = (0 until numStreams).map  i =>
       KinesisUtils.createStream(ssc,
                                 appName,
                                 streamName,
@@ -144,7 +143,6 @@ object KinesisWordCountASL extends Logging {
                                 InitialPositionInStream.LATEST,
                                 kinesisCheckpointInterval,
                                 StorageLevel.MEMORY_AND_DISK_2)
-    }
 
     // Union all the streams
     val unionStreams = ssc.union(kinesisStreams)
@@ -162,8 +160,6 @@ object KinesisWordCountASL extends Logging {
     // Start the streaming context and await termination
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 
 /**
   * Usage: KinesisWordProducerASL <stream-name> <endpoint-url> \
@@ -179,9 +175,9 @@ object KinesisWordCountASL extends Logging {
   *    $ SPARK_HOME/bin/run-example streaming.KinesisWordProducerASL mySparkStream \
   *         https://kinesis.us-east-1.amazonaws.com us-east-1 10 5
   */
-object KinesisWordProducerASL {
-  def main(args: Array[String]) {
-    if (args.length != 4) {
+object KinesisWordProducerASL
+  def main(args: Array[String])
+    if (args.length != 4)
       System.err.println("""
           |Usage: KinesisWordProducerASL <stream-name> <endpoint-url> <records-per-sec>
                                          <words-per-record>
@@ -195,7 +191,6 @@ object KinesisWordProducerASL {
         """.stripMargin)
 
       System.exit(1)
-    }
 
     // Set default log4j logging level to WARN to hide Spark logs
     StreamingExamples.setStreamingLogLevels()
@@ -210,12 +205,11 @@ object KinesisWordProducerASL {
     // Print the array of (word, total) tuples
     println("Totals for the words sent")
     totals.foreach(println(_))
-  }
 
   def generate(stream: String,
                endpoint: String,
                recordsPerSecond: Int,
-               wordsPerRecord: Int): Seq[(String, Int)] = {
+               wordsPerRecord: Int): Seq[(String, Int)] =
 
     val randomWords = List("spark", "you", "are", "my", "father")
     val totals = scala.collection.mutable.Map[String, Int]()
@@ -230,13 +224,12 @@ object KinesisWordProducerASL {
         s" $recordsPerSecond records per second and $wordsPerRecord words per record")
 
     // Iterate and put records onto the stream per the given recordPerSec and wordsPerRecord
-    for (i <- 1 to 10) {
+    for (i <- 1 to 10)
       // Generate recordsPerSec records to put onto the stream
-      val records = (1 to recordsPerSecond.toInt).foreach { recordNum =>
+      val records = (1 to recordsPerSecond.toInt).foreach  recordNum =>
         // Randomly generate wordsPerRecord number of words
         val data = (1 to wordsPerRecord.toInt)
           .map(x =>
-                {
               // Get a random index to a word
               val randomWordIdx = Random.nextInt(randomWords.size)
               val randomWord = randomWords(randomWordIdx)
@@ -245,7 +238,7 @@ object KinesisWordProducerASL {
               totals(randomWord) = totals.getOrElse(randomWord, 0) + 1
 
               randomWord
-          })
+          )
           .mkString(" ")
 
         // Create a partitionKey based on recordNum
@@ -259,32 +252,25 @@ object KinesisWordProducerASL {
 
         // Put the record onto the stream and capture the PutRecordResult
         val putRecordResult = kinesisClient.putRecord(putRecordRequest)
-      }
 
       // Sleep for a second
       Thread.sleep(1000)
       println("Sent " + recordsPerSecond + " records")
-    }
     // Convert the totals to (index, total) tuple
     totals.toSeq.sortBy(_._1)
-  }
-}
 
 /**
   *  Utility functions for Spark Streaming examples.
   *  This has been lifted from the examples/ project to remove the circular dependency.
   */
-private[streaming] object StreamingExamples extends Logging {
+private[streaming] object StreamingExamples extends Logging
   // Set reasonable logging levels for streaming if the user has not configured log4j.
-  def setStreamingLogLevels() {
+  def setStreamingLogLevels()
     val log4jInitialized = Logger.getRootLogger.getAllAppenders.hasMoreElements
-    if (!log4jInitialized) {
+    if (!log4jInitialized)
       // We first log something to initialize Spark's default logging, then we override the
       // logging level.
       logInfo("Setting log level to [WARN] for streaming example." +
           " To override add a custom log4j.properties to the classpath.")
       Logger.getRootLogger.setLevel(Level.WARN)
-    }
-  }
-}
 // scalastyle:on println

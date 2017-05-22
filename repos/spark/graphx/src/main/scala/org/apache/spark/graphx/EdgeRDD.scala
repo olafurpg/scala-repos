@@ -37,27 +37,24 @@ import org.apache.spark.storage.StorageLevel
   * `impl.ReplicatedVertexView`.
   */
 abstract class EdgeRDD[ED](sc: SparkContext, deps: Seq[Dependency[_]])
-    extends RDD[Edge[ED]](sc, deps) {
+    extends RDD[Edge[ED]](sc, deps)
 
   // scalastyle:off structural.type
-  private[graphx] def partitionsRDD: RDD[(PartitionID, EdgePartition[ED, VD])] forSome {
+  private[graphx] def partitionsRDD: RDD[(PartitionID, EdgePartition[ED, VD])] forSome
     type VD
-  }
   // scalastyle:on structural.type
 
   override protected def getPartitions: Array[Partition] =
     partitionsRDD.partitions
 
   override def compute(
-      part: Partition, context: TaskContext): Iterator[Edge[ED]] = {
+      part: Partition, context: TaskContext): Iterator[Edge[ED]] =
     val p =
       firstParent[(PartitionID, EdgePartition[ED, _])].iterator(part, context)
-    if (p.hasNext) {
+    if (p.hasNext)
       p.next()._2.iterator.map(_.copy())
-    } else {
+    else
       Iterator.empty
-    }
-  }
 
   /**
     * Map the values in an edge partitioning preserving the structure but changing the values.
@@ -96,9 +93,8 @@ abstract class EdgeRDD[ED](sc: SparkContext, deps: Seq[Dependency[_]])
     */
   private[graphx] def withTargetStorageLevel(
       targetStorageLevel: StorageLevel): EdgeRDD[ED]
-}
 
-object EdgeRDD {
+object EdgeRDD
 
   /**
     * Creates an EdgeRDD from a set of edges.
@@ -107,16 +103,13 @@ object EdgeRDD {
     * @tparam VD the type of the vertex attributes that may be joined with the returned EdgeRDD
     */
   def fromEdges[ED : ClassTag, VD : ClassTag](
-      edges: RDD[Edge[ED]]): EdgeRDDImpl[ED, VD] = {
-    val edgePartitions = edges.mapPartitionsWithIndex { (pid, iter) =>
+      edges: RDD[Edge[ED]]): EdgeRDDImpl[ED, VD] =
+    val edgePartitions = edges.mapPartitionsWithIndex  (pid, iter) =>
       val builder = new EdgePartitionBuilder[ED, VD]
-      iter.foreach { e =>
+      iter.foreach  e =>
         builder.add(e.srcId, e.dstId, e.attr)
-      }
       Iterator((pid, builder.toEdgePartition))
-    }
     EdgeRDD.fromEdgePartitions(edgePartitions)
-  }
 
   /**
     * Creates an EdgeRDD from already-constructed edge partitions.
@@ -126,7 +119,5 @@ object EdgeRDD {
     */
   private[graphx] def fromEdgePartitions[ED : ClassTag, VD : ClassTag](
       edgePartitions: RDD[(Int, EdgePartition[ED, VD])])
-    : EdgeRDDImpl[ED, VD] = {
+    : EdgeRDDImpl[ED, VD] =
     new EdgeRDDImpl(edgePartitions)
-  }
-}

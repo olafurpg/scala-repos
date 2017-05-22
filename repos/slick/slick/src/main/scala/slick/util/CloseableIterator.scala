@@ -7,7 +7,7 @@ import scala.util.control.NonFatal
   * An Iterator with a `close` method to close the underlying data source.
   * Implementers must close the data source when `hasNext` returns `false`.
   */
-trait CloseableIterator[+T] extends Iterator[T] with Closeable { self =>
+trait CloseableIterator[+T] extends Iterator[T] with Closeable  self =>
 
   /**
     * Close the underlying data source. The behaviour of any methods of this
@@ -16,11 +16,10 @@ trait CloseableIterator[+T] extends Iterator[T] with Closeable { self =>
   override def close(): Unit
 
   override def map[B](f: T => B): CloseableIterator[B] =
-    new CloseableIterator[B] {
+    new CloseableIterator[B]
       def hasNext = self.hasNext
       def next() = f(self.next())
       def close() = self.close()
-    }
 
   final def use[R](f: (Iterator[T] => R)): R =
     try f(this) finally close()
@@ -33,36 +32,32 @@ trait CloseableIterator[+T] extends Iterator[T] with Closeable { self =>
     * object when itself gets closed.
     */
   final def thenClose(c: Closeable): CloseableIterator[T] =
-    new CloseableIterator[T] {
+    new CloseableIterator[T]
       def hasNext = self.hasNext
       def next() = self.next()
       def close() = try self.close() finally c.close()
-    }
 
   protected final def noNext =
     throw new NoSuchElementException("next on empty iterator")
-}
 
-object CloseableIterator {
+object CloseableIterator
 
   /**
     * An empty CloseableIterator
     */
-  val empty: CloseableIterator[Nothing] = new CloseableIterator[Nothing] {
+  val empty: CloseableIterator[Nothing] = new CloseableIterator[Nothing]
     def hasNext = false
     def next() = noNext
     def close() {}
-  }
 
   /**
     * A CloseableIterator which contains exactly one item.
     */
-  class Single[+T](item: T) extends CloseableIterator[T] {
+  class Single[+T](item: T) extends CloseableIterator[T]
     private var more = true
     def hasNext = more
     def next() = if (more) { more = false; item } else noNext
     def close {}
-  }
 
   /**
     * Using some Closeable resource and a function to create a CloseableIterator
@@ -72,14 +67,11 @@ object CloseableIterator {
     */
   def close[C <: Closeable](makeC: => C) = new Close[C](makeC)
 
-  final class Close[C <: Closeable](makeC: => C) {
-    def after[T](f: C => CloseableIterator[T]) = {
+  final class Close[C <: Closeable](makeC: => C)
+    def after[T](f: C => CloseableIterator[T]) =
       val c = makeC
-      (try f(c) catch {
+      (try f(c) catch
         case NonFatal(e) =>
           try c.close() catch ignoreFollowOnError
           throw e
-      }) thenClose c
-    }
-  }
-}
+      ) thenClose c

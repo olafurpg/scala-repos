@@ -11,7 +11,7 @@ import scala.language.implicitConversions
 
 import scala.io.Codec
 
-trait Names extends api.Names {
+trait Names extends api.Names
   private final val HASH_SIZE = 0x8000
   private final val HASH_MASK = 0x7FFF
   private final val NAME_SIZE = 0x20000
@@ -54,27 +54,23 @@ trait Names extends api.Names {
     *  cs[offset..offset+len-1]?
     */
   private def equals(
-      index: Int, cs: Array[Char], offset: Int, len: Int): Boolean = {
+      index: Int, cs: Array[Char], offset: Int, len: Int): Boolean =
     var i = 0
     while ( (i < len) && (chrs(index + i) == cs(offset + i))) i += 1
     i == len
-  }
 
   /** Enter characters into chrs array. */
-  private def enterChars(cs: Array[Char], offset: Int, len: Int) {
+  private def enterChars(cs: Array[Char], offset: Int, len: Int)
     var i = 0
-    while (i < len) {
-      if (nc + i == chrs.length) {
+    while (i < len)
+      if (nc + i == chrs.length)
         val newchrs = new Array[Char](chrs.length * 2)
         scala.compat.Platform.arraycopy(chrs, 0, newchrs, 0, chrs.length)
         chrs = newchrs
-      }
       chrs(nc + i) = cs(offset + i)
       i += 1
-    }
     if (len == 0) nc += 1
     else nc = nc + len
-  }
 
   /** Create a term name from the characters in cs[offset..offset+len-1]. */
   final def newTermName(cs: Array[Char], offset: Int, len: Int): TermName =
@@ -96,8 +92,8 @@ trait Names extends api.Names {
   final def newTermName(cs: Array[Char],
                         offset: Int,
                         len0: Int,
-                        cachedString: String): TermName = {
-    def body = {
+                        cachedString: String): TermName =
+    def body =
       require(offset >= 0, "offset must be non-negative, got " + offset)
       val len = math.max(len0, 0)
       val h = hashValue(cs, offset, len) & HASH_MASK
@@ -106,18 +102,17 @@ trait Names extends api.Names {
       (n.length != len || !equals(n.start, cs, offset, len))) n = n.next
 
       if (n ne null) n
-      else {
+      else
         // The logic order here is future-proofing against the possibility
         // that name.toString will become an eager val, in which case the call
         // to enterChars cannot follow the construction of the TermName.
         var startIndex = 0
-        if (cs == chrs) {
+        if (cs == chrs)
           // Optimize for subName, the new name is already stored in chrs
           startIndex = offset
-        } else {
+        else
           startIndex = nc
           enterChars(cs, offset, len)
-        }
         val next = termHashtable(h)
         val termName =
           if (cachedString ne null)
@@ -126,10 +121,7 @@ trait Names extends api.Names {
         // Add the new termName to the hashtable only after it's been fully constructed
         termHashtable(h) = termName
         termName
-      }
-    }
     if (synchronizeNames) nameLock.synchronized(body) else body
-  }
 
   final def newTypeName(
       cs: Array[Char], offset: Int, len: Int, cachedString: String): TypeName =
@@ -149,10 +141,9 @@ trait Names extends api.Names {
   def newTypeName(s: String): TypeName = newTermName(s).toTypeName
 
   /** Create a term name from the UTF8 encoded bytes in bs[offset..offset+len-1]. */
-  final def newTermName(bs: Array[Byte], offset: Int, len: Int): TermName = {
+  final def newTermName(bs: Array[Byte], offset: Int, len: Int): TermName =
     val chars = Codec.fromUTF8(bs, offset, len)
     newTermName(chars, 0, chars.length)
-  }
 
   final def newTermNameCached(s: String): TermName =
     newTermName(s.toCharArray(), 0, s.length(), cachedString = s)
@@ -174,18 +165,16 @@ trait Names extends api.Names {
     *
     * can-multi-thread: names are added to the hash tables only after they are fully constructed.
     */
-  final def lookupTypeName(cs: Array[Char]): TypeName = {
+  final def lookupTypeName(cs: Array[Char]): TypeName =
     val hash = hashValue(cs, 0, cs.length) & HASH_MASK
     var typeName = typeHashtable(hash)
 
     while ( (typeName ne null) &&
     (typeName.length != cs.length ||
-        !equals(typeName.start, cs, 0, cs.length))) {
+        !equals(typeName.start, cs, 0, cs.length)))
       typeName = typeName.next
-    }
     assert(typeName != null, s"TypeName ${new String(cs)} not yet created.")
     typeName
-  }
 
 // Classes ----------------------------------------------------------------------
 
@@ -195,7 +184,7 @@ trait Names extends api.Names {
     *  make people want Strings all the time.
     */
   sealed abstract class Name(protected val index: Int, protected val len: Int)
-      extends NameApi {
+      extends NameApi
     type ThisNameType >: Null <: Name
     protected[this] def thisName: ThisNameType
 
@@ -237,12 +226,11 @@ trait Names extends api.Names {
       scala.compat.Platform.arraycopy(chrs, index, cs, offset, len)
 
     /** @return the ascii representation of this name */
-    final def toChars: Array[Char] = {
+    final def toChars: Array[Char] =
       // used by ide
       val cs = new Array[Char](len)
       copyChars(cs, 0)
       cs
-    }
 
     /** @return the hash value of this name */
     final override def hashCode(): Int = index
@@ -296,11 +284,10 @@ trait Names extends api.Names {
       *  @param start the index from which to search
       *  @return      the index of the first occurrence of c
       */
-    final def pos(c: Char, start: Int): Int = {
+    final def pos(c: Char, start: Int): Int =
       var i = start
       while (i < len && chrs(index + i) != c) i += 1
       i
-    }
 
     /** Returns the index of the first occurrence of nonempty string s
       *  in this name from start, length if not found.
@@ -309,18 +296,15 @@ trait Names extends api.Names {
       *  @param start the index from which to search
       *  @return      the index of the first occurrence of s
       */
-    final def pos(s: String, start: Int): Int = {
+    final def pos(s: String, start: Int): Int =
       var i = pos(s.charAt(0), start)
-      while (i + s.length() <= len) {
+      while (i + s.length() <= len)
         var j = 1
-        while (s.charAt(j) == chrs(index + i + j)) {
+        while (s.charAt(j) == chrs(index + i + j))
           j += 1
           if (j == s.length()) return i
-        }
         i = pos(s.charAt(0), i + 1)
-      }
       len
-    }
 
     /** Returns the index of last occurrence of char c in this
       *  name, -1 if not found.
@@ -337,63 +321,55 @@ trait Names extends api.Names {
       *  @param start the index from which to search
       *  @return      the index of the last occurrence of c
       */
-    final def lastPos(c: Char, start: Int): Int = {
+    final def lastPos(c: Char, start: Int): Int =
       var i = start
       while (i >= 0 && chrs(index + i) != c) i -= 1
       i
-    }
 
     /** Does this name start with prefix? */
     final def startsWith(prefix: Name): Boolean = startsWith(prefix, 0)
 
     /** Does this name start with prefix at given start index? */
-    final def startsWith(prefix: Name, start: Int): Boolean = {
+    final def startsWith(prefix: Name, start: Int): Boolean =
       var i = 0
       while (i < prefix.length && start + i < len &&
       chrs(index + start + i) == chrs(prefix.start + i)) i += 1
       i == prefix.length
-    }
-    final def startsWith(prefix: String, start: Int): Boolean = {
+    final def startsWith(prefix: String, start: Int): Boolean =
       var i = 0
       while (i < prefix.length && start + i < len &&
       chrs(index + start + i) == prefix.charAt(i)) i += 1
       i == prefix.length
-    }
 
     /** Does this name end with suffix? */
     final def endsWith(suffix: Name): Boolean = endsWith(suffix, len)
 
     /** Does this name end with suffix just before given end index? */
-    final def endsWith(suffix: Name, end: Int): Boolean = {
+    final def endsWith(suffix: Name, end: Int): Boolean =
       var i = 1
       while (i <= suffix.length && i <= end &&
       chrs(index + end - i) == chrs(suffix.start + suffix.length - i)) i += 1
       i > suffix.length
-    }
-    final def endsWith(suffix: String, end: Int): Boolean = {
+    final def endsWith(suffix: String, end: Int): Boolean =
       var i = 1
       while (i <= suffix.length && i <= end &&
       chrs(index + end - i) == suffix.charAt(suffix.length - i)) i += 1
       i > suffix.length
-    }
 
     final def containsName(subname: String): Boolean =
       containsName(newTermName(subname))
-    final def containsName(subname: Name): Boolean = {
+    final def containsName(subname: Name): Boolean =
       var start = 0
       val last = len - subname.length
       while (start <= last && !startsWith(subname, start)) start += 1
       start <= last
-    }
-    final def containsChar(ch: Char): Boolean = {
+    final def containsChar(ch: Char): Boolean =
       var i = index
       val max = index + len
-      while (i < max) {
+      while (i < max)
         if (chrs(i) == ch) return true
         i += 1
-      }
       false
-    }
 
     /** Some thoroughly self-explanatory convenience functions.  They
       *  assume that what they're being asked to do is known to be valid.
@@ -421,16 +397,14 @@ trait Names extends api.Names {
     /** Replace all occurrences of `from` by `to` in
       *  name; result is always a term name.
       */
-    def replace(from: Char, to: Char): Name = {
+    def replace(from: Char, to: Char): Name =
       val cs = new Array[Char](len)
       var i = 0
-      while (i < len) {
+      while (i < len)
         val ch = charAt(i)
         cs(i) = if (ch == from) to else ch
         i += 1
-      }
       newTermName(cs, 0, len)
-    }
 
     /* TODO - reconcile/fix that encode returns a Name but
      *  decode returns a String.
@@ -444,21 +418,19 @@ trait Names extends api.Names {
     def encodedName: ThisNameType = encode
 
     /** Replace operator symbols by corresponding \$op_name. */
-    def encode: ThisNameType = {
+    def encode: ThisNameType =
       val str = toString
       val res = NameTransformer.encode(str)
       if (res == str) thisName else newName(res)
-    }
 
     /** Replace \$op_name by corresponding operator symbol. */
-    def decode: String = {
-      if (this containsChar '$') {
+    def decode: String =
+      if (this containsChar '$')
         val str = toString
         val res = NameTransformer.decode(str)
         if (res == str) str
         else res
-      } else toString
-    }
+      else toString
 
     /** TODO - find some efficiency. */
     def append(ch: Char) = newName(toString + ch)
@@ -472,7 +444,6 @@ trait Names extends api.Names {
     def isOperatorName: Boolean = decode != toString // used by ide
     def longString: String = nameKind + " " + decode
     def debugString = { val s = decode; if (isTypeName) s + "!" else s }
-  }
 
   implicit def AnyNameOps(name: Name): NameOps[Name] = new NameOps(name)
   implicit def TermNameOps(name: TermName): NameOps[TermName] =
@@ -483,7 +454,7 @@ trait Names extends api.Names {
   /** FIXME: This is a good example of something which is pure "value class" but cannot
     *  reap the benefits because an (unused) $outer pointer so it is not single-field.
     */
-  final class NameOps[T <: Name](name: T) {
+  final class NameOps[T <: Name](name: T)
     import NameTransformer._
     def stripSuffix(suffix: String): T =
       if (name endsWith suffix) dropRight(suffix.length) else name // OPT avoid creating a Name with `suffix`
@@ -500,12 +471,10 @@ trait Names extends api.Names {
     def getterName: TermName = dropTraitSetterSeparator.dropSetter.dropLocal
 
     private def dropTraitSetterSeparator: TermName =
-      name indexOf TRAIT_SETTER_SEPARATOR_STRING match {
+      name indexOf TRAIT_SETTER_SEPARATOR_STRING match
         case -1 => name.toTermName
         case idx =>
           name.toTermName drop idx drop TRAIT_SETTER_SEPARATOR_STRING.length
-      }
-  }
 
   implicit val NameTag = ClassTag[Name](classOf[Name])
 
@@ -527,56 +496,49 @@ trait Names extends api.Names {
     */
   private final class TermName_S(
       index0: Int, len0: Int, next0: TermName, override val toString: String)
-      extends TermName(index0, len0, next0) {
+      extends TermName(index0, len0, next0)
     protected def createCompanionName(next: TypeName): TypeName =
       new TypeName_S(index, len, next, toString)
     override def newName(str: String): TermName = newTermNameCached(str)
-  }
   private final class TypeName_S(
       index0: Int, len0: Int, next0: TypeName, override val toString: String)
-      extends TypeName(index0, len0, next0) {
+      extends TypeName(index0, len0, next0)
     override def newName(str: String): TypeName = newTypeNameCached(str)
-  }
 
   private final class TermName_R(index0: Int, len0: Int, next0: TermName)
-      extends TermName(index0, len0, next0) {
+      extends TermName(index0, len0, next0)
     protected def createCompanionName(next: TypeName): TypeName =
       new TypeName_R(index, len, next)
     override def toString = new String(chrs, index, len)
-  }
 
   private final class TypeName_R(index0: Int, len0: Int, next0: TypeName)
-      extends TypeName(index0, len0, next0) {
+      extends TypeName(index0, len0, next0)
     override def toString = new String(chrs, index, len)
-  }
 
   // SYNCNOTE: caller to constructor must synchronize if `synchronizeNames` is enabled
   sealed abstract class TermName(index0: Int, len0: Int, val next: TermName)
-      extends Name(index0, len0) with TermNameApi {
+      extends Name(index0, len0) with TermNameApi
     type ThisNameType = TermName
     protected[this] def thisName: TermName = this
 
     def isTermName: Boolean = true
     def isTypeName: Boolean = false
     def toTermName: TermName = this
-    def toTypeName: TypeName = {
-      def body = {
+    def toTypeName: TypeName =
+      def body =
         // Re-computing the hash saves a field for storing it in the TermName
         val h = hashValue(chrs, index, len) & HASH_MASK
         var n = typeHashtable(h)
         while ( (n ne null) && n.start != index) n = n.next
 
         if (n ne null) n
-        else {
+        else
           val next = typeHashtable(h)
           val typeName = createCompanionName(next)
           // Add the new typeName to the hashtable only after it's been fully constructed
           typeHashtable(h) = typeName
           typeName
-        }
-      }
       if (synchronizeNames) nameLock.synchronized(body) else body
-    }
     def newName(str: String): TermName = newTermName(str)
     def companionName: TypeName = toTypeName
     def subName(from: Int, to: Int): TermName =
@@ -586,24 +548,22 @@ trait Names extends api.Names {
 
     /** SYNCNOTE: caller must synchronize if `synchronizeNames` is enabled */
     protected def createCompanionName(next: TypeName): TypeName
-  }
 
   implicit val TermNameTag = ClassTag[TermName](classOf[TermName])
 
-  object TermName extends TermNameExtractor {
+  object TermName extends TermNameExtractor
     def apply(s: String) = newTermName(s)
     def unapply(name: TermName): Option[String] = Some(name.toString)
-  }
 
   sealed abstract class TypeName(index0: Int, len0: Int, val next: TypeName)
-      extends Name(index0, len0) with TypeNameApi {
+      extends Name(index0, len0) with TypeNameApi
     type ThisNameType = TypeName
     protected[this] def thisName: TypeName = this
 
     def isTermName: Boolean = false
     def isTypeName: Boolean = true
-    def toTermName: TermName = {
-      def body = {
+    def toTermName: TermName =
+      def body =
         // Re-computing the hash saves a field for storing it in the TypeName
         val h = hashValue(chrs, index, len) & HASH_MASK
         var n = termHashtable(h)
@@ -611,9 +571,7 @@ trait Names extends api.Names {
 
         assert(n ne null, s"TypeName $this is missing its correspondent")
         n
-      }
       if (synchronizeNames) nameLock.synchronized(body) else body
-    }
     def toTypeName: TypeName = this
     def newName(str: String): TypeName = newTypeName(str)
     def companionName: TermName = toTermName
@@ -622,12 +580,9 @@ trait Names extends api.Names {
 
     def nameKind = "type"
     override def decode = if (nameDebug) super.decode + "!" else super.decode
-  }
 
   implicit val TypeNameTag = ClassTag[TypeName](classOf[TypeName])
 
-  object TypeName extends TypeNameExtractor {
+  object TypeName extends TypeNameExtractor
     def apply(s: String) = newTypeName(s)
     def unapply(name: TypeName): Option[String] = Some(name.toString)
-  }
-}

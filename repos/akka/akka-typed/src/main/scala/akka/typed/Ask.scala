@@ -29,15 +29,14 @@ import java.lang.IllegalArgumentException
   * val f: Future[Reply] = target ? (Request("hello", _))
   * }}}
   */
-object AskPattern {
-  implicit class Askable[T](val ref: ActorRef[T]) extends AnyVal {
+object AskPattern
+  implicit class Askable[T](val ref: ActorRef[T]) extends AnyVal
     def ?[U](f: ActorRef[U] ⇒ T)(implicit timeout: Timeout): Future[U] =
       ask(ref, timeout, f)
-  }
 
-  private class PromiseRef[U](actorRef: ActorRef[_], timeout: Timeout) {
+  private class PromiseRef[U](actorRef: ActorRef[_], timeout: Timeout)
     val (ref: ActorRef[U], future: Future[U], promiseRef: PromiseActorRef) =
-      actorRef.untypedRef match {
+      actorRef.untypedRef match
         case ref: InternalActorRef if ref.isTerminated ⇒
           (ActorRef[U](ref.provider.deadLetters),
            Future.failed[U](new AskTimeoutException(
@@ -47,29 +46,23 @@ object AskPattern {
             (ActorRef[U](ref.provider.deadLetters),
              Future.failed[U](new IllegalArgumentException(
                      s"Timeout length must not be negative, question not sent to [$actorRef]")))
-          else {
+          else
             val a = PromiseActorRef(ref.provider, timeout, actorRef, "unknown")
             val b = ActorRef[U](a)
             (b, a.result.future.asInstanceOf[Future[U]], a)
-          }
         case _ ⇒
           throw new IllegalArgumentException(
               s"cannot create PromiseRef for non-Akka ActorRef (${actorRef.getClass})")
-      }
-  }
 
-  private object PromiseRef {
+  private object PromiseRef
     def apply[U](actorRef: ActorRef[_])(implicit timeout: Timeout) =
       new PromiseRef[U](actorRef, timeout)
-  }
 
   private[typed] def ask[T, U](actorRef: ActorRef[T],
                                timeout: Timeout,
-                               f: ActorRef[U] ⇒ T): Future[U] = {
+                               f: ActorRef[U] ⇒ T): Future[U] =
     val p = PromiseRef[U](actorRef)(timeout)
     val m = f(p.ref)
     p.promiseRef.messageClassName = m.getClass.getName
     actorRef ! m
     p.future
-  }
-}

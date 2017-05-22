@@ -18,17 +18,16 @@ import akka.testkit.ImplicitSender
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
 
-object ClusterDomainEventPublisherSpec {
+object ClusterDomainEventPublisherSpec
   val config = """
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
     akka.remote.netty.tcp.port = 0
     """
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ClusterDomainEventPublisherSpec
     extends AkkaSpec(ClusterDomainEventPublisherSpec.config)
-    with BeforeAndAfterEach with ImplicitSender {
+    with BeforeAndAfterEach with ImplicitSender
 
   var publisher: ActorRef = _
   val aUp = TestMember(Address("akka.tcp", "sys", "a", 2552), Up)
@@ -71,7 +70,7 @@ class ClusterDomainEventPublisherSpec
   // created in beforeEach
   var memberSubscriber: TestProbe = _
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     memberSubscriber = TestProbe()
     system.eventStream.subscribe(memberSubscriber.ref, classOf[MemberEvent])
     system.eventStream.subscribe(memberSubscriber.ref, classOf[LeaderChanged])
@@ -82,32 +81,28 @@ class ClusterDomainEventPublisherSpec
     publisher ! PublishChanges(g0)
     memberSubscriber.expectMsg(MemberUp(aUp))
     memberSubscriber.expectMsg(LeaderChanged(Some(aUp.address)))
-  }
 
-  "ClusterDomainEventPublisher" must {
+  "ClusterDomainEventPublisher" must
 
-    "publish MemberJoined" in {
+    "publish MemberJoined" in
       publisher ! PublishChanges(g1)
       memberSubscriber.expectMsg(MemberJoined(cJoining))
-    }
 
-    "publish MemberUp" in {
+    "publish MemberUp" in
       publisher ! PublishChanges(g2)
       publisher ! PublishChanges(g3)
       memberSubscriber.expectMsg(MemberExited(bExiting))
       memberSubscriber.expectMsg(MemberUp(cUp))
-    }
 
-    "publish leader changed" in {
+    "publish leader changed" in
       publisher ! PublishChanges(g4)
       memberSubscriber.expectMsg(MemberUp(a51Up))
       memberSubscriber.expectMsg(MemberExited(bExiting))
       memberSubscriber.expectMsg(MemberUp(cUp))
       memberSubscriber.expectMsg(LeaderChanged(Some(a51Up.address)))
       memberSubscriber.expectNoMsg(500 millis)
-    }
 
-    "publish leader changed when old leader leaves and is removed" in {
+    "publish leader changed when old leader leaves and is removed" in
       publisher ! PublishChanges(g3)
       memberSubscriber.expectMsg(MemberExited(bExiting))
       memberSubscriber.expectMsg(MemberUp(cUp))
@@ -123,9 +118,8 @@ class ClusterDomainEventPublisherSpec
       memberSubscriber.expectMsg(MemberRemoved(bRemoved, Exiting))
       memberSubscriber.expectMsg(MemberRemoved(cRemoved, Up))
       memberSubscriber.expectMsg(LeaderChanged(None))
-    }
 
-    "not publish leader changed when same leader" in {
+    "not publish leader changed when same leader" in
       publisher ! PublishChanges(g4)
       memberSubscriber.expectMsg(MemberUp(a51Up))
       memberSubscriber.expectMsg(MemberExited(bExiting))
@@ -134,9 +128,8 @@ class ClusterDomainEventPublisherSpec
 
       publisher ! PublishChanges(g5)
       memberSubscriber.expectNoMsg(500 millis)
-    }
 
-    "publish role leader changed" in {
+    "publish role leader changed" in
       val subscriber = TestProbe()
       publisher ! Subscribe(subscriber.ref,
                             InitialStateAsSnapshot,
@@ -146,9 +139,8 @@ class ClusterDomainEventPublisherSpec
       subscriber.expectMsg(RoleLeaderChanged("GRP", Some(dUp.address)))
       publisher ! PublishChanges(Gossip(members = SortedSet(cUp, dUp)))
       subscriber.expectMsg(RoleLeaderChanged("GRP", Some(cUp.address)))
-    }
 
-    "send CurrentClusterState when subscribe" in {
+    "send CurrentClusterState when subscribe" in
       val subscriber = TestProbe()
       publisher ! Subscribe(subscriber.ref,
                             InitialStateAsSnapshot,
@@ -156,9 +148,8 @@ class ClusterDomainEventPublisherSpec
       subscriber.expectMsgType[CurrentClusterState]
       // but only to the new subscriber
       memberSubscriber.expectNoMsg(500 millis)
-    }
 
-    "send events corresponding to current state when subscribe" in {
+    "send events corresponding to current state when subscribe" in
       val subscriber = TestProbe()
       publisher ! PublishChanges(g8)
       publisher ! Subscribe(subscriber.ref,
@@ -171,9 +162,8 @@ class ClusterDomainEventPublisherSpec
                                                  MemberExited(bExiting)))
       subscriber.expectMsg(UnreachableMember(dUp))
       subscriber.expectNoMsg(500 millis)
-    }
 
-    "support unsubscribe" in {
+    "support unsubscribe" in
       val subscriber = TestProbe()
       publisher ! Subscribe(subscriber.ref,
                             InitialStateAsSnapshot,
@@ -185,9 +175,8 @@ class ClusterDomainEventPublisherSpec
       // but memberSubscriber is still subscriber
       memberSubscriber.expectMsg(MemberExited(bExiting))
       memberSubscriber.expectMsg(MemberUp(cUp))
-    }
 
-    "publish SeenChanged" in {
+    "publish SeenChanged" in
       val subscriber = TestProbe()
       publisher ! Subscribe(subscriber.ref,
                             InitialStateAsSnapshot,
@@ -199,12 +188,8 @@ class ClusterDomainEventPublisherSpec
       publisher ! PublishChanges(g3)
       subscriber.expectMsgType[SeenChanged]
       subscriber.expectNoMsg(500 millis)
-    }
 
-    "publish ClusterShuttingDown and Removed when stopped" in {
+    "publish ClusterShuttingDown and Removed when stopped" in
       publisher ! PoisonPill
       memberSubscriber.expectMsg(ClusterShuttingDown)
       memberSubscriber.expectMsg(MemberRemoved(aRemoved, Up))
-    }
-  }
-}

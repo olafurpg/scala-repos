@@ -29,35 +29,29 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
 /**
   * Wrapper around Word2VecModel to provide helper methods in Python
   */
-private[python] class Word2VecModelWrapper(model: Word2VecModel) {
-  def transform(word: String): Vector = {
+private[python] class Word2VecModelWrapper(model: Word2VecModel)
+  def transform(word: String): Vector =
     model.transform(word)
-  }
 
   /**
     * Transforms an RDD of words to its vector representation
     * @param rdd an RDD of words
     * @return an RDD of vector representations of words
     */
-  def transform(rdd: JavaRDD[String]): JavaRDD[Vector] = {
+  def transform(rdd: JavaRDD[String]): JavaRDD[Vector] =
     rdd.rdd.map(model.transform)
-  }
 
-  def findSynonyms(word: String, num: Int): JList[Object] = {
+  def findSynonyms(word: String, num: Int): JList[Object] =
     val vec = transform(word)
     findSynonyms(vec, num)
-  }
 
-  def findSynonyms(vector: Vector, num: Int): JList[Object] = {
+  def findSynonyms(vector: Vector, num: Int): JList[Object] =
     val result = model.findSynonyms(vector, num)
     val similarity = Vectors.dense(result.map(_._2))
     val words = result.map(_._1)
     List(words, similarity).map(_.asInstanceOf[Object]).asJava
-  }
 
-  def getVectors: JMap[String, JList[Float]] = {
+  def getVectors: JMap[String, JList[Float]] =
     model.getVectors.map({ case (k, v) => (k, v.toList.asJava) }).asJava
-  }
 
   def save(sc: SparkContext, path: String): Unit = model.save(sc, path)
-}

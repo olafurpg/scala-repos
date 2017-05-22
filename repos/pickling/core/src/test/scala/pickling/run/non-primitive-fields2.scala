@@ -8,8 +8,8 @@ final case class Person(val name: String, val age: Int)
 case class Philipp(
     val nationality: String, val weird: Boolean, val mother: Person)
 
-class NonPrimitiveFields2Test extends FunSuite {
-  test("main") {
+class NonPrimitiveFields2Test extends FunSuite
+  test("main")
     val p = new Philipp("German", true, new Person("Gudrun", 62))
     val pickle = p.pickle
     assert(
@@ -25,5 +25,3 @@ class NonPrimitiveFields2Test extends FunSuite {
       |}
     """.stripMargin.trim)
     assert(pickle.unpickle[Philipp] === p)
-  }
-}

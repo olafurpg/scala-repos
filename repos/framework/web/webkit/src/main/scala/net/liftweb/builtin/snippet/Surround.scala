@@ -25,37 +25,32 @@ import net.liftweb.common._
 
 import Helpers._
 
-object Surround extends DispatchSnippet {
+object Surround extends DispatchSnippet
 
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case _ => render _
-  }
 
   def render(kids: NodeSeq): NodeSeq =
-    (for {
+    (for
       ctx <- S.session ?~ ("FIX" + "ME: Invalid session")
-    } yield {
+    yield
       def eatDiv(in: NodeSeq): NodeSeq =
         if (S.attr("eat").isDefined)
-          in.flatMap {
+          in.flatMap
             case e: Elem => e.child
             case n => n
-          } else in
+          else in
 
-      WithParamVar.doWith(Map()) {
+      WithParamVar.doWith(Map())
         lazy val mainParam =
           (S.attr("at") openOr "main",
            eatDiv(ctx.processSurroundAndInclude(PageName.get, kids)))
-        lazy val paramsMap = {
+        lazy val paramsMap =
           val q = mainParam // perform the side-effecting thing here
           WithParamVar.get +
           q // WithParamVar is the side effects of processing the template
-        }
         ctx.findAndMerge(S.attr("with"), paramsMap)
-      }
-    }) match {
+    ) match
       case Full(x) => x
       case Empty => Comment("FIX" + "ME: session or request are invalid")
       case Failure(msg, _, _) => Comment(msg)
-    }
-}

@@ -1,10 +1,7 @@
 package t785;
-trait ScalaNewTyper {
+trait ScalaNewTyper
   private var typed: String = null;
-  trait HasSymbol {
+  trait HasSymbol
     protected def foo(): Unit = {}
-  }
-  trait HasArgsTypeParametersImpl extends HasSymbol {
+  trait HasArgsTypeParametersImpl extends HasSymbol
     private var argss: List[List[String]] = Nil;
-  }
-}

@@ -16,9 +16,8 @@ limitations under the License.
 
 package com.twitter.summingbird.batch.option
 
-object FlatMapShards {
+object FlatMapShards
   val default = FlatMapShards(0)
-}
 
 /**
   * Setting this will force a random shuffle to the specified number of reducers.

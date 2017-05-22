@@ -9,13 +9,12 @@ import java.nio.charset._
 import org.junit.Test
 import org.junit.Assert._
 
-class CharsetJSTest {
+class CharsetJSTest
 
-  @Test def defaultCharset(): Unit = {
+  @Test def defaultCharset(): Unit =
     assertSame(UTF_8, Charset.defaultCharset())
-  }
 
-  @Test def forName(): Unit = {
+  @Test def forName(): Unit =
     assertSame(ISO_8859_1, Charset.forName("ISO-8859-1"))
     assertSame(ISO_8859_1, Charset.forName("Iso8859-1"))
     assertSame(ISO_8859_1, Charset.forName("iso_8859_1"))
@@ -42,5 +41,3 @@ class CharsetJSTest {
     assertSame(UTF_16, Charset.forName("Utf_16"))
     assertSame(UTF_16, Charset.forName("unicode"))
     assertSame(UTF_16, Charset.forName("UnicodeBig"))
-  }
-}

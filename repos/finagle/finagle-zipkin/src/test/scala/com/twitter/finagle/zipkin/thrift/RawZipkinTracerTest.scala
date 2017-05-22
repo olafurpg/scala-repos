@@ -13,7 +13,7 @@ import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
-class RawZipkinTracerTest extends FunSuite {
+class RawZipkinTracerTest extends FunSuite
 
   val traceId = TraceId(Some(SpanId(123)),
                         Some(SpanId(123)),
@@ -21,16 +21,14 @@ class RawZipkinTracerTest extends FunSuite {
                         None,
                         Flags().setDebug)
 
-  class ScribeClient extends Scribe.FutureIface {
+  class ScribeClient extends Scribe.FutureIface
     var messages: Seq[LogEntry] = Seq.empty[LogEntry]
     var response: Future[ResultCode] = Future.value(ResultCode.Ok)
-    def log(msgs: Seq[LogEntry]): Future[ResultCode] = {
+    def log(msgs: Seq[LogEntry]): Future[ResultCode] =
       messages ++= msgs
       response
-    }
-  }
 
-  test("formulate scribe log message correctly") {
+  test("formulate scribe log message correctly")
     val scribe = new ScribeClient
     val tracer = new RawZipkinTracer(scribe, NullStatsReceiver)
 
@@ -64,9 +62,8 @@ class RawZipkinTracerTest extends FunSuite {
 
     tracer.logSpans(Seq(span))
     assert(scribe.messages == Seq(expected))
-  }
 
-  test("send all traces to scribe") {
+  test("send all traces to scribe")
     val scribe = new ScribeClient
     val tracer = new RawZipkinTracer(scribe, NullStatsReceiver)
 
@@ -119,9 +116,8 @@ class RawZipkinTracerTest extends FunSuite {
 
     // Note: Since ports are ephemeral, we can't hardcode expected message.
     assert(scribe.messages.size == 1)
-  }
 
-  test("logSpan if a timeout occurs") {
+  test("logSpan if a timeout occurs")
     val ann1 = Annotation.Message("some_message")
     val ann2 = Annotation.Rpcname("some_service", "rpc_name")
     val ann3 = Annotation.Message(TimeoutFilter.TimeoutAnnotation)
@@ -135,5 +131,3 @@ class RawZipkinTracerTest extends FunSuite {
 
     // scribe Log method is in java
     assert(scribe.messages.size == 1)
-  }
-}

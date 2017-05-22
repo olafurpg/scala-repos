@@ -14,12 +14,11 @@ import akka.japi.function.Function
 
 import scala.reflect.ClassTag
 
-trait FormField[T] extends RequestVal[T] {
+trait FormField[T] extends RequestVal[T]
   def optional: RequestVal[Optional[T]]
   def withDefault(defaultValue: T): RequestVal[T]
-}
 
-object FormFields {
+object FormFields
   import akka.http.scaladsl.common.ToNameReceptacleEnhancements._
 
   def stringValue(name: String): FormField[String] = FormFieldImpl(name)
@@ -50,8 +49,6 @@ object FormFields {
   /** Unmarshals the `name` field using the provided `convert` function. */
   def fromString[T](name: String,
                     clazz: Class[T],
-                    convert: Function[String, T]): FormField[T] = {
+                    convert: Function[String, T]): FormField[T] =
     implicit val tTag: ClassTag[T] = ClassTag(clazz)
     FormFieldImpl(name.as(Util.fromStringUnmarshallerFromFunction(convert)))
-  }
-}

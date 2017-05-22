@@ -5,7 +5,7 @@ import javax.servlet.http.HttpServletRequest
 /**
   * Adds support for generating URIs from routes and their params.
   */
-trait UrlGeneratorSupport {
+trait UrlGeneratorSupport
 
   /**
     * Calculate a URL for a reversible route and some params.
@@ -49,12 +49,10 @@ trait UrlGeneratorSupport {
     */
   def url(route: Route, params: Map[String, String], splats: Iterable[String])(
       implicit req: HttpServletRequest): String =
-    route.reversibleMatcher match {
+    route.reversibleMatcher match
       case Some(matcher: ReversibleRouteMatcher) =>
         route.contextPath(req) + matcher.reverse(params, splats.toList)
       case _ =>
         throw new Exception("Route \"%s\" is not reversible" format (route))
-    }
-}
 
 object UrlGenerator extends UrlGeneratorSupport

@@ -19,21 +19,19 @@ import org.jetbrains.plugins.scala.project.settings.ScalaCompilerSettings
   * 2014-10-07
   */
 abstract class RemoteServerConnectorBase(
-    module: Module, filesToCompile: Seq[File], outputDir: File) {
+    module: Module, filesToCompile: Seq[File], outputDir: File)
 
   checkFilesToCompile(filesToCompile)
 
-  def this(module: Module, fileToCompile: File, outputDir: File) = {
+  def this(module: Module, fileToCompile: File, outputDir: File) =
     this(module, Seq(fileToCompile), outputDir)
-  }
 
-  private val libRoot = {
-    if (ApplicationManager.getApplication.isUnitTestMode) {
+  private val libRoot =
+    if (ApplicationManager.getApplication.isUnitTestMode)
       if (PlatformUtils.isIdeaCommunity)
         new File("./out/plugin/Scala/lib").getAbsoluteFile
       else new File("../../out/plugin/Scala/lib").getAbsoluteFile
-    } else new File(PathUtil.getJarPathForClass(getClass)).getParentFile
-  }
+    else new File(PathUtil.getJarPathForClass(getClass)).getParentFile
 
   private val libCanonicalPath = PathUtil.getCanonicalPath(libRoot.getPath)
 
@@ -45,10 +43,9 @@ abstract class RemoteServerConnectorBase(
           getClass.getClassLoader),
       new File(libRoot, "jps"),
       System.getProperty("java.class.version")
-  ) match {
+  ) match
     case Left(msg) => throw new IllegalArgumentException(msg)
     case Right(data) => data
-  }
 
   private val sourceRoot = filesToCompile.head.getParentFile
 
@@ -69,12 +66,11 @@ abstract class RemoteServerConnectorBase(
 
   protected def worksheetArgs: Array[String] = Array()
 
-  protected def classpath: String = {
+  protected def classpath: String =
     val classesRoots =
       assemblyClasspath().toSeq map
       (f => new File(f.getCanonicalPath stripSuffix "!" stripSuffix "!/"))
     (classesRoots ++ additionalCp).mkString("\n")
-  }
 
   import _root_.scala.language.implicitConversions
 
@@ -148,14 +144,13 @@ abstract class RemoteServerConnectorBase(
             "No Scala SDK configured for module: " + module.getName))
 
   private def findJdk =
-    scala.compiler.findJdkByName(settings.COMPILE_SERVER_SDK) match {
+    scala.compiler.findJdkByName(settings.COMPILE_SERVER_SDK) match
       case Right(jdk) => jdk.executable
       case Left(msg) =>
         configurationError(
             s"Cannot find jdk ${settings.COMPILE_SERVER_SDK} for compile server, underlying message: $msg")
-    }
 
-  private def checkFilesToCompile(files: Seq[File]) = {
+  private def checkFilesToCompile(files: Seq[File]) =
     if (files.isEmpty)
       throw new IllegalArgumentException("Non-empty list of files expected")
 
@@ -168,5 +163,3 @@ abstract class RemoteServerConnectorBase(
     if (files.map(_.getParent).distinct.size != 1)
       throw new IllegalArgumentException(
           "All files should be in the same directory")
-  }
-}

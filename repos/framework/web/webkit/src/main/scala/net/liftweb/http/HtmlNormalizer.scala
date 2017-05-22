@@ -15,7 +15,7 @@ import util.Helpers._
   * the JS that should run when that event is triggered as a String.
   */
 private case class EventAttribute(eventName: String, jsString: String)
-private object EventAttribute {
+private object EventAttribute
 
   /**
     * Some elements allow a URL attribute to take a `javascript:(//)`-style
@@ -32,38 +32,27 @@ private object EventAttribute {
       "href" -> "click"
   )
 
-  object EventForAttribute {
-    def unapply(attributeName: String): Option[String] = {
+  object EventForAttribute
+    def unapply(attributeName: String): Option[String] =
       eventsByAttributeName.get(attributeName)
-    }
-  }
-}
 
-case class NodesAndEventJs(nodes: NodeSeq, js: JsCmd) {
-  def append(newNodesAndEventJs: NodesAndEventJs): NodesAndEventJs = {
+case class NodesAndEventJs(nodes: NodeSeq, js: JsCmd)
+  def append(newNodesAndEventJs: NodesAndEventJs): NodesAndEventJs =
     this.copy(
         nodes = nodes ++ newNodesAndEventJs.nodes,
         js = js & newNodesAndEventJs.js
     )
-  }
-  def append(newNodeAndEventJs: NodeAndEventJs): NodesAndEventJs = {
+  def append(newNodeAndEventJs: NodeAndEventJs): NodesAndEventJs =
     append(newNodeAndEventJs.node, newNodeAndEventJs.js)
-  }
-  def append(newNode: Node): NodesAndEventJs = {
+  def append(newNode: Node): NodesAndEventJs =
     this.copy(nodes = nodes :+ newNode)
-  }
-  def append(newJs: JsCmd): NodesAndEventJs = {
+  def append(newJs: JsCmd): NodesAndEventJs =
     this.copy(js = js & newJs)
-  }
-  def append(newNode: Node, newJs: JsCmd): NodesAndEventJs = {
+  def append(newNode: Node, newJs: JsCmd): NodesAndEventJs =
     this.copy(nodes = nodes :+ newNode, js = js & newJs)
-  }
-}
-private[http] case class NodeAndEventJs(node: Node, js: JsCmd) {
-  def append(newJs: JsCmd): NodeAndEventJs = {
+private[http] case class NodeAndEventJs(node: Node, js: JsCmd)
+  def append(newJs: JsCmd): NodeAndEventJs =
     this.copy(js = js & newJs)
-  }
-}
 
 /**
   * Helper class that performs certain Lift-specific normalizations of HTML
@@ -76,7 +65,7 @@ private[http] case class NodeAndEventJs(node: Node, js: JsCmd) {
   *    that element.
   *  - Provides for caller-specific additional processing for each node.
   */
-private[http] final object HtmlNormalizer {
+private[http] final object HtmlNormalizer
   // Fix URLs using Req.normalizeHref and extract JS event attributes for
   // putting into page JS. Returns a triple of:
   //  - The optional id that was found in this set of attributes.
@@ -88,10 +77,10 @@ private[http] final object HtmlNormalizer {
       contextPath: String,
       shouldRewriteUrl: Boolean, // whether to apply URLRewrite.rewriteFunc
       eventAttributes: List[EventAttribute] = Nil
-  ): (Option[String], MetaData, List[EventAttribute]) = {
-    if (attributes == Null) {
+  ): (Option[String], MetaData, List[EventAttribute]) =
+    if (attributes == Null)
       (None, Null, eventAttributes)
-    } else {
+    else
       // Note: we don't do this tail-recursively because we have to preserve
       // attribute order!
       val (id, normalizedRemainingAttributes, remainingEventAttributes) =
@@ -103,26 +92,24 @@ private[http] final object HtmlNormalizer {
             eventAttributes
         )
 
-      attributes match {
+      attributes match
         case attribute @ UnprefixedAttribute(
             EventAttribute.EventForAttribute(eventName),
             attributeValue,
             remainingAttributes
             ) if attributeValue.text.startsWith("javascript:") =>
-          val attributeJavaScript = {
+          val attributeJavaScript =
             // Could be javascript: or javascript://.
             val base = attributeValue.text.substring(11)
             val strippedJs =
               if (base.startsWith("//")) base.substring(2)
               else base
 
-            if (strippedJs.trim.isEmpty) {
+            if (strippedJs.trim.isEmpty)
               Nil
-            } else {
+            else
               // When using javascript:-style URIs, event.preventDefault is implied.
               List(strippedJs + "; event.preventDefault()")
-            }
-          }
 
           val updatedEventAttributes =
             attributeJavaScript.map(EventAttribute(eventName, _)) ::: remainingEventAttributes
@@ -163,15 +150,12 @@ private[http] final object HtmlNormalizer {
           (id,
            attributes.copy(normalizedRemainingAttributes),
            remainingEventAttributes)
-      }
-    }
-  }
 
   // Given an element id and the `EventAttribute`s to apply to elements with
   // that id, return a JsCmd that binds all those event handlers to that id.
   private[this] def jsForEventAttributes(
-      elementId: String, eventAttributes: List[EventAttribute]): JsCmd = {
-    eventAttributes.map {
+      elementId: String, eventAttributes: List[EventAttribute]): JsCmd =
+    eventAttributes.map
       case EventAttribute(name, handlerJs) =>
         Call(
             "lift.onEvent",
@@ -179,14 +163,13 @@ private[http] final object HtmlNormalizer {
             name,
             AnonFunc("event", JsRaw(handlerJs).cmd)
         ).cmd
-    }.foldLeft(Noop)(_ & _)
-  }
+    .foldLeft(Noop)(_ & _)
 
   private[http] def normalizeElementAndAttributes(
       element: Elem,
       attributeToNormalize: String,
       contextPath: String,
-      shouldRewriteUrl: Boolean): NodeAndEventJs = {
+      shouldRewriteUrl: Boolean): NodeAndEventJs =
     val (id, normalizedAttributes, eventAttributes) =
       normalizeUrlAndExtractEvents(
           attributeToNormalize,
@@ -196,26 +179,24 @@ private[http] final object HtmlNormalizer {
       )
 
     val attributesIncludingEventsAsData =
-      LiftRules.attributeForRemovedEventAttributes match {
+      LiftRules.attributeForRemovedEventAttributes match
         case Some(attribute) if eventAttributes.nonEmpty =>
-          val removedAttributes = eventAttributes.map {
+          val removedAttributes = eventAttributes.map
             case EventAttribute(event, _) =>
               s"on$event"
-          }
           new UnprefixedAttribute(
               attribute, removedAttributes.mkString(" "), normalizedAttributes)
 
         case _ =>
           normalizedAttributes
-      }
 
-    id.map { foundId =>
+    id.map  foundId =>
       NodeAndEventJs(
           element.copy(attributes = attributesIncludingEventsAsData),
           jsForEventAttributes(foundId, eventAttributes)
       )
-    } getOrElse {
-      if (eventAttributes.nonEmpty) {
+    getOrElse
+      if (eventAttributes.nonEmpty)
         val generatedId = s"lift-event-js-${nextFuncName}"
 
         NodeAndEventJs(
@@ -223,22 +204,19 @@ private[http] final object HtmlNormalizer {
                       "id", generatedId, attributesIncludingEventsAsData)),
             jsForEventAttributes(generatedId, eventAttributes)
         )
-      } else {
+      else
         NodeAndEventJs(
             element.copy(attributes = attributesIncludingEventsAsData),
             Noop
         )
-      }
-    }
-  }
 
   private[http] def normalizeNode(
       node: Node,
       contextPath: String,
-      stripComments: Boolean): Option[NodeAndEventJs] = {
-    node match {
+      stripComments: Boolean): Option[NodeAndEventJs] =
+    node match
       case element: Elem =>
-        val (attributeToFix, shouldRewriteUrl) = element.label match {
+        val (attributeToFix, shouldRewriteUrl) = element.label match
           case "form" =>
             ("action", true)
 
@@ -251,7 +229,6 @@ private[http] final object HtmlNormalizer {
             ("src", false)
           case _ =>
             ("src", true)
-        }
 
         Some(
             normalizeElementAndAttributes(
@@ -267,8 +244,6 @@ private[http] final object HtmlNormalizer {
 
       case otherNode =>
         Some(NodeAndEventJs(otherNode, Noop))
-    }
-  }
 
   /**
     * Base for all the normalizeHtml* implementations; in addition to what it
@@ -286,10 +261,10 @@ private[http] final object HtmlNormalizer {
       nodes: NodeSeq,
       contextPath: String,
       stripComments: Boolean
-  ): NodesAndEventJs = {
-    nodes.foldLeft(NodesAndEventJs(Vector[Node](), Noop)) {
+  ): NodesAndEventJs =
+    nodes.foldLeft(NodesAndEventJs(Vector[Node](), Noop))
       (soFar, nodeToNormalize) =>
-        normalizeNode(nodeToNormalize, contextPath, stripComments).map {
+        normalizeNode(nodeToNormalize, contextPath, stripComments).map
           case NodeAndEventJs(normalizedElement: Elem, js: JsCmd) =>
             val NodesAndEventJs(normalizedChildren, childJs) =
               normalizeHtmlAndEventHandlers(
@@ -305,9 +280,5 @@ private[http] final object HtmlNormalizer {
 
           case node =>
             soFar.append(node)
-        } getOrElse {
+        getOrElse
           soFar
-        }
-    }
-  }
-}

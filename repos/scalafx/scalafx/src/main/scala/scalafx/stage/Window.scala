@@ -34,23 +34,21 @@ import scalafx.beans.property.{DoubleProperty, ObjectProperty, ReadOnlyBooleanPr
 import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventHandlerDelegate}
 
-object Window {
+object Window
   implicit def sfxWindow2jfx(v: Window): jfxs.Window =
     if (v != null) v.delegate else null
-}
 
 class Window protected (override val delegate: jfxs.Window)
     extends EventHandlerDelegate with SFXDelegate[jfxs.Window]
-    with jfxe.EventTarget {
+    with jfxe.EventTarget
 
   /**
     * Specifies the event dispatcher for this node.
     */
   def eventDispatcher: ObjectProperty[jfxe.EventDispatcher] =
     delegate.eventDispatcherProperty
-  def eventDispatcher_=(v: jfxe.EventDispatcher) {
+  def eventDispatcher_=(v: jfxe.EventDispatcher)
     eventDispatcher() = v
-  }
 
   /**
     * Whether or not this Window has the keyboard or input focus.
@@ -61,57 +59,50 @@ class Window protected (override val delegate: jfxs.Window)
     * The height of this Stage.
     */
   def height: ReadOnlyDoubleProperty = delegate.heightProperty
-  def height_=(h: Double) {
+  def height_=(h: Double)
     delegate.setHeight(h)
-  }
 
   /**
     * Called when there is an external request to close this Window.
     */
   def onCloseRequest = delegate.onCloseRequestProperty
-  def onCloseRequest_=(v: jfxe.EventHandler[jfxs.WindowEvent]) {
+  def onCloseRequest_=(v: jfxe.EventHandler[jfxs.WindowEvent])
     onCloseRequest() = v
-  }
 
   /**
     * Called just after the Window has been hidden.
     */
   def onHidden = delegate.onHiddenProperty
-  def onHidden_=(v: jfxe.EventHandler[jfxs.WindowEvent]) {
+  def onHidden_=(v: jfxe.EventHandler[jfxs.WindowEvent])
     onHidden() = v
-  }
 
   /**
     * Called just prior to the Window being hidden.
     */
   def onHiding = delegate.onHidingProperty
-  def onHiding_=(v: jfxe.EventHandler[jfxs.WindowEvent]) {
+  def onHiding_=(v: jfxe.EventHandler[jfxs.WindowEvent])
     onHiding() = v
-  }
 
   /**
     * Called just prior to the Window being shown, even if the menu has no items to show.
     */
   def onShowing = delegate.onShowingProperty
-  def onShowing_=(v: jfxe.EventHandler[jfxs.WindowEvent]) {
+  def onShowing_=(v: jfxe.EventHandler[jfxs.WindowEvent])
     onShowing() = v
-  }
 
   /**
     * Called just after the Window is shown.
     */
   def onShown = delegate.onShownProperty
-  def onShown_=(v: jfxe.EventHandler[jfxs.WindowEvent]) {
+  def onShown_=(v: jfxe.EventHandler[jfxs.WindowEvent])
     onShown() = v
-  }
 
   /**
     * Defines the opacity of the Stage as a value between 0.0 and 1.0.
     */
   def opacity: DoubleProperty = delegate.opacityProperty
-  def opacity_=(v: Double) {
+  def opacity_=(v: Double)
     opacity() = v
-  }
 
   /**
     * The Scene to be rendered on this Stage.
@@ -128,53 +119,46 @@ class Window protected (override val delegate: jfxs.Window)
     * The width of this Stage.
     */
   def width: ReadOnlyDoubleProperty = delegate.widthProperty
-  def width_=(w: Double) {
+  def width_=(w: Double)
     delegate.setWidth(w)
-  }
 
   /**
     * The horizontal location of this Stage on the screen.
     */
   def x: ReadOnlyDoubleProperty = delegate.xProperty
-  def x_=(value: Double) {
+  def x_=(value: Double)
     delegate.setX(value)
-  }
 
   /**
     * The vertical location of this Stage on the screen.
     */
   def y: ReadOnlyDoubleProperty = delegate.yProperty
-  def y_=(value: Double) {
+  def y_=(value: Double)
     delegate.setY(value)
-  }
 
   /**
     * Sets x and y properties on this Window so that it is centered on the screen.
     */
-  def centerOnScreen() {
+  def centerOnScreen()
     delegate.centerOnScreen()
-  }
 
   /**
     * Whether or not this Window has the keyboard or input focus.
     */
-  def fireEvent(event: Event) {
+  def fireEvent(event: Event)
     delegate.fireEvent(event)
-  }
 
   /**
     * Attempts to hide this Window by setting the visibility to false.
     */
-  def hide() {
+  def hide()
     delegate.hide()
-  }
 
   /**
     * Requests that this Window get the input focus.
     */
-  def requestFocus() {
+  def requestFocus()
     delegate.requestFocus()
-  }
 
   /*
    * Attempts to show this Window by setting visibility to true
@@ -184,10 +168,8 @@ class Window protected (override val delegate: jfxs.Window)
   /**
     * Set the width and height of this Window to match the size of the content of this Window's Scene.
     */
-  def sizeToScene() {
+  def sizeToScene()
     delegate.sizeToScene()
-  }
 
   override protected def eventHandlerDelegate =
     delegate.asInstanceOf[EventHandled]
-}

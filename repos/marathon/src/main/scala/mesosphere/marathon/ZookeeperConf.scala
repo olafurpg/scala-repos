@@ -6,7 +6,7 @@ import org.rogach.scallop.ScallopConf
 
 import scala.concurrent.duration._
 
-trait ZookeeperConf extends ScallopConf {
+trait ZookeeperConf extends ScallopConf
 
   //scalastyle:off magic.number
 
@@ -58,11 +58,10 @@ trait ZookeeperConf extends ScallopConf {
   def zooKeeperServerSetPath: String = "%s/apps".format(zkPath)
 
   def zooKeeperHostAddresses: Seq[InetSocketAddress] =
-    for (s <- zkHosts.split(",")) yield {
+    for (s <- zkHosts.split(",")) yield
       val splits = s.split(":")
       require(splits.length == 2, "expected host:port for zk servers")
       new InetSocketAddress(splits(0), splits(1).toInt)
-    }
 
   def zkURL: String = zooKeeperUrl.get.get
 
@@ -71,4 +70,3 @@ trait ZookeeperConf extends ScallopConf {
   lazy val zkTimeoutDuration = Duration(zooKeeperTimeout(), MILLISECONDS)
   lazy val zkSessionTimeoutDuration = Duration(
       zooKeeperSessionTimeout(), MILLISECONDS)
-}

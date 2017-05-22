@@ -1,18 +1,14 @@
-package actions {
+package actions
   sealed case class Column(s: String, tp: Column.Type) {}
 
-  object Column {
+  object Column
     sealed trait Type {}
-    object Type {
+    object Type
       case object Integer extends Type
-    }
-  }
-}
 
-class Temp {
+class Temp
   def foo(c: actions.Column.Type) = 1
   def foo(c: Int) = false
   /*start*/
   foo(actions.Column.Type.Integer) /*end*/
-}
 //Int

@@ -19,24 +19,21 @@ package akka.cluster.ddata
   * i.e. if used outside the Replicator infrastructure, but the worst thing that can happen is that
   * a full merge is performed instead of the fast forward merge.
   */
-private[akka] trait FastMerge { self: ReplicatedData ⇒
+private[akka] trait FastMerge  self: ReplicatedData ⇒
 
   private var ancestor: FastMerge = null
 
   /** INTERNAL API: should be called from "updating" methods */
-  private[akka] def assignAncestor(newData: T with FastMerge): T = {
+  private[akka] def assignAncestor(newData: T with FastMerge): T =
     newData.ancestor = if (this.ancestor eq null) this else this.ancestor
     this.ancestor = null // only one level, for GC
     newData
-  }
 
   /** INTERNAL API: should be used from merge */
   private[akka] def isAncestorOf(that: T with FastMerge): Boolean =
     that.ancestor eq this
 
   /** INTERNAL API: should be called from merge */
-  private[akka] def clearAncestor(): self.type = {
+  private[akka] def clearAncestor(): self.type =
     ancestor = null
     this
-  }
-}

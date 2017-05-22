@@ -1,7 +1,5 @@
-object Test extends App {
-  try {
+object Test extends App
+  try
     class A; class B; List().head.isInstanceOf[A with B]
-  } catch {
+  catch
     case _: java.util.NoSuchElementException => println("ok")
-  }
-}

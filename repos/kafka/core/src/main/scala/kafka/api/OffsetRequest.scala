@@ -24,7 +24,7 @@ import kafka.network.{RequestOrResponseSend, RequestChannel}
 import kafka.network.RequestChannel.Response
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 
-object OffsetRequest {
+object OffsetRequest
   val CurrentVersion = 0.shortValue
   val DefaultClientId = ""
 
@@ -33,32 +33,28 @@ object OffsetRequest {
   val LatestTime = -1L
   val EarliestTime = -2L
 
-  def readFrom(buffer: ByteBuffer): OffsetRequest = {
+  def readFrom(buffer: ByteBuffer): OffsetRequest =
     val versionId = buffer.getShort
     val correlationId = buffer.getInt
     val clientId = readShortString(buffer)
     val replicaId = buffer.getInt
     val topicCount = buffer.getInt
     val pairs = (1 to topicCount).flatMap(_ =>
-          {
         val topic = readShortString(buffer)
         val partitionCount = buffer.getInt
         (1 to partitionCount).map(_ =>
-              {
             val partitionId = buffer.getInt
             val time = buffer.getLong
             val maxNumOffsets = buffer.getInt
             (TopicAndPartition(topic, partitionId),
              PartitionOffsetRequestInfo(time, maxNumOffsets))
-        })
-    })
+        )
+    )
     OffsetRequest(Map(pairs: _*),
                   versionId = versionId,
                   clientId = clientId,
                   correlationId = correlationId,
                   replicaId = replicaId)
-  }
-}
 
 case class PartitionOffsetRequestInfo(time: Long, maxNumOffsets: Int)
 
@@ -68,7 +64,7 @@ case class OffsetRequest(
     correlationId: Int = 0,
     clientId: String = OffsetRequest.DefaultClientId,
     replicaId: Int = Request.OrdinaryConsumerId)
-    extends RequestOrResponse(Some(ApiKeys.LIST_OFFSETS.id)) {
+    extends RequestOrResponse(Some(ApiKeys.LIST_OFFSETS.id))
 
   def this(requestInfo: Map[TopicAndPartition, PartitionOffsetRequestInfo],
            correlationId: Int,
@@ -81,25 +77,22 @@ case class OffsetRequest(
 
   lazy val requestInfoGroupedByTopic = requestInfo.groupBy(_._1.topic)
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     buffer.putShort(versionId)
     buffer.putInt(correlationId)
     writeShortString(buffer, clientId)
     buffer.putInt(replicaId)
 
     buffer.putInt(requestInfoGroupedByTopic.size) // topic count
-    requestInfoGroupedByTopic.foreach {
+    requestInfoGroupedByTopic.foreach
       case ((topic, partitionInfos)) =>
         writeShortString(buffer, topic)
         buffer.putInt(partitionInfos.size) // partition count
-        partitionInfos.foreach {
+        partitionInfos.foreach
           case (TopicAndPartition(_, partition), partitionInfo) =>
             buffer.putInt(partition)
             buffer.putLong(partitionInfo.time)
             buffer.putInt(partitionInfo.maxNumOffsets)
-        }
-    }
-  }
 
   def sizeInBytes =
     2 + /* versionId */
@@ -107,7 +100,6 @@ case class OffsetRequest(
     shortStringLength(clientId) + 4 + /* replicaId */
     4 + /* topic count */
     requestInfoGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) =>
-          {
         val (topic, partitionInfos) = currTopic
         foldedTopics + shortStringLength(topic) + 4 + /* partition count */
         partitionInfos.size *
@@ -115,32 +107,29 @@ case class OffsetRequest(
             8 + /* time */
             4 /* maxNumOffsets */
             )
-    })
+    )
 
   def isFromOrdinaryClient = replicaId == Request.OrdinaryConsumerId
   def isFromDebuggingClient = replicaId == Request.DebuggingConsumerId
 
-  override def toString(): String = {
+  override def toString(): String =
     describe(true)
-  }
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
-    val partitionOffsetResponseMap = requestInfo.map {
+                           request: RequestChannel.Request): Unit =
+    val partitionOffsetResponseMap = requestInfo.map
       case (topicAndPartition, partitionOffsetRequest) =>
         (topicAndPartition,
          PartitionOffsetsResponse(Errors.forException(e).code, Nil))
-    }
     val errorResponse = OffsetResponse(
         correlationId, partitionOffsetResponseMap)
     requestChannel.sendResponse(
         new Response(
             request,
             new RequestOrResponseSend(request.connectionId, errorResponse)))
-  }
 
-  override def describe(details: Boolean): String = {
+  override def describe(details: Boolean): String =
     val offsetRequest = new StringBuilder
     offsetRequest.append("Name: " + this.getClass.getSimpleName)
     offsetRequest.append("; Version: " + versionId)
@@ -150,5 +139,3 @@ case class OffsetRequest(
     if (details)
       offsetRequest.append("; RequestInfo: " + requestInfo.mkString(","))
     offsetRequest.toString()
-  }
-}

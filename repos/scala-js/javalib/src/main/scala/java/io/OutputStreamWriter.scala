@@ -7,7 +7,7 @@ import java.nio.charset._
 
 class OutputStreamWriter(
     private[this] var out: OutputStream, private[this] var enc: CharsetEncoder)
-    extends Writer {
+    extends Writer
 
   private[this] var closed: Boolean = false
 
@@ -48,70 +48,62 @@ class OutputStreamWriter(
   override def write(str: String, off: Int, len: Int): Unit =
     writeImpl(CharBuffer.wrap(str, off, off + len))
 
-  private def writeImpl(cbuf: CharBuffer): Unit = {
+  private def writeImpl(cbuf: CharBuffer): Unit =
     ensureOpen()
 
     val cbuf1 =
-      if (inBuf != "") {
+      if (inBuf != "")
         val fullInput = CharBuffer.wrap(inBuf + cbuf.toString)
         inBuf = ""
         fullInput
-      } else cbuf
+      else cbuf
 
     @inline
     @tailrec
-    def loopEncode(): Unit = {
+    def loopEncode(): Unit =
       val result = enc.encode(cbuf1, outBuf, false)
       if (result.isUnderflow) ()
-      else if (result.isOverflow) {
+      else if (result.isOverflow)
         makeRoomInOutBuf()
         loopEncode()
-      } else {
+      else
         result.throwException()
         throw new AssertionError("should not get here")
-      }
-    }
 
     loopEncode()
     if (cbuf1.hasRemaining) inBuf = cbuf1.toString
-  }
 
-  override def flush(): Unit = {
+  override def flush(): Unit =
     ensureOpen()
     flushBuffer()
     out.flush()
-  }
 
-  override def close(): Unit = if (!closed) {
+  override def close(): Unit = if (!closed)
     // Finish up the input
     @inline
     @tailrec
-    def loopEncode(): Unit = {
+    def loopEncode(): Unit =
       val cbuf = CharBuffer.wrap(inBuf)
       val result = enc.encode(cbuf, outBuf, true)
-      if (result.isUnderflow) {
+      if (result.isUnderflow)
         assert(
             !cbuf.hasRemaining,
             "CharsetEncoder.encode() should not have returned UNDERFLOW when " +
             "both endOfInput and inBuf.hasRemaining are true. It should have " +
             "returned a MalformedInput error instead.")
-      } else if (result.isOverflow) {
+      else if (result.isOverflow)
         makeRoomInOutBuf()
         loopEncode()
-      } else {
+      else
         result.throwException()
         throw new AssertionError("should not get here")
-      }
-    }
 
     @inline
     @tailrec
-    def loopFlush(): Unit = {
-      if (enc.flush(outBuf).isOverflow) {
+    def loopFlush(): Unit =
+      if (enc.flush(outBuf).isOverflow)
         makeRoomInOutBuf()
         loopFlush()
-      }
-    }
 
     loopEncode()
     loopFlush()
@@ -128,33 +120,27 @@ class OutputStreamWriter(
     enc = null
     inBuf = null
     outBuf = null
-  }
 
-  private def ensureOpen(): Unit = {
+  private def ensureOpen(): Unit =
     if (closed) throw new IOException("Closed writer.")
-  }
 
-  private def makeRoomInOutBuf(): Unit = {
-    if (outBuf.position != 0) {
+  private def makeRoomInOutBuf(): Unit =
+    if (outBuf.position != 0)
       flushBuffer()
-    } else {
+    else
       // Very unlikely (outBuf.capacity is not enough to encode a single code point)
       outBuf.flip()
       val newBuf = ByteBuffer.allocate(outBuf.capacity * 2)
       newBuf.put(outBuf)
       outBuf = newBuf
-    }
-  }
 
   /** Flushes the internal buffer of this writer, but not the underlying
     *  output stream.
     */
-  private[io] def flushBuffer(): Unit = {
+  private[io] def flushBuffer(): Unit =
     ensureOpen()
 
     // Don't use outBuf.flip() first, in case out.write() throws
     // Hence, use 0 instead of position, and position instead of limit
     out.write(outBuf.array, outBuf.arrayOffset, outBuf.position)
     outBuf.clear()
-  }
-}

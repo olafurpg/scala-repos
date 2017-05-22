@@ -19,9 +19,9 @@ package org.apache.spark.mllib.util
 
 import org.apache.spark.{SparkException, SparkFunSuite}
 
-class NumericParserSuite extends SparkFunSuite {
+class NumericParserSuite extends SparkFunSuite
 
-  test("parser") {
+  test("parser")
     val s = "((1.0,2e3),-4,[5e-6,7.0E8],+9)"
     val parsed = NumericParser.parse(s).asInstanceOf[Seq[_]]
     assert(parsed(0).asInstanceOf[Seq[_]] === Seq(1.0, 2.0e3))
@@ -30,18 +30,13 @@ class NumericParserSuite extends SparkFunSuite {
     assert(parsed(3).asInstanceOf[Double] === 9.0)
 
     val malformatted = Seq("a", "[1,,]", "0.123.4", "1 2", "3+4")
-    malformatted.foreach { s =>
-      intercept[SparkException] {
+    malformatted.foreach  s =>
+      intercept[SparkException]
         NumericParser.parse(s)
         throw new RuntimeException(s"Didn't detect malformatted string $s.")
-      }
-    }
-  }
 
-  test("parser with whitespaces") {
+  test("parser with whitespaces")
     val s = "(0.0, [1.0, 2.0])"
     val parsed = NumericParser.parse(s).asInstanceOf[Seq[_]]
     assert(parsed(0).asInstanceOf[Double] === 0.0)
     assert(parsed(1).asInstanceOf[Array[Double]] === Array(1.0, 2.0))
-  }
-}

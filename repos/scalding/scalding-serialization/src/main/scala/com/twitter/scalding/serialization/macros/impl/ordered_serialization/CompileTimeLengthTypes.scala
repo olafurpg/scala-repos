@@ -18,62 +18,48 @@ package com.twitter.scalding.serialization.macros.impl.ordered_serialization
 import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
-sealed trait CompileTimeLengthTypes[C <: Context] {
+sealed trait CompileTimeLengthTypes[C <: Context]
   val ctx: C
   def t: ctx.Tree
-}
-object CompileTimeLengthTypes {
+object CompileTimeLengthTypes
 
   // Repesents an Int returning
-  object FastLengthCalculation {
+  object FastLengthCalculation
     def apply(c: Context)(tree: c.Tree): FastLengthCalculation[c.type] =
-      new FastLengthCalculation[c.type] {
+      new FastLengthCalculation[c.type]
         override val ctx: c.type = c
         override val t: c.Tree = tree
-      }
-  }
 
   trait FastLengthCalculation[C <: Context] extends CompileTimeLengthTypes[C]
 
-  object MaybeLengthCalculation {
+  object MaybeLengthCalculation
     def apply(c: Context)(tree: c.Tree): MaybeLengthCalculation[c.type] =
-      new MaybeLengthCalculation[c.type] {
+      new MaybeLengthCalculation[c.type]
         override val ctx: c.type = c
         override val t: c.Tree = tree
-      }
-  }
 
   trait MaybeLengthCalculation[C <: Context] extends CompileTimeLengthTypes[C]
 
-  object ConstantLengthCalculation {
+  object ConstantLengthCalculation
     def apply(c: Context)(intArg: Int): ConstantLengthCalculation[c.type] =
-      new ConstantLengthCalculation[c.type] {
+      new ConstantLengthCalculation[c.type]
         override val toInt = intArg
         override val ctx: c.type = c
-        override val t: c.Tree = {
+        override val t: c.Tree =
           import c.universe._
           q"$intArg"
-        }
-      }
-  }
 
   trait ConstantLengthCalculation[C <: Context]
-      extends CompileTimeLengthTypes[C] {
+      extends CompileTimeLengthTypes[C]
     def toInt: Int
-  }
 
-  object NoLengthCalculationAvailable {
-    def apply(c: Context): NoLengthCalculationAvailable[c.type] = {
-      new NoLengthCalculationAvailable[c.type] {
+  object NoLengthCalculationAvailable
+    def apply(c: Context): NoLengthCalculationAvailable[c.type] =
+      new NoLengthCalculationAvailable[c.type]
         override val ctx: c.type = c
-        override def t = {
+        override def t =
           import c.universe._
           q"""_root_.scala.sys.error("no length available")"""
-        }
-      }
-    }
-  }
 
   trait NoLengthCalculationAvailable[C <: Context]
       extends CompileTimeLengthTypes[C]
-}

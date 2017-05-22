@@ -40,7 +40,7 @@ class UnresolvedException[TreeType <: TreeNode[_]](
   */
 case class UnresolvedRelation(
     tableIdentifier: TableIdentifier, alias: Option[String] = None)
-    extends LeafNode {
+    extends LeafNode
 
   /** Returns a `.` separated name for this relation. */
   def tableName: String = tableIdentifier.unquotedString
@@ -48,13 +48,12 @@ case class UnresolvedRelation(
   override def output: Seq[Attribute] = Nil
 
   override lazy val resolved = false
-}
 
 /**
   * Holds the name of an attribute that has yet to be resolved.
   */
 case class UnresolvedAttribute(nameParts: Seq[String])
-    extends Attribute with Unevaluable {
+    extends Attribute with Unevaluable
 
   def name: String =
     nameParts.map(n => if (n.contains(".")) s"`$n`" else n).mkString(".")
@@ -79,9 +78,8 @@ case class UnresolvedAttribute(nameParts: Seq[String])
   override def toString: String = s"'$name"
 
   override def sql: String = quoteIdentifier(name)
-}
 
-object UnresolvedAttribute {
+object UnresolvedAttribute
 
   /**
     * Creates an [[UnresolvedAttribute]], parsing segments separated by dots ('.').
@@ -110,44 +108,38 @@ object UnresolvedAttribute {
     * which means `ab..c`e.f is not allowed.
     * Escape character is not supported now, so we can't use backtick inside name part.
     */
-  def parseAttributeName(name: String): Seq[String] = {
+  def parseAttributeName(name: String): Seq[String] =
     def e = new AnalysisException(s"syntax error in attribute name: $name")
     val nameParts = scala.collection.mutable.ArrayBuffer.empty[String]
     val tmp = scala.collection.mutable.ArrayBuffer.empty[Char]
     var inBacktick = false
     var i = 0
-    while (i < name.length) {
+    while (i < name.length)
       val char = name(i)
-      if (inBacktick) {
-        if (char == '`') {
+      if (inBacktick)
+        if (char == '`')
           inBacktick = false
           if (i + 1 < name.length && name(i + 1) != '.') throw e
-        } else {
+        else
           tmp += char
-        }
-      } else {
-        if (char == '`') {
+      else
+        if (char == '`')
           if (tmp.nonEmpty) throw e
           inBacktick = true
-        } else if (char == '.') {
+        else if (char == '.')
           if (name(i - 1) == '.' || i == name.length - 1) throw e
           nameParts += tmp.mkString
           tmp.clear()
-        } else {
+        else
           tmp += char
-        }
-      }
       i += 1
-    }
     if (inBacktick) throw e
     nameParts += tmp.mkString
     nameParts.toSeq
-  }
-}
 
 case class UnresolvedFunction(
     name: String, children: Seq[Expression], isDistinct: Boolean)
-    extends Expression with Unevaluable {
+    extends Expression with Unevaluable
 
   override def dataType: DataType =
     throw new UnresolvedException(this, "dataType")
@@ -159,13 +151,12 @@ case class UnresolvedFunction(
 
   override def prettyName: String = name
   override def toString: String = s"'$name(${children.mkString(", ")})"
-}
 
 /**
   * Represents all of the input attributes to a given relational operator, for example in
   * "SELECT * FROM ...". A [[Star]] gets automatically expanded during analysis.
   */
-abstract class Star extends LeafExpression with NamedExpression {
+abstract class Star extends LeafExpression with NamedExpression
 
   override def name: String = throw new UnresolvedException(this, "name")
   override def exprId: ExprId = throw new UnresolvedException(this, "exprId")
@@ -182,7 +173,6 @@ abstract class Star extends LeafExpression with NamedExpression {
   override lazy val resolved = false
 
   def expand(input: LogicalPlan, resolver: Resolver): Seq[NamedExpression]
-}
 
 /**
   * Represents all of the input attributes to a given relational operator, for example in
@@ -196,54 +186,47 @@ abstract class Star extends LeafExpression with NamedExpression {
   *              is a list of identifiers that is the path of the expansion.
   */
 case class UnresolvedStar(target: Option[Seq[String]])
-    extends Star with Unevaluable {
+    extends Star with Unevaluable
 
   override def expand(
-      input: LogicalPlan, resolver: Resolver): Seq[NamedExpression] = {
+      input: LogicalPlan, resolver: Resolver): Seq[NamedExpression] =
 
     // First try to expand assuming it is table.*.
-    val expandedAttributes: Seq[Attribute] = target match {
+    val expandedAttributes: Seq[Attribute] = target match
       // If there is no table specified, use all input attributes.
       case None => input.output
       // If there is a table, pick out attributes that are part of this table.
       case Some(t) =>
-        if (t.size == 1) {
+        if (t.size == 1)
           input.output.filter(_.qualifiers.exists(resolver(_, t.head)))
-        } else {
+        else
           List()
-        }
-    }
     if (expandedAttributes.nonEmpty) return expandedAttributes
 
     // Try to resolve it as a struct expansion. If there is a conflict and both are possible,
     // (i.e. [name].* is both a table and a struct), the struct path can always be qualified.
     require(target.isDefined)
     val attribute = input.resolve(target.get, resolver)
-    if (attribute.isDefined) {
+    if (attribute.isDefined)
       // This target resolved to an attribute in child. It must be a struct. Expand it.
-      attribute.get.dataType match {
+      attribute.get.dataType match
         case s: StructType =>
-          s.zipWithIndex.map {
+          s.zipWithIndex.map
             case (f, i) =>
               val extract = GetStructField(attribute.get, i)
               Alias(extract, f.name)()
-          }
 
         case _ =>
           throw new AnalysisException(
               "Can only star expand struct data types. Attribute: `" +
               target.get + "`")
-      }
-    } else {
+    else
       val from = input.inputSet.map(_.name).mkString(", ")
       val targetString = target.get.mkString(".")
       throw new AnalysisException(
           s"cannot resolve '$targetString.*' give input columns '$from'")
-    }
-  }
 
   override def toString: String = target.map(_ + ".").getOrElse("") + "*"
-}
 
 /**
   * Used to assign new names to Generator's output, such as hive udtf.
@@ -256,7 +239,7 @@ case class UnresolvedStar(target: Option[Seq[String]])
   * @param names the names to be associated with each output of computing [[child]].
   */
 case class MultiAlias(child: Expression, names: Seq[String])
-    extends UnaryExpression with NamedExpression with CodegenFallback {
+    extends UnaryExpression with NamedExpression with CodegenFallback
 
   override def name: String = throw new UnresolvedException(this, "name")
 
@@ -280,7 +263,6 @@ case class MultiAlias(child: Expression, names: Seq[String])
   override lazy val resolved = false
 
   override def toString: String = s"$child AS $names"
-}
 
 /**
   * Represents all the resolved input attributes to a given relational operator. This is used
@@ -289,7 +271,7 @@ case class MultiAlias(child: Expression, names: Seq[String])
   * @param expressions Expressions to expand.
   */
 case class ResolvedStar(expressions: Seq[NamedExpression])
-    extends Star with Unevaluable {
+    extends Star with Unevaluable
   override def newInstance(): NamedExpression =
     throw new UnresolvedException(this, "newInstance")
   override def expand(
@@ -297,7 +279,6 @@ case class ResolvedStar(expressions: Seq[NamedExpression])
     expressions
   override def toString: String =
     expressions.mkString("ResolvedStar(", ", ", ")")
-}
 
 /**
   * Extracts a value or values from an Expression
@@ -308,7 +289,7 @@ case class ResolvedStar(expressions: Seq[NamedExpression])
   *                   can be key of Map, index of Array, field name of Struct.
   */
 case class UnresolvedExtractValue(child: Expression, extraction: Expression)
-    extends UnaryExpression with Unevaluable {
+    extends UnaryExpression with Unevaluable
 
   override def dataType: DataType =
     throw new UnresolvedException(this, "dataType")
@@ -320,7 +301,6 @@ case class UnresolvedExtractValue(child: Expression, extraction: Expression)
 
   override def toString: String = s"$child[$extraction]"
   override def sql: String = s"${child.sql}[${extraction.sql}]"
-}
 
 /**
   * Holds the expression that has yet to be aliased.
@@ -330,7 +310,7 @@ case class UnresolvedExtractValue(child: Expression, extraction: Expression)
   *
   */
 case class UnresolvedAlias(child: Expression, aliasName: Option[String] = None)
-    extends UnaryExpression with NamedExpression with Unevaluable {
+    extends UnaryExpression with NamedExpression with Unevaluable
 
   override def toAttribute: Attribute =
     throw new UnresolvedException(this, "toAttribute")
@@ -346,4 +326,3 @@ case class UnresolvedAlias(child: Expression, aliasName: Option[String] = None)
     throw new UnresolvedException(this, "newInstance")
 
   override lazy val resolved = false
-}

@@ -1,7 +1,7 @@
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
-object Test extends App {
+object Test extends App
   val csv =
     """
     |    phase name;  id;  description
@@ -22,26 +22,20 @@ object Test extends App {
   val fields = csv.head.split(";").map { _.trim() }.toList
   println(fields)
 
-  reify({
-    object Csv {
+  reify(
+    object Csv
       case class record(`phase name`: String, id: String, description: String)
 
-      object record {
-        def parse(lines: List[String]) = {
-          lines drop (1) map {
+      object record
+        def parse(lines: List[String]) =
+          lines drop (1) map
             line =>
-              line.split(";", -1).toList match {
+              line.split(";", -1).toList match
                 case phase$whitespace$name :: id :: description :: _ =>
                   record(phase$whitespace$name.trim(),
                          id.trim(),
                          description.trim())
                 case _ => throw new Exception("format error")
-              }
-          }
-        }
-      }
-    }
 
     Csv.record.parse(csv) foreach println
-  }).eval
-}
+  ).eval

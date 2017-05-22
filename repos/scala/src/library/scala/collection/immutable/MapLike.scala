@@ -48,7 +48,7 @@ import parallel.immutable.ParMap
   */
 trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     extends scala.collection.MapLike[A, B, This]
-    with Parallelizable[(A, B), ParMap[A, B]] {
+    with Parallelizable[(A, B), ParMap[A, B]]
   self =>
 
   protected[this] override def parCombiner = ParMap.newCombiner[A, B]
@@ -111,7 +111,7 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
   override def keySet: immutable.Set[A] = new ImmutableDefaultKeySet
 
   protected class ImmutableDefaultKeySet
-      extends super.DefaultKeySet with immutable.Set[A] {
+      extends super.DefaultKeySet with immutable.Set[A]
     override def +(elem: A): immutable.Set[A] =
       if (this(elem)) this
       else immutable.Set[A]() ++ this + elem
@@ -123,7 +123,6 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     // Someone could override in a way that makes widening not okay
     // (e.g. by overriding +, though the version in this class is fine)
     override def toSet[B >: A]: Set[B] = this.asInstanceOf[Set[B]]
-  }
 
   /** This function transforms all the values of mappings contained
     *  in this map with function `f`.
@@ -132,9 +131,7 @@ trait MapLike[A, +B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return  the updated map
     */
   def transform[C, That](f: (A, B) => C)(
-      implicit bf: CanBuildFrom[This, (A, C), That]): That = {
+      implicit bf: CanBuildFrom[This, (A, C), That]): That =
     val b = bf(repr)
     for ((key, value) <- this) b += ((key, f(key, value)))
     b.result()
-  }
-}

@@ -1,6 +1,6 @@
 class Value {}
 
-object Test {
+object Test
 
   implicit def view(v: Value): Int = 0
 
@@ -14,4 +14,3 @@ object Test {
 
   foo(fun0);
   foo(fun1(new Value));
-}

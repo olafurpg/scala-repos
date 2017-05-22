@@ -37,13 +37,13 @@ import org.bson.types.ObjectId
  * Field for storing an ObjectId
  */
 class ObjectIdField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
-    extends Field[ObjectId, OwnerType] with MandatoryTypedField[ObjectId] {
+    extends Field[ObjectId, OwnerType] with MandatoryTypedField[ObjectId]
 
   def owner = rec
 
   def defaultValue = ObjectId.get
 
-  def setFromAny(in: Any): Box[ObjectId] = in match {
+  def setFromAny(in: Any): Box[ObjectId] = in match
     case oid: ObjectId => setBox(Full(oid))
     case Some(oid: ObjectId) => setBox(Full(oid))
     case Full(oid: ObjectId) => setBox(Full(oid))
@@ -54,41 +54,35 @@ class ObjectIdField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
     case null | None | Empty => setBox(defaultValueBox)
     case f: Failure => setBox(f)
     case o => setFromString(o.toString)
-  }
 
-  def setFromJValue(jvalue: JValue): Box[ObjectId] = jvalue match {
+  def setFromJValue(jvalue: JValue): Box[ObjectId] = jvalue match
     case JNothing | JNull if optional_? => setBox(Empty)
     case JObject(JField("$oid", JString(s)) :: Nil) => setFromString(s)
     case JString(s) => setFromString(s)
     case other => setBox(FieldHelpers.expectedA("JObject", other))
-  }
 
   def setFromString(in: String): Box[ObjectId] =
     if (ObjectId.isValid(in)) setBox(Full(new ObjectId(in)))
     else setBox(Failure("Invalid ObjectId string: " + in))
 
   private def elem =
-    S.fmapFunc(S.SFuncHolder(this.setFromAny(_))) { funcName =>
+    S.fmapFunc(S.SFuncHolder(this.setFromAny(_)))  funcName =>
       <input type="text"
         name={funcName}
         value={valueBox.map(s => s.toString) openOr ""}
         tabindex={tabIndex.toString}/>
-    }
 
   def toForm =
-    uniqueFieldId match {
+    uniqueFieldId match
       case Full(id) => Full(elem % ("id" -> id))
       case _ => Full(elem)
-    }
 
-  def asJs = asJValue match {
+  def asJs = asJValue match
     case JNothing => JsNull
     case jv => JsRaw(compactRender(jv))
-  }
 
   def asJValue: JValue =
     valueBox.map(v => JsonObjectId.asJValue(v, owner.meta.formats)) openOr
     (JNothing: JValue)
 
   def createdAt: Date = this.get.getDate
-}

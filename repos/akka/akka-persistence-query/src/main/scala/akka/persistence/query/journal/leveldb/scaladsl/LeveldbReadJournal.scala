@@ -39,7 +39,7 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     extends ReadJournal with AllPersistenceIdsQuery
     with CurrentPersistenceIdsQuery with EventsByPersistenceIdQuery
     with CurrentEventsByPersistenceIdQuery with EventsByTagQuery
-    with CurrentEventsByTagQuery {
+    with CurrentEventsByTagQuery
 
   private val serialization = SerializationExtension(system)
   private val refreshInterval = Some(
@@ -65,7 +65,7 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     * The stream is completed with failure if there is a failure in executing the query in the
     * backend journal.
     */
-  override def allPersistenceIds(): Source[String, NotUsed] = {
+  override def allPersistenceIds(): Source[String, NotUsed] =
     // no polling for this query, the write journal will push all changes, i.e.
     // no refreshInterval
     Source
@@ -73,20 +73,18 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
               liveQuery = true, maxBufSize, writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("allPersistenceIds")
-  }
 
   /**
     * Same type of query as [[#allPersistenceIds]] but the stream
     * is completed immediately when it reaches the end of the "result set". Persistent
     * actors that are created after the query is completed are not included in the stream.
     */
-  override def currentPersistenceIds(): Source[String, NotUsed] = {
+  override def currentPersistenceIds(): Source[String, NotUsed] =
     Source
       .actorPublisher[String](AllPersistenceIdsPublisher.props(
               liveQuery = false, maxBufSize, writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("currentPersistenceIds")
-  }
 
   /**
     * `eventsByPersistenceId` is used for retrieving events for a specific
@@ -117,7 +115,7 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
   override def eventsByPersistenceId(
       persistenceId: String,
       fromSequenceNr: Long = 0L,
-      toSequenceNr: Long = Long.MaxValue): Source[EventEnvelope, NotUsed] = {
+      toSequenceNr: Long = Long.MaxValue): Source[EventEnvelope, NotUsed] =
     Source
       .actorPublisher[EventEnvelope](
           EventsByPersistenceIdPublisher.props(persistenceId,
@@ -128,7 +126,6 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
                                                writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("eventsByPersistenceId-" + persistenceId)
-  }
 
   /**
     * Same type of query as [[#eventsByPersistenceId]] but the event stream
@@ -138,7 +135,7 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
   override def currentEventsByPersistenceId(
       persistenceId: String,
       fromSequenceNr: Long = 0L,
-      toSequenceNr: Long = Long.MaxValue): Source[EventEnvelope, NotUsed] = {
+      toSequenceNr: Long = Long.MaxValue): Source[EventEnvelope, NotUsed] =
     Source
       .actorPublisher[EventEnvelope](
           EventsByPersistenceIdPublisher.props(persistenceId,
@@ -149,7 +146,6 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
                                                writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("currentEventsByPersistenceId-" + persistenceId)
-  }
 
   /**
     * `eventsByTag` is used for retrieving events that were marked with
@@ -187,7 +183,7 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     * backend journal.
     */
   override def eventsByTag(
-      tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
+      tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] =
     Source
       .actorPublisher[EventEnvelope](
           EventsByTagPublisher.props(tag,
@@ -198,7 +194,6 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
                                      writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("eventsByTag-" + URLEncoder.encode(tag, ByteString.UTF_8))
-  }
 
   /**
     * Same type of query as [[#eventsByTag]] but the event stream
@@ -206,7 +201,7 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
     * stored after the query is completed are not included in the event stream.
     */
   override def currentEventsByTag(
-      tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] = {
+      tag: String, offset: Long = 0L): Source[EventEnvelope, NotUsed] =
     Source
       .actorPublisher[EventEnvelope](
           EventsByTagPublisher.props(tag,
@@ -217,10 +212,8 @@ class LeveldbReadJournal(system: ExtendedActorSystem, config: Config)
                                      writeJournalPluginId))
       .mapMaterializedValue(_ ⇒ NotUsed)
       .named("currentEventsByTag-" + URLEncoder.encode(tag, ByteString.UTF_8))
-  }
-}
 
-object LeveldbReadJournal {
+object LeveldbReadJournal
 
   /**
     * The default identifier for [[LeveldbReadJournal]] to be used with
@@ -230,4 +223,3 @@ object LeveldbReadJournal {
     * to the absolute path to the read journal configuration entry.
     */
   final val Identifier = "akka.persistence.query.journal.leveldb"
-}

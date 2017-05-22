@@ -26,7 +26,7 @@ import org.apache.spark.api.java.JavaRDDLike
 import org.apache.spark.streaming.api.java.{JavaDStreamLike, JavaDStream, JavaStreamingContext}
 
 /** Exposes streaming test functionality in a Java-friendly way. */
-trait JavaTestBase extends TestSuiteBase {
+trait JavaTestBase extends TestSuiteBase
 
   /**
     * Create a [[org.apache.spark.streaming.TestInputStream]] and attach it to the supplied context.
@@ -34,14 +34,13 @@ trait JavaTestBase extends TestSuiteBase {
     */
   def attachTestInputStream[T](ssc: JavaStreamingContext,
                                data: JList[JList[T]],
-                               numPartitions: Int) = {
+                               numPartitions: Int) =
     val seqData = data.asScala.map(_.asScala)
 
     implicit val cm: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
     val dstream = new TestInputStream[T](ssc.ssc, seqData, numPartitions)
     new JavaDStream[T](dstream)
-  }
 
   /**
     * Attach a provided stream to it's associated StreamingContext as a
@@ -49,12 +48,11 @@ trait JavaTestBase extends TestSuiteBase {
     **/
   def attachTestOutputStream[
       T, This <: JavaDStreamLike[T, This, R], R <: JavaRDDLike[T, R]](
-      dstream: JavaDStreamLike[T, This, R]) = {
+      dstream: JavaDStreamLike[T, This, R]) =
     implicit val cm: ClassTag[T] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[T]]
     val ostream = new TestOutputStreamWithPartitions(dstream.dstream)
     ostream.register()
-  }
 
   /**
     * Process all registered streams for a numBatches batches, failing if
@@ -65,13 +63,12 @@ trait JavaTestBase extends TestSuiteBase {
     */
   def runStreams[V](ssc: JavaStreamingContext,
                     numBatches: Int,
-                    numExpectedOutput: Int): JList[JList[V]] = {
+                    numExpectedOutput: Int): JList[JList[V]] =
     implicit val cm: ClassTag[V] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[V]]
     ssc.getState()
     val res = runStreams[V](ssc.ssc, numBatches, numExpectedOutput)
     res.map(_.asJava).toSeq.asJava
-  }
 
   /**
     * Process all registered streams for a numBatches batches, failing if
@@ -84,19 +81,15 @@ trait JavaTestBase extends TestSuiteBase {
   def runStreamsWithPartitions[V](
       ssc: JavaStreamingContext,
       numBatches: Int,
-      numExpectedOutput: Int): JList[JList[JList[V]]] = {
+      numExpectedOutput: Int): JList[JList[JList[V]]] =
     implicit val cm: ClassTag[V] =
       implicitly[ClassTag[AnyRef]].asInstanceOf[ClassTag[V]]
     val res =
       runStreamsWithPartitions[V](ssc.ssc, numBatches, numExpectedOutput)
     res.map(entry => entry.map(_.asJava).asJava).toSeq.asJava
-  }
-}
 
-object JavaTestUtils extends JavaTestBase {
+object JavaTestUtils extends JavaTestBase
   override def maxWaitTimeMillis = 20000
-}
 
-object JavaCheckpointTestUtils extends JavaTestBase {
+object JavaCheckpointTestUtils extends JavaTestBase
   override def actuallyWait = true
-}

@@ -5,11 +5,11 @@ package testingSupport.specs2
   * @author Roman.Shein
   * @since 16.10.2014.
   */
-abstract class Specs2SingleTestTest extends Specs2TestCase {
+abstract class Specs2SingleTestTest extends Specs2TestCase
   protected val specsTestFileName = "SpecificationTest.scala"
   protected val specsTestClassName = "SpecificationTest"
 
-  def testSpecification() {
+  def testSpecification()
     addFileToProject(specsTestFileName,
                      """
         |import org.specs2.mutable.Specification
@@ -81,5 +81,3 @@ abstract class Specs2SingleTestTest extends Specs2TestCase {
                                           "ignore other test",
                                           "run single test",
                                           "run exclamation test"))
-  }
-}

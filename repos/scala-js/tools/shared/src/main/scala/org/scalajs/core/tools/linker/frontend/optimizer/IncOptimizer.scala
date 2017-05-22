@@ -16,9 +16,9 @@ import org.scalajs.core.tools.javascript.ESLevel
 
 final class IncOptimizer(
     semantics: Semantics, esLevel: ESLevel, considerPositions: Boolean)
-    extends GenIncOptimizer(semantics, esLevel, considerPositions) {
+    extends GenIncOptimizer(semantics, esLevel, considerPositions)
 
-  private[optimizer] object CollOps extends GenIncOptimizer.AbsCollOps {
+  private[optimizer] object CollOps extends GenIncOptimizer.AbsCollOps
     type Map[K, V] = mutable.Map[K, V]
     type ParMap[K, V] = mutable.Map[K, V]
     type AccMap[K, V] = mutable.Map[K, mutable.ListBuffer[V]]
@@ -52,7 +52,6 @@ final class IncOptimizer(
     def prepAdd[V](it: ParIterable[V]): Addable[V] = it
     def add[V](addable: Addable[V], v: V): Unit = addable += v
     def finishAdd[V](addable: Addable[V]): ParIterable[V] = addable
-  }
 
   private val _interfaces = mutable.Map.empty[String, InterfaceType]
   private[optimizer] def getInterface(encodedName: String): InterfaceType =
@@ -66,14 +65,13 @@ final class IncOptimizer(
       owner: MethodContainer, encodedName: String): MethodImpl =
     new SeqMethodImpl(owner, encodedName)
 
-  private[optimizer] def processAllTaggedMethods(): Unit = {
+  private[optimizer] def processAllTaggedMethods(): Unit =
     logProcessingMethods(methodsToProcess.count(!_.deleted))
     for (method <- methodsToProcess) method.process()
     methodsToProcess.clear()
-  }
 
   private class SeqInterfaceType(encName: String)
-      extends InterfaceType(encName) {
+      extends InterfaceType(encName)
     private val ancestorsAskers = mutable.Set.empty[MethodImpl]
     private val dynamicCallers =
       mutable.Map.empty[String, mutable.Set[MethodImpl]]
@@ -96,13 +94,11 @@ final class IncOptimizer(
 
     def ancestors: List[String] = _ancestors
 
-    def ancestors_=(v: List[String]): Unit = {
-      if (v != _ancestors) {
+    def ancestors_=(v: List[String]): Unit =
+      if (v != _ancestors)
         _ancestors = v
         ancestorsAskers.foreach(_.tag())
         ancestorsAskers.clear()
-      }
-    }
 
     def registerAskAncestors(asker: MethodImpl): Unit =
       ancestorsAskers += asker
@@ -116,12 +112,11 @@ final class IncOptimizer(
     def registerCallerOfStatic(methodName: String, caller: MethodImpl): Unit =
       callersOfStatic.getOrElseUpdate(methodName, mutable.Set.empty) += caller
 
-    def unregisterDependee(dependee: MethodImpl): Unit = {
+    def unregisterDependee(dependee: MethodImpl): Unit =
       ancestorsAskers -= dependee
       dynamicCallers.values.foreach(_ -= dependee)
       staticCallers.values.foreach(_ -= dependee)
       callersOfStatic.values.foreach(_ -= dependee)
-    }
 
     def tagDynamicCallersOf(methodName: String): Unit =
       dynamicCallers.remove(methodName).foreach(_.foreach(_.tag()))
@@ -131,10 +126,9 @@ final class IncOptimizer(
 
     def tagCallersOfStatic(methodName: String): Unit =
       callersOfStatic.remove(methodName).foreach(_.foreach(_.tag()))
-  }
 
   private class SeqMethodImpl(owner: MethodContainer, encodedName: String)
-      extends MethodImpl(owner, encodedName) {
+      extends MethodImpl(owner, encodedName)
 
     private val bodyAskers = mutable.Set.empty[MethodImpl]
 
@@ -144,10 +138,9 @@ final class IncOptimizer(
     def unregisterDependee(dependee: MethodImpl): Unit =
       bodyAskers -= dependee
 
-    def tagBodyAskers(): Unit = {
+    def tagBodyAskers(): Unit =
       bodyAskers.foreach(_.tag())
       bodyAskers.clear()
-    }
 
     private var _registeredTo: List[Unregisterable] = Nil
     private var tagged = false
@@ -155,20 +148,15 @@ final class IncOptimizer(
     protected def registeredTo(intf: Unregisterable): Unit =
       _registeredTo ::= intf
 
-    protected def unregisterFromEverywhere(): Unit = {
+    protected def unregisterFromEverywhere(): Unit =
       _registeredTo.foreach(_.unregisterDependee(this))
       _registeredTo = Nil
-    }
 
-    protected def protectTag(): Boolean = {
+    protected def protectTag(): Boolean =
       val res = !tagged
       tagged = true
       res
-    }
     protected def resetTag(): Unit = tagged = false
-  }
-}
 
-object IncOptimizer {
+object IncOptimizer
   val factory: GenIncOptimizer.OptimizerFactory = new IncOptimizer(_, _, _)
-}

@@ -37,8 +37,8 @@ import org.junit.experimental.categories.Category
   */
 @Category(Array(classOf[SlowTests]))
 class AllProjectHighlightingTest
-    extends ExternalSystemImportingTestCase with SbtStructureSetup {
-  override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
+    extends ExternalSystemImportingTestCase with SbtStructureSetup
+  override protected def getCurrentExternalProjectSettings: ExternalProjectSettings =
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
     val sdk =
@@ -48,7 +48,6 @@ class AllProjectHighlightingTest
     settings.setJdk(sdk.getName)
     settings.setCreateEmptyContentRootDirectories(true)
     settings
-  }
 
   override protected def getExternalSystemId: ProjectSystemId =
     SbtProjectSystem.Id
@@ -63,16 +62,15 @@ class AllProjectHighlightingTest
 
   def testDotty(): Unit = doRunTest()
 
-  def doRunTest(): Unit = {
+  def doRunTest(): Unit =
     val projectDir: File = new File(getRootDir, getTestName(false))
     //this test is not intended to ran locally
-    if (!projectDir.exists()) {
+    if (!projectDir.exists())
       println("Project is not found. Test is skipped.")
       return
-    }
     importProject()
 
-    extensions.inWriteAction {
+    extensions.inWriteAction
       val internalSdk =
         JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
       val sdk =
@@ -80,16 +78,13 @@ class AllProjectHighlightingTest
         else internalSdk
 
       //todo: why we need this??? Looks like SBT integration problem, as we attached SDK as setting
-      if (ProjectJdkTable.getInstance().findJdk(sdk.getName) == null) {
+      if (ProjectJdkTable.getInstance().findJdk(sdk.getName) == null)
         ProjectJdkTable.getInstance().addJdk(sdk)
-      }
       ProjectRootManager.getInstance(myProject).setProjectSdk(sdk)
-    }
 
     doRunHighlighting()
-  }
 
-  def doRunHighlighting(): Unit = {
+  def doRunHighlighting(): Unit =
     val inspectionManagerEx: InspectionManagerEx = InspectionManager
       .getInstance(myProject)
       .asInstanceOf[InspectionManagerEx]
@@ -118,57 +113,46 @@ class AllProjectHighlightingTest
     var errorCount = 0
     val size: Int = files.size()
 
-    for ((file, index) <- files.zipWithIndex) {
-      val mock = new AnnotatorHolderMock {
+    for ((file, index) <- files.zipWithIndex)
+      val mock = new AnnotatorHolderMock
         override def createErrorAnnotation(
-            range: TextRange, message: String): Annotation = {
+            range: TextRange, message: String): Annotation =
           errorCount += 1
           println(
               s"Error in ${file.getName}. Range: $range. Message: $message.")
           super.createErrorAnnotation(range, message)
-        }
 
         override def createErrorAnnotation(
-            elt: PsiElement, message: String): Annotation = {
+            elt: PsiElement, message: String): Annotation =
           errorCount += 1
           println(
               s"Error in ${file.getName}. Range: ${elt.getTextRange}. Message: $message.")
           super.createErrorAnnotation(elt, message)
-        }
-      }
 
-      if ((index + 1) * 100 >= (percent + 1) * size) {
+      if ((index + 1) * 100 >= (percent + 1) * size)
         while ( (index + 1) * 100 >= (percent + 1) * size) percent += 1
         println(s"Analyzing... $percent%")
-      }
 
       val psi = fileManager.findFile(file)
 
-      val visitor = new ScalaRecursiveElementVisitor {
-        override def visitElement(element: ScalaPsiElement) {
-          try {
+      val visitor = new ScalaRecursiveElementVisitor
+        override def visitElement(element: ScalaPsiElement)
+          try
             annotator.annotate(element, mock)
-          } catch {
+          catch
             case e: Throwable =>
               println(s"Exception in ${file.getName}, Stacktrace: ")
               e.printStackTrace()
               assert(false)
-          }
           super.visitElement(element)
-        }
-      }
       psi.accept(visitor)
-    }
 
     assert(errorCount == 0, s"$errorCount found.")
-  }
 
-  override protected def setUpInWriteAction(): Unit = {
+  override protected def setUpInWriteAction(): Unit =
     super.setUpInWriteAction()
     val projectDir: File = new File(getRootDir, getTestName(false))
     if (!projectDir.exists()) return
     myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
         projectDir)
     setUpSbtLauncherAndStructure(myProject)
-  }
-}

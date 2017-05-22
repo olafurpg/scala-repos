@@ -13,7 +13,7 @@ import com.twitter.scalding.mathematics.Matrix
  *
  */
 
-class CofollowsJob(args: Args) extends Job(args) {
+class CofollowsJob(args: Args) extends Job(args)
 
   import Matrix._
 
@@ -22,4 +22,3 @@ class CofollowsJob(args: Args) extends Job(args) {
 
   // compute the innerproduct of the adjacency matrix with itself 
   (adjacencyMatrix * adjacencyMatrix.transpose).write(Tsv(args("output")))
-}

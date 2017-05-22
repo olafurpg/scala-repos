@@ -19,7 +19,7 @@ package org.apache.spark.streaming
 
 import org.apache.spark.util.Utils
 
-case class Duration(private val millis: Long) {
+case class Duration(private val millis: Long)
 
   def <(that: Duration): Boolean = (this.millis < that.millis)
 
@@ -71,36 +71,32 @@ case class Duration(private val millis: Long) {
   def milliseconds: Long = millis
 
   def prettyPrint: String = Utils.msDurationToString(millis)
-}
 
 /**
   * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
   * a given number of milliseconds.
   */
-object Milliseconds {
+object Milliseconds
   def apply(milliseconds: Long): Duration = new Duration(milliseconds)
-}
 
 /**
   * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
   * a given number of seconds.
   */
-object Seconds {
+object Seconds
   def apply(seconds: Long): Duration = new Duration(seconds * 1000)
-}
 
 /**
   * Helper object that creates instance of [[org.apache.spark.streaming.Duration]] representing
   * a given number of minutes.
   */
-object Minutes {
+object Minutes
   def apply(minutes: Long): Duration = new Duration(minutes * 60000)
-}
 
 // Java-friendlier versions of the objects above.
 // Named "Durations" instead of "Duration" to avoid changing the case class's implied API.
 
-object Durations {
+object Durations
 
   /**
     * @return [[org.apache.spark.streaming.Duration]] representing given number of milliseconds.
@@ -116,4 +112,3 @@ object Durations {
     * @return [[org.apache.spark.streaming.Duration]] representing given number of minutes.
     */
   def minutes(minutes: Long): Duration = Minutes(minutes)
-}

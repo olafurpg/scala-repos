@@ -5,26 +5,24 @@
 //############################################################################
 // Lisp Scanner
 
-class LispTokenizer(s: String) extends Iterator[String] {
+class LispTokenizer(s: String) extends Iterator[String]
   private var i = 0;
   private def isDelimiter(ch: Char) = ch <= ' ' || ch == '(' || ch == ')'
-  def hasNext: Boolean = {
+  def hasNext: Boolean =
     while (i < s.length() && s.charAt(i) <= ' ') i += 1
     i < s.length()
-  }
   def next: String =
-    if (hasNext) {
+    if (hasNext)
       val start = i
       if (isDelimiter(s charAt i)) i += 1
       else do i = i + 1 while (!isDelimiter(s charAt i))
       s.substring(start, i)
-    } else sys.error("premature end of string")
-}
+    else sys.error("premature end of string")
 
 //############################################################################
 // Lisp Interface
 
-trait Lisp {
+trait Lisp
   type Data
 
   def string2lisp(s: String): Data
@@ -33,43 +31,35 @@ trait Lisp {
   def evaluate(d: Data): Data
   // !!! def evaluate(s: String): Data = evaluate(string2lisp(s))
   def evaluate(s: String): Data
-}
 
 //############################################################################
 // Lisp Implementation Using Case Classes
 
-object LispCaseClasses extends Lisp {
+object LispCaseClasses extends Lisp
 
   import List.range
 
-  trait Data {
+  trait Data
     def elemsToString(): String = toString();
-  }
-  case class CONS(car: Data, cdr: Data) extends Data {
+  case class CONS(car: Data, cdr: Data) extends Data
     override def toString() = "(" + elemsToString() + ")";
     override def elemsToString() =
       car.toString() +
-      (cdr match {
+      (cdr match
             case NIL() => ""
             case _ => " " + cdr.elemsToString();
-          })
-  }
-  case class NIL() extends Data {
+          )
+  case class NIL() extends Data
     // !!! use case object
     override def toString() = "()";
-  }
-  case class SYM(name: String) extends Data {
+  case class SYM(name: String) extends Data
     override def toString() = name;
-  }
-  case class NUM(x: Int) extends Data {
+  case class NUM(x: Int) extends Data
     override def toString() = x.toString();
-  }
-  case class STR(x: String) extends Data {
+  case class STR(x: String) extends Data
     override def toString() = "\"" + x + "\"";
-  }
-  case class FUN(f: List[Data] => Data) extends Data {
+  case class FUN(f: List[Data] => Data) extends Data
     override def toString() = "<fn>";
-  }
 
   def list(): Data =
     NIL();
@@ -131,31 +121,26 @@ object LispCaseClasses extends Lisp {
   def lispError[a](msg: String): a =
     sys.error("error: " + msg + "\n" + curexp);
 
-  trait Environment {
+  trait Environment
     def lookup(n: String): Data;
     def extendRec(name: String, expr: Environment => Data) =
-      new Environment {
+      new Environment
         def lookup(n: String): Data =
           if (n == name) expr(this) else Environment.this.lookup(n);
-      }
     def extend(name: String, v: Data) = extendRec(name, (env1 => v));
-  }
-  val EmptyEnvironment = new Environment {
+  val EmptyEnvironment = new Environment
     def lookup(n: String): Data = lispError("undefined: " + n);
-  }
 
-  def toList(x: Data): List[Data] = x match {
+  def toList(x: Data): List[Data] = x match
     case NIL() => List()
     case CONS(y, ys) => y :: toList(ys)
     case _ => lispError("malformed list: " + x);
-  }
 
-  def toBoolean(x: Data) = x match {
+  def toBoolean(x: Data) = x match
     case NUM(0) => false
     case _ => true
-  }
 
-  def normalize(x: Data): Data = x match {
+  def normalize(x: Data): Data = x match
     case CONS(SYM("def"),
               CONS(CONS(SYM(name), args), CONS(body, CONS(expr, NIL())))) =>
       normalize(
@@ -167,27 +152,23 @@ object LispCaseClasses extends Lisp {
       normalize(list(SYM("if"), test, expr, CONS(SYM("cond"), rest)))
     case CONS(h, t) => CONS(normalize(h), normalize(t))
     case _ => x
-  }
 
-  def eval(x: Data, env: Environment): Data = {
+  def eval(x: Data, env: Environment): Data =
     val prevexp = curexp;
     curexp = x;
-    if (trace) {
+    if (trace)
       for (x <- range(1, indent)) Console.print(" ");
       Console.println("===> " + x);
       indent = indent + 1;
-    }
     val result = eval1(x, env);
-    if (trace) {
+    if (trace)
       indent = indent - 1;
       for (x <- range(1, indent)) Console.print(" ");
       Console.println("<=== " + result);
-    }
     curexp = prevexp;
     result
-  }
 
-  def eval1(x: Data, env: Environment): Data = x match {
+  def eval1(x: Data, env: Environment): Data = x match
     case SYM(name) =>
       env lookup name
     case CONS(SYM("def"), CONS(SYM(name), CONS(y, CONS(z, NIL())))) =>
@@ -207,73 +188,68 @@ object LispCaseClasses extends Lisp {
     case FUN(_) => x
     case _ =>
       lispError("illegal term")
-  }
 
-  def apply(fn: Data, args: List[Data]): Data = fn match {
+  def apply(fn: Data, args: List[Data]): Data = fn match
     case FUN(f) => f(args);
     case _ => lispError("application of non-function: " + fn);
-  }
 
-  def mkLambda(params: Data, expr: Data, env: Environment): Data = {
+  def mkLambda(params: Data, expr: Data, env: Environment): Data =
 
     def extendEnv(
         env: Environment, ps: List[String], args: List[Data]): Environment =
-      (ps, args) match {
+      (ps, args) match
         case (List(), List()) =>
           env
         case (p :: ps1, arg :: args1) =>
           extendEnv(env.extend(p, arg), ps1, args1)
         case _ =>
           lispError("wrong number of arguments")
-      }
 
     val ps: List[String] =
-      toList(params) map {
+      toList(params) map
         case SYM(name) => name
         case _ => sys.error("illegal parameter list");
-      }
 
     FUN(args => eval(expr, extendEnv(env, ps, args)))
-  }
 
   val globalEnv = EmptyEnvironment
-    .extend("=", FUN({
+    .extend("=", FUN(
       case List(NUM(arg1), NUM(arg2)) => NUM(if (arg1 == arg2) 1 else 0)
       case List(STR(arg1), STR(arg2)) => NUM(if (arg1 == arg2) 1 else 0)
-    }))
-    .extend("+", FUN({
+    ))
+    .extend("+", FUN(
       case List(NUM(arg1), NUM(arg2)) => NUM(arg1 + arg2)
       case List(STR(arg1), STR(arg2)) => STR(arg1 + arg2)
-    }))
-    .extend("-", FUN({
+    ))
+    .extend("-", FUN(
       case List(NUM(arg1), NUM(arg2)) => NUM(arg1 - arg2)
-    }))
-    .extend("*", FUN({
+    ))
+    .extend("*", FUN(
       case List(NUM(arg1), NUM(arg2)) => NUM(arg1 * arg2)
-    }))
-    .extend("/", FUN({
+    ))
+    .extend("/", FUN(
       case List(NUM(arg1), NUM(arg2)) => NUM(arg1 / arg2)
-    }))
-    .extend("car", FUN({
+    ))
+    .extend("car", FUN(
       case List(CONS(x, xs)) => x
-    }))
-    .extend("cdr", FUN({
+    ))
+    .extend("cdr", FUN(
       case List(CONS(x, xs)) => xs
-    }))
-    .extend("null?", FUN({
+    ))
+    .extend("null?", FUN(
       case List(NIL()) => NUM(1)
       case _ => NUM(0)
-    }))
-    .extend("cons", FUN({
+    ))
+    .extend("cons", FUN(
       case List(x, y) => CONS(x, y)
-    }));
+    ));
 
   def evaluate(x: Data): Data = eval(normalize(x), globalEnv);
   def evaluate(s: String): Data = evaluate(string2lisp(s));
 
-  def string2lisp(s: String): Data = {
+  def string2lisp(s: String): Data =
     val it = new LispTokenizer(s);
-    def parse(token: String): Data = {
+    def parse(token: String): Data =
       if (token == "(") parseList
       else if (token == ")") sys.error("unbalanced parentheses")
       else if ('0' <= token.charAt(0) && token.charAt(0) <= '9')
@@ -282,21 +258,17 @@ object LispCaseClasses extends Lisp {
                token.charAt(token.length() - 1) == '\"')
         STR(token.substring(1, token.length() - 1))
       else SYM(token)
-    }
-    def parseList: Data = {
+    def parseList: Data =
       val token = it.next;
       if (token == ")") NIL() else CONS(parse(token), parseList)
-    }
     parse(it.next)
-  }
 
   def lisp2string(d: Data): String = d.toString();
-}
 
 //############################################################################
 // Lisp Implementation Using Any
 
-object LispAny extends Lisp {
+object LispAny extends Lisp
 
   import List._;
 
@@ -311,37 +283,31 @@ object LispAny extends Lisp {
   def lispError[a](msg: String): a =
     sys.error("error: " + msg + "\n" + curexp);
 
-  trait Environment {
+  trait Environment
     def lookup(n: String): Data;
     def extendRec(name: String, expr: Environment => Data) =
-      new Environment {
+      new Environment
         def lookup(n: String): Data =
           if (n == name) expr(this) else Environment.this.lookup(n);
-      }
     def extend(name: String, v: Data) = extendRec(name, (env1 => v));
-  }
-  val EmptyEnvironment = new Environment {
+  val EmptyEnvironment = new Environment
     def lookup(n: String): Data = lispError("undefined: " + n);
-  }
 
-  def asList(x: Data): List[Data] = x match {
+  def asList(x: Data): List[Data] = x match
     case y: List[_] => y
     case _ => lispError("malformed list: " + x)
-  }
 
-  def asInt(x: Data): Int = x match {
+  def asInt(x: Data): Int = x match
     case y: Int => y
     case _ => lispError("not an integer: " + x)
-  }
 
-  def asString(x: Data): String = x match {
+  def asString(x: Data): String = x match
     case y: String => y
     case _ => lispError("not a string: " + x)
-  }
 
   def asBoolean(x: Data): Boolean = x != 0
 
-  def normalize(x: Data): Data = x match {
+  def normalize(x: Data): Data = x match
     case 'and :: x :: y :: Nil =>
       normalize('if :: x :: y :: 0 :: Nil)
     case 'or :: x :: y :: Nil =>
@@ -359,27 +325,23 @@ object LispAny extends Lisp {
       normalize(h) :: asList(normalize(t))
     case _ =>
       x
-  }
 
-  def eval(x: Data, env: Environment): Data = {
+  def eval(x: Data, env: Environment): Data =
     val prevexp = curexp;
     curexp = x;
-    if (trace) {
+    if (trace)
       for (x <- range(1, indent)) Console.print(" ");
       Console.println("===> " + x);
       indent += 1;
-    }
     val result = eval1(x, env);
-    if (trace) {
+    if (trace)
       indent -= 1;
       for (x <- range(1, indent)) Console.print(" ");
       Console.println("<=== " + result);
-    }
     curexp = prevexp;
     result
-  }
 
-  def eval1(x: Data, env: Environment): Data = x match {
+  def eval1(x: Data, env: Environment): Data = x match
     case Symbol(name) =>
       env lookup name
     case 'def :: Symbol(name) :: y :: z :: Nil =>
@@ -398,85 +360,78 @@ object LispAny extends Lisp {
     case y: String => x
     case y: Int => x
     case y => lispError("illegal term")
-  }
 
-  def lisp2string(x: Data): String = x match {
+  def lisp2string(x: Data): String = x match
     case Symbol(name) => name
     case Nil => "()"
     case y :: ys =>
-      def list2string(xs: List[Data]): String = xs match {
+      def list2string(xs: List[Data]): String = xs match
         case List() => ""
         case y :: ys => " " + lisp2string(y) + list2string(ys)
-      }
       "(" + lisp2string(y) + list2string(ys) + ")"
     case _ => if (x.isInstanceOf[String]) "\"" + x + "\""; else x.toString()
-  }
 
-  def apply(fn: Data, args: List[Data]): Data = fn match {
+  def apply(fn: Data, args: List[Data]): Data = fn match
     case Lambda(f) => f(args);
     case _ => lispError("application of non-function: " + fn + " to " + args);
-  }
 
-  def mkLambda(params: Data, expr: Data, env: Environment): Data = {
+  def mkLambda(params: Data, expr: Data, env: Environment): Data =
 
     def extendEnv(
         env: Environment, ps: List[String], args: List[Data]): Environment =
-      (ps, args) match {
+      (ps, args) match
         case (List(), List()) =>
           env
         case (p :: ps1, arg :: args1) =>
           extendEnv(env.extend(p, arg), ps1, args1)
         case _ =>
           lispError("wrong number of arguments")
-      }
 
     val ps: List[String] =
-      asList(params) map {
+      asList(params) map
         case Symbol(name) => name
         case _ => sys.error("illegal parameter list");
-      }
 
     Lambda(args => eval(expr, extendEnv(env, ps, args)))
-  }
 
   val globalEnv = EmptyEnvironment
-    .extend("=", Lambda {
+    .extend("=", Lambda
       case List(arg1, arg2) => if (arg1 == arg2) 1 else 0
-    })
-    .extend("+", Lambda {
+    )
+    .extend("+", Lambda
       case List(arg1: Int, arg2: Int) => arg1 + arg2
       case List(arg1: String, arg2: String) => arg1 + arg2
-    })
-    .extend("-", Lambda {
+    )
+    .extend("-", Lambda
       case List(arg1: Int, arg2: Int) => arg1 - arg2
-    })
-    .extend("*", Lambda {
+    )
+    .extend("*", Lambda
       case List(arg1: Int, arg2: Int) => arg1 * arg2
-    })
-    .extend("/", Lambda {
+    )
+    .extend("/", Lambda
       case List(arg1: Int, arg2: Int) => arg1 / arg2
-    })
+    )
     .extend("nil", Nil)
-    .extend("cons", Lambda {
+    .extend("cons", Lambda
       case List(arg1, arg2) => arg1 :: asList(arg2)
-    })
-    .extend("car", Lambda {
+    )
+    .extend("car", Lambda
       case List(x :: xs) => x
-    })
-    .extend("cdr", Lambda {
+    )
+    .extend("cdr", Lambda
       case List(x :: xs) => xs
-    })
-    .extend("null?", Lambda {
+    )
+    .extend("null?", Lambda
       case List(Nil) => 1
       case _ => 0
-    });
+    );
 
   def evaluate(x: Data): Data = eval(normalize(x), globalEnv);
   def evaluate(s: String): Data = evaluate(string2lisp(s));
 
-  def string2lisp(s: String): Data = {
+  def string2lisp(s: String): Data =
     val it = new LispTokenizer(s);
-    def parse(token: String): Data = {
+    def parse(token: String): Data =
       if (token == "(") parseList
       else if (token == ")") sys.error("unbalanced parentheses")
       //else if (Character.isDigit(token.charAt(0)))
@@ -485,25 +440,21 @@ object LispAny extends Lisp {
                token.charAt(token.length() - 1) == '\"')
         token.substring(1, token.length() - 1)
       else Symbol(token)
-    }
-    def parseList: List[Data] = {
+    def parseList: List[Data] =
       val token = it.next;
       if (token == ")") Nil else parse(token) :: parseList
-    }
     parse(it.next)
-  }
-}
 
 //############################################################################
 // List User
 
-class LispUser(lisp: Lisp) {
+class LispUser(lisp: Lisp)
 
   import lisp._;
 
   def evaluate(s: String) = lisp2string(lisp.evaluate(s));
 
-  def run = {
+  def run =
 
     Console.println(
         string2lisp("(lambda (x) (+ (* x x) 1))").asInstanceOf[AnyRef]);
@@ -536,18 +487,14 @@ class LispUser(lisp: Lisp) {
             "(val v3 (+ (+ (foo 3) (foo 4)) (foo 5)) " + "(val v4 (foo 6) " +
             "(cons v1 (cons v2 (cons v3 (cons v4 nil))))))))))"));
     Console.println;
-  }
-}
 
 //############################################################################
 // Main
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     new LispUser(LispCaseClasses).run;
     new LispUser(LispAny).run;
     ()
-  }
-}
 
 //############################################################################

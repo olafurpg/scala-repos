@@ -28,7 +28,7 @@ import org.scalacheck.Gen
 import org.scalacheck.Gen._
 import scalaz.syntax.std.boolean._
 
-trait SampleSet[T] {
+trait SampleSet[T]
   // the number of samples to return in the queriablesamples list
   def queriableSampleSize: Int
 
@@ -38,9 +38,8 @@ trait SampleSet[T] {
   def queriableSamples: Option[Vector[T]]
 
   def next: (T, SampleSet[T])
-}
 
-object AdSamples {
+object AdSamples
   val genders = List("male", "female")
   val employees = List("0-25",
                        "25-100",
@@ -158,41 +157,36 @@ object AdSamples {
                          "manufacturing",
                          "research")
 
-  def gaussianIndex(size: Int): Gen[Int] = {
+  def gaussianIndex(size: Int): Gen[Int] =
     Gen(
         p =>
-          {
-        def sample: Double = {
+        def sample: Double =
           val testIndex = (p.rng.nextGaussian * (size / 5)) + (size / 2)
           if (testIndex < 0 || testIndex >= size) sample
           else testIndex
-        }
 
         Some(sample.toInt)
-    })
-  }
+    )
 
-  def exponentialIndex(size: Int): Gen[Int] = {
+  def exponentialIndex(size: Int): Gen[Int] =
     Gen(
         p =>
-          {
         import scala.math._
         Some(round(exp(-p.rng.nextDouble * 8) * size).toInt
               .min(size - 1)
               .max(0))
-    })
-  }
+    )
 
   def defaultSample = adCampaignSample
 
   def adCampaignSample =
-    for {
+    for
       gender <- oneOf(genders)
       plat <- exponentialIndex(platforms.size).map { platforms(_) }
       camp <- gaussianIndex(campaigns.size).map { campaigns(_) }
       cpm <- chooseNum(1, 100)
       ageRange <- gaussianIndex(ageRangeArrays.size).map { ageRangeArrays(_) }
-    } yield {
+    yield
       JObject(
           Map(
               "gender" -> JString(gender),
@@ -202,15 +196,14 @@ object AdSamples {
               "ageRange" -> ageRange
           )
       )
-    }
 
   def adOrganizationSample =
-    for {
+    for
       emps <- oneOf(employees)
       rev <- oneOf(revenue)
       cat <- oneOf(category)
       camp <- gaussianIndex(campaigns.size).map { campaigns(_) }
-    } yield {
+    yield
       JObject(
           Map(
               "employees" -> JString(emps),
@@ -219,16 +212,15 @@ object AdSamples {
               "campaign" -> JString(camp)
           )
       )
-    }
 
   def interactionSample =
-    for {
+    for
       time <- earlierTimeFrame
       tz <- oneOf(timeZone)
       ts <- ISO8601(time, tz)
       pid <- oneOf(pageId)
       uid <- oneOf(userId)
-    } yield {
+    yield
       JObject(
           Map(
               "time" -> JNum(time),
@@ -238,15 +230,14 @@ object AdSamples {
               "userId" -> JString(uid)
           )
       )
-    }
 
   def interactionSample2 =
-    for {
+    for
       time <- laterTimeFrame
       tz <- oneOf(timeZone)
       pid <- oneOf(pageId)
       uid <- oneOf(userId)
-    } yield {
+    yield
       JObject(
           Map(
               "time" -> JNum(time),
@@ -255,14 +246,13 @@ object AdSamples {
               "userId" -> JString(uid)
           )
       )
-    }
 
   def eventsSample =
-    for {
+    for
       time <- ISO8601(laterTimeFrame, oneOf(timeZone))
       platform <- oneOf(platforms)
       eventName <- oneOf(eventNames)
-    } yield {
+    yield
       JObject(
           Map(
               "time" -> JString(time),
@@ -270,14 +260,13 @@ object AdSamples {
               "eventName" -> JString(eventName)
           )
       )
-    }
 
   def usersSample =
-    for {
+    for
       age <- chooseNum(18, 100)
       income <- chooseNum(10, 250).map { _ * 1000 }
       state <- oneOf(states)
-    } yield {
+    yield
       JObject(
           Map(
               "age" -> JNum(age),
@@ -285,17 +274,16 @@ object AdSamples {
               "location" -> JObject(Map("state" -> JString(state)))
           )
       )
-    }
 
   def ordersSample =
-    for {
+    for
       userId <- chooseNum(12345, 12545)
       taxRate <- chooseNum(70, 110).map { _.toDouble / 100 }
       subTotal <- chooseNum(123, 11145).map { _.toDouble / 100 }
       shipping <- oneOf(shippingRates)
       handling <- oneOf(handlingCharges)
       val total = subTotal * taxRate + shipping + handling
-    } yield {
+    yield
       JObject(
           Map(
               "userId" -> JNum(userId),
@@ -306,39 +294,34 @@ object AdSamples {
               "handling" -> JNum(handling)
           )
       )
-    }
 
-  def recipientsSample = listOfN(2, oneOf(departments)).map { list =>
+  def recipientsSample = listOfN(2, oneOf(departments)).map  list =>
     JArray(list.map { JString(_) })
-  }
 
   def paymentsSample =
-    for {
+    for
       date <- earlierTimeFrame
       recipients <- recipientsSample
       amount <- chooseNum(500, 5000).map(_.toDouble / 100)
-    } yield {
+    yield
       JObject(
           Map("date" -> JNum(date),
               "recipients" -> recipients,
               "amount" -> JNum(amount)))
-    }
 
   def pageViewsSample =
-    for {
+    for
       duration <- chooseNum(1, 300)
       userId <- chooseNum(12345, 12360)
-    } yield {
+    yield
       JObject(Map("duration" -> JNum(duration), "userId" -> JNum(userId)))
-    }
 
   def customersSample =
-    for {
+    for
       userId <- chooseNum(12345, 12545)
       income <- chooseNum(10, 250).map(_ * 1000)
-    } yield {
+    yield
       JObject(Map("userId" -> JNum(userId), "income" -> JNum(income)))
-    }
 
   def emptyObjectSample = JObject(List())
 
@@ -356,62 +339,53 @@ object AdSamples {
               System.currentTimeMillis)
 
   def ISO8601(timeGen: Gen[Long], timeZoneGen: Gen[String]) =
-    for {
+    for
       time <- timeGen
       tz <- timeZoneGen
-    } yield {
+    yield
       val format = ISODateTimeFormat.dateTime()
       val timeZone = DateTimeZone.forID(tz.toString)
       val dateTime = new DateTime(time, timeZone)
       format.print(dateTime)
-    }
 
-  def toISO8601(time: Long, tz: String): String = {
+  def toISO8601(time: Long, tz: String): String =
     val format = ISODateTimeFormat.dateTime()
     val timeZone = DateTimeZone.forID(tz.toString)
     val dateTime = new DateTime(time.toLong, timeZone)
     format.print(dateTime)
-  }
-}
 
 case class DistributedSampleSet[T](
     val queriableSampleSize: Int,
     sampler: Gen[T],
     private val recordedSamples: Vector[T] = Vector())
-    extends SampleSet[T] { self =>
+    extends SampleSet[T]  self =>
   def queriableSamples =
     (recordedSamples.size >= queriableSampleSize).option(recordedSamples)
 
   import AdSamples._
-  def next = {
+  def next =
     val sample = sampler.sample.get
 
     // dumb sample accumulation, just takes the first n samples recorded
     (sample,
      if (recordedSamples.size >= queriableSampleSize) this
      else this.copy(recordedSamples = recordedSamples :+ sample))
-  }
-}
 
-object DistributedSampleSet {
+object DistributedSampleSet
   def sample[T](sampleSize: Int,
                 queriableSamples: Int,
                 sampler: Gen[T] = AdSamples.defaultSample)
-    : (Vector[T], Option[Vector[T]]) = {
+    : (Vector[T], Option[Vector[T]]) =
     def pull[T](sampleSet: SampleSet[T],
                 sampleData: Vector[T],
-                counter: Int): (SampleSet[T], Vector[T]) = {
-      if (counter < sampleSize) {
+                counter: Int): (SampleSet[T], Vector[T]) =
+      if (counter < sampleSize)
         val (event, nextSet) = sampleSet.next
         pull(nextSet, sampleData :+ event, counter + 1)
-      } else {
+      else
         (sampleSet, sampleData)
-      }
-    }
 
     val (sampleSet, data) = pull(
         DistributedSampleSet(queriableSamples, sampler), Vector(), 0)
     (data, sampleSet.queriableSamples)
-  }
-}
 // vim: set ts=4 sw=4 et:

@@ -25,13 +25,12 @@ import org.scalatest.prop._
 @RunWith(classOf[JUnitRunner])
 class PoissonTest
     extends FunSuite with Checkers
-    with MomentsTestBase[Int] with ExpFamTest[Poisson, Int] {
+    with MomentsTestBase[Int] with ExpFamTest[Poisson, Int]
   import org.scalacheck.Arbitrary.arbitrary
   val expFam = Poisson
 
-  implicit def arbDistr: Arbitrary[Poisson] = Arbitrary {
+  implicit def arbDistr: Arbitrary[Poisson] = Arbitrary
     for (p <- arbitrary[Double].map { _.abs % 200 + 1 }) yield new Poisson(p)
-  }
   def arbParameter = Arbitrary(arbitrary[Double].map(x => math.abs(x) % 20))
   def paramsClose(p: Double, b: Double) =
     if (b == 0.0) p < 1E-4 else (p - b).abs / b.abs.max(1E-4) < 1E-1
@@ -42,12 +41,10 @@ class PoissonTest
   override val VARIANCE_TOLERANCE: Double = 1E-1
   val TOL = 1E-1
 
-  test("cdf") {
+  test("cdf")
     val mean = 5.0
     import breeze.numerics._
     val poi = new Poisson(mean)
     assert(closeTo(poi.cdf(0), exp(-mean)), poi.cdf(0) + " " + exp(-mean))
-  }
 
   override type Distr = Poisson
-}

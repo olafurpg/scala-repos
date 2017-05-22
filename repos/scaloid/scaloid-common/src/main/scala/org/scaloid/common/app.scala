@@ -47,12 +47,11 @@ import scala.concurrent.duration.Duration
 import Implicits._
 import scala.deprecated
 
-trait TraitActivity[+This <: Activity] {
+trait TraitActivity[+This <: Activity]
 
-  @inline def contentView_=(p: View) = {
+  @inline def contentView_=(p: View) =
     basis.setContentView(p)
     basis
-  }
 
   @inline def contentView(p: View) = contentView_=(p)
 
@@ -64,18 +63,14 @@ trait TraitActivity[+This <: Activity] {
 
   def find[V <: View](id: Int): V = basis.findViewById(id).asInstanceOf[V]
 
-  def runOnUiThread(f: => Unit) {
-    if (uiThread == Thread.currentThread) {
+  def runOnUiThread(f: => Unit)
+    if (uiThread == Thread.currentThread)
       f
-    } else {
-      handler.post(new Runnable() {
-        def run() {
+    else
+      handler.post(new Runnable()
+        def run()
           f
-        }
-      })
-    }
-  }
-}
+      )
 
 /**
  * Enriched trait for the class android.app.Activity.
@@ -120,7 +115,7 @@ trait TraitActivity[+This <: Activity] {
  * In contrast of method overriding, this shortcut can be called multiple times from different places of your code.
  *
  */
-trait SActivity extends Activity with SContext with TraitActivity[SActivity] with Destroyable with Creatable with Registerable {
+trait SActivity extends Activity with SContext with TraitActivity[SActivity] with Destroyable with Creatable with Registerable
 
   override def basis = this
   override implicit val ctx = this
@@ -128,109 +123,90 @@ trait SActivity extends Activity with SContext with TraitActivity[SActivity] wit
   def onRegister(body: => Any) = onResume(body)
   def onUnregister(body: => Any) = onPause(body)
 
-  val onStartStop = new Registerable {
+  val onStartStop = new Registerable
     def onRegister(body: => Any) = onStart(body)
     def onUnregister(body: => Any) = onStop(body)
-  }
 
-  val onCreateDestroy = new Registerable {
+  val onCreateDestroy = new Registerable
     def onRegister(body: => Any) = onCreate(body)
     def onUnregister(body: => Any) = onDestroy(body)
-  }
 
-  protected override def onCreate(b: Bundle) {
+  protected override def onCreate(b: Bundle)
     super.onCreate(b)
-    AppHelpers.createBundle.withValue(Option(b)) {
+    AppHelpers.createBundle.withValue(Option(b))
       onCreateBodies.foreach(_())
-    }
-  }
 
-  def onCreate(body: Option[Bundle] => Any) = {
-    val el = { () =>
+  def onCreate(body: Option[Bundle] => Any) =
+    val el =  () =>
       body(AppHelpers.createBundle.value)
-    }
     onCreateBodies :+= el
     el
-  }
 
-  override def onStart {
+  override def onStart
     super.onStart()
     onStartBodies.foreach(_())
-  }
 
   protected var onStartBodies = Vector[() => Any]()
 
-  def onStart(body: => Any) = {
+  def onStart(body: => Any) =
     val el = body _
     onStartBodies :+= el
     el
-  }
 
-  override def onResume {
+  override def onResume
     super.onResume()
     onResumeBodies.foreach(_())
-  }
 
   protected var onResumeBodies = Vector[() => Any]()
 
-  def onResume(body: => Any) = {
+  def onResume(body: => Any) =
     val el = body _
     onResumeBodies :+= el
     el
-  }
 
-  override def onPause {
+  override def onPause
     onPauseBodies.foreach(_())
     super.onPause()
-  }
 
   protected var onPauseBodies = Vector[() => Any]()
 
-  def onPause(body: => Any) = {
+  def onPause(body: => Any) =
     val el = body _
     onPauseBodies :+= el
     el
-  }
 
-  override def onStop {
+  override def onStop
     onStopBodies.foreach(_())
     super.onStop()
-  }
 
   protected var onStopBodies = Vector[() => Any]()
 
-  def onStop(body: => Any) = {
+  def onStop(body: => Any) =
     val el = body _
     onStopBodies :+= el
     el
-  }
 
-  override def onDestroy {
+  override def onDestroy
     onDestroyBodies.foreach(_())
     super.onDestroy()
-  }
-}
 
 /**
  * Enriched trait of the class android.app.Service. To enable Scaloid support for subclasses of android.app.Service, extend this trait.
  */
-trait SService extends Service with SContext with Destroyable with Creatable with Registerable {
+trait SService extends Service with SContext with Destroyable with Creatable with Registerable
   override def basis = this
   override implicit val ctx = this
 
   def onRegister(body: => Any) = onCreate(body)
   def onUnregister(body: => Any) = onDestroy(body)
 
-  override def onCreate() {
+  override def onCreate()
     super.onCreate()
     onCreateBodies.foreach(_())
-  }
 
-  override def onDestroy() {
+  override def onDestroy()
     onDestroyBodies.foreach(_())
     super.onDestroy()
-  }
-}
 
 /**
  * An in-process service that can be bound with [[LocalServiceConnection]]. This yields far more concise code than that uses plain-old Android API.
@@ -239,16 +215,14 @@ trait SService extends Service with SContext with Destroyable with Creatable wit
  *
  * [[http://blog.scaloid.org/2013/03/introducing-localservice.html]]
  */
-trait LocalService extends SService {
+trait LocalService extends SService
   private val binder = new ScaloidServiceBinder
 
   def onBind(intent: Intent): IBinder = binder
 
-  class ScaloidServiceBinder extends Binder {
+  class ScaloidServiceBinder extends Binder
     def service: LocalService = LocalService.this
-  }
 
-}
 
 /**
  * A Scala-style builder for AlertDialog.
@@ -268,57 +242,52 @@ trait LocalService extends SService {
  *
  * See also: `alert()`
  */
-class AlertDialogBuilder(_title: CharSequence = null, _message: CharSequence = null)(implicit context: Context) extends AlertDialog.Builder(context) {
+class AlertDialogBuilder(_title: CharSequence = null, _message: CharSequence = null)(implicit context: Context) extends AlertDialog.Builder(context)
   if (_title != null) setTitle(_title)
   if (_message != null) setMessage(_message)
 
   @inline def positiveButton(name: CharSequence = android.R.string.yes, onClick: => Unit = {}): AlertDialogBuilder =
-    positiveButton(name, (_, _) => {
+    positiveButton(name, (_, _) =>
       onClick
-    })
+    )
 
-  @inline def positiveButton(name: CharSequence, onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
+  @inline def positiveButton(name: CharSequence, onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder =
     setPositiveButton(name, func2DialogOnClickListener(onClick))
     this
-  }
 
   @inline def neutralButton(name: CharSequence = android.R.string.ok, onClick: => Unit = {}): AlertDialogBuilder =
-    neutralButton(name, (_, _) => {
+    neutralButton(name, (_, _) =>
       onClick
-    })
+    )
 
-  @inline def neutralButton(name: CharSequence, onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder = {
+  @inline def neutralButton(name: CharSequence, onClick: (DialogInterface, Int) => Unit): AlertDialogBuilder =
     setNeutralButton(name, func2DialogOnClickListener(onClick))
     this
-  }
 
   @inline def negativeButton(name: CharSequence, onClick: => Unit): AlertDialogBuilder =
-    negativeButton(name, (_, _) => {
+    negativeButton(name, (_, _) =>
       onClick
-    })
+    )
 
-  @inline def negativeButton(name: CharSequence = android.R.string.no, onClick: (DialogInterface, Int) => Unit = (d, _) => {
+  @inline def negativeButton(name: CharSequence = android.R.string.no, onClick: (DialogInterface, Int) => Unit = (d, _) =>
     d.cancel()
-  }): AlertDialogBuilder = {
+  ): AlertDialogBuilder =
     setNegativeButton(name, func2DialogOnClickListener(onClick))
     this
-  }
 
   var tit: CharSequence = null
 
-  @inline def title_=(str: CharSequence) = {
+  @inline def title_=(str: CharSequence) =
     tit = str
     setTitle(str)
-  }
 
   @inline def title = tit
 
   var msg: CharSequence = null
 
-  @inline def message_=(str: CharSequence) = {
+  @inline def message_=(str: CharSequence) =
     msg = str
     setMessage(str)
-  }
 
   @inline def message = msg
 
@@ -328,7 +297,6 @@ class AlertDialogBuilder(_title: CharSequence = null, _message: CharSequence = n
    * This method blocks until the dialog has been built in the UI thread.
    */
   override def show(): AlertDialog = Await.result(evalOnUiThread(super.show()), Duration.Inf)
-}
 
 /**
  * Scaloid wrapper of android.graphics.drawable.StateListDrawable.
@@ -340,7 +308,7 @@ class AlertDialogBuilder(_title: CharSequence = null, _message: CharSequence = n
  * }
  * }}}
  */
-class SStateListDrawable extends StateListDrawable {
+class SStateListDrawable extends StateListDrawable
   val ABOVE_ANCHOR = android.R.attr.state_above_anchor
   val ACTIVE = android.R.attr.state_active
   val CHECKABLE = android.R.attr.state_checkable
@@ -358,8 +326,6 @@ class SStateListDrawable extends StateListDrawable {
   val SINGLE = android.R.attr.state_single
   val WINDOW_FOCUSED = android.R.attr.state_window_focused
 
-  def +=(drawable: Drawable, states: Int*): SStateListDrawable = {
+  def +=(drawable: Drawable, states: Int*): SStateListDrawable =
     addState(states.toArray, drawable)
     this
-  }
-}

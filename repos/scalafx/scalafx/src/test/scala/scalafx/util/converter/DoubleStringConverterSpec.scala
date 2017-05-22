@@ -46,11 +46,10 @@ class DoubleStringConverterSpec
                                                 DoubleStringConverter](
         classOf[jfxuc.DoubleStringConverter],
         classOf[DoubleStringConverter],
-        classOf[Double]) {
+        classOf[Double])
 
   val examples = List((0.0, "0.0"),
                       (123.09, "123.09"),
                       (-123.45, "-123.45"),
                       (Double.MaxValue, Double.MaxValue.toString),
                       (Double.MinValue, Double.MinValue.toString))
-}

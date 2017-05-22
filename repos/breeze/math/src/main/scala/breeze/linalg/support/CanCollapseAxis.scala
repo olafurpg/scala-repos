@@ -28,14 +28,12 @@ package breeze.linalg.support
   * @tparam R What the column is being collapsed to.
   * @tparam TR result tensor type
   */
-trait CanCollapseAxis[From, Axis, ColType, R, TR] {
+trait CanCollapseAxis[From, Axis, ColType, R, TR]
   def apply(from: From, axis: Axis)(f: ColType => R): TR
-}
 
-object CanCollapseAxis {
+object CanCollapseAxis
 
   /** Sometimes Scala can't deal with the R/TR part if it's being chained. This
     * delays some of the inference of [[breeze.linalg.support.CanCollapseAxis]]'s parameters
     * until they can be further resolved. (See [[breeze.generic.UFunc.collapseUred]] for an example.) */
   class HandHold[From, Axis, ColType]
-}

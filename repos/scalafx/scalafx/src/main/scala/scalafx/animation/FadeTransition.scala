@@ -40,7 +40,7 @@ import scalafx.util.Duration
   *
   * @define FT `FadeTransition`
   */
-object FadeTransition extends AnimationStatics {
+object FadeTransition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $FT to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/FadeTransition.html $FT]], 
@@ -51,7 +51,6 @@ object FadeTransition extends AnimationStatics {
     */
   implicit def sfxFadeTransition2jfx(v: FadeTransition): jfxa.FadeTransition =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/FadeTransition.html $FT]].
@@ -64,7 +63,7 @@ object FadeTransition extends AnimationStatics {
   */
 class FadeTransition(
     override val delegate: jfxa.FadeTransition = new jfxa.FadeTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.FadeTransition] {
+    extends Transition(delegate) with SFXDelegate[jfxa.FadeTransition]
 
   // CONSTRUCTORS
 
@@ -91,41 +90,35 @@ class FadeTransition(
     * $FT.
     */
   def byValue: DoubleProperty = delegate.byValueProperty
-  def byValue_=(by: Double) {
+  def byValue_=(by: Double)
     byValue() = by
-  }
 
   /**
     * The duration of this $FT. $DV 400ms
     */
   def duration: ObjectProperty[jfxu.Duration] = delegate.durationProperty
-  def duration_=(d: Duration) {
+  def duration_=(d: Duration)
     duration() = d
-  }
 
   /**
     * Specifies the start opacity value for this $FT. $DV Double.NaN
     */
   def fromValue: DoubleProperty = delegate.fromValueProperty
-  def fromValue_=(from: Double) {
+  def fromValue_=(from: Double)
     fromValue() = from
-  }
 
   /**
     * The target node of this `Transition`.
     */
   def node: ObjectProperty[jfxs.Node] = delegate.nodeProperty
-  def node_=(n: Node) {
+  def node_=(n: Node)
     node() = n
-  }
 
   /**
     * Specifies the stop opacity value for this $FT. $DV Double.NaN
     */
   def toValue: DoubleProperty = delegate.toValueProperty
-  def toValue_=(to: Double) {
+  def toValue_=(to: Double)
     toValue() = to
-  }
 
   // METHODS
-}

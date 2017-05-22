@@ -12,20 +12,18 @@ import org.junit.Assert._
 
 import java.{util => ju}
 
-class DefaultMethodsTest {
+class DefaultMethodsTest
 
-  @Test def canOverrideDefaultMethod(): Unit = {
+  @Test def canOverrideDefaultMethod(): Unit =
     var counter = 0
 
-    class SpecialIntComparator extends ju.Comparator[Int] {
+    class SpecialIntComparator extends ju.Comparator[Int]
       def compare(o1: Int, o2: Int): Int =
         o1.compareTo(o2)
 
-      override def reversed(): ju.Comparator[Int] = {
+      override def reversed(): ju.Comparator[Int] =
         counter += 1
         super.reversed()
-      }
-    }
 
     val c = new SpecialIntComparator
     assertTrue(c.compare(5, 7) < 0)
@@ -34,5 +32,3 @@ class DefaultMethodsTest {
     val reversed = c.reversed()
     assertEquals(1, counter)
     assertTrue(reversed.compare(5, 7) > 0)
-  }
-}

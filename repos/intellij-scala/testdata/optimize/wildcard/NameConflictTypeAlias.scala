@@ -1,13 +1,12 @@
-class NameConflictTypeAlias {
+class NameConflictTypeAlias
   import Mess.{a, foo, s, AAAA, BBBB}
 
   val x = new AAAA
   val y = new BBBB
   val z = a + s + foo
   val l: List = null
-}
 
-object Mess {
+object Mess
   val a = 1
   val s = "a"
   def foo = 1
@@ -15,7 +14,6 @@ object Mess {
   class AAAA
   class BBBB
   type List = java.util.List
-}
 
 /*
 class NameConflictTypeAlias {

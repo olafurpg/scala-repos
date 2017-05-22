@@ -19,11 +19,11 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   */
 class ScalaMethodFilter(
     function: ScMethodLike, callingExpressionLines: Range[Integer])
-    extends MethodFilter {
+    extends MethodFilter
   private val unknownName: String = "!unknownName!"
   private val myTargetMethodSignature =
     DebuggerUtil.getFunctionJVMSignature(function)
-  private val myDeclaringClassName = {
+  private val myDeclaringClassName =
     val clazz =
       PsiTreeUtil.getParentOfType(function, classOf[ScTemplateDefinition])
     if (clazz == null) JVMNameUtil.getJVMRawText(unknownName)
@@ -31,15 +31,13 @@ class ScalaMethodFilter(
       DebuggerUtil.getClassJVMName(clazz,
                                    clazz.isInstanceOf[ScObject] ||
                                    ValueClassType.isValueClass(clazz))
-  }
-  private val funName = function match {
+  private val funName = function match
     case c: ScMethodLike if c.isConstructor => "<init>"
     case fun: ScFunction => ScalaNamesUtil.toJavaName(fun.name)
     case _ => unknownName
-  }
 
   override def locationMatches(
-      process: DebugProcessImpl, location: Location): Boolean = {
+      process: DebugProcessImpl, location: Location): Boolean =
     val method = location.method()
     if (!method.name.contains(funName)) return false
 
@@ -53,12 +51,9 @@ class ScalaMethodFilter(
     else if (myTargetMethodSignature != null &&
              method.signature() != myTargetMethodSignature.getName(process))
       false
-    else {
+    else
       DebuggerUtilsEx.isAssignableFrom(
           locationTypeName, location.declaringType) &&
       !ScalaPositionManager.shouldSkip(location, process)
-    }
-  }
 
   override def getCallingExpressionLines = callingExpressionLines
-}

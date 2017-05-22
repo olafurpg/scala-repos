@@ -25,19 +25,16 @@ import akka.routing.FromConfig
 import akka.testkit._
 import scala.concurrent.duration._
 
-object RemoteRoundRobinMultiJvmSpec extends MultiNodeConfig {
+object RemoteRoundRobinMultiJvmSpec extends MultiNodeConfig
 
-  class SomeActor extends Actor {
-    def receive = {
+  class SomeActor extends Actor
+    def receive =
       case "hit" ⇒ sender() ! self
-    }
-  }
 
-  class TestResizer extends Resizer {
+  class TestResizer extends Resizer
     override def isTimeForResize(messageCounter: Long): Boolean =
       messageCounter <= 10
     override def resize(currentRoutees: immutable.IndexedSeq[Routee]): Int = 1
-  }
 
   val first = role("first")
   val second = role("second")
@@ -66,7 +63,6 @@ object RemoteRoundRobinMultiJvmSpec extends MultiNodeConfig {
           "@third@/user/target-third"]
       }
     """)
-}
 
 class RemoteRoundRobinMultiJvmNode1 extends RemoteRoundRobinSpec
 class RemoteRoundRobinMultiJvmNode2 extends RemoteRoundRobinSpec
@@ -75,19 +71,18 @@ class RemoteRoundRobinMultiJvmNode4 extends RemoteRoundRobinSpec
 
 class RemoteRoundRobinSpec
     extends MultiNodeSpec(RemoteRoundRobinMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    with ImplicitSender with DefaultTimeout
   import RemoteRoundRobinMultiJvmSpec._
 
   def initialParticipants = roles.size
 
-  "A remote round robin pool" must {
-    "be locally instantiated on a remote node and be able to communicate through its RemoteActorRef" in {
+  "A remote round robin pool" must
+    "be locally instantiated on a remote node and be able to communicate through its RemoteActorRef" in
 
-      runOn(first, second, third) {
+      runOn(first, second, third)
         enterBarrier("start", "broadcast-end", "end")
-      }
 
-      runOn(fourth) {
+      runOn(fourth)
         enterBarrier("start")
         val actor = system.actorOf(
             RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]),
@@ -97,19 +92,17 @@ class RemoteRoundRobinSpec
         val connectionCount = 3
         val iterationCount = 10
 
-        for (i ← 0 until iterationCount; k ← 0 until connectionCount) {
+        for (i ← 0 until iterationCount; k ← 0 until connectionCount)
           actor ! "hit"
-        }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5 seconds, messages = connectionCount * iterationCount) {
+            5 seconds, messages = connectionCount * iterationCount)
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0,
+        ).foldLeft(Map(node(first).address -> 0,
                         node(second).address -> 0,
-                        node(third).address -> 0)) {
+                        node(third).address -> 0))
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
-        }
 
         enterBarrier("broadcast-end")
         actor ! Broadcast(PoisonPill)
@@ -121,21 +114,17 @@ class RemoteRoundRobinSpec
         // shut down the actor before we let the other node(s) shut down so we don't try to send
         // "Terminate" to a shut down node
         system.stop(actor)
-      }
 
       enterBarrier("done")
-    }
-  }
 
-  "A remote round robin pool with resizer" must {
+  "A remote round robin pool with resizer" must
     "be locally instantiated on a remote node after several resize rounds" in within(
-        5 seconds) {
+        5 seconds)
 
-      runOn(first, second, third) {
+      runOn(first, second, third)
         enterBarrier("start", "broadcast-end", "end")
-      }
 
-      runOn(fourth) {
+      runOn(fourth)
         enterBarrier("start")
         val actor =
           system.actorOf(RoundRobinPool(nrOfInstances = 1,
@@ -148,7 +137,7 @@ class RemoteRoundRobinSpec
         // initial nrOfInstances 1 + initial resize => 2
         expectMsgType[Routees].routees.size should ===(2)
 
-        val repliesFrom: Set[ActorRef] = (for (n ← 3 to 9) yield {
+        val repliesFrom: Set[ActorRef] = (for (n ← 3 to 9) yield
           // each message trigger a resize, incrementing number of routees with 1
           actor ! "hit"
           Await
@@ -157,7 +146,7 @@ class RemoteRoundRobinSpec
             .routees
             .size should ===(n)
           expectMsgType[ActorRef]
-        }).toSet
+        ).toSet
 
         enterBarrier("broadcast-end")
         actor ! Broadcast(PoisonPill)
@@ -171,21 +160,17 @@ class RemoteRoundRobinSpec
         // shut down the actor before we let the other node(s) shut down so we don't try to send
         // "Terminate" to a shut down node
         system.stop(actor)
-      }
 
       enterBarrier("done")
-    }
-  }
 
-  "A remote round robin group" must {
-    "send messages with actor selection to remote paths" in {
+  "A remote round robin group" must
+    "send messages with actor selection to remote paths" in
 
-      runOn(first, second, third) {
+      runOn(first, second, third)
         system.actorOf(Props[SomeActor], name = "target-" + myself.name)
         enterBarrier("start", "end")
-      }
 
-      runOn(fourth) {
+      runOn(fourth)
         enterBarrier("start")
         val actor = system.actorOf(FromConfig.props(), "service-hello3")
         actor.isInstanceOf[RoutedActorRef] should ===(true)
@@ -193,26 +178,20 @@ class RemoteRoundRobinSpec
         val connectionCount = 3
         val iterationCount = 10
 
-        for (i ← 0 until iterationCount; k ← 0 until connectionCount) {
+        for (i ← 0 until iterationCount; k ← 0 until connectionCount)
           actor ! "hit"
-        }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5 seconds, messages = connectionCount * iterationCount) {
+            5 seconds, messages = connectionCount * iterationCount)
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0,
+        ).foldLeft(Map(node(first).address -> 0,
                         node(second).address -> 0,
-                        node(third).address -> 0)) {
+                        node(third).address -> 0))
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
-        }
 
         enterBarrier("end")
         replies.values foreach { _ should ===(iterationCount) }
         replies.get(node(fourth).address) should ===(None)
-      }
 
       enterBarrier("done")
-    }
-  }
-}

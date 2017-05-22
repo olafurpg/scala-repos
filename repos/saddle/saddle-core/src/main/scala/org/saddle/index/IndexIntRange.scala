@@ -28,7 +28,7 @@ import locator.Locator
   * is the default when creating a Saddle object such as [[org.saddle.Series]] which
   * requires and index and one is not supplied.
   */
-class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
+class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int]
   require(length >= 0, "Length must be non-negative!")
 
   @transient lazy val scalarTag = ScalarTagInt
@@ -40,18 +40,16 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
     * Custom implementation of a Locator to serve as the backing map in a
     * more space-efficient manner than the full blown LocatorInt implementation.
     */
-  protected def locator = new Locator[Int] {
+  protected def locator = new Locator[Int]
     def size = length
 
-    lazy val cts = {
+    lazy val cts =
       val res = Array.ofDim[Int](length)
       var i = 0
-      while (i < length) {
+      while (i < length)
         res(i) = 1
         i += 1
-      }
       res
-    }
 
     def contains(key: Int) = key >= from && key < from + length
     def get(key: Int) = if (contains(key)) key - from else -1
@@ -61,7 +59,6 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
     def inc(key: Int) = sys.error("Not supported")
     def keys() = asArr
     def counts() = cts
-  }
 
   private def guardLoc(loc: Int): Int =
     if (loc < 0 || loc >= length)
@@ -121,8 +118,6 @@ class IndexIntRange(val length: Int, val from: Int = 0) extends Index[Int] {
     genIdx map f
 
   private[saddle] def toArray = asArr
-}
 
-object IndexIntRange {
+object IndexIntRange
   def apply(length: Int, from: Int = 0) = new IndexIntRange(length, from)
-}

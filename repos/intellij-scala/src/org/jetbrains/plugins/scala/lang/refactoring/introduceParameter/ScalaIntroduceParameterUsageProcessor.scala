@@ -17,37 +17,34 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
   * @author Nikolay.Tropin
   */
 class ScalaIntroduceParameterUsageProcessor
-    extends ChangeSignatureUsageProcessor {
+    extends ChangeSignatureUsageProcessor
 
-  override def findUsages(info: ChangeInfo): Array[UsageInfo] = info match {
+  override def findUsages(info: ChangeInfo): Array[UsageInfo] = info match
     case isIntroduceParameter(data) if data.replaceAll =>
-      for {
+      for
         occ <- data.occurrences
-      } yield {
+      yield
         val file = data.methodToSearchFor.getContainingFile
         val doc =
           PsiDocumentManager.getInstance(data.getProject).getDocument(file)
         TextRangeUsageInfo(file, doc.createRangeMarker(occ))
-      }
     case isIntroduceParameter(data) =>
       val file = data.methodToSearchFor.getContainingFile
       val doc =
         PsiDocumentManager.getInstance(data.getProject).getDocument(file)
       Array(TextRangeUsageInfo(file, doc.createRangeMarker(data.mainOcc)))
     case _ => Array.empty
-  }
 
   override def processUsage(changeInfo: ChangeInfo,
                             usageInfo: UsageInfo,
                             beforeMethodChange: Boolean,
-                            usages: Array[UsageInfo]): Boolean = {
+                            usages: Array[UsageInfo]): Boolean =
     if (!beforeMethodChange) return false
 
-    changeInfo match {
+    changeInfo match
       case isIntroduceParameter(data) =>
-        val textRangeUsages = usages.collect {
+        val textRangeUsages = usages.collect
           case t: TextRangeUsageInfo => t
-        }
         if (textRangeUsages.headOption.forall(_.processed)) return false
 
         val pName = data.paramName
@@ -66,8 +63,6 @@ class ScalaIntroduceParameterUsageProcessor
         textRangeUsages.foreach(_.processed = true)
         true
       case _ => false
-    }
-  }
 
   override def processPrimaryMethod(changeInfo: ChangeInfo): Boolean = false
 
@@ -88,9 +83,7 @@ class ScalaIntroduceParameterUsageProcessor
   override def setupDefaultValues(changeInfo: ChangeInfo,
                                   refUsages: Ref[Array[UsageInfo]],
                                   project: Project): Boolean = true
-}
 
 private case class TextRangeUsageInfo(file: PsiFile, range: RangeMarker)
-    extends UsageInfo(file, range.getStartOffset, range.getEndOffset) {
+    extends UsageInfo(file, range.getStartOffset, range.getEndOffset)
   var processed = false
-}

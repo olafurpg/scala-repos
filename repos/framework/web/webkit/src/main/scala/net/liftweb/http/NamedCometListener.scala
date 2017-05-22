@@ -40,7 +40,7 @@ import common.{Empty, Full, Box, Loggable}
   *
   *
   */
-object NamedCometListener extends Loggable {
+object NamedCometListener extends Loggable
 
   /**
     * The map of key -> Dispatchers
@@ -51,26 +51,20 @@ object NamedCometListener extends Loggable {
     * Either returns  or creates a dispatcher for the @str key
     */
   def getOrAddDispatchersFor(str: Box[String]): LAFuture[LiftActor] =
-    synchronized {
+    synchronized
       val name = str.getOrElse("")
       val liftActor: LAFuture[LiftActor] = new LAFuture()
-      Schedule { () =>
-        {
-          val ret = disptchers.get(name) match {
+      Schedule  () =>
+          val ret = disptchers.get(name) match
             case Some(actor) => actor
-            case None => {
+            case None =>
                 val ret = new NamedCometDispatcher(str)
                 disptchers += name -> ret
                 logger.debug("Our map of NamedCometDispatchers is: %s".format(
                         disptchers));
                 ret
-              }
-          }
           liftActor.satisfy(ret)
-        }
-      }
       liftActor
-    }
 
   /**
     * Returns a Future containing a Full dispatcher or None for the @str key
@@ -80,18 +74,12 @@ object NamedCometListener extends Loggable {
     *
     */
   def getDispatchersFor(str: Box[String]): LAFuture[Box[LiftActor]] =
-    synchronized {
+    synchronized
       val name = str.getOrElse("")
       val liftActor: LAFuture[Box[LiftActor]] = new LAFuture()
-      Schedule { () =>
-        {
-          val ret = disptchers.get(name) match {
+      Schedule  () =>
+          val ret = disptchers.get(name) match
             case Some(actor) => Full(actor)
             case None => Empty
-          }
           liftActor.satisfy(ret)
-        }
-      }
       liftActor
-    }
-}

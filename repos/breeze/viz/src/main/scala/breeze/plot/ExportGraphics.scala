@@ -9,7 +9,7 @@ import java.awt.Graphics2D
   *
   * @author dramage, Robby McKilliam
   */
-object ExportGraphics {
+object ExportGraphics
 
   /** A Drawable is any function that draws to a Graphics2D context. */
   type Drawable = ((Graphics2D) => Unit)
@@ -20,37 +20,32 @@ object ExportGraphics {
     * determines its format, with options png, eps, svg, and pdf.
     */
   def writeFile(
-      file: File, draw: Drawable, width: Int, height: Int, dpi: Int = 72) = {
+      file: File, draw: Drawable, width: Int, height: Int, dpi: Int = 72) =
     lazy val fos = new FileOutputStream(file)
-    if (file.getName.toLowerCase.endsWith(".png")) {
-      try {
+    if (file.getName.toLowerCase.endsWith(".png"))
+      try
         writePNG(fos, draw, width, height, dpi)
-      } finally {
+      finally
         fos.close()
-      }
-    } else if (file.getName.toLowerCase.endsWith(".eps")) {
-      try {
+    else if (file.getName.toLowerCase.endsWith(".eps"))
+      try
         writeEPS(fos, draw, width, height)
-      } finally {
+      finally
         fos.close()
-      }
-    } else if (file.getName.toLowerCase.endsWith(".pdf")) {
-      try {
+    else if (file.getName.toLowerCase.endsWith(".pdf"))
+      try
         writePDF(fos, draw, width, height)
-      } finally {
+      finally
         fos.close()
-      }
 //    } else if (file.getName.toLowerCase.endsWith(".svg")) {
 //      try {
 //        writeSVG(fos,draw,width,height)
 //      } finally {
 //        fos.close()
 //      }
-    } else {
+    else
       throw new IOException(
           "Unrecognized file extension: should be png, svg, eps, or pdf")
-    }
-  }
 
   /**
     * Writes the given drawable to the given OutputStream at the given dpi,
@@ -60,7 +55,7 @@ object ExportGraphics {
                draw: Drawable,
                width: Int,
                height: Int,
-               dpi: Int = 72) {
+               dpi: Int = 72)
     import javax.imageio.ImageIO
     import java.awt.image.BufferedImage
 
@@ -76,12 +71,11 @@ object ExportGraphics {
     g2d.dispose
 
     ImageIO.write(image, "png", out)
-  }
 
   /**
     * Writes the given drawable to the given OutputStream formatted as eps.
     */
-  def writeEPS(out: OutputStream, draw: Drawable, width: Int, height: Int) {
+  def writeEPS(out: OutputStream, draw: Drawable, width: Int, height: Int)
     import org.apache.xmlgraphics.java2d.ps.EPSDocumentGraphics2D
     import org.apache.xmlgraphics.java2d.GraphicContext
 
@@ -90,20 +84,19 @@ object ExportGraphics {
     g2d.setupDocument(out, width, height)
     draw(g2d)
     g2d.finish()
-  }
 
   /**
     * Writes the given drawable to the given OutputStream formatted as pdf.
     * Contributed by Robby McKilliam.
     */
-  def writePDF(out: OutputStream, draw: Drawable, width: Int, height: Int) {
+  def writePDF(out: OutputStream, draw: Drawable, width: Int, height: Int)
     import com.lowagie.text.Document
     import com.lowagie.text.Rectangle
     import com.lowagie.text.pdf.PdfWriter
 
     val document = new Document()
 
-    try {
+    try
       document.setPageSize(new Rectangle(width, height))
       val writer = PdfWriter.getInstance(document, out)
       document.open()
@@ -117,10 +110,8 @@ object ExportGraphics {
       g2d.dispose()
 
       cb.addTemplate(tp, 1, 0, 0, 1, 0, 0)
-    } finally {
+    finally
       document.close()
-    }
-  }
 
 //  /**
 //   * Writes the given drawable to the given OutputStream formatted as svg.
@@ -138,4 +129,3 @@ object ExportGraphics {
 //    g2d.stream(new OutputStreamWriter(out, "UTF-8"), true)
 //    g2d.dispose()
 //  }
-}

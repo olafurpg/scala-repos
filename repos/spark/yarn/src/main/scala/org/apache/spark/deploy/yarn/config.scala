@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 import org.apache.spark.internal.config.ConfigBuilder
 import org.apache.spark.network.util.ByteUnit
 
-package object config {
+package object config
 
   /* Common app configuration. */
 
@@ -232,4 +232,3 @@ package object config {
   // of the executors
   private[spark] val SECONDARY_JARS = ConfigBuilder(
       "spark.yarn.secondary.jars").internal.stringConf.toSequence.optional
-}

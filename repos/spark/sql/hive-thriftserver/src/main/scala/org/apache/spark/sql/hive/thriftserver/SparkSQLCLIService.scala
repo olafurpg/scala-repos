@@ -38,9 +38,9 @@ import org.apache.spark.sql.hive.thriftserver.ReflectionUtils._
 
 private[hive] class SparkSQLCLIService(
     hiveServer: HiveServer2, hiveContext: HiveContext)
-    extends CLIService(hiveServer) with ReflectedCompositeService {
+    extends CLIService(hiveServer) with ReflectedCompositeService
 
-  override def init(hiveConf: HiveConf) {
+  override def init(hiveConf: HiveConf)
     setSuperField(this, "hiveConf", hiveConf)
 
     val sparkSqlSessionManager = new SparkSQLSessionManager(
@@ -49,36 +49,30 @@ private[hive] class SparkSQLCLIService(
     addService(sparkSqlSessionManager)
     var sparkServiceUGI: UserGroupInformation = null
 
-    if (UserGroupInformation.isSecurityEnabled) {
-      try {
+    if (UserGroupInformation.isSecurityEnabled)
+      try
         HiveAuthFactory.loginFromKeytab(hiveConf)
         sparkServiceUGI = Utils.getUGI()
         setSuperField(this, "serviceUGI", sparkServiceUGI)
-      } catch {
+      catch
         case e @ (_: IOException | _: LoginException) =>
           throw new ServiceException(
               "Unable to login to kerberos with given principal/keytab", e)
-      }
-    }
 
     initCompositeService(hiveConf)
-  }
 
   override def getInfo(
-      sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue = {
-    getInfoType match {
+      sessionHandle: SessionHandle, getInfoType: GetInfoType): GetInfoValue =
+    getInfoType match
       case GetInfoType.CLI_SERVER_NAME => new GetInfoValue("Spark SQL")
       case GetInfoType.CLI_DBMS_NAME => new GetInfoValue("Spark SQL")
       case GetInfoType.CLI_DBMS_VER =>
         new GetInfoValue(hiveContext.sparkContext.version)
       case _ => super.getInfo(sessionHandle, getInfoType)
-    }
-  }
-}
 
-private[thriftserver] trait ReflectedCompositeService {
+private[thriftserver] trait ReflectedCompositeService
   this: AbstractService =>
-  def initCompositeService(hiveConf: HiveConf) {
+  def initCompositeService(hiveConf: HiveConf)
     // Emulating `CompositeService.init(hiveConf)`
     val serviceList = getAncestorField[JList[Service]](this, 2, "serviceList")
     serviceList.asScala.foreach(_.init(hiveConf))
@@ -94,5 +88,3 @@ private[thriftserver] trait ReflectedCompositeService {
            "changeState",
            classOf[STATE] -> STATE.INITED)
     getAncestorField[Log](this, 3, "LOG").info(s"Service: $getName is inited.")
-  }
-}

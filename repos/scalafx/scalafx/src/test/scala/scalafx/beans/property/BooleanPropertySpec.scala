@@ -42,153 +42,134 @@ import scalafx.Includes._
   *
   */
 @RunWith(classOf[JUnitRunner])
-class BooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
+class BooleanPropertySpec extends FlatSpec with BeforeAndAfterEach
   val bean = new Object()
   var booleanProperty: jfxbp.BooleanProperty = null
   var booleanProperty2: jfxbp.BooleanProperty = null
   var booleanProperty3: jfxbp.BooleanProperty = null
   var sfxBooleanProperty: BooleanProperty = null
 
-  override def beforeEach() {
+  override def beforeEach()
     booleanProperty = new BooleanProperty(bean, "Test Boolean")
     booleanProperty2 = new BooleanProperty(bean, "Test Boolean 2")
     booleanProperty3 = new BooleanProperty(bean, "Test Boolean 3")
     sfxBooleanProperty = new BooleanProperty(bean, "Test SFX Boolean")
-  }
 
-  "A Boolean Property" should "have a default value of false" in {
+  "A Boolean Property" should "have a default value of false" in
     booleanProperty.value should be(false)
-  }
 
-  it should "be assignable using update" in {
+  it should "be assignable using update" in
     booleanProperty() = true
     booleanProperty.value should be(true)
-  }
 
-  it should "return its value using apply" in {
+  it should "return its value using apply" in
     booleanProperty() = true
     booleanProperty() should be(true)
-  }
 
-  it should "know its name" in {
+  it should "know its name" in
     booleanProperty.name should equal("Test Boolean")
-  }
 
-  it should "know its bean" in {
+  it should "know its bean" in
     booleanProperty.bean should equal(bean)
-  }
 
-  it should "be bindable to another Boolean Property" in {
+  it should "be bindable to another Boolean Property" in
     booleanProperty <== booleanProperty2
     booleanProperty2() = true
     booleanProperty() should be(true)
-  }
 
-  it should "support unbinding from another Boolean Property" in {
+  it should "support unbinding from another Boolean Property" in
     booleanProperty <== booleanProperty2
     booleanProperty2() = true
     booleanProperty.unbind()
     booleanProperty2() = false
     booleanProperty() should be(true)
-  }
 
-  it should "be bidirectionally bindable to another Boolean Property" in {
+  it should "be bidirectionally bindable to another Boolean Property" in
     booleanProperty <==> booleanProperty2
     booleanProperty() = true
     booleanProperty2() should be(true)
     booleanProperty2() = false
     booleanProperty() should be(false)
-  }
 
-  it should "support bidirectional unbinding from another Boolean Property" in {
+  it should "support bidirectional unbinding from another Boolean Property" in
     booleanProperty <==> booleanProperty2
     booleanProperty() = true
     booleanProperty unbind booleanProperty2
     booleanProperty() = false
     booleanProperty2() should be(true)
-  }
 
-  it should "support bindable infix equality (===) with a property" in {
+  it should "support bindable infix equality (===) with a property" in
     booleanProperty <== booleanProperty2 === booleanProperty3
     booleanProperty2() = true
     booleanProperty3() = false
     booleanProperty() should be(false)
     booleanProperty3() = true
     booleanProperty() should be(true)
-  }
 
-  it should "support bindable infix equality (===) with an sfx property" in {
+  it should "support bindable infix equality (===) with an sfx property" in
     booleanProperty <== booleanProperty2 === sfxBooleanProperty
     booleanProperty2() = true
     sfxBooleanProperty() = false
     booleanProperty() should be(false)
     sfxBooleanProperty() = true
     booleanProperty() should be(true)
-  }
 
-  it should "support bindable infix inequality (=!=) with a property" in {
+  it should "support bindable infix inequality (=!=) with a property" in
     booleanProperty <== booleanProperty2 =!= booleanProperty3
     booleanProperty2() = true
     booleanProperty3() = false
     booleanProperty() should be(true)
     booleanProperty3() = true
     booleanProperty() should be(false)
-  }
 
-  it should "support bindable infix inequality (=!=) with an sfx property" in {
+  it should "support bindable infix inequality (=!=) with an sfx property" in
     booleanProperty <== booleanProperty2 =!= sfxBooleanProperty
     booleanProperty2() = true
     sfxBooleanProperty() = false
     booleanProperty() should be(true)
     sfxBooleanProperty() = true
     booleanProperty() should be(false)
-  }
 
-  it should "support bindable infix and (&&) with a property" in {
+  it should "support bindable infix and (&&) with a property" in
     booleanProperty <== booleanProperty2 && booleanProperty3
     booleanProperty2() = true
     booleanProperty3() = false
     booleanProperty() should be(false)
     booleanProperty3() = true
     booleanProperty() should be(true)
-  }
 
-  it should "support bindable infix and (&&) with an sfx property" in {
+  it should "support bindable infix and (&&) with an sfx property" in
     booleanProperty <== booleanProperty2 && sfxBooleanProperty
     booleanProperty2() = true
     sfxBooleanProperty() = false
     booleanProperty() should be(false)
     sfxBooleanProperty() = true
     booleanProperty() should be(true)
-  }
 
-  it should "support bindable infix or (||) with a property" in {
+  it should "support bindable infix or (||) with a property" in
     booleanProperty <== booleanProperty2 || booleanProperty3
     booleanProperty2() = true
     booleanProperty3() = false
     booleanProperty() should be(true)
     booleanProperty2() = false
     booleanProperty() should be(false)
-  }
 
-  it should "support bindable infix or (||) with an sfx property" in {
+  it should "support bindable infix or (||) with an sfx property" in
     booleanProperty <== booleanProperty2 || sfxBooleanProperty
     booleanProperty2() = true
     sfxBooleanProperty() = false
     booleanProperty() should be(true)
     booleanProperty2() = false
     booleanProperty() should be(false)
-  }
 
-  it should "support bindable prefix not (!)" in {
+  it should "support bindable prefix not (!)" in
     booleanProperty <== !booleanProperty2
     booleanProperty2() = true
     booleanProperty() should be(false)
     booleanProperty2() = false
     booleanProperty() should be(true)
-  }
 
-  it should "do the right thing with order of operations" in {
+  it should "do the right thing with order of operations" in
     // order of operations should be ! > && > || > ==
     booleanProperty <== !booleanProperty3 === booleanProperty2 ||
     !booleanProperty2 && !booleanProperty3
@@ -204,25 +185,20 @@ class BooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
     booleanProperty2() = false
     booleanProperty3() = true
     booleanProperty() should be(true)
-  }
 
-  it should "support invalidate/change triggers on binding expressions" in {
+  it should "support invalidate/change triggers on binding expressions" in
     var invalidateCount = 0
     var changeCount = 0
     val binding = booleanProperty2 || booleanProperty3
-    binding onInvalidate {
+    binding onInvalidate
       invalidateCount += 1
-    }
-    binding onChange {
+    binding onChange
       changeCount += 1
-    }
     booleanProperty2() = true
     invalidateCount should equal(1)
     changeCount should equal(1)
     booleanProperty3() = true
     invalidateCount should equal(1)
     changeCount should equal(1)
-  }
 
   it should "support comparison starting with boolean constants" is (pending)
-}

@@ -9,7 +9,7 @@ import org.junit.experimental.categories.Category
   */
 @Category(Array(classOf[SlowTests]))
 class ScalazHighlightingPerformanceTest
-    extends PerformanceSbtProjectHighlightingTestBase {
+    extends PerformanceSbtProjectHighlightingTestBase
   override protected def getExternalSystemConfigFileName: String =
     "project/build.scala"
 
@@ -28,4 +28,3 @@ class ScalazHighlightingPerformanceTest
     doTest("Foldable.scala", 6.seconds)
 
   def testIListScalazPerformance(): Unit = doTest("IList.scala", 6.seconds)
-}

@@ -1,3 +1,2 @@
-class Client {
+class Client
   Macro()
-}

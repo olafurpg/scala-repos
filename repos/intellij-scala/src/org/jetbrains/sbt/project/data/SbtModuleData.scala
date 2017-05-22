@@ -13,8 +13,7 @@ class SbtModuleData(val owner: ProjectSystemId,
                     val resolvers: Set[SbtResolver])
     extends AbstractExternalEntityData(owner)
 
-object SbtModuleData {
+object SbtModuleData
   val Key: Key[SbtModuleData] = new Key(
       classOf[SbtModuleData].getName,
       ProjectKeys.MODULE.getProcessingWeight + 1)
-}

@@ -15,48 +15,40 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  * ClassParamClause ::= [nl] '(' 'implicit' ClassParam {',' ClassParam} ')'
  */
 
-object ImplicitClassParamClause {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ImplicitClassParamClause
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val classParamMarker = builder.mark
-    if (builder.twoNewlinesBeforeCurrentToken) {
+    if (builder.twoNewlinesBeforeCurrentToken)
       classParamMarker.rollbackTo()
       return false
-    }
     //Look for '('
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLPARENTHESIS =>
         builder.advanceLexer //Ate '('
         builder.disableNewlines
         //Look for implicit
-        builder.getTokenType match {
-          case ScalaTokenTypes.kIMPLICIT => {
+        builder.getTokenType match
+          case ScalaTokenTypes.kIMPLICIT =>
               //It's ok
               builder.advanceLexer //Ate implicit
-            }
-          case _ => {
+          case _ =>
               builder error ErrMsg("wrong.parameter")
-            }
-        }
         //ok, let's parse parameters
-        if (!(ClassParam parse builder)) {
+        if (!(ClassParam parse builder))
           classParamMarker.rollbackTo
           builder.restoreNewlinesState
           return false
-        }
-        while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
+        while (builder.getTokenType == ScalaTokenTypes.tCOMMA)
           builder.advanceLexer //Ate ,
-          if (!(ClassParam parse builder)) {
+          if (!(ClassParam parse builder))
             classParamMarker.rollbackTo
             builder.restoreNewlinesState
             return false
-          }
-        }
       case _ =>
         classParamMarker.rollbackTo
         return false
-    }
     //Look for ')'
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tRPARENTHESIS =>
         builder.advanceLexer //Ate )
         builder.restoreNewlinesState
@@ -66,6 +58,3 @@ object ImplicitClassParamClause {
         builder.restoreNewlinesState
         classParamMarker.rollbackTo
         return false
-    }
-  }
-}

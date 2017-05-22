@@ -22,33 +22,27 @@ package muspelheim
 
 import com.precog.yggdrasil._
 
-trait NormalizationSpecs extends EvalStackSpecs {
+trait NormalizationSpecs extends EvalStackSpecs
   import stack._
 
-  def summaryHeight(obj: Map[String, SValue]) = {
-    obj("count") must beLike {
+  def summaryHeight(obj: Map[String, SValue]) =
+    obj("count") must beLike
       case SDecimal(d) =>
         d.toDouble mustEqual 993
-    }
-    obj("mean") must beLike {
+    obj("mean") must beLike
       case SDecimal(d) =>
         d.toDouble mustEqual 176.4370594159114
-    }
-    obj("min") must beLike {
+    obj("min") must beLike
       case SDecimal(d) =>
         d.toDouble mustEqual 140
-    }
-    obj("max") must beLike {
+    obj("max") must beLike
       case SDecimal(d) =>
         d.toDouble mustEqual 208
-    }
-    obj("stdDev") must beLike {
+    obj("stdDev") must beLike
       case SDecimal(d) =>
         d.toDouble mustEqual 11.56375193112367
-    }
-  }
 
-  "find simple summary" in {
+  "find simple summary" in
     val input = """
       | medals := //summer_games/london_medals
       | summary(medals.HeightIncm)
@@ -58,29 +52,25 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveSize(1)
 
-    result must haveAllElementsLike {
-      case (ids, SObject(model)) => {
+    result must haveAllElementsLike
+      case (ids, SObject(model)) =>
           ids must haveSize(0)
           model.keySet mustEqual Set("model1")
 
           val SObject(obj) = model("model1")
 
           summaryHeight(obj)
-        }
       case _ => ko
-    }
-  }
 
-  "return empty set when summary called on non-numeric data" in {
+  "return empty set when summary called on non-numeric data" in
     val input = """
       | medals := //summer_games/london_medals
       | summary(medals.Sport)
     """.stripMargin
 
     evalE(input) must beEmpty
-  }
 
-  "find summary and another reduction on the same dataset" in {
+  "find summary and another reduction on the same dataset" in
     val input =
       """
       | medals := //summer_games/london_medals
@@ -92,29 +82,24 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveSize(1)
 
-    result must haveAllElementsLike {
-      case (ids, SObject(obj)) => {
+    result must haveAllElementsLike
+      case (ids, SObject(obj)) =>
           ids must haveSize(0)
 
           summaryHeight(obj)
 
-          obj("sqVariance") must beLike {
+          obj("sqVariance") must beLike
             case SDecimal(d) =>
               d.toDouble mustEqual 17881.13433742673
-          }
-        }
       case _ => ko
-    }
-  }
 
-  def makeObject(query: String): Map[String, SValue] = {
+  def makeObject(query: String): Map[String, SValue] =
     val result =
       evalE(query) collect { case (_, SObject(values)) => values("model1") }
     val SObject(obj) = result.head
     obj
-  }
 
-  "find summary of arrays, objects, and values" in {
+  "find summary of arrays, objects, and values" in
     val input = """
       | medals := //summer_games/london_medals
       | height := { height: medals.HeightIncm }
@@ -148,37 +133,31 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveSize(1)
 
-    result must haveAllElementsLike {
-      case (ids, SObject(models)) => {
+    result must haveAllElementsLike
+      case (ids, SObject(models)) =>
           ids must haveSize(0)
           models.keySet mustEqual Set("model1", "model2", "model3")
 
-          def testModels(sv: SValue) = sv must beLike {
-            case SObject(model) if model.keySet == Set("height") => {
+          def testModels(sv: SValue) = sv must beLike
+            case SObject(model) if model.keySet == Set("height") =>
                 val SObject(summary) = model("height")
                 summary mustEqual heightResult
-              }
 
             case SObject(summary) =>
               summary mustEqual ageResult
 
-            case SArray(model) => {
+            case SArray(model) =>
                 model must haveSize(1)
                 val SObject(summary) = model(0)
                 summary mustEqual weightResult
-              }
 
             case _ => ko
-          }
 
           testModels(models("model1"))
           testModels(models("model2"))
           testModels(models("model3"))
-        }
-    }
-  }
 
-  "find summary with object" in {
+  "find summary with object" in
     val input =
       """
       | medals := //summer_games/london_medals
@@ -233,19 +212,18 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     result must haveSize(1)
 
-    def makeObject(query: String): Map[String, SValue] = {
+    def makeObject(query: String): Map[String, SValue] =
       val result =
         evalE(query) collect { case (_, SObject(values)) => values("model1") }
       val SObject(obj) = result.head
       obj
-    }
 
     val obj1 = makeObject(schema1)
     val obj2 = makeObject(schema2)
     val obj3 = makeObject(schema3)
     val obj4 = makeObject(schema4)
 
-    def testModel(model: SValue) = {
+    def testModel(model: SValue) =
       val SObject(obj) = model
 
       if (Set("age", "height", "weight").subsetOf(obj.keySet))
@@ -254,10 +232,9 @@ trait NormalizationSpecs extends EvalStackSpecs {
       else if (Set("age", "weight").subsetOf(obj.keySet)) obj mustEqual obj3
       else if (Set("age").subsetOf(obj.keySet)) obj mustEqual obj1
       else ko
-    }
 
-    result must haveAllElementsLike {
-      case (ids, SObject(models)) => {
+    result must haveAllElementsLike
+      case (ids, SObject(models)) =>
           ids must haveSize(0)
           models.keySet mustEqual Set("model1", "model2", "model3", "model4")
 
@@ -265,13 +242,10 @@ trait NormalizationSpecs extends EvalStackSpecs {
           testModel(models("model2"))
           testModel(models("model3"))
           testModel(models("model4"))
-        }
 
       case _ => ko
-    }
-  }
 
-  "find summary with object (2)" in {
+  "find summary with object (2)" in
     val input =
       """
       | medals := //summer_games/london_medals
@@ -317,9 +291,8 @@ trait NormalizationSpecs extends EvalStackSpecs {
       expected0 collect { case (ids, value) if ids.size == 1 => value }
 
     result mustEqual expected
-  }
 
-  "normalize data in simple case" in {
+  "normalize data in simple case" in
     val input = """
       | medals := //summer_games/london_medals
       | height := { HeightIncm: medals.HeightIncm }
@@ -341,19 +314,16 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val expected = evalE(expectedInput)
 
     val resultValues =
-      result collect {
+      result collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     val expectedValues =
-      expected collect {
+      expected collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     resultValues mustEqual expectedValues
-  }
 
-  "return empty set when there exists fields in summary not present in data" in {
+  "return empty set when there exists fields in summary not present in data" in
     val input =
       """
       | medals := //summer_games/london_medals
@@ -363,9 +333,8 @@ trait NormalizationSpecs extends EvalStackSpecs {
     """.stripMargin
 
     evalE(input) must beEmpty
-  }
 
-  "normalize data with multiple fields" in {
+  "normalize data with multiple fields" in
     val input =
       """
       | medals := //summer_games/london_medals
@@ -410,19 +379,16 @@ trait NormalizationSpecs extends EvalStackSpecs {
     expected.size mustEqual result.size
 
     val resultValues =
-      result collect {
+      result collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     val expectedValues =
-      expected collect {
+      expected collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     resultValues mustEqual expectedValues
-  }
 
-  "join normalize data with original data" in {
+  "join normalize data with original data" in
     val input = """
       | medals := //summer_games/london_medals
       | height := { HeightIncm: medals.HeightIncm }
@@ -445,19 +411,16 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val expected = evalE(expectedInput)
 
     val resultValues =
-      result collect {
+      result collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     val expectedValues =
-      expected collect {
+      expected collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     resultValues mustEqual expectedValues
-  }
 
-  "return empty set when normalizing and denormalizing when mean or stdDev is missing" in {
+  "return empty set when normalizing and denormalizing when mean or stdDev is missing" in
     val inputNorm = """
       | medals := //summer_games/london_medals
       | height := { HeightIncm: medals.HeightIncm }
@@ -476,9 +439,8 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     resultNorm must beEmpty
     resultDenorm must beEmpty
-  }
 
-  "return empty set when normalizing and denormalizing with non-present schema" in {
+  "return empty set when normalizing and denormalizing with non-present schema" in
     val inputNorm =
       """
       | medals := //summer_games/london_medals
@@ -498,9 +460,8 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     resultNorm must beEmpty
     resultDenorm must beEmpty
-  }
 
-  "denormalize normalized data" in {
+  "denormalize normalized data" in
     val input = """
       | medals := //summer_games/london_medals
       | height := { HeightIncm: medals.HeightIncm }
@@ -521,19 +482,16 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val expected = evalE(expectedInput)
 
     val resultValues =
-      result collect {
+      result collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     val expectedValues =
-      expected collect {
+      expected collect
         case (ids, value) if ids.size == 1 => value
-      }
 
     resultValues mustEqual expectedValues
-  }
 
-  "denormalize normalized data and join with original data" in {
+  "denormalize normalized data and join with original data" in
     val input =
       """
       | medals := //summer_games/london_medals
@@ -549,19 +507,16 @@ trait NormalizationSpecs extends EvalStackSpecs {
 
     val result = evalE(input)
 
-    result must haveAllElementsLike {
-      case (ids, SObject(obj)) => {
+    result must haveAllElementsLike
+      case (ids, SObject(obj)) =>
           ids must haveSize(1)
           obj.keySet mustEqual Set("originalHeight", "HeightIncm")
 
           obj("originalHeight") mustEqual obj("HeightIncm")
-        }
 
       case _ => ko
-    }
-  }
 
-  "denormalize normalized data after clustering" in {
+  "denormalize normalized data after clustering" in
     val input =
       """
       | conversions := //conversions
@@ -584,30 +539,24 @@ trait NormalizationSpecs extends EvalStackSpecs {
     val clusterIds = (1 to 10) map { "cluster" + _.toString }
 
     def clusterSchema(obj: Map[String, SValue],
-                      clusterId: String): Set[String] = obj(clusterId) match {
+                      clusterId: String): Set[String] = obj(clusterId) match
       case SObject(ctr) => ctr.keySet
       case _ => sys.error("malformed SObject")
-    }
 
-    result must haveAllElementsLike {
+    result must haveAllElementsLike
       case (ids, SObject(elems)) =>
         ids must haveSize(0)
         elems.keySet mustEqual Set("model1")
 
-        elems("model1") must beLike {
+        elems("model1") must beLike
           case SObject(clusters) =>
             clusters must haveSize(10)
             clusters.keySet mustEqual clusterIds.toSet
 
-            val checkClusters = clusterIds.forall { clusterId =>
+            val checkClusters = clusterIds.forall  clusterId =>
               clusterSchema(clusters, clusterId) == Set("age", "income")
-            }
 
             if (checkClusters) ok
             else ko
-        }
 
       case _ => ko
-    }
-  }
-}

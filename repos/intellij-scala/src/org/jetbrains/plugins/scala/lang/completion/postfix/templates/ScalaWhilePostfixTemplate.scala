@@ -12,7 +12,6 @@ class ScalaWhilePostfixTemplate
     extends ScalaStringBasedPostfixTemplate(
         "while",
         "while (expr) {}",
-        new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost)) {
+        new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost))
   override def getTemplateString(element: PsiElement): String =
     "while ($expr$) {\n$END$\n}"
-}

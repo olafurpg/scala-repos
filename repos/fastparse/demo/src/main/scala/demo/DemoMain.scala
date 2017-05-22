@@ -8,9 +8,9 @@ import scala.scalajs.js
 import scala.scalajs.js.annotation.JSExport
 
 @JSExport
-object DemoMain {
+object DemoMain
   @JSExport
-  def scalaparser(container: html.Div) = {
+  def scalaparser(container: html.Div) =
     val example = """
         |package scalaparser
         |
@@ -23,19 +23,16 @@ object DemoMain {
         |  }
         |}""".stripMargin
     helper(container, scalaparse.Scala.CompilationUnit, example)
-  }
   @JSExport
-  def math(container: html.Div) = {
+  def math(container: html.Div) =
     helper(container, fastparse.MathTests.expr, "((1+1*2)+(3*4*5))/3")
-  }
   @JSExport
-  def whitespaceMath(container: html.Div) = {
+  def whitespaceMath(container: html.Div) =
     helper(container,
            fastparse.WhiteSpaceMathTests.expr,
            "  (  (  1+1  * 2   ) +( 3* 4  *5  )  )/3")
-  }
   @JSExport
-  def indentation(container: html.Div) = {
+  def indentation(container: html.Div) =
     helper(
         container,
         fastparse.IndentationTests.expr,
@@ -50,9 +47,8 @@ object DemoMain {
         |    4
         |    5""".stripMargin
     )
-  }
   @JSExport
-  def json(container: html.Div) = {
+  def json(container: html.Div) =
     helper(container,
            fastparse.JsonTests.jsonExpr,
            """{
@@ -76,8 +72,7 @@ object DemoMain {
         |      }
         |  ]
         |}""".stripMargin)
-  }
-  def helper(container: html.Div, parser: Parser[_], default: String) = {
+  def helper(container: html.Div, parser: Parser[_], default: String) =
     import scalatags.JsDom.all._
     val inputBox = textarea(
         width := "45%",
@@ -89,9 +84,9 @@ object DemoMain {
 
     val outputBox = div(width := "45%", float.right, overflowX.scroll).render
 
-    def recalc() = {
+    def recalc() =
       inputBox.rows = inputBox.value.lines.length
-      val details = parser.parse(inputBox.value) match {
+      val details = parser.parse(inputBox.value) match
         case s: Parsed.Success[_] =>
           table(
               width := "100%",
@@ -110,13 +105,9 @@ object DemoMain {
               tr(td("found:"), td("...", code(pretty))),
               tr(td("expected:"), td(code(lastParser.toString)))
           )
-      }
       outputBox.innerHTML = ""
       outputBox.appendChild(details.render)
-    }
     recalc()
     inputBox.onkeyup = (e: dom.Event) => recalc()
 
     container.appendChild(div(inputBox, outputBox, div(clear.both)).render)
-  }
-}

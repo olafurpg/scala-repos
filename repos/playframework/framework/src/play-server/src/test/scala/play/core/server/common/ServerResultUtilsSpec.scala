@@ -11,10 +11,10 @@ import play.api.http.HeaderNames._
 import play.api.libs.iteratee._
 import scala.concurrent.{Future, Promise}
 
-object ServerResultUtilsSpec extends Specification with IterateeSpecification {
+object ServerResultUtilsSpec extends Specification with IterateeSpecification
 
   case class CookieRequestHeader(cookie: Option[(String, String)])
-      extends RequestHeader {
+      extends RequestHeader
     def id = 1
     def tags = Map()
     def uri = ""
@@ -27,11 +27,10 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
     override def clientCertificateChain = None
     val headers = new Headers(
         cookie.map { case (name, value) => "Cookie" -> s"$name=$value" }.toSeq)
-  }
 
-  "ServerResultUtils.cleanFlashCookie" should {
+  "ServerResultUtils.cleanFlashCookie" should
     def flashCookieResult(cookie: Option[(String, String)],
-                          result: Result): Option[Seq[Cookie]] = {
+                          result: Result): Option[Seq[Cookie]] =
       val rh = CookieRequestHeader(cookie)
       ServerResultUtils
         .cleanFlashCookie(rh, result)
@@ -39,52 +38,38 @@ object ServerResultUtilsSpec extends Specification with IterateeSpecification {
         .headers
         .get("Set-Cookie")
         .map(Cookies.decodeSetCookieHeader)
-    }
 
-    "do nothing when flash not present" in {
+    "do nothing when flash not present" in
       flashCookieResult(None, Ok) must beNone
-    }
-    "send flash if new" in {
-      flashCookieResult(None, Ok.flashing("a" -> "b")) must beSome {
+    "send flash if new" in
+      flashCookieResult(None, Ok.flashing("a" -> "b")) must beSome
         cookies: Seq[Cookie] =>
           cookies.length must_== 1
           val cookie = cookies(0)
           cookie.name must_== "PLAY_FLASH"
           cookie.value must_== "a=b"
-      }
-    }
-    "clear flash when received" in {
-      flashCookieResult(Some("PLAY_FLASH" -> "\"a=b\"; Path=/"), Ok) must beSome {
+    "clear flash when received" in
+      flashCookieResult(Some("PLAY_FLASH" -> "\"a=b\"; Path=/"), Ok) must beSome
         cookies: Seq[Cookie] =>
           cookies.length must_== 1
           val cookie = cookies(0)
           cookie.name must_== "PLAY_FLASH"
           cookie.value must_== ""
-      }
-    }
-    "leave other cookies untouched when clearing" in {
+    "leave other cookies untouched when clearing" in
       flashCookieResult(
           Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
-          Ok.withCookies(Cookie("cookie", "value"))) must beSome {
+          Ok.withCookies(Cookie("cookie", "value"))) must beSome
         cookies: Seq[Cookie] =>
           cookies.length must_== 2
-          cookies.find(_.name == "PLAY_FLASH") must beSome.like {
+          cookies.find(_.name == "PLAY_FLASH") must beSome.like
             case cookie => cookie.value must_== ""
-          }
-          cookies.find(_.name == "cookie") must beSome.like {
+          cookies.find(_.name == "cookie") must beSome.like
             case cookie => cookie.value must_== "value"
-          }
-      }
-    }
-    "clear old flash value when different value sent" in {
+    "clear old flash value when different value sent" in
       flashCookieResult(Some("PLAY_FLASH" -> "\"a=b\"; Path=/"),
-                        Ok.flashing("c" -> "d")) must beSome {
+                        Ok.flashing("c" -> "d")) must beSome
         cookies: Seq[Cookie] =>
           cookies.length must_== 1
           val cookie = cookies(0)
           cookie.name must_== "PLAY_FLASH"
           cookie.value must_== "c=d"
-      }
-    }
-  }
-}

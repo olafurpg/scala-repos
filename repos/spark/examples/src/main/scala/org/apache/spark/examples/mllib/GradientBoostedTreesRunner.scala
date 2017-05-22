@@ -36,7 +36,7 @@ import org.apache.spark.util.Utils
   * Note: This script treats all features as real-valued (not categorical).
   *       To include categorical features, modify categoricalFeaturesInfo.
   */
-object GradientBoostedTreesRunner {
+object GradientBoostedTreesRunner
 
   case class Params(input: String = null,
                     testInput: String = "",
@@ -47,10 +47,10 @@ object GradientBoostedTreesRunner {
                     fracTest: Double = 0.2)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("GradientBoostedTrees") {
+    val parser = new OptionParser[Params]("GradientBoostedTrees")
       head("GradientBoostedTrees: an example decision tree app.")
       opt[String]("algo")
         .text(
@@ -79,27 +79,21 @@ object GradientBoostedTreesRunner {
         .text("input path to labeled examples")
         .required()
         .action((x, c) => c.copy(input = x))
-      checkConfig { params =>
-        if (params.fracTest < 0 || params.fracTest > 1) {
+      checkConfig  params =>
+        if (params.fracTest < 0 || params.fracTest > 1)
           failure(
               s"fracTest ${params.fracTest} value incorrect; should be in [0,1].")
-        } else {
+        else
           success
-        }
-      }
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
 
     val conf =
       new SparkConf().setAppName(s"GradientBoostedTreesRunner with $params")
@@ -122,39 +116,34 @@ object GradientBoostedTreesRunner {
     boostingStrategy.treeStrategy.maxDepth = params.maxDepth
 
     val randomSeed = Utils.random.nextInt()
-    if (params.algo == "Classification") {
+    if (params.algo == "Classification")
       val startTime = System.nanoTime()
       val model = GradientBoostedTrees.train(training, boostingStrategy)
       val elapsedTime = (System.nanoTime() - startTime) / 1e9
       println(s"Training time: $elapsedTime seconds")
-      if (model.totalNumNodes < 30) {
+      if (model.totalNumNodes < 30)
         println(model.toDebugString) // Print full model.
-      } else {
+      else
         println(model) // Print model summary.
-      }
       val trainAccuracy = new MulticlassMetrics(
           training.map(lp => (model.predict(lp.features), lp.label))).precision
       println(s"Train accuracy = $trainAccuracy")
       val testAccuracy = new MulticlassMetrics(
           test.map(lp => (model.predict(lp.features), lp.label))).precision
       println(s"Test accuracy = $testAccuracy")
-    } else if (params.algo == "Regression") {
+    else if (params.algo == "Regression")
       val startTime = System.nanoTime()
       val model = GradientBoostedTrees.train(training, boostingStrategy)
       val elapsedTime = (System.nanoTime() - startTime) / 1e9
       println(s"Training time: $elapsedTime seconds")
-      if (model.totalNumNodes < 30) {
+      if (model.totalNumNodes < 30)
         println(model.toDebugString) // Print full model.
-      } else {
+      else
         println(model) // Print model summary.
-      }
       val trainMSE = DecisionTreeRunner.meanSquaredError(model, training)
       println(s"Train mean squared error = $trainMSE")
       val testMSE = DecisionTreeRunner.meanSquaredError(model, test)
       println(s"Test mean squared error = $testMSE")
-    }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

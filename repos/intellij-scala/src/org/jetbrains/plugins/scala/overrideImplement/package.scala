@@ -7,6 +7,5 @@ import com.intellij.psi.PsiDocCommentOwner
   * Nikolay.Tropin
   * 2014-03-25
   */
-package object overrideImplement {
+package object overrideImplement
   type ClassMember = PsiElementClassMember[_ <: PsiDocCommentOwner]
-}

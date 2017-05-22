@@ -10,19 +10,19 @@ import lila.analyse.AnalysisRepo
 final class Analyser(repo: FishnetRepo,
                      uciMemo: UciMemo,
                      sequencer: lila.hub.FutureSequencer,
-                     limiter: Limiter) {
+                     limiter: Limiter)
 
   val maxPlies = 200
 
   def apply(game: Game, sender: Work.Sender): Fu[Boolean] =
-    AnalysisRepo exists game.id flatMap {
+    AnalysisRepo exists game.id flatMap
       case true => fuccess(false)
       case false =>
-        limiter(sender) flatMap { accepted =>
-          accepted ?? {
-            makeWork(game, sender) flatMap { work =>
-              sequencer {
-                repo getSimilarAnalysis work flatMap {
+        limiter(sender) flatMap  accepted =>
+          accepted ??
+            makeWork(game, sender) flatMap  work =>
+              sequencer
+                repo getSimilarAnalysis work flatMap
                   // already in progress, do nothing
                   case Some(similar) if similar.isAcquired => funit
                   // queued by system, reschedule for the human sender
@@ -33,22 +33,15 @@ final class Analyser(repo: FishnetRepo,
                   case Some(similar) => funit
                   // first request, store
                   case _ => repo addAnalysis work
-                }
-              }
-            }
-          } inject accepted
-        }
-    }
+          inject accepted
 
   def apply(gameId: String, sender: Work.Sender): Fu[Boolean] =
-    GameRepo game gameId flatMap {
-      _ ?? { game =>
+    GameRepo game gameId flatMap
+      _ ??  game =>
         apply(game, sender)
-      }
-    }
 
   private def makeWork(game: Game, sender: Work.Sender): Fu[Work.Analysis] =
-    GameRepo.initialFen(game) zip uciMemo.get(game) map {
+    GameRepo.initialFen(game) zip uciMemo.get(game) map
       case (initialFen, moves) =>
         Work.Analysis(
             _id = Work.makeId,
@@ -62,5 +55,3 @@ final class Analyser(repo: FishnetRepo,
             tries = 0,
             acquired = None,
             createdAt = DateTime.now)
-    }
-}

@@ -1,3 +1,2 @@
-object Bippy {
+object Bippy
   def bippy = "bippy!"
-}

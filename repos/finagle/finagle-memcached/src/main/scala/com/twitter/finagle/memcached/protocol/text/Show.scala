@@ -9,7 +9,7 @@ import org.jboss.netty.channel._
 /**
   * Used by the server.
   */
-class ResponseToEncoding extends OneToOneEncoder {
+class ResponseToEncoding extends OneToOneEncoder
   private[this] val ZERO = Buf.Utf8("0")
   private[this] val VALUE = Buf.Utf8("VALUE")
 
@@ -21,7 +21,7 @@ class ResponseToEncoding extends OneToOneEncoder {
 
   def encode(
       ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
-    message match {
+    message match
       case Stored() => Tokens(Seq(STORED))
       case NotStored() => Tokens(Seq(NOT_STORED))
       case Exists() => Tokens(Seq(EXISTS))
@@ -34,28 +34,24 @@ class ResponseToEncoding extends OneToOneEncoder {
         Tokens(formatted.map { Buf.ByteArray.Owned(_) })
       case InfoLines(lines) =>
         val statLines =
-          lines map { line =>
+          lines map  line =>
             val key = line.key
             val values = line.values
             Tokens(Seq(key) ++ values)
-          }
         StatLines(statLines)
       case Values(values) =>
         val tokensWithData =
-          values map {
+          values map
             case Value(key, value, casUnique, Some(flags)) =>
               TokensWithData(Seq(VALUE, key, flags), value, casUnique)
             case Value(key, value, casUnique, None) =>
               TokensWithData(Seq(VALUE, key, ZERO), value, casUnique)
-          }
         ValueLines(tokensWithData)
-    }
-}
 
 /**
   * Used by the client.
   */
-class CommandToEncoding extends OneToOneEncoder {
+class CommandToEncoding extends OneToOneEncoder
   private[this] val GET = Buf.Utf8("get")
   private[this] val GETS = Buf.Utf8("gets")
   private[this] val DELETE = Buf.Utf8("delete")
@@ -82,7 +78,7 @@ class CommandToEncoding extends OneToOneEncoder {
 
   def encode(
       ctx: ChannelHandlerContext, ch: Channel, message: AnyRef): Decoding =
-    message match {
+    message match
       case Add(key, flags, expiry, value) =>
         TokensWithData(
             Seq(ADD, key, intToUtf8(flags), intToUtf8(expiry.inSeconds)),
@@ -128,17 +124,13 @@ class CommandToEncoding extends OneToOneEncoder {
       case Stats(args) => Tokens(STATS +: args)
       case Quit() =>
         Tokens(Seq(QUIT))
-    }
-}
 
-class ExceptionHandler extends SimpleChannelUpstreamHandler {
-  override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) = {
+class ExceptionHandler extends SimpleChannelUpstreamHandler
+  override def exceptionCaught(ctx: ChannelHandlerContext, e: ExceptionEvent) =
     val formatted = ExceptionHandler.formatWithEol(e.getCause)
     Channels.write(ctx.getChannel, ChannelBuffers.copiedBuffer(formatted: _*))
-  }
-}
 
-object ExceptionHandler {
+object ExceptionHandler
   private val DELIMITER = "\r\n".getBytes
   private val ERROR = "ERROR".getBytes
   private val CLIENT_ERROR = "CLIENT_ERROR".getBytes
@@ -146,13 +138,12 @@ object ExceptionHandler {
   private val SPACE = " ".getBytes
   private val Newlines = "[\\r\\n]".r
 
-  def formatWithEol(e: Throwable) = format(e) match {
+  def formatWithEol(e: Throwable) = format(e) match
     case head :: Nil => Seq(head, DELIMITER)
     case head :: tail :: Nil => Seq(head, SPACE, tail, DELIMITER)
     case _ => throw e
-  }
 
-  def format(e: Throwable) = e match {
+  def format(e: Throwable) = e match
     case e: NonexistentCommand =>
       Seq(ERROR)
     case e: ClientError =>
@@ -161,5 +152,3 @@ object ExceptionHandler {
       Seq(SERVER_ERROR, Newlines.replaceAllIn(e.getMessage, " ").getBytes)
     case t =>
       throw t
-  }
-}

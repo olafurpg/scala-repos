@@ -13,21 +13,20 @@ import akka.routing.Pool
 import akka.remote.routing.RemoteRouterConfig
 
 @SerialVersionUID(1L)
-final case class RemoteScope(node: Address) extends Scope {
+final case class RemoteScope(node: Address) extends Scope
   def withFallback(other: Scope): Scope = this
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class RemoteDeployer(
     _settings: ActorSystem.Settings, _pm: DynamicAccess)
-    extends Deployer(_settings, _pm) {
-  override def parseConfig(path: String, config: Config): Option[Deploy] = {
+    extends Deployer(_settings, _pm)
+  override def parseConfig(path: String, config: Config): Option[Deploy] =
 
-    super.parseConfig(path, config) match {
+    super.parseConfig(path, config) match
       case d @ Some(deploy) ⇒
-        deploy.config.getString("remote") match {
+        deploy.config.getString("remote") match
           case AddressFromURIString(r) ⇒
             Some(deploy.copy(scope = RemoteScope(r)))
           case str if !str.isEmpty ⇒
@@ -39,14 +38,9 @@ private[akka] class RemoteDeployer(
                 .map(AddressFromURIString(_))
             if (nodes.isEmpty || deploy.routerConfig == NoRouter) d
             else
-              deploy.routerConfig match {
+              deploy.routerConfig match
                 case r: Pool ⇒
                   Some(
                       deploy.copy(routerConfig = RemoteRouterConfig(r, nodes)))
                 case _ ⇒ d
-              }
-        }
       case None ⇒ None
-    }
-  }
-}

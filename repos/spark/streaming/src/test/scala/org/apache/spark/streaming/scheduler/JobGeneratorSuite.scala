@@ -28,7 +28,7 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming._
 import org.apache.spark.util.{ManualClock, Utils}
 
-class JobGeneratorSuite extends TestSuiteBase {
+class JobGeneratorSuite extends TestSuiteBase
 
   // SPARK-6222 is a tricky regression bug which causes received block metadata
   // to be deleted before the corresponding batch has completed. This occurs when
@@ -56,7 +56,7 @@ class JobGeneratorSuite extends TestSuiteBase {
   // 4. allow subsequent batches to be generated (to allow premature deletion of 3rd batch metadata)
   // 5. verify whether 3rd batch's block metadata still exists
   //
-  test("SPARK-6222: Do not clear received block data too soon") {
+  test("SPARK-6222: Do not clear received block data too soon")
     import JobGeneratorSuite._
     val checkpointDir = Utils.createTempDir()
     val testConf = conf
@@ -64,7 +64,7 @@ class JobGeneratorSuite extends TestSuiteBase {
         "spark.streaming.clock", "org.apache.spark.streaming.util.ManualClock")
     testConf.set("spark.streaming.receiver.writeAheadLog.rollingInterval", "1")
 
-    withStreamingContext(new StreamingContext(testConf, batchDuration)) {
+    withStreamingContext(new StreamingContext(testConf, batchDuration))
       ssc =>
         val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
         val numBatches = 10
@@ -76,13 +76,10 @@ class JobGeneratorSuite extends TestSuiteBase {
 
         inputStream.foreachRDD(
             (rdd: RDD[Int], time: Time) =>
-              {
-            if (time.milliseconds == longBatchTime) {
-              while (waitLatch.getCount() > 0) {
+            if (time.milliseconds == longBatchTime)
+              while (waitLatch.getCount() > 0)
                 waitLatch.await()
-              }
-            }
-        })
+        )
 
         val batchCounter = new BatchCounter(ssc)
         ssc.checkpoint(checkpointDir.getAbsolutePath)
@@ -93,48 +90,37 @@ class JobGeneratorSuite extends TestSuiteBase {
         val receiverTracker = ssc.scheduler.receiverTracker
 
         // Get the blocks belonging to a batch
-        def getBlocksOfBatch(batchTime: Long): Seq[ReceivedBlockInfo] = {
+        def getBlocksOfBatch(batchTime: Long): Seq[ReceivedBlockInfo] =
           receiverTracker.getBlocksOfBatchAndStream(Time(batchTime),
                                                     inputStream.id)
-        }
 
         // Wait for new blocks to be received
-        def waitForNewReceivedBlocks() {
-          eventually(testTimeout) {
+        def waitForNewReceivedBlocks()
+          eventually(testTimeout)
             assert(receiverTracker.hasUnallocatedBlocks)
-          }
-        }
 
         // Wait for received blocks to be allocated to a batch
-        def waitForBlocksToBeAllocatedToBatch(batchTime: Long) {
-          eventually(testTimeout) {
+        def waitForBlocksToBeAllocatedToBatch(batchTime: Long)
+          eventually(testTimeout)
             assert(getBlocksOfBatch(batchTime).nonEmpty)
-          }
-        }
 
         // Generate a large number of batches with blocks in them
-        for (batchNum <- 1 to numBatches) {
+        for (batchNum <- 1 to numBatches)
           waitForNewReceivedBlocks()
           clock.advance(batchDuration.milliseconds)
           waitForBlocksToBeAllocatedToBatch(clock.getTimeMillis())
-        }
 
         // Wait for 3rd batch to start
-        eventually(testTimeout) {
+        eventually(testTimeout)
           ssc.scheduler
             .getPendingTimes()
             .contains(Time(numBatches * batchDuration.milliseconds))
-        }
 
         // Verify that the 3rd batch's block data is still present while the 3rd batch is incomplete
         assert(getBlocksOfBatch(longBatchTime).nonEmpty,
                "blocks of incomplete batch already deleted")
         assert(batchCounter.getNumCompletedBatches < longBatchNumber)
         waitLatch.countDown()
-    }
-  }
-}
 
-object JobGeneratorSuite {
+object JobGeneratorSuite
   val waitLatch = new CountDownLatch(1)
-}

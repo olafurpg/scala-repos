@@ -13,8 +13,8 @@ import org.junit.Assert
   * Date: 6/15/15
   */
 class SingleAbstractMethodTest
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
-  protected override def setUp() {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
+  protected override def setUp()
     super.setUp()
 
     val defaultProfile =
@@ -22,9 +22,8 @@ class SingleAbstractMethodTest
     val newSettings = defaultProfile.getSettings
     newSettings.experimental = true
     defaultProfile.setSettings(newSettings)
-  }
 
-  def testBasicGenerics() {
+  def testBasicGenerics()
     val code = """
         |trait Blargle[T] {
         |  def blargle(a: T): Unit
@@ -33,9 +32,8 @@ class SingleAbstractMethodTest
         |foo(x => println(x.charAt(0)))
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testTypeInference() {
+  def testTypeInference()
     val code = """
         | abstract class Foo {
         |   def bar(i: Int, j: String)
@@ -44,147 +42,124 @@ class SingleAbstractMethodTest
         | val b: Foo = (i, j) => println(i + j.charAt(0))
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testFunctionSAM() {
+  def testFunctionSAM()
     val code = """
         |def z() = println()
         |val y: Runnable = z
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testFunctionNegOne() {
+  def testFunctionNegOne()
     val code = """
         |def z(): Unit = println()
         |val y: Runnable = z()
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("z()", typeMismatch()) :: Error("z()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testFunctionNegTwo() {
+  def testFunctionNegTwo()
     val code = """
         |def z: Unit = println()
         |val y: Runnable = z
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("z", typeMismatch()) :: Error("z", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testFunctionNegThree() {
+  def testFunctionNegThree()
     val code = """
         |def z(): Unit = println()
         |val x = z
         |val y: Runnable = x
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("x", typeMismatch()) :: Error("x", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSCL7686(): Unit = {
+  def testSCL7686(): Unit =
     val code = """
         |trait FI { def apply(idx: Int): String }
         |val a: FI = x => "result: " + x.toString
         |println(a(5))
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testUnderscoreOne() {
+  def testUnderscoreOne()
     val code = """
         |trait Foo { def bar(i: Int, s: String): String }
         |val f: Foo = _ + _
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testUnderscoreTwo() {
+  def testUnderscoreTwo()
     val code = """
         |trait Foo { def bar(s: String): String }
         |val i: Foo = _.charAt(0).toString
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testSimpleNeg() {
+  def testSimpleNeg()
     val code = """
         |trait Foo { def blargle(i: Int): Unit }
         |val f: Foo = s => println(s.charAt(0))
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("charAt", cannotResolveSymbol()) :: Nil =>
-    }
-  }
 
-  def testSimpleNegWrongReturnType() {
+  def testSimpleNegWrongReturnType()
     val code = """
         |object T {
         |  trait Blergh { def apply(i: Int): String }
         |  ((j: Int) => j): Blergh
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("((j: Int) => j)", typeMismatch()) :: Error(
           "((j: Int) => j)",
           doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSimpleNegWrongParamNumber() {
+  def testSimpleNegWrongParamNumber()
     val code = """
         |object T {
         |  trait Blargle { def apply(i: Int, j: String): String }
         |  ((i: Int) => "aaa"): Blargle
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("((i: Int) => \"aaa\")", typeMismatch()) :: Error(
           "((i: Int) => \"aaa\")", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSimpleNegWrongParamType() {
+  def testSimpleNegWrongParamType()
     val code = """
         |object T {
         |  trait Blargle { def apply(i: Int, j: String): String }
         |  ((i: Int, j: Int) => "aaa"): Blargle
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("((i: Int, j: Int) => \"aaa\")", typeMismatch()) :: Error(
           "((i: Int, j: Int) => \"aaa\")", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSimpleNegRightParamWrongReturn() {
+  def testSimpleNegRightParamWrongReturn()
     val code = """
         |object T {
         |  trait Blergh { def apply(i: Int): String }
         |  (j => j): Blergh
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("(j => j)", typeMismatch()) :: Error(
           "(j => j)",
           doesNotConform()) :: Error("j", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testConstructorWithArgs() {
+  def testConstructorWithArgs()
     val code = """
         |abstract class Foo(s: String) { def a(): String }
         |val f: Foo = () => ""
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("() => \"\"", typeMismatch()) :: Nil =>
-    }
-  }
 
-  def testImplicitConversionWithSAM() {
+  def testImplicitConversionWithSAM()
     val code = """
         |import scala.language.implicitConversions
         |object T {
@@ -204,21 +179,18 @@ class SingleAbstractMethodTest
         |}
         |
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("() => 3", typeMismatch()) :: Error(
           "wantString", cannotResolveReference()) :: Nil =>
-    }
-  }
 
-  def testUnimplementedWithSAM(): Unit = {
+  def testUnimplementedWithSAM(): Unit =
     val code = """
         |abstract class Foo { def a(): String }
         |val f: Foo = () => ???
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testConformance(): Unit = {
+  def testConformance(): Unit =
     val code = """
         |trait SAAM {
         |  def sam(s: String): Object
@@ -226,26 +198,22 @@ class SingleAbstractMethodTest
         |val s: SAAM = (i: Object) => ""
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testConformanceNeg(): Unit = {
+  def testConformanceNeg(): Unit =
     val code = """
         |trait SAAM {
         |  def sam(s: Object): Object
         |}
         |val s: SAAM = (i: String) => i
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("(i: String) => i", typeMismatch()) :: Nil =>
-    }
-  }
 
-  def testSimpleThreadRunnable(): Unit = {
+  def testSimpleThreadRunnable(): Unit =
     val code = "new Thread(() => println()).run()"
     checkCodeHasNoErrors(code)
-  }
 
-  def testValueDiscarding(): Unit = {
+  def testValueDiscarding(): Unit =
     val code = """
         |def goo(r: Runnable) = 2
         |
@@ -253,18 +221,16 @@ class SingleAbstractMethodTest
         |goo(() => {1 + 1})
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testJavaGenerics(): Unit = {
+  def testJavaGenerics(): Unit =
     val code = """
         |import java.util.concurrent.FutureTask
         |
         |new FutureTask[String](() => "hi")
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMMethodReference(): Unit = {
+  def testSAMMethodReference(): Unit =
     val code = """
         |trait F[T, R] {
         |  def apply(a: T): R
@@ -276,9 +242,8 @@ class SingleAbstractMethodTest
         |
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testExistentialBounds(): Unit = {
+  def testExistentialBounds(): Unit =
     val code = """
         |trait Blargle[T] {
         |  def foo(a: T): String
@@ -301,9 +266,8 @@ class SingleAbstractMethodTest
         |
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testOverload(): Unit = {
+  def testOverload(): Unit =
     val code = """
         |trait SAMOverload[A] {
         |  def foo(s: A): Int = ???
@@ -315,9 +279,8 @@ class SingleAbstractMethodTest
         |
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testJavaSAM(): Unit = {
+  def testJavaSAM(): Unit =
     val scalaCode = "new ObservableCopy(1).mapFunc(x => x + 1)"
     val javaCode =
       """
@@ -335,7 +298,6 @@ class SingleAbstractMethodTest
         |
       """.stripMargin
     checkCodeHasNoErrors(scalaCode, Some(javaCode))
-  }
 
   val etaExpansionPrefix: String = """
       |def a = () => println()
@@ -349,109 +311,82 @@ class SingleAbstractMethodTest
       |
     """.stripMargin
 
-  def testSAMEtaExpansion1(): Unit = {
+  def testSAMEtaExpansion1(): Unit =
     val code = etaExpansionPrefix + "val a1: Runnable = a"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("a", typeMismatch()) :: Error("a", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion2(): Unit = {
+  def testSAMEtaExpansion2(): Unit =
     val code = etaExpansionPrefix + "val a2: Runnable = a()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("a()", typeMismatch()) :: Error("a()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion3(): Unit = {
+  def testSAMEtaExpansion3(): Unit =
     val code = etaExpansionPrefix + "val b1: Runnable = b"
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMEtaExpansion4(): Unit = {
+  def testSAMEtaExpansion4(): Unit =
     val code = etaExpansionPrefix + "val b2: Runnable = b()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("b()", typeMismatch()) :: Error("b()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion5(): Unit = {
+  def testSAMEtaExpansion5(): Unit =
     val code = etaExpansionPrefix + "val c1: Runnable = c"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("c", typeMismatch()) :: Error("c", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion6(): Unit = {
+  def testSAMEtaExpansion6(): Unit =
     val code = etaExpansionPrefix + "val c2: Runnable = c()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("()", doesNotTakeParameters()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion7(): Unit = {
+  def testSAMEtaExpansion7(): Unit =
     val code = etaExpansionPrefix + "val d1: Runnable = d"
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMEtaExpansion8(): Unit = {
+  def testSAMEtaExpansion8(): Unit =
     val code = etaExpansionPrefix + "val d2: Runnable = d()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("d()", typeMismatch()) :: Error("d()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion9(): Unit = {
+  def testSAMEtaExpansion9(): Unit =
     val code = etaExpansionPrefix + "val e1: Runnable = e"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("e", typeMismatch()) :: Error("e", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion10(): Unit = {
+  def testSAMEtaExpansion10(): Unit =
     val code = etaExpansionPrefix + "val e2: Runnable = e()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("e()", typeMismatch()) :: Error("e()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion11(): Unit = {
+  def testSAMEtaExpansion11(): Unit =
     val code = etaExpansionPrefix + "val f1: Runnable = f"
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMEtaExpansion12(): Unit = {
+  def testSAMEtaExpansion12(): Unit =
     val code = etaExpansionPrefix + "val f2: Runnable = f()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("f()", typeMismatch()) :: Error("f()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion13(): Unit = {
+  def testSAMEtaExpansion13(): Unit =
     val code = etaExpansionPrefix + "val g1: Runnable = g"
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMEtaExpansion14(): Unit = {
+  def testSAMEtaExpansion14(): Unit =
     val code = etaExpansionPrefix + "val g2: Runnable = g()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("g()", typeMismatch()) :: Error("g()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testSAMEtaExpansion15(): Unit = {
+  def testSAMEtaExpansion15(): Unit =
     val code = etaExpansionPrefix + "val h1: Runnable = h"
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMEtaExpansion16(): Unit = {
+  def testSAMEtaExpansion16(): Unit =
     val code = etaExpansionPrefix + "val h2: Runnable = h()"
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("h()", typeMismatch()) :: Error("h()", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testEtaExpansionImplicit(): Unit = {
+  def testEtaExpansionImplicit(): Unit =
     val code = """
         |class A
         |class B
@@ -467,10 +402,9 @@ class SingleAbstractMethodTest
         |
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
   //similar to testEtaExpansion11
-  def testEtaExpansionUnitReturnWithParams(): Unit = {
+  def testEtaExpansionUnitReturnWithParams(): Unit =
     val code = """
         |trait S {
         |  def foo(i: Int): Unit
@@ -479,12 +413,10 @@ class SingleAbstractMethodTest
         |
         |val s: S = ss
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("ss", typeMismatch()) :: Error("ss", doesNotConform()) :: Nil =>
-    }
-  }
 
-  def testOverrideImplementSAM(): Unit = {
+  def testOverrideImplementSAM(): Unit =
     val code = """
         |val s: Bar = () => 2
         |
@@ -497,9 +429,8 @@ class SingleAbstractMethodTest
       """.stripMargin
 
     checkCodeHasNoErrors(code)
-  }
 
-  def testOverrideImplementSAM2(): Unit = {
+  def testOverrideImplementSAM2(): Unit =
     val code = """
         |val s: Bar = () => 2
         |
@@ -513,18 +444,16 @@ class SingleAbstractMethodTest
         |
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMComparable(): Unit = {
+  def testSAMComparable(): Unit =
     val code = """
         |import java.util.Comparator
         |
         |val comp: Comparator[String] = (o1, o2) => o1.compareTo(o2)
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testNotSAM(): Unit = {
+  def testNotSAM(): Unit =
     val code = """
         |abstract class U {
         |  def foo(): Unit
@@ -533,9 +462,8 @@ class SingleAbstractMethodTest
         |val x: U = z()
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMNumericWidening(): Unit = {
+  def testSAMNumericWidening(): Unit =
     val code = """
         |  abstract class A {
         |    def foo(): Long
@@ -548,9 +476,8 @@ class SingleAbstractMethodTest
         |  val a: A = foo
       """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMCorrectWildcardExtrapolationWithParameterizedTypes(): Unit = {
+  def testSAMCorrectWildcardExtrapolationWithParameterizedTypes(): Unit =
     val code =
       """
         |trait MyObservableValue[T] {
@@ -565,9 +492,8 @@ class SingleAbstractMethodTest
         |observableValue.addListener((observable: MyObservableValue[Int]) => ())
         """.stripMargin
     checkCodeHasNoErrors(code)
-  }
 
-  def testSAMCorrectWildcardExtrapolationWithExistentialTypes(): Unit = {
+  def testSAMCorrectWildcardExtrapolationWithExistentialTypes(): Unit =
     val code =
       """
         |class P[R]
@@ -580,21 +506,17 @@ class SingleAbstractMethodTest
       """.stripMargin
 
     checkCodeHasNoErrors(code)
-  }
 
   def checkCodeHasNoErrors(
-      scalaCode: String, javaCode: Option[String] = None) {
-    assertMatches(messages(scalaCode, javaCode)) {
+      scalaCode: String, javaCode: Option[String] = None)
+    assertMatches(messages(scalaCode, javaCode))
       case Nil =>
-    }
-  }
 
   def messages(@Language("Scala") scalaCode: String,
-               javaCode: Option[String] = None): List[Message] = {
-    javaCode match {
+               javaCode: Option[String] = None): List[Message] =
+    javaCode match
       case Some(s) => configureFromFileTextAdapter("dummy.java", s)
       case _ =>
-    }
 
     val annotator = new ScalaAnnotator() {}
     val mock = new AnnotatorHolderMock
@@ -603,25 +525,21 @@ class SingleAbstractMethodTest
 
     parse.depthFirst.foreach(annotator.annotate(_, mock))
 
-    mock.errorAnnotations.filter {
+    mock.errorAnnotations.filter
       case Error(_, null) => false
       case _ => true
-    }
-  }
 
-  def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit]) {
+  def assertMatches[T](actual: T)(pattern: PartialFunction[T, Unit])
     Assert.assertTrue(
         "actual: " + actual.toString, pattern.isDefinedAt(actual))
-  }
 
-  def parseText(@Language("Scala") s: String): ScalaFile = {
+  def parseText(@Language("Scala") s: String): ScalaFile =
     PsiFileFactory
       .getInstance(getProjectAdapter)
       .createFileFromText("foo" + ScalaFileType.DEFAULT_EXTENSION,
                           ScalaFileType.SCALA_FILE_TYPE,
                           s)
       .asInstanceOf[ScalaFile]
-  }
 
   val cannotResolveSymbol = ContainsPattern("Cannot resolve symbol")
   val doesNotConform = ContainsPattern("doesn't conform to expected type")
@@ -629,7 +547,5 @@ class SingleAbstractMethodTest
   val cannotResolveReference = ContainsPattern("Cannot resolve reference")
   val doesNotTakeParameters = ContainsPattern("does not take parameters")
 
-  case class ContainsPattern(fr: String) {
+  case class ContainsPattern(fr: String)
     def unapply(s: String) = s.contains(fr)
-  }
-}

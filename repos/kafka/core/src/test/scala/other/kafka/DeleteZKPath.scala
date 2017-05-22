@@ -21,13 +21,12 @@ import utils.ZkUtils
 import org.I0Itec.zkclient.ZkClient
 import org.apache.kafka.common.utils.Utils
 
-object DeleteZKPath {
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+object DeleteZKPath
+  def main(args: Array[String])
+    if (args.length < 2)
       println("USAGE: " + DeleteZKPath.getClass.getName +
           " consumer.properties zk_path")
       System.exit(1)
-    }
 
     val config = new ConsumerConfig(Utils.loadProps(args(0)))
     val zkPath = args(1)
@@ -36,12 +35,9 @@ object DeleteZKPath {
                           config.zkConnectionTimeoutMs,
                           false)
 
-    try {
+    try
       zkUtils.deletePathRecursive(zkPath);
       System.out.println(zkPath + " is deleted")
-    } catch {
+    catch
       case e: Exception =>
         System.err.println("Path not deleted " + e.printStackTrace())
-    }
-  }
-}

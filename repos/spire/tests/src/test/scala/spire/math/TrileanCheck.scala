@@ -9,45 +9,35 @@ import prop._
 import spire.laws.arb._
 
 class TrileanCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
 
-  property("associativity") {
-    forAll { (x: Trilean, y: Trilean, z: Trilean) =>
+  property("associativity")
+    forAll  (x: Trilean, y: Trilean, z: Trilean) =>
       ((x & y) & z) shouldBe (x & (y & z))
       ((x | y) | z) shouldBe (x | (y | z))
-    }
-  }
 
-  property("commutativity") {
-    forAll { (x: Trilean, y: Trilean) =>
+  property("commutativity")
+    forAll  (x: Trilean, y: Trilean) =>
       (x & y) shouldBe (y & x)
       (x | y) shouldBe (y | x)
-    }
-  }
 
-  property("absorption") {
-    forAll { (x: Trilean, y: Trilean) =>
+  property("absorption")
+    forAll  (x: Trilean, y: Trilean) =>
       (x & (x | y)) shouldBe x
       (x | (x & y)) shouldBe x
-    }
-  }
 
-  property("identity") {
-    forAll { (x: Trilean) =>
+  property("identity")
+    forAll  (x: Trilean) =>
       (x & Trilean.True) shouldBe x
       (x | Trilean.False) shouldBe x
-    }
-  }
 
-  property("distributivity") {
-    forAll { (x: Trilean, y: Trilean, z: Trilean) =>
+  property("distributivity")
+    forAll  (x: Trilean, y: Trilean, z: Trilean) =>
       (x & (y | z)) shouldBe ((x & y) | (x & z))
       (x | (y & z)) shouldBe ((x | y) & (x | z))
-    }
-  }
 
-  property("Boolean equivalence") {
-    forAll { (x: Boolean, y: Boolean) =>
+  property("Boolean equivalence")
+    forAll  (x: Boolean, y: Boolean) =>
       val tx = Trilean(x)
       val ty = Trilean(y)
       !tx shouldBe Trilean(!x)
@@ -55,6 +45,3 @@ class TrileanCheck
       tx & ty shouldBe Trilean(x & y)
       tx | ty shouldBe Trilean(x | y)
       tx ^ ty shouldBe Trilean(x ^ y)
-    }
-  }
-}

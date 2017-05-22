@@ -8,7 +8,7 @@ import org.openjdk.jmh.infra.Blackhole
 import spire.math.SafeLong
 import SafeLongUtil._
 
-object SafeLongUtil {
+object SafeLongUtil
   private def isBig(x: SafeLong) =
     x.getClass.getSimpleName.endsWith("BigInteger")
 
@@ -21,26 +21,21 @@ object SafeLongUtil {
   def classify(a: SafeLong, b: SafeLong, a_op_b: SafeLong): String =
     classify(a) + "_" + classify(b) + "_" + classify(a_op_b)
 
-  def check(cases: Map[String, (SafeLong, SafeLong)]): Unit = {
-    for ((kind, (a, b)) ← cases) {
+  def check(cases: Map[String, (SafeLong, SafeLong)]): Unit =
+    for ((kind, (a, b)) ← cases)
       val c = classify(a, b)
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
-    }
-  }
 
   def check(cases: Map[String, (SafeLong, SafeLong)],
-            op: (SafeLong, SafeLong) ⇒ SafeLong): Unit = {
-    for ((kind, (a, b)) ← cases) {
+            op: (SafeLong, SafeLong) ⇒ SafeLong): Unit =
+    for ((kind, (a, b)) ← cases)
       val c = classify(a, b, op(a, b))
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
-    }
-  }
-}
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class SafeLongMultiplyBenchmark {
+class SafeLongMultiplyBenchmark
 
   val pairs: Map[String, (SafeLong, SafeLong)] = Map(
       "l_l_l" → ((SafeLong.two, SafeLong.two)),
@@ -63,23 +58,20 @@ class SafeLongMultiplyBenchmark {
   var c: SafeLong = 0L
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
     c = -b0
-  }
 
   @Benchmark
-  def multiply(x: Blackhole): Unit = {
+  def multiply(x: Blackhole): Unit =
     x.consume(a * b)
-  }
-}
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class SafeLongAddSubtractBenchmark {
+class SafeLongAddSubtractBenchmark
 
   val pairs: Map[String, (SafeLong, SafeLong)] = Map(
       "l_l_l" → ((SafeLong.one, SafeLong.one)),
@@ -109,28 +101,24 @@ class SafeLongAddSubtractBenchmark {
   var c: SafeLong = 0L
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
 
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
     c = -b0
-  }
 
   @Benchmark
-  def add(x: Blackhole): Unit = {
+  def add(x: Blackhole): Unit =
     x.consume(a + b)
-  }
 
-  def subtract(x: Blackhole): Unit = {
+  def subtract(x: Blackhole): Unit =
     x.consume(a - c)
-  }
-}
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class SafeLongCompareBenchmark {
+class SafeLongCompareBenchmark
 
   val pairs: Map[String, (SafeLong, SafeLong)] = Map(
       "l_l" → ((SafeLong.one, SafeLong.one + 1)),
@@ -144,15 +132,12 @@ class SafeLongCompareBenchmark {
   var b: SafeLong = 0L
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
 
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
-  }
 
   @Benchmark
-  def compare(x: Blackhole): Unit = {
+  def compare(x: Blackhole): Unit =
     x.consume(a compare b)
-  }
-}

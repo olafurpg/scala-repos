@@ -5,15 +5,12 @@ import org.junit.Assert._
 
 import java.util.Objects
 
-class ObjectsTestOnJDK8 {
+class ObjectsTestOnJDK8
 
-  @Test def isNull(): Unit = {
+  @Test def isNull(): Unit =
     assertTrue(Objects.isNull(null))
     assertFalse(Objects.isNull(new Object))
-  }
 
-  @Test def nonNull(): Unit = {
+  @Test def nonNull(): Unit =
     assertFalse(Objects.nonNull(null))
     assertTrue(Objects.nonNull(new Object))
-  }
-}

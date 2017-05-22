@@ -17,12 +17,12 @@ package com.twitter.scalding
 
 import org.scalatest.{Matchers, WordSpec}
 
-class IntegralCompTest extends WordSpec with Matchers {
+class IntegralCompTest extends WordSpec with Matchers
   def box[T](t: T) = t.asInstanceOf[AnyRef]
 
-  "IntegralComparator" should {
+  "IntegralComparator" should
     val intComp = new IntegralComparator
-    "recognize integral types" in {
+    "recognize integral types" in
       intComp.isIntegral(box(1)) shouldBe true
       intComp.isIntegral(box(1L)) shouldBe true
       intComp.isIntegral(box(1.asInstanceOf[Short])) shouldBe true
@@ -37,32 +37,23 @@ class IntegralCompTest extends WordSpec with Matchers {
       intComp.isIntegral(box("hey")) shouldBe false
       intComp.isIntegral(box(Nil)) shouldBe false
       intComp.isIntegral(box(None)) shouldBe false
-    }
-    "handle null inputs" in {
+    "handle null inputs" in
       intComp.hashCode(null) shouldBe 0
-      List(box(1), box("hey"), box(2L), box(0.0)).foreach { x =>
+      List(box(1), box("hey"), box(2L), box(0.0)).foreach  x =>
         intComp.compare(null, x) should be < (0)
         intComp.compare(x, null) should be > (0)
         intComp.compare(x, x) shouldBe 0
-      }
       intComp.compare(null, null) shouldBe 0
-    }
-    "have consistent hashcode" in {
-      List((box(1), box(1L)), (box(2), box(2L)), (box(3), box(3L))).foreach {
+    "have consistent hashcode" in
+      List((box(1), box(1L)), (box(2), box(2L)), (box(3), box(3L))).foreach
         pair =>
           intComp.compare(pair._1, pair._2) shouldBe 0
           intComp.hashCode(pair._1) shouldBe (intComp.hashCode(pair._2))
-      }
-      List((box(1), box(2L)), (box(2), box(3L)), (box(3), box(4L))).foreach {
+      List((box(1), box(2L)), (box(2), box(3L)), (box(3), box(4L))).foreach
         pair =>
           intComp.compare(pair._1, pair._2) should be < (0)
           intComp.compare(pair._2, pair._1) should be > (0)
-      }
-    }
-    "Compare strings properly" in {
+    "Compare strings properly" in
       intComp.compare("hey", "you") shouldBe ("hey".compareTo("you"))
       intComp.compare("hey", "hey") shouldBe ("hey".compareTo("hey"))
       intComp.compare("you", "hey") shouldBe ("you".compareTo("hey"))
-    }
-  }
-}

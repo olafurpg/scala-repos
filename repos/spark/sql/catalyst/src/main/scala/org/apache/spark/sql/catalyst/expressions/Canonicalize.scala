@@ -31,26 +31,23 @@ package org.apache.spark.sql.catalyst.expressions
   *  - [[EqualTo]] and [[EqualNullSafe]] are reordered by `hashCode`.
   *  - Other comparisons ([[GreaterThan]], [[LessThan]]) are reversed by `hashCode`.
   */
-object Canonicalize extends {
-  def execute(e: Expression): Expression = {
+object Canonicalize extends
+  def execute(e: Expression): Expression =
     expressionReorder(ignoreNamesTypes(e))
-  }
 
   /** Remove names and nullability from types. */
-  private def ignoreNamesTypes(e: Expression): Expression = e match {
+  private def ignoreNamesTypes(e: Expression): Expression = e match
     case a: AttributeReference =>
       AttributeReference("none", a.dataType.asNullable)(exprId = a.exprId)
     case _ => e
-  }
 
   /** Collects adjacent commutative operations. */
   private def gatherCommutative(
       e: Expression,
       f: PartialFunction[Expression, Seq[Expression]]): Seq[Expression] =
-    e match {
+    e match
       case c if f.isDefinedAt(c) => f(c).flatMap(gatherCommutative(_, f))
       case other => other :: Nil
-    }
 
   /** Orders a set of commutative operations by their hash code. */
   private def orderCommutative(
@@ -59,7 +56,7 @@ object Canonicalize extends {
     gatherCommutative(e, f).sortBy(_.hashCode())
 
   /** Rearrange expressions that are commutative or associative. */
-  private def expressionReorder(e: Expression): Expression = e match {
+  private def expressionReorder(e: Expression): Expression = e match
     case a: Add =>
       orderCommutative(a, { case Add(l, r) => Seq(l, r) }).reduce(Add)
     case m: Multiply =>
@@ -79,5 +76,3 @@ object Canonicalize extends {
       GreaterThanOrEqual(r, l)
 
     case _ => e
-  }
-}

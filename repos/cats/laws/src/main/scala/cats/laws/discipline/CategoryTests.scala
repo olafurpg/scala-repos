@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait CategoryTests[F[_, _]] extends ComposeTests[F] {
+trait CategoryTests[F[_, _]] extends ComposeTests[F]
   def laws: CategoryLaws[F]
 
   def category[A, B, C, D](implicit ArbFAB: Arbitrary[F[A, B]],
@@ -21,9 +21,7 @@ trait CategoryTests[F[_, _]] extends ComposeTests[F] {
         "category left identity" -> forAll(laws.categoryLeftIdentity[A, B] _),
         "category right identity" -> forAll(
             laws.categoryRightIdentity[A, B] _))
-}
 
-object CategoryTests {
+object CategoryTests
   def apply[F[_, _]: Category]: CategoryTests[F] =
     new CategoryTests[F] { def laws: CategoryLaws[F] = CategoryLaws[F] }
-}

@@ -29,10 +29,9 @@ import akka.shapeless.ops.hlist.ReversePrepend
   *     (L dropRight T) ::: R  if L has a tail of type T
   */
 @implicitNotFound("Illegal rule composition")
-sealed trait TailSwitch[L <: HList, T <: HList, R <: HList] {
+sealed trait TailSwitch[L <: HList, T <: HList, R <: HList]
   type Out <: HList
-}
-object TailSwitch {
+object TailSwitch
   implicit def tailSwitch[L <: HList, T <: HList, R <: HList, Out0 <: HList]
   (implicit ts: Aux[L, L, T, T, R, HNil, Out0]): TailSwitch[L, T, R] { type Out = Out0 } = `n/a`
 
@@ -46,19 +45,17 @@ object TailSwitch {
   //   rec(L, L, T, T, R, HNil)
   sealed trait Aux[L <: HList, LI <: HList, T <: HList, TI <: HList, R <: HList, RI <: HList, Out <: HList]
 
-  object Aux extends Aux1 {
+  object Aux extends Aux1
     // if TI <: L then Out = R
     implicit def terminate1[L <: HList, LI <: HList, T <: HList, TI <: L, R <: HList, RI <: HList]:
     Aux[L, LI, T, TI, R, RI, R] = `n/a`
-  }
 
-  private[parboiled2] abstract class Aux1 extends Aux2 {
+  private[parboiled2] abstract class Aux1 extends Aux2
     // if LI <: T then Out = RI.reverse ::: R
     implicit def terminate2[T <: HList, TI <: HList, L <: HList, LI <: T, R <: HList, RI <: HList, Out <: HList]
     (implicit rp: ReversePrepend.Aux[RI, R, Out]): Aux[L, LI, T, TI, R, RI, Out] = `n/a`
-  }
 
-  private[parboiled2] abstract class Aux2 {
+  private[parboiled2] abstract class Aux2
     implicit def iter1[L <: HList, T <: HList, TH, TT <: HList, R <: HList, RI <: HList, Out <: HList]
     (implicit next: Aux[L, HNil, T, TT, R, RI, Out]): Aux[L, HNil, T, TH :: TT, R, RI, Out] = `n/a`
 
@@ -67,5 +64,3 @@ object TailSwitch {
 
     implicit def iter3[L <: HList, LH, LT <: HList, T <: HList, TH, TT <: HList, R <: HList, RI <: HList, Out <: HList]
     (implicit next: Aux[L, LT, T, TT, R, LH :: RI, Out]): Aux[L, LH :: LT, T, TH :: TT, R, RI, Out] = `n/a`
-  }
-}

@@ -1,7 +1,7 @@
 package slick.util
 
 /** Utilities for logging and creating tree & table dumps. */
-private[slick] object LogUtil {
+private[slick] object LogUtil
   val (cNormal, cBlack, cRed, cGreen, cYellow, cBlue, cMagenta, cCyan) =
     if (GlobalConfig.ansiDump)
       ("\u001B[0m",
@@ -28,4 +28,3 @@ private[slick] object LogUtil {
 
   def multilineBorder(s: String): String =
     multilineBorderPrefix + s.replace("\n", "\n" + multilineBorderPrefix)
-}

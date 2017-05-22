@@ -14,9 +14,9 @@ import mesosphere.mesos.protos.SlaveID
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class TaskOpFactoryImplTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers
 
-  test("Copy SlaveID from Offer to Task") {
+  test("Copy SlaveID from Offer to Task")
     val f = new Fixture
 
     val offer = MarathonTestHelper
@@ -48,9 +48,8 @@ class TaskOpFactoryImplTest
     )
     assert(inferredTaskOp.isDefined, "task op is not empty")
     assert(inferredTaskOp.get.maybeNewTask.get == expectedTask)
-  }
 
-  test("Normal app -> None (insufficient offer)") {
+  test("Normal app -> None (insufficient offer)")
     Given("A normal app, an insufficient offer and no tasks")
     val f = new Fixture
     val app = f.normalApp
@@ -64,9 +63,8 @@ class TaskOpFactoryImplTest
 
     Then("None is returned because there are already 2 launched tasks")
     taskOp shouldBe empty
-  }
 
-  test("Normal app -> Launch") {
+  test("Normal app -> Launch")
     Given("A normal app, a normal offer and no tasks")
     val f = new Fixture
     val app = f.normalApp
@@ -80,9 +78,8 @@ class TaskOpFactoryImplTest
 
     Then("A Launch is inferred")
     taskOp shouldBe a[Some[TaskOp.Launch]]
-  }
 
-  test("Resident app -> None (insufficient offer)") {
+  test("Resident app -> None (insufficient offer)")
     Given("A resident app, an insufficient offer and no tasks")
     val f = new Fixture
     val app = f.residentApp
@@ -96,10 +93,9 @@ class TaskOpFactoryImplTest
 
     Then("None is returned")
     taskOp shouldBe empty
-  }
 
   test(
-      "Resident app -> ReserveAndCreateVolumes fails because of insufficient disk resources") {
+      "Resident app -> ReserveAndCreateVolumes fails because of insufficient disk resources")
     Given("A resident app, an insufficient offer and no tasks")
     val f = new Fixture
     val app = f.residentApp
@@ -113,9 +109,8 @@ class TaskOpFactoryImplTest
 
     Then("A no is returned because there is not enough disk space")
     taskOp shouldBe None
-  }
 
-  test("Resident app -> ReserveAndCreateVolumes succeeds") {
+  test("Resident app -> ReserveAndCreateVolumes succeeds")
     Given("A resident app, a normal offer and no tasks")
     val f = new Fixture
     val app = f.residentApp
@@ -129,9 +124,8 @@ class TaskOpFactoryImplTest
 
     Then("A ReserveAndCreateVolumes is returned")
     taskOp shouldBe a[Some[TaskOp.ReserveAndCreateVolumes]]
-  }
 
-  test("Resident app -> Launch succeeds") {
+  test("Resident app -> Launch succeeds")
     Given(
         "A resident app, an offer with persistent volumes and a matching task")
     val f = new Fixture
@@ -166,14 +160,12 @@ class TaskOpFactoryImplTest
       .getTaskInfos(0)
       .getResourcesList
       .asScala
-    val found = taskInfoResources.find { resource =>
+    val found = taskInfoResources.find  resource =>
       resource.hasDisk && resource.getDisk.hasPersistence &&
       resource.getDisk.getPersistence.getId == localVolumeIdMatch.idString
-    }
     found should not be empty
-  }
 
-  test("Resident app -> None (enough launched tasks)") {
+  test("Resident app -> None (enough launched tasks)")
     Given(
         "A resident app, a matching offer with persistent volumes but already enough launched tasks")
     val f = new Fixture
@@ -193,9 +185,8 @@ class TaskOpFactoryImplTest
 
     Then("A None is returned because there is already a launched Task")
     taskOp shouldBe empty
-  }
 
-  class Fixture {
+  class Fixture
     import mesosphere.marathon.{MarathonTestHelper => MTH}
     val taskTracker = mock[TaskTracker]
     val config: MarathonConf = MTH.defaultConfig(
@@ -223,5 +214,3 @@ class TaskOpFactoryImplTest
 
     def offerWithVolumes(taskId: String, localVolumeIds: LocalVolumeId*) =
       MTH.offerWithVolumes(taskId, localVolumeIds: _*)
-  }
-}

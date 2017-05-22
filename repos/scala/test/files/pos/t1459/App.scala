@@ -1,11 +1,10 @@
 package foo
 import base._
 
-object App extends scala.App {
-  class Concrete extends AbstractBase {
+object App extends scala.App
+  class Concrete extends AbstractBase
     override def doStuff(params: java.lang.String*): Unit =
       println("doStuff invoked")
-  }
 
   val impl = new Concrete
 
@@ -16,4 +15,3 @@ object App extends scala.App {
 
   // fails with AbstractMethodError
   caller.callDoStuff(impl)
-}

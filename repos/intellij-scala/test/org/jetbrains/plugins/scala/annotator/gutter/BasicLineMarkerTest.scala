@@ -3,7 +3,7 @@ package org.jetbrains.plugins.scala.annotator.gutter
 /**
   * Pavel.Fatin, 21.01.2010
   */
-class BasicLineMarkerTest extends LineMarkerTestBase {
+class BasicLineMarkerTest extends LineMarkerTestBase
 
   // TODO enable annotations test
 //  def testAnnotations = doTest
@@ -16,11 +16,9 @@ class BasicLineMarkerTest extends LineMarkerTestBase {
   def testComplex() = doTest()
   def testLexerErrorBypass() = doTest()
 
-  def testGators() = {
+  def testGators() =
     doTest()
 
     // TODO make sure somehow that gators (overriding, etc) remain
 //    val markers = DaemonCodeAnalyzerImpl.getLineMarkers(myFixture.getEditor.getDocument, myFixture.getProject)
 //    assertTrue(markers.get(2).getNavigationHandler != null)
-  }
-}

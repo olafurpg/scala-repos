@@ -4,7 +4,7 @@ import actorApi.SocketLeave
 import akka.actor._
 import play.api.libs.json.JsValue
 
-final class Channel extends Actor {
+final class Channel extends Actor
 
   context.system.lilaBus.subscribe(self, 'socketDoor)
 
@@ -12,7 +12,7 @@ final class Channel extends Actor {
 
   val members = scala.collection.mutable.Set.empty[SocketMember]
 
-  def receive = {
+  def receive =
 
     case Sub(member) => members += member
 
@@ -21,13 +21,10 @@ final class Channel extends Actor {
     case SocketLeave(_, member) => members -= member
 
     case Publish(msg) => members.foreach(_ push msg)
-  }
-}
 
-object Channel {
+object Channel
 
   case class Sub(member: SocketMember)
   case class UnSub(member: SocketMember)
 
   case class Publish(msg: JsValue)
-}

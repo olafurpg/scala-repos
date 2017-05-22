@@ -18,7 +18,7 @@ import scala.beans.BeanProperty
 import scala.collection.immutable.Stack
 import scala.annotation.tailrec
 
-private[akka] object ActorRefInternals {
+private[akka] object ActorRefInternals
 
   /**
     * LifeCycles for ActorRefs.
@@ -28,13 +28,12 @@ private[akka] object ActorRefInternals {
   object RUNNING extends StatusType
   object BEING_RESTARTED extends StatusType
   object SHUTDOWN extends StatusType
-}
 
 /**
   * Abstraction for unification of sender and senderFuture for later reply.
   * Can be stored away and used at a later point in time.
   */
-abstract class Channel[T] {
+abstract class Channel[T]
 
   /**
     * Scala API. <p/>
@@ -47,7 +46,6 @@ abstract class Channel[T] {
     * Sends the specified message to the channel.
     */
   def sendOneWay(msg: T): Unit = this.!(msg)
-}
 
 /**
   * ActorRef is an immutable and serializable handle to an Actor.
@@ -81,7 +79,7 @@ abstract class Channel[T] {
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
+trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef]
   scalaRef: ScalaActorRef =>
   // Only mutable for RemoteServer in order to maintain identity across nodes
   @volatile
@@ -241,10 +239,9 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
   /**
     * Is the actor running?
     */
-  def isRunning: Boolean = _status match {
+  def isRunning: Boolean = _status match
     case ActorRefInternals.BEING_RESTARTED | ActorRefInternals.RUNNING => true
     case _ => false
-  }
 
   /**
     * Is the actor shut down?
@@ -325,14 +322,13 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
     * to send a reply message to the original sender. If not then the sender will block until the timeout expires.
     */
   def sendRequestReply(
-      message: AnyRef, timeout: Long, sender: ActorRef): AnyRef = {
+      message: AnyRef, timeout: Long, sender: ActorRef): AnyRef =
     !!(message, timeout)(Option(sender))
       .getOrElse(throw new ActorTimeoutException("Message [" + message +
               "]\n\tsent to [" + actorClassName + "]\n\tfrom [" +
               (if (sender ne null) sender.actorClassName else "nowhere") +
               "]\n\twith timeout [" + timeout + "]\n\ttimed out."))
       .asInstanceOf[AnyRef]
-  }
 
   /**
     * Akka Java API. <p/>
@@ -556,20 +552,17 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
   /**
     * Abstraction for unification of sender and senderFuture for later reply
     */
-  def channel: Channel[Any] = {
-    if (senderFuture.isDefined) {
-      new Channel[Any] {
+  def channel: Channel[Any] =
+    if (senderFuture.isDefined)
+      new Channel[Any]
         val future = senderFuture.get
         def !(msg: Any) = future completeWithResult msg
-      }
-    } else if (sender.isDefined) {
+    else if (sender.isDefined)
       val someSelf = Some(this)
-      new Channel[Any] {
+      new Channel[Any]
         val client = sender.get
         def !(msg: Any) = client.!(msg)(someSelf)
-      }
-    } else throw new IllegalActorStateException("No channel available")
-  }
+    else throw new IllegalActorStateException("No channel available")
 
   /**
     * Java API. <p/>
@@ -611,12 +604,10 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
 
   override def hashCode: Int = HashCode.hash(HashCode.SEED, uuid)
 
-  override def equals(that: Any): Boolean = {
+  override def equals(that: Any): Boolean =
     that.isInstanceOf[ActorRef] && that.asInstanceOf[ActorRef].uuid == uuid
-  }
 
   override def toString = "Actor[" + id + ":" + uuid + "]"
-}
 
 /**
   *  Local (serializable) ActorRef that is used when referencing the Actor on its "home" node.
@@ -626,7 +617,7 @@ trait ActorRef extends ActorRefShared with java.lang.Comparable[ActorRef] {
 class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
                                   val homeAddress: Option[InetSocketAddress],
                                   val clientManaged: Boolean = false)
-    extends ActorRef with ScalaActorRef {
+    extends ActorRef with ScalaActorRef
   protected[akka] val guard = new ReentrantGuard
 
   @volatile
@@ -645,9 +636,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   private[akka] var _dispatcher: MessageDispatcher =
     Dispatchers.defaultGlobalDispatcher
 
-  protected[akka] val actorInstance = guard.withGuard {
+  protected[akka] val actorInstance = guard.withGuard
     new AtomicReference[Actor](newActor)
-  }
 
   //If it was started inside "newActor", initialize it
   if (isRunning) initializeActorInstance
@@ -661,7 +651,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
                          __supervisor: Option[ActorRef],
                          __hotswap: Stack[PartialFunction[Any, Unit]],
                          __factory: () => Actor,
-                         __homeAddress: Option[InetSocketAddress]) = {
+                         __homeAddress: Option[InetSocketAddress]) =
     this(__factory, __homeAddress)
     _uuid = __uuid
     id = __id
@@ -672,7 +662,6 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     hotswap = __hotswap
     setActorSelfFields(actor, this)
     start
-  }
 
   /**
     * Returns whether this actor ref is client-managed remote or not
@@ -702,14 +691,12 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   /**
     * Sets the dispatcher for this actor. Needs to be invoked before the actor is started.
     */
-  def dispatcher_=(md: MessageDispatcher): Unit = guard.withGuard {
-    if (!isBeingRestarted) {
+  def dispatcher_=(md: MessageDispatcher): Unit = guard.withGuard
+    if (!isBeingRestarted)
       if (!isRunning) _dispatcher = md
       else
         throw new ActorInitializationException("Can not swap dispatcher for " +
             toString + " after it has been started")
-    }
-  }
 
   /**
     * Get the dispatcher for this actor.
@@ -719,11 +706,11 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   /**
     * Starts up the actor and its message queue.
     */
-  def start(): ActorRef = guard.withGuard {
+  def start(): ActorRef = guard.withGuard
     if (isShutdown)
       throw new ActorStartException(
           "Can't restart an actor that has been shut down with 'stop' or 'exit'")
-    if (!isRunning) {
+    if (!isRunning)
       dispatcher.attach(this)
 
       _status = ActorRefInternals.RUNNING
@@ -739,36 +726,31 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
             uuid)
 
       checkReceiveTimeout //Schedule the initial Receive timeout
-    }
     this
-  }
 
   /**
     * Shuts down the actor its dispatcher and message queue.
     */
-  def stop() = guard.withGuard {
-    if (isRunning) {
+  def stop() = guard.withGuard
+    if (isRunning)
       receiveTimeout = None
       cancelReceiveTimeout
       dispatcher.detach(this)
       _status = ActorRefInternals.SHUTDOWN
-      try {
+      try
         actor.postStop
-      } finally {
+      finally
         currentMessage = null
         Actor.registry.unregister(this)
-        if (isRemotingEnabled) {
+        if (isRemotingEnabled)
           if (isClientManaged_?)
             Actor.remote.unregisterClientManagedActor(
                 homeAddress.get.getAddress.getHostAddress,
                 homeAddress.get.getPort,
                 uuid)
           Actor.remote.unregister(this)
-        }
         setActorSelfFields(actorInstance.get, null)
-      }
-    } //else if (isBeingRestarted) throw new ActorKilledException("Actor [" + toString + "] is being restarted.")
-  }
+    //else if (isBeingRestarted) throw new ActorKilledException("Actor [" + toString + "] is being restarted.")
 
   /**
     * Links an other actor to this actor. Links are unidirectional and means that a the linking actor will
@@ -780,7 +762,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     * <p/>
     * To be invoked from within the actor itself.
     */
-  def link(actorRef: ActorRef): Unit = guard.withGuard {
+  def link(actorRef: ActorRef): Unit = guard.withGuard
     val actorRefSupervisor = actorRef.supervisor
     val hasSupervisorAlready = actorRefSupervisor.isDefined
     if (hasSupervisorAlready && actorRefSupervisor.get.uuid == uuid)
@@ -789,34 +771,30 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
       throw new IllegalActorStateException(
           "Actor can only have one supervisor [" + actorRef +
           "], e.g. link(actor) fails")
-    else {
+    else
       _linkedActors.put(actorRef.uuid, actorRef)
       actorRef.supervisor = Some(this)
-    }
-  }
 
   /**
     * Unlink the actor.
     * <p/>
     * To be invoked from within the actor itself.
     */
-  def unlink(actorRef: ActorRef) = guard.withGuard {
+  def unlink(actorRef: ActorRef) = guard.withGuard
     if (_linkedActors.remove(actorRef.uuid) eq null)
       throw new IllegalActorStateException(
           "Actor [" + actorRef + "] is not a linked actor, can't unlink")
 
     actorRef.supervisor = None
-  }
 
   /**
     * Atomically start and link an actor.
     * <p/>
     * To be invoked from within the actor itself.
     */
-  def startLink(actorRef: ActorRef): Unit = guard.withGuard {
+  def startLink(actorRef: ActorRef): Unit = guard.withGuard
     link(actorRef)
     actorRef.start()
-  }
 
   /**
     * Atomically create (from actor class) and start an actor.
@@ -834,24 +812,22 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   def spawnRemote(clazz: Class[_ <: Actor],
                   hostname: String,
                   port: Int,
-                  timeout: Long = Actor.TIMEOUT): ActorRef = {
+                  timeout: Long = Actor.TIMEOUT): ActorRef =
     ensureRemotingEnabled
     val ref = Actor.remote.actorOf(clazz, hostname, port)
     ref.timeout = timeout
     ref.start()
-  }
 
   /**
     * Atomically create (from actor class), start and link an actor.
     * <p/>
     * To be invoked from within the actor itself.
     */
-  def spawnLink(clazz: Class[_ <: Actor]): ActorRef = {
+  def spawnLink(clazz: Class[_ <: Actor]): ActorRef =
     val actor = spawn(clazz)
     link(actor)
     actor.start()
     actor
-  }
 
   /**
     * Atomically create (from actor class), start, link and make an actor remote.
@@ -861,23 +837,21 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
   def spawnLinkRemote(clazz: Class[_ <: Actor],
                       hostname: String,
                       port: Int,
-                      timeout: Long = Actor.TIMEOUT): ActorRef = {
+                      timeout: Long = Actor.TIMEOUT): ActorRef =
     ensureRemotingEnabled
     val actor = Actor.remote.actorOf(clazz, hostname, port)
     actor.timeout = timeout
     link(actor)
     actor.start()
     actor
-  }
 
   /**
     * Returns the mailbox.
     */
   def mailbox: AnyRef = _mailbox
 
-  protected[akka] def mailbox_=(value: AnyRef): AnyRef = {
+  protected[akka] def mailbox_=(value: AnyRef): AnyRef =
     _mailbox = value; value
-  }
 
   /**
     * Returns the supervisor, if there is one.
@@ -891,7 +865,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
 
   protected[akka] def postMessageToMailbox(
       message: Any, senderOption: Option[ActorRef]): Unit =
-    if (isClientManaged_?) {
+    if (isClientManaged_?)
       Actor.remote.send[Any](message,
                              senderOption,
                              None,
@@ -902,7 +876,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
                              None,
                              ActorType.ScalaActor,
                              None)
-    } else
+    else
       dispatcher dispatchMessage new MessageInvocation(
           this, message, senderOption, None)
 
@@ -910,8 +884,8 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
       message: Any,
       timeout: Long,
       senderOption: Option[ActorRef],
-      senderFuture: Option[CompletableFuture[T]]): CompletableFuture[T] = {
-    if (isClientManaged_?) {
+      senderFuture: Option[CompletableFuture[T]]): CompletableFuture[T] =
+    if (isClientManaged_?)
       val future = Actor.remote.send[T](message,
                                         senderOption,
                                         senderFuture,
@@ -926,7 +900,7 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
       else
         throw new IllegalActorStateException(
             "Expected a future from remote call to actor " + toString)
-    } else {
+    else
       val future =
         if (senderFuture.isDefined) senderFuture
         else Some(new DefaultCompletableFuture[T](timeout))
@@ -936,41 +910,35 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
           senderOption,
           future.asInstanceOf[Some[CompletableFuture[Any]]])
       future.get
-    }
-  }
 
   /**
     * Callback for the dispatcher. This is the single entry point to the user Actor implementation.
     */
-  protected[akka] def invoke(messageHandle: MessageInvocation): Unit = {
+  protected[akka] def invoke(messageHandle: MessageInvocation): Unit =
     guard.lock.lock
-    try {
-      if (!isShutdown) {
+    try
+      if (!isShutdown)
         currentMessage = messageHandle
-        try {
-          try {
+        try
+          try
             cancelReceiveTimeout // FIXME: leave this here?
             actor(messageHandle.message)
             currentMessage = null // reset current message after successful invocation
-          } catch {
+          catch
             case e: InterruptedException =>
               currentMessage = null // received message while actor is shutting down, ignore
             case e =>
               handleExceptionInDispatch(e, messageHandle.message)
-          } finally {
+          finally
             checkReceiveTimeout // Reschedule receive timeout
-          }
-        } catch {
+        catch
           case e =>
             EventHandler.error(e, this, messageHandle.message.toString)
             throw e
-        }
-      }
-    } finally { guard.lock.unlock }
-  }
+    finally { guard.lock.unlock }
 
-  protected[akka] def handleTrapExit(dead: ActorRef, reason: Throwable) {
-    faultHandler match {
+  protected[akka] def handleTrapExit(dead: ActorRef, reason: Throwable)
+    faultHandler match
       case AllForOneStrategy(trapExit, maxRetries, within)
           if trapExit.exists(_.isAssignableFrom(reason.getClass)) =>
         restartLinkedActors(reason, maxRetries, within)
@@ -983,20 +951,18 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
         if (_supervisor.isDefined)
           notifySupervisorWithMessage(Exit(this, reason))
         else dead.stop()
-    }
-  }
 
   private def requestRestartPermission(
-      maxNrOfRetries: Option[Int], withinTimeRange: Option[Int]): Boolean = {
+      maxNrOfRetries: Option[Int], withinTimeRange: Option[Int]): Boolean =
     val denied =
-      if (maxNrOfRetries.isEmpty && withinTimeRange.isEmpty) {
+      if (maxNrOfRetries.isEmpty && withinTimeRange.isEmpty)
         //Immortal
         false
-      } else if (withinTimeRange.isEmpty) {
+      else if (withinTimeRange.isEmpty)
         // restrict number of restarts
         maxNrOfRetriesCount += 1 //Increment number of retries
         maxNrOfRetriesCount > maxNrOfRetries.get
-      } else {
+      else
         // cannot restart more than N within M timerange
         maxNrOfRetriesCount += 1 //Increment number of retries
         val windowStart = restartsWithinTimeRangeTimestamp
@@ -1020,18 +986,16 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
           maxNrOfRetriesCount = 1
 
         unrestartable
-      }
 
     denied == false //If we weren't denied, we have a go
-  }
 
   protected[akka] def restart(reason: Throwable,
                               maxNrOfRetries: Option[Int],
-                              withinTimeRange: Option[Int]) {
-    def performRestart() {
+                              withinTimeRange: Option[Int])
+    def performRestart()
       val failedActor = actorInstance.get
 
-      failedActor match {
+      failedActor match
         case p: Proxyable =>
           failedActor.preRestart(reason)
           failedActor.postRestart(reason)
@@ -1042,117 +1006,99 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
           actorInstance.set(freshActor) // Assign it here so if preStart fails, we can null out the sef-refs next call
           freshActor.preStart
           freshActor.postRestart(reason)
-      }
-    }
 
-    def tooManyRestarts() {
-      _supervisor.foreach { sup =>
+    def tooManyRestarts()
+      _supervisor.foreach  sup =>
         // can supervisor handle the notification?
         val notification = MaximumNumberOfRestartsWithinTimeRangeReached(
             this, maxNrOfRetries, withinTimeRange, reason)
         if (sup.isDefinedAt(notification))
           notifySupervisorWithMessage(notification)
-      }
       stop
-    }
 
     @tailrec
-    def attemptRestart() {
+    def attemptRestart()
       val success =
-        if (requestRestartPermission(maxNrOfRetries, withinTimeRange)) {
-          guard.withGuard[Boolean] {
+        if (requestRestartPermission(maxNrOfRetries, withinTimeRange))
+          guard.withGuard[Boolean]
             _status = ActorRefInternals.BEING_RESTARTED
 
-            lifeCycle match {
+            lifeCycle match
               case Temporary =>
                 shutDownTemporaryActor(this)
                 true
 
               case _ => // either permanent or none where default is permanent
-                val success = try {
+                val success = try
                   performRestart()
                   true
-                } catch {
+                catch
                   case e =>
                     EventHandler.error(
                         e,
                         this,
                         "Exception in restart of Actor [%s]".format(toString))
                     false // an error or exception here should trigger a retry
-                } finally {
+                finally
                   currentMessage = null
-                }
-                if (success) {
+                if (success)
                   _status = ActorRefInternals.RUNNING
                   dispatcher.resume(this)
                   restartLinkedActors(reason, maxNrOfRetries, withinTimeRange)
-                }
                 success
-            }
-          }
-        } else {
+        else
           tooManyRestarts()
           true // done
-        }
 
       if (success) () // alles gut
       else attemptRestart()
-    }
 
     attemptRestart() // recur
-  }
 
   protected[akka] def restartLinkedActors(reason: Throwable,
                                           maxNrOfRetries: Option[Int],
-                                          withinTimeRange: Option[Int]) = {
+                                          withinTimeRange: Option[Int]) =
     val i = _linkedActors.values.iterator
-    while (i.hasNext) {
+    while (i.hasNext)
       val actorRef = i.next
-      actorRef.lifeCycle match {
+      actorRef.lifeCycle match
         // either permanent or none where default is permanent
         case Temporary => shutDownTemporaryActor(actorRef)
         case _ => actorRef.restart(reason, maxNrOfRetries, withinTimeRange)
-      }
-    }
-  }
 
   protected[akka] def registerSupervisorAsRemoteActor: Option[Uuid] =
-    guard.withGuard {
+    guard.withGuard
       ensureRemotingEnabled
-      if (_supervisor.isDefined) {
+      if (_supervisor.isDefined)
         if (homeAddress.isDefined)
           Actor.remote.registerSupervisorForActor(this)
         Some(_supervisor.get.uuid)
-      } else None
-    }
+      else None
 
   def linkedActors: JMap[Uuid, ActorRef] =
     java.util.Collections.unmodifiableMap(_linkedActors)
 
   // ========= PRIVATE FUNCTIONS =========
 
-  private[this] def newActor: Actor = {
-    try {
+  private[this] def newActor: Actor =
+    try
       Actor.actorRefInCreation.set(Some(this))
       val a = actorFactory()
       if (a eq null)
         throw new ActorInitializationException(
             "Actor instance passed to ActorRef can not be 'null'")
       a
-    } finally {
+    finally
       Actor.actorRefInCreation.set(None)
-    }
-  }
 
-  private def shutDownTemporaryActor(temporaryActor: ActorRef) {
+  private def shutDownTemporaryActor(temporaryActor: ActorRef)
     temporaryActor.stop()
     _linkedActors.remove(temporaryActor.uuid) // remove the temporary actor
     // if last temporary actor is gone, then unlink me from supervisor
     if (_linkedActors.isEmpty) notifySupervisorWithMessage(UnlinkAndStop(this))
     true
-  }
 
-  private def handleExceptionInDispatch(reason: Throwable, message: Any) = {
+  private def handleExceptionInDispatch(reason: Throwable, message: Any) =
     EventHandler.error(reason, this, message.toString)
 
     //Prevent any further messages to be processed until the actor has been restarted
@@ -1161,39 +1107,31 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
     senderFuture.foreach(_.completeWithException(reason))
 
     if (supervisor.isDefined) notifySupervisorWithMessage(Exit(this, reason))
-    else {
-      lifeCycle match {
+    else
+      lifeCycle match
         case Temporary => shutDownTemporaryActor(this)
         case _ => dispatcher.resume(this) //Resume processing for this actor
-      }
-    }
-  }
 
-  private def notifySupervisorWithMessage(notification: LifeCycleMessage) = {
+  private def notifySupervisorWithMessage(notification: LifeCycleMessage) =
     // FIXME to fix supervisor restart of remote actor for oneway calls, inject a supervisor proxy that can send notification back to client
-    _supervisor.foreach { sup =>
-      if (sup.isShutdown) {
+    _supervisor.foreach  sup =>
+      if (sup.isShutdown)
         // if supervisor is shut down, game over for all linked actors
         //Scoped stop all linked actors, to avoid leaking the 'i' val
-        {
           val i = _linkedActors.values.iterator
-          while (i.hasNext) {
+          while (i.hasNext)
             i.next.stop()
             i.remove
-          }
-        }
         //Stop the actor itself
         stop
-      } else sup ! notification // else notify supervisor
-    }
-  }
+      else sup ! notification // else notify supervisor
 
-  private def setActorSelfFields(actor: Actor, value: ActorRef) {
+  private def setActorSelfFields(actor: Actor, value: ActorRef)
 
     @tailrec
     def lookupAndSetSelfFields(
-        clazz: Class[_], actor: Actor, value: ActorRef): Boolean = {
-      val success = try {
+        clazz: Class[_], actor: Actor, value: ActorRef): Boolean =
+      val success = try
         val selfField = clazz.getDeclaredField("self")
         val someSelfField = clazz.getDeclaredField("someSelf")
         selfField.setAccessible(true)
@@ -1201,54 +1139,43 @@ class LocalActorRef private[akka](private[this] val actorFactory: () => Actor,
         selfField.set(actor, value)
         someSelfField.set(actor, if (value ne null) Some(value) else null)
         true
-      } catch {
+      catch
         case e: NoSuchFieldException => false
-      }
 
       if (success) true
-      else {
+      else
         val parent = clazz.getSuperclass
         if (parent eq null)
           throw new IllegalActorStateException(toString +
               " is not an Actor since it have not mixed in the 'Actor' trait")
         lookupAndSetSelfFields(parent, actor, value)
-      }
-    }
 
     lookupAndSetSelfFields(actor.getClass, actor, value)
-  }
 
-  private def initializeActorInstance = {
+  private def initializeActorInstance =
     actor.preStart // run actor preStart
     Actor.registry.register(this)
-  }
 
-  protected[akka] def checkReceiveTimeout = {
+  protected[akka] def checkReceiveTimeout =
     cancelReceiveTimeout
-    if (receiveTimeout.isDefined && dispatcher.mailboxSize(this) <= 0) {
+    if (receiveTimeout.isDefined && dispatcher.mailboxSize(this) <= 0)
       //Only reschedule if desired and there are currently no more messages to be processed
       _futureTimeout = Some(
           Scheduler.scheduleOnce(
               this, ReceiveTimeout, receiveTimeout.get, TimeUnit.MILLISECONDS))
-    }
-  }
 
-  protected[akka] def cancelReceiveTimeout = {
-    if (_futureTimeout.isDefined) {
+  protected[akka] def cancelReceiveTimeout =
+    if (_futureTimeout.isDefined)
       _futureTimeout.get.cancel(true)
       _futureTimeout = None
-    }
-  }
-}
 
 /**
   * System messages for RemoteActorRef.
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object RemoteActorSystemMessage {
+object RemoteActorSystemMessage
   val Stop = "RemoteActorRef:stop".intern
-}
 
 /**
   * Remote ActorRef that is used when referencing the Actor on a different node than its "home" node.
@@ -1264,7 +1191,7 @@ private[akka] case class RemoteActorRef private[akka](
     _timeout: Long,
     loader: Option[ClassLoader],
     val actorType: ActorType = ActorType.ScalaActor)
-    extends ActorRef with ScalaActorRef {
+    extends ActorRef with ScalaActorRef
 
   ensureRemotingEnabled
 
@@ -1295,7 +1222,7 @@ private[akka] case class RemoteActorRef private[akka](
       message: Any,
       timeout: Long,
       senderOption: Option[ActorRef],
-      senderFuture: Option[CompletableFuture[T]]): CompletableFuture[T] = {
+      senderFuture: Option[CompletableFuture[T]]): CompletableFuture[T] =
     val future = Actor.remote.send[T](message,
                                       senderOption,
                                       senderFuture,
@@ -1310,19 +1237,15 @@ private[akka] case class RemoteActorRef private[akka](
     else
       throw new IllegalActorStateException(
           "Expected a future from remote call to actor " + toString)
-  }
 
-  def start: ActorRef = synchronized {
+  def start: ActorRef = synchronized
     _status = ActorRefInternals.RUNNING
     this
-  }
 
-  def stop: Unit = synchronized {
-    if (_status == ActorRefInternals.RUNNING) {
+  def stop: Unit = synchronized
+    if (_status == ActorRefInternals.RUNNING)
       _status = ActorRefInternals.SHUTDOWN
       postMessageToMailbox(RemoteActorSystemMessage.Stop, None)
-    }
-  }
 
   protected[akka] def registerSupervisorAsRemoteActor: Option[Uuid] = None
 
@@ -1365,7 +1288,6 @@ private[akka] case class RemoteActorRef private[akka](
   protected[akka] def actorInstance: AtomicReference[Actor] = unsupported
   private def unsupported =
     throw new UnsupportedOperationException("Not supported for RemoteActorRef")
-}
 
 /**
   * This trait represents the common (external) methods for all ActorRefs
@@ -1377,20 +1299,19 @@ private[akka] case class RemoteActorRef private[akka](
   * //can't call ActorRef methods here unless they are declared in a common
   * //superclass, which ActorRefShared is.
   */
-trait ActorRefShared {
+trait ActorRefShared
 
   /**
     * Returns the uuid for the actor.
     */
   def uuid: Uuid
-}
 
 /**
   * This trait represents the Scala Actor API
   * There are implicit conversions in ../actor/Implicits.scala
   * from ActorRef -> ScalaActorRef and back
   */
-trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
+trait ScalaActorRef extends ActorRefShared  ref: ActorRef =>
 
   /**
     * Identifier for actor, does not have to be a unique one. Default is the 'uuid'.
@@ -1435,21 +1356,19 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     * The reference sender Actor of the last received message.
     * Is defined if the message was sent from another Actor, else None.
     */
-  def sender: Option[ActorRef] = {
+  def sender: Option[ActorRef] =
     val msg = currentMessage
     if (msg eq null) None
     else msg.sender
-  }
 
   /**
     * The reference sender future of the last received message.
     * Is defined if the message was sent with sent with '!!' or '!!!', else None.
     */
-  def senderFuture(): Option[CompletableFuture[Any]] = {
+  def senderFuture(): Option[CompletableFuture[Any]] =
     val msg = currentMessage
     if (msg eq null) None
     else msg.senderFuture
-  }
 
   /**
     * Sends a one-way asynchronous message. E.g. fire-and-forget semantics.
@@ -1465,12 +1384,11 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     * </pre>
     * <p/>
     */
-  def !(message: Any)(implicit sender: Option[ActorRef] = None): Unit = {
+  def !(message: Any)(implicit sender: Option[ActorRef] = None): Unit =
     if (isRunning) postMessageToMailbox(message, sender)
     else
       throw new ActorInitializationException(
           "Actor has not been started, you need to invoke 'actor.start()' before using it")
-  }
 
   /**
     * Sends a message asynchronously and waits on a future for a reply message.
@@ -1485,28 +1403,26 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     * to send a reply message to the original sender. If not then the sender will block until the timeout expires.
     */
   def !!(message: Any, timeout: Long = this.timeout)(
-      implicit sender: Option[ActorRef] = None): Option[Any] = {
-    if (isRunning) {
+      implicit sender: Option[ActorRef] = None): Option[Any] =
+    if (isRunning)
       val future = postMessageToMailboxAndCreateFutureResultWithTimeout[Any](
           message, timeout, sender, None)
       val isMessageJoinPoint =
         if (isTypedActorEnabled)
           TypedActorModule.resolveFutureIfMessageIsJoinPoint(message, future)
         else false
-      try {
+      try
         future.await
-      } catch {
+      catch
         case e: FutureTimeoutException =>
-          if (isMessageJoinPoint) {
+          if (isMessageJoinPoint)
             EventHandler.error(e, this, e.getMessage)
             throw e
-          } else None
-      }
+          else None
       future.resultOrException
-    } else
+    else
       throw new ActorInitializationException(
           "Actor has not been started, you need to invoke 'actor.start()' before using it")
-  }
 
   /**
     * Sends a message asynchronously returns a future holding the eventual reply message.
@@ -1518,30 +1434,28 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     * to send a reply message to the original sender. If not then the sender will block until the timeout expires.
     */
   def !!![T](message: Any, timeout: Long = this.timeout)(
-      implicit sender: Option[ActorRef] = None): Future[T] = {
+      implicit sender: Option[ActorRef] = None): Future[T] =
     if (isRunning)
       postMessageToMailboxAndCreateFutureResultWithTimeout[T](
           message, timeout, sender, None)
     else
       throw new ActorInitializationException(
           "Actor has not been started, you need to invoke 'actor.start()' before using it")
-  }
 
   /**
     * Forwards the message and passes the original sender actor as the sender.
     * <p/>
     * Works with '!', '!!' and '!!!'.
     */
-  def forward(message: Any)(implicit sender: Some[ActorRef]) = {
-    if (isRunning) {
+  def forward(message: Any)(implicit sender: Some[ActorRef]) =
+    if (isRunning)
       if (sender.get.senderFuture.isDefined)
         postMessageToMailboxAndCreateFutureResultWithTimeout(
             message, timeout, sender.get.sender, sender.get.senderFuture)
       else postMessageToMailbox(message, sender.get.sender)
-    } else
+    else
       throw new ActorInitializationException(
           "Actor has not been started, you need to invoke 'actor.start()' before using it")
-  }
 
   /**
     * Use <code>self.reply(..)</code> to reply with a message to the original sender of the message currently
@@ -1563,16 +1477,15 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     * <p/>
     * Returns true if reply was sent, and false if unable to determine what to reply to.
     */
-  def reply_?(message: Any): Boolean = {
-    if (senderFuture.isDefined) {
+  def reply_?(message: Any): Boolean =
+    if (senderFuture.isDefined)
       senderFuture.get completeWithResult message
       true
-    } else if (sender.isDefined) {
+    else if (sender.isDefined)
       //TODO: optimize away this allocation, perhaps by having implicit self: Option[ActorRef] in signature
       sender.get.!(message)(Some(this))
       true
-    } else false
-  }
+    else false
 
   /**
     * Atomically create (from actor class) and start an actor.
@@ -1584,13 +1497,12 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     * Atomically create (from actor class), start and make an actor remote.
     */
   def spawnRemote[T <: Actor : ClassTag](
-      hostname: String, port: Int, timeout: Long): ActorRef = {
+      hostname: String, port: Int, timeout: Long): ActorRef =
     ensureRemotingEnabled
     spawnRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
                 hostname,
                 port,
                 timeout)
-  }
 
   /**
     * Atomically create (from actor class), start and link an actor.
@@ -1602,11 +1514,9 @@ trait ScalaActorRef extends ActorRefShared { ref: ActorRef =>
     * Atomically create (from actor class), start, link and make an actor remote.
     */
   def spawnLinkRemote[T <: Actor : ClassTag](
-      hostname: String, port: Int, timeout: Long): ActorRef = {
+      hostname: String, port: Int, timeout: Long): ActorRef =
     ensureRemotingEnabled
     spawnLinkRemote(classTag[T].erasure.asInstanceOf[Class[_ <: Actor]],
                     hostname,
                     port,
                     timeout)
-  }
-}

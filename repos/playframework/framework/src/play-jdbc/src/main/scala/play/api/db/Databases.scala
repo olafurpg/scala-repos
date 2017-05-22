@@ -16,7 +16,7 @@ import play.api.{Environment, Configuration, PlayConfig}
 /**
   * Creation helpers for manually instantiating databases.
   */
-object Databases {
+object Databases
 
   /**
     * Create a pooled database named "default" with the given driver and url.
@@ -30,12 +30,11 @@ object Databases {
   def apply(driver: String,
             url: String,
             name: String = "default",
-            config: Map[String, _ <: Any] = Map.empty): Database = {
+            config: Map[String, _ <: Any] = Map.empty): Database =
     val dbConfig =
       Configuration.reference.getConfig("play.db.prototype").get ++ Configuration
         .from(Map("driver" -> driver, "url" -> url) ++ config)
     new PooledDatabase(name, dbConfig)
-  }
 
   /**
     * Create an in-memory H2 database.
@@ -47,13 +46,12 @@ object Databases {
     */
   def inMemory(name: String = "default",
                urlOptions: Map[String, String] = Map.empty,
-               config: Map[String, _ <: Any] = Map.empty): Database = {
+               config: Map[String, _ <: Any] = Map.empty): Database =
     val driver = "org.h2.Driver"
     val urlExtra = urlOptions.map { case (k, v) => k + "=" + v }
       .mkString(";", ";", "")
     val url = "jdbc:h2:mem:" + name + urlExtra
     Databases(driver, url, name, config)
-  }
 
   /**
     * Run the given block with a database, cleaning up afterwards.
@@ -69,14 +67,12 @@ object Databases {
                       url: String,
                       name: String = "default",
                       config: Map[String, _ <: Any] = Map.empty)(
-      block: Database => T): T = {
+      block: Database => T): T =
     val database = Databases(driver, url, name, config)
-    try {
+    try
       block(database)
-    } finally {
+    finally
       database.shutdown()
-    }
-  }
 
   /**
     * Run the given block with an in-memory h2 database, cleaning up afterwards.
@@ -90,15 +86,12 @@ object Databases {
   def withInMemory[T](name: String = "default",
                       urlOptions: Map[String, String] = Map.empty,
                       config: Map[String, _ <: Any] = Map.empty)(
-      block: Database => T): T = {
+      block: Database => T): T =
     val database = inMemory(name, urlOptions, config)
-    try {
+    try
       block(database)
-    } finally {
+    finally
       database.shutdown()
-    }
-  }
-}
 
 /**
   * Default implementation of the database API.
@@ -106,7 +99,7 @@ object Databases {
   */
 abstract class DefaultDatabase(
     val name: String, configuration: Config, environment: Environment)
-    extends Database {
+    extends Database
 
   private val config = PlayConfig(configuration)
   val databaseConfig = DatabaseConfig.fromConfig(config, environment)
@@ -119,90 +112,73 @@ abstract class DefaultDatabase(
 
   // driver registration
 
-  lazy val driver: Option[Driver] = {
-    databaseConfig.driver.map { driverClassName =>
-      try {
+  lazy val driver: Option[Driver] =
+    databaseConfig.driver.map  driverClassName =>
+      try
         val proxyDriver = new ProxyDriver(Reflect.createInstance[Driver](
                 driverClassName, environment.classLoader))
         DriverManager.registerDriver(proxyDriver)
         proxyDriver
-      } catch {
+      catch
         case NonFatal(e) =>
           throw config.reportError(
               "driver", s"Driver not found: [$driverClassName}]", Some(e))
-      }
-    }
-  }
 
   // lazy data source creation
 
-  lazy val dataSource: DataSource = {
+  lazy val dataSource: DataSource =
     driver // trigger driver registration
     createDataSource()
-  }
 
-  lazy val url: String = {
+  lazy val url: String =
     val connection = dataSource.getConnection
-    try {
+    try
       connection.getMetaData.getURL
-    } finally {
+    finally
       connection.close()
-    }
-  }
 
   // connection methods
 
-  def getConnection(): Connection = {
+  def getConnection(): Connection =
     getConnection(autocommit = true)
-  }
 
-  def getConnection(autocommit: Boolean): Connection = {
+  def getConnection(autocommit: Boolean): Connection =
     val connection = dataSource.getConnection
     connection.setAutoCommit(autocommit)
     connection
-  }
 
-  def withConnection[A](block: Connection => A): A = {
+  def withConnection[A](block: Connection => A): A =
     withConnection(autocommit = true)(block)
-  }
 
-  def withConnection[A](autocommit: Boolean)(block: Connection => A): A = {
+  def withConnection[A](autocommit: Boolean)(block: Connection => A): A =
     val connection = getConnection(autocommit)
-    try {
+    try
       block(connection)
-    } finally {
+    finally
       connection.close()
-    }
-  }
 
-  def withTransaction[A](block: Connection => A): A = {
-    withConnection(autocommit = false) { connection =>
-      try {
+  def withTransaction[A](block: Connection => A): A =
+    withConnection(autocommit = false)  connection =>
+      try
         val r = block(connection)
         connection.commit()
         r
-      } catch {
+      catch
         case e: ControlThrowable =>
           connection.commit()
           throw e
         case e: Throwable =>
           connection.rollback()
           throw e
-      }
-    }
-  }
 
   // shutdown
 
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     closeDataSource(dataSource)
     deregisterDriver()
-  }
 
-  def deregisterDriver(): Unit = {
+  def deregisterDriver(): Unit =
     driver.foreach(DriverManager.deregisterDriver)
-  }
-}
 
 /**
   * Default implementation of the database API using a connection pool.
@@ -211,7 +187,7 @@ class PooledDatabase(name: String,
                      configuration: Config,
                      environment: Environment,
                      pool: ConnectionPool)
-    extends DefaultDatabase(name, configuration, environment) {
+    extends DefaultDatabase(name, configuration, environment)
 
   def this(name: String, configuration: Configuration) =
     this(name,
@@ -219,22 +195,17 @@ class PooledDatabase(name: String,
          Environment.simple(),
          new HikariCPConnectionPool(Environment.simple()))
 
-  def createDataSource(): DataSource = {
+  def createDataSource(): DataSource =
     val datasource: DataSource =
       pool.create(name, databaseConfig, configuration)
-    if (configuration.getBoolean("logSql")) {
+    if (configuration.getBoolean("logSql"))
       val proxyDatasource = new LogSqlDataSource()
       proxyDatasource.setTargetDSDirect(datasource)
       proxyDatasource
-    } else {
+    else
       datasource
-    }
-  }
 
-  def closeDataSource(dataSource: DataSource): Unit = {
-    dataSource match {
+  def closeDataSource(dataSource: DataSource): Unit =
+    dataSource match
       case ds: LogSqlDataSource => pool.close(ds.getTargetDatasource)
       case _ => pool.close(dataSource)
-    }
-  }
-}

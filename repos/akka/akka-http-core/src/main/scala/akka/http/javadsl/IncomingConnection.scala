@@ -19,7 +19,7 @@ import scala.compat.java8.FutureConverters._
   * Represents one accepted incoming HTTP connection.
   */
 class IncomingConnection private[http](
-    delegate: akka.http.scaladsl.Http.IncomingConnection) {
+    delegate: akka.http.scaladsl.Http.IncomingConnection)
 
   /**
     * The local address of this connection.
@@ -79,4 +79,3 @@ class IncomingConnection private[http](
     delegate.handleWithAsyncHandler(
         handler.apply(_).toScala.asInstanceOf[Future[sm.HttpResponse]],
         parallelism)(materializer)
-}

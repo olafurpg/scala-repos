@@ -24,30 +24,24 @@ class ScTraitParentsImpl private (stub: StubElement[ScTemplateParents],
                                   nodeType: IElementType,
                                   node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScTraitParents {
+    with ScTraitParents
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScTemplateParentsStub) = {
+  def this(stub: ScTemplateParentsStub) =
     this(stub, ScalaElementTypes.TRAIT_PARENTS, null)
-  }
 
   override def toString: String = "TraitParents"
 
-  def superTypes: Seq[ScType] = {
+  def superTypes: Seq[ScType] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScTemplateParentsStub].getTemplateParentsTypes ++ syntheticTypeElements
         .map(_.getType(TypingContext.empty).getOrAny)
-    }
     allTypeElements.map(_.getType(TypingContext.empty).getOrAny)
-  }
 
-  def typeElements: Seq[ScTypeElement] = {
+  def typeElements: Seq[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub
         .asInstanceOf[ScTemplateParentsStub]
         .getTemplateParentsTypeElements
-    }
     findChildrenByClassScala(classOf[ScTypeElement])
-  }
-}

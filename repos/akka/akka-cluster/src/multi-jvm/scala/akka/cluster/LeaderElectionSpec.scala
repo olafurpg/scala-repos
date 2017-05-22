@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 import scala.collection.immutable
 
 final case class LeaderElectionMultiNodeConfig(failureDetectorPuppet: Boolean)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val controller = role("controller")
   val first = role("first")
   val second = role("second")
@@ -21,7 +21,6 @@ final case class LeaderElectionMultiNodeConfig(failureDetectorPuppet: Boolean)
 
   commonConfig(debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
-}
 
 class LeaderElectionWithFailureDetectorPuppetMultiJvmNode1
     extends LeaderElectionSpec(failureDetectorPuppet = true)
@@ -47,7 +46,7 @@ class LeaderElectionWithAccrualFailureDetectorMultiJvmNode5
 
 abstract class LeaderElectionSpec(
     multiNodeConfig: LeaderElectionMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec
 
   def this(failureDetectorPuppet: Boolean) =
     this(LeaderElectionMultiNodeConfig(failureDetectorPuppet))
@@ -57,20 +56,18 @@ abstract class LeaderElectionSpec(
   // sorted in the order used by the cluster
   lazy val sortedRoles = List(first, second, third, fourth).sorted
 
-  "A cluster of four nodes" must {
+  "A cluster of four nodes" must
 
-    "be able to 'elect' a single leader" taggedAs LongRunningTest in {
+    "be able to 'elect' a single leader" taggedAs LongRunningTest in
       awaitClusterUp(first, second, third, fourth)
 
-      if (myself != controller) {
+      if (myself != controller)
         clusterView.isLeader should ===(myself == sortedRoles.head)
         assertLeaderIn(sortedRoles)
-      }
 
       enterBarrier("after-1")
-    }
 
-    def shutdownLeaderAndVerifyNewLeader(alreadyShutdown: Int): Unit = {
+    def shutdownLeaderAndVerifyNewLeader(alreadyShutdown: Int): Unit =
       val currentRoles = sortedRoles.drop(alreadyShutdown)
       currentRoles.size should be >= (2)
       val leader = currentRoles.head
@@ -78,7 +75,7 @@ abstract class LeaderElectionSpec(
       val remainingRoles = currentRoles.tail
       val n = "-" + (alreadyShutdown + 1)
 
-      myself match {
+      myself match
 
         case `controller` ⇒
           val leaderAddress = address(leader)
@@ -129,19 +126,13 @@ abstract class LeaderElectionSpec(
           assertLeaderIn(remainingRoles)
 
           enterBarrier("completed" + n)
-      }
-    }
 
     "be able to 're-elect' a single leader after leader has left" taggedAs LongRunningTest in within(
-        30 seconds) {
+        30 seconds)
       shutdownLeaderAndVerifyNewLeader(alreadyShutdown = 0)
       enterBarrier("after-2")
-    }
 
     "be able to 're-elect' a single leader after leader has left (again)" taggedAs LongRunningTest in within(
-        30 seconds) {
+        30 seconds)
       shutdownLeaderAndVerifyNewLeader(alreadyShutdown = 1)
       enterBarrier("after-3")
-    }
-  }
-}

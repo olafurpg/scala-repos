@@ -1,5 +1,4 @@
 package a
 
-private[a] object Settings {
+private[a] object Settings
   val X = "a.Settings"
-}

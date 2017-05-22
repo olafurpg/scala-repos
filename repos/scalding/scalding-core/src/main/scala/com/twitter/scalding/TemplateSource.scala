@@ -26,7 +26,7 @@ import cascading.tuple.Fields
 /**
   * This is a base class for template based output sources
   */
-abstract class TemplateSource extends SchemedSource with HfsTapProvider {
+abstract class TemplateSource extends SchemedSource with HfsTapProvider
 
   // The root path of the templated output.
   def basePath: String
@@ -44,46 +44,36 @@ abstract class TemplateSource extends SchemedSource with HfsTapProvider {
     * @returns A cascading TemplateTap.
     */
   override def createTap(readOrWrite: AccessMode)(
-      implicit mode: Mode): Tap[_, _, _] = {
-    readOrWrite match {
+      implicit mode: Mode): Tap[_, _, _] =
+    readOrWrite match
       case Read =>
         throw new InvalidSourceException("Cannot use TemplateSource for input")
-      case Write => {
-          mode match {
-            case Local(_) => {
+      case Write =>
+          mode match
+            case Local(_) =>
                 val localTap = new FileTap(localScheme, basePath, sinkMode)
                 new LTemplateTap(localTap, template, pathFields)
-              }
-            case hdfsMode @ Hdfs(_, _) => {
+            case hdfsMode @ Hdfs(_, _) =>
                 val hfsTap = createHfsTap(hdfsScheme, basePath, sinkMode)
                 new HTemplateTap(hfsTap, template, pathFields)
-              }
-            case hdfsTest @ HadoopTest(_, _) => {
+            case hdfsTest @ HadoopTest(_, _) =>
                 val hfsTap = createHfsTap(
                     hdfsScheme, hdfsTest.getWritePathFor(this), sinkMode)
                 new HTemplateTap(hfsTap, template, pathFields)
-              }
             case _ => TestTapFactory(this, hdfsScheme).createTap(readOrWrite)
-          }
-        }
-    }
-  }
 
   /**
     * Validates the taps, makes sure there are no nulls as the path or template.
     *
     * @param mode The mode of the job.
     */
-  override def validateTaps(mode: Mode): Unit = {
-    if (basePath == null) {
+  override def validateTaps(mode: Mode): Unit =
+    if (basePath == null)
       throw new InvalidSourceException(
           "basePath cannot be null for TemplateTap")
-    } else if (template == null) {
+    else if (template == null)
       throw new InvalidSourceException(
           "template cannot be null for TemplateTap")
-    }
-  }
-}
 
 /**
   * An implementation of TSV output, split over a template tap.
@@ -118,7 +108,6 @@ case class TemplatedSequenceFile(
     val sequenceFields: Fields = Fields.ALL,
     override val pathFields: Fields = Fields.ALL,
     override val sinkMode: SinkMode = SinkMode.REPLACE)
-    extends TemplateSource with SequenceFileScheme {
+    extends TemplateSource with SequenceFileScheme
 
   override val fields = sequenceFields
-}

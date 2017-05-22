@@ -33,60 +33,54 @@ import Helpers._
   * tag, then its contents will be executed after successful submission of
   * the form.
   */
-object Form extends DispatchSnippet {
+object Form extends DispatchSnippet
 
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case "render" => render _
     case "ajax" => render _
     case "post" => post _
-  }
 
   /**
     * Add the post method and postback (current URL) as action.
     * If the multipart attribute is specified, set the enctype
     * as "multipart/form-data"
     */
-  def post(kids: NodeSeq): NodeSeq = {
+  def post(kids: NodeSeq): NodeSeq =
     // yeah it's ugly, but I'm not sure
     // we could do it reliably with pattern matching
     // dpp Oct 29, 2010
     val ret: Elem =
       if (kids.length == 1 && kids(0).isInstanceOf[Elem] &&
-          (kids(0).prefix eq null) && kids(0).label == "form") {
+          (kids(0).prefix eq null) && kids(0).label == "form")
         val e = kids(0).asInstanceOf[Elem]
         val meta = new UnprefixedAttribute(
             "method",
             "post",
-            new UnprefixedAttribute("action", S.uri, e.attributes.filter {
+            new UnprefixedAttribute("action", S.uri, e.attributes.filter
               case up: UnprefixedAttribute =>
                 up.key != "method" && up.key != "action"
               case x => true
-            }))
+            ))
         new Elem(null, "form", meta, e.scope, e.minimizeEmpty, e.child: _*)
-      } else {
+      else
         <form method="post" action={S.uri}>{kids}</form>
-      }
 
-    S.attr("multipart") match {
+    S.attr("multipart") match
       case Full(x) if Helpers.toBoolean(x) =>
         ret % ("enctype" -> "multipart/form-data")
       case _ => ret
-    }
-  }
 
-  def render(kids: NodeSeq): NodeSeq = {
+  def render(kids: NodeSeq): NodeSeq =
     // yeah it's ugly, but I'm not sure
     // we could do it reliably with pattern matching
     // dpp Oct 29, 2010
     if (kids.length == 1 && kids(0).isInstanceOf[Elem] &&
-        (kids(0).prefix eq null) && kids(0).label == "form") {
+        (kids(0).prefix eq null) && kids(0).label == "form")
       new Elem(null, "form", addAjaxForm, TopScope, true, kids(0).child: _*)
-    } else {
+    else
       Elem(null, "form", addAjaxForm, TopScope, true, kids: _*)
-    }
-  }
 
-  private def addAjaxForm: MetaData = {
+  private def addAjaxForm: MetaData =
     val id = Helpers.nextFuncName
 
     val attr = S.currentAttrsToMetaData(name =>
@@ -110,5 +104,3 @@ object Form extends DispatchSnippet {
             "action",
             Text("javascript://"),
             new UnprefixedAttribute("onsubmit", Text(ajax), attr)))
-  }
-}

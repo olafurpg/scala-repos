@@ -26,48 +26,41 @@ import kafka.common.{InvalidConfigException, Config}
     "This object has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
-object ProducerConfig extends Config {
-  def validate(config: ProducerConfig) {
+object ProducerConfig extends Config
+  def validate(config: ProducerConfig)
     validateClientId(config.clientId)
     validateBatchSize(
         config.batchNumMessages, config.queueBufferingMaxMessages)
     validateProducerType(config.producerType)
-  }
 
-  def validateClientId(clientId: String) {
+  def validateClientId(clientId: String)
     validateChars("client.id", clientId)
-  }
 
-  def validateBatchSize(batchSize: Int, queueSize: Int) {
+  def validateBatchSize(batchSize: Int, queueSize: Int)
     if (batchSize > queueSize)
       throw new InvalidConfigException(
           "Batch size = " + batchSize + " can't be larger than queue size = " +
           queueSize)
-  }
 
-  def validateProducerType(producerType: String) {
-    producerType match {
+  def validateProducerType(producerType: String)
+    producerType match
       case "sync" =>
       case "async" =>
       case _ =>
         throw new InvalidConfigException("Invalid value " + producerType +
             " for producer.type, valid values are sync/async")
-    }
-  }
-}
 
 @deprecated(
     "This class has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 class ProducerConfig private (val props: VerifiableProperties)
-    extends AsyncProducerConfig with SyncProducerConfigShared {
+    extends AsyncProducerConfig with SyncProducerConfigShared
   import ProducerConfig._
 
-  def this(originalProps: Properties) {
+  def this(originalProps: Properties)
     this(new VerifiableProperties(originalProps))
     props.verify()
-  }
 
   /** This is for bootstrapping and the producer will only use it for getting metadata
     * (topics, partitions and replicas). The socket connections for sending the actual data
@@ -130,4 +123,3 @@ class ProducerConfig private (val props: VerifiableProperties)
     props.getInt("topic.metadata.refresh.interval.ms", 600000)
 
   validate(this)
-}

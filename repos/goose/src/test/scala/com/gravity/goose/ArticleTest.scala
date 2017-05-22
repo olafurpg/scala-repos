@@ -8,12 +8,10 @@ import org.junit.Assert._
   * User: jim
   * Date: 8/14/11
   */
-class ArticleTest {
+class ArticleTest
 
   @Test
-  def newArticle() {
+  def newArticle()
     val a = new Article()
 
     assertTrue(a.isInstanceOf[Article])
-  }
-}

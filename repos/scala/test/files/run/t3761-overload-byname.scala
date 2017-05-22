@@ -1,4 +1,4 @@
-class OverTheTop {
+class OverTheTop
   def info0(m: String) = m + "!"
   def info0(m: String, args: Any*) = m + " " + args.mkString(" ")
 
@@ -17,10 +17,9 @@ class OverTheTop {
 
   def m3(x: => Int, s: String) = 0
   def m3(x: => Any, s: Object) = 1
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val top = new OverTheTop
     println(top.info0("hello"))
     println(top.info0("hello", "working", "world"))
@@ -34,5 +33,3 @@ object Test {
     println(top.m2(1d, ""))
     println(top.m3(1, ""))
     println(top.m3("", ""))
-  }
-}

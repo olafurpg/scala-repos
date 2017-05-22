@@ -9,7 +9,7 @@ import akka.http.javadsl.{model ⇒ jm}
 
 /** The result status code of an HTTP response. */
 sealed abstract class StatusCode
-    extends jm.StatusCode with LazyValueBytesRenderable {
+    extends jm.StatusCode with LazyValueBytesRenderable
   def intValue: Int
   def value: String = intValue.toString + ' ' + reason
   def reason: String
@@ -18,42 +18,35 @@ sealed abstract class StatusCode
   def isFailure: Boolean
   def isRedirection: Boolean
   def allowsEntity: Boolean
-}
 
-object StatusCode {
+object StatusCode
   import StatusCodes._
   implicit def int2StatusCode(code: Int): StatusCode =
     getForKey(code).getOrElse(throw new RuntimeException(
             "Non-standard status codes cannot be created by implicit conversion. Use `StatusCodes.custom` instead."))
-}
 
-object StatusCodes extends ObjectRegistry[Int, StatusCode] {
-  sealed protected abstract class HttpSuccess extends StatusCode {
+object StatusCodes extends ObjectRegistry[Int, StatusCode]
+  sealed protected abstract class HttpSuccess extends StatusCode
     def isSuccess = true
     def isFailure = false
-  }
-  sealed protected abstract class HttpFailure extends StatusCode {
+  sealed protected abstract class HttpFailure extends StatusCode
     def isSuccess = false
     def isFailure = true
     def isRedirection: Boolean = false
 
     def allowsEntity = true
-  }
 
   // format: OFF
   final case class Informational private[StatusCodes] (intValue: Int)(val reason: String,
-                                                                val defaultMessage: String) extends HttpSuccess {
+                                                                val defaultMessage: String) extends HttpSuccess
     def allowsEntity = false
     def isRedirection: Boolean = false
-  }
   final case class Success       private[StatusCodes] (intValue: Int)(val reason: String, val defaultMessage: String,
-                                                                val allowsEntity: Boolean = true) extends HttpSuccess {
+                                                                val allowsEntity: Boolean = true) extends HttpSuccess
     def isRedirection: Boolean = false
-  }
   final case class Redirection   private[StatusCodes] (intValue: Int)(val reason: String, val defaultMessage: String,
-                                                                val htmlTemplate: String, val allowsEntity: Boolean = true) extends HttpSuccess {
+                                                                val htmlTemplate: String, val allowsEntity: Boolean = true) extends HttpSuccess
     def isRedirection: Boolean = true
-  }
   final case class ClientError   private[StatusCodes] (intValue: Int)(val reason: String, val defaultMessage: String) extends HttpFailure
   final case class ServerError   private[StatusCodes] (intValue: Int)(val reason: String, val defaultMessage: String) extends HttpFailure
 
@@ -61,16 +54,14 @@ object StatusCodes extends ObjectRegistry[Int, StatusCode] {
     val reason: String,
     val defaultMessage: String,
     val isSuccess: Boolean,
-    val allowsEntity: Boolean) extends StatusCode {
+    val allowsEntity: Boolean) extends StatusCode
     def isFailure: Boolean = !isSuccess
     def isRedirection: Boolean = false
-  }
 
-  private def reg[T <: StatusCode](code: T): T = {
+  private def reg[T <: StatusCode](code: T): T =
     require(getForKey(code.intValue).isEmpty, s"Status code for ${code.intValue} already registered as '${getForKey(code.intValue).get}'.")
 
     register(code.intValue, code)
-  }
 
   /**
     * Create a custom status code and allow full customization of behavior. The value of `allowsEntity`
@@ -168,4 +159,3 @@ object StatusCodes extends ObjectRegistry[Int, StatusCode] {
   val NetworkReadTimeout            = reg(e(598)("Network read timeout error", ""))
   val NetworkConnectTimeout         = reg(e(599)("Network connect timeout error", ""))
   // format: ON
-}

@@ -1,6 +1,6 @@
 package lila.forumSearch
 
-private[forumSearch] object Fields {
+private[forumSearch] object Fields
   val body = "bo"
   val topic = "to"
   val topicId = "ti"
@@ -8,4 +8,3 @@ private[forumSearch] object Fields {
   val staff = "st"
   val troll = "tr"
   val date = "da"
-}

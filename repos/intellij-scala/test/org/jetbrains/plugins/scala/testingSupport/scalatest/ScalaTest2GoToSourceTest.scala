@@ -4,7 +4,7 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   * @author Roman.Shein
   * @since 11.02.2015.
   */
-trait ScalaTest2GoToSourceTest extends ScalaTestGoToSourceTest {
+trait ScalaTest2GoToSourceTest extends ScalaTestGoToSourceTest
   def getSuccessfulTestPath: List[String] =
     List("[root]",
          "SuccessfulGoToLocationTest",
@@ -27,4 +27,3 @@ trait ScalaTest2GoToSourceTest extends ScalaTestGoToSourceTest {
   def getPendingLocationLine: Int = 6
   def getIgnoredLocationLine: Int = 10
   def getFailedLocationLine: Int = 13
-}

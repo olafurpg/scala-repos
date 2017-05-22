@@ -18,7 +18,7 @@ import mutable.{Builder, SetBuilder}
   *  @define Coll `immutable.TreeSet`
   *  @define coll immutable tree set
   */
-object TreeSet extends ImmutableSortedSetFactory[TreeSet] {
+object TreeSet extends ImmutableSortedSetFactory[TreeSet]
   implicit def implicitBuilder[A](
       implicit ordering: Ordering[A]): Builder[A, TreeSet[A]] =
     newBuilder[A](ordering)
@@ -29,7 +29,6 @@ object TreeSet extends ImmutableSortedSetFactory[TreeSet] {
   /** The empty set of this type
     */
   def empty[A](implicit ordering: Ordering[A]) = new TreeSet[A]
-}
 
 /** This class implements immutable sets using a tree.
   *
@@ -55,7 +54,7 @@ object TreeSet extends ImmutableSortedSetFactory[TreeSet] {
     "2.11.0")
 class TreeSet[A] private (
     tree: RB.Tree[A, Unit])(implicit val ordering: Ordering[A])
-    extends SortedSet[A] with SortedSetLike[A, TreeSet[A]] with Serializable {
+    extends SortedSet[A] with SortedSetLike[A, TreeSet[A]] with Serializable
 
   if (ordering eq null)
     throw new NullPointerException("ordering must not be null")
@@ -72,35 +71,31 @@ class TreeSet[A] private (
   override def tail = new TreeSet(RB.delete(tree, firstKey))
   override def init = new TreeSet(RB.delete(tree, lastKey))
 
-  override def drop(n: Int) = {
+  override def drop(n: Int) =
     if (n <= 0) this
     else if (n >= size) empty
     else newSet(RB.drop(tree, n))
-  }
 
-  override def take(n: Int) = {
+  override def take(n: Int) =
     if (n <= 0) empty
     else if (n >= size) this
     else newSet(RB.take(tree, n))
-  }
 
-  override def slice(from: Int, until: Int) = {
+  override def slice(from: Int, until: Int) =
     if (until <= from) empty
     else if (from <= 0) take(until)
     else if (until >= size) drop(from)
     else newSet(RB.slice(tree, from, until))
-  }
 
   override def dropRight(n: Int) = take(size - math.max(n, 0))
   override def takeRight(n: Int) = drop(size - math.max(n, 0))
   override def splitAt(n: Int) = (take(n), drop(n))
 
-  private[this] def countWhile(p: A => Boolean): Int = {
+  private[this] def countWhile(p: A => Boolean): Int =
     var result = 0
     val it = iterator
     while (it.hasNext && p(it.next())) result += 1
     result
-  }
   override def dropWhile(p: A => Boolean) = drop(countWhile(p))
   override def takeWhile(p: A => Boolean) = take(countWhile(p))
   override def span(p: A => Boolean) = splitAt(countWhile(p))
@@ -127,10 +122,9 @@ class TreeSet[A] private (
     *  @param elem    a new element to add.
     *  @return        a new $coll containing `elem` and all the elements of this $coll.
     */
-  def insert(elem: A): TreeSet[A] = {
+  def insert(elem: A): TreeSet[A] =
     assert(!RB.contains(tree, elem))
     newSet(RB.update(tree, elem, (), overwrite = false))
-  }
 
   /** Creates a new `TreeSet` with the entry removed.
     *
@@ -169,4 +163,3 @@ class TreeSet[A] private (
 
   override def firstKey = head
   override def lastKey = last
-}

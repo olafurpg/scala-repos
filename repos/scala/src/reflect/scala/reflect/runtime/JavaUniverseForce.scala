@@ -2,8 +2,8 @@
 package scala.reflect
 package runtime
 
-trait JavaUniverseForce { self: runtime.JavaUniverse =>
-  def force() {
+trait JavaUniverseForce  self: runtime.JavaUniverse =>
+  def force()
     Literal(Constant(42)).duplicate
     nme.flattenedName()
     nme.raw
@@ -458,5 +458,3 @@ trait JavaUniverseForce { self: runtime.JavaUniverse =>
     erasure.javaErasure
     erasure.verifiedJavaErasure
     erasure.boxingErasure
-  }
-}

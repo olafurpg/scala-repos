@@ -10,7 +10,7 @@ import org.openjdk.jmh.infra.Blackhole
 
 @OperationsPerInvocation(50)
 @State(Scope.Benchmark)
-class TraceBenchmark extends StdBenchAnnotations {
+class TraceBenchmark extends StdBenchAnnotations
 
   private[this] val traceId = TraceId(
       Some(SpanId(5L)),
@@ -28,16 +28,14 @@ class TraceBenchmark extends StdBenchAnnotations {
   private[this] val deadline = Deadline(Time.Top, Time.Top)
 
   @Benchmark
-  def contexts0(hole: Blackhole): Unit = {
+  def contexts0(hole: Blackhole): Unit =
     // Because Contexts are only scoped within a `let`, we want
     // to amortize the cost of setting up the context and try
     // to focus this measurement on the call to `Trace.id`.
     var i = 0
-    while (i < Iterations) {
+    while (i < Iterations)
       hole.consume(Trace.id)
       i += 1
-    }
-  }
 
   @Benchmark
   def contexts1(hole: Blackhole): Unit =
@@ -58,4 +56,3 @@ class TraceBenchmark extends StdBenchAnnotations {
   @Benchmark
   def contexts5(hole: Blackhole): Unit =
     Trace.letTracer(NullTracer) { contexts4(hole) }
-}

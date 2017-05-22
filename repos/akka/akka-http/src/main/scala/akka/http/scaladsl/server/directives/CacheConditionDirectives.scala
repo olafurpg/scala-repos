@@ -12,7 +12,7 @@ import HttpMethods._
 import StatusCodes._
 import EntityTag._
 
-trait CacheConditionDirectives {
+trait CacheConditionDirectives
   import BasicDirectives._
   import RouteDirectives._
 
@@ -69,7 +69,7 @@ trait CacheConditionDirectives {
     * must be on a deeper level in your route structure in order to function correctly.
     */
   def conditional(
-      eTag: Option[EntityTag], lastModified: Option[DateTime]): Directive0 = {
+      eTag: Option[EntityTag], lastModified: Option[DateTime]): Directive0 =
     def addResponseHeaders: Directive0 =
       mapResponse(
           _.withDefaultHeaders(eTag.map(ETag(_)).toList ++ lastModified
@@ -81,9 +81,9 @@ trait CacheConditionDirectives {
       addResponseHeaders(complete(HttpResponse(NotModified)))
     def complete412(): Route = _.complete(PreconditionFailed)
 
-    extractRequest.flatMap { request ⇒
+    extractRequest.flatMap  request ⇒
       import request._
-      mapInnerRoute { route ⇒
+      mapInnerRoute  route ⇒
         def innerRouteWithRangeHeaderFilteredOut: Route =
           (mapRequest(_.mapHeaders(_.filterNot(_.isInstanceOf[Range]))) & addResponseHeaders)(
               route)
@@ -94,38 +94,34 @@ trait CacheConditionDirectives {
           ifModifiedSince.clicks < System.currentTimeMillis()
 
         def step1(): Route =
-          header[`If-Match`] match {
+          header[`If-Match`] match
             case Some(`If-Match`(im)) if eTag.isDefined ⇒
               if (matchesRange(eTag.get, im, weakComparison = false)) step3()
               else complete412()
             case None ⇒ step2()
-          }
         def step2(): Route =
-          header[`If-Unmodified-Since`] match {
+          header[`If-Unmodified-Since`] match
             case Some(`If-Unmodified-Since`(ius))
                 if lastModified.isDefined && !unmodified(ius) ⇒
               complete412()
             case _ ⇒ step3()
-          }
         def step3(): Route =
-          header[`If-None-Match`] match {
+          header[`If-None-Match`] match
             case Some(`If-None-Match`(inm)) if eTag.isDefined ⇒
               if (!matchesRange(eTag.get, inm, weakComparison = true)) step5()
               else if (isGetOrHead) complete304() else complete412()
             case None ⇒ step4()
-          }
         def step4(): Route =
-          if (isGetOrHead) {
-            header[`If-Modified-Since`] match {
+          if (isGetOrHead)
+            header[`If-Modified-Since`] match
               case Some(`If-Modified-Since`(ims))
                   if lastModified.isDefined && unmodified(ims) ⇒
                 complete304()
               case _ ⇒ step5()
-            }
-          } else step5()
+          else step5()
         def step5(): Route =
           if (method == GET && header[Range].isDefined)
-            header[`If-Range`] match {
+            header[`If-Range`] match
               case Some(`If-Range`(Left(tag)))
                   if eTag.isDefined &&
                   !matches(eTag.get, tag, weakComparison = false) ⇒
@@ -134,13 +130,9 @@ trait CacheConditionDirectives {
                   if lastModified.isDefined && !unmodified(ims) ⇒
                 innerRouteWithRangeHeaderFilteredOut
               case _ ⇒ step6()
-            } else step6()
+            else step6()
         def step6(): Route = addResponseHeaders(route)
 
         step1()
-      }
-    }
-  }
-}
 
 object CacheConditionDirectives extends CacheConditionDirectives

@@ -17,7 +17,7 @@ class LauncherModule(
     conf: MarathonConf,
     taskCreationHandler: TaskCreationHandler,
     marathonSchedulerDriverHolder: MarathonSchedulerDriverHolder,
-    offerMatcher: OfferMatcher) {
+    offerMatcher: OfferMatcher)
 
   lazy val offerProcessor: OfferProcessor = new OfferProcessorImpl(
       conf,
@@ -29,4 +29,3 @@ class LauncherModule(
 
   lazy val taskLauncher: TaskLauncher = new TaskLauncherImpl(
       metrics, marathonSchedulerDriverHolder, clock)
-}

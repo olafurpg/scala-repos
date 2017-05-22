@@ -41,14 +41,14 @@ import scalafx.collections.ObservableBuffer
   * Added and Removed when correlated become Replaced. Replaced shows that item in fact was modified.
   * It is very important for cost-significant computation performed when list is actually reducing or expanding.
   */
-object Example2App extends App {
+object Example2App extends App
   val items: ObservableBuffer[String] = ObservableBuffer()
 
-  val listener = new jfxc.ListChangeListener[String] {
-    def onChanged(change: jfxc.ListChangeListener.Change[_ <: String]) {
+  val listener = new jfxc.ListChangeListener[String]
+    def onChanged(change: jfxc.ListChangeListener.Change[_ <: String])
       println(change)
       var order = 0
-      while (change.next()) {
+      while (change.next())
         order += 1
         println(order)
         if (change.wasPermutated) println("permutated")
@@ -56,9 +56,6 @@ object Example2App extends App {
         if (change.wasRemoved) println("removed")
         if (change.wasReplaced) println("replaced")
         if (change.wasUpdated) println("updated")
-      }
-    }
-  }
 
   items.delegate.addListener(listener)
 
@@ -66,4 +63,3 @@ object Example2App extends App {
   items.append("test")
   println("items(0) = \"update\"")
   items(0) = "update"
-}

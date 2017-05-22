@@ -9,7 +9,7 @@ import BigDecimal.RoundingMode.{CEILING, FLOOR, HALF_UP}
 import spire.algebra.{Field, IsRational, NRoot, Order, Signed, Trig}
 import spire.math.Rational
 
-trait BigDecimalIsField extends Field[BigDecimal] {
+trait BigDecimalIsField extends Field[BigDecimal]
   override def minus(a: BigDecimal, b: BigDecimal): BigDecimal = a - b
   def negate(a: BigDecimal): BigDecimal = -a
   val one: BigDecimal = BigDecimal(1.0)
@@ -24,7 +24,7 @@ trait BigDecimalIsField extends Field[BigDecimal] {
   def mod(a: BigDecimal, b: BigDecimal): BigDecimal = a % b
   override def quotmod(
       a: BigDecimal, b: BigDecimal): (BigDecimal, BigDecimal) = a /% b
-  def gcd(a: BigDecimal, b: BigDecimal): BigDecimal = {
+  def gcd(a: BigDecimal, b: BigDecimal): BigDecimal =
     import java.math.BigInteger
 
     val Two = BigInteger.valueOf(2)
@@ -34,26 +34,23 @@ trait BigDecimalIsField extends Field[BigDecimal] {
     @tailrec
     def reduce0(n: BigInteger,
                 prime: BigInteger,
-                shift: Int = 0): (Int, BigInteger) = {
+                shift: Int = 0): (Int, BigInteger) =
       val Array(div, rem) = n.divideAndRemainder(prime)
-      if (n == BigInteger.ZERO || rem != BigInteger.ZERO) {
+      if (n == BigInteger.ZERO || rem != BigInteger.ZERO)
         (shift, n)
-      } else {
+      else
         reduce0(div, prime, shift + 1)
-      }
-    }
 
-    def reduce(n: BigInteger): (Int, Int, BigInteger) = {
+    def reduce(n: BigInteger): (Int, Int, BigInteger) =
       val (shift10, n0) = reduce0(n, Ten)
       val (shift5, n1) = reduce0(n0, Five)
       val (shift2, n2) = reduce0(n1, Two)
       (shift2 + shift10, shift5 + shift10, n2)
-    }
 
     def gcd0(val0: BigInteger,
              exp0: Int,
              val1: BigInteger,
-             exp1: Int): BigDecimal = {
+             exp1: Int): BigDecimal =
       val (shiftTwo0, shiftFive0, shifted0) = reduce(val0)
       val (shiftTwo1, shiftFive1, shifted1) = reduce(val1)
       val sharedTwo = spire.math.min(shiftTwo0, shiftTwo1 + exp1 - exp0)
@@ -61,7 +58,6 @@ trait BigDecimalIsField extends Field[BigDecimal] {
       val reshift = Two.pow(sharedTwo).multiply(Five.pow(sharedFive))
       val n = (shifted0 gcd shifted1).multiply(reshift)
       BigDecimal(new java.math.BigDecimal(n, -exp0))
-    }
 
     val aJbd = a.bigDecimal
     val aVal = aJbd.unscaledValue.abs
@@ -73,25 +69,22 @@ trait BigDecimalIsField extends Field[BigDecimal] {
 
     if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
     else gcd0(bVal, bExp, aVal, aExp)
-  }
 
   override def fromDouble(n: Double): BigDecimal =
     BigDecimal(n, MathContext.UNLIMITED)
   def div(a: BigDecimal, b: BigDecimal): BigDecimal = a / b
-}
 
-trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
-  def nroot(a: BigDecimal, k: Int): BigDecimal = {
+trait BigDecimalIsNRoot extends NRoot[BigDecimal]
+  def nroot(a: BigDecimal, k: Int): BigDecimal =
     if (a.mc.getPrecision <= 0)
       throw new ArithmeticException(
           "Cannot find the nroot of a BigDecimal with unlimited precision.")
     NRoot.nroot(a, k, a.mc)
-  }
 
   private[this] val two = BigDecimal(2)
 
   // this is newton's method
-  override def sqrt(n: BigDecimal): BigDecimal = {
+  override def sqrt(n: BigDecimal): BigDecimal =
     if (n.mc.getPrecision <= 0)
       throw new ArithmeticException(
           "Cannot find the sqrt of a BigDecimal with unlimited precision.")
@@ -106,14 +99,12 @@ trait BigDecimalIsNRoot extends NRoot[BigDecimal] {
       if (x == y) y else loop(y, ((n / y) + y) / two)
 
     loop(BigDecimal(0, n.mc), approxSqrt(n))
-  }
 
   def fpow(a: BigDecimal, b: BigDecimal): BigDecimal = spire.math.pow(a, b)
-}
 
 @SerialVersionUID(1L)
 class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext)
-    extends Trig[BigDecimal] with Serializable {
+    extends Trig[BigDecimal] with Serializable
   import spire.math.Real
 
   val bits = Real.digitsToBits(mc.getPrecision + 1)
@@ -147,9 +138,8 @@ class BigDecimalIsTrig(mc: MathContext = BigDecimal.defaultMathContext)
   def sinh(a: BigDecimal): BigDecimal = fromReal(Real.sinh(Real(a)))
   def cosh(a: BigDecimal): BigDecimal = fromReal(Real.cosh(Real(a)))
   def tanh(a: BigDecimal): BigDecimal = fromReal(Real.tanh(Real(a)))
-}
 
-trait BigDecimalOrder extends Order[BigDecimal] {
+trait BigDecimalOrder extends Order[BigDecimal]
   override def eqv(x: BigDecimal, y: BigDecimal): Boolean = x == y
   override def neqv(x: BigDecimal, y: BigDecimal): Boolean = x != y
   override def gt(x: BigDecimal, y: BigDecimal): Boolean = x > y
@@ -162,30 +152,27 @@ trait BigDecimalOrder extends Order[BigDecimal] {
   // so we call Java's compareTo which does
   def compare(x: BigDecimal, y: BigDecimal): Int =
     x.bigDecimal.compareTo(y.bigDecimal)
-}
 
-trait BigDecimalIsSigned extends Signed[BigDecimal] {
+trait BigDecimalIsSigned extends Signed[BigDecimal]
   def signum(a: BigDecimal): Int = a.signum
   def abs(a: BigDecimal): BigDecimal = a.abs
-}
 
 trait BigDecimalIsReal
     extends IsRational[BigDecimal] with BigDecimalOrder
-    with BigDecimalIsSigned {
+    with BigDecimalIsSigned
   def toDouble(x: BigDecimal): Double = x.toDouble
   def ceil(a: BigDecimal): BigDecimal = a.setScale(0, CEILING)
   def floor(a: BigDecimal): BigDecimal = a.setScale(0, FLOOR)
   def round(a: BigDecimal): BigDecimal = a.setScale(0, HALF_UP)
   def isWhole(a: BigDecimal): Boolean = a % 1.0 == 0.0
   def toRational(a: BigDecimal): Rational = Rational(a)
-}
 
 @SerialVersionUID(0L)
 class BigDecimalAlgebra
     extends BigDecimalIsField with BigDecimalIsNRoot with BigDecimalIsReal
     with Serializable
 
-trait BigDecimalInstances {
+trait BigDecimalInstances
   import BigDecimal.defaultMathContext
 
   implicit final val BigDecimalAlgebra = new BigDecimalAlgebra
@@ -196,4 +183,3 @@ trait BigDecimalInstances {
   import spire.math.NumberTag._
   implicit final val BigDecimalTag =
     new LargeTag[BigDecimal](Approximate, BigDecimal(0))
-}

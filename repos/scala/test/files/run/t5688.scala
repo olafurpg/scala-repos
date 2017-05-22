@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   trait T
 
   trait TA
@@ -11,13 +11,11 @@ object Test extends App {
 
   val li: Vector[T] = Vector(new A, new B, new AB)
 
-  val matched = (for (l <- li) yield {
-    l match {
+  val matched = (for (l <- li) yield
+    l match
       case _: TA with TB => "tab"
       case _: TA => "ta"
       case _: TB => "tb"
-    }
-  })
+  )
 
   println(matched)
-}

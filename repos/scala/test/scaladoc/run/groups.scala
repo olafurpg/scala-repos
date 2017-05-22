@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code =
     """
@@ -60,7 +60,7 @@ object Test extends ScaladocModelTest {
   // no need for special settings
   def scaladocSettings = "-feature"
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -73,7 +73,7 @@ object Test extends ScaladocModelTest {
              "Incorrect group for " + mbr.qualifiedName + ": " + mbr.group +
              " instead of " + grp)
 
-    def checkGroupDesc(dtpl: DocTemplateEntity, grp: String, grpDesc: String) = {
+    def checkGroupDesc(dtpl: DocTemplateEntity, grp: String, grpDesc: String) =
       assert(dtpl.groupDescription(grp).isDefined,
              "Group description for " + grp + " not defined in " +
              dtpl.qualifiedName)
@@ -82,7 +82,6 @@ object Test extends ScaladocModelTest {
           "Group description for " + grp + " in " + dtpl.qualifiedName +
           " does not contain \"" + grpDesc + "\": \"" +
           extractCommentText(dtpl.groupDescription(grp).get) + "\"")
-    }
 
     def checkGroupName(dtpl: DocTemplateEntity, grp: String, grpName: String) =
       // TODO: See why we need trim here, we already do trimming in the CommentFactory
@@ -135,5 +134,3 @@ object Test extends ScaladocModelTest {
     checkGroupName(C, "C", "C")
     checkGroupPrio(C, "C", 0)
     checkGroupName(C, "Z", "From owner chain")
-  }
-}

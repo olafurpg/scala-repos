@@ -5,14 +5,12 @@ import com.twitter.finagle.{Filter, Service}
 import com.twitter.finagle.stats.{DefaultStatsReceiver, StatsReceiver}
 import com.twitter.util.Duration
 
-object ThriftForwardingWarmUpFilter {
+object ThriftForwardingWarmUpFilter
   val thriftForwardingWarmupFilter =
-    new Filter[Array[Byte], Array[Byte], ThriftClientRequest, Array[Byte]] {
+    new Filter[Array[Byte], Array[Byte], ThriftClientRequest, Array[Byte]]
       override def apply(request: Array[Byte],
                          service: Service[ThriftClientRequest, Array[Byte]]) =
         service(new ThriftClientRequest(request, false))
-    }
-}
 
 import ThriftForwardingWarmUpFilter.thriftForwardingWarmupFilter
 
@@ -26,7 +24,6 @@ class ThriftForwardingWarmUpFilter(
         warmupPeriod,
         thriftForwardingWarmupFilter andThen forwardTo,
         statsReceiver
-    ) {
+    )
 
   override def bypassForward: Boolean = ClientId.current.forall(isBypassClient)
-}

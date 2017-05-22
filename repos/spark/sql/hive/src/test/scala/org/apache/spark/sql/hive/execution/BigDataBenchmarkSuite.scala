@@ -25,7 +25,7 @@ import org.apache.spark.sql.hive.test.TestHive._
   * A set of test cases based on the big-data-benchmark.
   * https://amplab.cs.berkeley.edu/benchmark/
   */
-class BigDataBenchmarkSuite extends HiveComparisonTest {
+class BigDataBenchmarkSuite extends HiveComparisonTest
   val testDataDirectory = new File(
       "target" + File.separator + "big-data-benchmark-testdata")
 
@@ -39,8 +39,8 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |  pageRank INT,
         |  avgDuration INT)
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
-        |  STORED AS TEXTFILE LOCATION "${new File(
-                         testDataDirectory, "rankings").getCanonicalPath}"
+        |  STORED AS TEXTFILE LOCATION "$new File(
+                         testDataDirectory, "rankings").getCanonicalPath"
       """.stripMargin.cmd),
       TestTable("scratch", s"""
         |CREATE EXTERNAL TABLE scratch (
@@ -48,8 +48,8 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |  pageRank INT,
         |  avgDuration INT)
         |  ROW FORMAT DELIMITED FIELDS TERMINATED BY ","
-        |  STORED AS TEXTFILE LOCATION "${new File(
-                              testDataDirectory, "scratch").getCanonicalPath}"
+        |  STORED AS TEXTFILE LOCATION "$new File(
+                              testDataDirectory, "scratch").getCanonicalPath"
       """.stripMargin.cmd),
       TestTable("uservisits",
                 s"""
@@ -74,10 +74,10 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
 
   testTables.foreach(registerTestTable)
 
-  if (!testDataDirectory.exists()) {
+  if (!testDataDirectory.exists())
     // TODO: Auto download the files on demand.
     ignore("No data files found for BigDataBenchmark tests.") {}
-  } else {
+  else
     createQueryTest(
         "query1", "SELECT pageURL, pageRank FROM rankings WHERE pageRank > 1")
 
@@ -124,5 +124,3 @@ class BigDataBenchmarkSuite extends HiveComparisonTest {
         |-- SELECT * FROM url_counts_partial
         |-- SELECT * FROM url_counts_total
       """.stripMargin)
-  }
-}

@@ -1,4 +1,3 @@
 trait A
-object A {
+object A
   implicit def m[A]: M[A] = ???
-}

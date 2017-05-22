@@ -10,10 +10,10 @@ import org.scalatest.junit.JUnitRunner
   * @author ktakagaki
   */
 @RunWith(classOf[JUnitRunner])
-class DesignFilterTest extends FunSuite {
+class DesignFilterTest extends FunSuite
 
   test(
-      "designFilterFirwin tested against output from scipy.signal.firwin (0.13.2-1)") {
+      "designFilterFirwin tested against output from scipy.signal.firwin (0.13.2-1)")
 
     val testNormThreshold = 1.0E-10
     val firwin1 =
@@ -65,7 +65,6 @@ class DesignFilterTest extends FunSuite {
                                  multiplier = 1d,
                                  optWindow = OptWindowFunction.Blackman())
     assert(norm(testFirwin5 - firwin5.kernel) < testNormThreshold)
-  }
 
   val testFirwin1 = DenseVector(-0.0077763127191025679,
                                 0.064454645578710029,
@@ -89,4 +88,3 @@ class DesignFilterTest extends FunSuite {
                                 4.999999999999998335e-01,
                                 6.948495923029154864e-02,
                                 -2.596504355380610970e-18)
-}

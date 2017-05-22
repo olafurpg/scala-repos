@@ -1,21 +1,18 @@
 import scala.reflect.internal.util._
 
-package bippity {
+package bippity
   trait DingDongBippy
 
-  package bop {
-    class Foo {
+  package bop
+    class Foo
       class Bar
       object Bar
-    }
-  }
-}
 
-object Test {
+object Test
   import bippity._
   import bop._
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val f = new Foo
     val instances = List(f,
                          new f.Bar,
@@ -24,5 +21,3 @@ object Test {
                          new f.Bar with DingDongBippy)
     instances map (_.getClass.getName) foreach println
     instances map shortClassOfInstance foreach println
-  }
-}

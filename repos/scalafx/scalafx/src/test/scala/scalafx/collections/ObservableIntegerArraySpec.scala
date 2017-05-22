@@ -46,12 +46,12 @@ class ObservableIntegerArraySpec
         jfxc.ObservableIntegerArray, ObservableIntegerArray](
         classOf[jfxc.ObservableIntegerArray],
         classOf[ObservableIntegerArray]
-    ) {
+    )
 
   /**
     * Test trait for instance testing.
     */
-  trait InstanceTests {
+  trait InstanceTests
     val array0: Array[Int] = Array.empty
     val array1 = Array(4, 5, 6, 7)
     val array2 = Array(8, 9, 10, 11, 12)
@@ -60,12 +60,10 @@ class ObservableIntegerArraySpec
     val instance2 = ObservableIntegerArray(array2)
     val change = Buffer.empty[(ObservableIntegerArray, Change)]
     var changes = 0
-    def onChangeFull(a: ObservableIntegerArray, c: Change) {
+    def onChangeFull(a: ObservableIntegerArray, c: Change)
       change += ((a, c))
-    }
-    def onChangeBrief() {
+    def onChangeBrief()
       changes += 1
-    }
     instance0.onChange(onChangeFull(_, _))
     instance0.onChange(onChangeBrief)
     instance1.onChange(onChangeFull(_, _))
@@ -76,14 +74,12 @@ class ObservableIntegerArraySpec
                      array: ObservableIntegerArray,
                      sizeChanged: Boolean,
                      start: Int,
-                     end: Int) {
+                     end: Int)
       val (a, c) = change(n)
       assert(a eq array)
       assert(c.sizeChanged === sizeChanged)
       assert(c.start === start)
       assert(c.end === end)
-    }
-  }
 
   /**
     * @inheritdoc
@@ -96,92 +92,75 @@ class ObservableIntegerArraySpec
   /**
     * Test that a function to access/change an array element with an invalid index yields an out of bounds exception.
     */
-  def testOutOfBoundsExceptionThrown(f: => Unit) {
-    intercept[ArrayIndexOutOfBoundsException] {
+  def testOutOfBoundsExceptionThrown(f: => Unit)
+    intercept[ArrayIndexOutOfBoundsException]
       f
-    }
-  }
 
   /**
     * Test that a function results in an NegativeArraySizeException being thrown.
     */
-  def testNegativeArraySizeExceptionThrown(f: => Unit) {
-    intercept[NegativeArraySizeException] {
+  def testNegativeArraySizeExceptionThrown(f: => Unit)
+    intercept[NegativeArraySizeException]
       f
-    }
-  }
 
   /**
     * Test that a function results in an IllegalArgumentException being thrown.
     */
-  def testIllegalArgumentExceptionThrown(f: => Unit) {
-    intercept[IllegalArgumentException] {
+  def testIllegalArgumentExceptionThrown(f: => Unit)
+    intercept[IllegalArgumentException]
       f
-    }
-  }
 
   /**
     * Common tests for an empty array.
     */
-  def testEmpty(oa: ObservableIntegerArray) {
+  def testEmpty(oa: ObservableIntegerArray)
     assert(oa.length === 0)
     assert(oa.size === 0)
     assert(oa.isEmpty === true)
     testOutOfBoundsExceptionThrown(oa(-1))
     testOutOfBoundsExceptionThrown(oa(0))
     testOutOfBoundsExceptionThrown(oa(1))
-  }
 
   /**
     * Common tests for a non-empty array with known contents.
     */
-  def testNonEmpty(oa: ObservableIntegerArray, expected: Array[Int]) {
+  def testNonEmpty(oa: ObservableIntegerArray, expected: Array[Int])
     assert(oa.length === expected.length)
     assert(oa.size === expected.length)
     assert(oa.isEmpty === false)
     testOutOfBoundsExceptionThrown(oa(-1))
-    for (i <- 0 until expected.length) {
+    for (i <- 0 until expected.length)
       assert(oa(i) === expected(i))
-    }
     testOutOfBoundsExceptionThrown(oa(expected.length))
-  }
 
   /**
     * Class tests.
     */
-  it should "allow construct an empty array by default" in {
+  it should "allow construct an empty array by default" in
     testEmpty(new ObservableIntegerArray())
-  }
-  it should "allow construction of empty array" in {
+  it should "allow construction of empty array" in
     testEmpty(new ObservableIntegerArray(0))
-  }
-  it should "not allow construction of array of negative dimension" in {
+  it should "not allow construction of array of negative dimension" in
     testNegativeArraySizeExceptionThrown(new ObservableIntegerArray(-1))
-  }
-  it should "allow construction of dimensioned array with zeroed elements" in {
+  it should "allow construction of dimensioned array with zeroed elements" in
     testNonEmpty(new ObservableIntegerArray(1), new Array(1))
     testNonEmpty(new ObservableIntegerArray(10), new Array(10))
-  }
-  it should "allow its elements to be retrieved correctly" in {
-    new InstanceTests {
+  it should "allow its elements to be retrieved correctly" in
+    new InstanceTests
       testEmpty(instance0)
       testNonEmpty(instance1, array1)
       testNonEmpty(instance2, array2)
       assert(change.size === 0)
       assert(changes === 0)
-    }
-  }
-  it should "report its size correctly" in {
-    new InstanceTests {
+  it should "report its size correctly" in
+    new InstanceTests
       assert(instance0.size === array0.size)
       assert(instance1.size === array1.size)
       assert(instance2.size === array2.size)
       assert(change.size === 0)
       assert(changes === 0)
-    }
-  }
-  it should "allow the array to be resized and report changes" in {
-    new InstanceTests {
+  it should "allow the array to be resized and report changes" in
+    new InstanceTests
       testNegativeArraySizeExceptionThrown(instance0.resize(-1))
       testEmpty(instance0)
       instance0.resize(3) // Notification 0
@@ -199,12 +178,10 @@ class ObservableIntegerArraySpec
       verifyChange(2, instance2, true, 1, 1) // Elements 1 through 4 removed.
       verifyChange(3, instance2, true, 1, 4) // Elements 1 through 3 added.
       assert(changes === 4)
-    }
-  }
-  it should "allow its capacity to be trimmed to its size" in {
+  it should "allow its capacity to be trimmed to its size" in
     // It appears there's no way to determine the capacity of an observable array, so we cannot verify that this works.
     // However, we can check that nothing bad happens.
-    new InstanceTests {
+    new InstanceTests
       instance0.trimToSize()
       assert(instance0.size === array0.size)
       instance1.trimToSize()
@@ -213,10 +190,8 @@ class ObservableIntegerArraySpec
       assert(instance2.size === array2.size)
       assert(change.size === 0)
       assert(changes === 0)
-    }
-  }
-  it should "allow its contents to be cleared" in {
-    new InstanceTests {
+  it should "allow its contents to be cleared" in
+    new InstanceTests
       instance0.clear() // No notification - nothing was changed
       testEmpty(instance0)
       instance1.clear() // Notification 0
@@ -230,13 +205,11 @@ class ObservableIntegerArraySpec
       verifyChange(0, instance1, true, 0, 0)
       verifyChange(1, instance2, true, 0, 0)
       assert(changes === 2)
-    }
-  }
-  it should "allow its capacity to be ensured" in {
+  it should "allow its capacity to be ensured" in
     // It appears there's no way to determine the capacity of an observable
     // array, so we cannot verify that this works.  However, we can check that
     // nothing bad happens.
-    new InstanceTests {
+    new InstanceTests
       instance0.ensureCapacity(10)
       testEmpty(instance0)
       instance0.ensureCapacity(0)
@@ -253,10 +226,8 @@ class ObservableIntegerArraySpec
       testNonEmpty(instance2, array2)
       assert(change.size === 0)
       assert(changes === 0)
-    }
-  }
-  it should "allow individual elements to be modified and report changes" in {
-    new InstanceTests {
+  it should "allow individual elements to be modified and report changes" in
+    new InstanceTests
       testOutOfBoundsExceptionThrown(instance0(-1) = 0)
       testOutOfBoundsExceptionThrown(instance0(0) = 0)
       testOutOfBoundsExceptionThrown(instance1(-1) = 0)
@@ -269,69 +240,56 @@ class ObservableIntegerArraySpec
       verifyChange(0, instance1, false, 0, 1)
       verifyChange(1, instance1, false, 2, 3)
       verifyChange(2, instance1, false, 3, 4)
-    }
-  }
 
   /**
     * Companion tests.
     */
-  it should "return an empty observable array from companion's empty()" in {
+  it should "return an empty observable array from companion's empty()" in
     testEmpty(ObservableIntegerArray.empty())
-  }
-  it should "not allow a negative dimension array from companion's ofDim(size)" in {
+  it should "not allow a negative dimension array from companion's ofDim(size)" in
     testNegativeArraySizeExceptionThrown(new ObservableIntegerArray(-1))
-  }
-  it should "return a dimension array of zeroed elements from companion's ofDim(size)" in {
+  it should "return a dimension array of zeroed elements from companion's ofDim(size)" in
     testNonEmpty(ObservableIntegerArray.ofDim(1), new Array(1))
     testNonEmpty(ObservableIntegerArray.ofDim(10), new Array(10))
-  }
-  it should "return valid array from companion's apply(values*)" in {
+  it should "return valid array from companion's apply(values*)" in
     testEmpty(ObservableIntegerArray())
     testNonEmpty(ObservableIntegerArray(1), Array(1))
     testNonEmpty(ObservableIntegerArray(0, 1, 2, 3, 4), Array(0, 1, 2, 3, 4))
-  }
-  it should "return valid array from companion's apply(Array)" in {
+  it should "return valid array from companion's apply(Array)" in
     testEmpty(ObservableIntegerArray(Array[Int]()))
     val arrays = List(Array(1), Array(0, 1, 2, 3, 4))
     arrays.foreach(array => testNonEmpty(ObservableIntegerArray(array), array))
-  }
-  it should "return valid initialized array from companion's fill(n)(f)" in {
-    def fillArray(n: Int): ObservableIntegerArray = {
+  it should "return valid initialized array from companion's fill(n)(f)" in
+    def fillArray(n: Int): ObservableIntegerArray =
       var lastVal = 0
-      def initVal: Int = {
+      def initVal: Int =
         lastVal += 1
         lastVal
-      }
       val oa = ObservableIntegerArray.fill(n)(initVal)
       testOutOfBoundsExceptionThrown(oa(-1))
       testOutOfBoundsExceptionThrown(oa(n))
       oa
-    }
     testEmpty(fillArray(-1))
     testEmpty(fillArray(0))
     testNonEmpty(fillArray(1), Array(1))
     testNonEmpty(fillArray(5), Array(1, 2, 3, 4, 5))
-  }
-  it should "return valid initialized array from companion's tabulate(n)(f)" in {
-    def tabulateArray(n: Int): ObservableIntegerArray = {
+  it should "return valid initialized array from companion's tabulate(n)(f)" in
+    def tabulateArray(n: Int): ObservableIntegerArray =
       val oa = ObservableIntegerArray.tabulate(n)(_ + 1)
       testOutOfBoundsExceptionThrown(oa(-1))
       testOutOfBoundsExceptionThrown(oa(n))
       oa
-    }
     testEmpty(tabulateArray(-1))
     testEmpty(tabulateArray(0))
     testNonEmpty(tabulateArray(1), Array(1))
     testNonEmpty(tabulateArray(5), Array(1, 2, 3, 4, 5))
-  }
-  it should "return valid initialized array from companion's iterate(start, length)(f)" in {
+  it should "return valid initialized array from companion's iterate(start, length)(f)" in
     testEmpty(ObservableIntegerArray.iterate(0, -1)(_ + 1))
     testEmpty(ObservableIntegerArray.iterate(0, 0)(_ + 1))
     testNonEmpty(ObservableIntegerArray.iterate(0, 1)(_ + 1), Array(0))
     testNonEmpty(
         ObservableIntegerArray.iterate(0, 5)(_ + 1), Array(0, 1, 2, 3, 4))
-  }
-  it should "return valid initialized array from companion's range(start, end)" in {
+  it should "return valid initialized array from companion's range(start, end)" in
     testIllegalArgumentExceptionThrown(ObservableIntegerArray.range(1, 2, 0))
     testEmpty(ObservableIntegerArray.range(1, 0))
     testEmpty(ObservableIntegerArray.range(1, 0, 1))
@@ -351,5 +309,3 @@ class ObservableIntegerArraySpec
     val a531 = Array(5, 3, 1)
     testNonEmpty(ObservableIntegerArray.range(5, 0, -2), a531)
     testNonEmpty(ObservableIntegerArray.range(5, -1, -2), a531)
-  }
-}

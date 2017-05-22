@@ -10,7 +10,7 @@ import std.string._
   * Very similar to `Rope[Char]`, but with better constant factors and a
   * simpler interface since it's specialized for `String`s.
   */
-final case class Cord(self: FingerTree[Int, String]) {
+final case class Cord(self: FingerTree[Int, String])
 
   import Cord.{stringToCord => _, _}
 
@@ -21,20 +21,18 @@ final case class Cord(self: FingerTree[Int, String]) {
     * Returns the character at the given position. Throws an error if the index is out of range.
     * Time complexity: O(log N)
     */
-  def apply(i: Int): Char = {
+  def apply(i: Int): Char =
     val (a, b) = self.split(_ > i)
     b.viewl.headOption.map(_ (i - a.measure)).getOrElse(rangeError(i))
-  }
 
   /**
     * Splits this `Cord` in two at the given position.
     * Time complexity: O(log N)
     */
-  def split(i: Int): (Cord, Cord) = {
+  def split(i: Int): (Cord, Cord) =
     val (l, mid, r) = self.split1(_ > i)
     val (midl, midr) = mid.splitAt(i - l.measure)
     (cord(l :+ midl), cord(midr +: r))
-  }
 
   /**
     * Returns the number of characters in this `Cord`.
@@ -111,14 +109,13 @@ final case class Cord(self: FingerTree[Int, String]) {
   def toList: List[Char] = toVector.toList
   def toStream: Stream[Char] = toVector.toStream
   def toVector: Vector[Char] = self.foldMap(_.toVector)
-  override def toString: String = {
+  override def toString: String =
     import syntax.foldable._
     import Free._
     val sb = new StringBuilder(self.measure)
     val t = self.traverse_[Trampoline](x => Trampoline.delay(sb ++= x))
     t.run
     sb.toString
-  }
 
   /** Transforms each character to a `Cord` according to the given function and concatenates them all into one `Cord`. */
   def flatMap(f: Char => Cord): Cord =
@@ -129,9 +126,8 @@ final case class Cord(self: FingerTree[Int, String]) {
 
   /** Returns whether this `Cord` will expand to a non-empty string. */
   def nonEmpty: Boolean = self.iterator.exists(_.nonEmpty)
-}
 
-object Cord {
+object Cord
   private def cord[A](v: FingerTree[Int, String]): Cord = new Cord(v)
 
   implicit def stringToCord(s: String): Cord =
@@ -151,16 +147,12 @@ object Cord {
     if (!as.isEmpty) as.tail.foldLeft(as.head)(_ ++ sep ++ _)
     else Cord()
 
-  implicit lazy val CordShow: Show[Cord] = new Show[Cord] {
+  implicit lazy val CordShow: Show[Cord] = new Show[Cord]
     override def show(x: Cord) = x
     override def shows(x: Cord) = x.toString
-  }
-  implicit lazy val CordMonoid: Monoid[Cord] = new Monoid[Cord] {
+  implicit lazy val CordMonoid: Monoid[Cord] = new Monoid[Cord]
     def zero = empty
     def append(x: Cord, y: => Cord) = x ++ y
-  }
-  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord] {
+  implicit lazy val CordEqual: Equal[Cord] = new Equal[Cord]
     def equal(x: Cord, y: Cord) =
       Equal[FingerTree[Int, String]].equal(x.self, y.self)
-  }
-}

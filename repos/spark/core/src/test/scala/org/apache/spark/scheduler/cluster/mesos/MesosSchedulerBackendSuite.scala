@@ -40,9 +40,9 @@ import org.apache.spark.scheduler.{LiveListenerBus, SparkListenerExecutorAdded, 
 import org.apache.spark.scheduler.cluster.ExecutorInfo
 
 class MesosSchedulerBackendSuite
-    extends SparkFunSuite with LocalSparkContext with MockitoSugar {
+    extends SparkFunSuite with LocalSparkContext with MockitoSugar
 
-  test("weburi is set in created scheduler driver") {
+  test("weburi is set in created scheduler driver")
     val conf = new SparkConf
     conf.set("spark.mesos.driver.webui.url", "http://webui")
     conf.set("spark.app.name", "name1")
@@ -56,7 +56,7 @@ class MesosSchedulerBackendSuite
     val driver = mock[SchedulerDriver]
     when(driver.start()).thenReturn(Protos.Status.DRIVER_RUNNING)
 
-    val backend = new MesosSchedulerBackend(taskScheduler, sc, "master") {
+    val backend = new MesosSchedulerBackend(taskScheduler, sc, "master")
       override protected def createSchedulerDriver(
           masterUrl: String,
           scheduler: Scheduler,
@@ -66,18 +66,15 @@ class MesosSchedulerBackendSuite
           webuiUrl: Option[String] = None,
           checkpoint: Option[Boolean] = None,
           failoverTimeout: Option[Double] = None,
-          frameworkId: Option[String] = None): SchedulerDriver = {
+          frameworkId: Option[String] = None): SchedulerDriver =
         markRegistered()
         assert(webuiUrl.isDefined)
         assert(webuiUrl.get.equals("http://webui"))
         driver
-      }
-    }
 
     backend.start()
-  }
 
-  test("Use configured mesosExecutor.cores for ExecutorInfo") {
+  test("Use configured mesosExecutor.cores for ExecutorInfo")
     val mesosExecutorCores = 3
     val conf = new SparkConf
     conf.set("spark.mesos.mesosExecutor.cores", mesosExecutorCores.toString)
@@ -113,9 +110,8 @@ class MesosSchedulerBackendSuite
       .getValue
 
     assert(cpus === mesosExecutorCores)
-  }
 
-  test("check spark-class location correctly") {
+  test("check spark-class location correctly")
     val conf = new SparkConf
     conf.set("spark.mesos.executor.home", "/mesos-home")
 
@@ -151,9 +147,8 @@ class MesosSchedulerBackendSuite
       mesosSchedulerBackend.createExecutorInfo(resources, "test-id")
     assert(
         executorInfo1.getCommand.getValue === s"cd test-app-1*;  ./bin/spark-class ${classOf[MesosExecutorBackend].getName}")
-  }
 
-  test("spark docker properties correctly populate the DockerInfo message") {
+  test("spark docker properties correctly populate the DockerInfo message")
     val taskScheduler = mock[TaskSchedulerImpl]
 
     val conf = new SparkConf()
@@ -199,10 +194,9 @@ class MesosSchedulerBackendSuite
     assert(volumes.get(4).getContainerPath.equals("/e"))
     assert(volumes.get(4).getHostPath.equals("/e"))
     assert(volumes.get(4).getMode.equals(Volume.Mode.RO))
-  }
 
-  test("mesos resource offers result in launching tasks") {
-    def createOffer(id: Int, mem: Int, cpu: Int): Offer = {
+  test("mesos resource offers result in launching tasks")
+    def createOffer(id: Int, mem: Int, cpu: Int): Offer =
       val builder = Offer.newBuilder()
       builder
         .addResourcesBuilder()
@@ -220,7 +214,6 @@ class MesosSchedulerBackendSuite
         .setSlaveId(SlaveID.newBuilder().setValue(s"s${id.toString}"))
         .setHostname(s"host${id.toString}")
         .build()
-    }
 
     val driver = mock[SchedulerDriver]
     val taskScheduler = mock[TaskSchedulerImpl]
@@ -308,9 +301,8 @@ class MesosSchedulerBackendSuite
 
     backend.resourceOffers(driver, mesosOffers2)
     verify(driver, times(1)).declineOffer(mesosOffers2.get(0).getId)
-  }
 
-  test("can handle multiple roles") {
+  test("can handle multiple roles")
     val driver = mock[SchedulerDriver]
     val taskScheduler = mock[TaskSchedulerImpl]
 
@@ -404,14 +396,12 @@ class MesosSchedulerBackendSuite
     assert(cpusDev.getRole.equals("dev"))
     val executorResources = taskInfo.getExecutor.getResourcesList.asScala
     assert(
-        executorResources.exists { r =>
+        executorResources.exists  r =>
       r.getName.equals("mem") && r.getScalar.getValue.equals(484.0) &&
       r.getRole.equals("prod")
-    })
+    )
     assert(
-        executorResources.exists { r =>
+        executorResources.exists  r =>
       r.getName.equals("cpus") && r.getScalar.getValue.equals(1.0) &&
       r.getRole.equals("prod")
-    })
-  }
-}
+    )

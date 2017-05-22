@@ -1,11 +1,10 @@
 // Summary of incorrect or questionable behavior.
 // Full code and successful parts follow.
 
-object Summary {
-  class Outer {
+object Summary
+  class Outer
     class Inner {}
     def f() = { class MethodInner; new MethodInner }
-  }
 
   // 1 static issue:
   // 
@@ -33,12 +32,11 @@ object Summary {
   //   instance of Outer.
   //
   //   WRT "same method invocation", see Iterator.duplicate for an example of this.
-}
 
 // Tests
 
-class Outer {
-  class Inner {
+class Outer
+  class Inner
     def passOuter(other: Outer) = () // pass any Outer
     def passThisType(other: Outer.this.type) =
       () // pass only this Outer instance
@@ -47,31 +45,26 @@ class Outer {
     def passInner2(other: Outer.this.Inner) = () // same as above
     def passInnerSharp(other: Outer#Inner) = () // pass any Inner
 
-    def compareSimpleWithTypeMatch(other: Any) = other match {
+    def compareSimpleWithTypeMatch(other: Any) = other match
       case _: Inner => true
       case _ => false
-    }
     def compareSimpleWithInstanceOf(other: Any) = other.isInstanceOf[Inner]
 
-    def compareSharpWithTypeMatch(other: Any) = {
-      other match {
+    def compareSharpWithTypeMatch(other: Any) =
+      other match
         case _: Outer#Inner => true
         case _ => false
-      }
-    }
     def compareSharpWithInstanceOf(other: Any) =
       other.isInstanceOf[Outer#Inner]
 
-    def comparePathWithTypeMatch(other: Any) = other match {
+    def comparePathWithTypeMatch(other: Any) = other match
       case _: Outer.this.Inner => true
       case _ => false
-    }
     def comparePathWithInstanceOf(other: Any) =
       other.isInstanceOf[Outer.this.Inner]
-  }
 
-  def f() = {
-    class MethodInner {
+  def f() =
+    class MethodInner
       def passOuter(other: Outer) = () // pass any Outer
       def passThisType(other: Outer.this.type) =
         () // pass only this Outer instance
@@ -84,17 +77,13 @@ class Outer {
       // is there any way to refer to Outer#MethodInner? Not that there should be.
 
       def compareWithInstanceOf(other: Any) = other.isInstanceOf[MethodInner]
-      def compareWithTypeMatch(other: Any) = other match {
+      def compareWithTypeMatch(other: Any) = other match
         case _: MethodInner => true
         case _ => false
-      }
-    }
 
     new MethodInner
-  }
-}
 
-object Test {
+object Test
   val outer1 = new Outer
   val outer2 = new Outer
   val inner1 = new outer1.Inner
@@ -102,7 +91,7 @@ object Test {
   val method1 = outer1.f()
   val method2 = outer2.f()
 
-  def testInnerStatic = {
+  def testInnerStatic =
     // these should all work
     inner1.passOuter(outer1)
     inner1.passOuter(outer2)
@@ -117,8 +106,7 @@ object Test {
     // inner1.passThisType(outer2)
     // inner1.passInner(inner2)
     // inner1.passInner2(inner2)
-  }
-  def testInnerRuntime = {
+  def testInnerRuntime =
     println("testInnerRuntime\n")
 
     List("These should be true under any scenario: ",
@@ -144,9 +132,8 @@ object Test {
     List("These are doing the wrong thing under current proposal",
          (inner1: Any) match { case _: outer2.Inner => true; case _ => false } // should be false
     ) foreach println
-  }
 
-  def testMethodInnerStatic = {
+  def testMethodInnerStatic =
     // these should all work
     method1.passOuter(outer1)
     method1.passOuter(outer2)
@@ -170,9 +157,8 @@ object Test {
     // method1.passInner(inner2)
     // method1.passInner2(inner2)
     // method1.passMethodInner(method2)
-  }
 
-  def testMethodInnerRuntime = {
+  def testMethodInnerRuntime =
     println("\ntestMethodInnerRuntime\n")
 
     List("These should be true under any scenario: ",
@@ -185,10 +171,7 @@ object Test {
     List("These are doing the wrong thing under current proposal",
          method1.compareWithTypeMatch(method2) // should be false
     ) foreach println
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     testInnerRuntime
     testMethodInnerRuntime
-  }
-}

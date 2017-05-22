@@ -34,7 +34,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventType}
 
-object WorkerStateEvent {
+object WorkerStateEvent
   implicit def sfxWorkerStateEvent2jfx(
       w: WorkerStateEvent): jfxc.WorkerStateEvent =
     if (w != null) w.delegate else null
@@ -109,13 +109,12 @@ object WorkerStateEvent {
       "Use WorkerStateSucceeded; WORKER_STATE_SUCCEEDED will be removed in a future release",
       "8.0.60-R10")
   val WORKER_STATE_SUCCEEDED = WorkerStateSucceeded
-}
 
 /**
   * Wrapper trait for [[http://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/WorkerStateEvent.html WorkerStateEvent]] Class.
   */
 class WorkerStateEvent(override val delegate: jfxc.WorkerStateEvent)
-    extends Event(delegate) with SFXDelegate[jfxc.WorkerStateEvent] {
+    extends Event(delegate) with SFXDelegate[jfxc.WorkerStateEvent]
 
   /**
     * Create a new WorkerStateEvent.
@@ -127,4 +126,3 @@ class WorkerStateEvent(override val delegate: jfxc.WorkerStateEvent)
   def this(
       worker: Worker[_], eventType: EventType[_ <: jfxc.WorkerStateEvent]) =
     this(new jfxc.WorkerStateEvent(worker, eventType))
-}

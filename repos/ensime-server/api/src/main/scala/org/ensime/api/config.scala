@@ -26,11 +26,10 @@ case class EnsimeConfig(
     // WORKAROUND: https://github.com/ensime/ensime-server/issues/1042
     disableSourceMonitoring: Boolean = false,
     disableClassMonitoring: Boolean = false
-) {
-  (rootDir :: cacheDir :: javaHome :: referenceSourceRoots ::: javaLibs).foreach {
+)
+  (rootDir :: cacheDir :: javaHome :: referenceSourceRoots ::: javaLibs).foreach
     f =>
       require(f.exists, "" + f + " is required but does not exist")
-  }
 
   /* Proposed alternatives to the legacy wire format field names */
   def root = rootDir
@@ -39,34 +38,32 @@ case class EnsimeConfig(
     (referenceSourceRoots ++ subprojects.flatMap(_.referenceSourceRoots)).toSet
 
   // some marshalling libs (e.g. spray-json) might not like extra vals
-  val modules = subprojects.map { module =>
+  val modules = subprojects.map  module =>
     (module.name, module)
-  }.toMap
+  .toMap
 
   def runtimeClasspath: Set[File] =
     compileClasspath ++ modules.values.flatMap(_.runtimeDeps) ++ targetClasspath
 
   def compileClasspath: Set[File] =
-    modules.values.toSet.flatMap { m: EnsimeModule =>
+    modules.values.toSet.flatMap  m: EnsimeModule =>
       m.compileDeps ++ m.testDeps
-    } ++ (if (sourceMode) List.empty else targetClasspath)
+    ++ (if (sourceMode) List.empty else targetClasspath)
 
-  def targetClasspath: Set[File] = modules.values.toSet.flatMap {
+  def targetClasspath: Set[File] = modules.values.toSet.flatMap
     m: EnsimeModule =>
       m.targetDirs ++ m.testTargetDirs
-  }
 
-  def allJars: Set[File] = {
-    modules.values.flatMap { m =>
+  def allJars: Set[File] =
+    modules.values.flatMap  m =>
       m.compileDeps ::: m.testDeps
-    }.toSet
-  } ++ javaLibs
+    .toSet
+  ++ javaLibs
 
   def allDocJars: Set[File] = modules.values.flatMap(_.docJars).toSet
 
   def scalaLibrary: Option[File] =
     allJars.find(_.getName.startsWith("scala-library"))
-}
 
 case class EnsimeModule(
     name: String,
@@ -82,12 +79,11 @@ case class EnsimeModule(
     sourceRoots: List[File],
     docJars: List[File],
     referenceSourceRoots: List[File]
-) {
+)
   // only check the files, not the directories, see below
-  (compileDeps ::: runtimeDeps ::: testDeps ::: referenceSourceRoots).foreach {
+  (compileDeps ::: runtimeDeps ::: testDeps ::: referenceSourceRoots).foreach
     f =>
       require(f.exists, "" + f + " is required but does not exist")
-  }
 
   /*
    Proposed alternatives to the legacy wire format field names:
@@ -102,4 +98,3 @@ case class EnsimeModule(
 
   def dependencies(implicit config: EnsimeConfig): List[EnsimeModule] =
     dependsOnModules.map(config.modules)
-}

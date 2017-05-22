@@ -11,7 +11,7 @@ import java.net.URL
   * Methods from JDK 7 are declared but they throw a NotImplementedException instead
   * of delegating the call, so that this class can be compiled on both, JDK 6 and
   * JDK 7. */
-class DelegateResultSet(rs: ResultSet) extends ResultSet {
+class DelegateResultSet(rs: ResultSet) extends ResultSet
   def next(): Boolean = rs.next()
   def isWrapperFor(iface: Class[_]): Boolean = rs.isWrapperFor(iface)
   def unwrap[T](iface: Class[T]): T = rs.unwrap(iface)
@@ -321,4 +321,3 @@ class DelegateResultSet(rs: ResultSet) extends ResultSet {
   def getString(columnIndex: Int): String = rs.getString(columnIndex)
   def wasNull(): Boolean = rs.wasNull
   def close(): Unit = rs.close
-}

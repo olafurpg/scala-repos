@@ -1,22 +1,17 @@
-object FromDependentObject {
-  class AA {
-    class E {
+object FromDependentObject
+  class AA
+    class E
       def foo = 1
-    }
-    object E {
+    object E
       implicit def srt2E(s: String): E = new E
-    }
 
     def goo(x: E) = x
-  }
 
   object AA extends AA
 
-  object Main {
+  object Main
     import AA._
     goo( /*start*/ "" /*end*/ )
-  }
-}
 /*
 Seq(any2ArrowAssoc,
     any2Ensuring,

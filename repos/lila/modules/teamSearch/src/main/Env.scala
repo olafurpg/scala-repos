@@ -8,7 +8,7 @@ import lila.search._
 import lila.team.tube.teamTube
 
 final class Env(
-    config: Config, makeClient: Index => ESClient, system: ActorSystem) {
+    config: Config, makeClient: Index => ESClient, system: ActorSystem)
 
   private val IndexName = config getString "index"
   private val PaginatorMaxPerPage = config getInt "paginator.max_per_page"
@@ -20,32 +20,27 @@ final class Env(
 
   def apply(text: String, page: Int) = paginatorBuilder(Query(text), page)
 
-  def cli = new lila.common.Cli {
-    def process = {
+  def cli = new lila.common.Cli
+    def process =
       case "team" :: "search" :: "reset" :: Nil => api.reset inject "done"
-    }
-  }
 
   private lazy val paginatorBuilder =
     new lila.search.PaginatorBuilder[lila.team.Team, Query](
         searchApi = api, maxPerPage = PaginatorMaxPerPage)
 
   system.actorOf(Props(
-                     new Actor {
+                     new Actor
                    import lila.team.actorApi._
-                   def receive = {
+                   def receive =
                      case InsertTeam(team) => api store team
                      case RemoveTeam(id) => client deleteById Id(id)
-                   }
-                 }),
+                 ),
                  name = ActorName)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "teamSearch" boot new Env(
         config = lila.common.PlayApp loadConfig "teamSearch",
         makeClient = lila.search.Env.current.makeClient,
         system = lila.common.PlayApp.system)
-}

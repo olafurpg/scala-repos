@@ -34,7 +34,7 @@ import scalafx.delegate._
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/application/ConditionalFeature.html javafx.application.ConditionalFeature]] */
 object ConditionalFeature
     extends SFXEnumDelegateCompanion[
-        jfxa.ConditionalFeature, ConditionalFeature] {
+        jfxa.ConditionalFeature, ConditionalFeature]
 
   val Controls = new ConditionalFeature(jfxa.ConditionalFeature.CONTROLS)
   @deprecated(
@@ -134,7 +134,6 @@ object ConditionalFeature
       InputMultitouch,
       InputPointer
   )
-}
 
 sealed case class ConditionalFeature(
     override val delegate: jfxa.ConditionalFeature)

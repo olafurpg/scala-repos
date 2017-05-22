@@ -36,13 +36,12 @@ import org.apache.spark.util.IntParam
   *   <port> is the port on which RawTextSender is running in the worker nodes.
   *   <batchMillise> is the Spark Streaming batch duration in milliseconds.
   */
-object RawNetworkGrep {
-  def main(args: Array[String]) {
-    if (args.length != 4) {
+object RawNetworkGrep
+  def main(args: Array[String])
+    if (args.length != 4)
       System.err.println(
           "Usage: RawNetworkGrep <numStreams> <host> <port> <batchMillis>")
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -64,6 +63,4 @@ object RawNetworkGrep {
       .foreachRDD(r => println("Grep count: " + r.collect().mkString))
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 // scalastyle:on println

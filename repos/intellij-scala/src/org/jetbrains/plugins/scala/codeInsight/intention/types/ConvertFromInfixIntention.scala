@@ -15,27 +15,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScInfixTypeElement, 
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /** Converts type element `(A @@ B)` to `@@[A, B]` */
-class ConvertFromInfixIntention extends PsiElementBaseIntentionAction {
+class ConvertFromInfixIntention extends PsiElementBaseIntentionAction
   def getFamilyName = "Use Prefix Type Syntax"
 
   override def getText = getFamilyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
-    element match {
+  def isAvailable(project: Project, editor: Editor, element: PsiElement) =
+    element match
       case Parent(Both(ref: ScStableCodeReferenceElement,
                        Parent(Parent(param: ScInfixTypeElement)))) =>
         true
       case _ => false
-    }
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val infixTypeElement: ScInfixTypeElement =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixTypeElement], false)
-    val elementToReplace = infixTypeElement.getParent match {
+    val elementToReplace = infixTypeElement.getParent match
       case x: ScParenthesisedTypeElement => x
       case _ => infixTypeElement
-    }
 
     if (element == null) return
     val newTypeText =
@@ -45,5 +42,3 @@ class ConvertFromInfixIntention extends PsiElementBaseIntentionAction {
         newTypeText, element.getManager)
     val replaced = elementToReplace.replace(newTypeElement)
     UndoUtil.markPsiFileForUndo(replaced.getContainingFile)
-  }
-}

@@ -26,14 +26,14 @@ import scala.annotation.tailrec
   *
   *  This is only a start, but it is a start.
   */
-abstract class SymbolPairs {
+abstract class SymbolPairs
   val global: SymbolTable
   import global._
 
   /** Type operations relative to a prefix.  All operations work on Symbols,
     *  and the types are the member types of those symbols in the prefix.
     */
-  class RelativeTo(val prefix: Type) {
+  class RelativeTo(val prefix: Type)
     def this(clazz: Symbol) = this(clazz.thisType)
     import scala.language.implicitConversions // geez, it even has to hassle me when it's private
     private implicit def symbolToType(sym: Symbol): Type =
@@ -53,7 +53,6 @@ abstract class SymbolPairs {
       (sym1: Type) matches (sym2: Type)
 
     override def toString = s"RelativeTo($prefix)"
-  }
 
   /** Are types tp1 and tp2 equivalent seen from the perspective
     *  of `baseClass`? For instance List[Int] and Seq[Int] are =:=
@@ -62,7 +61,7 @@ abstract class SymbolPairs {
   def sameInBaseClass(baseClass: Symbol)(tp1: Type, tp2: Type) =
     (tp1 baseType baseClass) =:= (tp2 baseType baseClass)
 
-  case class SymbolPair(base: Symbol, low: Symbol, high: Symbol) {
+  case class SymbolPair(base: Symbol, low: Symbol, high: Symbol)
     def pos =
       if (low.owner == base) low.pos
       else if (high.owner == base) high.pos else base.pos
@@ -84,12 +83,11 @@ abstract class SymbolPairs {
     private def classBoundAsSeen(tsym: Symbol) =
       tsym.classBound.asSeenFrom(rootType, tsym.owner)
 
-    private def memberDefString(sym: Symbol, where: Boolean) = {
+    private def memberDefString(sym: Symbol, where: Boolean) =
       val def_s =
         (if (sym.isConstructor) s"$sym: ${self memberType sym}"
          else sym defStringSeenAs (self memberType sym))
       def_s + whereString(sym)
-    }
 
     /** A string like ' at line 55' if the symbol is defined in the class
       *  under consideration, or ' in trait Foo' if defined elsewhere.
@@ -109,12 +107,11 @@ abstract class SymbolPairs {
       | erased  $lowErased
       |  infos  ${low.infosString}
       |}""".trim
-  }
 
   /** The cursor class
     *  @param base   the base class containing the participating symbols
     */
-  abstract class Cursor(val base: Symbol) { cursor =>
+  abstract class Cursor(val base: Symbol)  cursor =>
 
     final val self =
       base.thisType // The type relative to which symbols are seen.
@@ -159,9 +156,8 @@ abstract class SymbolPairs {
     /** A map from baseclasses of <base> to ints, with smaller ints meaning lower in
       *  linearization order. Symbols that are not baseclasses map to -1.
       */
-    private val index = new mutable.HashMap[Symbol, Int] {
+    private val index = new mutable.HashMap[Symbol, Int]
       override def default(key: Symbol) = -1
-    }
 
     /** The scope entries that have already been visited as highSymbol
       *  (but may have been excluded via hasCommonParentAsSubclass.)
@@ -186,77 +182,64 @@ abstract class SymbolPairs {
     next()
 
     // populate the above data structures
-    private def init() {
+    private def init()
       // Fill `decls` with lower symbols shadowing higher ones
-      def fillDecls(bcs: List[Symbol], deferred: Boolean) {
-        if (!bcs.isEmpty) {
+      def fillDecls(bcs: List[Symbol], deferred: Boolean)
+        if (!bcs.isEmpty)
           fillDecls(bcs.tail, deferred)
           var e = bcs.head.info.decls.elems
-          while (e ne null) {
+          while (e ne null)
             if (e.sym.initialize.isDeferred == deferred && !exclude(e.sym))
               decls enter e.sym
             e = e.next
-          }
-        }
-      }
       var i = 0
-      for (bc <- bases) {
+      for (bc <- bases)
         index(bc) = i
         subParents(i) = new BitSet(size)
         i += 1
-      }
-      for (p <- parents) {
+      for (p <- parents)
         val pIndex = index(p.typeSymbol)
         if (pIndex >= 0)
-          for (bc <- p.baseClasses; if sameInBaseClass(bc)(p, self)) {
+          for (bc <- p.baseClasses; if sameInBaseClass(bc)(p, self))
             val bcIndex = index(bc)
             if (bcIndex >= 0) include(subParents(bcIndex), pIndex)
-          }
-      }
       // first, deferred (this will need to change if we change lookup rules!)
       fillDecls(bases, deferred = true)
       // then, concrete.
       fillDecls(bases, deferred = false)
-    }
 
-    private def include(bs: BitSet, n: Int) {
+    private def include(bs: BitSet, n: Int)
       val nshifted = n >> 5
       val nmask = 1 << (n & 31)
       bs(nshifted) |= nmask
-    }
 
     /** Implements `bs1 * bs2 * {0..n} != 0`.
       *  Used in hasCommonParentAsSubclass */
     private def intersectionContainsElementLeq(
-        bs1: BitSet, bs2: BitSet, n: Int): Boolean = {
+        bs1: BitSet, bs2: BitSet, n: Int): Boolean =
       val nshifted = n >> 5
       val nmask = 1 << (n & 31)
       var i = 0
-      while (i < nshifted) {
+      while (i < nshifted)
         if ((bs1(i) & bs2(i)) != 0) return true
         i += 1
-      }
       (bs1(nshifted) & bs2(nshifted) & (nmask | nmask - 1)) != 0
-    }
 
     /** Do `sym1` and `sym2` have a common subclass in `parents`?
       *  In that case we do not follow their pairs.
       */
-    private def hasCommonParentAsSubclass(sym1: Symbol, sym2: Symbol) = {
+    private def hasCommonParentAsSubclass(sym1: Symbol, sym2: Symbol) =
       val index1 = index(sym1.owner)
-      (index1 >= 0) && {
+      (index1 >= 0) &&
         val index2 = index(sym2.owner)
-        (index2 >= 0) && {
+        (index2 >= 0) &&
           intersectionContainsElementLeq(
               subParents(index1), subParents(index2), index1 min index2)
-        }
-      }
-    }
 
-    @tailrec private def advanceNextEntry() {
-      if (nextEntry ne null) {
+    @tailrec private def advanceNextEntry()
+      if (nextEntry ne null)
         nextEntry = decls lookupNextEntry nextEntry
-        if (nextEntry ne null) {
+        if (nextEntry ne null)
           val high = nextEntry.sym
           val isMatch =
             matches(lowSymbol, high) && { visited addEntry nextEntry; true } // side-effect visited on all matches
@@ -266,18 +249,12 @@ abstract class SymbolPairs {
           if (isMatch && !hasCommonParentAsSubclass(lowSymbol, high))
             highSymbol = high
           else advanceNextEntry()
-        }
-      }
-    }
-    @tailrec private def advanceCurEntry() {
-      if (curEntry ne null) {
+    @tailrec private def advanceCurEntry()
+      if (curEntry ne null)
         curEntry = curEntry.next
-        if (curEntry ne null) {
+        if (curEntry ne null)
           if (visited(curEntry) || exclude(curEntry.sym)) advanceCurEntry()
           else nextEntry = curEntry
-        }
-      }
-    }
 
     /** The `low` and `high` symbol.  In the context of overriding pairs,
       *  low == overriding and high == overridden.
@@ -287,22 +264,16 @@ abstract class SymbolPairs {
 
     def hasNext = curEntry ne null
     def currentPair = new SymbolPair(base, low, high)
-    def iterator = new Iterator[SymbolPair] {
+    def iterator = new Iterator[SymbolPair]
       def hasNext = cursor.hasNext
       def next() = try cursor.currentPair finally cursor.next()
-    }
 
     // Note that next is called once during object initialization to
     // populate the fields tracking the current symbol pair.
-    def next() {
-      if (curEntry ne null) {
+    def next()
+      if (curEntry ne null)
         lowSymbol = curEntry.sym
         advanceNextEntry() // sets highSymbol
-        if (nextEntry eq null) {
+        if (nextEntry eq null)
           advanceCurEntry()
           next()
-        }
-      }
-    }
-  }
-}

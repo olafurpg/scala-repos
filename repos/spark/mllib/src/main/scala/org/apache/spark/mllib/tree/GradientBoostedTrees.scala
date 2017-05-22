@@ -51,7 +51,7 @@ import org.apache.spark.storage.StorageLevel
 @Since("1.2.0")
 class GradientBoostedTrees @Since("1.2.0")(
     private val boostingStrategy: BoostingStrategy)
-    extends Serializable with Logging {
+    extends Serializable with Logging
 
   /**
     * Method to train a gradient boosting model
@@ -60,9 +60,9 @@ class GradientBoostedTrees @Since("1.2.0")(
     * @return GradientBoostedTreesModel that can be used for prediction.
     */
   @Since("1.2.0")
-  def run(input: RDD[LabeledPoint]): GradientBoostedTreesModel = {
+  def run(input: RDD[LabeledPoint]): GradientBoostedTreesModel =
     val algo = boostingStrategy.treeStrategy.algo
-    algo match {
+    algo match
       case Regression =>
         GradientBoostedTrees.boost(
             input, input, boostingStrategy, validate = false)
@@ -75,16 +75,13 @@ class GradientBoostedTrees @Since("1.2.0")(
       case _ =>
         throw new IllegalArgumentException(
             s"$algo is not supported by the gradient boosting.")
-    }
-  }
 
   /**
     * Java-friendly API for [[org.apache.spark.mllib.tree.GradientBoostedTrees!#run]].
     */
   @Since("1.2.0")
-  def run(input: JavaRDD[LabeledPoint]): GradientBoostedTreesModel = {
+  def run(input: JavaRDD[LabeledPoint]): GradientBoostedTreesModel =
     run(input.rdd)
-  }
 
   /**
     * Method to validate a gradient boosting model
@@ -100,9 +97,9 @@ class GradientBoostedTrees @Since("1.2.0")(
   @Since("1.4.0")
   def runWithValidation(
       input: RDD[LabeledPoint],
-      validationInput: RDD[LabeledPoint]): GradientBoostedTreesModel = {
+      validationInput: RDD[LabeledPoint]): GradientBoostedTreesModel =
     val algo = boostingStrategy.treeStrategy.algo
-    algo match {
+    algo match
       case Regression =>
         GradientBoostedTrees.boost(
             input, validationInput, boostingStrategy, validate = true)
@@ -119,8 +116,6 @@ class GradientBoostedTrees @Since("1.2.0")(
       case _ =>
         throw new IllegalArgumentException(
             s"$algo is not supported by the gradient boosting.")
-    }
-  }
 
   /**
     * Java-friendly API for [[org.apache.spark.mllib.tree.GradientBoostedTrees!#runWithValidation]].
@@ -128,13 +123,11 @@ class GradientBoostedTrees @Since("1.2.0")(
   @Since("1.4.0")
   def runWithValidation(
       input: JavaRDD[LabeledPoint],
-      validationInput: JavaRDD[LabeledPoint]): GradientBoostedTreesModel = {
+      validationInput: JavaRDD[LabeledPoint]): GradientBoostedTreesModel =
     runWithValidation(input.rdd, validationInput.rdd)
-  }
-}
 
 @Since("1.2.0")
-object GradientBoostedTrees extends Logging {
+object GradientBoostedTrees extends Logging
 
   /**
     * Method to train a gradient boosting model.
@@ -147,18 +140,16 @@ object GradientBoostedTrees extends Logging {
     */
   @Since("1.2.0")
   def train(input: RDD[LabeledPoint],
-            boostingStrategy: BoostingStrategy): GradientBoostedTreesModel = {
+            boostingStrategy: BoostingStrategy): GradientBoostedTreesModel =
     new GradientBoostedTrees(boostingStrategy).run(input)
-  }
 
   /**
     * Java-friendly API for [[org.apache.spark.mllib.tree.GradientBoostedTrees$#train]]
     */
   @Since("1.2.0")
   def train(input: JavaRDD[LabeledPoint],
-            boostingStrategy: BoostingStrategy): GradientBoostedTreesModel = {
+            boostingStrategy: BoostingStrategy): GradientBoostedTreesModel =
     train(input.rdd, boostingStrategy)
-  }
 
   /**
     * Internal method for performing regression using trees as base learners.
@@ -171,7 +162,7 @@ object GradientBoostedTrees extends Logging {
   private def boost(input: RDD[LabeledPoint],
                     validationInput: RDD[LabeledPoint],
                     boostingStrategy: BoostingStrategy,
-                    validate: Boolean): GradientBoostedTreesModel = {
+                    validate: Boolean): GradientBoostedTreesModel =
     val timer = new TimeTracker()
     timer.start("total")
     timer.start("init")
@@ -193,12 +184,11 @@ object GradientBoostedTrees extends Logging {
 
     // Cache input
     val persistedInput =
-      if (input.getStorageLevel == StorageLevel.NONE) {
+      if (input.getStorageLevel == StorageLevel.NONE)
         input.persist(StorageLevel.MEMORY_AND_DISK)
         true
-      } else {
+      else
         false
-      }
 
     // Prepare periodic checkpointers
     val predErrorCheckpointer = new PeriodicRDDCheckpointer[(Double, Double)](
@@ -239,12 +229,11 @@ object GradientBoostedTrees extends Logging {
 
     var m = 1
     var doneLearning = false
-    while (m < numIterations && !doneLearning) {
+    while (m < numIterations && !doneLearning)
       // Update data with pseudo-residuals
-      val data = predError.zip(input).map {
+      val data = predError.zip(input).map
         case ((pred, _), point) =>
           LabeledPoint(-loss.gradient(pred, point.label), point.features)
-      }
 
       timer.start(s"building tree $m")
       logDebug("###################################################")
@@ -264,7 +253,7 @@ object GradientBoostedTrees extends Logging {
       predErrorCheckpointer.update(predError)
       logDebug("error of gbt = " + predError.values.mean())
 
-      if (validate) {
+      if (validate)
         // Stop training early if
         // 1. Reduction in error is less than the validationTol or
         // 2. If the error increases, that is if the model is overfit.
@@ -279,15 +268,12 @@ object GradientBoostedTrees extends Logging {
         validatePredErrorCheckpointer.update(validatePredError)
         val currentValidateError = validatePredError.values.mean()
         if (bestValidateError - currentValidateError < validationTol * Math
-              .max(currentValidateError, 0.01)) {
+              .max(currentValidateError, 0.01))
           doneLearning = true
-        } else if (currentValidateError < bestValidateError) {
+        else if (currentValidateError < bestValidateError)
           bestValidateError = currentValidateError
           bestM = m + 1
-        }
-      }
       m += 1
-    }
 
     timer.stop("total")
 
@@ -298,13 +284,10 @@ object GradientBoostedTrees extends Logging {
     validatePredErrorCheckpointer.deleteAllCheckpoints()
     if (persistedInput) input.unpersist()
 
-    if (validate) {
+    if (validate)
       new GradientBoostedTreesModel(boostingStrategy.treeStrategy.algo,
                                     baseLearners.slice(0, bestM),
                                     baseLearnerWeights.slice(0, bestM))
-    } else {
+    else
       new GradientBoostedTreesModel(
           boostingStrategy.treeStrategy.algo, baseLearners, baseLearnerWeights)
-    }
-  }
-}

@@ -21,7 +21,7 @@ import com.twitter.summingbird._
 /**
   * @author Ian O Connell
   */
-trait ExecutionConfig[P <: Platform[P]] {
+trait ExecutionConfig[P <: Platform[P]]
   // User supplied name for this job
   def name: String
 
@@ -32,4 +32,3 @@ trait ExecutionConfig[P <: Platform[P]] {
   def transformConfig(m: Map[String, AnyRef]): Map[String, AnyRef] = m
 
   def graph: TailProducer[P, Any]
-}

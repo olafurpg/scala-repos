@@ -11,7 +11,7 @@ import org.apache.camel.impl.DefaultCamelContext
 /**
   * Subclass this abstract class to create an untyped producer actor. This class is meant to be used from Java.
   */
-abstract class UntypedProducerActor extends UntypedActor with ProducerSupport {
+abstract class UntypedProducerActor extends UntypedActor with ProducerSupport
 
   /**
     * Called before the message is sent to the endpoint specified by <code>getEndpointUri</code>. The original
@@ -79,4 +79,3 @@ abstract class UntypedProducerActor extends UntypedActor with ProducerSupport {
     * @return the Activation interface
     */
   def getActivation(): Activation = camel
-}

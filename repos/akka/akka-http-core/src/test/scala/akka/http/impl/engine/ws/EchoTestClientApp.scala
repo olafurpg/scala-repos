@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
 /**
   * An example App that runs a quick test against the websocket server at wss://echo.websocket.org
   */
-object EchoTestClientApp extends App {
+object EchoTestClientApp extends App
   implicit val system = ActorSystem()
   import system.dispatcher
   implicit val materializer = ActorMaterializer()
@@ -44,7 +44,7 @@ object EchoTestClientApp extends App {
 
   def sink: Sink[Message, Future[Seq[String]]] =
     Flow[Message]
-      .mapAsync(1) {
+      .mapAsync(1)
         case tm: TextMessage ⇒
           tm.textStream
             .runWith(Sink.fold("")(_ + _))
@@ -53,7 +53,6 @@ object EchoTestClientApp extends App {
           bm.dataStream
             .runWith(Sink.fold(ByteString.empty)(_ ++ _))
             .map(bs ⇒ s"BinaryMessage: '${bs.utf8String}'")
-      }
       .grouped(10000)
       .toMat(Sink.head)(Keep.right)
 
@@ -61,7 +60,7 @@ object EchoTestClientApp extends App {
 
   val (upgrade, res) =
     Http().singleWebSocketRequest("wss://echo.websocket.org", echoClient)
-  res onComplete {
+  res onComplete
     case Success(res) ⇒
       println("Run successful. Got these elements:")
       res.foreach(println)
@@ -70,7 +69,5 @@ object EchoTestClientApp extends App {
       println("Run failed.")
       e.printStackTrace()
       system.terminate()
-  }
 
   system.scheduler.scheduleOnce(10.seconds)(system.terminate())
-}

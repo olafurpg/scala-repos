@@ -12,15 +12,11 @@ import java.io.File
   * Import this to hijack the default string interpolator, muahahaha!
   * Also, don't be evil.
   */
-object EscapingStringInterpolation {
-  case class StringContext(parts: String*) {
+object EscapingStringInterpolation
+  case class StringContext(parts: String*)
     private val delegate = new scala.StringContext(parts: _*)
-    def s(args: Any*): String = {
-      val hijacked = args.map {
+    def s(args: Any*): String =
+      val hijacked = args.map
         case f: File => f.toString.replace("""\""", """\\""")
         case other => other
-      }
       delegate.s(hijacked: _*)
-    }
-  }
-}

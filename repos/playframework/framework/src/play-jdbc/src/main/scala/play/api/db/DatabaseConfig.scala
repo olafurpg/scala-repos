@@ -20,9 +20,9 @@ case class DatabaseConfig(driver: Option[String],
                           password: Option[String],
                           jndiName: Option[String])
 
-object DatabaseConfig {
+object DatabaseConfig
 
-  def fromConfig(config: PlayConfig, environment: Environment) = {
+  def fromConfig(config: PlayConfig, environment: Environment) =
 
     val driver = config.get[Option[String]]("driver")
     val (url, userPass) = ConnectionPool.extractUrl(
@@ -36,5 +36,3 @@ object DatabaseConfig {
     val jndiName = config.get[Option[String]]("jndiName")
 
     DatabaseConfig(driver, url, username, password, jndiName)
-  }
-}

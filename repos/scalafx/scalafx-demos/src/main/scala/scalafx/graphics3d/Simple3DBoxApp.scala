@@ -36,28 +36,23 @@ import scalafx.scene.transform.Transform._
 import scalafx.scene.transform.{Rotate, Translate}
 
 /** Demo of a triangular frame of a 3D box, originally based on example in Ensemble 8. */
-object Simple3DBoxApp extends JFXApp {
+object Simple3DBoxApp extends JFXApp
 
-  stage = new PrimaryStage {
-    scene = new Scene(300, 300, true, SceneAntialiasing.Balanced) {
+  stage = new PrimaryStage
+    scene = new Scene(300, 300, true, SceneAntialiasing.Balanced)
       // 3D content
-      content = new Box {
+      content = new Box
         width = 5
         height = 5
         depth = 5
         material = new PhongMaterial(Color.Red)
         drawMode = DrawMode.Line
-      }
 
       // Background
       fill = Color.AliceBlue
 
       // Modify point of view
-      camera = new PerspectiveCamera(true) {
+      camera = new PerspectiveCamera(true)
         transforms +=
         (new Rotate(-20, Rotate.YAxis), new Rotate(-20, Rotate.XAxis),
             new Translate(0, 0, -15))
-      }
-    }
-  }
-}

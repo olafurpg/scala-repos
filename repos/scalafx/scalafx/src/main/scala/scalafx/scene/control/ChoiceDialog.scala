@@ -36,7 +36,7 @@ import scalafx.beans.property.ReadOnlyObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object ChoiceDialog {
+object ChoiceDialog
 
   /**
     * Converts a ScalaFX ChoiceDialog to its JavaFX counterpart.
@@ -47,7 +47,6 @@ object ChoiceDialog {
   implicit def sfxChoiceDialog2jfx[T](
       v: ChoiceDialog[T]): jfxsc.ChoiceDialog[T] =
     if (v != null) v.delegate else null
-}
 
 /**
   * A dialog that shows a list of choices to the user, from which they can pick
@@ -69,7 +68,7 @@ object ChoiceDialog {
   */
 class ChoiceDialog[T](
     override val delegate: jfxsc.ChoiceDialog[T] = new jfxsc.ChoiceDialog[T]())
-    extends Dialog[T](delegate) with SFXDelegate[jfxsc.ChoiceDialog[T]] {
+    extends Dialog[T](delegate) with SFXDelegate[jfxsc.ChoiceDialog[T]]
 
   /**
     * Creates a new ChoiceDialog instance with the first argument specifying the
@@ -105,9 +104,8 @@ class ChoiceDialog[T](
     *
     * @return An `Option` that contains the `result`.
     */
-  def showAndWait(): Option[T] = {
+  def showAndWait(): Option[T] =
     super.showAndWait((x: T) => x).asInstanceOf[Option[T]]
-  }
 
   /**
     * Returns the property representing the currently selected item in the dialog.
@@ -118,9 +116,8 @@ class ChoiceDialog[T](
     * Sets the currently selected item in the dialog.
     * @param item The item to select in the dialog.
     */
-  def selectedItem_=(item: T): Unit = {
+  def selectedItem_=(item: T): Unit =
     delegate.setSelectedItem(item)
-  }
 
   /**
     * Returns the buffer of all items that will be displayed to users. This buffer
@@ -133,4 +130,3 @@ class ChoiceDialog[T](
     * Returns the default choice that was specified in the constructor.
     */
   def defaultChoice: T = delegate.getDefaultChoice
-}

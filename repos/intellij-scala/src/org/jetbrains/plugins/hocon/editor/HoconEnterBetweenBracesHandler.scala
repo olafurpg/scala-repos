@@ -13,7 +13,7 @@ import org.jetbrains.plugins.hocon.lang.HoconLanguage
   * Like [[com.intellij.json.formatter.JsonEnterBetweenBracesHandler]]
   * @author ghik
   */
-class HoconEnterBetweenBracesHandler extends EnterBetweenBracesHandler {
+class HoconEnterBetweenBracesHandler extends EnterBetweenBracesHandler
   override def preprocessEnter(file: PsiFile,
                                editor: Editor,
                                caretOffsetRef: Ref[Integer],
@@ -31,4 +31,3 @@ class HoconEnterBetweenBracesHandler extends EnterBetweenBracesHandler {
 
   override def isBracePair(c1: Char, c2: Char): Boolean =
     c1 == '{' && c2 == '}' || c1 == '[' && c2 == ']'
-}

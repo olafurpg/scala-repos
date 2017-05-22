@@ -8,11 +8,10 @@ import scala.collection.mutable.ArrayBuffer
   * Created by user
   * on 10/27/15
   */
-trait Modifier {
+trait Modifier
   def modificator: ModifierType
-}
 
-object ModifierType extends Enumeration {
+object ModifierType extends Enumeration
   type ModifierType = Value
   val ABSTRACT, PUBLIC, PROTECTED, PRIVATE, PACKAGE_LOCAL, ANNOTATION,
   OVERRIDE, INNER, VOLATILE, TRANSIENT, NATIVE, THROW, SerialVersionUID,
@@ -23,28 +22,23 @@ object ModifierType extends Enumeration {
                             ModifierType.PROTECTED,
                             ModifierType.PACKAGE_LOCAL)
 
-  override def toString(): String = {
-    Value match {
+  override def toString(): String =
+    Value match
       case ABSTRACT => "abstract"
       case _ => "other"
-    }
-  }
-}
 
 case class ModifiersConstruction(
     annotations: Seq[IntermediateNode], modifiers: Seq[IntermediateNode])
-    extends IntermediateNode {
+    extends IntermediateNode
   val withoutList = new ArrayBuffer[ModifierType]()
 
-  def without(value: ModifierType): IntermediateNode = {
+  def without(value: ModifierType): IntermediateNode =
     withoutList += value
     this
-  }
 
-  def withoutAccessModifiers: IntermediateNode = {
+  def withoutAccessModifiers: IntermediateNode =
     withoutList ++= accessModifiers
     this
-  }
 
   def noModifiers = annotations.isEmpty && modifiers.isEmpty
 
@@ -52,14 +46,11 @@ case class ModifiersConstruction(
                             ModifierType.PRIVATE,
                             ModifierType.PROTECTED,
                             ModifierType.PACKAGE_LOCAL)
-}
 
 case class ModifierWithExpression(mtype: ModifierType, value: IntermediateNode)
-    extends IntermediateNode with Modifier {
+    extends IntermediateNode with Modifier
   override def modificator: ModifierType = mtype
-}
 
 case class SimpleModifier(mtype: ModifierType)
-    extends IntermediateNode with Modifier {
+    extends IntermediateNode with Modifier
   override def modificator: ModifierType = mtype
-}

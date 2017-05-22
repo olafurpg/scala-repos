@@ -21,7 +21,7 @@ import org.junit.Assert._
 
 import lens._, nat._, record._, syntax.singleton._, tag.@@, test._, testutil._
 
-package lensTestDataTypes {
+package lensTestDataTypes
   sealed trait Sum1
   case class Prod1a(s2: Sum2, i: Int) extends Sum1
   case class Prod1b(s2: Sum2, s: String) extends Sum1
@@ -43,15 +43,13 @@ package lensTestDataTypes {
   sealed trait BGraph[T]
   case class BTerm[T](value: T) extends BGraph[T]
 
-  class BNode[T](left0: => BGraph[T], right0: => BGraph[T]) extends BGraph[T] {
+  class BNode[T](left0: => BGraph[T], right0: => BGraph[T]) extends BGraph[T]
     lazy val left = left0
     lazy val right = right0
-  }
-}
 
 import lensTestDataTypes._
 
-trait LensTests {
+trait LensTests
   val address = Address("Southover Street", "Brighton", "BN2 9UA")
   val person = Person("Joe Grey", 37, address)
 
@@ -63,7 +61,7 @@ trait LensTests {
   val postcodeLens: Lens[Person, String]
 
   @Test
-  def testBasics {
+  def testBasics
     val age1 = ageLens.get(person)
     typed[Int](age1)
     assertEquals(37, age1)
@@ -77,10 +75,9 @@ trait LensTests {
 
     val person3 = streetLens.set(person)("Montpelier Road")
     assertEquals("Montpelier Road", person3.address.street)
-  }
 
   @Test
-  def testCompose {
+  def testCompose
     val addressLens = lens[Person] >> 2
     val streetLens = lens[Address] >> 0
 
@@ -100,10 +97,9 @@ trait LensTests {
     val street3 = personStreetLens3.get(person)
     typed[String](street3)
     assertEquals("Southover Street", street3)
-  }
 
   @Test
-  def testTuples {
+  def testTuples
     type ISDB = (Int, (String, (Double, Boolean)))
 
     val tp = (23, ("foo", (2.0, false)))
@@ -162,10 +158,9 @@ trait LensTests {
     val tpb = lens111.set(tp)(true)
     typed[ISDB](tpb)
     assertEquals((23, ("foo", (2.0, true))), tpb)
-  }
 
   @Test
-  def testHLists {
+  def testHLists
     type ISB = Int :: String :: Boolean :: HNil
     val l = 23 :: "foo" :: true :: HNil
 
@@ -205,10 +200,9 @@ trait LensTests {
     typed[ISB](lb)
     assertEquals(23 :: "foo" :: false :: HNil, lb)
     assertEquals(23 :: "foo" :: false :: HNil, lensB.set(l)(false))
-  }
 
   @Test
-  def testRecords {
+  def testRecords
     import labelled.FieldType, syntax.singleton._
 
     val (fooT, barT) = (Witness("foo"), Witness("bar"))
@@ -223,10 +217,9 @@ trait LensTests {
     val ls = recordLens[LT]("bar")
     assertEquals("hi", ls.get(l))
     assertEquals(("foo" ->> 42) :: ("bar" ->> "bye") :: HNil, ls.set(l)("bye"))
-  }
 
   @Test
-  def testSets {
+  def testSets
     val s = Set("foo", "bar", "baz")
     val lens = setLens[String]("bar")
 
@@ -241,10 +234,9 @@ trait LensTests {
 
     val s3 = lens.set(s2)(true)
     assertEquals(s, s3)
-  }
 
   @Test
-  def testMaps {
+  def testMaps
     val m = Map(23 -> "foo", 13 -> "bar", 11 -> "baz")
     val lens = mapLens[Int, String](13)
 
@@ -268,10 +260,9 @@ trait LensTests {
 
     val s4 = lens.get(m4)
     assertEquals(Option("bar"), s4)
-  }
 
   @Test
-  def testProducts {
+  def testProducts
     val nameAgeCityLens = nameLens ~ ageLens ~ cityLens
 
     val nac1 = nameAgeCityLens.get(person)
@@ -283,48 +274,42 @@ trait LensTests {
         Person(
             "Joe Soap", 27, Address("Southover Street", "London", "BN2 9UA")),
         person2)
-  }
-}
 
-class LensTestsNat extends LensTests {
+class LensTestsNat extends LensTests
   val nameLens = lens[Person] >> 0
   val ageLens = lens[Person] >> 1
   val addressLens = lens[Person] >> 2
   val streetLens = lens[Person] >> 2 >> 0
   val cityLens = lens[Person] >> 2 >> 1
   val postcodeLens = lens[Person] >> 2 >> 2
-}
 
-class LensTestsKey extends LensTests {
+class LensTestsKey extends LensTests
   val nameLens = lens[Person] >> 'name
   val ageLens = lens[Person] >> 'age
   val addressLens = lens[Person] >> 'address
   val streetLens = lens[Person] >> 'address >> 'street
   val cityLens = lens[Person] >> 'address >> 'city
   val postcodeLens = lens[Person] >> 'address >> 'postcode
-}
 
-class OpticTestsDynamic extends LensTests {
+class OpticTestsDynamic extends LensTests
   val nameLens = lens[Person].name
   val ageLens = lens[Person].age
   val addressLens = lens[Person].address
   val streetLens = lens[Person].address.street
   val cityLens = lens[Person].address.city
   val postcodeLens = lens[Person].address.postcode
-}
 
-class AscribedOpticTestsDynamic extends LensTests {
+class AscribedOpticTestsDynamic extends LensTests
   val nameLens: Lens[Person, String] = lens[Person].name
   val ageLens: Lens[Person, Int] = lens[Person].age
   val addressLens: Lens[Person, Address] = lens[Person].address
   val streetLens: Lens[Person, String] = lens[Person].address.street
   val cityLens: Lens[Person, String] = lens[Person].address.city
   val postcodeLens: Lens[Person, String] = lens[Person].address.postcode
-}
 
-class OpticTests {
+class OpticTests
   @Test
-  def testBasics {
+  def testBasics
     val s1: Sum1 = Prod1a(Prod2a(13), 23)
     val s2: Sum1 = Prod1b(Prod2b("foo"), "bar")
 
@@ -415,10 +400,9 @@ class OpticTests {
     val t5b = l5.set(s2)(19)
     typed[Sum1](t5b)
     assertEquals(s2, t5b)
-  }
 
   @Test
-  def testInferredProducts {
+  def testInferredProducts
     val s1: Sum1 = Prod1a(Prod2a(13), 23)
     val s2: Sum1 = Prod1b(Prod2b("foo"), "bar")
 
@@ -475,10 +459,9 @@ class OpticTests {
     val t3b = li3.set(s2)(19)
     typed[Sum1](t3b)
     assertEquals(s2, t3b)
-  }
 
   @Test
-  def testRecursive {
+  def testRecursive
     val t1: Tree[Int] = Node(Node(Leaf(1), Leaf(2)), Leaf(3))
     val t2: Tree[Int] = Node(Leaf(4), Node(Leaf(5), Leaf(6)))
     val t3: Node[Int] = Node(Leaf(7), Leaf(8))
@@ -556,10 +539,9 @@ class OpticTests {
     val s5b = l5.set(t2)(23)
     typed[Tree[Int]](s5b)
     assertEquals(t2, s5b)
-  }
 
   @Test
-  def testRecursiveInferredProducts {
+  def testRecursiveInferredProducts
     val t1: Tree[Int] = Node(Node(Leaf(1), Leaf(2)), Leaf(3))
     val t2: Tree[Int] = Node(Leaf(4), Node(Leaf(5), Leaf(6)))
     val t3: Node[Int] = Node(Leaf(7), Leaf(8))
@@ -620,10 +602,9 @@ class OpticTests {
     val s4b = l4.set(t2)(23)
     typed[Tree[Int]](s4b)
     assertEquals(t2, s4b)
-  }
 
   @Test
-  def testPaths {
+  def testPaths
     val t1: Tree[Int] = Node(Node(Leaf(1), Leaf(2)), Leaf(3))
     val t2: Tree[Int] = Node(Leaf(4), Node(Leaf(5), Leaf(6)))
     val t3: Node[Int] = Node(Leaf(7), Leaf(8))
@@ -689,10 +670,9 @@ class OpticTests {
     val s4b = l4.set(t2)(23)
     typed[Tree[Int]](s4b)
     assertEquals(t2, s4b)
-  }
 
   @Test
-  def testInferredLenses {
+  def testInferredLenses
     def update[T, E](t: T)(e: E)(implicit mkLens: p.Lens[T, E]): T =
       mkLens().set(t)(e)
 
@@ -708,10 +688,9 @@ class OpticTests {
     val bar2 = update(bar)(7)
     typed[Bar](bar2)
     assertEquals(Bar(7, true), bar2)
-  }
 
   @Test
-  def testUnapply {
+  def testUnapply
     val t1: Tree[Int] = Node(Node(Leaf(1), Leaf(2)), Leaf(3))
     val t2: Tree[Int] = Node(Leaf(4), Node(Leaf(5), Leaf(6)))
 
@@ -729,22 +708,19 @@ class OpticTests {
     val rv(z) = t1
     assertTypedEquals[Int](3, z)
 
-    val x2 = t2 match {
+    val x2 = t2 match
       case llv(x2) => Some(x2)
       case _ => None
-    }
     assertTypedEquals[Option[Int]](None, x2)
 
-    val y2 = t2 match {
+    val y2 = t2 match
       case lrv(y2) => Some(y2)
       case _ => None
-    }
     assertTypedEquals[Option[Int]](None, y2)
 
-    val z2 = t2 match {
+    val z2 = t2 match
       case rv(z2) => Some(z2)
       case _ => None
-    }
     assertTypedEquals[Option[Int]](None, z2)
 
     val llvrv = llv ~ lrv ~ rv
@@ -752,10 +728,9 @@ class OpticTests {
     assertTypedEquals[Int](1, x3)
     assertTypedEquals[Int](2, y3)
     assertTypedEquals[Int](3, z3)
-  }
 
   @Test
-  def testLazyUnapply {
+  def testLazyUnapply
     val g = optic[BGraph[Int]]
     val l = g.left
     val rl = g.right.left
@@ -784,5 +759,3 @@ class OpticTests {
     val looped(x2, y2) = g1
     assertEquals(1, x2)
     assertEquals(2, y2)
-  }
-}

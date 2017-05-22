@@ -13,7 +13,7 @@ import scala.collection.immutable
 
 final case class SingletonClusterMultiNodeConfig(
     failureDetectorPuppet: Boolean)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -27,7 +27,6 @@ final case class SingletonClusterMultiNodeConfig(
     """))
         .withFallback(
             MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
-}
 
 class SingletonClusterWithFailureDetectorPuppetMultiJvmNode1
     extends SingletonClusterSpec(failureDetectorPuppet = true)
@@ -41,7 +40,7 @@ class SingletonClusterWithAccrualFailureDetectorMultiJvmNode2
 
 abstract class SingletonClusterSpec(
     multiNodeConfig: SingletonClusterMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec
 
   def this(failureDetectorPuppet: Boolean) =
     this(SingletonClusterMultiNodeConfig(failureDetectorPuppet))
@@ -50,29 +49,26 @@ abstract class SingletonClusterSpec(
 
   muteMarkingAsUnreachable()
 
-  "A cluster of 2 nodes" must {
+  "A cluster of 2 nodes" must
 
-    "become singleton cluster when started with seed-nodes" taggedAs LongRunningTest in {
-      runOn(first) {
+    "become singleton cluster when started with seed-nodes" taggedAs LongRunningTest in
+      runOn(first)
         val nodes: immutable.IndexedSeq[Address] = Vector(first) //
         cluster.joinSeedNodes(nodes)
         awaitMembersUp(1)
         clusterView.isSingletonCluster should ===(true)
-      }
 
       enterBarrier("after-1")
-    }
 
-    "not be singleton cluster when joined with other node" taggedAs LongRunningTest in {
+    "not be singleton cluster when joined with other node" taggedAs LongRunningTest in
       awaitClusterUp(first, second)
       clusterView.isSingletonCluster should ===(false)
       assertLeader(first, second)
 
       enterBarrier("after-2")
-    }
 
-    "become singleton cluster when one node is shutdown" taggedAs LongRunningTest in {
-      runOn(first) {
+    "become singleton cluster when one node is shutdown" taggedAs LongRunningTest in
+      runOn(first)
         val secondAddress = address(second)
         testConductor.exit(second, 0).await
 
@@ -83,17 +79,11 @@ abstract class SingletonClusterSpec(
                        30.seconds)
         clusterView.isSingletonCluster should ===(true)
         awaitCond(clusterView.isLeader)
-      }
 
       enterBarrier("after-3")
-    }
 
-    "leave and shutdown itself when singleton cluster" taggedAs LongRunningTest in {
-      runOn(first) {
+    "leave and shutdown itself when singleton cluster" taggedAs LongRunningTest in
+      runOn(first)
         cluster.leave(first)
         awaitCond(cluster.isTerminated, 5.seconds)
-      }
       enterBarrier("after-4")
-    }
-  }
-}

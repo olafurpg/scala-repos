@@ -6,7 +6,7 @@ import reactivemongo.core.commands._
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Types.Coll
 
-final class Search(collection: Coll) {
+final class Search(collection: Coll)
 
   private implicit val commentBSONHandler = Macros.handler[Comment]
   private implicit val voteBSONHandler = Macros.handler[Vote]
@@ -17,24 +17,21 @@ final class Search(collection: Coll) {
   private case class Search(collectionName: String,
                             search: String,
                             filter: Option[BSONDocument] = None)
-      extends Command[Result] {
+      extends Command[Result]
 
     override def makeDocuments =
       BSONDocument("text" -> collectionName,
                    "search" -> search,
                    "filter" -> filter)
 
-    val ResultMaker = new BSONCommandResultMaker[Result] {
+    val ResultMaker = new BSONCommandResultMaker[Result]
 
       /**
         * Deserializes the given response into an instance of Result.
         */
       def apply(document: BSONDocument): Either[CommandError, Result] =
-        CommandError.checkOk(document, Some("search")) toLeft {
+        CommandError.checkOk(document, Some("search")) toLeft
           document.getAs[List[BSONDocument]]("results") getOrElse Nil
-        }
-    }
-  }
 
   def apply(q: String): Fu[List[Question]] =
     collection
@@ -43,4 +40,3 @@ final class Search(collection: Coll) {
           ))
       .cursor[Question]()
       .collect[List]()
-}

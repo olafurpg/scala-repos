@@ -33,11 +33,11 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 
-object PixelFormat {
+object PixelFormat
   implicit def sfxPixelFormat2jfx[B <: Buffer](
       pf: PixelFormat[B]): jfxsi.PixelFormat[B] = pf.delegate
 
-  object Type extends SFXEnumDelegateCompanion[jfxsi.PixelFormat.Type, Type] {
+  object Type extends SFXEnumDelegateCompanion[jfxsi.PixelFormat.Type, Type]
 
     /**
       * The pixels are stored in adjacent bytes with the non-premultiplied components stored in order of increasing 
@@ -98,7 +98,6 @@ object PixelFormat {
 
     protected override def unsortedValues: Array[Type] =
       Array(ByteBGRA, ByteBRGAPre, ByteIndexed, ByteRGB, IntARGB, IntARGBPre)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/PixelFormat.Type.html]]
@@ -127,14 +126,13 @@ object PixelFormat {
 
   def getIntArgbPreInstance: WritablePixelFormat[IntBuffer] =
     jfxsi.PixelFormat.getIntArgbPreInstance
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/PixelFormat.html]]
   */
 abstract class PixelFormat[B <: Buffer](
     override val delegate: jfxsi.PixelFormat[B])
-    extends SFXDelegate[jfxsi.PixelFormat[B]] {
+    extends SFXDelegate[jfxsi.PixelFormat[B]]
 
   /**
     * Reads a 32-bit integer representation of the color from the buffer at the specified coordinates.
@@ -150,4 +148,3 @@ abstract class PixelFormat[B <: Buffer](
   def premultiplied = delegate.isPremultiplied
 
   def writable = delegate.isWritable
-}

@@ -3,16 +3,15 @@ package com.typesafe.slick.testkit.tests
 import com.typesafe.slick.testkit.util.{AsyncTest, JdbcTestDB}
 import slick.jdbc.OracleProfile
 
-class OracleExtraTests extends AsyncTest[JdbcTestDB] {
+class OracleExtraTests extends AsyncTest[JdbcTestDB]
   lazy val oracleProfile = tdb.profile.asInstanceOf[OracleProfile]
   import oracleProfile.api._
 
-  def testBlobCompare = {
-    class A(tag: Tag) extends Table[(Int, Option[Array[Byte]])](tag, "a") {
+  def testBlobCompare =
+    class A(tag: Tag) extends Table[(Int, Option[Array[Byte]])](tag, "a")
       def id = column[Int]("id")
       def a = column[Option[Array[Byte]]]("a")
       def * = (id, a)
-    }
     val as = TableQuery[A]
 
     DBIO.seq(
@@ -50,10 +49,9 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
           .result
           .map(_ shouldBe Nil)
       )
-  }
 
-  def testSequenceAndTriggerName = {
-    class A(tag: Tag) extends Table[(Int, Int)](tag, "A_SEQTRG") {
+  def testSequenceAndTriggerName =
+    class A(tag: Tag) extends Table[(Int, Int)](tag, "A_SEQTRG")
       def id =
         column[Int]("ID",
                     O.PrimaryKey,
@@ -62,7 +60,6 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
                     O.AutoIncTriggerName("TRG_SEQTRG"))
       def a = column[Int]("A")
       def * = (id, a)
-    }
     val as = TableQuery[A]
 
     //as.schema.createStatements.foreach(println)
@@ -77,5 +74,3 @@ class OracleExtraTests extends AsyncTest[JdbcTestDB] {
         as.to[Set].result.map(_ shouldBe Set((1, 1), (2, 2), (3, 3))),
         as.schema.drop
     )
-  }
-}

@@ -31,28 +31,24 @@ import org.apache.spark.storage.StorageLevel
 import org.apache.spark.streaming.{Milliseconds, StreamingContext}
 
 class KafkaStreamSuite
-    extends SparkFunSuite with Eventually with BeforeAndAfterAll {
+    extends SparkFunSuite with Eventually with BeforeAndAfterAll
   private var ssc: StreamingContext = _
   private var kafkaTestUtils: KafkaTestUtils = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     kafkaTestUtils = new KafkaTestUtils
     kafkaTestUtils.setup()
-  }
 
-  override def afterAll(): Unit = {
-    if (ssc != null) {
+  override def afterAll(): Unit =
+    if (ssc != null)
       ssc.stop()
       ssc = null
-    }
 
-    if (kafkaTestUtils != null) {
+    if (kafkaTestUtils != null)
       kafkaTestUtils.teardown()
       kafkaTestUtils = null
-    }
-  }
 
-  test("Kafka input stream") {
+  test("Kafka input stream")
     val sparkConf = new SparkConf()
       .setMaster("local[4]")
       .setAppName(this.getClass.getSimpleName)
@@ -71,19 +67,13 @@ class KafkaStreamSuite
       KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
           ssc, kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_ONLY)
     val result = new mutable.HashMap[String, Long]()
-    stream.map(_._2).countByValue().foreachRDD { r =>
-      r.collect().foreach { kv =>
-        result.synchronized {
+    stream.map(_._2).countByValue().foreachRDD  r =>
+      r.collect().foreach  kv =>
+        result.synchronized
           val count = result.getOrElseUpdate(kv._1, 0) + kv._2
           result.put(kv._1, count)
-        }
-      }
-    }
 
     ssc.start()
 
-    eventually(timeout(10000 milliseconds), interval(100 milliseconds)) {
+    eventually(timeout(10000 milliseconds), interval(100 milliseconds))
       assert(result.synchronized { sent === result })
-    }
-  }
-}

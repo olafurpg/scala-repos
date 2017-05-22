@@ -18,58 +18,48 @@ import lila.socket.actorApi.GetVersion
   */
 private[round] final class History(load: Fu[VersionedEvents],
                                    persist: VersionedEvents => Unit,
-                                   withPersistence: Boolean) {
+                                   withPersistence: Boolean)
 
   private var events: VersionedEvents = _
 
-  def getVersion: Int = {
+  def getVersion: Int =
     waitForLoadedEvents
     events.headOption.??(_.version)
-  }
 
   // none if version asked is > to history version
   // none if an event is missing (asked too old version)
-  def getEventsSince(v: Int): Option[List[VersionedEvent]] = {
+  def getEventsSince(v: Int): Option[List[VersionedEvent]] =
     waitForLoadedEvents
     val version = getVersion
     if (v > version) None
     else if (v == version) Some(Nil)
     else
-      events.takeWhile(_.version > v).reverse.some filter {
+      events.takeWhile(_.version > v).reverse.some filter
         case first :: rest => first.version == v + 1
         case _ => true
-      }
-  }
 
-  def addEvents(xs: List[Event]): VersionedEvents = {
+  def addEvents(xs: List[Event]): VersionedEvents =
     waitForLoadedEvents
     val vevs = xs
-      .foldLeft(List.empty[VersionedEvent] -> getVersion) {
+      .foldLeft(List.empty[VersionedEvent] -> getVersion)
         case ((vevs, v), e) => (VersionedEvent(e, v + 1) :: vevs, v + 1)
-      }
       ._1
     events = (vevs ::: events) take History.size
     if (persistenceEnabled) persist(events)
     vevs.reverse
-  }
 
-  private def waitForLoadedEvents {
-    if (events == null) {
+  private def waitForLoadedEvents
+    if (events == null)
       events = load awaitSeconds 3
-    }
-  }
 
   private var persistenceEnabled = withPersistence
 
-  def enablePersistence {
-    if (!persistenceEnabled) {
+  def enablePersistence
+    if (!persistenceEnabled)
       persistenceEnabled = true
       if (events != null) persist(events)
-    }
-  }
-}
 
-private[round] object History {
+private[round] object History
 
   val size = 30
 
@@ -83,20 +73,17 @@ private[round] object History {
   private def load(coll: Coll,
                    gameId: String,
                    withPersistence: Boolean): Fu[VersionedEvents] =
-    coll.find(BSONDocument("_id" -> gameId)).one[BSONDocument].map {
+    coll.find(BSONDocument("_id" -> gameId)).one[BSONDocument].map
       _.flatMap(_.getAs[VersionedEvents]("e")) ?? (_.reverse)
-    } addEffect {
+    addEffect
       case events if events.nonEmpty && !withPersistence =>
         coll.remove(BSONDocument("_id" -> gameId)).void
       case _ =>
-    }
 
-  private def persist(coll: Coll, gameId: String)(vevs: List[VersionedEvent]) {
+  private def persist(coll: Coll, gameId: String)(vevs: List[VersionedEvent])
     if (vevs.nonEmpty)
       coll.uncheckedUpdate(
           BSONDocument("_id" -> gameId),
           BSONDocument("$set" -> BSONDocument("e" -> vevs.reverse),
                        "$setOnInsert" -> BSONDocument("d" -> DateTime.now)),
           upsert = true)
-  }
-}

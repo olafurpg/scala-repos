@@ -26,7 +26,7 @@ import scala.collection.JavaConversions
 /** This Java-friendly object provides a set of operation to access Event Store
   * with Spark's parallelization
   */
-object PJavaEventStore {
+object PJavaEventStore
 
   /** Read events from Event Store
     *
@@ -57,7 +57,7 @@ object PJavaEventStore {
            eventNames: Option[java.util.List[String]],
            targetEntityType: Option[Option[String]],
            targetEntityId: Option[Option[String]],
-           sc: SparkContext): JavaRDD[Event] = {
+           sc: SparkContext): JavaRDD[Event] =
 
     val eventNamesSeq = eventNames.map(JavaConversions.asScalaBuffer(_).toSeq)
 
@@ -72,7 +72,6 @@ object PJavaEventStore {
         targetEntityType,
         targetEntityId
     )(sc)
-  }
 
   /** Aggregate properties of entities based on these special events:
     * \$set, \$unset, \$delete events.
@@ -92,7 +91,7 @@ object PJavaEventStore {
                           startTime: Option[DateTime],
                           untilTime: Option[DateTime],
                           required: Option[java.util.List[String]],
-                          sc: SparkContext): JavaRDD[(String, PropertyMap)] = {
+                          sc: SparkContext): JavaRDD[(String, PropertyMap)] =
 
     PEventStore.aggregateProperties(
         appName,
@@ -101,5 +100,3 @@ object PJavaEventStore {
         startTime,
         untilTime
     )(sc)
-  }
-}

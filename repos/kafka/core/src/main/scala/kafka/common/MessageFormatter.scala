@@ -27,7 +27,7 @@ import org.apache.kafka.clients.consumer.ConsumerRecord
   *
   * This is used by the `ConsoleConsumer`.
   */
-trait MessageFormatter {
+trait MessageFormatter
 
   def init(props: Properties) {}
 
@@ -35,4 +35,3 @@ trait MessageFormatter {
               output: PrintStream): Unit
 
   def close() {}
-}

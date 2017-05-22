@@ -40,7 +40,7 @@ class IncludedFileReferenceSet(text: String,
                                element: PsiElement,
                                forcedAbsolute: Boolean,
                                fromClasspath: Boolean)
-    extends FileReferenceSet(text, element, 1, null, true) {
+    extends FileReferenceSet(text, element, 1, null, true)
 
   setEmptyPathAllowed(false)
 
@@ -56,14 +56,13 @@ class IncludedFileReferenceSet(text: String,
     new IncludedFileReference(this, range, index, text)
 
   override def getReferenceCompletionFilter: Condition[PsiFileSystemItem] =
-    new Condition[PsiFileSystemItem] {
+    new Condition[PsiFileSystemItem]
       def value(item: PsiFileSystemItem): Boolean =
         item.isDirectory || item.getName.endsWith(ConfExt) ||
         item.getName.endsWith(JsonExt) || item.getName.endsWith(PropsExt)
-    }
 
   // code mostly based on similar bits in `FileReferenceSet` and `PsiFileReferenceHelper`
-  override def computeDefaultContexts: ju.Collection[PsiFileSystemItem] = {
+  override def computeDefaultContexts: ju.Collection[PsiFileSystemItem] =
     val empty = ju.Collections.emptyList[PsiFileSystemItem]
     def single(fsi: PsiFileSystemItem) = ju.Collections.singletonList(fsi)
 
@@ -82,7 +81,7 @@ class IncludedFileReferenceSet(text: String,
 
     val psiManager = PsiManager.getInstance(proj)
 
-    def classpathDefaultContexts: ju.Collection[PsiFileSystemItem] = {
+    def classpathDefaultContexts: ju.Collection[PsiFileSystemItem] =
       val empty = ju.Collections.emptyList[PsiFileSystemItem]
 
       val pfi = ProjectRootManager.getInstance(proj).getFileIndex
@@ -93,14 +92,13 @@ class IncludedFileReferenceSet(text: String,
       if (pkgName == null) return empty
 
       val allScopes =
-        pfi.getOrderEntriesForFile(parent).iterator.asScala.collect {
+        pfi.getOrderEntriesForFile(parent).iterator.asScala.collect
           case msoe: ModuleSourceOrderEntry =>
             msoe.getOwnerModule.getModuleRuntimeScope(
                 pfi.isInTestSourceContent(parent))
           case loe: LibraryOrderEntry =>
             loe.getOwnerModule.getModuleRuntimeScope(
                 loe.getScope == DependencyScope.TEST)
-        }
 
       def orderEntryScope = allScopes.reduceOption(_ union _)
       def moduleScope =
@@ -109,7 +107,7 @@ class IncludedFileReferenceSet(text: String,
           .toOption
           .map(_.getModuleRuntimeScope(false))
 
-        (orderEntryScope orElse moduleScope).map { scope =>
+        (orderEntryScope orElse moduleScope).map  scope =>
         // If there are any source roots with package prefix and that package is a subpackage of
         // including file's package, they will be omitted because `getDirectoriesByPackageName` doesn't find them.
         // I tried to fix this by manually searching for package-prefixed source dirs and representing them with
@@ -124,19 +122,16 @@ class IncludedFileReferenceSet(text: String,
           .filter(scope.contains)
           .flatMap(dir => Option(psiManager.findDirectory(dir)))
           .toJList[PsiFileSystemItem]
-      } getOrElse empty
-    }
+      getOrElse empty
 
     if (fromClasspath) classpathDefaultContexts
     else if (!isAbsolutePathReference)
       psiManager.findDirectory(parent).toOption.map(single).getOrElse(empty)
     else empty
-  }
-}
 
-object IncludedFileReference {
-  val ResolveResultOrdering = Ordering.by { rr: ResolveResult =>
-    rr.getElement match {
+object IncludedFileReference
+  val ResolveResultOrdering = Ordering.by  rr: ResolveResult =>
+    rr.getElement match
       case file: PsiFile =>
         val name = file.getName
         if (name.endsWith(ConfExt)) 0
@@ -145,13 +140,10 @@ object IncludedFileReference {
         else 3
       case _ =>
         3
-    }
-  }
-}
 
 class IncludedFileReference(
     refSet: FileReferenceSet, range: TextRange, index: Int, text: String)
-    extends FileReference(refSet, range, index, text) {
+    extends FileReference(refSet, range, index, text)
 
   private def lacksExtension(text: String) =
     isLast && text.nonEmpty && text != "." && text != ".." && text != "/" &&
@@ -159,29 +151,27 @@ class IncludedFileReference(
     !text.endsWith(PropsExt)
 
   override def innerResolve(caseSensitive: Boolean,
-                            containingFile: PsiFile): Array[ResolveResult] = {
+                            containingFile: PsiFile): Array[ResolveResult] =
     val result = super.innerResolve(caseSensitive, containingFile)
 
     // Sort the files so that .conf files come first, .json files after then and .properties files at the end
     // This is to mimic Typesafe Config which merges included files in exactly that order.
     ju.Arrays.sort(result, IncludedFileReference.ResolveResultOrdering)
     result
-  }
 
   override def innerResolveInContext(text: String,
                                      context: PsiFileSystemItem,
                                      result: ju.Collection[ResolveResult],
                                      caseSensitive: Boolean) =
-    if (lacksExtension(text)) {
+    if (lacksExtension(text))
       def resolveWithExt(ext: String) =
         super.innerResolveInContext(text + ext, context, result, caseSensitive)
 
       resolveWithExt(ConfExt)
       resolveWithExt(JsonExt)
       resolveWithExt(PropsExt)
-    } else super.innerResolveInContext(text, context, result, caseSensitive)
+    else super.innerResolveInContext(text, context, result, caseSensitive)
 
   override def getFileNameToCreate: String =
     if (lacksExtension(getCanonicalText)) super.getFileNameToCreate + ConfExt
     else super.getFileNameToCreate
-}

@@ -1,5 +1,4 @@
 class A[T]
 
-abstract class C {
+abstract class C
   def foo: A[B]
-}

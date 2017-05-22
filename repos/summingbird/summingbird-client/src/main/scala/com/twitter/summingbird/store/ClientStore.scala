@@ -29,7 +29,7 @@ import scala.collection.breakOut
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-object ClientStore {
+object ClientStore
   def apply[K, V](
       onlineStore: ReadableStore[(K, BatchID), V], batchesToKeep: Int)(
       implicit batcher: Batcher, semigroup: Semigroup[V]): ClientStore[K, V] =
@@ -85,12 +85,10 @@ object ClientStore {
       k: K,
       b: BatchID,
       v: Future[Option[(BatchID, V)]]): Future[Option[(BatchID, V)]] =
-    v.flatMap {
+    v.flatMap
       case s @ Some((bOld, v)) if (bOld.id <= b.id) => Future.value(s)
       case Some((bOld, v)) => Future.exception(OfflinePassedBatch(k, bOld, b))
       case None => Future.None
-    }
-}
 
 /**
   * The multiGet uses the "for" syntax internally to chain a bunch of computations
@@ -144,7 +142,7 @@ class ClientStore[K, V : Semigroup](
     batchesToKeep: Int,
     onlineKeyFilter: K => Boolean,
     collector: FutureCollector[(K, Iterable[BatchID])])
-    extends ReadableStore[K, V] {
+    extends ReadableStore[K, V]
   import MergeOperations._
 
   override def multiGet[K1 <: K](ks: Set[K1]): Map[K1, FOpt[V]] =
@@ -154,7 +152,7 @@ class ClientStore[K, V : Semigroup](
    * This is a big hint that in fact this store should be a
    * ReadableStore[(K, BatchID), V]
    */
-  def multiGetBatch[K1 <: K](batch: BatchID, ks: Set[K1]): Map[K1, FOpt[V]] = {
+  def multiGetBatch[K1 <: K](batch: BatchID, ks: Set[K1]): Map[K1, FOpt[V]] =
     val offlineResult: Map[K1, FOpt[(BatchID, V)]] = offlineStore
       .multiGet(ks)
       /*
@@ -163,9 +161,9 @@ class ClientStore[K, V : Semigroup](
        * offline batch <= batch.next
        * for the key
        */
-      .map {
+      .map
         case (k, bv) => (k, ClientStore.offlineLTEQBatch(k, batch.next, bv))
-      }(breakOut)
+      (breakOut)
 
     // For combining later we move the offline result batch id from being the exclusive upper bound
     // to the inclusive upper bound.
@@ -182,7 +180,7 @@ class ClientStore[K, V : Semigroup](
         possibleOnlineKeys.toSeq, batch, batchesToKeep)(keyToBatch)(
         collector.asInstanceOf[FutureCollector[(K1, Iterable[BatchID])]])
 
-    val m: Future[Map[K1, FOpt[V]]] = fOnlineKeys.map { onlineKeys =>
+    val m: Future[Map[K1, FOpt[V]]] = fOnlineKeys.map  onlineKeys =>
       val onlineResult: Map[(K1, BatchID), FOpt[V]] =
         onlineStore.multiGet(onlineKeys)
       val liftedOnline: Map[K1, Future[Seq[Option[(BatchID, V)]]]] =
@@ -191,11 +189,8 @@ class ClientStore[K, V : Semigroup](
         mergeResults(liftedOffline, liftedOnline)
       // We discard the BatchID here
       dropBatches(merged)
-    }
 
     FutureOps.liftFutureValues(ks, m)
-  }
-}
 
 case class OfflinePassedBatch(
     key: Any, offlineBatch: BatchID, requested: BatchID)

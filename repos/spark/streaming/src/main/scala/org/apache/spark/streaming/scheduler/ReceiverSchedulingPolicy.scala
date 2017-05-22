@@ -54,7 +54,7 @@ import org.apache.spark.streaming.receiver.Receiver
   * In conclusion, we should make a global schedule, try to achieve that exactly as long as possible,
   * otherwise do local scheduling.
   */
-private[streaming] class ReceiverSchedulingPolicy {
+private[streaming] class ReceiverSchedulingPolicy
 
   /**
     * Try our best to schedule receivers with evenly distributed. However, if the
@@ -75,14 +75,12 @@ private[streaming] class ReceiverSchedulingPolicy {
     */
   def scheduleReceivers(receivers: Seq[Receiver[_]],
                         executors: Seq[ExecutorCacheTaskLocation])
-    : Map[Int, Seq[TaskLocation]] = {
-    if (receivers.isEmpty) {
+    : Map[Int, Seq[TaskLocation]] =
+    if (receivers.isEmpty)
       return Map.empty
-    }
 
-    if (executors.isEmpty) {
+    if (executors.isEmpty)
       return receivers.map(_.streamId -> Seq.empty).toMap
-    }
 
     val hostToExecutors = executors.groupBy(_.host)
     val scheduledLocations =
@@ -94,10 +92,10 @@ private[streaming] class ReceiverSchedulingPolicy {
 
     // Firstly, we need to respect "preferredLocation". So if a receiver has "preferredLocation",
     // we need to make sure the "preferredLocation" is in the candidate scheduled executor list.
-    for (i <- 0 until receivers.length) {
+    for (i <- 0 until receivers.length)
       // Note: preferredLocation is host but executors are host_executorId
-      receivers(i).preferredLocation.foreach { host =>
-        hostToExecutors.get(host) match {
+      receivers(i).preferredLocation.foreach  host =>
+        hostToExecutors.get(host) match
           case Some(executorsOnHost) =>
             // preferredLocation is a known host. Select an executor that has the least receivers in
             // this host
@@ -116,31 +114,25 @@ private[streaming] class ReceiverSchedulingPolicy {
             // Note: host could be `HDFSCacheTaskLocation`, so use `TaskLocation.apply` to handle
             // this case
             scheduledLocations(i) += TaskLocation(host)
-        }
-      }
-    }
 
     // For those receivers that don't have preferredLocation, make sure we assign at least one
     // executor to them.
     for (scheduledLocationsForOneReceiver <- scheduledLocations.filter(
-        _.isEmpty)) {
+        _.isEmpty))
       // Select the executor that has the least receivers
       val (leastScheduledExecutor, numReceivers) =
         numReceiversOnExecutor.minBy(_._2)
       scheduledLocationsForOneReceiver += leastScheduledExecutor
       numReceiversOnExecutor(leastScheduledExecutor) = numReceivers + 1
-    }
 
     // Assign idle executors to receivers that have less executors
     val idleExecutors = numReceiversOnExecutor.filter(_._2 == 0).map(_._1)
-    for (executor <- idleExecutors) {
+    for (executor <- idleExecutors)
       // Assign an idle executor to the receiver that has least candidate executors.
       val leastScheduledExecutors = scheduledLocations.minBy(_.size)
       leastScheduledExecutors += executor
-    }
 
     receivers.map(_.streamId).zip(scheduledLocations).toMap
-  }
 
   /**
     * Return a list of candidate locations to run the receiver. If the list is empty, the caller can
@@ -174,10 +166,9 @@ private[streaming] class ReceiverSchedulingPolicy {
       receiverId: Int,
       preferredLocation: Option[String],
       receiverTrackingInfoMap: Map[Int, ReceiverTrackingInfo],
-      executors: Seq[ExecutorCacheTaskLocation]): Seq[TaskLocation] = {
-    if (executors.isEmpty) {
+      executors: Seq[ExecutorCacheTaskLocation]): Seq[TaskLocation] =
+    if (executors.isEmpty)
       return Seq.empty
-    }
 
     // Always try to schedule to the preferred locations
     val scheduledLocations = mutable.Set[TaskLocation]()
@@ -185,29 +176,25 @@ private[streaming] class ReceiverSchedulingPolicy {
     // handle this case
     scheduledLocations ++= preferredLocation.map(TaskLocation(_))
 
-    val executorWeights: Map[ExecutorCacheTaskLocation, Double] = {
+    val executorWeights: Map[ExecutorCacheTaskLocation, Double] =
       receiverTrackingInfoMap.values
         .flatMap(convertReceiverTrackingInfoToExecutorWeights)
         .groupBy(_._1)
         .mapValues(_.map(_._2).sum) // Sum weights for each executor
-    }
 
     val idleExecutors = executors.toSet -- executorWeights.keys
-    if (idleExecutors.nonEmpty) {
+    if (idleExecutors.nonEmpty)
       scheduledLocations ++= idleExecutors
-    } else {
+    else
       // There is no idle executor. So select all executors that have the minimum weight.
       val sortedExecutors = executorWeights.toSeq.sortBy(_._2)
-      if (sortedExecutors.nonEmpty) {
+      if (sortedExecutors.nonEmpty)
         val minWeight = sortedExecutors(0)._2
         scheduledLocations ++=
           sortedExecutors.takeWhile(_._2 == minWeight).map(_._1)
-      } else {
+      else
         // This should not happen since "executors" is not empty
-      }
-    }
     scheduledLocations.toSeq
-  }
 
   /**
     * This method tries to convert a receiver tracking info to executor weights. Every executor will
@@ -219,8 +206,8 @@ private[streaming] class ReceiverSchedulingPolicy {
     */
   private def convertReceiverTrackingInfoToExecutorWeights(
       receiverTrackingInfo: ReceiverTrackingInfo)
-    : Seq[(ExecutorCacheTaskLocation, Double)] = {
-    receiverTrackingInfo.state match {
+    : Seq[(ExecutorCacheTaskLocation, Double)] =
+    receiverTrackingInfo.state match
       case ReceiverState.INACTIVE => Nil
       case ReceiverState.SCHEDULED =>
         val scheduledLocations = receiverTrackingInfo.scheduledLocations.get
@@ -228,12 +215,8 @@ private[streaming] class ReceiverSchedulingPolicy {
         // 1.0 / scheduledLocations.size
         scheduledLocations
           .filter(_.isInstanceOf[ExecutorCacheTaskLocation])
-          .map { location =>
+          .map  location =>
             location.asInstanceOf[ExecutorCacheTaskLocation] ->
             (1.0 / scheduledLocations.size)
-          }
       case ReceiverState.ACTIVE =>
         Seq(receiverTrackingInfo.runningExecutor.get -> 1.0)
-    }
-  }
-}

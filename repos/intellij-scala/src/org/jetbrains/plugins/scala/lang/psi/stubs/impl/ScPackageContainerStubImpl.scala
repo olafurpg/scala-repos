@@ -17,7 +17,7 @@ class ScPackageContainerStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScPackageContainer](parent, elemType)
-    with ScPackageContainerStub {
+    with ScPackageContainerStub
 
   var myPrefix: StringRef = _
   var myOwnNamePart: StringRef = _
@@ -28,7 +28,7 @@ class ScPackageContainerStubImpl[ParentPsi <: PsiElement](
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            prefix: String,
            ownNamePart: String,
-           explicit: Boolean) {
+           explicit: Boolean)
     this(
         parent,
         elemType
@@ -36,14 +36,13 @@ class ScPackageContainerStubImpl[ParentPsi <: PsiElement](
     myPrefix = StringRef.fromString(prefix)
     myOwnNamePart = StringRef.fromString(ownNamePart)
     myExplicit = explicit
-  }
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            prefix: StringRef,
            ownNamePart: StringRef,
-           explicit: Boolean) {
+           explicit: Boolean)
     this(
         parent,
         elemType
@@ -51,9 +50,7 @@ class ScPackageContainerStubImpl[ParentPsi <: PsiElement](
     myPrefix = prefix
     myOwnNamePart = ownNamePart
     myExplicit = explicit
-  }
 
   def prefix = StringRef.toString(myPrefix)
   def ownNamePart = StringRef.toString(myOwnNamePart)
   def isExplicit = myExplicit
-}

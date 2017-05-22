@@ -28,7 +28,7 @@ import org.apache.spark.mllib.regression.GeneralizedLinearModel
   */
 private[mllib] class GeneralizedLinearPMMLModelExport(
     model: GeneralizedLinearModel, description: String)
-    extends PMMLModelExport {
+    extends PMMLModelExport
 
   populateGeneralizedLinearPMML(model)
 
@@ -36,10 +36,10 @@ private[mllib] class GeneralizedLinearPMMLModelExport(
     * Export the input GeneralizedLinearModel model to PMML format.
     */
   private def populateGeneralizedLinearPMML(
-      model: GeneralizedLinearModel): Unit = {
+      model: GeneralizedLinearModel): Unit =
     pmml.getHeader.setDescription(description)
 
-    if (model.weights.size > 0) {
+    if (model.weights.size > 0)
       val fields = new SArray[FieldName](model.weights.size)
       val dataDictionary = new DataDictionary
       val miningSchema = new MiningSchema
@@ -50,7 +50,7 @@ private[mllib] class GeneralizedLinearPMMLModelExport(
         .setModelName(description)
         .addRegressionTables(regressionTable)
 
-      for (i <- 0 until model.weights.size) {
+      for (i <- 0 until model.weights.size)
         fields(i) = FieldName.create("field_" + i)
         dataDictionary.addDataFields(
             new DataField(fields(i), OpType.CONTINUOUS, DataType.DOUBLE))
@@ -58,7 +58,6 @@ private[mllib] class GeneralizedLinearPMMLModelExport(
             new MiningField(fields(i)).setUsageType(FieldUsageType.ACTIVE))
         regressionTable.addNumericPredictors(
             new NumericPredictor(fields(i), model.weights(i)))
-      }
 
       // for completeness add target field
       val targetField = FieldName.create("target")
@@ -71,6 +70,3 @@ private[mllib] class GeneralizedLinearPMMLModelExport(
 
       pmml.setDataDictionary(dataDictionary)
       pmml.addModels(regressionModel)
-    }
-  }
-}

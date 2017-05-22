@@ -6,8 +6,8 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class MuxCancelledCategorizerTest extends FunSuite {
-  test("MuxCancelledCategorizer knows when things get cancelled") {
+class MuxCancelledCategorizerTest extends FunSuite
+  test("MuxCancelledCategorizer knows when things get cancelled")
     val categorizer = MuxCancelledCategorizer.Instance.lift
 
     assert(categorizer(new ClientDiscardedRequestException("")) == Some(
@@ -24,5 +24,3 @@ class MuxCancelledCategorizerTest extends FunSuite {
 
     assert(
         categorizer(new Exception(new Exception(new RuntimeException("")))) == None)
-  }
-}

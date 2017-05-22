@@ -28,9 +28,9 @@ import scala.concurrent.duration._
 
 class TaskStatusUpdateProcessorImplTest
     extends MarathonSpec with Mockito with ScalaFutures with GivenWhenThen
-    with Matchers {
+    with Matchers
   test(
-      "process update for unknown task that's not lost will result in a kill and ack") {
+      "process update for unknown task that's not lost will result in a kill and ack")
     fOpt = Some(new Fixture)
     val origUpdate =
       TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
@@ -57,10 +57,9 @@ class TaskStatusUpdateProcessorImplTest
 
     And("that's it")
     f.verifyNoMoreInteractions()
-  }
 
   test(
-      "process update for known task without launchedTask that's not lost will result in a kill and ack") {
+      "process update for known task without launchedTask that's not lost will result in a kill and ack")
     fOpt = Some(new Fixture)
     val origUpdate =
       TaskStatusUpdateTestHelper.finished // everything != lost is handled in the same way
@@ -92,9 +91,8 @@ class TaskStatusUpdateProcessorImplTest
 
     And("that's it")
     f.verifyNoMoreInteractions()
-  }
 
-  test("update for unknown task (TASK_LOST) will get only acknowledged") {
+  test("update for unknown task (TASK_LOST) will get only acknowledged")
     fOpt = Some(new Fixture)
 
     val origUpdate = TaskStatusUpdateTestHelper.lost
@@ -119,9 +117,8 @@ class TaskStatusUpdateProcessorImplTest
 
     And("that's it")
     f.verifyNoMoreInteractions()
-  }
 
-  test("an update for existing task applies the side effects of all steps") {
+  test("an update for existing task applies the side effects of all steps")
     fOpt = Some(new Fixture)
 
     val origUpdate = TaskStatusUpdateTestHelper.finished
@@ -168,7 +165,6 @@ class TaskStatusUpdateProcessorImplTest
 
     And("that's it")
     f.verifyNoMoreInteractions()
-  }
 
   var fOpt: Option[Fixture] = None
   def f = fOpt.get
@@ -183,11 +179,10 @@ class TaskStatusUpdateProcessorImplTest
       task.getTaskId.getValue, appVersion = version)
   lazy val marathonTask = taskState.marathonTask
 
-  after {
+  after
     fOpt.foreach(_.shutdown())
-  }
 
-  class Fixture {
+  class Fixture
     implicit lazy val actorSystem: ActorSystem = ActorSystem()
     lazy val clock: ConstantClock = ConstantClock()
     lazy val taskStatusEmitter: TaskStatusEmitter = mock[TaskStatusEmitter]
@@ -200,11 +195,10 @@ class TaskStatusUpdateProcessorImplTest
     lazy val taskTracker: TaskTracker = mock[TaskTracker]
     lazy val taskUpdater: TaskUpdater = mock[TaskUpdater]
     lazy val schedulerDriver: SchedulerDriver = mock[SchedulerDriver]
-    lazy val marathonSchedulerDriverHolder: MarathonSchedulerDriverHolder = {
+    lazy val marathonSchedulerDriverHolder: MarathonSchedulerDriverHolder =
       val holder = new MarathonSchedulerDriverHolder
       holder.driver = Some(schedulerDriver)
       holder
-    }
 
     lazy val notifyHealthCheckManager = new NotifyHealthCheckManagerStepImpl(
         healthCheckManager)
@@ -235,7 +229,7 @@ class TaskStatusUpdateProcessorImplTest
         )
     )
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       noMoreInteractions(eventBus)
       noMoreInteractions(appRepository)
       noMoreInteractions(launchQueue)
@@ -246,12 +240,8 @@ class TaskStatusUpdateProcessorImplTest
       shutdown()
 
       schedulerActor.expectNoMsg(0.seconds)
-    }
 
-    def shutdown(): Unit = {
+    def shutdown(): Unit =
       actorSystem.shutdown()
       actorSystem.awaitTermination()
       fOpt = None
-    }
-  }
-}

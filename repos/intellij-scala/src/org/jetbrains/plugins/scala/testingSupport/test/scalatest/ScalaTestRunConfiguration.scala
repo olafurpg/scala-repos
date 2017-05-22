@@ -21,7 +21,7 @@ class ScalaTestRunConfiguration(
     override val configurationFactory: ConfigurationFactory,
     override val name: String)
     extends AbstractTestRunConfiguration(project, configurationFactory, name)
-    with ScalaTestingConfiguration {
+    with ScalaTestingConfiguration
 
   override def suitePaths = List("org.scalatest.Suite")
 
@@ -37,24 +37,22 @@ class ScalaTestRunConfiguration(
 
   protected[test] override def isInvalidSuite(clazz: PsiClass): Boolean =
     ScalaTestRunConfiguration.isInvalidSuite(clazz)
-}
 
-object ScalaTestRunConfiguration extends SuiteValidityChecker {
+object ScalaTestRunConfiguration extends SuiteValidityChecker
 
   protected def wrapWithAnnotationFqn = "org.scalatest.WrapWith"
 
-  protected[test] def lackConfigMapConstructor(clazz: PsiClass): Boolean = {
+  protected[test] def lackConfigMapConstructor(clazz: PsiClass): Boolean =
     val project = clazz.getProject
-    val constructors = clazz match {
+    val constructors = clazz match
       case c: ScClass =>
         c.secondaryConstructors.filter(_.isConstructor).toList ::: c.constructor.toList
       case _ => clazz.getConstructors.toList
-    }
-    for (con <- constructors) {
-      if (con.isConstructor && con.getParameterList.getParametersCount == 1) {
-        con match {
+    for (con <- constructors)
+      if (con.isConstructor && con.getParameterList.getParametersCount == 1)
+        con match
           case owner: ScModifierListOwner =>
-            if (owner.hasModifierProperty(PsiModifier.PUBLIC)) {
+            if (owner.hasModifierProperty(PsiModifier.PUBLIC))
               val params = con.getParameterList.getParameters
               val firstParam = params(0)
               val psiManager = ScalaPsiManager.instance(project)
@@ -64,32 +62,22 @@ object ScalaTestRunConfiguration extends SuiteValidityChecker {
                 .orNull
               val mapClass = ScType.designator(mapPsiClass)
               val paramClass = ScType.create(firstParam.getType, project)
-              val conformanceType = paramClass match {
+              val conformanceType = paramClass match
                 case parameterizedType: ScParameterizedType =>
                   parameterizedType.designator
                 case _ => paramClass
-              }
               if (Conformance.conforms(mapClass, conformanceType)) return false
-            }
           case _ =>
-        }
-      }
-    }
     true
-  }
 
   override protected[test] def lackSuitableConstructor(
-      clazz: PsiClass): Boolean = {
-    val hasConfigMapAnnotation = clazz match {
+      clazz: PsiClass): Boolean =
+    val hasConfigMapAnnotation = clazz match
       case classDef: ScTypeDefinition =>
         val annotation = classDef.hasAnnotation(wrapWithAnnotationFqn)
         annotation.isDefined
       case _ => false
-    }
-    if (hasConfigMapAnnotation) {
+    if (hasConfigMapAnnotation)
       lackConfigMapConstructor(clazz)
-    } else {
+    else
       AbstractTestRunConfiguration.lackSuitableConstructor(clazz)
-    }
-  }
-}

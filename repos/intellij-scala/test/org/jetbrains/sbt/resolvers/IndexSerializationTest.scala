@@ -9,14 +9,14 @@ import org.jetbrains.plugins.scala.base.ScalaFixtureTestCase
   * @author Nikolay Obedin
   * @since 7/28/14.
   */
-class IndexSerializationTest extends ScalaFixtureTestCase {
+class IndexSerializationTest extends ScalaFixtureTestCase
 
   import _root_.junit.framework.Assert._
 
   val testResolver = new SbtResolver(
       SbtResolver.Kind.Maven, "some cool repo name", "http://some.cool.repo/")
 
-  def testIndexStoring() = {
+  def testIndexStoring() =
     val tmpPath = new File(myFixture.getTempDirPath)
     val storingManager = new SbtResolverIndexesManager(Some(tmpPath))
     val newIndex = storingManager.add(testResolver)
@@ -31,9 +31,8 @@ class IndexSerializationTest extends ScalaFixtureTestCase {
     assertEquals(index.timestamp, SbtResolverIndex.NO_TIMESTAMP)
 
     storingManager.dispose()
-  }
 
-  def testIndexLoading() = {
+  def testIndexLoading() =
     myFixture.setTestDataPath(rootPath)
     val testIndexDir = new File(
         myFixture
@@ -49,5 +48,3 @@ class IndexSerializationTest extends ScalaFixtureTestCase {
     assertEquals(index.timestamp, SbtResolverIndex.NO_TIMESTAMP)
 
     storingManager.dispose()
-  }
-}

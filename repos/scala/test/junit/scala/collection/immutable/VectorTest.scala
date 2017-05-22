@@ -6,10 +6,10 @@ import org.junit.runners.JUnit4
 import org.junit.Test
 
 @RunWith(classOf[JUnit4])
-class VectorTest {
+class VectorTest
 
   @Test
-  def hasCorrectDropAndTakeMethods() {
+  def hasCorrectDropAndTakeMethods()
     val v = Vector(0) ++ Vector(1 to 64: _*)
 
     assertEquals(Vector(0, 1), v take 2)
@@ -26,5 +26,3 @@ class VectorTest {
     assertEquals(Vector.empty[Int], v takeRight Int.MinValue)
     assertEquals(v, v drop Int.MinValue)
     assertEquals(v, v dropRight Int.MinValue)
-  }
-}

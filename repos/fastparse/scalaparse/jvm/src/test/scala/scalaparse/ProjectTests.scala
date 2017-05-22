@@ -9,60 +9,52 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 import scalaparse.PerfTests._
 
-object ProjectTests extends TestSuite {
+object ProjectTests extends TestSuite
 
   println("running")
-  def tests = this {
+  def tests = this
 
-    def checkDir(path: String, filter: String => Boolean = _ => true) = {
+    def checkDir(path: String, filter: String => Boolean = _ => true) =
       println("Checking Dir " + path)
-      def listFiles(s: java.io.File): Iterator[String] = {
+      def listFiles(s: java.io.File): Iterator[String] =
         val (dirs, files) = Option(s.listFiles()).toIterator
           .flatMap(_.toIterator)
           .partition(_.isDirectory)
 
         files.map(_.getPath) ++ dirs.flatMap(listFiles)
-      }
 
-      val files = for {
+      val files = for
         f0 <- Option(listFiles(new java.io.File(path))).toVector
         filename <- f0
-      } yield
-        Future {
-          if (filename.endsWith(".scala") && filter(filename)) {
+      yield
+        Future
+          if (filename.endsWith(".scala") && filter(filename))
             val code = new String(java.nio.file.Files
                   .readAllBytes(java.nio.file.Paths.get(filename)))
-            if (!ScalacParser.checkParseFails(code)) {
+            if (!ScalacParser.checkParseFails(code))
               print(".")
               TestUtil.check(code, tag = filename)
-            }
-          }
-        }
 
       files.foreach(Await.result(_, Duration.Inf))
       println()
-    }
 
-    'test - {
+    'test -
       val testSource = scala.io.Source
         .fromInputStream(
             getClass.getResourceAsStream("/scalaparse/Test.scala")
         )
         .mkString
       TestUtil.check(testSource)
-    }
     def checkRepo(filter: String => Boolean = _ => true)(
-        implicit testPath: utest.framework.TestPath) = {
+        implicit testPath: utest.framework.TestPath) =
       val url = "https://github.com/" + testPath.value.last
       import sys.process._
       val name = url.split("/").last
       println("CLONING?")
-      if (!Files.exists(Paths.get("target", "repos", name))) {
+      if (!Files.exists(Paths.get("target", "repos", name)))
         println("CLONING")
         Seq("git", "clone", url, "target/repos/" + name, "--depth", "1").!
-      }
       checkDir("target/repos/" + name, filter)
-    }
 
     "lihaoyi/fastparse" - checkRepo()
     "scala-js/scala-js" - checkRepo()
@@ -153,5 +145,3 @@ object ProjectTests extends TestSuite {
               "target/repos/scala/src/scaladoc/scala/tools/nsc/doc/html/page/Template.scala"
           ).exists(x.startsWith)
     )
-  }
-}

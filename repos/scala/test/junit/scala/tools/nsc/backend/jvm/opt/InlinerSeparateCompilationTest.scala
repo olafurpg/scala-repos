@@ -15,16 +15,15 @@ import AsmUtils._
 
 import scala.collection.convert.decorateAsScala._
 
-object InlinerSeparateCompilationTest {
+object InlinerSeparateCompilationTest
   val args = "-Yopt:l:classpath"
-}
 
 @RunWith(classOf[JUnit4])
-class InlinerSeparateCompilationTest {
+class InlinerSeparateCompilationTest
   import InlinerSeparateCompilationTest._
 
   @Test
-  def inlnieMixedinMember(): Unit = {
+  def inlnieMixedinMember(): Unit =
     val codeA = """trait T {
         |  @inline def f = 0
         |}
@@ -53,10 +52,9 @@ class InlinerSeparateCompilationTest {
     assertInvoke(getSingleMethod(c, "t1"), "T", "f")
 //    assertNoInvoke(getSingleMethod(c, "t2")) // SD-85
     assertNoInvoke(getSingleMethod(c, "t3"))
-  }
 
   @Test
-  def inlineSealedMember(): Unit = {
+  def inlineSealedMember(): Unit =
     val codeA = """sealed trait T {
         |  @inline def f = 1
         |}
@@ -69,10 +67,9 @@ class InlinerSeparateCompilationTest {
 
     val List(c, t) = compileClassesSeparately(List(codeA, codeB), args)
     assertNoInvoke(getSingleMethod(c, "t1"))
-  }
 
   @Test
-  def inlineInheritedMember(): Unit = {
+  def inlineInheritedMember(): Unit =
     val codeA = """trait T {
         |  @inline final def f = 1
         |}
@@ -90,10 +87,9 @@ class InlinerSeparateCompilationTest {
 
     val List(c, t, u) = compileClassesSeparately(List(codeA, codeB), args)
     for (m <- List("t1", "t2", "t3")) assertNoInvoke(getSingleMethod(c, m))
-  }
 
   @Test
-  def inlineWithSelfType(): Unit = {
+  def inlineWithSelfType(): Unit =
     val assembly = """trait Assembly extends T {
         |  @inline final def g = 1
         |  @inline final def n = m
@@ -110,5 +106,3 @@ class InlinerSeparateCompilationTest {
     val List(a, t) = compileClassesSeparately(List(codeA, assembly), args)
     assertNoInvoke(getSingleMethod(t, "f"))
     assertNoInvoke(getSingleMethod(a, "n"))
-  }
-}

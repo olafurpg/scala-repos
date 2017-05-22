@@ -36,19 +36,17 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.SparkFunSuite
 
 class ClientDistributedCacheManagerSuite
-    extends SparkFunSuite with MockitoSugar {
+    extends SparkFunSuite with MockitoSugar
 
   class MockClientDistributedCacheManager
-      extends ClientDistributedCacheManager {
+      extends ClientDistributedCacheManager
     override def getVisibility(
         conf: Configuration,
         uri: URI,
-        statCache: Map[URI, FileStatus]): LocalResourceVisibility = {
+        statCache: Map[URI, FileStatus]): LocalResourceVisibility =
       LocalResourceVisibility.PRIVATE
-    }
-  }
 
-  test("test getFileStatus empty") {
+  test("test getFileStatus empty")
     val distMgr = new ClientDistributedCacheManager()
     val fs = mock[FileSystem]
     val uri = new URI("/tmp/testing")
@@ -56,9 +54,8 @@ class ClientDistributedCacheManagerSuite
     val statCache: Map[URI, FileStatus] = HashMap[URI, FileStatus]()
     val stat = distMgr.getFileStatus(fs, uri, statCache)
     assert(stat.getPath() === null)
-  }
 
-  test("test getFileStatus cached") {
+  test("test getFileStatus cached")
     val distMgr = new ClientDistributedCacheManager()
     val fs = mock[FileSystem]
     val uri = new URI("/tmp/testing")
@@ -77,9 +74,8 @@ class ClientDistributedCacheManagerSuite
       HashMap[URI, FileStatus](uri -> realFileStatus)
     val stat = distMgr.getFileStatus(fs, uri, statCache)
     assert(stat.getPath().toString() === "/tmp/testing")
-  }
 
-  test("test addResource") {
+  test("test addResource")
     val distMgr = new MockClientDistributedCacheManager()
     val fs = mock[FileSystem]
     val conf = new Configuration()
@@ -164,9 +160,8 @@ class ClientDistributedCacheManagerSuite
     assert(timestamps(1) === "10")
     assert(sizes(1) === "20")
     assert(visibilities(1) === LocalResourceVisibility.PRIVATE.name())
-  }
 
-  test("test addResource link null") {
+  test("test addResource link null")
     val distMgr = new MockClientDistributedCacheManager()
     val fs = mock[FileSystem]
     val conf = new Configuration()
@@ -175,7 +170,7 @@ class ClientDistributedCacheManagerSuite
     val statCache: Map[URI, FileStatus] = HashMap[URI, FileStatus]()
     when(fs.getFileStatus(destPath)).thenReturn(new FileStatus())
 
-    intercept[Exception] {
+    intercept[Exception]
       distMgr.addResource(fs,
                           conf,
                           destPath,
@@ -184,12 +179,10 @@ class ClientDistributedCacheManagerSuite
                           null,
                           statCache,
                           false)
-    }
     assert(localResources.get("link") === None)
     assert(localResources.size === 0)
-  }
 
-  test("test addResource appmaster only") {
+  test("test addResource appmaster only")
     val distMgr = new MockClientDistributedCacheManager()
     val fs = mock[FileSystem]
     val conf = new Configuration()
@@ -236,9 +229,8 @@ class ClientDistributedCacheManagerSuite
     assert(env.get("SPARK_YARN_CACHE_ARCHIVES_TIME_STAMPS") === None)
     assert(env.get("SPARK_YARN_CACHE_ARCHIVES_FILE_SIZES") === None)
     assert(env.get("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES") === None)
-  }
 
-  test("test addResource archive") {
+  test("test addResource archive")
     val distMgr = new MockClientDistributedCacheManager()
     val fs = mock[FileSystem]
     val conf = new Configuration()
@@ -289,5 +281,3 @@ class ClientDistributedCacheManagerSuite
     assert(env.get("SPARK_YARN_CACHE_FILES_TIME_STAMPS") === None)
     assert(env.get("SPARK_YARN_CACHE_FILES_FILE_SIZES") === None)
     assert(env.get("SPARK_YARN_CACHE_FILES_VISIBILITIES") === None)
-  }
-}

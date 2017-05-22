@@ -6,20 +6,19 @@ import mesosphere.marathon.state.Timestamp
 case class ScalingProposition(
     tasksToKill: Option[Seq[Task]], tasksToStart: Option[Int])
 
-object ScalingProposition {
+object ScalingProposition
   def propose(runningTasks: Iterable[Task],
               toKill: Option[Iterable[Task]],
               meetConstraints: ((Iterable[Task], Int) => Iterable[Task]),
-              scaleTo: Int): ScalingProposition = {
+              scaleTo: Int): ScalingProposition =
 
     val runningTaskMap = Task.tasksById(runningTasks)
     val toKillMap = Task.tasksById(toKill.getOrElse(Set.empty))
 
     val (sentencedAndRunningMap, notSentencedAndRunningMap) =
-      runningTaskMap partition {
+      runningTaskMap partition
         case (k, v) =>
           toKillMap.contains(k)
-      }
     // overall number of tasks that need to be killed
     val killCount =
       math.max(runningTasks.size - scaleTo, sentencedAndRunningMap.size)
@@ -46,5 +45,3 @@ object ScalingProposition {
       if (numberOfTasksToStart > 0) Some(numberOfTasksToStart) else None
 
     ScalingProposition(tasksToKill, tasksToStart)
-  }
-}

@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class ElementMixTest extends ResolveTestBase {
-  override def folderPath: String = {
+class ElementMixTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "element/mix/"
-  }
   //TODO classes clash
 //  def testCaseClassAndClass = doTest
   def testCaseClassAndObject() = doTest()
@@ -36,4 +35,3 @@ class ElementMixTest extends ResolveTestBase {
   def testObjectAndTrait() = doTest()
   def testObjectAndTypeAlias() = doTest()
   def testTraitAndTypeAlias() = doTest()
-}

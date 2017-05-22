@@ -2,7 +2,7 @@ import sbt._
 import Import._
 import Keys._
 
-object Build extends Build {
+object Build extends Build
   lazy val root = Project("root", file("."))
   lazy val a = project("a")
   lazy val b = project("b")
@@ -11,14 +11,13 @@ object Build extends Build {
     Project(s, file(s)) settings
     (ivyPaths <<= (baseDirectory in root, target in root)(
             (dir, t) => new IvyPaths(dir, Some(t / "ivy-cache"))),
-        resolvers <+= appConfiguration { app =>
+        resolvers <+= appConfiguration  app =>
           // need this to resolve sbt
           val ivyHome =
             Classpaths.bootIvyHome(app) getOrElse sys.error(
                 "Launcher did not provide the Ivy home directory.")
           Resolver.file("real-local", ivyHome / "local")(
               Resolver.ivyStylePatterns)
-        },
+        ,
         resolvers += Resolver.typesafeIvyRepo("releases") // not sure why this isn't included by default
         )
-}

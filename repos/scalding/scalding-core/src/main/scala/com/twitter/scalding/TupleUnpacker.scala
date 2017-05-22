@@ -29,20 +29,18 @@ import scala.reflect.Manifest
   * @author Oscar Boykin
   */
 object TupleUnpacker extends LowPriorityTupleUnpackers
-trait TupleUnpacker[T] extends java.io.Serializable {
+trait TupleUnpacker[T] extends java.io.Serializable
   def newSetter(fields: Fields): TupleSetter[T]
   def getResultFields(fields: Fields): Fields = fields
-}
 
-trait LowPriorityTupleUnpackers {
+trait LowPriorityTupleUnpackers
   implicit def genericUnpacker[T : Manifest] = new ReflectionTupleUnpacker[T]
-}
 
 /**
   * A helper for working with class reflection.
   * Allows us to avoid code repetition.
   */
-object ReflectionUtils {
+object ReflectionUtils
 
   /**
     * Returns the set of fields in the given class.
@@ -50,9 +48,9 @@ object ReflectionUtils {
     * order they were declared.
     */
   def fieldsOf[T](c: Class[T]): List[String] =
-    c.getDeclaredFields.map { f =>
+    c.getDeclaredFields.map  f =>
       f.getName
-    }.toList.distinct
+    .toList.distinct
 
   /**
     * For a given class, give a function that takes
@@ -66,10 +64,9 @@ object ReflectionUtils {
     * if T is immutable).
     */
   // def fieldSetters[T](c: Class[T]): (T,String,AnyRef) => T
-}
 
 class ReflectionTupleUnpacker[T](implicit m: Manifest[T])
-    extends TupleUnpacker[T] {
+    extends TupleUnpacker[T]
 
   // A Fields object representing all of m's
   // fields, in the declared field order.
@@ -90,10 +87,9 @@ class ReflectionTupleUnpacker[T](implicit m: Manifest[T])
 
   override def getResultFields(fields: Fields): Fields =
     expandIfAll(fields)
-}
 
 class ReflectionSetter[T](fields: Fields)(implicit m: Manifest[T])
-    extends TupleSetter[T] {
+    extends TupleSetter[T]
 
   validate // Call the validation method at the submitter
 
@@ -107,57 +103,47 @@ class ReflectionSetter[T](fields: Fields)(implicit m: Manifest[T])
   def methodMap =
     m.runtimeClass.getDeclaredMethods
     // Keep only methods with 0 parameter types
-    .filter { m =>
+    .filter  m =>
       m.getParameterTypes.length == 0
-    }.groupBy { _.getName }.mapValues { _.head }
+    .groupBy { _.getName }.mapValues { _.head }
 
   // TODO: filter by isAccessible, which somehow seems to fail
   def fieldMap =
     m.runtimeClass.getDeclaredFields.groupBy { _.getName }.mapValues { _.head }
 
-  def makeSetters = {
-    (0 until fields.size).map { idx =>
+  def makeSetters =
+    (0 until fields.size).map  idx =>
       val fieldName = fields.get(idx).toString
       setterForFieldName(fieldName)
-    }
-  }
 
   // This validation makes sure that the setters exist
   // but does not save them in a val (due to serialization issues)
   def validate = makeSetters
 
-  override def apply(input: T): Tuple = {
-    val values = setters.map { setFn =>
+  override def apply(input: T): Tuple =
+    val values = setters.map  setFn =>
       setFn(input)
-    }
     new Tuple(values: _*)
-  }
 
   override def arity = fields.size
 
-  private def setterForFieldName(fieldName: String): (T => AnyRef) = {
+  private def setterForFieldName(fieldName: String): (T => AnyRef) =
     getValueFromMethod(createGetter(fieldName))
       .orElse(getValueFromMethod(fieldName))
       .orElse(getValueFromField(fieldName))
       .getOrElse(throw new TupleUnpackerException("Unrecognized field: " +
               fieldName + " for class: " + m.runtimeClass.getName))
-  }
 
-  private def getValueFromField(fieldName: String): Option[(T => AnyRef)] = {
-    fieldMap.get(fieldName).map { f => (x: T) =>
+  private def getValueFromField(fieldName: String): Option[(T => AnyRef)] =
+    fieldMap.get(fieldName).map  f => (x: T) =>
       f.get(x)
-    }
-  }
 
-  private def getValueFromMethod(methodName: String): Option[(T => AnyRef)] = {
-    methodMap.get(methodName).map { m => (x: T) =>
+  private def getValueFromMethod(methodName: String): Option[(T => AnyRef)] =
+    methodMap.get(methodName).map  m => (x: T) =>
       m.invoke(x)
-    }
-  }
 
   private def upperFirst(s: String) =
     s.substring(0, 1).toUpperCase + s.substring(1)
   private def createGetter(s: String) = "get" + upperFirst(s)
-}
 
 class TupleUnpackerException(args: String) extends Exception(args)

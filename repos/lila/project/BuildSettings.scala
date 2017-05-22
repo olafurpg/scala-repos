@@ -1,7 +1,7 @@
 import play.Play.autoImport._
 import sbt._, Keys._
 
-object BuildSettings {
+object BuildSettings
 
   import Dependencies._
 
@@ -54,4 +54,3 @@ object BuildSettings {
   )
 
   def projectToRef(p: Project): ProjectReference = LocalProject(p.id)
-}

@@ -1,4 +1,4 @@
-object Test {
+object Test
   def f(a1: Int,
         a2: Int,
         a3: Int,
@@ -47,4 +47,3 @@ object Test {
            a23: Int) = 0
   val eta1 = f _
   val eta2 = g[Any] _
-}

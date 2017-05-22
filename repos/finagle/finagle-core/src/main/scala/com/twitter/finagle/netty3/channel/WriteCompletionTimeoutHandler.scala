@@ -12,24 +12,20 @@ import org.jboss.netty.channel._
   */
 private[finagle] class WriteCompletionTimeoutHandler(
     timer: Timer, timeout: Duration)
-    extends SimpleChannelDownstreamHandler {
-  override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) {
-    val task = timer.schedule(Time.now + timeout) {
+    extends SimpleChannelDownstreamHandler
+  override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent)
+    val task = timer.schedule(Time.now + timeout)
       val channel = ctx.getChannel
       Channels.fireExceptionCaught(
           channel,
           new WriteTimedOutException(
               if (channel != null) channel.getRemoteAddress else null))
-    }
     e.getFuture.addListener(
-        new ChannelFutureListener {
+        new ChannelFutureListener
       override def operationComplete(f: ChannelFuture): Unit =
-        if (!f.isCancelled) {
+        if (!f.isCancelled)
           // on success or failure
           task.cancel()
-        }
-    })
+    )
 
     super.writeRequested(ctx, e)
-  }
-}

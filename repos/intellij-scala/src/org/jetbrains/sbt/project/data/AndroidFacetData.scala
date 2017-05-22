@@ -22,8 +22,7 @@ class AndroidFacetData(val owner: ProjectSystemId,
                        val proguardConfig: Seq[String])
     extends AbstractExternalEntityData(owner)
 
-object AndroidFacetData {
+object AndroidFacetData
   val Key: Key[AndroidFacetData] = new Key(
       classOf[AndroidFacetData].getName,
       ProjectKeys.LIBRARY_DEPENDENCY.getProcessingWeight + 1)
-}

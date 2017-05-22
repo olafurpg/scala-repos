@@ -34,10 +34,9 @@ import scalafx.beans.property.{DoubleProperty, ObjectProperty}
 import scalafx.delegate.{DimensionDelegate, SFXDelegate}
 import scalafx.scene.paint.Color
 
-object Shadow {
+object Shadow
   implicit def sfxShadow2jfx(s: Shadow): jfxse.Shadow =
     if (s != null) s.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/effect/Shadow.html]].
@@ -45,7 +44,7 @@ object Shadow {
 class Shadow(override val delegate: jfxse.Shadow = new jfxse.Shadow)
     extends Effect(delegate) with ColorDelegate[jfxse.Shadow]
     with InputDelegate[jfxse.Shadow]
-    with DimensionDelegate[jfxse.Shadow] with SFXDelegate[jfxse.Shadow] {
+    with DimensionDelegate[jfxse.Shadow] with SFXDelegate[jfxse.Shadow]
 
   /**
     * Creates a new instance of Shadow with the specified blurType, color, radius.
@@ -63,15 +62,12 @@ class Shadow(override val delegate: jfxse.Shadow = new jfxse.Shadow)
     * The algorithm used to blur the shadow.
     */
   def blurType: ObjectProperty[jfxse.BlurType] = delegate.blurTypeProperty
-  def blurType_=(v: BlurType) {
+  def blurType_=(v: BlurType)
     blurType() = v
-  }
 
   /**
     * The radius of the shadow blur kernel.
     */
   def radius: DoubleProperty = delegate.radiusProperty
-  def radius_=(v: Double) {
+  def radius_=(v: Double)
     radius() = v
-  }
-}

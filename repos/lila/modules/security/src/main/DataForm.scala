@@ -11,7 +11,7 @@ import lila.user.User
 
 final class DataForm(
     val captcher: akka.actor.ActorSelection, emailAddress: EmailAddress)
-    extends lila.hub.CaptchedForm {
+    extends lila.hub.CaptchedForm
 
   import DataForm._
 
@@ -32,7 +32,7 @@ final class DataForm(
   private def acceptableUniqueEmail(forUser: Option[User]) =
     acceptableEmail.verifying(emailAddress uniqueConstraint forUser)
 
-  object signup {
+  object signup
 
     private val username = nonEmptyText
       .verifying(
@@ -68,7 +68,6 @@ final class DataForm(
         )(MobileSignupData.apply)(_ => None))
 
     def websiteWithCaptcha = withCaptcha(website)
-  }
 
   val passwordReset = Form(
       mapping(
@@ -85,9 +84,8 @@ final class DataForm(
           "password" -> text(minLength = 4)
       ))
 
-  case class PasswordResetConfirm(newPasswd1: String, newPasswd2: String) {
+  case class PasswordResetConfirm(newPasswd1: String, newPasswd2: String)
     def samePasswords = newPasswd1 == newPasswd2
-  }
 
   val passwdReset = Form(
       mapping(
@@ -109,18 +107,16 @@ final class DataForm(
     Form(single("email" -> acceptableUniqueEmail(user.some)))
 
   val closeAccount = Form(single("passwd" -> nonEmptyText))
-}
 
-object DataForm {
+object DataForm
 
   case class SignupData(username: String,
                         password: String,
                         email: String,
                         `g-recaptcha-response`: String,
                         gameId: String,
-                        move: String) {
+                        move: String)
     def recaptchaResponse = `g-recaptcha-response`
-  }
 
   case class MobileSignupData(
       username: String, password: String, email: Option[String])
@@ -128,4 +124,3 @@ object DataForm {
   case class PasswordReset(email: String, gameId: String, move: String)
 
   case class ChangeEmail(email: String, passwd: String)
-}

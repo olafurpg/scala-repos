@@ -29,16 +29,14 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * (private[classification])  Params for probabilistic classification.
   */
 private[classification] trait ProbabilisticClassifierParams
-    extends ClassifierParams with HasProbabilityCol with HasThresholds {
+    extends ClassifierParams with HasProbabilityCol with HasThresholds
   override protected def validateAndTransformSchema(
       schema: StructType,
       fitting: Boolean,
-      featuresDataType: DataType): StructType = {
+      featuresDataType: DataType): StructType =
     val parentSchema =
       super.validateAndTransformSchema(schema, fitting, featuresDataType)
     SchemaUtils.appendColumn(parentSchema, $(probabilityCol), new VectorUDT)
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -54,7 +52,7 @@ abstract class ProbabilisticClassifier[
     FeaturesType,
     E <: ProbabilisticClassifier[FeaturesType, E, M],
     M <: ProbabilisticClassificationModel[FeaturesType, M]]
-    extends Classifier[FeaturesType, E, M] with ProbabilisticClassifierParams {
+    extends Classifier[FeaturesType, E, M] with ProbabilisticClassifierParams
 
   /** @group setParam */
   def setProbabilityCol(value: String): E =
@@ -63,7 +61,6 @@ abstract class ProbabilisticClassifier[
   /** @group setParam */
   def setThresholds(value: Array[Double]): E =
     set(thresholds, value).asInstanceOf[E]
-}
 
 /**
   * :: DeveloperApi ::
@@ -78,7 +75,7 @@ abstract class ProbabilisticClassifier[
 abstract class ProbabilisticClassificationModel[
     FeaturesType, M <: ProbabilisticClassificationModel[FeaturesType, M]]
     extends ClassificationModel[FeaturesType, M]
-    with ProbabilisticClassifierParams {
+    with ProbabilisticClassifierParams
 
   /** @group setParam */
   def setProbabilityCol(value: String): M =
@@ -98,64 +95,53 @@ abstract class ProbabilisticClassificationModel[
     * @param dataset input dataset
     * @return transformed dataset
     */
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
-    if (isDefined(thresholds)) {
+    if (isDefined(thresholds))
       require(
           $(thresholds).length == numClasses,
           this.getClass.getSimpleName +
           ".transform() called with non-matching numClasses and thresholds.length." +
           s" numClasses=$numClasses, but thresholds has length ${$(thresholds).length}")
-    }
 
     // Output selected columns only.
     // This is a bit complicated since it tries to avoid repeated computation.
     var outputData = dataset
     var numColsOutput = 0
-    if ($(rawPredictionCol).nonEmpty) {
-      val predictRawUDF = udf { (features: Any) =>
+    if ($(rawPredictionCol).nonEmpty)
+      val predictRawUDF = udf  (features: Any) =>
         predictRaw(features.asInstanceOf[FeaturesType])
-      }
       outputData = outputData.withColumn(
           getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
       numColsOutput += 1
-    }
-    if ($(probabilityCol).nonEmpty) {
+    if ($(probabilityCol).nonEmpty)
       val probUDF =
-        if ($(rawPredictionCol).nonEmpty) {
+        if ($(rawPredictionCol).nonEmpty)
           udf(raw2probability _).apply(col($(rawPredictionCol)))
-        } else {
-          val probabilityUDF = udf { (features: Any) =>
+        else
+          val probabilityUDF = udf  (features: Any) =>
             predictProbability(features.asInstanceOf[FeaturesType])
-          }
           probabilityUDF(col($(featuresCol)))
-        }
       outputData = outputData.withColumn($(probabilityCol), probUDF)
       numColsOutput += 1
-    }
-    if ($(predictionCol).nonEmpty) {
+    if ($(predictionCol).nonEmpty)
       val predUDF =
-        if ($(rawPredictionCol).nonEmpty) {
+        if ($(rawPredictionCol).nonEmpty)
           udf(raw2prediction _).apply(col($(rawPredictionCol)))
-        } else if ($(probabilityCol).nonEmpty) {
+        else if ($(probabilityCol).nonEmpty)
           udf(probability2prediction _).apply(col($(probabilityCol)))
-        } else {
-          val predictUDF = udf { (features: Any) =>
+        else
+          val predictUDF = udf  (features: Any) =>
             predict(features.asInstanceOf[FeaturesType])
-          }
           predictUDF(col($(featuresCol)))
-        }
       outputData = outputData.withColumn($(predictionCol), predUDF)
       numColsOutput += 1
-    }
 
-    if (numColsOutput == 0) {
+    if (numColsOutput == 0)
       this.logWarning(
           s"$uid: ProbabilisticClassificationModel.transform() was called as NOOP" +
           " since no output columns were set.")
-    }
     outputData
-  }
 
   /**
     * Estimate the probability of each class given the raw prediction,
@@ -169,18 +155,15 @@ abstract class ProbabilisticClassificationModel[
   protected def raw2probabilityInPlace(rawPrediction: Vector): Vector
 
   /** Non-in-place version of [[raw2probabilityInPlace()]] */
-  protected def raw2probability(rawPrediction: Vector): Vector = {
+  protected def raw2probability(rawPrediction: Vector): Vector =
     val probs = rawPrediction.copy
     raw2probabilityInPlace(probs)
-  }
 
-  override protected def raw2prediction(rawPrediction: Vector): Double = {
-    if (!isDefined(thresholds)) {
+  override protected def raw2prediction(rawPrediction: Vector): Double =
+    if (!isDefined(thresholds))
       rawPrediction.argmax
-    } else {
+    else
       probability2prediction(raw2probability(rawPrediction))
-    }
-  }
 
   /**
     * Predict the probability of each class given the features.
@@ -190,32 +173,27 @@ abstract class ProbabilisticClassificationModel[
     *
     * @return Estimated class conditional probabilities
     */
-  protected def predictProbability(features: FeaturesType): Vector = {
+  protected def predictProbability(features: FeaturesType): Vector =
     val rawPreds = predictRaw(features)
     raw2probabilityInPlace(rawPreds)
-  }
 
   /**
     * Given a vector of class conditional probabilities, select the predicted label.
     * This supports thresholds which favor particular labels.
     * @return  predicted label
     */
-  protected def probability2prediction(probability: Vector): Double = {
-    if (!isDefined(thresholds)) {
+  protected def probability2prediction(probability: Vector): Double =
+    if (!isDefined(thresholds))
       probability.argmax
-    } else {
+    else
       val thresholds: Array[Double] = getThresholds
       val scaledProbability: Array[Double] =
-        probability.toArray.zip(thresholds).map {
+        probability.toArray.zip(thresholds).map
           case (p, t) =>
             if (t == 0.0) Double.PositiveInfinity else p / t
-        }
       Vectors.dense(scaledProbability).argmax
-    }
-  }
-}
 
-private[ml] object ProbabilisticClassificationModel {
+private[ml] object ProbabilisticClassificationModel
 
   /**
     * Normalize a vector of raw predictions to be a multinomial probability vector, in place.
@@ -227,15 +205,11 @@ private[ml] object ProbabilisticClassificationModel {
     * NOTE: This is NOT applicable to all models, only ones which effectively use class
     *       instance counts for raw predictions.
     */
-  def normalizeToProbabilitiesInPlace(v: DenseVector): Unit = {
+  def normalizeToProbabilitiesInPlace(v: DenseVector): Unit =
     val sum = v.values.sum
-    if (sum != 0) {
+    if (sum != 0)
       var i = 0
       val size = v.size
-      while (i < size) {
+      while (i < size)
         v.values(i) /= sum
         i += 1
-      }
-    }
-  }
-}

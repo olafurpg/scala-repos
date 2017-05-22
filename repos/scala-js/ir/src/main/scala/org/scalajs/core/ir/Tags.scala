@@ -9,7 +9,7 @@
 package org.scalajs.core.ir
 
 /** Serialization and hashing tags for trees and types */
-private[ir] object Tags {
+private[ir] object Tags
 
   // Tags for Trees
 
@@ -114,4 +114,3 @@ private[ir] object Tags {
   final val TagArrayType = TagClassType + 1
   final val TagRecordType = TagArrayType + 1
   final val TagNoType = TagRecordType + 1
-}

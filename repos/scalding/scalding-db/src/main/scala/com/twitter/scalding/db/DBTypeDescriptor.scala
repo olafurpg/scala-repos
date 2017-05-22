@@ -18,10 +18,9 @@ package com.twitter.scalding.db
 import com.twitter.scalding._
 import cascading.tuple.Fields
 
-trait DBTypeDescriptor[T] {
+trait DBTypeDescriptor[T]
   def columnDefn: ColumnDefinitionProvider[T]
   def converter: TupleConverter[T]
   def setter: TupleSetter[T]
   def fields: Fields
   def jdbcSetter: JdbcStatementSetter[T]
-}

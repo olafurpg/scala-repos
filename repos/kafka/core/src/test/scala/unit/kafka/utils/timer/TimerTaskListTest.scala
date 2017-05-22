@@ -20,20 +20,18 @@ import org.junit.Assert._
 import java.util.concurrent.atomic._
 import org.junit.{Test, After, Before}
 
-class TimerTaskListTest {
+class TimerTaskListTest
 
-  private class TestTask(val expirationMs: Long) extends TimerTask {
+  private class TestTask(val expirationMs: Long) extends TimerTask
     def run(): Unit = {}
-  }
 
-  private def size(list: TimerTaskList): Int = {
+  private def size(list: TimerTaskList): Int =
     var count = 0
     list.foreach(_ => count += 1)
     count
-  }
 
   @Test
-  def testAll() {
+  def testAll()
     val sharedCounter = new AtomicInteger(0)
     val runCounter = new AtomicInteger(0)
     val execCounter = new AtomicInteger(0)
@@ -41,34 +39,32 @@ class TimerTaskListTest {
     val list2 = new TimerTaskList(sharedCounter)
     val list3 = new TimerTaskList(sharedCounter)
 
-    val tasks = (1 to 10).map { i =>
+    val tasks = (1 to 10).map  i =>
       val task = new TestTask(10L)
       list1.add(new TimerTaskEntry(task))
       assertEquals(i, sharedCounter.get)
       task
-    }.toSeq
+    .toSeq
 
     assertEquals(tasks.size, sharedCounter.get)
 
     // reinserting the existing tasks shouldn't change the task count
-    tasks.take(4).foreach { task =>
+    tasks.take(4).foreach  task =>
       val prevCount = sharedCounter.get
       // new TimerTaskEntry(task) will remove the existing entry from the list
       list2.add(new TimerTaskEntry(task))
       assertEquals(prevCount, sharedCounter.get)
-    }
     assertEquals(10 - 4, size(list1))
     assertEquals(4, size(list2))
 
     assertEquals(tasks.size, sharedCounter.get)
 
     // reinserting the existing tasks shouldn't change the task count
-    tasks.drop(4).foreach { task =>
+    tasks.drop(4).foreach  task =>
       val prevCount = sharedCounter.get
       // new TimerTaskEntry(task) will remove the existing entry from the list
       list3.add(new TimerTaskEntry(task))
       assertEquals(prevCount, sharedCounter.get)
-    }
     assertEquals(0, size(list1))
     assertEquals(4, size(list2))
     assertEquals(6, size(list3))
@@ -90,5 +86,3 @@ class TimerTaskListTest {
     assertEquals(0, size(list1))
     assertEquals(0, size(list2))
     assertEquals(0, size(list3))
-  }
-}

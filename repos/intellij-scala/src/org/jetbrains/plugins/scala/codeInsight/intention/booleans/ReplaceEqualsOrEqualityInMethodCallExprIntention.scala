@@ -15,17 +15,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 4/23/12
   */
-object ReplaceEqualsOrEqualityInMethodCallExprIntention {
+object ReplaceEqualsOrEqualityInMethodCallExprIntention
   def familyName = "Replace equals or equality in method call expression"
-}
 
 class ReplaceEqualsOrEqualityInMethodCallExprIntention
-    extends PsiElementBaseIntentionAction {
+    extends PsiElementBaseIntentionAction
   def getFamilyName =
     ReplaceEqualsOrEqualityInMethodCallExprIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
@@ -55,9 +54,8 @@ class ReplaceEqualsOrEqualityInMethodCallExprIntention
           .isQualified) return true
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null || !methodCallExpr.isValid) return
@@ -93,12 +91,9 @@ class ReplaceEqualsOrEqualityInMethodCallExprIntention
         .getTextRange
         .getStartOffset - newMethodCallExpr.getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       methodCallExpr.replace(newMethodCallExpr)
       editor.getCaretModel.moveToOffset(start + size)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

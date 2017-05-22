@@ -24,7 +24,7 @@ import collection.immutable.Stack
 
 import java.nio.CharBuffer
 
-object RecoverJson {
+object RecoverJson
 
   sealed trait Balanced
   case class Colon(v: Balanced) extends Balanced
@@ -37,22 +37,20 @@ object RecoverJson {
 
   @tailrec private def findEndString(buffers: Vector[CharBuffer],
                                      bufferIndex: Int,
-                                     offset: Int): Option[(Int, Int)] = {
+                                     offset: Int): Option[(Int, Int)] =
     if (bufferIndex >= buffers.length) None
     else if (offset >= buffers(bufferIndex).limit)
       findEndString(
           buffers, bufferIndex + 1, offset % buffers(bufferIndex).limit)
-    else {
+    else
       val char = buffers(bufferIndex).get(offset)
 
       if (char == '"') Some((bufferIndex, offset))
       else if (char == '\\') findEndString(buffers, bufferIndex, offset + 2)
       else findEndString(buffers, bufferIndex, offset + 1)
-    }
-  }
 
   private case class BalancedStackState(
-      bufferIndex: Int, offset: Int, stack: Stack[Balanced]) {
+      bufferIndex: Int, offset: Int, stack: Stack[Balanced])
     def increment(balanced: Balanced) = BalancedStackState(
         bufferIndex,
         offset + 1,
@@ -68,9 +66,8 @@ object RecoverJson {
         offset + 1,
         stack
     )
-  }
 
-  private def balancedStack(buffers: Vector[CharBuffer]) = {
+  private def balancedStack(buffers: Vector[CharBuffer]) =
     @tailrec
     @inline def buildState(accum: BalancedStackState): BalancedStackState =
       if (accum.bufferIndex >= buffers.length) accum
@@ -81,10 +78,10 @@ object RecoverJson {
                 accum.offset % buffers(accum.bufferIndex).limit,
                 accum.stack
             ))
-      else {
+      else
         val buffer = buffers(accum.bufferIndex)
         var char = buffer.get(accum.offset)
-        char match {
+        char match
           case '{' =>
             val next = accum increment Brace
             buildState(next.copy(stack = next.stack push Colon(NullValue)))
@@ -104,16 +101,15 @@ object RecoverJson {
             buildState(next.copy(stack = next.stack push NullValue))
 
           case '"' =>
-            val next = accum.stack.headOption match {
+            val next = accum.stack.headOption match
               case Some(NullValue) => accum.decrement
               case Some(Key(Colon(value))) =>
                 val decremented = accum.decrement
                 decremented.copy(stack = decremented.stack push Colon(value))
               case _ => accum
-            }
 
             buildState(
-                findEndString(buffers, next.bufferIndex, next.offset + 1) map {
+                findEndString(buffers, next.bufferIndex, next.offset + 1) map
               case (bufferIndex, offset) =>
                 // Jump over the string
                 BalancedStackState(
@@ -121,7 +117,7 @@ object RecoverJson {
                     offset + 1,
                     next.stack
                 )
-            } getOrElse {
+            getOrElse
               // String didn't end
               val lastBuffer = buffers(buffers.length - 1)
               val lastCharacter = lastBuffer.get(lastBuffer.length - 1)
@@ -132,21 +128,18 @@ object RecoverJson {
                   if (lastCharacter == '\\') quoted push EscapeChar
                   else quoted
               )
-            })
+            )
 
           case _ => buildState(accum.skip)
-        }
-      }
 
     buildState(BalancedStackState(0, 0, new Stack())).stack
-  }
 
   // Count braces, quotes and parens in every chunk's CharBuffer.
   // Creates a new buffer which can correctly close the chunk.
-  def getJsonCloserBuffer(buffers: Vector[CharBuffer]) = {
+  def getJsonCloserBuffer(buffers: Vector[CharBuffer]) =
     val BlankElement = "null"
 
-    def balancedToString(b: Balanced): String = b match {
+    def balancedToString(b: Balanced): String = b match
       case Brace => "}"
       case Bracket => "]"
       case Colon(v) => ":" + balancedToString(v)
@@ -154,7 +147,6 @@ object RecoverJson {
       case Quote => "\""
       case EscapeChar => "\\"
       case NullValue => "null"
-    }
 
     val stringStack = balancedStack(buffers).map(balancedToString)
     // "}] <- stringStack
@@ -165,23 +157,17 @@ object RecoverJson {
         stringStack.map(_.length).sum + 4 + (if (needsComma) 1 else 0))
 
     @tailrec
-    def addToCloserBuffer(s: Stack[String]) {
-      if (s.length == 1) {
+    def addToCloserBuffer(s: Stack[String])
+      if (s.length == 1)
         // Last element should always be a Bracket (']')
         // Put the blank element before end of array
-        if (needsComma) {
+        if (needsComma)
           closerBuffer.put(',')
-        }
         closerBuffer.put(BlankElement)
-      }
-      if (!s.isEmpty) {
+      if (!s.isEmpty)
         closerBuffer.put(s.head)
         addToCloserBuffer(s.pop)
-      }
-    }
 
     addToCloserBuffer(stringStack)
     closerBuffer.flip()
     closerBuffer
-  }
-}

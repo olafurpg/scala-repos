@@ -49,36 +49,31 @@ import org.apache.hadoop.mapred.OutputCollector
 import org.scalatest.WordSpec
 import com.twitter.scalding.Config
 
-class ScaldingSerializationSpecs extends WordSpec {
+class ScaldingSerializationSpecs extends WordSpec
   implicit def tupleExtractor[T <: (Long, _)]: TimeExtractor[T] =
     TimeExtractor(_._1)
 
-  "ScaldingPlatform" should {
-    "serialize Hadoop Jobs for single step jobs" in {
+  "ScaldingPlatform" should
+    "serialize Hadoop Jobs for single step jobs" in
       // Add a time:
-      val inWithTime = List(1, 2, 3).zipWithIndex.map {
+      val inWithTime = List(1, 2, 3).zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
       val batcher = TestUtil.randomBatcher(inWithTime)
       val testStore =
         TestStore[Int, Int]("test", batcher, Iterable.empty, inWithTime.size)
       val (buffer, source) = TestSource(inWithTime)
 
       val summer = TestGraphs.singleStepJob[Scalding, (Long, Int), Int, Int](
-          source, testStore) { tup =>
+          source, testStore)  tup =>
         List((1 -> tup._2))
-      }
 
-      val mode = HadoopTest(new Configuration, {
+      val mode = HadoopTest(new Configuration,
         case x: ScaldingSource => buffer.get(x)
-      })
+      )
       val intr = Interval.leftClosedRightOpen(
           Timestamp(0L), Timestamp(inWithTime.size.toLong))
       val scald = Scalding("scalaCheckJob")
 
-      assert((try {
+      assert((try
         scald.toFlow(Config.default, intr, mode, scald.plan(summer)); true
-      } catch { case t: Throwable => println(toTry(t)); false }) == true)
-    }
-  }
-}
+      catch { case t: Throwable => println(toTry(t)); false }) == true)

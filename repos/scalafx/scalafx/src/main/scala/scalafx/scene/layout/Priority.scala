@@ -32,7 +32,7 @@ import javafx.scene.{layout => jfxsl}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/Priority.html javafx.scene.layout.Priority]] */
-object Priority extends SFXEnumDelegateCompanion[jfxsl.Priority, Priority] {
+object Priority extends SFXEnumDelegateCompanion[jfxsl.Priority, Priority]
 
   val Always = new Priority(jfxsl.Priority.ALWAYS)
   @deprecated(
@@ -54,7 +54,6 @@ object Priority extends SFXEnumDelegateCompanion[jfxsl.Priority, Priority] {
 
   /** Convenience method for returning the lower of two priorities. */
   def min(a: jfxsl.Priority, b: jfxsl.Priority) = jfxsl.Priority.min(a, b)
-}
 
 sealed case class Priority(override val delegate: jfxsl.Priority)
     extends SFXEnumDelegate[jfxsl.Priority]

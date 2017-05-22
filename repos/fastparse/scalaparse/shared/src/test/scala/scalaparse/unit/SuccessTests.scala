@@ -4,10 +4,10 @@ import scalaparse.{TestUtil, Scala}
 import fastparse._
 import utest._
 import TestUtil._
-object SuccessTests extends TestSuite {
+object SuccessTests extends TestSuite
 
   println("running")
-  def tests = TestSuite {
+  def tests = TestSuite
 
     * - check("package torimatomeru")
 
@@ -1400,5 +1400,3 @@ object SuccessTests extends TestSuite {
         |  contents += 1
         |}""".stripMargin
     )
-  }
-}

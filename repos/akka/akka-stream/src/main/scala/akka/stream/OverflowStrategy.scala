@@ -20,7 +20,7 @@ final case class BufferOverflowException(msg: String)
   */
 sealed abstract class OverflowStrategy extends DelayOverflowStrategy
 
-private[akka] object OverflowStrategies {
+private[akka] object OverflowStrategies
 
   /**
     * INTERNAL API
@@ -56,9 +56,8 @@ private[akka] object OverflowStrategies {
     * INTERNAL API
     */
   private[akka] case object EmitEarly extends DelayOverflowStrategy
-}
 
-object OverflowStrategy {
+object OverflowStrategy
 
   /**
     * If the buffer is full when a new element arrives, drops the oldest element from the buffer to make space for
@@ -92,9 +91,8 @@ object OverflowStrategy {
     * If the buffer is full when a new element is available this strategy completes the stream with failure.
     */
   def fail: OverflowStrategy = Fail
-}
 
-object DelayOverflowStrategy {
+object DelayOverflowStrategy
 
   /**
     * If the buffer is full when a new element is available this strategy send next element downstream without waiting
@@ -133,4 +131,3 @@ object DelayOverflowStrategy {
     * If the buffer is full when a new element is available this strategy completes the stream with failure.
     */
   def fail: DelayOverflowStrategy = Fail
-}

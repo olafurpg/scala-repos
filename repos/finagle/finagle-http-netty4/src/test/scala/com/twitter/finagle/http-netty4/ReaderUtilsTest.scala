@@ -18,31 +18,28 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ReaderUtilsTest extends FunSuite {
+class ReaderUtilsTest extends FunSuite
   import ReaderUtils._
 
-  test("readChunk: returned bufs have same content as http chunk") {
+  test("readChunk: returned bufs have same content as http chunk")
     val input = Array[Byte](1, 2, 3)
     val output =
       readChunk(new DefaultHttpContent(Unpooled.wrappedBuffer(input)))
     assert(Await.result(output, 2.seconds) == Some(Buf.ByteArray.Owned(input)))
-  }
 
-  test("readChunk: interprets last http chunk as Future.None") {
+  test("readChunk: interprets last http chunk as Future.None")
     val output = readChunk(new NettyHttp.DefaultLastHttpContent)
     assert(output == Future.None)
-  }
 
-  test("chunkOfBuf: wraps buf in http chunk") {
+  test("chunkOfBuf: wraps buf in http chunk")
     val input = Array[Byte](1, 2, 3)
     val chunk = chunkOfBuf(Buf.ByteArray.Owned(input))
 
     val output = new Array[Byte](chunk.content.readableBytes)
     chunk.content.readBytes(output)
     assert(input.toSeq == output.toSeq)
-  }
 
-  test("streamChunks: streams http chunks into transport") {
+  test("streamChunks: streams http chunks into transport")
     val rw = Reader.writable()
 
     val (write, read) = (new AsyncQueue[Any], new AsyncQueue[Any])
@@ -73,9 +70,8 @@ class ReaderUtilsTest extends FunSuite {
       Await.result(write.poll(), 2.seconds).asInstanceOf[NettyHttp.HttpContent]
 
     assert(lastChunk.isInstanceOf[NettyHttp.LastHttpContent])
-  }
 
-  val failingT = new Transport[Any, Any] {
+  val failingT = new Transport[Any, Any]
     def write(req: Any): Future[Unit] = Future.exception(new Exception("nop"))
 
     def remoteAddress: SocketAddress = ???
@@ -91,14 +87,11 @@ class ReaderUtilsTest extends FunSuite {
     val onClose: Future[Throwable] = Future.exception(new Exception)
 
     def close(deadline: Time): Future[Unit] = ???
-  }
 
-  test("streamChunks: discard reader on transport write failure") {
+  test("streamChunks: discard reader on transport write failure")
     val rw = Reader.writable()
     rw.write(Buf.Utf8("msg"))
 
     streamChunks(failingT, rw)
 
     intercept[ReaderDiscarded] { Await.result(rw.read(1), 2.seconds) }
-  }
-}

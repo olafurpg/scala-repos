@@ -32,6 +32,5 @@ case class Emit(obj: AnyRef) extends NextStep
 /**
   * A decoder stage.
   */
-trait Stage {
+trait Stage
   def apply(buffer: ChannelBuffer): NextStep
-}

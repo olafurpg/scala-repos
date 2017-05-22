@@ -30,10 +30,10 @@ import spire.syntax.cfor._
   * Array operations on generic arrays, a little faster in general, I hope.
   * @author dlwh
   */
-object ArrayUtil {
+object ArrayUtil
 
-  def fill[V](a: Array[V], offset: Int, length: Int, v: V) {
-    a match {
+  def fill[V](a: Array[V], offset: Int, length: Int, v: V)
+    a match
       case x: Array[Double] =>
         Arrays.fill(x, offset, offset + length, v.asInstanceOf[Double])
       case x: Array[Int] =>
@@ -56,11 +56,9 @@ object ArrayUtil {
                     offset + length,
                     v.asInstanceOf[AnyRef])
       case _ => throw new RuntimeException("shouldn't be here!")
-    }
-  }
 
-  def copyOf[V](a: Array[V], length: Int): Array[V] = {
-    a match {
+  def copyOf[V](a: Array[V], length: Int): Array[V] =
+    a match
       case x: Array[Double] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
       case x: Array[Int] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
       case x: Array[Float] => Arrays.copyOf(x, length).asInstanceOf[Array[V]]
@@ -74,11 +72,9 @@ object ArrayUtil {
           .copyOf(x.asInstanceOf[Array[AnyRef]], length)
           .asInstanceOf[Array[V]]
       case _ => throw new RuntimeException("shouldn't be here!")
-    }
-  }
 
-  def copyOfRange[V, VU >: V](a: Array[V], from: Int, to: Int): Array[V] = {
-    a match {
+  def copyOfRange[V, VU >: V](a: Array[V], from: Int, to: Int): Array[V] =
+    a match
       case x: Array[Double] =>
         Arrays.copyOfRange(x, from, to).asInstanceOf[Array[V]]
       case x: Array[Int] =>
@@ -100,11 +96,9 @@ object ArrayUtil {
           .copyOfRange(x.asInstanceOf[Array[AnyRef]], from, to)
           .asInstanceOf[Array[V]]
       case _ => throw new RuntimeException("shouldn't be here!")
-    }
-  }
 
-  def newArrayLike[V](a: Array[V], length: Int): Array[V] = {
-    a match {
+  def newArrayLike[V](a: Array[V], length: Int): Array[V] =
+    a match
       case x: Array[Double] => new Array[Double](length).asInstanceOf[Array[V]]
       case x: Array[Int] => new Array[Int](length).asInstanceOf[Array[V]]
       case x: Array[Float] => new Array[Float](length).asInstanceOf[Array[V]]
@@ -119,8 +113,6 @@ object ArrayUtil {
           ClassTag[V](x.getClass.getComponentType.asInstanceOf[Class[V]])
         new Array[V](length)
       case _ => throw new RuntimeException("shouldn't be here!")
-    }
-  }
 
   /**
     * For reasons that I cannot explain java.util.Arrays.equals(Array(0.0), Array(-0.0)) == false
@@ -133,49 +125,44 @@ object ArrayUtil {
                       b: Array[_],
                       boffset: Int,
                       bstride: Int,
-                      blength: Int): Boolean = {
+                      blength: Int): Boolean =
     val ac = a.getClass
     val bc = b.getClass
-    if (ac != bc || alength != blength) {
+    if (ac != bc || alength != blength)
       false
-    } else {
-      a match {
+    else
+      a match
         case x: Array[Double] =>
           val y = b.asInstanceOf[Array[Double]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Float] =>
           val y = b.asInstanceOf[Array[Float]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case _ =>
           equals(a, aoffset, astride, alength, b, boffset, bstride, blength)
-      }
-    }
-  }
 
-  def equals(a: Array[_], b: Array[_]): Boolean = {
+  def equals(a: Array[_], b: Array[_]): Boolean =
     val ac = a.getClass
     val bc = b.getClass
     if (ac != bc) false
-    else {
-      a match {
+    else
+      a match
         case x: Array[Double] =>
           Arrays.equals(
               a.asInstanceOf[Array[Double]], b.asInstanceOf[Array[Double]])
@@ -203,9 +190,6 @@ object ArrayUtil {
           Arrays.equals(
               a.asInstanceOf[Array[AnyRef]], b.asInstanceOf[Array[AnyRef]])
         case _ => throw new RuntimeException("shouldn't be here!")
-      }
-    }
-  }
 
   def equals(a: Array[_],
              aoffset: Int,
@@ -214,130 +198,118 @@ object ArrayUtil {
              b: Array[_],
              boffset: Int,
              bstride: Int,
-             blength: Int): Boolean = {
+             blength: Int): Boolean =
     val ac = a.getClass
     val bc = b.getClass
     if (ac != bc || alength != blength) false
     else if (aoffset == 0 && astride == 1 && alength == a.length &&
-             boffset == 0 && bstride == 1 && blength == b.length) {
+             boffset == 0 && bstride == 1 && blength == b.length)
       ArrayUtil.equals(a, b)
-    } else {
-      a match {
+    else
+      a match
         case x: Array[Double] =>
           val y = b.asInstanceOf[Array[Double]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Int] =>
           val y = b.asInstanceOf[Array[Int]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Float] =>
           val y = b.asInstanceOf[Array[Float]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Long] =>
           val y = b.asInstanceOf[Array[Long]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Short] =>
           val y = b.asInstanceOf[Array[Short]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Char] =>
           val y = b.asInstanceOf[Array[Char]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Byte] =>
           val y = b.asInstanceOf[Array[Byte]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[Boolean] =>
           val y = b.asInstanceOf[Array[Boolean]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case x: Array[_] =>
           val y = b.asInstanceOf[Array[AnyRef]]
           var ai = aoffset
           var bi = boffset
           var i = 0
-          while (i < alength) {
+          while (i < alength)
             if (x(ai) != y(bi)) return false
             ai += astride
             bi += bstride
             i += 1
-          }
           true
         case _ => throw new RuntimeException("shouldn't be here!")
-      }
-    }
-  }
 
   def gallopSearch(
-      objs: Array[Int], fromIndex: Int, toIndex: Int, toFind: Int): Int = {
+      objs: Array[Int], fromIndex: Int, toIndex: Int, toFind: Int): Int =
     if (objs.length == 0) return ~0
 
 //    if(toIndex - fromIndex <= 16) return linearSearch(objs, fromIndex, toIndex, toFind)
@@ -347,22 +319,19 @@ object ArrayUtil {
     var step = 1
     var high = fromIndex + step
 
-    while (high < toIndex && objs(high) < toFind) {
+    while (high < toIndex && objs(high) < toFind)
       low = high
       step *= 2
       high = fromIndex + step
-    }
 
-    if (high < toIndex && objs(high) == toFind) {
+    if (high < toIndex && objs(high) == toFind)
       high
-    } else {
+    else
       Arrays.binarySearch(objs, low, math.min(high, toIndex), toFind)
-    }
-  }
 
   def zeroSkippingHashCode[V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
-    (data: Any) match {
+      data: Array[V], offset: Int, stride: Int, length: Int): Int =
+    (data: Any) match
       case x: Array[Double] =>
         zeroSkippingHashCodeImpl_Double(x, offset, stride, length)
       case x: Array[Float] =>
@@ -380,34 +349,27 @@ object ArrayUtil {
       case x: Array[Boolean] =>
         zeroSkippingHashCodeImpl_Boolean(x, offset, stride, length)
       case _ => zeroSkippingHashCodeImplSlow(data, offset, stride, length)
-    }
-  }
 
   @expand
   private def zeroSkippingHashCodeImpl[
       @expand.args(Int, Float, Double, Long, Byte, Short, Char, Boolean) V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+      data: Array[V], offset: Int, stride: Int, length: Int): Int =
     var hash = 43
     var i = offset
-    cforRange(0 until length) { _ =>
+    cforRange(0 until length)  _ =>
       val v = data(i)
       val hh = v.##
       if (hh != 0) hash = MurmurHash3.mix(hash, hh)
       i += stride
-    }
     hash
-  }
 
   private def zeroSkippingHashCodeImplSlow[V](
-      data: Array[V], offset: Int, stride: Int, length: Int): Int = {
+      data: Array[V], offset: Int, stride: Int, length: Int): Int =
     var hash = 43
     var i = offset
-    cforRange(0 until length) { _ =>
+    cforRange(0 until length)  _ =>
       val v = data(i)
       val hh = v.##
       if (hh != 0) hash = MurmurHash3.mix(hash, hh)
       i += stride
-    }
     hash
-  }
-}

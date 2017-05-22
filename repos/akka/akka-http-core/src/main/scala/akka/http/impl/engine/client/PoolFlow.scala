@@ -16,13 +16,12 @@ import akka.stream.scaladsl._
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.Http
 
-private object PoolFlow {
+private object PoolFlow
 
   case class RequestContext(request: HttpRequest,
                             responsePromise: Promise[HttpResponse],
-                            retriesLeft: Int) {
+                            retriesLeft: Int)
     require(retriesLeft >= 0)
-  }
   case class ResponseContext(rc: RequestContext, response: Try[HttpResponse])
 
   /*
@@ -77,7 +76,7 @@ private object PoolFlow {
       implicit system: ActorSystem,
       fm: Materializer): Flow[RequestContext, ResponseContext, NotUsed] =
     Flow.fromGraph(
-        GraphDSL.create[FlowShape[RequestContext, ResponseContext]]() {
+        GraphDSL.create[FlowShape[RequestContext, ResponseContext]]()
       implicit b ⇒
         import settings._
         import GraphDSL.Implicits._
@@ -93,11 +92,9 @@ private object PoolFlow {
           b.add(Merge[PoolSlot.RawSlotEvent](maxConnections))
 
         slotEventMerge.out ~> conductor.slotEventIn
-        for ((slot, ix) ← slots.zipWithIndex) {
+        for ((slot, ix) ← slots.zipWithIndex)
           conductor.slotOuts(ix) ~> slot.in
           slot.out0 ~> responseMerge.in(ix)
           slot.out1 ~> slotEventMerge.in(ix)
-        }
         FlowShape(conductor.requestIn, responseMerge.out)
-    })
-}
+    )

@@ -10,20 +10,19 @@ import akka.testkit.AkkaSpec
 import akka.actor.ActorRef
 import akka.testkit.TestProbe
 
-object FlowSectionSpec {
+object FlowSectionSpec
   val config = s"""
       my-dispatcher1 = $${akka.test.stream-dispatcher}
       my-dispatcher2 = $${akka.test.stream-dispatcher}
     """
-}
 
-class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
+class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config)
 
   implicit val materializer = ActorMaterializer()
 
-  "A flow" can {
+  "A flow" can
 
-    "have an op with a different dispatcher" in {
+    "have an op with a different dispatcher" in
       val flow = Flow[Int]
         .map(sendThreadNameTo(testActor))
         .withAttributes(dispatcher("my-dispatcher1"))
@@ -31,9 +30,8 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
       Source.single(1).via(flow).to(Sink.ignore).run()
 
       expectMsgType[String] should include("my-dispatcher1")
-    }
 
-    "have a nested flow with a different dispatcher" in {
+    "have a nested flow with a different dispatcher" in
       Source
         .single(1)
         .via(Flow[Int]
@@ -43,9 +41,8 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
         .run()
 
       expectMsgType[String] should include("my-dispatcher1")
-    }
 
-    "have multiple levels of nesting" in {
+    "have multiple levels of nesting" in
 
       val probe1 = TestProbe()
       val probe2 = TestProbe()
@@ -62,9 +59,8 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
 
       probe1.expectMsgType[String] should include("my-dispatcher1")
       probe2.expectMsgType[String] should include("my-dispatcher2")
-    }
 
-    "include name in toString" in {
+    "include name in toString" in
       pending //FIXME: Flow has no simple toString anymore
       val n = "Uppercase reverser"
       val f1 = Flow[String].map(_.toLowerCase)
@@ -75,9 +71,8 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
         .map(_.toLowerCase)
 
       f1.via(f2).toString should include(n)
-    }
 
-    "have an op section with a different dispatcher and name" in {
+    "have an op section with a different dispatcher and name" in
       val defaultDispatcher = TestProbe()
       val customDispatcher = TestProbe()
 
@@ -90,18 +85,12 @@ class FlowSectionSpec extends AkkaSpec(FlowSectionSpec.config) {
 
       Source(0 to 2).via(f1).via(f2).runWith(Sink.ignore)
 
-      defaultDispatcher.receiveN(3).foreach {
+      defaultDispatcher.receiveN(3).foreach
         case s: String ⇒ s should include("akka.test.stream-dispatcher")
-      }
 
-      customDispatcher.receiveN(3).foreach {
+      customDispatcher.receiveN(3).foreach
         case s: String ⇒ s should include("my-dispatcher1")
-      }
-    }
 
-    def sendThreadNameTo[T](probe: ActorRef)(element: T) = {
+    def sendThreadNameTo[T](probe: ActorRef)(element: T) =
       probe ! Thread.currentThread.getName
       element
-    }
-  }
-}

@@ -1,5 +1,4 @@
 package scalaz
 
-trait SpecLitePlatform {
+trait SpecLitePlatform
   def updateName: Unit = ()
-}

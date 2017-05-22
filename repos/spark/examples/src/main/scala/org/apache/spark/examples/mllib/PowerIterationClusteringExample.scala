@@ -53,7 +53,7 @@ import org.apache.spark.rdd.RDD
   *
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object PowerIterationClusteringExample {
+object PowerIterationClusteringExample
 
   case class Params(
       k: Int = 2,
@@ -62,10 +62,10 @@ object PowerIterationClusteringExample {
   )
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("PowerIterationClusteringExample") {
+    val parser = new OptionParser[Params]("PowerIterationClusteringExample")
       head(
           "PowerIterationClusteringExample: an example PIC app using concentric circles.")
       opt[Int]('k', "k")
@@ -78,19 +78,15 @@ object PowerIterationClusteringExample {
       opt[Int]("maxIterations")
         .text(s"number of iterations, default: ${defaultParams.maxIterations}")
         .action((x, c) => c.copy(maxIterations = x))
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName(s"PowerIterationClustering with $params")
@@ -109,51 +105,43 @@ object PowerIterationClusteringExample {
     val clusters =
       model.assignments.collect().groupBy(_.cluster).mapValues(_.map(_.id))
     val assignments = clusters.toList.sortBy { case (k, v) => v.length }
-    val assignmentsStr = assignments.map {
+    val assignmentsStr = assignments.map
       case (k, v) =>
         s"$k -> ${v.sorted.mkString("[", ",", "]")}"
-    }.mkString(", ")
-    val sizesStr = assignments.map {
+    .mkString(", ")
+    val sizesStr = assignments.map
       _._2.length
-    }.sorted.mkString("(", ",", ")")
+    .sorted.mkString("(", ",", ")")
     println(s"Cluster assignments: $assignmentsStr\ncluster sizes: $sizesStr")
     // $example off$
 
     sc.stop()
-  }
 
-  def generateCircle(radius: Double, n: Int): Seq[(Double, Double)] = {
-    Seq.tabulate(n) { i =>
+  def generateCircle(radius: Double, n: Int): Seq[(Double, Double)] =
+    Seq.tabulate(n)  i =>
       val theta = 2.0 * math.Pi * i / n
       (radius * math.cos(theta), radius * math.sin(theta))
-    }
-  }
 
   def generateCirclesRdd(sc: SparkContext,
                          nCircles: Int,
-                         nPoints: Int): RDD[(Long, Long, Double)] = {
-    val points = (1 to nCircles).flatMap { i =>
+                         nPoints: Int): RDD[(Long, Long, Double)] =
+    val points = (1 to nCircles).flatMap  i =>
       generateCircle(i, i * nPoints)
-    }.zipWithIndex
+    .zipWithIndex
     val rdd = sc.parallelize(points)
-    val distancesRdd = rdd.cartesian(rdd).flatMap {
+    val distancesRdd = rdd.cartesian(rdd).flatMap
       case (((x0, y0), i0), ((x1, y1), i1)) =>
-        if (i0 < i1) {
+        if (i0 < i1)
           Some((i0.toLong, i1.toLong, gaussianSimilarity((x0, y0), (x1, y1))))
-        } else {
+        else
           None
-        }
-    }
     distancesRdd
-  }
 
   /**
     * Gaussian Similarity:  http://en.wikipedia.org/wiki/Radial_basis_function_kernel
     */
-  def gaussianSimilarity(p1: (Double, Double), p2: (Double, Double)): Double = {
+  def gaussianSimilarity(p1: (Double, Double), p2: (Double, Double)): Double =
     val ssquares =
       (p1._1 - p2._1) * (p1._1 - p2._1) + (p1._2 - p2._2) * (p1._2 - p2._2)
     math.exp(-ssquares / 2.0)
-  }
-}
 // scalastyle:on println

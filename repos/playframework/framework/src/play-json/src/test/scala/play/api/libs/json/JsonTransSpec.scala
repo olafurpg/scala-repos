@@ -14,8 +14,8 @@ import play.api.libs.json.util._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._
 
-object JsonTransSpec extends Specification {
-  "JSON transformers " should {
+object JsonTransSpec extends Specification
+  "JSON transformers " should
     val js = Json.obj(
         "field1" -> "alpha",
         "field2" -> 123L,
@@ -30,7 +30,7 @@ object JsonTransSpec extends Specification {
                                       "field42" -> "tata"))
     )
 
-    "pick a value at a path" in {
+    "pick a value at a path" in
       js.transform(
             (__ \ 'field3).json.pick
         )
@@ -40,9 +40,8 @@ object JsonTransSpec extends Specification {
               "field32" -> 345
           )
       )
-    }
 
-    "pick a branch" in {
+    "pick a branch" in
       js.transform(
             (__ \ 'field3).json.pickBranch
         )
@@ -51,15 +50,13 @@ object JsonTransSpec extends Specification {
               "field3" -> Json.obj("field31" -> "beta", "field32" -> 345)
           )
       )
-    }
 
-    "copy input JSON and update a branch (merge the updated branch with input JSON)" in {
+    "copy input JSON and update a branch (merge the updated branch with input JSON)" in
       js.transform(
             (__ \ 'field3).json.update(
                 __.read[JsObject]
-                  .map { o =>
+                  .map  o =>
                     o ++ Json.obj("field33" -> false)
-                  }
               )
           )
         .get must beEqualTo(
@@ -78,9 +75,8 @@ object JsonTransSpec extends Specification {
                                             "field42" -> "tata"))
           )
       )
-    }
 
-    "pick a branch and update its content" in {
+    "pick a branch and update its content" in
       js.transform(
             (__ \ 'field3).json.pickBranch(
                 (__ \ 'field32).json.update(
@@ -99,9 +95,8 @@ object JsonTransSpec extends Specification {
               "field3" -> Json.obj("field31" -> "betatoto", "field32" -> 357)
           )
       )
-    }
 
-    "put a value in a new branch (don't keep passed json)" in {
+    "put a value in a new branch (don't keep passed json)" in
       js.transform(
             (__ \ 'field3).json.put(JsNumber(234))
         )
@@ -110,9 +105,8 @@ object JsonTransSpec extends Specification {
               "field3" -> 234
           )
       )
-    }
 
-    "create a new path by copying a branch" in {
+    "create a new path by copying a branch" in
       js.transform(
             (__ \ 'field5).json.copyFrom((__ \ 'field3).json.pick)
         )
@@ -124,9 +118,8 @@ object JsonTransSpec extends Specification {
               )
           )
       )
-    }
 
-    "copy full json and prune a branch" in {
+    "copy full json and prune a branch" in
       js.transform(
             (__ \ 'field3).json.prune
         )
@@ -141,9 +134,8 @@ object JsonTransSpec extends Specification {
                                             "field42" -> "tata"))
           )
       )
-    }
 
-    "pick a single branch and prune a sub-branch" in {
+    "pick a single branch and prune a sub-branch" in
       js.transform(
             (__ \ 'field3).json.pickBranch(
                 (__ \ 'field32).json.prune
@@ -154,9 +146,8 @@ object JsonTransSpec extends Specification {
               "field3" -> Json.obj("field31" -> "beta")
           )
       )
-    }
 
-    "copy the full json and update a 2nd-level path and then prune a subbranch" in {
+    "copy the full json and update a 2nd-level path and then prune a subbranch" in
       js.validate(
             (__ \ 'field3 \ 'field32).json.update(
                 Reads
@@ -174,9 +165,8 @@ object JsonTransSpec extends Specification {
               )
           )
       )
-    }
 
-    "deepMerge when reducing JsObjects" in {
+    "deepMerge when reducing JsObjects" in
       val json = Json.obj("somekey1" -> 11, "somekey2" -> 22)
       val jsonTransform =
         ((__ \ "key1" \ "sk1").json.copyFrom((__ \ "somekey1").json.pick) and
@@ -185,10 +175,9 @@ object JsonTransSpec extends Specification {
       json.validate(jsonTransform).get must beEqualTo(
           Json.obj("key1" -> Json.obj("sk1" -> 11, "sk2" -> 22))
       )
-    }
 
-    "report the correct path in the JsError" in {
-      "when the field to modify doesn't exist" in {
+    "report the correct path in the JsError" in
+      "when the field to modify doesn't exist" in
         js.transform(
               (__ \ 'field42).json.update(__.read[JsString])
           )
@@ -197,9 +186,8 @@ object JsonTransSpec extends Specification {
           .get
           .head must_==
         ((__ \ 'field42, Seq(ValidationError("error.path.missing"))))
-      }
 
-      "when the reader is the wrong type" in {
+      "when the reader is the wrong type" in
         js.transform(
               (__ \ 'field2).json.update(__.read[JsString])
           )
@@ -208,7 +196,3 @@ object JsonTransSpec extends Specification {
           .get
           .head must_==
         ((__ \ 'field2, Seq(ValidationError("error.expected.jsstring"))))
-      }
-    }
-  }
-}

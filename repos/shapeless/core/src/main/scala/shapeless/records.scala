@@ -26,7 +26,7 @@ import scala.reflect.macros.whitebox
   *
   * @author Miles Sabin
   */
-object record {
+object record
   import syntax.RecordOps
 
   implicit def recordOps[L <: HList](l: L): RecordOps[L] = new RecordOps(l)
@@ -55,13 +55,11 @@ object record {
     * xyz('y) // == "foo"
     * }}}
     */
-  object Record extends Dynamic {
+  object Record extends Dynamic
     def applyDynamic(method: String)(rec: Any*): HList = macro RecordMacros.mkRecordEmptyImpl
     def applyDynamicNamed(method: String)(rec: Any*): HList = macro RecordMacros.mkRecordNamedImpl
 
     def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.recordTypeImpl
-  }
-}
 
 /**
   * Trait supporting mapping named argument lists to record arguments.
@@ -83,13 +81,12 @@ object record {
   * application of an implementing method (identified by the "Record" suffix) which
   * accepts a single record argument.
   */
-trait RecordArgs extends Dynamic {
+trait RecordArgs extends Dynamic
   def applyDynamic(method: String)(): Any = macro RecordMacros.forwardImpl
   def applyDynamicNamed(method: String)(rec: Any*): Any = macro RecordMacros.forwardNamedImpl
-}
 
 @macrocompat.bundle
-class RecordMacros(val c: whitebox.Context) {
+class RecordMacros(val c: whitebox.Context)
   import c.universe._
   import internal.constantType
   import labelled.FieldType
@@ -100,26 +97,24 @@ class RecordMacros(val c: whitebox.Context) {
   val SymTpe = typeOf[scala.Symbol]
   val atatTpe = typeOf[tag.@@[_, _]].typeConstructor
 
-  def mkRecordEmptyImpl(method: Tree)(rec: Tree*): Tree = {
+  def mkRecordEmptyImpl(method: Tree)(rec: Tree*): Tree =
     if (rec.nonEmpty)
       c.abort(c.enclosingPosition,
               "this method must be called with named arguments")
 
     q"_root_.shapeless.HNil"
-  }
 
-  def mkRecordNamedImpl(method: Tree)(rec: Tree*): Tree = {
+  def mkRecordNamedImpl(method: Tree)(rec: Tree*): Tree =
     val q"${ methodString: String }" = method
     if (methodString != "apply")
       c.abort(c.enclosingPosition,
               s"this method must be called as 'apply' not '$methodString'")
 
     mkRecordImpl(rec: _*)
-  }
 
   def forwardImpl(method: Tree)(): Tree = forwardNamedImpl(method)()
 
-  def forwardNamedImpl(method: Tree)(rec: Tree*): Tree = {
+  def forwardNamedImpl(method: Tree)(rec: Tree*): Tree =
     val lhs = c.prefix.tree
     val lhsTpe = lhs.tpe
 
@@ -132,9 +127,8 @@ class RecordMacros(val c: whitebox.Context) {
     val recTree = mkRecordImpl(rec: _*)
 
     q""" $lhs.$methodName($recTree) """
-  }
 
-  def mkRecordImpl(rec: Tree*): Tree = {
+  def mkRecordImpl(rec: Tree*): Tree =
     def mkSingletonSymbolType(c: Constant): Type =
       appliedType(atatTpe, List(SymTpe, constantType(c)))
 
@@ -144,16 +138,12 @@ class RecordMacros(val c: whitebox.Context) {
     def mkElem(keyTpe: Type, value: Tree): Tree =
       q"$value.asInstanceOf[${mkFieldTpe(keyTpe, value.tpe)}]"
 
-    def promoteElem(elem: Tree): Tree = elem match {
+    def promoteElem(elem: Tree): Tree = elem match
       case q""" $prefix(${ Literal(k: Constant) }, $v) """ =>
         mkElem(mkSingletonSymbolType(k), v)
       case _ =>
         c.abort(c.enclosingPosition,
                 s"$elem has the wrong shape for a record field")
-    }
 
-    rec.foldRight(hnilValueTree) {
+    rec.foldRight(hnilValueTree)
       case (elem, acc) => q""" $hconsValueTree(${promoteElem(elem)}, $acc) """
-    }
-  }
-}

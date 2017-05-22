@@ -16,7 +16,7 @@
 
 package shapeless
 
-class TypeableTests {
+class TypeableTests
   import java.{lang => jl}
 
   import org.junit.Test
@@ -26,7 +26,7 @@ class TypeableTests {
   import test._
 
   @Test
-  def testPrimitives {
+  def testPrimitives
     val b: Any = 23.toByte
     val cb = b.cast[Byte]
     assertTrue(cb.isDefined)
@@ -62,10 +62,9 @@ class TypeableTests {
     val u: Any = ()
     val cu = u.cast[Unit]
     assertTrue(cu.isDefined)
-  }
 
   @Test
-  def testBoxedPrimitives {
+  def testBoxedPrimitives
     val b: Any = 23.toByte
     val cb = b.cast[jl.Byte]
     assertTrue(cb.isDefined)
@@ -97,10 +96,9 @@ class TypeableTests {
     val bl: Any = true
     val cbl = bl.cast[jl.Boolean]
     assertTrue(cbl.isDefined)
-  }
 
   @Test
-  def testUnerased {
+  def testUnerased
     val li: Any = List(1, 2, 3, 4)
     val cli = li.cast[List[Int]]
     assertTrue(cli.isDefined)
@@ -138,12 +136,11 @@ class TypeableTests {
 
     val csi2 = si.cast[Set[String]]
     assertTrue(csi2.isEmpty)
-  }
 
   trait Poly[T]
 
   @Test
-  def testErased {
+  def testErased
     illTyped("""
       Typeable[Int => String]
     """)
@@ -151,20 +148,18 @@ class TypeableTests {
     illTyped("""
       Typeable[Poly[Int]]
     """)
-  }
 
   @Test
-  def testHList {
+  def testHList
     val lisdb: Any = 23 :: "foo" :: false :: HNil
     val clisdb = lisdb.cast[Int :: String :: Boolean :: HNil]
     assertTrue(clisdb.isDefined)
 
     val clisdb2 = lisdb.cast[Int :: String :: Double :: HNil]
     assertTrue(clisdb2.isEmpty)
-  }
 
   @Test
-  def testCoproductt {
+  def testCoproductt
     type CP = Int :+: String :+: Double :+: Boolean :+: CNil
     type CP2 = Char :+: Long :+: Unit :+: CNil
 
@@ -195,10 +190,9 @@ class TypeableTests {
     val cpu: Any = Coproduct[CP2](())
     val ccpu = cpu.cast[CP]
     assertTrue(ccpu.isEmpty)
-  }
 
   @Test
-  def testAnys {
+  def testAnys
     val v: Any = 23
     val cv = v.cast[AnyVal]
     assertTrue(cv.isDefined)
@@ -212,10 +206,9 @@ class TypeableTests {
 
     val cr2 = r.cast[AnyVal]
     assertTrue(cr2.isEmpty)
-  }
 
   @Test
-  def testNull {
+  def testNull
     val n: Any = null
     val cn = n.cast[AnyVal]
     assertTrue(!cn.isDefined)
@@ -240,20 +233,18 @@ class TypeableTests {
 
     val cn7 = n.cast[(Int, String)]
     assertTrue(!cn7.isDefined)
-  }
 
   @Test
-  def testExistentials {
+  def testExistentials
     val l: Any = List(1, 2, 3, 4)
     val cl = l.cast[List[_]]
     assertTrue(cl.isDefined)
 
     val cl2 = l.cast[Vector[_]]
     assertTrue(cl2.isEmpty)
-  }
 
   @Test
-  def testTraits {
+  def testTraits
     trait A
     trait B
     trait C
@@ -268,10 +259,9 @@ class TypeableTests {
 
     val cd3 = d.cast[C]
     assertTrue(cd3.isEmpty)
-  }
 
   @Test
-  def testIntersections {
+  def testIntersections
     trait A
     trait B
     trait C
@@ -289,10 +279,9 @@ class TypeableTests {
 
     val cd4 = d.cast[C with A]
     assertTrue(cd4.isEmpty)
-  }
 
   @Test
-  def testNarrowTo {
+  def testNarrowTo
     trait A
     trait B
     class C extends A with B
@@ -314,10 +303,9 @@ class TypeableTests {
     illTyped("""
     val cb = a.narrowTo[B]
     """)
-  }
 
   @Test
-  def testTuples {
+  def testTuples
     val p: Any = (23, "foo")
     val cp = p.cast[(Int, String)]
     assertTrue(cp.isDefined)
@@ -337,10 +325,9 @@ class TypeableTests {
 
     val cm3 = m.cast[Map[Int, List[String]]]
     assertTrue(cm3.isEmpty)
-  }
 
   @Test
-  def testOption {
+  def testOption
     val o: Any = Option(23)
     val co = o.cast[Option[Int]]
     assertTrue(co.isDefined)
@@ -353,10 +340,9 @@ class TypeableTests {
 
     val co4 = o.cast[Option[_]]
     assertTrue(co4.isDefined)
-  }
 
   @Test
-  def testEither {
+  def testEither
     val ei: Any = Left[Int, String](23)
     val cei = ei.cast[Either[Int, String]]
     assertTrue(cei.isDefined)
@@ -382,13 +368,12 @@ class TypeableTests {
 
     val ces4 = es.cast[Either[Int, Unit]]
     assertTrue(ces4.isEmpty)
-  }
 
   case class Foo(i: Int, s: String, b: Boolean)
   case class Bar[T](t: T)
 
   @Test
-  def testProducts {
+  def testProducts
     val foo: Any = Foo(23, "foo", true)
     val iBar: Any = Bar(23)
     val sBar: Any = Bar("bar")
@@ -410,27 +395,24 @@ class TypeableTests {
 
     val cbar4 = sBar.cast[Bar[Int]]
     assertTrue(cbar4.isEmpty)
-  }
 
   @Test
-  def testTypeCase {
+  def testTypeCase
     import HList.ListCompat._
 
-    def typeCase[T : Typeable](t: Any): Option[T] = {
+    def typeCase[T : Typeable](t: Any): Option[T] =
       val T = TypeCase[T]
       val `List[T]` = TypeCase[List[T]]
       val `(String, T)` = TypeCase[(String, T)]
       val `List[(String, T)]` = TypeCase[List[(String, T)]]
 
-      t match {
+      t match
         case T(t) => Some(t)
         case `List[T]`(lt) => lt.headOption
         case `(String, T)`(s, t) => typed[String](s); Some(t)
         case `List[(String, T)]`((s, t) :: _) => typed[String](s); Some(t)
         case `List[(String, T)]`(lst) => assertTrue(lst.isEmpty); None
         case _ => None
-      }
-    }
 
     assertEquals(Some(23), typeCase[Int](23: Any))
     assertEquals(None, typeCase[String](23: Any))
@@ -440,10 +422,9 @@ class TypeableTests {
     assertEquals(None, typeCase[String](("foo", 23): Any))
     assertEquals(Some(23), typeCase[Int](List(("foo", 23)): Any))
     assertEquals(None, typeCase[String](List(("foo", 23)): Any))
-  }
 
   @Test
-  def testSingletons {
+  def testSingletons
     val wOne = Witness(1)
     type One = wOne.T
 
@@ -498,14 +479,13 @@ class TypeableTests {
     val c10 = (ObjB: Any).cast[ObjA.type]
     typed[Option[ObjA.type]](c10)
     assertEquals(None, c10)
-  }
 
   trait A
   trait B
   class C extends A with B
 
   @Test
-  def testToString {
+  def testToString
     def typeableString[T](t: T)(implicit tp: Typeable[T]) = tp.toString
 
     val i: Int = 7
@@ -567,5 +547,3 @@ class TypeableTests {
 
     val tc = TypeCase[List[Int]]
     assertEquals("TypeCase[List[Int]]", tc.toString)
-  }
-}

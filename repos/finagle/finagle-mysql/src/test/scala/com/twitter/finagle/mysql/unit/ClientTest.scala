@@ -12,10 +12,10 @@ import com.twitter.util.Time
   * Tests the functionality of the MySQL client.
   */
 @RunWith(classOf[JUnitRunner])
-class ClientTest extends FunSuite with MockitoSugar with MustMatchers {
+class ClientTest extends FunSuite with MockitoSugar with MustMatchers
   private val sqlQuery = "SELECT * FROM FOO"
 
-  test("basic test creates a new service for each query") {
+  test("basic test creates a new service for each query")
     val service = new MockService()
     val factory = spy(new MockServiceFactory(service))
     val client = spy(Client(factory))
@@ -31,5 +31,3 @@ class ClientTest extends FunSuite with MockitoSugar with MustMatchers {
     verify(client, times(2)).query(sqlQuery)
     verify(factory, times(2)).apply()
     verify(factory, times(0)).close(any[Time])
-  }
-}

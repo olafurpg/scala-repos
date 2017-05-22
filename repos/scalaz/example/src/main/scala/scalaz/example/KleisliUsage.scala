@@ -1,6 +1,6 @@
 package scalaz.example
 
-object KleisliUsage extends App {
+object KleisliUsage extends App
 
   import scalaz._
   import Scalaz._
@@ -32,9 +32,8 @@ object KleisliUsage extends App {
   def cities(country: Country): List[City] = country.cities
 
   def save(cities: List[City]): Try[Unit] =
-    Try {
+    Try
       cities.foreach(c => println("Saving " + c.name))
-    }
 
   def inhabitants(c: City): Int = c.inhabitants
   // allCities and allCities are examples of using the variations of the
@@ -73,4 +72,3 @@ object KleisliUsage extends App {
   def index(i: Int) = data(i).name
   val allCitiesByIndex = allCities local index
   allCitiesByIndex(1).map(println)
-}

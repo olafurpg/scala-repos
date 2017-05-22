@@ -62,7 +62,7 @@ import org.joda.time.Instant
 import scalaz.NonEmptyList
 
 abstract class IngestProducer(args: Array[String])
-    extends RealisticEventMessage with AkkaDefaults {
+    extends RealisticEventMessage with AkkaDefaults
 
   lazy val config = loadConfig(args)
 
@@ -73,8 +73,8 @@ abstract class IngestProducer(args: Array[String])
   lazy val repeats = if (rawRepeats < 1) Int.MaxValue - 2 else rawRepeats
   lazy val verbose = config.getProperty("verbose", "true").toBoolean
 
-  def run() {
-    for (r <- 0 until repeats) {
+  def run()
+    for (r <- 0 until repeats)
       val start = System.nanoTime
 
       val samples = List(
@@ -106,17 +106,15 @@ abstract class IngestProducer(args: Array[String])
           "Time: %.02f Messages: %d Throughput: %.01f msgs/s Errors: %d"
             .format(
               seconds, totalMessages, totalMessages / seconds, totalErrors))
-    }
     close
-  }
 
   class TestRun(samples: List[(String, DistributedSampleSet[JObject])])
-      extends Runnable {
+      extends Runnable
     private var errors = 0
     val timeout = new Timeout(120000)
     def errorCount = errors
-    override def run() {
-      samples.foreach {
+    override def run()
+      samples.foreach
         case (path, sample) =>
           val event = Ingest("bogus",
                              Path(path),
@@ -126,25 +124,19 @@ abstract class IngestProducer(args: Array[String])
                              new Instant(),
                              StreamRef.Append)
 
-          0.until(messages).foreach { i =>
+          0.until(messages).foreach  i =>
             if (i % 10 == 0 && verbose)
               println("Sending to [%s]: %d".format(path, i))
-            try {
+            try
               send(event, timeout)
-            } catch {
+            catch
               case ex =>
                 ex.printStackTrace
                 errors += 1
-            }
-            if (delay > 0) {
+            if (delay > 0)
               Thread.sleep(delay)
-            }
-          }
-      }
-    }
-  }
 
-  def loadConfig(args: Array[String]): Properties = {
+  def loadConfig(args: Array[String]): Properties =
     if (args.length != 1) usage()
 
     val config = new Properties()
@@ -154,12 +146,10 @@ abstract class IngestProducer(args: Array[String])
 
     config.load(new FileReader(file))
     config
-  }
 
-  def usage() {
+  def usage()
     println(usageMessage)
     sys.exit(1)
-  }
 
   def usageMessage =
     """
@@ -174,13 +164,12 @@ repeats - number of of times to repeat test (default: 1)
 
   def send(event: Ingest, timeout: Timeout): Unit
   def close(): Unit = ()
-}
 
-object JsonLoader extends App with AkkaDefaults {
+object JsonLoader extends App with AkkaDefaults
   implicit val M: scalaz.Monad[Future] =
     new blueeyes.bkka.FutureMonad(defaultFutureDispatch)
 
-  def usage() {
+  def usage()
     println(
         """
 Usage:
@@ -188,23 +177,20 @@ Usage:
   command {host} {API key} {json data file}
 """
     )
-  }
 
   val client = new HttpClientXLightWeb
 
-  def run(url: String, apiKey: String, datafile: String) {
+  def run(url: String, apiKey: String, datafile: String)
     val data = IOUtils.readFileToString(new File(datafile)).unsafePerformIO
     val json = JParser.parseUnsafe(data)
-    json match {
+    json match
       case JArray(elements) => elements.foreach { send(url, apiKey, _) }
       case _ =>
         println(
             "Error the input file must contain an array of elements to insert")
         System.exit(1)
-    }
-  }
 
-  def send(url: String, apiKey: String, event: JValue) {
+  def send(url: String, apiKey: String, event: JValue)
 
     val f: Future[HttpResponse[JValue]] = client
       .path(url)
@@ -212,7 +198,7 @@ Usage:
       .contentType(application / MimeTypes.json)
       .post[JValue]("")(event)
     Await.ready(f, 10 seconds)
-    f.value match {
+    f.value match
       case Some(Right(HttpResponse(status, _, _, _))) if status.code == OK =>
         ()
       case Some(Right(HttpResponse(status, _, _, _))) =>
@@ -221,24 +207,19 @@ Usage:
         throw ex
       case _ =>
         throw new RuntimeException("Error processing insert request")
-    }
-  }
 
-  if (args.size < 3) {
+  if (args.size < 3)
     usage()
     System.exit(1)
-  } else {
+  else
     run(args(0), args(1), args(2))
-  }
 
   AkkaDefaults.actorSystem.shutdown
-}
 
-object WebappIngestProducer {
+object WebappIngestProducer
   def main(args: Array[String]) = new WebappIngestProducer(args).run()
-}
 
-class WebappIngestProducer(args: Array[String]) extends IngestProducer(args) {
+class WebappIngestProducer(args: Array[String]) extends IngestProducer(args)
 
   lazy val base =
     config.getProperty("serviceUrl", "http://localhost:30050/vfs/")
@@ -249,7 +230,7 @@ class WebappIngestProducer(args: Array[String]) extends IngestProducer(args) {
   implicit val M: scalaz.Monad[Future] =
     new blueeyes.bkka.FutureMonad(defaultFutureDispatch)
 
-  def send(event: Ingest, timeout: Timeout) {
+  def send(event: Ingest, timeout: Timeout)
     // FIXME: expects ingest to be of a single value only.
     val f: Future[HttpResponse[JValue]] = client
       .path(base)
@@ -257,7 +238,7 @@ class WebappIngestProducer(args: Array[String]) extends IngestProducer(args) {
       .contentType(application / MimeTypes.json)
       .post[JValue](event.path.toString)(event.data.head)
     Await.ready(f, 10 seconds)
-    f.value match {
+    f.value match
       case Some(Right(HttpResponse(status, _, _, _))) if status.code == OK =>
         ()
       case Some(Right(HttpResponse(status, _, _, _))) =>
@@ -266,8 +247,6 @@ class WebappIngestProducer(args: Array[String]) extends IngestProducer(args) {
         throw ex
       case _ =>
         throw new RuntimeException("Error processing insert request")
-    }
-  }
 
   override def usageMessage =
     super.usageMessage +
@@ -276,6 +255,5 @@ serviceUrl - base url for web application (default: http://localhost:30050/vfs/)
   """
 
   override def close(): Unit = AkkaDefaults.actorSystem.shutdown
-}
 
 // type WebappIngestBenchmark

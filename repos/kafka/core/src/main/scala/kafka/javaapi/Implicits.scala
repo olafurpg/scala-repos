@@ -18,13 +18,12 @@ package kafka.javaapi
 
 import kafka.utils.Logging
 
-private[javaapi] object Implicits extends Logging {
+private[javaapi] object Implicits extends Logging
 
   implicit def scalaMessageSetToJavaMessageSet(
       messageSet: kafka.message.ByteBufferMessageSet)
-    : kafka.javaapi.message.ByteBufferMessageSet = {
+    : kafka.javaapi.message.ByteBufferMessageSet =
     new kafka.javaapi.message.ByteBufferMessageSet(messageSet.buffer)
-  }
 
   implicit def toJavaFetchResponse(
       response: kafka.api.FetchResponse): kafka.javaapi.FetchResponse =
@@ -49,10 +48,7 @@ private[javaapi] object Implicits extends Logging {
     : kafka.javaapi.OffsetCommitResponse =
     new kafka.javaapi.OffsetCommitResponse(response)
 
-  implicit def optionToJavaRef[T](opt: Option[T]): T = {
-    opt match {
+  implicit def optionToJavaRef[T](opt: Option[T]): T =
+    opt match
       case Some(obj) => obj
       case None => null.asInstanceOf[T]
-    }
-  }
-}

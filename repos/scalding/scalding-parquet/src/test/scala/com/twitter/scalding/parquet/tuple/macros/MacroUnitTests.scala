@@ -40,11 +40,11 @@ case class SampleClassJ(a: Map[Int, String])
 
 case class SampleClassK(a: String, b: Map[SampleClassA, SampleClassB])
 
-class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
+class MacroUnitTests extends WordSpec with Matchers with MockitoSugar
 
-  "Macro case class parquet schema generator" should {
+  "Macro case class parquet schema generator" should
 
-    "Generate parquet schema for SampleClassA" in {
+    "Generate parquet schema for SampleClassA" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassA])
       val expectedSchema =
@@ -55,9 +55,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
           |}
         """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassB" in {
+    "Generate parquet schema for SampleClassB" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassB])
 
@@ -72,9 +71,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassC" in {
+    "Generate parquet schema for SampleClassC" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassC])
 
@@ -95,9 +93,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassD" in {
+    "Generate parquet schema for SampleClassD" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassD])
       val expectedSchema =
@@ -113,9 +110,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassE" in {
+    "Generate parquet schema for SampleClassE" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassE])
       val expectedSchema =
@@ -132,9 +128,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassG" in {
+    "Generate parquet schema for SampleClassG" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassG])
       val expectedSchema =
@@ -150,9 +145,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassH" in {
+    "Generate parquet schema for SampleClassH" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassH])
       val expectedSchema =
@@ -170,9 +164,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassI" in {
+    "Generate parquet schema for SampleClassI" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassI])
       val expectedSchema =
@@ -187,9 +180,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassJ" in {
+    "Generate parquet schema for SampleClassJ" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassJ])
       val expectedSchema =
@@ -204,9 +196,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
 
-    "Generate parquet schema for SampleClassK" in {
+    "Generate parquet schema for SampleClassK" in
       val schema = MessageTypeParser.parseMessageType(
           Macros.caseClassParquetSchema[SampleClassK])
       val expectedSchema =
@@ -231,12 +222,10 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
         |}
       """.stripMargin)
       schema shouldEqual expectedSchema
-    }
-  }
 
-  "Macro case class converters generator" should {
+  "Macro case class converters generator" should
 
-    "Generate converters for all primitive types" in {
+    "Generate converters for all primitive types" in
       val schema = Macros.caseClassParquetSchema[SampleClassE]
       val readSupport = Macros.caseClassParquetReadSupport[SampleClassE]
       val converter = readSupport.tupleConverter
@@ -267,9 +256,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
       converter.end()
       converter.currentValue shouldEqual SampleClassE(
           0, 1L, 2, d = true, 3F, 4D, "foo", 1)
-    }
 
-    "Generate converters for case class with nested class" in {
+    "Generate converters for case class with nested class" in
       val readSupport = Macros.caseClassParquetReadSupport[SampleClassB]
       val converter = readSupport.tupleConverter
       converter.start()
@@ -287,9 +275,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
       converter.end()
       converter.currentValue shouldEqual SampleClassB(SampleClassA(2, "foo"),
                                                       "toto")
-    }
 
-    "Generate converters for case class with optional nested class" in {
+    "Generate converters for case class with optional nested class" in
       val readSupport = Macros.caseClassParquetReadSupport[SampleClassF]
       val converter = readSupport.tupleConverter
       converter.start()
@@ -315,9 +302,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
       converter.end()
       converter.currentValue shouldEqual SampleClassF(
           0, Some(SampleClassB(SampleClassA(2, "foo"), "b1")), 4D)
-    }
 
-    "Generate converters for case class with list fields" in {
+    "Generate converters for case class with list fields" in
       val readSupport = Macros.caseClassParquetReadSupport[SampleClassH]
       val converter = readSupport.tupleConverter
       converter.start()
@@ -341,9 +327,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
 
       converter.currentValue shouldEqual SampleClassH(
           0, List(SampleClassA(2, "foo")))
-    }
 
-    "Generate converters for case class with map fields" in {
+    "Generate converters for case class with map fields" in
       val readSupport = Macros.caseClassParquetReadSupport[SampleClassK]
       val converter = readSupport.tupleConverter
       converter.start()
@@ -383,11 +368,9 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
           "foo",
           Map(SampleClassA(2, "bar") -> SampleClassB(SampleClassA(2, "bar"),
                                                      "b1")))
-    }
-  }
 
-  "Macro case class parquet write support generator" should {
-    "Generate write support for class with all the primitive type fields" in {
+  "Macro case class parquet write support generator" should
+    "Generate write support for class with all the primitive type fields" in
 
       val writeSupport = Macros.caseClassParquetWriteSupport[SampleClassE]
       val e = SampleClassE(0, 1L, 2, d = true, 3F, 4D, "foo", 1)
@@ -428,9 +411,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
                                      |write INT32 1
                                      |end field h at 7
                                      |end message""".stripMargin
-    }
 
-    "Generate write support for nested case class and optional fields" in {
+    "Generate write support for nested case class and optional fields" in
       val schemaString: String = Macros.caseClassParquetSchema[SampleClassF]
       val writeSupport = Macros.caseClassParquetWriteSupport[SampleClassF]
 
@@ -479,9 +461,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
                                      |write DOUBLE 4.0
                                      |end field c at 2
                                      |end message""".stripMargin
-    }
 
-    "Generate write support for case class with LIST fields" in {
+    "Generate write support for case class with LIST fields" in
       //test write tuple with list of primitive fields
       val schemaString: String = Macros.caseClassParquetSchema[SampleClassI]
       val writeSupport = Macros.caseClassParquetWriteSupport[SampleClassI]
@@ -554,9 +535,8 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
                                       |end group
                                       |end field b at 1
                                       |end message""".stripMargin
-    }
 
-    "Generate write support for case class with MAP fields" in {
+    "Generate write support for case class with MAP fields" in
       //test write tuple with map of primitive fields
       val schemaString: String = Macros.caseClassParquetSchema[SampleClassJ]
       val writeSupport = Macros.caseClassParquetWriteSupport[SampleClassJ]
@@ -643,12 +623,9 @@ class MacroUnitTests extends WordSpec with Matchers with MockitoSugar {
                                       |end group
                                       |end field b at 1
                                       |end message""".stripMargin
-    }
-  }
-}
 
 //class to simulate record consumer for testing
-class StringBuilderRecordConsumer extends RecordConsumer {
+class StringBuilderRecordConsumer extends RecordConsumer
   val sb = new StringBuilder
 
   override def startMessage(): Unit = sb.append("start message\n")
@@ -680,4 +657,3 @@ class StringBuilderRecordConsumer extends RecordConsumer {
   override def addInteger(i: Int): Unit = sb.append(s"write INT32 $i\n")
 
   def writeScenario = sb.toString()
-}

@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.{OneHotEncoder, StringIndexer}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object OneHotEncoderExample {
-  def main(args: Array[String]): Unit = {
+object OneHotEncoderExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("OneHotEncoderExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -56,6 +56,4 @@ object OneHotEncoderExample {
     encoded.select("id", "categoryVec").show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

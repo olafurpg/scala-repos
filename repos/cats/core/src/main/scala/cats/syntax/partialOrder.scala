@@ -3,12 +3,11 @@ package syntax
 
 import cats.macros.Ops
 
-trait PartialOrderSyntax extends EqSyntax {
+trait PartialOrderSyntax extends EqSyntax
   implicit def partialOrderSyntax[A : PartialOrder](a: A): PartialOrderOps[A] =
     new PartialOrderOps[A](a)
-}
 
-final class PartialOrderOps[A](lhs: A)(implicit A: PartialOrder[A]) {
+final class PartialOrderOps[A](lhs: A)(implicit A: PartialOrder[A])
   def >(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def >=(rhs: A): Boolean = macro Ops.binop[A, Boolean]
   def <(rhs: A): Boolean = macro Ops.binop[A, Boolean]
@@ -18,4 +17,3 @@ final class PartialOrderOps[A](lhs: A)(implicit A: PartialOrder[A]) {
   def tryCompare(rhs: A): Option[Int] = macro Ops.binop[A, Option[Int]]
   def pmin(rhs: A): Option[A] = macro Ops.binop[A, Option[A]]
   def pmax(rhs: A): Option[A] = macro Ops.binop[A, Option[A]]
-}

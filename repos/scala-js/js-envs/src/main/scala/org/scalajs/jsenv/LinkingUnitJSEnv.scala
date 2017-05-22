@@ -13,7 +13,7 @@ import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.linker.LinkingUnit
 import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
 
-trait LinkingUnitJSEnv extends JSEnv {
+trait LinkingUnitJSEnv extends JSEnv
 
   /** Symbols this [[LinkingUnitJSEnv]] needs present in the
     *  [[org.scalajs.core.tools.linker.LinkingUnit LinkingUnit]] it receives.
@@ -52,20 +52,18 @@ trait LinkingUnitJSEnv extends JSEnv {
     new LoadedUnit { val loadedUnit = linkingUnit }
 
   private[jsenv] trait LinkingUnitLoadedLibs
-      extends LoadedLibs with LinkingUnitJSEnv {
+      extends LoadedLibs with LinkingUnitJSEnv
     val symbolRequirements: SymbolRequirement =
       LinkingUnitJSEnv.this.symbolRequirements
 
     def jsRunner(preLibs: Seq[ResolvedJSDependency],
                  linkingUnit: LinkingUnit,
                  postLibs: Seq[ResolvedJSDependency],
-                 code: VirtualJSFile): JSRunner = {
+                 code: VirtualJSFile): JSRunner =
       LinkingUnitJSEnv.this.jsRunner(
           loadedLibs ++ preLibs, linkingUnit, postLibs, code)
-    }
-  }
 
-  private[jsenv] trait LoadedUnit extends JSEnv {
+  private[jsenv] trait LoadedUnit extends JSEnv
     val loadedUnit: LinkingUnit
 
     def name: String = LinkingUnitJSEnv.this.name
@@ -73,5 +71,3 @@ trait LinkingUnitJSEnv extends JSEnv {
     def jsRunner(
         libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner =
       LinkingUnitJSEnv.this.jsRunner(Nil, loadedUnit, libs, code)
-  }
-}

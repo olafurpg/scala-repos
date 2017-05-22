@@ -5,7 +5,7 @@ package refactoring.introduceField
   * Nikolay.Tropin
   * 7/17/13
   */
-class IntroduceFieldTests extends IntroduceFieldTestBase {
+class IntroduceFieldTests extends IntroduceFieldTestBase
   def testSimple() = doTest()
   def testSimpleReplaceAll() = doTest()
   def testSimpleReplaceOne() = doTest()
@@ -19,4 +19,3 @@ class IntroduceFieldTests extends IntroduceFieldTestBase {
   def testFromBaseConstructorAddEarlyDefs() = doTest()
   def testFromBaseConstructorToEarlyDefs() = doTest()
   def testFromBaseConstructorToEarlyDefs2() = doTest()
-}

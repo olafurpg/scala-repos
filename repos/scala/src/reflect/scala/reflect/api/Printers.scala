@@ -135,10 +135,10 @@ import java.io.{PrintWriter, StringWriter}
   *
   *  @group ReflectionAPI
   */
-trait Printers { self: Universe =>
+trait Printers  self: Universe =>
 
   /** @group Printers */
-  protected trait TreePrinter {
+  protected trait TreePrinter
     def print(args: Any*)
     protected var printTypes = false
     protected var printIds = false
@@ -158,13 +158,12 @@ trait Printers { self: Universe =>
     def withoutMirrors: this.type = { printMirrors = false; this }
     def withPositions: this.type = { printPositions = true; this }
     def withoutPositions: this.type = { printPositions = false; this }
-  }
 
   /** @group Printers */
   case class BooleanFlag(value: Option[Boolean])
 
   /** @group Printers */
-  object BooleanFlag {
+  object BooleanFlag
     import scala.language.implicitConversions
     implicit def booleanToBooleanFlag(value: Boolean): BooleanFlag =
       BooleanFlag(Some(value))
@@ -174,7 +173,6 @@ trait Printers { self: Universe =>
     implicit def settingToBooleanFlag(
         setting: MutableSettings#BooleanSetting): BooleanFlag =
       BooleanFlag(Some(setting.value))
-  }
 
   /** @group Printers */
   protected def render(what: Any,
@@ -184,7 +182,7 @@ trait Printers { self: Universe =>
                        printOwners: BooleanFlag = None,
                        printKinds: BooleanFlag = None,
                        printMirrors: BooleanFlag = None,
-                       printPositions: BooleanFlag = None): String = {
+                       printPositions: BooleanFlag = None): String =
     val buffer = new StringWriter()
     val writer = new PrintWriter(buffer)
     val printer = mkPrinter(writer)
@@ -204,7 +202,6 @@ trait Printers { self: Universe =>
     printer.print(what)
     writer.flush()
     buffer.toString
-  }
 
   /** By default trees are printed with `show`
     *  @group Printers
@@ -331,4 +328,3 @@ trait Printers { self: Universe =>
     * @group Printers
     */
   def showDecl(sym: Symbol): String
-}

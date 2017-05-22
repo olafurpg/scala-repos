@@ -26,13 +26,11 @@ import scala.collection.JavaConversions.asScalaBuffer
   *
   * @group Evaluation
   */
-abstract class JavaEngineParamsGenerator extends EngineParamsGenerator {
+abstract class JavaEngineParamsGenerator extends EngineParamsGenerator
 
   /** Set the list of [[EngineParams]].
     *
     * @param engineParams A list of engine params
     */
-  def setEngineParamsList(engineParams: java.util.List[_ <: EngineParams]) {
+  def setEngineParamsList(engineParams: java.util.List[_ <: EngineParams])
     engineParamsList = asScalaBuffer(engineParams)
-  }
-}

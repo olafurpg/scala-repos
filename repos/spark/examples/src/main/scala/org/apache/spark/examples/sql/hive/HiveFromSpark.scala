@@ -26,7 +26,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql._
 import org.apache.spark.sql.hive.HiveContext
 
-object HiveFromSpark {
+object HiveFromSpark
   case class Record(key: Int, value: String)
 
   // Copy kv1.txt file from classpath to temporary directory
@@ -35,7 +35,7 @@ object HiveFromSpark {
   kv1File.deleteOnExit()
   ByteStreams.copy(kv1Stream, Files.newOutputStreamSupplier(kv1File))
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val sparkConf = new SparkConf().setAppName("HiveFromSpark")
     val sc = new SparkContext(sparkConf)
 
@@ -64,9 +64,8 @@ object HiveFromSpark {
         "SELECT key, value FROM src WHERE key < 10 ORDER BY key")
 
     println("Result of RDD.map:")
-    val rddAsStrings = rddFromSql.rdd.map {
+    val rddAsStrings = rddFromSql.rdd.map
       case Row(key: Int, value: String) => s"Key: $key, Value: $value"
-    }
 
     // You can also register RDDs as temporary tables within a HiveContext.
     val rdd = sc.parallelize((1 to 100).map(i => Record(i, s"val_$i")))
@@ -79,6 +78,4 @@ object HiveFromSpark {
       .foreach(println)
 
     sc.stop()
-  }
-}
 // scalastyle:on println

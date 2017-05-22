@@ -137,10 +137,9 @@ case class UnacceptedResponseContentTypeRejection(
 case class UnacceptedResponseEncodingRejection(
     supported: immutable.Set[HttpEncoding])
     extends Rejection
-object UnacceptedResponseEncodingRejection {
+object UnacceptedResponseEncodingRejection
   def apply(supported: HttpEncoding): UnacceptedResponseEncodingRejection =
     UnacceptedResponseEncodingRejection(Set(supported))
-}
 
 /**
   * Rejection created by an [[akka.http.javadsl.server.values.HttpBasicAuthenticator]].
@@ -152,7 +151,7 @@ case class AuthenticationFailedRejection(
     challenge: HttpChallenge)
     extends Rejection
 
-object AuthenticationFailedRejection {
+object AuthenticationFailedRejection
 
   /**
     * Signals the cause of the failed authentication.
@@ -170,7 +169,6 @@ object AuthenticationFailedRejection {
     * are invalid.
     */
   case object CredentialsRejected extends Cause
-}
 
 /**
   * Rejection created by the 'authorize' directive.

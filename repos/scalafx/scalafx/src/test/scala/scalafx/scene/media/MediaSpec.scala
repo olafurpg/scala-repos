@@ -42,7 +42,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class MediaSpec
     extends SimpleSFXDelegateSpec[jfxsm.Media, Media](
-        classOf[jfxsm.Media], classOf[Media]) with UrlMedia {
+        classOf[jfxsm.Media], classOf[Media]) with UrlMedia
 
   override protected def getJavaClassInstance = new jfxsm.Media(url)
-}

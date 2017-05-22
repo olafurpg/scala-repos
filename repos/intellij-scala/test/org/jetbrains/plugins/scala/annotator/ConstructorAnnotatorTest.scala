@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScConstructor
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.types.Compatibility
 
-class ConstructorAnnotatorTest extends SimpleTestCase {
+class ConstructorAnnotatorTest extends SimpleTestCase
   final val Header = """
   class Seq[+A] 
   object Seq { def apply[A](a: A) = new Seq[A] } 
@@ -33,13 +33,11 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
   val iAmAScriptFile = ()
   """
 
-  def testEmpty() {
-    assertMatches(messages("")) {
+  def testEmpty()
+    assertMatches(messages(""))
       case Nil =>
-    }
-  }
 
-  def testFine() {
+  def testFine()
     val codes = Seq(
         "new A(0)",
         "new A(a = 0)",
@@ -56,52 +54,36 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
         "new E(new Z[Int])",
         "new Alias[Int](0)"
     )
-    for { code <- codes } {
-      assertMatches(messages(code)) {
+    for { code <- codes }
+      assertMatches(messages(code))
         case Nil =>
-      }
-    }
-  }
 
-  def testExcessArguments() {
-    assertMatches(messages("new A(0, 1)")) {
+  def testExcessArguments()
+    assertMatches(messages("new A(0, 1)"))
       case Error("1", "Too many arguments for constructor") :: Nil =>
-    }
-  }
 
-  def testMissedParameters() {
-    assertMatches(messages("new A")) {
+  def testMissedParameters()
+    assertMatches(messages("new A"))
       case Error(_, "Unspecified value parameters: a: Int") :: Nil =>
-    }
-    assertMatches(messages("new A()")) {
+    assertMatches(messages("new A()"))
       case Error(_, "Unspecified value parameters: a: Int") :: Nil =>
-    }
-    assertMatches(messages("new B[Int]()")) {
+    assertMatches(messages("new B[Int]()"))
       case Error(_, "Unspecified value parameters: a: X") :: Nil =>
-    }
-  }
 
-  def testNamedDuplicates() {
-    assertMatches(messages("new A(a = null, a = Unit)")) {
+  def testNamedDuplicates()
+    assertMatches(messages("new A(a = null, a = Unit)"))
       case Error("a", "Parameter specified multiple times") :: Error(
           "a", "Parameter specified multiple times") :: Nil =>
-    }
-  }
 
-  def testTypeMismatch() {
-    assertMatches(messages("new A(false)")) {
+  def testTypeMismatch()
+    assertMatches(messages("new A(false)"))
       case Error("false", "Type mismatch, expected: Int, actual: Boolean") :: Nil =>
-    }
-    assertMatches(messages("new B[Int](false)")) {
+    assertMatches(messages("new B[Int](false)"))
       case Error("false", "Type mismatch, expected: Int, actual: Boolean") :: Nil =>
-    }
-  }
 
-  def testMalformedSignature() {
-    assertMatches(messages("class Malformed(a: A*, b: B); new Malformed(0)")) {
+  def testMalformedSignature()
+    assertMatches(messages("class Malformed(a: A*, b: B); new Malformed(0)"))
       case Error("Malformed", "Constructor has malformed definition") :: Nil =>
-    }
-  }
 
   // TODO: Type Aliases
   //class A(a: Int)
@@ -114,7 +96,7 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
   //new AA[Int](0)
 
   def messages(@Language(value = "Scala", prefix = Header) code: String)
-    : List[Message] = {
+    : List[Message] =
     val annotator = new ConstructorAnnotator {}
     val mock = new AnnotatorHolderMock
 
@@ -123,14 +105,10 @@ class ConstructorAnnotatorTest extends SimpleTestCase {
     val seq = file.depthFirst.findByType(classOf[ScClass])
     Compatibility.seqClass = seq
 
-    try {
-      file.depthFirst.filterByType(classOf[ScConstructor]).foreach {
+    try
+      file.depthFirst.filterByType(classOf[ScConstructor]).foreach
         annotator.annotateConstructor(_, mock)
-      }
 
       mock.annotations
-    } finally {
+    finally
       Compatibility.seqClass = None
-    }
-  }
-}

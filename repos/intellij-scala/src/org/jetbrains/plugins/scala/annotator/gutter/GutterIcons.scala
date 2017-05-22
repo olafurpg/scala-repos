@@ -8,7 +8,7 @@ import com.intellij.openapi.util.IconLoader
   * User: Alexander Podkhalyuzin
   * Date: 31.10.2008
   */
-object GutterIcons {
+object GutterIcons
   val RECURSION_ICON =
     IconLoader.getIcon("/org/jetbrains/plugins/scala/gator/recursion.png")
   val TAIL_RECURSION_ICON =
@@ -26,4 +26,3 @@ object GutterIcons {
   val IMPLEMENTED_INTERFACE_MARKER_RENDERER =
     IMPLEMENTED_METHOD_MARKER_RENDERER
   val SUBCLASSED_CLASS_MARKER_RENDERER = OVERRIDEN_METHOD_MARKER_RENDERER
-}

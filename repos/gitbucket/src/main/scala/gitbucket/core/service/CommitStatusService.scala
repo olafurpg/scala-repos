@@ -10,7 +10,7 @@ import gitbucket.core.service.RepositoryService.RepositoryInfo
 import org.joda.time.LocalDateTime
 import gitbucket.core.model.Profile.dateColumnType
 
-trait CommitStatusService {
+trait CommitStatusService
 
   /** insert or update */
   def createCommitStatus(userName: String,
@@ -27,16 +27,14 @@ trait CommitStatusService {
             t.byCommit(userName, repositoryName, sha) &&
             t.context === context.bind)
       .map(_.commitStatusId)
-      .firstOption match {
-      case Some(id: Int) => {
+      .firstOption match
+      case Some(id: Int) =>
           CommitStatuses
             .filter(_.byPrimaryKey(id))
-            .map { t =>
+            .map  t =>
               (t.state, t.targetUrl, t.updatedDate, t.creator, t.description)
-            }
             .update((state, targetUrl, now, creator.userName, description))
           id
-        }
       case None =>
         (CommitStatuses returning CommitStatuses.map(_.commitStatusId)) +=
           CommitStatus(userName = userName,
@@ -49,7 +47,6 @@ trait CommitStatusService {
                        creator = creator.userName,
                        registeredDate = now,
                        updatedDate = now)
-    }
 
   def getCommitStatus(userName: String, repositoryName: String, id: Int)(
       implicit s: Session): Option[CommitStatus] =
@@ -95,4 +92,3 @@ trait CommitStatusService {
     CommitStatuses
       .filter(t => t.byCommit(userName, repositoryName, sha))
       .sortBy(_.updatedDate desc)
-}

@@ -37,7 +37,7 @@ import scalafx.scene.control.ButtonBar.ButtonData
 /**
   * Object companion for [[scalafx.scene.control.ButtonType]].
   */
-object ButtonType {
+object ButtonType
 
   /**
     * Converts a ScalaFX ButtonType to its JavaFX counterpart.
@@ -109,7 +109,6 @@ object ButtonType {
     * [[scalafx.scene.control.ButtonBar.ButtonData.BackPrevious]].
     */
   val Previous: ButtonType = jfxsc.ButtonType.PREVIOUS
-}
 
 /**
   *
@@ -123,7 +122,7 @@ object ButtonType {
   * @define ORIGINALDOC Original Documentation]].
   */
 class ButtonType(override val delegate: jfxsc.ButtonType)
-    extends SFXDelegate[jfxsc.ButtonType] {
+    extends SFXDelegate[jfxsc.ButtonType]
 
   def this(text: String) = this(new jfxsc.ButtonType(text))
 
@@ -139,4 +138,3 @@ class ButtonType(override val delegate: jfxsc.ButtonType)
     * Returns the text specified for this ButtonType in the constructor;
     */
   val text: String = delegate.getText
-}

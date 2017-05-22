@@ -7,7 +7,7 @@ import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 
 trait CoordinateSpace[V, @sp(Float, Double) F]
-    extends Any with InnerProductSpace[V, F] {
+    extends Any with InnerProductSpace[V, F]
   def dimensions: Int
 
   def coord(v: V, i: Int): F // = v dot axis(i)
@@ -20,19 +20,16 @@ trait CoordinateSpace[V, @sp(Float, Double) F]
 
   def basis: Vector[V] = Vector.tabulate(dimensions)(axis)
 
-  def dot(v: V, w: V): F = {
+  def dot(v: V, w: V): F =
     @tailrec def loop(sum: F, i: Int): F =
-      if (i < dimensions) {
+      if (i < dimensions)
         loop(scalar.plus(sum, scalar.times(coord(v, i), coord(w, i))), i + 1)
-      } else {
+      else
         sum
-      }
 
     loop(scalar.zero, 0)
-  }
-}
 
-object CoordinateSpace {
+object CoordinateSpace
   @inline final def apply[V, @sp(Float, Double) F](
       implicit V: CoordinateSpace[V, F]): CoordinateSpace[V, F] = V
 
@@ -44,4 +41,3 @@ object CoordinateSpace {
   def array[@sp(Float, Double) A : Field : ClassTag](
       dimensions: Int): CoordinateSpace[Array[A], A] =
     new ArrayCoordinateSpace[A](dimensions)
-}

@@ -1,4 +1,4 @@
-object SCL7388C {
+object SCL7388C
 
   class P[T, S]
   class G[T]
@@ -9,5 +9,4 @@ object SCL7388C {
 
   def a[T](p: P[_ <: Any, T]): G[T] = new G[T]
   val g: G[String] = a( /*start*/ new B(new PL) /*end*/ )
-}
 //SCL7388C.B[String]

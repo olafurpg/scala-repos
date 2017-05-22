@@ -39,9 +39,9 @@ import scalafx.scene.layout.{HBox, Priority, VBox}
   * @see scalafx.scene.image.ImageView
   * @resource /scalafx/ensemble/images/sanfran.jpg
   */
-class EnsembleImageProperties extends EnsembleExample {
+class EnsembleImageProperties extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     // We can set image properties directly during creation
     val url = this.getClass
       .getResource("/scalafx/ensemble/images/sanfran.jpg")
@@ -53,46 +53,39 @@ class EnsembleImageProperties extends EnsembleExample {
                   preserveRatio = false,
                   smooth = true))
 
-    val sample2 = new ImageView(new Image(url)) {
+    val sample2 = new ImageView(new Image(url))
       // Image can be resized to preferred width
       fitWidth = 200
       preserveRatio = true
-    }
 
-    val sample3 = new ImageView(new Image(url)) {
+    val sample3 = new ImageView(new Image(url))
       //image can be resized to preferred height
       fitHeight = 20
       preserveRatio = true
-    }
 
-    val sample4 = new ImageView(new Image(url)) {
+    val sample4 = new ImageView(new Image(url))
       // One can resize image without preserving ratio between height and width
       fitWidth = 40
       fitHeight = 80
       preserveRatio = false
       // The usage of the better filter
       smooth = true
-    }
 
-    val sample5 = new ImageView(new Image(url)) {
+    val sample5 = new ImageView(new Image(url))
       fitHeight = 60
       preserveRatio = true
       // Viewport is used for displaying the part of image
       viewport = new Rectangle2D(50, 200, width = 120, height = 60)
-    }
 
-    new VBox {
+    new VBox
       vgrow = Priority.Always
       hgrow = Priority.Always
       spacing = 10
       padding = Insets(20)
       children = List(
-          new HBox {
+          new HBox
             spacing = 5
             children = List(sample1, sample3, sample4, sample5)
-          },
+          ,
           sample2
       )
-    }
-  }
-}

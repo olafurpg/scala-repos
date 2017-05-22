@@ -17,18 +17,17 @@ import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import scala.collection.JavaConverters._
 
-object StackServer {
+object StackServer
   private[this] val newJvmFilter = new MkJvmFilter(Jvm())
 
   /**
     * Canonical Roles for each Server-related Stack modules.
     */
-  object Role extends Stack.Role("StackServer") {
+  object Role extends Stack.Role("StackServer")
     val serverDestTracing = Stack.Role("ServerDestTracing")
     val jvmTracing = Stack.Role("JvmTracing")
     val preparer = Stack.Role("preparer")
     val protoTracing = Stack.Role("protoTracing")
-  }
 
   /**
     * Creates a default finagle server [[com.twitter.finagle.Stack]].
@@ -49,7 +48,7 @@ object StackServer {
     * @see [[com.twitter.finagle.filter.MonitorFilter]]
     * @see [[com.twitter.finagle.filter.ServerStatsFilter]]
     */
-  def newStack[Req, Rep]: Stack[ServiceFactory[Req, Rep]] = {
+  def newStack[Req, Rep]: Stack[ServiceFactory[Req, Rep]] =
     val stk =
       new StackBuilder[ServiceFactory[Req, Rep]](stack.nilStack[Req, Rep])
 
@@ -85,14 +84,12 @@ object StackServer {
     stk.push(TraceInitializerFilter.serverModule)
     stk.push(MonitorFilter.module)
     stk.result
-  }
 
   /**
     * The default params used for StackServers.
     */
   val defaultParams: Stack.Params =
     Stack.Params.empty + Stats(ServerStatsReceiver)
-}
 
 /**
   * A [[com.twitter.finagle.Server Server]] that is
@@ -108,7 +105,7 @@ trait StackBasedServer[Req, Rep]
   */
 trait StackServer[Req, Rep]
     extends StackBasedServer[Req, Rep]
-    with Stack.Parameterized[StackServer[Req, Rep]] {
+    with Stack.Parameterized[StackServer[Req, Rep]]
 
   /** The current stack used in this StackServer. */
   def stack: Stack[ServiceFactory[Req, Rep]]
@@ -124,7 +121,6 @@ trait StackServer[Req, Rep]
   override def configured[P : Param](p: P): StackServer[Req, Rep]
 
   override def configured[P](psp: (P, Param[P])): StackServer[Req, Rep]
-}
 
 /**
   * A standard template implementation for
@@ -139,7 +135,7 @@ trait StackServer[Req, Rep]
 trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
     extends StackServer[Req, Rep] with Stack.Parameterized[This]
     with CommonParams[This] with WithServerTransport[This]
-    with WithServerAdmissionControl[This] {
+    with WithServerAdmissionControl[This]
   self =>
 
   /**
@@ -178,10 +174,9 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
   /**
     * Creates a new StackServer with parameter `psp._1` and Stack Param type `psp._2`.
     */
-  override def configured[P](psp: (P, Stack.Param[P])): This = {
+  override def configured[P](psp: (P, Stack.Param[P])): This =
     val (p, sp) = psp
     configured(p)(sp)
-  }
 
   /**
     * Creates a new StackServer with `params` used to configure this StackServer's `stack`.
@@ -203,7 +198,7 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
 
   def serve(addr: SocketAddress,
             factory: ServiceFactory[Req, Rep]): ListeningServer =
-    new ListeningServer with CloseAwaitably {
+    new ListeningServer with CloseAwaitably
       // Ensure that we have performed global initialization.
       com.twitter.finagle.Init()
 
@@ -227,12 +222,11 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
       // Hydrates a new ClientConnection with connection information from the
       // given `transport`. ClientConnection instances are used to
       // thread this through a finagle server stack.
-      def newConn(transport: Transport[In, Out]) = new ClientConnection {
+      def newConn(transport: Transport[In, Out]) = new ClientConnection
         val remoteAddress = transport.remoteAddress
         val localAddress = transport.localAddress
         def close(deadline: Time) = transport.close(deadline)
         val onClose = transport.onClose.map(_ => ())
-      }
 
       val statsReceiver =
         if (serverLabel.isEmpty) stats
@@ -250,8 +244,8 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
       // Listen over `addr` and serve traffic from incoming transports to
       // `serviceFactory` via `newDispatcher`.
       val listener = server.newListener()
-      val underlying = listener.listen(addr) { transport =>
-        serviceFactory(newConn(transport)) respond {
+      val underlying = listener.listen(addr)  transport =>
+        serviceFactory(newConn(transport)) respond
           case Return(service) =>
             val d = server.newDispatcher(transport, service)
             connections.add(d)
@@ -271,13 +265,11 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
             // We give it a generous amount of time to shut down the session to
             // improve our chances of being able to do so gracefully.
             d.close(10.seconds)
-        }
-      }
 
       ServerRegistry.register(
           underlying.boundAddress.toString, server.stack, server.params)
 
-      protected def closeServer(deadline: Time) = closeAwaitably {
+      protected def closeServer(deadline: Time) = closeAwaitably
         // Here be dragons
         // We want to do four things here in this order:
         // 1. close the listening socket
@@ -296,8 +288,5 @@ trait StdStackServer[Req, Rep, This <: StdStackServer[Req, Rep, This]]
 
         // and once they're drained we can then wait on the listener physically closing them
         Closable.all(everythingElse: _*).close(deadline) before ulClosed
-      }
 
       def boundAddress = underlying.boundAddress
-    }
-}

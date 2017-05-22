@@ -34,7 +34,7 @@ class ConsumerIterator[K, V](
     private val keyDecoder: Decoder[K],
     private val valueDecoder: Decoder[V],
     val clientId: String)
-    extends IteratorTemplate[MessageAndMetadata[K, V]] with Logging {
+    extends IteratorTemplate[MessageAndMetadata[K, V]] with Logging
 
   private val current: AtomicReference[Iterator[MessageAndOffset]] =
     new AtomicReference(null)
@@ -43,7 +43,7 @@ class ConsumerIterator[K, V](
   private val consumerTopicStats =
     ConsumerTopicStatsRegistry.getConsumerTopicStat(clientId)
 
-  override def next(): MessageAndMetadata[K, V] = {
+  override def next(): MessageAndMetadata[K, V] =
     val item = super.next()
     if (consumedOffset < 0)
       throw new KafkaException(
@@ -55,40 +55,35 @@ class ConsumerIterator[K, V](
     consumerTopicStats.getConsumerTopicStats(topic).messageRate.mark()
     consumerTopicStats.getConsumerAllTopicStats().messageRate.mark()
     item
-  }
 
-  protected def makeNext(): MessageAndMetadata[K, V] = {
+  protected def makeNext(): MessageAndMetadata[K, V] =
     var currentDataChunk: FetchedDataChunk = null
     // if we don't have an iterator, get one
     var localCurrent = current.get()
-    if (localCurrent == null || !localCurrent.hasNext) {
+    if (localCurrent == null || !localCurrent.hasNext)
       if (consumerTimeoutMs < 0) currentDataChunk = channel.take
-      else {
+      else
         currentDataChunk = channel.poll(
             consumerTimeoutMs, TimeUnit.MILLISECONDS)
-        if (currentDataChunk == null) {
+        if (currentDataChunk == null)
           // reset state to make the iterator re-iterable
           resetState()
           throw new ConsumerTimeoutException
-        }
-      }
-      if (currentDataChunk eq ZookeeperConsumerConnector.shutdownCommand) {
+      if (currentDataChunk eq ZookeeperConsumerConnector.shutdownCommand)
         debug("Received the shutdown command")
         return allDone
-      } else {
+      else
         currentTopicInfo = currentDataChunk.topicInfo
         val cdcFetchOffset = currentDataChunk.fetchOffset
         val ctiConsumeOffset = currentTopicInfo.getConsumeOffset
-        if (ctiConsumeOffset < cdcFetchOffset) {
+        if (ctiConsumeOffset < cdcFetchOffset)
           error(
               "consumed offset: %d doesn't match fetch offset: %d for %s;\n Consumer may lose data"
                 .format(ctiConsumeOffset, cdcFetchOffset, currentTopicInfo))
           currentTopicInfo.resetConsumeOffset(cdcFetchOffset)
-        }
         localCurrent = currentDataChunk.messages.iterator
 
         current.set(localCurrent)
-      }
       // if we just updated the current chunk and it is empty that means the fetch size is too small!
       if (currentDataChunk.messages.validBytes == 0)
         throw new MessageSizeTooLargeException(
@@ -97,13 +92,11 @@ class ConsumerIterator[K, V](
               .format(currentDataChunk.topicInfo.topic,
                       currentDataChunk.topicInfo.partitionId,
                       currentDataChunk.fetchOffset))
-    }
     var item = localCurrent.next()
     // reject the messages that have already been consumed
     while (item.offset < currentTopicInfo.getConsumeOffset &&
-    localCurrent.hasNext) {
+    localCurrent.hasNext)
       item = localCurrent.next()
-    }
     consumedOffset = item.nextOffset
 
     item.message.ensureValid() // validate checksum of message to ensure it is valid
@@ -116,12 +109,9 @@ class ConsumerIterator[K, V](
                            item.message.timestampType,
                            keyDecoder,
                            valueDecoder)
-  }
 
-  def clearCurrentChunk() {
+  def clearCurrentChunk()
     debug("Clearing the current data chunk for this consumer iterator")
     current.set(null)
-  }
-}
 
 class ConsumerTimeoutException() extends RuntimeException()

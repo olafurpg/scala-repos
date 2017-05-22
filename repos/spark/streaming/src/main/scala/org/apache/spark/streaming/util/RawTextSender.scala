@@ -32,15 +32,14 @@ import org.apache.spark.util.IntParam
   * A helper program that sends blocks of Kryo-serialized text strings out on a socket at a
   * specified rate. Used to feed data into RawInputDStream.
   */
-private[streaming] object RawTextSender extends Logging {
-  def main(args: Array[String]) {
-    if (args.length != 4) {
+private[streaming] object RawTextSender extends Logging
+  def main(args: Array[String])
+    if (args.length != 4)
       // scalastyle:off println
       System.err.println(
           "Usage: RawTextSender <port> <file> <blockSize> <bytesPerSec>")
       // scalastyle:on println
       System.exit(1)
-    }
     // Parse the arguments using a pattern match
     val Array(IntParam(port), file, IntParam(blockSize), IntParam(bytesPerSec)) =
       args
@@ -51,10 +50,9 @@ private[streaming] object RawTextSender extends Logging {
     val ser = new KryoSerializer(new SparkConf()).newInstance()
     val serStream = ser.serializeStream(bufferStream)
     var i = 0
-    while (bufferStream.size < blockSize) {
+    while (bufferStream.size < blockSize)
       serStream.writeObject(lines(i))
       i = (i + 1) % lines.length
-    }
     val array = bufferStream.toByteArray
 
     val countBuf = ByteBuffer.wrap(new Array[Byte](4))
@@ -64,22 +62,17 @@ private[streaming] object RawTextSender extends Logging {
     val serverSocket = new ServerSocket(port)
     logInfo("Listening on port " + port)
 
-    while (true) {
+    while (true)
       val socket = serverSocket.accept()
       logInfo("Got a new connection")
       val out = new RateLimitedOutputStream(
           socket.getOutputStream, bytesPerSec)
-      try {
-        while (true) {
+      try
+        while (true)
           out.write(countBuf.array)
           out.write(array)
-        }
-      } catch {
+      catch
         case e: IOException =>
           logError("Client disconnected")
-      } finally {
+      finally
         socket.close()
-      }
-    }
-  }
-}

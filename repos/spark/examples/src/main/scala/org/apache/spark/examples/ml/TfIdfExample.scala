@@ -24,9 +24,9 @@ import org.apache.spark.ml.feature.{HashingTF, IDF, Tokenizer}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object TfIdfExample {
+object TfIdfExample
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("TfIdfExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -53,6 +53,4 @@ object TfIdfExample {
     val rescaledData = idfModel.transform(featurizedData)
     rescaledData.select("features", "label").take(3).foreach(println)
     // $example off$
-  }
-}
 // scalastyle:on println

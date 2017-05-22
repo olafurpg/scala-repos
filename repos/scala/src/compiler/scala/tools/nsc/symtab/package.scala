@@ -1,6 +1,5 @@
 package scala.tools.nsc
 
-package object symtab {
+package object symtab
 
   val Flags = scala.reflect.internal.Flags
-}

@@ -13,7 +13,7 @@ import scala.tools.nsc.doc.html.HtmlPage
 import scala.tools.nsc.doc.model.diagram.Diagram
 import scala.tools.nsc.doc.model.DocTemplateEntity
 
-trait DiagramGenerator {
+trait DiagramGenerator
 
   /**
     * Generates a visualization of the internal representation
@@ -24,4 +24,3 @@ trait DiagramGenerator {
     * @return    The HTML to be embedded in the Scaladoc page
     */
   def generate(d: Diagram, t: DocTemplateEntity, p: HtmlPage): NodeSeq
-}

@@ -29,7 +29,7 @@ import org.apache.spark.sql.types.StructType
 /**
   * Params for [[TrainValidationSplit]] and [[TrainValidationSplitModel]].
   */
-private[ml] trait TrainValidationSplitParams extends ValidatorParams {
+private[ml] trait TrainValidationSplitParams extends ValidatorParams
 
   /**
     * Param for ratio between train and validation data. Must be between 0 and 1.
@@ -46,7 +46,6 @@ private[ml] trait TrainValidationSplitParams extends ValidatorParams {
   def getTrainRatio: Double = $(trainRatio)
 
   setDefault(trainRatio -> 0.75)
-}
 
 /**
   * :: Experimental ::
@@ -60,7 +59,7 @@ private[ml] trait TrainValidationSplitParams extends ValidatorParams {
 class TrainValidationSplit @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
     extends Estimator[TrainValidationSplitModel]
-    with TrainValidationSplitParams with Logging {
+    with TrainValidationSplitParams with Logging
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("tvs"))
@@ -83,7 +82,7 @@ class TrainValidationSplit @Since("1.5.0")(
   def setTrainRatio(value: Double): this.type = set(trainRatio, value)
 
   @Since("1.5.0")
-  override def fit(dataset: DataFrame): TrainValidationSplitModel = {
+  override def fit(dataset: DataFrame): TrainValidationSplitModel =
     val schema = dataset.schema
     transformSchema(schema, logging = true)
     val sqlCtx = dataset.sqlContext
@@ -103,14 +102,13 @@ class TrainValidationSplit @Since("1.5.0")(
     val models = est.fit(trainingDataset, epm).asInstanceOf[Seq[Model[_]]]
     trainingDataset.unpersist()
     var i = 0
-    while (i < numModels) {
+    while (i < numModels)
       // TODO: duplicate evaluator to take extra params from input
       val metric =
         eval.evaluate(models(i).transform(validationDataset, epm(i)))
       logDebug(s"Got metric $metric for model trained with ${epm(i)}.")
       metrics(i) += metric
       i += 1
-    }
     validationDataset.unpersist()
 
     logInfo(s"Train validation split metrics: ${metrics.toSeq}")
@@ -122,24 +120,19 @@ class TrainValidationSplit @Since("1.5.0")(
     val bestModel = est.fit(dataset, epm(bestIndex)).asInstanceOf[Model[_]]
     copyValues(
         new TrainValidationSplitModel(uid, bestModel, metrics).setParent(this))
-  }
 
   @Since("1.5.0")
   override def transformSchema(schema: StructType): StructType =
     transformSchemaImpl(schema)
 
   @Since("1.5.0")
-  override def copy(extra: ParamMap): TrainValidationSplit = {
+  override def copy(extra: ParamMap): TrainValidationSplit =
     val copied = defaultCopy(extra).asInstanceOf[TrainValidationSplit]
-    if (copied.isDefined(estimator)) {
+    if (copied.isDefined(estimator))
       copied.setEstimator(copied.getEstimator.copy(extra))
-    }
-    if (copied.isDefined(evaluator)) {
+    if (copied.isDefined(evaluator))
       copied.setEvaluator(copied.getEvaluator.copy(extra))
-    }
     copied
-  }
-}
 
 /**
   * :: Experimental ::
@@ -155,25 +148,21 @@ class TrainValidationSplitModel private[ml](
     @Since("1.5.0") override val uid: String,
     @Since("1.5.0") val bestModel: Model[_],
     @Since("1.5.0") val validationMetrics: Array[Double])
-    extends Model[TrainValidationSplitModel] with TrainValidationSplitParams {
+    extends Model[TrainValidationSplitModel] with TrainValidationSplitParams
 
   @Since("1.5.0")
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
     bestModel.transform(dataset)
-  }
 
   @Since("1.5.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     bestModel.transformSchema(schema)
-  }
 
   @Since("1.5.0")
-  override def copy(extra: ParamMap): TrainValidationSplitModel = {
+  override def copy(extra: ParamMap): TrainValidationSplitModel =
     val copied = new TrainValidationSplitModel(
         uid,
         bestModel.copy(extra).asInstanceOf[Model[_]],
         validationMetrics.clone())
     copyValues(copied, extra)
-  }
-}

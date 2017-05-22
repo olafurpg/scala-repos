@@ -4,7 +4,7 @@ import gitbucket.core.model.SshKey
 import gitbucket.core.model.Profile._
 import profile.simple._
 
-trait SshKeyService {
+trait SshKeyService
 
   def addPublicKey(userName: String, title: String, publicKey: String)(
       implicit s: Session): Unit =
@@ -17,4 +17,3 @@ trait SshKeyService {
   def deletePublicKey(userName: String, sshKeyId: Int)(
       implicit s: Session): Unit =
     SshKeys filter (_.byPrimaryKey(userName, sshKeyId)) delete
-}

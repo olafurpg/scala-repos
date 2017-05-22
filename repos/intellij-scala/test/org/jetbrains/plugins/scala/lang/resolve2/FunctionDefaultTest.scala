@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class FunctionDefaultTest extends ResolveTestBase {
-  override def folderPath: String = {
+class FunctionDefaultTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "function/default/"
-  }
 
   def testFirstAsOne() = doTest()
   def testFirstAsTwo() = doTest()
@@ -27,4 +26,3 @@ class FunctionDefaultTest extends ResolveTestBase {
   def testTwoAsOne() = doTest()
   def testTwoAsThree() = doTest()
   def testTwoAsTwo() = doTest()
-}

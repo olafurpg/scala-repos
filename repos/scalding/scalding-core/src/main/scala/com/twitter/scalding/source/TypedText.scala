@@ -12,7 +12,7 @@ import com.twitter.scalding.typed.TypedSink
   */
 case class TypedSep(str: String) extends AnyVal
 
-object TypedText {
+object TypedText
 
   val TAB = TypedSep("\t")
   val ONE = TypedSep("\u0001")
@@ -32,52 +32,44 @@ object TypedText {
     * Prefix might be "/logs/awesome"
     */
   def hourlyTsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] =
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathTypedText[T](
         TAB, prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
-  }
   def hourlyOsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] =
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathTypedText[T](
         ONE, prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
-  }
   def hourlyCsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] =
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathTypedText[T](
         COMMA, prefix + TimePathedSource.YEAR_MONTH_DAY_HOUR + "/*")
-  }
   def dailyTsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] =
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathTypedText[T](
         TAB, prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
-  }
   def dailyOsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] =
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathTypedText[T](
         ONE, prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
-  }
   def dailyCsv[T](prefix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] =
     require(prefix.last != '/', "prefix should not include trailing /")
     new TimePathTypedText[T](
         COMMA, prefix + TimePathedSource.YEAR_MONTH_DAY + "/*")
-  }
   def dailyPrefixSuffixOsv[T](prefix: String, suffix: String)(
-      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] = {
+      implicit dr: DateRange, td: TypeDescriptor[T]): TypedTextDelimited[T] =
     require(prefix.last != '/', "prefix should not include trailing /")
     require(suffix.head == '/', "suffix should include a preceding /")
     new TimePathTypedText[T](
         ONE, prefix + TimePathedSource.YEAR_MONTH_DAY + suffix + "/*")
-  }
-}
 
 trait TypedTextDelimited[T]
-    extends SchemedSource with Mappable[T] with TypedSink[T] {
+    extends SchemedSource with Mappable[T] with TypedSink[T]
   def typeDescriptor: TypeDescriptor[T]
 
   protected def separator: TypedSep
@@ -120,27 +112,23 @@ trait TypedTextDelimited[T]
                             null /* quote */,
                             typeDescriptor.fields.getTypesClasses,
                             safe).asInstanceOf[Scheme[_, _, _, _, _]])
-}
 
 class TimePathTypedText[T](
     sep: TypedSep, path: String)(implicit dr: DateRange, td: TypeDescriptor[T])
     extends TimePathedSource(path, dr, DateOps.UTC)
-    with TypedTextDelimited[T] {
+    with TypedTextDelimited[T]
   override def typeDescriptor = td
   protected override def separator = sep
-}
 
 class MostRecentTypedText[T](
     sep: TypedSep, path: String)(implicit dr: DateRange, td: TypeDescriptor[T])
     extends MostRecentGoodSource(path, dr, DateOps.UTC)
-    with TypedTextDelimited[T] {
+    with TypedTextDelimited[T]
   override def typeDescriptor = td
   protected override def separator = sep
-}
 
 class FixedTypedText[T](sep: TypedSep, path: String*)(
     implicit td: TypeDescriptor[T])
-    extends FixedPathSource(path: _*) with TypedTextDelimited[T] {
+    extends FixedPathSource(path: _*) with TypedTextDelimited[T]
   override def typeDescriptor = td
   protected override def separator = sep
-}

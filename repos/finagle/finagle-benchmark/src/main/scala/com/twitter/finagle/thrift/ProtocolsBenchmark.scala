@@ -9,12 +9,11 @@ import org.openjdk.jmh.annotations._
 import scala.util.Random
 
 @State(Scope.Benchmark)
-class ProtocolsBenchmark extends StdBenchAnnotations {
+class ProtocolsBenchmark extends StdBenchAnnotations
 
-  private val LooongStrings: Array[String] = {
+  private val LooongStrings: Array[String] =
     val rnd = new Random(514291442)
     Array(200, 500, 1000, 2000).map(rnd.nextString)
-  }
 
   private[this] val ShortStrings = Array(
       "abcde",
@@ -39,23 +38,20 @@ class ProtocolsBenchmark extends StdBenchAnnotations {
   private[this] var protocolsProtocol: TProtocol = _
 
   @Setup(Level.Iteration)
-  def setup(): Unit = {
+  def setup(): Unit =
     baselineProtocol = new TBinaryProtocol(ttransport)
     protocolsProtocol = Protocols
       .binaryFactory(statsReceiver = NullStatsReceiver)
       .getProtocol(ttransport)
-  }
 
   private[this] def writeStrings(
-      ss: Array[String], tprotocol: TProtocol): Int = {
+      ss: Array[String], tprotocol: TProtocol): Int =
     ttransport.reset()
     var i = 0
-    while (i < ss.length) {
+    while (i < ss.length)
       tprotocol.writeString(ss(i))
       i += 1
-    }
     i
-  }
 
   @Benchmark
   def writeStringShortBaseline(): Int =
@@ -80,4 +76,3 @@ class ProtocolsBenchmark extends StdBenchAnnotations {
   @Benchmark
   def writeStringMultiByteProtocols(): Int =
     writeStrings(MultiByteStrings, protocolsProtocol)
-}

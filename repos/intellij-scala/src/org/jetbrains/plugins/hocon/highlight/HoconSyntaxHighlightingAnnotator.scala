@@ -4,17 +4,17 @@ import com.intellij.lang.annotation.{AnnotationHolder, Annotator}
 import com.intellij.psi.PsiElement
 import org.jetbrains.plugins.hocon.HoconConstants
 
-class HoconSyntaxHighlightingAnnotator extends Annotator {
+class HoconSyntaxHighlightingAnnotator extends Annotator
 
   import org.jetbrains.plugins.hocon.CommonUtil._
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
   import org.jetbrains.plugins.hocon.parser.HoconElementSets._
   import org.jetbrains.plugins.hocon.parser.HoconElementType._
 
-  def annotate(element: PsiElement, holder: AnnotationHolder) {
+  def annotate(element: PsiElement, holder: AnnotationHolder)
     lazy val parentType = element.getParent.getNode.getElementType
     lazy val firstChildType = element.getFirstChild.getNode.getElementType
-    element.getNode.getElementType match {
+    element.getNode.getElementType match
       case Null =>
         holder
           .createInfoAnnotation(element, null)
@@ -36,7 +36,7 @@ class HoconSyntaxHighlightingAnnotator extends Annotator {
           .setTextAttributes(HoconHighlighterColors.Include)
 
       case UnquotedChars if parentType == Included =>
-        if (HoconConstants.IncludeQualifiers.contains(element.getText)) {
+        if (HoconConstants.IncludeQualifiers.contains(element.getText))
           val TextRange(start, end) = element.getTextRange
           holder
             .createInfoAnnotation(TextRange(start, end - 1), null)
@@ -44,18 +44,16 @@ class HoconSyntaxHighlightingAnnotator extends Annotator {
           holder
             .createInfoAnnotation(TextRange(end - 1, end), null)
             .setTextAttributes(HoconHighlighterColors.IncludeModifierParens)
-        } else if (element.getText == ")") {
+        else if (element.getText == ")")
           holder
             .createInfoAnnotation(element, null)
             .setTextAttributes(HoconHighlighterColors.IncludeModifierParens)
-        }
 
       case KeyPart if firstChildType == UnquotedString =>
         val textAttributesKey =
-          element.getParent.getParent.getNode.getElementType match {
+          element.getParent.getParent.getNode.getElementType match
             case Path => HoconHighlighterColors.SubstitutionKey
             case KeyedField.extractor() => HoconHighlighterColors.EntryKey
-          }
         holder
           .createInfoAnnotation(element, null)
           .setTextAttributes(textAttributesKey)
@@ -66,6 +64,3 @@ class HoconSyntaxHighlightingAnnotator extends Annotator {
           .setTextAttributes(HoconHighlighterColors.PathSeparator)
 
       case _ =>
-    }
-  }
-}

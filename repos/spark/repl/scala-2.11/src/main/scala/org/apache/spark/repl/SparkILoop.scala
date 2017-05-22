@@ -30,12 +30,12 @@ import scala.tools.nsc.util.stringFromStream
   *  A Spark-specific interactive shell.
   */
 class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
-    extends ILoop(in0, out) {
+    extends ILoop(in0, out)
   def this(in0: BufferedReader, out: JPrintWriter) = this(Some(in0), out)
   def this() = this(None, new JPrintWriter(Console.out, true))
 
-  def initializeSpark() {
-    intp.beQuietDuring {
+  def initializeSpark()
+    intp.beQuietDuring
       processLine("""
         @transient val sc = {
           val _sc = org.apache.spark.repl.Main.createSparkContext()
@@ -55,11 +55,9 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
       processLine("import sqlContext.implicits._")
       processLine("import sqlContext.sql")
       processLine("import org.apache.spark.sql.functions._")
-    }
-  }
 
   /** Print a welcome message */
-  override def printWelcome() {
+  override def printWelcome()
     import org.apache.spark.SPARK_VERSION
     echo("""Welcome to
       ____              __
@@ -73,7 +71,6 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
     echo(welcomeMsg)
     echo("Type in expressions to have them evaluated.")
     echo("Type :help for more information.")
-  }
 
   import LoopCommand.{cmd, nullary}
 
@@ -92,23 +89,21 @@ class SparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
     * sees any files, so that the Spark context is visible in those files. This is a bit of a
     * hack, but there isn't another hook available to us at this point.
     */
-  override def loadFiles(settings: Settings): Unit = {
+  override def loadFiles(settings: Settings): Unit =
     initializeSpark()
     super.loadFiles(settings)
-  }
-}
 
-object SparkILoop {
+object SparkILoop
 
   /**
     * Creates an interpreter loop with default settings and feeds
     * the given code to it as input.
     */
-  def run(code: String, sets: Settings = new Settings): String = {
+  def run(code: String, sets: Settings = new Settings): String =
     import java.io.{BufferedReader, StringReader, OutputStreamWriter}
 
-    stringFromStream { ostream =>
-      Console.withOut(ostream) {
+    stringFromStream  ostream =>
+      Console.withOut(ostream)
         val input = new BufferedReader(new StringReader(code))
         val output = new JPrintWriter(new OutputStreamWriter(ostream), true)
         val repl = new SparkILoop(input, output)
@@ -117,8 +112,4 @@ object SparkILoop {
           sets.classpath.value = sys.props("java.class.path")
 
         repl process sets
-      }
-    }
-  }
   def run(lines: List[String]): String = run(lines.map(_ + "\n").mkString)
-}

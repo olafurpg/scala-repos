@@ -2,7 +2,7 @@ package com.twitter.finagle.param
 
 import com.twitter.finagle.Stack
 
-trait WithClientAdmissionControl[A <: Stack.Parameterized[A]] {
+trait WithClientAdmissionControl[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -10,4 +10,3 @@ trait WithClientAdmissionControl[A <: Stack.Parameterized[A]] {
     */
   val withAdmissionControl: ClientAdmissionControlParams[A] =
     new ClientAdmissionControlParams(this)
-}

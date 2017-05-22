@@ -33,17 +33,15 @@ import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyIntegerProperty
 import scalafx.delegate.SFXDelegate
 
-object IndexedCell {
+object IndexedCell
   implicit def sfxIndexedCell2jfx[T](c: IndexedCell[T]): jfxsc.IndexedCell[T] =
     if (c != null) c.delegate else null
-}
 
 class IndexedCell[T](
     override val delegate: jfxsc.IndexedCell[T] = new jfxsc.IndexedCell[T])
-    extends Cell(delegate) with SFXDelegate[jfxsc.IndexedCell[T]] {
+    extends Cell(delegate) with SFXDelegate[jfxsc.IndexedCell[T]]
 
   /**
     * The location of this cell in the virtualized control (e.g: ListView, TreeView, TableView, etc).
     */
   def index: ReadOnlyIntegerProperty = delegate.indexProperty
-}

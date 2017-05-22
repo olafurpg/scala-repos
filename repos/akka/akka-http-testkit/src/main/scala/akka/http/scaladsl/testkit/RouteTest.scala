@@ -26,7 +26,7 @@ import FastFuture._
 
 trait RouteTest
     extends RequestBuilding with WSTestRequestBuilding
-    with RouteTestResultComponent with MarshallingTestUtils {
+    with RouteTestResultComponent with MarshallingTestUtils
   this: TestFrameworkInterface ⇒
 
   /** Override to supply a custom ActorSystem */
@@ -37,13 +37,12 @@ trait RouteTest
     clazz.getName.replace('.', '-').replace('_', '-').filter(_ != '$')
 
   def testConfigSource: String = ""
-  def testConfig: Config = {
+  def testConfig: Config =
     val source = testConfigSource
     val config =
       if (source.isEmpty) ConfigFactory.empty()
       else ConfigFactory.parseString(source)
     config.withFallback(ConfigFactory.load())
-  }
   implicit val system = createActorSystem()
   implicit def executor = system.dispatcher
   implicit val materializer = ActorMaterializer()
@@ -68,7 +67,7 @@ trait RouteTest
   def responseEntity: HttpEntity = result.entity
   def chunks: immutable.Seq[HttpEntity.ChunkStreamPart] = result.chunks
   def entityAs[T : FromEntityUnmarshaller : ClassTag](
-      implicit timeout: Duration = 1.second): T = {
+      implicit timeout: Duration = 1.second): T =
     def msg(e: Throwable) =
       s"Could not unmarshal entity to type '${implicitly[ClassTag[T]]}' for `entityAs` assertion: $e\n\nResponse was: $responseSafe"
     Await.result(Unmarshal(responseEntity)
@@ -76,9 +75,8 @@ trait RouteTest
                    .fast
                    .recover[T] { case error ⇒ failTest(msg(error)) },
                  timeout)
-  }
   def responseAs[T : FromResponseUnmarshaller : ClassTag](
-      implicit timeout: Duration = 1.second): T = {
+      implicit timeout: Duration = 1.second): T =
     def msg(e: Throwable) =
       s"Could not unmarshal response to type '${implicitly[ClassTag[T]]}' for `responseAs` assertion: $e\n\nResponse was: $responseSafe"
     Await.result(Unmarshal(response)
@@ -86,7 +84,6 @@ trait RouteTest
                    .fast
                    .recover[T] { case error ⇒ failTest(msg(error)) },
                  timeout)
-  }
   def contentType: ContentType = responseEntity.contentType
   def mediaType: MediaType = contentType.mediaType
   def charsetOption: Option[HttpCharset] = contentType.charsetOption
@@ -98,22 +95,19 @@ trait RouteTest
     response.headers.find(_.is(name.toLowerCase))
   def status: StatusCode = response.status
 
-  def closingExtension: String = chunks.lastOption match {
+  def closingExtension: String = chunks.lastOption match
     case Some(HttpEntity.LastChunk(extension, _)) ⇒ extension
     case _ ⇒ ""
-  }
-  def trailer: immutable.Seq[HttpHeader] = chunks.lastOption match {
+  def trailer: immutable.Seq[HttpHeader] = chunks.lastOption match
     case Some(HttpEntity.LastChunk(_, trailer)) ⇒ trailer
     case _ ⇒ Nil
-  }
 
   def rejections: immutable.Seq[Rejection] = result.rejections
-  def rejection: Rejection = {
+  def rejection: Rejection =
     val r = rejections
     if (r.size == 1) r.head
     else
       failTest("Expected a single rejection but got %s (%s)".format(r.size, r))
-  }
 
   def isWebSocketUpgrade: Boolean =
     status == StatusCodes.SwitchingProtocols &&
@@ -123,14 +117,12 @@ trait RouteTest
     * Asserts that the received response is a WebSocket upgrade response and the extracts
     * the chosen subprotocol and passes it to the handler.
     */
-  def expectWebSocketUpgradeWithProtocol(body: String ⇒ Unit): Unit = {
+  def expectWebSocketUpgradeWithProtocol(body: String ⇒ Unit): Unit =
     if (!isWebSocketUpgrade)
       failTest("Response was no WebSocket Upgrade response")
-    header[`Sec-WebSocket-Protocol`] match {
+    header[`Sec-WebSocket-Protocol`] match
       case Some(`Sec-WebSocket-Protocol`(Seq(protocol))) ⇒ body(protocol)
       case _ ⇒ failTest("No WebSocket protocol found in response.")
-    }
-  }
 
   /**
     * A dummy that can be used as `~> runRoute` to run the route but without blocking for the result.
@@ -142,32 +134,28 @@ trait RouteTest
 
   // there is already an implicit class WithTransformation in scope (inherited from akka.http.scaladsl.testkit.TransformerPipelineSupport)
   // however, this one takes precedence
-  implicit class WithTransformation2(request: HttpRequest) {
+  implicit class WithTransformation2(request: HttpRequest)
 
     /**
       * Apply request to given routes for further inspection in `check { }` block.
       */
     def ~>[A, B](f: A ⇒ B)(implicit ta: TildeArrow[A, B]): ta.Out =
       ta(request, f)
-  }
 
-  abstract class TildeArrow[A, B] {
+  abstract class TildeArrow[A, B]
     type Out
     def apply(request: HttpRequest, f: A ⇒ B): Out
-  }
 
   case class DefaultHostInfo(host: Host, securedConnection: Boolean)
-  object DefaultHostInfo {
+  object DefaultHostInfo
     implicit def defaultHost: DefaultHostInfo =
       DefaultHostInfo(Host("example.com"), securedConnection = false)
-  }
-  object TildeArrow {
+  object TildeArrow
     implicit object InjectIntoRequestTransformer
-        extends TildeArrow[HttpRequest, HttpRequest] {
+        extends TildeArrow[HttpRequest, HttpRequest]
       type Out = HttpRequest
       def apply(request: HttpRequest, f: HttpRequest ⇒ HttpRequest) =
         f(request)
-    }
     implicit def injectIntoRoute(
         implicit timeout: RouteTestTimeout,
         defaultHostInfo: DefaultHostInfo,
@@ -177,9 +165,9 @@ trait RouteTest
         routingLog: RoutingLog,
         rejectionHandler: RejectionHandler = RejectionHandler.default,
         exceptionHandler: ExceptionHandler = null) =
-      new TildeArrow[RequestContext, Future[RouteResult]] {
+      new TildeArrow[RequestContext, Future[RouteResult]]
         type Out = RouteTestResult
-        def apply(request: HttpRequest, route: Route): Out = {
+        def apply(request: HttpRequest, route: Route): Out =
           val routeTestResult = new RouteTestResult(timeout.duration)
           val effectiveRequest = request.withEffectiveUri(
               securedConnection = defaultHostInfo.securedConnection,
@@ -195,9 +183,5 @@ trait RouteTest
           deferrableRouteResult.fast.foreach(routeTestResult.handleResult)(
               executionContext)
           routeTestResult
-        }
-      }
-  }
-}
 
 //FIXME: trait Specs2RouteTest extends RouteTest with Specs2Interface

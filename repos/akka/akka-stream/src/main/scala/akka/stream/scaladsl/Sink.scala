@@ -23,7 +23,7 @@ import scala.util.{Failure, Success, Try}
   * Can be used as a `Subscriber`
   */
 final class Sink[-In, +Mat](private[stream] override val module: Module)
-    extends Graph[SinkShape[In], Mat] {
+    extends Graph[SinkShape[In], Mat]
 
   override val shape: SinkShape[In] = module.shape.asInstanceOf[SinkShape[In]]
 
@@ -83,9 +83,8 @@ final class Sink[-In, +Mat](private[stream] override val module: Module)
 
   /** Converts this Scala DSL element to it's Java DSL counterpart. */
   def asJava: javadsl.Sink[In, Mat] = new javadsl.Sink(this)
-}
 
-object Sink {
+object Sink
 
   /** INTERNAL API */
   private[stream] def shape[T](name: String): SinkShape[T] =
@@ -96,11 +95,10 @@ object Sink {
     * it so also in type.
     */
   def fromGraph[T, M](g: Graph[SinkShape[T], M]): Sink[T, M] =
-    g match {
+    g match
       case s: Sink[T, M] ⇒ s
       case s: javadsl.Sink[T, M] ⇒ s.asScala
       case other ⇒ new Sink(other.module)
-    }
 
   /**
     * Helper to create [[Sink]] from `Subscriber`.
@@ -230,7 +228,7 @@ object Sink {
       strategy: Int ⇒ Graph[UniformFanOutShape[T, U], NotUsed])
     : Sink[T, NotUsed] =
     Sink.fromGraph(
-        GraphDSL.create() { implicit b ⇒
+        GraphDSL.create()  implicit b ⇒
       import GraphDSL.Implicits._
       val d = b.add(strategy(rest.size + 2))
       d.out(0) ~> first
@@ -238,13 +236,13 @@ object Sink {
 
       @tailrec
       def combineRest(idx: Int, i: Iterator[Sink[U, _]]): SinkShape[T] =
-        if (i.hasNext) {
+        if (i.hasNext)
           d.out(idx) ~> i.next()
           combineRest(idx + 1, i)
-        } else new SinkShape(d.in)
+        else new SinkShape(d.in)
 
       combineRest(2, rest.iterator)
-    })
+    )
 
   /**
     * A `Sink` that will invoke the given function to each of the elements
@@ -290,32 +288,27 @@ object Sink {
     * completion, apply the provided function with [[scala.util.Success]]
     * or [[scala.util.Failure]].
     */
-  def onComplete[T](callback: Try[Done] ⇒ Unit): Sink[T, NotUsed] = {
+  def onComplete[T](callback: Try[Done] ⇒ Unit): Sink[T, NotUsed] =
 
-    def newOnCompleteStage(): PushStage[T, NotUsed] = {
-      new PushStage[T, NotUsed] {
+    def newOnCompleteStage(): PushStage[T, NotUsed] =
+      new PushStage[T, NotUsed]
         override def onPush(elem: T, ctx: Context[NotUsed]): SyncDirective =
           ctx.pull()
 
         override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[NotUsed]): TerminationDirective = {
+            cause: Throwable, ctx: Context[NotUsed]): TerminationDirective =
           callback(Failure(cause))
           ctx.fail(cause)
-        }
 
         override def onUpstreamFinish(
-            ctx: Context[NotUsed]): TerminationDirective = {
+            ctx: Context[NotUsed]): TerminationDirective =
           callback(Success(Done))
           ctx.finish()
-        }
-      }
-    }
 
     Flow[T]
       .transform(newOnCompleteStage)
       .to(Sink.ignore)
       .named("onCompleteSink")
-  }
 
   /**
     * Sends the elements of the stream to the given `ActorRef`.
@@ -370,14 +363,13 @@ object Sink {
     * created according to the passed in [[akka.actor.Props]]. Actor created by the `props` must
     * be [[akka.stream.actor.ActorSubscriber]].
     */
-  def actorSubscriber[T](props: Props): Sink[T, ActorRef] = {
+  def actorSubscriber[T](props: Props): Sink[T, ActorRef] =
     require(classOf[ActorSubscriber].isAssignableFrom(props.actorClass()),
             "Actor must be ActorSubscriber")
     new Sink(
         new ActorSubscriberSink(props,
                                 DefaultAttributes.actorSubscriberSink,
                                 shape("ActorSubscriberSink")))
-  }
 
   /**
     * Creates a `Sink` that is materialized as an [[akka.stream.SinkQueue]].
@@ -398,4 +390,3 @@ object Sink {
     */
   def queue[T](): Sink[T, SinkQueue[T]] =
     Sink.fromGraph(new QueueSink())
-}

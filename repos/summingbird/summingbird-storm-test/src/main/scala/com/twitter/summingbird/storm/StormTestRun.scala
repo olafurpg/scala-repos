@@ -33,13 +33,11 @@ import com.twitter.util.Duration
 /**
   * This stops Storm's exception handling triggering an exit(1)
   */
-private[storm] class MySecurityManager extends SecurityManager {
-  override def checkExit(status: Int): Unit = {
+private[storm] class MySecurityManager extends SecurityManager
+  override def checkExit(status: Int): Unit =
     throw new SecurityException();
-  }
   override def checkAccess(t: Thread) = {}
   override def checkPermission(p: Permission) = {}
-}
 
 /*
  * This is a wrapper to run a storm topology.
@@ -47,21 +45,20 @@ private[storm] class MySecurityManager extends SecurityManager {
  * fails. We wrap it into a normal exception instead so it can report better/retry.
  */
 
-object StormTestRun {
-  private def completeTopologyParam(conf: BacktypeStormConfig) = {
+object StormTestRun
+  private def completeTopologyParam(conf: BacktypeStormConfig) =
     val ret = new CompleteTopologyParam()
     ret.setMockedSources(new MockedSources)
     ret.setStormConf(conf)
     ret.setCleanupState(false)
     ret
-  }
 
-  private def tryRun(plannedTopology: PlannedTopology): Unit = {
+  private def tryRun(plannedTopology: PlannedTopology): Unit =
     //Before running the external Command
     val oldSecManager = System.getSecurityManager()
     System.setSecurityManager(new MySecurityManager());
     InflightTuples.reset()
-    try {
+    try
       val cluster = new LocalCluster()
       cluster.submitTopology(
           "test topology", plannedTopology.config, plannedTopology.topology)
@@ -69,22 +66,19 @@ object StormTestRun {
       cluster.killTopology("test topology")
       Thread.sleep(1500)
       cluster.shutdown
-    } finally {
+    finally
       System.setSecurityManager(oldSecManager)
-    }
     require(InflightTuples.get == 0,
             "Inflight tuples is: %d".format(InflightTuples.get))
-  }
 
-  def apply(graph: TailProducer[Storm, Any])(implicit storm: Storm) {
+  def apply(graph: TailProducer[Storm, Any])(implicit storm: Storm)
     val topo = storm.plan(graph)
     apply(topo)
-  }
 
   def simpleRun[T, K, V : Semigroup](
       original: List[T],
       mkJob: (Producer[Storm, T],
-      Storm#Store[K, V]) => TailProducer[Storm, Any]): TestStore[K, V] = {
+      Storm#Store[K, V]) => TailProducer[Storm, Any]): TestStore[K, V] =
 
     implicit def extractor[T]: TimeExtractor[T] = TimeExtractor(_ => 0L)
 
@@ -105,17 +99,12 @@ object StormTestRun {
     apply(job)
     TestStore[K, V](id).getOrElse(
         sys.error("Error running test, unable to find store at the end"))
-  }
 
-  def apply(plannedTopology: PlannedTopology) {
-    this.synchronized {
-      try {
+  def apply(plannedTopology: PlannedTopology)
+    this.synchronized
+      try
         tryRun(plannedTopology)
-      } catch {
+      catch
         case _: Throwable =>
           Thread.sleep(3000)
           tryRun(plannedTopology)
-      }
-    }
-  }
-}

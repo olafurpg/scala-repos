@@ -1,6 +1,6 @@
 // This tests the implicit comment inheritance capabilities of scaladoc for usecases (no $super, no @inheritdoc)
 /** Testing use case inheritance */
-class UseCaseInheritDoc {
+class UseCaseInheritDoc
 
   /**
     * The base comment. And another sentence...
@@ -44,4 +44,3 @@ class UseCaseInheritDoc {
     * @todo StartTodo @inheritdoc And dad! EndTodo
     */
   def function[T](implicit arg1: T, arg2: String): Double = 0.0d
-}

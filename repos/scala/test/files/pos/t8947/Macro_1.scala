@@ -2,7 +2,7 @@ import language.experimental.macros
 import scala.reflect.macros._
 import blackbox.Context
 
-object X {
+object X
 
   def classTagOrNull[T](implicit t: reflect.ClassTag[T] = null) = t
   // the failed search for ClassTag[T] does not issue a visible
@@ -13,7 +13,7 @@ object X {
   def foo[D] = classTagOrNull[D]
 
   def extractor: Any = macro X.extractorMacro
-  def extractorMacro(c: Context): c.Expr[Any] = {
+  def extractorMacro(c: Context): c.Expr[Any] =
     // Later, in reify, an unrelated use of `EmptyTree` in the AST representing
     // the argument is now treated as a macro expansion which should be rolled
     // back in the tree we reify! This ends up generating a call to `implicitly`
@@ -21,7 +21,6 @@ object X {
     //
     // Any macro call that expands to EmptyTree could have triggered this problem.
     c.universe.reify(new { def something(data: Any) = ??? })
-  }
 
   // Workarounds:
   //
@@ -37,4 +36,3 @@ object X {
   //
   //   To make this visible to the macro implementation, it will need to be compiled in an earlier stage,
   //   e.g a separate SBT sub-project.
-}

@@ -15,26 +15,21 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
   * @author ilyas, Alexander Podkhalyuzin
   */
 class ScTupleImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTuple {
+    extends ScalaPsiElementImpl(node) with ScTuple
   override def toString: String = "Tuple"
 
   protected[expr] override def innerType(
       ctx: TypingContext): TypeResult[ScType] =
     if (exprs.length == 0) Success(Unit, Some(this))
-    else {
+    else
       val tupleType = ScTupleType(exprs.map(_.getType(ctx).getOrAny))(
           getProject, getResolveScope)
       Success(tupleType, Some(this))
-    }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitTupleExpr(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => visitor.visitTupleExpr(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

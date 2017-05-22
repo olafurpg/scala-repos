@@ -3,7 +3,7 @@ package codeInspection
 
 import org.jetbrains.plugins.scala.base.SimpleTestCase
 
-class SuspiciousNewLineInMethodCallTest extends SimpleTestCase {
+class SuspiciousNewLineInMethodCallTest extends SimpleTestCase
 
   def testStub() = {}
 
@@ -43,4 +43,3 @@ class SuspiciousNewLineInMethodCallTest extends SimpleTestCase {
     val problems: Seq[Problem] = inspection.checkFileInternal(file, manager, false)
     problems.toList
   }*/
-}

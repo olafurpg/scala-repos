@@ -10,7 +10,7 @@ import org.eclipse.jetty.util.log
 
 private[phantomjs] final class JettyWebsocketManager(
     wsListener: WebsocketListener)
-    extends WebsocketManager { thisMgr =>
+    extends WebsocketManager  thisMgr =>
 
   private[this] var webSocketConn: WebSocket.Connection = null
   private[this] var closed = false
@@ -28,53 +28,46 @@ private[phantomjs] final class JettyWebsocketManager(
 
   server.addConnector(connector)
   server.setHandler(
-      new WebSocketHandler {
+      new WebSocketHandler
     // Support Hixie 76 for Phantom.js
     getWebSocketFactory().setMinVersion(-1)
 
     override def doWebSocketConnect(
         request: HttpServletRequest, protocol: String): WebSocket =
       new ComWebSocketListener
-  })
+  )
 
   server.addLifeCycleListener(
-      new AbstractLifeCycle.AbstractLifeCycleListener {
-    override def lifeCycleStarted(event: LifeCycle): Unit = {
+      new AbstractLifeCycle.AbstractLifeCycleListener
+    override def lifeCycleStarted(event: LifeCycle): Unit =
       if (event.isRunning()) wsListener.onRunning()
-    }
-  })
+  )
 
-  private class ComWebSocketListener extends WebSocket.OnTextMessage {
-    override def onOpen(connection: WebSocket.Connection): Unit = {
-      thisMgr.synchronized {
+  private class ComWebSocketListener extends WebSocket.OnTextMessage
+    override def onOpen(connection: WebSocket.Connection): Unit =
+      thisMgr.synchronized
         if (isConnected)
           throw new IllegalStateException("Client connected twice")
         connection.setMaxIdleTime(Int.MaxValue)
         webSocketConn = connection
-      }
       wsListener.onOpen()
-    }
 
-    override def onClose(statusCode: Int, reason: String): Unit = {
-      thisMgr.synchronized {
+    override def onClose(statusCode: Int, reason: String): Unit =
+      thisMgr.synchronized
         webSocketConn = null
         closed = true
-      }
       wsListener.onClose()
       server.stop()
 
-      if (statusCode != 1000) {
+      if (statusCode != 1000)
         throw new Exception(
             "Abnormal closing of connection. " +
             s"Code: $statusCode, Reason: $reason")
-      }
-    }
 
     override def onMessage(message: String): Unit =
       wsListener.onMessage(message)
-  }
 
-  private class WSLogger(fullName: String) extends log.AbstractLogger {
+  private class WSLogger(fullName: String) extends log.AbstractLogger
     private[this] var debugEnabled = false
 
     def debug(msg: String, args: Object*): Unit =
@@ -111,7 +104,6 @@ private[phantomjs] final class JettyWebsocketManager(
       wsListener.log(s"$lvl: $thrown\n{$thrown.getStackStrace}")
 
     protected def newLogger(fullName: String) = new WSLogger(fullName)
-  }
 
   def start(): Unit = server.start()
 
@@ -122,7 +114,5 @@ private[phantomjs] final class JettyWebsocketManager(
 
   def localPort: Int = connector.getLocalPort()
 
-  def sendMessage(msg: String): Unit = synchronized {
+  def sendMessage(msg: String): Unit = synchronized
     if (webSocketConn != null) webSocketConn.sendMessage(msg)
-  }
-}

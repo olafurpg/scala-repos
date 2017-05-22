@@ -16,9 +16,9 @@ import Keys._
 
 import sbt.io.IO
 
-object IvyConsole {
+object IvyConsole
   final val Name = "ivy-console"
-  lazy val command = Command.command(Name) { state =>
+  lazy val command = Command.command(Name)  state =>
     val Dependencies(managed, repos, unmanaged) =
       parseDependencies(state.remainingCommands, state.log)
     val base = new File(CommandUtil.bootDirectory(state), Name)
@@ -44,7 +44,6 @@ object IvyConsole {
     val newStructure = Load.reapply(session.original ++ append, structure)
     val newState = state.copy(remainingCommands = "console-quick" :: Nil)
     Project.setProject(session, newStructure, newState)
-  }
 
   final case class Dependencies(
       managed: Seq[ModuleID], resolvers: Seq[Resolver], unmanaged: Seq[File])
@@ -58,19 +57,16 @@ object IvyConsole {
       acc.copy(unmanaged = new File(arg) +: acc.unmanaged)
     else acc.copy(managed = parseManaged(arg, log) ++ acc.managed)
 
-  private[this] def parseResolver(arg: String): MavenRepository = {
+  private[this] def parseResolver(arg: String): MavenRepository =
     val Array(name, url) = arg.split(" at ")
     new MavenRepository(name.trim, url.trim)
-  }
 
   val DepPattern = """([^%]+)%(%?)([^%]+)%([^%]+)""".r
   def parseManaged(arg: String, log: Logger): Seq[ModuleID] =
-    arg match {
+    arg match
       case DepPattern(group, cross, name, version) =>
         val crossV =
           if (cross.trim.isEmpty) CrossVersion.Disabled
           else CrossVersion.binary
         ModuleID(group.trim, name.trim, version.trim, crossVersion = crossV) :: Nil
       case _ => log.warn("Ignoring invalid argument '" + arg + "'"); Nil
-    }
-}

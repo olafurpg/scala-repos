@@ -7,22 +7,20 @@ import akka.testkit.AkkaSpec
 import scala.annotation.tailrec
 import java.util.concurrent.ThreadLocalRandom
 
-object AckedDeliverySpec {
+object AckedDeliverySpec
 
   final case class Sequenced(seq: SeqNo, body: String)
-      extends HasSequenceNumber {
+      extends HasSequenceNumber
     override def toString = s"MSG[${seq.rawValue}]"
-  }
-}
 
-class AckedDeliverySpec extends AkkaSpec {
+class AckedDeliverySpec extends AkkaSpec
   import AckedDeliverySpec._
 
   def msg(seq: Long) = Sequenced(SeqNo(seq), "msg" + seq)
 
-  "SeqNo" must {
+  "SeqNo" must
 
-    "implement simple ordering" in {
+    "implement simple ordering" in
       val sm1 = SeqNo(-1)
       val s0 = SeqNo(0)
       val s1 = SeqNo(1)
@@ -39,9 +37,8 @@ class AckedDeliverySpec extends AkkaSpec {
       s1 > s2 should ===(false)
 
       s0b == s0 should ===(true)
-    }
 
-    "correctly handle wrapping over" in {
+    "correctly handle wrapping over" in
       val s1 = SeqNo(Long.MaxValue - 1)
       val s2 = SeqNo(Long.MaxValue)
       val s3 = SeqNo(Long.MinValue)
@@ -55,9 +52,8 @@ class AckedDeliverySpec extends AkkaSpec {
 
       s3 < s4 should ===(true)
       s3 > s4 should ===(false)
-    }
 
-    "correctly handle large gaps" in {
+    "correctly handle large gaps" in
       val smin = SeqNo(Long.MinValue)
       val smin2 = SeqNo(Long.MinValue + 1)
       val s0 = SeqNo(0)
@@ -67,12 +63,10 @@ class AckedDeliverySpec extends AkkaSpec {
 
       smin2 < s0 should ===(true)
       smin2 > s0 should ===(false)
-    }
-  }
 
-  "SendBuffer" must {
+  "SendBuffer" must
 
-    "aggregate unacked messages in order" in {
+    "aggregate unacked messages in order" in
       val b0 = new AckedSendBuffer[Sequenced](10)
       val msg0 = msg(0)
       val msg1 = msg(1)
@@ -86,21 +80,18 @@ class AckedDeliverySpec extends AkkaSpec {
 
       val b3 = b2.buffer(msg2)
       b3.nonAcked should ===(Vector(msg0, msg1, msg2))
-    }
 
-    "refuse buffering new messages if capacity reached" in {
+    "refuse buffering new messages if capacity reached" in
       val buffer = new AckedSendBuffer[Sequenced](4)
         .buffer(msg(0))
         .buffer(msg(1))
         .buffer(msg(2))
         .buffer(msg(3))
 
-      intercept[ResendBufferCapacityReachedException] {
+      intercept[ResendBufferCapacityReachedException]
         buffer buffer msg(4)
-      }
-    }
 
-    "remove messages from buffer when cumulative ack received" in {
+    "remove messages from buffer when cumulative ack received" in
       val b0 = new AckedSendBuffer[Sequenced](10)
       val msg0 = msg(0)
       val msg1 = msg(1)
@@ -134,9 +125,8 @@ class AckedDeliverySpec extends AkkaSpec {
 
       val b9 = b8.acknowledge(Ack(SeqNo(4)))
       b9.nonAcked should ===(Vector.empty)
-    }
 
-    "keep NACKed messages in buffer if selective nacks are received" in {
+    "keep NACKed messages in buffer if selective nacks are received" in
       val b0 = new AckedSendBuffer[Sequenced](10)
       val msg0 = msg(0)
       val msg1 = msg(1)
@@ -168,23 +158,19 @@ class AckedDeliverySpec extends AkkaSpec {
       val b7 = b6.acknowledge(Ack(SeqNo(4)))
       b7.nonAcked should ===(Vector.empty)
       b7.nacked should ===(Vector.empty)
-    }
 
-    "throw exception if non-buffered sequence number is NACKed" in {
+    "throw exception if non-buffered sequence number is NACKed" in
       val b0 = new AckedSendBuffer[Sequenced](10)
       val msg1 = msg(1)
       val msg2 = msg(2)
 
       val b1 = b0.buffer(msg1).buffer(msg2)
-      intercept[ResendUnfulfillableException] {
+      intercept[ResendUnfulfillableException]
         b1.acknowledge(Ack(SeqNo(2), nacks = Set(SeqNo(0))))
-      }
-    }
-  }
 
-  "ReceiveBuffer" must {
+  "ReceiveBuffer" must
 
-    "enqueue message in buffer if needed, return the list of deliverable messages and acks" in {
+    "enqueue message in buffer if needed, return the list of deliverable messages and acks" in
       val b0 = new AckedReceiveBuffer[Sequenced]
       val msg0 = msg(0)
       val msg1 = msg(1)
@@ -216,9 +202,8 @@ class AckedDeliverySpec extends AkkaSpec {
       val (_, deliver6, ack6) = b5.receive(msg3).extractDeliverable
       deliver6 should ===(Vector(msg3, msg4, msg5))
       ack6 should ===(Ack(SeqNo(5)))
-    }
 
-    "handle duplicate arrivals correctly" in {
+    "handle duplicate arrivals correctly" in
       val buf = new AckedReceiveBuffer[Sequenced]
       val msg0 = msg(0)
       val msg1 = msg(1)
@@ -233,9 +218,8 @@ class AckedDeliverySpec extends AkkaSpec {
 
       deliver should ===(Vector.empty)
       ack should ===(Ack(SeqNo(2)))
-    }
 
-    "be able to correctly merge with another receive buffer" in {
+    "be able to correctly merge with another receive buffer" in
       val buf1 = new AckedReceiveBuffer[Sequenced]
       val buf2 = new AckedReceiveBuffer[Sequenced]
       val msg0 = msg(0)
@@ -252,10 +236,8 @@ class AckedDeliverySpec extends AkkaSpec {
       val (_, deliver, ack) = buf.receive(msg0).extractDeliverable
       deliver should ===(Vector(msg0, msg1a, msg2, msg3))
       ack should ===(Ack(SeqNo(3)))
-    }
-  }
 
-  "SendBuffer and ReceiveBuffer" must {
+  "SendBuffer and ReceiveBuffer" must
 
     def happened(p: Double) = ThreadLocalRandom.current().nextDouble() < p
 
@@ -264,13 +246,12 @@ class AckedDeliverySpec extends AkkaSpec {
       else if (happened(p)) acc
       else geom(p, limit, acc + 1)
 
-    "correctly cooperate with each other" in {
+    "correctly cooperate with each other" in
       val MsgCount = 1000
       val DeliveryProbability = 0.5
       val referenceList: Seq[Sequenced] =
-        (0 until MsgCount).toSeq map { i ⇒
+        (0 until MsgCount).toSeq map  i ⇒
           msg(i.toLong)
-        }
 
       var toSend = referenceList
       var received = Seq.empty[Sequenced]
@@ -281,19 +262,19 @@ class AckedDeliverySpec extends AkkaSpec {
 
       def dbgLog(message: String): Unit = log :+= message
 
-      def senderSteps(steps: Int, p: Double = 1.0) = {
+      def senderSteps(steps: Int, p: Double = 1.0) =
         val resends = (sndBuf.nacked ++ sndBuf.nonAcked).take(steps)
 
         val sends =
-          if (steps - resends.size > 0) {
+          if (steps - resends.size > 0)
             val tmp = toSend.take(steps - resends.size)
             toSend = toSend.drop(steps - resends.size)
             tmp
-          } else Seq.empty[Sequenced]
+          else Seq.empty[Sequenced]
 
-        (resends ++ sends) foreach { msg ⇒
+        (resends ++ sends) foreach  msg ⇒
           if (sends.contains(msg)) sndBuf = sndBuf.buffer(msg)
-          if (happened(p)) {
+          if (happened(p))
             val (updatedRcvBuf, delivers, ack) =
               rcvBuf.receive(msg).extractDeliverable
             rcvBuf = updatedRcvBuf
@@ -301,45 +282,36 @@ class AckedDeliverySpec extends AkkaSpec {
             lastAck = ack
             received ++= delivers
             dbgLog(s"R: ${received.mkString(", ")}")
-          } else dbgLog(s"$sndBuf -- $msg --X $rcvBuf")
-        }
-      }
+          else dbgLog(s"$sndBuf -- $msg --X $rcvBuf")
 
-      def receiverStep(p: Double = 1.0) = {
-        if (happened(p)) {
+      def receiverStep(p: Double = 1.0) =
+        if (happened(p))
           sndBuf = sndBuf.acknowledge(lastAck)
           dbgLog(s"$sndBuf <-- $lastAck -- $rcvBuf")
-        } else dbgLog(s"$sndBuf X-- $lastAck -- $rcvBuf")
-      }
+        else dbgLog(s"$sndBuf X-- $lastAck -- $rcvBuf")
 
       // Dropping phase
       info(
           s"Starting unreliable delivery for $MsgCount messages, with delivery probability P = $DeliveryProbability")
       var steps = MsgCount * 2
-      while (steps > 0) {
+      while (steps > 0)
         val s = geom(0.3, limit = 5)
         senderSteps(s, DeliveryProbability)
         receiverStep(DeliveryProbability)
         steps -= s
-      }
       info(
           s"Successfully delivered ${received.size} messages from ${MsgCount}")
       info("Entering reliable phase")
 
       // Finalizing phase
-      for (_ ← 1 to MsgCount) {
+      for (_ ← 1 to MsgCount)
         senderSteps(1, 1.0)
         receiverStep(1.0)
-      }
 
-      if (received != referenceList) {
+      if (received != referenceList)
         println(log.mkString("\n"))
         println("Received:")
         println(received)
         fail("Not all messages were received")
-      }
 
       info("All messages have been successfully delivered")
-    }
-  }
-}

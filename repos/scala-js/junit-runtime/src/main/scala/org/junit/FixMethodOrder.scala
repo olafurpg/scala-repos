@@ -7,9 +7,8 @@ import java.lang.annotation._
 
 import org.junit.runners.MethodSorters
 
-class FixMethodOrder(val value: MethodSorters) extends Annotation {
+class FixMethodOrder(val value: MethodSorters) extends Annotation
 
   def this() = this(MethodSorters.DEFAULT)
 
   def annotationType(): Class[_ <: Annotation] = classOf[FixMethodOrder]
-}

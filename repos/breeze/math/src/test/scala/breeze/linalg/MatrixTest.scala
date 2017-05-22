@@ -22,8 +22,8 @@ import org.junit.runner.RunWith
 import breeze.math.Complex
 
 @RunWith(classOf[JUnitRunner])
-class MatrixTest extends FunSuite with Checkers {
-  test("Multiply") {
+class MatrixTest extends FunSuite with Checkers
+  test("Multiply")
     val a = Matrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val ad = DenseMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = Matrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0), (12.0, 0.0, 5.0))
@@ -48,17 +48,15 @@ class MatrixTest extends FunSuite with Checkers {
 
 //    val z : DenseMatrix[Double] = b * (b + 1.0)
 //    assert(z === DenseMatrix((164.0,5.0,107.0),(-5.0,10.0,-27.0),(161.0,-7.0,138.0)))
-  }
 
-  test("big multiply bug around 256") {
+  test("big multiply bug around 256")
     val phi2: Matrix[Double] = DenseMatrix.ones[Double](400, 5)
     val w2: Matrix[Double] = DenseMatrix.ones[Double](5, 24)
 
     val theta2 = (phi2 * w2) //.toDenseMatrix
     assert(theta2(256, 0) != 0)
-  }
 
-  test("Setting") {
+  test("Setting")
     val a: Matrix[Double] = Matrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = Matrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0))
     val c = DenseMatrix((3.0, -1.0, 9.0), (-2.0, -2.0, 2.0))
@@ -66,25 +64,21 @@ class MatrixTest extends FunSuite with Checkers {
     assert(a === b)
     a := c
     assert(a === c)
-  }
 
-  test("Generic  ops") {
+  test("Generic  ops")
     // mostly for coverage
     val a = Matrix.create[String](1, 1, Array("SSS"))
-    intercept[IndexOutOfBoundsException] {
+    intercept[IndexOutOfBoundsException]
       a(3, 3) = ":("
       assert(false, "Shouldn't be here!")
-    }
     assert(a(0, 0) === "SSS")
-    intercept[IndexOutOfBoundsException] {
+    intercept[IndexOutOfBoundsException]
       a(3, 3)
       assert(false, "Shouldn't be here!")
-    }
     a(0, 0) = ":("
     assert(a(0, 0) === ":(")
-  }
 
-  test("Multiply Complex") {
+  test("Multiply Complex")
 
     val a = Matrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
                    (Complex(4, 4), Complex(5, 5), Complex(6, 6)))
@@ -102,9 +96,8 @@ class MatrixTest extends FunSuite with Checkers {
     assert(b * cs === DenseVector(
             Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
 //    assert(b.t * c === DenseVector(Complex(72,-72), Complex(-18,18), Complex(65,-65)))
-  }
 
-  test("Other complex") {
+  test("Other complex")
     val a = Matrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
                    (Complex(4, 4), Complex(5, 5), Complex(6, 6)))
 
@@ -117,28 +110,24 @@ class MatrixTest extends FunSuite with Checkers {
 
     assert(a === Matrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
                         (Complex(4, 4), Complex(5, 5), Complex(6, 6))))
-  }
 
-  test("hashcode") {
+  test("hashcode")
     val v: DenseMatrix[Int] = DenseMatrix(1, 2, 0, 0, 3)
-    val v2: CSCMatrix[Int] = {
+    val v2: CSCMatrix[Int] =
       val mt = new CSCMatrix.Builder[Int](5, 1)
       mt.add(0, 0, 1)
       mt.add(1, 0, 2)
       mt.add(4, 0, 3)
       mt.result
-    }
     assert(v === v2)
     assert(v.hashCode == v2.hashCode)
-  }
 
-  test("Sparse equality") {
-    val v: CSCMatrix[Int] = {
+  test("Sparse equality")
+    val v: CSCMatrix[Int] =
       val mt = new CSCMatrix.Builder[Int](5, 1)
       mt.add(1, 0, 2)
       mt.add(4, 0, 3)
       mt.result
-    }
     val v2: CSCMatrix[Int] = CSCMatrix(0, 2, 0, 0, 3)
     val diff = v - v2
     val zeros = CSCMatrix.zeros[Int](5, 1)
@@ -151,7 +140,6 @@ class MatrixTest extends FunSuite with Checkers {
     assert(zeros == v4) // implicit vs explicit
     assert(v4 == zeros) // explicit vs implicit
     assert(zeros != v)
-  }
 
 //  test("MapValues") {
 //    val a : Matrix[Int] = Matrix((1,0,0),(2,3,-1))
@@ -162,4 +150,3 @@ class MatrixTest extends FunSuite with Checkers {
 //    val b2 : Matrix[Double] = a.mapValues(_ + 1.0)
 //    assert(b2 === Matrix((2.0,1.0,1.0),(3.0,4.0,0.0)))
 //  }
-}

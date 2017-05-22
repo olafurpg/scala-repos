@@ -8,19 +8,18 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 /**
   * @author Nikolay.Tropin
   */
-class ToSetAndBackInspection extends OperationOnCollectionInspection {
+class ToSetAndBackInspection extends OperationOnCollectionInspection
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(ToSetAndBackToDistinct)
-}
 
-object ToSetAndBackToDistinct extends SimplificationType {
+object ToSetAndBackToDistinct extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.toSet.and.back.with.distinct")
 
   private val `.toSet` = invocation("toSet").from(likeCollectionClasses)
 
-  override def getSimplification(expr: ScExpression): Option[Simplification] = {
-    expr match {
+  override def getSimplification(expr: ScExpression): Option[Simplification] =
+    expr match
       case (qual @ ExpressionType(qualType)) `.toSet` () `.toCollection` ()
           if sameCollectionType(qualType, expr.getType().getOrAny) &&
           (isSeq(qual) || isArray(qual)) =>
@@ -29,15 +28,10 @@ object ToSetAndBackToDistinct extends SimplificationType {
               .withText(invocationText(qual, "distinct"))
               .highlightFrom(qual))
       case _ => None
-    }
-  }
 
-  def sameCollectionType(tp1: ScType, tp2: ScType) = {
-    (tp1, tp2) match {
+  def sameCollectionType(tp1: ScType, tp2: ScType) =
+    (tp1, tp2) match
       case (ScParameterizedType(des1, _), ScParameterizedType(des2, _))
           if des1.equiv(des2) =>
         true
       case _ => false
-    }
-  }
-}

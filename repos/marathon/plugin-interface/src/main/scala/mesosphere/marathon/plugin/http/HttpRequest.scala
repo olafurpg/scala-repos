@@ -3,7 +3,7 @@ package mesosphere.marathon.plugin.http
 /**
   * Simple abstraction for a HTTP Request.
   */
-trait HttpRequest {
+trait HttpRequest
 
   /**
     * Returns the name of the HTTP method with which this request was made.
@@ -42,4 +42,3 @@ trait HttpRequest {
     * @return IP address of the client that sent the request
     */
   def remoteAddr: String
-}

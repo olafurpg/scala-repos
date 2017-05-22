@@ -49,15 +49,12 @@ import scalafx.beans.property.DoubleProperty
   * http://docs.oracle.com/javafx/2.0/binding/jfxpub-binding.htm
   *
   */
-object ScalaFX_Properties_And_Binding_01 {
-  def main(args: Array[String]) {
+object ScalaFX_Properties_And_Binding_01
+  def main(args: Array[String])
     val bill = new Bill(new DoubleProperty(null, "Bill"))
-    bill.amountDue onChange { (_, oldAmountDue, newAmountDue) =>
+    bill.amountDue onChange  (_, oldAmountDue, newAmountDue) =>
       println("bill amount due changes from " + oldAmountDue + " to " +
           newAmountDue)
-    }
     println("before change: bill amount due = " + bill.amountDue())
     bill.amountDue() = 50.0
     println("after  change: bill amount due = " + bill.amountDue())
-  }
-}

@@ -8,7 +8,7 @@ import akka.cluster.UniqueAddress
 import akka.util.HashCode
 import java.math.BigInteger
 
-object PNCounter {
+object PNCounter
   val empty: PNCounter = new PNCounter(GCounter.empty, GCounter.empty)
   def apply(): PNCounter = empty
 
@@ -21,7 +21,6 @@ object PNCounter {
     * Extract the [[GCounter#value]].
     */
   def unapply(c: PNCounter): Option[BigInt] = Some(c.value)
-}
 
 /**
   * Implements a 'Increment/Decrement Counter' CRDT, also called a 'PN-Counter'.
@@ -41,7 +40,7 @@ object PNCounter {
 final class PNCounter private[akka](private[akka] val increments: GCounter,
                                     private[akka] val decrements: GCounter)
     extends ReplicatedData with ReplicatedDataSerialization
-    with RemovedNodePruning {
+    with RemovedNodePruning
 
   type T = PNCounter
 
@@ -122,23 +121,19 @@ final class PNCounter private[akka](private[akka] val increments: GCounter,
 
   override def toString: String = s"PNCounter($value)"
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case other: PNCounter ⇒
       increments == other.increments && decrements == other.decrements
     case _ ⇒ false
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     var result = HashCode.SEED
     result = HashCode.hash(result, increments)
     result = HashCode.hash(result, decrements)
     result
-  }
-}
 
-object PNCounterKey {
+object PNCounterKey
   def create[A](id: String): Key[PNCounter] = PNCounterKey(id)
-}
 
 @SerialVersionUID(1L)
 final case class PNCounterKey(_id: String)

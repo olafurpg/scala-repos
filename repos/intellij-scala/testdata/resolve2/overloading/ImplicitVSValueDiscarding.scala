@@ -1,4 +1,4 @@
-object Test extends Application {
+object Test extends Application
   def foo(x: Unit): Int = { print(1); 2 }
   def foo(x: String): Int = { print(4); 1 }
 
@@ -6,4 +6,3 @@ object Test extends Application {
 
   /* line: 3 */
   foo(3: Byte)
-}

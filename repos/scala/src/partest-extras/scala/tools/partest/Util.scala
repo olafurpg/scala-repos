@@ -2,7 +2,7 @@ package scala.tools.partest
 
 import scala.language.experimental.macros
 
-object Util {
+object Util
 
   /**
     * `trace("".isEmpty)` will return `true` and as a side effect print the following to standard out.
@@ -18,7 +18,7 @@ object Util {
   def trace[A](a: A) = macro traceImpl[A]
 
   import scala.reflect.macros.blackbox.Context
-  def traceImpl[A : c.WeakTypeTag](c: Context)(a: c.Expr[A]): c.Expr[A] = {
+  def traceImpl[A : c.WeakTypeTag](c: Context)(a: c.Expr[A]): c.Expr[A] =
     import c.universe._
     import definitions._
 
@@ -47,5 +47,3 @@ object Util {
                                     Literal(Constant(show(a.actualType))),
                                     a.tree))))),
             a.tree))
-  }
-}

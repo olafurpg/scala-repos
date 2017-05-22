@@ -12,16 +12,13 @@ import com.intellij.openapi.project.Project
   */
 class AbstractTestRunConfigurationEditor(
     project: Project, configuration: AbstractTestRunConfiguration)
-    extends SettingsEditor[AbstractTestRunConfiguration] {
+    extends SettingsEditor[AbstractTestRunConfiguration]
   val form = new TestRunConfigurationForm(project, configuration)
 
-  def resetEditorFrom(s: AbstractTestRunConfiguration) {
+  def resetEditorFrom(s: AbstractTestRunConfiguration)
     form(s)
-  }
 
-  def applyEditorTo(s: AbstractTestRunConfiguration) {
+  def applyEditorTo(s: AbstractTestRunConfiguration)
     s(form)
-  }
 
   def createEditor: JComponent = form.getPanel
-}

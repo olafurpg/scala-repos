@@ -3,12 +3,12 @@ package gitbucket.core.util
 /**
   * Define key strings for request attributes, session attributes or flash attributes.
   */
-object Keys {
+object Keys
 
   /**
     * Define session keys.
     */
-  object Session {
+  object Session
 
     /**
       * Session key for the logged in account information.
@@ -39,9 +39,8 @@ object Keys {
       * Generate session key for the upload filename.
       */
     def Upload(fileId: String) = s"upload_${fileId}"
-  }
 
-  object Flash {
+  object Flash
 
     /**
       * Flash key for the redirect URL.
@@ -52,12 +51,11 @@ object Keys {
       * Flash key for the information message.
       */
     val Info = "info"
-  }
 
   /**
     * Define request keys.
     */
-  object Request {
+  object Request
 
     /**
       * Request key for the Slick Session.
@@ -83,5 +81,3 @@ object Keys {
       * Generate request key for the request cache.
       */
     def Cache(key: String) = s"cache.${key}"
-  }
-}

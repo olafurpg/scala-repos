@@ -33,16 +33,14 @@ class ResolverNotFoundException(scheme: String)
   */
 class MultipleResolversPerSchemeException(
     resolvers: Map[String, Seq[Resolver]])
-    extends NoStacktrace {
-  override def getMessage = {
+    extends NoStacktrace
+  override def getMessage =
     val msgs =
-      resolvers map {
+      resolvers map
         case (scheme, rs) =>
           "%s=(%s)".format(scheme, rs.map(_.getClass.getName).mkString(", "))
-      } mkString (" ")
+      mkString (" ")
     "Multiple resolvers defined: %s".format(msgs)
-  }
-}
 
 /**
   * Indicates that a destination name string passed to a
@@ -69,17 +67,15 @@ class ResolverAddressInvalid(addr: String)
   * [[http://docs.oracle.com/javase/6/docs/api/java/util/ServiceLoader.html ServiceLoader]]
   * documentation for further details.
   */
-trait Resolver {
+trait Resolver
   val scheme: String
   def bind(arg: String): Var[Addr]
 
   @deprecated("Use Resolver.bind", "6.7.x")
   final def resolve(name: String): Try[Group[SocketAddress]] =
-    bind(name) match {
+    bind(name) match
       case Var.Sampled(Addr.Failed(e)) => Throw(e)
       case va => Return(Group.fromVarAddr(va))
-    }
-}
 
 /**
   * An abstract class version of Resolver for java compatibility.
@@ -89,17 +85,16 @@ abstract class AbstractResolver extends Resolver
 /**
   * Resolver for inet scheme.
   */
-object InetResolver {
+object InetResolver
   def apply(): Resolver = apply(DefaultStatsReceiver)
   def apply(statsReceiver: StatsReceiver): Resolver =
     new InetResolver(statsReceiver, Some(5.seconds))
-}
 
 private[finagle] class InetResolver(
     unscopedStatsReceiver: StatsReceiver,
     pollIntervalOpt: Option[Duration]
 )
-    extends Resolver {
+    extends Resolver
   import InetSocketAddressUtil._
 
   type HostPortMetadata = (String, Int, Addr.Metadata)
@@ -119,17 +114,14 @@ private[finagle] class InetResolver(
    * Resolve hostnames asynchronously and concurrently.
    */
   private[this] val dnsCond = new AsyncSemaphore(100)
-  protected def resolveHost(host: String): Future[Seq[InetAddress]] = {
-    dnsCond.acquire().flatMap { permit =>
+  protected def resolveHost(host: String): Future[Seq[InetAddress]] =
+    dnsCond.acquire().flatMap  permit =>
       FuturePool
         .unboundedPool(InetAddress.getAllByName(host).toSeq)
-        .onFailure { e =>
+        .onFailure  e =>
           log.warning(s"Failed to resolve $host. Error $e")
           dnsLookupFailures.incr()
-        }
         .ensure { permit.release() }
-    }
-  }
 
   /**
     * Resolve all hostnames and merge into a final Addr.
@@ -138,83 +130,69 @@ private[finagle] class InetResolver(
     * If any lookup succeeds the final result will be Addr.Bound
     * with the successful results.
     */
-  def toAddr(hp: Seq[HostPortMetadata]): Future[Addr] = {
+  def toAddr(hp: Seq[HostPortMetadata]): Future[Addr] =
     val elapsed = Stopwatch.start()
     Future
       .collectToTry(
-          hp.map {
+          hp.map
         case (host, port, meta) =>
-          resolveHost(host).map { inetAddrs =>
-            inetAddrs.map { inetAddr =>
+          resolveHost(host).map  inetAddrs =>
+            inetAddrs.map  inetAddr =>
               Address.Inet(new InetSocketAddress(inetAddr, port), meta)
-            }
-          }
-      })
-      .flatMap { seq: Seq[Try[Seq[Address]]] =>
+      )
+      .flatMap  seq: Seq[Try[Seq[Address]]] =>
         // Filter out all successes. If there was at least 1 success, consider
         // the entire operation a success
-        val results = seq.collect {
+        val results = seq.collect
           case Return(subset) => subset
-        }.flatten
+        .flatten
 
         // Consider any result a success. Ignore partial failures.
-        if (results.nonEmpty) {
+        if (results.nonEmpty)
           successes.incr()
           latencyStat.add(elapsed().inMilliseconds)
           Future.value(Addr.Bound(results.toSet))
-        } else {
+        else
           // Either no hosts or resolution failed for every host
           failures.incr()
           log.warning("Resolution failed for all hosts")
 
-          seq.collectFirst {
+          seq.collectFirst
             case Throw(e) => e
-          } match {
+          match
             case Some(_: UnknownHostException) => Future.value(Addr.Neg)
             case Some(e) => Future.value(Addr.Failed(e))
             case None => Future.value(Addr.Bound(Set[Address]()))
-          }
-        }
-      }
-  }
 
-  def bindHostPortsToAddr(hosts: Seq[HostPortMetadata]): Var[Addr] = {
-    Var.async(Addr.Pending: Addr) { u =>
+  def bindHostPortsToAddr(hosts: Seq[HostPortMetadata]): Var[Addr] =
+    Var.async(Addr.Pending: Addr)  u =>
       toAddr(hosts) onSuccess { u() = _ }
-      pollIntervalOpt match {
+      pollIntervalOpt match
         case Some(pollInterval) =>
-          val updater = new Updater[Unit] {
+          val updater = new Updater[Unit]
             val one = Seq(())
             // Just perform one update at a time.
             protected def preprocess(elems: Seq[Unit]) = one
-            protected def handle(unit: Unit) {
+            protected def handle(unit: Unit)
               // This always runs in a thread pool; it's okay to block.
               u() = Await.result(toAddr(hosts))
-            }
-          }
-          timer.schedule(pollInterval.fromNow, pollInterval) {
+          timer.schedule(pollInterval.fromNow, pollInterval)
             FuturePool.unboundedPool(updater(()))
-          }
         case None =>
           Closable.nop
-      }
-    }
-  }
 
   /**
     * Binds to the specified hostnames, and refreshes the DNS information periodically.
     */
-  def bind(hosts: String): Var[Addr] = Try(parseHostPorts(hosts)) match {
+  def bind(hosts: String): Var[Addr] = Try(parseHostPorts(hosts)) match
     case Return(hp) =>
       bindHostPortsToAddr(
-          hp.map {
+          hp.map
         case (host, port) =>
           (host, port, Addr.Metadata.empty)
-      })
+      )
     case Throw(exc) =>
       Var.value(Addr.Failed(exc))
-  }
-}
 
 /**
   * InetResolver that caches all successful DNS lookups indefinitely
@@ -223,14 +201,13 @@ private[finagle] class InetResolver(
   * Clients should only use this in scenarios where host -> IP map changes
   * do not occur.
   */
-object FixedInetResolver {
+object FixedInetResolver
 
   val scheme = "fixedinet"
 
   def apply(): InetResolver = apply(DefaultStatsReceiver)
   def apply(statsReceiver: StatsReceiver): InetResolver =
     new FixedInetResolver(statsReceiver, None)
-}
 
 /**
   * Uses a future cache to do lookups once. Allows unit tests to
@@ -242,7 +219,7 @@ private[finagle] class FixedInetResolver(
     statsReceiver: StatsReceiver,
     resolveOverride: Option[String => Future[Seq[InetAddress]]]
 )
-    extends InetResolver(statsReceiver, None) {
+    extends InetResolver(statsReceiver, None)
 
   override val scheme = FixedInetResolver.scheme
 
@@ -254,35 +231,31 @@ private[finagle] class FixedInetResolver(
   private[this] val cache = CacheBuilder
     .newBuilder()
     .maximumSize(16000L)
-    .build(new CacheLoader[String, Future[Seq[InetAddress]]]() {
+    .build(new CacheLoader[String, Future[Seq[InetAddress]]]()
       def load(host: String) = resolveFn(host)
-    })
+    )
   private[this] val futureCache = GuavaCache.fromLoadingCache(cache)
 
   override def resolveHost(host: String): Future[Seq[InetAddress]] =
     futureCache(host)
-}
 
-object NegResolver extends Resolver {
+object NegResolver extends Resolver
   val scheme = "neg"
   def bind(arg: String) = Var.value(Addr.Neg)
-}
 
-object NilResolver extends Resolver {
+object NilResolver extends Resolver
   val scheme = "nil"
   def bind(arg: String) = Var.value(Addr.Bound())
-}
 
-object FailResolver extends Resolver {
+object FailResolver extends Resolver
   val scheme = "fail"
   def bind(arg: String) = Var.value(Addr.Failed(new Exception(arg)))
-}
 
-private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
+private[finagle] abstract class BaseResolver(f: () => Seq[Resolver])
   private[this] val inetResolver = InetResolver()
   private[this] val fixedInetResolver = FixedInetResolver()
 
-  private[this] lazy val resolvers = {
+  private[this] lazy val resolvers =
     val rs = f()
     val log = Logger.getLogger(getClass.getName)
     val resolvers =
@@ -301,12 +274,10 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
         "Resolver[%s] = %s(%s)".format(r.scheme, r.getClass.getName, r))
 
     resolvers
-  }
 
   def get[T <: Resolver](clazz: Class[T]): Option[T] =
-    resolvers find { _.getClass isAssignableFrom clazz } map {
+    resolvers find { _.getClass isAssignableFrom clazz } map
       _.asInstanceOf[T]
-    }
 
   private[this] sealed trait Token
   private[this] case class El(e: String) extends Token
@@ -314,20 +285,19 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
   private[this] object Bang extends Token
 
   private[this] def delex(ts: Seq[Token]) =
-    ts map {
+    ts map
       case El(e) => e
       case Bang => "!"
       case Eq => "="
-    } mkString ""
+    mkString ""
 
-  private[this] def lex(s: String) = {
-    s.foldLeft(List[Token]()) {
+  private[this] def lex(s: String) =
+    s.foldLeft(List[Token]())
       case (ts, '=') => Eq :: ts
       case (ts, '!') => Bang :: ts
       case (El(s) :: ts, c) => El(s + c) :: ts
       case (ts, c) => El("" + c) :: ts
-    }
-  }.reverse
+  .reverse
 
   /**
     * Resolve a group from an address, a string. Resolve uses
@@ -352,13 +322,12 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
     */
   @deprecated("Use Resolver.eval", "6.7.x")
   def resolve(addr: String): Try[Group[SocketAddress]] =
-    Try { eval(addr) } flatMap {
+    Try { eval(addr) } flatMap
       case Name.Path(_) =>
         Throw(new IllegalArgumentException(
                 "Resolver.resolve does not support logical names"))
       case bound @ Name.Bound(_) =>
         Return(NameGroup(bound))
-    }
 
   /**
     * Parse and evaluate the argument into a Name. Eval parses
@@ -380,22 +349,19 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
     */
   def eval(name: String): Name =
     if (name startsWith "/") Name(name)
-    else {
-      val (resolver, arg) = lex(name) match {
+    else
+      val (resolver, arg) = lex(name) match
         case (Eq :: _) | (Bang :: _) =>
           throw new ResolverAddressInvalid(name)
 
         case El(scheme) :: Bang :: name =>
-          resolvers.find(_.scheme == scheme) match {
+          resolvers.find(_.scheme == scheme) match
             case Some(resolver) => (resolver, delex(name))
             case None => throw new ResolverNotFoundException(scheme)
-          }
 
         case ts => (inetResolver, delex(ts))
-      }
 
       Name.Bound(resolver.bind(arg), name)
-    }
 
   /**
     * Parse and evaluate the argument into a (Name, label: String) tuple.
@@ -404,15 +370,12 @@ private[finagle] abstract class BaseResolver(f: () => Seq[Resolver]) {
     *
     * @see [[Resolvers.evalLabeled]] for Java support
     */
-  def evalLabeled(addr: String): (Name, String) = {
-    val (label, rest) = lex(addr) match {
+  def evalLabeled(addr: String): (Name, String) =
+    val (label, rest) = lex(addr) match
       case El(n) :: Eq :: rest => (n, rest)
       case rest => ("", rest)
-    }
 
     (eval(delex(rest)), label)
-  }
-}
 
 /**
   * The default [[Resolver]] used by Finagle.
@@ -424,7 +387,7 @@ object Resolver extends BaseResolver(() => LoadService[Resolver]())
 /**
   * Java APIs for [[Resolver]].
   */
-object Resolvers {
+object Resolvers
 
   /**
     * @see [[Resolver.eval]]
@@ -437,4 +400,3 @@ object Resolvers {
     */
   def evalLabeled(addr: String): (Name, String) =
     Resolver.evalLabeled(addr)
-}

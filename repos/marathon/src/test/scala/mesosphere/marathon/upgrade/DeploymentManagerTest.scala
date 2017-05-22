@@ -29,7 +29,7 @@ import scala.concurrent.duration._
 class DeploymentManagerTest
     extends MarathonActorSupport with FunSuiteLike with Matchers
     with BeforeAndAfter with BeforeAndAfterAll with Mockito
-    with ImplicitSender {
+    with ImplicitSender
 
   var driver: SchedulerDriver = _
   var eventBus: EventStream = _
@@ -42,7 +42,7 @@ class DeploymentManagerTest
   var storage: StorageProvider = _
   var hcManager: HealthCheckManager = _
 
-  before {
+  before
     driver = mock[SchedulerDriver]
     eventBus = mock[EventStream]
     taskQueue = mock[LaunchQueue]
@@ -66,9 +66,8 @@ class DeploymentManagerTest
         metrics
     )
     hcManager = mock[HealthCheckManager]
-  }
 
-  test("deploy") {
+  test("deploy")
     val manager = TestActorRef[DeploymentManager](
         Props(classOf[DeploymentManager],
               appRepo,
@@ -93,9 +92,8 @@ class DeploymentManagerTest
         manager.underlyingActor.runningDeployments.contains(plan.id),
         5.seconds
     )
-  }
 
-  test("StopActor") {
+  test("StopActor")
     val manager = TestActorRef[DeploymentManager](
         Props(classOf[DeploymentManager],
               appRepo,
@@ -109,22 +107,20 @@ class DeploymentManagerTest
     val probe = TestProbe()
 
     probe.setAutoPilot(
-        new AutoPilot {
-      override def run(sender: ActorRef, msg: Any): AutoPilot = msg match {
+        new AutoPilot
+      override def run(sender: ActorRef, msg: Any): AutoPilot = msg match
         case Cancel(_) =>
           system.stop(probe.ref)
           NoAutoPilot
-      }
-    })
+    )
 
     val ex = new Exception
 
     val res = manager.underlyingActor.stopActor(probe.ref, ex)
 
     Await.result(res, 5.seconds) should be(true)
-  }
 
-  test("Cancel deployment") {
+  test("Cancel deployment")
     val manager = TestActorRef[DeploymentManager](
         Props(classOf[DeploymentManager],
               appRepo,
@@ -148,5 +144,3 @@ class DeploymentManagerTest
     manager ! CancelDeployment(plan.id)
 
     expectMsgType[DeploymentFailed]
-  }
-}

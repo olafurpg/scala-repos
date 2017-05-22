@@ -1,5 +1,5 @@
-object Test extends App {
-  def testAnonFunClass(o: AnyRef, sp: Boolean = false) = {
+object Test extends App
+  def testAnonFunClass(o: AnyRef, sp: Boolean = false) =
     val isSpecialized = o.getClass.getSuperclass.getName contains "$sp"
     val isDelambdafyMethod = o.getClass.getName contains "$lambda$"
     assert(
@@ -10,13 +10,11 @@ object Test extends App {
     val Some(f) =
       o.getClass.getDeclaredFields.find(_.getName == "serialVersionUID")
     assert(f.getLong(null) == 0l)
-  }
 
-  def testIndyLambda(o: AnyRef, sp: Boolean = false) = {
+  def testIndyLambda(o: AnyRef, sp: Boolean = false) =
     val isSpecialized =
       o.getClass.getInterfaces.exists(_.getName contains "$sp")
     assert(sp == isSpecialized, o.getClass.getName)
-  }
 
   testIndyLambda(() => (), sp = true)
   testIndyLambda(() => 1, sp = true)
@@ -93,27 +91,26 @@ object Test extends App {
       x15: Int, x16: Int, x17: Int, x18: Int, x19: Int, x20: Int, x21: Int,
       x22: Int) => x1)
 
-  testAnonFunClass({
+  testAnonFunClass(
     case x: Int => x
-  }: PartialFunction[Int, Int], sp = true)
+  : PartialFunction[Int, Int], sp = true)
 
-  testAnonFunClass({
+  testAnonFunClass(
     case x: Int => x
-  }: PartialFunction[Any, Any])
+  : PartialFunction[Any, Any])
 
-  testAnonFunClass({
+  testAnonFunClass(
     case x: Int => ()
-  }: PartialFunction[Int, Unit], sp = true)
+  : PartialFunction[Int, Unit], sp = true)
 
-  testAnonFunClass({
+  testAnonFunClass(
     case x: String => 1
-  }: PartialFunction[String, Int])
+  : PartialFunction[String, Int])
 
-  testAnonFunClass({
+  testAnonFunClass(
     case x: String => ()
-  }: PartialFunction[String, Unit])
+  : PartialFunction[String, Unit])
 
-  testAnonFunClass({
+  testAnonFunClass(
     case x: String => x
-  }: PartialFunction[String, String])
-}
+  : PartialFunction[String, String])

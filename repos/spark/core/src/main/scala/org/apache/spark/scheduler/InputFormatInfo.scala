@@ -38,66 +38,58 @@ import org.apache.spark.internal.Logging
 class InputFormatInfo(val configuration: Configuration,
                       val inputFormatClazz: Class[_],
                       val path: String)
-    extends Logging {
+    extends Logging
 
   var mapreduceInputFormat: Boolean = false
   var mapredInputFormat: Boolean = false
 
   validate()
 
-  override def toString: String = {
+  override def toString: String =
     "InputFormatInfo " + super.toString + " .. inputFormatClazz " +
     inputFormatClazz + ", " + "path : " + path
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     var hashCode = inputFormatClazz.hashCode
     hashCode = hashCode * 31 + path.hashCode
     hashCode
-  }
 
   // Since we are not doing canonicalization of path, this can be wrong : like relative vs
   // absolute path .. which is fine, this is best case effort to remove duplicates - right ?
-  override def equals(other: Any): Boolean = other match {
-    case that: InputFormatInfo => {
+  override def equals(other: Any): Boolean = other match
+    case that: InputFormatInfo =>
         // not checking config - that should be fine, right ?
         this.inputFormatClazz == that.inputFormatClazz &&
         this.path == that.path
-      }
     case _ => false
-  }
 
-  private def validate() {
+  private def validate()
     logDebug(
         "validate InputFormatInfo : " + inputFormatClazz + ", path  " + path)
 
-    try {
+    try
       if (classOf[org.apache.hadoop.mapreduce.InputFormat[_, _]]
-            .isAssignableFrom(inputFormatClazz)) {
+            .isAssignableFrom(inputFormatClazz))
         logDebug("inputformat is from mapreduce package")
         mapreduceInputFormat = true
-      } else if (classOf[org.apache.hadoop.mapred.InputFormat[_, _]]
-                   .isAssignableFrom(inputFormatClazz)) {
+      else if (classOf[org.apache.hadoop.mapred.InputFormat[_, _]]
+                   .isAssignableFrom(inputFormatClazz))
         logDebug("inputformat is from mapred package")
         mapredInputFormat = true
-      } else {
+      else
         throw new IllegalArgumentException(
             "Specified inputformat " + inputFormatClazz +
             " is NOT a supported input format ? does not implement either of the supported hadoop " +
             "api's")
-      }
-    } catch {
-      case e: ClassNotFoundException => {
+    catch
+      case e: ClassNotFoundException =>
           throw new IllegalArgumentException(
               "Specified inputformat " + inputFormatClazz +
               " cannot be found ?",
               e)
-        }
-    }
-  }
 
   // This method does not expect failures, since validate has already passed ...
-  private def prefLocsFromMapreduceInputFormat(): Set[SplitInfo] = {
+  private def prefLocsFromMapreduceInputFormat(): Set[SplitInfo] =
     val conf = new JobConf(configuration)
     SparkHadoopUtil.get.addCredentials(conf)
     FileInputFormat.setInputPaths(conf, path)
@@ -110,15 +102,13 @@ class InputFormatInfo(val configuration: Configuration,
 
     val retval = new ArrayBuffer[SplitInfo]()
     val list = instance.getSplits(job)
-    for (split <- list.asScala) {
+    for (split <- list.asScala)
       retval ++= SplitInfo.toSplitInfo(inputFormatClazz, path, split)
-    }
 
     retval.toSet
-  }
 
   // This method does not expect failures, since validate has already passed ...
-  private def prefLocsFromMapredInputFormat(): Set[SplitInfo] = {
+  private def prefLocsFromMapredInputFormat(): Set[SplitInfo] =
     val jobConf = new JobConf(configuration)
     SparkHadoopUtil.get.addCredentials(jobConf)
     FileInputFormat.setInputPaths(jobConf, path)
@@ -136,23 +126,19 @@ class InputFormatInfo(val configuration: Configuration,
       )
 
     retval.toSet
-  }
 
-  private def findPreferredLocations(): Set[SplitInfo] = {
+  private def findPreferredLocations(): Set[SplitInfo] =
     logDebug(
         "mapreduceInputFormat : " + mapreduceInputFormat +
         ", mapredInputFormat : " + mapredInputFormat +
         ", inputFormatClazz : " + inputFormatClazz)
-    if (mapreduceInputFormat) {
+    if (mapreduceInputFormat)
       prefLocsFromMapreduceInputFormat()
-    } else {
+    else
       assert(mapredInputFormat)
       prefLocsFromMapredInputFormat()
-    }
-  }
-}
 
-object InputFormatInfo {
+object InputFormatInfo
 
   /**
     Computes the preferred locations based on input(s) and returned a location to block map.
@@ -173,19 +159,15 @@ object InputFormatInfo {
     PS: I know the wording here is weird, hopefully it makes some sense !
     */
   def computePreferredLocations(
-      formats: Seq[InputFormatInfo]): Map[String, Set[SplitInfo]] = {
+      formats: Seq[InputFormatInfo]): Map[String, Set[SplitInfo]] =
 
     val nodeToSplit = new HashMap[String, HashSet[SplitInfo]]
-    for (inputSplit <- formats) {
+    for (inputSplit <- formats)
       val splits = inputSplit.findPreferredLocations()
 
-      for (split <- splits) {
+      for (split <- splits)
         val location = split.hostLocation
         val set = nodeToSplit.getOrElseUpdate(location, new HashSet[SplitInfo])
         set += split
-      }
-    }
 
     nodeToSplit.mapValues(_.toSet).toMap
-  }
-}

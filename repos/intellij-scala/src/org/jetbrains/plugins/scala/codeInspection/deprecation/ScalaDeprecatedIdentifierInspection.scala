@@ -12,14 +12,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
   * @author Nikolay.Tropin
   */
 class ScalaDeprecatedIdentifierInspection
-    extends AbstractInspection(id, inspectionName) {
+    extends AbstractInspection(id, inspectionName)
   private val deprecatedNames = Set("then")
 
   private def message(deprecatedName: String) =
     s"Usage of $deprecatedName as identifier is deprecated. It can be used as a keyword in future versions of scala."
 
   override def actionFor(
-      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case ref: ScReferenceElement if deprecatedNames.contains(ref.refName) =>
       holder.registerProblem(ref.nameId,
                              message(ref.refName),
@@ -30,10 +30,7 @@ class ScalaDeprecatedIdentifierInspection
                              message(named.name),
                              ProblemHighlightType.LIKE_DEPRECATED,
                              null: TextRange)
-  }
-}
 
-object ScalaDeprecatedIdentifierInspection {
+object ScalaDeprecatedIdentifierInspection
   val id = s"ScalaDeprecatedIdentifier"
   val inspectionName = "Deprecated identifier"
-}

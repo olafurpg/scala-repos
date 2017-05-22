@@ -1,10 +1,9 @@
-object ObjectProperty {
+object ObjectProperty
   implicit def jfxObjectProperty2sfx[T](p: OP[T]) = new ObjectProperty[T](p)
-}
 
 class ObjectProperty[T](val delegate: OP[T])
 
-trait TestWildcardBoundInference {
+trait TestWildcardBoundInference
   def delegate: Skinnable
   def skin: ObjectProperty[Skin[_ /* inferred: <: Skinnable */ ]] =
     ObjectProperty.jfxObjectProperty2sfx(delegate.skinProperty)
@@ -12,4 +11,3 @@ trait TestWildcardBoundInference {
 
   def skinCheckInference = delegate.skinProperty
   skinCheckInference: ObjectProperty[Skin[_ <: Skinnable]]
-}

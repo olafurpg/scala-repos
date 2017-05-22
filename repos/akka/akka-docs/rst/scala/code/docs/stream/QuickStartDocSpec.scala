@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 import java.io.File
 
 class QuickStartDocSpec
-    extends WordSpec with BeforeAndAfterAll with ScalaFutures {
+    extends WordSpec with BeforeAndAfterAll with ScalaFutures
   implicit val patience = PatienceConfig(5.seconds)
 
   //#create-materializer
@@ -26,11 +26,10 @@ class QuickStartDocSpec
   implicit val materializer = ActorMaterializer()
   //#create-materializer
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     system.terminate()
-  }
 
-  "demonstrate Source" in {
+  "demonstrate Source" in
     //#create-source
     val source: Source[Int, NotUsed] = Source(1 to 100)
     //#create-source
@@ -62,7 +61,6 @@ class QuickStartDocSpec
     //#add-streams
 
     done.futureValue
-  }
 
   //#transform-sink
   def lineSink(filename: String): Sink[String, Future[IOResult]] =
@@ -70,4 +68,3 @@ class QuickStartDocSpec
       .map(s => ByteString(s + "\n"))
       .toMat(FileIO.toFile(new File(filename)))(Keep.right)
   //#transform-sink
-}

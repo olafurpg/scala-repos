@@ -21,33 +21,30 @@ import java.nio.ByteBuffer
 import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
 
 case class MemcacheRequest(
-    line: List[String], data: Option[ByteBuffer], bytesRead: Int) {
-  override def toString = {
+    line: List[String], data: Option[ByteBuffer], bytesRead: Int)
+  override def toString =
     "<Request: " + line.mkString("[", " ", "]") +
-    (data match {
+    (data match
           case None => ""
           case Some(x) => " data=" + x.remaining
-        }) + " read=" + bytesRead + ">"
-  }
-}
+        ) + " read=" + bytesRead + ">"
 
 case class MemcacheResponse(
     line: String,
     data: Option[ByteBuffer] = None
 )
-    extends Codec.Signalling {
-  override def toString = {
+    extends Codec.Signalling
+  override def toString =
     "<Response: " + line +
-    (data match {
+    (data match
           case None => ""
           case Some(x) => " data=" + x.remaining
-        }) + ">"
-  }
+        ) + ">"
 
   val lineData = line.getBytes("ISO-8859-1")
 
-  def writeAscii(): Option[ChannelBuffer] = {
-    if (lineData.size > 0) {
+  def writeAscii(): Option[ChannelBuffer] =
+    if (lineData.size > 0)
       val dataSize =
         if (data.isDefined) (data.get.remaining + MemcacheCodec.END.size)
         else 0
@@ -55,18 +52,14 @@ case class MemcacheResponse(
       val buffer = ChannelBuffers.buffer(size)
       buffer.writeBytes(lineData)
       buffer.writeBytes(MemcacheCodec.CRLF)
-      data.foreach { x =>
+      data.foreach  x =>
         buffer.writeBytes(x)
         buffer.writeBytes(MemcacheCodec.END)
-      }
       Some(buffer)
-    } else {
+    else
       None
-    }
-  }
-}
 
-object MemcacheCodec {
+object MemcacheCodec
   import Stages._
 
   val STORAGE_COMMANDS = List(
@@ -80,17 +73,16 @@ object MemcacheCodec {
 
   def asciiCodec() = new Codec(readAscii, writeAscii)
 
-  val readAscii = readLine(true, "ISO-8859-1") { line =>
+  val readAscii = readLine(true, "ISO-8859-1")  line =>
     val segments = line.split(" ")
     segments(0) = segments(0).toLowerCase
 
     val command = segments(0)
-    if (STORAGE_COMMANDS contains command) {
-      if (segments.length < 5) {
+    if (STORAGE_COMMANDS contains command)
+      if (segments.length < 5)
         throw new ProtocolError("Malformed request line")
-      }
       val dataBytes = segments(4).toInt
-      ensureBytes(dataBytes + 2) { buffer =>
+      ensureBytes(dataBytes + 2)  buffer =>
         // final 2 bytes are just "\r\n" mandated by protocol.
         val bytes = ByteBuffer.allocate(dataBytes)
         buffer.readBytes(bytes)
@@ -98,13 +90,8 @@ object MemcacheCodec {
         buffer.skipBytes(2)
         emit(MemcacheRequest(
                 segments.toList, Some(bytes), line.length + dataBytes + 4))
-      }
-    } else {
+    else
       emit(MemcacheRequest(segments.toList, None, line.length + 2))
-    }
-  }
 
-  val writeAscii = new Encoder[MemcacheResponse] {
+  val writeAscii = new Encoder[MemcacheResponse]
     def encode(obj: MemcacheResponse) = obj.writeAscii()
-  }
-}

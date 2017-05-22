@@ -12,7 +12,7 @@ class ChainSetup[In, Out, M](stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
                              materializer: ActorMaterializer,
                              toPublisher: (Source[Out, _],
                              ActorMaterializer) ⇒ Publisher[Out])(
-    implicit val system: ActorSystem) {
+    implicit val system: ActorSystem)
 
   def this(stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
            settings: ActorMaterializerSettings,
@@ -39,4 +39,3 @@ class ChainSetup[In, Out, M](stream: Flow[In, In, NotUsed] ⇒ Flow[In, Out, M],
   val upstreamSubscription = upstream.expectSubscription()
   publisher.subscribe(downstream)
   val downstreamSubscription = downstream.expectSubscription()
-}

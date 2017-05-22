@@ -19,10 +19,9 @@ package generic
   *  @define coll clearable collection
   *  @define Coll `Clearable`
   */
-trait Clearable {
+trait Clearable
 
   /** Clears the $coll's contents. After this operation, the
     *  $coll is empty.
     */
   def clear(): Unit
-}

@@ -10,10 +10,10 @@ package org.scalajs.testsuite.javalib.lang
 import org.junit.Test
 import org.junit.Assert._
 
-class CharacterTestOnJDK7 {
+class CharacterTestOnJDK7
 
   @Test
-  def shouldProvideIsBmpCodePoint(): Unit = {
+  def shouldProvideIsBmpCodePoint(): Unit =
     // 50 randomly chosen characters that produce true
     assertTrue(Character.isBmpCodePoint('\u0120'))
     assertTrue(Character.isBmpCodePoint('\u0147'))
@@ -117,10 +117,9 @@ class CharacterTestOnJDK7 {
     assertFalse(Character.isBmpCodePoint(1043178))
     assertFalse(Character.isBmpCodePoint(1075598))
     assertFalse(Character.isBmpCodePoint(1097392))
-  }
 
   @Test
-  def shouldProvideIsAlphabetic(): Unit = {
+  def shouldProvideIsAlphabetic(): Unit =
     // 50 randomly chosen characters that produce true
     assertTrue(Character.isAlphabetic('\u04F8'))
     assertTrue(Character.isAlphabetic('\u05DB'))
@@ -224,10 +223,9 @@ class CharacterTestOnJDK7 {
     assertFalse(Character.isAlphabetic(977329))
     assertFalse(Character.isAlphabetic(99202))
     assertFalse(Character.isAlphabetic(993967))
-  }
 
   @Test
-  def shouldProvideIsIdeographic(): Unit = {
+  def shouldProvideIsIdeographic(): Unit =
     // 50 randomly chosen characters that produce true
     assertTrue(Character.isIdeographic('\u388F'))
     assertTrue(Character.isIdeographic('\u4711'))
@@ -331,5 +329,3 @@ class CharacterTestOnJDK7 {
     assertFalse(Character.isIdeographic(912462))
     assertFalse(Character.isIdeographic(958559))
     assertFalse(Character.isIdeographic(999076))
-  }
-}

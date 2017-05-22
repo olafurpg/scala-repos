@@ -3,7 +3,7 @@ package math.prime
 
 import spire.math.SafeLong
 
-object SieveUtil {
+object SieveUtil
 
   /**
     * Represents a prime factor which we need to keep track of.
@@ -14,9 +14,8 @@ object SieveUtil {
     * We use a slightly non-standard compare() function so that the
     * factor with the smallest 'next' field will be the largest.
     */
-  case class Factor(p: SafeLong, var next: SafeLong) extends Ordered[Factor] {
+  case class Factor(p: SafeLong, var next: SafeLong) extends Ordered[Factor]
     def compare(that: Factor): Int = -(this.next compare that.next)
-  }
 
   /**
     * Reprsents a prime factor which we need to keep track of.
@@ -35,7 +34,5 @@ object SieveUtil {
     */
   case class FastFactors(var arr: Array[FastFactor])
 
-  object FastFactors {
+  object FastFactors
     def empty: FastFactors = FastFactors(new Array[FastFactor](0))
-  }
-}

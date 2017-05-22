@@ -6,7 +6,7 @@ package akka.http.scaladsl
 
 import scala.concurrent.Future
 
-package object server {
+package object server
 
   type Route = RequestContext ⇒ Future[RouteResult]
   type RouteGenerator[T] = T ⇒ Route
@@ -16,4 +16,3 @@ package object server {
   type PathMatcher1[T] = PathMatcher[Tuple1[T]]
 
   def FIXME = throw new RuntimeException("Not yet implemented")
-}

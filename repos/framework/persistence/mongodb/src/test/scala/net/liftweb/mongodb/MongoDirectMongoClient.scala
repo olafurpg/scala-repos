@@ -26,18 +26,17 @@ import org.specs2.mutable.Specification
 /**
   * System under specification for MongoDirectMonoClient.
   */
-class MongoDirectMongoClientSpec extends Specification with MongoTestKit {
+class MongoDirectMongoClientSpec extends Specification with MongoTestKit
   "MongoDirectMongoClient Specification".title
 
   override def mongo = new MongoClient("127.0.0.1", 27017)
 
-  "MongoClient example" in {
+  "MongoClient example" in
 
     checkMongoIsRunning
 
     // use a Mongo instance directly
     MongoDB.use(db =>
-          {
         val coll = db.getCollection("testCollection")
 
         // create a unique index on name
@@ -65,7 +64,5 @@ class MongoDirectMongoClientSpec extends Specification with MongoTestKit {
         coll.save(doc)
         coll.save(doc2) must throwA[MongoException]
         coll.save(doc3)
-    })
+    )
     success
-  }
-}

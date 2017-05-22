@@ -39,7 +39,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * @define ORIGINALDOC Original Documentation]].
   */
 object TreeSortMode
-    extends SFXEnumDelegateCompanion[jfxsc.TreeSortMode, TreeSortMode] {
+    extends SFXEnumDelegateCompanion[jfxsc.TreeSortMode, TreeSortMode]
 
   /**
     * Default; sort all nodes.
@@ -59,7 +59,6 @@ object TreeSortMode
 
   protected override def unsortedValues: Array[TreeSortMode] =
     Array(AllDescendants, OnlyFirstModel)
-}
 
 /**
   * Wraps JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TreeSortMode.html TreeSortMode]].

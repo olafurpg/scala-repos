@@ -1,3 +1,2 @@
-class A {
+class A
   def x = "3"
-}

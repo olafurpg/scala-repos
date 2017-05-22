@@ -10,7 +10,7 @@ package scala.scalajs.js
 
 /** Methods related to URIs, provided by ECMAScript 5.1. */
 @native
-object URIUtils extends GlobalScope {
+object URIUtils extends GlobalScope
 
   /** Decodes a Uniform Resource Identifier (URI).
     *  @see [[encodeURI]]
@@ -31,4 +31,3 @@ object URIUtils extends GlobalScope {
     *  @see [[decodeURIComponent]]
     */
   def encodeURIComponent(uriComponent: String): String = native
-}

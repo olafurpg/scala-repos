@@ -2,6 +2,5 @@ package com
 
 import test.RT
 
-class A {
+class A
   val rt: RT = new RT()
-}

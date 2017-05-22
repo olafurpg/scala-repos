@@ -21,7 +21,7 @@ import simulacrum.typeclass
   *    but not the structure of A.
   */
 @typeclass
-trait SemigroupK[F[_]] { self =>
+trait SemigroupK[F[_]]  self =>
 
   /**
     * Combine two F[A] values.
@@ -33,22 +33,18 @@ trait SemigroupK[F[_]] { self =>
     * Compose this SemigroupK with an arbitrary type constructor
     */
   def composeK[G[_]]: SemigroupK[λ[α => F[G[α]]]] =
-    new CompositeSemigroupK[F, G] {
+    new CompositeSemigroupK[F, G]
       implicit def F: SemigroupK[F] = self
-    }
 
   /**
     * Given a type A, create a concrete Semigroup[F[A]].
     */
   def algebra[A]: Semigroup[F[A]] =
-    new Semigroup[F[A]] {
+    new Semigroup[F[A]]
       def combine(x: F[A], y: F[A]): F[A] = self.combineK(x, y)
-    }
-}
 
-trait CompositeSemigroupK[F[_], G[_]] extends SemigroupK[λ[α => F[G[α]]]] {
+trait CompositeSemigroupK[F[_], G[_]] extends SemigroupK[λ[α => F[G[α]]]]
 
   implicit def F: SemigroupK[F]
 
   def combineK[A](x: F[G[A]], y: F[G[A]]): F[G[A]] = F.combineK(x, y)
-}

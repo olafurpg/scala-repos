@@ -6,12 +6,12 @@ import spire.implicits.cforRange
 /**
   * Computes the determinant of the given real matrix.
   */
-object det extends UFunc {
+object det extends UFunc
   implicit def canDetUsingLU[T](
       implicit luImpl: LU.Impl[T, (DenseMatrix[Double], Array[Int])])
-    : Impl[T, Double] = {
-    new Impl[T, Double] {
-      def apply(X: T): Double = {
+    : Impl[T, Double] =
+    new Impl[T, Double]
+      def apply(X: T): Double =
 
         // For triangular N-by-N matrices X, the determinant of X equals the product
         // of the diagonal elements X(i,i) where 0 <= i < N.
@@ -24,17 +24,11 @@ object det extends UFunc {
         //  indices, we have to compare them against their position within the array.  A
         //  final complication is that the array indices are 1-based, due to the LU call
         //  into LAPACK.
-        val numExchangedRows = ipiv.map(_ - 1).zipWithIndex.count { piv =>
+        val numExchangedRows = ipiv.map(_ - 1).zipWithIndex.count  piv =>
           piv._1 != piv._2
-        }
 
         var acc = if (numExchangedRows % 2 == 1) -1.0 else 1.0
-        cforRange(0 until m.rows) { i =>
+        cforRange(0 until m.rows)  i =>
           acc *= m(i, i)
-        }
 
         acc
-      }
-    }
-  }
-}

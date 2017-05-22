@@ -50,7 +50,7 @@ import convert._
   *  @author Martin Odersky
   *  @since  2.8
   */
-object JavaConversions extends WrapAsScala with WrapAsJava {
+object JavaConversions extends WrapAsScala with WrapAsJava
   @deprecated("Use a member of scala.collection.convert.Wrappers", "2.10.0")
   type ConcurrentMapWrapper[A, B] = Wrappers.ConcurrentMapWrapper[A, B]
   @deprecated("Use a member of scala.collection.convert.Wrappers", "2.10.0")
@@ -172,4 +172,3 @@ object JavaConversions extends WrapAsScala with WrapAsJava {
   @deprecated("use propertiesAsScalaMap instead", "2.9.0")
   def asScalaMap(p: ju.Properties): mutable.Map[String, String] =
     propertiesAsScalaMap(p)
-}

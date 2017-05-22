@@ -12,14 +12,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.TypeParameter
   */
 class ScLightTypeParamClause(
     tParams: List[TypeParameter], t: ScTypeParamClause)
-    extends LightElement(t.getManager, t.getLanguage) with ScTypeParamClause {
+    extends LightElement(t.getManager, t.getLanguage) with ScTypeParamClause
   override def getTextByStub: String = t.getTextByStub
 
   override def typeParameters: Seq[ScTypeParam] =
-    tParams.zip(t.typeParameters).map {
+    tParams.zip(t.typeParameters).map
       case (t: TypeParameter, tParam: ScTypeParam) =>
         new ScLightTypeParam(t, tParam)
-    }
 
   override def toString: String = t.toString
 
@@ -30,4 +29,3 @@ class ScLightTypeParamClause(
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
-}

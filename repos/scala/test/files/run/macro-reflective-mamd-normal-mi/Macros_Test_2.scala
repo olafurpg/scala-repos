@@ -2,7 +2,7 @@
 //  def foo(x: Int) = macro Impls.foo
 //}
 
-object Test extends App {
+object Test extends App
   import scala.reflect.runtime.universe._
   import scala.reflect.runtime.universe.Flag._
   import scala.reflect.runtime.{currentMirror => cm}
@@ -35,4 +35,3 @@ object Test extends App {
   val tree = Block(List(macrodef, module), macroapp)
   val toolbox = cm.mkToolBox(options = "-language:experimental.macros")
   println(toolbox.eval(tree))
-}

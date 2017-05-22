@@ -10,7 +10,7 @@ import scala.collection.immutable.{Iterable, List}
   * Most usage will be via the implementation provided
   * by [[GlobalRules.get]].
   */
-trait Rules {
+trait Rules
 
   /**
     * Return all rules [[add added]].
@@ -26,23 +26,19 @@ trait Rules {
     * Duplicates are allowed.
     */
   def add(rule: Rule): Unit
-}
 
-class RulesImpl extends Rules {
+class RulesImpl extends Rules
 
   // thread-safety via synchronization on `this`
   private[this] var rules = List.empty[Rule]
 
-  def iterable: Iterable[Rule] = synchronized {
+  def iterable: Iterable[Rule] = synchronized
     rules
-  }
 
-  def add(rule: Rule): Unit = synchronized {
+  def add(rule: Rule): Unit = synchronized
     rules = rule :: rules
-  }
-}
 
-object GlobalRules {
+object GlobalRules
 
   private[this] val rules = new RulesImpl()
 
@@ -50,4 +46,3 @@ object GlobalRules {
     * Gets the global [[Rules]] implementation.
     */
   def get: Rules = rules
-}

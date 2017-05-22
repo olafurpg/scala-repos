@@ -9,13 +9,11 @@ import com.intellij.debugger.engine.evaluation.expression.{Evaluator, Modifier}
   * 7/24/13
   */
 class ScalaBlockExpressionEvaluator(statements: Seq[Evaluator])
-    extends Evaluator {
-  def evaluate(context: EvaluationContextImpl): AnyRef = {
+    extends Evaluator
+  def evaluate(context: EvaluationContextImpl): AnyRef =
     val void: AnyRef =
       context.getSuspendContext.getDebugProcess.getVirtualMachineProxy
         .mirrorOfVoid()
     statements.foldLeft(void)((_, stmt) => stmt.evaluate(context))
-  }
 
   def getModifier: Modifier = null
-}

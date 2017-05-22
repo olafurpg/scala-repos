@@ -28,24 +28,18 @@ import fixtures._
 /**
   * Systems under specification for RecordField.
   */
-object RecordRulesSpec extends Specification {
+object RecordRulesSpec extends Specification
   "Record Rules Specification".title
   sequential
 
-  "RecordRules" should {
-    "snakify custom field name" in {
-      RecordRules.fieldName.doWith((_, name) => snakify(name)) {
+  "RecordRules" should
+    "snakify custom field name" in
+      RecordRules.fieldName.doWith((_, name) => snakify(name))
         val rec = BasicTestRecord.createRecord
 
         rec.fieldThree.name must_== "field_three"
-      }
-    }
-    "camelify custom field display name" in {
-      RecordRules.displayName.doWith((_, _, name) => camelify(name)) {
+    "camelify custom field display name" in
+      RecordRules.displayName.doWith((_, _, name) => camelify(name))
         val rec = BasicTestRecord.createRecord
 
         rec.fieldThree.displayName must_== "FieldThree"
-      }
-    }
-  }
-}

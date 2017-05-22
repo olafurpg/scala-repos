@@ -29,7 +29,7 @@ private trait KafkaCSVMetricsReporterMBean extends KafkaMetricsReporterMBean
 
 private class KafkaCSVMetricsReporter
     extends KafkaMetricsReporter with KafkaCSVMetricsReporterMBean
-    with Logging {
+    with Logging
 
   private var csvDir: File = null
   private var underlying: CsvReporter = null
@@ -39,9 +39,9 @@ private class KafkaCSVMetricsReporter
   override def getMBeanName =
     "kafka:type=kafka.metrics.KafkaCSVMetricsReporter"
 
-  override def init(props: VerifiableProperties) {
-    synchronized {
-      if (!initialized) {
+  override def init(props: VerifiableProperties)
+    synchronized
+      if (!initialized)
         val metricsConfig = new KafkaMetricsConfig(props)
         csvDir = new File(
             props.getString("kafka.csv.metrics.dir", "kafka_metrics"))
@@ -49,34 +49,23 @@ private class KafkaCSVMetricsReporter
         csvDir.mkdirs()
         underlying = new CsvReporter(Metrics.defaultRegistry(), csvDir)
         if (props.getBoolean(
-                "kafka.csv.metrics.reporter.enabled", default = false)) {
+                "kafka.csv.metrics.reporter.enabled", default = false))
           initialized = true
           startReporter(metricsConfig.pollingIntervalSecs)
-        }
-      }
-    }
-  }
 
-  override def startReporter(pollingPeriodSecs: Long) {
-    synchronized {
-      if (initialized && !running) {
+  override def startReporter(pollingPeriodSecs: Long)
+    synchronized
+      if (initialized && !running)
         underlying.start(pollingPeriodSecs, TimeUnit.SECONDS)
         running = true
         info(
             "Started Kafka CSV metrics reporter with polling period %d seconds"
               .format(pollingPeriodSecs))
-      }
-    }
-  }
 
-  override def stopReporter() {
-    synchronized {
-      if (initialized && running) {
+  override def stopReporter()
+    synchronized
+      if (initialized && running)
         underlying.shutdown()
         running = false
         info("Stopped Kafka CSV metrics reporter")
         underlying = new CsvReporter(Metrics.defaultRegistry(), csvDir)
-      }
-    }
-  }
-}

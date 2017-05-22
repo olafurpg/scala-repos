@@ -1,23 +1,17 @@
-package p {
+package p
 
-  object Container {
+  object Container
     private[p] val invisible = "smth"
-  }
-  package p2 {
+  package p2
 
     import p.Container
 
-    object User {
+    object User
       Container. /*resolved: true*/ invisible
-    }
-  }
-}
 
-package p3 {
+package p3
 
   import p.Container
 
-  object User {
+  object User
     Container. /*accessible: false*/ invisible
-  }
-}

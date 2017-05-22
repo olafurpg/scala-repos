@@ -29,7 +29,7 @@ import org.apache.kafka.common.serialization.{IntegerSerializer, StringSerialize
 import org.junit.{After, Before, Test}
 import org.junit.Assert._
 
-class LogRecoveryTest extends ZooKeeperTestHarness {
+class LogRecoveryTest extends ZooKeeperTestHarness
 
   val replicaLagTimeMaxMs = 5000L
   val replicaLagMaxMessages = 10L
@@ -69,7 +69,7 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
 
   // Some tests restart the brokers then produce more data. But since test brokers use random ports, we need
   // to use a new producer that knows the new ports
-  def updateProducer() = {
+  def updateProducer() =
     if (producer != null) producer.close()
     producer = TestUtils.createNewProducer(
         TestUtils.getBrokerListStrFromServers(servers),
@@ -77,10 +77,9 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
         keySerializer = new IntegerSerializer,
         valueSerializer = new StringSerializer
     )
-  }
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     configs = TestUtils
@@ -100,20 +99,17 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
 
     // create the producer
     updateProducer()
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     producer.close()
-    for (server <- servers) {
+    for (server <- servers)
       server.shutdown()
       CoreUtils.rm(server.config.logDirs(0))
-    }
     super.tearDown()
-  }
 
   @Test
-  def testHWCheckpointNoFailuresSingleLogSegment {
+  def testHWCheckpointNoFailuresSingleLogSegment
     val numMessages = 2L
     sendMessages(numMessages.toInt)
 
@@ -132,10 +128,9 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
     assertEquals(numMessages, leaderHW)
     val followerHW = hwFile2.read.getOrElse(TopicAndPartition(topic, 0), 0L)
     assertEquals(numMessages, followerHW)
-  }
 
   @Test
-  def testHWCheckpointWithFailuresSingleLogSegment {
+  def testHWCheckpointWithFailuresSingleLogSegment
     var leader = waitUntilLeaderIsElectedOrChanged(zkUtils, topic, partitionId)
 
     assertEquals(0L, hwFile1.read.getOrElse(TopicAndPartition(topic, 0), 0L))
@@ -192,10 +187,9 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
     servers.foreach(_.shutdown())
     assertEquals(hw, hwFile1.read.getOrElse(TopicAndPartition(topic, 0), 0L))
     assertEquals(hw, hwFile2.read.getOrElse(TopicAndPartition(topic, 0), 0L))
-  }
 
   @Test
-  def testHWCheckpointNoFailuresMultipleLogSegments {
+  def testHWCheckpointNoFailuresMultipleLogSegments
     sendMessages(20)
     val hw = 20L
     // give some time for follower 1 to record leader HW of 600
@@ -213,10 +207,9 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
     assertEquals(hw, leaderHW)
     val followerHW = hwFile2.read.getOrElse(TopicAndPartition(topic, 0), 0L)
     assertEquals(hw, followerHW)
-  }
 
   @Test
-  def testHWCheckpointWithFailuresMultipleLogSegments {
+  def testHWCheckpointWithFailuresMultipleLogSegments
     var leader = waitUntilLeaderIsElectedOrChanged(zkUtils, topic, partitionId)
 
     sendMessages(2)
@@ -273,11 +266,8 @@ class LogRecoveryTest extends ZooKeeperTestHarness {
     servers.foreach(_.shutdown())
     assertEquals(hw, hwFile1.read.getOrElse(TopicAndPartition(topic, 0), 0L))
     assertEquals(hw, hwFile2.read.getOrElse(TopicAndPartition(topic, 0), 0L))
-  }
 
-  private def sendMessages(n: Int = 1) {
+  private def sendMessages(n: Int = 1)
     (0 until n)
       .map(_ => producer.send(new ProducerRecord(topic, 0, message)))
       .foreach(_.get)
-  }
-}

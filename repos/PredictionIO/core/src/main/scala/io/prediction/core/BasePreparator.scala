@@ -26,7 +26,7 @@ import org.apache.spark.SparkContext
   * @tparam PD Prepared data class
   */
 @DeveloperApi
-abstract class BasePreparator[TD, PD] extends AbstractDoer {
+abstract class BasePreparator[TD, PD] extends AbstractDoer
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by training
@@ -38,4 +38,3 @@ abstract class BasePreparator[TD, PD] extends AbstractDoer {
     */
   @DeveloperApi
   def prepareBase(sc: SparkContext, td: TD): PD
-}

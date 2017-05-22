@@ -38,7 +38,7 @@ case class ScalaUDF(function: AnyRef,
                     dataType: DataType,
                     children: Seq[Expression],
                     inputTypes: Seq[DataType] = Nil)
-    extends Expression with ImplicitCastInputTypes with NonSQLExpression {
+    extends Expression with ImplicitCastInputTypes with NonSQLExpression
 
   override def nullable: Boolean = true
 
@@ -70,13 +70,11 @@ case class ScalaUDF(function: AnyRef,
   def userDefinedFunc(): AnyRef = function
   def getChildren(): Seq[Expression] = children
 
-  private[this] val f = children.size match {
+  private[this] val f = children.size match
     case 0 =>
       val func = function.asInstanceOf[() => Any]
       (input: InternalRow) =>
-        {
           func()
-        }
 
       case 1 =>
       val func = function.asInstanceOf[(Any) => Any]
@@ -84,9 +82,7 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter0 =
         CatalystTypeConverters.createToScalaConverter(child0.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)))
-        }
 
       case 2 =>
       val func = function.asInstanceOf[(Any, Any) => Any]
@@ -97,10 +93,8 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter1 =
         CatalystTypeConverters.createToScalaConverter(child1.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)))
-        }
 
       case 3 =>
       val func = function.asInstanceOf[(Any, Any, Any) => Any]
@@ -114,11 +108,9 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter2 =
         CatalystTypeConverters.createToScalaConverter(child2.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)))
-        }
 
       case 4 =>
       val func = function.asInstanceOf[(Any, Any, Any, Any) => Any]
@@ -135,12 +127,10 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter3 =
         CatalystTypeConverters.createToScalaConverter(child3.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
                converter3(child3.eval(input)))
-        }
 
       case 5 =>
       val func = function.asInstanceOf[(Any, Any, Any, Any, Any) => Any]
@@ -160,13 +150,11 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter4 =
         CatalystTypeConverters.createToScalaConverter(child4.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
                converter3(child3.eval(input)),
                converter4(child4.eval(input)))
-        }
 
       case 6 =>
       val func = function.asInstanceOf[(Any, Any, Any, Any, Any, Any) => Any]
@@ -189,14 +177,12 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter5 =
         CatalystTypeConverters.createToScalaConverter(child5.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
                converter3(child3.eval(input)),
                converter4(child4.eval(input)),
                converter5(child5.eval(input)))
-        }
 
       case 7 =>
       val func =
@@ -223,7 +209,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter6 =
         CatalystTypeConverters.createToScalaConverter(child6.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -231,7 +216,6 @@ case class ScalaUDF(function: AnyRef,
                converter4(child4.eval(input)),
                converter5(child5.eval(input)),
                converter6(child6.eval(input)))
-        }
 
       case 8 =>
       val func =
@@ -261,7 +245,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter7 =
         CatalystTypeConverters.createToScalaConverter(child7.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -270,7 +253,6 @@ case class ScalaUDF(function: AnyRef,
                converter5(child5.eval(input)),
                converter6(child6.eval(input)),
                converter7(child7.eval(input)))
-        }
 
       case 9 =>
       val func = function
@@ -303,7 +285,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter8 =
         CatalystTypeConverters.createToScalaConverter(child8.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -313,7 +294,6 @@ case class ScalaUDF(function: AnyRef,
                converter6(child6.eval(input)),
                converter7(child7.eval(input)),
                converter8(child8.eval(input)))
-        }
 
       case 10 =>
       val func = function.asInstanceOf[
@@ -349,7 +329,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter9 =
         CatalystTypeConverters.createToScalaConverter(child9.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -360,7 +339,6 @@ case class ScalaUDF(function: AnyRef,
                converter7(child7.eval(input)),
                converter8(child8.eval(input)),
                converter9(child9.eval(input)))
-        }
 
       case 11 =>
       val func = function.asInstanceOf[
@@ -399,7 +377,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter10 =
         CatalystTypeConverters.createToScalaConverter(child10.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -411,7 +388,6 @@ case class ScalaUDF(function: AnyRef,
                converter8(child8.eval(input)),
                converter9(child9.eval(input)),
                converter10(child10.eval(input)))
-        }
 
       case 12 =>
       val func = function.asInstanceOf[
@@ -453,7 +429,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter11 =
         CatalystTypeConverters.createToScalaConverter(child11.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -466,7 +441,6 @@ case class ScalaUDF(function: AnyRef,
                converter9(child9.eval(input)),
                converter10(child10.eval(input)),
                converter11(child11.eval(input)))
-        }
 
       case 13 =>
       val func = function.asInstanceOf[
@@ -511,7 +485,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter12 =
         CatalystTypeConverters.createToScalaConverter(child12.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -525,7 +498,6 @@ case class ScalaUDF(function: AnyRef,
                converter10(child10.eval(input)),
                converter11(child11.eval(input)),
                converter12(child12.eval(input)))
-        }
 
       case 14 =>
       val func = function.asInstanceOf[
@@ -573,7 +545,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter13 =
         CatalystTypeConverters.createToScalaConverter(child13.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -588,7 +559,6 @@ case class ScalaUDF(function: AnyRef,
                converter11(child11.eval(input)),
                converter12(child12.eval(input)),
                converter13(child13.eval(input)))
-        }
 
       case 15 =>
       val func = function.asInstanceOf[
@@ -639,7 +609,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter14 =
         CatalystTypeConverters.createToScalaConverter(child14.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -655,7 +624,6 @@ case class ScalaUDF(function: AnyRef,
                converter12(child12.eval(input)),
                converter13(child13.eval(input)),
                converter14(child14.eval(input)))
-        }
 
       case 16 =>
       val func = function.asInstanceOf[
@@ -709,7 +677,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter15 =
         CatalystTypeConverters.createToScalaConverter(child15.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -726,7 +693,6 @@ case class ScalaUDF(function: AnyRef,
                converter13(child13.eval(input)),
                converter14(child14.eval(input)),
                converter15(child15.eval(input)))
-        }
 
       case 17 =>
       val func = function.asInstanceOf[
@@ -783,7 +749,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter16 =
         CatalystTypeConverters.createToScalaConverter(child16.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -801,7 +766,6 @@ case class ScalaUDF(function: AnyRef,
                converter14(child14.eval(input)),
                converter15(child15.eval(input)),
                converter16(child16.eval(input)))
-        }
 
       case 18 =>
       val func = function.asInstanceOf[
@@ -861,7 +825,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter17 =
         CatalystTypeConverters.createToScalaConverter(child17.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -880,7 +843,6 @@ case class ScalaUDF(function: AnyRef,
                converter15(child15.eval(input)),
                converter16(child16.eval(input)),
                converter17(child17.eval(input)))
-        }
 
       case 19 =>
       val func = function.asInstanceOf[
@@ -943,7 +905,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter18 =
         CatalystTypeConverters.createToScalaConverter(child18.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -963,7 +924,6 @@ case class ScalaUDF(function: AnyRef,
                converter16(child16.eval(input)),
                converter17(child17.eval(input)),
                converter18(child18.eval(input)))
-        }
 
       case 20 =>
       val func = function.asInstanceOf[
@@ -1029,7 +989,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter19 =
         CatalystTypeConverters.createToScalaConverter(child19.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -1050,7 +1009,6 @@ case class ScalaUDF(function: AnyRef,
                converter17(child17.eval(input)),
                converter18(child18.eval(input)),
                converter19(child19.eval(input)))
-        }
 
       case 21 =>
       val func = function.asInstanceOf[
@@ -1119,7 +1077,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter20 =
         CatalystTypeConverters.createToScalaConverter(child20.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -1141,7 +1098,6 @@ case class ScalaUDF(function: AnyRef,
                converter18(child18.eval(input)),
                converter19(child19.eval(input)),
                converter20(child20.eval(input)))
-        }
 
       case 22 =>
       val func = function.asInstanceOf[
@@ -1213,7 +1169,6 @@ case class ScalaUDF(function: AnyRef,
       lazy val converter21 =
         CatalystTypeConverters.createToScalaConverter(child21.dataType)
       (input: InternalRow) =>
-        {
           func(converter0(child0.eval(input)),
                converter1(child1.eval(input)),
                converter2(child2.eval(input)),
@@ -1236,14 +1191,12 @@ case class ScalaUDF(function: AnyRef,
                converter19(child19.eval(input)),
                converter20(child20.eval(input)),
                converter21(child21.eval(input)))
-        }
-  }
 
   // scalastyle:on line.size.limit
 
   // Generate codes used to convert the arguments to Scala type for user-defined functions
   private[this] def genCodeForConverter(
-      ctx: CodegenContext, index: Int): String = {
+      ctx: CodegenContext, index: Int): String =
     val converterClassName = classOf[Any => Any].getName
     val typeConvertersClassName =
       CatalystTypeConverters.getClass.getName + ".MODULE$"
@@ -1259,9 +1212,8 @@ case class ScalaUDF(function: AnyRef,
         s".createToScalaConverter(((${expressionClassName})((($scalaUDFClassName)" +
         s"references[$expressionIdx]).getChildren().apply($index))).dataType());")
     converterTerm
-  }
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
 
     ctx.references += this
 
@@ -1306,14 +1258,14 @@ case class ScalaUDF(function: AnyRef,
     // such as IntegerType, its javaType is `int` and the returned type of user-defined
     // function is Object. Trying to convert an Object to `int` will cause casting exception.
     val evalCode = evals.map(_.code).mkString
-    val (converters, funcArguments) = converterTerms.zipWithIndex.map {
+    val (converters, funcArguments) = converterTerms.zipWithIndex.map
       case (converter, i) =>
         val eval = evals(i)
         val argTerm = ctx.freshName("arg")
         val convert =
           s"Object $argTerm = ${eval.isNull} ? null : $converter.apply(${eval.value});"
         (convert, argTerm)
-    }.unzip
+    .unzip
 
     val callFunc =
       s"${ctx.boxedType(dataType)} $resultTerm = " +
@@ -1331,10 +1283,8 @@ case class ScalaUDF(function: AnyRef,
         ${ev.value} = $resultTerm;
       }
     """
-  }
 
   private[this] val converter =
     CatalystTypeConverters.createToCatalystConverter(dataType)
 
   override def eval(input: InternalRow): Any = converter(f(input))
-}

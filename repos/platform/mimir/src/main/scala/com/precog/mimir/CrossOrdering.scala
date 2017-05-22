@@ -24,15 +24,15 @@ import com.precog.yggdrasil.TableModule
 
 import scala.collection.mutable
 
-trait CrossOrdering extends DAG {
+trait CrossOrdering extends DAG
   import TableModule.CrossOrder // TODO: Move CrossOrder out somewhere else.
   import instructions._
   import dag._
 
-  def orderCrosses(node: DepGraph): DepGraph = {
+  def orderCrosses(node: DepGraph): DepGraph =
     val memotable = mutable.Map[DepGraphWrapper, DepGraph]()
 
-    def memoizedSpec(spec: BucketSpec): BucketSpec = spec match {
+    def memoizedSpec(spec: BucketSpec): BucketSpec = spec match
       case UnionBucketSpec(left, right) =>
         UnionBucketSpec(memoizedSpec(left), memoizedSpec(right))
 
@@ -47,10 +47,9 @@ trait CrossOrdering extends DAG {
 
       case dag.Extra(target) =>
         dag.Extra(memoized(target))
-    }
 
-    def memoized(node: DepGraph): DepGraph = {
-      def inner(node: DepGraph): DepGraph = node match {
+    def memoized(node: DepGraph): DepGraph =
+      def inner(node: DepGraph): DepGraph = node match
         // not using extractors due to bug
         case node: SplitParam =>
           SplitParam(node.id, node.parentId)(node.loc)
@@ -90,11 +89,10 @@ trait CrossOrdering extends DAG {
         case dag.MegaReduce(reds, parent) =>
           dag.MegaReduce(reds, memoized(parent))
 
-        case s @ dag.Split(spec, child, id) => {
+        case s @ dag.Split(spec, child, id) =>
             val spec2 = memoizedSpec(spec)
             val child2 = memoized(child)
             dag.Split(spec2, child2, id)(s.loc)
-          }
 
         case node @ dag.Assert(pred, child) =>
           dag.Assert(memoized(pred), memoized(child))(node.loc)
@@ -115,7 +113,7 @@ trait CrossOrdering extends DAG {
         case node @ Diff(left, right) =>
           Diff(memoized(left), memoized(right))(node.loc)
 
-        case node @ Join(op, Cross(hint), left, right) => {
+        case node @ Join(op, Cross(hint), left, right) =>
             import CrossOrder._
             if (right.isSingleton)
               Join(op,
@@ -127,19 +125,16 @@ trait CrossOrdering extends DAG {
                    Cross(Some(CrossRight)),
                    memoized(left),
                    memoized(right))(node.loc)
-            else {
+            else
               val right2 = memoized(right)
 
-              right2 match {
+              right2 match
                 case _: Memoize | _: AddSortKey | _: AbsoluteLoad =>
                   Join(op, Cross(hint), memoized(left), right2)(node.loc)
 
                 case _ =>
                   Join(op, Cross(hint), memoized(left), Memoize(right2, 100))(
                       node.loc)
-              }
-            }
-          }
 
         case node @ Join(op, joinSort, left, right) =>
           Join(op, joinSort, memoized(left), memoized(right))(node.loc)
@@ -151,15 +146,10 @@ trait CrossOrdering extends DAG {
           AddSortKey(memoized(parent), sortField, valueField, id)
 
         case Memoize(parent, priority) => Memoize(memoized(parent), priority)
-      }
 
-      memotable.get(new DepGraphWrapper(node)) getOrElse {
+      memotable.get(new DepGraphWrapper(node)) getOrElse
         val result = inner(node)
         memotable += (new DepGraphWrapper(node) -> result)
         result
-      }
-    }
 
     memoized(node)
-  }
-}

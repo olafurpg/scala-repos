@@ -3,7 +3,7 @@ package org.jetbrains.plugins.scala.annotator.gutter
 /**
   * Pavel.Fatin, 21.01.2010
   */
-class PrefaceImportContainerTest extends LineMarkerTestBase {
+class PrefaceImportContainerTest extends LineMarkerTestBase
   protected override def getBasePath =
     super.getBasePath + "/preface/import/container/"
 
@@ -13,4 +13,3 @@ class PrefaceImportContainerTest extends LineMarkerTestBase {
   def testObject() = doTest()
   def testPackageContainer() = doTest()
   def testTrait() = doTest()
-}

@@ -1,9 +1,7 @@
 package tests
 
-class AA extends A {
+class AA extends A
   override type /*caret*/ Type = this.type
-}
 
-trait A {
+trait A
   type /*caret*/ Type
-}

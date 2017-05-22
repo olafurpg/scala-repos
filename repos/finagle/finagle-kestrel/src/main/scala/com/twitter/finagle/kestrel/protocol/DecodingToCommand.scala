@@ -7,7 +7,7 @@ import com.twitter.finagle.memcached.util.Bufs.RichBuf
 import com.twitter.io.Buf
 
 private[kestrel] class DecodingToCommand
-    extends AbstractDecodingToCommand[Command] {
+    extends AbstractDecodingToCommand[Command]
   private[this] val TimestampPrefix = Buf.Utf8("t=")
 
   private[this] val GET = Buf.Utf8("get")
@@ -27,21 +27,19 @@ private[kestrel] class DecodingToCommand
 
   protected val storageCommands = collection.Set(SET)
 
-  def parseStorageCommand(tokens: Seq[Buf], data: Buf) = {
+  def parseStorageCommand(tokens: Seq[Buf], data: Buf) =
     val commandName = tokens.head
     val args = tokens.tail
-    commandName match {
+    commandName match
       case SET =>
         val (name, _, expiry, _) = validateStorageCommand(args, data)
         Set(name, expiry, data)
       case _ => throw new NonexistentCommand(commandName.toString)
-    }
-  }
 
-  def parseNonStorageCommand(tokens: Seq[Buf]) = {
+  def parseNonStorageCommand(tokens: Seq[Buf]) =
     val commandName = tokens.head
     val args = tokens.tail
-    commandName match {
+    commandName match
       case GET => validateGetCommand(args)
       case DELETE => Delete(validateDeleteCommand(args))
       case FLUSH => Flush(validateDeleteCommand(args))
@@ -51,27 +49,23 @@ private[kestrel] class DecodingToCommand
       case STATS => Stats()
       case DUMP_STATS => DumpStats()
       case _ => throw new NonexistentCommand(commandName.toString)
-    }
-  }
 
-  private[this] def validateGetCommand(tokens: Seq[Buf]): GetCommand = {
+  private[this] def validateGetCommand(tokens: Seq[Buf]): GetCommand =
     if (tokens.size < 1) throw new ClientError("Key missing")
     if (tokens.size > 1) throw new ClientError("Too many arguments")
 
     val splitAll = tokens.head.split('/')
 
     val (splitTimeout, split) =
-      splitAll partition { (value: Buf) =>
+      splitAll partition  (value: Buf) =>
         value.startsWith(TimestampPrefix)
-      }
 
     val queueName = split.head
 
-    val timeout = splitTimeout.lastOption.map {
+    val timeout = splitTimeout.lastOption.map
       case Buf.Utf8(s) => s.drop(2).toInt.milliseconds
-    }
 
-    split.tail match {
+    split.tail match
       case Seq() => Get(queueName, timeout)
       case Seq(OPEN) => Open(queueName, timeout)
       case Seq(CLOSE) => Close(queueName, timeout)
@@ -81,6 +75,3 @@ private[kestrel] class DecodingToCommand
       case _ =>
         throw new NonexistentCommand(
             tokens.map { case Buf.Utf8(s) => s }.mkString)
-    }
-  }
-}

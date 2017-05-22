@@ -1,10 +1,8 @@
-abstract class A {
+abstract class A
   class F
-  object F {
-    implicit class RichF(f: F) {
+  object F
+    implicit class RichF(f: F)
       def foo() = 123
-    }
-  }
 
   type Z <: F
 
@@ -12,5 +10,4 @@ abstract class A {
 
   /*start*/
   foo().foo() /*end*/
-}
 //Int

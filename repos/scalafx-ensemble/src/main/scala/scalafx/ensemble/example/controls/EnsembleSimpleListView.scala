@@ -34,11 +34,11 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.{ListView, SelectionMode}
 import scalafx.scene.layout.StackPane
 
-class EnsembleSimpleListView extends EnsembleExample {
+class EnsembleSimpleListView extends EnsembleExample
 
-  def getContent = new StackPane {
+  def getContent = new StackPane
     padding = Insets(20)
-    children = new ListView[String] {
+    children = new ListView[String]
       maxWidth = 200
       items = ObservableBuffer("Row 1",
                                "Row 2",
@@ -61,6 +61,3 @@ class EnsembleSimpleListView extends EnsembleExample {
                                "Row 19",
                                "Row 20")
       selectionModel().selectionMode = SelectionMode.MULTIPLE
-    }
-  }
-}

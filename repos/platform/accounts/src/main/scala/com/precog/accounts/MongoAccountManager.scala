@@ -50,39 +50,34 @@ import org.streum.configrity.Configuration
 import scalaz._
 import scalaz.syntax.monad._
 
-trait ZkAccountManagerSettings {
+trait ZkAccountManagerSettings
   def zkAccountIdPath: String
-}
 
-trait ZKAccountIdSource extends AccountManager[Future] {
+trait ZKAccountIdSource extends AccountManager[Future]
   implicit def M: Monad[Future]
   def zkc: ZkClient
   def settings: ZkAccountManagerSettings
 
-  def newAccountId: Future[String] = M.point {
-    if (!zkc.exists(settings.zkAccountIdPath)) {
+  def newAccountId: Future[String] = M.point
+    if (!zkc.exists(settings.zkAccountIdPath))
       zkc.createPersistent(settings.zkAccountIdPath, true)
-    }
 
     val createdPath = zkc.createPersistentSequential(
         settings.zkAccountIdPath, Array.empty[Byte])
     createdPath.substring(createdPath.length - 10) //last 10 characters are a sequential int
-  }
-}
 
-trait MongoAccountManagerSettings {
+trait MongoAccountManagerSettings
   def accounts: String
   def deletedAccounts: String
   def timeout: Timeout
 
   def resetTokens: String
   def resetTokenExpirationMinutes: Int
-}
 
 abstract class MongoAccountManager(
     mongo: Mongo, database: Database, settings: MongoAccountManagerSettings)(
     implicit val M: Monad[Future])
-    extends AccountManager[Future] {
+    extends AccountManager[Future]
   import Account._
 
   private lazy val mamLogger =
@@ -107,12 +102,12 @@ abstract class MongoAccountManager(
                     plan: AccountPlan,
                     parent: Option[AccountId],
                     profile: Option[JValue])(
-      f: AccountId => Future[APIKey]): Future[Account] = {
-    for {
+      f: AccountId => Future[APIKey]): Future[Account] =
+    for
       accountId <- newAccountId
       path = Path(accountId)
       apiKey <- f(accountId)
-      account <- {
+      account <-
         val salt = randomSalt()
         val account0 = Account(accountId,
                                email,
@@ -127,34 +122,26 @@ abstract class MongoAccountManager(
                                profile)
 
         database(insert(account0.serialize.asInstanceOf[JObject])
-              .into(settings.accounts)) map { _ =>
+              .into(settings.accounts)) map  _ =>
           account0
-        }
-      }
-    } yield account
-  }
+    yield account
 
   private def findOneMatching[A](
       keyName: String, keyValue: String, collection: String)(
-      implicit extractor: Extractor[A]): Future[Option[A]] = {
-    database(selectOne().from(collection).where(keyName === keyValue)) map {
+      implicit extractor: Extractor[A]): Future[Option[A]] =
+    database(selectOne().from(collection).where(keyName === keyValue)) map
       _.map(_.deserialize(extractor))
-    }
-  }
 
   private def findAllMatching[A](
       keyName: String, keyValue: String, collection: String)(
-      implicit extractor: Extractor[A]): Future[Set[A]] = {
-    database(selectAll.from(collection).where(keyName === keyValue)) map {
+      implicit extractor: Extractor[A]): Future[Set[A]] =
+    database(selectAll.from(collection).where(keyName === keyValue)) map
       _.map(_.deserialize(extractor)).toSet
-    }
-  }
 
   private def findAll[A](
       collection: String)(implicit extract: Extractor[A]): Future[Seq[A]] =
-    database(selectAll.from(collection)) map {
+    database(selectAll.from(collection)) map
       _.map(_.deserialize(extract)).toSeq
-    }
 
   def generateResetToken(account: Account): Future[ResetTokenId] =
     generateResetToken(
@@ -162,7 +149,7 @@ abstract class MongoAccountManager(
         (new DateTime).plusMinutes(settings.resetTokenExpirationMinutes))
 
   def generateResetToken(
-      account: Account, expiration: DateTime): Future[ResetTokenId] = {
+      account: Account, expiration: DateTime): Future[ResetTokenId] =
     val tokenId = java.util.UUID.randomUUID.toString.replace("-", "")
 
     val token = ResetToken(
@@ -170,20 +157,16 @@ abstract class MongoAccountManager(
 
     logger.debug("Saving new reset token " + token)
     database(insert(token.serialize.asInstanceOf[JObject])
-          .into(settings.resetTokens)).map { _ =>
+          .into(settings.resetTokens)).map  _ =>
       logger.debug("Save complete on reset token " + token)
       tokenId
-    }
-  }
 
-  def markResetTokenUsed(tokenId: ResetTokenId): Future[PrecogUnit] = {
+  def markResetTokenUsed(tokenId: ResetTokenId): Future[PrecogUnit] =
     logger.debug("Marking reset token %s as used".format(tokenId))
     database(update(settings.resetTokens)
           .set("usedAt" set (new DateTime).serialize)
-          .where("tokenId" === tokenId)).map { _ =>
+          .where("tokenId" === tokenId)).map  _ =>
       logger.debug("Reset token %s marked as used".format(tokenId)); PrecogUnit
-    }
-  }
 
   def findResetToken(accountId: AccountId,
                      tokenId: ResetTokenId): Future[Option[ResetToken]] =
@@ -199,38 +182,31 @@ abstract class MongoAccountManager(
   def findAccountByEmail(email: String) =
     findOneMatching[Account]("email", email, settings.accounts)
 
-  def updateAccount(account: Account): Future[Boolean] = {
-    findAccountById(account.accountId).flatMap {
+  def updateAccount(account: Account): Future[Boolean] =
+    findAccountById(account.accountId).flatMap
       case Some(existingAccount) =>
-        database {
+        database
           val updateObj = account.serialize.asInstanceOf[JObject]
           update(settings.accounts)
             .set(updateObj)
             .where("accountId" === account.accountId)
-        } map { _ =>
+        map  _ =>
           true
-        }
 
       case None =>
         M.point(false)
-    }
-  }
 
-  def deleteAccount(accountId: String): Future[Option[Account]] = {
-    findAccountById(accountId).flatMap {
+  def deleteAccount(accountId: String): Future[Option[Account]] =
+    findAccountById(accountId).flatMap
       case ot @ Some(account) =>
-        for {
+        for
           _ <- database(insert(account.serialize.asInstanceOf[JObject])
                 .into(settings.deletedAccounts))
           _ <- database(
               remove.from(settings.accounts).where("accountId" === accountId))
-        } yield { ot }
+        yield { ot }
       case None =>
         M.point(None)
-    }
-  }
 
-  def close() = database.disconnect.fallbackTo(M.point(())).flatMap { _ =>
+  def close() = database.disconnect.fallbackTo(M.point(())).flatMap  _ =>
     mongo.close
-  }
-}

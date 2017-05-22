@@ -1,4 +1,4 @@
-object SCL4150 {
+object SCL4150
   class U[T]
   class JK extends U[Int]
   class B[T] extends JK
@@ -9,5 +9,4 @@ object SCL4150 {
 
   /*start*/
   foo(new A[Int, String]) /*end*/
-}
 //SCL4150.B[Int]

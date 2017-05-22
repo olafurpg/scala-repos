@@ -26,7 +26,7 @@ import cascading.tuple.{Fields, TupleEntry}
   * The template string needs to have %s as placeholder for a given field.
   */
 case class TemplatePartition(partitionFields: Fields, template: String)
-    extends Partition {
+    extends Partition
   assert(partitionFields.size == "%s".r.findAllIn(template).length,
          "Number of partition fields %s does not correspond to template (%s)"
            .format(partitionFields, template))
@@ -44,20 +44,17 @@ case class TemplatePartition(partitionFields: Fields, template: String)
     * Converts the given partition string to field values and populates the supplied tuple entry
     * with it.
     */
-  override def toTuple(partition: String, tupleEntry: TupleEntry): Unit = {
+  override def toTuple(partition: String, tupleEntry: TupleEntry): Unit =
     val m = pattern.matcher(partition)
     m.matches
     val parts: Array[Object] =
       (1 to partitionFields.size).map(i => m.group(i)).toArray
     tupleEntry.setCanonicalValues(parts)
-  }
 
   /**
     * Given the specified tuple entry fill in the supplied template entry to create the partition
     * path.
     */
-  override def toPartition(tupleEntry: TupleEntry): String = {
+  override def toPartition(tupleEntry: TupleEntry): String =
     val fields = tupleEntry.asIterableOf(classOf[String]).asScala.toList
     template.format(fields: _*)
-  }
-}

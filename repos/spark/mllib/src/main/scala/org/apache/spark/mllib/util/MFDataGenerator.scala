@@ -53,17 +53,16 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 @Since("0.8.0")
-object MFDataGenerator {
+object MFDataGenerator
   @Since("0.8.0")
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+  def main(args: Array[String])
+    if (args.length < 2)
       // scalastyle:off println
       println(
           "Usage: MFDataGenerator " +
           "<master> <outputDir> [m] [n] [rank] [trainSampFact] [noise] [sigma] [test] [testSampFact]")
       // scalastyle:on println
       System.exit(1)
-    }
 
     val sparkMaster: String = args(0)
     val outputPath: String = args(1)
@@ -99,16 +98,15 @@ object MFDataGenerator {
       sc.parallelize(ordered).map(x => (x % m, x / m, fullData.values(x)))
 
     // optionally add gaussian noise
-    if (noise) {
+    if (noise)
       trainData.map(x => (x._1, x._2, x._3 + rand.nextGaussian * sigma))
-    }
 
     trainData
       .map(x => x._1 + "," + x._2 + "," + x._3)
       .saveAsTextFile(outputPath)
 
     // optionally generate testing data
-    if (test) {
+    if (test)
       val testSampSize =
         math.min(math.round(sampSize * testSampFact).toInt, mn - sampSize)
       val testOmega = shuffled.slice(sampSize, sampSize + testSampSize)
@@ -119,8 +117,5 @@ object MFDataGenerator {
       testData
         .map(x => x._1 + "," + x._2 + "," + x._3)
         .saveAsTextFile(outputPath)
-    }
 
     sc.stop()
-  }
-}

@@ -23,7 +23,7 @@ import simulacrum.typeclass
   * See: [[http://www.cs.nott.ac.uk/~pszgmh/fold.pdf A tutorial on the universality and expressiveness of fold]]
   */
 @typeclass
-trait Foldable[F[_]] { self =>
+trait Foldable[F[_]]  self =>
 
   /**
     * Left associative fold on 'F' using the function 'f'.
@@ -46,27 +46,23 @@ trait Foldable[F[_]] { self =>
 
   def reduceLeftToOption[A, B](
       fa: F[A])(f: A => B)(g: (B, A) => B): Option[B] =
-    foldLeft(fa, Option.empty[B]) {
+    foldLeft(fa, Option.empty[B])
       case (Some(b), a) => Some(g(b, a))
       case (None, a) => Some(f(a))
-    }
 
   def reduceRightToOption[A, B](
       fa: F[A])(f: A => B)(g: (A, Eval[B]) => Eval[B]): Eval[Option[B]] =
-    foldRight(fa, Now(Option.empty[B])) { (a, lb) =>
-      lb.flatMap {
+    foldRight(fa, Now(Option.empty[B]))  (a, lb) =>
+      lb.flatMap
         case Some(b) => g(a, Now(b)).map(Some(_))
         case None => Later(Some(f(a)))
-      }
-    }
 
   /**
     * Fold implemented using the given Monoid[A] instance.
     */
   def fold[A](fa: F[A])(implicit A: Monoid[A]): A =
-    foldLeft(fa, A.empty) { (acc, a) =>
+    foldLeft(fa, A.empty)  (acc, a) =>
       A.combine(acc, a)
-    }
 
   /**
     * Alias for [[fold]].
@@ -113,11 +109,9 @@ trait Foldable[F[_]] { self =>
     */
   def traverse_[G[_], A, B](
       fa: F[A])(f: A => G[B])(implicit G: Applicative[G]): G[Unit] =
-    foldLeft(fa, G.pure(())) { (acc, a) =>
-      G.map2(acc, f(a)) { (_, _) =>
+    foldLeft(fa, G.pure(()))  (acc, a) =>
+      G.map2(acc, f(a))  (_, _) =>
         ()
-      }
-    }
 
   /**
     * Behaves like traverse_, but uses [[Unapply]] to find the
@@ -211,9 +205,9 @@ trait Foldable[F[_]] { self =>
     * Find the first element matching the predicate, if one exists.
     */
   def find[A](fa: F[A])(f: A => Boolean): Option[A] =
-    foldRight(fa, Now(Option.empty[A])) { (a, lb) =>
+    foldRight(fa, Now(Option.empty[A]))  (a, lb) =>
       if (f(a)) Now(Some(a)) else lb
-    }.value
+    .value
 
   /**
     * Check whether at least one element satisfies the predicate.
@@ -221,9 +215,9 @@ trait Foldable[F[_]] { self =>
     * If there are no elements, the result is `false`.
     */
   def exists[A](fa: F[A])(p: A => Boolean): Boolean =
-    foldRight(fa, Eval.False) { (a, lb) =>
+    foldRight(fa, Eval.False)  (a, lb) =>
       if (p(a)) Eval.True else lb
-    }.value
+    .value
 
   /**
     * Check whether all elements satisfy the predicate.
@@ -231,43 +225,43 @@ trait Foldable[F[_]] { self =>
     * If there are no elements, the result is `true`.
     */
   def forall[A](fa: F[A])(p: A => Boolean): Boolean =
-    foldRight(fa, Eval.True) { (a, lb) =>
+    foldRight(fa, Eval.True)  (a, lb) =>
       if (p(a)) lb else Eval.False
-    }.value
+    .value
 
   /**
     * Convert F[A] to a List[A].
     */
   def toList[A](fa: F[A]): List[A] =
-    foldLeft(fa, mutable.ListBuffer.empty[A]) { (buf, a) =>
+    foldLeft(fa, mutable.ListBuffer.empty[A])  (buf, a) =>
       buf += a
-    }.toList
+    .toList
 
   /**
     * Convert F[A] to a List[A], only including elements which match `p`.
     */
   def filter_[A](fa: F[A])(p: A => Boolean): List[A] =
-    foldLeft(fa, mutable.ListBuffer.empty[A]) { (buf, a) =>
+    foldLeft(fa, mutable.ListBuffer.empty[A])  (buf, a) =>
       if (p(a)) buf += a else buf
-    }.toList
+    .toList
 
   /**
     * Convert F[A] to a List[A], retaining only initial elements which
     * match `p`.
     */
   def takeWhile_[A](fa: F[A])(p: A => Boolean): List[A] =
-    foldRight(fa, Now(List.empty[A])) { (a, llst) =>
+    foldRight(fa, Now(List.empty[A]))  (a, llst) =>
       if (p(a)) llst.map(a :: _) else Now(Nil)
-    }.value
+    .value
 
   /**
     * Convert F[A] to a List[A], dropping all initial elements which
     * match `p`.
     */
   def dropWhile_[A](fa: F[A])(p: A => Boolean): List[A] =
-    foldLeft(fa, mutable.ListBuffer.empty[A]) { (buf, a) =>
+    foldLeft(fa, mutable.ListBuffer.empty[A])  (buf, a) =>
       if (buf.nonEmpty || !p(a)) buf += a else buf
-    }.toList
+    .toList
 
   /**
     * Returns true if there are no elements. Otherwise false.
@@ -283,16 +277,14 @@ trait Foldable[F[_]] { self =>
     * a `Foldable[F[G]]` instance.
     */
   def compose[G[_]](implicit ev: Foldable[G]): Foldable[λ[α => F[G[α]]]] =
-    new CompositeFoldable[F, G] {
+    new CompositeFoldable[F, G]
       val F = self
       val G = ev
-    }
-}
 
 /**
   *  Methods that apply to 2 nested Foldable instances
   */
-trait CompositeFoldable[F[_], G[_]] extends Foldable[λ[α => F[G[α]]]] {
+trait CompositeFoldable[F[_], G[_]] extends Foldable[λ[α => F[G[α]]]]
   implicit def F: Foldable[F]
   implicit def G: Foldable[G]
 
@@ -308,13 +300,10 @@ trait CompositeFoldable[F[_], G[_]] extends Foldable[λ[α => F[G[α]]]] {
   def foldRight[A, B](fga: F[G[A]], lb: Eval[B])(
       f: (A, Eval[B]) => Eval[B]): Eval[B] =
     F.foldRight(fga, lb)((ga, lb) => G.foldRight(ga, lb)(f))
-}
 
-object Foldable {
+object Foldable
   def iterateRight[A, B](it: Iterator[A], lb: Eval[B])(
-      f: (A, Eval[B]) => Eval[B]): Eval[B] = {
+      f: (A, Eval[B]) => Eval[B]): Eval[B] =
     def loop(): Eval[B] =
       Eval.defer(if (it.hasNext) f(it.next, loop()) else lb)
     loop()
-  }
-}

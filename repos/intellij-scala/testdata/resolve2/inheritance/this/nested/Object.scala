@@ -1,7 +1,5 @@
-object O {
+object O
   def f = {}
-  object I {
+  object I
     println( /* offset: 17 */ f)
     println(this. /* resolved: false */ f)
-  }
-}

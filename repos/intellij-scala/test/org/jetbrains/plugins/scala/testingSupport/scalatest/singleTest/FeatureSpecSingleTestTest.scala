@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FeatureSp
   * @author Roman.Shein
   * @since 20.01.2015.
   */
-trait FeatureSpecSingleTestTest extends FeatureSpecGenerator {
+trait FeatureSpecSingleTestTest extends FeatureSpecGenerator
   //this is required because ScalaTest 1.9.2 has different convention for feature test names (without the 'Feature: ' prefix)
   val featureSpecConfigTestName = "Feature: Feature 1 Scenario: Scenario A"
   val featureSpecTestPath = List("[root]",
@@ -14,7 +14,7 @@ trait FeatureSpecSingleTestTest extends FeatureSpecGenerator {
                                  "Feature: Feature 1",
                                  "Scenario: Scenario A")
 
-  def testFeatureSpecSingleTest() {
+  def testFeatureSpecSingleTest()
     addFeatureSpec()
 
     runTestByLocation(
@@ -27,5 +27,3 @@ trait FeatureSpecSingleTestTest extends FeatureSpecGenerator {
           checkResultTreeHasExactNamedPath(root, featureSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "Scenario: Scenario B"),
         debug = true)
-  }
-}

@@ -24,12 +24,12 @@ import scalaz._
 
 import blueeyes.json._
 
-trait JsonConverters {
+trait JsonConverters
 
   def perfTestToJson[A](result: Tree[(PerfTest, A)])(
-      f: A => List[JField]): JValue = {
+      f: A => List[JField]): JValue =
     def values(path: List[JString], test: Tree[(PerfTest, A)]): List[JValue] =
-      test match {
+      test match
         case Tree.Node((RunQuery(query), a), _) =>
           JObject(JField("path", JArray(path)) :: JField(
                   "query", JString(query)) :: f(a)) :: Nil
@@ -41,15 +41,13 @@ trait JsonConverters {
 
         case Tree.Node(_, kids) =>
           kids.toList.flatMap(values(path, _))
-      }
 
     JArray(values(Nil, result))
-  }
 
-  def perfTestDeltaToJson(result: Tree[(PerfTest, PerfDelta)]): JValue = {
+  def perfTestDeltaToJson(result: Tree[(PerfTest, PerfDelta)]): JValue =
     import PerfDelta._
 
-    perfTestToJson(result) {
+    perfTestToJson(result)
       case NoChange(baseline, stats) =>
         JField("baseline", baseline.toJson) :: JField("stats", stats.toJson) :: JField(
             "delta", JString("insignificant")) :: Nil
@@ -70,59 +68,50 @@ trait JsonConverters {
 
       case Missing =>
         Nil
-    }
-  }
 
   def perfTestResultToJson(
-      result: Tree[(PerfTest, Option[Statistics])]): JValue = {
-    perfTestToJson(result) {
+      result: Tree[(PerfTest, Option[Statistics])]): JValue =
+    perfTestToJson(result)
       case Some(stats) => JField("stats", stats.toJson) :: Nil
       case None => Nil
-    }
-  }
-}
 
-trait PrettyPrinters {
+trait PrettyPrinters
   def prettyPerfTest[A](t: Tree[(PerfTest, A)])(
-      prettyResult: A => String): String = {
-    def lines(test: Tree[(PerfTest, A)]): List[String] = {
-      test match {
+      prettyResult: A => String): String =
+    def lines(test: Tree[(PerfTest, A)]): List[String] =
+      test match
         case Tree.Node((Group(name), _), kids) =>
           name :: (kids.toList flatMap (lines(_)))
 
         case Tree.Node((RunSequential, result), kids) =>
-          (kids.toList map (lines(_)) flatMap {
+          (kids.toList map (lines(_)) flatMap
                 case head :: tail =>
                   (" + " + head) :: (tail map (" | " + _))
                 case Nil => Nil
-              }) ++ List(" ' " + prettyResult(result), "")
+              ) ++ List(" ' " + prettyResult(result), "")
 
         case Tree.Node((RunConcurrent, result), kids) =>
-          (kids.toList map (lines(_)) flatMap {
+          (kids.toList map (lines(_)) flatMap
                 case head :: tail =>
                   (" * " + head) :: (tail map (" | " + _))
                 case Nil => Nil
-              }) ++ List(" ' " + prettyResult(result), "")
+              ) ++ List(" ' " + prettyResult(result), "")
 
         case Tree.Node((RunQuery(q), result), kids) =>
-          (q split "\n").toList match {
+          (q split "\n").toList match
             case Nil => Nil
             case head :: tail =>
               ("-> " + head) ::
-              (tail.foldRight(List(" ' " + prettyResult(result), "")) {
+              (tail.foldRight(List(" ' " + prettyResult(result), ""))
                     " | " + _ :: _
-                  })
-          }
-      }
-    }
+                  )
 
     lines(t) mkString "\n"
-  }
 
-  def prettyPerfTestDelta(test: Tree[(PerfTest, PerfDelta)]): String = {
+  def prettyPerfTestDelta(test: Tree[(PerfTest, PerfDelta)]): String =
     import PerfDelta._
 
-    prettyPerfTest(test) {
+    prettyPerfTest(test)
       case NoChange(baseline, stats) =>
         "NO CHANGE  %.1f ms (s = %.1f ms)" format (stats.mean, stats.stdDev)
       case Faster(baseline, stats) =>
@@ -135,36 +124,30 @@ trait PrettyPrinters {
         "TOTAL      %.1f ms" format stats.mean
       case MissingStats(_) | Missing =>
         ""
-    }
-  }
 
   def prettyPerfTestResult(
       result: Tree[(PerfTest, Option[Statistics])]): String =
     prettyPerfTest(result)(
-        _ map { s =>
+        _ map  s =>
       "%.1f ms  (s = %.1f ms)" format (s.mean, s.stdDev)
-    } getOrElse "")
-}
+    getOrElse "")
 
-object PerfTestPrettyPrinters extends PrettyPrinters with JsonConverters {
+object PerfTestPrettyPrinters extends PrettyPrinters with JsonConverters
   implicit def statsPrinter(result: Tree[(PerfTest, Option[Statistics])]) =
     new PerfTestStatsPrettyPrinter(result)
 
   implicit def deltaPrinter(result: Tree[(PerfTest, PerfDelta)]) =
     new PerfTestDeltaPrettyPrinter(result)
-}
 
 final class PerfTestDeltaPrettyPrinter(result: Tree[(PerfTest, PerfDelta)])
-    extends PrettyPrinters with JsonConverters {
+    extends PrettyPrinters with JsonConverters
 
   def toJson: JValue = perfTestDeltaToJson(result)
   def toPrettyString: String = prettyPerfTestDelta(result)
-}
 
 final class PerfTestStatsPrettyPrinter(
     result: Tree[(PerfTest, Option[Statistics])])
-    extends PrettyPrinters with JsonConverters {
+    extends PrettyPrinters with JsonConverters
 
   def toJson: JValue = perfTestResultToJson(result)
   def toPrettyString: String = prettyPerfTestResult(result)
-}

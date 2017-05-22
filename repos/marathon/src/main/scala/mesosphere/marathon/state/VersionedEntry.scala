@@ -1,6 +1,6 @@
 package mesosphere.marathon.state
 
-trait VersionedEntry {
+trait VersionedEntry
 
   import VersionedEntry.VERSION_SEPARATOR
 
@@ -30,12 +30,10 @@ trait VersionedEntry {
     */
   def idFromVersionKey(key: String): String =
     key.substring(0, key.indexOf(VERSION_SEPARATOR))
-}
 
-object VersionedEntry {
+object VersionedEntry
 
   /**
     * Separator to separate key and version.
     */
   val VERSION_SEPARATOR = ":"
-}

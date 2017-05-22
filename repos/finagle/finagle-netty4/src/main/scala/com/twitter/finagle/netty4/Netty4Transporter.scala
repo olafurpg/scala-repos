@@ -14,14 +14,14 @@ import io.netty.util.concurrent.GenericFutureListener
 import java.lang.{Boolean => JBool, Integer => JInt}
 import java.net.SocketAddress
 
-private[netty4] object Netty4Transporter {
+private[netty4] object Netty4Transporter
 
   private[this] def build[In, Out](
       init: ChannelInitializer[SocketChannel],
       params: Stack.Params,
       transportP: Promise[Transport[In, Out]]
-  ): Transporter[In, Out] = new Transporter[In, Out] {
-    def apply(addr: SocketAddress): Future[Transport[In, Out]] = {
+  ): Transporter[In, Out] = new Transporter[In, Out]
+    def apply(addr: SocketAddress): Future[Transport[In, Out]] =
       val Transport.Options(noDelay, reuseAddr) = params[Transport.Options]
       val LatencyCompensation.Compensation(compensation) =
         params[LatencyCompensation.Compensation]
@@ -54,20 +54,17 @@ private[netty4] object Netty4Transporter {
       val nettyConnectF = bootstrap.connect(addr)
 
       // try to cancel the connect attempt if the transporter's promise is interrupted.
-      transportP.setInterruptHandler {
+      transportP.setInterruptHandler
         case _ => nettyConnectF.cancel(true /* mayInterruptIfRunning */ )
-      }
 
       nettyConnectF.addListener(
-          new GenericFutureListener[ChannelPromise] {
+          new GenericFutureListener[ChannelPromise]
         def operationComplete(channelP: ChannelPromise): Unit =
           if (channelP.cause != null)
             transportP.updateIfEmpty(Throw(channelP.cause))
-      })
+      )
 
       transportP
-    }
-  }
 
   /**
     * transporter constructor for protocols that need direct access to the netty pipeline
@@ -76,13 +73,12 @@ private[netty4] object Netty4Transporter {
   def apply[In, Out](
       pipeCb: ChannelPipeline => Unit,
       params: Stack.Params
-  ): Transporter[In, Out] = {
+  ): Transporter[In, Out] =
     val transportP = new Promise[Transport[In, Out]]
     val init = new RawNetty4ClientChannelInitializer[In, Out](
         transportP, params, pipeCb)
 
     build(init, params, transportP)
-  }
 
   /**
     * transporter constructor for protocols which are entirely implemented in
@@ -92,11 +88,9 @@ private[netty4] object Netty4Transporter {
       enc: Option[FrameEncoder[In]],
       decoderFactory: Option[() => FrameDecoder[Out]],
       params: Stack.Params
-  ): Transporter[In, Out] = {
+  ): Transporter[In, Out] =
     val transportP = new Promise[Transport[In, Out]]
     val init = new Netty4ClientChannelInitializer[In, Out](
         transportP, params, enc, decoderFactory)
 
     build(init, params, transportP)
-  }
-}

@@ -43,9 +43,9 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 class TableViewSpec[S]
     extends SimpleSFXDelegateSpec[jfxsc.TableView[S], TableView[S]](
         classOf[jfxsc.TableView[S]], classOf[TableView[S]])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
-  it should "not drop assigned columns - Issue 41" in {
+  it should "not drop assigned columns - Issue 41" in
     val firstTC = new TableColumn[String, String]("First Name")
     val lastTC = new TableColumn[String, String]("Last Name")
 
@@ -54,9 +54,8 @@ class TableViewSpec[S]
 
     tableView.columns += (firstTC, lastTC)
     tableView.columns.size should (equal(2))
-  }
 
-  it should "not drop assigned sort order - Issue 43" in {
+  it should "not drop assigned sort order - Issue 43" in
     val firstTC = new TableColumn[String, String]("First Name")
     val lastTC = new TableColumn[String, String]("Last Name")
 
@@ -73,16 +72,14 @@ class TableViewSpec[S]
     tableView.sortOrder.size should (equal(2))
     tableView.sortOrder.clear()
     tableView.sortOrder.size should (equal(0))
-  }
 
-  it should "not alter the delegate state during implicit conversion - Issue 154" in {
+  it should "not alter the delegate state during implicit conversion - Issue 154" in
     val rocky = "Rocky"
     val characters = ObservableBuffer[String](
         "Peggy", "Sue", "555-6798", rocky, "Raccoon", "555-6798")
 
-    val tableView = new TableView[String](characters) {
+    val tableView = new TableView[String](characters)
       columns += new TableColumn[String, String]("Name")
-    }
 
     tableView.getSelectionModel.select(rocky)
     tableView.getSelectionModel.selectedItem.value should equal(rocky)
@@ -97,5 +94,3 @@ class TableViewSpec[S]
     // Clear selection
     tableView.selectionModel().clearSelection()
     tableView.selectionModel().selectedItem() should equal(null)
-  }
-}

@@ -7,11 +7,11 @@ import java.math.{BigDecimal => BD, MathContext => MC}
 
 /* Tests various maps by making sure they all agree on the same answers. */
 @RunWith(classOf[JUnit4])
-class BigDecimalTest {
+class BigDecimalTest
 
   // Motivated by SI-6173: BigDecimal#isWhole implementation is very heap intensive
   @Test
-  def isWholeTest() {
+  def isWholeTest()
     val wholes = List(
         BigDecimal(1),
         BigDecimal(10L),
@@ -29,11 +29,10 @@ class BigDecimalTest {
         BigDecimal("912834718237510238591285") / 2
     )
     assert(wholes.forall(_.isWhole) && fracs.forall(!_.isWhole))
-  }
 
   // Motivated by SI-6699: BigDecimal.isValidDouble behaves unexpectedly
   @Test
-  def isValidDoubleTest() {
+  def isValidDoubleTest()
     val valids = List(
         BigDecimal(1),
         BigDecimal(19571.125),
@@ -48,11 +47,10 @@ class BigDecimalTest {
     assert(
         valids.forall(_.isDecimalDouble) && invalids.forall(!_.isDecimalDouble)
     )
-  }
 
   // Motivated by SI-6173: BigDecimal#isWhole implementation is very heap intensive
   @Test
-  def doesNotExplodeTest() {
+  def doesNotExplodeTest()
     val troublemaker = BigDecimal("1e1000000000")
     val reasonable = BigDecimal("1e1000")
     val reasonableInt = reasonable.toBigInt
@@ -62,28 +60,24 @@ class BigDecimalTest {
         troublemaker.hashCode != reasonable.hashCode &&
         !(troublemaker == reasonableInt) && !(reasonableInt == troublemaker)
     )
-  }
 
   // Motivated by SI-6456: scala.math.BigDecimal should not accept a null value
   @Test
-  def refusesNullTest() {
-    def isIAE[A](a: => A) = try { a; false } catch {
+  def refusesNullTest()
+    def isIAE[A](a: => A) = try { a; false } catch
       case iae: IllegalArgumentException => true
-    }
-    def isNPE[A](a: => A) = try { a; false } catch {
+    def isNPE[A](a: => A) = try { a; false } catch
       case npe: NullPointerException => true
-    }
     assert(
         isIAE(new BigDecimal(null: BD, new MC(2))) &&
         isIAE(new BigDecimal(new BD("5.7"), null: MC)) &&
         isNPE(BigDecimal(null: BigInt)) && isNPE(BigDecimal(null: String)) &&
         isNPE(BigDecimal(null: Array[Char]))
     )
-  }
 
   // Motivated by SI-6153: BigDecimal.hashCode() has high collision rate
   @Test
-  def hashCodesAgreeTest() {
+  def hashCodesAgreeTest()
     val bi: BigInt = 100000
     val bd: BigDecimal = 100000
     val l: Long = 100000
@@ -93,11 +87,10 @@ class BigDecimalTest {
         bd.## == bi.## && (bd pow 4).hashCode == (bi pow 4).hashCode &&
         BigDecimal("1e150000").hashCode != BigDecimal("1e150000").toBigInt.hashCode
     )
-  }
 
   // Motivated by noticing BigDecimal(0.1f) != BigDecimal(0.1)
   @Test
-  def consistentTenthsTest() {
+  def consistentTenthsTest()
     def tenths = List[Any](
         BigDecimal("0.1"),
         0.1,
@@ -112,12 +105,11 @@ class BigDecimalTest {
     )
     for (a <- tenths; b <- tenths) assert(
         a == b, s"$a != $b but both should be 0.1")
-  }
 
   // Motivated by noticing BigDecimal(123456789, mc6) != BigDecimal(123456789L, mc6)
   // where mc6 is a MathContext that rounds to six digits
   @Test
-  def consistentRoundingTest() {
+  def consistentRoundingTest()
     val mc6 = new MC(6)
     val sameRounding = List(
         List(
@@ -154,22 +146,19 @@ class BigDecimalTest {
             BigDecimal.valueOf(123456789d, mc6)
         )
     )
-    sameRounding.map(_.zipWithIndex).foreach {
+    sameRounding.map(_.zipWithIndex).foreach
       case xs =>
-        for ((a, i) <- xs; (b, j) <- xs) {
+        for ((a, i) <- xs; (b, j) <- xs)
           assert(a == b, s"$a != $b (#$i != #$j) but should be the same")
           assert(a.## == b.##,
                  s"Hash code mismatch in equal BigDecimals: #$i != #$j")
-        }
-    }
     val List(xs, ys) = sameRounding.map(_.zipWithIndex)
     for ((a, i) <- xs; (b, j) <- ys) assert(
         a != b, s"$a == $b (#$i == #$j) but should be different")
-  }
 
   // This was unexpectedly truncated in 2.10
   @Test
-  def noPrematureRoundingTest() {
+  def noPrematureRoundingTest()
     val text =
       "9791375983750284059237954823745923845928547807345082378340572986452364"
     val same = List[Any](
@@ -179,29 +168,26 @@ class BigDecimalTest {
     )
     for (a <- same; b <- same) assert(
         a == b, s"$a != $b but should be the same")
-  }
 
   // Tests attempts to make sane the representation of IEEE binary32 and binary64
   // (i.e. Float and Double) with Scala's text-is-King BigDecimal policy
   @Test
-  def churnRepresentationTest() {
+  def churnRepresentationTest()
     val rn = new scala.util.Random(42)
-    for (i <- 1 to 1000) {
+    for (i <- 1 to 1000)
       val d = rn.nextDouble
-      assert({
+      assert(
         BigDecimal.decimal(d).isDecimalDouble &&
         BigDecimal.binary(d).isBinaryDouble &&
         BigDecimal.exact(d).isExactDouble
-      }, s"At least one wrong BigDecimal representation for $d")
-    }
-    for (i <- 1 to 1000) {
+      , s"At least one wrong BigDecimal representation for $d")
+    for (i <- 1 to 1000)
       val f = rn.nextFloat
-      assert({
+      assert(
         BigDecimal.decimal(f).isDecimalFloat &&
         BigDecimal.binary(f).isBinaryFloat && BigDecimal.exact(f).isExactFloat
-      }, s"At least one wrong BigDecimal representation for $f")
-    }
-    for (i <- 1 to 1000) {
+      , s"At least one wrong BigDecimal representation for $f")
+    for (i <- 1 to 1000)
       val ndig = 15 + rn.nextInt(5)
       val s = Array.fill(ndig)((rn.nextInt(10) + '0').toChar).mkString
       val bi = BigInt(s)
@@ -217,7 +203,6 @@ class BigDecimalTest {
       assert(bd == bd2 || bd2 != BigDecimal.exact(d) || !bi.isValidDouble,
              s"$bd != $bd2 should only be when inexact or invalid")
       assert(d == bd2 && bd2 == d, s"$d != $bd2 but they should equal")
-    }
     val different = List(
         BigDecimal.decimal(0.1),
         BigDecimal.binary(0.1),
@@ -228,18 +213,16 @@ class BigDecimalTest {
     )
     for (a <- different; b <- different if (a ne b)) assert(
         a != b, "BigDecimal representations of Double mistakenly conflated")
-  }
 
   // Make sure hash code agrees with decimal representation of Double
   @Test
-  def test_SI8970() {
+  def test_SI8970()
     assert((0.1).## == BigDecimal(0.1).##)
-  }
 
   // Motivated by the problem of MathContext lost
   @Test
-  def testMathContext() {
-    def testPrecision() {
+  def testMathContext()
+    def testPrecision()
       val p = 1000
       val n = BigDecimal("1.1", MC.UNLIMITED).pow(p)
 
@@ -255,9 +238,8 @@ class BigDecimalTest {
 
       assert((BigDecimal(11, MC.UNLIMITED) / 10).pow(p) == n)
       assert((BigDecimal.decimal(11, MC.UNLIMITED) / 10).pow(p) == n)
-    }
 
-    def testRounded() {
+    def testRounded()
       // the default rounding mode is HALF_UP
       assert(
           (BigDecimal(1.23f, new MC(3)) +
@@ -271,14 +253,10 @@ class BigDecimalTest {
       assert(
           (BigDecimal.decimal(1.23d, new MC(3)) +
               BigDecimal("0.005")).rounded == BigDecimal("1.24"))
-    }
 
     testPrecision()
     testRounded()
-  }
 
   @Test
-  def testIsComparable() {
+  def testIsComparable()
     assert(BigDecimal(0.1).isInstanceOf[java.lang.Comparable[_]])
-  }
-}

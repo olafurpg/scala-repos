@@ -3,7 +3,7 @@ package java.lang
 /* This is a hijacked class. Its instances are primitive numbers.
  * Constructors are not emitted.
  */
-final class Short private () extends Number with Comparable[Short] {
+final class Short private () extends Number with Comparable[Short]
 
   def this(value: scala.Short) = this()
   def this(s: String) = this()
@@ -28,9 +28,8 @@ final class Short private () extends Number with Comparable[Short] {
 
   @inline override def toString(): String =
     Short.toString(shortValue)
-}
 
-object Short {
+object Short
   final val TYPE = classOf[scala.Short]
   final val SIZE = 16
 
@@ -53,12 +52,11 @@ object Short {
 
   @inline def parseShort(s: String): scala.Short = parseShort(s, 10)
 
-  def parseShort(s: String, radix: Int): scala.Short = {
+  def parseShort(s: String, radix: Int): scala.Short =
     val r = Integer.parseInt(s, radix)
     if (r < MIN_VALUE || r > MAX_VALUE)
       throw new NumberFormatException(s"""For input string: "$s"""")
     else r.toShort
-  }
 
   @inline def toString(s: scala.Short): String =
     "" + s
@@ -68,4 +66,3 @@ object Short {
 
   def reverseBytes(i: scala.Short): scala.Short =
     (((i >>> 8) & 0xff) + ((i & 0xff) << 8)).toShort
-}

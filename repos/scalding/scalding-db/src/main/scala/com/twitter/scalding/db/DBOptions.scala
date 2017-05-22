@@ -46,7 +46,6 @@ case class ConnectionConfig(connectUrl: ConnectUrl,
 
 case class Database(toStr: String) extends AnyVal
 
-case class AvailableDatabases(m: Map[Database, ConnectionConfig] = Map()) {
+case class AvailableDatabases(m: Map[Database, ConnectionConfig] = Map())
   def get(d: Database) = m.get(d)
   def apply(d: Database) = m.apply(d)
-}

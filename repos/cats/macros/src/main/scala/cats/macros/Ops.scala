@@ -3,7 +3,7 @@ package macros
 
 import scala.reflect.NameTransformer
 
-object Ops extends machinist.Ops {
+object Ops extends machinist.Ops
 
   def uesc(c: Char): String = "$u%04X".format(c.toInt)
 
@@ -16,8 +16,7 @@ object Ops extends machinist.Ops {
       ("<=", "lteqv"),
       ("|+|", "combine"),
       ("|-|", "remove")
-  ).map {
+  ).map
     case (k, v) =>
       (NameTransformer.encode(k), v)
-  }.toMap
-}
+  .toMap

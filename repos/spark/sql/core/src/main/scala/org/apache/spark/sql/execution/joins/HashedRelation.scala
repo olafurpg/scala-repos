@@ -36,7 +36,7 @@ import org.apache.spark.util.collection.CompactBuffer
   * Interface for a hashed relation by some key. Use [[HashedRelation.apply]] to create a concrete
   * object.
   */
-private[execution] sealed trait HashedRelation {
+private[execution] sealed trait HashedRelation
 
   /**
     * Returns matched rows.
@@ -46,9 +46,8 @@ private[execution] sealed trait HashedRelation {
   /**
     * Returns matched rows for a key that has only one column with LongType.
     */
-  def get(key: Long): Seq[InternalRow] = {
+  def get(key: Long): Seq[InternalRow] =
     throw new UnsupportedOperationException
-  }
 
   /**
     * Returns the size of used memory.
@@ -57,28 +56,25 @@ private[execution] sealed trait HashedRelation {
 
   // This is a helper method to implement Externalizable, and is used by
   // GeneralHashedRelation and UniqueKeyHashedRelation
-  protected def writeBytes(out: ObjectOutput, serialized: Array[Byte]): Unit = {
+  protected def writeBytes(out: ObjectOutput, serialized: Array[Byte]): Unit =
     out.writeInt(serialized.length) // Write the length of serialized bytes first
     out.write(serialized)
-  }
 
   // This is a helper method to implement Externalizable, and is used by
   // GeneralHashedRelation and UniqueKeyHashedRelation
-  protected def readBytes(in: ObjectInput): Array[Byte] = {
+  protected def readBytes(in: ObjectInput): Array[Byte] =
     val serializedSize =
       in.readInt() // Read the length of serialized bytes first
     val bytes = new Array[Byte](serializedSize)
     in.readFully(bytes)
     bytes
-  }
-}
 
 /**
   * Interface for a hashed relation that have only one row per key.
   *
   * We should call getValue() for better performance.
   */
-private[execution] trait UniqueHashedRelation extends HashedRelation {
+private[execution] trait UniqueHashedRelation extends HashedRelation
 
   /**
     * Returns the matched single row.
@@ -88,49 +84,40 @@ private[execution] trait UniqueHashedRelation extends HashedRelation {
   /**
     * Returns the matched single row with key that have only one column of LongType.
     */
-  def getValue(key: Long): InternalRow = {
+  def getValue(key: Long): InternalRow =
     throw new UnsupportedOperationException
-  }
 
-  override def get(key: InternalRow): Seq[InternalRow] = {
+  override def get(key: InternalRow): Seq[InternalRow] =
     val row = getValue(key)
-    if (row != null) {
+    if (row != null)
       CompactBuffer[InternalRow](row)
-    } else {
+    else
       null
-    }
-  }
 
-  override def get(key: Long): Seq[InternalRow] = {
+  override def get(key: Long): Seq[InternalRow] =
     val row = getValue(key)
-    if (row != null) {
+    if (row != null)
       CompactBuffer[InternalRow](row)
-    } else {
+    else
       null
-    }
-  }
-}
 
 /**
   * A general [[HashedRelation]] backed by a hash map that maps the key into a sequence of values.
   */
 private[joins] class GeneralHashedRelation(private var hashTable: JavaHashMap[
         InternalRow, CompactBuffer[InternalRow]])
-    extends HashedRelation with Externalizable {
+    extends HashedRelation with Externalizable
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
 
   override def get(key: InternalRow): Seq[InternalRow] = hashTable.get(key)
 
-  override def writeExternal(out: ObjectOutput): Unit = {
+  override def writeExternal(out: ObjectOutput): Unit =
     writeBytes(out, SparkSqlSerializer.serialize(hashTable))
-  }
 
-  override def readExternal(in: ObjectInput): Unit = {
+  override def readExternal(in: ObjectInput): Unit =
     hashTable = SparkSqlSerializer.deserialize(readBytes(in))
-  }
-}
 
 /**
   * A specialized [[HashedRelation]] that maps key into a single value. This implementation
@@ -138,23 +125,20 @@ private[joins] class GeneralHashedRelation(private var hashTable: JavaHashMap[
   */
 private[joins] class UniqueKeyHashedRelation(
     private var hashTable: JavaHashMap[InternalRow, InternalRow])
-    extends UniqueHashedRelation with Externalizable {
+    extends UniqueHashedRelation with Externalizable
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
 
   override def getValue(key: InternalRow): InternalRow = hashTable.get(key)
 
-  override def writeExternal(out: ObjectOutput): Unit = {
+  override def writeExternal(out: ObjectOutput): Unit =
     writeBytes(out, SparkSqlSerializer.serialize(hashTable))
-  }
 
-  override def readExternal(in: ObjectInput): Unit = {
+  override def readExternal(in: ObjectInput): Unit =
     hashTable = SparkSqlSerializer.deserialize(readBytes(in))
-  }
-}
 
-private[execution] object HashedRelation {
+private[execution] object HashedRelation
 
   /**
     * Create a HashedRelation from an Iterator of InternalRow.
@@ -163,12 +147,11 @@ private[execution] object HashedRelation {
     */
   def apply(input: Iterator[InternalRow],
             keyGenerator: Projection,
-            sizeEstimate: Int = 64): HashedRelation = {
+            sizeEstimate: Int = 64): HashedRelation =
 
-    if (keyGenerator.isInstanceOf[UnsafeProjection]) {
+    if (keyGenerator.isInstanceOf[UnsafeProjection])
       return UnsafeHashedRelation(
           input, keyGenerator.asInstanceOf[UnsafeProjection], sizeEstimate)
-    }
 
     // TODO: Use Spark's HashMap implementation.
     val hashTable =
@@ -180,38 +163,31 @@ private[execution] object HashedRelation {
     var keyIsUnique = true
 
     // Create a mapping of buildKeys -> rows
-    while (input.hasNext) {
+    while (input.hasNext)
       currentRow = input.next()
       val rowKey = keyGenerator(currentRow)
-      if (!rowKey.anyNull) {
+      if (!rowKey.anyNull)
         val existingMatchList = hashTable.get(rowKey)
         val matchList =
-          if (existingMatchList == null) {
+          if (existingMatchList == null)
             val newMatchList = new CompactBuffer[InternalRow]()
             hashTable.put(rowKey.copy(), newMatchList)
             newMatchList
-          } else {
+          else
             keyIsUnique = false
             existingMatchList
-          }
         matchList += currentRow
-      }
-    }
 
-    if (keyIsUnique) {
+    if (keyIsUnique)
       val uniqHashTable =
         new JavaHashMap[InternalRow, InternalRow](hashTable.size)
       val iter = hashTable.entrySet().iterator()
-      while (iter.hasNext) {
+      while (iter.hasNext)
         val entry = iter.next()
         uniqHashTable.put(entry.getKey, entry.getValue()(0))
-      }
       new UniqueKeyHashedRelation(uniqHashTable)
-    } else {
+    else
       new GeneralHashedRelation(hashTable)
-    }
-  }
-}
 
 /**
   * A HashedRelation for UnsafeRow, which is backed by HashMap or BytesToBytesMap that maps the key
@@ -232,7 +208,7 @@ private[execution] object HashedRelation {
   */
 private[joins] final class UnsafeHashedRelation(
     private var hashTable: JavaHashMap[UnsafeRow, CompactBuffer[UnsafeRow]])
-    extends HashedRelation with KnownSizeEstimation with Externalizable {
+    extends HashedRelation with KnownSizeEstimation with Externalizable
 
   private[joins] def this() = this(null) // Needed for serialization
 
@@ -250,26 +226,22 @@ private[joins] final class UnsafeHashedRelation(
     *
     * For non-broadcast joins or in local mode, return 0.
     */
-  override def getMemorySize: Long = {
-    if (binaryMap != null) {
+  override def getMemorySize: Long =
+    if (binaryMap != null)
       binaryMap.getTotalMemoryConsumption
-    } else {
+    else
       0
-    }
-  }
 
-  override def estimatedSize: Long = {
-    if (binaryMap != null) {
+  override def estimatedSize: Long =
+    if (binaryMap != null)
       binaryMap.getTotalMemoryConsumption
-    } else {
+    else
       SizeEstimator.estimate(hashTable)
-    }
-  }
 
-  override def get(key: InternalRow): Seq[InternalRow] = {
+  override def get(key: InternalRow): Seq[InternalRow] =
     val unsafeKey = key.asInstanceOf[UnsafeRow]
 
-    if (binaryMap != null) {
+    if (binaryMap != null)
       // Used in Broadcast join
       val map = binaryMap // avoid the compiler error
       val loc = new map.Location // this could be allocated in stack
@@ -278,13 +250,13 @@ private[joins] final class UnsafeHashedRelation(
                            unsafeKey.getSizeInBytes,
                            loc,
                            unsafeKey.hashCode())
-      if (loc.isDefined) {
+      if (loc.isDefined)
         val buffer = CompactBuffer[UnsafeRow]()
 
         val base = loc.getValueBase
         var offset = loc.getValueOffset
         val last = offset + loc.getValueLength
-        while (offset < last) {
+        while (offset < last)
           val numFields = Platform.getInt(base, offset)
           val sizeInBytes = Platform.getInt(base, offset + 4)
           offset += 8
@@ -293,48 +265,41 @@ private[joins] final class UnsafeHashedRelation(
           row.pointTo(base, offset, sizeInBytes)
           buffer += row
           offset += sizeInBytes
-        }
         buffer
-      } else {
+      else
         null
-      }
-    } else {
+    else
       // Use the Java HashMap in local mode or for non-broadcast joins (e.g. ShuffleHashJoin)
       hashTable.get(unsafeKey)
-    }
-  }
 
   override def writeExternal(out: ObjectOutput): Unit =
-    Utils.tryOrIOException {
-      if (binaryMap != null) {
+    Utils.tryOrIOException
+      if (binaryMap != null)
         // This could happen when a cached broadcast object need to be dumped into disk to free memory
         out.writeInt(binaryMap.numElements())
 
         var buffer = new Array[Byte](64)
-        def write(base: Object, offset: Long, length: Int): Unit = {
-          if (buffer.length < length) {
+        def write(base: Object, offset: Long, length: Int): Unit =
+          if (buffer.length < length)
             buffer = new Array[Byte](length)
-          }
           Platform.copyMemory(
               base, offset, buffer, Platform.BYTE_ARRAY_OFFSET, length)
           out.write(buffer, 0, length)
-        }
 
         val iter = binaryMap.iterator()
-        while (iter.hasNext) {
+        while (iter.hasNext)
           val loc = iter.next()
           // [key size] [values size] [key bytes] [values bytes]
           out.writeInt(loc.getKeyLength)
           out.writeInt(loc.getValueLength)
           write(loc.getKeyBase, loc.getKeyOffset, loc.getKeyLength)
           write(loc.getValueBase, loc.getValueOffset, loc.getValueLength)
-        }
-      } else {
+      else
         assert(hashTable != null)
         out.writeInt(hashTable.size())
 
         val iter = hashTable.entrySet().iterator()
-        while (iter.hasNext) {
+        while (iter.hasNext)
           val entry = iter.next()
           val key = entry.getKey
           val values = entry.getValue
@@ -342,10 +307,9 @@ private[joins] final class UnsafeHashedRelation(
           // write all the values as single byte array
           var totalSize = 0L
           var i = 0
-          while (i < values.length) {
+          while (i < values.length)
             totalSize += values(i).getSizeInBytes + 4 + 4
             i += 1
-          }
           assert(totalSize < Integer.MAX_VALUE, "values are too big")
 
           // [key size] [values size] [key bytes] [values bytes]
@@ -353,24 +317,19 @@ private[joins] final class UnsafeHashedRelation(
           out.writeInt(totalSize.toInt)
           out.write(key.getBytes)
           i = 0
-          while (i < values.length) {
+          while (i < values.length)
             // [num of fields] [num of bytes] [row bytes]
             // write the integer in native order, so they can be read by UNSAFE.getInt()
-            if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN) {
+            if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN)
               out.writeInt(values(i).numFields())
               out.writeInt(values(i).getSizeInBytes)
-            } else {
+            else
               out.writeInt(Integer.reverseBytes(values(i).numFields()))
               out.writeInt(Integer.reverseBytes(values(i).getSizeInBytes))
-            }
             out.write(values(i).getBytes)
             i += 1
-          }
-        }
-      }
-    }
 
-  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException {
+  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException
     val nKeys = in.readInt()
     // This is used in Broadcast, shared by multiple tasks, so we use on-heap memory
     // TODO(josh): This needs to be revisited before we merge this patch; making this change now
@@ -399,16 +358,14 @@ private[joins] final class UnsafeHashedRelation(
     var i = 0
     var keyBuffer = new Array[Byte](1024)
     var valuesBuffer = new Array[Byte](1024)
-    while (i < nKeys) {
+    while (i < nKeys)
       val keySize = in.readInt()
       val valuesSize = in.readInt()
-      if (keySize > keyBuffer.length) {
+      if (keySize > keyBuffer.length)
         keyBuffer = new Array[Byte](keySize)
-      }
       in.readFully(keyBuffer, 0, keySize)
-      if (valuesSize > valuesBuffer.length) {
+      if (valuesSize > valuesBuffer.length)
         valuesBuffer = new Array[Byte](valuesSize)
-      }
       in.readFully(valuesBuffer, 0, valuesSize)
 
       // put it into binary map
@@ -421,98 +378,79 @@ private[joins] final class UnsafeHashedRelation(
                                       valuesBuffer,
                                       Platform.BYTE_ARRAY_OFFSET,
                                       valuesSize)
-      if (!putSuceeded) {
+      if (!putSuceeded)
         throw new IOException(
             "Could not allocate memory to grow BytesToBytesMap")
-      }
       i += 1
-    }
-  }
-}
 
-private[joins] object UnsafeHashedRelation {
+private[joins] object UnsafeHashedRelation
 
   def apply(input: Iterator[InternalRow],
             keyGenerator: UnsafeProjection,
-            sizeEstimate: Int): HashedRelation = {
+            sizeEstimate: Int): HashedRelation =
 
     // Use a Java hash table here because unsafe maps expect fixed size records
     val hashTable =
       new JavaHashMap[UnsafeRow, CompactBuffer[UnsafeRow]](sizeEstimate)
 
     // Create a mapping of buildKeys -> rows
-    while (input.hasNext) {
+    while (input.hasNext)
       val unsafeRow = input.next().asInstanceOf[UnsafeRow]
       val rowKey = keyGenerator(unsafeRow)
-      if (!rowKey.anyNull) {
+      if (!rowKey.anyNull)
         val existingMatchList = hashTable.get(rowKey)
         val matchList =
-          if (existingMatchList == null) {
+          if (existingMatchList == null)
             val newMatchList = new CompactBuffer[UnsafeRow]()
             hashTable.put(rowKey.copy(), newMatchList)
             newMatchList
-          } else {
+          else
             existingMatchList
-          }
         matchList += unsafeRow
-      }
-    }
 
     // TODO: create UniqueUnsafeRelation
     new UnsafeHashedRelation(hashTable)
-  }
-}
 
 /**
   * An interface for a hashed relation that the key is a Long.
   */
-private[joins] trait LongHashedRelation extends HashedRelation {
-  override def get(key: InternalRow): Seq[InternalRow] = {
+private[joins] trait LongHashedRelation extends HashedRelation
+  override def get(key: InternalRow): Seq[InternalRow] =
     get(key.getLong(0))
-  }
-}
 
 private[joins] final class GeneralLongHashedRelation(
     private var hashTable: JavaHashMap[Long, CompactBuffer[UnsafeRow]])
-    extends LongHashedRelation with Externalizable {
+    extends LongHashedRelation with Externalizable
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
 
   override def get(key: Long): Seq[InternalRow] = hashTable.get(key)
 
-  override def writeExternal(out: ObjectOutput): Unit = {
+  override def writeExternal(out: ObjectOutput): Unit =
     writeBytes(out, SparkSqlSerializer.serialize(hashTable))
-  }
 
-  override def readExternal(in: ObjectInput): Unit = {
+  override def readExternal(in: ObjectInput): Unit =
     hashTable = SparkSqlSerializer.deserialize(readBytes(in))
-  }
-}
 
 private[joins] final class UniqueLongHashedRelation(
     private var hashTable: JavaHashMap[Long, UnsafeRow])
-    extends UniqueHashedRelation with LongHashedRelation with Externalizable {
+    extends UniqueHashedRelation with LongHashedRelation with Externalizable
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(null)
 
-  override def getValue(key: InternalRow): InternalRow = {
+  override def getValue(key: InternalRow): InternalRow =
     getValue(key.getLong(0))
-  }
 
-  override def getValue(key: Long): InternalRow = {
+  override def getValue(key: Long): InternalRow =
     hashTable.get(key)
-  }
 
-  override def writeExternal(out: ObjectOutput): Unit = {
+  override def writeExternal(out: ObjectOutput): Unit =
     writeBytes(out, SparkSqlSerializer.serialize(hashTable))
-  }
 
-  override def readExternal(in: ObjectInput): Unit = {
+  override def readExternal(in: ObjectInput): Unit =
     hashTable = SparkSqlSerializer.deserialize(readBytes(in))
-  }
-}
 
 /**
   * A relation that pack all the rows into a byte array, together with offsets and sizes.
@@ -542,45 +480,39 @@ private[joins] final class LongArrayRelation(
     private var sizes: Array[Int],
     private var bytes: Array[Byte]
 )
-    extends UniqueHashedRelation with LongHashedRelation with Externalizable {
+    extends UniqueHashedRelation with LongHashedRelation with Externalizable
 
   // Needed for serialization (it is public to make Java serialization work)
   def this() = this(0, 0L, null, null, null)
 
-  override def getValue(key: InternalRow): InternalRow = {
+  override def getValue(key: InternalRow): InternalRow =
     getValue(key.getLong(0))
-  }
 
-  override def getMemorySize: Long = {
+  override def getMemorySize: Long =
     offsets.length * 4 + sizes.length * 4 + bytes.length
-  }
 
-  override def getValue(key: Long): InternalRow = {
+  override def getValue(key: Long): InternalRow =
     val idx = (key - start).toInt
-    if (idx >= 0 && idx < sizes.length && sizes(idx) > 0) {
+    if (idx >= 0 && idx < sizes.length && sizes(idx) > 0)
       val result = new UnsafeRow(numFields)
       result.pointTo(
           bytes, Platform.BYTE_ARRAY_OFFSET + offsets(idx), sizes(idx))
       result
-    } else {
+    else
       null
-    }
-  }
 
-  override def writeExternal(out: ObjectOutput): Unit = {
+  override def writeExternal(out: ObjectOutput): Unit =
     out.writeInt(numFields)
     out.writeLong(start)
     out.writeInt(sizes.length)
     var i = 0
-    while (i < sizes.length) {
+    while (i < sizes.length)
       out.writeInt(sizes(i))
       i += 1
-    }
     out.writeInt(bytes.length)
     out.write(bytes)
-  }
 
-  override def readExternal(in: ObjectInput): Unit = {
+  override def readExternal(in: ObjectInput): Unit =
     numFields = in.readInt()
     start = in.readLong()
     val length = in.readInt()
@@ -589,30 +521,27 @@ private[joins] final class LongArrayRelation(
     offsets = new Array[Int](length)
     var i = 0
     var offset = 0
-    while (i < length) {
+    while (i < length)
       offsets(i) = offset
       sizes(i) = in.readInt()
       offset += sizes(i)
       i += 1
-    }
     // read all the bytes
     val total = in.readInt()
     assert(total == offset)
     bytes = new Array[Byte](total)
     in.readFully(bytes)
-  }
-}
 
 /**
   * Create hashed relation with key that is long.
   */
-private[joins] object LongHashedRelation {
+private[joins] object LongHashedRelation
 
   val DENSE_FACTOR = 0.2
 
   def apply(input: Iterator[InternalRow],
             keyGenerator: Projection,
-            sizeEstimate: Int): HashedRelation = {
+            sizeEstimate: Int): HashedRelation =
 
     // Use a Java hash table here because unsafe maps expect fixed size records
     val hashTable =
@@ -623,98 +552,80 @@ private[joins] object LongHashedRelation {
     var keyIsUnique = true
     var minKey = Long.MaxValue
     var maxKey = Long.MinValue
-    while (input.hasNext) {
+    while (input.hasNext)
       val unsafeRow = input.next().asInstanceOf[UnsafeRow]
       numFields = unsafeRow.numFields()
       val rowKey = keyGenerator(unsafeRow)
-      if (!rowKey.anyNull) {
+      if (!rowKey.anyNull)
         val key = rowKey.getLong(0)
         minKey = math.min(minKey, key)
         maxKey = math.max(maxKey, key)
         val existingMatchList = hashTable.get(key)
         val matchList =
-          if (existingMatchList == null) {
+          if (existingMatchList == null)
             val newMatchList = new CompactBuffer[UnsafeRow]()
             hashTable.put(key, newMatchList)
             newMatchList
-          } else {
+          else
             keyIsUnique = false
             existingMatchList
-          }
         matchList += unsafeRow
-      }
-    }
 
-    if (keyIsUnique) {
-      if (hashTable.size() > (maxKey - minKey) * DENSE_FACTOR) {
+    if (keyIsUnique)
+      if (hashTable.size() > (maxKey - minKey) * DENSE_FACTOR)
         // The keys are dense enough, so use LongArrayRelation
         val length = (maxKey - minKey).toInt + 1
         val sizes = new Array[Int](length)
         val offsets = new Array[Int](length)
         var offset = 0
         var i = 0
-        while (i < length) {
+        while (i < length)
           val rows = hashTable.get(i + minKey)
-          if (rows != null) {
+          if (rows != null)
             offsets(i) = offset
             sizes(i) = rows(0).getSizeInBytes
             offset += sizes(i)
-          }
           i += 1
-        }
         val bytes = new Array[Byte](offset)
         i = 0
-        while (i < length) {
+        while (i < length)
           val rows = hashTable.get(i + minKey)
-          if (rows != null) {
+          if (rows != null)
             rows(0).writeToMemory(
                 bytes, Platform.BYTE_ARRAY_OFFSET + offsets(i))
-          }
           i += 1
-        }
         new LongArrayRelation(numFields, minKey, offsets, sizes, bytes)
-      } else {
+      else
         // all the keys are unique, one row per key.
         val uniqHashTable = new JavaHashMap[Long, UnsafeRow](hashTable.size)
         val iter = hashTable.entrySet().iterator()
-        while (iter.hasNext) {
+        while (iter.hasNext)
           val entry = iter.next()
           uniqHashTable.put(entry.getKey, entry.getValue()(0))
-        }
         new UniqueLongHashedRelation(uniqHashTable)
-      }
-    } else {
+    else
       new GeneralLongHashedRelation(hashTable)
-    }
-  }
-}
 
 /** The HashedRelationBroadcastMode requires that rows are broadcasted as a HashedRelation. */
 private[execution] case class HashedRelationBroadcastMode(
     canJoinKeyFitWithinLong: Boolean,
     keys: Seq[Expression],
     attributes: Seq[Attribute])
-    extends BroadcastMode {
+    extends BroadcastMode
 
-  override def transform(rows: Array[InternalRow]): HashedRelation = {
+  override def transform(rows: Array[InternalRow]): HashedRelation =
     val generator = UnsafeProjection.create(keys, attributes)
-    if (canJoinKeyFitWithinLong) {
+    if (canJoinKeyFitWithinLong)
       LongHashedRelation(rows.iterator, generator, rows.length)
-    } else {
+    else
       HashedRelation(rows.iterator, generator, rows.length)
-    }
-  }
 
-  private lazy val canonicalizedKeys: Seq[Expression] = {
-    keys.map { e =>
+  private lazy val canonicalizedKeys: Seq[Expression] =
+    keys.map  e =>
       BindReferences.bindReference(e.canonicalized, attributes)
-    }
-  }
 
-  override def compatibleWith(other: BroadcastMode): Boolean = other match {
+  override def compatibleWith(other: BroadcastMode): Boolean = other match
     case m: HashedRelationBroadcastMode =>
       canJoinKeyFitWithinLong == m.canJoinKeyFitWithinLong &&
       canonicalizedKeys == m.canonicalizedKeys
     case _ => false
-  }
-}

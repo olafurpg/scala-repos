@@ -15,7 +15,7 @@ import Decorators._
 import WrapAsScala._
 import scala.language.implicitConversions
 
-trait DecorateAsScala {
+trait DecorateAsScala
 
   /**
     * Adds an `asScala` method that implicitly converts a Java `Iterator` to
@@ -204,4 +204,3 @@ trait DecorateAsScala {
   implicit def propertiesAsScalaMapConverter(
       p: ju.Properties): AsScala[mutable.Map[String, String]] =
     new AsScala(propertiesAsScalaMap(p))
-}

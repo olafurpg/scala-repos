@@ -27,9 +27,8 @@ import scala.collection.JavaConverters._
 /**
   * Handle the notificationMessage.
   */
-trait NotificationHandler {
+trait NotificationHandler
   def processNotification(notificationMessage: String)
-}
 
 /**
   * A listener that subscribes to seqNodeRoot for any child changes where all children are assumed to be sequence node
@@ -55,58 +54,50 @@ class ZkNodeChangeNotificationListener(
     private val notificationHandler: NotificationHandler,
     private val changeExpirationMs: Long = 15 * 60 * 1000,
     private val time: Time = SystemTime)
-    extends Logging {
+    extends Logging
   private var lastExecutedChange = -1L
   private val isClosed = new AtomicBoolean(false)
 
   /**
     * create seqNodeRoot and begin watching for any new children nodes.
     */
-  def init() {
+  def init()
     zkUtils.makeSurePersistentPathExists(seqNodeRoot)
     zkUtils.zkClient.subscribeChildChanges(seqNodeRoot, NodeChangeListener)
     zkUtils.zkClient.subscribeStateChanges(ZkStateChangeListener)
     processAllNotifications()
-  }
 
-  def close() = {
+  def close() =
     isClosed.set(true)
-  }
 
   /**
     * Process all changes
     */
-  def processAllNotifications() {
+  def processAllNotifications()
     val changes = zkUtils.zkClient.getChildren(seqNodeRoot)
     processNotifications(changes.asScala.sorted)
-  }
 
   /**
     * Process the given list of notifications
     */
-  private def processNotifications(notifications: Seq[String]) {
-    if (notifications.nonEmpty) {
+  private def processNotifications(notifications: Seq[String])
+    if (notifications.nonEmpty)
       info(s"Processing notification(s) to $seqNodeRoot")
-      try {
+      try
         val now = time.milliseconds
-        for (notification <- notifications) {
+        for (notification <- notifications)
           val changeId = changeNumber(notification)
-          if (changeId > lastExecutedChange) {
+          if (changeId > lastExecutedChange)
             val changeZnode = seqNodeRoot + "/" + notification
             val (data, stat) = zkUtils.readDataMaybeNull(changeZnode)
             data map (notificationHandler.processNotification(_)) getOrElse
             (logger.warn(
                     s"read null data from $changeZnode when processing notification $notification"))
-          }
           lastExecutedChange = changeId
-        }
         purgeObsoleteNotifications(now, notifications)
-      } catch {
+      catch
         case e: ZkInterruptedException =>
           if (!isClosed.get) throw e
-      }
-    }
-  }
 
   /**
     * Purges expired notifications.
@@ -114,18 +105,14 @@ class ZkNodeChangeNotificationListener(
     * @param notifications
     */
   private def purgeObsoleteNotifications(
-      now: Long, notifications: Seq[String]) {
-    for (notification <- notifications.sorted) {
+      now: Long, notifications: Seq[String])
+    for (notification <- notifications.sorted)
       val notificationNode = seqNodeRoot + "/" + notification
       val (data, stat) = zkUtils.readDataMaybeNull(notificationNode)
-      if (data.isDefined) {
-        if (now - stat.getCtime > changeExpirationMs) {
+      if (data.isDefined)
+        if (now - stat.getCtime > changeExpirationMs)
           debug(s"Purging change notification $notificationNode")
           zkUtils.deletePath(notificationNode)
-        }
-      }
-    }
-  }
 
   /* get the change number from a change notification znode */
   private def changeNumber(name: String): Long =
@@ -134,34 +121,26 @@ class ZkNodeChangeNotificationListener(
   /**
     * A listener that gets invoked when a node is created to notify changes.
     */
-  object NodeChangeListener extends IZkChildListener {
+  object NodeChangeListener extends IZkChildListener
     override def handleChildChange(
-        path: String, notifications: java.util.List[String]) {
-      try {
+        path: String, notifications: java.util.List[String])
+      try
         import scala.collection.JavaConverters._
         if (notifications != null)
           processNotifications(notifications.asScala.sorted)
-      } catch {
+      catch
         case e: Exception =>
           error(
               s"Error processing notification change for path = $path and notification= $notifications :",
               e)
-      }
-    }
-  }
 
-  object ZkStateChangeListener extends IZkStateListener {
+  object ZkStateChangeListener extends IZkStateListener
 
-    override def handleNewSession() {
+    override def handleNewSession()
       processAllNotifications
-    }
 
-    override def handleSessionEstablishmentError(error: Throwable) {
+    override def handleSessionEstablishmentError(error: Throwable)
       fatal("Could not establish session with zookeeper", error)
-    }
 
-    override def handleStateChanged(state: KeeperState) {
+    override def handleStateChanged(state: KeeperState)
       debug(s"New zookeeper state: ${state}")
-    }
-  }
-}

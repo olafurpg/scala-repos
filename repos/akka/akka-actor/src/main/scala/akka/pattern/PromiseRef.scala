@@ -12,7 +12,7 @@ import scala.concurrent.{Future, Promise}
   * A combination of a Future and an ActorRef associated with it, which points
   * to an actor performing a task which will eventually resolve the Future.
   */
-trait FutureRef[T] {
+trait FutureRef[T]
 
   /**
     * ActorRef associated with this FutureRef.
@@ -23,13 +23,12 @@ trait FutureRef[T] {
     * Future associated with this FutureRef.
     */
   def future: Future[T]
-}
 
 /**
   * A combination of a Promise and an ActorRef associated with it, which points
   * to an actor performing a task which will eventually resolve the Promise.
   */
-trait PromiseRef[T] {
+trait PromiseRef[T]
   this: FutureRef[T] ⇒
 
   /**
@@ -51,17 +50,15 @@ trait PromiseRef[T] {
     * Converts this PromiseRef to FutureRef, effectively narrowing it's API.
     */
   def toFutureRef: FutureRef[T]
-}
 
-object PromiseRef {
+object PromiseRef
 
   /**
     * Wraps an ActorRef and a Promise into a PromiseRef.
     */
   private[akka] def wrap[T](
-      actorRef: ActorRef, promise: Promise[T]): PromiseRef[T] = {
+      actorRef: ActorRef, promise: Promise[T]): PromiseRef[T] =
     new PromiseRefImpl(actorRef, promise)
-  }
 
   /**
     * Constructs a new PromiseRef which will be completed with the first message sent to it.
@@ -75,10 +72,9 @@ object PromiseRef {
     * promiseRef.onComplete(println)  // prints "message"
     * }}}
     */
-  def apply(system: ActorSystem, timeout: Timeout): PromiseRef[Any] = {
+  def apply(system: ActorSystem, timeout: Timeout): PromiseRef[Any] =
     val provider = system.asInstanceOf[ExtendedActorSystem].provider
     AskPromiseRef(provider, timeout)
-  }
 
   /**
     * Constructs a new PromiseRef which will be completed with the first message sent to it.
@@ -93,20 +89,17 @@ object PromiseRef {
     * promiseRef.future.onComplete(println)  // prints "message"
     * }}}
     */
-  def apply(timeout: Timeout)(implicit system: ActorSystem): PromiseRef[Any] = {
+  def apply(timeout: Timeout)(implicit system: ActorSystem): PromiseRef[Any] =
     PromiseRef(system, timeout)
-  }
-}
 
-object FutureRef {
+object FutureRef
 
   /**
     * Wraps an ActorRef and a Future into a FutureRef.
     */
   private[akka] def wrap[T](
-      actorRef: ActorRef, future: Future[T]): FutureRef[T] = {
+      actorRef: ActorRef, future: Future[T]): FutureRef[T] =
     new FutureRefImpl(actorRef, future)
-  }
 
   /**
     * Constructs a new FutureRef which will be completed with the first message sent to it.
@@ -120,9 +113,8 @@ object FutureRef {
     * futureRef.onComplete(println)  // prints "message"
     * }}}
     */
-  def apply(system: ActorSystem, timeout: Timeout): FutureRef[Any] = {
+  def apply(system: ActorSystem, timeout: Timeout): FutureRef[Any] =
     PromiseRef(system, timeout).toFutureRef
-  }
 
   /**
     * Constructs a new PromiseRef which will be completed with the first message sent to it.
@@ -137,16 +129,13 @@ object FutureRef {
     * futureRef.onComplete(println)  // prints "message"
     * }}}
     */
-  def apply(timeout: Timeout)(implicit system: ActorSystem): FutureRef[Any] = {
+  def apply(timeout: Timeout)(implicit system: ActorSystem): FutureRef[Any] =
     FutureRef(system, timeout)
-  }
-}
 
 private[akka] class PromiseRefImpl[T](
     val ref: ActorRef, val promise: Promise[T])
-    extends PromiseRef[T] with FutureRef[T] {
+    extends PromiseRef[T] with FutureRef[T]
   def toFutureRef: FutureRef[T] = this
-}
 
 private[akka] final class FutureRefImpl[T](
     val ref: ActorRef, val future: Future[T])
@@ -156,15 +145,12 @@ private[akka] final class AskPromiseRef private (
     promiseActorRef: PromiseActorRef)
     extends PromiseRefImpl[Any](promiseActorRef, promiseActorRef.result)
 
-private[akka] object AskPromiseRef {
-  def apply(provider: ActorRefProvider, timeout: Timeout): AskPromiseRef = {
-    if (timeout.duration.length > 0) {
+private[akka] object AskPromiseRef
+  def apply(provider: ActorRefProvider, timeout: Timeout): AskPromiseRef =
+    if (timeout.duration.length > 0)
       val promiseActorRef = PromiseActorRef(
           provider, timeout, "unknown", "unknown", provider.deadLetters)
       new AskPromiseRef(promiseActorRef)
-    } else {
+    else
       throw new IllegalArgumentException(
           s"Timeout length must not be negative, was: $timeout")
-    }
-  }
-}

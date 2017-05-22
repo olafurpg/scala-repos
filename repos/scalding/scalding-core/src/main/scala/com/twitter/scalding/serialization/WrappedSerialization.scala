@@ -27,7 +27,7 @@ import scala.collection.JavaConverters._
   * has an associated Binary that is used to deserialize
   * items wrapped in the wrapper
   */
-class WrappedSerialization[T] extends HSerialization[T] with Configurable {
+class WrappedSerialization[T] extends HSerialization[T] with Configurable
 
   import WrappedSerialization.ClassSerialization
 
@@ -39,10 +39,9 @@ class WrappedSerialization[T] extends HSerialization[T] with Configurable {
    */
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
   override def getConf: Configuration = conf.get
-  override def setConf(config: Configuration) {
+  override def setConf(config: Configuration)
     conf = Some(config)
     serializations = WrappedSerialization.getBinary(config)
-  }
 
   def accept(c: Class[_]): Boolean = serializations.contains(c)
 
@@ -61,37 +60,30 @@ class WrappedSerialization[T] extends HSerialization[T] with Configurable {
     new BinaryDeserializer(
         getSerialization(c).getOrElse(
             sys.error(s"Serialization for class: ${c} not found")))
-}
 
-class BinarySerializer[T](buf: Serialization[T]) extends Serializer[T] {
+class BinarySerializer[T](buf: Serialization[T]) extends Serializer[T]
   private var out: OutputStream = _
-  def open(os: OutputStream): Unit = {
+  def open(os: OutputStream): Unit =
     out = os
-  }
   def close(): Unit = { out = null }
-  def serialize(t: T): Unit = {
+  def serialize(t: T): Unit =
     if (out == null) throw new NullPointerException("OutputStream is null")
     buf.write(out, t).get
-  }
-}
 
-class BinaryDeserializer[T](buf: Serialization[T]) extends Deserializer[T] {
+class BinaryDeserializer[T](buf: Serialization[T]) extends Deserializer[T]
   private var is: InputStream = _
   def open(i: InputStream): Unit = { is = i }
   def close(): Unit = { is = null }
-  def deserialize(t: T): T = {
+  def deserialize(t: T): T =
     if (is == null) throw new NullPointerException("InputStream is null")
     buf.read(is).get
-  }
-}
 
-object WrappedSerialization {
+object WrappedSerialization
   type ClassSerialization[T] = (Class[T], Serialization[T])
 
-  private def getSerializer[U]: Injection[Externalizer[U], String] = {
+  private def getSerializer[U]: Injection[Externalizer[U], String] =
     implicit val initialInj = JavaSerializationInjection[Externalizer[U]]
     Injection.connect[Externalizer[U], Array[Byte], Base64String, String]
-  }
 
   private def serialize[T](b: T): String =
     getSerializer[T](Externalizer(b))
@@ -103,29 +95,25 @@ object WrappedSerialization {
     "com.twitter.scalding.serialization.WrappedSerialization"
 
   def rawSetBinary(
-      bufs: Iterable[ClassSerialization[_]], fn: (String, String) => Unit) = {
-    fn(confKey, bufs.map {
+      bufs: Iterable[ClassSerialization[_]], fn: (String, String) => Unit) =
+    fn(confKey, bufs.map
       case (cls, buf) => s"${cls.getName}:${serialize(buf)}"
-    }.mkString(","))
-  }
+    .mkString(","))
   def setBinary(
       conf: Configuration, bufs: Iterable[ClassSerialization[_]]): Unit =
     rawSetBinary(bufs, { case (k, v) => conf.set(k, v) })
 
   def getBinary(conf: Configuration): Map[Class[_], Serialization[_]] =
-    conf.iterator.asScala.map { it =>
+    conf.iterator.asScala.map  it =>
       (it.getKey, it.getValue)
-    }.filter(_._1.startsWith(confKey))
-      .map {
+    .filter(_._1.startsWith(confKey))
+      .map
         case (_, clsbuf) =>
-          clsbuf.split(":") match {
+          clsbuf.split(":") match
             case Array(className, serialization) =>
               // Jump through a hoop to get scalac happy
               def deser[T](cls: Class[T]): ClassSerialization[T] =
                 (cls, deserialize[Serialization[T]](serialization))
               deser(conf.getClassByName(className))
             case _ => sys.error(s"ill formed bufferables: ${clsbuf}")
-          }
-      }
       .toMap
-}

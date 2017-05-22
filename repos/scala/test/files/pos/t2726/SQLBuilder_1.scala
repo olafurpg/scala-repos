@@ -1,5 +1,4 @@
 class SQLBuilder extends SQLBuilder.Segment
 
-object SQLBuilder {
+object SQLBuilder
   trait Segment
-}

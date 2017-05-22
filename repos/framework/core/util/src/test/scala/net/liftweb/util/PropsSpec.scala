@@ -25,23 +25,21 @@ import org.specs2.mutable.After
 import common._
 import Props.RunModes._
 
-object PropsSpec extends Specification {
+object PropsSpec extends Specification
   "Props Specification".title
 
   case class TestProps() extends Props
 
-  "Props" should {
-    "Detect test mode correctly" in {
+  "Props" should
+    "Detect test mode correctly" in
       TestProps().testMode must_== true
-    }
 
-    "Allow modification of whereToLook before run-mode is set" in {
+    "Allow modification of whereToLook before run-mode is set" in
       val testProps = TestProps()
       val originalWtl = testProps.whereToLook
 
       var wasCalled = false
       testProps.whereToLook = () =>
-        {
           wasCalled = true
 
           List(
@@ -50,29 +48,25 @@ object PropsSpec extends Specification {
                  Full(new ByteArrayInputStream(
                          "test.prop=value".getBytes("UTF-8"))))
           )
-      }
 
       testProps.getInt("jetty.port") must_== Empty
       testProps.get("test.prop") must_== Full("value")
       wasCalled must_== true
-    }
 
-    "Allow modification of run-mode properties before the run-mode is set" in {
+    "Allow modification of run-mode properties before the run-mode is set" in
       val testProps = TestProps()
 
       val before = testProps.autoDetectRunModeFn.get
-      try {
+      try
         testProps.runModeInitialised = false
         testProps.autoDetectRunModeFn.allowModification must_== true
         testProps.autoDetectRunModeFn.set(() => Test) must_== true
         testProps.autoDetectRunModeFn.get must_!= before
-      } finally {
+      finally
         testProps.autoDetectRunModeFn.set(before)
         testProps.runModeInitialised = true
-      }
-    }
 
-    "Prohibit modification of run-mode properties when the run-mode is set" in {
+    "Prohibit modification of run-mode properties when the run-mode is set" in
       val testProps = TestProps()
 
       val before = testProps.autoDetectRunModeFn.get
@@ -80,30 +74,25 @@ object PropsSpec extends Specification {
       testProps.autoDetectRunModeFn.allowModification must_== false
       testProps.autoDetectRunModeFn.set(() => Test) must_== false
       testProps.autoDetectRunModeFn.get must_== before
-    }
 
-    "Parse and cast to int" in {
+    "Parse and cast to int" in
       TestProps().getInt("an.int") must_== Full(42)
-    }
 
-    "Parse and cast to long" in {
+    "Parse and cast to long" in
       TestProps().getLong("a.long") must_== Full(9223372036854775807L)
-    }
 
-    "Parse and cast to boolean" in {
+    "Parse and cast to boolean" in
       TestProps().getBool("a.boolean") must_== Full(true)
-    }
 
-    "Prefer prepended properties to the test.default.props" in {
+    "Prefer prepended properties to the test.default.props" in
       val testProps = TestProps()
 
       testProps.prependProvider(Map("jetty.port" -> "8080"))
       val port = testProps.getInt("jetty.port")
 
       port must_== Full(8080)
-    }
 
-    "Prefer prepended System.properties to the test.default.props" in {
+    "Prefer prepended System.properties to the test.default.props" in
       val testProps = TestProps()
 
       System.setProperty("omniauth.baseurl1", "http://google.com")
@@ -112,9 +101,8 @@ object PropsSpec extends Specification {
       val baseurl = testProps.get("omniauth.baseurl1")
 
       baseurl must_== Full("http://google.com")
-    }
 
-    "Read through to System.properties, correctly handling mutation" in {
+    "Read through to System.properties, correctly handling mutation" in
       val testProps = TestProps()
 
       System.setProperty("omniauth.baseurl2", "http://google.com")
@@ -123,33 +111,29 @@ object PropsSpec extends Specification {
       val baseurl = testProps.get("omniauth.baseurl2")
 
       baseurl must_== Full("http://ebay.com")
-    }
 
-    "Find properties in appended maps when not defined in test.default.props" in {
+    "Find properties in appended maps when not defined in test.default.props" in
       val testProps = TestProps()
 
       testProps.appendProvider(Map("new.prop" -> "new.value"))
       val prop = testProps.get("new.prop")
 
       prop must_== Full("new.value")
-    }
 
-    "Not interpolate values when no interpolator is given" in {
+    "Not interpolate values when no interpolator is given" in
       val port = TestProps().get("jetty.port")
 
       port must_== Full("${PORT}")
-    }
 
-    "Interpolate values from the given interpolator" in {
+    "Interpolate values from the given interpolator" in
       val testProps = TestProps()
 
       testProps.appendInterpolationValues(Map("PORT" -> "8080"))
       val port = testProps.getInt("jetty.port")
 
       port must_== Full(8080)
-    }
 
-    "Interpolate multiple values in a string from the given interpolator" in {
+    "Interpolate multiple values in a string from the given interpolator" in
       val testProps = TestProps()
 
       testProps.appendInterpolationValues(
@@ -157,20 +141,15 @@ object PropsSpec extends Specification {
       val url = testProps.get("db.url")
 
       url must_== Full("jdbc:mysql://localhost:3306/MYDB")
-    }
 
-    "Find properties in append for require()" in {
+    "Find properties in append for require()" in
       val testProps = TestProps()
 
       testProps.appendProvider(Map("new.prop" -> "new.value"))
       testProps.require("new.prop") must_== Nil
-    }
 
-    "Find properties in prepend for require()" in {
+    "Find properties in prepend for require()" in
       val testProps = TestProps()
 
       testProps.prependProvider(Map("new.prop" -> "new.value"))
       testProps.require("new.prop") must_== Nil
-    }
-  }
-}

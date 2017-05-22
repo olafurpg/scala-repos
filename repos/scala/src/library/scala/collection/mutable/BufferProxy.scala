@@ -29,7 +29,7 @@ import script._
 @deprecated(
     "Proxying is deprecated due to lack of use and compiler-level support.",
     "2.11.0")
-trait BufferProxy[A] extends Buffer[A] with Proxy {
+trait BufferProxy[A] extends Buffer[A] with Proxy
 
   def self: Buffer[A]
 
@@ -72,9 +72,8 @@ trait BufferProxy[A] extends Buffer[A] with Proxy {
     */
   def +=:(elem: A): this.type = { self.+=:(elem); this }
 
-  override def ++=:(xs: TraversableOnce[A]): this.type = {
+  override def ++=:(xs: TraversableOnce[A]): this.type =
     self.++=:(xs); this
-  }
 
   /** Prepend an element to this list.
     *
@@ -105,13 +104,11 @@ trait BufferProxy[A] extends Buffer[A] with Proxy {
     *  @param n     the index where a new element will be inserted.
     *  @param iter  the iterable object providing all elements to insert.
     */
-  def insertAll(n: Int, iter: scala.collection.Iterable[A]) {
+  def insertAll(n: Int, iter: scala.collection.Iterable[A])
     self.insertAll(n, iter)
-  }
 
-  override def insertAll(n: Int, iter: scala.collection.Traversable[A]) {
+  override def insertAll(n: Int, iter: scala.collection.Traversable[A])
     self.insertAll(n, iter)
-  }
 
   /** Replace element at index `n` with the new element `newelem`.
     *
@@ -141,7 +138,5 @@ trait BufferProxy[A] extends Buffer[A] with Proxy {
     *
     *  @return a `Buffer` with the same elements.
     */
-  override def clone(): Buffer[A] = new BufferProxy[A] {
+  override def clone(): Buffer[A] = new BufferProxy[A]
     def self = BufferProxy.this.self.clone()
-  }
-}

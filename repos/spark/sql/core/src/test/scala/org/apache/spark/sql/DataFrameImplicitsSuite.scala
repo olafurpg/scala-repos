@@ -19,35 +19,29 @@ package org.apache.spark.sql
 
 import org.apache.spark.sql.test.SharedSQLContext
 
-class DataFrameImplicitsSuite extends QueryTest with SharedSQLContext {
+class DataFrameImplicitsSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("RDD of tuples") {
+  test("RDD of tuples")
     checkAnswer(sparkContext
                   .parallelize(1 to 10)
                   .map(i => (i, i.toString))
                   .toDF("intCol", "strCol"),
                 (1 to 10).map(i => Row(i, i.toString)))
-  }
 
-  test("Seq of tuples") {
+  test("Seq of tuples")
     checkAnswer((1 to 10).map(i => (i, i.toString)).toDF("intCol", "strCol"),
                 (1 to 10).map(i => Row(i, i.toString)))
-  }
 
-  test("RDD[Int]") {
+  test("RDD[Int]")
     checkAnswer(sparkContext.parallelize(1 to 10).toDF("intCol"),
                 (1 to 10).map(i => Row(i)))
-  }
 
-  test("RDD[Long]") {
+  test("RDD[Long]")
     checkAnswer(sparkContext.parallelize(1L to 10L).toDF("longCol"),
                 (1L to 10L).map(i => Row(i)))
-  }
 
-  test("RDD[String]") {
+  test("RDD[String]")
     checkAnswer(
         sparkContext.parallelize(1 to 10).map(_.toString).toDF("stringCol"),
         (1 to 10).map(i => Row(i.toString)))
-  }
-}

@@ -1,6 +1,6 @@
-object Test {
+object Test
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]) =
     val one = "1"
     val two = "2"
 
@@ -12,5 +12,3 @@ object Test {
     assert(raw != escaped, "Raw strings should not be escaped.")
     assert(raw != buggy, "Raw strings after variables should not be escaped.")
     assert(raw == correct, "Raw strings should stay raw.")
-  }
-}

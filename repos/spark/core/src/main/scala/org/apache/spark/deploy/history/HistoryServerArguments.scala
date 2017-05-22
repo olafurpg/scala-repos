@@ -28,17 +28,17 @@ import org.apache.spark.util.Utils
   */
 private[history] class HistoryServerArguments(
     conf: SparkConf, args: Array[String])
-    extends Logging {
+    extends Logging
   private var propertiesFile: String = null
 
   parse(args.toList)
 
   @tailrec
-  private def parse(args: List[String]): Unit = {
-    if (args.length == 1) {
+  private def parse(args: List[String]): Unit =
+    if (args.length == 1)
       setLogDirectory(args.head)
-    } else {
-      args match {
+    else
+      args match
         case ("--dir" | "-d") :: value :: tail =>
           setLogDirectory(value)
           parse(tail)
@@ -53,21 +53,17 @@ private[history] class HistoryServerArguments(
         case Nil =>
         case _ =>
           printUsageAndExit(1)
-      }
-    }
-  }
 
-  private def setLogDirectory(value: String): Unit = {
+  private def setLogDirectory(value: String): Unit =
     logWarning(
         "Setting log directory through the command line is deprecated as of " +
         "Spark 1.1.0. Please set this through spark.history.fs.logDirectory instead.")
     conf.set("spark.history.fs.logDirectory", value)
-  }
 
   // This mutates the SparkConf, so all accesses to it must be made after this line
   Utils.loadDefaultSparkProperties(conf, propertiesFile)
 
-  private def printUsageAndExit(exitCode: Int) {
+  private def printUsageAndExit(exitCode: Int)
     // scalastyle:off println
     System.err.println("""
       |Usage: HistoryServer [options]
@@ -100,5 +96,3 @@ private[history] class HistoryServerArguments(
       |""".stripMargin)
     // scalastyle:on println
     System.exit(exitCode)
-  }
-}

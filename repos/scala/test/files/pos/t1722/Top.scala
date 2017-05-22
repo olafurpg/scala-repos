@@ -1,9 +1,8 @@
 package t1722
 
 sealed trait Top
-trait C {
+trait C
   private object P extends Top
-}
 /*
 $ scala -e 'new AnyRef with C'
 error: error while loading Top, class file '/private/tmp/bobobo/./Top.class' is broken

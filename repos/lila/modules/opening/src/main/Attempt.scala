@@ -10,20 +10,19 @@ case class Attempt(id: String, // userId/openingId
                    openingRating: Int,
                    openingRatingDiff: Int,
                    userRating: Int,
-                   userRatingDiff: Int) {
+                   userRatingDiff: Int)
 
   def loss = !win
 
   def userPostRating = userRating + userRatingDiff
 
   def openingPostRating = openingRating + openingRatingDiff
-}
 
-object Attempt {
+object Attempt
 
   def makeId(openingId: Opening.ID, userId: String) = s"$openingId/$userId"
 
-  object BSONFields {
+  object BSONFields
     val id = "_id"
     val openingId = "p"
     val userId = "u"
@@ -33,12 +32,11 @@ object Attempt {
     val openingRatingDiff = "od"
     val userRating = "ur"
     val userRatingDiff = "ud"
-  }
 
   import reactivemongo.bson._
   import lila.db.BSON
   import BSON.BSONJodaDateTimeHandler
-  implicit val attemptBSONHandler = new BSON[Attempt] {
+  implicit val attemptBSONHandler = new BSON[Attempt]
 
     import BSONFields._
 
@@ -63,5 +61,3 @@ object Attempt {
                    openingRatingDiff -> w.int(o.openingRatingDiff),
                    userRating -> w.int(o.userRating),
                    userRatingDiff -> w.int(o.userRatingDiff))
-  }
-}

@@ -24,7 +24,7 @@ package org.apache.sparktest
   * As `implicit` is a compiler feature, we don't need to run this class.
   * What we need to do is making the compiler happy.
   */
-class ImplicitSuite {
+class ImplicitSuite
 
   // We only want to test if `implicit` works well with the compiler, so we don't need a real
   // SparkContext.
@@ -33,106 +33,85 @@ class ImplicitSuite {
   // We only want to test if `implicit` works well with the compiler, so we don't need a real RDD.
   def mockRDD[T]: org.apache.spark.rdd.RDD[T] = null
 
-  def testRddToPairRDDFunctions(): Unit = {
+  def testRddToPairRDDFunctions(): Unit =
     val rdd: org.apache.spark.rdd.RDD[(Int, Int)] = mockRDD
     rdd.groupByKey()
-  }
 
-  def testRddToAsyncRDDActions(): Unit = {
+  def testRddToAsyncRDDActions(): Unit =
     val rdd: org.apache.spark.rdd.RDD[Int] = mockRDD
     rdd.countAsync()
-  }
 
-  def testRddToSequenceFileRDDFunctions(): Unit = {
+  def testRddToSequenceFileRDDFunctions(): Unit =
     val rdd: org.apache.spark.rdd.RDD[(Int, Int)] = mockRDD
     rdd.saveAsSequenceFile("/a/test/path")
-  }
 
-  def testRddToSequenceFileRDDFunctionsWithWritable(): Unit = {
+  def testRddToSequenceFileRDDFunctionsWithWritable(): Unit =
     val rdd: org.apache.spark.rdd.RDD[
         (org.apache.hadoop.io.IntWritable, org.apache.hadoop.io.Text)] =
       mockRDD
     rdd.saveAsSequenceFile("/a/test/path")
-  }
 
-  def testRddToSequenceFileRDDFunctionsWithBytesArray(): Unit = {
+  def testRddToSequenceFileRDDFunctionsWithBytesArray(): Unit =
     val rdd: org.apache.spark.rdd.RDD[(Int, Array[Byte])] = mockRDD
     rdd.saveAsSequenceFile("/a/test/path")
-  }
 
-  def testRddToOrderedRDDFunctions(): Unit = {
+  def testRddToOrderedRDDFunctions(): Unit =
     val rdd: org.apache.spark.rdd.RDD[(Int, Int)] = mockRDD
     rdd.sortByKey()
-  }
 
-  def testDoubleRDDToDoubleRDDFunctions(): Unit = {
+  def testDoubleRDDToDoubleRDDFunctions(): Unit =
     val rdd: org.apache.spark.rdd.RDD[Double] = mockRDD
     rdd.stats()
-  }
 
-  def testNumericRDDToDoubleRDDFunctions(): Unit = {
+  def testNumericRDDToDoubleRDDFunctions(): Unit =
     val rdd: org.apache.spark.rdd.RDD[Int] = mockRDD
     rdd.stats()
-  }
 
-  def testDoubleAccumulatorParam(): Unit = {
+  def testDoubleAccumulatorParam(): Unit =
     val sc = mockSparkContext
     sc.accumulator(123.4)
-  }
 
-  def testIntAccumulatorParam(): Unit = {
+  def testIntAccumulatorParam(): Unit =
     val sc = mockSparkContext
     sc.accumulator(123)
-  }
 
-  def testLongAccumulatorParam(): Unit = {
+  def testLongAccumulatorParam(): Unit =
     val sc = mockSparkContext
     sc.accumulator(123L)
-  }
 
-  def testFloatAccumulatorParam(): Unit = {
+  def testFloatAccumulatorParam(): Unit =
     val sc = mockSparkContext
     sc.accumulator(123F)
-  }
 
-  def testIntWritableConverter(): Unit = {
+  def testIntWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[Int, Int]("/a/test/path")
-  }
 
-  def testLongWritableConverter(): Unit = {
+  def testLongWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[Long, Long]("/a/test/path")
-  }
 
-  def testDoubleWritableConverter(): Unit = {
+  def testDoubleWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[Double, Double]("/a/test/path")
-  }
 
-  def testFloatWritableConverter(): Unit = {
+  def testFloatWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[Float, Float]("/a/test/path")
-  }
 
-  def testBooleanWritableConverter(): Unit = {
+  def testBooleanWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[Boolean, Boolean]("/a/test/path")
-  }
 
-  def testBytesWritableConverter(): Unit = {
+  def testBytesWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[Array[Byte], Array[Byte]]("/a/test/path")
-  }
 
-  def testStringWritableConverter(): Unit = {
+  def testStringWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[String, String]("/a/test/path")
-  }
 
-  def testWritableWritableConverter(): Unit = {
+  def testWritableWritableConverter(): Unit =
     val sc = mockSparkContext
     sc.sequenceFile[org.apache.hadoop.io.Text, org.apache.hadoop.io.Text](
         "/a/test/path")
-  }
-}

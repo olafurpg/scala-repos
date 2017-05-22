@@ -16,12 +16,9 @@ import scala.annotation.tailrec
 //wrapper over an identifier for variable declarations 'var v : T' 
 trait ScFieldId extends ScTypedDefinition {}
 
-object ScFieldId {
+object ScFieldId
   @tailrec
-  def getCompoundCopy(rt: ScType, f: ScFieldId): ScFieldId = {
-    f match {
+  def getCompoundCopy(rt: ScType, f: ScFieldId): ScFieldId =
+    f match
       case light: ScLightFieldId => getCompoundCopy(rt, light.f)
       case definition: ScFieldId => new ScLightFieldId(rt, definition)
-    }
-  }
-}

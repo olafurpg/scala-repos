@@ -10,12 +10,12 @@ import com.twitter.finagle.thrift.ClientId
 import com.twitter.finagle.tracing.Trace
 import com.twitter.util.Future
 
-private[finagle] object ExceptionRemoteInfoFactory {
+private[finagle] object ExceptionRemoteInfoFactory
   val role = Stack.Role("ExceptionRemoteInfo")
 
   def addRemoteInfo[T](
       endpointAddr: SocketAddress,
-      label: String): PartialFunction[Throwable, Future[T]] = {
+      label: String): PartialFunction[Throwable, Future[T]] =
     case e: HasRemoteInfo =>
       e.setRemoteInfo(
           RemoteInfo.Available(Upstream.addr,
@@ -32,13 +32,12 @@ private[finagle] object ExceptionRemoteInfoFactory {
                                             Some(endpointAddr),
                                             Some(ClientId(label)),
                                             Trace.id)))
-  }
 
   /**
     * Creates a [[com.twitter.finagle.Stackable]] [[service.ExceptionRemoteInfoFactory]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.ModuleParams[ServiceFactory[Req, Rep]] {
+    new Stack.ModuleParams[ServiceFactory[Req, Rep]]
       val role = ExceptionRemoteInfoFactory.role
       val description =
         "Add upstream/downstream addresses and trace id to request exceptions"
@@ -46,17 +45,13 @@ private[finagle] object ExceptionRemoteInfoFactory {
       val parameters = Seq(implicitly[Stack.Param[Transporter.EndpointAddr]])
 
       def make(params: Stack.Params,
-               next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] = {
+               next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] =
         val endpointAddr = params[Transporter.EndpointAddr].addr
-        endpointAddr match {
+        endpointAddr match
           case Address.Inet(addr, _) =>
             val param.Label(label) = params[param.Label]
             new ExceptionRemoteInfoFactory(next, addr, label)
           case _ => next
-        }
-      }
-    }
-}
 
 /**
   * A [[com.twitter.finagle.ServiceFactoryProxy]] that adds remote info to exceptions for clients.
@@ -70,7 +65,7 @@ private[finagle] class ExceptionRemoteInfoFactory[Req, Rep](
     underlying: ServiceFactory[Req, Rep],
     endpointAddr: SocketAddress,
     label: String)
-    extends ServiceFactoryProxy[Req, Rep](underlying) {
+    extends ServiceFactoryProxy[Req, Rep](underlying)
   private[this] val requestAddRemoteInfo: PartialFunction[
       Throwable, Future[Rep]] =
     ExceptionRemoteInfoFactory.addRemoteInfo(endpointAddr, label)
@@ -80,12 +75,10 @@ private[finagle] class ExceptionRemoteInfoFactory[Req, Rep](
     ExceptionRemoteInfoFactory.addRemoteInfo(endpointAddr, label)
 
   override def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
-    underlying(conn).map { service =>
-      val filter = new SimpleFilter[Req, Rep] {
+    underlying(conn).map  service =>
+      val filter = new SimpleFilter[Req, Rep]
         override def apply(request: Req,
                            service: Service[Req, Rep]): Future[Rep] =
           service(request).rescue(requestAddRemoteInfo)
-      }
       filter andThen service
-    }.rescue(connectionAddRemoteInfo)
-}
+    .rescue(connectionAddRemoteInfo)

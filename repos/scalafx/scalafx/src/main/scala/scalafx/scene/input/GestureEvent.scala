@@ -34,7 +34,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventType}
 
-object GestureEvent {
+object GestureEvent
   implicit def sfxGestureEvent2jfx(ge: GestureEvent): jfxsi.GestureEvent =
     if (ge != null) ge.delegate else null
 
@@ -42,14 +42,13 @@ object GestureEvent {
     * Common supertype for all gestures.
     */
   val ANY: EventType[jfxsi.GestureEvent] = jfxsi.GestureEvent.ANY
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/GestureEvent.html]]
   *
   */
 class GestureEvent(override val delegate: jfxsi.GestureEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.GestureEvent] {
+    extends InputEvent(delegate) with SFXDelegate[jfxsi.GestureEvent]
 
   /**
     * Creates and returns a copy of this event with the specified event source and target.
@@ -121,4 +120,3 @@ class GestureEvent(override val delegate: jfxsi.GestureEvent)
     * Indicates whether or not the host platform common shortcut modifier is down on this event.
     */
   def shortcutDown: Boolean = delegate.isShortcutDown
-}

@@ -23,13 +23,13 @@ import org.junit.Assert._
 import kafka.utils.{CoreUtils, TestUtils}
 import kafka.server.{KafkaConfig, KafkaServer}
 
-class RollingBounceTest extends ZooKeeperTestHarness {
+class RollingBounceTest extends ZooKeeperTestHarness
 
   val partitionId = 0
   var servers: Seq[KafkaServer] = null
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     // controlled.shutdown.enable is true by default
     val configs =
@@ -39,17 +39,15 @@ class RollingBounceTest extends ZooKeeperTestHarness {
     // start all the servers
     servers = configs.map(
         c => TestUtils.createServer(KafkaConfig.fromProps(c)))
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     servers.foreach(_.shutdown())
     servers.foreach(server => CoreUtils.rm(server.config.logDirs))
     super.tearDown()
-  }
 
   @Test
-  def testRollingBounce {
+  def testRollingBounce
     // start all the brokers
     val topic1 = "new-topic1"
     val topic2 = "new-topic2"
@@ -87,17 +85,15 @@ class RollingBounceTest extends ZooKeeperTestHarness {
 
     // Bring down the leader for the fourth topic
     bounceServer(topic4, 3)
-  }
 
-  private def bounceServer(topic: String, startIndex: Int) {
+  private def bounceServer(topic: String, startIndex: Int)
     var prevLeader = 0
-    if (isLeaderLocalOnBroker(topic, partitionId, servers(startIndex))) {
+    if (isLeaderLocalOnBroker(topic, partitionId, servers(startIndex)))
       servers(startIndex).shutdown()
       prevLeader = startIndex
-    } else {
+    else
       servers((startIndex + 1) % 4).shutdown()
       prevLeader = (startIndex + 1) % 4
-    }
     var newleader = waitUntilLeaderIsElectedOrChanged(
         zkUtils, topic, partitionId)
     // Ensure the new leader is different from the old
@@ -106,5 +102,3 @@ class RollingBounceTest extends ZooKeeperTestHarness {
                (newleader.getOrElse(-1) != prevLeader))
     // Start the server back up again
     servers(prevLeader).startup()
-  }
-}

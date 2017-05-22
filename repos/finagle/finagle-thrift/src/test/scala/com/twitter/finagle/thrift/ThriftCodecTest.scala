@@ -12,7 +12,7 @@ import scala.collection.mutable.ListBuffer
 import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
-class ThriftCodecTest extends FunSuite {
+class ThriftCodecTest extends FunSuite
   import ThriftCodecTest._
 
   def thriftToBuffer(
@@ -20,7 +20,7 @@ class ThriftCodecTest extends FunSuite {
       `type`: Byte,
       seqId: Int,
       message: { def write(p: TProtocol) }
-  ): ChannelBuffer = {
+  ): ChannelBuffer =
     val buffer = ChannelBuffers.dynamicBuffer()
     val transport = new ChannelBufferToTransport(buffer)
     val protocol = new TBinaryProtocol(transport, true, true)
@@ -28,18 +28,16 @@ class ThriftCodecTest extends FunSuite {
     message.write(protocol)
     protocol.writeMessageEnd()
     buffer
-  }
 
-  def makeChannel(codec: ChannelHandler) = SunkChannel {
+  def makeChannel(codec: ChannelHandler) = SunkChannel
     val pipeline = Channels.pipeline()
     pipeline.addLast("codec", codec)
     pipeline
-  }
 
   ThriftTypes.add(new ThriftCallFactory[Silly.bleep_args, Silly.bleep_result](
           "bleep", classOf[Silly.bleep_args], classOf[Silly.bleep_result]))
 
-  test("thrift server encoder should encode replys") {
+  test("thrift server encoder should encode replys")
     val protocolFactory = new TBinaryProtocol.Factory()
     val call = new ThriftCall("testMethod",
                               new Silly.bleep_args("arg"),
@@ -69,9 +67,8 @@ class ThriftCodecTest extends FunSuite {
     result.read(protocol)
     assert(result.isSetSuccess)
     assert(result.success == "result")
-  }
 
-  test("thrift server decoder should decode calls") {
+  test("thrift server decoder should decode calls")
     val protocolFactory = new TBinaryProtocol.Factory()
     // receive call and decode
     val buffer = thriftToBuffer(
@@ -91,14 +88,13 @@ class ThriftCodecTest extends FunSuite {
     assert(thriftCall.method == "bleep")
     assert(thriftCall.seqid == 23)
     assert(thriftCall.arguments.request == "args")
-  }
 
-  test("thrift server decoder should decode calls broken in two") {
+  test("thrift server decoder should decode calls broken in two")
     val protocolFactory = new TBinaryProtocol.Factory()
     val buffer = thriftToBuffer(
         "bleep", TMessageType.CALL, 23, new Silly.bleep_args("args"))
 
-    Range(0, buffer.readableBytes - 1).foreach { numBytes =>
+    Range(0, buffer.readableBytes - 1).foreach  numBytes =>
       // receive partial call
       val channel = makeChannel(new ThriftServerDecoder(protocolFactory))
       val truncatedBuffer = buffer.copy(buffer.readerIndex, numBytes)
@@ -123,10 +119,8 @@ class ThriftCodecTest extends FunSuite {
         message.asInstanceOf[ThriftCall[Silly.bleep_args, Silly.bleep_result]]
       assert(thriftCall != null)
       assert(thriftCall.method == "bleep")
-    }
-  }
 
-  test("thrift client encoder should encode calls") {
+  test("thrift client encoder should encode calls")
     val protocolFactory = new TBinaryProtocol.Factory()
     val call = new ThriftCall(
         "testMethod", new Silly.bleep_args("arg"), classOf[Silly.bleep_result])
@@ -150,9 +144,8 @@ class ThriftCodecTest extends FunSuite {
     val args = new Silly.bleep_args()
     args.read(protocol)
     assert(args.request == "arg")
-  }
 
-  test("thrift client decoder should decode replys") {
+  test("thrift client decoder should decode replys")
     val protocolFactory = new TBinaryProtocol.Factory()
     // receive reply and decode
     val buffer = thriftToBuffer(
@@ -168,14 +161,13 @@ class ThriftCodecTest extends FunSuite {
     val result = message.asInstanceOf[ThriftReply[Silly.bleep_result]]
     assert(result != null)
     assert(result.response.success == "result")
-  }
 
-  test("decode replies broken in two") {
+  test("decode replies broken in two")
     val protocolFactory = new TBinaryProtocol.Factory()
     val buffer = thriftToBuffer(
         "bleep", TMessageType.REPLY, 23, new Silly.bleep_result("result"))
 
-    Range(0, buffer.readableBytes - 1).foreach { numBytes =>
+    Range(0, buffer.readableBytes - 1).foreach  numBytes =>
       // receive partial call
       val channel = makeChannel(new ThriftClientDecoder(protocolFactory))
       val truncatedBuffer = buffer.copy(buffer.readerIndex, numBytes)
@@ -198,10 +190,8 @@ class ThriftCodecTest extends FunSuite {
       val result = message.asInstanceOf[ThriftReply[Silly.bleep_result]]
       assert(result != null)
       assert(result.response.success == "result")
-    }
-  }
 
-  test("decode exceptions") {
+  test("decode exceptions")
     val protocolFactory = new TBinaryProtocol.Factory()
     // receive exception and decode
     val buffer =
@@ -220,19 +210,15 @@ class ThriftCodecTest extends FunSuite {
     val cause = event.getCause.asInstanceOf[TApplicationException]
     assert(cause.getType == TApplicationException.UNKNOWN_METHOD)
     assert(cause.getMessage == "message")
-  }
-}
 
-object ThriftCodecTest {
-  class SunkChannelSink extends AbstractChannelSink {
+object ThriftCodecTest
+  class SunkChannelSink extends AbstractChannelSink
     val events = new ListBuffer[ChannelEvent]
 
-    def eventSunk(p: ChannelPipeline, e: ChannelEvent) {
+    def eventSunk(p: ChannelPipeline, e: ChannelEvent)
       events += e
-    }
-  }
 
-  class SunkChannelFactory extends ChannelFactory {
+  class SunkChannelFactory extends ChannelFactory
     val sink = new SunkChannelSink
 
     def newChannel(pipeline: ChannelPipeline): Channel =
@@ -240,22 +226,21 @@ object ThriftCodecTest {
 
     def releaseExternalResources() = ()
     def shutdown() = ()
-  }
 
   class SunkChannel(factory: SunkChannelFactory,
                     pipeline: ChannelPipeline,
                     sink: SunkChannelSink)
       extends AbstractChannel(
-          null /*parent*/, null /*factory*/, pipeline, sink) {
+          null /*parent*/, null /*factory*/, pipeline, sink)
     def upstreamEvents: Seq[ChannelEvent] = _upstreamEvents
     def downstreamEvents: Seq[ChannelEvent] = sink.events
 
     val _upstreamEvents = new ListBuffer[ChannelEvent]
 
-    pipeline.addLast("upstreamSink", new ChannelUpstreamHandler {
+    pipeline.addLast("upstreamSink", new ChannelUpstreamHandler
       def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent) =
         _upstreamEvents += e
-    })
+    )
 
     var _isConnected = true
     var _isBound = true
@@ -272,10 +257,7 @@ object ThriftCodecTest {
     def isBound_=(yesno: Boolean) { _isBound = yesno }
 
     def getConfig = config
-  }
 
-  object SunkChannel {
+  object SunkChannel
     def apply(p: ChannelPipeline) =
       new SunkChannelFactory().newChannel(p).asInstanceOf[SunkChannel]
-  }
-}

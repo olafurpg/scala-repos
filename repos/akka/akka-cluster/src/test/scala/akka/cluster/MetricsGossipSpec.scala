@@ -14,7 +14,7 @@ import java.lang.System.{currentTimeMillis ⇒ newTimestamp}
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsGossipSpec
     extends AkkaSpec(MetricsEnabledSpec.config) with ImplicitSender
-    with MetricsCollectorFactory {
+    with MetricsCollectorFactory
 
   val collector = createMetricsCollector
 
@@ -22,13 +22,12 @@ class MetricsGossipSpec
     * sometimes Sigar will not be able to return a valid value (NaN and such) so must ensure they
     * have the same Metric types
     */
-  def newSample(previousSample: Set[Metric]): Set[Metric] = {
+  def newSample(previousSample: Set[Metric]): Set[Metric] =
     // Metric.equals is based on name equality
     collector.sample.metrics.filter(previousSample.contains) ++ previousSample
-  }
 
-  "A MetricsGossip" must {
-    "add new NodeMetrics" in {
+  "A MetricsGossip" must
+    "add new NodeMetrics" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -47,9 +46,8 @@ class MetricsGossipSpec
       g2.nodes.size should ===(2)
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2.metrics))
-    }
 
-    "merge peer metrics" in {
+    "merge peer metrics" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -69,13 +67,11 @@ class MetricsGossipSpec
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(
           Some(m2Updated.metrics))
-      g2.nodes collect {
+      g2.nodes collect
         case peer if peer.address == m2.address ⇒
           peer.timestamp should ===(m2Updated.timestamp)
-      }
-    }
 
-    "merge an existing metric set for a node and update node ring" in {
+    "merge an existing metric set for a node and update node ring" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -107,17 +103,15 @@ class MetricsGossipSpec
       mergedGossip.nodes.foreach(_.metrics.size should be > (3))
       mergedGossip.nodeMetricsFor(m2.address).map(_.timestamp) should ===(
           Some(m2Updated.timestamp))
-    }
 
-    "get the current NodeMetrics if it exists in the local nodes" in {
+    "get the current NodeMetrics if it exists in the local nodes" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
       val g1 = MetricsGossip.empty :+ m1
       g1.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
-    }
 
-    "remove a node if it is no longer Up" in {
+    "remove a node if it is no longer Up" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -132,9 +126,8 @@ class MetricsGossipSpec
       g2.nodes.exists(_.address == m1.address) should ===(false)
       g2.nodeMetricsFor(m1.address) should ===(None)
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2.metrics))
-    }
 
-    "filter nodes" in {
+    "filter nodes" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -149,6 +142,3 @@ class MetricsGossipSpec
       g2.nodes.exists(_.address == m1.address) should ===(false)
       g2.nodeMetricsFor(m1.address) should ===(None)
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2.metrics))
-    }
-  }
-}

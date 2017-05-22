@@ -1,5 +1,5 @@
-class DefNoParamInput {
-  def foo {
+class DefNoParamInput
+  def foo
     def goo: Int = 23
 
     /*start*/
@@ -8,8 +8,6 @@ class DefNoParamInput {
     val y = goo
     /*end*/
     x + goo
-  }
-}
 /*
 class DefNoParamInput {
   def foo {

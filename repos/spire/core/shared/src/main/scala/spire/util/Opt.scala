@@ -4,22 +4,19 @@ package util
 import spire.algebra.Eq
 import spire.syntax.eq._
 
-object Opt extends OptVersions {
+object Opt extends OptVersions
   def apply[A](a: A): Opt[A] = new Opt(a)
   def empty[A]: Opt[A] = new Opt[A](null.asInstanceOf[A])
 
-  implicit def Eq[A : Eq]: Eq[Opt[A]] = new Eq[Opt[A]] {
+  implicit def Eq[A : Eq]: Eq[Opt[A]] = new Eq[Opt[A]]
     def eqv(x: Opt[A], y: Opt[A]): Boolean =
       if (x.isEmpty) y.isEmpty else x.ref === y.ref
-  }
-}
 
-class Opt[+A](val ref: A) extends OptVersions.Base {
+class Opt[+A](val ref: A) extends OptVersions.Base
   def scala2_10hashCode: Int = ref.hashCode
-  def scala2_10equals(other: Any): Boolean = other match {
+  def scala2_10equals(other: Any): Boolean = other match
     case that: Opt[_] => ref == that.ref
     case _ => false
-  }
   def isDefined: Boolean = ref != null
   def nonEmpty: Boolean = ref != null
   def isEmpty: Boolean = ref == null
@@ -68,4 +65,3 @@ class Opt[+A](val ref: A) extends OptVersions.Base {
 
   def toLeft[X](right: => X): Either[A, X] =
     if (ref == null) Right(right) else Left(ref)
-}

@@ -20,7 +20,7 @@ import akka.dispatch.{RequiresMessageQueue, UnboundedMessageQueueSemantics}
 /**
   * INTERNAL API
   */
-private[akka] object RemoteActorRefProvider {
+private[akka] object RemoteActorRefProvider
   private final case class Internals(transport: RemoteTransport,
                                      serialization: Serialization,
                                      remoteDaemon: InternalActorRef)
@@ -35,34 +35,31 @@ private[akka] object RemoteActorRefProvider {
 
   private class RemotingTerminator(systemGuardian: ActorRef)
       extends Actor with FSM[TerminatorState, Option[Internals]]
-      with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+      with RequiresMessageQueue[UnboundedMessageQueueSemantics]
     import context.dispatcher
 
     startWith(Uninitialized, None)
 
-    when(Uninitialized) {
+    when(Uninitialized)
       case Event(i: Internals, _) ⇒
         systemGuardian ! RegisterTerminationHook
         goto(Idle) using Some(i)
-    }
 
-    when(Idle) {
+    when(Idle)
       case Event(TerminationHook, Some(internals)) ⇒
         log.info("Shutting down remote daemon.")
         internals.remoteDaemon ! TerminationHook
         goto(WaitDaemonShutdown)
-    }
 
     // TODO: state timeout
-    when(WaitDaemonShutdown) {
+    when(WaitDaemonShutdown)
       case Event(TerminationHookDone, Some(internals)) ⇒
         log.info(
             "Remote daemon shut down; proceeding with flushing remote transports.")
         internals.transport.shutdown() pipeTo self
         goto(WaitTransportShutdown)
-    }
 
-    when(WaitTransportShutdown) {
+    when(WaitTransportShutdown)
       case Event(Done, _) ⇒
         log.info("Remoting shut down.")
         systemGuardian ! TerminationHookDone
@@ -72,8 +69,6 @@ private[akka] object RemoteActorRefProvider {
         log.error(ex, "Remoting shut down with error")
         systemGuardian ! TerminationHookDone
         stop()
-    }
-  }
 
   /*
    * Remoting wraps messages destined to a remote host in a remoting specific envelope: EndpointManager.Send
@@ -84,11 +79,11 @@ private[akka] object RemoteActorRefProvider {
   private class RemoteDeadLetterActorRef(_provider: ActorRefProvider,
                                          _path: ActorPath,
                                          _eventStream: EventStream)
-      extends DeadLetterActorRef(_provider, _path, _eventStream) {
+      extends DeadLetterActorRef(_provider, _path, _eventStream)
     import EndpointManager.Send
 
     override def !(message: Any)(implicit sender: ActorRef): Unit =
-      message match {
+      message match
         case Send(m, senderOption, _, seqOpt) ⇒
           // else ignore: it is a reliably delivered message that might be retried later, and it has not yet deserved
           // the dead letter status
@@ -98,13 +93,10 @@ private[akka] object RemoteActorRefProvider {
           // the dead letter status
           if (seqOpt.isEmpty) super.!(m)(senderOption.orNull)
         case _ ⇒ super.!(message)(sender)
-      }
 
     @throws(classOf[java.io.ObjectStreamException])
     override protected def writeReplace(): AnyRef =
       DeadLetterActorRef.serialized
-  }
-}
 
 /**
   * INTERNAL API
@@ -117,7 +109,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
                                            val settings: ActorSystem.Settings,
                                            val eventStream: EventStream,
                                            val dynamicAccess: DynamicAccess)
-    extends ActorRefProvider {
+    extends ActorRefProvider
   import RemoteActorRefProvider._
 
   val remoteSettings: RemoteSettings = new RemoteSettings(settings.config)
@@ -174,7 +166,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
 
   @volatile private var remoteDeploymentWatcher: ActorRef = _
 
-  def init(system: ActorSystemImpl): Unit = {
+  def init(system: ActorSystemImpl): Unit =
     local.init(system)
 
     remotingTerminator = system.systemActorOf(
@@ -183,7 +175,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
         "remoting-terminator")
 
     val internals = Internals(
-        remoteDaemon = {
+        remoteDaemon =
           val d = new RemoteSystemDaemon(
               system,
               local.rootPath / "remote",
@@ -193,7 +185,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
               untrustedMode = remoteSettings.UntrustedMode)
           local.registerExtraNames(Map(("remote", d)))
           d
-        },
+        ,
         serialization = SerializationExtension(system),
         transport = new Remoting(system, this))
 
@@ -207,9 +199,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
 
     _remoteWatcher = createRemoteWatcher(system)
     remoteDeploymentWatcher = createRemoteDeploymentWatcher(system)
-  }
 
-  protected def createRemoteWatcher(system: ActorSystemImpl): ActorRef = {
+  protected def createRemoteWatcher(system: ActorSystemImpl): ActorRef =
     import remoteSettings._
     val failureDetector = createRemoteWatcherFailureDetector(system)
     system.systemActorOf(
@@ -220,10 +211,9 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
                 unreachableReaperInterval = WatchUnreachableReaperInterval,
                 heartbeatExpectedResponseAfter = WatchHeartbeatExpectedResponseAfter)),
         "remote-watcher")
-  }
 
   protected def createRemoteWatcherFailureDetector(
-      system: ExtendedActorSystem): FailureDetectorRegistry[Address] = {
+      system: ExtendedActorSystem): FailureDetectorRegistry[Address] =
     def createFailureDetector(): FailureDetector =
       FailureDetectorLoader.load(
           remoteSettings.WatchFailureDetectorImplementationClass,
@@ -231,7 +221,6 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
           system)
 
     new DefaultFailureDetectorRegistry(() ⇒ createFailureDetector())
-  }
 
   protected def createRemoteDeploymentWatcher(
       system: ActorSystemImpl): ActorRef =
@@ -256,7 +245,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
                     deploy,
                     lookupDeploy,
                     async)
-    else {
+    else
 
       if (!system.dispatchers.hasDispatcher(props.dispatcher))
         throw new ConfigurationException(
@@ -288,35 +277,31 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
        */
 
       @scala.annotation.tailrec
-      def lookupRemotes(p: Iterable[String]): Option[Deploy] = {
-        p.headOption match {
+      def lookupRemotes(p: Iterable[String]): Option[Deploy] =
+        p.headOption match
           case None ⇒ None
           case Some("remote") ⇒ lookupRemotes(p.drop(3))
           case Some("user") ⇒ deployer.lookup(p.drop(1))
           case Some(_) ⇒ None
-        }
-      }
 
       val elems = path.elements
       val lookup =
         if (lookupDeploy)
-          elems.head match {
+          elems.head match
             case "user" ⇒ deployer.lookup(elems.drop(1))
             case "remote" ⇒ lookupRemotes(elems)
             case _ ⇒ None
-          } else None
+          else None
 
-      val deployment = {
-        deploy.toList ::: lookup.toList match {
+      val deployment =
+        deploy.toList ::: lookup.toList match
           case Nil ⇒ Nil
           case l ⇒ List(l reduce ((a, b) ⇒ b withFallback a))
-        }
-      }
 
       Iterator(props.deploy) ++ deployment.iterator reduce
-      ((a, b) ⇒ b withFallback a) match {
+      ((a, b) ⇒ b withFallback a) match
         case d @ Deploy(_, _, _, RemoteScope(addr), _, _) ⇒
-          if (hasAddress(addr)) {
+          if (hasAddress(addr))
             local.actorOf(system,
                           props,
                           supervisor,
@@ -325,22 +310,21 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
                           deployment.headOption,
                           false,
                           async)
-          } else if (props.deploy.scope == LocalScope) {
+          else if (props.deploy.scope == LocalScope)
             throw new ConfigurationException(
                 s"configuration requested remote deployment for local-only Props at [$path]")
-          } else
-            try {
-              try {
+          else
+            try
+              try
                 // for consistency we check configuration of dispatcher and mailbox locally
                 val dispatcher = system.dispatchers.lookup(props.dispatcher)
                 system.mailboxes.getMailboxType(
                     props, dispatcher.configurator.config)
-              } catch {
+              catch
                 case NonFatal(e) ⇒
                   throw new ConfigurationException(
                       s"configuration problem while creating [$path] with dispatcher [${props.dispatcher}] and mailbox [${props.mailbox}]",
                       e)
-              }
               val localAddress = transport.localAddressForRemote(addr)
               val rpath =
                 (RootActorPath(addr) / "remote" / localAddress.protocol / localAddress.hostPort / path.elements)
@@ -351,11 +335,10 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
                                  supervisor,
                                  Some(props),
                                  Some(d))
-            } catch {
+            catch
               case NonFatal(e) ⇒
                 throw new IllegalArgumentException(
                     s"remote deployment failed for [$path]", e)
-            }
 
         case _ ⇒
           local.actorOf(system,
@@ -366,50 +349,43 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
                         deployment.headOption,
                         false,
                         async)
-      }
-    }
 
   @deprecated("use actorSelection instead of actorFor", "2.2")
-  override private[akka] def actorFor(path: ActorPath): InternalActorRef = {
+  override private[akka] def actorFor(path: ActorPath): InternalActorRef =
     if (hasAddress(path.address)) actorFor(rootGuardian, path.elements)
     else
-      try {
+      try
         new RemoteActorRef(transport,
                            transport.localAddressForRemote(path.address),
                            path,
                            Nobody,
                            props = None,
                            deploy = None)
-      } catch {
+      catch
         case NonFatal(e) ⇒
           log.error(e, "Error while looking up address [{}]", path.address)
           new EmptyLocalActorRef(this, path, eventStream)
-      }
-  }
 
   @deprecated("use actorSelection instead of actorFor", "2.2")
   override private[akka] def actorFor(
-      ref: InternalActorRef, path: String): InternalActorRef = path match {
+      ref: InternalActorRef, path: String): InternalActorRef = path match
     case ActorPathExtractor(address, elems) ⇒
       if (hasAddress(address)) actorFor(rootGuardian, elems)
-      else {
+      else
         val rootPath = RootActorPath(address) / elems
-        try {
+        try
           new RemoteActorRef(transport,
                              transport.localAddressForRemote(address),
                              rootPath,
                              Nobody,
                              props = None,
                              deploy = None)
-        } catch {
+        catch
           case NonFatal(e) ⇒
             log.error(
                 e, "Error while looking up address [{}]", rootPath.address)
             new EmptyLocalActorRef(this, rootPath, eventStream)
-        }
-      }
     case _ ⇒ local.actorFor(ref, path)
-  }
 
   @deprecated("use actorSelection instead of actorFor", "2.2")
   override private[akka] def actorFor(
@@ -431,8 +407,8 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
     * Called in deserialization of incoming remote messages where the correct local address is known.
     */
   private[akka] def resolveActorRefWithLocalAddress(
-      path: String, localAddress: Address): InternalActorRef = {
-    path match {
+      path: String, localAddress: Address): InternalActorRef =
+    path match
       case ActorPathExtractor(address, elems) ⇒
         if (hasAddress(address)) local.resolveActorRef(rootGuardian, elems)
         else
@@ -445,51 +421,44 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
       case _ ⇒
         log.debug("resolve of unknown path [{}] failed", path)
         deadLetters
-    }
-  }
 
-  def resolveActorRef(path: String): ActorRef = path match {
+  def resolveActorRef(path: String): ActorRef = path match
     case ActorPathExtractor(address, elems) ⇒
       if (hasAddress(address)) local.resolveActorRef(rootGuardian, elems)
-      else {
+      else
         val rootPath = RootActorPath(address) / elems
-        try {
+        try
           new RemoteActorRef(transport,
                              transport.localAddressForRemote(address),
                              rootPath,
                              Nobody,
                              props = None,
                              deploy = None)
-        } catch {
+        catch
           case NonFatal(e) ⇒
             log.warning("Error while resolving address [{}] due to [{}]",
                         rootPath.address,
                         e.getMessage)
             new EmptyLocalActorRef(this, rootPath, eventStream)
-        }
-      }
     case _ ⇒
       log.debug("resolve of unknown path [{}] failed", path)
       deadLetters
-  }
 
-  def resolveActorRef(path: ActorPath): ActorRef = {
+  def resolveActorRef(path: ActorPath): ActorRef =
     if (hasAddress(path.address))
       local.resolveActorRef(rootGuardian, path.elements)
     else
-      try {
+      try
         new RemoteActorRef(transport,
                            transport.localAddressForRemote(path.address),
                            path,
                            Nobody,
                            props = None,
                            deploy = None)
-      } catch {
+      catch
         case NonFatal(e) ⇒
           log.error(e, "Error while resolving address [{}]", path.address)
           new EmptyLocalActorRef(this, path, eventStream)
-      }
-  }
 
   /**
     * Using (checking out) actor on a specific node.
@@ -497,7 +466,7 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
   def useActorOnNode(ref: ActorRef,
                      props: Props,
                      deploy: Deploy,
-                     supervisor: ActorRef): Unit = {
+                     supervisor: ActorRef): Unit =
     log.debug("[{}] Instantiating Remote Actor [{}]", rootPath, ref.path)
 
     // we don’t wait for the ACK, because the remote end will process this command before any other message to the new actor
@@ -508,18 +477,14 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
 
     remoteDeploymentWatcher ! RemoteDeploymentWatcher.WatchRemote(
         ref, supervisor)
-  }
 
-  def getExternalAddressFor(addr: Address): Option[Address] = {
-    addr match {
+  def getExternalAddressFor(addr: Address): Option[Address] =
+    addr match
       case _ if hasAddress(addr) ⇒ Some(local.rootPath.address)
       case Address(_, _, Some(_), Some(_)) ⇒
-        try Some(transport.localAddressForRemote(addr)) catch {
+        try Some(transport.localAddressForRemote(addr)) catch
           case NonFatal(_) ⇒ None
-        }
       case _ ⇒ None
-    }
-  }
 
   def getDefaultAddress: Address = transport.defaultAddress
 
@@ -535,11 +500,9 @@ private[akka] class RemoteActorRefProvider(val systemName: String,
     */
   def quarantine(address: Address, uid: Option[Int]): Unit =
     transport.quarantine(address, uid)
-}
 
-private[akka] trait RemoteRef extends ActorRefScope {
+private[akka] trait RemoteRef extends ActorRefScope
   final def isLocal = false
-}
 
 /**
   * INTERNAL API
@@ -553,11 +516,11 @@ private[akka] class RemoteActorRef private[akka](
     val getParent: InternalActorRef,
     props: Option[Props],
     deploy: Option[Deploy])
-    extends InternalActorRef with RemoteRef {
+    extends InternalActorRef with RemoteRef
 
-  def getChild(name: Iterator[String]): InternalActorRef = {
+  def getChild(name: Iterator[String]): InternalActorRef =
     val s = name.toStream
-    s.headOption match {
+    s.headOption match
       case None ⇒ this
       case Some("..") ⇒ getParent getChild name
       case _ ⇒
@@ -567,13 +530,11 @@ private[akka] class RemoteActorRef private[akka](
                            Nobody,
                            props = None,
                            deploy = None)
-    }
-  }
 
   @deprecated("Use context.watch(actor) and receive Terminated(actor)", "2.2")
   override private[akka] def isTerminated: Boolean = false
 
-  private def handleException: Catcher[Unit] = {
+  private def handleException: Catcher[Unit] =
     case e: InterruptedException ⇒
       remote.system.eventStream.publish(
           Error(e, path.toString, getClass, "interrupted during message send"))
@@ -584,27 +545,25 @@ private[akka] class RemoteActorRef private[akka](
                 path.toString,
                 getClass,
                 "swallowing exception during message send"))
-  }
 
   /**
     * Determine if a watch/unwatch message must be handled by the remoteWatcher actor, or sent to this remote ref
     */
   def isWatchIntercepted(watchee: ActorRef, watcher: ActorRef) =
-    if (watchee.path.uid == akka.actor.ActorCell.undefinedUid) {
+    if (watchee.path.uid == akka.actor.ActorCell.undefinedUid)
       provider.log.debug(
           "actorFor is deprecated, and watching a remote ActorRef acquired with actorFor is not reliable: [{}]",
           watchee.path)
       false // Not managed by the remote watcher, so not reliable to communication failure or remote system crash
-    } else {
+    else
       // If watchee != this then watcher should == this. This is a reverse watch, and it is not intercepted
       // If watchee == this, only the watches from remoteWatcher are sent on the wire, on behalf of other watchers
       watcher != provider.remoteWatcher && watchee == this
-    }
 
   def sendSystemMessage(message: SystemMessage): Unit =
-    try {
+    try
       //send to remote, unless watch message is intercepted by the remoteWatcher
-      message match {
+      message match
         case Watch(watchee, watcher) if isWatchIntercepted(watchee, watcher) ⇒
           provider.remoteWatcher ! RemoteWatcher.WatchRemote(watchee, watcher)
         //Unwatch has a different signature, need to pattern match arguments against InternalActorRef
@@ -613,14 +572,12 @@ private[akka] class RemoteActorRef private[akka](
           provider.remoteWatcher ! RemoteWatcher.UnwatchRemote(
               watchee, watcher)
         case _ ⇒ remote.send(message, None, this)
-      }
-    } catch handleException
+    catch handleException
 
   override def !(message: Any)(
-      implicit sender: ActorRef = Actor.noSender): Unit = {
+      implicit sender: ActorRef = Actor.noSender): Unit =
     if (message == null) throw new InvalidMessageException("Message is null")
     try remote.send(message, Option(sender), this) catch handleException
-  }
 
   override def provider: RemoteActorRefProvider = remote.provider
 
@@ -639,4 +596,3 @@ private[akka] class RemoteActorRef private[akka](
 
   @throws(classOf[java.io.ObjectStreamException])
   private def writeReplace(): AnyRef = SerializedActorRef(this)
-}

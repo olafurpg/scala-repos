@@ -23,7 +23,7 @@ import org.saddle.vec
   * The Random class provides methods to generate pseudo-random numbers via a plug-in
   * PRNG, which is simply any function that generates a Long primitive.
   */
-class Random private (rng64: () => Long) {
+class Random private (rng64: () => Long)
 
   /**
     * Generate a new integer (taking the 32 low order bits of the
@@ -49,34 +49,30 @@ class Random private (rng64: () => Long) {
   /**
     * Generate a new non-negative integer
     */
-  @tailrec final def nextNonNegInt: Int = {
+  @tailrec final def nextNonNegInt: Int =
     val tmp = nextInt
     if (tmp >= 0) tmp else nextNonNegInt
-  }
 
   /**
     * Generate a new non-negative long
     */
-  @tailrec final def nextNonNegLong: Long = {
+  @tailrec final def nextNonNegLong: Long =
     val tmp = nextLong
     if (tmp >= 0) tmp else nextNonNegLong
-  }
 
   /**
     * Generate a new non-negative float
     */
-  @tailrec final def nextNonNegFloat: Float = {
+  @tailrec final def nextNonNegFloat: Float =
     val tmp = nextFloat
     if (tmp >= 0) tmp else nextNonNegFloat
-  }
 
   /**
     * Generate a new non-negative double
     */
-  @tailrec final def nextNonNegDouble: Double = {
+  @tailrec final def nextNonNegDouble: Double =
     val tmp = nextDouble
     if (tmp >= 0) tmp else nextNonNegDouble
-  }
 
   private var next = Double.NaN
 
@@ -86,27 +82,23 @@ class Random private (rng64: () => Long) {
     * This is based on Apache Commons Math's nextGaussian, which in turn is based
     * on the Polar Method of Box, Muller, & Marsiglia as described in Knuth 3.4.1C
     */
-  @tailrec final def nextGaussian: Double = {
-    if (next == next) {
+  @tailrec final def nextGaussian: Double =
+    if (next == next)
       val tmp = next
       next = Double.NaN
       tmp
-    } else {
+    else
       val u1 = 2.0 * nextDouble - 1.0
       val u2 = 2.0 * nextDouble - 1.0
       val s = u1 * u1 + u2 * u2
 
       if (s >= 1) nextGaussian
-      else {
+      else
         val bm = if (s != 0) { math.sqrt(-2.0 * math.log(s) / s) } else s
         next = u1 * bm
         u2 * bm
-      }
-    }
-  }
-}
 
-object Random {
+object Random
 
   /**
     * Create Random instance
@@ -123,52 +115,45 @@ object Random {
     * Create Random instance from custom RNG function
     */
   def apply(rng: () => Long) = new Random(rng)
-}
 
 /**
   * Marsaglia XorShift PRNG
   *
   * See [[http://www.jstatsoft.org/v08/i14/ Marsaglia]]
   */
-object XorShift {
+object XorShift
   def apply(): () => Long = apply(new java.util.Random().nextLong)
 
   def apply(seed: Long): () => Long = makeRNG((13, 7, 17), seed)
 
-  def makeRNG(tup: (Int, Int, Int), seed: Long): () => Long = {
+  def makeRNG(tup: (Int, Int, Int), seed: Long): () => Long =
     var seedL = seed
     val (a, b, c) = tup
     () =>
       seedL ^= (seedL << a); seedL ^= (seedL >> b); seedL ^= (seedL << c); seedL
-  }
-}
 
 /**
   * Marsaglia Lagged Fibonacci PRNG
   *
   * See [[https://groups.google.com/forum/?fromgroups=#!msg/sci.crypt/yoaCpGWKEk0/UXCxgufdTesJ]]
   */
-object LFib4 {
+object LFib4
   def apply(): () => Long = apply(new java.util.Random().nextLong)
 
   def apply(seed: Long): () => Long = makeRNG(seed)
 
-  def makeRNG(seed: Long): () => Long = {
+  def makeRNG(seed: Long): () => Long =
     val jrand = new java.util.Random(seed)
     val state = Array.ofDim[Long](256) // 2K of memory
     for (i <- 0 until 256) state(i) = jrand.nextLong
     var c = 0
 
     () =>
-      {
         c += 1
         c &= 0xFF
         state(c) = state(c) + state((c + 58) & 0xFF) +
         state((c + 119) & 0xFF) + state((c + 178) & 0xFF)
         state(c)
-      }
-  }
-}
 
 /**
   * Ziff 4-tap shift-register-sequence
@@ -176,12 +161,12 @@ object LFib4 {
   * http://arxiv.org/pdf/cond-mat/9710104v1.pdf
   * http://www.aip.org/cip/pdf/vol_12/iss_4/385_1.pdf
   */
-object Ziff98 {
+object Ziff98
   def apply(): () => Long = apply(new java.util.Random().nextLong)
 
   def apply(seed: Long): () => Long = makeRNG(seed)
 
-  def makeRNG(seed: Long): () => Long = {
+  def makeRNG(seed: Long): () => Long =
     val (a, b, c, d, m) = (471, 1586, 6988, 9689, 16383)
 
     val jrand = new java.util.Random(seed)
@@ -191,27 +176,23 @@ object Ziff98 {
     for (i <- 0 until m) state(i) = jrand.nextLong
 
     () =>
-      {
         nd += 1
         val (a1, b1, c1, d1, e1) =
           (nd & m, (nd - a) & m, (nd - b) & m, (nd - c) & m, (nd - d) & m)
         state(a1) = state(b1) ^ state(c1) ^ state(d1) ^ state(e1)
         state(a1)
-      }
-  }
-}
 
 /**
   * Create a random InputStream of bytes from a PRNG. Useful for testing, e.g.,
   * for feeding into dieharder battery of tests via stdin.
   */
-case class RandomStream(rng: () => Long) extends InputStream {
+case class RandomStream(rng: () => Long) extends InputStream
   var c = 0
   var r = rng()
 
-  def read(): Int = {
+  def read(): Int =
     c += 1
-    val byte = c match {
+    val byte = c match
       case 1 => r
       case 2 => r >>> 8
       case 3 => r >>> 16
@@ -220,7 +201,4 @@ case class RandomStream(rng: () => Long) extends InputStream {
       case 6 => r >>> 40
       case 7 => r >>> 48
       case 8 => c = 0; val tmp = (r >>> 56); r = rng(); tmp
-    }
     (byte & 0xFF).asInstanceOf[Int]
-  }
-}

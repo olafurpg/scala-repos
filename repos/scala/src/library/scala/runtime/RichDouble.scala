@@ -10,7 +10,7 @@ package scala
 package runtime
 
 final class RichDouble(val self: Double)
-    extends AnyVal with FractionalProxy[Double] {
+    extends AnyVal with FractionalProxy[Double]
   protected def num = scala.math.Numeric.DoubleIsFractional
   protected def ord = scala.math.Ordering.Double
   protected def integralNum = scala.math.Numeric.DoubleAsIfIntegral
@@ -22,12 +22,11 @@ final class RichDouble(val self: Double)
   override def byteValue() = self.toByte
   override def shortValue() = self.toShort
 
-  override def isWhole = {
+  override def isWhole =
     val l = self.toLong
     l.toDouble == self || l == Long.MaxValue &&
     self < Double.PositiveInfinity || l == Long.MinValue &&
     self > Double.NegativeInfinity
-  }
   override def isValidByte = self.toByte.toDouble == self
   override def isValidShort = self.toShort.toDouble == self
   override def isValidChar = self.toChar.toDouble == self
@@ -62,4 +61,3 @@ final class RichDouble(val self: Double)
     *  @return the measurement of the angle x in degrees.
     */
   def toDegrees: Double = math.toDegrees(self)
-}

@@ -4,15 +4,12 @@ import akka.actor._
 
 import lila.hub.ActorMap
 
-trait SocketHubActor[A <: SocketActor[_]] extends Socket with ActorMap {
+trait SocketHubActor[A <: SocketActor[_]] extends Socket with ActorMap
 
   def socketHubReceive: Receive = actorMapReceive
-}
 
-object SocketHubActor {
+object SocketHubActor
 
-  trait Default[A <: SocketActor[_]] extends SocketHubActor[A] {
+  trait Default[A <: SocketActor[_]] extends SocketHubActor[A]
 
     def receive = socketHubReceive
-  }
-}

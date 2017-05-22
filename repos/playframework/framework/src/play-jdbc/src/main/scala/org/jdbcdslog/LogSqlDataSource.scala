@@ -12,10 +12,9 @@ import javax.sql.DataSource
   * exposes the target dataSource, which is necessary to shutdown
   * the pool.
   */
-class LogSqlDataSource extends ConnectionPoolDataSourceProxy {
+class LogSqlDataSource extends ConnectionPoolDataSourceProxy
 
   override def getParentLogger: Logger =
     throw new SQLFeatureNotSupportedException
 
   def getTargetDatasource = this.targetDS.asInstanceOf[DataSource]
-}

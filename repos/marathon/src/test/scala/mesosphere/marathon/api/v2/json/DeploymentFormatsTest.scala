@@ -12,10 +12,10 @@ import scala.collection.immutable.Seq
 
 import scala.util.Random
 
-class DeploymentFormatsTest extends MarathonSpec {
+class DeploymentFormatsTest extends MarathonSpec
   import Formats._
 
-  test("Can read GroupUpdate json") {
+  test("Can read GroupUpdate json")
     val json =
       """
       |{
@@ -41,15 +41,13 @@ class DeploymentFormatsTest extends MarathonSpec {
     update.scaleBy.get should be(23.0 +- 0.01)
     update.version should be('defined)
     update.version.get should be(Timestamp("2015-06-03T13:00:52.928Z"))
-  }
 
-  test("Can write/read GroupUpdate") {
+  test("Can write/read GroupUpdate")
     marshalUnmarshal(genGroupUpdate())
     marshalUnmarshal(genGroupUpdate(
             Set(genGroupUpdate(), genGroupUpdate(Set(genGroupUpdate())))))
-  }
 
-  test("Will read from no given value") {
+  test("Will read from no given value")
     val groupFromNull = JsNull.as[GroupUpdate]
     groupFromNull.id should be('empty)
     groupFromNull.apps should be('empty)
@@ -57,9 +55,8 @@ class DeploymentFormatsTest extends MarathonSpec {
     groupFromNull.dependencies should be('empty)
     groupFromNull.scaleBy should be('empty)
     groupFromNull.version should be('empty)
-  }
 
-  test("Can read Group json") {
+  test("Can read Group json")
     val json = """
         |{
         |  "id": "a",
@@ -82,18 +79,15 @@ class DeploymentFormatsTest extends MarathonSpec {
     group.groups.head.id should be("c".toPath)
     group.dependencies.head should be("d".toPath)
     group.version should be(Timestamp("2015-06-03T13:18:25.640Z"))
-  }
 
-  test("Can write/read Group") {
+  test("Can write/read Group")
     marshalUnmarshal(genGroup())
     marshalUnmarshal(genGroup(Set(genGroup(), genGroup(Set(genGroup())))))
-  }
 
-  test("Can write/read byte arrays") {
+  test("Can write/read byte arrays")
     marshalUnmarshal("Hello".getBytes)
-  }
 
-  test("DeploymentPlan can be serialized") {
+  test("DeploymentPlan can be serialized")
     val plan = DeploymentPlan(
         genId.toString,
         genGroup(),
@@ -105,20 +99,17 @@ class DeploymentFormatsTest extends MarathonSpec {
     val fieldMap = json.as[JsObject].fields.toMap
     fieldMap.keySet should be(
         Set("version", "id", "target", "original", "steps"))
-  }
 
   // regression test for #1176
-  test("allow / as id") {
+  test("allow / as id")
     val json = """{"id": "/"}"""
     assert(Json.parse(json).as[Group].id.isRoot)
-  }
 
-  def marshalUnmarshal[T](original: T)(implicit format: Format[T]): JsValue = {
+  def marshalUnmarshal[T](original: T)(implicit format: Format[T]): JsValue =
     val json = Json.toJson(original)
     val read = json.as[T]
     read should be(original)
     json
-  }
 
   def genInt = Random.nextInt(1000)
 
@@ -150,4 +141,3 @@ class DeploymentFormatsTest extends MarathonSpec {
         Some(23),
         Some(genTimestamp)
     )
-}

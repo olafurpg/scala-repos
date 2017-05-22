@@ -67,21 +67,17 @@ import scala.util.Success
 import scalaj.http.HttpOptions
 
 class KryoInstantiator(classLoader: ClassLoader)
-    extends ScalaKryoInstantiator {
-  override def newKryo(): KryoBase = {
+    extends ScalaKryoInstantiator
+  override def newKryo(): KryoBase =
     val kryo = super.newKryo()
     kryo.setClassLoader(classLoader)
     SynchronizedCollectionsSerializer.registerSerializers(kryo)
     kryo
-  }
-}
 
-object KryoInstantiator extends Serializable {
-  def newKryoInjection: Injection[Any, Array[Byte]] = {
+object KryoInstantiator extends Serializable
+  def newKryoInjection: Injection[Any, Array[Byte]] =
     val kryoInstantiator = new KryoInstantiator(getClass.getClassLoader)
     KryoInjection.instance(kryoInstantiator)
-  }
-}
 
 case class ServerConfig(
     batch: String = "",
@@ -109,79 +105,72 @@ case class StopServer()
 case class ReloadServer()
 case class UpgradeCheck()
 
-object CreateServer extends Logging {
+object CreateServer extends Logging
   val actorSystem = ActorSystem("pio-server")
   val engineInstances = Storage.getMetaDataEngineInstances
   val engineManifests = Storage.getMetaDataEngineManifests
   val modeldata = Storage.getModelDataModels
 
-  def main(args: Array[String]): Unit = {
-    val parser = new scopt.OptionParser[ServerConfig]("CreateServer") {
-      opt[String]("batch") action { (x, c) =>
+  def main(args: Array[String]): Unit =
+    val parser = new scopt.OptionParser[ServerConfig]("CreateServer")
+      opt[String]("batch") action  (x, c) =>
         c.copy(batch = x)
-      } text ("Batch label of the deployment.")
-      opt[String]("engineId") action { (x, c) =>
+      text ("Batch label of the deployment.")
+      opt[String]("engineId") action  (x, c) =>
         c.copy(engineId = Some(x))
-      } text ("Engine ID.")
-      opt[String]("engineVersion") action { (x, c) =>
+      text ("Engine ID.")
+      opt[String]("engineVersion") action  (x, c) =>
         c.copy(engineVersion = Some(x))
-      } text ("Engine version.")
-      opt[String]("engine-variant") required () action { (x, c) =>
+      text ("Engine version.")
+      opt[String]("engine-variant") required () action  (x, c) =>
         c.copy(engineVariant = x)
-      } text ("Engine variant JSON.")
-      opt[String]("ip") action { (x, c) =>
+      text ("Engine variant JSON.")
+      opt[String]("ip") action  (x, c) =>
         c.copy(ip = x)
-      }
-      opt[String]("env") action { (x, c) =>
+      opt[String]("env") action  (x, c) =>
         c.copy(env = Some(x))
-      } text
+      text
       ("Comma-separated list of environmental variables (in 'FOO=BAR' " +
           "format) to pass to the Spark execution environment.")
-      opt[Int]("port") action { (x, c) =>
+      opt[Int]("port") action  (x, c) =>
         c.copy(port = x)
-      } text ("Port to bind to (default: 8000).")
-      opt[String]("engineInstanceId") required () action { (x, c) =>
+      text ("Port to bind to (default: 8000).")
+      opt[String]("engineInstanceId") required () action  (x, c) =>
         c.copy(engineInstanceId = x)
-      } text ("Engine instance ID.")
-      opt[Unit]("feedback") action { (_, c) =>
+      text ("Engine instance ID.")
+      opt[Unit]("feedback") action  (_, c) =>
         c.copy(feedback = true)
-      } text ("Enable feedback loop to event server.")
-      opt[String]("event-server-ip") action { (x, c) =>
+      text ("Enable feedback loop to event server.")
+      opt[String]("event-server-ip") action  (x, c) =>
         c.copy(eventServerIp = x)
-      }
-      opt[Int]("event-server-port") action { (x, c) =>
+      opt[Int]("event-server-port") action  (x, c) =>
         c.copy(eventServerPort = x)
-      } text ("Event server port. Default: 7070")
-      opt[String]("accesskey") action { (x, c) =>
+      text ("Event server port. Default: 7070")
+      opt[String]("accesskey") action  (x, c) =>
         c.copy(accessKey = Some(x))
-      } text ("Event server access key.")
-      opt[String]("log-url") action { (x, c) =>
+      text ("Event server access key.")
+      opt[String]("log-url") action  (x, c) =>
         c.copy(logUrl = Some(x))
-      }
-      opt[String]("log-prefix") action { (x, c) =>
+      opt[String]("log-prefix") action  (x, c) =>
         c.copy(logPrefix = Some(x))
-      }
-      opt[String]("log-file") action { (x, c) =>
+      opt[String]("log-file") action  (x, c) =>
         c.copy(logFile = Some(x))
-      }
-      opt[Unit]("verbose") action { (x, c) =>
+      opt[Unit]("verbose") action  (x, c) =>
         c.copy(verbose = true)
-      } text ("Enable verbose output.")
-      opt[Unit]("debug") action { (x, c) =>
+      text ("Enable verbose output.")
+      opt[Unit]("debug") action  (x, c) =>
         c.copy(debug = true)
-      } text ("Enable debug output.")
-      opt[String]("json-extractor") action { (x, c) =>
+      text ("Enable debug output.")
+      opt[String]("json-extractor") action  (x, c) =>
         c.copy(jsonExtractor = JsonExtractorOption.withName(x))
-      }
-    }
 
-    parser.parse(args, ServerConfig()) map { sc =>
+    parser.parse(args, ServerConfig()) map  sc =>
       WorkflowUtils.modifyLogging(sc.verbose)
-      engineInstances.get(sc.engineInstanceId) map { engineInstance =>
+      engineInstances.get(sc.engineInstanceId) map  engineInstance =>
         val engineId = sc.engineId.getOrElse(engineInstance.engineId)
         val engineVersion =
           sc.engineVersion.getOrElse(engineInstance.engineVersion)
-        engineManifests.get(engineId, engineVersion) map { manifest =>
+        engineManifests.get(engineId, engineVersion) map  manifest =>
           val engineFactoryName = engineInstance.engineFactory
           val upgrade = actorSystem.actorOf(
               Props(classOf[UpgradeActor], engineFactoryName))
@@ -198,21 +187,17 @@ object CreateServer extends Logging {
           implicit val timeout = Timeout(5.seconds)
           master ? StartServer()
           actorSystem.awaitTermination
-        } getOrElse {
+        getOrElse
           error(s"Invalid engine ID or version. Aborting server.")
-        }
-      } getOrElse {
+      getOrElse
         error(s"Invalid engine instance ID. Aborting server.")
-      }
-    }
-  }
 
   def createServerActorWithEngine[TD, EIN, PD, Q, P, A](
       sc: ServerConfig,
       engineInstance: EngineInstance,
       engine: Engine[TD, EIN, PD, Q, P, A],
       engineLanguage: EngineLanguage.Value,
-      manifest: EngineManifest): ActorRef = {
+      manifest: EngineManifest): ActorRef =
 
     val engineParams =
       engine.engineInstanceToEngineParams(engineInstance, sc.jsonExtractor)
@@ -225,11 +210,10 @@ object CreateServer extends Logging {
       .asInstanceOf[Seq[Any]]
 
     val batch =
-      if (engineInstance.batch.nonEmpty) {
+      if (engineInstance.batch.nonEmpty)
         s"${engineInstance.engineFactory} (${engineInstance.batch})"
-      } else {
+      else
         engineInstance.engineFactory
-      }
 
     val sparkContext = WorkflowContext(batch = batch,
                                        executorEnv = engineInstance.env,
@@ -244,10 +228,9 @@ object CreateServer extends Logging {
         params = WorkflowParams()
     )
 
-    val algorithms = engineParams.algorithmParamsList.map {
+    val algorithms = engineParams.algorithmParamsList.map
       case (n, p) =>
         Doer(engine.algorithmClassMap(n), p)
-    }
 
     val servingParamsWithName = engineParams.servingParams
 
@@ -268,33 +251,29 @@ object CreateServer extends Logging {
               models,
               serving,
               engineParams.servingParams._2))
-  }
-}
 
-class UpgradeActor(engineClass: String) extends Actor {
+class UpgradeActor(engineClass: String) extends Actor
   val log = Logging(context.system, this)
   implicit val system = context.system
-  def receive: Actor.Receive = {
+  def receive: Actor.Receive =
     case x: UpgradeCheck =>
       WorkflowUtils.checkUpgrade("deployment", engineClass)
-  }
-}
 
 class MasterActor(sc: ServerConfig,
                   engineInstance: EngineInstance,
                   engineFactoryName: String,
                   manifest: EngineManifest)
-    extends Actor with SSLConfiguration with KeyAuthentication {
+    extends Actor with SSLConfiguration with KeyAuthentication
   val log = Logging(context.system, this)
   implicit val system = context.system
   var sprayHttpListener: Option[ActorRef] = None
   var currentServerActor: Option[ActorRef] = None
   var retry = 3
 
-  def undeploy(ip: String, port: Int): Unit = {
+  def undeploy(ip: String, port: Int): Unit =
     val serverUrl = s"https://${ip}:${port}"
     log.info(s"Undeploying any existing engine instance at $serverUrl")
-    try {
+    try
       val code = scalaj.http
         .Http(s"$serverUrl/stop")
         .option(HttpOptions.allowUnsafeSSL)
@@ -302,7 +281,7 @@ class MasterActor(sc: ServerConfig,
         .method("POST")
         .asString
         .code
-      code match {
+      code match
         case 200 => Unit
         case 404 =>
           log.error(
@@ -311,17 +290,14 @@ class MasterActor(sc: ServerConfig,
           log.error(s"Another process is using $serverUrl, or an existing " +
               s"engine server is not responding properly (HTTP $code). " +
               "Unable to undeploy.")
-      }
-    } catch {
+    catch
       case e: java.net.ConnectException =>
         log.warning(s"Nothing at $serverUrl")
       case _: Throwable =>
         log.error("Another process might be occupying " +
             s"$ip:$port. Unable to undeploy.")
-    }
-  }
 
-  def receive: Actor.Receive = {
+  def receive: Actor.Receive =
     case x: StartServer =>
       val actor = createServerActor(
           sc, engineInstance, engineFactoryName, manifest)
@@ -329,25 +305,23 @@ class MasterActor(sc: ServerConfig,
       undeploy(sc.ip, sc.port)
       self ! BindServer()
     case x: BindServer =>
-      currentServerActor map { actor =>
+      currentServerActor map  actor =>
         val settings = ServerSettings(system)
         IO(Http) ! Http.Bind(
             actor,
             interface = sc.ip,
             port = sc.port,
             settings = Some(settings.copy(sslEncryption = true)))
-      } getOrElse {
+      getOrElse
         log.error("Cannot bind a non-existing server backend.")
-      }
     case x: StopServer =>
       log.info(s"Stop server command received.")
-      sprayHttpListener.map { l =>
+      sprayHttpListener.map  l =>
         log.info("Server is shutting down.")
         l ! Http.Unbind(5.seconds)
         system.shutdown
-      } getOrElse {
+      getOrElse
         log.warning("No active server is running.")
-      }
     case x: ReloadServer =>
       log.info("Reload server command received.")
       val latestEngineInstance =
@@ -355,9 +329,9 @@ class MasterActor(sc: ServerConfig,
             manifest.id,
             manifest.version,
             engineInstance.engineVariant)
-      latestEngineInstance map { lr =>
+      latestEngineInstance map  lr =>
         val actor = createServerActor(sc, lr, engineFactoryName, manifest)
-        sprayHttpListener.map { l =>
+        sprayHttpListener.map  l =>
           l ! Http.Unbind(5.seconds)
           val settings = ServerSettings(system)
           IO(Http) ! Http.Bind(
@@ -367,44 +341,38 @@ class MasterActor(sc: ServerConfig,
               settings = Some(settings.copy(sslEncryption = true)))
           currentServerActor.get ! Kill
           currentServerActor = Some(actor)
-        } getOrElse {
+        getOrElse
           log.warning("No active server is running. Abort reloading.")
-        }
-      } getOrElse {
+      getOrElse
         log.warning(
             s"No latest completed engine instance for ${manifest.id} " +
             s"${manifest.version}. Abort reloading.")
-      }
     case x: Http.Bound =>
       val serverUrl = s"https://${sc.ip}:${sc.port}"
       log.info(
           s"Engine is deployed and running. Engine API is live at ${serverUrl}.")
       sprayHttpListener = Some(sender)
     case x: Http.CommandFailed =>
-      if (retry > 0) {
+      if (retry > 0)
         retry -= 1
         log.error(s"Bind failed. Retrying... ($retry more trial(s))")
-        context.system.scheduler.scheduleOnce(1.seconds) {
+        context.system.scheduler.scheduleOnce(1.seconds)
           self ! BindServer()
-        }
-      } else {
+      else
         log.error("Bind failed. Shutting down.")
         system.shutdown
-      }
-  }
 
   def createServerActor(sc: ServerConfig,
                         engineInstance: EngineInstance,
                         engineFactoryName: String,
-                        manifest: EngineManifest): ActorRef = {
+                        manifest: EngineManifest): ActorRef =
     val (engineLanguage, engineFactory) =
       WorkflowUtils.getEngine(engineFactoryName, getClass.getClassLoader)
     val engine = engineFactory()
 
     // EngineFactory return a base engine, which may not be deployable.
-    if (!engine.isInstanceOf[Engine[_, _, _, _, _, _]]) {
+    if (!engine.isInstanceOf[Engine[_, _, _, _, _, _]])
       throw new NoSuchMethodException(s"Engine $engine is not deployable")
-    }
 
     val deployableEngine = engine.asInstanceOf[Engine[_, _, _, _, _, _]]
 
@@ -414,8 +382,6 @@ class MasterActor(sc: ServerConfig,
                                              deployableEngine,
                                              engineLanguage,
                                              manifest)
-  }
-}
 
 class ServerActor[Q, P](val args: ServerConfig,
                         val engineInstance: EngineInstance,
@@ -429,7 +395,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                         val models: Seq[Any],
                         val serving: BaseServing[Q, P],
                         val servingParams: Params)
-    extends Actor with HttpService with KeyAuthentication {
+    extends Actor with HttpService with KeyAuthentication
   val serverStartTime = DateTime.now
   val log = Logging(context.system, this)
 
@@ -448,43 +414,39 @@ class ServerActor[Q, P](val args: ServerConfig,
   def receive: Actor.Receive = runRoute(myRoute)
 
   val feedbackEnabled =
-    if (args.feedback) {
-      if (args.accessKey.isEmpty) {
+    if (args.feedback)
+      if (args.accessKey.isEmpty)
         log.error(
             "Feedback loop cannot be enabled because accessKey is empty.")
         false
-      } else {
+      else
         true
-      }
-    } else false
+    else false
 
-  def remoteLog(logUrl: String, logPrefix: String, message: String): Unit = {
+  def remoteLog(logUrl: String, logPrefix: String, message: String): Unit =
     implicit val formats = Utils.json4sDefaultFormats
-    try {
+    try
       scalaj.http
         .Http(logUrl)
         .postData(logPrefix + write(
                 Map("engineInstance" -> engineInstance, "message" -> message)))
         .asString
-    } catch {
+    catch
       case e: Throwable =>
         log.error(s"Unable to send remote log: ${e.getMessage}")
-    }
-  }
 
-  def getStackTraceString(e: Throwable): String = {
+  def getStackTraceString(e: Throwable): String =
     val writer = new StringWriter()
     val printWriter = new PrintWriter(writer)
     e.printStackTrace(printWriter)
     writer.toString
-  }
 
   val myRoute =
-    path("") {
-      get {
-        respondWithMediaType(`text/html`) {
-          detach() {
-            complete {
+    path("")
+      get
+        respondWithMediaType(`text/html`)
+          detach()
+            complete
               html
                 .index(
                     args,
@@ -505,15 +467,11 @@ class ServerActor[Q, P](val args: ServerConfig,
                     lastServingSec
                 )
                 .toString
-            }
-          }
-        }
-      }
-    } ~ path("queries.json") {
-      post {
-        detach() {
-          entity(as[String]) { queryString =>
-            try {
+    ~ path("queries.json")
+      post
+        detach()
+          entity(as[String])  queryString =>
+            try
               val servingStartTime = DateTime.now
               val jsonExtractorOption = args.jsonExtractor
               val queryTime = DateTime.now
@@ -534,10 +492,9 @@ class ServerActor[Q, P](val args: ServerConfig,
               // finally Serving.serve.
               val supplementedQuery = serving.supplementBase(query)
               // TODO: Parallelize the following.
-              val predictions = algorithms.zipWithIndex.map {
+              val predictions = algorithms.zipWithIndex.map
                 case (a, ai) =>
                   a.predictBase(models(ai), supplementedQuery)
-              }
               // Notice that it is by design to call Serving.serve with the
               // *original* query.
               val prediction = serving.serveBase(query, predictions)
@@ -556,29 +513,26 @@ class ServerActor[Q, P](val args: ServerConfig,
                 * - prId
                 */
               val result =
-                if (feedbackEnabled) {
+                if (feedbackEnabled)
                   implicit val formats =
-                    algorithms.headOption map { alg =>
+                    algorithms.headOption map  alg =>
                       alg.querySerializer
-                    } getOrElse {
+                    getOrElse
                       Utils.json4sDefaultFormats
-                    }
                   // val genPrId = Random.alphanumeric.take(64).mkString
                   def genPrId: String = Random.alphanumeric.take(64).mkString
-                  val newPrId = prediction match {
+                  val newPrId = prediction match
                     case id: WithPrId =>
                       val org = id.prId
                       if (org.isEmpty) genPrId else org
                     case _ => genPrId
-                  }
 
                   // also save Query's prId as prId of this pio_pr predict events
-                  val queryPrId = query match {
+                  val queryPrId = query match
                     case id: WithPrId =>
                       Map("prId" -> id.prId)
                     case _ =>
                       Map()
-                  }
                   val data =
                     Map(
                         // "appId" -> dataSourceParams.asInstanceOf[ParamsWithAppId].appId,
@@ -592,7 +546,7 @@ class ServerActor[Q, P](val args: ServerConfig,
                             "prediction" -> prediction)) ++ queryPrId
                   // At this point args.accessKey should be Some(String).
                   val accessKey = args.accessKey.getOrElse("")
-                  val f: Future[Int] = future {
+                  val f: Future[Int] = future
                     scalaj.http
                       .Http(
                           s"http://${args.eventServerIp}:${args.eventServerPort}/" +
@@ -601,35 +555,28 @@ class ServerActor[Q, P](val args: ServerConfig,
                       .header("content-type", "application/json")
                       .asString
                       .code
-                  }
-                  f onComplete {
-                    case Success(code) => {
-                        if (code != 201) {
+                  f onComplete
+                    case Success(code) =>
+                        if (code != 201)
                           log.error(
                               s"Feedback event failed. Status code: $code." +
                               s"Data: ${write(data)}.")
-                        }
-                      }
-                    case Failure(t) => {
+                    case Failure(t) =>
                         log.error(s"Feedback event failed: ${t.getMessage}")
-                      }
-                  }
                   // overwrite prId in predictedResult
                   // - if it is WithPrId,
                   //   then overwrite with new prId
                   // - if it is not WithPrId, no prId injection
-                  if (prediction.isInstanceOf[WithPrId]) {
+                  if (prediction.isInstanceOf[WithPrId])
                     predictionJValue merge parse(s"""{"prId" : "$newPrId"}""")
-                  } else {
+                  else
                     predictionJValue
-                  }
-                } else predictionJValue
+                else predictionJValue
 
               val pluginResult =
-                pluginContext.outputBlockers.values.foldLeft(result) {
+                pluginContext.outputBlockers.values.foldLeft(result)
                   case (r, p) =>
                     p.process(engineInstance, queryJValue, r, pluginContext)
-                }
 
               // Bookkeeping
               val servingEndTime = DateTime.now
@@ -639,105 +586,79 @@ class ServerActor[Q, P](val args: ServerConfig,
               (requestCount + 1)
               requestCount += 1
 
-              respondWithMediaType(`application/json`) {
+              respondWithMediaType(`application/json`)
                 complete(compact(render(pluginResult)))
-              }
-            } catch {
+            catch
               case e: MappingException =>
                 log.error(
                     s"Query '$queryString' is invalid. Reason: ${e.getMessage}")
-                args.logUrl map { url =>
+                args.logUrl map  url =>
                   remoteLog(url,
                             args.logPrefix.getOrElse(""),
                             s"Query:\n$queryString\n\nStack Trace:\n" +
                             s"${getStackTraceString(e)}\n\n")
-                }
                 complete(StatusCodes.BadRequest, e.getMessage)
               case e: Throwable =>
                 val msg =
                   s"Query:\n$queryString\n\nStack Trace:\n" +
                   s"${getStackTraceString(e)}\n\n"
                 log.error(msg)
-                args.logUrl map { url =>
+                args.logUrl map  url =>
                   remoteLog(url,
                             args.logPrefix.getOrElse(""),
                             msg)
-                }
                 complete(StatusCodes.InternalServerError, msg)
-            }
-          }
-        }
-      }
-    } ~ path("reload") {
-      authenticate(withAccessKeyFromFile) { request =>
-        post {
-          complete {
+    ~ path("reload")
+      authenticate(withAccessKeyFromFile)  request =>
+        post
+          complete
             context.actorSelection("/user/master") ! ReloadServer()
             "Reloading..."
-          }
-        }
-      }
-    } ~ path("stop") {
-      authenticate(withAccessKeyFromFile) { request =>
-        post {
-          complete {
-            context.system.scheduler.scheduleOnce(1.seconds) {
+    ~ path("stop")
+      authenticate(withAccessKeyFromFile)  request =>
+        post
+          complete
+            context.system.scheduler.scheduleOnce(1.seconds)
               context.actorSelection("/user/master") ! StopServer()
-            }
             "Shutting down..."
-          }
-        }
-      }
-    } ~ pathPrefix("assets") {
+    ~ pathPrefix("assets")
       getFromResourceDirectory("assets")
-    } ~ path("plugins.json") {
+    ~ path("plugins.json")
       import EngineServerJson4sSupport._
-      get {
-        respondWithMediaType(MediaTypes.`application/json`) {
-          complete {
+      get
+        respondWithMediaType(MediaTypes.`application/json`)
+          complete
             Map("plugins" -> Map(
-                    "outputblockers" -> pluginContext.outputBlockers.map {
+                    "outputblockers" -> pluginContext.outputBlockers.map
                   case (n, p) =>
                     n -> Map(
                         "name" -> p.pluginName,
                         "description" -> p.pluginDescription,
                         "class" -> p.getClass.getName,
                         "params" -> pluginContext.pluginParams(p.pluginName))
-                },
-                    "outputsniffers" -> pluginContext.outputSniffers.map {
+                ,
+                    "outputsniffers" -> pluginContext.outputSniffers.map
                   case (n, p) =>
                     n -> Map(
                         "name" -> p.pluginName,
                         "description" -> p.pluginDescription,
                         "class" -> p.getClass.getName,
                         "params" -> pluginContext.pluginParams(p.pluginName))
-                }
                 ))
-          }
-        }
-      }
-    } ~ path("plugins" / Segments) { segments =>
+    ~ path("plugins" / Segments)  segments =>
       import EngineServerJson4sSupport._
-      get {
-        respondWithMediaType(MediaTypes.`application/json`) {
-          complete {
+      get
+        respondWithMediaType(MediaTypes.`application/json`)
+          complete
             val pluginArgs = segments.drop(2)
             val pluginType = segments(0)
             val pluginName = segments(1)
-            pluginType match {
+            pluginType match
               case EngineServerPlugin.outputSniffer =>
                 pluginsActorRef ? PluginsActor.HandleREST(
                     pluginName = pluginName,
-                    pluginArgs = pluginArgs) map {
+                    pluginArgs = pluginArgs) map
                   _.asInstanceOf[String]
-                }
-            }
-          }
-        }
-      }
-    }
-}
 
-object EngineServerJson4sSupport extends Json4sSupport {
+object EngineServerJson4sSupport extends Json4sSupport
   implicit def json4sFormats: Formats = DefaultFormats
-}

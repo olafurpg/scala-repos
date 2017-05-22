@@ -1,5 +1,4 @@
 package demo
 
-object B {
+object B
   3.y
-}

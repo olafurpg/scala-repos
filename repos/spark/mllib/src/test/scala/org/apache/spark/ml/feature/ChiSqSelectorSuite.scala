@@ -28,9 +28,9 @@ import org.apache.spark.sql.{Row, SQLContext}
 
 class ChiSqSelectorSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("Test Chi-Square selector") {
+  test("Test Chi-Square selector")
     val sqlContext = SQLContext.getOrCreate(sc)
     import sqlContext.implicits._
 
@@ -64,25 +64,20 @@ class ChiSqSelectorSuite
       .transform(df)
       .select("filtered", "preFilteredData")
       .collect()
-      .foreach {
+      .foreach
         case Row(vec1: Vector, vec2: Vector) =>
           assert(vec1 ~== vec2 absTol 1e-1)
-      }
-  }
 
-  test("ChiSqSelector read/write") {
+  test("ChiSqSelector read/write")
     val t = new ChiSqSelector()
       .setFeaturesCol("myFeaturesCol")
       .setLabelCol("myLabelCol")
       .setOutputCol("myOutputCol")
       .setNumTopFeatures(2)
     testDefaultReadWrite(t)
-  }
 
-  test("ChiSqSelectorModel read/write") {
+  test("ChiSqSelectorModel read/write")
     val oldModel = new feature.ChiSqSelectorModel(Array(1, 3))
     val instance = new ChiSqSelectorModel("myChiSqSelectorModel", oldModel)
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.selectedFeatures === instance.selectedFeatures)
-  }
-}

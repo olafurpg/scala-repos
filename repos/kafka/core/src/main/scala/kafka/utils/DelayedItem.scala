@@ -19,7 +19,7 @@ package kafka.utils
 import java.util.concurrent._
 import scala.math._
 
-class DelayedItem(delayMs: Long) extends Delayed with Logging {
+class DelayedItem(delayMs: Long) extends Delayed with Logging
 
   private val dueMs = SystemTime.milliseconds + delayMs
 
@@ -28,16 +28,13 @@ class DelayedItem(delayMs: Long) extends Delayed with Logging {
   /**
     * The remaining delay time
     */
-  def getDelay(unit: TimeUnit): Long = {
+  def getDelay(unit: TimeUnit): Long =
     unit.convert(
         max(dueMs - SystemTime.milliseconds, 0), TimeUnit.MILLISECONDS)
-  }
 
-  def compareTo(d: Delayed): Int = {
+  def compareTo(d: Delayed): Int =
     val other = d.asInstanceOf[DelayedItem]
 
     if (dueMs < other.dueMs) -1
     else if (dueMs > other.dueMs) 1
     else 0
-  }
-}

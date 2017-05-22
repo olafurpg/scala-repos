@@ -33,7 +33,7 @@ final class OptimizerOptions private (
     val checkScalaJSIR: Boolean = false,
     /** Use Google Closure Backend */
     val useClosureCompiler: Boolean = false
-) {
+)
 
   @deprecated(
       "Bypassing linking errors will not be possible in the next major version.",
@@ -66,7 +66,7 @@ final class OptimizerOptions private (
                    disableOptimizer: Boolean = disableOptimizer,
                    prettyPrintFullOptJS: Boolean = prettyPrintFullOptJS,
                    checkScalaJSIR: Boolean = checkScalaJSIR,
-                   useClosureCompiler: Boolean = useClosureCompiler) = {
+                   useClosureCompiler: Boolean = useClosureCompiler) =
     new OptimizerOptions(bypassLinkingErrors,
                          parallel,
                          batchMode,
@@ -74,9 +74,8 @@ final class OptimizerOptions private (
                          prettyPrintFullOptJS,
                          checkScalaJSIR,
                          useClosureCompiler)
-  }
 
-  override def toString: String = {
+  override def toString: String =
     s"""OptimizerOptions(
        |  bypassLinkingErrors  = $bypassLinkingErrors
        |  parallel             = $parallel
@@ -86,9 +85,6 @@ final class OptimizerOptions private (
        |  checkScalaJSIR       = $checkScalaJSIR
        |  useClosureCompiler   = $useClosureCompiler
        |)""".stripMargin
-  }
-}
 
-object OptimizerOptions {
+object OptimizerOptions
   def apply(): OptimizerOptions = new OptimizerOptions()
-}

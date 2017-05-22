@@ -31,9 +31,9 @@ class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
     extends P2LAlgorithm[PreparedData,
                          PIORandomForestModel, // CHANGED
                          Query,
-                         PredictedResult] {
+                         PredictedResult]
 
-  def train(data: PreparedData): PIORandomForestModel = {
+  def train(data: PreparedData): PIORandomForestModel =
     // CHANGED
     // CHANGED
     // Empty categoricalFeaturesInfo indicates all features are continuous.
@@ -51,10 +51,9 @@ class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
         educationMap = data.educationMap,
         randomForestModel = m
     )
-  }
 
   def predict(model: PIORandomForestModel, // CHANGED
-              query: Query): PredictedResult = {
+              query: Query): PredictedResult =
     val gendersMap = model.gendersMap
     val educationMap = model.educationMap
     val randomForestModel = model.randomForestModel
@@ -63,5 +62,3 @@ class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
                             query.age.toDouble,
                             educationMap(query.education))))
     new PredictedResult(label)
-  }
-}

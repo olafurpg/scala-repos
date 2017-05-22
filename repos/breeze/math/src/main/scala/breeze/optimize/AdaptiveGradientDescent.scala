@@ -15,7 +15,7 @@ import breeze.stats.distributions.{Rand, RandBasis}
   *
   * @author dlwh
   */
-object AdaptiveGradientDescent {
+object AdaptiveGradientDescent
 
   /**
     * Implements the L2 regularization update.
@@ -34,7 +34,7 @@ object AdaptiveGradientDescent {
       implicit vspace: MutableFiniteCoordinateField[T, _, Double],
       rand: RandBasis = Rand)
       extends StochasticGradientDescent[T](
-          stepSize, maxIter, tolerance, minImprovementWindow) {
+          stepSize, maxIter, tolerance, minImprovementWindow)
 
     val delta = 1E-4
     import vspace._
@@ -47,20 +47,18 @@ object AdaptiveGradientDescent {
                                newGrad: T,
                                newValue: Double,
                                f: StochasticDiffFunction[T],
-                               oldState: State) = {
+                               oldState: State) =
       val oldHistory = oldState.history
       val newG = (oldState.grad :* oldState.grad)
       val maxAge = 1000.0
-      if (oldState.iter > maxAge) {
+      if (oldState.iter > maxAge)
         newG *= 1 / maxAge
         axpy((maxAge - 1) / maxAge, oldHistory.sumOfSquaredGradients, newG)
-      } else {
+      else
         newG += oldHistory.sumOfSquaredGradients
-      }
       new History(newG)
-    }
 
-    override protected def takeStep(state: State, dir: T, stepSize: Double) = {
+    override protected def takeStep(state: State, dir: T, stepSize: Double) =
       import state._
       val s = sqrt(
           state.history.sumOfSquaredGradients :+ (state.grad :* state.grad))
@@ -69,19 +67,15 @@ object AdaptiveGradientDescent {
       s += (delta + regularizationConstant * stepSize)
       newx :/= s
       newx
-    }
 
     override def determineStepSize(
-        state: State, f: StochasticDiffFunction[T], dir: T) = {
+        state: State, f: StochasticDiffFunction[T], dir: T) =
       defaultStepSize
-    }
 
-    override protected def adjust(newX: T, newGrad: T, newVal: Double) = {
+    override protected def adjust(newX: T, newGrad: T, newVal: Double) =
       val av = newVal + (newX dot newX) * regularizationConstant / 2.0
       val ag = newGrad + newX * regularizationConstant
       (av -> ag)
-    }
-  }
 
   /**
     * Implements the L1 regularization update.
@@ -98,7 +92,7 @@ object AdaptiveGradientDescent {
                             maxIter: Int = 100)(
       implicit space: MutableFiniteCoordinateField[T, _, Double],
       rand: RandBasis = Rand)
-      extends StochasticGradientDescent[T](eta, maxIter) {
+      extends StochasticGradientDescent[T](eta, maxIter)
 
     import space._
     case class History(sumOfSquaredGradients: T)
@@ -116,44 +110,36 @@ object AdaptiveGradientDescent {
                                newGrad: T,
                                newValue: Double,
                                f: StochasticDiffFunction[T],
-                               oldState: State) = {
+                               oldState: State) =
       val oldHistory = oldState.history
       val newG = (oldState.grad :* oldState.grad)
       val maxAge = 200.0
-      if (oldState.iter > maxAge) {
+      if (oldState.iter > maxAge)
         newG *= (1 / maxAge)
         axpy((maxAge - 1) / maxAge, oldHistory.sumOfSquaredGradients, newG)
-      } else {
+      else
         newG += oldHistory.sumOfSquaredGradients
-      }
       new History(newG)
-    }
 
-    override protected def takeStep(state: State, dir: T, stepSize: Double) = {
+    override protected def takeStep(state: State, dir: T, stepSize: Double) =
       import state._
       val s: T = sqrt(
           state.history.sumOfSquaredGradients :+ (grad :* grad) :+ delta)
       val res: T = x + (dir :* stepSize :/ s)
       val tlambda = lambda * stepSize
-      space.zipMapValues.map(res, s, {
+      space.zipMapValues.map(res, s,
         case (x_half, s_i) =>
-          if (x_half.abs < tlambda / s_i) {
+          if (x_half.abs < tlambda / s_i)
             0.0
-          } else {
+          else
             (x_half - math.signum(x_half) * tlambda / s_i)
-          }
-      })
-    }
+      )
 
     override def determineStepSize(
-        state: State, f: StochasticDiffFunction[T], dir: T) = {
+        state: State, f: StochasticDiffFunction[T], dir: T) =
       defaultStepSize
-    }
 
-    override protected def adjust(newX: T, newGrad: T, newVal: Double) = {
+    override protected def adjust(newX: T, newGrad: T, newVal: Double) =
       val av = newVal + norm(newX, 1.0) * lambda
       val ag = newGrad + (signum(newX) :* lambda)
       (av -> ag)
-    }
-  }
-}

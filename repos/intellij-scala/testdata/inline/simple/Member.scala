@@ -1,12 +1,10 @@
-object X {
+object X
   val /*caret*/ a = 1
 
-  def foo() = {
+  def foo() =
     a + a
-  }
 
   val b = a
-}
 /*
 object X {
   def foo() = {

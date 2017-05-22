@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Apply` */
 final class ApplyOps[F[_], A] private[syntax](val self: F[A])(
     implicit val F: Apply[F])
-    extends Ops[F[A]] {
+    extends Ops[F[A]]
   ////
 
   final def <*>[B](f: F[A => B]): F[B] = F.ap(self)(f)
@@ -26,10 +26,9 @@ final class ApplyOps[F[_], A] private[syntax](val self: F[A])(
     * Warning: each call to `|@|` leads to an allocation of wrapper object. For performance sensitive code, consider using
     *          [[scalaz.Apply]]`#applyN` directly.
     */
-  final def |@|[B](fb: F[B]) = new ApplicativeBuilder[F, A, B] {
+  final def |@|[B](fb: F[B]) = new ApplicativeBuilder[F, A, B]
     val a: F[A] = self
     val b: F[B] = fb
-  }
 
   /** Alias for `|@|` */
   final def ⊛[B](fb: F[B]) = |@|(fb)
@@ -41,14 +40,12 @@ final class ApplyOps[F[_], A] private[syntax](val self: F[A])(
 
   // Do not remove this comment; used as delimiter by `genTypeClasses` sbt task.
   ////
-}
 
-sealed trait ToApplyOps0 {
+sealed trait ToApplyOps0
   implicit def ToApplyOpsUnapply[FA](v: FA)(implicit F0: Unapply[Apply, FA]) =
     new ApplyOps[F0.M, F0.A](F0(v))(F0.TC)
-}
 
-trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
+trait ToApplyOps extends ToApplyOps0 with ToFunctorOps
   implicit def ToApplyOps[F[_], A](v: F[A])(implicit F0: Apply[F]) =
     new ApplyOps[F, A](v)
 
@@ -92,9 +89,8 @@ trait ToApplyOps extends ToApplyOps0 with ToFunctorOps {
     F.apply7(fa, fb, fc, fd, fe, fi, fj)(f)
 
   ////
-}
 
-trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
+trait ApplySyntax[F[_]] extends FunctorSyntax[F]
   implicit def ToApplyOps[A](v: F[A]): ApplyOps[F, A] =
     new ApplyOps[F, A](v)(ApplySyntax.this.F)
 
@@ -136,4 +132,3 @@ trait ApplySyntax[F[_]] extends FunctorSyntax[F] {
     F.apply7(fa, fb, fc, fd, fe, fi, fj)(f)
 
   ////
-}

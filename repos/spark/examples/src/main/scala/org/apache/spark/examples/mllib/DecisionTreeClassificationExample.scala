@@ -25,9 +25,9 @@ import org.apache.spark.mllib.tree.model.DecisionTreeModel
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object DecisionTreeClassificationExample {
+object DecisionTreeClassificationExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("DecisionTreeClassificationExample")
     val sc = new SparkContext(conf)
 
@@ -54,10 +54,9 @@ object DecisionTreeClassificationExample {
                                              maxBins)
 
     // Evaluate model on test instances and compute test error
-    val labelAndPreds = testData.map { point =>
+    val labelAndPreds = testData.map  point =>
       val prediction = model.predict(point.features)
       (point.label, prediction)
-    }
     val testErr =
       labelAndPreds.filter(r => r._1 != r._2).count().toDouble / testData
         .count()
@@ -69,6 +68,4 @@ object DecisionTreeClassificationExample {
     val sameModel = DecisionTreeModel.load(
         sc, "target/tmp/myDecisionTreeClassificationModel")
     // $example off$
-  }
-}
 // scalastyle:on println

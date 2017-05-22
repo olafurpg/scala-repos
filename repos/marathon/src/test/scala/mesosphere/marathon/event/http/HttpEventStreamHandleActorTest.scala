@@ -15,10 +15,10 @@ import scala.concurrent.duration._
 
 class HttpEventStreamHandleActorTest
     extends MarathonActorSupport with MarathonSpec with Matchers
-    with GivenWhenThen with ImplicitSender with BeforeAndAfter with Mockito {
+    with GivenWhenThen with ImplicitSender with BeforeAndAfter with Mockito
 
   test(
-      "A message send to the handle actor will be transferred to the stream handle") {
+      "A message send to the handle actor will be transferred to the stream handle")
     Given("A handler that will postpone sending until latch is hit")
     val latch = new CountDownLatch(1)
     handle.sendEvent(any[String], any[String]) answers (_ => latch.countDown())
@@ -29,10 +29,9 @@ class HttpEventStreamHandleActorTest
     Then("We need to wait for the future to succeed")
     awaitCond(latch.getCount == 0)
     verify(handle, times(1)).sendEvent(any[String], any[String])
-  }
 
   test(
-      "If the consumer is slow and maxOutstanding limit is reached, messages get dropped") {
+      "If the consumer is slow and maxOutstanding limit is reached, messages get dropped")
     Given("A handler that will postpone the sending")
     val latch = new CountDownLatch(1)
     handle.sendEvent(any[String], any[String]) answers (_ => latch.await())
@@ -46,13 +45,11 @@ class HttpEventStreamHandleActorTest
     Then("Only one message is send to the handler")
     latch.countDown()
     filter.awaitDone(1.second)
-  }
 
-  test("If the handler throws an EOF exception, the actor stops acting") {
+  test("If the handler throws an EOF exception, the actor stops acting")
     Given("A handler that will postpone the sending")
-    handle.sendEvent(any[String], any[String]) answers { _ =>
+    handle.sendEvent(any[String], any[String]) answers  _ =>
       throw new EOFException()
-    }
     val filter = EventFilter(pattern = "Received EOF.*", occurrences = 1)
 
     When("An event is send to actor")
@@ -60,15 +57,13 @@ class HttpEventStreamHandleActorTest
 
     Then("The actor does not understand any messages")
     filter.awaitDone(1.second)
-  }
 
-  test("Multiple messages are send in order") {
+  test("Multiple messages are send in order")
     Given("A handler that will postpone the sending")
     val latch = new CountDownLatch(1)
     var events = List.empty[String]
-    handle.sendEvent(any[String], any[String]) answers { args =>
+    handle.sendEvent(any[String], any[String]) answers  args =>
       events ::= args(0).asInstanceOf[String]; latch.await()
-    }
     handleActor = TestActorRef(
         Props(
             new HttpEventStreamHandleActor(handle, stream, 50)
@@ -93,18 +88,15 @@ class HttpEventStreamHandleActorTest
     awaitCond(events.size == 3)
     events.reverse should be(
         "event_stream_attached" :: "event_stream_detached" :: "subscribe_event" :: Nil)
-  }
 
   var handleActor: TestActorRef[HttpEventStreamHandleActor] = _
   var stream: EventStream = _
   var handle: HttpEventStreamHandle = _
 
-  before {
+  before
     handle = mock[HttpEventStreamHandle]
     stream = mock[EventStream]
     handleActor = TestActorRef(
         Props(
             new HttpEventStreamHandleActor(handle, stream, 1)
         ))
-  }
-}

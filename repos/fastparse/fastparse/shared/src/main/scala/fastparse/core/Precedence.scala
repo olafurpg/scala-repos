@@ -6,19 +6,17 @@ import acyclic.file
   * to correctly wrap other things which contain lower precedences in 
   * parentheses when stringifying.
   */
-trait Precedence {
+trait Precedence
   protected def opPred: Int
   protected def opWrap(s: Precedence) = Precedence.opWrap(s, opPred)
-}
 
 /**
   * All the level of operator precedence in Scala
   */
-object Precedence {
-  def opWrap(s: Precedence, selfOpPred: Int) = {
+object Precedence
+  def opWrap(s: Precedence, selfOpPred: Int) =
     if (s.opPred >= selfOpPred) s.toString
     else "(" + s + ")"
-  }
   val Letters = 0
   val | = 1
   val ^ = 2
@@ -31,4 +29,3 @@ object Precedence {
   val OtherOp = 9
   val PrefixOp = 10
   val Max = 11
-}

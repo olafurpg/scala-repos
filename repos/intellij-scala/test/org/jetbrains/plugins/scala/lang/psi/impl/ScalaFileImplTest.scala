@@ -9,7 +9,7 @@ import org.junit.Assert
 /**
   * Pavel Fatin
   */
-class ScalaFileImplTest extends SimpleTestCase {
+class ScalaFileImplTest extends SimpleTestCase
 //  def testStripPackages() {
 //    assertPackagesStrippedAs("", "")
 //    assertPackagesStrippedAs("package a", "")
@@ -31,7 +31,7 @@ class ScalaFileImplTest extends SimpleTestCase {
 //    Assert.assertSame(file, newClass.getContainingFile)
 //  }
 
-  def testPathIn() {
+  def testPathIn()
     assertPathIs("", List())
     assertPathIs("package a", List(List("a")))
     assertPathIs("package a.b", List(List("a", "b")))
@@ -42,7 +42,6 @@ class ScalaFileImplTest extends SimpleTestCase {
     assertPathIs("/* foo */\npackage a", List(List("a")))
     assertPathIs("/* foo */\npackage a\n/* bar */\npackage b",
                  List(List("a"), List("b")))
-  }
 
 //  def testSetPath() {
 //    assertPathAddedAs("", List(List("a")), "package a");
@@ -67,7 +66,7 @@ class ScalaFileImplTest extends SimpleTestCase {
 //    Assert.assertSame(file, newClass.getContainingFile)
 //  }
 
-  def testSplitsIn() {
+  def testSplitsIn()
     assertSplitsAre(List(), List())
     assertSplitsAre(List(List("a")), List())
     assertSplitsAre(List(List("a", "b")), List())
@@ -78,9 +77,8 @@ class ScalaFileImplTest extends SimpleTestCase {
     assertSplitsAre(List(List("a", "b"), List("c", "d")), List(List("a", "b")))
     assertSplitsAre(List(List("a", "b"), List("c", "d"), List("e")),
                     List(List("a", "b"), List("a", "b", "c", "d")))
-  }
 
-  def testSplitAt() {
+  def testSplitAt()
     assertSplitAs(List(), List(), List())
     assertSplitAs(List(), List("a"), List())
     assertSplitAs(List(List("a")), List(), List(List("a")))
@@ -102,7 +100,6 @@ class ScalaFileImplTest extends SimpleTestCase {
     assertSplitAs(List(List("a"), List("b", "c")),
                   List("a", "b"),
                   List(List("a"), List("b"), List("c")))
-  }
 
   /*  def testSetPackageName() {
     assertPackageNameSetAs("class C", ("", ""), "class C");
@@ -141,9 +138,8 @@ class ScalaFileImplTest extends SimpleTestCase {
 //    Assert.assertEquals(describe(parseText(after)), describe(file))
 //  }
 
-  private def assertPathIs(code: String, path: List[List[String]]) {
+  private def assertPathIs(code: String, path: List[List[String]])
     Assert.assertEquals(path, ScalaFileImpl.pathIn(parseText(code)))
-  }
 
 //  private def assertPathAddedAs(before: String, path: List[List[String]], after: String) {
 //    val file = parseText(before)
@@ -153,19 +149,15 @@ class ScalaFileImplTest extends SimpleTestCase {
 
   private def assertSplitAs(before: List[List[String]],
                             vector: List[String],
-                            after: List[List[String]]) {
+                            after: List[List[String]])
     Assert.assertEquals(after, ScalaFileImpl.splitAt(before, vector))
-  }
 
   private def assertSplitsAre(
-      path: List[List[String]], vectors: List[List[String]]) {
+      path: List[List[String]], vectors: List[List[String]])
     Assert.assertEquals(vectors, ScalaFileImpl.splitsIn(path))
-  }
 
   private def assertPackageNameSetAs(
-      before: String, name: (String, String), after: String) {
+      before: String, name: (String, String), after: String)
     val file = parseText(before).asInstanceOf[ScalaFileImpl]
     file.setPackageName(name._1, name._2)
     Assert.assertEquals(describe(parseText(after)), describe(file))
-  }
-}

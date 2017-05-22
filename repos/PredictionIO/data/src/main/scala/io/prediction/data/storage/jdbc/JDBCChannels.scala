@@ -22,49 +22,41 @@ import scalikejdbc._
 
 /** JDBC implementation of [[Channels]] */
 class JDBCChannels(client: String, config: StorageClientConfig, prefix: String)
-    extends Channels with Logging {
+    extends Channels with Logging
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "channels")
-  DB autoCommit { implicit session =>
+  DB autoCommit  implicit session =>
     sql"""
     create table if not exists $tableName (
       id serial not null primary key,
       name text not null,
       appid integer not null)""".execute().apply()
-  }
 
-  def insert(channel: Channel): Option[Int] = DB localTx { implicit session =>
+  def insert(channel: Channel): Option[Int] = DB localTx  implicit session =>
     val q =
-      if (channel.id == 0) {
+      if (channel.id == 0)
         sql"INSERT INTO $tableName (name, appid) VALUES(${channel.name}, ${channel.appid})"
-      } else {
+      else
         sql"INSERT INTO $tableName VALUES(${channel.id}, ${channel.name}, ${channel.appid})"
-      }
     Some(q.updateAndReturnGeneratedKey().apply().toInt)
-  }
 
-  def get(id: Int): Option[Channel] = DB localTx { implicit session =>
+  def get(id: Int): Option[Channel] = DB localTx  implicit session =>
     sql"SELECT id, name, appid FROM $tableName WHERE id = $id"
       .map(resultToChannel)
       .single()
       .apply()
-  }
 
-  def getByAppid(appid: Int): Seq[Channel] = DB localTx { implicit session =>
+  def getByAppid(appid: Int): Seq[Channel] = DB localTx  implicit session =>
     sql"SELECT id, name, appid FROM $tableName WHERE appid = $appid"
       .map(resultToChannel)
       .list()
       .apply()
-  }
 
-  def delete(id: Int): Unit = DB localTx { implicit session =>
+  def delete(id: Int): Unit = DB localTx  implicit session =>
     sql"DELETE FROM $tableName WHERE id = $id".update().apply()
-  }
 
-  def resultToChannel(rs: WrappedResultSet): Channel = {
+  def resultToChannel(rs: WrappedResultSet): Channel =
     Channel(id = rs.int("id"),
             name = rs.string("name"),
             appid = rs.int("appid"))
-  }
-}

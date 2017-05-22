@@ -8,7 +8,7 @@ import collection.JavaConverters._
 /**
   * @author Pavel Fatin
   */
-private class FacetProperties(element: Element) {
+private class FacetProperties(element: Element)
   def option(key: String): Option[String] =
     Option(
         XPath
@@ -34,4 +34,3 @@ private class FacetProperties(element: Element) {
           element, s"configuration/option[@name='$key']/array/option/@value")
       .asScala
       .map(_.asInstanceOf[Attribute].getValue)
-}

@@ -29,7 +29,7 @@ private[akka] final case class ParserSettingsImpl(
     includeTlsSessionInfoHeader: Boolean,
     customMethods: String ⇒ Option[HttpMethod],
     customStatusCodes: Int ⇒ Option[StatusCode])
-    extends akka.http.scaladsl.settings.ParserSettings {
+    extends akka.http.scaladsl.settings.ParserSettings
 
   require(maxUriLength > 0, "max-uri-length must be > 0")
   require(maxMethodLength > 0, "max-method-length must be > 0")
@@ -49,16 +49,15 @@ private[akka] final case class ParserSettingsImpl(
     headerValueCacheLimits.getOrElse(headerName, defaultHeaderValueCacheLimit)
 
   override def productPrefix = "ParserSettings"
-}
 
 object ParserSettingsImpl
-    extends SettingsCompanion[ParserSettingsImpl]("akka.http.parsing") {
+    extends SettingsCompanion[ParserSettingsImpl]("akka.http.parsing")
 
   // for equality
   private[this] val noCustomMethods: String ⇒ Option[HttpMethod] = _ ⇒ None
   private[this] val noCustomStatusCodes: Int ⇒ Option[StatusCode] = _ ⇒ None
 
-  def fromSubConfig(root: Config, inner: Config) = {
+  def fromSubConfig(root: Config, inner: Config) =
     val c = inner.withFallback(root.getConfig(prefix))
     val cacheConfig = c getConfig "header-cache"
 
@@ -82,5 +81,3 @@ object ParserSettingsImpl
         c getBoolean "tls-session-info-header",
         noCustomMethods,
         noCustomStatusCodes)
-  }
-}

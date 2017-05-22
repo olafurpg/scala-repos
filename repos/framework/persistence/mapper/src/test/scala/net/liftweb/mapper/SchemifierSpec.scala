@@ -24,16 +24,13 @@ import common._
 /**
   * Systems under specification for Schemifier.
   */
-object SchemifierSpec extends Specification {
+object SchemifierSpec extends Specification
   "Schemifier Specification".title
 
   val provider = DbProviders.H2MemoryProvider
 
-  "Schemifier" should {
-    "not crash in readonly if table doesn't exist" in {
+  "Schemifier" should
+    "not crash in readonly if table doesn't exist" in
       provider.setupDB
       Schemifier.schemify(false, Schemifier.neverF _, Thing)
       success
-    }
-  }
-}

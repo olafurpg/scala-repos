@@ -13,7 +13,7 @@ import slick.util.DumpInfo
 /** Abstract profile for SQL-based databases. */
 trait SqlProfile
     extends RelationalProfile with SqlTableComponent with SqlActionComponent
-    /* internal: */ with SqlUtilsComponent {
+    /* internal: */ with SqlUtilsComponent
 
   @deprecated(
       "Use the Profile object directly instead of calling `.profile` on it",
@@ -27,7 +27,7 @@ trait SqlProfile
 
   type SchemaDescription = DDL
 
-  trait DDL extends SchemaDescriptionDef { self =>
+  trait DDL extends SchemaDescriptionDef  self =>
 
     /** Statements to execute first for create(), e.g. creating tables and indexes. */
     protected def createPhase1: Iterable[String]
@@ -55,12 +55,11 @@ trait SqlProfile
       * Composition is such that given {{{A.ddl ++ B.ddl}}} the create phases will be
       * run in FIFO order and the drop phases will be run in LIFO order.
       */
-    override def ++(other: DDL): DDL = new DDL {
+    override def ++(other: DDL): DDL = new DDL
       protected lazy val createPhase1 = self.createPhase1 ++ other.createPhase1
       protected lazy val createPhase2 = self.createPhase2 ++ other.createPhase2
       protected lazy val dropPhase1 = other.dropPhase1 ++ self.dropPhase1
       protected lazy val dropPhase2 = other.dropPhase2 ++ self.dropPhase2
-    }
 
     override def hashCode() =
       Vector(self.createPhase1,
@@ -68,38 +67,33 @@ trait SqlProfile
              self.dropPhase1,
              self.dropPhase2).hashCode
 
-    override def equals(o: Any) = o match {
+    override def equals(o: Any) = o match
       case ddl: DDL =>
         self.createPhase1 == ddl.createPhase1 &&
         self.createPhase2 == ddl.createPhase2 &&
         self.dropPhase1 == ddl.dropPhase1 && self.dropPhase2 == ddl.dropPhase2
       case _ => false
-    }
-  }
 
-  object DDL {
+  object DDL
     def apply(create1: Iterable[String],
               create2: Iterable[String],
               drop1: Iterable[String],
-              drop2: Iterable[String]): DDL = new DDL {
+              drop2: Iterable[String]): DDL = new DDL
       protected def createPhase1 = create1
       protected def createPhase2 = create2
       protected def dropPhase1 = drop1
       protected def dropPhase2 = drop2
-    }
 
     def apply(create1: Iterable[String], drop2: Iterable[String]): DDL =
       apply(create1, Nil, Nil, drop2)
 
     def apply(create1: String, drop2: String): DDL =
       apply(Iterable(create1), Iterable(drop2))
-  }
-}
 
-object SqlProfile {
+object SqlProfile
 
   /** Extra column options for SqlProfile */
-  object ColumnOption {
+  object ColumnOption
     case object NotNull extends ColumnOption[Nothing]
     case object Nullable extends ColumnOption[Nothing]
 
@@ -112,58 +106,47 @@ object SqlProfile {
       * Note that Slick uses VARCHAR or VARCHAR(254) in DDL for String columns if neither
       * ColumnOption DBType nor Length are given. */
     case class SqlType(val typeName: String) extends ColumnOption[Nothing]
-  }
-}
 
-trait SqlUtilsComponent { self: SqlProfile =>
+trait SqlUtilsComponent  self: SqlProfile =>
 
   /** quotes identifiers to avoid collisions with SQL keywords and other syntax issues */
-  def quoteIdentifier(id: String): String = {
+  def quoteIdentifier(id: String): String =
     val s = new StringBuilder(id.length + 4) append '"'
     for (c <- id) if (c == '"') s append "\"\"" else s append c
     (s append '"').toString
-  }
 
-  def quoteTableName(t: TableNode): String = t.schemaName match {
+  def quoteTableName(t: TableNode): String = t.schemaName match
     case Some(s) => quoteIdentifier(s) + "." + quoteIdentifier(t.tableName)
     case None => quoteIdentifier(t.tableName)
-  }
 
-  def likeEncode(s: String) = {
+  def likeEncode(s: String) =
     val b = new StringBuilder
-    for (c <- s) c match {
+    for (c <- s) c match
       case '%' | '_' | '^' => b append '^' append c
       case _ => b append c
-    }
     b.toString
-  }
 
   class QuotingSymbolNamer(parent: Option[SymbolNamer])
-      extends SymbolNamer("x", "y", parent) {
+      extends SymbolNamer("x", "y", parent)
     override def namedSymbolName(s: Symbol) = quoteIdentifier(s.name)
-  }
-}
 
-trait SqlTableComponent extends RelationalTableComponent {
+trait SqlTableComponent extends RelationalTableComponent
   this: SqlProfile =>
 
-  trait ColumnOptions extends super.ColumnOptions {
+  trait ColumnOptions extends super.ColumnOptions
     def SqlType(typeName: String) = SqlProfile.ColumnOption.SqlType(typeName)
-  }
 
   override val columnOptions: ColumnOptions = new ColumnOptions {}
-}
 
-trait SqlActionComponent extends RelationalActionComponent {
+trait SqlActionComponent extends RelationalActionComponent
   this: SqlProfile =>
 
   type ProfileAction [+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
   type StreamingProfileAction [+R, +T, -E <: Effect] <: SqlStreamingAction[
       R, T, E] with ProfileAction[R, Streaming[T], E]
-}
 
 trait SqlAction[+R, +S <: NoStream, -E <: Effect]
-    extends BasicAction[R, S, E] {
+    extends BasicAction[R, S, E]
 
   type ResultAction [+R, +S <: NoStream, -E <: Effect] <: SqlAction[R, S, E]
 
@@ -177,15 +160,13 @@ trait SqlAction[+R, +S <: NoStream, -E <: Effect]
   def getDumpInfo =
     DumpInfo(DumpInfo.simpleNameFor(getClass),
              mainInfo = statements.mkString("[", "; ", "]"))
-}
 
 trait SqlStreamingAction[+R, +T, -E <: Effect]
     extends BasicStreamingAction[R, T, E] with SqlAction[R, Streaming[T], E]
 
 trait FixedSqlAction[+R, +S <: NoStream, -E <: Effect]
-    extends SqlAction[R, S, E] {
+    extends SqlAction[R, S, E]
   type ResultAction[+R, +S <: NoStream, -E <: Effect] = SqlAction[R, S, E]
-}
 
 trait FixedSqlStreamingAction[+R, +T, -E <: Effect]
     extends SqlStreamingAction[R, T, E] with FixedSqlAction[R, Streaming[T], E]

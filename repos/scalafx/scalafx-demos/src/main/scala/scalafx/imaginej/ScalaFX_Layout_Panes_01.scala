@@ -54,37 +54,28 @@ import scalafx.scene.shape.Rectangle
   * http://docs.oracle.com/javafx/2.0/layout/builtin_layouts.htm
   *
   */
-object ScalaFX_Layout_Panes_01 extends JFXApp {
-  stage = new PrimaryStage {
+object ScalaFX_Layout_Panes_01 extends JFXApp
+  stage = new PrimaryStage
     title = "ScalaFX Layout Panes 01"
-    scene = new Scene {
-      content = new BorderPane {
-        top = new Rectangle {
+    scene = new Scene
+      content = new BorderPane
+        top = new Rectangle
           fill = Color.DarkCyan
           width = 200
           height = 50
-        }
-        bottom = new Rectangle {
+        bottom = new Rectangle
           fill = Color.DarkCyan
           width = 200
           height = 50
-        }
-        left = new Rectangle {
+        left = new Rectangle
           fill = Color.DarkTurquoise
           width = 50
           height = 100
-        }
-        right = new Rectangle {
+        right = new Rectangle
           fill = Color.DarkTurquoise
           width = 50
           height = 100
-        }
-        center = new Rectangle {
+        center = new Rectangle
           fill = Color.MediumAquamarine
           width = 100
           height = 100
-        }
-      }
-    }
-  }
-}

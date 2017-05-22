@@ -28,38 +28,32 @@ class ScalaTypeDefinitionUsagesDialog(element: ScTypeDefinition,
         toShowInNewTab,
         mustOpenInNewTab,
         isSingleFile,
-        handler) {
+        handler)
   private var myCbUsages: StateRestoringCheckBox = _
   private var myCbMembersUsages: StateRestoringCheckBox = _
   private var myCbImplementingTypeDefinitions: StateRestoringCheckBox = _
   private var myCbCompanionModule: StateRestoringCheckBox = _
 
-  override def getPreferredFocusedControl: JComponent = {
+  override def getPreferredFocusedControl: JComponent =
     myCbUsages
-  }
 
   import com.intellij.find.findUsages.AbstractFindUsagesDialog.{isSelected, isToChange}
 
   override def calcFindUsagesOptions(
-      options: ScalaTypeDefinitionFindUsagesOptions) {
+      options: ScalaTypeDefinitionFindUsagesOptions)
     super.calcFindUsagesOptions(options)
-    if (isToChange(myCbUsages)) {
+    if (isToChange(myCbUsages))
       options.isUsages = isSelected(myCbUsages)
-    }
-    if (isToChange(myCbMembersUsages)) {
+    if (isToChange(myCbMembersUsages))
       options.isMembersUsages = isSelected(myCbMembersUsages)
-    }
-    if (isToChange(myCbImplementingTypeDefinitions)) {
+    if (isToChange(myCbImplementingTypeDefinitions))
       options.isImplementingTypeDefinitions = isSelected(
           myCbImplementingTypeDefinitions)
-    }
-    if (isToChange(myCbCompanionModule)) {
+    if (isToChange(myCbCompanionModule))
       options.isSearchCompanionModule = isSelected(myCbCompanionModule)
-    }
     options.isSkipImportStatements = false
-  }
 
-  protected override def createFindWhatPanel: JPanel = {
+  protected override def createFindWhatPanel: JPanel =
     val findWhatPanel: JPanel = new JPanel
     findWhatPanel.setBorder(IdeBorderFactory.createTitledBorder(
             FindBundle.message("find.what.group"), true))
@@ -80,7 +74,7 @@ class ScalaTypeDefinitionUsagesDialog(element: ScTypeDefinition,
         getFindUsagesOptions.isImplementingTypeDefinitions,
         findWhatPanel,
         true)
-    ScalaPsiUtil.getBaseCompanionModule(element) match {
+    ScalaPsiUtil.getBaseCompanionModule(element) match
       case Some(td) =>
         myCbCompanionModule = addCheckboxToPanel(
             ScalaBundle.message("find.what.companion.module.checkbox"),
@@ -88,28 +82,20 @@ class ScalaTypeDefinitionUsagesDialog(element: ScTypeDefinition,
             findWhatPanel,
             true)
       case _ =>
-    }
     findWhatPanel
-  }
 
-  protected override def update() {
-    if (myCbToSearchForTextOccurrences != null) {
-      if (isSelected(myCbUsages)) {
+  protected override def update()
+    if (myCbToSearchForTextOccurrences != null)
+      if (isSelected(myCbUsages))
         myCbToSearchForTextOccurrences.makeSelectable()
-      } else {
+      else
         myCbToSearchForTextOccurrences.makeUnselectable(false)
-      }
-    }
-    if (myCbCompanionModule != null) {
-      if (isSelected(myCbUsages)) {
+    if (myCbCompanionModule != null)
+      if (isSelected(myCbUsages))
         myCbCompanionModule.makeSelectable()
-      } else {
+      else
         myCbCompanionModule.makeUnselectable(false)
-      }
-    }
     val hasSelected: Boolean =
       isSelected(myCbUsages) || isSelected(myCbMembersUsages) ||
       isSelected(myCbImplementingTypeDefinitions)
     setOKActionEnabled(hasSelected)
-  }
-}

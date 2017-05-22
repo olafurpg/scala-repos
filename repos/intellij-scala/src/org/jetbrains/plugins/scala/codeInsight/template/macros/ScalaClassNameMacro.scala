@@ -12,15 +12,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
   * @author Roman.Shein
   * @since 22.09.2015.
   */
-class ScalaClassNameMacro extends Macro {
+class ScalaClassNameMacro extends Macro
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+      params: Array[Expression], context: ExpressionContext): Result =
     Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                       classOf[PsiClass])).map {
+                                       classOf[PsiClass])).map
       case obj: ScObject => obj.fakeCompanionClassOrCompanionClass.getName
       case cl: PsiClass => cl.getName
-    }.map(new TextResult(_)).orNull
-  }
+    .map(new TextResult(_)).orNull
 
   override def getName: String = MacroUtil.scalaIdPrefix + "className"
 
@@ -30,4 +29,3 @@ class ScalaClassNameMacro extends Macro {
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]
-}

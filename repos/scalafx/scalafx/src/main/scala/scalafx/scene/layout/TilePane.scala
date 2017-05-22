@@ -36,16 +36,15 @@ import scalafx.delegate.{AlignmentDelegate, SFXDelegate}
 import scalafx.geometry.{Insets, Orientation, Pos}
 import scalafx.scene.Node
 
-object TilePane {
+object TilePane
   implicit def sfxTilePane2jfx(v: TilePane): jfxsl.TilePane =
     if (v != null) v.delegate else null
 
   /**
     * Removes all hbox constraints from the child node.
     */
-  def clearConstraints(child: jfxs.Node) {
+  def clearConstraints(child: jfxs.Node)
     jfxsl.TilePane.clearConstraints(child)
-  }
 
   /**
     * Returns the child's alignment constraint if set.
@@ -55,9 +54,8 @@ object TilePane {
   /**
     * Sets the alignment for the child when contained by a stackpane.
     */
-  def setAlignment(child: Node, value: jfxg.Pos) {
+  def setAlignment(child: Node, value: jfxg.Pos)
     jfxsl.TilePane.setAlignment(child, value)
-  }
 
   /**
     * Returns the child's margin constraint if set.
@@ -67,71 +65,62 @@ object TilePane {
   /**
     * Sets the margin for the child when contained by an hbox.
     */
-  def setMargin(child: Node, value: Insets) {
+  def setMargin(child: Node, value: Insets)
     jfxsl.TilePane.setMargin(child, value)
-  }
-}
 
 class TilePane(override val delegate: jfxsl.TilePane = new jfxsl.TilePane)
     extends Pane(delegate) with AlignmentDelegate[jfxsl.TilePane]
-    with SFXDelegate[jfxsl.TilePane] {
+    with SFXDelegate[jfxsl.TilePane]
 
   /**
     * The amount of horizontal space between each tile in a row.
     */
   def hgap: DoubleProperty = delegate.hgapProperty
-  def hgap_=(v: Double) {
+  def hgap_=(v: Double)
     hgap() = v
-  }
 
   /**
     * The orientation of this tilepane.
     */
   def orientation: ObjectProperty[jfxg.Orientation] =
     delegate.orientationProperty
-  def orientation_=(v: Orientation) {
+  def orientation_=(v: Orientation)
     orientation() = v
-  }
 
   /**
     * The preferred number of columns for a horizontal tilepane.
     */
   def prefColumns: IntegerProperty = delegate.prefColumnsProperty
-  def prefColumns_=(v: Int) {
+  def prefColumns_=(v: Int)
     prefColumns() = v
-  }
 
   /**
     * The preferred number of rows for a vertical tilepane.
     */
   def prefRows: IntegerProperty = delegate.prefRowsProperty
-  def prefRows_=(v: Int) {
+  def prefRows_=(v: Int)
     prefRows() = v
-  }
 
   /**
     * The preferred height of each tile.
     */
   def prefTileHeight: DoubleProperty = delegate.prefTileHeightProperty
-  def prefTileHeight_=(v: Double) {
+  def prefTileHeight_=(v: Double)
     prefTileHeight() = v
-  }
 
   /**
     * The preferred width of each tile.
     */
   def prefTileWidth: DoubleProperty = delegate.prefTileWidthProperty
-  def prefTileWidth_=(v: Double) {
+  def prefTileWidth_=(v: Double)
     prefTileWidth() = v
-  }
 
   /**
     * The default alignment of each child within its tile.
     */
   def tileAlignment: ObjectProperty[jfxg.Pos] = delegate.tileAlignmentProperty
-  def tileAlignment_=(v: Pos) {
+  def tileAlignment_=(v: Pos)
     tileAlignment() = v
-  }
 
   /**
     * The actual height of each tile.
@@ -147,9 +136,8 @@ class TilePane(override val delegate: jfxsl.TilePane = new jfxsl.TilePane)
     * The amount of vertical space between each tile in a column.
     */
   def vgap: DoubleProperty = delegate.vgapProperty
-  def vgap_=(v: Double) {
+  def vgap_=(v: Double)
     vgap() = v
-  }
 
   /**
     * Returns the orientation of a node's resizing bias for layout purposes.
@@ -159,7 +147,5 @@ class TilePane(override val delegate: jfxsl.TilePane = new jfxsl.TilePane)
   /**
     * Requests a layout pass to be performed before the next scene is rendered.
     */
-  def requestLayout() {
+  def requestLayout()
     delegate.requestLayout()
-  }
-}

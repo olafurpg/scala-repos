@@ -8,7 +8,7 @@ import akka.testkit.AkkaSpec
 import akka.actor.{ActorSystem, ActorRef}
 import akka.testkit.TestProbe
 
-object EventBusDocSpec {
+object EventBusDocSpec
 
   //#lookup-bus
   import akka.event.EventBus
@@ -20,7 +20,7 @@ object EventBusDocSpec {
     * Publishes the payload of the MsgEnvelope when the topic of the
     * MsgEnvelope equals the String specified when subscribing.
     */
-  class LookupBusImpl extends EventBus with LookupClassification {
+  class LookupBusImpl extends EventBus with LookupClassification
     type Event = MsgEnvelope
     type Classifier = String
     type Subscriber = ActorRef
@@ -31,9 +31,8 @@ object EventBusDocSpec {
     // will be invoked for each event for all subscribers which registered themselves
     // for the event’s classifier
     override protected def publish(
-        event: Event, subscriber: Subscriber): Unit = {
+        event: Event, subscriber: Subscriber): Unit =
       subscriber ! event.payload
-    }
 
     // must define a full order over the subscribers, expressed as expected from
     // `java.lang.Comparable.compare`
@@ -44,20 +43,18 @@ object EventBusDocSpec {
     // determines the initial size of the index data structure
     // used internally (i.e. the expected number of different classifiers)
     override protected def mapSize: Int = 128
-  }
 
   //#lookup-bus
 
   //#subchannel-bus
   import akka.util.Subclassification
 
-  class StartsWithSubclassification extends Subclassification[String] {
+  class StartsWithSubclassification extends Subclassification[String]
     override def isEqual(x: String, y: String): Boolean =
       x == y
 
     override def isSubclass(x: String, y: String): Boolean =
       x.startsWith(y)
-  }
 
   import akka.event.SubchannelClassification
 
@@ -65,7 +62,7 @@ object EventBusDocSpec {
     * Publishes the payload of the MsgEnvelope when the topic of the
     * MsgEnvelope starts with the String specified when subscribing.
     */
-  class SubchannelBusImpl extends EventBus with SubchannelClassification {
+  class SubchannelBusImpl extends EventBus with SubchannelClassification
     type Event = MsgEnvelope
     type Classifier = String
     type Subscriber = ActorRef
@@ -81,10 +78,8 @@ object EventBusDocSpec {
     // will be invoked for each event for all subscribers which registered
     // themselves for the event’s classifier
     override protected def publish(
-        event: Event, subscriber: Subscriber): Unit = {
+        event: Event, subscriber: Subscriber): Unit =
       subscriber ! event.payload
-    }
-  }
   //#subchannel-bus
 
   //#scanning-bus
@@ -94,7 +89,7 @@ object EventBusDocSpec {
     * Publishes String messages with length less than or equal to the length
     * specified when subscribing.
     */
-  class ScanningBusImpl extends EventBus with ScanningClassification {
+  class ScanningBusImpl extends EventBus with ScanningClassification
     type Event = String
     type Classifier = Int
     type Subscriber = ActorRef
@@ -119,10 +114,8 @@ object EventBusDocSpec {
     // will be invoked for each event for all subscribers which registered themselves
     // for a classifier matching this event
     override protected def publish(
-        event: Event, subscriber: Subscriber): Unit = {
+        event: Event, subscriber: Subscriber): Unit =
       subscriber ! event
-    }
-  }
   //#scanning-bus
 
   //#actor-bus
@@ -134,7 +127,7 @@ object EventBusDocSpec {
 
   class ActorBusImpl(val system: ActorSystem)
       extends ActorEventBus with ActorClassifier
-      with ManagedActorClassification {
+      with ManagedActorClassification
     type Event = Notification
 
     // is used for extracting the classifier from the incoming events
@@ -143,15 +136,13 @@ object EventBusDocSpec {
     // determines the initial size of the index data structure
     // used internally (i.e. the expected number of different classifiers)
     override protected def mapSize: Int = 128
-  }
   //#actor-bus
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class EventBusDocSpec extends AkkaSpec {
+class EventBusDocSpec extends AkkaSpec
   import EventBusDocSpec._
 
-  "demonstrate LookupClassification" in {
+  "demonstrate LookupClassification" in
     //#lookup-bus-test
     val lookupBus = new LookupBusImpl
     lookupBus.subscribe(testActor, "greetings")
@@ -159,9 +150,8 @@ class EventBusDocSpec extends AkkaSpec {
     lookupBus.publish(MsgEnvelope("greetings", "hello"))
     expectMsg("hello")
     //#lookup-bus-test
-  }
 
-  "demonstrate SubchannelClassification" in {
+  "demonstrate SubchannelClassification" in
     //#subchannel-bus-test
     val subchannelBus = new SubchannelBusImpl
     subchannelBus.subscribe(testActor, "abc")
@@ -172,9 +162,8 @@ class EventBusDocSpec extends AkkaSpec {
     subchannelBus.publish(MsgEnvelope("abcdef", "d"))
     expectMsg("d")
     //#subchannel-bus-test
-  }
 
-  "demonstrate ScanningClassification" in {
+  "demonstrate ScanningClassification" in
     //#scanning-bus-test
     val scanningBus = new ScanningBusImpl
     scanningBus.subscribe(testActor, 3)
@@ -184,9 +173,8 @@ class EventBusDocSpec extends AkkaSpec {
     scanningBus.publish("abc")
     expectMsg("abc")
     //#scanning-bus-test
-  }
 
-  "demonstrate ManagedActorClassification" in {
+  "demonstrate ManagedActorClassification" in
     //#actor-bus-test
     val observer1 = TestProbe().ref
     val observer2 = TestProbe().ref
@@ -205,5 +193,3 @@ class EventBusDocSpec extends AkkaSpec {
     probe2.expectMsg(Notification(observer2, 101))
     probe1.expectNoMsg(500.millis)
     //#actor-bus-test
-  }
-}

@@ -23,9 +23,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.streaming.Time
 import org.apache.spark.streaming.scheduler._
 
-class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
+class JavaStreamingListenerWrapperSuite extends SparkFunSuite
 
-  test("basic") {
+  test("basic")
     val listener = new TestJavaStreamingListener()
     val listenerWrapper = new JavaStreamingListenerWrapper(listener)
 
@@ -207,10 +207,9 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
     assertOutputOperationInfo(
         listener.outputOperationCompleted.outputOperationInfo,
         outputOperationCompleted.outputOperationInfo)
-  }
 
   private def assertReceiverInfo(
-      javaReceiverInfo: JavaReceiverInfo, receiverInfo: ReceiverInfo): Unit = {
+      javaReceiverInfo: JavaReceiverInfo, receiverInfo: ReceiverInfo): Unit =
     assert(javaReceiverInfo.streamId === receiverInfo.streamId)
     assert(javaReceiverInfo.name === receiverInfo.name)
     assert(javaReceiverInfo.active === receiverInfo.active)
@@ -219,18 +218,16 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
     assert(javaReceiverInfo.lastErrorMessage === receiverInfo.lastErrorMessage)
     assert(javaReceiverInfo.lastError === receiverInfo.lastError)
     assert(javaReceiverInfo.lastErrorTime === receiverInfo.lastErrorTime)
-  }
 
   private def assertBatchInfo(
-      javaBatchInfo: JavaBatchInfo, batchInfo: BatchInfo): Unit = {
+      javaBatchInfo: JavaBatchInfo, batchInfo: BatchInfo): Unit =
     assert(javaBatchInfo.batchTime === batchInfo.batchTime)
     assert(
         javaBatchInfo.streamIdToInputInfo.size === batchInfo.streamIdToInputInfo.size)
-    batchInfo.streamIdToInputInfo.foreach {
+    batchInfo.streamIdToInputInfo.foreach
       case (streamId, streamInputInfo) =>
         assertStreamingInfo(
             javaBatchInfo.streamIdToInputInfo.get(streamId), streamInputInfo)
-    }
     assert(javaBatchInfo.submissionTime === batchInfo.submissionTime)
     assert(
         javaBatchInfo.processingStartTime === batchInfo.processingStartTime
@@ -248,26 +245,23 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
     assert(javaBatchInfo.numRecords === batchInfo.numRecords)
     assert(
         javaBatchInfo.outputOperationInfos.size === batchInfo.outputOperationInfos.size)
-    batchInfo.outputOperationInfos.foreach {
+    batchInfo.outputOperationInfos.foreach
       case (outputOperationId, outputOperationInfo) =>
         assertOutputOperationInfo(
             javaBatchInfo.outputOperationInfos.get(outputOperationId),
             outputOperationInfo)
-    }
-  }
 
   private def assertStreamingInfo(javaStreamInputInfo: JavaStreamInputInfo,
-                                  streamInputInfo: StreamInputInfo): Unit = {
+                                  streamInputInfo: StreamInputInfo): Unit =
     assert(javaStreamInputInfo.inputStreamId === streamInputInfo.inputStreamId)
     assert(javaStreamInputInfo.numRecords === streamInputInfo.numRecords)
     assert(javaStreamInputInfo.metadata === streamInputInfo.metadata.asJava)
     assert(
         javaStreamInputInfo.metadataDescription === streamInputInfo.metadataDescription.orNull)
-  }
 
   private def assertOutputOperationInfo(
       javaOutputOperationInfo: JavaOutputOperationInfo,
-      outputOperationInfo: OutputOperationInfo): Unit = {
+      outputOperationInfo: OutputOperationInfo): Unit =
     assert(javaOutputOperationInfo.batchTime === outputOperationInfo.batchTime)
     assert(javaOutputOperationInfo.id === outputOperationInfo.id)
     assert(javaOutputOperationInfo.name === outputOperationInfo.name)
@@ -281,10 +275,8 @@ class JavaStreamingListenerWrapperSuite extends SparkFunSuite {
           .getOrElse(-1))
     assert(
         javaOutputOperationInfo.failureReason === outputOperationInfo.failureReason.orNull)
-  }
-}
 
-class TestJavaStreamingListener extends JavaStreamingListener {
+class TestJavaStreamingListener extends JavaStreamingListener
 
   var receiverStarted: JavaStreamingListenerReceiverStarted = null
   var receiverError: JavaStreamingListenerReceiverError = null
@@ -298,44 +290,35 @@ class TestJavaStreamingListener extends JavaStreamingListener {
     null
 
   override def onReceiverStarted(
-      receiverStarted: JavaStreamingListenerReceiverStarted): Unit = {
+      receiverStarted: JavaStreamingListenerReceiverStarted): Unit =
     this.receiverStarted = receiverStarted
-  }
 
   override def onReceiverError(
-      receiverError: JavaStreamingListenerReceiverError): Unit = {
+      receiverError: JavaStreamingListenerReceiverError): Unit =
     this.receiverError = receiverError
-  }
 
   override def onReceiverStopped(
-      receiverStopped: JavaStreamingListenerReceiverStopped): Unit = {
+      receiverStopped: JavaStreamingListenerReceiverStopped): Unit =
     this.receiverStopped = receiverStopped
-  }
 
   override def onBatchSubmitted(
-      batchSubmitted: JavaStreamingListenerBatchSubmitted): Unit = {
+      batchSubmitted: JavaStreamingListenerBatchSubmitted): Unit =
     this.batchSubmitted = batchSubmitted
-  }
 
   override def onBatchStarted(
-      batchStarted: JavaStreamingListenerBatchStarted): Unit = {
+      batchStarted: JavaStreamingListenerBatchStarted): Unit =
     this.batchStarted = batchStarted
-  }
 
   override def onBatchCompleted(
-      batchCompleted: JavaStreamingListenerBatchCompleted): Unit = {
+      batchCompleted: JavaStreamingListenerBatchCompleted): Unit =
     this.batchCompleted = batchCompleted
-  }
 
   override def onOutputOperationStarted(
       outputOperationStarted: JavaStreamingListenerOutputOperationStarted)
-    : Unit = {
+    : Unit =
     this.outputOperationStarted = outputOperationStarted
-  }
 
   override def onOutputOperationCompleted(
       outputOperationCompleted: JavaStreamingListenerOutputOperationCompleted)
-    : Unit = {
+    : Unit =
     this.outputOperationCompleted = outputOperationCompleted
-  }
-}

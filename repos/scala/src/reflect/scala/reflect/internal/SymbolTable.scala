@@ -22,11 +22,10 @@ abstract class SymbolTable
     with Positions with TypeDebugging with Importers with Required
     with CapturedVariables with StdAttachments with StdCreators
     with ReificationSupport with PrivateWithin with pickling.Translations
-    with FreshNames with Internals with Reporting {
+    with FreshNames with Internals with Reporting
 
-  val gen = new InternalTreeGen {
+  val gen = new InternalTreeGen
     val global: SymbolTable.this.type = SymbolTable.this
-  }
 
   def log(msg: => AnyRef): Unit
 
@@ -61,7 +60,7 @@ abstract class SymbolTable
   /** Prints a stack trace if -Ydebug or equivalent was given, otherwise does nothing. */
   def debugStack(t: Throwable): Unit = devWarning(throwableAsString(t))
 
-  private[scala] def printCaller[T](msg: String)(result: T) = {
+  private[scala] def printCaller[T](msg: String)(result: T) =
     Console.err.println(
         "%s: %s\nCalled from: %s".format(
             msg,
@@ -69,46 +68,38 @@ abstract class SymbolTable
             (new Throwable).getStackTrace.drop(2).take(50).mkString("\n")))
 
     result
-  }
 
-  private[scala] def printResult[T](msg: String)(result: T) = {
+  private[scala] def printResult[T](msg: String)(result: T) =
     Console.err.println(msg + ": " + result)
     result
-  }
   @inline
-  final private[scala] def logResult[T](msg: => String)(result: T): T = {
+  final private[scala] def logResult[T](msg: => String)(result: T): T =
     log(msg + ": " + result)
     result
-  }
   @inline
-  final private[scala] def debuglogResult[T](msg: => String)(result: T): T = {
+  final private[scala] def debuglogResult[T](msg: => String)(result: T): T =
     debuglog(msg + ": " + result)
     result
-  }
   @inline
-  final private[scala] def devWarningResult[T](msg: => String)(result: T): T = {
+  final private[scala] def devWarningResult[T](msg: => String)(result: T): T =
     devWarning(msg + ": " + result)
     result
-  }
   @inline
   final private[scala] def logResultIf[T](msg: => String, cond: T => Boolean)(
-      result: T): T = {
+      result: T): T =
     if (cond(result)) log(msg + ": " + result)
 
     result
-  }
   @inline
   final private[scala] def debuglogResultIf[T](
-      msg: => String, cond: T => Boolean)(result: T): T = {
+      msg: => String, cond: T => Boolean)(result: T): T =
     if (cond(result)) debuglog(msg + ": " + result)
 
     result
-  }
 
   @inline final def findSymbol(xs: TraversableOnce[Symbol])(
-      p: Symbol => Boolean): Symbol = {
+      p: Symbol => Boolean): Symbol =
     xs find p getOrElse NoSymbol
-  }
 
   // For too long have we suffered in order to sort NAMES.
   // I'm pretty sure there's a reasonable default for that.
@@ -116,18 +107,17 @@ abstract class SymbolTable
   implicit def lowPriorityNameOrdering[T <: Names#Name]: Ordering[T] =
     SimpleNameOrdering.asInstanceOf[Ordering[T]]
 
-  private object SimpleNameOrdering extends Ordering[Names#Name] {
+  private object SimpleNameOrdering extends Ordering[Names#Name]
     def compare(n1: Names#Name, n2: Names#Name) = (if (n1 eq n2) 0
                                                    else
                                                      n1.toString compareTo n2.toString)
-  }
 
   /** Dump each symbol to stdout after shutdown.
     */
   final val traceSymbolActivity = sys.props contains "scalac.debug.syms"
-  object traceSymbols extends {
+  object traceSymbols extends
     val global: SymbolTable.this.type = SymbolTable.this
-  } with util.TraceSymbolActivity
+  with util.TraceSymbolActivity
 
   val treeInfo: TreeInfo { val global: SymbolTable.this.type }
 
@@ -162,33 +152,28 @@ abstract class SymbolTable
   private[this] var per = NoPeriod
 
   final def atPhaseStack: List[Phase] = phStack
-  final def phase: Phase = {
+  final def phase: Phase =
     if (Statistics.hotEnabled)
       Statistics.incCounter(SymbolTableStats.phaseCounter)
     ph
-  }
 
-  def atPhaseStackMessage = atPhaseStack match {
+  def atPhaseStackMessage = atPhaseStack match
     case Nil => ""
     case ps => ps.reverseMap("->" + _).mkString("(", " ", ")")
-  }
 
-  final def phase_=(p: Phase) {
+  final def phase_=(p: Phase)
     //System.out.println("setting phase to " + p)
     assert((p ne null) && p != NoPhase, p)
     ph = p
     per = period(currentRunId, p.id)
-  }
-  final def pushPhase(ph: Phase): Phase = {
+  final def pushPhase(ph: Phase): Phase =
     val current = phase
     phase = ph
     phStack ::= ph
     current
-  }
-  final def popPhase(ph: Phase) {
+  final def popPhase(ph: Phase)
     phStack = phStack.tail
     phase = ph
-  }
 
   /** The current compiler run identifier. */
   def currentRunId: RunId
@@ -200,10 +185,9 @@ abstract class SymbolTable
   final def phaseId(period: Period): Phase#Id = period & 0xFF
 
   /** The current period. */
-  final def currentPeriod: Period = {
+  final def currentPeriod: Period =
     //assert(per == (currentRunId << 8) + phase.id)
     per
-  }
 
   /** The phase associated with given period. */
   final def phaseOf(period: Period): Phase = phaseWithId(phaseId(period))
@@ -216,27 +200,22 @@ abstract class SymbolTable
     p != NoPhase && phase.id > p.id
 
   /** Perform given operation at given phase. */
-  @inline final def enteringPhase[T](ph: Phase)(op: => T): T = {
+  @inline final def enteringPhase[T](ph: Phase)(op: => T): T =
     val saved = pushPhase(ph)
     try op finally popPhase(saved)
-  }
 
-  final def findPhaseWithName(phaseName: String): Phase = {
+  final def findPhaseWithName(phaseName: String): Phase =
     var ph = phase
-    while (ph != NoPhase && ph.name != phaseName) {
+    while (ph != NoPhase && ph.name != phaseName)
       ph = ph.prev
-    }
     if (ph eq NoPhase) phase else ph
-  }
-  final def enteringPhaseWithName[T](phaseName: String)(body: => T): T = {
+  final def enteringPhaseWithName[T](phaseName: String)(body: => T): T =
     val phase = findPhaseWithName(phaseName)
     enteringPhase(phase)(body)
-  }
 
-  def slowButSafeEnteringPhase[T](ph: Phase)(op: => T): T = {
+  def slowButSafeEnteringPhase[T](ph: Phase)(op: => T): T =
     if (isCompilerUniverse) enteringPhase(ph)(op)
     else op
-  }
 
   @inline final def exitingPhase[T](ph: Phase)(op: => T): T =
     enteringPhase(ph.next)(op)
@@ -250,57 +229,47 @@ abstract class SymbolTable
     if (isCompilerUniverse) enteringPhaseNotLaterThan(target)(op) else op
 
   final def isValid(period: Period): Boolean =
-    period != 0 && runId(period) == currentRunId && {
+    period != 0 && runId(period) == currentRunId &&
       val pid = phaseId(period)
       if (phase.id > pid) infoTransformers.nextFrom(pid).pid >= phase.id
       else infoTransformers.nextFrom(phase.id).pid >= pid
-    }
 
-  final def isValidForBaseClasses(period: Period): Boolean = {
+  final def isValidForBaseClasses(period: Period): Boolean =
     def noChangeInBaseClasses(it: InfoTransformer, limit: Phase#Id): Boolean =
       (it.pid >= limit || !it.changesBaseClasses &&
           noChangeInBaseClasses(it.next, limit))
-    period != 0 && runId(period) == currentRunId && {
+    period != 0 && runId(period) == currentRunId &&
       val pid = phaseId(period)
       if (phase.id > pid)
         noChangeInBaseClasses(infoTransformers.nextFrom(pid), phase.id)
       else noChangeInBaseClasses(infoTransformers.nextFrom(phase.id), pid)
-    }
-  }
 
-  def openPackageModule(container: Symbol, dest: Symbol) {
+  def openPackageModule(container: Symbol, dest: Symbol)
     // unlink existing symbols in the package
-    for (member <- container.info.decls.iterator) {
-      if (!member.isPrivate && !member.isConstructor) {
+    for (member <- container.info.decls.iterator)
+      if (!member.isPrivate && !member.isConstructor)
         // todo: handle overlapping definitions in some way: mark as errors
         // or treat as abstractions. For now the symbol in the package module takes precedence.
         for (existing <- dest.info.decl(member.name).alternatives) dest.info.decls
           .unlink(existing)
-      }
-    }
     // enter non-private decls the class
-    for (member <- container.info.decls.iterator) {
-      if (!member.isPrivate && !member.isConstructor) {
+    for (member <- container.info.decls.iterator)
+      if (!member.isPrivate && !member.isConstructor)
         dest.info.decls.enter(member)
-      }
-    }
     // enter decls of parent classes
-    for (p <- container.parentSymbols) {
-      if (p != definitions.ObjectClass) {
+    for (p <- container.parentSymbols)
+      if (p != definitions.ObjectClass)
         openPackageModule(p, dest)
-      }
-    }
-  }
 
   /** Convert array parameters denoting a repeated parameter of a Java method
     *  to `JavaRepeatedParamClass` types.
     */
-  def arrayToRepeated(tp: Type): Type = tp match {
+  def arrayToRepeated(tp: Type): Type = tp match
     case MethodType(params, rtpe) =>
       val formals = tp.paramTypes
       assert(formals.last.typeSymbol == definitions.ArrayClass, formals)
       val method = params.last.owner
-      val elemtp = formals.last.typeArgs.head match {
+      val elemtp = formals.last.typeArgs.head match
         case RefinedType(List(t1, t2), _)
             if
             (t1.typeSymbol.isAbstractType &&
@@ -308,32 +277,26 @@ abstract class SymbolTable
           t1 // drop intersection with Object for abstract types in varargs. UnCurry can handle them.
         case t =>
           t
-      }
       val newParams = method.newSyntheticValueParams(
           formals.init :+ definitions.javaRepeatedType(elemtp))
       MethodType(newParams, rtpe)
     case PolyType(tparams, rtpe) =>
       PolyType(tparams, arrayToRepeated(rtpe))
-  }
 
-  abstract class SymLoader extends LazyType {
+  abstract class SymLoader extends LazyType
     def fromSource = false
-  }
 
   /** if there's a `package` member object in `pkgClass`, enter its members into it. */
-  def openPackageModule(pkgClass: Symbol) {
+  def openPackageModule(pkgClass: Symbol)
 
     val pkgModule = pkgClass.packageObject
-    def fromSource = pkgModule.rawInfo match {
+    def fromSource = pkgModule.rawInfo match
       case ltp: SymLoader => ltp.fromSource
       case _ => false
-    }
-    if (pkgModule.isModule && !fromSource) {
+    if (pkgModule.isModule && !fromSource)
       openPackageModule(pkgModule, pkgClass)
-    }
-  }
 
-  object perRunCaches {
+  object perRunCaches
     import scala.collection.generic.Clearable
 
     // Weak references so the garbage collector will take care of
@@ -341,24 +304,21 @@ abstract class SymbolTable
     import java.lang.ref.WeakReference
     private var caches = List[WeakReference[Clearable]]()
 
-    def recordCache[T <: Clearable](cache: T): T = {
+    def recordCache[T <: Clearable](cache: T): T =
       caches ::= new WeakReference(cache)
       cache
-    }
 
     /**
       * Removes a cache from the per-run caches. This is useful for testing: it allows running the
       * compiler and then inspect the state of a cache.
       */
-    def unrecordCache[T <: Clearable](cache: T): Unit = {
+    def unrecordCache[T <: Clearable](cache: T): Unit =
       caches = caches.filterNot(_.get eq cache)
-    }
 
-    def clearAll() = {
+    def clearAll() =
       debuglog("Clearing " + caches.size + " caches.")
       caches foreach (ref => Option(ref.get).foreach(_.clear))
       caches = caches.filterNot(_.get == null)
-    }
 
     def newWeakMap[K, V]() = recordCache(mutable.WeakHashMap[K, V]())
     def newMap[K, V]() = recordCache(mutable.HashMap[K, V]())
@@ -366,31 +326,25 @@ abstract class SymbolTable
     def newWeakSet[K <: AnyRef]() = recordCache(new WeakHashSet[K]())
 
     def newAnyRefMap[K <: AnyRef, V]() = recordCache(mutable.AnyRefMap[K, V]())
-    def newGeneric[T](f: => T): () => T = {
+    def newGeneric[T](f: => T): () => T =
       val NoCached: T = null.asInstanceOf[T]
       var cached: T = NoCached
       var cachedRunId = NoRunId
       recordCache(
-          new Clearable {
+          new Clearable
         def clear(): Unit = cached = NoCached
-      })
+      )
       () =>
-        {
-          if (currentRunId != cachedRunId || cached == NoCached) {
+          if (currentRunId != cachedRunId || cached == NoCached)
             cached = f
             cachedRunId = currentRunId
-          }
           cached
-        }
-    }
-  }
 
   /** The set of all installed infotransformers. */
-  var infoTransformers = new InfoTransformer {
+  var infoTransformers = new InfoTransformer
     val pid = NoPhase.id
     val changesBaseClasses = true
     def transform(sym: Symbol, tpe: Type): Type = tpe
-  }
 
   /** The phase which has given index as identifier. */
   val phaseWithId: Array[Phase]
@@ -407,8 +361,6 @@ abstract class SymbolTable
     */
   implicit val StringContextStripMarginOps: StringContext => StringContextStripMarginOps =
     util.StringContextStripMarginOps
-}
 
-object SymbolTableStats {
+object SymbolTableStats
   val phaseCounter = Statistics.newCounter("#phase calls")
-}

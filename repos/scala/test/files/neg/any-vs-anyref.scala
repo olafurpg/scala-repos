@@ -2,7 +2,7 @@ trait Quux extends Any
 trait QuuxRef extends AnyRef
 final class Bippy(val x: Any) extends AnyVal with Quux
 
-object Foo {
+object Foo
   def foo1[A <: Product](a: A) = { type X = a.type }
   def foo2[A <: Product with Quux](a: A) = { type X = a.type }
   def foo3(a: Product) = { type X = a.type }
@@ -23,10 +23,8 @@ object Foo {
     (x eq "abc") && ("abc" eq x)
 
   def bad1(x: Bippy, y: Bippy) = x eq y
-}
 
-object Bar {
+object Bar
   def f(x: Quux { def g(x: Int): Int }): Int = x g 5
   f(new Quux { def g(x: String) = x })
   f(new Quux { def g(x: Int) = x })
-}

@@ -8,7 +8,7 @@ import actorApi.{RemoveHook, BiteHook, BiteSeek, JoinHook, JoinSeek, LobbyUser}
 import lila.game.{GameRepo, Game, Player, Pov, Progress, PerfPicker}
 import lila.user.{User, UserRepo}
 
-private[lobby] object Biter {
+private[lobby] object Biter
 
   def apply(hook: Hook, uid: String, user: Option[LobbyUser]): Fu[JoinHook] =
     canJoin(hook, user).fold(
@@ -25,7 +25,7 @@ private[lobby] object Biter {
   private def join(hook: Hook,
                    uid: String,
                    lobbyUserOption: Option[LobbyUser]): Fu[JoinHook] =
-    for {
+    for
       userOption ← lobbyUserOption.map(_.id) ?? UserRepo.byId
       ownerOption ← hook.userId ?? UserRepo.byId
       creatorColor <- assignCreatorColor(
@@ -36,10 +36,10 @@ private[lobby] object Biter {
           blame(creatorColor, ownerOption, makeGame(hook))
       ).start
       _ ← GameRepo insertDenormalized game
-    } yield JoinHook(uid, hook, game, creatorColor)
+    yield JoinHook(uid, hook, game, creatorColor)
 
   private def join(seek: Seek, lobbyUser: LobbyUser): Fu[JoinSeek] =
-    for {
+    for
       user ← UserRepo byId lobbyUser.id flatten s"No such user: ${lobbyUser.id}"
       owner ← UserRepo byId seek.user.id flatten s"No such user: ${seek.user.id}"
       creatorColor <- assignCreatorColor(owner.some, user.some, seek.realColor)
@@ -49,23 +49,21 @@ private[lobby] object Biter {
           blame(creatorColor, owner.some, makeGame(seek))
       ).start
       _ ← GameRepo insertDenormalized game
-    } yield JoinSeek(user.id, seek, game, creatorColor)
+    yield JoinSeek(user.id, seek, game, creatorColor)
 
   private def assignCreatorColor(creatorUser: Option[User],
                                  joinerUser: Option[User],
-                                 color: Color): Fu[chess.Color] = color match {
+                                 color: Color): Fu[chess.Color] = color match
     case Color.Random =>
       UserRepo.firstGetsWhite(creatorUser.map(_.id), joinerUser.map(_.id)) map chess.Color.apply
     case Color.White => fuccess(chess.White)
     case Color.Black => fuccess(chess.Black)
-  }
 
   private def blame(color: ChessColor, userOption: Option[User], game: Game) =
-    userOption.fold(game) { user =>
+    userOption.fold(game)  user =>
       game.updatePlayer(
           color,
           _.withUser(user.id, PerfPicker.mainOrDefault(game)(user.perfs)))
-    }
 
   private def makeGame(hook: Hook) =
     Game.make(
@@ -95,17 +93,13 @@ private[lobby] object Biter {
         user ?? { _.lame == hook.lame }
     ) && !(hook.userId ?? (user ?? (_.blocking)).contains) && !((user map
             (_.id)) ?? (hook.user ?? (_.blocking)).contains) &&
-    hook.realRatingRange.fold(true) { range =>
-      user ?? { u =>
+    hook.realRatingRange.fold(true)  range =>
+      user ??  u =>
         (hook.perfType map (_.key) flatMap u.ratingMap.get) ?? range.contains
-      }
-    }
 
   def canJoin(seek: Seek, user: LobbyUser): Boolean =
     (seek.realMode.casual || user.lame == seek.user.lame) &&
     !(user.blocking contains seek.user.id) &&
-    !(seek.user.blocking contains user.id) && seek.realRatingRange.fold(true) {
+    !(seek.user.blocking contains user.id) && seek.realRatingRange.fold(true)
       range =>
         (seek.perfType map (_.key) flatMap user.ratingMap.get) ?? range.contains
-    }
-}

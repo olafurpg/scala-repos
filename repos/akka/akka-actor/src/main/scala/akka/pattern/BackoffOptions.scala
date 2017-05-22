@@ -22,7 +22,7 @@ import akka.actor.{Props, OneForOneStrategy, SupervisorStrategy}
   *
   * }}}
   */
-object Backoff {
+object Backoff
 
   /**
     * Back-off options for creating a back-off supervisor actor that expects a child actor to restart on failure.
@@ -146,7 +146,6 @@ object Backoff {
                        minBackoff,
                        maxBackoff,
                        randomFactor)
-}
 
 /**
   * Configures a back-off supervisor actor. Start with `Backoff.onStop` or `Backoff.onFailure`.
@@ -157,7 +156,7 @@ object Backoff {
   * context.actorOf(BackoffSupervisor.props(options), name)
   * }}}
   */
-trait BackoffOptions {
+trait BackoffOptions
 
   /**
     * Returns a new BackoffOptions with automatic back-off reset.
@@ -191,7 +190,6 @@ trait BackoffOptions {
     * Returns the props to create the back-off supervisor.
     */
   private[akka] def props: Props
-}
 
 private final case class BackoffOptionsImpl(
     backoffType: BackoffType = RestartImpliesFailure,
@@ -203,7 +201,7 @@ private final case class BackoffOptionsImpl(
     reset: Option[BackoffReset] = None,
     supervisorStrategy: OneForOneStrategy = OneForOneStrategy()(
           SupervisorStrategy.defaultStrategy.decider))
-    extends BackoffOptions {
+    extends BackoffOptions
 
   val backoffReset = reset.getOrElse(AutoReset(minBackoff))
 
@@ -216,18 +214,17 @@ private final case class BackoffOptionsImpl(
     copy(supervisorStrategy = OneForOneStrategy()(
               SupervisorStrategy.stoppingStrategy.decider))
 
-  def props = {
+  def props =
     require(minBackoff > Duration.Zero, "minBackoff must be > 0")
     require(maxBackoff >= minBackoff, "maxBackoff must be >= minBackoff")
     require(0.0 <= randomFactor && randomFactor <= 1.0,
             "randomFactor must be between 0.0 and 1.0")
-    backoffReset match {
+    backoffReset match
       case AutoReset(resetBackoff) ⇒
         require(minBackoff <= resetBackoff && resetBackoff <= maxBackoff)
       case _ ⇒ // ignore
-    }
 
-    backoffType match {
+    backoffType match
       case RestartImpliesFailure ⇒
         Props(
             new BackoffOnRestartSupervisor(childProps,
@@ -246,9 +243,6 @@ private final case class BackoffOptionsImpl(
                                   backoffReset,
                                   randomFactor,
                                   supervisorStrategy))
-    }
-  }
-}
 
 private sealed trait BackoffType
 private final case object StopImpliesFailure extends BackoffType

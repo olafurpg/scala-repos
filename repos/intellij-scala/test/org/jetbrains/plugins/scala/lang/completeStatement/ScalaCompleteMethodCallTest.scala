@@ -5,8 +5,8 @@ package lang.completeStatement
   * @author Ksenia.Sautina
   * @since 1/28/13
   */
-class ScalaCompleteMethodCallTest extends ScalaCompleteStatementTestBase {
-  def testMethodCall() {
+class ScalaCompleteMethodCallTest extends ScalaCompleteStatementTestBase
+  def testMethodCall()
     val fileText = """
         |class B {
         |  def method() {}
@@ -23,5 +23,3 @@ class ScalaCompleteMethodCallTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
-}

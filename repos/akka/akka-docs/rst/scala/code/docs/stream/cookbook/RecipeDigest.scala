@@ -10,11 +10,11 @@ import akka.util.ByteString
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class RecipeDigest extends RecipeSpec {
+class RecipeDigest extends RecipeSpec
 
-  "Recipe for calculating digest" must {
+  "Recipe for calculating digest" must
 
-    "work" in {
+    "work" in
 
       val data = Source(
           List(ByteString("abcdbcdecdef"),
@@ -23,36 +23,31 @@ class RecipeDigest extends RecipeSpec {
       //#calculating-digest
       import akka.stream.stage._
       class DigestCalculator(algorithm: String)
-          extends GraphStage[FlowShape[ByteString, ByteString]] {
+          extends GraphStage[FlowShape[ByteString, ByteString]]
         val in = Inlet[ByteString]("DigestCalculator.in")
         val out = Outlet[ByteString]("DigestCalculator.out")
         override val shape = FlowShape.of(in, out)
 
         override def createLogic(
             inheritedAttributes: Attributes): GraphStageLogic =
-          new GraphStageLogic(shape) {
+          new GraphStageLogic(shape)
             val digest = MessageDigest.getInstance(algorithm)
 
-            setHandler(out, new OutHandler {
-              override def onPull(): Trigger = {
+            setHandler(out, new OutHandler
+              override def onPull(): Trigger =
                 pull(in)
-              }
-            })
+            )
 
-            setHandler(in, new InHandler {
-              override def onPush(): Trigger = {
+            setHandler(in, new InHandler
+              override def onPush(): Trigger =
                 val chunk = grab(in)
                 digest.update(chunk.toArray)
                 pull(in)
-              }
 
-              override def onUpstreamFinish(): Unit = {
+              override def onUpstreamFinish(): Unit =
                 emit(out, ByteString(digest.digest()))
                 completeStage()
-              }
-            })
-          }
-      }
+            )
       val digest: Source[ByteString, NotUsed] =
         data.via(new DigestCalculator("SHA-256"))
       //#calculating-digest
@@ -90,6 +85,3 @@ class RecipeDigest extends RecipeSpec {
                      0xdb,
                      0x06,
                      0xc1))
-    }
-  }
-}

@@ -24,128 +24,100 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScImportExprStub
   */
 class ScImportExprImpl private (
     stub: StubElement[ScImportExpr], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScImportExpr {
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScImportExpr
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScImportExprStub) = {
+  def this(stub: ScImportExprStub) =
     this(stub, ScalaElementTypes.IMPORT_EXPR, null)
-  }
 
   override def toString: String = "ImportExpression"
 
-  def singleWildcard: Boolean = {
+  def singleWildcard: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScImportExprStub].isSingleWildcard
-    }
-    if (findChildByType[PsiElement](ScalaTokenTypes.tUNDER) != null) {
+    if (findChildByType[PsiElement](ScalaTokenTypes.tUNDER) != null)
       true
-    } else {
-      selectorSet match {
+    else
+      selectorSet match
         case Some(set) => set.hasWildcard
         case None => false
-      }
-    }
-  }
 
-  def wildcardElement: Option[PsiElement] = {
-    if (findChildByType[PsiElement](ScalaTokenTypes.tUNDER) != null) {
+  def wildcardElement: Option[PsiElement] =
+    if (findChildByType[PsiElement](ScalaTokenTypes.tUNDER) != null)
       Some(findChildByType[PsiElement](ScalaTokenTypes.tUNDER))
-    } else {
-      selectorSet match {
+    else
+      selectorSet match
         case Some(set) =>
           set.wildcardElement
         case None => None
-      }
-    }
-  }
 
-  def qualifier: ScStableCodeReferenceElement = {
+  def qualifier: ScStableCodeReferenceElement =
     if (reference.isEmpty) throw new IncorrectOperationException()
     else if (!singleWildcard && selectorSet.isEmpty)
       reference.flatMap(_.qualifier).orNull
     else reference.get
-  }
 
-  def deleteExpr() {
+  def deleteExpr()
     val parent = getParent.asInstanceOf[ScImportStmt]
-    if (parent.importExprs.length == 1) {
-      parent.getParent match {
+    if (parent.importExprs.length == 1)
+      parent.getParent match
         case x: ScImportsHolder => x.deleteImportStmt(parent)
         case _ =>
-      }
-    } else {
+    else
       val node = parent.getNode
       val remove = node.removeChild _
       val next = getNextSibling
-      if (next != null) {
-        def removeWhitespaceAfterComma(comma: ASTNode) {
+      if (next != null)
+        def removeWhitespaceAfterComma(comma: ASTNode)
           if (comma.getTreeNext != null &&
               !comma.getTreeNext.getText.contains("\n") &&
-              comma.getTreeNext.getText.trim.isEmpty) {
+              comma.getTreeNext.getText.trim.isEmpty)
             remove(comma.getTreeNext)
-          }
-        }
-        if (next.getText == ",") {
+        if (next.getText == ",")
           val comma = next.getNode
           removeWhitespaceAfterComma(comma)
           remove(comma)
-        } else {
+        else
           if (next.getNextSibling != null &&
-              next.getNextSibling.getText == ",") {
+              next.getNextSibling.getText == ",")
             val comma = next.getNextSibling
             removeWhitespaceAfterComma(comma.getNode)
             remove(next.getNode)
             remove(comma.getNode)
-          } else {
+          else
             val prev = getPrevSibling
-            if (prev != null) {
-              if (prev.getText == ",") {
+            if (prev != null)
+              if (prev.getText == ",")
                 remove(prev.getNode)
-              } else {
+              else
                 if (prev.getPrevSibling != null &&
-                    prev.getPrevSibling.getText == ",") {
+                    prev.getPrevSibling.getText == ",")
                   remove(prev.getPrevSibling.getNode)
-                }
-              }
-            }
-          }
-        }
-      } else {
+      else
         val prev = getPrevSibling
-        if (prev != null) {
-          if (prev.getText == ",") {
+        if (prev != null)
+          if (prev.getText == ",")
             remove(prev.getNode)
-          } else {
+          else
             if (prev.getPrevSibling != null &&
-                prev.getPrevSibling.getText == ",") {
+                prev.getPrevSibling.getText == ",")
               val prevSibling = prev.getPrevSibling
               remove(prev.getNode)
               remove(prevSibling.getNode)
-            }
-          }
-        }
-      }
       remove(getNode)
-    }
-  }
 
-  def selectorSet: Option[ScImportSelectors] = {
+  def selectorSet: Option[ScImportSelectors] =
     val psi: ScImportSelectors = getStubOrPsiChild(
         ScalaElementTypes.IMPORT_SELECTORS)
     Option(psi)
-  }
 
-  def reference: Option[ScStableCodeReferenceElement] = {
+  def reference: Option[ScStableCodeReferenceElement] =
     val stub = getStub
     if (stub != null) stub.asInstanceOf[ScImportExprStub].reference
     else
       getFirstChild.asOptionOf[ScStableCodeReferenceElement] /*findChild(classOf[ScStableCodeReferenceElement])*/
-  }
-}

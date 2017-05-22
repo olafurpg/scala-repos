@@ -31,7 +31,7 @@ import org.apache.kafka.common.internals.TopicConstants
 /**
   * A helper class for writing integration tests that involve producers, consumers, and servers
   */
-trait IntegrationTestHarness extends KafkaServerTestHarness {
+trait IntegrationTestHarness extends KafkaServerTestHarness
 
   val producerCount: Int
   val consumerCount: Int
@@ -43,7 +43,7 @@ trait IntegrationTestHarness extends KafkaServerTestHarness {
   val consumers = Buffer[KafkaConsumer[Array[Byte], Array[Byte]]]()
   val producers = Buffer[KafkaProducer[Array[Byte], Array[Byte]]]()
 
-  override def generateConfigs() = {
+  override def generateConfigs() =
     val cfgs = TestUtils.createBrokerConfigs(
         serverCount,
         zkConnect,
@@ -51,10 +51,9 @@ trait IntegrationTestHarness extends KafkaServerTestHarness {
         trustStoreFile = trustStoreFile)
     cfgs.foreach(_.putAll(serverConfig))
     cfgs.map(KafkaConfig.fromProps)
-  }
 
   @Before
-  override def setUp() {
+  override def setUp()
     val producerSecurityProps =
       TestUtils.producerSecurityConfigs(securityProtocol, trustStoreFile)
     val consumerSecurityProps =
@@ -79,13 +78,12 @@ trait IntegrationTestHarness extends KafkaServerTestHarness {
                                   securityProtocol = this.securityProtocol,
                                   trustStoreFile = this.trustStoreFile,
                                   props = Some(producerConfig))
-    for (i <- 0 until consumerCount) {
+    for (i <- 0 until consumerCount)
       consumers +=
         TestUtils.createNewConsumer(brokerList,
                                     securityProtocol = this.securityProtocol,
                                     trustStoreFile = this.trustStoreFile,
                                     props = Some(consumerConfig))
-    }
 
     // create the consumer offset topic
     TestUtils.createTopic(
@@ -97,12 +95,9 @@ trait IntegrationTestHarness extends KafkaServerTestHarness {
           .toInt,
         servers,
         servers(0).consumerCoordinator.offsetsTopicConfigs)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     producers.foreach(_.close())
     consumers.foreach(_.close())
     super.tearDown()
-  }
-}

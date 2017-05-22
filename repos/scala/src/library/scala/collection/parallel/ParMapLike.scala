@@ -33,7 +33,7 @@ trait ParMapLike[K,
                  +Repr <: ParMapLike[K, V, Repr, Sequential] with ParMap[K, V],
                  +Sequential <: Map[K, V] with MapLike[K, V, Sequential]]
     extends GenMapLike[K, V, Repr]
-    with ParIterableLike[(K, V), Repr, Sequential] {
+    with ParIterableLike[(K, V), Repr, Sequential]
   self =>
 
   def default(key: K): V =
@@ -41,15 +41,13 @@ trait ParMapLike[K,
 
   def empty: Repr
 
-  def apply(key: K) = get(key) match {
+  def apply(key: K) = get(key) match
     case Some(v) => v
     case None => default(key)
-  }
 
-  def getOrElse[U >: V](key: K, default: => U): U = get(key) match {
+  def getOrElse[U >: V](key: K, default: => U): U = get(key) match
     case Some(v) => v
     case None => default
-  }
 
   def contains(key: K): Boolean = get(key).isDefined
 
@@ -57,39 +55,35 @@ trait ParMapLike[K,
 
   private[this] def keysIterator(
       s: IterableSplitter[(K, V)] @uncheckedVariance): IterableSplitter[K] =
-    new IterableSplitter[K] { i =>
+    new IterableSplitter[K]  i =>
       val iter = s
       def hasNext = iter.hasNext
       def next() = iter.next()._1
-      def split = {
+      def split =
         val ss = iter.split.map(keysIterator(_))
         ss.foreach { _.signalDelegate = i.signalDelegate }
         ss
-      }
       def remaining = iter.remaining
       def dup = keysIterator(iter.dup)
-    }
 
   def keysIterator: IterableSplitter[K] = keysIterator(splitter)
 
   private[this] def valuesIterator(
       s: IterableSplitter[(K, V)] @uncheckedVariance): IterableSplitter[V] =
-    new IterableSplitter[V] { i =>
+    new IterableSplitter[V]  i =>
       val iter = s
       def hasNext = iter.hasNext
       def next() = iter.next()._2
-      def split = {
+      def split =
         val ss = iter.split.map(valuesIterator(_))
         ss.foreach { _.signalDelegate = i.signalDelegate }
         ss
-      }
       def remaining = iter.remaining
       def dup = valuesIterator(iter.dup)
-    }
 
   def valuesIterator: IterableSplitter[V] = valuesIterator(splitter)
 
-  protected class DefaultKeySet extends ParSet[K] {
+  protected class DefaultKeySet extends ParSet[K]
     def contains(key: K) = self.contains(key)
     def splitter = keysIterator(self.splitter)
     def +(elem: K): ParSet[K] =
@@ -99,14 +93,12 @@ trait ParMapLike[K,
     override def size = self.size
     override def foreach[U](f: K => U) = for ((k, v) <- self) f(k)
     override def seq = self.seq.keySet
-  }
 
-  protected class DefaultValuesIterable extends ParIterable[V] {
+  protected class DefaultValuesIterable extends ParIterable[V]
     def splitter = valuesIterator(self.splitter)
     override def size = self.size
     override def foreach[U](f: V => U) = for ((k, v) <- self) f(v)
     def seq = self.seq.values
-  }
 
   def keySet: ParSet[K] = new DefaultKeySet
 
@@ -114,7 +106,7 @@ trait ParMapLike[K,
 
   def values: ParIterable[V] = new DefaultValuesIterable
 
-  def filterKeys(p: K => Boolean): ParMap[K, V] = new ParMap[K, V] {
+  def filterKeys(p: K => Boolean): ParMap[K, V] = new ParMap[K, V]
     lazy val filtered = self.filter(kv => p(kv._1))
     override def foreach[U](f: ((K, V)) => U): Unit =
       for (kv <- self) if (p(kv._1)) f(kv)
@@ -125,9 +117,8 @@ trait ParMapLike[K,
     def size = filtered.size
     def +[U >: V](kv: (K, U)): ParMap[K, U] = ParMap[K, U]() ++ this + kv
     def -(key: K): ParMap[K, V] = ParMap[K, V]() ++ this - key
-  }
 
-  def mapValues[S](f: V => S): ParMap[K, S] = new ParMap[K, S] {
+  def mapValues[S](f: V => S): ParMap[K, S] = new ParMap[K, S]
     override def foreach[U](g: ((K, S)) => U): Unit =
       for ((k, v) <- self) g((k, f(v)))
     def splitter = self.splitter.map(kv => (kv._1, f(kv._2)))
@@ -137,7 +128,5 @@ trait ParMapLike[K,
     def seq = self.seq.mapValues(f)
     def +[U >: S](kv: (K, U)): ParMap[K, U] = ParMap[K, U]() ++ this + kv
     def -(key: K): ParMap[K, S] = ParMap[K, S]() ++ this - key
-  }
 
   // note - should not override toMap (could be mutable)
-}

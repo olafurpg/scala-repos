@@ -1,9 +1,9 @@
 package gitbucket.core.model
 
-protected[model] trait TemplateComponent { self: Profile =>
+protected[model] trait TemplateComponent  self: Profile =>
   import profile.simple._
 
-  trait BasicTemplate { self: Table[_] =>
+  trait BasicTemplate  self: Table[_] =>
     val userName = column[String]("USER_NAME")
     val repositoryName = column[String]("REPOSITORY_NAME")
 
@@ -13,9 +13,8 @@ protected[model] trait TemplateComponent { self: Profile =>
     def byRepository(
         userName: Column[String], repositoryName: Column[String]) =
       (this.userName === userName) && (this.repositoryName === repositoryName)
-  }
 
-  trait IssueTemplate extends BasicTemplate { self: Table[_] =>
+  trait IssueTemplate extends BasicTemplate  self: Table[_] =>
     val issueId = column[Int]("ISSUE_ID")
 
     def byIssue(owner: String, repository: String, issueId: Int) =
@@ -25,9 +24,8 @@ protected[model] trait TemplateComponent { self: Profile =>
                 repositoryName: Column[String],
                 issueId: Column[Int]) =
       byRepository(userName, repositoryName) && (this.issueId === issueId)
-  }
 
-  trait LabelTemplate extends BasicTemplate { self: Table[_] =>
+  trait LabelTemplate extends BasicTemplate  self: Table[_] =>
     val labelId = column[Int]("LABEL_ID")
     val labelName = column[String]("LABEL_NAME")
 
@@ -41,9 +39,8 @@ protected[model] trait TemplateComponent { self: Profile =>
 
     def byLabel(owner: String, repository: String, labelName: String) =
       byRepository(owner, repository) && (this.labelName === labelName.bind)
-  }
 
-  trait MilestoneTemplate extends BasicTemplate { self: Table[_] =>
+  trait MilestoneTemplate extends BasicTemplate  self: Table[_] =>
     val milestoneId = column[Int]("MILESTONE_ID")
 
     def byMilestone(owner: String, repository: String, milestoneId: Int) =
@@ -55,9 +52,8 @@ protected[model] trait TemplateComponent { self: Profile =>
                     milestoneId: Column[Int]) =
       byRepository(userName, repositoryName) &&
       (this.milestoneId === milestoneId)
-  }
 
-  trait CommitTemplate extends BasicTemplate { self: Table[_] =>
+  trait CommitTemplate extends BasicTemplate  self: Table[_] =>
     val commitId = column[String]("COMMIT_ID")
 
     def byCommit(owner: String, repository: String, commitId: String) =
@@ -67,9 +63,8 @@ protected[model] trait TemplateComponent { self: Profile =>
                  repository: Column[String],
                  commitId: Column[String]) =
       byRepository(userName, repositoryName) && (this.commitId === commitId)
-  }
 
-  trait BranchTemplate extends BasicTemplate { self: Table[_] =>
+  trait BranchTemplate extends BasicTemplate  self: Table[_] =>
     val branch = column[String]("BRANCH")
     def byBranch(owner: String, repository: String, branchName: String) =
       byRepository(owner, repository) && (branch === branchName.bind)
@@ -77,5 +72,3 @@ protected[model] trait TemplateComponent { self: Profile =>
                  repository: Column[String],
                  branchName: Column[String]) =
       byRepository(owner, repository) && (this.branch === branchName)
-  }
-}

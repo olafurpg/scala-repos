@@ -14,13 +14,11 @@ import org.osgi.framework.BundleContext
 
 @RunWith(classOf[PaxExam])
 @ExamReactorStrategy(Array(classOf[PerMethod]))
-class BasicTest extends ScalaOsgiHelper {
+class BasicTest extends ScalaOsgiHelper
   @Configuration
-  def config(): Array[exam.Option] = {
+  def config(): Array[exam.Option] =
     // TODO - Find scala bundles.
     standardOptions
-  }
 
   @Test
   def everythingLoads(): Unit = ()
-}

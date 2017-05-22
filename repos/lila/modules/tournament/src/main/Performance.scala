@@ -1,7 +1,7 @@
 package lila.tournament
 
 // based on https://en.wikipedia.org/wiki/Elo_rating_system#Performance_rating
-private final class Performance {
+private final class Performance
 
   private val DIFF = 500
 
@@ -9,23 +9,19 @@ private final class Performance {
       tour: Tournament, player: Player, pairings: Pairings): Fu[Option[Int]] =
     if (!tour.isFinished || pairings.size < 3 || player.performance.isDefined)
       fuccess(player.performance)
-    else {
+    else
       val opponentIds = pairings.flatMap(_ opponentOf player.userId).distinct
-      PlayerRepo.byTourAndUserIds(tour.id, opponentIds) flatMap { opponents =>
-        val ratingMap = opponents.map { o =>
+      PlayerRepo.byTourAndUserIds(tour.id, opponentIds) flatMap  opponents =>
+        val ratingMap = opponents.map  o =>
           o.userId -> o.finalRating
-        }.toMap
+        .toMap
         val performance =
-          pairings.foldLeft(0) {
+          pairings.foldLeft(0)
             case (acc, pairing) =>
               acc +
-              ~(pairing.opponentOf(player.userId) flatMap ratingMap.get) + {
+              ~(pairing.opponentOf(player.userId) flatMap ratingMap.get) +
                 if (pairing wonBy player.userId) DIFF
                 else if (pairing lostBy player.userId) -DIFF
                 else 0
-              }
-          } / pairings.size
+          / pairings.size
         PlayerRepo.setPerformance(player, performance) inject performance.some
-      }
-    }
-}

@@ -15,13 +15,12 @@ final case class RoutingSettingsImpl(verboseErrorMessages: Boolean,
                                      rangeCoalescingThreshold: Long,
                                      decodeMaxBytesPerChunk: Int,
                                      fileIODispatcher: String)
-    extends akka.http.scaladsl.settings.RoutingSettings {
+    extends akka.http.scaladsl.settings.RoutingSettings
 
   override def productPrefix = "RoutingSettings"
-}
 
 object RoutingSettingsImpl
-    extends SettingsCompanion[RoutingSettingsImpl]("akka.http.routing") {
+    extends SettingsCompanion[RoutingSettingsImpl]("akka.http.routing")
   def fromSubConfig(root: Config, c: Config) =
     new RoutingSettingsImpl(c getBoolean "verbose-error-messages",
                             c getBoolean "file-get-conditional",
@@ -30,4 +29,3 @@ object RoutingSettingsImpl
                             c getBytes "range-coalescing-threshold",
                             c getIntBytes "decode-max-bytes-per-chunk",
                             c getString "file-io-dispatcher")
-}

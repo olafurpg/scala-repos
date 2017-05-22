@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes._
 import org.jetbrains.plugins.scala.util.MemberElementTypesExtension
 
-object TokenSets {
+object TokenSets
   val WHITESPACE_OR_COMMENT_SET = TokenSet.create(tWHITE_SPACE_IN_LINE,
                                                   tLINE_COMMENT,
                                                   tBLOCK_COMMENT,
@@ -178,4 +178,3 @@ object TokenSets {
       TYPE_PROJECTION,
       TYPE_VARIABLE
   )
-}

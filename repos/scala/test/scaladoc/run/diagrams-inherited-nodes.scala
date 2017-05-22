@@ -2,7 +2,7 @@ import scala.tools.nsc.doc.model._
 import scala.tools.nsc.doc.model.diagram._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code = """
         package scala.test.scaladoc.diagrams.inherited.nodes {
@@ -45,7 +45,7 @@ object Test extends ScaladocModelTest {
   // diagrams must be started. In case there's an error with dot, it should not report anything
   def scaladocSettings = "-diagrams"
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -59,7 +59,7 @@ object Test extends ScaladocModelTest {
       ._package("inherited")
       ._package("nodes")
 
-    def checkDiagram(t: String, nodes: Int, edges: Int) = {
+    def checkDiagram(t: String, nodes: Int, edges: Int) =
       // trait T1
       val T = base._trait(t)
       val TDiag = T.contentDiagram.get
@@ -68,11 +68,8 @@ object Test extends ScaladocModelTest {
       assert(TDiag.edges.map(_._2.length).sum == edges,
              t + ": " + TDiag.edges.mkString("List(\n", ",\n", "\n)") +
              ".map(_._2.length).sum == " + edges)
-    }
 
     checkDiagram("T1", 3, 2)
     checkDiagram("T2", 6, 7)
     checkDiagram("T3", 3, 2)
     checkDiagram("T4", 12, 17)
-  }
-}

@@ -7,10 +7,8 @@ sealed trait C
 case class CTA(id: Int, da: TA) extends C
 case class CTB(id: Int, da: TB) extends C
 
-class Test {
-  def test(c: C): Unit = c match {
+class Test
+  def test(c: C): Unit = c match
     case CTA(_, A) =>
     case CTA(_, B) =>
     case CTB(_, B) =>
-  }
-}

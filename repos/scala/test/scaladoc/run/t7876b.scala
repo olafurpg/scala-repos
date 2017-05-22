@@ -2,7 +2,7 @@ import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
 // Don't dealias just to print a Function or Tuple type.
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code = """
   class Test {
@@ -15,11 +15,8 @@ object Test extends ScaladocModelTest {
 
   def scaladocSettings = ""
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     import access._
-    List("foo", "bar").foreach { name =>
+    List("foo", "bar").foreach  name =>
       println(
           "foo: " + rootPackage._class("Test")._method(name).resultType.name)
-    }
-  }
-}

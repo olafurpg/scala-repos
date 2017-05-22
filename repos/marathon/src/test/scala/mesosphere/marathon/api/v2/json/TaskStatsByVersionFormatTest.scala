@@ -7,7 +7,7 @@ import org.scalatest.{Matchers, GivenWhenThen}
 import play.api.libs.json.Json
 
 class TaskStatsByVersionFormatTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec with GivenWhenThen with Matchers
   import Formats._
 
   private[this] val emptyStats = TaskStatsByVersion(
@@ -32,14 +32,13 @@ class TaskStatsByVersionFormatTest
         )
   )
 
-  test("empty stats get rendered correctly") {
+  test("empty stats get rendered correctly")
     When("serializing to JSON")
     val json = Json.toJson(emptyStats)
     Then("we get an empty object")
     JsonTestHelper.assertThatJsonOf(json).correspondsToJsonOf(Json.obj())
-  }
 
-  test("fullTaskStats (not by version) get rendered correctly") {
+  test("fullTaskStats (not by version) get rendered correctly")
     When("serializing to JSON")
     val json = Json.toJson(fullTaskStats)
     Then("we get the correct json")
@@ -60,10 +59,9 @@ class TaskStatsByVersionFormatTest
                   )
               )
           ))
-  }
 
   test(
-      "fullTaskStats (not by version) without lifeTimes get rendered correctly") {
+      "fullTaskStats (not by version) without lifeTimes get rendered correctly")
     When("serializing to JSON")
     val json = Json.toJson(fullTaskStats.copy(maybeLifeTime = None))
     Then("we get the correct json")
@@ -80,9 +78,8 @@ class TaskStatsByVersionFormatTest
                   )
               )
           ))
-  }
 
-  test("full task stats by version get rendered correctly") {
+  test("full task stats by version get rendered correctly")
     // we just vary the task running count to see that the different instances get rendered to the correct output
     val fullStats = TaskStatsByVersion(
         maybeStartedAfterLastScaling = Some(fullTaskStats.copy(
@@ -98,7 +95,7 @@ class TaskStatsByVersionFormatTest
     When("serializing to JSON")
     val json = Json.toJson(fullStats)
     Then("the stats get rendered into the correct sub fields")
-    withClue(Json.prettyPrint(json)) {
+    withClue(Json.prettyPrint(json))
       (json \ "startedAfterLastScaling" \ "stats" \ "counts" \ "running")
         .as[Int] should be(100)
       (json \ "withLatestConfig" \ "stats" \ "counts" \ "running").as[Int] should be(
@@ -107,6 +104,3 @@ class TaskStatsByVersionFormatTest
           300)
       (json \ "totalSummary" \ "stats" \ "counts" \ "running").as[Int] should be(
           500)
-    }
-  }
-}

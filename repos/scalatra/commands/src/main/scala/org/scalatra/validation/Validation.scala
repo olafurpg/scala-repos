@@ -5,7 +5,7 @@ import org.scalatra.commands.FieldValidation
 
 import scala.util.matching.Regex
 
-object Validation {
+object Validation
 
   def nonEmptyString(
       fieldName: String,
@@ -123,4 +123,3 @@ object Validation {
                 messageFormat: String = "%%s must be one of %s.")
     : FieldValidation[String] =
     oneOf(fieldName, value, messageFormat, enum.values.map(_.toString).toSeq)
-}

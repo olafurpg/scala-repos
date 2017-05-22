@@ -15,13 +15,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScExpression, _}
   * Date: 07.03.2008
   */
 class ScGeneratorImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScGenerator {
-  override def accept(visitor: PsiElementVisitor): Unit = {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScGenerator
+  override def accept(visitor: PsiElementVisitor): Unit =
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   override def toString: String = "Generator"
 
@@ -30,4 +28,3 @@ class ScGeneratorImpl(node: ASTNode)
   def guard = findChildByClass(classOf[ScGuard])
 
   def rvalue = findChildByClass(classOf[ScExpression])
-}

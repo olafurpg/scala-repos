@@ -6,8 +6,7 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.singleTest.FunSuiteS
   * @author Roman.Shein
   * @since 11.02.2015.
   */
-class Scalatest2_10_1_9_2_SingleTestTestDynamic extends {
+class Scalatest2_10_1_9_2_SingleTestTestDynamic extends
   override val funSuiteTestPath = List("[root]", "should run single test")
-} with Scalatest2_10_1_9_2_Base with FunSuiteSingleTestTest {
+with Scalatest2_10_1_9_2_Base with FunSuiteSingleTestTest
   override val useDynamicClassPath = true
-}

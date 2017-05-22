@@ -31,11 +31,10 @@ import org.apache.spark.util.Utils
   *
   * @param pageSize the number of rows in a page
   */
-private[ui] abstract class PagedDataSource[T](val pageSize: Int) {
+private[ui] abstract class PagedDataSource[T](val pageSize: Int)
 
-  if (pageSize <= 0) {
+  if (pageSize <= 0)
     throw new IllegalArgumentException("Page size must be positive")
-  }
 
   /**
     * Return the size of all data.
@@ -50,17 +49,14 @@ private[ui] abstract class PagedDataSource[T](val pageSize: Int) {
   /**
     * Slice the data for this page
     */
-  def pageData(page: Int): PageData[T] = {
+  def pageData(page: Int): PageData[T] =
     val totalPages = (dataSize + pageSize - 1) / pageSize
-    if (page <= 0 || page > totalPages) {
+    if (page <= 0 || page > totalPages)
       throw new IndexOutOfBoundsException(
           s"Page $page is out of range. Please select a page number between 1 and $totalPages.")
-    }
     val from = (page - 1) * pageSize
     val to = dataSize.min(page * pageSize)
     PageData(totalPages, sliceData(from, to))
-  }
-}
 
 /**
   * The data returned by `PagedDataSource.pageData`, including the page number, the number of total
@@ -71,7 +67,7 @@ private[ui] case class PageData[T](totalPage: Int, data: Seq[T])
 /**
   * A paged table that will generate a HTML table for a specified page and also the page navigation.
   */
-private[ui] trait PagedTable[T] {
+private[ui] trait PagedTable[T]
 
   def tableId: String
 
@@ -89,9 +85,9 @@ private[ui] trait PagedTable[T] {
 
   def row(t: T): Seq[Node]
 
-  def table(page: Int): Seq[Node] = {
+  def table(page: Int): Seq[Node] =
     val _dataSource = dataSource
-    try {
+    try
       val PageData(totalPages, data) = _dataSource.pageData(page)
       <div>
         {pageNavigation(page, _dataSource.pageSize, totalPages)}
@@ -102,7 +98,7 @@ private[ui] trait PagedTable[T] {
           </tbody>
         </table>
       </div>
-    } catch {
+    catch
       case e: IndexOutOfBoundsException =>
         val PageData(totalPages, _) = _dataSource.pageData(1)
         <div>
@@ -114,8 +110,6 @@ private[ui] trait PagedTable[T] {
             </pre>
           </div>
         </div>
-    }
-  }
 
   /**
     * Return a page navigation.
@@ -151,10 +145,10 @@ private[ui] trait PagedTable[T] {
     * }}}
     */
   private[ui] def pageNavigation(
-      page: Int, pageSize: Int, totalPages: Int): Seq[Node] = {
-    if (totalPages == 1) {
+      page: Int, pageSize: Int, totalPages: Int): Seq[Node] =
+    if (totalPages == 1)
       Nil
-    } else {
+    else
       // A group includes all page numbers will be shown in the page navigation.
       // The size of group is 10 means there are 10 page numbers will be shown.
       // The first group is 1 to 10, the second is 2 to 20, and so on
@@ -164,17 +158,15 @@ private[ui] trait PagedTable[T] {
       val currentGroup = (page - 1) / groupSize
       val startPage = currentGroup * groupSize + 1
       val endPage = totalPages.min(startPage + groupSize - 1)
-      val pageTags = (startPage to endPage).map { p =>
-        if (p == page) {
+      val pageTags = (startPage to endPage).map  p =>
+        if (p == page)
           // The current page should be disabled so that it cannot be clicked.
           <li class="disabled"><a href="#">{p}</a></li>
-        } else {
+        else
           <li><a href={Unparsed(pageLink(p))}>{p}</a></li>
-        }
-      }
 
-      val hiddenFormFields = {
-        if (goButtonFormPath.contains('?')) {
+      val hiddenFormFields =
+        if (goButtonFormPath.contains('?'))
           val querystring = goButtonFormPath.split("\\?", 2)(1)
           Splitter
             .on('&')
@@ -186,14 +178,11 @@ private[ui] trait PagedTable[T] {
             .filterKeys(_ != prevPageSizeFormField)
             .filterKeys(_ != pageNumberFormField)
             .mapValues(URLDecoder.decode(_, "UTF-8"))
-            .map {
+            .map
               case (k, v) =>
                 <input type="hidden" name={k} value={v} />
-            }
-        } else {
+        else
           Seq.empty
-        }
-      }
 
       <div>
         <div>
@@ -226,7 +215,7 @@ private[ui] trait PagedTable[T] {
         <div class="pagination" style="margin-bottom: 0px;">
           <span style="float: left; padding-top: 4px; padding-right: 4px;">Page: </span>
           <ul>
-            {if (currentGroup > firstGroup) {
+            if (currentGroup > firstGroup)
             <li>
               <a href={Unparsed(pageLink(startPage - groupSize))} aria-label="Previous Group">
                 <span aria-hidden="true">
@@ -234,8 +223,8 @@ private[ui] trait PagedTable[T] {
                 </span>
               </a>
             </li>
-            }}
-            {if (page > 1) {
+            
+            if (page > 1)
             <li>
             <a href={Unparsed(pageLink(page - 1))} aria-label="Previous">
               <span aria-hidden="true">
@@ -243,16 +232,16 @@ private[ui] trait PagedTable[T] {
               </span>
             </a>
             </li>
-            }}
+            
             {pageTags}
-            {if (page < totalPages) {
+            if (page < totalPages)
             <li>
               <a href={Unparsed(pageLink(page + 1))} aria-label="Next">
                 <span aria-hidden="true">&gt;</span>
               </a>
             </li>
-            }}
-            {if (currentGroup < lastGroup) {
+            
+            if (currentGroup < lastGroup)
             <li>
               <a href={Unparsed(pageLink(startPage + groupSize))} aria-label="Next Group">
                 <span aria-hidden="true">
@@ -260,12 +249,10 @@ private[ui] trait PagedTable[T] {
                 </span>
               </a>
             </li>
-          }}
+          
           </ul>
         </div>
       </div>
-    }
-  }
 
   /**
     * Return a link to jump to a page.
@@ -276,4 +263,3 @@ private[ui] trait PagedTable[T] {
     * Returns the submission path for the "go to page #" form.
     */
   def goButtonFormPath: String
-}

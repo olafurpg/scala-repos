@@ -1,5 +1,5 @@
-object Test {
-  def f(args: Array[String]) = args match {
+object Test
+  def f(args: Array[String]) = args match
     case Array("-p", prefix, from, to) =>
       prefix + from + to
 
@@ -8,9 +8,6 @@ object Test {
 
     case _ =>
       "default"
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     assert(f(Array("1", "2")) == "12")
-  }
-}

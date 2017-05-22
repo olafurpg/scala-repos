@@ -6,11 +6,11 @@ import slick.ast._
 import slick.util.ConstArray
 
 /** Optimize scalar expressions */
-class OptimizeScalar extends Phase {
+class OptimizeScalar extends Phase
   val name = "optimizeScalar"
 
   def apply(state: CompilerState) =
-    state.map(_.tree.replace({
+    state.map(_.tree.replace(
       case n @ Library.==(IfThenElse(ConstArray(p, Const(a), Const(b))),
                           LiteralNode(null)) =>
         logger.debug("Optimizing: (if(p) a else b).isNull", n)
@@ -52,10 +52,10 @@ class OptimizeScalar extends Phase {
       case n: Comprehension if n.where == Some(LiteralNode(true)) =>
         logger.debug("Optimizing: WHERE TRUE", n)
         n.copy(where = None) :@ n.nodeType
-    }, keepType = true, bottomUp = true))
+    , keepType = true, bottomUp = true))
 
-  object Const {
-    def unapply(n: Node): Option[Option[Any]] = n match {
+  object Const
+    def unapply(n: Node): Option[Option[Any]] = n match
       case LiteralNode(null) => Some(None)
       case LiteralNode(v) =>
         Some(
@@ -64,11 +64,7 @@ class OptimizeScalar extends Phase {
       case Apply(Library.SilentCast, ConstArray(ch)) => unapply(ch)
       case OptionApply(ch) => unapply(ch).map(_.map(Option.apply _))
       case _ => None
-    }
-  }
 
-  def cast(tpe: Type, n: Node): Node = {
+  def cast(tpe: Type, n: Node): Node =
     val n2 = n.infer()
     if (n2.nodeType == tpe) n2 else Library.SilentCast.typed(tpe, n2)
-  }
-}

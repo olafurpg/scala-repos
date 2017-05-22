@@ -7,9 +7,9 @@ import akka.cluster.Cluster
 import akka.cluster.UniqueAddress
 import akka.util.HashCode
 
-object LWWRegister {
+object LWWRegister
 
-  trait Clock[A] {
+  trait Clock[A]
 
     /**
       * @param currentTimestamp the current `timestamp` value of the `LWWRegister`
@@ -17,12 +17,10 @@ object LWWRegister {
       * @return next timestamp
       */
     def apply(currentTimestamp: Long, value: A): Long
-  }
 
-  private val _defaultClock: Clock[Any] = new Clock[Any] {
+  private val _defaultClock: Clock[Any] = new Clock[Any]
     override def apply(currentTimestamp: Long, value: Any): Long =
       math.max(System.currentTimeMillis(), currentTimestamp + 1)
-  }
 
   /**
     * The default [[LWWRegister.Clock]] is using max value of `System.currentTimeMillis()`
@@ -30,10 +28,9 @@ object LWWRegister {
     */
   def defaultClock[A]: Clock[A] = _defaultClock.asInstanceOf[Clock[A]]
 
-  private val _reverseClock = new Clock[Any] {
+  private val _reverseClock = new Clock[Any]
     override def apply(currentTimestamp: Long, value: Any): Long =
       math.min(-System.currentTimeMillis(), currentTimestamp - 1)
-  }
 
   /**
     * This [[LWWRegister.Clock]] can be used for first-write-wins semantics. It is using min value of
@@ -70,7 +67,6 @@ object LWWRegister {
     * Extract the [[LWWRegister#value]].
     */
   def unapply[A](c: LWWRegister[A]): Option[A] = Some(c.value)
-}
 
 /**
   * Implements a 'Last Writer Wins Register' CRDT, also called a 'LWW-Register'.
@@ -97,7 +93,7 @@ object LWWRegister {
 @SerialVersionUID(1L)
 final class LWWRegister[A] private[akka](
     private[akka] val node: UniqueAddress, val value: A, val timestamp: Long)
-    extends ReplicatedData with ReplicatedDataSerialization {
+    extends ReplicatedData with ReplicatedDataSerialization
   import LWWRegister.{Clock, defaultClock}
 
   type T = LWWRegister[A]
@@ -158,25 +154,21 @@ final class LWWRegister[A] private[akka](
 
   override def toString: String = s"LWWRegister($value)"
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case other: LWWRegister[_] ⇒
       timestamp == other.timestamp && value == other.value &&
       node == other.node
     case _ ⇒ false
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     var result = HashCode.SEED
     result = HashCode.hash(result, timestamp)
     result = HashCode.hash(result, node)
     result = HashCode.hash(result, value)
     result
-  }
-}
 
-object LWWRegisterKey {
+object LWWRegisterKey
   def create[A](id: String): Key[LWWRegister[A]] = LWWRegisterKey(id)
-}
 
 @SerialVersionUID(1L)
 final case class LWWRegisterKey[A](_id: String)

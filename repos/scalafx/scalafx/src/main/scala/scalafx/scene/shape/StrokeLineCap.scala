@@ -33,7 +33,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/StrokeLineCap.html javafx.scene.shape.StrokeLineCap]] */
 object StrokeLineCap
-    extends SFXEnumDelegateCompanion[jfxss.StrokeLineCap, StrokeLineCap] {
+    extends SFXEnumDelegateCompanion[jfxss.StrokeLineCap, StrokeLineCap]
 
   val Square = new StrokeLineCap(jfxss.StrokeLineCap.SQUARE)
   @deprecated(
@@ -52,7 +52,6 @@ object StrokeLineCap
 
   protected override def unsortedValues: Array[StrokeLineCap] =
     Array(Square, Butt, Round)
-}
 
 sealed case class StrokeLineCap(override val delegate: jfxss.StrokeLineCap)
     extends SFXEnumDelegate[jfxss.StrokeLineCap]

@@ -18,7 +18,7 @@ package scala.beans
 abstract class ScalaBeanInfo(clazz: java.lang.Class[_],
                              props: Array[String],
                              methods: Array[String])
-    extends java.beans.SimpleBeanInfo {
+    extends java.beans.SimpleBeanInfo
 
   import java.beans._
 
@@ -34,12 +34,9 @@ abstract class ScalaBeanInfo(clazz: java.lang.Class[_],
 
   // override def getAdditionalBeanInfo() = Array(Introspector getBeanInfo clazz.getSuperclass)
 
-  private def init() {
+  private def init()
     var i = 0
-    while (i < props.length) {
+    while (i < props.length)
       pd(i / 3) = new PropertyDescriptor(
           props(i), clazz, props(i + 1), props(i + 2))
       i = i + 3
-    }
-  }
-}

@@ -8,7 +8,7 @@ sealed abstract class QueueOfferResult
 /**
   * Contains types that is used as return types for async callbacks to streams
   */
-object QueueOfferResult {
+object QueueOfferResult
 
   /**
     * Type is used to indicate that stream is successfully enqueued an element
@@ -30,4 +30,3 @@ object QueueOfferResult {
     * Type is used to indicate that stream is completed before call
     */
   case object QueueClosed extends QueueOfferResult
-}

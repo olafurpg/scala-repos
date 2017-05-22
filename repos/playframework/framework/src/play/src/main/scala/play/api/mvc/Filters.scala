@@ -9,14 +9,12 @@ import play.api._
 import play.api.libs.streams.Accumulator
 import scala.concurrent.{Promise, Future}
 
-trait EssentialFilter {
+trait EssentialFilter
   def apply(next: EssentialAction): EssentialAction
 
-  def asJava: play.mvc.EssentialFilter = new play.mvc.EssentialFilter {
+  def asJava: play.mvc.EssentialFilter = new play.mvc.EssentialFilter
     override def apply(next: play.mvc.EssentialAction) =
       EssentialFilter.this(next).asJava
-  }
-}
 
 /**
   * Implement this interface if you want to add a Filter to your application
@@ -29,7 +27,7 @@ trait EssentialFilter {
   * }
   * }}}
   */
-trait Filter extends EssentialFilter { self =>
+trait Filter extends EssentialFilter  self =>
 
   implicit def mat: Materializer
 
@@ -45,11 +43,11 @@ trait Filter extends EssentialFilter { self =>
   def apply(f: RequestHeader => Future[Result])(
       rh: RequestHeader): Future[Result]
 
-  def apply(next: EssentialAction): EssentialAction = {
-    new EssentialAction {
+  def apply(next: EssentialAction): EssentialAction =
+    new EssentialAction
       import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
-      def apply(rh: RequestHeader): Accumulator[ByteString, Result] = {
+      def apply(rh: RequestHeader): Accumulator[ByteString, Result] =
 
         // Promised result returned to this filter when it invokes the delegate function (the next filter in the chain)
         val promisedResult = Promise[Result]()
@@ -57,26 +55,26 @@ trait Filter extends EssentialFilter { self =>
         val bodyAccumulator = Promise[Accumulator[ByteString, Result]]()
 
         // Invoke the filter
-        val result = self.apply({ (rh: RequestHeader) =>
+        val result = self.apply( (rh: RequestHeader) =>
           // Invoke the delegate
           bodyAccumulator.success(next(rh))
           promisedResult.future
-        })(rh)
+        )(rh)
 
-        result.onComplete({ resultTry =>
+        result.onComplete( resultTry =>
           // It is possible that the delegate function (the next filter in the chain) was never invoked by this Filter.
           // Therefore, as a fallback, we try to redeem the bodyAccumulator Promise here with an iteratee that consumes
           // the request body.
           bodyAccumulator.tryComplete(
               resultTry.map(simpleResult => Accumulator.done(simpleResult)))
-        })
+        )
 
-        Accumulator.flatten(bodyAccumulator.future.map { it =>
-          it.mapFuture { simpleResult =>
+        Accumulator.flatten(bodyAccumulator.future.map  it =>
+          it.mapFuture  simpleResult =>
             // When the iteratee is done, we can redeem the promised result that was returned to the filter
             promisedResult.success(simpleResult)
             result
-          }.recoverWith {
+          .recoverWith
             case t: Throwable =>
               // If the iteratee finishes with an error, fail the promised result that was returned to the
               // filter with the same error. Note, we MUST use tryFailure here as it's possible that a)
@@ -84,52 +82,37 @@ trait Filter extends EssentialFilter { self =>
               // the result in that method caused an error, so we ended up in this recover block anyway.
               promisedResult.tryFailure(t)
               result
-          }
-        })
-      }
-    }
-  }
-}
+        )
 
-object Filter {
+object Filter
   def apply(filter: (RequestHeader => Future[Result],
             RequestHeader) => Future[Result])(
-      implicit m: Materializer): Filter = new Filter {
+      implicit m: Materializer): Filter = new Filter
     implicit def mat = m
     def apply(f: RequestHeader => Future[Result])(
         rh: RequestHeader): Future[Result] = filter(f, rh)
-  }
-}
 
 /**
   * Compose the action and the Filters to create a new Action
   */
-object Filters {
-  def apply(h: EssentialAction, filters: EssentialFilter*) = h match {
+object Filters
+  def apply(h: EssentialAction, filters: EssentialFilter*) = h match
     case a: EssentialAction => FilterChain(a, filters.toList)
     case h => h
-  }
-}
 
 @deprecated("Use dependency injection", "2.5.0")
-class WithFilters(filters: EssentialFilter*) extends GlobalSettings {
-  override def doFilter(a: EssentialAction): EssentialAction = {
+class WithFilters(filters: EssentialFilter*) extends GlobalSettings
+  override def doFilter(a: EssentialAction): EssentialAction =
     Filters(super.doFilter(a), filters: _*)
-  }
-}
 
 /**
   * Compose the action and the Filters to create a new Action
   */
-object FilterChain {
+object FilterChain
   def apply[A](
       action: EssentialAction,
-      filters: List[EssentialFilter]): EssentialAction = new EssentialAction {
-    def apply(rh: RequestHeader): Accumulator[ByteString, Result] = {
-      val chain = filters.reverse.foldLeft(action) { (a, i) =>
+      filters: List[EssentialFilter]): EssentialAction = new EssentialAction
+    def apply(rh: RequestHeader): Accumulator[ByteString, Result] =
+      val chain = filters.reverse.foldLeft(action)  (a, i) =>
         i(a)
-      }
       chain(rh)
-    }
-  }
-}

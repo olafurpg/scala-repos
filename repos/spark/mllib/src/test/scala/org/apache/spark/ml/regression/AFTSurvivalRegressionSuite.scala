@@ -30,12 +30,12 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 class AFTSurvivalRegressionSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   @transient var datasetUnivariate: DataFrame = _
   @transient var datasetMultivariate: DataFrame = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     datasetUnivariate = sqlContext.createDataFrame(
         sc.parallelize(generateAFTInput(
@@ -49,35 +49,32 @@ class AFTSurvivalRegressionSuite
                                         1.5,
                                         2.5,
                                         2.0)))
-  }
 
   /**
     * Enable the ignored test to export the dataset into CSV format,
     * so we can validate the training accuracy compared with R's survival package.
     */
-  ignore("export test data into CSV format") {
-    datasetUnivariate.rdd.map {
+  ignore("export test data into CSV format")
+    datasetUnivariate.rdd.map
       case Row(features: Vector, label: Double, censor: Double) =>
         features.toArray.mkString(",") + "," + censor + "," + label
-    }.repartition(1)
+    .repartition(1)
       .saveAsTextFile(
           "target/tmp/AFTSurvivalRegressionSuite/datasetUnivariate")
-    datasetMultivariate.rdd.map {
+    datasetMultivariate.rdd.map
       case Row(features: Vector, label: Double, censor: Double) =>
         features.toArray.mkString(",") + "," + censor + "," + label
-    }.repartition(1)
+    .repartition(1)
       .saveAsTextFile(
           "target/tmp/AFTSurvivalRegressionSuite/datasetMultivariate")
-  }
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new AFTSurvivalRegression)
     val model = new AFTSurvivalRegressionModel(
         "aftSurvReg", Vectors.dense(0.0), 0.0, 0.0)
     ParamsSuite.checkParams(model)
-  }
 
-  test("aft survival regression: default params") {
+  test("aft survival regression: default params")
     val aftr = new AFTSurvivalRegression
     assert(aftr.getLabelCol === "label")
     assert(aftr.getFeaturesCol === "features")
@@ -104,7 +101,6 @@ class AFTSurvivalRegressionSuite
     assert(model.getQuantilesCol === "quantiles")
     assert(model.intercept !== 0.0)
     assert(model.hasParent)
-  }
 
   def generateAFTInput(numFeatures: Int,
                        xMean: Array[Double],
@@ -113,7 +109,7 @@ class AFTSurvivalRegressionSuite
                        seed: Int,
                        weibullShape: Double,
                        weibullScale: Double,
-                       exponentialMean: Double): Seq[AFTPoint] = {
+                       exponentialMean: Double): Seq[AFTPoint] =
 
     def censor(x: Double, y: Double): Double = { if (x <= y) 1.0 else 0.0 }
 
@@ -127,24 +123,19 @@ class AFTSurvivalRegressionSuite
     val x = Array.fill[Array[Double]](nPoints)(
         Array.fill[Double](numFeatures)(rnd.nextDouble()))
 
-    x.foreach { v =>
+    x.foreach  v =>
       var i = 0
       val len = v.length
-      while (i < len) {
+      while (i < len)
         v(i) = (v(i) - 0.5) * math.sqrt(12.0 * xVariance(i)) + xMean(i)
         i += 1
-      }
-    }
-    val y = (1 to nPoints).map { i =>
+    val y = (1 to nPoints).map  i =>
       (weibull.nextValue(), exponential.nextValue())
-    }
 
-    y.zip(x).map { p =>
+    y.zip(x).map  p =>
       AFTPoint(Vectors.dense(p._2), p._1._1, censor(p._1._1, p._1._2))
-    }
-  }
 
-  test("aft survival regression with univariate") {
+  test("aft survival regression with univariate")
     val quantileProbabilities = Array(0.1, 0.5, 0.9)
     val trainer = new AFTSurvivalRegression()
       .setQuantileProbabilities(quantileProbabilities)
@@ -209,14 +200,12 @@ class AFTSurvivalRegressionSuite
       .transform(datasetUnivariate)
       .select("features", "prediction", "quantiles")
       .collect()
-      .foreach {
+      .foreach
         case Row(features: Vector, prediction: Double, quantiles: Vector) =>
           assert(prediction ~== model.predict(features) relTol 1E-5)
           assert(quantiles ~== model.predictQuantiles(features) relTol 1E-5)
-      }
-  }
 
-  test("aft survival regression with multivariate") {
+  test("aft survival regression with multivariate")
     val quantileProbabilities = Array(0.1, 0.5, 0.9)
     val trainer = new AFTSurvivalRegression()
       .setQuantileProbabilities(quantileProbabilities)
@@ -282,14 +271,12 @@ class AFTSurvivalRegressionSuite
       .transform(datasetMultivariate)
       .select("features", "prediction", "quantiles")
       .collect()
-      .foreach {
+      .foreach
         case Row(features: Vector, prediction: Double, quantiles: Vector) =>
           assert(prediction ~== model.predict(features) relTol 1E-5)
           assert(quantiles ~== model.predictQuantiles(features) relTol 1E-5)
-      }
-  }
 
-  test("aft survival regression w/o intercept") {
+  test("aft survival regression w/o intercept")
     val quantileProbabilities = Array(0.1, 0.5, 0.9)
     val trainer = new AFTSurvivalRegression()
       .setQuantileProbabilities(quantileProbabilities)
@@ -355,42 +342,35 @@ class AFTSurvivalRegressionSuite
       .transform(datasetMultivariate)
       .select("features", "prediction", "quantiles")
       .collect()
-      .foreach {
+      .foreach
         case Row(features: Vector, prediction: Double, quantiles: Vector) =>
           assert(prediction ~== model.predict(features) relTol 1E-5)
           assert(quantiles ~== model.predictQuantiles(features) relTol 1E-5)
-      }
-  }
 
-  test("aft survival regression w/o quantiles column") {
+  test("aft survival regression w/o quantiles column")
     val trainer = new AFTSurvivalRegression
     val model = trainer.fit(datasetUnivariate)
     val outputDf = model.transform(datasetUnivariate)
 
     assert(outputDf.schema.fieldNames.contains("quantiles") === false)
 
-    outputDf.select("features", "prediction").collect().foreach {
+    outputDf.select("features", "prediction").collect().foreach
       case Row(features: Vector, prediction: Double) =>
         assert(prediction ~== model.predict(features) relTol 1E-5)
-    }
-  }
 
-  test("read/write") {
+  test("read/write")
     def checkModelData(model: AFTSurvivalRegressionModel,
-                       model2: AFTSurvivalRegressionModel): Unit = {
+                       model2: AFTSurvivalRegressionModel): Unit =
       assert(model.intercept === model2.intercept)
       assert(model.coefficients === model2.coefficients)
       assert(model.scale === model2.scale)
-    }
     val aft = new AFTSurvivalRegression()
     testEstimatorAndModelReadWrite(aft,
                                    datasetMultivariate,
                                    AFTSurvivalRegressionSuite.allParamSettings,
                                    checkModelData)
-  }
-}
 
-object AFTSurvivalRegressionSuite {
+object AFTSurvivalRegressionSuite
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -403,4 +383,3 @@ object AFTSurvivalRegressionSuite {
       "maxIter" -> 2,
       "tol" -> 0.01
   )
-}

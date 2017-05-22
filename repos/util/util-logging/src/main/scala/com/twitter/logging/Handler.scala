@@ -23,25 +23,22 @@ import java.util.{logging => javalog}
   * formatter automatically.
   */
 abstract class Handler(val formatter: Formatter, val level: Option[Level])
-    extends javalog.Handler {
+    extends javalog.Handler
   setFormatter(formatter)
 
-  level.foreach { x =>
+  level.foreach  x =>
     setLevel(x)
-  }
 
-  override def toString = {
+  override def toString =
     "<%s level=%s formatter=%s>".format(
         getClass.getName, getLevel, formatter.toString)
-  }
-}
 
 /**
   * A log handler class which delegates to another handler. This allows to implement filtering
   * log handlers.
   */
 abstract class ProxyHandler(val handler: Handler)
-    extends Handler(handler.formatter, handler.level) {
+    extends Handler(handler.formatter, handler.level)
   override def close() = handler.close()
 
   override def flush() = handler.flush()
@@ -72,18 +69,16 @@ abstract class ProxyHandler(val handler: Handler)
     handler.setFormatter(formatter)
 
   override def setLevel(level: javalog.Level) = handler.setLevel(level)
-}
 
-object NullHandler extends Handler(BareFormatter, None) {
+object NullHandler extends Handler(BareFormatter, None)
   def publish(record: javalog.LogRecord) {}
   def close() {}
   def flush() {}
 
   // for java compatibility
   def get(): this.type = this
-}
 
-object StringHandler {
+object StringHandler
 
   /**
     * Generates a HandlerFactory that returns a StringHandler
@@ -97,37 +92,32 @@ object StringHandler {
     * for java compatibility
     */
   def apply() = () => new StringHandler()
-}
 
 /**
   * Mostly useful for unit tests: logging goes directly into a string buffer.
   */
 class StringHandler(
     formatter: Formatter = new Formatter(), level: Option[Level] = None)
-    extends Handler(formatter, level) {
+    extends Handler(formatter, level)
 
   // thread-safe logging
   private val buffer = new StringBuffer()
 
-  def publish(record: javalog.LogRecord) = {
+  def publish(record: javalog.LogRecord) =
     buffer append getFormatter().format(record)
-  }
 
   def close() = {}
 
   def flush() = {}
 
-  def get = {
+  def get =
     buffer.toString
-  }
 
-  def clear() = {
+  def clear() =
     buffer.setLength(0)
     buffer.trimToSize()
-  }
-}
 
-object ConsoleHandler {
+object ConsoleHandler
 
   /**
     * Generates a HandlerFactory that returns a ConsoleHandler
@@ -141,20 +131,17 @@ object ConsoleHandler {
     * for java compatibility
     */
   def apply() = () => new ConsoleHandler()
-}
 
 /**
   * Log things to the console.
   */
 class ConsoleHandler(
     formatter: Formatter = new Formatter(), level: Option[Level] = None)
-    extends Handler(formatter, level) {
+    extends Handler(formatter, level)
 
-  def publish(record: javalog.LogRecord) = {
+  def publish(record: javalog.LogRecord) =
     System.err.print(getFormatter().format(record))
-  }
 
   def close() = {}
 
   def flush() = Console.flush
-}

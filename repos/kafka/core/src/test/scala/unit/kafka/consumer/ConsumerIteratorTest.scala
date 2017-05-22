@@ -31,7 +31,7 @@ import org.junit.{Before, Test}
 import kafka.serializer._
 import kafka.integration.KafkaServerTestHarness
 
-class ConsumerIteratorTest extends KafkaServerTestHarness {
+class ConsumerIteratorTest extends KafkaServerTestHarness
 
   val numNodes = 1
 
@@ -53,7 +53,7 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
         TestUtils.createConsumerProperties(zkConnect, group, consumer0))
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     topicInfos = configs.map(
         c =>
@@ -69,10 +69,9 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
         topic,
         partitionReplicaAssignment = Map(0 -> Seq(configs.head.brokerId)),
         servers = servers)
-  }
 
   @Test
-  def testConsumerIteratorDeduplicationDeepIterator() {
+  def testConsumerIteratorDeduplicationDeepIterator()
     val messageStrings = (0 until 10).map(_.toString).toList
     val messages = messageStrings.map(s => new Message(s.getBytes))
     val messageSet = new ByteBufferMessageSet(
@@ -97,10 +96,9 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
       .filter(_.offset >= consumedOffset)
       .map(m => TestUtils.readString(m.message.payload))
     assertEquals(unconsumed, receivedMessages)
-  }
 
   @Test
-  def testConsumerIteratorDecodingFailure() {
+  def testConsumerIteratorDecodingFailure()
     val messageStrings = (0 until 10).map(_.toString).toList
     val messages = messageStrings.map(s => new Message(s.getBytes))
     val messageSet = new ByteBufferMessageSet(
@@ -116,27 +114,21 @@ class ConsumerIteratorTest extends KafkaServerTestHarness {
         new FailDecoder(),
         clientId = "")
 
-    val receivedMessages = (0 until 5).map { i =>
+    val receivedMessages = (0 until 5).map  i =>
       assertTrue(iter.hasNext)
       val message = iter.next
       assertEquals(message.offset, i + consumedOffset)
 
-      try {
+      try
         message.message // should fail
-      } catch {
+      catch
         case e: UnsupportedOperationException => // this is ok
         case e2: Throwable =>
           fail("Unexpected exception when iterating the message set. " +
               e2.getMessage)
-      }
-    }
-  }
 
   class FailDecoder(props: VerifiableProperties = null)
-      extends Decoder[String] {
-    def fromBytes(bytes: Array[Byte]): String = {
+      extends Decoder[String]
+    def fromBytes(bytes: Array[Byte]): String =
       throw new UnsupportedOperationException(
           "This decoder does not work at all..")
-    }
-  }
-}

@@ -8,16 +8,15 @@ import play.twirl.api.Html
 /**
   * A render engine to render content to HTML.
   */
-trait Renderer {
+trait Renderer
 
   /**
     * Render the given request to HTML.
     */
   def render(request: RenderRequest): Html
-}
 
-object MarkdownRenderer extends Renderer {
-  override def render(request: RenderRequest): Html = {
+object MarkdownRenderer extends Renderer
+  override def render(request: RenderRequest): Html =
     import request._
     Html(
         Markdown.toHtml(
@@ -28,17 +27,13 @@ object MarkdownRenderer extends Renderer {
             enableAnchor = enableAnchor,
             enableLineBreaks = false
         )(context))
-  }
-}
 
-object DefaultRenderer extends Renderer {
-  override def render(request: RenderRequest): Html = {
+object DefaultRenderer extends Renderer
+  override def render(request: RenderRequest): Html =
     import request._
     Html(
         s"<tt>${fileContent.split("(\\r\\n)|\\n").map(xml.Utility.escape(_)).mkString("<br/>")}</tt>"
     )
-  }
-}
 
 case class RenderRequest(
     filePath: List[String],

@@ -1,6 +1,6 @@
 package somereallylongpackagenamethatwilltestsbtsanalyzer_somereallylongpackagenamethatwilltestsbtsanalyzer.somereallylongpackagenamethatwilltestsbtsanalyzer
 
-object T {
+object T
   val y = List(3)
   for (a <- y;
   b <- y;
@@ -39,4 +39,3 @@ object T {
   ii <- y;
   jj <- y;
   kk <- y) yield a + b + c + d + e
-}

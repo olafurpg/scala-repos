@@ -1,15 +1,11 @@
-object SCL2820 {
-  object TypingObject extends TypingTrait {
+object SCL2820
+  object TypingObject extends TypingTrait
     val columns = List[Col](
         /*start*/ Col.String('title) /*end*/
     )
-  }
 
-  trait TypingTrait {
+  trait TypingTrait
     trait Col { def name: Symbol }
-    object Col {
+    object Col
       case class String(name: Symbol) extends Col
-    }
-  }
-}
 //TypingObject.Col.String

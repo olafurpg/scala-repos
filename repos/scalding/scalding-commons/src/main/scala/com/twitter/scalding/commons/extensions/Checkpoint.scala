@@ -59,7 +59,7 @@ import org.slf4j.{Logger, LoggerFactory => LogManager}
   *
   * @author Mike Jahr
   */
-object Checkpoint {
+object Checkpoint
   private val LOG: Logger = LogManager.getLogger(this.getClass)
 
   /**
@@ -83,7 +83,7 @@ object Checkpoint {
       mode: Mode,
       flowDef: FlowDef,
       conv: TupleConverter[A],
-      setter: TupleSetter[A]): Pipe = {
+      setter: TupleSetter[A]): Pipe =
     conv.assertArityMatches(resultFields)
     setter.assertArityMatches(resultFields)
 
@@ -92,7 +92,7 @@ object Checkpoint {
     val filename: Option[String] = getFilename(checkpointName)
     val format: String = getFormat(checkpointName)
 
-    filename match {
+    filename match
       case Some(name) if hasInput(checkpointName, name) =>
         // We have checkpoint input; read the file instead of executing the flow.
         LOG.info(
@@ -111,8 +111,6 @@ object Checkpoint {
         pipe.write(getSource(format, name))
       case None =>
         flow.project(resultFields)
-    }
-  }
 
   // Wrapper for Checkpoint when using a TypedPipe
   def apply[A](checkpointName: String)(flow: => TypedPipe[A])(
@@ -120,76 +118,63 @@ object Checkpoint {
       mode: Mode,
       flowDef: FlowDef,
       conv: TupleConverter[A],
-      setter: TupleSetter[A]): TypedPipe[A] = {
-    val rPipe = apply(checkpointName, Dsl.intFields(0 until conv.arity)) {
+      setter: TupleSetter[A]): TypedPipe[A] =
+    val rPipe = apply(checkpointName, Dsl.intFields(0 until conv.arity))
       flow.toPipe(Dsl.intFields(0 until conv.arity))
-    }
     TypedPipe.from[A](rPipe, Dsl.intFields(0 until conv.arity))
-  }
 
   // Helper class for looking up checkpoint arguments, either the base value from
   // --checkpoint.<argname> or the override value from
   // --checkpoint.<argname>.<checkpointname>
   // TODO(mjahr): maybe move this to scalding.Args
   private case class CheckpointArg(checkpointName: String, argName: String)(
-      implicit args: Args) {
+      implicit args: Args)
     val baseValue: Option[String] = args.optional("checkpoint." + argName)
     val overrideValue: Option[String] =
       args.optional("checkpoint." + argName + "." + checkpointName)
     def value: Option[String] =
-      if (overrideValue.isDefined) {
+      if (overrideValue.isDefined)
         overrideValue
-      } else {
+      else
         baseValue
-      }
     def isTrue: Boolean = value.exists { _.toLowerCase != "false" }
-  }
 
   // Returns the filename to use for the given checkpoint, or None if this
   // checkpoint is disabled.
   private def getFilename(checkpointName: String)(
-      implicit args: Args, mode: Mode): Option[String] = {
+      implicit args: Args, mode: Mode): Option[String] =
     val fileArg = CheckpointArg(checkpointName, "file")
-    if (fileArg.overrideValue.isDefined) {
+    if (fileArg.overrideValue.isDefined)
       // The flag "--checkpoint.file.<name>=<filename>" is present; use its
       // value as the filename.
       fileArg.overrideValue
-    } else {
-      fileArg.baseValue.map { value =>
+    else
+      fileArg.baseValue.map  value =>
         // The flag "--checkpoint.file=<prefix>"; use "<prefix>_<name>" as the
         // filename.
         value + "_" + checkpointName
-      }
-    }
-  }
 
   // Returns a format for the checkpoint.  The format of the source is
   // determined by the flag --checkpoint.format, and defaults to SequenceFile.
   private def getFormat(checkpointName: String)(
-      implicit args: Args, mode: Mode): String = {
-    val defaultFormat = mode match {
+      implicit args: Args, mode: Mode): String =
+    val defaultFormat = mode match
       case Hdfs(_, _) | HadoopTest(_, _) => "sequencefile"
       case _ => "tsv"
-    }
     CheckpointArg(checkpointName, "format").value
       .getOrElse(defaultFormat)
       .toLowerCase
-  }
 
   // Returns a source for the checkpoint in the given format.
   private def getSource(format: String, filename: String)(
-      implicit mode: Mode): Source = {
-    format match {
+      implicit mode: Mode): Source =
+    format match
       case "sequencefile" => SequenceFile(filename)
       case "tsv" => Tsv(filename)
       case _ => sys.error("Invalid value for --checkpoint.format: " + format)
-    }
-  }
 
   // Returns true if the given checkpoint file exists and should be read.
   private def hasInput(checkpointName: String, filename: String)(
-      implicit args: Args, mode: Mode): Boolean = {
+      implicit args: Args, mode: Mode): Boolean =
     !CheckpointArg(checkpointName, "clobber").isTrue &&
     mode.fileExists(filename)
-  }
-}

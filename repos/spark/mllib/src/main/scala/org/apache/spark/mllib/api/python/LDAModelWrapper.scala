@@ -25,7 +25,7 @@ import org.apache.spark.mllib.linalg.Matrix
 /**
   * Wrapper around LDAModel to provide helper methods in Python
   */
-private[python] class LDAModelWrapper(model: LDAModel) {
+private[python] class LDAModelWrapper(model: LDAModel)
 
   def topicsMatrix(): Matrix = model.topicsMatrix
 
@@ -33,16 +33,13 @@ private[python] class LDAModelWrapper(model: LDAModel) {
 
   def describeTopics(): Array[Byte] = describeTopics(this.model.vocabSize)
 
-  def describeTopics(maxTermsPerTopic: Int): Array[Byte] = {
-    val topics = model.describeTopics(maxTermsPerTopic).map {
+  def describeTopics(maxTermsPerTopic: Int): Array[Byte] =
+    val topics = model.describeTopics(maxTermsPerTopic).map
       case (terms, termWeights) =>
         val jTerms = JavaConverters.seqAsJavaListConverter(terms).asJava
         val jTermWeights =
           JavaConverters.seqAsJavaListConverter(termWeights).asJava
         Array[Any](jTerms, jTermWeights)
-    }
     SerDe.dumps(JavaConverters.seqAsJavaListConverter(topics).asJava)
-  }
 
   def save(sc: SparkContext, path: String): Unit = model.save(sc, path)
-}

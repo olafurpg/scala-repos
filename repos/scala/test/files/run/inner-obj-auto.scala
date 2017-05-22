@@ -3,2052 +3,1697 @@
          (2-level nesting)
    ================================================================================ */
 
-class Class2_1 {
+class Class2_1
 
-  class Class1_2 {
+  class Class1_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class1_2).run }
-}
 
-object Object3_1 {
+object Object3_1
 
-  class Class1_2 {
+  class Class1_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class1_2).run } // trigger
-}
 
-trait Trait4_1 {
+trait Trait4_1
 
-  class Class1_2 {
+  class Class1_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class1_2).run }
-}
 
-class Class6_1 {
+class Class6_1
 
-  object Object5_2 {
+  object Object5_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object5_2.run }
-}
 
-object Object7_1 {
+object Object7_1
 
-  object Object5_2 {
+  object Object5_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object5_2.run } // trigger
-}
 
-trait Trait8_1 {
+trait Trait8_1
 
-  object Object5_2 {
+  object Object5_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object5_2.run }
-}
 
-class Class10_1 {
+class Class10_1
 
-  trait Trait9_2 {
+  trait Trait9_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait9_2 {}).run }
-}
 
-object Object11_1 {
+object Object11_1
 
-  trait Trait9_2 {
+  trait Trait9_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait9_2 {}).run } // trigger
-}
 
-trait Trait12_1 {
+trait Trait12_1
 
-  trait Trait9_2 {
+  trait Trait9_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait9_2 {}).run }
-}
 
-class Class14_1 {
+class Class14_1
 
-  def method13_2 {
+  def method13_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method13_2 }
-}
 
-object Object15_1 {
+object Object15_1
 
-  def method13_2 {
+  def method13_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method13_2 } // trigger
-}
 
-trait Trait16_1 {
+trait Trait16_1
 
-  def method13_2 {
+  def method13_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method13_2 }
-}
 
-class Class18_1 {
+class Class18_1
 
-  private def method17_2 {
+  private def method17_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method17_2 }
-}
 
-object Object19_1 {
+object Object19_1
 
-  private def method17_2 {
+  private def method17_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method17_2 } // trigger
-}
 
-trait Trait20_1 {
+trait Trait20_1
 
-  private def method17_2 {
+  private def method17_2
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method17_2 }
-}
 
-class Class22_1 {
+class Class22_1
 
   val fun21_2 = () =>
-    {
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-  }
 
   def run { fun21_2() }
-}
 
-object Object23_1 {
+object Object23_1
 
   val fun21_2 = () =>
-    {
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-  }
 
   def run { fun21_2() } // trigger
-}
 
-trait Trait24_1 {
+trait Trait24_1
 
   val fun21_2 = () =>
-    {
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-  }
 
   def run { fun21_2() }
-}
 
-class Class26_1 {
+class Class26_1
 
-  class Class25_2 {
-    {
+  class Class25_2
       // in primary constructor
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Class25_2) }
-}
 
-object Object27_1 {
+object Object27_1
 
-  class Class25_2 {
-    {
+  class Class25_2
       // in primary constructor
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Class25_2) } // trigger
-}
 
-trait Trait28_1 {
+trait Trait28_1
 
-  class Class25_2 {
-    {
+  class Class25_2
       // in primary constructor
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Class25_2) }
-}
 
-class Class30_1 {
+class Class30_1
 
-  trait Trait29_2 {
-    {
+  trait Trait29_2
       // in primary constructor
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Trait29_2 {}) }
-}
 
-object Object31_1 {
+object Object31_1
 
-  trait Trait29_2 {
-    {
+  trait Trait29_2
       // in primary constructor
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Trait29_2 {}) } // trigger
-}
 
-trait Trait32_1 {
+trait Trait32_1
 
-  trait Trait29_2 {
-    {
+  trait Trait29_2
       // in primary constructor
       var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
       Obj // one
 
-      def singleThreadedAccess(x: Any) = {
+      def singleThreadedAccess(x: Any) =
         x == Obj
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           assert(singleThreadedAccess(Obj))
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable => print("failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Trait29_2 {}) }
-}
 
-class Class34_1 {
+class Class34_1
 
-  lazy val lzvalue33_2 = {
+  lazy val lzvalue33_2 =
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { lzvalue33_2 }
-}
 
-object Object35_1 {
+object Object35_1
 
-  lazy val lzvalue33_2 = {
+  lazy val lzvalue33_2 =
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { lzvalue33_2 } // trigger
-}
 
-trait Trait36_1 {
+trait Trait36_1
 
-  lazy val lzvalue33_2 = {
+  lazy val lzvalue33_2 =
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { lzvalue33_2 }
-}
 
-class Class38_1 {
+class Class38_1
 
-  val value37_2 = {
+  val value37_2 =
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { value37_2 }
-}
 
-object Object39_1 {
+object Object39_1
 
-  val value37_2 = {
+  val value37_2 =
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { value37_2 } // trigger
-}
 
-trait Trait40_1 {
+trait Trait40_1
 
-  val value37_2 = {
+  val value37_2 =
     var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { value37_2 }
-}
 
-class Class42_1 {
+class Class42_1
 
-  class Class41_2 {
+  class Class41_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class41_2).run }
-}
 
-object Object43_1 {
+object Object43_1
 
-  class Class41_2 {
+  class Class41_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class41_2).run } // trigger
-}
 
-trait Trait44_1 {
+trait Trait44_1
 
-  class Class41_2 {
+  class Class41_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class41_2).run }
-}
 
-class Class46_1 {
+class Class46_1
 
-  object Object45_2 {
+  object Object45_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object45_2.run }
-}
 
-object Object47_1 {
+object Object47_1
 
-  object Object45_2 {
+  object Object45_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object45_2.run } // trigger
-}
 
-trait Trait48_1 {
+trait Trait48_1
 
-  object Object45_2 {
+  object Object45_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object45_2.run }
-}
 
-class Class50_1 {
+class Class50_1
 
-  trait Trait49_2 {
+  trait Trait49_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait49_2 {}).run }
-}
 
-object Object51_1 {
+object Object51_1
 
-  trait Trait49_2 {
+  trait Trait49_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait49_2 {}).run } // trigger
-}
 
-trait Trait52_1 {
+trait Trait52_1
 
-  trait Trait49_2 {
+  trait Trait49_2
     var ObjCounter = 0
 
     private object Obj { ObjCounter += 1 }
     Obj // one
 
-    def singleThreadedAccess(x: Any) = {
+    def singleThreadedAccess(x: Any) =
       x == Obj
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         assert(singleThreadedAccess(Obj))
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable => print("failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait49_2 {}).run }
-}
 
-class Class54_1 {
+class Class54_1
 
-  class Class53_2 {
+  class Class53_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class53_2).run }
-}
 
-object Object55_1 {
+object Object55_1
 
-  class Class53_2 {
+  class Class53_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class53_2).run } // trigger
-}
 
-trait Trait56_1 {
+trait Trait56_1
 
-  class Class53_2 {
+  class Class53_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Class53_2).run }
-}
 
-class Class58_1 {
+class Class58_1
 
-  object Object57_2 {
+  object Object57_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object57_2.run }
-}
 
-object Object59_1 {
+object Object59_1
 
-  object Object57_2 {
+  object Object57_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object57_2.run } // trigger
-}
 
-trait Trait60_1 {
+trait Trait60_1
 
-  object Object57_2 {
+  object Object57_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest } // trigger
-  }
 
   def run { Object57_2.run }
-}
 
-class Class62_1 {
+class Class62_1
 
-  trait Trait61_2 {
+  trait Trait61_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait61_2 {}).run }
-}
 
-object Object63_1 {
+object Object63_1
 
-  trait Trait61_2 {
+  trait Trait61_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait61_2 {}).run } // trigger
-}
 
-trait Trait64_1 {
+trait Trait64_1
 
-  trait Trait61_2 {
+  trait Trait61_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     def run { runTest }
-  }
 
   def run { (new Trait61_2 {}).run }
-}
 
-class Class66_1 {
+class Class66_1
 
-  def method65_2 {
+  def method65_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method65_2 }
-}
 
-object Object67_1 {
+object Object67_1
 
-  def method65_2 {
+  def method65_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method65_2 } // trigger
-}
 
-trait Trait68_1 {
+trait Trait68_1
 
-  def method65_2 {
+  def method65_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method65_2 }
-}
 
-class Class70_1 {
+class Class70_1
 
-  private def method69_2 {
+  private def method69_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method69_2 }
-}
 
-object Object71_1 {
+object Object71_1
 
-  private def method69_2 {
+  private def method69_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method69_2 } // trigger
-}
 
-trait Trait72_1 {
+trait Trait72_1
 
-  private def method69_2 {
+  private def method69_2
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { method69_2 }
-}
 
-class Class74_1 {
+class Class74_1
 
   val fun73_2 = () =>
-    {
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-  }
 
   def run { fun73_2() }
-}
 
-object Object75_1 {
+object Object75_1
 
   val fun73_2 = () =>
-    {
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-  }
 
   def run { fun73_2() } // trigger
-}
 
-trait Trait76_1 {
+trait Trait76_1
 
   val fun73_2 = () =>
-    {
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-  }
 
   def run { fun73_2() }
-}
 
-class Class78_1 {
+class Class78_1
 
-  class Class77_2 {
-    {
+  class Class77_2
       // in primary constructor
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Class77_2) }
-}
 
-object Object79_1 {
+object Object79_1
 
-  class Class77_2 {
-    {
+  class Class77_2
       // in primary constructor
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Class77_2) } // trigger
-}
 
-trait Trait80_1 {
+trait Trait80_1
 
-  class Class77_2 {
-    {
+  class Class77_2
       // in primary constructor
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Class77_2) }
-}
 
-class Class82_1 {
+class Class82_1
 
-  trait Trait81_2 {
-    {
+  trait Trait81_2
       // in primary constructor
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Trait81_2 {}) }
-}
 
-object Object83_1 {
+object Object83_1
 
-  trait Trait81_2 {
-    {
+  trait Trait81_2
       // in primary constructor
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Trait81_2 {}) } // trigger
-}
 
-trait Trait84_1 {
+trait Trait84_1
 
-  trait Trait81_2 {
-    {
+  trait Trait81_2
       // in primary constructor
       @volatile var ObjCounter = 0
 
       object Obj { ObjCounter += 1 }
 
-      def multiThreadedAccess() {
+      def multiThreadedAccess()
         val threads = for (i <- 1 to 5) yield
           new Thread(
-              new Runnable {
+              new Runnable
             def run = Obj
-          })
+          )
 
         threads foreach (_.start())
         threads foreach (_.join())
-      }
 
-      def runTest {
-        try {
+      def runTest
+        try
           multiThreadedAccess()
           assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
           println("ok")
-        } catch {
+        catch
           case e: Throwable =>
             print("multi-threaded failed "); e.printStackTrace()
-        }
-      }
 
       runTest // trigger
-    }
-  }
 
   def run { (new Trait81_2 {}) }
-}
 
-class Class90_1 {
+class Class90_1
 
-  val value89_2 = {
+  val value89_2 =
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { value89_2 }
-}
 
-trait Trait92_1 {
+trait Trait92_1
 
-  val value89_2 = {
+  val value89_2 =
     @volatile var ObjCounter = 0
 
     object Obj { ObjCounter += 1 }
 
-    def multiThreadedAccess() {
+    def multiThreadedAccess()
       val threads = for (i <- 1 to 5) yield
         new Thread(
-            new Runnable {
+            new Runnable
           def run = Obj
-        })
+        )
 
       threads foreach (_.start())
       threads foreach (_.join())
-    }
 
-    def runTest {
-      try {
+    def runTest
+      try
         multiThreadedAccess()
         assert(ObjCounter == 1, "multiple instances: " + ObjCounter)
         println("ok")
-      } catch {
+      catch
         case e: Throwable =>
           print("multi-threaded failed "); e.printStackTrace()
-      }
-    }
 
     runTest // trigger
-  }
 
   def run { value89_2 }
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     (new Class2_1).run
     Object3_1.run
     (new Trait4_1 {}).run
@@ -2114,5 +1759,3 @@ object Test {
     (new Trait84_1 {}).run
     (new Class90_1).run
     (new Trait92_1 {}).run
-  }
-}

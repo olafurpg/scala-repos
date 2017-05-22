@@ -8,13 +8,13 @@ import java.net.DatagramSocket
 import java.net.ServerSocket
 import java.net.Socket
 
-object Inet {
+object Inet
 
   /**
     * SocketOption is a package of data (from the user) and associated
     * behavior (how to apply that to a channel).
     */
-  trait SocketOption {
+  trait SocketOption
 
     /**
       * Action to be taken for this option before bind() is called
@@ -36,7 +36,6 @@ object Inet {
       * the slave socket for servers).
       */
     def afterConnect(s: Socket): Unit = ()
-  }
 
   /**
     * Java API: AbstractSocketOption is a package of data (from the user) and associated
@@ -44,7 +43,7 @@ object Inet {
     */
   abstract class AbstractSocketOption extends SocketOption
 
-  trait SocketOptionV2 extends SocketOption {
+  trait SocketOptionV2 extends SocketOption
 
     /**
       * Action to be taken for this option after connect returned (i.e. on
@@ -63,7 +62,6 @@ object Inet {
       * the slave socket for servers).
       */
     def afterConnect(s: DatagramSocket): Unit = ()
-  }
 
   /**
     * Java API
@@ -73,7 +71,7 @@ object Inet {
   /**
     * DatagramChannel creation behavior.
     */
-  class DatagramChannelCreator extends SocketOption {
+  class DatagramChannelCreator extends SocketOption
 
     /**
       * Open and return new DatagramChannel.
@@ -83,21 +81,19 @@ object Inet {
       */
     @throws(classOf[Exception])
     def create(): DatagramChannel = DatagramChannel.open()
-  }
 
-  object DatagramChannelCreator {
+  object DatagramChannelCreator
     val default = new DatagramChannelCreator()
     def apply() = default
-  }
 
-  object SO {
+  object SO
 
     /**
       * [[akka.io.Inet.SocketOption]] to set the SO_RCVBUF option
       *
       * For more information see [[java.net.Socket#setReceiveBufferSize]]
       */
-    final case class ReceiveBufferSize(size: Int) extends SocketOption {
+    final case class ReceiveBufferSize(size: Int) extends SocketOption
       require(size > 0, "ReceiveBufferSize must be > 0")
       override def beforeServerSocketBind(s: ServerSocket): Unit =
         s.setReceiveBufferSize(size)
@@ -105,7 +101,6 @@ object Inet {
         s.setReceiveBufferSize(size)
       override def beforeConnect(s: Socket): Unit =
         s.setReceiveBufferSize(size)
-    }
 
     // server socket options
 
@@ -114,23 +109,21 @@ object Inet {
       *
       * For more information see [[java.net.Socket#setReuseAddress]]
       */
-    final case class ReuseAddress(on: Boolean) extends SocketOption {
+    final case class ReuseAddress(on: Boolean) extends SocketOption
       override def beforeServerSocketBind(s: ServerSocket): Unit =
         s.setReuseAddress(on)
       override def beforeDatagramBind(s: DatagramSocket): Unit =
         s.setReuseAddress(on)
       override def beforeConnect(s: Socket): Unit = s.setReuseAddress(on)
-    }
 
     /**
       * [[akka.io.Inet.SocketOption]] to set the SO_SNDBUF option.
       *
       * For more information see [[java.net.Socket#setSendBufferSize]]
       */
-    final case class SendBufferSize(size: Int) extends SocketOption {
+    final case class SendBufferSize(size: Int) extends SocketOption
       require(size > 0, "SendBufferSize must be > 0")
       override def afterConnect(s: Socket): Unit = s.setSendBufferSize(size)
-    }
 
     /**
       * [[akka.io.Inet.SocketOption]] to set the traffic class or
@@ -139,14 +132,12 @@ object Inet {
       *
       * For more information see [[java.net.Socket#setTrafficClass]]
       */
-    final case class TrafficClass(tc: Int) extends SocketOption {
+    final case class TrafficClass(tc: Int) extends SocketOption
       require(0 <= tc && tc <= 255,
               "TrafficClass needs to be in the interval [0, 255]")
       override def afterConnect(s: Socket): Unit = s.setTrafficClass(tc)
-    }
-  }
 
-  trait SoForwarders {
+  trait SoForwarders
 
     /**
       * [[akka.io.Inet.SocketOption]] to set the SO_RCVBUF option
@@ -177,9 +168,8 @@ object Inet {
       * For more information see [[java.net.Socket#setTrafficClass]]
       */
     val TrafficClass = SO.TrafficClass
-  }
 
-  trait SoJavaFactories {
+  trait SoJavaFactories
     import SO._
 
     /**
@@ -211,5 +201,3 @@ object Inet {
       * For more information see [[java.net.Socket#setTrafficClass]]
       */
     def trafficClass(tc: Int) = TrafficClass(tc)
-  }
-}

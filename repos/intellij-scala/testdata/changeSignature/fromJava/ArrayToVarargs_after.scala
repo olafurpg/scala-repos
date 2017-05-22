@@ -1,4 +1,4 @@
-class ArrayToVarargsTest extends ArrayToVarargs {
+class ArrayToVarargsTest extends ArrayToVarargs
   override def foo(i: Int, b: Boolean, js: Int*): Unit =
     super.foo(i, b, js: _*)
 
@@ -7,4 +7,3 @@ class ArrayToVarargsTest extends ArrayToVarargs {
   foo(1, true, xs: _*)
   foo(i = 1, b = false, 1, 2)
   foo(1, b = true, js = xs: _*)
-}

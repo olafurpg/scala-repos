@@ -14,7 +14,7 @@ import headers.HttpEncodings
 /**
   * An encoder and decoder for the HTTP 'identity' encoding.
   */
-object NoCoding extends Coder with StreamDecoder {
+object NoCoding extends Coder with StreamDecoder
   val encoding = HttpEncodings.identity
 
   override def encode[T <: HttpMessage](message: T)(
@@ -31,13 +31,11 @@ object NoCoding extends Coder with StreamDecoder {
   def newDecompressorStage(maxBytesPerChunk: Int)
     : () ⇒ GraphStage[FlowShape[ByteString, ByteString]] =
     () ⇒ StreamUtils.limitByteChunksStage(maxBytesPerChunk)
-}
 
-object NoCodingCompressor extends Compressor {
+object NoCodingCompressor extends Compressor
   def compress(input: ByteString): ByteString = input
   def flush() = ByteString.empty
   def finish() = ByteString.empty
 
   def compressAndFlush(input: ByteString): ByteString = input
   def compressAndFinish(input: ByteString): ByteString = input
-}

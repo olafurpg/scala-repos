@@ -19,7 +19,7 @@ import com.twitter.io.{Files, TempDirectory, StreamIO}
  *   The cert chain should contain the certificate.
  * @return Array[KeyManager]
  */
-object PEMEncodedKeyManager {
+object PEMEncodedKeyManager
   class ExternalExecutableFailed(message: String) extends Exception(message)
 
   def apply(
@@ -30,12 +30,11 @@ object PEMEncodedKeyManager {
     makeKeystore(
         Files.readBytes(new File(certificatePath)),
         Files.readBytes(new File(keyPath)),
-        caCertPath map { filename =>
+        caCertPath map  filename =>
           Files.readBytes(new File(filename))
-        }
     )
 
-  private[this] def secret(length: Int): Array[Char] = {
+  private[this] def secret(length: Int): Array[Char] =
     val rng = new Random()
     rng.setSeed(System.currentTimeMillis())
     val b = new Array[Char](length)
@@ -43,13 +42,12 @@ object PEMEncodedKeyManager {
     for (i <- 0 until length) b(i) = (65 + rng.nextInt(90 - 65)).toChar
 
     b
-  }
 
   private[this] def makeKeystore(
       certificate: Array[Byte],
       key: Array[Byte],
       caCert: Option[Array[Byte]]
-  ): Array[KeyManager] = {
+  ): Array[KeyManager] =
 
     // Create a secure directory for the conversion
     val path = TempDirectory.create()
@@ -68,10 +66,9 @@ object PEMEncodedKeyManager {
     // Write out the certificate and key
     val f = new FileOutputStream(new File(pemPath))
     // if the chain is present, use it instead of the cert (chain contains cert)
-    caCert match {
+    caCert match
       case Some(c) => StreamIO.copy(new ByteArrayInputStream(c), f)
       case None => StreamIO.copy(new ByteArrayInputStream(certificate), f)
-    }
     StreamIO.copy(new ByteArrayInputStream(key), f)
     f.close()
 
@@ -123,5 +120,3 @@ object PEMEncodedKeyManager {
     path.delete()
 
     kmf.getKeyManagers
-  }
-}

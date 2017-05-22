@@ -31,42 +31,34 @@ private[streaming] class QueueInputDStream[T : ClassTag](
     oneAtATime: Boolean,
     defaultRDD: RDD[T]
 )
-    extends InputDStream[T](ssc) {
+    extends InputDStream[T](ssc)
 
   override def start() {}
 
   override def stop() {}
 
-  private def readObject(in: ObjectInputStream): Unit = {
+  private def readObject(in: ObjectInputStream): Unit =
     throw new NotSerializableException(
         "queueStream doesn't support checkpointing. " +
         "Please don't use queueStream when checkpointing is enabled.")
-  }
 
-  private def writeObject(oos: ObjectOutputStream): Unit = {
+  private def writeObject(oos: ObjectOutputStream): Unit =
     logWarning("queueStream doesn't support checkpointing")
-  }
 
-  override def compute(validTime: Time): Option[RDD[T]] = {
+  override def compute(validTime: Time): Option[RDD[T]] =
     val buffer = new ArrayBuffer[RDD[T]]()
-    queue.synchronized {
-      if (oneAtATime && queue.nonEmpty) {
+    queue.synchronized
+      if (oneAtATime && queue.nonEmpty)
         buffer += queue.dequeue()
-      } else {
+      else
         buffer ++= queue
         queue.clear()
-      }
-    }
-    if (buffer.nonEmpty) {
-      if (oneAtATime) {
+    if (buffer.nonEmpty)
+      if (oneAtATime)
         Some(buffer.head)
-      } else {
+      else
         Some(new UnionRDD(context.sc, buffer.toSeq))
-      }
-    } else if (defaultRDD != null) {
+    else if (defaultRDD != null)
       Some(defaultRDD)
-    } else {
+    else
       Some(ssc.sparkContext.emptyRDD)
-    }
-  }
-}

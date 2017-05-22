@@ -14,11 +14,11 @@ import akka.http.scaladsl.HttpsConnectionContext
 /**
   * These are HTTPS example configurations that take key material from the resources/key folder.
   */
-object ExampleHttpContexts {
+object ExampleHttpContexts
 
   // TODO show example how to obtain pre-configured context from ssl-config
 
-  val exampleServerContext = {
+  val exampleServerContext =
     // never put passwords into code!
     val password = "abcdef".toCharArray
 
@@ -32,9 +32,8 @@ object ExampleHttpContexts {
     context.init(keyManagerFactory.getKeyManagers, null, new SecureRandom)
 
     new HttpsConnectionContext(context)
-  }
 
-  val exampleClientContext = {
+  val exampleClientContext =
     val certStore = KeyStore.getInstance(KeyStore.getDefaultType)
     certStore.load(null, null)
     // only do this if you want to accept a custom root CA. Understand what you are doing!
@@ -49,16 +48,13 @@ object ExampleHttpContexts {
     val params = new SSLParameters()
     params.setEndpointIdentificationAlgorithm("https")
     new HttpsConnectionContext(context, sslParameters = Some(params))
-  }
 
-  def resourceStream(resourceName: String): InputStream = {
+  def resourceStream(resourceName: String): InputStream =
     val is = getClass.getClassLoader.getResourceAsStream(resourceName)
     require(is ne null, s"Resource $resourceName not found")
     is
-  }
 
   def loadX509Certificate(resourceName: String): Certificate =
     CertificateFactory
       .getInstance("X.509")
       .generateCertificate(resourceStream(resourceName))
-}

@@ -22,18 +22,15 @@ import scalikejdbc._
 
 /** JDBC implementation of [[BaseStorageClient]] */
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient with Logging
   override val prefix = "JDBC"
 
-  if (!config.properties.contains("URL")) {
+  if (!config.properties.contains("URL"))
     throw new StorageClientException("The URL variable is not set!", null)
-  }
-  if (!config.properties.contains("USERNAME")) {
+  if (!config.properties.contains("USERNAME"))
     throw new StorageClientException("The USERNAME variable is not set!", null)
-  }
-  if (!config.properties.contains("PASSWORD")) {
+  if (!config.properties.contains("PASSWORD"))
     throw new StorageClientException("The PASSWORD variable is not set!", null)
-  }
 
   // set max size of connection pool
   val maxSize: Int = config.properties.getOrElse("CONNECTIONS", "8").toInt
@@ -46,4 +43,3 @@ class StorageClient(val config: StorageClientConfig)
 
   /** JDBC connection URL. Connections are managed by ScalikeJDBC. */
   val client = config.properties("URL")
-}

@@ -21,19 +21,18 @@ case class TestServer(
     port: Int,
     application: Application = GuiceApplicationBuilder().build(),
     sslPort: Option[Int] = None,
-    serverProvider: Option[ServerProvider] = None) {
+    serverProvider: Option[ServerProvider] = None)
 
   private var testServerProcess: TestServerProcess = _
 
   /**
     * Starts this server.
     */
-  def start() {
-    if (testServerProcess != null) {
+  def start()
+    if (testServerProcess != null)
       sys.error("Server already started!")
-    }
 
-    try {
+    try
       val config = ServerConfig(
           rootDir = application.path,
           port = Option(port),
@@ -42,26 +41,21 @@ case class TestServer(
           properties = System.getProperties
       )
       testServerProcess = TestServer.start(serverProvider, config, application)
-    } catch {
+    catch
       case NonFatal(t) =>
         t.printStackTrace
         throw new RuntimeException(t)
-    }
-  }
 
   /**
     * Stops this server.
     */
-  def stop() {
-    if (testServerProcess != null) {
+  def stop()
+    if (testServerProcess != null)
       val shuttingDownProcess = testServerProcess
       testServerProcess = null
       shuttingDownProcess.shutdown()
-    }
-  }
-}
 
-object TestServer {
+object TestServer
 
   /**
     * Start a TestServer with the given config and application. To stop it,
@@ -69,20 +63,17 @@ object TestServer {
     */
   private[play] def start(testServerProvider: Option[ServerProvider],
                           config: ServerConfig,
-                          application: Application): TestServerProcess = {
+                          application: Application): TestServerProcess =
     val process = new TestServerProcess
-    val serverProvider: ServerProvider = {
+    val serverProvider: ServerProvider =
       testServerProvider
-    } getOrElse {
+    getOrElse
       ServerProvider.fromConfiguration(
           process.classLoader, config.configuration)
-    }
     Play.start(application)
     val server = serverProvider.createServer(config, application)
     process.addShutdownHook { server.stop() }
     process
-  }
-}
 
 /**
   * A mock system process for a TestServer to run within. A ServerProcess
@@ -92,15 +83,13 @@ object TestServer {
   * When the process is finished, call `shutdown()` to run all registered
   * shutdown hooks.
   */
-private[play] class TestServerProcess extends ServerProcess {
+private[play] class TestServerProcess extends ServerProcess
 
   private var hooks = Seq.empty[() => Unit]
-  override def addShutdownHook(hook: => Unit) = {
+  override def addShutdownHook(hook: => Unit) =
     hooks = hooks :+ (() => hook)
-  }
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     for (h <- hooks) h.apply()
-  }
 
   override def classLoader = getClass.getClassLoader
   override def args = Seq()
@@ -109,10 +98,8 @@ private[play] class TestServerProcess extends ServerProcess {
 
   override def exit(message: String,
                     cause: Option[Throwable] = None,
-                    returnCode: Int = -1): Nothing = {
+                    returnCode: Int = -1): Nothing =
     throw new TestServerExitException(message, cause, returnCode)
-  }
-}
 
 private[play] case class TestServerExitException(
     message: String, cause: Option[Throwable] = None, returnCode: Int = -1)

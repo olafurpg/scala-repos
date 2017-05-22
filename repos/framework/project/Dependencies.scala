@@ -18,7 +18,7 @@ import sbt._
 import Keys._
 import net.liftweb.sbt.LiftBuildPlugin.{crossMapped, defaultOrMapped}
 
-object Dependencies {
+object Dependencies
 
   type ModuleMap = String => ModuleID
 
@@ -97,4 +97,3 @@ object Dependencies {
     "org.webjars.bower" % "jasmine-core" % "2.4.1" % "provided"
   lazy val jasmineAjax =
     "org.webjars.bower" % "jasmine-ajax" % "3.2.0" % "provided"
-}

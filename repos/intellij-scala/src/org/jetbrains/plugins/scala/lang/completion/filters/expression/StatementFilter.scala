@@ -16,11 +16,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates.ScTemplateBod
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
-class StatementFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class StatementFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
-    if (leaf != null) {
+    if (leaf != null)
       val parent = leaf.getParent
       if (parent.isInstanceOf[ScReferenceExpression] &&
           !parent.getParent.isInstanceOf[ScStableReferenceElementPattern] &&
@@ -29,25 +29,18 @@ class StatementFilter extends ElementFilter {
               parent.getPrevSibling.getPrevSibling == null ||
               (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
                   !parent.getPrevSibling.getPrevSibling.getLastChild
-                    .isInstanceOf[PsiErrorElement]))) {
-        parent.getParent match {
+                    .isInstanceOf[PsiErrorElement])))
+        parent.getParent match
           case _: ScBlockExpr | _: ScBlock | _: ScTemplateBody => return true
           case x: ScExpression =>
             return checkReplace(x, "if (true) true", x.getManager)
           case _ =>
-        }
         return true
-      }
-    }
     false
-  }
 
-  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = {
+  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean =
     true
-  }
 
   @NonNls
-  override def toString: String = {
+  override def toString: String =
     "statements keyword filter"
-  }
-}

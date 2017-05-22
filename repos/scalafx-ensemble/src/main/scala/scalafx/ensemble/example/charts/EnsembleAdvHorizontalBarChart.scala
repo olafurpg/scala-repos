@@ -42,35 +42,32 @@ import scalafx.scene.chart.XYChart
   * @see scalafx.scene.chart.NumberAxis
   * @see scalafx.scene.chart.XYChart
   */
-class EnsembleAdvHorizontalBarChart extends EnsembleExample {
-  def getContent = {
+class EnsembleAdvHorizontalBarChart extends EnsembleExample
+  def getContent =
     // Category/x values
     val years = Seq("2007", "2008", "2009")
 
-    val yAxis = new CategoryAxis {
+    val yAxis = new CategoryAxis
       label = "Year"
       categories = ObservableBuffer(years)
-    }
 
-    val xAxis = new NumberAxis {
+    val xAxis = new NumberAxis
       label = "Price"
       tickLabelFormatter = NumberAxis.DefaultFormatter(this, "$", "")
-    }
 
     //
     // Create data series.
     // To illustrate different possibilities, each series data is created using different approach.
     //
 
-    val series1 = new XYChart.Series[Number, String] {
+    val series1 = new XYChart.Series[Number, String]
       name = "Data Series 1"
       // Example of assigning data directly
       data() += XYChart.Data[Number, String](567, years(0))
       data() += XYChart.Data[Number, String](1292, years(1))
       data() += XYChart.Data[Number, String](2180, years(2))
-    }
 
-    val series2 = new XYChart.Series[Number, String] {
+    val series2 = new XYChart.Series[Number, String]
       name = "Data Series 2"
       // Example of assigning data using a container
       data = ObservableBuffer(
@@ -78,17 +75,15 @@ class EnsembleAdvHorizontalBarChart extends EnsembleExample {
           XYChart.Data[Number, String](1665, years(1)),
           XYChart.Data[Number, String](2450, years(2))
       )
-    }
 
-    val series3 = new XYChart.Series[Number, String] {
+    val series3 = new XYChart.Series[Number, String]
       name = "Data Series 3"
       // Assign data by mapping x and y values to XYChart.Data
       val prices = Seq(800, 1000, 2000)
       data = ObservableBuffer(
-          prices zip years map {
+          prices zip years map
         case (x, y) => XYChart.Data[Number, String](x, y)
-      })
-    }
+      )
 
     // Assign data using a helper function
     def xyData(xs: Seq[Number]) =
@@ -96,11 +91,8 @@ class EnsembleAdvHorizontalBarChart extends EnsembleExample {
     val series4 = XYChart.Series("Data Series 4", xyData(Seq(786, 2100, 450)))
 
     // setup chart
-    new BarChart(xAxis, yAxis) {
+    new BarChart(xAxis, yAxis)
       barGap = 5
       categoryGap = 12
       title = "Horizontal Bar Chart Example"
       data() ++= Seq(series1, series2, series3, series4)
-    }
-  }
-}

@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.lang.resolve.{ResolvableReferenceElement, Sca
   * 8/29/13
   */
 abstract class ApplyUnapplyMethodSearcherBase
-    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
+    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters]
 
   protected val names: Set[String]
 
@@ -23,31 +23,23 @@ abstract class ApplyUnapplyMethodSearcherBase
       ref: PsiReference): Option[ResolvableReferenceElement]
 
   def execute(queryParameters: SearchParameters,
-              consumer: Processor[PsiReference]): Boolean = {
+              consumer: Processor[PsiReference]): Boolean =
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
     val ignoreAccess = queryParameters.isIgnoreAccessScope
-    element match {
+    element match
       case fun: ScFunctionDefinition if names.contains(fun.name) =>
-        val processor = new Processor[PsiReference] {
-          def process(ref: PsiReference): Boolean = {
-            inReadAction {
-              checkAndTransform(ref).flatMap(_.bind()) match {
+        val processor = new Processor[PsiReference]
+          def process(ref: PsiReference): Boolean =
+            inReadAction
+              checkAndTransform(ref).flatMap(_.bind()) match
                 case Some(ScalaResolveResult(`fun`, _)) =>
                   consumer.process(ref)
                 case _ => true
-              }
-            }
-          }
-        }
-        inReadAction(fun.containingClass) match {
+        inReadAction(fun.containingClass) match
           case obj: ScObject =>
             ReferencesSearch
               .search(obj, scope, ignoreAccess)
               .forEach(processor)
           case _ => true
-        }
       case _ => true
-    }
-  }
-}

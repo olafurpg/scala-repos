@@ -52,7 +52,7 @@ class HistoryServer(conf: SparkConf,
                   securityManager.getSSLOptions("historyServer"),
                   port,
                   conf) with Logging with UIRoot
-    with ApplicationCacheOperations {
+    with ApplicationCacheOperations
 
   // How many applications to retain
   private val retainedApplications =
@@ -65,18 +65,17 @@ class HistoryServer(conf: SparkConf,
   // and its metrics, for testing as well as monitoring
   val cacheMetrics = appCache.metrics
 
-  private val loaderServlet = new HttpServlet {
+  private val loaderServlet = new HttpServlet
     protected override def doGet(
-        req: HttpServletRequest, res: HttpServletResponse): Unit = {
+        req: HttpServletRequest, res: HttpServletResponse): Unit =
       // Parse the URI created by getAttemptURI(). It contains an app ID and an optional
       // attempt ID (separated by a slash).
       val parts = Option(req.getPathInfo()).getOrElse("").split("/")
-      if (parts.length < 2) {
+      if (parts.length < 2)
         res.sendError(
             HttpServletResponse.SC_BAD_REQUEST,
             s"Unexpected path info in request (URI = ${req.getRequestURI()}")
         return
-      }
 
       val appId = parts(1)
       val attemptId = if (parts.length >= 3) Some(parts(2)) else None
@@ -85,14 +84,12 @@ class HistoryServer(conf: SparkConf,
       // single attempt, we need to try both. Try the single-attempt route first, and if an
       // error is raised, then try the multiple attempt route.
       if (!loadAppUi(appId, None) &&
-          (!attemptId.isDefined || !loadAppUi(appId, attemptId))) {
+          (!attemptId.isDefined || !loadAppUi(appId, attemptId)))
         val msg = <div class="row-fluid">Application {appId} not found.</div>
         res.setStatus(HttpServletResponse.SC_NOT_FOUND)
-        UIUtils.basicSparkPage(msg, "Not Found").foreach { n =>
+        UIUtils.basicSparkPage(msg, "Not Found").foreach  n =>
           res.getWriter().write(n.toString)
-        }
         return
-      }
 
       // Note we don't use the UI retrieved from the cache; the cache loader above will register
       // the app's UI, and all we need to do is redirect the user to the same URI that was
@@ -102,18 +99,14 @@ class HistoryServer(conf: SparkConf,
         req.getRequestURI +
         Option(req.getQueryString).map("?" + _).getOrElse("")
       res.sendRedirect(res.encodeRedirectURL(requestURI))
-    }
 
     // SPARK-5983 ensure TRACE is not supported
     protected override def doTrace(
-        req: HttpServletRequest, res: HttpServletResponse): Unit = {
+        req: HttpServletRequest, res: HttpServletResponse): Unit =
       res.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED)
-    }
-  }
 
-  def getSparkUI(appKey: String): Option[SparkUI] = {
+  def getSparkUI(appKey: String): Option[SparkUI] =
     appCache.getSparkUI(appKey)
-  }
 
   initialize()
 
@@ -123,7 +116,7 @@ class HistoryServer(conf: SparkConf,
     * This starts a background thread that periodically synchronizes information displayed on
     * this UI with the event logs in the provided base directory.
     */
-  def initialize() {
+  def initialize()
     attachPage(new HistoryPage(this))
 
     attachHandler(ApiRootResource.getServletHandler(this))
@@ -134,38 +127,33 @@ class HistoryServer(conf: SparkConf,
     contextHandler.setContextPath(HistoryServer.UI_PATH_PREFIX)
     contextHandler.addServlet(new ServletHolder(loaderServlet), "/*")
     attachHandler(contextHandler)
-  }
 
   /** Bind to the HTTP server behind this web interface. */
-  override def bind() {
+  override def bind()
     super.bind()
-  }
 
   /** Stop the server and close the file system. */
-  override def stop() {
+  override def stop()
     super.stop()
     provider.stop()
     appCache.stop()
-  }
 
   /** Attach a reconstructed UI to this server. Only valid after bind(). */
   override def attachSparkUI(appId: String,
                              attemptId: Option[String],
                              ui: SparkUI,
-                             completed: Boolean) {
+                             completed: Boolean)
     assert(serverInfo.isDefined,
            "HistoryServer must be bound before attaching SparkUIs")
     ui.getHandlers.foreach(attachHandler)
     addFilters(ui.getHandlers, conf)
-  }
 
   /** Detach a reconstructed UI from this server. Only valid after bind(). */
   override def detachSparkUI(
-      appId: String, attemptId: Option[String], ui: SparkUI): Unit = {
+      appId: String, attemptId: Option[String], ui: SparkUI): Unit =
     assert(serverInfo.isDefined,
            "HistoryServer must be bound before detaching SparkUIs")
     ui.getHandlers.foreach(detachHandler)
-  }
 
   /**
     * Get the application UI and whether or not it is completed
@@ -174,29 +162,25 @@ class HistoryServer(conf: SparkConf,
     * @return If found, the Spark UI and any history information to be used in the cache
     */
   override def getAppUI(
-      appId: String, attemptId: Option[String]): Option[LoadedAppUI] = {
+      appId: String, attemptId: Option[String]): Option[LoadedAppUI] =
     provider.getAppUI(appId, attemptId)
-  }
 
   /**
     * Returns a list of available applications, in descending order according to their end time.
     *
     * @return List of all known applications.
     */
-  def getApplicationList(): Iterable[ApplicationHistoryInfo] = {
+  def getApplicationList(): Iterable[ApplicationHistoryInfo] =
     provider.getListing()
-  }
 
-  def getApplicationInfoList: Iterator[ApplicationInfo] = {
+  def getApplicationInfoList: Iterator[ApplicationInfo] =
     getApplicationList().iterator
       .map(ApplicationsListResource.appHistoryInfoToPublicAppInfo)
-  }
 
   override def writeEventLogs(appId: String,
                               attemptId: Option[String],
-                              zipStream: ZipOutputStream): Unit = {
+                              zipStream: ZipOutputStream): Unit =
     provider.writeEventLogs(appId, attemptId, zipStream)
-  }
 
   /**
     * Returns the provider configuration to show in the listing page.
@@ -211,33 +195,28 @@ class HistoryServer(conf: SparkConf,
     * @param attemptId optional attempt ID
     * @return true if the application was found and loaded.
     */
-  private def loadAppUi(appId: String, attemptId: Option[String]): Boolean = {
-    try {
+  private def loadAppUi(appId: String, attemptId: Option[String]): Boolean =
+    try
       appCache.get(appId, attemptId)
       true
-    } catch {
+    catch
       case NonFatal(e) =>
-        e.getCause() match {
+        e.getCause() match
           case nsee: NoSuchElementException =>
             false
 
           case cause: Exception => throw cause
-        }
-    }
-  }
 
   /**
     * String value for diagnostics.
     * @return a multi-line description of the server state.
     */
-  override def toString: String = {
+  override def toString: String =
     s"""
       | History Server;
       | provider = $provider
       | cache = $appCache
     """.stripMargin
-  }
-}
 
 /**
   * The recommended way of starting and stopping a HistoryServer is through the scripts
@@ -250,12 +229,12 @@ class HistoryServer(conf: SparkConf,
   *
   * This launches the HistoryServer as a Spark daemon.
   */
-object HistoryServer extends Logging {
+object HistoryServer extends Logging
   private val conf = new SparkConf
 
   val UI_PATH_PREFIX = "/history"
 
-  def main(argStrings: Array[String]): Unit = {
+  def main(argStrings: Array[String]): Unit =
     Utils.initDaemon(log)
     new HistoryServerArguments(conf, argStrings)
     initSecurity()
@@ -275,32 +254,26 @@ object HistoryServer extends Logging {
     val server = new HistoryServer(conf, provider, securityManager, port)
     server.bind()
 
-    ShutdownHookManager.addShutdownHook { () =>
+    ShutdownHookManager.addShutdownHook  () =>
       server.stop()
-    }
 
     // Wait until the end of the world... or if the HistoryServer process is manually stopped
     while (true) { Thread.sleep(Int.MaxValue) }
-  }
 
-  def initSecurity() {
+  def initSecurity()
     // If we are accessing HDFS and it has security enabled (Kerberos), we have to login
     // from a keytab file so that we can access HDFS beyond the kerberos ticket expiration.
     // As long as it is using Hadoop rpc (hdfs://), a relogin will automatically
     // occur from the keytab.
-    if (conf.getBoolean("spark.history.kerberos.enabled", false)) {
+    if (conf.getBoolean("spark.history.kerberos.enabled", false))
       // if you have enabled kerberos the following 2 params must be set
       val principalName = conf.get("spark.history.kerberos.principal")
       val keytabFilename = conf.get("spark.history.kerberos.keytab")
       SparkHadoopUtil.get.loginUserFromKeytab(principalName, keytabFilename)
-    }
-  }
 
   private[history] def getAttemptURI(
-      appId: String, attemptId: Option[String]): String = {
-    val attemptSuffix = attemptId.map { id =>
+      appId: String, attemptId: Option[String]): String =
+    val attemptSuffix = attemptId.map  id =>
       s"/$id"
-    }.getOrElse("")
+    .getOrElse("")
     s"${HistoryServer.UI_PATH_PREFIX}/${appId}${attemptSuffix}"
-  }
-}

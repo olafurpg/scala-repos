@@ -5,24 +5,21 @@ import scala.reflect.ClassTag
 import breeze.math.Field
 import breeze.linalg.Vector
 
-package object interpolation {
+package object interpolation
 
-  object UnivariateInterpolatorImpl extends UFunc with MappingUFunc {
+  object UnivariateInterpolatorImpl extends UFunc with MappingUFunc
     implicit def impl[T]: Impl2[UnivariateInterpolator[T], T, T] =
-      new Impl2[UnivariateInterpolator[T], T, T] {
+      new Impl2[UnivariateInterpolator[T], T, T]
         def apply(k: UnivariateInterpolator[T], v: T): T = k(v)
-      }
-  }
 
   trait UnivariateInterpolator[T]
       extends VariableUFunc[
-          UnivariateInterpolatorImpl.type, UnivariateInterpolator[T]] {
+          UnivariateInterpolatorImpl.type, UnivariateInterpolator[T]]
     def apply(x: T): T
-  }
 
   abstract class HandyUnivariateInterpolator[T : ClassTag : Field : Ordering](
       x_coords: Vector[T], y_coords: Vector[T])
-      extends UnivariateInterpolator[T] {
+      extends UnivariateInterpolator[T]
 
     if (x_coords.size != x_coords.toArray.toSet.size)
       throw new Exception("x coordinates must be unique")
@@ -32,40 +29,32 @@ package object interpolation {
       throw new Exception("need to provide at least one pair of coordinates")
 
     private val nodes =
-      x_coords.toArray zip y_coords.toArray sortBy { n =>
+      x_coords.toArray zip y_coords.toArray sortBy  n =>
         n._1
-      }
     protected val X: Array[T] =
-      nodes map { n =>
+      nodes map  n =>
         n._1
-      }
     protected val Y: Array[T] =
-      nodes map { n =>
+      nodes map  n =>
         n._2
-      }
 
     private val ord = implicitly[Ordering[T]]
     import ord.mkOrderingOps
 
-    def apply(x: T): T = {
+    def apply(x: T): T =
       if (x < X(0) || x > X(X.size - 1)) extrapolate(x)
       else interpolate(x)
-    }
 
     protected def interpolate(x: T): T
 
-    protected def extrapolate(x: T): T = {
+    protected def extrapolate(x: T): T =
       throw new IndexOutOfBoundsException(
           "Out of the domain [" + X(0) + "," + X(X.size - 1) + "]")
-    }
 
     protected def bisearch(x: T): Int = bisearch(0, X.length - 1, x)
 
     private def bisearch(low: Int, high: Int, x: T): Int =
-      (low + high) / 2 match {
+      (low + high) / 2 match
         case mid if low == high => mid
         case mid if X(mid) < x => bisearch(mid + 1, high, x)
         case mid => bisearch(low, mid, x)
-      }
-  }
-}

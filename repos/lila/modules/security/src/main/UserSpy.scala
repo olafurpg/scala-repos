@@ -13,7 +13,7 @@ import tube.storeColl
 case class UserSpy(ips: List[UserSpy.IPData],
                    uas: List[String],
                    usersSharingIp: List[User],
-                   usersSharingFingerprint: List[User]) {
+                   usersSharingFingerprint: List[User])
 
   import UserSpy.OtherUser
 
@@ -22,16 +22,14 @@ case class UserSpy(ips: List[UserSpy.IPData],
   def ipsByLocations: List[(Location, List[UserSpy.IPData])] =
     ips.sortBy(_.ip).groupBy(_.location).toList.sortBy(_._1.comparable)
 
-  lazy val otherUsers: List[OtherUser] = {
-    usersSharingIp.map { u =>
+  lazy val otherUsers: List[OtherUser] =
+    usersSharingIp.map  u =>
       OtherUser(u, true, usersSharingFingerprint contains u)
-    } ::: usersSharingFingerprint.filterNot(usersSharingIp.contains).map {
+    ::: usersSharingFingerprint.filterNot(usersSharingIp.contains).map
       OtherUser(_, false, true)
-    }
-  }.sortBy(-_.user.createdAt.getMillis)
-}
+  .sortBy(-_.user.createdAt.getMillis)
 
-object UserSpy {
+object UserSpy
 
   case class OtherUser(user: User, byIp: Boolean, byFingerprint: Boolean)
 
@@ -43,20 +41,19 @@ object UserSpy {
 
   private[security] def apply(
       firewall: Firewall, geoIP: GeoIP)(userId: String): Fu[UserSpy] =
-    for {
+    for
       user ← UserRepo named userId flatten "[spy] user not found"
       infos ← Store.findInfoByUser(user.id)
       ips = infos.map(_.ip).distinct
       blockedIps ← (ips map firewall.blocksIp).sequenceFu
-      locations <- scala.concurrent.Future {
+      locations <- scala.concurrent.Future
         ips map geoIP.orUnknown
-      }
       sharingIp ← exploreSimilar("ip")(user)
       sharingFingerprint ← exploreSimilar("fp")(user)
-    } yield
-      UserSpy(ips = ips zip blockedIps zip locations map {
+    yield
+      UserSpy(ips = ips zip blockedIps zip locations map
                 case ((ip, blocked), location) => IPData(ip, blocked, location)
-              },
+              ,
               uas = infos.map(_.ua).distinct,
               usersSharingIp = (sharingIp +
                     user).toList.sortBy(-_.createdAt.getMillis),
@@ -64,9 +61,8 @@ object UserSpy {
                     user).toList.sortBy(-_.createdAt.getMillis))
 
   private def exploreSimilar(field: String)(user: User): Fu[Set[User]] =
-    nextValues(field)(user) flatMap { nValues =>
+    nextValues(field)(user) flatMap  nValues =>
       nextUsers(field)(nValues, user) map { _ + user }
-    }
 
   private def nextValues(field: String)(user: User): Fu[Set[Value]] =
     storeColl
@@ -75,20 +71,16 @@ object UserSpy {
           BSONDocument(field -> true)
       )
       .cursor[BSONDocument]()
-      .collect[List]() map {
+      .collect[List]() map
       _.flatMap(_.getAs[Value](field)).toSet
-    }
 
   private def nextUsers(field: String)(
       values: Set[Value], user: User): Fu[Set[User]] =
-    values.nonEmpty ?? {
+    values.nonEmpty ??
       storeColl.distinct("user",
                          BSONDocument(
                              field -> BSONDocument("$in" -> values),
                              "user" -> BSONDocument("$ne" -> user.id)
-                         ).some) map lila.db.BSON.asStrings flatMap {
+                         ).some) map lila.db.BSON.asStrings flatMap
         userIds =>
           userIds.nonEmpty ?? (UserRepo byIds userIds) map (_.toSet)
-      }
-    }
-}

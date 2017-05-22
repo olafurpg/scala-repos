@@ -25,22 +25,18 @@ import scala.concurrent.duration.{Duration => SDuration}
 import cascading.flow.FlowDef
 import org.apache.hadoop.conf.Configuration
 
-class NoStackLineNumberTest extends WordSpec {
+class NoStackLineNumberTest extends WordSpec
 
-  "No Stack Shouldn't block getting line number info" should {
-    "actually get the no stack info" in {
+  "No Stack Shouldn't block getting line number info" should
+    "actually get the no stack info" in
       import Dsl._
       implicit val fd = new FlowDef
       implicit val m = new Hdfs(false, new Configuration)
 
       val pipeFut =
-        com.twitter.example.scalding.typed.InAnotherPackage.buildF.map { tp =>
+        com.twitter.example.scalding.typed.InAnotherPackage.buildF.map  tp =>
           tp.toPipe('a, 'b)
-        }
       val pipe = Await.result(pipeFut, SDuration.Inf)
       // We pick up line number info via the NoStackAndThenClass
       // So this should have some non-scalding info in it.
       assert(RichPipe.getPipeDescriptions(pipe).size > 0)
-    }
-  }
-}

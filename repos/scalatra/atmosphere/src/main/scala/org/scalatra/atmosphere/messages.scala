@@ -17,9 +17,8 @@ sealed trait OutboundMessage
   * A base trait for creating messages of different content types
   * @tparam T The type of content this protocol message represents
   */
-trait ProtocolMessage[T] extends InboundMessage with OutboundMessage {
+trait ProtocolMessage[T] extends InboundMessage with OutboundMessage
   def content: T
-}
 
 /**
   * A callback event signaling that the connection has been fully established.

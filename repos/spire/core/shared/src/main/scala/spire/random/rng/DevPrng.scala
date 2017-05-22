@@ -4,7 +4,7 @@ package rng
 
 import java.io._
 
-class Device(f: File) extends Generator { self =>
+class Device(f: File) extends Generator  self =>
   if (!f.canRead) throw new IllegalArgumentException("can't read %s" format f)
 
   private var dis = new DataInputStream(new FileInputStream(f))
@@ -20,32 +20,28 @@ class Device(f: File) extends Generator { self =>
   def nextInt(): Int = dis.readInt()
 
   def nextLong(): Long = dis.readLong()
-}
 
-object Device {
+object Device
   def apply(path: String): Device = new Device(new File(path))
   def random: Device = new Device(new File("/dev/random"))
   def urandom: Device = new Device(new File("/dev/urandom"))
-}
 
-class CycledFile(f: File) extends Generator { self =>
+class CycledFile(f: File) extends Generator  self =>
   private var dis: DataInputStream = null
 
   if (!f.canRead) throw new IllegalArgumentException("can't read %s" format f)
   else reinit()
 
-  try {
+  try
     nextLong()
-  } catch {
+  catch
     case e: EOFException =>
       throw new IllegalArgumentException(
           "%s contains less than 8 bytes" format f)
-  }
 
-  def reinit(): Unit = {
+  def reinit(): Unit =
     if (dis != null) dis.close()
     dis = new DataInputStream(new FileInputStream(f))
-  }
 
   def copyInit: Generator = new CycledFile(f)
 
@@ -56,24 +52,20 @@ class CycledFile(f: File) extends Generator { self =>
     throw new UnsupportedOperationException("setSeedBytes")
 
   def nextInt(): Int =
-    try {
+    try
       dis.readInt()
-    } catch {
+    catch
       case e: EOFException =>
         reinit()
         dis.readInt()
-    }
 
   def nextLong(): Long =
-    try {
+    try
       dis.readLong()
-    } catch {
+    catch
       case e: EOFException =>
         reinit()
         dis.readInt()
-    }
-}
 
-object CycledFile {
+object CycledFile
   def apply(path: String): CycledFile = new CycledFile(new File(path))
-}

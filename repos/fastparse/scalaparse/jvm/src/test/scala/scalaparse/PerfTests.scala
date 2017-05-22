@@ -5,14 +5,14 @@ import utest._
 
 import scala.tools.nsc.{Global, Settings}
 
-object PerfTests extends TestSuite {
+object PerfTests extends TestSuite
   val genJsCodeSource = scala.io.Source
     .fromInputStream(
         getClass.getResourceAsStream("/scalaparse/GenJSCode.scala")
     )
     .mkString
-  val tests = TestSuite {
-    'GenJSCode {
+  val tests = TestSuite
+    'GenJSCode
       var current = Thread.currentThread().getContextClassLoader
       val files = collection.mutable.Buffer.empty[java.io.File]
       files.appendAll(
@@ -21,14 +21,12 @@ object PerfTests extends TestSuite {
             .split(":")
             .map(new java.io.File(_))
         )
-      while (current != null) {
-        current match {
+      while (current != null)
+        current match
           case t: java.net.URLClassLoader =>
             files.appendAll(t.getURLs.map(u => new java.io.File(u.toURI)))
           case _ =>
-        }
         current = current.getParent
-      }
 
       val settings = new Settings()
       settings.usejavacp.value = true
@@ -102,15 +100,10 @@ object PerfTests extends TestSuite {
 //        time(() => parser.parse(genJsCodeSource))
 //        time(() => parser.parse(genJsCodeSource + "*/").asInstanceOf[Result.Failure].traced)
 //        time(() => global.newUnitParser(genJsCodeSource).parse())
-    }
-  }
-  def time(f: () => Unit) = {
+  def time(f: () => Unit) =
     val start = System.currentTimeMillis()
     var count = 0
-    while (System.currentTimeMillis() - start < 10000) {
+    while (System.currentTimeMillis() - start < 10000)
       f()
       count += 1
-    }
     println(count)
-  }
-}

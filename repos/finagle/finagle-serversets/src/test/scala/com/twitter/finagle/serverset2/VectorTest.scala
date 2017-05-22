@@ -5,9 +5,9 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
-class VectorTest extends FunSuite {
+class VectorTest extends FunSuite
   val port = 80 // not bound
-  test("Selector.matches") {
+  test("Selector.matches")
     val ep1 = Endpoint(Array(null),
                        "10.0.0.1",
                        port,
@@ -28,9 +28,8 @@ class VectorTest extends FunSuite {
     val shard = Selector.Shard(3)
     assert(!(mem matches ep1))
     assert(mem matches ep2)
-  }
 
-  test("Vector.weightOf") {
+  test("Vector.weightOf")
     val vec = Vector(
         Seq(Descriptor(Selector.Host("10.0.0.2", 123), 1.2, 1),
             Descriptor(Selector.Member("9876"), 1.1, 1),
@@ -55,13 +54,10 @@ class VectorTest extends FunSuite {
 
     for (ep <- Seq(ep1, ep2, ep3, ep4)) assert(
         Vector(Seq.empty).weightOf(ep) == 1.0)
-  }
 
-  test("Vector.parseJson") {
+  test("Vector.parseJson")
     val Some(Vector(vec)) = Vector.parseJson(
         """{"vector":[{"select":"member=1","weight":1.2,"priority":1},{"select":"inet=10.0.0.3:%d","weight":1.3,"priority":2}]}"""
           .format(port))
     assert(vec == Seq(Descriptor(Selector.Member("1"), 1.2, 1),
                       Descriptor(Selector.Host("10.0.0.3", port), 1.3, 2)))
-  }
-}

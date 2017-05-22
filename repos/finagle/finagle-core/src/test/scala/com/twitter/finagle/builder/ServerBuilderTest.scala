@@ -19,9 +19,9 @@ import org.scalatest.concurrent.{Eventually, IntegrationPatience}
 @RunWith(classOf[JUnitRunner])
 class ServerBuilderTest
     extends FunSuite with Eventually with IntegrationPatience with MockitoSugar
-    with IntegrationBase {
+    with IntegrationBase
 
-  trait ServerBuilderHelper {
+  trait ServerBuilderHelper
     val preparedFactory = mock[ServiceFactory[String, String]]
     val preparedServicePromise = new Promise[Service[String, String]]
     when(preparedFactory.status) thenReturn Status.Open
@@ -32,15 +32,14 @@ class ServerBuilderTest
 
     val m = new MockChannel
     when(m.codec.prepareConnFactory(any[ServiceFactory[String, String]])) thenReturn preparedFactory
-  }
 
   val svc: Service[String, String] = Service.const(Future.value("hi"))
 
   def verifyProtocolRegistry(name: String, expected: String)(
-      build: => Server) = {
-    test(name + " registers protocol library") {
+      build: => Server) =
+    test(name + " registers protocol library")
       val simple = new SimpleRegistry()
-      GlobalRegistry.withRegistry(simple) {
+      GlobalRegistry.withRegistry(simple)
         val server = build
 
         val entries = GlobalRegistry.get.toSet
@@ -52,15 +51,12 @@ class ServerBuilderTest
           entries.count(_.key.startsWith(Seq("server", expected)))
         assert(specified > 0, "did not see expected protocol registry keys")
         server.close()
-      }
-    }
-  }
 
   def verifyServerBoundAddress(name: String, expected: String)(
-      build: => Server) = {
-    test(s"$name registers server with bound address") {
+      build: => Server) =
+    test(s"$name registers server with bound address")
       val simple = new SimpleRegistry()
-      GlobalRegistry.withRegistry(simple) {
+      GlobalRegistry.withRegistry(simple)
         val server = build
 
         val entries = GlobalRegistry.get.toSet
@@ -73,85 +69,64 @@ class ServerBuilderTest
         assert(!hostAndPort.contains(":0"),
                "unbounded address in server registry")
         server.close()
-      }
-    }
-  }
 
   def loopback = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
 
-  verifyProtocolRegistry("#codec(Codec)", expected = "fancy") {
+  verifyProtocolRegistry("#codec(Codec)", expected = "fancy")
     val ctx = new ServerBuilderHelper {}
     when(ctx.m.codec.protocolLibraryName).thenReturn("fancy")
 
     ServerBuilder().name("test").codec(ctx.m.codec).bindTo(loopback).build(svc)
-  }
 
-  verifyProtocolRegistry("#codec(CodecFactory)", expected = "fancy") {
+  verifyProtocolRegistry("#codec(CodecFactory)", expected = "fancy")
     val ctx = new ServerBuilderHelper {}
-    val cf = new CodecFactory[String, String] {
+    val cf = new CodecFactory[String, String]
       def client: Client = ???
       def server: Server = (_: ServerCodecConfig) => ctx.m.codec
       override def protocolLibraryName = "fancy"
-    }
 
     ServerBuilder().name("test").codec(cf).bindTo(loopback).build(svc)
-  }
 
-  verifyProtocolRegistry("#codec(CodecFactory#Server)", expected = "fancy") {
+  verifyProtocolRegistry("#codec(CodecFactory#Server)", expected = "fancy")
     val ctx = new ServerBuilderHelper {}
     when(ctx.m.codec.protocolLibraryName).thenReturn("fancy")
 
-    val cfServer: CodecFactory[String, String]#Server = {
+    val cfServer: CodecFactory[String, String]#Server =
       (_: ServerCodecConfig) =>
         ctx.m.codec
-    }
 
     ServerBuilder().name("test").codec(cfServer).bindTo(loopback).build(svc)
-  }
 
   verifyProtocolRegistry(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
-    class FancyCodec extends CodecFactory[String, String] {
-      def client = { config =>
-        new com.twitter.finagle.Codec[String, String] {
+      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy")
+    class FancyCodec extends CodecFactory[String, String]
+      def client =  config =>
+        new com.twitter.finagle.Codec[String, String]
           def pipelineFactory = null
-        }
-      }
 
-      def server = { config =>
-        new com.twitter.finagle.Codec[String, String] {
+      def server =  config =>
+        new com.twitter.finagle.Codec[String, String]
           def pipelineFactory = null
-        }
-      }
       override val protocolLibraryName: String = "fancy"
-    }
     ServerBuilder()
       .codec(new FancyCodec)
       .bindTo(loopback)
       .name("test")
       .build(svc)
-  }
 
   verifyServerBoundAddress(
-      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy") {
-    class FancyCodec extends CodecFactory[String, String] {
-      def client = { config =>
-        new com.twitter.finagle.Codec[String, String] {
+      "#codec(CodecFactory#Server)FancyCodec", expected = "fancy")
+    class FancyCodec extends CodecFactory[String, String]
+      def client =  config =>
+        new com.twitter.finagle.Codec[String, String]
           def pipelineFactory = null
-        }
-      }
 
-      def server = { config =>
-        new com.twitter.finagle.Codec[String, String] {
+      def server =  config =>
+        new com.twitter.finagle.Codec[String, String]
           def pipelineFactory = null
-        }
-      }
       override val protocolLibraryName: String = "fancy"
-    }
     ServerBuilder()
       .codec(new FancyCodec)
       .bindTo(loopback) // loopback is configured to port 0
       .name("test")
       .build(svc)
-  }
-}

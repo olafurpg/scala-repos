@@ -9,17 +9,16 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class DedupingLogsReceiverTest extends FunSuite with MockitoSugar {
-  test("DedupingLogsReceiver logs when recording and flushing") {
+class DedupingLogsReceiverTest extends FunSuite with MockitoSugar
+  test("DedupingLogsReceiver logs when recording and flushing")
     val mockLog = mock[Logger]
     val lr = new DedupingLogsReceiver(mockLog)
     lr.record("log", "me")
     verify(mockLog, never).info(anyString)
     lr.flush()
     verify(mockLog).info("log=me")
-  }
 
-  test("DedupingLogsReceiver relogging obliterates the old") {
+  test("DedupingLogsReceiver relogging obliterates the old")
     val mockLog = mock[Logger]
     val lr = new DedupingLogsReceiver(mockLog)
     lr.record("log", "me")
@@ -28,9 +27,8 @@ class DedupingLogsReceiverTest extends FunSuite with MockitoSugar {
     verify(mockLog, never).info(anyString)
     lr.flush()
     verify(mockLog).info("log=you")
-  }
 
-  test("DedupingLogsReceiver can log multiple values") {
+  test("DedupingLogsReceiver can log multiple values")
     val mockLog = mock[Logger]
     val lr = new DedupingLogsReceiver(mockLog)
     lr.record("log", "me")
@@ -45,9 +43,8 @@ class DedupingLogsReceiverTest extends FunSuite with MockitoSugar {
     lr.record("log", "me")
     lr.flush()
     verify(mockLog, times(2)).info("gol=em, log=me")
-  }
 
-  test("DedupingLogsReceiver record order doesn't matter") {
+  test("DedupingLogsReceiver record order doesn't matter")
     val mockLog = mock[Logger]
     val lr = new DedupingLogsReceiver(mockLog)
     lr.record("log", "me")
@@ -59,9 +56,8 @@ class DedupingLogsReceiverTest extends FunSuite with MockitoSugar {
     lr.record("log", "me")
     lr.flush()
     verify(mockLog, times(2)).info("gol=em, log=me")
-  }
 
-  test("DedupingLogsReceiver flushes clears too") {
+  test("DedupingLogsReceiver flushes clears too")
     val mockLog = mock[Logger]
     val lr = new DedupingLogsReceiver(mockLog)
     lr.record("log", "1")
@@ -74,5 +70,3 @@ class DedupingLogsReceiverTest extends FunSuite with MockitoSugar {
     lr.flush()
     verify(mockLog).info("log=1")
     verify(mockLog).info("log=2")
-  }
-}

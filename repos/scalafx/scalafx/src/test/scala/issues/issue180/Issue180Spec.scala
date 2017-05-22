@@ -36,10 +36,8 @@ import scalafx.testutil.RunOnApplicationThread
 
 /** Issue 91: "Setting control effect as null causes NPE" */
 @RunWith(classOf[JUnitRunner])
-class Issue180Spec extends FlatSpec with RunOnApplicationThread {
+class Issue180Spec extends FlatSpec with RunOnApplicationThread
 
-  "selectDouble" should "should not throw exception with valid input" in {
+  "selectDouble" should "should not throw exception with valid input" in
     val group = new Group()
     group.parent.selectDouble("width")
-  }
-}

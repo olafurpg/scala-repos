@@ -11,7 +11,7 @@ import scalaz.std.java.time._
 import scala.collection.convert.decorateAsScala._
 import TimeTest._
 
-object TimeTestJVM extends SpecLite {
+object TimeTestJVM extends SpecLite
 
   private[this] def arb[A](implicit A: Arbitrary[A]): Arbitrary[A] = A
 
@@ -28,9 +28,8 @@ object TimeTestJVM extends SpecLite {
           Gen.choose(0, 999999999)
       )(LocalDateTime.of(_, _, _, _, _, _, _)))
 
-  implicit val InstantArbitrary: Arbitrary[Instant] = arb[Long].map {
+  implicit val InstantArbitrary: Arbitrary[Instant] = arb[Long].map
     Instant.ofEpochMilli(_)
-  }
 
   implicit val zonedOffsetArbitrary: Arbitrary[ZoneOffset] = Arbitrary(
       Apply[Gen].apply3(
@@ -66,4 +65,3 @@ object TimeTestJVM extends SpecLite {
   checkAll("OffsetTime", order.laws[OffsetTime])
   checkAll("ZonedDateTime", order.laws[ZonedDateTime])
   checkAll("ZoneOffset", order.laws[ZoneOffset])
-}

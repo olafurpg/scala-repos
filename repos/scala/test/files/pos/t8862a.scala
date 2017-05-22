@@ -1,33 +1,28 @@
-package p {
+package p
 
-  abstract class C[A] {
+  abstract class C[A]
     def x: A
     implicit def oops: A = x
     implicit def oopso: Option[A] = None
-  }
 
-  package q {
+  package q
 
     class Oops
 
-    object `package` extends C[Oops] {
+    object `package` extends C[Oops]
       override def x = new Oops
-    }
 
-    object Blah {
+    object Blah
       oops
       oopso
 
       // implicits found in enclosing context
       implicitly[Oops]
       implicitly[Option[Oops]]
-    }
-  }
-}
 
-package other {
+package other
 
-  object Blah {
+  object Blah
     // implicits found through this import
     import p.q._
 
@@ -36,11 +31,8 @@ package other {
 
     implicitly[Oops]
     implicitly[Option[Oops]]
-  }
 
-  object Blee {
+  object Blee
     // implicits found through the companion implicits
     implicitly[p.q.Oops]
     implicitly[Option[p.q.Oops]]
-  }
-}

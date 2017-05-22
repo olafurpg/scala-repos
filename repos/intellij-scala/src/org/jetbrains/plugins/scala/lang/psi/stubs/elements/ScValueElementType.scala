@@ -16,14 +16,13 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
   * Date: 17.10.2008
   */
 abstract class ScValueElementType[Value <: ScValue](debugName: String)
-    extends ScStubElementType[ScValueStub, ScValue](debugName) {
+    extends ScStubElementType[ScValueStub, ScValue](debugName)
   def createStubImpl[ParentPsi <: PsiElement](
-      psi: ScValue, parentStub: StubElement[ParentPsi]): ScValueStub = {
+      psi: ScValue, parentStub: StubElement[ParentPsi]): ScValueStub =
     val isDecl = psi.isInstanceOf[ScValueDeclaration]
-    val typeText = psi.typeElement match {
+    val typeText = psi.typeElement match
       case Some(te) => te.getText
       case None => ""
-    }
     val bodyText =
       if (!isDecl)
         psi.asInstanceOf[ScPatternDefinition].expr.map(_.getText).getOrElse("")
@@ -42,9 +41,8 @@ abstract class ScValueElementType[Value <: ScValue](debugName: String)
         containerText,
         isImplicit,
         psi.containingClass == null)
-  }
 
-  def serialize(stub: ScValueStub, dataStream: StubOutputStream) {
+  def serialize(stub: ScValueStub, dataStream: StubOutputStream)
     dataStream.writeBoolean(stub.isDeclaration)
     val names = stub.getNames
     dataStream.writeInt(names.length)
@@ -54,10 +52,9 @@ abstract class ScValueElementType[Value <: ScValue](debugName: String)
     dataStream.writeName(stub.getBindingsContainerText)
     dataStream.writeBoolean(stub.isImplicit)
     dataStream.writeBoolean(stub.isLocal)
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScValueStub = {
+      dataStream: StubInputStream, parentStub: Any): ScValueStub =
     val isDecl = dataStream.readBoolean
     val namesLength = dataStream.readInt
     val names = new Array[StringRef](namesLength)
@@ -77,15 +74,11 @@ abstract class ScValueElementType[Value <: ScValue](debugName: String)
                         bindingsText,
                         isImplicit,
                         isLocal)
-  }
 
-  def indexStub(stub: ScValueStub, sink: IndexSink) {
+  def indexStub(stub: ScValueStub, sink: IndexSink)
     val names = stub.getNames
 
-    for (name <- names if name != null) {
+    for (name <- names if name != null)
       sink.occurrence(ScalaIndexKeys.VALUE_NAME_KEY, name)
-    }
     if (stub.isImplicit)
       sink.occurrence(ScalaIndexKeys.IMPLICITS_KEY, "implicit")
-  }
-}

@@ -22,7 +22,7 @@ final class WrappedArray[A](val array: Array[A])
     with scala.collection.generic.GenericTraversableTemplate[A, WrappedArray]
     with mutable.IndexedSeq[A] with mutable.BufferLike[A, WrappedArray[A]]
     with mutable.ArrayLike[A, WrappedArray[A]]
-    with Builder[A, WrappedArray[A]] {
+    with Builder[A, WrappedArray[A]]
 
   /** Creates a new empty [[WrappedArray]]. */
   def this() = this(Array())
@@ -37,10 +37,9 @@ final class WrappedArray[A](val array: Array[A])
 
   // Builder interface
 
-  @inline def +=(elem: A): this.type = {
+  @inline def +=(elem: A): this.type =
     array.push(elem)
     this
-  }
 
   @inline def clear(): Unit =
     array.length = 0
@@ -49,19 +48,16 @@ final class WrappedArray[A](val array: Array[A])
 
   // Rest of BufferLike interface
 
-  @inline def +=:(elem: A): this.type = {
+  @inline def +=:(elem: A): this.type =
     array.unshift(elem)
     this
-  }
 
-  @inline override def ++=:(xs: TraversableOnce[A]): this.type = {
+  @inline override def ++=:(xs: TraversableOnce[A]): this.type =
     array.unshift(xs.toSeq: _*)
     this
-  }
 
-  @inline def insertAll(n: Int, elems: scala.collection.Traversable[A]): Unit = {
+  @inline def insertAll(n: Int, elems: scala.collection.Traversable[A]): Unit =
     array.splice(n, 0, elems.toSeq: _*)
-  }
 
   @inline def remove(n: Int): A =
     array.splice(n, 1)(0)
@@ -70,13 +66,12 @@ final class WrappedArray[A](val array: Array[A])
     array.splice(n, count)
 
   @inline override def stringPrefix: String = "WrappedArray"
-}
 
 /** Factory for [[WrappedArray]]. Mainly provides the relevant
   *  [[scala.collection.generic.CanBuildFrom CanBuildFroms]]s and implicit
   *  conversions.
   */
-object WrappedArray extends SeqFactory[WrappedArray] {
+object WrappedArray extends SeqFactory[WrappedArray]
 
   /** Standard CBF for [[WrappedArray]] */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, WrappedArray[A]] =
@@ -86,4 +81,3 @@ object WrappedArray extends SeqFactory[WrappedArray] {
 
   implicit def toJSArray[A](wrappedArray: WrappedArray[A]): Array[A] =
     wrappedArray.array
-}

@@ -14,7 +14,7 @@ import org.apache.thrift.protocol.TProtocolFactory
 class ThriftMuxClientLike private[finagle](client: ThriftMux.Client)
     extends StackBasedClient[ThriftClientRequest, Array[Byte]]
     with Stack.Parameterized[ThriftMuxClientLike]
-    with Stack.Transformable[ThriftMuxClientLike] with ThriftRichClient {
+    with Stack.Transformable[ThriftMuxClientLike] with ThriftRichClient
 
   /**
     * Used for Java access.
@@ -87,7 +87,6 @@ class ThriftMuxClientLike private[finagle](client: ThriftMux.Client)
       dest: Name,
       label: String): ServiceFactory[ThriftClientRequest, Array[Byte]] =
     client.newClient(dest, label)
-}
 
 /**
   * A client for thrift served over [[com.twitter.finagle.mux]]

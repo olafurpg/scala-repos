@@ -22,7 +22,7 @@ package mutable
 @deprecated(
     "Proxying is deprecated due to lack of use and compiler-level support.",
     "2.11.0")
-trait StackProxy[A] extends Stack[A] with Proxy {
+trait StackProxy[A] extends Stack[A] with Proxy
 
   def self: Stack[A]
 
@@ -46,24 +46,20 @@ trait StackProxy[A] extends Stack[A] with Proxy {
     *
     *  @param  elem        the element to push onto the stack
     */
-  def +=(elem: A): this.type = {
+  def +=(elem: A): this.type =
     self push elem
     this
-  }
 
-  override def pushAll(xs: TraversableOnce[A]): this.type = {
+  override def pushAll(xs: TraversableOnce[A]): this.type =
     self pushAll xs; this
-  }
 
-  override def push(elem1: A, elem2: A, elems: A*): this.type = {
+  override def push(elem1: A, elem2: A, elems: A*): this.type =
     self.push(elem1).push(elem2).pushAll(elems)
     this
-  }
 
-  override def push(elem: A): this.type = {
+  override def push(elem: A): this.type =
     self.push(elem)
     this
-  }
 
   /** Returns the top element of the stack. This method will not remove
     *  the element from the stack. An error is signaled if there is no
@@ -103,7 +99,5 @@ trait StackProxy[A] extends Stack[A] with Proxy {
     *
     *  @return  a stack with the same elements.
     */
-  override def clone(): Stack[A] = new StackProxy[A] {
+  override def clone(): Stack[A] = new StackProxy[A]
     def self = StackProxy.this.self.clone()
-  }
-}

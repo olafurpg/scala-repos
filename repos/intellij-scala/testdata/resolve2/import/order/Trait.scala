@@ -1,4 +1,4 @@
-trait T {
+trait T
   println( /* resolved: false */ HashMap.getClass)
   println(classOf[ /* resolved: false */ HashMap])
 
@@ -6,4 +6,3 @@ trait T {
 
   println( /* */ HashMap.getClass)
   println(classOf[ /* */ HashMap])
-}

@@ -24,8 +24,8 @@ import org.apache.spark.SparkFunSuite
 /**
   *
   */
-class DistributionSuite extends SparkFunSuite with Matchers {
-  test("summary") {
+class DistributionSuite extends SparkFunSuite with Matchers
+  test("summary")
     val d = new Distribution((1 to 100).toArray.map { _.toDouble })
     val stats = d.statCounter
     stats.count should be(100)
@@ -38,5 +38,3 @@ class DistributionSuite extends SparkFunSuite with Matchers {
     quantiles(2) should be(51)
     quantiles(3) should be(76)
     quantiles(4) should be(100)
-  }
-}

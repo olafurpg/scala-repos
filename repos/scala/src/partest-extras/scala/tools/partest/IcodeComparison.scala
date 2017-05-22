@@ -16,7 +16,7 @@ import scala.tools.partest.nest.FileManager.compareContents
   *  in that file.  See scaladoc for possible customizations.
   *  TODO promote me to partest
   */
-abstract class IcodeComparison extends DirectTest {
+abstract class IcodeComparison extends DirectTest
 
   /** The phase after which icode is printed.
     *  Override to check icode at a different point,
@@ -45,7 +45,7 @@ abstract class IcodeComparison extends DirectTest {
     *  @param arg0 at least one arg is required
     *  @param args must include -Xprint-icode:phase
     */
-  def collectIcode(arg0: String, args: String*): List[String] = {
+  def collectIcode(arg0: String, args: String*): List[String] =
     compile("-d" :: testOutput.path :: arg0 :: args.toList: _*)
     val icodeFiles = testOutput.files.toList filter (_ hasExtension "icode")
 
@@ -56,7 +56,6 @@ abstract class IcodeComparison extends DirectTest {
     // check that `delete` returns true indicating successful deletion.
     try icodeFiles sortBy (_.name) flatMap (f => f.slurp().lines.toList) finally icodeFiles foreach
     (f => require(f.delete()))
-  }
 
   /** Collect icode at the default phase, `printIcodeAfterPhase`. */
   def collectIcode(): List[String] =
@@ -68,14 +67,12 @@ abstract class IcodeComparison extends DirectTest {
   /** Compile the test code with and without optimization, and
     *  then print the diff of the icode.
     */
-  def showComparison() = {
+  def showComparison() =
     val lines1 = collectIcode(s"-Xprint-icode:$printSuboptimalIcodeAfterPhase")
     val lines2 = collectIcode(
         "-optimise", s"-Xprint-icode:$printIcodeAfterPhase")
 
     println(compareContents(lines1, lines2))
-  }
 
   /** Print icode at the default phase, `printIcodeAfterPhase`. */
   def showIcode() = println(collectIcode() mkString EOL)
-}

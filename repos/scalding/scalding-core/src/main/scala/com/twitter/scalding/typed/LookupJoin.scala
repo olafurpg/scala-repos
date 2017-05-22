@@ -71,7 +71,7 @@ import com.twitter.algebird.Semigroup
   * right side will return None only if the key is absent,
   * else, the service will return Some(joinedV).
   */
-object LookupJoin extends Serializable {
+object LookupJoin extends Serializable
 
   /**
     * This is the "infinite history" join and always joins regardless of how
@@ -104,14 +104,12 @@ object LookupJoin extends Serializable {
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
       reducers: Option[Int] = None)(
-      gate: (T, T) => Boolean): TypedPipe[(T, (K, (V, Option[JoinedV])))] = {
+      gate: (T, T) => Boolean): TypedPipe[(T, (K, (V, Option[JoinedV])))] =
 
-    implicit val keepNew: Semigroup[JoinedV] = Semigroup.from {
+    implicit val keepNew: Semigroup[JoinedV] = Semigroup.from
       (older, newer) =>
         newer
-    }
     withWindowRightSumming(left, right, reducers)(gate)
-  }
 
   /**
     * This ensures that gate(Tleft, Tright) == true, else the None is emitted
@@ -123,7 +121,7 @@ object LookupJoin extends Serializable {
       left: TypedPipe[(T, (K, V))],
       right: TypedPipe[(T, (K, JoinedV))],
       reducers: Option[Int] = None)(
-      gate: (T, T) => Boolean): TypedPipe[(T, (K, (V, Option[JoinedV])))] = {
+      gate: (T, T) => Boolean): TypedPipe[(T, (K, (V, Option[JoinedV])))] =
 
     /**
       * Implicit ordering on an either that doesn't care about the
@@ -131,23 +129,21 @@ object LookupJoin extends Serializable {
       * Since we assume it takes non-zero time to do a lookup.
       */
     implicit def eitherOrd[T, U]: Ordering[Either[T, U]] =
-      new Ordering[Either[T, U]] {
+      new Ordering[Either[T, U]]
         def compare(l: Either[T, U], r: Either[T, U]) =
-          (l, r) match {
+          (l, r) match
             case (Left(_), Right(_)) => -1
             case (Right(_), Left(_)) => 1
             case (Left(_), Left(_)) => 0
             case (Right(_), Right(_)) => 0
-          }
-      }
 
     val joined: TypedPipe[(K, (Option[(T, JoinedV)], Option[
-            (T, V, Option[JoinedV])]))] = left.map {
+            (T, V, Option[JoinedV])]))] = left.map
       case (t, (k, v)) => (k, (t, Left(v): Either[V, JoinedV]))
-    }.++(right.map {
+    .++(right.map
         case (t, (k, joinedV)) =>
           (k, (t, Right(joinedV): Either[V, JoinedV]))
-      })
+      )
       .group
       .withReducers(reducers.getOrElse(-1)) // -1 means default in scalding
       .sorted
@@ -169,13 +165,12 @@ object LookupJoin extends Serializable {
             * JoinedV is updated and Some(newValue) when a (K, V)
             * shows up and a new join occurs.
             */
-          (Option.empty[(T, JoinedV)], Option.empty[(T, V, Option[JoinedV])])) {
-        case ((None, result), (time, Left(v))) => {
+          (Option.empty[(T, JoinedV)], Option.empty[(T, V, Option[JoinedV])]))
+        case ((None, result), (time, Left(v))) =>
             // The was no value previously
             (None, Some((time, v, None)))
-          }
 
-        case ((prev @ Some((oldt, jv)), result), (time, Left(v))) => {
+        case ((prev @ Some((oldt, jv)), result), (time, Left(v))) =>
             // Left(v) means that we have a new value from the left
             // pipe that we need to join against the current
             // "lastJoined" value sitting in scanLeft's state. This
@@ -183,14 +178,12 @@ object LookupJoin extends Serializable {
             // pipe at time "thisTime".
             val filteredJoined = if (gate(time, oldt)) Some(jv) else None
             (prev, Some((time, v, filteredJoined)))
-          }
 
-        case ((None, result), (time, Right(joined))) => {
+        case ((None, result), (time, Right(joined))) =>
             // There was no value before, so we just update to joined
             (Some((time, joined)), None)
-          }
 
-        case ((Some((oldt, oldJ)), result), (time, Right(joined))) => {
+        case ((Some((oldt, oldJ)), result), (time, Right(joined))) =>
             // Right(joinedV) means that we've received a new value
             // to use in the simulated realtime service
             // described in the comments above
@@ -198,18 +191,12 @@ object LookupJoin extends Serializable {
             val nextJoined =
               if (gate(time, oldt)) Semigroup.plus(oldJ, joined) else joined
             (Some((time, nextJoined)), None)
-          }
-      }
       .toTypedPipe
 
     // Now, get rid of residual state from the scanLeft above:
-    joined.flatMap {
+    joined.flatMap
       case (k, (_, optV)) =>
         // filter out every event that produced a Right(delta) above,
         // leaving only the leftJoin events that occurred above:
-        optV.map {
+        optV.map
           case (t, v, optJoined) => (t, (k, (v, optJoined)))
-        }
-    }
-  }
-}

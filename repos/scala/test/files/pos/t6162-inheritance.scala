@@ -17,6 +17,5 @@ object SubT extends T
 @deprecatedInheritance()
 trait S
 
-object O {
+object O
   new S {}
-}

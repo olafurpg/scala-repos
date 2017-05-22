@@ -16,8 +16,8 @@ import scala.collection.JavaConverters._
   * @author Nikolay Obedin
   * @since 7/27/15.
   */
-trait MockSbt {
-  def addSbtAsModuleDependency(module: Module): Unit = {
+trait MockSbt
+  def addSbtAsModuleDependency(module: Module): Unit =
     val sbtLibraries = Seq("collections",
                            "interface",
                            "io",
@@ -43,11 +43,9 @@ trait MockSbt {
         classesPath.toList.asJava,
         java.util.Collections.emptyList())
     preventLeakageOfVfsPointers()
-  }
 
   def preventLeakageOfVfsPointers(): Unit =
     VirtualFilePointerManager
       .getInstance()
       .asInstanceOf[VirtualFilePointerManagerImpl]
       .storePointers()
-}

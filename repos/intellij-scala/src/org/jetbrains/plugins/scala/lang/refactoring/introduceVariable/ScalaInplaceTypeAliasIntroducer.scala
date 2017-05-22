@@ -14,50 +14,43 @@ import org.jetbrains.plugins.scala.lang.refactoring.rename.inplace.ScalaMemberIn
   * Created by Kate Ustyuzhanina
   * on 8/10/15
   */
-object ScalaInplaceTypeAliasIntroducer {
+object ScalaInplaceTypeAliasIntroducer
   def apply(scNamedElement: ScNamedElement,
             substituted: PsiElement,
             editor: Editor,
             initialName: String,
             oldName: String,
-            scopeItem: ScopeItem): ScalaInplaceTypeAliasIntroducer = {
+            scopeItem: ScopeItem): ScalaInplaceTypeAliasIntroducer =
 
     editor
       .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
       .addScopeElement(scopeItem)
     new ScalaInplaceTypeAliasIntroducer(
         scNamedElement, substituted, editor, initialName, oldName)
-  }
 
   def revertState(myEditor: Editor,
                   scopeItem: ScopeItem,
-                  namedElement: ScNamedElement): Unit = {
+                  namedElement: ScNamedElement): Unit =
     val myProject = myEditor.getProject
-    CommandProcessor.getInstance.executeCommand(myProject, new Runnable {
-      def run() {
+    CommandProcessor.getInstance.executeCommand(myProject, new Runnable
+      def run()
         val revertInfo =
           myEditor.getUserData(ScalaIntroduceVariableHandler.REVERT_INFO)
         val document = myEditor.getDocument
-        if (revertInfo != null) {
-          extensions.inWriteAction {
+        if (revertInfo != null)
+          extensions.inWriteAction
             document.replaceString(
                 0, document.getTextLength, revertInfo.fileText)
             PsiDocumentManager.getInstance(myProject).commitDocument(document)
-          }
           val offset = revertInfo.caretOffset
           myEditor.getCaretModel.moveToOffset(offset)
           myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
           PsiDocumentManager
             .getInstance(myEditor.getProject)
             .commitDocument(document)
-        }
-        if (!myProject.isDisposed && myProject.isOpen) {
+        if (!myProject.isDisposed && myProject.isOpen)
           PsiDocumentManager.getInstance(myProject).commitDocument(document)
-        }
-      }
-    }, "Introduce Type Alias", null)
-  }
-}
+    , "Introduce Type Alias", null)
 
 class ScalaInplaceTypeAliasIntroducer(scNamedElement: ScNamedElement,
                                       substituted: PsiElement,
@@ -65,54 +58,44 @@ class ScalaInplaceTypeAliasIntroducer(scNamedElement: ScNamedElement,
                                       initialName: String,
                                       oldName: String)
     extends ScalaMemberInplaceRenamer(
-        scNamedElement, substituted, editor, initialName, oldName) {
+        scNamedElement, substituted, editor, initialName, oldName)
 
-  override def setAdvertisementText(text: String) = {
+  override def setAdvertisementText(text: String) =
     myAdvertisementText = "Press ctrl + alt + v" +
     " to show dialog with more options"
-  }
 
   override def startsOnTheSameElement(
-      handler: RefactoringActionHandler, element: PsiElement): Boolean = {
-    def checkEquals(typeAliasDefinition: ScTypeAliasDefinition) = {
+      handler: RefactoringActionHandler, element: PsiElement): Boolean =
+    def checkEquals(typeAliasDefinition: ScTypeAliasDefinition) =
       editor
         .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
         .getNamedElement == element
-    }
 
-    element match {
+    element match
       case typeAliasDefinition: ScTypeAliasDefinition =>
         checkEquals(typeAliasDefinition) &&
         handler.isInstanceOf[ScalaIntroduceVariableHandler]
       case _ => false
-    }
-  }
 
-  override def revertState(): Unit = {
+  override def revertState(): Unit =
     //do nothing. we don't need to revert state
-  }
 
-  protected override def moveOffsetAfter(success: Boolean): Unit = {
-    if (success) {
+  protected override def moveOffsetAfter(success: Boolean): Unit =
+    if (success)
       // don't know about element to refactor place
-    } else if (myInsertedName != null &&
+    else if (myInsertedName != null &&
                !UndoManager.getInstance(myProject).isUndoInProgress && !editor
                  .getUserData(IntroduceTypeAlias.REVERT_TYPE_ALIAS_INFO)
-                 .isCallModalDialogInProgress) {
+                 .isCallModalDialogInProgress)
 
       val revertInfo =
         myEditor.getUserData(ScalaIntroduceVariableHandler.REVERT_INFO)
-      if (revertInfo != null) {
-        extensions.inWriteAction {
+      if (revertInfo != null)
+        extensions.inWriteAction
           val myFile: PsiFile = PsiDocumentManager
             .getInstance(myEditor.getProject)
             .getPsiFile(myEditor.getDocument)
           myEditor.getDocument.replaceString(
               0, myFile.getTextLength, revertInfo.fileText)
-        }
         myEditor.getCaretModel.moveToOffset(revertInfo.caretOffset)
         myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
-      }
-    }
-  }
-}

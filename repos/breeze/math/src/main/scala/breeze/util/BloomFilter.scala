@@ -29,27 +29,24 @@ import java.util
 @SerialVersionUID(1L)
 class BloomFilter[@specialized(Int, Long) T](
     val numBuckets: Int, val numHashFunctions: Int, val bits: util.BitSet)
-    extends (T => Boolean) with Serializable {
+    extends (T => Boolean) with Serializable
   def this(numBuckets: Int, numHashFunctions: Int) =
     this(numBuckets, numHashFunctions, new util.BitSet(numBuckets))
   def this(numBuckets: Int) = this(numBuckets, 3)
 
-  def activeBuckets(key: T) = {
+  def activeBuckets(key: T) =
     val hash1 = key.##
     val hash2 = math.abs(MurmurHash3.mixLast(0, hash1))
 
-    for {
+    for
       i <- 0 to numHashFunctions
-    } yield {
+    yield
       val h = hash1 + i * hash2
       val nextHash = if (h < 0) ~h else h
       nextHash % numBuckets
-    }
-  }
 
-  def apply(o: T): Boolean = {
+  def apply(o: T): Boolean =
     activeBuckets(o).forall(i => bits.get(i))
-  }
 
   def contains(o: T) = apply(o)
 
@@ -61,63 +58,53 @@ class BloomFilter[@specialized(Int, Long) T](
     */
   def load: Double = bits.cardinality().toDouble / numBuckets
 
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case that: BloomFilter[_] =>
       this.numBuckets == that.numBuckets &&
       this.numHashFunctions == that.numHashFunctions && this.bits == that.bits
     case _ => false
-  }
 
-  def +=(o: T): this.type = {
+  def +=(o: T): this.type =
     activeBuckets(o).foreach(i => bits.set(i))
     this
-  }
 
-  def &(that: BloomFilter[T]) = {
+  def &(that: BloomFilter[T]) =
     checkCompatibility(that)
     new BloomFilter[T](
         this.numBuckets, this.numHashFunctions, this.bits & that.bits)
-  }
 
-  private def checkCompatibility(that: BloomFilter[T]) {
+  private def checkCompatibility(that: BloomFilter[T])
     require(that.numBuckets == this.numBuckets,
             "Must have the same number of buckets to intersect")
     require(that.numHashFunctions == this.numHashFunctions,
             "Must have the same number of hash functions to intersect")
-  }
 
-  def |(that: BloomFilter[T]) = {
+  def |(that: BloomFilter[T]) =
     checkCompatibility(that)
     new BloomFilter[T](
         this.numBuckets, this.numHashFunctions, this.bits | that.bits)
-  }
 
-  def |=(that: BloomFilter[T]): this.type = {
+  def |=(that: BloomFilter[T]): this.type =
     checkCompatibility(that)
     this.bits |= that.bits
     this
-  }
 
-  def &=(that: BloomFilter[T]): this.type = {
+  def &=(that: BloomFilter[T]): this.type =
     checkCompatibility(that)
     this.bits &= that.bits
     this
-  }
 
-  def &~=(that: BloomFilter[T]): this.type = {
+  def &~=(that: BloomFilter[T]): this.type =
     checkCompatibility(that)
     this.bits &~= that.bits
     this
-  }
 
-  def &~(that: BloomFilter[T]) = {
+  def &~(that: BloomFilter[T]) =
     checkCompatibility(that)
     new BloomFilter[T](
         this.numBuckets, this.numHashFunctions, this.bits &~ that.bits)
-  }
-}
 
-object BloomFilter {
+object BloomFilter
 
   /**
     * Returns the optimal number of buckets  (m) and hash functions (k)
@@ -133,14 +120,13 @@ object BloomFilter {
     * @return
     */
   def optimalSize(
-      expectedNumItems: Double, falsePositiveRate: Double): (Int, Int) = {
+      expectedNumItems: Double, falsePositiveRate: Double): (Int, Int) =
     val n = expectedNumItems
     val p = falsePositiveRate
     import scala.math._
     val m = ceil(-(n * log(p)) / log(pow(2.0, log(2.0))))
     val k = round(log(2.0) * m / n)
     (m.toInt, k.toInt)
-  }
 
   /**
     * Returns a BloomFilter that is optimally sized for the expected number of inputs and false positive rate
@@ -150,8 +136,6 @@ object BloomFilter {
     * @return
     */
   def optimallySized[T](
-      expectedNumItems: Double, falsePositiveRate: Double): BloomFilter[T] = {
+      expectedNumItems: Double, falsePositiveRate: Double): BloomFilter[T] =
     val (buckets, funs) = optimalSize(expectedNumItems, falsePositiveRate)
     new BloomFilter(buckets, funs)
-  }
-}

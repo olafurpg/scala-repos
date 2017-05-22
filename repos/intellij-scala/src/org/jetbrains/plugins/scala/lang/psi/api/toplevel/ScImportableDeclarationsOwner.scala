@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 /**
   * @author ilyas
   */
-trait ScImportableDeclarationsOwner extends ScalaPsiElement {
+trait ScImportableDeclarationsOwner extends ScalaPsiElement
   self: ScTypedDefinition =>
 
   /**
@@ -21,8 +21,7 @@ trait ScImportableDeclarationsOwner extends ScalaPsiElement {
                                    state: ResolveState,
                                    lastParent: PsiElement,
                                    place: PsiElement) =
-    if (isStable) {
+    if (isStable)
       ScalaPsiUtil.processImportLastParent(
           processor, state, place, lastParent, getType(TypingContext.empty))
-    } else true
-}
+    else true

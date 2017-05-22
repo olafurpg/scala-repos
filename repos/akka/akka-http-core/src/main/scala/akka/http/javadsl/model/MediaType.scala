@@ -9,26 +9,22 @@ package akka.http.javadsl.model
   */
 // Has to be defined in Scala even though it's JavaDSL because of:
 // https://issues.scala-lang.org/browse/SI-9621
-object MediaType {
+object MediaType
 
-  trait Binary extends MediaType {
+  trait Binary extends MediaType
     def toContentType: ContentType.Binary
-  }
 
   trait NonBinary extends MediaType {}
 
-  trait WithFixedCharset extends NonBinary {
+  trait WithFixedCharset extends NonBinary
     def toContentType: ContentType.WithFixedCharset
-  }
 
-  trait WithOpenCharset extends NonBinary {
+  trait WithOpenCharset extends NonBinary
     def toContentType(charset: HttpCharset): ContentType.WithCharset
-  }
 
   trait Multipart extends WithOpenCharset {}
-}
 
-trait MediaType {
+trait MediaType
 
   /**
     * The main-type of this media-type.
@@ -73,4 +69,3 @@ trait MediaType {
     * Creates a media-range from this media-type with a given qValue.
     */
   def toRange(qValue: Float): MediaRange
-}

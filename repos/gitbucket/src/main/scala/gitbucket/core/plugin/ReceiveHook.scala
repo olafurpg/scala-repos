@@ -4,7 +4,7 @@ import gitbucket.core.model.Profile._
 import org.eclipse.jgit.transport.{ReceivePack, ReceiveCommand}
 import profile.simple._
 
-trait ReceiveHook {
+trait ReceiveHook
 
   def preReceive(owner: String,
                  repository: String,
@@ -18,4 +18,3 @@ trait ReceiveHook {
                   receivePack: ReceivePack,
                   command: ReceiveCommand,
                   pusher: String)(implicit session: Session): Unit = ()
-}

@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 import akka.actor.Address
 
 final case class ConvergenceMultiNodeConfig(failureDetectorPuppet: Boolean)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -25,7 +25,6 @@ final case class ConvergenceMultiNodeConfig(failureDetectorPuppet: Boolean)
                 "akka.cluster.failure-detector.threshold = 4"))
         .withFallback(
             MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
-}
 
 class ConvergenceWithFailureDetectorPuppetMultiJvmNode1
     extends ConvergenceSpec(failureDetectorPuppet = true)
@@ -46,7 +45,7 @@ class ConvergenceWithAccrualFailureDetectorMultiJvmNode4
     extends ConvergenceSpec(failureDetectorPuppet = false)
 
 abstract class ConvergenceSpec(multiNodeConfig: ConvergenceMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec
 
   def this(failureDetectorPuppet: Boolean) =
     this(ConvergenceMultiNodeConfig(failureDetectorPuppet))
@@ -55,31 +54,28 @@ abstract class ConvergenceSpec(multiNodeConfig: ConvergenceMultiNodeConfig)
 
   muteMarkingAsUnreachable()
 
-  "A cluster of 3 members" must {
+  "A cluster of 3 members" must
 
-    "reach initial convergence" taggedAs LongRunningTest in {
+    "reach initial convergence" taggedAs LongRunningTest in
       awaitClusterUp(first, second, third)
 
-      runOn(fourth) {
+      runOn(fourth)
         // doesn't join immediately
-      }
 
       enterBarrier("after-1")
-    }
 
-    "not reach convergence while any nodes are unreachable" taggedAs LongRunningTest in {
+    "not reach convergence while any nodes are unreachable" taggedAs LongRunningTest in
       val thirdAddress = address(third)
       enterBarrier("before-shutdown")
 
-      runOn(first) {
+      runOn(first)
         // kill 'third' node
         testConductor.exit(third, 0).await
         markNodeAsUnavailable(thirdAddress)
-      }
 
-      runOn(first, second) {
+      runOn(first, second)
 
-        within(28 seconds) {
+        within(28 seconds)
           // third becomes unreachable
           awaitAssert(clusterView.unreachableMembers.size should ===(1))
           awaitSeenSameState(first, second)
@@ -87,27 +83,22 @@ abstract class ConvergenceSpec(multiNodeConfig: ConvergenceMultiNodeConfig)
           clusterView.unreachableMembers.size should ===(1)
           clusterView.unreachableMembers.head.address should ===(thirdAddress)
           clusterView.members.size should ===(3)
-        }
-      }
 
       enterBarrier("after-2")
-    }
 
-    "not move a new joining node to Up while there is no convergence" taggedAs LongRunningTest in {
-      runOn(fourth) {
+    "not move a new joining node to Up while there is no convergence" taggedAs LongRunningTest in
+      runOn(fourth)
         // try to join
         cluster.join(first)
-      }
 
       def memberStatus(address: Address): Option[MemberStatus] =
-        clusterView.members.collectFirst {
+        clusterView.members.collectFirst
           case m if m.address == address ⇒ m.status
-        }
 
       enterBarrier("after-join")
 
-      runOn(first, second, fourth) {
-        for (n ← 1 to 5) {
+      runOn(first, second, fourth)
+        for (n ← 1 to 5)
           awaitAssert(clusterView.members.size should ===(4))
           awaitSeenSameState(first, second, fourth)
           memberStatus(first) should ===(Some(MemberStatus.Up))
@@ -115,10 +106,5 @@ abstract class ConvergenceSpec(multiNodeConfig: ConvergenceMultiNodeConfig)
           memberStatus(fourth) should ===(Some(MemberStatus.Joining))
           // wait and then check again
           Thread.sleep(1.second.dilated.toMillis)
-        }
-      }
 
       enterBarrier("after-3")
-    }
-  }
-}

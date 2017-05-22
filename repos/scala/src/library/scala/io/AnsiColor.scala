@@ -1,7 +1,7 @@
 package scala
 package io
 
-trait AnsiColor {
+trait AnsiColor
 
   /** Foreground color for ANSI black */
   final val BLACK = "\u001b[30m"
@@ -68,6 +68,5 @@ trait AnsiColor {
 
   /** ANSI invisible */
   final val INVISIBLE = "\u001b[8m"
-}
 
 object AnsiColor extends AnsiColor {}

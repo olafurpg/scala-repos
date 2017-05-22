@@ -21,10 +21,10 @@ import Types._
 import Infos._
 import Utils.printEscapeJS
 
-object Printers {
+object Printers
 
   /** Basically copied from scala.reflect.internal.Printers */
-  abstract class IndentationManager {
+  abstract class IndentationManager
     protected val out: Writer
 
     private var indentMargin = 0
@@ -36,16 +36,14 @@ object Printers {
 
     protected def getIndentMargin(): Int = indentMargin
 
-    protected def println(): Unit = {
+    protected def println(): Unit =
       out.write('\n')
       while (indentMargin > indentString.length()) indentString += indentString
       if (indentMargin > 0) out.write(indentString, 0, indentMargin)
-    }
-  }
 
-  class IRTreePrinter(protected val out: Writer) extends IndentationManager {
-    def printTopLevelTree(tree: Tree): Unit = {
-      tree match {
+  class IRTreePrinter(protected val out: Writer) extends IndentationManager
+    def printTopLevelTree(tree: Tree): Unit =
+      tree match
         case Skip() =>
         // do not print anything
         case Block(stats) =>
@@ -53,38 +51,31 @@ object Printers {
         case _ =>
           print(tree)
           println()
-      }
-    }
 
     protected final def printColumn(
-        ts: List[Tree], start: String, sep: String, end: String): Unit = {
+        ts: List[Tree], start: String, sep: String, end: String): Unit =
       print(start); indent(); println()
       var rest = ts
-      while (rest.nonEmpty) {
+      while (rest.nonEmpty)
         print(rest.head)
         rest = rest.tail
-        if (rest.nonEmpty) {
+        if (rest.nonEmpty)
           print(sep)
           println()
-        }
-      }
       undent(); println(); print(end)
-    }
 
     protected final def printRow(
-        ts: List[Tree], start: String, sep: String, end: String): Unit = {
+        ts: List[Tree], start: String, sep: String, end: String): Unit =
       print(start)
       var rest = ts
-      while (rest.nonEmpty) {
+      while (rest.nonEmpty)
         print(rest.head)
         rest = rest.tail
         if (rest.nonEmpty) print(sep)
-      }
       print(end)
-    }
 
-    protected def printBlock(tree: Tree): Unit = {
-      tree match {
+    protected def printBlock(tree: Tree): Unit =
+      tree match
         case Block(trees) =>
           printColumn(trees, "{", ";", "}")
 
@@ -92,26 +83,21 @@ object Printers {
           print('{'); indent(); println()
           print(tree)
           undent(); println(); print('}')
-      }
-    }
 
-    protected def printSig(args: List[ParamDef], resultType: Type): Unit = {
+    protected def printSig(args: List[ParamDef], resultType: Type): Unit =
       printRow(args, "(", ", ", ")")
-      if (resultType != NoType) {
+      if (resultType != NoType)
         print(": ")
         print(resultType)
         print(" = ")
-      } else {
+      else
         print(' ')
-      }
-    }
 
-    protected def printArgs(args: List[Tree]): Unit = {
+    protected def printArgs(args: List[Tree]): Unit =
       printRow(args, "(", ", ", ")")
-    }
 
-    def print(tree: Tree): Unit = {
-      tree match {
+    def print(tree: Tree): Unit =
+      tree match
         case EmptyTree =>
           print("<empty>")
 
@@ -123,10 +109,9 @@ object Printers {
           print(ident)
           print(": ")
           print(vtpe)
-          if (rhs != EmptyTree) {
+          if (rhs != EmptyTree)
             print(" = ")
             print(rhs)
-          }
 
         case ParamDef(ident, ptpe, mutable, rest) =>
           if (mutable) print("var ")
@@ -145,11 +130,10 @@ object Printers {
 
         case Labeled(label, tpe, body) =>
           print(label)
-          if (tpe != NoType) {
+          if (tpe != NoType)
             print('[')
             print(tpe)
             print(']')
-          }
           print(": ")
           printBlock(body)
 
@@ -159,15 +143,14 @@ object Printers {
           print(rhs)
 
         case Return(expr, label) =>
-          if (label.isEmpty) {
+          if (label.isEmpty)
             print("return ")
             print(expr)
-          } else {
+          else
             print("return(")
             print(label.get)
             print(") ")
             print(expr)
-          }
 
         case If(cond, BooleanLiteral(true), elsep) =>
           print(cond)
@@ -185,7 +168,7 @@ object Printers {
           print(") ")
 
           printBlock(thenp)
-          elsep match {
+          elsep match
             case Skip() => ()
             case If(_, _, _) =>
               print(" else ")
@@ -193,23 +176,20 @@ object Printers {
             case _ =>
               print(" else ")
               printBlock(elsep)
-          }
 
         case While(cond, body, label) =>
-          if (label.isDefined) {
+          if (label.isDefined)
             print(label.get)
             print(": ")
-          }
           print("while (")
           print(cond)
           print(") ")
           printBlock(body)
 
         case DoWhile(body, cond, label) =>
-          if (label.isDefined) {
+          if (label.isDefined)
             print(label.get)
             print(": ")
-          }
           print("do ")
           printBlock(body)
           print(" while (")
@@ -219,16 +199,14 @@ object Printers {
         case Try(block, errVar, handler, finalizer) =>
           print("try ")
           printBlock(block)
-          if (handler != EmptyTree) {
+          if (handler != EmptyTree)
             print(" catch (")
             print(errVar)
             print(") ")
             printBlock(handler)
-          }
-          if (finalizer != EmptyTree) {
+          if (finalizer != EmptyTree)
             print(" finally ")
             printBlock(finalizer)
-          }
 
         case Throw(expr) =>
           print("throw ")
@@ -236,29 +214,26 @@ object Printers {
 
         case Continue(label) =>
           print("continue")
-          if (label.isDefined) {
+          if (label.isDefined)
             print(' ')
             print(label.get)
-          }
 
         case Match(selector, cases, default) =>
           print("match (")
           print(selector)
           print(") {"); indent
-          for ((values, body) <- cases) {
+          for ((values, body) <- cases)
             println()
             printRow(values, "case ", " | ", ":"); indent; println()
             print(body)
             print(";")
             undent
-          }
-          if (default != EmptyTree) {
+          if (default != EmptyTree)
             println()
             print("default:"); indent; println()
             print(default)
             print(";")
             undent
-          }
           undent; println(); print('}')
 
         case Debugger() =>
@@ -311,13 +286,13 @@ object Printers {
         case UnaryOp(op, lhs) =>
           import UnaryOp._
           print('(')
-          print((op: @switch) match {
+          print((op: @switch) match
             case Boolean_! => "!"
             case IntToLong | DoubleToLong => "(long)"
             case DoubleToInt | LongToInt => "(int)"
             case DoubleToFloat => "(float)"
             case LongToDouble => "(double)"
-          })
+          )
           print(lhs)
           print(')')
 
@@ -358,7 +333,7 @@ object Printers {
           print('(')
           print(lhs)
           print(' ')
-          print((op: @switch) match {
+          print((op: @switch) match
             case === => "==="
             case !== => "!=="
 
@@ -420,7 +395,7 @@ object Printers {
             case Boolean_!= => "!=[bool]"
             case Boolean_| => "|[bool]"
             case Boolean_& => "&[bool]"
-          })
+          )
           print(' ')
           print(rhs)
           print(')')
@@ -428,11 +403,10 @@ object Printers {
         case NewArray(tpe, lengths) =>
           print("new ")
           print(tpe.baseClassName)
-          for (length <- lengths) {
+          for (length <- lengths)
             print('[')
             print(length)
             print(']')
-          }
           for (dim <- lengths.size until tpe.dimensions) print("[]")
 
         case ArrayValue(tpe, elems) =>
@@ -452,13 +426,12 @@ object Printers {
         case RecordValue(tpe, elems) =>
           print('(')
           var first = true
-          for ((field, value) <- tpe.fields zip elems) {
+          for ((field, value) <- tpe.fields zip elems)
             if (first) first = false
             else print(", ")
             print(field.name)
             print(" = ")
             print(value)
-          }
           print(')')
 
         case IsInstanceOf(expr, cls) =>
@@ -490,21 +463,19 @@ object Printers {
         // JavaScript expressions
 
         case JSNew(ctor, args) =>
-          def containsOnlySelectsFromAtom(tree: Tree): Boolean = tree match {
+          def containsOnlySelectsFromAtom(tree: Tree): Boolean = tree match
             case JSDotSelect(qual, _) => containsOnlySelectsFromAtom(qual)
             case JSBracketSelect(qual, _) => containsOnlySelectsFromAtom(qual)
             case VarRef(_) => true
             case This() => true
             case _ => false // in particular, Apply
-          }
-          if (containsOnlySelectsFromAtom(ctor)) {
+          if (containsOnlySelectsFromAtom(ctor))
             print("new ")
             print(ctor)
-          } else {
+          else
             print("new (")
             print(ctor)
             print(')')
-          }
           printArgs(args)
 
         case JSDotSelect(qualifier, item) =>
@@ -519,7 +490,7 @@ object Printers {
           print(']')
 
         case JSFunctionApply(fun, args) =>
-          fun match {
+          fun match
             case _: JSDotSelect | _: JSBracketSelect | _: Select =>
               print("protect(")
               print(fun)
@@ -527,7 +498,6 @@ object Printers {
 
             case _ =>
               print(fun)
-          }
           printArgs(args)
 
         case JSDotMethodApply(receiver, method, args) =>
@@ -585,14 +555,14 @@ object Printers {
           import JSUnaryOp._
           print('(')
           print(
-              (op: @switch) match {
+              (op: @switch) match
             case + => "+"
             case - => "-"
             case ~ => "~"
             case ! => "!"
 
             case `typeof` => "typeof "
-          })
+          )
           print(lhs)
           print(")")
 
@@ -601,7 +571,7 @@ object Printers {
           print('(')
           print(lhs)
           print(" ")
-          print((op: @switch) match {
+          print((op: @switch) match
             case === => "==="
             case !== => "!=="
 
@@ -628,7 +598,7 @@ object Printers {
 
             case `in` => "in"
             case `instanceof` => "instanceof"
-          })
+          )
           print(" ")
           print(rhs)
           print(')')
@@ -642,16 +612,14 @@ object Printers {
         case JSObjectConstr(fields) =>
           print('{'); indent; println()
           var rest = fields
-          while (rest.nonEmpty) {
+          while (rest.nonEmpty)
             print(rest.head._1)
             print(": ")
             print(rest.head._2)
             rest = rest.tail
-            if (rest.nonEmpty) {
+            if (rest.nonEmpty)
               print(",")
               println()
-            }
-          }
           undent; println(); print('}')
 
         case JSLinkingInfo() =>
@@ -669,13 +637,12 @@ object Printers {
           print(if (value) "true" else "false")
 
         case IntLiteral(value) =>
-          if (value >= 0) {
+          if (value >= 0)
             print(value.toString)
-          } else {
+          else
             print('(')
             print(value.toString)
             print(')')
-          }
 
         case LongLiteral(value) =>
           if (value < 0L) print('(')
@@ -684,24 +651,22 @@ object Printers {
           if (value < 0L) print(')')
 
         case FloatLiteral(value) =>
-          if (value == 0.0f && 1.0f / value < 0.0f) {
+          if (value == 0.0f && 1.0f / value < 0.0f)
             print("(-0f)")
-          } else {
+          else
             if (value < 0.0f) print('(')
             print(value.toString)
             print('f')
             if (value < 0.0f) print(')')
-          }
 
         case DoubleLiteral(value) =>
-          if (value == 0.0 && 1.0 / value < 0.0) {
+          if (value == 0.0 && 1.0 / value < 0.0)
             print("(-0d)")
-          } else {
+          else
             if (value < 0.0) print('(')
             print(value.toString)
             print('d')
             if (value < 0.0) print(')')
-          }
 
         case StringLiteral(value) =>
           print('\"')
@@ -738,7 +703,7 @@ object Printers {
         case tree: ClassDef =>
           val ClassDef(name, kind, superClass, interfaces, jsName, defs) = tree
           print(tree.optimizerHints)
-          kind match {
+          kind match
             case ClassKind.Class => print("class ")
             case ClassKind.ModuleClass => print("module class ")
             case ClassKind.Interface => print("interface ")
@@ -746,25 +711,20 @@ object Printers {
             case ClassKind.HijackedClass => print("hijacked class ")
             case ClassKind.JSClass => print("js class ")
             case ClassKind.JSModuleClass => print("js module class ")
-          }
           print(name)
-          superClass.foreach { cls =>
+          superClass.foreach  cls =>
             print(" extends ")
             print(cls)
-          }
-          if (interfaces.nonEmpty) {
+          if (interfaces.nonEmpty)
             print(" implements ")
             var rest = interfaces
-            while (rest.nonEmpty) {
+            while (rest.nonEmpty)
               print(rest.head)
               rest = rest.tail
               if (rest.nonEmpty) print(", ")
-            }
-          }
-          jsName.foreach { name =>
+          jsName.foreach  name =>
             print(" jsname ")
             print(name)
-          }
           print(" ")
           printColumn(defs, "{", "", "}")
           println()
@@ -811,13 +771,11 @@ object Printers {
 
         case _ =>
           print(s"<error, elem of class ${tree.getClass()}>")
-      }
-    }
 
     def printRefType(tpe: ReferenceType): Unit =
       print(tpe.asInstanceOf[Type])
 
-    def print(tpe: Type): Unit = tpe match {
+    def print(tpe: Type): Unit = tpe match
       case AnyType => print("any")
       case NothingType => print("nothing")
       case UndefType => print("void")
@@ -838,24 +796,21 @@ object Printers {
       case RecordType(fields) =>
         print('(')
         var first = false
-        for (RecordType.Field(name, _, tpe, mutable) <- fields) {
+        for (RecordType.Field(name, _, tpe, mutable) <- fields)
           if (first) first = false
           else print(", ")
           if (mutable) print("var ")
           print(name)
           print(": ")
           print(tpe)
-        }
         print(')')
-    }
 
     protected def print(ident: Ident): Unit =
       printEscapeJS(ident.name, out)
 
-    private final def print(propName: PropertyName): Unit = propName match {
+    private final def print(propName: PropertyName): Unit = propName match
       case lit: StringLiteral => print(lit: Tree)
       case ident: Ident => print(ident)
-    }
 
     protected def print(s: String): Unit =
       out.write(s)
@@ -864,22 +819,19 @@ object Printers {
       out.write(c)
 
     protected def print(optimizerHints: OptimizerHints)(
-        implicit dummy: DummyImplicit): Unit = {
-      if (optimizerHints != OptimizerHints.empty) {
+        implicit dummy: DummyImplicit): Unit =
+      if (optimizerHints != OptimizerHints.empty)
         print("@hints(")
         print(optimizerHints.bits.toString)
         print(") ")
-      }
-    }
 
     // Make it public
     override def println(): Unit = super.println()
 
     def complete(): Unit = ()
-  }
 
-  class InfoPrinter(protected val out: Writer) extends IndentationManager {
-    def printClassInfoHeader(classInfo: ClassInfo): Unit = {
+  class InfoPrinter(protected val out: Writer) extends IndentationManager
+    def printClassInfoHeader(classInfo: ClassInfo): Unit =
       import classInfo._
       print("encodedName: ")
       printEscapeJS(encodedName, out)
@@ -894,20 +846,17 @@ object Printers {
       print(if (superClass == null) "null" else superClass.toString)
       println()
 
-      if (interfaces.nonEmpty) {
+      if (interfaces.nonEmpty)
         print("interfaces: [")
         var rest = interfaces
-        while (rest.nonEmpty) {
+        while (rest.nonEmpty)
           printEscapeJS(rest.head, out)
           rest = rest.tail
           if (rest.nonEmpty) print(", ")
-        }
         print(']')
         println()
-      }
-    }
 
-    def print(classInfo: ClassInfo): Unit = {
+    def print(classInfo: ClassInfo): Unit =
       import classInfo._
 
       printClassInfoHeader(classInfo)
@@ -916,65 +865,55 @@ object Printers {
       indent(); println()
       methods.foreach((mi: MethodInfo) => print(mi))
       undent(); println()
-    }
 
-    def print(methodInfo: MethodInfo): Unit = {
+    def print(methodInfo: MethodInfo): Unit =
       import methodInfo._
       printEscapeJS(encodedName, out)
       print(":")
       indent(); println()
 
-      if (isStatic) {
+      if (isStatic)
         print("isStatic: ")
         print(isStatic.toString)
         println()
-      }
-      if (isAbstract) {
+      if (isAbstract)
         print("isAbstract: ")
         print(isAbstract.toString)
         println()
-      }
-      if (isExported) {
+      if (isExported)
         print("isExported: ")
         print(isExported.toString)
         println()
-      }
-      if (methodsCalled.nonEmpty) {
+      if (methodsCalled.nonEmpty)
         print("methodsCalled:")
         indent(); println()
         val iter = methodsCalled.iterator
-        while (iter.hasNext) {
+        while (iter.hasNext)
           val (cls, callers) = iter.next()
           printEscapeJS(cls, out)
           printRow(callers, ": [", ", ", "]")
           if (iter.hasNext) println()
-        }
         undent(); println()
-      }
-      if (methodsCalledStatically.nonEmpty) {
+      if (methodsCalledStatically.nonEmpty)
         print("methodsCalledStatically:")
         indent(); println()
         val iter = methodsCalledStatically.iterator
-        while (iter.hasNext) {
+        while (iter.hasNext)
           val (cls, callers) = iter.next
           printEscapeJS(cls, out)
           printRow(callers, ": [", ", ", "]")
           if (iter.hasNext) println()
-        }
         undent(); println()
-      }
-      if (staticMethodsCalled.nonEmpty) {
+      if (staticMethodsCalled.nonEmpty)
         print("staticMethodsCalled:")
         indent(); println()
         val iter = staticMethodsCalled.iterator
-        while (iter.hasNext) {
+        while (iter.hasNext)
           val (cls, callers) = iter.next()
           printEscapeJS(cls, out)
           printRow(callers, ": [", ", ", "]")
           if (iter.hasNext) println()
-        }
         undent(); println()
-      }
       if (instantiatedClasses.nonEmpty)
         printRow(instantiatedClasses, "instantiatedClasses: [", ", ", "]")
       if (accessedModules.nonEmpty)
@@ -985,19 +924,16 @@ object Printers {
         printRow(accessedClassData, "accessedClassData: [", ", ", "]")
 
       undent(); println()
-    }
 
     protected def printRow(
-        ts: List[String], start: String, sep: String, end: String): Unit = {
+        ts: List[String], start: String, sep: String, end: String): Unit =
       print(start)
       var rest = ts
-      while (rest.nonEmpty) {
+      while (rest.nonEmpty)
         print(rest.head)
         rest = rest.tail
         if (rest.nonEmpty) print(sep)
-      }
       print(end)
-    }
 
     protected def print(s: String): Unit =
       out.write(s)
@@ -1006,5 +942,3 @@ object Printers {
       out.write(c)
 
     def complete(): Unit = ()
-  }
-}

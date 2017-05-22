@@ -6,9 +6,9 @@ package akka
 import sbt._
 import sbt.Keys._
 
-object Sample {
+object Sample
 
-  object CliOptions {
+  object CliOptions
 
     /**
       * Aggregated sample builds are transformed by swapping library dependencies to project ones.
@@ -19,19 +19,17 @@ object Sample {
       */
     val aggregateSamples =
       sys.props.getOrElse("akka.build.aggregateSamples", "true").toBoolean
-  }
 
   final val akkaOrganization = "com.typesafe.akka"
 
   def buildTransformer =
     (ti: BuildLoader.TransformInfo) =>
-      ti.base.name match {
+      ti.base.name match
         case s if s.startsWith("akka-sample") =>
           ti.unit.copy(loadedDefinitions = ti.unit.definitions
                   .copy(projects = libraryToProjectDeps(
                           ti.unit.definitions.projects)))
         case _ => ti.unit
-    }
 
   def project(name: String) =
     ProjectRef(file(s"akka-samples/$name"), name)
@@ -42,28 +40,25 @@ object Sample {
 
   private val addProjectDependencies = (project: Project) =>
     project.settings(
-        buildDependencies := {
-          val projectDependencies = libraryDependencies.value.collect {
+        buildDependencies :=
+          val projectDependencies = libraryDependencies.value.collect
             case module if module.organization == akkaOrganization =>
               ProjectRef(file("").toURI, module.name)
-          }
           val dependencies = buildDependencies.value
-          val classpathWithProjectDependencies = dependencies.classpath.map {
+          val classpathWithProjectDependencies = dependencies.classpath.map
             case (proj, deps) if proj.project == project.id =>
               // add project dependency for every akka library dependency
               (proj,
                deps ++ projectDependencies.map(
                    ResolvedClasspathDependency(_, None)))
             case (project, deps) => (project, deps)
-          }
           BuildDependencies(classpathWithProjectDependencies,
                             dependencies.aggregate)
-        }
   )
 
   private val excludeLibraryDependencies = (project: Project) =>
     project.settings(
-        libraryDependencies := libraryDependencies.value.map {
+        libraryDependencies := libraryDependencies.value.map
           case module if module.organization == akkaOrganization =>
             /**
               * Exclude self, so it is still possible to know what project dependencies to add.
@@ -74,7 +69,6 @@ object Sample {
             module.excludeAll(
                 ExclusionRule(organization = module.organization))
           case module => module
-        }
   )
 
   /**
@@ -90,14 +84,11 @@ object Sample {
           (Publish.projectSettings ++ ValidatePullRequest.projectSettings): _*)
       .configs(ValidatePullRequest.ValidatePR)
 
-  private implicit class RichLoadedDefinitions(ld: LoadedDefinitions) {
+  private implicit class RichLoadedDefinitions(ld: LoadedDefinitions)
     def copy(projects: Seq[Project]) =
       new LoadedDefinitions(
           ld.base, ld.target, ld.loader, ld.builds, projects, ld.buildNames)
-  }
 
-  private implicit class RichBuildUnit(bu: BuildUnit) {
+  private implicit class RichBuildUnit(bu: BuildUnit)
     def copy(loadedDefinitions: LoadedDefinitions) =
       new BuildUnit(bu.uri, bu.localBase, loadedDefinitions, bu.plugins)
-  }
-}

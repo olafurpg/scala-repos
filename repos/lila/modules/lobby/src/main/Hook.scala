@@ -23,7 +23,7 @@ case class Hook(
     color: String,
     user: Option[LobbyUser],
     ratingRange: String,
-    createdAt: DateTime) {
+    createdAt: DateTime)
 
   val realColor = Color orDefault color
 
@@ -39,10 +39,9 @@ case class Hook(
       .fold(isAuth && h.isAuth, true) && ratingRangeCompatibleWith(h) &&
     h.ratingRangeCompatibleWith(this)
 
-  private def ratingRangeCompatibleWith(h: Hook) = realRatingRange.fold(true) {
+  private def ratingRangeCompatibleWith(h: Hook) = realRatingRange.fold(true)
     range =>
       h.rating ?? range.contains
-  }
 
   private def compatibilityProperties =
     (variant, clock.limit, clock.increment, mode)
@@ -53,9 +52,8 @@ case class Hook(
   def userId = user map (_.id)
   def isAuth = user.nonEmpty
   def username = user.fold(User.anonymous)(_.username)
-  def rating = user flatMap { u =>
+  def rating = user flatMap  u =>
     perfType map (_.key) flatMap u.ratingMap.get
-  }
   def engine = user ?? (_.engine)
   def booster = user ?? (_.booster)
   def lame = user ?? (_.lame)
@@ -80,9 +78,8 @@ case class Hook(
   lazy val perfType = PerfPicker.perfType(speed, realVariant, none)
 
   private lazy val speed = Speed(clock.some)
-}
 
-object Hook {
+object Hook
 
   val idSize = 8
 
@@ -107,4 +104,3 @@ object Hook {
              sid = sid,
              ratingRange = ratingRange.toString,
              createdAt = DateTime.now)
-}

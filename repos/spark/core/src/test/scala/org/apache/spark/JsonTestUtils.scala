@@ -19,8 +19,8 @@ package org.apache.spark
 import org.json4s._
 import org.json4s.jackson.JsonMethods
 
-trait JsonTestUtils {
-  def assertValidDataInJson(validateJson: JValue, expectedJson: JValue) {
+trait JsonTestUtils
+  def assertValidDataInJson(validateJson: JValue, expectedJson: JValue)
     val Diff(c, a, d) = validateJson.diff(expectedJson)
     val validatePretty = JsonMethods.pretty(validateJson)
     val expectedPretty = JsonMethods.pretty(expectedJson)
@@ -31,5 +31,3 @@ trait JsonTestUtils {
     assert(a === JNothing, s"$errorMessage\nAdded:\n${JsonMethods.pretty(a)}")
     assert(
         d === JNothing, s"$errorMessage\nDeleted:\n${JsonMethods.pretty(d)}")
-  }
-}

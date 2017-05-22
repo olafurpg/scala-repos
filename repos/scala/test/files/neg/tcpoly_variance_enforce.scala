@@ -30,10 +30,9 @@ object fcoll4ok extends coll4[FooString, String]
 object fcoll4_1 extends coll4[FooString, Int] // error
 object fcoll4_2 extends coll4[FooString, Any] // error
 
-object test {
+object test
   var ok: coll[FooCov] = _
 
   def x: coll[FooInvar] = sys.error("foo") // error
   def y: coll[FooContra] = sys.error("foo") // error
-}
 // TODO: need test for rank N with N >: 2

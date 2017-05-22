@@ -1,5 +1,4 @@
 package disktest
 
-class Foo {
+class Foo
   def m(vs: List[Int]) = vs map (_ + 1)
-}

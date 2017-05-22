@@ -27,16 +27,15 @@ import scala.util.control.ControlThrowable
   * User: Alexander Podkhalyuzin
   * Date: 08.06.2009
   */
-object CachesUtil {
+object CachesUtil
 
   /** This value is used by cache analyzer
     *
     * @see [[org.jetbrains.plugins.scala.macroAnnotations.CachedMacroUtil.transformRhsToAnalyzeCaches]]
     */
   lazy val timeToCalculateForAnalyzingCaches: ThreadLocal[Stack[Long]] =
-    new ThreadLocal[Stack[Long]] {
+    new ThreadLocal[Stack[Long]]
       override def initialValue: Stack[Long] = new Stack[Long]()
-    }
 
   /**
     * Do not delete this type alias, it is used by [[org.jetbrains.plugins.scala.macroAnnotations.CachedMappedWithRecursionGuard]]
@@ -55,19 +54,16 @@ object CachesUtil {
     *
     * Do not use this method directly. You should use annotations instead
     */
-  def getOrCreateKey[T](id: String): T = Option(keys.get(id)) match {
+  def getOrCreateKey[T](id: String): T = Option(keys.get(id)) match
     case Some(key) => key.asInstanceOf[T]
     case None =>
-      synchronized {
-        Option(keys.get(id)) match {
+      synchronized
+        Option(keys.get(id)) match
           case Some(key) => key.asInstanceOf[T]
           case None =>
             val res: T = Key.create[T](id).asInstanceOf[T]
             keys.put(id, res)
             res
-        }
-      }
-  }
 
   //keys for getUserData
   val IMPLICIT_TYPE: Key[ScType] = Key.create("implicit.type")
@@ -87,64 +83,54 @@ object CachesUtil {
       e: Dom,
       key: Key[CachedValue[Result]],
       provider: => MyProvider[Dom, Result],
-      defaultValue: => Result): Result = {
+      defaultValue: => Result): Result =
     var computed: CachedValue[Result] = e.getUserData(key)
-    if (computed == null) {
+    if (computed == null)
       val manager = CachedValuesManager.getManager(e.getProject)
-      computed = manager.createCachedValue(new CachedValueProvider[Result] {
-        def compute(): CachedValueProvider.Result[Result] = {
+      computed = manager.createCachedValue(new CachedValueProvider[Result]
+        def compute(): CachedValueProvider.Result[Result] =
           val guard = getRecursionGuard(key.toString)
-          if (guard.currentStack().contains(e)) {
-            if (ScPackageImpl.isPackageObjectProcessing) {
+          if (guard.currentStack().contains(e))
+            if (ScPackageImpl.isPackageObjectProcessing)
               throw new ScPackageImpl.DoNotProcessPackageObjectException
-            }
             val fun =
               PsiTreeUtil.getContextOfType(e, true, classOf[ScFunction])
-            if (fun == null || fun.isProbablyRecursive) {
+            if (fun == null || fun.isProbablyRecursive)
               return new CachedValueProvider.Result(
                   defaultValue, provider.getDependencyItem)
-            } else {
+            else
               fun.setProbablyRecursive(true)
               throw new ProbablyRecursionException(e, (), key, Set(fun))
-            }
-          }
           guard.doPreventingRecursion(
               e,
               false /* todo: true? */,
-              new Computable[CachedValueProvider.Result[Result]] {
-                def compute(): CachedValueProvider.Result[Result] = {
-                  try {
+              new Computable[CachedValueProvider.Result[Result]]
+                def compute(): CachedValueProvider.Result[Result] =
+                  try
                     provider.compute()
-                  } catch {
+                  catch
                     case ProbablyRecursionException(`e`, (), k, set)
                         if k == key =>
-                      try {
+                      try
                         provider.compute()
-                      } finally set.foreach(_.setProbablyRecursive(false))
+                      finally set.foreach(_.setProbablyRecursive(false))
                     case t @ ProbablyRecursionException(ee, data, k, set)
                         if k == key =>
                       val fun = PsiTreeUtil.getContextOfType(
                           e, true, classOf[ScFunction])
                       if (fun == null || fun.isProbablyRecursive) throw t
-                      else {
+                      else
                         fun.setProbablyRecursive(true)
                         throw ProbablyRecursionException(
                             ee, data, k, set + fun)
-                      }
-                  }
-                }
-              }) match {
+              ) match
             case null =>
               new CachedValueProvider.Result(
                   defaultValue, provider.getDependencyItem)
             case notNull => notNull
-          }
-        }
-      }, false)
+      , false)
       e.putUserData(key, computed)
-    }
     computed.getValue
-  }
 
   /**
     * IMPORTANT:
@@ -156,32 +142,28 @@ object CachesUtil {
     */
   def get[Dom <: PsiElement, T](e: Dom,
                                 key: Key[CachedValue[T]],
-                                provider: => CachedValueProvider[T]): T = {
+                                provider: => CachedValueProvider[T]): T =
     var computed: CachedValue[T] = e.getUserData(key)
-    if (computed == null) {
+    if (computed == null)
       val manager = CachedValuesManager.getManager(e.getProject)
       computed = manager.createCachedValue(provider, false)
       e.putUserData(key, computed)
-    }
     computed.getValue
-  }
 
   class MyProvider[Dom, T](e: Dom, builder: Dom => T)(dependencyItem: Object)
-      extends CachedValueProvider[T] {
+      extends CachedValueProvider[T]
     def getDependencyItem: Object = dependencyItem
     def compute() = new CachedValueProvider.Result(builder(e), dependencyItem)
-  }
 
   private val guards: ConcurrentMap[String, RecursionGuard] =
     ContainerUtil.newConcurrentMap[String, RecursionGuard]()
-  def getRecursionGuard(id: String): RecursionGuard = {
+  def getRecursionGuard(id: String): RecursionGuard =
     val guard = guards.get(id)
-    if (guard == null) {
+    if (guard == null)
       val result = RecursionManager.createGuard(id)
       guards.put(id, result)
       result
-    } else guard
-  }
+    else guard
 
   /**
     * IMPORTANT:
@@ -198,104 +180,87 @@ object CachesUtil {
       key: Key[CachedValue[ConcurrentMap[Data, Result]]],
       builder: (Dom, Data) => Result,
       defaultValue: => Result,
-      dependencyItem: Object): Result = {
+      dependencyItem: Object): Result =
     var computed: CachedValue[ConcurrentMap[Data, Result]] = e.getUserData(key)
-    if (computed == null) {
+    if (computed == null)
       val manager = CachedValuesManager.getManager(e.getProject)
       computed = manager.createCachedValue(
-          new CachedValueProvider[ConcurrentMap[Data, Result]] {
+          new CachedValueProvider[ConcurrentMap[Data, Result]]
         def compute(
-            ): CachedValueProvider.Result[ConcurrentMap[Data, Result]] = {
+            ): CachedValueProvider.Result[ConcurrentMap[Data, Result]] =
           new CachedValueProvider.Result(
               ContainerUtil.newConcurrentMap[Data, Result](), dependencyItem)
-        }
-      }, false)
+      , false)
       e.putUserData(key, computed)
-    }
     val map = computed.getValue
     var result = map.get(data)
-    if (result == null) {
+    if (result == null)
       var isCache = true
-      result = {
+      result =
         val guard = getRecursionGuard(key.toString)
-        if (guard.currentStack().contains((e, data))) {
-          if (ScPackageImpl.isPackageObjectProcessing) {
+        if (guard.currentStack().contains((e, data)))
+          if (ScPackageImpl.isPackageObjectProcessing)
             throw new ScPackageImpl.DoNotProcessPackageObjectException
-          }
           val fun = PsiTreeUtil.getContextOfType(e, true, classOf[ScFunction])
-          if (fun == null || fun.isProbablyRecursive) {
+          if (fun == null || fun.isProbablyRecursive)
             isCache = false
             defaultValue
-          } else {
+          else
             fun.setProbablyRecursive(true)
             throw new ProbablyRecursionException(e, data, key, Set(fun))
-          }
-        } else {
+        else
           guard.doPreventingRecursion(
-              (e, data), false, new Computable[Result] {
-            def compute(): Result = {
-              try {
+              (e, data), false, new Computable[Result]
+            def compute(): Result =
+              try
                 builder(e, data)
-              } catch {
+              catch
                 case ProbablyRecursionException(`e`, `data`, k, set)
                     if k == key =>
-                  try {
+                  try
                     builder(e, data)
-                  } finally set.foreach(_.setProbablyRecursive(false))
+                  finally set.foreach(_.setProbablyRecursive(false))
                 case t @ ProbablyRecursionException(ee, innerData, k, set)
                     if k == key =>
                   val fun =
                     PsiTreeUtil.getContextOfType(e, true, classOf[ScFunction])
                   if (fun == null || fun.isProbablyRecursive) throw t
-                  else {
+                  else
                     fun.setProbablyRecursive(true)
                     throw ProbablyRecursionException(
                         ee, innerData, k, set + fun)
-                  }
-              }
-            }
-          }) match {
+          ) match
             case null => defaultValue
             case notNull => notNull
-          }
-        }
-      }
-      if (isCache) {
+      if (isCache)
         map.put(data, result)
-      }
-    }
     result
-  }
 
   def getDependentItem(element: PsiElement)(
-      dep_item: Object = enclosingModificationOwner(element)): Object = {
-    element.getContainingFile match {
+      dep_item: Object = enclosingModificationOwner(element)): Object =
+    element.getContainingFile match
       case file: ScalaFile if file.isCompiled =>
         if (!ProjectRootManager
               .getInstance(element.getProject)
               .getFileIndex
-              .isInContent(file.getVirtualFile)) {
+              .isInContent(file.getVirtualFile))
           return dep_item
-        }
         var dir = file.getParent
-        while (dir != null) {
+        while (dir != null)
           if (dir.getName == "scala-library.jar")
             return ModificationTracker.NEVER_CHANGED
           dir = dir.getParent
-        }
         ProjectRootManager.getInstance(element.getProject)
       case cls: ClsFileImpl =>
         ProjectRootManager.getInstance(element.getProject)
       case _ => dep_item
-    }
-  }
 
-  def enclosingModificationOwner(elem: PsiElement): ModificationTracker = {
+  def enclosingModificationOwner(elem: PsiElement): ModificationTracker =
     @tailrec
-    def calc(element: PsiElement): ModificationTracker = {
+    def calc(element: PsiElement): ModificationTracker =
       Option(
           PsiTreeUtil.getContextOfType(
-              element, false, classOf[ScModificationTrackerOwner])) match {
+              element, false, classOf[ScModificationTrackerOwner])) match
         case Some(owner) if owner.isValidModificationTrackerOwner() =>
           owner.getModificationTracker
         case Some(owner) => calc(owner.getContext)
@@ -303,20 +268,17 @@ object CachesUtil {
           ScalaPsiManager.instance(elem.getProject).modificationTracker
         case _ =>
           ScalaPsiManager.instance(element.getProject).modificationTracker
-      }
-    }
 
     calc(elem)
-  }
 
   @tailrec
   def updateModificationCount(
-      elem: PsiElement, incModCountOnTopLevel: Boolean = false): Unit = {
+      elem: PsiElement, incModCountOnTopLevel: Boolean = false): Unit =
     Option(
         PsiTreeUtil.getContextOfType(elem,
                                      false,
                                      classOf[ScModificationTrackerOwner],
-                                     classOf[ScalaCodeFragment])) match {
+                                     classOf[ScalaCodeFragment])) match
       case Some(_: ScalaCodeFragment) =>
       //do not update on changes in dummy file
       case Some(owner: ScModificationTrackerOwner)
@@ -327,8 +289,6 @@ object CachesUtil {
       case _ if incModCountOnTopLevel =>
         ScalaPsiManager.instance(elem.getProject).incModificationCount()
       case _ =>
-    }
-  }
 
   case class ProbablyRecursionException[Dom <: PsiElement, Data, T](
       elem: Dom,
@@ -341,24 +301,21 @@ object CachesUtil {
     new mutable.Queue[(ScModifiableTypedDeclaration, Project)]()
   private[this] val associatedQueueLock = new ReentrantLock(true)
   private def doQueueWithLock[T](
-      ac: mutable.Queue[(ScModifiableTypedDeclaration, Project)] => T): T = {
-    try {
+      ac: mutable.Queue[(ScModifiableTypedDeclaration, Project)] => T): T =
+    try
       associatedQueueLock.lock()
       ac(funsRetTpToCheck)
-    } finally {
+    finally
       if (associatedQueueLock.isHeldByCurrentThread)
         associatedQueueLock.unlock()
-    }
-  }
 
   @volatile
   private[this] var needToCheckFuns: Boolean = false
-  private[this] val currentThreadIsCheckingFuns = new ThreadLocal[Boolean] {
+  private[this] val currentThreadIsCheckingFuns = new ThreadLocal[Boolean]
     override def initialValue(): Boolean = false
-  }
 
-  def incrementModCountForFunsWithModifiedReturn(): Unit = {
-    def checkFuns(): Unit = {
+  def incrementModCountForFunsWithModifiedReturn(): Unit =
+    def checkFuns(): Unit =
       @inline def nextElement =
         doQueueWithLock(queue => if (queue.nonEmpty) queue.dequeue() else null)
       @inline def checkSize = doQueueWithLock(queue => queue.size > 1)
@@ -366,48 +323,36 @@ object CachesUtil {
 
       var cur = nextElement
 
-      while (cur != null) {
+      while (cur != null)
         val (fun, proj) = cur
         val isValid: Boolean = fun.isValid
         if ((!isValid || fun.returnTypeHasChangedSinceLastCheck) &&
-            !proj.isDisposed) {
+            !proj.isDisposed)
           //if there's more than one, just increment the general modCount If there's one, go up th
-          if (!isValid || checkSize) {
+          if (!isValid || checkSize)
             ScalaPsiManager.instance(proj).incModificationCount()
             clearQueue()
-          } else {
+          else
             updateModificationCount(
                 fun.getContext, incModCountOnTopLevel = true)
-          }
-        }
 
         cur = nextElement
-      }
 
       doQueueWithLock(_ => { needToCheckFuns = false })
-    }
 
-    if (needToCheckFuns && !currentThreadIsCheckingFuns.get()) {
-      try {
+    if (needToCheckFuns && !currentThreadIsCheckingFuns.get())
+      try
         currentThreadIsCheckingFuns.set(true)
         checkFuns()
-      } finally {
+      finally
         currentThreadIsCheckingFuns.set(false)
-      }
-    }
-  }
 
   def addModificationFunctionsReturnType(
-      fun: ScModifiableTypedDeclaration): Unit = {
+      fun: ScModifiableTypedDeclaration): Unit =
     val project = fun.getProject
 
     doQueueWithLock(
         queue =>
-          {
-            if (!queue.exists(_._1 == fun)) {
+            if (!queue.exists(_._1 == fun))
               queue.enqueue((fun, project)); needToCheckFuns = true
-            }
-        }
     )
-  }
-}

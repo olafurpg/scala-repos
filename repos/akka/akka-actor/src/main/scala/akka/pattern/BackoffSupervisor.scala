@@ -17,7 +17,7 @@ import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.OneForOneStrategy
 import akka.actor.SupervisorStrategy
 
-object BackoffSupervisor {
+object BackoffSupervisor
 
   /**
     * Props for creating a [[BackoffSupervisor]] actor.
@@ -40,14 +40,13 @@ object BackoffSupervisor {
             childName: String,
             minBackoff: FiniteDuration,
             maxBackoff: FiniteDuration,
-            randomFactor: Double): Props = {
+            randomFactor: Double): Props =
     propsWithSupervisorStrategy(childProps,
                                 childName,
                                 minBackoff,
                                 maxBackoff,
                                 randomFactor,
                                 SupervisorStrategy.defaultStrategy)
-  }
 
   /**
     * Props for creating a [[BackoffSupervisor]] actor with a custom
@@ -74,7 +73,7 @@ object BackoffSupervisor {
                                   minBackoff: FiniteDuration,
                                   maxBackoff: FiniteDuration,
                                   randomFactor: Double,
-                                  strategy: SupervisorStrategy): Props = {
+                                  strategy: SupervisorStrategy): Props =
     require(minBackoff > Duration.Zero, "minBackoff must be > 0")
     require(maxBackoff >= minBackoff, "maxBackoff must be >= minBackoff")
     require(0.0 <= randomFactor && randomFactor <= 1.0,
@@ -86,7 +85,6 @@ object BackoffSupervisor {
                               maxBackoff,
                               randomFactor,
                               strategy))
-  }
 
   /**
     * Props for creating a [[BackoffSupervisor]] actor from [[BackoffOptions]].
@@ -110,13 +108,12 @@ object BackoffSupervisor {
     * Send this message to the [[BackoffSupervisor]] and it will reply with
     * [[BackoffSupervisor.CurrentChild]] containing the `ActorRef` of the current child, if any.
     */
-  final case class CurrentChild(ref: Option[ActorRef]) {
+  final case class CurrentChild(ref: Option[ActorRef])
 
     /**
       * Java API: The `ActorRef` of the current child, if any
       */
     def getRef: Optional[ActorRef] = Optional.ofNullable(ref.orNull)
-  }
 
   /**
     * Send this message to the [[BackoffSupervisor]] and it will reset the back-off.
@@ -158,17 +155,14 @@ object BackoffSupervisor {
   private[akka] def calculateDelay(restartCount: Int,
                                    minBackoff: FiniteDuration,
                                    maxBackoff: FiniteDuration,
-                                   randomFactor: Double): FiniteDuration = {
+                                   randomFactor: Double): FiniteDuration =
     val rnd = 1.0 + ThreadLocalRandom.current().nextDouble() * randomFactor
     if (restartCount >= 30) // Duration overflow protection (> 100 years)
       maxBackoff
     else
-      maxBackoff.min(minBackoff * math.pow(2, restartCount)) * rnd match {
+      maxBackoff.min(minBackoff * math.pow(2, restartCount)) * rnd match
         case f: FiniteDuration ⇒ f
         case _ ⇒ maxBackoff
-      }
-  }
-}
 
 /**
   * Back-off supervisor that stops and starts a child actor using a back-off algorithm when the child actor stops.
@@ -182,25 +176,23 @@ final class BackoffSupervisor(val childProps: Props,
                               val reset: BackoffReset,
                               randomFactor: Double,
                               strategy: SupervisorStrategy)
-    extends Actor with HandleBackoff {
+    extends Actor with HandleBackoff
 
   import BackoffSupervisor._
   import context.dispatcher
 
   // to keep binary compatibility with 2.4.1
-  override val supervisorStrategy = strategy match {
+  override val supervisorStrategy = strategy match
     case oneForOne: OneForOneStrategy ⇒
       OneForOneStrategy(oneForOne.maxNrOfRetries,
                         oneForOne.withinTimeRange,
-                        oneForOne.loggingEnabled) {
+                        oneForOne.loggingEnabled)
         case ex ⇒
           val defaultDirective: Directive = super.supervisorStrategy.decider
             .applyOrElse(ex, (_: Any) ⇒ Escalate)
 
           strategy.decider.applyOrElse(ex, (_: Any) ⇒ defaultDirective)
-      }
     case s ⇒ s
-  }
 
   // for binary compatibility with 2.4.1
   def this(childProps: Props,
@@ -230,19 +222,17 @@ final class BackoffSupervisor(val childProps: Props,
          randomFactor,
          SupervisorStrategy.defaultStrategy)
 
-  def onTerminated: Receive = {
+  def onTerminated: Receive =
     case Terminated(ref) if child.contains(ref) ⇒
       child = None
       val restartDelay = calculateDelay(
           restartCount, minBackoff, maxBackoff, randomFactor)
       context.system.scheduler.scheduleOnce(restartDelay, self, StartChild)
       restartCount += 1
-  }
 
   def receive = onTerminated orElse handleBackoff
-}
 
-private[akka] trait HandleBackoff {
+private[akka] trait HandleBackoff
   this: Actor ⇒
   def childProps: Props
   def childName: String
@@ -257,25 +247,22 @@ private[akka] trait HandleBackoff {
   override def preStart(): Unit = startChild()
 
   def startChild(): Unit =
-    if (child.isEmpty) {
+    if (child.isEmpty)
       child = Some(context.watch(context.actorOf(childProps, childName)))
-    }
 
-  def handleBackoff: Receive = {
+  def handleBackoff: Receive =
     case StartChild ⇒
       startChild()
-      reset match {
+      reset match
         case AutoReset(resetBackoff) ⇒
           val _ = context.system.scheduler
             .scheduleOnce(resetBackoff, self, ResetRestartCount(restartCount))
         case _ ⇒ // ignore
-      }
 
     case Reset ⇒
-      reset match {
+      reset match
         case ManualReset ⇒ restartCount = 0
         case msg ⇒ unhandled(msg)
-      }
 
     case ResetRestartCount(current) ⇒
       if (current == restartCount) restartCount = 0
@@ -291,9 +278,6 @@ private[akka] trait HandleBackoff {
       context.parent ! msg
 
     case msg ⇒
-      child match {
+      child match
         case Some(c) ⇒ c.forward(msg)
         case None ⇒ context.system.deadLetters.forward(msg)
-      }
-  }
-}

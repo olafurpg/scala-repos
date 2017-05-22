@@ -24,10 +24,8 @@ trait ClientIdBroker {}
 
 case class ClientIdAndBroker(
     clientId: String, brokerHost: String, brokerPort: Int)
-    extends ClientIdBroker {
+    extends ClientIdBroker
   override def toString = "%s-%s-%d".format(clientId, brokerHost, brokerPort)
-}
 
-case class ClientIdAllBrokers(clientId: String) extends ClientIdBroker {
+case class ClientIdAllBrokers(clientId: String) extends ClientIdBroker
   override def toString = "%s-%s".format(clientId, "AllBrokers")
-}

@@ -7,9 +7,9 @@ import org.junit.Test
 import org.scalajs.testsuite.utils.AssertThrows._
 import org.scalajs.testsuite.utils.Platform._
 
-class MathTestOnJDK8 {
+class MathTestOnJDK8
 
-  @Test def addExact(): Unit = {
+  @Test def addExact(): Unit =
     assertEquals(0, Math.addExact(0, 0))
     assertEquals(1, Math.addExact(0, 1))
     assertEquals(1, Math.addExact(1, 0))
@@ -76,9 +76,8 @@ class MathTestOnJDK8 {
                  Math.addExact(Long.MaxValue, Long.MaxValue))
     expectThrows(classOf[ArithmeticException],
                  Math.addExact(4611686018427387904L, 4611686018427387904L))
-  }
 
-  @Test def subtractExact(): Unit = {
+  @Test def subtractExact(): Unit =
     assertEquals(0, Math.subtractExact(0, 0))
     assertEquals(1, Math.subtractExact(1, 0))
     assertEquals(-1, Math.subtractExact(0, 1))
@@ -146,15 +145,13 @@ class MathTestOnJDK8 {
     expectThrows(
         classOf[ArithmeticException],
         Math.subtractExact(4611686018427387904L, -4611686018427387904L))
-  }
 
-  @Test def multiplyExact(): Unit = {
-    for (n <- Seq(Int.MinValue, -1, 0, 1, Int.MaxValue)) {
+  @Test def multiplyExact(): Unit =
+    for (n <- Seq(Int.MinValue, -1, 0, 1, Int.MaxValue))
       assertEquals(0, Math.multiplyExact(n, 0))
       assertEquals(0, Math.multiplyExact(0, n))
       assertEquals(n, Math.multiplyExact(n, 1))
       assertEquals(n, Math.multiplyExact(1, n))
-    }
     assertEquals(Int.MaxValue, Math.multiplyExact(-2147483647, -1))
     assertEquals(Int.MaxValue, Math.multiplyExact(-1, -2147483647))
     assertEquals(2147483646, Math.multiplyExact(1073741823, 2))
@@ -183,12 +180,11 @@ class MathTestOnJDK8 {
     expectThrows(
         classOf[ArithmeticException], Math.multiplyExact(-2, 1073741825))
 
-    for (n <- Seq(Long.MinValue, -1L, 0L, 1L, Long.MaxValue)) {
+    for (n <- Seq(Long.MinValue, -1L, 0L, 1L, Long.MaxValue))
       assertEquals(0L, Math.multiplyExact(n, 0))
       assertEquals(0L, Math.multiplyExact(0, n))
       assertEquals(n, Math.multiplyExact(n, 1))
       assertEquals(n, Math.multiplyExact(1, n))
-    }
     assertEquals(0L, Math.multiplyExact(Long.MinValue, 0))
     assertEquals(0L, Math.multiplyExact(0, Long.MinValue))
     assertEquals(Long.MaxValue, Math.multiplyExact(-9223372036854775807L, -1))
@@ -220,9 +216,8 @@ class MathTestOnJDK8 {
                  Math.multiplyExact(4611686018427387905L, -2))
     expectThrows(classOf[ArithmeticException],
                  Math.multiplyExact(-2, 4611686018427387905L))
-  }
 
-  @Test def incrementExact(): Unit = {
+  @Test def incrementExact(): Unit =
     assertEquals(Int.MaxValue, Math.incrementExact(Int.MaxValue - 1))
     assertEquals(Long.MaxValue, Math.incrementExact(Long.MaxValue - 1))
 
@@ -230,9 +225,8 @@ class MathTestOnJDK8 {
         classOf[ArithmeticException], Math.incrementExact(Int.MaxValue))
     expectThrows(
         classOf[ArithmeticException], Math.incrementExact(Long.MaxValue))
-  }
 
-  @Test def decrementExact(): Unit = {
+  @Test def decrementExact(): Unit =
     assertEquals(Int.MinValue, Math.decrementExact(Int.MinValue + 1))
     assertEquals(Long.MinValue, Math.decrementExact(Long.MinValue + 1))
 
@@ -240,9 +234,8 @@ class MathTestOnJDK8 {
         classOf[ArithmeticException], Math.decrementExact(Int.MinValue))
     expectThrows(
         classOf[ArithmeticException], Math.decrementExact(Long.MinValue))
-  }
 
-  @Test def negateExact(): Unit = {
+  @Test def negateExact(): Unit =
     assertEquals(Int.MaxValue, Math.negateExact(Int.MinValue + 1))
     assertEquals(Int.MinValue + 1, Math.negateExact(Int.MaxValue))
     assertEquals(Long.MaxValue, Math.negateExact(Long.MinValue + 1))
@@ -250,17 +243,15 @@ class MathTestOnJDK8 {
 
     expectThrows(classOf[ArithmeticException], Math.negateExact(Int.MinValue))
     expectThrows(classOf[ArithmeticException], Math.negateExact(Long.MinValue))
-  }
 
-  @Test def toIntExact(): Unit = {
+  @Test def toIntExact(): Unit =
     assertEquals(Int.MinValue, Math.toIntExact(-2147483648L))
     assertEquals(Int.MaxValue, Math.toIntExact(2147483647L))
 
     expectThrows(classOf[ArithmeticException], Math.toIntExact(-2147483649L))
     expectThrows(classOf[ArithmeticException], Math.toIntExact(2147483648L))
-  }
 
-  @Test def floorDiv(): Unit = {
+  @Test def floorDiv(): Unit =
     assertEquals(0, Math.floorDiv(0, 1))
     assertEquals(0, Math.floorDiv(0, -1))
     assertEquals(1, Math.floorDiv(1, 1))
@@ -296,9 +287,8 @@ class MathTestOnJDK8 {
     assertEquals(Long.MinValue, Math.floorDiv(Long.MinValue, -1))
     for (n <- Seq(0L, 1L, -1L, Long.MaxValue, Long.MinValue)) expectThrows(
         classOf[ArithmeticException], Math.floorDiv(n, 0))
-  }
 
-  @Test def floorMod() = {
+  @Test def floorMod() =
     assumeFalse("Executing in PhantomJS", executingInPhantomJS) // crashes otherwise, see #593
 
     assertEquals(0, Math.floorMod(0, 1))
@@ -337,5 +327,3 @@ class MathTestOnJDK8 {
 
     for (n <- Seq(0L, 1L, -1L, Long.MaxValue, Long.MinValue)) assertThrows(
         classOf[ArithmeticException], Math.floorMod(n, 0))
-  }
-}

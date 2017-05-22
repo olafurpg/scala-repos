@@ -21,7 +21,6 @@ import org.saddle.array.Sorter
 /**
   * Short ScalarTag
   */
-object ScalarTagShort extends ScalarTagAny[Short] {
+object ScalarTagShort extends ScalarTagAny[Short]
   override def makeSorter(implicit ord: ORD[Short]): Sorter[Short] =
     Sorter.shortSorter
-}

@@ -27,7 +27,7 @@ import scala.reflect.Manifest
   * with the Injector.  This provides both concrete Maker/Vender functionality as
   * well as Injector functionality.
   */
-trait Factory extends SimpleInjector {
+trait Factory extends SimpleInjector
 
   /**
     * Create an object or val that is a subclass of the FactoryMaker to
@@ -37,7 +37,7 @@ trait Factory extends SimpleInjector {
     */
   abstract class FactoryMaker[T](_default: Vendor[T])(
       implicit man: Manifest[T])
-      extends StackableMaker[T] with Vendor[T] {
+      extends StackableMaker[T] with Vendor[T]
     registerInjection(this)(man)
 
     /**
@@ -49,32 +49,28 @@ trait Factory extends SimpleInjector {
     /**
       * The default function for vending an instance
       */
-    object default extends PSettableValueHolder[Vendor[T]] {
+    object default extends PSettableValueHolder[Vendor[T]]
       private var value = _default
 
       def get = value
 
       def is = get
 
-      def set(v: Vendor[T]): Vendor[T] = {
+      def set(v: Vendor[T]): Vendor[T] =
         value = v
         v
-      }
-    }
 
     /**
       * The session-specific Maker for creating an instance
       */
-    object session extends SessionVar[Maker[T]](Empty) {
+    object session extends SessionVar[Maker[T]](Empty)
       override protected def __nameSalt = Helpers.randomString(20)
-    }
 
     /**
       * The request specific Maker for creating an instance
       */
-    object request extends RequestVar[Maker[T]](Empty) {
+    object request extends RequestVar[Maker[T]](Empty)
       override protected def __nameSalt = Helpers.randomString(20)
-    }
     private val _sub: List[PValueHolder[Maker[T]]] = List(request, session)
 
     /**
@@ -87,5 +83,3 @@ trait Factory extends SimpleInjector {
       */
     override implicit def make: Box[T] =
       super.make or find(_sub) or Full(default.is.apply())
-  }
-}

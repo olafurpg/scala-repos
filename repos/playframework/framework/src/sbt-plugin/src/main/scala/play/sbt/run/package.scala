@@ -5,10 +5,10 @@ package play.sbt
 import sbt._
 import play.runsupport.LoggerProxy
 
-package object run {
+package object run
   import scala.language.implicitConversions
 
-  implicit def toLoggerProxy(in: Logger): LoggerProxy = new LoggerProxy {
+  implicit def toLoggerProxy(in: Logger): LoggerProxy = new LoggerProxy
     def verbose(message: => String): Unit = in.verbose(message)
     def debug(message: => String): Unit = in.debug(message)
     def info(message: => String): Unit = in.info(message)
@@ -16,5 +16,3 @@ package object run {
     def error(message: => String): Unit = in.error(message)
     def trace(t: => Throwable): Unit = in.trace(t)
     def success(message: => String): Unit = in.success(message)
-  }
-}

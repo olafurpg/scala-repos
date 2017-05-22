@@ -25,32 +25,29 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
-class PrunedScanSource extends RelationProvider {
+class PrunedScanSource extends RelationProvider
   override def createRelation(
       sqlContext: SQLContext,
-      parameters: Map[String, String]): BaseRelation = {
+      parameters: Map[String, String]): BaseRelation =
     SimplePrunedScan(parameters("from").toInt, parameters("to").toInt)(
         sqlContext)
-  }
-}
 
 case class SimplePrunedScan(from: Int, to: Int)(
     @transient val sqlContext: SQLContext)
-    extends BaseRelation with PrunedScan {
+    extends BaseRelation with PrunedScan
 
   override def schema: StructType =
     StructType(StructField("a", IntegerType, nullable = false) :: StructField(
             "b", IntegerType, nullable = false) :: Nil)
 
-  override def buildScan(requiredColumns: Array[String]): RDD[Row] = {
-    val rowBuilders = requiredColumns.map {
+  override def buildScan(requiredColumns: Array[String]): RDD[Row] =
+    val rowBuilders = requiredColumns.map
       case "a" =>
         (i: Int) =>
           Seq(i)
         case "b" =>
         (i: Int) =>
           Seq(i * 2)
-    }
 
     sqlContext.sparkContext
       .parallelize(from to to)
@@ -59,13 +56,11 @@ case class SimplePrunedScan(from: Int, to: Int)(
                   .map(_ (i))
                   .reduceOption(_ ++ _)
                   .getOrElse(Seq.empty)))
-  }
-}
 
-class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
+class PrunedScanSuite extends DataSourceTest with SharedSQLContext
   protected override lazy val sql = caseInsensitiveContext.sql _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     sql("""
         |CREATE TEMPORARY TABLE oneToTenPruned
@@ -75,7 +70,6 @@ class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
         |  to '10'
         |)
       """.stripMargin)
-  }
 
   sqlTest(
       "SELECT * FROM oneToTenPruned", (1 to 10).map(i => Row(i, i * 2)).toSeq)
@@ -114,38 +108,31 @@ class PrunedScanSuite extends DataSourceTest with SharedSQLContext {
   testPruning("SELECT a FROM oneToTenPruned", "a")
   testPruning("SELECT b FROM oneToTenPruned", "b")
 
-  def testPruning(sqlString: String, expectedColumns: String*): Unit = {
-    test(s"Columns output ${expectedColumns.mkString(",")}: $sqlString") {
+  def testPruning(sqlString: String, expectedColumns: String*): Unit =
+    test(s"Columns output ${expectedColumns.mkString(",")}: $sqlString")
 
       // These tests check a particular plan, disable whole stage codegen.
       caseInsensitiveContext.conf.setConf(
           SQLConf.WHOLESTAGE_CODEGEN_ENABLED, false)
-      try {
+      try
         val queryExecution = sql(sqlString).queryExecution
-        val rawPlan = queryExecution.executedPlan.collect {
+        val rawPlan = queryExecution.executedPlan.collect
           case p: execution.DataSourceScan => p
-        } match {
+        match
           case Seq(p) => p
           case _ => fail(s"More than one PhysicalRDD found\n$queryExecution")
-        }
         val rawColumns = rawPlan.output.map(_.name)
         val rawOutput = rawPlan.execute().first()
 
-        if (rawColumns != expectedColumns) {
+        if (rawColumns != expectedColumns)
           fail(
               s"Wrong column names. Got $rawColumns, Expected $expectedColumns\n" +
               s"Filters pushed: ${FiltersPushed.list.mkString(",")}\n" +
               queryExecution)
-        }
 
-        if (rawOutput.numFields != expectedColumns.size) {
+        if (rawOutput.numFields != expectedColumns.size)
           fail(s"Wrong output row. Got $rawOutput\n$queryExecution")
-        }
-      } finally {
+      finally
         caseInsensitiveContext.conf.setConf(
             SQLConf.WHOLESTAGE_CODEGEN_ENABLED,
             SQLConf.WHOLESTAGE_CODEGEN_ENABLED.defaultValue.get)
-      }
-    }
-  }
-}

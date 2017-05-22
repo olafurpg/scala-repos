@@ -35,7 +35,7 @@ import org.apache.kafka.common.record.TimestampType
 import scala.collection.{JavaConverters, Map, immutable}
 import JavaConverters._
 
-object Defaults {
+object Defaults
 
   /** ********* Zookeeper Configuration ***********/
   val ZkSessionTimeoutMs = 6000
@@ -192,15 +192,13 @@ object Defaults {
     SaslConfigs.DEFAULT_KERBEROS_MIN_TIME_BEFORE_RELOGIN
   val SaslKerberosPrincipalToLocalRules =
     SaslConfigs.DEFAULT_SASL_KERBEROS_PRINCIPAL_TO_LOCAL_RULES
-}
 
-object KafkaConfig {
+object KafkaConfig
 
   private val LogConfigPrefix = "log."
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     System.out.println(configDef.toHtmlTable)
-  }
 
   /** ********* Zookeeper Configuration ***********/
   val ZkConnectProp = "zookeeper.connect"
@@ -694,7 +692,7 @@ object KafkaConfig {
   val SaslKerberosPrincipalToLocalRulesDoc =
     SaslConfigs.SASL_KERBEROS_PRINCIPAL_TO_LOCAL_RULES_DOC
 
-  private val configDef = {
+  private val configDef =
     import ConfigDef.Importance._
     import ConfigDef.Range._
     import ConfigDef.Type._
@@ -1365,22 +1363,19 @@ object KafkaConfig {
               Defaults.SaslKerberosPrincipalToLocalRules,
               MEDIUM,
               SaslKerberosPrincipalToLocalRulesDoc)
-  }
 
-  def configNames() = {
+  def configNames() =
     import scala.collection.JavaConversions._
     configDef.names().toList.sorted
-  }
 
   /**
     * Check that property names are valid
     */
-  def validateNames(props: Properties) {
+  def validateNames(props: Properties)
     import scala.collection.JavaConversions._
     val names = configDef.names()
     for (name <- props.keys) require(
         names.contains(name), "Unknown configuration \"%s\".".format(name))
-  }
 
   def fromProps(props: Properties): KafkaConfig =
     fromProps(props, true)
@@ -1393,19 +1388,17 @@ object KafkaConfig {
 
   def fromProps(defaults: Properties,
                 overrides: Properties,
-                doLog: Boolean): KafkaConfig = {
+                doLog: Boolean): KafkaConfig =
     val props = new Properties()
     props.putAll(defaults)
     props.putAll(overrides)
     fromProps(props, doLog)
-  }
 
   def apply(props: java.util.Map[_, _]): KafkaConfig =
     new KafkaConfig(props, true)
-}
 
 class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
-    extends AbstractConfig(KafkaConfig.configDef, props, doLog) {
+    extends AbstractConfig(KafkaConfig.configDef, props, doLog)
 
   /** ********* Zookeeper Configuration ***********/
   val zkConnect: String = getString(KafkaConfig.ZkConnectProp)
@@ -1449,9 +1442,8 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
   val maxConnectionsPerIp = getInt(KafkaConfig.MaxConnectionsPerIpProp)
   val maxConnectionsPerIpOverrides: Map[String, Int] =
     getMap(KafkaConfig.MaxConnectionsPerIpOverridesProp,
-           getString(KafkaConfig.MaxConnectionsPerIpOverridesProp)).map {
+           getString(KafkaConfig.MaxConnectionsPerIpOverridesProp)).map
       case (k, v) => (k, v.toInt)
-    }
   val connectionsMaxIdleMs = getLong(KafkaConfig.ConnectionsMaxIdleMsProp)
 
   /***************** rack configuration **************/
@@ -1639,44 +1631,40 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
   val listeners = getListeners
   val advertisedListeners = getAdvertisedListeners
 
-  private def getLogRetentionTimeMillis: Long = {
+  private def getLogRetentionTimeMillis: Long =
     val millisInMinute = 60L * 1000L
     val millisInHour = 60L * millisInMinute
 
     val millis: java.lang.Long = Option(
         getLong(KafkaConfig.LogRetentionTimeMillisProp)).getOrElse(
-        Option(getInt(KafkaConfig.LogRetentionTimeMinutesProp)) match {
+        Option(getInt(KafkaConfig.LogRetentionTimeMinutesProp)) match
       case Some(mins) => millisInMinute * mins
       case None => getInt(KafkaConfig.LogRetentionTimeHoursProp) * millisInHour
-    })
+    )
 
     if (millis < 0) return -1
     millis
-  }
 
   private def getMap(
-      propName: String, propValue: String): Map[String, String] = {
-    try {
+      propName: String, propValue: String): Map[String, String] =
+    try
       CoreUtils.parseCsvMap(propValue)
-    } catch {
+    catch
       case e: Exception =>
         throw new IllegalArgumentException(
             "Error parsing configuration property '%s': %s".format(
                 propName, e.getMessage))
-    }
-  }
 
-  private def validateUniquePortAndProtocol(listeners: String) {
+  private def validateUniquePortAndProtocol(listeners: String)
 
-    val endpoints = try {
+    val endpoints = try
       val listenerList = CoreUtils.parseCsvList(listeners)
       listenerList.map(listener => EndPoint.createEndPoint(listener))
-    } catch {
+    catch
       case e: Exception =>
         throw new IllegalArgumentException(
             "Error creating broker listeners from '%s': %s".format(
                 listeners, e.getMessage))
-    }
     // filter port 0 for unit tests
     val endpointsWithoutZeroPort = endpoints.map(ep => ep.port).filter(_ != 0)
     val distinctPorts = endpointsWithoutZeroPort.distinct
@@ -1686,48 +1674,42 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
             "Each listener must have a different port")
     require(distinctProtocols.size == endpoints.size,
             "Each listener must have a different protocol")
-  }
 
   // If the user did not define listeners but did define host or port, let's use them in backward compatible way
   // If none of those are defined, we default to PLAINTEXT://:9092
-  private def getListeners(): immutable.Map[SecurityProtocol, EndPoint] = {
-    if (getString(KafkaConfig.ListenersProp) != null) {
+  private def getListeners(): immutable.Map[SecurityProtocol, EndPoint] =
+    if (getString(KafkaConfig.ListenersProp) != null)
       validateUniquePortAndProtocol(getString(KafkaConfig.ListenersProp))
       CoreUtils.listenerListToEndPoints(getString(KafkaConfig.ListenersProp))
-    } else {
+    else
       CoreUtils.listenerListToEndPoints("PLAINTEXT://" + hostName + ":" + port)
-    }
-  }
 
   // If the user defined advertised listeners, we use those
   // If he didn't but did define advertised host or port, we'll use those and fill in the missing value from regular host / port or defaults
   // If none of these are defined, we'll use the listeners
   private def getAdvertisedListeners(
-      ): immutable.Map[SecurityProtocol, EndPoint] = {
-    if (getString(KafkaConfig.AdvertisedListenersProp) != null) {
+      ): immutable.Map[SecurityProtocol, EndPoint] =
+    if (getString(KafkaConfig.AdvertisedListenersProp) != null)
       validateUniquePortAndProtocol(
           getString(KafkaConfig.AdvertisedListenersProp))
       CoreUtils.listenerListToEndPoints(
           getString(KafkaConfig.AdvertisedListenersProp))
-    } else if (getString(KafkaConfig.AdvertisedHostNameProp) != null ||
-               getInt(KafkaConfig.AdvertisedPortProp) != null) {
+    else if (getString(KafkaConfig.AdvertisedHostNameProp) != null ||
+               getInt(KafkaConfig.AdvertisedPortProp) != null)
       CoreUtils.listenerListToEndPoints(
           "PLAINTEXT://" + advertisedHostName + ":" + advertisedPort)
-    } else {
+    else
       getListeners()
-    }
-  }
 
   validateValues()
 
-  private def validateValues() {
-    if (brokerIdGenerationEnable) {
+  private def validateValues()
+    if (brokerIdGenerationEnable)
       require(
           brokerId >= -1 && brokerId <= maxReservedBrokerId,
           "broker.id must be equal or greater than -1 and not greater than reserved.broker.max.id")
-    } else {
+    else
       require(brokerId >= 0, "broker.id must be equal or greater than 0")
-    }
     require(
         logRollTimeMillis >= 1, "log.roll.ms must be equal or greater than 1")
     require(logRollTimeJitterMillis >= 0,
@@ -1769,5 +1751,3 @@ class KafkaConfig(val props: java.util.Map[_, _], doLog: Boolean)
     require(
         interBrokerProtocolVersion >= logMessageFormatVersion,
         s"log.message.format.version $logMessageFormatVersionString cannot be used when inter.broker.protocol.version is set to $interBrokerProtocolVersionString")
-  }
-}

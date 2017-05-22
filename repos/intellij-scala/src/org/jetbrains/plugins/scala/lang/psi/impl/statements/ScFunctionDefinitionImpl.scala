@@ -28,17 +28,16 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, Unit}
   */
 class ScFunctionDefinitionImpl protected (
     stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
-    extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDefinition {
+    extends ScFunctionImpl(stub, nodeType, node) with ScFunctionDefinition
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScFunctionStub) = {
+  def this(stub: ScFunctionStub) =
     this(stub, ScalaElementTypes.FUNCTION_DEFINITION, null)
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
     //process function's parameters for dependent method types, and process type parameters
     if (!super [ScFunctionImpl].processDeclarations(
             processor, state, lastParent, place)) return false
@@ -47,88 +46,70 @@ class ScFunctionDefinitionImpl protected (
     //processing parameters for default parameters in ScParameters
     val parameterIncludingSynthetic: Seq[ScParameter] =
       effectiveParameterClauses.flatMap(_.effectiveParameters)
-    if (getStub == null) {
-      body match {
+    if (getStub == null)
+      body match
         case Some(x)
             if lastParent != null &&
             (!needCheckProcessingDeclarationsForBody ||
                 x.startOffsetInParent == lastParent.startOffsetInParent) =>
-          for (p <- parameterIncludingSynthetic) {
+          for (p <- parameterIncludingSynthetic)
             ProgressManager.checkCanceled()
             if (!processor.execute(p, state)) return false
-          }
         case _ =>
-      }
-    } else {
+    else
       if (lastParent != null &&
-          lastParent.getContext != lastParent.getParent) {
-        for (p <- parameterIncludingSynthetic) {
+          lastParent.getContext != lastParent.getParent)
+        for (p <- parameterIncludingSynthetic)
           ProgressManager.checkCanceled()
           if (!processor.execute(p, state)) return false
-        }
-      }
-    }
     true
-  }
 
   protected def needCheckProcessingDeclarationsForBody = true
 
   override def toString: String = "ScFunctionDefinition: " + name
 
-  def returnTypeInner: TypeResult[ScType] = returnTypeElement match {
+  def returnTypeInner: TypeResult[ScType] = returnTypeElement match
     case None if !hasAssign => Success(Unit, Some(this))
     case None =>
-      body match {
+      body match
         case Some(b) => b.getType(TypingContext.empty)
         case _ => Success(Unit, Some(this))
-      }
     case Some(rte: ScTypeElement) => rte.getType(TypingContext.empty)
-  }
 
-  def body: Option[ScExpression] = {
+  def body: Option[ScExpression] =
     val stub = getStub
     if (stub != null) stub.asInstanceOf[ScFunctionStub].getBodyExpression
     else findChild(classOf[ScExpression])
-  }
 
-  override def hasAssign: Boolean = {
+  override def hasAssign: Boolean =
     val stub = getStub
     if (stub != null) stub.asInstanceOf[ScFunctionStub].hasAssign
     else assignment.isDefined
-  }
 
   def assignment = Option(findChildByType[PsiElement](ScalaTokenTypes.tASSIGN))
 
-  def removeAssignment() {
-    body match {
+  def removeAssignment()
+    body match
       case Some(block: ScBlockExpr) => // do nothing
       case Some(exp: ScExpression) =>
         val block =
           ScalaPsiElementFactory.createBlockFromExpr(exp, exp.getManager)
         exp.replace(block)
       case _ =>
-    }
     assignment.foreach(_.delete())
-  }
 
-  override def getBody: FakePsiCodeBlock = body match {
+  override def getBody: FakePsiCodeBlock = body match
     case Some(b) =>
       new FakePsiCodeBlock(b) // Needed so that LineBreakpoint.canAddLineBreakpoint allows line breakpoints on one-line method definitions
     case None => null
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitFunctionDefinition(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitFunctionDefinition(this)
       case _ => super.accept(visitor)
-    }
-  }
 
-  override def importantOrderFunction(): Boolean = {
+  override def importantOrderFunction(): Boolean =
     hasModifierProperty("implicit") && !hasExplicitType
-  }
-}

@@ -16,11 +16,10 @@
   */
 package kafka.network
 
-trait ConnectionConfig {
+trait ConnectionConfig
   val host: String
   val port: Int
   val sendBufferSize: Int = -1
   val receiveBufferSize: Int = -1
   val tcpNoDelay = true
   val keepAlive = false
-}

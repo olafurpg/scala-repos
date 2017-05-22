@@ -40,7 +40,7 @@ import org.scalatest.junit.JUnitSuite
 
 import scala.collection.Map
 
-class SocketServerTest extends JUnitSuite {
+class SocketServerTest extends JUnitSuite
   val props =
     TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 0)
   props.put("listeners", "PLAINTEXT://localhost:0,TRACE://localhost:0")
@@ -57,29 +57,26 @@ class SocketServerTest extends JUnitSuite {
   server.startup()
 
   def sendRequest(
-      socket: Socket, request: Array[Byte], id: Option[Short] = None) {
+      socket: Socket, request: Array[Byte], id: Option[Short] = None)
     val outgoing = new DataOutputStream(socket.getOutputStream)
-    id match {
+    id match
       case Some(id) =>
         outgoing.writeInt(request.length + 2)
         outgoing.writeShort(id)
       case None =>
         outgoing.writeInt(request.length)
-    }
     outgoing.write(request)
     outgoing.flush()
-  }
 
-  def receiveResponse(socket: Socket): Array[Byte] = {
+  def receiveResponse(socket: Socket): Array[Byte] =
     val incoming = new DataInputStream(socket.getInputStream)
     val len = incoming.readInt()
     val response = new Array[Byte](len)
     incoming.readFully(response)
     response
-  }
 
   /* A simple request handler that just echos back the response */
-  def processRequest(channel: RequestChannel) {
+  def processRequest(channel: RequestChannel)
     val request = channel.receiveRequest
     val byteBuffer =
       ByteBuffer.allocate(request.header.sizeOf + request.body.sizeOf)
@@ -90,19 +87,17 @@ class SocketServerTest extends JUnitSuite {
     val send = new NetworkSend(request.connectionId, byteBuffer)
     channel.sendResponse(
         new RequestChannel.Response(request.processor, request, send))
-  }
 
   def connect(s: SocketServer = server,
               protocol: SecurityProtocol = SecurityProtocol.PLAINTEXT) =
     new Socket("localhost", server.boundPort(protocol))
 
   @After
-  def cleanup() {
+  def cleanup()
     metrics.close()
     server.shutdown()
-  }
 
-  private def producerRequestBytes: Array[Byte] = {
+  private def producerRequestBytes: Array[Byte] =
     val apiKey: Short = 0
     val correlationId = -1
     val clientId = ""
@@ -121,10 +116,9 @@ class SocketServerTest extends JUnitSuite {
     val serializedBytes = new Array[Byte](byteBuffer.remaining)
     byteBuffer.get(serializedBytes)
     serializedBytes
-  }
 
   @Test
-  def simpleRequest() {
+  def simpleRequest()
     val plainSocket = connect(protocol = SecurityProtocol.PLAINTEXT)
     val traceSocket = connect(protocol = SecurityProtocol.TRACE)
     val serializedBytes = producerRequestBytes
@@ -138,23 +132,20 @@ class SocketServerTest extends JUnitSuite {
     sendRequest(traceSocket, serializedBytes)
     processRequest(server.requestChannel)
     assertEquals(serializedBytes.toSeq, receiveResponse(traceSocket).toSeq)
-  }
 
   @Test
-  def tooBigRequestIsRejected() {
+  def tooBigRequestIsRejected()
     val tooManyBytes = new Array[Byte](server.config.socketRequestMaxBytes + 1)
     new Random().nextBytes(tooManyBytes)
     val socket = connect()
     sendRequest(socket, tooManyBytes, Some(0))
-    try {
+    try
       receiveResponse(socket)
-    } catch {
+    catch
       case e: IOException => // thats fine
-    }
-  }
 
   @Test
-  def testSocketsCloseOnShutdown() {
+  def testSocketsCloseOnShutdown()
     // open a connection
     val plainSocket = connect(protocol = SecurityProtocol.PLAINTEXT)
     val traceSocket = connect(protocol = SecurityProtocol.TRACE)
@@ -173,23 +164,20 @@ class SocketServerTest extends JUnitSuite {
     val largeChunkOfBytes = new Array[Byte](1000000)
     // doing a subsequent send should throw an exception as the connection should be closed.
     // send a large chunk of bytes to trigger a socket flush
-    try {
+    try
       sendRequest(plainSocket, largeChunkOfBytes, Some(0))
       fail("expected exception when writing to closed plain socket")
-    } catch {
+    catch
       case e: IOException => // expected
-    }
 
-    try {
+    try
       sendRequest(traceSocket, largeChunkOfBytes, Some(0))
       fail("expected exception when writing to closed trace socket")
-    } catch {
+    catch
       case e: IOException => // expected
-    }
-  }
 
   @Test
-  def testMaxConnectionsPerIp() {
+  def testMaxConnectionsPerIp()
     // make the maximum allowable number of connections and then leak them
     val conns = (0 until server.config.maxConnectionsPerIp).map(_ => connect())
     // now try one more (should fail)
@@ -211,10 +199,9 @@ class SocketServerTest extends JUnitSuite {
     assertNotNull(request)
     conn2.close()
     conns.tail.foreach(_.close())
-  }
 
   @Test
-  def testMaxConnectionsPerIPOverrides() {
+  def testMaxConnectionsPerIPOverrides()
     val overrideNum = 6
     val overrides = Map("localhost" -> overrideNum)
     val overrideProps =
@@ -222,7 +209,7 @@ class SocketServerTest extends JUnitSuite {
     val serverMetrics = new Metrics()
     val overrideServer: SocketServer = new SocketServer(
         KafkaConfig.fromProps(overrideProps), serverMetrics, new SystemTime())
-    try {
+    try
       overrideServer.startup()
       // make the maximum allowable number of connections and then leak them
       val conns = ( (0 until overrideNum).map(i => connect(overrideServer)))
@@ -232,14 +219,12 @@ class SocketServerTest extends JUnitSuite {
       assertEquals(-1, conn.getInputStream.read())
       conn.close()
       conns.foreach(_.close())
-    } finally {
+    finally
       overrideServer.shutdown()
       serverMetrics.close()
-    }
-  }
 
   @Test
-  def testSslSocketServer(): Unit = {
+  def testSslSocketServer(): Unit =
     val trustStoreFile = File.createTempFile("truststore", ".jks")
     val overrideProps = TestUtils.createBrokerConfig(
         0,
@@ -252,7 +237,7 @@ class SocketServerTest extends JUnitSuite {
     val overrideServer: SocketServer = new SocketServer(
         KafkaConfig.fromProps(overrideProps), serverMetrics, new SystemTime)
     overrideServer.startup()
-    try {
+    try
       val sslContext = SSLContext.getInstance("TLSv1.2")
       sslContext.init(null,
                       Array(TestUtils.trustAllCerts),
@@ -285,19 +270,15 @@ class SocketServerTest extends JUnitSuite {
       processRequest(overrideServer.requestChannel)
       assertEquals(serializedBytes.toSeq, receiveResponse(sslSocket).toSeq)
       sslSocket.close()
-    } finally {
+    finally
       overrideServer.shutdown()
       serverMetrics.close()
-    }
-  }
 
   @Test
-  def testSessionPrincipal(): Unit = {
+  def testSessionPrincipal(): Unit =
     val socket = connect()
     val bytes = new Array[Byte](40)
     sendRequest(socket, bytes, Some(0))
     assertEquals(KafkaPrincipal.ANONYMOUS,
                  server.requestChannel.receiveRequest().session.principal)
     socket.close()
-  }
-}

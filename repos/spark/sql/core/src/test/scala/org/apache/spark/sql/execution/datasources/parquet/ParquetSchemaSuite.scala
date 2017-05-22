@@ -27,7 +27,7 @@ import org.apache.spark.sql.catalyst.ScalaReflection
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
-abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext {
+abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext
 
   /**
     * Checks whether the reflected Parquet message type for product type `T` conforms `messageType`.
@@ -37,14 +37,13 @@ abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext {
       messageType: String,
       binaryAsString: Boolean,
       int96AsTimestamp: Boolean,
-      writeLegacyParquetFormat: Boolean): Unit = {
+      writeLegacyParquetFormat: Boolean): Unit =
     testSchema(testName,
                StructType.fromAttributes(ScalaReflection.attributesFor[T]),
                messageType,
                binaryAsString,
                int96AsTimestamp,
                writeLegacyParquetFormat)
-  }
 
   protected def testParquetToCatalyst(
       testName: String,
@@ -52,13 +51,13 @@ abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext {
       parquetSchema: String,
       binaryAsString: Boolean,
       int96AsTimestamp: Boolean,
-      writeLegacyParquetFormat: Boolean): Unit = {
+      writeLegacyParquetFormat: Boolean): Unit =
     val converter = new CatalystSchemaConverter(
         assumeBinaryIsString = binaryAsString,
         assumeInt96IsTimestamp = int96AsTimestamp,
         writeLegacyParquetFormat = writeLegacyParquetFormat)
 
-    test(s"sql <= parquet: $testName") {
+    test(s"sql <= parquet: $testName")
       val actual =
         converter.convert(MessageTypeParser.parseMessageType(parquetSchema))
       val expected = sqlSchema
@@ -66,8 +65,6 @@ abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext {
            |Expected schema: ${expected.json}
            |Actual schema:   ${actual.json}
          """.stripMargin)
-    }
-  }
 
   protected def testCatalystToParquet(
       testName: String,
@@ -75,26 +72,24 @@ abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext {
       parquetSchema: String,
       binaryAsString: Boolean,
       int96AsTimestamp: Boolean,
-      writeLegacyParquetFormat: Boolean): Unit = {
+      writeLegacyParquetFormat: Boolean): Unit =
     val converter = new CatalystSchemaConverter(
         assumeBinaryIsString = binaryAsString,
         assumeInt96IsTimestamp = int96AsTimestamp,
         writeLegacyParquetFormat = writeLegacyParquetFormat)
 
-    test(s"sql => parquet: $testName") {
+    test(s"sql => parquet: $testName")
       val actual = converter.convert(sqlSchema)
       val expected = MessageTypeParser.parseMessageType(parquetSchema)
       actual.checkContains(expected)
       expected.checkContains(actual)
-    }
-  }
 
   protected def testSchema(testName: String,
                            sqlSchema: StructType,
                            parquetSchema: String,
                            binaryAsString: Boolean,
                            int96AsTimestamp: Boolean,
-                           writeLegacyParquetFormat: Boolean): Unit = {
+                           writeLegacyParquetFormat: Boolean): Unit =
 
     testCatalystToParquet(testName,
                           sqlSchema,
@@ -109,10 +104,8 @@ abstract class ParquetSchemaTest extends ParquetTest with SharedSQLContext {
                           binaryAsString,
                           int96AsTimestamp,
                           writeLegacyParquetFormat)
-  }
-}
 
-class ParquetSchemaInferenceSuite extends ParquetSchemaTest {
+class ParquetSchemaInferenceSuite extends ParquetSchemaTest
   testSchemaInference[(Boolean, Int, Long, Float, Double, Array[Byte])](
       "basic types",
       """
@@ -331,10 +324,9 @@ class ParquetSchemaInferenceSuite extends ParquetSchemaTest {
       binaryAsString = true,
       int96AsTimestamp = true,
       writeLegacyParquetFormat = false)
-}
 
-class ParquetSchemaSuite extends ParquetSchemaTest {
-  test("DataType string parser compatibility") {
+class ParquetSchemaSuite extends ParquetSchemaTest
+  test("DataType string parser compatibility")
     // This is the generated string from previous versions of the Spark SQL, using the following:
     // val schema = StructType(List(
     //  StructField("c1", IntegerType, false),
@@ -350,18 +342,16 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
     val fromCaseClassString = StructType.fromString(caseClassString)
     val fromJson = StructType.fromString(jsonString)
 
-    (fromCaseClassString, fromJson).zipped.foreach { (a, b) =>
+    (fromCaseClassString, fromJson).zipped.foreach  (a, b) =>
       assert(a.name == b.name)
       assert(a.dataType === b.dataType)
       assert(a.nullable === b.nullable)
-    }
-  }
 
-  test("merge with metastore schema") {
+  test("merge with metastore schema")
     // Field type conflict resolution
     assertResult(StructType(
             Seq(StructField("lowerCase", StringType),
-                StructField("UPPERCase", DoubleType, nullable = false)))) {
+                StructField("UPPERCase", DoubleType, nullable = false))))
 
       ParquetRelation.mergeMetastoreParquetSchema(
           StructType(
@@ -370,11 +360,10 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
           StructType(
               Seq(StructField("lowerCase", BinaryType),
                   StructField("UPPERCase", IntegerType, nullable = true))))
-    }
 
     // MetaStore schema is subset of parquet schema
     assertResult(StructType(
-            Seq(StructField("UPPERCase", DoubleType, nullable = false)))) {
+            Seq(StructField("UPPERCase", DoubleType, nullable = false))))
 
       ParquetRelation.mergeMetastoreParquetSchema(
           StructType(
@@ -382,33 +371,30 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
           StructType(
               Seq(StructField("lowerCase", BinaryType),
                   StructField("UPPERCase", IntegerType, nullable = true))))
-    }
 
     // Metastore schema contains additional non-nullable fields.
-    assert(intercept[Throwable] {
+    assert(intercept[Throwable]
       ParquetRelation.mergeMetastoreParquetSchema(
           StructType(
               Seq(StructField("uppercase", DoubleType, nullable = false),
                   StructField("lowerCase", BinaryType, nullable = false))),
           StructType(
               Seq(StructField("UPPERCase", IntegerType, nullable = true))))
-    }.getMessage.contains("detected conflicting schemas"))
+    .getMessage.contains("detected conflicting schemas"))
 
     // Conflicting non-nullable field names
-    intercept[Throwable] {
+    intercept[Throwable]
       ParquetRelation.mergeMetastoreParquetSchema(
           StructType(Seq(StructField("lower", StringType, nullable = false))),
           StructType(Seq(StructField("lowerCase", BinaryType))))
-    }
-  }
 
-  test("merge missing nullable fields from Metastore schema") {
+  test("merge missing nullable fields from Metastore schema")
     // Standard case: Metastore schema contains additional nullable fields not present
     // in the Parquet file schema.
     assertResult(StructType(
             Seq(StructField("firstField", StringType, nullable = true),
                 StructField("secondField", StringType, nullable = true),
-                StructField("thirdfield", StringType, nullable = true)))) {
+                StructField("thirdfield", StringType, nullable = true))))
       ParquetRelation.mergeMetastoreParquetSchema(
           StructType(
               Seq(StructField("firstfield", StringType, nullable = true),
@@ -417,11 +403,10 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
           StructType(
               Seq(StructField("firstField", StringType, nullable = true),
                   StructField("secondField", StringType, nullable = true))))
-    }
 
     // Merge should fail if the Metastore contains any additional fields that are not
     // nullable.
-    assert(intercept[Throwable] {
+    assert(intercept[Throwable]
       ParquetRelation.mergeMetastoreParquetSchema(
           StructType(
               Seq(StructField("firstfield", StringType, nullable = true),
@@ -430,11 +415,10 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
           StructType(
               Seq(StructField("firstField", StringType, nullable = true),
                   StructField("secondField", StringType, nullable = true))))
-    }.getMessage.contains("detected conflicting schemas"))
-  }
+    .getMessage.contains("detected conflicting schemas"))
 
-  test("schema merging failure error message") {
-    withTempPath { dir =>
+  test("schema merging failure error message")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
       sqlContext.range(3).write.parquet(s"$path/p=1")
       sqlContext
@@ -443,15 +427,14 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         .write
         .parquet(s"$path/p=2")
 
-      val message = intercept[SparkException] {
+      val message = intercept[SparkException]
         sqlContext.read.option("mergeSchema", "true").parquet(path).schema
-      }.getMessage
+      .getMessage
 
       assert(message.contains("Failed merging schema of file"))
-    }
 
     // test for second merging (after read Parquet schema in parallel done)
-    withTempPath { dir =>
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
       sqlContext.range(3).write.parquet(s"$path/p=1")
       sqlContext
@@ -462,13 +445,11 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
       sqlContext.sparkContext.conf.set("spark.default.parallelism", "20")
 
-      val message = intercept[SparkException] {
+      val message = intercept[SparkException]
         sqlContext.read.option("mergeSchema", "true").parquet(path).schema
-      }.getMessage
+      .getMessage
 
       assert(message.contains("Failed merging schema:"))
-    }
-  }
 
   // =======================================================
   // Tests for converting Parquet LIST to Catalyst ArrayType
@@ -644,7 +625,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
 
   testParquetToCatalyst(
       "Backwards-compatibility: LIST with non-nullable element type 8 - " +
-      "parquet-protobuf non-primitive lists", {
+      "parquet-protobuf non-primitive lists",
         val elementType = new StructType()
           .add("c1", StringType, nullable = true)
           .add("c2", IntegerType, nullable = false)
@@ -652,7 +633,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         new StructType().add("f1",
                              ArrayType(elementType, containsNull = false),
                              nullable = false)
-      },
+      ,
       """message root {
       |  repeated group f1 {
       |    optional binary c1 (UTF8);
@@ -1042,16 +1023,16 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
   private def testSchemaClipping(testName: String,
                                  parquetSchema: String,
                                  catalystSchema: StructType,
-                                 expectedSchema: String): Unit = {
-    test(s"Clipping - $testName") {
+                                 expectedSchema: String): Unit =
+    test(s"Clipping - $testName")
       val expected = MessageTypeParser.parseMessageType(expectedSchema)
       val actual = CatalystReadSupport.clipParquetSchema(
           MessageTypeParser.parseMessageType(parquetSchema), catalystSchema)
 
-      try {
+      try
         expected.checkContains(actual)
         actual.checkContains(expected)
-      } catch {
+      catch
         case cause: Throwable =>
           fail(s"""Expected clipped schema:
              |$expected
@@ -1059,9 +1040,6 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
              |$actual
            """.stripMargin,
                cause)
-      }
-    }
-  }
 
   testSchemaClipping(
       "simple nested struct", parquetSchema = """message root {
@@ -1070,12 +1048,12 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |    optional int32 f01;
         |  }
         |}
-      """.stripMargin, catalystSchema = {
+      """.stripMargin, catalystSchema =
     val f0Type = new StructType().add("f00", IntegerType, nullable = true)
     new StructType()
       .add("f0", f0Type, nullable = false)
       .add("f1", IntegerType, nullable = true)
-  }, expectedSchema = """message root {
+  , expectedSchema = """message root {
         |  required group f0 {
         |    optional int32 f00;
         |  }
@@ -1095,7 +1073,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin,
-      catalystSchema = {
+      catalystSchema =
         val f00Type = ArrayType(StringType, containsNull = false)
         val f01Type =
           ArrayType(new StructType().add("f011", DoubleType, nullable = true),
@@ -1109,7 +1087,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         new StructType()
           .add("f0", f0Type, nullable = false)
           .add("f1", f1Type, nullable = true)
-      },
+      ,
       expectedSchema = """message root {
         |  required group f0 {
         |    repeated binary f00 (UTF8);
@@ -1142,7 +1120,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin,
-                     catalystSchema = {
+                     catalystSchema =
                        val f01ElementType = new StructType()
                          .add("f011", DoubleType, nullable = true)
                          .add("f012", LongType, nullable = true)
@@ -1156,7 +1134,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
                               nullable = true)
 
                        new StructType().add("f0", f0Type, nullable = false)
-                     },
+                     ,
                      expectedSchema = """message root {
         |  required group f0 {
         |    optional group f00 (LIST) {
@@ -1189,7 +1167,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin,
-                     catalystSchema = {
+                     catalystSchema =
                        val f01ElementType = new StructType()
                          .add("f011", DoubleType, nullable = true)
                          .add("f012", LongType, nullable = true)
@@ -1203,7 +1181,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
                               nullable = true)
 
                        new StructType().add("f0", f0Type, nullable = false)
-                     },
+                     ,
                      expectedSchema = """message root {
         |  required group f0 {
         |    optional group f00 (LIST) {
@@ -1240,7 +1218,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin,
-                     catalystSchema = {
+                     catalystSchema =
                        val f01ElementType = new StructType()
                          .add("f011", DoubleType, nullable = true)
                          .add("f012", LongType, nullable = true)
@@ -1254,7 +1232,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
                               nullable = true)
 
                        new StructType().add("f0", f0Type, nullable = true)
-                     },
+                     ,
                      expectedSchema = """message root {
         |  optional group f0 {
         |    optional group f00 (LIST) {
@@ -1286,7 +1264,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
          |    }
          |  }
          |}
-       """.stripMargin, catalystSchema = {
+       """.stripMargin, catalystSchema =
     val f00ElementType = new StructType()
       .add("f001", LongType, nullable = true)
       .add("f002", DoubleType, nullable = false)
@@ -1295,7 +1273,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
     val f0Type = new StructType().add("f00", f00Type, nullable = false)
 
     new StructType().add("f0", f0Type, nullable = false)
-  }, expectedSchema = s"""message root {
+  , expectedSchema = s"""message root {
          |  required group f0 {
          |    required group f00 (LIST) {
          |      repeated group element {
@@ -1327,7 +1305,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin,
-                     catalystSchema = {
+                     catalystSchema =
                        val f01ElementType = new StructType()
                          .add("f011", DoubleType, nullable = true)
                          .add("f012", LongType, nullable = true)
@@ -1341,7 +1319,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
                               nullable = true)
 
                        new StructType().add("f0", f0Type, nullable = false)
-                     },
+                     ,
                      expectedSchema = """message root {
         |  required group f0 {
         |    optional group f00 (LIST) {
@@ -1409,7 +1387,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin,
-      catalystSchema = {
+      catalystSchema =
         val valueType = new StructType()
           .add("value_f1", LongType, nullable = false)
           .add("value_f2", DoubleType, nullable = false)
@@ -1417,7 +1395,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         val f0Type = MapType(IntegerType, valueType, valueContainsNull = false)
 
         new StructType().add("f0", f0Type, nullable = false)
-      },
+      ,
       expectedSchema = """message root {
         |  required group f0 (MAP) {
         |    repeated group map (MAP_KEY_VALUE) {
@@ -1443,7 +1421,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |    }
         |  }
         |}
-      """.stripMargin, catalystSchema = {
+      """.stripMargin, catalystSchema =
     val valueType = new StructType()
       .add("value_f1", LongType, nullable = false)
       .add("value_f2", DoubleType, nullable = false)
@@ -1451,7 +1429,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
     val f0Type = MapType(IntegerType, valueType, valueContainsNull = false)
 
     new StructType().add("f0", f0Type, nullable = false)
-  }, expectedSchema = """message root {
+  , expectedSchema = """message root {
         |  required group f0 (MAP) {
         |    repeated group key_value {
         |      required int32 key;
@@ -1478,7 +1456,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin,
-      catalystSchema = {
+      catalystSchema =
         val keyType = new StructType()
           .add("value_f1", LongType, nullable = false)
           .add("value_f2", DoubleType, nullable = false)
@@ -1486,7 +1464,7 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         val f0Type = MapType(keyType, IntegerType, valueContainsNull = false)
 
         new StructType().add("f0", f0Type, nullable = false)
-      },
+      ,
       expectedSchema = """message root {
         |  required group f0 (MAP) {
         |    repeated group key_value {
@@ -1499,4 +1477,3 @@ class ParquetSchemaSuite extends ParquetSchemaTest {
         |  }
         |}
       """.stripMargin)
-}

@@ -21,19 +21,17 @@ import scala.annotation.migration
   *  @define coll mutable stack
   *  @define Coll `mutable.Stack`
   */
-object Stack extends SeqFactory[Stack] {
-  class StackBuilder[A] extends Builder[A, Stack[A]] {
+object Stack extends SeqFactory[Stack]
+  class StackBuilder[A] extends Builder[A, Stack[A]]
     val lbuff = new ListBuffer[A]
     def +=(elem: A) = { lbuff += elem; this }
     def clear() = lbuff.clear()
     def result = new Stack(lbuff.result)
-  }
 
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Stack[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Stack[A]] = new StackBuilder[A]
   val empty: Stack[Nothing] = new Stack(Nil)
-}
 
 /** A stack implements a data structure which allows to store and retrieve
   *  objects in a last-in-first-out (LIFO) fashion.
@@ -56,7 +54,7 @@ object Stack extends SeqFactory[Stack] {
 class Stack[A] private (var elems: List[A])
     extends AbstractSeq[A] with Seq[A] with SeqLike[A, Stack[A]]
     with GenericTraversableTemplate[A, Stack]
-    with Cloneable[Stack[A]] with Serializable {
+    with Cloneable[Stack[A]] with Serializable
   def this() = this(Nil)
 
   override def companion = Stack
@@ -131,11 +129,10 @@ class Stack[A] private (var elems: List[A])
     *  @throws java.util.NoSuchElementException
     *  @return the top element
     */
-  def pop(): A = {
+  def pop(): A =
     val res = elems.head
     elems = elems.tail
     res
-  }
 
   /**
     * Removes all elements from the stack. After this operation completed,
@@ -169,4 +166,3 @@ class Stack[A] private (var elems: List[A])
     *  @return  a stack with the same elements.
     */
   override def clone(): Stack[A] = new Stack[A](elems)
-}

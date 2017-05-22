@@ -34,7 +34,7 @@ private[streaming] class ReducedWindowedDStream[K : ClassTag, V : ClassTag](
     _slideDuration: Duration,
     partitioner: Partitioner
 )
-    extends DStream[(K, V)](parent.ssc) {
+    extends DStream[(K, V)](parent.ssc)
 
   require(_windowDuration.isMultipleOf(parent.slideDuration),
           "The window duration of ReducedWindowedDStream (" + _windowDuration +
@@ -65,19 +65,17 @@ private[streaming] class ReducedWindowedDStream[K : ClassTag, V : ClassTag](
   override def parentRememberDuration: Duration =
     rememberDuration + windowDuration
 
-  override def persist(storageLevel: StorageLevel): DStream[(K, V)] = {
+  override def persist(storageLevel: StorageLevel): DStream[(K, V)] =
     super.persist(storageLevel)
     reducedStream.persist(storageLevel)
     this
-  }
 
-  override def checkpoint(interval: Duration): DStream[(K, V)] = {
+  override def checkpoint(interval: Duration): DStream[(K, V)] =
     super.checkpoint(interval)
     // reducedStream.checkpoint(interval)
     this
-  }
 
-  override def compute(validTime: Time): Option[RDD[(K, V)]] = {
+  override def compute(validTime: Time): Option[RDD[(K, V)]] =
     val reduceF = reduceFunc
     val invReduceF = invReduceFunc
 
@@ -131,11 +129,9 @@ private[streaming] class ReducedWindowedDStream[K : ClassTag, V : ClassTag](
     val numNewValues = newRDDs.size
 
     val mergeValues = (arrayOfValues: Array[Iterable[V]]) =>
-      {
-        if (arrayOfValues.length != 1 + numOldValues + numNewValues) {
+        if (arrayOfValues.length != 1 + numOldValues + numNewValues)
           throw new Exception(
               "Unexpected number of sequences of reduced values")
-        }
         // Getting reduced values "old time steps" that will be removed from current window
         val oldValues = (1 to numOldValues)
           .map(i => arrayOfValues(i))
@@ -147,38 +143,30 @@ private[streaming] class ReducedWindowedDStream[K : ClassTag, V : ClassTag](
           .filter(!_.isEmpty)
           .map(_.head)
 
-        if (arrayOfValues(0).isEmpty) {
+        if (arrayOfValues(0).isEmpty)
           // If previous window's reduce value does not exist, then at least new values should exist
-          if (newValues.isEmpty) {
+          if (newValues.isEmpty)
             throw new Exception(
                 "Neither previous window has value for key, nor new values found. " +
                 "Are you sure your key class hashes consistently?")
-          }
           // Reduce the new values
           newValues.reduce(reduceF) // return
-        } else {
+        else
           // Get the previous window's reduced value
           var tempValue = arrayOfValues(0).head
           // If old values exists, then inverse reduce then from previous value
-          if (!oldValues.isEmpty) {
+          if (!oldValues.isEmpty)
             tempValue = invReduceF(tempValue, oldValues.reduce(reduceF))
-          }
           // If new values exists, then reduce them with previous value
-          if (!newValues.isEmpty) {
+          if (!newValues.isEmpty)
             tempValue = reduceF(tempValue, newValues.reduce(reduceF))
-          }
           tempValue // return
-        }
-    }
 
     val mergedValuesRDD = cogroupedRDD
       .asInstanceOf[RDD[(K, Array[Iterable[V]])]]
       .mapValues(mergeValues)
 
-    if (filterFunc.isDefined) {
+    if (filterFunc.isDefined)
       Some(mergedValuesRDD.filter(filterFunc.get))
-    } else {
+    else
       Some(mergedValuesRDD)
-    }
-  }
-}

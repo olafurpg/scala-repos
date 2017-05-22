@@ -1,7 +1,7 @@
-object Test {
+object Test
   def f = (1 to 100).toArray.view
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val xs = (f filter (_ < 50)).reverse
       .filter(_ % 2 == 0)
       .map(_ / 2)
@@ -10,5 +10,3 @@ object Test {
     val ys = xs.toArray
     assert(ys.size == 48)
     assert(xs.sum == ys.sum)
-  }
-}

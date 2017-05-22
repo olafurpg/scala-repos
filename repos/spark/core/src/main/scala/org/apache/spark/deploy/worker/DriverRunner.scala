@@ -46,7 +46,7 @@ private[deploy] class DriverRunner(conf: SparkConf,
                                    val worker: RpcEndpointRef,
                                    val workerUrl: String,
                                    val securityManager: SecurityManager)
-    extends Logging {
+    extends Logging
 
   @volatile private var process: Option[Process] = None
   @volatile private var killed = false
@@ -57,33 +57,29 @@ private[deploy] class DriverRunner(conf: SparkConf,
   private var finalExitCode: Option[Int] = None
 
   // Decoupled for testing
-  def setClock(_clock: Clock): Unit = {
+  def setClock(_clock: Clock): Unit =
     clock = _clock
-  }
 
-  def setSleeper(_sleeper: Sleeper): Unit = {
+  def setSleeper(_sleeper: Sleeper): Unit =
     sleeper = _sleeper
-  }
 
   private var clock: Clock = new SystemClock()
-  private var sleeper = new Sleeper {
+  private var sleeper = new Sleeper
     def sleep(seconds: Int): Unit =
       (0 until seconds).takeWhile(f => { Thread.sleep(1000); !killed })
-  }
 
   /** Starts a thread to run and manage the driver. */
-  private[worker] def start() = {
-    new Thread("DriverRunner for " + driverId) {
-      override def run() {
-        try {
+  private[worker] def start() =
+    new Thread("DriverRunner for " + driverId)
+      override def run()
+        try
           val driverDir = createWorkingDirectory()
           val localJarFilename = downloadUserJar(driverDir)
 
-          def substituteVariables(argument: String): String = argument match {
+          def substituteVariables(argument: String): String = argument match
             case "{{WORKER_URL}}" => workerUrl
             case "{{USER_JAR}}" => localJarFilename
             case other => other
-          }
 
           // TODO: If we add ability to submit multiple jars they should also be added here
           val builder =
@@ -93,54 +89,45 @@ private[deploy] class DriverRunner(conf: SparkConf,
                                              sparkHome.getAbsolutePath,
                                              substituteVariables)
           launchDriver(builder, driverDir, driverDesc.supervise)
-        } catch {
+        catch
           case e: Exception => finalException = Some(e)
-        }
 
         val state =
-          if (killed) {
+          if (killed)
             DriverState.KILLED
-          } else if (finalException.isDefined) {
+          else if (finalException.isDefined)
             DriverState.ERROR
-          } else {
-            finalExitCode match {
+          else
+            finalExitCode match
               case Some(0) => DriverState.FINISHED
               case _ => DriverState.FAILED
-            }
-          }
 
         finalState = Some(state)
 
         worker.send(DriverStateChanged(driverId, state, finalException))
-      }
-    }.start()
-  }
+    .start()
 
   /** Terminate this driver (or prevent it from ever starting if not yet started) */
-  private[worker] def kill() {
-    synchronized {
+  private[worker] def kill()
+    synchronized
       process.foreach(p => p.destroy())
       killed = true
-    }
-  }
 
   /**
     * Creates the working directory for this driver.
     * Will throw an exception if there are errors preparing the directory.
     */
-  private def createWorkingDirectory(): File = {
+  private def createWorkingDirectory(): File =
     val driverDir = new File(workDir, driverId)
-    if (!driverDir.exists() && !driverDir.mkdirs()) {
+    if (!driverDir.exists() && !driverDir.mkdirs())
       throw new IOException("Failed to create directory " + driverDir)
-    }
     driverDir
-  }
 
   /**
     * Download the user jar into the supplied directory and return its local path.
     * Will throw an exception if there are errors downloading the jar.
     */
-  private def downloadUserJar(driverDir: File): String = {
+  private def downloadUserJar(driverDir: File): String =
     val jarPath = new Path(driverDesc.jarUrl)
 
     val hadoopConf = SparkHadoopUtil.get.newConfiguration(conf)
@@ -149,7 +136,7 @@ private[deploy] class DriverRunner(conf: SparkConf,
     val localJarFile = new File(driverDir, jarFileName)
     val localJarFilename = localJarFile.getAbsolutePath
 
-    if (!localJarFile.exists()) {
+    if (!localJarFile.exists())
       // May already exist if running multiple workers on one node
       logInfo(s"Copying user jar $jarPath to $destPath")
       Utils.fetchFile(driverDesc.jarUrl,
@@ -159,21 +146,18 @@ private[deploy] class DriverRunner(conf: SparkConf,
                       hadoopConf,
                       System.currentTimeMillis(),
                       useCache = false)
-    }
 
-    if (!localJarFile.exists()) {
+    if (!localJarFile.exists())
       // Verify copy succeeded
       throw new Exception(
           s"Did not see expected jar $jarFileName in $driverDir")
-    }
 
     localJarFilename
-  }
 
   private def launchDriver(
-      builder: ProcessBuilder, baseDir: File, supervise: Boolean) {
+      builder: ProcessBuilder, baseDir: File, supervise: Boolean)
     builder.directory(baseDir)
-    def initialize(process: Process): Unit = {
+    def initialize(process: Process): Unit =
       // Redirect stdout and stderr to files
       val stdout = new File(baseDir, "stdout")
       CommandUtils.redirectStream(process.getInputStream, stdout)
@@ -185,13 +169,11 @@ private[deploy] class DriverRunner(conf: SparkConf,
         "Launch Command: %s\n%s\n\n".format(formattedCommand, "=" * 40)
       Files.append(header, stderr, StandardCharsets.UTF_8)
       CommandUtils.redirectStream(process.getErrorStream, stderr)
-    }
     runCommandWithRetry(ProcessBuilderLike(builder), initialize, supervise)
-  }
 
   def runCommandWithRetry(command: ProcessBuilderLike,
                           initialize: Process => Unit,
-                          supervise: Boolean): Unit = {
+                          supervise: Boolean): Unit =
     // Time to wait between submission retries.
     var waitSeconds = 1
     // A run of this many seconds resets the exponential back-off.
@@ -199,50 +181,40 @@ private[deploy] class DriverRunner(conf: SparkConf,
 
     var keepTrying = !killed
 
-    while (keepTrying) {
+    while (keepTrying)
       logInfo(
           "Launch Command: " + command.command.mkString("\"", "\" \"", "\""))
 
-      synchronized {
+      synchronized
         if (killed) { return }
         process = Some(command.start())
         initialize(process.get)
-      }
 
       val processStart = clock.getTimeMillis()
       val exitCode = process.get.waitFor()
       if (clock.getTimeMillis() -
-          processStart > successfulRunDuration * 1000) {
+          processStart > successfulRunDuration * 1000)
         waitSeconds = 1
-      }
 
-      if (supervise && exitCode != 0 && !killed) {
+      if (supervise && exitCode != 0 && !killed)
         logInfo(
             s"Command exited with status $exitCode, re-launching after $waitSeconds s.")
         sleeper.sleep(waitSeconds)
         waitSeconds = waitSeconds * 2 // exponential back-off
-      }
 
       keepTrying = supervise && exitCode != 0 && !killed
       finalExitCode = Some(exitCode)
-    }
-  }
-}
 
-private[deploy] trait Sleeper {
+private[deploy] trait Sleeper
   def sleep(seconds: Int)
-}
 
 // Needed because ProcessBuilder is a final class and cannot be mocked
-private[deploy] trait ProcessBuilderLike {
+private[deploy] trait ProcessBuilderLike
   def start(): Process
   def command: Seq[String]
-}
 
-private[deploy] object ProcessBuilderLike {
+private[deploy] object ProcessBuilderLike
   def apply(processBuilder: ProcessBuilder): ProcessBuilderLike =
-    new ProcessBuilderLike {
+    new ProcessBuilderLike
       override def start(): Process = processBuilder.start()
       override def command: Seq[String] = processBuilder.command().asScala
-    }
-}

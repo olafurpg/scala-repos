@@ -15,34 +15,29 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * User: Alexander Podkhalyuzin
   * Date: 06.03.2009
   */
-class RunConsoleAction extends AnAction {
-  override def update(e: AnActionEvent) {
+class RunConsoleAction extends AnAction
+  override def update(e: AnActionEvent)
     val presentation = e.getPresentation
     presentation.setIcon(Icons.SCALA_CONSOLE)
-    def enable() {
+    def enable()
       presentation.setEnabled(true)
       presentation.setVisible(true)
-    }
-    def disable() {
+    def disable()
       presentation.setEnabled(false)
       presentation.setVisible(false)
-    }
-    try {
+    try
       val file = CommonDataKeys.PSI_FILE.getData(e.getDataContext)
-      file match {
+      file match
         case _: ScalaFile => enable()
         case _ => disable()
-      }
-    } catch {
+    catch
       case e: Exception => disable()
-    }
-  }
 
-  def actionPerformed(e: AnActionEvent) {
+  def actionPerformed(e: AnActionEvent)
     val dataContext = e.getDataContext
     val file = CommonDataKeys.PSI_FILE.getData(dataContext)
     val project = CommonDataKeys.PROJECT.getData(dataContext)
-    file match {
+    file match
       case file: ScalaFile =>
         val runManagerEx = RunManagerEx.getInstanceEx(file.getProject)
         val configurationType = ConfigurationTypeUtil.findConfigurationType(
@@ -50,7 +45,7 @@ class RunConsoleAction extends AnAction {
         val settings =
           runManagerEx.getConfigurationSettingsList(configurationType)
 
-        def execute(setting: RunnerAndConfigurationSettings) {
+        def execute(setting: RunnerAndConfigurationSettings)
           val configuration =
             setting.getConfiguration.asInstanceOf[ScalaConsoleRunConfiguration]
           runManagerEx.setSelectedConfiguration(setting)
@@ -58,35 +53,30 @@ class RunConsoleAction extends AnAction {
           val runner = RunnerRegistry
             .getInstance()
             .getRunner(runExecutor.getId, configuration)
-          if (runner != null) {
-            try {
+          if (runner != null)
+            try
               val builder: ExecutionEnvironmentBuilder =
                 new ExecutionEnvironmentBuilder(project, runExecutor)
               builder.runnerAndSettings(runner, setting)
               runner.execute(builder.build())
-            } catch {
+            catch
               case e: ExecutionException =>
                 Messages.showErrorDialog(
                     file.getProject,
                     e.getMessage,
                     ExecutionBundle.message("error.common.title"))
-            }
-          }
-        }
 
         import scala.collection.JavaConversions._
-        for (setting <- settings) {
+        for (setting <- settings)
           ActionRunner.runInsideReadAction(
-              new ActionRunner.InterruptibleRunnable {
-            def run() {
+              new ActionRunner.InterruptibleRunnable
+            def run()
               execute(setting)
-            }
-          })
+          )
           return
-        }
         ActionRunner.runInsideReadAction(
-            new ActionRunner.InterruptibleRunnable {
-          def run() {
+            new ActionRunner.InterruptibleRunnable
+          def run()
             val factory: ScalaConsoleRunConfigurationFactory =
               configurationType.getConfigurationFactories
                 .apply(0)
@@ -97,9 +87,5 @@ class RunConsoleAction extends AnAction {
 
             runManagerEx.setTemporaryConfiguration(setting)
             execute(setting)
-          }
-        })
+        )
       case _ =>
-    }
-  }
-}

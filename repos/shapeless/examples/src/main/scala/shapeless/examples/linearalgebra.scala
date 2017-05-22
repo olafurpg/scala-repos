@@ -21,7 +21,7 @@ package shapeless.examples
  * 
  * @author Miles Sabin
  */
-object LinearAlgebraExamples extends App {
+object LinearAlgebraExamples extends App
   import shapeless._
   import nat._
   import newtype._
@@ -29,37 +29,31 @@ object LinearAlgebraExamples extends App {
   import ops.product.ProductLength
   import test._
 
-  abstract class VectorOps[N <: Nat, P <: Product](p: P) {
+  abstract class VectorOps[N <: Nat, P <: Product](p: P)
     type Self = Newtype[P, VectorOps[N, P]]
     def tupled = p
     def +(other: Self): Self
-  }
 
-  object VectorOps {
+  object VectorOps
     type HomPair[T] = (T, T)
-    object sum extends Poly1 {
-      implicit def caseDouble = at[Double :: Double :: HNil] {
+    object sum extends Poly1
+      implicit def caseDouble = at[Double :: Double :: HNil]
         case a :: b :: HNil => a + b
-      }
-    }
 
     implicit def pointOps1(p: Tuple1[Double]): VectorOps[_1, Tuple1[Double]] =
-      new VectorOps[_1, Tuple1[Double]](p) {
+      new VectorOps[_1, Tuple1[Double]](p)
         def +(other: Self): Self = newtype(Tuple1(p._1 + other.tupled._1))
-      }
 
     implicit def pointOpsN[N <: Nat, LN <: HList, PN <: Product, ZLN <: HList](
         implicit gen: Generic.Aux[PN, LN],
         zipper: Transposer.Aux[LN :: LN :: HNil, ZLN],
         mapper: Mapper.Aux[sum.type, ZLN, LN]): PN => VectorOps[N, PN] =
       (p: PN) =>
-        new VectorOps[N, PN](p) {
+        new VectorOps[N, PN](p)
           def +(other: Self): Self =
             newtype(
                 gen.from((gen.to(p) :: gen.to(other.tupled) :: HNil).transpose
                       .map(sum)))
-      }
-  }
 
   def Vector(p: Double) =
     newtype[Tuple1[Double], VectorOps[_1, Tuple1[Double]]](Tuple1(p))
@@ -91,4 +85,3 @@ object LinearAlgebraExamples extends App {
   typed[V3](v3c)
 
   assert((1.0, 2.0, 0.0) == v3c.tupled)
-}

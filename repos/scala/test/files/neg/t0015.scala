@@ -1,10 +1,9 @@
-abstract class Test {
+abstract class Test
   def f: Nothing
 
   Nil.map(f _)
-}
 
-abstract class M { self =>
+abstract class M  self =>
 
   type T
   final type selfType = M { type T = self.T }
@@ -19,4 +18,3 @@ abstract class M { self =>
 
   //def g(x: Any) = {}
   //g(self: selfType)
-}

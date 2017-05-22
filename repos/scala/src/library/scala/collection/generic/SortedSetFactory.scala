@@ -18,7 +18,7 @@ import scala.language.higherKinds
   *  @since 2.8
   */
 abstract class SortedSetFactory[
-    CC[A] <: SortedSet[A] with SortedSetLike[A, CC[A]]] {
+    CC[A] <: SortedSet[A] with SortedSetLike[A, CC[A]]]
   type Coll = CC[_]
 
   def empty[A](implicit ord: Ordering[A]): CC[A]
@@ -34,8 +34,6 @@ abstract class SortedSetFactory[
     new SortedSetCanBuildFrom()(ord)
 
   class SortedSetCanBuildFrom[A](implicit ord: Ordering[A])
-      extends CanBuildFrom[Coll, A, CC[A]] {
+      extends CanBuildFrom[Coll, A, CC[A]]
     def apply(from: Coll) = newBuilder[A](ord)
     def apply() = newBuilder[A](ord)
-  }
-}

@@ -5,15 +5,14 @@ import java.util.UUID
 import mesosphere.mesos.protos.TaskID
 import org.apache.mesos.Protos.{TaskState, TaskStatus}
 
-object MarathonTaskStatusTestHelper {
+object MarathonTaskStatusTestHelper
   def mesosStatus(
-      state: TaskState, maybeHealthy: Option[Boolean] = None): TaskStatus = {
+      state: TaskState, maybeHealthy: Option[Boolean] = None): TaskStatus =
     import mesosphere.mesos.protos.Implicits._
     val builder = TaskStatus.newBuilder()
     builder.setTaskId(TaskID(UUID.randomUUID().toString)).setState(state)
     maybeHealthy.foreach(builder.setHealthy)
     builder.build()
-  }
 
   val running = MarathonTaskStatus.Running(
       mesosStatus = Some(mesosStatus(TaskState.TASK_RUNNING)))
@@ -31,4 +30,3 @@ object MarathonTaskStatusTestHelper {
       mesosStatus = Some(mesosStatus(TaskState.TASK_LOST)))
   val killed = MarathonTaskStatus.Killed(
       mesosStatus = Some(mesosStatus(TaskState.TASK_KILLED)))
-}

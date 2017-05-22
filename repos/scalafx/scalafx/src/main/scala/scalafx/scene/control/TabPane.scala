@@ -35,14 +35,14 @@ import scalafx.beans.property.{BooleanProperty, DoubleProperty, ObjectProperty}
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 import scalafx.geometry.Side
 
-object TabPane {
+object TabPane
 
   implicit def sfxTabPane2jfx(v: TabPane): jfxsc.TabPane =
     if (v != null) v.delegate else null
 
   object TabClosingPolicy
       extends SFXEnumDelegateCompanion[
-          jfxsc.TabPane.TabClosingPolicy, TabClosingPolicy] {
+          jfxsc.TabPane.TabClosingPolicy, TabClosingPolicy]
 
     /**
       * All tabs will have the option to be closed.
@@ -75,7 +75,6 @@ object TabPane {
 
     protected override def unsortedValues: Array[TabClosingPolicy] =
       Array(AllTabs, SelectedTab, Unavailable)
-  }
 
   /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TabPane.TabClosingPolicy.html]] */
   sealed case class TabClosingPolicy(
@@ -86,91 +85,79 @@ object TabPane {
     * TabPane mode will be changed to floating allowing the TabPane to be placed alongside other control.
     */
   val StyleClassFloating = jfxsc.TabPane.STYLE_CLASS_FLOATING
-}
 
 class TabPane(override val delegate: jfxsc.TabPane = new jfxsc.TabPane)
-    extends Control(delegate) with SFXDelegate[jfxsc.TabPane] {
+    extends Control(delegate) with SFXDelegate[jfxsc.TabPane]
 
   /**
     * The rotatedGraphic state of the tabs in the TabPane.
     */
   def rotateGraphic: BooleanProperty = delegate.rotateGraphicProperty
-  def rotateGraphic_=(v: Boolean) {
+  def rotateGraphic_=(v: Boolean)
     rotateGraphic() = v
-  }
 
   /**
     * The selection model used for selecting tabs.
     */
   def selectionModel: ObjectProperty[jfxsc.SingleSelectionModel[jfxsc.Tab]] =
     delegate.selectionModelProperty
-  def selectionModel_=(v: SingleSelectionModel[Tab]) {
+  def selectionModel_=(v: SingleSelectionModel[Tab])
     selectionModel() = v.asInstanceOf[jfxsc.SingleSelectionModel[jfxsc.Tab]]
-  }
 
   /**
     * The position of the tabs in the TabPane.
     */
   def side: ObjectProperty[jfxg.Side] = delegate.sideProperty
-  def side_=(v: Side) {
+  def side_=(v: Side)
     side() = v
-  }
 
   /**
     * The closing policy for the tabs.
     */
   def tabClosingPolicy: ObjectProperty[jfxsc.TabPane.TabClosingPolicy] =
     delegate.tabClosingPolicyProperty
-  def tabClosingPolicy_=(v: TabPane.TabClosingPolicy) {
+  def tabClosingPolicy_=(v: TabPane.TabClosingPolicy)
     tabClosingPolicy() = v
-  }
 
   /**
     * The maximum height of the tabs in the TabPane.
     */
   def tabMaxHeight: DoubleProperty = delegate.tabMaxHeightProperty
-  def tabMaxHeight_=(v: Double) {
+  def tabMaxHeight_=(v: Double)
     tabMaxHeight() = v
-  }
 
   /**
     * The maximum width of the tabs in the TabPane.
     */
   def tabMaxWidth: DoubleProperty = delegate.tabMaxWidthProperty
-  def tabMaxWidth_=(v: Double) {
+  def tabMaxWidth_=(v: Double)
     tabMaxWidth() = v
-  }
 
   /**
     * The minimum height of the tab.
     */
   def tabMinHeight: DoubleProperty = delegate.tabMinHeightProperty
-  def tabMinHeight_=(v: Double) {
+  def tabMinHeight_=(v: Double)
     tabMinHeight() = v
-  }
 
   /**
     * The minimum width of the tabs in the TabPane.
     */
   def tabMinWidth: DoubleProperty = delegate.tabMinWidthProperty
-  def tabMinWidth_=(v: Double) {
+  def tabMinWidth_=(v: Double)
     tabMinWidth() = v
-  }
 
   /**
     * The tabs to display in this TabPane.
     */
   def tabs = delegate.getTabs
-  def tabs_=(tabSeq: Seq[Tab]) {
+  def tabs_=(tabSeq: Seq[Tab])
     delegate.getTabs.clear()
     tabSeq.foreach(this += _)
-  }
 
   /**
     * Append a new Tab to tabs
     */
-  def +=(tab: Tab) = {
+  def +=(tab: Tab) =
     tabs.add(tab)
     this
-  }
-}

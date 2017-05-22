@@ -8,7 +8,7 @@ import Def.ScopedKey
 import Types.idFun
 import java.io.File
 
-object Inspect {
+object Inspect
   sealed trait Mode
   final case class Details(actual: Boolean) extends Mode
   private[this] final class Opt(override val toString: String) extends Mode
@@ -18,35 +18,30 @@ object Inspect {
 
   def parser: State => Parser[(Inspect.Mode, ScopedKey[_])] =
     (s: State) =>
-      spacedModeParser(s) flatMap {
+      spacedModeParser(s) flatMap
         case opt @ (Uses | Definitions) =>
           allKeyParser(s).map(key => (opt, Def.ScopedKey(Global, key)))
         case opt @ (DependencyTree | Details(_)) =>
           spacedKeyParser(s).map(key => (opt, key))
-    }
   val spacedModeParser: (State => Parser[Mode]) = (s: State) =>
-    {
       val actual = "actual" ^^^ Details(true)
       val tree = "tree" ^^^ DependencyTree
       val uses = "uses" ^^^ Uses
       val definitions = "definitions" ^^^ Definitions
       token(Space ~> (tree | actual | uses | definitions)) ?? Details(false)
-  }
 
-  def allKeyParser(s: State): Parser[AttributeKey[_]] = {
+  def allKeyParser(s: State): Parser[AttributeKey[_]] =
     val keyMap = Project.structure(s).index.keyMap
-    token(Space ~> (ID !!! "Expected key" examples keyMap.keySet)) flatMap {
+    token(Space ~> (ID !!! "Expected key" examples keyMap.keySet)) flatMap
       key =>
         Act.getKey(keyMap, key, idFun)
-    }
-  }
   val spacedKeyParser: State => Parser[ScopedKey[_]] = (s: State) =>
     Act.requireSession(s, token(Space) ~> Act.scopedKeyParser(s))
 
-  def output(s: State, option: Mode, sk: Def.ScopedKey[_]): String = {
+  def output(s: State, option: Mode, sk: Def.ScopedKey[_]): String =
     val extracted = Project.extract(s)
     import extracted._
-    option match {
+    option match
       case Details(actual) =>
         Project.details(structure, actual, sk.scope, sk.key)
       case DependencyTree =>
@@ -57,6 +52,3 @@ object Inspect {
       case Definitions =>
         Project.showDefinitions(
             sk.key, Project.definitions(structure, true, sk.key))
-    }
-  }
-}

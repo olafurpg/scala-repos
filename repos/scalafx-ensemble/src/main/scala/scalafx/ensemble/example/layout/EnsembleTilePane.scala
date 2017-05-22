@@ -39,9 +39,9 @@ import scalafx.scene.layout.TilePane
   * @see scalafx.scene.layout.TilePane
   * @resource /scalafx/ensemble/images/icon-48x48.png
   */
-class EnsembleTilePane extends EnsembleExample {
+class EnsembleTilePane extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     // Image for buttons
     val image = new Image(
         this.getClass
@@ -51,12 +51,9 @@ class EnsembleTilePane extends EnsembleExample {
     val buttons = for (i <- 1 to 17) yield
       new Button("Button " + i, new ImageView(image))
 
-    new TilePane {
+    new TilePane
       hgap = 3
       vgap = 3
       padding = Insets(20)
       prefColumns = 3
       children = buttons
-    }
-  }
-}

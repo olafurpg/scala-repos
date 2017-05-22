@@ -9,12 +9,12 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 
 @RunWith(classOf[JUnitRunner])
 class FixedLengthDecoderTest
-    extends FunSuite with GeneratorDrivenPropertyChecks {
+    extends FunSuite with GeneratorDrivenPropertyChecks
 
   def stringDecoder(frameSize: Int) =
     new FixedLengthDecoder(frameSize, Buf.Utf8.unapply(_).getOrElse("????"))
 
-  test("FixedLengthDecoder can frame a series of buffers") {
+  test("FixedLengthDecoder can frame a series of buffers")
     val decode = stringDecoder(4)
 
     // the decoder sees one four-byte frame which is returned.
@@ -28,13 +28,12 @@ class FixedLengthDecoderTest
 
     val c = decode(Buf.Utf8("0123456789"))
     assert(c.toList == Seq("0123", "4567"))
-  }
 
-  test("framing") {
+  test("framing")
     forAll(
         Gen.alphaStr,
         Gen.posNum[Int]
-    ) { (s: String, frameSize: Int) =>
+    )  (s: String, frameSize: Int) =>
       val decode = stringDecoder(frameSize)
       val buf = Buf.Utf8(s)
       val frames: Seq[String] = decode(buf).toList
@@ -43,6 +42,3 @@ class FixedLengthDecoderTest
       if (buf.length < frameSize) assert(frames == Nil)
       else if (buf.length % frameSize == 0) assert(groupedString == frames)
       else assert(groupedString.take(groupedString.length - 1) == frames)
-    }
-  }
-}

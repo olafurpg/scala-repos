@@ -11,7 +11,7 @@ case class Report(id: String, // also the url slug
                   text: String,
                   processedBy: Option[String],
                   createdAt: DateTime,
-                  createdBy: String) {
+                  createdBy: String)
 
   def slug = id
 
@@ -36,9 +36,8 @@ case class Report(id: String, // also the url slug
   def unprocessed = processedBy.isEmpty
 
   lazy val realReason: Reason = Reason byName reason
-}
 
-object Report {
+object Report
 
   case class WithUser(report: Report, user: User)
 
@@ -58,4 +57,3 @@ object Report {
       (__.json update readDate('createdAt)) andThen Json.reads[Report],
       Json.writes[Report] andThen (__.json update writeDate('createdAt))
   )
-}

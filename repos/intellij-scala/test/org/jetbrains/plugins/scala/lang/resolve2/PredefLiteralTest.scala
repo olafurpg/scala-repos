@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class PredefLiteralTest extends ResolveTestBase {
-  override def folderPath: String = {
+class PredefLiteralTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "predef/literal/"
-  }
   //TODO answer?
 //  def testBoolean = doTest
   //TODO answer?
@@ -31,4 +30,3 @@ class PredefLiteralTest extends ResolveTestBase {
 //  def testString = doTest
   //TODO answer?
 //  def testSymbol = doTest
-}

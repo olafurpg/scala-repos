@@ -34,7 +34,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/text/FontPosture.html javafx.scene.text.FontPosture]] */
 object FontPosture
-    extends SFXEnumDelegateCompanion[jfxst.FontPosture, FontPosture] {
+    extends SFXEnumDelegateCompanion[jfxst.FontPosture, FontPosture]
 
   val Regular = new FontPosture(jfxst.FontPosture.REGULAR)
   @deprecated(
@@ -52,7 +52,6 @@ object FontPosture
   /** Returns FontPosture by its name. */
   def findByName(name: String): FontPosture =
     jfxst.FontPosture.findByName(name)
-}
 
 sealed case class FontPosture(override val delegate: jfxst.FontPosture)
     extends SFXEnumDelegate[jfxst.FontPosture]

@@ -23,6 +23,5 @@ package org.apache.spark.partial
 class BoundedDouble(val mean: Double,
                     val confidence: Double,
                     val low: Double,
-                    val high: Double) {
+                    val high: Double)
   override def toString(): String = "[%.3f, %.3f]".format(low, high)
-}

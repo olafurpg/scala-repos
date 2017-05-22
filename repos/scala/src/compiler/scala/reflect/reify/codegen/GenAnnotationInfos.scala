@@ -1,20 +1,20 @@
 package scala.reflect.reify
 package codegen
 
-trait GenAnnotationInfos { self: Reifier =>
+trait GenAnnotationInfos  self: Reifier =>
 
   import global._
 
   // usually annotations are reified as their originals from Modifiers
   // however, when reifying free and tough types, we're forced to reify annotation infos as is
   // why is that bad? take a look inside
-  def reifyAnnotationInfo(ann: AnnotationInfo): Tree = {
+  def reifyAnnotationInfo(ann: AnnotationInfo): Tree =
     val reifiedArgs =
-      ann.args map { arg =>
+      ann.args map  arg =>
         val saved1 = reifyTreeSymbols
         val saved2 = reifyTreeTypes
 
-        try {
+        try
           // one more quirk of reifying annotations
           //
           // when reifying AnnotatedTypes we need to reify all the types and symbols of inner ASTs
@@ -32,11 +32,9 @@ trait GenAnnotationInfos { self: Reifier =>
           // hence we need to run its contents through the entire reification pipeline
           // e.g. to apply reshaping or to check metalevels
           reify(arg)
-        } finally {
+        finally
           state.reifyTreeSymbols = saved1
           state.reifyTreeTypes = saved2
-        }
-      }
 
     // if you reify originals of anns, you get SO when trying to reify AnnotatedTypes, so screw it - after all, it's not that important
     val Apply(Select(New(tpt), name), args) = annotationToTree(ann)
@@ -46,5 +44,3 @@ trait GenAnnotationInfos { self: Reifier =>
         reify(name))
     val reifiedAnnRepr = mirrorCall(nme.Apply, reifiedAtp, reifyList(args))
     mirrorFactoryCall(nme.Annotation, reifiedAnnRepr)
-  }
-}

@@ -2,7 +2,7 @@ package spire.math.extras.interval
 
 import spire.math.Interval
 
-abstract class IntervalSet[T, S <: IntervalSet[T, _]] extends (T => Boolean) {
+abstract class IntervalSet[T, S <: IntervalSet[T, _]] extends (T => Boolean)
 
   def isEmpty: Boolean
 
@@ -39,4 +39,3 @@ abstract class IntervalSet[T, S <: IntervalSet[T, _]] extends (T => Boolean) {
   def edges: Iterable[T]
 
   def intervalIterator: Iterator[Interval[T]]
-}

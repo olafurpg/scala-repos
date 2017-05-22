@@ -13,27 +13,25 @@ import scala.util.control.NonFatal
   *       irrespective of any pending requests in the dispatcher.
   */
 class HttpTransport(self: Transport[Any, Any], manager: ConnectionManager)
-    extends Transport[Any, Any] {
+    extends Transport[Any, Any]
 
   def this(self: Transport[Any, Any]) = this(self, new ConnectionManager)
 
   def close(deadline: Time) = self.close(deadline)
 
   def read(): Future[Any] =
-    self.read() onSuccess { m =>
+    self.read() onSuccess  m =>
       manager.observeMessage(m)
       if (manager.shouldClose) self.close()
-    }
 
   def write(m: Any): Future[Unit] =
-    try {
+    try
       manager.observeMessage(m)
       val f = self.write(m)
       if (manager.shouldClose) f before self.close()
       else f
-    } catch {
+    catch
       case NonFatal(e) => Future.exception(e)
-    }
 
   def status =
     if (manager.shouldClose) finagle.Status.Closed
@@ -46,4 +44,3 @@ class HttpTransport(self: Transport[Any, Any], manager: ConnectionManager)
   def peerCertificate = self.peerCertificate
 
   val onClose = self.onClose
-}

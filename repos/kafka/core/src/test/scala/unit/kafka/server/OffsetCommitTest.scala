@@ -34,7 +34,7 @@ import scala.collection._
 
 import org.junit.Assert._
 
-class OffsetCommitTest extends ZooKeeperTestHarness {
+class OffsetCommitTest extends ZooKeeperTestHarness
   val random: Random = new Random()
   val group = "test-group"
   val retentionCheckInterval: Long = 100L
@@ -46,7 +46,7 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
   var time: Time = new MockTime()
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     val config: Properties = createBrokerConfig(1, zkConnect)
     config.setProperty(KafkaConfig.OffsetsTopicReplicationFactorProp, "1")
@@ -59,27 +59,24 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     simpleConsumer = new SimpleConsumer(
         "localhost", server.boundPort(), 1000000, 64 * 1024, "test-client")
     val consumerMetadataRequest = GroupCoordinatorRequest(group)
-    Stream.continually {
+    Stream.continually
       val consumerMetadataResponse =
         simpleConsumer.send(consumerMetadataRequest)
       consumerMetadataResponse.coordinatorOpt.isDefined
-    }.dropWhile(success =>
-          {
+    .dropWhile(success =>
         if (!success) Thread.sleep(1000)
         !success
-    })
-  }
+    )
 
   @After
-  override def tearDown() {
+  override def tearDown()
     simpleConsumer.close
     server.shutdown
     CoreUtils.rm(logDir)
     super.tearDown()
-  }
 
   @Test
-  def testUpdateOffsets() {
+  def testUpdateOffsets()
     val topic = "topic"
 
     // Commit an offset
@@ -144,10 +141,9 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     assertEquals(OffsetMetadataAndError.NoOffset,
                  fetchResponse2.requestInfo.get(unknownTopicAndPartition).get)
     assertEquals(1, fetchResponse2.requestInfo.size)
-  }
 
   @Test
-  def testCommitAndFetchOffsets() {
+  def testCommitAndFetchOffsets()
     val topic1 = "topic-1"
     val topic2 = "topic-2"
     val topic3 = "topic-3"
@@ -291,10 +287,9 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     assertEquals(
         OffsetMetadata.InvalidOffset,
         fetchResponse.requestInfo.get(TopicAndPartition(topic5, 0)).get.offset)
-  }
 
   @Test
-  def testLargeMetadataPayload() {
+  def testLargeMetadataPayload()
     val topicAndPartition = TopicAndPartition("large-metadata", 0)
     val expectedReplicaAssignment = Map(0 -> List(1))
     createTopic(zkUtils,
@@ -327,10 +322,9 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
 
     assertEquals(Errors.OFFSET_METADATA_TOO_LARGE.code,
                  commitResponse1.commitStatus.get(topicAndPartition).get)
-  }
 
   @Test
-  def testOffsetExpiration() {
+  def testOffsetExpiration()
     // set up topic partition
     val topic = "topic"
     val topicPartition = TopicAndPartition(topic, 0)
@@ -469,10 +463,9 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
                    .get(topicPartition)
                    .get
                    .offset)
-  }
 
   @Test
-  def testNonExistingTopicOffsetCommit() {
+  def testNonExistingTopicOffsetCommit()
     val topic1 = "topicDoesNotExists"
     val topic2 = "topic-2"
 
@@ -494,5 +487,3 @@ class OffsetCommitTest extends ZooKeeperTestHarness {
     assertEquals(
         Errors.NONE.code,
         commitResponse.commitStatus.get(TopicAndPartition(topic2, 0)).get)
-  }
-}

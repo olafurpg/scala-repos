@@ -31,11 +31,11 @@ import org.apache.kafka.common.utils.Utils
 /**
   * Command line program to dump out messages to standard out using the simple consumer
   */
-object SimpleConsumerShell extends Logging {
+object SimpleConsumerShell extends Logging
 
   def UseLeaderReplica = -1
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     val parser = new OptionParser
     val brokerListOpt = parser
@@ -163,72 +163,64 @@ object SimpleConsumerShell extends Logging {
       .fetchTopicMetadata(
           Set(topic), metadataTargetBrokers, clientId, maxWaitMs)
       .topicsMetadata
-    if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic)) {
+    if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic))
       System.err.println(("Error: no valid topic metadata for topic: %s, " +
               "what we get from server is only: %s").format(
               topic, topicsMetadata))
       System.exit(1)
-    }
 
     // validating partition id
     val partitionsMetadata = topicsMetadata(0).partitionsMetadata
     val partitionMetadataOpt =
       partitionsMetadata.find(p => p.partitionId == partitionId)
-    if (!partitionMetadataOpt.isDefined) {
+    if (!partitionMetadataOpt.isDefined)
       System.err.println("Error: partition %d does not exist for topic %s"
             .format(partitionId, topic))
       System.exit(1)
-    }
 
     // validating replica id and initializing target broker
     var fetchTargetBroker: BrokerEndPoint = null
     var replicaOpt: Option[BrokerEndPoint] = null
-    if (replicaId == UseLeaderReplica) {
+    if (replicaId == UseLeaderReplica)
       replicaOpt = partitionMetadataOpt.get.leader
-      if (!replicaOpt.isDefined) {
+      if (!replicaOpt.isDefined)
         System.err.println(
             "Error: user specifies to fetch from leader for partition (%s, %d) which has not been elected yet"
               .format(topic, partitionId))
         System.exit(1)
-      }
-    } else {
+    else
       val replicasForPartition = partitionMetadataOpt.get.replicas
       replicaOpt = replicasForPartition.find(r => r.id == replicaId)
-      if (!replicaOpt.isDefined) {
+      if (!replicaOpt.isDefined)
         System.err.println(
             "Error: replica %d does not exist for partition (%s, %d)".format(
                 replicaId, topic, partitionId))
         System.exit(1)
-      }
-    }
     fetchTargetBroker = replicaOpt.get
 
     // initializing starting offset
-    if (startingOffset < OffsetRequest.EarliestTime) {
+    if (startingOffset < OffsetRequest.EarliestTime)
       System.err.println("Invalid starting offset: %d".format(startingOffset))
       System.exit(1)
-    }
-    if (startingOffset < 0) {
+    if (startingOffset < 0)
       val simpleConsumer = new SimpleConsumer(fetchTargetBroker.host,
                                               fetchTargetBroker.port,
                                               ConsumerConfig.SocketTimeout,
                                               ConsumerConfig.SocketBufferSize,
                                               clientId)
-      try {
+      try
         startingOffset = simpleConsumer.earliestOrLatestOffset(
             TopicAndPartition(topic, partitionId),
             startingOffset,
             Request.DebuggingConsumerId)
-      } catch {
+      catch
         case t: Throwable =>
           System.err.println(
               "Error in getting earliest or latest offset due to: " +
               Utils.stackTrace(t))
           System.exit(1)
-      } finally {
+      finally
         if (simpleConsumer != null) simpleConsumer.close()
-      }
-    }
 
     // initializing formatter
     val formatter =
@@ -250,28 +242,27 @@ object SimpleConsumerShell extends Logging {
                                             10000,
                                             64 * 1024,
                                             clientId)
-    val thread = Utils.newThread("kafka-simpleconsumer-shell", new Runnable() {
-      def run() {
+    val thread = Utils.newThread("kafka-simpleconsumer-shell", new Runnable()
+      def run()
         var offset = startingOffset
         var numMessagesConsumed = 0
-        try {
-          while (numMessagesConsumed < maxMessages) {
+        try
+          while (numMessagesConsumed < maxMessages)
             val fetchRequest = fetchRequestBuilder
               .addFetch(topic, partitionId, offset, fetchSize)
               .build()
             val fetchResponse = simpleConsumer.fetch(fetchRequest)
             val messageSet = fetchResponse.messageSet(topic, partitionId)
-            if (messageSet.validBytes <= 0 && noWaitAtEndOfLog) {
+            if (messageSet.validBytes <= 0 && noWaitAtEndOfLog)
               println(
                   "Terminating. Reached the end of partition (%s, %d) at offset %d"
                     .format(topic, partitionId, offset))
               return
-            }
             debug("multi fetched " + messageSet.sizeInBytes +
                 " bytes from offset " + offset)
             for (messageAndOffset <- messageSet
-                                        if numMessagesConsumed < maxMessages) {
-              try {
+                                        if numMessagesConsumed < maxMessages)
+              try
                 offset = messageAndOffset.nextOffset
                 if (printOffsets) System.out.println("next offset = " + offset)
                 val message = messageAndOffset.message
@@ -295,38 +286,30 @@ object SimpleConsumerShell extends Logging {
                                                      value),
                                   System.out)
                 numMessagesConsumed += 1
-              } catch {
+              catch
                 case e: Throwable =>
                   if (skipMessageOnError)
                     error(
                         "Error processing message, skipping this message: ", e)
                   else throw e
-              }
-              if (System.out.checkError()) {
+              if (System.out.checkError())
                 // This means no one is listening to our output stream any more, time to shutdown
                 System.err.println(
                     "Unable to write to standard out, closing consumer.")
                 formatter.close()
                 simpleConsumer.close()
                 System.exit(1)
-              }
-            }
-          }
-        } catch {
+        catch
           case e: Throwable =>
             error(
                 "Error consuming topic, partition, replica (%s, %d, %d) with offset [%d]"
                   .format(topic, partitionId, replicaId, offset),
                 e)
-        } finally {
+        finally
           info(s"Consumed $numMessagesConsumed messages")
-        }
-      }
-    }, false)
+    , false)
     thread.start()
     thread.join()
     System.out.flush()
     formatter.close()
     simpleConsumer.close()
-  }
-}

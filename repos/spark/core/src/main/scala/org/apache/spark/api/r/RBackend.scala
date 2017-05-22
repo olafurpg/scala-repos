@@ -35,13 +35,13 @@ import org.apache.spark.internal.Logging
 /**
   * Netty-based backend server that is used to communicate between R and Java.
   */
-private[spark] class RBackend {
+private[spark] class RBackend
 
   private[this] var channelFuture: ChannelFuture = null
   private[this] var bootstrap: ServerBootstrap = null
   private[this] var bossGroup: EventLoopGroup = null
 
-  def init(): Int = {
+  def init(): Int =
     val conf = new SparkConf()
     bossGroup = new NioEventLoopGroup(
         conf.getInt("spark.r.numRBackendThreads", 2))
@@ -52,8 +52,8 @@ private[spark] class RBackend {
       .group(bossGroup, workerGroup)
       .channel(classOf[NioServerSocketChannel])
 
-    bootstrap.childHandler(new ChannelInitializer[SocketChannel]() {
-      def initChannel(ch: SocketChannel): Unit = {
+    bootstrap.childHandler(new ChannelInitializer[SocketChannel]()
+      def initChannel(ch: SocketChannel): Unit =
         ch.pipeline()
           .addLast("encoder", new ByteArrayEncoder())
           .addLast(
@@ -66,8 +66,7 @@ private[spark] class RBackend {
               new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4))
           .addLast("decoder", new ByteArrayDecoder())
           .addLast("handler", handler)
-      }
-    })
+    )
 
     channelFuture = bootstrap.bind(new InetSocketAddress("localhost", 0))
     channelFuture.syncUninterruptibly()
@@ -76,41 +75,33 @@ private[spark] class RBackend {
       .localAddress()
       .asInstanceOf[InetSocketAddress]
       .getPort()
-  }
 
-  def run(): Unit = {
+  def run(): Unit =
     channelFuture.channel.closeFuture().syncUninterruptibly()
-  }
 
-  def close(): Unit = {
-    if (channelFuture != null) {
+  def close(): Unit =
+    if (channelFuture != null)
       // close is a local operation and should finish within milliseconds; timeout just to be safe
       channelFuture
         .channel()
         .close()
         .awaitUninterruptibly(10, TimeUnit.SECONDS)
       channelFuture = null
-    }
-    if (bootstrap != null && bootstrap.group() != null) {
+    if (bootstrap != null && bootstrap.group() != null)
       bootstrap.group().shutdownGracefully()
-    }
-    if (bootstrap != null && bootstrap.childGroup() != null) {
+    if (bootstrap != null && bootstrap.childGroup() != null)
       bootstrap.childGroup().shutdownGracefully()
-    }
     bootstrap = null
-  }
-}
 
-private[spark] object RBackend extends Logging {
-  def main(args: Array[String]): Unit = {
-    if (args.length < 1) {
+private[spark] object RBackend extends Logging
+  def main(args: Array[String]): Unit =
+    if (args.length < 1)
       // scalastyle:off println
       System.err.println("Usage: RBackend <tempFilePath>")
       // scalastyle:on println
       System.exit(-1)
-    }
     val sparkRBackend = new RBackend()
-    try {
+    try
       // bind to random port
       val boundPort = sparkRBackend.init()
       val serverSocket = new ServerSocket(
@@ -128,32 +119,27 @@ private[spark] object RBackend extends Logging {
       f.renameTo(new File(path))
 
       // wait for the end of stdin, then exit
-      new Thread("wait for socket to close") {
+      new Thread("wait for socket to close")
         setDaemon(true)
-        override def run(): Unit = {
+        override def run(): Unit =
           // any un-catched exception will also shutdown JVM
           val buf = new Array[Byte](1024)
           // shutdown JVM if R does not connect back in 10 seconds
           serverSocket.setSoTimeout(10000)
-          try {
+          try
             val inSocket = serverSocket.accept()
             serverSocket.close()
             // wait for the end of socket, closed if R process die
             inSocket.getInputStream().read(buf)
-          } finally {
+          finally
             sparkRBackend.close()
             System.exit(0)
-          }
-        }
-      }.start()
+      .start()
 
       sparkRBackend.run()
-    } catch {
+    catch
       case e: IOException =>
         logError("Server shutting down: failed with exception ", e)
         sparkRBackend.close()
         System.exit(1)
-    }
     System.exit(0)
-  }
-}

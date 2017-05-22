@@ -36,42 +36,37 @@ import org.apache.spark.deploy.SparkSubmitUtils.MavenCoordinate
 import org.apache.spark.util.ResetSystemProperties
 
 class RPackageUtilsSuite
-    extends SparkFunSuite with BeforeAndAfterEach with ResetSystemProperties {
+    extends SparkFunSuite with BeforeAndAfterEach with ResetSystemProperties
 
   private val main = MavenCoordinate("a", "b", "c")
   private val dep1 = MavenCoordinate("a", "dep1", "c")
   private val dep2 = MavenCoordinate("a", "dep2", "d")
 
-  private def getJarPath(coord: MavenCoordinate, repo: File): File = {
+  private def getJarPath(coord: MavenCoordinate, repo: File): File =
     new File(IvyTestUtils.pathFromCoordinate(
                  coord, repo, "jar", useIvyLayout = false),
              IvyTestUtils.artifactName(coord, useIvyLayout = false, ".jar"))
-  }
 
   private val lineBuffer = ArrayBuffer[String]()
 
-  private val noOpOutputStream = new OutputStream {
+  private val noOpOutputStream = new OutputStream
     def write(b: Int) = {}
-  }
 
   /** Simple PrintStream that reads data into a buffer */
-  private class BufferPrintStream extends PrintStream(noOpOutputStream) {
+  private class BufferPrintStream extends PrintStream(noOpOutputStream)
     // scalastyle:off println
-    override def println(line: String) {
+    override def println(line: String)
       // scalastyle:on println
       lineBuffer += line
-    }
-  }
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
     System.setProperty("spark.testing", "true")
     lineBuffer.clear()
-  }
 
-  test("pick which jars to unpack using the manifest") {
+  test("pick which jars to unpack using the manifest")
     val deps = Seq(dep1, dep2).mkString(",")
-    IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
+    IvyTestUtils.withRepository(main, Some(deps), None, withR = true)  repo =>
       val jars = Seq(main, dep1, dep2).map(
           c => new JarFile(getJarPath(c, new File(new URI(repo)))))
       assert(RPackageUtils.checkManifestForR(jars(0)), "should have R code")
@@ -79,16 +74,14 @@ class RPackageUtilsSuite
              "should not have R code")
       assert(!RPackageUtils.checkManifestForR(jars(2)),
              "should not have R code")
-    }
-  }
 
-  test("build an R package from a jar end to end") {
+  test("build an R package from a jar end to end")
     assume(RUtils.isRInstalled, "R isn't installed on this machine.")
     val deps = Seq(dep1, dep2).mkString(",")
-    IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
-      val jars = Seq(main, dep1, dep2).map { c =>
+    IvyTestUtils.withRepository(main, Some(deps), None, withR = true)  repo =>
+      val jars = Seq(main, dep1, dep2).map  c =>
         getJarPath(c, new File(new URI(repo)))
-      }.mkString(",")
+      .mkString(",")
       RPackageUtils.checkAndBuildRPackage(
           jars, new BufferPrintStream, verbose = true)
       val firstJar = jars.substring(0, jars.indexOf(","))
@@ -98,29 +91,24 @@ class RPackageUtilsSuite
       assert(output.contains(
               s"$firstJar contains R source code. Now installing package."))
       assert(output.contains("doesn't contain R source code, skipping..."))
-    }
-  }
 
-  test("jars that don't exist are skipped and print warning") {
+  test("jars that don't exist are skipped and print warning")
     assume(RUtils.isRInstalled, "R isn't installed on this machine.")
     val deps = Seq(dep1, dep2).mkString(",")
-    IvyTestUtils.withRepository(main, Some(deps), None, withR = true) { repo =>
-      val jars = Seq(main, dep1, dep2).map { c =>
+    IvyTestUtils.withRepository(main, Some(deps), None, withR = true)  repo =>
+      val jars = Seq(main, dep1, dep2).map  c =>
         getJarPath(c, new File(new URI(repo))) + "dummy"
-      }.mkString(",")
+      .mkString(",")
       RPackageUtils.checkAndBuildRPackage(
           jars, new BufferPrintStream, verbose = true)
       val individualJars = jars.split(",")
       val output = lineBuffer.mkString("\n")
-      individualJars.foreach { jarFile =>
+      individualJars.foreach  jarFile =>
         assert(output.contains(s"$jarFile"))
-      }
-    }
-  }
 
-  test("faulty R package shows documentation") {
+  test("faulty R package shows documentation")
     assume(RUtils.isRInstalled, "R isn't installed on this machine.")
-    IvyTestUtils.withRepository(main, None, None) { repo =>
+    IvyTestUtils.withRepository(main, None, None)  repo =>
       val manifest = new Manifest
       val attr = manifest.getMainAttributes
       attr.put(Name.MANIFEST_VERSION, "1.0")
@@ -135,12 +123,10 @@ class RPackageUtilsSuite
           jar.getAbsolutePath, new BufferPrintStream, verbose = true)
       val output = lineBuffer.mkString("\n")
       assert(output.contains(RPackageUtils.RJarDoc))
-    }
-  }
 
-  test("SparkR zipping works properly") {
+  test("SparkR zipping works properly")
     val tempDir = Files.createTempDir()
-    try {
+    try
       IvyTestUtils.writeFile(tempDir, "test.R", "abc")
       val fakeSparkRDir = new File(tempDir, "SparkR")
       assert(fakeSparkRDir.mkdirs())
@@ -161,8 +147,5 @@ class RPackageUtilsSuite
       assert(!entries.contains("/package.zip"))
       assert(entries.contains("/packageTest/def.R"))
       assert(entries.contains("/packageTest/DESCRIPTION"))
-    } finally {
+    finally
       FileUtils.deleteDirectory(tempDir)
-    }
-  }
-}

@@ -17,34 +17,29 @@ import scala.concurrent.Await
 /** INTERNAL API - not (yet?) ready for public consuption */
 private[akka] trait IntegrationRoutingSpec
     extends WordSpecLike with Matchers with BeforeAndAfterAll with Directives
-    with RequestBuilding with ScalaFutures with IntegrationPatience {
+    with RequestBuilding with ScalaFutures with IntegrationPatience
 
   implicit val system = ActorSystem(AkkaSpec.getCallerName(getClass))
   implicit val mat = ActorMaterializer()
   import system.dispatcher
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     Await.ready(system.terminate(), 3.seconds)
-  }
 
-  implicit class DSL(request: HttpRequest) {
+  implicit class DSL(request: HttpRequest)
     def ~!>(route: Route) = new Prepped(request, route)
-  }
 
   final case class Prepped(request: HttpRequest, route: Route)
 
-  implicit class Checking(p: Prepped) {
-    def ~!>(checking: HttpResponse ⇒ Unit) = {
+  implicit class Checking(p: Prepped)
+    def ~!>(checking: HttpResponse ⇒ Unit) =
       val (_, host, port) = TestUtils.temporaryServerHostnameAndPort()
       val binding = Http().bindAndHandle(p.route, host, port)
 
-      try {
+      try
         val targetUri =
           p.request.uri.withHost(host).withPort(port).withScheme("http")
         val response =
           Http().singleRequest(p.request.withUri(targetUri)).futureValue
         checking(response)
-      } finally binding.flatMap(_.unbind()).futureValue
-    }
-  }
-}
+      finally binding.flatMap(_.unbind()).futureValue

@@ -22,14 +22,11 @@ package com.precog.gjallerhorn
 import dispatch._
 import specs2._
 
-trait Runner {
+trait Runner
   def tasks(settings: Settings): List[Task]
 
-  def main(args: Array[String]) {
-    try {
+  def main(args: Array[String])
+    try
       run(tasks(Settings.fromFile(new java.io.File("bifrost.out"))): _*)
-    } finally {
+    finally
       Http.shutdown()
-    }
-  }
-}

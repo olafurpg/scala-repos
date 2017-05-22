@@ -24,20 +24,19 @@ import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
 
-class OuterJoinEliminationSuite extends PlanTest {
-  object Optimize extends RuleExecutor[LogicalPlan] {
+class OuterJoinEliminationSuite extends PlanTest
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
           "Outer Join Elimination",
           Once,
           OuterJoinElimination,
           PushPredicateThroughJoin) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
   val testRelation1 = LocalRelation('d.int, 'e.int, 'f.int)
 
-  test("joins: full outer to inner") {
+  test("joins: full outer to inner")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -52,9 +51,8 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, Inner, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("joins: full outer to right") {
+  test("joins: full outer to right")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -69,9 +67,8 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, RightOuter, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("joins: full outer to left") {
+  test("joins: full outer to left")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -86,9 +83,8 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, LeftOuter, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("joins: right to inner") {
+  test("joins: right to inner")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -103,9 +99,8 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, Inner, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("joins: left to inner") {
+  test("joins: left to inner")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -120,10 +115,9 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, Inner, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   // evaluating if mixed OR and NOT expressions can eliminate all null-supplying rows
-  test("joins: left to inner with complicated filter predicates #1") {
+  test("joins: left to inner with complicated filter predicates #1")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -138,10 +132,9 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, Inner, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   // eval(emptyRow) of 'e.in(1, 2) will return null instead of false
-  test("joins: left to inner with complicated filter predicates #2") {
+  test("joins: left to inner with complicated filter predicates #2")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -156,10 +149,9 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, Inner, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   // evaluating if mixed OR and AND expressions can eliminate all null-supplying rows
-  test("joins: left to inner with complicated filter predicates #3") {
+  test("joins: left to inner with complicated filter predicates #3")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -175,12 +167,11 @@ class OuterJoinEliminationSuite extends PlanTest {
       left.join(right, Inner, Option("a".attr === "d".attr)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   // evaluating if the expressions that have both left and right attributes
   // can eliminate all null-supplying rows
   // FULL OUTER => INNER
-  test("joins: left to inner with complicated filter predicates #4") {
+  test("joins: left to inner with complicated filter predicates #4")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
 
@@ -198,5 +189,3 @@ class OuterJoinEliminationSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
-}

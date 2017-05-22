@@ -1,7 +1,5 @@
-object D {
+object D
   def x(a: A) =
-    a match {
+    a match
       case _: B => ()
       case _: C => ()
-    }
-}

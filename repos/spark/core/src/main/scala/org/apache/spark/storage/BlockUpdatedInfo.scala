@@ -31,14 +31,12 @@ case class BlockUpdatedInfo(blockManagerId: BlockManagerId,
                             memSize: Long,
                             diskSize: Long)
 
-private[spark] object BlockUpdatedInfo {
+private[spark] object BlockUpdatedInfo
 
   private[spark] def apply(
-      updateBlockInfo: UpdateBlockInfo): BlockUpdatedInfo = {
+      updateBlockInfo: UpdateBlockInfo): BlockUpdatedInfo =
     BlockUpdatedInfo(updateBlockInfo.blockManagerId,
                      updateBlockInfo.blockId,
                      updateBlockInfo.storageLevel,
                      updateBlockInfo.memSize,
                      updateBlockInfo.diskSize)
-  }
-}

@@ -9,7 +9,7 @@ package cats
   */
 sealed trait NotNull[A]
 
-object NotNull {
+object NotNull
 
   /**
     * Since NotNull is just a marker trait with no functionality, it's safe to
@@ -27,4 +27,3 @@ object NotNull {
   implicit def ambiguousNull2: NotNull[Null] = throw ambiguousException
 
   implicit def notNull[A]: NotNull[A] = singleton.asInstanceOf[NotNull[A]]
-}

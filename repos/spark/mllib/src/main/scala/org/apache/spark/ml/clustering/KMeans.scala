@@ -36,7 +36,7 @@ import org.apache.spark.sql.types.{IntegerType, StructType}
   */
 private[clustering] trait KMeansParams
     extends Params with HasMaxIter with HasFeaturesCol with HasSeed
-    with HasPredictionCol with HasTol {
+    with HasPredictionCol with HasTol
 
   /**
     * Set the number of clusters to create (k). Must be > 1. Default: 2.
@@ -87,11 +87,9 @@ private[clustering] trait KMeansParams
     * @param schema input schema
     * @return output schema
     */
-  protected def validateAndTransformSchema(schema: StructType): StructType = {
+  protected def validateAndTransformSchema(schema: StructType): StructType =
     SchemaUtils.checkColumnType(schema, $(featuresCol), new VectorUDT)
     SchemaUtils.appendColumn(schema, $(predictionCol), IntegerType)
-  }
-}
 
 /**
   * :: Experimental ::
@@ -103,24 +101,21 @@ private[clustering] trait KMeansParams
 @Experimental
 class KMeansModel private[ml](@Since("1.5.0") override val uid: String,
                               private val parentModel: MLlibKMeansModel)
-    extends Model[KMeansModel] with KMeansParams with MLWritable {
+    extends Model[KMeansModel] with KMeansParams with MLWritable
 
   @Since("1.5.0")
-  override def copy(extra: ParamMap): KMeansModel = {
+  override def copy(extra: ParamMap): KMeansModel =
     val copied = new KMeansModel(uid, parentModel)
     copyValues(copied, extra)
-  }
 
   @Since("1.5.0")
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val predictUDF = udf((vector: Vector) => predict(vector))
     dataset.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
-  }
 
   @Since("1.5.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
   private[clustering] def predict(features: Vector): Int =
     parentModel.predict(features)
@@ -134,37 +129,32 @@ class KMeansModel private[ml](@Since("1.5.0") override val uid: String,
     */
   // TODO: Replace the temp fix when we have proper evaluators defined for clustering.
   @Since("1.6.0")
-  def computeCost(dataset: DataFrame): Double = {
+  def computeCost(dataset: DataFrame): Double =
     SchemaUtils.checkColumnType(dataset.schema, $(featuresCol), new VectorUDT)
-    val data = dataset.select(col($(featuresCol))).rdd.map {
+    val data = dataset.select(col($(featuresCol))).rdd.map
       case Row(point: Vector) => point
-    }
     parentModel.computeCost(data)
-  }
 
   @Since("1.6.0")
   override def write: MLWriter = new KMeansModel.KMeansModelWriter(this)
 
   private var trainingSummary: Option[KMeansSummary] = None
 
-  private[clustering] def setSummary(summary: KMeansSummary): this.type = {
+  private[clustering] def setSummary(summary: KMeansSummary): this.type =
     this.trainingSummary = Some(summary)
     this
-  }
 
   /**
     * Gets summary of model on training set. An exception is
     * thrown if `trainingSummary == None`.
     */
   @Since("2.0.0")
-  def summary: KMeansSummary = trainingSummary.getOrElse {
+  def summary: KMeansSummary = trainingSummary.getOrElse
     throw new SparkException(
         s"No training summary available for the ${this.getClass.getSimpleName}")
-  }
-}
 
 @Since("1.6.0")
-object KMeansModel extends MLReadable[KMeansModel] {
+object KMeansModel extends MLReadable[KMeansModel]
 
   @Since("1.6.0")
   override def read: MLReader[KMeansModel] = new KMeansModelReader
@@ -174,11 +164,11 @@ object KMeansModel extends MLReadable[KMeansModel] {
 
   /** [[MLWriter]] instance for [[KMeansModel]] */
   private[KMeansModel] class KMeansModelWriter(instance: KMeansModel)
-      extends MLWriter {
+      extends MLWriter
 
     private case class Data(clusterCenters: Array[Vector])
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       // Save metadata and Params
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       // Save model data: cluster centers
@@ -189,15 +179,13 @@ object KMeansModel extends MLReadable[KMeansModel] {
         .repartition(1)
         .write
         .parquet(dataPath)
-    }
-  }
 
-  private class KMeansModelReader extends MLReader[KMeansModel] {
+  private class KMeansModelReader extends MLReader[KMeansModel]
 
     /** Checked against metadata when loading model */
     private val className = classOf[KMeansModel].getName
 
-    override def load(path: String): KMeansModel = {
+    override def load(path: String): KMeansModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
 
       val dataPath = new Path(path, "data").toString
@@ -209,9 +197,6 @@ object KMeansModel extends MLReadable[KMeansModel] {
 
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
-}
 
 /**
   * :: Experimental ::
@@ -223,7 +208,7 @@ object KMeansModel extends MLReadable[KMeansModel] {
 @Experimental
 class KMeans @Since("1.5.0")(@Since("1.5.0") override val uid: String)
     extends Estimator[KMeansModel] with KMeansParams
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   setDefault(k -> 2,
              maxIter -> 20,
@@ -270,10 +255,9 @@ class KMeans @Since("1.5.0")(@Since("1.5.0") override val uid: String)
   def setSeed(value: Long): this.type = set(seed, value)
 
   @Since("1.5.0")
-  override def fit(dataset: DataFrame): KMeansModel = {
-    val rdd = dataset.select(col($(featuresCol))).rdd.map {
+  override def fit(dataset: DataFrame): KMeansModel =
+    val rdd = dataset.select(col($(featuresCol))).rdd.map
       case Row(point: Vector) => point
-    }
 
     val algo = new MLlibKMeans()
       .setK($(k))
@@ -287,26 +271,22 @@ class KMeans @Since("1.5.0")(@Since("1.5.0") override val uid: String)
     val summary = new KMeansSummary(
         model.transform(dataset), $(predictionCol), $(featuresCol))
     model.setSummary(summary)
-  }
 
   @Since("1.5.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
-}
 
 @Since("1.6.0")
-object KMeans extends DefaultParamsReadable[KMeans] {
+object KMeans extends DefaultParamsReadable[KMeans]
 
   @Since("1.6.0")
   override def load(path: String): KMeans = super.load(path)
-}
 
 class KMeansSummary private[clustering](
     @Since("2.0.0") @transient val predictions: DataFrame,
     @Since("2.0.0") val predictionCol: String,
     @Since("2.0.0") val featuresCol: String)
-    extends Serializable {
+    extends Serializable
 
   /**
     * Cluster centers of the transformed data.
@@ -318,7 +298,6 @@ class KMeansSummary private[clustering](
     * Size of each cluster.
     */
   @Since("2.0.0")
-  lazy val size: Array[Int] = cluster.rdd.map {
+  lazy val size: Array[Int] = cluster.rdd.map
     case Row(clusterIdx: Int) => (clusterIdx, 1)
-  }.reduceByKey(_ + _).collect().sortBy(_._1).map(_._2)
-}
+  .reduceByKey(_ + _).collect().sortBy(_._1).map(_._2)

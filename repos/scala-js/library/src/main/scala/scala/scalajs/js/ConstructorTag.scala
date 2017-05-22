@@ -17,7 +17,7 @@ package scala.scalajs.js
   *  type argument to `js.constructorOf`.
   */
 final class ConstructorTag[T <: Any] private[scalajs](val constructor: Dynamic)
-    extends AnyVal {
+    extends AnyVal
 
   /** Instantiates the class `T` with the specified arguments.
     *
@@ -28,9 +28,8 @@ final class ConstructorTag[T <: Any] private[scalajs](val constructor: Dynamic)
     Dynamic
       .newInstance(constructor)(args.asInstanceOf[Seq[Any]]: _*)
       .asInstanceOf[T]
-}
 
-object ConstructorTag {
+object ConstructorTag
 
   /** Implicitly materializes a [[ConstructorTag]].
     *
@@ -38,4 +37,3 @@ object ConstructorTag {
     *  [[constructorOf js.constructorOf]].
     */
   implicit def materialize[T <: Any]: ConstructorTag[T] = sys.error("stub")
-}

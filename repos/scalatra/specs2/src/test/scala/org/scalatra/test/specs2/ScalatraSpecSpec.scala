@@ -4,7 +4,7 @@ package specs2
 
 import javax.servlet.http.{HttpServlet, HttpServletRequest, HttpServletResponse}
 
-class ScalatraSpecSpec extends ScalatraSpec {
+class ScalatraSpecSpec extends ScalatraSpec
   def is =
     s2"""
 get / should
@@ -13,13 +13,10 @@ get / should
 
   // scalatra-specs2 does not depend on Scalatra, so we'll create our own
   // simple servlet for a sanity check
-  addServlet(new HttpServlet {
-    override def doGet(req: HttpServletRequest, res: HttpServletResponse) {
+  addServlet(new HttpServlet
+    override def doGet(req: HttpServletRequest, res: HttpServletResponse)
       res.getWriter.write("Hello, world.")
-    }
-  }, "/*")
+  , "/*")
 
-  def e1 = get("/") {
+  def e1 = get("/")
     body must_== "Hello, world."
-  }
-}

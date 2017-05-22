@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns.{ScCaseClause, ScC
   * Nikolay.Tropin
   * 2014-06-27
   */
-class ScalaCaseClauseRemover extends ScalaUnwrapper {
+class ScalaCaseClauseRemover extends ScalaUnwrapper
 
   override def isApplicableTo(e: PsiElement): Boolean =
     forCaseClause(e)(_ => true)(false)
@@ -22,21 +22,18 @@ class ScalaCaseClauseRemover extends ScalaUnwrapper {
 
   override def collectAffectedElements(
       e: PsiElement, toExtract: util.List[PsiElement]): PsiElement =
-    forCaseClause[PsiElement](e) { cl =>
+    forCaseClause[PsiElement](e)  cl =>
       super.collectAffectedElements(cl, toExtract)
       cl
-    }(e)
+    (e)
 
   private def forCaseClause[T](e: PsiElement)(ifClause: (ScCaseClause) => T)(
-      ifNot: => T): T = {
-    e match {
+      ifNot: => T): T =
+    e match
       case (cl: ScCaseClause) childOf (cls: ScCaseClauses)
           if cls.caseClauses.size > 1 =>
         ifClause(cl)
       case _ => ifNot
-    }
-  }
 
   override def getDescription(e: PsiElement): String =
     ScalaBundle.message("remove.case.clause")
-}

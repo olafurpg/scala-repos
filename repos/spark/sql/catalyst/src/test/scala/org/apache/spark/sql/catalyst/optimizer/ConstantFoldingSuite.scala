@@ -26,9 +26,9 @@ import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, LogicalPlan}
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 import org.apache.spark.sql.types._
 
-class ConstantFoldingSuite extends PlanTest {
+class ConstantFoldingSuite extends PlanTest
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("AnalysisNodes", Once, EliminateSubqueryAliases) :: Batch(
           "ConstantFolding",
@@ -36,23 +36,21 @@ class ConstantFoldingSuite extends PlanTest {
           OptimizeIn,
           ConstantFolding,
           BooleanSimplification) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
 
-  test("eliminate subqueries") {
+  test("eliminate subqueries")
     val originalQuery = testRelation.subquery('y).select('a)
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer = testRelation.select('a.attr).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   /**
     * Unit tests for constant folding in expressions.
     */
-  test("Constant folding test: expressions only have literals") {
+  test("Constant folding test: expressions only have literals")
     val originalQuery = testRelation
       .select(Literal(2) + Literal(3) + Literal(4) as Symbol("2+3+4"),
               Literal(2) * Literal(3) + Literal(4) as Symbol("2*3+4"),
@@ -74,11 +72,10 @@ class ConstantFoldingSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   test(
       "Constant folding test: expressions have attribute references and literals in " +
-      "arithmetic operations") {
+      "arithmetic operations")
     val originalQuery =
       testRelation.select(Literal(2) + Literal(3) + 'a as Symbol("c1"),
                           'a + Literal(2) + Literal(3) as Symbol("c2"),
@@ -95,11 +92,10 @@ class ConstantFoldingSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   test(
       "Constant folding test: expressions have attribute references and literals in " +
-      "predicates") {
+      "predicates")
     val originalQuery = testRelation.where(
         (('a > 1 && Literal(1) === Literal(1)) ||
             ('a < 10 && Literal(1) === Literal(2)) ||
@@ -116,9 +112,8 @@ class ConstantFoldingSuite extends PlanTest {
       testRelation.where(('a > 1 || 'b > 1) && ('a < 10 && 'b < 10)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Constant folding test: expressions have foldable functions") {
+  test("Constant folding test: expressions have foldable functions")
     val originalQuery = testRelation.select(
         Cast(Literal("2"), IntegerType) + Literal(3) + 'a as Symbol("c1"),
         Coalesce(Seq(Cast(Literal("abc"), IntegerType), Literal(3))) as Symbol(
@@ -131,9 +126,8 @@ class ConstantFoldingSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Constant folding test: expressions have nonfoldable functions") {
+  test("Constant folding test: expressions have nonfoldable functions")
     val originalQuery =
       testRelation.select(Rand(5L) + Literal(1) as Symbol("c1"),
                           sum('a) as Symbol("c2"))
@@ -146,9 +140,8 @@ class ConstantFoldingSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Constant folding test: expressions have null literals") {
+  test("Constant folding test: expressions have null literals")
     val originalQuery =
       testRelation.select(
           IsNull(Literal(null)) as 'c1,
@@ -207,9 +200,8 @@ class ConstantFoldingSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Constant folding test: Fold In(v, list) into true or false") {
+  test("Constant folding test: Fold In(v, list) into true or false")
     val originalQuery = testRelation
       .select('a)
       .where(In(Literal(1), Seq(Literal(1), Literal(2))))
@@ -219,5 +211,3 @@ class ConstantFoldingSuite extends PlanTest {
     val correctAnswer = testRelation.select('a).where(Literal(true)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
-}

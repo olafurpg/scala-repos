@@ -8,8 +8,8 @@ import javax.servlet._
 
 import org.scalatra._
 
-class ScalatraBootstrap extends LifeCycle {
-  override def init(context: ServletContext) {
+class ScalatraBootstrap extends LifeCycle
+  override def init(context: ServletContext)
     // Register TransactionFilter and BasicAuthenticationFilter at first
     context.addFilter("transactionFilter", new TransactionFilter)
     context
@@ -31,10 +31,9 @@ class ScalatraBootstrap extends LifeCycle {
     // Register controllers
     context.mount(new AnonymousAccessController, "/*")
 
-    PluginRegistry().getControllers.foreach {
+    PluginRegistry().getControllers.foreach
       case (controller, path) =>
         context.mount(controller, path)
-    }
 
     context.mount(new IndexController, "/")
     context.mount(new ApiController, "/api/v3")
@@ -52,12 +51,8 @@ class ScalatraBootstrap extends LifeCycle {
 
     // Create GITBUCKET_HOME directory if it does not exist
     val dir = new java.io.File(Directory.GitBucketHome)
-    if (!dir.exists) {
+    if (!dir.exists)
       dir.mkdirs()
-    }
-  }
 
-  override def destroy(context: ServletContext): Unit = {
+  override def destroy(context: ServletContext): Unit =
     Database.closeDataSource()
-  }
-}

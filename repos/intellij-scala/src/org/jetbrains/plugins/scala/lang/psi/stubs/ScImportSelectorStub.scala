@@ -11,10 +11,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.ScImportSelecto
   * User: Alexander Podkhalyuzin
   * Date: 20.06.2009
   */
-trait ScImportSelectorStub extends StubElement[ScImportSelector] {
+trait ScImportSelectorStub extends StubElement[ScImportSelector]
   def isAliasedImport: Boolean
 
   def reference: ScStableCodeReferenceElement
 
   def importedName: String
-}

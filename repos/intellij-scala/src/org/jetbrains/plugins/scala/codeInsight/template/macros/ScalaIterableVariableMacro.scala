@@ -15,7 +15,7 @@ import scala.collection.mutable.ArrayBuffer
   * @author Roman.Shein
   * @since 24.09.2015.
   */
-class ScalaIterableVariableMacro extends ScalaVariableOfTypeMacro {
+class ScalaIterableVariableMacro extends ScalaVariableOfTypeMacro
 
   override def getName: String = MacroUtil.scalaIdPrefix + "iterableVariable"
 
@@ -49,4 +49,3 @@ class ScalaIterableVariableMacro extends ScalaVariableOfTypeMacro {
         project)
 
   override def validExprsCount(exprsCount: Int): Boolean = exprsCount == 0
-}

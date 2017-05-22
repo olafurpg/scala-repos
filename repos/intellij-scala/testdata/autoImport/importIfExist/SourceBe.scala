@@ -1,5 +1,4 @@
 package gt
 
-object be {
+object be
   def apply() = 3
-}

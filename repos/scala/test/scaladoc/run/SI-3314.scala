@@ -2,14 +2,14 @@ import scala.tools.nsc.doc.base._
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def resourceFile = "SI-3314.scala"
 
   // no need for special settings
   def scaladocSettings = "-feature"
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -37,8 +37,8 @@ object Test extends ScaladocModelTest {
     // test2
 
     val test2 = base._package("test2")
-    def testDefinition(doc: DocTemplateEntity) = {
-      for (day <- List("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) {
+    def testDefinition(doc: DocTemplateEntity) =
+      for (day <- List("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
         assert(doc._value(day).resultType.name == "Value",
                doc._value(day).resultType.name + " == Value")
         assert(doc._value(day).resultType.refEntity.size == 1,
@@ -47,13 +47,11 @@ object Test extends ScaladocModelTest {
                    doc._classMbr("Value"), doc),
                doc._value(day).resultType.refEntity(0)._1 +
                " == LinkToMember(" + doc.qualifiedName + ".Value)")
-      }
-    }
     testDefinition(test2._trait("WeekDayTrait"))
     testDefinition(test2._class("WeekDayClass"))
     testDefinition(test2._object("WeekDayObject"))
 
-    def testUsage(doc: DocTemplateEntity) = {
+    def testUsage(doc: DocTemplateEntity) =
       val ValueInClass = test2._class("WeekDayClass")._classMbr("Value")
       val ValueInTrait = test2._trait("WeekDayTrait")._classMbr("Value")
       val ValueInObject = test2._object("WeekDayObject")._classMbr("Value")
@@ -70,7 +68,7 @@ object Test extends ScaladocModelTest {
           ("isWorkingDay8", "WeekDay", WeekDayInObject),
           ("isWorkingDay9", "WeekDayObject.Value", ValueInObject))
 
-      for ((method, name, ref) <- expected) {
+      for ((method, name, ref) <- expected)
         assert(doc._method(method).valueParams(0)(0).resultType.name == name,
                doc._method(method).valueParams(0)(0).resultType.name + " == " +
                name + " (in " + doc + "." + method + ")")
@@ -84,8 +82,6 @@ object Test extends ScaladocModelTest {
             doc._method(method).valueParams(0)(0).resultType.refEntity(0)._1 +
             " == LinkToMember(" + ref.qualifiedName + ") (in " + doc + "." +
             method + ")")
-      }
-    }
     testUsage(test2._object("UserObject"))
     testUsage(test2._class("UserClass"))
     testUsage(test2._trait("UserTrait"))
@@ -100,5 +96,3 @@ object Test extends ScaladocModelTest {
         bar.valueParams(0)(0).resultType.name == "(AnyRef { type Lambda[X] <: Either[A,X] })#Lambda[String]",
         bar.valueParams(0)(0).resultType.name +
         " == (AnyRef { type Lambda[X] <: Either[A,X] })#Lambda[String]")
-  }
-}

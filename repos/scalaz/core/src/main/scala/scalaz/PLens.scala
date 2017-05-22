@@ -16,7 +16,7 @@ package scalaz
   * @tparam B1 The initial type of the optional field
   * @tparam B2 The final type of the optional field
   */
-sealed abstract class PLensFamily[A1, A2, B1, B2] {
+sealed abstract class PLensFamily[A1, A2, B1, B2]
   def run(a: A1): Option[IndexedStore[B1, B2, A2]]
 
   def apply(a: A1): Option[IndexedStore[B1, B2, A2]] =
@@ -79,10 +79,9 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
 
   /** If the Partial Lens is null, then return the target object, otherwise run the function on its projection. */
   def as(f: B1 => A1, a: A1): A1 =
-    get(a) match {
+    get(a) match
       case None => a
       case Some(w) => f(w)
-    }
 
   def is(a: A1): Boolean =
     run(a).isDefined
@@ -104,10 +103,9 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
 
   /** Modify the potential value viewed through the partial lens */
   def mod[A >: A2 <: A1](f: B1 => B2, a: A): A =
-    run(a) match {
+    run(a) match
       case None => a: A
       case Some(w) => (w puts f): A
-    }
 
   def =>=[A >: A2 <: A1](f: B1 => B2): A => A =
     mod(f, _)
@@ -118,13 +116,12 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def %=[A >: A2 <: A1](f: B1 => B2): PState[A, B2] =
     State(
         a =>
-          run(a) match {
+          run(a) match
         case None => (a, None)
-        case Some(w) => {
+        case Some(w) =>
             val r = f(w.pos)
             (w put r, Some(r))
-          }
-    })
+    )
 
   def :=[A >: A2 <: A1](b: => B2): PState[A, B2] =
     %=(_ => b)
@@ -135,13 +132,12 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def %%=[A >: A2 <: A1, C](s: IndexedState[B1, B2, C]): PState[A, C] =
     State(
         a =>
-          run(a) match {
+          run(a) match
         case None => (a, None)
-        case Some(w) => {
+        case Some(w) =>
             val r = s.run(w.pos): (B2, C)
             (w put r._1, Some(r._2))
-          }
-    })
+    )
 
   def >-[A >: A2 <: A1, C](f: B1 => C): PState[A, C] =
     State(a => (a, get(a) map f))
@@ -149,13 +145,12 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   def >>-[A >: A2 <: A1, C](f: B1 => State[A, C]): PState[A, C] =
     StateT(
         a =>
-          get(a) match {
+          get(a) match
         case None => (a, None)
         case Some(w) =>
-          f(w) apply a match {
+          f(w) apply a match
             case (y, x) => (y, Some(x))
-          }
-    })
+    )
 
   def ->>-[A >: A2 <: A1, C](f: => State[A, C]): PState[A, C] =
     >>-(_ => f)
@@ -166,15 +161,13 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
     plensFamily(
         c =>
           (that run c).flatMap(x =>
-                {
           val (ac, a) = x.run
           run(a) map
           (y =>
-                {
                   val (ba, b) = y.run
                   IndexedStore(ac compose ba, b)
-              })
-      }))
+              )
+      ))
 
   /** alias for `compose` */
   def <=<[C1, C2](
@@ -193,12 +186,11 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   /** Two partial lenses that view a value of the same type can be joined */
   def sum[C1, C2](that: => PLensFamily[C1, C2, B1, B2])
     : PLensFamily[A1 \/ C1, A2 \/ C2, B1, B2] =
-    plensFamily {
+    plensFamily
       case -\/(a) =>
         run(a) map (_ map (\/.left))
       case \/-(c) =>
         that run c map (_ map (\/.right))
-    }
 
   /** Alias for `sum` */
   def |||[C1, C2](that: => PLensFamily[C1, C2, B1, B2])
@@ -207,35 +199,31 @@ sealed abstract class PLensFamily[A1, A2, B1, B2] {
   /** Two disjoint partial lenses can be paired */
   def product[C1, C2, D1, D2](that: PLensFamily[C1, C2, D1, D2])
     : PLensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] =
-    plensFamily {
+    plensFamily
       case (a, c) =>
-        for {
+        for
           q <- run(a)
           r <- that run c
-        } yield q *** r
-    }
+        yield q *** r
 
   /** alias for `product` */
   def ***[C1, C2, D1, D2](that: PLensFamily[C1, C2, D1, D2])
     : PLensFamily[(A1, C1), (A2, C2), (B1, D1), (B2, D2)] = product(that)
-}
 
-object PLensFamily extends PLensInstances with PLensFunctions {
+object PLensFamily extends PLensInstances with PLensFunctions
 
   def apply[A1, A2, B1, B2](
       r: A1 => Option[IndexedStore[B1, B2, A2]]): PLensFamily[A1, A2, B1, B2] =
     plensFamily(r)
-}
 
-trait PLensFamilyFunctions extends PLensInstances {
+trait PLensFamilyFunctions extends PLensInstances
 
   import BijectionT._
 
   def plensFamily[A1, A2, B1, B2](
       r: A1 => Option[IndexedStore[B1, B2, A2]]): PLensFamily[A1, A2, B1, B2] =
-    new PLensFamily[A1, A2, B1, B2] {
+    new PLensFamily[A1, A2, B1, B2]
       def run(a: A1): Option[IndexedStore[B1, B2, A2]] = r(a)
-    }
 
   def plensFamilyf[A1, A2, B1, B2](
       r: PartialFunction[A1, IndexedStore[B1, B2, A2]])
@@ -247,10 +235,10 @@ trait PLensFamilyFunctions extends PLensInstances {
       get: A1 => Option[B1]): PLensFamily[A1, A2, B1, B2] =
     plensFamily(
         a =>
-          for {
+          for
         w <- set(a)
         x <- get(a)
-      } yield IndexedStore(w, x))
+      yield IndexedStore(w, x))
 
   /** The identity partial lens family for a given pair of objects */
   def plensFamilyId[A1, A2]: PLensFamily[A1, A2, A1, A2] =
@@ -268,16 +256,14 @@ trait PLensFamilyFunctions extends PLensInstances {
     plensFamily(_ map (z => IndexedStore(Some(_), z)))
 
   def leftPLensFamily[A1, A2, B]: PLensFamily[A1 \/ B, A2 \/ B, A1, A2] =
-    plensFamily {
+    plensFamily
       case -\/(a) => Some(IndexedStore(\/.left, a))
       case \/-(_) => None
-    }
 
   def rightPLensFamily[A, B1, B2]: PLensFamily[A \/ B1, A \/ B2, B1, B2] =
-    plensFamily {
+    plensFamily
       case \/-(b) => Some(IndexedStore(\/.right, b))
       case -\/(_) => None
-    }
 
   def tuple2PLensFamily[S1, S2, A, B](
       lens: PLensFamily[S1, S2, (A, B), (A, B)])
@@ -358,14 +344,12 @@ trait PLensFamilyFunctions extends PLensInstances {
                                                                  B2) \/ (A2,
                                                                  C2))] =
     ~LensFamily.distributeLensFamily
-}
 
-trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
+trait PLensFunctions extends PLensInstances with PLensFamilyFunctions
   import BijectionT._
 
-  def plens[A, B](r: A => Option[Store[B, A]]): PLens[A, B] = new PLens[A, B] {
+  def plens[A, B](r: A => Option[Store[B, A]]): PLens[A, B] = new PLens[A, B]
     def run(a: A): Option[Store[B, A]] = r(a)
-  }
 
   def plensf[A, B](r: PartialFunction[A, Store[B, A]]): PLens[A, B] =
     plens(r.lift)
@@ -374,10 +358,10 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
       set: A => Option[B => A], get: A => Option[B]): PLens[A, B] =
     plens(
         a =>
-          for {
+          for
         w <- set(a)
         x <- get(a)
-      } yield Store(w, x))
+      yield Store(w, x))
 
   def plensgf[A, B](set: PartialFunction[A, B => A],
                     get: PartialFunction[A, B]): PLens[A, B] =
@@ -403,16 +387,14 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     plens(_ map (z => Store(Some(_), z)))
 
   def leftPLens[A, B]: (A \/ B) @?> A =
-    plens {
+    plens
       case -\/(a) => Some(Store(\/.left, a))
       case \/-(_) => None
-    }
 
   def rightPLens[A, B]: (A \/ B) @?> B =
-    plens {
+    plens
       case \/-(b) => Some(Store(\/.right, b))
       case -\/(_) => None
-    }
 
   def tuple2PLens[S, A, B](
       lens: PLens[S, (A, B)]): (PLens[S, A], PLens[S, B]) =
@@ -460,40 +442,34 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     plens(_.fold(_ => None, b => Some(Store(lazyRight(_), b))))
 
   def listHeadPLens[A]: List[A] @?> A =
-    plens {
+    plens
       case Nil => None
       case h :: t => Some(Store(_ :: t, h))
-    }
 
   def listTailPLens[A]: List[A] @?> List[A] =
-    plens {
+    plens
       case Nil => None
       case h :: t => Some(Store(h :: _, t))
-    }
 
   def listNthPLens[A](n: Int): List[A] @?> A =
     if (n < 0) nil
     else if (n == 0) listHeadPLens
     else listNthPLens(n - 1) compose listTailPLens
 
-  def listLookupByPLens[K, V](p: K => Boolean): List[(K, V)] @?> V = {
+  def listLookupByPLens[K, V](p: K => Boolean): List[(K, V)] @?> V =
     @annotation.tailrec
     def lookupr(
         t: (List[(K, V)], (K, V),
         List[(K, V)])): Option[(List[(K, V)], (K, V), List[(K, V)])] =
-      t match {
+      t match
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _, Nil) => None
         case (l, x, r :: rs) => lookupr(x :: l, r, rs)
-      }
-    plens {
+    plens
       case Nil => None
       case h :: t =>
-        lookupr(Nil, h, t) map {
+        lookupr(Nil, h, t) map
           case (l, (k, v), r) => Store(w => l reverse_::: (k, w) :: r, v)
-        }
-    }
-  }
 
   def listLookupPLens[K : Equal, V](k: K): List[(K, V)] @?> V =
     listLookupByPLens(Equal[K].equal(k, _))
@@ -513,40 +489,34 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
   import Stream._
 
   def streamHeadPLens[A]: Stream[A] @?> A =
-    plens {
+    plens
       case Empty => None
       case h #:: t => Some(Store(_ #:: t, h))
-    }
 
   def streamTailPLens[A]: Stream[A] @?> Stream[A] =
-    plens {
+    plens
       case Empty => None
       case h #:: t => Some(Store(h #:: _, t))
-    }
 
   def streamNthPLens[A](n: Int): Stream[A] @?> A =
     if (n < 0) nil
     else if (n == 0) streamHeadPLens
     else streamNthPLens(n - 1) compose streamTailPLens
 
-  def streamLookupByPLens[K, V](p: K => Boolean): Stream[(K, V)] @?> V = {
+  def streamLookupByPLens[K, V](p: K => Boolean): Stream[(K, V)] @?> V =
     @annotation.tailrec
     def lookupr(
         t: (Stream[(K, V)], (K, V),
         Stream[(K, V)])): Option[(Stream[(K, V)], (K, V), Stream[(K, V)])] =
-      t match {
+      t match
         case (_, (k, _), _) if p(k) => Some(t)
         case (_, _, Stream.Empty) => None
         case (l, x, r #:: rs) => lookupr(x #:: l, r, rs)
-      }
-    plens {
+    plens
       case Stream.Empty => None
       case h #:: t =>
-        lookupr(Stream.empty, h, t) map {
+        lookupr(Stream.empty, h, t) map
           case (l, (k, v), r) => Store(w => l.reverse #::: (k, w) #:: r, v)
-        }
-    }
-  }
 
   def streamLookupPLens[K : Equal, V](k: K): Stream[(K, V)] @?> V =
     streamLookupByPLens(Equal[K].equal(k, _))
@@ -569,26 +539,24 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
     else ephemeralStreamNthPLens(n - 1) compose ephemeralStreamTailPLens
 
   def ephemeralStreamLookupByPLens[K, V](
-      p: K => Boolean): EphemeralStream[(K, V)] @?> V = {
+      p: K => Boolean): EphemeralStream[(K, V)] @?> V =
     import EphemeralStream.cons
 
     @annotation.tailrec
     def lookupr(t: (EphemeralStream[(K, V)], (K, V), EphemeralStream[(K, V)]))
       : Option[(EphemeralStream[(K, V)], (K, V), EphemeralStream[(K, V)])] =
-      t match {
+      t match
         case (_, (k, _), _) if p(k) => Some(t)
         case (l, x, s) =>
           if (s.isEmpty) None
           else lookupr((cons(x, l), s.head(), s.tail()))
-      }
     plens(
         s =>
           if (s.isEmpty) None
           else
-            lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map {
+            lookupr((EphemeralStream.emptyEphemeralStream, s.head(), s.tail())) map
           case (l, (k, v), r) => Store(w => l.reverse ++ cons((k, w), r), v)
-      })
-  }
+      )
 
   def ephemeralStreamLookupPLens[K : Equal, V](
       k: K): EphemeralStream[(K, V)] @?> V =
@@ -604,9 +572,8 @@ trait PLensFunctions extends PLensInstances with PLensFamilyFunctions {
 
   def distributePLens[A, B, C]: (A, B \/ C) @?> ((A, B) \/ (A, C)) =
     ~LensFamily.distributeLens
-}
 
-abstract class PLensInstances {
+abstract class PLensInstances
 
   import PLensFamily._
 
@@ -618,30 +585,27 @@ abstract class PLensInstances {
     plens.st
 
   implicit def PLensFamilyUnzip[S, R]: Unzip[λ[α => PLensFamily[S, R, α, α]]] =
-    new Unzip[λ[α => PLensFamily[S, R, α, α]]] {
+    new Unzip[λ[α => PLensFamily[S, R, α, α]]]
       def unzip[A, B](a: PLensFamily[S, R, (A, B), (A, B)]) =
         (
             plensFamily(
                 x =>
                   a run x map
                   (c =>
-                        {
                       val (p, q) = c.pos
                       IndexedStore(a => c.put((a, q)): R, p)
-                  })),
+                  )),
             plensFamily(
                 x =>
                   a run x map
                   (c =>
-                        {
                       val (p, q) = c.pos
                       IndexedStore(a => c.put((p, a)): R, q)
-                  }))
+                  ))
         )
-    }
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
-  case class NumericPLens[S, N : Numeric](lens: S @?> N, num: Numeric[N]) {
+  case class NumericPLens[S, N : Numeric](lens: S @?> N, num: Numeric[N])
     def +=(that: N): PState[S, N] =
       lens %= (num.plus(_, that))
 
@@ -650,45 +614,39 @@ abstract class PLensInstances {
 
     def *=(that: N): PState[S, N] =
       lens %= (num.times(_, that))
-  }
 
   implicit def numericPLens[S, N : Numeric](lens: S @?> N) =
     NumericPLens[S, N](lens, implicitly[Numeric[N]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
-  case class FractionalPLens[S, F](lens: S @?> F, frac: Fractional[F]) {
+  case class FractionalPLens[S, F](lens: S @?> F, frac: Fractional[F])
     def /=(that: F): PState[S, F] =
       lens %= (frac.div(_, that))
-  }
 
   implicit def fractionalPLens[S, F : Fractional](lens: S @?> F) =
     FractionalPLens[S, F](lens, implicitly[Fractional[F]])
 
   /** Allow the illusion of imperative updates to potential numbers viewed through a partial lens */
-  case class IntegralPLens[S, I](lens: S @?> I, ig: Integral[I]) {
+  case class IntegralPLens[S, I](lens: S @?> I, ig: Integral[I])
     def %=(that: I): PState[S, I] =
       lens %= (ig.quot(_, that))
-  }
 
   implicit def integralPLens[S, I : Integral](lens: S @?> I) =
     IntegralPLens[S, I](lens, implicitly[Integral[I]])
-}
 
-private[scalaz] trait PLensCategory extends Choice[PLens] with Split[PLens] {
+private[scalaz] trait PLensCategory extends Choice[PLens] with Split[PLens]
 
   def compose[A, B, C](bc: PLens[B, C], ab: PLens[A, B]): PLens[A, C] =
     ab >=> bc
   def id[A]: PLens[A, A] = PLensFamily.plensId
 
   def choice[A, B, C](f: => PLens[A, C], g: => PLens[B, C]): PLens[A \/ B, C] =
-    PLensFamily.plens[A \/ B, C] {
+    PLensFamily.plens[A \/ B, C]
       case -\/(a) =>
         f run a map (_ map (\/.left))
       case \/-(b) =>
         g run b map (_ map (\/.right))
-    }
 
   def split[A, B, C, D](
       f: PLens[A, B], g: PLens[C, D]): PLens[(A, C), (B, D)] =
     f *** g
-}

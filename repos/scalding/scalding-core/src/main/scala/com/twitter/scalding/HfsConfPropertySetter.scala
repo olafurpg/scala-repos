@@ -28,25 +28,20 @@ private[scalding] class ConfPropertiesHfsTap(
     scheme: Scheme[JobConf, RecordReader[_, _], OutputCollector[_, _], _, _],
     stringPath: String,
     sinkMode: SinkMode)
-    extends Hfs(scheme, stringPath, sinkMode) {
+    extends Hfs(scheme, stringPath, sinkMode)
   override def sourceConfInit(
-      process: FlowProcess[JobConf], conf: JobConf): Unit = {
-    config.toMap.foreach {
+      process: FlowProcess[JobConf], conf: JobConf): Unit =
+    config.toMap.foreach
       case (k, v) =>
         conf.set(k, v)
-    }
     super.sourceConfInit(process, conf)
-  }
 
   override def sinkConfInit(
-      process: FlowProcess[JobConf], conf: JobConf): Unit = {
-    config.toMap.foreach {
+      process: FlowProcess[JobConf], conf: JobConf): Unit =
+    config.toMap.foreach
       case (k, v) =>
         conf.set(k, v)
-    }
     super.sinkConfInit(process, conf)
-  }
-}
 
 /*
  * The HfsConfPropertySetter can be added to sources to allow close in changes
@@ -55,7 +50,7 @@ private[scalding] class ConfPropertiesHfsTap(
  *
  * Changes here however will not show up in the hadoop UI
  */
-trait HfsConfPropertySetter extends HfsTapProvider {
+trait HfsConfPropertySetter extends HfsTapProvider
   def tapConfig: Config = Config.empty
 
   override def createHfsTap(
@@ -63,4 +58,3 @@ trait HfsConfPropertySetter extends HfsTapProvider {
       path: String,
       sinkMode: SinkMode): Hfs =
     new ConfPropertiesHfsTap(tapConfig, scheme, path, sinkMode)
-}

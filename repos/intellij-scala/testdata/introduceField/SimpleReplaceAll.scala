@@ -1,9 +1,8 @@
 /*replaceAll*/
-class Test {
+class Test
   /*start*/
   1 /*end*/
   1
-}
 /*
 /*replaceAll*/
 class Test {

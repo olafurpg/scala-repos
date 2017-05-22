@@ -18,9 +18,8 @@ package script
   *  @since   2.8
   */
 @deprecated("Scripting is deprecated.", "2.11.0")
-trait Scriptable[A] {
+trait Scriptable[A]
 
   /** Send a message to this scriptable object.
     */
   def <<(cmd: Message[A]): Unit
-}

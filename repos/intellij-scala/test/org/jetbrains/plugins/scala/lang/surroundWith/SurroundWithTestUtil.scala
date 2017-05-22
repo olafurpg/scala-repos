@@ -6,7 +6,7 @@ package surroundWith
   * User: Alexander Podkhalyuzin
   * Date: 08.11.2008
   */
-object SurroundWithTestUtil {
+object SurroundWithTestUtil
   val startMarker = "<start>"
   val endMarkers: Array[String] = Array[String]("<if>",
                                                 "<else>",
@@ -23,7 +23,7 @@ object SurroundWithTestUtil {
                                                 "<if_cond>",
                                                 "<else_cond>",
                                                 "<unary>")
-  def prepareFile(text: String): (String, Integer, Integer, Integer) = {
+  def prepareFile(text: String): (String, Integer, Integer, Integer) =
     var workingText = text
     val start = text.indexOf(startMarker)
     val t = endMarkers.indexWhere(text.indexOf(_) != -1)
@@ -32,10 +32,7 @@ object SurroundWithTestUtil {
     workingText = removeMarker(workingText, startMarker)
     workingText = removeMarker(workingText, s)
     (workingText, start, end, t)
-  }
 
-  private def removeMarker(text: String, marker: String): String = {
+  private def removeMarker(text: String, marker: String): String =
     val i = text.indexOf(marker)
     text.substring(0, i) + text.substring(i + marker.length)
-  }
-}

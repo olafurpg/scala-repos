@@ -6,7 +6,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(classOf[JUnit4])
-class AbstractFileClassLoaderTest {
+class AbstractFileClassLoaderTest
 
   import scala.reflect.io._
   import scala.io.Source
@@ -15,44 +15,39 @@ class AbstractFileClassLoaderTest {
   import java.net.{URLClassLoader, URL}
 
   implicit def `we love utf8` = UTF8
-  implicit class `abs file ops`(f: AbstractFile) {
+  implicit class `abs file ops`(f: AbstractFile)
     def writeContent(s: String): Unit =
       Streamable.closing(f.bufferedOutput)(
           os => os write s.getBytes(UTF8.charSet))
-  }
-  implicit class `url slurp`(url: URL) {
+  implicit class `url slurp`(url: URL)
     def slurp(): String = Streamable.slurp(url)
-  }
 
   val NoClassLoader: ClassLoader = null
 
-  def fuzzBuzzBooz: (AbstractFile, AbstractFile) = {
+  def fuzzBuzzBooz: (AbstractFile, AbstractFile) =
     val fuzz = new VirtualDirectory("fuzz", None)
     val buzz = fuzz subdirectoryNamed "buzz"
     val booz = buzz fileNamed "booz.class"
     (fuzz, booz)
-  }
 
   @Test
-  def afclGetsParent(): Unit = {
+  def afclGetsParent(): Unit =
     val p = new URLClassLoader(Array.empty[URL])
     val d = new VirtualDirectory("vd", None)
     val x = new AbstractFileClassLoader(d, p)
     assertSame(p, x.getParent)
-  }
 
   @Test
-  def afclGetsResource(): Unit = {
+  def afclGetsResource(): Unit =
     val (fuzz, booz) = fuzzBuzzBooz
     booz writeContent "hello, world"
     val x = new AbstractFileClassLoader(fuzz, NoClassLoader)
     val r = x.getResource("buzz/booz.class")
     assertNotNull(r)
     assertEquals("hello, world", r.slurp())
-  }
 
   @Test
-  def afclGetsResourceFromParent(): Unit = {
+  def afclGetsResourceFromParent(): Unit =
     val (fuzz, booz) = fuzzBuzzBooz
     val (fuzz_, booz_) = fuzzBuzzBooz
     booz writeContent "hello, world"
@@ -62,10 +57,9 @@ class AbstractFileClassLoaderTest {
     val r = x.getResource("buzz/booz.class")
     assertNotNull(r)
     assertEquals("hello, world", r.slurp())
-  }
 
   @Test
-  def afclGetsResourceInDefaultPackage(): Unit = {
+  def afclGetsResourceInDefaultPackage(): Unit =
     val fuzz = new VirtualDirectory("fuzz", None)
     val booz = fuzz fileNamed "booz.class"
     val bass = fuzz fileNamed "bass"
@@ -76,11 +70,10 @@ class AbstractFileClassLoaderTest {
     assertNotNull(r)
     assertEquals("hello, world", r.slurp())
     assertEquals("lo tone", (x getResource "bass").slurp())
-  }
 
   // SI-8843
   @Test
-  def afclGetsResources(): Unit = {
+  def afclGetsResources(): Unit =
     val (fuzz, booz) = fuzzBuzzBooz
     booz writeContent "hello, world"
     val x = new AbstractFileClassLoader(fuzz, NoClassLoader)
@@ -88,10 +81,9 @@ class AbstractFileClassLoaderTest {
     assertTrue(e.hasMoreElements)
     assertEquals("hello, world", e.nextElement.slurp())
     assertFalse(e.hasMoreElements)
-  }
 
   @Test
-  def afclGetsResourcesFromParent(): Unit = {
+  def afclGetsResourcesFromParent(): Unit =
     val (fuzz, booz) = fuzzBuzzBooz
     val (fuzz_, booz_) = fuzzBuzzBooz
     booz writeContent "hello, world"
@@ -104,10 +96,9 @@ class AbstractFileClassLoaderTest {
     assertTrue(e.hasMoreElements)
     assertEquals("hello, world_", e.nextElement.slurp())
     assertFalse(e.hasMoreElements)
-  }
 
   @Test
-  def afclGetsResourceAsStream(): Unit = {
+  def afclGetsResourceAsStream(): Unit =
     val (fuzz, booz) = fuzzBuzzBooz
     booz writeContent "hello, world"
     val x = new AbstractFileClassLoader(fuzz, NoClassLoader)
@@ -116,19 +107,17 @@ class AbstractFileClassLoaderTest {
     assertEquals(
         "hello, world",
         Streamable.closing(r)(is => Source.fromInputStream(is).mkString))
-  }
 
   @Test
-  def afclGetsClassBytes(): Unit = {
+  def afclGetsClassBytes(): Unit =
     val (fuzz, booz) = fuzzBuzzBooz
     booz writeContent "hello, world"
     val x = new AbstractFileClassLoader(fuzz, NoClassLoader)
     val b = x.classBytes("buzz/booz.class")
     assertEquals("hello, world", new String(b, UTF8.charSet))
-  }
 
   @Test
-  def afclGetsClassBytesFromParent(): Unit = {
+  def afclGetsClassBytesFromParent(): Unit =
     val (fuzz, booz) = fuzzBuzzBooz
     val (fuzz_, booz_) = fuzzBuzzBooz
     booz writeContent "hello, world"
@@ -138,5 +127,3 @@ class AbstractFileClassLoaderTest {
     val x = new AbstractFileClassLoader(fuzz_, p)
     val b = x.classBytes("buzz/booz.class")
     assertEquals("hello, world", new String(b, UTF8.charSet))
-  }
-}

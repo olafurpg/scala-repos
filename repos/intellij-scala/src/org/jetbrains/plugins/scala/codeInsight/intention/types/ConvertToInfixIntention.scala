@@ -15,48 +15,41 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScParameterizedTypeE
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
 /** Converts type element `@@[A, B]` to `(A @@ B)` */
-class ConvertToInfixIntention extends PsiElementBaseIntentionAction {
+class ConvertToInfixIntention extends PsiElementBaseIntentionAction
   def getFamilyName = "Use Infix Type Syntax"
 
   override def getText = getFamilyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
-    element match {
+  def isAvailable(project: Project, editor: Editor, element: PsiElement) =
+    element match
       case Parent(Both(ref: ScStableCodeReferenceElement,
                        Parent(Parent(param: ScParameterizedTypeElement))))
           if param.typeArgList.typeArgs.size == 2 &&
           !ref.refName.forall(_.isLetterOrDigit) =>
         true
       case _ => false
-    }
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     if (element == null || !element.isValid) return
     val paramTypeElement: ScParameterizedTypeElement =
       PsiTreeUtil.getParentOfType(
           element, classOf[ScParameterizedTypeElement], false)
     val Seq(targ1, targ2) = paramTypeElement.typeArgList.typeArgs
-    val needParens = paramTypeElement.getParent match {
+    val needParens = paramTypeElement.getParent match
       case _: ScTypeArgs | _: ScParenthesisedTypeElement => false
       case _ => true
-    }
     val newTypeText = Seq(targ1, paramTypeElement.typeElement, targ2)
       .map(_.getText)
       .mkString(" ")
       .parenthesisedIf(needParens)
     val newTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
         newTypeText, element.getManager)
-    if (paramTypeElement.isValid) {
-      val replaced = try {
+    if (paramTypeElement.isValid)
+      val replaced = try
         paramTypeElement.replace(newTypeElement)
-      } catch {
+      catch
         case npe: NullPointerException =>
           throw new RuntimeException("Unable to replace: %s with %s".format(
                                          paramTypeElement, newTypeText),
                                      npe)
-      }
       UndoUtil.markPsiFileForUndo(replaced.getContainingFile)
-    }
-  }
-}

@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object EqualizerBand {
+object EqualizerBand
   implicit def sfxEqualizerBand2jfx(eb: EqualizerBand): jfxsm.EqualizerBand =
     if (eb != null) eb.delegate else null
 
@@ -46,11 +46,10 @@ object EqualizerBand {
     * Minimum possible gain value.
     */
   val MIN_GAIN = jfxsm.EqualizerBand.MIN_GAIN
-}
 
 class EqualizerBand(
     override val delegate: jfxsm.EqualizerBand = new jfxsm.EqualizerBand)
-    extends SFXDelegate[jfxsm.EqualizerBand] {
+    extends SFXDelegate[jfxsm.EqualizerBand]
 
   /**
     * Custom EqualizerBand constructor.
@@ -62,23 +61,19 @@ class EqualizerBand(
     * Bandwidth of the band in Hertz.
     */
   def bandwidth: DoubleProperty = delegate.bandwidthProperty
-  def bandwidth_=(v: Double) {
+  def bandwidth_=(v: Double)
     bandwidth() = v
-  }
 
   /**
     * Center frequency of the band in Hertz.
     */
   def centerFrequency: DoubleProperty = delegate.centerFrequencyProperty
-  def centerFrequency_=(v: Double) {
+  def centerFrequency_=(v: Double)
     centerFrequency() = v
-  }
 
   /**
     * The gain to be applied to the frequencies of this band.
     */
   def gain: DoubleProperty = delegate.gainProperty
-  def gain_=(v: Double) {
+  def gain_=(v: Double)
     gain() = v
-  }
-}

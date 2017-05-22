@@ -22,8 +22,8 @@ import org.scalatest.prop._
 import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
-class SparseArrayTest extends FunSuite with Checkers {
-  test("Map") {
+class SparseArrayTest extends FunSuite with Checkers
+  test("Map")
     val x = SparseArray(1, 0, 2, 0, 3, 0, -1, -2, -3)
     x.compact()
     val y = x.map(_ + 1)
@@ -31,9 +31,8 @@ class SparseArrayTest extends FunSuite with Checkers {
     assert(x.activeSize === x.length - 3)
     assert(y.activeSize === 6, y)
     assert(y.toList === List(2, 1, 3, 1, 4, 1, 0, -1, -2))
-  }
 
-  test("Filter") {
+  test("Filter")
     val x = SparseArray(1, 0, 2, 0, 3, 0, -1, -2, -3)
     x.compact()
     assert(x.filter(_ % 2 == 1).toList === List(1, 3))
@@ -49,5 +48,3 @@ class SparseArrayTest extends FunSuite with Checkers {
     y.compact()
     assert(y.filter(_ > 0).toList === List(1))
     assert(y.filter(_ >= 0).toList === List(0, 1, 0, 0))
-  }
-}

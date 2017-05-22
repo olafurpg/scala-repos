@@ -9,7 +9,7 @@ import play.twirl.sbt.Import.TwirlKeys
 import com.typesafe.sbt.web.SbtWeb.autoImport._
 import com.typesafe.sbt.packager.universal.UniversalPlugin.autoImport._
 
-object PlayLayoutPlugin extends AutoPlugin {
+object PlayLayoutPlugin extends AutoPlugin
 
   override def requires = Play
 
@@ -35,4 +35,3 @@ object PlayLayoutPlugin extends AutoPlugin {
       // Native packager
       sourceDirectory in Universal := baseDirectory.value / "dist"
   )
-}

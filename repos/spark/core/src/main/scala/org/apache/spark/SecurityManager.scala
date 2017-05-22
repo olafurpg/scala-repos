@@ -179,7 +179,7 @@ import org.apache.spark.util.Utils
   *  setting `spark.ssl.useNodeLocalConf` to `true`.
   */
 private[spark] class SecurityManager(sparkConf: SparkConf)
-    extends Logging with SecretKeyHolder {
+    extends Logging with SecretKeyHolder
 
   import SecurityManager._
 
@@ -217,22 +217,18 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
   // Set our own authenticator to properly negotiate user/password for HTTP connections.
   // This is needed by the HTTP client fetching from the HttpServer. Put here so its
   // only set once.
-  if (authOn) {
+  if (authOn)
     Authenticator.setDefault(
-        new Authenticator() {
-          override def getPasswordAuthentication(): PasswordAuthentication = {
+        new Authenticator()
+          override def getPasswordAuthentication(): PasswordAuthentication =
             var passAuth: PasswordAuthentication = null
             val userInfo = getRequestingURL().getUserInfo()
-            if (userInfo != null) {
+            if (userInfo != null)
               val parts = userInfo.split(":", 2)
               passAuth = new PasswordAuthentication(
                   parts(0), parts(1).toCharArray())
-            }
             return passAuth
-          }
-        }
     )
-  }
 
   // the default SSL configuration - it will be used by all communication layers unless overwritten
   private val defaultSSLOptions =
@@ -241,14 +237,14 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
   // SSL configuration for the file server. This is used by Utils.setupSecureURLConnection().
   val fileServerSSLOptions = getSSLOptions("fs")
   val (sslSocketFactory, hostnameVerifier) =
-    if (fileServerSSLOptions.enabled) {
+    if (fileServerSSLOptions.enabled)
       val trustStoreManagers =
-        for (trustStore <- fileServerSSLOptions.trustStore) yield {
+        for (trustStore <- fileServerSSLOptions.trustStore) yield
           val input = Files
             .asByteSource(fileServerSSLOptions.trustStore.get)
             .openStream()
 
-          try {
+          try
             val ks = KeyStore.getInstance(KeyStore.getDefaultType)
             ks.load(
                 input, fileServerSSLOptions.trustStorePassword.get.toCharArray)
@@ -257,14 +253,12 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
                 TrustManagerFactory.getDefaultAlgorithm)
             tmf.init(ks)
             tmf.getTrustManagers
-          } finally {
+          finally
             input.close()
-          }
-        }
 
-      lazy val credulousTrustStoreManagers = Array({
+      lazy val credulousTrustStoreManagers = Array(
         logWarning("Using 'accept-all' trust manager for SSL connections.")
-        new X509TrustManager {
+        new X509TrustManager
           override def getAcceptedIssuers: Array[X509Certificate] = null
 
           override def checkClientTrusted(
@@ -272,8 +266,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
 
           override def checkServerTrusted(
               x509Certificates: Array[X509Certificate], s: String) {}
-        }: TrustManager
-      })
+        : TrustManager
+      )
 
       val sslContext = SSLContext.getInstance(
           fileServerSSLOptions.protocol.getOrElse("Default"))
@@ -282,86 +276,73 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
           trustStoreManagers.getOrElse(credulousTrustStoreManagers),
           null)
 
-      val hostVerifier = new HostnameVerifier {
+      val hostVerifier = new HostnameVerifier
         override def verify(s: String, sslSession: SSLSession): Boolean = true
-      }
 
       (Some(sslContext.getSocketFactory), Some(hostVerifier))
-    } else {
+    else
       (None, None)
-    }
 
-  def getSSLOptions(module: String): SSLOptions = {
+  def getSSLOptions(module: String): SSLOptions =
     val opts = SSLOptions.parse(
         sparkConf, s"spark.ssl.$module", Some(defaultSSLOptions))
     logDebug(s"Created SSL options for $module: $opts")
     opts
-  }
 
   /**
     * Split a comma separated String, filter out any empty items, and return a Set of strings
     */
-  private def stringToSet(list: String): Set[String] = {
+  private def stringToSet(list: String): Set[String] =
     list.split(',').map(_.trim).filter(!_.isEmpty).toSet
-  }
 
   /**
     * Admin acls should be set before the view or modify acls.  If you modify the admin
     * acls you should also set the view and modify acls again to pick up the changes.
     */
-  def setViewAcls(defaultUsers: Set[String], allowedUsers: String) {
+  def setViewAcls(defaultUsers: Set[String], allowedUsers: String)
     viewAcls = (adminAcls ++ defaultUsers ++ stringToSet(allowedUsers))
     logInfo("Changing view acls to: " + viewAcls.mkString(","))
-  }
 
-  def setViewAcls(defaultUser: String, allowedUsers: String) {
+  def setViewAcls(defaultUser: String, allowedUsers: String)
     setViewAcls(Set[String](defaultUser), allowedUsers)
-  }
 
   /**
     * Checking the existence of "*" is necessary as YARN can't recognize the "*" in "defaultuser,*"
     */
-  def getViewAcls: String = {
-    if (viewAcls.contains("*")) {
+  def getViewAcls: String =
+    if (viewAcls.contains("*"))
       "*"
-    } else {
+    else
       viewAcls.mkString(",")
-    }
-  }
 
   /**
     * Admin acls should be set before the view or modify acls.  If you modify the admin
     * acls you should also set the view and modify acls again to pick up the changes.
     */
-  def setModifyAcls(defaultUsers: Set[String], allowedUsers: String) {
+  def setModifyAcls(defaultUsers: Set[String], allowedUsers: String)
     modifyAcls = (adminAcls ++ defaultUsers ++ stringToSet(allowedUsers))
     logInfo("Changing modify acls to: " + modifyAcls.mkString(","))
-  }
 
   /**
     * Checking the existence of "*" is necessary as YARN can't recognize the "*" in "defaultuser,*"
     */
-  def getModifyAcls: String = {
-    if (modifyAcls.contains("*")) {
+  def getModifyAcls: String =
+    if (modifyAcls.contains("*"))
       "*"
-    } else {
+    else
       modifyAcls.mkString(",")
-    }
-  }
 
   /**
     * Admin acls should be set before the view or modify acls.  If you modify the admin
     * acls you should also set the view and modify acls again to pick up the changes.
     */
-  def setAdminAcls(adminUsers: String) {
+  def setAdminAcls(adminUsers: String)
     adminAcls = stringToSet(adminUsers)
     logInfo("Changing admin acls to: " + adminAcls.mkString(","))
-  }
 
-  def setAcls(aclSetting: Boolean) {
+  def setAcls(aclSetting: Boolean)
     aclsOn = aclSetting
     logInfo("Changing acls enabled to: " + aclsOn)
-  }
 
   /**
     * Generates or looks up the secret key.
@@ -372,16 +353,16 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
     * For non-Yarn deployments, If the config variable is not set
     * we throw an exception.
     */
-  private def generateSecretKey(): String = {
-    if (!isAuthenticationEnabled) {
+  private def generateSecretKey(): String =
+    if (!isAuthenticationEnabled)
       null
-    } else if (SparkHadoopUtil.get.isYarnMode) {
+    else if (SparkHadoopUtil.get.isYarnMode)
       // In YARN mode, the secure cookie will be created by the driver and stashed in the
       // user's credentials, where executors can get it. The check for an array of size 0
       // is because of the test code in YarnSparkHadoopUtilSuite.
       val secretKey =
         SparkHadoopUtil.get.getSecretKeyFromUserCredentials(SECRET_LOOKUP_KEY)
-      if (secretKey == null || secretKey.length == 0) {
+      if (secretKey == null || secretKey.length == 0)
         logDebug(
             "generateSecretKey: yarn mode, secret key from credentials is null")
         val rnd = new SecureRandom()
@@ -394,22 +375,18 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
         SparkHadoopUtil.get.addSecretKeyToUserCredentials(
             SECRET_LOOKUP_KEY, cookie)
         cookie
-      } else {
+      else
         new Text(secretKey).toString
-      }
-    } else {
+    else
       // user must have set spark.authenticate.secret config
       // For Master/Worker, auth secret is in conf; for Executors, it is in env variable
       Option(sparkConf.getenv(SecurityManager.ENV_AUTH_SECRET)).orElse(
-          sparkConf.getOption(SecurityManager.SPARK_AUTH_SECRET_CONF)) match {
+          sparkConf.getOption(SecurityManager.SPARK_AUTH_SECRET_CONF)) match
         case Some(value) => value
         case None =>
           throw new IllegalArgumentException(
               "Error: a secret key must be specified via the " +
               SecurityManager.SPARK_AUTH_SECRET_CONF + " config")
-      }
-    }
-  }
 
   /**
     * Check to see if Acls for the UI are enabled
@@ -426,12 +403,11 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
     * @param user to see if is authorized
     * @return true is the user has permission, otherwise false
     */
-  def checkUIViewPermissions(user: String): Boolean = {
+  def checkUIViewPermissions(user: String): Boolean =
     logDebug("user=" + user + " aclsEnabled=" + aclsEnabled() + " viewAcls=" +
         viewAcls.mkString(","))
     !aclsEnabled || user == null || viewAcls.contains(user) ||
     viewAcls.contains("*")
-  }
 
   /**
     * Checks the given user against the modify acl list to see if they have
@@ -442,13 +418,12 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
     * @param user to see if is authorized
     * @return true is the user has permission, otherwise false
     */
-  def checkModifyPermissions(user: String): Boolean = {
+  def checkModifyPermissions(user: String): Boolean =
     logDebug(
         "user=" + user + " aclsEnabled=" + aclsEnabled() + " modifyAcls=" +
         modifyAcls.mkString(","))
     !aclsEnabled || user == null || modifyAcls.contains(user) ||
     modifyAcls.contains("*")
-  }
 
   /**
     * Check to see if authentication for the Spark communication protocols is enabled
@@ -460,9 +435,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
     * Checks whether SASL encryption should be enabled.
     * @return Whether to enable SASL encryption when connecting to services that support it.
     */
-  def isSaslEncryptionEnabled(): Boolean = {
+  def isSaslEncryptionEnabled(): Boolean =
     sparkConf.getBoolean("spark.authenticate.enableSaslEncryption", false)
-  }
 
   /**
     * Gets the user used for authenticating HTTP connections.
@@ -487,9 +461,8 @@ private[spark] class SecurityManager(sparkConf: SparkConf)
   // Default SecurityManager only has a single secret key, so ignore appId.
   override def getSaslUser(appId: String): String = getSaslUser()
   override def getSecretKey(appId: String): String = getSecretKey()
-}
 
-private[spark] object SecurityManager {
+private[spark] object SecurityManager
 
   val SPARK_AUTH_CONF: String = "spark.authenticate"
   val SPARK_AUTH_SECRET_CONF: String = "spark.authenticate.secret"
@@ -499,4 +472,3 @@ private[spark] object SecurityManager {
 
   // key used to store the spark secret in the Hadoop UGI
   val SECRET_LOOKUP_KEY = "sparkCookie"
-}

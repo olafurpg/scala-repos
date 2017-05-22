@@ -6,12 +6,12 @@ import scala.tools.reflect.ToolBox
 class ann(bar: String, quux: Array[String] = Array(), baz: ann = null)
     extends annotation.ClassfileAnnotation
 
-object Test extends App {
+object Test extends App
   // test 1: reify
-  val tree = reify {
+  val tree = reify
     @ann(bar = "1", quux = Array("2", "3"), baz = new ann(bar = "4"))
     class C
-  }.tree
+  .tree
   println(tree.toString)
 
   // test 2: import and typecheck
@@ -21,4 +21,3 @@ object Test extends App {
 
   // test 3: import and compile
   toolbox.eval(tree)
-}

@@ -22,17 +22,15 @@ import akka.routing.Routees
 import akka.cluster.routing.ClusterRouterPool
 import akka.cluster.routing.ClusterRouterPoolSettings
 
-object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
+object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig
 
-  class Echo extends Actor {
-    def receive = {
+  class Echo extends Actor
+    def receive =
       case _ ⇒ sender() ! Reply(Cluster(context.system).selfAddress)
-    }
-  }
 
-  class Memory extends Actor with ActorLogging {
+  class Memory extends Actor with ActorLogging
     var usedMemory: Array[Array[Int]] = _
-    def receive = {
+    def receive =
       case AllocateMemory ⇒
         val heap = ManagementFactory.getMemoryMXBean.getHeapMemoryUsage
         // getMax can be undefined (-1)
@@ -47,8 +45,6 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
         log.info("used heap after: [{}] bytes",
                  ManagementFactory.getMemoryMXBean.getHeapMemoryUsage.getUsed)
         sender() ! "done"
-    }
-  }
 
   case object AllocateMemory
   final case class Reply(address: Address)
@@ -60,13 +56,11 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
   def nodeList = Seq(node1, node2, node3)
 
   // Extract individual sigar library for every node.
-  nodeList foreach { role ⇒
-    nodeConfig(role) {
+  nodeList foreach  role ⇒
+    nodeConfig(role)
       ConfigFactory.parseString(
           "akka.cluster.metrics.native-library-extract-folder=${user.dir}/target/native/" +
           role.name)
-    }
-  }
 
   commonConfig(
       debugConfig(on = false)
@@ -108,12 +102,10 @@ object AdaptiveLoadBalancingRouterConfig extends MultiNodeConfig {
       }
     """))
         .withFallback(MultiNodeClusterSpec.clusterConfig))
-}
 
-class TestCustomMetricsSelector(config: Config) extends MetricsSelector {
+class TestCustomMetricsSelector(config: Config) extends MetricsSelector
   override def weights(nodeMetrics: Set[NodeMetrics]): Map[Address, Int] =
     Map.empty
-}
 
 class AdaptiveLoadBalancingRouterMultiJvmNode1
     extends AdaptiveLoadBalancingRouterSpec
@@ -125,7 +117,7 @@ class AdaptiveLoadBalancingRouterMultiJvmNode3
 abstract class AdaptiveLoadBalancingRouterSpec
     extends MultiNodeSpec(AdaptiveLoadBalancingRouterConfig)
     with MultiNodeClusterSpec with RedirectLogging with ImplicitSender
-    with DefaultTimeout {
+    with DefaultTimeout
   import AdaptiveLoadBalancingRouterConfig._
 
   def currentRoutees(router: ActorRef) =
@@ -134,25 +126,22 @@ abstract class AdaptiveLoadBalancingRouterSpec
       .asInstanceOf[Routees]
       .routees
 
-  def receiveReplies(expectedReplies: Int): Map[Address, Int] = {
+  def receiveReplies(expectedReplies: Int): Map[Address, Int] =
     val zero = Map.empty[Address, Int] ++ roles.map(address(_) -> 0)
-    (receiveWhile(5 seconds, messages = expectedReplies) {
+    (receiveWhile(5 seconds, messages = expectedReplies)
       case Reply(address) ⇒ address
-    }).foldLeft(zero) {
+    ).foldLeft(zero)
       case (replyMap, address) ⇒
         replyMap + (address -> (replyMap(address) + 1))
-    }
-  }
 
   /**
     * Fills in self address for local ActorRef
     */
-  def fullAddress(actorRef: ActorRef): Address = actorRef.path.address match {
+  def fullAddress(actorRef: ActorRef): Address = actorRef.path.address match
     case Address(_, _, None, None) ⇒ cluster.selfAddress
     case a ⇒ a
-  }
 
-  def startRouter(name: String): ActorRef = {
+  def startRouter(name: String): ActorRef =
     val router = system.actorOf(
         ClusterRouterPool(
             local = AdaptiveLoadBalancingPool(HeapMetricsSelector),
@@ -168,32 +157,29 @@ abstract class AdaptiveLoadBalancingRouterSpec
     routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
         roles.map(address).toSet)
     router
-  }
 
   val metricsSettings = ClusterMetricsSettings(cluster.system.settings.config)
 
   def metricsAwait(factor: Int = 10): Unit =
     Thread.sleep(metricsSettings.CollectorSampleInterval.toMillis * factor)
 
-  "A cluster with a AdaptiveLoadBalancingRouter" must {
-    "start cluster nodes" taggedAs LongRunningTest in {
+  "A cluster with a AdaptiveLoadBalancingRouter" must
+    "start cluster nodes" taggedAs LongRunningTest in
       awaitClusterUp(roles: _*)
       enterBarrier("after-1")
-    }
 
-    "use all nodes in the cluster when not overloaded" taggedAs LongRunningTest in {
-      runOn(node1) {
+    "use all nodes in the cluster when not overloaded" taggedAs LongRunningTest in
+      runOn(node1)
         val router1 = startRouter("router1")
 
         // collect some metrics before we start
         metricsAwait()
 
         val iterationCount = 100
-        1 to iterationCount foreach { _ ⇒
+        1 to iterationCount foreach  _ ⇒
           router1 ! "hit"
           // wait a while between each message, since metrics is collected periodically
           Thread.sleep(10)
-        }
 
         val replies = receiveReplies(iterationCount)
 
@@ -201,45 +187,38 @@ abstract class AdaptiveLoadBalancingRouterSpec
         replies(node2) should be > (0)
         replies(node3) should be > (0)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-2")
-    }
 
-    "prefer node with more free heap capacity" taggedAs LongRunningTest in {
+    "prefer node with more free heap capacity" taggedAs LongRunningTest in
       System.gc()
       enterBarrier("gc")
 
-      runOn(node2) {
-        within(20.seconds) {
+      runOn(node2)
+        within(20.seconds)
           system.actorOf(Props[Memory], "memory") ! AllocateMemory
           expectMsg("done")
-        }
-      }
       enterBarrier("heap-allocated")
 
-      runOn(node1) {
+      runOn(node1)
         val router2 = startRouter("router2")
 
         // collect some metrics before we start
         metricsAwait()
 
         val iterationCount = 3000
-        1 to iterationCount foreach { _ ⇒
+        1 to iterationCount foreach  _ ⇒
           router2 ! "hit"
-        }
 
         val replies = receiveReplies(iterationCount)
 
         replies(node3) should be > (replies(node2))
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-3")
-    }
 
-    "create routees from configuration" taggedAs LongRunningTest in {
-      runOn(node1) {
+    "create routees from configuration" taggedAs LongRunningTest in
+      runOn(node1)
         val router3 =
           system.actorOf(FromConfig.props(Props[Memory]), "router3")
         // it may take some time until router receives cluster member events
@@ -247,12 +226,10 @@ abstract class AdaptiveLoadBalancingRouterSpec
         val routees = currentRoutees(router3)
         routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
             Set(address(node1)))
-      }
       enterBarrier("after-4")
-    }
 
-    "create routees from cluster.enabled configuration" taggedAs LongRunningTest in {
-      runOn(node1) {
+    "create routees from cluster.enabled configuration" taggedAs LongRunningTest in
+      runOn(node1)
         val router4 =
           system.actorOf(FromConfig.props(Props[Memory]), "router4")
         // it may take some time until router receives cluster member events
@@ -260,8 +237,4 @@ abstract class AdaptiveLoadBalancingRouterSpec
         val routees = currentRoutees(router4)
         routees.map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }.toSet should ===(
             Set(address(node1), address(node2), address(node3)))
-      }
       enterBarrier("after-5")
-    }
-  }
-}

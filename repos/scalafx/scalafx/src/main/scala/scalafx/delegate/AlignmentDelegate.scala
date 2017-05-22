@@ -35,31 +35,27 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.AlignmentDelegate._
 import scalafx.geometry.Pos
 
-object AlignmentDelegate {
+object AlignmentDelegate
 
   /**
     * Types that contains `alignment` property.
     */
-  type Aligned = {
+  type Aligned =
 
     /*
      * The overall alignment of children (or text) within the component's width and height
      */
     def alignmentProperty(): jfxbp.ObjectProperty[jfxg.Pos]
-  }
-}
 
 /**
   * Trait that unifies JavaFX classes that contains properties indicating component's internal alignment,
   * represented by `alignmentProperty` and its respective getter and setters.
   */
-trait AlignmentDelegate[J <: Object with Aligned] extends SFXDelegate[J] {
+trait AlignmentDelegate[J <: Object with Aligned] extends SFXDelegate[J]
 
   /**
     * The overall alignment of children (or text) within the component's width and height.
     */
   def alignment: ObjectProperty[jfxg.Pos] = delegate.alignmentProperty()
-  def alignment_=(v: Pos) {
+  def alignment_=(v: Pos)
     alignment() = v
-  }
-}

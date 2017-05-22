@@ -35,7 +35,7 @@ case class AccessKey(key: String, appid: Int, events: Seq[String])
   * @group Meta Data
   */
 @DeveloperApi
-trait AccessKeys {
+trait AccessKeys
 
   /** Insert a new [[AccessKey]]. If the key field is empty, a key will be
     * generated.
@@ -59,4 +59,3 @@ trait AccessKeys {
 
   /** Default implementation of key generation */
   def generateKey: String = Random.alphanumeric.take(64).mkString
-}

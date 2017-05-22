@@ -10,34 +10,29 @@ import com.sun.jdi.BooleanValue
   */
 class ScalaIfEvaluator(
     condition: Evaluator, ifBranch: Evaluator, elseBranch: Option[Evaluator])
-    extends Evaluator {
+    extends Evaluator
   private var modifier: Modifier = null
 
-  def evaluate(context: EvaluationContextImpl): AnyRef = {
+  def evaluate(context: EvaluationContextImpl): AnyRef =
     var value: AnyRef = condition.evaluate(context)
-    value match {
+    value match
       case v: BooleanValue =>
-        if (v.booleanValue) {
+        if (v.booleanValue)
           value = ifBranch.evaluate(context)
           modifier = ifBranch.getModifier
-        } else {
-          elseBranch match {
+        else
+          elseBranch match
             case Some(branch) =>
               value = branch.evaluate(context)
               modifier = branch.getModifier
               return value
             case None =>
               modifier = null
-          }
-        }
       case _ => throw EvaluateExceptionUtil.BOOLEAN_EXPECTED
-    }
 
     if (elseBranch.isEmpty)
       value = context.getDebugProcess.getVirtualMachineProxy.mirrorOfVoid()
 
     value
-  }
 
   def getModifier: Modifier = modifier
-}

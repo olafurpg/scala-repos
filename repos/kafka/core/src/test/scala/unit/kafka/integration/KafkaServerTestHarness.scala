@@ -32,7 +32,7 @@ import scala.collection.mutable.Buffer
 /**
   * A test harness that brings up some number of broker nodes
   */
-trait KafkaServerTestHarness extends ZooKeeperTestHarness {
+trait KafkaServerTestHarness extends ZooKeeperTestHarness
   var instanceConfigs: Seq[KafkaConfig] = null
   var servers: Buffer[KafkaServer] = null
   var brokerList: String = null
@@ -46,10 +46,9 @@ trait KafkaServerTestHarness extends ZooKeeperTestHarness {
     */
   def generateConfigs(): Seq[KafkaConfig]
 
-  def configs: Seq[KafkaConfig] = {
+  def configs: Seq[KafkaConfig] =
     if (instanceConfigs == null) instanceConfigs = generateConfigs()
     instanceConfigs
-  }
 
   def serverForId(id: Int) = servers.find(s => s.config.brokerId == id)
 
@@ -57,7 +56,7 @@ trait KafkaServerTestHarness extends ZooKeeperTestHarness {
   protected def trustStoreFile: Option[File] = None
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp
     if (configs.size <= 0)
       throw new KafkaException("Must supply at least one server config.")
@@ -76,41 +75,33 @@ trait KafkaServerTestHarness extends ZooKeeperTestHarness {
     // The following method does nothing by default, but
     // if the test case requires setting up a cluster ACL,
     // then it needs to be implemented.
-    setClusterAcl match {
+    setClusterAcl match
       case Some(f) =>
         f()
       case None => // Nothing to do
-    }
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     servers.foreach(_.shutdown())
     servers.foreach(_.config.logDirs.foreach(CoreUtils.rm(_)))
     super.tearDown
-  }
 
   /**
     * Pick a broker at random and kill it if it isn't already dead
     * Return the id of the broker killed
     */
-  def killRandomBroker(): Int = {
+  def killRandomBroker(): Int =
     val index = TestUtils.random.nextInt(servers.length)
-    if (alive(index)) {
+    if (alive(index))
       servers(index).shutdown()
       servers(index).awaitShutdown()
       alive(index) = false
-    }
     index
-  }
 
   /**
     * Restart any dead brokers
     */
-  def restartDeadBrokers() {
-    for (i <- 0 until servers.length if !alive(i)) {
+  def restartDeadBrokers()
+    for (i <- 0 until servers.length if !alive(i))
       servers(i).startup()
       alive(i) = true
-    }
-  }
-}

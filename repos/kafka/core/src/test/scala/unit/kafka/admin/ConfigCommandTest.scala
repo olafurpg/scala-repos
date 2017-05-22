@@ -22,9 +22,9 @@ import org.junit.Test
 import kafka.utils.Logging
 import kafka.zk.ZooKeeperTestHarness
 
-class ConfigCommandTest extends ZooKeeperTestHarness with Logging {
+class ConfigCommandTest extends ZooKeeperTestHarness with Logging
   @Test
-  def testArgumentParse() {
+  def testArgumentParse()
     // Should parse correctly
     var createOpts = new ConfigCommandOptions(
         Array("--zookeeper",
@@ -84,5 +84,3 @@ class ConfigCommandTest extends ZooKeeperTestHarness with Logging {
     val deletedProps = ConfigCommand.parseConfigsToBeDeleted(createOpts)
     assertEquals(1, deletedProps.size)
     assertEquals("a", deletedProps(0))
-  }
-}

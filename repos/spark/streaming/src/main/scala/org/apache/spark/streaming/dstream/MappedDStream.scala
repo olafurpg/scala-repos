@@ -26,13 +26,11 @@ private[streaming] class MappedDStream[T : ClassTag, U : ClassTag](
     parent: DStream[T],
     mapFunc: T => U
 )
-    extends DStream[U](parent.ssc) {
+    extends DStream[U](parent.ssc)
 
   override def dependencies: List[DStream[_]] = List(parent)
 
   override def slideDuration: Duration = parent.slideDuration
 
-  override def compute(validTime: Time): Option[RDD[U]] = {
+  override def compute(validTime: Time): Option[RDD[U]] =
     parent.getOrCompute(validTime).map(_.map[U](mapFunc))
-  }
-}

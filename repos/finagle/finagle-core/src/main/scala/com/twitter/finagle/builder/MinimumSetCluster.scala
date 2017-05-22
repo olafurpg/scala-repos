@@ -16,39 +16,31 @@ class MinimumSetCluster[T](
     supplementary: Cluster[T],
     statsReceiver: StatsReceiver = NullStatsReceiver
 )
-    extends Cluster[T] {
+    extends Cluster[T]
 
   private[this] val censoredAdd = statsReceiver.counter("censored_add")
   private[this] val censoredRem = statsReceiver.counter("censored_rem")
 
-  private[this] val missingGauge = statsReceiver.addGauge("missing") {
+  private[this] val missingGauge = statsReceiver.addGauge("missing")
     (supplementary.snap._1 diff minimum.toSeq).size
-  }
 
-  private[this] val additionalGauge = statsReceiver.addGauge("additional") {
+  private[this] val additionalGauge = statsReceiver.addGauge("additional")
     (minimum.toSeq diff supplementary.snap._1).size
-  }
 
-  def snap: (Seq[T], Future[Spool[Cluster.Change[T]]]) = {
+  def snap: (Seq[T], Future[Spool[Cluster.Change[T]]]) =
     val (supplementaryCluster, supplementaryUpdates) = supplementary.snap
 
     val unionCluster = (minimum ++ Set(supplementaryCluster: _*)).toSeq
 
     val censoredUpdates =
-      supplementaryUpdates flatMap { updates =>
-        updates filter { update =>
+      supplementaryUpdates flatMap  updates =>
+        updates filter  update =>
           val ignore = minimum.contains(update.value)
-          if (ignore) {
-            update match {
+          if (ignore)
+            update match
               case Cluster.Add(_) => censoredAdd.incr()
               case Cluster.Rem(_) => censoredRem.incr()
-            }
-          }
 
           !ignore
-        }
-      }
 
     (unionCluster, censoredUpdates)
-  }
-}

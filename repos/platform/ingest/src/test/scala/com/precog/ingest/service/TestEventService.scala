@@ -62,7 +62,7 @@ import blueeyes.core.service.test.BlueEyesServiceSpecification
 import blueeyes.json._
 
 trait TestEventService
-    extends BlueEyesServiceSpecification with EventService with AkkaDefaults {
+    extends BlueEyesServiceSpecification with EventService with AkkaDefaults
   import EventService._
   import Permission._
 
@@ -95,9 +95,9 @@ trait TestEventService
                    new DateTime,
                    AccountPlan.Free,
                    None,
-                   None) { accountId =>
+                   None)  accountId =>
       apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey)
-  } copoint
+  copoint
 
   private val accountFinder = new TestAccountFinder[Future](
       Map(testAccount.apiKey -> testAccount.accountId),
@@ -120,8 +120,8 @@ trait TestEventService
                    new DateTime,
                    AccountPlan.Free,
                    None,
-                   None) { accountId =>
-      apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey).flatMap {
+                   None)  accountId =>
+      apiKeyManager.newStandardAPIKeyRecord(accountId).map(_.apiKey).flatMap
         expiredAPIKey =>
           apiKeyManager
             .deriveAndAddGrant(None,
@@ -131,20 +131,17 @@ trait TestEventService
                                expiredAPIKey,
                                Some(new DateTime().minusYears(1000)))
             .map(_ => expiredAPIKey)
-    }
-  } copoint
+  copoint
 
   private val stored = scala.collection.mutable.ArrayBuffer.empty[Event]
 
-  def configureEventService(config: Configuration): EventService.State = {
+  def configureEventService(config: Configuration): EventService.State =
     val apiKeyFinder = new DirectAPIKeyFinder(apiKeyManager)
     val permissionsFinder = new PermissionsFinder(
         apiKeyFinder, accountFinder, new Instant(1363327426906L))
-    val eventStore = new EventStore[Future] {
-      def save(action: Event, timeout: Timeout) = M.point {
+    val eventStore = new EventStore[Future]
+      def save(action: Event, timeout: Timeout) = M.point
         stored += action; \/-(PrecogUnit)
-      }
-    }
     val jobManager =
       new InMemoryJobManager[({ type l[+a] = EitherT[Future, String, a] })#l]
     val shardClient =
@@ -166,7 +163,6 @@ trait TestEventService
                       eventStore,
                       jobManager,
                       Stoppable.Noop)
-  }
 
   implicit def jValueToFutureJValue(j: JValue) = Future(j)
 
@@ -177,7 +173,7 @@ trait TestEventService
                sync: Boolean = true,
                batch: Boolean = false)(data: A)(
       implicit bi: A => Future[JValue], t: AsyncHttpTranscoder[A, ByteChunk])
-    : Future[(HttpResponse[JValue], List[Ingest])] = {
+    : Future[(HttpResponse[JValue], List[Ingest])] =
     val svc = client
       .contentType[A](contentType)
       .query("receipt", sync.toString)
@@ -190,15 +186,12 @@ trait TestEventService
     val svcWithQueries = queries.map(svc.queries(_: _*)).getOrElse(svc)
 
     stored.clear()
-    for {
+    for
       response <- svcWithQueries.post[A](path.toString)(data)
       content <- response.content map (a => bi(a) map (Some(_))) getOrElse Future(
           None)
-    } yield {
+    yield
       (
           response.copy(content = content),
           stored.toList collect { case in: Ingest => in }
       )
-    }
-  }
-}

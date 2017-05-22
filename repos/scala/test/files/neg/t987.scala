@@ -4,19 +4,15 @@
 
 class A {}
 
-trait B[T <: B[T]] { self: T =>
-}
+trait B[T <: B[T]]  self: T =>
 
-abstract class C extends A with B[C] {
+abstract class C extends A with B[C]
   protected val data: List[Int]
-}
 
-class E extends D {
+class E extends D
   val data = Nil
-}
 
-class F extends D {
+class F extends D
   val data = Nil
-}
 
 abstract class D extends C with B[D] {}

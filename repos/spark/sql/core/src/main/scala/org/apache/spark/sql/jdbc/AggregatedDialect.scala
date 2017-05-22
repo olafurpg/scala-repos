@@ -27,7 +27,7 @@ import org.apache.spark.sql.types.{DataType, MetadataBuilder}
   * @param dialects List of dialects.
   */
 private class AggregatedDialect(dialects: List[JdbcDialect])
-    extends JdbcDialect {
+    extends JdbcDialect
 
   require(dialects.nonEmpty)
 
@@ -37,11 +37,8 @@ private class AggregatedDialect(dialects: List[JdbcDialect])
   override def getCatalystType(sqlType: Int,
                                typeName: String,
                                size: Int,
-                               md: MetadataBuilder): Option[DataType] = {
+                               md: MetadataBuilder): Option[DataType] =
     dialects.flatMap(_.getCatalystType(sqlType, typeName, size, md)).headOption
-  }
 
-  override def getJDBCType(dt: DataType): Option[JdbcType] = {
+  override def getJDBCType(dt: DataType): Option[JdbcType] =
     dialects.flatMap(_.getJDBCType(dt)).headOption
-  }
-}

@@ -37,16 +37,14 @@ import scalaz.std.list._
 import scalaz.syntax.traverse._
 
 class ArchiveSpecs
-    extends Specification with ArbitraryEventMessage with ScalaCheck {
+    extends Specification with ArbitraryEventMessage with ScalaCheck
   implicit val arbArchive = Arbitrary(genRandomArchive)
-  "serialization of an archive" should {
-    "read back the data that was written" in check { in: Archive =>
-      in.serialize.validated[Archive] must beLike {
+  "serialization of an archive" should
+    "read back the data that was written" in check  in: Archive =>
+      in.serialize.validated[Archive] must beLike
         case Success(out) => in must_== out
-      }
-    }
 
-    "read legacy archives" in {
+    "read legacy archives" in
       val Success(JArray(input)) =
         JParser.parseFromString("""[
 {"path":"/test/test/php/query/T10170960455069fb56d061c690884208/","tokenId":"test1"},
@@ -60,16 +58,14 @@ class ArchiveSpecs
 {"path":"/test/foo/","tokenId":"test4"}
 ]""")
 
-      val results = input.map(_.validated[Archive]).collect {
+      val results = input.map(_.validated[Archive]).collect
         case Success(result) => result
-      }
 
       results.size mustEqual 9
       results.map(_.apiKey).toSet mustEqual Set(
           "test1", "test2", "test3", "test4")
-    }
 
-    "read new archives" in {
+    "read new archives" in
       val Success(JArray(input)) =
         JParser.parseFromString("""[
 {"apiKey":"test1","path":"/foo1/test/js/delete/"},
@@ -79,15 +75,13 @@ class ArchiveSpecs
 {"apiKey":"test2","path":"/foo2/testing/"}
 ]""")
 
-      val results = input.map(_.validated[Archive]).collect {
+      val results = input.map(_.validated[Archive]).collect
         case Success(result) => result
-      }
 
       results.size mustEqual 5
       results.map(_.apiKey).toSet mustEqual Set("test1", "test2")
-    }
 
-    "read archives with reversed fields" in {
+    "read archives with reversed fields" in
       val Success(JArray(input)) =
         JParser.parseFromString("""[
 {"path":"test1","apiKey":"/foo1/test/js/delete/"},
@@ -97,13 +91,9 @@ class ArchiveSpecs
 {"path":"test2","apiKey":"/foo2/testing/"}
 ]""")
 
-      val results = input.map(_.validated[Archive]).collect {
+      val results = input.map(_.validated[Archive]).collect
         case Success(result) => result
-      }
 
       results.size mustEqual 5
       results.map(_.apiKey).toSet mustEqual Set("test1", "test2")
-    }
-  }
-}
 // vim: set ts=4 sw=4 et:

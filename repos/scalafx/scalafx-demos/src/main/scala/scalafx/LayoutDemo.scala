@@ -37,42 +37,31 @@ import scalafx.scene.paint.Color
 import scalafx.scene.shape.Circle
 import scalafx.scene.text.{Font, Text}
 
-object LayoutDemo extends JFXApp {
-  val hello = new Accordion {
+object LayoutDemo extends JFXApp
+  val hello = new Accordion
     panes = List(
-        new TitledPane {
+        new TitledPane
           content = new Label { text = "Hello" }
-        }
     )
-  }
 
-  val hbox1 = new HBox {
+  val hbox1 = new HBox
     children = List(hello, new Label { text = "Goodbye" })
-  }
-  val hbox2 = new HBox {
+  val hbox2 = new HBox
     children = List(new Circle { radius = 20 }, new Label { text = "Strange" })
-  }
 
-  val charm = new Text("charm") {
+  val charm = new Text("charm")
     font = new Font(24); alignmentInParent = Pos.BaselineLeft;
     textOrigin = VPos.Baseline
-  }
-  val strange = new Text("strange") {
+  val strange = new Text("strange")
     font = new Font(12); alignmentInParent = Pos.BaselineLeft;
     textOrigin = VPos.Baseline
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     width = 1024
     height = 768
-    scene = new Scene {
-      content = new ScrollPane {
-        content = new HBox {
+    scene = new Scene
+      content = new ScrollPane
+        content = new HBox
           alignmentInParent = Pos.BaselineLeft
           fill = Color.Blue
           children = List(charm, strange)
-        }
-      }
-    }
-  }
-}

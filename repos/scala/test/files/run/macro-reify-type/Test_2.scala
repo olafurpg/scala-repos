@@ -1,6 +1,6 @@
 import StaticReflect._
 
-object Test extends App {
+object Test extends App
   //println(method[List[Int]]("distinct"))
   println(method[List[Int]]("map"))
   //val $u: scala.reflect.runtime.universe.type = scala.reflect.runtime.universe;
@@ -18,4 +18,3 @@ object Test extends App {
   //  PolyType(List(symdef$B2, symdef$That2), MethodType(List(symdef$f2), MethodType(List(symdef$bf2), TypeRef(NoPrefix, symdef$That2, List()))))
   //}
   //println(tpe)
-}

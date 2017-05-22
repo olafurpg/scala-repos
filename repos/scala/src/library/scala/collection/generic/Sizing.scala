@@ -12,6 +12,5 @@ package generic
 
 /** A trait for objects which have a size.
   */
-trait Sizing {
+trait Sizing
   def size: Int
-}

@@ -11,8 +11,7 @@ package akka.remote.security.provider
   *
   * INTERNAL API
   */
-private[provider] object SeedSize {
+private[provider] object SeedSize
   val Seed128 = 16
   val Seed192 = 24
   val Seed256 = 32
-}

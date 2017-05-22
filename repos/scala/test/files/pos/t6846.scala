@@ -1,12 +1,11 @@
-object Test {
+object Test
   class Arb[_]
   implicit def foo[M[_], A]: Arb[M[A]] = null
   foo: Arb[List[Int]]
   type ListInt = List[Int]
   foo: Arb[ListInt]
-}
 
-object Test2 {
+object Test2
   import scala.collection.immutable.List
 
   class Carb[_]
@@ -26,4 +25,3 @@ object Test2 {
   bar: Carb[ListInt]
   bar: Carb[ListSingletonX]
   bar: Carb[ListSingletonY]
-}

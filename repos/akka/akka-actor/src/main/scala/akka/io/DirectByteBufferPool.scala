@@ -5,10 +5,9 @@ package akka.io
 
 import java.nio.ByteBuffer
 
-trait BufferPool {
+trait BufferPool
   def acquire(): ByteBuffer
   def release(buf: ByteBuffer)
-}
 
 /**
   * INTERNAL API
@@ -25,7 +24,7 @@ trait BufferPool {
   */
 private[akka] class DirectByteBufferPool(
     defaultBufferSize: Int, maxPoolEntries: Int)
-    extends BufferPool {
+    extends BufferPool
   private[this] val pool: Array[ByteBuffer] =
     new Array[ByteBuffer](maxPoolEntries)
   private[this] var buffersInPool: Int = 0
@@ -39,27 +38,22 @@ private[akka] class DirectByteBufferPool(
   private def allocate(size: Int): ByteBuffer =
     ByteBuffer.allocateDirect(size)
 
-  private final def takeBufferFromPool(): ByteBuffer = {
-    val buffer = pool.synchronized {
-      if (buffersInPool > 0) {
+  private final def takeBufferFromPool(): ByteBuffer =
+    val buffer = pool.synchronized
+      if (buffersInPool > 0)
         buffersInPool -= 1
         pool(buffersInPool)
-      } else null
-    }
+      else null
 
     // allocate new and clear outside the lock
     if (buffer == null) allocate(defaultBufferSize)
-    else {
+    else
       buffer.clear()
       buffer
-    }
-  }
 
   private final def offerBufferToPool(buf: ByteBuffer): Unit =
-    pool.synchronized {
-      if (buffersInPool < maxPoolEntries) {
+    pool.synchronized
+      if (buffersInPool < maxPoolEntries)
         pool(buffersInPool) = buf
         buffersInPool += 1
-      } // else let the buffer be gc'd
-    }
-}
+      // else let the buffer be gc'd

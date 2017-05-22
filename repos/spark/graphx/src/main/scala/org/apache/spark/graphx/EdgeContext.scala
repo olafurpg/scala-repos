@@ -21,7 +21,7 @@ package org.apache.spark.graphx
   * Represents an edge along with its neighboring vertices and allows sending messages along the
   * edge. Used in [[Graph#aggregateMessages]].
   */
-abstract class EdgeContext[VD, ED, A] {
+abstract class EdgeContext[VD, ED, A]
 
   /** The vertex id of the edge's source vertex. */
   def srcId: VertexId
@@ -45,7 +45,7 @@ abstract class EdgeContext[VD, ED, A] {
   def sendToDst(msg: A): Unit
 
   /** Converts the edge and vertex properties into an [[EdgeTriplet]] for convenience. */
-  def toEdgeTriplet: EdgeTriplet[VD, ED] = {
+  def toEdgeTriplet: EdgeTriplet[VD, ED] =
     val et = new EdgeTriplet[VD, ED]
     et.srcId = srcId
     et.srcAttr = srcAttr
@@ -53,10 +53,8 @@ abstract class EdgeContext[VD, ED, A] {
     et.dstAttr = dstAttr
     et.attr = attr
     et
-  }
-}
 
-object EdgeContext {
+object EdgeContext
 
   /**
     * Extractor mainly used for Graph#aggregateMessages*.
@@ -71,4 +69,3 @@ object EdgeContext {
   def unapply[VD, ED, A](
       edge: EdgeContext[VD, ED, A]): Some[(VertexId, VertexId, VD, VD, ED)] =
     Some(edge.srcId, edge.dstId, edge.srcAttr, edge.dstAttr, edge.attr)
-}

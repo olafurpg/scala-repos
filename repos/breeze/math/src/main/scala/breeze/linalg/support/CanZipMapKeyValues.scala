@@ -46,18 +46,17 @@ trait CanZipMapKeyValues[From,
                          @spec(Int) K,
                          @spec(Double, Int, Float, Long) V,
                          @spec(Double, Int, Float, Long) RV,
-                         +To] {
+                         +To]
 
   /** Maps all corresponding values from the two collections. */
   def map(from: From, from2: From, fn: (K, V, V) => RV): To
 
   def mapActive(from: From, from2: From, fn: (K, V, V) => RV): To
-}
 
-object CanZipMapKeyValues {
+object CanZipMapKeyValues
 
   def canZipMapSelf[S]: CanZipMapKeyValues[S, Unit, S, S, S] =
-    new CanZipMapKeyValues[S, Unit, S, S, S] {
+    new CanZipMapKeyValues[S, Unit, S, S, S]
 
       /** Maps all corresponding values from the two collections. */
       /** Maps all corresponding values from the two collections. */
@@ -66,7 +65,6 @@ object CanZipMapKeyValues {
 
       override def mapActive(from: S, from2: S, fn: (Unit, S, S) => S): S =
         fn((), from, from2)
-    }
 
   //
   // Arrays
@@ -74,23 +72,19 @@ object CanZipMapKeyValues {
 
   class OpArray[@spec(Double, Int, Float, Long) V,
                 @spec(Double, Int, Float, Long) RV : ClassTag]
-      extends CanZipMapKeyValues[Array[V], Int, V, RV, Array[RV]] {
+      extends CanZipMapKeyValues[Array[V], Int, V, RV, Array[RV]]
 
     /**Maps all values from the given collection. */
-    def map(from: Array[V], from2: Array[V], fn: (Int, V, V) => RV) = {
+    def map(from: Array[V], from2: Array[V], fn: (Int, V, V) => RV) =
       require(from.length == from2.length, "Array lengths don't match!")
       val arr = new Array[RV](from.length)
-      for (i <- 0 until from.length) {
+      for (i <- 0 until from.length)
         arr(i) = fn(i, from(i), from2(i))
-      }
       arr
-    }
 
     override def mapActive(
-        from: Array[V], from2: Array[V], fn: (Int, V, V) => RV): Array[RV] = {
+        from: Array[V], from2: Array[V], fn: (Int, V, V) => RV): Array[RV] =
       map(from, from2, fn)
-    }
-  }
 
   // <editor-fold defaultstate="collapsed" desc=" implicit CanZipMapValues[V, RV] implementations ">
 
@@ -117,4 +111,3 @@ object CanZipMapKeyValues {
   implicit object OpArrayFD extends OpArray[Float, Double]
 
   // </editor-fold>
-}

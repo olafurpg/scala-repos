@@ -15,7 +15,7 @@ import slick.basic.{DatabaseConfig, StaticDatabaseConfig}
 /** A simple example that uses plain SQL queries against an in-memory
   * H2 database. The example data comes from Oracle's JDBC tutorial at
   * http://docs.oracle.com/javase/tutorial/jdbc/basics/tables.html. */
-object PlainSQL extends App {
+object PlainSQL extends App
   var out = new ArrayBuffer[String]()
   def println(s: String): Unit = out += s
 
@@ -44,8 +44,8 @@ object PlainSQL extends App {
   //#getresult
 
   val db = Database.forConfig("h2mem1")
-  try {
-    val f: Future[_] = {
+  try
+    val f: Future[_] =
 
       val a: DBIO[Unit] = DBIO.seq(
           createSuppliers,
@@ -54,20 +54,18 @@ object PlainSQL extends App {
           insertCoffees,
           printAll,
           printParameterized,
-          coffeeByName("Colombian").map { s =>
+          coffeeByName("Colombian").map  s =>
             println(s"Coffee Colombian: $s")
-          },
-          deleteCoffee("Colombian").map { rows =>
+          ,
+          deleteCoffee("Colombian").map  rows =>
             println(s"Deleted $rows rows")
-          },
-          coffeeByName("Colombian").map { s =>
+          ,
+          coffeeByName("Colombian").map  s =>
             println(s"Coffee Colombian: $s")
-          }
       )
       db.run(a)
-    }
     Await.result(f, Duration.Inf)
-  } finally db.close
+  finally db.close
 
   out.foreach(Console.out.println)
 
@@ -98,7 +96,7 @@ object PlainSQL extends App {
   )
   //#sqlu
 
-  def insertCoffees: DBIO[Unit] = {
+  def insertCoffees: DBIO[Unit] =
     //#bind
     def insert(c: Coffee): DBIO[Int] =
       sqlu"insert into coffees values (${c.name}, ${c.supID}, ${c.price}, ${c.sales}, ${c.total})"
@@ -118,47 +116,40 @@ object PlainSQL extends App {
     val combined: DBIO[Seq[Int]] = DBIO.sequence(inserts)
     combined.map(_.sum)
     //#sequence
-  }
 
   def printAll: DBIO[Unit] =
     // Iterate through all coffees and output them
-    sql"select * from coffees".as[Coffee].map { cs =>
+    sql"select * from coffees".as[Coffee].map  cs =>
       println("Coffees:")
       for (c <- cs) println("* " + c.name + "\t" + c.supID + "\t" + c.price +
           "\t" + c.sales + "\t" + c.total)
-    }
 
-  def namesByPrice(price: Double): DBIO[Seq[(String, String)]] = {
+  def namesByPrice(price: Double): DBIO[Seq[(String, String)]] =
     //#sql
     sql"""select c.name, s.name
           from coffees c, suppliers s
           where c.price < $price and s.id = c.sup_id""".as[(String, String)]
     //#sql
-  }
 
   def supplierById(id: Int): DBIO[Seq[Supplier]] =
     sql"select * from suppliers where id = $id".as[Supplier]
 
-  def printParameterized: DBIO[Unit] = {
+  def printParameterized: DBIO[Unit] =
     // Perform a join to retrieve coffee names and supplier names for
     // all coffees costing less than $9.00
-    namesByPrice(9.0).flatMap { l2 =>
+    namesByPrice(9.0).flatMap  l2 =>
       println("Parameterized StaticQuery:")
       for (t <- l2) println("* " + t._1 + " supplied by " + t._2)
       supplierById(49).map(s => println(s"Supplier #49: $s"))
-    }
-  }
 
-  def coffeeByName(name: String): DBIO[Option[Coffee]] = {
+  def coffeeByName(name: String): DBIO[Option[Coffee]] =
     //#literal
     val table = "coffees"
     sql"select * from #$table where name = $name".as[Coffee].headOption
     //#literal
-  }
 
   def deleteCoffee(name: String): DBIO[Int] =
     sqlu"delete from coffees where name = $name"
-}
 
 /* Can't test this properly because reference.conf is not on the compiler class path when it
    doesn't come from a JAR:

@@ -1,46 +1,37 @@
 import scala.tools.partest.BytecodeTest
 import scala.collection.JavaConverters._
 
-package p1 {
-  package p2 {
-    object Singleton {
-      object Singleton {
+package p1
+  package p2
+    object Singleton
+      object Singleton
         object Singleton
-      }
-    }
-  }
-}
 
-class A1 {
-  class B1 {
+class A1
+  class B1
     @scala.beans.BeanInfo
     class C1
-  }
-}
 
-class A2 {
-  class B2 {
+class A2
+  class B2
     class C2
-  }
   def f: B2#C2 = null
-}
 
-object Test extends BytecodeTest {
+object Test extends BytecodeTest
   import p1.p2._
 
   def nested(c: Class[_]) = s" ${c.getName}: ${c.getDeclaredClasses.toList}"
 
   def nprintln(s: String) = println("\n" + s)
-  def printInner(cname: String): Unit = {
+  def printInner(cname: String): Unit =
     val cnode = loadClassNode(cname)
     println(
         cnode.innerClasses.asScala.toList
           .map(i =>
                 s"className[${i.name}] outerClassName[${i.outerName}] innerName[${i.innerName}] access[${i.access}]")
           .mkString(" ", "\n ", ""))
-  }
 
-  def show() {
+  def show()
 
     println("getClass on module gives module class")
     println(" " + Singleton.Singleton.getClass)
@@ -87,5 +78,3 @@ object Test extends BytecodeTest {
     printInner("A2$B2")
     println("C2")
     printInner("A2$B2$C2")
-  }
-}

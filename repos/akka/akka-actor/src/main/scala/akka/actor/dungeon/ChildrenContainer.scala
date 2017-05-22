@@ -11,7 +11,7 @@ import akka.util.Collections.{EmptyImmutableSeq, PartialImmutableValuesIterable}
 /**
   * INTERNAL API
   */
-private[akka] trait ChildrenContainer {
+private[akka] trait ChildrenContainer
 
   def add(name: String, stats: ChildRestartStats): ChildrenContainer
   def remove(child: ActorRef): ChildrenContainer
@@ -31,7 +31,6 @@ private[akka] trait ChildrenContainer {
 
   def isTerminating: Boolean = false
   def isNormal: Boolean = true
-}
 
 /**
   * INTERNAL API
@@ -39,7 +38,7 @@ private[akka] trait ChildrenContainer {
   * This object holds the classes performing the logic of managing the children
   * of an actor, hence they are intimately tied to ActorCell.
   */
-private[akka] object ChildrenContainer {
+private[akka] object ChildrenContainer
 
   sealed trait SuspendReason
   case object UserRequest extends SuspendReason
@@ -50,25 +49,23 @@ private[akka] object ChildrenContainer {
   case object Termination extends SuspendReason
 
   class ChildRestartsIterable(stats: immutable.MapLike[_, ChildStats, _])
-      extends PartialImmutableValuesIterable[ChildStats, ChildRestartStats] {
+      extends PartialImmutableValuesIterable[ChildStats, ChildRestartStats]
     override final def apply(c: ChildStats) = c.asInstanceOf[ChildRestartStats]
     override final def isDefinedAt(c: ChildStats) =
       c.isInstanceOf[ChildRestartStats]
     override final def valuesIterator = stats.valuesIterator
-  }
 
   class ChildrenIterable(stats: immutable.MapLike[_, ChildStats, _])
-      extends PartialImmutableValuesIterable[ChildStats, ActorRef] {
+      extends PartialImmutableValuesIterable[ChildStats, ActorRef]
     override final def apply(c: ChildStats) =
       c.asInstanceOf[ChildRestartStats].child
     override final def isDefinedAt(c: ChildStats) =
       c.isInstanceOf[ChildRestartStats]
     override final def valuesIterator = stats.valuesIterator
-  }
 
   trait WaitingForChildren
 
-  trait EmptyChildrenContainer extends ChildrenContainer {
+  trait EmptyChildrenContainer extends ChildrenContainer
     val emptyStats = immutable.TreeMap.empty[String, ChildStats]
     override def add(
         name: String, stats: ChildRestartStats): ChildrenContainer =
@@ -83,21 +80,19 @@ private[akka] object ChildrenContainer {
     override def reserve(name: String): ChildrenContainer =
       new NormalChildrenContainer(emptyStats.updated(name, ChildNameReserved))
     override def unreserve(name: String): ChildrenContainer = this
-  }
 
   /**
     * This is the empty container, shared among all leaf actors.
     */
-  object EmptyChildrenContainer extends EmptyChildrenContainer {
+  object EmptyChildrenContainer extends EmptyChildrenContainer
     override def toString = "no children"
-  }
 
   /**
     * This is the empty container which is installed after the last child has
     * terminated while stopping; it is necessary to distinguish from the normal
     * empty state while calling handleChildTerminated() for the last time.
     */
-  object TerminatedChildrenContainer extends EmptyChildrenContainer {
+  object TerminatedChildrenContainer extends EmptyChildrenContainer
     override def add(
         name: String, stats: ChildRestartStats): ChildrenContainer = this
     override def reserve(name: String): ChildrenContainer =
@@ -106,7 +101,6 @@ private[akka] object ChildrenContainer {
     override def isTerminating: Boolean = true
     override def isNormal: Boolean = false
     override def toString = "terminated"
-  }
 
   /**
     * Normal children container: we do have at least one child, but none of our
@@ -115,7 +109,7 @@ private[akka] object ChildrenContainer {
     * message).
     */
   class NormalChildrenContainer(val c: immutable.TreeMap[String, ChildStats])
-      extends ChildrenContainer {
+      extends ChildrenContainer
 
     override def add(
         name: String, stats: ChildRestartStats): ChildrenContainer =
@@ -127,11 +121,10 @@ private[akka] object ChildrenContainer {
     override def getByName(name: String): Option[ChildStats] = c.get(name)
 
     override def getByRef(actor: ActorRef): Option[ChildRestartStats] =
-      c.get(actor.path.name) match {
+      c.get(actor.path.name) match
         case c @ Some(crs: ChildRestartStats) if (crs.child == actor) ⇒
           c.asInstanceOf[Option[ChildRestartStats]]
         case _ ⇒ None
-      }
 
     override def children: immutable.Iterable[ActorRef] =
       if (c.isEmpty) EmptyImmutableSeq else new ChildrenIterable(c)
@@ -149,21 +142,18 @@ private[akka] object ChildrenContainer {
       else new NormalChildrenContainer(c.updated(name, ChildNameReserved))
 
     override def unreserve(name: String): ChildrenContainer =
-      c.get(name) match {
+      c.get(name) match
         case Some(ChildNameReserved) ⇒ NormalChildrenContainer(c - name)
         case _ ⇒ this
-      }
 
     override def toString =
       if (c.size > 20) c.size + " children"
       else c.mkString("children:\n    ", "\n    ", "")
-  }
 
-  object NormalChildrenContainer {
+  object NormalChildrenContainer
     def apply(c: immutable.TreeMap[String, ChildStats]): ChildrenContainer =
       if (c.isEmpty) EmptyChildrenContainer
       else new NormalChildrenContainer(c)
-  }
 
   /**
     * Waiting state: there are outstanding termination requests (i.e. context.stop(child)
@@ -179,29 +169,27 @@ private[akka] object ChildrenContainer {
       c: immutable.TreeMap[String, ChildStats],
       toDie: Set[ActorRef],
       reason: SuspendReason)
-      extends ChildrenContainer {
+      extends ChildrenContainer
 
     override def add(
         name: String, stats: ChildRestartStats): ChildrenContainer =
       copy(c.updated(name, stats))
 
-    override def remove(child: ActorRef): ChildrenContainer = {
+    override def remove(child: ActorRef): ChildrenContainer =
       val t = toDie - child
       if (t.isEmpty)
-        reason match {
+        reason match
           case Termination ⇒ TerminatedChildrenContainer
           case _ ⇒ NormalChildrenContainer(c - child.path.name)
-        } else copy(c - child.path.name, t)
-    }
+        else copy(c - child.path.name, t)
 
     override def getByName(name: String): Option[ChildStats] = c.get(name)
 
     override def getByRef(actor: ActorRef): Option[ChildRestartStats] =
-      c.get(actor.path.name) match {
+      c.get(actor.path.name) match
         case c @ Some(crs: ChildRestartStats) if (crs.child == actor) ⇒
           c.asInstanceOf[Option[ChildRestartStats]]
         case _ ⇒ None
-      }
 
     override def children: immutable.Iterable[ActorRef] =
       if (c.isEmpty) EmptyImmutableSeq else new ChildrenIterable(c)
@@ -212,7 +200,7 @@ private[akka] object ChildrenContainer {
     override def shallDie(actor: ActorRef): ChildrenContainer =
       copy(toDie = toDie + actor)
 
-    override def reserve(name: String): ChildrenContainer = reason match {
+    override def reserve(name: String): ChildrenContainer = reason match
       case Termination ⇒
         throw new IllegalStateException(
             "cannot reserve actor name '" + name + "': terminating")
@@ -221,13 +209,11 @@ private[akka] object ChildrenContainer {
           throw new InvalidActorNameException(
               s"actor name [$name] is not unique!")
         else copy(c = c.updated(name, ChildNameReserved))
-    }
 
     override def unreserve(name: String): ChildrenContainer =
-      c.get(name) match {
+      c.get(name) match
         case Some(ChildNameReserved) ⇒ copy(c = c - name)
         case _ ⇒ this
-      }
 
     override def isTerminating: Boolean = reason == Termination
     override def isNormal: Boolean = reason == UserRequest
@@ -238,5 +224,3 @@ private[akka] object ChildrenContainer {
         c.mkString("children (" + toDie.size + " terminating):\n    ",
                    "\n    ",
                    "\n") + toDie
-  }
-}

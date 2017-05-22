@@ -25,7 +25,7 @@ import scala.concurrent.Await
  */
 @State(Scope.Benchmark)
 @BenchmarkMode(Array(Mode.Throughput))
-class PersistentActorDeferBenchmark {
+class PersistentActorDeferBenchmark
 
   val config = PersistenceSpec.config("leveldb", "benchmark")
 
@@ -44,7 +44,7 @@ class PersistentActorDeferBenchmark {
   val data10k = (1 to 10000).toArray
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     system = ActorSystem("test", config)
 
     probe = TestProbe()(system)
@@ -55,63 +55,48 @@ class PersistentActorDeferBenchmark {
     persistAsync_defer_replyASAP = system.actorOf(
         Props(classOf[`persistAsync, defer, respond ASAP`], data10k.last),
         "a-2")
-  }
 
   @TearDown
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     system.terminate()
     Await.ready(system.whenTerminated, 15.seconds)
 
     storageLocations.foreach(FileUtils.deleteDirectory)
-  }
 
   @Benchmark
   @OperationsPerInvocation(10000)
-  def tell_persistAsync_defer_persistAsync_reply(): Unit = {
+  def tell_persistAsync_defer_persistAsync_reply(): Unit =
     for (i <- data10k) persistAsync_defer.tell(i, probe.ref)
 
     probe.expectMsg(data10k.last)
-  }
 
   @Benchmark
   @OperationsPerInvocation(10000)
-  def tell_persistAsync_defer_persistAsync_replyASAP(): Unit = {
+  def tell_persistAsync_defer_persistAsync_replyASAP(): Unit =
     for (i <- data10k) persistAsync_defer_replyASAP.tell(i, probe.ref)
 
     probe.expectMsg(data10k.last)
-  }
-}
 
-class `persistAsync, defer`(respondAfter: Int) extends PersistentActor {
+class `persistAsync, defer`(respondAfter: Int) extends PersistentActor
 
   override def persistenceId: String = self.path.name
 
-  override def receiveCommand = {
+  override def receiveCommand =
     case n: Int =>
-      persistAsync(Evt(n)) { e =>
-      }
-      deferAsync(Evt(n)) { e =>
+      persistAsync(Evt(n))  e =>
+      deferAsync(Evt(n))  e =>
         if (e.i == respondAfter) sender() ! e.i
-      }
-  }
-  override def receiveRecover = {
+  override def receiveRecover =
     case _ => // do nothing
-  }
-}
 class `persistAsync, defer, respond ASAP`(respondAfter: Int)
-    extends PersistentActor {
+    extends PersistentActor
 
   override def persistenceId: String = self.path.name
 
-  override def receiveCommand = {
+  override def receiveCommand =
     case n: Int =>
-      persistAsync(Evt(n)) { e =>
-      }
-      deferAsync(Evt(n)) { e =>
-      }
+      persistAsync(Evt(n))  e =>
+      deferAsync(Evt(n))  e =>
       if (n == respondAfter) sender() ! n
-  }
-  override def receiveRecover = {
+  override def receiveRecover =
     case _ => // do nothing
-  }
-}

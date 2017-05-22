@@ -27,7 +27,7 @@ import org.apache.spark.ml.param._
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.sql.DataFrame
 
-trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
+trait DefaultReadWriteTest extends TempDirectory  self: Suite =>
 
   /**
     * Checks "overwrite" option and params.
@@ -40,7 +40,7 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
     * @return  Instance loaded from file
     */
   def testDefaultReadWrite[T <: Params with MLWritable](
-      instance: T, testParams: Boolean = true): T = {
+      instance: T, testParams: Boolean = true): T =
     val uid = instance.uid
     val subdirName = Identifiable.randomUID("test")
 
@@ -48,9 +48,8 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
     val path = new File(subdir, uid).getPath
 
     instance.save(path)
-    intercept[IOException] {
+    intercept[IOException]
       instance.save(path)
-    }
     instance.write.overwrite().save(path)
     val loader = instance.getClass
       .getMethod("read")
@@ -59,29 +58,24 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
     val newInstance = loader.load(path)
 
     assert(newInstance.uid === instance.uid)
-    if (testParams) {
-      instance.params.foreach { p =>
-        if (instance.isDefined(p)) {
-          (instance.getOrDefault(p), newInstance.getOrDefault(p)) match {
+    if (testParams)
+      instance.params.foreach  p =>
+        if (instance.isDefined(p))
+          (instance.getOrDefault(p), newInstance.getOrDefault(p)) match
             case (Array(values), Array(newValues)) =>
               assert(values === newValues,
                      s"Values do not match on param ${p.name}.")
             case (value, newValue) =>
               assert(value === newValue,
                      s"Values do not match on param ${p.name}.")
-          }
-        } else {
+        else
           assert(!newInstance.isDefined(p),
                  s"Param ${p.name} shouldn't be defined.")
-        }
-      }
-    }
 
     val load = instance.getClass.getMethod("load", classOf[String])
     val another = load.invoke(instance, path).asInstanceOf[T]
     assert(another.uid === instance.uid)
     another
-  }
 
   /**
     * Default test for Estimator, Model pairs:
@@ -105,35 +99,30 @@ trait DefaultReadWriteTest extends TempDirectory { self: Suite =>
       estimator: E,
       dataset: DataFrame,
       testParams: Map[String, Any],
-      checkModelData: (M, M) => Unit): Unit = {
+      checkModelData: (M, M) => Unit): Unit =
     // Set some Params to make sure set Params are serialized.
-    testParams.foreach {
+    testParams.foreach
       case (p, v) =>
         estimator.set(estimator.getParam(p), v)
-    }
     val model = estimator.fit(dataset)
 
     // Test Estimator save/load
     val estimator2 = testDefaultReadWrite(estimator)
-    testParams.foreach {
+    testParams.foreach
       case (p, v) =>
         val param = estimator.getParam(p)
         assert(estimator.get(param).get === estimator2.get(param).get)
-    }
 
     // Test Model save/load
     val model2 = testDefaultReadWrite(model)
-    testParams.foreach {
+    testParams.foreach
       case (p, v) =>
         val param = model.getParam(p)
         assert(model.get(param).get === model2.get(param).get)
-    }
 
     checkModelData(model, model2)
-  }
-}
 
-class MyParams(override val uid: String) extends Params with MLWritable {
+class MyParams(override val uid: String) extends Params with MLWritable
 
   final val intParamWithDefault: IntParam = new IntParam(
       this, "intParamWithDefault", "doc")
@@ -164,21 +153,17 @@ class MyParams(override val uid: String) extends Params with MLWritable {
   override def copy(extra: ParamMap): Params = defaultCopy(extra)
 
   override def write: MLWriter = new DefaultParamsWriter(this)
-}
 
-object MyParams extends MLReadable[MyParams] {
+object MyParams extends MLReadable[MyParams]
 
   override def read: MLReader[MyParams] = new DefaultParamsReader[MyParams]
 
   override def load(path: String): MyParams = super.load(path)
-}
 
 class DefaultReadWriteSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("default read/write") {
+  test("default read/write")
     val myParams = new MyParams("my_params")
     testDefaultReadWrite(myParams)
-  }
-}

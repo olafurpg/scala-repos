@@ -15,7 +15,7 @@ import scala.reflect.internal.util.StringOps.countElementsAsString
   *
   * TODO: make reporting configurable
   */
-trait Reporting extends scala.reflect.internal.Reporting {
+trait Reporting extends scala.reflect.internal.Reporting
   self: ast.Positions with CompilationUnits with scala.reflect.internal.Symbols =>
   def settings: Settings
 
@@ -25,20 +25,19 @@ trait Reporting extends scala.reflect.internal.Reporting {
 
   // a new instance of this class is created for every Run (access the current instance via `currentRun.reporting`)
   protected def PerRunReporting = new PerRunReporting
-  class PerRunReporting extends PerRunReportingBase {
+  class PerRunReporting extends PerRunReportingBase
 
     /** Collects for certain classes of warnings during this run. */
     private class ConditionalWarning(
-        what: String, doReport: () => Boolean, setting: Settings#Setting) {
-      def this(what: String, booleanSetting: Settings#BooleanSetting) {
+        what: String, doReport: () => Boolean, setting: Settings#Setting)
+      def this(what: String, booleanSetting: Settings#BooleanSetting)
         this(what, () => booleanSetting, booleanSetting)
-      }
       val warnings = mutable.LinkedHashMap[Position, String]()
       def warn(pos: Position, msg: String) =
         if (doReport()) reporter.warning(pos, msg)
         else if (!(warnings contains pos)) warnings += ((pos, msg))
       def summarize() =
-        if (warnings.nonEmpty && (setting.isDefault || doReport())) {
+        if (warnings.nonEmpty && (setting.isDefault || doReport()))
           val numWarnings = warnings.size
           val warningVerb = if (numWarnings == 1) "was" else "were"
           val warningCount = countElementsAsString(
@@ -47,8 +46,6 @@ trait Reporting extends scala.reflect.internal.Reporting {
           reporter.warning(
               NoPosition,
               s"there $warningVerb $warningCount; re-run with ${setting.name} for details")
-        }
-    }
 
     // This change broke sbt; I gave it the thrilling name of uncheckedWarnings0 so
     // as to recover uncheckedWarnings for its ever-fragile compiler interface.
@@ -87,14 +84,12 @@ trait Reporting extends scala.reflect.internal.Reporting {
     // behold! the symbol that caused the deprecation warning (may not be deprecated itself)
     def deprecationWarning(pos: Position, sym: Symbol, msg: String): Unit =
       _deprecationWarnings.warn(pos, msg)
-    def deprecationWarning(pos: Position, sym: Symbol): Unit = {
-      val suffix = sym.deprecationMessage match {
+    def deprecationWarning(pos: Position, sym: Symbol): Unit =
+      val suffix = sym.deprecationMessage match
         case Some(msg) => ": " + msg
         case _ => ""
-      }
       deprecationWarning(
           pos, sym, s"$sym${sym.locationString} is deprecated$suffix")
-    }
 
     private[this] var reportedFeature = Set[Symbol]()
     def featureWarning(pos: Position,
@@ -102,7 +97,7 @@ trait Reporting extends scala.reflect.internal.Reporting {
                        featureDesc: String,
                        featureTrait: Symbol,
                        construct: => String = "",
-                       required: Boolean): Unit = {
+                       required: Boolean): Unit =
       val req = if (required) "needs to" else "should"
       val fqname = "scala.language." + featureName
       val explain = (if (reportedFeature contains featureTrait) "" else s"""|
@@ -117,12 +112,11 @@ trait Reporting extends scala.reflect.internal.Reporting {
         ("#", construct)
       if (required) reporter.error(pos, msg)
       else featureWarning(pos, msg)
-    }
 
     /** Has any macro expansion used a fallback during this run? */
     var seenMacroExpansionsFallingBack = false
 
-    def summarizeErrors(): Unit = if (!reporter.hasErrors) {
+    def summarizeErrors(): Unit = if (!reporter.hasErrors)
       _allConditionalWarnings foreach (_.summarize())
 
       if (seenMacroExpansionsFallingBack)
@@ -136,6 +130,3 @@ trait Reporting extends scala.reflect.internal.Reporting {
       if (settings.fatalWarnings && reporter.hasWarnings)
         reporter.error(
             NoPosition, "No warnings can be incurred under -Xfatal-warnings.")
-    }
-  }
-}

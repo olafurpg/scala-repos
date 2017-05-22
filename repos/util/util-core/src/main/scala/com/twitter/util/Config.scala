@@ -25,26 +25,22 @@ import scala.language.implicitConversions
   * that does not inherit from trait Config.
   */
 @deprecated("use a Plain Old Scala Object", "")
-object Config {
-  sealed trait Required[+A] extends Serializable {
+object Config
+  sealed trait Required[+A] extends Serializable
     def value: A
     def isSpecified: Boolean
     def isEmpty = !isSpecified
-  }
 
-  object Specified {
+  object Specified
     def unapply[A](specified: Specified[A]) = Some(specified.value)
-  }
 
-  class Specified[+A](f: => A) extends Required[A] {
+  class Specified[+A](f: => A) extends Required[A]
     lazy val value = f
     def isSpecified = true
-  }
 
-  case object Unspecified extends Required[scala.Nothing] {
+  case object Unspecified extends Required[scala.Nothing]
     def value = throw new NoSuchElementException
     def isSpecified = false
-  }
 
   class RequiredValuesMissing(names: Seq[String])
       extends Exception(names.mkString(","))
@@ -54,16 +50,14 @@ object Config {
     * can extends Config.Nothing, and still get access to the Required
     * classes and methods.
     */
-  class Nothing extends Config[scala.Nothing] {
+  class Nothing extends Config[scala.Nothing]
     def apply() = throw new UnsupportedOperationException
-  }
 
   implicit def toSpecified[A](value: => A) = new Specified(value)
   implicit def toSpecifiedOption[A](value: => A) = new Specified(Some(value))
   implicit def fromRequired[A](req: Required[A]) = req.value
   implicit def intoOption[A](item: A): Option[A] = Some(item)
   implicit def intoList[A](item: A): List[A] = List(item)
-}
 
 /**
   * A config object contains vars for configuring an object of type T, and an apply() method
@@ -88,7 +82,7 @@ object Config {
   *    var nextLevel = computed { level + 1 }
   */
 @deprecated("use a Plain Old Scala Object", "")
-trait Config[T] extends (() => T) {
+trait Config[T] extends (() => T)
   import Config.{Required, Specified, Unspecified, RequiredValuesMissing}
 
   /**
@@ -125,54 +119,44 @@ trait Config[T] extends (() => T) {
     * of those missing values.  For missing values in child Config objects,
     * the name is the dot-separated path down to that value.
     */
-  def missingValues: Seq[String] = {
+  def missingValues: Seq[String] =
     val alreadyVisited = mutable.Set[AnyRef]()
     val interestingReturnTypes = Seq(
         classOf[Required[_]], classOf[Config[_]], classOf[Option[_]])
     val buf = new mutable.ListBuffer[String]
-    def collect(prefix: String, config: Config[_]) {
-      if (!alreadyVisited.contains(config)) {
+    def collect(prefix: String, config: Config[_])
+      if (!alreadyVisited.contains(config))
         alreadyVisited += config
         val nullaryMethods =
-          config.getClass.getMethods.toSeq filter {
+          config.getClass.getMethods.toSeq filter
             _.getParameterTypes.isEmpty
-          }
-        for (method <- nullaryMethods) {
+        for (method <- nullaryMethods)
           val name = method.getName
           val rt = method.getReturnType
           if (name != "required" && name != "optional" &&
               !name.endsWith("$outer") && // no loops!
-              interestingReturnTypes.exists(_.isAssignableFrom(rt))) {
-            method.invoke(config) match {
+              interestingReturnTypes.exists(_.isAssignableFrom(rt)))
+            method.invoke(config) match
               case Unspecified =>
                 buf += (prefix + name)
               case specified: Specified[_] =>
-                specified match {
+                specified match
                   case Specified(sub: Config[_]) =>
                     collect(prefix + name + ".", sub)
                   case Specified(Some(sub: Config[_])) =>
                     collect(prefix + name + ".", sub)
                   case _ =>
-                }
               case sub: Config[_] =>
                 collect(prefix + name + ".", sub)
               case Some(sub: Config[_]) =>
                 collect(prefix + name + ".", sub)
               case _ =>
-            }
-          }
-        }
-      }
-    }
     collect("", this)
     buf.toList
-  }
 
   /**
     * @throws RequiredValuesMissing if there are any missing values.
     */
-  def validate() {
+  def validate()
     val missing = missingValues
     if (!missing.isEmpty) throw new RequiredValuesMissing(missing)
-  }
-}

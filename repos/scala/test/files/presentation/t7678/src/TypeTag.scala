@@ -1,9 +1,7 @@
 package test
 
-object Test {
+object Test
   import scala.reflect.runtime.{universe => ru}
   def getTypeTag(implicit tag: ru.TypeTag[Int]) = ()
-  locally {
+  locally
     getTypeTag /*?*/
-  }
-}

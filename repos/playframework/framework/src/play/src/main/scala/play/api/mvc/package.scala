@@ -17,16 +17,14 @@ package play.api
   * }
   * }}}
   */
-package object mvc {
+package object mvc
 
   /**
     * Alias types for Sockets
     */
-  object Socket {
+  object Socket
 
     /**
       * A Socket Out
       */
     type Out[A] = play.api.libs.iteratee.Iteratee[A, Unit]
-  }
-}

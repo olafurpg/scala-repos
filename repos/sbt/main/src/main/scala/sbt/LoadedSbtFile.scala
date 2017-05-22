@@ -15,7 +15,7 @@ private[sbt] final class LoadedSbtFile(
     // TODO - we may want to expose a simpler interface on top of here for the set command,
     // rather than what we have now...
     val definitions: DefinedSbtValues,
-    val generatedFiles: Seq[File]) {
+    val generatedFiles: Seq[File])
   // We still use merge for now.  We track originating sbt file in an alternative manner.
   def merge(o: LoadedSbtFile): LoadedSbtFile =
     new LoadedSbtFile(settings ++ o.settings,
@@ -32,32 +32,29 @@ private[sbt] final class LoadedSbtFile(
                       manipulations,
                       definitions,
                       generatedFiles)
-}
 
 /**
   * Represents the `val`/`lazy val` definitions defined within a build.sbt file
   * which we can reference in other settings.
   */
 private[sbt] final class DefinedSbtValues(
-    val sbtFiles: Seq[compiler.EvalDefinitions]) {
+    val sbtFiles: Seq[compiler.EvalDefinitions])
 
   def values(parent: ClassLoader): Seq[Any] =
     sbtFiles flatMap (_ values parent)
 
   def classloader(parent: ClassLoader): ClassLoader =
-    sbtFiles.foldLeft(parent) { (cl, e) =>
+    sbtFiles.foldLeft(parent)  (cl, e) =>
       e.loader(cl)
-    }
 
-  def imports: Seq[String] = {
+  def imports: Seq[String] =
     // TODO - Sanity check duplicates and such, so users get a nice warning rather
     // than explosion.
-    for {
+    for
       file <- sbtFiles
       m = file.enclosingModule
       v <- file.valNames
-    } yield s"import ${m}.${v}"
-  }
+    yield s"import ${m}.${v}"
   def generated: Seq[File] =
     sbtFiles flatMap (_.generated)
 
@@ -72,8 +69,7 @@ private[sbt] final class DefinedSbtValues(
     */
   def zip(other: DefinedSbtValues): DefinedSbtValues =
     new DefinedSbtValues(sbtFiles ++ other.sbtFiles)
-}
-private[sbt] object DefinedSbtValues {
+private[sbt] object DefinedSbtValues
 
   /** Construct a DefinedSbtValues object directly from the underlying representation. */
   def apply(eval: compiler.EvalDefinitions): DefinedSbtValues =
@@ -81,11 +77,9 @@ private[sbt] object DefinedSbtValues {
 
   /** Construct an empty value object. */
   def empty = new DefinedSbtValues(Nil)
-}
 
-private[sbt] object LoadedSbtFile {
+private[sbt] object LoadedSbtFile
 
   /** Represents an empty .sbt file: no Projects, imports, or settings.*/
   def empty =
     new LoadedSbtFile(Nil, Nil, Nil, Nil, DefinedSbtValues.empty, Nil)
-}

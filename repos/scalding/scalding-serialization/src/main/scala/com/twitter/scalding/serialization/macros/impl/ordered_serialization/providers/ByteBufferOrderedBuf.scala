@@ -25,24 +25,23 @@ import CompileTimeLengthTypes._
 import java.nio.ByteBuffer
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object ByteBufferOrderedBuf {
-  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+object ByteBufferOrderedBuf
+  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe if tpe =:= c.universe.typeOf[ByteBuffer] =>
       ByteBufferOrderedBuf(c)(tpe)
-  }
 
-  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
 
     def freshT(id: String) = newTermName(c.fresh(id))
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def hash(element: ctx.TermName): ctx.Tree = q"$element.hashCode"
 
       override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
+          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
         val lenA = freshT("lenA")
         val lenB = freshT("lenB")
         val queryLength = freshT("queryLength")
@@ -66,14 +65,13 @@ object ByteBufferOrderedBuf {
         $state
       }
       """
-      }
       override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         q"""
       $inputStream.writePosVarInt($element.remaining)
       $inputStream.writeBytes($element.array, $element.arrayOffset + $element.position, $element.remaining)
       """
 
-      override def get(inputStream: ctx.TermName): ctx.Tree = {
+      override def get(inputStream: ctx.TermName): ctx.Tree =
         val lenA = freshT("lenA")
         val bytes = freshT("bytes")
         q"""
@@ -82,20 +80,15 @@ object ByteBufferOrderedBuf {
       $inputStream.readFully($bytes)
       _root_.java.nio.ByteBuffer.wrap($bytes)
     """
-      }
       override def compare(
           elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = q"""
         $elementA.compareTo($elementB)
       """
-      override def length(element: Tree): CompileTimeLengthTypes[c.type] = {
+      override def length(element: Tree): CompileTimeLengthTypes[c.type] =
         val tmpLen = freshT("tmpLen")
         FastLengthCalculation(c)(q"""
           val $tmpLen = $element.remaining
           posVarIntSize($tmpLen) + $tmpLen
         """)
-      }
 
       def lazyOuterVariables: Map[String, ctx.Tree] = Map.empty
-    }
-  }
-}

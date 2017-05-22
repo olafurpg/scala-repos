@@ -9,7 +9,7 @@ package scala.man1
   *  @author Lex Spoon
   *  @version 1.0
   */
-object fsc extends Command {
+object fsc extends Command
   import _root_.scala.tools.docutil.ManPage._
 
   protected def cn = new Error().getStackTrace()(0).getClassName()
@@ -112,7 +112,7 @@ object fsc extends Command {
           Bold("scaladoc") & "(1)", "scaladoc.html") & ", " & Link(
           Bold("scalap") & "(1)", "scalap.html"))
 
-  def manpage = new Document {
+  def manpage = new Document
     title = command
     date = "March 2012"
     author = "Lex Spoon"
@@ -129,5 +129,3 @@ object fsc extends Command {
                     bugs,
                     copyright,
                     seeAlso)
-  }
-}

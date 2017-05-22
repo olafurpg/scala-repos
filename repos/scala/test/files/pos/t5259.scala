@@ -1,21 +1,17 @@
 class A[T]
-class B {
+class B
   def m(a: A[this.type] = new A[this.type]) {}
-}
 
-class C {
+class C
   def foo(a: Int, b: Int = 0) = 0
   def foo() = 0
-}
 
-object Test {
+object Test
   def newB = new B
   newB.m()
 
   val stableB = new B
   stableB.m()
 
-  def f {
+  def f
     println((new C).foo(0))
-  }
-}

@@ -29,9 +29,9 @@ import org.apache.spark.rdd.RDD
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object RandomRDDGeneration {
+object RandomRDDGeneration
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val conf = new SparkConf().setAppName(s"RandomRDDGeneration")
     val sc = new SparkContext(conf)
@@ -57,6 +57,4 @@ object RandomRDDGeneration {
     println()
 
     sc.stop()
-  }
-}
 // scalastyle:on println

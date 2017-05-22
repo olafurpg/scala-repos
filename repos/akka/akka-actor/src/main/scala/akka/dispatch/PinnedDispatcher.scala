@@ -24,23 +24,20 @@ class PinnedDispatcher(_configurator: MessageDispatcherConfigurator,
         Int.MaxValue,
         Duration.Zero,
         _threadPoolConfig.copy(corePoolSize = 1, maxPoolSize = 1),
-        _shutdownTimeout) {
+        _shutdownTimeout)
 
   @volatile
   private var owner: ActorCell = _actor
 
   //Relies on an external lock provided by MessageDispatcher.attach
-  protected[akka] override def register(actorCell: ActorCell) = {
+  protected[akka] override def register(actorCell: ActorCell) =
     val actor = owner
     if ((actor ne null) && actorCell != actor)
       throw new IllegalArgumentException(
           "Cannot register to anyone but " + actor)
     owner = actorCell
     super.register(actorCell)
-  }
   //Relies on an external lock provided by MessageDispatcher.detach
-  protected[akka] override def unregister(actor: ActorCell) = {
+  protected[akka] override def unregister(actor: ActorCell) =
     super.unregister(actor)
     owner = null
-  }
-}

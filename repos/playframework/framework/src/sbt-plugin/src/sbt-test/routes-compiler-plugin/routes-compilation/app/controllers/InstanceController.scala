@@ -5,8 +5,6 @@ package controllers
 
 import play.api.mvc._
 
-class InstanceController extends Controller {
-  def index = Action {
+class InstanceController extends Controller
+  def index = Action
     Ok
-  }
-}

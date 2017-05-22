@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
   * @see [[SimpleRetryPolicy]] for a Java friendly API.
   */
 abstract class RetryPolicy[-A]
-    extends (A => Option[(Duration, RetryPolicy[A])]) {
+    extends (A => Option[(Duration, RetryPolicy[A])])
 
   /**
     * Creates a new `RetryPolicy` based on the current `RetryPolicy` in which values of `A`
@@ -36,9 +36,8 @@ abstract class RetryPolicy[-A]
     * in the chain.
     */
   def filter[B <: A](pred: B => Boolean): RetryPolicy[B] =
-    RetryPolicy { e =>
+    RetryPolicy  e =>
       if (!pred(e)) None else this(e)
-    }
 
   /**
     * Similar to `filter`, but the predicate is applied to each `RetryPolicy` in the chain
@@ -56,14 +55,11 @@ abstract class RetryPolicy[-A]
     * 50% chance of the full number of retries.
     */
   def filterEach[B <: A](pred: B => Boolean): RetryPolicy[B] =
-    RetryPolicy { e =>
+    RetryPolicy  e =>
       if (!pred(e)) None
-      else {
-        this(e).map {
+      else
+        this(e).map
           case (backoff, p2) => (backoff, p2.filterEach(pred))
-        }
-      }
-    }
 
   /**
     * Applies a dynamically chosen retry limit to an existing `RetryPolicy` that may allow for
@@ -76,41 +72,34 @@ abstract class RetryPolicy[-A]
     * based upon backpressure signals such as failure rate or request latency.
     */
   def limit(maxRetries: => Int): RetryPolicy[A] =
-    RetryPolicy[A] { e =>
+    RetryPolicy[A]  e =>
       val triesRemaining = maxRetries
       if (triesRemaining <= 0) None
-      else {
-        this(e).map {
+      else
+        this(e).map
           case (backoff, p2) => (backoff, p2.limit(triesRemaining - 1))
-        }
-      }
-    }
-}
 
 /**
   * A retry policy abstract class. This is convenient to use for Java programmers. Simply implement
   * the two abstract methods `shouldRetry` and `backoffAt` and you're good to go!
   */
 abstract class SimpleRetryPolicy[A](i: Int)
-    extends RetryPolicy[A] with (A => Option[(Duration, RetryPolicy[A])]) {
+    extends RetryPolicy[A] with (A => Option[(Duration, RetryPolicy[A])])
   def this() = this(0)
 
-  final def apply(e: A) = {
-    if (shouldRetry(e)) {
-      backoffAt(i) match {
+  final def apply(e: A) =
+    if (shouldRetry(e))
+      backoffAt(i) match
         case Duration.Top =>
           None
         case howlong =>
           Some(
-              (howlong, new SimpleRetryPolicy[A](i + 1) {
+              (howlong, new SimpleRetryPolicy[A](i + 1)
             def shouldRetry(a: A) = SimpleRetryPolicy.this.shouldRetry(a)
             def backoffAt(retry: Int) = SimpleRetryPolicy.this.backoffAt(retry)
-          }))
-      }
-    } else {
+          ))
+    else
       None
-    }
-  }
 
   override def andThen[B](
       that: Option[(Duration, RetryPolicy[A])] => B): A => B =
@@ -137,44 +126,37 @@ abstract class SimpleRetryPolicy[A](i: Int)
     * signals no-further-retries.
     */
   final val never = Duration.Top
-}
 
-object RetryPolicy extends JavaSingleton {
-  object RetryableWriteException {
-    def unapply(thr: Throwable): Option[Throwable] = thr match {
+object RetryPolicy extends JavaSingleton
+  object RetryableWriteException
+    def unapply(thr: Throwable): Option[Throwable] = thr match
       // We don't retry interruptions by default since they
       // indicate that the request was discarded.
       case f: Failure if f.isFlagged(Failure.Interrupted) => None
       case f: Failure if f.isFlagged(Failure.Restartable) => Some(f.show)
       case WriteException(exc) => Some(exc)
       case _ => None
-    }
-  }
 
   /**
     * Failures that are generally retryable because the request failed
     * before it finished being written to the remote service.
     * See [[com.twitter.finagle.WriteException]].
     */
-  val WriteExceptionsOnly: PartialFunction[Try[Nothing], Boolean] = {
+  val WriteExceptionsOnly: PartialFunction[Try[Nothing], Boolean] =
     case Throw(RetryableWriteException(_)) => true
-  }
 
   val TimeoutAndWriteExceptionsOnly: PartialFunction[Try[Nothing], Boolean] =
-    WriteExceptionsOnly.orElse {
+    WriteExceptionsOnly.orElse
       case Throw(Failure(Some(_: TimeoutException))) => true
       case Throw(Failure(Some(_: UtilTimeoutException))) => true
       case Throw(_: TimeoutException) => true
       case Throw(_: UtilTimeoutException) => true
-    }
 
-  val ChannelClosedExceptionsOnly: PartialFunction[Try[Nothing], Boolean] = {
+  val ChannelClosedExceptionsOnly: PartialFunction[Try[Nothing], Boolean] =
     case Throw(_: ChannelClosedException) => true
-  }
 
-  val Never: RetryPolicy[Try[Nothing]] = new RetryPolicy[Try[Nothing]] {
+  val Never: RetryPolicy[Try[Nothing]] = new RetryPolicy[Try[Nothing]]
     def apply(t: Try[Nothing]): Option[(Duration, Nothing)] = None
-  }
 
   /**
     * Converts a `RetryPolicy[Try[Nothing]]` to a `RetryPolicy[(Req, Try[Rep])]`
@@ -183,28 +165,24 @@ object RetryPolicy extends JavaSingleton {
   private[finagle] def convertExceptionPolicy[Req, Rep](
       policy: RetryPolicy[Try[Nothing]]
   ): RetryPolicy[(Req, Try[Rep])] =
-    new RetryPolicy[(Req, Try[Rep])] {
+    new RetryPolicy[(Req, Try[Rep])]
       def apply(
           input: (Req,
           Try[Rep])): Option[(Duration, RetryPolicy[(Req, Try[Rep])])] =
-        input match {
+        input match
           case (_, t @ Throw(_)) =>
-            policy(t.asInstanceOf[Throw[Nothing]]) match {
+            policy(t.asInstanceOf[Throw[Nothing]]) match
               case Some((howlong, nextPolicy)) =>
                 Some((howlong, convertExceptionPolicy(nextPolicy)))
               case None => None
-            }
           case (_, Return(_)) => None
-        }
-    }
 
   /**
     * Lifts a function of type `A => Option[(Duration, RetryPolicy[A])]` in the  `RetryPolicy` type.
     */
   def apply[A](f: A => Option[(Duration, RetryPolicy[A])]): RetryPolicy[A] =
-    new RetryPolicy[A] {
+    new RetryPolicy[A]
       def apply(e: A): Option[(Duration, RetryPolicy[A])] = f(e)
-    }
 
   /**
     * Try up to a specific number of times, based on the supplied `PartialFunction[A, Boolean]`.
@@ -222,10 +200,9 @@ object RetryPolicy extends JavaSingleton {
   def tries[A](
       numTries: Int,
       shouldRetry: PartialFunction[A, Boolean]
-  ): RetryPolicy[A] = {
+  ): RetryPolicy[A] =
     val backoffs = Backoff.decorrelatedJittered(5.millis, 200.millis)
     backoff[A](backoffs.take(numTries - 1))(shouldRetry)
-  }
 
   /**
     * Try up to a specific number of times of times on failures that are
@@ -253,20 +230,16 @@ object RetryPolicy extends JavaSingleton {
     */
   def backoff[A](
       backoffs: Stream[Duration]
-  )(shouldRetry: PartialFunction[A, Boolean]): RetryPolicy[A] = {
-    RetryPolicy { e =>
-      if (shouldRetry.applyOrElse(e, AlwaysFalse)) {
-        backoffs match {
+  )(shouldRetry: PartialFunction[A, Boolean]): RetryPolicy[A] =
+    RetryPolicy  e =>
+      if (shouldRetry.applyOrElse(e, AlwaysFalse))
+        backoffs match
           case howlong #:: rest =>
             Some((howlong, backoff(rest)(shouldRetry)))
           case _ =>
             None
-        }
-      } else {
+      else
         None
-      }
-    }
-  }
 
   /**
     * A version of [[backoff]] usable from Java.
@@ -276,9 +249,8 @@ object RetryPolicy extends JavaSingleton {
   def backoffJava[A](
       backoffs: juc.Callable[ju.Iterator[Duration]],
       shouldRetry: PartialFunction[A, Boolean]
-  ): RetryPolicy[A] = {
+  ): RetryPolicy[A] =
     backoff[A](backoffs.call().asScala.toStream)(shouldRetry)
-  }
 
   /**
     * Combines multiple `RetryPolicy`s into a single combined `RetryPolicy`, with interleaved
@@ -305,25 +277,19 @@ object RetryPolicy extends JavaSingleton {
     * policy with a smaller cap.
     */
   def combine[A](policies: RetryPolicy[A]*): RetryPolicy[A] =
-    RetryPolicy[A] { e =>
+    RetryPolicy[A]  e =>
       // stores the first matched backoff
       var backoffOpt: Option[Duration] = None
 
-      val policies2 = policies.map { p =>
+      val policies2 = policies.map  p =>
         if (backoffOpt.nonEmpty) p
-        else {
-          p(e) match {
+        else
+          p(e) match
             case None => p
             case Some((backoff, p2)) =>
               backoffOpt = Some(backoff)
               p2
-          }
-        }
-      }
 
-      backoffOpt match {
+      backoffOpt match
         case None => None
         case Some(backoff) => Some((backoff, combine(policies2: _*)))
-      }
-    }
-}

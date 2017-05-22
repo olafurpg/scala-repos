@@ -14,25 +14,22 @@ import org.ensime.util.EnsimeSpec
 
 class JavaCompilerSpec
     extends EnsimeSpec with IsolatedJavaCompilerFixture
-    with SearchServiceTestUtils {
+    with SearchServiceTestUtils
 
   val original = EnsimeConfigFixture.SimpleTestProject
 
-  "JavaCompiler" should "generate compilation notes" in {
-    withJavaCompiler { (_, config, cc, store, search) =>
+  "JavaCompiler" should "generate compilation notes" in
+    withJavaCompiler  (_, config, cc, store, search) =>
       runForPositionInCompiledSource(config,
                                      cc,
                                      "import java.io.File;",
                                      "class Test1 {",
                                      "  ksjdfkdjsf @1@",
-                                     "}") { (sf, p, label, cc) =>
-      }
+                                     "}")  (sf, p, label, cc) =>
       store.notes should not be empty
-    }
-  }
 
-  it should "find type at point" in {
-    withJavaCompiler { (_, config, cc, store, search) =>
+  it should "find type at point" in
+    withJavaCompiler  (_, config, cc, store, search) =>
       runForPositionInCompiledSource(config,
                                      cc,
                                      "import java.io.File;",
@@ -41,19 +38,15 @@ class JavaCompilerSpec
                                      "    int fo@1@o = 1;",
                                      "    System.out.println(fo@2@o);",
                                      "  }",
-                                     "}") { (sf, offset, label, cc) =>
+                                     "}")  (sf, offset, label, cc) =>
         val info = cc.askTypeAtPoint(sf, offset).get
-        label match {
+        label match
           case "0" => info.name shouldBe "Test1"
           case "1" => info.name shouldBe "int"
           case "2" => info.name shouldBe "int"
-        }
-      }
-    }
-  }
 
-  it should "link symbols to their source positions" in {
-    withJavaCompiler { (_, config, cc, store, _) =>
+  it should "link symbols to their source positions" in
+    withJavaCompiler  (_, config, cc, store, _) =>
       val test1 = SourceFileInfo(
           new File(config.rootDir,
                    "testing/simple/src/main/java/org/example/Test1.java"))
@@ -61,20 +54,15 @@ class JavaCompilerSpec
           new File(config.rootDir,
                    "testing/simple/src/main/java/org/example/Test2.java"))
 
-      cc.askLinkPos(JavaFqn("org.example", "Test2", None), test2) should matchPattern {
+      cc.askLinkPos(JavaFqn("org.example", "Test2", None), test2) should matchPattern
         case Some(OffsetSourcePosition(f, 22)) =>
-      }
-      cc.askLinkPos(JavaFqn("org.example", "Foo", None), test2) should matchPattern {
+      cc.askLinkPos(JavaFqn("org.example", "Foo", None), test2) should matchPattern
         case None =>
-      }
-      cc.askLinkPos(JavaFqn("org.example", "Test2.Bar", None), test2) should matchPattern {
+      cc.askLinkPos(JavaFqn("org.example", "Test2.Bar", None), test2) should matchPattern
         case Some(OffsetSourcePosition(f, 260)) =>
-      }
     //    cc.askLinkPos(JavaFqn("org.example", "Test2", Some("compute()")), test2) should matchPattern { case Some(OffsetSourcePosition(f, 58)) => }
-    }
-  }
 
-  it should "find symbol at point" in withJavaCompiler {
+  it should "find symbol at point" in withJavaCompiler
     (_, config, cc, store, search) =>
       implicit val searchService = search
       refresh()
@@ -106,36 +94,33 @@ class JavaCompilerSpec
           "    return \"tues\";",
           "  }",
           "  public enum Day { MON, TUES }",
-          "}") { (sf, offset, label, cc) =>
+          "}")  (sf, offset, label, cc) =>
         val info = cc.askSymbolAtPoint(sf, offset).get
-        label match {
+        label match
           case "0" | "11" | "12" =>
             info.name shouldBe "foo"
             info.localName shouldBe "foo"
             info.`type`.name shouldBe "int"
             info.isCallable shouldBe false
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, 174))
                   if f.getName == "Test1.java" =>
-            }
           case "1" =>
             info.name shouldBe "args"
             info.localName shouldBe "args"
             info.`type`.name shouldBe "java.lang.String[]"
             info.isCallable shouldBe false
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, 153))
                   if f.getName == "Test1.java" =>
-            }
           case "2" =>
             info.name shouldBe "org.example.Test1.Foo"
             info.localName shouldBe "Foo"
             info.`type`.name shouldBe "org.example.Test1.Foo"
             info.isCallable shouldBe false
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, 58))
                   if f.getName == "Test1.java" =>
-            }
           case "3" =>
             info.name shouldBe "java.io.PrintStream.println(java.lang.Object)"
             info.localName shouldBe "println"
@@ -151,10 +136,9 @@ class JavaCompilerSpec
             info.localName shouldBe "Test2"
             info.`type`.name shouldBe "org.example.Test2"
             info.isCallable shouldBe false
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, 22))
                   if f.getName == "Test2.java" =>
-            }
           case "6" =>
             info.name shouldBe "org.example.Test2.compute()"
             info.localName shouldBe "compute"
@@ -164,60 +148,52 @@ class JavaCompilerSpec
             // the compiler's working set in case "5" above.
             // TODO - However if the 'element' is not found, we'll fall through to indexer lookup.
             // look into more exhaustive ways of finding the element.
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(LineSourcePosition(f, 8))
                   if f.getName == "Test2.java" =>
               case Some(OffsetSourcePosition(f, 48))
                   if f.getName == "Test2.java" =>
-            }
           case "7" =>
             {}
             info.name shouldBe "org.example.Test1.compute(int,int)"
             info.localName shouldBe "compute"
             info.`type`.name shouldBe "(int,int)int"
             info.isCallable shouldBe true
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, 481))
                   if f.getName == "Test1.java" =>
-            }
           case "8" =>
             info.name shouldBe "org.example.Test1.CONST"
             info.localName shouldBe "CONST"
             info.`type`.name shouldBe "int"
             info.isCallable shouldBe false
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, 98))
                   if f.getName == "Test1.java" =>
-            }
           case "9" =>
             info.name shouldBe "org.example.Test1.Day"
             info.localName shouldBe "Day"
             info.`type`.name shouldBe "org.example.Test1.Day"
             info.isCallable shouldBe false
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, 653))
                   if f.getName == "Test1.java" =>
-            }
           case "10" =>
             info.name shouldBe "org.example.Test1.Day.MON"
             info.localName shouldBe "MON"
             info.`type`.name shouldBe "org.example.Test1.Day"
             info.isCallable shouldBe false
             // Don't specify offset pos here as Java 6 seems to have a problem locating enums
-            info.declPos should matchPattern {
+            info.declPos should matchPattern
               case Some(OffsetSourcePosition(f, i: Int))
                   if f.getName == "Test1.java" =>
-            }
           case "13" | "14" =>
             info.name shouldBe "k"
             info.`type`.name shouldBe "int"
             info.isCallable shouldBe false
-        }
-      }
-  }
 
-  it should "find completions at point" in {
-    withJavaCompiler { (_, config, cc, store, search) =>
+  it should "find completions at point" in
+    withJavaCompiler  (_, config, cc, store, search) =>
       runForPositionInCompiledSource(
           config,
           cc,
@@ -246,9 +222,9 @@ class JavaCompilerSpec
           "      System.out.@14@",
           "    }",
           "  }",
-          "}") { (sf, offset, label, cc) =>
+          "}")  (sf, offset, label, cc) =>
         val info = cc.askCompletionsAtPoint(sf, offset, 0, false)
-        label match {
+        label match
           case "0" =>
             forAtLeast(1, info.completions)(_.name shouldBe "toString")
           case "1" =>
@@ -279,25 +255,17 @@ class JavaCompilerSpec
 
           case "14" =>
             forAtLeast(1, info.completions)(_.name shouldBe "println")
-        }
-      }
-    }
-  }
 
-  it should "find completion at beginning of file" in {
-    withJavaCompiler { (_, config, cc, store, search) =>
-      runForPositionInCompiledSource(config, cc, "Sys@0@") {
+  it should "find completion at beginning of file" in
+    withJavaCompiler  (_, config, cc, store, search) =>
+      runForPositionInCompiledSource(config, cc, "Sys@0@")
         (sf, offset, label, cc) =>
           val info = cc.askCompletionsAtPoint(sf, offset, 0, false)
-          label match {
+          label match
             case "0" =>
               forAtLeast(1, info.completions)(_.name shouldBe "System")
-          }
-      }
-    }
-  }
 
-  it should "find doc sig at point" in withJavaCompiler {
+  it should "find doc sig at point" in withJavaCompiler
     (_, config, cc, store, search) =>
       runForPositionInCompiledSource(
           config,
@@ -313,9 +281,9 @@ class JavaCompilerSpec
           "    System.out.println(\"bla\".index@7@Of(\"b\", 1));",
           "    System.out.println(\"bla\".index@8@Of(1));",
           "  }",
-          "}") { (sf, offset, label, cc) =>
+          "}")  (sf, offset, label, cc) =>
         val sig = cc.askDocSignatureAtPoint(sf, offset).get.java
-        label match {
+        label match
           case "0" => sig.fqn shouldBe DocFqn("", "Test1")
           case "1" => sig.fqn shouldBe DocFqn("java.io", "File")
           case "2" =>
@@ -338,7 +306,3 @@ class JavaCompilerSpec
           case "8" =>
             sig shouldBe DocSig(DocFqn("java.lang", "String"),
                                 Some("indexOf(int)"));
-        }
-      }
-  }
-}

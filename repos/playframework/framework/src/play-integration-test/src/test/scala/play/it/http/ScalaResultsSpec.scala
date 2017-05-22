@@ -8,9 +8,9 @@ import play.api.test._
 import play.api.mvc._
 import play.api.mvc.Results._
 
-object ScalaResultsSpec extends PlaySpecification {
+object ScalaResultsSpec extends PlaySpecification
 
-  "support session helper" in withApplication() {
+  "support session helper" in withApplication()
 
     Session.decode("  ").isEmpty must be_==(true)
 
@@ -40,9 +40,8 @@ object ScalaResultsSpec extends PlaySpecification {
     val playSession =
       Session.decodeFromCookie(setCookies.get(Session.COOKIE_NAME))
     playSession.data must_== Map("user" -> "kiki", "langs" -> "fr:en:de")
-  }
 
-  "ignore session cookies that have been tampered with" in withApplication() {
+  "ignore session cookies that have been tampered with" in withApplication()
     val data = Map("user" -> "alice")
     val encodedSession = Session.encode(data)
     // Change a value in the session
@@ -50,68 +49,57 @@ object ScalaResultsSpec extends PlaySpecification {
       encodedSession.replaceFirst("user=alice", "user=mallory")
     val decodedSession = Session.decode(maliciousSession)
     decodedSession must beEmpty
-  }
 
-  "support a custom application context" in {
-    "set session on right path" in withFooPath {
+  "support a custom application context" in
+    "set session on right path" in withFooPath
       Cookies
         .decodeSetCookieHeader(
             Ok.withSession("user" -> "alice").header.headers("Set-Cookie"))
         .head
         .path must_== "/foo"
-    }
 
-    "discard session on right path" in withFooPath {
+    "discard session on right path" in withFooPath
       Cookies
         .decodeSetCookieHeader(Ok.withNewSession.header.headers("Set-Cookie"))
         .head
         .path must_== "/foo"
-    }
 
-    "set flash on right path" in withFooPath {
+    "set flash on right path" in withFooPath
       Cookies
         .decodeSetCookieHeader(
             Ok.flashing("user" -> "alice").header.headers("Set-Cookie"))
         .head
         .path must_== "/foo"
-    }
 
     // flash cookie is discarded in PlayDefaultUpstreamHandler
-  }
 
-  "support a custom session domain" in {
-    "set session on right domain" in withFooDomain {
+  "support a custom session domain" in
+    "set session on right domain" in withFooDomain
       Cookies
         .decodeSetCookieHeader(
             Ok.withSession("user" -> "alice").header.headers("Set-Cookie"))
         .head
         .domain must beSome(".foo.com")
-    }
 
-    "discard session on right domain" in withFooDomain {
+    "discard session on right domain" in withFooDomain
       Cookies
         .decodeSetCookieHeader(Ok.withNewSession.header.headers("Set-Cookie"))
         .head
         .domain must beSome(".foo.com")
-    }
-  }
 
-  "support a secure session" in {
-    "set session as secure" in withSecureSession {
+  "support a secure session" in
+    "set session as secure" in withSecureSession
       Cookies
         .decodeSetCookieHeader(
             Ok.withSession("user" -> "alice").header.headers("Set-Cookie"))
         .head
         .secure must_== true
-    }
 
-    "discard session as secure" in withSecureSession {
+    "discard session as secure" in withSecureSession
       Cookies
         .decodeSetCookieHeader(Ok.withNewSession.header.headers("Set-Cookie"))
         .head
         .secure must_== true
-    }
-  }
 
   def withApplication[T](config: (String, Any)*)(block: => T): T =
     running(
@@ -126,4 +114,3 @@ object ScalaResultsSpec extends PlaySpecification {
 
   def withSecureSession[T](block: => T) =
     withApplication("session.secure" -> true)(block)
-}

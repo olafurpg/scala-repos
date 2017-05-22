@@ -1,7 +1,7 @@
 package scala.reflect.macros
 package contexts
 
-trait Aliases { self: Context =>
+trait Aliases  self: Context =>
 
   override type Symbol = universe.Symbol
   override type Type = universe.Type
@@ -32,8 +32,6 @@ trait Aliases { self: Context =>
   override def weakTypeOf[T](implicit attag: WeakTypeTag[T]): Type = attag.tpe
   override def typeOf[T](implicit ttag: TypeTag[T]): Type = ttag.tpe
 
-  implicit class RichOpenImplicit(oi: universe.analyzer.OpenImplicit) {
+  implicit class RichOpenImplicit(oi: universe.analyzer.OpenImplicit)
     def toImplicitCandidate =
       ImplicitCandidate(oi.info.pre, oi.info.sym, oi.pt, oi.tree)
-  }
-}

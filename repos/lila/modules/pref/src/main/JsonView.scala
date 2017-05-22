@@ -2,9 +2,9 @@ package lila.pref
 
 import play.api.libs.json._
 
-object JsonView {
+object JsonView
 
-  implicit val prefJsonWriter = OWrites[Pref] { p =>
+  implicit val prefJsonWriter = OWrites[Pref]  p =>
     Json.obj("dark" -> p.dark,
              "transp" -> p.transp,
              "bgImg" -> p.bgImg,
@@ -36,5 +36,3 @@ object JsonView {
              "submitMove" -> p.submitMove,
              "confirmResign" -> p.confirmResign,
              "insightShare" -> p.insightShare)
-  }
-}

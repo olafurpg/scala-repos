@@ -14,7 +14,7 @@ import breeze.macros.expand
   *
   * @author ktakagaki
   */
-trait CanFirwin[Output] {
+trait CanFirwin[Output]
   def apply(taps: Int,
             omegas: DenseVector[Double],
             nyquist: Double,
@@ -22,7 +22,6 @@ trait CanFirwin[Output] {
             scale: Boolean,
             multiplier: Double,
             optWindow: OptWindowFunction): FIRKernel1D[Output]
-}
 
 /**
   * Construction delegate for firwin filter design.</p>
@@ -32,13 +31,13 @@ trait CanFirwin[Output] {
   *
   * @author ktakagaki
   */
-object CanFirwin {
+object CanFirwin
 
   /** Use via implicit delegate syntax firwin(xxxx)
     *
     */
-  implicit def firwinDouble: CanFirwin[Double] = {
-    new CanFirwin[Double] {
+  implicit def firwinDouble: CanFirwin[Double] =
+    new CanFirwin[Double]
       def apply(taps: Int,
                 omegas: DenseVector[Double],
                 nyquist: Double,
@@ -53,12 +52,10 @@ object CanFirwin {
           optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
           ", scale=" + scale
       )
-    }
-  }
 
   @expand
-  implicit def firwinT[@expand.args(Int, Long, Float) T]: CanFirwin[T] = {
-    new CanFirwin[T] {
+  implicit def firwinT[@expand.args(Int, Long, Float) T]: CanFirwin[T] =
+    new CanFirwin[T]
       def apply(
           taps: Int,
           omegas: DenseVector[Double],
@@ -79,15 +76,13 @@ object CanFirwin {
           optWindow + ", zeroPass=" + zeroPass + ", nyquist=" + nyquist +
           ", scale=" + scale
       )
-    }
-  }
 
   def firwinDoubleImpl(taps: Int,
                        omegas: DenseVector[Double],
                        nyquist: Double,
                        zeroPass: Boolean,
                        scale: Boolean,
-                       optWindow: OptWindowFunction): DenseVector[Double] = {
+                       optWindow: OptWindowFunction): DenseVector[Double] =
     //various variable conditions which must be met
     require(omegas.length > 0, "At least one cutoff frequency must be given!")
     require(
@@ -95,10 +90,9 @@ object CanFirwin {
     require(
         max(omegas) <= nyquist,
         "The cutoff frequencies must be smaller than the nyquist frequency!")
-    if (omegas.length > 1) {
+    if (omegas.length > 1)
       require(min(diff(omegas)) > 0,
               "The cutoff frequency must be monotonically increasing.")
-    }
 
     val nyquistPass = (zeroPass != isOdd(omegas.length))
     var tempCutoff = (omegas / nyquist).toArray
@@ -117,12 +111,11 @@ object CanFirwin {
     val m = DenseVector.tabulate(taps)(i => i.toDouble) - alpha
 
     val h = DenseVector.zeros[Double](m.length)
-    for (band <- scaledCutoff.toArray.zipWithIndex) {
+    for (band <- scaledCutoff.toArray.zipWithIndex)
       if (isEven(band._2)) h -= sincpi(m :* band._1) :* band._1
       else h += sincpi(m :* band._1) :* band._1
-    }
 
-    val win = optWindow match {
+    val win = optWindow match
       case OptWindowFunction.Hamming(alpha, beta) =>
         WindowFunctions.hammingWindow(taps, alpha, beta)
       case OptWindowFunction.Hanning(alpha, beta) =>
@@ -130,17 +123,15 @@ object CanFirwin {
       case OptWindowFunction.Blackman(a0, a1, a2) =>
         WindowFunctions.blackmanWindow(taps, a0, a1, a2)
       case OptWindowFunction.None => DenseVector.ones[Double](taps)
-      case OptWindowFunction.User(dv) => {
+      case OptWindowFunction.User(dv) =>
           require(
               dv.length == taps,
               "Length of specified window function is not the same as taps option!")
           dv
-        }
-    }
 
     h *= win
 
-    if (scale) {
+    if (scale)
       val scaleFrequency =
         if (scaledCutoff(0) == 0d) 0d
         else if (scaledCutoff(1) == 1d) 1d
@@ -148,8 +139,5 @@ object CanFirwin {
       val c: DenseVector[Double] = cos(m :* (Pi * scaleFrequency))
       val s: Double = sum(h :* c)
       h /= s
-    }
 
     h
-  }
-}

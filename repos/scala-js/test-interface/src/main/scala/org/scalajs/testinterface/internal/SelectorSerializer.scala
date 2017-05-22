@@ -5,9 +5,9 @@ import js.Dynamic.{literal => lit}
 
 import sbt.testing._
 
-object SelectorSerializer {
+object SelectorSerializer
 
-  def serialize(sel: Selector): js.Dynamic = sel match {
+  def serialize(sel: Selector): js.Dynamic = sel match
     case sel: SuiteSelector => lit(selType = "SuiteSelector")
     case sel: TestSelector =>
       lit(selType = "TestSelector", testName = sel.testName)
@@ -22,10 +22,9 @@ object SelectorSerializer {
     case _ =>
       throw new IllegalArgumentException(
           s"Unknown Selector type: ${sel.getClass}")
-  }
 
-  def deserialize(obj: js.Dynamic): Selector = {
-    obj.selType.asInstanceOf[String] match {
+  def deserialize(obj: js.Dynamic): Selector =
+    obj.selType.asInstanceOf[String] match
       case "SuiteSelector" =>
         new SuiteSelector()
       case "TestSelector" =>
@@ -39,6 +38,3 @@ object SelectorSerializer {
         new TestWildcardSelector(obj.testWildcard.asInstanceOf[String])
       case tpe =>
         throw new IllegalArgumentException(s"Unknown Selector type: $tpe")
-    }
-  }
-}

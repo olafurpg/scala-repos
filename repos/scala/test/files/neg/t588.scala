@@ -1,8 +1,7 @@
-abstract class Test0 {
+abstract class Test0
   def visit(f: Int => Unit): Boolean
   def visit(f: Int => String): Boolean
-}
-trait Test {
+trait Test
   type TypeA <: TraitA;
   type TypeB <: TypeA with TraitB;
 
@@ -11,4 +10,3 @@ trait Test {
 
   trait TraitA;
   trait TraitB;
-}

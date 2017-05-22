@@ -14,13 +14,13 @@ import org.junit.Assert._
   */
 abstract class AnnotatorTestBase[T <: ScalaPsiElement](
     annotator: AnnotatorPart[T])
-    extends SimpleTestCase {
+    extends SimpleTestCase
   final val Prefix = "object Holder { class Object; "
   final val Suffix = " }"
 
   protected def messages(@Language(
           value = "Scala", prefix = Prefix, suffix = Suffix) code: String)
-    : List[Message] = {
+    : List[Message] =
     val s: String = Prefix + code + Suffix
     val mock = new AnnotatorHolderMock
     val file: ScalaFile = s.parse
@@ -38,9 +38,6 @@ abstract class AnnotatorTestBase[T <: ScalaPsiElement](
                    .map(_.getElement.getText)
                    .toList)
 
-    file.depthFirst.filterByType(annotator.kind).foreach { it =>
+    file.depthFirst.filterByType(annotator.kind).foreach  it =>
       annotator.annotate(it, mock, typeAware = true)
-    }
     mock.annotations
-  }
-}

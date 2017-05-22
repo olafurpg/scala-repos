@@ -1,6 +1,4 @@
-class Database {
+class Database
   class Info
-}
-class Foo(db: Database) {
+class Foo(db: Database)
   val info = new db.Info
-}

@@ -13,7 +13,7 @@ import akka.persistence.PersistentRepr
 /**
   * Java API: asynchronous message replay and sequence number recovery interface.
   */
-abstract class AsyncRecovery extends SAsyncReplay with AsyncRecoveryPlugin {
+abstract class AsyncRecovery extends SAsyncReplay with AsyncRecoveryPlugin
   this: Actor ⇒
   import context.dispatcher
 
@@ -26,12 +26,11 @@ abstract class AsyncRecovery extends SAsyncReplay with AsyncRecoveryPlugin {
                           fromSequenceNr,
                           toSequenceNr,
                           max,
-                          new Consumer[PersistentRepr] {
+                          new Consumer[PersistentRepr]
                             def accept(p: PersistentRepr) = replayCallback(p)
-                          }).map(Unit.unbox)
+                          ).map(Unit.unbox)
 
   final def asyncReadHighestSequenceNr(
       persistenceId: String, fromSequenceNr: Long): Future[Long] =
     doAsyncReadHighestSequenceNr(persistenceId, fromSequenceNr: Long)
       .map(_.longValue)
-}

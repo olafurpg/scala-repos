@@ -13,17 +13,14 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.IStubElement
   */
 abstract class ScStubElementType[S <: StubElement[T], T <: PsiElement](
     debugName: String)
-    extends IStubElementTypeWrapper[S, T](debugName) {
+    extends IStubElementTypeWrapper[S, T](debugName)
 
   def getExternalId = "sc." + super.toString
 
-  def isCompiled(stub: S) = {
+  def isCompiled(stub: S) =
     var parent = stub
-    while (!parent.isInstanceOf[PsiFileStub[_ <: PsiFile]]) {
+    while (!parent.isInstanceOf[PsiFileStub[_ <: PsiFile]])
       parent = parent.getParentStub.asInstanceOf[S]
-    }
     parent.asInstanceOf[ScFileStub].isCompiled
-  }
 
   override def isLeftBound = true
-}

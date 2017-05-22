@@ -32,7 +32,7 @@ import org.apache.spark.util.Utils
 /**
   * Test suite for [[GBTRegressor]].
   */
-class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
+class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext
 
   import GBTRegressorSuite.compareAPIs
 
@@ -44,7 +44,7 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
   private var trainData: RDD[LabeledPoint] = _
   private var validationData: RDD[LabeledPoint] = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     data = sc.parallelize(
         EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 10, 100),
@@ -55,12 +55,11 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
     validationData = sc.parallelize(
         EnsembleTestHelper.generateOrderedLabeledPoints(numFeatures = 20, 80),
         2)
-  }
 
-  test("Regression with continuous features: SquaredError") {
+  test("Regression with continuous features: SquaredError")
     val categoricalFeatures = Map.empty[Int, Int]
-    GBTRegressor.supportedLossTypes.foreach { loss =>
-      testCombinations.foreach {
+    GBTRegressor.supportedLossTypes.foreach  loss =>
+      testCombinations.foreach
         case (maxIter, learningRate, subsamplingRate) =>
           val gbt = new GBTRegressor()
             .setMaxDepth(2)
@@ -69,11 +68,8 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
             .setMaxIter(maxIter)
             .setStepSize(learningRate)
           compareAPIs(data, None, gbt, categoricalFeatures)
-      }
-    }
-  }
 
-  test("GBTRegressor behaves reasonably on toy data") {
+  test("GBTRegressor behaves reasonably on toy data")
     val df = sqlContext.createDataFrame(
         Seq(
             LabeledPoint(10, Vectors.dense(1, 2, 3, 4)),
@@ -93,9 +89,8 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
     // Checks based on SPARK-8736 (to ensure it is not doing classification)
     assert(predictions.max() > 2)
     assert(predictions.min() < -1)
-  }
 
-  test("Checkpointing") {
+  test("Checkpointing")
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
     sc.setCheckpointDir(path)
@@ -110,7 +105,6 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
 
     sc.checkpointDir = None
     Utils.deleteRecursively(tempDir)
-  }
 
   // TODO: Reinstate test once runWithValidation is implemented  SPARK-7132
   /*
@@ -155,9 +149,8 @@ class GBTRegressorSuite extends SparkFunSuite with MLlibTestSparkContext {
     }
   }
  */
-}
 
-private object GBTRegressorSuite extends SparkFunSuite {
+private object GBTRegressorSuite extends SparkFunSuite
 
   /**
     * Train 2 models on the given dataset, one using the old API and one using the new API.
@@ -166,7 +159,7 @@ private object GBTRegressorSuite extends SparkFunSuite {
   def compareAPIs(data: RDD[LabeledPoint],
                   validationData: Option[RDD[LabeledPoint]],
                   gbt: GBTRegressor,
-                  categoricalFeatures: Map[Int, Int]): Unit = {
+                  categoricalFeatures: Map[Int, Int]): Unit =
     val numFeatures = data.first().features.size
     val oldBoostingStrategy =
       gbt.getOldBoostingStrategy(categoricalFeatures, OldAlgo.Regression)
@@ -184,5 +177,3 @@ private object GBTRegressorSuite extends SparkFunSuite {
     TreeTests.checkEqual(oldModelAsNew, newModel)
     assert(newModel.numFeatures === numFeatures)
     assert(oldModelAsNew.numFeatures === numFeatures)
-  }
-}

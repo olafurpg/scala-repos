@@ -45,10 +45,10 @@ import org.apache.spark.tags.DockerTest
   */
 @DockerTest
 class OracleIntegrationSuite
-    extends DockerJDBCIntegrationSuite with SharedSQLContext {
+    extends DockerJDBCIntegrationSuite with SharedSQLContext
   import testImplicits._
 
-  override val db = new DatabaseOnDocker {
+  override val db = new DatabaseOnDocker
     override val imageName = "wnameless/oracle-xe-11g:latest"
     override val env = Map(
         "ORACLE_ROOT_PASSWORD" -> "oracle"
@@ -56,11 +56,10 @@ class OracleIntegrationSuite
     override val jdbcPort: Int = 1521
     override def getJdbcUrl(ip: String, port: Int): String =
       s"jdbc:oracle:thin:system/oracle@//$ip:$port/xe"
-  }
 
   override def dataPreparation(conn: Connection): Unit = {}
 
-  ignore("SPARK-12941: String datatypes to be mapped to Varchar in Oracle") {
+  ignore("SPARK-12941: String datatypes to be mapped to Varchar in Oracle")
     // create a sample dataframe with string type
     val df1 = sparkContext.parallelize(Seq(("foo"))).toDF("x")
     // write the dataframe to the oracle table tbl
@@ -74,5 +73,3 @@ class OracleIntegrationSuite
     assert(types(0).equals("class java.lang.String"))
     // verify the value is the inserted correct or not
     assert(rows(0).getString(0).equals("foo"))
-  }
-}

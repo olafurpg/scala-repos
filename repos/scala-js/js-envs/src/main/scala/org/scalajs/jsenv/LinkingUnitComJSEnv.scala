@@ -12,7 +12,7 @@ import org.scalajs.core.tools.io.VirtualJSFile
 import org.scalajs.core.tools.jsdep.ResolvedJSDependency
 import org.scalajs.core.tools.linker.LinkingUnit
 
-trait LinkingUnitComJSEnv extends LinkingUnitAsyncJSEnv with ComJSEnv {
+trait LinkingUnitComJSEnv extends LinkingUnitAsyncJSEnv with ComJSEnv
   def comRunner(preLibs: Seq[ResolvedJSDependency],
                 linkingUnit: LinkingUnit,
                 postLibs: Seq[ResolvedJSDependency],
@@ -26,20 +26,15 @@ trait LinkingUnitComJSEnv extends LinkingUnitAsyncJSEnv with ComJSEnv {
 
   private[jsenv] trait LinkingUnitComLoadedLibs
       extends LinkingUnitAsyncLoadedLibs with ComLoadedLibs
-      with LinkingUnitComJSEnv {
+      with LinkingUnitComJSEnv
     def comRunner(preLibs: Seq[ResolvedJSDependency],
                   linkingUnit: LinkingUnit,
                   postLibs: Seq[ResolvedJSDependency],
-                  code: VirtualJSFile): ComJSRunner = {
+                  code: VirtualJSFile): ComJSRunner =
       LinkingUnitComJSEnv.this.comRunner(
           loadedLibs ++ preLibs, linkingUnit, postLibs, code)
-    }
-  }
 
-  private[jsenv] trait ComLoadedUnit extends AsyncLoadedUnit with ComJSEnv {
+  private[jsenv] trait ComLoadedUnit extends AsyncLoadedUnit with ComJSEnv
     def comRunner(
-        libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+        libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner =
       LinkingUnitComJSEnv.this.comRunner(Nil, loadedUnit, libs, code)
-    }
-  }
-}

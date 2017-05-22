@@ -27,8 +27,8 @@ case class TwoMinimal[
     @specialized(Int, AnyRef) B
 ](v: A, w: B)
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     println(Two("Hello", "World").getClass().getName());
     println(Two(12, "Hello").getClass().getName());
     println(Two("Hello", 12).getClass().getName());
@@ -53,5 +53,3 @@ object Test {
     println(TwoMinimal(12, "Hello").getClass().getName());
     println(TwoMinimal("Hello", 12).getClass().getName());
     println(TwoMinimal(12, 12).getClass().getName());
-  }
-}

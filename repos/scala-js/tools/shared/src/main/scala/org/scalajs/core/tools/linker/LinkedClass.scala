@@ -53,7 +53,7 @@ final class LinkedClass(
                         val hasInstances: Boolean,
                         val hasInstanceTests: Boolean,
                         val hasRuntimeTypeInfo: Boolean,
-                        val version: Option[String]) {
+                        val version: Option[String])
 
   // Helpers to give Info-Like access
   def encodedName: String = name.name
@@ -61,7 +61,7 @@ final class LinkedClass(
 
   def fullName: String = Definitions.decodeClassName(encodedName)
 
-  def toInfo: Infos.ClassInfo = {
+  def toInfo: Infos.ClassInfo =
     val methodInfos =
       (staticMethods.map(_.info) ++ memberMethods.map(_.info) ++ abstractMethods
             .map(_.info) ++ exportedMembers.map(_.info) ++ classExportInfo)
@@ -72,7 +72,6 @@ final class LinkedClass(
                     superClass.map(_.name),
                     interfaces.map(_.name),
                     methodInfos)
-  }
 
   def copy(
       name: Ident = this.name,
@@ -93,7 +92,7 @@ final class LinkedClass(
       hasInstances: Boolean = this.hasInstances,
       hasInstanceTests: Boolean = this.hasInstanceTests,
       hasRuntimeTypeInfo: Boolean = this.hasRuntimeTypeInfo,
-      version: Option[String] = this.version) = {
+      version: Option[String] = this.version) =
     new LinkedClass(name,
                     kind,
                     superClass,
@@ -113,14 +112,12 @@ final class LinkedClass(
                     hasInstanceTests,
                     hasRuntimeTypeInfo,
                     version)
-  }
-}
 
-object LinkedClass {
+object LinkedClass
 
   def apply(info: Infos.ClassInfo,
             classDef: ClassDef,
-            ancestors: List[String]): LinkedClass = {
+            ancestors: List[String]): LinkedClass =
 
     val memberInfoByName = Map(info.methods.map(m => m.encodedName -> m): _*)
 
@@ -131,17 +128,15 @@ object LinkedClass {
     val exportedMembers = mutable.Buffer.empty[LinkedMember[Tree]]
     val classExports = mutable.Buffer.empty[Tree]
 
-    def linkedMethod(m: MethodDef) = {
+    def linkedMethod(m: MethodDef) =
       val info = memberInfoByName(m.name.name)
       new LinkedMember(info, m, None)
-    }
 
-    def linkedProperty(p: PropertyDef) = {
+    def linkedProperty(p: PropertyDef) =
       val info = memberInfoByName(p.name.name)
       new LinkedMember(info, p, None)
-    }
 
-    classDef.defs.foreach {
+    classDef.defs.foreach
       // Static methods
       case m: MethodDef if m.static =>
         staticMethods += linkedMethod(m)
@@ -169,7 +164,6 @@ object LinkedClass {
 
       case tree =>
         sys.error(s"Illegal tree in ClassDef of class ${tree.getClass}")
-    }
 
     val classExportInfo =
       memberInfoByName.get(Definitions.ExportedConstructorsName)
@@ -193,9 +187,8 @@ object LinkedClass {
                     hasInstanceTests = true,
                     hasRuntimeTypeInfo = true,
                     version = None)
-  }
 
-  def dummyParent(encodedName: String, version: Option[String]): LinkedClass = {
+  def dummyParent(encodedName: String, version: Option[String]): LinkedClass =
     import ir.Trees.{Ident, OptimizerHints}
 
     implicit val pos = Position.NoPosition
@@ -219,5 +212,3 @@ object LinkedClass {
                     hasInstanceTests = true,
                     hasRuntimeTypeInfo = true,
                     version = version)
-  }
-}

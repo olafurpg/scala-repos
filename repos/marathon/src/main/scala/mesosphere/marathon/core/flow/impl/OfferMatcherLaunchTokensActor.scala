@@ -10,14 +10,12 @@ import rx.lang.scala.{Observable, Subscription}
 
 import scala.concurrent.duration._
 
-private[flow] object OfferMatcherLaunchTokensActor {
+private[flow] object OfferMatcherLaunchTokensActor
   def props(conf: LaunchTokenConfig,
             taskStatusObservables: TaskStatusObservables,
-            offerMatcherManager: OfferMatcherManager): Props = {
+            offerMatcherManager: OfferMatcherManager): Props =
     Props(new OfferMatcherLaunchTokensActor(
             conf, taskStatusObservables, offerMatcherManager))
-  }
-}
 
 /**
   * We throttle task launching to avoid overloading ourself and Mesos.
@@ -31,11 +29,11 @@ private class OfferMatcherLaunchTokensActor(
     conf: LaunchTokenConfig,
     taskStatusObservables: TaskStatusObservables,
     offerMatcherManager: OfferMatcherManager)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   var taskStatusUpdateSubscription: Subscription = _
   var periodicSetToken: Cancellable = _
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     val all: Observable[TaskStatusUpdate] = taskStatusObservables.forAll
     taskStatusUpdateSubscription = all.subscribe(self ! _)
 
@@ -44,19 +42,15 @@ private class OfferMatcherLaunchTokensActor(
       .schedule(0.seconds, conf.launchTokenRefreshInterval().millis)(
         offerMatcherManager.setLaunchTokens(conf.launchTokens())
     )
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     taskStatusUpdateSubscription.unsubscribe()
     periodicSetToken.cancel()
-  }
 
   private[this] def healthy(status: TaskStatus): Boolean =
     !status.hasHealthy || status.getHealthy
 
-  override def receive: Receive = {
+  override def receive: Receive =
     case TaskStatusUpdate(_, _, MarathonTaskStatus.Running(Some(mesosStatus)))
         if healthy(mesosStatus) =>
       offerMatcherManager.addLaunchTokens(1)
-  }
-}

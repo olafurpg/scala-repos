@@ -48,7 +48,7 @@ import scalafx.testutil.RunOnApplicationThread
   */
 @RunWith(classOf[JUnitRunner])
 class ReadOnlyObjectWrapperSpec
-    extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread {
+    extends FlatSpec with BeforeAndAfterEach with RunOnApplicationThread
 
   val bean = new Object()
   var objectProperty: jfxbp.ReadOnlyObjectWrapper[String] = null
@@ -56,59 +56,50 @@ class ReadOnlyObjectWrapperSpec
   var sfxObjectProperty: ReadOnlyObjectWrapper[String] = null
   var booleanProperty: jfxbp.BooleanProperty = null
 
-  override protected def beforeEach() {
+  override protected def beforeEach()
     objectProperty = new ReadOnlyObjectWrapper[String](bean, "Test Object")
     objectProperty2 = new ReadOnlyObjectWrapper[String](bean, "Test Object 2")
     sfxObjectProperty = new ReadOnlyObjectWrapper[String](
         bean, "SFX Test Object")
     booleanProperty = new BooleanProperty(bean, "Test Boolean")
-  }
 
-  "An Object Property" should "have a default value of null" in {
+  "An Object Property" should "have a default value of null" in
     objectProperty.value should be(null)
-  }
 
-  it should "be assignable using update" in {
+  it should "be assignable using update" in
     objectProperty() = "Update"
     objectProperty.value should equal("Update")
-  }
 
-  it should "return its value using apply" in {
+  it should "return its value using apply" in
     objectProperty() = "Update"
     objectProperty() should equal("Update")
-  }
 
-  it should "know its name" in {
+  it should "know its name" in
     objectProperty.name should equal("Test Object")
-  }
 
-  it should "know its bean" in {
+  it should "know its bean" in
     objectProperty.bean should equal(bean)
-  }
 
-  it should "be bindable to another Object Property" in {
+  it should "be bindable to another Object Property" in
     objectProperty <== objectProperty2
     objectProperty2() = "Other value"
     objectProperty() should equal("Other value")
     objectProperty.unbind()
-  }
 
-  it should "be bindable to another SFX Object Property" in {
+  it should "be bindable to another SFX Object Property" in
     objectProperty <== sfxObjectProperty
     sfxObjectProperty() = "Other value"
     objectProperty() should equal("Other value")
     objectProperty.unbind()
-  }
 
-  it should "support unbinding from another Object Property" in {
+  it should "support unbinding from another Object Property" in
     objectProperty <== objectProperty2
     objectProperty2() = "Yet another value"
     objectProperty.unbind()
     objectProperty2() = "This should not be visible"
     objectProperty() should equal("Yet another value")
-  }
 
-  it should "support bindable infix equality with a property" in {
+  it should "support bindable infix equality with a property" in
     booleanProperty <== objectProperty === objectProperty2
     objectProperty() = "One"
     objectProperty2() = "Two"
@@ -116,9 +107,8 @@ class ReadOnlyObjectWrapperSpec
     objectProperty2() = "One"
     booleanProperty() should be(true)
     booleanProperty.unbind()
-  }
 
-  it should "support bindable infix equality with an sfx property" in {
+  it should "support bindable infix equality with an sfx property" in
     booleanProperty <== objectProperty === sfxObjectProperty
     objectProperty() = "One"
     sfxObjectProperty() = "Two"
@@ -126,26 +116,23 @@ class ReadOnlyObjectWrapperSpec
     sfxObjectProperty() = "One"
     booleanProperty() should be(true)
     booleanProperty.unbind()
-  }
 
-  it should "support bindable infix equality with a constant" in {
+  it should "support bindable infix equality with a constant" in
     booleanProperty <== objectProperty === "One"
     objectProperty() = "Two"
     booleanProperty() should be(false)
     objectProperty() = "One"
     booleanProperty() should be(true)
     booleanProperty.unbind()
-  }
 
-  it should "support null comparisons for equal to (===)" in {
+  it should "support null comparisons for equal to (===)" in
     booleanProperty <== objectProperty === null
     objectProperty() = "clearly not null"
     booleanProperty() should be(false)
     objectProperty() = null
     booleanProperty() should be(true)
-  }
 
-  it should "support bindable infix inequality with a property" in {
+  it should "support bindable infix inequality with a property" in
     booleanProperty <== objectProperty =!= objectProperty2
     objectProperty() = "One"
     objectProperty2() = "Two"
@@ -153,9 +140,8 @@ class ReadOnlyObjectWrapperSpec
     objectProperty2() = "One"
     booleanProperty() should be(false)
     booleanProperty.unbind()
-  }
 
-  it should "support bindable infix inequality with an sfx property" in {
+  it should "support bindable infix inequality with an sfx property" in
     booleanProperty <== objectProperty =!= sfxObjectProperty
     objectProperty() = "One"
     sfxObjectProperty() = "Two"
@@ -163,55 +149,48 @@ class ReadOnlyObjectWrapperSpec
     sfxObjectProperty() = "One"
     booleanProperty() should be(false)
     booleanProperty.unbind()
-  }
 
-  it should "support bindable infix inequality with a constant" in {
+  it should "support bindable infix inequality with a constant" in
     booleanProperty <== objectProperty =!= "One"
     objectProperty() = "Two"
     booleanProperty() should be(true)
     objectProperty() = "One"
     booleanProperty() should be(false)
     booleanProperty.unbind()
-  }
 
-  it should "support null comparisons for not equal to (=!=)" in {
+  it should "support null comparisons for not equal to (=!=)" in
     booleanProperty <== objectProperty =!= null
     objectProperty() = "clearly not null"
     booleanProperty() should be(true)
     objectProperty() = null
     booleanProperty() should be(false)
-  }
 
-  it should "support invalidate/change triggers on binding expressions" in {
+  it should "support invalidate/change triggers on binding expressions" in
     var invalidateCount = 0
     var changeCount = 0
     val binding = objectProperty === objectProperty2
-    binding onInvalidate {
+    binding onInvalidate
       invalidateCount += 1
-    }
-    binding onChange {
+    binding onChange
       changeCount += 1
-    }
     objectProperty() = "new value"
     invalidateCount should equal(1)
     changeCount should equal(1)
     objectProperty2() = "new value"
     invalidateCount should equal(2)
     changeCount should equal(2)
-  }
 
   it should "support implicit conversion to a String Binding" is (pending)
 
-  it should "support implicit conversion from a ScalaFX ReadOnlyObjectWrapper with a SFXDelegate of a type T to a JavaFX ReadOnlyObjectWrapper of type T" in {
+  it should "support implicit conversion from a ScalaFX ReadOnlyObjectWrapper with a SFXDelegate of a type T to a JavaFX ReadOnlyObjectWrapper of type T" in
     val scalaObjProperty: ReadOnlyObjectWrapper[Button] =
       ReadOnlyObjectWrapper[Button](new Button("Test"))
     val javaObjProperty: jfxbp.ReadOnlyObjectWrapper[jfxsc.Button] =
       scalaObjProperty
 
     javaObjProperty.get should be(scalaObjProperty.get.delegate)
-  }
 
-  it should "support readOnlyProperty" in {
+  it should "support readOnlyProperty" in
     val wrapper = ReadOnlyObjectWrapper("Test")
     val readOnlyProperty: ReadOnlyObjectProperty[String] =
       wrapper.readOnlyProperty
@@ -219,17 +198,15 @@ class ReadOnlyObjectWrapperSpec
 
     wrapper.value = "New value"
     readOnlyProperty() should equal("New value")
-  }
 
-  it should "be able to hold a value type like Double" in {
+  it should "be able to hold a value type like Double" in
 
     val p = ReadOnlyObjectWrapper[Double](42.1)
     assert(42.1 === p.value)
     val readOnlyProperty = p.readOnlyProperty
     assert(42.1 === readOnlyProperty())
-  }
 
-  it should "bind its readOnlyProperty hold a value type like Double" in {
+  it should "bind its readOnlyProperty hold a value type like Double" in
     val p = ReadOnlyObjectWrapper[Double](42.1)
     assert(42.1 === p.value)
     val readOnlyProperty = p.readOnlyProperty
@@ -237,9 +214,8 @@ class ReadOnlyObjectWrapperSpec
 
     p.value = 13.2
     assert(13.2 === readOnlyProperty())
-  }
 
-  it should "readOnlyProperty holding a value type like Double should bind to JFX" in {
+  it should "readOnlyProperty holding a value type like Double should bind to JFX" in
     val p = ReadOnlyObjectWrapper[Double](42.1)
     assert(42.1 === p.value)
     val readOnlyProperty = p.readOnlyProperty
@@ -253,5 +229,3 @@ class ReadOnlyObjectWrapperSpec
     p.value = 13.4
     assert(13.4 === jfxProperty())
     assert(13.4 === readOnlyProperty())
-  }
-}

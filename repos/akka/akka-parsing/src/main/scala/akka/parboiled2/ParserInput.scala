@@ -19,7 +19,7 @@ package akka.parboiled2
 import scala.annotation.tailrec
 import java.nio.ByteBuffer
 
-trait ParserInput {
+trait ParserInput
 
   /**
     * Returns the character at the given (zero-based) index.
@@ -49,9 +49,8 @@ trait ParserInput {
     * Note: the first line is line number one!
     */
   def getLine(line: Int): String
-}
 
-object ParserInput {
+object ParserInput
   val Empty = apply(Array.empty[Byte])
 
   implicit def apply(bytes: Array[Byte]): ByteArrayBasedParserInput =
@@ -67,8 +66,8 @@ object ParserInput {
       chars: Array[Char], endIndex: Int): CharArrayBasedParserInput =
     new CharArrayBasedParserInput(chars, endIndex)
 
-  abstract class DefaultParserInput extends ParserInput {
-    def getLine(line: Int): String = {
+  abstract class DefaultParserInput extends ParserInput
+    def getLine(line: Int): String =
       @tailrec def rec(ix: Int, lineStartIx: Int, lineNr: Int): String =
         if (ix < length)
           if (charAt(ix) == '\n')
@@ -77,8 +76,6 @@ object ParserInput {
           else rec(ix + 1, lineStartIx, lineNr)
         else if (lineNr == line) sliceString(lineStartIx, ix) else ""
       rec(ix = 0, lineStartIx = 0, lineNr = 1)
-    }
-  }
 
   /**
     * ParserInput reading directly off a byte array.
@@ -93,7 +90,7 @@ object ParserInput {
     * encoded with only one byte that is identical to 7-bit ASCII and ISO-8859-1.
     */
   class ByteArrayBasedParserInput(bytes: Array[Byte], endIndex: Int = 0)
-      extends DefaultParserInput {
+      extends DefaultParserInput
     val length =
       if (endIndex <= 0 || endIndex > bytes.length) bytes.length else endIndex
     def charAt(ix: Int) = (bytes(ix) & 0xFF).toChar
@@ -104,21 +101,18 @@ object ParserInput {
         .decode(
             ByteBuffer.wrap(java.util.Arrays.copyOfRange(bytes, start, end)))
         .array()
-  }
 
-  class StringBasedParserInput(string: String) extends DefaultParserInput {
+  class StringBasedParserInput(string: String) extends DefaultParserInput
     def charAt(ix: Int) = string.charAt(ix)
     def length = string.length
     def sliceString(start: Int, end: Int) = string.substring(start, end)
-    def sliceCharArray(start: Int, end: Int) = {
+    def sliceCharArray(start: Int, end: Int) =
       val chars = new Array[Char](end - start)
       string.getChars(start, end, chars, 0)
       chars
-    }
-  }
 
   class CharArrayBasedParserInput(chars: Array[Char], endIndex: Int = 0)
-      extends DefaultParserInput {
+      extends DefaultParserInput
     val length =
       if (endIndex <= 0 || endIndex > chars.length) chars.length else endIndex
     def charAt(ix: Int) = chars(ix)
@@ -126,5 +120,3 @@ object ParserInput {
       new String(chars, start, end - start)
     def sliceCharArray(start: Int, end: Int) =
       java.util.Arrays.copyOfRange(chars, start, end)
-  }
-}

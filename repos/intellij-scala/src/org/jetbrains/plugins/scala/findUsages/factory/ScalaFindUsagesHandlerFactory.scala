@@ -22,7 +22,7 @@ import org.jetbrains.plugins.scala.{ScalaBundle, extensions}
   * Date: 17.08.2009
   */
 class ScalaFindUsagesHandlerFactory(project: Project)
-    extends FindUsagesHandlerFactory {
+    extends FindUsagesHandlerFactory
 
   val typeDefinitionOptions = new ScalaTypeDefinitionFindUsagesOptions(project)
 
@@ -30,8 +30,8 @@ class ScalaFindUsagesHandlerFactory(project: Project)
 
   val localOptions = new ScalaLocalFindUsagesOptions(project)
 
-  override def canFindUsages(element: PsiElement): Boolean = {
-    element match {
+  override def canFindUsages(element: PsiElement): Boolean =
+    element match
       case _: FakePsiMethod => true
       case _: ScTypedDefinition => true
       case _: ScTypeDefinition => true
@@ -42,12 +42,10 @@ class ScalaFindUsagesHandlerFactory(project: Project)
       case _: PsiTypedDefinitionWrapper => true
       case _: StaticPsiTypedDefinitionWrapper => true
       case _ => false
-    }
-  }
 
   override def createFindUsagesHandler(
-      element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler = {
-    var replacedElement = element match {
+      element: PsiElement, forHighlightUsages: Boolean): FindUsagesHandler =
+    var replacedElement = element match
       case wrapper: PsiClassWrapper => wrapper.definition
       case p: PsiTypedDefinitionWrapper => p.typedDefinition
       case p: StaticPsiTypedDefinitionWrapper => p.typedDefinition
@@ -55,26 +53,22 @@ class ScalaFindUsagesHandlerFactory(project: Project)
       case f: FakePsiMethod => f.navElement
       case s: StaticPsiMethodWrapper => s.method
       case _ => element
-    }
-    def chooseSuper(name: String, supers: Seq[PsiNamedElement]) {
-      def showDialog() {
+    def chooseSuper(name: String, supers: Seq[PsiNamedElement])
+      def showDialog()
         val message =
           ScalaBundle.message("find.usages.member.has.supers", name)
         val result = Messages.showYesNoCancelDialog(
             element.getProject, message, "Warning", Messages.getQuestionIcon)
-        result match {
+        result match
           case 0 =>
             val elem = supers.last
             replacedElement = elem
           case 1 => //do nothing, it's ok
           case _ => replacedElement = null
-        }
-      }
       if (SwingUtilities.isEventDispatchThread) showDialog()
       else extensions.invokeAndWait(showDialog())
-    }
 
-    replacedElement match {
+    replacedElement match
       case function: ScFunction if function.isLocal => Array(function)
       case named: ScNamedElement if !forHighlightUsages =>
         val supers = RenameSuperMembersUtil
@@ -82,26 +76,19 @@ class ScalaFindUsagesHandlerFactory(project: Project)
           .filter(needToAsk)
         if (supers.nonEmpty) chooseSuper(named.name, supers)
       case _ =>
-    }
     if (replacedElement == null) return FindUsagesHandler.NULL_HANDLER
     new ScalaFindUsagesHandler(replacedElement, this)
-  }
 
-  private def needToAsk(named: PsiNamedElement): Boolean = {
-    named match {
+  private def needToAsk(named: PsiNamedElement): Boolean =
+    named match
       case fun: ScFunction
           if fun.containingClass.qualifiedName.startsWith("scala.Function") &&
           fun.name == "apply" =>
         false
       case _ => true
-    }
-  }
-}
 
-object ScalaFindUsagesHandlerFactory {
-  def getInstance(project: Project): ScalaFindUsagesHandlerFactory = {
+object ScalaFindUsagesHandlerFactory
+  def getInstance(project: Project): ScalaFindUsagesHandlerFactory =
     ContainerUtil.findInstance(
         Extensions.getExtensions(FindUsagesHandlerFactory.EP_NAME, project),
         classOf[ScalaFindUsagesHandlerFactory])
-  }
-}

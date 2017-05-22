@@ -6,17 +6,16 @@ import java.io.File
 //   - isFlattenablePrefix(vanishingPackage) was true (wrongly)
 //   - therefore flatten tried to flatten the class defined in the package, but the class is
 //     top-level, vanishingClass.enclosingTopLevelClass is NoSymbol
-object Test extends StoreReporterDirectTest {
+object Test extends StoreReporterDirectTest
   def code = ???
 
-  def compileCode(code: String) = {
+  def compileCode(code: String) =
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(code)
-  }
 
-  def show(): Unit = {
+  def show(): Unit =
     compileCode("""
       class Outer {
         class Nested extends vanishing.Vanishing
@@ -34,15 +33,11 @@ object Test extends StoreReporterDirectTest {
       }
     """)
     assert(storeReporter.infos.isEmpty, storeReporter.infos.mkString("\n")) // Included a MissingRequirementError before.
-  }
 
-  def deletePackage(name: String) {
+  def deletePackage(name: String)
     val directory = new File(testOutput.path, name)
-    for (f <- directory.listFiles()) {
+    for (f <- directory.listFiles())
       assert(f.getName.endsWith(".class"))
       assert(f.delete())
-    }
     assert(directory.listFiles().isEmpty)
     assert(directory.delete())
-  }
-}

@@ -31,7 +31,7 @@ abstract class StochasticGradientDescent[T](val defaultStepSize: Double,
     implicit protected val vspace: NormedModule[T, Double])
     extends FirstOrderMinimizer[T, StochasticDiffFunction[T]](
         maxIter, tolerance, fvalMemory, relativeTolerance = true)
-    with SerializableLogging {
+    with SerializableLogging
 
   import vspace._
 
@@ -52,20 +52,17 @@ abstract class StochasticGradientDescent[T](val defaultStepSize: Double,
     *
     * Default is eta / math.pow(state.iter + 1,2.0 / 3.0)
     */
-  def determineStepSize(state: State, f: StochasticDiffFunction[T], dir: T) = {
+  def determineStepSize(state: State, f: StochasticDiffFunction[T], dir: T) =
     defaultStepSize / math.pow(state.iter + 1, 2.0 / 3.0)
-  }
-}
 
-object StochasticGradientDescent {
+object StochasticGradientDescent
   def apply[T](initialStepSize: Double = 4, maxIter: Int = 100)(
-      implicit vs: NormedModule[T, Double]): StochasticGradientDescent[T] = {
+      implicit vs: NormedModule[T, Double]): StochasticGradientDescent[T] =
     new SimpleSGD(initialStepSize, maxIter)
-  }
 
   class SimpleSGD[T](eta: Double = 4, maxIter: Int = 100)(
       implicit vs: NormedModule[T, Double])
-      extends StochasticGradientDescent[T](eta, maxIter) {
+      extends StochasticGradientDescent[T](eta, maxIter)
     type History = Unit
     def initialHistory(f: StochasticDiffFunction[T], init: T) = ()
     def updateHistory(newX: T,
@@ -73,5 +70,3 @@ object StochasticGradientDescent {
                       newValue: Double,
                       f: StochasticDiffFunction[T],
                       oldState: State) = ()
-  }
-}

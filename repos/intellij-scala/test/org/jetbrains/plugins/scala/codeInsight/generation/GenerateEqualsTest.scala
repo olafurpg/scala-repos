@@ -5,10 +5,10 @@ package codeInsight.generation
   * Nikolay.Tropin
   * 8/23/13
   */
-class GenerateEqualsTest extends ScalaGenerateTestBase {
+class GenerateEqualsTest extends ScalaGenerateTestBase
   val handler = new ScalaGenerateEqualsHandler
 
-  def testFindAllFields() {
+  def testFindAllFields()
     val text = s"""class A (i: Int, val j: Int) {
                  |  val x = 0$CARET_MARKER
                  |  var y = 0
@@ -37,9 +37,8 @@ class GenerateEqualsTest extends ScalaGenerateTestBase {
                    |  }
                    |}"""
     testInvoke(text, result, checkCaret = false)
-  }
 
-  def testInFinalClass() {
+  def testInFinalClass()
     val text = s"""final class$CARET_MARKER A (i: Int, val j: Int) {
                  |  private val z = 0
                  |}"""
@@ -59,9 +58,8 @@ class GenerateEqualsTest extends ScalaGenerateTestBase {
                    |  }
                    |}"""
     testInvoke(text, result, checkCaret = false)
-  }
 
-  def testInAbstract() {
+  def testInAbstract()
     val text = s"""abstract class A (i: Int, val j: Int) extends Set[Int] {
                  |  private val z = 0
                  |
@@ -86,9 +84,8 @@ class GenerateEqualsTest extends ScalaGenerateTestBase {
                    |  }
                    |}"""
     testInvoke(text, result, checkCaret = false)
-  }
 
-  def testInInheritor() {
+  def testInInheritor()
     val text = s"""class A {
                  |  val a = 0
                  |
@@ -149,9 +146,8 @@ class GenerateEqualsTest extends ScalaGenerateTestBase {
                    |  }
                    |}"""
     testInvoke(text, result, checkCaret = false)
-  }
 
-  def testInheritsMethodsFromJavaLangObject() = {
+  def testInheritsMethodsFromJavaLangObject() =
     val text = s"""class A {
                  |  val a = 0
                  |}
@@ -182,5 +178,3 @@ class GenerateEqualsTest extends ScalaGenerateTestBase {
                    |  }
                    |}"""
     testInvoke(text, result, checkCaret = false)
-  }
-}

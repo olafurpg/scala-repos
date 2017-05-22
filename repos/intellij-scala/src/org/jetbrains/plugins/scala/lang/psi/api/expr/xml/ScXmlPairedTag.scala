@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
   * User: Dmitry Naydanov
   * Date: 4/9/12
   */
-trait ScXmlPairedTag extends ScalaPsiElement {
+trait ScXmlPairedTag extends ScalaPsiElement
   def getTagName =
     findChildrenByType(ScalaXmlTokenTypes.XML_NAME).headOption
       .map(_.getText)
@@ -17,4 +17,3 @@ trait ScXmlPairedTag extends ScalaPsiElement {
   def getTagNameElement: PsiElement =
     findChildrenByType(ScalaXmlTokenTypes.XML_NAME).headOption.orNull
   def getMatchedTag: ScXmlPairedTag
-}

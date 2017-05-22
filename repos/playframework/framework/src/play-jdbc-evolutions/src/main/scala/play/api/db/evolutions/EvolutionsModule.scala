@@ -13,8 +13,8 @@ import play.core.WebCommands
 /**
   * Default module for evolutions API.
   */
-class EvolutionsModule extends Module {
-  def bindings(environment: Environment, configuration: Configuration) = {
+class EvolutionsModule extends Module
+  def bindings(environment: Environment, configuration: Configuration) =
     Seq(
         bind[EvolutionsConfig].toProvider[DefaultEvolutionsConfigParser],
         bind[EvolutionsReader].to[EnvironmentEvolutionsReader],
@@ -23,13 +23,11 @@ class EvolutionsModule extends Module {
           .toProvider[ApplicationEvolutionsProvider]
           .eagerly
       )
-  }
-}
 
 /**
   * Components for default implementation of the evolutions API.
   */
-trait EvolutionsComponents {
+trait EvolutionsComponents
   def environment: Environment
   def configuration: Configuration
   def dbApi: DBApi
@@ -49,7 +47,6 @@ trait EvolutionsComponents {
                               dbApi,
                               environment,
                               webCommands)
-}
 
 @Singleton
 class ApplicationEvolutionsProvider @Inject()(config: EvolutionsConfig,
@@ -59,7 +56,7 @@ class ApplicationEvolutionsProvider @Inject()(config: EvolutionsConfig,
                                               environment: Environment,
                                               webCommands: WebCommands,
                                               injector: Injector)
-    extends Provider[ApplicationEvolutions] {
+    extends Provider[ApplicationEvolutions]
 
   lazy val get = new ApplicationEvolutions(
       config,
@@ -69,4 +66,3 @@ class ApplicationEvolutionsProvider @Inject()(config: EvolutionsConfig,
       dbApi,
       environment,
       webCommands)
-}

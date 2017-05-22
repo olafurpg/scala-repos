@@ -11,7 +11,7 @@ import java.util.Optional
 import scala.annotation.varargs
 import scala.compat.java8.OptionConverters._
 
-abstract class Cookie {
+abstract class Cookie
   def name(): String
   def domain(): Optional[String]
   def path(): Optional[String]
@@ -28,7 +28,5 @@ abstract class Cookie {
   def delete(innerRoute: Route, moreInnerRoutes: Route*): Route =
     RouteStructure.DeleteCookie(name(), domain().asScala, path().asScala)(
         innerRoute, moreInnerRoutes.toList)
-}
-object Cookies {
+object Cookies
   def create(name: String): Cookie = new CookieImpl(name)
-}

@@ -20,6 +20,5 @@ package kafka.common
   * Indicates that the given config parameter has invalid value
   */
 class InvalidConfigException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

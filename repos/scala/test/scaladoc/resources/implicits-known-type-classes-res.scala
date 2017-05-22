@@ -2,9 +2,9 @@
   *  if the test fails, please update the correct qualified name of
   *  the type class in src/compiler/scala/tools/nsc/doc/Settings.scala
   *  in the knownTypeClasses map. Thank you! */
-package scala.test.scaladoc.implicits.typeclasses {
+package scala.test.scaladoc.implicits.typeclasses
   class A[T]
-  object A {
+  object A
     import language.implicitConversions
     import scala.reflect.ClassTag
     import scala.reflect.runtime.universe.TypeTag
@@ -40,8 +40,5 @@ package scala.test.scaladoc.implicits.typeclasses {
     implicit def convertP[T : P](a: A[T]) = new B(implicitly[P[T]])
     implicit def convertQ[T : Q](a: A[T]) = new B(implicitly[Q[T]])
     implicit def convertR[T : R](a: A[T]) = new B(implicitly[R[T]])
-  }
-  class B[T](t: T) {
+  class B[T](t: T)
     def typeClass: T = t
-  }
-}

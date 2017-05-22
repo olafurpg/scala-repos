@@ -8,13 +8,13 @@ import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTes
   * 2016-02-08
   */
 class HashCodeUsesVarInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
   override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[HashCodeUsesVarInspection]
   override protected def annotation: String =
     "Non-value field is accessed in 'hashCode()'"
 
-  def testReturnsVar(): Unit = {
+  def testReturnsVar(): Unit =
     val text = s"""class A {
                    |    var a = 1
                    |
@@ -23,9 +23,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasError(text)
-  }
 
-  def testReturnsVal(): Unit = {
+  def testReturnsVal(): Unit =
     val text = s"""class A {
                    |    val a = 1
                    |
@@ -34,9 +33,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasNoErrors(text)
-  }
 
-  def testDefineValThroughVar(): Unit = {
+  def testDefineValThroughVar(): Unit =
     val text = s"""class A {
                    |    var a = 1
                    |
@@ -46,9 +44,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasError(text)
-  }
 
-  def testUseVarFromAncestor(): Unit = {
+  def testUseVarFromAncestor(): Unit =
     val text = s"""class A {
                    |    var a = 1
                    |}
@@ -58,9 +55,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasError(text)
-  }
 
-  def testUseVarTuple(): Unit = {
+  def testUseVarTuple(): Unit =
     val text = s"""class A {
                    |    var a = (1, 2)
                    |
@@ -69,9 +65,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasError(text)
-  }
 
-  def testUseVarOperations(): Unit = {
+  def testUseVarOperations(): Unit =
     val text = s"""class A {
                    |    var a = 1
                    |
@@ -80,9 +75,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasError(text)
-  }
 
-  def testUseVarInNonHashCode(): Unit = {
+  def testUseVarInNonHashCode(): Unit =
     val text = s"""class A {
                    |    var a = 1
                    |
@@ -91,9 +85,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasNoErrors(text)
-  }
 
-  def testUseVarInInnerFun(): Unit = {
+  def testUseVarInInnerFun(): Unit =
     val text = s"""class A {
                    |    var a = 1
                    |
@@ -103,9 +96,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasError(text)
-  }
 
-  def testUseVarInInnerClass(): Unit = {
+  def testUseVarInInnerClass(): Unit =
     val text = s"""class A {
                    |    var a = 1
                    |
@@ -117,9 +109,8 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasError(text)
-  }
 
-  def testUseVarAsAcuumulator(): Unit = {
+  def testUseVarAsAcuumulator(): Unit =
     val text = s"""class A {
                    |    val a = 1
                    |    val b = 1
@@ -132,5 +123,3 @@ class HashCodeUsesVarInspectionTest
                    |    }
                    |}"""
     checkTextHasNoErrors(text)
-  }
-}

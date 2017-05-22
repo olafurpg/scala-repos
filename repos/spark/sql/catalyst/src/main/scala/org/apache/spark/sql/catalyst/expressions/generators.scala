@@ -39,7 +39,7 @@ import org.apache.spark.sql.types._
   * requested.  The attributes produced by this function will be automatically copied anytime rules
   * result in changes to the Generator or its children.
   */
-trait Generator extends Expression {
+trait Generator extends Expression
 
   // TODO ideally we should return the type of ArrayType(StructType),
   // however, we don't keep the output field names in the Generator.
@@ -63,7 +63,6 @@ trait Generator extends Expression {
     * rows can be made here.
     */
   def terminate(): TraversableOnce[InternalRow] = Nil
-}
 
 /**
   * A generator that produces its output using the provided lambda function.
@@ -71,89 +70,75 @@ trait Generator extends Expression {
 case class UserDefinedGenerator(elementTypes: Seq[(DataType, Boolean, String)],
                                 function: Row => TraversableOnce[InternalRow],
                                 children: Seq[Expression])
-    extends Generator with CodegenFallback {
+    extends Generator with CodegenFallback
 
   @transient private[this] var inputRow: InterpretedProjection = _
   @transient private[this] var convertToScala: (InternalRow) => Row = _
 
-  private def initializeConverters(): Unit = {
+  private def initializeConverters(): Unit =
     inputRow = new InterpretedProjection(children)
-    convertToScala = {
+    convertToScala =
       val inputSchema = StructType(
           children.map(e => StructField(e.simpleString, e.dataType, true)))
       CatalystTypeConverters.createToScalaConverter(inputSchema)
-    }.asInstanceOf[InternalRow => Row]
-  }
+    .asInstanceOf[InternalRow => Row]
 
-  override def eval(input: InternalRow): TraversableOnce[InternalRow] = {
-    if (inputRow == null) {
+  override def eval(input: InternalRow): TraversableOnce[InternalRow] =
+    if (inputRow == null)
       initializeConverters()
-    }
     // Convert the objects into Scala Type before calling function, we need schema to support UDT
     function(convertToScala(inputRow(input)))
-  }
 
   override def toString: String =
     s"UserDefinedGenerator(${children.mkString(",")})"
-}
 
 /**
   * Given an input array produces a sequence of rows for each value in the array.
   */
 case class Explode(child: Expression)
-    extends UnaryExpression with Generator with CodegenFallback {
+    extends UnaryExpression with Generator with CodegenFallback
 
   override def children: Seq[Expression] = child :: Nil
 
-  override def checkInputDataTypes(): TypeCheckResult = {
+  override def checkInputDataTypes(): TypeCheckResult =
     if (child.dataType.isInstanceOf[ArrayType] ||
-        child.dataType.isInstanceOf[MapType]) {
+        child.dataType.isInstanceOf[MapType])
       TypeCheckResult.TypeCheckSuccess
-    } else {
+    else
       TypeCheckResult.TypeCheckFailure(
           s"input to function explode should be array or map type, not ${child.dataType}")
-    }
-  }
 
   // hive-compatible default alias for explode function ("col" for array, "key", "value" for map)
   override def elementTypes: Seq[(DataType, Boolean, String)] =
-    child.dataType match {
+    child.dataType match
       case ArrayType(et, containsNull) => (et, containsNull, "col") :: Nil
       case MapType(kt, vt, valueContainsNull) =>
         (kt, false, "key") :: (vt, valueContainsNull, "value") :: Nil
-    }
 
-  override def eval(input: InternalRow): TraversableOnce[InternalRow] = {
-    child.dataType match {
+  override def eval(input: InternalRow): TraversableOnce[InternalRow] =
+    child.dataType match
       case ArrayType(et, _) =>
         val inputArray = child.eval(input).asInstanceOf[ArrayData]
-        if (inputArray == null) {
+        if (inputArray == null)
           Nil
-        } else {
+        else
           val rows = new Array[InternalRow](inputArray.numElements())
           inputArray.foreach(et,
                              (i, e) =>
-                               {
                                  rows(i) = InternalRow(e)
-                             })
+                             )
           rows
-        }
       case MapType(kt, vt, _) =>
         val inputMap = child.eval(input).asInstanceOf[MapData]
-        if (inputMap == null) {
+        if (inputMap == null)
           Nil
-        } else {
+        else
           val rows = new Array[InternalRow](inputMap.numElements())
           var i = 0
           inputMap.foreach(kt,
                            vt,
                            (k, v) =>
-                             {
                                rows(i) = InternalRow(k, v)
                                i += 1
-                           })
+                           )
           rows
-        }
-    }
-  }
-}

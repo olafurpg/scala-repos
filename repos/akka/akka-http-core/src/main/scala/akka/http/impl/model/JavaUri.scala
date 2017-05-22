@@ -13,7 +13,7 @@ import akka.http.impl.util.JavaMapping.Implicits._
 import scala.compat.java8.OptionConverters._
 
 /** INTERNAL API */
-case class JavaUri(uri: sm.Uri) extends jm.Uri {
+case class JavaUri(uri: sm.Uri) extends jm.Uri
   def isRelative: Boolean = uri.isRelative
   def isAbsolute: Boolean = uri.isAbsolute
   def isEmpty: Boolean = uri.isEmpty
@@ -25,16 +25,14 @@ case class JavaUri(uri: sm.Uri) extends jm.Uri {
 
   def path(): String = uri.path.toString
 
-  def pathSegments(): jl.Iterable[String] = {
+  def pathSegments(): jl.Iterable[String] =
     import sm.Uri.Path._
-    def gatherSegments(path: sm.Uri.Path): List[String] = path match {
+    def gatherSegments(path: sm.Uri.Path): List[String] = path match
       case Empty ⇒ Nil
       case Segment(head, tail) ⇒ head :: gatherSegments(tail)
       case Slash(tail) ⇒ gatherSegments(tail)
-    }
     import collection.JavaConverters._
     gatherSegments(uri.path).asJava
-  }
 
   def rawQueryString: Optional[String] = uri.rawQueryString.asJava
   def queryString(charset: Charset): Optional[String] =
@@ -64,17 +62,15 @@ case class JavaUri(uri: sm.Uri) extends jm.Uri {
     t(_.withRawQueryString(rawQuery))
   def query(query: jm.Query): jm.Uri = t(_.withQuery(query.asScala))
 
-  def addPathSegment(segment: String): jm.Uri = t { u ⇒
+  def addPathSegment(segment: String): jm.Uri = t  u ⇒
     val newPath =
       if (u.path.endsWithSlash) u.path ++ sm.Uri.Path(segment)
       else u.path ++ sm.Uri.Path./(segment)
 
     u.withPath(newPath)
-  }
 
   def fragment(fragment: Optional[String]): jm.Uri =
     t(_.copy(fragment = fragment.asScala))
   def fragment(fragment: String): jm.Uri = t(_.withFragment(fragment))
 
   override def toString: String = uri.toString
-}

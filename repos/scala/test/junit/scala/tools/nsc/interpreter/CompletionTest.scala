@@ -7,11 +7,11 @@ import org.junit.Test
 
 import scala.tools.nsc.Settings
 
-class CompletionTest {
+class CompletionTest
   val EmptyString =
     "" // def string results include the empty string so that JLine won't insert "def ..." at the cursor
 
-  def newIMain(): IMain = {
+  def newIMain(): IMain =
     val settings = new Settings()
     settings.Xnojline.value = true
     settings.usejavacp.value = true
@@ -19,9 +19,8 @@ class CompletionTest {
     val writer = new StringWriter
     val out = new PrintWriter(writer)
     new IMain(settings, out)
-  }
   @Test
-  def t4438_arrayCompletion(): Unit = {
+  def t4438_arrayCompletion(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     assert(
@@ -29,10 +28,9 @@ class CompletionTest {
           .complete("Array(1, 2, 3) rev")
           .candidates
           .contains("reverseMap"))
-  }
 
   @Test
-  def completions(): Unit = {
+  def completions(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(completer, "object O { def x_y_z = 1 }; import O._; x_y")(
@@ -68,10 +66,9 @@ class CompletionTest {
           .complete(
               """class C { def prefix_nnn = 0; def prefix_zzz = 0; def prefix_aaa = 0; prefix_""")
           .candidates)
-  }
 
   @Test
-  def annotations(): Unit = {
+  def annotations(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(completer, "def foo[@specialize", " A]")("specialized")
@@ -80,28 +77,25 @@ class CompletionTest {
         "deprecatedName")
     checkExact(completer, """@deprecateN""")("deprecatedName")
     checkExact(completer, """{@deprecateN""")("deprecatedName")
-  }
 
   @Test
-  def incompleteStringInterpolation(): Unit = {
+  def incompleteStringInterpolation(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(completer, """val x_y_z = 1; s"${x_""", "}\"")("x_y_z")
     checkExact(completer, """val x_y_z = 1; s"${x_""", "\"")("x_y_z")
-  }
 
   @Test
-  def symbolically(): Unit = {
+  def symbolically(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(
         completer,
         """class C { def +++(a: Any) = 0; def ---(a: Any) = 0; this.++""")(
         "+++")
-  }
 
   @Test
-  def camelCompletions(): Unit = {
+  def camelCompletions(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(
@@ -121,10 +115,9 @@ class CompletionTest {
     checkExact(completer,
                "object O { class AbstractMetaFactoryFactory }; new O.AMFF")(
         "AbstractMetaFactoryFactory")
-  }
 
   @Test
-  def lenientCamelCompletions(): Unit = {
+  def lenientCamelCompletions(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(
@@ -135,10 +128,9 @@ class CompletionTest {
         "theCatSatOnTheMat")
     checkExact(completer,
                "object O { def theCatSatOnTheMat = 1 }; import O._; TCSOTM")()
-  }
 
   @Test
-  def previousLineCompletions(): Unit = {
+  def previousLineCompletions(): Unit =
     val intp = newIMain()
     intp.interpret("class C { val x_y_z = 42 }")
     intp.interpret("object O { type T = Int }")
@@ -153,20 +145,18 @@ class CompletionTest {
     checkExact(completer1, "new X_y_")("X_y_z")
     checkExact(completer1, "X_y_")("X_y_z")
     checkExact(completer1, "X_y_z.app")("apply")
-  }
 
   @Test
-  def previousResultInvocation(): Unit = {
+  def previousResultInvocation(): Unit =
     val intp = newIMain()
     intp.interpret("1 + 1")
 
     val completer = new PresentationCompilerCompleter(intp)
 
     checkExact(completer, ".toCha")("toChar")
-  }
 
   @Test
-  def defString(): Unit = {
+  def defString(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
 
@@ -214,19 +204,17 @@ class CompletionTest {
     checkExact(completer, "trait T[A] { def foo: A }; (t: T[Int]) => t.foo")()
     checkExact(completer, "trait T[A] { def foo: A }; (t: T[Int]) => t.foo")(
         EmptyString, "def foo: Int")
-  }
 
   @Test
-  def treePrint(): Unit = {
+  def treePrint(): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(completer, " 1.toHexString //print")(
         EmptyString, "scala.Predef.intWrapper(1).toHexString // : String")
-  }
 
   @Test
   def firstCompletionWithNoPrefixHidesUniversalMethodsAndExtensionMethods(
-      ): Unit = {
+      ): Unit =
     val intp = newIMain()
     val completer = new PresentationCompilerCompleter(intp)
     checkExact(completer, "class C(val a: Int, val b: Int) { this.")("a", "b")
@@ -239,12 +227,9 @@ class CompletionTest {
           .isEmpty)
     checkExact(completer, "case class D(a: Int, b: Int) { this.a")(
         "a", "asInstanceOf")
-  }
 
   def checkExact(completer: PresentationCompilerCompleter,
                  before: String,
-                 after: String = "")(expected: String*): Unit = {
+                 after: String = "")(expected: String*): Unit =
     assertEquals(
         expected.toSet, completer.complete(before, after).candidates.toSet)
-  }
-}

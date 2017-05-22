@@ -25,9 +25,9 @@ import kafka.common.TopicAndPartition
 import kafka.client.ClientUtils
 import kafka.utils.{ToolsUtils, CommandLineUtils}
 
-object GetOffsetShell {
+object GetOffsetShell
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val parser = new OptionParser
     val brokerListOpt = parser
       .accepts(
@@ -92,24 +92,22 @@ object GetOffsetShell {
       .fetchTopicMetadata(
           Set(topic), metadataTargetBrokers, clientId, maxWaitMs)
       .topicsMetadata
-    if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic)) {
+    if (topicsMetadata.size != 1 || !topicsMetadata(0).topic.equals(topic))
       System.err.println(("Error: no valid topic metadata for topic: %s, " +
               " probably the topic does not exist, run ").format(topic) +
           "kafka-list-topic.sh to verify")
       System.exit(1)
-    }
     val partitions =
-      if (partitionList == "") {
+      if (partitionList == "")
         topicsMetadata.head.partitionsMetadata.map(_.partitionId)
-      } else {
+      else
         partitionList.split(",").map(_.toInt).toSeq
-      }
-    partitions.foreach { partitionId =>
+    partitions.foreach  partitionId =>
       val partitionMetadataOpt = topicsMetadata.head.partitionsMetadata
         .find(_.partitionId == partitionId)
-      partitionMetadataOpt match {
+      partitionMetadataOpt match
         case Some(metadata) =>
-          metadata.leader match {
+          metadata.leader match
             case Some(leader) =>
               val consumer = new SimpleConsumer(
                   leader.host, leader.port, 10000, 100000, clientId)
@@ -128,11 +126,6 @@ object GetOffsetShell {
               System.err.println(
                   "Error: partition %d does not have a leader. Skip getting offsets"
                     .format(partitionId))
-          }
         case None =>
           System.err.println(
               "Error: partition %d does not exist".format(partitionId))
-      }
-    }
-  }
-}

@@ -1,12 +1,11 @@
 // This test case was extracted from `names-defaults-neg.scala`
 // It pinpoints an improvement an error message that results from
 // a type inference failure
-object Test extends App {
+object Test extends App
   test4(test4$default$1)
 
   def test4[T[P]](x: T[T[List[T[X forSome { type X }]]]]) = ???
   def test4$default$1[T[P]]: List[Int] = ???
-}
 
 /*
 OLD:

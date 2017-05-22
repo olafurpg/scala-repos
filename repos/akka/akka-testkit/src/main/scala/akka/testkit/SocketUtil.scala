@@ -12,16 +12,15 @@ import java.nio.channels.ServerSocketChannel
 /**
   * Utilities to get free socket address.
   */
-object SocketUtil {
+object SocketUtil
 
   import scala.language.reflectiveCalls
 
   // Structural type needed since DatagramSocket and ServerSocket has no common ancestor apart from Object
-  private type GeneralSocket = {
+  private type GeneralSocket =
     def bind(sa: SocketAddress): Unit
     def close(): Unit
     def getLocalPort(): Int
-  }
 
   def temporaryServerAddress(
       address: String = "127.0.0.1", udp: Boolean = false): InetSocketAddress =
@@ -30,8 +29,8 @@ object SocketUtil {
   def temporaryServerAddresses(
       numberOfAddresses: Int,
       hostname: String = "127.0.0.1",
-      udp: Boolean = false): immutable.IndexedSeq[InetSocketAddress] = {
-    Vector.fill(numberOfAddresses) {
+      udp: Boolean = false): immutable.IndexedSeq[InetSocketAddress] =
+    Vector.fill(numberOfAddresses)
       val serverSocket: GeneralSocket =
         if (udp) DatagramChannel.open().socket()
         else ServerSocketChannel.open().socket()
@@ -39,6 +38,4 @@ object SocketUtil {
       serverSocket.bind(new InetSocketAddress(hostname, 0))
       (serverSocket,
        new InetSocketAddress(hostname, serverSocket.getLocalPort))
-    } collect { case (socket, address) ⇒ socket.close(); address }
-  }
-}
+    collect { case (socket, address) ⇒ socket.close(); address }

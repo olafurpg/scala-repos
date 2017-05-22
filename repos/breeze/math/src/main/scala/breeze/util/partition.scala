@@ -32,27 +32,20 @@ import breeze.linalg.support.CanCopy
   *
   * @author dlwh
   **/
-object partition extends UFunc {
+object partition extends UFunc
 
   implicit def inPlaceFromQSelectImplImpl[Arr, T](
       implicit qs: quickSelectImpl.Impl2[Arr, Int, T])
-    : InPlaceImpl2[Arr, Int] = {
-    new InPlaceImpl2[Arr, Int] {
-      override def apply(v: Arr, v2: Int): Unit = {
+    : InPlaceImpl2[Arr, Int] =
+    new InPlaceImpl2[Arr, Int]
+      override def apply(v: Arr, v2: Int): Unit =
         qs(v, v2)
-      }
-    }
-  }
 
   implicit def implFromInPlaceAndcopy[Arr](
       implicit qs: InPlaceImpl2[Arr, Int],
-      copy: CanCopy[Arr]): Impl2[Arr, Int, Arr] = {
-    new Impl2[Arr, Int, Arr] {
-      override def apply(v: Arr, v2: Int): Arr = {
+      copy: CanCopy[Arr]): Impl2[Arr, Int, Arr] =
+    new Impl2[Arr, Int, Arr]
+      override def apply(v: Arr, v2: Int): Arr =
         val c = copy(v)
         qs(c, v2)
         c
-      }
-    }
-  }
-}

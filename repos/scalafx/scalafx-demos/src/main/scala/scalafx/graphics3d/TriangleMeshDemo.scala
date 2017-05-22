@@ -44,49 +44,42 @@ import scalafx.scene.{AmbientLight, Group, Node, PerspectiveCamera, PointLight, 
   *
   * @author Mike Allen (mike@hindsight-consulting.com).
   */
-object TriangleMeshDemo extends JFXApp {
+object TriangleMeshDemo extends JFXApp
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "TriangleMesh Demo"
-    scene = new Scene(500, 500, true, SceneAntialiasing.Balanced) {
+    scene = new Scene(500, 500, true, SceneAntialiasing.Balanced)
       fill = Color.Beige
 
       // Create a tetrahedron and add to a mesh view. Configure it.
-      val tetra = new MeshView(tetrahedron(500.0)) {
+      val tetra = new MeshView(tetrahedron(500.0))
         val image = new Image(this, "images/TetrahedronMap.png")
-        material = new PhongMaterial {
+        material = new PhongMaterial
           specularColor = Color.White
           diffuseMap = image
-        }
-      }
 
       // Put shapes in a group so they can be rotated together
       val shapes = new Group(tetra)
 
-      val pointLight = new PointLight {
+      val pointLight = new PointLight
         color = Color.AntiqueWhite
         translateX = -300.0
         translateY = -300.0
         translateZ = -700.0
-      }
 
-      val ambientLight = new AmbientLight {
+      val ambientLight = new AmbientLight
         color = Color.White
-      }
 
-      root = new Group {
+      root = new Group
         children = new Group(shapes, pointLight, ambientLight)
         translateX = 250.0
         translateY = 250.0
         translateZ = 700.0
         rotationAxis = Rotate.YAxis
-      }
 
       camera = new PerspectiveCamera(false)
 
       addMouseInteraction(this, shapes)
-    }
-  }
 
   /**
     * Create a simple regular tetrahedron.
@@ -101,7 +94,7 @@ object TriangleMeshDemo extends JFXApp {
     *
     * @throws java.lang.IllegalArgumentException if `length` is not greater than zero.
     */
-  private def tetrahedron(length: Double) = {
+  private def tetrahedron(length: Double) =
     require(length > 0.0)
 
     /*
@@ -227,28 +220,20 @@ object TriangleMeshDemo extends JFXApp {
      * Return the populated mesh.
      */
     mesh
-  }
 
   /** Add mouse interaction to a scene, rotating given node. */
-  private def addMouseInteraction(scene: Scene, node: Node) {
+  private def addMouseInteraction(scene: Scene, node: Node)
     val angleY = DoubleProperty(0)
-    val yRotate = new Rotate {
+    val yRotate = new Rotate
       angle <== angleY
       axis = Rotate.YAxis
-    }
     var anchorX: Double = 0
     var anchorAngleY: Double = 0
 
     node.transforms = Seq(yRotate)
 
     scene.onMousePressed = (event: MouseEvent) =>
-      {
         anchorX = event.sceneX
         anchorAngleY = angleY()
-    }
     scene.onMouseDragged = (event: MouseEvent) =>
-      {
         angleY() = anchorAngleY + anchorX - event.sceneX
-    }
-  }
-}

@@ -31,10 +31,9 @@ import kafka.server.DelayedOperation
 private[coordinator] class DelayedJoin(coordinator: GroupCoordinator,
                                        group: GroupMetadata,
                                        sessionTimeout: Long)
-    extends DelayedOperation(sessionTimeout) {
+    extends DelayedOperation(sessionTimeout)
 
   override def tryComplete(): Boolean =
     coordinator.tryCompleteJoin(group, forceComplete)
   override def onExpiration() = coordinator.onExpireJoin()
   override def onComplete() = coordinator.onCompleteJoin(group)
-}

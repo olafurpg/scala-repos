@@ -40,17 +40,16 @@ import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectWrapper}
   * Verify that code causing Issue 36 behaves correctly after fix.
   */
 @RunWith(classOf[JUnitRunner])
-class Issue36Spec extends FlatSpec {
+class Issue36Spec extends FlatSpec
 
-  "Issue 36 - ObjectProperty[Int]" should "be able to instantiate" in {
+  "Issue 36 - ObjectProperty[Int]" should "be able to instantiate" in
 
     val p = new ObjectProperty[Int]
     p.value = 42
 
     assert(42 === p.value)
-  }
 
-  it should "bind SFX <==> JFX" in {
+  it should "bind SFX <==> JFX" in
     val sfxProperty = ObjectProperty[Int](null, "sfx", 13)
     val jfxProperty = new jfxbp.SimpleObjectProperty[Int](this, "jfx", 224)
 
@@ -62,9 +61,8 @@ class Issue36Spec extends FlatSpec {
     jfxProperty() = 21
     assert(21 === sfxProperty())
     assert(21 === jfxProperty())
-  }
 
-  it should "bind JFX <==> SFX" in {
+  it should "bind JFX <==> SFX" in
     val sfxProperty = ObjectProperty[Int](null, "sfx", 13)
     val jfxProperty = new jfxbp.SimpleObjectProperty[Int](this, "jfx", 224)
 
@@ -76,17 +74,15 @@ class Issue36Spec extends FlatSpec {
     jfxProperty() = 21
     assert(21 === sfxProperty())
     assert(21 === jfxProperty())
-  }
 
-  "Issue 36 - ReadOnlyObjectWrapper[Int]" should "be able to instantiate" in {
+  "Issue 36 - ReadOnlyObjectWrapper[Int]" should "be able to instantiate" in
 
     val p = ReadOnlyObjectWrapper[Int](42)
     assert(42 === p.value)
     val readOnlyProperty = p.readOnlyProperty
     assert(42 === readOnlyProperty())
-  }
 
-  it should "bind its readOnlyProperty" in {
+  it should "bind its readOnlyProperty" in
     val p = ReadOnlyObjectWrapper[Int](42)
     assert(42 === p.value)
     val readOnlyProperty = p.readOnlyProperty
@@ -94,9 +90,8 @@ class Issue36Spec extends FlatSpec {
 
     p.value = 13
     assert(13 === readOnlyProperty())
-  }
 
-  it should "readOnlyProperty should bind to JFX" in {
+  it should "readOnlyProperty should bind to JFX" in
     val p = ReadOnlyObjectWrapper[Int](42)
     assert(42 === p.value)
     val readOnlyProperty = p.readOnlyProperty
@@ -109,5 +104,3 @@ class Issue36Spec extends FlatSpec {
     p.value = 13
     assert(13 === jfxProperty())
     assert(13 === readOnlyProperty())
-  }
-}

@@ -9,14 +9,11 @@ import com.intellij.openapi.vfs.VirtualFileManager
   * @since 3/23/15.
   */
 class SbtAutoImportComponent(project: Project)
-    extends AbstractProjectComponent(project) {
+    extends AbstractProjectComponent(project)
   private val listener = new SbtAutoImportListener(project)
 
-  override def projectOpened(): Unit = {
+  override def projectOpened(): Unit =
     VirtualFileManager.getInstance().addVirtualFileListener(listener, project)
-  }
 
-  override def projectClosed(): Unit = {
+  override def projectClosed(): Unit =
     VirtualFileManager.getInstance().removeVirtualFileListener(listener)
-  }
-}

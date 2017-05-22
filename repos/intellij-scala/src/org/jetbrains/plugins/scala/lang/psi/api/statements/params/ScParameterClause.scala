@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Alexander Podkhalyuzin
   * Date: 21.03.2008
   */
-trait ScParameterClause extends ScalaPsiElement {
+trait ScParameterClause extends ScalaPsiElement
 
   def parameters: Seq[ScParameter]
 
@@ -46,4 +46,3 @@ trait ScParameterClause extends ScalaPsiElement {
   def addParameter(param: ScParameter): ScParameterClause
 
   def owner: PsiElement
-}

@@ -65,23 +65,21 @@ private[sql] case class InsertIntoHadoopFsRelation(
     options: Map[String, String],
     @transient query: LogicalPlan,
     mode: SaveMode)
-    extends RunnableCommand {
+    extends RunnableCommand
 
   override def children: Seq[LogicalPlan] = query :: Nil
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     // Most formats don't do well with duplicate columns, so lets not allow that
-    if (query.schema.fieldNames.length != query.schema.fieldNames.distinct.length) {
+    if (query.schema.fieldNames.length != query.schema.fieldNames.distinct.length)
       val duplicateColumns = query.schema.fieldNames
         .groupBy(identity)
-        .collect {
+        .collect
           case (x, ys) if ys.length > 1 => "\"" + x + "\""
-        }
         .mkString(", ")
       throw new AnalysisException(
           s"Duplicate column(s) : $duplicateColumns found, " +
           s"cannot save to file.")
-    }
 
     val hadoopConf = sqlContext.sparkContext.hadoopConfiguration
     val fs = outputPath.getFileSystem(hadoopConf)
@@ -89,17 +87,15 @@ private[sql] case class InsertIntoHadoopFsRelation(
       outputPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
 
     val pathExists = fs.exists(qualifiedOutputPath)
-    val doInsertion = (mode, pathExists) match {
+    val doInsertion = (mode, pathExists) match
       case (SaveMode.ErrorIfExists, true) =>
         throw new AnalysisException(
             s"path $qualifiedOutputPath already exists.")
       case (SaveMode.Overwrite, true) =>
-        Utils.tryOrIOException {
-          if (!fs.delete(qualifiedOutputPath, true /* recursively */ )) {
+        Utils.tryOrIOException
+          if (!fs.delete(qualifiedOutputPath, true /* recursively */ ))
             throw new IOException(s"Unable to clear output " +
                 s"directory $qualifiedOutputPath prior to writing to it")
-          }
-        }
         true
       case (SaveMode.Append, _) | (SaveMode.Overwrite, _) |
           (SaveMode.ErrorIfExists, false) =>
@@ -108,11 +104,10 @@ private[sql] case class InsertIntoHadoopFsRelation(
         !exists
       case (s, exists) =>
         throw new IllegalStateException(s"unsupported save mode $s ($exists)")
-    }
     // If we are appending data to an existing dir.
     val isAppend = pathExists && (mode == SaveMode.Append)
 
-    if (doInsertion) {
+    if (doInsertion)
       val job = Job.getInstance(hadoopConf)
       job.setOutputKeyClass(classOf[Void])
       job.setOutputValueClass(classOf[InternalRow])
@@ -123,7 +118,7 @@ private[sql] case class InsertIntoHadoopFsRelation(
 
       val queryExecution =
         Dataset.newDataFrame(sqlContext, query).queryExecution
-      SQLExecution.withNewExecutionId(sqlContext, queryExecution) {
+      SQLExecution.withNewExecutionId(sqlContext, queryExecution)
         val relation =
           WriteRelation(sqlContext,
                         dataColumns.toStructType,
@@ -133,9 +128,9 @@ private[sql] case class InsertIntoHadoopFsRelation(
                         bucketSpec)
 
         val writerContainer =
-          if (partitionColumns.isEmpty && bucketSpec.isEmpty) {
+          if (partitionColumns.isEmpty && bucketSpec.isEmpty)
             new DefaultWriterContainer(relation, job, isAppend)
-          } else {
+          else
             new DynamicPartitionWriterContainer(
                 relation,
                 job,
@@ -145,28 +140,22 @@ private[sql] case class InsertIntoHadoopFsRelation(
                 PartitioningUtils.DEFAULT_PARTITION_NAME,
                 sqlContext.conf.getConf(SQLConf.PARTITION_MAX_FILES),
                 isAppend)
-          }
 
         // This call shouldn't be put into the `try` block below because it only initializes and
         // prepares the job, any exception thrown from here shouldn't cause abortJob() to be called.
         writerContainer.driverSideSetup()
 
-        try {
+        try
           sqlContext.sparkContext.runJob(
               queryExecution.toRdd, writerContainer.writeRows _)
           writerContainer.commitJob()
           refreshFunction()
-        } catch {
+        catch
           case cause: Throwable =>
             logError("Aborting job.", cause)
             writerContainer.abortJob()
             throw new SparkException("Job aborted.", cause)
-        }
-      }
-    } else {
+    else
       logInfo("Skipping insertion into a relation that already exists.")
-    }
 
     Seq.empty[Row]
-  }
-}

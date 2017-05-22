@@ -43,9 +43,9 @@ import scalafx.scene.chart.XYChart
   * @related charts/AreaChart
   * @related charts/ScatterChart
   */
-class EnsembleLineChart extends EnsembleExample {
+class EnsembleLineChart extends EnsembleExample
 
-  def getContent = {
+  def getContent =
 
     val xAxis = NumberAxis("Values for X-Axis", 0, 3, 1)
     val yAxis = NumberAxis("Values for Y-Axis", 0, 3, 1)
@@ -54,25 +54,21 @@ class EnsembleLineChart extends EnsembleExample {
     val toChartData = (xy: (Double, Double)) =>
       XYChart.Data[Number, Number](xy._1, xy._2)
 
-    val series1 = new XYChart.Series[Number, Number] {
+    val series1 = new XYChart.Series[Number, Number]
       name = "Series 1"
       data = Seq((0.0, 1.0),
                  (1.2, 1.4),
                  (2.2, 1.9),
                  (2.7, 2.3),
                  (2.9, 0.5)).map(toChartData)
-    }
 
-    val series2 = new XYChart.Series[Number, Number] {
+    val series2 = new XYChart.Series[Number, Number]
       name = "Series 2"
       data = Seq((0.0, 1.6),
                  (0.8, 0.4),
                  (1.4, 2.9),
                  (2.1, 1.3),
                  (2.6, 0.9)).map(toChartData)
-    }
 
     new LineChart[Number, Number](
         xAxis, yAxis, ObservableBuffer(series1, series2))
-  }
-}

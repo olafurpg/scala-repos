@@ -11,7 +11,7 @@ package interpreter
   * @version 1.0
   * @author Lex Spoon, 2007/3/24
   **/
-class ISettings(intp: IMain) {
+class ISettings(intp: IMain)
 
   /** The maximum length of toString to use when printing the result
     *  of an evaluation.  0 means no maximum.  If a printout requires
@@ -30,12 +30,11 @@ class ISettings(intp: IMain) {
     */
   var unwrapStrings = true
 
-  def deprecation_=(x: Boolean) = {
+  def deprecation_=(x: Boolean) =
     val old = intp.settings.deprecation.value
     intp.settings.deprecation.value = x
     if (!old && x) println("Enabled -deprecation output.")
     else if (old && !x) println("Disabled -deprecation output.")
-  }
   def deprecation: Boolean = intp.settings.deprecation.value
 
   def allSettings = Map[String, Any](
@@ -46,12 +45,11 @@ class ISettings(intp: IMain) {
   )
 
   private def allSettingsString =
-    allSettings.toList sortBy (_._1) map {
+    allSettings.toList sortBy (_._1) map
       case (k, v) => "  " + k + " = " + v + "\n"
-    } mkString
+    mkString
 
   override def toString = """
     | ISettings {
     | %s
     | }""".stripMargin.format(allSettingsString)
-}

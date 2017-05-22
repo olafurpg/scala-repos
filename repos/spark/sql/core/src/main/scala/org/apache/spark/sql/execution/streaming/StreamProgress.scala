@@ -22,17 +22,16 @@ import scala.collection.mutable
 /**
   * A helper class that looks like a Map[Source, Offset].
   */
-class StreamProgress {
+class StreamProgress
   private val currentOffsets = new mutable.HashMap[Source, Offset]
 
-  private[streaming] def update(source: Source, newOffset: Offset): Unit = {
+  private[streaming] def update(source: Source, newOffset: Offset): Unit =
     currentOffsets
       .get(source)
       .foreach(old =>
             assert(
                 newOffset > old, s"Stream going backwards $newOffset -> $old"))
     currentOffsets.put(source, newOffset)
-  }
 
   private[streaming] def update(newOffset: (Source, Offset)): Unit =
     update(newOffset._1, newOffset._2)
@@ -43,34 +42,29 @@ class StreamProgress {
   private[streaming] def contains(source: Source): Boolean =
     currentOffsets.contains(source)
 
-  private[streaming] def ++(updates: Map[Source, Offset]): StreamProgress = {
+  private[streaming] def ++(updates: Map[Source, Offset]): StreamProgress =
     val updated = new StreamProgress
     currentOffsets.foreach(updated.update)
     updates.foreach(updated.update)
     updated
-  }
 
   /**
     * Used to create a new copy of this [[StreamProgress]]. While this class is currently mutable,
     * it should be copied before being passed to user code.
     */
-  private[streaming] def copy(): StreamProgress = {
+  private[streaming] def copy(): StreamProgress =
     val copied = new StreamProgress
     currentOffsets.foreach(copied.update)
     copied
-  }
 
-  private[sql] def toCompositeOffset(source: Seq[Source]): CompositeOffset = {
+  private[sql] def toCompositeOffset(source: Seq[Source]): CompositeOffset =
     CompositeOffset(source.map(get))
-  }
 
   override def toString: String =
     currentOffsets.map { case (k, v) => s"$k: $v" }.mkString("{", ",", "}")
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case s: StreamProgress => currentOffsets == s.currentOffsets
     case _ => false
-  }
 
   override def hashCode: Int = currentOffsets.hashCode()
-}

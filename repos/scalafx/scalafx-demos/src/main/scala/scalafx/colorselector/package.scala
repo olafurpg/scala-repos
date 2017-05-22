@@ -28,7 +28,7 @@ package scalafx
 
 import scalafx.geometry.Insets
 
-package object colorselector {
+package object colorselector
 
   val Min = 0.0
 
@@ -37,4 +37,3 @@ package object colorselector {
   val insets = Insets(5, 5, 5, 5)
 
   def doubleToInt(d: Double) = (colorselector.Max * d).toInt
-}

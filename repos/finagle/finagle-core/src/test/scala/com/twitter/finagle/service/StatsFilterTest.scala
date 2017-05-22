@@ -10,60 +10,52 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class StatsFilterTest extends FunSuite {
+class StatsFilterTest extends FunSuite
   val BasicExceptions = new CategorizingExceptionStatsHandler(
       _ => None, _ => None, rollup = false)
 
   def getService(
       exceptionStatsHandler: ExceptionStatsHandler = BasicExceptions
-  ): (Promise[String], InMemoryStatsReceiver, Service[String, String]) = {
+  ): (Promise[String], InMemoryStatsReceiver, Service[String, String]) =
     val receiver = new InMemoryStatsReceiver()
     val statsFilter =
       new StatsFilter[String, String](receiver, exceptionStatsHandler)
     val promise = new Promise[String]
-    val service = new Service[String, String] {
+    val service = new Service[String, String]
       def apply(request: String) = promise
-    }
 
     (promise, receiver, statsFilter andThen service)
-  }
 
-  test("latency stat defaults to milliseconds") {
+  test("latency stat defaults to milliseconds")
     val sr = new InMemoryStatsReceiver()
     val filter = new StatsFilter[String, String](sr)
     val promise = new Promise[String]
     val svc =
-      filter andThen new Service[String, String] {
+      filter andThen new Service[String, String]
         def apply(request: String) = promise
-      }
 
-    Time.withCurrentTimeFrozen { tc =>
+    Time.withCurrentTimeFrozen  tc =>
       svc("1")
       tc.advance(100.millis)
       promise.setValue("done")
       assert(sr.stat("request_latency_ms")() == Seq(100))
-    }
-  }
 
-  test("latency stat in microseconds") {
+  test("latency stat in microseconds")
     val sr = new InMemoryStatsReceiver()
     val filter = new StatsFilter[String, String](
         sr, StatsFilter.DefaultExceptions, TimeUnit.MICROSECONDS)
     val promise = new Promise[String]
     val svc =
-      filter andThen new Service[String, String] {
+      filter andThen new Service[String, String]
         def apply(request: String) = promise
-      }
 
-    Time.withCurrentTimeFrozen { tc =>
+    Time.withCurrentTimeFrozen  tc =>
       svc("1")
       tc.advance(100.millis)
       promise.setValue("done")
       assert(sr.stat("request_latency_us")() == Seq(100.millis.inMicroseconds))
-    }
-  }
 
-  test("report exceptions") {
+  test("report exceptions")
     val (promise, receiver, statsService) = getService()
 
     val e1 = new Exception("e1")
@@ -75,9 +67,8 @@ class StatsFilterTest extends FunSuite {
     assert(res.isDefined)
     assert(Await.ready(res).poll.get.isThrow)
 
-    val sourced = receiver.counters.filterKeys {
+    val sourced = receiver.counters.filterKeys
       _.exists(_ == "sourcedfailures")
-    }
     assert(sourced.size == 0)
 
     val unsourced = receiver.counters.filterKeys { _.exists(_ == "failures") }
@@ -88,9 +79,8 @@ class StatsFilterTest extends FunSuite {
                       classOf[ChannelWriteException].getName(),
                       classOf[RequestException].getName(),
                       classOf[Exception].getName())) == 1)
-  }
 
-  test("source failures") {
+  test("source failures")
     val esh = new CategorizingExceptionStatsHandler(
         sourceFunction = _ => Some("bogus"))
 
@@ -101,9 +91,8 @@ class StatsFilterTest extends FunSuite {
     assert(res.isDefined)
     assert(Await.ready(res).poll.get.isThrow)
 
-    val sourced = receiver.counters.filterKeys {
+    val sourced = receiver.counters.filterKeys
       _.exists(_ == "sourcedfailures")
-    }
     assert(sourced.size == 2)
     assert(sourced(Seq("sourcedfailures", "bogus")) == 1)
     assert(
@@ -113,10 +102,9 @@ class StatsFilterTest extends FunSuite {
     assert(unsourced.size == 2)
     assert(unsourced(Seq("failures")) == 1)
     assert(unsourced(Seq("failures", classOf[Failure].getName())) == 1)
-  }
 
-  test("don't report BackupRequestLost exceptions") {
-    for (exc <- Seq(BackupRequestLost, WriteException(BackupRequestLost))) {
+  test("don't report BackupRequestLost exceptions")
+    for (exc <- Seq(BackupRequestLost, WriteException(BackupRequestLost)))
       val (promise, receiver, statsService) = getService()
 
       // It may seem strange to test for the absence
@@ -132,28 +120,24 @@ class StatsFilterTest extends FunSuite {
       assert(!receiver.counters.contains(Seq("requests")))
       assert(!receiver.counters.contains(Seq("success")))
       assert(receiver.gauges(Seq("pending"))() == 0.0)
-    }
-  }
 
-  test("report pending requests on success") {
+  test("report pending requests on success")
     val (promise, receiver, statsService) = getService()
     assert(receiver.gauges(Seq("pending"))() == 0.0)
     statsService("foo")
     assert(receiver.gauges(Seq("pending"))() == 1.0)
     promise.setValue("")
     assert(receiver.gauges(Seq("pending"))() == 0.0)
-  }
 
-  test("report pending requests on failure") {
+  test("report pending requests on failure")
     val (promise, receiver, statsService) = getService()
     assert(receiver.gauges(Seq("pending"))() == 0.0)
     statsService("foo")
     assert(receiver.gauges(Seq("pending"))() == 1.0)
     promise.setException(new Exception)
     assert(receiver.gauges(Seq("pending"))() == 0.0)
-  }
 
-  test("should count failure requests only after they are finished") {
+  test("should count failure requests only after they are finished")
     val (promise, receiver, statsService) = getService()
 
     assert(receiver.counters.contains(Seq("requests")) == false)
@@ -168,9 +152,8 @@ class StatsFilterTest extends FunSuite {
 
     assert(receiver.counters(Seq("requests")) == 1)
     assert(receiver.counters(Seq("failures")) == 1)
-  }
 
-  test("should count successful requests only after they are finished") {
+  test("should count successful requests only after they are finished")
     val (promise, receiver, statsService) = getService()
 
     assert(receiver.counters.contains(Seq("requests")) == false)
@@ -185,9 +168,8 @@ class StatsFilterTest extends FunSuite {
 
     assert(receiver.counters(Seq("requests")) == 1)
     assert(receiver.counters(Seq("success")) == 1)
-  }
 
-  test("support rollup exceptions") {
+  test("support rollup exceptions")
     val esh = new CategorizingExceptionStatsHandler(rollup = true)
 
     val (promise, receiver, statsService) = getService(esh)
@@ -206,19 +188,16 @@ class StatsFilterTest extends FunSuite {
         unsourced(Seq("failures",
                       classOf[ChannelWriteException].getName(),
                       classOf[Exception].getName())) == 1)
-  }
 
-  test("respects ResponseClassifier") {
+  test("respects ResponseClassifier")
     val sr = new InMemoryStatsReceiver()
-    val svc = Service.mk { i: Int =>
+    val svc = Service.mk  i: Int =>
       if (i < 0) Future.exception(new RuntimeException(i.toString))
       else Future(i)
-    }
-    val aClassifier: ResponseClassifier = {
+    val aClassifier: ResponseClassifier =
       case ReqRep(_, Return(i: Int)) if i == 5 =>
         ResponseClass.RetryableFailure
       case ReqRep(_, Throw(x)) if x.getMessage == "-5" => ResponseClass.Success
-    }
     val statsFilter = new StatsFilter[Int, Int](
         sr, aClassifier, StatsFilter.DefaultExceptions, TimeUnit.MILLISECONDS)
 
@@ -246,5 +225,3 @@ class StatsFilterTest extends FunSuite {
     assert(3 == sr.counter("requests")())
     assert(2 == sr.counter("success")())
     assert(1 == sr.counter("failures")())
-  }
-}

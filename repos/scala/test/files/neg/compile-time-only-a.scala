@@ -16,28 +16,25 @@ case class C3(x: Int)
 case class C4(x: Int)
 object C4
 
-object pkg {
+object pkg
   @compileTimeOnly("C5")
-  implicit class C5(val x: Int) {
+  implicit class C5(val x: Int)
     def ext = ???
-  }
-}
 
-class C6(@compileTimeOnly("C6.x") val x: Int) {
+class C6(@compileTimeOnly("C6.x") val x: Int)
   @compileTimeOnly("C6.foo")
   def foo = 2
   @compileTimeOnly("C6.Foo")
   type Foo = Int
   @compileTimeOnly("C6.y")
   var y = 3
-}
 
 @compileTimeOnly("C7")
 class C7
 @compileTimeOnly("C8")
 class C8[T]
 
-object Test extends App {
+object Test extends App
   new C1()
   C1
 
@@ -74,12 +71,10 @@ object Test extends App {
   // val c708b: T forSome { @compileTimeOnly("C7") type T } = ???
   val c709: (C8[Int], C8[C7]) = ???
   val c710: (C8[_] => C8[_]) = ???
-}
 
 @compileTimeOnly("placebo")
 class placebo extends scala.annotation.StaticAnnotation
 
 @placebo
-class Test {
+class Test
   @placebo def x = (2: @placebo)
-}

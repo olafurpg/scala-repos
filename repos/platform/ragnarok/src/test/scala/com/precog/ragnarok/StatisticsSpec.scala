@@ -30,7 +30,7 @@ import scalaz.syntax.applicative._
 import scalaz.syntax.foldable._
 import scalaz.std.list._
 
-class StatisticsSpec extends Specification with ScalaCheck {
+class StatisticsSpec extends Specification with ScalaCheck
   def stats(xs: List[Double]): List[Option[Statistics]] =
     xs map (x => somez(Statistics(x)))
 
@@ -38,7 +38,7 @@ class StatisticsSpec extends Specification with ScalaCheck {
     beCloseTo(n, math.abs(n * err))
 
   private def statsAreEqual(a: Option[Statistics], b: Option[Statistics]) =
-    (a, b) match {
+    (a, b) match
       case (Some(a), Some(b)) =>
         a.mean must (beEqualTo(b.mean) or beRelativelyCloseTo(b.mean)(1e-10))
         a.variance must
@@ -48,12 +48,11 @@ class StatisticsSpec extends Specification with ScalaCheck {
         a.max must_== b.max
 
       case _ => ok
-    }
 
   implicit val arbDouble: Arbitrary[Double] = Arbitrary(
       Gen.chooseNum(-1e250, 1e250))
 
-  "statistics is a semigroup that" should {
+  "statistics is a semigroup that" should
     todo
     //// Super annoying, since Double isn't associative, which is causing failures.
     //"be associative" ! check { (a: List[Double], b: List[Double]) =>
@@ -62,37 +61,30 @@ class StatisticsSpec extends Specification with ScalaCheck {
     //  statsAreEqual(stats(a).suml |+| stats(b).suml, stats(c).suml)
     //  statsAreEqual(stats(c).suml, stats(c).sumr)
     //}
-  }
 
-  "statistics" should {
-    "construct trivial statistics from single value" in {
+  "statistics" should
+    "construct trivial statistics from single value" in
       val s = Statistics(1.0)
       s.mean must_== 1.0
       s.variance must_== 0.0
       s.count must_== 1
       s.min must_== 1.0
       s.max must_== 1.0
-    }
 
-    "exclude outliers from statistics" in {
+    "exclude outliers from statistics" in
       val s = (1 to 9).toList map (Statistics(_, tails = 2)) reduce (_ |+| _)
       s.mean must_== 5.0
       s.variance must beCloseTo(2.5, 1e-10)
       s.count must_== 5
       s.min must_== 3
       s.max must_== 7
-    }
 
-    "return invalid results when tails overlap" in {
+    "return invalid results when tails overlap" in
       java.lang.Double.isNaN(Statistics(1.0, tails = 3).mean) must beTrue
       val s1 = Statistics(0.0, tails = 1) |+| Statistics(1.0, tails = 1)
       java.lang.Double.isNaN(s1.mean) must beTrue
       java.lang.Double.isNaN(s1.variance) must beTrue
-    }
 
-    "be scalable" ! check { (xs: List[Double]) =>
+    "be scalable" ! check  (xs: List[Double]) =>
       statsAreEqual(stats(xs).suml map (_ * 0.0001),
                     stats(xs map (_ * 0.0001)).suml)
-    }
-  }
-}

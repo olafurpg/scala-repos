@@ -21,43 +21,34 @@ import org.scalatest.Matchers._
 import org.scalatest.FunSuite
 import org.scalatest.Inside
 
-object MetricDevSuite {
-  class QIntSumMetric extends SumMetric[EmptyParams, Int, Int, Int, Int] {
+object MetricDevSuite
+  class QIntSumMetric extends SumMetric[EmptyParams, Int, Int, Int, Int]
     def calculate(q: Int, p: Int, a: Int): Int = q
-  }
 
   class QDoubleSumMetric
-      extends SumMetric[EmptyParams, Int, Int, Int, Double] {
+      extends SumMetric[EmptyParams, Int, Int, Int, Double]
     def calculate(q: Int, p: Int, a: Int): Double = q.toDouble
-  }
 
-  class QAverageMetric extends AverageMetric[EmptyParams, Int, Int, Int] {
+  class QAverageMetric extends AverageMetric[EmptyParams, Int, Int, Int]
     def calculate(q: Int, p: Int, a: Int): Double = q.toDouble
-  }
 
   class QOptionAverageMetric
-      extends OptionAverageMetric[EmptyParams, Int, Int, Int] {
-    def calculate(q: Int, p: Int, a: Int): Option[Double] = {
+      extends OptionAverageMetric[EmptyParams, Int, Int, Int]
+    def calculate(q: Int, p: Int, a: Int): Option[Double] =
       if (q < 0) { None } else { Some(q.toDouble) }
-    }
-  }
 
-  class QStdevMetric extends StdevMetric[EmptyParams, Int, Int, Int] {
+  class QStdevMetric extends StdevMetric[EmptyParams, Int, Int, Int]
     def calculate(q: Int, p: Int, a: Int): Double = q.toDouble
-  }
 
   class QOptionStdevMetric
-      extends OptionStdevMetric[EmptyParams, Int, Int, Int] {
-    def calculate(q: Int, p: Int, a: Int): Option[Double] = {
+      extends OptionStdevMetric[EmptyParams, Int, Int, Int]
+    def calculate(q: Int, p: Int, a: Int): Option[Double] =
       if (q < 0) { None } else { Some(q.toDouble) }
-    }
-  }
-}
 
-class MetricDevSuite extends FunSuite with Inside with SharedSparkContext {
+class MetricDevSuite extends FunSuite with Inside with SharedSparkContext
   @transient lazy val logger = Logger[this.type]
 
-  test("Average Metric") {
+  test("Average Metric")
     val qpaSeq0 = Seq((1, 0, 0), (2, 0, 0), (3, 0, 0))
     val qpaSeq1 = Seq((4, 0, 0), (5, 0, 0), (6, 0, 0))
 
@@ -68,9 +59,8 @@ class MetricDevSuite extends FunSuite with Inside with SharedSparkContext {
     val result = m.calculate(sc, evalDataSet)
 
     result shouldBe (21.0 / 6)
-  }
 
-  test("Option Average Metric") {
+  test("Option Average Metric")
     val qpaSeq0 = Seq((1, 0, 0), (2, 0, 0), (3, 0, 0))
     val qpaSeq1 = Seq((-4, 0, 0), (-5, 0, 0), (6, 0, 0))
 
@@ -81,9 +71,8 @@ class MetricDevSuite extends FunSuite with Inside with SharedSparkContext {
     val result = m.calculate(sc, evalDataSet)
 
     result shouldBe (12.0 / 4)
-  }
 
-  test("Stdev Metric") {
+  test("Stdev Metric")
     val qpaSeq0 = Seq((1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0))
     val qpaSeq1 = Seq((5, 0, 0), (5, 0, 0), (5, 0, 0), (5, 0, 0))
 
@@ -94,9 +83,8 @@ class MetricDevSuite extends FunSuite with Inside with SharedSparkContext {
     val result = m.calculate(sc, evalDataSet)
 
     result shouldBe 2.0
-  }
 
-  test("Option Stdev Metric") {
+  test("Option Stdev Metric")
     val qpaSeq0 = Seq((1, 0, 0), (1, 0, 0), (1, 0, 0), (1, 0, 0))
     val qpaSeq1 = Seq((5, 0, 0), (5, 0, 0), (5, 0, 0), (5, 0, 0), (-5, 0, 0))
 
@@ -107,9 +95,8 @@ class MetricDevSuite extends FunSuite with Inside with SharedSparkContext {
     val result = m.calculate(sc, evalDataSet)
 
     result shouldBe 2.0
-  }
 
-  test("Sum Metric [Int]") {
+  test("Sum Metric [Int]")
     val qpaSeq0 = Seq((1, 0, 0), (2, 0, 0), (3, 0, 0))
     val qpaSeq1 = Seq((4, 0, 0), (5, 0, 0), (6, 0, 0))
 
@@ -120,9 +107,8 @@ class MetricDevSuite extends FunSuite with Inside with SharedSparkContext {
     val result = m.calculate(sc, evalDataSet)
 
     result shouldBe 21
-  }
 
-  test("Sum Metric [Double]") {
+  test("Sum Metric [Double]")
     val qpaSeq0 = Seq((1, 0, 0), (2, 0, 0), (3, 0, 0))
     val qpaSeq1 = Seq((4, 0, 0), (5, 0, 0), (6, 0, 0))
 
@@ -133,5 +119,3 @@ class MetricDevSuite extends FunSuite with Inside with SharedSparkContext {
     val result = m.calculate(sc, evalDataSet)
 
     result shouldBe 21.0
-  }
-}

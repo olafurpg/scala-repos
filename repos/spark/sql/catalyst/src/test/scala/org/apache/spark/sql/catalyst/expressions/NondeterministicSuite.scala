@@ -19,16 +19,12 @@ package org.apache.spark.sql.catalyst.expressions
 
 import org.apache.spark.SparkFunSuite
 
-class NondeterministicSuite extends SparkFunSuite with ExpressionEvalHelper {
-  test("MonotonicallyIncreasingID") {
+class NondeterministicSuite extends SparkFunSuite with ExpressionEvalHelper
+  test("MonotonicallyIncreasingID")
     checkEvaluation(MonotonicallyIncreasingID(), 0L)
-  }
 
-  test("SparkPartitionID") {
+  test("SparkPartitionID")
     checkEvaluation(SparkPartitionID(), 0)
-  }
 
-  test("InputFileName") {
+  test("InputFileName")
     checkEvaluation(InputFileName(), "")
-  }
-}

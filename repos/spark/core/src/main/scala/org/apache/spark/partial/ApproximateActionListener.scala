@@ -35,7 +35,7 @@ private[spark] class ApproximateActionListener[T, U, R](
     func: (TaskContext, Iterator[T]) => U,
     evaluator: ApproximateEvaluator[U, R],
     timeout: Long)
-    extends JobListener {
+    extends JobListener
 
   val startTime = System.currentTimeMillis()
   val totalTasks = rdd.partitions.length
@@ -45,47 +45,38 @@ private[spark] class ApproximateActionListener[T, U, R](
   var resultObject: Option[PartialResult[R]] =
     None // Set if we've already returned a PartialResult
 
-  override def taskSucceeded(index: Int, result: Any) {
-    synchronized {
+  override def taskSucceeded(index: Int, result: Any)
+    synchronized
       evaluator.merge(index, result.asInstanceOf[U])
       finishedTasks += 1
-      if (finishedTasks == totalTasks) {
+      if (finishedTasks == totalTasks)
         // If we had already returned a PartialResult, set its final value
         resultObject.foreach(r => r.setFinalValue(evaluator.currentResult()))
         // Notify any waiting thread that may have called awaitResult
         this.notifyAll()
-      }
-    }
-  }
 
-  override def jobFailed(exception: Exception) {
-    synchronized {
+  override def jobFailed(exception: Exception)
+    synchronized
       failure = Some(exception)
       this.notifyAll()
-    }
-  }
 
   /**
     * Waits for up to timeout milliseconds since the listener was created and then returns a
     * PartialResult with the result so far. This may be complete if the whole job is done.
     */
-  def awaitResult(): PartialResult[R] = synchronized {
+  def awaitResult(): PartialResult[R] = synchronized
     val finishTime = startTime + timeout
-    while (true) {
+    while (true)
       val time = System.currentTimeMillis()
-      if (failure.isDefined) {
+      if (failure.isDefined)
         throw failure.get
-      } else if (finishedTasks == totalTasks) {
+      else if (finishedTasks == totalTasks)
         return new PartialResult(evaluator.currentResult(), true)
-      } else if (time >= finishTime) {
+      else if (time >= finishTime)
         resultObject = Some(
             new PartialResult(evaluator.currentResult(), false))
         return resultObject.get
-      } else {
+      else
         this.wait(finishTime - time)
-      }
-    }
     // Should never be reached, but required to keep the compiler happy
     return null
-  }
-}

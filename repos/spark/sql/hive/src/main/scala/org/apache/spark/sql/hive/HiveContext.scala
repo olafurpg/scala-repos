@@ -62,14 +62,12 @@ import org.apache.spark.util.Utils
   * Returns the current database of metadataHive.
   */
 private[hive] case class CurrentDatabase(ctx: HiveContext)
-    extends LeafExpression with CodegenFallback {
+    extends LeafExpression with CodegenFallback
   override def dataType: DataType = StringType
   override def foldable: Boolean = true
   override def nullable: Boolean = false
-  override def eval(input: InternalRow): Any = {
+  override def eval(input: InternalRow): Any =
     UTF8String.fromString(ctx.metadataHive.currentDatabase)
-  }
-}
 
 /**
   * An instance of the Spark SQL execution engine that integrates with data stored in Hive.
@@ -85,17 +83,16 @@ class HiveContext private[hive](
     @transient private val metaHive: HiveClient,
     isRootContext: Boolean)
     extends SQLContext(sc, cacheManager, listener, isRootContext)
-    with Logging {
+    with Logging
   self =>
 
-  def this(sc: SparkContext) = {
+  def this(sc: SparkContext) =
     this(sc,
          new CacheManager,
          SQLContext.createListenerAndUI(sc),
          null,
          null,
          true)
-  }
   def this(sc: JavaSparkContext) = this(sc.sc)
 
   import org.apache.spark.sql.hive.HiveContext._
@@ -107,14 +104,13 @@ class HiveContext private[hive](
     * temporary tables and SessionState, but sharing the same CacheManager, IsolatedClientLoader
     * and Hive client (both of execution and metadata) with existing HiveContext.
     */
-  override def newSession(): HiveContext = {
+  override def newSession(): HiveContext =
     new HiveContext(sc = sc,
                     cacheManager = cacheManager,
                     listener = listener,
                     execHive = executionHive.newSession(),
                     metaHive = metadataHive.newSession(),
                     isRootContext = false)
-  }
 
   @transient
   protected[sql] override lazy val sessionState = new HiveSessionState(self)
@@ -212,9 +208,9 @@ class HiveContext private[hive](
     */
   @transient
   protected[hive] lazy val executionHive: HiveClientImpl =
-    if (execHive != null) {
+    if (execHive != null)
       execHive
-    } else {
+    else
       logInfo(s"Initializing execution hive, version $hiveExecutionVersion")
       val loader = new IsolatedClientLoader(
           version = IsolatedClientLoader.hiveVersion(hiveExecutionVersion),
@@ -225,15 +221,13 @@ class HiveContext private[hive](
           isolationOn = false,
           baseClassLoader = Utils.getContextOrSparkClassLoader)
       loader.createClient().asInstanceOf[HiveClientImpl]
-    }
 
   /**
     * Overrides default Hive configurations to avoid breaking changes to Spark SQL users.
     *  - allow SQL11 keywords to be used as identifiers
     */
-  private[sql] def defaultOverrides() = {
+  private[sql] def defaultOverrides() =
     setConf(ConfVars.HIVE_SUPPORT_SQL11_RESERVED_KEYWORDS.varname, "false")
-  }
 
   defaultOverrides()
 
@@ -244,9 +238,9 @@ class HiveContext private[hive](
     */
   @transient
   protected[hive] lazy val metadataHive: HiveClient =
-    if (metaHive != null) {
+    if (metaHive != null)
       metaHive
-    } else {
+    else
       val metaVersion = IsolatedClientLoader.hiveVersion(hiveMetastoreVersion)
 
       // We instantiate a HiveConf here to read in the hive-site.xml file and then pass the options
@@ -263,32 +257,29 @@ class HiveContext private[hive](
         metadataConf.asScala.map(e => e.getKey -> e.getValue).toMap ++ configure
 
       val isolatedLoader =
-        if (hiveMetastoreJars == "builtin") {
-          if (hiveExecutionVersion != hiveMetastoreVersion) {
+        if (hiveMetastoreJars == "builtin")
+          if (hiveExecutionVersion != hiveMetastoreVersion)
             throw new IllegalArgumentException(
                 "Builtin jars can only be used when hive execution version == hive metastore version. " +
                 s"Execution: ${hiveExecutionVersion} != Metastore: ${hiveMetastoreVersion}. " +
                 "Specify a vaild path to the correct hive jars using $HIVE_METASTORE_JARS " +
                 s"or change ${HIVE_METASTORE_VERSION.key} to $hiveExecutionVersion.")
-          }
 
           // We recursively find all jars in the class loader chain,
           // starting from the given classLoader.
           def allJars(classLoader: ClassLoader): Array[URL] =
-            classLoader match {
+            classLoader match
               case null => Array.empty[URL]
               case urlClassLoader: URLClassLoader =>
                 urlClassLoader.getURLs ++ allJars(urlClassLoader.getParent)
               case other => allJars(other.getParent)
-            }
 
           val classLoader = Utils.getContextOrSparkClassLoader
           val jars = allJars(classLoader)
-          if (jars.length == 0) {
+          if (jars.length == 0)
             throw new IllegalArgumentException(
                 "Unable to locate hive jars to connect to metastore. " +
                 "Please set spark.sql.hive.metastore.jars.")
-          }
 
           logInfo(
               s"Initializing HiveMetastoreConnection version $hiveMetastoreVersion using Spark classes.")
@@ -301,7 +292,7 @@ class HiveContext private[hive](
               isolationOn = true,
               barrierPrefixes = hiveMetastoreBarrierPrefixes,
               sharedPrefixes = hiveMetastoreSharedPrefixes)
-        } else if (hiveMetastoreJars == "maven") {
+        else if (hiveMetastoreJars == "maven")
           // TODO: Support for loading the jars from an already downloaded location.
           logInfo(
               s"Initializing HiveMetastoreConnection version $hiveMetastoreVersion using maven.")
@@ -313,22 +304,20 @@ class HiveContext private[hive](
               config = allConfig,
               barrierPrefixes = hiveMetastoreBarrierPrefixes,
               sharedPrefixes = hiveMetastoreSharedPrefixes)
-        } else {
+        else
           // Convert to files and expand any directories.
           val jars = hiveMetastoreJars
             .split(File.pathSeparator)
-            .flatMap {
+            .flatMap
               case path if new File(path).getName() == "*" =>
                 val files = new File(path).getParentFile().listFiles()
-                if (files == null) {
+                if (files == null)
                   logWarning(s"Hive jar path '$path' does not exist.")
                   Nil
-                } else {
+                else
                   files.filter(_.getName().toLowerCase().endsWith(".jar"))
-                }
               case path =>
                 new File(path) :: Nil
-            }
             .map(_.toURI.toURL)
 
           logInfo(
@@ -343,15 +332,11 @@ class HiveContext private[hive](
               isolationOn = true,
               barrierPrefixes = hiveMetastoreBarrierPrefixes,
               sharedPrefixes = hiveMetastoreSharedPrefixes)
-        }
       isolatedLoader.createClient()
-    }
 
-  protected[sql] override def parseSql(sql: String): LogicalPlan = {
-    executionHive.withHiveState {
+  protected[sql] override def parseSql(sql: String): LogicalPlan =
+    executionHive.withHiveState
       super.parseSql(substitutor.substitute(hiveconf, sql))
-    }
-  }
 
   override protected[sql] def executePlan(
       plan: LogicalPlan): this.QueryExecution =
@@ -365,15 +350,13 @@ class HiveContext private[hive](
     *
     * @since 1.3.0
     */
-  def refreshTable(tableName: String): Unit = {
+  def refreshTable(tableName: String): Unit =
     val tableIdent = sessionState.sqlParser.parseTableIdentifier(tableName)
     sessionState.catalog.refreshTable(tableIdent)
-  }
 
-  protected[hive] def invalidateTable(tableName: String): Unit = {
+  protected[hive] def invalidateTable(tableName: String): Unit =
     val tableIdent = sessionState.sqlParser.parseTableIdentifier(tableName)
     sessionState.catalog.invalidateTable(tableIdent)
-  }
 
   /**
     * Analyzes the given table in the current database to generate statistics, which will be
@@ -384,12 +367,12 @@ class HiveContext private[hive](
     *
     * @since 1.2.0
     */
-  def analyze(tableName: String) {
+  def analyze(tableName: String)
     val tableIdent = sessionState.sqlParser.parseTableIdentifier(tableName)
     val relation = EliminateSubqueryAliases(
         sessionState.catalog.lookupRelation(tableIdent))
 
-    relation match {
+    relation match
       case relation: MetastoreRelation =>
         // This method is mainly based on
         // org.apache.hadoop.hive.ql.stats.StatsUtils.getFileSizeForTable(HiveConf, Table)
@@ -403,43 +386,37 @@ class HiveContext private[hive](
             HiveConf.ConfVars.STAGINGDIR.varname,
             HiveConf.ConfVars.STAGINGDIR.defaultStrVal)
 
-        def calculateTableSize(fs: FileSystem, path: Path): Long = {
+        def calculateTableSize(fs: FileSystem, path: Path): Long =
           val fileStatus = fs.getFileStatus(path)
           val size =
-            if (fileStatus.isDirectory) {
+            if (fileStatus.isDirectory)
               fs.listStatus(path)
-                .map { status =>
-                  if (!status.getPath().getName().startsWith(stagingDir)) {
+                .map  status =>
+                  if (!status.getPath().getName().startsWith(stagingDir))
                     calculateTableSize(fs, status.getPath)
-                  } else {
+                  else
                     0L
-                  }
-                }
                 .sum
-            } else {
+            else
               fileStatus.getLen
-            }
 
           size
-        }
 
-        def getFileSizeForTable(conf: HiveConf, table: Table): Long = {
+        def getFileSizeForTable(conf: HiveConf, table: Table): Long =
           val path = table.getPath
           var size: Long = 0L
-          try {
+          try
             val fs = path.getFileSystem(conf)
             size = calculateTableSize(fs, path)
-          } catch {
+          catch
             case e: Exception =>
               logWarning(
                   s"Failed to get the size of table ${table.getTableName} in the " +
                   s"database ${table.getDbName} because of ${e.toString}",
                   e)
               size = 0L
-          }
 
           size
-        }
 
         val tableParameters = relation.hiveQlTable.getParameters
         val oldTotalSize =
@@ -450,18 +427,15 @@ class HiveContext private[hive](
         // Update the Hive metastore if the total size of the table is different than the size
         // recorded in the Hive metastore.
         // This logic is based on org.apache.hadoop.hive.ql.exec.StatsTask.aggregateStats().
-        if (newTotalSize > 0 && newTotalSize != oldTotalSize) {
+        if (newTotalSize > 0 && newTotalSize != oldTotalSize)
           sessionState.catalog.client.alterTable(
               relation.table.copy(properties = relation.table.properties +
                     (StatsSetupConst.TOTAL_SIZE -> newTotalSize.toString)))
-        }
       case otherRelation =>
         throw new UnsupportedOperationException(
             s"Analyze only works for Hive tables, but $tableName is a ${otherRelation.nodeName}")
-    }
-  }
 
-  override def setConf(key: String, value: String): Unit = {
+  override def setConf(key: String, value: String): Unit =
     super.setConf(key, value)
     executionHive.runSqlHive(s"SET $key=$value")
     metadataHive.runSqlHive(s"SET $key=$value")
@@ -471,15 +445,13 @@ class HiveContext private[hive](
     // will interfer with the creation of executionHive (which is a lazy val). So,
     // we put hiveconf.set at the end of this method.
     hiveconf.set(key, value)
-  }
 
   override private[sql] def setConf[T](
-      entry: SQLConfEntry[T], value: T): Unit = {
+      entry: SQLConfEntry[T], value: T): Unit =
     setConf(entry.key, entry.stringConverter(value))
-  }
 
   /** Overridden by child classes that need to set configuration before the client init. */
-  protected def configure(): Map[String, String] = {
+  protected def configure(): Map[String, String] =
     // Hive 0.14.0 introduces timeout operations in HiveConf, and changes default values of a bunch
     // of time `ConfVar`s by adding time suffixes (`s`, `ms`, and `d` etc.).  This breaks backwards-
     // compatibility when users are trying to connecting to a Hive metastore of lower version,
@@ -527,11 +499,10 @@ class HiveContext private[hive](
         ConfVars.SPARK_JOB_MONITOR_TIMEOUT -> TimeUnit.SECONDS,
         ConfVars.SPARK_RPC_CLIENT_CONNECT_TIMEOUT -> TimeUnit.MILLISECONDS,
         ConfVars.SPARK_RPC_CLIENT_HANDSHAKE_TIMEOUT -> TimeUnit.MILLISECONDS
-    ).map {
+    ).map
       case (confVar, unit) =>
         confVar.varname -> hiveconf.getTimeVar(confVar, unit).toString
-    }.toMap
-  }
+    .toMap
 
   /**
     * SQLConf and HiveConf contracts:
@@ -542,11 +513,10 @@ class HiveContext private[hive](
     *    set in the SQLConf *as well as* in the HiveConf.
     */
   @transient
-  protected[hive] lazy val hiveconf: HiveConf = {
+  protected[hive] lazy val hiveconf: HiveConf =
     val c = executionHive.conf
     setConf(c.getAllProperties)
     c
-  }
 
   private def functionOrMacroDDLPattern(command: String) =
     Pattern
@@ -554,49 +524,44 @@ class HiveContext private[hive](
                Pattern.DOTALL)
       .matcher(command)
 
-  protected[hive] def runSqlHive(sql: String): Seq[String] = {
+  protected[hive] def runSqlHive(sql: String): Seq[String] =
     val command = sql.trim.toLowerCase
-    if (functionOrMacroDDLPattern(command).matches()) {
+    if (functionOrMacroDDLPattern(command).matches())
       executionHive.runSqlHive(sql)
-    } else if (command.startsWith("set")) {
+    else if (command.startsWith("set"))
       metadataHive.runSqlHive(sql)
       executionHive.runSqlHive(sql)
-    } else {
+    else
       metadataHive.runSqlHive(sql)
-    }
-  }
 
   /**
     * Executes a SQL query without parsing it, but instead passing it directly to Hive.
     * This is currently only used for DDLs and will be removed as soon as Spark can parse
     * all supported Hive DDLs itself.
     */
-  protected[sql] override def runNativeSql(sqlText: String): Seq[Row] = {
-    runSqlHive(sqlText).map { s =>
+  protected[sql] override def runNativeSql(sqlText: String): Seq[Row] =
+    runSqlHive(sqlText).map  s =>
       Row(s)
-    }
-  }
 
   /** Extends QueryExecution with hive specific features. */
   protected[sql] class QueryExecution(logicalPlan: LogicalPlan)
-      extends org.apache.spark.sql.execution.QueryExecution(this, logicalPlan) {
+      extends org.apache.spark.sql.execution.QueryExecution(this, logicalPlan)
 
     /**
       * Returns the result as a hive compatible sequence of strings.  For native commands, the
       * execution is simply passed back to Hive.
       */
-    def stringResult(): Seq[String] = executedPlan match {
+    def stringResult(): Seq[String] = executedPlan match
       case ExecutedCommand(desc: DescribeHiveTableCommand) =>
         // If it is a describe command for a Hive table, we want to have the output format
         // be similar with Hive.
-        desc.run(self).map {
+        desc.run(self).map
           case Row(name: String, dataType: String, comment) =>
             Seq(name,
                 dataType,
                 Option(comment.asInstanceOf[String]).getOrElse(""))
               .map(s => String.format(s"%-20s", s))
               .mkString("\t")
-        }
       case command: ExecutedCommand =>
         command.executeCollect().map(_.getString(0))
 
@@ -610,18 +575,15 @@ class HiveContext private[hive](
           .map(_.zip(types).map(HiveContext.toHiveString))
           .map(_.mkString("\t"))
           .toSeq
-    }
 
     override def simpleString: String =
-      logical match {
+      logical match
         case _: HiveNativeCommand => "<Native command: executed by Hive>"
         case _: SetCommand =>
           "<SET command: executed by Hive, and noted by SQLContext>"
         case _ => super.simpleString
-      }
-  }
 
-  protected[sql] override def addJar(path: String): Unit = {
+  protected[sql] override def addJar(path: String): Unit =
     // Add jar to Hive and classloader
     executionHive.addJar(path)
     metadataHive.addJar(path)
@@ -629,10 +591,8 @@ class HiveContext private[hive](
       .currentThread()
       .setContextClassLoader(executionHive.clientLoader.classLoader)
     super.addJar(path)
-  }
-}
 
-private[hive] object HiveContext {
+private[hive] object HiveContext
 
   /** The version of hive used internally by Spark SQL. */
   val hiveExecutionVersion: String = "1.2.1"
@@ -710,7 +670,7 @@ private[hive] object HiveContext {
 
   /** Constructs a configuration for hive, where the metastore is located in a temp directory. */
   def newTemporaryConfiguration(
-      useInMemoryDerby: Boolean): Map[String, String] = {
+      useInMemoryDerby: Boolean): Map[String, String] =
     val withInMemoryMode = if (useInMemoryDerby) "memory:" else ""
 
     val tempDir = Utils.createTempDir()
@@ -718,13 +678,11 @@ private[hive] object HiveContext {
     val propMap: HashMap[String, String] = HashMap()
     // We have to mask all properties in hive-site.xml that relates to metastore data source
     // as we used a local metastore here.
-    HiveConf.ConfVars.values().foreach { confvar =>
+    HiveConf.ConfVars.values().foreach  confvar =>
       if (confvar.varname.contains("datanucleus") ||
           confvar.varname.contains("jdo") ||
-          confvar.varname.contains("hive.metastore.rawstore.impl")) {
+          confvar.varname.contains("hive.metastore.rawstore.impl"))
         propMap.put(confvar.varname, confvar.getDefaultExpr())
-      }
-    }
     propMap.put(HiveConf.ConfVars.METASTOREWAREHOUSE.varname,
                 localMetastore.toURI.toString)
     propMap.put(
@@ -748,7 +706,6 @@ private[hive] object HiveContext {
     propMap.put(ConfVars.METASTOREURIS.varname, "")
 
     propMap.toMap
-  }
 
   protected val primitiveTypes = Seq(StringType,
                                      IntegerType,
@@ -762,23 +719,22 @@ private[hive] object HiveContext {
                                      TimestampType,
                                      BinaryType)
 
-  protected[sql] def toHiveString(a: (Any, DataType)): String = a match {
+  protected[sql] def toHiveString(a: (Any, DataType)): String = a match
     case (struct: Row, StructType(fields)) =>
       struct.toSeq
         .zip(fields)
-        .map {
+        .map
           case (v, t) =>
             s""""${t.name}":${toHiveStructString(v, t.dataType)}"""
-        }
         .mkString("{", ",", "}")
     case (seq: Seq[_], ArrayType(typ, _)) =>
       seq.map(v => (v, typ)).map(toHiveStructString).mkString("[", ",", "]")
     case (map: Map[_, _], MapType(kType, vType, _)) =>
-      map.map {
+      map.map
         case (key, value) =>
           toHiveStructString((key, kType)) + ":" +
           toHiveStructString((value, vType))
-      }.toSeq.sorted.mkString("{", ",", "}")
+      .toSeq.sorted.mkString("{", ",", "}")
     case (null, _) => "NULL"
     case (d: Int, DateType) => new DateWritable(d).toString
     case (t: Timestamp, TimestampType) => new TimestampWritable(t).toString
@@ -788,29 +744,25 @@ private[hive] object HiveContext {
       // Hive strips trailing zeros so use its toString
       HiveDecimal.create(decimal).toString
     case (other, tpe) if primitiveTypes contains tpe => other.toString
-  }
 
   /** Hive outputs fields of structs slightly differently than top level attributes. */
-  protected def toHiveStructString(a: (Any, DataType)): String = a match {
+  protected def toHiveStructString(a: (Any, DataType)): String = a match
     case (struct: Row, StructType(fields)) =>
       struct.toSeq
         .zip(fields)
-        .map {
+        .map
           case (v, t) =>
             s""""${t.name}":${toHiveStructString(v, t.dataType)}"""
-        }
         .mkString("{", ",", "}")
     case (seq: Seq[_], ArrayType(typ, _)) =>
       seq.map(v => (v, typ)).map(toHiveStructString).mkString("[", ",", "]")
     case (map: Map[_, _], MapType(kType, vType, _)) =>
-      map.map {
+      map.map
         case (key, value) =>
           toHiveStructString((key, kType)) + ":" +
           toHiveStructString((value, vType))
-      }.toSeq.sorted.mkString("{", ",", "}")
+      .toSeq.sorted.mkString("{", ",", "}")
     case (null, _) => "null"
     case (s: String, StringType) => "\"" + s + "\""
     case (decimal, DecimalType()) => decimal.toString
     case (other, tpe) if primitiveTypes contains tpe => other.toString
-  }
-}

@@ -1,9 +1,9 @@
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
-object Test extends App {
-  reify {
-    object Persons {
+object Test extends App
+  reify
+    object Persons
 
       /** A list of persons. To create a list, we use Predef.List
         *  which takes a variable number of arguments and constructs
@@ -28,7 +28,7 @@ object Test extends App {
       /** Return an iterator over persons older than 20, given
         *  an iterator over persons.
         */
-      def olderThan20(xs: Iterator[Person]): Iterator[String] = {
+      def olderThan20(xs: Iterator[Person]): Iterator[String] =
 
         // The first expression is called a 'generator' and makes
         // 'p' take values from 'xs'. The second expression is
@@ -38,13 +38,11 @@ object Test extends App {
         // for each 'p' which satisfies the filters and used to assemble
         // the resulting iterator
         for (p <- xs if p.age > 20) yield p.name
-      }
-    }
 
     /** Some functions over lists of numbers which demonstrate
       *  the use of for comprehensions.
       */
-    object Numeric {
+    object Numeric
 
       /** Return the divisors of n. */
       def divisors(n: Int): List[Int] =
@@ -54,18 +52,16 @@ object Test extends App {
       def isPrime(n: Int) = divisors(n).length == 2
 
       /** Return pairs of numbers whose sum is prime. */
-      def findNums(n: Int): Iterable[(Int, Int)] = {
+      def findNums(n: Int): Iterable[(Int, Int)] =
 
         // a for comprehension using two generators
         for (i <- 1 until n;
         j <- 1 until (i - 1); if isPrime(i + j)) yield (i, j)
-      }
 
       /** Return the sum of the elements of 'xs'. */
       def sum(xs: List[Double]): Double =
-        xs.foldLeft(0.0) { (x, y) =>
+        xs.foldLeft(0.0)  (x, y) =>
           x + y
-        }
 
       /** Return the sum of pairwise product of the two lists. */
       def scalProd(xs: List[Double], ys: List[Double]) =
@@ -77,15 +73,13 @@ object Test extends App {
         else
           xs.head :: removeDuplicates(
               for (x <- xs.tail if x != xs.head) yield x)
-    }
 
     // import all members of object 'persons' in the current scope
     import Persons._
 
     print("Persons over 20:")
-    olderThan20(persons) foreach { x =>
+    olderThan20(persons) foreach  x =>
       print(" " + x)
-    }
     println
 
     import Numeric._
@@ -93,9 +87,8 @@ object Test extends App {
     println("divisors(34) = " + divisors(34))
 
     print("findNums(15) =")
-    findNums(15) foreach { x =>
+    findNums(15) foreach  x =>
       print(" " + x)
-    }
     println
 
     val xs = List(3.5, 5.0, 4.5)
@@ -103,5 +96,4 @@ object Test extends App {
 
     val ys = List(2.0, 1.0, 3.0)
     println("scalProd(" + xs + ", " + ys + ") = " + scalProd(xs, ys))
-  }.eval
-}
+  .eval

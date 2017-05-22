@@ -9,14 +9,13 @@ import scala.runtime.NonLocalReturnControl
   * A FuturePool executes tasks asynchronously, typically using a pool
   * of worker threads.
   */
-trait FuturePool {
+trait FuturePool
   def apply[T](f: => T): Future[T]
-}
 
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.util.FuturePools]].
   */
-object FuturePool {
+object FuturePool
 
   /**
     * Creates a [[FuturePool]] backed by an `java.util.concurrent.ExecutorService`.
@@ -35,9 +34,8 @@ object FuturePool {
     * A [[FuturePool]] that really isn't; it executes tasks immediately
     * without waiting.  This can be useful in unit tests.
     */
-  val immediatePool: FuturePool = new FuturePool {
+  val immediatePool: FuturePool = new FuturePool
     def apply[T](f: => T): Future[T] = Future(f)
-  }
 
   private lazy val defaultExecutor = Executors.newCachedThreadPool(
       new NamedPoolThreadFactory("UnboundedFuturePool", makeDaemons = true)
@@ -64,7 +62,6 @@ object FuturePool {
     */
   lazy val interruptibleUnboundedPool: FuturePool =
     new InterruptibleExecutorServiceFuturePool(defaultExecutor)
-}
 
 /**
   * A [[FuturePool]] backed by a `java.util.concurrent.ExecutorService`
@@ -82,16 +79,16 @@ class InterruptibleExecutorServiceFuturePool(executor: ExecutorService)
   */
 class ExecutorServiceFuturePool protected[this](
     val executor: ExecutorService, val interruptible: Boolean)
-    extends FuturePool {
+    extends FuturePool
   def this(executor: ExecutorService) = this(executor, false)
 
-  def apply[T](f: => T): Future[T] = {
+  def apply[T](f: => T): Future[T] =
     val runOk = new AtomicBoolean(true)
     val p = new Promise[T]
-    val task = new Runnable {
+    val task = new Runnable
       private[this] val saved = Local.save()
 
-      def run(): Unit = {
+      def run(): Unit =
         // Make an effort to skip work in the case the promise
         // has been cancelled or already defined.
         if (!runOk.compareAndSet(true, false)) return
@@ -99,7 +96,7 @@ class ExecutorServiceFuturePool protected[this](
         val current = Local.save()
         Local.restore(saved)
 
-        try p.updateIfEmpty(Try(f)) catch {
+        try p.updateIfEmpty(Try(f)) catch
           case nlrc: NonLocalReturnControl[_] =>
             val fnlrc = new FutureNonLocalReturnControl(nlrc)
             p.updateIfEmpty(Throw(fnlrc))
@@ -107,29 +104,22 @@ class ExecutorServiceFuturePool protected[this](
           case e: Throwable =>
             p.updateIfEmpty(Throw(new ExecutionException(e)))
             throw e
-        } finally Local.restore(current)
-      }
-    }
+        finally Local.restore(current)
 
     // This is safe: the only thing that can call task.run() is
     // executor, the only thing that can raise an interrupt is the
     // receiver of this value, which will then be fully initialized.
-    val javaFuture = try executor.submit(task) catch {
+    val javaFuture = try executor.submit(task) catch
       case e: RejectedExecutionException =>
         runOk.set(false)
         p.setException(e)
         null
-    }
 
-    p.setInterruptHandler {
+    p.setInterruptHandler
       case cause =>
-        if (interruptible || runOk.compareAndSet(true, false)) {
+        if (interruptible || runOk.compareAndSet(true, false))
           val exc = new CancellationException
           exc.initCause(cause)
           if (p.updateIfEmpty(Throw(exc))) javaFuture.cancel(true)
-        }
-    }
 
     p
-  }
-}

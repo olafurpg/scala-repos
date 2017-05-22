@@ -12,7 +12,7 @@ import akka.cluster.routing.ClusterRouterGroup
 import akka.cluster.routing.ClusterRouterPoolSettings
 import akka.cluster.routing.ClusterRouterGroupSettings
 
-object ClusterDeployerSpec {
+object ClusterDeployerSpec
   val deployerConf = ConfigFactory.parseString(
       """
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
@@ -38,17 +38,15 @@ object ClusterDeployerSpec {
       """,
       ConfigParseOptions.defaults)
 
-  class RecipeActor extends Actor {
+  class RecipeActor extends Actor
     def receive = { case _ ⇒ }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf) {
+class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf)
 
-  "A RemoteDeployer" must {
+  "A RemoteDeployer" must
 
-    "be able to parse 'akka.actor.deployment._' with specified cluster pool" in {
+    "be able to parse 'akka.actor.deployment._' with specified cluster pool" in
       val service = "/user/service1"
       val deployment = system
         .asInstanceOf[ActorSystemImpl]
@@ -70,9 +68,8 @@ class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf) {
                      ClusterScope,
                      Deploy.NoDispatcherGiven,
                      Deploy.NoMailboxGiven)))
-    }
 
-    "be able to parse 'akka.actor.deployment._' with specified cluster group" in {
+    "be able to parse 'akka.actor.deployment._' with specified cluster group" in
       val service = "/user/service2"
       val deployment = system
         .asInstanceOf[ActorSystemImpl]
@@ -95,9 +92,8 @@ class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf) {
                      ClusterScope,
                      "mydispatcher",
                      "mymailbox")))
-    }
 
-    "have correct router mappings" in {
+    "have correct router mappings" in
       val mapping = system
         .asInstanceOf[ActorSystemImpl]
         .provider
@@ -107,6 +103,3 @@ class ClusterDeployerSpec extends AkkaSpec(ClusterDeployerSpec.deployerConf) {
           classOf[akka.cluster.routing.AdaptiveLoadBalancingPool].getName)
       mapping("adaptive-group") should ===(
           classOf[akka.cluster.routing.AdaptiveLoadBalancingGroup].getName)
-    }
-  }
-}

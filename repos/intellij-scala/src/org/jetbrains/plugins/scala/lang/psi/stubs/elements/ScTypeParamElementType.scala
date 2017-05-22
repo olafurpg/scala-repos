@@ -18,8 +18,8 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 17.06.2009
   */
 class ScTypeParamElementType[Func <: ScTypeParam]
-    extends ScStubElementType[ScTypeParamStub, ScTypeParam]("type parameter") {
-  def serialize(stub: ScTypeParamStub, dataStream: StubOutputStream) {
+    extends ScStubElementType[ScTypeParamStub, ScTypeParam]("type parameter")
+  def serialize(stub: ScTypeParamStub, dataStream: StubOutputStream)
     dataStream.writeName(stub.getName)
     dataStream.writeName(stub.getUpperText)
     dataStream.writeName(stub.getLowerText)
@@ -30,25 +30,21 @@ class ScTypeParamElementType[Func <: ScTypeParam]
     serialiseSeq(dataStream, stub.getContextBoundText)
     dataStream.writeName(stub.getContainingFileName)
     dataStream.writeName(stub.typeParameterText)
-  }
 
   def indexStub(stub: ScTypeParamStub, sink: IndexSink) {}
 
-  def createPsi(stub: ScTypeParamStub): ScTypeParam = {
+  def createPsi(stub: ScTypeParamStub): ScTypeParam =
     new ScTypeParamImpl(stub)
-  }
 
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScTypeParam,
-      parentStub: StubElement[ParentPsi]): ScTypeParamStub = {
-    val upperText = psi.upperTypeElement match {
+      parentStub: StubElement[ParentPsi]): ScTypeParamStub =
+    val upperText = psi.upperTypeElement match
       case Some(te) => te.getText
       case None => ""
-    }
-    val lowerText = psi.lowerTypeElement match {
+    val lowerText = psi.lowerTypeElement match
       case Some(te) => te.getText
       case None => ""
-    }
     val viewText =
       psi.viewTypeElement.map(te => StringRef.fromString(te.getText))
     val contextText =
@@ -66,10 +62,9 @@ class ScTypeParamElementType[Func <: ScTypeParam]
                             psi.getTextRange.getStartOffset,
                             StringRef.fromString(psi.getContainingFileName),
                             StringRef.fromString(typeParameterText))
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeParamStub = {
+      dataStream: StubInputStream, parentStub: Any): ScTypeParamStub =
     val name = dataStream.readName
     val upperText = dataStream.readName
     val lowerText = dataStream.readName
@@ -92,17 +87,13 @@ class ScTypeParamElementType[Func <: ScTypeParam]
                             position,
                             fileName,
                             typeParameterText)
-  }
 
-  def deserialiseSeq(dataStream: StubInputStream): Seq[StringRef] = {
+  def deserialiseSeq(dataStream: StubInputStream): Seq[StringRef] =
     val n = dataStream.readInt
     val refs = new ArrayBuffer[StringRef]
     for (i <- 0 until n) refs += dataStream.readName
     refs
-  }
 
-  def serialiseSeq(dataStream: StubOutputStream, ref: Seq[String]) {
+  def serialiseSeq(dataStream: StubOutputStream, ref: Seq[String])
     dataStream.writeInt(ref.length)
     for (r <- ref) dataStream.writeName(r)
-  }
-}

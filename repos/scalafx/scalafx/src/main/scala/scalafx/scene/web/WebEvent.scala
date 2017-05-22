@@ -36,7 +36,7 @@ import scalafx.event.{Event, EventType}
 /**
   * Companion object for [[scalafx.scene.web.WebEvent]].
   */
-object WebEvent {
+object WebEvent
 
   /**
     * Converts a ScalaFX WebEvent to its JavaFX counterpart.
@@ -89,7 +89,6 @@ object WebEvent {
       "Use VisibilityChanged; VISIBILITY_CHANGED will be removed in a future release",
       "8.0.60-R10")
   val VISIBILITY_CHANGED = VisibilityChanged
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/web/WebEvent.html JavaFX WebEvent]].
@@ -98,7 +97,7 @@ object WebEvent {
   * @param delegate JavaFX WebEvent. Since it has no default constructor, there is not default value.
   */
 final class WebEvent[T](override val delegate: jfxsw.WebEvent[T])
-    extends Event(delegate) with SFXDelegate[jfxsw.WebEvent[T]] {
+    extends Event(delegate) with SFXDelegate[jfxsw.WebEvent[T]]
 
   /**
     * Creates a new event object.
@@ -111,4 +110,3 @@ final class WebEvent[T](override val delegate: jfxsw.WebEvent[T])
     * Returns data item carried by this event.
     */
   def data: T = delegate.getData
-}

@@ -7,17 +7,16 @@ import org.scalacheck.Prop._
 import org.scalacheck.Properties
 import org.scalacheck.Arbitrary._
 
-trait PairValues[K, V] {
+trait PairValues[K, V]
   def kvalues: Seq[Gen[K]]
   def vvalues: Seq[Gen[V]]
 
   def values =
-    for {
+    for
       kg <- kvalues
       vg <- vvalues
-    } yield
-      for {
+    yield
+      for
         k <- kg
         v <- vg
-      } yield (k, v)
-}
+      yield (k, v)

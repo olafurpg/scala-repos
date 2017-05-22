@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.control.NonFatal
 
-private[tracker] object TaskOpProcessorImpl {
+private[tracker] object TaskOpProcessorImpl
 
   /**
     * Maps a task status update to the appropriate [[TaskOpProcessor.Action]].
@@ -24,7 +24,7 @@ private[tracker] object TaskOpProcessorImpl {
     *                          without going through the WhenLeaderActor indirection.
     */
   class StatusUpdateActionResolver(
-      clock: Clock, directTaskTracker: TaskTracker) {
+      clock: Clock, directTaskTracker: TaskTracker)
     private[this] val log = LoggerFactory.getLogger(getClass)
 
     /**
@@ -36,29 +36,23 @@ private[tracker] object TaskOpProcessorImpl {
       * * an Action.Update if the tasks existed and the TaskStatus contains new information OR ELSE
       */
     def resolve(taskId: Task.Id, status: TaskStatus)(
-        implicit ec: ExecutionContext): Future[Action] = {
-      directTaskTracker.task(taskId).map {
+        implicit ec: ExecutionContext): Future[Action] =
+      directTaskTracker.task(taskId).map
         case Some(existingTask) =>
           actionForTaskAndStatus(existingTask, status)
         case None =>
           Action.Fail(new IllegalStateException(
                   s"$taskId of app [${taskId.appId}] does not exist"))
-      }
-    }
 
     private[this] def actionForTaskAndStatus(
-        task: Task, statusUpdate: TaskStatus): Action = {
+        task: Task, statusUpdate: TaskStatus): Action =
       val change = task.update(TaskStateOp.MesosUpdate(
               MarathonTaskStatus(statusUpdate), clock.now()))
-      change match {
+      change match
         case TaskStateChange.Update(updatedTask) => Action.Update(updatedTask)
         case TaskStateChange.Expunge => Action.Expunge
         case TaskStateChange.NoChange => Action.Noop
         case TaskStateChange.Failure(cause) => Action.Fail(cause)
-      }
-    }
-  }
-}
 
 /**
   * Processes durable operations on tasks by
@@ -70,14 +64,14 @@ private[tracker] class TaskOpProcessorImpl(
     taskTrackerRef: ActorRef,
     repo: TaskRepository,
     statusUpdateActionResolver: StatusUpdateActionResolver)
-    extends TaskOpProcessor {
+    extends TaskOpProcessor
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   import TaskOpProcessor._
 
   override def process(op: Operation)(
-      implicit ec: ExecutionContext): Future[Unit] = {
-    op.action match {
+      implicit ec: ExecutionContext): Future[Unit] =
+    op.action match
 
       case Action.Update(task) =>
         // Used for a create or as a result from a UpdateStatus action.
@@ -85,10 +79,9 @@ private[tracker] class TaskOpProcessorImpl(
         val marathonTask = TaskSerializer.toProto(task)
         repo
           .store(marathonTask)
-          .map { _ =>
+          .map  _ =>
             taskTrackerRef ! TaskTrackerActor.TaskUpdated(
                 task, TaskTrackerActor.Ack(op.sender))
-          }
           .recoverWith(tryToRecover(op)(expectedTaskState = Some(task)))
 
       case Action.Expunge =>
@@ -96,19 +89,17 @@ private[tracker] class TaskOpProcessorImpl(
         // The expunge is propagated to the taskTracker which in turn informs the sender about the success (see Ack).
         repo
           .expunge(op.taskId.idString)
-          .map { _ =>
+          .map  _ =>
             taskTrackerRef ! TaskTrackerActor.TaskRemoved(
                 op.taskId, TaskTrackerActor.Ack(op.sender))
-          }
           .recoverWith(tryToRecover(op)(expectedTaskState = None))
 
       case Action.UpdateStatus(status) =>
-        statusUpdateActionResolver.resolve(op.taskId, status).flatMap {
+        statusUpdateActionResolver.resolve(op.taskId, status).flatMap
           action: Action =>
             // Since this action is mapped to another action, we delegate the responsibility to inform
             // the sender to that other action.
             process(op.copy(action = action))
-        }
 
       case Action.Noop =>
         // Used if a task status update does not result in any changes.
@@ -122,8 +113,6 @@ private[tracker] class TaskOpProcessorImpl(
         // Since we did not change the task state, we inform the sender directly of the failed operation.
         op.sender ! Status.Failure(cause)
         Future.successful(())
-    }
-  }
 
   /**
     * If we encounter failure, we try to reload the effected task to make sure that the taskTracker
@@ -136,15 +125,14 @@ private[tracker] class TaskOpProcessorImpl(
     */
   private[this] def tryToRecover(op: Operation)(
       expectedTaskState: Option[Task])(implicit ec: ExecutionContext)
-    : PartialFunction[Throwable, Future[Unit]] = {
+    : PartialFunction[Throwable, Future[Unit]] =
 
     case NonFatal(cause) =>
-      def ack(actualTaskState: Option[MarathonTask]): TaskTrackerActor.Ack = {
+      def ack(actualTaskState: Option[MarathonTask]): TaskTrackerActor.Ack =
         val msg =
           if (expectedTaskState.map(_.marathonTask) == actualTaskState) (())
           else Status.Failure(cause)
         TaskTrackerActor.Ack(op.sender, msg)
-      }
 
       log.warn(
           s"${op.taskId} of app [${op.taskId.appId}]: try to recover from failed ${op.action.toString}",
@@ -153,21 +141,17 @@ private[tracker] class TaskOpProcessorImpl(
 
       repo
         .task(op.taskId.idString)
-        .map {
+        .map
           case Some(task) =>
             val taskState = TaskSerializer.fromProto(task)
             taskTrackerRef ! TaskTrackerActor.TaskUpdated(taskState,
                                                           ack(Some(task)))
           case None =>
             taskTrackerRef ! TaskTrackerActor.TaskRemoved(op.taskId, ack(None))
-        }
-        .recover {
+        .recover
           case NonFatal(loadingFailure) =>
             log.warn(
                 s"${op.taskId} of app [${op.taskId.appId}]: task reloading failed as well",
                 loadingFailure
             )
             throw cause
-        }
-  }
-}

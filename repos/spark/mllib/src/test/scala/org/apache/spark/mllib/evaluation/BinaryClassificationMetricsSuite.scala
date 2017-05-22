@@ -22,7 +22,7 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
 class BinaryClassificationMetricsSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite with MLlibTestSparkContext
 
   private def areWithinEpsilon(x: (Double, Double)): Boolean =
     x._1 ~= (x._2) absTol 1E-5
@@ -32,14 +32,12 @@ class BinaryClassificationMetricsSuite
     (x._1._1 ~= x._2._1 absTol 1E-5) && (x._1._2 ~= x._2._2 absTol 1E-5)
 
   private def assertSequencesMatch(
-      left: Seq[Double], right: Seq[Double]): Unit = {
+      left: Seq[Double], right: Seq[Double]): Unit =
     assert(left.zip(right).forall(areWithinEpsilon))
-  }
 
   private def assertTupleSequencesMatch(
-      left: Seq[(Double, Double)], right: Seq[(Double, Double)]): Unit = {
+      left: Seq[(Double, Double)], right: Seq[(Double, Double)]): Unit =
     assert(left.zip(right).forall(pairsWithinEpsilon))
-  }
 
   private def validateMetrics(metrics: BinaryClassificationMetrics,
                               expectedThresholds: Seq[Double],
@@ -48,7 +46,7 @@ class BinaryClassificationMetricsSuite
                               expectedFMeasures1: Seq[Double],
                               expectedFmeasures2: Seq[Double],
                               expectedPrecisions: Seq[Double],
-                              expectedRecalls: Seq[Double]) = {
+                              expectedRecalls: Seq[Double]) =
 
     assertSequencesMatch(metrics.thresholds().collect(), expectedThresholds)
     assertTupleSequencesMatch(metrics.roc().collect(), expectedROCCurve)
@@ -67,9 +65,8 @@ class BinaryClassificationMetricsSuite
                               expectedThresholds.zip(expectedPrecisions))
     assertTupleSequencesMatch(metrics.recallByThreshold().collect(),
                               expectedThresholds.zip(expectedRecalls))
-  }
 
-  test("binary evaluation metrics") {
+  test("binary evaluation metrics")
     val scoreAndLabels = sc.parallelize(Seq((0.1, 0.0),
                                             (0.1, 1.0),
                                             (0.4, 0.0),
@@ -84,10 +81,9 @@ class BinaryClassificationMetricsSuite
     val numFalsePositives = Seq(0, 1, 2, 3)
     val numPositives = 4
     val numNegatives = 3
-    val precisions = numTruePositives.zip(numFalsePositives).map {
+    val precisions = numTruePositives.zip(numFalsePositives).map
       case (t, f) =>
         t.toDouble / (t + f)
-    }
     val recalls = numTruePositives.map(t => t.toDouble / numPositives)
     val fpr = numFalsePositives.map(f => f.toDouble / numNegatives)
     val rocCurve = Seq((0.0, 0.0)) ++ fpr.zip(recalls) ++ Seq((1.0, 1.0))
@@ -98,10 +94,9 @@ class BinaryClassificationMetricsSuite
 
     validateMetrics(
         metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
-  }
 
   test(
-      "binary evaluation metrics for RDD where all examples have positive label") {
+      "binary evaluation metrics for RDD where all examples have positive label")
     val scoreAndLabels = sc.parallelize(Seq((0.5, 1.0), (0.5, 1.0)), 2)
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
 
@@ -117,10 +112,9 @@ class BinaryClassificationMetricsSuite
 
     validateMetrics(
         metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
-  }
 
   test(
-      "binary evaluation metrics for RDD where all examples have negative label") {
+      "binary evaluation metrics for RDD where all examples have negative label")
     val scoreAndLabels = sc.parallelize(Seq((0.5, 0.0), (0.5, 0.0)), 2)
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
 
@@ -131,20 +125,17 @@ class BinaryClassificationMetricsSuite
     val rocCurve = Seq((0.0, 0.0)) ++ fpr.zip(recalls) ++ Seq((1.0, 1.0))
     val pr = recalls.zip(precisions)
     val prCurve = Seq((0.0, 1.0)) ++ pr
-    val f1 = pr.map {
+    val f1 = pr.map
       case (0, 0) => 0.0
       case (r, p) => 2.0 * (p * r) / (p + r)
-    }
-    val f2 = pr.map {
+    val f2 = pr.map
       case (0, 0) => 0.0
       case (r, p) => 5.0 * (p * r) / (4.0 * p + r)
-    }
 
     validateMetrics(
         metrics, thresholds, rocCurve, prCurve, f1, f2, precisions, recalls)
-  }
 
-  test("binary evaluation metrics with downsampling") {
+  test("binary evaluation metrics with downsampling")
     val scoreAndLabels = Seq((0.1, 0.0),
                              (0.2, 0.0),
                              (0.3, 1.0),
@@ -194,5 +185,3 @@ class BinaryClassificationMetricsSuite
             (1.0, 1.0),
             (1.0, 1.0)
         ) == downsampledROC)
-  }
-}

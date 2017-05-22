@@ -6,9 +6,8 @@ import org.jetbrains.jps.incremental.scala.data.{CompilationData, CompilerData, 
 /**
   * @author Pavel Fatin
   */
-trait Server {
+trait Server
   def compile(sbtData: SbtData,
               compilerData: CompilerData,
               compilationData: CompilationData,
               client: Client): ExitCode
-}

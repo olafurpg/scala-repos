@@ -14,7 +14,7 @@ import akka.remote.transport.ThrottlerTransportAdapter.Direction
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
 
-object JepsenInspiredInsertSpec extends MultiNodeConfig {
+object JepsenInspiredInsertSpec extends MultiNodeConfig
   val controller = role("controller")
   val n1 = role("n1")
   val n2 = role("n2")
@@ -32,7 +32,6 @@ object JepsenInspiredInsertSpec extends MultiNodeConfig {
     """))
 
   testTransport(on = true)
-}
 
 class JepsenInspiredInsertSpecMultiJvmNode1 extends JepsenInspiredInsertSpec
 class JepsenInspiredInsertSpecMultiJvmNode2 extends JepsenInspiredInsertSpec
@@ -43,7 +42,7 @@ class JepsenInspiredInsertSpecMultiJvmNode6 extends JepsenInspiredInsertSpec
 
 class JepsenInspiredInsertSpec
     extends MultiNodeSpec(JepsenInspiredInsertSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
   import JepsenInspiredInsertSpec._
   import Replicator._
 
@@ -59,112 +58,89 @@ class JepsenInspiredInsertSpec
   //  val delayMillis = 20
   //  val totalCount = 2000
   val expectedData = (0 until totalCount).toSet
-  val data: Map[RoleName, Seq[Int]] = {
+  val data: Map[RoleName, Seq[Int]] =
     val nodeIndex = nodes.zipWithIndex.map { case (n, i) ⇒ i -> n }.toMap
     (0 until totalCount).groupBy(i ⇒ nodeIndex(i % nodeCount))
-  }
   lazy val myData: Seq[Int] = data(myself)
 
   def sleepDelay(): Unit =
-    if (delayMillis != 0) {
+    if (delayMillis != 0)
       val rndDelay = ThreadLocalRandom.current().nextInt(delayMillis)
       if (rndDelay != 0) Thread.sleep(delayMillis)
-    }
 
-  def sleepBeforePartition(): Unit = {
+  def sleepBeforePartition(): Unit =
     if (delayMillis != 0)
       Thread.sleep(delayMillis * totalCount / nodeCount / 10)
-  }
 
   def sleepDuringPartition(): Unit =
     Thread.sleep(math.max(5000, delayMillis * totalCount / nodeCount / 2))
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       cluster join node(to).address
-    }
     enterBarrier(from.name + "-joined")
-  }
 
-  "Insert from 5 nodes" must {
+  "Insert from 5 nodes" must
 
-    "setup cluster" in {
-      runOn(nodes: _*) {
+    "setup cluster" in
+      runOn(nodes: _*)
         nodes.foreach { join(_, n1) }
 
-        within(10.seconds) {
-          awaitAssert {
+        within(10.seconds)
+          awaitAssert
             replicator ! GetReplicaCount
             expectMsg(ReplicaCount(nodes.size))
-          }
-        }
-      }
 
-      runOn(controller) {
-        nodes.foreach { n ⇒
+      runOn(controller)
+        nodes.foreach  n ⇒
           enterBarrier(n.name + "-joined")
-        }
-      }
 
       enterBarrier("after-setup")
-    }
-  }
 
-  "replicate values when all nodes connected" in {
+  "replicate values when all nodes connected" in
     val key = ORSetKey[Int]("A")
-    runOn(nodes: _*) {
+    runOn(nodes: _*)
       val writeProbe = TestProbe()
-      val writeAcks = myData.map { i ⇒
+      val writeAcks = myData.map  i ⇒
         sleepDelay()
         replicator.tell(Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
                         writeProbe.ref)
         writeProbe.receiveOne(3.seconds)
-      }
-      val successWriteAcks = writeAcks.collect {
+      val successWriteAcks = writeAcks.collect
         case success: UpdateSuccess[_] ⇒ success
-      }
-      val failureWriteAcks = writeAcks.collect {
+      val failureWriteAcks = writeAcks.collect
         case fail: UpdateFailure[_] ⇒ fail
-      }
       successWriteAcks.map(_.request.get).toSet should be(myData.toSet)
       successWriteAcks.size should be(myData.size)
       failureWriteAcks should be(Nil)
       (successWriteAcks.size + failureWriteAcks.size) should be(myData.size)
 
       // eventually all nodes will have the data
-      within(15.seconds) {
-        awaitAssert {
+      within(15.seconds)
+        awaitAssert
           val readProbe = TestProbe()
           replicator.tell(Get(key, ReadLocal), readProbe.ref)
-          val result = readProbe.expectMsgPF() {
+          val result = readProbe.expectMsgPF()
             case g @ GetSuccess(`key`, _) ⇒ g.get(key)
-          }
           result.elements should be(expectedData)
-        }
-      }
-    }
 
     enterBarrier("after-test-1")
-  }
 
-  "write/read to majority when all nodes connected" in {
+  "write/read to majority when all nodes connected" in
     val key = ORSetKey[Int]("B")
     val readMajority = ReadMajority(timeout)
     val writeMajority = WriteMajority(timeout)
-    runOn(nodes: _*) {
+    runOn(nodes: _*)
       val writeProbe = TestProbe()
-      val writeAcks = myData.map { i ⇒
+      val writeAcks = myData.map  i ⇒
         sleepDelay()
         replicator.tell(Update(key, ORSet(), writeMajority, Some(i))(_ + i),
                         writeProbe.ref)
         writeProbe.receiveOne(timeout + 1.second)
-      }
-      val successWriteAcks = writeAcks.collect {
+      val successWriteAcks = writeAcks.collect
         case success: UpdateSuccess[_] ⇒ success
-      }
-      val failureWriteAcks = writeAcks.collect {
+      val failureWriteAcks = writeAcks.collect
         case fail: UpdateFailure[_] ⇒ fail
-      }
       successWriteAcks.map(_.request.get).toSet should be(myData.toSet)
       successWriteAcks.size should be(myData.size)
       failureWriteAcks should be(Nil)
@@ -175,23 +151,19 @@ class JepsenInspiredInsertSpec
       // read from majority of nodes, which is enough to retrieve all data
       val readProbe = TestProbe()
       replicator.tell(Get(key, readMajority), readProbe.ref)
-      val result = readProbe.expectMsgPF() {
+      val result = readProbe.expectMsgPF()
         case g @ GetSuccess(`key`, _) ⇒ g.get(key)
-      }
       val survivors = result.elements.size
       result.elements should be(expectedData)
-    }
 
-    runOn(controller) {
+    runOn(controller)
       enterBarrier("data-written-2")
-    }
 
     enterBarrier("after-test-2")
-  }
 
-  "replicate values after partition" in {
+  "replicate values after partition" in
     val key = ORSetKey[Int]("C")
-    runOn(controller) {
+    runOn(controller)
       sleepBeforePartition()
       for (a ← List(n1, n4, n5); b ← List(n2, n3)) testConductor
         .blackhole(a, b, Direction.Both)
@@ -201,22 +173,18 @@ class JepsenInspiredInsertSpec
         .passThrough(a, b, Direction.Both)
         .await
       enterBarrier("partition-healed-3")
-    }
 
-    runOn(nodes: _*) {
+    runOn(nodes: _*)
       val writeProbe = TestProbe()
-      val writeAcks = myData.map { i ⇒
+      val writeAcks = myData.map  i ⇒
         sleepDelay()
         replicator.tell(Update(key, ORSet(), WriteLocal, Some(i))(_ + i),
                         writeProbe.ref)
         writeProbe.receiveOne(3.seconds)
-      }
-      val successWriteAcks = writeAcks.collect {
+      val successWriteAcks = writeAcks.collect
         case success: UpdateSuccess[_] ⇒ success
-      }
-      val failureWriteAcks = writeAcks.collect {
+      val failureWriteAcks = writeAcks.collect
         case fail: UpdateFailure[_] ⇒ fail
-      }
       successWriteAcks.map(_.request.get).toSet should be(myData.toSet)
       successWriteAcks.size should be(myData.size)
       failureWriteAcks should be(Nil)
@@ -225,26 +193,21 @@ class JepsenInspiredInsertSpec
       enterBarrier("partition-healed-3")
 
       // eventually all nodes will have the data
-      within(15.seconds) {
-        awaitAssert {
+      within(15.seconds)
+        awaitAssert
           val readProbe = TestProbe()
           replicator.tell(Get(key, ReadLocal), readProbe.ref)
-          val result = readProbe.expectMsgPF() {
+          val result = readProbe.expectMsgPF()
             case g @ GetSuccess(`key`, _) ⇒ g.get(key)
-          }
           result.elements should be(expectedData)
-        }
-      }
-    }
 
     enterBarrier("after-test-3")
-  }
 
-  "write to majority during 3+2 partition and read from majority after partition" in {
+  "write to majority during 3+2 partition and read from majority after partition" in
     val key = ORSetKey[Int]("D")
     val readMajority = ReadMajority(timeout)
     val writeMajority = WriteMajority(timeout)
-    runOn(controller) {
+    runOn(controller)
       sleepBeforePartition()
       for (a ← List(n1, n4, n5); b ← List(n2, n3)) testConductor
         .blackhole(a, b, Direction.Both)
@@ -254,61 +217,47 @@ class JepsenInspiredInsertSpec
         .passThrough(a, b, Direction.Both)
         .await
       enterBarrier("partition-healed-4")
-    }
 
-    runOn(nodes: _*) {
+    runOn(nodes: _*)
       val writeProbe = TestProbe()
-      val writeAcks = myData.map { i ⇒
+      val writeAcks = myData.map  i ⇒
         sleepDelay()
         replicator.tell(Update(key, ORSet(), writeMajority, Some(i))(_ + i),
                         writeProbe.ref)
         writeProbe.receiveOne(timeout + 1.second)
-      }
-      val successWriteAcks = writeAcks.collect {
+      val successWriteAcks = writeAcks.collect
         case success: UpdateSuccess[_] ⇒ success
-      }
-      val failureWriteAcks = writeAcks.collect {
+      val failureWriteAcks = writeAcks.collect
         case fail: UpdateFailure[_] ⇒ fail
-      }
-      runOn(n1, n4, n5) {
+      runOn(n1, n4, n5)
         successWriteAcks.map(_.request.get).toSet should be(myData.toSet)
         successWriteAcks.size should be(myData.size)
         failureWriteAcks should be(Nil)
-      }
-      runOn(n2, n3) {
+      runOn(n2, n3)
         // without delays all could teoretically have been written before the blackhole
         if (delayMillis != 0) failureWriteAcks should not be (Nil)
-      }
       (successWriteAcks.size + failureWriteAcks.size) should be(myData.size)
 
       enterBarrier("partition-healed-4")
 
       // on the 2 node side, read from majority of nodes is enough to read all writes
-      runOn(n2, n3) {
+      runOn(n2, n3)
         val readProbe = TestProbe()
         replicator.tell(Get(key, readMajority), readProbe.ref)
-        val result = readProbe.expectMsgPF() {
+        val result = readProbe.expectMsgPF()
           case g @ GetSuccess(`key`, _) ⇒ g.get(key)
-        }
         val survivors = result.elements.size
         result.elements should be(expectedData)
-      }
       // but on the 3 node side, read from majority doesn't mean that we are guaranteed to see
       // the writes from the other side, yet
 
       // eventually all nodes will have the data
-      within(15.seconds) {
-        awaitAssert {
+      within(15.seconds)
+        awaitAssert
           val readProbe = TestProbe()
           replicator.tell(Get(key, ReadLocal), readProbe.ref)
-          val result = readProbe.expectMsgPF() {
+          val result = readProbe.expectMsgPF()
             case g @ GetSuccess(`key`, _) ⇒ g.get(key)
-          }
           result.elements should be(expectedData)
-        }
-      }
-    }
 
     enterBarrier("after-test-4")
-  }
-}

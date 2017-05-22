@@ -25,7 +25,7 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 04.05.2008
   */
 trait ScMember
-    extends ScalaPsiElement with ScModifierListOwner with PsiMember {
+    extends ScalaPsiElement with ScModifierListOwner with PsiMember
   def getContainingClass: PsiClass = containingClass
 
   def isPrivate: Boolean = hasModifierPropertyScala("private")
@@ -41,18 +41,16 @@ trait ScMember
     *
     * `object a { def foo { def bar = 0 }}`
     */
-  def containingClass: ScTemplateDefinition = {
-    val stub: StubElement[_ <: PsiElement] = this match {
+  def containingClass: ScTemplateDefinition =
+    val stub: StubElement[_ <: PsiElement] = this match
       case file: PsiFileImpl => file.getStub
       case st: ScalaStubBasedElementImpl[_] => st.getStub
       case _ => null
-    }
-    stub match {
+    stub match
       case m: ScMemberOrLocal if m.isLocal => return null
       case _ =>
-    }
     val context = getContext
-    (getContainingClassLoose, this) match {
+    (getContainingClassLoose, this) match
       case (null, _) => null
       case (found, fun: ScFunction)
           if fun.syntheticContainingClass.isDefined =>
@@ -69,54 +67,43 @@ trait ScMember
           found.extendsBlock.earlyDefinitions.contains(context) =>
         found
       case (found, _) => null // See SCL-3178
-    }
-  }
 
-  def getContainingClassLoose: ScTemplateDefinition = {
-    val stub: StubElement[_ <: PsiElement] = this match {
+  def getContainingClassLoose: ScTemplateDefinition =
+    val stub: StubElement[_ <: PsiElement] = this match
       case file: PsiFileImpl => file.getStub
       case st: ScalaStubBasedElementImpl[_] => st.getStub
       case _ => null
-    }
-    if (stub != null) {
+    if (stub != null)
       stub.getParentStubOfType(classOf[ScTemplateDefinition])
-    } else {
-      child match {
+    else
+      child match
         // TODO is all of this mess still necessary?! 
         case c: ScClass if c.isCase =>
-          this match {
+          this match
             case fun: ScFunction
                 if fun.isSyntheticApply || fun.isSyntheticUnapply ||
                 fun.isSyntheticUnapplySeq =>
               //this is special case for synthetic apply and unapply methods
-              ScalaPsiUtil.getCompanionModule(c) match {
+              ScalaPsiUtil.getCompanionModule(c) match
                 case Some(td) => return td
                 case _ =>
-              }
             case _ =>
-          }
         case _ =>
-      }
       PsiTreeUtil.getContextOfType(this, true, classOf[ScTemplateDefinition])
-    }
-  }
 
-  def isLocal: Boolean = {
-    val stub: StubElement[_ <: PsiElement] = this match {
+  def isLocal: Boolean =
+    val stub: StubElement[_ <: PsiElement] = this match
       case file: PsiFileImpl => file.getStub
       case st: ScalaStubBasedElementImpl[_] => st.getStub
       case _ => null
-    }
-    stub match {
+    stub match
       case memberOrLocal: ScMemberOrLocal =>
         return memberOrLocal.isLocal
       case _ =>
-    }
     containingClass == null
-  }
 
-  override def hasModifierProperty(name: String) = {
-    name match {
+  override def hasModifierProperty(name: String) =
+    name match
       case PsiModifier.PUBLIC =>
         !hasModifierProperty("private") && !hasModifierProperty("protected")
       case PsiModifier.STATIC => containingClass.isInstanceOf[ScObject]
@@ -127,91 +114,75 @@ trait ScMember
         getModifierList.accessModifier.exists(
             _.access == ScAccessModifier.Type.THIS_PROTECTED)
       case _ => super.hasModifierProperty(name)
-    }
-  }
 
   protected def isSimilarMemberForNavigation(m: ScMember, isStrict: Boolean) =
     false
 
-  override def getNavigationElement: PsiElement = getContainingFile match {
+  override def getNavigationElement: PsiElement = getContainingFile match
     case s: ScalaFileImpl if s.isCompiled => getSourceMirrorMember
     case _ => this
-  }
 
-  private def getSourceMirrorMember: ScMember = getParent match {
+  private def getSourceMirrorMember: ScMember = getParent match
     case tdb: ScTemplateBody =>
-      tdb.getParent match {
+      tdb.getParent match
         case eb: ScExtendsBlock =>
-          eb.getParent match {
+          eb.getParent match
             case td: ScTypeDefinition =>
-              td.getNavigationElement match {
+              td.getNavigationElement match
                 case c: ScTypeDefinition =>
                   val membersIterator = c.members.iterator
                   val buf: ArrayBuffer[ScMember] = new ArrayBuffer[ScMember]
-                  while (membersIterator.hasNext) {
+                  while (membersIterator.hasNext)
                     val member = membersIterator.next()
                     if (isSimilarMemberForNavigation(member, isStrict = false))
                       buf += member
-                  }
                   if (buf.isEmpty) this
                   else if (buf.length == 1) buf(0)
-                  else {
+                  else
                     val filter = buf.filter(
                         isSimilarMemberForNavigation(_, isStrict = true))
                     if (filter.isEmpty) buf(0)
                     else filter(0)
-                  }
                 case _ => this
-              }
             case _ => this
-          }
         case _ => this
-      }
     case c: ScTypeDefinition if this.isInstanceOf[ScPrimaryConstructor] =>
       //primary constructor
-      c.getNavigationElement match {
+      c.getNavigationElement match
         case td: ScClass =>
-          td.constructor match {
+          td.constructor match
             case Some(constr) => constr
             case _ => this
-          }
         case _ => this
-      }
     case _ => this
-  }
 
-  abstract override def getUseScope: SearchScope = {
+  abstract override def getUseScope: SearchScope =
     val accessModifier = Option(getModifierList).flatMap(_.accessModifier)
 
-    def fromContainingBlockOrMember(): Option[SearchScope] = {
+    def fromContainingBlockOrMember(): Option[SearchScope] =
       val blockOrMember = PsiTreeUtil.getContextOfType(
           this, true, classOf[ScBlock], classOf[ScMember])
-      blockOrMember match {
+      blockOrMember match
         case null => None
         case block: ScBlock => Some(new LocalSearchScope(block))
         case member: ScMember => Some(member.getUseScope)
-      }
-    }
 
-    def fromQualifiedPrivate(): Option[SearchScope] = {
+    def fromQualifiedPrivate(): Option[SearchScope] =
       accessModifier
         .filter(am => am.isPrivate && am.getReference != null)
-        .map(_.scope) collect {
+        .map(_.scope) collect
         case p: PsiPackage => new PackageScope(p, true, true)
         case td: ScTypeDefinition => ScalaPsiUtil.withCompanionSearchScope(td)
-      }
-    }
 
-    val fromModifierOrContext = this match {
+    val fromModifierOrContext = this match
       case _ if accessModifier.exists(mod => mod.isPrivate && mod.isThis) =>
         Option(containingClass)
           .orElse(containingFile)
           .map(new LocalSearchScope(_))
       case _ if accessModifier.exists(_.isUnqualifiedPrivateOrThis) =>
-        containingClass match {
+        containingClass match
           case null => containingFile.map(new LocalSearchScope(_))
           case c => Some(ScalaPsiUtil.withCompanionSearchScope(c))
-        }
       case cp: ScClassParameter =>
         Option(cp.containingClass)
           .map(_.getUseScope)
@@ -220,7 +191,4 @@ trait ScMember
         fun.getSyntheticNavigationElement.map(_.getUseScope)
       case _ =>
         fromQualifiedPrivate().orElse(fromContainingBlockOrMember())
-    }
     ScalaPsiUtil.intersectScopes(super.getUseScope, fromModifierOrContext)
-  }
-}

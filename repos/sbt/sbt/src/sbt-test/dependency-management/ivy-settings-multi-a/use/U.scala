@@ -1,5 +1,4 @@
 import junit._
 
-object U {
+object U
   val x = D.x
-}

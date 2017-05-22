@@ -7,18 +7,16 @@ import scala.util.Random
   * according to Donald Knuth's algorithm as shown on Wikipedia's
   * Poisson Distribution page
   */
-class Poisson(fraction: Double, seed: Int) {
+class Poisson(fraction: Double, seed: Int)
 
   val L = math.exp(-fraction)
   val randomGenerator = new Random(seed)
 
-  def nextInt = {
+  def nextInt =
     var k = 0
     var p = 1.0
-    do {
+    do
       k = k + 1
       p = p * randomGenerator.nextDouble
-    } while (p > L)
+    while (p > L)
     k - 1
-  }
-}

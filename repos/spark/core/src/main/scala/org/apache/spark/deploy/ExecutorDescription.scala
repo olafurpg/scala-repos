@@ -26,9 +26,8 @@ private[deploy] class ExecutorDescription(val appId: String,
                                           val execId: Int,
                                           val cores: Int,
                                           val state: ExecutorState.Value)
-    extends Serializable {
+    extends Serializable
 
   override def toString: String =
     "ExecutorState(appId=%s, execId=%d, cores=%d, state=%s)".format(
         appId, execId, cores, state)
-}

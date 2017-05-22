@@ -9,7 +9,7 @@ import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model._
 import StatusCodes._
 
-trait RouteDirectives {
+trait RouteDirectives
 
   /**
     * Rejects the request with an empty set of rejections.
@@ -26,20 +26,18 @@ trait RouteDirectives {
     * Completes the request with redirection response of the given type to the given URI.
     */
   def redirect(uri: Uri, redirectionType: Redirection): StandardRoute =
-    StandardRoute {
+    StandardRoute
       _. //# red-impl
-      complete {
+      complete
         HttpResponse(status = redirectionType,
                      headers = headers.Location(uri) :: Nil,
-                     entity = redirectionType.htmlTemplate match {
+                     entity = redirectionType.htmlTemplate match
                        case "" ⇒ HttpEntity.Empty
                        case template ⇒
                          HttpEntity(ContentTypes.`text/html(UTF-8)`,
                                     template format uri)
-                     })
-      }
+                     )
       //#
-    }
 
   /**
     * Completes the request using the given arguments.
@@ -53,8 +51,6 @@ trait RouteDirectives {
     */
   def failWith(error: Throwable): StandardRoute =
     StandardRoute(_.fail(error))
-}
 
-object RouteDirectives extends RouteDirectives {
+object RouteDirectives extends RouteDirectives
   private val _reject = StandardRoute(_.reject())
-}

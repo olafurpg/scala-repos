@@ -23,7 +23,7 @@ package scalaz
   *
   * @see [[http://hackage.haskell.org/package/kan-extensions-4.0.1/docs/Data-Functor-Contravariant-Coyoneda.html]]
   */
-sealed abstract class ContravariantCoyoneda[F[_], A] {
+sealed abstract class ContravariantCoyoneda[F[_], A]
 
   /** The pivot between `fi` and `k`, usually existential. */
   type I
@@ -50,22 +50,19 @@ sealed abstract class ContravariantCoyoneda[F[_], A] {
 
   /** Natural transformation. */
   final def trans[G[_]](f: F ~> G): Aux[G, A, I] = apply(f(fi))(k)
-}
 
-sealed abstract class ContravariantCoyonedaInstances {
+sealed abstract class ContravariantCoyonedaInstances
 
   /** `ContravariantCoyoneda[F,_]` is a contravariant functor for any
     * `F`.
     */
   implicit def contravariantCoyonedaContravariant[F[_]]: Contravariant[
       ContravariantCoyoneda[F, ?]] =
-    new Contravariant[ContravariantCoyoneda[F, ?]] {
+    new Contravariant[ContravariantCoyoneda[F, ?]]
       def contramap[A, B](fa: ContravariantCoyoneda[F, A])(f: B => A) =
         fa contramap f
-    }
-}
 
-object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
+object ContravariantCoyoneda extends ContravariantCoyonedaInstances
 
   /** Lift the `I` type member to a parameter.  It is usually more
     * convenient to use `Aux` than a structural type.
@@ -73,10 +70,9 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
   type Aux[F[_], A, B] = ContravariantCoyoneda[F, A] { type I = B }
 
   /** See `by` method. */
-  final class By[F[_]] {
+  final class By[F[_]]
     @inline def apply[A, B](k: A => B)(implicit F: F[B]): Aux[F, A, B] =
       ContravariantCoyoneda(F)(k)
-  }
 
   /** Partial application of type parameters to `apply`.  It is often
     * more convenient to invoke `ContravariantCoyoneda.by[F]{x: X =>
@@ -86,11 +82,10 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
 
   /** Like `lift(fa).contramap(_k)`. */
   def apply[F[_], A, B](fa: F[B])(_k: A => B): Aux[F, A, B] =
-    new ContravariantCoyoneda[F, A] {
+    new ContravariantCoyoneda[F, A]
       type I = B
       val k = _k
       val fi = fa
-    }
 
   /** `F[A]` converts to `ContravariantCoyoneda[F,A]` for any `F`. */
   def lift[F[_], A](fa: F[A]): ContravariantCoyoneda[F, A] =
@@ -99,8 +94,6 @@ object ContravariantCoyoneda extends ContravariantCoyonedaInstances {
   import Isomorphism._
 
   def iso[F[_]: Contravariant]: ContravariantCoyoneda[F, ?] <~> F =
-    new IsoFunctorTemplate[ContravariantCoyoneda[F, ?], F] {
+    new IsoFunctorTemplate[ContravariantCoyoneda[F, ?], F]
       def from[A](fa: F[A]) = lift(fa)
       def to[A](fa: ContravariantCoyoneda[F, A]) = fa.run
-    }
-}

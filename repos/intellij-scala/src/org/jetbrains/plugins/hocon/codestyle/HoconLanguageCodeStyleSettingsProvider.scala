@@ -6,7 +6,7 @@ import com.intellij.psi.codeStyle.{CodeStyleSettingsCustomizable, CommonCodeStyl
 import org.jetbrains.plugins.hocon.lang.HoconLanguage
 
 class HoconLanguageCodeStyleSettingsProvider
-    extends LanguageCodeStyleSettingsProvider {
+    extends LanguageCodeStyleSettingsProvider
   def getLanguage = HoconLanguage
 
   override def getDisplayPriority = DisplayPriority.COMMON_SETTINGS
@@ -17,7 +17,7 @@ class HoconLanguageCodeStyleSettingsProvider
   private val ObjectFieldsWithAssignmentWrap = "Object fields with '=' or '+='"
 
   override def customizeSettings(
-      consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType) {
+      consumer: CodeStyleSettingsCustomizable, settingsType: SettingsType)
     def showCustomOption(
         name: String, title: String, group: String, options: AnyRef*) =
       consumer.showCustomOption(classOf[HoconCustomCodeStyleSettings],
@@ -29,7 +29,7 @@ class HoconLanguageCodeStyleSettingsProvider
     import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable._
     import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider.SettingsType._
 
-    settingsType match {
+    settingsType match
       case SPACING_SETTINGS =>
         import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable.SpacingOption._
 
@@ -133,21 +133,18 @@ class HoconLanguageCodeStyleSettingsProvider
             "KEEP_BLANK_LINES_BEFORE_RBRACKET", "Before ']'", BLANK_LINES_KEEP)
 
       case _ =>
-    }
-  }
 
-  override def getDefaultCommonSettings = {
+  override def getDefaultCommonSettings =
     val commonCodeStyleSettings = new CommonCodeStyleSettings(getLanguage)
     val indentOptions = commonCodeStyleSettings.initIndentOptions
     indentOptions.INDENT_SIZE = 2
     indentOptions.TAB_SIZE = 2
     indentOptions.CONTINUATION_INDENT_SIZE = 2
     commonCodeStyleSettings
-  }
 
   override def getIndentOptionsEditor = new SmartIndentOptionsEditor
 
-  def getCodeSample(settingsType: SettingsType) = settingsType match {
+  def getCodeSample(settingsType: SettingsType) = settingsType match
     case SettingsType.INDENT_SETTINGS =>
       """object {
         |  key = value
@@ -214,5 +211,3 @@ class HoconLanguageCodeStyleSettingsProvider
         | """.stripMargin.trim
 
     case _ => ""
-  }
-}

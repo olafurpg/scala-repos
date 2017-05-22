@@ -34,7 +34,7 @@ import specs2._
 import scalaz._
 
 class IngestTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings) with Specification
 
   val simpleData = """
     {"a":1,"b":"Tom"}
@@ -44,47 +44,39 @@ class IngestTask(settings: Settings)
     {"a":5,"c":"asdf"}
   """
 
-  "ingest" should {
-    "ingest json without a content type" in {
+  "ingest" should
+    "ingest json without a content type" in
       val account = createAccount
       val req =
         (((ingest / "sync" / "fs").POST / account.bareRootPath / "foo" / "") <<? List(
                 "apiKey" -> account.apiKey,
                 "ownerAccountId" -> account.accountId) << simpleData)
       val res = http(req)()
-      EventuallyResults.eventually(10, 1.second) {
+      EventuallyResults.eventually(10, 1.second)
         val json =
           metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         (json \ "size").deserialize[Long] must_== 5
-      }
-    }
 
-    "ingest multiple sync requests" in {
+    "ingest multiple sync requests" in
       val account = createAccount
-      (1 to 20) foreach { _ =>
+      (1 to 20) foreach  _ =>
         ingestString(account, simpleData, "application/json")(
             _ / account.bareRootPath / "foo")
-      }
-      EventuallyResults.eventually(20, 1.second) {
+      EventuallyResults.eventually(20, 1.second)
         val json =
           metadataFor(account.apiKey)(_ / account.bareRootPath / "foo")
         (json \ "size").deserialize[Long] must_== 100
-      }
-    }
 
-    "ingest multiple async requests" in {
+    "ingest multiple async requests" in
       val account = createAccount
-      (1 to 20) foreach { _ =>
+      (1 to 20) foreach  _ =>
         asyncIngestString(account, simpleData, "application/json")(
             _ / account.bareRootPath / "foo" / "")
-      }
 
-      EventuallyResults.eventually(20, 1.second) {
+      EventuallyResults.eventually(20, 1.second)
         val json =
           metadataFor(account.apiKey)(_ / account.bareRootPath / "foo" / "")
         (json \ "size").deserialize[Long] must_== 100
-      }
-    }
 
     val csvData = """a,b,c,d
                     |1.2,asdf,,
@@ -155,9 +147,6 @@ class IngestTask(settings: Settings)
     //    data must_== expected
     //  }
     //}
-  }
-}
 
-object RunIngest extends Runner {
+object RunIngest extends Runner
   def tasks(settings: Settings) = new IngestTask(settings) :: Nil
-}

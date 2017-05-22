@@ -25,13 +25,13 @@ import kafka.serializer.StringEncoder
 @deprecated(
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
-trait ProducerConsumerTestHarness extends KafkaServerTestHarness {
+trait ProducerConsumerTestHarness extends KafkaServerTestHarness
   val host = "localhost"
   var producer: Producer[String, String] = null
   var consumer: SimpleConsumer = null
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp
     producer = TestUtils.createProducer[String, String](
         TestUtils.getBrokerListStrFromServers(servers),
@@ -40,12 +40,9 @@ trait ProducerConsumerTestHarness extends KafkaServerTestHarness {
         partitioner = classOf[StaticPartitioner].getName)
     consumer = new SimpleConsumer(
         host, servers(0).boundPort(), 1000000, 64 * 1024, "")
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     producer.close()
     consumer.close()
     super.tearDown
-  }
-}

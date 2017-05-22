@@ -6,7 +6,6 @@ import com.intellij.psi.tree.IElementType
 /**
   * Pavel Fatin
   */
-object ElementType {
+object ElementType
   def unapply(e: PsiElement): Option[IElementType] =
     Option(e.getNode.getElementType)
-}

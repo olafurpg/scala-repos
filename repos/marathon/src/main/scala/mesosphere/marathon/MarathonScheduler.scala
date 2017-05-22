@@ -16,9 +16,8 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.{Await, Future}
 import scala.util.control.NonFatal
 
-trait SchedulerCallbacks {
+trait SchedulerCallbacks
   def disconnected(): Unit
-}
 
 class MarathonScheduler @Inject()(
     @Named(EventModule.busName) eventBus: EventStream,
@@ -30,7 +29,7 @@ class MarathonScheduler @Inject()(
     system: ActorSystem,
     config: MarathonConf,
     schedulerCallbacks: SchedulerCallbacks)
-    extends Scheduler {
+    extends Scheduler
 
   private[this] val log = LoggerFactory.getLogger(getClass.getName)
 
@@ -40,62 +39,53 @@ class MarathonScheduler @Inject()(
 
   override def registered(driver: SchedulerDriver,
                           frameworkId: FrameworkID,
-                          master: MasterInfo): Unit = {
+                          master: MasterInfo): Unit =
     log.info(
         s"Registered as ${frameworkId.getValue} to master '${master.getId}'")
     frameworkIdUtil.store(frameworkId)
     mesosLeaderInfo.onNewMasterInfo(master)
     eventBus.publish(
         SchedulerRegisteredEvent(frameworkId.getValue, master.getHostname))
-  }
 
   override def reregistered(
-      driver: SchedulerDriver, master: MasterInfo): Unit = {
+      driver: SchedulerDriver, master: MasterInfo): Unit =
     log.info("Re-registered to %s".format(master))
     mesosLeaderInfo.onNewMasterInfo(master)
     eventBus.publish(SchedulerReregisteredEvent(master.getHostname))
-  }
 
   override def resourceOffers(
-      driver: SchedulerDriver, offers: java.util.List[Offer]): Unit = {
+      driver: SchedulerDriver, offers: java.util.List[Offer]): Unit =
     import scala.collection.JavaConverters._
-    offers.asScala.foreach { offer =>
+    offers.asScala.foreach  offer =>
       val processFuture = offerProcessor.processOffer(offer)
-      processFuture.onComplete {
+      processFuture.onComplete
         case scala.util.Success(_) =>
           log.debug(s"Finished processing offer '${offer.getId.getValue}'")
         case scala.util.Failure(NonFatal(e)) =>
           log.error(s"while processing offer '${offer.getId.getValue}'", e)
-      }
-    }
-  }
 
-  override def offerRescinded(driver: SchedulerDriver, offer: OfferID): Unit = {
+  override def offerRescinded(driver: SchedulerDriver, offer: OfferID): Unit =
     log.info("Offer %s rescinded".format(offer))
-  }
 
   override def statusUpdate(
-      driver: SchedulerDriver, status: TaskStatus): Unit = {
+      driver: SchedulerDriver, status: TaskStatus): Unit =
     log.info("Received status update for task %s: %s (%s)".format(
             status.getTaskId.getValue, status.getState, status.getMessage))
 
-    taskStatusProcessor.publish(status).onFailure {
+    taskStatusProcessor.publish(status).onFailure
       case NonFatal(e) =>
         log.error(s"while processing task status update $status", e)
-    }
-  }
 
   override def frameworkMessage(driver: SchedulerDriver,
                                 executor: ExecutorID,
                                 slave: SlaveID,
-                                message: Array[Byte]): Unit = {
+                                message: Array[Byte]): Unit =
     log.info("Received framework message %s %s %s ".format(
             executor, slave, message))
     eventBus.publish(
         MesosFrameworkMessageEvent(executor.getValue, slave.getValue, message))
-  }
 
-  override def disconnected(driver: SchedulerDriver) {
+  override def disconnected(driver: SchedulerDriver)
     log.warn("Disconnected")
 
     eventBus.publish(SchedulerDisconnectedEvent())
@@ -103,20 +93,17 @@ class MarathonScheduler @Inject()(
     // Disconnection from the Mesos master has occurred.
     // Thus, call the scheduler callbacks.
     schedulerCallbacks.disconnected()
-  }
 
-  override def slaveLost(driver: SchedulerDriver, slave: SlaveID) {
+  override def slaveLost(driver: SchedulerDriver, slave: SlaveID)
     log.info(s"Lost slave $slave")
-  }
 
   override def executorLost(driver: SchedulerDriver,
                             executor: ExecutorID,
                             slave: SlaveID,
-                            p4: Int) {
+                            p4: Int)
     log.info(s"Lost executor $executor slave $p4")
-  }
 
-  override def error(driver: SchedulerDriver, message: String) {
+  override def error(driver: SchedulerDriver, message: String)
     log.warn(
         s"Error: $message\n" +
         s"In case Mesos does not allow registration with the current frameworkId, " +
@@ -126,12 +113,10 @@ class MarathonScheduler @Inject()(
     // Currently, it's pretty hard to disambiguate this error from other causes of framework errors.
     // Watch MESOS-2522 which will add a reason field for framework errors to help with this.
     // For now the frameworkId is removed based on the error message.
-    val removeFrameworkId = message match {
+    val removeFrameworkId = message match
       case "Framework has been removed" => true
       case _: String => false
-    }
     suicide(removeFrameworkId)
-  }
 
   /**
     * Exits the JVM process, optionally deleting Marathon's FrameworkID
@@ -144,7 +129,7 @@ class MarathonScheduler @Inject()(
     * the scheduler may never re-register with the saved FrameworkID until
     * the leading Mesos master process is killed.
     */
-  protected def suicide(removeFrameworkId: Boolean): Unit = {
+  protected def suicide(removeFrameworkId: Boolean): Unit =
     log.error(s"Committing suicide!")
 
     if (removeFrameworkId)
@@ -152,9 +137,6 @@ class MarathonScheduler @Inject()(
 
     // Asynchronously call sys.exit() to avoid deadlock due to the JVM shutdown hooks
     // scalastyle:off magic.number
-    Future(sys.exit(9)).onFailure {
+    Future(sys.exit(9)).onFailure
       case NonFatal(t) => log.error("Exception while committing suicide", t)
-    }
     // scalastyle:on
-  }
-}

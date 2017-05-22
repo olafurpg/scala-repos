@@ -11,26 +11,23 @@ import java.util._
 
 class CopyOnWriteArrayList[E <: AnyRef] private (
     private var inner: js.Array[E])
-    extends List[E] with RandomAccess with Cloneable with Serializable {
+    extends List[E] with RandomAccess with Cloneable with Serializable
   self =>
 
   // requiresCopyOnWrite is false if and only if no other object
   // (like the iterator) may have a reference to inner
   private var requiresCopyOnWrite = false
 
-  def this() = {
+  def this() =
     this(new js.Array[E])
-  }
 
-  def this(c: Collection[_ <: E]) = {
+  def this(c: Collection[_ <: E]) =
     this()
     addAll(c)
-  }
 
-  def this(toCopyIn: Array[E]) = {
+  def this(toCopyIn: Array[E]) =
     this()
     toCopyIn.foreach(add)
-  }
 
   def size(): Int =
     inner.size
@@ -44,23 +41,20 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
   def indexOf(o: scala.Any): Int =
     indexOf(o.asInstanceOf[E], 0)
 
-  def indexOf(e: E, index: Int): Int = {
+  def indexOf(e: E, index: Int): Int =
     checkIndexInBounds(index)
     index + listIterator(index).indexWhere(_ === e)
-  }
 
   def lastIndexOf(o: scala.Any): Int =
     lastIndexOf(o.asInstanceOf[E], 0)
 
-  def lastIndexOf(e: E, index: Int): Int = {
+  def lastIndexOf(e: E, index: Int): Int =
     @tailrec
-    def findIndex(iter: ListIterator[E]): Int = {
+    def findIndex(iter: ListIterator[E]): Int =
       if (!iter.hasPrevious) -1
       else if (iter.previous() === e) iter.nextIndex
       else findIndex(iter)
-    }
     findIndex(listIterator(size))
-  }
 
   override def clone(): AnyRef =
     new CopyOnWriteArrayList[E](this)
@@ -68,7 +62,7 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
   def toArray(): Array[AnyRef] =
     toArray(new Array[AnyRef](size))
 
-  def toArray[T](a: Array[T]): Array[T] = {
+  def toArray[T](a: Array[T]): Array[T] =
     val componentType = a.getClass.getComponentType
     val toFill: Array[T] =
       if (a.size >= size) a
@@ -78,120 +72,98 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
     for (i <- 0 until size) toFill(i) = iter.next().asInstanceOf[T]
     if (toFill.size > size) toFill(size) = null.asInstanceOf[T]
     toFill
-  }
 
-  def get(index: Int): E = {
+  def get(index: Int): E =
     checkIndexInBounds(index)
     innerGet(index)
-  }
 
-  def set(index: Int, element: E): E = {
+  def set(index: Int, element: E): E =
     checkIndexInBounds(index)
     copyIfNeeded()
     val oldValue = innerGet(index)
     innerSet(index, element)
     oldValue
-  }
 
-  def add(e: E): Boolean = {
+  def add(e: E): Boolean =
     copyIfNeeded()
     innerPush(e)
     true
-  }
 
-  def add(index: Int, element: E): Unit = {
+  def add(index: Int, element: E): Unit =
     checkIndexOnBounds(index)
     copyIfNeeded()
     innerSplice(index, 0, element)
-  }
 
-  def remove(index: Int): E = {
+  def remove(index: Int): E =
     checkIndexInBounds(index)
     copyIfNeeded()
     innerSplice(index, 1)(0)
-  }
 
-  def remove(o: scala.Any): Boolean = {
+  def remove(o: scala.Any): Boolean =
     val index = indexOf(o)
     if (index == -1) false
-    else {
+    else
       remove(index)
       true
-    }
-  }
 
-  def addIfAbsent(e: E): Boolean = {
+  def addIfAbsent(e: E): Boolean =
     if (contains(e)) false
-    else {
+    else
       copyIfNeeded()
       innerPush(e)
       true
-    }
-  }
 
   def containsAll(c: Collection[_]): Boolean =
     c.iterator.forall(this.contains(_))
 
-  def removeAll(c: Collection[_]): Boolean = {
+  def removeAll(c: Collection[_]): Boolean =
     copyIfNeeded()
     c.foldLeft(false)((prev, elem) => remove(elem) || prev)
-  }
 
-  def retainAll(c: Collection[_]): Boolean = {
+  def retainAll(c: Collection[_]): Boolean =
     val iter = iterator()
     clear()
     var modified = false
-    for (elem <- iter) {
+    for (elem <- iter)
       if (c.contains(elem)) innerPush(elem)
       else modified = true
-    }
     modified
-  }
 
-  def addAllAbsent(c: Collection[_ <: E]): Int = {
+  def addAllAbsent(c: Collection[_ <: E]): Int =
     var added = 0
-    for (e <- c.iterator()) {
+    for (e <- c.iterator())
       if (addIfAbsent(e)) added += 1
-    }
     added
-  }
 
-  def clear(): Unit = {
+  def clear(): Unit =
     inner = new js.Array[E]
     requiresCopyOnWrite = false
-  }
 
   def addAll(c: Collection[_ <: E]): Boolean =
     addAll(size, c)
 
-  def addAll(index: Int, c: Collection[_ <: E]): Boolean = {
+  def addAll(index: Int, c: Collection[_ <: E]): Boolean =
     checkIndexOnBounds(index)
     copyIfNeeded()
     innerSplice(index, 0, c.asInstanceOf[Collection[E]].toSeq: _*)
     c.nonEmpty
-  }
 
   override def toString: String =
     iterator().mkString("[", ",", "]")
 
-  override def equals(obj: Any): Boolean = {
-    if (obj.asInstanceOf[AnyRef] eq this) {
+  override def equals(obj: Any): Boolean =
+    if (obj.asInstanceOf[AnyRef] eq this)
       true
-    } else {
-      obj match {
+    else
+      obj match
         case obj: List[_] =>
           val oIter = obj.listIterator
           this.forall(oIter.hasNext && _ === oIter.next()) && !oIter.hasNext
         case _ => false
-      }
-    }
-  }
 
-  override def hashCode(): Int = {
-    iterator().foldLeft(1) { (prev, elem) =>
+  override def hashCode(): Int =
+    iterator().foldLeft(1)  (prev, elem) =>
       31 * prev + (if (elem == null) 0 else elem.hashCode)
-    }
-  }
 
   def iterator(): Iterator[E] =
     listIterator()
@@ -199,16 +171,14 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
   def listIterator(): ListIterator[E] =
     listIterator(0)
 
-  def listIterator(index: Int): ListIterator[E] = {
+  def listIterator(index: Int): ListIterator[E] =
     checkIndexOnBounds(index)
     new CopyOnWriteArrayListIterator[E](innerSnapshot(), index, 0, size)
-  }
 
-  def subList(fromIndex: Int, toIndex: Int): List[E] = {
+  def subList(fromIndex: Int, toIndex: Int): List[E] =
     if (fromIndex < 0 || fromIndex > toIndex || toIndex > size)
       throw new IndexOutOfBoundsException
     new CopyOnWriteArrayListView(fromIndex, toIndex)
-  }
 
   protected def innerGet(index: Int): E =
     inner(index)
@@ -223,52 +193,43 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
       index: Int, deleteCount: Int, items: E*): js.Array[E] =
     inner.splice(index, deleteCount, items: _*)
 
-  protected def copyIfNeeded(): Unit = {
-    if (requiresCopyOnWrite) {
+  protected def copyIfNeeded(): Unit =
+    if (requiresCopyOnWrite)
       inner = inner.jsSlice()
       requiresCopyOnWrite = false
-    }
-  }
 
-  protected def innerSnapshot(): js.Array[E] = {
+  protected def innerSnapshot(): js.Array[E] =
     requiresCopyOnWrite = true
     inner
-  }
 
   private class CopyOnWriteArrayListView(
       fromIndex: Int, private var toIndex: Int)
-      extends CopyOnWriteArrayList[E](null: js.Array[E]) { viewSelf =>
+      extends CopyOnWriteArrayList[E](null: js.Array[E])  viewSelf =>
 
     override def size(): Int =
       toIndex - fromIndex
 
-    override def clear(): Unit = {
+    override def clear(): Unit =
       copyIfNeeded()
       self.innerSplice(fromIndex, size)
       changeSize(-size)
-    }
 
-    override def listIterator(index: Int): ListIterator[E] = {
+    override def listIterator(index: Int): ListIterator[E] =
       checkIndexOnBounds(index)
       new CopyOnWriteArrayListIterator[E](
-          innerSnapshot(), fromIndex + index, fromIndex, toIndex) {
+          innerSnapshot(), fromIndex + index, fromIndex, toIndex)
         override protected def onSizeChanged(delta: Int): Unit =
           changeSize(delta)
-      }
-    }
 
-    override def subList(fromIndex: Int, toIndex: Int): List[E] = {
+    override def subList(fromIndex: Int, toIndex: Int): List[E] =
       if (fromIndex < 0 || fromIndex > toIndex || toIndex > size)
         throw new IndexOutOfBoundsException
 
       new CopyOnWriteArrayListView(
-          viewSelf.fromIndex + fromIndex, viewSelf.fromIndex + toIndex) {
-        override protected def changeSize(delta: Int): Unit = {
+          viewSelf.fromIndex + fromIndex, viewSelf.fromIndex + toIndex)
+        override protected def changeSize(delta: Int): Unit =
           super.changeSize(delta)
           viewSelf.changeSize(delta)
-        }
-      }
-    }
 
     override def clone(): AnyRef =
       new CopyOnWriteArrayList[E](this)
@@ -280,19 +241,16 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
       self.innerSet(fromIndex + index, elem)
 
     override protected def innerSplice(
-        index: Int, deleteCount: Int, items: E*): js.Array[E] = {
+        index: Int, deleteCount: Int, items: E*): js.Array[E] =
       changeSize(items.size - deleteCount)
       self.innerSplice(fromIndex + index, deleteCount, items: _*)
-    }
 
-    override protected def innerPush(elem: E): Unit = {
-      if (toIndex < self.size) {
+    override protected def innerPush(elem: E): Unit =
+      if (toIndex < self.size)
         innerSplice(size, 0, elem)
-      } else {
+      else
         changeSize(1)
         self.innerPush(elem)
-      }
-    }
 
     override protected def copyIfNeeded(): Unit =
       self.copyIfNeeded()
@@ -302,22 +260,18 @@ class CopyOnWriteArrayList[E <: AnyRef] private (
 
     protected def changeSize(delta: Int): Unit =
       toIndex += delta
-  }
 
-  protected def checkIndexInBounds(index: Int): Unit = {
+  protected def checkIndexInBounds(index: Int): Unit =
     if (index < 0 || index >= size)
       throw new IndexOutOfBoundsException(index.toString)
-  }
 
-  protected def checkIndexOnBounds(index: Int): Unit = {
+  protected def checkIndexOnBounds(index: Int): Unit =
     if (index < 0 || index > size)
       throw new IndexOutOfBoundsException(index.toString)
-  }
-}
 
 private class CopyOnWriteArrayListIterator[E](
     arraySnapshot: js.Array[E], i: Int, start: Int, end: Int)
-    extends AbstractRandomAccessListIterator[E](i, start, end) {
+    extends AbstractRandomAccessListIterator[E](i, start, end)
   override def remove(): Unit =
     throw new UnsupportedOperationException
 
@@ -338,4 +292,3 @@ private class CopyOnWriteArrayListIterator[E](
 
   protected def add(index: Int, e: E): Unit =
     throw new UnsupportedOperationException
-}

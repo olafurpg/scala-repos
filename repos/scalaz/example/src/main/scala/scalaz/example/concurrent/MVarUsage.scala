@@ -10,62 +10,57 @@ import MVar._
 import std.anyVal._
 import syntax.equal._
 
-object MVarUsage extends App {
-  def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO {
+object MVarUsage extends App
+  def forkIO(f: => IO[Unit])(implicit s: Strategy): IO[Unit] = IO
     s(f.unsafePerformIO); ()
-  }
 
-  def out() {
+  def out()
     def calc(mvar: MVar[Int]): IO[Unit] = mvar.put(42)
 
-    val io = for {
+    val io = for
       mvar <- newEmptyMVar[Int]
       _ <- forkIO(calc(mvar))
       a <- mvar.take
-    } yield a
+    yield a
     assert(io.unsafePerformIO === 42)
-  }
 
-  def inout() {
+  def inout()
     def calc(in: MVar[Int], out: MVar[Int]): IO[Unit] =
-      for {
+      for
         a <- in.take
         b <- in.take
         _ <- out.put(a * b)
-      } yield ()
+      yield ()
 
-    val io = for {
+    val io = for
       in <- newMVar(6)
       out <- newEmptyMVar[Int]
       _ <- forkIO(calc(in, out))
       _ <- in.put(7)
       a <- out.take
-    } yield a
+    yield a
     assert(io.unsafePerformIO === 42)
-  }
 
-  def pingpong() {
+  def pingpong()
     def pong(c: MVar[String], p: MVar[String]) =
-      for {
+      for
         _ <- c.take flatMap (s => putStrLn("c: " + s))
         _ <- p.put("pong")
         _ <- c.take flatMap (s => putStrLn("c: " + s))
         _ <- p.put("pong")
-      } yield ()
+      yield ()
 
     def io =
-      for {
+      for
         c <- newMVar("ping")
         p <- newEmptyMVar[String]
         _ <- forkIO(pong(c, p))
         _ <- p.take flatMap (s => putStrLn("p: " + s))
         _ <- c.put("ping")
         _ <- p.take flatMap (s => putStrLn("p: " + s))
-      } yield ()
+      yield ()
     io.unsafePerformIO
-  }
 
   //out()
   //inout()
   pingpong()
-}

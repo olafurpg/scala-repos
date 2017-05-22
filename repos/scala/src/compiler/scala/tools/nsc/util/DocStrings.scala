@@ -10,7 +10,7 @@ import scala.reflect.internal.Chars._
 
 /** Utility methods for doc comment strings
   */
-object DocStrings {
+object DocStrings
 
   /** Returns index of string `str` following `start` skipping longest
     *  sequence of whitespace characters characters (but no newlines)
@@ -43,7 +43,7 @@ object DocStrings {
     */
   def skipLineLead(str: String, start: Int): Int =
     if (start == str.length) start
-    else {
+    else
       val idx = skipWhitespace(str, start + 1)
       if (idx < str.length && (str charAt idx) == '*')
         skipWhitespace(str, idx + 1)
@@ -51,7 +51,6 @@ object DocStrings {
                (str charAt (idx + 1)) == '*' && (str charAt (idx + 2)) == '*')
         skipWhitespace(str, idx + 3)
       else idx
-    }
 
   /** Skips to next occurrence of `\n` or to the position after the `/``**` sequence following index `start`.
     */
@@ -66,20 +65,18 @@ object DocStrings {
   /** Returns first index following `start` and starting a line (i.e. after skipLineLead) or starting the comment
     *  which satisfies predicate `p`.
     */
-  def findNext(str: String, start: Int)(p: Int => Boolean): Int = {
+  def findNext(str: String, start: Int)(p: Int => Boolean): Int =
     val idx = skipLineLead(str, skipToEol(str, start))
     if (idx < str.length && !p(idx)) findNext(str, idx)(p)
     else idx
-  }
 
   /** Return first index following `start` and starting a line (i.e. after skipLineLead)
     *  which satisfies predicate `p`.
     */
-  def findAll(str: String, start: Int)(p: Int => Boolean): List[Int] = {
+  def findAll(str: String, start: Int)(p: Int => Boolean): List[Int] =
     val idx = findNext(str, start)(p)
     if (idx == str.length) List()
     else idx :: findAll(str, idx)(p)
-  }
 
   /** Produces a string index, which is a list of `sections`, i.e
     *  pairs of start/end positions of all tagged sections in the string.
@@ -92,23 +89,21 @@ object DocStrings {
     *  of their own
     */
   def tagIndex(
-      str: String, p: Int => Boolean = (idx => true)): List[(Int, Int)] = {
+      str: String, p: Int => Boolean = (idx => true)): List[(Int, Int)] =
     var indices = findAll(str, 0)(idx => str(idx) == '@' && p(idx))
     indices = mergeUsecaseSections(str, indices)
     indices = mergeInheritdocSections(str, indices)
 
-    indices match {
+    indices match
       case List() => List()
       case idxs => idxs zip (idxs.tail ::: List(str.length - 2))
-    }
-  }
 
   /**
     * Merge sections following an usecase into the usecase comment, so they
     * can override the parent symbol's sections
     */
-  def mergeUsecaseSections(str: String, idxs: List[Int]): List[Int] = {
-    idxs.indexWhere(str.startsWith("@usecase", _)) match {
+  def mergeUsecaseSections(str: String, idxs: List[Int]): List[Int] =
+    idxs.indexWhere(str.startsWith("@usecase", _)) match
       case firstUCIndex if firstUCIndex != -1 =>
         val commentSections = idxs.take(firstUCIndex)
         val usecaseSections =
@@ -116,8 +111,6 @@ object DocStrings {
         commentSections ::: usecaseSections
       case _ =>
         idxs
-    }
-  }
 
   /**
     * Merge the inheritdoc sections, as they never make sense on their own
@@ -137,10 +130,9 @@ object DocStrings {
   /** The first start tag of a list of tag intervals,
     *  or the end of the whole comment string - 2 if list is empty
     */
-  def startTag(str: String, sections: List[(Int, Int)]) = sections match {
+  def startTag(str: String, sections: List[(Int, Int)]) = sections match
     case Nil => str.length - 2
     case (start, _) :: _ => start
-  }
 
   /** A map from parameter names to start/end indices describing all parameter
     *  sections in `str` tagged with `tag`, where `sections` is the index of `str`.
@@ -148,12 +140,10 @@ object DocStrings {
   def paramDocs(str: String,
                 tag: String,
                 sections: List[(Int, Int)]): Map[String, (Int, Int)] =
-    Map() ++ {
-      for (section <- sections if startsWithTag(str, section, tag)) yield {
+    Map() ++
+      for (section <- sections if startsWithTag(str, section, tag)) yield
         val start = skipWhitespace(str, section._1 + tag.length)
         str.substring(start, skipIdent(str, start)) -> section
-      }
-    }
 
   /** Optionally start and end index of return section in `str`, or `None`
     *  if `str` does not have a @group. */
@@ -174,31 +164,28 @@ object DocStrings {
 
   /** Returns index following variable, or start index if no variable was recognized
     */
-  def skipVariable(str: String, start: Int): Int = {
+  def skipVariable(str: String, start: Int): Int =
     var idx = start
-    if (idx < str.length && (str charAt idx) == '{') {
+    if (idx < str.length && (str charAt idx) == '{')
       do idx += 1 while (idx < str.length && (str charAt idx) != '}')
       if (idx < str.length) idx + 1 else start
-    } else {
+    else
       while (idx < str.length && isVarPart(str charAt idx)) idx += 1
       idx
-    }
-  }
 
   /** A map from the section tag to section parameters */
   def sectionTagMap(
       str: String, sections: List[(Int, Int)]): Map[String, (Int, Int)] =
-    Map() ++ {
+    Map() ++
       for (section <- sections) yield
         extractSectionTag(str, section) -> section
-    }
 
   /** Extract the section tag, treating the section tag as an identifier */
   def extractSectionTag(str: String, section: (Int, Int)): String =
     str.substring(section._1, skipTag(str, section._1))
 
   /** Extract the section parameter */
-  def extractSectionParam(str: String, section: (Int, Int)): String = {
+  def extractSectionParam(str: String, section: (Int, Int)): String =
     val (beg, _) = section
     assert(str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
         str.startsWith("@throws", beg))
@@ -207,10 +194,9 @@ object DocStrings {
     val finish = skipIdent(str, start)
 
     str.substring(start, finish)
-  }
 
   /** Extract the section text, except for the tag and comment newlines */
-  def extractSectionText(str: String, section: (Int, Int)): (Int, Int) = {
+  def extractSectionText(str: String, section: (Int, Int)): (Int, Int) =
     val (beg, end) = section
     if (str.startsWith("@param", beg) || str.startsWith("@tparam", beg) ||
         str.startsWith("@throws", beg))
@@ -218,12 +204,9 @@ object DocStrings {
            str, skipIdent(str, skipWhitespace(str, skipTag(str, beg)))),
        end)
     else (skipWhitespace(str, skipTag(str, beg)), end)
-  }
 
   /** Cleanup section text */
-  def cleanupSectionText(str: String) = {
+  def cleanupSectionText(str: String) =
     var result = str.trim.replaceAll("\n\\s+\\*\\s+", " \n")
     while (result.endsWith("\n")) result = result.substring(0, str.length - 1)
     result
-  }
-}

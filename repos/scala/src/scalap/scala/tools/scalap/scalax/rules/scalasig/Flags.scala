@@ -3,7 +3,7 @@ package scalax
 package rules
 package scalasig
 
-trait Flags {
+trait Flags
   def hasFlag(flag: Long): Boolean
 
   def isImplicit = hasFlag(0x00000001)
@@ -69,4 +69,3 @@ trait Flags {
   def isExpandedName = hasFlag(0x1000000000L)
   def isImplementationClass = hasFlag(0x2000000000L)
   def isPreSuper = hasFlag(0x2000000000L)
-}

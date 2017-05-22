@@ -20,7 +20,7 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
 
-object RestartNode2SpecMultiJvmSpec extends MultiNodeConfig {
+object RestartNode2SpecMultiJvmSpec extends MultiNodeConfig
   val seed1 = role("seed1")
   val seed2 = role("seed2")
 
@@ -33,14 +33,13 @@ object RestartNode2SpecMultiJvmSpec extends MultiNodeConfig {
       akka.remote.log-remote-lifecycle-events = INFO
                                            """))
         .withFallback(MultiNodeClusterSpec.clusterConfig))
-}
 
 class RestartNode2SpecMultiJvmNode1 extends RestartNode2SpecSpec
 class RestartNode2SpecMultiJvmNode2 extends RestartNode2SpecSpec
 
 abstract class RestartNode2SpecSpec
     extends MultiNodeSpec(RestartNode2SpecMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec with ImplicitSender
 
   import RestartNode2SpecMultiJvmSpec._
 
@@ -59,75 +58,60 @@ abstract class RestartNode2SpecSpec
       #akka.remote.retry-gate-closed-for = 1s
     """).withFallback(system.settings.config))
 
-  override def afterAll(): Unit = {
-    runOn(seed1) {
+  override def afterAll(): Unit =
+    runOn(seed1)
       shutdown(if (seed1System.whenTerminated.isCompleted) restartedSeed1System
           else seed1System)
-    }
     super.afterAll()
-  }
 
-  "Cluster seed nodes" must {
+  "Cluster seed nodes" must
     "be able to restart first seed node and join other seed nodes" taggedAs LongRunningTest in within(
-        60.seconds) {
+        60.seconds)
       // seed1System is a separate ActorSystem, to be able to simulate restart
       // we must transfer its address to seed2
-      runOn(seed2) {
-        system.actorOf(Props(new Actor {
-          def receive = {
+      runOn(seed2)
+        system.actorOf(Props(new Actor
+          def receive =
             case a: Address ⇒
               seedNode1Address = a
               sender() ! "ok"
-          }
-        }).withDeploy(Deploy.local), name = "address-receiver")
+        ).withDeploy(Deploy.local), name = "address-receiver")
         enterBarrier("seed1-address-receiver-ready")
-      }
 
-      runOn(seed1) {
+      runOn(seed1)
         enterBarrier("seed1-address-receiver-ready")
         seedNode1Address = Cluster(seed1System).selfAddress
-        List(seed2) foreach { r ⇒
+        List(seed2) foreach  r ⇒
           system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! seedNode1Address
           expectMsg(5.seconds, "ok")
-        }
-      }
       enterBarrier("seed1-address-transfered")
 
       // now we can join seed1System, seed2 together
 
-      runOn(seed1) {
+      runOn(seed1)
         Cluster(seed1System).joinSeedNodes(seedNodes)
         awaitAssert(Cluster(seed1System).readView.members.size should be(2))
         awaitAssert(
             Cluster(seed1System).readView.members.map(_.status) should be(
                 Set(Up)))
-      }
-      runOn(seed2) {
+      runOn(seed2)
         cluster.joinSeedNodes(seedNodes)
         awaitMembersUp(2)
-      }
       enterBarrier("started")
 
       // shutdown seed1System
-      runOn(seed1) {
+      runOn(seed1)
         shutdown(seed1System, remainingOrDefault)
-      }
       enterBarrier("seed1-shutdown")
 
       // then start restartedSeed1System, which has the same address as seed1System
-      runOn(seed1) {
+      runOn(seed1)
         Cluster(restartedSeed1System).joinSeedNodes(seedNodes)
-        within(30.seconds) {
+        within(30.seconds)
           awaitAssert(
               Cluster(restartedSeed1System).readView.members.size should be(2))
           awaitAssert(Cluster(restartedSeed1System).readView.members
                 .map(_.status) should be(Set(Up)))
-        }
-      }
-      runOn(seed2) {
+      runOn(seed2)
         awaitMembersUp(2)
-      }
       enterBarrier("seed1-restarted")
-    }
-  }
-}

@@ -6,6 +6,5 @@ class C
 class D
 class E
 
-package bon {
+package bon
   class G
-}

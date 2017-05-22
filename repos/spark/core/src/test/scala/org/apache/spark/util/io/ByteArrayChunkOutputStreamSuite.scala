@@ -21,38 +21,34 @@ import scala.util.Random
 
 import org.apache.spark.SparkFunSuite
 
-class ByteArrayChunkOutputStreamSuite extends SparkFunSuite {
+class ByteArrayChunkOutputStreamSuite extends SparkFunSuite
 
-  test("empty output") {
+  test("empty output")
     val o = new ByteArrayChunkOutputStream(1024)
     assert(o.toArrays.length === 0)
-  }
 
-  test("write a single byte") {
+  test("write a single byte")
     val o = new ByteArrayChunkOutputStream(1024)
     o.write(10)
     assert(o.toArrays.length === 1)
     assert(o.toArrays.head.toSeq === Seq(10.toByte))
-  }
 
-  test("write a single near boundary") {
+  test("write a single near boundary")
     val o = new ByteArrayChunkOutputStream(10)
     o.write(new Array[Byte](9))
     o.write(99)
     assert(o.toArrays.length === 1)
     assert(o.toArrays.head(9) === 99.toByte)
-  }
 
-  test("write a single at boundary") {
+  test("write a single at boundary")
     val o = new ByteArrayChunkOutputStream(10)
     o.write(new Array[Byte](10))
     o.write(99)
     assert(o.toArrays.length === 2)
     assert(o.toArrays(1).length === 1)
     assert(o.toArrays(1)(0) === 99.toByte)
-  }
 
-  test("single chunk output") {
+  test("single chunk output")
     val ref = new Array[Byte](8)
     Random.nextBytes(ref)
     val o = new ByteArrayChunkOutputStream(10)
@@ -61,9 +57,8 @@ class ByteArrayChunkOutputStreamSuite extends SparkFunSuite {
     assert(arrays.length === 1)
     assert(arrays.head.length === ref.length)
     assert(arrays.head.toSeq === ref.toSeq)
-  }
 
-  test("single chunk output at boundary size") {
+  test("single chunk output at boundary size")
     val ref = new Array[Byte](10)
     Random.nextBytes(ref)
     val o = new ByteArrayChunkOutputStream(10)
@@ -72,9 +67,8 @@ class ByteArrayChunkOutputStreamSuite extends SparkFunSuite {
     assert(arrays.length === 1)
     assert(arrays.head.length === ref.length)
     assert(arrays.head.toSeq === ref.toSeq)
-  }
 
-  test("multiple chunk output") {
+  test("multiple chunk output")
     val ref = new Array[Byte](26)
     Random.nextBytes(ref)
     val o = new ByteArrayChunkOutputStream(10)
@@ -88,9 +82,8 @@ class ByteArrayChunkOutputStreamSuite extends SparkFunSuite {
     assert(arrays(0).toSeq === ref.slice(0, 10))
     assert(arrays(1).toSeq === ref.slice(10, 20))
     assert(arrays(2).toSeq === ref.slice(20, 26))
-  }
 
-  test("multiple chunk output at boundary size") {
+  test("multiple chunk output at boundary size")
     val ref = new Array[Byte](30)
     Random.nextBytes(ref)
     val o = new ByteArrayChunkOutputStream(10)
@@ -104,5 +97,3 @@ class ByteArrayChunkOutputStreamSuite extends SparkFunSuite {
     assert(arrays(0).toSeq === ref.slice(0, 10))
     assert(arrays(1).toSeq === ref.slice(10, 20))
     assert(arrays(2).toSeq === ref.slice(20, 30))
-  }
-}

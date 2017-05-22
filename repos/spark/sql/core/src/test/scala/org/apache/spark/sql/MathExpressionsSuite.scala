@@ -23,12 +23,11 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.functions.{log => logarithm}
 import org.apache.spark.sql.test.SharedSQLContext
 
-private object MathExpressionsTestData {
+private object MathExpressionsTestData
   case class DoubleData(a: java.lang.Double, b: java.lang.Double)
   case class NullDoubles(a: java.lang.Double)
-}
 
-class MathExpressionsSuite extends QueryTest with SharedSQLContext {
+class MathExpressionsSuite extends QueryTest with SharedSQLContext
   import MathExpressionsTestData._
   import testImplicits._
 
@@ -45,7 +44,7 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
   private def testOneToOneMathFunction[
       @specialized(Int, Long, Float, Double) T,
       @specialized(Int, Long, Float, Double) U](
-      c: Column => Column, f: T => U): Unit = {
+      c: Column => Column, f: T => U): Unit =
     checkAnswer(
         doubleData.select(c('a)),
         (1 to 10).map(n => Row(f((n * 0.2 - 1).asInstanceOf[T])))
@@ -60,31 +59,28 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         doubleData.select(c(lit(null))),
         (1 to 10).map(_ => Row(null))
     )
-  }
 
   private def testOneToOneNonNegativeMathFunction(
-      c: Column => Column, f: Double => Double): Unit = {
+      c: Column => Column, f: Double => Double): Unit =
     checkAnswer(
         nnDoubleData.select(c('a)),
         (1 to 10).map(n => Row(f(n * 0.1)))
     )
 
-    if (f(-1) === math.log1p(-1)) {
+    if (f(-1) === math.log1p(-1))
       checkAnswer(
           nnDoubleData.select(c('b)),
           (1 to 9).map(n => Row(f(n * -0.1))) :+ Row(null)
       )
-    }
 
     checkAnswer(
         nnDoubleData.select(c(lit(null))),
         (1 to 10).map(_ => Row(null))
     )
-  }
 
   private def testTwoToOneMathFunction(c: (Column, Column) => Column,
                                        d: (Column, Double) => Column,
-                                       f: (Double, Double) => Double): Unit = {
+                                       f: (Double, Double) => Double): Unit =
     checkAnswer(
         nnDoubleData.select(c('a, 'a)),
         nnDoubleData
@@ -117,45 +113,35 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         nullDoubles.select(c('a, 'a)).orderBy('a.asc),
         Row(null) +: nonNull.map(r => Row(f(r.getDouble(0), r.getDouble(0))))
     )
-  }
 
-  test("sin") {
+  test("sin")
     testOneToOneMathFunction(sin, math.sin)
-  }
 
-  test("asin") {
+  test("asin")
     testOneToOneMathFunction(asin, math.asin)
-  }
 
-  test("sinh") {
+  test("sinh")
     testOneToOneMathFunction(sinh, math.sinh)
-  }
 
-  test("cos") {
+  test("cos")
     testOneToOneMathFunction(cos, math.cos)
-  }
 
-  test("acos") {
+  test("acos")
     testOneToOneMathFunction(acos, math.acos)
-  }
 
-  test("cosh") {
+  test("cosh")
     testOneToOneMathFunction(cosh, math.cosh)
-  }
 
-  test("tan") {
+  test("tan")
     testOneToOneMathFunction(tan, math.tan)
-  }
 
-  test("atan") {
+  test("atan")
     testOneToOneMathFunction(atan, math.atan)
-  }
 
-  test("tanh") {
+  test("tanh")
     testOneToOneMathFunction(tanh, math.tanh)
-  }
 
-  test("toDegrees") {
+  test("toDegrees")
     testOneToOneMathFunction(toDegrees, math.toDegrees)
     checkAnswer(
         sql("SELECT degrees(0), degrees(1), degrees(1.5)"),
@@ -163,9 +149,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
           .toDF()
           .select(toDegrees(lit(0)), toDegrees(lit(1)), toDegrees(lit(1.5)))
       )
-  }
 
-  test("toRadians") {
+  test("toRadians")
     testOneToOneMathFunction(toRadians, math.toRadians)
     checkAnswer(
         sql("SELECT radians(0), radians(1), radians(1.5)"),
@@ -173,19 +158,16 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
           .toDF()
           .select(toRadians(lit(0)), toRadians(lit(1)), toRadians(lit(1.5)))
       )
-  }
 
-  test("cbrt") {
+  test("cbrt")
     testOneToOneMathFunction(cbrt, math.cbrt)
-  }
 
-  test("ceil and ceiling") {
+  test("ceil and ceiling")
     testOneToOneMathFunction(ceil, (d: Double) => math.ceil(d).toLong)
     checkAnswer(
         sql("SELECT ceiling(0), ceiling(1), ceiling(1.5)"), Row(0L, 1L, 2L))
-  }
 
-  test("conv") {
+  test("conv")
     val df = Seq(("333", 10, 2)).toDF("num", "fromBase", "toBase")
     checkAnswer(df.select(conv('num, 10, 16)), Row("14D"))
     checkAnswer(df.select(conv(lit(100), 2, 16)), Row("4"))
@@ -195,13 +177,11 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.selectExpr("""conv("-10", 16, -10)"""), Row("-16"))
     checkAnswer(df.selectExpr("""conv("9223372036854775807", 36, -16)"""),
                 Row("-1")) // for overflow
-  }
 
-  test("floor") {
+  test("floor")
     testOneToOneMathFunction(floor, (d: Double) => math.floor(d).toLong)
-  }
 
-  test("factorial") {
+  test("factorial")
     val df = (0 to 5).map(i => (i, i)).toDF("a", "b")
     checkAnswer(
         df.select(factorial('a)),
@@ -211,13 +191,11 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
         df.selectExpr("factorial(a)"),
         Seq(Row(1), Row(1), Row(2), Row(6), Row(24), Row(120))
     )
-  }
 
-  test("rint") {
+  test("rint")
     testOneToOneMathFunction(rint, math.rint)
-  }
 
-  test("round") {
+  test("round")
     val df = Seq(5, 55, 555).map(Tuple1(_)).toDF("a")
     checkAnswer(
         df.select(round('a), round('a, -1), round('a, -2)),
@@ -237,32 +215,27 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
                 BigDecimal("3.14"),
                 BigDecimal("3.142")))
     )
-  }
 
-  test("exp") {
+  test("exp")
     testOneToOneMathFunction(exp, math.exp)
-  }
 
-  test("expm1") {
+  test("expm1")
     testOneToOneMathFunction(expm1, math.expm1)
-  }
 
-  test("signum / sign") {
+  test("signum / sign")
     testOneToOneMathFunction[Double, Double](signum, math.signum)
 
     checkAnswer(sql("SELECT sign(10), signum(-11)"), Row(1, -1))
-  }
 
-  test("pow / power") {
+  test("pow / power")
     testTwoToOneMathFunction(pow, pow, math.pow)
 
     checkAnswer(
         sql("SELECT pow(1, 2), power(2, 1)"),
         Seq((1, 2)).toDF().select(pow(lit(1), lit(2)), pow(lit(2), lit(1)))
     )
-  }
 
-  test("hex") {
+  test("hex")
     val data = Seq((28, -28, 100800200404L, "hello")).toDF("a", "b", "c", "d")
     checkAnswer(data.select(hex('a)), Seq(Row("1C")))
     checkAnswer(data.select(hex('b)), Seq(Row("FFFFFFFFFFFFFFE4")))
@@ -274,9 +247,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
     checkAnswer(data.selectExpr("hex(d)"), Seq(Row("68656C6C6F")))
     checkAnswer(
         data.selectExpr("hex(cast(d as binary))"), Seq(Row("68656C6C6F")))
-  }
 
-  test("unhex") {
+  test("unhex")
     val data = Seq(("1C", "737472696E67")).toDF("a", "b")
     checkAnswer(data.select(unhex('a)), Row(Array[Byte](28.toByte)))
     checkAnswer(
@@ -286,17 +258,14 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
                 Row("string".getBytes(StandardCharsets.UTF_8)))
     checkAnswer(data.selectExpr("""unhex("##")"""), Row(null))
     checkAnswer(data.selectExpr("""unhex("G123")"""), Row(null))
-  }
 
-  test("hypot") {
+  test("hypot")
     testTwoToOneMathFunction(hypot, hypot, math.hypot)
-  }
 
-  test("atan2") {
+  test("atan2")
     testTwoToOneMathFunction(atan2, atan2, math.atan2)
-  }
 
-  test("log / ln") {
+  test("log / ln")
     testOneToOneNonNegativeMathFunction(
         org.apache.spark.sql.functions.log, math.log)
     checkAnswer(
@@ -305,17 +274,14 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
           .toDF()
           .select(logarithm(lit(0)), logarithm(lit(1)), logarithm(lit(1.5)))
       )
-  }
 
-  test("log10") {
+  test("log10")
     testOneToOneNonNegativeMathFunction(log10, math.log10)
-  }
 
-  test("log1p") {
+  test("log1p")
     testOneToOneNonNegativeMathFunction(log1p, math.log1p)
-  }
 
-  test("shift left") {
+  test("shift left")
     val df = Seq[(Long, Integer, Short, Byte, Integer, Integer)](
         (21, 21, 21, 21, 21, null)).toDF("a", "b", "c", "d", "e", "f")
 
@@ -332,9 +298,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
                               "shiftLeft(d, 1)",
                               "shiftLeft(f, 1)"),
                 Row(42.toLong, 42, 42.toShort, 42.toByte, null))
-  }
 
-  test("shift right") {
+  test("shift right")
     val df = Seq[(Long, Integer, Short, Byte, Integer, Integer)](
         (42, 42, 42, 42, 42, null)).toDF("a", "b", "c", "d", "e", "f")
 
@@ -351,9 +316,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
                               "shiftRight(d, 1)",
                               "shiftRight(f, 1)"),
                 Row(21.toLong, 21, 21.toShort, 21.toByte, null))
-  }
 
-  test("shift right unsigned") {
+  test("shift right unsigned")
     val df = Seq[(Long, Integer, Short, Byte, Integer, Integer)](
         (-42, 42, 42, 42, 42, null)).toDF("a", "b", "c", "d", "e", "f")
 
@@ -370,9 +334,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
                               "shiftRightUnsigned(d, 1)",
                               "shiftRightUnsigned(f, 1)"),
                 Row(9223372036854775787L, 21, 21.toShort, 21.toByte, null))
-  }
 
-  test("binary log") {
+  test("binary log")
     val df = Seq[(Integer, Integer)]((123, null)).toDF("a", "b")
     checkAnswer(df.select(org.apache.spark.sql.functions.log("a"),
                           org.apache.spark.sql.functions.log(2.0, "a"),
@@ -381,9 +344,8 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(df.selectExpr("log(a)", "log(2.0, a)", "log(b)"),
                 Row(math.log(123), math.log(123) / math.log(2), null))
-  }
 
-  test("abs") {
+  test("abs")
     val input = Seq[(java.lang.Double, java.lang.Double)](
         (null, null), (0.0, 0.0), (1.5, 1.5), (-2.5, 2.5))
     checkAnswer(
@@ -404,32 +366,26 @@ class MathExpressionsSuite extends QueryTest with SharedSQLContext {
             BigDecimal("3.14159265"),
             BigDecimal("3.14159265"))
     )
-  }
 
-  test("log2") {
+  test("log2")
     val df = Seq((1, 2)).toDF("a", "b")
     checkAnswer(df.select(log2("b") + log2("a")), Row(1))
 
     checkAnswer(sql("SELECT LOG2(8), LOG2(null)"), Row(3, null))
-  }
 
-  test("sqrt") {
+  test("sqrt")
     val df = Seq((1, 4)).toDF("a", "b")
     checkAnswer(df.select(sqrt("a"), sqrt("b")), Row(1.0, 2.0))
 
     checkAnswer(sql("SELECT SQRT(4.0), SQRT(null)"), Row(2.0, null))
     checkAnswer(
         df.selectExpr("sqrt(a)", "sqrt(b)", "sqrt(null)"), Row(1.0, 2.0, null))
-  }
 
-  test("negative") {
+  test("negative")
     checkAnswer(
         sql("SELECT negative(1), negative(0), negative(-1)"), Row(-1, 0, 1))
-  }
 
-  test("positive") {
+  test("positive")
     val df = Seq((1, -1, "abc")).toDF("a", "b", "c")
     checkAnswer(df.selectExpr("positive(a)"), Row(1))
     checkAnswer(df.selectExpr("positive(b)"), Row(-1))
-  }
-}

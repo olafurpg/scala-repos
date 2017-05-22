@@ -12,13 +12,13 @@ class CollectAllForImportProcessor(
     override val kinds: Set[ResolveTargets.Value],
     override val ref: PsiElement,
     override val name: String)
-    extends ResolveProcessor(kinds, ref, name) {
-  override def execute(element: PsiElement, state: ResolveState): Boolean = {
+    extends ResolveProcessor(kinds, ref, name)
+  override def execute(element: PsiElement, state: ResolveState): Boolean =
     val named = element.asInstanceOf[PsiNamedElement]
-    if (nameAndKindMatch(named, state)) {
+    if (nameAndKindMatch(named, state))
       val accessible = isAccessible(named, ref)
       if (accessibility && !accessible) return true
-      named match {
+      named match
         case pack: PsiPackage =>
           candidatesSet += new ScalaResolveResult(ScPackageImpl(pack),
                                                   getSubst(state),
@@ -32,8 +32,4 @@ class CollectAllForImportProcessor(
                                    boundClass = getBoundClass(state),
                                    fromType = getFromType(state),
                                    isAccessible = true)
-      }
-    }
     true
-  }
-}

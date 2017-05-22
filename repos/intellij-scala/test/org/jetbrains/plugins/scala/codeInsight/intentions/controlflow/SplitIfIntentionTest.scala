@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 6/8/12
   */
-class SplitIfIntentionTest extends ScalaIntentionTestBase {
+class SplitIfIntentionTest extends ScalaIntentionTestBase
   val familyName = SplitIfIntention.familyName
 
-  def testSplitIf() {
+  def testSplitIf()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -28,9 +28,8 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitIf2() {
+  def testSplitIf2()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -59,9 +58,8 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitIf3() {
+  def testSplitIf3()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -83,9 +81,8 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitIf4() {
+  def testSplitIf4()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -108,9 +105,8 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitIf5() {
+  def testSplitIf5()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -134,9 +130,8 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitIf6() {
+  def testSplitIf6()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -163,9 +158,8 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitIf7() {
+  def testSplitIf7()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -192,9 +186,8 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitIf8() {
+  def testSplitIf8()
     val text = """
         |class X {
         |  def f(a: Boolean, b: Boolean) {
@@ -221,5 +214,3 @@ class SplitIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

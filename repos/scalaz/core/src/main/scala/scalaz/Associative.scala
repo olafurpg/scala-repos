@@ -5,7 +5,7 @@ package scalaz
   *
   */
 ////
-trait Associative[=>:[_, _]] { self =>
+trait Associative[=>:[_, _]]  self =>
   ////
   import Isomorphism.<=>
 
@@ -14,12 +14,11 @@ trait Associative[=>:[_, _]] { self =>
   def reassociateRight[A, B, C](f: (A =>: B) =>: C): A =>: (B =>: C)
 
   def reassociateIso[A, B, C]: ((A =>: B) =>: C) <=> (A =>: (B =>: C)) =
-    new (((A =>: B) =>: C) <=> (A =>: (B =>: C))) {
+    new (((A =>: B) =>: C) <=> (A =>: (B =>: C)))
       def from = reassociateLeft
       def to = reassociateRight
-    }
 
-  trait AssociativeLaw {
+  trait AssociativeLaw
 
     /** Reassociating left and then right is a no-op. */
     def leftRight[A, B, C](fa: A =>: (B =>: C))(
@@ -30,19 +29,15 @@ trait Associative[=>:[_, _]] { self =>
     def rightLeft[A, B, C](fa: (A =>: B) =>: C)(
         implicit FL: Equal[(A =>: B) =>: C]): Boolean =
       FL.equal(reassociateLeft(reassociateRight(fa)), fa)
-  }
 
   def associativeLaw = new AssociativeLaw {}
   ////
-  val associativeSyntax = new scalaz.syntax.AssociativeSyntax[=>:] {
+  val associativeSyntax = new scalaz.syntax.AssociativeSyntax[=>:]
     def F = Associative.this
-  }
-}
 
-object Associative {
+object Associative
   @inline def apply[F[_, _]](implicit F: Associative[F]): Associative[F] = F
 
   ////
 
   ////
-}

@@ -1,9 +1,8 @@
 // /scala/trac/5777/a.scala
 // Wed May  9 08:44:57 PDT 2012
 
-trait Ring {
+trait Ring
   trait E
-}
 
 class Poly[C <: Ring](val ring: C) extends Ring
 // This definition of Poly triggers the same failure on *both* versions
@@ -11,7 +10,7 @@ class Poly[C <: Ring](val ring: C) extends Ring
 
 object BigInt extends Ring
 
-object MyApp {
+object MyApp
   val r = new Poly(BigInt)
 
   implicitly[r.ring.E <:< BigInt.E]
@@ -42,4 +41,3 @@ object MyApp {
   // <     scala.this.Predef.implicitly[<:<[BigInt.E,MyApp.r.ring.E]](scala.this.Predef.conforms[BigInt.E]);
   // ---
   // >     scala.this.Predef.implicitly[<:<[BigInt.E,MyApp.r.ring.E]]();
-}

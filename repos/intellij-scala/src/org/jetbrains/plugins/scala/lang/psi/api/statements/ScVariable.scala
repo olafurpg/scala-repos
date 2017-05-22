@@ -23,7 +23,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingCont
 trait ScVariable
     extends ScBlockStatement with ScMember with ScDocCommentOwner
     with ScDeclaredElementsHolder with ScAnnotationsHolder with ScCommentOwner
-    with ScModifiableTypedDeclaration {
+    with ScModifiableTypedDeclaration
   self =>
   def varKeyword = findChildrenByType(ScalaTokenTypes.kVAR).apply(0)
 
@@ -39,25 +39,20 @@ trait ScVariable
   def getType(ctx: TypingContext): TypeResult[ScType]
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean): Boolean = m match {
+      m: ScMember, isStrict: Boolean): Boolean = m match
     case other: ScVariable =>
-      for (elem <- self.declaredElements) {
+      for (elem <- self.declaredElements)
         if (other.declaredElements.exists(_.name == elem.name)) return true
-      }
       false
     case _ => false
-  }
-  override def getIcon(flags: Int): Icon = {
+  override def getIcon(flags: Int): Icon =
     var parent = getParent
-    while (parent != null) {
-      parent match {
+    while (parent != null)
+      parent match
         case _: ScExtendsBlock => return Icons.FIELD_VAR
         case _: ScBlock => return Icons.VAR
         case _ => parent = parent.getParent
-      }
-    }
     null
-  }
 
   def getVarToken: PsiElement = findFirstChildByType(ScalaTokenTypes.kVAR)
 
@@ -67,4 +62,3 @@ trait ScVariable
 
   override def modifiableReturnType: Option[ScType] =
     getType(TypingContext.empty).toOption
-}

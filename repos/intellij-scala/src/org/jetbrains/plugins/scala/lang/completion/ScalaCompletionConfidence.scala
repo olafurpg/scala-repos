@@ -10,14 +10,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScReferenceExpression
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaCompletionConfidence extends CompletionConfidence {
+class ScalaCompletionConfidence extends CompletionConfidence
   override def shouldSkipAutopopup(contextElement: PsiElement,
                                    psiFile: PsiFile,
-                                   offset: Int): ThreeState = {
-    if (offset != 0) {
+                                   offset: Int): ThreeState =
+    if (offset != 0)
       val elementType: IElementType =
         psiFile.findElementAt(offset - 1).getNode.getElementType
-      elementType match {
+      elementType match
         case ScalaTokenTypes.tINTEGER | ScalaTokenTypes.tFLOAT =>
           return ThreeState.YES
         case ScalaTokenTypes.tSTRING | ScalaTokenTypes.tMULTILINE_STRING
@@ -26,13 +26,8 @@ class ScalaCompletionConfidence extends CompletionConfidence {
         case ScalaTokenTypes.tINTERPOLATED_STRING |
             ScalaTokenTypes.tINTERPOLATED_MULTILINE_STRING
             if psiFile.getText.charAt(offset - 1) == '.' =>
-          psiFile.findElementAt(offset).getPrevSibling match {
+          psiFile.findElementAt(offset).getPrevSibling match
             case ref: ScReferenceExpression => return ThreeState.NO
             case _ =>
-          }
         case _ =>
-      }
-    }
     super.shouldSkipAutopopup(contextElement, psiFile, offset)
-  }
-}

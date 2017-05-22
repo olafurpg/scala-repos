@@ -12,7 +12,7 @@ import com.twitter.util.lint.{Issue, Category, Rule, GlobalRules}
 import com.twitter.util.{Time, Throw, Try}
 import java.util.concurrent.ConcurrentHashMap
 
-private object Json {
+private object Json
   import com.fasterxml.jackson.annotation.JsonInclude
   import com.fasterxml.jackson.core.`type`.TypeReference
   import com.fasterxml.jackson.databind.{ObjectMapper, JsonNode}
@@ -44,20 +44,17 @@ private object Json {
   def deserialize[T : Manifest](node: JsonNode): T =
     mapper.readValue(node.traverse, typeReference[T])
 
-  private def typeReference[T : Manifest] = new TypeReference[T] {
+  private def typeReference[T : Manifest] = new TypeReference[T]
     override def getType = typeFromManifest(manifest[T])
-  }
 
   private def typeFromManifest(m: Manifest[_]): Type =
     if (m.typeArguments.isEmpty) m.runtimeClass
     else
-      new ParameterizedType {
+      new ParameterizedType
         def getRawType = m.runtimeClass
         def getActualTypeArguments =
           m.typeArguments.map(typeFromManifest).toArray
         def getOwnerType = null
-      }
-}
 
 // The ordering issue is that LoadService is run early in the startup
 // lifecycle, typically before Flags are loaded. By using a system
@@ -79,7 +76,7 @@ object scopeSeparator
         "Override the scope separator."
     )
 
-object MetricsStatsReceiver {
+object MetricsStatsReceiver
   val defaultRegistry = Metrics.root()
   private[this] val _defaultHostRegistry = Metrics.createDetached()
   val defaultHostRegistry = _defaultHostRegistry
@@ -99,11 +96,11 @@ object MetricsStatsReceiver {
   /**
     * The [[com.twitter.util.events.Event.Type Event.Type]] for counter increment events.
     */
-  val CounterIncr: Event.Type = {
-    new Event.Type {
+  val CounterIncr: Event.Type =
+    new Event.Type
       val id = "CounterIncr"
 
-      def serialize(event: Event) = event match {
+      def serialize(event: Event) = event match
         case Event(etype, when, value, name: String, _, tid, sid)
             if etype eq this =>
           val (t, s) = serializeTrace(tid, sid)
@@ -113,17 +110,16 @@ object MetricsStatsReceiver {
 
         case _ =>
           Throw(new IllegalArgumentException("unknown format: " + event))
-      }
 
       def deserialize(buf: Buf) =
-        for {
-          env <- Buf.Utf8.unapply(buf) match {
+        for
+          env <- Buf.Utf8.unapply(buf) match
                   case None =>
                     Throw(new IllegalArgumentException("unknown format"))
                   case Some(str) =>
                     Try(Json.deserialize[Json.Envelope[CounterIncrData]](str))
-                } if env.id == id
-        } yield {
+                if env.id == id
+        yield
           val when = Time.fromMilliseconds(env.when)
           // This line fails without the JsonDeserialize annotation in Envelope.
           val tid = env.traceId.getOrElse(Event.NoTraceId)
@@ -134,18 +130,15 @@ object MetricsStatsReceiver {
                 objectVal = env.data.name,
                 traceIdVal = tid,
                 spanIdVal = sid)
-        }
-    }
-  }
 
   /**
     * The [[com.twitter.util.events.Event.Type Event.Type]] for stat add events.
     */
-  val StatAdd: Event.Type = {
-    new Event.Type {
+  val StatAdd: Event.Type =
+    new Event.Type
       val id = "StatAdd"
 
-      def serialize(event: Event) = event match {
+      def serialize(event: Event) = event match
         case Event(etype, when, delta, name: String, _, tid, sid)
             if etype eq this =>
           val (t, s) = serializeTrace(tid, sid)
@@ -155,17 +148,16 @@ object MetricsStatsReceiver {
 
         case _ =>
           Throw(new IllegalArgumentException("unknown format: " + event))
-      }
 
       def deserialize(buf: Buf) =
-        for {
-          env <- Buf.Utf8.unapply(buf) match {
+        for
+          env <- Buf.Utf8.unapply(buf) match
                   case None =>
                     Throw(new IllegalArgumentException("unknown format"))
                   case Some(str) =>
                     Try(Json.deserialize[Json.Envelope[StatAddData]](str))
-                } if env.id == id
-        } yield {
+                if env.id == id
+        yield
           val when = Time.fromMilliseconds(env.when)
           // This line fails without the JsonDeserialize annotation in Envelope.
           val tid = env.traceId.getOrElse(Event.NoTraceId)
@@ -176,10 +168,6 @@ object MetricsStatsReceiver {
                 objectVal = env.data.name,
                 traceIdVal = tid,
                 spanIdVal = sid)
-        }
-    }
-  }
-}
 
 /**
   * This implementation of StatsReceiver uses the [[com.twitter.common.metrics]] library under
@@ -195,7 +183,7 @@ class MetricsStatsReceiver(
     sink: Sink,
     histogramFactory: String => HistogramInterface
 )
-    extends StatsReceiverWithCumulativeGauges {
+    extends StatsReceiverWithCumulativeGauges
   import MetricsStatsReceiver._
 
   def this(registry: Metrics, sink: Sink) =
@@ -218,14 +206,13 @@ class MetricsStatsReceiver(
   private[this] val gaugeRequests = new LongAdder()
 
   private[this] def checkRequestsLimit(
-      which: String, adder: LongAdder): Option[Issue] = {
+      which: String, adder: LongAdder): Option[Issue] =
     // todo: ideally these would be computed as rates over time, but this is a
     // relatively simple proxy for bad behavior.
     val count = adder.sum()
     if (count > CreateRequestLimit)
       Some(Issue(s"StatReceiver.$which() has been called $count times"))
     else None
-  }
 
   GlobalRules.get.add(
       Rule(
@@ -235,13 +222,12 @@ class MetricsStatsReceiver(
           "and not requested via `StatsReceiver.{counter,stat,addGauge}` at runtime. " +
           "Large numbers are an indication that these metrics are being requested " +
           "frequently at runtime."
-      ) {
+      )
         Seq(
             checkRequestsLimit("counter", counterRequests),
             checkRequestsLimit("stat", statRequests),
             checkRequestsLimit("addGauge", gaugeRequests)
         ).flatten
-      }
   )
 
   // Scope separator, a string value used to separate scopes defined by `StatsReceiver`.
@@ -254,107 +240,87 @@ class MetricsStatsReceiver(
   /**
     * Create and register a counter inside the underlying Metrics library
     */
-  def counter(names: String*): Counter = {
+  def counter(names: String*): Counter =
     if (log.isLoggable(Level.TRACE))
       log.trace(s"Calling StatsReceiver.counter on $names")
     counterRequests.increment()
     var counter = counters.get(names)
     if (counter == null)
-      counters.synchronized {
+      counters.synchronized
         counter = counters.get(names)
-        if (counter == null) {
-          counter = new Counter {
+        if (counter == null)
+          counter = new Counter
             val metricsCounter = registry.createCounter(format(names))
-            def incr(delta: Int): Unit = {
+            def incr(delta: Int): Unit =
               metricsCounter.add(delta)
-              if (sink.recording) {
-                if (Trace.hasId) {
+              if (sink.recording)
+                if (Trace.hasId)
                   val traceId = Trace.id
                   sink.event(CounterIncr,
                              objectVal = metricsCounter.getName(),
                              longVal = delta,
                              traceIdVal = traceId.traceId.self,
                              spanIdVal = traceId.spanId.self)
-                } else {
+                else
                   sink.event(CounterIncr,
                              objectVal = metricsCounter.getName(),
                              longVal = delta)
-                }
-              }
-            }
-          }
           counters.put(names, counter)
-        }
-      }
     counter
-  }
 
   /**
     * Create and register a stat (histogram) inside the underlying Metrics library
     */
-  def stat(names: String*): Stat = {
+  def stat(names: String*): Stat =
     if (log.isLoggable(Level.TRACE))
       log.trace(s"Calling StatsReceiver.stat for $names")
     statRequests.increment()
     var stat = stats.get(names)
     if (stat == null)
-      stats.synchronized {
+      stats.synchronized
         stat = stats.get(names)
-        if (stat == null) {
+        if (stat == null)
           val doLog = loggedStats.contains(format(names))
-          stat = new Stat {
+          stat = new Stat
             val histogram = histogramFactory(format(names))
             registry.registerHistogram(histogram)
-            def add(value: Float): Unit = {
+            def add(value: Float): Unit =
               if (doLog)
                 log.info(s"Stat ${histogram.getName()} observed $value")
               val asLong = value.toLong
               histogram.add(asLong)
-              if (sink.recording) {
-                if (Trace.hasId) {
+              if (sink.recording)
+                if (Trace.hasId)
                   val traceId = Trace.id
                   sink.event(StatAdd,
                              objectVal = histogram.getName(),
                              longVal = asLong,
                              traceIdVal = traceId.traceId.self,
                              spanIdVal = traceId.spanId.self)
-                } else {
+                else
                   sink.event(StatAdd,
                              objectVal = histogram.getName(),
                              longVal = asLong)
-                }
-              }
-            }
-          }
           stats.put(names, stat)
-        }
-      }
     stat
-  }
 
-  override def addGauge(name: String*)(f: => Float): Gauge = {
+  override def addGauge(name: String*)(f: => Float): Gauge =
     if (log.isLoggable(Level.TRACE))
       log.trace(s"Calling StatsReceiver.addGauge for $name")
     gaugeRequests.increment()
     super.addGauge(name: _*)(f)
-  }
 
-  protected[this] def registerGauge(names: Seq[String], f: => Float) {
-    val gauge = new AbstractGauge[java.lang.Double](format(names)) {
+  protected[this] def registerGauge(names: Seq[String], f: => Float)
+    val gauge = new AbstractGauge[java.lang.Double](format(names))
       override def read = new java.lang.Double(f)
-    }
     registry.register(gauge)
-  }
 
-  protected[this] def deregisterGauge(names: Seq[String]) {
+  protected[this] def deregisterGauge(names: Seq[String])
     registry.unregister(format(names))
-  }
 
   private[this] def format(names: Seq[String]) = names.mkString(separator)
-}
 
 class MetricsExporter(val registry: Metrics)
-    extends JsonExporter(registry) with HttpMuxHandler with MetricsRegistry {
+    extends JsonExporter(registry) with HttpMuxHandler with MetricsRegistry
   def this() = this(MetricsStatsReceiver.defaultRegistry)
   val pattern = "/admin/metrics.json"
-}

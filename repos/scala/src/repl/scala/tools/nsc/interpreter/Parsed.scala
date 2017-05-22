@@ -8,7 +8,7 @@ package interpreter
 
 import util.returning
 
-trait Delimited { self: Parsed =>
+trait Delimited  self: Parsed =>
 
   def delimited: Char => Boolean
   def escapeChars: List[Char] = List('\\')
@@ -18,14 +18,12 @@ trait Delimited { self: Parsed =>
   protected def toArgs(s: String): List[String] =
     if (s == "") Nil
     else
-      (s indexWhere isDelimiterChar) match {
+      (s indexWhere isDelimiterChar) match
         case -1 => List(s)
         case idx => (s take idx) :: toArgs(s drop (idx + 1))
-      }
 
   def isDelimiterChar(ch: Char) = delimited(ch)
   def isEscapeChar(ch: Char): Boolean = escapeChars contains ch
-}
 
 /** One instance of a command buffer.
   */
@@ -34,7 +32,7 @@ class Parsed private (
     val cursor: Int,
     val delimited: Char => Boolean
 )
-    extends Delimited {
+    extends Delimited
   def isEmpty = args.isEmpty
   def isUnqualified = args.size == 1
   def isAtStart = cursor <= 0
@@ -68,9 +66,8 @@ class Parsed private (
   def isDelimiter = !isQuoted && !isEscaped && isDelimiterChar(currentChar)
 
   override def toString = "Parsed(%s / %d)".format(buffer, cursor)
-}
 
-object Parsed {
+object Parsed
   val DefaultDelimiters = "[]{},`; \t".toSet
 
   private def onull(s: String) = if (s == null) "" else s
@@ -82,4 +79,3 @@ object Parsed {
 
   def dotted(s: String, cursor: Int): Parsed =
     new Parsed(onull(s), cursor, _ == '.')
-}

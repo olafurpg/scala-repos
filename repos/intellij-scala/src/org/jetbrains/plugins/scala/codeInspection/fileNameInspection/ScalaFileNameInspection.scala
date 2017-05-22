@@ -18,14 +18,14 @@ import scala.collection.mutable.ArrayBuffer
   * User: Alexander Podkhalyuzin
   * Date: 02.07.2009
   */
-class ScalaFileNameInspection extends LocalInspectionTool {
+class ScalaFileNameInspection extends LocalInspectionTool
   override def isEnabledByDefault: Boolean = true
 
   override def getID: String = "ScalaFileName"
 
   override def checkFile(file: PsiFile,
                          manager: InspectionManager,
-                         isOnTheFly: Boolean): Array[ProblemDescriptor] = {
+                         isOnTheFly: Boolean): Array[ProblemDescriptor] =
     if (!file.isInstanceOf[ScalaFile] || InjectedLanguageManager
           .getInstance(file.getProject)
           .isInjectedFragment(file) ||
@@ -50,21 +50,19 @@ class ScalaFileNameInspection extends LocalInspectionTool {
       return Array.empty //with companion
 
     var hasProblems = true
-    for (clazz <- definitions) {
-      clazz match {
+    for (clazz <- definitions)
+      clazz match
         case o: ScObject
             if file.name == "package.scala" && o.isPackageObject =>
           hasProblems = false
         case _ if ScalaPsiUtil.memberNamesEquals(clazz.name, name) =>
           hasProblems = false
         case _ =>
-      }
-    }
 
     val res = new ArrayBuffer[ProblemDescriptor]
-    if (hasProblems) {
+    if (hasProblems)
       for (clazz <- definitions;
-      scalaClass: ScTypeDefinition = clazz) {
+      scalaClass: ScTypeDefinition = clazz)
         res += manager.createProblemDescriptor(
             scalaClass.nameId,
             "Class doesn't correspond to file name",
@@ -73,8 +71,4 @@ class ScalaFileNameInspection extends LocalInspectionTool {
                 new ScalaRenameClassQuickFix(scalaClass, name),
                 new ScalaRenameFileQuickFix(scalaFile, clazz.name + ".scala")),
             ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
-      }
-    }
     res.toArray
-  }
-}

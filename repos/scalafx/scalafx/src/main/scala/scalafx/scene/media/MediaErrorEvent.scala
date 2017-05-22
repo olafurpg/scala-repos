@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event._
 
-object MediaErrorEvent {
+object MediaErrorEvent
   implicit def sfxMediaErrorEvent2jfx(
       mee: MediaErrorEvent): jfxsm.MediaErrorEvent =
     if (mee != null) mee.delegate else null
@@ -44,13 +44,11 @@ object MediaErrorEvent {
       "Use MediaError; MEDIA_ERROR will be removed in a future release",
       "8.0.60-R10")
   val MEDIA_ERROR = MediaError
-}
 
 class MediaErrorEvent(override val delegate: jfxsm.MediaErrorEvent)
-    extends Event(delegate) with SFXDelegate[jfxsm.MediaErrorEvent] {
+    extends Event(delegate) with SFXDelegate[jfxsm.MediaErrorEvent]
 
   /**
     * Retrieve the error associated with this event.
     */
   def mediaError: MediaException = delegate.getMediaError
-}

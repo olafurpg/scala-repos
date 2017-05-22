@@ -19,17 +19,16 @@ package syntax
 
 import scala.collection.{GenTraversable, GenTraversableLike}
 
-object sized {
+object sized
   implicit def genTraversableSizedConv[CC[X] <: GenTraversable[X], T](
       cc: CC[T])(implicit conv: CC[T] => GenTraversableLike[T, CC[T]],
                  ev: AdditiveCollection[CC[T]]) =
     new SizedConv[T, CC[T]](cc)
 
   implicit def stringSizedConv(s: String) = new SizedConv[Char, String](s)
-}
 
 final class SizedConv[
-    A, Repr <% GenTraversableLike[A, Repr]: AdditiveCollection](r: Repr) {
+    A, Repr <% GenTraversableLike[A, Repr]: AdditiveCollection](r: Repr)
   import ops.nat._
   import Sized._
 
@@ -39,8 +38,6 @@ final class SizedConv[
   def sized(l: Nat)(implicit toInt: ToInt[l.N]) =
     if (r.size == toInt()) Some(wrap[Repr, l.N](r)) else None
 
-  def ensureSized[L <: Nat](implicit toInt: ToInt[L]) = {
+  def ensureSized[L <: Nat](implicit toInt: ToInt[L]) =
     assert(r.size == toInt())
     wrap[Repr, L](r)
-  }
-}

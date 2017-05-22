@@ -32,43 +32,37 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.{Button, Slider, ToolBar}
 import scalafx.scene.layout.VBox
 
-class EnsembleStyledToolBar extends EnsembleExample {
+class EnsembleStyledToolBar extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     // ToolBar Standard
-    val stdToolBar = new ToolBar {
+    val stdToolBar = new ToolBar
       id = "standard"
-      content = List(new Button {
+      content = List(new Button
         text = "Button 1"
-      }, new Button {
+      , new Button
         text = "Button 2"
-      }, new Slider {})
-    }
+      , new Slider {})
     //ToolBar Blue
-    val blueToolBar = new ToolBar {
+    val blueToolBar = new ToolBar
       id = "blue"
       style = "-fx-base: dodgerblue"
-      content = List(new Button {
+      content = List(new Button
         text = "Button 1"
-      }, new Button {
+      , new Button
         text = "Button 2"
-      }, new Slider {})
-    }
+      , new Slider {})
     //ToolBar Dark
-    val darkToolBar = new ToolBar {
+    val darkToolBar = new ToolBar
       id = "dark"
       style = "-fx-base: #333333"
-      content = List(new Button {
+      content = List(new Button
         text = "Button 1"
-      }, new Button {
+      , new Button
         text = "Button 2"
-      }, new Slider {})
-    }
+      , new Slider {})
 
-    new VBox {
+    new VBox
       spacing = 10
       padding = Insets(20)
       children = List(stdToolBar, darkToolBar, blueToolBar)
-    }
-  }
-}

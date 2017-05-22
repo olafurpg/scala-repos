@@ -23,11 +23,11 @@ import org.specs2.mutable.Specification
 /**
   * Systems under specification for VCardParser.
   */
-object VCardParserSpec extends Specification with XmlMatchers {
+object VCardParserSpec extends Specification with XmlMatchers
   "VCardParser Specification".title
 
-  "VCard" should {
-    "parse correctly" in {
+  "VCard" should
+    "parse correctly" in
 
       val vcard = """BEGIN:VCARD
         |VERSION:2.1
@@ -40,8 +40,8 @@ object VCardParserSpec extends Specification with XmlMatchers {
         |END:VCARD""".stripMargin
 
       val list = VCardParser.parse(vcard)
-      list must beLike {
-        case Left(l) => {
+      list must beLike
+        case Left(l) =>
             import VCardParser._
             l must_== List(
                 VCardEntry(VCardKey("BEGIN", List()), List("VCARD")),
@@ -56,8 +56,3 @@ object VCardParserSpec extends Specification with XmlMatchers {
                 VCardEntry(VCardKey("TEL", List(("HOME", ""), ("VOICE", ""))),
                            List("(404) 555-1212")),
                 VCardEntry(VCardKey("END", List()), List("VCARD")))
-          }
-      }
-    }
-  }
-}

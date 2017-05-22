@@ -24,42 +24,35 @@ final class TestProbabilisticClassificationModel(override val uid: String,
                                                  override val numFeatures: Int,
                                                  override val numClasses: Int)
     extends ProbabilisticClassificationModel[
-        Vector, TestProbabilisticClassificationModel] {
+        Vector, TestProbabilisticClassificationModel]
 
   override def copy(extra: org.apache.spark.ml.param.ParamMap): this.type =
     defaultCopy(extra)
 
-  override protected def predictRaw(input: Vector): Vector = {
+  override protected def predictRaw(input: Vector): Vector =
     input
-  }
 
   override protected def raw2probabilityInPlace(
-      rawPrediction: Vector): Vector = {
+      rawPrediction: Vector): Vector =
     rawPrediction
-  }
 
-  def friendlyPredict(input: Vector): Double = {
+  def friendlyPredict(input: Vector): Double =
     predict(input)
-  }
-}
 
-class ProbabilisticClassifierSuite extends SparkFunSuite {
+class ProbabilisticClassifierSuite extends SparkFunSuite
 
-  test("test thresholding") {
+  test("test thresholding")
     val thresholds = Array(0.5, 0.2)
     val testModel = new TestProbabilisticClassificationModel("myuid", 2, 2)
       .setThresholds(thresholds)
     assert(testModel.friendlyPredict(Vectors.dense(Array(1.0, 1.0))) === 1.0)
     assert(testModel.friendlyPredict(Vectors.dense(Array(1.0, 0.2))) === 0.0)
-  }
 
-  test("test thresholding not required") {
+  test("test thresholding not required")
     val testModel = new TestProbabilisticClassificationModel("myuid", 2, 2)
     assert(testModel.friendlyPredict(Vectors.dense(Array(1.0, 2.0))) === 1.0)
-  }
-}
 
-object ProbabilisticClassifierSuite {
+object ProbabilisticClassifierSuite
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -71,4 +64,3 @@ object ProbabilisticClassifierSuite {
         "probabilityCol" -> "myProbability",
         "thresholds" -> Array(0.4, 0.6)
     )
-}

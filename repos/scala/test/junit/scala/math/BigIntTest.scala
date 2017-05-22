@@ -7,10 +7,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(classOf[JUnit4])
-class BigIntTest {
+class BigIntTest
 
   @Test
-  def testIsComparable() {
+  def testIsComparable()
     assert(BigInt(1).isInstanceOf[java.lang.Comparable[_]])
-  }
-}

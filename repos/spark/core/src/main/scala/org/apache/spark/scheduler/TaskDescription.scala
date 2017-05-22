@@ -32,7 +32,7 @@ private[spark] class TaskDescription(
     val name: String,
     val index: Int, // Index within this task's TaskSet
     _serializedTask: ByteBuffer)
-    extends Serializable {
+    extends Serializable
 
   // Because ByteBuffers are not serializable, wrap the task in a SerializableBuffer
   private val buffer = new SerializableBuffer(_serializedTask)
@@ -41,4 +41,3 @@ private[spark] class TaskDescription(
 
   override def toString: String =
     "TaskDescription(TID=%d, index=%d)".format(taskId, index)
-}

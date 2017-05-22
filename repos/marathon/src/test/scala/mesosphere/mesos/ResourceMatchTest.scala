@@ -5,8 +5,8 @@ import mesosphere.marathon.tasks.{PortsMatcher, PortsMatch}
 import org.scalatest.{Matchers, GivenWhenThen, FunSuite}
 import scala.collection.immutable.Seq
 
-class ResourceMatchTest extends FunSuite with GivenWhenThen with Matchers {
-  test("resources include all matched reservations") {
+class ResourceMatchTest extends FunSuite with GivenWhenThen with Matchers
+  test("resources include all matched reservations")
     Given("a resource match with reservations")
     val memReservation = MarathonTestHelper.reservation(
         principal = "memPrincipal", labels = Map("resource" -> "mem"))
@@ -43,5 +43,3 @@ class ResourceMatchTest extends FunSuite with GivenWhenThen with Matchers {
                 80, 80, "role2", reservation = Some(portReservation))
         )
     )
-  }
-}

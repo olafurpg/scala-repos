@@ -38,7 +38,7 @@ import scalafx.application.JFXApp.{Parameters, PrimaryStage}
 import scalafx.delegate.SFXDelegate
 import scalafx.stage.Stage
 
-object JFXApp {
+object JFXApp
 
   var Stage: jfxs.Stage = null
   @deprecated("Prefer Scala naming convention over Java, use `Stage` instead.",
@@ -75,7 +75,7 @@ object JFXApp {
     */
   private val keyValue = """^--([A-Za-z_][^=]*?)=(.*)$""".r
 
-  object Parameters {
+  object Parameters
     implicit def sfxParameters2jfx(p: Parameters): Application.Parameters =
       if (p != null) p.delegate else null
 
@@ -84,14 +84,13 @@ object JFXApp {
       */
     private[application] def apply(arguments: Seq[String]): Parameters =
       if (arguments.isEmpty) EmptyParameters else new ParametersImpl(arguments)
-  }
 
   /**
     * Wraps
     * [[http://docs.oracle.com/javase/8/javafx/api/javafx/application/Application.Parameters.html Application.Parameters]]
     * class.
     */
-  abstract class Parameters extends SFXDelegate[jfxa.Application.Parameters] {
+  abstract class Parameters extends SFXDelegate[jfxa.Application.Parameters]
 
     /**
       * Retrieves a read-only map of the named parameters.
@@ -107,50 +106,43 @@ object JFXApp {
       * Retrieves a read-only list of the unnamed parameters.
       */
     def unnamed: Seq[String]
-  }
 
   /**
     * Default implementation for Parameters class.
     */
   private[application] class ParametersImpl(arguments: Seq[String])
-      extends Parameters {
+      extends Parameters
 
     private var namedArguments: mutable.Map[String, String] =
       mutable.Map.empty[String, String]
     private var unnamedArguments = Buffer.empty[String]
     private var filled = false
 
-    private def parseArguments() {
-      if (!filled) {
+    private def parseArguments()
+      if (!filled)
         arguments.foreach(
             arg =>
-              keyValue.findFirstMatchIn(arg) match {
+              keyValue.findFirstMatchIn(arg) match
             case None => unnamedArguments += arg
             case Some(matcher) =>
               namedArguments(matcher.group(1)) = matcher.group(2)
-        })
+        )
         filled = true
-      }
-    }
 
     def raw = arguments
 
-    def named = {
+    def named =
       parseArguments()
       namedArguments
-    }
 
-    def unnamed = {
+    def unnamed =
       parseArguments()
       unnamedArguments
-    }
 
-    lazy val delegate = new jfxa.Application.Parameters {
+    lazy val delegate = new jfxa.Application.Parameters
       def getRaw = raw
       def getNamed = named
       def getUnnamed = unnamed
-    }
-  }
 
   /**
     * Get the user agent stylesheet used by the whole application.
@@ -182,16 +174,14 @@ object JFXApp {
   /**
     * Empty parameters for an application
     */
-  private[application] object EmptyParameters extends Parameters {
+  private[application] object EmptyParameters extends Parameters
     def raw = Seq.empty[String]
     def named = Map.empty[String, String]
     def unnamed = Seq.empty[String]
-    lazy val delegate = new jfxa.Application.Parameters {
+    lazy val delegate = new jfxa.Application.Parameters
       def getRaw = raw
       def getNamed = named
       def getUnnamed = unnamed
-    }
-  }
 
   /** Simple helper class for construction of primary application stages.
     *
@@ -217,7 +207,6 @@ object JFXApp {
     * }}}
     */
   class PrimaryStage extends Stage(JFXApp.Stage)
-}
 
 /** ScalaFX applications can extend JFXApp to create properly initialized JavaFX applications.
   *
@@ -245,7 +234,7 @@ object JFXApp {
   * }}}
   *
   */
-trait JFXApp extends DelayedInit {
+trait JFXApp extends DelayedInit
 
   // Since JFXApp is now a trait, it is immune from the behavior of the DelayedInit marker trait. All JFXApp
   // initialization code is executed immediately, rather than being passed to delayedInit() and executed when init() is
@@ -279,9 +268,8 @@ trait JFXApp extends DelayedInit {
     *
     * @param x Class/object construction code to be buffered for delayed execution.
     */
-  def delayedInit(x: => Unit) {
+  def delayedInit(x: => Unit)
     subClassInitCode += (() => x)
-  }
 
   /** Perform app-related initialization, and execute initialization/construction code for all classes and objects that
     * extend this trait.
@@ -290,14 +278,13 @@ trait JFXApp extends DelayedInit {
     *
     * @param args Command line arguments.
     */
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     JFXApp.ActiveApp = this
     arguments = args
     // Put any further non-essential initialization here.
     /* Launch the JFX application.
      */
     jfxa.Application.launch(classOf[AppHelper], args: _*)
-  }
 
   /** Perform sub-class initialization when directed to duing application startup.
     *
@@ -321,4 +308,3 @@ trait JFXApp extends DelayedInit {
     * NOTE: This method is called on the JavaFX Application Thread, the same as javafx.Application.stop method.
     */
   def stopApp() {}
-}

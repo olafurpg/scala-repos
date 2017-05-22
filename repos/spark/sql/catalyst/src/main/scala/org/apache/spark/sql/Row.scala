@@ -23,7 +23,7 @@ import scala.util.hashing.MurmurHash3
 import org.apache.spark.sql.catalyst.expressions.GenericRow
 import org.apache.spark.sql.types.StructType
 
-object Row {
+object Row
 
   /**
     * This method can be used to extract fields from a [[Row]] object in a pattern match. Example:
@@ -53,14 +53,12 @@ object Row {
   /**
     * Merge multiple rows into a single row, one after another.
     */
-  def merge(rows: Row*): Row = {
+  def merge(rows: Row*): Row =
     // TODO: Improve the performance of this if used in performance critical part.
     new GenericRow(rows.flatMap(_.toSeq).toArray)
-  }
 
   /** Returns an empty row. */
   val empty = apply()
-}
 
 /**
   * Represents one row of output from a relational operator.  Allows both generic access by ordinal,
@@ -119,7 +117,7 @@ object Row {
   *
   * @group row
   */
-trait Row extends Serializable {
+trait Row extends Serializable
 
   /** Number of elements in the Row. */
   def size: Int = length
@@ -305,15 +303,13 @@ trait Row extends Serializable {
     *
     * @throws ClassCastException when data type does not match.
     */
-  def getStruct(i: Int): Row = {
+  def getStruct(i: Int): Row =
     // Product and Row both are recognized as StructType in a Row
     val t = get(i)
-    if (t.isInstanceOf[Product]) {
+    if (t.isInstanceOf[Product])
       Row.fromTuple(t.asInstanceOf[Product])
-    } else {
+    else
       t.asInstanceOf[Row]
-    }
-  }
 
   /**
     * Returns the value at position i.
@@ -341,10 +337,9 @@ trait Row extends Serializable {
     * @throws UnsupportedOperationException when schema is not defined.
     * @throws IllegalArgumentException when fieldName do not exist.
     */
-  def fieldIndex(name: String): Int = {
+  def fieldIndex(name: String): Int =
     throw new UnsupportedOperationException(
         "fieldIndex on a Row without schema is undefined.")
-  }
 
   /**
     * Returns a Map(name -> value) for the requested fieldNames
@@ -355,11 +350,10 @@ trait Row extends Serializable {
     * @throws IllegalArgumentException when fieldName do not exist.
     * @throws ClassCastException when data type does not match.
     */
-  def getValuesMap[T](fieldNames: Seq[String]): Map[String, T] = {
-    fieldNames.map { name =>
+  def getValuesMap[T](fieldNames: Seq[String]): Map[String, T] =
+    fieldNames.map  name =>
       name -> getAs[T](name)
-    }.toMap
-  }
+    .toMap
 
   override def toString(): String = s"[${this.mkString(",")}]"
 
@@ -369,93 +363,76 @@ trait Row extends Serializable {
   def copy(): Row
 
   /** Returns true if there are any NULL values in this row. */
-  def anyNull: Boolean = {
+  def anyNull: Boolean =
     val len = length
     var i = 0
-    while (i < len) {
+    while (i < len)
       if (isNullAt(i)) { return true }
       i += 1
-    }
     false
-  }
 
-  override def equals(o: Any): Boolean = {
+  override def equals(o: Any): Boolean =
     if (!o.isInstanceOf[Row]) return false
     val other = o.asInstanceOf[Row]
 
     if (other eq null) return false
 
-    if (length != other.length) {
+    if (length != other.length)
       return false
-    }
 
     var i = 0
-    while (i < length) {
-      if (isNullAt(i) != other.isNullAt(i)) {
+    while (i < length)
+      if (isNullAt(i) != other.isNullAt(i))
         return false
-      }
-      if (!isNullAt(i)) {
+      if (!isNullAt(i))
         val o1 = get(i)
         val o2 = other.get(i)
-        o1 match {
+        o1 match
           case b1: Array[Byte] =>
             if (!o2.isInstanceOf[Array[Byte]] ||
-                !java.util.Arrays.equals(b1, o2.asInstanceOf[Array[Byte]])) {
+                !java.util.Arrays.equals(b1, o2.asInstanceOf[Array[Byte]]))
               return false
-            }
           case f1: Float if java.lang.Float.isNaN(f1) =>
             if (!o2.isInstanceOf[Float] ||
-                !java.lang.Float.isNaN(o2.asInstanceOf[Float])) {
+                !java.lang.Float.isNaN(o2.asInstanceOf[Float]))
               return false
-            }
           case d1: Double if java.lang.Double.isNaN(d1) =>
             if (!o2.isInstanceOf[Double] ||
-                !java.lang.Double.isNaN(o2.asInstanceOf[Double])) {
+                !java.lang.Double.isNaN(o2.asInstanceOf[Double]))
               return false
-            }
           case d1: java.math.BigDecimal
               if o2.isInstanceOf[java.math.BigDecimal] =>
-            if (d1.compareTo(o2.asInstanceOf[java.math.BigDecimal]) != 0) {
+            if (d1.compareTo(o2.asInstanceOf[java.math.BigDecimal]) != 0)
               return false
-            }
           case _ =>
-            if (o1 != o2) {
+            if (o1 != o2)
               return false
-            }
-        }
-      }
       i += 1
-    }
     true
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     // Using Scala's Seq hash code implementation.
     var n = 0
     var h = MurmurHash3.seqSeed
     val len = length
-    while (n < len) {
+    while (n < len)
       h = MurmurHash3.mix(h, apply(n).##)
       n += 1
-    }
     MurmurHash3.finalizeHash(h, n)
-  }
 
   /* ---------------------- utility methods for Scala ---------------------- */
 
   /**
     * Return a Scala Seq representing the row. Elements are placed in the same order in the Seq.
     */
-  def toSeq: Seq[Any] = {
+  def toSeq: Seq[Any] =
     val n = length
     val values = new Array[Any](n)
     var i = 0
-    while (i < n) {
+    while (i < n)
       values.update(i, get(i))
       i += 1
-    }
     values.toSeq
-  }
 
   /** Displays all elements of this sequence in a string (without a separator). */
   def mkString: String = toSeq.mkString
@@ -481,4 +458,3 @@ trait Row extends Serializable {
     if (isNullAt(i))
       throw new NullPointerException(s"Value at index $i in null")
     else getAs[T](i)
-}

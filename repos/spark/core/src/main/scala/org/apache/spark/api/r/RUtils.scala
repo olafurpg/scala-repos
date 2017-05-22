@@ -22,7 +22,7 @@ import java.util.Arrays
 
 import org.apache.spark.{SparkEnv, SparkException}
 
-private[spark] object RUtils {
+private[spark] object RUtils
   // Local path where R binary packages built from R source code contained in the spark
   // packages specified with "--packages" or "--jars" command line option reside.
   var rPackages: Option[String] = None
@@ -30,13 +30,12 @@ private[spark] object RUtils {
   /**
     * Get the SparkR package path in the local spark distribution.
     */
-  def localSparkRPackagePath: Option[String] = {
+  def localSparkRPackagePath: Option[String] =
     val sparkHome =
       sys.env.get("SPARK_HOME").orElse(sys.props.get("spark.test.home"))
     sparkHome.map(
         Seq(_, "R", "lib").mkString(File.separator)
     )
-  }
 
   /**
     * Get the list of paths for R packages in various deployment modes, of which the first
@@ -47,15 +46,14 @@ private[spark] object RUtils {
     * This assumes that Spark properties `spark.master` and `spark.submit.deployMode`
     * and environment variable `SPARK_HOME` are set.
     */
-  def sparkRPackagePath(isDriver: Boolean): Seq[String] = {
+  def sparkRPackagePath(isDriver: Boolean): Seq[String] =
     val (master, deployMode) =
-      if (isDriver) {
+      if (isDriver)
         (sys.props("spark.master"), sys.props("spark.submit.deployMode"))
-      } else {
+      else
         val sparkConf = SparkEnv.get.conf
         (sparkConf.get("spark.master"),
          sparkConf.get("spark.submit.deployMode", "client"))
-      }
 
     val isYarnCluster =
       master != null && master.contains("yarn") && deployMode == "cluster"
@@ -69,36 +67,28 @@ private[spark] object RUtils {
     //
     // Note that this does not apply to the driver in client mode because it is run
     // outside of the cluster.
-    if (isYarnCluster || (isYarnClient && !isDriver)) {
+    if (isYarnCluster || (isYarnClient && !isDriver))
       val sparkRPkgPath = new File("sparkr").getAbsolutePath
       val rPkgPath = new File("rpkg")
-      if (rPkgPath.exists()) {
+      if (rPkgPath.exists())
         Seq(sparkRPkgPath, rPkgPath.getAbsolutePath)
-      } else {
+      else
         Seq(sparkRPkgPath)
-      }
-    } else {
+    else
       // Otherwise, assume the package is local
       // TODO: support this for Mesos
-      val sparkRPkgPath = localSparkRPackagePath.getOrElse {
+      val sparkRPkgPath = localSparkRPackagePath.getOrElse
         throw new SparkException(
             "SPARK_HOME not set. Can't locate SparkR package.")
-      }
-      if (!rPackages.isEmpty) {
+      if (!rPackages.isEmpty)
         Seq(sparkRPkgPath, rPackages.get)
-      } else {
+      else
         Seq(sparkRPkgPath)
-      }
-    }
-  }
 
   /** Check if R is installed before running tests that use R commands. */
-  def isRInstalled: Boolean = {
-    try {
+  def isRInstalled: Boolean =
+    try
       val builder = new ProcessBuilder(Arrays.asList("R", "--version"))
       builder.start().waitFor() == 0
-    } catch {
+    catch
       case e: Exception => false
-    }
-  }
-}

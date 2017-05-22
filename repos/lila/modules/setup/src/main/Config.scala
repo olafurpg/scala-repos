@@ -6,7 +6,7 @@ import chess.{Game => ChessGame, Board, Situation, Clock, Speed}
 import lila.game.Game
 import lila.lobby.Color
 
-private[setup] trait Config {
+private[setup] trait Config
 
   // Whether or not to use a clock
   val timeMode: TimeMode
@@ -46,9 +46,8 @@ private[setup] trait Config {
 
   def makeDaysPerTurn: Option[Int] =
     (timeMode == TimeMode.Correspondence) option days
-}
 
-trait Positional { self: Config =>
+trait Positional  self: Config =>
 
   import chess.format.Forsyth, Forsyth.SituationPlus
 
@@ -57,16 +56,14 @@ trait Positional { self: Config =>
   def strictFen: Boolean
 
   lazy val validFen =
-    variant != chess.variant.FromPosition || {
-      fen ?? { f =>
+    variant != chess.variant.FromPosition ||
+      fen ??  f =>
         ~(Forsyth <<< f).map(_.situation playable strictFen)
-      }
-    }
 
-  def fenGame(builder: ChessGame => Game): Game = {
+  def fenGame(builder: ChessGame => Game): Game =
     val baseState =
       fen ifTrue (variant == chess.variant.FromPosition) flatMap Forsyth.<<<
-    val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus]) {
+    val (chessGame, state) = baseState.fold(makeGame -> none[SituationPlus])
       case sit @ SituationPlus(Situation(board, color), _) =>
         val game = ChessGame(board = board,
                              player = color,
@@ -76,9 +73,8 @@ trait Positional { self: Config =>
         if (Forsyth.>>(game) == Forsyth.initial)
           makeGame(chess.variant.Standard) -> none
         else game -> baseState
-    }
     val game = builder(chessGame)
-    state.fold(game) {
+    state.fold(game)
       case sit @ SituationPlus(Situation(board, _), _) =>
         game.copy(variant = chess.variant.FromPosition,
                   castleLastMoveTime = game.castleLastMoveTime.copy(
@@ -86,13 +82,10 @@ trait Positional { self: Config =>
                         castles = board.history.castles
                     ),
                   turns = sit.turns)
-    }
-  }
-}
 
 object Config extends BaseConfig
 
-trait BaseConfig {
+trait BaseConfig
   val variants = List(chess.variant.Standard.id, chess.variant.Chess960.id)
   val variantDefault = chess.variant.Standard
 
@@ -115,4 +108,3 @@ trait BaseConfig {
   private val incrementMin = 0
   private val incrementMax = 180
   def validateIncrement(i: Int) = i >= incrementMin && i <= incrementMax
-}

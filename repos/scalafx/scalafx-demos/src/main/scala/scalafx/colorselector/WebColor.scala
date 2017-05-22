@@ -29,7 +29,7 @@ package scalafx.colorselector
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color._
 
-object WebColor {
+object WebColor
 
   val colors = List(
       WebColor("ALICEBLUE", AliceBlue),
@@ -181,7 +181,6 @@ object WebColor {
       WebColor("YELLOW", Yellow),
       WebColor("YELLOWGREEN", YellowGreen)
   )
-}
 
 /**
   * Represents pre-defined colors defined in [[scalafx.scene.paint.Color]] Object.
@@ -190,11 +189,10 @@ object WebColor {
   * @param name Color Name
   * @param color Color
   */
-sealed case class WebColor(name: String, color: Color) {
+sealed case class WebColor(name: String, color: Color)
 
   /**
     * Verifies if a determined color is equivalent to color represented by this WebColor.
     */
   def sameColor(c: Color) =
     ((c.red == color.red) && (c.green == color.green) && (c.blue == color.blue))
-}

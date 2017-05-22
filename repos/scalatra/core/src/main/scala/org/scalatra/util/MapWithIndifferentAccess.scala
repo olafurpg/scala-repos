@@ -8,7 +8,7 @@ import scala.collection.Map
   * for maps with arbitrary keys.  There is no performance gain using symbols.  It is here to make our Rubyists feel
   * more at home.
   */
-trait MapWithIndifferentAccess[+B] extends Map[String, B] {
+trait MapWithIndifferentAccess[+B] extends Map[String, B]
 
   def get(key: Symbol): Option[B] = get(key.name)
 
@@ -16,4 +16,3 @@ trait MapWithIndifferentAccess[+B] extends Map[String, B] {
     getOrElse(key.name, default)
 
   def apply(key: Symbol): B = apply(key.name)
-}

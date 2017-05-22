@@ -8,8 +8,6 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
   * Pavel Fatin
   */
 class RemoveParentheses(f: ScFunction)
-    extends AbstractFixOnPsiElement("Remove redundant parentheses", f) {
-  def doApplyFix(project: Project) {
+    extends AbstractFixOnPsiElement("Remove redundant parentheses", f)
+  def doApplyFix(project: Project)
     getElement.removeAllClauses()
-  }
-}

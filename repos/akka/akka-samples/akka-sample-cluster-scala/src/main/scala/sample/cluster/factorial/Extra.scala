@@ -4,7 +4,7 @@ import akka.actor.Props
 import akka.actor.Actor
 
 // not used, only for documentation
-abstract class FactorialFrontend2 extends Actor {
+abstract class FactorialFrontend2 extends Actor
   //#router-lookup-in-code
   import akka.cluster.routing.ClusterRouterGroup
   import akka.cluster.routing.ClusterRouterGroupSettings
@@ -20,10 +20,9 @@ abstract class FactorialFrontend2 extends Actor {
                              useRole = Some("backend"))).props(),
       name = "factorialBackendRouter2")
   //#router-lookup-in-code
-}
 
 // not used, only for documentation
-abstract class FactorialFrontend3 extends Actor {
+abstract class FactorialFrontend3 extends Actor
   //#router-deploy-in-code
   import akka.cluster.routing.ClusterRouterPool
   import akka.cluster.routing.ClusterRouterPoolSettings
@@ -40,4 +39,3 @@ abstract class FactorialFrontend3 extends Actor {
               useRole = Some("backend"))).props(Props[FactorialBackend]),
       name = "factorialBackendRouter3")
   //#router-deploy-in-code
-}

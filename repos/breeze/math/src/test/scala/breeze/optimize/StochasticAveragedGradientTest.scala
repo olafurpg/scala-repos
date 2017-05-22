@@ -25,35 +25,30 @@ import org.junit.runner.RunWith
 import breeze.linalg._
 
 @RunWith(classOf[JUnitRunner])
-class StochasticAveragedGradientTest extends OptimizeTestBase {
-  test("optimize a simple multivariate gaussian") {
+class StochasticAveragedGradientTest extends OptimizeTestBase
+  test("optimize a simple multivariate gaussian")
     val lbfgs = new StochasticAveragedGradient[DenseVector[Double]](100)
 
-    def optimizeThis(init: DenseVector[Double]) = {
+    def optimizeThis(init: DenseVector[Double]) =
       val f = BatchDiffFunction.wrap(
-          new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+          new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           ((sum((x - 3.0) :^ 2.0)), (x * 2.0) - 6.0)
-        }
-      })
+      )
 
       val result = lbfgs.minimize(f, init)
       norm(result - 3.0, 2) < 1E-3
-    }
 
     check(Prop.forAll(optimizeThis _))
-  }
 
-  test("optimize a simple multivariate gaussian with l2 regularization") {
+  test("optimize a simple multivariate gaussian with l2 regularization")
     val lbfgs = new StochasticAveragedGradient[DenseVector[Double]](
         400, l2Regularization = 1.0)
 
-    def optimizeThis(init: DenseVector[Double]) = {
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    def optimizeThis(init: DenseVector[Double]) =
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (norm((x - 3.0) :^ 2.0, 1), (x * 2.0) - 6.0)
-        }
-      }
 
       val targetValue = 3 / (1.0 / 2 + 1)
       val result = lbfgs.minimize(BatchDiffFunction.wrap(f), init)
@@ -62,10 +57,8 @@ class StochasticAveragedGradientTest extends OptimizeTestBase {
       ok ||
       (throw new RuntimeException("Failed to find optimum for init " + init +
               " " + result + "  " + targetValue))
-    }
 
     check(Prop.forAll(optimizeThis _))
-  }
 
   /*
    test("lbfgs-c rosenbroch example") {
@@ -104,4 +97,3 @@ class StochasticAveragedGradientTest extends OptimizeTestBase {
     assert(optimizeThis(init))
    }
  */
-}

@@ -18,7 +18,7 @@ import scala.language.{implicitConversions, higherKinds}
   *  @author Stephane Micheloud
   *
   */
-class Random(val self: java.util.Random) extends AnyRef with Serializable {
+class Random(val self: java.util.Random) extends AnyRef with Serializable
 
   /** Creates a new random number generator using a single long seed. */
   def this(seed: Long) = this(new java.util.Random(seed))
@@ -80,24 +80,21 @@ class Random(val self: java.util.Random) extends AnyRef with Serializable {
     *  @param  length    the desired length of the String
     *  @return           the String
     */
-  def nextString(length: Int) = {
-    def safeChar() = {
+  def nextString(length: Int) =
+    def safeChar() =
       val surrogateStart: Int = 0xD800
       val res = nextInt(surrogateStart - 1) + 1
       res.toChar
-    }
 
     List.fill(length)(safeChar()).mkString
-  }
 
   /** Returns the next pseudorandom, uniformly distributed value
     *  from the ASCII range 33-126.
     */
-  def nextPrintableChar(): Char = {
+  def nextPrintableChar(): Char =
     val low = 33
     val high = 127
     (self.nextInt(high - low) + low).toChar
-  }
 
   def setSeed(seed: Long) { self.setSeed(seed) }
 
@@ -106,22 +103,19 @@ class Random(val self: java.util.Random) extends AnyRef with Serializable {
     *  @return         the shuffled collection
     */
   def shuffle[T, CC[X] <: TraversableOnce[X]](xs: CC[T])(
-      implicit bf: CanBuildFrom[CC[T], T, CC[T]]): CC[T] = {
+      implicit bf: CanBuildFrom[CC[T], T, CC[T]]): CC[T] =
     val buf = new ArrayBuffer[T] ++= xs
 
-    def swap(i1: Int, i2: Int) {
+    def swap(i1: Int, i2: Int)
       val tmp = buf(i1)
       buf(i1) = buf(i2)
       buf(i2) = tmp
-    }
 
-    for (n <- buf.length to 2 by -1) {
+    for (n <- buf.length to 2 by -1)
       val k = nextInt(n)
       swap(n - 1, k)
-    }
 
     (bf(xs) ++= buf).result()
-  }
 
   @deprecated(
       "Preserved for backwards binary compatibility. To remove in 2.12.x.",
@@ -134,23 +128,19 @@ class Random(val self: java.util.Random) extends AnyRef with Serializable {
     *
     *  @since 2.8
     */
-  def alphanumeric: Stream[Char] = {
-    def nextAlphaNum: Char = {
+  def alphanumeric: Stream[Char] =
+    def nextAlphaNum: Char =
       val chars =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
       chars charAt (self nextInt chars.length)
-    }
 
     Stream continually nextAlphaNum
-  }
-}
 
 /** The object `Random` offers a default implementation
   *  of scala.util.Random and random-related convenience methods.
   *
   *  @since 2.8
   */
-object Random extends Random {
+object Random extends Random
 
   implicit def javaRandomToRandom(r: java.util.Random): Random = new Random(r)
-}

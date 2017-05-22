@@ -8,37 +8,32 @@ import language.implicitConversions
   * A value of type `A` can implicitly convert to a `Parameter` if an evidence `CanBeParameter[A]` is
   * available in scope. This type is not to be instantiated in any other manner.
   */
-sealed trait Parameter {
+sealed trait Parameter
   type A
   def value: A
   def evidence: CanBeParameter[A]
 
-  final def writeTo(writer: BufferWriter): Unit = {
+  final def writeTo(writer: BufferWriter): Unit =
     evidence.write(writer, value)
-  }
 
   final def size: Int = evidence.sizeOf(value)
   final def typeCode: Short = evidence.typeCode(value)
-}
 
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.finagle.exp.mysql.Parameters]].
   */
-object Parameter {
+object Parameter
 
   implicit def wrap[_A](_value: _A)(
-      implicit _evidence: CanBeParameter[_A]): Parameter = {
-    if (_value == null) {
+      implicit _evidence: CanBeParameter[_A]): Parameter =
+    if (_value == null)
       NullParameter
-    } else {
-      new Parameter {
+    else
+      new Parameter
         type A = _A
         def value: A = _value
         def evidence: CanBeParameter[A] = _evidence
         override def toString = s"Parameter($value)"
-      }
-    }
-  }
 
   private val log = Logger.getLogger("finagle-mysql")
 
@@ -49,7 +44,7 @@ object Parameter {
     * we log a failure to encode and transparently write a SQL NULL to
     * the wire.
     */
-  def unsafeWrap(value: Any): Parameter = value match {
+  def unsafeWrap(value: Any): Parameter = value match
     case v: String => wrap(v)
     case v: Boolean => wrap(v)
     case v: Byte => wrap(v)
@@ -69,23 +64,19 @@ object Parameter {
       log.warning(
           s"Unknown parameter ${v.getClass.getName} will be treated as SQL NULL.")
       Parameter.NullParameter
-  }
 
-  object NullParameter extends Parameter {
+  object NullParameter extends Parameter
     type A = Null
     def value = null
     def evidence = CanBeParameter.nullCanBeParameter
-  }
-}
 
 /**
   * A Java adaptation of the [[com.twitter.finagle.exp.mysql.Parameter]] companion object.
   */
-object Parameters {
+object Parameters
 
   def nullParameter: Parameter = Parameter.NullParameter
 
   def unsafeWrap(value: Any): Parameter = Parameter.unsafeWrap(value)
 
   //TODO: create an accessor to Parameter.wrap, so type errors are caught at compile time.
-}

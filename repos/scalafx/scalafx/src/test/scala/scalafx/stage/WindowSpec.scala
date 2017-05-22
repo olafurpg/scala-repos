@@ -43,10 +43,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class WindowSpec
     extends SimpleSFXDelegateSpec[jfxs.Window, Window](
-        classOf[jfxs.Window], classOf[Window]) {
+        classOf[jfxs.Window], classOf[Window])
 
   override protected def getScalaClassInstance =
     new Window(this.getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = new jfxs.Window {}
-}

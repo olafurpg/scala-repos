@@ -46,42 +46,36 @@ case class SampleClassG(a: java.util.Date)
 
 case class SampleClassFail(a: Option[Option[Int]])
 
-object MacroProperties extends Properties("TypeDescriptor.roundTrip") {
-  def roundTrip[T : Arbitrary : TypeDescriptor]: Prop = forAll { t: T =>
+object MacroProperties extends Properties("TypeDescriptor.roundTrip")
+  def roundTrip[T : Arbitrary : TypeDescriptor]: Prop = forAll  t: T =>
     val setter = implicitly[TypeDescriptor[T]].setter
     val converter = implicitly[TypeDescriptor[T]].converter
     val fields = implicitly[TypeDescriptor[T]].fields
     converter(new TupleEntry(fields, setter(t))) == t
-  }
 
-  def propertyFor[T : TypeTag : Arbitrary : TypeDescriptor]: Unit = {
+  def propertyFor[T : TypeTag : Arbitrary : TypeDescriptor]: Unit =
     property(typeTag[T].tpe.toString) = roundTrip[T]
-  }
 
   propertyFor[Int]
   propertyFor[Option[Int]]
   propertyFor[Option[(Int, String, Option[Long])]]
   propertyFor[Option[(Option[Boolean], Int, String, Option[Long])]]
   propertyFor[(Int, Double, String, Option[(String, Int, Option[Long])])]
-}
 
-class MacrosUnitTests extends WordSpec with Matchers {
+class MacrosUnitTests extends WordSpec with Matchers
   import MacroImplicits._
-  def isMg[T](t: T): T = {
+  def isMg[T](t: T): T =
     t shouldBe a[MacroGenerated]
     t
-  }
 
-  private val dummy = new TupleConverter[Nothing] {
+  private val dummy = new TupleConverter[Nothing]
     def apply(te: TupleEntry) = sys.error("dummy")
     override val arity = 1
-  }
 
-  private val dummy2 = new TypeDescriptor[Nothing] {
+  private val dummy2 = new TypeDescriptor[Nothing]
     def setter = sys.error("dummy")
     def converter = sys.error("dummy")
     def fields = sys.error("dummy")
-  }
 
   def isMacroTupleConverterAvailable[T](
       implicit proof: TupleConverter[T] = dummy
@@ -98,148 +92,113 @@ class MacrosUnitTests extends WordSpec with Matchers {
   def mgSet[T](t: T)(implicit set: TupleSetter[T]): TupleEntry =
     new TupleEntry(isMg(set)(t))
 
-  def shouldRoundTrip[T : IsCaseClass : TupleSetter : TupleConverter](t: T) {
+  def shouldRoundTrip[T : IsCaseClass : TupleSetter : TupleConverter](t: T)
     t shouldBe mgConv(mgSet(t))
-  }
 
   def shouldRoundTripOther[T : IsCaseClass : TupleSetter : TupleConverter](
-      te: TupleEntry, t: T) {
+      te: TupleEntry, t: T)
     val inter = mgConv(te)
     inter shouldBe t
     mgSet(inter) shouldBe te
-  }
 
   def canExternalize(t: AnyRef) { Externalizer(t).javaWorks shouldBe true }
 
-  "MacroGenerated TupleConverter" should {
-    "Not compile for Option[Option[Int]]" in {
+  "MacroGenerated TupleConverter" should
+    "Not compile for Option[Option[Int]]" in
       //TODO figure out a way to test this does not compile. See:
       //https://github.com/milessabin/shapeless/blob/master/core/src/main/scala/shapeless/test/typechecking.scala
       //uncommenting fails to compile, but we want to be more sure
       //Macros.caseClassTupleConverter[Option[Option[Int]]]
       //Macros.caseClassTupleConverter[Option[String]]
-    }
-  }
 
-  "MacroGenerated TupleSetter" should {
+  "MacroGenerated TupleSetter" should
 
-    "Generate the setter SampleClassA" in {
+    "Generate the setter SampleClassA" in
       Macros.caseClassTupleSetter[SampleClassA]
-    }
-    "Generate the setter SampleClassB" in {
+    "Generate the setter SampleClassB" in
       Macros.caseClassTupleSetter[SampleClassB]
-    }
-    "Generate the setter SampleClassC" in {
+    "Generate the setter SampleClassC" in
       Macros.caseClassTupleSetter[SampleClassC]
-    }
-    "Generate the setter SampleClassD" in {
+    "Generate the setter SampleClassD" in
       Macros.caseClassTupleSetter[SampleClassD]
-    }
-    "Generate the setter SampleClassE" in {
+    "Generate the setter SampleClassE" in
       Macros.caseClassTupleSetter[SampleClassE]
-    }
-    "Generate the setter SampleClassF" in {
+    "Generate the setter SampleClassF" in
       Macros.caseClassTupleSetter[SampleClassF]
-    }
-    "Generate the setter SampleClassG" in {
+    "Generate the setter SampleClassG" in
       Macros.caseClassTupleSetterWithUnknown[SampleClassG]
-    }
 
-    def doesJavaWork[T](implicit set: TupleSetter[T]) {
+    def doesJavaWork[T](implicit set: TupleSetter[T])
       canExternalize(isMg(set))
-    }
     "be serializable for case class A" in { doesJavaWork[SampleClassA] }
     "be serializable for case class B" in { doesJavaWork[SampleClassB] }
     "be serializable for case class C" in { doesJavaWork[SampleClassC] }
     "be serializable for case class D" in { doesJavaWork[SampleClassD] }
     "be serializable for case class E" in { doesJavaWork[SampleClassE] }
     "be serializable for case class F" in { doesJavaWork[SampleClassF] }
-  }
 
-  "MacroGenerated TupleConverter" should {
-    "Generate the converter SampleClassA" in {
+  "MacroGenerated TupleConverter" should
+    "Generate the converter SampleClassA" in
       Macros.caseClassTupleConverter[SampleClassA]
-    }
-    "Generate the converter SampleClassB" in {
+    "Generate the converter SampleClassB" in
       Macros.caseClassTupleConverter[SampleClassB]
-    }
-    "Generate the converter SampleClassC" in {
+    "Generate the converter SampleClassC" in
       Macros.caseClassTupleConverter[SampleClassC]
-    }
-    "Generate the converter SampleClassD" in {
+    "Generate the converter SampleClassD" in
       Macros.caseClassTupleConverter[SampleClassD]
-    }
-    "Generate the converter SampleClassE" in {
+    "Generate the converter SampleClassE" in
       Macros.caseClassTupleConverter[SampleClassE]
-    }
-    "Generate the converter SampleClassF" in {
+    "Generate the converter SampleClassF" in
       Macros.caseClassTupleConverter[SampleClassF]
-    }
-    "Generate the converter SampleClassG" in {
+    "Generate the converter SampleClassG" in
       Macros.caseClassTupleConverterWithUnknown[SampleClassG]
-    }
-    "Generate the converter Option[(Int, String)]" in {
+    "Generate the converter Option[(Int, String)]" in
       Macros.caseClassTupleConverter[Option[(Int, String)]]
-    }
-    "Generate the converter Option[(Int, Option[(Long, String)])]" in {
+    "Generate the converter Option[(Int, Option[(Long, String)])]" in
       Macros.caseClassTupleConverter[Option[(Int, Option[(Long, String)])]]
-    }
 
-    "Not generate a convertor for SampleClassFail" in {
+    "Not generate a convertor for SampleClassFail" in
       isMacroTupleConverterAvailable[SampleClassFail] shouldBe false
-    }
 
-    def doesJavaWork[T](implicit conv: TupleConverter[T]) {
+    def doesJavaWork[T](implicit conv: TupleConverter[T])
       canExternalize(isMg(conv))
-    }
     "be serializable for case class A" in { doesJavaWork[SampleClassA] }
     "be serializable for case class B" in { doesJavaWork[SampleClassB] }
     "be serializable for case class C" in { doesJavaWork[SampleClassC] }
     "be serializable for case class D" in { doesJavaWork[SampleClassD] }
     "be serializable for case class E" in { doesJavaWork[SampleClassE] }
     "be serializable for case class F" in { doesJavaWork[SampleClassF] }
-  }
 
-  "MacroGenerated TypeDescriptor" should {
-    "Generate the converter SampleClassA" in {
+  "MacroGenerated TypeDescriptor" should
+    "Generate the converter SampleClassA" in
       Macros.caseClassTypeDescriptor[SampleClassA]
-    }
-    "Generate the converter SampleClassB" in {
+    "Generate the converter SampleClassB" in
       Macros.caseClassTypeDescriptor[SampleClassB]
-    }
-    "Generate the converter SampleClassC" in {
+    "Generate the converter SampleClassC" in
       Macros.caseClassTypeDescriptor[SampleClassC]
-    }
-    "Generate the converter SampleClassD" in {
+    "Generate the converter SampleClassD" in
       Macros.caseClassTypeDescriptor[SampleClassD]
-    }
-    "Generate the converter SampleClassE" in {
+    "Generate the converter SampleClassE" in
       Macros.caseClassTypeDescriptor[SampleClassE]
-    }
-    "Generate the converter SampleClassF" in {
+    "Generate the converter SampleClassF" in
       Macros.caseClassTypeDescriptor[SampleClassF]
-    }
-    "Generate the converter SampleClassG" in {
+    "Generate the converter SampleClassG" in
       Macros.caseClassTypeDescriptorWithUnknown[SampleClassG]
-    }
 
-    "Not generate a convertor for SampleClassFail" in {
+    "Not generate a convertor for SampleClassFail" in
       isMacroTypeDescriptorAvailable[SampleClassFail] shouldBe false
-    }
 
-    def doesJavaWork[T](implicit conv: TypeDescriptor[T]) {
+    def doesJavaWork[T](implicit conv: TypeDescriptor[T])
       canExternalize(isMg(conv))
-    }
     "be serializable for case class A" in { doesJavaWork[SampleClassA] }
     "be serializable for case class B" in { doesJavaWork[SampleClassB] }
     "be serializable for case class C" in { doesJavaWork[SampleClassC] }
     "be serializable for case class D" in { doesJavaWork[SampleClassD] }
     "be serializable for case class E" in { doesJavaWork[SampleClassE] }
     "be serializable for case class F" in { doesJavaWork[SampleClassF] }
-  }
 
-  "MacroGenerated TupleSetter and TupleConverter" should {
-    "round trip class -> tupleentry -> class" in {
+  "MacroGenerated TupleSetter and TupleConverter" should
+    "round trip class -> tupleentry -> class" in
       shouldRoundTrip(SampleClassA(100, "onehundred"))
       shouldRoundTrip(SampleClassB(SampleClassA(100, "onehundred"),
                                    SampleClassA(-1, "zero"),
@@ -262,9 +221,8 @@ class MacrosUnitTests extends WordSpec with Matchers {
       implicit val tupConverterG =
         Macros.caseClassTupleConverterWithUnknown[SampleClassG]
       shouldRoundTrip(SampleClassG(new java.util.Date(123412L)))
-    }
 
-    "Case Class should form expected tuple" in {
+    "Case Class should form expected tuple" in
       val input = SampleClassC(SampleClassA(1, "asdf"),
                                SampleClassB(SampleClassA(2, "bcdf"),
                                             SampleClassA(5, "jkfs"),
@@ -281,9 +239,8 @@ class MacrosUnitTests extends WordSpec with Matchers {
       assert(tup.size == 19)
       assert(tup.getInteger(0) === 1)
       assert(tup.getString(18) === "adsfmx")
-    }
 
-    "round trip tupleentry -> class -> tupleEntry" in {
+    "round trip tupleentry -> class -> tupleEntry" in
       val a_tup = CTuple.size(2)
       a_tup.setInteger(0, 100)
       a_tup.setString(1, "onehundred")
@@ -329,9 +286,8 @@ class MacrosUnitTests extends WordSpec with Matchers {
       val c_te = new TupleEntry(c_tup)
       val c = SampleClassC(a, b, a, b, b)
       shouldRoundTripOther(c_te, c)
-    }
 
-    "Case Class should form expected Fields" in {
+    "Case Class should form expected Fields" in
       val fields = Macros.toFields[SampleClassB]
       assert(fields.size === 5)
       assert(
@@ -341,27 +297,23 @@ class MacrosUnitTests extends WordSpec with Matchers {
                                                             classOf[String],
                                                             classOf[String]))
       val names = List("a1.x", "a1.y", "a2.x", "a2.y", "y")
-      names.zipWithIndex.foreach {
+      names.zipWithIndex.foreach
         case (name, indx) =>
           assert(fields.get(indx) === name)
-      }
-    }
 
-    "Case Class should form expected Fields with Options" in {
+    "Case Class should form expected Fields with Options" in
       val fields = Macros.toFields[SampleClassD]
       assert(fields.size === 19)
       assert(fields.getTypes === Array
             .fill[java.lang.reflect.Type](19)(classOf[java.lang.Object]))
-    }
 
-    "Case Class should form expected Fields with Unknown types" in {
+    "Case Class should form expected Fields with Unknown types" in
       val fields = Macros.toFieldsWithUnknown[SampleClassG]
       assert(fields.size === 1)
       assert(fields.getTypes === Array[java.lang.reflect.Type](
               classOf[java.util.Date]))
-    }
 
-    "Case Class should form expected Indexed Fields" in {
+    "Case Class should form expected Indexed Fields" in
       val fields = Macros.toIndexedFields[SampleClassB]
       assert(fields.size === 5)
       assert(
@@ -371,10 +323,6 @@ class MacrosUnitTests extends WordSpec with Matchers {
                                                             classOf[String],
                                                             classOf[String]))
       val names = (0 until fields.size)
-      names.zipWithIndex.foreach {
+      names.zipWithIndex.foreach
         case (name, indx) =>
           assert(fields.get(indx) === name)
-      }
-    }
-  }
-}

@@ -23,11 +23,11 @@ import scalikejdbc._
 /** JDBC implementation of [[EngineManifests]] */
 class JDBCEngineManifests(
     client: String, config: StorageClientConfig, prefix: String)
-    extends EngineManifests with Logging {
+    extends EngineManifests with Logging
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "enginemanifests")
-  DB autoCommit { implicit session =>
+  DB autoCommit  implicit session =>
     sql"""
     create table if not exists $tableName (
       id varchar(100) not null primary key,
@@ -36,9 +36,8 @@ class JDBCEngineManifests(
       description text,
       files text not null,
       engineFactory text not null)""".execute().apply()
-  }
 
-  def insert(m: EngineManifest): Unit = DB localTx { implicit session =>
+  def insert(m: EngineManifest): Unit = DB localTx  implicit session =>
     sql"""
     INSERT INTO $tableName VALUES(
       ${m.id},
@@ -47,9 +46,8 @@ class JDBCEngineManifests(
       ${m.description},
       ${m.files.mkString(",")},
       ${m.engineFactory})""".update().apply()
-  }
 
-  def get(id: String, version: String): Option[EngineManifest] = DB localTx {
+  def get(id: String, version: String): Option[EngineManifest] = DB localTx
     implicit session =>
       sql"""
     SELECT
@@ -63,9 +61,8 @@ class JDBCEngineManifests(
         .map(resultToEngineManifest)
         .single()
         .apply()
-  }
 
-  def getAll(): Seq[EngineManifest] = DB localTx { implicit session =>
+  def getAll(): Seq[EngineManifest] = DB localTx  implicit session =>
     sql"""
     SELECT
       id,
@@ -75,11 +72,10 @@ class JDBCEngineManifests(
       files,
       engineFactory
     FROM $tableName""".map(resultToEngineManifest).list().apply()
-  }
 
-  def update(m: EngineManifest, upsert: Boolean = false): Unit = {
+  def update(m: EngineManifest, upsert: Boolean = false): Unit =
     var r = 0
-    DB localTx { implicit session =>
+    DB localTx  implicit session =>
       r = sql"""
       update $tableName set
         engineName = ${m.name},
@@ -87,30 +83,23 @@ class JDBCEngineManifests(
         files = ${m.files.mkString(",")},
         engineFactory = ${m.engineFactory}
       where id = ${m.id} and version = ${m.version}""".update().apply()
-    }
-    if (r == 0) {
-      if (upsert) {
+    if (r == 0)
+      if (upsert)
         insert(m)
-      } else {
+      else
         error("Cannot find a record to update, and upsert is not enabled.")
-      }
-    }
-  }
 
-  def delete(id: String, version: String): Unit = DB localTx {
+  def delete(id: String, version: String): Unit = DB localTx
     implicit session =>
       sql"DELETE FROM $tableName WHERE id = $id AND version = $version"
         .update()
         .apply()
-  }
 
   /** Convert JDBC results to [[EngineManifest]] */
-  def resultToEngineManifest(rs: WrappedResultSet): EngineManifest = {
+  def resultToEngineManifest(rs: WrappedResultSet): EngineManifest =
     EngineManifest(id = rs.string("id"),
                    version = rs.string("version"),
                    name = rs.string("engineName"),
                    description = rs.stringOpt("description"),
                    files = rs.string("files").split(","),
                    engineFactory = rs.string("engineFactory"))
-  }
-}

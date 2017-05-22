@@ -1,4 +1,4 @@
-object Test {
+object Test
   class A
   class B
   class C
@@ -14,4 +14,3 @@ object Test {
   implicit def b[X <: B](implicit mx: G[X]) = new F[X]()
 
   f
-}

@@ -49,14 +49,13 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.reflect.internal.util.{BatchSourceFile, SourceFile}
 
-trait CompletionControl { self: RichPresentationCompiler =>
+trait CompletionControl  self: RichPresentationCompiler =>
 
-  sealed trait CompletionContext {
+  sealed trait CompletionContext
     val source: SourceFile
     val offset: Int
     val prefix: String
     val constructing: Boolean
-  }
 
   case class ScopeContext(
       source: SourceFile,
@@ -78,16 +77,16 @@ trait CompletionControl { self: RichPresentationCompiler =>
 
   def completionsAt(inputP: Position,
                     maxResultsArg: Int,
-                    caseSens: Boolean): CompletionInfoList = {
+                    caseSens: Boolean): CompletionInfoList =
     val origContents = inputP.source.content
     val point = inputP.endOrCursor
 
-    if (point > origContents.length) {
+    if (point > origContents.length)
       // invalid request - completion point is outside of file
       // this causes an ArrayOutOfBounds in the array copy below
       logger.warn("completionsAt request has point outside of file")
       CompletionInfoList("", List.empty)
-    } else {
+    else
       val maxResults = if (maxResultsArg == 0) Int.MaxValue else maxResultsArg
 
       val preceding = inputP.source.content.slice(
@@ -95,16 +94,15 @@ trait CompletionControl { self: RichPresentationCompiler =>
           inputP.point
       )
 
-      val defaultPrefix = IdentRegexp.findFirstMatchIn(preceding) match {
+      val defaultPrefix = IdentRegexp.findFirstMatchIn(preceding) match
         case Some(m) => m.group(1)
         case _ => ""
-      }
 
       val constructing =
         ConstructingRegexp.findFirstMatchIn(preceding).isDefined
 
       val (src, p, patched) =
-        if (defaultPrefix.isEmpty) {
+        if (defaultPrefix.isEmpty)
 
           // Add a fake prefix if none was provided by the user. Otherwise the
           // compiler will give us a weird tree.
@@ -121,19 +119,18 @@ trait CompletionControl { self: RichPresentationCompiler =>
           val src = new BatchSourceFile(inputP.source.file, contents)
 
           (src, inputP.withSource(src).withShift(1), true)
-        } else {
+        else
           (inputP.source, inputP, false)
-        }
       askReloadFile(src)
       val x = new Response[Tree]
       askTypeAt(p, x)
 
-      val contextOpt = x.get match {
+      val contextOpt = x.get match
         case Left(tree) =>
           logger.debug("Completing at tree:" + tree.summaryString)
-          tree match {
+          tree match
             case Apply(fun, _) =>
-              fun match {
+              fun match
                 case Select(qualifier: New, name) =>
                   Some(
                       ScopeContext(src,
@@ -154,7 +151,6 @@ trait CompletionControl { self: RichPresentationCompiler =>
                         .mkString
                   Some(ScopeContext(
                           src, fun.pos.endOrCursor, prefix, constructing))
-              }
             case Literal(Constant(_)) => None
             case New(name) =>
               Some(
@@ -172,46 +168,40 @@ trait CompletionControl { self: RichPresentationCompiler =>
             case Import(expr, _) =>
               val topLevel =
                 ImportTopLevelRegexp.findFirstMatchIn(preceding).isDefined
-              if (topLevel) {
+              if (topLevel)
                 Some(
                     ScopeContext(src,
                                  expr.pos.endOrCursor,
                                  defaultPrefix,
                                  constructing = false))
-              } else {
+              else
                 Some(
                     MemberContext(src,
                                   expr.pos.endOrCursor,
                                   defaultPrefix,
                                   constructing = false))
-              }
             case other =>
               Some(ScopeContext(src, p.point, defaultPrefix, constructing))
-          }
         case _ =>
           logger.error("Unrecognized completion context.")
           None
-      }
-      contextOpt match {
+      contextOpt match
         case Some(context) =>
           CompletionInfoList(
               context.prefix,
               makeAll(context, maxResults, caseSens)
-                .sortWith({ (c1, c2) =>
+                .sortWith( (c1, c2) =>
                   c1.relevance > c2.relevance ||
                   (c1.relevance == c2.relevance &&
                       c1.name.length < c2.name.length)
-                })
+                )
                 .take(maxResults)
             )
         case _ => CompletionInfoList("", Nil)
-      }
-    }
-  }
 
   def makeAll(context: CompletionContext,
               maxResults: Int,
-              caseSens: Boolean): List[CompletionInfo] = {
+              caseSens: Boolean): List[CompletionInfo] =
 
     def toCompletionInfo(
         context: CompletionContext,
@@ -219,7 +209,7 @@ trait CompletionControl { self: RichPresentationCompiler =>
         tpe: Type,
         inherited: Boolean,
         viaView: Symbol
-    ): List[CompletionInfo] = {
+    ): List[CompletionInfo] =
 
       var score = 0
       if (sym.nameString.startsWith(context.prefix)) score += 10
@@ -235,94 +225,78 @@ trait CompletionControl { self: RichPresentationCompiler =>
 
       val infos = List(CompletionInfo.fromSymbolAndType(sym, tpe, score))
 
-      if (context.constructing) {
-        val constructorSyns = constructorSynonyms(sym).map { c =>
+      if (context.constructing)
+        val constructorSyns = constructorSynonyms(sym).map  c =>
           CompletionInfo.fromSymbolAndType(sym, c.tpe, score + 50)
-        }
         infos ++ constructorSyns
-      } else {
-        val applySyns = applySynonyms(sym).map { c =>
+      else
+        val applySyns = applySynonyms(sym).map  c =>
           CompletionInfo.fromSymbolAndType(sym, c.tpe, score)
-        }
         infos ++ applySyns
-      }
-    }
 
     val buff = new mutable.LinkedHashSet[CompletionInfo]()
 
     // Kick off an index search if the name looks like a type.
     // Do this before the lookups below, so the two can
     // proceed concurrently.
-    val typeSearch = context match {
+    val typeSearch = context match
       case ScopeContext(_, _, prefix, _) =>
-        if (TypeNameRegex.findFirstMatchIn(prefix).isDefined) {
+        if (TypeNameRegex.findFirstMatchIn(prefix).isDefined)
           Some(fetchTypeSearchCompletions(prefix, maxResults, indexer))
-        } else None
+        else None
       case _ => None
-    }
 
     var members = List[Member]()
     val x = new Response[List[Member]]
-    context match {
+    context match
       case ScopeContext(src, offset, _, _) =>
         askScopeCompletion(rangePos(src, offset, offset, offset), x)
       case MemberContext(src, offset, _, _) =>
         askTypeCompletion(rangePos(src, offset, offset, offset), x)
-    }
-    do {
-      x.get match {
+    do
+      x.get match
         case Left(mems) => members ++= mems
         case _ =>
-      }
-    } while (!x.isComplete)
+    while (!x.isComplete)
 
     logger.info("Found " + members.size + " members.")
 
     // Any interaction with the members (their types and symbols) must be done
     // on the compiler thread.
-    askOption[Unit] {
-      val filtered = members.filter { m =>
+    askOption[Unit]
+      val filtered = members.filter  m =>
         val s = m.sym.nameString
         matchesPrefix(
             s, context.prefix, matchEntire = false, caseSens = caseSens) &&
         !s.contains("$")
-      }
       logger.info("Filtered down to " + filtered.size + ".")
-      for (m <- filtered) {
-        m match {
+      for (m <- filtered)
+        m match
           case m @ ScopeMember(sym, tpe, accessible, viaView) =>
             val p = sym.pos
             val inSymbol =
               p.isRange &&
               (context.offset >= p.startOrCursor &&
                   context.offset <= p.endOrCursor)
-            if (!sym.isConstructor && !inSymbol) {
+            if (!sym.isConstructor && !inSymbol)
               buff ++= toCompletionInfo(
                   context, sym, tpe, inherited = false, NoSymbol)
-            }
           case m @ TypeMember(sym, tpe, accessible, inherited, viaView) =>
-            if (!sym.isConstructor) {
+            if (!sym.isConstructor)
               buff ++= toCompletionInfo(context, sym, tpe, inherited, viaView)
-            }
           case _ =>
-        }
-      }
-    }
 
     val typeSearchResults = typeSearch.flatMap(Await.result(_, Duration.Inf))
 
-    def keywordCompletions(prefix: String): Seq[CompletionInfo] = {
-      if (prefix.length > 0) {
+    def keywordCompletions(prefix: String): Seq[CompletionInfo] =
+      if (prefix.length > 0)
         Keywords.keywordCompletions.filter(_.name.startsWith(prefix))
-      } else Seq()
-    }
+      else Seq()
 
     buff.toList ++ typeSearchResults.getOrElse(Nil) ++ keywordCompletions(
         context.prefix)
-  }
-}
 
-object Keywords {
+object Keywords
   val keywords = Seq(
       "abstract",
       "case",
@@ -367,25 +341,22 @@ object Keywords {
   )
 
   val keywordCompletions =
-    keywords map {
+    keywords map
       CompletionInfo(_,
                      CompletionSignature(List(), "", hasImplicit = false),
                      false,
                      100,
                      None)
-    }
-}
 
-trait Completion { self: RichPresentationCompiler =>
+trait Completion  self: RichPresentationCompiler =>
 
   def completePackageMember(
-      path: String, prefix: String): List[CompletionInfo] = {
-    packageSymFromPath(path) match {
+      path: String, prefix: String): List[CompletionInfo] =
+    packageSymFromPath(path) match
       case Some(sym) =>
-        val memberSyms = packageMembers(sym).filterNot { s =>
+        val memberSyms = packageMembers(sym).filterNot  s =>
           s == NoSymbol || s.nameString.contains("$")
-        }
-        memberSyms.flatMap { s =>
+        memberSyms.flatMap  s =>
           val name =
             if (s.hasPackageFlag) { s.nameString } else { typeShortName(s) }
           if (name.startsWith(prefix))
@@ -395,13 +366,10 @@ trait Completion { self: RichPresentationCompiler =>
                                isCallable = false,
                                50,
                                None)) else None
-        }.toList.sortBy(ci => (ci.relevance, ci.name))
+        .toList.sortBy(ci => (ci.relevance, ci.name))
       case _ => List.empty
-    }
-  }
-}
 
-object CompletionUtil {
+object CompletionUtil
 
   val IdentRegexp = """([a-zA-Z0-9_#:<=>@!%&*+/?\\^|~-]*)\z""".r
   val JavaIdentRegexp = """([a-zA-Z0-9_]*)\z""".r
@@ -415,24 +383,23 @@ object CompletionUtil {
   def matchesPrefix(m: String,
                     prefix: String,
                     matchEntire: Boolean,
-                    caseSens: Boolean): Boolean = {
+                    caseSens: Boolean): Boolean =
     val prefixUpper = prefix.toUpperCase
 
     (matchEntire && m == prefix) ||
     (!matchEntire && caseSens && m.startsWith(prefix)) ||
     (!matchEntire && !caseSens && m.toUpperCase.startsWith(prefixUpper))
-  }
 
   def fetchTypeSearchCompletions(
       prefix: String,
       maxResults: Int,
-      indexer: ActorRef): Future[Option[List[CompletionInfo]]] = {
+      indexer: ActorRef): Future[Option[List[CompletionInfo]]] =
     val req = TypeCompletionsReq(prefix, maxResults)
     import scala.concurrent.ExecutionContext.Implicits.{global => exe}
     val askRes = Patterns.ask(indexer, req, Timeout(1000.milliseconds))
-    askRes.map {
+    askRes.map
       case s: SymbolSearchResults =>
-        s.syms.map { s =>
+        s.syms.map  s =>
           CompletionInfo(
               s.localName,
               CompletionSignature(List.empty, s.name, false),
@@ -440,10 +407,7 @@ object CompletionUtil {
               40,
               None
           )
-        }
       case unknown =>
         throw new IllegalStateException(
             "Unexpected response type from request:" + unknown)
-    }.map(Some(_)).recover { case _ => None }
-  }
-}
+    .map(Some(_)).recover { case _ => None }

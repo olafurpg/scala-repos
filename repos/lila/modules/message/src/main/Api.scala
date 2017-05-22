@@ -16,7 +16,7 @@ final class Api(unreadCache: UnreadCache,
                 shutup: akka.actor.ActorSelection,
                 maxPerPage: Int,
                 blocks: (String, String) => Fu[Boolean],
-                bus: lila.common.Bus) {
+                bus: lila.common.Bus)
 
   def inbox(me: User, page: Int): Fu[Paginator[Thread]] = Paginator(
       adapter = new Adapter(
@@ -27,43 +27,38 @@ final class Api(unreadCache: UnreadCache,
       maxPerPage = maxPerPage
   )
 
-  def preview(userId: String): Fu[List[Thread]] = unreadCache(userId) flatMap {
+  def preview(userId: String): Fu[List[Thread]] = unreadCache(userId) flatMap
     ids =>
       $find byOrderedIds ids
-  }
 
   def thread(id: String, me: User): Fu[Option[Thread]] =
-    for {
+    for
       threadOption ← $find.byId(id) map (_ filter (_ hasUser me))
       _ ← threadOption
         .filter(_ isUnReadBy me)
         .??(thread => (ThreadRepo setRead thread) >>- updateUser(me))
-    } yield threadOption
+    yield threadOption
 
   def markThreadAsRead(id: String, me: User): Funit = thread(id, me).void
 
-  def makeThread(data: DataForm.ThreadData, me: User): Fu[Thread] = {
+  def makeThread(data: DataForm.ThreadData, me: User): Fu[Thread] =
     val fromMod = Granter(_.MessageAnyone)(me)
-    UserRepo named data.user.id flatMap {
-      _.fold(fufail[Thread]("No such recipient")) { invited =>
+    UserRepo named data.user.id flatMap
+      _.fold(fufail[Thread]("No such recipient"))  invited =>
         Thread.make(name = data.subject,
                     text = data.text,
                     creatorId = me.id,
-                    invitedId = data.user.id) |> { t =>
+                    invitedId = data.user.id) |>  t =>
           val thread =
             if (me.troll || lila.security.Spam.detect(data.subject, data.text))
               t deleteFor invited
             else t
-          sendUnlessBlocked(thread, fromMod) >>- updateUser(invited) >>- {
+          sendUnlessBlocked(thread, fromMod) >>- updateUser(invited) >>-
             val text = s"${data.subject} ${data.text}"
             shutup ! lila.hub.actorApi.shutup.RecordPrivateMessage(me.id,
                                                                    invited.id,
                                                                    text)
-          } inject thread
-        }
-      }
-    }
-  }
+          inject thread
 
   def lichessThread(lt: LichessThread): Funit =
     sendUnlessBlocked(Thread.make(name = lt.subject,
@@ -75,42 +70,34 @@ final class Api(unreadCache: UnreadCache,
   private def sendUnlessBlocked(thread: Thread, fromMod: Boolean): Funit =
     if (fromMod) $insert(thread)
     else
-      blocks(thread.invitedId, thread.creatorId) flatMap {
+      blocks(thread.invitedId, thread.creatorId) flatMap
         !_ ?? $insert(thread)
-      }
 
-  def makePost(thread: Thread, text: String, me: User): Fu[Thread] = {
+  def makePost(thread: Thread, text: String, me: User): Fu[Thread] =
     val post = Post.make(text = text, isByCreator = thread isCreator me)
     if (thread endsWith post) fuccess(thread) // prevent duplicate post
     else
-      blocks(thread receiverOf post, me.id) flatMap {
+      blocks(thread receiverOf post, me.id) flatMap
         case true => fuccess(thread)
         case false =>
           val newThread = thread + post
-          $update[ThreadRepo.ID, Thread](newThread) >>- {
-            UserRepo.named(thread receiverOf post) foreach {
+          $update[ThreadRepo.ID, Thread](newThread) >>-
+            UserRepo.named(thread receiverOf post) foreach
               _ foreach updateUser
-            }
-          } >>- {
+          >>-
             val toUserId = newThread otherUserId me
             shutup ! lila.hub.actorApi.shutup
               .RecordPrivateMessage(me.id, toUserId, text)
-          } inject newThread
-      }
-  }
+          inject newThread
 
   def deleteThread(id: String, me: User): Funit =
-    thread(id, me) flatMap { threadOption =>
+    thread(id, me) flatMap  threadOption =>
       (threadOption.map(_.id) ?? (ThreadRepo deleteFor me.id)) >>- updateUser(
           me)
-    }
 
   val unreadIds = unreadCache apply _
 
-  def updateUser(user: lila.user.User) {
+  def updateUser(user: lila.user.User)
     if (!user.kid)
-      (unreadCache refresh user) mapTo manifest[List[String]] foreach { ids =>
+      (unreadCache refresh user) mapTo manifest[List[String]] foreach  ids =>
         bus.publish(SendTo(user.id, "nbm", ids.size), 'users)
-      }
-  }
-}

@@ -2,9 +2,9 @@ trait Cov[+A]
 trait Con[-A]
 trait Inv[A]
 
-trait Trait[-A, +B, C] {
+trait Trait[-A, +B, C]
   // trait Inner[-D <: C, +E >: C, F] {
-  trait Inner[-D <: C, +E >: C, F] {
+  trait Inner[-D <: C, +E >: C, F]
     def f0(x: A): Unit = ()
     def f1(x: B): Unit = ()
     def f2(x: C): Unit = ()
@@ -148,12 +148,10 @@ trait Trait[-A, +B, C] {
     object O16 extends Inv[D]
     object O17 extends Inv[E]
     object O18 extends Inv[F]
-  }
-}
 
-trait Trait2[-A, +B, C] {
+trait Trait2[-A, +B, C]
   // trait Inner[-D <: C, +E >: C, F] {
-  def method[D <: A, E >: B, F]() {
+  def method[D <: A, E >: B, F]()
     def f0(x: A): Unit = ()
     def f1(x: B): Unit = ()
     def f2(x: C): Unit = ()
@@ -299,5 +297,3 @@ trait Trait2[-A, +B, C] {
     object O18 extends Inv[F]
 
     ()
-  }
-}

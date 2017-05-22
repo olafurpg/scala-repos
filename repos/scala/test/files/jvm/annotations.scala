@@ -1,29 +1,23 @@
 import scala.language.{higherKinds, reflectiveCalls}
 
-object Test1 {
-  class Foo {
+object Test1
+  class Foo
     @remote
     def foo: Unit = ()
-  }
-  def run {
+  def run
     val method = classOf[Foo].getMethod("foo")
     method.getExceptionTypes foreach println
-  }
-}
 
-object Test2 {
+object Test2
   import java.io.{BufferedReader, FileReader, IOException}
-  class Reader(fname: String) {
+  class Reader(fname: String)
     private val in = new BufferedReader(new FileReader(fname))
 
     @throws(classOf[IOException])
     def read() = in.read()
-  }
-  def run {
+  def run
     val method = classOf[Reader].getMethod("read")
     method.getExceptionTypes foreach println
-  }
-}
 
 /* Java:
 public class Main {
@@ -36,18 +30,15 @@ public class Main {
     }
 }
  */
-object Test3 {
+object Test3
   import java.lang.Deprecated
-  class Foo {
+  class Foo
     @Deprecated
     def foo: Unit = ()
-  }
-  def run {
+  def run
     val method = classOf[Foo].getMethod("foo")
     val annotation = method.getAnnotation(classOf[Deprecated])
     println(annotation)
-  }
-}
 
 /* Java:
 @Retention(value=RetentionPolicy.RUNTIME)
@@ -67,7 +58,7 @@ public class Main {
     }
 }
  */
-object Test4 {
+object Test4
   import test.SourceAnnotation // defined in SourceAnnotation.java
   @SourceAnnotation(
       value = "http://scala-lang.org",
@@ -78,25 +69,21 @@ object Test4 {
   class Foo2
   @SourceAnnotation("http://bloodsuckers.com")
   class Foo3
-  class Foo4 {
+  class Foo4
     @SourceAnnotation("file:///dev/null")
     val x = 1
-  }
-  class Foo5 {
+  class Foo5
     @SourceAnnotation("file:///dev/zero")
     def bar: Int = 0
-  }
-  class Foo6 @SourceAnnotation("primary constructor")(s: String) {
+  class Foo6 @SourceAnnotation("primary constructor")(s: String)
     // to guarantee that primary constructor annotations
     // are not applied to secondary constructors
     def this() = this("")
-  }
-  class Foo7(s: String) {
+  class Foo7(s: String)
     @SourceAnnotation("secondary constructor")
     def this() = this("")
-  }
   class Foo8(@SourceAnnotation("constructor val") val n: Int) {}
-  class Foo9 {
+  class Foo9
     import scala.annotation.meta._
     import scala.beans.BeanProperty
     @(SourceAnnotation @getter)("http://apple.com")
@@ -119,39 +106,33 @@ object Test4 {
     @BeanProperty
     @myAnn3[List]("http://eppli.com")
     var z3 = 0
-  }
   class Foo10(@SourceAnnotation("on param 1") val name: String)
   class Foo11(
       @(SourceAnnotation @scala.annotation.meta.field)("on param 2") val name: String)
   class Foo12(
       @(SourceAnnotation @scala.annotation.meta.setter)("on param 3") var name: String)
-  def run {
+  def run
     import java.lang.annotation.Annotation
     import java.lang.reflect.AnnotatedElement
-    def printSourceAnnotation(a: Annotation) {
+    def printSourceAnnotation(a: Annotation)
       val ann = a.asInstanceOf[SourceAnnotation]
       println("@test.SourceAnnotation(mails=" + ann.mails.deep
             .mkString("{", ",", "}") + ", value=" + ann.value + ")")
-    }
-    def printSourceAnnotations(target: AnnotatedElement) {
+    def printSourceAnnotations(target: AnnotatedElement)
       //print SourceAnnotation in a predefined way to insure
       // against difference in the JVMs (e.g. Sun's vs IBM's)
       val anns = target.getAnnotations()
       anns foreach printSourceAnnotation
-      if (anns.length > 0) {
+      if (anns.length > 0)
         println(target)
         println
-      }
-    }
     def printParamSourceAnnotations(
-        target: { def getParameterAnnotations(): Array[Array[Annotation]] }) {
+        target: { def getParameterAnnotations(): Array[Array[Annotation]] })
       val anns = target.getParameterAnnotations().flatten
       anns foreach printSourceAnnotation
-      if (anns.length > 0) {
+      if (anns.length > 0)
         println(target)
         println
-      }
-    }
     printSourceAnnotations(classOf[Foo1])
     printSourceAnnotations(classOf[Foo2])
     printSourceAnnotations(classOf[Foo3])
@@ -181,14 +162,12 @@ object Test4 {
     classOf[Foo12].getDeclaredMethods.sortWith(
         (x, y) => x.toString < y.toString) foreach printSourceAnnotations
     classOf[Foo12].getDeclaredConstructors foreach printParamSourceAnnotations
-  }
-}
 
-object Test5 {
+object Test5
   import scala.beans.BeanProperty
   import java.lang.Integer
 
-  class Count {
+  class Count
     // we use "Integer" instead of "Int" because of Java reflection
     @BeanProperty
     var count: Integer = 0
@@ -198,45 +177,36 @@ object Test5 {
 
     def get = getter.invoke(this).asInstanceOf[Integer].intValue
     def set(n: Int) = setter.invoke(this, new Integer(n))
-  }
-  def run {
+  def run
     val count = new Count
     println(count.get)
     count.set(99)
     println(count.get)
-  }
-}
 
-object Test6 {
+object Test6
   import scala.beans.BeanProperty
   import scala.beans.BooleanBeanProperty
   class C(@BeanProperty var text: String)
-  class D(@BooleanBeanProperty var prop: Boolean) {
+  class D(@BooleanBeanProperty var prop: Boolean)
     @BeanProperty val m: Int = if (prop) 1 else 2
-  }
 
-  def run {
+  def run
     val c = new C("bob")
     c.setText("dylan")
     println(c.getText())
     val d = new D(true)
     d.setProp(false)
-    if (!d.isProp()) {
+    if (!d.isProp())
       println(new D(false).getM())
-    }
-  }
-}
 
 // #3345
 class A3345(@volatile private var i: Int)
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     Test1.run
     Test2.run
     Test3.run // requires the use of -target:jvm-1.5
     Test4.run
     Test5.run
     Test6.run
-  }
-}

@@ -23,17 +23,16 @@ import org.apache.spark.sql.catalyst.plans.{LeftSemi, PlanTest}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 
-class ReplaceOperatorSuite extends PlanTest {
+class ReplaceOperatorSuite extends PlanTest
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("Replace Operators",
             FixedPoint(100),
             ReplaceDistinctWithAggregate,
             ReplaceIntersectWithSemiJoin) :: Nil
-  }
 
-  test("replace Intersect with Left-semi Join") {
+  test("replace Intersect with Left-semi Join")
     val table1 = LocalRelation('a.int, 'b.int)
     val table2 = LocalRelation('c.int, 'd.int)
 
@@ -46,9 +45,8 @@ class ReplaceOperatorSuite extends PlanTest {
         Join(table1, table2, LeftSemi, Option('a <=> 'c && 'b <=> 'd))).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("replace Distinct with Aggregate") {
+  test("replace Distinct with Aggregate")
     val input = LocalRelation('a.int, 'b.int)
 
     val query = Distinct(input)
@@ -57,5 +55,3 @@ class ReplaceOperatorSuite extends PlanTest {
     val correctAnswer = Aggregate(input.output, input.output, input)
 
     comparePlans(optimized, correctAnswer)
-  }
-}

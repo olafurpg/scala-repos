@@ -1,6 +1,6 @@
 import scala.sth
 
-object Test extends App {
+object Test extends App
   def foo(a: Int)(implicit b: sth.Sth): Unit = {}
   foo(1)
 
@@ -12,4 +12,3 @@ object Test extends App {
 
   def meh2(x: Int)(implicit b: Int, a: sth.Sth): Unit = {}
   meh2(1)
-}

@@ -19,7 +19,7 @@ package com.twitter.scalding
   * Enrichment on TypedPipes allowing them to be run locally, independent of the overall flow.
   * @param pipe to wrap
   */
-class ShellTypedPipe[T](pipe: TypedPipe[T])(implicit state: BaseReplState) {
+class ShellTypedPipe[T](pipe: TypedPipe[T])(implicit state: BaseReplState)
   import state.execute
 
   /**
@@ -54,13 +54,11 @@ class ShellTypedPipe[T](pipe: TypedPipe[T])(implicit state: BaseReplState) {
     * Print the contents of a pipe to stdout. Uses `ShellTypedPipe.toIterator`.
     */
   def dump: Unit = toIterator.foreach(println(_))
-}
 
-class ShellValuePipe[T](vp: ValuePipe[T])(implicit state: BaseReplState) {
+class ShellValuePipe[T](vp: ValuePipe[T])(implicit state: BaseReplState)
   import state.execute
   // This might throw if the value is empty
   def dump: Unit = println(toOption)
   def get: T = execute(vp.getExecution)
   def getOrElse(t: => T): T = execute(vp.getOrElseExecution(t))
   def toOption: Option[T] = execute(vp.toOptionExecution)
-}

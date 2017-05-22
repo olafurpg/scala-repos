@@ -19,22 +19,19 @@ import spire.util.Opt
   *
   * `(g.rightId ?|+|> p).get === p`, the operation `?|+|>` being defined.
   */
-trait LeftPartialAction[P, G] extends Any {
+trait LeftPartialAction[P, G] extends Any
   def actlIsDefined(g: G, p: P): Boolean = partialActl(g, p).nonEmpty
   def partialActl(g: G, p: P): Opt[P]
-}
 
-object LeftPartialAction {
+object LeftPartialAction
   @inline final def apply[P, G](
       implicit G: LeftPartialAction[P, G]): LeftPartialAction[P, G] = G
 
   implicit def fromLeftAction[P, G](
       implicit G: LeftAction[P, G]): LeftPartialAction[P, G] =
-    new LeftPartialAction[P, G] {
+    new LeftPartialAction[P, G]
       override def actlIsDefined(g: G, p: P): Boolean = true
       def partialActl(g: G, p: P): Opt[P] = Opt(G.actl(g, p))
-    }
-}
 
 /**
   * A right partial action of a semigroupoid `G` on `P` is the implementation of
@@ -51,22 +48,19 @@ object LeftPartialAction {
   *
   * `(p <|+|? g.leftId).get === p`, the operation `<|+|?` being defined.
   */
-trait RightPartialAction[P, G] extends Any {
+trait RightPartialAction[P, G] extends Any
   def actrIsDefined(p: P, g: G): Boolean = partialActr(p, g).nonEmpty
   def partialActr(p: P, g: G): Opt[P]
-}
 
-object RightPartialAction {
+object RightPartialAction
   @inline final def apply[P, G](
       implicit G: RightPartialAction[P, G]): RightPartialAction[P, G] = G
 
   implicit def fromRightAction[P, G](
       implicit G: RightAction[P, G]): RightPartialAction[P, G] =
-    new RightPartialAction[P, G] {
+    new RightPartialAction[P, G]
       override def actrIsDefined(p: P, g: G): Boolean = true
       def partialActr(p: P, g: G): Opt[P] = Opt(G.actr(p, g))
-    }
-}
 
 /**
   * A partial action is the combination of left and right partial actions, providing:
@@ -103,16 +97,14 @@ object RightPartialAction {
 trait PartialAction[P, G]
     extends Any with LeftPartialAction[P, G] with RightPartialAction[P, G]
 
-object PartialAction {
+object PartialAction
   @inline final def apply[P, G](
       implicit G: PartialAction[P, G]): PartialAction[P, G] = G
 
   implicit def fromAction[P, G](
       implicit G: Action[P, G]): PartialAction[P, G] =
-    new PartialAction[P, G] {
+    new PartialAction[P, G]
       override def actlIsDefined(g: G, p: P): Boolean = true
       def partialActl(g: G, p: P): Opt[P] = Opt(G.actl(g, p))
       override def actrIsDefined(p: P, g: G): Boolean = true
       def partialActr(p: P, g: G): Opt[P] = Opt(G.actr(p, g))
-    }
-}

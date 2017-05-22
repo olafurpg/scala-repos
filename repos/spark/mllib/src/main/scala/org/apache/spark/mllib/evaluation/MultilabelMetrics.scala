@@ -28,7 +28,7 @@ import org.apache.spark.sql.DataFrame
   */
 @Since("1.2.0")
 class MultilabelMetrics @Since("1.2.0")(
-    predictionAndLabels: RDD[(Array[Double], Array[Double])]) {
+    predictionAndLabels: RDD[(Array[Double], Array[Double])])
 
   /**
     * An auxiliary constructor taking a DataFrame.
@@ -36,16 +36,16 @@ class MultilabelMetrics @Since("1.2.0")(
     */
   private[mllib] def this(predictionAndLabels: DataFrame) =
     this(
-        predictionAndLabels.rdd.map { r =>
+        predictionAndLabels.rdd.map  r =>
       (r.getSeq[Double](0).toArray, r.getSeq[Double](1).toArray)
-    })
+    )
 
   private lazy val numDocs: Long = predictionAndLabels.count()
 
-  private lazy val numLabels: Long = predictionAndLabels.flatMap {
+  private lazy val numLabels: Long = predictionAndLabels.flatMap
     case (_, labels) =>
       labels
-  }.distinct().count()
+  .distinct().count()
 
   /**
     * Returns subset accuracy
@@ -53,146 +53,137 @@ class MultilabelMetrics @Since("1.2.0")(
     */
   @Since("1.2.0")
   lazy val subsetAccuracy: Double =
-    predictionAndLabels.filter {
+    predictionAndLabels.filter
       case (predictions, labels) =>
         predictions.deep == labels.deep
-    }.count().toDouble / numDocs
+    .count().toDouble / numDocs
 
   /**
     * Returns accuracy
     */
   @Since("1.2.0")
   lazy val accuracy: Double =
-    predictionAndLabels.map {
+    predictionAndLabels.map
       case (predictions, labels) =>
         labels.intersect(predictions).length.toDouble /
         (labels.length + predictions.length -
             labels.intersect(predictions).length)
-    }.sum / numDocs
+    .sum / numDocs
 
   /**
     * Returns Hamming-loss
     */
   @Since("1.2.0")
   lazy val hammingLoss: Double =
-    predictionAndLabels.map {
+    predictionAndLabels.map
       case (predictions, labels) =>
         labels.length + predictions.length -
         2 * labels.intersect(predictions).length
-    }.sum / (numDocs * numLabels)
+    .sum / (numDocs * numLabels)
 
   /**
     * Returns document-based precision averaged by the number of documents
     */
   @Since("1.2.0")
   lazy val precision: Double =
-    predictionAndLabels.map {
+    predictionAndLabels.map
       case (predictions, labels) =>
-        if (predictions.length > 0) {
+        if (predictions.length > 0)
           predictions.intersect(labels).length.toDouble / predictions.length
-        } else {
+        else
           0
-        }
-    }.sum / numDocs
+    .sum / numDocs
 
   /**
     * Returns document-based recall averaged by the number of documents
     */
   @Since("1.2.0")
   lazy val recall: Double =
-    predictionAndLabels.map {
+    predictionAndLabels.map
       case (predictions, labels) =>
         labels.intersect(predictions).length.toDouble / labels.length
-    }.sum / numDocs
+    .sum / numDocs
 
   /**
     * Returns document-based f1-measure averaged by the number of documents
     */
   @Since("1.2.0")
   lazy val f1Measure: Double =
-    predictionAndLabels.map {
+    predictionAndLabels.map
       case (predictions, labels) =>
         2.0 * predictions.intersect(labels).length /
         (predictions.length + labels.length)
-    }.sum / numDocs
+    .sum / numDocs
 
-  private lazy val tpPerClass = predictionAndLabels.flatMap {
+  private lazy val tpPerClass = predictionAndLabels.flatMap
     case (predictions, labels) =>
       predictions.intersect(labels)
-  }.countByValue()
+  .countByValue()
 
-  private lazy val fpPerClass = predictionAndLabels.flatMap {
+  private lazy val fpPerClass = predictionAndLabels.flatMap
     case (predictions, labels) =>
       predictions.diff(labels)
-  }.countByValue()
+  .countByValue()
 
-  private lazy val fnPerClass = predictionAndLabels.flatMap {
+  private lazy val fnPerClass = predictionAndLabels.flatMap
     case (predictions, labels) =>
       labels.diff(predictions)
-  }.countByValue()
+  .countByValue()
 
   /**
     * Returns precision for a given label (category)
     * @param label the label.
     */
   @Since("1.2.0")
-  def precision(label: Double): Double = {
+  def precision(label: Double): Double =
     val tp = tpPerClass(label)
     val fp = fpPerClass.getOrElse(label, 0L)
     if (tp + fp == 0) 0.0 else tp.toDouble / (tp + fp)
-  }
 
   /**
     * Returns recall for a given label (category)
     * @param label the label.
     */
   @Since("1.2.0")
-  def recall(label: Double): Double = {
+  def recall(label: Double): Double =
     val tp = tpPerClass(label)
     val fn = fnPerClass.getOrElse(label, 0L)
     if (tp + fn == 0) 0.0 else tp.toDouble / (tp + fn)
-  }
 
   /**
     * Returns f1-measure for a given label (category)
     * @param label the label.
     */
   @Since("1.2.0")
-  def f1Measure(label: Double): Double = {
+  def f1Measure(label: Double): Double =
     val p = precision(label)
     val r = recall(label)
     if ((p + r) == 0) 0.0 else 2 * p * r / (p + r)
-  }
 
-  private lazy val sumTp = tpPerClass.foldLeft(0L) {
+  private lazy val sumTp = tpPerClass.foldLeft(0L)
     case (sum, (_, tp)) => sum + tp
-  }
-  private lazy val sumFpClass = fpPerClass.foldLeft(0L) {
+  private lazy val sumFpClass = fpPerClass.foldLeft(0L)
     case (sum, (_, fp)) => sum + fp
-  }
-  private lazy val sumFnClass = fnPerClass.foldLeft(0L) {
+  private lazy val sumFnClass = fnPerClass.foldLeft(0L)
     case (sum, (_, fn)) => sum + fn
-  }
 
   /**
     * Returns micro-averaged label-based precision
     * (equals to micro-averaged document-based precision)
     */
   @Since("1.2.0")
-  lazy val microPrecision: Double = {
+  lazy val microPrecision: Double =
     val sumFp = fpPerClass.foldLeft(0L) { case (cum, (_, fp)) => cum + fp }
     sumTp.toDouble / (sumTp + sumFp)
-  }
 
   /**
     * Returns micro-averaged label-based recall
     * (equals to micro-averaged document-based recall)
     */
   @Since("1.2.0")
-  lazy val microRecall: Double = {
+  lazy val microRecall: Double =
     val sumFn = fnPerClass.foldLeft(0.0) { case (cum, (_, fn)) => cum + fn }
     sumTp.toDouble / (sumTp + sumFn)
-  }
 
   /**
     * Returns micro-averaged label-based f1-measure
@@ -207,4 +198,3 @@ class MultilabelMetrics @Since("1.2.0")(
     */
   @Since("1.2.0")
   lazy val labels: Array[Double] = tpPerClass.keys.toArray.sorted
-}

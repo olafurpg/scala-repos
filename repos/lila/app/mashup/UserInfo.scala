@@ -29,7 +29,7 @@ case class UserInfo(user: User,
                     donor: Boolean,
                     trophies: Trophies,
                     isStreamer: Boolean,
-                    insightVisible: Boolean) {
+                    insightVisible: Boolean)
 
   def nbRated = user.count.rated
 
@@ -48,9 +48,8 @@ case class UserInfo(user: User,
                                  kind = Trophy.Kind.Streamer,
                                  date = org.joda.time.DateTime.now)
     ).flatten ::: trophies
-}
 
-object UserInfo {
+object UserInfo
 
   def apply(countUsers: () => Fu[Int],
             bookmarkApi: BookmarkApi,
@@ -68,15 +67,15 @@ object UserInfo {
       user: User, ctx: Context): Fu[UserInfo] =
     countUsers() zip getRanks(user.id) zip (gameCached nbPlaying user.id) zip gameCached
       .nbImportedBy(user.id) zip
-    (ctx.me.filter(user !=) ?? { me =>
+    (ctx.me.filter(user !=) ??  me =>
           crosstableApi(me.id, user.id)
-        }) zip getRatingChart(user) zip relationApi.countFollowing(user.id) zip relationApi
+        ) zip getRatingChart(user) zip relationApi.countFollowing(user.id) zip relationApi
       .countFollowers(user.id) zip
-    (ctx.me ?? Granter(_.UserSpy) ?? {
+    (ctx.me ?? Granter(_.UserSpy) ??
           relationApi.countBlockers(user.id) map (_.some)
-        }) zip postApi.nbByUser(user.id) zip isDonor(user.id) zip trophyApi
+        ) zip postApi.nbByUser(user.id) zip isDonor(user.id) zip trophyApi
       .findByUser(user) zip (user.count.rated >= 10)
-      .??(insightShare.grant(user, ctx.me)) zip PlayTime(user) flatMap {
+      .??(insightShare.grant(user, ctx.me)) zip PlayTime(user) flatMap
       case (((((((((((((nbUsers, ranks), nbPlaying), nbImported), crosstable),
                     ratingChart),
                    nbFollowing),
@@ -87,7 +86,7 @@ object UserInfo {
               trophies),
              insightVisible),
             playTime) =>
-        (nbPlaying > 0) ?? isHostingSimul(user.id) map { hasSimul =>
+        (nbPlaying > 0) ?? isHostingSimul(user.id) map  hasSimul =>
           new UserInfo(user = user,
                        ranks = ranks,
                        nbUsers = nbUsers,
@@ -106,6 +105,3 @@ object UserInfo {
                        trophies = trophies,
                        isStreamer = isStreamer(user.id),
                        insightVisible = insightVisible)
-        }
-    }
-}

@@ -47,15 +47,14 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PageLayoutSpec
     extends SimpleSFXDelegateSpec[jfxp.PageLayout, PageLayout](
-        classOf[jfxp.PageLayout], classOf[PageLayout]) {
+        classOf[jfxp.PageLayout], classOf[PageLayout])
 
   val skipingMessage: String =
     if (jfxp.Printer.getDefaultPrinter == null ||
-        jfxp.Printer.getDefaultPrinter.getDefaultPageLayout == null) {
+        jfxp.Printer.getDefaultPrinter.getDefaultPageLayout == null)
       "Neither Default Printer nor Page Layout defined."
-    } else {
+    else
       ""
-    }
 
   override val skipJfxToSfxCause = skipingMessage
 
@@ -66,4 +65,3 @@ class PageLayoutSpec
 
   override protected def getJavaClassInstance =
     jfxp.Printer.getDefaultPrinter.getDefaultPageLayout
-}

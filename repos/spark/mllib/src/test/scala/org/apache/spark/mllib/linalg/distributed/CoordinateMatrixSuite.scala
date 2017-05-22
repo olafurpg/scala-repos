@@ -23,13 +23,13 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
-class CoordinateMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
+class CoordinateMatrixSuite extends SparkFunSuite with MLlibTestSparkContext
 
   val m = 5
   val n = 4
   var mat: CoordinateMatrix = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     val entries = sc
       .parallelize(Seq((0, 0, 1.0),
@@ -42,44 +42,36 @@ class CoordinateMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                        (3, 3, 8.0),
                        (4, 1, 9.0)),
                    3)
-      .map {
+      .map
         case (i, j, value) =>
           MatrixEntry(i, j, value)
-      }
     mat = new CoordinateMatrix(entries)
-  }
 
-  test("size") {
+  test("size")
     assert(mat.numRows() === m)
     assert(mat.numCols() === n)
-  }
 
-  test("empty entries") {
+  test("empty entries")
     val entries = sc.parallelize(Seq[MatrixEntry](), 1)
     val emptyMat = new CoordinateMatrix(entries)
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       emptyMat.numCols()
-    }
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       emptyMat.numRows()
-    }
-  }
 
-  test("toBreeze") {
+  test("toBreeze")
     val expected = BDM((1.0, 2.0, 0.0, 0.0),
                        (0.0, 3.0, 4.0, 0.0),
                        (0.0, 0.0, 5.0, 6.0),
                        (7.0, 0.0, 0.0, 8.0),
                        (0.0, 9.0, 0.0, 0.0))
     assert(mat.toBreeze() === expected)
-  }
 
-  test("transpose") {
+  test("transpose")
     val transposed = mat.transpose()
     assert(mat.toBreeze().t === transposed.toBreeze())
-  }
 
-  test("toIndexedRowMatrix") {
+  test("toIndexedRowMatrix")
     val indexedRowMatrix = mat.toIndexedRowMatrix()
     val expected = BDM((1.0, 2.0, 0.0, 0.0),
                        (0.0, 3.0, 4.0, 0.0),
@@ -87,9 +79,8 @@ class CoordinateMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                        (7.0, 0.0, 0.0, 8.0),
                        (0.0, 9.0, 0.0, 0.0))
     assert(indexedRowMatrix.toBreeze() === expected)
-  }
 
-  test("toRowMatrix") {
+  test("toRowMatrix")
     val rowMatrix = mat.toRowMatrix()
     val rows = rowMatrix.rows.collect().toSet
     val expected = Set(Vectors.dense(1.0, 2.0, 0.0, 0.0),
@@ -98,19 +89,14 @@ class CoordinateMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                        Vectors.dense(7.0, 0.0, 0.0, 8.0),
                        Vectors.dense(0.0, 9.0, 0.0, 0.0))
     assert(rows === expected)
-  }
 
-  test("toBlockMatrix") {
+  test("toBlockMatrix")
     val blockMat = mat.toBlockMatrix(2, 2)
     assert(blockMat.numRows() === m)
     assert(blockMat.numCols() === n)
     assert(blockMat.toBreeze() === mat.toBreeze())
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       mat.toBlockMatrix(-1, 2)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       mat.toBlockMatrix(2, 0)
-    }
-  }
-}

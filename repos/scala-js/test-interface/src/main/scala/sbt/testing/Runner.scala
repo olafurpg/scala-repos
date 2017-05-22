@@ -18,7 +18,7 @@ package sbt.testing
   *  <code>done</code> method is invoked, nothing may be invoked on the slaves
   *  or the master. Slaves can be de-comissioned before the master terminates.
   */
-trait Runner {
+trait Runner
 
   /** Returns an array of tasks that when executed will run tests and suites
     *  determined by the passed <code>TaskDef</code>s.
@@ -142,4 +142,3 @@ trait Runner {
     *  The resulting task must associate with this runner.
     */
   def deserializeTask(task: String, deserializer: String => TaskDef): Task
-}

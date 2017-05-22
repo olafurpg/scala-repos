@@ -13,7 +13,7 @@ import akka.remote.transport.TestTransport.{DisassociateAttempt, WriteAttempt, L
 abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
     extends AkkaSpec(
         """akka.actor.provider = "akka.remote.RemoteActorRefProvider" """)
-    with DefaultTimeout with ImplicitSender {
+    with DefaultTimeout with ImplicitSender
 
   def transportName: String
   def schemeIdentifier: String
@@ -30,7 +30,7 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
 
   def freshTransport(testTransport: TestTransport): Transport
   def wrapTransport(transport: Transport): Transport =
-    if (withAkkaProtocol) {
+    if (withAkkaProtocol)
       val provider = system
         .asInstanceOf[ExtendedActorSystem]
         .provider
@@ -40,16 +40,16 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
           system,
           new AkkaProtocolSettings(provider.remoteSettings.config),
           AkkaPduProtobufCodec)
-    } else transport
+    else transport
 
   def newTransportA(registry: AssociationRegistry): Transport =
     wrapTransport(freshTransport(new TestTransport(addressATest, registry)))
   def newTransportB(registry: AssociationRegistry): Transport =
     wrapTransport(freshTransport(new TestTransport(addressBTest, registry)))
 
-  transportName must {
+  transportName must
 
-    "return an Address and promise when listen is called" in {
+    "return an Address and promise when listen is called" in
       val registry = new AssociationRegistry
       val transportA = newTransportA(registry)
 
@@ -58,13 +58,12 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
       result._1 should ===(addressA)
       result._2 should not be null
 
-      registry.logSnapshot.exists {
+      registry.logSnapshot.exists
         case ListenAttempt(address) ⇒ address == addressATest
         case _ ⇒ false
-      } should ===(true)
-    }
+      should ===(true)
 
-    "associate successfully with another transport of its kind" in {
+    "associate successfully with another transport of its kind" in
       val registry = new AssociationRegistry
       val transportA = newTransportA(registry)
       val transportB = newTransportB(registry)
@@ -82,16 +81,14 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
       awaitCond(registry.transportsReady(addressATest, addressBTest))
 
       transportA.associate(addressB)
-      expectMsgPF(timeout.duration, "Expect InboundAssociation from A") {
+      expectMsgPF(timeout.duration, "Expect InboundAssociation from A")
         case InboundAssociation(handle) if handle.remoteAddress == addressA ⇒
-      }
 
       registry.logSnapshot.contains(
           AssociateAttempt(addressATest, addressBTest)) should ===(true)
       awaitCond(registry.existsAssociation(addressATest, addressBTest))
-    }
 
-    "fail to associate with nonexisting address" in {
+    "fail to associate with nonexisting address" in
       val registry = new AssociationRegistry
       val transportA = newTransportA(registry)
 
@@ -102,13 +99,11 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
       awaitCond(registry.transportsReady(addressATest))
 
       // TestTransport throws InvalidAssociationException when trying to associate with non-existing system
-      intercept[InvalidAssociationException] {
+      intercept[InvalidAssociationException]
         Await.result(transportA.associate(nonExistingAddress),
                      timeout.duration)
-      }
-    }
 
-    "successfully send PDUs" in {
+    "successfully send PDUs" in
       val registry = new AssociationRegistry
       val transportA = newTransportA(registry)
       val transportB = newTransportB(registry)
@@ -126,10 +121,9 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
 
       val associate: Future[AssociationHandle] = transportA.associate(addressB)
       val handleB =
-        expectMsgPF(timeout.duration, "Expect InboundAssociation from A") {
+        expectMsgPF(timeout.duration, "Expect InboundAssociation from A")
           case InboundAssociation(handle) if handle.remoteAddress == addressA ⇒
             handle
-        }
 
       val handleA = Await.result(associate, timeout.duration)
 
@@ -145,18 +139,16 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
       awaitCond(registry.existsAssociation(addressATest, addressBTest))
 
       handleA.write(payload)
-      expectMsgPF(timeout.duration, "Expect InboundPayload from A") {
+      expectMsgPF(timeout.duration, "Expect InboundPayload from A")
         case InboundPayload(p) if payload == p ⇒
-      }
 
-      registry.logSnapshot.exists {
+      registry.logSnapshot.exists
         case WriteAttempt(`addressATest`, `addressBTest`, sentPdu) ⇒
           sentPdu == pdu
         case _ ⇒ false
-      } should ===(true)
-    }
+      should ===(true)
 
-    "successfully disassociate" in {
+    "successfully disassociate" in
       val registry = new AssociationRegistry
       val transportA = newTransportA(registry)
       val transportB = newTransportB(registry)
@@ -174,10 +166,9 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
 
       val associate: Future[AssociationHandle] = transportA.associate(addressB)
       val handleB: AssociationHandle =
-        expectMsgPF(timeout.duration, "Expect InboundAssociation from A") {
+        expectMsgPF(timeout.duration, "Expect InboundAssociation from A")
           case InboundAssociation(handle) if handle.remoteAddress == addressA ⇒
             handle
-        }
 
       val handleA = Await.result(associate, timeout.duration)
 
@@ -189,18 +180,12 @@ abstract class GenericTransportSpec(withAkkaProtocol: Boolean = false)
 
       handleA.disassociate()
 
-      expectMsgPF(timeout.duration) {
+      expectMsgPF(timeout.duration)
         case Disassociated(_) ⇒
-      }
 
       awaitCond(!registry.existsAssociation(addressATest, addressBTest))
 
-      awaitCond {
-        registry.logSnapshot exists {
+      awaitCond
+        registry.logSnapshot exists
           case DisassociateAttempt(`addressATest`, `addressBTest`) ⇒ true
           case _ ⇒ false
-        }
-      }
-    }
-  }
-}

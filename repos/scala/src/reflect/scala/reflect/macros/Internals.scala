@@ -6,13 +6,13 @@ package macros
   *  <span class="badge badge-red" style="float: right;">EXPERIMENTAL</span>
   *  @see [[scala.reflect.api.Internals]]
   */
-trait Internals { self: blackbox.Context =>
+trait Internals  self: blackbox.Context =>
 
   /** @see [[scala.reflect.api.Internals]] */
   val internal: ContextInternalApi
 
   /** @see [[scala.reflect.api.Internals]] */
-  trait ContextInternalApi extends universe.MacroInternalApi {
+  trait ContextInternalApi extends universe.MacroInternalApi
 
     /** Symbol associated with the innermost enclosing lexical context.
       *  Walking the owner chain of this symbol will reveal information about more and more enclosing contexts.
@@ -22,7 +22,7 @@ trait Internals { self: blackbox.Context =>
     /** Functions that are available during [[transform]].
       *  @see [[transform]]
       */
-    trait TransformApi {
+    trait TransformApi
 
       /** Calls the current transformer on the given tree.
         *  Current transformer = argument to the `transform` call.
@@ -33,7 +33,6 @@ trait Internals { self: blackbox.Context =>
         *  Default transformer = recur into tree's children and assemble the results.
         */
       def default(tree: Tree): Tree
-    }
 
     /** Transforms a given tree using the provided function.
       *  @see [[TransformApi]]
@@ -46,7 +45,7 @@ trait Internals { self: blackbox.Context =>
     /** Functions that are available during [[typingTransform]].
       *  @see [[typingTransform]]
       */
-    trait TypingTransformApi extends TransformApi {
+    trait TypingTransformApi extends TransformApi
 
       /** Temporarily pushes the given symbol onto the owner stack, creating a new local typer,
         *  invoke the given operation and then rollback the changes to the owner stack.
@@ -66,7 +65,6 @@ trait Internals { self: blackbox.Context =>
         *  If we're not inside any `atOwner` call, then macro application's callsite typer will be used.
         */
       def typecheck(tree: Tree): Tree
-    }
 
     /** Transforms a given tree using the provided function.
       *  @see [[TypingTransformApi]]
@@ -79,5 +77,3 @@ trait Internals { self: blackbox.Context =>
       */
     def typingTransform(tree: Tree, owner: Symbol)(
         transformer: (Tree, TypingTransformApi) => Tree): Tree
-  }
-}

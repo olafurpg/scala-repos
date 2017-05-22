@@ -38,33 +38,31 @@ import scalafx.scene.layout.{Priority, VBox}
   * @related controls/buttons/GraphicButton
   * @related controls/buttons/HyperlinkSample
   */
-class EnsembleColorButton extends EnsembleExample {
+class EnsembleColorButton extends EnsembleExample
 
-  def getContent = new VBox {
+  def getContent = new VBox
     vgrow = Priority.Always
     hgrow = Priority.Always
     spacing = 10
     padding = Insets(20)
-    children = List(new Button {
+    children = List(new Button
       maxWidth = 200
       maxHeight = 150
       text = "Color Button 1"
       style = "-fx-base: red"
-    }, new Button {
+    , new Button
       maxWidth = 200
       maxHeight = 150
       text = "Color Button 2"
       style = "-fx-base: green "
-    }, new Button {
+    , new Button
       maxWidth = 200
       maxHeight = 150
       text = "Color Button 3"
       style = "-fx-base: Yellow"
-    }, new Button {
+    , new Button
       maxWidth = 200
       maxHeight = 150
       text = "Color Button 4"
       style = "-fx-base: Orange"
-    })
-  }
-}
+    )

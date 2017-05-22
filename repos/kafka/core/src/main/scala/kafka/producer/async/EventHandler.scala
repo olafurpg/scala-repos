@@ -24,7 +24,7 @@ import kafka.producer.KeyedMessage
 @deprecated(
     "This trait has been deprecated and will be removed in a future release.",
     "0.10.0.0")
-trait EventHandler[K, V] {
+trait EventHandler[K, V]
 
   /**
     * Callback to dispatch the batched data and send it to a Kafka server
@@ -36,4 +36,3 @@ trait EventHandler[K, V] {
     * Cleans up and shuts down the event handler
     */
   def close
-}

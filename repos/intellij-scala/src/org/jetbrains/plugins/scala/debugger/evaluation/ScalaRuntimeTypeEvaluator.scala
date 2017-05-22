@@ -35,91 +35,76 @@ abstract class ScalaRuntimeTypeEvaluator(@Nullable editor: Editor,
                                          expression: PsiElement,
                                          context: DebuggerContextImpl,
                                          indicator: ProgressIndicator)
-    extends RuntimeTypeEvaluator(editor, expression, context, indicator) {
+    extends RuntimeTypeEvaluator(editor, expression, context, indicator)
 
-  override def evaluate(evaluationContext: EvaluationContextImpl): PsiType = {
+  override def evaluate(evaluationContext: EvaluationContextImpl): PsiType =
     val project: Project = evaluationContext.getProject
 
     val evaluator: ExpressionEvaluator =
       DebuggerInvocationUtil.commitAndRunReadAction(
-          project, new EvaluatingComputable[ExpressionEvaluator] {
-        def compute: ExpressionEvaluator = {
+          project, new EvaluatingComputable[ExpressionEvaluator]
+        def compute: ExpressionEvaluator =
           val textWithImports = new TextWithImportsImpl(
               CodeFragmentKind.CODE_BLOCK, expression.getText)
           val codeFragment = new ScalaCodeFragmentFactory()
             .createCodeFragment(textWithImports, expression, project)
           ScalaEvaluatorBuilder.build(
               codeFragment, ContextUtil.getSourcePosition(evaluationContext))
-        }
-      })
+      )
     val value: Value = evaluator.evaluate(evaluationContext)
-    if (value != null) {
-      inReadAction {
+    if (value != null)
+      inReadAction
         Option(getCastableRuntimeType(project, value))
           .map(new PsiImmediateClassType(_, PsiSubstitutor.EMPTY))
           .orNull
-      }
-    } else
+    else
       throw EvaluationException(
           DebuggerBundle.message(
               "evaluation.error.surrounded.expression.null"))
-  }
-}
 
-object ScalaRuntimeTypeEvaluator {
+object ScalaRuntimeTypeEvaluator
 
   val KEY: Key[ScExpression => ScType] =
     Key.create("SCALA_RUNTIME_TYPE_EVALUATOR")
 
-  def getCastableRuntimeType(project: Project, value: Value): PsiClass = {
+  def getCastableRuntimeType(project: Project, value: Value): PsiClass =
     val unwrapped = DebuggerUtil.unwrapScalaRuntimeObjectRef(value)
     val jdiType: Type = unwrapped.asInstanceOf[Value].`type`
     var psiClass: PsiClass = findPsiClass(project, jdiType)
-    if (psiClass != null) {
+    if (psiClass != null)
       return psiClass
-    }
-    jdiType match {
+    jdiType match
       case classType: ClassType =>
         val superclass: ClassType = classType.superclass
         val stdTypeNames = Seq(
             "java.lang.Object", "scala.Any", "scala.AnyRef", "scala.AnyVal")
-        if (superclass != null && !stdTypeNames.contains(superclass.name)) {
+        if (superclass != null && !stdTypeNames.contains(superclass.name))
           psiClass = findPsiClass(project, superclass)
-          if (psiClass != null) {
+          if (psiClass != null)
             return psiClass
-          }
-        }
         import scala.collection.JavaConversions._
         classType.interfaces
           .map(findPsiClass(project, _))
           .find(_ != null)
           .orNull
       case _ => null
-    }
-  }
 
-  private def findPsiClass(project: Project, jdiType: Type): PsiClass = {
+  private def findPsiClass(project: Project, jdiType: Type): PsiClass =
     val token: AccessToken = ReadAction.start
-    try {
+    try
       ScalaPsiManager
         .instance(project)
         .getCachedClass(GlobalSearchScope.allScope(project), jdiType.name())
         .orNull
-    } finally {
+    finally
       token.finish()
-    }
-  }
 
-  def isSubtypeable(scType: ScType): Boolean = {
-    scType match {
+  def isSubtypeable(scType: ScType): Boolean =
+    scType match
       case ExtractClass(psiClass) =>
-        psiClass match {
+        psiClass match
           case _: ScObject => false
           case owner: ScModifierListOwner => !owner.hasFinalModifier
           case _ if scType.isInstanceOf[PsiPrimitiveType] => false
           case _ => !psiClass.hasModifierProperty(PsiModifier.FINAL)
-        }
       case _ => false
-    }
-  }
-}

@@ -35,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger
   * they are working on and return if this index is smaller than their index. Examples
   * of operations using this are `takeWhile`, `dropWhile`, `span` and `indexOf`.
   */
-trait Signalling {
+trait Signalling
 
   /**
     * Checks whether an abort signal has been issued.
@@ -91,19 +91,17 @@ trait Signalling {
     * specific workers information on the part of the collection being operated on.
     */
   def tag: Int
-}
 
 /**
   * This signalling implementation returns default values and ignores received signals.
   */
-class DefaultSignalling extends Signalling with VolatileAbort {
+class DefaultSignalling extends Signalling with VolatileAbort
   def indexFlag = -1
   def setIndexFlag(f: Int) {}
   def setIndexFlagIfGreater(f: Int) {}
   def setIndexFlagIfLesser(f: Int) {}
 
   def tag = -1
-}
 
 /**
   * An object that returns default values and ignores received signals.
@@ -113,43 +111,39 @@ object IdleSignalling extends DefaultSignalling
 /**
   * A mixin trait that implements abort flag behaviour using volatile variables.
   */
-trait VolatileAbort extends Signalling {
+trait VolatileAbort extends Signalling
   @volatile private var abortflag = false
   override def isAborted = abortflag
   override def abort() = abortflag = true
-}
 
 /**
   * A mixin trait that implements index flag behaviour using atomic integers.
   * The `setIndex` operation is wait-free, while conditional set operations `setIndexIfGreater`
   * and `setIndexIfLesser` are lock-free and support only monotonic changes.
   */
-trait AtomicIndexFlag extends Signalling {
+trait AtomicIndexFlag extends Signalling
   private val intflag: AtomicInteger = new AtomicInteger(-1)
   abstract override def indexFlag = intflag.get
   abstract override def setIndexFlag(f: Int) = intflag.set(f)
-  abstract override def setIndexFlagIfGreater(f: Int) = {
+  abstract override def setIndexFlagIfGreater(f: Int) =
     var loop = true
-    do {
+    do
       val old = intflag.get
       if (f <= old) loop = false
       else if (intflag.compareAndSet(old, f)) loop = false
-    } while (loop)
-  }
-  abstract override def setIndexFlagIfLesser(f: Int) = {
+    while (loop)
+  abstract override def setIndexFlagIfLesser(f: Int) =
     var loop = true
-    do {
+    do
       val old = intflag.get
       if (f >= old) loop = false
       else if (intflag.compareAndSet(old, f)) loop = false
-    } while (loop)
-  }
-}
+    while (loop)
 
 /**
   * An implementation of the signalling interface using delegates.
   */
-trait DelegatedSignalling extends Signalling {
+trait DelegatedSignalling extends Signalling
 
   /**
     * A delegate that method calls are redirected to.
@@ -165,7 +159,6 @@ trait DelegatedSignalling extends Signalling {
   def setIndexFlagIfLesser(f: Int) = signalDelegate.setIndexFlagIfLesser(f)
 
   def tag = signalDelegate.tag
-}
 
 /**
   * Class implementing delegated signalling.

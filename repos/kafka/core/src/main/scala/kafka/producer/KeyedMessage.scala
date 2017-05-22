@@ -25,7 +25,7 @@ package kafka.producer
     "Please use org.apache.kafka.clients.producer.ProducerRecord instead.",
     "0.10.0.0")
 case class KeyedMessage[
-    K, V](topic: String, key: K, partKey: Any, message: V) {
+    K, V](topic: String, key: K, partKey: Any, message: V)
   if (topic == null)
     throw new IllegalArgumentException("Topic cannot be null.")
 
@@ -34,11 +34,9 @@ case class KeyedMessage[
 
   def this(topic: String, key: K, message: V) = this(topic, key, key, message)
 
-  def partitionKey = {
+  def partitionKey =
     if (partKey != null) partKey
     else if (hasKey) key
     else null
-  }
 
   def hasKey = key != null
-}

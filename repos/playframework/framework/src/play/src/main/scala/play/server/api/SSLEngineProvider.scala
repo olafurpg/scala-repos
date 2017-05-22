@@ -14,10 +14,9 @@ import javax.net.ssl.SSLEngine
   *
   * The path to this class should be configured with the system property <pre>play.http.sslengineprovider</pre>
   */
-trait SSLEngineProvider extends play.server.SSLEngineProvider {
+trait SSLEngineProvider extends play.server.SSLEngineProvider
 
   /**
     * @return the SSL engine to be used for HTTPS connection.
     */
   def createSSLEngine: SSLEngine
-}

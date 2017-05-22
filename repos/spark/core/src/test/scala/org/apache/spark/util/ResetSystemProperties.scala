@@ -39,25 +39,21 @@ import org.scalatest.{BeforeAndAfterEach, Suite}
   * See the "Composing fixtures by stacking traits" section at
   * http://www.scalatest.org/user_guide/sharing_fixtures for more details about this pattern.
   */
-private[spark] trait ResetSystemProperties extends BeforeAndAfterEach {
+private[spark] trait ResetSystemProperties extends BeforeAndAfterEach
   this: Suite =>
   var oldProperties: Properties = null
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     // we need SerializationUtils.clone instead of `new Properties(System.getProperties())` because
     // the later way of creating a copy does not copy the properties but it initializes a new
     // Properties object with the given properties as defaults. They are not recognized at all
     // by standard Scala wrapper over Java Properties then.
     oldProperties = SerializationUtils.clone(System.getProperties)
     super.beforeEach()
-  }
 
-  override def afterEach(): Unit = {
-    try {
+  override def afterEach(): Unit =
+    try
       super.afterEach()
-    } finally {
+    finally
       System.setProperties(oldProperties)
       oldProperties = null
-    }
-  }
-}

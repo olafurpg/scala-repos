@@ -37,7 +37,7 @@ case class HadoopPlatformJobTest(
     dataToCreate: Seq[(String, Seq[String])] = Vector(),
     sourceWriters: Seq[Args => Job] = Vector.empty,
     sourceReaders: Seq[Mode => Unit] = Vector.empty,
-    flowCheckers: Seq[Flow[JobConf] => Unit] = Vector.empty) {
+    flowCheckers: Seq[Flow[JobConf] => Unit] = Vector.empty)
   private val LOG = LoggerFactory.getLogger(getClass)
 
   def arg(inArg: String, value: List[String]): HadoopPlatformJobTest =
@@ -52,16 +52,14 @@ case class HadoopPlatformJobTest(
 
   def source[T](out: TypedSink[T], data: Seq[T]): HadoopPlatformJobTest =
     copy(
-        sourceWriters = sourceWriters :+ { args: Args =>
-      new Job(args) {
+        sourceWriters = sourceWriters :+  args: Args =>
+      new Job(args)
         TypedPipe
           .from(List(""))
-          .flatMap { _ =>
+          .flatMap  _ =>
             data
-          }
           .write(out)
-      }
-    })
+    )
 
   def sink[T : TypeDescriptor](location: String)(
       toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
@@ -70,43 +68,37 @@ case class HadoopPlatformJobTest(
   def sink[T](in: Mappable[T])(
       toExpect: Seq[T] => Unit): HadoopPlatformJobTest =
     copy(
-        sourceReaders = sourceReaders :+ { m: Mode =>
+        sourceReaders = sourceReaders :+  m: Mode =>
       toExpect(in.toIterator(Config.defaultFrom(m), m).toSeq)
-    })
+    )
 
   def inspectCompletedFlow(
       checker: Flow[JobConf] => Unit): HadoopPlatformJobTest =
     copy(flowCheckers = flowCheckers :+ checker)
 
-  private def createSources() {
-    dataToCreate foreach {
+  private def createSources()
+    dataToCreate foreach
       case (location, lines) =>
         val tmpFile = File.createTempFile("hadoop_platform", "job_test")
         tmpFile.deleteOnExit()
-        if (!lines.isEmpty) {
+        if (!lines.isEmpty)
           val os = new BufferedWriter(new FileWriter(tmpFile))
           os.write(lines.head)
-          lines.tail.foreach { str =>
+          lines.tail.foreach  str =>
             os.newLine()
             os.write(str)
-          }
           os.close()
-        }
         cluster.putFile(tmpFile, location)
         tmpFile.delete()
-    }
 
-    sourceWriters.foreach { cons =>
+    sourceWriters.foreach  cons =>
       runJob(initJob(cons))
-    }
-  }
 
-  private def checkSinks() {
+  private def checkSinks()
     LOG.debug("Executing sinks")
     sourceReaders.foreach { _ (cluster.mode) }
-  }
 
-  def run {
+  def run
     System.setProperty("cascading.update.skip", "true")
     val job = initJob(cons)
     cluster.addClassSourceToClassPath(cons.getClass)
@@ -114,23 +106,17 @@ case class HadoopPlatformJobTest(
     createSources()
     runJob(job)
     checkSinks()
-    flowCheckers.foreach { checker =>
-      job.completedFlow.collect {
+    flowCheckers.foreach  checker =>
+      job.completedFlow.collect
         case f: Flow[JobConf] => checker(f)
-      }
-    }
-  }
 
   private def initJob(cons: Args => Job): Job =
     cons(Mode.putMode(cluster.mode, new Args(argsMap)))
 
   @annotation.tailrec
-  private final def runJob(job: Job) {
+  private final def runJob(job: Job)
     job.run
     job.clear
-    job.next match {
+    job.next match
       case Some(nextJob) => runJob(nextJob)
       case None => ()
-    }
-  }
-}

@@ -1,11 +1,10 @@
 import scala.tools.partest.SessionTest
 import scala.PartialFunction.{cond => when}
 
-object Elision {
+object Elision
   val elideMsg = """  ... \d+ elided""".r
-}
 
-object Test extends SessionTest {
+object Test extends SessionTest
   import Elision._
 
   // Filter out the abbreviated stacktrace "... X elided" 
@@ -21,4 +20,3 @@ scala> val List(1) = List(1)
 
 scala> :quit
 """
-}

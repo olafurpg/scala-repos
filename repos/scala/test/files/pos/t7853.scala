@@ -1,11 +1,7 @@
-trait S {
-  trait T {
+trait S
+  trait T
     this: Any =>
 
-    trait U {
-      trait V {
+    trait U
+      trait V
         S.this
-      }
-    }
-  }
-}

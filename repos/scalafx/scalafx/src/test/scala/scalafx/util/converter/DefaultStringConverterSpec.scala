@@ -46,7 +46,6 @@ class DefaultStringConverterSpec
                                                 DefaultStringConverter](
         classOf[jfxuc.DefaultStringConverter],
         classOf[DefaultStringConverter],
-        classOf[String]) {
+        classOf[String])
 
   val examples = List(("alpha", "alpha"), ("ação", "ação"), ("", ""))
-}

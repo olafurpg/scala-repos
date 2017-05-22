@@ -41,14 +41,14 @@ import org.apache.spark.mllib.linalg.distributed.{MatrixEntry, RowMatrix}
   * bin/run-example mllib.CosineSimilarity \
   * --threshold 0.1 data/mllib/sample_svm_data.txt
   */
-object CosineSimilarity {
+object CosineSimilarity
   case class Params(inputFile: String = null, threshold: Double = 0.1)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("CosineSimilarity") {
+    val parser = new OptionParser[Params]("CosineSimilarity")
       head("CosineSimilarity: an example app.")
       opt[Double]("threshold")
         .required()
@@ -66,26 +66,22 @@ object CosineSimilarity {
           | examplesjar.jar \
           | --threshold 0.1 data/mllib/sample_svm_data.txt
         """.stripMargin)
-    }
 
-    parser.parse(args, defaultParams).map { params =>
+    parser.parse(args, defaultParams).map  params =>
       run(params)
-    } getOrElse {
+    getOrElse
       System.exit(1)
-    }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName("CosineSimilarity")
     val sc = new SparkContext(conf)
 
     // Load and parse the data file.
     val rows = sc
       .textFile(params.inputFile)
-      .map { line =>
+      .map  line =>
         val values = line.split(' ').map(_.toDouble)
         Vectors.dense(values)
-      }
       .cache()
     val mat = new RowMatrix(rows)
 
@@ -95,26 +91,21 @@ object CosineSimilarity {
     // Compute similar columns with estimation using DIMSUM
     val approx = mat.columnSimilarities(params.threshold)
 
-    val exactEntries = exact.entries.map {
+    val exactEntries = exact.entries.map
       case MatrixEntry(i, j, u) => ((i, j), u)
-    }
-    val approxEntries = approx.entries.map {
+    val approxEntries = approx.entries.map
       case MatrixEntry(i, j, v) => ((i, j), v)
-    }
     val MAE = exactEntries
       .leftOuterJoin(approxEntries)
       .values
-      .map {
+      .map
         case (u, Some(v)) =>
           math.abs(u - v)
         case (u, None) =>
           math.abs(u)
-      }
       .mean()
 
     println(s"Average absolute error in estimate is: $MAE")
 
     sc.stop()
-  }
-}
 // scalastyle:on println

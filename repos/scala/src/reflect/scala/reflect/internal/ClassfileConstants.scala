@@ -9,7 +9,7 @@ package internal
 
 import scala.annotation.switch
 
-object ClassfileConstants {
+object ClassfileConstants
   final val JAVA_MAGIC = 0xCAFEBABE
   final val JAVA_MAJOR_VERSION = 45
   final val JAVA_MINOR_VERSION = 3
@@ -331,14 +331,14 @@ object ClassfileConstants {
   final val impdep1 = 0xfe
   final val impdep2 = 0xff
 
-  abstract class FlagTranslation {
+  abstract class FlagTranslation
     import Flags._
 
     private def isAnnotation(flags: Int): Boolean =
       (flags & JAVA_ACC_ANNOTATION) != 0
     private def translateFlag(
         jflag: Int, isAnnotation: Boolean, isClass: Boolean): Long =
-      (jflag: @switch) match {
+      (jflag: @switch) match
         case JAVA_ACC_PRIVATE => PRIVATE
         case JAVA_ACC_PROTECTED => PROTECTED
         case JAVA_ACC_FINAL => FINAL
@@ -352,9 +352,8 @@ object ClassfileConstants {
         case JAVA_ACC_ENUM => JAVA_ENUM
         case JAVA_ACC_ANNOTATION => JAVA_ANNOTATION
         case _ => 0L
-      }
     private def translateFlags(
-        jflags: Int, baseFlags: Long, isClass: Boolean): Long = {
+        jflags: Int, baseFlags: Long, isClass: Boolean): Long =
       val isAnnot = isAnnotation(jflags)
       def translateFlag0(jflags: Int): Long =
         translateFlag(jflags, isAnnot, isClass)
@@ -370,26 +369,20 @@ object ClassfileConstants {
       res |= translateFlag0(jflags & JAVA_ACC_ENUM)
       res |= translateFlag0(jflags & JAVA_ACC_ANNOTATION)
       res
-    }
 
-    def classFlags(jflags: Int): Long = {
+    def classFlags(jflags: Int): Long =
       translateFlags(jflags, 0, isClass = true)
-    }
-    def fieldFlags(jflags: Int): Long = {
+    def fieldFlags(jflags: Int): Long =
       translateFlags(jflags,
                      if ((jflags & JAVA_ACC_FINAL) == 0) MUTABLE else 0,
                      isClass = false)
-    }
-    def methodFlags(jflags: Int): Long = {
+    def methodFlags(jflags: Int): Long =
       translateFlags(
           jflags,
           if ((jflags & JAVA_ACC_BRIDGE) != 0) BRIDGE | ARTIFACT else 0,
           isClass = false)
-    }
-  }
   object FlagTranslation extends FlagTranslation {}
 
   def toScalaMethodFlags(flags: Int): Long = FlagTranslation methodFlags flags
   def toScalaClassFlags(flags: Int): Long = FlagTranslation classFlags flags
   def toScalaFieldFlags(flags: Int): Long = FlagTranslation fieldFlags flags
-}

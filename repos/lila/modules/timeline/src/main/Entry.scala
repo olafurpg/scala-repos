@@ -12,13 +12,13 @@ case class Entry(_id: BSONObjectID,
                  typ: String,
                  chan: Option[String],
                  data: JsObject,
-                 date: DateTime) {
+                 date: DateTime)
 
   import Entry._
 
   def similarTo(other: Entry) = typ == other.typ && data == other.data
 
-  lazy val decode: Option[Atom] = (typ match {
+  lazy val decode: Option[Atom] = (typ match
     case "follow" => Json.fromJson[Follow](data)
     case "team-join" => Json.fromJson[TeamJoin](data)
     case "team-create" => Json.fromJson[TeamCreate](data)
@@ -31,15 +31,14 @@ case class Entry(_id: BSONObjectID,
     case "game-end" => Json.fromJson[GameEnd](data)
     case "simul-create" => Json.fromJson[SimulCreate](data)
     case "simul-join" => Json.fromJson[SimulJoin](data)
-  }).asOpt
+  ).asOpt
 
   def okForKid = decode ?? (_.okForKid)
-}
 
-object Entry {
+object Entry
 
   private[timeline] def make(users: List[String], data: Atom): Option[Entry] =
-    (data match {
+    (data match
       case d: Follow => "follow" -> Json.toJson(d)
       case d: TeamJoin => "team-join" -> Json.toJson(d)
       case d: TeamCreate => "team-create" -> Json.toJson(d)
@@ -52,24 +51,20 @@ object Entry {
       case d: GameEnd => "game-end" -> Json.toJson(d)
       case d: SimulCreate => "simul-create" -> Json.toJson(d)
       case d: SimulJoin => "simul-join" -> Json.toJson(d)
-    }) match {
+    ) match
       case (typ, json) =>
-        json.asOpt[JsObject] map {
+        json.asOpt[JsObject] map
           new Entry(BSONObjectID.generate,
                     users,
                     typ,
                     data.channel.some,
                     _,
                     DateTime.now)
-        }
-    }
 
   import play.modules.reactivemongo.json.ImplicitBSONHandlers._
   import lila.db.BSON.BSONJodaDateTimeHandler
   import reactivemongo.bson.Macros
   implicit val EntryBSONHandler = Macros.handler[Entry]
 
-  implicit val entryWrites = OWrites[Entry] { e =>
+  implicit val entryWrites = OWrites[Entry]  e =>
     Json.obj("type" -> e.typ, "data" -> e.data, "date" -> e.date)
-  }
-}

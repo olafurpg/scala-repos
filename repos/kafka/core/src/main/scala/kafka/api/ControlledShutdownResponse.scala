@@ -22,46 +22,38 @@ import kafka.api.ApiUtils._
 import org.apache.kafka.common.protocol.Errors
 import collection.Set
 
-object ControlledShutdownResponse {
-  def readFrom(buffer: ByteBuffer): ControlledShutdownResponse = {
+object ControlledShutdownResponse
+  def readFrom(buffer: ByteBuffer): ControlledShutdownResponse =
     val correlationId = buffer.getInt
     val errorCode = buffer.getShort
     val numEntries = buffer.getInt
 
     var partitionsRemaining = Set[TopicAndPartition]()
-    for (i <- 0 until numEntries) {
+    for (i <- 0 until numEntries)
       val topic = readShortString(buffer)
       val partition = buffer.getInt
       partitionsRemaining += new TopicAndPartition(topic, partition)
-    }
     new ControlledShutdownResponse(
         correlationId, errorCode, partitionsRemaining)
-  }
-}
 
 case class ControlledShutdownResponse(
     correlationId: Int,
     errorCode: Short = Errors.NONE.code,
     partitionsRemaining: Set[TopicAndPartition])
-    extends RequestOrResponse() {
-  def sizeInBytes(): Int = {
+    extends RequestOrResponse()
+  def sizeInBytes(): Int =
     var size =
       4 /* correlation id */ + 2 /* error code */ + 4 /* number of responses */
-    for (topicAndPartition <- partitionsRemaining) {
+    for (topicAndPartition <- partitionsRemaining)
       size += 2 + topicAndPartition.topic.length /* topic */ + 4 /* partition */
-    }
     size
-  }
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     buffer.putInt(correlationId)
     buffer.putShort(errorCode)
     buffer.putInt(partitionsRemaining.size)
-    for (topicAndPartition: TopicAndPartition <- partitionsRemaining) {
+    for (topicAndPartition: TopicAndPartition <- partitionsRemaining)
       writeShortString(buffer, topicAndPartition.topic)
       buffer.putInt(topicAndPartition.partition)
-    }
-  }
 
   override def describe(details: Boolean): String = { toString }
-}

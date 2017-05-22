@@ -8,7 +8,7 @@ import scala.collection.immutable.HashMap
 /**
   * @author Alexander Podkhalyuzin
   */
-object ScalaRecursionManager {
+object ScalaRecursionManager
   val functionRecursionGuard =
     RecursionManager.createGuard("function.inference.recursion")
   val resolveReferenceRecursionGuard =
@@ -18,51 +18,41 @@ object ScalaRecursionManager {
   val CYCLIC_HELPER_KEY = "cyclic.helper.key"
 
   type RecursionMap = Map[(PsiElement, String), List[Object]]
-  val recursionMap: ThreadLocal[RecursionMap] = new ThreadLocal[RecursionMap] {
+  val recursionMap: ThreadLocal[RecursionMap] = new ThreadLocal[RecursionMap]
     override def initialValue(): RecursionMap =
       new HashMap[(PsiElement, String), List[Object]]
-  }
 
-  def usingPreviousRecursionMap[T](m: RecursionMap)(body: => T): T = {
+  def usingPreviousRecursionMap[T](m: RecursionMap)(body: => T): T =
     val currentMap = recursionMap.get()
-    try {
+    try
       recursionMap.set(m)
       body
-    } finally {
+    finally
       recursionMap.set(currentMap)
-    }
-  }
 
   private def getSearches[Dom <: PsiElement](
-      element: Dom, key: String): List[Object] = {
-    recursionMap.get().get((element, key)) match {
+      element: Dom, key: String): List[Object] =
+    recursionMap.get().get((element, key)) match
       case Some(buffer: List[Object]) => buffer
       case _ => List.empty
-    }
-  }
 
   private def addLast[Dom <: PsiElement](
-      element: Dom, key: String, obj: Object) {
-    recursionMap.get().get((element, key)) match {
+      element: Dom, key: String, obj: Object)
+    recursionMap.get().get((element, key)) match
       case Some(list) =>
         recursionMap.set(
             recursionMap.get().updated((element, key), obj :: list))
       case _ =>
         recursionMap.set(recursionMap.get() + ((element, key) -> List(obj)))
-    }
-  }
 
-  private def removeLast[Dom <: PsiElement](element: Dom, key: String) {
-    recursionMap.get().get((element, key)) match {
+  private def removeLast[Dom <: PsiElement](element: Dom, key: String)
+    recursionMap.get().get((element, key)) match
       case Some(list) =>
-        list match {
+        list match
           case hd :: tl =>
             recursionMap.set(recursionMap.get().updated((element, key), tl))
           case _ => recursionMap.set(recursionMap.get() - ((element, key)))
-        }
       case _ => throw new RuntimeException("Match is not exhaustive")
-    }
-  }
 
   /**
     * Do computations stopping infinite recursion.
@@ -77,19 +67,17 @@ object ScalaRecursionManager {
       checkAdd: (Object, Seq[Object]) => Boolean,
       addElement: Object,
       compute: => Result,
-      key: String): Option[Result] = {
+      key: String): Option[Result] =
     val searches: List[Object] = getSearches(element, key)
-    if (checkAdd(addElement, searches)) {
-      try {
+    if (checkAdd(addElement, searches))
+      try
         addLast(element, key, addElement)
 
         //computations
         Some(compute)
-      } finally {
+      finally
         removeLast(element, key)
-      }
-    } else None
-  }
+    else None
 
   def doComputationsForTwoElements[Dom <: PsiElement, Result](
       element1: Dom,
@@ -98,20 +86,17 @@ object ScalaRecursionManager {
       addElement1: Object,
       addElement2: Object,
       compute: => Result,
-      key: String): Option[Result] = {
+      key: String): Option[Result] =
     val searches1: List[Object] = getSearches(element1, key)
     val searches2: List[Object] = getSearches(element2, key)
-    if (checkAdd(addElement1, searches1) && checkAdd(addElement2, searches2)) {
-      try {
+    if (checkAdd(addElement1, searches1) && checkAdd(addElement2, searches2))
+      try
         addLast(element1, key, addElement1)
         addLast(element2, key, addElement2)
 
         //computations
         Some(compute)
-      } finally {
+      finally
         removeLast(element2, key)
         removeLast(element1, key)
-      }
-    } else None
-  }
-}
+    else None

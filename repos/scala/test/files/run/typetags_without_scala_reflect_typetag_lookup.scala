@@ -1,6 +1,6 @@
 import scala.tools.partest._
 
-object Test extends StoreReporterDirectTest {
+object Test extends StoreReporterDirectTest
   def code = ???
 
   def library = """
@@ -10,13 +10,12 @@ object Test extends StoreReporterDirectTest {
       def foo[T: TypeTag] = ()
     }
   """
-  def compileLibrary() = {
+  def compileLibrary() =
     val classpath =
       List(sys.props("partest.lib"), sys.props("partest.reflect")) mkString sys
         .props("path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(
         library)
-  }
 
   def app =
     """
@@ -30,14 +29,13 @@ object Test extends StoreReporterDirectTest {
       Library.foo[Int]
     }
   """
-  def compileApp() = {
+  def compileApp() =
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(app)
-  }
 
-  def show(): Unit = {
+  def show(): Unit =
     compileLibrary();
     println(filteredInfos.mkString("\n"))
     storeReporter.infos.clear()
@@ -48,5 +46,3 @@ object Test extends StoreReporterDirectTest {
         filteredInfos
           .filterNot(_.msg.contains("missing or invalid dependency detected"))
           .mkString("\n"))
-  }
-}

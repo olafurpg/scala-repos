@@ -4,11 +4,11 @@ package org.jetbrains.plugins.scala.testingSupport.utest
   * @author Roman.Shein
   * @since 05.09.2015.
   */
-trait UTestPackageTest extends UTestTestCase {
+trait UTestPackageTest extends UTestTestCase
   val packageName = "myPackage"
   val secondPackageName = "otherPackage"
 
-  protected def addPackageTest(): Unit = {
+  protected def addPackageTest(): Unit =
     addFileToProject(packageName + "/Test1.scala",
                      """
         |package myPackage
@@ -54,9 +54,8 @@ trait UTestPackageTest extends UTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
 
-  def testPackageTestRun(): Unit = {
+  def testPackageTestRun(): Unit =
     addPackageTest()
     runTestByConfig(createTestFromPackage(packageName),
                     checkPackageConfigAndSettings(_, packageName),
@@ -76,9 +75,8 @@ trait UTestPackageTest extends UTestTestCase {
                       checkResultTreeHasExactNamedPath(
                           root, "[root]", "Test2", "tests", "test2") &&
                       checkResultTreeDoesNotHaveNodes(root, "[root]", "test"))
-  }
 
-  def testModuleTestRun(): Unit = {
+  def testModuleTestRun(): Unit =
     addPackageTest()
     runTestByConfig(createTestFromModule(testClassName),
                     checkPackageConfigAndSettings(
@@ -97,5 +95,3 @@ trait UTestPackageTest extends UTestTestCase {
                           root, "[root]", "Test2", "tests", "test2") &&
                       checkResultTreeHasExactNamedPath(
                           root, "[root]", "Test2", "tests", "test"))
-  }
-}

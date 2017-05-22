@@ -7,14 +7,12 @@ import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.Flow
 import org.reactivestreams.Processor
 
-class MapTest extends AkkaIdentityProcessorVerification[Int] {
+class MapTest extends AkkaIdentityProcessorVerification[Int]
 
   override def createIdentityProcessor(
-      maxBufferSize: Int): Processor[Int, Int] = {
+      maxBufferSize: Int): Processor[Int, Int] =
     implicit val materializer = ActorMaterializer()(system)
 
     Flow[Int].map(elem ⇒ elem).named("identity").toProcessor.run()
-  }
 
   override def createElement(element: Int): Int = element
-}

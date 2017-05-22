@@ -12,7 +12,7 @@ import com.twitter.scalding.{Job, Args, JsonLine}
 import com.twitter.scalding.avro.UnpackedAvroSource
 import org.apache.avro.Schema
 
-class AvroTutorial0(args: Args) extends Job(args) {
+class AvroTutorial0(args: Args) extends Job(args)
   val schema = """{
 "type": "record", "name": "parseJson", "fields": [
 { "name": "sessionId", "type": "string" },
@@ -22,4 +22,3 @@ class AvroTutorial0(args: Args) extends Job(args) {
   JsonLine("tutorial/data/session.json", ('sessionId, 'optionalField)).read
     .write(UnpackedAvroSource(
           "tutorial/data/avrooutput0.avro", new Schema.Parser().parse(schema)))
-}

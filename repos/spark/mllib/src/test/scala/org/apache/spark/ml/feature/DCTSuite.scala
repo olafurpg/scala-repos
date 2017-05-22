@@ -32,39 +32,35 @@ case class DCTTestData(vec: Vector, wantedVec: Vector)
 
 class DCTSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("forward transform of discrete cosine matches jTransforms result") {
+  test("forward transform of discrete cosine matches jTransforms result")
     val data =
       Vectors.dense((0 until 128).map(_ => 2D * math.random - 1D).toArray)
     val inverse = false
 
     testDCT(data, inverse)
-  }
 
-  test("inverse transform of discrete cosine matches jTransforms result") {
+  test("inverse transform of discrete cosine matches jTransforms result")
     val data =
       Vectors.dense((0 until 128).map(_ => 2D * math.random - 1D).toArray)
     val inverse = true
 
     testDCT(data, inverse)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new DCT()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setInverse(true)
     testDefaultReadWrite(t)
-  }
 
-  private def testDCT(data: Vector, inverse: Boolean): Unit = {
+  private def testDCT(data: Vector, inverse: Boolean): Unit =
     val expectedResultBuffer = data.toArray.clone()
-    if (inverse) {
+    if (inverse)
       (new DoubleDCT_1D(data.size)).inverse(expectedResultBuffer, true)
-    } else {
+    else
       (new DoubleDCT_1D(data.size)).forward(expectedResultBuffer, true)
-    }
     val expectedResult = Vectors.dense(expectedResultBuffer)
 
     val dataset = sqlContext.createDataFrame(
@@ -81,9 +77,6 @@ class DCTSuite
       .transform(dataset)
       .select("resultVec", "wantedVec")
       .collect()
-      .foreach {
+      .foreach
         case Row(resultVec: Vector, wantedVec: Vector) =>
           assert(Vectors.sqdist(resultVec, wantedVec) < 1e-6)
-      }
-  }
-}

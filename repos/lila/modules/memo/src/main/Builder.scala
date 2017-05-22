@@ -6,7 +6,7 @@ import scala.concurrent.duration.Duration
 import com.google.common.base.Function
 import com.google.common.cache._
 
-object Builder {
+object Builder
 
   private implicit def durationToMillis(d: Duration): Long = d.toMillis
 
@@ -35,19 +35,15 @@ object Builder {
 
   implicit def functionToRemovalListener[K, V](
       f: (K, V) => Unit): RemovalListener[K, V] =
-    new RemovalListener[K, V] {
+    new RemovalListener[K, V]
       def onRemoval(notification: RemovalNotification[K, V]) =
         f(notification.getKey, notification.getValue)
-    }
 
   implicit def functionToGoogleFunction[T, R](f: T => R): Function[T, R] =
-    new Function[T, R] {
+    new Function[T, R]
       def apply(p1: T) = f(p1)
-    }
 
   implicit def functionToGoogleCacheLoader[T, R](
       f: T => R): CacheLoader[T, R] =
-    new CacheLoader[T, R] {
+    new CacheLoader[T, R]
       def load(p1: T) = f(p1)
-    }
-}

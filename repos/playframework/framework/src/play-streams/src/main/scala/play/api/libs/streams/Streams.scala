@@ -14,7 +14,7 @@ import scala.concurrent.{ExecutionContext, Future, Promise}
   * Methods to adapt Futures, Promises, Iteratees and Enumerators to
   * and from Reactive Streams' Publishers and Subscribers.
   */
-object Streams {
+object Streams
 
   /**
     * Adapt a Future into a Publisher. For a successful Future the
@@ -41,12 +41,11 @@ object Streams {
     * of the the Processor is created with `promiseToSubscriber`. The
     * Publisher end of the Processor is created with `futureToPublisher`.
     */
-  def promiseToProcessor[T](prom: Promise[T]): Processor[T, T] = {
+  def promiseToProcessor[T](prom: Promise[T]): Processor[T, T] =
     val subr = promiseToSubscriber(prom)
     val pubr = futureToPublisher(prom.future)
     val proc = join(subr, pubr)
     proc
-  }
 
   /**
     * Adapt an Iteratee to a Subscriber and a result Iteratee.
@@ -71,11 +70,10 @@ object Streams {
     * to "consume" events, even if the Iteratee doesn't.
     */
   def iterateeToSubscriber[T, U](
-      iter: Iteratee[T, U]): (Subscriber[T], Iteratee[T, U]) = {
+      iter: Iteratee[T, U]): (Subscriber[T], Iteratee[T, U]) =
     val subr = new impl.IterateeSubscriber(iter)
     val resultIter = subr.result
     (subr, resultIter)
-  }
 
   /**
     * Adapt a Subscriber to an Iteratee.
@@ -93,9 +91,8 @@ object Streams {
     * This Iteratee will never enter the error state, unless the subscriber
     * deviates from the reactive streams spec.
     */
-  def subscriberToIteratee[T](subscriber: Subscriber[T]): Iteratee[T, Unit] = {
+  def subscriberToIteratee[T](subscriber: Subscriber[T]): Iteratee[T, Unit] =
     new SubscriberIteratee[T](subscriber)
-  }
 
   /**
     * Adapt an Iteratee to a Publisher, publishing its Done value. If
@@ -106,14 +103,13 @@ object Streams {
     * Iteratee.run, this method will not feed an EOF input to the
     * Iteratee.
     */
-  def iterateeDoneToPublisher[T, U](iter: Iteratee[T, U]): Publisher[U] = {
-    iterateeFoldToPublisher[T, U, U](iter, {
+  def iterateeDoneToPublisher[T, U](iter: Iteratee[T, U]): Publisher[U] =
+    iterateeFoldToPublisher[T, U, U](iter,
       case Step.Done(x, _) => Future.successful(x)
       case notDone: Step[T, U] =>
         Future.failed(
             new Exception(s"Can only get value from Done iteratee: $notDone"))
-    })(Execution.trampoline)
-  }
+    )(Execution.trampoline)
 
   /**
     * Fold an Iteratee and publish its result. This method is used
@@ -121,23 +117,21 @@ object Streams {
     */
   private def iterateeFoldToPublisher[T, U, V](
       iter: Iteratee[T, U], f: Step[T, U] => Future[V])(
-      implicit ec: ExecutionContext): Publisher[V] = {
+      implicit ec: ExecutionContext): Publisher[V] =
     val fut: Future[V] = iter.fold(f)(ec.prepare)
     val pubr: Publisher[V] = futureToPublisher(fut)
     pubr
-  }
 
   /**
     * Adapt an Iteratee to a Processor, which consumes input and then
     * yields the iteratee's Done value. It uses iterateeToSubscriber and
     * iterateeDoneToPublisher to create each end of the Processor.
     */
-  def iterateeToProcessor[T, U](iter: Iteratee[T, U]): Processor[T, U] = {
+  def iterateeToProcessor[T, U](iter: Iteratee[T, U]): Processor[T, U] =
     val (subr, resultIter) = iterateeToSubscriber(iter)
     val pubr = iterateeDoneToPublisher(resultIter)
     val proc = join(subr, pubr)
     proc
-  }
 
   /**
     * Adapt an Enumerator to a Publisher. Each Subscriber will be
@@ -170,30 +164,25 @@ object Streams {
     * Adapt an Enumeratee to a Processor.
     */
   def enumerateeToProcessor[A, B](
-      enumeratee: Enumeratee[A, B]): Processor[A, B] = {
+      enumeratee: Enumeratee[A, B]): Processor[A, B] =
     val (iter, enum) = Concurrent.joined[A]
     val (subr, _) = iterateeToSubscriber(iter)
     val pubr = enumeratorToPublisher(enum &> enumeratee)
     new SubscriberPublisherProcessor(subr, pubr)
-  }
 
   /**
     * Adapt a Processor to an Enumeratee.
     */
   def processorToEnumeratee[A, B](
-      processor: Processor[A, B]): Enumeratee[A, B] = {
+      processor: Processor[A, B]): Enumeratee[A, B] =
     val iter = subscriberToIteratee(processor)
     val enum = publisherToEnumerator(processor)
-    new Enumeratee[A, B] {
+    new Enumeratee[A, B]
       override def applyOn[U](
-          inner: Iteratee[B, U]): Iteratee[A, Iteratee[B, U]] = {
+          inner: Iteratee[B, U]): Iteratee[A, Iteratee[B, U]] =
         import play.api.libs.iteratee.Execution.Implicits.trampoline
-        iter.map { _ =>
+        iter.map  _ =>
           Iteratee.flatten(enum(inner))
-        }
-      }
-    }
-  }
 
   /**
     * Join a Subscriber and Publisher together to make a Processor.
@@ -211,12 +200,11 @@ object Streams {
     * an Akka streams Sink from that, which is mapped to the result of running
     * the adapted iteratee subscriber result.
     */
-  def iterateeToAccumulator[T, U](iter: Iteratee[T, U]): Accumulator[T, U] = {
+  def iterateeToAccumulator[T, U](iter: Iteratee[T, U]): Accumulator[T, U] =
     val (subr, resultIter) = iterateeToSubscriber(iter)
     val result = resultIter.run
     val sink = Sink.fromSubscriber(subr).mapMaterializedValue(_ => result)
     Accumulator(sink)
-  }
 
   /**
     * Adapt an Accumulator to an Iteratee.
@@ -229,18 +217,13 @@ object Streams {
     * iteratees fold method has been invoked.
     */
   def accumulatorToIteratee[T, U](accumulator: Accumulator[T, U])(
-      implicit mat: Materializer): Iteratee[T, U] = {
-    new Iteratee[T, U] {
+      implicit mat: Materializer): Iteratee[T, U] =
+    new Iteratee[T, U]
       def fold[B](folder: (Step[T, U]) => Future[B])(
-          implicit ec: ExecutionContext) = {
+          implicit ec: ExecutionContext) =
         Source.asSubscriber
-          .toMat(accumulator.toSink) { (subscriber, result) =>
+          .toMat(accumulator.toSink)  (subscriber, result) =>
             import play.api.libs.iteratee.Execution.Implicits.trampoline
             subscriberToIteratee(subscriber).mapM(_ => result)(trampoline)
-          }
           .run()
           .fold(folder)
-      }
-    }
-  }
-}

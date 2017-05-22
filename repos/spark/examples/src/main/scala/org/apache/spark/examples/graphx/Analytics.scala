@@ -30,10 +30,10 @@ import org.apache.spark.storage.StorageLevel
 /**
   * Driver program for running graph algorithms.
   */
-object Analytics extends Logging {
+object Analytics extends Logging
 
-  def main(args: Array[String]): Unit = {
-    if (args.length < 2) {
+  def main(args: Array[String]): Unit =
+    if (args.length < 2)
       System.err.println(
           "Usage: Analytics <taskType> <file> --numEPart=<num_edge_partitions> [other options]")
       System.err.println("Supported 'taskType' as follows:")
@@ -42,26 +42,22 @@ object Analytics extends Logging {
           "  cc          Compute the connected components of vertices")
       System.err.println("  triangles   Count the number of triangles")
       System.exit(1)
-    }
 
     val taskType = args(0)
     val fname = args(1)
-    val optionsList = args.drop(2).map { arg =>
-      arg.dropWhile(_ == '-').split('=') match {
+    val optionsList = args.drop(2).map  arg =>
+      arg.dropWhile(_ == '-').split('=') match
         case Array(opt, v) => (opt -> v)
         case _ =>
           throw new IllegalArgumentException("Invalid argument: " + arg)
-      }
-    }
     val options = mutable.Map(optionsList: _*)
 
     val conf = new SparkConf()
     GraphXUtils.registerKryoClasses(conf)
 
-    val numEPart = options.remove("numEPart").map(_.toInt).getOrElse {
+    val numEPart = options.remove("numEPart").map(_.toInt).getOrElse
       println("Set the number of edge partitions using --numEPart.")
       sys.exit(1)
-    }
     val partitionStrategy: Option[PartitionStrategy] =
       options.remove("partStrategy").map(PartitionStrategy.fromString(_))
     val edgeStorageLevel = options
@@ -73,16 +69,15 @@ object Analytics extends Logging {
       .map(StorageLevel.fromString(_))
       .getOrElse(StorageLevel.MEMORY_ONLY)
 
-    taskType match {
+    taskType match
       case "pagerank" =>
         val tol = options.remove("tol").map(_.toFloat).getOrElse(0.001F)
         val outFname = options.remove("output").getOrElse("")
         val numIterOpt = options.remove("numIter").map(_.toInt)
 
-        options.foreach {
+        options.foreach
           case (opt, _) =>
             throw new IllegalArgumentException("Invalid option: " + opt)
-        }
 
         println("======================================")
         println("|             PageRank               |")
@@ -103,25 +98,23 @@ object Analytics extends Logging {
         println("GRAPHX: Number of vertices " + graph.vertices.count)
         println("GRAPHX: Number of edges " + graph.edges.count)
 
-        val pr = (numIterOpt match {
+        val pr = (numIterOpt match
           case Some(numIter) => PageRank.run(graph, numIter)
           case None => PageRank.runUntilConvergence(graph, tol)
-        }).vertices.cache()
+        ).vertices.cache()
 
         println("GRAPHX: Total rank: " + pr.map(_._2).reduce(_ + _))
 
-        if (!outFname.isEmpty) {
+        if (!outFname.isEmpty)
           logWarning("Saving pageranks of pages to " + outFname)
           pr.map { case (id, r) => id + "\t" + r }.saveAsTextFile(outFname)
-        }
 
         sc.stop()
 
       case "cc" =>
-        options.foreach {
+        options.foreach
           case (opt, _) =>
             throw new IllegalArgumentException("Invalid option: " + opt)
-        }
 
         println("======================================")
         println("|      Connected Components          |")
@@ -146,10 +139,9 @@ object Analytics extends Logging {
         sc.stop()
 
       case "triangles" =>
-        options.foreach {
+        options.foreach
           case (opt, _) =>
             throw new IllegalArgumentException("Invalid option: " + opt)
-        }
 
         println("======================================")
         println("|      Triangle Count                |")
@@ -169,14 +161,11 @@ object Analytics extends Logging {
           .cache()
         val triangles = TriangleCount.run(graph)
         println(
-            "Triangles: " + triangles.vertices.map {
+            "Triangles: " + triangles.vertices.map
           case (vid, data) => data.toLong
-        }.reduce(_ + _) / 3)
+        .reduce(_ + _) / 3)
         sc.stop()
 
       case _ =>
         println("Invalid task type.")
-    }
-  }
-}
 // scalastyle:on println

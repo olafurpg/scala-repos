@@ -19,35 +19,32 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * Date: 23.09.2009
   */
 abstract class CompletionTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   protected val caretMarker = "/*caret*/"
 
   def folderPath: String = baseRootPath() + "completion/"
   def testFileExt: String = ".scala"
 
-  protected def loadFile = {
+  protected def loadFile =
     val fileName = getTestName(false) + testFileExt
     val filePath = folderPath + fileName
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
     assert(file != null, "file " + filePath + " not found")
     (fileName, file)
-  }
 
-  protected def loadAndSetFileText(filePath: String, file: VirtualFile) = {
+  protected def loadAndSetFileText(filePath: String, file: VirtualFile) =
     val fileText = StringUtil.convertLineSeparators(FileUtil.loadFile(
             new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(filePath, fileText)
     fileText
-  }
 
-  protected def extractCaretOffset(fileText: String) = {
+  protected def extractCaretOffset(fileText: String) =
     val offset = fileText.indexOf(caretMarker)
     assert(
         offset != -1,
         "Not specified end marker in test case. Use /*caret*/ in scala file for this.")
     offset
-  }
 
   /**
     * Open {@code file} in editor at {@code offset} position,
@@ -57,7 +54,7 @@ abstract class CompletionTestBase
     * @return Array of lookup strings
     */
   protected def getCompletionItems(
-      file: VirtualFile, offset: Integer): Array[String] = {
+      file: VirtualFile, offset: Integer): Array[String] =
     val fileEditorManager = FileEditorManager.getInstance(getProjectAdapter)
     val editor = fileEditorManager.openTextEditor(
         new OpenFileDescriptor(getProjectAdapter, file, offset), false)
@@ -73,7 +70,6 @@ abstract class CompletionTestBase
     if (lookup == null) Array.empty
     else
       lookup.getItems.toArray(LookupElement.EMPTY_ARRAY).map(_.getLookupString)
-  }
 
   /**
     * Fetches last PSI element, checks if it is comment or not
@@ -81,11 +77,11 @@ abstract class CompletionTestBase
     * If it's not, fail and return empty string
     * @return Expected result string
     */
-  protected def getExpectedResult: String = {
+  protected def getExpectedResult: String =
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val text = lastPsi.getText
-    lastPsi.getNode.getElementType match {
+    lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT =>
         text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
@@ -94,21 +90,16 @@ abstract class CompletionTestBase
         assert(assertion = false,
                "Test result must be in last comment statement.")
         ""
-    }
-  }
 
-  protected def checkResult(got: Array[String], expected: String) {
+  protected def checkResult(got: Array[String], expected: String)
     import junit.framework.Assert._
     val res = got.sortWith(_ < _).mkString("\n")
     assertEquals(expected, res.trim)
-  }
 
-  protected def doTest() {
+  protected def doTest()
     val (filePath, file) = loadFile
     val fileText = loadAndSetFileText(filePath, file)
     val offset = extractCaretOffset(fileText)
     val items = getCompletionItems(file, offset)
     val expected = getExpectedResult
     checkResult(items, expected)
-  }
-}

@@ -16,8 +16,7 @@
 
 package com.twitter
 
-package object util {
+package object util
   // backward compat for people who imported "com.twitter.util.TimeConversions._"
   val TimeConversions = com.twitter.conversions.time
   val StorageUnitConversions = com.twitter.conversions.storage
-}

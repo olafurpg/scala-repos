@@ -17,7 +17,7 @@ class SplitExpressionsFilesTest
 //class SplitExpressionsFilesFailedTest extends AbstractSplitExpressionsFilesTest("/fail-format/")
 
 abstract class AbstractSplitExpressionsFilesTest(pathName: String)
-    extends Specification {
+    extends Specification
 
   case class SplitterComparison(
       oldSplitterResult: scala.util.Try[(Seq[(String, Int)], Seq[LineRange])],
@@ -32,78 +32,69 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
   final val START_COMMENT = "/*"
   final val END_COMMENT = START_COMMENT.reverse
 
-  s"$getClass " should {
-    "split whole sbt files" in {
+  s"$getClass " should
+    "split whole sbt files" in
       val rootPath = getClass.getClassLoader.getResource("").getPath + pathName
       println(s"Reading files from: $rootPath")
       val allFiles = new File(rootPath).listFiles.toList
 
-      val results = for {
+      val results = for
         path <- allFiles
         lines = Source.fromFile(path).getLines().toList
         comparison = SplitterComparison(splitLines(path, oldSplitter, lines),
                                         splitLines(path, newSplitter, lines))
-      } yield path -> comparison
+      yield path -> comparison
 
       printResults(results)
 
-      val validResults = results.collect {
+      val validResults = results.collect
         case (path,
               SplitterComparison(scala.util.Success(oldRes),
                                  scala.util.Success(newRes)))
             if oldRes == newRes =>
           path
-      }
 
       validResults.length must be_==(results.length)
-    }
-  }
 
   def removeCommentFromStatement(
-      statement: String, lineRange: LineRange): Option[LineRange] = {
+      statement: String, lineRange: LineRange): Option[LineRange] =
     val lines = statement.lines.toList
     val optionStatements = removeSlashAsterisk(
-        lines, lineRange, !REVERTED_LINES) match {
+        lines, lineRange, !REVERTED_LINES) match
       case Some((st, lr)) =>
         removeDoubleSlash(st, lr)
       case _ => None
-    }
     optionStatements.map(t => t._2)
-  }
 
   @tailrec
   private def removeSlashAsterisk(
       statements: Seq[String],
       lineRange: LineRange,
       reverted: Boolean): Option[(Seq[String], LineRange)] =
-    statements match {
+    statements match
       case statement +: _ =>
         val openSlashAsteriskIndex = statement.indexOf(START_COMMENT, 0)
         if (openSlashAsteriskIndex == -1 ||
-            statement.substring(0, openSlashAsteriskIndex).trim.nonEmpty) {
+            statement.substring(0, openSlashAsteriskIndex).trim.nonEmpty)
           Some((statements, lineRange))
-        } else {
+        else
           val closeSlashAsteriskLine =
             statements.indexWhere(s => s.contains(END_COMMENT))
-          if (closeSlashAsteriskLine == -1) {
+          if (closeSlashAsteriskLine == -1)
             Some((statements, lineRange))
-          } else {
+          else
             val newLineRange =
-              if (reverted) {
+              if (reverted)
                 lineRange.copy(
                     end = lineRange.end - closeSlashAsteriskLine - 1)
-              } else {
+              else
                 lineRange.copy(
                     start = lineRange.start + closeSlashAsteriskLine + 1)
-              }
             removeSlashAsterisk(statements.drop(closeSlashAsteriskLine + 1),
                                 newLineRange,
                                 reverted)
-          }
-        }
       case _ =>
         None
-    }
 
   /**
     * Remove // and /* */
@@ -113,40 +104,36 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
     */
   def removeDoubleSlash(
       statements: Seq[String],
-      lineRange: LineRange): Option[(Seq[String], LineRange)] = {
+      lineRange: LineRange): Option[(Seq[String], LineRange)] =
 
     @tailrec
     def removeDoubleSlashReversed(
         lines: Seq[String],
         lineRange: LineRange): Option[(Seq[String], LineRange)] =
-      lines match {
+      lines match
         case statement +: _ =>
           val doubleSlashIndex = statement.indexOf("//")
           if (doubleSlashIndex == -1 ||
-              statement.substring(0, doubleSlashIndex).trim.nonEmpty) {
-            removeSlashAsterisk(lines, lineRange, REVERTED_LINES) match {
+              statement.substring(0, doubleSlashIndex).trim.nonEmpty)
+            removeSlashAsterisk(lines, lineRange, REVERTED_LINES) match
               case some @ Some((s, ln)) if ln == lineRange =>
                 some
               case Some((s, ln)) =>
                 removeDoubleSlashReversed(s, ln)
               case _ => None
-            }
-          } else {
+          else
             removeDoubleSlashReversed(
                 lines.tail, lineRange.copy(end = lineRange.end - 1))
-          }
         case _ =>
           None
-      }
     removeDoubleSlashReversed(statements.reverse, lineRange)
       .map(t => (t._1.reverse, t._2))
-  }
 
   def splitLines(file: File,
                  splitter: SplitExpressions.SplitExpression,
                  lines: List[String])
-    : scala.util.Try[(Seq[(String, Int)], Seq[LineRange])] = {
-    try {
+    : scala.util.Try[(Seq[(String, Int)], Seq[LineRange])] =
+    try
       val (imports, settingsAndDefs) = splitter(file, lines)
 
       //TODO: Return actual contents (after making both splitter...
@@ -155,18 +142,16 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
         settingsAndDefs.flatMap(t => removeCommentFromStatement(t._1, t._2))
       scala.util.Success((imports.map(imp => (imp._1.trim, imp._2)),
                           settingsAndDefWithoutComments))
-    } catch {
+    catch
       case e: ToolBoxError =>
         scala.util.Failure(e)
       case e: Throwable =>
         scala.util.Failure(e)
-    }
-  }
 
-  def printResults(results: List[(File, SplitterComparison)]) = {
-    for ((file, comparison) <- results) {
+  def printResults(results: List[(File, SplitterComparison)]) =
+    for ((file, comparison) <- results)
       val fileName = file.getName
-      comparison match {
+      comparison match
         case SplitterComparison(scala.util.Failure(ex), _) =>
           println(s"In file: $fileName, old splitter failed. ${ex.toString}")
         case SplitterComparison(_, scala.util.Failure(ex)) =>
@@ -174,14 +159,9 @@ abstract class AbstractSplitExpressionsFilesTest(pathName: String)
           ex.printStackTrace()
         case SplitterComparison(
             scala.util.Success(resultOld), scala.util.Success(resultNew)) =>
-          if (resultOld != resultNew) {
+          if (resultOld != resultNew)
             println(s"""In file: $fileName, results differ:
                  |resultOld:
                  |$resultOld
                  |resultNew:
                  |$resultNew""".stripMargin)
-          }
-      }
-    }
-  }
-}

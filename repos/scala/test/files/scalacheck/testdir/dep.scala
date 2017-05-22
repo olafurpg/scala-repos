@@ -1,3 +1,2 @@
-object Dependency {
+object Dependency
   val v = 1
-}

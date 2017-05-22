@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.Normalizer
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object NormalizerExample {
-  def main(args: Array[String]): Unit = {
+object NormalizerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("NormalizerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -50,6 +50,4 @@ object NormalizerExample {
     lInfNormData.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

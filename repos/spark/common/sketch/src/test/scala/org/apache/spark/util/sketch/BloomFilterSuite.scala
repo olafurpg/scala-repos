@@ -24,13 +24,13 @@ import scala.util.Random
 
 import org.scalatest.FunSuite // scalastyle:ignore funsuite
 
-class BloomFilterSuite extends FunSuite {
+class BloomFilterSuite extends FunSuite
   // scalastyle:ignore funsuite
   private final val EPSILON = 0.01
 
   // Serializes and deserializes a given `BloomFilter`, then checks whether the deserialized
   // version is equivalent to the original one.
-  private def checkSerDe(filter: BloomFilter): Unit = {
+  private def checkSerDe(filter: BloomFilter): Unit =
     val out = new ByteArrayOutputStream()
     filter.writeTo(out)
     out.close()
@@ -40,11 +40,10 @@ class BloomFilterSuite extends FunSuite {
     in.close()
 
     assert(filter == deserialized)
-  }
 
   def testAccuracy[T : ClassTag](typeName: String, numItems: Int)(
-      itemGen: Random => T): Unit = {
-    test(s"accuracy - $typeName") {
+      itemGen: Random => T): Unit =
+    test(s"accuracy - $typeName")
       // use a fixed seed to make the test predictable.
       val r = new Random(37)
       val fpp = 0.05
@@ -71,12 +70,10 @@ class BloomFilterSuite extends FunSuite {
       assert(actualFpp - fpp < EPSILON)
 
       checkSerDe(filter)
-    }
-  }
 
   def testMergeInPlace[T : ClassTag](typeName: String, numItems: Int)(
-      itemGen: Random => T): Unit = {
-    test(s"mergeInPlace - $typeName") {
+      itemGen: Random => T): Unit =
+    test(s"mergeInPlace - $typeName")
       // use a fixed seed to make the test predictable.
       val r = new Random(37)
 
@@ -99,14 +96,11 @@ class BloomFilterSuite extends FunSuite {
       items2.foreach(i => assert(filter1.mightContain(i)))
 
       checkSerDe(filter1)
-    }
-  }
 
   def testItemType[T : ClassTag](typeName: String, numItems: Int)(
-      itemGen: Random => T): Unit = {
+      itemGen: Random => T): Unit =
     testAccuracy[T](typeName, numItems)(itemGen)
     testMergeInPlace[T](typeName, numItems)(itemGen)
-  }
 
   testItemType[Byte]("Byte", 160) { _.nextInt().toByte }
 
@@ -116,25 +110,19 @@ class BloomFilterSuite extends FunSuite {
 
   testItemType[Long]("Long", 100000) { _.nextLong() }
 
-  testItemType[String]("String", 100000) { r =>
+  testItemType[String]("String", 100000)  r =>
     r.nextString(r.nextInt(512))
-  }
 
-  test("incompatible merge") {
-    intercept[IncompatibleMergeException] {
+  test("incompatible merge")
+    intercept[IncompatibleMergeException]
       BloomFilter.create(1000).mergeInPlace(null)
-    }
 
-    intercept[IncompatibleMergeException] {
+    intercept[IncompatibleMergeException]
       val filter1 = BloomFilter.create(1000, 6400)
       val filter2 = BloomFilter.create(1000, 3200)
       filter1.mergeInPlace(filter2)
-    }
 
-    intercept[IncompatibleMergeException] {
+    intercept[IncompatibleMergeException]
       val filter1 = BloomFilter.create(1000, 6400)
       val filter2 = BloomFilter.create(2000, 6400)
       filter1.mergeInPlace(filter2)
-    }
-  }
-}

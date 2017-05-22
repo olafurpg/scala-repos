@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.WordSpecG
   * @author Roman.Shein
   * @since 20.01.2015.
   */
-trait WordSpecSingleTestTest extends WordSpecGenerator {
+trait WordSpecSingleTestTest extends WordSpecGenerator
   val wordSpecTestPath = List(
       "[root]", "WordSpecTest", "WordSpecTest", "Run single test")
 
-  def testWordSpec() {
+  def testWordSpec()
     addWordSpec()
 
     runTestByLocation(
@@ -23,5 +23,3 @@ trait WordSpecSingleTestTest extends WordSpecGenerator {
           checkResultTreeHasExactNamedPath(root, wordSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "ignore other tests"),
         debug = true)
-  }
-}

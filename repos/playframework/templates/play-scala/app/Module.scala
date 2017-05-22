@@ -13,9 +13,9 @@ import services.{ApplicationTimer, AtomicCounter, Counter}
   * adding `play.modules.enabled` settings to the `application.conf`
   * configuration file.
   */
-class Module extends AbstractModule {
+class Module extends AbstractModule
 
-  override def configure() = {
+  override def configure() =
     // Use the system clock as the default implementation of Clock
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone)
     // Ask Guice to create an instance of ApplicationTimer when the
@@ -23,5 +23,3 @@ class Module extends AbstractModule {
     bind(classOf[ApplicationTimer]).asEagerSingleton()
     // Set AtomicCounter as the implementation for Counter.
     bind(classOf[Counter]).to(classOf[AtomicCounter])
-  }
-}

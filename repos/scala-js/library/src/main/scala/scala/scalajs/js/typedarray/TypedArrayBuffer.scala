@@ -17,7 +17,7 @@ import java.nio._
   *  All buffers created by the methods of this object are direct buffers with
   *  the native byte order of the platform.
   */
-object TypedArrayBuffer {
+object TypedArrayBuffer
 
   /** Wraps an [[ArrayBuffer]] in a direct [[java.nio.ByteBuffer ByteBuffer]]. */
   def wrap(array: ArrayBuffer): ByteBuffer =
@@ -50,4 +50,3 @@ object TypedArrayBuffer {
   /** Wraps a [[Float64Array]] in a direct [[java.nio.DoubleBuffer DoubleBuffer]]. */
   def wrap(array: Float64Array): DoubleBuffer =
     TypedArrayBufferBridge.wrap(array)
-}

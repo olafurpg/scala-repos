@@ -16,6 +16,5 @@
 
 package com.twitter
 
-package object logging {
+package object logging
   type HandlerFactory = (() => Handler)
-}

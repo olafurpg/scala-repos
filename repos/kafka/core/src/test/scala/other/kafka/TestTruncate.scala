@@ -20,9 +20,9 @@ import java.io._
 import java.nio._
 
 /* This code tests the correct function of java's FileChannel.truncate--some platforms don't work. */
-object TestTruncate {
+object TestTruncate
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val name = File.createTempFile("kafka", ".test")
     name.deleteOnExit()
     val file = new RandomAccessFile(name, "rw").getChannel()
@@ -33,5 +33,3 @@ object TestTruncate {
     println("position prior to truncate: " + file.position)
     file.truncate(4)
     println("position after truncate to 4: " + file.position)
-  }
-}

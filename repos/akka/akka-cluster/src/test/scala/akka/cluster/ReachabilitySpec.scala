@@ -8,7 +8,7 @@ import org.scalatest.Matchers
 import akka.actor.Address
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ReachabilitySpec extends WordSpec with Matchers {
+class ReachabilitySpec extends WordSpec with Matchers
 
   import Reachability.{Reachable, Unreachable, Terminated, Record}
 
@@ -18,48 +18,42 @@ class ReachabilitySpec extends WordSpec with Matchers {
   val nodeD = UniqueAddress(Address("akka.tcp", "sys", "d", 2552), 4)
   val nodeE = UniqueAddress(Address("akka.tcp", "sys", "e", 2552), 5)
 
-  "Reachability table" must {
+  "Reachability table" must
 
-    "be reachable when empty" in {
+    "be reachable when empty" in
       val r = Reachability.empty
       r.isReachable(nodeA) should ===(true)
       r.allUnreachable should ===(Set.empty)
-    }
 
-    "be unreachable when one observed unreachable" in {
+    "be unreachable when one observed unreachable" in
       val r = Reachability.empty.unreachable(nodeB, nodeA)
       r.isReachable(nodeA) should ===(false)
       r.allUnreachable should ===(Set(nodeA))
-    }
 
-    "not be reachable when terminated" in {
+    "not be reachable when terminated" in
       val r = Reachability.empty.terminated(nodeB, nodeA)
       r.isReachable(nodeA) should ===(false)
       // allUnreachable doesn't include terminated
       r.allUnreachable should ===(Set.empty)
       r.allUnreachableOrTerminated should ===(Set(nodeA))
-    }
 
-    "not change terminated entry" in {
+    "not change terminated entry" in
       val r = Reachability.empty.terminated(nodeB, nodeA)
       r.reachable(nodeB, nodeA) should be theSameInstanceAs (r)
       r.unreachable(nodeB, nodeA) should be theSameInstanceAs (r)
-    }
 
-    "not change when same status" in {
+    "not change when same status" in
       val r = Reachability.empty.unreachable(nodeB, nodeA)
       r.unreachable(nodeB, nodeA) should be theSameInstanceAs (r)
-    }
 
-    "be unreachable when some observed unreachable and others reachable" in {
+    "be unreachable when some observed unreachable and others reachable" in
       val r = Reachability.empty
         .unreachable(nodeB, nodeA)
         .unreachable(nodeC, nodeA)
         .reachable(nodeD, nodeA)
       r.isReachable(nodeA) should ===(false)
-    }
 
-    "be reachable when all observed reachable again" in {
+    "be reachable when all observed reachable again" in
       val r = Reachability.empty
         .unreachable(nodeB, nodeA)
         .unreachable(nodeC, nodeA)
@@ -68,9 +62,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
         .unreachable(nodeB, nodeC)
         .unreachable(nodeC, nodeB)
       r.isReachable(nodeA) should ===(true)
-    }
 
-    "exclude observations from specific (downed) nodes" in {
+    "exclude observations from specific (downed) nodes" in
       val r = Reachability.empty
         .unreachable(nodeC, nodeA)
         .reachable(nodeC, nodeA)
@@ -84,9 +77,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
       r.allUnreachableOrTerminated should ===(Set(nodeA, nodeB, nodeC))
       r.removeObservers(Set(nodeB)).allUnreachableOrTerminated should ===(
           Set(nodeB))
-    }
 
-    "be pruned when all records of an observer are Reachable" in {
+    "be pruned when all records of an observer are Reachable" in
       val r = Reachability.empty
         .unreachable(nodeB, nodeA)
         .unreachable(nodeB, nodeC)
@@ -101,9 +93,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
       r2.records.toSet should ===(Set(Record(nodeD, nodeC, Unreachable, 1L),
                                       Record(nodeB, nodeD, Unreachable, 5L),
                                       Record(nodeB, nodeE, Unreachable, 6L)))
-    }
 
-    "have correct aggregated status" in {
+    "have correct aggregated status" in
       val records = Vector(Reachability.Record(nodeA, nodeB, Reachable, 2),
                            Reachability.Record(nodeC, nodeB, Unreachable, 2),
                            Reachability.Record(nodeA, nodeD, Unreachable, 3),
@@ -113,9 +104,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
       r.status(nodeA) should ===(Reachable)
       r.status(nodeB) should ===(Terminated)
       r.status(nodeD) should ===(Unreachable)
-    }
 
-    "have correct status for a mix of nodes" in {
+    "have correct status for a mix of nodes" in
       val r = Reachability.empty
         .unreachable(nodeB, nodeA)
         .unreachable(nodeC, nodeA)
@@ -155,9 +145,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
           Map(nodeA -> Set(nodeB, nodeC, nodeD),
               nodeB -> Set(nodeD),
               nodeE -> Set(nodeA)))
-    }
 
-    "merge by picking latest version of each record" in {
+    "merge by picking latest version of each record" in
       val r1 =
         Reachability.empty.unreachable(nodeB, nodeA).unreachable(nodeC, nodeD)
       val r2 = r1
@@ -178,9 +167,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
 
       val merged2 = r2.merge(Set(nodeA, nodeB, nodeC, nodeD, nodeE), r1)
       merged2.records.toSet should ===(merged.records.toSet)
-    }
 
-    "merge by taking allowed set into account" in {
+    "merge by taking allowed set into account" in
       val r1 =
         Reachability.empty.unreachable(nodeB, nodeA).unreachable(nodeC, nodeD)
       val r2 = r1
@@ -206,9 +194,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
       val merged2 = r2.merge(allowed, r1)
       merged2.records.toSet should ===(merged.records.toSet)
       merged2.versions should ===(merged.versions)
-    }
 
-    "merge correctly after pruning" in {
+    "merge correctly after pruning" in
       val r1 =
         Reachability.empty.unreachable(nodeB, nodeA).unreachable(nodeC, nodeD)
       val r2 = r1.unreachable(nodeA, nodeE)
@@ -221,9 +208,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
 
       val merged3 = r3.merge(Set(nodeA, nodeB, nodeC, nodeD, nodeE), r2)
       merged3.records.toSet should ===(merged.records.toSet)
-    }
 
-    "merge versions correctly" in {
+    "merge versions correctly" in
       val r1 =
         Reachability(Vector.empty, Map(nodeA -> 3L, nodeB -> 5L, nodeC -> 7L))
       val r2 =
@@ -235,9 +221,8 @@ class ReachabilitySpec extends WordSpec with Matchers {
 
       val merged2 = r2.merge(Set(nodeA, nodeB, nodeC, nodeD, nodeE), r1)
       merged2.versions should ===(expected)
-    }
 
-    "remove node" in {
+    "remove node" in
       val r = Reachability.empty
         .unreachable(nodeB, nodeA)
         .unreachable(nodeC, nodeD)
@@ -249,6 +234,3 @@ class ReachabilitySpec extends WordSpec with Matchers {
       r.status(nodeC, nodeD) should ===(Unreachable)
       r.status(nodeB, nodeC) should ===(Reachable)
       r.status(nodeB, nodeE) should ===(Reachable)
-    }
-  }
-}

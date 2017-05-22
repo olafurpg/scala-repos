@@ -22,7 +22,7 @@ import util.ConnectionIdentifier
 
 import com.mongodb.{BasicDBObject, DB, DBCollection, DBObject}
 
-trait JsonFormats {
+trait JsonFormats
   // override this for custom Formats
   def formats: Formats = DefaultFormats.lossless
 
@@ -31,12 +31,11 @@ trait JsonFormats {
   lazy val allFormats =
     DefaultFormats.lossless + new ObjectIdSerializer + new DateSerializer +
     new DateTimeSerializer + new PatternSerializer + new UUIDSerializer
-}
 
 /*
  * This is used by both MongoDocumentMeta and MongoMetaRecord
  */
-trait MongoMeta[BaseDocument] extends JsonFormats {
+trait MongoMeta[BaseDocument] extends JsonFormats
 
   def connectionIdentifier: ConnectionIdentifier
 
@@ -53,13 +52,12 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
    * -- the collection namespace is flat from the database's perspective.
    * From: http://www.mongodb.org/display/DOCS/Collections
    */
-  def fixCollectionName = {
+  def fixCollectionName =
     val colName = MongoRules.collectionName.vend
       .apply(connectionIdentifier, _collectionName)
 
     if (colName.contains("$")) colName.replaceAllLiterally("$", "_d_")
     else colName
-  }
 
   /**
     * The name of the database collection.  Override this method if you
@@ -81,16 +79,14 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
   /*
    * Count all documents
    */
-  def count: Long = useColl { coll =>
+  def count: Long = useColl  coll =>
     coll.getCount
-  }
 
   /*
    * Count documents by DBObject query
    */
-  def count(qry: DBObject): Long = useColl { coll =>
+  def count(qry: DBObject): Long = useColl  coll =>
     coll.getCount(qry)
-  }
 
   /*
    * Count documents by JObject query
@@ -101,26 +97,23 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
    * Count distinct records on a given field
    */
   def countDistinct(key: String, query: DBObject): Long =
-    useColl { coll =>
+    useColl  coll =>
       coll.distinct(key, query).size
-    }
 
   /*
    * Delete documents by a DBObject query
    */
   def delete(qry: DBObject): Unit =
-    useColl { coll =>
+    useColl  coll =>
       coll.remove(qry)
-    }
 
   // delete a document
-  def delete(k: String, v: Any) {
+  def delete(k: String, v: Any)
     delete(
-        new BasicDBObject(k, v match {
+        new BasicDBObject(k, v match
       case s: String if (ObjectId.isValid(s)) => new ObjectId(s)
       case _ => v
-    }))
-  }
+    ))
 
   /*
    * Delete documents by a JObject query
@@ -128,57 +121,49 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
   def delete(qry: JObject): Unit = delete(JObjectParser.parse(qry))
 
   /* drop this document collection */
-  def drop: Unit = useColl { coll =>
+  def drop: Unit = useColl  coll =>
     coll.drop
-  }
 
   /*
    * Ensure an index exists
    */
   @deprecated("use createIndex(JObject) instead.", "2.6")
   def ensureIndex(keys: JObject): Unit =
-    useColl { coll =>
+    useColl  coll =>
       coll.createIndex(JObjectParser.parse(keys))
-    }
 
   /*
    * Ensure an index exists and make unique
    */
   @deprecated("use createIndex(JObject, Boolean) instead.", "2.6")
-  def ensureIndex(keys: JObject, unique: Boolean): Unit = {
+  def ensureIndex(keys: JObject, unique: Boolean): Unit =
     val options = new BasicDBObject
     if (unique) options.put("unique", true)
-    useColl { coll =>
+    useColl  coll =>
       coll.createIndex(JObjectParser.parse(keys), options)
-    }
-  }
 
-  def createIndex(keys: JObject, unique: Boolean = false): Unit = {
+  def createIndex(keys: JObject, unique: Boolean = false): Unit =
     val options = new BasicDBObject
     if (unique) options.put("unique", true)
-    useColl { coll =>
+    useColl  coll =>
       coll.createIndex(JObjectParser.parse(keys), options)
-    }
-  }
 
   /*
    * Ensure an index exists with options
    */
   @deprecated("use createIndex(JObject, JObject) instead.", "2.6")
   def ensureIndex(keys: JObject, opts: JObject): Unit =
-    useColl { coll =>
+    useColl  coll =>
       coll.createIndex(JObjectParser.parse(keys), JObjectParser.parse(opts))
-    }
 
   def createIndex(keys: JObject, opts: JObject): Unit =
-    useColl { coll =>
+    useColl  coll =>
       coll.createIndex(JObjectParser.parse(keys), JObjectParser.parse(opts))
-    }
 
   /*
    * Update document with a DBObject query using the given Mongo instance.
    */
-  def update(qry: DBObject, newobj: DBObject, db: DB, opts: UpdateOption*) {
+  def update(qry: DBObject, newobj: DBObject, db: DB, opts: UpdateOption*)
     val dboOpts = opts.toList
     db.getCollection(collectionName)
       .update(
@@ -187,36 +172,30 @@ trait MongoMeta[BaseDocument] extends JsonFormats {
           dboOpts.find(_ == Upsert).map(x => true).getOrElse(false),
           dboOpts.find(_ == Multi).map(x => true).getOrElse(false)
       )
-  }
 
   /*
    * Update document with a JObject query using the given Mongo instance.
    */
-  def update(qry: JObject, newobj: JObject, db: DB, opts: UpdateOption*) {
+  def update(qry: JObject, newobj: JObject, db: DB, opts: UpdateOption*)
     update(
         JObjectParser.parse(qry),
         JObjectParser.parse(newobj),
         db,
         opts: _*
     )
-  }
 
   /*
    * Update document with a JObject query.
    */
-  def update(qry: JObject, newobj: JObject, opts: UpdateOption*) {
-    useDb { db =>
+  def update(qry: JObject, newobj: JObject, opts: UpdateOption*)
+    useDb  db =>
       update(qry, newobj, db, opts: _*)
-    }
-  }
-}
 
 /*
  * For passing in options to the find function
  */
-abstract sealed class FindOption {
+abstract sealed class FindOption
   def value: Int
-}
 case class Limit(value: Int) extends FindOption
 case class Skip(value: Int) extends FindOption
 

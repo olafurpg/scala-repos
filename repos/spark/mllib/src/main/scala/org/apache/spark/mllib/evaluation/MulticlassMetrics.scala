@@ -32,7 +32,7 @@ import org.apache.spark.sql.DataFrame
   */
 @Since("1.1.0")
 class MulticlassMetrics @Since("1.1.0")(
-    predictionAndLabels: RDD[(Double, Double)]) {
+    predictionAndLabels: RDD[(Double, Double)])
 
   /**
     * An auxiliary constructor taking a DataFrame.
@@ -44,18 +44,18 @@ class MulticlassMetrics @Since("1.1.0")(
   private lazy val labelCountByClass: Map[Double, Long] =
     predictionAndLabels.values.countByValue()
   private lazy val labelCount: Long = labelCountByClass.values.sum
-  private lazy val tpByClass: Map[Double, Int] = predictionAndLabels.map {
+  private lazy val tpByClass: Map[Double, Int] = predictionAndLabels.map
     case (prediction, label) =>
       (label, if (label == prediction) 1 else 0)
-  }.reduceByKey(_ + _).collectAsMap()
-  private lazy val fpByClass: Map[Double, Int] = predictionAndLabels.map {
+  .reduceByKey(_ + _).collectAsMap()
+  private lazy val fpByClass: Map[Double, Int] = predictionAndLabels.map
     case (prediction, label) =>
       (prediction, if (prediction != label) 1 else 0)
-  }.reduceByKey(_ + _).collectAsMap()
-  private lazy val confusions = predictionAndLabels.map {
+  .reduceByKey(_ + _).collectAsMap()
+  private lazy val confusions = predictionAndLabels.map
     case (prediction, label) =>
       ((label, prediction), 1)
-  }.reduceByKey(_ + _).collectAsMap()
+  .reduceByKey(_ + _).collectAsMap()
 
   /**
     * Returns confusion matrix:
@@ -64,22 +64,19 @@ class MulticlassMetrics @Since("1.1.0")(
     * as in "labels"
     */
   @Since("1.1.0")
-  def confusionMatrix: Matrix = {
+  def confusionMatrix: Matrix =
     val n = labels.length
     val values = Array.ofDim[Double](n * n)
     var i = 0
-    while (i < n) {
+    while (i < n)
       var j = 0
-      while (j < n) {
+      while (j < n)
         values(i + j * n) = confusions
           .getOrElse((labels(i), labels(j)), 0)
           .toDouble
         j += 1
-      }
       i += 1
-    }
     Matrices.dense(n, n, values)
-  }
 
   /**
     * Returns true positive rate for a given label (category)
@@ -93,21 +90,19 @@ class MulticlassMetrics @Since("1.1.0")(
     * @param label the label.
     */
   @Since("1.1.0")
-  def falsePositiveRate(label: Double): Double = {
+  def falsePositiveRate(label: Double): Double =
     val fp = fpByClass.getOrElse(label, 0)
     fp.toDouble / (labelCount - labelCountByClass(label))
-  }
 
   /**
     * Returns precision for a given label (category)
     * @param label the label.
     */
   @Since("1.1.0")
-  def precision(label: Double): Double = {
+  def precision(label: Double): Double =
     val tp = tpByClass(label)
     val fp = fpByClass.getOrElse(label, 0)
     if (tp + fp == 0) 0 else tp.toDouble / (tp + fp)
-  }
 
   /**
     * Returns recall for a given label (category)
@@ -123,12 +118,11 @@ class MulticlassMetrics @Since("1.1.0")(
     * @param beta the beta parameter.
     */
   @Since("1.1.0")
-  def fMeasure(label: Double, beta: Double): Double = {
+  def fMeasure(label: Double, beta: Double): Double =
     val p = precision(label)
     val r = recall(label)
     val betaSqrd = beta * beta
     if (p + r == 0) 0 else (1 + betaSqrd) * p * r / (betaSqrd * p + r)
-  }
 
   /**
     * Returns f1-measure for a given label (category)
@@ -170,29 +164,29 @@ class MulticlassMetrics @Since("1.1.0")(
     * Returns weighted false positive rate
     */
   @Since("1.1.0")
-  lazy val weightedFalsePositiveRate: Double = labelCountByClass.map {
+  lazy val weightedFalsePositiveRate: Double = labelCountByClass.map
     case (category, count) =>
       falsePositiveRate(category) * count.toDouble / labelCount
-  }.sum
+  .sum
 
   /**
     * Returns weighted averaged recall
     * (equals to precision, recall and f-measure)
     */
   @Since("1.1.0")
-  lazy val weightedRecall: Double = labelCountByClass.map {
+  lazy val weightedRecall: Double = labelCountByClass.map
     case (category, count) =>
       recall(category) * count.toDouble / labelCount
-  }.sum
+  .sum
 
   /**
     * Returns weighted averaged precision
     */
   @Since("1.1.0")
-  lazy val weightedPrecision: Double = labelCountByClass.map {
+  lazy val weightedPrecision: Double = labelCountByClass.map
     case (category, count) =>
       precision(category) * count.toDouble / labelCount
-  }.sum
+  .sum
 
   /**
     * Returns weighted averaged f-measure
@@ -200,23 +194,22 @@ class MulticlassMetrics @Since("1.1.0")(
     */
   @Since("1.1.0")
   def weightedFMeasure(beta: Double): Double =
-    labelCountByClass.map {
+    labelCountByClass.map
       case (category, count) =>
         fMeasure(category, beta) * count.toDouble / labelCount
-    }.sum
+    .sum
 
   /**
     * Returns weighted averaged f1-measure
     */
   @Since("1.1.0")
-  lazy val weightedFMeasure: Double = labelCountByClass.map {
+  lazy val weightedFMeasure: Double = labelCountByClass.map
     case (category, count) =>
       fMeasure(category, 1.0) * count.toDouble / labelCount
-  }.sum
+  .sum
 
   /**
     * Returns the sequence of labels in ascending order
     */
   @Since("1.1.0")
   lazy val labels: Array[Double] = tpByClass.keys.toArray.sorted
-}

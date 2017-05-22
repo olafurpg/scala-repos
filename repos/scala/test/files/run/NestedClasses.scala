@@ -5,70 +5,54 @@
 // The following set of classes tests nasty references to "outer"
 // values.
 
-class A(pa: Int) {
+class A(pa: Int)
   def a1 = pa;
-  class B(pb: Int) {
+  class B(pb: Int)
     def b1 = pa + pb + a1;
-    class C(pc: Int) extends A(b1) {
+    class C(pc: Int) extends A(b1)
       def c1 = pc + pb + pa
-    }
     val c1 = new C(13)
-  }
-}
 
-trait M {
+trait M
   def m1 = 1
-}
 
-class A1(x: Int) extends A(x) with M {
-  class D extends B(14) {
+class A1(x: Int) extends A(x) with M
+  class D extends B(14)
     val c2 = new C(15);
-    class E extends C(16) {
+    class E extends C(16)
       def e1 = c1 + b1 + a1 + m1;
       def e2 = new D();
-    }
-  }
-}
 
 // The following set of classes test qualified "this" and "super"
 // references.
 
-class AA {
+class AA
   def m = 1;
-  class BB {
+  class BB
     def m = 2;
-    class CC {
+    class CC
       def m = 3;
       def am = AA.this.m;
       def bm = BB.this.m;
-    }
-  }
-}
 
-class AAA {
+class AAA
   def f = 42;
-}
 
-class BBB extends AAA {
+class BBB extends AAA
   override def f = 24;
-}
 
-class AAA1 extends AAA {
+class AAA1 extends AAA
   override def f = 111;
-  class BBB1 extends BBB {
+  class BBB1 extends BBB
     override def f = AAA1. super.f;
-  }
-  class BBB2 extends BBB {
+  class BBB2 extends BBB
     override def f = BBB2. super.f;
-  }
-  class BBB3 extends BBB {
+  class BBB3 extends BBB
     override def f = super.f;
-  }
   class BBB4 extends BBB {}
-}
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     val a = new A1(12);
     val d = new a.D;
     val e = new d.E;
@@ -91,7 +75,5 @@ object Test {
     Console.println("bbb2.f = " + bbb2.f);
     Console.println("bbb3.f = " + bbb3.f);
     Console.println("bbb4.f = " + bbb4.f);
-  }
-}
 
 //############################################################################

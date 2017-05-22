@@ -15,18 +15,18 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * Date: 6/25/15
   */
 class KindProjectorUseCorrectLambdaKeywordInspection
-    extends AbstractInspection(inspectionId, inspectionName) {
+    extends AbstractInspection(inspectionId, inspectionName)
 
   override def actionFor(
-      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case param: ScParameterizedTypeElement
         if ScalaPsiUtil.kindProjectorPluginEnabled(param) =>
       val useGreekLambda = ScalaCodeStyleSettings
         .getInstance(param.getProject)
         .REPLACE_LAMBDA_WITH_GREEK_LETTER
-      param.children.foreach {
+      param.children.foreach
         case simple: ScSimpleTypeElement =>
-          simple.getText match {
+          simple.getText match
             case "Lambda" if useGreekLambda =>
               val changeKeywordFix =
                 new KindProjectorUseCorrectLambdaKeywordQuickFix(simple, "λ")
@@ -49,45 +49,36 @@ class KindProjectorUseCorrectLambdaKeywordInspection
               holder.registerProblem(
                   simple, codeStyleSettingUseGreekLambda, changeSettingsFix)
             case _ =>
-          }
         case _ =>
-      }
-  }
-}
 
 class KindProjectorUseCorrectLambdaKeywordQuickFix(
     e: PsiElement, replacement: String)
-    extends AbstractFixOnPsiElement(inspectionName, e) {
-  override def doApplyFix(project: Project): Unit = {
+    extends AbstractFixOnPsiElement(inspectionName, e)
+  override def doApplyFix(project: Project): Unit =
     val elem = getElement
     if (!elem.isValid) return
 
     val repl = ScalaPsiElementFactory.createTypeElementFromText(
         replacement, elem.getManager)
     elem.replace(repl)
-  }
-}
 
 class ChangeLambdaCodeStyleSetting(useGreekLambda: Boolean)
-    extends LocalQuickFix {
+    extends LocalQuickFix
   override def getFamilyName: String = getName
 
   override def getName: String =
     if (useGreekLambda) codeStyleSettingUseGreekLambda
     else codeStyleSettingUseWordLambda
 
-  override def applyFix(project: Project, d: ProblemDescriptor): Unit = {
+  override def applyFix(project: Project, d: ProblemDescriptor): Unit =
     ScalaCodeStyleSettings
       .getInstance(project)
       .REPLACE_LAMBDA_WITH_GREEK_LETTER = useGreekLambda
-  }
-}
 
-object KindProjectorUseCorrectLambdaKeywordInspection {
+object KindProjectorUseCorrectLambdaKeywordInspection
   val inspectionName = "Kind Projector: Use correct lambda keyword"
   val inspectionId = "KindProjectorUseCorrectLambdaKeyword"
   val codeStyleSettingUseGreekLambda =
     "Kind Projector: Change code style setting: use λ instead of Lambda"
   val codeStyleSettingUseWordLambda =
     "Kind Projector: Change code style setting: use Lambda instead of λ"
-}

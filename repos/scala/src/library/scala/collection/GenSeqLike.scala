@@ -32,7 +32,7 @@ import generic._
   */
 trait GenSeqLike[+A, +Repr]
     extends Any with GenIterableLike[A, Repr] with Equals
-    with Parallelizable[A, parallel.ParSeq[A]] {
+    with Parallelizable[A, parallel.ParSeq[A]]
   def seq: Seq[A]
 
   /** Selects an element by its index in the $coll.
@@ -480,8 +480,6 @@ trait GenSeqLike[+A, +Repr]
     *  @return   `true` if `that` is a sequence that has the same elements as
     *            this sequence in the same order, `false` otherwise
     */
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: GenSeq[_] => (that canEqual this) && (this sameElements that)
     case _ => false
-  }
-}

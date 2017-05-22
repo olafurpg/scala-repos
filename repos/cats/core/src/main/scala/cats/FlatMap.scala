@@ -18,7 +18,7 @@ import simulacrum.typeclass
   * Must obey the laws defined in cats.laws.FlatMapLaws.
   */
 @typeclass
-trait FlatMap[F[_]] extends Apply[F] {
+trait FlatMap[F[_]] extends Apply[F]
   def flatMap[A, B](fa: F[A])(f: A => F[B]): F[B]
 
   /**
@@ -42,7 +42,5 @@ trait FlatMap[F[_]] extends Apply[F] {
   /**
     * `if` lifted into monad.
     */
-  def ifM[B](fa: F[Boolean])(ifTrue: => F[B], ifFalse: => F[B]): F[B] = {
+  def ifM[B](fa: F[Boolean])(ifTrue: => F[B], ifFalse: => F[B]): F[B] =
     flatMap(fa)(if (_) ifTrue else ifFalse)
-  }
-}

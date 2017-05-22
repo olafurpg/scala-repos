@@ -17,17 +17,14 @@ class NoClientIdSpecifiedException extends RequestException
   */
 class ClientIdRequiredFilter[Req, Rep](
     statsReceiver: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep]
   private[this] val noClientIdSpecifiedEx = new NoClientIdSpecifiedException
   private[this] val filterCounter =
     statsReceiver.counter("no_client_id_specified")
 
-  def apply(req: Req, service: Service[Req, Rep]) = {
-    ClientId.current match {
+  def apply(req: Req, service: Service[Req, Rep]) =
+    ClientId.current match
       case Some(_) => service(req)
       case None =>
         filterCounter.incr()
         Future.exception(noClientIdSpecifiedEx)
-    }
-  }
-}

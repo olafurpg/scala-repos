@@ -34,25 +34,24 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.util.ContinuousQueryListener.{QueryProgress, QueryStarted, QueryTerminated}
 
 class ContinuousQueryListenerSuite
-    extends StreamTest with SharedSQLContext with BeforeAndAfter {
+    extends StreamTest with SharedSQLContext with BeforeAndAfter
 
   import testImplicits._
 
-  after {
+  after
     sqlContext.streams.active.foreach(_.stop())
     assert(sqlContext.streams.active.isEmpty)
     assert(addedListeners.isEmpty)
     // Make sure we don't leak any events to the next test
     sqlContext.sparkContext.listenerBus.waitUntilEmpty(10000)
-  }
 
-  test("single listener") {
+  test("single listener")
     val listener = new QueryStatusCollector
     val input = MemoryStream[Int]
-    withListenerAdded(listener) {
+    withListenerAdded(listener)
       testStream(input.toDS)(
           StartStream,
-          Assert("Incorrect query status in onQueryStarted") {
+          Assert("Incorrect query status in onQueryStarted")
             val status = listener.startStatus
             assert(status != null)
             assert(status.active == true)
@@ -67,11 +66,11 @@ class ContinuousQueryListenerSuite
             // No progress events or termination events
             assert(listener.progressStatuses.isEmpty)
             assert(listener.terminationStatus === null)
-          },
+          ,
           AddDataMemory(input, Seq(1, 2, 3)),
           CheckAnswer(1, 2, 3),
-          Assert("Incorrect query status in onQueryProgress") {
-            eventually(Timeout(streamingTimeout)) {
+          Assert("Incorrect query status in onQueryProgress")
+            eventually(Timeout(streamingTimeout))
 
               // There should be only on progress event as batch has been processed
               assert(listener.progressStatuses.size === 1)
@@ -84,11 +83,10 @@ class ContinuousQueryListenerSuite
 
               // No termination events
               assert(listener.terminationStatus === null)
-            }
-          },
+          ,
           StopStream,
-          Assert("Incorrect query status in onQueryTerminated") {
-            eventually(Timeout(streamingTimeout)) {
+          Assert("Incorrect query status in onQueryTerminated")
+            eventually(Timeout(streamingTimeout))
               val status = listener.terminationStatus
               assert(status != null)
 
@@ -96,24 +94,19 @@ class ContinuousQueryListenerSuite
               assert(status.sourceStatuses(0).offset === Some(LongOffset(0)))
               assert(status.sinkStatus.offset === Some(
                       CompositeOffset.fill(LongOffset(0))))
-            }
             listener.checkAsyncErrors()
-          }
       )
-    }
-  }
 
-  test("adding and removing listener") {
-    def isListenerActive(listener: QueryStatusCollector): Boolean = {
+  test("adding and removing listener")
+    def isListenerActive(listener: QueryStatusCollector): Boolean =
       listener.reset()
       testStream(MemoryStream[Int].toDS)(
           StartStream,
           StopStream
       )
       listener.startStatus != null
-    }
 
-    try {
+    try
       val listener1 = new QueryStatusCollector
       val listener2 = new QueryStatusCollector
 
@@ -126,15 +119,13 @@ class ContinuousQueryListenerSuite
       sqlContext.streams.removeListener(listener1)
       assert(isListenerActive(listener1) === false)
       assert(isListenerActive(listener2) === true)
-    } finally {
+    finally
       addedListeners.foreach(sqlContext.streams.removeListener)
-    }
-  }
 
-  test("event ordering") {
+  test("event ordering")
     val listener = new QueryStatusCollector
-    withListenerAdded(listener) {
-      for (i <- 1 to 100) {
+    withListenerAdded(listener)
+      for (i <- 1 to 100)
         listener.reset()
         require(listener.startStatus === null)
         testStream(MemoryStream[Int].toDS)(
@@ -144,31 +135,24 @@ class ContinuousQueryListenerSuite
             StopStream,
             Assert { listener.checkAsyncErrors() }
         )
-      }
-    }
-  }
 
   private def withListenerAdded(listener: ContinuousQueryListener)(
-      body: => Unit): Unit = {
+      body: => Unit): Unit =
     @volatile var query: StreamExecution = null
-    try {
-      failAfter(1 minute) {
+    try
+      failAfter(1 minute)
         sqlContext.streams.addListener(listener)
         body
-      }
-    } finally {
+    finally
       sqlContext.streams.removeListener(listener)
-    }
-  }
 
-  private def addedListeners(): Array[ContinuousQueryListener] = {
+  private def addedListeners(): Array[ContinuousQueryListener] =
     val listenerBusMethod =
       PrivateMethod[ContinuousQueryListenerBus]('listenerBus)
     val listenerBus = sqlContext.streams invokePrivate listenerBusMethod()
     listenerBus.listeners.toArray.map(_.asInstanceOf[ContinuousQueryListener])
-  }
 
-  class QueryStatusCollector extends ContinuousQueryListener {
+  class QueryStatusCollector extends ContinuousQueryListener
 
     private val asyncTestWaiter =
       new Waiter // to catch errors in the async listener events
@@ -177,56 +161,43 @@ class ContinuousQueryListenerSuite
     @volatile var terminationStatus: QueryStatus = null
     val progressStatuses = new ConcurrentLinkedQueue[QueryStatus]
 
-    def reset(): Unit = {
+    def reset(): Unit =
       startStatus = null
       terminationStatus = null
       progressStatuses.clear()
 
       // To reset the waiter
-      try asyncTestWaiter.await(timeout(1 milliseconds)) catch {
+      try asyncTestWaiter.await(timeout(1 milliseconds)) catch
         case NonFatal(e) =>
-      }
-    }
 
-    def checkAsyncErrors(): Unit = {
+    def checkAsyncErrors(): Unit =
       asyncTestWaiter.await(timeout(streamingTimeout))
-    }
 
-    override def onQueryStarted(queryStarted: QueryStarted): Unit = {
-      asyncTestWaiter {
+    override def onQueryStarted(queryStarted: QueryStarted): Unit =
+      asyncTestWaiter
         startStatus = QueryStatus(queryStarted.query)
-      }
-    }
 
-    override def onQueryProgress(queryProgress: QueryProgress): Unit = {
-      asyncTestWaiter {
+    override def onQueryProgress(queryProgress: QueryProgress): Unit =
+      asyncTestWaiter
         assert(startStatus != null,
                "onQueryProgress called before onQueryStarted")
         progressStatuses.add(QueryStatus(queryProgress.query))
-      }
-    }
 
-    override def onQueryTerminated(queryTerminated: QueryTerminated): Unit = {
-      asyncTestWaiter {
+    override def onQueryTerminated(queryTerminated: QueryTerminated): Unit =
+      asyncTestWaiter
         assert(startStatus != null,
                "onQueryTerminated called before onQueryStarted")
         terminationStatus = QueryStatus(queryTerminated.query)
-      }
       asyncTestWaiter.dismiss()
-    }
-  }
 
   case class QueryStatus(active: Boolean,
                          expection: Option[Exception],
                          sourceStatuses: Array[SourceStatus],
                          sinkStatus: SinkStatus)
 
-  object QueryStatus {
-    def apply(query: ContinuousQuery): QueryStatus = {
+  object QueryStatus
+    def apply(query: ContinuousQuery): QueryStatus =
       QueryStatus(query.isActive,
                   query.exception,
                   query.sourceStatuses,
                   query.sinkStatus)
-    }
-  }
-}

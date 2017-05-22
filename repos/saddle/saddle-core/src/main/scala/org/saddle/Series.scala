@@ -98,7 +98,7 @@ import org.saddle.mat.MatCols
   * @tparam T Type of elements in the values array, for which there must be an implicit ST
   */
 class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
-    extends NumericOps[Series[X, T]] with Serializable {
+    extends NumericOps[Series[X, T]] with Serializable
 
   require(values.length == index.length,
           "Values length %d != index length %d" format
@@ -149,20 +149,18 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * Get the first value of the Series whose key matches that provided
     * @param key Key on which to match
     */
-  def first(key: X): Scalar[T] = {
+  def first(key: X): Scalar[T] =
     val loc = index.getFirst(key)
     if (loc == -1) NA else at(loc)
-  }
 
   /**
     * Alias for `first`. If a key exists, get the value associated with the first
     * occurence of that key.
     * @return
     */
-  def get(key: X): Scalar[T] = {
+  def get(key: X): Scalar[T] =
     val loc = index.getFirst(key)
     if (loc == -1) NA else at(loc)
-  }
 
   /**
     * Get the last value of the Series
@@ -173,10 +171,9 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * Get the last value of the Series whose key matches that provided
     * @param key Key on which to match
     */
-  def last(key: X): Scalar[T] = {
+  def last(key: X): Scalar[T] =
     val loc = index.getLast(key)
     if (loc == -1) NA else at(loc)
-  }
 
   // access index keys by location(s)
 
@@ -238,10 +235,9 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * are derived from the original Series.
     * @param newIx Index of the result series
     */
-  def reindex(newIx: Index[X]): Series[X, T] = {
+  def reindex(newIx: Index[X]): Series[X, T] =
     val ixer = index.getIndexer(newIx)
     ixer.map(a => Series(values.take(a), newIx)) getOrElse this
-  }
 
   /**
     * Create a new Series whose index formed of the provided argument, and whose values
@@ -307,11 +303,10 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param from Beginning offset key
     * @param to Ending offset key
     */
-  def sliceBy(from: X, to: X, inclusive: Boolean = true): Series[X, T] = {
+  def sliceBy(from: X, to: X, inclusive: Boolean = true): Series[X, T] =
     val start = index.lsearch(from)
     val end = if (inclusive) index.rsearch(to) else index.lsearch(to)
     Series(values.slice(start, end), index.slice(start, end))
-  }
 
   /**
     * Creates a view into original Series from one key through another key as
@@ -319,10 +314,9 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * sorted.
     * @param rng An IRange which computes the bound locations
     */
-  def sliceBy(rng: Slice[X]): Series[X, T] = {
+  def sliceBy(rng: Slice[X]): Series[X, T] =
     val (start, end) = rng(index)
     Series(values.slice(start, end), index.slice(start, end))
-  }
 
   /**
     * Creates a view into original Series from one int offset until (exclusive)
@@ -330,9 +324,8 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param from Beginning offset
     * @param until Ending offset
     */
-  def slice(from: Int, until: Int, stride: Int = 1): Series[X, T] = {
+  def slice(from: Int, until: Int, stride: Int = 1): Series[X, T] =
     Series(values.slice(from, until, stride), index.slice(from, until, stride))
-  }
 
   /**
     * Given int offets to take, form a new series from the keys and values found
@@ -450,11 +443,10 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * Series[_, Boolean] where the latter contains a true value.
     * @param pred Series[_, Boolean] (or Vec[Boolean] which will implicitly convert)
     */
-  def where(pred: Series[_, Boolean]): Series[X, T] = {
+  def where(pred: Series[_, Boolean]): Series[X, T] =
     val newVals = VecImpl.where(this.values)(pred.values.toArray)
     val newIdx = VecImpl.where(index.toVec)(pred.values.toArray)
     Series(newVals, Index(newIdx))
-  }
 
   // searching
 
@@ -484,28 +476,25 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * a predicate function.
     * @param pred Function from T to Boolean
     */
-  def findOneKey(pred: T => Boolean): Scalar[X] = {
+  def findOneKey(pred: T => Boolean): Scalar[X] =
     val loc = findOne(pred)
     if (loc == -1) NA else keyAt(loc)
-  }
 
   /**
     * Return key corresponding to minimum value in series
     */
   def minKey(implicit num: NUM[T], ord: ORD[T]): Scalar[X] =
-    array.argmin(values.toArray) match {
+    array.argmin(values.toArray) match
       case -1 => NA
       case _ @i => index.at(i)
-    }
 
   /**
     * Return key corresponding to maximum value in series
     */
   def maxKey(implicit num: NUM[T], ord: ORD[T]): Scalar[X] =
-    array.argmax(values.toArray) match {
+    array.argmax(values.toArray) match
       case -1 => NA
       case _ @i => index.at(i)
-    }
 
   /**
     * Returns true if the index of the Series contains the key
@@ -573,10 +562,9 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @tparam V The result type of the function
     */
   def joinMap[U : ST, V : ST](other: Series[X, U], how: JoinType = LeftJoin)(
-      f: (T, U) => V): Series[X, V] = {
+      f: (T, U) => V): Series[X, V] =
     val (l, r) = align(other, how)
     Series(VecImpl.zipMap(l.values, r.values)(f), l.index)
-  }
 
   /**
     * Create a new Series whose key/value entries are sorted according to the values of the Series.
@@ -631,20 +619,17 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param f Function Series[X, T] => B to operate on sliding window
     * @tparam B Result type of function
     */
-  def rolling[B : ST](winSz: Int, f: Series[X, T] => B): Series[X, B] = {
+  def rolling[B : ST](winSz: Int, f: Series[X, T] => B): Series[X, B] =
     if (winSz <= 0) Series.empty[X, B]
-    else {
+    else
       val len = values.length
       val win = if (winSz > len) len else winSz
       val buf = new Array[B](len - win + 1)
       var i = win
-      while (i <= len) {
+      while (i <= len)
         buf(i - win) = f(slice(i - win, i))
         i += 1
-      }
       Series(Vec(buf), index.slice(win - 1, len))
-    }
-  }
 
   /**
     * Split Series into two series at position i
@@ -705,7 +690,7 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
                     ord1: ORD[O1],
                     ord2: ORD[O2],
                     m1: ST[O1],
-                    m2: ST[O2]): Frame[O1, O2, T] = {
+                    m2: ST[O2]): Frame[O1, O2, T] =
     val (lft, rgt) = split(index)
 
     val rix = lft.uniques
@@ -716,12 +701,12 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
       grpr.groups // Group by pivot label. Each unique label will get its
     //  own column
     if (length == 0) Frame.empty[O1, O2, T]
-    else {
+    else
       var loc = 0
       val result =
         Array.ofDim[Vec[T]](cix.length) // accumulates result columns
 
-      for ((k, taker) <- grps) {
+      for ((k, taker) <- grps)
         // For each pivot label grouping,
         val gIdx = lft.take(taker) //   use group's (lft) row index labels
         val ixer = rix.join(gIdx) //   to compute map to final (rix) locations;
@@ -731,11 +716,8 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
           ixer.rTake.map(vals.take(_)).getOrElse(vals) //   map values to be in correspondence to rix
         result(loc) = v //   and save resulting col vec in array.
         loc += 1 // Increment offset into result array
-      }
 
       Frame(result, rix, Index(grpr.keys))
-    }
-  }
 
   // ----------------------------
   // joining
@@ -755,12 +737,11 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param other Series to join with
     * @param how How to perform the join
     */
-  def join(other: Series[X, T], how: JoinType = LeftJoin): Frame[X, Int, T] = {
+  def join(other: Series[X, T], how: JoinType = LeftJoin): Frame[X, Int, T] =
     val indexer = this.index.join(other.index, how)
     val lseq = indexer.lTake.map(this.values.take(_)) getOrElse this.values
     val rseq = indexer.rTake.map(other.values.take(_)) getOrElse other.values
     Frame(MatCols(lseq, rseq), indexer.index, Array(0, 1))
-  }
 
   /**
     * Perform a (heterogeneous) join with another Series[X, _] according to its index.
@@ -772,12 +753,11 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param how How to perform the join
     */
   def hjoin(
-      other: Series[X, _], how: JoinType = LeftJoin): Frame[X, Int, Any] = {
+      other: Series[X, _], how: JoinType = LeftJoin): Frame[X, Int, Any] =
     val indexer = this.index.join(other.index, how)
     val lft = indexer.lTake.map(this.values.take(_)) getOrElse this.values
     val rgt = indexer.rTake.map(other.values.take(_)) getOrElse other.values
     Panel(Seq(lft, rgt), indexer.index, IndexIntRange(2))
-  }
 
   /**
     * Perform a join with a Frame[X, _, T] according to its row index. The values of
@@ -790,13 +770,12 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param how How to perform the join
     */
   def joinF(
-      other: Frame[X, _, T], how: JoinType = LeftJoin): Frame[X, Int, T] = {
+      other: Frame[X, _, T], how: JoinType = LeftJoin): Frame[X, Int, T] =
     val tmpFrame = other.joinS(this, how)
     Frame(tmpFrame.values.last +: tmpFrame.values.slice(
               0, tmpFrame.values.length - 1),
           tmpFrame.rowIx,
           IndexIntRange(other.colIx.length + 1))
-  }
 
   /**
     * Perform a (heterogeneous) join with a Frame[X, _, _] according to its row index.
@@ -809,13 +788,12 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param how How to perform the join
     */
   def hjoinF(
-      other: Frame[X, _, _], how: JoinType = LeftJoin): Frame[X, Int, Any] = {
+      other: Frame[X, _, _], how: JoinType = LeftJoin): Frame[X, Int, Any] =
     val tmpFrame = other.joinAnyS(this, how)
     Panel(tmpFrame.values.last +: tmpFrame.values.slice(
               0, tmpFrame.values.length - 1),
           tmpFrame.rowIx,
           IndexIntRange(other.colIx.length + 1))
-  }
 
   /**
     * Aligns this series with another series, returning the two series aligned
@@ -825,12 +803,11 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param how How to perform the join on the indexes
     */
   def align[U : ST](other: Series[X, U],
-                    how: JoinType = LeftJoin): (Series[X, T], Series[X, U]) = {
+                    how: JoinType = LeftJoin): (Series[X, T], Series[X, U]) =
     val indexer = this.index.join(other.index, how)
     val lseq = indexer.lTake.map(this.values.take(_)) getOrElse this.values
     val rseq = indexer.rTake.map(other.values.take(_)) getOrElse other.values
     (Series(lseq, indexer.index), Series(rseq, indexer.index))
-  }
 
   // ----------------------------
   // proxy
@@ -841,15 +818,13 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     * @param proxy The series containing the values to use
     */
   def proxyWith(proxy: Series[X, T])(
-      implicit fn: org.saddle.scalar.NA.type => T): Series[X, T] = {
+      implicit fn: org.saddle.scalar.NA.type => T): Series[X, T] =
     require(proxy.index.isUnique, "Proxy index must be unique")
 
-    this.fillNA { key =>
+    this.fillNA  key =>
       val loc = proxy.index.getFirst(key)
       val res: T = if (loc == -1) NA else proxy.raw(loc)
       res
-    }
-  }
 
   // ----------------------------
   // conversions
@@ -864,13 +839,13 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
     */
   def toSeq: IndexedSeq[(X, T)] = index.toSeq zip values.toSeq
 
-  def stringify(len: Int = 10): String = {
+  def stringify(len: Int = 10): String =
     val half = len / 2
 
     val buf = new StringBuilder()
 
     if (length == 0) buf append "Empty Series"
-    else {
+    else
       buf.append("[%d x 1]\n" format length)
 
       val maxf = (a: List[Int], b: List[String]) =>
@@ -894,60 +869,52 @@ class Series[X : ST : ORD, T : ST](val values: Vec[T], val index: Index[X])
       val sz = isca.strList(index.raw(0)).size
 
       val prevRowLabels = Array.fill(sz)("")
-      def resetRowLabels(k: Int) {
+      def resetRowLabels(k: Int)
         for (i <- k until prevRowLabels.length) prevRowLabels(i) = ""
-      }
 
-      def createIx(r: Int) = {
+      def createIx(r: Int) =
         val vls = isca.strList(index.raw(r))
-        val lst = for ((i, l, v) <- enumZip(ilens, vls)) yield {
+        val lst = for ((i, l, v) <- enumZip(ilens, vls)) yield
           val fmt = "%" + l + "s"
           val res =
-            if (i == vls.length - 1 || prevRowLabels(i) != v) {
+            if (i == vls.length - 1 || prevRowLabels(i) != v)
               resetRowLabels(i + 1)
               v.formatted(fmt)
-            } else "".formatted(fmt)
+            else "".formatted(fmt)
           prevRowLabels(i) = v
           res
-        }
         lst.mkString(" ")
-      }
 
       def createVal(r: Int) =
         ("%" + vlen + "s\n").format(vsca.show(values.raw(r)))
 
       buf.append(
           util.buildStr(
-              len, length, (i: Int) => createIx(i) + " -> " + createVal(i), {
+              len, length, (i: Int) => createIx(i) + " -> " + createVal(i),
         resetRowLabels(0); " ... \n"
-      }))
-    }
+      ))
 
     buf.toString()
-  }
 
   /**
     * Pretty-printer for Series, which simply outputs the result of stringify.
     * @param len Number of elements to display
     */
-  def print(len: Int = 10, stream: OutputStream = System.out) {
+  def print(len: Int = 10, stream: OutputStream = System.out)
     stream.write(stringify(len).getBytes)
-  }
 
   override def hashCode(): Int =
     values.hashCode() * 31 + index.hashCode()
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case s: Series[_, _] =>
       (this eq s) || (length == s.length) && index == s.index &&
       values == s.values
     case _ => false
-  }
 
   override def toString: String = stringify()
-}
 
-object Series extends BinOpSeries {
+object Series extends BinOpSeries
   // stats implicits
 
   type Vec2Stats[T] = Vec[T] => VecStats[T]
@@ -1047,4 +1014,3 @@ object Series extends BinOpSeries {
   def apply[X : ST : ORD, T : ST](values: (X, T)*): Series[X, T] =
     new Series[X, T](
         Vec(values.map(_._2).toArray), Index(values.map(_._1).toArray))
-}

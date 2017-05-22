@@ -14,22 +14,20 @@ case class NativeConnector(connectString: String,
                            sessionTimeout: Duration,
                            timer: Timer,
                            authenticate: Option[AuthInfo] = None)
-    extends Connector with Serialized {
+    extends Connector with Serialized
   override val name = "native-zk-connector"
 
-  protected[this] def mkConnection = {
+  protected[this] def mkConnection =
     new NativeConnector.Connection(connectString,
                                    connectTimeout,
                                    sessionTimeout,
                                    authenticate,
                                    timer,
                                    log)
-  }
 
-  onSessionEvent {
+  onSessionEvent
     // Invalidate the connection on expiration.
     case StateEvent.Expired => Await.ready(release())
-  }
 
   /*
    * Access to connection must be serialized, i.e. enqueued to be processed asynchronously and
@@ -45,61 +43,52 @@ case class NativeConnector(connectString: String,
     * If the connection is not received within connectTimeout, the connection is released.
     */
   def apply() =
-    serialized {
-      connection getOrElse {
+    serialized
+      connection getOrElse
         val c = mkConnection
-        c.sessionEvents foreach { event =>
+        c.sessionEvents foreach  event =>
           sessionBroker.send(event()).sync()
-        }
         connection = Some(c)
         c
-      } apply ()
-    }.flatten.rescue {
+      apply ()
+    .flatten.rescue
       case e: NativeConnector.ConnectTimeoutException =>
-        release() flatMap { _ =>
+        release() flatMap  _ =>
           Future.exception(e)
-        }
-    }
 
   /**
     * If there is a connection, release it.
     */
   def release() =
-    serialized {
-      connection match {
+    serialized
+      connection match
         case None => Future.Unit
-        case Some(c) => {
+        case Some(c) =>
             connection = None
             c.release()
-          }
-      }
-    }.flatten
-}
+    .flatten
 
-object NativeConnector {
+object NativeConnector
   def apply(connectString: String, sessionTimeout: Duration)(
-      implicit timer: Timer): NativeConnector = {
+      implicit timer: Timer): NativeConnector =
     NativeConnector(connectString, None, sessionTimeout, timer)
-  }
 
   def apply(
       connectString: String,
       connectTimeout: Duration,
-      sessionTimeout: Duration)(implicit timer: Timer): NativeConnector = {
+      sessionTimeout: Duration)(implicit timer: Timer): NativeConnector =
     NativeConnector(connectString, Some(connectTimeout), sessionTimeout, timer)
-  }
 
   def apply(connectString: String,
             connectTimeout: Duration,
             sessionTimeout: Duration,
             authenticate: Option[AuthInfo])(
-      implicit timer: Timer): NativeConnector = {
+      implicit timer: Timer): NativeConnector =
     NativeConnector(connectString,
                     Some(connectTimeout),
                     sessionTimeout,
                     timer,
                     authenticate)
-  }
 
   case class ConnectTimeoutException(connectString: String, timeout: Duration)
       extends TimeoutException(
@@ -116,7 +105,7 @@ object NativeConnector {
                              sessionTimeout: Duration,
                              authenticate: Option[AuthInfo],
                              timer: Timer,
-                             log: Logger) {
+                             log: Logger)
 
     @volatile protected[this] var zookeeper: Option[ZooKeeper] = None
 
@@ -124,12 +113,11 @@ object NativeConnector {
 
     /** A ZooKeeper handle that will error if connectTimeout is specified and exceeded. */
     lazy val connected: Future[ZooKeeper] =
-      connectTimeout map { timeout =>
-        connectPromise within (timer, timeout) rescue {
+      connectTimeout map  timeout =>
+        connectPromise within (timer, timeout) rescue
           case _: TimeoutException =>
             Future.exception(ConnectTimeoutException(connectString, timeout))
-        }
-      } getOrElse (connectPromise)
+      getOrElse (connectPromise)
 
     protected[this] val releasePromise = new Promise[Unit]
     val released: Future[Unit] = releasePromise
@@ -140,25 +128,21 @@ object NativeConnector {
       * Publish session events, but intercept Connected events and use them to satisfy the pending
       * connection promise if possible, and add the authentication handle.
       */
-    val sessionEvents: Offer[StateEvent] = {
+    val sessionEvents: Offer[StateEvent] =
       val broker = new Broker[StateEvent]
-      def loop() {
-        sessionBroker.recv sync () map { StateEvent(_) } onSuccess {
+      def loop()
+        sessionBroker.recv sync () map { StateEvent(_) } onSuccess
           case StateEvent.Connected =>
-            zookeeper foreach { zk =>
+            zookeeper foreach  zk =>
               connectPromise.updateIfEmpty(Return(zk))
-              authenticate foreach { auth =>
+              authenticate foreach  auth =>
                 log.info("Authenticating to zk as %s".format(
                         new String(auth.data, "UTF-8")))
                 zk.addAuthInfo(auth.mode, auth.data)
-              }
-            }
           case _ =>
-        } flatMap { broker.send(_).sync() } ensure loop()
-      }
+        flatMap { broker.send(_).sync() } ensure loop()
       loop()
       broker.recv
-    }
 
     /**
       * Obtain a ZooKeeper connection
@@ -166,24 +150,18 @@ object NativeConnector {
       * There must not be concurrent calls to this method and/or release();  this is enforced by
       * NativeConnector.
       */
-    def apply(): Future[ZooKeeper] = {
+    def apply(): Future[ZooKeeper] =
       assert(!releasePromise.isDefined)
       zookeeper = zookeeper orElse Some { mkZooKeeper }
       connected
-    }
 
-    protected[this] def mkZooKeeper = {
+    protected[this] def mkZooKeeper =
       new ZooKeeper(
           connectString, sessionTimeout.inMillis.toInt, sessionBroker)
-    }
 
-    def release(): Future[Unit] = Future {
-      zookeeper foreach { zk =>
+    def release(): Future[Unit] = Future
+      zookeeper foreach  zk =>
         log.debug("release")
         zk.close()
         zookeeper = None
         releasePromise.setValue(Unit)
-      }
-    }
-  }
-}

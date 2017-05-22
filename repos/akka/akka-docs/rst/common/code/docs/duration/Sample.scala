@@ -5,7 +5,7 @@ package docs.duration
 
 import language.postfixOps
 
-object Scala {
+object Scala
   //#dsl
   import scala.concurrent.duration._
 
@@ -23,4 +23,3 @@ object Scala {
   // do something
   val rest = deadline.timeLeft
   //#deadline
-}

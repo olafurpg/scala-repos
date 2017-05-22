@@ -17,11 +17,11 @@ import scala.annotation.tailrec
 /**
   * @author Nikolay.Tropin
   */
-class ScalaSourcePositionProvider extends SourcePositionProvider {
+class ScalaSourcePositionProvider extends SourcePositionProvider
   override def computeSourcePosition(descriptor: NodeDescriptor,
                                      project: Project,
                                      context: DebuggerContextImpl,
-                                     nearest: Boolean): SourcePosition = {
+                                     nearest: Boolean): SourcePosition =
 
     val contextElement = PositionUtil.getContextElement(context)
     if (contextElement == null) return null
@@ -29,21 +29,18 @@ class ScalaSourcePositionProvider extends SourcePositionProvider {
     val isScala = contextElement.getLanguage.isKindOf(ScalaLanguage.Instance)
     if (!isScala) return null
 
-    descriptor match {
+    descriptor match
       case _: FieldDescriptor | _: LocalVariableDescriptor =>
       case _ => return null
-    }
 
     val name = descriptor.getName
-    resolveReferenceWithName(name, contextElement) match {
+    resolveReferenceWithName(name, contextElement) match
       case bp: ScBindingPattern => SourcePosition.createFromElement(bp)
       case _ => null
-    }
-  }
 
   @tailrec
   private def resolveReferenceWithName(
-      name: String, context: PsiElement): PsiElement = {
+      name: String, context: PsiElement): PsiElement =
     if (!ScalaNamesUtil.isIdentifier(name)) return null
     if (name == "$outer" || name.startsWith("x$")) return null
 
@@ -51,11 +48,8 @@ class ScalaSourcePositionProvider extends SourcePositionProvider {
       .createExpressionWithContextFromText(name, context, context)
       .asInstanceOf[ScReferenceExpression]
 
-    ref.resolve() match {
+    ref.resolve() match
       case null if name.contains("$") =>
         val fixedName = name.substring(0, name.indexOf('$'))
         resolveReferenceWithName(fixedName, context)
       case elem => elem
-    }
-  }
-}

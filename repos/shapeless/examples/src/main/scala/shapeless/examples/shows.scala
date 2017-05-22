@@ -18,7 +18,7 @@ package shapeless.examples
 
 import shapeless._
 
-object ShowExamples extends App {
+object ShowExamples extends App
   import ShowSyntax._
 
   sealed trait Super
@@ -26,9 +26,8 @@ object ShowExamples extends App {
   case class Bar(i: Int) extends Super
   case class BarRec(i: Int, rec: Super) extends Super
 
-  object Super {
+  object Super
     implicit val instance = Show[Super]
-  }
 
   sealed trait MutualA
   case class MutualA1(x: Int) extends MutualA
@@ -38,13 +37,11 @@ object ShowExamples extends App {
   case class MutualB1(x: Int) extends MutualB
   case class MutualB2(b: MutualA) extends MutualB
 
-  object MutualA {
+  object MutualA
     implicit val aInstance = Show[MutualA]
-  }
 
-  object MutualB {
+  object MutualB
     implicit val bInstance = Show[MutualB]
-  }
 
   val bar: Super = Bar(0)
   val rec: Super = BarRec(1, Foo(0, "foo"))
@@ -55,62 +52,46 @@ object ShowExamples extends App {
   val mutual: MutualA = MutualA2(MutualB2(MutualA1(0)))
 
   assert(mutual.show == "MutualA2(b = MutualB2(b = MutualA1(x = 0)))")
-}
 
-trait ShowSyntax {
+trait ShowSyntax
   def show: String
-}
 
-object ShowSyntax {
+object ShowSyntax
   implicit def showSyntax[T](a: T)(implicit st: Show[T]): ShowSyntax =
-    new ShowSyntax {
+    new ShowSyntax
       def show = st.show(a)
-    }
-}
 
-trait Show[T] {
+trait Show[T]
   def show(t: T): String
-}
 
-object Show extends LabelledTypeClassCompanion[Show] {
-  implicit def stringShow: Show[String] = new Show[String] {
+object Show extends LabelledTypeClassCompanion[Show]
+  implicit def stringShow: Show[String] = new Show[String]
     def show(t: String) = t
-  }
 
-  implicit def intShow: Show[Int] = new Show[Int] {
+  implicit def intShow: Show[Int] = new Show[Int]
     def show(n: Int) = n.toString
-  }
 
-  object typeClass extends LabelledTypeClass[Show] {
-    def emptyProduct = new Show[HNil] {
+  object typeClass extends LabelledTypeClass[Show]
+    def emptyProduct = new Show[HNil]
       def show(t: HNil) = ""
-    }
 
     def product[F, T <: HList](name: String, sh: Show[F], st: Show[T]) =
-      new Show[F :: T] {
-        def show(ft: F :: T) = {
+      new Show[F :: T]
+        def show(ft: F :: T) =
           val head = sh.show(ft.head)
           val tail = st.show(ft.tail)
           if (tail.isEmpty) s"$name = $head"
           else s"$name = $head, $tail"
-        }
-      }
 
-    def emptyCoproduct = new Show[CNil] {
+    def emptyCoproduct = new Show[CNil]
       def show(t: CNil) = ""
-    }
 
     def coproduct[L, R <: Coproduct](
-        name: String, sl: => Show[L], sr: => Show[R]) = new Show[L :+: R] {
-      def show(lr: L :+: R) = lr match {
+        name: String, sl: => Show[L], sr: => Show[R]) = new Show[L :+: R]
+      def show(lr: L :+: R) = lr match
         case Inl(l) => s"$name(${sl.show(l)})"
         case Inr(r) => s"${sr.show(r)}"
-      }
-    }
 
     def project[F, G](instance: => Show[G], to: F => G, from: G => F) =
-      new Show[F] {
+      new Show[F]
         def show(f: F) = instance.show(to(f))
-      }
-  }
-}

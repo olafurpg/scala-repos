@@ -35,18 +35,16 @@ import Helpers._
   * This makes building Lists of things that can be converted to Menu instance
   * easier because there's a common trait.
   */
-trait ConvertableToMenu {
+trait ConvertableToMenu
   def toMenu: Menu
-}
 
 /**
   * A common trait that defines a portion of a Menu's Link URI path. This allows
   * us to constrain how people construct paths using the DSL by restricting it to
   * Strings or to the <pre>**</pre> object.
   */
-sealed trait MenuPath {
+sealed trait MenuPath
   def pathItem: String
-}
 
 /**
   * This object may be appended to a Menu DSL path, with the syntax
@@ -64,34 +62,29 @@ object ** extends MenuPath { def pathItem = "**" }
   */
 final case class AMenuPath(pathItem: String) extends MenuPath
 
-sealed trait LocPath {
+sealed trait LocPath
   def pathItem: String
   def wildcard_? : Boolean
-}
 
-object LocPath {
+object LocPath
   implicit def stringToLocPath(in: String): LocPath =
     new NormalLocPath(in)
-}
 
-case object * extends LocPath {
+case object * extends LocPath
   def pathItem = "star"
   def wildcard_? = true
   override def toString() = "WildcardLocPath()"
-}
 
-final case class NormalLocPath(pathItem: String) extends LocPath {
+final case class NormalLocPath(pathItem: String) extends LocPath
   def wildcard_? = false
-}
 
 /**
   * The bridge from the Menu singleton to Java-land
   */
-final class MenuJBridge {
+final class MenuJBridge
   def menu(): MenuSingleton = Menu
-}
 
-object Menu extends MenuSingleton {
+object Menu extends MenuSingleton
 
   /**
     * An intermediate class that holds the basic stuff that's needed to make a Menu item for SiteMap.
@@ -100,7 +93,7 @@ object Menu extends MenuSingleton {
   class PreParamMenu[T <: AnyRef](name: String,
                                   linkText: Loc.LinkText[T],
                                   parser: String => Box[T],
-                                  encoder: T => String) {
+                                  encoder: T => String)
 
     /**
       * The method to add a path element to the URL representing this menu item
@@ -125,18 +118,17 @@ object Menu extends MenuSingleton {
                                  else 0)
                              .map(_.trim)
                              .filter(_ != "**")
-                             .map {
+                             .map
                                case "*" => *
                                case "" => NormalLocPath("index")
                                case str => NormalLocPath(str)
-                             } match {
+                             match
                              case Nil => List(NormalLocPath("index"))
                              case xs => xs
-                           },
+                           ,
                            pathElement.endsWith("**"),
                            Nil,
                            Nil)
-  }
 
   class ParamMenuable[T](val name: String,
                          val linkText: Loc.LinkText[T],
@@ -146,7 +138,7 @@ object Menu extends MenuSingleton {
                          val headMatch: Boolean,
                          val params: List[Loc.LocParam[T]],
                          val submenus: List[ConvertableToMenu])
-      extends ConvertableToMenu with BaseMenuable {
+      extends ConvertableToMenu with BaseMenuable
     type BuiltType = ParamMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
@@ -207,7 +199,7 @@ object Menu extends MenuSingleton {
       * Convert the ParamMenuable into a Loc so you can access
       * the well typed currentValue
       */
-    lazy val toLoc: Loc[T] = new Loc[T] with ParamExtractor[String, T] {
+    lazy val toLoc: Loc[T] = new Loc[T] with ParamExtractor[String, T]
       def headMatch: Boolean = ParamMenuable.this.headMatch
 
       // the name of the page
@@ -233,13 +225,11 @@ object Menu extends MenuSingleton {
       val link = new ParamLocLink[T](ParamMenuable.this.path,
                                      ParamMenuable.this.headMatch,
                                      t => List(encoder(t)))
-    }
-  }
 
   /**
     * The companion object to Menuable that has convenience methods
     */
-  object ParamMenuable {
+  object ParamMenuable
 
     /**
       * Convert a Menuable into a Menu when you need a Menu.
@@ -251,7 +241,6 @@ object Menu extends MenuSingleton {
       */
     implicit def toLoc[T](able: ParamMenuable[T]): Loc[T] =
       able.toMenu.loc.asInstanceOf[Loc[T]]
-  }
 
   /**
     * An intermediate class that holds the basic stuff that's needed to make a Menu item for SiteMap.
@@ -260,7 +249,7 @@ object Menu extends MenuSingleton {
   class PreParamsMenu[T <: AnyRef](name: String,
                                    linkText: Loc.LinkText[T],
                                    parser: List[String] => Box[T],
-                                   encoder: T => List[String]) {
+                                   encoder: T => List[String])
 
     /**
       * The method to add a path element to the URL representing this menu item
@@ -284,7 +273,6 @@ object Menu extends MenuSingleton {
                             false,
                             Nil,
                             Nil) with WithSlash
-  }
 
   class ParamsMenuable[T](val name: String,
                           val linkText: Loc.LinkText[T],
@@ -294,7 +282,7 @@ object Menu extends MenuSingleton {
                           val headMatch: Boolean,
                           val params: List[Loc.LocParam[T]],
                           val submenus: List[ConvertableToMenu])
-      extends ConvertableToMenu with BaseMenuable {
+      extends ConvertableToMenu with BaseMenuable
     type BuiltType = ParamsMenuable[T]
 
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType =
@@ -355,7 +343,7 @@ object Menu extends MenuSingleton {
       * Convert the ParamsMenuable into a Loc so you can access
       * the well typed currentValue
       */
-    lazy val toLoc: Loc[T] = new Loc[T] with ParamExtractor[List[String], T] {
+    lazy val toLoc: Loc[T] = new Loc[T] with ParamExtractor[List[String], T]
       // the name of the page
       def name = ParamsMenuable.this.name
 
@@ -383,13 +371,11 @@ object Menu extends MenuSingleton {
       def listToFrom(in: List[String]): Box[List[String]] = Full(in)
 
       val pathLen = ParamsMenuable.this.path.length
-    }
-  }
 
   /**
     * The companion object to Menuable that has convenience methods
     */
-  object ParamsMenuable {
+  object ParamsMenuable
 
     /**
       * Convert a Menuable into a Menu when you need a Menu.
@@ -401,13 +387,12 @@ object Menu extends MenuSingleton {
       */
     implicit def toLoc[T](able: ParamsMenuable[T]): Loc[T] =
       able.toMenu.loc.asInstanceOf[Loc[T]]
-  }
 
   /**
     * An intermediate class that holds the basic stuff that's needed to make a Menu item for SiteMap.
     * You must include at least one URI path element by calling the / method.
     */
-  class PreMenu(name: String, linkText: Loc.LinkText[Unit]) {
+  class PreMenu(name: String, linkText: Loc.LinkText[Unit])
 
     /**
       * The method to add a path element to the URL representing this menu item
@@ -419,14 +404,13 @@ object Menu extends MenuSingleton {
     def path(pathElement: String): Menuable with WithSlash =
       new Menuable(name, linkText, pathElement :: Nil, false, Nil, Nil)
       with WithSlash
-  }
 
   /**
     * This trait contains helper method that will extract
     * parameters and convert path items based on
     * the locPath
     */
-  trait ParamExtractor[ConvertFrom, ConvertTo] { self: Loc[ConvertTo] =>
+  trait ParamExtractor[ConvertFrom, ConvertTo]  self: Loc[ConvertTo] =>
 
     /**
       * What's the path we're extracting against?
@@ -448,29 +432,25 @@ object Menu extends MenuSingleton {
       */
     def listToFrom(in: List[String]): Box[ConvertFrom]
 
-    object ExtractSan {
-      def unapply(in: List[String]): Option[(List[String], Box[ConvertTo])] = {
-        for {
+    object ExtractSan
+      def unapply(in: List[String]): Option[(List[String], Box[ConvertTo])] =
+        for
           (path, paramList) <- extractAndConvertPath(in)
           toConvert <- listToFrom(paramList)
-        } yield {
+        yield
           path -> parser(toConvert)
-        }
-      }
-    }
 
     /**
       * Rewrite the request and emit the type-safe parameter
       */
-    override lazy val rewrite: LocRewrite = Full(NamedPF(locPath.toString) {
+    override lazy val rewrite: LocRewrite = Full(NamedPF(locPath.toString)
       case RewriteRequest(ParsePath(ExtractSan(path, param), _, _, _),
                           _,
                           _)
           if param.isDefined ||
-          params.contains(Loc.MatchWithoutCurrentValue) => {
+          params.contains(Loc.MatchWithoutCurrentValue) =>
           RewriteResponse(path, true) -> param
-        }
-    })
+    )
 
     def headMatch: Boolean
 
@@ -482,7 +462,7 @@ object Menu extends MenuSingleton {
       * the rewritten path and the extracted path parameter
       */
     def extractAndConvertPath(
-        org: List[String]): Box[(List[String], List[String])] = {
+        org: List[String]): Box[(List[String], List[String])] =
       import scala.collection.mutable._
       val retPath = new ListBuffer[String]()
       val retParams = new ListBuffer[String]()
@@ -490,37 +470,30 @@ object Menu extends MenuSingleton {
 
       @tailrec
       def doExtract(op: List[String], mp: List[LocPath]): Boolean =
-        (op, mp) match {
+        (op, mp) match
           case (Nil, Nil) => true
-          case (o :: Nil, Nil) => {
+          case (o :: Nil, Nil) =>
               retParams += o
               headMatch || !gotStar
-            }
 
           case (op, Nil) => retParams ++= op; headMatch
           case (Nil, _) => false
           case (o :: _, NormalLocPath(str) :: _) if o != str => false
-          case (o :: os, * :: ms) => {
+          case (o :: os, * :: ms) =>
               gotStar = true
               retParams += o
               retPath += *.pathItem
               doExtract(os, ms)
-            }
-          case (o :: os, _ :: ms) => {
+          case (o :: os, _ :: ms) =>
               retPath += o
               doExtract(os, ms)
-            }
-        }
 
-      if (doExtract(org, locPath)) {
+      if (doExtract(org, locPath))
         Full((retPath.toList, retParams.toList))
-      } else {
+      else
         Empty
-      }
-    }
-  }
 
-  trait BaseMenuable {
+  trait BaseMenuable
     type BuiltType
 
     def path: List[LocPath]
@@ -529,19 +502,17 @@ object Menu extends MenuSingleton {
     def buildOne(newPath: List[LocPath], newHead: Boolean): BuiltType
     def buildSlashOne(
         newPath: List[LocPath], newHead: Boolean): BuiltType with WithSlash
-  }
 
-  trait WithSlash { self: BaseMenuable =>
+  trait WithSlash  self: BaseMenuable =>
 
     /**
       * The method to add a path element to the URL representing this menu item. This method is
       * typically only used to allow the <pre>**</pre> object mechanism for specifying head match.
       */
-    def /(pathElement: MenuPath): BuiltType = pathElement match {
+    def /(pathElement: MenuPath): BuiltType = pathElement match
       case ** => buildOne(path, true)
       case AMenuPath(pathItem) =>
         buildOne(path ::: List(NormalLocPath(pathItem)), headMatch)
-    }
 
     def path(pathElement: MenuPath): BuiltType = this./(pathElement)
 
@@ -550,7 +521,6 @@ object Menu extends MenuSingleton {
       */
     def /(pathElement: LocPath): BuiltType with WithSlash =
       buildSlashOne(path ::: List(pathElement), headMatch)
-  }
 
   class Menuable(val name: String,
                  val linkText: Loc.LinkText[Unit],
@@ -558,7 +528,7 @@ object Menu extends MenuSingleton {
                  val headMatch: Boolean,
                  val params: List[Loc.LocParam[Unit]],
                  val submenus: List[ConvertableToMenu])
-      extends ConvertableToMenu with BaseMenuable {
+      extends ConvertableToMenu with BaseMenuable
 
     type BuiltType = Menuable
 
@@ -596,12 +566,11 @@ object Menu extends MenuSingleton {
       * Convert the Menuable into a Menu instance
       */
     def toMenu: Menu = Menuable.toMenu(this)
-  }
 
   /**
     * The companion object to Menuable that has convenience methods
     */
-  object Menuable {
+  object Menuable
 
     /**
       * Convert a Menuable into a Menu when you need a Menu.
@@ -613,13 +582,11 @@ object Menu extends MenuSingleton {
               able.linkText,
               able.params),
           able.submenus: _*)
-  }
-}
 
 /**
   * A DSL for building menus.
   */
-sealed trait MenuSingleton {
+sealed trait MenuSingleton
   import Menu._
 
   /**
@@ -662,20 +629,18 @@ sealed trait MenuSingleton {
                           parser: List[String] => Box[T],
                           encoder: T => List[String]): PreParamsMenu[T] =
     new PreParamsMenu[T](name, linkText, parser, encoder)
-}
 
 case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
-    extends HasKids with ConvertableToMenu {
+    extends HasKids with ConvertableToMenu
   lazy val kids: Seq[Menu] = convertableKids.map(_.toMenu)
   private[sitemap] var _parent: Box[HasKids] = Empty
   private[sitemap] var siteMap: SiteMap = _
 
-  private[sitemap] def init(siteMap: SiteMap) {
+  private[sitemap] def init(siteMap: SiteMap)
     this.siteMap = siteMap
     kids.foreach(_._parent = Full(this))
     kids.foreach(_.init(siteMap))
     loc.menu = this
-  }
 
   /**
     * Rebuild the menu by mutating the child menu items.
@@ -684,20 +649,18 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
   def rebuild(f: List[Menu] => List[Menu]): Menu =
     Menu(loc, f(kids.toList): _*)
 
-  private[sitemap] def validate {
+  private[sitemap] def validate
     _parent.foreach(
         p =>
           if (p.isRoot_?)
             throw new SiteMapException(
                 "Menu items with root location (\"/\") cannot have children"))
     kids.foreach(_.validate)
-  }
 
   private[sitemap] def testParentAccess: Either[
-      Boolean, Box[() => LiftResponse]] = _parent match {
+      Boolean, Box[() => LiftResponse]] = _parent match
     case Full(p) => p.testAccess
     case _ => Left(true)
-  }
 
   override private[sitemap] def testAccess: Either[
       Boolean, Box[() => LiftResponse]] = loc.testAccess
@@ -714,7 +677,7 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
 
   override def buildUpperLines(pathAt: HasKids,
                                actual: Menu,
-                               populate: List[MenuItem]): List[MenuItem] = {
+                               populate: List[MenuItem]): List[MenuItem] =
     val kids: List[MenuItem] = _parent.toList.flatMap(
         _.kids.toList.flatMap(m =>
               m.loc.buildItem(if (m == this) populate else Nil,
@@ -722,7 +685,6 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
                               m == pathAt)))
 
     _parent.toList.flatMap(p => p.buildUpperLines(p, actual, kids))
-  }
 
   def makeMenuItem(path: List[Loc[_]]): Box[MenuItem] =
     loc.buildItem(
@@ -737,63 +699,52 @@ case class Menu(loc: Loc[_], private val convertableKids: ConvertableToMenu*)
     if (loc.inGroup_?(group)) makeMenuItem(path)
     else Empty
 
-  private def _inPath(in: List[Loc[_]]): Boolean = in match {
+  private def _inPath(in: List[Loc[_]]): Boolean = in match
     case Nil => false
     case x :: xs if x eq loc => true
     case x :: xs => _inPath(xs)
-  }
 
-  private def _lastInPath(path: List[Loc[_]]): Boolean = path match {
+  private def _lastInPath(path: List[Loc[_]]): Boolean = path match
     case Nil => false
     case xs => xs.last eq loc
-  }
 
-  def breadCrumbs: List[Loc[_]] = _parent match {
+  def breadCrumbs: List[Loc[_]] = _parent match
     case Full(m: Menu) => m.loc.breadCrumbs
     case _ => Nil
-  }
-}
 
 final class ParamLocLink[T](
     path: List[LocPath], headMatch: Boolean, backToList: T => List[String])
-    extends Loc.Link[T](path.map(_.pathItem), headMatch) {
+    extends Loc.Link[T](path.map(_.pathItem), headMatch)
 
   @tailrec
-  def test(toTest: List[String], path: List[LocPath]): Boolean = {
-    (toTest, path) match {
+  def test(toTest: List[String], path: List[LocPath]): Boolean =
+    (toTest, path) match
       case (Nil, Nil) => true
       case (Nil, _) => false
       case (_, Nil) => matchHead_?
       case (str :: _, NormalLocPath(p) :: _) if str != p => false
       case (_ :: ts, * :: ps) => test(ts, ps)
       case (_ :: ts, _ :: ps) => test(ts, ps)
-    }
-  }
 
-  override def isDefinedAt(req: Req): Boolean = {
+  override def isDefinedAt(req: Req): Boolean =
     test(req.path.partPath, path)
-  }
 
   /**
     * Override this method to modify the uriList with data from the Loc's value
     */
-  override def pathList(value: T): List[String] = {
+  override def pathList(value: T): List[String] =
     import scala.collection.mutable.ListBuffer
     val ret = new ListBuffer[String]()
 
     @tailrec
-    def merge(path: List[LocPath], params: List[String]) {
-      (path, params) match {
+    def merge(path: List[LocPath], params: List[String])
+      (path, params) match
         case (Nil, p) => ret ++= p
         case (* :: ps, Nil) => ret += "?"; merge(ps, Nil)
         case (* :: ps, r :: rs) => ret += r; merge(ps, rs)
         case (NormalLocPath(p) :: ps, rs) =>
           ret += p; merge(ps, rs)
-      }
-    }
 
     merge(path, backToList(value))
 
     ret.toList
-  }
-}

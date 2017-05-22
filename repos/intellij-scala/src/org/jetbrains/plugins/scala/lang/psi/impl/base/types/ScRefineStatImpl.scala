@@ -13,6 +13,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types._
   * Date: 22.02.2008
   */
 class ScRefineStatImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScRefineStat {
+    extends ScalaPsiElementImpl(node) with ScRefineStat
   override def toString: String = "RefinementStatement"
-}

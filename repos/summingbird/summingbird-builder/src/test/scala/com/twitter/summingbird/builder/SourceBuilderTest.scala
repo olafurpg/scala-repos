@@ -22,8 +22,8 @@ import org.scalatest.WordSpec
 case class One()
 case class Two()
 
-class SourceBuilderTest extends WordSpec {
-  "SourceBuilder.adjust should properly update a map" in {
+class SourceBuilderTest extends WordSpec
+  "SourceBuilder.adjust should properly update a map" in
     val empty = Map[String, Options]()
 
     assert(empty.get("a") == None)
@@ -38,5 +38,3 @@ class SourceBuilderTest extends WordSpec {
 
     assert(withB.get("a").flatMap(_.get[One]).exists(Set(One())) == true)
     assert(withB.get("b").flatMap(_.get[Two]).exists(Set(Two())) == true)
-  }
-}

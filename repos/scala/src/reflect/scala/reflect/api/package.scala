@@ -37,7 +37,7 @@ import scala.reflect.api.{Universe => ApiUniverse}
   *                        classes. These are abstract in the interface but are later filled in to provide ClassTags
   *                        for the either the runtime reflection or macros entities, depending on the use.
   */
-package object api {
+package object api
 
   // anchors for materialization macros emitted during tag materialization in Implicits.scala
   // implementation is hardwired into `scala.reflect.reify.Taggers`
@@ -46,4 +46,3 @@ package object api {
   private[scala] def materializeWeakTypeTag[T](
       u: ApiUniverse): u.WeakTypeTag[T] = macro ???
   private[scala] def materializeTypeTag[T](u: ApiUniverse): u.TypeTag[T] = macro ???
-}

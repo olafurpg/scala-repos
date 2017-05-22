@@ -28,8 +28,8 @@ import org.apache.spark.{SecurityManager, SparkConf, SparkFunSuite}
 import org.apache.spark.deploy.{Command, DriverDescription}
 import org.apache.spark.util.Clock
 
-class DriverRunnerTest extends SparkFunSuite {
-  private def createDriverRunner() = {
+class DriverRunnerTest extends SparkFunSuite
+  private def createDriverRunner() =
     val command = new Command("mainClass", Seq(), Map(), Seq(), Seq(), Seq())
     val driverDescription = new DriverDescription(
         "jarUrl", 512, 1, true, command)
@@ -42,17 +42,15 @@ class DriverRunnerTest extends SparkFunSuite {
                      null,
                      "spark://1.2.3.4/worker/",
                      new SecurityManager(conf))
-  }
 
-  private def createProcessBuilderAndProcess(): (ProcessBuilderLike, Process) = {
+  private def createProcessBuilderAndProcess(): (ProcessBuilderLike, Process) =
     val processBuilder = mock(classOf[ProcessBuilderLike])
     when(processBuilder.command).thenReturn(Seq("mocked", "command"))
     val process = mock(classOf[Process])
     when(processBuilder.start()).thenReturn(process)
     (processBuilder, process)
-  }
 
-  test("Process succeeds instantly") {
+  test("Process succeeds instantly")
     val runner = createDriverRunner()
 
     val sleeper = mock(classOf[Sleeper])
@@ -65,9 +63,8 @@ class DriverRunnerTest extends SparkFunSuite {
 
     verify(process, times(1)).waitFor()
     verify(sleeper, times(0)).sleep(anyInt())
-  }
 
-  test("Process failing several times and then succeeding") {
+  test("Process failing several times and then succeeding")
     val runner = createDriverRunner()
 
     val sleeper = mock(classOf[Sleeper])
@@ -87,9 +84,8 @@ class DriverRunnerTest extends SparkFunSuite {
     verify(sleeper, times(1)).sleep(1)
     verify(sleeper, times(1)).sleep(2)
     verify(sleeper, times(1)).sleep(4)
-  }
 
-  test("Process doesn't restart if not supervised") {
+  test("Process doesn't restart if not supervised")
     val runner = createDriverRunner()
 
     val sleeper = mock(classOf[Sleeper])
@@ -102,29 +98,26 @@ class DriverRunnerTest extends SparkFunSuite {
 
     verify(process, times(1)).waitFor()
     verify(sleeper, times(0)).sleep(anyInt())
-  }
 
-  test("Process doesn't restart if killed") {
+  test("Process doesn't restart if killed")
     val runner = createDriverRunner()
 
     val sleeper = mock(classOf[Sleeper])
     runner.setSleeper(sleeper)
 
     val (processBuilder, process) = createProcessBuilderAndProcess()
-    when(process.waitFor()).thenAnswer(new Answer[Int] {
-      def answer(invocation: InvocationOnMock): Int = {
+    when(process.waitFor()).thenAnswer(new Answer[Int]
+      def answer(invocation: InvocationOnMock): Int =
         runner.kill()
         -1
-      }
-    })
+    )
 
     runner.runCommandWithRetry(processBuilder, p => (), supervise = true)
 
     verify(process, times(1)).waitFor()
     verify(sleeper, times(0)).sleep(anyInt())
-  }
 
-  test("Reset of backoff counter") {
+  test("Reset of backoff counter")
     val runner = createDriverRunner()
 
     val sleeper = mock(classOf[Sleeper])
@@ -159,5 +152,3 @@ class DriverRunnerTest extends SparkFunSuite {
     // Expected sequence of sleeps is 1,2,1,2
     verify(sleeper, times(2)).sleep(1)
     verify(sleeper, times(2)).sleep(2)
-  }
-}

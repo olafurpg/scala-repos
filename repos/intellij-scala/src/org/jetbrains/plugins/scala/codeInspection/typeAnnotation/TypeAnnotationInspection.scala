@@ -16,8 +16,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScMember
 /**
   * Pavel Fatin
   */
-class TypeAnnotationInspection extends AbstractInspection {
-  def actionFor(holder: ProblemsHolder) = {
+class TypeAnnotationInspection extends AbstractInspection
+  def actionFor(holder: ProblemsHolder) =
     case value: ScPatternDefinition
         if value.isSimple && !value.hasExplicitType =>
       val settings = ScalaCodeStyleSettings.getInstance(holder.getProject)
@@ -61,44 +61,36 @@ class TypeAnnotationInspection extends AbstractInspection {
               settings.OVERRIDING_METHOD_TYPE_ANNOTATION,
               settings.SIMPLE_METHOD_TYPE_ANNOTATION,
               holder)
-  }
 
-  private def isSimple(exp: ScExpression): Boolean = {
-    exp match {
+  private def isSimple(exp: ScExpression): Boolean =
+    exp match
       case _: ScLiteral => true
       case _ => false
-    }
-  }
 
   private def requirementForProperty(
-      property: ScMember, settings: ScalaCodeStyleSettings): Int = {
-    if (property.isLocal) {
+      property: ScMember, settings: ScalaCodeStyleSettings): Int =
+    if (property.isLocal)
       settings.LOCAL_PROPERTY_TYPE_ANNOTATION
-    } else {
+    else
       if (property.isPrivate) settings.PRIVATE_PROPERTY_TYPE_ANNOTATION
       else if (property.isProtected)
         settings.PROTECTED_PROPERTY_TYPE_ANNOTATION
       else settings.PUBLIC_PROPERTY_TYPE_ANNOTATION
-    }
-  }
 
   private def requirementForMethod(
-      method: ScFunctionDefinition, settings: ScalaCodeStyleSettings): Int = {
-    if (method.isLocal) {
+      method: ScFunctionDefinition, settings: ScalaCodeStyleSettings): Int =
+    if (method.isLocal)
       settings.LOCAL_METHOD_TYPE_ANNOTATION
-    } else {
+    else
       if (method.isPrivate) settings.PRIVATE_METHOD_TYPE_ANNOTATION
       else if (method.isProtected) settings.PROTECTED_METHOD_TYPE_ANNOTATION
       else settings.PUBLIC_METHOD_TYPE_ANNOTATION
-    }
-  }
 
   private def kindOf(member: ScMember) =
     if (member.isLocal) "Local"
-    else {
+    else
       if (member.isPrivate) "Private"
       else if (member.isProtected) "Protected" else "Public"
-    }
 
   private def inspect(element: PsiElement,
                       name: String,
@@ -107,23 +99,18 @@ class TypeAnnotationInspection extends AbstractInspection {
                       requirement: Int,
                       overridingPolicy: Int,
                       simplePolicy: Int,
-                      holder: ProblemsHolder) {
+                      holder: ProblemsHolder)
     if (requirement == TypeAnnotationRequirement.Required.ordinal &&
         (!isSimple || simplePolicy == TypeAnnotationPolicy.Regular.ordinal) &&
         (overridingPolicy == TypeAnnotationPolicy.Regular.ordinal ||
-            !isOverriding)) {
+            !isOverriding))
       holder.registerProblem(
           element,
           s"$name requires an explicit type annotation (according to Code Style settings)",
           new AddTypeAnnotationQuickFix(element))
-    }
-  }
 
   private class AddTypeAnnotationQuickFix(element: PsiElement)
-      extends AbstractFixOnPsiElement("Add type annotation", element) {
-    def doApplyFix(project: Project): Unit = {
+      extends AbstractFixOnPsiElement("Add type annotation", element)
+    def doApplyFix(project: Project): Unit =
       val elem = getElement
       ToggleTypeAnnotation.complete(AddOnlyStrategy.withoutEditor, elem)
-    }
-  }
-}

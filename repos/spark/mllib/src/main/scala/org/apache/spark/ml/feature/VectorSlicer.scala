@@ -43,7 +43,7 @@ import org.apache.spark.sql.types.StructType
 @Experimental
 final class VectorSlicer(override val uid: String)
     extends Transformer with HasInputCol with HasOutputCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("vectorSlicer"))
 
@@ -96,41 +96,35 @@ final class VectorSlicer(override val uid: String)
   /** @group setParam */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     // Validity checks
     transformSchema(dataset.schema)
     val inputAttr = AttributeGroup.fromStructField(dataset.schema($(inputCol)))
-    inputAttr.numAttributes.foreach { numFeatures =>
+    inputAttr.numAttributes.foreach  numFeatures =>
       val maxIndex = $(indices).max
       require(
           maxIndex < numFeatures,
           s"Selected feature index $maxIndex invalid for only $numFeatures input features.")
-    }
 
     // Prepare output attributes
     val inds = getSelectedFeatureIndices(dataset.schema)
-    val selectedAttrs: Option[Array[Attribute]] = inputAttr.attributes.map {
+    val selectedAttrs: Option[Array[Attribute]] = inputAttr.attributes.map
       attrs =>
         inds.map(index => attrs(index))
-    }
-    val outputAttr = selectedAttrs match {
+    val outputAttr = selectedAttrs match
       case Some(attrs) => new AttributeGroup($(outputCol), attrs)
       case None => new AttributeGroup($(outputCol), inds.length)
-    }
 
     // Select features
-    val slicer = udf { vec: Vector =>
-      vec match {
+    val slicer = udf  vec: Vector =>
+      vec match
         case features: DenseVector => Vectors.dense(inds.map(features.apply))
         case features: SparseVector => features.slice(inds)
-      }
-    }
     dataset.withColumn(
         $(outputCol), slicer(dataset($(inputCol))), outputAttr.toMetadata())
-  }
 
   /** Get the feature indices in order: indices, names */
-  private def getSelectedFeatureIndices(schema: StructType): Array[Int] = {
+  private def getSelectedFeatureIndices(schema: StructType): Array[Int] =
     val nameFeatures =
       MetadataUtils.getFeatureIndicesFromNames(schema($(inputCol)), $(names))
     val indFeatures = $(indices)
@@ -146,43 +140,35 @@ final class VectorSlicer(override val uid: String)
     require(nameFeatures.length + indFeatures.length == numDistinctFeatures,
             errMsg)
     indFeatures ++ nameFeatures
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     require($(indices).length > 0 || $(names).length > 0,
             s"VectorSlicer requires that at least one feature be selected.")
     SchemaUtils.checkColumnType(schema, $(inputCol), new VectorUDT)
 
-    if (schema.fieldNames.contains($(outputCol))) {
+    if (schema.fieldNames.contains($(outputCol)))
       throw new IllegalArgumentException(
           s"Output column ${$(outputCol)} already exists.")
-    }
     val numFeaturesSelected = $(indices).length + $(names).length
     val outputAttr = new AttributeGroup($(outputCol), numFeaturesSelected)
     val outputFields = schema.fields :+ outputAttr.toStructField()
     StructType(outputFields)
-  }
 
   override def copy(extra: ParamMap): VectorSlicer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object VectorSlicer extends DefaultParamsReadable[VectorSlicer] {
+object VectorSlicer extends DefaultParamsReadable[VectorSlicer]
 
   /** Return true if given feature indices are valid */
-  private[feature] def validIndices(indices: Array[Int]): Boolean = {
-    if (indices.isEmpty) {
+  private[feature] def validIndices(indices: Array[Int]): Boolean =
+    if (indices.isEmpty)
       true
-    } else {
+    else
       indices.length == indices.distinct.length && indices.forall(_ >= 0)
-    }
-  }
 
   /** Return true if given feature names are valid */
-  private[feature] def validNames(names: Array[String]): Boolean = {
+  private[feature] def validNames(names: Array[String]): Boolean =
     names.forall(_.nonEmpty) && names.length == names.distinct.length
-  }
 
   @Since("1.6.0")
   override def load(path: String): VectorSlicer = super.load(path)
-}

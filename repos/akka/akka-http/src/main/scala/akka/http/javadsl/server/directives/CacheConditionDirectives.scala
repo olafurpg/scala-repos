@@ -11,7 +11,7 @@ import akka.http.impl.server.RouteStructure
 
 import scala.annotation.varargs
 
-abstract class CacheConditionDirectives extends BasicDirectives {
+abstract class CacheConditionDirectives extends BasicDirectives
 
   /**
     * Wraps its inner route with support for Conditional Requests as defined
@@ -67,4 +67,3 @@ abstract class CacheConditionDirectives extends BasicDirectives {
                   moreInnerRoutes: Route*): Route =
     RouteStructure.Conditional(Some(entityTag), Some(lastModified))(
         innerRoute, moreInnerRoutes.toList)
-}

@@ -38,18 +38,15 @@ import scalafx.testutil.RunOnApplicationThread
 
 /** Issue 91: "Setting control effect as null causes NPE" */
 @RunWith(classOf[JUnitRunner])
-class Issue091Spec extends FlatSpec with RunOnApplicationThread {
+class Issue091Spec extends FlatSpec with RunOnApplicationThread
 
-  "Issue 91 - cont" should "compile" in {
+  "Issue 91 - cont" should "compile" in
 
-    val drop = new Rectangle() {
+    val drop = new Rectangle()
       effect = new Blend()
-    }
     drop.effect() should not be null
 
     // Issue 91 is causing NPE exception in the following line, due to an attempted implicit conversion of `null`.
     drop.effect = null
 
     drop.effect() should be(null)
-  }
-}

@@ -1,7 +1,7 @@
 package java.util.concurrent.atomic
 
 class AtomicReference[T <: AnyRef](private[this] var value: T)
-    extends Serializable {
+    extends Serializable
 
   def this() = this(null.asInstanceOf[T])
 
@@ -13,23 +13,19 @@ class AtomicReference[T <: AnyRef](private[this] var value: T)
   final def lazySet(newValue: T): Unit =
     set(newValue)
 
-  final def compareAndSet(expect: T, update: T): Boolean = {
+  final def compareAndSet(expect: T, update: T): Boolean =
     if (expect ne value) false
-    else {
+    else
       value = update
       true
-    }
-  }
 
   final def weakCompareAndSet(expect: T, update: T): Boolean =
     compareAndSet(expect, update)
 
-  final def getAndSet(newValue: T): T = {
+  final def getAndSet(newValue: T): T =
     val old = value
     value = newValue
     old
-  }
 
   override def toString(): String =
     String.valueOf(value)
-}

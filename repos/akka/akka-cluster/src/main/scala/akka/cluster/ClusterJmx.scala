@@ -14,7 +14,7 @@ import javax.management.InstanceNotFoundException
 /**
   * Interface for the cluster JMX MBean.
   */
-trait ClusterNodeMBean {
+trait ClusterNodeMBean
 
   /**
     * Member status for this node.
@@ -124,12 +124,11 @@ trait ClusterNodeMBean {
     * The address format is `akka.tcp://actor-system-name@hostname:port`
     */
   def down(address: String)
-}
 
 /**
   * INTERNAL API
   */
-private[akka] class ClusterJmx(cluster: Cluster, log: LoggingAdapter) {
+private[akka] class ClusterJmx(cluster: Cluster, log: LoggingAdapter)
 
   private val mBeanServer = ManagementFactory.getPlatformMBeanServer
   private val clusterMBeanName = new ObjectName("akka:type=Cluster")
@@ -139,15 +138,15 @@ private[akka] class ClusterJmx(cluster: Cluster, log: LoggingAdapter) {
   /**
     * Creates the cluster JMX MBean and registers it in the MBean server.
     */
-  def createMBean() = {
+  def createMBean() =
     val mbean = new StandardMBean(classOf[ClusterNodeMBean])
-    with ClusterNodeMBean {
+    with ClusterNodeMBean
 
       // JMX attributes (bean-style)
 
-      def getClusterStatus: String = {
+      def getClusterStatus: String =
         val members =
-          clusterView.members.toSeq.sorted(Member.ordering).map { m ⇒
+          clusterView.members.toSeq.sorted(Member.ordering).map  m ⇒
             s"""{
               |      "address": "${m.address}",
               |      "status": "${m.status}",
@@ -155,22 +154,22 @@ private[akka] class ClusterJmx(cluster: Cluster, log: LoggingAdapter) {
               |        ${m.roles.map("\"" + _ + "\"").mkString(",\n        ")}
               |      ]
               |    }""".stripMargin
-          } mkString (",\n    ")
+          mkString (",\n    ")
 
         val unreachable =
           clusterView.reachability.observersGroupedByUnreachable.toSeq
             .sortBy(_._1)
-            .map {
+            .map
               case (subject, observers) ⇒
                 s"""{
               |      "node": "${subject.address}",
               |      "observed-by": [
-              |        ${observers.toSeq.sorted
+              |        $observers.toSeq.sorted
                      .map(_.address)
-                     .mkString("\"", "\",\n        \"", "\"")}
+                     .mkString("\"", "\",\n        \"", "\"")
               |      ]
               |    }""".stripMargin
-            } mkString (",\n")
+            mkString (",\n")
 
         s"""{
         |  "self-address": "${clusterView.selfAddress}",
@@ -182,7 +181,6 @@ private[akka] class ClusterJmx(cluster: Cluster, log: LoggingAdapter) {
         |  ]
         |}
         |""".stripMargin
-      }
 
       def getMembers: String =
         clusterView.members.toSeq.map(_.address).mkString(",")
@@ -205,25 +203,19 @@ private[akka] class ClusterJmx(cluster: Cluster, log: LoggingAdapter) {
       def leave(address: String) = cluster.leave(AddressFromURIString(address))
 
       def down(address: String) = cluster.down(AddressFromURIString(address))
-    }
-    try {
+    try
       mBeanServer.registerMBean(mbean, clusterMBeanName)
       logInfo("Registered cluster JMX MBean [{}]", clusterMBeanName)
-    } catch {
+    catch
       case e: InstanceAlreadyExistsException ⇒
       // ignore - we are running multiple cluster nodes in the same JVM (probably for testing)
-    }
-  }
 
   /**
     * Unregisters the cluster JMX MBean from MBean server.
     */
-  def unregisterMBean(): Unit = {
-    try {
+  def unregisterMBean(): Unit =
+    try
       mBeanServer.unregisterMBean(clusterMBeanName)
-    } catch {
+    catch
       case e: InstanceNotFoundException ⇒
       // ignore - we are running multiple cluster nodes in the same JVM (probably for testing)
-    }
-  }
-}

@@ -21,8 +21,8 @@ import java.nio.ByteBuffer
 
 import org.apache.spark.SparkFunSuite
 
-class MesosTaskLaunchDataSuite extends SparkFunSuite {
-  test("serialize and deserialize data must be same") {
+class MesosTaskLaunchDataSuite extends SparkFunSuite
+  test("serialize and deserialize data must be same")
     val serializedTask = ByteBuffer.allocate(40)
     (Range(100, 110).map(serializedTask.putInt(_)))
     serializedTask.rewind
@@ -33,5 +33,3 @@ class MesosTaskLaunchDataSuite extends SparkFunSuite {
     val mesosTaskLaunchData = MesosTaskLaunchData.fromByteString(byteString)
     assert(mesosTaskLaunchData.attemptNumber == attemptNumber)
     assert(mesosTaskLaunchData.serializedTask.equals(serializedTask))
-  }
-}

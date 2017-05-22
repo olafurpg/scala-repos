@@ -26,20 +26,18 @@ import scala.reflect.ClassTag
 trait CanZipMapValues[From,
                       @spec(Double, Int, Float, Long) V,
                       @spec(Double, Int, Float, Long) RV,
-                      +To] {
+                      +To]
 
   /** Maps all corresponding values from the two collections. */
   def map(from: From, from2: From, fn: (V, V) => RV): To
-}
 
-object CanZipMapValues {
+object CanZipMapValues
 
   def canZipMapSelf[S]: CanZipMapValues[S, S, S, S] =
-    new CanZipMapValues[S, S, S, S] {
+    new CanZipMapValues[S, S, S, S]
 
       /** Maps all corresponding values from the two collections. */
       def map(from: S, from2: S, fn: (S, S) => S): S = fn(from, from2)
-    }
 
   type Op[From, V, RV, To] = CanZipMapValues[From, V, RV, To]
 
@@ -49,18 +47,15 @@ object CanZipMapValues {
 
   class OpArray[@spec(Double, Int, Float, Long) V,
                 @spec(Double, Int, Float, Long) RV : ClassTag]
-      extends Op[Array[V], V, RV, Array[RV]] {
+      extends Op[Array[V], V, RV, Array[RV]]
 
     /**Maps all values from the given collection. */
-    def map(from: Array[V], from2: Array[V], fn: (V, V) => RV) = {
+    def map(from: Array[V], from2: Array[V], fn: (V, V) => RV) =
       require(from.length == from2.length, "Array lengths don't match!")
       val arr = new Array[RV](from.length)
-      for (i <- 0 until from.length) {
+      for (i <- 0 until from.length)
         arr(i) = fn(from(i), from2(i))
-      }
       arr
-    }
-  }
 
   // <editor-fold defaultstate="collapsed" desc=" implicit CanZipMapValues[V, RV] implementations ">
 
@@ -87,4 +82,3 @@ object CanZipMapValues {
   implicit object OpArrayFD extends OpArray[Float, Double]
 
   // </editor-fold>
-}

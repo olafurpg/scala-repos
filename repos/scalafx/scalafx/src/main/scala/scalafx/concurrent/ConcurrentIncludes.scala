@@ -49,7 +49,7 @@ object ConcurrentIncludes extends ConcurrentIncludes
   * @define WRS Worker.State
   * @define WSE WorkerStateEvent
   */
-trait ConcurrentIncludes {
+trait ConcurrentIncludes
 
   /**
     * $START$SER.html $SER$END
@@ -87,9 +87,9 @@ trait ConcurrentIncludes {
     */
   implicit def jfxWorker2sfxWorker[T](w: jfxc.Worker[T]): Worker[T] =
     if (w != null)
-      new Worker[T] {
+      new Worker[T]
         override val delegate = w
-      } else null
+      else null
 
   /**
     * $START$WRS.html $WRS$END
@@ -109,4 +109,3 @@ trait ConcurrentIncludes {
   implicit def jfxWorkerStateEvent2sfxWorkerStateEvent(
       w: jfxc.WorkerStateEvent): WorkerStateEvent =
     if (w != null) new WorkerStateEvent(w) else null
-}

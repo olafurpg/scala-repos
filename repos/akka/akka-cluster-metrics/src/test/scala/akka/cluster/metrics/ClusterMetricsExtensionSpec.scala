@@ -13,7 +13,7 @@ import akka.cluster.Cluster
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsExtensionSpec
     extends AkkaSpec(MetricsConfig.clusterSigarMock) with ImplicitSender
-    with RedirectLogging {
+    with RedirectLogging
 
   val cluster = Cluster(system)
 
@@ -40,22 +40,20 @@ class MetricsExtensionSpec
   def awaitSample(time: Long = 3 * sampleInterval.toMillis) =
     Thread.sleep(time)
 
-  "Metrics Extension" must {
+  "Metrics Extension" must
 
-    "collect metrics after start command" in {
+    "collect metrics after start command" in
       extension.supervisor ! CollectionStartMessage
       awaitAssert(metricsNodeCount should ===(nodeCount), 15 seconds)
-    }
 
-    "collect mock sample during a time window" in {
+    "collect mock sample during a time window" in
       awaitAssert(metricsHistorySize should ===(sampleCount), 15 seconds)
       extension.supervisor ! CollectionStopMessage
       awaitSample()
       metricsNodeCount should ===(nodeCount)
       metricsHistorySize should be >= (sampleCount)
-    }
 
-    "verify sigar mock data matches expected ewma data" in {
+    "verify sigar mock data matches expected ewma data" in
 
       val history = metricsView.metricsHistory.reverse.map { _.head }
 
@@ -72,22 +70,19 @@ class MetricsExtensionSpec
 
       expected.size should ===(sampleCount)
 
-      history.zip(expected) foreach {
+      history.zip(expected) foreach
         case (mockMetrics, expectedData) ⇒
-          (mockMetrics, expectedData) match {
+          (mockMetrics, expectedData) match
             case (
                 Cpu(_, _, loadAverageMock, cpuCombinedMock, cpuStolenMock, _),
                 (loadAverageEwma, cpuCombinedEwma, cpuStolenEwma)) ⇒
               loadAverageMock.get should ===(loadAverageEwma +- epsilon)
               cpuCombinedMock.get should ===(cpuCombinedEwma +- epsilon)
               cpuStolenMock.get should ===(cpuStolenEwma +- epsilon)
-          }
-      }
-    }
 
-    "control collector on/off state" in {
+    "control collector on/off state" in
 
-      def cycle() = {
+      def cycle() =
 
         val size1 = metricsHistorySize
         awaitSample()
@@ -107,11 +102,6 @@ class MetricsExtensionSpec
         awaitSample()
         val size5 = metricsHistorySize
         size5 should ===(size4)
-      }
 
-      (1 to 3) foreach { step ⇒
+      (1 to 3) foreach  step ⇒
         cycle()
-      }
-    }
-  }
-}

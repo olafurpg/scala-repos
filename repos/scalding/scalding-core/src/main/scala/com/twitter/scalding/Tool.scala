@@ -25,20 +25,18 @@ import org.apache.hadoop.util.{GenericOptionsParser, Tool => HTool, ToolRunner}
 import scala.annotation.tailrec
 import scala.collection.JavaConverters._
 
-class Tool extends Configured with HTool {
+class Tool extends Configured with HTool
   // This mutable state is not my favorite, but we are constrained by the Hadoop API:
   var rootJob: Option[(Args) => Job] = None
 
   //  Allows you to set the job for the Tool to run
-  def setJobConstructor(jobc: (Args) => Job) {
-    if (rootJob.isDefined) {
+  def setJobConstructor(jobc: (Args) => Job)
+    if (rootJob.isDefined)
       sys.error("Job is already defined")
-    } else {
+    else
       rootJob = Some(jobc)
-    }
-  }
 
-  protected def getJob(args: Args): Job = rootJob match {
+  protected def getJob(args: Args): Job = rootJob match
     case Some(job) => job(args)
     case None if args.positional.isEmpty =>
       throw ArgsException("Usage: Tool <jobClass> --local|--hdfs [args...]")
@@ -47,35 +45,30 @@ class Tool extends Configured with HTool {
       // Remove the job name from the positional arguments:
       val nonJobNameArgs = args + ("" -> args.positional.tail)
       Job(jobName, nonJobNameArgs)
-  }
 
   // This both updates the jobConf with hadoop arguments
   // and returns all the non-hadoop arguments. Should be called once if
   // you want to process hadoop arguments (like -libjars).
-  protected def nonHadoopArgsFrom(args: Array[String]): Array[String] = {
+  protected def nonHadoopArgsFrom(args: Array[String]): Array[String] =
     (new GenericOptionsParser(getConf, args)).getRemainingArgs
-  }
 
-  def parseModeArgs(args: Array[String]): (Mode, Args) = {
+  def parseModeArgs(args: Array[String]): (Mode, Args) =
     val a = Args(nonHadoopArgsFrom(args))
     (Mode(a, getConf), a)
-  }
 
   // Parse the hadoop args, and if job has not been set, instantiate the job
-  def run(args: Array[String]): Int = {
+  def run(args: Array[String]): Int =
     val (mode, jobArgs) = parseModeArgs(args)
     // Connect mode with job Args
     run(getJob(Mode.putMode(mode, jobArgs)))
-  }
 
-  protected def run(job: Job): Int = {
+  protected def run(job: Job): Int =
 
     val onlyPrintGraph = job.args.boolean("tool.graph")
-    if (onlyPrintGraph) {
+    if (onlyPrintGraph)
       // TODO use proper logging
       println(
           "Only printing the job graph, NOT executing. Run without --tool.graph to execute the job")
-    }
 
     /*
      * This is a tail recursive loop that runs all the
@@ -83,9 +76,9 @@ class Tool extends Configured with HTool {
      */
     val jobName = job.getClass.getName
     @tailrec
-    def start(j: Job, cnt: Int) {
+    def start(j: Job, cnt: Int)
       val successful =
-        if (onlyPrintGraph) {
+        if (onlyPrintGraph)
           val flow = j.buildFlow
           /*
            * This just writes out the graph representing
@@ -97,17 +90,16 @@ class Tool extends Configured with HTool {
           println("writing DOT: " + thisDot)
 
           /* We add descriptions if they exist to the stepName so it appears in the .dot file */
-          flow match {
+          flow match
             case hadoopFlow: HadoopFlow =>
               val flowSteps = hadoopFlow.getFlowSteps.asScala
               flowSteps.foreach(
                   step =>
-                    {
                   val baseFlowStep: BaseFlowStep[JobConf] =
                     step.asInstanceOf[BaseFlowStep[JobConf]]
                   val descriptions =
                     baseFlowStep.getConfig.get(Config.StepDescriptions, "")
-                  if (!descriptions.isEmpty) {
+                  if (!descriptions.isEmpty)
                     val stepXofYData = """\(\d+/\d+\)""".r
                       .findFirstIn(baseFlowStep.getName)
                       .getOrElse("")
@@ -117,10 +109,8 @@ class Tool extends Configured with HTool {
                       .getDeclaredMethod("setName", classOf[String])
                     x.setAccessible(true)
                     x.invoke(step, "%s %s".format(stepXofYData, descriptions))
-                  }
-              })
+              )
             case _ => // descriptions not yet supported in other modes
-          }
 
           flow.writeDOT(thisDot)
 
@@ -128,40 +118,30 @@ class Tool extends Configured with HTool {
           println("writing Steps DOT: " + thisStepsDot)
           flow.writeStepsDOT(thisStepsDot)
           true
-        } else {
+        else
           j.validate
           j.run
-        }
       j.clear
       //When we get here, the job is finished
-      if (successful) {
-        j.next match {
+      if (successful)
+        j.next match
           case Some(nextj) => start(nextj, cnt + 1)
           case None => Unit
-        }
-      } else {
+      else
         throw new RuntimeException(
             "Job failed to run: " + jobName +
-            (if (cnt > 0) {
+            (if (cnt > 0)
            " child: " + cnt.toString + ", class: " + j.getClass.getName
-         } else { "" }))
-      }
-    }
+         else { "" }))
     //start a counter to see how deep we recurse:
     start(job, 0)
     0
-  }
-}
 
-object Tool {
-  def main(args: Array[String]) {
-    try {
+object Tool
+  def main(args: Array[String])
+    try
       ToolRunner.run(new JobConf, new Tool, ExpandLibJarsGlobs(args))
-    } catch {
-      case t: Throwable => {
+    catch
+      case t: Throwable =>
           //re-throw the exception with extra info
           throw new Throwable(RichXHandler(t), t)
-        }
-    }
-  }
-}

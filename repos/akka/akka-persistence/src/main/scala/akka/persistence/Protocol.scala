@@ -10,7 +10,7 @@ import akka.actor.NoSerializationVerificationNeeded
   *
   * Messages exchanged between persistent actors, views and a journal/snapshot-store.
   */
-private[persistence] object Protocol {
+private[persistence] object Protocol
 
   /**
     * INTERNAL API.
@@ -25,4 +25,3 @@ private[persistence] object Protocol {
     * One notable exception to this is the shared journal used for testing.
     */
   trait Message extends NoSerializationVerificationNeeded
-}

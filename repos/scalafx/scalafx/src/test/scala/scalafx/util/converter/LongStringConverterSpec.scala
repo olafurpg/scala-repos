@@ -44,11 +44,10 @@ class LongStringConverterSpec
         java.lang.Long, jfxuc.LongStringConverter, Long, LongStringConverter](
         classOf[jfxuc.LongStringConverter],
         classOf[LongStringConverter],
-        classOf[Long]) {
+        classOf[Long])
 
   val examples = List((0L, "0"),
                       (123L, "123"),
                       (-123L, "-123"),
                       (Long.MaxValue, Long.MaxValue.toString),
                       (Long.MinValue, Long.MinValue.toString))
-}

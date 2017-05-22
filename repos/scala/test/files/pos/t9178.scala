@@ -3,11 +3,9 @@
 // on SI-9178.
 //
 // This test encodes the status quo: no deprecation.
-object Test {
+object Test
   def foo(): () => String = () => ""
   val f: () => Any = foo
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     println(f()) // <function0>
-  }
-}

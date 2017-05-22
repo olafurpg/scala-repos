@@ -28,7 +28,7 @@ import org.apache.http.client.methods.HttpGet
   */
 case class ParsingCandidate(urlString: String, linkhash: String, url: URL)
 
-object URLHelper extends Logging {
+object URLHelper extends Logging
 
   private val ESCAPED_FRAGMENT_REPLACEMENT: StringReplacement =
     StringReplacement.compile("#!", "?_escaped_fragment_=")
@@ -36,22 +36,21 @@ object URLHelper extends Logging {
   /**
     * returns a ParseCandidate object  that is a valid URL
     */
-  def getCleanedUrl(urlToCrawl: String): Option[ParsingCandidate] = {
+  def getCleanedUrl(urlToCrawl: String): Option[ParsingCandidate] =
 
     val finalURL =
       if (urlToCrawl.contains("#!"))
         ESCAPED_FRAGMENT_REPLACEMENT.replaceAll(urlToCrawl) else urlToCrawl
 
-    try {
+    try
       val url = new URL(finalURL)
       val linkhash = HashUtils.md5(finalURL)
       Some(ParsingCandidate(finalURL, linkhash, url))
-    } catch {
-      case e: MalformedURLException => {
+    catch
+      case e: MalformedURLException =>
           warn("{0} - is a malformed URL and cannot be processed", urlToCrawl)
           None
-        }
-      case unknown: Exception => {
+      case unknown: Exception =>
           critical(
               "Unable to process URL: {0} due to an unexpected exception:\n\tException Type: {1}\n\tException Message: {2}\n\tException Stack:\n{3}",
               urlToCrawl,
@@ -60,44 +59,32 @@ object URLHelper extends Logging {
               unknown.getStackTraceString)
 
           None
-        }
-    }
-  }
 
-  def tryToURL(url: String): Option[URL] = {
+  def tryToURL(url: String): Option[URL] =
     val finalUrl =
-      if (url.contains("#!")) {
+      if (url.contains("#!"))
         ESCAPED_FRAGMENT_REPLACEMENT.replaceAll(url)
-      } else {
+      else
         url
-      }
 
-    try {
+    try
       Some(new URL(finalUrl))
-    } catch {
+    catch
       case _: Exception => None
-    }
-  }
 
-  def tryToURI(url: String): Option[URI] = {
+  def tryToURI(url: String): Option[URI] =
     val finalUrl =
-      if (url.contains("#!")) {
+      if (url.contains("#!"))
         ESCAPED_FRAGMENT_REPLACEMENT.replaceAll(url)
-      } else {
+      else
         url
-      }
 
-    try {
+    try
       Some(URI.create(finalUrl))
-    } catch {
+    catch
       case _: Exception => None
-    }
-  }
 
-  def tryToHttpGet(url: String): Option[HttpGet] = {
-    tryToURI(url) match {
+  def tryToHttpGet(url: String): Option[HttpGet] =
+    tryToURI(url) match
       case Some(uri) => Some(new HttpGet(uri))
       case None => None
-    }
-  }
-}

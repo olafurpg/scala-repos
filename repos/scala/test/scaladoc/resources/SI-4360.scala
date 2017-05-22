@@ -1,26 +1,23 @@
-package scala.test.scaladoc.prefix {
-  package pack1 {
+package scala.test.scaladoc.prefix
+  package pack1
 
-    class A {
+    class A
       class Z
-    }
 
     class B extends A
 
-    package a {
+    package a
       class C
-    }
 
-    package b {
+    package b
       class C
-    }
 
-    package c {
+    package c
       class C
 
       class L extends pack2.Z
 
-      class TEST {
+      class TEST
         // test inherited classes
         def fooCA(x: pack1.A#Z) = 1
         def fooCB(x: pack1.B#Z) = 1
@@ -30,13 +27,8 @@ package scala.test.scaladoc.prefix {
         def fooPA(x: pack1.a.C) = 1
         def fooPB(x: pack1.b.C) = 1
         def fooPC(x: pack1.c.C) = 1
-      }
 
       class A extends pack1.A
-    }
-  }
 
-  package pack2 {
+  package pack2
     class Z extends pack1.A
-  }
-}

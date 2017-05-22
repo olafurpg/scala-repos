@@ -13,21 +13,20 @@ import org.jetbrains.plugins.scala.lang.completion.handlers.ScalaInsertHandler
   */
 class ScalaChainLookupElement(
     val prefix: ScalaLookupItem, val element: ScalaLookupItem)
-    extends LookupElementDecorator[ScalaLookupItem](element) {
-  override def getAllLookupStrings: util.Set[String] = {
+    extends LookupElementDecorator[ScalaLookupItem](element)
+  override def getAllLookupStrings: util.Set[String] =
     val strings: util.Set[String] = getDelegate.getAllLookupStrings
     val result: THashSet[String] = new THashSet[String]
     result.addAll(strings)
     result.add(getLookupString)
     result
-  }
 
   override def getLookupString: String =
     prefix.getLookupString + "." + element.getLookupString
 
   override def toString: String = getLookupString
 
-  override def renderElement(presentation: LookupElementPresentation) {
+  override def renderElement(presentation: LookupElementPresentation)
     val prefixPresentation: LookupElementPresentation =
       new LookupElementPresentation
     prefix.renderElement(prefixPresentation)
@@ -37,12 +36,10 @@ class ScalaChainLookupElement(
     element.someSmartCompletion = old
     presentation.setItemText(
         prefixPresentation.getItemText + "." + presentation.getItemText)
-    if (element.someSmartCompletion) {
+    if (element.someSmartCompletion)
       presentation.setItemText("Some(" + presentation.getItemText + ")")
-    }
-  }
 
-  override def handleInsert(context: InsertionContext) {
+  override def handleInsert(context: InsertionContext)
     val editor = context.getEditor
     val caretModel = editor.getCaretModel
     val offsetForPrefix =
@@ -52,10 +49,7 @@ class ScalaChainLookupElement(
     val document = context.getDocument
     val status = ScalaInsertHandler.getItemParametersAndAccessorStatus(prefix)
     val addParams = status._1 >= 0 && (status._1 > 0 || !status._3)
-    if (addParams) {
+    if (addParams)
       document.insertString(offsetForPrefix, "()")
       //      val offset = editor.getCaretModel.getOffset
       //      editor.getCaretModel.moveToOffset(offset + 2)
-    }
-  }
-}

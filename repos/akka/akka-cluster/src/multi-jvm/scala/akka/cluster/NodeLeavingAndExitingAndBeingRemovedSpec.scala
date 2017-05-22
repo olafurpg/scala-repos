@@ -11,7 +11,7 @@ import akka.testkit._
 import scala.concurrent.duration._
 
 object NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -22,7 +22,6 @@ object NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec
                 "akka.cluster.auto-down-unreachable-after = 0s"))
         .withFallback(
             MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
-}
 
 class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode1
     extends NodeLeavingAndExitingAndBeingRemovedSpec
@@ -33,44 +32,35 @@ class NodeLeavingAndExitingAndBeingRemovedMultiJvmNode3
 
 abstract class NodeLeavingAndExitingAndBeingRemovedSpec
     extends MultiNodeSpec(NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import NodeLeavingAndExitingAndBeingRemovedMultiJvmSpec._
 
-  "A node that is LEAVING a non-singleton cluster" must {
+  "A node that is LEAVING a non-singleton cluster" must
 
-    "eventually set to REMOVED and removed from membership ring and seen table" taggedAs LongRunningTest in {
+    "eventually set to REMOVED and removed from membership ring and seen table" taggedAs LongRunningTest in
 
       awaitClusterUp(first, second, third)
 
-      within(30.seconds) {
-        runOn(first) {
+      within(30.seconds)
+        runOn(first)
           cluster.leave(second)
-        }
         enterBarrier("second-left")
 
-        runOn(first, third) {
+        runOn(first, third)
           enterBarrier("second-shutdown")
           markNodeAsUnavailable(second)
           // verify that the 'second' node is no longer part of the 'members'/'unreachable' set
-          awaitAssert {
+          awaitAssert
             clusterView.members.map(_.address) should not contain
             (address(second))
-          }
-          awaitAssert {
+          awaitAssert
             clusterView.unreachableMembers.map(_.address) should not contain
             (address(second))
-          }
-        }
 
-        runOn(second) {
+        runOn(second)
           // verify that the second node is shut down
           awaitCond(cluster.isTerminated)
           enterBarrier("second-shutdown")
-        }
-      }
 
       enterBarrier("finished")
-    }
-  }
-}

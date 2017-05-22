@@ -1,6 +1,6 @@
 import scala.collection.immutable._
 
-object Test extends App {
+object Test extends App
   // test that ListSet.tail does not use a builder
   // we can't test for O(1) behavior, so the best we can do is to
   // check that ls.tail always returns the same instance
@@ -20,4 +20,3 @@ object Test extends App {
   val y = x - Collision(0)
   if (y.getClass.getSimpleName != "HashSet1")
     println("HashSet of size 1 should use HashSet1" + y.getClass)
-}

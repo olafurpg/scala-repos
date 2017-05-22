@@ -32,7 +32,7 @@ import org.apache.spark.rdd.RDD
   * @tparam ED the edge attribute type
   */
 class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
-    extends Serializable {
+    extends Serializable
 
   /** The number of edges in the graph. */
   @transient lazy val numEdges: Long = graph.edges.count()
@@ -66,18 +66,16 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     *
     * @param edgeDirection the direction along which to collect neighboring vertex attributes
     */
-  private def degreesRDD(edgeDirection: EdgeDirection): VertexRDD[Int] = {
-    if (edgeDirection == EdgeDirection.In) {
+  private def degreesRDD(edgeDirection: EdgeDirection): VertexRDD[Int] =
+    if (edgeDirection == EdgeDirection.In)
       graph.aggregateMessages(_.sendToDst(1), _ + _, TripletFields.None)
-    } else if (edgeDirection == EdgeDirection.Out) {
+    else if (edgeDirection == EdgeDirection.Out)
       graph.aggregateMessages(_.sendToSrc(1), _ + _, TripletFields.None)
-    } else {
+    else
       // EdgeDirection.Either
       graph.aggregateMessages(ctx => { ctx.sendToSrc(1); ctx.sendToDst(1) },
                               _ + _,
                               TripletFields.None)
-    }
-  }
 
   /**
     * Collect the neighbor vertex ids for each vertex.
@@ -88,36 +86,33 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     * @return the set of neighboring ids for each vertex
     */
   def collectNeighborIds(
-      edgeDirection: EdgeDirection): VertexRDD[Array[VertexId]] = {
+      edgeDirection: EdgeDirection): VertexRDD[Array[VertexId]] =
     val nbrs =
-      if (edgeDirection == EdgeDirection.Either) {
+      if (edgeDirection == EdgeDirection.Either)
         graph.aggregateMessages[Array[VertexId]](
             ctx =>
-              {
                 ctx.sendToSrc(Array(ctx.dstId));
                 ctx.sendToDst(Array(ctx.srcId))
-            },
+            ,
             _ ++ _,
             TripletFields.None)
-      } else if (edgeDirection == EdgeDirection.Out) {
+      else if (edgeDirection == EdgeDirection.Out)
         graph.aggregateMessages[Array[VertexId]](
             ctx => ctx.sendToSrc(Array(ctx.dstId)),
             _ ++ _,
             TripletFields.None)
-      } else if (edgeDirection == EdgeDirection.In) {
+      else if (edgeDirection == EdgeDirection.In)
         graph.aggregateMessages[Array[VertexId]](
             ctx => ctx.sendToDst(Array(ctx.srcId)),
             _ ++ _,
             TripletFields.None)
-      } else {
+      else
         throw new SparkException(
             "It doesn't make sense to collect neighbor ids without a " +
             "direction. (EdgeDirection.Both is not supported; use EdgeDirection.Either instead.)")
-      }
-    graph.vertices.leftZipJoin(nbrs) { (vid, vdata, nbrsOpt) =>
+    graph.vertices.leftZipJoin(nbrs)  (vid, vdata, nbrsOpt) =>
       nbrsOpt.getOrElse(Array.empty[VertexId])
-    }
-  } // end of collectNeighborIds
+  // end of collectNeighborIds
 
   /**
     * Collect the neighbor vertex attributes for each vertex.
@@ -132,15 +127,14 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     * @return the vertex set of neighboring vertex attributes for each vertex
     */
   def collectNeighbors(
-      edgeDirection: EdgeDirection): VertexRDD[Array[(VertexId, VD)]] = {
-    val nbrs = edgeDirection match {
+      edgeDirection: EdgeDirection): VertexRDD[Array[(VertexId, VD)]] =
+    val nbrs = edgeDirection match
       case EdgeDirection.Either =>
         graph.aggregateMessages[Array[(VertexId, VD)]](
             ctx =>
-              {
                 ctx.sendToSrc(Array((ctx.dstId, ctx.dstAttr)))
                 ctx.sendToDst(Array((ctx.srcId, ctx.srcAttr)))
-            },
+            ,
             (a, b) => a ++ b,
             TripletFields.All)
       case EdgeDirection.In =>
@@ -157,11 +151,9 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
         throw new SparkException(
             "collectEdges does not support EdgeDirection.Both. Use" +
             "EdgeDirection.Either instead.")
-    }
-    graph.vertices.leftJoin(nbrs) { (vid, vdata, nbrsOpt) =>
+    graph.vertices.leftJoin(nbrs)  (vid, vdata, nbrsOpt) =>
       nbrsOpt.getOrElse(Array.empty[(VertexId, VD)])
-    }
-  } // end of collectNeighbor
+  // end of collectNeighbor
 
   /**
     * Returns an RDD that contains for each vertex v its local edges,
@@ -178,15 +170,14 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     *
     * @return the local edges for each vertex
     */
-  def collectEdges(edgeDirection: EdgeDirection): VertexRDD[Array[Edge[ED]]] = {
-    edgeDirection match {
+  def collectEdges(edgeDirection: EdgeDirection): VertexRDD[Array[Edge[ED]]] =
+    edgeDirection match
       case EdgeDirection.Either =>
         graph.aggregateMessages[Array[Edge[ED]]](
             ctx =>
-              {
                 ctx.sendToSrc(Array(new Edge(ctx.srcId, ctx.dstId, ctx.attr)))
                 ctx.sendToDst(Array(new Edge(ctx.srcId, ctx.dstId, ctx.attr)))
-            },
+            ,
             (a, b) => a ++ b,
             TripletFields.EdgeOnly)
       case EdgeDirection.In =>
@@ -205,17 +196,14 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
         throw new SparkException(
             "collectEdges does not support EdgeDirection.Both. Use" +
             "EdgeDirection.Either instead.")
-    }
-  }
 
   /**
     * Remove self edges.
     *
     * @return a graph with all self edges removed
     */
-  def removeSelfEdges(): Graph[VD, ED] = {
+  def removeSelfEdges(): Graph[VD, ED] =
     graph.subgraph(epred = e => e.srcId != e.dstId)
-  }
 
   /**
     * Join the vertices with an RDD and then apply a function from the
@@ -245,16 +233,12 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     *
     */
   def joinVertices[U : ClassTag](table: RDD[(VertexId, U)])(
-      mapFunc: (VertexId, VD, U) => VD): Graph[VD, ED] = {
+      mapFunc: (VertexId, VD, U) => VD): Graph[VD, ED] =
     val uf = (id: VertexId, data: VD, o: Option[U]) =>
-      {
-        o match {
+        o match
           case Some(u) => mapFunc(id, data, u)
           case None => data
-        }
-    }
     graph.outerJoinVertices(table)(uf)
-  }
 
   /**
     * Filter the graph by computing some values to filter on, and applying the predicates.
@@ -288,31 +272,25 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
       epred: (EdgeTriplet[VD2, ED2]) => Boolean = (x: EdgeTriplet[VD2, ED2]) =>
           true,
       vpred: (VertexId, VD2) => Boolean = (v: VertexId, d: VD2) =>
-          true): Graph[VD, ED] = {
+          true): Graph[VD, ED] =
     graph.mask(preprocess(graph).subgraph(epred, vpred))
-  }
 
   /**
     * Picks a random vertex from the graph and returns its ID.
     */
-  def pickRandomVertex(): VertexId = {
+  def pickRandomVertex(): VertexId =
     val probability = 50.0 / graph.numVertices
     var found = false
     var retVal: VertexId = null.asInstanceOf[VertexId]
-    while (!found) {
-      val selectedVertices = graph.vertices.flatMap { vidVvals =>
-        if (Random.nextDouble() < probability) { Some(vidVvals._1) } else {
+    while (!found)
+      val selectedVertices = graph.vertices.flatMap  vidVvals =>
+        if (Random.nextDouble() < probability) { Some(vidVvals._1) } else
           None
-        }
-      }
-      if (selectedVertices.count > 1) {
+      if (selectedVertices.count > 1)
         found = true
         val collectedVertices = selectedVertices.collect()
         retVal = collectedVertices(Random.nextInt(collectedVertices.length))
-      }
-    }
     retVal
-  }
 
   /**
     * Convert bi-directional edges into uni-directional ones.
@@ -328,13 +306,12 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     * @return the resulting graph with canonical edges
     */
   def convertToCanonicalEdges(
-      mergeFunc: (ED, ED) => ED = (e1, e2) => e1): Graph[VD, ED] = {
-    val newEdges = graph.edges.map {
+      mergeFunc: (ED, ED) => ED = (e1, e2) => e1): Graph[VD, ED] =
+    val newEdges = graph.edges.map
       case e if e.srcId < e.dstId => ((e.srcId, e.dstId), e.attr)
       case e => ((e.dstId, e.srcId), e.attr)
-    }.reduceByKey(mergeFunc).map(e => new Edge(e._1._1, e._1._2, e._2))
+    .reduceByKey(mergeFunc).map(e => new Edge(e._1._1, e._1._2, e._2))
     Graph(graph.vertices, newEdges)
-  }
 
   /**
     * Execute a Pregel-like iterative vertex-parallel abstraction.  The
@@ -389,10 +366,9 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
       activeDirection: EdgeDirection = EdgeDirection.Either)(
       vprog: (VertexId, VD, A) => VD,
       sendMsg: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
-      mergeMsg: (A, A) => A): Graph[VD, ED] = {
+      mergeMsg: (A, A) => A): Graph[VD, ED] =
     Pregel(graph, initialMsg, maxIterations, activeDirection)(
         vprog, sendMsg, mergeMsg)
-  }
 
   /**
     * Run a dynamic version of PageRank returning a graph with vertex attributes containing the
@@ -400,9 +376,8 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     *
     * @see [[org.apache.spark.graphx.lib.PageRank$#runUntilConvergence]]
     */
-  def pageRank(tol: Double, resetProb: Double = 0.15): Graph[Double, Double] = {
+  def pageRank(tol: Double, resetProb: Double = 0.15): Graph[Double, Double] =
     PageRank.runUntilConvergence(graph, tol, resetProb)
-  }
 
   /**
     * Run personalized PageRank for a given vertex, such that all random walks
@@ -412,9 +387,8 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     */
   def personalizedPageRank(src: VertexId,
                            tol: Double,
-                           resetProb: Double = 0.15): Graph[Double, Double] = {
+                           resetProb: Double = 0.15): Graph[Double, Double] =
     PageRank.runUntilConvergenceWithOptions(graph, tol, resetProb, Some(src))
-  }
 
   /**
     * Run Personalized PageRank for a fixed number of iterations with
@@ -427,9 +401,8 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
   def staticPersonalizedPageRank(
       src: VertexId,
       numIter: Int,
-      resetProb: Double = 0.15): Graph[Double, Double] = {
+      resetProb: Double = 0.15): Graph[Double, Double] =
     PageRank.runWithOptions(graph, numIter, resetProb, Some(src))
-  }
 
   /**
     * Run PageRank for a fixed number of iterations returning a graph with vertex attributes
@@ -438,9 +411,8 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     * @see [[org.apache.spark.graphx.lib.PageRank$#run]]
     */
   def staticPageRank(
-      numIter: Int, resetProb: Double = 0.15): Graph[Double, Double] = {
+      numIter: Int, resetProb: Double = 0.15): Graph[Double, Double] =
     PageRank.run(graph, numIter, resetProb)
-  }
 
   /**
     * Compute the connected component membership of each vertex and return a graph with the vertex
@@ -448,9 +420,8 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     *
     * @see [[org.apache.spark.graphx.lib.ConnectedComponents$#run]]
     */
-  def connectedComponents(): Graph[VertexId, ED] = {
+  def connectedComponents(): Graph[VertexId, ED] =
     ConnectedComponents.run(graph)
-  }
 
   /**
     * Compute the connected component membership of each vertex and return a graph with the vertex
@@ -458,18 +429,16 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     *
     * @see [[org.apache.spark.graphx.lib.ConnectedComponents$#run]]
     */
-  def connectedComponents(maxIterations: Int): Graph[VertexId, ED] = {
+  def connectedComponents(maxIterations: Int): Graph[VertexId, ED] =
     ConnectedComponents.run(graph, maxIterations)
-  }
 
   /**
     * Compute the number of triangles passing through each vertex.
     *
     * @see [[org.apache.spark.graphx.lib.TriangleCount$#run]]
     */
-  def triangleCount(): Graph[Int, ED] = {
+  def triangleCount(): Graph[Int, ED] =
     TriangleCount.run(graph)
-  }
 
   /**
     * Compute the strongly connected component (SCC) of each vertex and return a graph with the
@@ -477,7 +446,6 @@ class GraphOps[VD : ClassTag, ED : ClassTag](graph: Graph[VD, ED])
     *
     * @see [[org.apache.spark.graphx.lib.StronglyConnectedComponents$#run]]
     */
-  def stronglyConnectedComponents(numIter: Int): Graph[VertexId, ED] = {
+  def stronglyConnectedComponents(numIter: Int): Graph[VertexId, ED] =
     StronglyConnectedComponents.run(graph, numIter)
-  }
-} // end of GraphOps
+// end of GraphOps

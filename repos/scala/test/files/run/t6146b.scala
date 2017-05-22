@@ -1,24 +1,20 @@
 import scala.tools.partest.ReplTest
 
-class A {
+class A
   sealed trait F[A]
-}
 
-class C[T] extends A {
+class C[T] extends A
   sealed trait F[A]
-  object X {
+  object X
     object S1 extends F[T]
-  }
   class S2 extends F[T]
-}
-object O extends C[Int] {
+object O extends C[Int]
   def foo(f: F[Int]) = f match { case X.S1 => }
 
   class S3 extends F[Int]
-}
 class S4 extends O.F[String]
 
-object Test extends ReplTest {
+object Test extends ReplTest
   override def code =
     """
 :power
@@ -38,4 +34,3 @@ memType(S2, fTpe)
 memType(S3, fTpe)
 memType(S4, fTpe)
   """.stripMargin.trim
-}

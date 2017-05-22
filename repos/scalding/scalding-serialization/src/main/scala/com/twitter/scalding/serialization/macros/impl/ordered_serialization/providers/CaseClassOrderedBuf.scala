@@ -23,34 +23,33 @@ import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{Com
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object CaseClassOrderedBuf {
+object CaseClassOrderedBuf
   def dispatch(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
-    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe
         if tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass &&
         !tpe.typeSymbol.asClass.isModuleClass &&
         !tpe.typeConstructor.takesTypeArgs =>
       CaseClassOrderedBuf(c)(buildDispatcher, tpe)
-  }
 
   def apply(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
-      outerType: c.Type): TreeOrderedBuf[c.type] = {
+      outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
     val dispatcher = buildDispatcher
     val elementData: List[(c.universe.Type, TermName, TreeOrderedBuf[c.type])] =
-      outerType.declarations.collect {
+      outerType.declarations.collect
         case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
+      .map  accessorMethod =>
         val fieldType = accessorMethod.returnType
         val b: TreeOrderedBuf[c.type] = dispatcher(fieldType)
         (fieldType, accessorMethod.name.toTermName, b)
-      }.toList
+      .toList
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -63,9 +62,9 @@ object CaseClassOrderedBuf {
       override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         ProductLike.put(c)(inputStream, element)(elementData)
 
-      override def get(inputStream: ctx.TermName): ctx.Tree = {
+      override def get(inputStream: ctx.TermName): ctx.Tree =
 
-        val getValProcessor = elementData.map {
+        val getValProcessor = elementData.map
           case (tpe, accessorSymbol, tBuf) =>
             val curR = freshT("curR")
             val builderTree = q"""
@@ -74,12 +73,10 @@ object CaseClassOrderedBuf {
           }
         """
             (builderTree, curR)
-        }
         q"""
        ..${getValProcessor.map(_._1)}
        ${outerType.typeSymbol.companionSymbol}(..${getValProcessor.map(_._2)})
         """
-      }
       override def compare(
           elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
         ProductLike.compare(c)(elementA, elementB)(elementData)
@@ -89,6 +86,3 @@ object CaseClassOrderedBuf {
 
       override def length(element: Tree) =
         ProductLike.length(c)(element)(elementData)
-    }
-  }
-}

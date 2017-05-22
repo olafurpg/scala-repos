@@ -3,14 +3,12 @@ package i18n
 
 import java.util.{Locale, MissingResourceException, ResourceBundle}
 
-object Messages {
+object Messages
 
   def apply(locale: Locale = Locale.getDefault,
-            bundlePath: String = "i18n/messages"): Messages = {
+            bundlePath: String = "i18n/messages"): Messages =
     new Messages(locale, bundlePath)
-  }
-}
-class Messages(locale: Locale, bundlePath: String = "i18n/messages") {
+class Messages(locale: Locale, bundlePath: String = "i18n/messages")
 
   private[this] val bundle: ResourceBundle =
     ResourceBundle.getBundle(bundlePath, locale)
@@ -28,35 +26,28 @@ class Messages(locale: Locale, bundlePath: String = "i18n/messages") {
     *
     * @param key The key to find the message for
     */
-  def get(key: String): Option[String] = {
-    try {
+  def get(key: String): Option[String] =
+    try
       Some(bundle.getString(key))
-    } catch {
+    catch
       case e: MissingResourceException => None
-    }
-  }
 
   def apply(key: String): String = bundle.getString(key)
 
   /**
     * Return the value for the key or fall back to the provided default
     */
-  def getOrElse(key: String, default: => String): String = {
-    try {
+  def getOrElse(key: String, default: => String): String =
+    try
       bundle.getString(key)
-    } catch {
+    catch
       case e: MissingResourceException => default
-    }
-  }
 
   /**
     * Returned the value for the key or the default
     */
-  def apply(key: String, default: String): String = {
-    try {
+  def apply(key: String, default: String): String =
+    try
       bundle.getString(key)
-    } catch {
+    catch
       case e: MissingResourceException => default
-    }
-  }
-}

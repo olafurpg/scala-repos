@@ -34,7 +34,7 @@ package net.liftweb.markdown
   *
   * If you want line breaks after opening/closing block level tags, you have to add the newline yourself.
   */
-trait Decorator {
+trait Decorator
 
   /**
     * The string used to ident one level. Defaults to the empty string
@@ -66,20 +66,18 @@ trait Decorator {
   /** Used to print link elements (default: <a href...)
     */
   def decorateLink(text: String, url: String, title: Option[String]): String =
-    title match {
+    title match
       case None => "<a href=\"" + url + "\">" + text + "</a>"
       case Some(t) =>
         "<a href=\"" + url + "\" title=\"" + t + "\">" + text + "</a>"
-    }
 
   /** Used to print image elements (default: <img ...)
     */
   def decorateImg(alt: String, src: String, title: Option[String]): String =
-    title match {
+    title match
       case None => "<img src=\"" + src + "\" alt=\"" + alt + "\" />"
       case Some(t) =>
         "<img src=\"" + src + "\" alt=\"" + alt + "\" title=\"" + t + "\" />"
-    }
 
   /**used to print a horizontal ruler defaults to "<hr />\n" */
   def decorateRuler(): String = "<hr />\n"
@@ -125,7 +123,6 @@ trait Decorator {
 
   /** used to print the end of an ordered list, defaults to </ol>\n */
   def decorateOListClose(): String = "</ol>\n"
-}
 
 /**
   * Default instance of Decorator with the standard Markdown behavior

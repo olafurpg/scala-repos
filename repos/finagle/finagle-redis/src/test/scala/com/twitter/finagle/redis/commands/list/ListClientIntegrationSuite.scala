@@ -9,33 +9,29 @@ import org.scalatest.junit.JUnitRunner
 
 @Ignore
 @RunWith(classOf[JUnitRunner])
-final class ListClientIntegrationSuite extends RedisClientTest {
+final class ListClientIntegrationSuite extends RedisClientTest
 
   val IndexFailureMessage = "Unknown failure calling Index"
   val PopFailureMessage = "Failure popping element from list"
 
-  test("Correctly push elements onto a list", RedisTest, ClientTest) {
-    withRedisClient { client =>
+  test("Correctly push elements onto a list", RedisTest, ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.lPush(foo, List(bar))) == 1)
       assert(Await.result(client.lPush(foo, List(baz))) == 2)
-    }
-  }
 
-  test("Correctly pop elements off a list", RedisTest, ClientTest) {
-    withRedisClient { client =>
+  test("Correctly pop elements off a list", RedisTest, ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.lPush(foo, List(bar))) == 1)
       assert(Await.result(client.lPush(foo, List(baz))) == 2)
       assert(
           Await.result(client.lPop(foo)).getOrElse(fail(PopFailureMessage)) == baz)
       assert(
           Await.result(client.lPop(foo)).getOrElse(fail(PopFailureMessage)) == bar)
-    }
-  }
 
   test("Correctly measure length of an actively changing list",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = foo
 
       assert(Await.result(client.lLen(key)) == 0)
@@ -46,13 +42,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == string2ChanBuf(
               "bar"))
       assert(Await.result(client.lLen(key)) == 0)
-    }
-  }
 
   test("Correctly index elements of an actively changing list",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("lindex")
 
       assert(Await.result(client.lIndex(key, 0)) == None)
@@ -71,13 +65,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
             .getOrElse(fail(IndexFailureMessage)) == bar)
       assert(
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == bar)
-    }
-  }
 
   test("Correctly insert before & after a pushed element",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("linsert")
       val PivotFailureMessage = "Pivot not found"
 
@@ -94,13 +86,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == moo)
       assert(
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == bar)
-    }
-  }
 
   test("Correctly Push -->> Remove -->> Pop elements in order",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("lremove")
 
       assert(Await.result(client.lPush(key, List(bar))) == 1)
@@ -108,13 +98,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
       assert(Await.result(client.lRem(key, 1, baz)) == 1)
       assert(
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == bar)
-    }
-  }
 
   test("Correctly push members, set one, then pop them off in order",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("lset")
 
       assert(Await.result(client.lPush(key, List(bar))) == 1)
@@ -130,13 +118,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == moo)
       assert(
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == bar)
-    }
-  }
 
   test("Correctly push members, examine the range, then pop them off",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("lrange")
 
       assert(Await.result(client.lPush(key, List(bar))) == 1)
@@ -146,13 +132,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == baz)
       assert(
           Await.result(client.lPop(key)).getOrElse(fail(PopFailureMessage)) == bar)
-    }
-  }
 
   test("Correctly push members, the poll members queue style (RPOP)",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("rpop")
 
       assert(Await.result(client.lPush(key, List(bar))) == 1)
@@ -161,13 +145,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
           Await.result(client.rPop(key)).getOrElse(fail(PopFailureMessage)) == bar)
       assert(
           Await.result(client.rPop(key)).getOrElse(fail(PopFailureMessage)) == baz)
-    }
-  }
 
   test("Correctly push then pop members from the HEAD (RPUSH RPOP)",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("rpush")
 
       assert(Await.result(client.rPush(key, List(bar))) == 1)
@@ -176,13 +158,11 @@ final class ListClientIntegrationSuite extends RedisClientTest {
           Await.result(client.rPop(key)).getOrElse(fail(PopFailureMessage)) == baz)
       assert(
           Await.result(client.rPop(key)).getOrElse(fail(PopFailureMessage)) == bar)
-    }
-  }
 
   test("Correctly push and trim members, then pop the two remaining",
        RedisTest,
-       ClientTest) {
-    withRedisClient { client =>
+       ClientTest)
+    withRedisClient  client =>
       val key = string2ChanBuf("ltrim")
 
       assert(Await.result(client.lPush(key, List(bar))) == 1)
@@ -207,6 +187,3 @@ final class ListClientIntegrationSuite extends RedisClientTest {
           Await.result(client.rPop(key)).getOrElse(fail(PopFailureMessage)) == boo)
       assert(
           Await.result(client.rPop(key)).getOrElse(fail(PopFailureMessage)) == moo)
-    }
-  }
-}

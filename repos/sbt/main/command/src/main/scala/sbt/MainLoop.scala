@@ -11,31 +11,29 @@ import sbt.internal.io.Using
 import sbt.internal.util.{ErrorHandling, GlobalLogBacking, GlobalLogging}
 import sbt.util.{AbstractLogger, Logger}
 
-object MainLoop {
+object MainLoop
 
   /** Entry point to run the remaining commands in State with managed global logging.*/
-  def runLogged(state: State): xsbti.MainResult = {
+  def runLogged(state: State): xsbti.MainResult =
     // We've disabled jline shutdown hooks to prevent classloader leaks, and have been careful to always restore
     // the jline terminal in finally blocks, but hitting ctrl+c prevents finally blocks from being executed, in that
     // case the only way to restore the terminal is in a shutdown hook.
     val shutdownHook = new Thread(
-        new Runnable {
+        new Runnable
       def run(): Unit = TerminalFactory.get().restore()
-    })
+    )
 
-    try {
+    try
       Runtime.getRuntime.addShutdownHook(shutdownHook)
       runLoggedLoop(state, state.globalLogging.backing)
-    } finally {
+    finally
       Runtime.getRuntime.removeShutdownHook(shutdownHook)
-    }
-  }
 
   /** Run loop that evaluates remaining commands and manages changes to global logging configuration.*/
   @tailrec
   def runLoggedLoop(
       state: State, logBacking: GlobalLogBacking): xsbti.MainResult =
-    runAndClearLast(state, logBacking) match {
+    runAndClearLast(state, logBacking) match
       case ret: Return =>
         // delete current and last log files when exiting normally
         logBacking.file.delete()
@@ -49,11 +47,10 @@ object MainLoop {
         // make previous log file the current log file
         logBacking.file.delete
         runLoggedLoop(keep.state, logBacking.unshift)
-    }
 
   /** Runs the next sequence of commands, cleaning up global logging after any exceptions. */
   def runAndClearLast(state: State, logBacking: GlobalLogBacking): RunNext =
-    try runWithNewLog(state, logBacking) catch {
+    try runWithNewLog(state, logBacking) catch
       case e: xsbti.FullReload =>
         deleteLastLog(logBacking)
         throw e // pass along a reboot request
@@ -63,7 +60,6 @@ object MainLoop {
             logBacking.file)
         deleteLastLog(logBacking)
         throw e
-    }
 
   /** Deletes the previous global log file. */
   def deleteLastLog(logBacking: GlobalLogBacking): Unit =
@@ -71,26 +67,23 @@ object MainLoop {
 
   /** Runs the next sequence of commands with global logging in place. */
   def runWithNewLog(state: State, logBacking: GlobalLogBacking): RunNext =
-    Using.fileWriter(append = true)(logBacking.file) { writer =>
+    Using.fileWriter(append = true)(logBacking.file)  writer =>
       val out = new java.io.PrintWriter(writer)
       val newLogging = state.globalLogging.newLogger(out, logBacking)
       transferLevels(state, newLogging)
       val loggedState = state.copy(globalLogging = newLogging)
       try run(loggedState) finally out.close()
-    }
 
   /** Transfers logging and trace levels from the old global loggers to the new ones. */
   private[this] def transferLevels(
-      state: State, logging: GlobalLogging): Unit = {
+      state: State, logging: GlobalLogging): Unit =
     val old = state.globalLogging
     Logger.transferLevels(old.backed, logging.backed)
-    (old.full, logging.full) match {
+    (old.full, logging.full) match
       // well, this is a hack
       case (oldLog: AbstractLogger, newLog: AbstractLogger) =>
         Logger.transferLevels(oldLog, newLog)
       case _ => ()
-    }
-  }
 
   sealed trait RunNext
   final class ClearGlobalLog(val state: State) extends RunNext
@@ -99,19 +92,17 @@ object MainLoop {
 
   /** Runs the next sequence of commands that doesn't require global logging changes.*/
   @tailrec def run(state: State): RunNext =
-    state.next match {
+    state.next match
       case State.Continue => run(next(state))
       case State.ClearGlobalLog => new ClearGlobalLog(state.continue)
       case State.KeepLastLog => new KeepGlobalLog(state.continue)
       case ret: State.Return => new Return(ret.result)
-    }
 
   def next(state: State): State =
-    ErrorHandling.wideConvert { state.process(Command.process) } match {
+    ErrorHandling.wideConvert { state.process(Command.process) } match
       case Right(s) => s
       case Left(t: xsbti.FullReload) => throw t
       case Left(t) => state.handleError(t)
-    }
 
   @deprecated("Use State.handleError", "0.13.0")
   def handleException(e: Throwable, s: State): State = s.handleError(e)
@@ -122,4 +113,3 @@ object MainLoop {
 
   def logFullException(e: Throwable, log: Logger): Unit =
     State.logFullException(e, log)
-}

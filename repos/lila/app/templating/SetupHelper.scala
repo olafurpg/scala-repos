@@ -9,7 +9,7 @@ import lila.report.Reason
 import lila.setup.TimeMode
 import lila.tournament.System
 
-trait SetupHelper { self: I18nHelper =>
+trait SetupHelper  self: I18nHelper =>
 
   def translatedTimeModeChoices(implicit ctx: Context) = List(
       (TimeMode.RealTime.id.toString, trans.realTime.str(), none),
@@ -63,15 +63,13 @@ trait SetupHelper { self: I18nHelper =>
     translatedVariantChoicesWithVariants :+ variantTuple(
         chess.variant.FromPosition)
 
-  def translatedSpeedChoices(implicit ctx: Context) = Speed.limited map { s =>
-    (s.id.toString, {
-      (s.range.min, s.range.max) match {
+  def translatedSpeedChoices(implicit ctx: Context) = Speed.limited map  s =>
+    (s.id.toString,
+      (s.range.min, s.range.max) match
         case (0, y) => s.toString + " - " + trans.lessThanNbMinutes(y / 60 + 1)
         case (x, y) =>
           s.toString + " - " + trans.xToYMinutes(x / 60, y / 60 + 1)
-      }
-    }, none)
-  }
+    , none)
 
   def translatedAnimationChoices(implicit ctx: Context) = List(
       (Pref.Animation.NONE, trans.none.str()),
@@ -153,4 +151,3 @@ trait SetupHelper { self: I18nHelper =>
   def translatedBlindfoldChoices(implicit ctx: Context) =
     List(Pref.Blindfold.NO -> trans.no.str(),
          Pref.Blindfold.YES -> trans.yes.str())
-}

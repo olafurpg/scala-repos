@@ -27,11 +27,11 @@ import org.joda.time.format._
 
 object JodaHelpers extends JodaHelpers
 
-trait JodaHelpers {
+trait JodaHelpers
   def dateTimeFormatter: DateTimeFormatter = ISODateTimeFormat.dateTime
-  def toDateTime(in: Any): Box[DateTime] = {
-    try {
-      in match {
+  def toDateTime(in: Any): Box[DateTime] =
+    try
+      in match
         case null => Empty
         case d: Date => Full(new DateTime(d))
         case d: DateTime => Full(d)
@@ -43,9 +43,5 @@ trait JodaHelpers {
         case v :: vs => toDateTime(v)
         case s: String => tryo(DateTime.parse(s, dateTimeFormatter))
         case o => toDateTime(o.toString)
-      }
-    } catch {
+    catch
       case e: Exception => Failure("Bad date: " + in, Full(e), Empty)
-    }
-  }
-}

@@ -1,12 +1,12 @@
 package gitbucket.core.model
 
-trait WebHookComponent extends TemplateComponent { self: Profile =>
+trait WebHookComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
 
   lazy val WebHooks = TableQuery[WebHooks]
 
   class WebHooks(tag: Tag)
-      extends Table[WebHook](tag, "WEB_HOOK") with BasicTemplate {
+      extends Table[WebHook](tag, "WEB_HOOK") with BasicTemplate
     val url = column[String]("URL")
     val token = column[Option[String]]("TOKEN", O.Nullable)
     def * =
@@ -15,8 +15,6 @@ trait WebHookComponent extends TemplateComponent { self: Profile =>
 
     def byPrimaryKey(owner: String, repository: String, url: String) =
       byRepository(owner, repository) && (this.url === url.bind)
-  }
-}
 
 case class WebHook(
     userName: String,
@@ -25,7 +23,7 @@ case class WebHook(
     token: Option[String]
 )
 
-object WebHook {
+object WebHook
   sealed class Event(var name: String)
   case object CommitComment extends Event("commit_comment")
   case object Create extends Event("create")
@@ -47,7 +45,7 @@ object WebHook {
   case object Status extends Event("status")
   case object TeamAdd extends Event("team_add")
   case object Watch extends Event("watch")
-  object Event {
+  object Event
     val values = List(CommitComment,
                       Create,
                       Delete,
@@ -70,5 +68,3 @@ object WebHook {
     private val map: Map[String, Event] = values.map(e => e.name -> e).toMap
     def valueOf(name: String): Event = map(name)
     def valueOpt(name: String): Option[Event] = map.get(name)
-  }
-}

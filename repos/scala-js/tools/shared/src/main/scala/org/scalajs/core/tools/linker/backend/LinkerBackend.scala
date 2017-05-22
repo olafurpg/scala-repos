@@ -27,7 +27,7 @@ import org.scalajs.core.tools.linker.analyzer.SymbolRequirement
 abstract class LinkerBackend(val semantics: Semantics,
                              val esLevel: ESLevel,
                              val withSourceMap: Boolean,
-                             protected val config: LinkerBackend.Config) {
+                             protected val config: LinkerBackend.Config)
 
   /** Symbols this backend needs to be present in the linking unit. */
   val symbolRequirements: SymbolRequirement
@@ -47,15 +47,13 @@ abstract class LinkerBackend(val semantics: Semantics,
     *  [[org.scalajs.core.tools.javascript.OutputMode OutputMode]]).
     *  @throws java.lang.IllegalArgumentException if there is a mismatch
     */
-  protected def verifyUnit(unit: LinkingUnit): Unit = {
+  protected def verifyUnit(unit: LinkingUnit): Unit =
     require(unit.semantics == semantics,
             "LinkingUnit and LinkerBackend must agree on semantics")
     require(unit.esLevel == esLevel,
             "LinkingUnit and LinkerBackend must agree on esLevel")
-  }
-}
 
-object LinkerBackend {
+object LinkerBackend
 
   /** Configurations relevant to the backend */
   final class Config private (
@@ -65,7 +63,7 @@ object LinkerBackend {
       val customOutputWrapper: (String, String) = ("", ""),
       /** Pretty-print the output. */
       val prettyPrint: Boolean = false
-  ) {
+  )
     def withRelativizeSourceMapBase(
         relativizeSourceMapBase: Option[URI]): Config =
       copy(relativizeSourceMapBase = relativizeSourceMapBase)
@@ -80,12 +78,8 @@ object LinkerBackend {
     private def copy(
         relativizeSourceMapBase: Option[URI] = relativizeSourceMapBase,
         customOutputWrapper: (String, String) = customOutputWrapper,
-        prettyPrint: Boolean = prettyPrint): Config = {
+        prettyPrint: Boolean = prettyPrint): Config =
       new Config(relativizeSourceMapBase, customOutputWrapper, prettyPrint)
-    }
-  }
 
-  object Config {
+  object Config
     def apply(): Config = new Config()
-  }
-}

@@ -26,7 +26,7 @@ import org.scalajs.core.tools.jsdep.ResolvedJSDependency
   *  scalajsCom.close();
   *  }}}
   */
-trait ComJSEnv extends AsyncJSEnv {
+trait ComJSEnv extends AsyncJSEnv
   def comRunner(
       libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner
 
@@ -35,21 +35,16 @@ trait ComJSEnv extends AsyncJSEnv {
   override def loadLibs(libs: Seq[ResolvedJSDependency]): ComJSEnv =
     new ComLoadedLibs { val loadedLibs = libs }
 
-  private[jsenv] trait ComLoadedLibs extends AsyncLoadedLibs with ComJSEnv {
+  private[jsenv] trait ComLoadedLibs extends AsyncLoadedLibs with ComJSEnv
     def comRunner(
-        libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+        libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner =
       ComJSEnv.this.comRunner(loadedLibs ++ libs, code)
-    }
-  }
-}
 
-object ComJSEnv {
+object ComJSEnv
   private final val defaultMsg = "JSCom has been closed"
 
   class ComClosedException(msg: String, cause: Throwable)
-      extends Exception(msg, cause) {
+      extends Exception(msg, cause)
     def this() = this(defaultMsg, null)
     def this(cause: Throwable) = this(defaultMsg, cause)
     def this(msg: String) = this(msg, null)
-  }
-}

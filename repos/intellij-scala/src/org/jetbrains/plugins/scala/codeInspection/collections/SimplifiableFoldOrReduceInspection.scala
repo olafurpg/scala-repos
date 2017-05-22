@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
   * 2014-05-05
   */
 class SimplifiableFoldOrReduceInspection
-    extends OperationOnCollectionInspection {
+    extends OperationOnCollectionInspection
   val foldSum = new FoldSimplificationType(this, "fold.sum", "0", "+", "sum")
   val foldProduct = new FoldSimplificationType(
       this, "fold.product", "1", "*", "product")
@@ -23,7 +23,6 @@ class SimplifiableFoldOrReduceInspection
 
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(foldSum, foldProduct, reduceSum, reduceProduct, reduceMax, reduceMin)
-}
 
 object SimplifiableFoldOrReduceInspection {}
 
@@ -32,13 +31,13 @@ class FoldSimplificationType(inspection: OperationOnCollectionInspection,
                              startElem: String,
                              opName: String,
                              methodName: String)
-    extends SimplificationType() {
+    extends SimplificationType()
 
   override def hint = InspectionBundle.message(keyPrefix + ".hint")
   override def description = InspectionBundle.message(keyPrefix + ".short")
 
-  override def getSimplification(expr: ScExpression): Option[Simplification] = {
-    expr match {
+  override def getSimplification(expr: ScExpression): Option[Simplification] =
+    expr match
       case qual `.fold` (literal(`startElem`), binaryOperation(`opName`))
           if implicitParameterExistsFor(methodName, qual) =>
         val simpl = replace(expr)
@@ -46,21 +45,18 @@ class FoldSimplificationType(inspection: OperationOnCollectionInspection,
           .highlightFrom(qual)
         Some(simpl)
       case _ => None
-    }
-  }
-}
 
 class ReduceSimplificationType(inspection: OperationOnCollectionInspection,
                                keyPrefix: String,
                                opName: String,
                                methodName: String)
-    extends SimplificationType() {
+    extends SimplificationType()
 
   override def hint = InspectionBundle.message(keyPrefix + ".hint")
   override def description = InspectionBundle.message(keyPrefix + ".short")
 
-  override def getSimplification(expr: ScExpression): Option[Simplification] = {
-    expr match {
+  override def getSimplification(expr: ScExpression): Option[Simplification] =
+    expr match
       case qual `.reduce`(binaryOperation(`opName`))
           if implicitParameterExistsFor(methodName, qual) =>
         val simpl = replace(expr)
@@ -68,6 +64,3 @@ class ReduceSimplificationType(inspection: OperationOnCollectionInspection,
           .highlightFrom(qual)
         Some(simpl)
       case _ => None
-    }
-  }
-}

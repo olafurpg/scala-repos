@@ -23,15 +23,14 @@ import com.typesafe.config.ConfigFactory
   * This "sample" simulates lots of data entries, and can be used for
   * optimizing replication (e.g. catch-up when adding more nodes).
   */
-object LotsOfDataBot {
+object LotsOfDataBot
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     if (args.isEmpty) startup(Seq("2551", "2552", "0"))
     else startup(args)
-  }
 
-  def startup(ports: Seq[String]): Unit = {
-    ports.foreach { port ⇒
+  def startup(ports: Seq[String]): Unit =
+    ports.foreach  port ⇒
       // Override the configuration of the port
       val config = ConfigFactory
         .parseString("akka.remote.netty.tcp.port=" + port)
@@ -61,13 +60,10 @@ object LotsOfDataBot {
       val system = ActorSystem("ClusterSystem", config)
       // Create an actor that handles cluster domain events
       system.actorOf(Props[LotsOfDataBot], name = "dataBot")
-    }
-  }
 
   private case object Tick
-}
 
-class LotsOfDataBot extends Actor with ActorLogging {
+class LotsOfDataBot extends Actor with ActorLogging
   import LotsOfDataBot._
   import Replicator._
 
@@ -87,50 +83,43 @@ class LotsOfDataBot extends Actor with ActorLogging {
 
   def receive = if (isPassive) passive else active
 
-  def active: Receive = {
+  def active: Receive =
     case Tick ⇒
       val loop = if (count >= maxEntries) 1 else 100
-      for (_ ← 1 to loop) {
+      for (_ ← 1 to loop)
         count += 1
         if (count % 10000 == 0) log.info("Reached {} entries", count)
-        if (count == maxEntries) {
+        if (count == maxEntries)
           log.info("Reached {} entries", count)
           tickTask.cancel()
           tickTask = context.system.scheduler
             .schedule(1.seconds, 1.seconds, self, Tick)
-        }
         val key = ORSetKey[String]((count % maxEntries).toString)
         if (count <= 100) replicator ! Subscribe(key, self)
         val s = ThreadLocalRandom.current().nextInt(97, 123).toChar.toString
-        if (count <= maxEntries || ThreadLocalRandom.current().nextBoolean()) {
+        if (count <= maxEntries || ThreadLocalRandom.current().nextBoolean())
           // add
           replicator ! Update(key, ORSet(), WriteLocal)(_ + s)
-        } else {
+        else
           // remove
           replicator ! Update(key, ORSet(), WriteLocal)(_ - s)
-        }
-      }
 
     case _: UpdateResponse[_] ⇒ // ignore
 
     case c @ Changed(ORSetKey(id)) ⇒
       val ORSet(elements) = c.dataValue
       log.info("Current elements: {} -> {}", id, elements)
-  }
 
-  def passive: Receive = {
+  def passive: Receive =
     case Tick ⇒
       if (!tickTask.isCancelled) replicator ! GetKeyIds
     case GetKeyIdsResult(keys) ⇒
-      if (keys.size >= maxEntries) {
+      if (keys.size >= maxEntries)
         tickTask.cancel()
         val duration = (System.nanoTime() - startTime).nanos.toMillis
         log.info("It took {} ms to replicate {} entries", duration, keys.size)
-      }
     case c @ Changed(ORSetKey(id)) ⇒
       val ORSet(elements) = c.dataValue
       log.info("Current elements: {} -> {}", id, elements)
-  }
 
   override def postStop(): Unit = tickTask.cancel()
-}

@@ -19,27 +19,24 @@ package org.apache.spark.serializer
 
 import org.apache.spark.{SparkConf, SparkFunSuite}
 
-class JavaSerializerSuite extends SparkFunSuite {
-  test("JavaSerializer instances are serializable") {
+class JavaSerializerSuite extends SparkFunSuite
+  test("JavaSerializer instances are serializable")
     val serializer = new JavaSerializer(new SparkConf())
     val instance = serializer.newInstance()
     val obj =
       instance.deserialize[JavaSerializer](instance.serialize(serializer))
     // enforce class cast
     obj.getClass
-  }
 
-  test("Deserialize object containing a primitive Class as attribute") {
+  test("Deserialize object containing a primitive Class as attribute")
     val serializer = new JavaSerializer(new SparkConf())
     val instance = serializer.newInstance()
     val obj = instance.deserialize[ContainsPrimitiveClass](
         instance.serialize(new ContainsPrimitiveClass()))
     // enforce class cast
     obj.getClass
-  }
-}
 
-private class ContainsPrimitiveClass extends Serializable {
+private class ContainsPrimitiveClass extends Serializable
   val intClass = classOf[Int]
   val longClass = classOf[Long]
   val shortClass = classOf[Short]
@@ -49,4 +46,3 @@ private class ContainsPrimitiveClass extends Serializable {
   val booleanClass = classOf[Boolean]
   val byteClass = classOf[Byte]
   val voidClass = classOf[Void]
-}

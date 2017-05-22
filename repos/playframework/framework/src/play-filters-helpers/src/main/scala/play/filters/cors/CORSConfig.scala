@@ -35,7 +35,7 @@ case class CORSConfig(allowedOrigins: Origins = Origins.None,
                       isHttpHeaderAllowed: String => Boolean = _ => true,
                       exposedHeaders: Seq[String] = Seq.empty,
                       supportsCredentials: Boolean = true,
-                      preflightMaxAge: Duration = 1.hour) {
+                      preflightMaxAge: Duration = 1.hour)
   def anyOriginAllowed: Boolean = allowedOrigins == Origins.All
   def withAnyOriginAllowed = withOriginsAllowed(Origins.All)
 
@@ -66,26 +66,22 @@ case class CORSConfig(allowedOrigins: Origins = Origins.None,
     withExposedHeaders(headers.asScala.toSeq)
   def withPreflightMaxAge(maxAge: java.time.Duration): CORSConfig =
     withPreflightMaxAge(Duration.fromNanos(maxAge.toNanos))
-}
 
 /**
   * Helpers to build CORS policy configurations
   */
-object CORSConfig {
+object CORSConfig
 
   /**
     * Origins allowed by the CORS filter
     */
   sealed trait Origins extends (String => Boolean)
-  object Origins {
-    case object All extends Origins {
+  object Origins
+    case object All extends Origins
       override def apply(v: String) = true
-    }
-    case class Matching(func: String => Boolean) extends Origins {
+    case class Matching(func: String => Boolean) extends Origins
       override def apply(v: String) = func(v)
-    }
     val None = Matching(_ => false)
-  }
 
   /**
     *
@@ -114,35 +110,30 @@ object CORSConfig {
     *
     * }}}
     */
-  def fromConfiguration(conf: Configuration): CORSConfig = {
+  def fromConfiguration(conf: Configuration): CORSConfig =
     val config = PlayConfig(conf).get[PlayConfig]("play.filters.cors")
     fromUnprefixedConfiguration(config)
-  }
 
   private[cors] def fromUnprefixedConfiguration(
-      config: PlayConfig): CORSConfig = {
+      config: PlayConfig): CORSConfig =
     CORSConfig(
-        allowedOrigins = config.get[Option[Seq[String]]]("allowedOrigins") match {
+        allowedOrigins = config.get[Option[Seq[String]]]("allowedOrigins") match
           case Some(allowed) => Origins.Matching(allowed.toSet)
           case None => Origins.All
-        },
+        ,
         isHttpMethodAllowed = config
             .get[Option[Seq[String]]]("allowedHttpMethods")
-            .map { methods =>
+            .map  methods =>
             val s = methods.toSet
             s.contains _
-          }
             .getOrElse(_ => true),
         isHttpHeaderAllowed = config
             .get[Option[Seq[String]]]("allowedHttpHeaders")
-            .map { headers =>
+            .map  headers =>
             val s = headers.map(_.toLowerCase(java.util.Locale.ENGLISH)).toSet
             s.contains _
-          }
             .getOrElse(_ => true),
         exposedHeaders = config.get[Seq[String]]("exposedHeaders"),
         supportsCredentials = config.get[Boolean]("supportsCredentials"),
         preflightMaxAge = config.get[Duration]("preflightMaxAge")
     )
-  }
-}

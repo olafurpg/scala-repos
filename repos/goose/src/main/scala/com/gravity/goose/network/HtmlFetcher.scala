@@ -58,7 +58,7 @@ import org.apache.http.impl.client.{DefaultHttpRequestRetryHandler, AbstractHttp
   * contain up to 1GB of text that is just wasted resources so we set a max bytes level on how much content we're going
   * to try and pull back before we say screw it.
   */
-object HtmlFetcher extends AbstractHtmlFetcher with Logging {
+object HtmlFetcher extends AbstractHtmlFetcher with Logging
 
   /**
     * holds a reference to our override cookie store, we don't want to store
@@ -72,9 +72,8 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
   private var httpClient: HttpClient = null
   initClient()
 
-  def getHttpClient: HttpClient = {
+  def getHttpClient: HttpClient =
     httpClient
-  }
 
   /**
     * Makes an http fetch to go retrieve the HTML from a url, store it to disk and pass it off
@@ -88,7 +87,7 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     * @throws UnhandledStatusCodeException(String, Int)
     * @throws MaxBytesException()
     */
-  def getHtml(config: Configuration, url: String): Option[String] = {
+  def getHtml(config: Configuration, url: String): Option[String] =
     var httpget: HttpGet = null
     var htmlResult: String = null
     var entity: HttpEntity = null
@@ -96,12 +95,11 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
 
     // Identified the the apache http client does not drop URL fragments before opening the request to the host
     // more info: http://stackoverflow.com/questions/4251841/400-error-with-httpclient-for-a-link-with-an-anchor
-    val cleanUrl = {
+    val cleanUrl =
       val foundAt = url.indexOf("#")
       if (foundAt >= 0) url.substring(0, foundAt) else url
-    }
 
-    try {
+    try
       val localContext: HttpContext = new BasicHttpContext
       localContext.setAttribute(
           ClientContext.COOKIE_STORE, HtmlFetcher.emptyCookieStore)
@@ -119,121 +117,92 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
       val response: HttpResponse = httpClient.execute(httpget, localContext)
 
       HttpStatusValidator.validate(
-          cleanUrl, response.getStatusLine.getStatusCode) match {
+          cleanUrl, response.getStatusLine.getStatusCode) match
         case Left(ex) => throw ex
         case _ =>
-      }
 
       entity = response.getEntity
-      if (entity != null) {
+      if (entity != null)
         instream = entity.getContent
         var encodingType: String = "UTF-8"
-        try {
+        try
           encodingType = EntityUtils.getContentCharSet(entity)
-          if (encodingType == null) {
+          if (encodingType == null)
             encodingType = "UTF-8"
-          }
-        } catch {
-          case e: Exception => {
-              if (logger.isDebugEnabled) {
+        catch
+          case e: Exception =>
+              if (logger.isDebugEnabled)
                 trace("Unable to get charset for: " + cleanUrl)
                 trace("Encoding Type is: " + encodingType)
-              }
-            }
-        }
-        try {
+        try
           htmlResult = HtmlFetcher
             .convertStreamToString(instream, 15728640, encodingType)
             .trim
-        } finally {
+        finally
           EntityUtils.consume(entity)
-        }
-      } else {
+      else
         trace("Unable to fetch URL Properly: " + cleanUrl)
-      }
-    } catch {
-      case e: NullPointerException => {
+    catch
+      case e: NullPointerException =>
           logger.warn(
               e.toString + " " + e.getMessage + " Caught for URL: " + cleanUrl)
-        }
-      case e: MaxBytesException => {
+      case e: MaxBytesException =>
           trace("GRVBIGFAIL: " + cleanUrl + " Reached max bytes size")
           throw e
-        }
-      case e: SocketException => {
+      case e: SocketException =>
           logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-        }
-      case e: SocketTimeoutException => {
+      case e: SocketTimeoutException =>
           trace(e.toString)
-        }
-      case e: LoggableException => {
+      case e: LoggableException =>
           logger.warn(e.getMessage)
           return None
-        }
-      case e: Exception => {
+      case e: Exception =>
           trace("FAILURE FOR LINK: " + cleanUrl + " " + e.toString)
           return None
-        }
-    } finally {
-      if (instream != null) {
-        try {
+    finally
+      if (instream != null)
+        try
           instream.close()
-        } catch {
-          case e: Exception => {
+        catch
+          case e: Exception =>
               logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-            }
-        }
-      }
-      if (httpget != null) {
-        try {
+      if (httpget != null)
+        try
           httpget.abort()
           entity = null
-        } catch {
+        catch
           case e: Exception => {}
-        }
-      }
-    }
-    if (logger.isDebugEnabled) {
+    if (logger.isDebugEnabled)
       logger.debug("starting...")
-    }
-    if (htmlResult == null || htmlResult.length < 1) {
-      if (logger.isDebugEnabled) {
+    if (htmlResult == null || htmlResult.length < 1)
+      if (logger.isDebugEnabled)
         logger.debug("HTMLRESULT is empty or null")
-      }
       throw new NotHtmlException(cleanUrl)
-    }
     var is: InputStream = null
     var mimeType: String = null
-    try {
+    try
       is = new ByteArrayInputStream(htmlResult.getBytes("UTF-8"))
       mimeType = URLConnection.guessContentTypeFromStream(is)
-      if (mimeType != null) {
+      if (mimeType != null)
         if ((mimeType == "text/html") == true ||
-            (mimeType == "application/xml") == true) {
+            (mimeType == "application/xml") == true)
           return Some(htmlResult)
-        } else {
+        else
           if (htmlResult.contains("<title>") == true &&
-              htmlResult.contains("<p>") == true) {
+              htmlResult.contains("<p>") == true)
             return Some(htmlResult)
-          }
           trace("GRVBIGFAIL: " + mimeType + " - " + cleanUrl)
           throw new NotHtmlException(cleanUrl)
-        }
-      } else {
+      else
         throw new NotHtmlException(cleanUrl)
-      }
-    } catch {
-      case e: UnsupportedEncodingException => {
+    catch
+      case e: UnsupportedEncodingException =>
           logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-        }
-      case e: IOException => {
+      case e: IOException =>
           logger.warn(e.getMessage + " Caught for URL: " + cleanUrl)
-        }
-    }
     None
-  }
 
-  private def initClient() {
+  private def initClient()
 
     trace("Initializing HttpClient")
 
@@ -241,21 +210,18 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     HttpConnectionParams.setConnectionTimeout(httpParams, 10 * 1000)
     HttpConnectionParams.setSoTimeout(httpParams, 10 * 1000)
     HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1)
-    emptyCookieStore = new CookieStore {
+    emptyCookieStore = new CookieStore
       def addCookie(cookie: Cookie) {}
 
-      def getCookies: List[Cookie] = {
+      def getCookies: List[Cookie] =
         emptyList
-      }
 
-      def clearExpired(date: Date): Boolean = {
+      def clearExpired(date: Date): Boolean =
         false
-      }
 
       def clear() {}
 
       private[network] var emptyList: ArrayList[Cookie] = new ArrayList[Cookie]
-    }
     httpParams.setParameter(
         "http.protocol.cookie-policy", CookiePolicy.BROWSER_COMPATIBILITY)
     httpParams.setParameter(
@@ -284,7 +250,6 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     httpClient.getParams.setParameter(
         "http.protocol.wait-for-continue", 10000L)
     httpClient.getParams.setParameter("http.tcp.nodelay", true)
-  }
 
   /**
     * reads bytes off the string and returns a string
@@ -294,44 +259,34 @@ object HtmlFetcher extends AbstractHtmlFetcher with Logging {
     * @return String
     */
   def convertStreamToString(
-      is: InputStream, maxBytes: Int, encodingType: String): String = {
+      is: InputStream, maxBytes: Int, encodingType: String): String =
     val buf: Array[Char] = new Array[Char](2048)
     var r: Reader = null
     val s = new StringBuilder
-    try {
+    try
       r = new InputStreamReader(is, encodingType)
       var bytesRead: Int = 2048
       var inLoop = true
-      while (inLoop) {
-        if (bytesRead >= maxBytes) {
+      while (inLoop)
+        if (bytesRead >= maxBytes)
           throw new MaxBytesException
-        }
         var n: Int = r.read(buf)
         bytesRead += 2048
 
         if (n < 0) inLoop = false
         if (inLoop) s.appendAll(buf, 0, n)
-      }
       return s.toString()
-    } catch {
-      case e: SocketTimeoutException => {
+    catch
+      case e: SocketTimeoutException =>
           logger.warn(e.toString + " " + e.getMessage)
-        }
-      case e: UnsupportedEncodingException => {
+      case e: UnsupportedEncodingException =>
           logger.warn(e.toString + " Encoding: " + encodingType)
-        }
-      case e: IOException => {
+      case e: IOException =>
           logger.warn(e.toString + " " + e.getMessage)
-        }
-    } finally {
-      if (r != null) {
-        try {
+    finally
+      if (r != null)
+        try
           r.close()
-        } catch {
+        catch
           case e: Exception => {}
-        }
-      }
-    }
     null
-  }
-}

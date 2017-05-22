@@ -4,32 +4,26 @@ package effect
 import java.io._
 import std.effect.closeable._
 
-object ResourceTest extends SpecLite {
+object ResourceTest extends SpecLite
 
-  "Resource" should {
+  "Resource" should
 
-    "close the resource properly (1)" in {
+    "close the resource properly (1)" in
       val r = new StringReader("abcdef")
       r.read
       Resource[StringReader].close(r).unsafePerformIO
-      try {
+      try
         r.read
         fail("should have thrown")
-      } catch {
+      catch
         case ioe: IOException => // ok
-      }
-    }
 
-    "close the resource properly (2)" in {
+    "close the resource properly (2)" in
       val r = new StringReader("abcdef")
       r.read
       IO(r).using(_ => IO.ioUnit).unsafePerformIO
-      try {
+      try
         r.read
         fail("should have thrown")
-      } catch {
+      catch
         case ioe: IOException => // ok
-      }
-    }
-  }
-}

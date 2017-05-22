@@ -31,7 +31,7 @@ import org.apache.spark.util.Utils
 /**
   ** Utilities for running commands with the spark classpath.
   */
-private[deploy] object CommandUtils extends Logging {
+private[deploy] object CommandUtils extends Logging
 
   /**
     * Build a ProcessBuilder based on the given parameters.
@@ -44,26 +44,23 @@ private[deploy] object CommandUtils extends Logging {
       sparkHome: String,
       substituteArguments: String => String,
       classPaths: Seq[String] = Seq[String](),
-      env: Map[String, String] = sys.env): ProcessBuilder = {
+      env: Map[String, String] = sys.env): ProcessBuilder =
     val localCommand = buildLocalCommand(
         command, securityMgr, substituteArguments, classPaths, env)
     val commandSeq = buildCommandSeq(localCommand, memory, sparkHome)
     val builder = new ProcessBuilder(commandSeq: _*)
     val environment = builder.environment()
-    for ((key, value) <- localCommand.environment) {
+    for ((key, value) <- localCommand.environment)
       environment.put(key, value)
-    }
     builder
-  }
 
   private def buildCommandSeq(
-      command: Command, memory: Int, sparkHome: String): Seq[String] = {
+      command: Command, memory: Int, sparkHome: String): Seq[String] =
     // SPARK-698: do not call the run.cmd script, as process.destroy()
     // fails to kill a process tree on Windows
     val cmd =
       new WorkerCommandBuilder(sparkHome, memory, command).buildCommand()
     cmd.asScala ++ Seq(command.mainClass) ++ command.arguments
-  }
 
   /**
     * Build a command based on the given one, taking into account the local environment
@@ -74,26 +71,24 @@ private[deploy] object CommandUtils extends Logging {
                                 securityMgr: SecurityManager,
                                 substituteArguments: String => String,
                                 classPath: Seq[String] = Seq[String](),
-                                env: Map[String, String]): Command = {
+                                env: Map[String, String]): Command =
     val libraryPathName = Utils.libraryPathEnvName
     val libraryPathEntries = command.libraryPathEntries
     val cmdLibraryPath = command.environment.get(libraryPathName)
 
     var newEnvironment =
-      if (libraryPathEntries.nonEmpty && libraryPathName.nonEmpty) {
+      if (libraryPathEntries.nonEmpty && libraryPathName.nonEmpty)
         val libraryPaths =
           libraryPathEntries ++ cmdLibraryPath ++ env.get(libraryPathName)
         command.environment +
         ((libraryPathName, libraryPaths.mkString(File.pathSeparator)))
-      } else {
+      else
         command.environment
-      }
 
     // set auth secret to env variable if needed
-    if (securityMgr.isAuthenticationEnabled) {
+    if (securityMgr.isAuthenticationEnabled)
       newEnvironment +=
       (SecurityManager.ENV_AUTH_SECRET -> securityMgr.getSecretKey)
-    }
 
     Command(
         command.mainClass,
@@ -104,22 +99,17 @@ private[deploy] object CommandUtils extends Logging {
         // filter out auth secret from java options
         command.javaOpts.filterNot(
             _.startsWith("-D" + SecurityManager.SPARK_AUTH_SECRET_CONF)))
-  }
 
   /** Spawn a thread that will redirect a given stream to a file */
-  def redirectStream(in: InputStream, file: File) {
+  def redirectStream(in: InputStream, file: File)
     val out = new FileOutputStream(file, true)
     // TODO: It would be nice to add a shutdown hook here that explains why the output is
     //       terminating. Otherwise if the worker dies the executor logs will silently stop.
-    new Thread("redirect output to " + file) {
-      override def run() {
-        try {
+    new Thread("redirect output to " + file)
+      override def run()
+        try
           Utils.copyStream(in, out, true)
-        } catch {
+        catch
           case e: IOException =>
             logInfo("Redirection to " + file + " closed: " + e.getMessage)
-        }
-      }
-    }.start()
-  }
-}
+    .start()

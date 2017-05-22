@@ -14,28 +14,25 @@ package internal
   *  Eventually, this interface should be reduced to one method: `reporter`,
   *  and clients should indirect themselves (reduce duplication of forwarders).
   */
-trait Reporting { self: Positions =>
+trait Reporting  self: Positions =>
   def reporter: Reporter
   def currentRun: RunReporting
 
-  trait RunReporting {
+  trait RunReporting
     val reporting: PerRunReporting = PerRunReporting
-  }
 
   type PerRunReporting <: PerRunReportingBase
   protected def PerRunReporting: PerRunReporting
-  abstract class PerRunReportingBase {
+  abstract class PerRunReportingBase
     def deprecationWarning(pos: Position, msg: String): Unit
 
     /** Have we already supplemented the error message of a compiler crash? */
     private[this] var supplementedError = false
     def supplementErrorMessage(errorMessage: String): String =
       if (supplementedError) errorMessage
-      else {
+      else
         supplementedError = true
         supplementTyperState(errorMessage)
-      }
-  }
 
   // overridden in Global
   def supplementTyperState(errorMessage: String): String = errorMessage
@@ -58,12 +55,11 @@ trait Reporting { self: Positions =>
       "2.11.2")
   def globalError(msg: String): Unit = globalError(NoPosition, msg)
 
-  def abort(msg: String): Nothing = {
+  def abort(msg: String): Nothing =
     val augmented = supplementErrorMessage(msg)
     // Needs to call error to make sure the compile fails.
     globalError(augmented)
     throw new FatalError(augmented)
-  }
 
   @deprecatedOverriding(
       "This forwards to the corresponding method in reporter -- override reporter instead",
@@ -77,7 +73,6 @@ trait Reporting { self: Positions =>
       "This forwards to the corresponding method in reporter -- override reporter instead",
       "2.11.2")
   def globalError(pos: Position, msg: String) = reporter.error(pos, msg)
-}
 
 import util.Position
 
@@ -86,7 +81,7 @@ import util.Position
   *  This describes the (future) external interface for issuing information, warnings and errors.
   *  Currently, scala.tools.nsc.Reporter is used by sbt/ide/partest.
   */
-abstract class Reporter {
+abstract class Reporter
   protected def info0(
       pos: Position, msg: String, severity: Severity, force: Boolean): Unit
 
@@ -111,27 +106,23 @@ abstract class Reporter {
   def hasErrors: Boolean = count(ERROR) > 0
   def hasWarnings: Boolean = count(WARNING) > 0
 
-  def reset(): Unit = {
+  def reset(): Unit =
     resetCount(INFO)
     resetCount(WARNING)
     resetCount(ERROR)
-  }
 
   def flush(): Unit = ()
 
   /** Finish reporting: print summaries, release resources. */
   def finish(): Unit = ()
-}
 
 // TODO: move into superclass once partest cuts tie on Severity
-abstract class ReporterImpl extends Reporter {
-  class Severity(val id: Int)(name: String) {
+abstract class ReporterImpl extends Reporter
+  class Severity(val id: Int)(name: String)
     var count: Int = 0; override def toString = name
-  }
   object INFO extends Severity(0)("INFO")
   object WARNING extends Severity(1)("WARNING")
   object ERROR extends Severity(2)("ERROR")
 
   def count(severity: Severity): Int = severity.count
   def resetCount(severity: Severity): Unit = severity.count = 0
-}

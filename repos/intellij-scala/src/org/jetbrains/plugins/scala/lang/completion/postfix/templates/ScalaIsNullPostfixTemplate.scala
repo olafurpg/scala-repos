@@ -5,7 +5,6 @@ package org.jetbrains.plugins.scala.lang.completion.postfix.templates
   * @since 14.09.2015.
   */
 class ScalaIsNullPostfixTemplate
-    extends ScalaNullPostfixTemplate("null", "if (expr == null) {}") {
+    extends ScalaNullPostfixTemplate("null", "if (expr == null) {}")
 
   override def getTail = "== null"
-}

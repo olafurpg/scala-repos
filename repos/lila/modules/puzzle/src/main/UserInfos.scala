@@ -9,27 +9,25 @@ import lila.user.User
 
 case class UserInfos(user: User, history: List[Attempt], chart: JsArray)
 
-object UserInfos {
+object UserInfos
 
   private def historySize = 20
   private def chartSize = 12
 
   import Attempt.attemptBSONHandler
 
-  lazy val defaultChart = JsArray {
+  lazy val defaultChart = JsArray
     List.fill(chartSize)(Glicko.default.intRating) map { JsNumber(_) }
-  }
 
-  def apply(attemptColl: Coll) = new {
+  def apply(attemptColl: Coll) = new
 
     def apply(user: User): Fu[UserInfos] =
-      fetchAttempts(user.id) map { attempts =>
+      fetchAttempts(user.id) map  attempts =>
         new UserInfos(user, makeHistory(attempts), makeChart(attempts))
-      } recover {
+      recover
         case e: Exception =>
           logger.error("user infos", e)
           new UserInfos(user, Nil, JsArray())
-      }
 
     def apply(user: Option[User]): Fu[Option[UserInfos]] =
       user ?? { apply(_) map (_.some) }
@@ -44,14 +42,11 @@ object UserInfos {
             ))
         .cursor[Attempt]()
         .collect[List](math.max(historySize, chartSize))
-  }
 
   private def makeHistory(attempts: List[Attempt]) = attempts.take(historySize)
 
-  private def makeChart(attempts: List[Attempt]) = JsArray {
+  private def makeChart(attempts: List[Attempt]) = JsArray
     val ratings = attempts.take(chartSize).reverse map (_.userPostRating)
     val filled =
       List.fill(chartSize - ratings.size)(Glicko.default.intRating) ::: ratings
     filled map { JsNumber(_) }
-  }
-}

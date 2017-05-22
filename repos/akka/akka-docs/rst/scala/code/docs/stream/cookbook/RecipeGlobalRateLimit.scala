@@ -9,12 +9,12 @@ import akka.stream.testkit._
 import scala.collection.immutable
 import scala.concurrent.duration._
 
-class RecipeGlobalRateLimit extends RecipeSpec {
+class RecipeGlobalRateLimit extends RecipeSpec
 
-  "Global rate limiting recipe" must {
+  "Global rate limiting recipe" must
 
     //#global-limiter-actor
-    object Limiter {
+    object Limiter
       case object WantToPass
       case object MayPass
 
@@ -25,12 +25,11 @@ class RecipeGlobalRateLimit extends RecipeSpec {
                 tokenRefreshAmount: Int): Props =
         Props(new Limiter(
                 maxAvailableTokens, tokenRefreshPeriod, tokenRefreshAmount))
-    }
 
     class Limiter(val maxAvailableTokens: Int,
                   val tokenRefreshPeriod: FiniteDuration,
                   val tokenRefreshAmount: Int)
-        extends Actor {
+        extends Actor
       import Limiter._
       import context.dispatcher
       import akka.actor.Status
@@ -45,7 +44,7 @@ class RecipeGlobalRateLimit extends RecipeSpec {
 
       override def receive: Receive = open
 
-      val open: Receive = {
+      val open: Receive =
         case ReplenishTokens =>
           permitTokens = math.min(
               permitTokens + tokenRefreshAmount, maxAvailableTokens)
@@ -53,49 +52,42 @@ class RecipeGlobalRateLimit extends RecipeSpec {
           permitTokens -= 1
           sender() ! MayPass
           if (permitTokens == 0) context.become(closed)
-      }
 
-      val closed: Receive = {
+      val closed: Receive =
         case ReplenishTokens =>
           permitTokens = math.min(
               permitTokens + tokenRefreshAmount, maxAvailableTokens)
           releaseWaiting()
         case WantToPass =>
           waitQueue = waitQueue.enqueue(sender())
-      }
 
-      private def releaseWaiting(): Unit = {
+      private def releaseWaiting(): Unit =
         val (toBeReleased, remainingQueue) = waitQueue.splitAt(permitTokens)
         waitQueue = remainingQueue
         permitTokens -= toBeReleased.size
         toBeReleased foreach (_ ! MayPass)
         if (permitTokens > 0) context.become(open)
-      }
 
-      override def postStop(): Unit = {
+      override def postStop(): Unit =
         replenishTimer.cancel()
         waitQueue foreach
         (_ ! Status.Failure(new IllegalStateException("limiter stopped")))
-      }
-    }
     //#global-limiter-actor
 
-    "work" in {
+    "work" in
 
       //#global-limiter-flow
       def limitGlobal[T](
           limiter: ActorRef,
-          maxAllowedWait: FiniteDuration): Flow[T, T, NotUsed] = {
+          maxAllowedWait: FiniteDuration): Flow[T, T, NotUsed] =
         import akka.pattern.ask
         import akka.util.Timeout
         Flow[T].mapAsync(4)((element: T) =>
-              {
             import system.dispatcher
             implicit val triggerTimeout = Timeout(maxAllowedWait)
             val limiterTriggerFuture = limiter ? Limiter.WantToPass
             limiterTriggerFuture.map((_) => element)
-        })
-      }
+        )
       //#global-limiter-flow
 
       // Use a large period and emulate the timer by hand instead
@@ -111,13 +103,13 @@ class RecipeGlobalRateLimit extends RecipeSpec {
       val probe = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b =>
+        .fromGraph(GraphDSL.create()  implicit b =>
           import GraphDSL.Implicits._
           val merge = b.add(Merge[String](2))
           source1 ~> merge ~> Sink.fromSubscriber(probe)
           source2 ~> merge
           ClosedShape
-        })
+        )
         .run()
 
       probe.expectSubscription().request(1000)
@@ -131,15 +123,11 @@ class RecipeGlobalRateLimit extends RecipeSpec {
       probe.expectNoMsg(500.millis)
 
       var resultSet = Set.empty[String]
-      for (_ <- 1 to 100) {
+      for (_ <- 1 to 100)
         limiter ! Limiter.ReplenishTokens
         resultSet += probe.expectNext()
-      }
 
       resultSet.contains("E1") should be(true)
       resultSet.contains("E2") should be(true)
 
       probe.expectError()
-    }
-  }
-}

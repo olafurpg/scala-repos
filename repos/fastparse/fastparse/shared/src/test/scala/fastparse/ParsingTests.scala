@@ -3,32 +3,29 @@ import all._
 import fastparse.core.Parsed
 import utest._
 
-object ParsingTests extends TestSuite {
+object ParsingTests extends TestSuite
 
   import Parsed.{Success, Failure}
 
-  def check[T](parser: P[T], input: (String, Int), rhs: Parsed[T]) = {
+  def check[T](parser: P[T], input: (String, Int), rhs: Parsed[T]) =
     val (str, index) = input
     val parsed = parser.parse(str, index)
     assert(parsed == rhs)
-  }
   def checkFail[T](
-      parser: P[T], input: (String, Int), expectedFailureIndex: Int) = {
+      parser: P[T], input: (String, Int), expectedFailureIndex: Int) =
     val (str, index) = input
     val parsed = parser.parse(str, index)
     val failureIndex = parsed.asInstanceOf[Failure].index
     assert(failureIndex == expectedFailureIndex)
-  }
-  val tests = TestSuite {
+  val tests = TestSuite
 
-    'literal {
+    'literal
       checkFail("Hello WOrld!", ("Hello", 0), 0)
       check("Hello", ("Hello WOrld!", 0), Success((), 5))
       check("Hello".!, ("Hello WOrld!", 0), Success("Hello", 5))
       checkFail("Hello", ("Hello WOrld!", 5), 5)
       check(" WO".!, ("Hello WOrld!", 5), Success(" WO", 8))
-    }
-    'literalIgnoreCase {
+    'literalIgnoreCase
       checkFail(IgnoreCase("Hello WOrld!"), ("hElLo", 0), 0)
       check(IgnoreCase("Hello"), ("hElLo WOrld!", 0), Success((), 5))
       check(IgnoreCase("Hello").!, ("hElLo WOrld!", 0), Success("hElLo", 5))
@@ -37,8 +34,7 @@ object ParsingTests extends TestSuite {
       check(IgnoreCase("`~@!3#$4%^&*()-_=+[{]}|\\,.? Hello World"),
             ("`~@!3#$4%^&*()-_=+[{]}|\\,.? hElLo wOrLd", 0),
             Success((), 39))
-    }
-    'repeat {
+    'repeat
       check("Hello".!.rep,
             ("HelloHello!", 0),
             Success(Seq("Hello", "Hello"), 10))
@@ -65,8 +61,7 @@ object ParsingTests extends TestSuite {
 
       checkFail("Hello".rep(1), ("HelloHello!", 2), 2)
       checkFail("Hello".rep ~ "bye" ~ End, ("HelloHello!", 0), 10)
-    }
-    'either {
+    'either
       check("Hello".! | "Bye".!, ("HelloBye", 0), Success("Hello", 5))
       check(("Hello" | "Bye").!, ("HelloBye", 5), Success("Bye", 8))
       checkFail("Hello" | "Bye", ("HelloBye", 2), 2)
@@ -74,8 +69,7 @@ object ParsingTests extends TestSuite {
             ("HelloBye", 0),
             Success(Seq("Hello", "Bye"), 8))
       check(("Hello" | "Bye").rep.!, ("HelloBye", 0), Success("HelloBye", 8))
-    }
-    'sequence {
+    'sequence
       val p = "Hello".! ~ "Bye".!
       println(p)
       check(p, ("HelloBye", 0), Success(("Hello", "Bye"), 8))
@@ -86,13 +80,11 @@ object ParsingTests extends TestSuite {
             ("HelloBye!", 0),
             Success(("Hello", "Bye", "!"), 9))
       checkFail("Hello" ~ "Bye", ("Bye", 0), 0)
-    }
-    'errors {
+    'errors
       checkFail("Hello" ~ ("omg" | "bbq"), ("Hellookk", 0), 5)
       checkFail("Hello" ~ ("omg" | "bbq"), ("ellookk", 0), 0)
-    }
-    'cut {
-      'sequence {
+    'cut
+      'sequence
         check("Hello" ~ ("wtf" ~ "omg" | "wtfom"),
               ("Hellowtfom", 0),
               Success((), 10))
@@ -104,17 +96,11 @@ object ParsingTests extends TestSuite {
         checkFail("Hello" ~ ("wtf" ~/ "omg" ~ "bbq" | "wtfom"),
                   ("Hellowtfomgbbe", 0),
                   11)
-      }
-      'rep {
+      'rep
         check(("Hello" ~ "Bye").rep, ("HelloByeHello", 0), Success((), 8))
         checkFail(("Hello" ~/ "Bye").rep, ("HelloByeHello", 0), 13)
         check(("Hello" ~ "Bye").rep, ("HelloByeHello", 0), Success((), 8))
         checkFail("Hello".rep(sep = "Bye" ~/ Pass), ("HelloBye", 0), 8)
-      }
-      'optional {
+      'optional
         check(("Hello" ~ "Bye").?, ("HelloBoo", 0), Success((), 0))
         checkFail(("Hello" ~/ "Bye").?, ("HelloBoo", 0), 5)
-      }
-    }
-  }
-}

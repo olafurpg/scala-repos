@@ -14,53 +14,45 @@ import scala.tools.testing.ClearAfterClass
 import CodeGenTools._
 import AsmUtils._
 
-object ProdConsAnalyzerTest extends ClearAfterClass.Clearable {
+object ProdConsAnalyzerTest extends ClearAfterClass.Clearable
   var noOptCompiler = newCompiler(extraArgs = "-Yopt:l:none")
 
-  def clear(): Unit = {
+  def clear(): Unit =
     noOptCompiler = null
-  }
-}
 
 @RunWith(classOf[JUnit4])
-class ProdConsAnalyzerTest extends ClearAfterClass {
+class ProdConsAnalyzerTest extends ClearAfterClass
   ClearAfterClass.stateToClear = ProdConsAnalyzerTest
   val noOptCompiler = ProdConsAnalyzerTest.noOptCompiler
   import noOptCompiler.genBCode.bTypes.backendUtils._
 
-  def prodToString(producer: AbstractInsnNode) = producer match {
+  def prodToString(producer: AbstractInsnNode) = producer match
     case p: InitialProducer => p.toString
     case p => textify(p)
-  }
 
   def testSingleInsn(singletonInsns: Traversable[AbstractInsnNode],
-                     expected: String): Unit = {
+                     expected: String): Unit =
     testInsn(single(singletonInsns), expected)
-  }
 
   def testMultiInsns(insns: Traversable[AbstractInsnNode],
-                     expected: Traversable[String]): Unit = {
+                     expected: Traversable[String]): Unit =
     assertTrue(s"Sizes don't match: ${insns.size} vs ${expected.size}",
                insns.size == expected.size)
-    for (insn <- insns) {
+    for (insn <- insns)
       val txt = prodToString(insn)
       assertTrue(s"Instruction $txt not found in ${expected mkString ", "}",
                  expected.exists(txt.contains))
-    }
-  }
 
-  def testInsn(insn: AbstractInsnNode, expected: String): Unit = {
+  def testInsn(insn: AbstractInsnNode, expected: String): Unit =
     val txt = prodToString(insn)
     assertTrue(s"Expected $expected, found $txt", txt contains expected)
-  }
 
-  def single[T](c: Traversable[T]): T = {
+  def single[T](c: Traversable[T]): T =
     assertTrue(s"Expected singleton collection, got $c", c.size == 1)
     c.head
-  }
 
   @Test
-  def parameters(): Unit = {
+  def parameters(): Unit =
     val List(m) = compileMethods(noOptCompiler)("def f = this.toString")
     val a = new ProdConsAnalyzer(m, "C")
     val call = findInstr(m, "INVOKEVIRTUAL").head
@@ -75,10 +67,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
 
     testSingleInsn(a.initialProducersForValueAt(call, 1), "ParameterProducer")
     testSingleInsn(a.producersForValueAt(call, 0), "ParameterProducer")
-  }
 
   @Test
-  def parametersInitialProducer(): Unit = {
+  def parametersInitialProducer(): Unit =
     // mutates a parameter local (not possible in scala, but in bytecode)
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
@@ -102,10 +93,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     val ret = findInstr(m, "IRETURN").head
     testMultiInsns(
         a.producersForValueAt(ret, 1), List("ParameterProducer", "ISTORE 1"))
-  }
 
   @Test
-  def branching(): Unit = {
+  def branching(): Unit =
     val List(m) = compileMethods(noOptCompiler)(
         "def f(x: Int) = { var a = x; if (a == 0) a = 12; a }")
     val a = new ProdConsAnalyzer(m, "C")
@@ -118,10 +108,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     val List(bipush) = findInstr(m, "BIPUSH 12")
     testSingleInsn(a.consumersOfOutputsFrom(bipush), "ISTORE 2")
     testSingleInsn(a.ultimateConsumersOfValueAt(bipush.getNext, 3), "IRETURN")
-  }
 
   @Test
-  def checkCast(): Unit = {
+  def checkCast(): Unit =
     val List(m) = compileMethods(noOptCompiler)(
         "def f(o: Object) = o.asInstanceOf[String]")
     val a = new ProdConsAnalyzer(m, "C")
@@ -129,10 +118,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
 
     val List(ret) = findInstr(m, "ARETURN")
     testSingleInsn(a.initialProducersForInputsOf(ret), "ParameterProducer(1)")
-  }
 
   @Test
-  def instanceOf(): Unit = {
+  def instanceOf(): Unit =
     val List(m) = compileMethods(noOptCompiler)(
         "def f(o: Object) = o.isInstanceOf[String]")
     val a = new ProdConsAnalyzer(m, "C")
@@ -140,10 +128,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
 
     val List(ret) = findInstr(m, "IRETURN")
     testSingleInsn(a.initialProducersForInputsOf(ret), "INSTANCEOF")
-  }
 
   @Test
-  def unInitLocal(): Unit = {
+  def unInitLocal(): Unit =
     val List(m) = compileMethods(noOptCompiler)(
         "def f(b: Boolean) = { if (b) { var a = 0; println(a) }; 1 }")
     val a = new ProdConsAnalyzer(m, "C")
@@ -157,10 +144,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(a.producersForValueAt(call, 2), "ISTORE")
     testMultiInsns(a.producersForValueAt(ret, 2),
                    List("UninitializedLocalProducer", "ISTORE"))
-  }
 
   @Test
-  def dupCopying(): Unit = {
+  def dupCopying(): Unit =
     val List(m) = compileMethods(noOptCompiler)("def f = new Object")
     val a = new ProdConsAnalyzer(m, "C")
 
@@ -173,10 +159,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(a.consumersOfOutputsFrom(newO), "DUP")
     testMultiInsns(a.ultimateConsumersOfOutputsFrom(newO),
                    List("INVOKESPECIAL", "ARETURN"))
-  }
 
   @Test
-  def multiProducer(): Unit = {
+  def multiProducer(): Unit =
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
         VarOp(ILOAD, 1),
@@ -213,10 +198,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(
         a.initialProducersForInputsOf(store), "ParameterProducer(1)")
     testSingleInsn(a.initialProducersForInputsOf(ret), "IADD")
-  }
 
   @Test
-  def iincProdCons(): Unit = {
+  def iincProdCons(): Unit =
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
         Incr(IINC, 1, 1), // producer and consumer of local variable 1
@@ -241,10 +225,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
     testSingleInsn(a.producersForValueAt(load, 1), "IINC")
 
     testSingleInsn(a.initialProducersForInputsOf(ret), "IINC")
-  }
 
   @Test
-  def copyingInsns(): Unit = {
+  def copyingInsns(): Unit =
     val List(m) = compileMethods(noOptCompiler)("def f = 0l.asInstanceOf[Int]")
     val a = new ProdConsAnalyzer(m, "C")
 
@@ -260,10 +243,9 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
 
     testSingleInsn(a.consumersOfOutputsFrom(l2i), "IRETURN")
     testSingleInsn(a.producersForInputsOf(ret), "L2I")
-  }
 
   @Test
-  def cyclicProdCons(): Unit = {
+  def cyclicProdCons(): Unit =
     import Opcodes._
     val m = genMethod(descriptor = "(I)I")(
         Label(1),
@@ -302,5 +284,3 @@ class ProdConsAnalyzerTest extends ClearAfterClass {
 
     testSingleInsn(a.consumersOfOutputsFrom(firstLoad), "IADD")
     testSingleInsn(a.consumersOfOutputsFrom(secondLoad), "ISTORE")
-  }
-}

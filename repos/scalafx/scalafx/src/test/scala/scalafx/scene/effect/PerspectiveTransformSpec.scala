@@ -44,7 +44,6 @@ class PerspectiveTransformSpec
     extends SimpleSFXDelegateSpec[
         jfxse.PerspectiveTransform, PerspectiveTransform](
         classOf[jfxse.PerspectiveTransform], classOf[PerspectiveTransform])
-    with InputDelegateSpec[PerspectiveTransform] {
+    with InputDelegateSpec[PerspectiveTransform]
 
   val inputDelegate = getScalaClassInstance
-}

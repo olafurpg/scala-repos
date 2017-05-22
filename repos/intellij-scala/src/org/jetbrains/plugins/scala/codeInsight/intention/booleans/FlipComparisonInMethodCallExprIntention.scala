@@ -18,18 +18,17 @@ import scala.collection.mutable
   * @author Ksenia.Sautina
   * @since 4/20/12
   */
-object FlipComparisonInMethodCallExprIntention {
+object FlipComparisonInMethodCallExprIntention
   def familyName = "Flip comparison in method call expression."
-}
 
 class FlipComparisonInMethodCallExprIntention
-    extends PsiElementBaseIntentionAction {
+    extends PsiElementBaseIntentionAction
   def getFamilyName = FlipComparisonInMethodCallExprIntention.familyName
 
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
@@ -54,21 +53,19 @@ class FlipComparisonInMethodCallExprIntention
       return false
 
     val notChanged = mutable.HashSet[String]("==", "!=", "equals", "eq", "ne")
-    if (notChanged.contains(oper)) {
+    if (notChanged.contains(oper))
       setText("Flip '" + oper + "'")
-    } else {
+    else
       val replaceOper = Map(">" -> "<", "<" -> ">", ">=" -> "<=", "<=" -> ">=")
       setText("Flip '" + oper + "' to '" + replaceOper(oper) + "'")
-    }
 
     if (methodCallExpr.getInvokedExpr
           .asInstanceOf[ScReferenceExpression]
           .isQualified) return true
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null || !methodCallExpr.isValid) return
@@ -103,14 +100,12 @@ class FlipComparisonInMethodCallExprIntention
       .get
     qualBuilder.append(qual.getText)
     var newArgs = qual.getText
-    if (!(newArgs.startsWith("(") && newArgs.endsWith(")"))) {
+    if (!(newArgs.startsWith("(") && newArgs.endsWith(")")))
       newArgs = qualBuilder.insert(0, "(").append(")").toString()
-    }
 
     var newQual = argsBuilder.toString()
-    if (newQual.startsWith("(") && newQual.endsWith(")")) {
+    if (newQual.startsWith("(") && newQual.endsWith(")"))
       newQual = argsBuilder.toString().drop(1).dropRight(1)
-    }
 
     val newQualExpr: ScExpression =
       ScalaPsiElementFactory.createExpressionFromText(
@@ -145,13 +140,10 @@ class FlipComparisonInMethodCallExprIntention
         .getTextRange
         .getStartOffset - newMethodCallExpr.getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       methodCallExpr.replaceExpression(
           newMethodCallExpr, removeParenthesis = true)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

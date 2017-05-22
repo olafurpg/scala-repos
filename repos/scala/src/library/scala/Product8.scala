@@ -9,18 +9,17 @@
 
 package scala
 
-object Product8 {
+object Product8
   def unapply[T1, T2, T3, T4, T5, T6, T7, T8](
       x: Product8[T1, T2, T3, T4, T5, T6, T7, T8])
     : Option[Product8[T1, T2, T3, T4, T5, T6, T7, T8]] =
     Some(x)
-}
 
 /** Product8 is a cartesian product of 8 components.
   *  @since 2.3
   */
 trait Product8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8]
-    extends Any with Product {
+    extends Any with Product
 
   /** The arity of this product.
     *  @return 8
@@ -35,7 +34,7 @@ trait Product8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8]
     *  @throws  IndexOutOfBoundsException
     */
   @throws(classOf[IndexOutOfBoundsException])
-  override def productElement(n: Int) = n match {
+  override def productElement(n: Int) = n match
     case 0 => _1
     case 1 => _2
     case 2 => _3
@@ -45,7 +44,6 @@ trait Product8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8]
     case 6 => _7
     case 7 => _8
     case _ => throw new IndexOutOfBoundsException(n.toString())
-  }
 
   /** A projection of element 1 of this Product.
     *  @return   A projection of element 1.
@@ -86,4 +84,3 @@ trait Product8[+T1, +T2, +T3, +T4, +T5, +T6, +T7, +T8]
     *  @return   A projection of element 8.
     */
   def _8: T8
-}

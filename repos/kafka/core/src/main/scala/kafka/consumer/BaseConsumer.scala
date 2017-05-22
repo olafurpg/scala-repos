@@ -29,12 +29,11 @@ import org.apache.kafka.common.record.TimestampType
   * this class should be removed (along with BaseProducer) be removed
   * once we deprecate old consumer
   */
-trait BaseConsumer {
+trait BaseConsumer
   def receive(): BaseConsumerRecord
   def stop()
   def cleanup()
   def commit()
-}
 
 case class BaseConsumerRecord(
     topic: String,
@@ -49,7 +48,7 @@ class NewShinyConsumer(topic: Option[String],
                        whitelist: Option[String],
                        consumerProps: Properties,
                        val timeoutMs: Long = Long.MaxValue)
-    extends BaseConsumer {
+    extends BaseConsumer
   import org.apache.kafka.clients.consumer.KafkaConsumer
 
   import scala.collection.JavaConversions._
@@ -65,11 +64,10 @@ class NewShinyConsumer(topic: Option[String],
 
   var recordIter = consumer.poll(0).iterator
 
-  override def receive(): BaseConsumerRecord = {
-    if (!recordIter.hasNext) {
+  override def receive(): BaseConsumerRecord =
+    if (!recordIter.hasNext)
       recordIter = consumer.poll(timeoutMs).iterator
       if (!recordIter.hasNext) throw new ConsumerTimeoutException
-    }
 
     val record = recordIter.next
     BaseConsumerRecord(record.topic,
@@ -79,23 +77,18 @@ class NewShinyConsumer(topic: Option[String],
                        record.timestampType,
                        record.key,
                        record.value)
-  }
 
-  override def stop() {
+  override def stop()
     this.consumer.wakeup()
-  }
 
-  override def cleanup() {
+  override def cleanup()
     this.consumer.close()
-  }
 
-  override def commit() {
+  override def commit()
     this.consumer.commitSync()
-  }
-}
 
 class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
-    extends BaseConsumer {
+    extends BaseConsumer
   import kafka.serializer.DefaultDecoder
 
   val consumerConnector = Consumer.create(new ConsumerConfig(consumerProps))
@@ -105,7 +98,7 @@ class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
     .head
   val iter = stream.iterator
 
-  override def receive(): BaseConsumerRecord = {
+  override def receive(): BaseConsumerRecord =
     if (!iter.hasNext()) throw new StreamEndException
 
     val messageAndMetadata = iter.next
@@ -116,17 +109,12 @@ class OldConsumer(topicFilter: TopicFilter, consumerProps: Properties)
                        messageAndMetadata.timestampType,
                        messageAndMetadata.key,
                        messageAndMetadata.message)
-  }
 
-  override def stop() {
+  override def stop()
     this.consumerConnector.shutdown()
-  }
 
-  override def cleanup() {
+  override def cleanup()
     this.consumerConnector.shutdown()
-  }
 
-  override def commit() {
+  override def commit()
     this.consumerConnector.commitOffsets
-  }
-}

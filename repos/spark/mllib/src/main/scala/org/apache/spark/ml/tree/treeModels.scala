@@ -32,49 +32,44 @@ import org.apache.spark.sql.SQLContext
   *
   * TODO: Add support for predicting probabilities and raw predictions  SPARK-3727
   */
-private[ml] trait DecisionTreeModel {
+private[ml] trait DecisionTreeModel
 
   /** Root of the decision tree */
   def rootNode: Node
 
   /** Number of nodes in tree, including leaf nodes. */
-  def numNodes: Int = {
+  def numNodes: Int =
     1 + rootNode.numDescendants
-  }
 
   /**
     * Depth of the tree.
     * E.g.: Depth 0 means 1 leaf node.  Depth 1 means 1 internal node and 2 leaf nodes.
     */
-  lazy val depth: Int = {
+  lazy val depth: Int =
     rootNode.subtreeDepth
-  }
 
   /** Summary of the model */
-  override def toString: String = {
+  override def toString: String =
     // Implementing classes should generally override this method to be more descriptive.
     s"DecisionTreeModel of depth $depth with $numNodes nodes"
-  }
 
   /** Full description of model */
-  def toDebugString: String = {
+  def toDebugString: String =
     val header = toString + "\n"
     header + rootNode.subtreeToString(2)
-  }
 
   /**
     * Trace down the tree, and return the largest feature index used in any split.
     * @return  Max feature index used in a split, or -1 if there are no splits (single leaf node).
     */
   private[ml] def maxSplitFeatureIndex(): Int = rootNode.maxSplitFeatureIndex()
-}
 
 /**
   * Abstraction for models which are ensembles of decision trees
   *
   * TODO: Add support for predicting probabilities and raw predictions  SPARK-3727
   */
-private[ml] trait TreeEnsembleModel {
+private[ml] trait TreeEnsembleModel
 
   // Note: We use getTrees since subclasses of TreeEnsembleModel will store subclasses of
   //       DecisionTreeModel.
@@ -90,34 +85,30 @@ private[ml] trait TreeEnsembleModel {
   private[spark] def javaTreeWeights: Vector = Vectors.dense(treeWeights)
 
   /** Summary of the model */
-  override def toString: String = {
+  override def toString: String =
     // Implementing classes should generally override this method to be more descriptive.
     s"TreeEnsembleModel with $numTrees trees"
-  }
 
   /** Full description of model */
-  def toDebugString: String = {
+  def toDebugString: String =
     val header = toString + "\n"
     header + trees
       .zip(treeWeights)
       .zipWithIndex
-      .map {
+      .map
         case ((tree, weight), treeIndex) =>
           s"  Tree $treeIndex (weight $weight):\n" +
           tree.rootNode.subtreeToString(4)
-      }
       .fold("")(_ + _)
-  }
 
   /** Number of trees in ensemble */
   val numTrees: Int = trees.length
 
   /** Total number of nodes, summed over all trees in the ensemble. */
   lazy val totalNumNodes: Int = trees.map(_.numNodes).sum
-}
 
 /** Helper classes for tree model persistence */
-private[ml] object DecisionTreeModelReadWrite {
+private[ml] object DecisionTreeModelReadWrite
 
   /**
     * Info for a [[org.apache.spark.ml.tree.Split]]
@@ -130,30 +121,25 @@ private[ml] object DecisionTreeModelReadWrite {
     */
   case class SplitData(featureIndex: Int,
                        leftCategoriesOrThreshold: Array[Double],
-                       numCategories: Int) {
+                       numCategories: Int)
 
-    def getSplit: Split = {
-      if (numCategories != -1) {
+    def getSplit: Split =
+      if (numCategories != -1)
         new CategoricalSplit(
             featureIndex, leftCategoriesOrThreshold, numCategories)
-      } else {
+      else
         assert(leftCategoriesOrThreshold.length == 1,
                s"DecisionTree split data expected" +
                s" 1 threshold for ContinuousSplit, but found thresholds: " +
                leftCategoriesOrThreshold.mkString(", "))
         new ContinuousSplit(featureIndex, leftCategoriesOrThreshold(0))
-      }
-    }
-  }
 
-  object SplitData {
-    def apply(split: Split): SplitData = split match {
+  object SplitData
+    def apply(split: Split): SplitData = split match
       case s: CategoricalSplit =>
         SplitData(s.featureIndex, s.leftCategories, s.numCategories)
       case s: ContinuousSplit =>
         SplitData(s.featureIndex, Array(s.threshold), -1)
-    }
-  }
 
   /**
     * Info for a [[Node]]
@@ -174,7 +160,7 @@ private[ml] object DecisionTreeModelReadWrite {
                       rightChild: Int,
                       split: SplitData)
 
-  object NodeData {
+  object NodeData
 
     /**
       * Create [[NodeData]] instances for this node and all children.
@@ -184,7 +170,7 @@ private[ml] object DecisionTreeModelReadWrite {
       *         The nodes are returned in pre-order traversal (root first) so that it is easy to
       *         get the ID of the subtree's root node.
       */
-    def build(node: Node, id: Int): (Seq[NodeData], Int) = node match {
+    def build(node: Node, id: Int): (Seq[NodeData], Int) = node match
       case n: InternalNode =>
         val (leftNodeData, leftIdx) = build(n.leftChild, id + 1)
         val (rightNodeData, rightIdx) = build(n.rightChild, leftIdx + 1)
@@ -208,20 +194,17 @@ private[ml] object DecisionTreeModelReadWrite {
                       -1,
                       SplitData(-1, Array.empty[Double], -1))),
          id)
-    }
-  }
 
   def loadTreeNodes(path: String,
                     metadata: DefaultParamsReader.Metadata,
-                    sqlContext: SQLContext): Node = {
+                    sqlContext: SQLContext): Node =
     import sqlContext.implicits._
     implicit val format = DefaultFormats
 
     // Get impurity to construct ImpurityCalculator for each node
-    val impurityType: String = {
+    val impurityType: String =
       val impurityJson: JValue = metadata.getParamValue("impurity")
       Param.jsonDecode[String](compact(render(impurityJson)))
-    }
 
     val dataPath = new Path(path, "data").toString
     val data = sqlContext.read.parquet(dataPath).as[NodeData]
@@ -238,12 +221,12 @@ private[ml] object DecisionTreeModelReadWrite {
     // We fill `finalNodes` in reverse order.  Since node IDs are assigned via a pre-order
     // traversal, this guarantees that child nodes will be built before parent nodes.
     val finalNodes = new Array[Node](nodes.length)
-    nodes.reverseIterator.foreach {
+    nodes.reverseIterator.foreach
       case n: NodeData =>
         val impurityStats =
           ImpurityCalculator.getCalculator(impurityType, n.impurityStats)
         val node =
-          if (n.leftChild != -1) {
+          if (n.leftChild != -1)
             val leftChild = finalNodes(n.leftChild)
             val rightChild = finalNodes(n.rightChild)
             new InternalNode(n.prediction,
@@ -253,12 +236,8 @@ private[ml] object DecisionTreeModelReadWrite {
                              rightChild,
                              n.split.getSplit,
                              impurityStats)
-          } else {
+          else
             new LeafNode(n.prediction, n.impurity, impurityStats)
-          }
         finalNodes(n.id) = node
-    }
     // Return the root node
     finalNodes.head
-  }
-}

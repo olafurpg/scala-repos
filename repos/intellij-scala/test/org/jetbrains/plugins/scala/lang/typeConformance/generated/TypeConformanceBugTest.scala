@@ -1,7 +1,7 @@
 package org.jetbrains.plugins.scala.lang.typeConformance
 package generated
 
-class TypeConformanceBugTest extends TypeConformanceTestBase {
+class TypeConformanceBugTest extends TypeConformanceTestBase
   override def folderPath: String = super.folderPath + "bug/"
 
   def testSCL2244() { doTest() }
@@ -21,4 +21,3 @@ class TypeConformanceBugTest extends TypeConformanceTestBase {
   def testSCL4278() { doTest() }
 
   def testSCL9627() { doTest() }
-}

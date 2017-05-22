@@ -16,7 +16,7 @@
 
 package com.twitter.summingbird
 
-trait SummingbirdConfig { self =>
+trait SummingbirdConfig  self =>
   def get(key: String): Option[AnyRef]
   def put(key: String, v: AnyRef): SummingbirdConfig
   final def +(kv: (String, AnyRef)) = put(kv._1, kv._2)
@@ -25,83 +25,67 @@ trait SummingbirdConfig { self =>
   def keys: Iterable[String]
   def updates: Map[String, AnyRef]
   def removes: Set[String]
-  def toMap: Map[String, AnyRef] = new Map[String, AnyRef] {
+  def toMap: Map[String, AnyRef] = new Map[String, AnyRef]
     def get(k: String) = self.get(k)
     def +[B1 >: AnyRef](kv: (String, B1)) =
       self.put(kv._1, kv._2.asInstanceOf[AnyRef]).toMap
     def -(k: String) = self.-(k).toMap
     def iterator = self.keys.iterator.map(k => (k, self.get(k).get))
-  }
-  def updated(newMap: Map[String, AnyRef]): SummingbirdConfig = {
+  def updated(newMap: Map[String, AnyRef]): SummingbirdConfig =
     val removedKeys: Set[String] = keys.toSet -- newMap.keys
-    val changedOrAddedKeys = newMap.flatMap {
+    val changedOrAddedKeys = newMap.flatMap
       case (k, v) =>
         val oldVal = get(k)
-        if (oldVal != Some(v)) {
+        if (oldVal != Some(v))
           Some((k, v))
-        } else None
-    }
+        else None
     val newWithoutRemoved = removedKeys.foldLeft(self)(_.remove(_))
     changedOrAddedKeys.foldLeft(newWithoutRemoved) { _ + _ }
-  }
-}
 
-trait MutableStringConfig {
+trait MutableStringConfig
   protected def summingbirdConfig: SummingbirdConfig
   private var config = summingbirdConfig
-  def get(key: String) = {
+  def get(key: String) =
     assert(config != null)
-    config.get(key) match {
+    config.get(key) match
       case Some(s) => s.toString
       case None => null
-    }
-  }
 
-  def set(key: String, value: String) {
+  def set(key: String, value: String)
     assert(config != null)
     config = config.put(key, value)
-  }
   def unwrap = config
-}
 
 /*
  * The ReadableMap is the trait that must be implemented on the actual underlying config for the WrappingConfig.
  * That is one of these should exist for an Hadoop Configuration, Storm Configuration, etc..
  */
-trait ReadableMap {
+trait ReadableMap
   def get(key: String): Option[AnyRef]
   def keys: Set[String]
-}
 
-object WrappingConfig {
+object WrappingConfig
   def apply(backingConfig: ReadableMap) =
     new WrappingConfig(backingConfig, Map[String, AnyRef](), Set[String]())
-}
 
 case class WrappingConfig(private val backingConfig: ReadableMap,
                           updates: Map[String, AnyRef],
                           removes: Set[String])
-    extends SummingbirdConfig {
+    extends SummingbirdConfig
 
-  def get(key: String) = {
-    updates.get(key) match {
+  def get(key: String) =
+    updates.get(key) match
       case s @ Some(_) => s
       case None =>
         if (removes.contains(key)) None
         else backingConfig.get(key)
-    }
-  }
 
-  def put(key: String, v: AnyRef): WrappingConfig = {
+  def put(key: String, v: AnyRef): WrappingConfig =
     assert(v != null)
     this.copy(updates = (updates + (key -> v)), removes = (removes - key))
-  }
 
-  def remove(key: String): WrappingConfig = {
+  def remove(key: String): WrappingConfig =
     this.copy(updates = (updates - key), removes = (removes + key))
-  }
 
-  def keys: Iterable[String] = {
+  def keys: Iterable[String] =
     ((backingConfig.keys ++ updates.keys) -- removes)
-  }
-}

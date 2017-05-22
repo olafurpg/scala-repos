@@ -21,63 +21,53 @@ import scala.reflect.NameTransformer
 /**
   * @author ilyas
   */
-object ScClsStubBuilder {
-  def canBeProcessed(file: VirtualFile): Boolean = {
-    try {
+object ScClsStubBuilder
+  def canBeProcessed(file: VirtualFile): Boolean =
+    try
       canBeProcessed(file, file.contentsToByteArray())
-    } catch {
+    catch
       case ex: IOException => false
       case u: UnsupportedOperationException =>
         false //why we need to handle this?
-    }
-  }
 
   private def canBeProcessed(
-      file: VirtualFile, bytes: => Array[Byte]): Boolean = {
+      file: VirtualFile, bytes: => Array[Byte]): Boolean =
     if (DecompilerUtil.isScalaFile(file, bytes)) return true
     val fileName: String = file.getNameWithoutExtension
     val parent = file.getParent
 
-    def split(str: String): Option[(String, String)] = {
+    def split(str: String): Option[(String, String)] =
       val index = str.indexOf('$')
       if (index == -1) None
       else Some(str.substring(0, index), str.substring(index + 1, str.length))
-    }
 
     @tailrec
-    def go(prefix: String, suffix: String): Boolean = {
-      if (!prefix.endsWith("$")) {
+    def go(prefix: String, suffix: String): Boolean =
+      if (!prefix.endsWith("$"))
         val child = parent.findChild(prefix + ".class")
         if (child != null && DecompilerUtil.isScalaFile(child)) return true
-      }
-      split(suffix) match {
+      split(suffix) match
         case Some((suffixPrefix, suffixSuffix)) =>
           go(prefix + "$" + suffixPrefix, suffixSuffix)
         case _ => false
-      }
-    }
 
-    split(fileName) match {
+    split(fileName) match
       case Some((prefix, suffix)) => go(prefix, suffix)
       case _ => false
-    }
-  }
-}
 
-class ScClsStubBuilder extends ClsStubBuilder {
+class ScClsStubBuilder extends ClsStubBuilder
   override def getStubVersion: Int = StubVersion.STUB_VERSION
 
-  override def buildFileStub(content: FileContent): PsiFileStub[ScalaFile] = {
+  override def buildFileStub(content: FileContent): PsiFileStub[ScalaFile] =
     if (isInnerClass(content.getFile)) null
     else
       buildFileStub(content.getFile,
                     content.getContent,
                     ProjectManager.getInstance().getDefaultProject)
-  }
 
   private def buildFileStub(vFile: VirtualFile,
                             bytes: Array[Byte],
-                            project: Project): PsiFileStub[ScalaFile] = {
+                            project: Project): PsiFileStub[ScalaFile] =
     val result = DecompilerUtil.decompile(vFile, bytes)
     val source = result.sourceName
     val text = result.sourceText
@@ -102,45 +92,35 @@ class ScClsStubBuilder extends ClsStubBuilder {
       .asInstanceOf[PsiFileStubImpl[PsiFile]]
       .clearPsi("Stub was built from decompiled file")
     stub.asInstanceOf[PsiFileStub[ScalaFile]]
-  }
 
-  private def isInnerClass(file: VirtualFile): Boolean = {
+  private def isInnerClass(file: VirtualFile): Boolean =
     if (file.getExtension != "class") return false
     val name: String = file.getNameWithoutExtension
     val parent: VirtualFile = file.getParent
     isInner(name, new ParentDirectory(parent))
-  }
 
-  private def isInner(name: String, directory: Directory): Boolean = {
-    if (name.endsWith("$") && directory.contains(name.dropRight(1))) {
+  private def isInner(name: String, directory: Directory): Boolean =
+    if (name.endsWith("$") && directory.contains(name.dropRight(1)))
       return false //let's handle it separately to avoid giving it for Java.
-    }
     isInner(NameTransformer.decode(name), 0, directory)
-  }
 
   @tailrec
-  private def isInner(name: String, from: Int, directory: Directory): Boolean = {
+  private def isInner(name: String, from: Int, directory: Directory): Boolean =
     val index: Int = name.indexOf('$', from)
     index != -1 &&
     (containsPart(directory, name, index) ||
         isInner(name, index + 1, directory))
-  }
 
   private def containsPart(
-      directory: Directory, name: String, endIndex: Int): Boolean = {
+      directory: Directory, name: String, endIndex: Int): Boolean =
     endIndex > 0 && directory.contains(name.substring(0, endIndex))
-  }
 
-  private trait Directory {
+  private trait Directory
     def contains(name: String): Boolean
-  }
 
-  private class ParentDirectory(dir: VirtualFile) extends Directory {
-    def contains(name: String): Boolean = {
+  private class ParentDirectory(dir: VirtualFile) extends Directory
+    def contains(name: String): Boolean =
       if (dir == null) return false
       !dir.getChildren.forall(child =>
             child.getExtension != "class" ||
             NameTransformer.decode(child.getNameWithoutExtension) == name)
-    }
-  }
-}

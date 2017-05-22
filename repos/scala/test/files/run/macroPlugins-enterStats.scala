@@ -1,7 +1,7 @@
 import scala.tools.partest._
 import scala.tools.nsc._
 
-object Test extends DirectTest {
+object Test extends DirectTest
   override def extraSettings: String = "-usejavacp -Xprint:typer"
 
   def code = """
@@ -11,7 +11,7 @@ object Test extends DirectTest {
     }
   """.trim
 
-  def show() {
+  def show()
     val global = newCompiler()
     import global._
     import analyzer._
@@ -22,7 +22,7 @@ object Test extends DirectTest {
     def logEnterStat(pluginName: String, stat: Tree): Unit =
       log(s"$pluginName:enterStat($stat)")
     def deriveStat(pluginName: String, typer: Typer, stat: Tree): List[Tree] =
-      stat match {
+      stat match
         case DefDef(mods, name, Nil, Nil, TypeTree(), body) =>
           val derived = DefDef(NoMods,
                                TermName(name + pluginName),
@@ -34,26 +34,19 @@ object Test extends DirectTest {
           List(derived)
         case _ =>
           Nil
-      }
 
-    object macroPlugin1 extends MacroPlugin {
+    object macroPlugin1 extends MacroPlugin
       override def pluginsEnterStats(
-          typer: Typer, stats: List[Tree]): List[Tree] = {
+          typer: Typer, stats: List[Tree]): List[Tree] =
         stats.foreach(stat => logEnterStat("macroPlugin1", stat))
         stats.flatMap(stat => stat +: deriveStat("macroPlugin1", typer, stat))
-      }
-    }
-    object macroPlugin2 extends MacroPlugin {
+    object macroPlugin2 extends MacroPlugin
       override def pluginsEnterStats(
-          typer: Typer, stats: List[Tree]): List[Tree] = {
+          typer: Typer, stats: List[Tree]): List[Tree] =
         stats.foreach(stat => logEnterStat("macroPlugin2", stat))
         stats.flatMap(stat => stat +: deriveStat("macroPlugin2", typer, stat))
-      }
-    }
 
     addMacroPlugin(macroPlugin1)
     addMacroPlugin(macroPlugin2)
     compileString(global)(code)
     println(output.mkString("\n"))
-  }
-}

@@ -33,20 +33,19 @@ import org.apache.spark.util.StatCounter
  * TODO update tests to use TestingUtils for floating point comparison after PR 1367 is merged
  */
 class RandomRDDsSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Serializable {
+    extends SparkFunSuite with MLlibTestSparkContext with Serializable
 
   def testGeneratedRDD(rdd: RDD[Double],
                        expectedSize: Long,
                        expectedNumPartitions: Int,
                        expectedMean: Double,
                        expectedStddev: Double,
-                       epsilon: Double = 0.01) {
+                       epsilon: Double = 0.01)
     val stats = rdd.stats()
     assert(expectedSize === stats.count)
     assert(expectedNumPartitions === rdd.partitions.size)
     assert(math.abs(stats.mean - expectedMean) < epsilon)
     assert(math.abs(stats.stdev - expectedStddev) < epsilon)
-  }
 
   // assume test RDDs are small
   def testGeneratedVectorRDD(rdd: RDD[Vector],
@@ -55,25 +54,21 @@ class RandomRDDsSuite
                              expectedNumPartitions: Int,
                              expectedMean: Double,
                              expectedStddev: Double,
-                             epsilon: Double = 0.01) {
+                             epsilon: Double = 0.01)
     assert(expectedNumPartitions === rdd.partitions.size)
     val values = new ArrayBuffer[Double]()
-    rdd.collect.foreach { vector =>
-      {
+    rdd.collect.foreach  vector =>
         assert(vector.size === expectedColumns)
         values ++= vector.toArray
-      }
-    }
     assert(expectedRows === values.size / expectedColumns)
     val stats = new StatCounter(values)
     assert(math.abs(stats.mean - expectedMean) < epsilon)
     assert(math.abs(stats.stdev - expectedStddev) < epsilon)
-  }
 
-  test("RandomRDD sizes") {
+  test("RandomRDD sizes")
 
     // some cases where size % numParts != 0 to test getPartitions behaves correctly
-    for ((size, numPartitions) <- List((10000, 6), (12345, 1), (1000, 101))) {
+    for ((size, numPartitions) <- List((10000, 6), (12345, 1), (1000, 101)))
       val rdd =
         new RandomRDD(sc, size, numPartitions, new UniformGenerator, 0L)
       assert(rdd.count() === size)
@@ -85,36 +80,30 @@ class RandomRDDsSuite
 
       val partStats = new StatCounter(partSizes)
       assert(partStats.max - partStats.min <= 1)
-    }
 
     // size > Int.MaxValue
     val size = Int.MaxValue.toLong * 100L
     val numPartitions = 101
     val rdd = new RandomRDD(sc, size, numPartitions, new UniformGenerator, 0L)
     assert(rdd.partitions.size === numPartitions)
-    val count = rdd.partitions.foldLeft(0L) { (count, part) =>
+    val count = rdd.partitions.foldLeft(0L)  (count, part) =>
       count + part.asInstanceOf[RandomRDDPartition[Double]].size
-    }
     assert(count === size)
 
     // size needs to be positive
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new RandomRDD(sc, 0, 10, new UniformGenerator, 0L)
-    }
 
     // numPartitions needs to be positive
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new RandomRDD(sc, 100, 0, new UniformGenerator, 0L)
-    }
 
     // partition size needs to be <= Int.MaxValue
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new RandomRDD(
           sc, Int.MaxValue.toLong * 100L, 99, new UniformGenerator, 0L)
-    }
-  }
 
-  test("randomRDD for different distributions") {
+  test("randomRDD for different distributions")
     val size = 100000L
     val numPartitions = 10
 
@@ -131,7 +120,7 @@ class RandomRDDsSuite
     val poissonMean = 100.0
     val exponentialMean = 1.0
 
-    for (seed <- 0 until 5) {
+    for (seed <- 0 until 5)
       val uniform = RandomRDDs.uniformRDD(sc, size, numPartitions, seed)
       testGeneratedRDD(uniform, size, numPartitions, 0.5, 1 / math.sqrt(12))
 
@@ -164,14 +153,12 @@ class RandomRDDsSuite
       val gamma = RandomRDDs.gammaRDD(
           sc, gammaShape, gammaScale, size, numPartitions, seed)
       testGeneratedRDD(gamma, size, numPartitions, gammaMean, gammaStd, 0.1)
-    }
 
     // mock distribution to check that partitions have unique seeds
     val random = RandomRDDs.randomRDD(sc, new MockDistro(), 1000L, 1000, 0L)
     assert(random.collect.size === random.collect.distinct.size)
-  }
 
-  test("randomVectorRDD for different distributions") {
+  test("randomVectorRDD for different distributions")
     val rows = 1000L
     val cols = 100
     val parts = 10
@@ -189,7 +176,7 @@ class RandomRDDsSuite
     val poissonMean = 100.0
     val exponentialMean = 1.0
 
-    for (seed <- 0 until 5) {
+    for (seed <- 0 until 5)
       val uniform = RandomRDDs.uniformVectorRDD(sc, rows, cols, parts, seed)
       testGeneratedVectorRDD(
           uniform, rows, cols, parts, 0.5, 1 / math.sqrt(12))
@@ -221,11 +208,8 @@ class RandomRDDsSuite
           sc, gammaShape, gammaScale, rows, cols, parts, seed)
       testGeneratedVectorRDD(
           gamma, rows, cols, parts, gammaMean, gammaStd, 0.1)
-    }
-  }
-}
 
-private[random] class MockDistro extends RandomDataGenerator[Double] {
+private[random] class MockDistro extends RandomDataGenerator[Double]
 
   var seed = 0L
 
@@ -235,4 +219,3 @@ private[random] class MockDistro extends RandomDataGenerator[Double] {
   override def setSeed(seed: Long): Unit = this.seed = seed
 
   override def copy(): MockDistro = new MockDistro
-}

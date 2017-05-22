@@ -29,9 +29,8 @@ import akka.shapeless.ops.hlist.ReversePrepend
 // unfortunately the Tree for the function argument to the `apply` overloads above does *not* allow us to inspect the
 // function type which is why we capture it separately with this helper type
 sealed trait FCapture[T]
-object FCapture {
+object FCapture
   implicit def apply[T]: FCapture[T] = `n/a`
-}
 
 // builds `In` and `Out` types according to this logic:
 //  if (R == Unit)
@@ -42,11 +41,10 @@ object FCapture {
 //    In = TailSwitch[I2, L1 ::: L2, I], Out = TailSwitch[L1 ::: L2, I2, O2]
 //  else
 //    In = I, Out = L1 ::: L2 ::: R :: HNil
-sealed trait Join[I <: HList, L1 <: HList, L2 <: HList, R] {
+sealed trait Join[I <: HList, L1 <: HList, L2 <: HList, R]
   type In <: HList
   type Out <: HList
-}
-object Join {
+object Join
   implicit def join[
       I <: HList, L1 <: HList, L2 <: HList, R, In0 <: HList, Out0 <: HList](
       implicit x: Aux[I, L1, L2, R, HNil, In0, Out0])
@@ -59,7 +57,7 @@ object Join {
                    Acc <: HList,
                    In <: HList,
                    Out <: HList]
-  object Aux extends Aux1 {
+  object Aux extends Aux1
     // if R == Unit convert to HNil
     implicit def forUnit[
         I <: HList, L1 <: HList, L2 <: HList, Acc <: HList, Out <: HList](
@@ -105,12 +103,9 @@ object Join {
         implicit i: TailSwitch.Aux[I2, I2, O, O, I, HNil, In],
         o: TailSwitch.Aux[O, O, I2, I2, O2, HNil, Out])
       : Aux[I, HNil, O, Rule[I2, O2], HNil, In, Out] = `n/a`
-  }
-  abstract class Aux1 {
+  abstract class Aux1
     // convert R to R :: HNil
     implicit def forAny[
         I <: HList, L1 <: HList, L2 <: HList, R, Acc <: HList, Out <: HList](
         implicit x: Aux[I, L1, L2, R :: HNil, Acc, I, Out])
       : Aux[I, L1, L2, R, Acc, I, Out] = `n/a`
-  }
-}

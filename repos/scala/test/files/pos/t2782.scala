@@ -1,6 +1,6 @@
 import scala.{collection => sc}
 
-object Test {
+object Test
   trait Foo[T]
 
   // Haven't managed to repro without using a CanBuild or CanBuildFrom implicit parameter
@@ -12,10 +12,8 @@ object Test {
   implicit def Tuple2Foo[A, B] = new Foo[(A, B)] {} // nor this one
 
   implicitly[Foo[(Int, Int)]]
-}
 
-class A {
+class A
   def x[N[X] >: M[X], M[_], G](n: N[G], m: M[G]) = null
 
   x(Some(3), Seq(2))
-}

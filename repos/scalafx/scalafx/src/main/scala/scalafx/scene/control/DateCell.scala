@@ -32,21 +32,18 @@ import javafx.scene.{control => jfxsc}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object DateCell {
+object DateCell
   implicit def sfxDateCell2jfx(c: DateCell): jfxsc.DateCell =
     if (c != null) c.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/DateCell.html]].
   */
 class DateCell(override val delegate: jfxsc.DateCell = new jfxsc.DateCell())
-    extends Cell[LocalDate](delegate) with SFXDelegate[jfxsc.DateCell] {
+    extends Cell[LocalDate](delegate) with SFXDelegate[jfxsc.DateCell]
 
   /**
     * Updates the item associated with this `Cell`.
     */
-  def updateItem(item: LocalDate, empty: Boolean) {
+  def updateItem(item: LocalDate, empty: Boolean)
     delegate.updateItem(item, empty)
-  }
-}

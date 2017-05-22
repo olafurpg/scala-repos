@@ -13,26 +13,25 @@ import org.jetbrains.plugins.scala.lang.lexer.{ScalaLexer, ScalaTokenTypes}
 /**
   * @author Alexander Podkhalyuzin
   */
-object ScalaDirUtil {
-  def getPackageStatement(text: CharSequence): String = {
+object ScalaDirUtil
+  def getPackageStatement(text: CharSequence): String =
     val lexer: Lexer = new ScalaLexer
     lexer.start(text)
     val buffer: StringBuilder = StringBuilderSpinAllocator.alloc()
-    def readPackage(firstTime: Boolean) {
+    def readPackage(firstTime: Boolean)
       skipWhiteSpaceAndComments(lexer)
       if (lexer.getTokenType != ScalaTokenTypes.kPACKAGE) return
       if (!firstTime) buffer.append('.')
       lexer.advance()
       skipWhiteSpaceAndComments(lexer)
-      if (lexer.getTokenType == ScalaTokenTypes.kOBJECT) {
+      if (lexer.getTokenType == ScalaTokenTypes.kOBJECT)
         lexer.advance()
         skipWhiteSpaceAndComments(lexer)
         if (lexer.getTokenType == ScalaTokenTypes.tIDENTIFIER)
           buffer.append(text, lexer.getTokenStart, lexer.getTokenEnd)
         return
-      }
-      def appendPackageStatement() {
-        while (true) {
+      def appendPackageStatement()
+        while (true)
           if (lexer.getTokenType != ScalaTokenTypes.tIDENTIFIER) return
           buffer.append(text, lexer.getTokenStart, lexer.getTokenEnd)
           lexer.advance()
@@ -41,30 +40,21 @@ object ScalaDirUtil {
           buffer.append('.')
           lexer.advance()
           skipWhiteSpaceAndComments(lexer)
-        }
-      }
       appendPackageStatement()
-      if (lexer.getTokenType == ScalaTokenTypes.tLBRACE) {
+      if (lexer.getTokenType == ScalaTokenTypes.tLBRACE)
         lexer.advance()
         skipWhiteSpaceAndComments(lexer)
-      }
       readPackage(false)
-    }
-    try {
+    try
       readPackage(true)
       val packageName: String = buffer.toString
       if (packageName.length == 0 || StringUtil.endsWithChar(packageName, '.'))
         return null
       packageName
-    } finally {
+    finally
       StringBuilderSpinAllocator.dispose(buffer)
-    }
-  }
 
-  def skipWhiteSpaceAndComments(lexer: Lexer) {
+  def skipWhiteSpaceAndComments(lexer: Lexer)
     while (ScalaTokenTypes.WHITES_SPACES_AND_COMMENTS_TOKEN_SET.contains(
-        lexer.getTokenType)) {
+        lexer.getTokenType))
       lexer.advance()
-    }
-  }
-}

@@ -11,60 +11,51 @@ import java.nio._
 
 import org.scalajs.testsuite.niobuffer.ByteBufferFactories._
 
-abstract class FloatBufferTest extends BaseBufferTest {
+abstract class FloatBufferTest extends BaseBufferTest
   type Factory = BufferFactory.FloatBufferFactory
 
-  class AllocFloatBufferFactory extends Factory {
+  class AllocFloatBufferFactory extends Factory
     def allocBuffer(capacity: Int): FloatBuffer =
       FloatBuffer.allocate(capacity)
-  }
 
   class WrappedFloatBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory with BufferFactory.WrappedBufferFactory
     def baseWrap(array: Array[Float]): FloatBuffer =
       FloatBuffer.wrap(array)
 
     def baseWrap(array: Array[Float], offset: Int, length: Int): FloatBuffer =
       FloatBuffer.wrap(array, offset, length)
-  }
 
   class ByteBufferFloatViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory with BufferFactory.ByteBufferViewFactory
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): FloatBuffer =
       byteBufferFactory.allocBuffer(capacity * 4).order(order).asFloatBuffer()
-  }
-}
 
-class AllocFloatBufferTest extends FloatBufferTest {
+class AllocFloatBufferTest extends FloatBufferTest
   val factory: Factory = new AllocFloatBufferFactory
-}
 
-class WrappedFloatBufferTest extends FloatBufferTest {
+class WrappedFloatBufferTest extends FloatBufferTest
   val factory: Factory = new WrappedFloatBufferFactory
-}
 
-class WrappedFloatReadOnlyBufferTest extends FloatBufferTest {
+class WrappedFloatReadOnlyBufferTest extends FloatBufferTest
   val factory: Factory = new WrappedFloatBufferFactory
   with BufferFactory.ReadOnlyBufferFactory
-}
 
-class AllocFloatSlicedBufferTest extends FloatBufferTest {
+class AllocFloatSlicedBufferTest extends FloatBufferTest
   val factory: Factory = new AllocFloatBufferFactory
   with BufferFactory.SlicedBufferFactory
-}
 
 // Float views of byte buffers
 
 abstract class FloatViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends FloatBufferTest {
+    extends FloatBufferTest
 
   val factory: BufferFactory.FloatBufferFactory =
     new ByteBufferFloatViewFactory(byteBufferFactory, order)
-}
 
 class FloatViewOfAllocByteBufferBigEndianTest
     extends FloatViewOfByteBufferTest(
@@ -94,13 +85,11 @@ class FloatViewOfSlicedAllocByteBufferLittleEndianTest
 
 abstract class ReadOnlyFloatViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends FloatBufferTest {
+    extends FloatBufferTest
 
-  val factory: BufferFactory.FloatBufferFactory = {
+  val factory: BufferFactory.FloatBufferFactory =
     new ByteBufferFloatViewFactory(byteBufferFactory, order)
     with BufferFactory.ReadOnlyBufferFactory
-  }
-}
 
 class ReadOnlyFloatViewOfAllocByteBufferBigEndianTest
     extends ReadOnlyFloatViewOfByteBufferTest(

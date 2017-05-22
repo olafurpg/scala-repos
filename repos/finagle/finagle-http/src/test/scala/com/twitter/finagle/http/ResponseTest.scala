@@ -6,19 +6,17 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ResponseTest extends FunSuite {
-  test("constructors") {
+class ResponseTest extends FunSuite
+  test("constructors")
     List(
         Response(),
         Response(Version.Http11, Status.Ok),
         Response()
-    ).foreach { response =>
+    ).foreach  response =>
       assert(response.version == Version.Http11)
       assert(response.status == Status.Ok)
-    }
-  }
 
-  test("encode") {
+  test("encode")
     val response = Response()
     response.headerMap.set("Server", "macaw")
 
@@ -26,22 +24,18 @@ class ResponseTest extends FunSuite {
     val actual = response.encodeString()
 
     assert(actual == expected)
-  }
 
-  test("decodeString") {
+  test("decodeString")
     val response = Response.decodeString(
         "HTTP/1.1 200 OK\r\nServer: macaw\r\nContent-Length: 0\r\n\r\n")
 
     assert(response.status == Status.Ok)
     assert(response.headerMap(Fields.Server) == "macaw")
-  }
 
-  test("decodeBytes") {
+  test("decodeBytes")
     val response = Response.decodeBytes(
         "HTTP/1.1 200 OK\r\nServer: macaw\r\nContent-Length: 0\r\n\r\n"
           .getBytes(Charsets.Utf8))
 
     assert(response.status == Status.Ok)
     assert(response.headerMap(Fields.Server) == "macaw")
-  }
-}

@@ -12,19 +12,19 @@ import akka.http.scaladsl.model.headers.`Content-Length`
 /**
   * INTERNAL API
   */
-private object SpecializedHeaderValueParsers {
+private object SpecializedHeaderValueParsers
   import HttpHeaderParser._
 
   def specializedHeaderValueParsers = Seq(ContentLengthParser)
 
   object ContentLengthParser
-      extends HeaderValueParser("Content-Length", maxValueCount = 1) {
+      extends HeaderValueParser("Content-Length", maxValueCount = 1)
     def apply(hhp: HttpHeaderParser,
               input: ByteString,
               valueStart: Int,
-              onIllegalHeader: ErrorInfo ⇒ Unit): (HttpHeader, Int) = {
+              onIllegalHeader: ErrorInfo ⇒ Unit): (HttpHeader, Int) =
       @tailrec def recurse(ix: Int = valueStart, result: Long = 0)
-        : (HttpHeader, Int) = {
+        : (HttpHeader, Int) =
         val c = byteChar(input, ix)
         if (result < 0)
           fail(
@@ -34,8 +34,4 @@ private object SpecializedHeaderValueParsers {
         else if (c == '\r' && byteChar(input, ix + 1) == '\n')
           (`Content-Length`(result), ix + 2)
         else fail("Illegal `Content-Length` header value")
-      }
       recurse()
-    }
-  }
-}

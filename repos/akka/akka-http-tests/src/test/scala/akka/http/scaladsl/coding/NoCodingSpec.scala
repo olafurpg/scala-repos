@@ -6,7 +6,7 @@ package akka.http.scaladsl.coding
 
 import java.io.{OutputStream, InputStream}
 
-class NoCodingSpec extends CoderSpec {
+class NoCodingSpec extends CoderSpec
   protected def Coder: Coder with StreamDecoder = NoCoding
 
   override protected def corruptInputCheck = false
@@ -15,4 +15,3 @@ class NoCodingSpec extends CoderSpec {
       underlying: OutputStream): OutputStream = underlying
   protected def newDecodedInputStream(underlying: InputStream): InputStream =
     underlying
-}

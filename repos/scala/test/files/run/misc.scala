@@ -1,11 +1,11 @@
-object Test {
+object Test
 
   def fac(n: Int): Int = if (n < 2) 1 else fac(n - 1) * n;
 
   // Fibonacci
   def fib(n: Int): Int = if (n < 2) 1 else fib(n - 1) + fib(n - 2);
 
-  def show_fib(n: Int): Int = {
+  def show_fib(n: Int): Int =
     Console.print("### fib(");
     Console.print(n);
     Console.print(") = ");
@@ -15,7 +15,6 @@ object Test {
     Console.println;
     Console.flush;
     v
-  }
 
   def id[X](x: X): X = x;
 
@@ -33,16 +32,14 @@ object Test {
 
   def apply_int(f: Int => Int, x: Int): Int = f(x);
 
-  class MyClass() {
+  class MyClass()
     override def toString() = "=== MyClass::toString ===";
     def test() = Console.println("=== MyClass::test ===");
-  }
 
-  class MySubclass() extends MyClass() {
+  class MySubclass() extends MyClass()
     override def toString() = "=== MySubclass::toString ===";
-  }
 
-  def foobar = {
+  def foobar =
     42;
     42l;
     23.5f;
@@ -102,29 +99,24 @@ object Test {
 
     Console.println(apply_any(id_any, "identity").toString());
     Console.println;
-  };
+  ;
 
   foobar;
 
 //############################################################################
 
-  class A(a: Int) {
+  class A(a: Int)
     def getA = a;
-  }
 
-  class B(b: Int, c: Int) extends A(b + c) {
+  class B(b: Int, c: Int) extends A(b + c)
     def getB = b;
-  }
 
-  class X(x: Int) {
+  class X(x: Int)
     def getX = x;
-  }
-  case class Y(y: Int, z: Int) extends X(y + z) {
+  case class Y(y: Int, z: Int) extends X(y + z)
     def getY = y;
     def getAA = this.y;
-  }
 
-  {
     val a: A = new A(1);
     val b: B = new B(2, 3);
 
@@ -141,25 +133,19 @@ object Test {
     Console.println("Y.b = " + y.getY);
     Console.println("Y.b = " + y.y);
     Console.println;
-  }
 
 //############################################################################
 
-  {
-    class X() {
+    class X()
 
-      def foo = {
+      def foo =
         Console.println("X::foo");
-      }
-    }
 
-    class Y() extends X() {
+    class Y() extends X()
 
-      override def foo = {
+      override def foo =
         Console.println("Y::foo");
         super.foo;
-      }
-    }
 
     val x: X = new X();
     val y: X = new Y();
@@ -169,42 +155,33 @@ object Test {
 
     y.foo;
     Console.println;
-  }
 
 //############################################################################
 
-  {
     class X() {}
 
-    class O(a: Int) {
+    class O(a: Int)
 
-      case class Y(b: Int) extends X() {
+      case class Y(b: Int) extends X()
         override def toString() = "";
         def bar = a + b;
-      }
 
       def foo = Y(2).bar
-    }
 
     Console.println(new O(1).foo)
-  }
 
-  {
 
-    class O(a: Int) {
+    class O(a: Int)
 
       class X() {}
 
-      case class Y(b: Int) extends X() {
+      case class Y(b: Int) extends X()
         override def toString() = "";
         def bar = a + b;
-      }
 
       def foo = Y(2).bar
-    }
 
     Console.println(new O(1).foo)
-  }
 
   Console.println;
 
@@ -225,4 +202,3 @@ object Test {
   def main(args: Array[String]) {}
 
 //############################################################################
-}

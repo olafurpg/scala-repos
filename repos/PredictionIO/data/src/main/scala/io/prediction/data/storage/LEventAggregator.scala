@@ -25,7 +25,7 @@ import org.joda.time.DateTime
   * @group Event Data
   */
 @DeveloperApi
-object LEventAggregator {
+object LEventAggregator
 
   /** :: DeveloperApi ::
     * Aggregate all properties grouped by entity type given an iterator of
@@ -36,13 +36,13 @@ object LEventAggregator {
     * @return A map of entity type to [[PropertyMap]]
     */
   @DeveloperApi
-  def aggregateProperties(events: Iterator[Event]): Map[String, PropertyMap] = {
+  def aggregateProperties(events: Iterator[Event]): Map[String, PropertyMap] =
     events.toList
       .groupBy(_.entityId)
       .mapValues(_.sortBy(_.eventTime.getMillis)
             .foldLeft[Prop](Prop())(propAggregator))
       .filter { case (k, v) => v.dm.isDefined }
-      .mapValues { v =>
+      .mapValues  v =>
         require(v.firstUpdated.isDefined,
                 "Unexpected Error: firstUpdated cannot be None.")
         require(v.lastUpdated.isDefined,
@@ -53,8 +53,6 @@ object LEventAggregator {
             firstUpdated = v.firstUpdated.get,
             lastUpdated = v.lastUpdated.get
         )
-      }
-  }
 
   /** :: DeveloperApi ::
     * Aggregate all properties given an iterator of [[Event]]s with the latest
@@ -64,12 +62,12 @@ object LEventAggregator {
     * @return An optional [[PropertyMap]]
     */
   @DeveloperApi
-  def aggregatePropertiesSingle(events: Iterator[Event]): Option[PropertyMap] = {
+  def aggregatePropertiesSingle(events: Iterator[Event]): Option[PropertyMap] =
     val prop = events.toList
       .sortBy(_.eventTime.getMillis)
       .foldLeft[Prop](Prop())(propAggregator)
 
-    prop.dm.map { d =>
+    prop.dm.map  d =>
       require(prop.firstUpdated.isDefined,
               "Unexpected Error: firstUpdated cannot be None.")
       require(prop.lastUpdated.isDefined,
@@ -80,54 +78,39 @@ object LEventAggregator {
           firstUpdated = prop.firstUpdated.get,
           lastUpdated = prop.lastUpdated.get
       )
-    }
-  }
 
   /** Event names that control aggregation: \$set, \$unset, and \$delete */
   val eventNames = List("$set", "$unset", "$delete")
 
   private def dataMapAggregator: ((Option[DataMap],
-  Event) => Option[DataMap]) = { (p, e) =>
-    {
-      e.event match {
-        case "$set" => {
-            if (p == None) {
+  Event) => Option[DataMap]) =  (p, e) =>
+      e.event match
+        case "$set" =>
+            if (p == None)
               Some(e.properties)
-            } else {
+            else
               p.map(_ ++ e.properties)
-            }
-          }
-        case "$unset" => {
-            if (p == None) {
+        case "$unset" =>
+            if (p == None)
               None
-            } else {
+            else
               p.map(_ -- e.properties.keySet)
-            }
-          }
         case "$delete" => None
         case _ => p // do nothing for others
-      }
-    }
-  }
 
-  private def propAggregator: ((Prop, Event) => Prop) = { (p, e) =>
-    {
-      e.event match {
-        case "$set" | "$unset" | "$delete" => {
+  private def propAggregator: ((Prop, Event) => Prop) =  (p, e) =>
+      e.event match
+        case "$set" | "$unset" | "$delete" =>
             Prop(
                 dm = dataMapAggregator(p.dm, e),
-                firstUpdated = p.firstUpdated.map { t =>
+                firstUpdated = p.firstUpdated.map  t =>
                   first(t, e.eventTime)
-                }.orElse(Some(e.eventTime)),
-                lastUpdated = p.lastUpdated.map { t =>
+                .orElse(Some(e.eventTime)),
+                lastUpdated = p.lastUpdated.map  t =>
                   last(t, e.eventTime)
-                }.orElse(Some(e.eventTime))
+                .orElse(Some(e.eventTime))
             )
-          }
         case _ => p // do nothing for others
-      }
-    }
-  }
 
   private def first(a: DateTime, b: DateTime): DateTime =
     if (b.isBefore(a)) b else a
@@ -140,4 +123,3 @@ object LEventAggregator {
       firstUpdated: Option[DateTime] = None,
       lastUpdated: Option[DateTime] = None
   )
-}

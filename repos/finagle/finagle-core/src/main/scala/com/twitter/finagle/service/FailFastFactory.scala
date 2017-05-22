@@ -11,7 +11,7 @@ import java.net.SocketAddress
 import java.util.logging.Logger
 import scala.util.Random
 
-object FailFastFactory {
+object FailFastFactory
   private sealed trait State
   private case object Ok extends State
   private case class Retrying(since: Time,
@@ -23,10 +23,9 @@ object FailFastFactory {
   private val url =
     "https://twitter.github.io/finagle/guide/FAQ.html#why-do-clients-see-com-twitter-finagle-failedfastexception-s"
 
-  private object Observation extends Enumeration {
+  private object Observation extends Enumeration
     type t = Value
     val Success, Fail, Timeout, TimeoutFail, Close = Value
-  }
 
   private val defaultBackoffs =
     (Backoff.exponential(1.second, 2) take 5) ++ Backoff.const(32.seconds)
@@ -41,13 +40,11 @@ object FailFastFactory {
     * @see The [[https://twitter.github.io/finagle/guide/Clients.html#fail-fast user guide]]
     *      for more details.
     */
-  case class FailFast(enabled: Boolean) {
+  case class FailFast(enabled: Boolean)
     def mk(): (FailFast, Stack.Param[FailFast]) =
       (this, FailFast.param)
-  }
-  object FailFast {
+  object FailFast
     implicit val param = Stack.Param(FailFast(enabled = true))
-  }
 
   /**
     * Creates a [[com.twitter.finagle.Stackable]] [[FailFastFactory]] when enabled.
@@ -59,7 +56,7 @@ object FailFastFactory {
                       param.Label,
                       param.Logger,
                       Transporter.EndpointAddr,
-                      ServiceFactory[Req, Rep]] {
+                      ServiceFactory[Req, Rep]]
       val role = FailFastFactory.role
       val description =
         "Backoff exponentially from hosts to which we cannot establish a connection"
@@ -71,8 +68,8 @@ object FailFastFactory {
           _logger: param.Logger,
           _endpoint: Transporter.EndpointAddr,
           next: ServiceFactory[Req, Rep]
-      ) = {
-        failFast match {
+      ) =
+        failFast match
           case FailFast(false) =>
             next
           case FailFast(true) =>
@@ -88,10 +85,6 @@ object FailFastFactory {
                                 label,
                                 logger,
                                 endpoint)
-        }
-      }
-    }
-}
 
 /**
   * A fail-fast factory that attempts to reduce the number of requests dispatched
@@ -117,7 +110,7 @@ private[finagle] class FailFastFactory[Req, Rep](
     logger: Logger = DefaultLogger,
     endpoint: Address = Address.failing,
     backoffs: Stream[Duration] = FailFastFactory.defaultBackoffs)
-    extends ServiceFactoryProxy(underlying) {
+    extends ServiceFactoryProxy(underlying)
   import FailFastFactory._
 
   private[this] val exc = new FailedFastException(
@@ -130,34 +123,29 @@ private[finagle] class FailFastFactory[Req, Rep](
   private[this] val markedDeadCounter = statsReceiver.counter("marked_dead")
 
   private[this] val unhealthyForMsGauge =
-    statsReceiver.addGauge("unhealthy_for_ms") {
-      state match {
+    statsReceiver.addGauge("unhealthy_for_ms")
+      state match
         case r: Retrying => r.since.untilNow.inMilliseconds
         case _ => 0
-      }
-    }
 
   private[this] val unhealthyNumRetriesGauge =
-    statsReceiver.addGauge("unhealthy_num_tries") {
-      state match {
+    statsReceiver.addGauge("unhealthy_num_tries")
+      state match
         case r: Retrying => r.ntries
         case _ => 0
-      }
-    }
 
-  private[this] def getBackoffs(): Stream[Duration] = backoffs map {
+  private[this] def getBackoffs(): Stream[Duration] = backoffs map
     duration =>
       // Add a 10% jitter to reduce correlation.
       val ms = duration.inMilliseconds
       (ms + ms * (rng.nextFloat() * 0.10)).toInt.milliseconds
-  }
 
   @volatile private[this] var state: State = Ok
 
-  private[this] val update = new Updater[Observation.t] {
+  private[this] val update = new Updater[Observation.t]
     def preprocess(elems: Seq[Observation.t]) = elems
 
-    def handle(o: Observation.t) = o match {
+    def handle(o: Observation.t) = o match
       case Observation.Success if state != Ok =>
         val Retrying(_, task, _, _) = state
         task.cancel()
@@ -165,14 +153,12 @@ private[finagle] class FailFastFactory[Req, Rep](
         state = Ok
 
       case Observation.Fail if state == Ok =>
-        val (wait, rest) = getBackoffs() match {
+        val (wait, rest) = getBackoffs() match
           case Stream.Empty => (Duration.Zero, Stream.empty[Duration])
           case wait #:: rest => (wait, rest)
-        }
         val now = Time.now
-        val task = timer.schedule(now + wait) {
+        val task = timer.schedule(now + wait)
           this.apply(Observation.Timeout)
-        }
         markedDeadCounter.incr()
 
         if (logger.isLoggable(Level.DEBUG))
@@ -183,15 +169,14 @@ private[finagle] class FailFastFactory[Req, Rep](
         state = Retrying(now, task, 0, rest)
 
       case Observation.Timeout if state != Ok =>
-        underlying(ClientConnection.nil).respond {
+        underlying(ClientConnection.nil).respond
           case Throw(_) => this.apply(Observation.TimeoutFail)
           case Return(service) =>
             this.apply(Observation.Success)
             service.close()
-        }
 
       case Observation.TimeoutFail if state != Ok =>
-        state match {
+        state match
           case Retrying(_, task, _, Stream.Empty) =>
             task.cancel()
             // Backoff schedule exhausted. Optimistically become available in
@@ -200,46 +185,35 @@ private[finagle] class FailFastFactory[Req, Rep](
 
           case Retrying(since, task, ntries, wait #:: rest) =>
             task.cancel()
-            val newTask = timer.schedule(Time.now + wait) {
+            val newTask = timer.schedule(Time.now + wait)
               this.apply(Observation.Timeout)
-            }
             state = Retrying(since, newTask, ntries + 1, rest)
 
           case Ok => assert(false)
-        }
 
       case Observation.Close =>
         val oldState = state
         state = Ok
-        oldState match {
+        oldState match
           case Retrying(_, task, _, _) =>
             task.cancel()
           case _ =>
-        }
 
       case _ => ()
-    }
-  }
 
-  override def apply(conn: ClientConnection): Future[Service[Req, Rep]] = {
+  override def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
     if (state != Ok) futureExc
-    else {
-      underlying(conn).respond {
+    else
+      underlying(conn).respond
         case Throw(_) => update(Observation.Fail)
         case Return(_) if state != Ok => update(Observation.Success)
         case _ =>
-      }
-    }
-  }
-  override def status = state match {
+  override def status = state match
     case Ok => underlying.status
     case _: Retrying => Status.Busy
-  }
 
   override val toString = "fail_fast_%s".format(underlying.toString)
 
-  override def close(deadline: Time): Future[Unit] = {
+  override def close(deadline: Time): Future[Unit] =
     update(Observation.Close)
     underlying.close(deadline)
-  }
-}

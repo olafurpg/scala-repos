@@ -8,52 +8,41 @@ import lila.app._
 import lila.common.LilaCookie
 import views._
 
-object Pref extends LilaController {
+object Pref extends LilaController
 
   private def api = Env.pref.api
   private def forms = Env.pref.forms
 
-  def form(categSlug: String) = Auth { implicit ctx => me =>
-    lila.pref.PrefCateg(categSlug) match {
+  def form(categSlug: String) = Auth  implicit ctx => me =>
+    lila.pref.PrefCateg(categSlug) match
       case None => notFound
       case Some(categ) =>
         Ok(html.account.pref(me, forms prefOf ctx.pref, categ)).fuccess
-    }
-  }
 
-  def formApply = AuthBody { implicit ctx => me =>
+  def formApply = AuthBody  implicit ctx => me =>
     implicit val req = ctx.body
-    FormFuResult(forms.pref) { err =>
+    FormFuResult(forms.pref)  err =>
       fuccess(err.toString)
-    } { data =>
+     data =>
       api.setPref(data(ctx.pref), notifyChange = true) inject Ok("saved")
-    }
-  }
 
-  def miniFormApply = AuthBody { implicit ctx => me =>
+  def miniFormApply = AuthBody  implicit ctx => me =>
     implicit val req = ctx.body
-    FormFuResult(forms.miniPref) { err =>
+    FormFuResult(forms.miniPref)  err =>
       fuccess("nope")
-    } { data =>
+     data =>
       api.setPref(data(ctx.pref), notifyChange = true) inject Ok("saved")
-    }
-  }
 
-  def set(name: String) = OpenBody { implicit ctx =>
+  def set(name: String) = OpenBody  implicit ctx =>
     implicit val req = ctx.body
-    (setters get name) ?? {
+    (setters get name) ??
       case (form, fn) =>
-        FormResult(form) { v =>
-          fn(v, ctx) map { cookie =>
+        FormResult(form)  v =>
+          fn(v, ctx) map  cookie =>
             Ok(()).withCookies(cookie)
-          }
-        }
-    }
-  }
 
-  def saveTag(name: String, value: String) = Auth { implicit ctx => me =>
+  def saveTag(name: String, value: String) = Auth  implicit ctx => me =>
     api.saveTag(me, name, value)
-  }
 
   private lazy val setters = Map(
       "theme" -> (forms.theme -> save("theme") _),
@@ -66,7 +55,6 @@ object Pref extends LilaController {
       "is3d" -> (forms.is3d -> save("is3d") _))
 
   private def save(name: String)(value: String, ctx: Context): Fu[Cookie] =
-    ctx.me ?? {
+    ctx.me ??
       api.setPrefString(_, name, value, notifyChange = false)
-    } inject LilaCookie.session(name, value)(ctx.req)
-}
+    inject LilaCookie.session(name, value)(ctx.req)

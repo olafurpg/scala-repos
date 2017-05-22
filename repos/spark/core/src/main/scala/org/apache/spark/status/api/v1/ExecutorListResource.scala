@@ -23,18 +23,14 @@ import org.apache.spark.ui.SparkUI
 import org.apache.spark.ui.exec.ExecutorsPage
 
 @Produces(Array(MediaType.APPLICATION_JSON))
-private[v1] class ExecutorListResource(ui: SparkUI) {
+private[v1] class ExecutorListResource(ui: SparkUI)
 
   @GET
-  def executorList(): Seq[ExecutorSummary] = {
+  def executorList(): Seq[ExecutorSummary] =
     val listener = ui.executorsListener
-    listener.synchronized {
+    listener.synchronized
       // The follow codes should be protected by `listener` to make sure no executors will be
       // removed before we query their status. See SPARK-12784.
       val storageStatusList = listener.activeStorageStatusList
-      (0 until storageStatusList.size).map { statusId =>
+      (0 until storageStatusList.size).map  statusId =>
         ExecutorsPage.getExecInfo(listener, statusId, isActive = true)
-      }
-    }
-  }
-}

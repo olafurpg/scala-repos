@@ -15,18 +15,18 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
 /**
   * @author Nikolay.Tropin
   */
-class AddBreakoutQuickFix(expr: ScExpression) extends IntentionAction {
+class AddBreakoutQuickFix(expr: ScExpression) extends IntentionAction
   override def getText: String = "Add `collection.breakOut` argument"
 
   override def getFamilyName: String = "Add `collection.breakOut`"
 
   override def invoke(
-      project: Project, editor: Editor, psiFile: PsiFile): Unit = {
+      project: Project, editor: Editor, psiFile: PsiFile): Unit =
     def createWithClauses(text: String) =
       ScalaPsiElementFactory.createExpressionWithContextFromText(
           text + "(collection.breakOut)", expr.getContext, expr)
 
-    expr match {
+    expr match
       case mc: ScMethodCall =>
         mc.replaceExpression(
             createWithClauses(mc.getText), removeParenthesis = true)
@@ -38,40 +38,31 @@ class AddBreakoutQuickFix(expr: ScExpression) extends IntentionAction {
         val withClauses = createWithClauses(s"(${forStmt.getText})")
         forStmt.replaceExpression(withClauses, removeParenthesis = true)
       case _ =>
-    }
-  }
 
   override def startInWriteAction(): Boolean = true
 
   override def isAvailable(
       project: Project, editor: Editor, psiFile: PsiFile): Boolean =
     AddBreakoutQuickFix.isAvailable(expr)
-}
 
-object AddBreakoutQuickFix {
-  def isAvailable(expr: ScExpression): Boolean = {
+object AddBreakoutQuickFix
+  def isAvailable(expr: ScExpression): Boolean =
     if (!expr.isValid) return false
-    expr match {
+    expr match
       case MethodRepr(_, _, Some(ResolvesTo(fd: ScFunctionDefinition)), _) =>
         val lastClause = fd.paramClauses.clauses.lastOption
-        lastClause.map(_.parameters) match {
+        lastClause.map(_.parameters) match
           case Some(Seq(p: ScParameter)) if isImplicitCanBuildFromParam(p) =>
             true
           case _ => false
-        }
       case forStmt: ScForStatement =>
         forStmt.getDesugarizedExpr.exists(isAvailable)
       case _ => false
-    }
-  }
 
-  def isImplicitCanBuildFromParam(p: ScParameter): Boolean = {
-    p.getType(TypingContext.empty) match {
+  def isImplicitCanBuildFromParam(p: ScParameter): Boolean =
+    p.getType(TypingContext.empty) match
       case Success(tpe, _)
           if tpe.canonicalText.startsWith(
               "_root_.scala.collection.generic.CanBuildFrom") =>
         true
       case _ => false
-    }
-  }
-}

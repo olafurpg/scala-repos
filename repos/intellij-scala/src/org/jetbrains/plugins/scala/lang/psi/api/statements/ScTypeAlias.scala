@@ -24,21 +24,18 @@ import scala.annotation.tailrec
   */
 trait ScTypeAlias
     extends ScPolymorphicElement with ScMember with ScAnnotationsHolder
-    with ScDocCommentOwner with ScCommentOwner {
+    with ScDocCommentOwner with ScCommentOwner
   override def getIcon(flags: Int): Icon = Icons.TYPE_ALIAS
 
   override protected def isSimilarMemberForNavigation(
-      m: ScMember, isStrict: Boolean) = m match {
+      m: ScMember, isStrict: Boolean) = m match
     case t: ScTypeAlias => t.name == name
     case _ => false
-  }
 
-  def isExistentialTypeAlias: Boolean = {
-    getContext match {
+  def isExistentialTypeAlias: Boolean =
+    getContext match
       case _: ScExistentialClause => true
       case _ => false
-    }
-  }
 
   override def isDeprecated =
     hasAnnotation("scala.deprecated") != None ||
@@ -46,7 +43,7 @@ trait ScTypeAlias
 
   def getTypeToken: PsiElement = findFirstChildByType(ScalaTokenTypes.kTYPE)
 
-  def getOriginalElement: PsiElement = {
+  def getOriginalElement: PsiElement =
     val ccontainingClass = containingClass
     if (ccontainingClass == null) return this
     val originalClass: PsiClass =
@@ -55,18 +52,15 @@ trait ScTypeAlias
     if (!originalClass.isInstanceOf[ScTypeDefinition]) return this
     val c = originalClass.asInstanceOf[ScTypeDefinition]
     val aliasesIterator = c.aliases.iterator
-    while (aliasesIterator.hasNext) {
+    while (aliasesIterator.hasNext)
       val alias = aliasesIterator.next()
       if (alias.name == name) return alias
-    }
     this
-  }
-}
 
-object ScTypeAlias {
+object ScTypeAlias
   @tailrec
-  def getCompoundCopy(sign: TypeAliasSignature, ta: ScTypeAlias): ScTypeAlias = {
-    ta match {
+  def getCompoundCopy(sign: TypeAliasSignature, ta: ScTypeAlias): ScTypeAlias =
+    ta match
       case light: ScLightTypeAliasDeclaration =>
         getCompoundCopy(sign, light.ta)
       case light: ScLightTypeAliasDefinition => getCompoundCopy(sign, light.ta)
@@ -74,6 +68,3 @@ object ScTypeAlias {
         new ScLightTypeAliasDeclaration(sign, decl)
       case definition: ScTypeAliasDefinition =>
         new ScLightTypeAliasDefinition(sign, definition)
-    }
-  }
-}

@@ -5,7 +5,7 @@ package tpe
 
 import scala.collection.mutable.HashSet
 
-private[internal] trait TypeToStrings { self: SymbolTable =>
+private[internal] trait TypeToStrings  self: SymbolTable =>
 
   /** The maximum number of recursions allowed in toString
     */
@@ -24,15 +24,15 @@ private[internal] trait TypeToStrings { self: SymbolTable =>
     //   "..."
     // }
     // else
-    if (toStringRecursions >= maxToStringRecursions) {
+    if (toStringRecursions >= maxToStringRecursions)
       devWarning(
           "Exceeded recursion depth attempting to print " +
           util.shortClassOfInstance(tpe))
       if (settings.debug) (new Throwable).printStackTrace
 
       "..."
-    } else
-      try {
+    else
+      try
         toStringRecursions += 1
         // TODO: study performance impact of this cache
         // to quote Jason:
@@ -40,8 +40,6 @@ private[internal] trait TypeToStrings { self: SymbolTable =>
         //   when we generate error messages, including, importantly, errors issued during silent mode that are never issued.
         // toStringSubjects += tpe
         tpe.safeToString
-      } finally {
+      finally
         // toStringSubjects -= tpe
         toStringRecursions -= 1
-      }
-}

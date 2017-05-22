@@ -7,33 +7,28 @@ class B;
 class C;
 class D;
 
-object Help {
+object Help
   val max: Int = 4;
   var next: Int = 0;
   var vars: Array[String] = new Array[String](max);
-  def init: Unit = {
+  def init: Unit =
     var i = 0;
     while (i < max) { vars(i) = null; i = i + 1; }
     next = 0;
-  }
-  def check(count: Int, value: String): Boolean = {
+  def check(count: Int, value: String): Boolean =
     var b: Boolean = true;
     var i: Int = 0;
     while (i < count) { if (vars(i) != value) b = false; i = i + 1; }
     while (i < max) { if (vars(i) != null) b = false; i = i + 1; }
     b;
-  }
-  def print: Unit = {
+  def print: Unit =
     var i = 0;
-    while (i < max) {
+    while (i < max)
       if (i > 0) Console.print(", "); Console.print(vars(i)); i = i + 1;
-    }
-  }
   def foo = { vars(next) = "foo"; next = next + 1; }
   def bar = { vars(next) = "bar"; next = next + 1; }
   def mix = { vars(next) = "mix"; next = next + 1; }
   def sub = { vars(next) = "sub"; next = next + 1; }
-}
 
 import Help.foo;
 import Help.bar;
@@ -41,15 +36,13 @@ import Help.mix;
 import Help.sub;
 
 abstract class Foo___ { type I >: Null <: AnyRef; def f: I; f; }
-abstract class Foo__f {
+abstract class Foo__f
   type I >: Null <: AnyRef; def f: I = { foo; null }; f;
-}
 abstract class Foo_I_ { class I; def f: I; f; }
 abstract class Foo_If { class I; def f: I = { foo; null }; f; }
 abstract class FooX__[X] { type I >: Null <: AnyRef; def f: I; f; }
-abstract class FooX_f[X] {
+abstract class FooX_f[X]
   type I >: Null <: AnyRef; def f: I = { foo; null }; f;
-}
 abstract class FooXI_[X] { class I; def f: I; f; }
 abstract class FooXIf[X] { class I; def f: I = { foo; null }; f; }
 
@@ -182,233 +175,181 @@ class Mix___eFooXIfwBarY__ extends FooXIf[A] with BarY__[B] { ;; f; }
 /* */
 abstract class Mix__feFoo___ extends Foo___ { ; def f: I = { mix; null }; f; }
 /* */
-abstract class Mix__feFoo___wBar___ extends Foo___ with Bar___ {
+abstract class Mix__feFoo___wBar___ extends Foo___ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo___wBar__f extends Foo___ with Bar__f {
+abstract class Mix__feFoo___wBar__f extends Foo___ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo___wBar_I_ extends Foo___ with Bar_I_ {
+class Mix__feFoo___wBar_I_ extends Foo___ with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo___wBar_If extends Foo___ with Bar_If {
+class Mix__feFoo___wBar_If extends Foo___ with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo___wBarY__ extends Foo___ with BarY__[B] {
+abstract class Mix__feFoo___wBarY__ extends Foo___ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo___wBarY_f extends Foo___ with BarY_f[B] {
+abstract class Mix__feFoo___wBarY_f extends Foo___ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo___wBarYI_ extends Foo___ with BarYI_[B] {
+class Mix__feFoo___wBarYI_ extends Foo___ with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo___wBarYIf extends Foo___ with BarYIf[B] {
+class Mix__feFoo___wBarYIf extends Foo___ with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo__f extends Foo__f {
+abstract class Mix__feFoo__f extends Foo__f
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo__fwBar___ extends Foo__f with Bar___ {
+abstract class Mix__feFoo__fwBar___ extends Foo__f with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo__fwBar__f extends Foo__f with Bar__f {
+abstract class Mix__feFoo__fwBar__f extends Foo__f with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo__fwBar_I_ extends Foo__f with Bar_I_ {
+class Mix__feFoo__fwBar_I_ extends Foo__f with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo__fwBar_If extends Foo__f with Bar_If {
+class Mix__feFoo__fwBar_If extends Foo__f with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo__fwBarY__ extends Foo__f with BarY__[B] {
+abstract class Mix__feFoo__fwBarY__ extends Foo__f with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFoo__fwBarY_f extends Foo__f with BarY_f[B] {
+abstract class Mix__feFoo__fwBarY_f extends Foo__f with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo__fwBarYI_ extends Foo__f with BarYI_[B] {
+class Mix__feFoo__fwBarYI_ extends Foo__f with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo__fwBarYIf extends Foo__f with BarYIf[B] {
+class Mix__feFoo__fwBarYIf extends Foo__f with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class Mix__feFoo_I_ extends Foo_I_ { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix__feFoo_I_wBar___ extends Foo_I_ with Bar___ {
+class Mix__feFoo_I_wBar___ extends Foo_I_ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo_I_wBar__f extends Foo_I_ with Bar__f {
+class Mix__feFoo_I_wBar__f extends Foo_I_ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFoo_I_wBar_I_     extends Foo_I_    with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFoo_I_wBar_If     extends Foo_I_    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__feFoo_I_wBarY__ extends Foo_I_ with BarY__[B] {
+class Mix__feFoo_I_wBarY__ extends Foo_I_ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo_I_wBarY_f extends Foo_I_ with BarY_f[B] {
+class Mix__feFoo_I_wBarY_f extends Foo_I_ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFoo_I_wBarYI_     extends Foo_I_    with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFoo_I_wBarYIf     extends Foo_I_    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
 class Mix__feFoo_If extends Foo_If { ; override def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix__feFoo_IfwBar___ extends Foo_If with Bar___ {
+class Mix__feFoo_IfwBar___ extends Foo_If with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo_IfwBar__f extends Foo_If with Bar__f {
+class Mix__feFoo_IfwBar__f extends Foo_If with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFoo_IfwBar_I_     extends Foo_If    with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFoo_IfwBar_If     extends Foo_If    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__feFoo_IfwBarY__ extends Foo_If with BarY__[B] {
+class Mix__feFoo_IfwBarY__ extends Foo_If with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFoo_IfwBarY_f extends Foo_If with BarY_f[B] {
+class Mix__feFoo_IfwBarY_f extends Foo_If with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFoo_IfwBarYI_     extends Foo_If    with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFoo_IfwBarYIf     extends Foo_If    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */
-abstract class Mix__feFooX__ extends FooX__[A] {
+abstract class Mix__feFooX__ extends FooX__[A]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX__wBar___ extends FooX__[A] with Bar___ {
+abstract class Mix__feFooX__wBar___ extends FooX__[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX__wBar__f extends FooX__[A] with Bar__f {
+abstract class Mix__feFooX__wBar__f extends FooX__[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX__wBar_I_ extends FooX__[A] with Bar_I_ {
+class Mix__feFooX__wBar_I_ extends FooX__[A] with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX__wBar_If extends FooX__[A] with Bar_If {
+class Mix__feFooX__wBar_If extends FooX__[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX__wBarY__ extends FooX__[A] with BarY__[B] {
+abstract class Mix__feFooX__wBarY__ extends FooX__[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX__wBarY_f extends FooX__[A] with BarY_f[B] {
+abstract class Mix__feFooX__wBarY_f extends FooX__[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX__wBarYI_ extends FooX__[A] with BarYI_[B] {
+class Mix__feFooX__wBarYI_ extends FooX__[A] with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX__wBarYIf extends FooX__[A] with BarYIf[B] {
+class Mix__feFooX__wBarYIf extends FooX__[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX_f extends FooX_f[A] {
+abstract class Mix__feFooX_f extends FooX_f[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX_fwBar___ extends FooX_f[A] with Bar___ {
+abstract class Mix__feFooX_fwBar___ extends FooX_f[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX_fwBar__f extends FooX_f[A] with Bar__f {
+abstract class Mix__feFooX_fwBar__f extends FooX_f[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX_fwBar_I_ extends FooX_f[A] with Bar_I_ {
+class Mix__feFooX_fwBar_I_ extends FooX_f[A] with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX_fwBar_If extends FooX_f[A] with Bar_If {
+class Mix__feFooX_fwBar_If extends FooX_f[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX_fwBarY__ extends FooX_f[A] with BarY__[B] {
+abstract class Mix__feFooX_fwBarY__ extends FooX_f[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__feFooX_fwBarY_f extends FooX_f[A] with BarY_f[B] {
+abstract class Mix__feFooX_fwBarY_f extends FooX_f[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX_fwBarYI_ extends FooX_f[A] with BarYI_[B] {
+class Mix__feFooX_fwBarYI_ extends FooX_f[A] with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooX_fwBarYIf extends FooX_f[A] with BarYIf[B] {
+class Mix__feFooX_fwBarYIf extends FooX_f[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class Mix__feFooXI_ extends FooXI_[A] { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix__feFooXI_wBar___ extends FooXI_[A] with Bar___ {
+class Mix__feFooXI_wBar___ extends FooXI_[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooXI_wBar__f extends FooXI_[A] with Bar__f {
+class Mix__feFooXI_wBar__f extends FooXI_[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFooXI_wBar_I_     extends FooXI_[A] with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFooXI_wBar_If     extends FooXI_[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__feFooXI_wBarY__ extends FooXI_[A] with BarY__[B] {
+class Mix__feFooXI_wBarY__ extends FooXI_[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooXI_wBarY_f extends FooXI_[A] with BarY_f[B] {
+class Mix__feFooXI_wBarY_f extends FooXI_[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFooXI_wBarYI_     extends FooXI_[A] with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFooXI_wBarYIf     extends FooXI_[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__feFooXIf extends FooXIf[A] {
+class Mix__feFooXIf extends FooXIf[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooXIfwBar___ extends FooXIf[A] with Bar___ {
+class Mix__feFooXIfwBar___ extends FooXIf[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooXIfwBar__f extends FooXIf[A] with Bar__f {
+class Mix__feFooXIfwBar__f extends FooXIf[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFooXIfwBar_I_     extends FooXIf[A] with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFooXIfwBar_If     extends FooXIf[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__feFooXIfwBarY__ extends FooXIf[A] with BarY__[B] {
+class Mix__feFooXIfwBarY__ extends FooXIf[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__feFooXIfwBarY_f extends FooXIf[A] with BarY_f[B] {
+class Mix__feFooXIfwBarY_f extends FooXIf[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__feFooXIfwBarYI_     extends FooXIf[A] with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__feFooXIfwBarYIf     extends FooXIf[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 
@@ -421,9 +362,8 @@ class Mix_I_eFoo___wBar__f extends Foo___ with Bar__f { class I;; f; }
 // */abstract class Mix_I_eFoo___wBar_I_     extends Foo___    with Bar_I_    { class I;                                ; f; }
 // *//*    */ class Mix_I_eFoo___wBar_If     extends Foo___    with Bar_If    { class I;                                ; f; }
 /* */
-abstract class Mix_I_eFoo___wBarY__ extends Foo___ with BarY__[B] {
+abstract class Mix_I_eFoo___wBarY__ extends Foo___ with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class Mix_I_eFoo___wBarY_f extends Foo___ with BarY_f[B] { class I;; f; }
 // */abstract class Mix_I_eFoo___wBarYI_     extends Foo___    with BarYI_[B] { class I;                                ; f; }
@@ -461,17 +401,15 @@ class Mix_I_eFoo__fwBarY__ extends Foo__f with BarY__[B] { class I;; f; }
 /* */
 abstract class Mix_I_eFooX__ extends FooX__[A] { class I;; f; }
 /* */
-abstract class Mix_I_eFooX__wBar___ extends FooX__[A] with Bar___ {
+abstract class Mix_I_eFooX__wBar___ extends FooX__[A] with Bar___
   class I;; f;
-}
 /* */ /*    */
 class Mix_I_eFooX__wBar__f extends FooX__[A] with Bar__f { class I;; f; }
 // */abstract class Mix_I_eFooX__wBar_I_     extends FooX__[A] with Bar_I_    { class I;                                ; f; }
 // *//*    */ class Mix_I_eFooX__wBar_If     extends FooX__[A] with Bar_If    { class I;                                ; f; }
 /* */
-abstract class Mix_I_eFooX__wBarY__ extends FooX__[A] with BarY__[B] {
+abstract class Mix_I_eFooX__wBarY__ extends FooX__[A] with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class Mix_I_eFooX__wBarY_f extends FooX__[A] with BarY_f[B] { class I;; f; }
 // */abstract class Mix_I_eFooX__wBarYI_     extends FooX__[A] with BarYI_[B] { class I;                                ; f; }
@@ -510,47 +448,38 @@ class Mix_I_eFooX_fwBarY__ extends FooX_f[A] with BarY__[B] { class I;; f; }
 /* */ /*    */
 class Mix_IfeFoo___ extends Foo___ { class I; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix_IfeFoo___wBar___ extends Foo___ with Bar___ {
+class Mix_IfeFoo___wBar___ extends Foo___ with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFoo___wBar__f extends Foo___ with Bar__f {
+class Mix_IfeFoo___wBar__f extends Foo___ with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFoo___wBar_I_     extends Foo___    with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFoo___wBar_If     extends Foo___    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfeFoo___wBarY__ extends Foo___ with BarY__[B] {
+class Mix_IfeFoo___wBarY__ extends Foo___ with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFoo___wBarY_f extends Foo___ with BarY_f[B] {
+class Mix_IfeFoo___wBarY_f extends Foo___ with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFoo___wBarYI_     extends Foo___    with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFoo___wBarYIf     extends Foo___    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfeFoo__f extends Foo__f {
+class Mix_IfeFoo__f extends Foo__f
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFoo__fwBar___ extends Foo__f with Bar___ {
+class Mix_IfeFoo__fwBar___ extends Foo__f with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFoo__fwBar__f extends Foo__f with Bar__f {
+class Mix_IfeFoo__fwBar__f extends Foo__f with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFoo__fwBar_I_     extends Foo__f    with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFoo__fwBar_If     extends Foo__f    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfeFoo__fwBarY__ extends Foo__f with BarY__[B] {
+class Mix_IfeFoo__fwBarY__ extends Foo__f with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFoo__fwBarY_f extends Foo__f with BarY_f[B] {
+class Mix_IfeFoo__fwBarY_f extends Foo__f with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFoo__fwBarYI_     extends Foo__f    with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFoo__fwBarYIf     extends Foo__f    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFoo_I_            extends Foo_I_                   { class I;          def f: I = {mix; null}; f; }
@@ -574,47 +503,38 @@ class Mix_IfeFoo__fwBarY_f extends Foo__f with BarY_f[B] {
 /* */ /*    */
 class Mix_IfeFooX__ extends FooX__[A] { class I; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix_IfeFooX__wBar___ extends FooX__[A] with Bar___ {
+class Mix_IfeFooX__wBar___ extends FooX__[A] with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFooX__wBar__f extends FooX__[A] with Bar__f {
+class Mix_IfeFooX__wBar__f extends FooX__[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFooX__wBar_I_     extends FooX__[A] with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFooX__wBar_If     extends FooX__[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfeFooX__wBarY__ extends FooX__[A] with BarY__[B] {
+class Mix_IfeFooX__wBarY__ extends FooX__[A] with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFooX__wBarY_f extends FooX__[A] with BarY_f[B] {
+class Mix_IfeFooX__wBarY_f extends FooX__[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFooX__wBarYI_     extends FooX__[A] with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFooX__wBarYIf     extends FooX__[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfeFooX_f extends FooX_f[A] {
+class Mix_IfeFooX_f extends FooX_f[A]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFooX_fwBar___ extends FooX_f[A] with Bar___ {
+class Mix_IfeFooX_fwBar___ extends FooX_f[A] with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFooX_fwBar__f extends FooX_f[A] with Bar__f {
+class Mix_IfeFooX_fwBar__f extends FooX_f[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFooX_fwBar_I_     extends FooX_f[A] with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFooX_fwBar_If     extends FooX_f[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfeFooX_fwBarY__ extends FooX_f[A] with BarY__[B] {
+class Mix_IfeFooX_fwBarY__ extends FooX_f[A] with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfeFooX_fwBarY_f extends FooX_f[A] with BarY_f[B] {
+class Mix_IfeFooX_fwBarY_f extends FooX_f[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfeFooX_fwBarYI_     extends FooX_f[A] with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFooX_fwBarYIf     extends FooX_f[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfeFooXI_            extends FooXI_[A]                { class I;          def f: I = {mix; null}; f; }
@@ -705,17 +625,14 @@ abstract class MixZ__eFooX__wBar_I_[Z] extends FooX__[A] with Bar_I_ { ;; f; }
 /* */ /*    */
 class MixZ__eFooX__wBar_If[Z] extends FooX__[A] with Bar_If { ;; f; }
 /* */
-abstract class MixZ__eFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+abstract class MixZ__eFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   ;; f;
-}
 /* */
-abstract class MixZ__eFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] {
+abstract class MixZ__eFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B]
   ;; f;
-}
 /* */
-abstract class MixZ__eFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B] {
+abstract class MixZ__eFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B]
   ;; f;
-}
 /* */ /*    */
 class MixZ__eFooX__wBarYIf[Z] extends FooX__[A] with BarYIf[B] { ;; f; }
 /* */
@@ -727,9 +644,8 @@ abstract class MixZ__eFooX_fwBar___[Z] extends FooX_f[A] with Bar___ { ;; f; }
 class MixZ__eFooX_fwBar_I_[Z] extends FooX_f[A] with Bar_I_ { ;; f; }
 // *//*    */ class MixZ__eFooX_fwBar_If[Z]  extends FooX_f[A] with Bar_If    {        ;                                ; f; }
 /* */
-abstract class MixZ__eFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] {
+abstract class MixZ__eFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B]
   ;; f;
-}
 // */abstract class MixZ__eFooX_fwBarY_f[Z]  extends FooX_f[A] with BarY_f[B] {        ;                                ; f; }
 /* */ /*    */
 class MixZ__eFooX_fwBarYI_[Z] extends FooX_f[A] with BarYI_[B] { ;; f; }
@@ -743,9 +659,8 @@ class MixZ__eFooXI_wBar__f[Z] extends FooXI_[A] with Bar__f { ;; f; }
 // */abstract class MixZ__eFooXI_wBar_I_[Z]  extends FooXI_[A] with Bar_I_    {        ;                                ; f; }
 // *//*    */ class MixZ__eFooXI_wBar_If[Z]  extends FooXI_[A] with Bar_If    {        ;                                ; f; }
 /* */
-abstract class MixZ__eFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B] {
+abstract class MixZ__eFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B]
   ;; f;
-}
 /* */ /*    */
 class MixZ__eFooXI_wBarY_f[Z] extends FooXI_[A] with BarY_f[B] { ;; f; }
 // */abstract class MixZ__eFooXI_wBarYI_[Z]  extends FooXI_[A] with BarYI_[B] {        ;                                ; f; }
@@ -764,256 +679,200 @@ class MixZ__eFooXIfwBarY__[Z] extends FooXIf[A] with BarY__[B] { ;; f; }
 // *//*    */ class MixZ__eFooXIfwBarYIf[Z]  extends FooXIf[A] with BarYIf[B] {        ;                                ; f; }
 
 /* */
-abstract class MixZ_feFoo___[Z] extends Foo___ {
+abstract class MixZ_feFoo___[Z] extends Foo___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo___wBar___[Z] extends Foo___ with Bar___ {
+abstract class MixZ_feFoo___wBar___[Z] extends Foo___ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo___wBar__f[Z] extends Foo___ with Bar__f {
+abstract class MixZ_feFoo___wBar__f[Z] extends Foo___ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo___wBar_I_[Z] extends Foo___ with Bar_I_ {
+class MixZ_feFoo___wBar_I_[Z] extends Foo___ with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo___wBar_If[Z] extends Foo___ with Bar_If {
+class MixZ_feFoo___wBar_If[Z] extends Foo___ with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo___wBarY__[Z] extends Foo___ with BarY__[B] {
+abstract class MixZ_feFoo___wBarY__[Z] extends Foo___ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo___wBarY_f[Z] extends Foo___ with BarY_f[B] {
+abstract class MixZ_feFoo___wBarY_f[Z] extends Foo___ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo___wBarYI_[Z] extends Foo___ with BarYI_[B] {
+class MixZ_feFoo___wBarYI_[Z] extends Foo___ with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo___wBarYIf[Z] extends Foo___ with BarYIf[B] {
+class MixZ_feFoo___wBarYIf[Z] extends Foo___ with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo__f[Z] extends Foo__f {
+abstract class MixZ_feFoo__f[Z] extends Foo__f
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo__fwBar___[Z] extends Foo__f with Bar___ {
+abstract class MixZ_feFoo__fwBar___[Z] extends Foo__f with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo__fwBar__f[Z] extends Foo__f with Bar__f {
+abstract class MixZ_feFoo__fwBar__f[Z] extends Foo__f with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo__fwBar_I_[Z] extends Foo__f with Bar_I_ {
+class MixZ_feFoo__fwBar_I_[Z] extends Foo__f with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo__fwBar_If[Z] extends Foo__f with Bar_If {
+class MixZ_feFoo__fwBar_If[Z] extends Foo__f with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo__fwBarY__[Z] extends Foo__f with BarY__[B] {
+abstract class MixZ_feFoo__fwBarY__[Z] extends Foo__f with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B] {
+abstract class MixZ_feFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo__fwBarYI_[Z] extends Foo__f with BarYI_[B] {
+class MixZ_feFoo__fwBarYI_[Z] extends Foo__f with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo__fwBarYIf[Z] extends Foo__f with BarYIf[B] {
+class MixZ_feFoo__fwBarYIf[Z] extends Foo__f with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class MixZ_feFoo_I_[Z] extends Foo_I_ { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class MixZ_feFoo_I_wBar___[Z] extends Foo_I_ with Bar___ {
+class MixZ_feFoo_I_wBar___[Z] extends Foo_I_ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo_I_wBar__f[Z] extends Foo_I_ with Bar__f {
+class MixZ_feFoo_I_wBar__f[Z] extends Foo_I_ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFoo_I_wBar_I_[Z]  extends Foo_I_    with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFoo_I_wBar_If[Z]  extends Foo_I_    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_feFoo_I_wBarY__[Z] extends Foo_I_ with BarY__[B] {
+class MixZ_feFoo_I_wBarY__[Z] extends Foo_I_ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo_I_wBarY_f[Z] extends Foo_I_ with BarY_f[B] {
+class MixZ_feFoo_I_wBarY_f[Z] extends Foo_I_ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFoo_I_wBarYI_[Z]  extends Foo_I_    with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFoo_I_wBarYIf[Z]  extends Foo_I_    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_feFoo_If[Z] extends Foo_If {
+class MixZ_feFoo_If[Z] extends Foo_If
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo_IfwBar___[Z] extends Foo_If with Bar___ {
+class MixZ_feFoo_IfwBar___[Z] extends Foo_If with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo_IfwBar__f[Z] extends Foo_If with Bar__f {
+class MixZ_feFoo_IfwBar__f[Z] extends Foo_If with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFoo_IfwBar_I_[Z]  extends Foo_If    with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFoo_IfwBar_If[Z]  extends Foo_If    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_feFoo_IfwBarY__[Z] extends Foo_If with BarY__[B] {
+class MixZ_feFoo_IfwBarY__[Z] extends Foo_If with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFoo_IfwBarY_f[Z] extends Foo_If with BarY_f[B] {
+class MixZ_feFoo_IfwBarY_f[Z] extends Foo_If with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFoo_IfwBarYI_[Z]  extends Foo_If    with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFoo_IfwBarYIf[Z]  extends Foo_If    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */
-abstract class MixZ_feFooX__[Z] extends FooX__[A] {
+abstract class MixZ_feFooX__[Z] extends FooX__[A]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX__wBar___[Z] extends FooX__[A] with Bar___ {
+abstract class MixZ_feFooX__wBar___[Z] extends FooX__[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX__wBar__f[Z] extends FooX__[A] with Bar__f {
+abstract class MixZ_feFooX__wBar__f[Z] extends FooX__[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX__wBar_I_[Z] extends FooX__[A] with Bar_I_ {
+class MixZ_feFooX__wBar_I_[Z] extends FooX__[A] with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX__wBar_If[Z] extends FooX__[A] with Bar_If {
+class MixZ_feFooX__wBar_If[Z] extends FooX__[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+abstract class MixZ_feFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] {
+abstract class MixZ_feFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B] {
+class MixZ_feFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX__wBarYIf[Z] extends FooX__[A] with BarYIf[B] {
+class MixZ_feFooX__wBarYIf[Z] extends FooX__[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX_f[Z] extends FooX_f[A] {
+abstract class MixZ_feFooX_f[Z] extends FooX_f[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX_fwBar___[Z] extends FooX_f[A] with Bar___ {
+abstract class MixZ_feFooX_fwBar___[Z] extends FooX_f[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f {
+abstract class MixZ_feFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX_fwBar_I_[Z] extends FooX_f[A] with Bar_I_ {
+class MixZ_feFooX_fwBar_I_[Z] extends FooX_f[A] with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX_fwBar_If[Z] extends FooX_f[A] with Bar_If {
+class MixZ_feFooX_fwBar_If[Z] extends FooX_f[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] {
+abstract class MixZ_feFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_feFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B] {
+abstract class MixZ_feFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX_fwBarYI_[Z] extends FooX_f[A] with BarYI_[B] {
+class MixZ_feFooX_fwBarYI_[Z] extends FooX_f[A] with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooX_fwBarYIf[Z] extends FooX_f[A] with BarYIf[B] {
+class MixZ_feFooX_fwBarYIf[Z] extends FooX_f[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class MixZ_feFooXI_[Z] extends FooXI_[A] { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class MixZ_feFooXI_wBar___[Z] extends FooXI_[A] with Bar___ {
+class MixZ_feFooXI_wBar___[Z] extends FooXI_[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooXI_wBar__f[Z] extends FooXI_[A] with Bar__f {
+class MixZ_feFooXI_wBar__f[Z] extends FooXI_[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFooXI_wBar_I_[Z]  extends FooXI_[A] with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFooXI_wBar_If[Z]  extends FooXI_[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_feFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B] {
+class MixZ_feFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooXI_wBarY_f[Z] extends FooXI_[A] with BarY_f[B] {
+class MixZ_feFooXI_wBarY_f[Z] extends FooXI_[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFooXI_wBarYI_[Z]  extends FooXI_[A] with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFooXI_wBarYIf[Z]  extends FooXI_[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_feFooXIf[Z] extends FooXIf[A] {
+class MixZ_feFooXIf[Z] extends FooXIf[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooXIfwBar___[Z] extends FooXIf[A] with Bar___ {
+class MixZ_feFooXIfwBar___[Z] extends FooXIf[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooXIfwBar__f[Z] extends FooXIf[A] with Bar__f {
+class MixZ_feFooXIfwBar__f[Z] extends FooXIf[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFooXIfwBar_I_[Z]  extends FooXIf[A] with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFooXIfwBar_If[Z]  extends FooXIf[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_feFooXIfwBarY__[Z] extends FooXIf[A] with BarY__[B] {
+class MixZ_feFooXIfwBarY__[Z] extends FooXIf[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_feFooXIfwBarY_f[Z] extends FooXIf[A] with BarY_f[B] {
+class MixZ_feFooXIfwBarY_f[Z] extends FooXIf[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_feFooXIfwBarYI_[Z]  extends FooXIf[A] with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_feFooXIfwBarYIf[Z]  extends FooXIf[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 
 /* */
 abstract class MixZI_eFoo___[Z] extends Foo___ { class I;; f; }
 /* */
-abstract class MixZI_eFoo___wBar___[Z] extends Foo___ with Bar___ {
+abstract class MixZI_eFoo___wBar___[Z] extends Foo___ with Bar___
   class I;; f;
-}
 /* */ /*    */
 class MixZI_eFoo___wBar__f[Z] extends Foo___ with Bar__f { class I;; f; }
 // */abstract class MixZI_eFoo___wBar_I_[Z]  extends Foo___    with Bar_I_    { class I;                                ; f; }
 // *//*    */ class MixZI_eFoo___wBar_If[Z]  extends Foo___    with Bar_If    { class I;                                ; f; }
 /* */
-abstract class MixZI_eFoo___wBarY__[Z] extends Foo___ with BarY__[B] {
+abstract class MixZI_eFoo___wBarY__[Z] extends Foo___ with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class MixZI_eFoo___wBarY_f[Z] extends Foo___ with BarY_f[B] { class I;; f; }
 // */abstract class MixZI_eFoo___wBarYI_[Z]  extends Foo___    with BarYI_[B] { class I;                                ; f; }
@@ -1051,17 +910,15 @@ class MixZI_eFoo__fwBarY__[Z] extends Foo__f with BarY__[B] { class I;; f; }
 /* */
 abstract class MixZI_eFooX__[Z] extends FooX__[A] { class I;; f; }
 /* */
-abstract class MixZI_eFooX__wBar___[Z] extends FooX__[A] with Bar___ {
+abstract class MixZI_eFooX__wBar___[Z] extends FooX__[A] with Bar___
   class I;; f;
-}
 /* */ /*    */
 class MixZI_eFooX__wBar__f[Z] extends FooX__[A] with Bar__f { class I;; f; }
 // */abstract class MixZI_eFooX__wBar_I_[Z]  extends FooX__[A] with Bar_I_    { class I;                                ; f; }
 // *//*    */ class MixZI_eFooX__wBar_If[Z]  extends FooX__[A] with Bar_If    { class I;                                ; f; }
 /* */
-abstract class MixZI_eFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+abstract class MixZI_eFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class MixZI_eFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] { class I;; f; }
 // */abstract class MixZI_eFooX__wBarYI_[Z]  extends FooX__[A] with BarYI_[B] { class I;                                ; f; }
@@ -1100,47 +957,38 @@ class MixZI_eFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] { class I;; f; }
 /* */ /*    */
 class MixZIfeFoo___[Z] extends Foo___ { class I; def f: I = { mix; null }; f; }
 /* */ /*    */
-class MixZIfeFoo___wBar___[Z] extends Foo___ with Bar___ {
+class MixZIfeFoo___wBar___[Z] extends Foo___ with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFoo___wBar__f[Z] extends Foo___ with Bar__f {
+class MixZIfeFoo___wBar__f[Z] extends Foo___ with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFoo___wBar_I_[Z]  extends Foo___    with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFoo___wBar_If[Z]  extends Foo___    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfeFoo___wBarY__[Z] extends Foo___ with BarY__[B] {
+class MixZIfeFoo___wBarY__[Z] extends Foo___ with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFoo___wBarY_f[Z] extends Foo___ with BarY_f[B] {
+class MixZIfeFoo___wBarY_f[Z] extends Foo___ with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFoo___wBarYI_[Z]  extends Foo___    with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFoo___wBarYIf[Z]  extends Foo___    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfeFoo__f[Z] extends Foo__f {
+class MixZIfeFoo__f[Z] extends Foo__f
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFoo__fwBar___[Z] extends Foo__f with Bar___ {
+class MixZIfeFoo__fwBar___[Z] extends Foo__f with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFoo__fwBar__f[Z] extends Foo__f with Bar__f {
+class MixZIfeFoo__fwBar__f[Z] extends Foo__f with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFoo__fwBar_I_[Z]  extends Foo__f    with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFoo__fwBar_If[Z]  extends Foo__f    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfeFoo__fwBarY__[Z] extends Foo__f with BarY__[B] {
+class MixZIfeFoo__fwBarY__[Z] extends Foo__f with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B] {
+class MixZIfeFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFoo__fwBarYI_[Z]  extends Foo__f    with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFoo__fwBarYIf[Z]  extends Foo__f    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFoo_I_       [Z]  extends Foo_I_                   { class I;          def f: I = {mix; null}; f; }
@@ -1162,51 +1010,41 @@ class MixZIfeFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B] {
 // *//*    */ class MixZIfeFoo_IfwBarYI_[Z]  extends Foo_If    with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFoo_IfwBarYIf[Z]  extends Foo_If    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfeFooX__[Z] extends FooX__[A] {
+class MixZIfeFooX__[Z] extends FooX__[A]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFooX__wBar___[Z] extends FooX__[A] with Bar___ {
+class MixZIfeFooX__wBar___[Z] extends FooX__[A] with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFooX__wBar__f[Z] extends FooX__[A] with Bar__f {
+class MixZIfeFooX__wBar__f[Z] extends FooX__[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFooX__wBar_I_[Z]  extends FooX__[A] with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFooX__wBar_If[Z]  extends FooX__[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfeFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+class MixZIfeFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] {
+class MixZIfeFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFooX__wBarYI_[Z]  extends FooX__[A] with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFooX__wBarYIf[Z]  extends FooX__[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfeFooX_f[Z] extends FooX_f[A] {
+class MixZIfeFooX_f[Z] extends FooX_f[A]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFooX_fwBar___[Z] extends FooX_f[A] with Bar___ {
+class MixZIfeFooX_fwBar___[Z] extends FooX_f[A] with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f {
+class MixZIfeFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFooX_fwBar_I_[Z]  extends FooX_f[A] with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFooX_fwBar_If[Z]  extends FooX_f[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfeFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] {
+class MixZIfeFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfeFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B] {
+class MixZIfeFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfeFooX_fwBarYI_[Z]  extends FooX_f[A] with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFooX_fwBarYIf[Z]  extends FooX_f[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfeFooXI_       [Z]  extends FooXI_[A]                { class I;          def f: I = {mix; null}; f; }
@@ -1348,233 +1186,181 @@ class Mix___wFooXIfwBarY__ extends FooXIf[A] with BarY__[B] { ;; f; }
 /* */
 abstract class Mix__fwFoo___ extends Foo___ { ; def f: I = { mix; null }; f; }
 /* */
-abstract class Mix__fwFoo___wBar___ extends Foo___ with Bar___ {
+abstract class Mix__fwFoo___wBar___ extends Foo___ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo___wBar__f extends Foo___ with Bar__f {
+abstract class Mix__fwFoo___wBar__f extends Foo___ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo___wBar_I_ extends Foo___ with Bar_I_ {
+class Mix__fwFoo___wBar_I_ extends Foo___ with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo___wBar_If extends Foo___ with Bar_If {
+class Mix__fwFoo___wBar_If extends Foo___ with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo___wBarY__ extends Foo___ with BarY__[B] {
+abstract class Mix__fwFoo___wBarY__ extends Foo___ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo___wBarY_f extends Foo___ with BarY_f[B] {
+abstract class Mix__fwFoo___wBarY_f extends Foo___ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo___wBarYI_ extends Foo___ with BarYI_[B] {
+class Mix__fwFoo___wBarYI_ extends Foo___ with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo___wBarYIf extends Foo___ with BarYIf[B] {
+class Mix__fwFoo___wBarYIf extends Foo___ with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo__f extends Foo__f {
+abstract class Mix__fwFoo__f extends Foo__f
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo__fwBar___ extends Foo__f with Bar___ {
+abstract class Mix__fwFoo__fwBar___ extends Foo__f with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo__fwBar__f extends Foo__f with Bar__f {
+abstract class Mix__fwFoo__fwBar__f extends Foo__f with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo__fwBar_I_ extends Foo__f with Bar_I_ {
+class Mix__fwFoo__fwBar_I_ extends Foo__f with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo__fwBar_If extends Foo__f with Bar_If {
+class Mix__fwFoo__fwBar_If extends Foo__f with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo__fwBarY__ extends Foo__f with BarY__[B] {
+abstract class Mix__fwFoo__fwBarY__ extends Foo__f with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFoo__fwBarY_f extends Foo__f with BarY_f[B] {
+abstract class Mix__fwFoo__fwBarY_f extends Foo__f with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo__fwBarYI_ extends Foo__f with BarYI_[B] {
+class Mix__fwFoo__fwBarYI_ extends Foo__f with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo__fwBarYIf extends Foo__f with BarYIf[B] {
+class Mix__fwFoo__fwBarYIf extends Foo__f with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class Mix__fwFoo_I_ extends Foo_I_ { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix__fwFoo_I_wBar___ extends Foo_I_ with Bar___ {
+class Mix__fwFoo_I_wBar___ extends Foo_I_ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo_I_wBar__f extends Foo_I_ with Bar__f {
+class Mix__fwFoo_I_wBar__f extends Foo_I_ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFoo_I_wBar_I_     extends Foo_I_    with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFoo_I_wBar_If     extends Foo_I_    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__fwFoo_I_wBarY__ extends Foo_I_ with BarY__[B] {
+class Mix__fwFoo_I_wBarY__ extends Foo_I_ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo_I_wBarY_f extends Foo_I_ with BarY_f[B] {
+class Mix__fwFoo_I_wBarY_f extends Foo_I_ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFoo_I_wBarYI_     extends Foo_I_    with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFoo_I_wBarYIf     extends Foo_I_    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
 class Mix__fwFoo_If extends Foo_If { ; override def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix__fwFoo_IfwBar___ extends Foo_If with Bar___ {
+class Mix__fwFoo_IfwBar___ extends Foo_If with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo_IfwBar__f extends Foo_If with Bar__f {
+class Mix__fwFoo_IfwBar__f extends Foo_If with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFoo_IfwBar_I_     extends Foo_If    with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFoo_IfwBar_If     extends Foo_If    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__fwFoo_IfwBarY__ extends Foo_If with BarY__[B] {
+class Mix__fwFoo_IfwBarY__ extends Foo_If with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFoo_IfwBarY_f extends Foo_If with BarY_f[B] {
+class Mix__fwFoo_IfwBarY_f extends Foo_If with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFoo_IfwBarYI_     extends Foo_If    with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFoo_IfwBarYIf     extends Foo_If    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */
-abstract class Mix__fwFooX__ extends FooX__[A] {
+abstract class Mix__fwFooX__ extends FooX__[A]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX__wBar___ extends FooX__[A] with Bar___ {
+abstract class Mix__fwFooX__wBar___ extends FooX__[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX__wBar__f extends FooX__[A] with Bar__f {
+abstract class Mix__fwFooX__wBar__f extends FooX__[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX__wBar_I_ extends FooX__[A] with Bar_I_ {
+class Mix__fwFooX__wBar_I_ extends FooX__[A] with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX__wBar_If extends FooX__[A] with Bar_If {
+class Mix__fwFooX__wBar_If extends FooX__[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX__wBarY__ extends FooX__[A] with BarY__[B] {
+abstract class Mix__fwFooX__wBarY__ extends FooX__[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX__wBarY_f extends FooX__[A] with BarY_f[B] {
+abstract class Mix__fwFooX__wBarY_f extends FooX__[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX__wBarYI_ extends FooX__[A] with BarYI_[B] {
+class Mix__fwFooX__wBarYI_ extends FooX__[A] with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX__wBarYIf extends FooX__[A] with BarYIf[B] {
+class Mix__fwFooX__wBarYIf extends FooX__[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX_f extends FooX_f[A] {
+abstract class Mix__fwFooX_f extends FooX_f[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX_fwBar___ extends FooX_f[A] with Bar___ {
+abstract class Mix__fwFooX_fwBar___ extends FooX_f[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX_fwBar__f extends FooX_f[A] with Bar__f {
+abstract class Mix__fwFooX_fwBar__f extends FooX_f[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX_fwBar_I_ extends FooX_f[A] with Bar_I_ {
+class Mix__fwFooX_fwBar_I_ extends FooX_f[A] with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX_fwBar_If extends FooX_f[A] with Bar_If {
+class Mix__fwFooX_fwBar_If extends FooX_f[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX_fwBarY__ extends FooX_f[A] with BarY__[B] {
+abstract class Mix__fwFooX_fwBarY__ extends FooX_f[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class Mix__fwFooX_fwBarY_f extends FooX_f[A] with BarY_f[B] {
+abstract class Mix__fwFooX_fwBarY_f extends FooX_f[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX_fwBarYI_ extends FooX_f[A] with BarYI_[B] {
+class Mix__fwFooX_fwBarYI_ extends FooX_f[A] with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooX_fwBarYIf extends FooX_f[A] with BarYIf[B] {
+class Mix__fwFooX_fwBarYIf extends FooX_f[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class Mix__fwFooXI_ extends FooXI_[A] { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix__fwFooXI_wBar___ extends FooXI_[A] with Bar___ {
+class Mix__fwFooXI_wBar___ extends FooXI_[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooXI_wBar__f extends FooXI_[A] with Bar__f {
+class Mix__fwFooXI_wBar__f extends FooXI_[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFooXI_wBar_I_     extends FooXI_[A] with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFooXI_wBar_If     extends FooXI_[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__fwFooXI_wBarY__ extends FooXI_[A] with BarY__[B] {
+class Mix__fwFooXI_wBarY__ extends FooXI_[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooXI_wBarY_f extends FooXI_[A] with BarY_f[B] {
+class Mix__fwFooXI_wBarY_f extends FooXI_[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFooXI_wBarYI_     extends FooXI_[A] with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFooXI_wBarYIf     extends FooXI_[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__fwFooXIf extends FooXIf[A] {
+class Mix__fwFooXIf extends FooXIf[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooXIfwBar___ extends FooXIf[A] with Bar___ {
+class Mix__fwFooXIfwBar___ extends FooXIf[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooXIfwBar__f extends FooXIf[A] with Bar__f {
+class Mix__fwFooXIfwBar__f extends FooXIf[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFooXIfwBar_I_     extends FooXIf[A] with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFooXIfwBar_If     extends FooXIf[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix__fwFooXIfwBarY__ extends FooXIf[A] with BarY__[B] {
+class Mix__fwFooXIfwBarY__ extends FooXIf[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix__fwFooXIfwBarY_f extends FooXIf[A] with BarY_f[B] {
+class Mix__fwFooXIfwBarY_f extends FooXIf[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix__fwFooXIfwBarYI_     extends FooXIf[A] with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix__fwFooXIfwBarYIf     extends FooXIf[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 
@@ -1587,9 +1373,8 @@ class Mix_I_wFoo___wBar__f extends Foo___ with Bar__f { class I;; f; }
 // */abstract class Mix_I_wFoo___wBar_I_     extends Foo___    with Bar_I_    { class I;                                ; f; }
 // *//*    */ class Mix_I_wFoo___wBar_If     extends Foo___    with Bar_If    { class I;                                ; f; }
 /* */
-abstract class Mix_I_wFoo___wBarY__ extends Foo___ with BarY__[B] {
+abstract class Mix_I_wFoo___wBarY__ extends Foo___ with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class Mix_I_wFoo___wBarY_f extends Foo___ with BarY_f[B] { class I;; f; }
 // */abstract class Mix_I_wFoo___wBarYI_     extends Foo___    with BarYI_[B] { class I;                                ; f; }
@@ -1627,17 +1412,15 @@ class Mix_I_wFoo__fwBarY__ extends Foo__f with BarY__[B] { class I;; f; }
 /* */
 abstract class Mix_I_wFooX__ extends FooX__[A] { class I;; f; }
 /* */
-abstract class Mix_I_wFooX__wBar___ extends FooX__[A] with Bar___ {
+abstract class Mix_I_wFooX__wBar___ extends FooX__[A] with Bar___
   class I;; f;
-}
 /* */ /*    */
 class Mix_I_wFooX__wBar__f extends FooX__[A] with Bar__f { class I;; f; }
 // */abstract class Mix_I_wFooX__wBar_I_     extends FooX__[A] with Bar_I_    { class I;                                ; f; }
 // *//*    */ class Mix_I_wFooX__wBar_If     extends FooX__[A] with Bar_If    { class I;                                ; f; }
 /* */
-abstract class Mix_I_wFooX__wBarY__ extends FooX__[A] with BarY__[B] {
+abstract class Mix_I_wFooX__wBarY__ extends FooX__[A] with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class Mix_I_wFooX__wBarY_f extends FooX__[A] with BarY_f[B] { class I;; f; }
 // */abstract class Mix_I_wFooX__wBarYI_     extends FooX__[A] with BarYI_[B] { class I;                                ; f; }
@@ -1676,47 +1459,38 @@ class Mix_I_wFooX_fwBarY__ extends FooX_f[A] with BarY__[B] { class I;; f; }
 /* */ /*    */
 class Mix_IfwFoo___ extends Foo___ { class I; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix_IfwFoo___wBar___ extends Foo___ with Bar___ {
+class Mix_IfwFoo___wBar___ extends Foo___ with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFoo___wBar__f extends Foo___ with Bar__f {
+class Mix_IfwFoo___wBar__f extends Foo___ with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFoo___wBar_I_     extends Foo___    with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFoo___wBar_If     extends Foo___    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfwFoo___wBarY__ extends Foo___ with BarY__[B] {
+class Mix_IfwFoo___wBarY__ extends Foo___ with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFoo___wBarY_f extends Foo___ with BarY_f[B] {
+class Mix_IfwFoo___wBarY_f extends Foo___ with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFoo___wBarYI_     extends Foo___    with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFoo___wBarYIf     extends Foo___    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfwFoo__f extends Foo__f {
+class Mix_IfwFoo__f extends Foo__f
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFoo__fwBar___ extends Foo__f with Bar___ {
+class Mix_IfwFoo__fwBar___ extends Foo__f with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFoo__fwBar__f extends Foo__f with Bar__f {
+class Mix_IfwFoo__fwBar__f extends Foo__f with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFoo__fwBar_I_     extends Foo__f    with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFoo__fwBar_If     extends Foo__f    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfwFoo__fwBarY__ extends Foo__f with BarY__[B] {
+class Mix_IfwFoo__fwBarY__ extends Foo__f with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFoo__fwBarY_f extends Foo__f with BarY_f[B] {
+class Mix_IfwFoo__fwBarY_f extends Foo__f with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFoo__fwBarYI_     extends Foo__f    with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFoo__fwBarYIf     extends Foo__f    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFoo_I_            extends Foo_I_                   { class I;          def f: I = {mix; null}; f; }
@@ -1740,47 +1514,38 @@ class Mix_IfwFoo__fwBarY_f extends Foo__f with BarY_f[B] {
 /* */ /*    */
 class Mix_IfwFooX__ extends FooX__[A] { class I; def f: I = { mix; null }; f; }
 /* */ /*    */
-class Mix_IfwFooX__wBar___ extends FooX__[A] with Bar___ {
+class Mix_IfwFooX__wBar___ extends FooX__[A] with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFooX__wBar__f extends FooX__[A] with Bar__f {
+class Mix_IfwFooX__wBar__f extends FooX__[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFooX__wBar_I_     extends FooX__[A] with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFooX__wBar_If     extends FooX__[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfwFooX__wBarY__ extends FooX__[A] with BarY__[B] {
+class Mix_IfwFooX__wBarY__ extends FooX__[A] with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFooX__wBarY_f extends FooX__[A] with BarY_f[B] {
+class Mix_IfwFooX__wBarY_f extends FooX__[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFooX__wBarYI_     extends FooX__[A] with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFooX__wBarYIf     extends FooX__[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfwFooX_f extends FooX_f[A] {
+class Mix_IfwFooX_f extends FooX_f[A]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFooX_fwBar___ extends FooX_f[A] with Bar___ {
+class Mix_IfwFooX_fwBar___ extends FooX_f[A] with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFooX_fwBar__f extends FooX_f[A] with Bar__f {
+class Mix_IfwFooX_fwBar__f extends FooX_f[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFooX_fwBar_I_     extends FooX_f[A] with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFooX_fwBar_If     extends FooX_f[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class Mix_IfwFooX_fwBarY__ extends FooX_f[A] with BarY__[B] {
+class Mix_IfwFooX_fwBarY__ extends FooX_f[A] with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class Mix_IfwFooX_fwBarY_f extends FooX_f[A] with BarY_f[B] {
+class Mix_IfwFooX_fwBarY_f extends FooX_f[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class Mix_IfwFooX_fwBarYI_     extends FooX_f[A] with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFooX_fwBarYIf     extends FooX_f[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class Mix_IfwFooXI_            extends FooXI_[A]                { class I;          def f: I = {mix; null}; f; }
@@ -1871,17 +1636,14 @@ abstract class MixZ__wFooX__wBar_I_[Z] extends FooX__[A] with Bar_I_ { ;; f; }
 /* */ /*    */
 class MixZ__wFooX__wBar_If[Z] extends FooX__[A] with Bar_If { ;; f; }
 /* */
-abstract class MixZ__wFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+abstract class MixZ__wFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   ;; f;
-}
 /* */
-abstract class MixZ__wFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] {
+abstract class MixZ__wFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B]
   ;; f;
-}
 /* */
-abstract class MixZ__wFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B] {
+abstract class MixZ__wFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B]
   ;; f;
-}
 /* */ /*    */
 class MixZ__wFooX__wBarYIf[Z] extends FooX__[A] with BarYIf[B] { ;; f; }
 /* */
@@ -1893,9 +1655,8 @@ abstract class MixZ__wFooX_fwBar___[Z] extends FooX_f[A] with Bar___ { ;; f; }
 class MixZ__wFooX_fwBar_I_[Z] extends FooX_f[A] with Bar_I_ { ;; f; }
 // *//*    */ class MixZ__wFooX_fwBar_If[Z]  extends FooX_f[A] with Bar_If    {        ;                                ; f; }
 /* */
-abstract class MixZ__wFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] {
+abstract class MixZ__wFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B]
   ;; f;
-}
 // */abstract class MixZ__wFooX_fwBarY_f[Z]  extends FooX_f[A] with BarY_f[B] {        ;                                ; f; }
 /* */ /*    */
 class MixZ__wFooX_fwBarYI_[Z] extends FooX_f[A] with BarYI_[B] { ;; f; }
@@ -1909,9 +1670,8 @@ class MixZ__wFooXI_wBar__f[Z] extends FooXI_[A] with Bar__f { ;; f; }
 // */abstract class MixZ__wFooXI_wBar_I_[Z]  extends FooXI_[A] with Bar_I_    {        ;                                ; f; }
 // *//*    */ class MixZ__wFooXI_wBar_If[Z]  extends FooXI_[A] with Bar_If    {        ;                                ; f; }
 /* */
-abstract class MixZ__wFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B] {
+abstract class MixZ__wFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B]
   ;; f;
-}
 /* */ /*    */
 class MixZ__wFooXI_wBarY_f[Z] extends FooXI_[A] with BarY_f[B] { ;; f; }
 // */abstract class MixZ__wFooXI_wBarYI_[Z]  extends FooXI_[A] with BarYI_[B] {        ;                                ; f; }
@@ -1930,256 +1690,200 @@ class MixZ__wFooXIfwBarY__[Z] extends FooXIf[A] with BarY__[B] { ;; f; }
 // *//*    */ class MixZ__wFooXIfwBarYIf[Z]  extends FooXIf[A] with BarYIf[B] {        ;                                ; f; }
 
 /* */
-abstract class MixZ_fwFoo___[Z] extends Foo___ {
+abstract class MixZ_fwFoo___[Z] extends Foo___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo___wBar___[Z] extends Foo___ with Bar___ {
+abstract class MixZ_fwFoo___wBar___[Z] extends Foo___ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo___wBar__f[Z] extends Foo___ with Bar__f {
+abstract class MixZ_fwFoo___wBar__f[Z] extends Foo___ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo___wBar_I_[Z] extends Foo___ with Bar_I_ {
+class MixZ_fwFoo___wBar_I_[Z] extends Foo___ with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo___wBar_If[Z] extends Foo___ with Bar_If {
+class MixZ_fwFoo___wBar_If[Z] extends Foo___ with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo___wBarY__[Z] extends Foo___ with BarY__[B] {
+abstract class MixZ_fwFoo___wBarY__[Z] extends Foo___ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo___wBarY_f[Z] extends Foo___ with BarY_f[B] {
+abstract class MixZ_fwFoo___wBarY_f[Z] extends Foo___ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo___wBarYI_[Z] extends Foo___ with BarYI_[B] {
+class MixZ_fwFoo___wBarYI_[Z] extends Foo___ with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo___wBarYIf[Z] extends Foo___ with BarYIf[B] {
+class MixZ_fwFoo___wBarYIf[Z] extends Foo___ with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo__f[Z] extends Foo__f {
+abstract class MixZ_fwFoo__f[Z] extends Foo__f
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo__fwBar___[Z] extends Foo__f with Bar___ {
+abstract class MixZ_fwFoo__fwBar___[Z] extends Foo__f with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo__fwBar__f[Z] extends Foo__f with Bar__f {
+abstract class MixZ_fwFoo__fwBar__f[Z] extends Foo__f with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo__fwBar_I_[Z] extends Foo__f with Bar_I_ {
+class MixZ_fwFoo__fwBar_I_[Z] extends Foo__f with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo__fwBar_If[Z] extends Foo__f with Bar_If {
+class MixZ_fwFoo__fwBar_If[Z] extends Foo__f with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo__fwBarY__[Z] extends Foo__f with BarY__[B] {
+abstract class MixZ_fwFoo__fwBarY__[Z] extends Foo__f with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B] {
+abstract class MixZ_fwFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo__fwBarYI_[Z] extends Foo__f with BarYI_[B] {
+class MixZ_fwFoo__fwBarYI_[Z] extends Foo__f with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo__fwBarYIf[Z] extends Foo__f with BarYIf[B] {
+class MixZ_fwFoo__fwBarYIf[Z] extends Foo__f with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class MixZ_fwFoo_I_[Z] extends Foo_I_ { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class MixZ_fwFoo_I_wBar___[Z] extends Foo_I_ with Bar___ {
+class MixZ_fwFoo_I_wBar___[Z] extends Foo_I_ with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo_I_wBar__f[Z] extends Foo_I_ with Bar__f {
+class MixZ_fwFoo_I_wBar__f[Z] extends Foo_I_ with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFoo_I_wBar_I_[Z]  extends Foo_I_    with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFoo_I_wBar_If[Z]  extends Foo_I_    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_fwFoo_I_wBarY__[Z] extends Foo_I_ with BarY__[B] {
+class MixZ_fwFoo_I_wBarY__[Z] extends Foo_I_ with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo_I_wBarY_f[Z] extends Foo_I_ with BarY_f[B] {
+class MixZ_fwFoo_I_wBarY_f[Z] extends Foo_I_ with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFoo_I_wBarYI_[Z]  extends Foo_I_    with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFoo_I_wBarYIf[Z]  extends Foo_I_    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_fwFoo_If[Z] extends Foo_If {
+class MixZ_fwFoo_If[Z] extends Foo_If
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo_IfwBar___[Z] extends Foo_If with Bar___ {
+class MixZ_fwFoo_IfwBar___[Z] extends Foo_If with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo_IfwBar__f[Z] extends Foo_If with Bar__f {
+class MixZ_fwFoo_IfwBar__f[Z] extends Foo_If with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFoo_IfwBar_I_[Z]  extends Foo_If    with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFoo_IfwBar_If[Z]  extends Foo_If    with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_fwFoo_IfwBarY__[Z] extends Foo_If with BarY__[B] {
+class MixZ_fwFoo_IfwBarY__[Z] extends Foo_If with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFoo_IfwBarY_f[Z] extends Foo_If with BarY_f[B] {
+class MixZ_fwFoo_IfwBarY_f[Z] extends Foo_If with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFoo_IfwBarYI_[Z]  extends Foo_If    with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFoo_IfwBarYIf[Z]  extends Foo_If    with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */
-abstract class MixZ_fwFooX__[Z] extends FooX__[A] {
+abstract class MixZ_fwFooX__[Z] extends FooX__[A]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX__wBar___[Z] extends FooX__[A] with Bar___ {
+abstract class MixZ_fwFooX__wBar___[Z] extends FooX__[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX__wBar__f[Z] extends FooX__[A] with Bar__f {
+abstract class MixZ_fwFooX__wBar__f[Z] extends FooX__[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX__wBar_I_[Z] extends FooX__[A] with Bar_I_ {
+class MixZ_fwFooX__wBar_I_[Z] extends FooX__[A] with Bar_I_
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX__wBar_If[Z] extends FooX__[A] with Bar_If {
+class MixZ_fwFooX__wBar_If[Z] extends FooX__[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+abstract class MixZ_fwFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] {
+abstract class MixZ_fwFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B] {
+class MixZ_fwFooX__wBarYI_[Z] extends FooX__[A] with BarYI_[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX__wBarYIf[Z] extends FooX__[A] with BarYIf[B] {
+class MixZ_fwFooX__wBarYIf[Z] extends FooX__[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX_f[Z] extends FooX_f[A] {
+abstract class MixZ_fwFooX_f[Z] extends FooX_f[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX_fwBar___[Z] extends FooX_f[A] with Bar___ {
+abstract class MixZ_fwFooX_fwBar___[Z] extends FooX_f[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f {
+abstract class MixZ_fwFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX_fwBar_I_[Z] extends FooX_f[A] with Bar_I_ {
+class MixZ_fwFooX_fwBar_I_[Z] extends FooX_f[A] with Bar_I_
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX_fwBar_If[Z] extends FooX_f[A] with Bar_If {
+class MixZ_fwFooX_fwBar_If[Z] extends FooX_f[A] with Bar_If
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] {
+abstract class MixZ_fwFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */
-abstract class MixZ_fwFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B] {
+abstract class MixZ_fwFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX_fwBarYI_[Z] extends FooX_f[A] with BarYI_[B] {
+class MixZ_fwFooX_fwBarYI_[Z] extends FooX_f[A] with BarYI_[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooX_fwBarYIf[Z] extends FooX_f[A] with BarYIf[B] {
+class MixZ_fwFooX_fwBarYIf[Z] extends FooX_f[A] with BarYIf[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
 class MixZ_fwFooXI_[Z] extends FooXI_[A] { ; def f: I = { mix; null }; f; }
 /* */ /*    */
-class MixZ_fwFooXI_wBar___[Z] extends FooXI_[A] with Bar___ {
+class MixZ_fwFooXI_wBar___[Z] extends FooXI_[A] with Bar___
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooXI_wBar__f[Z] extends FooXI_[A] with Bar__f {
+class MixZ_fwFooXI_wBar__f[Z] extends FooXI_[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFooXI_wBar_I_[Z]  extends FooXI_[A] with Bar_I_    {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFooXI_wBar_If[Z]  extends FooXI_[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_fwFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B] {
+class MixZ_fwFooXI_wBarY__[Z] extends FooXI_[A] with BarY__[B]
   ; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooXI_wBarY_f[Z] extends FooXI_[A] with BarY_f[B] {
+class MixZ_fwFooXI_wBarY_f[Z] extends FooXI_[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFooXI_wBarYI_[Z]  extends FooXI_[A] with BarYI_[B] {        ;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFooXI_wBarYIf[Z]  extends FooXI_[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_fwFooXIf[Z] extends FooXIf[A] {
+class MixZ_fwFooXIf[Z] extends FooXIf[A]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooXIfwBar___[Z] extends FooXIf[A] with Bar___ {
+class MixZ_fwFooXIfwBar___[Z] extends FooXIf[A] with Bar___
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooXIfwBar__f[Z] extends FooXIf[A] with Bar__f {
+class MixZ_fwFooXIfwBar__f[Z] extends FooXIf[A] with Bar__f
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFooXIfwBar_I_[Z]  extends FooXIf[A] with Bar_I_    {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFooXIfwBar_If[Z]  extends FooXIf[A] with Bar_If    {        ; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZ_fwFooXIfwBarY__[Z] extends FooXIf[A] with BarY__[B] {
+class MixZ_fwFooXIfwBarY__[Z] extends FooXIf[A] with BarY__[B]
   ; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZ_fwFooXIfwBarY_f[Z] extends FooXIf[A] with BarY_f[B] {
+class MixZ_fwFooXIfwBarY_f[Z] extends FooXIf[A] with BarY_f[B]
   ; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZ_fwFooXIfwBarYI_[Z]  extends FooXIf[A] with BarYI_[B] {        ; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZ_fwFooXIfwBarYIf[Z]  extends FooXIf[A] with BarYIf[B] {        ; override def f: I = {mix; null}; f; }
 
 /* */
 abstract class MixZI_wFoo___[Z] extends Foo___ { class I;; f; }
 /* */
-abstract class MixZI_wFoo___wBar___[Z] extends Foo___ with Bar___ {
+abstract class MixZI_wFoo___wBar___[Z] extends Foo___ with Bar___
   class I;; f;
-}
 /* */ /*    */
 class MixZI_wFoo___wBar__f[Z] extends Foo___ with Bar__f { class I;; f; }
 // */abstract class MixZI_wFoo___wBar_I_[Z]  extends Foo___    with Bar_I_    { class I;                                ; f; }
 // *//*    */ class MixZI_wFoo___wBar_If[Z]  extends Foo___    with Bar_If    { class I;                                ; f; }
 /* */
-abstract class MixZI_wFoo___wBarY__[Z] extends Foo___ with BarY__[B] {
+abstract class MixZI_wFoo___wBarY__[Z] extends Foo___ with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class MixZI_wFoo___wBarY_f[Z] extends Foo___ with BarY_f[B] { class I;; f; }
 // */abstract class MixZI_wFoo___wBarYI_[Z]  extends Foo___    with BarYI_[B] { class I;                                ; f; }
@@ -2217,17 +1921,15 @@ class MixZI_wFoo__fwBarY__[Z] extends Foo__f with BarY__[B] { class I;; f; }
 /* */
 abstract class MixZI_wFooX__[Z] extends FooX__[A] { class I;; f; }
 /* */
-abstract class MixZI_wFooX__wBar___[Z] extends FooX__[A] with Bar___ {
+abstract class MixZI_wFooX__wBar___[Z] extends FooX__[A] with Bar___
   class I;; f;
-}
 /* */ /*    */
 class MixZI_wFooX__wBar__f[Z] extends FooX__[A] with Bar__f { class I;; f; }
 // */abstract class MixZI_wFooX__wBar_I_[Z]  extends FooX__[A] with Bar_I_    { class I;                                ; f; }
 // *//*    */ class MixZI_wFooX__wBar_If[Z]  extends FooX__[A] with Bar_If    { class I;                                ; f; }
 /* */
-abstract class MixZI_wFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+abstract class MixZI_wFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   class I;; f;
-}
 /* */ /*    */
 class MixZI_wFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] { class I;; f; }
 // */abstract class MixZI_wFooX__wBarYI_[Z]  extends FooX__[A] with BarYI_[B] { class I;                                ; f; }
@@ -2266,47 +1968,38 @@ class MixZI_wFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] { class I;; f; }
 /* */ /*    */
 class MixZIfwFoo___[Z] extends Foo___ { class I; def f: I = { mix; null }; f; }
 /* */ /*    */
-class MixZIfwFoo___wBar___[Z] extends Foo___ with Bar___ {
+class MixZIfwFoo___wBar___[Z] extends Foo___ with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFoo___wBar__f[Z] extends Foo___ with Bar__f {
+class MixZIfwFoo___wBar__f[Z] extends Foo___ with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFoo___wBar_I_[Z]  extends Foo___    with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFoo___wBar_If[Z]  extends Foo___    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfwFoo___wBarY__[Z] extends Foo___ with BarY__[B] {
+class MixZIfwFoo___wBarY__[Z] extends Foo___ with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFoo___wBarY_f[Z] extends Foo___ with BarY_f[B] {
+class MixZIfwFoo___wBarY_f[Z] extends Foo___ with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFoo___wBarYI_[Z]  extends Foo___    with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFoo___wBarYIf[Z]  extends Foo___    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfwFoo__f[Z] extends Foo__f {
+class MixZIfwFoo__f[Z] extends Foo__f
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFoo__fwBar___[Z] extends Foo__f with Bar___ {
+class MixZIfwFoo__fwBar___[Z] extends Foo__f with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFoo__fwBar__f[Z] extends Foo__f with Bar__f {
+class MixZIfwFoo__fwBar__f[Z] extends Foo__f with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFoo__fwBar_I_[Z]  extends Foo__f    with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFoo__fwBar_If[Z]  extends Foo__f    with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfwFoo__fwBarY__[Z] extends Foo__f with BarY__[B] {
+class MixZIfwFoo__fwBarY__[Z] extends Foo__f with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B] {
+class MixZIfwFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFoo__fwBarYI_[Z]  extends Foo__f    with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFoo__fwBarYIf[Z]  extends Foo__f    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFoo_I_       [Z]  extends Foo_I_                   { class I;          def f: I = {mix; null}; f; }
@@ -2328,51 +2021,41 @@ class MixZIfwFoo__fwBarY_f[Z] extends Foo__f with BarY_f[B] {
 // *//*    */ class MixZIfwFoo_IfwBarYI_[Z]  extends Foo_If    with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFoo_IfwBarYIf[Z]  extends Foo_If    with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfwFooX__[Z] extends FooX__[A] {
+class MixZIfwFooX__[Z] extends FooX__[A]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFooX__wBar___[Z] extends FooX__[A] with Bar___ {
+class MixZIfwFooX__wBar___[Z] extends FooX__[A] with Bar___
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFooX__wBar__f[Z] extends FooX__[A] with Bar__f {
+class MixZIfwFooX__wBar__f[Z] extends FooX__[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFooX__wBar_I_[Z]  extends FooX__[A] with Bar_I_    { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFooX__wBar_If[Z]  extends FooX__[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfwFooX__wBarY__[Z] extends FooX__[A] with BarY__[B] {
+class MixZIfwFooX__wBarY__[Z] extends FooX__[A] with BarY__[B]
   class I; def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B] {
+class MixZIfwFooX__wBarY_f[Z] extends FooX__[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFooX__wBarYI_[Z]  extends FooX__[A] with BarYI_[B] { class I;          def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFooX__wBarYIf[Z]  extends FooX__[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfwFooX_f[Z] extends FooX_f[A] {
+class MixZIfwFooX_f[Z] extends FooX_f[A]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFooX_fwBar___[Z] extends FooX_f[A] with Bar___ {
+class MixZIfwFooX_fwBar___[Z] extends FooX_f[A] with Bar___
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f {
+class MixZIfwFooX_fwBar__f[Z] extends FooX_f[A] with Bar__f
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFooX_fwBar_I_[Z]  extends FooX_f[A] with Bar_I_    { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFooX_fwBar_If[Z]  extends FooX_f[A] with Bar_If    { class I; override def f: I = {mix; null}; f; }
 /* */ /*    */
-class MixZIfwFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B] {
+class MixZIfwFooX_fwBarY__[Z] extends FooX_f[A] with BarY__[B]
   class I; override def f: I = { mix; null }; f;
-}
 /* */ /*    */
-class MixZIfwFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B] {
+class MixZIfwFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B]
   class I; override def f: I = { mix; null }; f;
-}
 // *//*    */ class MixZIfwFooX_fwBarYI_[Z]  extends FooX_f[A] with BarYI_[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFooX_fwBarYIf[Z]  extends FooX_f[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 // *//*    */ class MixZIfwFooXI_       [Z]  extends FooXI_[A]                { class I;          def f: I = {mix; null}; f; }
@@ -2395,31 +2078,26 @@ class MixZIfwFooX_fwBarY_f[Z] extends FooX_f[A] with BarY_f[B] {
 // *//*    */ class MixZIfwFooXIfwBarYIf[Z]  extends FooXIf[A] with BarYIf[B] { class I; override def f: I = {mix; null}; f; }
 
 /* */
-class S_____eFoo___ extends Mix___eFoo___ {
+class S_____eFoo___ extends Mix___eFoo___
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_____eFoo___wBar___ extends Mix___eFoo___wBar___ {
+class S_____eFoo___wBar___ extends Mix___eFoo___wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFoo___wBar__f extends Mix___eFoo___wBar__f { class I;; f; }
 /* */
-class S_____eFoo___wBar_I_ extends Mix___eFoo___wBar_I_ {
+class S_____eFoo___wBar_I_ extends Mix___eFoo___wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFoo___wBar_If extends Mix___eFoo___wBar_If { ;; f; }
 /* */
-class S_____eFoo___wBarY__ extends Mix___eFoo___wBarY__ {
+class S_____eFoo___wBarY__ extends Mix___eFoo___wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFoo___wBarY_f extends Mix___eFoo___wBarY_f { class I;; f; }
 /* */
-class S_____eFoo___wBarYI_ extends Mix___eFoo___wBarYI_ {
+class S_____eFoo___wBarYI_ extends Mix___eFoo___wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFoo___wBarYIf extends Mix___eFoo___wBarYIf { ;; f; }
 /* */
@@ -2439,17 +2117,15 @@ class S_____eFoo__fwBarYI_ extends Mix___eFoo__fwBarYI_ { ;; f; }
 /* */
 class S_____eFoo_I_ extends Mix___eFoo_I_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_____eFoo_I_wBar___ extends Mix___eFoo_I_wBar___ {
+class S_____eFoo_I_wBar___ extends Mix___eFoo_I_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFoo_I_wBar__f extends Mix___eFoo_I_wBar__f { ;; f; }
 // */class S_____eFoo_I_wBar_I_     extends Mix___eFoo_I_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_____eFoo_I_wBar_If     extends Mix___eFoo_I_wBar_If     {        ;                                ; f; }
 /* */
-class S_____eFoo_I_wBarY__ extends Mix___eFoo_I_wBarY__ {
+class S_____eFoo_I_wBarY__ extends Mix___eFoo_I_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFoo_I_wBarY_f extends Mix___eFoo_I_wBarY_f { ;; f; }
 // */class S_____eFoo_I_wBarYI_     extends Mix___eFoo_I_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -2467,31 +2143,26 @@ class S_____eFoo_IfwBarY__ extends Mix___eFoo_IfwBarY__ { ;; f; }
 // */class S_____eFoo_IfwBarYI_     extends Mix___eFoo_IfwBarYI_     {        ;                                ; f; }
 // */class S_____eFoo_IfwBarYIf     extends Mix___eFoo_IfwBarYIf     {        ;                                ; f; }
 /* */
-class S_____eFooX__ extends Mix___eFooX__ {
+class S_____eFooX__ extends Mix___eFooX__
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_____eFooX__wBar___ extends Mix___eFooX__wBar___ {
+class S_____eFooX__wBar___ extends Mix___eFooX__wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFooX__wBar__f extends Mix___eFooX__wBar__f { class I;; f; }
 /* */
-class S_____eFooX__wBar_I_ extends Mix___eFooX__wBar_I_ {
+class S_____eFooX__wBar_I_ extends Mix___eFooX__wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFooX__wBar_If extends Mix___eFooX__wBar_If { ;; f; }
 /* */
-class S_____eFooX__wBarY__ extends Mix___eFooX__wBarY__ {
+class S_____eFooX__wBarY__ extends Mix___eFooX__wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFooX__wBarY_f extends Mix___eFooX__wBarY_f { class I;; f; }
 /* */
-class S_____eFooX__wBarYI_ extends Mix___eFooX__wBarYI_ {
+class S_____eFooX__wBarYI_ extends Mix___eFooX__wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFooX__wBarYIf extends Mix___eFooX__wBarYIf { ;; f; }
 /* */
@@ -2511,17 +2182,15 @@ class S_____eFooX_fwBarYI_ extends Mix___eFooX_fwBarYI_ { ;; f; }
 /* */
 class S_____eFooXI_ extends Mix___eFooXI_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_____eFooXI_wBar___ extends Mix___eFooXI_wBar___ {
+class S_____eFooXI_wBar___ extends Mix___eFooXI_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFooXI_wBar__f extends Mix___eFooXI_wBar__f { ;; f; }
 // */class S_____eFooXI_wBar_I_     extends Mix___eFooXI_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_____eFooXI_wBar_If     extends Mix___eFooXI_wBar_If     {        ;                                ; f; }
 /* */
-class S_____eFooXI_wBarY__ extends Mix___eFooXI_wBarY__ {
+class S_____eFooXI_wBarY__ extends Mix___eFooXI_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____eFooXI_wBarY_f extends Mix___eFooXI_wBarY_f { ;; f; }
 // */class S_____eFooXI_wBarYI_     extends Mix___eFooXI_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -2671,17 +2340,15 @@ class S____feFooXIfwBarY_f extends Mix__feFooXIfwBarY_f { ;; f; }
 /* */
 class S___I_eFoo___ extends Mix_I_eFoo___ { ; def f: I = { sub; null }; f; }
 /* */
-class S___I_eFoo___wBar___ extends Mix_I_eFoo___wBar___ {
+class S___I_eFoo___wBar___ extends Mix_I_eFoo___wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_eFoo___wBar__f extends Mix_I_eFoo___wBar__f { ;; f; }
 // */class S___I_eFoo___wBar_I_     extends Mix_I_eFoo___wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S___I_eFoo___wBar_If     extends Mix_I_eFoo___wBar_If     {        ;                                ; f; }
 /* */
-class S___I_eFoo___wBarY__ extends Mix_I_eFoo___wBarY__ {
+class S___I_eFoo___wBarY__ extends Mix_I_eFoo___wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_eFoo___wBarY_f extends Mix_I_eFoo___wBarY_f { ;; f; }
 // */class S___I_eFoo___wBarYI_     extends Mix_I_eFoo___wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -2719,17 +2386,15 @@ class S___I_eFoo__fwBarY__ extends Mix_I_eFoo__fwBarY__ { ;; f; }
 /* */
 class S___I_eFooX__ extends Mix_I_eFooX__ { ; def f: I = { sub; null }; f; }
 /* */
-class S___I_eFooX__wBar___ extends Mix_I_eFooX__wBar___ {
+class S___I_eFooX__wBar___ extends Mix_I_eFooX__wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_eFooX__wBar__f extends Mix_I_eFooX__wBar__f { ;; f; }
 // */class S___I_eFooX__wBar_I_     extends Mix_I_eFooX__wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S___I_eFooX__wBar_If     extends Mix_I_eFooX__wBar_If     {        ;                                ; f; }
 /* */
-class S___I_eFooX__wBarY__ extends Mix_I_eFooX__wBarY__ {
+class S___I_eFooX__wBarY__ extends Mix_I_eFooX__wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_eFooX__wBarY_f extends Mix_I_eFooX__wBarY_f { ;; f; }
 // */class S___I_eFooX__wBarYI_     extends Mix_I_eFooX__wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -2859,31 +2524,26 @@ class S___IfeFooX_fwBarY_f extends Mix_IfeFooX_fwBarY_f { ;; f; }
 // */class S___IfeFooXIfwBarYIf     extends Mix_IfeFooXIfwBarYIf     {        ;                                ; f; }
 
 /* */
-class S__Z__eFoo___ extends MixZ__eFoo___[C] {
+class S__Z__eFoo___ extends MixZ__eFoo___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S__Z__eFoo___wBar___ extends MixZ__eFoo___wBar___[C] {
+class S__Z__eFoo___wBar___ extends MixZ__eFoo___wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFoo___wBar__f extends MixZ__eFoo___wBar__f[C] { class I;; f; }
 /* */
-class S__Z__eFoo___wBar_I_ extends MixZ__eFoo___wBar_I_[C] {
+class S__Z__eFoo___wBar_I_ extends MixZ__eFoo___wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFoo___wBar_If extends MixZ__eFoo___wBar_If[C] { ;; f; }
 /* */
-class S__Z__eFoo___wBarY__ extends MixZ__eFoo___wBarY__[C] {
+class S__Z__eFoo___wBarY__ extends MixZ__eFoo___wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFoo___wBarY_f extends MixZ__eFoo___wBarY_f[C] { class I;; f; }
 /* */
-class S__Z__eFoo___wBarYI_ extends MixZ__eFoo___wBarYI_[C] {
+class S__Z__eFoo___wBarYI_ extends MixZ__eFoo___wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFoo___wBarYIf extends MixZ__eFoo___wBarYIf[C] { ;; f; }
 /* */
@@ -2903,17 +2563,15 @@ class S__Z__eFoo__fwBarYI_ extends MixZ__eFoo__fwBarYI_[C] { ;; f; }
 /* */
 class S__Z__eFoo_I_ extends MixZ__eFoo_I_[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__Z__eFoo_I_wBar___ extends MixZ__eFoo_I_wBar___[C] {
+class S__Z__eFoo_I_wBar___ extends MixZ__eFoo_I_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFoo_I_wBar__f extends MixZ__eFoo_I_wBar__f[C] { ;; f; }
 // */class S__Z__eFoo_I_wBar_I_     extends MixZ__eFoo_I_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__Z__eFoo_I_wBar_If     extends MixZ__eFoo_I_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__Z__eFoo_I_wBarY__ extends MixZ__eFoo_I_wBarY__[C] {
+class S__Z__eFoo_I_wBarY__ extends MixZ__eFoo_I_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFoo_I_wBarY_f extends MixZ__eFoo_I_wBarY_f[C] { ;; f; }
 // */class S__Z__eFoo_I_wBarYI_     extends MixZ__eFoo_I_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -2931,31 +2589,26 @@ class S__Z__eFoo_IfwBarY__ extends MixZ__eFoo_IfwBarY__[C] { ;; f; }
 // */class S__Z__eFoo_IfwBarYI_     extends MixZ__eFoo_IfwBarYI_[C]  {        ;                                ; f; }
 // */class S__Z__eFoo_IfwBarYIf     extends MixZ__eFoo_IfwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S__Z__eFooX__ extends MixZ__eFooX__[C] {
+class S__Z__eFooX__ extends MixZ__eFooX__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S__Z__eFooX__wBar___ extends MixZ__eFooX__wBar___[C] {
+class S__Z__eFooX__wBar___ extends MixZ__eFooX__wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFooX__wBar__f extends MixZ__eFooX__wBar__f[C] { class I;; f; }
 /* */
-class S__Z__eFooX__wBar_I_ extends MixZ__eFooX__wBar_I_[C] {
+class S__Z__eFooX__wBar_I_ extends MixZ__eFooX__wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFooX__wBar_If extends MixZ__eFooX__wBar_If[C] { ;; f; }
 /* */
-class S__Z__eFooX__wBarY__ extends MixZ__eFooX__wBarY__[C] {
+class S__Z__eFooX__wBarY__ extends MixZ__eFooX__wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFooX__wBarY_f extends MixZ__eFooX__wBarY_f[C] { class I;; f; }
 /* */
-class S__Z__eFooX__wBarYI_ extends MixZ__eFooX__wBarYI_[C] {
+class S__Z__eFooX__wBarYI_ extends MixZ__eFooX__wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFooX__wBarYIf extends MixZ__eFooX__wBarYIf[C] { ;; f; }
 /* */
@@ -2975,17 +2628,15 @@ class S__Z__eFooX_fwBarYI_ extends MixZ__eFooX_fwBarYI_[C] { ;; f; }
 /* */
 class S__Z__eFooXI_ extends MixZ__eFooXI_[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__Z__eFooXI_wBar___ extends MixZ__eFooXI_wBar___[C] {
+class S__Z__eFooXI_wBar___ extends MixZ__eFooXI_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFooXI_wBar__f extends MixZ__eFooXI_wBar__f[C] { ;; f; }
 // */class S__Z__eFooXI_wBar_I_     extends MixZ__eFooXI_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__Z__eFooXI_wBar_If     extends MixZ__eFooXI_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__Z__eFooXI_wBarY__ extends MixZ__eFooXI_wBarY__[C] {
+class S__Z__eFooXI_wBarY__ extends MixZ__eFooXI_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__eFooXI_wBarY_f extends MixZ__eFooXI_wBarY_f[C] { ;; f; }
 // */class S__Z__eFooXI_wBarYI_     extends MixZ__eFooXI_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -3135,17 +2786,15 @@ class S__Z_feFooXIfwBarY_f extends MixZ_feFooXIfwBarY_f[C] { ;; f; }
 /* */
 class S__ZI_eFoo___ extends MixZI_eFoo___[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__ZI_eFoo___wBar___ extends MixZI_eFoo___wBar___[C] {
+class S__ZI_eFoo___wBar___ extends MixZI_eFoo___wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_eFoo___wBar__f extends MixZI_eFoo___wBar__f[C] { ;; f; }
 // */class S__ZI_eFoo___wBar_I_     extends MixZI_eFoo___wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__ZI_eFoo___wBar_If     extends MixZI_eFoo___wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__ZI_eFoo___wBarY__ extends MixZI_eFoo___wBarY__[C] {
+class S__ZI_eFoo___wBarY__ extends MixZI_eFoo___wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_eFoo___wBarY_f extends MixZI_eFoo___wBarY_f[C] { ;; f; }
 // */class S__ZI_eFoo___wBarYI_     extends MixZI_eFoo___wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -3183,17 +2832,15 @@ class S__ZI_eFoo__fwBarY__ extends MixZI_eFoo__fwBarY__[C] { ;; f; }
 /* */
 class S__ZI_eFooX__ extends MixZI_eFooX__[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__ZI_eFooX__wBar___ extends MixZI_eFooX__wBar___[C] {
+class S__ZI_eFooX__wBar___ extends MixZI_eFooX__wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_eFooX__wBar__f extends MixZI_eFooX__wBar__f[C] { ;; f; }
 // */class S__ZI_eFooX__wBar_I_     extends MixZI_eFooX__wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__ZI_eFooX__wBar_If     extends MixZI_eFooX__wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__ZI_eFooX__wBarY__ extends MixZI_eFooX__wBarY__[C] {
+class S__ZI_eFooX__wBarY__ extends MixZI_eFooX__wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_eFooX__wBarY_f extends MixZI_eFooX__wBarY_f[C] { ;; f; }
 // */class S__ZI_eFooX__wBarYI_     extends MixZI_eFooX__wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -3323,31 +2970,26 @@ class S__ZIfeFooX_fwBarY_f extends MixZIfeFooX_fwBarY_f[C] { ;; f; }
 // */class S__ZIfeFooXIfwBarYIf     extends MixZIfeFooXIfwBarYIf[C]  {        ;                                ; f; }
 
 /* */
-class S_____wFoo___ extends Mix___wFoo___ {
+class S_____wFoo___ extends Mix___wFoo___
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_____wFoo___wBar___ extends Mix___wFoo___wBar___ {
+class S_____wFoo___wBar___ extends Mix___wFoo___wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFoo___wBar__f extends Mix___wFoo___wBar__f { class I;; f; }
 /* */
-class S_____wFoo___wBar_I_ extends Mix___wFoo___wBar_I_ {
+class S_____wFoo___wBar_I_ extends Mix___wFoo___wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFoo___wBar_If extends Mix___wFoo___wBar_If { ;; f; }
 /* */
-class S_____wFoo___wBarY__ extends Mix___wFoo___wBarY__ {
+class S_____wFoo___wBarY__ extends Mix___wFoo___wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFoo___wBarY_f extends Mix___wFoo___wBarY_f { class I;; f; }
 /* */
-class S_____wFoo___wBarYI_ extends Mix___wFoo___wBarYI_ {
+class S_____wFoo___wBarYI_ extends Mix___wFoo___wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFoo___wBarYIf extends Mix___wFoo___wBarYIf { ;; f; }
 /* */
@@ -3367,17 +3009,15 @@ class S_____wFoo__fwBarYI_ extends Mix___wFoo__fwBarYI_ { ;; f; }
 /* */
 class S_____wFoo_I_ extends Mix___wFoo_I_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_____wFoo_I_wBar___ extends Mix___wFoo_I_wBar___ {
+class S_____wFoo_I_wBar___ extends Mix___wFoo_I_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFoo_I_wBar__f extends Mix___wFoo_I_wBar__f { ;; f; }
 // */class S_____wFoo_I_wBar_I_     extends Mix___wFoo_I_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_____wFoo_I_wBar_If     extends Mix___wFoo_I_wBar_If     {        ;                                ; f; }
 /* */
-class S_____wFoo_I_wBarY__ extends Mix___wFoo_I_wBarY__ {
+class S_____wFoo_I_wBarY__ extends Mix___wFoo_I_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFoo_I_wBarY_f extends Mix___wFoo_I_wBarY_f { ;; f; }
 // */class S_____wFoo_I_wBarYI_     extends Mix___wFoo_I_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -3395,31 +3035,26 @@ class S_____wFoo_IfwBarY__ extends Mix___wFoo_IfwBarY__ { ;; f; }
 // */class S_____wFoo_IfwBarYI_     extends Mix___wFoo_IfwBarYI_     {        ;                                ; f; }
 // */class S_____wFoo_IfwBarYIf     extends Mix___wFoo_IfwBarYIf     {        ;                                ; f; }
 /* */
-class S_____wFooX__ extends Mix___wFooX__ {
+class S_____wFooX__ extends Mix___wFooX__
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_____wFooX__wBar___ extends Mix___wFooX__wBar___ {
+class S_____wFooX__wBar___ extends Mix___wFooX__wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFooX__wBar__f extends Mix___wFooX__wBar__f { class I;; f; }
 /* */
-class S_____wFooX__wBar_I_ extends Mix___wFooX__wBar_I_ {
+class S_____wFooX__wBar_I_ extends Mix___wFooX__wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFooX__wBar_If extends Mix___wFooX__wBar_If { ;; f; }
 /* */
-class S_____wFooX__wBarY__ extends Mix___wFooX__wBarY__ {
+class S_____wFooX__wBarY__ extends Mix___wFooX__wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFooX__wBarY_f extends Mix___wFooX__wBarY_f { class I;; f; }
 /* */
-class S_____wFooX__wBarYI_ extends Mix___wFooX__wBarYI_ {
+class S_____wFooX__wBarYI_ extends Mix___wFooX__wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFooX__wBarYIf extends Mix___wFooX__wBarYIf { ;; f; }
 /* */
@@ -3439,17 +3074,15 @@ class S_____wFooX_fwBarYI_ extends Mix___wFooX_fwBarYI_ { ;; f; }
 /* */
 class S_____wFooXI_ extends Mix___wFooXI_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_____wFooXI_wBar___ extends Mix___wFooXI_wBar___ {
+class S_____wFooXI_wBar___ extends Mix___wFooXI_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFooXI_wBar__f extends Mix___wFooXI_wBar__f { ;; f; }
 // */class S_____wFooXI_wBar_I_     extends Mix___wFooXI_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_____wFooXI_wBar_If     extends Mix___wFooXI_wBar_If     {        ;                                ; f; }
 /* */
-class S_____wFooXI_wBarY__ extends Mix___wFooXI_wBarY__ {
+class S_____wFooXI_wBarY__ extends Mix___wFooXI_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_____wFooXI_wBarY_f extends Mix___wFooXI_wBarY_f { ;; f; }
 // */class S_____wFooXI_wBarYI_     extends Mix___wFooXI_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -3599,17 +3232,15 @@ class S____fwFooXIfwBarY_f extends Mix__fwFooXIfwBarY_f { ;; f; }
 /* */
 class S___I_wFoo___ extends Mix_I_wFoo___ { ; def f: I = { sub; null }; f; }
 /* */
-class S___I_wFoo___wBar___ extends Mix_I_wFoo___wBar___ {
+class S___I_wFoo___wBar___ extends Mix_I_wFoo___wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_wFoo___wBar__f extends Mix_I_wFoo___wBar__f { ;; f; }
 // */class S___I_wFoo___wBar_I_     extends Mix_I_wFoo___wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S___I_wFoo___wBar_If     extends Mix_I_wFoo___wBar_If     {        ;                                ; f; }
 /* */
-class S___I_wFoo___wBarY__ extends Mix_I_wFoo___wBarY__ {
+class S___I_wFoo___wBarY__ extends Mix_I_wFoo___wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_wFoo___wBarY_f extends Mix_I_wFoo___wBarY_f { ;; f; }
 // */class S___I_wFoo___wBarYI_     extends Mix_I_wFoo___wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -3647,17 +3278,15 @@ class S___I_wFoo__fwBarY__ extends Mix_I_wFoo__fwBarY__ { ;; f; }
 /* */
 class S___I_wFooX__ extends Mix_I_wFooX__ { ; def f: I = { sub; null }; f; }
 /* */
-class S___I_wFooX__wBar___ extends Mix_I_wFooX__wBar___ {
+class S___I_wFooX__wBar___ extends Mix_I_wFooX__wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_wFooX__wBar__f extends Mix_I_wFooX__wBar__f { ;; f; }
 // */class S___I_wFooX__wBar_I_     extends Mix_I_wFooX__wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S___I_wFooX__wBar_If     extends Mix_I_wFooX__wBar_If     {        ;                                ; f; }
 /* */
-class S___I_wFooX__wBarY__ extends Mix_I_wFooX__wBarY__ {
+class S___I_wFooX__wBarY__ extends Mix_I_wFooX__wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S___I_wFooX__wBarY_f extends Mix_I_wFooX__wBarY_f { ;; f; }
 // */class S___I_wFooX__wBarYI_     extends Mix_I_wFooX__wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -3787,31 +3416,26 @@ class S___IfwFooX_fwBarY_f extends Mix_IfwFooX_fwBarY_f { ;; f; }
 // */class S___IfwFooXIfwBarYIf     extends Mix_IfwFooXIfwBarYIf     {        ;                                ; f; }
 
 /* */
-class S__Z__wFoo___ extends MixZ__wFoo___[C] {
+class S__Z__wFoo___ extends MixZ__wFoo___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S__Z__wFoo___wBar___ extends MixZ__wFoo___wBar___[C] {
+class S__Z__wFoo___wBar___ extends MixZ__wFoo___wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFoo___wBar__f extends MixZ__wFoo___wBar__f[C] { class I;; f; }
 /* */
-class S__Z__wFoo___wBar_I_ extends MixZ__wFoo___wBar_I_[C] {
+class S__Z__wFoo___wBar_I_ extends MixZ__wFoo___wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFoo___wBar_If extends MixZ__wFoo___wBar_If[C] { ;; f; }
 /* */
-class S__Z__wFoo___wBarY__ extends MixZ__wFoo___wBarY__[C] {
+class S__Z__wFoo___wBarY__ extends MixZ__wFoo___wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFoo___wBarY_f extends MixZ__wFoo___wBarY_f[C] { class I;; f; }
 /* */
-class S__Z__wFoo___wBarYI_ extends MixZ__wFoo___wBarYI_[C] {
+class S__Z__wFoo___wBarYI_ extends MixZ__wFoo___wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFoo___wBarYIf extends MixZ__wFoo___wBarYIf[C] { ;; f; }
 /* */
@@ -3831,17 +3455,15 @@ class S__Z__wFoo__fwBarYI_ extends MixZ__wFoo__fwBarYI_[C] { ;; f; }
 /* */
 class S__Z__wFoo_I_ extends MixZ__wFoo_I_[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__Z__wFoo_I_wBar___ extends MixZ__wFoo_I_wBar___[C] {
+class S__Z__wFoo_I_wBar___ extends MixZ__wFoo_I_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFoo_I_wBar__f extends MixZ__wFoo_I_wBar__f[C] { ;; f; }
 // */class S__Z__wFoo_I_wBar_I_     extends MixZ__wFoo_I_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__Z__wFoo_I_wBar_If     extends MixZ__wFoo_I_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__Z__wFoo_I_wBarY__ extends MixZ__wFoo_I_wBarY__[C] {
+class S__Z__wFoo_I_wBarY__ extends MixZ__wFoo_I_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFoo_I_wBarY_f extends MixZ__wFoo_I_wBarY_f[C] { ;; f; }
 // */class S__Z__wFoo_I_wBarYI_     extends MixZ__wFoo_I_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -3859,31 +3481,26 @@ class S__Z__wFoo_IfwBarY__ extends MixZ__wFoo_IfwBarY__[C] { ;; f; }
 // */class S__Z__wFoo_IfwBarYI_     extends MixZ__wFoo_IfwBarYI_[C]  {        ;                                ; f; }
 // */class S__Z__wFoo_IfwBarYIf     extends MixZ__wFoo_IfwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S__Z__wFooX__ extends MixZ__wFooX__[C] {
+class S__Z__wFooX__ extends MixZ__wFooX__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S__Z__wFooX__wBar___ extends MixZ__wFooX__wBar___[C] {
+class S__Z__wFooX__wBar___ extends MixZ__wFooX__wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFooX__wBar__f extends MixZ__wFooX__wBar__f[C] { class I;; f; }
 /* */
-class S__Z__wFooX__wBar_I_ extends MixZ__wFooX__wBar_I_[C] {
+class S__Z__wFooX__wBar_I_ extends MixZ__wFooX__wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFooX__wBar_If extends MixZ__wFooX__wBar_If[C] { ;; f; }
 /* */
-class S__Z__wFooX__wBarY__ extends MixZ__wFooX__wBarY__[C] {
+class S__Z__wFooX__wBarY__ extends MixZ__wFooX__wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFooX__wBarY_f extends MixZ__wFooX__wBarY_f[C] { class I;; f; }
 /* */
-class S__Z__wFooX__wBarYI_ extends MixZ__wFooX__wBarYI_[C] {
+class S__Z__wFooX__wBarYI_ extends MixZ__wFooX__wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFooX__wBarYIf extends MixZ__wFooX__wBarYIf[C] { ;; f; }
 /* */
@@ -3903,17 +3520,15 @@ class S__Z__wFooX_fwBarYI_ extends MixZ__wFooX_fwBarYI_[C] { ;; f; }
 /* */
 class S__Z__wFooXI_ extends MixZ__wFooXI_[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__Z__wFooXI_wBar___ extends MixZ__wFooXI_wBar___[C] {
+class S__Z__wFooXI_wBar___ extends MixZ__wFooXI_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFooXI_wBar__f extends MixZ__wFooXI_wBar__f[C] { ;; f; }
 // */class S__Z__wFooXI_wBar_I_     extends MixZ__wFooXI_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__Z__wFooXI_wBar_If     extends MixZ__wFooXI_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__Z__wFooXI_wBarY__ extends MixZ__wFooXI_wBarY__[C] {
+class S__Z__wFooXI_wBarY__ extends MixZ__wFooXI_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__Z__wFooXI_wBarY_f extends MixZ__wFooXI_wBarY_f[C] { ;; f; }
 // */class S__Z__wFooXI_wBarYI_     extends MixZ__wFooXI_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -4063,17 +3678,15 @@ class S__Z_fwFooXIfwBarY_f extends MixZ_fwFooXIfwBarY_f[C] { ;; f; }
 /* */
 class S__ZI_wFoo___ extends MixZI_wFoo___[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__ZI_wFoo___wBar___ extends MixZI_wFoo___wBar___[C] {
+class S__ZI_wFoo___wBar___ extends MixZI_wFoo___wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_wFoo___wBar__f extends MixZI_wFoo___wBar__f[C] { ;; f; }
 // */class S__ZI_wFoo___wBar_I_     extends MixZI_wFoo___wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__ZI_wFoo___wBar_If     extends MixZI_wFoo___wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__ZI_wFoo___wBarY__ extends MixZI_wFoo___wBarY__[C] {
+class S__ZI_wFoo___wBarY__ extends MixZI_wFoo___wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_wFoo___wBarY_f extends MixZI_wFoo___wBarY_f[C] { ;; f; }
 // */class S__ZI_wFoo___wBarYI_     extends MixZI_wFoo___wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -4111,17 +3724,15 @@ class S__ZI_wFoo__fwBarY__ extends MixZI_wFoo__fwBarY__[C] { ;; f; }
 /* */
 class S__ZI_wFooX__ extends MixZI_wFooX__[C] { ; def f: I = { sub; null }; f; }
 /* */
-class S__ZI_wFooX__wBar___ extends MixZI_wFooX__wBar___[C] {
+class S__ZI_wFooX__wBar___ extends MixZI_wFooX__wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_wFooX__wBar__f extends MixZI_wFooX__wBar__f[C] { ;; f; }
 // */class S__ZI_wFooX__wBar_I_     extends MixZI_wFooX__wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S__ZI_wFooX__wBar_If     extends MixZI_wFooX__wBar_If[C]  {        ;                                ; f; }
 /* */
-class S__ZI_wFooX__wBarY__ extends MixZI_wFooX__wBarY__[C] {
+class S__ZI_wFooX__wBarY__ extends MixZI_wFooX__wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S__ZI_wFooX__wBarY_f extends MixZI_wFooX__wBarY_f[C] { ;; f; }
 // */class S__ZI_wFooX__wBarYI_     extends MixZI_wFooX__wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -4251,31 +3862,26 @@ class S__ZIfwFooX_fwBarY_f extends MixZIfwFooX_fwBarY_f[C] { ;; f; }
 // */class S__ZIfwFooXIfwBarYIf     extends MixZIfwFooXIfwBarYIf[C]  {        ;                                ; f; }
 
 /* */
-class S_T___eFoo___[T] extends Mix___eFoo___ {
+class S_T___eFoo___[T] extends Mix___eFoo___
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_T___eFoo___wBar___[T] extends Mix___eFoo___wBar___ {
+class S_T___eFoo___wBar___[T] extends Mix___eFoo___wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFoo___wBar__f[T] extends Mix___eFoo___wBar__f { class I;; f; }
 /* */
-class S_T___eFoo___wBar_I_[T] extends Mix___eFoo___wBar_I_ {
+class S_T___eFoo___wBar_I_[T] extends Mix___eFoo___wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFoo___wBar_If[T] extends Mix___eFoo___wBar_If { ;; f; }
 /* */
-class S_T___eFoo___wBarY__[T] extends Mix___eFoo___wBarY__ {
+class S_T___eFoo___wBarY__[T] extends Mix___eFoo___wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFoo___wBarY_f[T] extends Mix___eFoo___wBarY_f { class I;; f; }
 /* */
-class S_T___eFoo___wBarYI_[T] extends Mix___eFoo___wBarYI_ {
+class S_T___eFoo___wBarYI_[T] extends Mix___eFoo___wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFoo___wBarYIf[T] extends Mix___eFoo___wBarYIf { ;; f; }
 /* */
@@ -4295,17 +3901,15 @@ class S_T___eFoo__fwBarYI_[T] extends Mix___eFoo__fwBarYI_ { ;; f; }
 /* */
 class S_T___eFoo_I_[T] extends Mix___eFoo_I_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T___eFoo_I_wBar___[T] extends Mix___eFoo_I_wBar___ {
+class S_T___eFoo_I_wBar___[T] extends Mix___eFoo_I_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFoo_I_wBar__f[T] extends Mix___eFoo_I_wBar__f { ;; f; }
 // */class S_T___eFoo_I_wBar_I_[T]  extends Mix___eFoo_I_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T___eFoo_I_wBar_If[T]  extends Mix___eFoo_I_wBar_If     {        ;                                ; f; }
 /* */
-class S_T___eFoo_I_wBarY__[T] extends Mix___eFoo_I_wBarY__ {
+class S_T___eFoo_I_wBarY__[T] extends Mix___eFoo_I_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFoo_I_wBarY_f[T] extends Mix___eFoo_I_wBarY_f { ;; f; }
 // */class S_T___eFoo_I_wBarYI_[T]  extends Mix___eFoo_I_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -4323,31 +3927,26 @@ class S_T___eFoo_IfwBarY__[T] extends Mix___eFoo_IfwBarY__ { ;; f; }
 // */class S_T___eFoo_IfwBarYI_[T]  extends Mix___eFoo_IfwBarYI_     {        ;                                ; f; }
 // */class S_T___eFoo_IfwBarYIf[T]  extends Mix___eFoo_IfwBarYIf     {        ;                                ; f; }
 /* */
-class S_T___eFooX__[T] extends Mix___eFooX__ {
+class S_T___eFooX__[T] extends Mix___eFooX__
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_T___eFooX__wBar___[T] extends Mix___eFooX__wBar___ {
+class S_T___eFooX__wBar___[T] extends Mix___eFooX__wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFooX__wBar__f[T] extends Mix___eFooX__wBar__f { class I;; f; }
 /* */
-class S_T___eFooX__wBar_I_[T] extends Mix___eFooX__wBar_I_ {
+class S_T___eFooX__wBar_I_[T] extends Mix___eFooX__wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFooX__wBar_If[T] extends Mix___eFooX__wBar_If { ;; f; }
 /* */
-class S_T___eFooX__wBarY__[T] extends Mix___eFooX__wBarY__ {
+class S_T___eFooX__wBarY__[T] extends Mix___eFooX__wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFooX__wBarY_f[T] extends Mix___eFooX__wBarY_f { class I;; f; }
 /* */
-class S_T___eFooX__wBarYI_[T] extends Mix___eFooX__wBarYI_ {
+class S_T___eFooX__wBarYI_[T] extends Mix___eFooX__wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFooX__wBarYIf[T] extends Mix___eFooX__wBarYIf { ;; f; }
 /* */
@@ -4367,17 +3966,15 @@ class S_T___eFooX_fwBarYI_[T] extends Mix___eFooX_fwBarYI_ { ;; f; }
 /* */
 class S_T___eFooXI_[T] extends Mix___eFooXI_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T___eFooXI_wBar___[T] extends Mix___eFooXI_wBar___ {
+class S_T___eFooXI_wBar___[T] extends Mix___eFooXI_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFooXI_wBar__f[T] extends Mix___eFooXI_wBar__f { ;; f; }
 // */class S_T___eFooXI_wBar_I_[T]  extends Mix___eFooXI_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T___eFooXI_wBar_If[T]  extends Mix___eFooXI_wBar_If     {        ;                                ; f; }
 /* */
-class S_T___eFooXI_wBarY__[T] extends Mix___eFooXI_wBarY__ {
+class S_T___eFooXI_wBarY__[T] extends Mix___eFooXI_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___eFooXI_wBarY_f[T] extends Mix___eFooXI_wBarY_f { ;; f; }
 // */class S_T___eFooXI_wBarYI_[T]  extends Mix___eFooXI_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -4527,17 +4124,15 @@ class S_T__feFooXIfwBarY_f[T] extends Mix__feFooXIfwBarY_f { ;; f; }
 /* */
 class S_T_I_eFoo___[T] extends Mix_I_eFoo___ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T_I_eFoo___wBar___[T] extends Mix_I_eFoo___wBar___ {
+class S_T_I_eFoo___wBar___[T] extends Mix_I_eFoo___wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_eFoo___wBar__f[T] extends Mix_I_eFoo___wBar__f { ;; f; }
 // */class S_T_I_eFoo___wBar_I_[T]  extends Mix_I_eFoo___wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T_I_eFoo___wBar_If[T]  extends Mix_I_eFoo___wBar_If     {        ;                                ; f; }
 /* */
-class S_T_I_eFoo___wBarY__[T] extends Mix_I_eFoo___wBarY__ {
+class S_T_I_eFoo___wBarY__[T] extends Mix_I_eFoo___wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_eFoo___wBarY_f[T] extends Mix_I_eFoo___wBarY_f { ;; f; }
 // */class S_T_I_eFoo___wBarYI_[T]  extends Mix_I_eFoo___wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -4575,17 +4170,15 @@ class S_T_I_eFoo__fwBarY__[T] extends Mix_I_eFoo__fwBarY__ { ;; f; }
 /* */
 class S_T_I_eFooX__[T] extends Mix_I_eFooX__ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T_I_eFooX__wBar___[T] extends Mix_I_eFooX__wBar___ {
+class S_T_I_eFooX__wBar___[T] extends Mix_I_eFooX__wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_eFooX__wBar__f[T] extends Mix_I_eFooX__wBar__f { ;; f; }
 // */class S_T_I_eFooX__wBar_I_[T]  extends Mix_I_eFooX__wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T_I_eFooX__wBar_If[T]  extends Mix_I_eFooX__wBar_If     {        ;                                ; f; }
 /* */
-class S_T_I_eFooX__wBarY__[T] extends Mix_I_eFooX__wBarY__ {
+class S_T_I_eFooX__wBarY__[T] extends Mix_I_eFooX__wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_eFooX__wBarY_f[T] extends Mix_I_eFooX__wBarY_f { ;; f; }
 // */class S_T_I_eFooX__wBarYI_[T]  extends Mix_I_eFooX__wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -4715,31 +4308,26 @@ class S_T_IfeFooX_fwBarY_f[T] extends Mix_IfeFooX_fwBarY_f { ;; f; }
 // */class S_T_IfeFooXIfwBarYIf[T]  extends Mix_IfeFooXIfwBarYIf     {        ;                                ; f; }
 
 /* */
-class S_TZ__eFoo___[T] extends MixZ__eFoo___[C] {
+class S_TZ__eFoo___[T] extends MixZ__eFoo___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__eFoo___wBar___[T] extends MixZ__eFoo___wBar___[C] {
+class S_TZ__eFoo___wBar___[T] extends MixZ__eFoo___wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFoo___wBar__f[T] extends MixZ__eFoo___wBar__f[C] { class I;; f; }
 /* */
-class S_TZ__eFoo___wBar_I_[T] extends MixZ__eFoo___wBar_I_[C] {
+class S_TZ__eFoo___wBar_I_[T] extends MixZ__eFoo___wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFoo___wBar_If[T] extends MixZ__eFoo___wBar_If[C] { ;; f; }
 /* */
-class S_TZ__eFoo___wBarY__[T] extends MixZ__eFoo___wBarY__[C] {
+class S_TZ__eFoo___wBarY__[T] extends MixZ__eFoo___wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFoo___wBarY_f[T] extends MixZ__eFoo___wBarY_f[C] { class I;; f; }
 /* */
-class S_TZ__eFoo___wBarYI_[T] extends MixZ__eFoo___wBarYI_[C] {
+class S_TZ__eFoo___wBarYI_[T] extends MixZ__eFoo___wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFoo___wBarYIf[T] extends MixZ__eFoo___wBarYIf[C] { ;; f; }
 /* */
@@ -4757,21 +4345,18 @@ class S_TZ__eFoo__fwBarY__[T] extends MixZ__eFoo__fwBarY__[C] { class I;; f; }
 class S_TZ__eFoo__fwBarYI_[T] extends MixZ__eFoo__fwBarYI_[C] { ;; f; }
 // */class S_TZ__eFoo__fwBarYIf[T]  extends MixZ__eFoo__fwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZ__eFoo_I_[T] extends MixZ__eFoo_I_[C] {
+class S_TZ__eFoo_I_[T] extends MixZ__eFoo_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__eFoo_I_wBar___[T] extends MixZ__eFoo_I_wBar___[C] {
+class S_TZ__eFoo_I_wBar___[T] extends MixZ__eFoo_I_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFoo_I_wBar__f[T] extends MixZ__eFoo_I_wBar__f[C] { ;; f; }
 // */class S_TZ__eFoo_I_wBar_I_[T]  extends MixZ__eFoo_I_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZ__eFoo_I_wBar_If[T]  extends MixZ__eFoo_I_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZ__eFoo_I_wBarY__[T] extends MixZ__eFoo_I_wBarY__[C] {
+class S_TZ__eFoo_I_wBarY__[T] extends MixZ__eFoo_I_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFoo_I_wBarY_f[T] extends MixZ__eFoo_I_wBarY_f[C] { ;; f; }
 // */class S_TZ__eFoo_I_wBarYI_[T]  extends MixZ__eFoo_I_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -4789,31 +4374,26 @@ class S_TZ__eFoo_IfwBarY__[T] extends MixZ__eFoo_IfwBarY__[C] { ;; f; }
 // */class S_TZ__eFoo_IfwBarYI_[T]  extends MixZ__eFoo_IfwBarYI_[C]  {        ;                                ; f; }
 // */class S_TZ__eFoo_IfwBarYIf[T]  extends MixZ__eFoo_IfwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZ__eFooX__[T] extends MixZ__eFooX__[C] {
+class S_TZ__eFooX__[T] extends MixZ__eFooX__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__eFooX__wBar___[T] extends MixZ__eFooX__wBar___[C] {
+class S_TZ__eFooX__wBar___[T] extends MixZ__eFooX__wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFooX__wBar__f[T] extends MixZ__eFooX__wBar__f[C] { class I;; f; }
 /* */
-class S_TZ__eFooX__wBar_I_[T] extends MixZ__eFooX__wBar_I_[C] {
+class S_TZ__eFooX__wBar_I_[T] extends MixZ__eFooX__wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFooX__wBar_If[T] extends MixZ__eFooX__wBar_If[C] { ;; f; }
 /* */
-class S_TZ__eFooX__wBarY__[T] extends MixZ__eFooX__wBarY__[C] {
+class S_TZ__eFooX__wBarY__[T] extends MixZ__eFooX__wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFooX__wBarY_f[T] extends MixZ__eFooX__wBarY_f[C] { class I;; f; }
 /* */
-class S_TZ__eFooX__wBarYI_[T] extends MixZ__eFooX__wBarYI_[C] {
+class S_TZ__eFooX__wBarYI_[T] extends MixZ__eFooX__wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFooX__wBarYIf[T] extends MixZ__eFooX__wBarYIf[C] { ;; f; }
 /* */
@@ -4831,21 +4411,18 @@ class S_TZ__eFooX_fwBarY__[T] extends MixZ__eFooX_fwBarY__[C] { class I;; f; }
 class S_TZ__eFooX_fwBarYI_[T] extends MixZ__eFooX_fwBarYI_[C] { ;; f; }
 // */class S_TZ__eFooX_fwBarYIf[T]  extends MixZ__eFooX_fwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZ__eFooXI_[T] extends MixZ__eFooXI_[C] {
+class S_TZ__eFooXI_[T] extends MixZ__eFooXI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__eFooXI_wBar___[T] extends MixZ__eFooXI_wBar___[C] {
+class S_TZ__eFooXI_wBar___[T] extends MixZ__eFooXI_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFooXI_wBar__f[T] extends MixZ__eFooXI_wBar__f[C] { ;; f; }
 // */class S_TZ__eFooXI_wBar_I_[T]  extends MixZ__eFooXI_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZ__eFooXI_wBar_If[T]  extends MixZ__eFooXI_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZ__eFooXI_wBarY__[T] extends MixZ__eFooXI_wBarY__[C] {
+class S_TZ__eFooXI_wBarY__[T] extends MixZ__eFooXI_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__eFooXI_wBarY_f[T] extends MixZ__eFooXI_wBarY_f[C] { ;; f; }
 // */class S_TZ__eFooXI_wBarYI_[T]  extends MixZ__eFooXI_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -4993,21 +4570,18 @@ class S_TZ_feFooXIfwBarY_f[T] extends MixZ_feFooXIfwBarY_f[C] { ;; f; }
 // */class S_TZ_feFooXIfwBarYIf[T]  extends MixZ_feFooXIfwBarYIf[C]  {        ;                                ; f; }
 
 /* */
-class S_TZI_eFoo___[T] extends MixZI_eFoo___[C] {
+class S_TZI_eFoo___[T] extends MixZI_eFoo___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZI_eFoo___wBar___[T] extends MixZI_eFoo___wBar___[C] {
+class S_TZI_eFoo___wBar___[T] extends MixZI_eFoo___wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_eFoo___wBar__f[T] extends MixZI_eFoo___wBar__f[C] { ;; f; }
 // */class S_TZI_eFoo___wBar_I_[T]  extends MixZI_eFoo___wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZI_eFoo___wBar_If[T]  extends MixZI_eFoo___wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZI_eFoo___wBarY__[T] extends MixZI_eFoo___wBarY__[C] {
+class S_TZI_eFoo___wBarY__[T] extends MixZI_eFoo___wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_eFoo___wBarY_f[T] extends MixZI_eFoo___wBarY_f[C] { ;; f; }
 // */class S_TZI_eFoo___wBarYI_[T]  extends MixZI_eFoo___wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -5043,21 +4617,18 @@ class S_TZI_eFoo__fwBarY__[T] extends MixZI_eFoo__fwBarY__[C] { ;; f; }
 // */class S_TZI_eFoo_IfwBarYI_[T]  extends MixZI_eFoo_IfwBarYI_[C]  {        ;                                ; f; }
 // */class S_TZI_eFoo_IfwBarYIf[T]  extends MixZI_eFoo_IfwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZI_eFooX__[T] extends MixZI_eFooX__[C] {
+class S_TZI_eFooX__[T] extends MixZI_eFooX__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZI_eFooX__wBar___[T] extends MixZI_eFooX__wBar___[C] {
+class S_TZI_eFooX__wBar___[T] extends MixZI_eFooX__wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_eFooX__wBar__f[T] extends MixZI_eFooX__wBar__f[C] { ;; f; }
 // */class S_TZI_eFooX__wBar_I_[T]  extends MixZI_eFooX__wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZI_eFooX__wBar_If[T]  extends MixZI_eFooX__wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZI_eFooX__wBarY__[T] extends MixZI_eFooX__wBarY__[C] {
+class S_TZI_eFooX__wBarY__[T] extends MixZI_eFooX__wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_eFooX__wBarY_f[T] extends MixZI_eFooX__wBarY_f[C] { ;; f; }
 // */class S_TZI_eFooX__wBarYI_[T]  extends MixZI_eFooX__wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -5187,31 +4758,26 @@ class S_TZIfeFooX_fwBarY_f[T] extends MixZIfeFooX_fwBarY_f[C] { ;; f; }
 // */class S_TZIfeFooXIfwBarYIf[T]  extends MixZIfeFooXIfwBarYIf[C]  {        ;                                ; f; }
 
 /* */
-class S_T___wFoo___[T] extends Mix___wFoo___ {
+class S_T___wFoo___[T] extends Mix___wFoo___
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_T___wFoo___wBar___[T] extends Mix___wFoo___wBar___ {
+class S_T___wFoo___wBar___[T] extends Mix___wFoo___wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFoo___wBar__f[T] extends Mix___wFoo___wBar__f { class I;; f; }
 /* */
-class S_T___wFoo___wBar_I_[T] extends Mix___wFoo___wBar_I_ {
+class S_T___wFoo___wBar_I_[T] extends Mix___wFoo___wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFoo___wBar_If[T] extends Mix___wFoo___wBar_If { ;; f; }
 /* */
-class S_T___wFoo___wBarY__[T] extends Mix___wFoo___wBarY__ {
+class S_T___wFoo___wBarY__[T] extends Mix___wFoo___wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFoo___wBarY_f[T] extends Mix___wFoo___wBarY_f { class I;; f; }
 /* */
-class S_T___wFoo___wBarYI_[T] extends Mix___wFoo___wBarYI_ {
+class S_T___wFoo___wBarYI_[T] extends Mix___wFoo___wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFoo___wBarYIf[T] extends Mix___wFoo___wBarYIf { ;; f; }
 /* */
@@ -5231,17 +4797,15 @@ class S_T___wFoo__fwBarYI_[T] extends Mix___wFoo__fwBarYI_ { ;; f; }
 /* */
 class S_T___wFoo_I_[T] extends Mix___wFoo_I_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T___wFoo_I_wBar___[T] extends Mix___wFoo_I_wBar___ {
+class S_T___wFoo_I_wBar___[T] extends Mix___wFoo_I_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFoo_I_wBar__f[T] extends Mix___wFoo_I_wBar__f { ;; f; }
 // */class S_T___wFoo_I_wBar_I_[T]  extends Mix___wFoo_I_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T___wFoo_I_wBar_If[T]  extends Mix___wFoo_I_wBar_If     {        ;                                ; f; }
 /* */
-class S_T___wFoo_I_wBarY__[T] extends Mix___wFoo_I_wBarY__ {
+class S_T___wFoo_I_wBarY__[T] extends Mix___wFoo_I_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFoo_I_wBarY_f[T] extends Mix___wFoo_I_wBarY_f { ;; f; }
 // */class S_T___wFoo_I_wBarYI_[T]  extends Mix___wFoo_I_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -5259,31 +4823,26 @@ class S_T___wFoo_IfwBarY__[T] extends Mix___wFoo_IfwBarY__ { ;; f; }
 // */class S_T___wFoo_IfwBarYI_[T]  extends Mix___wFoo_IfwBarYI_     {        ;                                ; f; }
 // */class S_T___wFoo_IfwBarYIf[T]  extends Mix___wFoo_IfwBarYIf     {        ;                                ; f; }
 /* */
-class S_T___wFooX__[T] extends Mix___wFooX__ {
+class S_T___wFooX__[T] extends Mix___wFooX__
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_T___wFooX__wBar___[T] extends Mix___wFooX__wBar___ {
+class S_T___wFooX__wBar___[T] extends Mix___wFooX__wBar___
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFooX__wBar__f[T] extends Mix___wFooX__wBar__f { class I;; f; }
 /* */
-class S_T___wFooX__wBar_I_[T] extends Mix___wFooX__wBar_I_ {
+class S_T___wFooX__wBar_I_[T] extends Mix___wFooX__wBar_I_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFooX__wBar_If[T] extends Mix___wFooX__wBar_If { ;; f; }
 /* */
-class S_T___wFooX__wBarY__[T] extends Mix___wFooX__wBarY__ {
+class S_T___wFooX__wBarY__[T] extends Mix___wFooX__wBarY__
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFooX__wBarY_f[T] extends Mix___wFooX__wBarY_f { class I;; f; }
 /* */
-class S_T___wFooX__wBarYI_[T] extends Mix___wFooX__wBarYI_ {
+class S_T___wFooX__wBarYI_[T] extends Mix___wFooX__wBarYI_
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFooX__wBarYIf[T] extends Mix___wFooX__wBarYIf { ;; f; }
 /* */
@@ -5303,17 +4862,15 @@ class S_T___wFooX_fwBarYI_[T] extends Mix___wFooX_fwBarYI_ { ;; f; }
 /* */
 class S_T___wFooXI_[T] extends Mix___wFooXI_ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T___wFooXI_wBar___[T] extends Mix___wFooXI_wBar___ {
+class S_T___wFooXI_wBar___[T] extends Mix___wFooXI_wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFooXI_wBar__f[T] extends Mix___wFooXI_wBar__f { ;; f; }
 // */class S_T___wFooXI_wBar_I_[T]  extends Mix___wFooXI_wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T___wFooXI_wBar_If[T]  extends Mix___wFooXI_wBar_If     {        ;                                ; f; }
 /* */
-class S_T___wFooXI_wBarY__[T] extends Mix___wFooXI_wBarY__ {
+class S_T___wFooXI_wBarY__[T] extends Mix___wFooXI_wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T___wFooXI_wBarY_f[T] extends Mix___wFooXI_wBarY_f { ;; f; }
 // */class S_T___wFooXI_wBarYI_[T]  extends Mix___wFooXI_wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -5463,17 +5020,15 @@ class S_T__fwFooXIfwBarY_f[T] extends Mix__fwFooXIfwBarY_f { ;; f; }
 /* */
 class S_T_I_wFoo___[T] extends Mix_I_wFoo___ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T_I_wFoo___wBar___[T] extends Mix_I_wFoo___wBar___ {
+class S_T_I_wFoo___wBar___[T] extends Mix_I_wFoo___wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_wFoo___wBar__f[T] extends Mix_I_wFoo___wBar__f { ;; f; }
 // */class S_T_I_wFoo___wBar_I_[T]  extends Mix_I_wFoo___wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T_I_wFoo___wBar_If[T]  extends Mix_I_wFoo___wBar_If     {        ;                                ; f; }
 /* */
-class S_T_I_wFoo___wBarY__[T] extends Mix_I_wFoo___wBarY__ {
+class S_T_I_wFoo___wBarY__[T] extends Mix_I_wFoo___wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_wFoo___wBarY_f[T] extends Mix_I_wFoo___wBarY_f { ;; f; }
 // */class S_T_I_wFoo___wBarYI_[T]  extends Mix_I_wFoo___wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -5511,17 +5066,15 @@ class S_T_I_wFoo__fwBarY__[T] extends Mix_I_wFoo__fwBarY__ { ;; f; }
 /* */
 class S_T_I_wFooX__[T] extends Mix_I_wFooX__ { ; def f: I = { sub; null }; f; }
 /* */
-class S_T_I_wFooX__wBar___[T] extends Mix_I_wFooX__wBar___ {
+class S_T_I_wFooX__wBar___[T] extends Mix_I_wFooX__wBar___
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_wFooX__wBar__f[T] extends Mix_I_wFooX__wBar__f { ;; f; }
 // */class S_T_I_wFooX__wBar_I_[T]  extends Mix_I_wFooX__wBar_I_     {        ;          def f: I = {sub; null}; f; }
 // */class S_T_I_wFooX__wBar_If[T]  extends Mix_I_wFooX__wBar_If     {        ;                                ; f; }
 /* */
-class S_T_I_wFooX__wBarY__[T] extends Mix_I_wFooX__wBarY__ {
+class S_T_I_wFooX__wBarY__[T] extends Mix_I_wFooX__wBarY__
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_T_I_wFooX__wBarY_f[T] extends Mix_I_wFooX__wBarY_f { ;; f; }
 // */class S_T_I_wFooX__wBarYI_[T]  extends Mix_I_wFooX__wBarYI_     {        ;          def f: I = {sub; null}; f; }
@@ -5651,31 +5204,26 @@ class S_T_IfwFooX_fwBarY_f[T] extends Mix_IfwFooX_fwBarY_f { ;; f; }
 // */class S_T_IfwFooXIfwBarYIf[T]  extends Mix_IfwFooXIfwBarYIf     {        ;                                ; f; }
 
 /* */
-class S_TZ__wFoo___[T] extends MixZ__wFoo___[C] {
+class S_TZ__wFoo___[T] extends MixZ__wFoo___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__wFoo___wBar___[T] extends MixZ__wFoo___wBar___[C] {
+class S_TZ__wFoo___wBar___[T] extends MixZ__wFoo___wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFoo___wBar__f[T] extends MixZ__wFoo___wBar__f[C] { class I;; f; }
 /* */
-class S_TZ__wFoo___wBar_I_[T] extends MixZ__wFoo___wBar_I_[C] {
+class S_TZ__wFoo___wBar_I_[T] extends MixZ__wFoo___wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFoo___wBar_If[T] extends MixZ__wFoo___wBar_If[C] { ;; f; }
 /* */
-class S_TZ__wFoo___wBarY__[T] extends MixZ__wFoo___wBarY__[C] {
+class S_TZ__wFoo___wBarY__[T] extends MixZ__wFoo___wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFoo___wBarY_f[T] extends MixZ__wFoo___wBarY_f[C] { class I;; f; }
 /* */
-class S_TZ__wFoo___wBarYI_[T] extends MixZ__wFoo___wBarYI_[C] {
+class S_TZ__wFoo___wBarYI_[T] extends MixZ__wFoo___wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFoo___wBarYIf[T] extends MixZ__wFoo___wBarYIf[C] { ;; f; }
 /* */
@@ -5693,21 +5241,18 @@ class S_TZ__wFoo__fwBarY__[T] extends MixZ__wFoo__fwBarY__[C] { class I;; f; }
 class S_TZ__wFoo__fwBarYI_[T] extends MixZ__wFoo__fwBarYI_[C] { ;; f; }
 // */class S_TZ__wFoo__fwBarYIf[T]  extends MixZ__wFoo__fwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZ__wFoo_I_[T] extends MixZ__wFoo_I_[C] {
+class S_TZ__wFoo_I_[T] extends MixZ__wFoo_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__wFoo_I_wBar___[T] extends MixZ__wFoo_I_wBar___[C] {
+class S_TZ__wFoo_I_wBar___[T] extends MixZ__wFoo_I_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFoo_I_wBar__f[T] extends MixZ__wFoo_I_wBar__f[C] { ;; f; }
 // */class S_TZ__wFoo_I_wBar_I_[T]  extends MixZ__wFoo_I_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZ__wFoo_I_wBar_If[T]  extends MixZ__wFoo_I_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZ__wFoo_I_wBarY__[T] extends MixZ__wFoo_I_wBarY__[C] {
+class S_TZ__wFoo_I_wBarY__[T] extends MixZ__wFoo_I_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFoo_I_wBarY_f[T] extends MixZ__wFoo_I_wBarY_f[C] { ;; f; }
 // */class S_TZ__wFoo_I_wBarYI_[T]  extends MixZ__wFoo_I_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -5725,31 +5270,26 @@ class S_TZ__wFoo_IfwBarY__[T] extends MixZ__wFoo_IfwBarY__[C] { ;; f; }
 // */class S_TZ__wFoo_IfwBarYI_[T]  extends MixZ__wFoo_IfwBarYI_[C]  {        ;                                ; f; }
 // */class S_TZ__wFoo_IfwBarYIf[T]  extends MixZ__wFoo_IfwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZ__wFooX__[T] extends MixZ__wFooX__[C] {
+class S_TZ__wFooX__[T] extends MixZ__wFooX__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__wFooX__wBar___[T] extends MixZ__wFooX__wBar___[C] {
+class S_TZ__wFooX__wBar___[T] extends MixZ__wFooX__wBar___[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFooX__wBar__f[T] extends MixZ__wFooX__wBar__f[C] { class I;; f; }
 /* */
-class S_TZ__wFooX__wBar_I_[T] extends MixZ__wFooX__wBar_I_[C] {
+class S_TZ__wFooX__wBar_I_[T] extends MixZ__wFooX__wBar_I_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFooX__wBar_If[T] extends MixZ__wFooX__wBar_If[C] { ;; f; }
 /* */
-class S_TZ__wFooX__wBarY__[T] extends MixZ__wFooX__wBarY__[C] {
+class S_TZ__wFooX__wBarY__[T] extends MixZ__wFooX__wBarY__[C]
   class I; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFooX__wBarY_f[T] extends MixZ__wFooX__wBarY_f[C] { class I;; f; }
 /* */
-class S_TZ__wFooX__wBarYI_[T] extends MixZ__wFooX__wBarYI_[C] {
+class S_TZ__wFooX__wBarYI_[T] extends MixZ__wFooX__wBarYI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFooX__wBarYIf[T] extends MixZ__wFooX__wBarYIf[C] { ;; f; }
 /* */
@@ -5767,21 +5307,18 @@ class S_TZ__wFooX_fwBarY__[T] extends MixZ__wFooX_fwBarY__[C] { class I;; f; }
 class S_TZ__wFooX_fwBarYI_[T] extends MixZ__wFooX_fwBarYI_[C] { ;; f; }
 // */class S_TZ__wFooX_fwBarYIf[T]  extends MixZ__wFooX_fwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZ__wFooXI_[T] extends MixZ__wFooXI_[C] {
+class S_TZ__wFooXI_[T] extends MixZ__wFooXI_[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZ__wFooXI_wBar___[T] extends MixZ__wFooXI_wBar___[C] {
+class S_TZ__wFooXI_wBar___[T] extends MixZ__wFooXI_wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFooXI_wBar__f[T] extends MixZ__wFooXI_wBar__f[C] { ;; f; }
 // */class S_TZ__wFooXI_wBar_I_[T]  extends MixZ__wFooXI_wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZ__wFooXI_wBar_If[T]  extends MixZ__wFooXI_wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZ__wFooXI_wBarY__[T] extends MixZ__wFooXI_wBarY__[C] {
+class S_TZ__wFooXI_wBarY__[T] extends MixZ__wFooXI_wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZ__wFooXI_wBarY_f[T] extends MixZ__wFooXI_wBarY_f[C] { ;; f; }
 // */class S_TZ__wFooXI_wBarYI_[T]  extends MixZ__wFooXI_wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -5929,21 +5466,18 @@ class S_TZ_fwFooXIfwBarY_f[T] extends MixZ_fwFooXIfwBarY_f[C] { ;; f; }
 // */class S_TZ_fwFooXIfwBarYIf[T]  extends MixZ_fwFooXIfwBarYIf[C]  {        ;                                ; f; }
 
 /* */
-class S_TZI_wFoo___[T] extends MixZI_wFoo___[C] {
+class S_TZI_wFoo___[T] extends MixZI_wFoo___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZI_wFoo___wBar___[T] extends MixZI_wFoo___wBar___[C] {
+class S_TZI_wFoo___wBar___[T] extends MixZI_wFoo___wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_wFoo___wBar__f[T] extends MixZI_wFoo___wBar__f[C] { ;; f; }
 // */class S_TZI_wFoo___wBar_I_[T]  extends MixZI_wFoo___wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZI_wFoo___wBar_If[T]  extends MixZI_wFoo___wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZI_wFoo___wBarY__[T] extends MixZI_wFoo___wBarY__[C] {
+class S_TZI_wFoo___wBarY__[T] extends MixZI_wFoo___wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_wFoo___wBarY_f[T] extends MixZI_wFoo___wBarY_f[C] { ;; f; }
 // */class S_TZI_wFoo___wBarYI_[T]  extends MixZI_wFoo___wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -5979,21 +5513,18 @@ class S_TZI_wFoo__fwBarY__[T] extends MixZI_wFoo__fwBarY__[C] { ;; f; }
 // */class S_TZI_wFoo_IfwBarYI_[T]  extends MixZI_wFoo_IfwBarYI_[C]  {        ;                                ; f; }
 // */class S_TZI_wFoo_IfwBarYIf[T]  extends MixZI_wFoo_IfwBarYIf[C]  {        ;                                ; f; }
 /* */
-class S_TZI_wFooX__[T] extends MixZI_wFooX__[C] {
+class S_TZI_wFooX__[T] extends MixZI_wFooX__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
-class S_TZI_wFooX__wBar___[T] extends MixZI_wFooX__wBar___[C] {
+class S_TZI_wFooX__wBar___[T] extends MixZI_wFooX__wBar___[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_wFooX__wBar__f[T] extends MixZI_wFooX__wBar__f[C] { ;; f; }
 // */class S_TZI_wFooX__wBar_I_[T]  extends MixZI_wFooX__wBar_I_[C]  {        ;          def f: I = {sub; null}; f; }
 // */class S_TZI_wFooX__wBar_If[T]  extends MixZI_wFooX__wBar_If[C]  {        ;                                ; f; }
 /* */
-class S_TZI_wFooX__wBarY__[T] extends MixZI_wFooX__wBarY__[C] {
+class S_TZI_wFooX__wBarY__[T] extends MixZI_wFooX__wBarY__[C]
   ; def f: I = { sub; null }; f;
-}
 /* */
 class S_TZI_wFooX__wBarY_f[T] extends MixZI_wFooX__wBarY_f[C] { ;; f; }
 // */class S_TZI_wFooX__wBarYI_[T]  extends MixZI_wFooX__wBarYI_[C]  {        ;          def f: I = {sub; null}; f; }
@@ -6122,28 +5653,24 @@ class S_TZIfwFooX_fwBarY_f[T] extends MixZIfwFooX_fwBarY_f[C] { ;; f; }
 // */class S_TZIfwFooXIfwBarYI_[T]  extends MixZIfwFooXIfwBarYI_[C]  {        ;                                ; f; }
 // */class S_TZIfwFooXIfwBarYIf[T]  extends MixZIfwFooXIfwBarYIf[C]  {        ;                                ; f; }
 
-object Test {
+object Test
   var errors: Int = 0;
-  def test(name: String, test: => Any, count: Int, value: String) = {
-    try {
+  def test(name: String, test: => Any, count: Int, value: String) =
+    try
       Help.init;
       test;
-      if (!Help.check(count, value)) {
+      if (!Help.check(count, value))
         Console.print(name + " failed: ");
         Help.print;
         Console.println;
         errors = errors + 1;
-      }
-    } catch {
-      case exception: Throwable => {
+    catch
+      case exception: Throwable =>
           Console.print(name + " raised exception " + exception);
           Console.println;
           errors = errors + 1;
-        }
-    }
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     // */abstract test("Mix___eFoo___       ", new Mix___eFoo___          , 2, null );
     // */abstract test("Mix___eFoo___wBar___", new Mix___eFoo___wBar___   , 3, null );
@@ -11072,9 +10599,6 @@ object Test {
     // */test("S_TZIfwFooXIfwBarYI_", new S_TZIfwFooXIfwBarYI_[D], 4, "mix");
     // */test("S_TZIfwFooXIfwBarYIf", new S_TZIfwFooXIfwBarYIf[D], 4, "mix");
 
-    if (errors > 0) {
+    if (errors > 0)
       Console.println;
       Console.println(errors + " error" + (if (errors > 1) "s" else ""));
-    }
-  }
-}

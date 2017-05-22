@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 /**
   * Pavel Fatin
   */
-object IllegalInheritance extends AnnotatorPart[ScTemplateDefinition] {
+object IllegalInheritance extends AnnotatorPart[ScTemplateDefinition]
   val Message =
     "Illegal inheritance, self-type %s does not conform to %s".format(
         _: String, _: String)
@@ -19,14 +19,14 @@ object IllegalInheritance extends AnnotatorPart[ScTemplateDefinition] {
 
   def annotate(definition: ScTemplateDefinition,
                holder: AnnotationHolder,
-               typeAware: Boolean) {
+               typeAware: Boolean)
     if (!typeAware) return
 
     definition.selfTypeElement
       .flatMap(_.getType(TypingContext.empty).toOption)
       .orElse(definition.getType(TypingContext.empty).toOption)
-      .foreach { ownType =>
-        definition.refs.foreach {
+      .foreach  ownType =>
+        definition.refs.foreach
           case (refElement, Some((SelfType(Some(aType)), subst))) =>
             val anotherType = subst.subst(aType)
             if (!ownType.conforms(anotherType))
@@ -34,7 +34,3 @@ object IllegalInheritance extends AnnotatorPart[ScTemplateDefinition] {
                                            Message(ownType.presentableText,
                                                    aType.presentableText))
           case _ =>
-        }
-      }
-  }
-}

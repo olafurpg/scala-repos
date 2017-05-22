@@ -11,7 +11,7 @@ import spire.algebra.lattice.Heyting
   * is `x & (y | x) == x` and `x | (x & y) == x`.
   */
 trait Bool[@sp(Boolean, Byte, Short, Int, Long) A]
-    extends Any with Heyting[A] {
+    extends Any with Heyting[A]
   def xor(a: A, b: A): A = or(and(a, complement(b)), and(complement(a), b))
   def imp(a: A, b: A): A = or(complement(a), b)
   def nand(a: A, b: A): A = complement(and(a, b))
@@ -19,10 +19,9 @@ trait Bool[@sp(Boolean, Byte, Short, Int, Long) A]
   def nxor(a: A, b: A): A = and(or(a, complement(b)), or(complement(a), b))
 
   def dual: Bool[A] = new DualBool(this)
-}
 
 class DualBool[@sp(Boolean, Byte, Short, Int, Long) A](orig: Bool[A])
-    extends Bool[A] {
+    extends Bool[A]
   def one: A = orig.zero
   def zero: A = orig.one
   def and(a: A, b: A): A = orig.or(a, b)
@@ -36,9 +35,7 @@ class DualBool[@sp(Boolean, Byte, Short, Int, Long) A](orig: Bool[A])
   override def nxor(a: A, b: A): A = orig.xor(a, b)
 
   override def dual: Bool[A] = orig
-}
 
-object Bool {
+object Bool
   @inline final def apply[@sp(Boolean, Byte, Short, Int, Long) A](
       implicit ev: Bool[A]): Bool[A] = ev
-}

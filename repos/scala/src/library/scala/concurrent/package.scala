@@ -82,7 +82,7 @@ import scala.annotation.implicitNotFound
   * }
   * }}} 
   */
-package object concurrent {
+package object concurrent
   type ExecutionException = java.util.concurrent.ExecutionException
   type CancellationException = java.util.concurrent.CancellationException
   type TimeoutException = java.util.concurrent.TimeoutException
@@ -124,9 +124,8 @@ package object concurrent {
   @throws(classOf[Exception])
   def blocking[T](body: => T): T =
     BlockContext.current.blockOn(body)(scala.concurrent.AwaitPermission)
-}
 
-package concurrent {
+package concurrent
 
   /**
     * This marker trait is used by [[Await]] to ensure that [[Awaitable.ready]] and [[Awaitable.result]]
@@ -150,7 +149,7 @@ package concurrent {
     * for comprehensions. Await will block the thread on which it runs, and could cause
     * performance and deadlock issues.
     */
-  object Await {
+  object Await
 
     /**
       * Await the "completed" state of an `Awaitable`.
@@ -194,5 +193,3 @@ package concurrent {
     @throws(classOf[Exception])
     def result[T](awaitable: Awaitable[T], atMost: Duration): T =
       blocking(awaitable.result(atMost)(AwaitPermission))
-  }
-}

@@ -1,4 +1,4 @@
-abstract class Template[T <: AnyRef](private val t: T) {
+abstract class Template[T <: AnyRef](private val t: T)
 
 //  type Repr[A<:AnyRef]<:Template[T]
   type Repr [T] <: Template[T]
@@ -12,21 +12,19 @@ abstract class Template[T <: AnyRef](private val t: T) {
 
   def withReadModifiers(readModifiers: Int): Repr[T] =
     this.asInstanceOf[Repr[T]]
-}
 
 class Curve
 
-class CurveTemplate[T <: Curve](t: T) extends Template(t) {
+class CurveTemplate[T <: Curve](t: T) extends Template(t)
 //  type Repr[A<: AnyRef] = CurveTemplate[T]
   type Repr = CurveTemplate[T]
-}
 
 class Base
 class X extends Base
 class Y extends Base
 
-object Example {
-  def test1() {
+object Example
+  def test1()
     new CurveTemplate(new Curve).access1(10)
 
     new CurveTemplate(new Curve).access2
@@ -38,9 +36,8 @@ object Example {
     new CurveTemplate(new Curve).access5(new X)
 
     ()
-  }
 
-  def test2() {
+  def test2()
     new CurveTemplate(new Curve).access1(10).withReadModifiers(1)
 
     new CurveTemplate(new Curve).access2.withReadModifiers(1)
@@ -50,5 +47,3 @@ object Example {
     new CurveTemplate(new Curve).access4(null).withReadModifiers(1)
 
     new CurveTemplate(new Curve).access5(new X).withReadModifiers(1)
-  }
-}

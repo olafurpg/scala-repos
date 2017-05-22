@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicReference
   * run very quickly. If any expensive work needs to be done then it the operation
   * should schedule the work to run asynchronously.
   */
-private[play] final class NonBlockingMutex {
+private[play] final class NonBlockingMutex
 
   /**
     * Schedule an operation to run with exclusive access to the mutex. If the
@@ -46,54 +46,45 @@ private[play] final class NonBlockingMutex {
     *
     * @param body The body of the operation to run.
     */
-  def exclusive(body: => Unit): Unit = {
+  def exclusive(body: => Unit): Unit =
     schedule(() => body)
-  }
 
   private type Op = () => Unit
 
   private val state = new AtomicReference[Vector[Op]](null)
 
   @tailrec
-  private def schedule(op: Op): Unit = {
+  private def schedule(op: Op): Unit =
     val prevState = state.get
-    val newState = prevState match {
+    val newState = prevState match
       case null =>
         Vector.empty // This is very cheap because Vector.empty is only allocated once
       case pending => pending :+ op
-    }
-    if (state.compareAndSet(prevState, newState)) {
-      prevState match {
+    if (state.compareAndSet(prevState, newState))
+      prevState match
         case null =>
           // We've update the state to say that we're running an op,
           // so we need to actually start it running.
           executeAll(op)
         case _ =>
-      }
-    } else schedule(op) // Try again
-  }
+    else schedule(op) // Try again
 
   @tailrec
-  private def executeAll(op: Op): Unit = {
+  private def executeAll(op: Op): Unit =
     op.apply()
     val nextOp = dequeueNextOpToExecute()
-    nextOp match {
+    nextOp match
       case None => ()
       case Some(op) => executeAll(op)
-    }
-  }
 
   @tailrec
-  private def dequeueNextOpToExecute(): Option[Op] = {
+  private def dequeueNextOpToExecute(): Option[Op] =
     val prevState = state.get
-    val (newState, nextOp) = prevState match {
+    val (newState, nextOp) = prevState match
       case null =>
         throw new IllegalStateException(
             "When executing, must have a queue of pending elements")
       case pending if pending.isEmpty => (null, None)
       case pending => (pending.tail, Some(pending.head))
-    }
     if (state.compareAndSet(prevState, newState)) nextOp
     else dequeueNextOpToExecute()
-  }
-}

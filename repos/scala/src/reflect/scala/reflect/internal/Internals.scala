@@ -8,7 +8,7 @@ import scala.language.higherKinds
 import scala.reflect.api.Universe
 import scala.reflect.macros.Attachments
 
-trait Internals extends api.Internals { self: SymbolTable =>
+trait Internals extends api.Internals  self: SymbolTable =>
 
   type Internal = MacroInternalApi
   lazy val internal: Internal = new SymbolTableInternal {}
@@ -16,19 +16,17 @@ trait Internals extends api.Internals { self: SymbolTable =>
   type Compat = MacroCompatApi
   lazy val compat: Compat = new Compat {}
 
-  trait SymbolTableInternal extends MacroInternalApi {
+  trait SymbolTableInternal extends MacroInternalApi
     lazy val reificationSupport: ReificationSupportApi = self.build
 
     def createImporter(from0: Universe): Importer { val from: from0.type } =
       self.mkImporter(from0)
 
     def newScopeWith(elems: Symbol*): Scope = self.newScopeWith(elems: _*)
-    def enter(scope: Scope, sym: Symbol): scope.type = {
+    def enter(scope: Scope, sym: Symbol): scope.type =
       scope.enter(sym); scope
-    }
-    def unlink(scope: Scope, sym: Symbol): scope.type = {
+    def unlink(scope: Scope, sym: Symbol): scope.type =
       scope.unlink(sym); scope
-    }
 
     def freeTerms(tree: Tree): List[FreeTermSymbol] = tree.freeTerms
     def freeTypes(tree: Tree): List[FreeTypeSymbol] = tree.freeTypes
@@ -79,9 +77,8 @@ trait Internals extends api.Internals { self: SymbolTable =>
     def labelDef(sym: Symbol, params: List[Symbol], rhs: Tree): LabelDef =
       self.LabelDef(sym, params, rhs)
 
-    def changeOwner(tree: Tree, prev: Symbol, next: Symbol): tree.type = {
+    def changeOwner(tree: Tree, prev: Symbol, next: Symbol): tree.type =
       new ChangeOwnerTraverser(prev, next).traverse(tree); tree
-    }
 
     lazy val gen = self.treeBuild
 
@@ -142,9 +139,8 @@ trait Internals extends api.Internals { self: SymbolTable =>
       symbol.updateAttachment(attachment)
     def removeAttachment[T : ClassTag](symbol: Symbol): symbol.type =
       symbol.removeAttachment[T]
-    def setOwner(symbol: Symbol, newowner: Symbol): symbol.type = {
+    def setOwner(symbol: Symbol, newowner: Symbol): symbol.type =
       symbol.owner = newowner; symbol
-    }
     def setInfo(symbol: Symbol, tpe: Type): symbol.type = symbol.setInfo(tpe)
     def setAnnotations(symbol: Symbol, annots: Annotation*): symbol.type =
       symbol.setAnnotations(annots: _*)
@@ -207,7 +203,7 @@ trait Internals extends api.Internals { self: SymbolTable =>
         .map(_.patterns.map(duplicateAndKeepPositions))
 
     type Decorators = MacroDecoratorApi
-    lazy val decorators: Decorators = new MacroDecoratorApi {
+    lazy val decorators: Decorators = new MacroDecoratorApi
       override type ScopeDecorator[T <: Scope] = MacroScopeDecoratorApi[T]
       override implicit def scopeDecorator[T <: Scope](
           scope: T): ScopeDecorator[T] = new MacroScopeDecoratorApi[T](scope)
@@ -225,10 +221,8 @@ trait Internals extends api.Internals { self: SymbolTable =>
       override type TypeDecorator[T <: Type] = TypeDecoratorApi[T]
       override implicit def typeDecorator[T <: Type](tp: T): TypeDecorator[T] =
         new TypeDecoratorApi[T](tp)
-    }
-  }
 
-  lazy val treeBuild = new self.TreeGen {
+  lazy val treeBuild = new self.TreeGen
     def mkAttributedQualifier(tpe: Type): Tree =
       self.gen.mkAttributedQualifier(tpe)
     def mkAttributedQualifier(tpe: Type, termSym: Symbol): Tree =
@@ -277,5 +271,3 @@ trait Internals extends api.Internals { self: SymbolTable =>
     def mkRuntimeUniverseRef: Tree = self.gen.mkRuntimeUniverseRef
     def mkZero(tp: Type): Tree = self.gen.mkZero(tp)
     def mkCast(tree: Tree, pt: Type): Tree = self.gen.mkCast(tree, pt)
-  }
-}

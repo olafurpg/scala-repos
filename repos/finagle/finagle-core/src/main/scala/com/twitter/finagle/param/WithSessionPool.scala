@@ -7,7 +7,7 @@ import com.twitter.finagle.Stack
   *
   * @see [[SessionPoolingParams]]
   */
-trait WithSessionPool[A <: Stack.Parameterized[A]] {
+trait WithSessionPool[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -16,4 +16,3 @@ trait WithSessionPool[A <: Stack.Parameterized[A]] {
     * @see [[https://twitter.github.io/finagle/guide/Clients.html#pooling]]
     */
   val withSessionPool: SessionPoolingParams[A] = new SessionPoolingParams(self)
-}

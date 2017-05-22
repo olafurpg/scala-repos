@@ -30,7 +30,7 @@ import play.twirl.api._
   * }}}
   *
   */
-object Comet {
+object Comet
 
   val initialHtmlChunk = Html(
       Array.fill[Char](5 * 1024)(' ').mkString + "<html><body>")
@@ -47,16 +47,14 @@ object Comet {
   @deprecated("Please use Comet.flow", "2.5.0")
   def apply[E](callback: String,
                initialChunk: Html = initialHtmlChunk): Enumeratee[E, Html] =
-    new Enumeratee[E, Html] {
+    new Enumeratee[E, Html]
       val cb: ByteString = ByteString.fromString(callback)
       def applyOn[A](
-          inner: Iteratee[Html, A]): Iteratee[E, Iteratee[Html, A]] = {
+          inner: Iteratee[Html, A]): Iteratee[E, Iteratee[Html, A]] =
         val fedWithInitialChunk =
           Iteratee.flatten(Enumerator(initialChunk) |>> inner)
         val eToScript = Enumeratee.map[E](toHtml(callback, _))
         eToScript.applyOn(fedWithInitialChunk)
-      }
-    }
 
   /**
     * Produces a Flow of escaped ByteString from a series of String elements.  Calls
@@ -65,13 +63,12 @@ object Comet {
     * @param callbackName the javascript callback method.
     * @return a flow of ByteString elements.
     */
-  def string(callbackName: String): Flow[String, ByteString, NotUsed] = {
+  def string(callbackName: String): Flow[String, ByteString, NotUsed] =
     Flow[String]
       .map(str =>
             ByteString.fromString(
                 "'" + StringEscapeUtils.escapeEcmaScript(str) + "'"))
       .via(flow(callbackName))
-  }
 
   /**
     * Produces a flow of ByteString using `Json.fromJson(_).get` from a Flow of JsValue.  Calls
@@ -80,11 +77,10 @@ object Comet {
     * @param callbackName the javascript callback method.
     * @return a flow of ByteString elements.
     */
-  def json(callbackName: String): Flow[JsValue, ByteString, NotUsed] = {
-    Flow[JsValue].map { msg =>
+  def json(callbackName: String): Flow[JsValue, ByteString, NotUsed] =
+    Flow[JsValue].map  msg =>
       ByteString.fromString(Json.asciiStringify(msg))
-    }.via(flow(callbackName))
-  }
+    .via(flow(callbackName))
 
   /**
     * Creates a flow of ByteString.  Useful when you have objects that are not JSON or String where
@@ -101,16 +97,15 @@ object Comet {
     * }}}
     */
   def flow(callbackName: String, initialChunk: ByteString = initialByteString)
-    : Flow[ByteString, ByteString, NotUsed] = {
+    : Flow[ByteString, ByteString, NotUsed] =
     val cb: ByteString = ByteString.fromString(callbackName)
     Flow
       .apply[ByteString]
       .map(msg => formatted(cb, msg))
       .prepend(Source.single(initialChunk))
-  }
 
   private def formatted(
-      callbackName: ByteString, javascriptMessage: ByteString): ByteString = {
+      callbackName: ByteString, javascriptMessage: ByteString): ByteString =
     val b: ByteStringBuilder = new ByteStringBuilder
     b.append(ByteString.fromString("""<script type="text/javascript">"""))
     b.append(callbackName)
@@ -118,10 +113,9 @@ object Comet {
     b.append(javascriptMessage)
     b.append(ByteString.fromString(");</script>"))
     b.result
-  }
 
-  private def toHtml[A](callbackName: String, message: A): Html = {
-    val javascriptMessage = message match {
+  private def toHtml[A](callbackName: String, message: A): Html =
+    val javascriptMessage = message match
       case str: String =>
         "'" + StringEscapeUtils.escapeEcmaScript(str) + "'"
       case json: JsValue =>
@@ -129,8 +123,5 @@ object Comet {
       case other =>
         throw new IllegalStateException(
             "Illegal type found: only String or JsValue elements are valid")
-    }
     Html(
         s"""<script type="text/javascript">${callbackName}(${javascriptMessage});</script>""")
-  }
-}

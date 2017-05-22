@@ -22,7 +22,7 @@ final class ScalaJSFramework(
     private[testadapter] val logger: Logger,
     private[testadapter] val jsConsole: JSConsole
 )
-    extends Framework {
+    extends Framework
 
   private[this] val frameworkInfo = fetchFrameworkInfo()
 
@@ -34,38 +34,32 @@ final class ScalaJSFramework(
 
   def runner(args: Array[String],
              remoteArgs: Array[String],
-             testClassLoader: ClassLoader): Runner = synchronized {
+             testClassLoader: ClassLoader): Runner = synchronized
 
-    if (_isRunning) {
+    if (_isRunning)
       throw new IllegalStateException(
           "Scala.js test frameworks do not support concurrent runs")
-    }
 
     _isRunning = true
 
     new ScalaJSRunner(this, args, remoteArgs)
-  }
 
   private[testadapter] def runDone(): Unit = synchronized(_isRunning = false)
 
-  private def fetchFrameworkInfo() = {
+  private def fetchFrameworkInfo() =
     val runner = libEnv.comRunner(frameworkInfoLauncher)
     runner.start(logger, jsConsole)
 
-    try {
+    try
       val msg = readJSON(runner.receive())
       fromJSON[FrameworkInfo](msg)
-    } finally {
+    finally
       runner.close()
       runner.await(VMTermTimeout)
-    }
-  }
 
-  private def frameworkInfoLauncher = {
+  private def frameworkInfoLauncher =
     val name = jsonToString(frameworkName.toJSON)
     val code = s"""
       new org.scalajs.testinterface.internal.InfoSender($name).initAndSend();
     """
     new MemVirtualJSFile(s"testFrameworkInfo.js").withContent(code)
-  }
-}

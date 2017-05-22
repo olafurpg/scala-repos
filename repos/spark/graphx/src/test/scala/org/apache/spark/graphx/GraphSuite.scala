@@ -24,15 +24,14 @@ import org.apache.spark.rdd._
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.Utils
 
-class GraphSuite extends SparkFunSuite with LocalSparkContext {
+class GraphSuite extends SparkFunSuite with LocalSparkContext
 
-  def starGraph(sc: SparkContext, n: Int): Graph[String, Int] = {
+  def starGraph(sc: SparkContext, n: Int): Graph[String, Int] =
     Graph.fromEdgeTuples(
         sc.parallelize((1 to n).map(x => (0: VertexId, x: VertexId)), 3), "v")
-  }
 
-  test("Graph.fromEdgeTuples") {
-    withSpark { sc =>
+  test("Graph.fromEdgeTuples")
+    withSpark  sc =>
       val ring = (0L to 100L).zip((1L to 99L) :+ 0L)
       val doubleRing = ring ++ ring
       val graph = Graph.fromEdgeTuples(sc.parallelize(doubleRing), 1)
@@ -44,21 +43,16 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
           sc.parallelize(doubleRing), 1, Some(RandomVertexCut))
       assert(uniqueGraph.edges.count() === ring.size)
       assert(uniqueGraph.edges.collect().forall(e => e.attr == 2))
-    }
-  }
 
-  test("Graph.fromEdges") {
-    withSpark { sc =>
-      val ring = (0L to 100L).zip((1L to 99L) :+ 0L).map {
+  test("Graph.fromEdges")
+    withSpark  sc =>
+      val ring = (0L to 100L).zip((1L to 99L) :+ 0L).map
         case (a, b) => Edge(a, b, 1)
-      }
       val graph = Graph.fromEdges(sc.parallelize(ring), 1.0F)
       assert(graph.edges.count() === ring.size)
-    }
-  }
 
-  test("Graph.apply") {
-    withSpark { sc =>
+  test("Graph.apply")
+    withSpark  sc =>
       val rawEdges = (0L to 98L).zip((1L to 99L) :+ 0L)
       val edges: RDD[Edge[Int]] =
         sc.parallelize(rawEdges).map { case (s, t) => Edge(s, t, 1) }
@@ -68,17 +62,14 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(graph.edges.count() === rawEdges.size)
       // Vertices not explicitly provided but referenced by edges should be created automatically
       assert(graph.vertices.count() === 100)
-      graph.triplets.collect().map { et =>
+      graph.triplets.collect().map  et =>
         assert(
             (et.srcId < 10 && et.srcAttr) || (et.srcId >= 10 && !et.srcAttr))
         assert(
             (et.dstId < 10 && et.dstAttr) || (et.dstId >= 10 && !et.dstAttr))
-      }
-    }
-  }
 
-  test("triplets") {
-    withSpark { sc =>
+  test("triplets")
+    withSpark  sc =>
       val n = 5
       val star = starGraph(sc, n)
       assert(
@@ -88,27 +79,22 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
             .toSet === (1 to n)
             .map(x => (0: VertexId, x: VertexId, "v", "v"))
             .toSet)
-    }
-  }
 
-  test("partitionBy") {
-    withSpark { sc =>
-      def mkGraph(edges: List[(Long, Long)]): Graph[Int, Int] = {
+  test("partitionBy")
+    withSpark  sc =>
+      def mkGraph(edges: List[(Long, Long)]): Graph[Int, Int] =
         Graph.fromEdgeTuples(sc.parallelize(edges, 2), 0)
-      }
-      def nonemptyParts(graph: Graph[Int, Int]): RDD[List[Edge[Int]]] = {
-        graph.edges.partitionsRDD.mapPartitions { iter =>
+      def nonemptyParts(graph: Graph[Int, Int]): RDD[List[Edge[Int]]] =
+        graph.edges.partitionsRDD.mapPartitions  iter =>
           Iterator(iter.next()._2.iterator.toList)
-        }.filter(_.nonEmpty)
-      }
+        .filter(_.nonEmpty)
       val identicalEdges = List((0L, 1L), (0L, 1L))
       val canonicalEdges = List((0L, 1L), (1L, 0L))
       val sameSrcEdges = List((0L, 1L), (0L, 2L))
 
       // The two edges start out in different partitions
-      for (edges <- List(identicalEdges, canonicalEdges, sameSrcEdges)) {
+      for (edges <- List(identicalEdges, canonicalEdges, sameSrcEdges))
         assert(nonemptyParts(mkGraph(edges)).count === 2)
-      }
       // partitionBy(RandomVertexCut) puts identical edges in the same partition
       assert(nonemptyParts(mkGraph(identicalEdges).partitionBy(
                   RandomVertexCut)).count === 1)
@@ -140,13 +126,13 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(graph.edges.partitions.length === p)
       val bound = 2 * math.sqrt(p)
       // Each vertex should be replicated to at most 2 * sqrt(p) partitions
-      val partitionSets = partitionedGraph.edges.partitionsRDD.mapPartitions {
+      val partitionSets = partitionedGraph.edges.partitionsRDD.mapPartitions
         iter =>
           val part = iter.next()._2
           Iterator(
               (part.iterator.flatMap(e => Iterator(e.srcId, e.dstId))).toSet)
-      }.collect
-      if (!verts.forall(id => partitionSets.count(_.contains(id)) <= bound)) {
+      .collect
+      if (!verts.forall(id => partitionSets.count(_.contains(id)) <= bound))
         val numFailures =
           verts.count(id => partitionSets.count(_.contains(id)) > bound)
         val failure = verts.maxBy(id => partitionSets.count(_.contains(id)))
@@ -158,14 +144,13 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
                       failure,
                       partitionSets.count(_.contains(failure)),
                       bound))
-      }
       // This should not be true for the default hash partitioning
       val partitionSetsUnpartitioned =
-        graph.edges.partitionsRDD.mapPartitions { iter =>
+        graph.edges.partitionsRDD.mapPartitions  iter =>
           val part = iter.next()._2
           Iterator(
               (part.iterator.flatMap(e => Iterator(e.srcId, e.dstId))).toSet)
-        }.collect
+        .collect
       assert(verts.exists(
               id => partitionSetsUnpartitioned.count(_.contains(id)) > bound))
 
@@ -177,11 +162,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val gPart = g.partitionBy(EdgePartition2D)
       assert(gPart.triplets.collect().map(_.toTuple).toSet === Set(
               ((0L, "a"), (1L, "b"), 1), ((0L, "a"), (2L, "c"), 1)))
-    }
-  }
 
-  test("mapVertices") {
-    withSpark { sc =>
+  test("mapVertices")
+    withSpark  sc =>
       val n = 5
       val star = starGraph(sc, n)
       // mapVertices preserving type
@@ -194,11 +177,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(mappedVAttrs2.vertices.collect().toSet === (0 to n)
             .map(x => (x: VertexId, 1))
             .toSet)
-    }
-  }
 
-  test("mapVertices changing type with same erased type") {
-    withSpark { sc =>
+  test("mapVertices changing type with same erased type")
+    withSpark  sc =>
       val vertices = sc.parallelize(Array[(Long, Option[java.lang.Integer])](
               (1L, Some(1)),
               (2L, Some(2)),
@@ -213,21 +194,18 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       // Trigger initial vertex replication
       graph0.triplets.foreach(x => {})
       // Change type of replicated vertices, but preserve erased type
-      val graph1 = graph0.mapVertices {
+      val graph1 = graph0.mapVertices
         case (vid, integerOpt) =>
           integerOpt.map(
               (x: java.lang.Integer) => x.toDouble: java.lang.Double)
-      }
       // Access replicated vertices, exposing the erased type
       val graph2 = graph1.mapTriplets(t => t.srcAttr.get)
       assert(
           graph2.edges.map(_.attr).collect().toSet === Set[java.lang.Double](
               1.0, 2.0, 3.0))
-    }
-  }
 
-  test("mapEdges") {
-    withSpark { sc =>
+  test("mapEdges")
+    withSpark  sc =>
       val n = 3
       val star = starGraph(sc, n)
       val starWithEdgeAttrs = star.mapEdges(e => e.dstId)
@@ -235,11 +213,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val edges = starWithEdgeAttrs.edges.collect()
       assert(edges.size === n)
       assert(edges.toSet === (1 to n).map(x => Edge(0, x, x)).toSet)
-    }
-  }
 
-  test("mapTriplets") {
-    withSpark { sc =>
+  test("mapTriplets")
+    withSpark  sc =>
       val n = 5
       val star = starGraph(sc, n)
       assert(star
@@ -247,21 +223,17 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
             .edges
             .collect()
             .toSet === (1L to n).map(x => Edge(0, x, "vv")).toSet)
-    }
-  }
 
-  test("reverse") {
-    withSpark { sc =>
+  test("reverse")
+    withSpark  sc =>
       val n = 5
       val star = starGraph(sc, n)
       assert(star.reverse.outDegrees.collect().toSet === (1 to n)
             .map(x => (x: VertexId, 1))
             .toSet)
-    }
-  }
 
-  test("reverse with join elimination") {
-    withSpark { sc =>
+  test("reverse with join elimination")
+    withSpark  sc =>
       val vertices: RDD[(VertexId, Int)] =
         sc.parallelize(Array((1L, 1), (2L, 2)))
       val edges: RDD[Edge[Int]] = sc.parallelize(Array(Edge(1L, 2L, 0)))
@@ -269,11 +241,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       val result = GraphXUtils.mapReduceTriplets[Int, Int, Int](
           graph, et => Iterator((et.dstId, et.srcAttr)), _ + _)
       assert(result.collect().toSet === Set((1L, 2)))
-    }
-  }
 
-  test("subgraph") {
-    withSpark { sc =>
+  test("subgraph")
+    withSpark  sc =>
       // Create a star graph of 10 vertices.
       val n = 10
       val star = starGraph(sc, n)
@@ -289,11 +259,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(subgraph.edges.map(_.copy()).collect().toSet === (2 to n by 2)
             .map(x => Edge(0, x, 1))
             .toSet)
-    }
-  }
 
-  test("mask") {
-    withSpark { sc =>
+  test("mask")
+    withSpark  sc =>
       val n = 5
       val vertices = sc.parallelize((0 to n).map(x => (x: VertexId, x)))
       val edges = sc.parallelize((1 to n).map(x => Edge(0, x, x)))
@@ -318,11 +286,9 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         .collect()
         .toSet
       assert(e === Set(Edge(0, 1, 1), Edge(0, 2, 2), Edge(0, 5, 5)))
-    }
-  }
 
-  test("groupEdges") {
-    withSpark { sc =>
+  test("groupEdges")
+    withSpark  sc =>
       val n = 5
       val star = starGraph(sc, n)
       val doubleStar = Graph.fromEdgeTuples(
@@ -331,9 +297,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
                                     (0: VertexId, x: VertexId))),
                          1),
           "v")
-      val star2 = doubleStar.groupEdges { (a, b) =>
+      val star2 = doubleStar.groupEdges  (a, b) =>
         a
-      }
       assert(star2.edges
             .collect()
             .toArray
@@ -342,39 +307,32 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
             .toArray
             .sorted(Edge.lexicographicOrdering[Int]))
       assert(star2.vertices.collect().toSet === star.vertices.collect().toSet)
-    }
-  }
 
-  test("aggregateMessages") {
-    withSpark { sc =>
+  test("aggregateMessages")
+    withSpark  sc =>
       val n = 5
       val agg = starGraph(sc, n).aggregateMessages[String](
           ctx =>
-            {
-              if (ctx.dstAttr != null) {
+              if (ctx.dstAttr != null)
                 throw new Exception(
                     "expected ctx.dstAttr to be null due to TripletFields, but it was " +
                     ctx.dstAttr)
-              }
               ctx.sendToDst(ctx.srcAttr)
-          },
+          ,
           _ + _,
           TripletFields.Src)
       assert(
           agg.collect().toSet === (1 to n).map(x => (x: VertexId, "v")).toSet)
-    }
-  }
 
-  test("outerJoinVertices") {
-    withSpark { sc =>
+  test("outerJoinVertices")
+    withSpark  sc =>
       val n = 5
       val reverseStar = starGraph(sc, n).reverse.cache()
       // outerJoinVertices changing type
       val reverseStarDegrees =
-        reverseStar.outerJoinVertices(reverseStar.outDegrees) {
+        reverseStar.outerJoinVertices(reverseStar.outDegrees)
           (vid, a, bOpt) =>
             bOpt.getOrElse(0)
-        }
       val neighborDegreeSums = GraphXUtils
         .mapReduceTriplets[Int, Int, Int](
             reverseStarDegrees,
@@ -385,21 +343,17 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(neighborDegreeSums === Set((0: VertexId, n)) ++ (1 to n).map(
               x => (x: VertexId, 0)))
       // outerJoinVertices preserving type
-      val messages = reverseStar.vertices.mapValues { (vid, attr) =>
+      val messages = reverseStar.vertices.mapValues  (vid, attr) =>
         vid.toString
-      }
-      val newReverseStar = reverseStar.outerJoinVertices(messages) {
+      val newReverseStar = reverseStar.outerJoinVertices(messages)
         (vid, a, bOpt) =>
           a + bOpt.getOrElse("")
-      }
       assert(newReverseStar.vertices.map(_._2).collect().toSet === (0 to n)
             .map(x => "v%d".format(x))
             .toSet)
-    }
-  }
 
-  test("more edge partitions than vertex partitions") {
-    withSpark { sc =>
+  test("more edge partitions than vertex partitions")
+    withSpark  sc =>
       val verts =
         sc.parallelize(List((1: VertexId, "a"), (2: VertexId, "b")), 1)
       val edges = sc.parallelize(List(Edge(1, 2, 0), Edge(2, 1, 0)), 2)
@@ -410,16 +364,13 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
         .toSet
       assert(triplets === Set((1: VertexId, 2: VertexId, "a", "b"),
                               (2: VertexId, 1: VertexId, "b", "a")))
-    }
-  }
 
-  test("checkpoint") {
+  test("checkpoint")
     val checkpointDir = Utils.createTempDir()
-    withSpark { sc =>
+    withSpark  sc =>
       sc.setCheckpointDir(checkpointDir.getAbsolutePath)
-      val ring = (0L to 100L).zip((1L to 99L) :+ 0L).map {
+      val ring = (0L to 100L).zip((1L to 99L) :+ 0L).map
         case (a, b) => Edge(a, b, 1)
-      }
       val rdd = sc.parallelize(ring)
       val graph = Graph.fromEdges(rdd, 1.0F)
       assert(!graph.isCheckpointed)
@@ -434,12 +385,10 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       assert(verticesDependencies.forall(_.rdd.isInstanceOf[CheckpointRDD[_]]))
       assert(graph.isCheckpointed)
       assert(graph.getCheckpointFiles.size === 2)
-    }
-  }
 
-  test("cache, getStorageLevel") {
+  test("cache, getStorageLevel")
     // test to see if getStorageLevel returns correct value
-    withSpark { sc =>
+    withSpark  sc =>
       val verts =
         sc.parallelize(List((1: VertexId, "a"), (2: VertexId, "b")), 1)
       val edges = sc.parallelize(List(Edge(1, 2, 0), Edge(2, 1, 0)), 2)
@@ -450,10 +399,8 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       graph.cache()
       assert(graph.vertices.getStorageLevel == StorageLevel.MEMORY_ONLY)
       assert(graph.edges.getStorageLevel == StorageLevel.MEMORY_ONLY)
-    }
-  }
 
-  test("non-default number of edge partitions") {
+  test("non-default number of edge partitions")
     val n = 10
     val defaultParallelism = 3
     val numEdgePartitions = 4
@@ -461,20 +408,18 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
     val conf = new org.apache.spark.SparkConf()
       .set("spark.default.parallelism", defaultParallelism.toString)
     val sc = new SparkContext("local", "test", conf)
-    try {
+    try
       val edges = sc.parallelize(
           (1 to n).map(x => (x: VertexId, 0: VertexId)), numEdgePartitions)
       val graph = Graph.fromEdgeTuples(edges, 1)
       val neighborAttrSums = GraphXUtils.mapReduceTriplets[Int, Int, Int](
           graph, et => Iterator((et.dstId, et.srcAttr)), _ + _)
       assert(neighborAttrSums.collect().toSet === Set((0: VertexId, n)))
-    } finally {
+    finally
       sc.stop()
-    }
-  }
 
-  test("unpersist graph RDD") {
-    withSpark { sc =>
+  test("unpersist graph RDD")
+    withSpark  sc =>
       val vert = sc.parallelize(List((1L, "a"), (2L, "b"), (3L, "c")), 1)
       val edges =
         sc.parallelize(List(Edge[Long](1L, 2L), Edge[Long](1L, 3L)), 1)
@@ -488,6 +433,3 @@ class GraphSuite extends SparkFunSuite with LocalSparkContext {
       vert.unpersist()
       edges.unpersist()
       assert(sc.getPersistentRDDs.isEmpty)
-    }
-  }
-}

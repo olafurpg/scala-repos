@@ -6,7 +6,6 @@ package project.structure
   */
 sealed abstract class OutputType
 
-object OutputType {
+object OutputType
   object StdOut extends OutputType
   object StdErr extends OutputType
-}

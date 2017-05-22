@@ -5,9 +5,9 @@ import cascading.tuple.{Fields, Tuple}
 import scala.collection.mutable.Buffer
 import org.scalatest.{Matchers, WordSpec}
 
-class TestTapFactoryTest extends WordSpec with Matchers {
-  "A test tap created by TestTapFactory" should {
-    "error helpfully when a source is not in the map for test buffers" in {
+class TestTapFactoryTest extends WordSpec with Matchers
+  "A test tap created by TestTapFactory" should
+    "error helpfully when a source is not in the map for test buffers" in
       // Source to use for this test.
       val testSource = Tsv("path")
 
@@ -22,11 +22,8 @@ class TestTapFactoryTest extends WordSpec with Matchers {
           .createTap(Read)(testMode)
           .asInstanceOf[Tap[Any, Any, Any]]
 
-      the[IllegalArgumentException] thrownBy {
+      the[IllegalArgumentException] thrownBy
         createIllegalTap()
-      } should have message
+      should have message
       ("requirement failed: " +
           TestTapFactory.sourceNotFoundError.format(testSource))
-    }
-  }
-}

@@ -20,19 +20,15 @@ package org.apache.spark.sql.catalyst.parser
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
-class DataTypeParserSuite extends SparkFunSuite {
+class DataTypeParserSuite extends SparkFunSuite
 
-  def checkDataType(dataTypeString: String, expectedDataType: DataType): Unit = {
-    test(s"parse ${dataTypeString.replace("\n", "")}") {
+  def checkDataType(dataTypeString: String, expectedDataType: DataType): Unit =
+    test(s"parse ${dataTypeString.replace("\n", "")}")
       assert(DataTypeParser.parse(dataTypeString) === expectedDataType)
-    }
-  }
 
-  def unsupported(dataTypeString: String): Unit = {
-    test(s"$dataTypeString is not supported") {
+  def unsupported(dataTypeString: String): Unit =
+    test(s"$dataTypeString is not supported")
       intercept[DataTypeException](DataTypeParser.parse(dataTypeString))
-    }
-  }
 
   checkDataType("int", IntegerType)
   checkDataType("integer", IntegerType)
@@ -125,4 +121,3 @@ class DataTypeParserSuite extends SparkFunSuite {
   unsupported("struct<x: int")
   unsupported("struct<x int, y string>")
   unsupported("struct<`x``y` int>")
-}

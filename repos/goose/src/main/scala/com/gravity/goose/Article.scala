@@ -27,7 +27,7 @@ import scala.collection._
   * User: jim
   * Date: 8/14/11
   */
-class Article {
+class Article
 
   /**
     * title of the article
@@ -119,4 +119,3 @@ class Article {
     * @return a {@link Map Map&lt;String,String&gt;} of property name to property vaue (represented as a {@link String}.
     */
   var additionalData: Map[String, String] = Map.empty
-}

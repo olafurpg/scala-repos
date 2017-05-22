@@ -13,63 +13,54 @@ import org.jetbrains.plugins.scala.project._
 /**
   * @author Alexander Podkhalyuzin
   */
-class RenameJavaToScalaAction extends AnAction {
-  override def update(e: AnActionEvent) {
+class RenameJavaToScalaAction extends AnAction
+  override def update(e: AnActionEvent)
     val presentation = e.getPresentation
-    def enable() {
+    def enable()
       presentation.setEnabled(true)
       presentation.setVisible(true)
-    }
-    def disable() {
+    def disable()
       presentation.setEnabled(false)
       presentation.setVisible(false)
-    }
-    try {
+    try
       var elements = LangDataKeys.PSI_ELEMENT_ARRAY.getData(e.getDataContext)
-      if (elements == null) {
+      if (elements == null)
         val file = CommonDataKeys.PSI_FILE.getData(e.getDataContext)
         if (file != null) elements = Array(file)
         else elements = Array.empty
-      }
-      for (element <- elements) {
-        element.getContainingFile match {
+      for (element <- elements)
+        element.getContainingFile match
           case j: PsiJavaFile if j.isInScalaModule =>
             val dir = j.getContainingDirectory
-            if (!dir.isWritable) {
+            if (!dir.isWritable)
               disable()
               return
-            }
           case _ =>
             disable()
             return
-        }
-      }
       enable()
-    } catch {
+    catch
       case e: Exception => disable()
-    }
-  }
 
-  def actionPerformed(e: AnActionEvent) {
+  def actionPerformed(e: AnActionEvent)
     var elements = LangDataKeys.PSI_ELEMENT_ARRAY.getData(e.getDataContext)
-    if (elements == null) {
+    if (elements == null)
       val file = CommonDataKeys.PSI_FILE.getData(e.getDataContext)
       if (file != null) elements = Array(file)
       else elements = Array.empty
-    }
-    for (element <- elements) {
-      element.getContainingFile match {
+    for (element <- elements)
+      element.getContainingFile match
         case jFile: PsiJavaFile if jFile.isInScalaModule =>
           val dir = jFile.getContainingDirectory
-          if (dir.isWritable) {
-            ScalaUtils.runWriteAction(new Runnable {
-              def run() {
+          if (dir.isWritable)
+            ScalaUtils.runWriteAction(new Runnable
+              def run()
                 val directory = jFile.getContainingDirectory
                 val name = jFile.getName.substring(0, jFile.getName.length - 5)
                 val nameWithExtension: String = name + ".scala"
                 val existingFile: VirtualFile =
                   directory.getVirtualFile.findChild(nameWithExtension)
-                if (existingFile != null) {
+                if (existingFile != null)
                   NotificationUtil
                     .builder(directory.getProject,
                              s"File $nameWithExtension already exists")
@@ -79,7 +70,6 @@ class RenameJavaToScalaAction extends AnAction {
                     .setTitle("Cannot create file")
                     .show()
                   return
-                }
                 val file = directory.createFile(name + ".scala")
                 val newText = JavaToScala.convertPsiToText(jFile).trim
                 val document = PsiDocumentManager
@@ -103,19 +93,12 @@ class RenameJavaToScalaAction extends AnAction {
                 settings.KEEP_BLANK_LINES_IN_CODE = 0
                 settings.KEEP_BLANK_LINES_IN_DECLARATIONS = 0
                 settings.KEEP_BLANK_LINES_BEFORE_RBRACE = 0
-                try {
+                try
                   manager.reformatText(file, 0, file.getTextLength)
-                } finally {
+                finally
                   settings.KEEP_BLANK_LINES_IN_CODE = keep_blank_lines_in_code
                   settings.KEEP_BLANK_LINES_IN_DECLARATIONS = keep_blank_lines_in_declarations
                   settings.KEEP_BLANK_LINES_BEFORE_RBRACE = keep_blank_lines_before_rbrace
-                }
                 file.navigate(true)
-              }
-            }, jFile.getProject, "Convert to Scala")
-          }
+            , jFile.getProject, "Convert to Scala")
         case _ =>
-      }
-    }
-  }
-}

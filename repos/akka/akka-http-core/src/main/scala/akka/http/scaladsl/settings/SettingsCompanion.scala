@@ -8,7 +8,7 @@ import com.typesafe.config.Config
 import akka.http.impl.util._
 
 /** INTERNAL API */
-private[akka] trait SettingsCompanion[T] {
+private[akka] trait SettingsCompanion[T]
 
   /**
     * Creates an instance of settings using the configuration provided by the given ActorSystem.
@@ -28,4 +28,3 @@ private[akka] trait SettingsCompanion[T] {
     * the class loader of this class).
     */
   def apply(configOverrides: String): T
-}

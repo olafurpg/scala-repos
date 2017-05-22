@@ -33,37 +33,32 @@ case class LogicalRelation(
     relation: BaseRelation,
     expectedOutputAttributes: Option[Seq[Attribute]] = None,
     metastoreTableIdentifier: Option[TableIdentifier] = None)
-    extends LeafNode with MultiInstanceRelation {
+    extends LeafNode with MultiInstanceRelation
 
-  override val output: Seq[AttributeReference] = {
+  override val output: Seq[AttributeReference] =
     val attrs = relation.schema.toAttributes
-    expectedOutputAttributes.map { expectedAttrs =>
+    expectedOutputAttributes.map  expectedAttrs =>
       assert(expectedAttrs.length == attrs.length)
-      attrs.zip(expectedAttrs).map {
+      attrs.zip(expectedAttrs).map
         // We should respect the attribute names provided by base relation and only use the
         // exprId in `expectedOutputAttributes`.
         // The reason is that, some relations(like parquet) will reconcile attribute names to
         // workaround case insensitivity issue.
         case (attr, expected) => attr.withExprId(expected.exprId)
-      }
-    }.getOrElse(attrs)
-  }
+    .getOrElse(attrs)
 
   // Logical Relations are distinct if they have different output for the sake of transformations.
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case l @ LogicalRelation(otherRelation, _, _) =>
       relation == otherRelation && output == l.output
     case _ => false
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     com.google.common.base.Objects.hashCode(relation, output)
-  }
 
-  override def sameResult(otherPlan: LogicalPlan): Boolean = otherPlan match {
+  override def sameResult(otherPlan: LogicalPlan): Boolean = otherPlan match
     case LogicalRelation(otherRelation, _, _) => relation == otherRelation
     case _ => false
-  }
 
   // When comparing two LogicalRelations from within LogicalPlan.sameResult, we only need
   // LogicalRelation.cleanArgs to return Seq(relation), since expectedOutputAttribute's
@@ -85,4 +80,3 @@ case class LogicalRelation(
 
   override def simpleString: String =
     s"Relation[${output.mkString(",")}] $relation"
-}

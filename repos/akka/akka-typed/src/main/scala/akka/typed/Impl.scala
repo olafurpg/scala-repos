@@ -15,13 +15,13 @@ import akka.actor.DeathPactException
   * [[akka.actor.Actor]].
   */
 private[typed] class ActorAdapter[T](_initialBehavior: () ⇒ Behavior[T])
-    extends akka.actor.Actor {
+    extends akka.actor.Actor
   import Behavior._
 
   var behavior = _initialBehavior()
   val ctx = new ActorContextAdapter[T](context)
 
-  def receive = LoggingReceive {
+  def receive = LoggingReceive
     case akka.actor.Terminated(ref) ⇒
       val msg = Terminated(ActorRef(ref))
       next(behavior.management(ctx, msg), msg)
@@ -30,34 +30,28 @@ private[typed] class ActorAdapter[T](_initialBehavior: () ⇒ Behavior[T])
     case msg ⇒
       val m = msg.asInstanceOf[T]
       next(behavior.message(ctx, m), m)
-  }
 
-  private def next(b: Behavior[T], msg: Any): Unit = {
+  private def next(b: Behavior[T], msg: Any): Unit =
     if (isUnhandled(b)) unhandled(msg)
     behavior = canonicalize(ctx, b, behavior)
-    if (!isAlive(behavior)) {
+    if (!isAlive(behavior))
       context.stop(self)
-    }
-  }
 
-  override def unhandled(msg: Any): Unit = msg match {
+  override def unhandled(msg: Any): Unit = msg match
     case Terminated(ref) ⇒ throw new DeathPactException(ref.untypedRef)
     case other ⇒ super.unhandled(other)
-  }
 
-  override val supervisorStrategy = a.OneForOneStrategy() {
+  override val supervisorStrategy = a.OneForOneStrategy()
     case ex ⇒
       import Failed._
       import akka.actor.{SupervisorStrategy ⇒ s}
       val f = Failed(ex, ActorRef(sender()))
       next(behavior.management(ctx, f), f)
-      f.getDecision match {
+      f.getDecision match
         case Resume ⇒ s.Resume
         case Restart ⇒ s.Restart
         case Stop ⇒ s.Stop
         case _ ⇒ s.Escalate
-      }
-  }
 
   override def preStart(): Unit =
     next(behavior.management(ctx, PreStart), PreStart)
@@ -67,13 +61,12 @@ private[typed] class ActorAdapter[T](_initialBehavior: () ⇒ Behavior[T])
     next(behavior.management(ctx, PostRestart(reason)), PostRestart(reason))
   override def postStop(): Unit =
     next(behavior.management(ctx, PostStop), PostStop)
-}
 
 /**
   * INTERNAL API. Wrapping an [[akka.actor.ActorContext]] as an [[ActorContext]].
   */
 private[typed] class ActorContextAdapter[T](ctx: akka.actor.ActorContext)
-    extends ActorContext[T] {
+    extends ActorContext[T]
   import Ops._
   def self = ActorRef(ctx.self)
   def props = Props(ctx.props)
@@ -85,19 +78,17 @@ private[typed] class ActorContextAdapter[T](ctx: akka.actor.ActorContext)
   def actorOf(props: a.Props) = ctx.actorOf(props)
   def actorOf(props: a.Props, name: String) = ctx.actorOf(props, name)
   def stop(child: ActorRef[Nothing]) =
-    child.untypedRef match {
+    child.untypedRef match
       case f: akka.actor.FunctionRef ⇒
         val cell = ctx.asInstanceOf[akka.actor.ActorCell]
         cell.removeFunctionRef(f)
       case _ ⇒
-        ctx.child(child.path.name) match {
+        ctx.child(child.path.name) match
           case Some(ref) if ref == child.untypedRef ⇒
             ctx.stop(child.untypedRef)
             true
           case _ ⇒
             false // none of our business
-        }
-    }
   def watch[U](other: ActorRef[U]) = { ctx.watch(other.untypedRef); other }
   def watch(other: a.ActorRef) = { ctx.watch(other); other }
   def unwatch[U](other: ActorRef[U]) = { ctx.unwatch(other.untypedRef); other }
@@ -105,22 +96,17 @@ private[typed] class ActorContextAdapter[T](ctx: akka.actor.ActorContext)
   def setReceiveTimeout(d: Duration) = ctx.setReceiveTimeout(d)
   def executionContext: ExecutionContextExecutor = ctx.dispatcher
   def schedule[U](
-      delay: FiniteDuration, target: ActorRef[U], msg: U): a.Cancellable = {
+      delay: FiniteDuration, target: ActorRef[U], msg: U): a.Cancellable =
     import ctx.dispatcher
     ctx.system.scheduler.scheduleOnce(delay, target.untypedRef, msg)
-  }
-  def spawnAdapter[U](f: U ⇒ T) = {
+  def spawnAdapter[U](f: U ⇒ T) =
     val cell = ctx.asInstanceOf[akka.actor.ActorCell]
     val ref = cell.addFunctionRef((_, msg) ⇒ ctx.self ! f(msg.asInstanceOf[U]))
     ActorRef[U](ref)
-  }
-}
 
 /**
   * INTERNAL API. A small Actor that translates between message protocols.
   */
-private[typed] class MessageWrapper(f: Any ⇒ Any) extends akka.actor.Actor {
-  def receive = {
+private[typed] class MessageWrapper(f: Any ⇒ Any) extends akka.actor.Actor
+  def receive =
     case msg ⇒ context.parent ! f(msg)
-  }
-}

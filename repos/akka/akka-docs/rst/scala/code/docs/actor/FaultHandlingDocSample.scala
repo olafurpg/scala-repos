@@ -19,7 +19,7 @@ import com.typesafe.config.ConfigFactory
 /**
   * Runs the sample
   */
-object FaultHandlingDocSample extends App {
+object FaultHandlingDocSample extends App
   import Worker._
 
   val config = ConfigFactory.parseString("""
@@ -37,38 +37,33 @@ object FaultHandlingDocSample extends App {
   // note that the listener is used as sender of the tell,
   // i.e. it will receive replies from the worker
   worker.tell(Start, sender = listener)
-}
 
 /**
   * Listens on progress from the worker and shuts down the system when enough
   * work has been done.
   */
-class Listener extends Actor with ActorLogging {
+class Listener extends Actor with ActorLogging
   import Worker._
   // If we don't get any progress within 15 seconds then the service is unavailable
   context.setReceiveTimeout(15 seconds)
 
-  def receive = {
+  def receive =
     case Progress(percent) =>
       log.info("Current progress: {} %", percent)
-      if (percent >= 100.0) {
+      if (percent >= 100.0)
         log.info("That's all, shutting down")
         context.system.terminate()
-      }
 
     case ReceiveTimeout =>
       // No progress within 15 seconds, ServiceUnavailable
       log.error("Shutting down due to unavailable service")
       context.system.terminate()
-  }
-}
 
 //#messages
-object Worker {
+object Worker
   case object Start
   case object Do
   final case class Progress(percent: Double)
-}
 //#messages
 
 /**
@@ -76,15 +71,14 @@ object Worker {
   * It will continuously notify the sender of the `Start` message
   * of current ``Progress``. The `Worker` supervise the `CounterService`.
   */
-class Worker extends Actor with ActorLogging {
+class Worker extends Actor with ActorLogging
   import Worker._
   import CounterService._
   implicit val askTimeout = Timeout(5 seconds)
 
   // Stop the CounterService child if it throws ServiceUnavailable
-  override val supervisorStrategy = OneForOneStrategy() {
+  override val supervisorStrategy = OneForOneStrategy()
     case _: CounterService.ServiceUnavailable => Stop
-  }
 
   // The sender of the initial Start message will continuously be notified
   // about progress
@@ -93,7 +87,7 @@ class Worker extends Actor with ActorLogging {
   val totalCount = 51
   import context.dispatcher // Use this Actors' Dispatcher as ExecutionContext
 
-  def receive = LoggingReceive {
+  def receive = LoggingReceive
     case Start if progressListener.isEmpty =>
       progressListener = Some(sender())
       context.system.scheduler.schedule(Duration.Zero, 1 second, self, Do)
@@ -104,14 +98,12 @@ class Worker extends Actor with ActorLogging {
       counterService ! Increment(1)
 
       // Send current progress to the initial sender
-      counterService ? GetCurrentCount map {
+      counterService ? GetCurrentCount map
         case CurrentCount(_, count) => Progress(100.0 * count / totalCount)
-      } pipeTo progressListener.get
-  }
-}
+      pipeTo progressListener.get
 
 //#messages
-object CounterService {
+object CounterService
   final case class Increment(n: Int)
   sealed abstract class GetCurrentCount
   case object GetCurrentCount extends GetCurrentCount
@@ -119,7 +111,6 @@ object CounterService {
   class ServiceUnavailable(msg: String) extends RuntimeException(msg)
 
   private case object Reconnect
-}
 //#messages
 
 /**
@@ -127,7 +118,7 @@ object CounterService {
   * counter. Replies with `CurrentCount` when it is asked for `CurrentCount`.
   * `CounterService` supervise `Storage` and `Counter`.
   */
-class CounterService extends Actor {
+class CounterService extends Actor
   import CounterService._
   import Counter._
   import Storage._
@@ -135,9 +126,8 @@ class CounterService extends Actor {
   // Restart the storage child when StorageException is thrown.
   // After 3 restarts within 5 seconds it will be stopped.
   override val supervisorStrategy =
-    OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 5 seconds) {
+    OneForOneStrategy(maxNrOfRetries = 3, withinTimeRange = 5 seconds)
       case _: Storage.StorageException => Restart
-    }
 
   val key = self.path.name
   var storage: Option[ActorRef] = None
@@ -147,9 +137,8 @@ class CounterService extends Actor {
 
   import context.dispatcher // Use this Actors' Dispatcher as ExecutionContext
 
-  override def preStart() {
+  override def preStart()
     initStorage()
-  }
 
   /**
     * The child storage is restarted in case of failure, but after 3 restarts,
@@ -157,16 +146,15 @@ class CounterService extends Actor {
     * failing. When it has been stopped we will schedule a Reconnect after a delay.
     * Watch the child so we receive Terminated message when it has been terminated.
     */
-  def initStorage() {
+  def initStorage()
     storage = Some(
         context.watch(context.actorOf(Props[Storage], name = "storage")))
     // Tell the counter, if any, to use the new storage
     counter foreach { _ ! UseStorage(storage) }
     // We need the initial value to be able to operate
     storage.get ! Get(key)
-  }
 
-  def receive = LoggingReceive {
+  def receive = LoggingReceive
 
     case Entry(k, v) if k == key && counter == None =>
       // Reply from Storage of the initial value, now we can create the Counter
@@ -194,27 +182,22 @@ class CounterService extends Actor {
     case Reconnect =>
       // Re-establish storage after the scheduled delay
       initStorage()
-  }
 
-  def forwardOrPlaceInBacklog(msg: Any) {
+  def forwardOrPlaceInBacklog(msg: Any)
     // We need the initial value from storage before we can start delegate to
     // the counter. Before that we place the messages in a backlog, to be sent
     // to the counter when it is initialized.
-    counter match {
+    counter match
       case Some(c) => c forward msg
       case None =>
         if (backlog.size >= MaxBacklog)
           throw new ServiceUnavailable(
               "CounterService not available, lack of initial value")
         backlog :+= (sender() -> msg)
-    }
-  }
-}
 
 //#messages
-object Counter {
+object Counter
   final case class UseStorage(storage: Option[ActorRef])
-}
 //#messages
 
 /**
@@ -222,7 +205,7 @@ object Counter {
   * value to the `Storage`, if there is any storage
   * available at the moment.
   */
-class Counter(key: String, initialValue: Long) extends Actor {
+class Counter(key: String, initialValue: Long) extends Actor
   import Counter._
   import CounterService._
   import Storage._
@@ -230,7 +213,7 @@ class Counter(key: String, initialValue: Long) extends Actor {
   var count = initialValue
   var storage: Option[ActorRef] = None
 
-  def receive = LoggingReceive {
+  def receive = LoggingReceive
     case UseStorage(s) =>
       storage = s
       storeCount()
@@ -241,22 +224,18 @@ class Counter(key: String, initialValue: Long) extends Actor {
 
     case GetCurrentCount =>
       sender() ! CurrentCount(key, count)
-  }
 
-  def storeCount() {
+  def storeCount()
     // Delegate dangerous work, to protect our valuable state.
     // We can continue without storage.
     storage foreach { _ ! Store(Entry(key, count)) }
-  }
-}
 
 //#messages
-object Storage {
+object Storage
   final case class Store(entry: Entry)
   final case class Get(key: String)
   final case class Entry(key: String, value: Long)
   class StorageException(msg: String) extends RuntimeException(msg)
-}
 //#messages
 
 /**
@@ -264,33 +243,28 @@ object Storage {
   * Replies with current value when receiving `Get` message.
   * Will throw StorageException if the underlying data store is out of order.
   */
-class Storage extends Actor {
+class Storage extends Actor
   import Storage._
 
   val db = DummyDB
 
-  def receive = LoggingReceive {
+  def receive = LoggingReceive
     case Store(Entry(key, count)) => db.save(key, count)
     case Get(key) => sender() ! Entry(key, db.load(key).getOrElse(0L))
-  }
-}
 
 //#dummydb
-object DummyDB {
+object DummyDB
   import Storage.StorageException
   private var db = Map[String, Long]()
 
   @throws(classOf[StorageException])
-  def save(key: String, value: Long): Unit = synchronized {
+  def save(key: String, value: Long): Unit = synchronized
     if (11 <= value && value <= 14)
       throw new StorageException("Simulated store failure " + value)
     db += (key -> value)
-  }
 
   @throws(classOf[StorageException])
-  def load(key: String): Option[Long] = synchronized {
+  def load(key: String): Option[Long] = synchronized
     db.get(key)
-  }
-}
 //#dummydb
 //#all

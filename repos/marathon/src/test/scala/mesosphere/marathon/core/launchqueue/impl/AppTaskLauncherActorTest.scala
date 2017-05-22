@@ -35,10 +35,10 @@ import scala.concurrent.duration._
   * * tracking task status
   * * timeout for task launching feedback
   */
-class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
+class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen
   import org.mockito.{Matchers => m}
 
-  test("Initial population of task list from taskTracker with one task") {
+  test("Initial population of task list from taskTracker with one task")
     Mockito
       .when(taskTracker.tasksByAppSync)
       .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
@@ -57,10 +57,9 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     assert(counts.tasksLeftToLaunch == 0)
 
     Mockito.verify(taskTracker).tasksByAppSync
-  }
 
   test(
-      "Upgrading an app updates app definition in actor and requeries backoff") {
+      "Upgrading an app updates app definition in actor and requeries backoff")
     Given("an entry for an app")
     Mockito
       .when(taskTracker.tasksByAppSync)
@@ -102,9 +101,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
     // We don't care about these:
     Mockito.reset(taskTracker)
-  }
 
-  test("Upgrading an app updates reregisters the offerMatcher at the manager") {
+  test("Upgrading an app updates reregisters the offerMatcher at the manager")
     Given("an entry for an app")
     Mockito
       .when(taskTracker.tasksByAppSync)
@@ -143,9 +141,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
     // We don't care about these:
     Mockito.reset(taskTracker)
-  }
 
-  test("Process task launch") {
+  test("Process task launch")
     Mockito
       .when(taskTracker.tasksByAppSync)
       .thenReturn(TaskTracker.TasksByApp.empty)
@@ -177,9 +174,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     val matchRequest =
       TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
-  }
 
-  test("Wait for inflight task launches on stop") {
+  test("Wait for inflight task launches on stop")
     Mockito
       .when(taskTracker.tasksByAppSync)
       .thenReturn(TaskTracker.TasksByApp.empty)
@@ -209,9 +205,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     val matchRequest =
       TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
-  }
 
-  test("Process task launch reject") {
+  test("Process task launch reject")
     Mockito
       .when(taskTracker.tasksByAppSync)
       .thenReturn(TaskTracker.TasksByApp.empty)
@@ -244,9 +239,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     val matchRequest =
       TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
-  }
 
-  test("Process task launch timeout") {
+  test("Process task launch timeout")
     Mockito
       .when(taskTracker.tasksByAppSync)
       .thenReturn(TaskTracker.TasksByApp.empty)
@@ -267,13 +261,11 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
             rateLimiterActor.ref,
             app,
             tasksToLaunch = 1
-        ) {
+        )
           override protected def scheduleTaskOperationTimeout(
-              context: ActorContext, message: TaskOpRejected): Cancellable = {
+              context: ActorContext, message: TaskOpRejected): Cancellable =
             scheduleCalled = true
             mock[Cancellable]
-          }
-        }
     )
     val launcherRef = actorSystem.actorOf(props, "launcher")
 
@@ -299,9 +291,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     val matchRequest =
       TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
-  }
 
-  test("Process task launch accept") {
+  test("Process task launch accept")
     Mockito
       .when(taskTracker.tasksByAppSync)
       .thenReturn(TaskTracker.TasksByApp.empty)
@@ -333,16 +324,15 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     val matchRequest =
       TaskOpFactory.Request(app, offer, Iterable.empty, additionalLaunches = 1)
     Mockito.verify(taskOpFactory).buildTaskOp(matchRequest)
-  }
 
   for (update <- Seq(
       TaskStatusUpdateTestHelper.finished,
       TaskStatusUpdateTestHelper.lost,
       TaskStatusUpdateTestHelper.killed,
       TaskStatusUpdateTestHelper.error
-  )) {
+  ))
     test(
-        s"Remove terminated task (${update.wrapped.status.getClass.getSimpleName})") {
+        s"Remove terminated task (${update.wrapped.status.getClass.getSimpleName})")
       Mockito
         .when(taskTracker.tasksByAppSync)
         .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
@@ -370,17 +360,15 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
       assert(counts.tasksLeftToLaunch == 0)
 
       Mockito.verify(taskTracker).tasksByAppSync
-    }
-  }
 
   for (update <- Seq(
       TaskStatusUpdateTestHelper.finished,
       TaskStatusUpdateTestHelper.lost,
       TaskStatusUpdateTestHelper.killed,
       TaskStatusUpdateTestHelper.error
-  )) {
+  ))
     test(
-        s"Revive offers if task with constraints terminates (${update.wrapped.status.getClass.getSimpleName})") {
+        s"Revive offers if task with constraints terminates (${update.wrapped.status.getClass.getSimpleName})")
       Given("an actor for an app with constraints and one task")
       val constraint = Protos.Constraint
         .newBuilder()
@@ -413,15 +401,13 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
       And("the task tracker as well")
       Mockito.verify(taskTracker).tasksByAppSync
-    }
-  }
 
   for (update <- Seq(
       TaskStatusUpdateTestHelper.staging,
       TaskStatusUpdateTestHelper.running
-  )) {
+  ))
     test(
-        s"DO NOT REMOVE running task (${update.wrapped.status.getClass.getSimpleName})") {
+        s"DO NOT REMOVE running task (${update.wrapped.status.getClass.getSimpleName})")
       Mockito
         .when(taskTracker.tasksByAppSync)
         .thenReturn(TaskTracker.TasksByApp.forTasks(marathonTask))
@@ -449,14 +435,11 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
       assert(counts.tasksLeftToLaunch == 0)
 
       Mockito.verify(taskTracker).tasksByAppSync
-    }
-  }
 
-  object f {
+  object f
     import org.apache.mesos.{Protos => Mesos}
     val launch = new TaskOpFactoryHelper(Some("principal"), Some("role"))
       .launch(_: Mesos.TaskInfo, _: Task, None)
-  }
 
   private[this] val app = AppDefinition(id = PathId("/testapp"))
   private[this] val taskId = Task.Id.forApp(app.id)
@@ -479,7 +462,7 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
   private[this] var rateLimiterActor: TestProbe = _
 
   private[this] def createLauncherRef(
-      instances: Int, appToLaunch: AppDefinition = app): ActorRef = {
+      instances: Int, appToLaunch: AppDefinition = app): ActorRef =
     val props = AppTaskLauncherActor.props(
         launchQueueConfig,
         offerMatcherManager,
@@ -492,9 +475,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
         props(appToLaunch, instances),
         "launcher"
     )
-  }
 
-  before {
+  before
     actorSystem = ActorSystem()
     offerMatcherManager = mock[OfferMatcherManager]
     launchQueueConfig = new LaunchQueueConfig {}
@@ -504,9 +486,8 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
     taskTracker = mock[TaskTracker]
     offerReviver = mock[OfferReviver]
     rateLimiterActor = TestProbe()
-  }
 
-  after {
+  after
     // we are not interested in these. We check for these in LaunchQueueModuleTest
     // Mockito.verifyNoMoreInteractions(offerMatcherManager)
     Mockito.verifyNoMoreInteractions(taskOpFactory)
@@ -514,5 +495,3 @@ class AppTaskLauncherActorTest extends MarathonSpec with GivenWhenThen {
 
     actorSystem.shutdown()
     actorSystem.awaitTermination()
-  }
-}

@@ -28,13 +28,13 @@ import org.apache.hadoop.conf.Configuration
   */
 private[streaming] class FileBasedWriteAheadLogRandomReader(
     path: String, conf: Configuration)
-    extends Closeable {
+    extends Closeable
 
   private val instream = HdfsUtils.getInputStream(path, conf)
   private var closed =
     (instream == null) // the file may be deleted as we're opening the stream
 
-  def read(segment: FileBasedWriteAheadLogSegment): ByteBuffer = synchronized {
+  def read(segment: FileBasedWriteAheadLogSegment): ByteBuffer = synchronized
     assertOpen()
     instream.seek(segment.offset)
     val nextLength = instream.readInt()
@@ -44,16 +44,12 @@ private[streaming] class FileBasedWriteAheadLogRandomReader(
     val buffer = new Array[Byte](nextLength)
     instream.readFully(buffer)
     ByteBuffer.wrap(buffer)
-  }
 
-  override def close(): Unit = synchronized {
+  override def close(): Unit = synchronized
     closed = true
     instream.close()
-  }
 
-  private def assertOpen() {
+  private def assertOpen()
     HdfsUtils.checkState(
         !closed,
         "Stream is closed. Create a new Reader to read from the file.")
-  }
-}

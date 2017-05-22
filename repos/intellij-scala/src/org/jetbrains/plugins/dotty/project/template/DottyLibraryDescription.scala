@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.project.template._
 /**
   * @author adkozlov
   */
-object DottyLibraryDescription extends ScalaLibraryDescription {
+object DottyLibraryDescription extends ScalaLibraryDescription
 
   override protected val libraryKind = DottyLibraryKind
 
@@ -31,13 +31,12 @@ object DottyLibraryDescription extends ScalaLibraryDescription {
             mavenScalaRoot))
 
   override def dialog(
-      parentComponent: JComponent, provider: () => util.List[SdkChoice]) = {
+      parentComponent: JComponent, provider: () => util.List[SdkChoice]) =
     new DottySdkSelectionDialog(parentComponent, provider)
-  }
 
   override def getDefaultLevel: LibraryLevel = LibraryLevel.GLOBAL
 
-  private def sdksIn(roots: Seq[File]): Seq[SdkDescriptor] = {
+  private def sdksIn(roots: Seq[File]): Seq[SdkDescriptor] =
     val files = roots.map(discoverComponents(_).toList).reduce(_ ::: _)
 
     val JLineVersion = "2.12"
@@ -45,7 +44,7 @@ object DottyLibraryDescription extends ScalaLibraryDescription {
     val PatchedCompilerVersion = "2.11.5-20151022-113908-7fb0e653fd"
 
     val components =
-      files.filter {
+      files.filter
         case Component(DottyArtifact.Main,
                        _,
                        Some(Version(DottyVersions.DottyVersion)),
@@ -56,7 +55,7 @@ object DottyLibraryDescription extends ScalaLibraryDescription {
           true
         case Component(DottyArtifact.Interfaces, _, _, _) => true
         case _ => false
-      } ++ files.filter {
+      ++ files.filter
         case Component(
             Artifact.ScalaLibrary, _, Some(Version(ScalaVersion)), _) =>
           true
@@ -64,18 +63,15 @@ object DottyLibraryDescription extends ScalaLibraryDescription {
             Artifact.ScalaReflect, _, Some(Version(ScalaVersion)), _) =>
           true
         case _ => false
-      } ++ files.filter {
+      ++ files.filter
         case Component(Artifact.ScalaCompiler,
                        _,
                        Some(Version(PatchedCompilerVersion)),
                        _) =>
           true
         case _ => false
-      }
 
     val dottyInterfacesFile = CompileServerLauncher.dottyInterfacesJar
     val interfaceComponent = Component.discoverIn(Seq(dottyInterfacesFile))
 
     sdkDescriptor.from(components.toSeq ++ interfaceComponent).right.toSeq
-  }
-}

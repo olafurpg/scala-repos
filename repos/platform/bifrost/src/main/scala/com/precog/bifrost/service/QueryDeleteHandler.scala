@@ -39,27 +39,23 @@ import scalaz._
 
 class QueryDeleteHandler[A](jobManager: JobManager[Future], clock: Clock)(
     implicit executor: ExecutionContext, M: Monad[Future])
-    extends CustomHttpService[A, APIKey => Future[HttpResponse[A]]] {
+    extends CustomHttpService[A, APIKey => Future[HttpResponse[A]]]
   import JobState._
   import scalaz.syntax.monad._
 
-  val service = { (request: HttpRequest[A]) =>
-    Success({ (apiKey: APIKey) =>
-      request.parameters get 'jobId map {
+  val service =  (request: HttpRequest[A]) =>
+    Success( (apiKey: APIKey) =>
+      request.parameters get 'jobId map
         jobId =>
-          jobManager.cancel(jobId, "User request through HTTP.", clock.now()) map {
+          jobManager.cancel(jobId, "User request through HTTP.", clock.now()) map
             case Left(error) =>
               HttpResponse[A](HttpStatus(BadRequest, error))
             case Right(_) =>
               HttpResponse[A](Accepted)
-          }
-      } getOrElse {
+      getOrElse
         Future(HttpResponse[A](
                 HttpStatus(BadRequest, "Missing required 'jobId parameter.")))
-      }
-    })
-  }
+    )
 
   val metadata = DescriptionMetadata(
       """Requests the deletion of an asynchronous query.""")
-}

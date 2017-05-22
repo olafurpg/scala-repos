@@ -64,7 +64,7 @@ import javax.servlet.http._
   *
   * @author Steve Jenson (stevej@pobox.com)
   */
-class MockServletContext(var target: String) extends ServletContext {
+class MockServletContext(var target: String) extends ServletContext
   def getInitParameter(f: String): String = null
   def getInitParameterNames(): java.util.Enumeration[String] =
     new Vector[String]().elements
@@ -81,14 +81,12 @@ class MockServletContext(var target: String) extends ServletContext {
   def getNamedDispatcher(name: String): RequestDispatcher = null
   def getRequestDispatcher(path: String): RequestDispatcher = null
   def getResource(path: String): java.net.URL = null
-  def getResourceAsStream(path: String): java.io.InputStream = {
+  def getResourceAsStream(path: String): java.io.InputStream =
     val file = new File(target + path)
-    if (file.exists) {
+    if (file.exists)
       new FileInputStream(file)
-    } else {
+    else
       null
-    }
-  }
 
   def getResourcePaths(path: String): java.util.Set[String] = null
   def getServerInfo(): String = null
@@ -98,14 +96,12 @@ class MockServletContext(var target: String) extends ServletContext {
     new Vector[String]().elements
   def getServlets(): java.util.Enumeration[Servlet] =
     new Vector[Servlet]().elements
-  def log(msg: String, t: Throwable) {
+  def log(msg: String, t: Throwable)
     t.printStackTrace
     log(msg)
-  }
-  def log(e: Exception, msg: String) {
+  def log(e: Exception, msg: String)
     e.printStackTrace
     log(msg)
-  }
   def log(msg: String) = println("MockServletContext.log: " + msg)
   def getContextPath(): String = null
 
@@ -163,42 +159,37 @@ class MockServletContext(var target: String) extends ServletContext {
       trackingModes: java.util.Set[javax.servlet.SessionTrackingMode]): Unit =
     ()
   def getVirtualServerName(): String = null
-}
 
 /**
   * A Mock FilterConfig. Construct with a MockServletContext and pass into
   * LiftFilter.init
   */
-class MockFilterConfig(servletContext: ServletContext) extends FilterConfig {
+class MockFilterConfig(servletContext: ServletContext) extends FilterConfig
   def getFilterName(): String = "LiftFilter" // as in lift's default web.xml
   def getInitParameter(key: String): String = null
   def getInitParameterNames(): java.util.Enumeration[String] =
     new Vector[String]().elements
   def getServletContext(): ServletContext = servletContext
-}
 
 /**
   * A FilterChain that does nothing.
   *
   * @author Steve Jenson (stevej@pobox.com)
   */
-class DoNothingFilterChain extends FilterChain with Logger {
-  def doFilter(req: ServletRequest, res: ServletResponse) {
+class DoNothingFilterChain extends FilterChain with Logger
+  def doFilter(req: ServletRequest, res: ServletResponse)
     debug("Doing nothing on filter chain")
-  }
-}
 
 /**
   * A Mock ServletInputStream. Pass in any ol InputStream like a ByteArrayInputStream.
   *
   * @author Steve Jenson (stevej@pobox.com)
   */
-class MockServletInputStream(is: InputStream) extends ServletInputStream {
+class MockServletInputStream(is: InputStream) extends ServletInputStream
   def read() = is.read()
   def isFinished(): Boolean = is.available() > 0
   def isReady(): Boolean = true
   def setReadListener(x$1: javax.servlet.ReadListener): Unit = ()
-}
 
 /**
   * A Mock ServletOutputStream. Pass in any ol' OutputStream like a ByteArrayOuputStream.
@@ -206,21 +197,19 @@ class MockServletInputStream(is: InputStream) extends ServletInputStream {
   * @author Steve Jenson (stevej@pobox.com)
   */
 class MockServletOutputStream(os: ByteArrayOutputStream)
-    extends ServletOutputStream {
-  def write(b: Int) {
+    extends ServletOutputStream
+  def write(b: Int)
     os.write(b)
-  }
 
   def isReady(): Boolean = true
   def setWriteListener(x$1: javax.servlet.WriteListener): Unit = ()
-}
 
 /**
   * A Mock HttpSession implementation.
   *
   * @author Steve Jenson (stevej@pobox.com)
   */
-class MockHttpSession extends HttpSession {
+class MockHttpSession extends HttpSession
   @volatile protected var values: Map[String, Object] = Map()
   @volatile protected var attr: Map[String, Object] = Map()
 
@@ -230,25 +219,22 @@ class MockHttpSession extends HttpSession {
   protected var creationTime: Long = System.currentTimeMillis
   def isNew = false
   def invalidate {}
-  def getValue(key: String): Object = values.get(key) match {
+  def getValue(key: String): Object = values.get(key) match
     case Some(v) => v
     case None => null
-  }
   def removeValue(key: String): Unit = values -= key
   def putValue(key: String, value: Object): Unit = values += (key -> value)
-  def getAttribute(key: String): Object = attr.get(key) match {
+  def getAttribute(key: String): Object = attr.get(key) match
     case Some(v) => v
     case None => null
-  }
   def removeAttribute(key: String): Unit = attr -= key
   def setAttribute(key: String, value: Object): Unit = attr += (key -> value)
   def getValueNames(): Array[String] = values.keys.toList.toArray
   def getAttributeNames(): java.util.Enumeration[String] =
-    new java.util.Enumeration[String] {
+    new java.util.Enumeration[String]
       private val keys = attr.keys.iterator
       def hasMoreElements() = keys.hasNext
       def nextElement(): String = keys.next
-    }
   def getSessionContext(): HttpSessionContext = null
   def getMaxInactiveInterval(): Int = maxii
   def setMaxInactiveInterval(i: Int): Unit = maxii = i
@@ -256,4 +242,3 @@ class MockHttpSession extends HttpSession {
   def getLastAccessedTime(): Long = 0L
   def getId(): String = null
   def getCreationTime(): Long = creationTime
-}

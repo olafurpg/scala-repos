@@ -11,10 +11,9 @@ import scala.language.experimental.macros
 
 import Compat210._
 
-object Typechecking {
+object Typechecking
   import scala.reflect.macros._
   import blackbox.Context
 
   def typeError(code: String): Unit = macro TypecheckingMacros.typeError
   def typeErrorWithMsg(code: String, msg: String): Unit = macro TypecheckingMacros.typeErrorWithMsg
-}

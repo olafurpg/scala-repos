@@ -17,7 +17,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
   */
 class ScLightParameter(val param: ScParameter, tp: ScType, i: Int)
     extends LightElement(param.getManager, param.getLanguage)
-    with ScParameter {
+    with ScParameter
   override def nameId: PsiElement = param.nameId
 
   override def getType(ctx: TypingContext): TypeResult[ScType] =
@@ -88,4 +88,3 @@ class ScLightParameter(val param: ScParameter, tp: ScType, i: Int)
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
-}

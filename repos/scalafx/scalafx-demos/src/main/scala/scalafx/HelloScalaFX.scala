@@ -36,41 +36,33 @@ import scalafx.scene.paint.Color._
 import scalafx.scene.paint.{LinearGradient, Stops}
 import scalafx.scene.text.Text
 
-object HelloScalaFX extends JFXApp {
-  stage = new PrimaryStage {
+object HelloScalaFX extends JFXApp
+  stage = new PrimaryStage
     title = "ScalaFX Hello World"
     width = 650
     height = 450
-    scene = new Scene {
+    scene = new Scene
       fill = Black
-      content = new HBox {
+      content = new HBox
         //        padding = Insets(5)
-        children = Seq(new Text {
+        children = Seq(new Text
           text = "Scala"
           style = "-fx-font-size: 100pt"
           fill = new LinearGradient(
               endX = 0, stops = Stops(PaleGreen, SeaGreen))
-        }, new Text {
+        , new Text
           text = "FX"
           style = "-fx-font-size: 100pt"
           fill = new LinearGradient(endX = 0, stops = Stops(Cyan, DodgerBlue))
-          effect = new DropShadow {
+          effect = new DropShadow
             color = DodgerBlue
             radius = 25
             spread = 0.25
-          }
-        })
-        effect = new Reflection {
+        )
+        effect = new Reflection
           fraction = 0.5
           topOffset = -5.0
           bottomOpacity = 0.75
-          input = new Lighting {
-            light = new Light.Distant {
+          input = new Lighting
+            light = new Light.Distant
               elevation = 60
-            }
-          }
-        }
-      }
-    }
-  }
-}

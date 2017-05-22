@@ -14,8 +14,8 @@ import org.junit.Assert._
 
 import BaseCharsetTest._
 
-class USASCIITest extends BaseCharsetTest(Charset.forName("US-ASCII")) {
-  @Test def decode(): Unit = {
+class USASCIITest extends BaseCharsetTest(Charset.forName("US-ASCII"))
+  @Test def decode(): Unit =
     // Simple tests
 
     testDecode(bb"48 65 6c 6c 6f")(cb"Hello")
@@ -28,9 +28,8 @@ class USASCIITest extends BaseCharsetTest(Charset.forName("US-ASCII")) {
     testDecode(bb"48 e5 ec 6c ef")(
         cb"H", Malformed(1), Malformed(1), cb"l", Malformed(1))
     testDecode(bb"80 ff")(Malformed(1), Malformed(1))
-  }
 
-  @Test def encode(): Unit = {
+  @Test def encode(): Unit =
     // Simple tests
 
     testEncode(cb"Hello")(bb"48 65 6c 6c 6f")
@@ -75,9 +74,8 @@ class USASCIITest extends BaseCharsetTest(Charset.forName("US-ASCII")) {
     testEncode(cb"\udbffA")(Malformed(1), bb"41")
     testEncode(cb"\udbff\udb8f")(Malformed(1), Malformed(1))
     testEncode(cb"\udbff\ud835\udcd7")(Malformed(1), Unmappable(2))
-  }
 
-  @Test def isLegalReplacement(): Unit = {
+  @Test def isLegalReplacement(): Unit =
     val encoder = charset.newEncoder
     assertTrue(encoder.isLegalReplacement(Array(0x00.toByte)))
     assertTrue(encoder.isLegalReplacement(Array(0x41.toByte)))
@@ -86,5 +84,3 @@ class USASCIITest extends BaseCharsetTest(Charset.forName("US-ASCII")) {
     // Bit 7 on is an error - #2156
     assertFalse(encoder.isLegalReplacement(Array(0x80.toByte)))
     assertFalse(encoder.isLegalReplacement(Array(0xff.toByte)))
-  }
-}

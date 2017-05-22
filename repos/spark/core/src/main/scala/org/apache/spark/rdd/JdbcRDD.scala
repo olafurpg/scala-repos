@@ -29,9 +29,8 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.NextIterator
 
 private[spark] class JdbcPartition(idx: Int, val lower: Long, val upper: Long)
-    extends Partition {
+    extends Partition
   override def index: Int = idx
-}
 
 // TODO: Expose a jdbcRDD function in SparkContext and mark this as semi-private
 /**
@@ -61,26 +60,23 @@ class JdbcRDD[T : ClassTag](
     upperBound: Long,
     numPartitions: Int,
     mapRow: (ResultSet) => T = JdbcRDD.resultSetToObjectArray _)
-    extends RDD[T](sc, Nil) with Logging {
+    extends RDD[T](sc, Nil) with Logging
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     // bounds are inclusive, hence the + 1 here and - 1 on end
     val length = BigInt(1) + upperBound - lowerBound
     (0 until numPartitions)
       .map(i =>
-            {
           val start = lowerBound + ((i * length) / numPartitions)
           val end = lowerBound + (((i + 1) * length) / numPartitions) - 1
           new JdbcPartition(i, start.toLong, end.toLong)
-      })
+      )
       .toArray
-  }
 
   override def compute(thePart: Partition, context: TaskContext): Iterator[T] =
-    new NextIterator[T] {
-      context.addTaskCompletionListener { context =>
+    new NextIterator[T]
+      context.addTaskCompletionListener  context =>
         closeIfNeeded()
-      }
       val part = thePart.asInstanceOf[JdbcPartition]
       val conn = getConnection()
       val stmt = conn.prepareStatement(
@@ -89,62 +85,48 @@ class JdbcRDD[T : ClassTag](
       // setFetchSize(Integer.MIN_VALUE) is a mysql driver specific way to force streaming results,
       // rather than pulling entire resultset into memory.
       // see http://dev.mysql.com/doc/refman/5.0/en/connector-j-reference-implementation-notes.html
-      if (conn.getMetaData.getURL.matches("jdbc:mysql:.*")) {
+      if (conn.getMetaData.getURL.matches("jdbc:mysql:.*"))
         stmt.setFetchSize(Integer.MIN_VALUE)
         logInfo("statement fetch size set to: " + stmt.getFetchSize +
             " to force MySQL streaming ")
-      }
 
       stmt.setLong(1, part.lower)
       stmt.setLong(2, part.upper)
       val rs = stmt.executeQuery()
 
-      override def getNext(): T = {
-        if (rs.next()) {
+      override def getNext(): T =
+        if (rs.next())
           mapRow(rs)
-        } else {
+        else
           finished = true
           null.asInstanceOf[T]
-        }
-      }
 
-      override def close() {
-        try {
-          if (null != rs) {
+      override def close()
+        try
+          if (null != rs)
             rs.close()
-          }
-        } catch {
+        catch
           case e: Exception => logWarning("Exception closing resultset", e)
-        }
-        try {
-          if (null != stmt) {
+        try
+          if (null != stmt)
             stmt.close()
-          }
-        } catch {
+        catch
           case e: Exception => logWarning("Exception closing statement", e)
-        }
-        try {
-          if (null != conn) {
+        try
+          if (null != conn)
             conn.close()
-          }
           logInfo("closed connection")
-        } catch {
+        catch
           case e: Exception => logWarning("Exception closing connection", e)
-        }
-      }
-    }
-}
 
-object JdbcRDD {
-  def resultSetToObjectArray(rs: ResultSet): Array[Object] = {
+object JdbcRDD
+  def resultSetToObjectArray(rs: ResultSet): Array[Object] =
     Array.tabulate[Object](rs.getMetaData.getColumnCount)(
         i => rs.getObject(i + 1))
-  }
 
-  trait ConnectionFactory extends Serializable {
+  trait ConnectionFactory extends Serializable
     @throws[Exception]
     def getConnection: Connection
-  }
 
   /**
     * Create an RDD that executes an SQL query on a JDBC connection and reads results.
@@ -171,7 +153,7 @@ object JdbcRDD {
                 lowerBound: Long,
                 upperBound: Long,
                 numPartitions: Int,
-                mapRow: JFunction[ResultSet, T]): JavaRDD[T] = {
+                mapRow: JFunction[ResultSet, T]): JavaRDD[T] =
 
     val jdbcRDD = new JdbcRDD[T](
         sc.sc,
@@ -183,7 +165,6 @@ object JdbcRDD {
         (resultSet: ResultSet) => mapRow.call(resultSet))(fakeClassTag)
 
     new JavaRDD[T](jdbcRDD)(fakeClassTag)
-  }
 
   /**
     * Create an RDD that executes an SQL query on a JDBC connection and reads results. Each row is
@@ -206,13 +187,11 @@ object JdbcRDD {
              sql: String,
              lowerBound: Long,
              upperBound: Long,
-             numPartitions: Int): JavaRDD[Array[Object]] = {
+             numPartitions: Int): JavaRDD[Array[Object]] =
 
-    val mapRow = new JFunction[ResultSet, Array[Object]] {
-      override def call(resultSet: ResultSet): Array[Object] = {
+    val mapRow = new JFunction[ResultSet, Array[Object]]
+      override def call(resultSet: ResultSet): Array[Object] =
         resultSetToObjectArray(resultSet)
-      }
-    }
 
     create(sc,
            connectionFactory,
@@ -221,5 +200,3 @@ object JdbcRDD {
            upperBound,
            numPartitions,
            mapRow)
-  }
-}

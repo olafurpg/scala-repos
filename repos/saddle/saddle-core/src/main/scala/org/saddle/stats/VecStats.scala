@@ -25,7 +25,7 @@ import org.saddle.scalar._
   */
 sealed trait RankTie
 
-object RankTie {
+object RankTie
 
   /**
     * Take the average of the ranks for all ties
@@ -62,14 +62,13 @@ object RankTie {
     * }}}
     */
   object Nat extends RankTie
-}
 
 /**
   * Trait which specifies what percentile method to use
   */
 sealed trait PctMethod
 
-object PctMethod {
+object PctMethod
 
   /**
     * Take percentile as MS Excel does
@@ -80,12 +79,11 @@ object PctMethod {
     * Take percentile according to [[http://www.itl.nist.gov/div898/handbook/prc/section2/prc252.htm NIST]]
     */
   object NIST extends PctMethod
-}
 
 /**
   * Statistical methods made available on numeric Vec objects via enrichment.
   */
-trait VecStats[@spec(Int, Long, Double) A] {
+trait VecStats[@spec(Int, Long, Double) A]
 
   /**
     * Sum of the elements of the Vec, ignoring NA values
@@ -189,92 +187,80 @@ trait VecStats[@spec(Int, Long, Double) A] {
     */
   def rank(tie: RankTie = RankTie.Avg, ascending: Boolean = true): Vec[Double]
 
-  protected def _variance(r: Vec[A], subOp: (A, Double) => Double): Double = {
+  protected def _variance(r: Vec[A], subOp: (A, Double) => Double): Double =
     val sa = r.scalarTag
     val sd = ScalarTagDouble
     val c = count
 
     if (c < 1) sd.missing
     else if (c == 1) 0.0
-    else {
+    else
       val m: Double = mean
-      r.filterFoldLeft(sa.notMissing)(0d) { (x, y) =>
+      r.filterFoldLeft(sa.notMissing)(0d)  (x, y) =>
         val tmp = subOp(y, m)
         x + tmp * tmp / (c - 1.0)
-      }
-    }
-  }
 
-  protected def _skew(r: Vec[A], subOp: (A, Double) => Double): Double = {
+  protected def _skew(r: Vec[A], subOp: (A, Double) => Double): Double =
     val sa = r.scalarTag
     val sd = ScalarTagDouble
     val c = count
 
-    if (c > 2) {
+    if (c > 2)
       val v: Double = variance
       val m: Double = mean
       val coef = c / ((c - 1) * (c - 2) * v * math.sqrt(v))
-      r.filterFoldLeft(sa.notMissing)(0d) { (x, y) =>
+      r.filterFoldLeft(sa.notMissing)(0d)  (x, y) =>
         val tmp = subOp(y, m)
         x + coef * tmp * tmp * tmp
-      }
-    } else sd.missing
-  }
+    else sd.missing
 
-  protected def _kurt(r: Vec[A], subOp: (A, Double) => Double): Double = {
+  protected def _kurt(r: Vec[A], subOp: (A, Double) => Double): Double =
     val sa = r.scalarTag
     val sd = ScalarTagDouble
     val c: Double = count
 
-    if (c > 3) {
+    if (c > 3)
       val vari = variance
       val m: Double = mean
-      val acacc = r.filterFoldLeft(sa.notMissing)(0d) { (x, y) =>
+      val acacc = r.filterFoldLeft(sa.notMissing)(0d)  (x, y) =>
         val tmp = subOp(y, m)
         x + (tmp * tmp * tmp * tmp) / (vari * vari)
-      }
       val coef1 = (c * (c + 1)) / ((c - 1) * (c - 2) * (c - 3))
       val coef2 = (c - 1) * (c - 1) / ((c - 2) * (c - 3))
       (coef1 * acacc - 3.0 * coef2)
-    } else sd.missing
-  }
+    else sd.missing
 
   protected def _demeaned(
-      r: Vec[A], subOp: (A, Double) => Double): Vec[Double] = {
+      r: Vec[A], subOp: (A, Double) => Double): Vec[Double] =
     val sa = r.scalarTag
     val sd = ScalarTagDouble
 
     val mn = mean
     val ar = Array.ofDim[Double](r.length)
     var i = 0
-    while (i < r.length) {
+    while (i < r.length)
       val v = r(i)
       if (sa.notMissing(v)) ar(i) = subOp(r(i), mn)
       else ar(i) = sd.missing
       i += 1
-    }
     new VecDouble(ar)
-  }
 
   // Fast median function that is N/A friendly; destructive to array
-  protected def _median(r: Vec[A])(implicit n: NUM[A]): Double = {
+  protected def _median(r: Vec[A])(implicit n: NUM[A]): Double =
     val sd = ScalarTagDouble
 
-    def _arrCopyToDblArr(r: Vec[A])(implicit n: NUM[A]): (Int, Array[Double]) = {
+    def _arrCopyToDblArr(r: Vec[A])(implicit n: NUM[A]): (Int, Array[Double]) =
       val arr = Array.ofDim[Double](r.length)
       val sa = r.scalarTag
       var i = 0
       var j = 0
-      while (i < r.length) {
+      while (i < r.length)
         val v = sa.toDouble(r(i))
-        if (v == v) {
+        if (v == v)
           arr(j) = v
           j += 1
-        }
         i += 1
-      }
       (j, arr)
-    }
 
     val (len, arr) = _arrCopyToDblArr(r)
 
@@ -282,38 +268,33 @@ trait VecStats[@spec(Int, Long, Double) A] {
     else if (len % 2 != 0) _kSmallest(arr, len, len / 2)
     else
       (_kSmallest(arr, len, len / 2) + _kSmallest(arr, len, len / 2 - 1)) / 2d
-  }
 
   // Find k_th smallest element,taken from N.Worth via pandas python library
   // (moments.pyx). Destructive to array input and not N/A friendly
-  private def _kSmallest(a: Array[Double], n: Int, k: Int): Double = {
+  private def _kSmallest(a: Array[Double], n: Int, k: Int): Double =
     var l = 0
     var m = n - 1
 
-    while (l < m) {
+    while (l < m)
       val x = a(k)
       var i = l
       var j = m
-      while (i <= j) {
+      while (i <= j)
         while (a(i) < x) i += 1
         while (a(j) > x) j -= 1
-        if (i <= j) {
+        if (i <= j)
           val t = a(i)
           a(i) = a(j)
           a(j) = t
           i += 1
           j -= 1
-        }
-      }
       if (j < k) l = i
       if (k < i) m = j
-    }
     a(k)
-  }
 
   // NB: destructive to argument v
   protected def _rank(
-      v: Array[Double], tie: RankTie, ascending: Boolean): Vec[Double] = {
+      v: Array[Double], tie: RankTie, ascending: Boolean): Vec[Double] =
     val sd = ScalarTagDouble
 
     val nan =
@@ -321,10 +302,9 @@ trait VecStats[@spec(Int, Long, Double) A] {
     val len = v.length
 
     var k = 0
-    while (k < len) {
+    while (k < len)
       if (sd.isMissing(v(k))) v(k) = nan
       k += 1
-    }
 
     val srt =
       if (ascending) array.argsort(v)
@@ -336,78 +316,64 @@ trait VecStats[@spec(Int, Long, Double) A] {
     var s = 0.0 // summation
     var d = 0 // duplicate counter
     val res = array.empty[Double](len)
-    while (i < len) {
+    while (i < len)
       val v = dat(i)
 
       s += (i + 1.0)
       d += 1
       if (v == nan) res(srt(i)) = sd.missing
-      else if (i == len - 1 || math.abs(dat(i + 1) - v) > 1e-13) {
-        if (tie == RankTie.Avg) {
+      else if (i == len - 1 || math.abs(dat(i + 1) - v) > 1e-13)
+        if (tie == RankTie.Avg)
           var j = i - d + 1
-          while (j < i + 1) {
+          while (j < i + 1)
             res(srt(j)) = s / d
             j += 1
-          }
-        } else if (tie == RankTie.Min) {
+        else if (tie == RankTie.Min)
           var j = i - d + 1
-          while (j < i + 1) {
+          while (j < i + 1)
             res(srt(j)) = i - d + 2
             j += 1
-          }
-        } else if (tie == RankTie.Max) {
+        else if (tie == RankTie.Max)
           var j = i - d + 1
-          while (j < i + 1) {
+          while (j < i + 1)
             res(srt(j)) = i + 1
             j += 1
-          }
-        } else if (tie == RankTie.Nat && ascending) {
+        else if (tie == RankTie.Nat && ascending)
           var j = i - d + 1
-          while (j < i + 1) {
+          while (j < i + 1)
             res(srt(j)) = j + 1
             j += 1
-          }
-        } else {
+        else
           var j = i - d + 1
-          while (j < i + 1) {
+          while (j < i + 1)
             res(srt(j)) = 2 * i - j - d + 2
             j += 1
-          }
-        }
         s = 0.0
         d = 0
-      }
       i += 1
-    }
 
     Vec(res)
-  }
 
   // percentile function: see: http://en.wikipedia.org/wiki/Percentile
   protected def _percentile(v: Vec[Double], tile: Double, method: PctMethod)(
-      implicit n: NUM[A]): Double = {
+      implicit n: NUM[A]): Double =
     val sd = ScalarTagDouble
     val vf = v.dropNA
     if (vf.length == 0 || tile < 0 || tile > 100) sd.missing
-    else {
+    else
       val c = vf.length
       if (c == 1) vf(0)
-      else {
-        val n = method match {
+      else
+        val n = method match
           case PctMethod.Excel => (tile / 100.0) * (c - 1.0) + 1.0
           case PctMethod.NIST => (tile / 100.0) * (c + 1.0)
-        }
         val s = vf.sorted
         val k = math.floor(n).toInt
         val d = n - k
         if (k <= 0) s(0)
         else if (k >= c) s.last else s(k - 1) + d * (s(k) - s(k - 1))
-      }
-    }
-  }
-}
 
-class DoubleStats(r: Vec[Double]) extends VecStats[Double] {
+class DoubleStats(r: Vec[Double]) extends VecStats[Double]
   val sd = ScalarTagDouble
 
   def sum: Double = r.filterFoldLeft(sd.notMissing)(0d)(_ + _)
@@ -415,19 +381,17 @@ class DoubleStats(r: Vec[Double]) extends VecStats[Double] {
 
   def min: Option[Double] =
     if (r.count == 0) None
-    else {
+    else
       val res = r.filterFoldLeft(sd.notMissing)(sd.inf)(
           (x: Double, y: Double) => if (x < y) x else y)
       Some(res)
-    }
 
   def max: Option[Double] =
     if (r.count == 0) None
-    else {
+    else
       val res: Double = r.filterFoldLeft(sd.notMissing)(sd.negInf)(
           (x: Double, y: Double) => if (x > y) x else y)
       Some(res)
-    }
 
   def prod: Double = r.filterFoldLeft(sd.notMissing)(1d)(_ * _)
   def countif(test: Double => Boolean): Int =
@@ -450,26 +414,23 @@ class DoubleStats(r: Vec[Double]) extends VecStats[Double] {
 
   def argmin: Int = array.argmin(r.toArray)
   def argmax: Int = array.argmax(r.toArray)
-}
 
-class IntStats(r: Vec[Int]) extends VecStats[Int] {
+class IntStats(r: Vec[Int]) extends VecStats[Int]
   val si = ScalarTagInt
 
   def min: Option[Int] =
     if (r.count == 0) None
-    else {
+    else
       val res: Int = r.filterFoldLeft(si.notMissing)(si.inf)(
           (x: Int, y: Int) => if (x < y) x else y)
       Some(res)
-    }
 
   def max: Option[Int] =
     if (r.count == 0) None
-    else {
+    else
       val res: Int = r.filterFoldLeft(si.notMissing)(si.negInf)(
           (x: Int, y: Int) => if (x > y) x else y)
       Some(res)
-    }
 
   def sum: Int = r.filterFoldLeft(si.notMissing)(0)(_ + _)
   def count: Int = r.filterFoldLeft(si.notMissing)(0)((a, b) => a + 1)
@@ -495,26 +456,23 @@ class IntStats(r: Vec[Int]) extends VecStats[Int] {
 
   def argmin: Int = array.argmin(r.toArray)
   def argmax: Int = array.argmax(r.toArray)
-}
 
-class LongStats(r: Vec[Long]) extends VecStats[Long] {
+class LongStats(r: Vec[Long]) extends VecStats[Long]
   val sl = ScalarTagLong
 
   def min: Option[Long] =
     if (r.count == 0) None
-    else {
+    else
       val res: Long = r.filterFoldLeft(sl.notMissing)(sl.inf)(
           (x: Long, y: Long) => if (x < y) x else y)
       Some(res)
-    }
 
   def max: Option[Long] =
     if (r.count == 0) None
-    else {
+    else
       val res: Long = r.filterFoldLeft(sl.notMissing)(sl.negInf)(
           (x: Long, y: Long) => if (x > y) x else y)
       Some(res)
-    }
 
   def sum: Long = r.filterFoldLeft(sl.notMissing)(0L)(_ + _)
   def count: Int = r.filterFoldLeft(sl.notMissing)(0)((a, b) => a + 1)
@@ -539,4 +497,3 @@ class LongStats(r: Vec[Long]) extends VecStats[Long] {
 
   def argmin: Int = array.argmin(r.toArray)
   def argmax: Int = array.argmax(r.toArray)
-}

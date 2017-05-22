@@ -1,5 +1,4 @@
 trait C[T] {}
 
-abstract class A {
+abstract class A
   type T >: C[T] <: C[C[T]]
-}

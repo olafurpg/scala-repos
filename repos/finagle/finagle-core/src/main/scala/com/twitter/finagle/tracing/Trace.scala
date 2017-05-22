@@ -30,17 +30,15 @@ object debugTrace extends GlobalFlag(false, "Print all traces to the console.")
   * `TraceId`.
   * When reporting, we report to all tracers in the list of `Tracer`s.
   */
-object Trace {
-  private case class TraceCtx(terminal: Boolean, tracers: List[Tracer]) {
+object Trace
+  private case class TraceCtx(terminal: Boolean, tracers: List[Tracer])
     def withTracer(tracer: Tracer) = copy(tracers = tracer :: this.tracers)
     def withTerminal(terminal: Boolean) =
       if (terminal == this.terminal) this
       else copy(terminal = terminal)
-  }
 
-  private object TraceCtx {
+  private object TraceCtx
     val empty = TraceCtx(false, Nil)
-  }
 
   private[this] val traceCtx = new Contexts.local.Key[TraceCtx]
 
@@ -49,10 +47,9 @@ object Trace {
 
   private[finagle] val idCtx = new Contexts.broadcast.Key[TraceId](
       "com.twitter.finagle.tracing.TraceContext"
-  ) {
-    private val local = new ThreadLocal[Array[Byte]] {
+  )
+    private val local = new ThreadLocal[Array[Byte]]
       override def initialValue() = new Array[Byte](32)
-    }
 
     def marshal(id: TraceId) =
       Buf.ByteArray.Owned(TraceId.serialize(id))
@@ -61,7 +58,7 @@ object Trace {
       * The wire format is (big-endian):
       *     ''spanId:8 parentId:8 traceId:8 flags:8''
       */
-    def tryUnmarshal(body: Buf): Try[TraceId] = {
+    def tryUnmarshal(body: Buf): Try[TraceId] =
       if (body.length != 32)
         return Throw(new IllegalArgumentException("Expected 32 bytes"))
 
@@ -75,9 +72,9 @@ object Trace {
 
       val flags = Flags(flags64)
       val sampled =
-        if (flags.isFlagSet(Flags.SamplingKnown)) {
+        if (flags.isFlagSet(Flags.SamplingKnown))
           if (flags.isFlagSet(Flags.Sampled)) someTrue else someFalse
-        } else None
+        else None
 
       val traceId = TraceId(
           if (trace64 == parent64) None else Some(SpanId(trace64)),
@@ -87,8 +84,6 @@ object Trace {
           flags)
 
       Return(traceId)
-    }
-  }
 
   private[this] val rng = new Random
   private[this] val defaultId = TraceId(
@@ -143,16 +138,14 @@ object Trace {
   /**
     * Create a derived id from the current TraceId.
     */
-  def nextId: TraceId = {
+  def nextId: TraceId =
     val spanId = SpanId(rng.nextLong())
-    idOption match {
+    idOption match
       case Some(id) =>
         TraceId(
             Some(id.traceId), Some(id.spanId), spanId, id.sampled, id.flags)
       case None =>
         TraceId(None, None, spanId, None, Flags())
-    }
-  }
 
   /**
     * Run computation `f` with the given traceId.
@@ -161,14 +154,12 @@ object Trace {
     * @param terminal true if traceId is a terminal id. Future calls to set() after a terminal
     *                 id is set will not set the traceId
     */
-  def letId[R](traceId: TraceId, terminal: Boolean = false)(f: => R): R = {
+  def letId[R](traceId: TraceId, terminal: Boolean = false)(f: => R): R =
     if (isTerminal) f
-    else if (terminal) {
-      Contexts.local.let(traceCtx, ctx.withTerminal(terminal)) {
+    else if (terminal)
+      Contexts.local.let(traceCtx, ctx.withTerminal(terminal))
         Contexts.broadcast.let(idCtx, traceId)(f)
-      }
-    } else Contexts.broadcast.let(idCtx, traceId)(f)
-  }
+    else Contexts.broadcast.let(idCtx, traceId)(f)
 
   /**
     * A version of [com.twitter.finagle.tracing.Trace.letId] providing an
@@ -176,10 +167,9 @@ object Trace {
     * altering the trace environment.
     */
   def letIdOption[R](traceIdOpt: Option[TraceId])(f: => R): R =
-    traceIdOpt match {
+    traceIdOpt match
       case Some(traceId) => letId(traceId)(f)
       case None => f
-    }
 
   /**
     * Run computation `f` with `tracer` added onto the tracer stack.
@@ -208,31 +198,25 @@ object Trace {
     *                 attempts to set nextId will be ignored.
     */
   def letTracerAndId[R](
-      tracer: Tracer, id: TraceId, terminal: Boolean = false)(f: => R): R = {
-    if (ctx.terminal) {
+      tracer: Tracer, id: TraceId, terminal: Boolean = false)(f: => R): R =
+    if (ctx.terminal)
       letTracer(tracer)(f)
-    } else {
+    else
       val newCtx = ctx.withTracer(tracer).withTerminal(terminal)
-      val newId = id.sampled match {
+      val newId = id.sampled match
         case None => id.copy(_sampled = tracer.sampleTrace(id))
         case Some(_) => id
-      }
-      Contexts.local.let(traceCtx, newCtx) {
+      Contexts.local.let(traceCtx, newCtx)
         Contexts.broadcast.let(idCtx, newId)(f)
-      }
-    }
-  }
 
   /**
     * Run computation `f` with all tracing state (tracers, trace id)
     * cleared.
     */
   def letClear[R](f: => R): R =
-    Contexts.local.letClear(traceCtx) {
-      Contexts.broadcast.letClear(idCtx) {
+    Contexts.local.letClear(traceCtx)
+      Contexts.broadcast.letClear(idCtx)
         f
-      }
-    }
 
   /**
     * Convenience method for event loops in services.  Put your
@@ -241,18 +225,15 @@ object Trace {
     */
   def traceService[T](
       service: String, rpc: String, hostOpt: Option[InetSocketAddress] = None)(
-      f: => T): T = {
-    Trace.letId(Trace.nextId) {
+      f: => T): T =
+    Trace.letId(Trace.nextId)
       Trace.recordBinary("finagle.version", Init.finagleVersion)
       Trace.recordServiceName(service)
       Trace.recordRpc(rpc)
       hostOpt.map { Trace.recordServerAddr(_) }
       Trace.record(Annotation.ServerRecv())
-      try f finally {
+      try f finally
         Trace.record(Annotation.ServerSend())
-      }
-    }
-  }
 
   /**
     * Returns true if tracing is enabled with a good tracer pushed and the current
@@ -260,31 +241,28 @@ object Trace {
     */
   def isActivelyTracing: Boolean =
     tracingEnabled &&
-    (id match {
+    (id match
           case TraceId(_, _, _, Some(false), flags) if !flags.isDebug => false
           case TraceId(_, _, _, _, Flags(Flags.Debug)) => true
           case _ =>
             tracers.nonEmpty &&
             (tracers.size > 1 || tracers.head != NullTracer)
-        })
+        )
 
   /**
     * Record a raw record without checking if it's sampled/enabled/etc.
     */
-  private[this] def uncheckedRecord(rec: Record): Unit = {
-    tracers.distinct.foreach { t: Tracer =>
+  private[this] def uncheckedRecord(rec: Record): Unit =
+    tracers.distinct.foreach  t: Tracer =>
       t.record(rec)
-    }
-  }
 
   /**
     * Record a raw ''Record''.  This will record to a _unique_ set of
     * tracers in the stack.
     */
-  def record(rec: => Record): Unit = {
+  def record(rec: => Record): Unit =
     if (debugTrace()) System.err.println(rec)
     if (isActivelyTracing) uncheckedRecord(rec)
-  }
 
   /**
     * Time an operation and add an annotation with that duration on it
@@ -293,81 +271,63 @@ object Trace {
     * @tparam T return type
     * @return return value of the operation
     */
-  def time[T](message: String)(f: => T): T = {
+  def time[T](message: String)(f: => T): T =
     val elapsed = Stopwatch.start()
     val rv = f
     record(message, elapsed())
     rv
-  }
 
   /**
     * Runs the function f and logs that duration until the future is satisfied with the given name.
     */
-  def timeFuture[T](message: String)(f: Future[T]): Future[T] = {
+  def timeFuture[T](message: String)(f: Future[T]): Future[T] =
     val start = Time.now
-    f.ensure {
+    f.ensure
       record(message, start.untilNow)
-    }
     f
-  }
 
   /*
    * Convenience methods that construct records of different kinds.
    */
-  def record(ann: Annotation): Unit = {
+  def record(ann: Annotation): Unit =
     if (debugTrace()) System.err.println(Record(id, Time.now, ann, None))
     if (isActivelyTracing) uncheckedRecord(Record(id, Time.now, ann, None))
-  }
 
-  def record(ann: Annotation, duration: Duration): Unit = {
+  def record(ann: Annotation, duration: Duration): Unit =
     if (debugTrace())
       System.err.println(Record(id, Time.now, ann, Some(duration)))
     if (isActivelyTracing)
       uncheckedRecord(Record(id, Time.now, ann, Some(duration)))
-  }
 
-  def record(message: String): Unit = {
+  def record(message: String): Unit =
     record(Annotation.Message(message))
-  }
 
-  def record(message: String, duration: Duration): Unit = {
+  def record(message: String, duration: Duration): Unit =
     record(Annotation.Message(message), duration)
-  }
 
   @deprecated("Use recordRpc and recordServiceName", "6.13.x")
-  def recordRpcname(service: String, rpc: String): Unit = {
+  def recordRpcname(service: String, rpc: String): Unit =
     record(Annotation.Rpcname(service, rpc))
-  }
 
-  def recordServiceName(serviceName: String): Unit = {
+  def recordServiceName(serviceName: String): Unit =
     record(Annotation.ServiceName(serviceName))
-  }
 
-  def recordRpc(name: String): Unit = {
+  def recordRpc(name: String): Unit =
     record(Annotation.Rpc(name))
-  }
 
-  def recordClientAddr(ia: InetSocketAddress): Unit = {
+  def recordClientAddr(ia: InetSocketAddress): Unit =
     record(Annotation.ClientAddr(ia))
-  }
 
-  def recordServerAddr(ia: InetSocketAddress): Unit = {
+  def recordServerAddr(ia: InetSocketAddress): Unit =
     record(Annotation.ServerAddr(ia))
-  }
 
-  def recordLocalAddr(ia: InetSocketAddress): Unit = {
+  def recordLocalAddr(ia: InetSocketAddress): Unit =
     record(Annotation.LocalAddr(ia))
-  }
 
-  def recordBinary(key: String, value: Any): Unit = {
+  def recordBinary(key: String, value: Any): Unit =
     record(Annotation.BinaryAnnotation(key, value))
-  }
 
-  def recordBinaries(annotations: Map[String, Any]): Unit = {
-    if (isActivelyTracing) {
-      for ((key, value) <- annotations) {
+  def recordBinaries(annotations: Map[String, Any]): Unit =
+    if (isActivelyTracing)
+      for ((key, value) <- annotations)
         recordBinary(key, value)
-      }
-    }
-  }
-}

@@ -21,7 +21,7 @@ import org.apache.spark.scheduler.SchedulingMode
 import org.apache.spark.ui.{SparkUI, SparkUITab}
 
 /** Web UI showing progress status of all jobs in the given SparkContext. */
-private[ui] class JobsTab(parent: SparkUI) extends SparkUITab(parent, "jobs") {
+private[ui] class JobsTab(parent: SparkUI) extends SparkUITab(parent, "jobs")
   val sc = parent.sc
   val killEnabled = parent.killEnabled
   val jobProgresslistener = parent.jobProgressListener
@@ -33,4 +33,3 @@ private[ui] class JobsTab(parent: SparkUI) extends SparkUITab(parent, "jobs") {
 
   attachPage(new AllJobsPage(this))
   attachPage(new JobPage(this))
-}

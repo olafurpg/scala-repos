@@ -6,7 +6,7 @@ import lila.db.api._
 import lila.db.Implicits._
 import tube.categTube
 
-object CategRepo {
+object CategRepo
 
   def bySlug(slug: String) = $find byId slug
 
@@ -26,4 +26,3 @@ object CategRepo {
 
   def nbPosts(id: String): Fu[Int] =
     $primitive.one($select(id), "nbPosts")(_.asOpt[Int]) map (~_)
-}

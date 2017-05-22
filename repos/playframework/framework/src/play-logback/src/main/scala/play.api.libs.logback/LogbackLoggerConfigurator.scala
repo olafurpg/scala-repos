@@ -11,12 +11,12 @@ import play.api._
 
 import scala.util.control.NonFatal
 
-class LogbackLoggerConfigurator extends LoggerConfigurator {
+class LogbackLoggerConfigurator extends LoggerConfigurator
 
   /**
     * Initialize the Logger when there's no application ClassLoader available.
     */
-  def init(rootPath: java.io.File, mode: Mode.Mode): Unit = {
+  def init(rootPath: java.io.File, mode: Mode.Mode): Unit =
     val properties = Map("application.home" -> rootPath.getAbsolutePath)
     val resourceName =
       if (mode == Mode.Dev) "logback-play-dev.xml"
@@ -24,19 +24,17 @@ class LogbackLoggerConfigurator extends LoggerConfigurator {
     val resourceUrl = Option(
         this.getClass.getClassLoader.getResource(resourceName))
     configure(properties, resourceUrl)
-  }
 
   /**
     * Reconfigures the underlying logback infrastructure.
     */
-  def configure(env: Environment): Unit = {
+  def configure(env: Environment): Unit =
     val properties = Map("application.home" -> env.rootPath.getAbsolutePath)
 
     // Get an explicitly configured resource URL
     // Fallback to a file in the conf directory if the resource wasn't found on the classpath
-    def explicitResourceUrl = sys.props.get("logger.resource").map { r =>
+    def explicitResourceUrl = sys.props.get("logger.resource").map  r =>
       env.resource(r).getOrElse(new File(env.getFile("conf"), r).toURI.toURL)
-    }
 
     // Get an explicitly configured file URL
     def explicitFileUrl =
@@ -47,10 +45,9 @@ class LogbackLoggerConfigurator extends LoggerConfigurator {
     if (!env
           .resource("application-logger.xml")
           .orElse(env.resource("logger.xml"))
-          .isEmpty) {
+          .isEmpty)
       System.err.println(
           "application-logger.xml and logger.xml are no longer supported. Please name your file logback.xml");
-    }
 
     // logback.xml is the documented method, logback-play-default.xml is the fallback that Play uses
     // if no other file is found
@@ -66,35 +63,30 @@ class LogbackLoggerConfigurator extends LoggerConfigurator {
       explicitResourceUrl orElse explicitFileUrl orElse resourceUrl
 
     configure(properties, configUrl)
-  }
 
   /**
     * Reconfigures the underlying logback infrastructure.
     */
   def configure(properties: Map[String, String], config: Option[URL]): Unit =
-    synchronized {
+    synchronized
       // Redirect JUL -> SL4FJ
-      {
         import java.util.logging._
 
         import org.slf4j.bridge._
 
-        Option(java.util.logging.Logger.getLogger("")).map { root =>
+        Option(java.util.logging.Logger.getLogger("")).map  root =>
           root.setLevel(Level.FINEST)
           root.getHandlers.foreach(root.removeHandler(_))
-        }
 
         SLF4JBridgeHandler.install()
-      }
 
       // Configure logback
-      {
         import ch.qos.logback.classic._
         import ch.qos.logback.classic.joran._
         import ch.qos.logback.core.util._
         import org.slf4j._
 
-        try {
+        try
           val ctx = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
           val configurator = new JoranConfigurator
           configurator.setContext(ctx)
@@ -106,40 +98,32 @@ class LogbackLoggerConfigurator extends LoggerConfigurator {
           frameworkPackages.add(classOf[play.Logger].getName)
           frameworkPackages.add(classOf[play.api.Logger].getName)
 
-          properties.foreach {
+          properties.foreach
             case (name, value) => ctx.putProperty(name, value)
-          }
 
-          try {
-            config match {
+          try
+            config match
               case Some(url) => configurator.doConfigure(url)
               case None =>
                 System.err.println(
                     "Could not detect a logback configuration file, not configuring logback")
-            }
-          } catch {
+          catch
             case NonFatal(e) =>
               System.err.println(
                   "Error encountered while configuring logback:")
               e.printStackTrace()
-          }
 
           StatusPrinter.printIfErrorsOccured(ctx)
-        } catch {
+        catch
           case NonFatal(_) =>
-        }
-      }
-    }
 
   /**
     * Shutdown the logger infrastructure.
     */
-  def shutdown() {
+  def shutdown()
     import ch.qos.logback.classic._
 
     val ctx = LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
     ctx.stop()
 
     org.slf4j.bridge.SLF4JBridgeHandler.uninstall()
-  }
-}

@@ -45,7 +45,7 @@ case class SystemError(error: Throwable) extends EvaluationError
 case class AccumulatedErrors(errors: NonEmptyList[EvaluationError])
     extends EvaluationError
 
-object EvaluationError {
+object EvaluationError
   def invalidState(message: String): EvaluationError =
     InvalidStateError(message)
   def storageError(error: ResourceError): EvaluationError = StorageError(error)
@@ -54,16 +54,13 @@ object EvaluationError {
     AccumulatedErrors(errors)
 
   implicit val semigroup: Semigroup[EvaluationError] =
-    new Semigroup[EvaluationError] {
-      def append(a: EvaluationError, b: => EvaluationError) = (a, b) match {
+    new Semigroup[EvaluationError]
+      def append(a: EvaluationError, b: => EvaluationError) = (a, b) match
         case (AccumulatedErrors(a0), AccumulatedErrors(b0)) =>
           AccumulatedErrors(a0 append b0)
         case (a0, AccumulatedErrors(b0)) => AccumulatedErrors(a0 <:: b0)
         case (AccumulatedErrors(a0), b0) => AccumulatedErrors(b0 <:: a0)
         case (a0, b0) => AccumulatedErrors(nels(a0, b0))
-      }
-    }
-}
 
 case class QueryOptions(
     page: Option[(Long, Long)] = None,
@@ -79,7 +76,7 @@ case class CacheControl(maxAge: Option[Long],
                         cacheable: Boolean,
                         onlyIfCached: Boolean)
 
-object CacheControl {
+object CacheControl
   import blueeyes.core.http.CacheDirective
   import blueeyes.core.http.CacheDirectives.{`max-age`, `no-cache`, `only-if-cached`, `max-stale`}
   import scalaz.syntax.semigroup._
@@ -88,30 +85,23 @@ object CacheControl {
 
   val NoCache = CacheControl(None, None, false, false)
 
-  def fromCacheDirectives(cacheDirectives: CacheDirective*) = {
-    val maxAge = cacheDirectives.collectFirst {
+  def fromCacheDirectives(cacheDirectives: CacheDirective*) =
+    val maxAge = cacheDirectives.collectFirst
       case `max-age`(Some(n)) => n.number * 1000
-    }
-    val maxStale = cacheDirectives.collectFirst {
+    val maxStale = cacheDirectives.collectFirst
       case `max-stale`(Some(n)) => n.number * 1000
-    }
     val cacheable = cacheDirectives exists { _ != `no-cache` }
     val onlyIfCached = cacheDirectives exists { _ == `only-if-cached` }
     CacheControl(maxAge |+| maxStale, maxAge, cacheable, onlyIfCached)
-  }
-}
 
-trait QueryExecutor[M[+ _], +A] { self =>
+trait QueryExecutor[M[+ _], +A]  self =>
   def execute(query: String,
               context: EvaluationContext,
               opts: QueryOptions): EitherT[M, EvaluationError, A]
 
   def map[B](f: A => B)(implicit M: Functor[M]): QueryExecutor[M, B] =
-    new QueryExecutor[M, B] {
+    new QueryExecutor[M, B]
       def execute(query: String,
                   context: EvaluationContext,
-                  opts: QueryOptions): EitherT[M, EvaluationError, B] = {
+                  opts: QueryOptions): EitherT[M, EvaluationError, B] =
         self.execute(query, context, opts) map f
-      }
-    }
-}

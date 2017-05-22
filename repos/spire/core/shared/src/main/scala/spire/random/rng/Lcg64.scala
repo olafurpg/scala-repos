@@ -5,7 +5,7 @@ package rng
 import spire.util.Pack
 import java.nio.ByteBuffer
 
-final class Lcg64(_seed: Long) extends LongBasedGenerator {
+final class Lcg64(_seed: Long) extends LongBasedGenerator
   private var seed: Long = _seed
 
   def copyInit: Lcg64 = new Lcg64(seed)
@@ -18,13 +18,11 @@ final class Lcg64(_seed: Long) extends LongBasedGenerator {
 
   def setSeedBytes(bytes: Array[Byte]): Unit = seed = Pack.longFromBytes(bytes)
 
-  def nextLong(): Long = {
+  def nextLong(): Long =
     seed = 6364136223846793005L * seed + 1442695040888963407L
     seed
-  }
-}
 
-object Lcg64 extends GeneratorCompanion[Lcg64, Long] {
+object Lcg64 extends GeneratorCompanion[Lcg64, Long]
   def randomSeed(): Long = System.nanoTime()
 
   def fromBytes(bytes: Array[Byte]): Lcg64 =
@@ -33,4 +31,3 @@ object Lcg64 extends GeneratorCompanion[Lcg64, Long] {
   def fromTime(time: Long = System.nanoTime()): Lcg64 = new Lcg64(time)
 
   def step(n: Long): Long = 6364136223846793005L * n + 1442695040888963407L
-}

@@ -13,6 +13,5 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocMethodParams
   * Date: 22.07.2008
   */
 class ScDocMethodParamsImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDocMethodParams {
+    extends ScalaPsiElementImpl(node) with ScDocMethodParams
   override def toString: String = "DocMethodParams"
-}

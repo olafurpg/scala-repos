@@ -11,15 +11,15 @@ import akka.testkit.AkkaSpec
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
-class StreamPartialFlowGraphDocSpec extends AkkaSpec {
+class StreamPartialFlowGraphDocSpec extends AkkaSpec
 
   implicit val ec = system.dispatcher
 
   implicit val materializer = ActorMaterializer()
 
-  "build with open ports" in {
+  "build with open ports" in
     //#simple-partial-flow-graph
-    val pickMaxOfThree = GraphDSL.create() { implicit b =>
+    val pickMaxOfThree = GraphDSL.create()  implicit b =>
       import GraphDSL.Implicits._
 
       val zip1 = b.add(ZipWith[Int, Int, Int](math.max _))
@@ -27,12 +27,11 @@ class StreamPartialFlowGraphDocSpec extends AkkaSpec {
       zip1.out ~> zip2.in0
 
       UniformFanInShape(zip2.out, zip1.in0, zip1.in1, zip2.in1)
-    }
 
     val resultSink = Sink.head[Int]
 
     val g = RunnableGraph.fromGraph(
-        GraphDSL.create(resultSink) { implicit b => sink =>
+        GraphDSL.create(resultSink)  implicit b => sink =>
       import GraphDSL.Implicits._
 
       // importing the partial graph will return its shape (inlets & outlets)
@@ -43,17 +42,16 @@ class StreamPartialFlowGraphDocSpec extends AkkaSpec {
       Source.single(3) ~> pm3.in(2)
       pm3.out ~> sink.in
       ClosedShape
-    })
+    )
 
     val max: Future[Int] = g.run()
     Await.result(max, 300.millis) should equal(3)
     //#simple-partial-flow-graph
-  }
 
-  "build source from partial flow graph" in {
+  "build source from partial flow graph" in
     //#source-from-partial-flow-graph
     val pairs = Source.fromGraph(
-        GraphDSL.create() { implicit b =>
+        GraphDSL.create()  implicit b =>
       import GraphDSL.Implicits._
 
       // prepare graph elements
@@ -66,17 +64,16 @@ class StreamPartialFlowGraphDocSpec extends AkkaSpec {
 
       // expose port
       SourceShape(zip.out)
-    })
+    )
 
     val firstPair: Future[(Int, Int)] = pairs.runWith(Sink.head)
     //#source-from-partial-flow-graph
     Await.result(firstPair, 300.millis) should equal(1 -> 2)
-  }
 
-  "build flow from partial flow graph" in {
+  "build flow from partial flow graph" in
     //#flow-from-partial-flow-graph
     val pairUpWithToString = Flow.fromGraph(
-        GraphDSL.create() { implicit b =>
+        GraphDSL.create()  implicit b =>
       import GraphDSL.Implicits._
 
       // prepare graph elements
@@ -89,7 +86,7 @@ class StreamPartialFlowGraphDocSpec extends AkkaSpec {
 
       // expose ports
       FlowShape(broadcast.in, zip.out)
-    })
+    )
 
     //#flow-from-partial-flow-graph
 
@@ -101,9 +98,8 @@ class StreamPartialFlowGraphDocSpec extends AkkaSpec {
     // format: ON
 
     Await.result(matSink, 300.millis) should equal(1 -> "1")
-  }
 
-  "combine sources with simplified API" in {
+  "combine sources with simplified API" in
     //#source-combine
     val sourceOne = Source(List(1))
     val sourceTwo = Source(List(2))
@@ -112,9 +108,8 @@ class StreamPartialFlowGraphDocSpec extends AkkaSpec {
     val mergedResult: Future[Int] = merged.runWith(Sink.fold(0)(_ + _))
     //#source-combine
     Await.result(mergedResult, 300.millis) should equal(3)
-  }
 
-  "combine sinks with simplified API" in {
+  "combine sinks with simplified API" in
     val actorRef: ActorRef = testActor
     //#sink-combine
     val sendRmotely = Sink.actorRef(actorRef, "Done")
@@ -127,5 +122,3 @@ class StreamPartialFlowGraphDocSpec extends AkkaSpec {
     expectMsg(0)
     expectMsg(1)
     expectMsg(2)
-  }
-}

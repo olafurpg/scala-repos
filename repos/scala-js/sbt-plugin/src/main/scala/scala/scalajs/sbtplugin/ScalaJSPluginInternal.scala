@@ -42,7 +42,7 @@ import java.net.URLClassLoader
 /** Contains settings used by ScalaJSPlugin that should not be automatically
   *  be in the *.sbt file's scope.
   */
-object ScalaJSPluginInternal {
+object ScalaJSPluginInternal
 
   import ScalaJSPlugin.autoImport._
 
@@ -114,14 +114,12 @@ object ScalaJSPluginInternal {
   )
 
   /** A JS expression that detects the global scope just like Scala.js */
-  val jsGlobalExpr: String = {
+  val jsGlobalExpr: String =
     """((typeof global === "object" && global &&
          global["Object"] === Object) ? global : this)"""
-  }
 
-  def logIRCacheStats(logger: Logger): Unit = {
+  def logIRCacheStats(logger: Logger): Unit =
     logger.debug("Global IR cache stats: " + globalIRCache.stats.logLine)
-  }
 
   /** Patches the IncOptions so that .sjsir files are pruned as needed.
     *
@@ -130,41 +128,38 @@ object ScalaJSPluginInternal {
     *  compiler. This makes sure that, when a .class file must be deleted, the
     *  corresponding .sjsir file are also deleted.
     */
-  def scalaJSPatchIncOptions(incOptions: IncOptions): IncOptions = {
+  def scalaJSPatchIncOptions(incOptions: IncOptions): IncOptions =
     val inheritedNewClassfileManager = incOptions.newClassfileManager
     val newClassfileManager = () =>
-      new ClassfileManager {
+      new ClassfileManager
         private[this] val inherited = inheritedNewClassfileManager()
 
-        def delete(classes: Iterable[File]): Unit = {
+        def delete(classes: Iterable[File]): Unit =
           inherited.delete(
-              classes flatMap { classFile =>
+              classes flatMap  classFile =>
             val scalaJSFiles =
-              if (classFile.getPath endsWith ".class") {
+              if (classFile.getPath endsWith ".class")
                 val f =
                   FileVirtualFile.withExtension(classFile, ".class", ".sjsir")
                 if (f.exists) List(f)
                 else Nil
-              } else Nil
+              else Nil
             classFile :: scalaJSFiles
-          })
-        }
+          )
 
         def generated(classes: Iterable[File]): Unit =
           inherited.generated(classes)
         def complete(success: Boolean): Unit = inherited.complete(success)
-    }
     incOptions.withNewClassfileManager(newClassfileManager)
-  }
 
   private def packageJSDependenciesSetting(
       taskKey: TaskKey[File],
       cacheName: String,
-      getLib: ResolvedJSDependency => VirtualJSFile): Setting[Task[File]] = {
-    taskKey <<= Def.taskDyn {
+      getLib: ResolvedJSDependency => VirtualJSFile): Setting[Task[File]] =
+    taskKey <<= Def.taskDyn
       if ((skip in taskKey).value) Def.task((artifactPath in taskKey).value)
       else
-        Def.task {
+        Def.task
           val s = (streams in taskKey).value
           val deps = resolvedJSDependencies.value
           val output = (artifactPath in taskKey).value
@@ -174,7 +169,7 @@ object ScalaJSPluginInternal {
 
           FileFunction.cached(s.cacheDirectory / cacheName,
                               FilesInfo.lastModified,
-                              FilesInfo.exists) { _ =>
+                              FilesInfo.exists)  _ =>
             // We don't need the files
 
             IO.createDirectory(output.getParentFile)
@@ -183,28 +178,24 @@ object ScalaJSPluginInternal {
             toolsIO.concatFiles(outFile, resolvedDeps.map(getLib))
 
             Set(output)
-          }(realFiles.toSet)
+          (realFiles.toSet)
 
           output
-        }
-    }
-  }
 
   /** Settings for the production key (e.g. fastOptJS) of a given stage */
   private def scalaJSStageSettings(
       stage: Stage, key: TaskKey[Attributed[File]]): Seq[Setting[_]] = Seq(
-      scalaJSLinker in key := {
+      scalaJSLinker in key :=
         val opts = (scalaJSOptimizerOptions in key).value
 
         val semantics = (scalaJSSemantics in key).value
         val outputMode = (scalaJSOutputMode in key).value
         val withSourceMap = (emitSourceMaps in key).value
 
-        val relSourceMapBase = {
+        val relSourceMapBase =
           if ((relativeSourceMaps in key).value)
             Some((artifactPath in key).value.getParentFile.toURI())
           else None
-        }
 
         val frontendConfig = LinkerFrontend
           .Config()
@@ -217,7 +208,7 @@ object ScalaJSPluginInternal {
           .withCustomOutputWrapper(scalaJSOutputWrapper.value)
           .withPrettyPrint(opts.prettyPrintFullOptJS)
 
-        val newLinker = { () =>
+        val newLinker =  () =>
           Linker(semantics,
                  outputMode,
                  withSourceMap,
@@ -226,25 +217,23 @@ object ScalaJSPluginInternal {
                  opts.useClosureCompiler,
                  frontendConfig,
                  backendConfig)
-        }
 
         new ClearableLinker(newLinker, opts.batchMode)
-      },
-      usesScalaJSLinkerTag in key := {
+      ,
+      usesScalaJSLinkerTag in key :=
         val projectPart = thisProject.value.id
         val configPart = configuration.value.name
 
-        val stagePart = stage match {
+        val stagePart = stage match
           case Stage.FastOpt => "fastopt"
           case Stage.FullOpt => "fullopt"
-        }
 
         Tags.Tag(s"uses-scalajs-linker-$projectPart-$configPart-$stagePart")
-      },
+      ,
       // Prevent this linker from being used concurrently
       concurrentRestrictions in Global +=
         Tags.limit((usesScalaJSLinkerTag in key).value, 1),
-      key <<= Def.taskDyn {
+      key <<= Def.taskDyn
         val s = (streams in key).value
         val log = s.log
         val irInfo = (scalaJSIR in key).value
@@ -252,17 +241,16 @@ object ScalaJSPluginInternal {
         val ir = irInfo.data
         val output = (artifactPath in key).value
 
-        Def.task {
+        Def.task
           FileFunction.cached(s.cacheDirectory,
                               FilesInfo.lastModified,
-                              FilesInfo.exists) {
+                              FilesInfo.exists)
             _ =>
               // We don't need the files
 
-              val stageName = stage match {
+              val stageName = stage match
                 case Stage.FastOpt => "Fast"
                 case Stage.FullOpt => "Full"
-              }
 
               log.info(s"$stageName optimizing $output")
 
@@ -274,59 +262,53 @@ object ScalaJSPluginInternal {
               logIRCacheStats(log)
 
               Set(output)
-          }(realFiles.toSet)
+          (realFiles.toSet)
 
           Attributed.blank(output)
-        } tag ((usesScalaJSLinkerTag in key).value)
-      },
+        tag ((usesScalaJSLinkerTag in key).value)
+      ,
       key <<= key.dependsOn(packageJSDependencies, packageScalaJSLauncher),
       scalaJSLinkedFile in key := new FileVirtualJSFile(key.value.data)
   )
 
   private def dispatchSettingKeySettings[T](key: SettingKey[T]) = Seq(
-      key <<= Def.settingDyn {
+      key <<= Def.settingDyn
         val stageKey = stageKeys(scalaJSStage.value)
         Def.setting { (key in stageKey).value }
-      }
   )
 
   private def dispatchTaskKeySettings[T](key: TaskKey[T]) = Seq(
-      key <<= Def.taskDyn {
+      key <<= Def.taskDyn
         val stageKey = stageKeys(scalaJSStage.value)
         Def.task { (key in stageKey).value }
-      }
   )
 
-  private def scalajspSettings: Seq[Setting[_]] = {
+  private def scalajspSettings: Seq[Setting[_]] =
     case class Options(
         infos: Boolean = false
     )
 
-    val optionsParser: Parser[Options] = {
+    val optionsParser: Parser[Options] =
       token(OptSpace ~>
-          ((literal("-i") | "--infos") ^^^ ((_: Options).copy(infos = true)))).* map {
+          ((literal("-i") | "--infos") ^^^ ((_: Options).copy(infos = true)))).* map
         fns =>
           Function.chain(fns)(Options())
-      }
-    }
 
-    def sjsirFileOnClasspathParser(relPaths: Seq[String]): Parser[String] = {
+    def sjsirFileOnClasspathParser(relPaths: Seq[String]): Parser[String] =
       OptSpace ~> StringBasic.examples(
           ScalajspUtils.relPathsExamples(relPaths))
-    }
 
     def scalajspParser(state: State, relPaths: Seq[String]) =
       optionsParser ~ sjsirFileOnClasspathParser(relPaths)
 
-    val parser = loadForParser(sjsirFilesOnClasspath) { (state, relPaths) =>
+    val parser = loadForParser(sjsirFilesOnClasspath)  (state, relPaths) =>
       scalajspParser(state, relPaths.getOrElse(Nil))
-    }
 
     Seq(
-        sjsirFilesOnClasspath <<= Def.task {
+        sjsirFilesOnClasspath <<= Def.task
           scalaJSIR.value.data.map(_.relativePath).toSeq
-        } storeAs (sjsirFilesOnClasspath) triggeredBy (scalaJSIR),
-        scalajsp := {
+        storeAs (sjsirFilesOnClasspath) triggeredBy (scalaJSIR),
+        scalajsp :=
           val (options, relPath) = parser.parsed
 
           val vfile = scalaJSIR.value.data
@@ -339,9 +321,7 @@ object ScalaJSPluginInternal {
           stdout.flush()
 
           logIRCacheStats(streams.value.log)
-        }
     )
-  }
 
   /** Collect certain file types from a classpath.
     *
@@ -357,32 +337,28 @@ object ScalaJSPluginInternal {
                                       filter: FileFilter,
                                       collectJar: VirtualJarFile => Seq[T],
                                       collectFile: (File,
-                                      String) => T): Attributed[Seq[T]] = {
+                                      String) => T): Attributed[Seq[T]] =
 
     val realFiles = Seq.newBuilder[File]
     val results = Seq.newBuilder[T]
 
-    for (cpEntry <- Attributed.data(cp) if cpEntry.exists) {
-      if (cpEntry.isFile && cpEntry.getName.endsWith(".jar")) {
+    for (cpEntry <- Attributed.data(cp) if cpEntry.exists)
+      if (cpEntry.isFile && cpEntry.getName.endsWith(".jar"))
         realFiles += cpEntry
         val vf = new FileVirtualBinaryFile(cpEntry) with VirtualJarFile
         results ++= collectJar(vf)
-      } else if (cpEntry.isDirectory) {
-        for {
+      else if (cpEntry.isDirectory)
+        for
           (file, relPath) <- Path.selectSubpaths(cpEntry, filter)
-        } {
+        
           realFiles += file
           results += collectFile(file, relPath)
-        }
-      } else {
+      else
         sys.error("Illegal classpath entry: " + cpEntry.getPath)
-      }
-    }
 
     Attributed
       .blank(results.result())
       .put(scalaJSSourceFiles, realFiles.result())
-  }
 
   val scalaJSConfigSettings: Seq[Setting[_]] =
     Seq(
@@ -399,21 +375,21 @@ object ScalaJSPluginInternal {
         scalaJSIRCache <<= Def
           .task(scalaJSIRCacheHolder.value)
           .dependsOn(scalaJSClearCacheStats),
-        scalaJSIR := {
+        scalaJSIR :=
           import IRFileCache.IRContainer
 
           val rawIR = collectFromClasspath(
               fullClasspath.value,
               "*.sjsir",
               collectJar = jar => IRContainer.Jar(jar) :: Nil,
-              collectFile = { (file, relPath) =>
+              collectFile =  (file, relPath) =>
                 IRContainer.File(
                     FileVirtualScalaJSIRFile.relative(file, relPath))
-              })
+              )
 
           val cache = scalaJSIRCache.value
           rawIR.map(cache.cached)
-        },
+        ,
         artifactPath in fastOptJS :=
         ((crossTarget in fastOptJS).value /
             ((moduleName in fastOptJS).value + "-fastopt.js")),
@@ -421,24 +397,24 @@ object ScalaJSPluginInternal {
         ((crossTarget in fullOptJS).value /
             ((moduleName in fullOptJS).value + "-opt.js")),
         scalaJSSemantics in fullOptJS ~= (_.optimized),
-        scalaJSOptimizerOptions in fullOptJS := {
+        scalaJSOptimizerOptions in fullOptJS :=
           val prev = (scalaJSOptimizerOptions in fullOptJS).value
           val outputMode = (scalaJSOutputMode in fullOptJS).value
           prev.withUseClosureCompiler(
               outputMode == OutputMode.ECMAScript51Isolated)
-        },
+        ,
         fullOptJS <<= fullOptJS.dependsOn(packageMinifiedJSDependencies),
         artifactPath in packageScalaJSLauncher :=
         ((crossTarget in packageScalaJSLauncher).value /
             ((moduleName in packageScalaJSLauncher).value + "-launcher.js")),
         skip in packageScalaJSLauncher := !persistLauncher.value,
-        packageScalaJSLauncher <<= Def.taskDyn {
+        packageScalaJSLauncher <<= Def.taskDyn
           if ((skip in packageScalaJSLauncher).value)
             Def.task(Attributed.blank(
                     (artifactPath in packageScalaJSLauncher).value))
           else
-            Def.task {
-              mainClass.value map {
+            Def.task
+              mainClass.value map
                 mainCl =>
                   val file = (artifactPath in packageScalaJSLauncher).value
                   IO.write(file,
@@ -447,12 +423,10 @@ object ScalaJSPluginInternal {
 
                   // Attach the name of the main class used, (ab?)using the name key
                   Attributed(file)(AttributeMap.empty.put(name.key, mainCl))
-              } getOrElse {
+              getOrElse
                 sys.error(
                     "Cannot write launcher file, since there is no or multiple mainClasses")
-              }
-            }
-        },
+        ,
         artifactPath in packageJSDependencies :=
         ((crossTarget in packageJSDependencies).value /
             ((moduleName in packageJSDependencies).value + "-jsdeps.js")),
@@ -466,21 +440,19 @@ object ScalaJSPluginInternal {
             packageMinifiedJSDependencies,
             "package-min-js-deps",
             dep => dep.minifiedLib.getOrElse(dep.lib)),
-        jsDependencyManifest := {
+        jsDependencyManifest :=
           val myModule = thisProject.value.id
           val config = configuration.value.name
 
           // Collect all libraries
-          val jsDeps = jsDependencies.value.collect {
+          val jsDeps = jsDependencies.value.collect
             case dep: JSModuleID if dep.configurations.forall(_ == config) =>
               dep.jsDep
-          }
 
-          val requiresDOM = jsDependencies.value.exists {
+          val requiresDOM = jsDependencies.value.exists
             case RuntimeDOMDep(configurations) =>
               configurations.forall(_ == config)
             case _ => false
-          }
 
           /* We make the assumption here, that scalaJSSemantics has not
            * unreasonably overridden values for the fastOptJS and fullOptJS
@@ -502,48 +474,47 @@ object ScalaJSPluginInternal {
 
           // Prevent writing if unnecessary to not invalidate dependencies
           val needWrite =
-            !vfile.exists || {
-              Try {
+            !vfile.exists ||
+              Try
                 val readManifest = JSDependencyManifest.read(vfile)
                 readManifest != manifest
-              } getOrElse true
-            }
+              getOrElse true
 
           if (needWrite) JSDependencyManifest.write(manifest, vfile)
 
           file
-        },
+        ,
         products <<= products.dependsOn(jsDependencyManifest),
         console <<= console.dependsOn(Def.task(
                 streams.value.log.warn(
                     "Scala REPL doesn't work with Scala.js. You " +
                     "are running a JVM REPL. JavaScript things won't work.")
             )),
-        scalaJSNativeLibraries := {
+        scalaJSNativeLibraries :=
           collectFromClasspath(fullClasspath.value,
                                "*.js",
                                collectJar = _.jsFiles,
                                collectFile = FileVirtualJSFile.relative)
-        },
-        jsDependencyManifests := {
+        ,
+        jsDependencyManifests :=
           val filter = jsManifestFilter.value
           val rawManifests = collectFromClasspath(
               fullClasspath.value,
               new ExactFilter(JSDependencyManifest.ManifestFileName),
               collectJar = _.jsDependencyManifests,
-              collectFile = { (file, _) =>
+              collectFile =  (file, _) =>
                 fromJSON[JSDependencyManifest](readJSON(IO.read(file)))
-              })
+              )
 
           rawManifests.map(manifests => filter(manifests.toTraversable))
-        },
-        resolvedJSDependencies := {
+        ,
+        resolvedJSDependencies :=
           val dependencyFilter = jsDependencyFilter.value
           val attLibs = scalaJSNativeLibraries.value
           val attManifests = jsDependencyManifests.value
 
           // Verify semantics compliance
-          if (checkScalaJSSemantics.value) {
+          if (checkScalaJSSemantics.value)
             import ComplianceRequirement._
             val requirements = mergeFromManifests(attManifests.data)
 
@@ -552,22 +523,19 @@ object ScalaJSPluginInternal {
              * tasks. Otherwise, this check is bogus.
              */
             checkCompliance(requirements, scalaJSSemantics.value)
-          }
 
           // Collect originating files
-          val realFiles = {
+          val realFiles =
             attLibs.get(scalaJSSourceFiles).get ++ attManifests
               .get(scalaJSSourceFiles)
               .get
-          }
 
           // Collect available JS libraries
-          val availableLibs = {
+          val availableLibs =
             val libs = mutable.Map.empty[String, VirtualJSFile]
             for (lib <- attLibs.data) libs.getOrElseUpdate(lib.relativePath,
                                                            lib)
             libs.toMap
-          }
 
           // Actually resolve the dependencies
           val resolved = DependencyResolver.resolveDependencies(
@@ -576,84 +544,76 @@ object ScalaJSPluginInternal {
           Attributed
             .blank[Seq[ResolvedJSDependency]](resolved)
             .put(scalaJSSourceFiles, realFiles)
-        },
+        ,
         // Give tasks ability to check we are not forking at build reading time
-        scalaJSEnsureUnforked := {
+        scalaJSEnsureUnforked :=
           if (fork.value) sys.error("Scala.js cannot be run in a forked JVM")
           else true
-        },
-        scalaJSRequestsDOM := {
+        ,
+        scalaJSRequestsDOM :=
           requiresDOM.?.value
             .getOrElse(jsDependencyManifests.value.data.exists(_.requiresDOM))
-        },
-        resolvedJSEnv := jsEnv.?.value.getOrElse {
-          if (scalaJSUseRhino.value) {
+        ,
+        resolvedJSEnv := jsEnv.?.value.getOrElse
+          if (scalaJSUseRhino.value)
             /* We take the semantics from the linker, since they depend on the
              * stage. This way we are sure we agree on the semantics with the
              * linker.
              */
             val semantics = scalaJSLinker.value.semantics
             new RhinoJSEnv(semantics, withDOM = scalaJSRequestsDOM.value)
-          } else if (scalaJSRequestsDOM.value) {
+          else if (scalaJSRequestsDOM.value)
             new PhantomJSEnv(
                 jettyClassLoader = scalaJSPhantomJSClassLoader.value)
-          } else {
+          else
             new NodeJSEnv
-          }
-        },
-        scalaJSJavaSystemProperties ++= {
+        ,
+        scalaJSJavaSystemProperties ++=
           val javaSysPropsPattern = "-D([^=]*)=(.*)".r
-          javaOptions.value.map {
+          javaOptions.value.map
             case javaSysPropsPattern(propName, propValue) =>
               (propName, propValue)
             case opt =>
               sys.error(
                   "Scala.js javaOptions can only be \"-D<key>=<value>\"," +
                   " but received: " + opt)
-          }
-        },
-        scalaJSConfigurationLibs ++= {
+        ,
+        scalaJSConfigurationLibs ++=
           val javaSystemProperties = scalaJSJavaSystemProperties.value
-          if (javaSystemProperties.isEmpty) {
+          if (javaSystemProperties.isEmpty)
             Nil
-          } else {
-            val formattedProps = javaSystemProperties.map {
+          else
+            val formattedProps = javaSystemProperties.map
               case (propName, propValue) =>
                 "\"" + escapeJS(propName) + "\": \"" + escapeJS(propValue) +
                 "\""
-            }
-            val code = {
+            val code =
               "var __ScalaJSEnv = (typeof __ScalaJSEnv === \"object\" && __ScalaJSEnv) ? __ScalaJSEnv : {};\n" +
               "__ScalaJSEnv.javaSystemProperties = {" +
               formattedProps.mkString(", ") + "};\n"
-            }
             Seq(ResolvedJSDependency.minimal(new MemVirtualJSFile(
                         "setJavaSystemProperties.js").withContent(code)))
-          }
-        },
-        loadedJSEnv <<= Def.taskDyn {
+        ,
+        loadedJSEnv <<= Def.taskDyn
           val log = streams.value.log
           val libs =
             resolvedJSDependencies.value.data ++ scalaJSConfigurationLibs.value
-          resolvedJSEnv.value match {
+          resolvedJSEnv.value match
             case env: LinkingUnitJSEnv =>
               log.debug(s"Generating LinkingUnit for JSEnv ${env.name}")
-              Def.task {
+              Def.task
                 val linker = scalaJSLinker.value
                 val ir = scalaJSIR.value.data
                 val unit = linker.linkUnit(ir, env.symbolRequirements, log)
 
                 log.debug("Loading JSEnv with LinkingUnit")
                 env.loadLibs(libs).loadLinkingUnit(unit)
-              } tag (usesScalaJSLinkerTag.value)
+              tag (usesScalaJSLinkerTag.value)
             case env =>
-              Def.task {
+              Def.task
                 val file = scalaJSLinkedFile.value
                 log.debug(s"Loading JSEnv with linked file ${file.path}")
                 env.loadLibs(libs :+ ResolvedJSDependency.minimal(file))
-              }
-          }
-        }
     )
 
   /** Run a class in a given environment using a given launcher */
@@ -661,26 +621,23 @@ object ScalaJSPluginInternal {
                     mainCl: String,
                     launcher: VirtualJSFile,
                     log: Logger,
-                    console: JSConsole) = {
+                    console: JSConsole) =
 
     log.info("Running " + mainCl)
     log.debug(s"with JSEnv ${jsEnv.name}")
 
     val runner = jsEnv.jsRunner(launcher)
     runner.run(log, console)
-  }
 
-  private def launcherContent(mainCl: String) = {
+  private def launcherContent(mainCl: String) =
     val parts = mainCl.split('.').map(s => s"""["${escapeJS(s)}"]""").mkString
     s"$jsGlobalExpr$parts().main();\n"
-  }
 
-  private def memLauncher(mainCl: String) = {
+  private def memLauncher(mainCl: String) =
     new MemVirtualJSFile("Generated launcher file")
       .withContent(launcherContent(mainCl))
-  }
 
-  def discoverJSApps(analysis: inc.Analysis): Seq[String] = {
+  def discoverJSApps(analysis: inc.Analysis): Seq[String] =
     import xsbt.api.{Discovered, Discovery}
 
     val jsApp = "scala.scalajs.js.JSApp"
@@ -688,41 +645,35 @@ object ScalaJSPluginInternal {
     def isJSApp(discovered: Discovered) =
       discovered.isModule && discovered.baseClasses.contains(jsApp)
 
-    Discovery(Set(jsApp), Set.empty)(Tests.allDefs(analysis)) collect {
+    Discovery(Set(jsApp), Set.empty)(Tests.allDefs(analysis)) collect
       case (definition, discovered) if isJSApp(discovered) =>
         definition.name
-    }
-  }
 
-  private val runMainParser = {
-    Defaults.loadForParser(discoveredMainClasses) { (_, names) =>
+  private val runMainParser =
+    Defaults.loadForParser(discoveredMainClasses)  (_, names) =>
       val mainClasses = names.getOrElse(Nil).toSet
       Space ~> token(NotSpace examples mainClasses)
-    }
-  }
 
   // These settings will be filtered by the stage dummy tasks
   val scalaJSRunSettings = Seq(
       mainClass in scalaJSLauncher := (mainClass in run).value,
-      scalaJSLauncher <<= Def.taskDyn {
+      scalaJSLauncher <<= Def.taskDyn
         if (persistLauncher.value)
           Def.task(packageScalaJSLauncher.value.map(FileVirtualJSFile))
         else
-          Def.task {
-            (mainClass in scalaJSLauncher).value map { mainClass =>
+          Def.task
+            (mainClass in scalaJSLauncher).value map  mainClass =>
               val memLaunch = memLauncher(mainClass)
               Attributed[VirtualJSFile](memLaunch)(
                   AttributeMap.empty.put(name.key, mainClass))
-            } getOrElse {
+            getOrElse
               sys.error("No main class detected.")
-            }
-          }
-      },
+      ,
       discoveredMainClasses <<= compile
         .map(discoverJSApps)
         .storeAs(discoveredMainClasses)
         .triggeredBy(compile),
-      run <<= Def.inputTask {
+      run <<= Def.inputTask
         // use assert to prevent warning about pure expr in stat pos
         assert(scalaJSEnsureUnforked.value)
 
@@ -733,8 +684,8 @@ object ScalaJSPluginInternal {
               launch.data,
               streams.value.log,
               scalaJSConsole.value)
-      },
-      runMain := {
+      ,
+      runMain :=
         // use assert to prevent warning about pure expr in stat pos
         assert(scalaJSEnsureUnforked.value)
 
@@ -744,13 +695,12 @@ object ScalaJSPluginInternal {
               memLauncher(mainClass),
               streams.value.log,
               scalaJSConsole.value)
-      }
   )
 
   val scalaJSCompileSettings = (scalaJSConfigSettings ++ scalaJSRunSettings)
 
   val scalaJSTestFrameworkSettings = Seq(
-      loadedTestFrameworks := {
+      loadedTestFrameworks :=
         // use assert to prevent warning about pure expr in stat pos
         assert(scalaJSEnsureUnforked.value)
 
@@ -758,20 +708,18 @@ object ScalaJSPluginInternal {
         val logger = streams.value.log
         val frameworks = testFrameworks.value
 
-        val jsEnv = loadedJSEnv.value match {
+        val jsEnv = loadedJSEnv.value match
           case jsEnv: ComJSEnv => jsEnv
 
           case jsEnv =>
             sys.error(s"You need a ComJSEnv to test (found ${jsEnv.name})")
-        }
 
         val detector = new FrameworkDetector(jsEnv)
 
-        detector.detect(frameworks) map {
+        detector.detect(frameworks) map
           case (tf, name) =>
             (tf, new ScalaJSFramework(name, jsEnv, logger, console))
-        }
-      },
+      ,
       // Override default to avoid triggering a test:fastOptJS in a test:compile
       // without loosing autocompletion.
       definedTestNames <<=
@@ -780,19 +728,18 @@ object ScalaJSPluginInternal {
 
   val scalaJSTestBuildSettings =
     (scalaJSConfigSettings) ++
-    (Seq(fastOptJS, fullOptJS, packageScalaJSLauncher, packageJSDependencies) map {
+    (Seq(fastOptJS, fullOptJS, packageScalaJSLauncher, packageJSDependencies) map
           packageJSTask =>
             moduleName in packageJSTask := moduleName.value + "-test"
-        })
+        )
 
   val scalaJSTestSettings =
     (scalaJSTestBuildSettings ++ scalaJSRunSettings ++ scalaJSTestFrameworkSettings)
 
   val scalaJSDependenciesSettings = Seq(
       // add all the webjars your jsDependencies depend upon
-      libraryDependencies ++= jsDependencies.value.collect {
+      libraryDependencies ++= jsDependencies.value.collect
         case JarJSModuleID(module, _) => module
-      }
   )
 
   val scalaJSDefaultBuildConfigs =
@@ -822,13 +769,13 @@ object ScalaJSPluginInternal {
         scalaJSOutputMode := OutputMode.ECMAScript51Isolated,
         checkScalaJSSemantics := true,
         scalaJSConsole := ConsoleJSConsole,
-        clean <<= clean.dependsOn(Def.task {
+        clean <<= clean.dependsOn(Def.task
           // have clean reset incremental linker state
           (scalaJSLinker in (Compile, fastOptJS)).value.clear()
           (scalaJSLinker in (Test, fastOptJS)).value.clear()
           (scalaJSLinker in (Compile, fullOptJS)).value.clear()
           (scalaJSLinker in (Test, fullOptJS)).value.clear()
-        }),
+        ),
         /* Depend on jetty artifacts in dummy configuration to be able to inject
          * them into the PhantomJS runner if necessary.
          * See scalaJSPhantomJSClassLoader
@@ -836,7 +783,7 @@ object ScalaJSPluginInternal {
         ivyConfigurations += config("phantom-js-jetty").hide,
         libraryDependencies ++=
           phantomJSJettyModules.map(_ % "phantom-js-jetty"),
-        scalaJSPhantomJSClassLoader := {
+        scalaJSPhantomJSClassLoader :=
           val report = update.value
           val jars = report.select(configurationFilter("phantom-js-jetty"))
 
@@ -844,7 +791,7 @@ object ScalaJSPluginInternal {
             new URLClassLoader(jars.map(_.toURI.toURL).toArray, null)
 
           new PhantomJettyClassLoader(jettyLoader, getClass.getClassLoader)
-        },
+        ,
         scalaJSJavaSystemProperties := Nil,
         scalaJSConfigurationLibs := Nil
     )
@@ -866,4 +813,3 @@ object ScalaJSPluginInternal {
       // and you will want to be cross-compiled on the Scala.js binary version
       crossVersion := ScalaJSCrossVersion.binary
   )
-}

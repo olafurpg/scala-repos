@@ -14,7 +14,7 @@ import akka.actor.Actor
 import akka.cluster.MemberStatus._
 import akka.actor.Deploy
 
-object LeaderLeavingMultiJvmSpec extends MultiNodeConfig {
+object LeaderLeavingMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -25,7 +25,6 @@ object LeaderLeavingMultiJvmSpec extends MultiNodeConfig {
                 "akka.cluster.auto-down-unreachable-after = 0s"))
         .withFallback(
             MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
-}
 
 class LeaderLeavingMultiJvmNode1 extends LeaderLeavingSpec
 class LeaderLeavingMultiJvmNode2 extends LeaderLeavingSpec
@@ -33,22 +32,22 @@ class LeaderLeavingMultiJvmNode3 extends LeaderLeavingSpec
 
 abstract class LeaderLeavingSpec
     extends MultiNodeSpec(LeaderLeavingMultiJvmSpec)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import LeaderLeavingMultiJvmSpec._
   import ClusterEvent._
 
-  "A LEADER that is LEAVING" must {
+  "A LEADER that is LEAVING" must
 
-    "be moved to LEAVING, then to EXITING, then to REMOVED, then be shut down and then a new LEADER should be elected" taggedAs LongRunningTest in {
+    "be moved to LEAVING, then to EXITING, then to REMOVED, then be shut down and then a new LEADER should be elected" taggedAs LongRunningTest in
 
       awaitClusterUp(first, second, third)
 
       val oldLeaderAddress = clusterView.leader.get
 
-      within(30.seconds) {
+      within(30.seconds)
 
-        if (clusterView.isLeader) {
+        if (clusterView.isLeader)
 
           enterBarrier("registered-listener")
 
@@ -58,12 +57,12 @@ abstract class LeaderLeavingSpec
           // verify that the LEADER is shut down
           awaitCond(cluster.isTerminated)
           enterBarrier("leader-shutdown")
-        } else {
+        else
 
           val exitingLatch = TestLatch()
 
-          cluster.subscribe(system.actorOf(Props(new Actor {
-            def receive = {
+          cluster.subscribe(system.actorOf(Props(new Actor
+            def receive =
               case state: CurrentClusterState ⇒
                 if (state.members.exists(m ⇒
                           m.address == oldLeaderAddress &&
@@ -71,8 +70,7 @@ abstract class LeaderLeavingSpec
               case MemberExited(m) if m.address == oldLeaderAddress ⇒
                 exitingLatch.countDown()
               case _ ⇒ // ignore
-            }
-          }).withDeploy(Deploy.local)), classOf[MemberEvent])
+          ).withDeploy(Deploy.local)), classOf[MemberEvent])
           enterBarrier("registered-listener")
 
           enterBarrier("leader-left")
@@ -94,10 +92,5 @@ abstract class LeaderLeavingSpec
 
           // verify that we have a new LEADER
           awaitAssert(clusterView.leader should not be (oldLeaderAddress))
-        }
 
         enterBarrier("finished")
-      }
-    }
-  }
-}

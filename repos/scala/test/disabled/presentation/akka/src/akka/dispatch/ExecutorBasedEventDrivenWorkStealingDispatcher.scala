@@ -34,7 +34,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     mailboxType: MailboxType = Dispatchers.MAILBOX_TYPE,
     config: ThreadPoolConfig = ThreadPoolConfig())
     extends ExecutorBasedEventDrivenDispatcher(
-        _name, throughput, throughputDeadlineTime, mailboxType, config) {
+        _name, throughput, throughputDeadlineTime, mailboxType, config)
 
   def this(_name: String,
            throughput: Int,
@@ -83,9 +83,9 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
   private var members = Vector[ActorRef]()
   private val donationInProgress = new DynamicVariable(false)
 
-  private[akka] override def register(actorRef: ActorRef) = {
+  private[akka] override def register(actorRef: ActorRef) =
     //Verify actor type conformity
-    actorType match {
+    actorType match
       case None => actorType = Some(actorRef.actor.getClass)
       case Some(aType) =>
         if (aType != actorRef.actor.getClass)
@@ -94,45 +94,39 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
                   "Can't register actor %s in a work stealing dispatcher which already knows actors of type %s",
                   actorRef,
                   aType))
-    }
 
     synchronized { members :+= actorRef } //Update members
     super.register(actorRef)
-  }
 
-  private[akka] override def unregister(actorRef: ActorRef) = {
+  private[akka] override def unregister(actorRef: ActorRef) =
     synchronized { members = members.filterNot(actorRef eq) } //Update members
     super.unregister(actorRef)
-  }
 
-  override private[akka] def dispatch(invocation: MessageInvocation) = {
+  override private[akka] def dispatch(invocation: MessageInvocation) =
     val mbox = getMailbox(invocation.receiver)
     if (donationInProgress.value == false &&
         (!mbox.isEmpty || mbox.dispatcherLock.locked) &&
-        attemptDonationOf(invocation, mbox)) {
+        attemptDonationOf(invocation, mbox))
       //We were busy and we got to donate the message to some other lucky guy, we're done here
-    } else {
+    else
       mbox enqueue invocation
       registerForExecution(mbox)
-    }
-  }
 
   override private[akka] def reRegisterForExecution(
-      mbox: MessageQueue with ExecutableMailbox): Unit = {
-    try {
+      mbox: MessageQueue with ExecutableMailbox): Unit =
+    try
       donationInProgress.value = true
       while (donateFrom(mbox)) {} //When we reregister, first donate messages to another actor
-    } finally { donationInProgress.value = false }
+    finally { donationInProgress.value = false }
 
     if (!mbox.isEmpty) //If we still have messages left to process, reschedule for execution
       super.reRegisterForExecution(mbox)
-  }
 
   /**
     * Returns true if it successfully donated a message
     */
   protected def donateFrom(
-      donorMbox: MessageQueue with ExecutableMailbox): Boolean = {
+      donorMbox: MessageQueue with ExecutableMailbox): Boolean =
     val actors =
       members // copy to prevent concurrent modifications having any impact
 
@@ -142,11 +136,9 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
     doFindDonorRecipient(
         donorMbox,
         actors,
-        (System.currentTimeMillis % actors.size).asInstanceOf[Int]) match {
+        (System.currentTimeMillis % actors.size).asInstanceOf[Int]) match
       case null => false
       case recipient => donate(donorMbox.dequeue, recipient)
-    }
-  }
 
   /**
     * Returns true if the donation succeeded or false otherwise
@@ -154,26 +146,25 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
   protected def attemptDonationOf(
       message: MessageInvocation,
       donorMbox: MessageQueue with ExecutableMailbox): Boolean =
-    try {
+    try
       donationInProgress.value = true
       val actors =
         members // copy to prevent concurrent modifications having any impact
       doFindDonorRecipient(
           donorMbox,
           actors,
-          System.identityHashCode(message) % actors.size) match {
+          System.identityHashCode(message) % actors.size) match
         case null => false
         case recipient => donate(message, recipient)
-      }
-    } finally { donationInProgress.value = false }
+    finally { donationInProgress.value = false }
 
   /**
     * Rewrites the message and adds that message to the recipients mailbox
     * returns true if the message is non-null
     */
   protected def donate(
-      organ: MessageInvocation, recipient: ActorRef): Boolean = {
-    if (organ ne null) {
+      organ: MessageInvocation, recipient: ActorRef): Boolean =
+    if (organ ne null)
       if (organ.senderFuture.isDefined)
         recipient.postMessageToMailboxAndCreateFutureResultWithTimeout[Any](
             organ.message, recipient.timeout, organ.sender, organ.senderFuture)
@@ -181,8 +172,7 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
         recipient.postMessageToMailbox(organ.message, organ.sender)
       else recipient.postMessageToMailbox(organ.message, None)
       true
-    } else false
-  }
+    else false
 
   /**
     * Returns an available recipient for the message, if any
@@ -190,24 +180,20 @@ class ExecutorBasedEventDrivenWorkStealingDispatcher(
   protected def doFindDonorRecipient(
       donorMbox: MessageQueue with ExecutableMailbox,
       potentialRecipients: Vector[ActorRef],
-      startIndex: Int): ActorRef = {
+      startIndex: Int): ActorRef =
     val prSz = potentialRecipients.size
     var i = 0
     var recipient: ActorRef = null
 
-    while ( (i < prSz) && (recipient eq null)) {
+    while ( (i < prSz) && (recipient eq null))
       val actor =
         potentialRecipients((i + startIndex) % prSz) //Wrap-around, one full lap
       val mbox = getMailbox(actor)
 
-      if ((mbox ne donorMbox) && mbox.isEmpty) {
+      if ((mbox ne donorMbox) && mbox.isEmpty)
         //Don't donate to yourself
         recipient = actor //Found!
-      }
 
       i += 1
-    }
 
     recipient // nothing found, reuse same start index next time
-  }
-}

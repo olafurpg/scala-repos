@@ -30,19 +30,18 @@ import scala.collection.generic.Sizing
   *  @since 2.9
   */
 trait Combiner[-Elem, +To]
-    extends Builder[Elem, To] with Sizing with Parallel {
+    extends Builder[Elem, To] with Sizing with Parallel
 
   @transient
   @volatile
   var _combinerTaskSupport = defaultTaskSupport
 
-  def combinerTaskSupport = {
+  def combinerTaskSupport =
     val cts = _combinerTaskSupport
-    if (cts eq null) {
+    if (cts eq null)
       _combinerTaskSupport = defaultTaskSupport
       defaultTaskSupport
-    } else cts
-  }
+    else cts
 
   def combinerTaskSupport_=(cts: TaskSupport) = _combinerTaskSupport = cts
 
@@ -84,11 +83,9 @@ trait Combiner[-Elem, +To]
   /** Constructs the result and sets the appropriate tasksupport object to the resulting collection
     *  if this is applicable.
     */
-  def resultWithTaskSupport: To = {
+  def resultWithTaskSupport: To =
     val res = result()
     setTaskSupport(res, combinerTaskSupport)
-  }
-}
 
 /*
 private[collection] trait EnvironmentPassingCombiner[-Elem, +To] extends Combiner[Elem, To] {

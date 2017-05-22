@@ -43,7 +43,6 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 class ImageInputSpec
     extends SimpleSFXDelegateSpec[jfxse.ImageInput, ImageInput](
         classOf[jfxse.ImageInput], classOf[ImageInput])
-    with PositionDelegateSpec[ImageInput] {
+    with PositionDelegateSpec[ImageInput]
 
   val positionDelegate = new ImageInput
-}

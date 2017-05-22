@@ -6,7 +6,7 @@ import java.net.SocketAddress
 
 private[finagle] object Echo
     extends Client[String, String] with StringClient
-    with Server[String, String] with StringServer {
+    with Server[String, String] with StringServer
 
   def serve(addr: SocketAddress, service: ServiceFactory[String, String]) =
     stringServer.serve(addr, service)
@@ -16,4 +16,3 @@ private[finagle] object Echo
 
   def newService(dest: Name, label: String) =
     stringClient.newService(dest, label)
-}

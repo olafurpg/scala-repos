@@ -46,7 +46,7 @@ import scala.concurrent.Future
 import scala.reflect._
 import scala.util.DynamicVariable
 
-trait AppHelpers {
+trait AppHelpers
 
   /**
     * Displays a simple alert dialog.
@@ -58,11 +58,10 @@ trait AppHelpers {
   @inline
   def alert(
       title: CharSequence, text: CharSequence, clickCallback: => Unit = {})(
-      implicit context: Context) {
-    new AlertDialogBuilder(title, text) {
+      implicit context: Context)
+    new AlertDialogBuilder(title, text)
       neutralButton(android.R.string.ok, clickCallback)
-    }.show()
-  }
+    .show()
 
   /**
     * Launches a new activity for a give uri. For example, opens a web browser for http protocols.
@@ -72,9 +71,8 @@ trait AppHelpers {
     * }}}
     */
   @inline
-  def openUri(uri: Uri)(implicit context: Context) {
+  def openUri(uri: Uri)(implicit context: Context)
     context.startActivity(new Intent(Intent.ACTION_VIEW, uri))
-  }
 
   @inline def pendingService(intent: Intent, flags: Int = 0)(
       implicit context: Context) =
@@ -92,11 +90,10 @@ trait AppHelpers {
 
   private[scaloid] val createBundle =
     new DynamicVariable[Option[android.os.Bundle]](None)
-}
 
 object AppHelpers extends AppHelpers
 
-trait ContentHelpers {
+trait ContentHelpers
 
   /**
     * When you register BroadcastReceiver with Context.registerReceiver() you have to unregister it to prevent memory leak.
@@ -114,15 +111,12 @@ trait ContentHelpers {
     */
   def broadcastReceiver(
       filter: IntentFilter)(onReceiveBody: (Context, Intent) => Any)(
-      implicit ctx: Context, reg: Registerable) {
-    val receiver = new BroadcastReceiver {
-      def onReceive(context: Context, intent: Intent) {
+      implicit ctx: Context, reg: Registerable)
+    val receiver = new BroadcastReceiver
+      def onReceive(context: Context, intent: Intent)
         onReceiveBody(context, intent)
-      }
-    }
     reg.onRegister(ctx.registerReceiver(receiver, filter))
     reg.onUnregister(ctx.unregisterReceiver(receiver))
-  }
 
   /**
     * When you register BroadcastReceiver with Context.registerReceiver() you have to unregister it to prevent memory leak.
@@ -139,22 +133,18 @@ trait ContentHelpers {
     * }}}
     */
   def broadcastReceiver(filterString: String)(
-      onReceiveBody: => Any)(implicit ctx: Context, reg: Registerable) {
-    val receiver = new BroadcastReceiver {
-      def onReceive(context: Context, intent: Intent) {
+      onReceiveBody: => Any)(implicit ctx: Context, reg: Registerable)
+    val receiver = new BroadcastReceiver
+      def onReceive(context: Context, intent: Intent)
         onReceiveBody
-      }
-    }
     val filter = new IntentFilter()
     filter.addAction(filterString)
     reg.onRegister(ctx.registerReceiver(receiver, filter))
     reg.onUnregister(ctx.unregisterReceiver(receiver))
-  }
-}
 
 object ContentHelpers extends ContentHelpers
 
-trait MediaHelpers {
+trait MediaHelpers
 
   /**
     * Plays a sound from a given Uri.
@@ -162,12 +152,10 @@ trait MediaHelpers {
     *   play("content://media/internal/audio/media/50")
     * }}}
     */
-  def play(uri: Uri = notificationSound)(implicit context: Context) {
+  def play(uri: Uri = notificationSound)(implicit context: Context)
     val r = RingtoneManager.getRingtone(context, uri)
-    if (r != null) {
+    if (r != null)
       r.play()
-    }
-  }
 
   @inline def alarmSound: Uri =
     RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
@@ -177,31 +165,27 @@ trait MediaHelpers {
 
   @inline def ringtoneSound: Uri =
     RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-}
 
 object MediaHelpers extends MediaHelpers
 
-abstract class PreferenceVar[T](val key: String, val defaultValue: T) {
+abstract class PreferenceVar[T](val key: String, val defaultValue: T)
   def apply(value: T)(implicit pref: SharedPreferences): T
 
   def apply()(implicit pref: SharedPreferences): T = apply(defaultValue)
 
-  def update(value: T)(implicit pref: SharedPreferences): this.type = {
+  def update(value: T)(implicit pref: SharedPreferences): this.type =
     val editor = pref.edit()
     put(value, editor)
     editor.commit()
     this
-  }
 
   protected def put(value: T, editor: SharedPreferences.Editor): Unit
 
-  def remove()(implicit pref: SharedPreferences): this.type = {
+  def remove()(implicit pref: SharedPreferences): this.type =
     pref.edit().remove(key).commit()
     this
-  }
-}
 
-trait PreferenceHelpers {
+trait PreferenceHelpers
 
   /**
     * Returns DefaultSharedPreferences object for given implicit context.
@@ -211,18 +195,18 @@ trait PreferenceHelpers {
     PreferenceManager.getDefaultSharedPreferences(context)
 
   @inline def preferenceVar[T](key: String, defaultVal: T): PreferenceVar[T] =
-    defaultVal match {
+    defaultVal match
       case v: String =>
-        new PreferenceVar[String](key, v) {
+        new PreferenceVar[String](key, v)
           override def apply(value: String)(
               implicit pref: SharedPreferences): String =
             pref.getString(key, value)
 
           def put(value: String, editor: SharedPreferences.Editor): Unit =
             editor.putString(key, value)
-        }.asInstanceOf[PreferenceVar[T]]
+        .asInstanceOf[PreferenceVar[T]]
       case v: Set[String] =>
-        new PreferenceVar[Set[String]](key, v) {
+        new PreferenceVar[Set[String]](key, v)
           import scala.collection.JavaConversions._
           import scala.collection.JavaConverters._
           override def apply(value: Set[String])(
@@ -231,104 +215,94 @@ trait PreferenceHelpers {
 
           def put(value: Set[String], editor: SharedPreferences.Editor): Unit =
             editor.putStringSet(key, value)
-        }.asInstanceOf[PreferenceVar[T]]
+        .asInstanceOf[PreferenceVar[T]]
       case v: Int =>
-        new PreferenceVar[Int](key, v) {
+        new PreferenceVar[Int](key, v)
           override def apply(value: Int)(
               implicit pref: SharedPreferences): Int = pref.getInt(key, value)
 
           def put(value: Int, editor: SharedPreferences.Editor): Unit =
             editor.putInt(key, value)
-        }.asInstanceOf[PreferenceVar[T]]
+        .asInstanceOf[PreferenceVar[T]]
       case v: Long =>
-        new PreferenceVar[Long](key, v) {
+        new PreferenceVar[Long](key, v)
           override def apply(value: Long)(
               implicit pref: SharedPreferences): Long =
             pref.getLong(key, value)
 
           def put(value: Long, editor: SharedPreferences.Editor): Unit =
             editor.putLong(key, value)
-        }.asInstanceOf[PreferenceVar[T]]
+        .asInstanceOf[PreferenceVar[T]]
       case v: Float =>
-        new PreferenceVar[Float](key, v) {
+        new PreferenceVar[Float](key, v)
           override def apply(value: Float)(
               implicit pref: SharedPreferences): Float =
             pref.getFloat(key, value)
 
           def put(value: Float, editor: SharedPreferences.Editor): Unit =
             editor.putFloat(key, value)
-        }.asInstanceOf[PreferenceVar[T]]
+        .asInstanceOf[PreferenceVar[T]]
       case v: Boolean =>
-        new PreferenceVar[Boolean](key, v) {
+        new PreferenceVar[Boolean](key, v)
           override def apply(value: Boolean)(
               implicit pref: SharedPreferences): Boolean =
             pref.getBoolean(key, value)
 
           def put(value: Boolean, editor: SharedPreferences.Editor): Unit =
             editor.putBoolean(key, value)
-        }.asInstanceOf[PreferenceVar[T]]
+        .asInstanceOf[PreferenceVar[T]]
       case _ => throw new Exception("Invalid type for SharedPreferences")
-    }
 
   import scala.language.experimental.macros
 
   def preferenceVar[T](defaultVal: T): PreferenceVar[T] = macro PreferenceHelpers
     .preferenceVarImpl[T]
-}
 
-object PreferenceHelpers extends PreferenceHelpers {
+object PreferenceHelpers extends PreferenceHelpers
   import scala.language.experimental.macros
   import scala.reflect.macros.blackbox.Context
 
-  private def getShortName(str: String) = {
+  private def getShortName(str: String) =
     val pos = str.lastIndexOf(".")
     if (pos < 0) str else str.substring(pos + 1)
-  }
 
   def preferenceVarImpl[T](c: Context)(
-      defaultVal: c.Expr[T]): c.Expr[PreferenceVar[T]] = {
+      defaultVal: c.Expr[T]): c.Expr[PreferenceVar[T]] =
     import c.universe._
 
     val enclosingName = getShortName(c.internal.enclosingOwner.fullName)
     val name = c.Expr[String](Literal(Constant(enclosingName)))
-    reify {
+    reify
       preferenceVar(name.splice, defaultVal.splice)
-    }
-  }
-}
 
 /**
   * Contains helper methods that displaying some UI elements.
   */
-trait WidgetHelpers {
+trait WidgetHelpers
   @inline private[this] def _toast(
       message: CharSequence, duration: Int, gravity: Int, view: View)(
-      implicit context: Context) {
-    runOnUiThread {
+      implicit context: Context)
+    runOnUiThread
       val toast = Toast.makeText(context, message, duration)
       toast.setGravity(gravity, 0, 0)
       if (view != null) toast.setView(view)
       toast.show()
-    }
-  }
 
   /**
     * Displays a toast message.
     * This method can be called from any threads.
     */
   @inline def toast(message: CharSequence, gravity: Int = Gravity.BOTTOM, view: View = null)(
-      implicit context: Context) {
+      implicit context: Context)
     _toast(message, Toast.LENGTH_SHORT, gravity, view)
-  }
 
   /**
     * Displays a toast message for a longer time.
     * This method can be called from any threads.
     */
   @inline def longToast(message: CharSequence, gravity: Int = Gravity.BOTTOM, view: View = null)(
-      implicit context: Context) {
+      implicit context: Context)
     _toast(message, Toast.LENGTH_LONG, gravity, view)
-  }
 
   /**
     * Displays a dialog with spinner icon.
@@ -338,7 +312,6 @@ trait WidgetHelpers {
   def spinnerDialog(title: CharSequence, message: CharSequence)(
       implicit context: Context): Future[ProgressDialog] =
     evalOnUiThread(ProgressDialog.show(context, title, message, true))
-}
 
 /**
   * Contains helper methods that displaying some UI elements.

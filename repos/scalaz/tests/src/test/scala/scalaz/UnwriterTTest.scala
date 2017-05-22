@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalaCheckBinding._
 import std.AllInstances._
 import org.scalacheck.Arbitrary
 
-object UnwriterTTest extends SpecLite {
+object UnwriterTTest extends SpecLite
 
   type UnwriterTOpt[W, A] = UnwriterT[Option, W, A]
   type UnwriterTOptInt[A] = UnwriterTOpt[Int, A]
@@ -22,7 +22,7 @@ object UnwriterTTest extends SpecLite {
 
   checkAll(comonad.laws[Unwriter[Int, ?]])
 
-  object instances {
+  object instances
     def equal[F[_], W, A](implicit E: Equal[F[(W, A)]]) =
       Equal[UnwriterT[F, W, A]]
     def functor[F[_]: Functor, W] = Functor[UnwriterT[F, W, ?]]
@@ -33,8 +33,5 @@ object UnwriterTTest extends SpecLite {
     def foldable[F[_]: Foldable, W] = Foldable[UnwriterT[F, W, ?]]
     def traverse[F[_]: Traverse, W] = Traverse[UnwriterT[F, W, ?]]
 
-    object Unwriter {
+    object Unwriter
       def comonad[W] = Comonad[Unwriter[W, ?]]
-    }
-  }
-}

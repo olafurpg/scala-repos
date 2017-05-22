@@ -24,20 +24,18 @@ import scala.util.{Failure, Try}
   * scala> val result: Future[Int] = capParallelExecution(myFutureReturningFunc)
   * }}}
   */
-object CapConcurrentExecutions {
+object CapConcurrentExecutions
   private val log = LoggerFactory.getLogger(getClass.getName)
 
   def apply[T](metrics: CapConcurrentExecutionsMetrics,
                actorRefFactory: ActorRefFactory,
                actorName: String,
                maxParallel: Int,
-               maxQueued: Int): CapConcurrentExecutions = {
+               maxQueued: Int): CapConcurrentExecutions =
     new CapConcurrentExecutions(
         metrics, actorRefFactory, actorName, maxParallel, maxQueued)
-  }
-}
 
-class CapConcurrentExecutionsMetrics(metrics: Metrics, metricsClass: Class[_]) {
+class CapConcurrentExecutionsMetrics(metrics: Metrics, metricsClass: Class[_])
   val queued = metrics.gauge(
       metrics.name(MetricPrefixes.SERVICE, metricsClass, "queued"),
       new AtomicIntGauge)
@@ -47,41 +45,35 @@ class CapConcurrentExecutionsMetrics(metrics: Metrics, metricsClass: Class[_]) {
   val processingTimer = metrics.timer(
       metrics.name(MetricPrefixes.SERVICE, metricsClass, "processing-time"))
 
-  def reset(): Unit = {
+  def reset(): Unit =
     queued.setValue(0)
     processing.setValue(0)
-  }
-}
 
 class CapConcurrentExecutions private (metrics: CapConcurrentExecutionsMetrics,
                                        actorRefFactory: ActorRefFactory,
                                        actorName: String,
                                        maxParallel: Int,
-                                       maxQueued: Int) {
+                                       maxQueued: Int)
   import CapConcurrentExecutions.log
 
-  private[util] val serializeExecutionActorRef = {
+  private[util] val serializeExecutionActorRef =
     val serializeExecutionActorProps = RestrictParallelExecutionsActor.props(
         metrics, maxParallel = maxParallel, maxQueued = maxQueued)
     actorRefFactory.actorOf(serializeExecutionActorProps, actorName)
-  }
 
   /**
     * Submit the given block to execution.
     */
-  def apply[T](block: => Future[T]): Future[T] = {
+  def apply[T](block: => Future[T]): Future[T] =
     val promise = Promise[T]()
     serializeExecutionActorRef ! RestrictParallelExecutionsActor.Execute(
         promise, () => block)
     promise.future
-  }
 
   @PreDestroy
-  def close(): Unit = {
+  def close(): Unit =
     log.debug(s"stopping $serializeExecutionActorRef")
     serializeExecutionActorRef ! PoisonPill
-  }
-}
 
 /**
   * Accepts execute instructions containing functions returning `scala.concurrent.Future`s.
@@ -90,77 +82,66 @@ class CapConcurrentExecutions private (metrics: CapConcurrentExecutionsMetrics,
   */
 private[util] class RestrictParallelExecutionsActor(
     metrics: CapConcurrentExecutionsMetrics, maxParallel: Int, maxQueued: Int)
-    extends Actor {
+    extends Actor
 
   import RestrictParallelExecutionsActor.Execute
 
   private[this] var active: Int = 0
   private[this] var queue: Queue[Execute[_]] = Queue.empty
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     super.preStart()
 
     metrics.reset()
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     metrics.reset()
 
-    for (execute <- queue) {
+    for (execute <- queue)
       execute.complete(
           Failure(new IllegalStateException(s"$self actor stopped")))
-    }
 
     queue = Queue.empty
 
     super.postStop()
-  }
 
-  override def receive: Receive = {
+  override def receive: Receive =
     case exec: Execute[_] =>
-      if (active >= maxParallel && queue.size >= maxQueued) {
+      if (active >= maxParallel && queue.size >= maxQueued)
         sender ! Status.Failure(new IllegalStateException(
                 s"$self queue may not exceed $maxQueued entries"))
-      } else {
+      else
         queue :+= exec
         startNextIfPossible()
-      }
 
     case Finished =>
       active -= 1
       startNextIfPossible()
-  }
 
-  private[this] def startNextIfPossible(): Unit = {
-    if (active < maxParallel) {
+  private[this] def startNextIfPossible(): Unit =
+    if (active < maxParallel)
       startNext()
-    }
 
     metrics.processing.setValue(active)
     metrics.queued.setValue(queue.size)
-  }
 
-  private[this] def startNext(): Unit = {
-    queue.dequeueOption.foreach {
+  private[this] def startNext(): Unit =
+    queue.dequeueOption.foreach
       case (next, newQueue) =>
         queue = newQueue
         active += 1
 
         val future: Future[_] =
-          try metrics.processingTimer.timeFuture(next.func()) catch {
+          try metrics.processingTimer.timeFuture(next.func()) catch
             case NonFatal(e) => Future.failed(e)
-          }
 
         val myself = self
-        future.onComplete { (result: Try[_]) =>
+        future.onComplete  (result: Try[_]) =>
           next.complete(result)
           myself ! Finished
-        }(CallerThreadExecutionContext.callerThreadExecutionContext)
-    }
-  }
-}
+        (CallerThreadExecutionContext.callerThreadExecutionContext)
 
-private[util] object RestrictParallelExecutionsActor {
+private[util] object RestrictParallelExecutionsActor
   def props(metrics: CapConcurrentExecutionsMetrics,
             maxParallel: Int,
             maxQueued: Int): Props =
@@ -168,9 +149,7 @@ private[util] object RestrictParallelExecutionsActor {
             metrics, maxParallel = maxParallel, maxQueued = maxQueued))
 
   private val log = LoggerFactory.getLogger(getClass.getName)
-  case class Execute[T](promise: Promise[T], func: () => Future[T]) {
+  case class Execute[T](promise: Promise[T], func: () => Future[T])
     def complete(result: Try[_]): Unit =
       promise.complete(result.asInstanceOf[Try[T]])
-  }
   private case object Finished
-}

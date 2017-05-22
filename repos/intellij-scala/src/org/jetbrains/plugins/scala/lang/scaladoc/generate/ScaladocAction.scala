@@ -23,19 +23,18 @@ import org.jetbrains.plugins.scala.lang.scaladoc.generate.ScaladocAction.Scalado
   * Date: 01.10.11
   */
 class ScaladocAction
-    extends BaseAnalysisAction("Generate Scaladoc", "Scaladoc") {
+    extends BaseAnalysisAction("Generate Scaladoc", "Scaladoc")
   private var configurationDialog: ScaladocConsoleRunConfigurationForm = null
 
-  private def disposeForm() {
+  private def disposeForm()
     configurationDialog = null
-  }
 
-  def analyze(project: Project, scope: AnalysisScope) {
+  def analyze(project: Project, scope: AnalysisScope)
     var config: ScaladocConfiguration = null
-    try {
+    try
       configurationDialog.saveSettings()
       config = new ScaladocConfiguration(configurationDialog, project, scope)
-      try {
+      try
         val runConfig = new ScaladocRunConfiguration(
             project, configurationDialog, config)
 
@@ -53,67 +52,55 @@ class ScaladocAction
                 runConfig,
                 false))
         runner.execute(builder.build())
-      } catch {
+      catch
         case e: ExecutionException =>
           ExecutionErrorDialog.show(e, CommonBundle.getErrorTitle, project)
-      }
-    } finally {
+    finally
       disposeForm()
-    }
-  }
 
-  override def canceled() {
+  override def canceled()
     super.canceled()
     disposeForm()
-  }
 
   override def getAdditionalActionSettings(
-      project: Project, dialog: BaseAnalysisActionDialog): JComponent = {
+      project: Project, dialog: BaseAnalysisActionDialog): JComponent =
     configurationDialog = new ScaladocConsoleRunConfigurationForm(project)
     configurationDialog.getOutputDirChooser.getDocument.addDocumentListener(
-        new DocumentAdapter() {
-      def textChanged(e: DocumentEvent) {
+        new DocumentAdapter()
+      def textChanged(e: DocumentEvent)
         updateAvailability(dialog)
-      }
-    })
+    )
     updateAvailability(dialog)
     configurationDialog.createCenterPanel()
-  }
 
-  private def updateAvailability(dialog: BaseAnalysisActionDialog) {
+  private def updateAvailability(dialog: BaseAnalysisActionDialog)
     dialog.setOKActionEnabled(!configurationDialog.getOutputDir.isEmpty)
-  }
-}
 
-object ScaladocAction {
+object ScaladocAction
 
   // just stub entities, will never be invoked
   object ScaladocRunConfigurationFactory
-      extends ConfigurationFactory(new ScalaConsoleConfigurationType) {
+      extends ConfigurationFactory(new ScalaConsoleConfigurationType)
     override def createTemplateConfiguration(
         project: Project): RunConfiguration =
       new ScaladocRunConfiguration(project, null, null)
-  }
 
   class ScaladocRunConfiguration(project: Project,
                                  dialog: ScaladocConsoleRunConfigurationForm,
                                  config: ScaladocConfiguration)
       extends RunConfigurationBase(
-          project, ScaladocRunConfigurationFactory, "Generate Scaladoc") {
+          project, ScaladocRunConfigurationFactory, "Generate Scaladoc")
     override def checkConfiguration() {}
 
     override def getConfigurationEditor: SettingsEditor[
         _ <: ScaladocRunConfiguration] =
-      new SettingsEditor[ScaladocRunConfiguration]() {
+      new SettingsEditor[ScaladocRunConfiguration]()
         override def createEditor(): JComponent = dialog.createCenterPanel()
 
         override def resetEditorFrom(s: ScaladocRunConfiguration) {}
 
         override def applyEditorTo(s: ScaladocRunConfiguration) {}
-      }
 
     override def getState(
         executor: Executor, env: ExecutionEnvironment): RunProfileState =
       config.getState(executor, env)
-  }
-}

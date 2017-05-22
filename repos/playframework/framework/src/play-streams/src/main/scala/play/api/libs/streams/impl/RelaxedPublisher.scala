@@ -11,17 +11,14 @@ import org.reactivestreams._
   * makes RelaxedPublisher a bit faster, but possibly a bit less safe,
   * than a CheckingPublisher.
   */
-private[streams] abstract class RelaxedPublisher[T] extends Publisher[T] {
+private[streams] abstract class RelaxedPublisher[T] extends Publisher[T]
   self: SubscriptionFactory[T] =>
 
   // Streams method
-  final override def subscribe(subr: Subscriber[_ >: T]): Unit = {
+  final override def subscribe(subr: Subscriber[_ >: T]): Unit =
     val handle: SubscriptionHandle[_] = createSubscription(
         subr, RelaxedPublisher.onSubscriptionEndedNop)
     handle.start()
-  }
-}
 
-private[streams] object RelaxedPublisher {
+private[streams] object RelaxedPublisher
   val onSubscriptionEndedNop: Any => Unit = _ => ()
-}

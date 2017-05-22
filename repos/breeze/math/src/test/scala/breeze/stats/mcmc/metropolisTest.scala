@@ -12,7 +12,7 @@ import org.scalatest.junit.JUnitRunner
   * @date 3/13/14.
   */
 @RunWith(classOf[JUnitRunner])
-class metropolisTest extends FunSuite {
+class metropolisTest extends FunSuite
 
   val rand: RandBasis = RandBasis.mt0
 
@@ -27,17 +27,16 @@ class metropolisTest extends FunSuite {
   private val l6 = math.log(6) //performance hack
   private val l2 = math.log(2)
   private val l1 = math.log(1)
-  def logLikelihood(x: State) = x match {
+  def logLikelihood(x: State) = x match
     case A => l6
     case B => l2
     case C => l1
-  }
 
   val proposal = rand.choose(Seq(A, B, C))
 
   val TOLERANCE = 0.1
 
-  test("stupidly simple mcmc") {
+  test("stupidly simple mcmc")
     val mh = ArbitraryMetropolisHastings(logLikelihood _,
                                          (_: State) => proposal,
                                          (_: State, _: State) => 0.0,
@@ -47,29 +46,25 @@ class metropolisTest extends FunSuite {
     var aCount: Double = 0
     var bCount: Double = 0
     var cCount: Double = 0
-    cforRange(0 until NUM_TESTS) { i =>
-      mh.draw() match {
+    cforRange(0 until NUM_TESTS)  i =>
+      mh.draw() match
         case A => aCount += 1
         case B => bCount += 1
         case C => cCount += 1
-      }
-    }
     assert(math.abs(aCount / cCount - 6) < TOLERANCE)
     assert(math.abs(aCount / bCount - 3) < TOLERANCE)
     assert(math.abs(bCount / cCount - 2) < TOLERANCE)
-  }
 
   def skewedProposal(x: State) = rand.choose(Seq(A, A, B, C).filter(_ != x))
 
   def logSkewedTransitionProbability(start: State, end: State) =
-    (start, end) match {
+    (start, end) match
       case (a, b) if (a == b) => ???
       case (A, _) => math.log(0.5)
       case (_, A) => math.log(2.0 / 3.0)
       case (_, _) => math.log(1.0 / 3.0)
-    }
 
-  test("stupidly simple mcmc, anisotropic") {
+  test("stupidly simple mcmc, anisotropic")
     val mh = ArbitraryMetropolisHastings(logLikelihood _,
                                          skewedProposal _,
                                          logSkewedTransitionProbability _,
@@ -79,15 +74,11 @@ class metropolisTest extends FunSuite {
     var aCount: Double = 0
     var bCount: Double = 0
     var cCount: Double = 0
-    cforRange(0 until NUM_TESTS) { i =>
-      mh.draw() match {
+    cforRange(0 until NUM_TESTS)  i =>
+      mh.draw() match
         case A => aCount += 1
         case B => bCount += 1
         case C => cCount += 1
-      }
-    }
     assert(math.abs(aCount / cCount - 6) < TOLERANCE)
     assert(math.abs(aCount / bCount - 3) < TOLERANCE)
     assert(math.abs(bCount / cCount - 2) < TOLERANCE)
-  }
-}

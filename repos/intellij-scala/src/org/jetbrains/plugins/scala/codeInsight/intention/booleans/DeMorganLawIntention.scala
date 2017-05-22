@@ -15,15 +15,14 @@ import org.jetbrains.plugins.scala.util.IntentionUtils
   * @author Ksenia.Sautina
   * @since 5/12/12
   */
-object DeMorganLawIntention {
+object DeMorganLawIntention
   def familyName = "DeMorgan Law"
-}
 
-class DeMorganLawIntention extends PsiElementBaseIntentionAction {
+class DeMorganLawIntention extends PsiElementBaseIntentionAction
   def getFamilyName = DeMorganLawIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
@@ -41,9 +40,8 @@ class DeMorganLawIntention extends PsiElementBaseIntentionAction {
     setText("Replace '" + oper + "' with " + replaceOper(oper) + "'")
 
     true
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null || !infixExpr.isValid) return
@@ -66,12 +64,9 @@ class DeMorganLawIntention extends PsiElementBaseIntentionAction {
     val res = IntentionUtils.negateAndValidateExpression(
         infixExpr, element.getManager, buf)
 
-    inWriteAction {
+    inWriteAction
       res._1.replaceExpression(res._2, true)
       editor.getCaretModel.moveToOffset(start + diff + res._3)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

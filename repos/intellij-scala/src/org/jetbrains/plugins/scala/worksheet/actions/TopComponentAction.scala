@@ -17,7 +17,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetUiConstructor
   * User: Dmitry Naydanov
   * Date: 2/17/14
   */
-trait TopComponentAction extends TopComponentDisplayable {
+trait TopComponentAction extends TopComponentDisplayable
   this: AnAction =>
 
   def shortcutId: Option[String] = None
@@ -28,67 +28,56 @@ trait TopComponentAction extends TopComponentDisplayable {
 
   def actionIcon: Icon
 
-  def getActionButton = {
+  def getActionButton =
     val button = new ActionButton(this,
                                   getTemplatePresentation,
                                   ActionPlaces.EDITOR_TOOLBAR,
                                   ActionToolbar.DEFAULT_MINIMUM_BUTTON_SIZE)
     button setToolTipText genericText
     button
-  }
 
-  override def init(panel: JPanel) {
+  override def init(panel: JPanel)
     val presentation = getTemplatePresentation
 
     presentation setIcon actionIcon
     presentation setEnabled true
 
     val text =
-      shortcutId flatMap {
+      shortcutId flatMap
         case id =>
-          KeymapManager.getInstance.getActiveKeymap.getShortcuts(id).headOption map {
+          KeymapManager.getInstance.getActiveKeymap.getShortcuts(id).headOption map
             case shortcut =>
               genericText + (" (" + KeymapUtil.getShortcutText(shortcut) + ")")
-          }
-      } getOrElse genericText
+      getOrElse genericText
 
     presentation setText text
 
     val actionButton = getActionButton
     WorksheetUiConstructor.fixUnboundMaxSize(actionButton)
 
-    ApplicationManager.getApplication.invokeAndWait(new Runnable {
-      override def run() {
+    ApplicationManager.getApplication.invokeAndWait(new Runnable
+      override def run()
         panel.add(actionButton, 0)
         actionButton.setEnabled(true)
-      }
-    }, ModalityState.any())
-  }
+    , ModalityState.any())
 
-  protected def updateInner(presentation: Presentation, project: Project) {
+  protected def updateInner(presentation: Presentation, project: Project)
     if (project == null) return
 
-    def enable() {
+    def enable()
       presentation setEnabled true
       presentation setVisible true
-    }
 
-    def disable() {
+    def disable()
       presentation setEnabled false
       presentation setVisible false
-    }
 
-    try {
+    try
       val editor = FileEditorManager.getInstance(project).getSelectedTextEditor
 
-      extensions.inReadAction {
-        PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument) match {
+      extensions.inReadAction
+        PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument) match
           case sf: ScalaFile if sf.isWorksheetFile => enable()
           case _ => disable()
-        }
-      }
-    } catch {
+    catch
       case e: Exception => disable()
-    }
-  }
-}

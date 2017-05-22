@@ -39,13 +39,13 @@ import scala.collection.JavaConversions._
 
 /** :: Experimental :: */
 @Experimental
-object HB_0_8_0 {
+object HB_0_8_0
 
   implicit val formats = DefaultFormats
 
   def getByAppId(connection: HConnection,
                  namespace: String,
-                 appId: Int): Iterator[Event] = {
+                 appId: Int): Iterator[Event] =
     val tableName = TableName.valueOf(namespace, "events")
     val table = connection.getTable(tableName)
     val start = PartialRowKey(appId)
@@ -54,7 +54,6 @@ object HB_0_8_0 {
     val scanner = table.getScanner(scan)
     table.close()
     scanner.iterator().map { resultToEvent(_) }
-  }
 
   val colNames: Map[String, Array[Byte]] = Map(
       "event" -> "e",
@@ -72,64 +71,53 @@ object HB_0_8_0 {
       val appId: Int,
       val millis: Long,
       val uuidLow: Long
-  ) {
-    lazy val toBytes: Array[Byte] = {
+  )
+    lazy val toBytes: Array[Byte] =
       // add UUID least significant bits for multiple actions at the same time
       // (UUID's most significant bits are actually timestamp,
       // use eventTime instead).
       Bytes.toBytes(appId) ++ Bytes.toBytes(millis) ++ Bytes.toBytes(uuidLow)
-    }
-    override def toString: String = {
+    override def toString: String =
       Base64.encodeBase64URLSafeString(toBytes)
-    }
-  }
 
-  object RowKey {
+  object RowKey
     // get RowKey from string representation
-    def apply(s: String): RowKey = {
-      try {
+    def apply(s: String): RowKey =
+      try
         apply(Base64.decodeBase64(s))
-      } catch {
+      catch
         case e: Exception =>
           throw new RowKeyException(
               s"Failed to convert String ${s} to RowKey because ${e}", e)
-      }
-    }
 
-    def apply(b: Array[Byte]): RowKey = {
-      if (b.size != 20) {
+    def apply(b: Array[Byte]): RowKey =
+      if (b.size != 20)
         val bString = b.mkString(",")
         throw new RowKeyException(
             s"Incorrect byte array size. Bytes: ${bString}.")
-      }
 
       new RowKey(
           appId = Bytes.toInt(b.slice(0, 4)),
           millis = Bytes.toLong(b.slice(4, 12)),
           uuidLow = Bytes.toLong(b.slice(12, 20))
       )
-    }
-  }
 
   class RowKeyException(msg: String, cause: Exception)
-      extends Exception(msg, cause) {
+      extends Exception(msg, cause)
     def this(msg: String) = this(msg, null)
-  }
 
-  case class PartialRowKey(val appId: Int, val millis: Option[Long] = None) {
-    val toBytes: Array[Byte] = {
+  case class PartialRowKey(val appId: Int, val millis: Option[Long] = None)
+    val toBytes: Array[Byte] =
       Bytes.toBytes(appId) ++
       (millis.map(Bytes.toBytes(_)).getOrElse(Array[Byte]()))
-    }
-  }
 
-  def resultToEvent(result: Result): Event = {
+  def resultToEvent(result: Result): Event =
     val rowKey = RowKey(result.getRow())
 
     val eBytes = Bytes.toBytes("e")
     // val e = result.getFamilyMap(eBytes)
 
-    def getStringCol(col: String): String = {
+    def getStringCol(col: String): String =
       val r = result.getValue(eBytes, colNames(col))
       require(r != null,
               s"Failed to get value for column ${col}. " +
@@ -137,20 +125,16 @@ object HB_0_8_0 {
               s"StringBinary: ${Bytes.toStringBinary(result.getRow())}.")
 
       Bytes.toString(r)
-    }
 
-    def getOptStringCol(col: String): Option[String] = {
+    def getOptStringCol(col: String): Option[String] =
       val r = result.getValue(eBytes, colNames(col))
-      if (r == null) {
+      if (r == null)
         None
-      } else {
+      else
         Some(Bytes.toString(r))
-      }
-    }
 
-    def getTimestamp(col: String): Long = {
+    def getTimestamp(col: String): Long =
       result.getColumnLatestCell(eBytes, colNames(col)).getTimestamp()
-    }
 
     val event = getStringCol("event")
     val entityType = getStringCol("entityType")
@@ -186,5 +170,3 @@ object HB_0_8_0 {
         prId = prId,
         creationTime = creationTime
     )
-  }
-}

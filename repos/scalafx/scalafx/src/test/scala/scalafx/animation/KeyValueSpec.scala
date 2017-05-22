@@ -43,7 +43,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class KeyValueSpec
     extends SimpleSFXDelegateSpec[jfxa.KeyValue, KeyValue[_, _]](
-        classOf[jfxa.KeyValue], classOf[KeyValue[_, _]]) {
+        classOf[jfxa.KeyValue], classOf[KeyValue[_, _]])
 
   //////////////////////////////
   // PRIVATE VALUES AND METHODS 
@@ -56,18 +56,16 @@ class KeyValueSpec
   private def evaluateFromSfx(property: Property[_, _],
                               endValue: Any,
                               kv: KeyValue[_, _],
-                              evaluateInterpolator: Boolean = false) {
+                              evaluateInterpolator: Boolean = false)
     kv.target should equal(property.delegate)
     kv.endValue should equal(endValue)
     if (evaluateInterpolator)
       kv.interpolator should equal(jfxa.Interpolator.EASE_BOTH)
-  }
 
   private def evaluateFromJfx[S, J](
-      property: jfxbp.Property[J], endValue: S, kv: KeyValue[S, J]) {
+      property: jfxbp.Property[J], endValue: S, kv: KeyValue[S, J])
     kv.target should equal(property.delegate)
     kv.endValue should equal(endValue)
-  }
 
   //////////////////////////////
   // OVERRIDE PROTECTED METHODS 
@@ -82,99 +80,83 @@ class KeyValueSpec
   // TESTS 
   /////////
 
-  it should "have a convenient apply construction format for integers" in {
+  it should "have a convenient apply construction format for integers" in
     val property = new IntegerProperty(null, name)
     val endValue = 50
     evaluateFromSfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for jfx integers" in {
+  it should "have a convenient apply construction format for jfx integers" in
     val property = new IntegerProperty(null, name).delegate
     val endValue = 50
     evaluateFromJfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for longs" in {
+  it should "have a convenient apply construction format for longs" in
     val property = new LongProperty(null, name)
     val endValue = 50l
     evaluateFromSfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for jfx longs" in {
+  it should "have a convenient apply construction format for jfx longs" in
     val property = new LongProperty(null, name).delegate
     val endValue = 50l
     evaluateFromJfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for floats" in {
+  it should "have a convenient apply construction format for floats" in
     val property = new FloatProperty(null, name)
     val endValue = 50f
     evaluateFromSfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for jfx floats" in {
+  it should "have a convenient apply construction format for jfx floats" in
     val property = new FloatProperty(null, name).delegate
     val endValue = 50f
     evaluateFromJfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for doubles" in {
+  it should "have a convenient apply construction format for doubles" in
     val property = new DoubleProperty(null, name)
     val endValue = 50d
     evaluateFromSfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for jfx doubles" in {
+  it should "have a convenient apply construction format for jfx doubles" in
     val property = new DoubleProperty(null, name).delegate
     val endValue = 50d
     evaluateFromJfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for booleans" in {
+  it should "have a convenient apply construction format for booleans" in
     val property = new BooleanProperty(null, name)
     val endValue = true
     evaluateFromSfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for jfx booleans" in {
+  it should "have a convenient apply construction format for jfx booleans" in
     val property = new BooleanProperty(null, name).delegate
     val endValue = true
     evaluateFromJfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for Objects" in {
+  it should "have a convenient apply construction format for Objects" in
     val property = ObjectProperty[Object](null, name)
     val endValue = new Object()
     evaluateFromSfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient apply construction format for jfx Objects" in {
+  it should "have a convenient apply construction format for jfx Objects" in
     val property = ObjectProperty[Object](null, name).delegate
     val endValue = new Object()
     evaluateFromJfx(property, endValue, KeyValue(property, endValue))
-  }
 
-  it should "have a convenient creation syntax using the -> operator" in {
+  it should "have a convenient creation syntax using the -> operator" in
     val property = new DoubleProperty(null, name)
     val endValue = 50
     evaluateFromSfx(property, endValue, property -> endValue)
-  }
 
-  it should "support interpolators" in {
+  it should "support interpolators" in
     val property = new DoubleProperty(null, name)
     val endValue = 50d
     evaluateFromSfx(property,
                     endValue,
                     KeyValue(property, endValue, jfxa.Interpolator.EASE_BOTH),
                     true)
-  }
 
-  it should "support interpolators with the ->/tween operator" in {
+  it should "support interpolators with the ->/tween operator" in
     val property = new DoubleProperty(null, name)
     val endValue = 50
     evaluateFromSfx(property,
                     endValue,
                     (property -> endValue tween Interpolator.EASE_BOTH),
                     true)
-  }
-}

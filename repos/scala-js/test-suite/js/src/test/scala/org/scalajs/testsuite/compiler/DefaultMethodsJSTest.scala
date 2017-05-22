@@ -12,25 +12,20 @@ import org.junit.Assert._
 
 import scala.scalajs.js.annotation.JavaDefaultMethod
 
-class DefaultMethodsJSTest {
+class DefaultMethodsJSTest
 
   import DefaultMethodsJSTest._
 
-  @Test def inheritSimpleDefaultMethod(): Unit = {
-    class InheritSimpleDefaultMethod extends SimpleInterfaceWithDefault {
+  @Test def inheritSimpleDefaultMethod(): Unit =
+    class InheritSimpleDefaultMethod extends SimpleInterfaceWithDefault
       def value: Int = 5
-    }
 
     val o = new InheritSimpleDefaultMethod
     assertEquals(9, o.foo(4))
-  }
-}
 
-object DefaultMethodsJSTest {
-  trait SimpleInterfaceWithDefault {
+object DefaultMethodsJSTest
+  trait SimpleInterfaceWithDefault
     def value: Int
 
     @JavaDefaultMethod
     def foo(x: Int): Int = value + x
-  }
-}

@@ -20,18 +20,15 @@ import kafka.common.KafkaException
 import org.junit.{Test, Assert}
 import org.scalatest.junit.JUnitSuite
 
-class PermissionTypeTest extends JUnitSuite {
+class PermissionTypeTest extends JUnitSuite
 
   @Test
-  def testFromString(): Unit = {
+  def testFromString(): Unit =
     val permissionType = PermissionType.fromString("Allow")
     Assert.assertEquals(Allow, permissionType)
 
-    try {
+    try
       PermissionType.fromString("badName")
       fail("Expected exception on invalid PermissionType name.")
-    } catch {
+    catch
       case e: KafkaException => // expected
-    }
-  }
-}

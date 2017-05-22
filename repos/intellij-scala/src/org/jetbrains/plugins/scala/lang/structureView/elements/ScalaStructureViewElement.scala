@@ -15,49 +15,42 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable}
   */
 abstract class ScalaStructureViewElement(
     protected val myElement: PsiElement, val inherited: Boolean)
-    extends StructureViewTreeElement {
+    extends StructureViewTreeElement
 
-  def getValue: Object = {
-    if (myElement.isValid) {
+  def getValue: Object =
+    if (myElement.isValid)
       /*
         code for right positioning for caret in case such:
         val x, y = {
           33<caret>
         }
        */
-      if (PsiTreeUtil.getParentOfType(myElement, classOf[ScValue]) != null) {
+      if (PsiTreeUtil.getParentOfType(myElement, classOf[ScValue]) != null)
         val v = PsiTreeUtil.getParentOfType(myElement, classOf[ScValue])
         if (myElement.textMatches(v.declaredElements.apply(0))) v
         else myElement
-      } else if (PsiTreeUtil.getParentOfType(myElement, classOf[ScVariable]) != null) {
+      else if (PsiTreeUtil.getParentOfType(myElement, classOf[ScVariable]) != null)
         val v = PsiTreeUtil.getParentOfType(myElement, classOf[ScVariable])
         if (myElement.textMatches(v.declaredElements.apply(0))) v
         else myElement
-      } else {
+      else
         myElement
-      }
-    } else {
+    else
       null;
-    }
-  }
 
-  def navigate(b: Boolean) {
+  def navigate(b: Boolean)
     myElement.asInstanceOf[Navigatable].navigate(b);
-  }
 
-  def canNavigate: Boolean = {
+  def canNavigate: Boolean =
     myElement.asInstanceOf[Navigatable].canNavigate
-  }
 
-  def canNavigateToSource: Boolean = {
+  def canNavigateToSource: Boolean =
     myElement.asInstanceOf[Navigatable].canNavigateToSource
-  }
 
-  override def equals(o: Any): Boolean = {
-    val clazz = o match {
+  override def equals(o: Any): Boolean =
+    val clazz = o match
       case obj: Object => obj.getClass
       case _ => return false
-    }
     if (o == null || getClass != clazz) return false
     val that = o.asInstanceOf[ScalaStructureViewElement]
     if (inherited != that.inherited) return false
@@ -65,12 +58,9 @@ abstract class ScalaStructureViewElement(
     val value = getValue
     if (value == null) that.getValue == null
     else value == that.getValue
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     val value = getValue
     val is = if (inherited) 1 else 0
     if (value == null) 0
     else value.hashCode * 2 + is
-  }
-}

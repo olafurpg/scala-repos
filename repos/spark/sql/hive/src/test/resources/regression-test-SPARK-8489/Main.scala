@@ -28,8 +28,8 @@ import org.apache.spark.sql.hive.HiveContext
   *
   * This is used in org.apache.spark.sql.hive.HiveSparkSubmitSuite.
   */
-object Main {
-  def main(args: Array[String]) {
+object Main
+  def main(args: Array[String])
     // scalastyle:off println
     println("Running regression test for SPARK-8489.")
     val sc = new SparkContext("local", "testing")
@@ -41,5 +41,3 @@ object Main {
     println("Regression test for SPARK-8489 success!")
     // scalastyle:on println
     sc.stop()
-  }
-}

@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeBoundsOwner
 import org.jetbrains.plugins.scala.lang.psi.types.result.{TypeResult, TypingContext}
 import org.jetbrains.plugins.scala.lang.psi.types.{Any, Nothing, ScType}
 
-trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
+trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner
   //todo[CYCLIC]
   def lowerBound: TypeResult[ScType] =
     wrapWith(lowerTypeElement, Nothing) flatMap
@@ -26,52 +26,42 @@ trait ScTypeBoundsOwnerImpl extends ScTypeBoundsOwner {
   override def contextBound: Seq[ScType] =
     contextBoundTypeElement.flatMap(_.getType(TypingContext.empty).toOption)
 
-  override def upperTypeElement: Option[ScTypeElement] = {
+  override def upperTypeElement: Option[ScTypeElement] =
     val tUpper = findLastChildByType[PsiElement](ScalaTokenTypes.tUPPER_BOUND)
-    if (tUpper != null) {
-      ScalaPsiUtil.getNextSiblingOfType(tUpper, classOf[ScTypeElement]) match {
+    if (tUpper != null)
+      ScalaPsiUtil.getNextSiblingOfType(tUpper, classOf[ScTypeElement]) match
         case null => None
         case te => Some(te)
-      }
-    } else None
-  }
+    else None
 
-  override def lowerTypeElement: Option[ScTypeElement] = {
+  override def lowerTypeElement: Option[ScTypeElement] =
     val tLower = findLastChildByType[PsiElement](ScalaTokenTypes.tLOWER_BOUND)
-    if (tLower != null) {
-      ScalaPsiUtil.getNextSiblingOfType(tLower, classOf[ScTypeElement]) match {
+    if (tLower != null)
+      ScalaPsiUtil.getNextSiblingOfType(tLower, classOf[ScTypeElement]) match
         case null => None
         case te => Some(te)
-      }
-    } else None
-  }
+    else None
 
-  override def viewTypeElement: Seq[ScTypeElement] = {
-    for {
+  override def viewTypeElement: Seq[ScTypeElement] =
+    for
       v <- findChildrenByType(ScalaTokenTypes.tVIEW)
       e = ScalaPsiUtil.getNextSiblingOfType(v, classOf[ScTypeElement])
       t <- Option(e)
-    } yield t
-  }
+    yield t
 
-  override def contextBoundTypeElement: Seq[ScTypeElement] = {
-    for {
+  override def contextBoundTypeElement: Seq[ScTypeElement] =
+    for
       v <- findChildrenByType(ScalaTokenTypes.tCOLON)
       t <- Option(ScalaPsiUtil.getNextSiblingOfType(v, classOf[ScTypeElement]))
-    } yield t
-  }
+    yield t
 
-  override def removeImplicitBounds() {
+  override def removeImplicitBounds()
     var node = getNode.getFirstChildNode
     while (node != null &&
-    !Set(ScalaTokenTypes.tCOLON, ScalaTokenTypes.tVIEW)(node.getElementType)) {
+    !Set(ScalaTokenTypes.tCOLON, ScalaTokenTypes.tVIEW)(node.getElementType))
       node = node.getTreeNext
-    }
     if (node == null) return
-    node.getPsi.getPrevSibling match {
+    node.getPsi.getPrevSibling match
       case ws: PsiWhiteSpace => ws.delete()
       case _ =>
-    }
     node.getTreeParent.removeRange(node, null)
-  }
-}

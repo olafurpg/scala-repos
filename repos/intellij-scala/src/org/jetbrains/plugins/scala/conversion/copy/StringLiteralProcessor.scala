@@ -11,27 +11,25 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 /**
   * Pavel.Fatin, 21.07.2010
   */
-class StringLiteralProcessor extends CopyPastePreProcessor {
+class StringLiteralProcessor extends CopyPastePreProcessor
   def preprocessOnCopy(file: PsiFile,
                        startOffsets: Array[Int],
                        endOffsets: Array[Int],
-                       text: String) = {
-    val literal = startOffsets.zip(endOffsets).forall {
+                       text: String) =
+    val literal = startOffsets.zip(endOffsets).forall
       case (a, b) =>
         val e = file.findElementAt(a);
         e.isInstanceOf[PsiElement] &&
         e.getLanguage == ScalaFileType.SCALA_LANGUAGE && e.getNode != null &&
         e.getNode.getElementType == ScalaTokenTypes.tSTRING &&
         a > e.getTextRange.getStartOffset && b < e.getTextRange.getEndOffset
-    }
     if (literal) StringUtil.unescapeStringCharacters(text) else null
-  }
 
   def preprocessOnPaste(project: Project,
                         file: PsiFile,
                         editor: Editor,
                         text: String,
-                        rawText: RawText): String = {
+                        rawText: RawText): String =
     PsiDocumentManager.getInstance(project).commitDocument(editor.getDocument)
 
     val offset = editor.getSelectionModel.getSelectionStart
@@ -39,23 +37,19 @@ class StringLiteralProcessor extends CopyPastePreProcessor {
 
     if (e.isInstanceOf[PsiElement] &&
         e.getLanguage == ScalaFileType.SCALA_LANGUAGE &&
-        offset > e.getTextOffset) {
+        offset > e.getTextOffset)
       val elementType =
         if (e.getNode == null) null else e.getNode.getElementType
       if ((elementType == ScalaTokenTypes.tSTRING ||
               elementType == ScalaTokenTypes.tCHAR) && rawText != null &&
-          rawText.rawText != null) {
+          rawText.rawText != null)
         rawText.rawText
-      } else if (elementType == ScalaTokenTypes.tSTRING) {
+      else if (elementType == ScalaTokenTypes.tSTRING)
         LineTokenizer
           .tokenize(text.toCharArray, false, true)
           .map(line => StringUtil.escapeStringCharacters(line))
           .mkString("\\n")
-      } else {
+      else
         text
-      }
-    } else {
+    else
       text
-    }
-  }
-}

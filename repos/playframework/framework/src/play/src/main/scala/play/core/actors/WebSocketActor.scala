@@ -11,15 +11,14 @@ import scala.reflect.ClassTag
 /**
   * Integration between Play WebSockets and actors
   */
-private[play] object WebSocketActor {
+private[play] object WebSocketActor
 
-  object WebSocketActorSupervisor {
+  object WebSocketActorSupervisor
     def props[In, Out : ClassTag](enumerator: Enumerator[In],
                                   iteratee: Iteratee[Out, Unit],
                                   createHandler: ActorRef => Props) =
       Props(new WebSocketActorSupervisor[In, Out](
               enumerator, iteratee, createHandler))
-  }
 
   /**
     * The actor that supervises and handles all messages to/from the WebSocket actor.
@@ -28,7 +27,7 @@ private[play] object WebSocketActor {
       enumerator: Enumerator[In],
       iteratee: Iteratee[Out, Unit],
       createHandler: ActorRef => Props)(implicit messageType: ClassTag[Out])
-      extends Actor {
+      extends Actor
 
     import context.dispatcher
 
@@ -51,25 +50,23 @@ private[play] object WebSocketActor {
       context.watch(context.actorOf(createHandler(self), "handler"))
 
     // Use a broadcast enumerator to imperatively push messages into the WebSocket
-    val channel = {
+    val channel =
       val (enum, chan) = Concurrent.broadcast[Out]
       // Ensure we feed EOF into the iteratee when done, to ensure that the WebSocket gets closed
       enum |>>> iteratee
       chan
-    }
 
     // Use a foreach iteratee to consume the WebSocket and feed it into the Actor
     // It's very important that we use the trampoline execution context here, otherwise it's possible that
-    val consumer = Iteratee.foreach[In] { msg =>
+    val consumer = Iteratee.foreach[In]  msg =>
       webSocketActor ! msg
-    }(play.api.libs.iteratee.Execution.trampoline)
+    (play.api.libs.iteratee.Execution.trampoline)
 
-    (enumerator |>> consumer).onComplete { _ =>
+    (enumerator |>> consumer).onComplete  _ =>
       // When the WebSocket is complete, either due to an error or not, shutdown
       if (!shutdown) webSocketActor ! PoisonPill
-    }
 
-    def receive = {
+    def receive =
       case _: Terminated =>
         shutdown = true
         // Child has terminated, close the WebSocket.
@@ -77,21 +74,17 @@ private[play] object WebSocketActor {
         context.stop(self)
       // A message of the type that we're handling has been received
       case messageType(a) => channel.push(a)
-    }
 
-    override def postStop() = {
+    override def postStop() =
       shutdown = true
       // In the normal shutdown case, this will already have been called, that's ok, channel.end() is a no-op in that
       // case.  This does however handle the case where this supervisor crashes, or when it's stopped externally.
       channel.end()
-    }
 
-    override def supervisorStrategy = OneForOneStrategy() {
+    override def supervisorStrategy = OneForOneStrategy()
       case _ => SupervisorStrategy.Stop
-    }
-  }
 
-  object WebSocketsActor {
+  object WebSocketsActor
 
     val props = Props(new WebSocketsActor)
 
@@ -110,32 +103,26 @@ private[play] object WebSocketActor {
                                 iteratee: Iteratee[Out, Unit],
                                 createHandler: ActorRef => Props)(
         implicit val messageType: ClassTag[Out])
-  }
 
   /**
     * The actor responsible for creating all web sockets
     */
-  private class WebSocketsActor extends Actor {
+  private class WebSocketsActor extends Actor
     import WebSocketsActor._
 
-    def receive = {
+    def receive =
       case c @ Connect(requestId, enumerator, iteratee, createHandler) =>
         implicit val mt = c.messageType
         context.actorOf(WebSocketActorSupervisor.props(
                             enumerator, iteratee, createHandler),
                         requestId.toString)
-    }
-  }
 
   /**
     * The extension for managing WebSockets
     */
-  object WebSocketsExtension extends ExtensionId[WebSocketsExtension] {
-    def createExtension(system: ExtendedActorSystem) = {
+  object WebSocketsExtension extends ExtensionId[WebSocketsExtension]
+    def createExtension(system: ExtendedActorSystem) =
       new WebSocketsExtension(
           system.systemActorOf(WebSocketsActor.props, "websockets"))
-    }
-  }
 
   class WebSocketsExtension(val actor: ActorRef) extends Extension
-}

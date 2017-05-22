@@ -1,4 +1,4 @@
-class a {
+class a
 
   /**
     *                                [[java.util.Hash<testref>Map]]
@@ -6,4 +6,3 @@ class a {
     *                             [[java.lang.<testref>NullPointerException]]
     */
   def f() {}
-}

@@ -36,24 +36,20 @@ private[spark] class WholeTextFileRDD(
     conf: Configuration,
     minPartitions: Int)
     extends NewHadoopRDD[Text, Text](
-        sc, inputFormatClass, keyClass, valueClass, conf) {
+        sc, inputFormatClass, keyClass, valueClass, conf)
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     val inputFormat = inputFormatClass.newInstance
     val conf = getConf
-    inputFormat match {
+    inputFormat match
       case configurable: Configurable =>
         configurable.setConf(conf)
       case _ =>
-    }
     val jobContext = new JobContextImpl(conf, jobId)
     inputFormat.setMinPartitions(jobContext, minPartitions)
     val rawSplits = inputFormat.getSplits(jobContext).toArray
     val result = new Array[Partition](rawSplits.size)
-    for (i <- 0 until rawSplits.size) {
+    for (i <- 0 until rawSplits.size)
       result(i) = new NewHadoopPartition(
           id, i, rawSplits(i).asInstanceOf[InputSplit with Writable])
-    }
     result
-  }
-}

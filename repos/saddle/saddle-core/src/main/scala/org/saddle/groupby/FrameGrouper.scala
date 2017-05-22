@@ -21,16 +21,15 @@ import org.saddle._
   * Helper class to do combine or transform after a groupBy
   */
 class FrameGrouper[Z : ST : ORD, X : ST : ORD, Y : ST : ORD, T : ST](
-    ix: Index[Z], frame: Frame[X, Y, T], sorted: Boolean = true) {
+    ix: Index[Z], frame: Frame[X, Y, T], sorted: Boolean = true)
 
-  private lazy val uniq: Array[Z] = {
+  private lazy val uniq: Array[Z] =
     val arr = ix.uniques.toArray
     if (sorted && !ix.isMonotonic)
       array.take(arr,
                  array.argsort(arr),
                  sys.error("Logic error in sorting group index"))
     else arr
-  }
 
   def keys: Array[Z] = uniq
 
@@ -53,12 +52,10 @@ class FrameGrouper[Z : ST : ORD, X : ST : ORD, Y : ST : ORD, T : ST](
   // less powerful transform, ignores group key
   def transform[U : ST](fn: Vec[T] => Vec[U]): Frame[X, Y, U] =
     transform((k, v) => fn(v))
-}
 
-object FrameGrouper {
+object FrameGrouper
   def apply[Z : ST : ORD, Y : ST : ORD, T : ST](frame: Frame[Z, Y, T]) =
     new FrameGrouper(frame.rowIx, frame)
 
   def apply[Z : ST : ORD, X : ST : ORD, Y : ST : ORD, T : ST](
       ix: Index[Z], frame: Frame[X, Y, T]) = new FrameGrouper(ix, frame)
-}

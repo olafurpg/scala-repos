@@ -7,7 +7,7 @@ import com.twitter.finagle.Stack
   *
   * @see [[SessionParams]]
   */
-trait WithSession[A <: Stack.Parameterized[A]] {
+trait WithSession[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -22,4 +22,3 @@ trait WithSession[A <: Stack.Parameterized[A]] {
     * timeouts on it.
     */
   val withSession: SessionParams[A] = new SessionParams(self)
-}

@@ -31,13 +31,11 @@ import javafx.beans.{binding => jfxbb}
 import scala.language.implicitConversions
 import scalafx.beans.value.ObservableValue
 
-object ObjectBinding {
+object ObjectBinding
   implicit def sfxObjectBinding2jfx[T](
       ob: ObjectBinding[T]): jfxbb.ObjectBinding[T] =
     if (ob != null) ob.delegate else null
-}
 
 class ObjectBinding[T](override val delegate: jfxbb.ObjectBinding[T])
-    extends ObjectExpression[T](delegate) with ObservableValue[T, T] {
+    extends ObjectExpression[T](delegate) with ObservableValue[T, T]
   def value = delegate.get
-}

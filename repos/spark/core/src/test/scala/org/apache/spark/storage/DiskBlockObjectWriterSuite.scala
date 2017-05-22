@@ -26,24 +26,21 @@ import org.apache.spark.serializer.JavaSerializer
 import org.apache.spark.util.Utils
 
 class DiskBlockObjectWriterSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite with BeforeAndAfterEach
 
   var tempDir: File = _
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
     tempDir = Utils.createTempDir()
-  }
 
-  override def afterEach(): Unit = {
-    try {
+  override def afterEach(): Unit =
+    try
       Utils.deleteRecursively(tempDir)
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
-  test("verify write metrics") {
+  test("verify write metrics")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -60,17 +57,15 @@ class DiskBlockObjectWriterSuite
     // Metrics don't update on every write
     assert(writeMetrics.bytesWritten == 0)
     // After 32 writes, metrics should update
-    for (i <- 0 until 32) {
+    for (i <- 0 until 32)
       writer.flush()
       writer.write(Long.box(i), Long.box(i))
-    }
     assert(writeMetrics.bytesWritten > 0)
     assert(writeMetrics.recordsWritten === 33)
     writer.commitAndClose()
     assert(file.length() == writeMetrics.bytesWritten)
-  }
 
-  test("verify write metrics on revert") {
+  test("verify write metrics on revert")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -87,18 +82,16 @@ class DiskBlockObjectWriterSuite
     // Metrics don't update on every write
     assert(writeMetrics.bytesWritten == 0)
     // After 32 writes, metrics should update
-    for (i <- 0 until 32) {
+    for (i <- 0 until 32)
       writer.flush()
       writer.write(Long.box(i), Long.box(i))
-    }
     assert(writeMetrics.bytesWritten > 0)
     assert(writeMetrics.recordsWritten === 33)
     writer.revertPartialWritesAndClose()
     assert(writeMetrics.bytesWritten == 0)
     assert(writeMetrics.recordsWritten == 0)
-  }
 
-  test("Reopening a closed block writer") {
+  test("Reopening a closed block writer")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -111,13 +104,11 @@ class DiskBlockObjectWriterSuite
 
     writer.open()
     writer.close()
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       writer.open()
-    }
-  }
 
   test(
-      "calling revertPartialWritesAndClose() on a closed block writer should have no effect") {
+      "calling revertPartialWritesAndClose() on a closed block writer should have no effect")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -127,18 +118,16 @@ class DiskBlockObjectWriterSuite
         os => os,
         true,
         writeMetrics)
-    for (i <- 1 to 1000) {
+    for (i <- 1 to 1000)
       writer.write(i, i)
-    }
     writer.commitAndClose()
     val bytesWritten = writeMetrics.bytesWritten
     assert(writeMetrics.recordsWritten === 1000)
     writer.revertPartialWritesAndClose()
     assert(writeMetrics.recordsWritten === 1000)
     assert(writeMetrics.bytesWritten === bytesWritten)
-  }
 
-  test("commitAndClose() should be idempotent") {
+  test("commitAndClose() should be idempotent")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -148,9 +137,8 @@ class DiskBlockObjectWriterSuite
         os => os,
         true,
         writeMetrics)
-    for (i <- 1 to 1000) {
+    for (i <- 1 to 1000)
       writer.write(i, i)
-    }
     writer.commitAndClose()
     val bytesWritten = writeMetrics.bytesWritten
     val writeTime = writeMetrics.writeTime
@@ -159,9 +147,8 @@ class DiskBlockObjectWriterSuite
     assert(writeMetrics.recordsWritten === 1000)
     assert(writeMetrics.bytesWritten === bytesWritten)
     assert(writeMetrics.writeTime === writeTime)
-  }
 
-  test("revertPartialWritesAndClose() should be idempotent") {
+  test("revertPartialWritesAndClose() should be idempotent")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -171,9 +158,8 @@ class DiskBlockObjectWriterSuite
         os => os,
         true,
         writeMetrics)
-    for (i <- 1 to 1000) {
+    for (i <- 1 to 1000)
       writer.write(i, i)
-    }
     writer.revertPartialWritesAndClose()
     val bytesWritten = writeMetrics.bytesWritten
     val writeTime = writeMetrics.writeTime
@@ -182,10 +168,9 @@ class DiskBlockObjectWriterSuite
     assert(writeMetrics.recordsWritten === 0)
     assert(writeMetrics.bytesWritten === bytesWritten)
     assert(writeMetrics.writeTime === writeTime)
-  }
 
   test(
-      "fileSegment() can only be called after commitAndClose() has been called") {
+      "fileSegment() can only be called after commitAndClose() has been called")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -195,16 +180,13 @@ class DiskBlockObjectWriterSuite
         os => os,
         true,
         writeMetrics)
-    for (i <- 1 to 1000) {
+    for (i <- 1 to 1000)
       writer.write(i, i)
-    }
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       writer.fileSegment()
-    }
     writer.close()
-  }
 
-  test("commitAndClose() without ever opening or writing") {
+  test("commitAndClose() without ever opening or writing")
     val file = new File(tempDir, "somefile")
     val writeMetrics = new ShuffleWriteMetrics()
     val writer = new DiskBlockObjectWriter(
@@ -216,5 +198,3 @@ class DiskBlockObjectWriterSuite
         writeMetrics)
     writer.commitAndClose()
     assert(writer.fileSegment().length === 0)
-  }
-}

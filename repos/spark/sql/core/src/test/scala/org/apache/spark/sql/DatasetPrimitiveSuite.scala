@@ -23,83 +23,70 @@ import org.apache.spark.sql.test.SharedSQLContext
 
 case class IntClass(value: Int)
 
-package object packageobject {
+package object packageobject
   case class PackageClass(value: Int)
-}
 
-class DatasetPrimitiveSuite extends QueryTest with SharedSQLContext {
+class DatasetPrimitiveSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("toDS") {
+  test("toDS")
     val data = Seq(1, 2, 3, 4, 5, 6)
     checkDataset(data.toDS(), data: _*)
-  }
 
-  test("as case class / collect") {
+  test("as case class / collect")
     val ds = Seq(1, 2, 3).toDS().as[IntClass]
     checkDataset(ds, IntClass(1), IntClass(2), IntClass(3))
 
     assert(ds.collect().head == IntClass(1))
-  }
 
-  test("map") {
+  test("map")
     val ds = Seq(1, 2, 3).toDS()
     checkDataset(ds.map(_ + 1), 2, 3, 4)
-  }
 
-  test("filter") {
+  test("filter")
     val ds = Seq(1, 2, 3, 4).toDS()
     checkDataset(ds.filter(_ % 2 == 0), 2, 4)
-  }
 
-  test("foreach") {
+  test("foreach")
     val ds = Seq(1, 2, 3).toDS()
     val acc = sparkContext.accumulator(0)
     ds.foreach(acc += _)
     assert(acc.value == 6)
-  }
 
-  test("foreachPartition") {
+  test("foreachPartition")
     val ds = Seq(1, 2, 3).toDS()
     val acc = sparkContext.accumulator(0)
     ds.foreachPartition(_.foreach(acc +=))
     assert(acc.value == 6)
-  }
 
-  test("reduce") {
+  test("reduce")
     val ds = Seq(1, 2, 3).toDS()
     assert(ds.reduce(_ + _) == 6)
-  }
 
-  test("groupBy function, keys") {
+  test("groupBy function, keys")
     val ds = Seq(1, 2, 3, 4, 5).toDS()
     val grouped = ds.groupByKey(_ % 2)
     checkDataset(grouped.keys, 0, 1)
-  }
 
-  test("groupBy function, map") {
+  test("groupBy function, map")
     val ds = Seq(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11).toDS()
     val grouped = ds.groupByKey(_ % 2)
-    val agged = grouped.mapGroups {
+    val agged = grouped.mapGroups
       case (g, iter) =>
         val name = if (g == 0) "even" else "odd"
         (name, iter.size)
-    }
 
     checkDataset(agged, ("even", 5), ("odd", 6))
-  }
 
-  test("groupBy function, flatMap") {
+  test("groupBy function, flatMap")
     val ds = Seq("a", "b", "c", "xyz", "hello").toDS()
     val grouped = ds.groupByKey(_.length)
-    val agged = grouped.flatMapGroups {
+    val agged = grouped.flatMapGroups
       case (g, iter) => Iterator(g.toString, iter.mkString)
-    }
 
     checkDataset(agged, "1", "abc", "3", "xyz", "5", "hello")
-  }
 
-  test("Arrays and Lists") {
+  test("Arrays and Lists")
     checkDataset(Seq(Seq(1)).toDS(), Seq(1))
     checkDataset(Seq(Seq(1.toLong)).toDS(), Seq(1.toLong))
     checkDataset(Seq(Seq(1.toDouble)).toDS(), Seq(1.toDouble))
@@ -119,10 +106,7 @@ class DatasetPrimitiveSuite extends QueryTest with SharedSQLContext {
     checkDataset(Seq(Array(true)).toDS(), Array(true))
     checkDataset(Seq(Array("test")).toDS(), Array("test"))
     checkDataset(Seq(Array(Tuple1(1))).toDS(), Array(Tuple1(1)))
-  }
 
-  test("package objects") {
+  test("package objects")
     import packageobject._
     checkDataset(Seq(PackageClass(1)).toDS(), PackageClass(1))
-  }
-}

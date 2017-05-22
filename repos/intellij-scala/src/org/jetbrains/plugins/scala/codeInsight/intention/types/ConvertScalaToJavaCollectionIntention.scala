@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.ScalaBundle
   *         23/07/13
   */
 class ConvertScalaToJavaCollectionIntention
-    extends BaseJavaConvertersIntention("asJava") {
+    extends BaseJavaConvertersIntention("asJava")
 
   val targetCollections = Set(
       "scala.collection.Seq",
@@ -26,9 +26,7 @@ class ConvertScalaToJavaCollectionIntention
     ScalaBundle.message("convert.scala.to.java.collection.hint")
 
   def getFamilyName = ConvertScalaToJavaCollectionIntention.getFamilyName
-}
 
-object ConvertScalaToJavaCollectionIntention {
+object ConvertScalaToJavaCollectionIntention
   def getFamilyName =
     ScalaBundle.message("convert.scala.to.java.collection.name")
-}

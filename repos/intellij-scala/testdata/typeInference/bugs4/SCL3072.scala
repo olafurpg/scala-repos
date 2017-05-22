@@ -1,4 +1,4 @@
-object K {
+object K
   def isNotBlank(s: String): Boolean = true
   val data: Map[String, Any] = Map.empty
   /*start*/
@@ -7,5 +7,4 @@ object K {
     .flatten
     .map(_.asInstanceOf[String])
     .filter(isNotBlank(_)) /*end*/
-}
 //List[String]

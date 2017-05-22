@@ -17,7 +17,7 @@ object Environment
     with AiHelper with GameHelper with UserHelper with ForumHelper
     with I18nHelper with BookmarkHelper with NotificationHelper
     with SecurityHelper with TeamHelper with AnalysisHelper
-    with TournamentHelper with SimulHelper {
+    with TournamentHelper with SimulHelper
 
   implicit val LilaHtmlMonoid =
     scalaz.Monoid.instance[Html]((a, b) => Html(a.body + b.body), Html(""))
@@ -33,9 +33,8 @@ object Environment
 
   def explorerEndpoint = apiEnv.ExplorerEndpoint
 
-  def globalCasualOnlyMessage = Env.setup.CasualOnly option {
+  def globalCasualOnlyMessage = Env.setup.CasualOnly option
     "Due to temporary maintenance on the servers, only casual games are available."
-  }
 
   def reportNbUnprocessed: Int =
     lila.report.Env.current.api.nbUnprocessed.await
@@ -43,21 +42,16 @@ object Environment
   val openingBrace = "{"
   val closingBrace = "}"
 
-  object icon {
+  object icon
     val dev = Html("&#xe000;")
     val donator = Html("&#xe001;")
     val mod = Html("&#xe002;")
-  }
 
-  val nonPuzzlePerfTypeNameIcons = {
+  val nonPuzzlePerfTypeNameIcons =
     import play.api.libs.json.Json
-    Html {
-      Json stringify {
+    Html
+      Json stringify
         Json toJson lila.rating.PerfType.nonPuzzleIconByName
-      }
-    }
-  }
 
   def NotForKids[Html](f: => Html)(implicit ctx: lila.api.Context) =
     if (ctx.kid) Html("") else f
-}

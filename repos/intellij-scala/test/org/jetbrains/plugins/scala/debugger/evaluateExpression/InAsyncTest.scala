@@ -7,13 +7,12 @@ import org.jetbrains.plugins.scala.debugger.{ScalaDebuggerTestCase, ScalaVersion
   */
 class InAsyncTest extends InAsyncTestBase with ScalaVersion_2_11
 
-abstract class InAsyncTestBase extends ScalaDebuggerTestCase {
+abstract class InAsyncTestBase extends ScalaDebuggerTestCase
 
-  override protected def addOtherLibraries(): Unit = {
+  override protected def addOtherLibraries(): Unit =
     addIvyCacheLibrary("scala-async",
                        "/org.scala-lang.modules/scala-async_2.11/bundles/",
                        "scala-async_2.11-0.9.5.jar")
-  }
 
   addFileWithBreakpoints("InAsync.scala",
                          s"""
@@ -52,8 +51,8 @@ abstract class InAsyncTestBase extends ScalaDebuggerTestCase {
       |}
     """.stripMargin)
 
-  def testInAsync(): Unit = {
-    runDebugger() {
+  def testInAsync(): Unit =
+    runDebugger()
       waitForBreakpoint()
       evalEquals("q", "q")
       evalEquals("f1.value.get.get", "false")
@@ -61,28 +60,22 @@ abstract class InAsyncTestBase extends ScalaDebuggerTestCase {
       evalEquals("t", "0")
       evalEquals("inc(1)", "2")
       evalEquals("f2.value.get.get", "42")
-      atNextBreakpoint {
+      atNextBreakpoint
         evalEquals("q", "q")
         evalEquals("x", "1")
         evalEquals("t", "0")
         evalEquals("z", "1")
         evalEquals("inc(11)", "12")
-      }
-      atNextBreakpoint {
+      atNextBreakpoint
         evalEquals("q", "q")
         evalEquals("x", "1")
         evalEquals("t", "1")
         evalEquals("r", "r")
         evalEquals("inc(12)", "13")
         evalEquals("inner()", "rq")
-      }
-      atNextBreakpoint {
+      atNextBreakpoint
         evalEquals("q", "q")
         evalEquals("x", "1")
         evalEquals("t", "1")
         evalEquals("inc(13)", "14")
         evalEquals("inner()", "rq")
-      }
-    }
-  }
-}

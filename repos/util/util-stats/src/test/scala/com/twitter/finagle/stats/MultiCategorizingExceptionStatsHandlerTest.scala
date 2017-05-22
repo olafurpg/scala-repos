@@ -5,8 +5,8 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
-  test("uses label, flags, source, exception chain and rolls up") {
+class MultiCategorizingExceptionStatsHandlerTest extends FunSuite
+  test("uses label, flags, source, exception chain and rolls up")
     val receiver = new InMemoryStatsReceiver
 
     val handler = new MultiCategorizingExceptionStatsHandler(
@@ -68,9 +68,8 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             "sourcedfailures/service/java.lang.RuntimeException",
             "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
         ))
-  }
 
-  test("skips flags when it's empty") {
+  test("skips flags when it's empty")
     val receiver = new InMemoryStatsReceiver
 
     val handler =
@@ -112,9 +111,8 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             "sourcedfailures/service/java.lang.RuntimeException",
             "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
         ))
-  }
 
-  test("skips unknown source and defaults to failures") {
+  test("skips unknown source and defaults to failures")
     val receiver = new InMemoryStatsReceiver
 
     val handler = new MultiCategorizingExceptionStatsHandler
@@ -132,9 +130,8 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             "failures/java.lang.RuntimeException",
             "failures/java.lang.RuntimeException/java.lang.Exception"
         ))
-  }
 
-  test("support no roll up") {
+  test("support no roll up")
     val receiver = new InMemoryStatsReceiver
 
     val handler = new MultiCategorizingExceptionStatsHandler(
@@ -181,5 +178,3 @@ class MultiCategorizingExceptionStatsHandlerTest extends FunSuite {
             "sourcedfailures/service",
             "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
         ))
-  }
-}

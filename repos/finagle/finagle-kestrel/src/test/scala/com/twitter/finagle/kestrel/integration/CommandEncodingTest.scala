@@ -10,14 +10,14 @@ import com.twitter.io.Buf
 import com.twitter.util.{Duration, Time}
 
 @RunWith(classOf[JUnitRunner])
-class CommandEncodingTest extends FunSuite {
+class CommandEncodingTest extends FunSuite
 
   private def testGetCommandEncodeDecode(
       name: String,
       timeout: Option[Duration] = None,
       mkCommand: (Buf, Option[Duration]) => GetCommand,
       extractCommand: GetCommand => Option[(Buf, Option[Duration])]
-  ) {
+  )
     val decoder = new DecodingToCommand
     val encoder = new CommandToEncoding
 
@@ -31,13 +31,12 @@ class CommandEncodingTest extends FunSuite {
 
     assert(queueName == name)
     assert(timeout.map { _.inSeconds } == expiry.map { _.inSeconds })
-  }
 
   private def testCommandEncodeDecode(
       name: String,
       mkCommand: Buf => Command,
       extractCommand: Command => Option[Buf]
-  ) {
+  )
     val decoder = new DecodingToCommand
     val encoder = new CommandToEncoding
 
@@ -49,9 +48,8 @@ class CommandEncodingTest extends FunSuite {
     val Some(Buf.Utf8(queueName)) = extractCommand(decoded)
 
     assert(queueName == name)
-  }
 
-  test("SET can be decoded") {
+  test("SET can be decoded")
     val decoder = new DecodingToCommand
     val encoder = new CommandToEncoding
 
@@ -72,165 +70,135 @@ class CommandEncodingTest extends FunSuite {
     assert(queueName == qName)
     assert(dataOut == data)
     assert(expiry.inSeconds == time.inSeconds)
-  }
 
-  test("DELETE can be decoded") {
+  test("DELETE can be decoded")
     testCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = Delete.apply,
-        extractCommand = {
+        extractCommand =
           case d: Delete => Delete.unapply(d)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("FLUSH can be decoded") {
+  test("FLUSH can be decoded")
     testCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = Flush.apply,
-        extractCommand = {
+        extractCommand =
           case f: Flush => Flush.unapply(f)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("GET without timeout can be decoded") {
+  test("GET without timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = Get.apply,
-        extractCommand = {
+        extractCommand =
           case c: Get => Get.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("GET with timeout can be decoded") {
+  test("GET with timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         timeout = Some(Duration.fromSeconds(2)),
         mkCommand = Get.apply,
-        extractCommand = {
+        extractCommand =
           case c: Get => Get.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("PEEK without timeout can be decoded") {
+  test("PEEK without timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = Peek.apply,
-        extractCommand = {
+        extractCommand =
           case c: Peek => Peek.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("PEEK with timeout can be decoded") {
+  test("PEEK with timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         timeout = Some(Duration.fromSeconds(2)),
         mkCommand = Peek.apply,
-        extractCommand = {
+        extractCommand =
           case c: Peek => Peek.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("ABORT without timeout can be decoded") {
+  test("ABORT without timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = Get.apply,
-        extractCommand = {
+        extractCommand =
           case c: Get => Get.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("ABORT with timeout can be decoded") {
+  test("ABORT with timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         timeout = Some(Duration.fromSeconds(2)),
         mkCommand = Abort.apply,
-        extractCommand = {
+        extractCommand =
           case c: Abort => Abort.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("CLOSE without timeout can be decoded") {
+  test("CLOSE without timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = Close.apply,
-        extractCommand = {
+        extractCommand =
           case c: Close => Close.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("CLOSE with timeout can be decoded") {
+  test("CLOSE with timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         timeout = Some(Duration.fromSeconds(2)),
         mkCommand = Close.apply,
-        extractCommand = {
+        extractCommand =
           case c: Close => Close.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("OPEN with timeout can be decoded") {
+  test("OPEN with timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         timeout = Some(Duration.fromSeconds(2)),
         mkCommand = Open.apply,
-        extractCommand = {
+        extractCommand =
           case c: Open => Open.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("OPEN without timeout can be decoded") {
+  test("OPEN without timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = Open.apply,
-        extractCommand = {
+        extractCommand =
           case c: Open => Open.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("CLOSE AND OPEN without timeout can be decoded") {
+  test("CLOSE AND OPEN without timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         mkCommand = CloseAndOpen.apply,
-        extractCommand = {
+        extractCommand =
           case c: CloseAndOpen => CloseAndOpen.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
 
-  test("CLOSE AND OPEN with timeout can be decoded") {
+  test("CLOSE AND OPEN with timeout can be decoded")
     testGetCommandEncodeDecode(
         name = "MyQueue",
         timeout = Some(Duration.fromSeconds(2)),
         mkCommand = CloseAndOpen.apply,
-        extractCommand = {
+        extractCommand =
           case c: CloseAndOpen => CloseAndOpen.unapply(c)
           case x => throw new MatchError(x)
-        }
     )
-  }
-}

@@ -10,12 +10,10 @@ package org.scalajs.testsuite.javalib.lang
 import org.junit.Assert._
 import org.junit.Test
 
-class StackTraceElementTest {
+class StackTraceElementTest
 
   @Test
   def should_leave_toString_unmodified_if_columnNumber_is_not_specified(
-      ): Unit = {
+      ): Unit =
     val st = new StackTraceElement("MyClass", "myMethod", "myFile.scala", 1)
     assertEquals("MyClass.myMethod(myFile.scala:1)", st.toString)
-  }
-}

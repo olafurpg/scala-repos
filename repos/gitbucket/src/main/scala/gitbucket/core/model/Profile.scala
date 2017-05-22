@@ -1,6 +1,6 @@
 package gitbucket.core.model
 
-trait Profile {
+trait Profile
   val profile: slick.driver.JdbcProfile
   import profile.simple._
 
@@ -16,20 +16,17 @@ trait Profile {
   /**
     * Extends Column to add conditional condition
     */
-  implicit class RichColumn(c1: Column[Boolean]) {
+  implicit class RichColumn(c1: Column[Boolean])
     def &&(c2: => Column[Boolean], guard: => Boolean): Column[Boolean] =
       if (guard) c1 && c2 else c1
-  }
 
   /**
     * Returns system date.
     */
   def currentDate = new java.util.Date()
-}
 
-trait ProfileProvider { self: Profile =>
+trait ProfileProvider  self: Profile =>
   val profile = slick.driver.H2Driver
-}
 
 trait CoreProfile
     extends ProfileProvider with Profile with AccessTokenComponent

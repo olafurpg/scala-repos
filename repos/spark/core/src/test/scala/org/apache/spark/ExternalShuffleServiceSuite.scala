@@ -30,11 +30,11 @@ import org.apache.spark.network.shuffle.{ExternalShuffleBlockHandler, ExternalSh
   * set up in [[ExternalShuffleBlockHandler]], such as changing the format of shuffle files or how
   * we hash files into folders.
   */
-class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll {
+class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll
   var server: TransportServer = _
   var rpcHandler: ExternalShuffleBlockHandler = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     val transportConf =
       SparkTransportConf.fromSparkConf(conf, "shuffle", numUsableCores = 2)
@@ -45,18 +45,15 @@ class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll {
     conf.set("spark.shuffle.manager", "sort")
     conf.set("spark.shuffle.service.enabled", "true")
     conf.set("spark.shuffle.service.port", server.getPort.toString)
-  }
 
-  override def afterAll() {
-    try {
+  override def afterAll()
+    try
       server.close()
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
   // This test ensures that the external shuffle service is actually in use for the other tests.
-  test("using external shuffle service") {
+  test("using external shuffle service")
     sc = new SparkContext("local-cluster[2,1,1024]", "test", conf)
     sc.env.blockManager.externalShuffleServiceEnabled should equal(true)
     sc.env.blockManager.shuffleClient.getClass should equal(
@@ -83,10 +80,7 @@ class ExternalShuffleServiceSuite extends ShuffleSuite with BeforeAndAfterAll {
 
     // Now Spark will receive FetchFailed, and not retry the stage due to "spark.test.noStageRetry"
     // being set.
-    val e = intercept[SparkException] {
+    val e = intercept[SparkException]
       rdd.count()
-    }
     e.getMessage should include(
         "Fetch failure will not retry stage due to testing config")
-  }
-}

@@ -10,24 +10,19 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
   * User: Dmitry Naidanov
   * Date: 11/14/11
   */
-trait ScDocSyntaxElement extends ScalaPsiElement {
+trait ScDocSyntaxElement extends ScalaPsiElement
   private var flags: Int = 0
 
   def getFlags = flags
 
-  def setFlag(flag: Int) {
+  def setFlag(flag: Int)
     flags |= flag
-  }
 
-  def reverseFlag(flag: Int) {
+  def reverseFlag(flag: Int)
     flags ^= flag
-  }
 
-  def clearFlag(flag: Int) {
+  def clearFlag(flag: Int)
     flags &= ~flag
-  }
 
-  def clearAll() {
+  def clearAll()
     flags = 0
-  }
-}

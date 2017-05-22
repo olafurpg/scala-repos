@@ -12,7 +12,7 @@ final class Env(config: Config,
                 db: lila.db.Env,
                 system: ActorSystem,
                 roundSocket: ActorSelection,
-                indexer: ActorSelection) {
+                indexer: ActorSelection)
 
   private val CollectionAnalysis = config getString "collection.analysis"
   private val NetDomain = config getString "net.domain"
@@ -26,9 +26,8 @@ final class Env(config: Config,
       indexer = indexer, roundSocket = roundSocket, bus = system.lilaBus)
 
   lazy val annotator = new Annotator(NetDomain)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "analyse" boot new Env(config = lila.common.PlayApp loadConfig "analyse",
@@ -36,4 +35,3 @@ object Env {
                            system = lila.common.PlayApp.system,
                            roundSocket = lila.hub.Env.current.socket.round,
                            indexer = lila.hub.Env.current.actor.gameSearch)
-}

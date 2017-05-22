@@ -9,14 +9,14 @@ import scala.tools.partest.ScaladocModelTest
 // SI-6487 "Scaladoc can't link to inner classes"
 // SI-6495 "Scaladoc won't pick up group name, priority and description from owner chain"
 // SI-6501 "Scaladoc won't link to a @template type T as a template but as a member"
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def resourceFile = "links.scala"
 
   // no need for special settings
   def scaladocSettings = ""
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -36,5 +36,3 @@ object Test extends ScaladocModelTest {
            memberLinks + " == 18 (the member links in object TEST)")
     assert(templateLinks == 6,
            templateLinks + " ==  6 (the template links in object TEST)")
-  }
-}

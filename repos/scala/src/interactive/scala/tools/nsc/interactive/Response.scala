@@ -19,7 +19,7 @@ package interactive
   *    }
   *  }
   */
-class Response[T] {
+class Response[T]
 
   private var data: Option[Either[T, Throwable]] = None
   private var complete = false
@@ -27,64 +27,53 @@ class Response[T] {
 
   /** Set provisional data, more to come
     */
-  def setProvisionally(x: T) = synchronized {
+  def setProvisionally(x: T) = synchronized
     data = Some(Left(x))
-  }
 
   /** Set final data, and mark response as complete.
     */
-  def set(x: T) = synchronized {
+  def set(x: T) = synchronized
     data = Some(Left(x))
     complete = true
     notifyAll()
-  }
 
   /** Store raised exception in data, and mark response as complete.
     */
-  def raise(exc: Throwable) = synchronized {
+  def raise(exc: Throwable) = synchronized
     data = Some(Right(exc))
     complete = true
     notifyAll()
-  }
 
   /** Get final data, wait as long as necessary.
     *  When interrupted will return with Right(InterruptedException)
     */
-  def get: Either[T, Throwable] = synchronized {
-    while (!complete) {
-      try {
+  def get: Either[T, Throwable] = synchronized
+    while (!complete)
+      try
         wait()
-      } catch {
-        case exc: InterruptedException => {
+      catch
+        case exc: InterruptedException =>
             Thread.currentThread().interrupt()
             raise(exc)
-          }
-      }
-    }
     data.get
-  }
 
   /** Optionally get data within `timeout` milliseconds.
     *  When interrupted will return with Some(Right(InterruptedException))
     *  When timeout ends, will return last stored provisional result,
     *  or else None if no provisional result was stored.
     */
-  def get(timeout: Long): Option[Either[T, Throwable]] = synchronized {
+  def get(timeout: Long): Option[Either[T, Throwable]] = synchronized
     val start = System.currentTimeMillis
     var current = start
-    while (!complete && start + timeout > current) {
-      try {
+    while (!complete && start + timeout > current)
+      try
         wait(timeout - (current - start))
-      } catch {
-        case exc: InterruptedException => {
+      catch
+        case exc: InterruptedException =>
             Thread.currentThread().interrupt()
             raise(exc)
-          }
-      }
       current = System.currentTimeMillis
-    }
     data
-  }
 
   /** Final data set was stored
     */
@@ -99,9 +88,7 @@ class Response[T] {
     */
   def isCancelled = synchronized { cancelled }
 
-  def clear() = synchronized {
+  def clear() = synchronized
     data = None
     complete = false
     cancelled = false
-  }
-}

@@ -12,28 +12,22 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.PostfixExpr
   * @author Alexander Podkhalyuzin
   * Date: 28.02.2008
   */
-object Guard {
+object Guard
   def parse(builder: ScalaPsiBuilder): Boolean =
     parse(builder, noIf = false) //deprecated if true
-  def parse(builder: ScalaPsiBuilder, noIf: Boolean): Boolean = {
+  def parse(builder: ScalaPsiBuilder, noIf: Boolean): Boolean =
     val guardMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kIF =>
         builder.advanceLexer //Ate if
       case _ =>
-        if (!noIf) {
+        if (!noIf)
           guardMarker.drop()
           return false
-        }
-    }
-    if (!PostfixExpr.parse(builder)) {
-      if (noIf) {
+    if (!PostfixExpr.parse(builder))
+      if (noIf)
         guardMarker.drop()
         return false
-      }
       builder error ErrMsg("wrong.postfix.expression")
-    }
     guardMarker.done(ScalaElementTypes.GUARD)
     return true
-  }
-}

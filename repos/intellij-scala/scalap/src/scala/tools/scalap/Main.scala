@@ -22,7 +22,7 @@ import scala.tools.util.PathResolver
   *
   * @author Matthias Zenger, Stephane Micheloud, Burak Emir, Ilya Sergey
   */
-object Main {
+object Main
   val SCALA_SIG = "ScalaSig"
   val SCALA_SIG_ANNOTATION = "Lscala/reflect/ScalaSignature;"
   val BYTES_VALUE = "bytes"
@@ -38,7 +38,7 @@ object Main {
 
   /**Prints usage information for scalap.
     */
-  def usage {
+  def usage
     Console.println("usage: scalap {<option>} <name>")
     Console.println(
         "where <name> is fully-qualified class name or <package_name>.package for package objects")
@@ -52,94 +52,81 @@ object Main {
         "  -classpath <path>  specify where to find user class files")
     Console.println(
         "  -cp <path>         specify where to find user class files")
-  }
 
-  def isScalaFile(bytes: Array[Byte]): Boolean = {
+  def isScalaFile(bytes: Array[Byte]): Boolean =
     val byteCode = ByteCode(bytes)
     val classFile = ClassFileParser.parse(byteCode)
     classFile.attribute("ScalaSig").isDefined
-  }
 
   /**Processes the given Java class file.
     *
     * @param clazz the class file to be processed.
     */
-  def processJavaClassFile(clazz: Classfile) {
+  def processJavaClassFile(clazz: Classfile)
     // construct a new output stream writer
     val out = new OutputStreamWriter(Console.out)
     val writer = new JavaWriter(clazz, out)
     // print the class
     writer.printClass
     out.flush()
-  }
 
   def isPackageObjectFile(s: String) =
     s != null && (s.endsWith(".package") || s == "package")
 
-  def parseScalaSignature(scalaSig: ScalaSig, isPackageObject: Boolean) = {
+  def parseScalaSignature(scalaSig: ScalaSig, isPackageObject: Boolean) =
     val baos = new ByteArrayOutputStream
     val stream = new PrintStream(baos)
     val syms = scalaSig.topLevelClasses ::: scalaSig.topLevelObjects
-    syms.head.parent match {
+    syms.head.parent match
       //Partial match
-      case Some(p) if (p.name != "<empty>") => {
+      case Some(p) if (p.name != "<empty>") =>
           val path = p.path
-          if (!isPackageObject) {
+          if (!isPackageObject)
             stream.print("package ")
             stream.print(path)
             stream.print("\n")
-          } else {
+          else
             val i = path.lastIndexOf(".")
-            if (i > 0) {
+            if (i > 0)
               stream.print("package ")
               stream.print(path.substring(0, i))
               stream.print("\n")
-            }
-          }
-        }
       case _ =>
-    }
     // Print classes
     val printer = new ScalaSigPrinter(stream, printPrivates)
-    for (c <- syms) {
+    for (c <- syms)
       printer.printSymbol(c)
-    }
     baos.toString
-  }
 
-  def decompileScala(bytes: Array[Byte], isPackageObject: Boolean): String = {
+  def decompileScala(bytes: Array[Byte], isPackageObject: Boolean): String =
     val byteCode = ByteCode(bytes)
     val classFile = ClassFileParser.parse(byteCode)
     classFile
       .attribute(SCALA_SIG)
       .map(_.byteCode)
-      .map(ScalaSigAttributeParsers.parse) match {
+      .map(ScalaSigAttributeParsers.parse) match
       // No entries in ScalaSig attribute implies that the signature is stored in the annotation
       case Some(ScalaSig(_, _, entries)) if entries.length == 0 =>
         unpickleFromAnnotation(classFile, isPackageObject)
       case Some(scalaSig) => parseScalaSignature(scalaSig, isPackageObject)
       case None => ""
-    }
-  }
 
   def unpickleFromAnnotation(
-      classFile: ClassFile, isPackageObject: Boolean): String = {
+      classFile: ClassFile, isPackageObject: Boolean): String =
     import classFile._
-    classFile.annotation(SCALA_SIG_ANNOTATION) match {
+    classFile.annotation(SCALA_SIG_ANNOTATION) match
       case None => ""
       case Some(Annotation(_, elements)) =>
         val bytesElem = elements
           .find(elem => constant(elem.elementNameIndex) == BYTES_VALUE)
           .get
-        val bytes = ((bytesElem.elementValue match {
+        val bytes = ((bytesElem.elementValue match
           case ConstValueIndex(index) => constantWrapped(index)
-        }).asInstanceOf[StringBytesPair].bytes)
+        ).asInstanceOf[StringBytesPair].bytes)
         val length = ByteCodecs.decode(bytes)
         val scalaSig =
           ScalaSigAttributeParsers.parse(ByteCode(bytes.take(length)))
         parseScalaSignature(scalaSig, isPackageObject)
-    }
-  }
 
   /**Executes scalap with the given arguments and classpath for the
     *  class denoted by <code>classname</code>.
@@ -149,31 +136,29 @@ object Main {
     * @param classname...
     */
   def process(args: Arguments, path: ClassPath[AbstractFile])(
-      classname: String) {
+      classname: String)
     // find the classfile
     val encName = Names.encode(
         if (classname == "scala.AnyRef") "java.lang.Object"
         else classname)
     val cls = path.findClass(encName)
-    if (cls.isDefined && cls.get.binary.isDefined) {
+    if (cls.isDefined && cls.get.binary.isDefined)
       val cfile = cls.get.binary.get
-      if (verbose) {
+      if (verbose)
         Console.println(
             Console.BOLD + "FILENAME" + Console.RESET + " = " + cfile.path)
-      }
       val bytes = cfile.toByteArray
-      if (isScalaFile(bytes)) {
+      if (isScalaFile(bytes))
         Console.println(decompileScala(bytes, isPackageObjectFile(encName)))
-      } else {
+      else
         // construct a reader for the classfile content
         val reader = new ByteArrayReader(cfile.toByteArray)
         // parse the classfile
         val clazz = new Classfile(reader)
         processJavaClassFile(clazz)
-      }
       // if the class corresponds to the artificial class scala.Any.
       // (see member list in class scala.tool.nsc.symtab.Definitions)
-    } else if (classname == "scala.Any") {
+    else if (classname == "scala.Any")
       Console.println("package scala")
       Console.println("class Any {")
       Console.println("  final def ==(scala.Any): scala.Boolean")
@@ -185,7 +170,7 @@ object Main {
       Console.println("  final def asInstanceOf[a]: a")
       Console.println("}")
       // if the class corresponds to the artificial class scala.AnyRef.
-    } else if (classname == "scala.AnyRef") {
+    else if (classname == "scala.AnyRef")
       Console.println("package scala")
       Console.println("class AnyRef extends Any {")
       Console.println("  def equals(scala.Any): scala.Boolean")
@@ -193,11 +178,11 @@ object Main {
       Console.println("  def toString(): java.lang.String")
       Console.println("}")
       // if the class corresponds to the artificial class scala.AnyVal.
-    } else if (classname == "scala.AnyVal") {
+    else if (classname == "scala.AnyVal")
       Console.println("package scala")
       Console.println("sealed class AnyVal extends Any")
       // if the class corresponds to the artificial class scala.Boolean.
-    } else if (classname == "scala.Boolean") {
+    else if (classname == "scala.Boolean")
       Console.println("package scala")
       Console.println("sealed abstract class Boolean extends AnyVal {")
       Console.println(
@@ -216,7 +201,7 @@ object Main {
           "  def !: scala.Boolean                        // boolean negation")
       Console.println("}")
       // if the class corresponds to the artificial class scala.Int.
-    } else if (classname == "scala.Int") {
+    else if (classname == "scala.Int")
       Console.println("package scala")
       Console.println("sealed abstract class Int extends AnyVal {")
       Console.println("  def ==(that: scala.Double): scala.Boolean")
@@ -285,31 +270,29 @@ object Main {
           "  def toDouble: scala.Double               // convert to Double")
       Console.println("}")
       // if the class corresponds to the artificial class scala.Nothing.
-    } else if (classname == "scala.Nothing") {
+    else if (classname == "scala.Nothing")
       Console.println("package scala")
       Console.println("sealed abstract class Nothing")
       // if the class corresponds to the artificial class scala.Null.
-    } else if (classname == "scala.Null") {
+    else if (classname == "scala.Null")
       Console.println("package scala")
       Console.println("sealed abstract class Null")
-    } else Console.println("class/object " + classname + " not found.")
-  }
+    else Console.println("class/object " + classname + " not found.")
 
   def fromPathString(
       path: String,
-      context: JavaContext = DefaultJavaContext): JavaClassPath = {
+      context: JavaContext = DefaultJavaContext): JavaClassPath =
     val s = new Settings()
     s.classpath.value = path
     new PathResolver(s, context).result
-  }
 
   /**The main method of this object.
     */
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     // print usage information if there is no command-line argument
     if (args.length == 0) usage
     // otherwise parse the arguments...
-    else {
+    else
       val arguments = Arguments
         .Parser('-')
         .withOption("-private")
@@ -329,16 +312,13 @@ object Main {
         (_ orElse _)
       val path = cparg map (fromPathString(_)) getOrElse EmptyClasspath
       // print the classpath if output is verbose
-      if (verbose) {
+      if (verbose)
         Console.println(
             Console.BOLD + "CLASSPATH" + Console.RESET + " = " + path)
-      }
       // process all given classes
       arguments.getOthers.foreach(process(arguments, path))
-    }
-  }
 
-  object EmptyClasspath extends ClassPath[AbstractFile] {
+  object EmptyClasspath extends ClassPath[AbstractFile]
 
     /**
       * The short name of the package (without prefix)
@@ -352,5 +332,3 @@ object Main {
       IndexedSeq.empty
     val packages: IndexedSeq[ClassPath[AbstractFile]] = IndexedSeq.empty
     val sourcepaths: IndexedSeq[AbstractFile] = IndexedSeq.empty
-  }
-}

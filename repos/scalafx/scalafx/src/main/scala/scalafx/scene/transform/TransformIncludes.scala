@@ -49,7 +49,7 @@ object TransformIncludes extends TransformIncludes
   * @define TR Transform
   * @define TL Translate
   */
-trait TransformIncludes {
+trait TransformIncludes
 
   /**
     * $START$AF.html $AF$END
@@ -116,4 +116,3 @@ trait TransformIncludes {
     */
   implicit def jfxTranslate2sfx(v: jfxst.Translate): Translate =
     if (v != null) new Translate(v) else null
-}

@@ -8,7 +8,7 @@ import lila.db.paginator._
 import lila.db.Types.Sort
 import tube.gameTube
 
-private[game] final class PaginatorBuilder(cached: Cached, maxPerPage: Int) {
+private[game] final class PaginatorBuilder(cached: Cached, maxPerPage: Int)
 
   private val readPreference =
     reactivemongo.api.ReadPreference.secondaryPreferred
@@ -19,9 +19,9 @@ private[game] final class PaginatorBuilder(cached: Cached, maxPerPage: Int) {
   def apply(selector: JsObject, sort: Sort, nb: Option[Int] = None)(
       page: Int): Fu[Paginator[Game]] =
     apply(
-        nb.fold(noCacheAdapter(selector, sort)) { cached =>
+        nb.fold(noCacheAdapter(selector, sort))  cached =>
       cacheAdapter(selector, sort, fuccess(cached))
-    })(page)
+    )(page)
 
   private def apply(adapter: AdapterLike[Game])(
       page: Int): Fu[Paginator[Game]] =
@@ -41,4 +41,3 @@ private[game] final class PaginatorBuilder(cached: Cached, maxPerPage: Int) {
   private def paginator(
       adapter: AdapterLike[Game], page: Int): Fu[Paginator[Game]] =
     Paginator(adapter, currentPage = page, maxPerPage = maxPerPage)
-}

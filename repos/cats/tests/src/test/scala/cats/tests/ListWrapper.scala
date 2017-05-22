@@ -35,7 +35,7 @@ import org.scalacheck.Arbitrary.arbitrary
   */
 final case class ListWrapper[A](list: List[A]) extends AnyVal
 
-object ListWrapper {
+object ListWrapper
   def order[A : Order]: Order[ListWrapper[A]] =
     Order[List[A]].on[ListWrapper[A]](_.list)
 
@@ -44,31 +44,28 @@ object ListWrapper {
 
   def eqv[A : Eq]: Eq[ListWrapper[A]] = Eq[List[A]].on[ListWrapper[A]](_.list)
 
-  val foldable: Foldable[ListWrapper] = new Foldable[ListWrapper] {
+  val foldable: Foldable[ListWrapper] = new Foldable[ListWrapper]
     def foldLeft[A, B](fa: ListWrapper[A], b: B)(f: (B, A) => B): B =
       Foldable[List].foldLeft(fa.list, b)(f)
 
     def foldRight[A, B](fa: ListWrapper[A], lb: Eval[B])(
         f: (A, Eval[B]) => Eval[B]): Eval[B] =
       Foldable[List].foldRight(fa.list, lb)(f)
-  }
 
-  val functor: Functor[ListWrapper] = new Functor[ListWrapper] {
+  val functor: Functor[ListWrapper] = new Functor[ListWrapper]
     def map[A, B](fa: ListWrapper[A])(f: A => B): ListWrapper[B] =
       ListWrapper(Functor[List].map(fa.list)(f))
-  }
 
-  val semigroupK: SemigroupK[ListWrapper] = new SemigroupK[ListWrapper] {
+  val semigroupK: SemigroupK[ListWrapper] = new SemigroupK[ListWrapper]
     def combineK[A](x: ListWrapper[A], y: ListWrapper[A]): ListWrapper[A] =
       ListWrapper(SemigroupK[List].combineK(x.list, y.list))
-  }
 
   def semigroup[A]: Semigroup[ListWrapper[A]] = semigroupK.algebra[A]
 
-  val monadCombine: MonadCombine[ListWrapper] = {
+  val monadCombine: MonadCombine[ListWrapper] =
     val M = MonadCombine[List]
 
-    new MonadCombine[ListWrapper] {
+    new MonadCombine[ListWrapper]
       def pure[A](x: A): ListWrapper[A] = ListWrapper(M.pure(x))
 
       def flatMap[A, B](fa: ListWrapper[A])(
@@ -79,8 +76,6 @@ object ListWrapper {
 
       def combineK[A](x: ListWrapper[A], y: ListWrapper[A]): ListWrapper[A] =
         ListWrapper(M.combineK(x.list, y.list))
-    }
-  }
 
   val monad: Monad[ListWrapper] = monadCombine
 
@@ -99,4 +94,3 @@ object ListWrapper {
     Arbitrary(arbitrary[List[A]].map(ListWrapper.apply))
 
   implicit def listWrapperEq[A : Eq]: Eq[ListWrapper[A]] = Eq.by(_.list)
-}

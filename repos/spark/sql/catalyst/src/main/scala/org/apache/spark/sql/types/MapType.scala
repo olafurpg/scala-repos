@@ -32,19 +32,18 @@ import org.json4s.JsonDSL._
   */
 case class MapType(
     keyType: DataType, valueType: DataType, valueContainsNull: Boolean)
-    extends DataType {
+    extends DataType
 
   /** No-arg constructor for kryo. */
   def this() = this(null, null, false)
 
   private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+      prefix: String, builder: StringBuilder): Unit =
     builder.append(s"$prefix-- key: ${keyType.typeName}\n")
     builder.append(s"$prefix-- value: ${valueType.typeName} " +
         s"(valueContainsNull = $valueContainsNull)\n")
     DataType.buildFormattedString(keyType, s"$prefix    |", builder)
     DataType.buildFormattedString(valueType, s"$prefix    |", builder)
-  }
 
   override private[sql] def jsonValue: JValue =
     ("type" -> typeName) ~ ("keyType" -> keyType.jsonValue) ~
@@ -68,19 +67,16 @@ case class MapType(
     MapType(keyType.asNullable, valueType.asNullable, valueContainsNull = true)
 
   override private[spark] def existsRecursively(
-      f: (DataType) => Boolean): Boolean = {
+      f: (DataType) => Boolean): Boolean =
     f(this) || keyType.existsRecursively(f) || valueType.existsRecursively(f)
-  }
-}
 
-object MapType extends AbstractDataType {
+object MapType extends AbstractDataType
 
   override private[sql] def defaultConcreteType: DataType =
     apply(NullType, NullType)
 
-  override private[sql] def acceptsType(other: DataType): Boolean = {
+  override private[sql] def acceptsType(other: DataType): Boolean =
     other.isInstanceOf[MapType]
-  }
 
   override private[sql] def simpleString: String = "map"
 
@@ -90,4 +86,3 @@ object MapType extends AbstractDataType {
     */
   def apply(keyType: DataType, valueType: DataType): MapType =
     MapType(keyType: DataType, valueType: DataType, valueContainsNull = true)
-}

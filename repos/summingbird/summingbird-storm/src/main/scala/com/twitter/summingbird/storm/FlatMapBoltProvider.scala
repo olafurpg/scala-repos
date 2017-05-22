@@ -43,35 +43,30 @@ import scala.collection.{Map => CMap}
   * There are two main codepaths here, for intermediate flat maps and final flat maps.
   * The primary difference between those two being the the presents of map side aggreagtion in a final flatmap.
   */
-object FlatMapBoltProvider {
+object FlatMapBoltProvider
   @transient private val logger =
     LoggerFactory.getLogger(FlatMapBoltProvider.getClass)
   private def wrapTimeBatchIDKV[T, K, V](
       existingOp: FlatMapOperation[T, (K, V)])(batcher: Batcher)
     : FlatMapOperation[(Timestamp, T), ((K, BatchID), (Timestamp, V))] =
-    FlatMapOperation.generic[(Timestamp, T), ((K, BatchID), (Timestamp, V))]({
+    FlatMapOperation.generic[(Timestamp, T), ((K, BatchID), (Timestamp, V))](
       case (ts, data) =>
-        existingOp.apply(data).map { vals =>
-          vals.map {
+        existingOp.apply(data).map  vals =>
+          vals.map
             case (k, v) =>
               ((k, batcher.batchOf(ts)), (ts, v))
-          }
-        }
-    })
+    )
 
   def wrapTime[T, U](existingOp: FlatMapOperation[T, U])
-    : FlatMapOperation[(Timestamp, T), (Timestamp, U)] = {
-    FlatMapOperation.generic({ x: (Timestamp, T) =>
-      existingOp.apply(x._2).map { vals =>
+    : FlatMapOperation[(Timestamp, T), (Timestamp, U)] =
+    FlatMapOperation.generic( x: (Timestamp, T) =>
+      existingOp.apply(x._2).map  vals =>
         vals.map((x._1, _))
-      }
-    })
-  }
-}
+    )
 
 case class FlatMapBoltProvider(
     storm: Storm, jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-    implicit topologyBuilder: TopologyBuilder) {
+    implicit topologyBuilder: TopologyBuilder)
   import FlatMapBoltProvider._
   import Producer2FlatMapOperation._
 
@@ -98,14 +93,14 @@ case class FlatMapBoltProvider(
   private val maxEmitPerExecute = getOrElse(DEFAULT_MAX_EMIT_PER_EXECUTE)
   logger.info(s"[$nodeName] maxEmitPerExecute : ${maxEmitPerExecute.get}")
 
-  private def getFFMBolt[T, K, V](summer: SummerNode[Storm]) = {
+  private def getFFMBolt[T, K, V](summer: SummerNode[Storm]) =
     type ExecutorInput = (Timestamp, T)
     type ExecutorKey = Int
     type InnerValue = (Timestamp, V)
     type ExecutorValue = CMap[(K, BatchID), InnerValue]
-    val summerProducer = summer.members.collect {
+    val summerProducer = summer.members.collect
       case s: Summer[_, _, _] => s
-    }.head.asInstanceOf[Summer[Storm, K, V]]
+    .head.asInstanceOf[Summer[Storm, K, V]]
     // When emitting tuples between the Final Flat Map and the summer we encode the timestamp in the value
     // The monoid we use in aggregation is timestamp max.
     val batcher = summerProducer.store.mergeableBatcher
@@ -146,9 +141,8 @@ case class FlatMapBoltProvider(
             new KeyValueInjection[ExecutorKey, ExecutorValue]
         )(implicitly[Semigroup[InnerValue]])
     )
-  }
 
-  def getIntermediateFMBolt[T, U] = {
+  def getIntermediateFMBolt[T, U] =
     type ExecutorInput = (Timestamp, T)
     type ExecutorOutput = (Timestamp, U)
 
@@ -172,18 +166,14 @@ case class FlatMapBoltProvider(
             new SingleItemInjection[ExecutorOutput]
         )
     )
-  }
 
-  def apply: BaseBolt[Any, Any] = {
+  def apply: BaseBolt[Any, Any] =
     val summerOpt: Option[SummerNode[Storm]] = stormDag
       .dependantsOf(node)
       .collect { case s: SummerNode[Storm] => s }
       .headOption
-    summerOpt match {
+    summerOpt match
       case Some(s) =>
         getFFMBolt[Any, Any, Any](s).asInstanceOf[BaseBolt[Any, Any]]
       case None =>
         getIntermediateFMBolt[Any, Any].asInstanceOf[BaseBolt[Any, Any]]
-    }
-  }
-}

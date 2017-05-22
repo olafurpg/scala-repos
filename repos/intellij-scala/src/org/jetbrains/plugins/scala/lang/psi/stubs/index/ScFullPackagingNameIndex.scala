@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageCont
   * @author ilyas
   */
 class ScFullPackagingNameIndex
-    extends IntStubIndexExtension[ScPackageContainer] {
+    extends IntStubIndexExtension[ScPackageContainer]
 
   override def get(
       int: java.lang.Integer,
@@ -23,8 +23,6 @@ class ScFullPackagingNameIndex
     super.get(int, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey = ScFullPackagingNameIndex.KEY
-}
 
-object ScFullPackagingNameIndex {
+object ScFullPackagingNameIndex
   val KEY = ScalaIndexKeys.PACKAGE_FQN_KEY
-}

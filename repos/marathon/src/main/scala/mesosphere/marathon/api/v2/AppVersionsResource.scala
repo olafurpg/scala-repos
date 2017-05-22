@@ -20,35 +20,30 @@ class AppVersionsResource(service: MarathonSchedulerService,
                           val authenticator: Authenticator,
                           val authorizer: Authorizer,
                           val config: MarathonConf)
-    extends AuthResource {
+    extends AuthResource
 
   val log = LoggerFactory.getLogger(getClass.getName)
 
   @GET
   @Timed
   def index(@PathParam("appId") appId: String,
-            @Context req: HttpServletRequest): Response = authenticated(req) {
+            @Context req: HttpServletRequest): Response = authenticated(req)
     implicit identity =>
       val id = appId.toRootPath
-      withAuthorization(ViewApp, result(groupManager.app(id)), unknownApp(id)) {
+      withAuthorization(ViewApp, result(groupManager.app(id)), unknownApp(id))
         _ =>
           ok(jsonObjString("versions" -> service.listAppVersions(id).toSeq))
-      }
-  }
 
   @GET
   @Timed
   @Path("{version}")
   def show(@PathParam("appId") appId: String,
            @PathParam("version") version: String,
-           @Context req: HttpServletRequest): Response = authenticated(req) {
+           @Context req: HttpServletRequest): Response = authenticated(req)
     implicit identity =>
       val id = appId.toRootPath
       val timestamp = Timestamp(version)
       withAuthorization(ViewApp,
                         service.getApp(id, timestamp),
-                        unknownApp(id, Some(timestamp))) { app =>
+                        unknownApp(id, Some(timestamp)))  app =>
         ok(jsonString(app))
-      }
-  }
-}

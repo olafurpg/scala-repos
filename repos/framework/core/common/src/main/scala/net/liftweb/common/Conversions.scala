@@ -30,9 +30,8 @@ import scala.xml._
   * into one type. It is used in conjuction with the implicit conversions defined
   * in its [[StringOrNodeSeq$ companion object]].
   */
-sealed trait StringOrNodeSeq {
+sealed trait StringOrNodeSeq
   def nodeSeq: scala.xml.NodeSeq
-}
 
 /**
   * Provides implicit conversions to the `StringOrNodeSeq` trait, which can in
@@ -47,32 +46,28 @@ sealed trait StringOrNodeSeq {
   * parameter of type `StringOrNodeSeq` to allow the user to pass either in as
   * their needs dictate.
   */
-object StringOrNodeSeq {
+object StringOrNodeSeq
   implicit def strTo[T <% String](str: T): StringOrNodeSeq =
-    new StringOrNodeSeq {
+    new StringOrNodeSeq
       def nodeSeq: NodeSeq = Text(str)
-    }
 
   /**
     * This is written in terms of a `Seq[Node]` to make sure Scala converts
     * everything it should to a `StringOrNodeSeq`. `NodeSeq` is a `Seq[Node]`.`
     */
   implicit def nsTo(ns: Seq[Node]): StringOrNodeSeq =
-    new StringOrNodeSeq {
+    new StringOrNodeSeq
       def nodeSeq: NodeSeq = ns
-    }
 
   implicit def toNodeSeq(sns: StringOrNodeSeq): NodeSeq = sns.nodeSeq
-}
 
 /**
   * This trait is used to unify `()=>String` and `String` into one type. It is
   * used in conjunction with the implicit conversions defined in its [[StringFunc$
   * companion object]].
   */
-sealed trait StringFunc {
+sealed trait StringFunc
   def func: () => String
-}
 
 /**
   * Provides implicit conversions to the `StringFunc` trait. This allows using a
@@ -85,7 +80,7 @@ sealed trait StringFunc {
   * session state to do more interesting things than a hard-coded `String` would,
   * while the former is simpler to use.
   */
-object StringFunc {
+object StringFunc
 
   /**
     * Implicit conversion from any type that in turn has an implicit conversion
@@ -108,7 +103,6 @@ object StringFunc {
   implicit def funcToStringFunc[T](func: () => T)(
       implicit f: T => String): StringFunc =
     RealStringFunc(() => f(func()))
-}
 
 /**
   * See `[[StringFunc]]`.
@@ -118,9 +112,8 @@ final case class RealStringFunc(func: () => String) extends StringFunc
 /**
   * See `[[StringFunc]]`.
   */
-final case class ConstStringFunc(str: String) extends StringFunc {
+final case class ConstStringFunc(str: String) extends StringFunc
   lazy val func = () => str
-}
 
 /**
   * This trait is used to unify `()=>[[scala.xml.NodeSeq NodeSeq]]` and
@@ -131,9 +124,8 @@ final case class ConstStringFunc(str: String) extends StringFunc {
 @deprecated("""Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
 than `NodeSeq` constants; consider doing the same.""",
             "3.0")
-sealed trait NodeSeqFunc {
+sealed trait NodeSeqFunc
   def func: () => NodeSeq
-}
 
 /**
   * Provides implicit conversions to the `NodeSeqFunc` trait. This allows using a
@@ -144,7 +136,7 @@ sealed trait NodeSeqFunc {
 @deprecated("""Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
 than `NodeSeq` constants; consider doing the same.""",
             "3.0")
-object NodeSeqFunc {
+object NodeSeqFunc
 
   /**
     * If you've got something that can be converted into a `NodeSeq` (a constant)
@@ -161,7 +153,6 @@ object NodeSeqFunc {
   implicit def funcToNodeSeqFunc[T](func: () => T)(
       implicit f: T => NodeSeq): NodeSeqFunc =
     RealNodeSeqFunc(() => f(func()))
-}
 
 /**
   * The case class that holds a `[[scala.xml.NodeSeq NodeSeq]]` function.
@@ -177,6 +168,5 @@ final case class RealNodeSeqFunc(func: () => NodeSeq) extends NodeSeqFunc
 @deprecated("""Lift now mostly uses `NodeSeq=>NodeSeq` transformations rather
 than `NodeSeq` constants; consider doing the same.""",
             "3.0")
-final case class ConstNodeSeqFunc(ns: NodeSeq) extends NodeSeqFunc {
+final case class ConstNodeSeqFunc(ns: NodeSeq) extends NodeSeqFunc
   lazy val func = () => ns
-}

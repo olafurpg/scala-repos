@@ -29,7 +29,7 @@ import scala.reflect.internal.util.BatchSourceFile
   * @param settings The settings to be used by the documenter and compiler for generating documentation.
   *
   * @author Gilles Dubochet */
-class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
+class DocFactory(val reporter: Reporter, val settings: doc.Settings)
   processor =>
 
   /** The unique compiler instance used by this processor and constructed from its `settings`. */
@@ -39,45 +39,42 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
     * as well as those defined in `sources` of previous calls to the same processor.
     * @param source The list of paths (relative to the compiler's source path,
     *        or absolute) of files to document or the source code. */
-  def makeUniverse(source: Either[List[String], String]): Option[Universe] = {
+  def makeUniverse(source: Either[List[String], String]): Option[Universe] =
     assert(settings.docformat.value == "html")
-    source match {
+    source match
       case Left(files) =>
         new compiler.Run() compile files
       case Right(sourceCode) =>
         new compiler.Run() compileSources List(
             new BatchSourceFile("newSource", sourceCode))
-    }
 
     if (reporter.hasErrors) return None
 
-    val extraTemplatesToDocument: Set[compiler.Symbol] = {
+    val extraTemplatesToDocument: Set[compiler.Symbol] =
       if (settings.docUncompilable.isDefault) Set()
-      else {
-        val uncompilable = new {
+      else
+        val uncompilable = new
           val global: compiler.type = compiler
           val settings = processor.settings
-        } with Uncompilable {}
+        with Uncompilable {}
 
         compiler.docComments ++= uncompilable.comments
         docdbg("" + uncompilable)
 
         uncompilable.templates
-      }
-    }
 
     val modelFactory = (new { override val global: compiler.type = compiler }
     with model.ModelFactory(compiler, settings)
     with model.ModelFactoryImplicitSupport with model.ModelFactoryTypeSupport
     with model.diagram.DiagramFactory with model.CommentFactory
-    with model.TreeFactory with model.MemberLookup {
+    with model.TreeFactory with model.MemberLookup
       override def templateShouldDocument(
           sym: compiler.Symbol, inTpl: DocTemplateImpl) =
         extraTemplatesToDocument(sym) ||
         super.templateShouldDocument(sym, inTpl)
-    })
+    )
 
-    modelFactory.makeModel match {
+    modelFactory.makeModel match
       case Some(madeModel) =>
         if (!settings.scaladocQuietRun)
           println("model contains " + modelFactory.templatesCount +
@@ -87,12 +84,10 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
         if (!settings.scaladocQuietRun)
           println("no documentable class found in compilation units")
         None
-    }
-  }
 
   object NoCompilerRunException extends ControlThrowable {}
 
-  val documentError: PartialFunction[Throwable, Unit] = {
+  val documentError: PartialFunction[Throwable, Unit] =
     case NoCompilerRunException =>
       reporter.info(
           null,
@@ -104,33 +99,26 @@ class DocFactory(val reporter: Reporter, val settings: doc.Settings) {
       reporter.error(
           null,
           s"Cannot load the doclet class ${settings.docgenerator.value} (specified with ${settings.docgenerator.name}): $e. Leaving the default settings will generate the html version of scaladoc.")
-  }
 
   /** Generate document(s) for all `files` containing scaladoc documentation.
     * @param files The list of paths (relative to the compiler's source path, or absolute) of files to document. */
-  def document(files: List[String]) {
-    def generate() = {
+  def document(files: List[String])
+    def generate() =
       import doclet._
       val docletClass =
         Class.forName(settings.docgenerator.value) // default is html.Doclet
       val docletInstance = docletClass.newInstance().asInstanceOf[Generator]
 
-      docletInstance match {
+      docletInstance match
         case universer: Universer =>
           val universe =
-            makeUniverse(Left(files)) getOrElse {
+            makeUniverse(Left(files)) getOrElse
               throw NoCompilerRunException
-            }
           universer setUniverse universe
         case _ => ()
-      }
       docletInstance.generate()
-    }
 
     try generate() catch documentError
-  }
 
-  private[doc] def docdbg(msg: String) {
+  private[doc] def docdbg(msg: String)
     if (settings.Ydocdebug) println(msg)
-  }
-}

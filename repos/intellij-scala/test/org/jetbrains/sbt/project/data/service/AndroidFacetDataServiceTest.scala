@@ -17,18 +17,18 @@ import scala.io.Source
   * @author Nikolay Obedin
   * @since 6/15/15.
   */
-class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
+class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase
 
   import ExternalSystemDataDsl._
 
   private def generateProject(
       proguardConfig: Seq[String]): DataNode[ProjectData] =
-    new project {
+    new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
 
-      modules += new javaModule {
+      modules += new javaModule
         name := "Module 1"
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
@@ -43,10 +43,9 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
             isLibrary = true,
             proguardConfig = proguardConfig
         )
-      }
-    }.build.toDataNode
+    .build.toDataNode
 
-  private def doTestFacetSetup(proguardConfig: Seq[String]): Unit = {
+  private def doTestFacetSetup(proguardConfig: Seq[String]): Unit =
     importProjectData(generateProject(proguardConfig))
 
     val module =
@@ -69,7 +68,7 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
     assert(properties.myProGuardCfgFiles.isEmpty == proguardConfig.isEmpty)
     assert(properties.RUN_PROGUARD == proguardConfig.nonEmpty)
 
-    if (proguardConfig.nonEmpty) {
+    if (proguardConfig.nonEmpty)
       import scala.collection.JavaConverters._
       val proguardConfigPath = FileUtil.toSystemDependentName(
           getProject.getBasePath + "/proguard-sbt.txt")
@@ -79,8 +78,6 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
       val actualProguardConfig =
         using(Source.fromFile(proguardConfigPath))(_.getLines().toVector)
       assert(actualProguardConfig == proguardConfig)
-    }
-  }
 
   def testWithoutProguard(): Unit =
     doTestFacetSetup(Seq.empty)
@@ -88,14 +85,12 @@ class AndroidFacetDataServiceTest extends ProjectDataServiceTestCase {
   def testWithProguard(): Unit =
     doTestFacetSetup(Seq("-some-option", "-another-option"))
 
-  def testModuleIsNull(): Unit = {
-    val testProject = new project {
+  def testModuleIsNull(): Unit =
+    val testProject = new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
       arbitraryNodes += new AndroidFacetNode(
           "", null, null, null, null, null, null, false, Seq.empty)
-    }.build.toDataNode
+    .build.toDataNode
     importProjectData(testProject)
-  }
-}

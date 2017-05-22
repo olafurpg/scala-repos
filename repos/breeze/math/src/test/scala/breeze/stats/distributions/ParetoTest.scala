@@ -26,7 +26,7 @@ import org.apache.commons.math3.random.MersenneTwister
 @RunWith(classOf[JUnitRunner])
 class ParetoTest
     extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
-    with MomentsTestBase[Double] with HasCdfTestBase {
+    with MomentsTestBase[Double] with HasCdfTestBase
   import Arbitrary.arbitrary
 
   override val numSamples = 40000
@@ -35,14 +35,12 @@ class ParetoTest
 
   def fromDouble(x: Double) = x
 
-  implicit def arbDistr: Arbitrary[Pareto] = Arbitrary {
-    for (location <- arbitrary[Double].map { x =>
+  implicit def arbDistr: Arbitrary[Pareto] = Arbitrary
+    for (location <- arbitrary[Double].map  x =>
       math.abs(x) % 1000.0 + 1.1
-    }; // Pareto pdf at 0 not defined when location == 1
-    scale <- arbitrary[Double].map { x =>
+    ; // Pareto pdf at 0 not defined when location == 1
+    scale <- arbitrary[Double].map  x =>
       math.abs(x) % 8.0 + 4.0
-    }) yield new Pareto(location, scale)(new RandBasis(new MersenneTwister(0)))
-  }
+    ) yield new Pareto(location, scale)(new RandBasis(new MersenneTwister(0)))
 
   override type Distr = Pareto
-}

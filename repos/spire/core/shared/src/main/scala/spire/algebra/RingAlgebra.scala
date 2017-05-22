@@ -7,20 +7,18 @@ package algebra
   */
 trait RingAlgebra[V, @sp R] extends Any with Module[V, R] with Rng[V]
 
-object RingAlgebra {
+object RingAlgebra
   implicit def ZAlgebra[A](
       implicit vector0: Ring[A], scalar0: Ring[Int]): ZAlgebra[A] =
-    new ZAlgebra[A] {
+    new ZAlgebra[A]
       val vector: Ring[A] = vector0
       val scalar: Ring[Int] = scalar0
-    }
-}
 
 /**
   * Given any `Ring[A]` we can construct a `RingAlgebra[A, Int]`. This is
   * possible since we can define `fromInt` on `Ring` generally.
   */
-trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V] {
+trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V]
   implicit def vector: Ring[V]
   implicit def scalar: Ring[Int]
 
@@ -34,7 +32,6 @@ trait ZAlgebra[V] extends Any with RingAlgebra[V, Int] with Ring[V] {
   def timesl(r: Int, v: V): V = vector.times(vector.fromInt(r), v)
 
   override def fromInt(n: Int): V = vector.fromInt(n)
-}
 
 /**
   * A `FieldAlgebra` is a vector space that is also a `Ring`. An example is the

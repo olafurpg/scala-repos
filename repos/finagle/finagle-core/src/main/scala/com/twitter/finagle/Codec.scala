@@ -14,7 +14,7 @@ import org.jboss.netty.channel.{Channel, ChannelPipeline, ChannelPipelineFactory
   * as well as a standard filter stack that is applied to services
   * from this codec.
   */
-trait Codec[Req, Rep] {
+trait Codec[Req, Rep]
 
   /**
     * The pipeline factory that implements the protocol.
@@ -94,27 +94,21 @@ trait Codec[Req, Rep] {
     * A protocol library name to use for displaying which protocol library this client or server is using.
     */
   def protocolLibraryName: String = "not-specified"
-}
 
 /**
   * An abstract class version of the above for java compatibility.
   */
 abstract class AbstractCodec[Req, Rep] extends Codec[Req, Rep]
 
-object Codec {
+object Codec
   def ofPipelineFactory[Req, Rep](makePipeline: => ChannelPipeline) =
-    new Codec[Req, Rep] {
-      def pipelineFactory = new ChannelPipelineFactory {
+    new Codec[Req, Rep]
+      def pipelineFactory = new ChannelPipelineFactory
         def getPipeline = makePipeline
-      }
-    }
 
-  def ofPipeline[Req, Rep](p: ChannelPipeline) = new Codec[Req, Rep] {
-    def pipelineFactory = new ChannelPipelineFactory {
+  def ofPipeline[Req, Rep](p: ChannelPipeline) = new Codec[Req, Rep]
+    def pipelineFactory = new ChannelPipelineFactory
       def getPipeline = p
-    }
-  }
-}
 
 /**
   * Codec factories create codecs given some configuration.
@@ -127,18 +121,16 @@ case class ClientCodecConfig(serviceName: String)
 /**
   * Servers
   */
-case class ServerCodecConfig(serviceName: String, boundAddress: SocketAddress) {
-  def boundInetSocketAddress = boundAddress match {
+case class ServerCodecConfig(serviceName: String, boundAddress: SocketAddress)
+  def boundInetSocketAddress = boundAddress match
     case ia: InetSocketAddress => ia
     case _ => new InetSocketAddress(0)
-  }
-}
 
 /**
   * A combined codec factory provides both client and server codec
   * factories in one (when available).
   */
-trait CodecFactory[Req, Rep] {
+trait CodecFactory[Req, Rep]
   type Client = ClientCodecConfig => Codec[Req, Rep]
   type Server = ServerCodecConfig => Codec[Req, Rep]
 
@@ -149,4 +141,3 @@ trait CodecFactory[Req, Rep] {
     * A protocol library name to use for displaying which protocol library this client or server is using.
     */
   def protocolLibraryName: String = "not-specified"
-}

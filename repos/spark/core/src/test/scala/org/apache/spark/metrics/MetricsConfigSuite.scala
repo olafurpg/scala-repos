@@ -22,16 +22,15 @@ import org.scalatest.BeforeAndAfter
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkFunSuite
 
-class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
+class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter
   var filePath: String = _
 
-  before {
+  before
     filePath = getClass.getClassLoader
       .getResource("test_metrics_config.properties")
       .getFile()
-  }
 
-  test("MetricsConfig with default properties") {
+  test("MetricsConfig with default properties")
     val sparkConf = new SparkConf(loadDefaults = false)
     sparkConf.set("spark.metrics.conf", "dummy-file")
     val conf = new MetricsConfig(sparkConf)
@@ -45,9 +44,8 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(
         property.getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(property.getProperty("sink.servlet.path") === "/metrics/json")
-  }
 
-  test("MetricsConfig with properties set from a file") {
+  test("MetricsConfig with properties set from a file")
     val sparkConf = new SparkConf(loadDefaults = false)
     sparkConf.set("spark.metrics.conf", filePath)
     val conf = new MetricsConfig(sparkConf)
@@ -73,9 +71,8 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(
         workerProp.getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(workerProp.getProperty("sink.servlet.path") === "/metrics/json")
-  }
 
-  test("MetricsConfig with properties set from a Spark configuration") {
+  test("MetricsConfig with properties set from a Spark configuration")
     val sparkConf = new SparkConf(loadDefaults = false)
     setMetricsProperty(sparkConf, "*.sink.console.period", "10")
     setMetricsProperty(sparkConf, "*.sink.console.unit", "seconds")
@@ -107,10 +104,9 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(
         workerProp.getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(workerProp.getProperty("sink.servlet.path") === "/metrics/json")
-  }
 
   test(
-      "MetricsConfig with properties set from a file and a Spark configuration") {
+      "MetricsConfig with properties set from a file and a Spark configuration")
     val sparkConf = new SparkConf(loadDefaults = false)
     setMetricsProperty(sparkConf, "*.sink.console.period", "10")
     setMetricsProperty(sparkConf, "*.sink.console.unit", "seconds")
@@ -142,9 +138,8 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
     assert(
         workerProp.getProperty("sink.servlet.class") === "org.apache.spark.metrics.sink.MetricsServlet")
     assert(workerProp.getProperty("sink.servlet.path") === "/metrics/json")
-  }
 
-  test("MetricsConfig with subProperties") {
+  test("MetricsConfig with subProperties")
     val sparkConf = new SparkConf(loadDefaults = false)
     sparkConf.set("spark.metrics.conf", filePath)
     val conf = new MetricsConfig(sparkConf)
@@ -170,10 +165,7 @@ class MetricsConfigSuite extends SparkFunSuite with BeforeAndAfter {
 
     val servletProps = sinkProps("servlet")
     assert(servletProps.size() === 2)
-  }
 
   private def setMetricsProperty(
-      conf: SparkConf, name: String, value: String): Unit = {
+      conf: SparkConf, name: String, value: String): Unit =
     conf.set(s"spark.metrics.conf.$name", value)
-  }
-}

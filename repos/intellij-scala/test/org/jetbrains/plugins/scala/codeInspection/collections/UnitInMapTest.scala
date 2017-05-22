@@ -5,7 +5,7 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 /**
   * @author Nikolay.Tropin
   */
-class UnitInMapTest extends OperationsOnCollectionInspectionTest {
+class UnitInMapTest extends OperationsOnCollectionInspectionTest
   override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
     classOf[UnitInMapInspection]
 
@@ -14,7 +14,7 @@ class UnitInMapTest extends OperationsOnCollectionInspectionTest {
   override def hint: String =
     InspectionBundle.message("use.foreach.instead.of.map")
 
-  def test1(): Unit = {
+  def test1(): Unit =
     doTest(
         s"""
         |Seq("1", "2").map { x =>
@@ -41,9 +41,8 @@ class UnitInMapTest extends OperationsOnCollectionInspectionTest {
         |}
       """.stripMargin
     )
-  }
 
-  def test2(): Unit = {
+  def test2(): Unit =
     check(s"val mapped = Seq(1, 2).map(${START}println(_)$END)")
     check(s"""
          |Seq(1, 2).map {
@@ -55,9 +54,6 @@ class UnitInMapTest extends OperationsOnCollectionInspectionTest {
          |  ${START}println(x)$END
          |}
        """.stripMargin)
-  }
 
-  def testFunctionToFunctionToUnit(): Unit = {
+  def testFunctionToFunctionToUnit(): Unit =
     checkTextHasNoErrors(s"Seq(1, 2).map(x => $START() => println(x)$END)")
-  }
-}

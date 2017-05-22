@@ -22,7 +22,7 @@ import BackendReporting._
 import scala.collection.convert.decorateAsScala._
 import scala.tools.testing.ClearAfterClass
 
-object InlinerTest extends ClearAfterClass.Clearable {
+object InlinerTest extends ClearAfterClass.Clearable
   val args = "-Yopt:l:classpath -Yopt-warnings"
   var compiler = newCompiler(extraArgs = args)
   var inlineOnlyCompiler = newCompiler(extraArgs = "-Yopt:inline-project")
@@ -36,10 +36,9 @@ object InlinerTest extends ClearAfterClass.Clearable {
   notPerRun foreach compiler.perRunCaches.unrecordCache
 
   def clear(): Unit = { compiler = null; inlineOnlyCompiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class InlinerTest extends ClearAfterClass {
+class InlinerTest extends ClearAfterClass
   ClearAfterClass.stateToClear = InlinerTest
 
   val compiler = InlinerTest.compiler
@@ -52,16 +51,15 @@ class InlinerTest extends ClearAfterClass {
   def compile(scalaCode: String,
               javaCode: List[(String, String)] = Nil,
               allowMessage: StoreReporter#Info => Boolean = _ =>
-                  false): List[ClassNode] = {
+                  false): List[ClassNode] =
     InlinerTest.notPerRun.foreach(_.clear())
     compileClasses(compiler)(scalaCode, javaCode, allowMessage)
     // Use the class nodes stored in the byteCodeRepository. The ones returned by compileClasses are not the same,
     // these are created new from the classfile byte array. They are completely separate instances which cannot
     // be used to look up methods / callsites in the callGraph hash maps for example.
     byteCodeRepository.compilingClasses.valuesIterator.toList.sortBy(_.name)
-  }
 
-  def checkCallsite(callsite: callGraph.Callsite, callee: MethodNode) = {
+  def checkCallsite(callsite: callGraph.Callsite, callee: MethodNode) =
     assert(callsite.callsiteMethod.instructions
              .contains(callsite.callsiteInstruction),
            instructionsFromMethod(callsite.callsiteMethod))
@@ -73,7 +71,6 @@ class InlinerTest extends ClearAfterClass {
 
     assert(
         callsite.callee.get.callee == callee, callsite.callee.get.callee.name)
-  }
 
   def getCallsite(method: MethodNode, calleeName: String) =
     callGraph
@@ -82,29 +79,26 @@ class InlinerTest extends ClearAfterClass {
       .find(_.callee.get.callee.name == calleeName)
       .get
 
-  def gMethAndFCallsite(code: String, mod: ClassNode => Unit = _ => ()) = {
+  def gMethAndFCallsite(code: String, mod: ClassNode => Unit = _ => ()) =
     val List(c) = compile(code)
     mod(c)
     val gMethod = findAsmMethod(c, "g")
     val fCall = getCallsite(gMethod, "f")
     (gMethod, fCall)
-  }
 
   def canInlineTest(code: String,
                     mod: ClassNode => Unit = _ =>
-                        ()): Option[OptimizerWarning] = {
+                        ()): Option[OptimizerWarning] =
     val cs = gMethAndFCallsite(code, mod)._2
     inliner.earlyCanInlineCheck(cs) orElse inliner.canInlineBody(cs)
-  }
 
-  def inlineTest(code: String, mod: ClassNode => Unit = _ => ()): MethodNode = {
+  def inlineTest(code: String, mod: ClassNode => Unit = _ => ()): MethodNode =
     val (gMethod, fCall) = gMethAndFCallsite(code, mod)
     inliner.inline(InlineRequest(fCall, Nil))
     gMethod
-  }
 
   @Test
-  def simpleInlineOK(): Unit = {
+  def simpleInlineOK(): Unit =
     val code = """class C {
         |  def f = 1
         |  def g = f + f
@@ -128,19 +122,18 @@ class InlinerTest extends ClearAfterClass {
                         Op(IRETURN)))
 
     // line numbers are kept, so there's a line 2 (from the inlined f)
-    assert(gConv.instructions exists {
+    assert(gConv.instructions exists
       case LineNumber(2, _) => true
       case _ => false
-    }, gConv.instructions.filter(_.isInstanceOf[LineNumber]))
+    , gConv.instructions.filter(_.isInstanceOf[LineNumber]))
 
     assert(gConv.localVars.map(_.name).sorted == List("f_this", "this"),
            gConv.localVars)
     assert(
         g.maxStack == 2 && g.maxLocals == 3, s"${g.maxLocals} - ${g.maxStack}")
-  }
 
   @Test
-  def nothingTypedOK(): Unit = {
+  def nothingTypedOK(): Unit =
     val code = """class C {
         |  def f: Nothing = ???
         |  def g: Int = { f; 1 }
@@ -174,10 +167,9 @@ class InlinerTest extends ClearAfterClass {
 
     compiler.genBCode.bTypes.localOpt.methodOptimizations(g, "C")
     assertSameCode(convertMethod(g), invokeQQQ :+ Op(ATHROW))
-  }
 
   @Test
-  def synchronizedNoInline(): Unit = {
+  def synchronizedNoInline(): Unit =
     val code = """class C {
         |  def f: Int = 0
         |  def g: Int = f
@@ -186,16 +178,14 @@ class InlinerTest extends ClearAfterClass {
 
     val can = canInlineTest(code,
                             cls =>
-                              {
                                 val f =
                                   cls.methods.asScala.find(_.name == "f").get
                                 f.access |= ACC_SYNCHRONIZED
-                            })
+                            )
     assert(can.nonEmpty && can.get.isInstanceOf[SynchronizedMethod], can)
-  }
 
   @Test
-  def tryCatchOK(): Unit = {
+  def tryCatchOK(): Unit =
     val code = """class C {
         |  def f: Int = try { 1 } catch { case _: Exception => 2 }
         |  def g = f + 1
@@ -203,10 +193,9 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val r = canInlineTest(code)
     assert(r.isEmpty, r)
-  }
 
   @Test
-  def tryCatchNoInline(): Unit = {
+  def tryCatchNoInline(): Unit =
     // cannot inline f: there's a value on g's stack. if f throws and enters the handler, all values
     // on the stack are removed, including the one of g's stack that we still need.
     val code = """class C {
@@ -218,10 +207,9 @@ class InlinerTest extends ClearAfterClass {
     assert(r.nonEmpty &&
            r.get.isInstanceOf[MethodWithHandlerCalledOnNonEmptyStack],
            r)
-  }
 
   @Test
-  def illegalAccessNoInline(): Unit = {
+  def illegalAccessNoInline(): Unit =
     val code = """package a {
         |  class C {
         |    private def f: Int = 0
@@ -240,10 +228,9 @@ class InlinerTest extends ClearAfterClass {
     val gCall = getCallsite(hMeth, "g")
     val r = inliner.canInlineBody(gCall)
     assert(r.nonEmpty && r.get.isInstanceOf[IllegalAccessInstruction], r)
-  }
 
   @Test
-  def inlineSimpleAtInline(): Unit = {
+  def inlineSimpleAtInline(): Unit =
     val code = """class C {
         |  @inline final def f = 0
         |  final def g = 1
@@ -255,10 +242,9 @@ class InlinerTest extends ClearAfterClass {
     val instructions = getSingleMethod(cCls, "test").instructions
     assert(instructions.contains(Op(ICONST_0)), instructions.stringLines)
     assert(!instructions.contains(Op(ICONST_1)), instructions)
-  }
 
   @Test
-  def cyclicInline(): Unit = {
+  def cyclicInline(): Unit =
     val code = """class C {
         |  @inline final def f: Int = g
         |  @inline final def g: Int = f
@@ -275,13 +261,11 @@ class InlinerTest extends ClearAfterClass {
     assert(callGraph.callsites.size == 3, callGraph.callsites)
     for (callsite <- callGraph.callsites.valuesIterator
                       .flatMap(_.valuesIterator)
-                        if methods.contains(callsite.callsiteMethod)) {
+                        if methods.contains(callsite.callsiteMethod))
       checkCallsite(callsite, g)
-    }
-  }
 
   @Test
-  def cyclicInline2(): Unit = {
+  def cyclicInline2(): Unit =
     val code = """class C {
         |  @inline final def h: Int = f
         |  @inline final def f: Int = g + g
@@ -303,13 +287,11 @@ class InlinerTest extends ClearAfterClass {
         callGraph.callsites)
     for (callsite <- callGraph.callsites.valuesIterator
                       .flatMap(_.valuesIterator)
-                        if methods.contains(callsite.callsiteMethod)) {
+                        if methods.contains(callsite.callsiteMethod))
       checkCallsite(callsite, g)
-    }
-  }
 
   @Test
-  def arraycopy(): Unit = {
+  def arraycopy(): Unit =
     // also tests inlining of a void-returning method (no return value on the stack)
     val code =
       """// can't use the `compat.Platform.arraycopy` from the std lib for now, because the classfile doesn't have a ScalaInlineInfo attribute
@@ -333,10 +315,9 @@ class InlinerTest extends ClearAfterClass {
         "(Ljava/lang/Object;ILjava/lang/Object;II)V",
         false)
     assert(ins contains invokeSysArraycopy, ins.stringLines)
-  }
 
   @Test
-  def arrayMemberMethod(): Unit = {
+  def arrayMemberMethod(): Unit =
     // This used to crash when building the call graph. The `owner` field of the MethodInsnNode
     // for the invocation of `clone` is not an internal name, but a full array descriptor
     // [Ljava.lang.Object; - the documentation in the ASM library didn't mention that possibility.
@@ -350,10 +331,9 @@ class InlinerTest extends ClearAfterClass {
     assert(
         callGraph.callsites.valuesIterator.flatMap(_.valuesIterator) exists
         (_.callsiteInstruction.name == "clone"))
-  }
 
   @Test
-  def atInlineInTrait(): Unit = {
+  def atInlineInTrait(): Unit =
     val code = """trait T {
         |  @inline final def f = 0
         |}
@@ -365,10 +345,9 @@ class InlinerTest extends ClearAfterClass {
     println(textify(c))
     println(textify(t))
     assertNoInvoke(getSingleMethod(c, "g"))
-  }
 
   @Test
-  def inlinePrivateMethodWithHandler(): Unit = {
+  def inlinePrivateMethodWithHandler(): Unit =
     val code =
       """class C {
         |  @inline private def f = try { 0 } catch { case _: Throwable => 1 }
@@ -378,10 +357,9 @@ class InlinerTest extends ClearAfterClass {
     val List(c) = compile(code)
     // no more invoke, f is inlined
     assertNoInvoke(getSingleMethod(c, "g"))
-  }
 
   @Test
-  def inlineStaticCall(): Unit = {
+  def inlineStaticCall(): Unit =
     val code = """class C {
         |  def f = Integer.lowestOneBit(103)
         |}
@@ -401,14 +379,12 @@ class InlinerTest extends ClearAfterClass {
     assertNoInvoke(ins)
 
     // no null check when inlining a static method
-    ins foreach {
+    ins foreach
       case Jump(IFNONNULL, _) => assert(false, ins.stringLines)
       case _ =>
-    }
-  }
 
   @Test
-  def maxLocalsMaxStackAfterInline(): Unit = {
+  def maxLocalsMaxStackAfterInline(): Unit =
     val code = """class C {
         |  @inline final def f1(x: Int): Int = {
         |    val a = x + 1
@@ -446,10 +422,9 @@ class InlinerTest extends ClearAfterClass {
     // like maxLocals for g1 / f1, but no return value
     assert(g2.maxLocals == 4 && f2.maxLocals == 3,
            s"${g2.maxLocals} - ${f2.maxLocals}")
-  }
 
   @Test
-  def mixedCompilationNoInline(): Unit = {
+  def mixedCompilationNoInline(): Unit =
     // The inliner checks if the invocation `A.bar` can be safely inlined. For that it needs to have
     // the bytecode of the invoked method. In mixed compilation, there's no classfile available for
     // A, so `flop` cannot be inlined, we cannot check if it's safe.
@@ -479,10 +454,9 @@ class InlinerTest extends ClearAfterClass {
     val ins = getSingleMethod(b, "g").instructions
     val invokeFlop = Invoke(INVOKEVIRTUAL, "B", "flop", "()I", false)
     assert(ins contains invokeFlop, ins.stringLines)
-  }
 
   @Test
-  def inlineFromTraits(): Unit = {
+  def inlineFromTraits(): Unit =
     val code = """trait T {
         |  @inline final def f = g
         |  @inline final def g = 1
@@ -497,10 +471,9 @@ class InlinerTest extends ClearAfterClass {
     // both are just `return 1`, no more calls
     assertNoInvoke(getSingleMethod(c, "t1"))
     assertNoInvoke(getSingleMethod(c, "t2"))
-  }
 
   @Test
-  def inlineMixinMethods(): Unit = {
+  def inlineMixinMethods(): Unit =
     val code = """trait T {
         |  @inline final def f = 1
         |}
@@ -509,10 +482,9 @@ class InlinerTest extends ClearAfterClass {
     val List(c, t) = compile(code)
     // the static implementation method is inlined into the mixin, so there's no invocation in the mixin
     assertNoInvoke(getSingleMethod(c, "f"))
-  }
 
   @Test
-  def inlineTraitInherited(): Unit = {
+  def inlineTraitInherited(): Unit =
     val code = """trait T {
         |  @inline final def f = 1
         |}
@@ -527,10 +499,9 @@ class InlinerTest extends ClearAfterClass {
     val List(c, t, u) = compile(code)
     assertNoInvoke(getSingleMethod(c, "t1"))
     assertNoInvoke(getSingleMethod(c, "t2"))
-  }
 
   @Test
-  def virtualTraitNoInline(): Unit = {
+  def virtualTraitNoInline(): Unit =
     val code = """trait T {
         |  @inline def f = 1
         |}
@@ -550,10 +521,9 @@ class InlinerTest extends ClearAfterClass {
     assert(count == 3, count)
     assertInvoke(getSingleMethod(c, "t1"), "T", "f")
     assertInvoke(getSingleMethod(c, "t2"), "C", "f")
-  }
 
   @Test
-  def sealedTraitInline(): Unit = {
+  def sealedTraitInline(): Unit =
     val code = """sealed trait T {
         |  @inline def f = 1
         |}
@@ -563,10 +533,9 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val List(c, t) = compile(code)
     assertNoInvoke(getSingleMethod(c, "t1"))
-  }
 
   @Test
-  def inlineFromObject(): Unit = {
+  def inlineFromObject(): Unit =
     val code =
       """trait T {
         |  @inline def f = 0
@@ -598,10 +567,9 @@ class InlinerTest extends ClearAfterClass {
 //    assertNoInvoke(getSingleMethod(c, "t1")) // SD-86
     assertNoInvoke(getSingleMethod(c, "t2"))
     assertInvoke(getSingleMethod(c, "t3"), "T", "f")
-  }
 
   @Test
-  def selfTypeInline(): Unit = {
+  def selfTypeInline(): Unit =
     val code =
       """trait T { self: Assembly =>
         |  @inline final def f = g
@@ -627,10 +595,9 @@ class InlinerTest extends ClearAfterClass {
 
     assertNoInvoke(getSingleMethod(c, "t1"))
     assertNoInvoke(getSingleMethod(c, "t2"))
-  }
 
   @Test
-  def selfTypeInline2(): Unit = {
+  def selfTypeInline2(): Unit =
     // There are some interesting things going on here with the self types. Here's a short version:
     //
     //   trait T1 { def f = 1 }
@@ -720,10 +687,9 @@ class InlinerTest extends ClearAfterClass {
     assertNoInvoke(getSingleMethod(cb, "m3b"))
     assertInvoke(getSingleMethod(cb, "m4b"), "T1", "f")
     assertNoInvoke(getSingleMethod(cb, "m5b"))
-  }
 
   @Test
-  def finalSubclassInline(): Unit = {
+  def finalSubclassInline(): Unit =
     val code =
       """class C {
         |  @inline def f = 0
@@ -737,10 +703,9 @@ class InlinerTest extends ClearAfterClass {
       """.stripMargin
     val List(c, d, e, eModule, t) = compile(code)
     assertNoInvoke(getSingleMethod(t, "t1"))
-  }
 
   @Test
-  def inlineFromNestedClasses(): Unit = {
+  def inlineFromNestedClasses(): Unit =
     val code = """class C {
         |  trait T { @inline final def f = 1 }
         |  class D extends T {
@@ -752,10 +717,9 @@ class InlinerTest extends ClearAfterClass {
     val List(c, d, t) = compile(code)
     assertNoInvoke(getSingleMethod(d, "m"))
     assertNoInvoke(getSingleMethod(c, "m"))
-  }
 
   @Test
-  def inlineTraitCastReceiverToSelf(): Unit = {
+  def inlineTraitCastReceiverToSelf(): Unit =
     val code = """class C { def foo(x: Int) = x }
         |trait T { self: C =>
         |  @inline final def f(x: Int) = foo(x)
@@ -769,10 +733,9 @@ class InlinerTest extends ClearAfterClass {
     val cast = TypeOp(CHECKCAST, "C")
     Set(t1, t2).foreach(
         m => assert(m.instructions.contains(cast), m.instructions))
-  }
 
   @Test
-  def abstractMethodWarning(): Unit = {
+  def abstractMethodWarning(): Unit =
     val code = """abstract class C {
         |  @inline def foo: Int
         |}
@@ -785,10 +748,9 @@ class InlinerTest extends ClearAfterClass {
     var c = 0
     compile(code, allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
-  }
 
   @Test
-  def abstractFinalMethodError(): Unit = {
+  def abstractFinalMethodError(): Unit =
     val code = """abstract class C {
         |  @inline final def foo: Int
         |}
@@ -800,10 +762,9 @@ class InlinerTest extends ClearAfterClass {
     var i = 0
     compile(code, allowMessage = info => { i += 1; info.msg contains err })
     assert(i == 2, i)
-  }
 
   @Test
-  def noInlineTraitFieldAccessors(): Unit = {
+  def noInlineTraitFieldAccessors(): Unit =
     val code =
       """sealed trait T {
         |  lazy val a = 0
@@ -872,10 +833,9 @@ class InlinerTest extends ClearAfterClass {
     assertInvoke(m6, "U", "g")
     assertInvoke(m6, "U", "h")
     assertInvoke(m6, "U", "i")
-  }
 
   @Test
-  def mixedNoCrashSI9111(): Unit = {
+  def mixedNoCrashSI9111(): Unit =
     val javaCode = """public final class A {
         |  public static final class T { }
         |  public static final class Inner {
@@ -911,10 +871,9 @@ class InlinerTest extends ClearAfterClass {
         List((javaCode, "A.java")),
         allowMessage = i => { c += 1; i.msg contains warn })
     assert(c == 1, c)
-  }
 
   @Test
-  def inlineInvokeSpecial(): Unit = {
+  def inlineInvokeSpecial(): Unit =
     val code =
       """class Aa {
         |  def f1 = 0
@@ -960,10 +919,9 @@ class InlinerTest extends ClearAfterClass {
     assertInvoke(getSingleMethod(t, "t2"), "B", "B$$f2m")
     assertInvoke(getSingleMethod(t, "t3"), "B", "<init>")
     assertInvoke(getSingleMethod(t, "t4"), "B", "<init>")
-  }
 
   @Test
-  def dontInlineNative(): Unit = {
+  def dontInlineNative(): Unit =
     val code = """class C {
         |  def t = System.arraycopy(null, 0, null, 0, 0)
         |}
@@ -971,10 +929,9 @@ class InlinerTest extends ClearAfterClass {
     val List(c) = compileClasses(newCompiler(extraArgs = InlinerTest.args +
               " -Yopt-inline-heuristics:everything"))(code)
     assertInvoke(getSingleMethod(c, "t"), "java/lang/System", "arraycopy")
-  }
 
   @Test
-  def inlineMayRenderCodeDead(): Unit = {
+  def inlineMayRenderCodeDead(): Unit =
     val code =
       """class C {
         |  @inline final def f: String = throw new Error("")
@@ -985,10 +942,9 @@ class InlinerTest extends ClearAfterClass {
 
     val List(c) = compile(code)
     assertInvoke(getSingleMethod(c, "t"), "java/lang/Error", "<init>")
-  }
 
   @Test
-  def noRedunantNullChecks(): Unit = {
+  def noRedunantNullChecks(): Unit =
     val code =
       """class C {
         |  @inline final def f: String = "hai!"
@@ -1001,10 +957,9 @@ class InlinerTest extends ClearAfterClass {
     assertNoInvoke(t)
     assert(1 == t.collect({ case Ldc(_, "hai!") => }).size) // push-pop eliminates the first LDC("hai!")
     assert(1 == t.collect({ case Jump(IFNONNULL, _) => }).size) // one single null check
-  }
 
   @Test
-  def inlineIndyLambda(): Unit = {
+  def inlineIndyLambda(): Unit =
     val code = """object M {
         |  @inline def m(s: String) = {
         |    val f = (x: String) => x.trim
@@ -1025,26 +980,25 @@ class InlinerTest extends ClearAfterClass {
 
     val t1 = getSingleMethod(c, "t1")
     assert(
-        t1.instructions forall {
+        t1.instructions forall
       // indy is eliminated by push-pop
       case _: InvokeDynamic => false
       case _ => true
-    })
+    )
     // the indy call is inlined into t, and the closure elimination rewrites the closure invocation to the body method
     assertInvoke(t1, "C", "C$$$anonfun$2")
 
     val t2 = getSingleMethod(c, "t2")
     assert(
-        t2.instructions forall {
+        t2.instructions forall
       // indy is eliminated by push-pop
       case _: InvokeDynamic => false
       case _ => true
-    })
+    )
     assertInvoke(t2, "M$", "M$$$anonfun$1")
-  }
 
   @Test
-  def inlinePostRequests(): Unit = {
+  def inlinePostRequests(): Unit =
     val code = """class C {
         |  final def f = 10
         |  final def g = f + 19
@@ -1071,10 +1025,9 @@ class InlinerTest extends ClearAfterClass {
                       gCall, post = List(InlineRequest(fCall, Nil))))))
     assertNoInvoke(convertMethod(iMeth)) // no invoke in i: first h is inlined, then the inlined call to g is also inlined, etc for f
     assertInvoke(convertMethod(gMeth), "C", "f") // g itself still has the call to f
-  }
 
   @Test
-  def postRequestSkipAlreadyInlined(): Unit = {
+  def postRequestSkipAlreadyInlined(): Unit =
     val code = """class C {
         |  final def a = 10
         |  final def b = a + 20
@@ -1096,10 +1049,9 @@ class InlinerTest extends ClearAfterClass {
     inliner.inline(req)
 
     assertNoInvoke(convertMethod(d))
-  }
 
   @Test
-  def inlineAnnotatedCallsite(): Unit = {
+  def inlineAnnotatedCallsite(): Unit =
     val code = """class C {
         |  final def a(x: Int, f: Int => Int): Int = f(x)
         |  final def b(x: Int) = x
@@ -1131,10 +1083,9 @@ class InlinerTest extends ClearAfterClass {
     assertInvoke(getSingleMethod(c, "t7"), "C", "c")
     assertInvoke(getSingleMethod(c, "t8"), "scala/Predef$", "println")
     assertNoInvoke(getSingleMethod(c, "t9"))
-  }
 
   @Test
-  def inlineNoInlineOverride(): Unit = {
+  def inlineNoInlineOverride(): Unit =
     val code =
       """class C {
         |  @inline   final def f1(x: Int) = x
@@ -1164,10 +1115,9 @@ class InlinerTest extends ClearAfterClass {
     assertNoInvoke(getSingleMethod(c, "t7"))
     assertInvoke(getSingleMethod(c, "t8"), "C", "f1")
     assertNoInvoke(getSingleMethod(c, "t9"))
-  }
 
   @Test
-  def inlineHigherOrder(): Unit = {
+  def inlineHigherOrder(): Unit =
     val code = """class C {
         |  final def h(f: Int => Int): Int = f(0)
         |  def t1 = h(x => x + 1)
@@ -1190,10 +1140,9 @@ class InlinerTest extends ClearAfterClass {
     assertInvoke(getSingleMethod(c, "t3"), "scala/Function1", "apply$mcII$sp")
     assertInvoke(getSingleMethod(c, "t4"), "scala/Function1", "apply$mcII$sp")
     assertInvoke(getSingleMethod(c, "t5"), "C", "h")
-  }
 
   @Test
-  def twoStepNoInlineHandler(): Unit = {
+  def twoStepNoInlineHandler(): Unit =
     val code =
       """class C {
         |  @inline final def f = try 1 catch { case _: Throwable => 2 }
@@ -1210,10 +1159,9 @@ class InlinerTest extends ClearAfterClass {
 
     val List(c) = compile(code, allowMessage = _.msg contains warn)
     assertInvoke(getSingleMethod(c, "t"), "C", "g")
-  }
 
   @Test
-  def twoStepNoInlinePrivate(): Unit = {
+  def twoStepNoInlinePrivate(): Unit =
     val code =
       """class C {
         |  @inline final def g = {
@@ -1235,10 +1183,9 @@ class InlinerTest extends ClearAfterClass {
     val List(c, d) = compile(code, allowMessage = _.msg contains warn)
     assertInvoke(getSingleMethod(c, "h"), "C", "f$1")
     assertInvoke(getSingleMethod(d, "t"), "C", "h")
-  }
 
   @Test
-  def twoStepInlinePrivate(): Unit = {
+  def twoStepInlinePrivate(): Unit =
     val code =
       """class C {
         |  @inline final def g = {  // initially, g invokes the private method f$1, but then f$1 is inlined
@@ -1254,10 +1201,9 @@ class InlinerTest extends ClearAfterClass {
     val List(c, d) = compile(code)
     assertNoInvoke(getSingleMethod(c, "g"))
     assertNoInvoke(getSingleMethod(d, "t"))
-  }
 
   @Test
-  def optimizeSpecializedClosures(): Unit = {
+  def optimizeSpecializedClosures(): Unit =
     val code =
       """class ValKl(val x: Int) extends AnyVal
         |
@@ -1416,10 +1362,9 @@ class InlinerTest extends ClearAfterClass {
     // t10a inlines Range.foreach
     assertInvoke(getSingleMethod(c, "t10a"), "C", "C$$$anonfun$15")
     assertDoesNotInvoke(getSingleMethod(c, "t10a"), "boxToInteger")
-  }
 
   @Test
-  def refElimination(): Unit = {
+  def refElimination(): Unit =
     val code =
       """class C {
         |  def t1 = {
@@ -1440,13 +1385,12 @@ class InlinerTest extends ClearAfterClass {
     val List(c) = compile(code)
     assertSameCode(getSingleMethod(c, "t1"),
                    List(Op(ICONST_0), Op(ICONST_1), Op(IADD), Op(IRETURN)))
-    assertEquals(getSingleMethod(c, "t2").instructions collect {
+    assertEquals(getSingleMethod(c, "t2").instructions collect
       case i: Invoke => i.owner + "." + i.name
-    }, List("scala/runtime/IntRef.create", "C.C$$$anonfun$1"))
-  }
+    , List("scala/runtime/IntRef.create", "C.C$$$anonfun$1"))
 
   @Test
-  def tupleElimination(): Unit = {
+  def tupleElimination(): Unit =
     val code =
       """class C {
         |  @inline final def tpl[A, B](a: A, b: B) = (a, b)
@@ -1489,10 +1433,9 @@ class InlinerTest extends ClearAfterClass {
                    List(Op(ICONST_1), Op(ICONST_3), Op(ISUB), Op(IRETURN)))
     assertNoInvoke(getSingleMethod(c, "t4"))
     assertNoInvoke(getSingleMethod(c, "t5"))
-  }
 
   @Test
-  def redundantCasts(): Unit = {
+  def redundantCasts(): Unit =
 
     // we go through the hoop of inlining the casts because erasure eliminates `asInstanceOf` calls
     // that are statically known to succeed. For example the following cast is removed by erasure:
@@ -1514,9 +1457,8 @@ class InlinerTest extends ClearAfterClass {
         |class D extends C
       """.stripMargin
     val List(c, _) = compile(code)
-    def casts(m: String) = getSingleMethod(c, m).instructions collect {
+    def casts(m: String) = getSingleMethod(c, m).instructions collect
       case TypeOp(CHECKCAST, tp) => tp
-    }
     assertSameCode(
         getSingleMethod(c, "t1"), List(VarOp(ALOAD, 1), Op(ARETURN)))
     assertSameCode(
@@ -1526,10 +1468,9 @@ class InlinerTest extends ClearAfterClass {
     assertEquals(casts("t4"), List("C"))
     assertEquals(casts("t5"), Nil)
     assertEquals(casts("t6"), Nil)
-  }
 
   @Test
-  def inlineFromSealed(): Unit = {
+  def inlineFromSealed(): Unit =
     val code = """sealed abstract class Foo {
         |  @inline def bar(x: Int) = x + 1
         |}
@@ -1560,10 +1501,9 @@ class InlinerTest extends ClearAfterClass {
                            ICONST_1,
                            IADD,
                            IRETURN))
-  }
 
   @Test // a test taken from the test suite for the 2.11 inliner
-  def oldInlineHigherOrderTest(): Unit = {
+  def oldInlineHigherOrderTest(): Unit =
     val code =
       """class C {
         |  private var debug = false
@@ -1583,15 +1523,12 @@ class InlinerTest extends ClearAfterClass {
                            -1 /*A*/,
                            "C$$$anonfun$3",
                            IRETURN))
-  }
 
   @Test
-  def inlineProject(): Unit = {
+  def inlineProject(): Unit =
     val codeA = "final class A { @inline def f = 1 }"
     val codeB = "class B { def t(a: A) = a.f }"
     // tests that no warning is emitted
     val List(a, b) = compileClassesSeparately(
         List(codeA, codeB), extraArgs = "-Yopt:l:project -Yopt-warnings")
     assertInvoke(getSingleMethod(b, "t"), "A", "f")
-  }
-}

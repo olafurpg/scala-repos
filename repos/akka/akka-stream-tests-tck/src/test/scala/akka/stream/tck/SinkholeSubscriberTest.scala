@@ -14,38 +14,31 @@ import org.reactivestreams.{Subscription, Subscriber}
 
 class SinkholeSubscriberTest
     extends SubscriberWhiteboxVerification[JInt](new TestEnvironment())
-    with TestNGSuiteLike {
+    with TestNGSuiteLike
   override def createSubscriber(
-      probe: WhiteboxSubscriberProbe[JInt]): Subscriber[JInt] = {
-    new Subscriber[JInt] {
+      probe: WhiteboxSubscriberProbe[JInt]): Subscriber[JInt] =
+    new Subscriber[JInt]
       val hole = new SinkholeSubscriber[JInt](Promise[Done]())
 
-      override def onError(t: Throwable): Unit = {
+      override def onError(t: Throwable): Unit =
         hole.onError(t)
         probe.registerOnError(t)
-      }
 
-      override def onSubscribe(s: Subscription): Unit = {
+      override def onSubscribe(s: Subscription): Unit =
         probe.registerOnSubscribe(
-            new SubscriberPuppet() {
+            new SubscriberPuppet()
           override def triggerRequest(elements: Long): Unit =
             s.request(elements)
           override def signalCancel(): Unit = s.cancel()
-        })
+        )
         hole.onSubscribe(s)
-      }
 
-      override def onComplete(): Unit = {
+      override def onComplete(): Unit =
         hole.onComplete()
         probe.registerOnComplete()
-      }
 
-      override def onNext(t: JInt): Unit = {
+      override def onNext(t: JInt): Unit =
         hole.onNext(t)
         probe.registerOnNext(t)
-      }
-    }
-  }
 
   override def createElement(element: Int): JInt = element
-}

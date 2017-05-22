@@ -28,8 +28,8 @@ import org.apache.spark.sql.types.StructType
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object VectorSlicerExample {
-  def main(args: Array[String]): Unit = {
+object VectorSlicerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("VectorSlicerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -56,6 +56,4 @@ object VectorSlicerExample {
     println(output.select("userFeatures", "features").first())
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

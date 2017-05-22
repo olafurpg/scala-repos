@@ -22,29 +22,25 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory._
   * 2014-08-01
   */
 abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
-    extends IntentionAction {
-  override val getText = {
-    val classKind = td match {
+    extends IntentionAction
+  override val getText =
+    val classKind = td match
       case _: ScObject => "object"
       case _: ScTrait => "trait"
       case _: ScClass => "class"
       case _ => ""
-    }
     s"$getFamilyName in $classKind ${td.name}"
-  }
 
-  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
+  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     if (!td.isValid) return false
-    td.getContainingFile match {
+    td.getContainingFile match
       case _: ScalaCodeFragment => false
       case f: ScalaFile if f.isWritable => true
       case _ => false
-    }
-  }
 
   def startInWriteAction = false
 
-  protected def createEntity(block: ScExtendsBlock, text: String): PsiElement = {
+  protected def createEntity(block: ScExtendsBlock, text: String): PsiElement =
     if (block.templateBody.isEmpty)
       block.add(createTemplateBody(block.getManager))
 
@@ -57,7 +53,6 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
     if (hasMembers) holder.addAfter(createNewLine(td.getManager), entity)
 
     entity
-  }
 
   protected def methodType: Option[String]
 
@@ -66,14 +61,14 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
   protected def addElementsToTemplate(
       method: ScFunction, builder: TemplateBuilder): Unit
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     PsiDocumentManager.getInstance(project).commitAllDocuments()
 
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
 
     IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
 
-    inWriteAction {
+    inWriteAction
       val entity =
         createEntity(td.extendsBlock, methodText).asInstanceOf[ScFunction]
 
@@ -92,6 +87,3 @@ abstract class CreateApplyOrUnapplyQuickFix(td: ScTypeDefinition)
       newEditor.getDocument.deleteString(
           range.getStartOffset, range.getEndOffset)
       TemplateManager.getInstance(project).startTemplate(newEditor, template)
-    }
-  }
-}

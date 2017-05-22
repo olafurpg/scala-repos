@@ -40,7 +40,7 @@ import breeze.util.SerializableLogging
 class LBFGS[T](convergenceCheck: ConvergenceCheck[T], m: Int)(
     implicit space: MutableInnerProductModule[T, Double])
     extends FirstOrderMinimizer[T, DiffFunction[T]](convergenceCheck)
-    with SerializableLogging {
+    with SerializableLogging
 
   def this(maxIter: Int = -1, m: Int = 7, tolerance: Double = 1E-9)(
       implicit space: MutableInnerProductModule[T, Double]) =
@@ -57,17 +57,15 @@ class LBFGS[T](convergenceCheck: ConvergenceCheck[T], m: Int)(
     state.x + dir * stepSize
   protected def initialHistory(f: DiffFunction[T], x: T): History =
     new LBFGS.ApproximateInverseHessian(m)
-  protected def chooseDescentDirection(state: State, fn: DiffFunction[T]): T = {
+  protected def chooseDescentDirection(state: State, fn: DiffFunction[T]): T =
     state.history * state.grad
-  }
 
   protected def updateHistory(newX: T,
                               newGrad: T,
                               newVal: Double,
                               f: DiffFunction[T],
-                              oldState: State): History = {
+                              oldState: State): History =
     oldState.history.updated(newX - oldState.x, newGrad :- oldState.grad)
-  }
 
   /**
     * Given a direction, perform a line search to find 
@@ -79,7 +77,7 @@ class LBFGS[T](convergenceCheck: ConvergenceCheck[T], m: Int)(
     * @param dir The step direction
     * @return stepSize
     */
-  protected def determineStepSize(state: State, f: DiffFunction[T], dir: T) = {
+  protected def determineStepSize(state: State, f: DiffFunction[T], dir: T) =
     val x = state.x
     val grad = state.grad
 
@@ -92,73 +90,61 @@ class LBFGS[T](convergenceCheck: ConvergenceCheck[T], m: Int)(
 
     if (alpha * norm(grad) < 1E-10) throw new StepSizeUnderflow
     alpha
-  }
-}
 
-object LBFGS {
+object LBFGS
   case class ApproximateInverseHessian[T](
       m: Int,
       private[LBFGS] val memStep: IndexedSeq[T] = IndexedSeq.empty,
       private[LBFGS] val memGradDelta: IndexedSeq[T] = IndexedSeq.empty)(
       implicit space: MutableInnerProductModule[T, Double])
-      extends NumericOps[ApproximateInverseHessian[T]] {
+      extends NumericOps[ApproximateInverseHessian[T]]
 
     import space._
 
     def repr: ApproximateInverseHessian[T] = this
 
-    def updated(step: T, gradDelta: T) = {
+    def updated(step: T, gradDelta: T) =
       val memStep = (step +: this.memStep) take m
       val memGradDelta = (gradDelta +: this.memGradDelta) take m
 
       new ApproximateInverseHessian(m, memStep, memGradDelta)
-    }
 
     def historyLength = memStep.length
 
-    def *(grad: T) = {
+    def *(grad: T) =
       val diag =
-        if (historyLength > 0) {
+        if (historyLength > 0)
           val prevStep = memStep.head
           val prevGradStep = memGradDelta.head
           val sy = prevStep dot prevGradStep
           val yy = prevGradStep dot prevGradStep
           if (sy < 0 || sy.isNaN) throw new NaNHistory
           sy / yy
-        } else {
+        else
           1.0
-        }
 
       val dir = space.copy(grad)
       val as = new Array[Double](m)
       val rho = new Array[Double](m)
 
-      for (i <- 0 until historyLength) {
+      for (i <- 0 until historyLength)
         rho(i) = (memStep(i) dot memGradDelta(i))
         as(i) = (memStep(i) dot dir) / rho(i)
-        if (as(i).isNaN) {
+        if (as(i).isNaN)
           throw new NaNHistory
-        }
         axpy(-as(i), memGradDelta(i), dir)
-      }
 
       dir *= diag
 
-      for (i <- (historyLength - 1) to 0 by (-1)) {
+      for (i <- (historyLength - 1) to 0 by (-1))
         val beta = (memGradDelta(i) dot dir) / rho(i)
         axpy(as(i) - beta, memStep(i), dir)
-      }
 
       dir *= -1.0
       dir
-    }
-  }
 
   implicit def multiplyInverseHessian[T](
       implicit vspace: MutableInnerProductModule[T, Double])
-    : OpMulMatrix.Impl2[ApproximateInverseHessian[T], T, T] = {
-    new OpMulMatrix.Impl2[ApproximateInverseHessian[T], T, T] {
+    : OpMulMatrix.Impl2[ApproximateInverseHessian[T], T, T] =
+    new OpMulMatrix.Impl2[ApproximateInverseHessian[T], T, T]
       def apply(a: ApproximateInverseHessian[T], b: T): T = a * b
-    }
-  }
-}

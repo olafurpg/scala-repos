@@ -32,7 +32,7 @@ import scala.concurrent.{Await, Future, Promise}
 import scala.util.{Success, Try}
 
 class TightRequestTimeoutSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures {
+    extends WordSpec with Matchers with BeforeAndAfterAll with ScalaFutures
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loggers = ["akka.testkit.TestEventListener"]
@@ -47,9 +47,9 @@ class TightRequestTimeoutSpec
   implicit val materializer = ActorMaterializer()
   implicit val patience = PatienceConfig(3.seconds)
 
-  "Tight request timeout" should {
+  "Tight request timeout" should
 
-    "not cause double push error caused by the late response attemting to push" in {
+    "not cause double push error caused by the late response attemting to push" in
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
       val slowHandler = Flow[HttpRequest]
         .map(_ ⇒ HttpResponse())
@@ -64,14 +64,10 @@ class TightRequestTimeoutSpec
         .futureValue
       response.status should ===(StatusCodes.ServiceUnavailable) // the timeout response
 
-      p.expectMsgPF(hint = "Expected truncation error") {
+      p.expectMsgPF(hint = "Expected truncation error")
         case Logging.Error(_, _, _, msg: String)
             if msg contains "Inner stream finished before inputs completed." ⇒
           ()
-      }
       p.expectNoMsg(1.second) // here the double push might happen
 
       binding.flatMap(_.unbind()).futureValue
-    }
-  }
-}

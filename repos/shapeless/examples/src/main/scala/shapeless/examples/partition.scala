@@ -22,7 +22,7 @@ package shapeless.examples
   *
   * @author Travis Brown
   */
-object ADTPartitionExampleTypes {
+object ADTPartitionExampleTypes
 
   /**
     * An example type with two constructors.
@@ -31,7 +31,6 @@ object ADTPartitionExampleTypes {
 
   case class Apple(id: Int, sweetness: Int) extends Fruit
   case class Pear(id: Int, color: String) extends Fruit
-}
 
 /**
   * Partitioning lists of some algebraic data type by that type's constructors.
@@ -41,7 +40,7 @@ object ADTPartitionExampleTypes {
   *
   * @author Travis Brown
   */
-object ADTPartitionExample extends App {
+object ADTPartitionExample extends App
   import shapeless._
   import labelled._
   import ops.hlist.Tupler
@@ -52,32 +51,27 @@ object ADTPartitionExample extends App {
     * A type class that partitions a list of coproduct items into an HList of
     * lists of the coproduct alternatives.
     */
-  trait Partitioner[C <: Coproduct] extends DepFn1[List[C]] {
+  trait Partitioner[C <: Coproduct] extends DepFn1[List[C]]
     type Out <: HList
-  }
 
-  object Partitioner {
-    type Aux[C <: Coproduct, Out0 <: HList] = Partitioner[C] {
+  object Partitioner
+    type Aux[C <: Coproduct, Out0 <: HList] = Partitioner[C]
       type Out = Out0
-    }
 
-    implicit def cnilPartitioner: Aux[CNil, HNil] = new Partitioner[CNil] {
+    implicit def cnilPartitioner: Aux[CNil, HNil] = new Partitioner[CNil]
       type Out = HNil
 
       def apply(c: List[CNil]): Out = HNil
-    }
 
     implicit def cpPartitioner[K, H, T <: Coproduct, OutT <: HList](
         implicit cp: Aux[T, OutT])
       : Aux[FieldType[K, H] :+: T, FieldType[K, List[H]] :: OutT] =
-      new Partitioner[FieldType[K, H] :+: T] {
+      new Partitioner[FieldType[K, H] :+: T]
         type Out = FieldType[K, List[H]] :: OutT
 
         def apply(c: List[FieldType[K, H] :+: T]): Out =
           field[K](c.collect { case Inl(h) => h: H }) :: cp(
               c.collect { case Inr(t) => t })
-      }
-  }
 
   /**
     * Partition a list into a tuple of lists for each constructor.
@@ -131,4 +125,3 @@ object ADTPartitionExample extends App {
 
   assert(basket('Apple) == expectedApples)
   assert(basket('Pear) == expectedPears)
-}

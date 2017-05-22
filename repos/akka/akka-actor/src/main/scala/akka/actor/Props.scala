@@ -18,7 +18,7 @@ import scala.reflect.ClassTag
   *
   * Used when creating new actors through <code>ActorSystem.actorOf</code> and <code>ActorContext.actorOf</code>.
   */
-object Props extends AbstractProps {
+object Props extends AbstractProps
 
   /**
     * The defaultCreator, simply throws an UnsupportedOperationException when applied, which is used when creating a Props
@@ -52,9 +52,8 @@ object Props extends AbstractProps {
     *
     * (Not because it is so immensely complicated, only because we might remove it if no longer needed internally)
     */
-  private[akka] class EmptyActor extends Actor {
+  private[akka] class EmptyActor extends Actor
     def receive = Actor.emptyBehavior
-  }
 
   /**
     * Scala API: Returns a Props that has default values except for "creator" which will be a function that creates an instance
@@ -87,7 +86,6 @@ object Props extends AbstractProps {
     */
   def apply(clazz: Class[_], args: Any*): Props =
     apply(defaultDeploy, clazz, args.toList)
-}
 
 /**
   * Props is a configuration object using in creating an [[Actor]]; it is
@@ -114,7 +112,7 @@ object Props extends AbstractProps {
   */
 @SerialVersionUID(2L)
 final case class Props(
-    deploy: Deploy, clazz: Class[_], args: immutable.Seq[Any]) {
+    deploy: Deploy, clazz: Class[_], args: immutable.Seq[Any])
 
   Props.validate(clazz)
 
@@ -129,17 +127,15 @@ final case class Props(
   /**
     * INTERNAL API
     */
-  private[akka] def producer: IndirectActorProducer = {
+  private[akka] def producer: IndirectActorProducer =
     if (_producer eq null) _producer = IndirectActorProducer(clazz, args)
 
     _producer
-  }
 
-  private[this] def cachedActorClass: Class[_ <: Actor] = {
+  private[this] def cachedActorClass: Class[_ <: Actor] =
     if (_cachedActorClass eq null) _cachedActorClass = producer.actorClass
 
     _cachedActorClass
-  }
 
   // validate producer constructor signature; throws IllegalArgumentException if invalid
   producer
@@ -148,19 +144,17 @@ final case class Props(
     * Convenience method for extracting the dispatcher information from the
     * contained [[Deploy]] instance.
     */
-  def dispatcher: String = deploy.dispatcher match {
+  def dispatcher: String = deploy.dispatcher match
     case NoDispatcherGiven ⇒ Dispatchers.DefaultDispatcherId
     case x ⇒ x
-  }
 
   /**
     * Convenience method for extracting the mailbox information from the
     * contained [[Deploy]] instance.
     */
-  def mailbox: String = deploy.mailbox match {
+  def mailbox: String = deploy.mailbox match
     case NoMailboxGiven ⇒ Mailboxes.DefaultMailboxId
     case x ⇒ x
-  }
 
   /**
     * Convenience method for extracting the router configuration from the
@@ -171,18 +165,16 @@ final case class Props(
   /**
     * Returns a new Props with the specified dispatcher set.
     */
-  def withDispatcher(d: String): Props = deploy.dispatcher match {
+  def withDispatcher(d: String): Props = deploy.dispatcher match
     case NoDispatcherGiven ⇒ copy(deploy = deploy.copy(dispatcher = d))
     case x ⇒ if (x == d) this else copy(deploy = deploy.copy(dispatcher = d))
-  }
 
   /**
     * Returns a new Props with the specified mailbox set.
     */
-  def withMailbox(m: String): Props = deploy.mailbox match {
+  def withMailbox(m: String): Props = deploy.mailbox match
     case NoMailboxGiven ⇒ copy(deploy = deploy.copy(mailbox = m))
     case x ⇒ if (x == m) this else copy(deploy = deploy.copy(mailbox = m))
-  }
 
   /**
     * Returns a new Props with the specified router config set.
@@ -211,7 +203,5 @@ final case class Props(
     * actor creation by the ActorSystem, i.e. for user-level code it can only be
     * used within the implementation of [[IndirectActorProducer#produce]].
     */
-  private[akka] def newActor(): Actor = {
+  private[akka] def newActor(): Actor =
     producer.produce()
-  }
-}

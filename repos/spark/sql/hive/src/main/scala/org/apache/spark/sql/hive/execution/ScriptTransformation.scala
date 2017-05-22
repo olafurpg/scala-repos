@@ -57,7 +57,7 @@ private[hive] case class ScriptTransformation(
     output: Seq[Attribute],
     child: SparkPlan,
     ioschema: HiveScriptIOSchema)(@transient private val sc: HiveContext)
-    extends UnaryNode {
+    extends UnaryNode
 
   override protected def otherCopyArgs: Seq[HiveContext] = sc :: Nil
 
@@ -65,9 +65,9 @@ private[hive] case class ScriptTransformation(
 
   private val serializedHiveConf = new SerializableConfiguration(sc.hiveconf)
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     def processIterator(
-        inputIterator: Iterator[InternalRow]): Iterator[InternalRow] = {
+        inputIterator: Iterator[InternalRow]): Iterator[InternalRow] =
       val cmd = List("/bin/bash", "-c", script)
       val builder = new ProcessBuilder(cmd.asJava)
 
@@ -111,14 +111,13 @@ private[hive] case class ScriptTransformation(
 
       // This nullability is a performance optimization in order to avoid an Option.foreach() call
       // inside of a loop
-      @Nullable val (outputSerde, outputSoi) = {
+      @Nullable val (outputSerde, outputSoi) =
         ioschema.initOutputSerDe(output).getOrElse((null, null))
-      }
 
       val reader = new BufferedReader(
           new InputStreamReader(inputStream, StandardCharsets.UTF_8))
       val outputIterator: Iterator[InternalRow] = new Iterator[InternalRow]
-      with HiveInspectors {
+      with HiveInspectors
         var curLine: String = null
         val scriptOutputStream = new DataInputStream(inputStream)
 
@@ -127,112 +126,90 @@ private[hive] case class ScriptTransformation(
 
         var scriptOutputWritable: Writable = null
         val reusedWritableObject: Writable =
-          if (null != outputSerde) {
+          if (null != outputSerde)
             outputSerde.getSerializedClass().newInstance
-          } else {
+          else
             null
-          }
         val mutableRow = new SpecificMutableRow(output.map(_.dataType))
 
-        override def hasNext: Boolean = {
-          if (outputSerde == null) {
-            if (curLine == null) {
+        override def hasNext: Boolean =
+          if (outputSerde == null)
+            if (curLine == null)
               curLine = reader.readLine()
-              if (curLine == null) {
-                if (writerThread.exception.isDefined) {
+              if (curLine == null)
+                if (writerThread.exception.isDefined)
                   throw writerThread.exception.get
-                }
                 false
-              } else {
+              else
                 true
-              }
-            } else {
+            else
               true
-            }
-          } else if (scriptOutputWritable == null) {
+          else if (scriptOutputWritable == null)
             scriptOutputWritable = reusedWritableObject
 
-            if (scriptOutputReader != null) {
-              if (scriptOutputReader.next(scriptOutputWritable) <= 0) {
+            if (scriptOutputReader != null)
+              if (scriptOutputReader.next(scriptOutputWritable) <= 0)
                 writerThread.exception.foreach(throw _)
                 false
-              } else {
+              else
                 true
-              }
-            } else {
-              try {
+            else
+              try
                 scriptOutputWritable.readFields(scriptOutputStream)
                 true
-              } catch {
+              catch
                 case _: EOFException =>
-                  if (writerThread.exception.isDefined) {
+                  if (writerThread.exception.isDefined)
                     throw writerThread.exception.get
-                  }
                   false
-              }
-            }
-          } else {
+          else
             true
-          }
-        }
 
-        override def next(): InternalRow = {
-          if (!hasNext) {
+        override def next(): InternalRow =
+          if (!hasNext)
             throw new NoSuchElementException
-          }
-          if (outputSerde == null) {
+          if (outputSerde == null)
             val prevLine = curLine
             curLine = reader.readLine()
-            if (!ioschema.schemaLess) {
+            if (!ioschema.schemaLess)
               new GenericInternalRow(
                   prevLine
                     .split(
                         ioschema.outputRowFormatMap("TOK_TABLEROWFORMATFIELD"))
                     .map(CatalystTypeConverters.convertToCatalyst))
-            } else {
+            else
               new GenericInternalRow(
                   prevLine
                     .split(
                         ioschema.outputRowFormatMap("TOK_TABLEROWFORMATFIELD"),
                         2)
                     .map(CatalystTypeConverters.convertToCatalyst))
-            }
-          } else {
+          else
             val raw = outputSerde.deserialize(scriptOutputWritable)
             scriptOutputWritable = null
             val dataList = outputSoi.getStructFieldsDataAsList(raw)
             val fieldList = outputSoi.getAllStructFieldRefs()
             var i = 0
-            while (i < dataList.size()) {
-              if (dataList.get(i) == null) {
+            while (i < dataList.size())
+              if (dataList.get(i) == null)
                 mutableRow.setNullAt(i)
-              } else {
+              else
                 mutableRow(i) = unwrap(
                     dataList.get(i), fieldList.get(i).getFieldObjectInspector)
-              }
               i += 1
-            }
             mutableRow
-          }
-        }
-      }
 
       writerThread.start()
 
       outputIterator
-    }
 
-    child.execute().mapPartitions { iter =>
-      if (iter.hasNext) {
+    child.execute().mapPartitions  iter =>
+      if (iter.hasNext)
         val proj = UnsafeProjection.create(schema)
         processIterator(iter).map(proj)
-      } else {
+      else
         // If the input iterator has no rows then do not launch the external script.
         Iterator.empty
-      }
-    }
-  }
-}
 
 private class ScriptTransformationWriterThread(
     iter: Iterator[InternalRow],
@@ -247,7 +224,7 @@ private class ScriptTransformationWriterThread(
     taskContext: TaskContext,
     conf: Configuration
 )
-    extends Thread("Thread-ScriptTransformation-Feed") with Logging {
+    extends Thread("Thread-ScriptTransformation-Feed") with Logging
 
   setDaemon(true)
 
@@ -256,7 +233,7 @@ private class ScriptTransformationWriterThread(
   /** Contains the exception thrown while writing the parent iterator to the external process. */
   def exception: Option[Throwable] = Option(_exception)
 
-  override def run(): Unit = Utils.logUncaughtExceptions {
+  override def run(): Unit = Utils.logUncaughtExceptions
     TaskContext.setTaskContext(taskContext)
 
     val dataOutputStream = new DataOutputStream(outputStream)
@@ -267,63 +244,52 @@ private class ScriptTransformationWriterThread(
     // let's use a variable to record whether the `finally` block was hit due to an exception
     var threwException: Boolean = true
     val len = inputSchema.length
-    try {
-      iter.map(outputProjection).foreach { row =>
-        if (inputSerde == null) {
+    try
+      iter.map(outputProjection).foreach  row =>
+        if (inputSerde == null)
           val data =
-            if (len == 0) {
+            if (len == 0)
               ioschema.inputRowFormatMap("TOK_TABLEROWFORMATLINES")
-            } else {
+            else
               val sb = new StringBuilder
               sb.append(row.get(0, inputSchema(0)))
               var i = 1
-              while (i < len) {
+              while (i < len)
                 sb.append(
                     ioschema.inputRowFormatMap("TOK_TABLEROWFORMATFIELD"))
                 sb.append(row.get(i, inputSchema(i)))
                 i += 1
-              }
               sb.append(ioschema.inputRowFormatMap("TOK_TABLEROWFORMATLINES"))
               sb.toString()
-            }
           outputStream.write(data.getBytes(StandardCharsets.UTF_8))
-        } else {
+        else
           val writable = inputSerde.serialize(
               row.asInstanceOf[GenericInternalRow].values, inputSoi)
 
-          if (scriptInputWriter != null) {
+          if (scriptInputWriter != null)
             scriptInputWriter.write(writable)
-          } else {
+          else
             prepareWritable(writable, ioschema.outputSerdeProps)
               .write(dataOutputStream)
-          }
-        }
-      }
       outputStream.close()
       threwException = false
-    } catch {
+    catch
       case NonFatal(e) =>
         // An error occurred while writing input, so kill the child process. According to the
         // Javadoc this call will not throw an exception:
         _exception = e
         proc.destroy()
         throw e
-    } finally {
-      try {
-        if (proc.waitFor() != 0) {
+    finally
+      try
+        if (proc.waitFor() != 0)
           logError(stderrBuffer.toString) // log the stderr circular buffer
-        }
-      } catch {
+      catch
         case NonFatal(exceptionFromFinallyBlock) =>
-          if (!threwException) {
+          if (!threwException)
             throw exceptionFromFinallyBlock
-          } else {
+          else
             log.error("Exception in finally block", exceptionFromFinallyBlock)
-          }
-      }
-    }
-  }
-}
 
 /**
   * The wrapper class of Hive input and output schema properties
@@ -338,7 +304,7 @@ private[hive] case class HiveScriptIOSchema(
     recordReaderClass: Option[String],
     recordWriterClass: Option[String],
     schemaLess: Boolean)
-    extends ScriptInputOutputSchema with HiveInspectors {
+    extends ScriptInputOutputSchema with HiveInspectors
 
   private val defaultFormat = Map(
       ("TOK_TABLEROWFORMATFIELD", "\t"),
@@ -351,8 +317,8 @@ private[hive] case class HiveScriptIOSchema(
     outputRowFormat.toMap.withDefault((k) => defaultFormat(k))
 
   def initInputSerDe(
-      input: Seq[Expression]): Option[(AbstractSerDe, ObjectInspector)] = {
-    inputSerdeClass.map { serdeClass =>
+      input: Seq[Expression]): Option[(AbstractSerDe, ObjectInspector)] =
+    inputSerdeClass.map  serdeClass =>
       val (columns, columnTypes) = parseAttrs(input)
       val serde = initSerDe(serdeClass, columns, columnTypes, inputSerdeProps)
       val fieldObjectInspectors = columnTypes.map(toInspector)
@@ -361,32 +327,27 @@ private[hive] case class HiveScriptIOSchema(
             columns.asJava, fieldObjectInspectors.asJava)
         .asInstanceOf[ObjectInspector]
         (serde, objectInspector)
-    }
-  }
 
   def initOutputSerDe(output: Seq[Attribute])
-    : Option[(AbstractSerDe, StructObjectInspector)] = {
-    outputSerdeClass.map { serdeClass =>
+    : Option[(AbstractSerDe, StructObjectInspector)] =
+    outputSerdeClass.map  serdeClass =>
       val (columns, columnTypes) = parseAttrs(output)
       val serde = initSerDe(serdeClass, columns, columnTypes, outputSerdeProps)
       val structObjectInspector = serde
         .getObjectInspector()
         .asInstanceOf[StructObjectInspector]
         (serde, structObjectInspector)
-    }
-  }
 
   private def parseAttrs(
-      attrs: Seq[Expression]): (Seq[String], Seq[DataType]) = {
+      attrs: Seq[Expression]): (Seq[String], Seq[DataType]) =
     val columns = attrs.zipWithIndex.map(e => s"${e._1.prettyName}_${e._2}")
     val columnTypes = attrs.map(_.dataType)
     (columns, columnTypes)
-  }
 
   private def initSerDe(serdeClassName: String,
                         columns: Seq[String],
                         columnTypes: Seq[DataType],
-                        serdeProps: Seq[(String, String)]): AbstractSerDe = {
+                        serdeProps: Seq[(String, String)]): AbstractSerDe =
 
     val serde = Utils
       .classForName(serdeClassName)
@@ -406,29 +367,24 @@ private[hive] case class HiveScriptIOSchema(
     serde.initialize(null, properties)
 
     serde
-  }
 
   def recordReader(
-      inputStream: InputStream, conf: Configuration): Option[RecordReader] = {
-    recordReaderClass.map { klass =>
+      inputStream: InputStream, conf: Configuration): Option[RecordReader] =
+    recordReaderClass.map  klass =>
       val instance =
         Utils.classForName(klass).newInstance().asInstanceOf[RecordReader]
       val props = new Properties()
       props.putAll(outputSerdeProps.toMap.asJava)
       instance.initialize(inputStream, conf, props)
       instance
-    }
-  }
 
   def recordWriter(outputStream: OutputStream,
-                   conf: Configuration): Option[RecordWriter] = {
-    recordWriterClass.map { klass =>
+                   conf: Configuration): Option[RecordWriter] =
+    recordWriterClass.map  klass =>
       val instance =
         Utils.classForName(klass).newInstance().asInstanceOf[RecordWriter]
       instance.initialize(outputStream, conf)
       instance
-    }
-  }
 
   def inputRowFormatSQL: Option[String] =
     getRowFormatSQL(inputRowFormat, inputSerdeClass, inputSerdeProps)
@@ -445,10 +401,10 @@ private[hive] case class HiveScriptIOSchema(
   private def getRowFormatSQL(
       rowFormat: Seq[(String, String)],
       serdeClass: Option[String],
-      serdeProps: Seq[(String, String)]): Option[String] = {
+      serdeProps: Seq[(String, String)]): Option[String] =
     if (schemaLess) return Some("")
 
-    val rowFormatDelimited = rowFormat.map {
+    val rowFormatDelimited = rowFormat.map
       case ("TOK_TABLEROWFORMATFIELD", value) =>
         "FIELDS TERMINATED BY " + value
       case ("TOK_TABLEROWFORMATCOLLITEMS", value) =>
@@ -460,22 +416,17 @@ private[hive] case class HiveScriptIOSchema(
       case ("TOK_TABLEROWFORMATNULL", value) =>
         "NULL DEFINED AS " + value
       case o => return None
-    }
 
     val serdeClassSQL = serdeClass.map("'" + _ + "'").getOrElse("")
     val serdePropsSQL =
-      if (serdeClass.nonEmpty) {
-        val props = serdeProps.map { p =>
+      if (serdeClass.nonEmpty)
+        val props = serdeProps.map  p =>
           s"'${p._1}' = '${p._2}'"
-        }.mkString(", ")
+        .mkString(", ")
         if (props.nonEmpty) " WITH SERDEPROPERTIES(" + props + ")" else ""
-      } else {
+      else
         ""
-      }
-    if (rowFormat.nonEmpty) {
+    if (rowFormat.nonEmpty)
       Some("ROW FORMAT DELIMITED " + rowFormatDelimited.mkString(" "))
-    } else {
+    else
       Some("ROW FORMAT SERDE " + serdeClassSQL + serdePropsSQL)
-    }
-  }
-}

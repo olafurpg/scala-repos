@@ -5,15 +5,13 @@ import com.twitter.finagle.redis.protocol.commands._
 import com.twitter.finagle.redis.util._
 import com.twitter.io.Charsets
 
-object RequireClientProtocol extends ErrorConversion {
+object RequireClientProtocol extends ErrorConversion
   override def getException(msg: String) = new ClientError(msg)
-}
 
-abstract class Command extends RedisMessage {
+abstract class Command extends RedisMessage
   def command: String
-}
 
-object Commands {
+object Commands
   // Key Commands
   val DEL = "DEL"
   val DUMP = "DUMP"
@@ -154,9 +152,9 @@ object Commands {
       PEXPIRE -> { PExpire(_) },
       PEXPIREAT -> { PExpireAt(_) },
       PTTL -> { PTtl(_) },
-      RANDOMKEY -> { _ =>
+      RANDOMKEY ->  _ =>
         Randomkey()
-      },
+      ,
       RENAME -> { Rename(_) },
       RENAMENX -> { RenameNx(_) },
       SCAN -> { Scan(_) },
@@ -207,18 +205,18 @@ object Commands {
       BREM -> { BRem(_) },
       BGET -> { BGet(_) },
       // miscellaneous
-      FLUSHALL -> { _ =>
+      FLUSHALL ->  _ =>
         FlushAll
-      },
-      FLUSHDB -> { _ =>
+      ,
+      FLUSHDB ->  _ =>
         FlushDB
-      },
+      ,
       SELECT -> { Select(_) },
       AUTH -> { Auth(_) },
       INFO -> { Info(_) },
-      QUIT -> { _ =>
+      QUIT ->  _ =>
         Quit
-      },
+      ,
       SLAVEOF -> { SlaveOf(_) },
       CONFIG -> { Config(_) },
       // hash sets
@@ -256,18 +254,18 @@ object Commands {
       SRANDMEMBER -> { SRandMember(_) },
       SINTER -> { SInter(_) },
       // transactions
-      DISCARD -> { _ =>
+      DISCARD ->  _ =>
         Discard
-      },
-      EXEC -> { _ =>
+      ,
+      EXEC ->  _ =>
         Exec
-      },
-      MULTI -> { _ =>
+      ,
+      MULTI ->  _ =>
         Multi
-      },
-      UNWATCH -> { _ =>
+      ,
+      UNWATCH ->  _ =>
         UnWatch
-      },
+      ,
       WATCH -> { Watch(_) },
       // HyperLogLogs
       PFADD -> { PFAdd(_) },
@@ -278,25 +276,21 @@ object Commands {
   def doMatch(cmd: String, args: List[Array[Byte]]) =
     commandMap
       .get(cmd.toUpperCase)
-      .map {
+      .map
         _ (args)
-      }
       .getOrElse(throw ClientError("Unsupported command: " + cmd))
 
-  def trimList(list: Seq[Array[Byte]], count: Int, from: String = "") = {
+  def trimList(list: Seq[Array[Byte]], count: Int, from: String = "") =
     RequireClientProtocol(list != null, "%s Empty list found".format(from))
     RequireClientProtocol(
         list.length == count,
         "%s Expected %d elements, found %d".format(from, count, list.length))
     val newList = list.take(count)
-    newList.foreach { item =>
+    newList.foreach  item =>
       RequireClientProtocol(item != null, "Found empty item in list")
-    }
     newList
-  }
-}
 
-object CommandBytes {
+object CommandBytes
   // Key Commands
   val DEL = StringToChannelBuffer("DEL")
   val DUMP = StringToChannelBuffer("DUMP")
@@ -422,9 +416,8 @@ object CommandBytes {
   val PFADD = StringToChannelBuffer("PFADD")
   val PFCOUNT = StringToChannelBuffer("PFCOUNT")
   val PFMERGE = StringToChannelBuffer("PFMERGE")
-}
 
-class CommandCodec extends UnifiedProtocolCodec {
+class CommandCodec extends UnifiedProtocolCodec
 
   import RedisCodec._
   import com.twitter.finagle.redis.naggati.Encoder
@@ -433,48 +426,37 @@ class CommandCodec extends UnifiedProtocolCodec {
 
   val log = Logger(getClass)
 
-  val encode = new Encoder[Command] {
+  val encode = new Encoder[Command]
     def encode(obj: Command) = Some(obj.toChannelBuffer)
-  }
 
-  val decode = readBytes(1) { bytes =>
-    bytes(0) match {
+  val decode = readBytes(1)  bytes =>
+    bytes(0) match
       case ARG_COUNT_MARKER =>
-        val doneFn = { lines =>
+        val doneFn =  lines =>
           commandDecode(lines)
-        }
-        RequireClientProtocol.safe {
-          readLine { line =>
+        RequireClientProtocol.safe
+          readLine  line =>
             decodeUnifiedFormat(NumberFormat.toLong(line), doneFn)
-          }
-        }
       case b: Byte =>
         decodeInlineRequest(b.asInstanceOf[Char])
-    }
-  }
 
-  def decodeInlineRequest(c: Char) = readLine { line =>
-    val listOfArrays = (c + line).split(' ').toList.map { args =>
+  def decodeInlineRequest(c: Char) = readLine  line =>
+    val listOfArrays = (c + line).split(' ').toList.map  args =>
       args.getBytes(Charsets.Utf8)
-    }
     val cmd = commandDecode(listOfArrays)
     emit(cmd)
-  }
 
-  def commandDecode(lines: List[Array[Byte]]): Command = {
+  def commandDecode(lines: List[Array[Byte]]): Command =
     RequireClientProtocol(
         lines != null && lines.length > 0, "Invalid client command protocol")
     val cmd = BytesToString(lines.head)
     val args = lines.tail
-    try {
+    try
       Commands.doMatch(cmd, args)
-    } catch {
+    catch
       case e: ClientError => throw e
       case t: Throwable =>
         log.warning(t,
                     "Unhandled exception %s(%s)".format(
                         t.getClass.toString, t.getMessage))
         throw new ClientError(t.getMessage)
-    }
-  }
-}

@@ -10,7 +10,7 @@ import scala.xml.NodeSeq
 /**
   * Responsible for passing a JValue further in the render pipeline.
   */
-trait JValueResult extends ScalatraBase { self: JsonSupport[_] =>
+trait JValueResult extends ScalatraBase  self: JsonSupport[_] =>
 
   implicit protected def jsonFormats: Formats
 
@@ -21,15 +21,14 @@ trait JValueResult extends ScalatraBase { self: JsonSupport[_] =>
 
   private[this] def customSerializer = jsonFormats.customSerializer
 
-  private[this] def renderToJson: RenderPipeline = {
+  private[this] def renderToJson: RenderPipeline =
     case JNothing =>
     case JNull => response.writer.write("null")
     case a: JValue => super.renderPipeline(a)
     case a: Any if isJValueResponse && customSerializer.isDefinedAt(a) =>
-      customSerializer.lift(a) match {
+      customSerializer.lift(a) match
         case Some(jv: JValue) => jv
         case None => super.renderPipeline(a)
-      }
     case status: Int => super.renderPipeline(status)
     case bytes: Array[Byte] => super.renderPipeline(bytes)
     case is: java.io.InputStream => super.renderPipeline(is)
@@ -47,5 +46,3 @@ trait JValueResult extends ScalatraBase { self: JsonSupport[_] =>
       response.writer.write(x.toString)
     case p: Product if isJValueResponse => Extraction.decompose(p)
     case p: TraversableOnce[_] if isJValueResponse => Extraction.decompose(p)
-  }
-}

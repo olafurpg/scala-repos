@@ -23,7 +23,7 @@ import org.specs2.mutable.Specification
 /**
   * Systems under specification for PCDataXmlParser.
   */
-object PCDataXmlParserSpec extends Specification with XmlMatchers {
+object PCDataXmlParserSpec extends Specification with XmlMatchers
   "PCDataXmlParser Specification".title
   val data1 = """
 
@@ -64,19 +64,14 @@ object PCDataXmlParserSpec extends Specification with XmlMatchers {
 </body>
 </html>"""
 
-  "PCDataMarkupParser" should {
-    "Parse a document with whitespace" in {
+  "PCDataMarkupParser" should
+    "Parse a document with whitespace" in
       PCDataXmlParser(data1).openOrThrowException("Test") must ==/(
           <html>dude</html>)
-    }
 
-    "Parse a document with doctype" in {
+    "Parse a document with doctype" in
       PCDataXmlParser(data2).openOrThrowException("Test") must ==/(
           <html>dude</html>)
-    }
 
-    "Parse a document with xml and doctype" in {
+    "Parse a document with xml and doctype" in
       PCDataXmlParser(data3).openOrThrowException("Test").apply(0).label must_== "html"
-    }
-  }
-}

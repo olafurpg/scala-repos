@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.extensions._
   * @author Pavel Fatin
   */
 class SbtModuleDataService
-    extends AbstractDataService[SbtModuleData, Module](SbtModuleData.Key) {
+    extends AbstractDataService[SbtModuleData, Module](SbtModuleData.Key)
   override def createImporter(
       toImport: Seq[DataNode[SbtModuleData]],
       projectData: ProjectData,
@@ -22,40 +22,32 @@ class SbtModuleDataService
       modelsProvider: IdeModifiableModelsProvider): Importer[SbtModuleData] =
     new SbtModuleDataService.Importer(
         toImport, projectData, project, modelsProvider)
-}
 
-object SbtModuleDataService {
+object SbtModuleDataService
   private class Importer(dataToImport: Seq[DataNode[SbtModuleData]],
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
       extends AbstractImporter[SbtModuleData](
-          dataToImport, projectData, project, modelsProvider) {
+          dataToImport, projectData, project, modelsProvider)
 
     override def importData(): Unit =
-      dataToImport.foreach { moduleNode =>
-        for {
+      dataToImport.foreach  moduleNode =>
+        for
           module <- getIdeModuleByNode(moduleNode)
           imports = moduleNode.getData.imports
           resolvers = moduleNode.getData.resolvers
-        } {
+        
           SbtModule.setImportsTo(module, imports)
           setResolvers(module, resolvers)
           updateLocalResolvers(resolvers)
-        }
-      }
 
     private def setResolvers(
-        module: Module, resolvers: Set[SbtResolver]): Unit = {
+        module: Module, resolvers: Set[SbtResolver]): Unit =
       SbtModule.setResolversTo(module, resolvers)
       resolvers.foreach(SbtResolverIndexesManager().add)
-    }
 
-    private def updateLocalResolvers(resolvers: Set[SbtResolver]): Unit = {
-      val localResolvers = resolvers.filter { resolver =>
+    private def updateLocalResolvers(resolvers: Set[SbtResolver]): Unit =
+      val localResolvers = resolvers.filter  resolver =>
         resolver.associatedIndex.exists(_.isLocal)
-      }
       invokeLater(SbtResolverIndexesManager().update(localResolvers.toSeq))
-    }
-  }
-}

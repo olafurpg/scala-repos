@@ -5,7 +5,7 @@ package com.twitter.finagle.loadbalancer
   * updated nondestructively, but, as with nodes, may share some
   * data across updates.
   */
-protected[loadbalancer] trait DistributorT[Node] {
+protected[loadbalancer] trait DistributorT[Node]
   type This
 
   /**
@@ -33,4 +33,3 @@ protected[loadbalancer] trait DistributorT[Node] {
     * Rebuild this distributor with a new vector.
     */
   def rebuild(vector: Vector[Node]): This
-}

@@ -10,20 +10,18 @@ import java.util.Optional
   */
 // Has to be defined in Scala even though it's JavaDSL because of:
 // https://issues.scala-lang.org/browse/SI-9621
-object ContentType {
+object ContentType
 
   trait Binary extends ContentType {}
 
-  trait NonBinary extends ContentType {
+  trait NonBinary extends ContentType
     def charset: HttpCharset
-  }
 
   trait WithFixedCharset extends NonBinary {}
 
   trait WithCharset extends NonBinary {}
-}
 
-trait ContentType {
+trait ContentType
 
   /**
     * The media-type of this content-type.
@@ -39,4 +37,3 @@ trait ContentType {
     * Returns the charset if this ContentType is non-binary.
     */
   def getCharsetOption: Optional[HttpCharset]
-}

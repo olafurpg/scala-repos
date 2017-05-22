@@ -27,7 +27,7 @@ import scala.reflect.ClassTag
     "2.11.0")
 trait TraversableProxyLike[
     +A, +Repr <: TraversableLike[A, Repr] with Traversable[A]]
-    extends TraversableLike[A, Repr] with Proxy {
+    extends TraversableLike[A, Repr] with Proxy
   def self: Repr
 
   override def foreach[U](f: A => U): Unit = self.foreach(f)
@@ -120,4 +120,3 @@ trait TraversableProxyLike[
     self.view(from, until)
   // This appears difficult to override due to the type of WithFilter.
   // override def withFilter(p: A => Boolean): WithFilter = self.withFilter(p)
-}

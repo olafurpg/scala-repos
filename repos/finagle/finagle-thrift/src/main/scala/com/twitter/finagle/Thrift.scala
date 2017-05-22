@@ -59,7 +59,7 @@ import org.apache.thrift.protocol.TProtocolFactory
   */
 object Thrift
     extends Client[ThriftClientRequest, Array[Byte]] with ThriftRichClient
-    with Server[Array[Byte], Array[Byte]] with ThriftRichServer {
+    with Server[Array[Byte], Array[Byte]] with ThriftRichServer
 
   val protocolFactory: TProtocolFactory = Protocols.binaryFactory()
 
@@ -69,16 +69,14 @@ object Thrift
 
   override protected lazy val Stats(stats) = client.params[Stats]
 
-  object param {
+  object param
     case class ClientId(clientId: Option[thrift.ClientId])
-    implicit object ClientId extends Stack.Param[ClientId] {
+    implicit object ClientId extends Stack.Param[ClientId]
       val default = ClientId(None)
-    }
 
     case class ProtocolFactory(protocolFactory: TProtocolFactory)
-    implicit object ProtocolFactory extends Stack.Param[ProtocolFactory] {
+    implicit object ProtocolFactory extends Stack.Param[ProtocolFactory]
       val default = ProtocolFactory(Protocols.binaryFactory())
-    }
 
     /**
       * A `Param` to control whether a framed transport should be used.
@@ -87,9 +85,8 @@ object Thrift
       * @param enabled Whether a framed transport should be used.
       */
     case class Framed(enabled: Boolean)
-    implicit object Framed extends Stack.Param[Framed] {
+    implicit object Framed extends Stack.Param[Framed]
       val default = Framed(true)
-    }
 
     /**
       * A `Param` to set the max size of a reusable buffer for the thrift response.
@@ -99,9 +96,8 @@ object Thrift
       */
     case class MaxReusableBufferSize(maxReusableBufferSize: Int)
     implicit object MaxReusableBufferSize
-        extends Stack.Param[MaxReusableBufferSize] {
+        extends Stack.Param[MaxReusableBufferSize]
       val default = MaxReusableBufferSize(maxThriftBufferSize)
-    }
 
     /**
       * A `Param` to control upgrading the thrift protocol to TTwitter.
@@ -109,34 +105,29 @@ object Thrift
       */
     case class AttemptTTwitterUpgrade(upgrade: Boolean)
     implicit object AttemptTTwitterUpgrade
-        extends Stack.Param[AttemptTTwitterUpgrade] {
+        extends Stack.Param[AttemptTTwitterUpgrade]
       val default = AttemptTTwitterUpgrade(true)
-    }
-  }
 
-  object Client {
+  object Client
     private val preparer: Stackable[ServiceFactory[
             ThriftClientRequest, Array[Byte]]] = new Stack.ModuleParams[
-        ServiceFactory[ThriftClientRequest, Array[Byte]]] {
+        ServiceFactory[ThriftClientRequest, Array[Byte]]]
       override def parameters: Seq[Stack.Param[_]] = Nil
       override val role = StackClient.Role.prepConn
       override val description = "Prepare TTwitter thrift connection"
       def make(
           params: Stack.Params,
           next: ServiceFactory[ThriftClientRequest, Array[Byte]]
-      ) = {
+      ) =
         val Label(label) = params[Label]
         val param.ClientId(clientId) = params[param.ClientId]
         val param.ProtocolFactory(pf) = params[param.ProtocolFactory]
         val preparer = new ThriftClientPreparer(pf, label, clientId)
         preparer.prepare(next, params)
-      }
-    }
 
     // We must do 'preparation' this way in order to let Finagle set up tracing & so on.
     val stack: Stack[ServiceFactory[ThriftClientRequest, Array[Byte]]] =
       StackClient.newStack.replace(StackClient.Role.prepConn, preparer)
-  }
 
   case class Client(
       stack: Stack[ServiceFactory[ThriftClientRequest, Array[Byte]]] = Client.stack,
@@ -145,7 +136,7 @@ object Thrift
   )
       extends StdStackClient[ThriftClientRequest, Array[Byte], Client]
       with WithSessionPool[Client] with WithDefaultLoadBalancer[Client]
-      with ThriftRichClient {
+      with ThriftRichClient
 
     protected def copy1(
         stack: Stack[ServiceFactory[ThriftClientRequest, Array[Byte]]] = this.stack,
@@ -162,12 +153,11 @@ object Thrift
       params[param.ProtocolFactory]
     override protected lazy val Stats(stats) = params[Stats]
 
-    protected def newTransporter(): Transporter[In, Out] = {
+    protected def newTransporter(): Transporter[In, Out] =
       val pipeline =
         if (framed) ThriftClientFramedPipelineFactory
         else ThriftClientBufferedPipelineFactory(protocolFactory)
       Netty3Transporter(pipeline, params)
-    }
 
     protected def newDispatcher(
         transport: Transport[ThriftClientRequest, Array[Byte]]
@@ -192,7 +182,7 @@ object Thrift
 
     def clientId: Option[thrift.ClientId] = params[param.ClientId].clientId
 
-    private[this] def deserializingClassifier: Client = {
+    private[this] def deserializingClassifier: Client =
       // Note: what type of deserializer used is important if none is specified
       // so that we keep the prior behavior of Thrift exceptions
       // being counted as a success. Otherwise, even using the default
@@ -201,15 +191,13 @@ object Thrift
       // classifier is used to make when deserialization happens in the stack
       // uniform whether or not a `ResponseClassifier` is wired up.
       val classifier =
-        if (params.contains[com.twitter.finagle.param.ResponseClassifier]) {
+        if (params.contains[com.twitter.finagle.param.ResponseClassifier])
           ThriftResponseClassifier.usingDeserializeCtx(
               params[com.twitter.finagle.param.ResponseClassifier].responseClassifier
           )
-        } else {
+        else
           ThriftResponseClassifier.DeserializeCtxOnly
-        }
       configured(com.twitter.finagle.param.ResponseClassifier(classifier))
-    }
 
     private def superNewClient(dest: Name, label: String) =
       super.newClient(dest, label)
@@ -261,7 +249,6 @@ object Thrift
                        ThriftClientRequest,
                        Array[Byte]]): Client =
       super.filtered(filter)
-  }
 
   val client: Thrift.Client = Client()
 
@@ -285,24 +272,21 @@ object Thrift
   def withClientId(clientId: thrift.ClientId): Client =
     client.withClientId(clientId)
 
-  object Server {
+  object Server
     private val preparer =
-      new Stack.ModuleParams[ServiceFactory[Array[Byte], Array[Byte]]] {
+      new Stack.ModuleParams[ServiceFactory[Array[Byte], Array[Byte]]]
         override def parameters: Seq[Stack.Param[_]] = Nil
         override val role = StackClient.Role.prepConn
         override val description = "Prepare TTwitter thrift connection"
         def make(params: Stack.Params,
-                 next: ServiceFactory[Array[Byte], Array[Byte]]) = {
+                 next: ServiceFactory[Array[Byte], Array[Byte]]) =
           val Label(label) = params[Label]
           val param.ProtocolFactory(pf) = params[param.ProtocolFactory]
           val preparer = new thrift.ThriftServerPreparer(pf, label)
           preparer.prepare(next, params)
-        }
-      }
 
     val stack: Stack[ServiceFactory[Array[Byte], Array[Byte]]] =
       StackServer.newStack.replace(StackServer.Role.preparer, preparer)
-  }
 
   case class Server(
       stack: Stack[ServiceFactory[Array[Byte], Array[Byte]]] = Server.stack,
@@ -310,7 +294,7 @@ object Thrift
             "thrift")
   )
       extends StdStackServer[Array[Byte], Array[Byte], Server]
-      with ThriftRichServer {
+      with ThriftRichServer
     protected def copy1(
         stack: Stack[ServiceFactory[Array[Byte], Array[Byte]]] = this.stack,
         params: Stack.Params = this.params
@@ -323,7 +307,7 @@ object Thrift
     protected val param.ProtocolFactory(protocolFactory) =
       params[param.ProtocolFactory]
 
-    protected def newListener(): Listener[In, Out] = {
+    protected def newListener(): Listener[In, Out] =
       val pipeline =
         if (framed) thrift.ThriftServerFramedPipelineFactory
         else thrift.ThriftServerBufferedPipelineFactory(protocolFactory)
@@ -331,7 +315,6 @@ object Thrift
       Netty3Listener(pipeline,
                      if (params.contains[Label]) params
                      else params + Label("thrift"))
-    }
 
     protected def newDispatcher(
         transport: Transport[In, Out],
@@ -366,7 +349,6 @@ object Thrift
 
     override def configured[P](psp: (P, Stack.Param[P])): Server =
       super.configured(psp)
-  }
 
   val server: Thrift.Server = Server()
 
@@ -374,4 +356,3 @@ object Thrift
       addr: SocketAddress,
       service: ServiceFactory[Array[Byte], Array[Byte]]
   ): ListeningServer = server.serve(addr, service)
-}

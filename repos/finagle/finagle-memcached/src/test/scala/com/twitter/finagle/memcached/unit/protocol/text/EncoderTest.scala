@@ -12,9 +12,9 @@ import com.twitter.finagle.memcached.util.ChannelBufferUtils.channelBufferToStri
 import com.twitter.io.Buf
 
 @RunWith(classOf[JUnitRunner])
-class EncoderTest extends FunSuite with MockitoSugar {
+class EncoderTest extends FunSuite with MockitoSugar
 
-  test("not alter the tokens it is serializing") {
+  test("not alter the tokens it is serializing")
     val channel = mock[Channel]
     val context = mock[ChannelHandlerContext]
     val addr = mock[java.net.SocketAddress]
@@ -22,17 +22,15 @@ class EncoderTest extends FunSuite with MockitoSugar {
     when(channel.getLocalAddress) thenReturn addr
     val encoder = new Encoder
 
-    def encode(x: AnyRef) = {
+    def encode(x: AnyRef) =
       val encoded =
         encoder.encode(context, channel, x).asInstanceOf[ChannelBuffer]
       channelBufferToString(encoded)
-    }
 
-    def encodeIsPure(x: AnyRef) = {
+    def encodeIsPure(x: AnyRef) =
       val buf1 = encode(x)
       val buf2 = encode(x)
       assert(buf1 == buf2)
-    }
 
     info("tokens")
     encodeIsPure(Tokens(Seq(Buf.Utf8("tok"))))
@@ -60,5 +58,3 @@ class EncoderTest extends FunSuite with MockitoSugar {
                                       Buf.Utf8("bar"),
                                       Some(Buf.Utf8("quux")))))
     )
-  }
-}

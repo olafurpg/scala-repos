@@ -12,32 +12,29 @@ import breeze.macros.expand
   *
   * @author ktakagaki
   */
-abstract class FilterKernel[T] {
+abstract class FilterKernel[T]
   val designText: String
   override def toString = this.getClass.getSimpleName + "(): " + designText
 //  def toLong(): FilterKernel[Long]
 //  def toInt(): FilterKernel[Int]
 //  def toDouble(): FilterKernel[Double]
 //  def toFloat(): FilterKernel[Float]
-}
 
-abstract class FilterKernel1D[T] extends FilterKernel[T] {
+abstract class FilterKernel1D[T] extends FilterKernel[T]
   val multiplier: Double
-}
 
-object FIRKernel1D {
+object FIRKernel1D
 
   def apply[T](
       kernel: DenseVector[T], multiplier: Double, designText: String) =
     new FIRKernel1D[T](kernel, multiplier, designText)
-}
 
 /**This immutable class encapsulates 1D FIR filter kernels. It also internally stores the kernel Fourier transform for
   * multiple applications of fft convolution.*/
 class FIRKernel1D[T](val kernel: DenseVector[T],
                      override val multiplier: Double,
                      override val designText: String)
-    extends FilterKernel1D[T] {
+    extends FilterKernel1D[T]
   //lazy val kernelFourier: DenseVector[Complex] = fourierTr( kernel )
   lazy val length = kernel.length
 
@@ -54,7 +51,6 @@ class FIRKernel1D[T](val kernel: DenseVector[T],
 
   override def toString() =
     this.getClass.toString + " multiplier: " + multiplier + ": " + designText
-}
 
 /**This immutable class will encapsulate 1D IIR kernels. Not implemented yet.*/
 class IIRKernel1D[T](val kernelA: DenseVector[T],

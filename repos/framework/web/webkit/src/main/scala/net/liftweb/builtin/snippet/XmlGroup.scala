@@ -21,11 +21,10 @@ package snippet
 import scala.xml._
 import net.liftweb.http._
 
-object XmlGroup extends DispatchSnippet {
+object XmlGroup extends DispatchSnippet
 
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case _ => render _
-  }
 
   /**
     * Returns the child nodes:
@@ -40,4 +39,3 @@ object XmlGroup extends DispatchSnippet {
     * </pre>
     */
   def render(kids: NodeSeq): NodeSeq = kids
-}

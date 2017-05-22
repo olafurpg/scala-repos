@@ -4,7 +4,7 @@ package test
 import java.util.Date
 import java.sql.Connection
 
-abstract class SortedInPackage {
+abstract class SortedInPackage
   import java.sql.Clob
   import java.sql.Blob
 
@@ -12,7 +12,6 @@ abstract class SortedInPackage {
   val s: Connection
   val c: Clob
   val b: Blob
-}
 /*
 package com.jetbrains
 package test

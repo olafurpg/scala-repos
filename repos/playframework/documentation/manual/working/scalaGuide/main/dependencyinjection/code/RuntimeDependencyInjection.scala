@@ -6,60 +6,48 @@ package scalaguide.dependencyinjection
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test._
 
-object RuntimeDependencyInjection extends PlaySpecification {
+object RuntimeDependencyInjection extends PlaySpecification
 
-  "Play's runtime dependency injection support" should {
-    "support constructor injection" in new WithApplication() {
+  "Play's runtime dependency injection support" should
+    "support constructor injection" in new WithApplication()
       app.injector.instanceOf[constructor.MyComponent] must beAnInstanceOf[
           constructor.MyComponent]
-    }
-    "support singleton scope" in new WithApplication() {
+    "support singleton scope" in new WithApplication()
       app.injector.instanceOf[singleton.CurrentSharePrice].set(10)
       app.injector.instanceOf[singleton.CurrentSharePrice].get must_== 10
-    }
-    "support stopping" in {
-      running() { app =>
+    "support stopping" in
+      running()  app =>
         app.injector.instanceOf[cleanup.MessageQueueConnection]
-      }
       cleanup.MessageQueue.stopped must_== true
-    }
-    "support implemented by annotation" in new WithApplication() {
+    "support implemented by annotation" in new WithApplication()
       app.injector.instanceOf[implemented.Hello].sayHello("world") must_== "Hello world"
-    }
-  }
-}
 
-package constructor {
+package constructor
 //#constructor
   import javax.inject._
   import play.api.libs.ws._
 
-  class MyComponent @Inject()(ws: WSClient) {
+  class MyComponent @Inject()(ws: WSClient)
     // ...
-  }
 //#constructor
-}
 
-package singleton {
+package singleton
 //#singleton
   import javax.inject._
 
   @Singleton
-  class CurrentSharePrice {
+  class CurrentSharePrice
     @volatile private var price = 0
 
     def set(p: Int) = price = p
     def get = price
-  }
 //#singleton
-}
 
-package cleanup {
-  object MessageQueue {
+package cleanup
+  object MessageQueue
     @volatile var stopped = false
     def connectToMessageQueue() = MessageQueue
     def stop() = stopped = true
-  }
   import MessageQueue.connectToMessageQueue
 
 //#cleanup
@@ -68,36 +56,29 @@ package cleanup {
   import play.api.inject.ApplicationLifecycle
 
   @Singleton
-  class MessageQueueConnection @Inject()(lifecycle: ApplicationLifecycle) {
+  class MessageQueueConnection @Inject()(lifecycle: ApplicationLifecycle)
     val connection = connectToMessageQueue()
-    lifecycle.addStopHook { () =>
+    lifecycle.addStopHook  () =>
       Future.successful(connection.stop())
-    }
 
     //...
-  }
 //#cleanup
-}
 
-package implemented {
+package implemented
 //#implemented-by
   import com.google.inject.ImplementedBy
 
   @ImplementedBy(classOf[EnglishHello])
-  trait Hello {
+  trait Hello
     def sayHello(name: String): String
-  }
 
-  class EnglishHello extends Hello {
+  class EnglishHello extends Hello
     def sayHello(name: String) = "Hello " + name
-  }
 //#implemented-by
-  class GermanHello extends Hello {
+  class GermanHello extends Hello
     def sayHello(name: String) = "Hallo " + name
-  }
-}
 
-package guicemodule {
+package guicemodule
 
   import implemented._
 
@@ -105,8 +86,8 @@ package guicemodule {
   import com.google.inject.AbstractModule
   import com.google.inject.name.Names
 
-  class Module extends AbstractModule {
-    def configure() = {
+  class Module extends AbstractModule
+    def configure() =
 
       bind(classOf[Hello])
         .annotatedWith(Names.named("en"))
@@ -115,12 +96,9 @@ package guicemodule {
       bind(classOf[Hello])
         .annotatedWith(Names.named("de"))
         .to(classOf[GermanHello])
-    }
-  }
 //#guice-module
-}
 
-package dynamicguicemodule {
+package dynamicguicemodule
 
   import implemented._
 
@@ -130,8 +108,8 @@ package dynamicguicemodule {
   import play.api.{Configuration, Environment}
 
   class Module(environment: Environment, configuration: Configuration)
-      extends AbstractModule {
-    def configure() = {
+      extends AbstractModule
+    def configure() =
       // Expect configuration like:
       // hello.en = "myapp.EnglishHello"
       // hello.de = "myapp.GermanHello"
@@ -141,19 +119,15 @@ package dynamicguicemodule {
       // Iterate through all the languages and bind the
       // class associated with that language. Use Play's
       // ClassLoader to load the classes.
-      for (l <- languages) {
+      for (l <- languages)
         val bindingClassName: String = helloConfiguration.getString(l).get
         val bindingClass: Class[_ <: Hello] = environment.classLoader
           .loadClass(bindingClassName)
           .asSubclass(classOf[Hello])
         bind(classOf[Hello]).annotatedWith(Names.named(l)).to(bindingClass)
-      }
-    }
-  }
 //#dynamic-guice-module
-}
 
-package eagerguicemodule {
+package eagerguicemodule
 
   import implemented._
 
@@ -161,8 +135,8 @@ package eagerguicemodule {
   import com.google.inject.AbstractModule
   import com.google.inject.name.Names
 
-  class Module extends AbstractModule {
-    def configure() = {
+  class Module extends AbstractModule
+    def configure() =
 
       bind(classOf[Hello])
         .annotatedWith(Names.named("en"))
@@ -173,12 +147,9 @@ package eagerguicemodule {
         .annotatedWith(Names.named("de"))
         .to(classOf[GermanHello])
         .asEagerSingleton
-    }
-  }
 //#eager-guice-module
-}
 
-package playmodule {
+package playmodule
 
   import play.api.{Configuration, Environment}
 
@@ -187,16 +158,14 @@ package playmodule {
 //#play-module
   import play.api.inject._
 
-  class HelloModule extends Module {
+  class HelloModule extends Module
     def bindings(environment: Environment, configuration: Configuration) = Seq(
         bind[Hello].qualifiedWith("en").to[EnglishHello],
         bind[Hello].qualifiedWith("de").to[GermanHello]
     )
-  }
 //#play-module
-}
 
-package eagerplaymodule {
+package eagerplaymodule
 
   import play.api.{Configuration, Environment}
 
@@ -205,22 +174,18 @@ package eagerplaymodule {
 //#eager-play-module
   import play.api.inject._
 
-  class HelloModule extends Module {
+  class HelloModule extends Module
     def bindings(environment: Environment, configuration: Configuration) = Seq(
         bind[Hello].qualifiedWith("en").to[EnglishHello].eagerly,
         bind[Hello].qualifiedWith("de").to[GermanHello].eagerly
     )
-  }
 //#eager-play-module
-}
-package injected.controllers {
+package injected.controllers
   import play.api.mvc._
-  class Application {
+  class Application
     def index = Action(Results.Ok)
-  }
-}
 
-package customapplicationloader {
+package customapplicationloader
 
   import play.api.{Configuration, Environment}
 
@@ -232,20 +197,17 @@ package customapplicationloader {
   import play.api.inject._
   import play.api.inject.guice._
 
-  class CustomApplicationLoader extends GuiceApplicationLoader() {
+  class CustomApplicationLoader extends GuiceApplicationLoader()
     override def builder(
-        context: ApplicationLoader.Context): GuiceApplicationBuilder = {
+        context: ApplicationLoader.Context): GuiceApplicationBuilder =
       val extra = Configuration("a" -> 1)
       initialBuilder
         .in(context.environment)
         .loadConfig(extra ++ context.initialConfiguration)
         .overrides(overrides(context): _*)
-    }
-  }
 //#custom-application-loader
-}
 
-package circular {
+package circular
 
 //#circular
   import javax.inject.Inject
@@ -254,9 +216,8 @@ package circular {
   class Bar @Inject()(baz: Baz)
   class Baz @Inject()(foo: Foo)
 //#circular
-}
 
-package circularProvider {
+package circularProvider
 
 //#circular-provider
   import javax.inject.{Inject, Provider}
@@ -265,4 +226,3 @@ package circularProvider {
   class Bar @Inject()(baz: Baz)
   class Baz @Inject()(foo: Provider[Foo])
 //#circular-provider
-}

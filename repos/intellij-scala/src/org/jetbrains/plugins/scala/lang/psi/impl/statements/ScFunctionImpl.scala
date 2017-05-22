@@ -25,57 +25,46 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScFunctionStub
 abstract class ScFunctionImpl protected (
     stub: StubElement[ScFunction], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScMember
-    with ScFunction with ScTypeParametersOwner {
+    with ScFunction with ScTypeParametersOwner
   override def isStable = false
 
-  def nameId: PsiElement = {
-    val n = getNode.findChildByType(ScalaTokenTypes.tIDENTIFIER) match {
+  def nameId: PsiElement =
+    val n = getNode.findChildByType(ScalaTokenTypes.tIDENTIFIER) match
       case null => getNode.findChildByType(ScalaTokenTypes.kTHIS)
       case notNull => notNull
-    }
-    if (n == null) {
+    if (n == null)
       return ScalaPsiElementFactory
         .createIdentifier(
             getStub.asInstanceOf[ScFunctionStub].getName, getManager)
         .getPsi
-    }
     n.getPsi
-  }
 
-  def paramClauses: ScParameters = {
+  def paramClauses: ScParameters =
     getStubOrPsiChild(ScalaElementTypes.PARAM_CLAUSES)
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
     // process function's process type parameters
     if (!super [ScTypeParametersOwner].processDeclarations(
             processor, state, lastParent, place)) return false
 
     lazy val parameterIncludingSynthetic: Seq[ScParameter] =
       effectiveParameterClauses.flatMap(_.effectiveParameters)
-    if (getStub == null) {
-      returnTypeElement match {
+    if (getStub == null)
+      returnTypeElement match
         case Some(x)
             if lastParent != null &&
             x.startOffsetInParent == lastParent.startOffsetInParent =>
-          for (p <- parameterIncludingSynthetic) {
+          for (p <- parameterIncludingSynthetic)
             ProgressManager.checkCanceled()
             if (!processor.execute(p, state)) return false
-          }
         case _ =>
-      }
-    } else {
+    else
       if (lastParent != null &&
-          lastParent.getContext != lastParent.getParent) {
-        for (p <- parameterIncludingSynthetic) {
+          lastParent.getContext != lastParent.getParent)
+        for (p <- parameterIncludingSynthetic)
           ProgressManager.checkCanceled()
           if (!processor.execute(p, state)) return false
-        }
-      }
-    }
     true
-  }
-}

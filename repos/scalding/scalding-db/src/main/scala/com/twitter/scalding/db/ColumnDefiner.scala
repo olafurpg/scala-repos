@@ -28,16 +28,15 @@ case object DATETIME extends SqlType
 case object TEXT extends SqlType
 case object DOUBLE extends SqlType
 
-object IsNullable {
+object IsNullable
   def apply(isNullable: Boolean): IsNullable =
     if (isNullable) Nullable else NotNullable
-}
 
 sealed abstract class IsNullable(val toStr: String)
 case object Nullable extends IsNullable("NULL")
 case object NotNullable extends IsNullable("NOT NULL")
 
-trait ColumnDefiner {
+trait ColumnDefiner
   // Some helper methods that we can use to generate column definitions
   protected def bigint(name: String,
                        nullable: IsNullable = NotNullable,
@@ -103,4 +102,3 @@ trait ColumnDefiner {
                        sizeOpt: Option[Int] = None,
                        defaultValue: Option[String] = None) =
     ColumnDefinition(DOUBLE, ColumnName(name), nullable, sizeOpt, defaultValue)
-}

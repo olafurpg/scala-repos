@@ -23,7 +23,7 @@ import scala.util.control.NonFatal
 /**
   * INTERNAL API
   */
-private[akka] object Mailbox {
+private[akka] object Mailbox
 
   type Status = Int
 
@@ -49,7 +49,6 @@ private[akka] object Mailbox {
   // since this is a compile-time constant, scalac will elide code behind if (Mailbox.debug) (RK checked with 2.9.1)
   final val debug =
     false // Deliberately without type ascription to make it a compile-time constant
-}
 
 /**
   * Mailbox and InternalMailbox is separated in two classes because ActorCell is needed for implementation,
@@ -58,7 +57,7 @@ private[akka] object Mailbox {
   * INTERNAL API
   */
 private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
-    extends ForkJoinTask[Unit] with SystemMessageQueue with Runnable {
+    extends ForkJoinTask[Unit] with SystemMessageQueue with Runnable
 
   import Mailbox._
 
@@ -151,14 +150,13 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
     * @return true if the suspend count reached zero
     */
   @tailrec
-  final def resume(): Boolean = currentStatus match {
+  final def resume(): Boolean = currentStatus match
     case Closed ⇒
       setStatus(Closed); false
     case s ⇒
       val next = if (s < suspendUnit) s else s - suspendUnit
       if (updateStatus(s, next)) next < suspendUnit
       else resume()
-  }
 
   /**
     * Increment the suspend count by one. Caller does not need to worry about whether
@@ -167,30 +165,28 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
     * @return true if the previous suspend count was zero
     */
   @tailrec
-  final def suspend(): Boolean = currentStatus match {
+  final def suspend(): Boolean = currentStatus match
     case Closed ⇒
       setStatus(Closed); false
     case s ⇒
       if (updateStatus(s, s + suspendUnit)) s < suspendUnit
       else suspend()
-  }
 
   /**
     * set new primary status Closed. Caller does not need to worry about whether
     * status was Scheduled or not.
     */
   @tailrec
-  final def becomeClosed(): Boolean = currentStatus match {
+  final def becomeClosed(): Boolean = currentStatus match
     case Closed ⇒
       setStatus(Closed); false
     case s ⇒ updateStatus(s, Closed) || becomeClosed()
-  }
 
   /**
     * Set Scheduled status, keeping primary status as is.
     */
   @tailrec
-  final def setAsScheduled(): Boolean = {
+  final def setAsScheduled(): Boolean =
     val s = currentStatus
     /*
      * Only try to add Scheduled bit if pure Open/Suspended, not Closed or with
@@ -198,16 +194,14 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
      */
     if ((s & shouldScheduleMask) != Open) false
     else updateStatus(s, s | Scheduled) || setAsScheduled()
-  }
 
   /**
     * Reset Scheduled status, keeping primary status as is.
     */
   @tailrec
-  final def setAsIdle(): Boolean = {
+  final def setAsIdle(): Boolean =
     val s = currentStatus
     updateStatus(s, s & ~Scheduled) || setAsIdle()
-  }
   /*
    * AtomicReferenceFieldUpdater for system queue.
    */
@@ -230,41 +224,35 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
 
   final def canBeScheduledForExecution(
       hasMessageHint: Boolean, hasSystemMessageHint: Boolean): Boolean =
-    currentStatus match {
+    currentStatus match
       case Open | Scheduled ⇒
         hasMessageHint || hasSystemMessageHint || hasSystemMessages ||
         hasMessages
       case Closed ⇒ false
       case _ ⇒ hasSystemMessageHint || hasSystemMessages
-    }
 
-  override final def run(): Unit = {
-    try {
-      if (!isClosed) {
+  override final def run(): Unit =
+    try
+      if (!isClosed)
         //Volatile read, needed here
         processAllSystemMessages() //First, deal with any system messages
         processMailbox() //Then deal with messages
-      }
-    } finally {
+    finally
       setAsIdle() //Volatile write, needed here
       dispatcher.registerForExecution(this, false, false)
-    }
-  }
 
   override final def getRawResult(): Unit = ()
   override final def setRawResult(unit: Unit): Unit = ()
-  final override def exec(): Boolean = try { run(); false } catch {
+  final override def exec(): Boolean = try { run(); false } catch
     case ie: InterruptedException ⇒
       Thread.currentThread.interrupt()
       false
     case anything: Throwable ⇒
       val t = Thread.currentThread
-      t.getUncaughtExceptionHandler match {
+      t.getUncaughtExceptionHandler match
         case null ⇒
         case some ⇒ some.uncaughtException(t, anything)
-      }
       throw anything
-  }
 
   /**
     * Process the messages in the mailbox
@@ -274,9 +262,9 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
       deadlineNs: Long = if (dispatcher.isThroughputDeadlineTimeDefined == true)
           System.nanoTime + dispatcher.throughputDeadlineTime.toNanos else 0L)
     : Unit =
-    if (shouldProcessMessage) {
+    if (shouldProcessMessage)
       val next = dequeue()
-      if (next ne null) {
+      if (next ne null)
         if (Mailbox.debug) println(actor.self + " processing message " + next)
         actor invoke next
         if (Thread.interrupted())
@@ -287,8 +275,6 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
             ((dispatcher.isThroughputDeadlineTimeDefined == false) ||
                 (System.nanoTime - deadlineNs) < 0))
           processMailbox(left - 1, deadlineNs)
-      }
-    }
 
   /**
     * Will at least try to process all queued system messages: in case of
@@ -297,10 +283,10 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
     * becomes closed (because of processing a Terminate message), dump all
     * already dequeued message to deadLetters.
     */
-  final def processAllSystemMessages() {
+  final def processAllSystemMessages()
     var interruption: Throwable = null
     var messageList = systemDrain(SystemMessageList.LNil)
-    while ((messageList.nonEmpty) && !isClosed) {
+    while ((messageList.nonEmpty) && !isClosed)
       val msg = messageList.head
       messageList = messageList.tail
       msg.unlink()
@@ -315,17 +301,16 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
       // don’t ever execute normal message when system message present!
       if ((messageList.isEmpty) && !isClosed)
         messageList = systemDrain(SystemMessageList.LNil)
-    }
     /*
      * if we closed the mailbox, we must dump the remaining system messages
      * to deadLetters (this is essential for DeathWatch)
      */
     val dlm = actor.dispatcher.mailboxes.deadLetterMailbox
-    while (messageList.nonEmpty) {
+    while (messageList.nonEmpty)
       val msg = messageList.head
       messageList = messageList.tail
       msg.unlink()
-      try dlm.systemEnqueue(actor.self, msg) catch {
+      try dlm.systemEnqueue(actor.self, msg) catch
         case e: InterruptedException ⇒ interruption = e
         case NonFatal(e) ⇒
           actor.system.eventStream.publish(
@@ -334,14 +319,10 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
                     this.getClass,
                     "error while enqueuing " + msg + " to deadLetters: " +
                     e.getMessage))
-      }
-    }
     // if we got an interrupted exception while handling system messages, then rethrow it
-    if (interruption ne null) {
+    if (interruption ne null)
       Thread.interrupted() // clear interrupted flag before throwing according to java convention
       throw interruption
-    }
-  }
 
   /**
     * Overridable callback to clean up the mailbox,
@@ -349,32 +330,29 @@ private[akka] abstract class Mailbox(val messageQueue: MessageQueue)
     * By default it dequeues all system messages + messages and ships them to the owning actors' systems' DeadLetterMailbox
     */
   protected[dispatch] def cleanUp(): Unit =
-    if (actor ne null) {
+    if (actor ne null)
       // actor is null for the deadLetterMailbox
       val dlm = actor.dispatcher.mailboxes.deadLetterMailbox
       var messageList = systemDrain(
           new LatestFirstSystemMessageList(NoMessage))
-      while (messageList.nonEmpty) {
+      while (messageList.nonEmpty)
         // message must be “virgin” before being able to systemEnqueue again
         val msg = messageList.head
         messageList = messageList.tail
         msg.unlink()
         dlm.systemEnqueue(actor.self, msg)
-      }
 
       if (messageQueue ne null) // needed for CallingThreadDispatcher, which never calls Mailbox.run()
         messageQueue.cleanUp(
             actor.self,
             actor.dispatcher.mailboxes.deadLetterMailbox.messageQueue)
-    }
-}
 
 /**
   * A MessageQueue is one of the core components in forming an Akka Mailbox.
   * The MessageQueue is where the normal messages that are sent to Actors will be enqueued (and subsequently dequeued)
   * It needs to at least support N producers and 1 consumer thread-safely.
   */
-trait MessageQueue {
+trait MessageQueue
 
   /**
     * Try to enqueue the message to this queue, or throw an exception.
@@ -405,11 +383,10 @@ trait MessageQueue {
     * available (e.g. for creating DeadLetters()), “/deadletters” otherwise.
     */
   def cleanUp(owner: ActorRef, deadLetters: MessageQueue): Unit
-}
 
 class NodeMessageQueue
     extends AbstractNodeQueue[Envelope] with MessageQueue
-    with UnboundedMessageQueueSemantics {
+    with UnboundedMessageQueueSemantics
 
   final def enqueue(receiver: ActorRef, handle: Envelope): Unit = add(handle)
 
@@ -420,14 +397,11 @@ class NodeMessageQueue
   final def hasMessages: Boolean = !isEmpty()
 
   @tailrec final def cleanUp(
-      owner: ActorRef, deadLetters: MessageQueue): Unit = {
+      owner: ActorRef, deadLetters: MessageQueue): Unit =
     val envelope = dequeue()
-    if (envelope ne null) {
+    if (envelope ne null)
       deadLetters.enqueue(owner, envelope)
       cleanUp(owner, deadLetters)
-    }
-  }
-}
 
 /**
   * Lock-free bounded non-blocking multiple-producer single-consumer queue.
@@ -435,7 +409,7 @@ class NodeMessageQueue
   */
 class BoundedNodeMessageQueue(capacity: Int)
     extends AbstractBoundedNodeQueue[Envelope](capacity) with MessageQueue
-    with BoundedMessageQueueSemantics with MultipleConsumerSemantics {
+    with BoundedMessageQueueSemantics with MultipleConsumerSemantics
   final def pushTimeOut: Duration = Duration.Undefined
 
   final def enqueue(receiver: ActorRef, handle: Envelope): Unit =
@@ -454,19 +428,16 @@ class BoundedNodeMessageQueue(capacity: Int)
   final def hasMessages: Boolean = !isEmpty()
 
   @tailrec final def cleanUp(
-      owner: ActorRef, deadLetters: MessageQueue): Unit = {
+      owner: ActorRef, deadLetters: MessageQueue): Unit =
     val envelope = dequeue()
-    if (envelope ne null) {
+    if (envelope ne null)
       deadLetters.enqueue(owner, envelope)
       cleanUp(owner, deadLetters)
-    }
-  }
-}
 
 /**
   * INTERNAL API
   */
-private[akka] trait SystemMessageQueue {
+private[akka] trait SystemMessageQueue
 
   /**
     * Enqueue a new system message, e.g. by prepending atomically as new head of a single-linked list.
@@ -480,44 +451,37 @@ private[akka] trait SystemMessageQueue {
     : EarliestFirstSystemMessageList
 
   def hasSystemMessages: Boolean
-}
 
 /**
   * INTERNAL API
   */
-private[akka] trait DefaultSystemMessageQueue { self: Mailbox ⇒
+private[akka] trait DefaultSystemMessageQueue  self: Mailbox ⇒
 
   @tailrec
-  final def systemEnqueue(receiver: ActorRef, message: SystemMessage): Unit = {
+  final def systemEnqueue(receiver: ActorRef, message: SystemMessage): Unit =
     assert(message.unlinked)
     if (Mailbox.debug) println(receiver + " having enqueued " + message)
     val currentList = systemQueueGet
-    if (currentList.head == NoMessage) {
+    if (currentList.head == NoMessage)
       if (actor ne null)
         actor.dispatcher.mailboxes.deadLetterMailbox
           .systemEnqueue(receiver, message)
-    } else {
-      if (!systemQueuePut(currentList, message :: currentList)) {
+    else
+      if (!systemQueuePut(currentList, message :: currentList))
         message.unlink()
         systemEnqueue(receiver, message)
-      }
-    }
-  }
 
   @tailrec
   final def systemDrain(newContents: LatestFirstSystemMessageList)
-    : EarliestFirstSystemMessageList = {
+    : EarliestFirstSystemMessageList =
     val currentList = systemQueueGet
     if (currentList.head == NoMessage) new EarliestFirstSystemMessageList(null)
     else if (systemQueuePut(currentList, newContents)) currentList.reverse
     else systemDrain(newContents)
-  }
 
-  def hasSystemMessages: Boolean = systemQueueGet.head match {
+  def hasSystemMessages: Boolean = systemQueueGet.head match
     case null | NoMessage ⇒ false
     case _ ⇒ true
-  }
-}
 
 /**
   * This is a marker trait for message queues which support multiple consumers,
@@ -529,20 +493,16 @@ trait MultipleConsumerSemantics
   * A QueueBasedMessageQueue is a MessageQueue backed by a java.util.Queue.
   */
 trait QueueBasedMessageQueue
-    extends MessageQueue with MultipleConsumerSemantics {
+    extends MessageQueue with MultipleConsumerSemantics
   def queue: Queue[Envelope]
   def numberOfMessages = queue.size
   def hasMessages = !queue.isEmpty
-  def cleanUp(owner: ActorRef, deadLetters: MessageQueue): Unit = {
-    if (hasMessages) {
+  def cleanUp(owner: ActorRef, deadLetters: MessageQueue): Unit =
+    if (hasMessages)
       var envelope = dequeue
-      while (envelope ne null) {
+      while (envelope ne null)
         deadLetters.enqueue(owner, envelope)
         envelope = dequeue
-      }
-    }
-  }
-}
 
 /**
   * UnboundedMessageQueueSemantics adds unbounded semantics to a QueueBasedMessageQueue,
@@ -551,34 +511,31 @@ trait QueueBasedMessageQueue
 trait UnboundedMessageQueueSemantics
 
 trait UnboundedQueueBasedMessageQueue
-    extends QueueBasedMessageQueue with UnboundedMessageQueueSemantics {
+    extends QueueBasedMessageQueue with UnboundedMessageQueueSemantics
   def enqueue(receiver: ActorRef, handle: Envelope): Unit = queue add handle
   def dequeue(): Envelope = queue.poll()
-}
 
 /**
   * BoundedMessageQueueSemantics adds bounded semantics to a QueueBasedMessageQueue,
   * i.e. blocking enqueue with timeout.
   */
-trait BoundedMessageQueueSemantics {
+trait BoundedMessageQueueSemantics
   def pushTimeOut: Duration
-}
 
 /**
   * INTERNAL API
   * Used to determine mailbox factories which create [[BoundedMessageQueueSemantics]]
   * mailboxes, and thus should be validated that the `pushTimeOut` is greater than 0.
   */
-private[akka] trait ProducesPushTimeoutSemanticsMailbox {
+private[akka] trait ProducesPushTimeoutSemanticsMailbox
   def pushTimeOut: Duration
-}
 
 trait BoundedQueueBasedMessageQueue
-    extends QueueBasedMessageQueue with BoundedMessageQueueSemantics {
+    extends QueueBasedMessageQueue with BoundedMessageQueueSemantics
   override def queue: BlockingQueue[Envelope]
 
   def enqueue(receiver: ActorRef, handle: Envelope): Unit =
-    if (pushTimeOut.length >= 0) {
+    if (pushTimeOut.length >= 0)
       if (!queue.offer(handle, pushTimeOut.length, pushTimeOut.unit))
         receiver
           .asInstanceOf[InternalActorRef]
@@ -586,17 +543,15 @@ trait BoundedQueueBasedMessageQueue
           .deadLetters
           .tell(DeadLetter(handle.message, handle.sender, receiver),
                 handle.sender)
-    } else queue put handle
+    else queue put handle
 
   def dequeue(): Envelope = queue.poll()
-}
 
 /**
   * DequeBasedMessageQueue refines QueueBasedMessageQueue to be backed by a java.util.Deque.
   */
-trait DequeBasedMessageQueueSemantics {
+trait DequeBasedMessageQueueSemantics
   def enqueueFirst(receiver: ActorRef, handle: Envelope): Unit
-}
 
 trait UnboundedDequeBasedMessageQueueSemantics
     extends DequeBasedMessageQueueSemantics with UnboundedMessageQueueSemantics
@@ -605,9 +560,8 @@ trait BoundedDequeBasedMessageQueueSemantics
     extends DequeBasedMessageQueueSemantics with BoundedMessageQueueSemantics
 
 trait DequeBasedMessageQueue
-    extends QueueBasedMessageQueue with DequeBasedMessageQueueSemantics {
+    extends QueueBasedMessageQueue with DequeBasedMessageQueueSemantics
   def queue: Deque[Envelope]
-}
 
 /**
   * UnboundedDequeBasedMessageQueueSemantics adds unbounded semantics to a DequeBasedMessageQueue,
@@ -615,12 +569,11 @@ trait DequeBasedMessageQueue
   */
 trait UnboundedDequeBasedMessageQueue
     extends DequeBasedMessageQueue
-    with UnboundedDequeBasedMessageQueueSemantics {
+    with UnboundedDequeBasedMessageQueueSemantics
   def enqueue(receiver: ActorRef, handle: Envelope): Unit = queue add handle
   def enqueueFirst(receiver: ActorRef, handle: Envelope): Unit =
     queue addFirst handle
   def dequeue(): Envelope = queue.poll()
-}
 
 /**
   * BoundedMessageQueueSemantics adds bounded semantics to a DequeBasedMessageQueue,
@@ -628,12 +581,12 @@ trait UnboundedDequeBasedMessageQueue
   */
 trait BoundedDequeBasedMessageQueue
     extends DequeBasedMessageQueue
-    with BoundedDequeBasedMessageQueueSemantics {
+    with BoundedDequeBasedMessageQueueSemantics
   def pushTimeOut: Duration
   override def queue: BlockingDeque[Envelope]
 
   def enqueue(receiver: ActorRef, handle: Envelope): Unit =
-    if (pushTimeOut.length >= 0) {
+    if (pushTimeOut.length >= 0)
       if (!queue.offer(handle, pushTimeOut.length, pushTimeOut.unit))
         receiver
           .asInstanceOf[InternalActorRef]
@@ -641,10 +594,10 @@ trait BoundedDequeBasedMessageQueue
           .deadLetters
           .tell(DeadLetter(handle.message, handle.sender, receiver),
                 handle.sender)
-    } else queue put handle
+    else queue put handle
 
   def enqueueFirst(receiver: ActorRef, handle: Envelope): Unit =
-    if (pushTimeOut.length >= 0) {
+    if (pushTimeOut.length >= 0)
       if (!queue.offerFirst(handle, pushTimeOut.length, pushTimeOut.unit))
         receiver
           .asInstanceOf[InternalActorRef]
@@ -652,10 +605,9 @@ trait BoundedDequeBasedMessageQueue
           .deadLetters
           .tell(DeadLetter(handle.message, handle.sender, receiver),
                 handle.sender)
-    } else queue putFirst handle
+    else queue putFirst handle
 
   def dequeue(): Envelope = queue.poll()
-}
 
 /**
   * MailboxType is a factory to create MessageQueues for an optionally
@@ -670,10 +622,9 @@ trait BoundedDequeBasedMessageQueue
   * guardian actor has performed that second step will all previously sent
   * messages be transferred from the dummy queue into the real mailbox.
   */
-trait MailboxType {
+trait MailboxType
   def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue
-}
 
 trait ProducesMessageQueue[T <: MessageQueue]
 
@@ -682,22 +633,19 @@ trait ProducesMessageQueue[T <: MessageQueue]
   */
 final case class UnboundedMailbox()
     extends MailboxType
-    with ProducesMessageQueue[UnboundedMailbox.MessageQueue] {
+    with ProducesMessageQueue[UnboundedMailbox.MessageQueue]
 
   def this(settings: ActorSystem.Settings, config: Config) = this()
 
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new UnboundedMailbox.MessageQueue
-}
 
-object UnboundedMailbox {
+object UnboundedMailbox
   class MessageQueue
       extends ConcurrentLinkedQueue[Envelope]
-      with UnboundedQueueBasedMessageQueue {
+      with UnboundedQueueBasedMessageQueue
     final def queue: Queue[Envelope] = this
-  }
-}
 
 /**
   * SingleConsumerOnlyUnboundedMailbox is a high-performance, multiple producer—single consumer, unbounded MailboxType,
@@ -708,14 +656,13 @@ object UnboundedMailbox {
   * so be sure to measure the performance in your particular setting in order to determine which one to use.
   */
 final case class SingleConsumerOnlyUnboundedMailbox()
-    extends MailboxType with ProducesMessageQueue[NodeMessageQueue] {
+    extends MailboxType with ProducesMessageQueue[NodeMessageQueue]
 
   def this(settings: ActorSystem.Settings, config: Config) = this()
 
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new NodeMessageQueue
-}
 
 /**
   * NonBlockingBoundedMailbox is a high-performance, multiple-producer single-consumer, bounded MailboxType,
@@ -726,7 +673,7 @@ final case class SingleConsumerOnlyUnboundedMailbox()
   * NOTE: NonBlockingBoundedMailbox does not use `mailbox-push-timeout-time` as it is non-blocking.
   */
 case class NonBlockingBoundedMailbox(val capacity: Int)
-    extends MailboxType with ProducesMessageQueue[BoundedNodeMessageQueue] {
+    extends MailboxType with ProducesMessageQueue[BoundedNodeMessageQueue]
 
   def this(settings: ActorSystem.Settings, config: Config) =
     this(config.getInt("mailbox-capacity"))
@@ -738,7 +685,6 @@ case class NonBlockingBoundedMailbox(val capacity: Int)
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new BoundedNodeMessageQueue(capacity)
-}
 
 /**
   * BoundedMailbox is the default bounded MailboxType used by Akka Actors.
@@ -746,7 +692,7 @@ case class NonBlockingBoundedMailbox(val capacity: Int)
 final case class BoundedMailbox(
     val capacity: Int, override val pushTimeOut: FiniteDuration)
     extends MailboxType with ProducesMessageQueue[BoundedMailbox.MessageQueue]
-    with ProducesPushTimeoutSemanticsMailbox {
+    with ProducesPushTimeoutSemanticsMailbox
 
   def this(settings: ActorSystem.Settings, config: Config) =
     this(config.getInt("mailbox-capacity"),
@@ -762,15 +708,12 @@ final case class BoundedMailbox(
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new BoundedMailbox.MessageQueue(capacity, pushTimeOut)
-}
 
-object BoundedMailbox {
+object BoundedMailbox
   class MessageQueue(capacity: Int, final val pushTimeOut: FiniteDuration)
       extends LinkedBlockingQueue[Envelope](capacity)
-      with BoundedQueueBasedMessageQueue {
+      with BoundedQueueBasedMessageQueue
     final def queue: BlockingQueue[Envelope] = this
-  }
-}
 
 /**
   * UnboundedPriorityMailbox is an unbounded mailbox that allows for prioritization of its contents.
@@ -779,20 +722,17 @@ object BoundedMailbox {
 class UnboundedPriorityMailbox(
     val cmp: Comparator[Envelope], val initialCapacity: Int)
     extends MailboxType
-    with ProducesMessageQueue[UnboundedPriorityMailbox.MessageQueue] {
+    with ProducesMessageQueue[UnboundedPriorityMailbox.MessageQueue]
   def this(cmp: Comparator[Envelope]) = this(cmp, 11)
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new UnboundedPriorityMailbox.MessageQueue(initialCapacity, cmp)
-}
 
-object UnboundedPriorityMailbox {
+object UnboundedPriorityMailbox
   class MessageQueue(initialCapacity: Int, cmp: Comparator[Envelope])
       extends PriorityBlockingQueue[Envelope](initialCapacity, cmp)
-      with UnboundedQueueBasedMessageQueue {
+      with UnboundedQueueBasedMessageQueue
     final def queue: Queue[Envelope] = this
-  }
-}
 
 /**
   * BoundedPriorityMailbox is a bounded mailbox that allows for prioritization of its contents.
@@ -803,7 +743,7 @@ class BoundedPriorityMailbox(final val cmp: Comparator[Envelope],
                              override final val pushTimeOut: Duration)
     extends MailboxType
     with ProducesMessageQueue[BoundedPriorityMailbox.MessageQueue]
-    with ProducesPushTimeoutSemanticsMailbox {
+    with ProducesPushTimeoutSemanticsMailbox
 
   if (capacity < 0)
     throw new IllegalArgumentException(
@@ -815,17 +755,14 @@ class BoundedPriorityMailbox(final val cmp: Comparator[Envelope],
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new BoundedPriorityMailbox.MessageQueue(capacity, cmp, pushTimeOut)
-}
 
-object BoundedPriorityMailbox {
+object BoundedPriorityMailbox
   class MessageQueue(
       capacity: Int, cmp: Comparator[Envelope], val pushTimeOut: Duration)
       extends BoundedBlockingQueue[Envelope](
           capacity, new PriorityQueue[Envelope](11, cmp))
-      with BoundedQueueBasedMessageQueue {
+      with BoundedQueueBasedMessageQueue
     final def queue: BlockingQueue[Envelope] = this
-  }
-}
 
 /**
   * UnboundedStablePriorityMailbox is an unbounded mailbox that allows for prioritization of its contents.  Unlike the
@@ -835,20 +772,17 @@ object BoundedPriorityMailbox {
 class UnboundedStablePriorityMailbox(
     val cmp: Comparator[Envelope], val initialCapacity: Int)
     extends MailboxType
-    with ProducesMessageQueue[UnboundedStablePriorityMailbox.MessageQueue] {
+    with ProducesMessageQueue[UnboundedStablePriorityMailbox.MessageQueue]
   def this(cmp: Comparator[Envelope]) = this(cmp, 11)
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new UnboundedStablePriorityMailbox.MessageQueue(initialCapacity, cmp)
-}
 
-object UnboundedStablePriorityMailbox {
+object UnboundedStablePriorityMailbox
   class MessageQueue(initialCapacity: Int, cmp: Comparator[Envelope])
       extends StablePriorityBlockingQueue[Envelope](initialCapacity, cmp)
-      with UnboundedQueueBasedMessageQueue {
+      with UnboundedQueueBasedMessageQueue
     final def queue: Queue[Envelope] = this
-  }
-}
 
 /**
   * BoundedStablePriorityMailbox is a bounded mailbox that allows for prioritization of its contents.  Unlike the
@@ -860,7 +794,7 @@ class BoundedStablePriorityMailbox(final val cmp: Comparator[Envelope],
                                    override final val pushTimeOut: Duration)
     extends MailboxType
     with ProducesMessageQueue[BoundedStablePriorityMailbox.MessageQueue]
-    with ProducesPushTimeoutSemanticsMailbox {
+    with ProducesPushTimeoutSemanticsMailbox
 
   if (capacity < 0)
     throw new IllegalArgumentException(
@@ -872,39 +806,33 @@ class BoundedStablePriorityMailbox(final val cmp: Comparator[Envelope],
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new BoundedStablePriorityMailbox.MessageQueue(capacity, cmp, pushTimeOut)
-}
 
-object BoundedStablePriorityMailbox {
+object BoundedStablePriorityMailbox
   class MessageQueue(
       capacity: Int, cmp: Comparator[Envelope], val pushTimeOut: Duration)
       extends BoundedBlockingQueue[Envelope](
           capacity, new StablePriorityQueue[Envelope](11, cmp))
-      with BoundedQueueBasedMessageQueue {
+      with BoundedQueueBasedMessageQueue
     final def queue: BlockingQueue[Envelope] = this
-  }
-}
 
 /**
   * UnboundedDequeBasedMailbox is an unbounded MailboxType, backed by a Deque.
   */
 final case class UnboundedDequeBasedMailbox()
     extends MailboxType
-    with ProducesMessageQueue[UnboundedDequeBasedMailbox.MessageQueue] {
+    with ProducesMessageQueue[UnboundedDequeBasedMailbox.MessageQueue]
 
   def this(settings: ActorSystem.Settings, config: Config) = this()
 
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new UnboundedDequeBasedMailbox.MessageQueue
-}
 
-object UnboundedDequeBasedMailbox {
+object UnboundedDequeBasedMailbox
   class MessageQueue
       extends LinkedBlockingDeque[Envelope]
-      with UnboundedDequeBasedMessageQueue {
+      with UnboundedDequeBasedMessageQueue
     final val queue = this
-  }
-}
 
 /**
   * BoundedDequeBasedMailbox is an bounded MailboxType, backed by a Deque.
@@ -913,7 +841,7 @@ case class BoundedDequeBasedMailbox(
     final val capacity: Int, override final val pushTimeOut: FiniteDuration)
     extends MailboxType
     with ProducesMessageQueue[BoundedDequeBasedMailbox.MessageQueue]
-    with ProducesPushTimeoutSemanticsMailbox {
+    with ProducesPushTimeoutSemanticsMailbox
 
   def this(settings: ActorSystem.Settings, config: Config) =
     this(config.getInt("mailbox-capacity"),
@@ -929,39 +857,33 @@ case class BoundedDequeBasedMailbox(
   final override def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new BoundedDequeBasedMailbox.MessageQueue(capacity, pushTimeOut)
-}
 
-object BoundedDequeBasedMailbox {
+object BoundedDequeBasedMailbox
   class MessageQueue(capacity: Int, val pushTimeOut: FiniteDuration)
       extends LinkedBlockingDeque[Envelope](capacity)
-      with BoundedDequeBasedMessageQueue {
+      with BoundedDequeBasedMessageQueue
     final val queue = this
-  }
-}
 
 /**
   * ControlAwareMessageQueue handles messages that extend [[akka.dispatch.ControlMessage]] with priority.
   */
-trait ControlAwareMessageQueueSemantics extends QueueBasedMessageQueue {
+trait ControlAwareMessageQueueSemantics extends QueueBasedMessageQueue
   def controlQueue: Queue[Envelope]
   def queue: Queue[Envelope]
 
-  def enqueue(receiver: ActorRef, handle: Envelope): Unit = handle match {
+  def enqueue(receiver: ActorRef, handle: Envelope): Unit = handle match
     case envelope @ Envelope(_: ControlMessage, _) ⇒ controlQueue add envelope
     case envelope ⇒ queue add envelope
-  }
 
-  def dequeue(): Envelope = {
+  def dequeue(): Envelope =
     val controlMsg = controlQueue.poll()
 
     if (controlMsg ne null) controlMsg
     else queue.poll()
-  }
 
   override def numberOfMessages: Int = controlQueue.size() + queue.size()
 
   override def hasMessages: Boolean = !(queue.isEmpty && controlQueue.isEmpty)
-}
 
 trait UnboundedControlAwareMessageQueueSemantics
     extends UnboundedMessageQueueSemantics
@@ -980,7 +902,7 @@ trait ControlMessage
   */
 final case class UnboundedControlAwareMailbox()
     extends MailboxType
-    with ProducesMessageQueue[UnboundedControlAwareMailbox.MessageQueue] {
+    with ProducesMessageQueue[UnboundedControlAwareMailbox.MessageQueue]
 
   // this constructor will be called via reflection when this mailbox type
   // is used in the application config
@@ -989,16 +911,13 @@ final case class UnboundedControlAwareMailbox()
   def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new UnboundedControlAwareMailbox.MessageQueue
-}
 
-object UnboundedControlAwareMailbox {
+object UnboundedControlAwareMailbox
   class MessageQueue
       extends UnboundedControlAwareMessageQueueSemantics
-      with java.io.Serializable {
+      with java.io.Serializable
     val controlQueue: Queue[Envelope] = new ConcurrentLinkedQueue[Envelope]()
     val queue: Queue[Envelope] = new ConcurrentLinkedQueue[Envelope]()
-  }
-}
 
 /**
   * BoundedControlAwareMailbox is a bounded MailboxType, that maintains two queues
@@ -1008,7 +927,7 @@ final case class BoundedControlAwareMailbox(
     capacity: Int, override final val pushTimeOut: FiniteDuration)
     extends MailboxType
     with ProducesMessageQueue[BoundedControlAwareMailbox.MessageQueue]
-    with ProducesPushTimeoutSemanticsMailbox {
+    with ProducesPushTimeoutSemanticsMailbox
   def this(settings: ActorSystem.Settings, config: Config) =
     this(config.getInt("mailbox-capacity"),
          config.getNanosDuration("mailbox-push-timeout-time"))
@@ -1016,12 +935,11 @@ final case class BoundedControlAwareMailbox(
   def create(
       owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
     new BoundedControlAwareMailbox.MessageQueue(capacity, pushTimeOut)
-}
 
-object BoundedControlAwareMailbox {
+object BoundedControlAwareMailbox
   class MessageQueue(val capacity: Int, val pushTimeOut: FiniteDuration)
       extends BoundedControlAwareMessageQueueSemantics
-      with java.io.Serializable {
+      with java.io.Serializable
 
     private final val size = new AtomicInteger(0)
     private final val putLock = new ReentrantLock()
@@ -1032,84 +950,71 @@ object BoundedControlAwareMailbox {
     val queue = new ConcurrentLinkedQueue[Envelope]()
 
     override def enqueue(receiver: ActorRef, handle: Envelope): Unit =
-      handle match {
+      handle match
         case envelope @ Envelope(_: ControlMessage, _) ⇒
           enqueueWithTimeout(controlQueue, receiver, envelope)
         case envelope ⇒ enqueueWithTimeout(queue, receiver, envelope)
-      }
 
     override def numberOfMessages: Int = size.get()
     override def hasMessages: Boolean = numberOfMessages > 0
 
     @tailrec
-    final override def dequeue(): Envelope = {
+    final override def dequeue(): Envelope =
       val count = size.get()
 
       // if both queues are empty return null
-      if (count > 0) {
+      if (count > 0)
         // if there are messages try to fetch the current head
         // or retry if other consumer dequeued in the mean time
-        if (size.compareAndSet(count, count - 1)) {
+        if (size.compareAndSet(count, count - 1))
           val item = super.dequeue()
 
           if (size.get < capacity) signalNotFull()
 
           item
-        } else {
+        else
           dequeue()
-        }
-      } else {
+      else
         null
-      }
-    }
 
-    private def signalNotFull() {
+    private def signalNotFull()
       putLock.lock()
 
-      try {
+      try
         notFull.signal()
-      } finally {
+      finally
         putLock.unlock()
-      }
-    }
 
     private final def enqueueWithTimeout(
-        q: Queue[Envelope], receiver: ActorRef, envelope: Envelope) {
+        q: Queue[Envelope], receiver: ActorRef, envelope: Envelope)
       var remaining = pushTimeOut.toNanos
 
       putLock.lockInterruptibly()
-      val inserted = try {
+      val inserted = try
         var stop = false
-        while (size.get() == capacity && !stop) {
+        while (size.get() == capacity && !stop)
           remaining = notFull.awaitNanos(remaining)
           stop = remaining <= 0
-        }
 
-        if (stop) {
+        if (stop)
           false
-        } else {
+        else
           q.add(envelope)
           val c = size.incrementAndGet()
 
           if (c < capacity) notFull.signal()
 
           true
-        }
-      } finally {
+      finally
         putLock.unlock()
-      }
 
-      if (!inserted) {
+      if (!inserted)
         receiver
           .asInstanceOf[InternalActorRef]
           .provider
           .deadLetters
           .tell(DeadLetter(envelope.message, envelope.sender, receiver),
                 envelope.sender)
-      }
-    }
-  }
-}
 
 /**
   * Trait to signal that an Actor requires a certain type of message queue semantics.

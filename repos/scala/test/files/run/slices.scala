@@ -1,6 +1,6 @@
 import scala.language.postfixOps
 
-object Test extends App {
+object Test extends App
 
   // lists
   println(List(1, 2, 3, 4).slice(1, 2))
@@ -45,4 +45,3 @@ object Test extends App {
   println((Array(): Array[Int]) drop 3 deep)
 //  println(Array[Nothing]() drop 3)
   println
-}

@@ -20,49 +20,42 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class DelayedFactory[Req, Rep](
     underlyingF: Future[ServiceFactory[Req, Rep]]
 )
-    extends ServiceFactory[Req, Rep] {
+    extends ServiceFactory[Req, Rep]
   private[this] def wrapped(): Future[ServiceFactory[Req, Rep]] =
     safelyInterruptible(underlyingF)
 
   private[this] val q =
     new ConcurrentLinkedQueue[Promise[ServiceFactory[Req, Rep]]]()
 
-  underlyingF ensure {
+  underlyingF ensure
     q.clear()
-  }
 
   private[this] def safelyInterruptible(
       f: Future[ServiceFactory[Req, Rep]]
-  ): Future[ServiceFactory[Req, Rep]] = {
+  ): Future[ServiceFactory[Req, Rep]] =
     val p = Promise.attached(f)
-    p setInterruptHandler {
+    p setInterruptHandler
       case t: Throwable =>
-        if (p.detach()) {
+        if (p.detach())
           q.remove(p)
           p.setException(Failure.adapt(t, Failure.Interrupted))
-        }
-    }
     q.add(p)
     p
-  }
 
   def apply(conn: ClientConnection): Future[Service[Req, Rep]] =
-    wrapped flatMap { fac =>
+    wrapped flatMap  fac =>
       fac(conn)
-    }
 
-  override def close(deadline: Time): Future[Unit] = {
+  override def close(deadline: Time): Future[Unit] =
     if (underlyingF.isDefined)
-      wrapped flatMap { svc =>
+      wrapped flatMap  svc =>
         svc.close(deadline)
-      } else {
+      else
       underlyingF.onSuccess(_.close(deadline))
       val exc = new ServiceClosedException
       underlyingF.raise(exc)
       for (p <- q.asScala) p.raise(exc)
       Future.Done
-    }
-  }
 
   override def status: Status =
     if (underlyingF.isDefined) Await.result(underlyingF).status
@@ -71,9 +64,8 @@ class DelayedFactory[Req, Rep](
   private[finagle] def numWaiters(): Int = q.size()
 
   override def toString: String = s"DelayedFactory(waiters=${numWaiters()})"
-}
 
-object DelayedFactory {
+object DelayedFactory
 
   /**
     * Returns a [[com.twitter.finagle.ServiceFactory]] backed by a [[DelayedFactory]] until the
@@ -81,14 +73,11 @@ object DelayedFactory {
     */
   def swapOnComplete[Req, Rep](
       underlying: Future[ServiceFactory[Req, Rep]]
-  ): ServiceFactory[Req, Rep] = {
+  ): ServiceFactory[Req, Rep] =
     val delayed = new DelayedFactory(underlying)
 
     val ref = new ServiceFactoryRef[Req, Rep](delayed)
-    underlying respond {
+    underlying respond
       case Throw(e) => ref() = new FailingFactory(e)
       case Return(fac) => ref() = fac
-    }
     ref
-  }
-}

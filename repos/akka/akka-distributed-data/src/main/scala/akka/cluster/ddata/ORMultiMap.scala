@@ -5,7 +5,7 @@ package akka.cluster.ddata
 
 import akka.cluster.{UniqueAddress, Cluster}
 
-object ORMultiMap {
+object ORMultiMap
 
   val _empty: ORMultiMap[Any] = new ORMultiMap(ORMap.empty)
 
@@ -29,11 +29,9 @@ object ORMultiMap {
   /**
     * Extract the [[ORMultiMap#entries]] of an `ORMultiMap`.
     */
-  def unapply(value: Any): Option[Map[String, Set[Any]]] = value match {
+  def unapply(value: Any): Option[Map[String, Set[Any]]] = value match
     case m: ORMultiMap[Any] @unchecked ⇒ Some(m.entries)
     case _ ⇒ None
-  }
-}
 
 /**
   * An immutable multi-map implementation. This class wraps an
@@ -45,7 +43,7 @@ object ORMultiMap {
 final class ORMultiMap[A] private[akka](
     private[akka] val underlying: ORMap[ORSet[A]])
     extends ReplicatedData with ReplicatedDataSerialization
-    with RemovedNodePruning {
+    with RemovedNodePruning
 
   override type T = ORMultiMap[A]
 
@@ -61,14 +59,12 @@ final class ORMultiMap[A] private[akka](
   /**
     * Java API: All entries of a multimap where keys are strings and values are sets.
     */
-  def getEntries(): java.util.Map[String, java.util.Set[A]] = {
+  def getEntries(): java.util.Map[String, java.util.Set[A]] =
     import scala.collection.JavaConverters._
     val result = new java.util.HashMap[String, java.util.Set[A]]
-    underlying.entries.foreach {
+    underlying.entries.foreach
       case (k, v) ⇒ result.put(k, v.elements.asJava)
-    }
     result
-  }
 
   /**
     * Get the set associated with the key if there is one.
@@ -93,10 +89,9 @@ final class ORMultiMap[A] private[akka](
     * Convenience for put. Requires an implicit Cluster.
     * @see [[#put]]
     */
-  def +(entry: (String, Set[A]))(implicit node: Cluster): ORMultiMap[A] = {
+  def +(entry: (String, Set[A]))(implicit node: Cluster): ORMultiMap[A] =
     val (key, value) = entry
     put(node, key, value)
-  }
 
   /**
     * Scala API: Associate an entire set with the key while retaining the history of the previous
@@ -109,24 +104,20 @@ final class ORMultiMap[A] private[akka](
     * Java API: Associate an entire set with the key while retaining the history of the previous
     * replicated data set.
     */
-  def put(node: Cluster, key: String, value: java.util.Set[A]): ORMultiMap[A] = {
+  def put(node: Cluster, key: String, value: java.util.Set[A]): ORMultiMap[A] =
     import scala.collection.JavaConverters._
     put(node, key, value.asScala.toSet)
-  }
 
   /**
     * INTERNAL API
     */
   private[akka] def put(
-      node: UniqueAddress, key: String, value: Set[A]): ORMultiMap[A] = {
-    val newUnderlying = underlying.updated(node, key, ORSet.empty[A]) {
+      node: UniqueAddress, key: String, value: Set[A]): ORMultiMap[A] =
+    val newUnderlying = underlying.updated(node, key, ORSet.empty[A])
       existing ⇒
-        value.foldLeft(existing.clear(node)) { (s, element) ⇒
+        value.foldLeft(existing.clear(node))  (s, element) ⇒
           s.add(node, element)
-        }
-    }
     new ORMultiMap(newUnderlying)
-  }
 
   /**
     * Convenience for remove. Requires an implicit Cluster.
@@ -164,11 +155,10 @@ final class ORMultiMap[A] private[akka](
     * INTERNAL API
     */
   private[akka] def addBinding(
-      node: UniqueAddress, key: String, element: A): ORMultiMap[A] = {
+      node: UniqueAddress, key: String, element: A): ORMultiMap[A] =
     val newUnderlying =
       underlying.updated(node, key, ORSet.empty[A])(_.add(node, element))
     new ORMultiMap(newUnderlying)
-  }
 
   /**
     * Scala API: Remove an element of a set associated with a key. If there are no more elements in the set then the
@@ -189,17 +179,14 @@ final class ORMultiMap[A] private[akka](
     * INTERNAL API
     */
   private[akka] def removeBinding(
-      node: UniqueAddress, key: String, element: A): ORMultiMap[A] = {
-    val newUnderlying = {
+      node: UniqueAddress, key: String, element: A): ORMultiMap[A] =
+    val newUnderlying =
       val u =
         underlying.updated(node, key, ORSet.empty[A])(_.remove(node, element))
-      u.get(key) match {
+      u.get(key) match
         case Some(s) if s.isEmpty ⇒ u.remove(node, key)
         case _ ⇒ u
-      }
-    }
     new ORMultiMap(newUnderlying)
-  }
 
   /**
     * Replace an element of a set associated with a key with a new one if it is different. This is useful when an element is removed
@@ -235,17 +222,14 @@ final class ORMultiMap[A] private[akka](
 
   override def toString: String = s"ORMulti$entries"
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case other: ORMultiMap[_] ⇒ underlying == other.underlying
     case _ ⇒ false
-  }
 
   override def hashCode: Int = underlying.hashCode
-}
 
-object ORMultiMapKey {
+object ORMultiMapKey
   def create[A](id: String): Key[ORMultiMap[A]] = ORMultiMapKey(id)
-}
 
 @SerialVersionUID(1L)
 final case class ORMultiMapKey[A](_id: String)

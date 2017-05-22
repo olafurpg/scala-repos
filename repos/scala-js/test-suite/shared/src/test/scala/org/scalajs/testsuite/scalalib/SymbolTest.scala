@@ -10,15 +10,14 @@ package org.scalajs.testsuite.scalalib
 import org.junit.Test
 import org.junit.Assert._
 
-class SymbolTest {
+class SymbolTest
 
-  @Test def should_ensure_unique_identity(): Unit = {
-    def expectEqual(sym1: Symbol, sym2: Symbol): Unit = {
+  @Test def should_ensure_unique_identity(): Unit =
+    def expectEqual(sym1: Symbol, sym2: Symbol): Unit =
       assertTrue(sym1 eq sym2)
       assertEquals(sym2, sym1)
       assertEquals(sym2, sym1)
       assertEquals(sym2.##, sym1.##)
-    }
 
     expectEqual('ScalaJS, Symbol("ScalaJS"))
     expectEqual('$, Symbol("$"))
@@ -31,9 +30,8 @@ class SymbolTest {
     assertEquals(1.2, map(Symbol("$")))
     assertEquals(42, map(Symbol("42")))
     assertEquals(42, map(`42`))
-  }
 
-  @Test def should_support_name(): Unit = {
+  @Test def should_support_name(): Unit =
     val scalajs = 'ScalaJS
 
     assertEquals("ScalaJS", scalajs.name)
@@ -43,9 +41,8 @@ class SymbolTest {
     assertEquals("*", '*.name)
     assertEquals("'", Symbol("'").name)
     assertEquals("\"", Symbol("\"").name)
-  }
 
-  @Test def should_support_toString(): Unit = {
+  @Test def should_support_toString(): Unit =
     val scalajs = 'ScalaJS
 
     assertEquals("'ScalaJS", scalajs.toString)
@@ -55,5 +52,3 @@ class SymbolTest {
     assertEquals("'*", '*.toString)
     assertEquals("''", Symbol("'").toString)
     assertEquals("'\"", Symbol("\"").toString)
-  }
-}

@@ -9,7 +9,7 @@ package runtime
   */
 private[scala] trait SymbolTable
     extends internal.SymbolTable with JavaMirrors with SymbolLoaders
-    with SynchronizedOps with Gil with ThreadLocalStorage {
+    with SynchronizedOps with Gil with ThreadLocalStorage
 
   def info(msg: => String) =
     if (settings.verbose) println("[reflect-compiler] " + msg)
@@ -28,4 +28,3 @@ private[scala] trait SymbolTable
     *  in order to prevent memory leaks: http://groups.google.com/group/scala-internals/browse_thread/thread/eabcf3d406dab8b2.
     */
   override def isCompilerUniverse = false
-}

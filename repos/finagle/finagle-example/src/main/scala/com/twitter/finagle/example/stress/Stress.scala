@@ -15,8 +15,8 @@ import scala.collection.JavaConverters._
   * asynchronous semaphore. Specify the uri, concurrency level,  and the total number
   * of requests at the command line.
   */
-object Stress {
-  def main(args: Array[String]) {
+object Stress
+  def main(args: Array[String])
     val uri = new URI(args(0))
     val concurrency = args(1).toInt
     val totalRequests = args(2).toInt
@@ -40,22 +40,19 @@ object Stress {
 
     val completedRequests = new AtomicInteger(0)
 
-    val requests = Future.parallel(concurrency) {
-      Future.times(totalRequests / concurrency) {
-        client(request) onSuccess { response =>
+    val requests = Future.parallel(concurrency)
+      Future.times(totalRequests / concurrency)
+        client(request) onSuccess  response =>
           responses.incrementAndGet(response.status)
-        } handle {
+        handle
           case e =>
             errors.incrementAndGet()
-        } ensure {
+        ensure
           completedRequests.incrementAndGet()
-        }
-      }
-    }
 
     val elapsed = Stopwatch.start()
 
-    Future.join(requests) ensure {
+    Future.join(requests) ensure
       client.close()
 
       val duration = elapsed()
@@ -74,6 +71,3 @@ object Stress {
       println("=====")
 
       statsReceiver.print()
-    }
-  }
-}

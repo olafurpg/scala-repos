@@ -30,7 +30,7 @@ abstract class BaseMutableProjection extends MutableProjection
   * The internal [[MutableRow]] object created internally is used only when `target` is not used.
   */
 object GenerateMutableProjection
-    extends CodeGenerator[Seq[Expression], () => MutableProjection] {
+    extends CodeGenerator[Seq[Expression], () => MutableProjection]
 
   protected def canonicalize(in: Seq[Expression]): Seq[Expression] =
     in.map(ExpressionCanonicalizer.execute)
@@ -41,28 +41,26 @@ object GenerateMutableProjection
 
   def generate(expressions: Seq[Expression],
                inputSchema: Seq[Attribute],
-               useSubexprElimination: Boolean): (() => MutableProjection) = {
+               useSubexprElimination: Boolean): (() => MutableProjection) =
     create(canonicalize(bind(expressions, inputSchema)), useSubexprElimination)
-  }
 
   protected def create(
-      expressions: Seq[Expression]): (() => MutableProjection) = {
+      expressions: Seq[Expression]): (() => MutableProjection) =
     create(expressions, false)
-  }
 
   private def create(
       expressions: Seq[Expression],
-      useSubexprElimination: Boolean): (() => MutableProjection) = {
+      useSubexprElimination: Boolean): (() => MutableProjection) =
     val ctx = newCodeGenContext()
-    val (validExpr, index) = expressions.zipWithIndex.filter {
+    val (validExpr, index) = expressions.zipWithIndex.filter
       case (NoOp, _) => false
       case _ => true
-    }.unzip
+    .unzip
     val exprVals = ctx.generateExpressions(validExpr, useSubexprElimination)
-    val projectionCodes = exprVals.zip(index).map {
+    val projectionCodes = exprVals.zip(index).map
       case (ev, i) =>
         val e = expressions(i)
-        if (e.nullable) {
+        if (e.nullable)
           val isNull = s"isNull_$i"
           val value = s"value_$i"
           ctx.addMutableState("boolean", isNull, s"this.$isNull = true;")
@@ -75,7 +73,7 @@ object GenerateMutableProjection
             this.$isNull = ${ev.isNull};
             this.$value = ${ev.value};
            """
-        } else {
+        else
           val value = s"value_$i"
           ctx.addMutableState(
               ctx.javaType(e.dataType),
@@ -85,17 +83,14 @@ object GenerateMutableProjection
             ${ev.code}
             this.$value = ${ev.value};
            """
-        }
-    }
 
     // Evaluate all the subexpressions.
     val evalSubexpr = ctx.subexprFunctions.mkString("\n")
 
-    val updates = validExpr.zip(index).map {
+    val updates = validExpr.zip(index).map
       case (e, i) =>
         val ev = ExprCode("", s"this.isNull_$i", s"this.value_$i")
         ctx.updateColumn("mutableRow", e.dataType, i, ev, e.nullable)
-    }
 
     val allProjections = ctx.splitExpressions(ctx.INPUT_ROW, projectionCodes)
     val allUpdates = ctx.splitExpressions(ctx.INPUT_ROW, updates)
@@ -144,8 +139,4 @@ object GenerateMutableProjection
 
     val c = CodeGenerator.compile(code)
     () =>
-      {
         c.generate(ctx.references.toArray).asInstanceOf[MutableProjection]
-      }
-  }
-}

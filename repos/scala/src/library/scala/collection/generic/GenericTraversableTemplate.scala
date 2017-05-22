@@ -26,7 +26,7 @@ import scala.language.higherKinds
   *  @define Coll  Traversable
   */
 trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
-    extends HasNewBuilder[A, CC[A] @uncheckedVariance] {
+    extends HasNewBuilder[A, CC[A] @uncheckedVariance]
 
   /** Applies a function `f` to all elements of this $coll.
     *
@@ -90,16 +90,14 @@ trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
     *  @return       a pair of ${coll}s, containing the first, respectively second
     *                half of each element pair of this $coll.
     */
-  def unzip[A1, A2](implicit asPair: A => (A1, A2)): (CC[A1], CC[A2]) = {
+  def unzip[A1, A2](implicit asPair: A => (A1, A2)): (CC[A1], CC[A2]) =
     val b1 = genericBuilder[A1]
     val b2 = genericBuilder[A2]
-    for (xy <- sequential) {
+    for (xy <- sequential)
       val (x, y) = asPair(xy)
       b1 += x
       b2 += y
-    }
     (b1.result(), b2.result())
-  }
 
   /** Converts this $coll of triples into three collections of the first, second,
     *  and third element of each triple.
@@ -123,19 +121,17 @@ trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
     *                   third member of each element triple of this $coll.
     */
   def unzip3[A1, A2, A3](
-      implicit asTriple: A => (A1, A2, A3)): (CC[A1], CC[A2], CC[A3]) = {
+      implicit asTriple: A => (A1, A2, A3)): (CC[A1], CC[A2], CC[A3]) =
     val b1 = genericBuilder[A1]
     val b2 = genericBuilder[A2]
     val b3 = genericBuilder[A3]
 
-    for (xyz <- sequential) {
+    for (xyz <- sequential)
       val (x, y, z) = asTriple(xyz)
       b1 += x
       b2 += y
       b3 += z
-    }
     (b1.result(), b2.result(), b3.result())
-  }
 
   /** Converts this $coll of traversable collections into
     *  a $coll formed by the elements of these traversable
@@ -168,11 +164,10 @@ trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
     *    }}}
     */
   def flatten[B](
-      implicit asTraversable: A => /*<:<!!!*/ GenTraversableOnce[B]): CC[B] = {
+      implicit asTraversable: A => /*<:<!!!*/ GenTraversableOnce[B]): CC[B] =
     val b = genericBuilder[B]
     for (xs <- sequential) b ++= asTraversable(xs).seq
     b.result()
-  }
 
   /** Transposes this $coll of traversable collections into
     *  a $coll of ${coll}s.
@@ -211,7 +206,7 @@ trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
       "2.9.0")
   def transpose[B](
       implicit asTraversable: A => /*<:<!!!*/ GenTraversableOnce[B])
-    : CC[CC[B] @uncheckedVariance] = {
+    : CC[CC[B] @uncheckedVariance] =
     if (isEmpty) return genericBuilder[CC[B]].result()
 
     def fail =
@@ -221,17 +216,13 @@ trait GenericTraversableTemplate[+A, +CC[X] <: GenTraversable[X]]
     val headSize = asTraversable(head).size
     val bs: IndexedSeq[Builder[B, CC[B]]] =
       IndexedSeq.fill(headSize)(genericBuilder[B])
-    for (xs <- sequential) {
+    for (xs <- sequential)
       var i = 0
-      for (x <- asTraversable(xs).seq) {
+      for (x <- asTraversable(xs).seq)
         if (i >= headSize) fail
         bs(i) += x
         i += 1
-      }
       if (i != headSize) fail
-    }
     val bb = genericBuilder[CC[B]]
     for (b <- bs) bb += b.result
     bb.result()
-  }
-}

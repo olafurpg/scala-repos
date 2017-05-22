@@ -41,46 +41,35 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
                               nodeType: IElementType,
                               node: ASTNode)
     extends ScTypeDefinitionImpl(stub, nodeType, node) with ScObject
-    with ScTemplateDefinition {
-  override def additionalJavaNames: Array[String] = {
-    fakeCompanionClass match {
+    with ScTemplateDefinition
+  override def additionalJavaNames: Array[String] =
+    fakeCompanionClass match
       case Some(c) => Array(c.getName)
       case _ => Array.empty
-    }
-  }
 
-  override def getNavigationElement: PsiElement = {
-    if (isSyntheticObject) {
-      ScalaPsiUtil.getCompanionModule(this) match {
+  override def getNavigationElement: PsiElement =
+    if (isSyntheticObject)
+      ScalaPsiUtil.getCompanionModule(this) match
         case Some(clazz) => return clazz.getNavigationElement
         case _ =>
-      }
-    }
     super.getNavigationElement
-  }
 
-  override def getContainingFile: PsiFile = {
-    if (isSyntheticObject) {
-      ScalaPsiUtil.getCompanionModule(this) match {
+  override def getContainingFile: PsiFile =
+    if (isSyntheticObject)
+      ScalaPsiUtil.getCompanionModule(this) match
         case Some(clazz) => return clazz.getContainingFile
         case _ =>
-      }
-    }
     super.getContainingFile
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScTemplateDefinitionStub) = {
+  def this(stub: ScTemplateDefinitionStub) =
     this(stub, ScalaElementTypes.OBJECT_DEF, null)
-  }
 
   override def toString: String =
     (if (isPackageObject) "ScPackageObject: " else "ScObject: ") + name
@@ -88,26 +77,23 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
   override def getIconInner =
     if (isPackageObject) Icons.PACKAGE_OBJECT else Icons.OBJECT
 
-  override def getName: String = {
+  override def getName: String =
     if (isPackageObject) return "package$"
     super.getName + "$"
-  }
 
-  override def hasModifierProperty(name: String): Boolean = {
+  override def hasModifierProperty(name: String): Boolean =
     if (name == "final") return true
     super [ScTypeDefinitionImpl].hasModifierProperty(name)
-  }
 
   override def isObject: Boolean = true
 
-  override def isPackageObject: Boolean = {
+  override def isPackageObject: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScTemplateDefinitionStub].isPackageObject
-    } else
+    else
       findChildByType[PsiElement](ScalaTokenTypes.kPACKAGE) != null ||
       name == "`package`"
-  }
 
   def hasPackageKeyword: Boolean =
     findChildByType[PsiElement](ScalaTokenTypes.kPACKAGE) != null
@@ -118,11 +104,11 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
       processor: PsiScopeProcessor,
       state: ResolveState,
       lastParent: PsiElement,
-      place: PsiElement): Boolean = {
+      place: PsiElement): Boolean =
     if (DumbService.getInstance(getProject).isDumb) return true
     if (!super [ScTemplateDefinition].processDeclarationsForTemplateBody(
             processor, state, lastParent, place)) return false
-    if (isPackageObject && name != "`package`") {
+    if (isPackageObject && name != "`package`")
       val newState = state.put(BaseProcessor.FROM_TYPE_KEY, null)
       val qual = qualifiedName
       val facade = JavaPsiFacade.getInstance(getProject)
@@ -130,63 +116,54 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
         facade.findPackage(qual) //do not wrap into ScPackage to avoid SOE
       if (pack != null && !ResolveUtils.packageProcessDeclarations(
               pack, processor, newState, lastParent, place)) return false
-    }
     true
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
-    if (isPackageObject) {
+                                   place: PsiElement): Boolean =
+    if (isPackageObject)
       import org.jetbrains.plugins.scala.lang.psi.impl.ScPackageImpl._
       startPackageObjectProcessing()
-      try {
+      try
         super [ScTemplateDefinition].processDeclarations(
             processor, state, lastParent, place)
-      } catch {
+      catch
         case ignore: DoNotProcessPackageObjectException =>
           true //do nothing, just let's move on
-      } finally {
+      finally
         stopPackageObjectProcessing()
-      }
-    } else {
+    else
       super [ScTemplateDefinition].processDeclarations(
           processor, state, lastParent, place)
-    }
-  }
 
-  override protected def syntheticMethodsWithOverrideImpl: Seq[PsiMethod] = {
+  override protected def syntheticMethodsWithOverrideImpl: Seq[PsiMethod] =
     val res =
       if (isSyntheticObject) Seq.empty
       else
-        ScalaPsiUtil.getCompanionModule(this) match {
+        ScalaPsiUtil.getCompanionModule(this) match
           case Some(c: ScClass) if c.isCase =>
             val res = new ArrayBuffer[PsiMethod]
             c.getSyntheticMethodsText.foreach(s =>
-                  {
-                try {
+                try
                   val method = ScalaPsiElementFactory.createMethodWithContext(
                       s, c.getContext, c)
                   method.setSynthetic(this)
                   method.syntheticCaseClass = Some(c)
                   res += method
-                } catch {
+                catch
                   case e: Exception =>
                   //do not add methods with wrong signature
-                }
-            })
+            )
             res.toSeq
           case _ => Seq.empty
-        }
     res ++ super.syntheticMethodsWithOverrideImpl
-  }
 
   override protected def syntheticMethodsNoOverrideImpl: Seq[PsiMethod] =
     SyntheticMembersInjector.inject(this, withOverride = false)
 
-  def fakeCompanionClass: Option[PsiClass] = {
-    ScalaPsiUtil.getCompanionModule(this) match {
+  def fakeCompanionClass: Option[PsiClass] =
+    ScalaPsiUtil.getCompanionModule(this) match
       case Some(module) => None
       case None =>
         Some(
@@ -194,23 +171,19 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
                 this,
                 getQualifiedName.substring(0, getQualifiedName.length() - 1),
                 getName.substring(0, getName.length() - 1)))
-    }
-  }
 
-  def fakeCompanionClassOrCompanionClass: PsiClass = {
-    fakeCompanionClass match {
+  def fakeCompanionClassOrCompanionClass: PsiClass =
+    fakeCompanionClass match
       case Some(clazz) => clazz
       case _ =>
         ScalaPsiUtil.getCompanionModule(this).get
-    }
-  }
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
-  private def getModuleField: Option[PsiField] = {
+  private def getModuleField: Option[PsiField] =
     if (getQualifiedName
           .split('.')
           .exists(JavaLexer.isKeyword(_, PsiUtil.getLanguageLevel(this)))) None
-    else {
+    else
       val field: LightField = new LightField(
           getManager,
           JavaPsiFacade
@@ -223,48 +196,38 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
           this)
       field.setNavigationElement(this)
       Some(field)
-    }
-  }
 
-  override def getFields: Array[PsiField] = {
+  override def getFields: Array[PsiField] =
     getModuleField.toArray
-  }
 
-  override def findFieldByName(name: String, checkBases: Boolean): PsiField = {
-    name match {
+  override def findFieldByName(name: String, checkBases: Boolean): PsiField =
+    name match
       case "MODULE$" => getModuleField.orNull
       case _ => null
-    }
-  }
 
   override def getInnerClasses: Array[PsiClass] = Array.empty
 
-  override def getMethods: Array[PsiMethod] = {
+  override def getMethods: Array[PsiMethod] =
     getAllMethods.filter(_.containingClass == this)
-  }
 
-  override def getAllMethods: Array[PsiMethod] = {
+  override def getAllMethods: Array[PsiMethod] =
     val res = new ArrayBuffer[PsiMethod]()
     res ++= getConstructors
-    TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this) { node =>
-      val isInterface = node.info.namedElement match {
+    TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this)  node =>
+      val isInterface = node.info.namedElement match
         case t: ScTypedDefinition if t.isAbstractMember => true
         case _ => false
-      }
       this.processPsiMethodsForNode(
           node, isStatic = false, isInterface = isInterface)(res += _)
-    }
 
-    for (synthetic <- syntheticMethodsNoOverride) {
+    for (synthetic <- syntheticMethodsNoOverride)
       this.processPsiMethodsForNode(
           new SignatureNodes.Node(new PhysicalSignature(synthetic,
                                                         ScSubstitutor.empty),
                                   ScSubstitutor.empty),
           isStatic = false,
           isInterface = isInterface)(res += _)
-    }
     res.toArray
-  }
 
   @volatile
   private var emptyObjectConstructor: EmptyPrivateConstructor = null
@@ -275,42 +238,35 @@ class ScObjectImpl protected (stub: StubElement[ScTemplateDefinition],
   override def getConstructors: Array[PsiMethod] =
     Array(new EmptyPrivateConstructor(this))
 
-  override def isPhysical: Boolean = {
+  override def isPhysical: Boolean =
     if (isSyntheticObject) false
     else super.isPhysical
-  }
 
-  override def getTextRange: TextRange = {
+  override def getTextRange: TextRange =
     if (isSyntheticObject) null
     else super.getTextRange
-  }
 
-  override def getInterfaces: Array[PsiClass] = {
+  override def getInterfaces: Array[PsiClass] =
     getSupers.filter(_.isInterface)
-  }
 
   private val hardParameterlessSignatures: mutable.WeakHashMap[
       Project, TypeDefinitionMembers.ParameterlessNodes.Map] =
     new mutable.WeakHashMap[
         Project, TypeDefinitionMembers.ParameterlessNodes.Map]
-  def getHardParameterlessSignatures: TypeDefinitionMembers.ParameterlessNodes.Map = {
+  def getHardParameterlessSignatures: TypeDefinitionMembers.ParameterlessNodes.Map =
     hardParameterlessSignatures.getOrElseUpdate(
         getProject, TypeDefinitionMembers.ParameterlessNodes.build(this))
-  }
 
   private val hardTypes: mutable.WeakHashMap[
       Project, TypeDefinitionMembers.TypeNodes.Map] =
     new mutable.WeakHashMap[Project, TypeDefinitionMembers.TypeNodes.Map]
-  def getHardTypes: TypeDefinitionMembers.TypeNodes.Map = {
+  def getHardTypes: TypeDefinitionMembers.TypeNodes.Map =
     hardTypes.getOrElseUpdate(
         getProject, TypeDefinitionMembers.TypeNodes.build(this))
-  }
 
   private val hardSignatures: mutable.WeakHashMap[
       Project, TypeDefinitionMembers.SignatureNodes.Map] =
     new mutable.WeakHashMap[Project, TypeDefinitionMembers.SignatureNodes.Map]
-  def getHardSignatures: TypeDefinitionMembers.SignatureNodes.Map = {
+  def getHardSignatures: TypeDefinitionMembers.SignatureNodes.Map =
     hardSignatures.getOrElseUpdate(
         getProject, TypeDefinitionMembers.SignatureNodes.build(this))
-  }
-}

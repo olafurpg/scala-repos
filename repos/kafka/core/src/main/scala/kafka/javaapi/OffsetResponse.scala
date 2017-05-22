@@ -18,7 +18,7 @@ package kafka.javaapi
 
 import kafka.common.TopicAndPartition
 
-class OffsetResponse(private val underlying: kafka.api.OffsetResponse) {
+class OffsetResponse(private val underlying: kafka.api.OffsetResponse)
 
   def hasError = underlying.hasError
 
@@ -33,14 +33,12 @@ class OffsetResponse(private val underlying: kafka.api.OffsetResponse) {
       .offsets
       .toArray
 
-  override def equals(other: Any) = canEqual(other) && {
+  override def equals(other: Any) = canEqual(other) &&
     val otherOffsetResponse = other.asInstanceOf[kafka.javaapi.OffsetResponse]
     this.underlying.equals(otherOffsetResponse.underlying)
-  }
 
   def canEqual(other: Any) = other.isInstanceOf[kafka.javaapi.OffsetResponse]
 
   override def hashCode = underlying.hashCode
 
   override def toString = underlying.toString
-}

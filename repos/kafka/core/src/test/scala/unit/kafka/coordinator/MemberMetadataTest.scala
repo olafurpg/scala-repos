@@ -22,7 +22,7 @@ import org.junit.Assert._
 import org.junit.Test
 import org.scalatest.junit.JUnitSuite
 
-class MemberMetadataTest extends JUnitSuite {
+class MemberMetadataTest extends JUnitSuite
   val groupId = "groupId"
   val clientId = "clientId"
   val clientHost = "clientHost"
@@ -30,7 +30,7 @@ class MemberMetadataTest extends JUnitSuite {
   val sessionTimeoutMs = 10000
 
   @Test
-  def testMatchesSupportedProtocols {
+  def testMatchesSupportedProtocols
     val protocols = List(("range", Array.empty[Byte]))
 
     val member = new MemberMetadata(
@@ -41,10 +41,9 @@ class MemberMetadataTest extends JUnitSuite {
     assertFalse(
         member.matches(List(("range", Array.empty[Byte]),
                             ("roundrobin", Array.empty[Byte]))))
-  }
 
   @Test
-  def testVoteForPreferredProtocol {
+  def testVoteForPreferredProtocol
     val protocols = List(
         ("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte]))
 
@@ -52,10 +51,9 @@ class MemberMetadataTest extends JUnitSuite {
         memberId, groupId, clientId, clientHost, sessionTimeoutMs, protocols)
     assertEquals("range", member.vote(Set("range", "roundrobin")))
     assertEquals("roundrobin", member.vote(Set("blah", "roundrobin")))
-  }
 
   @Test
-  def testMetadata {
+  def testMetadata
     val protocols = List(
         ("range", Array[Byte](0)), ("roundrobin", Array[Byte](1)))
 
@@ -64,10 +62,9 @@ class MemberMetadataTest extends JUnitSuite {
     assertTrue(util.Arrays.equals(Array[Byte](0), member.metadata("range")))
     assertTrue(
         util.Arrays.equals(Array[Byte](1), member.metadata("roundrobin")))
-  }
 
   @Test(expected = classOf[IllegalArgumentException])
-  def testMetadataRaisesOnUnsupportedProtocol {
+  def testMetadataRaisesOnUnsupportedProtocol
     val protocols = List(
         ("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte]))
 
@@ -75,10 +72,9 @@ class MemberMetadataTest extends JUnitSuite {
         memberId, groupId, clientId, clientHost, sessionTimeoutMs, protocols)
     member.metadata("blah")
     fail()
-  }
 
   @Test(expected = classOf[IllegalArgumentException])
-  def testVoteRaisesOnNoSupportedProtocols {
+  def testVoteRaisesOnNoSupportedProtocols
     val protocols = List(
         ("range", Array.empty[Byte]), ("roundrobin", Array.empty[Byte]))
 
@@ -86,5 +82,3 @@ class MemberMetadataTest extends JUnitSuite {
         memberId, groupId, clientId, clientHost, sessionTimeoutMs, protocols)
     member.vote(Set("blah"))
     fail()
-  }
-}

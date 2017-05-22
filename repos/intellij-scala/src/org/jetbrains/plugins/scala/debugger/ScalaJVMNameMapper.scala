@@ -11,17 +11,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTe
 /**
   *@author ilyas
   */
-class ScalaJVMNameMapper extends NameMapper {
-  def getQualifiedName(@NotNull clazz: PsiClass): String = {
-    ApplicationManager.getApplication.runReadAction(new Computable[String] {
-      def compute: String = {
-        clazz match {
+class ScalaJVMNameMapper extends NameMapper
+  def getQualifiedName(@NotNull clazz: PsiClass): String =
+    ApplicationManager.getApplication.runReadAction(new Computable[String]
+      def compute: String =
+        clazz match
           case obj: ScObject => obj.qualifiedName + "$"
           case tr: ScTrait => tr.qualifiedName
           case templDef: ScTemplateDefinition => templDef.qualifiedName
           case psiClass => null
-        }
-      }
-    })
-  }
-}
+    )

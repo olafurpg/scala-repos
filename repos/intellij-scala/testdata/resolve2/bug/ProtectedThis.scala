@@ -1,14 +1,10 @@
-class ProtectedThis {
-  class A {
+class ProtectedThis
+  class A
     protected[this] val a = 34
-  }
 
-  class B extends A {
+  class B extends A
     val g = a
-  }
 
-  object B {
+  object B
     val b = new B
     b. /* accessible: false */ a
-  }
-}

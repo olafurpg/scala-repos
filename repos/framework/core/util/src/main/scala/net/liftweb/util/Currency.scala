@@ -23,15 +23,13 @@ import common._
 /**
   * A simple fixed-point currency representation
   */
-class Currency(val amount: Long, val symbol: String, val decimals: Int) {
-  override def toString = {
+class Currency(val amount: Long, val symbol: String, val decimals: Int)
+  override def toString =
     if (decimals == 0) symbol + amount
-    else {
+    else
       val d = amount.toDouble
       val pow = math.pow(10, decimals)
       symbol + (d / pow)
-    }
-  }
 
   /**
     * Return a string formatted as the URL-encoded symbol followed
@@ -43,11 +41,10 @@ class Currency(val amount: Long, val symbol: String, val decimals: Int) {
     * Determines whether two currencies are equal with respect to
     * symbol, amount, and decimal value.
     */
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case c: Currency =>
       c.amount == amount && c.symbol == symbol && c.decimals == decimals
     case _ => false
-  }
 
   /**
     * Addition on Currency objects. This compares currency symbols to prevent
@@ -68,7 +65,6 @@ class Currency(val amount: Long, val symbol: String, val decimals: Int) {
     if (symbol != other.symbol || decimals != other.decimals)
       throw new CurrencyMismatchException
     else new Currency(amount - other.amount, symbol, decimals)
-}
 
 /**
   * This exception is thrown if an operation is attempted on two currency values
@@ -76,15 +72,13 @@ class Currency(val amount: Long, val symbol: String, val decimals: Int) {
   */
 class CurrencyMismatchException extends Exception
 
-object Currency {
+object Currency
 
   /**
     * Parse a currency from the format specified by Currency.forDB
     */
-  def apply(s: String): Box[Currency] = s.roboSplit("&") match {
+  def apply(s: String): Box[Currency] = s.roboSplit("&") match
     case List(cur, a, d) =>
       for (av <- asLong(a); dv <- asInt(d)) yield
         new Currency(av, urlDecode(cur), dv)
     case _ => Empty
-  }
-}

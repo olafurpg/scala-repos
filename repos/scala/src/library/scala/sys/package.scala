@@ -19,7 +19,7 @@ import scala.collection.JavaConverters._
   *  @version 2.9
   *  @since   2.9
   */
-package object sys {
+package object sys
 
   /** Throw a new RuntimeException with the supplied message.
     *
@@ -37,10 +37,9 @@ package object sys {
     *
     *  @return   Nothing.
     */
-  def exit(status: Int): Nothing = {
+  def exit(status: Int): Nothing =
     java.lang.System.exit(status)
     throw new Throwable()
-  }
 
   /** A convenience method to get the current Runtime instance.
     *
@@ -80,11 +79,9 @@ package object sys {
     *
     *  @return   an IndexedSeq containing the threads.
     */
-  def allThreads(): IndexedSeq[Thread] = {
+  def allThreads(): IndexedSeq[Thread] =
     val num = Thread.activeCount()
     val tarray = new Array[Thread](num)
     val got = Thread.enumerate(tarray)
 
     tarray take got
-  }
-}

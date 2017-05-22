@@ -2,9 +2,8 @@ package spire
 
 import scala.collection._
 
-object Platform {
+object Platform
   type TrieMap[K, V] = mutable.Map[K, V]
 
   @inline
   def TrieMap[K, V](): TrieMap[K, V] = mutable.Map()
-}

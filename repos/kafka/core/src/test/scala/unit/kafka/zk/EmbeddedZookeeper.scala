@@ -25,7 +25,7 @@ import kafka.utils.CoreUtils
 import org.apache.kafka.common.security.JaasUtils
 import org.apache.kafka.common.utils.Utils.getPort
 
-class EmbeddedZookeeper() {
+class EmbeddedZookeeper()
   val snapshotDir = TestUtils.tempDir()
   val logDir = TestUtils.tempDir()
   val tickTime = 500
@@ -36,10 +36,8 @@ class EmbeddedZookeeper() {
   factory.startup(zookeeper)
   val port = zookeeper.getClientPort()
 
-  def shutdown() {
+  def shutdown()
     CoreUtils.swallow(zookeeper.shutdown())
     CoreUtils.swallow(factory.shutdown())
     CoreUtils.rm(logDir)
     CoreUtils.rm(snapshotDir)
-  }
-}

@@ -1,20 +1,18 @@
 /*
  * Copyright (C) 2009-2016 Lightbend Inc. <https://www.lightbend.com>
  */
-package play.api.libs {
+package play.api.libs
 
   /**
     * The Iteratee monad provides strict, safe, and functional I/O.
     */
-  package object iteratee {
+  package object iteratee
 
     type K[E, A] = Input[E] => Iteratee[E, A]
-  }
-}
 
-package play.api.libs.iteratee {
+package play.api.libs.iteratee
 
-  private[iteratee] object internal {
+  private[iteratee] object internal
     import play.api.libs.iteratee.Iteratee
     import scala.concurrent.{ExecutionContext, Future}
     import scala.util.control.NonFatal
@@ -26,21 +24,19 @@ package play.api.libs.iteratee {
       * TODO: Rename to `tryFuture`.
       */
     def eagerFuture[A](body: => A): Future[A] =
-      try Future.successful(body) catch {
+      try Future.successful(body) catch
         case NonFatal(e) => Future.failed(e)
-      }
 
     /**
       * Executes code in the given ExecutionContext, flattening the resulting Future.
       */
     def executeFuture[A](body: => Future[A])(
-        implicit ec: ExecutionContext): Future[A] = {
-      Future {
+        implicit ec: ExecutionContext): Future[A] =
+      Future
         body
-      }(ec /* Future.apply will prepare */ )
+      (ec /* Future.apply will prepare */ )
         .flatMap(identityFunc.asInstanceOf[Future[A] => Future[A]])(
           Execution.trampoline)
-    }
 
     /**
       * Executes code in the given ExecutionContext, flattening the resulting Iteratee.
@@ -58,11 +54,8 @@ package play.api.libs.iteratee {
       * def myFunc(implicit ec: ExecutionContext) = prepared(ec)(pec => ...)
       * }}}
       */
-    def prepared[A](ec: ExecutionContext)(f: ExecutionContext => A): A = {
+    def prepared[A](ec: ExecutionContext)(f: ExecutionContext => A): A =
       val pec = ec.prepare()
       f(pec)
-    }
 
     val identityFunc: (Any => Any) = (x: Any) => x
-  }
-}

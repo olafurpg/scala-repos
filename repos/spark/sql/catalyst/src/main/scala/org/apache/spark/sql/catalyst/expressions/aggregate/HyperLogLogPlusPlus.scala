@@ -52,22 +52,20 @@ case class HyperLogLogPlusPlus(child: Expression,
                                relativeSD: Double = 0.05,
                                mutableAggBufferOffset: Int = 0,
                                inputAggBufferOffset: Int = 0)
-    extends ImperativeAggregate {
+    extends ImperativeAggregate
   import HyperLogLogPlusPlus._
 
-  def this(child: Expression) = {
+  def this(child: Expression) =
     this(child = child,
          relativeSD = 0.05,
          mutableAggBufferOffset = 0,
          inputAggBufferOffset = 0)
-  }
 
-  def this(child: Expression, relativeSD: Expression) = {
+  def this(child: Expression, relativeSD: Expression) =
     this(child = child,
          relativeSD = HyperLogLogPlusPlus.validateDoubleLiteral(relativeSD),
          mutableAggBufferOffset = 0,
          inputAggBufferOffset = 0)
-  }
 
   override def prettyName: String = "approx_count_distinct"
 
@@ -120,12 +118,11 @@ case class HyperLogLogPlusPlus(child: Expression,
     * 'alpha' corrects the raw cardinality estimate 'Z'. See the FlFuGaMe07 paper for its
     * derivation.
     */
-  private[this] val alphaM2 = p match {
+  private[this] val alphaM2 = p match
     case 4 => 0.673d * m * m
     case 5 => 0.697d * m * m
     case 6 => 0.709d * m * m
     case _ => (0.7213d / (1.0d + 1.079d / m)) * m * m
-  }
 
   /**
     * The number of words used to store the registers. We use Longs for storage because this is the
@@ -149,9 +146,8 @@ case class HyperLogLogPlusPlus(child: Expression,
 
   /** Allocate enough words to store all registers. */
   override val aggBufferAttributes: Seq[AttributeReference] =
-    Seq.tabulate(numWords) { i =>
+    Seq.tabulate(numWords)  i =>
       AttributeReference(s"MS[$i]", LongType)()
-    }
 
   // Note: although this simply copies aggBufferAttributes, this common code can not be placed
   // in the superclass because that will lead to initialization ordering issues.
@@ -159,22 +155,20 @@ case class HyperLogLogPlusPlus(child: Expression,
     aggBufferAttributes.map(_.newInstance())
 
   /** Fill all words with zeros. */
-  override def initialize(buffer: MutableRow): Unit = {
+  override def initialize(buffer: MutableRow): Unit =
     var word = 0
-    while (word < numWords) {
+    while (word < numWords)
       buffer.setLong(mutableAggBufferOffset + word, 0)
       word += 1
-    }
-  }
 
   /**
     * Update the HLL++ buffer.
     *
     * Variable names in the HLL++ paper match variable names in the code.
     */
-  override def update(buffer: MutableRow, input: InternalRow): Unit = {
+  override def update(buffer: MutableRow, input: InternalRow): Unit =
     val v = child.eval(input)
-    if (v != null) {
+    if (v != null)
       // Create the hashed value 'x'.
       val x = MurmurHash.hash64(v)
 
@@ -194,137 +188,119 @@ case class HyperLogLogPlusPlus(child: Expression,
       val Midx = (word & mask) >>> shift
 
       // Assign the maximum number of leading zeros to the register.
-      if (pw > Midx) {
+      if (pw > Midx)
         buffer.setLong(mutableAggBufferOffset + wordOffset,
                        (word & ~mask) | (pw << shift))
-      }
-    }
-  }
 
   /**
     * Merge the HLL buffers by iterating through the registers in both buffers and select the
     * maximum number of leading zeros for each register.
     */
-  override def merge(buffer1: MutableRow, buffer2: InternalRow): Unit = {
+  override def merge(buffer1: MutableRow, buffer2: InternalRow): Unit =
     var idx = 0
     var wordOffset = 0
-    while (wordOffset < numWords) {
+    while (wordOffset < numWords)
       val word1 = buffer1.getLong(mutableAggBufferOffset + wordOffset)
       val word2 = buffer2.getLong(inputAggBufferOffset + wordOffset)
       var word = 0L
       var i = 0
       var mask = REGISTER_WORD_MASK
-      while (idx < m && i < REGISTERS_PER_WORD) {
+      while (idx < m && i < REGISTERS_PER_WORD)
         word |= Math.max(word1 & mask, word2 & mask)
         mask <<= REGISTER_SIZE
         i += 1
         idx += 1
-      }
       buffer1.setLong(mutableAggBufferOffset + wordOffset, word)
       wordOffset += 1
-    }
-  }
 
   /**
     * Estimate the bias using the raw estimates with their respective biases from the HLL++
     * appendix. We currently use KNN interpolation to determine the bias (as suggested in the
     * paper).
     */
-  def estimateBias(e: Double): Double = {
+  def estimateBias(e: Double): Double =
     val estimates = RAW_ESTIMATE_DATA(p - 4)
     val numEstimates = estimates.length
 
     // The estimates are sorted so we can use a binary search to find the index of the
     // interpolation estimate closest to the current estimate.
     val nearestEstimateIndex =
-      util.Arrays.binarySearch(estimates, 0, numEstimates, e) match {
+      util.Arrays.binarySearch(estimates, 0, numEstimates, e) match
         case ix if ix < 0 => -(ix + 1)
         case ix => ix
-      }
 
     // Use square of the difference between the current estimate and the estimate at the given
     // index as distance metric.
-    def distance(i: Int): Double = {
+    def distance(i: Int): Double =
       val diff = e - estimates(i)
       diff * diff
-    }
 
     // Keep moving bounds as long as the (exclusive) high bound is closer to the estimate than
     // the lower (inclusive) bound.
     var low = math.max(nearestEstimateIndex - K + 1, 0)
     var high = math.min(low + K, numEstimates)
-    while (high < numEstimates && distance(high) < distance(low)) {
+    while (high < numEstimates && distance(high) < distance(low))
       low += 1
       high += 1
-    }
 
     // Calculate the sum of the biases in low-high interval.
     val biases = BIAS_DATA(p - 4)
     var i = low
     var biasSum = 0.0
-    while (i < high) {
+    while (i < high)
       biasSum += biases(i)
       i += 1
-    }
 
     // Calculate the bias.
     biasSum / (high - low)
-  }
 
   /**
     * Compute the HyperLogLog estimate.
     *
     * Variable names in the HLL++ paper match variable names in the code.
     */
-  override def eval(buffer: InternalRow): Any = {
+  override def eval(buffer: InternalRow): Any =
     // Compute the inverse of indicator value 'z' and count the number of zeros 'V'.
     var zInverse = 0.0d
     var V = 0.0d
     var idx = 0
     var wordOffset = 0
-    while (wordOffset < numWords) {
+    while (wordOffset < numWords)
       val word = buffer.getLong(mutableAggBufferOffset + wordOffset)
       var i = 0
       var shift = 0
-      while (idx < m && i < REGISTERS_PER_WORD) {
+      while (idx < m && i < REGISTERS_PER_WORD)
         val Midx = (word >>> shift) & REGISTER_WORD_MASK
         zInverse += 1.0 / (1 << Midx)
-        if (Midx == 0) {
+        if (Midx == 0)
           V += 1.0d
-        }
         shift += REGISTER_SIZE
         i += 1
         idx += 1
-      }
       wordOffset += 1
-    }
 
     // We integrate two steps from the paper:
     // val Z = 1.0d / zInverse
     // val E = alphaM2 * Z
     @inline
-    def EBiasCorrected = alphaM2 / zInverse match {
+    def EBiasCorrected = alphaM2 / zInverse match
       case e if p < 19 && e < 5.0d * m => e - estimateBias(e)
       case e => e
-    }
 
     // Estimate the cardinality.
     val estimate =
-      if (V > 0) {
+      if (V > 0)
         // Use linear counting for small cardinality estimates.
         val H = m * Math.log(m / V)
-        if (H <= THRESHOLDS(p - 4)) {
+        if (H <= THRESHOLDS(p - 4))
           H
-        } else {
+        else
           EBiasCorrected
-        }
-      } else {
+      else
         EBiasCorrected
-      }
 
     // Round to the nearest long value.
     Math.round(estimate)
-  }
 
   /**
     * The <code>rsd</code> of HLL++ is always equal to or better than the <code>rsd</code> requested.
@@ -333,7 +309,6 @@ case class HyperLogLogPlusPlus(child: Expression,
     * @return the actual <code>rsd</code>.
     */
   def trueRsd: Double = 1.04 / math.sqrt(m)
-}
 
 // scalastyle:off
 /**
@@ -344,7 +319,7 @@ case class HyperLogLogPlusPlus(child: Expression,
   * for more information.
   */
 // scalastyle:on
-object HyperLogLogPlusPlus {
+object HyperLogLogPlusPlus
 
   /**
     * The size of a word used for storing registers: 64 Bits.
@@ -6158,11 +6133,9 @@ object HyperLogLogPlusPlus {
   )
   // scalastyle:on
 
-  private def validateDoubleLiteral(exp: Expression): Double = exp match {
+  private def validateDoubleLiteral(exp: Expression): Double = exp match
     case Literal(d: Double, DoubleType) => d
     case Literal(dec: Decimal, _) => dec.toDouble
     case _ =>
       throw new AnalysisException(
           "The second argument should be a double literal.")
-  }
-}

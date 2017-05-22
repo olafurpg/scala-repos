@@ -21,49 +21,41 @@ import java.util.Properties
 import kafka.metrics.KafkaMetricsReporter
 import kafka.utils.{VerifiableProperties, Logging}
 
-object KafkaServerStartable {
-  def fromProps(serverProps: Properties) = {
+object KafkaServerStartable
+  def fromProps(serverProps: Properties) =
     KafkaMetricsReporter.startReporters(new VerifiableProperties(serverProps))
     new KafkaServerStartable(KafkaConfig.fromProps(serverProps))
-  }
-}
 
-class KafkaServerStartable(val serverConfig: KafkaConfig) extends Logging {
+class KafkaServerStartable(val serverConfig: KafkaConfig) extends Logging
   private val server = new KafkaServer(serverConfig)
 
-  def startup() {
-    try {
+  def startup()
+    try
       server.startup()
-    } catch {
+    catch
       case e: Throwable =>
         fatal(
             "Fatal error during KafkaServerStartable startup. Prepare to shutdown",
             e)
         // KafkaServer already calls shutdown() internally, so this is purely for logging & the exit code
         System.exit(1)
-    }
-  }
 
-  def shutdown() {
-    try {
+  def shutdown()
+    try
       server.shutdown()
-    } catch {
+    catch
       case e: Throwable =>
         fatal("Fatal error during KafkaServerStable shutdown. Prepare to halt",
               e)
         // Calling exit() can lead to deadlock as exit() can be called multiple times. Force exit.
         Runtime.getRuntime.halt(1)
-    }
-  }
 
   /**
     * Allow setting broker state from the startable.
     * This is needed when a custom kafka server startable want to emit new states that it introduces.
     */
-  def setServerState(newState: Byte) {
+  def setServerState(newState: Byte)
     server.brokerState.newState(newState)
-  }
 
   def awaitShutdown() =
     server.awaitShutdown
-}

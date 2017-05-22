@@ -13,7 +13,7 @@ import akka.remote.transport.ThrottlerTransportAdapter.Direction
 import akka.testkit._
 import com.typesafe.config.ConfigFactory
 
-object ReplicatorChaosSpec extends MultiNodeConfig {
+object ReplicatorChaosSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -28,7 +28,6 @@ object ReplicatorChaosSpec extends MultiNodeConfig {
     """))
 
   testTransport(on = true)
-}
 
 class ReplicatorChaosSpecMultiJvmNode1 extends ReplicatorChaosSpec
 class ReplicatorChaosSpecMultiJvmNode2 extends ReplicatorChaosSpec
@@ -38,7 +37,7 @@ class ReplicatorChaosSpecMultiJvmNode5 extends ReplicatorChaosSpec
 
 class ReplicatorChaosSpec
     extends MultiNodeSpec(ReplicatorChaosSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
   import ReplicatorChaosSpec._
   import Replicator._
 
@@ -59,65 +58,53 @@ class ReplicatorChaosSpec
   val KeyF = ORSetKey[String]("F")
   val KeyX = GCounterKey("X")
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       cluster join node(to).address
-    }
     enterBarrier(from.name + "-joined")
-  }
 
   def assertValue(key: Key[ReplicatedData], expected: Any): Unit =
-    within(10.seconds) {
-      awaitAssert {
+    within(10.seconds)
+      awaitAssert
         replicator ! Get(key, ReadLocal)
-        val value = expectMsgPF() {
+        val value = expectMsgPF()
           case g @ GetSuccess(`key`, _) ⇒
-            g.dataValue match {
+            g.dataValue match
               case c: GCounter ⇒ c.value
               case c: PNCounter ⇒ c.value
               case c: GSet[_] ⇒ c.elements
               case c: ORSet[_] ⇒ c.elements
-            }
-        }
         value should be(expected)
-      }
-    }
 
   def assertDeleted(key: Key[ReplicatedData]): Unit =
-    within(5.seconds) {
-      awaitAssert {
+    within(5.seconds)
+      awaitAssert
         replicator ! Get(key, ReadLocal)
         expectMsg(DataDeleted(key))
-      }
-    }
 
-  "Replicator in chaotic cluster" must {
+  "Replicator in chaotic cluster" must
 
-    "replicate data in initial phase" in {
+    "replicate data in initial phase" in
       join(first, first)
       join(second, first)
       join(third, first)
       join(fourth, first)
       join(fifth, first)
 
-      within(10.seconds) {
-        awaitAssert {
+      within(10.seconds)
+        awaitAssert
           replicator ! GetReplicaCount
           expectMsg(ReplicaCount(5))
-        }
-      }
 
-      runOn(first) {
-        (0 until 5).foreach { i ⇒
+      runOn(first)
+        (0 until 5).foreach  i ⇒
           replicator ! Update(KeyA, GCounter(), WriteLocal)(_ + 1)
           replicator ! Update(KeyB, PNCounter(), WriteLocal)(_ - 1)
           replicator ! Update(KeyC, GCounter(), WriteAll(timeout))(_ + 1)
-        }
         receiveN(15).map(_.getClass).toSet should be(
             Set(classOf[UpdateSuccess[_]]))
-      }
 
-      runOn(second) {
+      runOn(second)
         replicator ! Update(KeyA, GCounter(), WriteLocal)(_ + 20)
         replicator ! Update(KeyB, PNCounter(), WriteTo(2, timeout))(_ + 20)
         replicator ! Update(KeyC, GCounter(), WriteAll(timeout))(_ + 20)
@@ -130,9 +117,8 @@ class ReplicatorChaosSpec
 
         replicator ! Update(KeyF, ORSet(), WriteLocal)(_ + "e1" + "e2")
         expectMsg(UpdateSuccess(KeyF, None))
-      }
 
-      runOn(fourth) {
+      runOn(fourth)
         replicator ! Update(KeyD, GCounter(), WriteLocal)(_ + 40)
         expectMsg(UpdateSuccess(KeyD, None))
 
@@ -141,14 +127,12 @@ class ReplicatorChaosSpec
 
         replicator ! Update(KeyF, ORSet(), WriteLocal)(_ + "e2" + "e3")
         expectMsg(UpdateSuccess(KeyF, None))
-      }
 
-      runOn(fifth) {
+      runOn(fifth)
         replicator ! Update(KeyX, GCounter(), WriteTo(2, timeout))(_ + 50)
         expectMsg(UpdateSuccess(KeyX, None))
         replicator ! Delete(KeyX, WriteLocal)
         expectMsg(DeleteSuccess(KeyX))
-      }
 
       enterBarrier("initial-updates-done")
 
@@ -161,24 +145,21 @@ class ReplicatorChaosSpec
       assertDeleted(KeyX)
 
       enterBarrier("after-1")
-    }
 
-    "be available during network split" in {
+    "be available during network split" in
       val side1 = Seq(first, second)
       val side2 = Seq(third, fourth, fifth)
-      runOn(first) {
+      runOn(first)
         for (a ← side1; b ← side2) testConductor
           .blackhole(a, b, Direction.Both)
           .await
-      }
       enterBarrier("split")
 
-      runOn(first) {
+      runOn(first)
         replicator ! Update(KeyA, GCounter(), WriteTo(2, timeout))(_ + 1)
         expectMsg(UpdateSuccess(KeyA, None))
-      }
 
-      runOn(third) {
+      runOn(third)
         replicator ! Update(KeyA, GCounter(), WriteTo(2, timeout))(_ + 2)
         expectMsg(UpdateSuccess(KeyA, None))
 
@@ -187,44 +168,37 @@ class ReplicatorChaosSpec
 
         replicator ! Update(KeyF, ORSet(), WriteTo(2, timeout))(_ - "e2")
         expectMsg(UpdateSuccess(KeyF, None))
-      }
-      runOn(fourth) {
+      runOn(fourth)
         replicator ! Update(KeyD, GCounter(), WriteTo(2, timeout))(_ + 1)
         expectMsg(UpdateSuccess(KeyD, None))
-      }
       enterBarrier("update-during-split")
 
-      runOn(side1: _*) {
+      runOn(side1: _*)
         assertValue(KeyA, 26)
         assertValue(KeyB, 15)
         assertValue(KeyD, 40)
         assertValue(KeyE, Set("e1", "e2", "e3"))
         assertValue(KeyF, Set("e1", "e2", "e3"))
-      }
-      runOn(side2: _*) {
+      runOn(side2: _*)
         assertValue(KeyA, 27)
         assertValue(KeyB, 15)
         assertValue(KeyD, 41)
         assertValue(KeyE, Set("e1", "e2", "e3", "e4"))
         assertValue(KeyF, Set("e1", "e3"))
-      }
       enterBarrier("update-during-split-verified")
 
-      runOn(first) {
+      runOn(first)
         testConductor.exit(fourth, 0).await
-      }
 
       enterBarrier("after-2")
-    }
 
-    "converge after partition" in {
+    "converge after partition" in
       val side1 = Seq(first, second)
       val side2 = Seq(third, fifth) // fourth was shutdown
-      runOn(first) {
+      runOn(first)
         for (a ← side1; b ← side2) testConductor
           .passThrough(a, b, Direction.Both)
           .await
-      }
       enterBarrier("split-repaired")
 
       assertValue(KeyA, 28)
@@ -236,6 +210,3 @@ class ReplicatorChaosSpec
       assertDeleted(KeyX)
 
       enterBarrier("after-3")
-    }
-  }
-}

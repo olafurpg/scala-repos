@@ -1,4 +1,4 @@
-trait T1 {
+trait T1
   class C
   object O
   type A = Int
@@ -6,9 +6,8 @@ trait T1 {
   val v1: String = ""
   var v2: String = ""
   def f = {}
-}
 
-trait T2 { self: T1 =>
+trait T2  self: T1 =>
 
   println(classOf[ /* line: 2 */ C])
   println( /* line: 3 */ O.getClass)
@@ -18,4 +17,3 @@ trait T2 { self: T1 =>
   println( /* line: 6 */ v1.getClass)
   println( /* line: 7 */ v2.getClass)
   println( /* line: 8 */ f)
-}

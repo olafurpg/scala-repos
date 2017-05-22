@@ -26,16 +26,13 @@ sealed trait PaintScale[T] extends (T => Paint)
 case class GradientPaintScale[T](
     lower: T, upper: T, gradient: Array[Color] = PaintScale.WhiteToBlack)(
     implicit view: T => Double)
-    extends PaintScale[T] {
-  def apply(value: T): Paint = {
-    if (view(value).isNaN) {
+    extends PaintScale[T]
+  def apply(value: T): Paint =
+    if (view(value).isNaN)
       PaintScale.nanPaint
-    } else {
+    else
       val index = gradient.length * (value - lower) / (upper - lower)
       gradient(math.min(gradient.length - 1, math.max(0, index.toInt)))
-    }
-  }
-}
 
 /**
   * Maps items to colors using the given partial function.  If no color
@@ -44,22 +41,18 @@ case class GradientPaintScale[T](
   * @author dramage
   */
 case class CategoricalPaintScale[T](categories: Function1[T, Paint])
-    extends PaintScale[T] {
-  def apply(value: T): Paint = {
-    if (categories == null) {
+    extends PaintScale[T]
+  def apply(value: T): Paint =
+    if (categories == null)
       PaintScale.nanPaint
-    } else {
+    else
       categories(value)
-    }
-  }
 
-  private def ida(v: T) = categories match {
+  private def ida(v: T) = categories match
     case f: PartialFunction[T, Paint] => f.isDefinedAt(v)
     case _ => true
-  }
-}
 
-object PaintScale {
+object PaintScale
 
   /**
     * Convert a color description string into a color suitable for plotting.
@@ -68,9 +61,9 @@ object PaintScale {
     *
     * @author Patryk Laurent
     */
-  def convertToColor(colorcode: String): java.awt.Color = {
+  def convertToColor(colorcode: String): java.awt.Color =
     val rgbcsv = "(.*),(.*),(.*)".r
-    colorcode.toLowerCase.replace(" ", "").replace("[", "").replace("]", "") match {
+    colorcode.toLowerCase.replace(" ", "").replace("[", "").replace("]", "") match
       case "y" | "yellow" => yellow
       case "m" | "magenta" => magenta
       case "c" | "cyan" => cyan
@@ -85,8 +78,6 @@ object PaintScale {
             "Expected color code to be either y m c r g b w k OR R,G,B or " +
             "[R,G,B] where R,G,B are numbers such that 0<=R,G,B<=255, but got '" +
             uninterpretable + "' instead.")
-    }
-  }
 
   /** Creates a GradientPaintScale automatically for the given range. */
   implicit def gradientTuple[T](vLowerUpper: (T, T))(
@@ -103,7 +94,7 @@ object PaintScale {
   //
 
   /** For painting NaN. */
-  val nanPaint = {
+  val nanPaint =
     val img = new BufferedImage(5, 5, BufferedImage.TYPE_INT_ARGB)
 
     val gfx = img.getGraphics
@@ -112,10 +103,9 @@ object PaintScale {
     gfx.dispose()
 
     new TexturePaint(img, new Rectangle2D.Double(0, 0, 5, 5))
-  }
 
   /** The Category10 palette from Protovis http://vis.stanford.edu/protovis/docs/color.html */
-  object Category10 {
+  object Category10
     val values: Array[Color] = Array(
         "#1f77b4",
         "#ff7f0e",
@@ -141,10 +131,9 @@ object PaintScale {
     val teal = values(9)
 
     def apply(i: Int) = values(i)
-  }
 
   /** The Category20 palette from Protovis http://vis.stanford.edu/protovis/docs/color.html */
-  object Category20 {
+  object Category20
     val values: Array[Color] =
       Category10.values ++ Array(
           "#aec7e8",
@@ -171,7 +160,6 @@ object PaintScale {
     val lightteal = values(19)
 
     def apply(i: Int) = values(i)
-  }
 
   //
   // A large pallete of color literals from ProtoVis
@@ -385,7 +373,7 @@ object PaintScale {
     * @param two Color used for the top of the gradient
     * @param numSteps The number of steps in the gradient. 250 is a good number.
     */
-  def createGradient(one: Color, two: Color, numSteps: Int): Array[Color] = {
+  def createGradient(one: Color, two: Color, numSteps: Int): Array[Color] =
     val r1 = one.getRed()
     val g1 = one.getGreen()
     val b1 = one.getBlue()
@@ -396,16 +384,14 @@ object PaintScale {
 
     val gradient = new Array[Color](numSteps)
     var iNorm: Double = 0
-    for (i <- 0 until numSteps) {
+    for (i <- 0 until numSteps)
       iNorm = i / numSteps.toDouble; //a normalized [0:1] variable
       val newR = (r1 + iNorm * (r2 - r1)).toInt
       val newG = (g1 + iNorm * (g2 - g1)).toInt
       val newB = (b1 + iNorm * (b2 - b1)).toInt
       gradient(i) = new Color(newR, newG, newB)
-    }
 
     gradient
-  }
 
   /**
     * Creates an array of Color objects for use as a gradient, using an array
@@ -419,7 +405,7 @@ object PaintScale {
     *
     * @param numSteps The number of steps in the gradient. 250 is a good number.
     */
-  def createMultiGradient(colors: Array[Color], numSteps: Int): Array[Color] = {
+  def createMultiGradient(colors: Array[Color], numSteps: Int): Array[Color] =
     //we assume a linear gradient, with equal spacing between colors
     //The final gradient will be made up of n 'sections', where n = colors.length - 1
     val numSections = colors.length - 1
@@ -428,27 +414,21 @@ object PaintScale {
 
     require(numSections > 0, "Array must have at least two colors")
 
-    for (section <- 0 until numSections) {
+    for (section <- 0 until numSections)
       //we divide the gradient into (n - 1) sections, and do a regular gradient for each
       val temp = createGradient(
           colors(section), colors(section + 1), numSteps / numSections)
-      for (i <- 0 until temp.length) {
+      for (i <- 0 until temp.length)
         //copy the sub-gradient into the overall gradient
         gradient(gradientIndex) = temp(i)
         gradientIndex += 1
-      }
-    }
 
-    if (gradientIndex < numSteps) {
+    if (gradientIndex < numSteps)
       //The rounding didn't work out in our favor, and there is at least
       // one unfilled slot in the gradient[] array.
       //We can just copy the final color there
-      while (gradientIndex < numSteps) {
+      while (gradientIndex < numSteps)
         gradient(gradientIndex) = colors(colors.length - 1)
         gradientIndex += 1
-      }
-    }
 
     gradient
-  }
-}

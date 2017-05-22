@@ -21,18 +21,17 @@ import java.sql.Types
 
 import org.apache.spark.sql.types._
 
-private object DerbyDialect extends JdbcDialect {
+private object DerbyDialect extends JdbcDialect
 
   override def canHandle(url: String): Boolean = url.startsWith("jdbc:derby")
 
   override def getCatalystType(sqlType: Int,
                                typeName: String,
                                size: Int,
-                               md: MetadataBuilder): Option[DataType] = {
+                               md: MetadataBuilder): Option[DataType] =
     if (sqlType == Types.REAL) Option(FloatType) else None
-  }
 
-  override def getJDBCType(dt: DataType): Option[JdbcType] = dt match {
+  override def getJDBCType(dt: DataType): Option[JdbcType] = dt match
     case StringType => Option(JdbcType("CLOB", java.sql.Types.CLOB))
     case ByteType => Option(JdbcType("SMALLINT", java.sql.Types.SMALLINT))
     case ShortType => Option(JdbcType("SMALLINT", java.sql.Types.SMALLINT))
@@ -41,5 +40,3 @@ private object DerbyDialect extends JdbcDialect {
     case t: DecimalType if t.precision > 31 =>
       Option(JdbcType("DECIMAL(31,5)", java.sql.Types.DECIMAL))
     case _ => None
-  }
-}

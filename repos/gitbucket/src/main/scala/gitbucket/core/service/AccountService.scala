@@ -10,68 +10,61 @@ import org.slf4j.LoggerFactory
 // TODO Why is direct import required?
 import gitbucket.core.model.Profile.dateColumnType
 
-trait AccountService {
+trait AccountService
 
   private val logger = LoggerFactory.getLogger(classOf[AccountService])
 
   def authenticate(
       settings: SystemSettings, userName: String, password: String)(
       implicit s: Session): Option[Account] =
-    if (settings.ldapAuthentication) {
+    if (settings.ldapAuthentication)
       ldapAuthentication(settings, userName, password)
-    } else {
+    else
       defaultAuthentication(userName, password)
-    }
 
   /**
     * Authenticate by internal database.
     */
   private def defaultAuthentication(userName: String, password: String)(
-      implicit s: Session) = {
-    getAccountByUserName(userName).collect {
+      implicit s: Session) =
+    getAccountByUserName(userName).collect
       case account
           if (!account.isGroupAccount && account.password == sha1(password)) =>
         Some(account)
-    } getOrElse None
-  }
+    getOrElse None
 
   /**
     * Authenticate by LDAP.
     */
   private def ldapAuthentication(
       settings: SystemSettings, userName: String, password: String)(
-      implicit s: Session): Option[Account] = {
-    LDAPUtil.authenticate(settings.ldap.get, userName, password) match {
-      case Right(ldapUserInfo) => {
+      implicit s: Session): Option[Account] =
+    LDAPUtil.authenticate(settings.ldap.get, userName, password) match
+      case Right(ldapUserInfo) =>
           // Create or update account by LDAP information
-          getAccountByUserName(ldapUserInfo.userName, true) match {
-            case Some(x) if (!x.isRemoved) => {
-                if (settings.ldap.get.mailAttribute.getOrElse("").isEmpty) {
+          getAccountByUserName(ldapUserInfo.userName, true) match
+            case Some(x) if (!x.isRemoved) =>
+                if (settings.ldap.get.mailAttribute.getOrElse("").isEmpty)
                   updateAccount(x.copy(fullName = ldapUserInfo.fullName))
-                } else {
+                else
                   updateAccount(
                       x.copy(mailAddress = ldapUserInfo.mailAddress,
                              fullName = ldapUserInfo.fullName))
-                }
                 getAccountByUserName(ldapUserInfo.userName)
-              }
-            case Some(x) if (x.isRemoved) => {
+            case Some(x) if (x.isRemoved) =>
                 logger.info(
                     "LDAP Authentication Failed: Account is already registered but disabled.")
                 defaultAuthentication(userName, password)
-              }
             case None =>
-              getAccountByMailAddress(ldapUserInfo.mailAddress, true) match {
-                case Some(x) if (!x.isRemoved) => {
+              getAccountByMailAddress(ldapUserInfo.mailAddress, true) match
+                case Some(x) if (!x.isRemoved) =>
                     updateAccount(x.copy(fullName = ldapUserInfo.fullName))
                     getAccountByUserName(ldapUserInfo.userName)
-                  }
-                case Some(x) if (x.isRemoved) => {
+                case Some(x) if (x.isRemoved) =>
                     logger.info(
                         "LDAP Authentication Failed: Account is already registered but disabled.")
                     defaultAuthentication(userName, password)
-                  }
-                case None => {
+                case None =>
                     createAccount(ldapUserInfo.userName,
                                   "",
                                   ldapUserInfo.fullName,
@@ -79,16 +72,9 @@ trait AccountService {
                                   false,
                                   None)
                     getAccountByUserName(ldapUserInfo.userName)
-                  }
-              }
-          }
-        }
-      case Left(errorMessage) => {
+      case Left(errorMessage) =>
           logger.info(s"LDAP Authentication Failed: ${errorMessage}")
           defaultAuthentication(userName, password)
-        }
-    }
-  }
 
   def getAccountByUserName(userName: String, includeRemoved: Boolean = false)(
       implicit s: Session): Option[Account] =
@@ -100,12 +86,12 @@ trait AccountService {
   def getAccountsByUserNames(userNames: Set[String],
                              knowns: Set[Account],
                              includeRemoved: Boolean = false)(
-      implicit s: Session): Map[String, Account] = {
+      implicit s: Session): Map[String, Account] =
     val map = knowns.map(a => a.userName -> a).toMap
     val needs = userNames -- map.keySet
-    if (needs.isEmpty) {
+    if (needs.isEmpty)
       map
-    } else {
+    else
       map ++ Accounts
         .filter(t =>
               (t.userName inSetBind needs) &&
@@ -113,8 +99,6 @@ trait AccountService {
         .list
         .map(a => a.userName -> a)
         .toMap
-    }
-  }
 
   def getAccountByMailAddress(
       mailAddress: String, includeRemoved: Boolean = false)(
@@ -126,11 +110,10 @@ trait AccountService {
 
   def getAllUsers(
       includeRemoved: Boolean = true)(implicit s: Session): List[Account] =
-    if (includeRemoved) {
+    if (includeRemoved)
       Accounts sortBy (_.userName) list
-    } else {
+    else
       Accounts filter (_.removed === false.bind) sortBy (_.userName) list
-    }
 
   def createAccount(userName: String,
                     password: String,
@@ -152,9 +135,9 @@ trait AccountService {
                             isRemoved = false)
 
   def updateAccount(account: Account)(implicit s: Session): Unit =
-    Accounts.filter { a =>
+    Accounts.filter  a =>
       a.userName === account.userName.bind
-    }.map { a =>
+    .map  a =>
       (a.password,
        a.fullName,
        a.mailAddress,
@@ -164,7 +147,7 @@ trait AccountService {
        a.updatedDate,
        a.lastLoginDate.?,
        a.removed)
-    }.update(account.password,
+    .update(account.password,
              account.fullName,
              account.mailAddress,
              account.isAdmin,
@@ -207,13 +190,11 @@ trait AccountService {
       .update(url, removed)
 
   def updateGroupMembers(groupName: String, members: List[(String, Boolean)])(
-      implicit s: Session): Unit = {
+      implicit s: Session): Unit =
     GroupMembers.filter(_.groupName === groupName.bind).delete
-    members.foreach {
+    members.foreach
       case (userName, isManager) =>
         GroupMembers insert GroupMember(groupName, userName, isManager)
-    }
-  }
 
   def getGroupMembers(groupName: String)(
       implicit s: Session): List[GroupMember] =
@@ -227,19 +208,16 @@ trait AccountService {
       .map(_.groupName)
       .list
 
-  def removeUserRelatedData(userName: String)(implicit s: Session): Unit = {
+  def removeUserRelatedData(userName: String)(implicit s: Session): Unit =
     GroupMembers.filter(_.userName === userName.bind).delete
     Collaborators.filter(_.collaboratorName === userName.bind).delete
     Repositories.filter(_.userName === userName.bind).delete
-  }
 
-  def getGroupNames(userName: String)(implicit s: Session): List[String] = {
+  def getGroupNames(userName: String)(implicit s: Session): List[String] =
     List(userName) ++ Collaborators
       .filter(_.collaboratorName === userName.bind)
       .sortBy(_.userName)
       .map(_.userName)
       .list
-  }
-}
 
 object AccountService extends AccountService

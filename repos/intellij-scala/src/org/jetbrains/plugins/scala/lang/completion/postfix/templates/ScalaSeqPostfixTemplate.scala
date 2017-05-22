@@ -12,6 +12,5 @@ class ScalaSeqPostfixTemplate
     extends ScalaStringBasedPostfixTemplate(
         "Seq",
         "Seq(expr)",
-        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All))
   override def getTemplateString(element: PsiElement): String = "Seq($expr$)"
-}

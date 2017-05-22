@@ -17,6 +17,5 @@
 package kafka.common
 
 class NotCoordinatorForConsumerException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

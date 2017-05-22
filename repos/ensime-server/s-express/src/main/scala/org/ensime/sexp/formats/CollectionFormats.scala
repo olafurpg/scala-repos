@@ -13,7 +13,7 @@ import scala.collection.GenTraversable
 /**
   * Support for anything with a `CanBuildFrom`.
   */
-trait CollectionFormats {
+trait CollectionFormats
   this: BasicFormats =>
 
   import scala.language.higherKinds
@@ -58,15 +58,13 @@ trait CollectionFormats {
       implicit evidence: T[E] <:< GenTraversable[E],
       cbf: CanBuildFrom[T[E], E, T[E]],
       ef: SexpFormat[E]
-  ): SexpFormat[T[E]] = new SexpFormat[T[E]] {
+  ): SexpFormat[T[E]] = new SexpFormat[T[E]]
     def write(t: T[E]) = SexpList(t.map(_.toSexp)(breakOut): List[Sexp])
 
-    def read(v: Sexp): T[E] = v match {
+    def read(v: Sexp): T[E] = v match
       case SexpNil => cbf().result()
       case SexpList(els) => els.map(_.convertTo[E])(breakOut)
       case x => deserializationError(x)
-    }
-  }
 
   /*
    We could potentially have a specialised mapDataFormat (using
@@ -79,23 +77,21 @@ trait CollectionFormats {
       cbf: CanBuildFrom[M[K, V], (K, V), M[K, V]],
       kf: SexpFormat[K],
       vf: SexpFormat[V]
-  ): SexpFormat[M[K, V]] = new SexpFormat[M[K, V]] {
+  ): SexpFormat[M[K, V]] = new SexpFormat[M[K, V]]
     def write(m: M[K, V]) =
       SexpList(
-          m.map {
+          m.map
         case (k, v) => SexpList(k.toSexp, v.toSexp)
-      }(breakOut): List[Sexp])
+      (breakOut): List[Sexp])
 
-    def read(v: Sexp): M[K, V] = v match {
+    def read(v: Sexp): M[K, V] = v match
       case SexpNil => cbf().result()
       case SexpList(els) =>
-        els.map {
+        els.map
           case SexpList(sk :: sv :: Nil) => (sk.convertTo[K], sv.convertTo[V])
           case x => deserializationError(x)
-        }(breakOut)
+        (breakOut)
       case x => deserializationError(x)
-    }
-  }
 
   /**
     * We only support deserialisation via `im.BitSet` as the general
@@ -128,53 +124,46 @@ trait CollectionFormats {
     *   (bitsetContains "16#10000000000000002" 64) ; t
     *   (bitsetContains "16#10000000000000002" 0) ; nil
     */
-  implicit object BitSetFormat extends SexpFormat[collection.BitSet] {
+  implicit object BitSetFormat extends SexpFormat[collection.BitSet]
     private val Radix = 16
     private val CalcEval = "(\\d+)#(\\d+)" r
 
     def write(bs: collection.BitSet) =
       if (bs.isEmpty) SexpNil
-      else {
+      else
         val bigInt = BigIntConvertor.fromBitSet(bs)
         SexpString(Radix + "#" + bigInt.toString(Radix))
-      }
 
     // NOTE: returns immutable BitSet
-    def read(m: Sexp): im.BitSet = m match {
+    def read(m: Sexp): im.BitSet = m match
       case SexpNil => im.BitSet()
       case SexpString(CalcEval(radix, num)) =>
         val bigInt = BigInt(num, radix.toInt)
         BigIntConvertor.toBitSet(bigInt)
       case x => deserializationError(x)
-    }
-  }
 
-  implicit object ImBitSetFormat extends SexpFormat[im.BitSet] {
+  implicit object ImBitSetFormat extends SexpFormat[im.BitSet]
     def write(bs: im.BitSet) = BitSetFormat.write(bs)
     def read(m: Sexp) = BitSetFormat.read(m)
-  }
 
   private val start = SexpSymbol(":start")
   private val end = SexpSymbol(":end")
   private val step = SexpSymbol(":step")
   private val inclusive = SexpSymbol(":inclusive")
-  implicit object RangeFormat extends SexpFormat[im.Range] {
+  implicit object RangeFormat extends SexpFormat[im.Range]
     def write(r: im.Range) = SexpData(
         start -> SexpNumber(r.start),
         end -> SexpNumber(r.end),
         step -> SexpNumber(r.step)
     )
 
-    def read(s: Sexp) = s match {
+    def read(s: Sexp) = s match
       case SexpData(data) =>
-        (data(start), data(end), data(step)) match {
+        (data(start), data(end), data(step)) match
           case (SexpNumber(s), SexpNumber(e), SexpNumber(st)) =>
             Range(s.toInt, e.toInt, st.toInt)
           case _ => deserializationError(s)
-        }
       case _ => deserializationError(s)
-    }
-  }
 
   // note that the type has to be im.NumericRange[E]
   // not im.NumericRange.{Inclusive, Exclusive}[E]
@@ -183,7 +172,7 @@ trait CollectionFormats {
       implicit nf: SexpFormat[E],
       n: Numeric[E],
       int: Integral[E]): SexpFormat[im.NumericRange[E]] =
-    new SexpFormat[im.NumericRange[E]] {
+    new SexpFormat[im.NumericRange[E]]
       def write(r: im.NumericRange[E]) = SexpData(
           start -> r.start.toSexp,
           end -> r.end.toSexp,
@@ -191,9 +180,9 @@ trait CollectionFormats {
           inclusive -> BooleanFormat.write(r.isInclusive)
       )
 
-      def read(s: Sexp): im.NumericRange[E] = s match {
+      def read(s: Sexp): im.NumericRange[E] = s match
         case SexpData(data) =>
-          (data(start), data(end), data(step), data(inclusive)) match {
+          (data(start), data(end), data(step), data(inclusive)) match
             case (s, e, st, incl) if BooleanFormat.read(incl) =>
               im.NumericRange.inclusive(
                   s.convertTo[E],
@@ -203,8 +192,4 @@ trait CollectionFormats {
             case (s, e, st, incl) =>
               im.NumericRange(s.convertTo[E], e.convertTo[E], st.convertTo[E])
             case _ => deserializationError(s)
-          }
         case _ => deserializationError(s)
-      }
-    }
-}

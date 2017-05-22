@@ -19,14 +19,14 @@ package shapeless
 import org.junit.Test
 import org.junit.Assert._
 
-class ConversionTests {
+class ConversionTests
   import ops.function.{FnToProduct, FnFromProduct}
   import syntax.std.function._
   import syntax.std.tuple._
   import test._
 
   @Test
-  def testTuples {
+  def testTuples
     val t1 = (23, "foo", 2.0, true)
 
     val h1 = t1.productElements
@@ -58,10 +58,9 @@ class ConversionTests {
     val t8b = (t8.productElements map choose).tupled
     typed[(Option[Int], Option[String])](t8b)
     assertEquals((Option(2), Option("foo")), t8b)
-  }
 
   @Test
-  def testFunctions {
+  def testFunctions
     val sum: (Int, Int) => Int = _ + _
     val prd: (Int, Int, Int) => Int = _ * _ * _
 
@@ -88,10 +87,9 @@ class ConversionTests {
     val s2 = foo(sum, 2 :: 3 :: HNil)
     val ab2 = foo(ab, a :: HNil)
 
-    class HListSyntax[A <: HList, F <: AnyRef](a: A) {
+    class HListSyntax[A <: HList, F <: AnyRef](a: A)
       def applied[U](f: F)(implicit cftp: FnToProduct.Aux[f.type, A => U]): U =
         cftp(f)(a)
-    }
 
     implicit def mkSyntax[A <: HList, F <: AnyRef](a: A)(
         implicit ffp: FnFromProduct.Aux[A => Any, F]): HListSyntax[A, F] =
@@ -101,10 +99,9 @@ class ConversionTests {
       (2 :: "a" :: 1.3 :: HNil) applied ((i, s, d) => (s * i, d * i)) // Function argument types inferred
 
     assert((res: (String, Double)) == ("aa", 2.6))
-  }
 
   @Test
-  def testCaseClasses {
+  def testCaseClasses
     case class Foo(a: Int, b: String, c: Double)
 
     val f1 = Foo(23, "foo", 2.3)
@@ -112,5 +109,3 @@ class ConversionTests {
     val hf = t1.productElements
     val f2 = Foo.tupled(hf.tupled)
     assertEquals(f1, f2)
-  }
-}

@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.{Gen, Arbitrary}
 import org.scalacheck.Prop.forAll
 
-object KleisliTest extends SpecLite {
+object KleisliTest extends SpecLite
 
   type KleisliOpt[A, B] = Kleisli[Option, A, B]
   type KleisliOptInt[B] = KleisliOpt[Int, B]
@@ -24,18 +24,15 @@ object KleisliTest extends SpecLite {
 
   implicit def KleisliEqual[M[_]](
       implicit M: Equal[M[Int]]): Equal[Kleisli[M, Int, Int]] =
-    new Equal[Kleisli[M, Int, Int]] {
-      def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean = {
+    new Equal[Kleisli[M, Int, Int]]
+      def equal(a1: Kleisli[M, Int, Int], a2: Kleisli[M, Int, Int]): Boolean =
         val mb1: M[Int] = a1.run(0)
         val mb2: M[Int] = a2.run(0)
         M.equal(mb1, mb2)
-      }
-    }
 
-  "mapK" ! forAll { (f: Int => Option[Int], a: Int) =>
+  "mapK" ! forAll  (f: Int => Option[Int], a: Int) =>
     Kleisli(f).mapK(_.toList.map(_.toString)).run(a) must_===
     (f(a).toList.map(_.toString))
-  }
 
   checkAll(monoid.laws[KleisliOptInt[Int]])
   checkAll(bindRec.laws[KleisliOptInt])
@@ -44,7 +41,7 @@ object KleisliTest extends SpecLite {
   checkAll(zip.laws[KleisliOptInt])
   checkAll(category.laws[KleisliOpt])
 
-  object instances {
+  object instances
     def semigroup[F[_], A, B](implicit FB: Semigroup[F[B]]) =
       Semigroup[Kleisli[F, A, B]]
     def monoid[F[_], A, B](implicit FB: Monoid[F[B]]) =
@@ -96,7 +93,7 @@ object KleisliTest extends SpecLite {
     def proChoice[F[_]: Monad] = ProChoice[Kleisli[F, ?, ?]]
     def compose[F[_]: Monad] = Compose[Kleisli[F, ?, ?]]
 
-    object reader {
+    object reader
       // F = Id
       def readerFunctor[A] = Functor[Reader[A, ?]]
       def readerApply[A] = Apply[Reader[A, ?]]
@@ -109,49 +106,40 @@ object KleisliTest extends SpecLite {
       type ReaderX[A] = Reader[X, A]
       def readerXFunctor = Functor[ReaderX]
       def readerXApply = Apply[ReaderX]
-    }
-  }
 
-  object `FromKleisliLike inference` {
+  object `FromKleisliLike inference`
     val k1: Kleisli[Option, Int, String] = Kleisli(i => Option("a"))
     val k2: Kleisli[Option, String, Int] = Kleisli(s => Option(1))
 
-    object compose {
+    object compose
       import syntax.compose._
       k1 >>> k2
-    }
 
-    object choice {
+    object choice
       import syntax.choice._
       k1 ||| k1
-    }
 
-    object split {
+    object split
       import syntax.split._
       k1 -*- k1
-    }
 
-    object profunctor {
+    object profunctor
       import syntax.profunctor._
       k1.mapsnd(x => x)
-    }
 
-    object strong {
+    object strong
       import syntax.strong._
       k1.first
-    }
 
-    object proChoice {
+    object proChoice
       import syntax.proChoice._
       k1.proleft
-    }
 
-    object arrow {
+    object arrow
       import syntax.arrow._
       k1 *** k1
-    }
 
-    object all {
+    object all
       import syntax.all._
 
       k1 >>> k2
@@ -159,10 +147,8 @@ object KleisliTest extends SpecLite {
       k1 -*- k1
       k1.mapsnd(x => x)
       k1 *** k1
-    }
-  }
 
-  "Catchable[Kleisli]" should {
+  "Catchable[Kleisli]" should
 
     import effect.IO
 
@@ -171,31 +157,23 @@ object KleisliTest extends SpecLite {
     val err = new Error("oh noes")
     val bad = C.fail[Int](err)
 
-    "throw exceptions captured via fail()" in {
-      try {
+    "throw exceptions captured via fail()" in
+      try
         bad.run(1).unsafePerformIO
         fail("should have thrown")
-      } catch {
+      catch
         case t: Throwable => t must_== err
-      }
-    }
 
-    "catch exceptions captured via fail()" in {
+    "catch exceptions captured via fail()" in
       C.attempt(bad).run(1).unsafePerformIO must_== -\/(err)
-    }
 
-    "catch ambient exceptions (1/2)" in {
+    "catch ambient exceptions (1/2)" in
       C.attempt(Kleisli(_ => IO[Int](throw err))).run(1).unsafePerformIO must_==
         -\/(err)
-    }
 
-    "catch ambient exceptions (2/2)" in {
+    "catch ambient exceptions (2/2)" in
       C.attempt(Kleisli(_ => throw err)).run(1).unsafePerformIO must_==
         -\/(err)
-    }
 
-    "properly handle success" in {
+    "properly handle success" in
       C.attempt(Kleisli(n => IO(n + 2))).run(1).unsafePerformIO must_== \/-(3)
-    }
-  }
-}

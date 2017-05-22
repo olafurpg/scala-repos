@@ -32,34 +32,31 @@ class ProducerSendThread[K, V](val threadName: String,
                                val queueTime: Long,
                                val batchSize: Int,
                                val clientId: String)
-    extends Thread(threadName) with Logging with KafkaMetricsGroup {
+    extends Thread(threadName) with Logging with KafkaMetricsGroup
 
   private val shutdownLatch = new CountDownLatch(1)
   private val shutdownCommand = new KeyedMessage[K, V](
       "shutdown", null.asInstanceOf[K], null.asInstanceOf[V])
 
-  newGauge("ProducerQueueSize", new Gauge[Int] {
+  newGauge("ProducerQueueSize", new Gauge[Int]
     def value = queue.size
-  }, Map("clientId" -> clientId))
+  , Map("clientId" -> clientId))
 
-  override def run {
-    try {
+  override def run
+    try
       processEvents
-    } catch {
+    catch
       case e: Throwable => error("Error in sending events: ", e)
-    } finally {
+    finally
       shutdownLatch.countDown
-    }
-  }
 
-  def shutdown = {
+  def shutdown =
     info("Begin shutting down ProducerSendThread")
     queue.put(shutdownCommand)
     shutdownLatch.await
     info("Shutdown ProducerSendThread complete")
-  }
 
-  private def processEvents() {
+  private def processEvents()
     var lastSend = SystemTime.milliseconds
     var events = new ArrayBuffer[KeyedMessage[K, V]]
     var full: Boolean = false
@@ -71,24 +68,23 @@ class ProducerSendThread[K, V](val threadName: String,
                          0, (lastSend + queueTime) - SystemTime.milliseconds),
                      TimeUnit.MILLISECONDS))
       .takeWhile(item => if (item != null) item ne shutdownCommand else true)
-      .foreach { currentQueueItem =>
+      .foreach  currentQueueItem =>
         val elapsed = (SystemTime.milliseconds - lastSend)
         // check if the queue time is reached. This happens when the poll method above returns after a timeout and
         // returns a null object
         val expired = currentQueueItem == null
-        if (currentQueueItem != null) {
+        if (currentQueueItem != null)
           trace(
               "Dequeued item for topic %s, partition key: %s, data: %s".format(
                   currentQueueItem.topic,
                   currentQueueItem.key,
                   currentQueueItem.message))
           events += currentQueueItem
-        }
 
         // check if the batch size is reached
         full = events.size >= batchSize
 
-        if (full || expired) {
+        if (full || expired)
           if (expired)
             debug(elapsed + " ms elapsed. Queue time reached. Sending..")
           if (full) debug("Batch full. Sending..")
@@ -96,24 +92,18 @@ class ProducerSendThread[K, V](val threadName: String,
           tryToHandle(events)
           lastSend = SystemTime.milliseconds
           events = new ArrayBuffer[KeyedMessage[K, V]]
-        }
-      }
     // send the last batch of events
     tryToHandle(events)
     if (queue.size > 0)
       throw new IllegalQueueStateException(
           "Invalid queue state! After queue shutdown, %d remaining items in the queue"
             .format(queue.size))
-  }
 
-  def tryToHandle(events: Seq[KeyedMessage[K, V]]) {
+  def tryToHandle(events: Seq[KeyedMessage[K, V]])
     val size = events.size
-    try {
+    try
       debug("Handling " + size + " events")
       if (size > 0) handler.handle(events)
-    } catch {
+    catch
       case e: Throwable =>
         error("Error in handling batch of " + size + " events", e)
-    }
-  }
-}

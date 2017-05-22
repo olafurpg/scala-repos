@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait MonadFilterTests[F[_]] extends MonadTests[F] {
+trait MonadFilterTests[F[_]] extends MonadTests[F]
   def laws: MonadFilterLaws[F]
 
   def monadFilter[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
@@ -20,7 +20,7 @@ trait MonadFilterTests[F[_]] extends MonadTests[F] {
       EqFB: Eq[F[B]],
       EqFC: Eq[F[C]],
       EqFABC: Eq[F[(A, B, C)]],
-      iso: Isomorphisms[F]): RuleSet = {
+      iso: Isomorphisms[F]): RuleSet =
     new DefaultRuleSet(
         name = "monadFilter",
         parent = Some(monad[A, B, C]),
@@ -29,12 +29,8 @@ trait MonadFilterTests[F[_]] extends MonadTests[F] {
             laws.monadFilterRightEmpty[A, B] _),
         "monadFilter consistency" -> forAll(
             laws.monadFilterConsistency[A, B] _))
-  }
-}
 
-object MonadFilterTests {
+object MonadFilterTests
   def apply[F[_]: MonadFilter]: MonadFilterTests[F] =
-    new MonadFilterTests[F] {
+    new MonadFilterTests[F]
       def laws: MonadFilterLaws[F] = MonadFilterLaws[F]
-    }
-}

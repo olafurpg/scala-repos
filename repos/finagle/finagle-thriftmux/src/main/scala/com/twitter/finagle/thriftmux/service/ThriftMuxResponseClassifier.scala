@@ -50,7 +50,7 @@ import com.twitter.util.{NonFatal, Return, Try}
   * any Thrift response that deserializes into an Exception as
   * a non-retryable failure.
   */
-object ThriftMuxResponseClassifier {
+object ThriftMuxResponseClassifier
 
   /**
     * Categorizes responses where the '''deserialized''' response is a
@@ -86,47 +86,40 @@ object ThriftMuxResponseClassifier {
     */
   private[finagle] def usingDeserializeCtx(
       classifier: ResponseClassifier
-  ): ResponseClassifier = new ResponseClassifier {
+  ): ResponseClassifier = new ResponseClassifier
     private[this] def deserialized(
         deserCtx: DeserializeCtx[_],
         buf: Buf
-    ): ReqRep = {
+    ): ReqRep =
       val bytes = Buf.ByteArray.Owned.extract(buf)
       ReqRep(deserCtx.request, deserCtx.deserialize(bytes))
-    }
 
     override def toString: String =
       s"ThriftMux.usingDeserializeCtx(${classifier.toString})"
 
-    def isDefinedAt(reqRep: ReqRep): Boolean = {
+    def isDefinedAt(reqRep: ReqRep): Boolean =
       val deserCtx =
         Contexts.local.getOrElse(DeserializeCtx.Key, NoDeserializerFn)
       if (deserCtx eq NoDeserializeCtx) return false
 
-      reqRep.response match {
+      reqRep.response match
         case Return(rep: mux.Response) =>
-          try classifier.isDefinedAt(deserialized(deserCtx, rep.body)) catch {
+          try classifier.isDefinedAt(deserialized(deserCtx, rep.body)) catch
             case _: Throwable => false
-          }
         case _ => false
-      }
-    }
 
     def apply(reqRep: ReqRep): ResponseClass =
-      reqRep.response match {
+      reqRep.response match
         case Return(rep: mux.Response) =>
           val deserCtx =
             Contexts.local.getOrElse(DeserializeCtx.Key, NoDeserializerFn)
           if (deserCtx eq NoDeserializeCtx)
             throw new MatchError("No DeserializeCtx found")
-          try {
+          try
             classifier(deserialized(deserCtx, rep.body))
-          } catch {
+          catch
             case NonFatal(e) => throw new MatchError(e)
-          }
         case e => throw new MatchError(e)
-      }
-  }
 
   /**
     * A [[ResponseClassifier]] that uses a Context local [[DeserializeCtx]]
@@ -137,34 +130,26 @@ object ThriftMuxResponseClassifier {
     * to a [[com.twitter.finagle.ThriftMux.Client ThriftMux client]].
     */
   private[finagle] val DeserializeCtxOnly: ResponseClassifier =
-    new ResponseClassifier {
+    new ResponseClassifier
       // we want the side-effect of deserialization if it has not
       // yet been done
-      private[this] def deserializeIfPossible(rep: Try[Any]): Unit = {
-        rep match {
+      private[this] def deserializeIfPossible(rep: Try[Any]): Unit =
+        rep match
           case Return(rep: mux.Response) =>
             val deserCtx =
               Contexts.local.getOrElse(DeserializeCtx.Key, NoDeserializerFn)
-            if (deserCtx ne NoDeserializeCtx) {
-              try {
+            if (deserCtx ne NoDeserializeCtx)
+              try
                 val bytes = Buf.ByteArray.Owned.extract(rep.body)
                 deserCtx.deserialize(bytes)
-              } catch {
+              catch
                 case _: Throwable =>
-              }
-            }
           case _ =>
-        }
-      }
 
-      def isDefinedAt(reqRep: ReqRep): Boolean = {
+      def isDefinedAt(reqRep: ReqRep): Boolean =
         deserializeIfPossible(reqRep.response)
         ResponseClassifier.Default.isDefinedAt(reqRep)
-      }
 
-      def apply(reqRep: ReqRep): ResponseClass = {
+      def apply(reqRep: ReqRep): ResponseClass =
         deserializeIfPossible(reqRep.response)
         ResponseClassifier.Default(reqRep)
-      }
-    }
-}

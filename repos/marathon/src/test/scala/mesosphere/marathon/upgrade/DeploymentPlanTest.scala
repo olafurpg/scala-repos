@@ -13,12 +13,12 @@ import com.wix.accord._
 import scala.collection.immutable.Seq
 
 class DeploymentPlanTest
-    extends MarathonSpec with Matchers with GivenWhenThen with Mockito {
+    extends MarathonSpec with Matchers with GivenWhenThen with Mockito
 
   protected def actionsOf(plan: DeploymentPlan): Seq[DeploymentAction] =
     plan.steps.flatMap(_.actions)
 
-  test("partition a simple group's apps into concurrently deployable subsets") {
+  test("partition a simple group's apps into concurrently deployable subsets")
     Given("a group of four apps with some simple dependencies")
     val aId = "/test/database/a".toPath
     val bId = "/test/service/b".toPath
@@ -50,9 +50,8 @@ class DeploymentPlanTest
     partitionedApps.keySet should contain(3)
 
     partitionedApps(2) should have size (2)
-  }
 
-  test("partition a complex group's apps into concurrently deployable subsets") {
+  test("partition a complex group's apps into concurrently deployable subsets")
     Given("a group of four apps with some simple dependencies")
     val aId = "/a".toPath
     val bId = "/b".toPath
@@ -84,9 +83,8 @@ class DeploymentPlanTest
     partitionedApps.keySet should contain(4)
 
     partitionedApps(1) should have size (2)
-  }
 
-  test("start from empty group") {
+  test("start from empty group")
     val app = AppDefinition("/app".toPath, instances = 2)
     val from = Group("/group".toPath, Set.empty)
     val to = Group("/group".toPath, Set(app))
@@ -94,9 +92,8 @@ class DeploymentPlanTest
 
     actionsOf(plan) should contain(StartApplication(app, 0))
     actionsOf(plan) should contain(ScaleApplication(app, app.instances))
-  }
 
-  test("start from running group") {
+  test("start from running group")
     val apps = Set(AppDefinition("/app".toPath, Some("sleep 10")),
                    AppDefinition("/app2".toPath, Some("cmd2")),
                    AppDefinition("/app3".toPath, Some("cmd3")))
@@ -115,9 +112,8 @@ class DeploymentPlanTest
     plan.toScale should have size 1
     plan.toStop should have size 1
    */
-  }
 
-  test("can compute affected app ids") {
+  test("can compute affected app ids")
     val versionInfo = AppDefinition.VersionInfo.forNewConfig(Timestamp(10))
     val app: AppDefinition =
       AppDefinition("/app".toPath, Some("sleep 10"), versionInfo = versionInfo)
@@ -145,10 +141,9 @@ class DeploymentPlanTest
         Set("/app".toPath, "/app2".toPath, "/app3".toPath, "/app4".toPath))
     plan.isAffectedBy(plan) should equal(right = true)
     plan.isAffectedBy(DeploymentPlan(from, from)) should equal(right = false)
-  }
 
   test(
-      "when updating a group with dependencies, the correct order is computed") {
+      "when updating a group with dependencies, the correct order is computed")
 
     Given("Two application updates with command and scale changes")
     val mongoId = "/test/database/mongo".toPath
@@ -204,19 +199,18 @@ class DeploymentPlanTest
     plan.steps(0).actions.toSet should equal(Set(RestartApplication(mongo._2)))
     plan.steps(1).actions.toSet should equal(
         Set(RestartApplication(service._2)))
-  }
 
   test(
-      "when starting apps without dependencies, they are first started and then scaled parallely") {
+      "when starting apps without dependencies, they are first started and then scaled parallely")
     Given(
         "an empty group and the same group but now including four independent apps")
     val emptyGroup = Group(id = "/test".toPath)
 
     val instances: Int = 10
 
-    val apps: Set[AppDefinition] = (1 to 4).map { i =>
+    val apps: Set[AppDefinition] = (1 to 4).map  i =>
       AppDefinition(s"/test/$i".toPath, Some("cmd"), instances = instances)
-    }.toSet
+    .toSet
 
     val targetGroup = Group(
         id = "/test".toPath,
@@ -234,10 +228,9 @@ class DeploymentPlanTest
     Then("and the second with all ScaleApplication actions")
     plan.steps(1).actions.toSet should equal(
         apps.map(ScaleApplication(_, instances)))
-  }
 
   test(
-      "when updating apps without dependencies, the restarts are executed in the same step") {
+      "when updating apps without dependencies, the restarts are executed in the same step")
     Given("Two application updates with command and scale changes")
     val mongoId = "/test/database/mongo".toPath
     val serviceId = "/test/service/srv1".toPath
@@ -289,10 +282,9 @@ class DeploymentPlanTest
     plan.steps should have size 1
     plan.steps(0).actions.toSet should equal(
         Set(RestartApplication(mongo._2), RestartApplication(service._2)))
-  }
 
   test(
-      "when updating a group with dependent and independent applications, the correct order is computed") {
+      "when updating a group with dependent and independent applications, the correct order is computed")
     Given("application updates with command and scale changes")
     val mongoId = "/test/database/mongo".toPath
     val serviceId = "/test/service/srv1".toPath
@@ -371,9 +363,8 @@ class DeploymentPlanTest
     plan.steps(3).actions.toSet should equal(
         Set(RestartApplication(service._2)))
     plan.steps(4).actions.toSet should equal(Set(ScaleApplication(toStart, 2)))
-  }
 
-  test("when the only action is to stop an application") {
+  test("when the only action is to stop an application")
     Given("application updates with only the removal of an app")
     val strategy = UpgradeStrategy(0.75)
     val app =
@@ -394,10 +385,9 @@ class DeploymentPlanTest
     Then("the deployment contains one step consisting of one stop action")
     plan.steps should have size 1
     plan.steps(0).actions.toSet should be(Set(StopApplication(app._1)))
-  }
 
   // regression test for #765
-  test("Should create non-empty deployment plan when only args have changed") {
+  test("Should create non-empty deployment plan when only args have changed")
     val versionInfo: FullVersionInfo =
       AppDefinition.VersionInfo.forNewConfig(Timestamp(10))
     val app = AppDefinition(
@@ -410,10 +400,9 @@ class DeploymentPlanTest
     val plan = DeploymentPlan(from, to)
 
     plan.steps should not be empty
-  }
 
   // regression test for #1007
-  test("Don't restart apps that have not changed") {
+  test("Don't restart apps that have not changed")
     val app = AppDefinition(
         id = "/test".toPath,
         cmd = Some("sleep 5"),
@@ -426,9 +415,8 @@ class DeploymentPlanTest
     val to = from.copy(apps = Set(appNew))
 
     DeploymentPlan(from, to) should be(empty)
-  }
 
-  test("Restart apps that have not changed but a new version") {
+  test("Restart apps that have not changed but a new version")
     val app = AppDefinition(
         id = "/test".toPath,
         cmd = Some("sleep 5"),
@@ -442,9 +430,8 @@ class DeploymentPlanTest
     DeploymentPlan(from, to).steps should have size (1)
     DeploymentPlan(from, to).steps.head should be(
         DeploymentStep(Seq(RestartApplication(appNew))))
-  }
 
-  test("ScaleApplication step is created with TasksToKill") {
+  test("ScaleApplication step is created with TasksToKill")
     Given("a group with one app")
     val aId = "/test/some/a".toPath
     val oldApp = AppDefinition(
@@ -480,9 +467,8 @@ class DeploymentPlanTest
     plan.steps should not be empty
     plan.steps.head.actions.head shouldEqual ScaleApplication(
         newApp, 5, Some(Set(taskToKill)))
-  }
 
-  test("Deployment plan allows valid updates for resident tasks") {
+  test("Deployment plan allows valid updates for resident tasks")
     Given("All options are supplied and we have a valid group change")
     AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
                                       "mesos_role",
@@ -496,10 +482,9 @@ class DeploymentPlanTest
 
     Then("The deployment is valid")
     validate(plan).isSuccess should be(true)
-  }
 
   test(
-      "Deployment plan validation fails for invalid changes in resident tasks") {
+      "Deployment plan validation fails for invalid changes in resident tasks")
     Given("All options are supplied and we have a valid group change")
     AllConf.SuppliedOptionNames = Set("mesos_authentication_principal",
                                       "mesos_role",
@@ -514,15 +499,14 @@ class DeploymentPlanTest
 
     Then("The deployment is not valid")
     validate(plan2).isSuccess should be(false)
-  }
 
-  class Fixture {
+  class Fixture
     def persistentVolume(path: String) =
       PersistentVolume(path, PersistentVolumeInfo(123), mesos.Volume.Mode.RW)
     val zero = UpgradeStrategy(0, 0)
 
     def residentApp(
-        id: String, volumes: Seq[PersistentVolume]): AppDefinition = {
+        id: String, volumes: Seq[PersistentVolume]): AppDefinition =
       AppDefinition(
           id = PathId(id),
           container = Some(Container(mesos.ContainerInfo.Type.MESOS, volumes)),
@@ -531,12 +515,9 @@ class DeploymentPlanTest
                     123,
                     Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT))
       )
-    }
     val vol1 = persistentVolume("foo")
     val vol2 = persistentVolume("bla")
     val vol3 = persistentVolume("test")
     val validResident =
       residentApp("/app1", Seq(vol1, vol2)).copy(upgradeStrategy = zero)
     val group = Group(PathId("/test"), apps = Set(validResident))
-  }
-}

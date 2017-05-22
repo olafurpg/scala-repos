@@ -1,5 +1,4 @@
 package gitbucket.core
 
-package object model {
+package object model
   type Session = slick.jdbc.JdbcBackend#Session
-}

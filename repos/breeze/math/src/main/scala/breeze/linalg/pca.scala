@@ -11,7 +11,7 @@ import breeze.stats.mean
   * Input is a matrix that has data points as rows. Variable naming and
   * documentation inspired and used directy from the 'princomp' function in R.
   */
-class PCA(val x: DenseMatrix[Double], val covmat: DenseMatrix[Double]) {
+class PCA(val x: DenseMatrix[Double], val covmat: DenseMatrix[Double])
 
   /**
     * The number of observations.
@@ -49,14 +49,12 @@ class PCA(val x: DenseMatrix[Double], val covmat: DenseMatrix[Double]) {
     * The cumulative proportion of variance explained by the first n
     * principal components.
     */
-  lazy val cumuvar = propvar.map {
+  lazy val cumuvar = propvar.map
     var c = 0.0;
     d =>
       { c += d; c }
-  }
 
   /**
     * Translate the original data points to the PC axes.
     */
   lazy val scores: DenseMatrix[Double] = (loadings * (x(*, ::) - center).t).t
-}

@@ -10,8 +10,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.{ScSequenceArg, ScTyp
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
-trait ScTypedStmt extends ScExpression {
+trait ScTypedStmt extends ScExpression
   def expr: ScExpression = findChildByClassScala(classOf[ScExpression])
   def typeElement: Option[ScTypeElement] = findChild(classOf[ScTypeElement])
   def isSequenceArg: Boolean = getLastChild.isInstanceOf[ScSequenceArg]
-}

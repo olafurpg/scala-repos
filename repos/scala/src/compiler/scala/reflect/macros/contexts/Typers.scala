@@ -1,7 +1,7 @@
 package scala.reflect.macros
 package contexts
 
-trait Typers { self: Context =>
+trait Typers  self: Context =>
 
   def openMacros: List[Context] = this :: universe.analyzer.openMacros
 
@@ -22,7 +22,7 @@ trait Typers { self: Context =>
                 pt: Type = universe.WildcardType,
                 silent: Boolean = false,
                 withImplicitViewsDisabled: Boolean = false,
-                withMacrosDisabled: Boolean = false): Tree = {
+                withMacrosDisabled: Boolean = false): Tree =
     macroLogVerbose(
         "typechecking %s with expected type %s, implicit views = %s, macros = %s"
           .format(tree, pt, !withImplicitViewsDisabled, !withMacrosDisabled))
@@ -42,7 +42,7 @@ trait Typers { self: Context =>
           reportAmbiguousErrors = false)
     withWrapping(tree)(
         wrappedTree =>
-          withContext(typecheckInternal(wrappedTree) match {
+          withContext(typecheckInternal(wrappedTree) match
         case universe.analyzer.SilentResultValue(result) =>
           macroLogVerbose(result)
           result
@@ -51,13 +51,12 @@ trait Typers { self: Context =>
           if (!silent)
             throw new TypecheckException(error.err.errPos, error.err.errMsg)
           universe.EmptyTree
-      }))
-  }
+      ))
 
   def inferImplicitValue(pt: Type,
                          silent: Boolean = true,
                          withMacrosDisabled: Boolean = false,
-                         pos: Position = enclosingPosition): Tree = {
+                         pos: Position = enclosingPosition): Tree =
     macroLogVerbose(
         "inferring implicit value of type %s, macros = %s".format(
             pt, !withMacrosDisabled))
@@ -70,14 +69,13 @@ trait Typers { self: Context =>
                                     pos,
                                     (pos,
                                     msg) => throw TypecheckException(pos, msg))
-  }
 
   def inferImplicitView(tree: Tree,
                         from: Type,
                         to: Type,
                         silent: Boolean = true,
                         withMacrosDisabled: Boolean = false,
-                        pos: Position = enclosingPosition): Tree = {
+                        pos: Position = enclosingPosition): Tree =
     macroLogVerbose(
         "inferring implicit view from %s to %s for %s, macros = %s".format(
             from, to, tree, !withMacrosDisabled))
@@ -93,10 +91,8 @@ trait Typers { self: Context =>
                                     pos,
                                     (pos,
                                     msg) => throw TypecheckException(pos, msg))
-  }
 
   def resetLocalAttrs(tree: Tree): Tree =
     universe.resetAttrs(universe.duplicateAndKeepPositions(tree))
 
   def untypecheck(tree: Tree): Tree = resetLocalAttrs(tree)
-}

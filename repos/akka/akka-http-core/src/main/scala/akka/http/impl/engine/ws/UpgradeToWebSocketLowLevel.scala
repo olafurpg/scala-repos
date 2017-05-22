@@ -15,7 +15,7 @@ import akka.stream.{Graph, FlowShape}
   */
 private[http] abstract class UpgradeToWebSocketLowLevel
     extends InternalCustomHeader("UpgradeToWebSocket")
-    with UpgradeToWebSocket {
+    with UpgradeToWebSocket
 
   /**
     * The low-level interface to create WebSocket server based on "frames".
@@ -30,4 +30,3 @@ private[http] abstract class UpgradeToWebSocketLowLevel
   private[http] def handleFrames(
       handlerFlow: Graph[FlowShape[FrameEvent, FrameEvent], Any],
       subprotocol: Option[String] = None): HttpResponse
-}

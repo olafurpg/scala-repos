@@ -17,62 +17,52 @@ import Uri._
 private[http] class UriParser(val input: ParserInput,
                               val uriParsingCharset: Charset = UTF8,
                               val uriParsingMode: Uri.ParsingMode = Uri.ParsingMode.Relaxed) extends Parser
-  with IpAddressParsing with StringBuilding {
+  with IpAddressParsing with StringBuilding
   import CharacterClasses._
 
   def parseAbsoluteUri(): Uri =
-    rule(`absolute-URI` ~ EOI).run() match {
+    rule(`absolute-URI` ~ EOI).run() match
       case Right(_) => create(_scheme, _userinfo, _host, _port, collapseDotSegments(_path), _rawQueryString, _fragment)
       case Left(error) => fail(error, "absolute URI")
-    }
 
   def parseUriReference(): Uri =
-    rule(`URI-reference` ~ EOI).run() match {
+    rule(`URI-reference` ~ EOI).run() match
       case Right(_) => createUriReference()
       case Left(error) => fail(error, "URI reference")
-    }
 
   def parseAndResolveUriReference(base: Uri): Uri =
-    rule(`URI-reference` ~ EOI).run() match {
+    rule(`URI-reference` ~ EOI).run() match
       case Right(_) => resolve(_scheme, _userinfo, _host, _port, _path, _rawQueryString, _fragment, base)
       case Left(error) => fail(error, "URI reference")
-    }
 
   def parseOrigin(): HttpOrigin =
-    rule(origin ~ EOI).run() match {
+    rule(origin ~ EOI).run() match
       case Right(_) => HttpOrigin(_scheme, akka.http.scaladsl.model.headers.Host(_host.address, _port))
       case Left(error) => fail(error, "origin")
-    }
 
   def parseHost(): Host =
-    rule(relaxedHost ~ EOI).run() match {
+    rule(relaxedHost ~ EOI).run() match
       case Right(_) => _host
       case Left(error) => fail(error, "URI host")
-    }
 
   def parseQuery(): Query =
-    rule(query ~ EOI).run() match {
+    rule(query ~ EOI).run() match
       case Right(query) => query
       case Left(error) => fail(error, "query")
-    }
 
-  def fail(error: ParseError, target: String): Nothing = {
+  def fail(error: ParseError, target: String): Nothing =
     val formatter = new ErrorFormatter(showLine = false)
     Uri.fail(s"Illegal $target: " + formatter.format(error, input), formatter.formatErrorLine(error, input))
-  }
 
-  private[this] val `path-segment-char` = uriParsingMode match {
+  private[this] val `path-segment-char` = uriParsingMode match
     case Uri.ParsingMode.Strict ⇒ `pchar-base`
     case _                      ⇒ `relaxed-path-segment-char`
-  }
-  private[this] val `query-char` = uriParsingMode match {
+  private[this] val `query-char` = uriParsingMode match
     case Uri.ParsingMode.Strict              ⇒ `strict-query-char`
     case Uri.ParsingMode.Relaxed             ⇒ `relaxed-query-char`
-  }
-  private[this] val `fragment-char` = uriParsingMode match {
+  private[this] val `fragment-char` = uriParsingMode match
     case Uri.ParsingMode.Strict ⇒ `query-fragment-char`
     case _                      ⇒ `relaxed-fragment-char`
-  }
 
   var _scheme = ""
   var _userinfo = ""
@@ -114,9 +104,8 @@ private[http] class UriParser(val input: ParserInput,
 
   def authority = rule { optional(userinfo) ~ hostAndPort }
 
-  def userinfo = rule {
+  def userinfo = rule
     clearSB() ~ zeroOrMore(`userinfo-char` ~ appendSB()| `pct-encoded`) ~ '@' ~ run(_userinfo = sb.toString)
-  }
 
   def hostAndPort = rule { host ~ optional(':' ~ port)  }
 
@@ -127,13 +116,12 @@ private[http] class UriParser(val input: ParserInput,
   /** A relaxed host rule to use in `parseHost` that also recognizes IPv6 address without the brackets. */
   def relaxedHost = rule { `IP-literal` | ipv6Host | ipv4Host | `reg-name` }
 
-  def port = rule {
+  def port = rule
     DIGIT ~ run(_port = lastChar - '0') ~ optional(
       DIGIT ~ run(_port = 10 * _port + lastChar - '0') ~ optional(
         DIGIT ~ run(_port = 10 * _port + lastChar - '0') ~ optional(
           DIGIT ~ run(_port = 10 * _port + lastChar - '0') ~ optional(
             DIGIT ~ run(_port = 10 * _port + lastChar - '0')))))
-  }
 
   def `IP-literal` = rule { '[' ~ ipv6Host ~ ']' } // IPvFuture not currently recognized
 
@@ -159,12 +147,11 @@ private[http] class UriParser(val input: ParserInput,
 
   def pchar = rule { `path-segment-char` ~ appendSB() | `pct-encoded` }
 
-  def rawQueryString = rule {
+  def rawQueryString = rule
     clearSB() ~ oneOrMore(`raw-query-char` ~ appendSB()) ~ run(_rawQueryString = Some(sb.toString)) | run(_rawQueryString = Some(""))
-  }
 
   // http://www.w3.org/TR/html401/interact/forms.html#h-17.13.4.1
-  def query: Rule1[Query] = {
+  def query: Rule1[Query] =
     def part = rule(
       clearSBForDecoding() ~ oneOrMore('+' ~ appendSB(' ') | `query-char` ~ appendSB() | `pct-encoded`) ~ push(getDecodedString())
         | push(""))
@@ -173,32 +160,26 @@ private[http] class UriParser(val input: ParserInput,
     // without having to reverse it at the end.
     // Also: request queries usually do not have hundreds of elements, so we should get away with
     // putting some pressure onto the JVM and value stack
-    def keyValuePairs: Rule1[Query] = rule {
-      part ~ ('=' ~ part | push(Query.EmptyValue)) ~ ('&' ~ keyValuePairs | push(Query.Empty)) ~> { (key, value, tail) =>
+    def keyValuePairs: Rule1[Query] = rule
+      part ~ ('=' ~ part | push(Query.EmptyValue)) ~ ('&' ~ keyValuePairs | push(Query.Empty)) ~>  (key, value, tail) =>
         Query.Cons(key, value, tail)
-      }
-    }
 
     rule { keyValuePairs }
-  }
 
   def fragment = rule(
     clearSBForDecoding() ~ oneOrMore(`fragment-char` ~ appendSB() | `pct-encoded`) ~ run(_fragment = Some(getDecodedString()))
     | run(_fragment = Some("")))
 
-  def `pct-encoded` = rule {
-    '%' ~ HEXDIG ~ HEXDIG ~ run {
+  def `pct-encoded` = rule
+    '%' ~ HEXDIG ~ HEXDIG ~ run
       if (firstPercentIx == -1) firstPercentIx = sb.length()
       sb.append('%').append(charAt(-2)).append(lastChar)
-    }
-  }
 
   //////////////////////////// ADDITIONAL HTTP-SPECIFIC RULES //////////////////////////
 
   // http://tools.ietf.org/html/rfc7230#section-2.7
-  def `absolute-path` = rule {
+  def `absolute-path` = rule
     clearSB() ~ oneOrMore('/' ~ appendSB('/') ~ segment) ~ savePath()
-  }
 
   // http://tools.ietf.org/html/rfc7230#section-5.3
   def `request-target` = rule(
@@ -207,12 +188,11 @@ private[http] class UriParser(val input: ParserInput,
       | authority) // authority-form or asterisk-form
 
   def parseHttpRequestTarget(): Uri =
-    rule(`request-target` ~ EOI).run() match {
+    rule(`request-target` ~ EOI).run() match
       case Right(_) =>
         val path = if (_scheme.isEmpty) _path else collapseDotSegments(_path)
         create(_scheme, _userinfo, _host, _port, path, _rawQueryString, _fragment)
       case Left(error) => fail(error, "request-target")
-    }
 
   ///////////// helpers /////////////
 
@@ -230,9 +210,7 @@ private[http] class UriParser(val input: ParserInput,
   private def getDecodedStringAndLowerIfEncoded(charset: Charset) =
     if (firstPercentIx >= 0) decode(sb.toString, charset, firstPercentIx)().toRootLowerCase else sb.toString
 
-  private def createUriReference(): Uri = {
+  private def createUriReference(): Uri =
     val path = if (_scheme.isEmpty) _path else collapseDotSegments(_path)
     create(_scheme, _userinfo, _host, _port, path, _rawQueryString, _fragment)
-  }
-}
 

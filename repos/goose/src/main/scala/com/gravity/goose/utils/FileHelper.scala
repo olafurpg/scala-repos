@@ -25,16 +25,13 @@ import java.io.{IOException, InputStream}
   * User: jim
   * Date: 8/16/11
   */
-object FileHelper extends Logging {
+object FileHelper extends Logging
 
-  def loadResourceFile[A](filename: String, cls: Class[A]): String = {
+  def loadResourceFile[A](filename: String, cls: Class[A]): String =
     var filedata: String = ""
     val is: InputStream = cls.getResourceAsStream(filename)
-    try {
+    try
       filedata = IOUtils.toString(is, "UTF-8")
-    } catch {
+    catch
       case e: IOException => warn(e, e.toString)
-    }
     filedata
-  }
-}

@@ -12,19 +12,18 @@ import org.junit.Assert.assertEquals
   * Nikolay.Tropin
   * 12/18/13
   */
-class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
+class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase
   protected override def tuneFixture(
-      moduleBuilder: JavaModuleFixtureBuilder[_ <: ModuleFixture]) {
+      moduleBuilder: JavaModuleFixtureBuilder[_ <: ModuleFixture])
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15)
     moduleBuilder.addJdk(IdeaTestUtil.getMockJdk14Path.getPath)
-  }
 
   def runTest(methodName: String,
               javaText: String,
               scalaText: String,
               expectedText: String,
               isImplement: Boolean,
-              needsInferType: Boolean = true) {
+              needsInferType: Boolean = true)
     myFixture.addFileToProject("JavaDummy.java", javaText.stripMargin.trim)
     val scalaFile = myFixture.configureByText(
         "ScalaDummy.scala", scalaText.replace("\r", "").stripMargin.trim)
@@ -39,9 +38,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
     assertEquals(expectedText.replace("\r", "").stripMargin.trim,
                  scalaFile.getText.stripMargin.trim)
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = oldSpecifyRetType
-  }
 
-  def testDefaultImplementations(): Unit = {
+  def testDefaultImplementations(): Unit =
     val javaText = """
         |public interface JavaDummy {
         |    default int foo() {
@@ -65,9 +63,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expectedText,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testVarargImplement() {
+  def testVarargImplement()
     val javaText = """
         |public abstract class JavaDummy {
         |    public abstract void vararg(int... args);
@@ -89,9 +86,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expectedText,
             isImplement = true,
             needsInferType = true)
-  }
 
-  def testVarargOverride() {
+  def testVarargOverride()
     val javaText = """
         |public class JavaDummy {
         |    public void vararg(int... args) {}
@@ -114,9 +110,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expectedText,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testKeywordNames() {
+  def testKeywordNames()
     val javaText = """
         |public class JavaDummy {
         |    public void def(int val) {}
@@ -138,9 +133,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expectedText,
             isImplement = false,
             needsInferType = false)
-  }
 
-  def testWithOverrideAnnotation() {
+  def testWithOverrideAnnotation()
     val javaText = """
         |public class JavaDummy {
         |    public void method(int number) {}
@@ -169,9 +163,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expected,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testWithoutOverrideAnnotation() {
+  def testWithoutOverrideAnnotation()
     val javaText = """
         |public class JavaDummy {
         |    public void method(int number) {}
@@ -199,9 +192,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expected,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testSimpleGenerics() {
+  def testSimpleGenerics()
     val javaText = """
         |public class JavaDummy<T> {
         |    public T method(T arg) {
@@ -225,9 +217,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expected,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testSimpleGenerics2() {
+  def testSimpleGenerics2()
     val javaText = """
         |public class JavaDummy<T> {
         |    public T method(T arg) {
@@ -251,9 +242,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expected,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testGenerics() {
+  def testGenerics()
     val javaText =
       """
         |public class JavaDummy<T, S> {
@@ -279,9 +269,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expectedText,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testTypeParameter() {
+  def testTypeParameter()
     val javaText =
       """
         |public class JavaDummy<T> {
@@ -311,9 +300,8 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expectedText,
             isImplement = false,
             needsInferType = true)
-  }
 
-  def testQueryLikeMethod() {
+  def testQueryLikeMethod()
     val javaText = """
         |public class JavaDummy<T> {
         |    public int getValue() {return 0;}
@@ -335,5 +323,3 @@ class FromJavaOverrideImplementTest extends JavaCodeInsightFixtureTestCase {
             expectedText,
             isImplement = false,
             needsInferType = true)
-  }
-}

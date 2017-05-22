@@ -30,12 +30,11 @@ import Helpers._
 
 class HTTPRequestServlet(
     val req: HttpServletRequest, val provider: HTTPProvider)
-    extends HTTPRequest {
-  private lazy val ctx = {
+    extends HTTPRequest
+  private lazy val ctx =
     new HTTPServletContext(req.getSession.getServletContext)
-  }
 
-  lazy val cookies: List[HTTPCookie] = {
+  lazy val cookies: List[HTTPCookie] =
     req.getSession(false) // do this to make sure we capture the JSESSIONID cookie
     (Box !! req.getCookies).map(
         _.toList.map(c =>
@@ -46,25 +45,24 @@ class HTTPRequestServlet(
                          Box !! (c.getMaxAge),
                          Box !! (c.getVersion),
                          Box !! (c.getSecure)))) openOr Nil
-  }
 
   lazy val authType: Box[String] = Box !! req.getAuthType
 
   def headers(name: String): List[String] =
-    for {
+    for
       h <- (Box !! req.getHeaders(name))
         .asA[java.util.Enumeration[String]]
         .toList
       li <- enumToList[String](h) if null != li
-    } yield li
+    yield li
 
-  lazy val headers: List[HTTPParam] = for {
+  lazy val headers: List[HTTPParam] = for
     hne <- (Box !! req.getHeaderNames)
       .asA[java.util.Enumeration[String]]
       .toList
     n <- enumToList[String](hne) if null != n
     hl <- Full(headers(n)) if !hl.isEmpty
-  } yield HTTPParam(n, hl)
+  yield HTTPParam(n, hl)
 
   def contextPath: String = req.getContextPath
 
@@ -82,10 +80,9 @@ class HTTPRequestServlet(
 
   lazy val queryString: Box[String] = Box !! req.getQueryString
 
-  def param(name: String): List[String] = req.getParameterValues(name) match {
+  def param(name: String): List[String] = req.getParameterValues(name) match
     case null => Nil
     case x => x.toList
-  }
 
   lazy val params: List[HTTPParam] = enumToList[String](
       req.getParameterNames.asInstanceOf[java.util.Enumeration[String]])
@@ -123,32 +120,31 @@ class HTTPRequestServlet(
   /**
     * Destroy the underlying servlet session
     */
-  def destroyServletSession() {
-    for {
+  def destroyServletSession()
+    for
       httpSession <- Box !! req.getSession(false)
-    } yield httpSession.invalidate()
-  }
+    yield httpSession.invalidate()
 
   /**
     * @return the sessionID (if there is one) for this request.  This will *NOT* create
     * a new session if one does not already exist
     */
   def sessionId: Box[String] =
-    for {
+    for
       httpSession <- Box !! req.getSession(false)
       id <- Box !! httpSession.getId
-    } yield id
+    yield id
 
   def extractFiles: List[ParamHolder] =
-    (new Iterator[ParamHolder] {
+    (new Iterator[ParamHolder]
       val mimeUpload = (new ServletFileUpload)
       mimeUpload.setProgressListener(
-          new ProgressListener {
+          new ProgressListener
         lazy val progList: (Long, Long, Int) => Unit =
           S.session.flatMap(_.progressListener) openOr LiftRules.progressListener
 
         def update(a: Long, b: Long, c: Int) { progList(a, b, c) }
-      })
+      )
 
       mimeUpload.setSizeMax(LiftRules.maxMimeSize)
       mimeUpload.setFileSizeMax(LiftRules.maxMimeFileSize)
@@ -158,11 +154,11 @@ class HTTPRequestServlet(
 
       import scala.collection.JavaConversions._
 
-      def next = what.next match {
+      def next = what.next match
         case f if (f.isFormField) =>
           NormalParamHolder(f.getFieldName,
                             new String(readWholeStream(f.openStream), "UTF-8"))
-        case f => {
+        case f =>
             val headers = f.getHeaders()
             val names: List[String] =
               if (headers eq null) Nil
@@ -177,13 +173,10 @@ class HTTPRequestServlet(
                         .getHeaders(n)
                         .asInstanceOf[java.util.Iterator[String]]
                         .toList): _*)
-            LiftRules.withMimeHeaders(map) {
+            LiftRules.withMimeHeaders(map)
               LiftRules.handleMimeFile(
                   f.getFieldName, f.getContentType, f.getName, f.openStream)
-            }
-          }
-      }
-    }).toList
+    ).toList
 
   def setCharacterEncoding(encoding: String) =
     req.setCharacterEncoding(encoding)
@@ -208,15 +201,13 @@ class HTTPRequestServlet(
           "open_! is bad, but presumably, the suspendResume support was checked")
       .resume(what)
 
-  lazy val suspendResumeSupport_? = {
+  lazy val suspendResumeSupport_? =
     LiftRules.asyncProviderMeta.map(_.suspendResumeSupport_? &&
         (asyncProvider.map(_.suspendResumeSupport_?) openOr false)) openOr false
-  }
-}
 
 private class OfflineRequestSnapshot(
     req: HTTPRequest, val provider: HTTPProvider)
-    extends HTTPRequest {
+    extends HTTPRequest
 
   private val _cookies = List(req.cookies: _*)
 
@@ -255,9 +246,8 @@ private class OfflineRequestSnapshot(
   /**
     * Destroy the underlying servlet session... null for offline requests
     */
-  def destroyServletSession() {
+  def destroyServletSession()
     // do nothing here
-  }
 
   val session: HTTPSession = req.session
 
@@ -273,7 +263,7 @@ private class OfflineRequestSnapshot(
 
   val scheme: String = req.scheme
 
-  lazy val serverPort: Int = req.serverPort match {
+  lazy val serverPort: Int = req.serverPort match
     case 80 =>
       headers("X-SSL")
         .flatMap(Helpers.asBoolean _)
@@ -281,7 +271,6 @@ private class OfflineRequestSnapshot(
         .map(a => 443)
         .headOption getOrElse 80
     case x => x
-  }
 
   val method: String = req.method
 
@@ -317,4 +306,3 @@ private class OfflineRequestSnapshot(
   lazy val userAgent: Box[String] =
     headers find (_.name equalsIgnoreCase "user-agent") flatMap
     (_.values.headOption)
-}

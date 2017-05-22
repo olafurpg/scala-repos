@@ -1,7 +1,7 @@
 package java.io
 
 class FilterOutputStream(protected val out: OutputStream)
-    extends OutputStream {
+    extends OutputStream
   def write(b: Int): Unit =
     out.write(b)
 
@@ -14,4 +14,3 @@ class FilterOutputStream(protected val out: OutputStream)
   override def flush(): Unit = out.flush()
 
   override def close(): Unit = out.close()
-}

@@ -13,10 +13,10 @@ import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.scala.lang.formatting.ScalaFormattingModelBuilder._
 import org.jetbrains.plugins.scala.lang.lexer.ScalaTokenTypes
 
-sealed class ScalaFormattingModelBuilder extends FormattingModelBuilder {
+sealed class ScalaFormattingModelBuilder extends FormattingModelBuilder
 
   def createModel(
-      element: PsiElement, settings: CodeStyleSettings): FormattingModel = {
+      element: PsiElement, settings: CodeStyleSettings): FormattingModel =
     val node: ASTNode = element.getNode
     assert(node != null)
     val containingFile: PsiFile = element.getContainingFile.getViewProvider
@@ -35,38 +35,30 @@ sealed class ScalaFormattingModelBuilder extends FormattingModelBuilder {
         containingFile,
         block,
         FormattingDocumentModelImpl.createOn(containingFile))
-  }
 
   def getRangeAffectingIndent(
-      file: PsiFile, offset: Int, elementAtOffset: ASTNode): TextRange = {
+      file: PsiFile, offset: Int, elementAtOffset: ASTNode): TextRange =
     elementAtOffset.getTextRange
-  }
-}
 
-object ScalaFormattingModelBuilder {
+object ScalaFormattingModelBuilder
   private class ScalaFormattingModel(
       file: PsiFile,
       rootBlock: Block,
       documentModel: FormattingDocumentModelImpl)
-      extends PsiBasedFormattingModel(file, rootBlock, documentModel) {
+      extends PsiBasedFormattingModel(file, rootBlock, documentModel)
     protected override def replaceWithPsiInLeaf(
         textRange: TextRange,
         whiteSpace: String,
-        leafElement: ASTNode): String = {
-      if (!myCanModifyAllWhiteSpaces) {
+        leafElement: ASTNode): String =
+      if (!myCanModifyAllWhiteSpaces)
         if (ScalaTokenTypes.WHITES_SPACES_FOR_FORMATTER_TOKEN_SET.contains(
                 leafElement.getElementType)) return null
-      }
       var elementTypeToUse: IElementType = TokenType.WHITE_SPACE
       val prevNode: ASTNode = TreeUtil.prevLeaf(leafElement)
       if (prevNode != null &&
           ScalaTokenTypes.WHITES_SPACES_FOR_FORMATTER_TOKEN_SET.contains(
-              prevNode.getElementType)) {
+              prevNode.getElementType))
         elementTypeToUse = prevNode.getElementType
-      }
       com.intellij.psi.formatter.FormatterUtil.replaceWhiteSpace(
           whiteSpace, leafElement, elementTypeToUse, textRange)
       whiteSpace
-    }
-  }
-}

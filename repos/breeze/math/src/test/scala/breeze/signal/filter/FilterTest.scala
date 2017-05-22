@@ -11,10 +11,10 @@ import org.scalatest.junit.JUnitRunner
   * @date 2/11/14.
   */
 @RunWith(classOf[JUnitRunner])
-class FilterTest extends FunSuite {
+class FilterTest extends FunSuite
 
   test(
-      "BP filtering tested against output from scipy.signal.firwin/ifilter (0.13.2-1)") {
+      "BP filtering tested against output from scipy.signal.firwin/ifilter (0.13.2-1)")
 
     val testNormThreshold = 1.0E-6
     val spFirwin1 = DenseVector(1.40718797E-02,
@@ -84,9 +84,8 @@ class FilterTest extends FunSuite {
     assert(
         norm(filtered1(0 to -6) - spTestSignalFiltered1(5 to -1)) < testNormThreshold,
         "filtered result is incorrect!")
-  }
 
-  test("filterMedian") {
+  test("filterMedian")
     val dataSmall = DenseVector.tabulate[Int](15)(p => p)
     val result1 = filterMedian(dataSmall, 5, OptOverhang.None).toScalaVector
     val result2 =
@@ -109,5 +108,3 @@ class FilterTest extends FunSuite {
     assert(
         result4 == (Array(0f, 1f) ++ result3 ++ Array(99998f, 99999f)).toVector,
         "median filter failed for large data and OptOverhang.PreserveLength")
-  }
-}

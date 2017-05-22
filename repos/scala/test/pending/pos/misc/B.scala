@@ -1,6 +1,5 @@
 package test
 
-class B {
+class B
 
   def myA = new A()
-}

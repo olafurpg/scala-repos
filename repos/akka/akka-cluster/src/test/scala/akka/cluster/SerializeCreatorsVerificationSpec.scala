@@ -5,9 +5,7 @@ package akka.cluster
 
 import akka.testkit.AkkaSpec
 
-class SerializeCreatorsVerificationSpec extends AkkaSpec {
+class SerializeCreatorsVerificationSpec extends AkkaSpec
 
-  "serialize-creators should be on" in {
+  "serialize-creators should be on" in
     system.settings.SerializeAllCreators should ===(true)
-  }
-}

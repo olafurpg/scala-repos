@@ -27,7 +27,7 @@ import org.apache.spark.ml.param.ParamMap
   * @tparam M model type
   */
 @DeveloperApi
-abstract class Model[M <: Model[M]] extends Transformer {
+abstract class Model[M <: Model[M]] extends Transformer
 
   /**
     * The parent estimator that produced this model.
@@ -38,13 +38,11 @@ abstract class Model[M <: Model[M]] extends Transformer {
   /**
     * Sets the parent of this model (Java API).
     */
-  def setParent(parent: Estimator[M]): M = {
+  def setParent(parent: Estimator[M]): M =
     this.parent = parent
     this.asInstanceOf[M]
-  }
 
   /** Indicates whether this [[Model]] has a corresponding parent. */
   def hasParent: Boolean = parent != null
 
   override def copy(extra: ParamMap): M
-}

@@ -1,6 +1,6 @@
 import scala.tools.partest.ParserTest
 
-object Test extends ParserTest {
+object Test extends ParserTest
 
   override def code =
     """
@@ -22,4 +22,3 @@ object Test extends ParserTest {
 
   // default under 2.12 is not coalescing
   override def extraSettings = s"${super.extraSettings} -Xsource:212"
-}

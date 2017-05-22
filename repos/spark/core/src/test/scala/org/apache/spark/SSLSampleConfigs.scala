@@ -19,7 +19,7 @@ package org.apache.spark
 
 import java.io.File
 
-object SSLSampleConfigs {
+object SSLSampleConfigs
   val keyStorePath =
     new File(this.getClass.getResource("/keystore").toURI).getAbsolutePath
   val untrustedKeyStorePath = new File(
@@ -41,7 +41,7 @@ object SSLSampleConfigs {
     "SSL_ECDHE_RSA_WITH_AES_128_CBC_SHA256, " +
     "SSL_DHE_RSA_WITH_AES_128_CBC_SHA256"
 
-  def sparkSSLConfig(): SparkConf = {
+  def sparkSSLConfig(): SparkConf =
     val conf = new SparkConf(loadDefaults = false)
     conf.set("spark.ssl.enabled", "true")
     conf.set("spark.ssl.keyStore", keyStorePath)
@@ -52,9 +52,8 @@ object SSLSampleConfigs {
     conf.set("spark.ssl.enabledAlgorithms", enabledAlgorithms)
     conf.set("spark.ssl.protocol", "TLSv1.2")
     conf
-  }
 
-  def sparkSSLConfigUntrusted(): SparkConf = {
+  def sparkSSLConfigUntrusted(): SparkConf =
     val conf = new SparkConf(loadDefaults = false)
     conf.set("spark.ssl.enabled", "true")
     conf.set("spark.ssl.keyStore", untrustedKeyStorePath)
@@ -65,5 +64,3 @@ object SSLSampleConfigs {
     conf.set("spark.ssl.enabledAlgorithms", enabledAlgorithms)
     conf.set("spark.ssl.protocol", "TLSv1.2")
     conf
-  }
-}

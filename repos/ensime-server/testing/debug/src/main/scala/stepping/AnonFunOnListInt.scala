@@ -2,9 +2,9 @@ package stepping
 
 import debug.Helper._
 
-object AnonFunOnListInt {
+object AnonFunOnListInt
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val l = List(1, 2, 4, 8)
 
@@ -16,10 +16,7 @@ object AnonFunOnListInt {
 
     l.foldLeft(0)(_ + ret(_))
 
-    l foreach { i =>
+    l foreach  i =>
       noop(i)
-    }
-  }
-}
 
 class AnonFunOnListInt {}

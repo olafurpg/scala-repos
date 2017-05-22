@@ -25,7 +25,7 @@ package org.apache.spark.sql.execution.streaming
   *  - Allow the user to query the metadata object of a specified batch id.
   *  - Allow the user to query metadata objects in a range of batch ids.
   */
-trait MetadataLog[T] {
+trait MetadataLog[T]
 
   /**
     * Store the metadata for the specified batchId and return `true` if successful. If the batchId's
@@ -48,4 +48,3 @@ trait MetadataLog[T] {
     * Return the latest batch Id and its metadata if exist.
     */
   def getLatest(): Option[(Long, T)]
-}

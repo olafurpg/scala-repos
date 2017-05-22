@@ -14,56 +14,44 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.immutable
 
 sealed private trait ZkOp { type Res; val res = new Promise[Res] }
-private object ZkOp {
-  case class Exists(path: String) extends ZkOp {
+private object ZkOp
+  case class Exists(path: String) extends ZkOp
     type Res = Option[Data.Stat]
-  }
 
-  case class ExistsWatch(path: String) extends ZkOp {
+  case class ExistsWatch(path: String) extends ZkOp
     type Res = Watched[Option[Data.Stat]]
-  }
 
-  case class GetChildren(path: String) extends ZkOp {
+  case class GetChildren(path: String) extends ZkOp
     type Res = Node.Children
-  }
 
-  case class GetChildrenWatch(path: String) extends ZkOp {
+  case class GetChildrenWatch(path: String) extends ZkOp
     type Res = Watched[Node.Children]
-  }
 
-  case class GlobWatch(pat: String) extends ZkOp {
+  case class GlobWatch(pat: String) extends ZkOp
     type Res = Watched[Seq[String]]
-  }
 
-  case class GetData(path: String) extends ZkOp {
+  case class GetData(path: String) extends ZkOp
     type Res = Node.Data
-  }
 
-  case class GetDataWatch(path: String) extends ZkOp {
+  case class GetDataWatch(path: String) extends ZkOp
     type Res = Watched[Node.Data]
-  }
 
-  case class GetEphemerals() extends ZkOp {
+  case class GetEphemerals() extends ZkOp
     type Res = Seq[String]
-  }
 
-  case class Sync(path: String) extends ZkOp {
+  case class Sync(path: String) extends ZkOp
     type Res = Unit
-  }
 
-  case class Close(deadline: Time) extends ZkOp {
+  case class Close(deadline: Time) extends ZkOp
     type Res = Unit
-  }
 
-  case class AddAuthInfo(scheme: String, auth: Buf) extends ZkOp {
+  case class AddAuthInfo(scheme: String, auth: Buf) extends ZkOp
     type Res = Unit
-  }
-}
 
 private class OpqueueZkReader(val sessionId: Long,
                               val sessionPasswd: Buf,
                               val sessionTimeout: Duration)
-    extends ZooKeeperReader {
+    extends ZooKeeperReader
 
   import ZkOp._
 
@@ -71,10 +59,9 @@ private class OpqueueZkReader(val sessionId: Long,
 
   @volatile var opq: immutable.Queue[ZkOp] = immutable.Queue.empty
 
-  private def enqueue(op: ZkOp): Future[op.Res] = synchronized {
+  private def enqueue(op: ZkOp): Future[op.Res] = synchronized
     opq = opq enqueue op
     op.res
-  }
 
   def exists(path: String) = enqueue(Exists(path))
   def existsWatch(path: String) = enqueue(ExistsWatch(path))
@@ -96,17 +83,16 @@ private class OpqueueZkReader(val sessionId: Long,
     enqueue(AddAuthInfo(scheme, auth))
 
   def getACL(path: String): Future[Node.ACL] = Future.never
-}
 
 @RunWith(classOf[JUnitRunner])
-class ZkSessionTest extends FunSuite with Eventually with IntegrationPatience {
+class ZkSessionTest extends FunSuite with Eventually with IntegrationPatience
 
   import ZkOp._
 
   val retryStream = RetryStream()
 
-  test("ops retry safely") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("ops retry safely")
+    Time.withCurrentTimeFrozen  tc =>
       implicit val timer = new MockTimer
       val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
       val zk = new ZkSession(retryStream, watchedZk, NullStatsReceiver)
@@ -137,11 +123,9 @@ class ZkSessionTest extends FunSuite with Eventually with IntegrationPatience {
                                         ExistsWatch("/foo/bar")))
       val Activity.Failed(exc) = ref.get
       assert(exc.isInstanceOf[KeeperException.SessionExpired])
-    }
-  }
 
-  test("ZkSession.globOf") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("ZkSession.globOf")
+    Time.withCurrentTimeFrozen  tc =>
       implicit val timer = new MockTimer
       val watchedZk = Watched(new OpqueueZkReader(), Var(WatchState.Pending))
       val zk = new ZkSession(retryStream, watchedZk, NullStatsReceiver)
@@ -176,11 +160,9 @@ class ZkSessionTest extends FunSuite with Eventually with IntegrationPatience {
         watchedZk.value.opq
       ew3.res() = Return(Watched(None, Var.value(WatchState.Pending)))
       assert(ref.get == Activity.Ok(Set.empty))
-    }
-  }
 
-  test("factory authenticates and closes on expiry") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("factory authenticates and closes on expiry")
+    Time.withCurrentTimeFrozen  tc =>
       val identity = Identities.get().head
       val authInfo = "%s:%s".format(identity, identity)
       implicit val timer = new MockTimer
@@ -191,35 +173,28 @@ class ZkSessionTest extends FunSuite with Eventually with IntegrationPatience {
           retryStream,
           () => new ZkSession(retryStream, watchedZk, NullStatsReceiver))
 
-      zk.changes.respond {
+      zk.changes.respond
         case _ => ()
-      }
 
       zkState() = WatchState.SessionState(SessionState.SyncConnected)
-      eventually {
+      eventually
         assert(watchedZk.value.opq == Seq(
                 AddAuthInfo("digest", Buf.Utf8(authInfo))))
-      }
 
       zkState() = WatchState.SessionState(SessionState.Expired)
       tc.advance(10.seconds)
       timer.tick()
-      eventually {
+      eventually
         assert(watchedZk.value.opq == Seq(
                 AddAuthInfo("digest", Buf.Utf8(authInfo)),
                 Close(Time.Bottom)
             ))
-      }
 
       zkState() = WatchState.SessionState(SessionState.SyncConnected)
-      eventually {
+      eventually
         assert(
             watchedZk.value.opq == Seq(
                 AddAuthInfo("digest", Buf.Utf8(authInfo)),
                 Close(Time.Bottom),
                 AddAuthInfo("digest", Buf.Utf8(authInfo))
             ))
-      }
-    }
-  }
-}

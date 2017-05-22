@@ -1,6 +1,6 @@
 package org.scalatra
 
-object ResponseStatus {
+object ResponseStatus
 
   def apply(code: Int): ResponseStatus =
     ResponseStatus(code, ReasonMap.getOrElse(code, ""))
@@ -68,18 +68,15 @@ object ResponseStatus {
       510 -> "Not Extended",
       511 -> "Network Authentication Required"
   )
-}
 
 case class ResponseStatus(code: Int, message: String)
-    extends Ordered[ResponseStatus] {
+    extends Ordered[ResponseStatus]
 
   def compare(that: ResponseStatus): Int = code.compareTo(that.code)
 
-  def line: String = {
+  def line: String =
     val buf = new StringBuilder(message.length + 5)
     buf.append(code)
     buf.append(' ')
     buf.append(message)
     buf.toString()
-  }
-}

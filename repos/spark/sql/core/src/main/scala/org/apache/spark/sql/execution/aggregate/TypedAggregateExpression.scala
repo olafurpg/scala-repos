@@ -28,9 +28,9 @@ import org.apache.spark.sql.catalyst.expressions.aggregate.ImperativeAggregate
 import org.apache.spark.sql.expressions.Aggregator
 import org.apache.spark.sql.types._
 
-object TypedAggregateExpression {
+object TypedAggregateExpression
   def apply[A, B : Encoder, C : Encoder](
-      aggregator: Aggregator[A, B, C]): TypedAggregateExpression = {
+      aggregator: Aggregator[A, B, C]): TypedAggregateExpression =
     new TypedAggregateExpression(
         aggregator.asInstanceOf[Aggregator[Any, Any, Any]],
         None,
@@ -39,8 +39,6 @@ object TypedAggregateExpression {
         Nil,
         0,
         0)
-  }
-}
 
 /**
   * This class is a rough sketch of how to hook `Aggregator` into the Aggregation system.  It has
@@ -55,7 +53,7 @@ case class TypedAggregateExpression(
     children: Seq[Attribute],
     mutableAggBufferOffset: Int,
     inputAggBufferOffset: Int)
-    extends ImperativeAggregate with Logging {
+    extends ImperativeAggregate with Logging
 
   override def withNewMutableAggBufferOffset(
       newMutableAggBufferOffset: Int): ImperativeAggregate =
@@ -68,11 +66,10 @@ case class TypedAggregateExpression(
   override def nullable: Boolean = true
 
   override def dataType: DataType =
-    if (cEncoder.flat) {
+    if (cEncoder.flat)
       cEncoder.schema.head.dataType
-    } else {
+    else
       cEncoder.schema
-    }
 
   override def deterministic: Boolean = true
 
@@ -97,11 +94,11 @@ case class TypedAggregateExpression(
   // We let the dataset do the binding for us.
   lazy val boundA = aEncoder.get
 
-  private def updateBuffer(buffer: MutableRow, value: InternalRow): Unit = {
+  private def updateBuffer(buffer: MutableRow, value: InternalRow): Unit =
     var i = 0
-    while (i < aggBufferAttributes.length) {
+    while (i < aggBufferAttributes.length)
       val offset = mutableAggBufferOffset + i
-      aggBufferSchema(i).dataType match {
+      aggBufferSchema(i).dataType match
         case BooleanType => buffer.setBoolean(offset, value.getBoolean(i))
         case ByteType => buffer.setByte(offset, value.getByte(i))
         case ShortType => buffer.setShort(offset, value.getShort(i))
@@ -110,46 +107,36 @@ case class TypedAggregateExpression(
         case FloatType => buffer.setFloat(offset, value.getFloat(i))
         case DoubleType => buffer.setDouble(offset, value.getDouble(i))
         case other => buffer.update(offset, value.get(i, other))
-      }
       i += 1
-    }
-  }
 
-  override def initialize(buffer: MutableRow): Unit = {
+  override def initialize(buffer: MutableRow): Unit =
     val zero = bEncoder.toRow(aggregator.zero)
     updateBuffer(buffer, zero)
-  }
 
-  override def update(buffer: MutableRow, input: InternalRow): Unit = {
+  override def update(buffer: MutableRow, input: InternalRow): Unit =
     val inputA = boundA.fromRow(input)
     val currentB = bEncoder.shift(mutableAggBufferOffset).fromRow(buffer)
     val merged = aggregator.reduce(currentB, inputA)
     val returned = bEncoder.toRow(merged)
 
     updateBuffer(buffer, returned)
-  }
 
-  override def merge(buffer1: MutableRow, buffer2: InternalRow): Unit = {
+  override def merge(buffer1: MutableRow, buffer2: InternalRow): Unit =
     val b1 = bEncoder.shift(mutableAggBufferOffset).fromRow(buffer1)
     val b2 = bEncoder.shift(inputAggBufferOffset).fromRow(buffer2)
     val merged = aggregator.merge(b1, b2)
     val returned = bEncoder.toRow(merged)
 
     updateBuffer(buffer1, returned)
-  }
 
-  override def eval(buffer: InternalRow): Any = {
+  override def eval(buffer: InternalRow): Any =
     val b = bEncoder.shift(mutableAggBufferOffset).fromRow(buffer)
     val result = cEncoder.toRow(aggregator.finish(b))
-    dataType match {
+    dataType match
       case _: StructType => result
       case _ => result.get(0, dataType)
-    }
-  }
 
-  override def toString: String = {
+  override def toString: String =
     s"""${aggregator.getClass.getSimpleName}(${children.mkString(",")})"""
-  }
 
   override def nodeName: String = aggregator.getClass.getSimpleName
-}

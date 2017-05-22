@@ -24,7 +24,7 @@ import scala.language.implicitConversions
   * Public API but not intended for subclassing
   */
 abstract class ServerSettings private[akka]()
-    extends akka.http.javadsl.settings.ServerSettings {
+    extends akka.http.javadsl.settings.ServerSettings
   self: ServerSettingsImpl ⇒
   def serverHeader: Option[Server]
   def timeouts: ServerSettings.Timeouts
@@ -57,9 +57,8 @@ abstract class ServerSettings private[akka]()
   override def getTimeouts = timeouts
   override def getRawRequestUriHeader = rawRequestUriHeader
   override def getRemoteAddressHeader = remoteAddressHeader
-  override def getWebsocketRandomFactory = new Supplier[Random] {
+  override def getWebsocketRandomFactory = new Supplier[Random]
     override def get(): Random = websocketRandomFactory()
-  }
 
   // ---
 
@@ -101,10 +100,9 @@ abstract class ServerSettings private[akka]()
   def withSocketOptions(
       newValue: immutable.Seq[SocketOption]): ServerSettings =
     self.copy(socketOptions = newValue)
-}
 
-object ServerSettings extends SettingsCompanion[ServerSettings] {
-  trait Timeouts extends akka.http.javadsl.settings.ServerSettings.Timeouts {
+object ServerSettings extends SettingsCompanion[ServerSettings]
+  trait Timeouts extends akka.http.javadsl.settings.ServerSettings.Timeouts
     // ---
     // override for more specific return types
     override def withIdleTimeout(newValue: Duration): ServerSettings.Timeouts =
@@ -115,7 +113,6 @@ object ServerSettings extends SettingsCompanion[ServerSettings] {
     override def withBindTimeout(
         newValue: FiniteDuration): ServerSettings.Timeouts =
       self.copy(bindTimeout = newValue)
-  }
 
   implicit def timeoutsShortcut(s: ServerSettings): Timeouts = s.timeouts
 
@@ -123,4 +120,3 @@ object ServerSettings extends SettingsCompanion[ServerSettings] {
     ServerSettingsImpl(config)
   override def apply(configOverrides: String): ServerSettings =
     ServerSettingsImpl(configOverrides)
-}

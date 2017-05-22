@@ -62,27 +62,25 @@ class Accumulable[R, T] private (val id: Long,
                                  val name: Option[String],
                                  internal: Boolean,
                                  private[spark] val countFailedValues: Boolean)
-    extends Serializable {
+    extends Serializable
 
   private[spark] def this(initialValue: R,
                           param: AccumulableParam[R, T],
                           name: Option[String],
                           internal: Boolean,
-                          countFailedValues: Boolean) = {
+                          countFailedValues: Boolean) =
     this(Accumulators.newId(),
          initialValue,
          param,
          name,
          internal,
          countFailedValues)
-  }
 
   private[spark] def this(initialValue: R,
                           param: AccumulableParam[R, T],
                           name: Option[String],
-                          internal: Boolean) = {
+                          internal: Boolean) =
     this(initialValue, param, name, internal, false /* countFailedValues */ )
-  }
 
   def this(
       initialValue: R, param: AccumulableParam[R, T], name: Option[String]) =
@@ -99,9 +97,8 @@ class Accumulable[R, T] private (val id: Long,
   // In many places we create internal accumulators without access to the active context cleaner,
   // so if we register them here then we may never unregister these accumulators. To avoid memory
   // leaks, we require the caller to explicitly register internal accumulators elsewhere.
-  if (!internal) {
+  if (!internal)
     Accumulators.register(this)
-  }
 
   /**
     * If this [[Accumulable]] is internal. Internal [[Accumulable]]s will be reported to the driver
@@ -117,10 +114,9 @@ class Accumulable[R, T] private (val id: Long,
     * [[Accumulators]] again. This method exists so that the caller can avoid passing the
     * same mutable instance around.
     */
-  private[spark] def copy(): Accumulable[R, T] = {
+  private[spark] def copy(): Accumulable[R, T] =
     new Accumulable[R, T](
         id, initialValue, param, name, internal, countFailedValues)
-  }
 
   /**
     * Add more data to this accumulator / accumulable
@@ -153,14 +149,12 @@ class Accumulable[R, T] private (val id: Long,
   /**
     * Access the accumulator's current value; only allowed on driver.
     */
-  def value: R = {
-    if (!deserialized) {
+  def value: R =
+    if (!deserialized)
       value_
-    } else {
+    else
       throw new UnsupportedOperationException(
           "Can't read accumulator value in task")
-    }
-  }
 
   /**
     * Get the current value of this accumulator from within a task.
@@ -176,14 +170,12 @@ class Accumulable[R, T] private (val id: Long,
   /**
     * Set the accumulator's value; only allowed on driver.
     */
-  def value_=(newValue: R) {
-    if (!deserialized) {
+  def value_=(newValue: R)
+    if (!deserialized)
       value_ = newValue
-    } else {
+    else
       throw new UnsupportedOperationException(
           "Can't assign accumulator value in task")
-    }
-  }
 
   /**
     * Set the accumulator's value. For internal use only.
@@ -193,21 +185,19 @@ class Accumulable[R, T] private (val id: Long,
   /**
     * Set the accumulator's value. For internal use only.
     */
-  private[spark] def setValueAny(newValue: Any): Unit = {
+  private[spark] def setValueAny(newValue: Any): Unit =
     setValue(newValue.asInstanceOf[R])
-  }
 
   /**
     * Create an [[AccumulableInfo]] representation of this [[Accumulable]] with the provided values.
     */
   private[spark] def toInfo(
-      update: Option[Any], value: Option[Any]): AccumulableInfo = {
+      update: Option[Any], value: Option[Any]): AccumulableInfo =
     new AccumulableInfo(id, name, update, value, internal, countFailedValues)
-  }
 
   // Called by Java when deserializing an object
   private def readObject(in: ObjectInputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       in.defaultReadObject()
       value_ = zero
       deserialized = true
@@ -216,14 +206,11 @@ class Accumulable[R, T] private (val id: Long,
       // This is for external accumulators and internal ones that do not represent task level
       // metrics, e.g. internal SQL metrics, which are per-operator.
       val taskContext = TaskContext.get()
-      if (taskContext != null) {
+      if (taskContext != null)
         taskContext.registerAccumulator(this)
-      }
-    }
 
   override def toString: String =
     if (value_ == null) "null" else value_.toString
-}
 
 /**
   * Helper object defining how to accumulate values of a particular type. An implicit
@@ -232,7 +219,7 @@ class Accumulable[R, T] private (val id: Long,
   * @tparam R the full accumulated data (result type)
   * @tparam T partial data that can be added in
   */
-trait AccumulableParam[R, T] extends Serializable {
+trait AccumulableParam[R, T] extends Serializable
 
   /**
     * Add additional data to the accumulator value. Is allowed to modify and return `r`
@@ -259,28 +246,23 @@ trait AccumulableParam[R, T] extends Serializable {
     * example, if R was a vector of N dimensions, this would return a vector of N zeroes.
     */
   def zero(initialValue: R): R
-}
 
 private[spark] class GrowableAccumulableParam[
     R <% Growable[T] with TraversableOnce[T] with Serializable : ClassTag, T]
-    extends AccumulableParam[R, T] {
+    extends AccumulableParam[R, T]
 
-  def addAccumulator(growable: R, elem: T): R = {
+  def addAccumulator(growable: R, elem: T): R =
     growable += elem
     growable
-  }
 
-  def addInPlace(t1: R, t2: R): R = {
+  def addInPlace(t1: R, t2: R): R =
     t1 ++= t2
     t1
-  }
 
-  def zero(initialValue: R): R = {
+  def zero(initialValue: R): R =
     // We need to clone initialValue, but it's hard to specify that R should also be Cloneable.
     // Instead we'll serialize it to a buffer and load it back.
     val ser = new JavaSerializer(new SparkConf(false)).newInstance()
     val copy = ser.deserialize[R](ser.serialize(initialValue))
     copy.clear() // In case it contained stuff
     copy
-  }
-}

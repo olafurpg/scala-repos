@@ -23,30 +23,25 @@ import org.junit.runner.RunWith
 import breeze.linalg.DenseVector
 
 @RunWith(classOf[JUnitRunner])
-class MultinomialTest extends FunSuite with Checkers with Matchers {
+class MultinomialTest extends FunSuite with Checkers with Matchers
   // can't use the standard moment tester tools for a categorial distribution, so let's just roll our ownkj
 
   def TestDist = DenseVector[Double](0.2, 0.5, 0.3)
   def TestParams = TestDist * 2.0
   def NSamples = 1e7.toInt
 
-  test("multinomial with naive sampling") {
+  test("multinomial with naive sampling")
     val mult = new Multinomial[DenseVector[Double], Int](TestParams)
     val accumNaive = DenseVector.zeros[Double](3)
-    (0 until NSamples) foreach { i =>
+    (0 until NSamples) foreach  i =>
       accumNaive(mult.drawNaive()) += 1
-    }
     accumNaive /= NSamples.toDouble
     accumNaive(2) should be(TestDist(2) +- 1e-3)
-  }
 
-  test("multinomial with alias sampling") {
+  test("multinomial with alias sampling")
     val mult = new Multinomial[DenseVector[Double], Int](TestParams)
     val accumAlias = DenseVector.zeros[Double](3)
-    (0 until NSamples) foreach { i =>
+    (0 until NSamples) foreach  i =>
       accumAlias(mult.draw()) += 1
-    }
     accumAlias /= NSamples.toDouble
     accumAlias(2) should be(TestDist(2) +- 1e-3)
-  }
-}

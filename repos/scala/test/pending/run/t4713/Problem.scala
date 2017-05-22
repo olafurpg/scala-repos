@@ -1,5 +1,3 @@
-object Problem {
-  def d() {
+object Problem
+  def d()
     val v: java.util.List[String] = JavaAnnots.Book
-  }
-}

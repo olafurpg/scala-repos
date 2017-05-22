@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 object Socket extends Socket
 
-private[socket] trait Socket {
+private[socket] trait Socket
 
   def makeMessage[A](t: String, data: A)(
       implicit writes: Writes[A]): JsObject =
@@ -13,4 +13,3 @@ private[socket] trait Socket {
   def makeMessage(t: String): JsObject = JsObject(List("t" -> JsString(t)))
 
   val initialPong = makeMessage("n")
-}

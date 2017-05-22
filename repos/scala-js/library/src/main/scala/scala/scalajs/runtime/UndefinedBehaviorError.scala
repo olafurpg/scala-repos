@@ -12,7 +12,7 @@ import scala.util.control.ControlThrowable
   *  Note that this will have (potentially major) performance impacts.
   */
 class UndefinedBehaviorError(message: String, cause: Throwable)
-    extends java.lang.Error(message, cause) with ControlThrowable {
+    extends java.lang.Error(message, cause) with ControlThrowable
 
   def this(message: String) = this(message, null)
 
@@ -23,4 +23,3 @@ class UndefinedBehaviorError(message: String, cause: Throwable)
 
   override def fillInStackTrace(): Throwable =
     super [Error].fillInStackTrace()
-}

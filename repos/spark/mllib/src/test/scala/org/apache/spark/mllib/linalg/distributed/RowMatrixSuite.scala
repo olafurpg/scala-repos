@@ -29,7 +29,7 @@ import org.apache.spark.mllib.linalg.{Matrices, Vector, Vectors}
 import org.apache.spark.mllib.random.RandomRDDs
 import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkContext}
 
-class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
+class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext
 
   val m = 4
   val n = 3
@@ -56,89 +56,73 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
   var denseMat: RowMatrix = _
   var sparseMat: RowMatrix = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     denseMat = new RowMatrix(sc.parallelize(denseData, 2))
     sparseMat = new RowMatrix(sc.parallelize(sparseData, 2))
-  }
 
-  test("size") {
+  test("size")
     assert(denseMat.numRows() === m)
     assert(denseMat.numCols() === n)
     assert(sparseMat.numRows() === m)
     assert(sparseMat.numCols() === n)
-  }
 
-  test("empty rows") {
+  test("empty rows")
     val rows = sc.parallelize(Seq[Vector](), 1)
     val emptyMat = new RowMatrix(rows)
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       emptyMat.numCols()
-    }
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       emptyMat.numRows()
-    }
-  }
 
-  test("toBreeze") {
+  test("toBreeze")
     val expected = BDM((0.0, 1.0, 2.0),
                        (3.0, 4.0, 5.0),
                        (6.0, 7.0, 8.0),
                        (9.0, 0.0, 1.0))
-    for (mat <- Seq(denseMat, sparseMat)) {
+    for (mat <- Seq(denseMat, sparseMat))
       assert(mat.toBreeze() === expected)
-    }
-  }
 
-  test("gram") {
+  test("gram")
     val expected = Matrices.dense(
         n, n, Array(126.0, 54.0, 72.0, 54.0, 66.0, 78.0, 72.0, 78.0, 94.0))
-    for (mat <- Seq(denseMat, sparseMat)) {
+    for (mat <- Seq(denseMat, sparseMat))
       val G = mat.computeGramianMatrix()
       assert(G.toBreeze === expected.toBreeze)
-    }
-  }
 
-  test("similar columns") {
+  test("similar columns")
     val colMags = Vectors.dense(math.sqrt(126), math.sqrt(66), math.sqrt(94))
     val expected = BDM((0.0, 54.0, 72.0), (0.0, 0.0, 78.0), (0.0, 0.0, 0.0))
 
-    for (i <- 0 until n; j <- 0 until n) {
+    for (i <- 0 until n; j <- 0 until n)
       expected(i, j) /= (colMags(i) * colMags(j))
-    }
 
-    for (mat <- Seq(denseMat, sparseMat)) {
+    for (mat <- Seq(denseMat, sparseMat))
       val G = mat.columnSimilarities(0.11).toBreeze()
-      for (i <- 0 until n; j <- 0 until n) {
-        if (expected(i, j) > 0) {
+      for (i <- 0 until n; j <- 0 until n)
+        if (expected(i, j) > 0)
           val actual = expected(i, j)
           val estimate = G(i, j)
           assert(math.abs(actual - estimate) / actual < 0.2,
                  s"Similarities not close enough: $actual vs $estimate")
-        }
-      }
-    }
 
-    for (mat <- Seq(denseMat, sparseMat)) {
+    for (mat <- Seq(denseMat, sparseMat))
       val G = mat.columnSimilarities()
       assert(closeToZero(G.toBreeze() - expected))
-    }
 
-    for (mat <- Seq(denseMat, sparseMat)) {
+    for (mat <- Seq(denseMat, sparseMat))
       val G = mat.columnSimilaritiesDIMSUM(colMags.toArray, 150.0)
       assert(closeToZero(G.toBreeze() - expected))
-    }
-  }
 
-  test("svd of a full-rank matrix") {
-    for (mat <- Seq(denseMat, sparseMat)) {
-      for (mode <- Seq("auto", "local-svd", "local-eigs", "dist-eigs")) {
+  test("svd of a full-rank matrix")
+    for (mat <- Seq(denseMat, sparseMat))
+      for (mode <- Seq("auto", "local-svd", "local-eigs", "dist-eigs"))
         val localMat = mat.toBreeze()
         val brzSvd.SVD(localU, localSigma, localVt) = brzSvd(localMat)
         val localV: BDM[Double] = localVt.t.toDenseMatrix
-        for (k <- 1 to n) {
+        for (k <- 1 to n)
           val skip = (mode == "local-eigs" || mode == "dist-eigs") && k == n
-          if (!skip) {
+          if (!skip)
             val svd =
               mat.computeSVD(k, computeU = true, 1e-9, 300, 1e-10, mode)
             val U = svd.U
@@ -154,19 +138,14 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                 V.toBreeze.asInstanceOf[BDM[Double]], localV, k)
             assert(closeToZero(s.toBreeze.asInstanceOf[BDV[Double]] -
                     localSigma(0 until k)))
-          }
-        }
         val svdWithoutU =
           mat.computeSVD(1, computeU = false, 1e-9, 300, 1e-10, mode)
         assert(svdWithoutU.U === null)
-      }
-    }
-  }
 
-  test("svd of a low-rank matrix") {
+  test("svd of a low-rank matrix")
     val rows = sc.parallelize(Array.fill(4)(Vectors.dense(1.0, 1.0, 1.0)), 2)
     val mat = new RowMatrix(rows, 4, 3)
-    for (mode <- Seq("auto", "local-svd", "local-eigs", "dist-eigs")) {
+    for (mode <- Seq("auto", "local-svd", "local-eigs", "dist-eigs"))
       val svd = mat.computeSVD(2, computeU = true, 1e-6, 300, 1e-10, mode)
       assert(svd.s.size === 1,
              s"should not return zero singular values but got ${svd.s}")
@@ -174,37 +153,28 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
       assert(svd.U.numCols() === 1)
       assert(svd.V.numRows === 3)
       assert(svd.V.numCols === 1)
-    }
-  }
 
-  test("validate k in svd") {
-    for (mat <- Seq(denseMat, sparseMat)) {
-      intercept[IllegalArgumentException] {
+  test("validate k in svd")
+    for (mat <- Seq(denseMat, sparseMat))
+      intercept[IllegalArgumentException]
         mat.computeSVD(-1)
-      }
-    }
-  }
 
-  def closeToZero(G: BDM[Double]): Boolean = {
+  def closeToZero(G: BDM[Double]): Boolean =
     G.valuesIterator.map(math.abs).sum < 1e-6
-  }
 
-  def closeToZero(v: BDV[Double]): Boolean = {
+  def closeToZero(v: BDV[Double]): Boolean =
     brzNorm(v, 1.0) < 1e-6
-  }
 
-  def assertColumnEqualUpToSign(A: BDM[Double], B: BDM[Double], k: Int) {
+  def assertColumnEqualUpToSign(A: BDM[Double], B: BDM[Double], k: Int)
     assert(A.rows === B.rows)
-    for (j <- 0 until k) {
+    for (j <- 0 until k)
       val aj = A(::, j)
       val bj = B(::, j)
       assert(closeToZero(aj - bj) || closeToZero(aj + bj),
              s"The $j-th columns mismatch: $aj and $bj")
-    }
-  }
 
-  test("pca") {
-    for (mat <- Seq(denseMat, sparseMat); k <- 1 to n) {
+  test("pca")
+    for (mat <- Seq(denseMat, sparseMat); k <- 1 to n)
       val (pc, expVariance) =
         mat.computePrincipalComponentsAndExplainedVariance(k)
       assert(pc.numRows === n)
@@ -215,12 +185,10 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
               BDV(Arrays.copyOfRange(explainedVariance.data, 0, k))))
       // Check that this method returns the same answer
       assert(pc === mat.computePrincipalComponents(k))
-    }
-  }
 
-  test("multiply a local matrix") {
+  test("multiply a local matrix")
     val B = Matrices.dense(n, 2, Array(0.0, 1.0, 2.0, 3.0, 4.0, 5.0))
-    for (mat <- Seq(denseMat, sparseMat)) {
+    for (mat <- Seq(denseMat, sparseMat))
       val AB = mat.multiply(B)
       assert(AB.numRows() === m)
       assert(AB.numCols() === 2)
@@ -231,14 +199,12 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
               Vectors.dense(23.0, 86.0),
               Vectors.dense(2.0, 32.0)
           ))
-    }
-  }
 
-  test("compute column summary statistics") {
-    for (mat <- Seq(denseMat, sparseMat)) {
+  test("compute column summary statistics")
+    for (mat <- Seq(denseMat, sparseMat))
       val summary = mat.computeColumnSummaryStatistics()
       // Run twice to make sure no internal states are changed.
-      for (k <- 0 to 1) {
+      for (k <- 0 to 1)
         assert(summary.mean === Vectors.dense(4.5, 3.0, 4.0), "mean mismatch")
         assert(summary.variance === Vectors.dense(15.0, 10.0, 10.0),
                "variance mismatch")
@@ -254,12 +220,9 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
                "magnitude mismatch.")
         assert(summary.normL1 === Vectors.dense(18.0, 12.0, 16.0),
                "L1 norm mismatch")
-      }
-    }
-  }
 
-  test("QR Decomposition") {
-    for (mat <- Seq(denseMat, sparseMat)) {
+  test("QR Decomposition")
+    for (mat <- Seq(denseMat, sparseMat))
       val result = mat.tallSkinnyQR(true)
       val expected = breeze.linalg.qr.reduced(mat.toBreeze())
       val calcQ = result.Q
@@ -273,50 +236,38 @@ class RowMatrixSuite extends SparkFunSuite with MLlibTestSparkContext {
       assert(rOnly.Q == null)
       assert(closeToZero(abs(expected.r) -
               abs(rOnly.R.toBreeze.asInstanceOf[BDM[Double]])))
-    }
-  }
 
-  test("compute covariance") {
-    for (mat <- Seq(denseMat, sparseMat)) {
+  test("compute covariance")
+    for (mat <- Seq(denseMat, sparseMat))
       val result = mat.computeCovariance()
       val expected = breeze.linalg.cov(mat.toBreeze())
       assert(closeToZero(
               abs(expected) - abs(result.toBreeze.asInstanceOf[BDM[Double]])))
-    }
-  }
 
-  test("covariance matrix is symmetric (SPARK-10875)") {
+  test("covariance matrix is symmetric (SPARK-10875)")
     val rdd = RandomRDDs.normalVectorRDD(sc, 100, 10, 0, 0)
     val matrix = new RowMatrix(rdd)
     val cov = matrix.computeCovariance()
-    for (i <- 0 until cov.numRows; j <- 0 until i) {
+    for (i <- 0 until cov.numRows; j <- 0 until i)
       assert(cov(i, j) === cov(j, i))
-    }
-  }
-}
 
 class RowMatrixClusterSuite
-    extends SparkFunSuite with LocalClusterSparkContext {
+    extends SparkFunSuite with LocalClusterSparkContext
 
   var mat: RowMatrix = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     val m = 4
     val n = 200000
-    val rows = sc.parallelize(0 until m, 2).mapPartitionsWithIndex {
+    val rows = sc.parallelize(0 until m, 2).mapPartitionsWithIndex
       (idx, iter) =>
         val random = new Random(idx)
         iter.map(i => Vectors.dense(Array.fill(n)(random.nextDouble())))
-    }
     mat = new RowMatrix(rows)
-  }
 
-  test("task size should be small in svd") {
+  test("task size should be small in svd")
     val svd = mat.computeSVD(1, computeU = true)
-  }
 
-  test("task size should be small in summarize") {
+  test("task size should be small in summarize")
     val summary = mat.computeColumnSummaryStatistics()
-  }
-}

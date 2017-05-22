@@ -1,6 +1,6 @@
 import language.experimental.macros
 
-object Macros {
+object Macros
   def foo1 = macro ???
   foo1
 
@@ -10,4 +10,3 @@ object Macros {
 
   def foo3[T] = macro ???
   foo3[Int]
-}

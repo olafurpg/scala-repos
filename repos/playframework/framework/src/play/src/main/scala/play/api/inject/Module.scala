@@ -38,7 +38,7 @@ import scala.reflect.ClassTag
   *   )
   * }}}
   */
-abstract class Module {
+abstract class Module
 
   /**
     * Get the bindings provided by this module.
@@ -75,12 +75,11 @@ abstract class Module {
     */
   @varargs
   final def seq(bindings: Binding[_]*): Seq[Binding[_]] = bindings
-}
 
 /**
   * Locates and loads modules from the Play environment.
   */
-object Modules {
+object Modules
 
   private val DefaultModuleName = "Module"
 
@@ -97,7 +96,7 @@ object Modules {
     *         allowing ApplicationLoader implementations to reuse the same mechanism to load modules specific to them.
     */
   def locate(
-      environment: Environment, configuration: Configuration): Seq[Any] = {
+      environment: Environment, configuration: Configuration): Seq[Any] =
 
     val includes =
       configuration.getStringSeq("play.modules.enabled").getOrElse(Seq.empty)
@@ -111,7 +110,7 @@ object Modules {
     val defaultModule =
       if (excludes.contains(DefaultModuleName)) None
       else
-        try {
+        try
           val defaultModuleClass = environment.classLoader
             .loadClass(DefaultModuleName)
             .asInstanceOf[Class[Any]]
@@ -120,11 +119,10 @@ object Modules {
                               configuration,
                               DefaultModuleName,
                               () => defaultModuleClass))
-        } catch {
+        catch
           case e: ClassNotFoundException => None
-        }
 
-    moduleClassNames.map { className =>
+    moduleClassNames.map  className =>
       constructModule(environment,
                       configuration,
                       className,
@@ -132,40 +130,35 @@ object Modules {
                         environment.classLoader
                           .loadClass(className)
                           .asInstanceOf[Class[Any]])
-    }.toSeq ++ defaultModule
-  }
+    .toSeq ++ defaultModule
 
   private def constructModule[T](environment: Environment,
                                  configuration: Configuration,
                                  className: String,
-                                 loadModuleClass: () => Class[T]): T = {
-    try {
+                                 loadModuleClass: () => Class[T]): T =
+    try
       val moduleClass = loadModuleClass()
 
-      def tryConstruct(args: AnyRef*): Option[T] = {
-        val ctor: Option[Constructor[T]] = try {
+      def tryConstruct(args: AnyRef*): Option[T] =
+        val ctor: Option[Constructor[T]] = try
           val argTypes = args.map(_.getClass)
           Some(moduleClass.getConstructor(argTypes: _*))
-        } catch {
+        catch
           case _: NoSuchMethodException => None
           case _: SecurityException => None
-        }
         ctor.map(_.newInstance(args: _*))
-      }
 
-      {
         tryConstruct(environment, configuration)
-      } orElse {
+      orElse
         tryConstruct(new JavaEnvironment(environment),
                      new JavaConfiguration(configuration))
-      } orElse {
+      orElse
         tryConstruct()
-      } getOrElse {
+      getOrElse
         throw new PlayException(
             "No valid constructors",
             "Module [" + className + "] cannot be instantiated.")
-      }
-    } catch {
+    catch
       case e: PlayException => throw e
       case e: VirtualMachineError => throw e
       case e: ThreadDeath => throw e
@@ -174,6 +167,3 @@ object Modules {
             "Cannot load module",
             "Module [" + className + "] cannot be instantiated.",
             e)
-    }
-  }
-}

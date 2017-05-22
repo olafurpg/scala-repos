@@ -1,5 +1,5 @@
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     // these should give unboxed results
     println(().getClass)
     println(5.getClass)
@@ -12,5 +12,3 @@ object Test {
     println(5.##)
     println((5.asInstanceOf[AnyRef]).##)
     println((5: Any).##)
-  }
-}

@@ -24,25 +24,22 @@ import org.saddle._
   * instances provide implicit support for [[org.saddle.ops.NumericOps]] methods which are
   * inherited by Mat.
   */
-trait BinOpMat {
+trait BinOpMat
   // ***************
 
   // Binary element-wise operation on one Mat and one scalar
   final class MatSclrElemOp[
       OP <: ScalarOp, @spec(Int, Long, Double) A, @spec(Int, Long, Double) B, @spec(Int, Long, Double) C : ST](
       val op: BinOp[OP, A, B, C])
-      extends BinOp[OP, Mat[A], B, Mat[C]] {
-    def apply(v1: Mat[A], v2: B) = {
+      extends BinOp[OP, Mat[A], B, Mat[C]]
+    def apply(v1: Mat[A], v2: B) =
       val sz = v1.length
       val ar = new Array[C](sz)
       var i = 0
-      while (i < sz) {
+      while (i < sz)
         ar(i) = op(v1.raw(i), v2)
         i += 1
-      }
       Mat(v1.numRows, v1.numCols, ar)
-    }
-  }
 
   // concrete implementations
   implicit def MatSclrElmOpDDD[Op <: ScalarOp](
@@ -81,21 +78,18 @@ trait BinOpMat {
   final class MatMatElemOp[
       OP <: ScalarOp, @spec(Int, Long, Double) A, @spec(Int, Long, Double) B, @spec(Int, Long, Double) C : ST](
       op: BinOp[OP, A, B, C])
-      extends BinOp[OP, Mat[A], Mat[B], Mat[C]] {
+      extends BinOp[OP, Mat[A], Mat[B], Mat[C]]
 
-    def apply(v1: Mat[A], v2: Mat[B]) = {
+    def apply(v1: Mat[A], v2: Mat[B]) =
       require(v1.numRows == v2.numRows && v1.numCols == v2.numCols,
               "Mats must have the same size!")
       val sz = v1.length
       val ar = new Array[C](sz)
       var i = 0
-      while (i < sz) {
+      while (i < sz)
         ar(i) = op(v1.raw(i), v2.raw(i))
         i += 1
-      }
       Mat(v1.numRows, v1.numCols, ar)
-    }
-  }
 
   // concrete implementations
   implicit def MatMatElemOpDDD[Op <: ScalarOp](
@@ -135,27 +129,20 @@ trait BinOpMat {
   // Binary op: matrix/vector multiplication
   implicit def matmulOpWithVector[A, B, OP <: InnerProd](
       implicit cb: ST[B], na: NUM[A], nb: NUM[B]) =
-    new BinOp[InnerProd, Mat[A], Vec[B], Mat[Double]] {
-      def apply(m1: Mat[A], m2: Vec[B]): Mat[Double] = {
+    new BinOp[InnerProd, Mat[A], Vec[B], Mat[Double]]
+      def apply(m1: Mat[A], m2: Vec[B]): Mat[Double] =
         m1.mult(Mat(m2))
-      }
-    }
 
   // Binary op: vector/matrix multiplication
   implicit def vecmulOpWithMatrix[A, B, OP <: InnerProd](
       implicit cb: ST[A], na: NUM[A], nb: NUM[B]) =
-    new BinOp[InnerProd, Vec[A], Mat[B], Mat[Double]] {
-      def apply(m1: Vec[A], m2: Mat[B]): Mat[Double] = {
+    new BinOp[InnerProd, Vec[A], Mat[B], Mat[Double]]
+      def apply(m1: Vec[A], m2: Mat[B]): Mat[Double] =
         Mat(m1).transpose.mult(m2)
-      }
-    }
 
   // Binary op: matrix/matrix multiplication
   implicit def matmulOpWithMatrix[A, B, OP <: InnerProd](
       implicit cb: ST[B], na: NUM[A], nb: NUM[B]) =
-    new BinOp[InnerProd, Mat[A], Mat[B], Mat[Double]] {
-      def apply(m1: Mat[A], m2: Mat[B]): Mat[Double] = {
+    new BinOp[InnerProd, Mat[A], Mat[B], Mat[Double]]
+      def apply(m1: Mat[A], m2: Mat[B]): Mat[Double] =
         m1.mult(m2)
-      }
-    }
-}

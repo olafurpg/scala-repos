@@ -14,7 +14,7 @@ import org.junit.Assert._
   * @author Nikolay Obedin
   * @since 8/18/15.
   */
-class SbtRunnerTest extends UsefulTestCase {
+class SbtRunnerTest extends UsefulTestCase
 
   def testSbtLaunch_0_12_4(): Unit =
     doTestSbtLauncherVersionDetection("0.12.4")
@@ -43,36 +43,33 @@ class SbtRunnerTest extends UsefulTestCase {
   def testSbtLaunch_0_13_9(): Unit =
     doTestSbtLauncherVersionDetection("0.13.9")
 
-  def testMockLauncherWithoutSbtBootProperties(): Unit = {
+  def testMockLauncherWithoutSbtBootProperties(): Unit =
     val expectedVersion = "1.0.0"
     val launcherFile = generateMockLauncher(expectedVersion)
     assertTrue(launcherFile.exists())
     val actualVersion = SbtRunner.detectSbtVersion(tmpDirFile, launcherFile)
     assertEquals(expectedVersion, actualVersion)
-  }
 
-  def testEmptyMockLauncher(): Unit = {
+  def testEmptyMockLauncher(): Unit =
     val launcherFile = generateJarFileWithEntries()
     assertTrue(launcherFile.exists())
     val actualVersion = SbtRunner.detectSbtVersion(tmpDirFile, launcherFile)
     assertEquals(Sbt.LatestVersion, actualVersion)
-  }
 
   private val tmpDirFile: File = new File(FileUtil.getTempDirectory)
 
-  private def doTestSbtLauncherVersionDetection(sbtVersion: String): Unit = {
+  private def doTestSbtLauncherVersionDetection(sbtVersion: String): Unit =
     val sbtLaunchJar = getSbtLaunchJarForVersion(sbtVersion)
     assertTrue(
         s"$sbtLaunchJar is not found. Make sure it is downloaded by Ivy.",
         sbtLaunchJar.exists())
     val actualVersion = SbtRunner.detectSbtVersion(tmpDirFile, sbtLaunchJar)
     assertEquals(sbtVersion, actualVersion)
-  }
 
   private def getSbtLaunchJarForVersion(sbtVersion: String): File =
     new File(TestUtils.getIvyCachePath) / "org.scala-sbt" / "sbt-launch" / "jars" / s"sbt-launch-$sbtVersion.jar"
 
-  private def generateMockLauncher(implementationVersion: String): File = {
+  private def generateMockLauncher(implementationVersion: String): File =
     val manifestContents = s"""|Manifest-Version: 1.0
           |Implementation-Vendor: com.example
           |Implementation-Title: launcher
@@ -80,20 +77,15 @@ class SbtRunnerTest extends UsefulTestCase {
           |Main-Class: com.example.Main
       """.stripMargin
     generateJarFileWithEntries("META-INF/MANIFEST.MF" -> manifestContents)
-  }
 
-  private def generateJarFileWithEntries(entries: (String, String)*): File = {
+  private def generateJarFileWithEntries(entries: (String, String)*): File =
     val launcherFile = FileUtil.createTempFile("mockLauncher", ".jar", true)
     using(new JarOutputStream(
-            new BufferedOutputStream(new FileOutputStream(launcherFile)))) {
+            new BufferedOutputStream(new FileOutputStream(launcherFile))))
       out =>
-        entries.foreach {
+        entries.foreach
           case (name, contents) =>
             out.putNextEntry(new ZipEntry(name))
             out.write(contents.getBytes)
             out.closeEntry()
-        }
-    }
     launcherFile
-  }
-}

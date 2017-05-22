@@ -1,4 +1,4 @@
-object Test {
+object Test
   final val a = ""
   var b: a.type = a
   b = a
@@ -10,4 +10,3 @@ object Test {
   final val e = Thread.State.NEW
   var e1: e.type = e
   e1 = e
-}

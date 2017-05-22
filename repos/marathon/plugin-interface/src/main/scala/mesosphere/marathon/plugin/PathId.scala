@@ -3,7 +3,7 @@ package mesosphere.marathon.plugin
 /**
   * A path based identifier.
   */
-trait PathId {
+trait PathId
 
   /**
     * The path of this id.
@@ -17,4 +17,3 @@ trait PathId {
     * @return the string representation of that path
     */
   def toString: String
-}

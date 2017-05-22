@@ -31,7 +31,7 @@ import scala.reflect.runtime.universe._
 import json.JsonAST.JValue
 
 abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
-    extends MappedField[Boolean, T] {
+    extends MappedField[Boolean, T]
   private var data: Box[Boolean] = Full(defaultValue)
   private var orgData: Box[Boolean] = Full(defaultValue)
 
@@ -51,7 +51,7 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Boolean } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(name, manifest, new FieldConverter
 
       /**
         * The type of the field
@@ -86,20 +86,18 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
         * @return the field as a sequence of SourceFields
         */
       def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+    )
 
   protected def i_is_! = data openOr false
   protected def i_was_! = orgData openOr false
   protected[mapper] def doneWithSave() { orgData = data }
 
-  protected def real_i_set_!(value: Boolean): Boolean = {
+  protected def real_i_set_!(value: Boolean): Boolean =
     val boxed = Full(value)
-    if (boxed != data) {
+    if (boxed != data)
       data = boxed
       dirty_?(true)
-    }
     value
-  }
   override def readPermission_? = true
   override def writePermission_? = true
 
@@ -113,8 +111,8 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
 
   def asJsExp: JsExp = if (get) JE.JsTrue else JE.JsFalse
 
-  override def setFromAny(in: Any): Boolean = {
-    in match {
+  override def setFromAny(in: Any): Boolean =
+    in match
       case b: Boolean => this.set(b)
       case JsonAST.JBool(v) => this.set(v)
       case (b: Boolean) :: _ => this.set(b)
@@ -126,65 +124,54 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
       case null => this.set(false)
       case s: String => this.set(toBoolean(s))
       case o => this.set(toBoolean(o))
-    }
-  }
 
   protected def i_obscure_!(in: Boolean) = false
 
   def buildSetActualValue(accessor: Method,
                           inst: AnyRef,
-                          columnName: String): (T, AnyRef) => Unit = {
-    inst match {
-      case null => { (inst: T, v: AnyRef) =>
-          {
+                          columnName: String): (T, AnyRef) => Unit =
+    inst match
+      case null =>  (inst: T, v: AnyRef) =>
             val tv = getField(inst, accessor).asInstanceOf[MappedBoolean[T]];
             tv.data = Full(false)
-          }
-        }
-      case _ => { (inst: T, v: AnyRef) =>
-          {
+      case _ =>  (inst: T, v: AnyRef) =>
             val tv = getField(inst, accessor).asInstanceOf[MappedBoolean[T]];
             tv.data = Full(toBoolean(v))
-          }
-        }
-    }
-  }
 
-  private def allSet(in: Box[Boolean]) {
+  private def allSet(in: Box[Boolean])
     this.data = in
     this.orgData = in
-  }
 
   def buildSetLongValue(
       accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case tv: MappedBoolean[T] =>
           tv.allSet(if (isNull) Empty else Full(v != 0L))
-      })
+      )
 
   def buildSetStringValue(
       accessor: Method, columnName: String): (T, String) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case tv: MappedBoolean[T] =>
           tv.allSet(if (v == null) Empty else Full(toBoolean(v)))
-      })
+      )
 
   def buildSetDateValue(
       accessor: Method, columnName: String): (T, Date) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case tv: MappedBoolean[T] =>
           tv.allSet(if (v == null) Empty else Full(true))
-      })
+      )
 
   def buildSetBooleanValue(
       accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case tv: MappedBoolean[T] => tv.allSet(if (isNull) Empty else Full(v))
-      })
+      )
 
   /**
     * Given the driver type, return the string required to create the column in the database
@@ -196,4 +183,3 @@ abstract class MappedBoolean[T <: Mapper[T]](val fieldOwner: T)
     * Create an input field for the item
     */
   override def _toForm: Box[NodeSeq] = Full(SHtml.checkbox(get, this.apply _))
-}

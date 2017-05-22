@@ -15,7 +15,7 @@ import slick.util.{DumpInfo, RefId, ??}
 
 /** A profile for distributed queries. */
 class DistributedProfile(val profiles: RelationalProfile*)
-    extends MemoryQueryingProfile { self: DistributedProfile =>
+    extends MemoryQueryingProfile  self: DistributedProfile =>
 
   @deprecated(
       "Use the Profile object directly instead of calling `.profile` on it",
@@ -53,12 +53,11 @@ class DistributedProfile(val profiles: RelationalProfile*)
 
   val emptyHeapDB = HeapBackend.createEmptyDatabase
 
-  class QueryExecutorDef[R](tree: Node, param: Any) {
+  class QueryExecutorDef[R](tree: Node, param: Any)
     def run(implicit session: Backend#Session): R =
       createDistributedQueryInterpreter(param, session)
         .run(tree)
         .asInstanceOf[R]
-  }
 
   type ProfileAction[+R, +S <: NoStream, -E <: Effect] = FixedBasicAction[
       R, S, E]
@@ -67,31 +66,29 @@ class DistributedProfile(val profiles: RelationalProfile*)
 
   class QueryActionExtensionMethodsImpl[R, S <: NoStream](
       tree: Node, param: Any)
-      extends super.QueryActionExtensionMethodsImpl[R, S] {
+      extends super.QueryActionExtensionMethodsImpl[R, S]
     protected[this] val exe = createQueryExecutor[R](tree, param)
     def result: ProfileAction[R, S, Effect.Read] =
       new StreamingProfileAction[R, Any, Effect.Read]
       with SynchronousDatabaseAction[
-          R, Streaming[Any], Backend#This, Effect.Read] {
+          R, Streaming[Any], Backend#This, Effect.Read]
         def run(ctx: Backend#Context) = exe.run(ctx.session)
         def getDumpInfo = DumpInfo("DistributedProfile.ProfileAction")
         def head: ResultAction[Any, NoStream, Effect.Read] = ??
         def headOption: ResultAction[Option[Any], NoStream, Effect.Read] = ??
-      }.asInstanceOf[ProfileAction[R, S, Effect.Read]]
-  }
+      .asInstanceOf[ProfileAction[R, S, Effect.Read]]
 
   class StreamingQueryActionExtensionMethodsImpl[R, T](tree: Node, param: Any)
       extends QueryActionExtensionMethodsImpl[R, Streaming[T]](tree, param)
-      with super.StreamingQueryActionExtensionMethodsImpl[R, T] {
+      with super.StreamingQueryActionExtensionMethodsImpl[R, T]
     override def result: StreamingProfileAction[R, T, Effect.Read] =
       super.result.asInstanceOf[StreamingProfileAction[R, T, Effect.Read]]
-  }
 
   class DistributedQueryInterpreter(param: Any, session: Backend#Session)
-      extends QueryInterpreter(emptyHeapDB, param) {
+      extends QueryInterpreter(emptyHeapDB, param)
     import QueryInterpreter._
 
-    override def run(n: Node) = n match {
+    override def run(n: Node) = n match
       case ProfileComputation(compiled, profile, _) =>
         if (logger.isDebugEnabled) logDebug("Evaluating " + n)
         val idx = profiles.indexOf(profile)
@@ -117,9 +114,8 @@ class DistributedProfile(val profiles: RelationalProfile*)
                 .read(v.asInstanceOf[QueryInterpreter.ProductValue]))
         b.result()
       case n => super.run(n)
-    }
 
-    def wrapScalaValue(value: Any, tpe: Type): Any = tpe match {
+    def wrapScalaValue(value: Any, tpe: Type): Any = tpe match
       case ProductType(ts) =>
         val p = value.asInstanceOf[Product]
         new ProductValue(
@@ -132,98 +128,84 @@ class DistributedProfile(val profiles: RelationalProfile*)
         v.foreach(v => b += wrapScalaValue(v, elType))
         b.result()
       case _ => value
-    }
-  }
 
   /* internal: */
 
   /** Compile sub-queries with the appropriate profile */
-  class Distribute extends Phase {
+  class Distribute extends Phase
     import Util._
     val name = "distribute"
 
-    def apply(state: CompilerState) = state.map { tree =>
+    def apply(state: CompilerState) = state.map  tree =>
       // Collect the required profiles and tainting profiles for all subtrees
       val needed = new HashMap[RefId[Node], Set[RelationalProfile]]
       val taints = new HashMap[RefId[Node], Set[RelationalProfile]]
       def collect(
           n: Node,
-          scope: Scope): (Set[RelationalProfile], Set[RelationalProfile]) = {
+          scope: Scope): (Set[RelationalProfile], Set[RelationalProfile]) =
         val (dr: Set[RelationalProfile], tt: Set[RelationalProfile]) =
-          n match {
+          n match
             case t: TableNode =>
               (Set(t.profileTable
                      .asInstanceOf[RelationalProfile#Table[_]]
                      .tableProvider),
                Set.empty)
             case Ref(sym) =>
-              scope.get(sym) match {
+              scope.get(sym) match
                 case Some(nn) =>
                   val target = RefId(nn._1)
                   (Set.empty, needed(target) ++ taints(target))
                 case None =>
                   (Set.empty, Set.empty)
-              }
             case n =>
               var nnd = Set.empty[RelationalProfile]
               var ntt = Set.empty[RelationalProfile]
-              mapChildrenWithScope(n, { (n, sc) =>
+              mapChildrenWithScope(n,  (n, sc) =>
                 val (nd, tt) = collect(n, sc)
                 nnd ++= nd
                 ntt ++= tt
                 n
-              }, scope)
+              , scope)
               (nnd, ntt)
-          }
         needed += RefId(n) -> dr
         taints += RefId(n) -> tt
         (dr, tt)
-      }
       collect(tree, Scope(Map()))
-      def transform(n: Node): Node = {
+      def transform(n: Node): Node =
         val dr = needed(RefId(n))
         val tt = taints(RefId(n))
-        if (dr.size == 1 && (tt -- dr).isEmpty) {
+        if (dr.size == 1 && (tt -- dr).isEmpty)
           val compiled = dr.head.queryCompiler.run(n).tree
-          val substituteType = compiled.nodeType.replace {
+          val substituteType = compiled.nodeType.replace
             case CollectionType(cons, el) =>
               CollectionType(cons.iterableSubstitute, el)
-          }
           ProfileComputation(
               compiled :@ substituteType, dr.head, substituteType)
-        } else n.mapChildren(transform)
-      }
+        else n.mapChildren(transform)
       transform(tree)
-    }
 
     def mapChildrenWithScope(
         tree: Node, f: (Node, Scope) => Node, scope: Scope): Node =
-      tree match {
+      tree match
         case d: DefNode =>
           var local = scope
-          d.mapScopedChildren { (symO, ch) =>
+          d.mapScopedChildren  (symO, ch) =>
             val r = f(ch, local)
             symO.foreach(sym => local = local + (sym, r))
             r
-          }
         case n => n.mapChildren(ch => f(ch, scope))
-      }
 
-    case class Scope(m: Map[TermSymbol, (Node, Scope)]) {
+    case class Scope(m: Map[TermSymbol, (Node, Scope)])
       def get(s: TermSymbol) = m.get(s)
       def +(s: TermSymbol, n: Node) = Scope(m + (s -> (n, this)))
-    }
-  }
-}
 
 /** Represents a computation that needs to be performed by another profile.
   * Despite having a child it is a NullaryNode because the sub-computation
   * should be opaque to the query compiler. */
 final case class ProfileComputation(
     compiled: Node, profile: RelationalProfile, buildType: Type)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode with SimplyTypedNode
   type Self = ProfileComputation
   protected[this] def rebuild = copy()
   override def getDumpInfo =
     super.getDumpInfo.copy(mainInfo = profile.toString)
-}

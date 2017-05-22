@@ -1,6 +1,5 @@
 abstract class F[T] { def apply(s: T): Int }
 
-object NeedsNiceError {
+object NeedsNiceError
   def bar(x: F[_ >: String]) = ???
   bar(_.parseInt)
-}

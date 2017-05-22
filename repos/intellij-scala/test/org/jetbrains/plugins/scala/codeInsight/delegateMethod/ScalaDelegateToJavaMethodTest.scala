@@ -12,17 +12,16 @@ import org.junit.Assert._
   * Nikolay.Tropin
   * 2014-03-27
   */
-class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
+class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase
   protected override def tuneFixture(
-      moduleBuilder: JavaModuleFixtureBuilder[_ <: ModuleFixture]) {
+      moduleBuilder: JavaModuleFixtureBuilder[_ <: ModuleFixture])
     moduleBuilder.setMockJdkLevel(JavaModuleFixtureBuilder.MockJdkLevel.jdk15)
     moduleBuilder.addJdk(IdeaTestUtil.getMockJdk14Path.getPath)
-  }
 
   def runTest(javaText: String,
               scalaText: String,
               expectedText: String,
-              specifyRetType: Boolean = true) {
+              specifyRetType: Boolean = true)
     def clean(s: String): String = s.replace("\r", "").stripMargin.trim
 
     myFixture.addFileToProject("JavaClass.java", clean(javaText))
@@ -35,9 +34,8 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
       .invoke(myFixture.getProject, myFixture.getEditor, scalaFile)
     assertEquals(clean(expectedText), clean(scalaFile.getText))
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = oldSpecifyType
-  }
 
-  def testJavaFieldTarget() {
+  def testJavaFieldTarget()
     val javaText = """public class JavaClass {
         |    public static class D {
         |        public int foo(int i) {
@@ -54,9 +52,8 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |  def foo(i: Int): Int = d.foo(i)
         |}"""
     runTest(javaText, scalaText, result)
-  }
 
-  def testJavaGetterTarget() {
+  def testJavaGetterTarget()
     val javaText = """public class JavaClass {
         |    public static class D {
         |        public int foo(int i) {
@@ -75,9 +72,8 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |  def foo(i: Int): Int = getD.foo(i)
         |}"""
     runTest(javaText, scalaText, result)
-  }
 
-  def testPrivateFieldTarget() {
+  def testPrivateFieldTarget()
     val javaText = """public class JavaClass {
         |    public static class D {
         |        public int foo(int i) {
@@ -95,9 +91,8 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |
         |}"""
     runTest(javaText, scalaText, result)
-  }
 
-  def testDelegateToJavaMethod() {
+  def testDelegateToJavaMethod()
     val javaText = """public class JavaClass {
         |    public int foo(int i) {
         |        return i;
@@ -113,9 +108,8 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |  def foo(i: Int): Int = d.foo(i)
         |}"""
     runTest(javaText, scalaText, result)
-  }
 
-  def testDelegateToGenericTarget() {
+  def testDelegateToGenericTarget()
     val javaText = """public class JavaClass<T> {
         |    public T foo(T t) {
         |        return t;
@@ -131,9 +125,8 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |  def foo(t: Int): Int = d.foo(t)
         |}"""
     runTest(javaText, scalaText, result)
-  }
 
-  def testDelegateToJavaMethodWithTypeParameter() {
+  def testDelegateToJavaMethodWithTypeParameter()
     val javaText = """public class JavaClass {
         |    public <T> T foo() {
         |        return null;
@@ -150,9 +143,8 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |  def foo[T](): T = d.foo()
         |}"""
     runTest(javaText, scalaText, result)
-  }
 
-  def testDelegateToJavaMethodWithTypeParameter2() {
+  def testDelegateToJavaMethodWithTypeParameter2()
     val javaText = """public class JavaClass {
         |    public <T> T foo() {
         |        return null;
@@ -169,12 +161,9 @@ class ScalaDelegateToJavaMethodTest extends JavaCodeInsightFixtureTestCase {
         |  def foo[T]() = d.foo[T]()
         |}"""
     runTest(javaText, scalaText, result, specifyRetType = false)
-  }
 
-  def template() {
+  def template()
     val javaText = """"""
     val scalaText = """"""
     val result = """"""
     runTest(javaText, scalaText, result)
-  }
-}

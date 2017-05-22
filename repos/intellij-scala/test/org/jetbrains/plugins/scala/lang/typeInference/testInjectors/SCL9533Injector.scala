@@ -7,8 +7,6 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembe
   * @author Alefas
   * @since 16/02/16
   */
-class SCL9533Injector extends SyntheticMembersInjector {
-  override def needsCompanionObject(source: ScTypeDefinition): Boolean = {
+class SCL9533Injector extends SyntheticMembersInjector
+  override def needsCompanionObject(source: ScTypeDefinition): Boolean =
     source.findAnnotation("something.enhance") != null
-  }
-}

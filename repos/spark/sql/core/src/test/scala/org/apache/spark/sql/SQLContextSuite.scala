@@ -22,21 +22,19 @@ import org.apache.spark.sql.catalyst.plans.logical.LogicalPlan
 import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.internal.SQLConf
 
-class SQLContextSuite extends SparkFunSuite with SharedSparkContext {
+class SQLContextSuite extends SparkFunSuite with SharedSparkContext
 
-  object DummyRule extends Rule[LogicalPlan] {
+  object DummyRule extends Rule[LogicalPlan]
     def apply(p: LogicalPlan): LogicalPlan = p
-  }
 
-  test("getOrCreate instantiates SQLContext") {
+  test("getOrCreate instantiates SQLContext")
     val sqlContext = SQLContext.getOrCreate(sc)
     assert(sqlContext != null, "SQLContext.getOrCreate returned null")
     assert(
         SQLContext.getOrCreate(sc).eq(sqlContext),
         "SQLContext created by SQLContext.getOrCreate not returned by SQLContext.getOrCreate")
-  }
 
-  test("getOrCreate return the original SQLContext") {
+  test("getOrCreate return the original SQLContext")
     val sqlContext = SQLContext.getOrCreate(sc)
     val newSession = sqlContext.newSession()
     assert(
@@ -46,9 +44,8 @@ class SQLContextSuite extends SparkFunSuite with SharedSparkContext {
     assert(
         SQLContext.getOrCreate(sc).eq(newSession),
         "SQLContext.getOrCreate after explicitly setActive() did not return the active context")
-  }
 
-  test("Sessions of SQLContext") {
+  test("Sessions of SQLContext")
     val sqlContext = SQLContext.getOrCreate(sc)
     val session1 = sqlContext.newSession()
     val session2 = sqlContext.newSession()
@@ -71,16 +68,12 @@ class SQLContextSuite extends SparkFunSuite with SharedSparkContext {
     def myadd(a: Int, b: Int): Int = a + b
     session1.udf.register[Int, Int, Int]("myadd", myadd)
     session1.sql("select myadd(1, 2)").explain()
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       session2.sql("select myadd(1, 2)").explain()
-    }
-  }
 
-  test("Catalyst optimization passes are modifiable at runtime") {
+  test("Catalyst optimization passes are modifiable at runtime")
     val sqlContext = SQLContext.getOrCreate(sc)
     sqlContext.experimental.extraOptimizations = Seq(DummyRule)
     assert(sqlContext.sessionState.optimizer.batches
           .flatMap(_.rules)
           .contains(DummyRule))
-  }
-}

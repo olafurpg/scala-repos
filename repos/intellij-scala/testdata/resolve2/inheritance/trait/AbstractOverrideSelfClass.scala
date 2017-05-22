@@ -1,13 +1,10 @@
-trait I {
+trait I
   def f = {}
-}
 
-trait T { self: I =>
+trait T  self: I =>
   abstract override def f = {}
-}
 
-class C extends I with T {
+class C extends I with T
   println( /* line: 6 */ f)
   println(this. /* line: 6 */ f)
   println(super. /* line: 6 */ f)
-}

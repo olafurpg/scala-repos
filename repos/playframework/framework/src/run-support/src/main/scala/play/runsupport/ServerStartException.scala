@@ -3,6 +3,5 @@ package play.runsupport
 import sbt.FeedbackProvidedException
 
 class ServerStartException(underlying: Throwable)
-    extends FeedbackProvidedException {
+    extends FeedbackProvidedException
   override def getMessage = underlying.getMessage
-}

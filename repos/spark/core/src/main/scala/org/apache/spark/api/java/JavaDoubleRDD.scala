@@ -31,7 +31,7 @@ import org.apache.spark.util.StatCounter
 import org.apache.spark.util.Utils
 
 class JavaDoubleRDD(val srdd: RDD[scala.Double])
-    extends AbstractJavaRDDLike[JDouble, JavaDoubleRDD] {
+    extends AbstractJavaRDDLike[JDouble, JavaDoubleRDD]
 
   override val classTag: ClassTag[JDouble] = implicitly[ClassTag[JDouble]]
 
@@ -242,10 +242,9 @@ class JavaDoubleRDD(val srdd: RDD[scala.Double])
     * If the RDD contains infinity, NaN throws an exception
     * If the elements in RDD do not vary (max == min) always returns a single bucket.
     */
-  def histogram(bucketCount: Int): (Array[scala.Double], Array[Long]) = {
+  def histogram(bucketCount: Int): (Array[scala.Double], Array[Long]) =
     val result = srdd.histogram(bucketCount)
     (result._1, result._2)
-  }
 
   /**
     * Compute a histogram using the provided buckets. The buckets are all open
@@ -264,23 +263,18 @@ class JavaDoubleRDD(val srdd: RDD[scala.Double])
     * the maximum value of the last position and all NaN entries will be counted
     * in that bucket.
     */
-  def histogram(buckets: Array[scala.Double]): Array[Long] = {
+  def histogram(buckets: Array[scala.Double]): Array[Long] =
     srdd.histogram(buckets, false)
-  }
 
-  def histogram(buckets: Array[JDouble], evenBuckets: Boolean): Array[Long] = {
+  def histogram(buckets: Array[JDouble], evenBuckets: Boolean): Array[Long] =
     srdd.histogram(buckets.map(_.toDouble), evenBuckets)
-  }
 
   /** Assign a name to this RDD */
-  def setName(name: String): JavaDoubleRDD = {
+  def setName(name: String): JavaDoubleRDD =
     srdd.setName(name)
     this
-  }
-}
 
-object JavaDoubleRDD {
+object JavaDoubleRDD
   def fromRDD(rdd: RDD[scala.Double]): JavaDoubleRDD = new JavaDoubleRDD(rdd)
 
   implicit def toRDD(rdd: JavaDoubleRDD): RDD[scala.Double] = rdd.srdd
-}

@@ -6,17 +6,15 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class KeyEncodingCacheTest extends AbstractFutureCacheTest {
+class KeyEncodingCacheTest extends AbstractFutureCacheTest
   def name: String = "KeyEncodingCache"
 
-  def mkCtx(): Ctx = new Ctx {
+  def mkCtx(): Ctx = new Ctx
     val underlyingMap: ConcurrentHashMap[Int, Future[String]] =
       new ConcurrentHashMap()
     val underlyingCache: FutureCache[Int, String] = new ConcurrentMapCache(
         underlyingMap)
-    val cache: FutureCache[String, String] = new KeyEncodingCache({
+    val cache: FutureCache[String, String] = new KeyEncodingCache(
       num: String =>
         num.hashCode
-    }, underlyingCache)
-  }
-}
+    , underlyingCache)

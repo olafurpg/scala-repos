@@ -15,8 +15,8 @@ class C1C[
     @spec(Double, Int, AnyRef) B
 ](v: A, w: B)
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     println(new C1A[String, Int].getClass.getName)
     println(new C1A[String, Double].getClass.getName)
     println(new C1A[String, String].getClass.getName)
@@ -47,5 +47,3 @@ object Test {
     println(new C1C(1d, 1).getClass.getName)
     println(new C1C(1d, 1d).getClass.getName)
     println(new C1C(1d, "a").getClass.getName)
-  }
-}

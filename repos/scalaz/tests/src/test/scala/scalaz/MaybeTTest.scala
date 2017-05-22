@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object MaybeTTest extends SpecLite {
+object MaybeTTest extends SpecLite
 
   type MaybeTList[A] = MaybeT[List, A]
   type IntOr[A] = Int \/ A
@@ -16,7 +16,7 @@ object MaybeTTest extends SpecLite {
   checkAll(traverse.laws[MaybeTList])
   checkAll(monadError.laws[MaybeTEither, Int])
 
-  object instances {
+  object instances
     def functor[F[_]: Functor] = Functor[MaybeT[F, ?]]
     def monad[F[_]: Monad] = MonadPlus[MaybeT[F, ?]]
     def bindRec[F[_]: Monad : BindRec] = BindRec[MaybeT[F, ?]]
@@ -33,5 +33,3 @@ object MaybeTTest extends SpecLite {
     def apply[F[_]: Monad] = Apply[MaybeT[F, ?]]
     def foldable[F[_]: Traverse] = Foldable[MaybeT[F, ?]]
     def monadEither[E] = Monad[MaybeT[E \/ ?, ?]]
-  }
-}

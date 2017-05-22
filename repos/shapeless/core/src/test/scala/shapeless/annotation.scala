@@ -20,7 +20,7 @@ import scala.annotation.{Annotation => saAnnotation}
 import org.junit.Test
 import shapeless.test.illTyped
 
-object AnnotationTestsDefinitions {
+object AnnotationTestsDefinitions
 
   case class First() extends saAnnotation
   case class Second(i: Int, s: String) extends saAnnotation
@@ -45,40 +45,32 @@ object AnnotationTestsDefinitions {
   case class BaseS(s: String) extends Base
 
   trait Dummy
-}
 
-class AnnotationTests {
+class AnnotationTests
   import AnnotationTestsDefinitions._
 
-  def simpleAnnotation {
-    {
+  def simpleAnnotation
       val other = Annotation[Other, CC].apply()
       assert(other == Other())
 
       val last = Annotation[Last, Something].apply()
       assert(last == Last(true))
-    }
 
-    {
       val other: Other = Annotation[Other, CC].apply()
       assert(other == Other())
 
       val last: Last = Annotation[Last, Something].apply()
       assert(last == Last(true))
-    }
-  }
 
   @Test
-  def invalidAnnotation {
+  def invalidAnnotation
     illTyped(" Annotation[Other, Dummy] ",
              "could not find implicit value for parameter annotation: .*")
     illTyped(" Annotation[Dummy, CC] ",
              "could not find implicit value for parameter annotation: .*")
-  }
 
   @Test
-  def simpleAnnotations {
-    {
+  def simpleAnnotations
       val first: Some[First] :: None.type :: None.type :: HNil =
         Annotations[First, CC].apply()
       assert(first == Some(First()) :: None :: None :: HNil)
@@ -98,9 +90,7 @@ class AnnotationTests {
       val secondSum: None.type :: Some[Second] :: HNil =
         Annotations[Second, Base].apply()
       assert(secondSum == None :: Some(Second(3, "e")) :: HNil)
-    }
 
-    {
       val first = Annotations[First, CC].apply()
       assert(first == Some(First()) :: None :: None :: HNil)
 
@@ -115,16 +105,12 @@ class AnnotationTests {
 
       val secondSum = Annotations[Second, Base].apply()
       assert(secondSum == None :: Some(Second(3, "e")) :: HNil)
-    }
-  }
 
   @Test
-  def invalidAnnotations {
+  def invalidAnnotations
     illTyped(" Annotations[Dummy, CC] ",
              "could not find implicit value for parameter annotations: .*")
     illTyped(" Annotations[Dummy, Base] ",
              "could not find implicit value for parameter annotations: .*")
     illTyped(" Annotations[Second, Dummy] ",
              "could not find implicit value for parameter annotations: .*")
-  }
-}

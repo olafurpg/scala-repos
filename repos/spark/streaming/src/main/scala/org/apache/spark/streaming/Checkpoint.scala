@@ -33,7 +33,7 @@ import org.apache.spark.util.Utils
 
 private[streaming] class Checkpoint(
     ssc: StreamingContext, val checkpointTime: Time)
-    extends Logging with Serializable {
+    extends Logging with Serializable
   val master = ssc.sc.master
   val framework = ssc.sc.appName
   val jars = ssc.sc.jars
@@ -43,7 +43,7 @@ private[streaming] class Checkpoint(
   val pendingTimes = ssc.scheduler.getPendingTimes().toArray
   val sparkConfPairs = ssc.conf.getAll
 
-  def createSparkConf(): SparkConf = {
+  def createSparkConf(): SparkConf =
 
     // Reload properties for the checkpoint application since user wants to set a reload property
     // or spark had changed its value and user wants to set it back.
@@ -61,100 +61,83 @@ private[streaming] class Checkpoint(
       .remove("spark.driver.host")
       .remove("spark.driver.port")
     val newReloadConf = new SparkConf(loadDefaults = true)
-    propertiesToReload.foreach { prop =>
-      newReloadConf.getOption(prop).foreach { value =>
+    propertiesToReload.foreach  prop =>
+      newReloadConf.getOption(prop).foreach  value =>
         newSparkConf.set(prop, value)
-      }
-    }
 
     // Add Yarn proxy filter specific configurations to the recovered SparkConf
     val filter = "org.apache.hadoop.yarn.server.webproxy.amfilter.AmIpFilter"
     val filterPrefix = s"spark.$filter.param."
-    newReloadConf.getAll.foreach {
+    newReloadConf.getAll.foreach
       case (k, v) =>
-        if (k.startsWith(filterPrefix) && k.length > filterPrefix.length) {
+        if (k.startsWith(filterPrefix) && k.length > filterPrefix.length)
           newSparkConf.set(k, v)
-        }
-    }
 
     newSparkConf
-  }
 
-  def validate() {
+  def validate()
     assert(master != null, "Checkpoint.master is null")
     assert(framework != null, "Checkpoint.framework is null")
     assert(graph != null, "Checkpoint.graph is null")
     assert(checkpointTime != null, "Checkpoint.checkpointTime is null")
     logInfo("Checkpoint for time " + checkpointTime + " validated")
-  }
-}
 
-private[streaming] object Checkpoint extends Logging {
+private[streaming] object Checkpoint extends Logging
   val PREFIX = "checkpoint-"
   val REGEX = (PREFIX + """([\d]+)([\w\.]*)""").r
 
   /** Get the checkpoint file for the given checkpoint time */
-  def checkpointFile(checkpointDir: String, checkpointTime: Time): Path = {
+  def checkpointFile(checkpointDir: String, checkpointTime: Time): Path =
     new Path(checkpointDir, PREFIX + checkpointTime.milliseconds)
-  }
 
   /** Get the checkpoint backup file for the given checkpoint time */
-  def checkpointBackupFile(checkpointDir: String, checkpointTime: Time): Path = {
+  def checkpointBackupFile(checkpointDir: String, checkpointTime: Time): Path =
     new Path(checkpointDir, PREFIX + checkpointTime.milliseconds + ".bk")
-  }
 
   /** Get checkpoint files present in the give directory, ordered by oldest-first */
   def getCheckpointFiles(checkpointDir: String,
-                         fsOption: Option[FileSystem] = None): Seq[Path] = {
+                         fsOption: Option[FileSystem] = None): Seq[Path] =
 
-    def sortFunc(path1: Path, path2: Path): Boolean = {
-      val (time1, bk1) = path1.getName match {
+    def sortFunc(path1: Path, path2: Path): Boolean =
+      val (time1, bk1) = path1.getName match
         case REGEX(x, y) => (x.toLong, !y.isEmpty)
-      }
-      val (time2, bk2) = path2.getName match {
+      val (time2, bk2) = path2.getName match
         case REGEX(x, y) => (x.toLong, !y.isEmpty)
-      }
       (time1 < time2) || (time1 == time2 && bk1)
-    }
 
     val path = new Path(checkpointDir)
     val fs = fsOption.getOrElse(path.getFileSystem(SparkHadoopUtil.get.conf))
-    if (fs.exists(path)) {
+    if (fs.exists(path))
       val statuses = fs.listStatus(path)
-      if (statuses != null) {
+      if (statuses != null)
         val paths = statuses.map(_.getPath)
         val filtered =
           paths.filter(p => REGEX.findFirstIn(p.toString).nonEmpty)
         filtered.sortWith(sortFunc)
-      } else {
+      else
         logWarning("Listing " + path + " returned null")
         Seq.empty
-      }
-    } else {
+    else
       logInfo("Checkpoint directory " + path + " does not exist")
       Seq.empty
-    }
-  }
 
   /** Serialize the checkpoint, or throw any exception that occurs */
-  def serialize(checkpoint: Checkpoint, conf: SparkConf): Array[Byte] = {
+  def serialize(checkpoint: Checkpoint, conf: SparkConf): Array[Byte] =
     val compressionCodec = CompressionCodec.createCodec(conf)
     val bos = new ByteArrayOutputStream()
     val zos = compressionCodec.compressedOutputStream(bos)
     val oos = new ObjectOutputStream(zos)
-    Utils.tryWithSafeFinally {
+    Utils.tryWithSafeFinally
       oos.writeObject(checkpoint)
-    } {
+    
       oos.close()
-    }
     bos.toByteArray
-  }
 
   /** Deserialize a checkpoint from the input stream, or throw any exception that occurs */
-  def deserialize(inputStream: InputStream, conf: SparkConf): Checkpoint = {
+  def deserialize(inputStream: InputStream, conf: SparkConf): Checkpoint =
     val compressionCodec = CompressionCodec.createCodec(conf)
     var ois: ObjectInputStreamWithLoader = null
-    Utils.tryWithSafeFinally {
+    Utils.tryWithSafeFinally
 
       // ObjectInputStream uses the last defined user-defined class loader in the stack
       // to find classes, which maybe the wrong class loader. Hence, a inherited version
@@ -167,13 +150,9 @@ private[streaming] object Checkpoint extends Logging {
       val cp = ois.readObject.asInstanceOf[Checkpoint]
       cp.validate()
       cp
-    } {
-      if (ois != null) {
+    
+      if (ois != null)
         ois.close()
-      }
-    }
-  }
-}
 
 /**
   * Convenience class to handle the writing of graph checkpoint to file
@@ -184,7 +163,7 @@ private[streaming] class CheckpointWriter(
     checkpointDir: String,
     hadoopConf: Configuration
 )
-    extends Logging {
+    extends Logging
   val MAX_ATTEMPTS = 3
   val executor = Executors.newFixedThreadPool(1)
   val compressionCodec = CompressionCodec.createCodec(conf)
@@ -196,12 +175,11 @@ private[streaming] class CheckpointWriter(
   class CheckpointWriteHandler(checkpointTime: Time,
                                bytes: Array[Byte],
                                clearCheckpointDataLater: Boolean)
-      extends Runnable {
-    def run() {
+      extends Runnable
+    def run()
       if (latestCheckpointTime == null ||
-          latestCheckpointTime < checkpointTime) {
+          latestCheckpointTime < checkpointTime)
         latestCheckpointTime = checkpointTime
-      }
       var attempts = 0
       val startTime = System.currentTimeMillis()
       val tempFile = new Path(checkpointDir, "temp")
@@ -219,54 +197,46 @@ private[streaming] class CheckpointWriter(
       val backupFile =
         Checkpoint.checkpointBackupFile(checkpointDir, latestCheckpointTime)
 
-      while (attempts < MAX_ATTEMPTS && !stopped) {
+      while (attempts < MAX_ATTEMPTS && !stopped)
         attempts += 1
-        try {
+        try
           logInfo(
               "Saving checkpoint for time " + checkpointTime + " to file '" +
               checkpointFile + "'")
 
           // Write checkpoint to temp file
-          if (fs.exists(tempFile)) {
+          if (fs.exists(tempFile))
             fs.delete(tempFile, true) // just in case it exists
-          }
           val fos = fs.create(tempFile)
-          Utils.tryWithSafeFinally {
+          Utils.tryWithSafeFinally
             fos.write(bytes)
-          } {
+          
             fos.close()
-          }
 
           // If the checkpoint file exists, back it up
           // If the backup exists as well, just delete it, otherwise rename will fail
-          if (fs.exists(checkpointFile)) {
-            if (fs.exists(backupFile)) {
+          if (fs.exists(checkpointFile))
+            if (fs.exists(backupFile))
               fs.delete(backupFile, true) // just in case it exists
-            }
-            if (!fs.rename(checkpointFile, backupFile)) {
+            if (!fs.rename(checkpointFile, backupFile))
               logWarning(
                   "Could not rename " + checkpointFile + " to " + backupFile)
-            }
-          }
 
           // Rename temp file to the final checkpoint file
-          if (!fs.rename(tempFile, checkpointFile)) {
+          if (!fs.rename(tempFile, checkpointFile))
             logWarning(
                 "Could not rename " + tempFile + " to " + checkpointFile)
-          }
 
           // Delete old checkpoint files
           val allCheckpointFiles =
             Checkpoint.getCheckpointFiles(checkpointDir, Some(fs))
-          if (allCheckpointFiles.size > 10) {
+          if (allCheckpointFiles.size > 10)
             allCheckpointFiles
               .take(allCheckpointFiles.size - 10)
               .foreach(file =>
-                    {
                   logInfo("Deleting " + file)
                   fs.delete(file, true)
-              })
-          }
+              )
 
           // All done, print success
           val finishTime = System.currentTimeMillis()
@@ -277,73 +247,61 @@ private[streaming] class CheckpointWriter(
           jobGenerator.onCheckpointCompletion(
               checkpointTime, clearCheckpointDataLater)
           return
-        } catch {
+        catch
           case ioe: IOException =>
             logWarning("Error in attempt " + attempts +
                        " of writing checkpoint to " + checkpointFile,
                        ioe)
             reset()
-        }
-      }
       logWarning("Could not write checkpoint for time " + checkpointTime +
           " to file " + checkpointFile + "'")
-    }
-  }
 
-  def write(checkpoint: Checkpoint, clearCheckpointDataLater: Boolean) {
-    try {
+  def write(checkpoint: Checkpoint, clearCheckpointDataLater: Boolean)
+    try
       val bytes = Checkpoint.serialize(checkpoint, conf)
       executor.execute(new CheckpointWriteHandler(
               checkpoint.checkpointTime, bytes, clearCheckpointDataLater))
       logInfo("Submitted checkpoint of time " + checkpoint.checkpointTime +
           " writer queue")
-    } catch {
+    catch
       case rej: RejectedExecutionException =>
         logError(
             "Could not submit checkpoint task to the thread pool executor",
             rej)
-    }
-  }
 
-  def stop(): Unit = synchronized {
+  def stop(): Unit = synchronized
     if (stopped) return
 
     executor.shutdown()
     val startTime = System.currentTimeMillis()
     val terminated =
       executor.awaitTermination(10, java.util.concurrent.TimeUnit.SECONDS)
-    if (!terminated) {
+    if (!terminated)
       executor.shutdownNow()
-    }
     val endTime = System.currentTimeMillis()
     logInfo("CheckpointWriter executor terminated ? " + terminated +
         ", waited for " + (endTime - startTime) + " ms.")
     stopped = true
-  }
 
-  private def fs = synchronized {
+  private def fs = synchronized
     if (_fs == null) _fs = new Path(checkpointDir).getFileSystem(hadoopConf)
     _fs
-  }
 
-  private def reset() = synchronized {
+  private def reset() = synchronized
     _fs = null
-  }
-}
 
-private[streaming] object CheckpointReader extends Logging {
+private[streaming] object CheckpointReader extends Logging
 
   /**
     * Read checkpoint files present in the given checkpoint directory. If there are no checkpoint
     * files, then return None, else try to return the latest valid checkpoint object. If no
     * checkpoint files could be read correctly, then return None.
     */
-  def read(checkpointDir: String): Option[Checkpoint] = {
+  def read(checkpointDir: String): Option[Checkpoint] =
     read(checkpointDir,
          new SparkConf(),
          SparkHadoopUtil.get.conf,
          ignoreReadError = true)
-  }
 
   /**
     * Read checkpoint files present in the given checkpoint directory. If there are no checkpoint
@@ -354,7 +312,7 @@ private[streaming] object CheckpointReader extends Logging {
   def read(checkpointDir: String,
            conf: SparkConf,
            hadoopConf: Configuration,
-           ignoreReadError: Boolean = false): Option[Checkpoint] = {
+           ignoreReadError: Boolean = false): Option[Checkpoint] =
     val checkpointPath = new Path(checkpointDir)
 
     // TODO(rxin): Why is this a def?!
@@ -363,52 +321,43 @@ private[streaming] object CheckpointReader extends Logging {
     // Try to find the checkpoint files
     val checkpointFiles =
       Checkpoint.getCheckpointFiles(checkpointDir, Some(fs)).reverse
-    if (checkpointFiles.isEmpty) {
+    if (checkpointFiles.isEmpty)
       return None
-    }
 
     // Try to read the checkpoint files in the order
     logInfo("Checkpoint files found: " + checkpointFiles.mkString(","))
     var readError: Exception = null
     checkpointFiles.foreach(
         file =>
-          {
         logInfo("Attempting to load checkpoint from file " + file)
-        try {
+        try
           val fis = fs.open(file)
           val cp = Checkpoint.deserialize(fis, conf)
           logInfo("Checkpoint successfully loaded from file " + file)
           logInfo("Checkpoint was generated at time " + cp.checkpointTime)
           return Some(cp)
-        } catch {
+        catch
           case e: Exception =>
             readError = e
             logWarning("Error reading checkpoint from file " + file, e)
-        }
-    })
+    )
 
     // If none of checkpoint files could be read, then throw exception
-    if (!ignoreReadError) {
+    if (!ignoreReadError)
       throw new SparkException(
           s"Failed to read checkpoint from directory $checkpointPath",
           readError)
-    }
     None
-  }
-}
 
 private[streaming] class ObjectInputStreamWithLoader(
     _inputStream: InputStream, loader: ClassLoader)
-    extends ObjectInputStream(_inputStream) {
+    extends ObjectInputStream(_inputStream)
 
-  override def resolveClass(desc: ObjectStreamClass): Class[_] = {
-    try {
+  override def resolveClass(desc: ObjectStreamClass): Class[_] =
+    try
       // scalastyle:off classforname
       return Class.forName(desc.getName(), false, loader)
       // scalastyle:on classforname
-    } catch {
+    catch
       case e: Exception =>
-    }
     super.resolveClass(desc)
-  }
-}

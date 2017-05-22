@@ -14,9 +14,8 @@ import scala.reflect.ClassTag
   * Extend from this class and implement `extractValue` to create a custom request val.
   */
 abstract class CustomRequestVal[T](clazz: Class[T])
-    extends StandaloneExtractionImpl[T]()(ClassTag(clazz)) {
+    extends StandaloneExtractionImpl[T]()(ClassTag(clazz))
   final def directive: Directive1[T] =
     extract(ctx ⇒ extractValue(RequestContextImpl(ctx)))
 
   protected def extractValue(ctx: RequestContext): T
-}

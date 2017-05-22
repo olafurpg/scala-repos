@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait BimonadTests[F[_]] extends MonadTests[F] with ComonadTests[F] {
+trait BimonadTests[F[_]] extends MonadTests[F] with ComonadTests[F]
   def laws: BimonadLaws[F]
 
   def bimonad[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
@@ -23,8 +23,8 @@ trait BimonadTests[F[_]] extends MonadTests[F] with ComonadTests[F] {
       EqFB: Eq[F[B]],
       EqFC: Eq[F[C]],
       EqFABC: Eq[F[(A, B, C)]],
-      iso: Isomorphisms[F]): RuleSet = {
-    new RuleSet {
+      iso: Isomorphisms[F]): RuleSet =
+    new RuleSet
       def name: String = "bimonad"
       def bases: Seq[(String, RuleSet)] = Nil
       def parents: Seq[RuleSet] = Seq(monad[A, B, C], comonad[A, B, C])
@@ -35,13 +35,8 @@ trait BimonadTests[F[_]] extends MonadTests[F] with ComonadTests[F] {
           "pure/coflatMap entwining" -> forAll(
               laws.pureCoflatMapEntwining[A] _)
       )
-    }
-  }
-}
 
-object BimonadTests {
+object BimonadTests
   def apply[F[_]: Bimonad]: BimonadTests[F] =
-    new BimonadTests[F] {
+    new BimonadTests[F]
       def laws: BimonadLaws[F] = BimonadLaws[F]
-    }
-}

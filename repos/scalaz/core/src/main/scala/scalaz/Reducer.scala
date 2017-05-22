@@ -14,7 +14,7 @@ import scalaz.Tags.{Conjunction}
   *
   * Based on a Haskell library by Edward Kmett
   */
-sealed abstract class Reducer[C, M] {
+sealed abstract class Reducer[C, M]
   implicit def monoid: Monoid[M]
 
   def unit(c: C): M
@@ -32,10 +32,10 @@ sealed abstract class Reducer[C, M] {
     monoid.append(a1, a2)
 
   /** Distribute `C`s to `M` and `N`. */
-  def compose[N](r: Reducer[C, N]): Reducer[C, (M, N)] = {
+  def compose[N](r: Reducer[C, N]): Reducer[C, (M, N)] =
     implicit val m = Reducer.this.monoid
     implicit val n = r.monoid
-    new Reducer[C, (M, N)] {
+    new Reducer[C, (M, N)]
 
       import std.tuple._
 
@@ -48,29 +48,23 @@ sealed abstract class Reducer[C, M] {
 
       override def cons(x: C, p: (M, N)) =
         (Reducer.this.cons(x, p._1), r.cons(x, p._2))
-    }
-  }
-}
-sealed abstract class UnitReducer[C, M] extends Reducer[C, M] {
+sealed abstract class UnitReducer[C, M] extends Reducer[C, M]
   implicit def monoid: Monoid[M]
   def unit(c: C): M
 
   def snoc(m: M, c: C): M = monoid.append(m, unit(c))
 
   def cons(c: C, m: M): M = monoid.append(unit(c), m)
-}
 
-object UnitReducer {
+object UnitReducer
 
   /** Minimal `Reducer` derived from a monoid and `unit`. */
   def apply[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
-    new UnitReducer[C, M] {
+    new UnitReducer[C, M]
       val monoid = mm
       def unit(c: C) = u(c)
-    }
-}
 
-object Reducer extends ReducerInstances {
+object Reducer extends ReducerInstances
 
   /** Reducer derived from `unit`, `cons`, and `snoc`.  Permits more
     * sharing than `UnitReducer.apply`.
@@ -78,42 +72,36 @@ object Reducer extends ReducerInstances {
   def apply[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(
       implicit mm: Monoid[M]): Reducer[C, M] =
     reducer(u, cs, sc)
-}
 
-sealed abstract class ReducerInstances {
+sealed abstract class ReducerInstances
 
   /** Collect `C`s into a list, in order. */
-  implicit def ListReducer[C]: Reducer[C, List[C]] = {
+  implicit def ListReducer[C]: Reducer[C, List[C]] =
     import std.list._
     unitConsReducer(_ :: Nil, c => c :: _)
-  }
 
   /** Collect `C`s into a stream, in order. */
-  implicit def StreamReducer[C]: Reducer[C, Stream[C]] = {
+  implicit def StreamReducer[C]: Reducer[C, Stream[C]] =
     import std.stream._
     unitConsReducer(Stream(_), c => c #:: _)
-  }
 
   /** Ignore `C`s. */
-  implicit def UnitReducer[C]: Reducer[C, Unit] = {
+  implicit def UnitReducer[C]: Reducer[C, Unit] =
     import std.anyVal._
     unitReducer((_: C) => ())
-  }
 
   /** Collect `C`s into a vector, in order. */
   implicit def VectorReducer[C]: Reducer[C, Vector[C]] =
-    new Reducer[C, Vector[C]] {
+    new Reducer[C, Vector[C]]
       val monoid: Monoid[Vector[C]] = std.vector.vectorMonoid[C]
       def cons(c: C, m: Vector[C]) = c +: m
       def snoc(m: Vector[C], c: C) = m :+ c
       def unit(c: C) = Vector(c)
-    }
 
   /** The "or" monoid. */
-  implicit val AnyReducer: Reducer[Boolean, Boolean] = {
+  implicit val AnyReducer: Reducer[Boolean, Boolean] =
     implicit val B = std.anyVal.booleanInstance.disjunction
     unitReducer(x => x)
-  }
 
   import std.anyVal._
 
@@ -144,10 +132,9 @@ sealed abstract class ReducerInstances {
   implicit val ShortProductReducer: Reducer[Short, Short @@ Multiplication] =
     unitReducer(s => Tag[Short, Multiplication](s))
 
-  implicit val BigIntProductReducer: Reducer[BigInt, BigInt @@ Multiplication] = {
+  implicit val BigIntProductReducer: Reducer[BigInt, BigInt @@ Multiplication] =
     import std.math.bigInt._
     unitReducer(b => Tag[BigInt, Multiplication](b))
-  }
 
   import std.option._
 
@@ -166,7 +153,7 @@ sealed abstract class ReducerInstances {
   /** Alias for [[scalaz.Reducer]]`.apply`. */
   def reducer[C, M](u: C => M, cs: C => M => M, sc: M => C => M)(
       implicit mm: Monoid[M]): Reducer[C, M] =
-    new Reducer[C, M] {
+    new Reducer[C, M]
       val monoid = mm
 
       def unit(c: C) = u(c)
@@ -174,7 +161,6 @@ sealed abstract class ReducerInstances {
       def snoc(m: M, c: C): M = sc(m)(c)
 
       def cons(c: C, m: M): M = cs(c)(m)
-    }
 
   def foldReduce[F[_], A, B](a: F[A])(
       implicit f: Foldable[F], r: Reducer[A, B]): B =
@@ -182,13 +168,12 @@ sealed abstract class ReducerInstances {
 
   /** Alias for [[scalaz.UnitReducer]]`.apply`. */
   def unitReducer[C, M](u: C => M)(implicit mm: Monoid[M]): Reducer[C, M] =
-    new UnitReducer[C, M] {
+    new UnitReducer[C, M]
       val monoid = mm
       def unit(c: C) = u(c)
-    }
 
   def unitConsReducer[C, M](u: C => M, cs: C => M => M)(
-      implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M] {
+      implicit mm: Monoid[M]): Reducer[C, M] = new Reducer[C, M]
     val monoid = mm
 
     def unit(c: C) = u(c)
@@ -196,11 +181,9 @@ sealed abstract class ReducerInstances {
     def snoc(m: M, c: C): M = mm.append(m, u(c))
 
     def cons(c: C, m: M): M = cs(c)(m)
-  }
 
   /** The reducer derived from any monoid.  Not implicit because it is
     * suboptimal for most reducer applications.
     */
   def identityReducer[M](implicit mm: Monoid[M]): Reducer[M, M] =
     unitReducer(x => x)
-}

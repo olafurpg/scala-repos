@@ -1,14 +1,13 @@
 // not a peep out of the pattern matcher's unreachability analysis
 // its budget should suffice for these simple matches (they do have a large search space)
-class Test {
+class Test
   import foo.Bar // a large enum
-  def exhaustUnreachabilitysStack_ENUM_STYLE = (null: Bar) match {
+  def exhaustUnreachabilitysStack_ENUM_STYLE = (null: Bar) match
     case Bar.BULGARIA =>
     case _ =>
-  }
 
   // lots of strings
-  def exhaustUnreachabilitysStack_StringStyle = "foo" match {
+  def exhaustUnreachabilitysStack_StringStyle = "foo" match
     case "a" =>
     case "b" =>
     case "c" =>
@@ -60,5 +59,3 @@ class Test {
     case "_e1a2" =>
     case "_f1a3" =>
     case _ =>
-  }
-}

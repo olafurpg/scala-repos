@@ -22,6 +22,5 @@ package kafka.common
   * 2. Broker does not have the specified partition by id upon receiving messages
   */
 class UnknownTopicOrPartitionException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

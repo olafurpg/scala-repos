@@ -32,34 +32,32 @@ import _root_.scala.collection.mutable
   */
 class ScalaFindUsagesHandler(
     element: PsiElement, factory: ScalaFindUsagesHandlerFactory)
-    extends FindUsagesHandler(element) {
+    extends FindUsagesHandler(element)
 
   override def getPrimaryElements: Array[PsiElement] = Array(element)
   override def getStringsToSearch(
-      element: PsiElement): util.Collection[String] = {
+      element: PsiElement): util.Collection[String] =
     val result: util.Set[String] = new util.HashSet[String]()
-    element match {
+    element match
       case t: ScTrait =>
         result.add(t.name)
         result.add(t.getName)
         result.add(t.fakeCompanionClass.getName)
-        t.fakeCompanionModule match {
+        t.fakeCompanionModule match
           case Some(o) => result.add(o.getName)
           case _ =>
-        }
       case o: ScObject =>
         result.add(o.name)
         result.add(o.getName)
       case c: ScClass =>
         result.add(c.name)
-        c.fakeCompanionModule match {
+        c.fakeCompanionModule match
           case Some(o) => result.add(o.getName)
           case _ =>
-        }
       case named: PsiNamedElement =>
         val name = named.name
         result.add(name)
-        ScalaPsiUtil.nameContext(named) match {
+        ScalaPsiUtil.nameContext(named) match
           case v: ScValue if ScalaPsiUtil.isBeanProperty(v) =>
             result.add("get" + StringUtil.capitalize(name))
           case v: ScVariable if ScalaPsiUtil.isBeanProperty(v) =>
@@ -71,15 +69,12 @@ class ScalaFindUsagesHandler(
             result.add("is" + StringUtil.capitalize(name))
             result.add("set" + StringUtil.capitalize(name))
           case _ =>
-        }
       case _ => result.add(element.getText)
-    }
     result
-  }
 
   override def getFindUsagesOptions(
-      dataContext: DataContext): FindUsagesOptions = {
-    element match {
+      dataContext: DataContext): FindUsagesOptions =
+    element match
       case t: ScTypeDefinition => factory.typeDefinitionOptions
       case ScalaPsiUtil.inNameContext(m: ScMember) if !m.isLocal =>
         factory.memberOptions
@@ -87,26 +82,22 @@ class ScalaFindUsagesHandler(
           _: ScMember | _: ScCaseClause | _: ScGenerator | _: ScEnumerator) =>
         factory.localOptions
       case _ => super.getFindUsagesOptions(dataContext)
-    }
-  }
 
-  override def getSecondaryElements: Array[PsiElement] = {
-    element match {
+  override def getSecondaryElements: Array[PsiElement] =
+    element match
       case t: ScObject =>
-        t.fakeCompanionClass match {
+        t.fakeCompanionClass match
           case Some(clazz) => Array(clazz)
           case _ => Array.empty
-        }
       case t: ScTrait => Array(t.fakeCompanionClass)
       case f: ScFunction
           if Seq("apply", "unapply", "unapplySeq").contains(f.name) =>
-        f.containingClass match {
+        f.containingClass match
           case obj: ScObject if obj.isSyntheticObject => Array(obj)
           case _ => Array.empty
-        }
       case t: ScTypedDefinition =>
-        t.getBeanMethods.toArray ++ {
-          val a: Array[DefinitionRole] = t.nameContext match {
+        t.getBeanMethods.toArray ++
+          val a: Array[DefinitionRole] = t.nameContext match
             case v: ScValue if ScalaPsiUtil.isBeanProperty(v) => Array(GETTER)
             case v: ScVariable if ScalaPsiUtil.isBeanProperty(v) =>
               Array(GETTER, SETTER)
@@ -115,23 +106,19 @@ class ScalaFindUsagesHandler(
             case v: ScVariable if ScalaPsiUtil.isBooleanBeanProperty(v) =>
               Array(IS_GETTER, SETTER)
             case _ => Array.empty
-          }
           a.map(
               role =>
                 t.getTypedDefinitionWrapper(isStatic = false,
                                             isInterface = false,
                                             role = role,
                                             cClass = None))
-        }
       case _ => Array.empty
-    }
-  }
 
   override def getFindUsagesDialog(
       isSingleFile: Boolean,
       toShowInNewTab: Boolean,
-      mustOpenInNewTab: Boolean): AbstractFindUsagesDialog = {
-    element match {
+      mustOpenInNewTab: Boolean): AbstractFindUsagesDialog =
+    element match
       case t: ScTypeDefinition =>
         new ScalaTypeDefinitionUsagesDialog(t,
                                             getProject,
@@ -143,44 +130,37 @@ class ScalaFindUsagesHandler(
       case _ =>
         super.getFindUsagesDialog(
             isSingleFile, toShowInNewTab, mustOpenInNewTab)
-    }
-  }
 
   override def processUsagesInText(element: PsiElement,
                                    processor: Processor[UsageInfo],
-                                   searchScope: GlobalSearchScope): Boolean = {
-    val nonScalaTextProcessor = new Processor[UsageInfo] {
-      override def process(t: UsageInfo): Boolean = {
+                                   searchScope: GlobalSearchScope): Boolean =
+    val nonScalaTextProcessor = new Processor[UsageInfo]
+      override def process(t: UsageInfo): Boolean =
         if (t.getFile.getFileType == ScalaFileType.SCALA_FILE_TYPE) true
         else processor.process(t)
-      }
-    }
     super.processUsagesInText(element, nonScalaTextProcessor, searchScope)
-  }
 
   override def processElementUsages(element: PsiElement,
                                     processor: Processor[UsageInfo],
-                                    options: FindUsagesOptions): Boolean = {
+                                    options: FindUsagesOptions): Boolean =
     if (!super.processElementUsages(element, processor, options)) return false
-    options match {
+    options match
       case s: ScalaTypeDefinitionFindUsagesOptions
           if element.isInstanceOf[ScTypeDefinition] =>
         val clazz = element.asInstanceOf[ScTypeDefinition]
-        if (s.isMembersUsages) {
-          clazz.members.foreach {
+        if (s.isMembersUsages)
+          clazz.members.foreach
             case fun: ScFunction =>
               if (!super.processElementUsages(fun, processor, options))
                 return false
             case v: ScValue =>
-              v.declaredElements.foreach { d =>
+              v.declaredElements.foreach  d =>
                 if (!super.processElementUsages(d, processor, options))
                   return false
-              }
             case v: ScVariable =>
-              v.declaredElements.foreach { d =>
+              v.declaredElements.foreach  d =>
                 if (!super.processElementUsages(d, processor, options))
                   return false
-              }
             case ta: ScTypeAlias =>
               if (!super.processElementUsages(ta, processor, options))
                 return false
@@ -190,67 +170,49 @@ class ScalaFindUsagesHandler(
             case c: ScPrimaryConstructor =>
               if (!super.processElementUsages(c, processor, options))
                 return false
-          }
-          clazz match {
+          clazz match
             case c: ScClass =>
-              c.constructor match {
+              c.constructor match
                 case Some(constr) =>
-                  constr.effectiveParameterClauses.foreach { clause =>
-                    clause.effectiveParameters.foreach { param =>
+                  constr.effectiveParameterClauses.foreach  clause =>
+                    clause.effectiveParameters.foreach  param =>
                       if (!super.processElementUsages(c, processor, options))
                         return false
-                    }
-                  }
                 case _ =>
-              }
             case _ =>
-          }
-        }
-        if (s.isSearchCompanionModule) {
-          ScalaPsiUtil.getBaseCompanionModule(clazz) match {
+        if (s.isSearchCompanionModule)
+          ScalaPsiUtil.getBaseCompanionModule(clazz) match
             case Some(companion) =>
               if (!super.processElementUsages(companion, processor, options))
                 return false
             case _ =>
-          }
-        }
-        if (s.isImplementingTypeDefinitions) {
+        if (s.isImplementingTypeDefinitions)
           val res = new mutable.HashSet[PsiClass]()
           ClassInheritorsSearch
             .search(clazz, true)
             .forEach(
-                new Processor[PsiClass] {
-              def process(t: PsiClass): Boolean = {
-                t match {
+                new Processor[PsiClass]
+              def process(t: PsiClass): Boolean =
+                t match
                   case p: PsiClassWrapper =>
                   case _ => res += t
-                }
                 true
-              }
-            })
-          res.foreach { c =>
+            )
+          res.foreach  c =>
             val processed = inReadAction(processor.process(new UsageInfo(c)))
             if (!processed) return false
-          }
-        }
       case _ =>
-    }
 
-    inReadAction {
-      element match {
+    inReadAction
+      element match
         case function: ScFunction if !function.isLocal =>
           for (elem <- ScalaOverridingMemberSearcher.search(
-              function, deep = true)) {
+              function, deep = true))
             val processed =
               super.processElementUsages(elem, processor, options)
             if (!processed) return false
-          }
         case _ =>
-      }
-    }
     true
-  }
 
   override def isSearchForTextOccurencesAvailable(
       psiElement: PsiElement, isSingleFile: Boolean): Boolean = !isSingleFile
-}

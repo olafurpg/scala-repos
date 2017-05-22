@@ -17,7 +17,7 @@ private[lease] class MemorySpace(
     rSnooper: RequestSnooper,
     lr: LogsReceiver,
     rnd: GenerationalRandom
-) {
+)
   def this(
       info: JvmInfo,
       minDiscount: StorageUnit,
@@ -47,11 +47,11 @@ private[lease] class MemorySpace(
     * garbage collection properties, but should also be consistent across a given
     * generation.
     */
-  def discount(): StorageUnit = {
+  def discount(): StorageUnit =
     val handleBytes: StorageUnit = rSnooper.handleBytes()
     lr.record("discountHandleBytes", handleBytes.toString)
 
-    if (handleBytes < maxDiscount) {
+    if (handleBytes < maxDiscount)
       val low = handleBytes max minDiscount
 
       // choose a random number of bytes between 0 and discountRange
@@ -63,13 +63,11 @@ private[lease] class MemorySpace(
       lr.record("discountTotal", discountTotal.toString)
 
       discountTotal
-    } else {
+    else
       lr.record("discountWin", printableZeroBytes)
       lr.record("discountTotal", printableZeroBytes)
 
       maxDiscount
-    }
-  }
 
   /**
     * The difference between the bytes remaining in the Eden space and the minimum
@@ -80,4 +78,3 @@ private[lease] class MemorySpace(
   override def toString(): String =
     "MemorySpace(left=" + left + ", discount=" + discount() + ", info=" +
     info + ")"
-}

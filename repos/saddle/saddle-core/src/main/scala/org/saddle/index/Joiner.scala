@@ -21,6 +21,5 @@ import scala.{specialized => spec}
 /**
   * Abstract interface for a Joiner instance
   */
-private[saddle] trait Joiner[@spec(Int, Long, Double) T] {
+private[saddle] trait Joiner[@spec(Int, Long, Double) T]
   def join(left: Index[T], right: Index[T], how: JoinType): ReIndexer[T]
-}

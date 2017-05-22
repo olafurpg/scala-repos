@@ -1,4 +1,4 @@
-object O {
+object O
   private case class CC1
   private[O] case class CC2
 
@@ -17,4 +17,3 @@ object O {
   /* */
   O. /* */ CC2.getClass
   classOf[ /* */ O. /* */ CC2]
-}

@@ -4,7 +4,7 @@ package api
 import play.api.libs.json._
 import Types._
 
-object $remove {
+object $remove
   import play.modules.reactivemongo.json._
 
   def apply[A : InColl](selector: JsObject): Funit =
@@ -22,4 +22,3 @@ object $remove {
     byId(doc.id)
   def apply[A <: Identified[String]: TubeInColl](doc: A): Funit =
     apply[String, A](doc)
-}

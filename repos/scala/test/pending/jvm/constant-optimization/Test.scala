@@ -3,7 +3,7 @@ import scala.tools.asm
 import asm.tree.InsnList
 import scala.collection.JavaConverters._
 
-object Test extends BytecodeTest {
+object Test extends BytecodeTest
   val comparisons = Set(asm.Opcodes.IF_ACMPEQ,
                         asm.Opcodes.IF_ACMPNE,
                         asm.Opcodes.IF_ICMPEQ,
@@ -21,7 +21,7 @@ object Test extends BytecodeTest {
                         asm.Opcodes.IFNONNULL,
                         asm.Opcodes.IFNULL)
 
-  def show: Unit = {
+  def show: Unit =
     val classNode = loadClassNode("Foo_1")
     val methodNode = getMethod(classNode, "foo")
     // after optimization there should be no comparisons left
@@ -29,11 +29,8 @@ object Test extends BytecodeTest {
 
     val got = countComparisons(methodNode.instructions)
     assert(got == expected, s"expected $expected but got $got comparisons")
-  }
 
-  def countComparisons(insnList: InsnList): Int = {
+  def countComparisons(insnList: InsnList): Int =
     def isComparison(node: asm.tree.AbstractInsnNode): Boolean =
       (comparisons contains node.getOpcode)
     insnList.iterator.asScala count isComparison
-  }
-}

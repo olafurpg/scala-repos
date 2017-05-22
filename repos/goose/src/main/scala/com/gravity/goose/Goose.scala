@@ -24,7 +24,7 @@ import java.io.File
   * Created by Jim Plush - Gravity.com
   * Date: 8/14/11
   */
-class Goose(config: Configuration = new Configuration) {
+class Goose(config: Configuration = new Configuration)
 
   initializeEnvironment()
 
@@ -32,52 +32,42 @@ class Goose(config: Configuration = new Configuration) {
     * Main method to extract an article object from a URL, pass in a url and get back a Article
     * @url The url that you want to extract
     */
-  def extractContent(url: String, rawHTML: String): Article = {
+  def extractContent(url: String, rawHTML: String): Article =
     val cc = new CrawlCandidate(config, url, rawHTML)
     sendToActor(cc)
-  }
 
-  def extractContent(url: String): Article = {
+  def extractContent(url: String): Article =
     val cc = new CrawlCandidate(config, url, null)
     sendToActor(cc)
-  }
 
-  def shutdownNetwork() {
+  def shutdownNetwork()
     HtmlFetcher.getHttpClient.getConnectionManager.shutdown()
-  }
 
-  def sendToActor(crawlCandidate: CrawlCandidate) = {
+  def sendToActor(crawlCandidate: CrawlCandidate) =
     val crawler = new Crawler(config)
     val article = crawler.crawl(crawlCandidate)
     article
-  }
 
-  def initializeEnvironment() {
+  def initializeEnvironment()
 
     val f = new File(config.localStoragePath)
-    try {
-      if (!f.isDirectory) {
+    try
+      if (!f.isDirectory)
         f.mkdirs()
-      }
-    } catch {
+    catch
       case e: Exception =>
-    }
-    if (!f.isDirectory) {
+    if (!f.isDirectory)
       throw new Exception(
           config.localStoragePath +
           " directory does not seem to exist, you need to set this for image processing downloads")
-    }
-    if (!f.canWrite) {
+    if (!f.canWrite)
       throw new Exception(
           config.localStoragePath +
           " directory is not writeble, you need to set this for image processing downloads")
-    }
 
     // todo cleanup any jank that may be in the tmp folder currently
-  }
-}
 
-object Goose {
+object Goose
 
   implicit val config = new Configuration
 
@@ -86,4 +76,3 @@ object Goose {
   // create the crawling actor that will accept bulk crawls
 //  val crawlingActor = Actor.actorOf[CrawlingActor]
 //  crawlingActor.start()
-}

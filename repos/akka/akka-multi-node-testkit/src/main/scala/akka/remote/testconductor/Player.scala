@@ -25,18 +25,17 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
   * the [[akka.remote.testconductor.Conductor]]’s [[akka.remote.testconductor.Controller]]
   * in order to participate in barriers and enable network failure injection.
   */
-trait Player {
+trait Player
   this: TestConductorExt ⇒
 
   private var _client: ActorRef = _
-  private def client = _client match {
+  private def client = _client match
     case null ⇒
       throw new IllegalStateException("TestConductor client not yet started")
     case _ if system.whenTerminated.isCompleted ⇒
       throw new IllegalStateException(
           "TestConductor unavailable because system is terminated; you need to startNewSystem() before this point")
     case x ⇒ x
-  }
 
   /**
     * Connect to the conductor on the given port (the host is taken from setting
@@ -47,7 +46,7 @@ trait Player {
     * set in [[akka.remote.testconductor.Conductor]]`.startController()`.
     */
   def startClient(
-      name: RoleName, controllerAddr: InetSocketAddress): Future[Done] = {
+      name: RoleName, controllerAddr: InetSocketAddress): Future[Done] =
     import ClientFSM._
     import akka.actor.FSM._
     import Settings.BarrierTimeout
@@ -57,9 +56,9 @@ trait Player {
     _client = system.actorOf(
         Props(classOf[ClientFSM], name, controllerAddr), "TestConductorClient")
     val a = system.actorOf(Props(new Actor
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+            with RequiresMessageQueue[UnboundedMessageQueueSemantics]
       var waiting: ActorRef = _
-      def receive = {
+      def receive =
         case fsm: ActorRef ⇒
           waiting = sender(); fsm ! SubscribeTransitionCallBack(self)
         case Transition(_, f: ClientFSM.State, t: ClientFSM.State)
@@ -76,11 +75,9 @@ trait Player {
           // SI-5900 workaround
           waiting ! Done; context stop self
         case _: CurrentState[_] ⇒
-      }
-    }))
+    ))
 
     a ? client mapTo classTag[Done]
-  }
 
   /**
     * Enter the named barriers, one after the other, in the order given. Will
@@ -93,46 +90,40 @@ trait Player {
     * Enter the named barriers, one after the other, in the order given. Will
     * throw an exception in case of timeouts or other errors.
     */
-  def enter(timeout: Timeout, name: immutable.Seq[String]) {
+  def enter(timeout: Timeout, name: immutable.Seq[String])
     system.log.debug("entering barriers " + name.mkString("(", ", ", ")"))
     val stop = Deadline.now + timeout.duration
-    name foreach { b ⇒
+    name foreach  b ⇒
       val barrierTimeout = stop.timeLeft
-      if (barrierTimeout < Duration.Zero) {
+      if (barrierTimeout < Duration.Zero)
         client ! ToServer(FailBarrier(b))
         throw new TimeoutException(
             "Server timed out while waiting for barrier " + b);
-      }
-      try {
+      try
         implicit val timeout =
           Timeout(barrierTimeout + Settings.QueryTimeout.duration)
         Await.result(
             client ? ToServer(EnterBarrier(b, Option(barrierTimeout))),
             Duration.Inf)
-      } catch {
+      catch
         case e: AskTimeoutException ⇒
           client ! ToServer(FailBarrier(b))
           // Why don't TimeoutException have a constructor that takes a cause?
           throw new TimeoutException(
               "Client timed out while waiting for barrier " + b);
-      }
       system.log.debug("passed barrier {}", b)
-    }
-  }
 
   /**
     * Query remote transport address of named node.
     */
-  def getAddressFor(name: RoleName): Future[Address] = {
+  def getAddressFor(name: RoleName): Future[Address] =
     import Settings.QueryTimeout
     client ? ToServer(GetAddress(name)) mapTo classTag[Address]
-  }
-}
 
 /**
   * INTERNAL API.
   */
-private[akka] object ClientFSM {
+private[akka] object ClientFSM
   sealed trait State
   case object Connecting extends State
   case object AwaitDone extends State
@@ -147,7 +138,6 @@ private[akka] object ClientFSM {
   final case class ConnectionFailure(msg: String)
       extends RuntimeException(msg) with NoStackTrace
   case object Disconnected
-}
 
 /**
   * This is the controlling entity on the [[akka.remote.testconductor.Player]]
@@ -166,7 +156,7 @@ private[akka] object ClientFSM {
 private[akka] class ClientFSM(
     name: RoleName, controllerAddr: InetSocketAddress)
     extends Actor with LoggingFSM[ClientFSM.State, ClientFSM.Data]
-    with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics]
   import ClientFSM._
 
   val settings = TestConductor().Settings
@@ -182,7 +172,7 @@ private[akka] class ClientFSM(
 
   startWith(Connecting, Data(None, None))
 
-  when(Connecting, stateTimeout = settings.ConnectTimeout) {
+  when(Connecting, stateTimeout = settings.ConnectTimeout)
     case Event(msg: ClientOp, _) ⇒
       stay replying Status.Failure(
           new IllegalStateException("not connected yet"))
@@ -196,9 +186,8 @@ private[akka] class ClientFSM(
       log.error("Failed to connect to test conductor within {} ms.",
                 settings.ConnectTimeout.toMillis)
       goto(Failed)
-  }
 
-  when(AwaitDone, stateTimeout = settings.BarrierTimeout.duration) {
+  when(AwaitDone, stateTimeout = settings.BarrierTimeout.duration)
     case Event(Done, _) ⇒
       log.debug("received Done: starting test")
       goto(Connected)
@@ -211,9 +200,8 @@ private[akka] class ClientFSM(
     case Event(StateTimeout, _) ⇒
       log.error("connect timeout to TestConductor")
       goto(Failed)
-  }
 
-  when(Connected) {
+  when(Connected)
     case Event(Disconnected, _) ⇒
       log.info("disconnected from TestConductor")
       throw new ConnectionFailure("disconnect")
@@ -222,19 +210,18 @@ private[akka] class ClientFSM(
       stay
     case Event(ToServer(msg), d @ Data(Some(channel), None)) ⇒
       channel.write(msg)
-      val token = msg match {
+      val token = msg match
         case EnterBarrier(barrier, timeout) ⇒ Some(barrier -> sender())
         case GetAddress(node) ⇒ Some(node.name -> sender())
         case _ ⇒ None
-      }
       stay using d.copy(runningOp = token)
     case Event(ToServer(op), Data(channel, Some((token, _)))) ⇒
       log.error("cannot write {} while waiting for {}", op, token)
       stay
     case Event(op: ClientOp, d @ Data(Some(channel), runningOp)) ⇒
-      op match {
+      op match
         case BarrierResult(b, success) ⇒
-          runningOp match {
+          runningOp match
             case Some((barrier, requester)) ⇒
               val response =
                 if (b != barrier)
@@ -246,13 +233,11 @@ private[akka] class ClientFSM(
               requester ! response
             case None ⇒
               log.warning("did not expect {}", op)
-          }
           stay using d.copy(runningOp = None)
         case AddressReply(node, addr) ⇒
-          runningOp match {
+          runningOp match
             case Some((_, requester)) ⇒ requester ! addr
             case None ⇒ log.warning("did not expect {}", op)
-          }
           stay using d.copy(runningOp = None)
         case t: ThrottleMsg ⇒
           import context.dispatcher // FIXME is this the right EC for the future below?
@@ -270,13 +255,12 @@ private[akka] class ClientFSM(
           val cmdFuture = TestConductor().transport
             .managementCommand(SetThrottle(t.target, t.direction, mode))
 
-          cmdFuture onSuccess {
+          cmdFuture onSuccess
             case true ⇒ self ! ToServer(Done)
             case _ ⇒
               throw new RuntimeException(
                   "Throttle was requested from the TestConductor, but no transport " +
                   "adapters available that support throttling. Specify `testTransport(on = true)` in your MultiNodeConfig")
-          }
           stay
         case d: DisconnectMsg ⇒
           // FIXME: Currently ignoring, needs support from Remoting
@@ -291,25 +275,20 @@ private[akka] class ClientFSM(
           System.exit(exitValue)
           stay // needed because Java doesn’t have Nothing
         case _: Done ⇒ stay //FIXME what should happen?
-      }
-  }
 
-  when(Failed) {
+  when(Failed)
     case Event(msg: ClientOp, _) ⇒
       stay replying Status.Failure(
           new RuntimeException("cannot do " + msg + " while Failed"))
     case Event(msg: NetworkOp, _) ⇒
       log.warning("ignoring network message {} while Failed", msg)
       stay
-  }
 
-  onTermination {
+  onTermination
     case StopEvent(_, _, Data(Some(channel), _)) ⇒
       channel.close()
-  }
 
   initialize()
-}
 
 /**
   * This handler only forwards messages received from the conductor to the [[akka.remote.testconductor.ClientFSM]].
@@ -324,7 +303,7 @@ private[akka] class PlayerHandler(
     fsm: ActorRef,
     log: LoggingAdapter,
     scheduler: Scheduler)(implicit executor: ExecutionContext)
-    extends SimpleChannelUpstreamHandler {
+    extends SimpleChannelUpstreamHandler
 
   import ClientFSM._
 
@@ -350,43 +329,38 @@ private[akka] class PlayerHandler(
         "channel {} written {}", event.getChannel, event.getWrittenAmount)
 
   override def exceptionCaught(
-      ctx: ChannelHandlerContext, event: ExceptionEvent) = {
+      ctx: ChannelHandlerContext, event: ExceptionEvent) =
     log.debug("channel {} exception {}", event.getChannel, event.getCause)
-    event.getCause match {
+    event.getCause match
       case c: ConnectException if reconnects > 0 ⇒
         reconnects -= 1
         scheduler.scheduleOnce(nextAttempt.timeLeft)(reconnect())
       case e ⇒ fsm ! ConnectionFailure(e.getMessage)
-    }
-  }
 
-  private def reconnect(): Unit = {
+  private def reconnect(): Unit =
     nextAttempt = Deadline.now + backoff
     RemoteConnection(Client, server, poolSize, this)
-  }
 
   override def channelConnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
     val ch = event.getChannel
     log.debug("connected to {}", getAddrString(ch))
     fsm ! Connected(ch)
-  }
 
   override def channelDisconnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
     val channel = event.getChannel
     log.debug("disconnected from {}", getAddrString(channel))
     fsm ! PoisonPill
-    executor.execute(new Runnable {
+    executor.execute(new Runnable
       def run = RemoteConnection.shutdown(channel)
-    }) // Must be shutdown outside of the Netty IO pool
-  }
+    ) // Must be shutdown outside of the Netty IO pool
 
   override def messageReceived(
-      ctx: ChannelHandlerContext, event: MessageEvent) = {
+      ctx: ChannelHandlerContext, event: MessageEvent) =
     val channel = event.getChannel
     log.debug("message from {}: {}", getAddrString(channel), event.getMessage)
-    event.getMessage match {
+    event.getMessage match
       case msg: NetworkOp ⇒
         fsm ! msg
       case msg ⇒
@@ -394,6 +368,3 @@ private[akka] class PlayerHandler(
                  getAddrString(channel),
                  msg)
         channel.close()
-    }
-  }
-}

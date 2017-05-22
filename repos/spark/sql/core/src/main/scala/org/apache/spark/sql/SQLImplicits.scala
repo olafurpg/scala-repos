@@ -32,7 +32,7 @@ import org.apache.spark.unsafe.types.UTF8String
   *
   * @since 1.6.0
   */
-abstract class SQLImplicits {
+abstract class SQLImplicits
 
   protected def _sqlContext: SQLContext
 
@@ -138,18 +138,16 @@ abstract class SQLImplicits {
     *
     * @since 1.6.0
     */
-  implicit def rddToDatasetHolder[T : Encoder](rdd: RDD[T]): DatasetHolder[T] = {
+  implicit def rddToDatasetHolder[T : Encoder](rdd: RDD[T]): DatasetHolder[T] =
     DatasetHolder(_sqlContext.createDataset(rdd))
-  }
 
   /**
     * Creates a [[Dataset]] from a local Seq.
     * @since 1.6.0
     */
   implicit def localSeqToDatasetHolder[T : Encoder](
-      s: Seq[T]): DatasetHolder[T] = {
+      s: Seq[T]): DatasetHolder[T] =
     DatasetHolder(_sqlContext.createDataset(s))
-  }
 
   /**
     * An implicit conversion that turns a Scala `Symbol` into a [[Column]].
@@ -162,18 +160,16 @@ abstract class SQLImplicits {
     * @since 1.3.0
     */
   implicit def rddToDataFrameHolder[A <: Product : TypeTag](
-      rdd: RDD[A]): DataFrameHolder = {
+      rdd: RDD[A]): DataFrameHolder =
     DataFrameHolder(_sqlContext.createDataFrame(rdd))
-  }
 
   /**
     * Creates a DataFrame from a local Seq of Product.
     * @since 1.3.0
     */
   implicit def localSeqToDataFrameHolder[A <: Product : TypeTag](
-      data: Seq[A]): DataFrameHolder = {
+      data: Seq[A]): DataFrameHolder =
     DataFrameHolder(_sqlContext.createDataFrame(data))
-  }
 
   // Do NOT add more implicit conversions for primitive types.
   // They are likely to break source compatibility by making existing implicit conversions
@@ -183,53 +179,43 @@ abstract class SQLImplicits {
     * Creates a single column DataFrame from an RDD[Int].
     * @since 1.3.0
     */
-  implicit def intRddToDataFrameHolder(data: RDD[Int]): DataFrameHolder = {
+  implicit def intRddToDataFrameHolder(data: RDD[Int]): DataFrameHolder =
     val dataType = IntegerType
-    val rows = data.mapPartitions { iter =>
+    val rows = data.mapPartitions  iter =>
       val row = new SpecificMutableRow(dataType :: Nil)
-      iter.map { v =>
+      iter.map  v =>
         row.setInt(0, v)
         row: InternalRow
-      }
-    }
     DataFrameHolder(
         _sqlContext.internalCreateDataFrame(
             rows, StructType(StructField("_1", dataType) :: Nil)))
-  }
 
   /**
     * Creates a single column DataFrame from an RDD[Long].
     * @since 1.3.0
     */
-  implicit def longRddToDataFrameHolder(data: RDD[Long]): DataFrameHolder = {
+  implicit def longRddToDataFrameHolder(data: RDD[Long]): DataFrameHolder =
     val dataType = LongType
-    val rows = data.mapPartitions { iter =>
+    val rows = data.mapPartitions  iter =>
       val row = new SpecificMutableRow(dataType :: Nil)
-      iter.map { v =>
+      iter.map  v =>
         row.setLong(0, v)
         row: InternalRow
-      }
-    }
     DataFrameHolder(
         _sqlContext.internalCreateDataFrame(
             rows, StructType(StructField("_1", dataType) :: Nil)))
-  }
 
   /**
     * Creates a single column DataFrame from an RDD[String].
     * @since 1.3.0
     */
-  implicit def stringRddToDataFrameHolder(data: RDD[String]): DataFrameHolder = {
+  implicit def stringRddToDataFrameHolder(data: RDD[String]): DataFrameHolder =
     val dataType = StringType
-    val rows = data.mapPartitions { iter =>
+    val rows = data.mapPartitions  iter =>
       val row = new SpecificMutableRow(dataType :: Nil)
-      iter.map { v =>
+      iter.map  v =>
         row.update(0, UTF8String.fromString(v))
         row: InternalRow
-      }
-    }
     DataFrameHolder(
         _sqlContext.internalCreateDataFrame(
             rows, StructType(StructField("_1", dataType) :: Nil)))
-  }
-}

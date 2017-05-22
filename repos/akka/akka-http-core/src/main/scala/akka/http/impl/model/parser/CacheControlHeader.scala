@@ -7,14 +7,13 @@ import akka.parboiled2.Parser
 import akka.http.scaladsl.model.headers._
 import CacheDirectives._
 
-private[parser] trait CacheControlHeader {
+private[parser] trait CacheControlHeader
   this: Parser with CommonRules with CommonActions with StringBuilding ⇒
 
   // http://tools.ietf.org/html/rfc7234#section-5.2
-  def `cache-control` = rule {
+  def `cache-control` = rule
     oneOrMore(`cache-directive`).separatedBy(listSep) ~ EOI ~>
     (`Cache-Control`(_))
-  }
 
   def `cache-directive` =
     rule(
@@ -31,12 +30,9 @@ private[parser] trait CacheControlHeader {
 
   def `field-names` = rule { `quoted-tokens` | token ~> (Seq(_)) }
 
-  def `quoted-tokens` = rule {
+  def `quoted-tokens` = rule
     '"' ~ zeroOrMore(`quoted-tokens-elem`).separatedBy(listSep) ~ '"'
-  }
 
-  def `quoted-tokens-elem` = rule {
+  def `quoted-tokens-elem` = rule
     clearSB() ~ zeroOrMore(!'"' ~ !',' ~ qdtext ~ appendSB() | `quoted-pair`) ~ push(
         sb.toString)
-  }
-}

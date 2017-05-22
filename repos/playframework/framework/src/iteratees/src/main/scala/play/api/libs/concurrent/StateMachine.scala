@@ -6,7 +6,7 @@ package play.api.libs.concurrent
 /**
   * A state machine with a non-blocking mutex protecting its state.
   */
-private[play] class StateMachine[S](initialState: S) {
+private[play] class StateMachine[S](initialState: S)
 
   /**
     * The current state. Modifications to the state should be performed
@@ -23,4 +23,3 @@ private[play] class StateMachine[S](initialState: S) {
     * f. Inside f it is safe to modify the state, if desired.
     */
   def exclusive(f: S => Unit) = mutex.exclusive { f(state) }
-}

@@ -24,22 +24,21 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 4/12/12
   */
-object RemoveApplyIntention {
+object RemoveApplyIntention
   val familyName = "Remove unnecessary apply"
-}
 
-class RemoveApplyIntention extends PsiElementBaseIntentionAction {
+class RemoveApplyIntention extends PsiElementBaseIntentionAction
   def getFamilyName = RemoveApplyIntention.familyName
 
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val methodCallExpr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
     if (methodCallExpr == null) return false
 
-    methodCallExpr.getInvokedExpr match {
+    methodCallExpr.getInvokedExpr match
       case ref: ScReferenceExpression =>
         val range: TextRange = ref.nameId.getTextRange
         val offset = editor.getCaretModel.getOffset
@@ -48,26 +47,20 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
           return false
         if (ref.isQualified && ref.nameId.getText == "apply") return true
       case _ =>
-    }
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
-    def countMethodCall(call: ScMethodCall): Int = {
-      call.getInvokedExpr match {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
+    def countMethodCall(call: ScMethodCall): Int =
+      call.getInvokedExpr match
         case call: ScMethodCall => 1 + countMethodCall(call)
         case _ => 1
-      }
-    }
 
-    def showErrorHint(hint: String) {
-      if (ApplicationManager.getApplication.isUnitTestMode) {
+    def showErrorHint(hint: String)
+      if (ApplicationManager.getApplication.isUnitTestMode)
         throw new RuntimeException(hint)
-      } else {
+      else
         HintManager.getInstance().showErrorHint(editor, hint)
-      }
-    }
 
     val expr: ScMethodCall =
       PsiTreeUtil.getParentOfType(element, classOf[ScMethodCall], false)
@@ -84,19 +77,18 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
       expr.getInvokedExpr.asInstanceOf[ScReferenceExpression].qualifier.get
     buf.append(qualifier.getText)
 
-    qualifier match {
+    qualifier match
       case parenth: ScParenthesisedExpr =>
         qualifier = parenth.expr.get
       case _ =>
-    }
 
-    qualifier match {
+    qualifier match
       case ref: ScReferenceExpression =>
         val resolved = ref.resolve()
-        resolved match {
+        resolved match
           case namedElement: PsiNamedElement =>
             val name = namedElement.name
-            val clazz: Option[ScTemplateDefinition] = expr.getParent match {
+            val clazz: Option[ScTemplateDefinition] = expr.getParent match
               case _ if expr.isInstanceOf[ScClassParameter] =>
                 Option(
                     PsiTreeUtil.getParentOfType(
@@ -110,118 +102,95 @@ class RemoveApplyIntention extends PsiElementBaseIntentionAction {
                     PsiTreeUtil.getParentOfType(
                         expr, classOf[ScTemplateDefinition]))
               case _ => None
-            }
 
             var flag = false
-            if (clazz.isDefined) {
+            if (clazz.isDefined)
               val signs = clazz.get.allSignatures
 
-              for (sign <- signs if !flag) {
-                sign.namedElement match {
+              for (sign <- signs if !flag)
+                sign.namedElement match
                   case function: ScFunction =>
-                    if (function.name == name && resolved != function) {
+                    if (function.name == name && resolved != function)
                       flag = true
-                    } else if (resolved == function) {
-                      if (function.getParameterList.getParameters.length == 0) {
+                    else if (resolved == function)
+                      if (function.getParameterList.getParameters.length == 0)
                         buf.append("()")
                         start = start + 2
-                      }
-                    }
                   case method: PsiMethod =>
-                    if (method.name == name && resolved != method) {
+                    if (method.name == name && resolved != method)
                       flag = true
-                    } else if (resolved == method) {
-                      if (method.getParameterList.getParameters.isEmpty) {
+                    else if (resolved == method)
+                      if (method.getParameterList.getParameters.isEmpty)
                         buf.append("()")
                         start = start + 2
-                      }
-                    }
                   case _ =>
-                }
-              }
-            }
 
-            if (flag) {
+            if (flag)
               showErrorHint(
                   InspectionBundle.message(
                       "remove.apply.overloaded", namedElement.name))
               return
-            }
           case _ =>
-        }
 
       case call: ScMethodCall =>
         val cmc = countMethodCall(call)
-        call.deepestInvokedExpr match {
+        call.deepestInvokedExpr match
           case ref: ScReferenceExpression =>
             val resolve: PsiElement = ref.resolve()
-            resolve match {
+            resolve match
               case fun: ScFunction =>
                 val clauses = fun.effectiveParameterClauses
                 if (clauses.length > 1 && clauses.last.isImplicit &&
-                    clauses.length == cmc + 1) {
+                    clauses.length == cmc + 1)
                   showErrorHint(
                       InspectionBundle.message(
                           "remove.apply.implicit.parameter",
                           resolve.asInstanceOf[PsiNamedElement].name))
                   return
-                }
               case _ => //all is ok
-            }
           case _ => //all is ok
-        }
 
       case templ: ScNewTemplateDefinition =>
-        templ.extendsBlock.templateParents match {
+        templ.extendsBlock.templateParents match
           case Some(parents: ScClassParents) =>
-            parents.constructor match {
+            parents.constructor match
               case Some(constr) =>
-                constr.reference match {
+                constr.reference match
                   case Some(ref) =>
                     val resolve = ref.resolve()
                     val argsCount = constr.arguments.length
-                    resolve match {
+                    resolve match
                       case con: ScPrimaryConstructor =>
                         val clauses = con.effectiveParameterClauses
                         if (clauses.length > 1 && clauses.last.isImplicit &&
-                            clauses.length == argsCount + 1) {
+                            clauses.length == argsCount + 1)
                           showErrorHint(
                               InspectionBundle.message(
                                   "remove.apply.constructor.implicit.parameter",
                                   parents.constructor.get.getText))
                           return
-                        }
                       case fun: ScFunction =>
                         val clauses = fun.effectiveParameterClauses
                         if (clauses.length > 1 && clauses.last.isImplicit &&
-                            clauses.length == argsCount + 1) {
+                            clauses.length == argsCount + 1)
                           showErrorHint(
                               InspectionBundle.message(
                                   "remove.apply.constructor.implicit.parameter",
                                   parents.constructor.get.getText))
                           return
-                        }
                       case _ =>
-                    }
                   case _ => //all is ok
-                }
               case _ => //all is ok
-            }
           case _ => //all is ok
-        }
       case _ =>
-    }
 
     buf.append(expr.args.getText)
     val newExpr = ScalaPsiElementFactory.createExpressionFromText(
         buf.toString(), element.getManager)
 
-    inWriteAction {
+    inWriteAction
       expr.replace(newExpr)
       editor.getCaretModel.moveToOffset(start)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

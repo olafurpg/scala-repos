@@ -1,5 +1,4 @@
 import scala.collection.mutable._
 
-object Test {
+object Test
   val m = new HashSet[String] with SynchronizedSet[String]
-}

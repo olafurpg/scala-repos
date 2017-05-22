@@ -17,9 +17,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScImportSelectorStubImpl
   */
 class ScImportSelectorElementType[Func <: ScImportSelector]
     extends ScStubElementType[ScImportSelectorStub, ScImportSelector](
-        "import selector") {
+        "import selector")
   def serialize(
-      stub: ScImportSelectorStub, dataStream: StubOutputStream): Unit = {
+      stub: ScImportSelectorStub, dataStream: StubOutputStream): Unit =
     dataStream.writeName(
         stub
           .asInstanceOf[ScImportSelectorStubImpl[_ <: PsiElement]]
@@ -27,20 +27,18 @@ class ScImportSelectorElementType[Func <: ScImportSelector]
           .toString)
     dataStream.writeName(stub.importedName)
     dataStream.writeBoolean(stub.isAliasedImport)
-  }
 
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScImportSelector,
-      parentStub: StubElement[ParentPsi]): ScImportSelectorStub = {
+      parentStub: StubElement[ParentPsi]): ScImportSelectorStub =
     val refText = psi.reference.getText
     val importedName = psi.importedName
     val aliasImport = psi.isAliasedImport
     new ScImportSelectorStubImpl(
         parentStub, this, refText, importedName, aliasImport)
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScImportSelectorStub = {
+      dataStream: StubInputStream, parentStub: Any): ScImportSelectorStub =
     val refText = StringRef.toString(dataStream.readName)
     val importedName = StringRef.toString(dataStream.readName)
     val aliasImport = dataStream.readBoolean()
@@ -50,11 +48,8 @@ class ScImportSelectorElementType[Func <: ScImportSelector]
         refText,
         importedName,
         aliasImport)
-  }
 
   def indexStub(stub: ScImportSelectorStub, sink: IndexSink): Unit = {}
 
-  def createPsi(stub: ScImportSelectorStub): ScImportSelector = {
+  def createPsi(stub: ScImportSelectorStub): ScImportSelector =
     new ScImportSelectorImpl(stub)
-  }
-}

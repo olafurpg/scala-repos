@@ -8,7 +8,7 @@ import org.junit.runners.JUnit4
 import scala.tools.testing.AssertUtil._
 
 @RunWith(classOf[JUnit4])
-class PredefAutoboxingTest {
+class PredefAutoboxingTest
   @Test def unboxNullByte() =
     assertEquals(Predef.Byte2byte(null), 0.toByte)
 
@@ -32,4 +32,3 @@ class PredefAutoboxingTest {
 
   @Test def unboxNullBoolean() =
     assertEquals(Predef.Boolean2boolean(null), false)
-}

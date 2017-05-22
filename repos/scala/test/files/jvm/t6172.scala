@@ -1,4 +1,4 @@
-trait Foo1 {
+trait Foo1
   trait A1
   trait A2
   trait A3
@@ -2999,7 +2999,5 @@ trait Foo1 {
   trait A2998
   trait A2999
   trait A3000
-}
-object Test extends App {
+object Test extends App
   new Foo1 {}
-}

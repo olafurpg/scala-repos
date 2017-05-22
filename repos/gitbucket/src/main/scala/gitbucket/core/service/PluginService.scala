@@ -4,7 +4,7 @@ import gitbucket.core.model.Plugin
 import gitbucket.core.model.Profile._
 import profile.simple._
 
-trait PluginService {
+trait PluginService
 
   def getPlugins()(implicit s: Session): List[Plugin] =
     Plugins.sortBy(_.pluginId).list
@@ -23,4 +23,3 @@ trait PluginService {
 
   def getPlugin(pluginId: String)(implicit s: Session): Option[Plugin] =
     Plugins.filter(_.pluginId === pluginId.bind).firstOption
-}

@@ -31,78 +31,64 @@ import org.apache.spark.internal.Logging
   * Note: The event queue will grow indefinitely. So subclasses should make sure `onReceive` can
   * handle events in time to avoid the potential OOM.
   */
-private[spark] abstract class EventLoop[E](name: String) extends Logging {
+private[spark] abstract class EventLoop[E](name: String) extends Logging
 
   private val eventQueue: BlockingQueue[E] = new LinkedBlockingDeque[E]()
 
   private val stopped = new AtomicBoolean(false)
 
-  private val eventThread = new Thread(name) {
+  private val eventThread = new Thread(name)
     setDaemon(true)
 
-    override def run(): Unit = {
-      try {
-        while (!stopped.get) {
+    override def run(): Unit =
+      try
+        while (!stopped.get)
           val event = eventQueue.take()
-          try {
+          try
             onReceive(event)
-          } catch {
-            case NonFatal(e) => {
-                try {
+          catch
+            case NonFatal(e) =>
+                try
                   onError(e)
-                } catch {
+                catch
                   case NonFatal(e) =>
                     logError("Unexpected error in " + name, e)
-                }
-              }
-          }
-        }
-      } catch {
+      catch
         case ie: InterruptedException =>
         // exit even if eventQueue is not empty
         case NonFatal(e) => logError("Unexpected error in " + name, e)
-      }
-    }
-  }
 
-  def start(): Unit = {
-    if (stopped.get) {
+  def start(): Unit =
+    if (stopped.get)
       throw new IllegalStateException(name + " has already been stopped")
-    }
     // Call onStart before starting the event thread to make sure it happens before onReceive
     onStart()
     eventThread.start()
-  }
 
-  def stop(): Unit = {
-    if (stopped.compareAndSet(false, true)) {
+  def stop(): Unit =
+    if (stopped.compareAndSet(false, true))
       eventThread.interrupt()
       var onStopCalled = false
-      try {
+      try
         eventThread.join()
         // Call onStop after the event thread exits to make sure onReceive happens before onStop
         onStopCalled = true
         onStop()
-      } catch {
+      catch
         case ie: InterruptedException =>
           Thread.currentThread().interrupt()
-          if (!onStopCalled) {
+          if (!onStopCalled)
             // ie is thrown from `eventThread.join()`. Otherwise, we should not call `onStop` since
             // it's already called.
             onStop()
-          }
-      }
-    } else {
+    else
       // Keep quiet to allow calling `stop` multiple times.
-    }
-  }
 
   /**
     * Put the event into the event queue. The event thread will process it later.
     */
-  def post(event: E): Unit = {
+  def post(event: E): Unit =
     eventQueue.put(event)
-  }
 
   /**
     * Return if the event thread has already been started but not yet stopped.
@@ -133,4 +119,3 @@ private[spark] abstract class EventLoop[E](name: String) extends Logging {
     * will be ignored.
     */
   protected def onError(e: Throwable): Unit
-}

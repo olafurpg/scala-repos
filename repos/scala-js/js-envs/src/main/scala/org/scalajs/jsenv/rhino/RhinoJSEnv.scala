@@ -39,7 +39,7 @@ final class RhinoJSEnv private (
     withDOM: Boolean,
     val sourceMap: Boolean
 )
-    extends LinkingUnitComJSEnv {
+    extends LinkingUnitComJSEnv
 
   import RhinoJSEnv._
 
@@ -58,10 +58,9 @@ final class RhinoJSEnv private (
 
   def name: String = "RhinoJSEnv"
 
-  override def loadLinkingUnit(linkingUnit: LinkingUnit): ComJSEnv = {
+  override def loadLinkingUnit(linkingUnit: LinkingUnit): ComJSEnv =
     verifyUnit(linkingUnit)
     super.loadLinkingUnit(linkingUnit)
-  }
 
   /** Executes code in an environment where the Scala.js library is set up to
     *  load its classes lazily.
@@ -70,56 +69,51 @@ final class RhinoJSEnv private (
     *  `code` is called.
     */
   override def jsRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner = {
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): JSRunner =
     new Runner(libs, None, Nil, code)
-  }
 
   override def jsRunner(preLibs: Seq[ResolvedJSDependency],
                         linkingUnit: LinkingUnit,
                         postLibs: Seq[ResolvedJSDependency],
-                        code: VirtualJSFile): JSRunner = {
+                        code: VirtualJSFile): JSRunner =
     verifyUnit(linkingUnit)
     new Runner(preLibs, Some(linkingUnit), postLibs, code)
-  }
 
   private class Runner(preLibs: Seq[ResolvedJSDependency],
                        optLinkingUnit: Option[LinkingUnit],
                        postLibs: Seq[ResolvedJSDependency],
                        code: VirtualJSFile)
-      extends JSRunner {
+      extends JSRunner
     def run(logger: Logger, console: JSConsole): Unit =
       internalRunJS(
           preLibs, optLinkingUnit, postLibs, code, logger, console, None)
-  }
 
   override def asyncRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner = {
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): AsyncJSRunner =
     new AsyncRunner(libs, None, Nil, code)
-  }
 
   override def asyncRunner(preLibs: Seq[ResolvedJSDependency],
                            linkingUnit: LinkingUnit,
                            postLibs: Seq[ResolvedJSDependency],
-                           code: VirtualJSFile): AsyncJSRunner = {
+                           code: VirtualJSFile): AsyncJSRunner =
     verifyUnit(linkingUnit)
     new AsyncRunner(preLibs, Some(linkingUnit), postLibs, code)
-  }
 
   private class AsyncRunner(preLibs: Seq[ResolvedJSDependency],
                             optLinkingUnit: Option[LinkingUnit],
                             postLibs: Seq[ResolvedJSDependency],
                             code: VirtualJSFile)
-      extends AsyncJSRunner {
+      extends AsyncJSRunner
 
     private[this] val promise = Promise[Unit]
     private[this] var _thread: Thread = _
 
     def future: Future[Unit] = promise.future
 
-    def start(logger: Logger, console: JSConsole): Future[Unit] = {
-      _thread = new Thread {
-        override def run(): Unit = {
-          try {
+    def start(logger: Logger, console: JSConsole): Future[Unit] =
+      _thread = new Thread
+        override def run(): Unit =
+          try
             internalRunJS(preLibs,
                           optLinkingUnit,
                           postLibs,
@@ -128,41 +122,34 @@ final class RhinoJSEnv private (
                           console,
                           optChannel)
             promise.success(())
-          } catch {
+          catch
             case t: Throwable =>
               promise.failure(t)
-          }
-        }
-      }
 
       _thread.start()
       future
-    }
 
     def stop(): Unit = _thread.interrupt()
 
     protected def optChannel(): Option[Channel] = None
-  }
 
   override def comRunner(
-      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner = {
+      libs: Seq[ResolvedJSDependency], code: VirtualJSFile): ComJSRunner =
     new ComRunner(libs, None, Nil, code)
-  }
 
   override def comRunner(preLibs: Seq[ResolvedJSDependency],
                          linkingUnit: LinkingUnit,
                          postLibs: Seq[ResolvedJSDependency],
-                         code: VirtualJSFile): ComJSRunner = {
+                         code: VirtualJSFile): ComJSRunner =
     verifyUnit(linkingUnit)
     new ComRunner(preLibs, Some(linkingUnit), postLibs, code)
-  }
 
   private class ComRunner(preLibs: Seq[ResolvedJSDependency],
                           optLinkingUnit: Option[LinkingUnit],
                           postLibs: Seq[ResolvedJSDependency],
                           code: VirtualJSFile)
       extends AsyncRunner(preLibs, optLinkingUnit, postLibs, code)
-      with ComJSRunner {
+      with ComJSRunner
 
     private[this] val channel = new Channel
 
@@ -170,17 +157,14 @@ final class RhinoJSEnv private (
 
     def send(msg: String): Unit = channel.sendToJS(msg)
 
-    def receive(timeout: Duration): String = {
-      try {
+    def receive(timeout: Duration): String =
+      try
         channel.recvJVM(timeout)
-      } catch {
+      catch
         case _: ChannelClosedException =>
           throw new ComJSEnv.ComClosedException
-      }
-    }
 
     def close(): Unit = channel.closeJVM()
-  }
 
   private def internalRunJS(preLibs: Seq[ResolvedJSDependency],
                             optLinkingUnit: Option[LinkingUnit],
@@ -188,10 +172,10 @@ final class RhinoJSEnv private (
                             code: VirtualJSFile,
                             logger: Logger,
                             console: JSConsole,
-                            optChannel: Option[Channel]): Unit = {
+                            optChannel: Option[Channel]): Unit =
 
     val context = Context.enter()
-    try {
+    try
       val scope = context.initStandardObjects()
 
       // Rhino has trouble optimizing some big things, e.g., env.js or ScalaTest
@@ -206,15 +190,14 @@ final class RhinoJSEnv private (
 
       // Optionally setup scalaJSCom
       var recvCallback: Option[String => Unit] = None
-      for (channel <- optChannel) {
+      for (channel <- optChannel)
         setupCom(context,
                  scope,
                  channel,
                  setCallback = cb => recvCallback = Some(cb),
                  clrCallback = () => recvCallback = None)
-      }
 
-      try {
+      try
         // Evaluate pre JS libs
         preLibs.foreach(lib => context.evaluateFile(scope, lib.lib))
 
@@ -229,30 +212,26 @@ final class RhinoJSEnv private (
 
         // Start the event loop
 
-        for (channel <- optChannel) {
+        for (channel <- optChannel)
           comEventLoop(taskQ,
                        channel,
                        () => recvCallback.get,
                        () => recvCallback.isDefined)
-        }
 
         // Channel is closed. Fall back to basic event loop
         basicEventLoop(taskQ)
-      } catch {
+      catch
         case e: RhinoException =>
           // Trace here, since we want to be in the context to trace.
           logger.trace(e)
           sys.error(s"Exception while running JS code: ${e.getMessage}")
-      }
-    } finally {
+    finally
       // Ensure the channel is closed to release JVM side
       optChannel.foreach(_.closeJS())
 
       Context.exit()
-    }
-  }
 
-  private def setupDOM(context: Context, scope: Scriptable): Unit = {
+  private def setupDOM(context: Context, scope: Scriptable): Unit =
     // Fetch env.rhino.js from webjar
     val name = "env.rhino.js"
     val path = "/META-INF/resources/webjars/envjs/1.2/" + name
@@ -268,42 +247,36 @@ final class RhinoJSEnv private (
 
     // No need to actually define print here: It is captured by envjs to
     // implement console.log, which we'll override in the next statement
-  }
 
   /** Make sure Rhino does not do its magic for JVM top-level packages (#364) */
-  private def disableLiveConnect(context: Context, scope: Scriptable): Unit = {
+  private def disableLiveConnect(context: Context, scope: Scriptable): Unit =
     val PackagesObject =
       ScriptableObject.getProperty(scope, "Packages").asInstanceOf[Scriptable]
     val topLevelPackageIds = ScriptableObject.getPropertyIds(PackagesObject)
-    for (id <- topLevelPackageIds) (id: Any) match {
+    for (id <- topLevelPackageIds) (id: Any) match
       case name: String => ScriptableObject.deleteProperty(scope, name)
       case index: Int => ScriptableObject.deleteProperty(scope, index)
       case _ => // should not happen, I think, but with Rhino you never know
-    }
-  }
 
   private def setupConsole(
-      context: Context, scope: Scriptable, console: JSConsole): Unit = {
+      context: Context, scope: Scriptable, console: JSConsole): Unit =
     // Setup console.log
     val jsconsole = context.newObject(scope)
     jsconsole.addFunction("log", _.foreach(console.log _))
     ScriptableObject.putProperty(scope, "console", jsconsole)
-  }
 
-  private def setupSetTimeout(context: Context, scope: Scriptable): TaskQueue = {
+  private def setupSetTimeout(context: Context, scope: Scriptable): TaskQueue =
 
     val ordering = Ordering.by[TimedTask, Deadline](_.deadline).reverse
     val taskQ = mutable.PriorityQueue.empty(ordering)
 
-    def ensure[T : ClassTag](v: AnyRef, errMsg: String) = v match {
+    def ensure[T : ClassTag](v: AnyRef, errMsg: String) = v match
       case v: T => v
       case _ => sys.error(errMsg)
-    }
 
     scope.addFunction(
         "setTimeout",
         args =>
-          {
             val cb = ensure[Function](
                 args(0), "First argument to setTimeout must be a function")
 
@@ -317,12 +290,11 @@ final class RhinoJSEnv private (
             taskQ += task
 
             task
-        })
+        )
 
     scope.addFunction(
         "setInterval",
         args =>
-          {
             val cb = ensure[Function](
                 args(0), "First argument to setInterval must be a function")
 
@@ -338,38 +310,35 @@ final class RhinoJSEnv private (
             taskQ += task
 
             task
-        })
+        )
 
     scope.addFunction(
         "clearTimeout",
         args =>
-          {
             val task = ensure[TimeoutTask](
                 args(0),
                 "First argument to " +
                 "clearTimeout must be a value returned by setTimeout")
             task.cancel()
-        })
+        )
 
     scope.addFunction(
         "clearInterval",
         args =>
-          {
             val task = ensure[IntervalTask](
                 args(0),
                 "First argument to " +
                 "clearInterval must be a value returned by setInterval")
             task.cancel()
-        })
+        )
 
     taskQ
-  }
 
   private def setupCom(context: Context,
                        scope: Scriptable,
                        channel: Channel,
                        setCallback: (String => Unit) => Unit,
-                       clrCallback: () => Unit): Unit = {
+                       clrCallback: () => Unit): Unit =
 
     val comObj = context.newObject(scope)
 
@@ -378,37 +347,35 @@ final class RhinoJSEnv private (
     comObj.addFunction(
         "init",
         s =>
-          s(0) match {
+          s(0) match
             case f: Function =>
               val cb: String => Unit =
                 msg => f.call(context, scope, scope, Array(msg))
               setCallback(cb)
             case _ =>
               sys.error("First argument to init must be a function")
-        })
+        )
 
     comObj.addFunction("close",
                        _ =>
-                         {
                            // Tell JVM side we won't send anything
                            channel.closeJS()
                            // Internally register that we're done
                            clrCallback()
-                       })
+                       )
 
     ScriptableObject.putProperty(scope, "scalajsCom", comObj)
-  }
 
   /** Loads a [[LinkingUnit]] with lazy loading of classes and source mapping. */
   private def loadLinkingUnit(
-      context: Context, scope: Scriptable, linkingUnit: LinkingUnit): Unit = {
+      context: Context, scope: Scriptable, linkingUnit: LinkingUnit): Unit =
 
     val loader = new ScalaJSCoreLib(linkingUnit)
 
     // Setup sourceMapper
-    if (sourceMap) {
+    if (sourceMap)
       val oldScalaJSenv = ScriptableObject.getProperty(scope, "__ScalaJSEnv")
-      val scalaJSenv = oldScalaJSenv match {
+      val scalaJSenv = oldScalaJSenv match
         case Scriptable.NOT_FOUND =>
           val newScalaJSenv = context.newObject(scope)
           ScriptableObject.putProperty(scope, "__ScalaJSEnv", newScalaJSenv)
@@ -416,18 +383,14 @@ final class RhinoJSEnv private (
 
         case oldScalaJSenv: Scriptable =>
           oldScalaJSenv
-      }
 
       scalaJSenv.addFunction("sourceMapper",
                              args =>
-                               {
                                  val trace = Context.toObject(args(0), scope)
                                  loader.mapStackTrace(trace, context, scope)
-                             })
-    }
+                             )
 
     loader.insertInto(context, scope)
-  }
 
   private def basicEventLoop(taskQ: TaskQueue): Unit =
     eventLoopImpl(taskQ, sleepWait, () => true)
@@ -435,7 +398,7 @@ final class RhinoJSEnv private (
   private def comEventLoop(taskQ: TaskQueue,
                            channel: Channel,
                            callback: () => String => Unit,
-                           isOpen: () => Boolean): Unit = {
+                           isOpen: () => Boolean): Unit =
 
     if (!isOpen())
       // The channel has not been opened yet. Wait for opening.
@@ -446,14 +409,14 @@ final class RhinoJSEnv private (
     // - The channel is open
 
     // Guard call to `callback`
-    if (isOpen()) {
+    if (isOpen())
       val cb = callback()
-      try {
+      try
         @tailrec
-        def loop(): Unit = {
+        def loop(): Unit =
           val loopResult = eventLoopImpl(taskQ, channel.recvJS _, isOpen)
 
-          loopResult match {
+          loopResult match
             case Some(msg) =>
               cb(msg)
               loop()
@@ -463,15 +426,10 @@ final class RhinoJSEnv private (
               loop()
             case None =>
             // No tasks left, channel closed
-          }
-        }
         loop()
-      } catch {
+      catch
         case _: ChannelClosedException =>
         // the JVM side closed the connection
-      }
-    }
-  }
 
   /** Run an event loop on [[taskQ]] using [[waitFct]] to wait
     *
@@ -487,20 +445,20 @@ final class RhinoJSEnv private (
     */
   private def eventLoopImpl[T](taskQ: TaskQueue,
                                waitFct: Deadline => Option[T],
-                               continue: () => Boolean): Option[T] = {
+                               continue: () => Boolean): Option[T] =
 
     @tailrec
-    def loop(): Option[T] = {
+    def loop(): Option[T] =
       if (Thread.interrupted()) throw new InterruptedException()
 
       if (taskQ.isEmpty || !continue()) None
-      else {
+      else
         val task = taskQ.head
-        if (task.canceled) {
+        if (task.canceled)
           taskQ.dequeue()
           loop()
-        } else {
-          waitFct(task.deadline) match {
+        else
+          waitFct(task.deadline) match
             case result @ Some(_) => result
 
             case None =>
@@ -513,52 +471,42 @@ final class RhinoJSEnv private (
               if (task.reschedule()) taskQ += task
 
               loop()
-          }
-        }
-      }
-    }
 
     loop()
-  }
 
-  private val sleepWait = { (deadline: Deadline) =>
+  private val sleepWait =  (deadline: Deadline) =>
     val timeLeft = deadline.timeLeft.toMillis
     if (timeLeft > 0) Thread.sleep(timeLeft)
     None
-  }
 
-  private def verifyUnit(linkingUnit: LinkingUnit) = {
+  private def verifyUnit(linkingUnit: LinkingUnit) =
     require(linkingUnit.semantics == semantics,
             "RhinoJSEnv and LinkingUnit must agree on semantics")
     require(linkingUnit.esLevel == ESLevel.ES5, "RhinoJSEnv only supports ES5")
-  }
-}
 
-object RhinoJSEnv {
+object RhinoJSEnv
 
   final class ClassNotFoundException(className: String)
       extends Exception(s"Rhino was unable to load Scala.js class: $className")
 
   /** Communication channel between the Rhino thread and the rest of the JVM */
-  private class Channel {
+  private class Channel
     private[this] var _closedJS = false
     private[this] var _closedJVM = false
     private[this] val js2jvm = mutable.Queue.empty[String]
     private[this] val jvm2js = mutable.Queue.empty[String]
 
-    def sendToJS(msg: String): Unit = synchronized {
+    def sendToJS(msg: String): Unit = synchronized
       ensureOpen(_closedJVM)
       jvm2js.enqueue(msg)
       notifyAll()
-    }
 
-    def sendToJVM(msg: String): Unit = synchronized {
+    def sendToJVM(msg: String): Unit = synchronized
       ensureOpen(_closedJS)
       js2jvm.enqueue(msg)
       notifyAll()
-    }
 
-    def recvJVM(timeout: Duration): String = synchronized {
+    def recvJVM(timeout: Duration): String = synchronized
       val deadline = OptDeadline(timeout)
 
       while (js2jvm.isEmpty && ensureOpen(_closedJS) &&
@@ -566,46 +514,38 @@ object RhinoJSEnv {
 
       if (js2jvm.isEmpty) throw new TimeoutException("Timeout expired")
       js2jvm.dequeue()
-    }
 
-    def recvJS(): String = synchronized {
+    def recvJS(): String = synchronized
       while (jvm2js.isEmpty && ensureOpen(_closedJVM)) wait()
 
       jvm2js.dequeue()
-    }
 
-    def recvJS(deadline: Deadline): Option[String] = synchronized {
+    def recvJS(deadline: Deadline): Option[String] = synchronized
       var expired = false
-      while (jvm2js.isEmpty && !expired && ensureOpen(_closedJVM)) {
+      while (jvm2js.isEmpty && !expired && ensureOpen(_closedJVM))
         val timeLeft = deadline.timeLeft.toMillis
         if (timeLeft > 0) wait(timeLeft)
         else expired = true
-      }
 
       if (expired) None
       else Some(jvm2js.dequeue())
-    }
 
-    def closeJS(): Unit = synchronized {
+    def closeJS(): Unit = synchronized
       _closedJS = true
       notifyAll()
-    }
 
-    def closeJVM(): Unit = synchronized {
+    def closeJVM(): Unit = synchronized
       _closedJVM = true
       notifyAll()
-    }
 
     /** Throws if the channel is closed and returns true */
-    private def ensureOpen(closed: Boolean): Boolean = {
+    private def ensureOpen(closed: Boolean): Boolean =
       if (closed) throw new ChannelClosedException
       true
-    }
-  }
 
   private class ChannelClosedException extends Exception
 
-  private abstract class TimedTask(val task: () => Unit) {
+  private abstract class TimedTask(val task: () => Unit)
     private[this] var _canceled: Boolean = false
 
     def deadline: Deadline
@@ -613,32 +553,27 @@ object RhinoJSEnv {
 
     def canceled: Boolean = _canceled
     def cancel(): Unit = _canceled = true
-  }
 
   private final class TimeoutTask(val deadline: Deadline, task: () => Unit)
-      extends TimedTask(task) {
+      extends TimedTask(task)
     def reschedule(): Boolean = false
 
     override def toString(): String =
       s"TimeoutTask($deadline, canceled = $canceled)"
-  }
 
   private final class IntervalTask(
       firstDeadline: Deadline, interval: FiniteDuration, task: () => Unit)
-      extends TimedTask(task) {
+      extends TimedTask(task)
 
     private[this] var _deadline = firstDeadline
 
     def deadline: Deadline = _deadline
 
-    def reschedule(): Boolean = {
+    def reschedule(): Boolean =
       _deadline += interval
       !canceled
-    }
 
     override def toString(): String =
       s"IntervalTask($deadline, interval = $interval, canceled = $canceled)"
-  }
 
   private type TaskQueue = mutable.PriorityQueue[TimedTask]
-}

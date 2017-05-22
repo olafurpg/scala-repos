@@ -10,7 +10,7 @@ import scala.concurrent.duration.FiniteDuration
   *
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
-object AbstractFSM {
+object AbstractFSM
 
   /**
     * A partial function value which does not match anything and can be used to
@@ -21,7 +21,6 @@ object AbstractFSM {
     * }}}
     */
   def NullFunction[S, D]: PartialFunction[S, D] = FSM.NullFunction
-}
 
 /**
   * Java API: compatible with lambda expressions
@@ -30,7 +29,7 @@ object AbstractFSM {
   *
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
-abstract class AbstractFSM[S, D] extends FSM[S, D] {
+abstract class AbstractFSM[S, D] extends FSM[S, D]
   import akka.japi.pf._
   import akka.japi.pf.FI._
   import java.util.{List ⇒ JList}
@@ -416,7 +415,6 @@ abstract class AbstractFSM[S, D] extends FSM[S, D] {
     * also applies to `Stop` supervision directive.
     */
   val Shutdown: FSM.Reason = FSM.Shutdown
-}
 
 /**
   * Java API: compatible with lambda expressions

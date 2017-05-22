@@ -22,9 +22,7 @@ package table
 
 import com.precog.yggdrasil.util._
 
-trait StubIdSourceScannerModule {
+trait StubIdSourceScannerModule
   type YggConfig = IdSourceConfig
-  val yggConfig = new IdSourceConfig {
+  val yggConfig = new IdSourceConfig
     val idSource = new FreshAtomicIdSource
-  }
-}

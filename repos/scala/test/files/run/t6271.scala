@@ -1,47 +1,36 @@
-object Test extends App {
-  def filterIssue = {
+object Test extends App
+  def filterIssue =
     val viewed: Iterable[Iterable[Int]] = List(List(0).view).view
     val filtered =
-      viewed flatMap { x =>
+      viewed flatMap  x =>
         List(x filter (_ > 0))
-      }
     filtered.iterator.toIterable.flatten
-  }
-  def takenIssue = {
+  def takenIssue =
     val viewed: Iterable[Iterable[Int]] = List(List(0).view).view
     val filtered =
-      viewed flatMap { x =>
+      viewed flatMap  x =>
         List(x take 0)
-      }
     filtered.iterator.toIterable.flatten
-  }
-  def droppedIssue = {
+  def droppedIssue =
     val viewed: Iterable[Iterable[Int]] = List(List(0).view).view
     val filtered =
-      viewed flatMap { x =>
+      viewed flatMap  x =>
         List(x drop 1)
-      }
     filtered.iterator.toIterable.flatten
-  }
-  def flatMappedIssue = {
+  def flatMappedIssue =
     val viewed: Iterable[Iterable[Int]] = List(List(0).view).view
     val filtered =
-      viewed flatMap { x =>
+      viewed flatMap  x =>
         List(x flatMap (_ => List()))
-      }
     filtered.iterator.toIterable.flatten
-  }
-  def slicedIssue = {
+  def slicedIssue =
     val viewed: Iterable[Iterable[Int]] = List(List(0).view).view
     val filtered =
-      viewed flatMap { x =>
+      viewed flatMap  x =>
         List(x slice (2, 3))
-      }
     filtered.iterator.toIterable.flatten
-  }
   filterIssue
   takenIssue
   droppedIssue
   flatMappedIssue
   slicedIssue
-}

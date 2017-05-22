@@ -18,15 +18,15 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * User: Alexander Podkhalyuzin
   * Date: 23.11.2008
   */
-class ScalaNameSuggestionProvider extends NameSuggestionProvider {
+class ScalaNameSuggestionProvider extends NameSuggestionProvider
   def completeName(element: PsiElement,
                    nameSuggestionContext: PsiElement,
                    prefix: String): util.Collection[LookupElement] = null
 
   def getSuggestedNames(element: PsiElement,
                         nameSuggestionContext: PsiElement,
-                        result: util.Set[String]): SuggestedNameInfo = {
-    val names = element match {
+                        result: util.Set[String]): SuggestedNameInfo =
+    val names = element match
       case clazz: ScTemplateDefinition => Seq[String](clazz.name)
       case typed: ScTypedDefinition =>
         typed.name +: NameSuggester
@@ -36,8 +36,5 @@ class ScalaNameSuggestionProvider extends NameSuggestionProvider {
       case named: ScNamedElement => Seq[String](named.name)
       case named: PsiNamedElement => Seq[String](named.getName)
       case _ => Seq[String]()
-    }
     names.distinct.foreach(result.add)
     new SuggestedNameInfo(names.toArray) {}
-  }
-}

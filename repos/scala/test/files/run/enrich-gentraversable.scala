@@ -1,18 +1,17 @@
 import scala.language.implicitConversions
 import scala.language.postfixOps
 
-object Test extends App {
+object Test extends App
   import scala.collection.{GenTraversableOnce, GenTraversableLike}
   import scala.collection.generic._
 
   def typed[T](t: => T) {}
-  def testTraversableLike = {
+  def testTraversableLike =
     class FilterMapImpl[
-        A, Repr](val r: GenTraversableLike[A, Repr]) /* extends AnyVal */ {
+        A, Repr](val r: GenTraversableLike[A, Repr]) /* extends AnyVal */
       final def filterMap[B, That](f: A => Option[B])(
           implicit cbf: CanBuildFrom[Repr, B, That]): That =
         r.flatMap(f(_).toSeq)
-    }
     implicit def filterMap[Repr, A](r: Repr)(
         implicit fr: IsTraversableLike[Repr]): FilterMapImpl[fr.A, Repr] =
       new FilterMapImpl[fr.A, Repr](fr.conversion(r))
@@ -35,18 +34,15 @@ object Test extends App {
     val fms2 = s.filterMap(c => if (c % 2 == 0) Some(c.toInt) else None)
     typed[IndexedSeq[Int]](fms2)
     println(fms2)
-  }
-  def testTraversableOnce = {
+  def testTraversableOnce =
     class FilterMapImpl[
-        A, Repr](val r: GenTraversableOnce[A]) /* extends AnyVal */ {
+        A, Repr](val r: GenTraversableOnce[A]) /* extends AnyVal */
       final def filterMap[B, That](f: A => Option[B])(
-          implicit cbf: CanBuildFrom[Repr, B, That]): That = {
+          implicit cbf: CanBuildFrom[Repr, B, That]): That =
         val b = cbf()
         for (e <- r.seq) f(e) foreach (b +=)
 
         b.result
-      }
-    }
     implicit def filterMap[Repr, A](r: Repr)(
         implicit fr: IsTraversableOnce[Repr]): FilterMapImpl[fr.A, Repr] =
       new FilterMapImpl[fr.A, Repr](fr.conversion(r))
@@ -69,8 +65,6 @@ object Test extends App {
     val fms2 = s.filterMap(c => if (c % 2 == 0) Some(c.toInt) else None)
     typed[IndexedSeq[Int]](fms2)
     println(fms2)
-  }
 
   testTraversableLike
   testTraversableOnce
-}

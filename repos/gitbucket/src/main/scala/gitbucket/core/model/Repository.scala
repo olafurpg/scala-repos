@@ -1,13 +1,13 @@
 package gitbucket.core.model
 
-trait RepositoryComponent extends TemplateComponent { self: Profile =>
+trait RepositoryComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import self._
 
   lazy val Repositories = TableQuery[Repositories]
 
   class Repositories(tag: Tag)
-      extends Table[Repository](tag, "REPOSITORY") with BasicTemplate {
+      extends Table[Repository](tag, "REPOSITORY") with BasicTemplate
     val isPrivate = column[Boolean]("PRIVATE")
     val description = column[String]("DESCRIPTION")
     val defaultBranch = column[String]("DEFAULT_BRANCH")
@@ -34,8 +34,6 @@ trait RepositoryComponent extends TemplateComponent { self: Profile =>
 
     def byPrimaryKey(owner: String, repository: String) =
       byRepository(owner, repository)
-  }
-}
 
 case class Repository(
     userName: String,

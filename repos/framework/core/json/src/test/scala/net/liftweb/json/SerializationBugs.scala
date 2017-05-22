@@ -20,20 +20,19 @@ package json
 import org.specs2.mutable.Specification
 import java.util.UUID
 
-object SerializationBugs extends Specification {
+object SerializationBugs extends Specification
   import Serialization.{read, write => swrite}
 
   implicit val formats = Serialization.formats(NoTypeHints)
 
-  "plan1.Plan can be serialized (issue 341)" in {
+  "plan1.Plan can be serialized (issue 341)" in
     import plan1._
 
     val game = Game(Map("a" -> Plan(Some(Action(1, None)))))
     val ser = swrite(game)
     read[Game](ser) mustEqual game
-  }
 
-  "plan2.Plan can be serialized (issue 341)" in {
+  "plan2.Plan can be serialized (issue 341)" in
     import plan2._
 
     val g1 = Game(
@@ -52,33 +51,27 @@ object SerializationBugs extends Specification {
     (rightOp.functionName mustEqual "f2") and (rightOp.symbol mustEqual "s2") and
     (rightOp.inParams.toList mustEqual List(0, 1, 2)) and
     (rightOp.subOperand mustEqual None)
-  }
 
-  "null serialization bug" in {
+  "null serialization bug" in
     val x = new X(null)
     val ser = swrite(x)
     read[X](ser) mustEqual x
-  }
 
-  "StackOverflowError with large Lists" in {
+  "StackOverflowError with large Lists" in
     val xs = LongList(List.fill(5000)(0).map(Num))
     val ser = swrite(xs)
     read[LongList](ser).xs.length mustEqual 5000
-  }
 
-  "Custom serializer should work with Option" in {
-    class UUIDFormat extends Serializer[UUID] {
+  "Custom serializer should work with Option" in
+    class UUIDFormat extends Serializer[UUID]
       val UUIDClass = classOf[UUID]
 
       def deserialize(implicit format: Formats)
-        : PartialFunction[(TypeInfo, JValue), UUID] = {
+        : PartialFunction[(TypeInfo, JValue), UUID] =
         case (TypeInfo(UUIDClass, _), JString(x)) => UUID.fromString(x)
-      }
 
-      def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
+      def serialize(implicit format: Formats): PartialFunction[Any, JValue] =
         case x: UUID => JString(x.toString)
-      }
-    }
 
     implicit val formats = Serialization.formats(NoTypeHints) + new UUIDFormat
     val o1 = OptionalUUID(None)
@@ -86,17 +79,15 @@ object SerializationBugs extends Specification {
 
     (read[OptionalUUID](swrite(o1)) mustEqual o1) and
     (read[OptionalUUID](swrite(o2)) mustEqual o2)
-  }
 
-  "TypeInfo is not correctly constructed for customer serializer -- 970" in {
-    class SeqFormat extends Serializer[Seq[_]] {
+  "TypeInfo is not correctly constructed for customer serializer -- 970" in
+    class SeqFormat extends Serializer[Seq[_]]
       val SeqClass = classOf[Seq[_]]
 
-      def serialize(implicit format: Formats) = {
+      def serialize(implicit format: Formats) =
         case seq: Seq[_] => JArray(seq.toList.map(Extraction.decompose))
-      }
 
-      def deserialize(implicit format: Formats) = {
+      def deserialize(implicit format: Formats) =
         case (TypeInfo(SeqClass, parameterizedType), JArray(xs)) =>
           val typeInfo = TypeInfo(
               parameterizedType
@@ -105,44 +96,38 @@ object SerializationBugs extends Specification {
                 .asInstanceOf[Class[_]],
               None)
           xs.map(x => Extraction.extract(x, typeInfo))
-      }
-    }
 
     implicit val formats = DefaultFormats + new SeqFormat
 
     val seq = Seq(1, 2, 3)
     val ser = Extraction.decompose(seq)
     Extraction.extract[Seq[Int]](ser) mustEqual seq
-  }
 
-  "Serialization of an opaque value should not fail" in {
+  "Serialization of an opaque value should not fail" in
     val o = Opaque(JObject(JField("some", JString("data")) :: Nil))
     val ser = Serialization.write(o)
     ser mustEqual """{"x":{"some":"data"}}"""
-  }
 
-  "Map with Map value" in {
+  "Map with Map value" in
     val a = Map("a" -> Map("a" -> 5))
     val b = Map("b" -> 1)
     val str = Serialization.write(MapWithMap(a, b))
     read[MapWithMap](str) mustEqual MapWithMap(a, b)
-  }
 
-  "Either can't be deserialized with type hints" in {
+  "Either can't be deserialized with type hints" in
     implicit val formats =
       DefaultFormats + FullTypeHints(classOf[Either[_, _]] :: Nil)
     val x = Eith(Left("hello"))
     val s = Serialization.write(x)
     read[Eith](s) mustEqual x
-  }
 
-  "Custom serializer should work as Map key (scala 2.9) (issue #1077)" in {
-    class SingleOrVectorSerializer extends Serializer[SingleOrVector[Double]] {
+  "Custom serializer should work as Map key (scala 2.9) (issue #1077)" in
+    class SingleOrVectorSerializer extends Serializer[SingleOrVector[Double]]
       private val singleOrVectorClass = classOf[SingleOrVector[Double]]
 
-      def deserialize(implicit format: Formats) = {
+      def deserialize(implicit format: Formats) =
         case (TypeInfo(`singleOrVectorClass`, _), json) =>
-          json match {
+          json match
             case JObject(List(JField("val", JDouble(x)))) => SingleValue(x)
             case JObject(List(JField("val", JArray(xs: List[_])))) =>
               VectorValue(
@@ -150,10 +135,8 @@ object SerializationBugs extends Specification {
             case x =>
               throw new MappingException(
                   "Can't convert " + x + " to SingleOrVector")
-          }
-      }
 
-      def serialize(implicit format: Formats) = {
+      def serialize(implicit format: Formats) =
         case SingleValue(x: Double) => JObject(List(JField("val", JDouble(x))))
         case VectorValue(x: Vector[_]) =>
           JObject(
@@ -162,16 +145,13 @@ object SerializationBugs extends Specification {
                                 .asInstanceOf[Vector[Double]]
                                 .toList
                                 .map(JDouble(_))))))
-      }
-    }
 
     implicit val formats = DefaultFormats + new SingleOrVectorSerializer
 
     val ser = swrite(MapHolder(Map("hello" -> SingleValue(2.0))))
     read[MapHolder](ser) mustEqual MapHolder(Map("hello" -> SingleValue(2.0)))
-  }
 
-  "Constructor memoization should not ignore type parameters" in {
+  "Constructor memoization should not ignore type parameters" in
     val jsonA = """ { "data": { "foo": "string" }, "success": true } """
     val jsonB = """ { "data": { "bar": "string" }, "success": true } """
 
@@ -179,8 +159,6 @@ object SerializationBugs extends Specification {
             TypeA("string"))) and
     (read[SomeContainer[TypeB]](jsonB) mustEqual SomeContainer(
             TypeB("string")))
-  }
-}
 
 case class TypeA(foo: String)
 case class TypeB(bar: String)
@@ -198,13 +176,12 @@ case class Y(ss: String)
 
 case class OptionalUUID(uuid: Option[UUID])
 
-package plan1 {
+package plan1
   case class Plan(plan: Option[Action])
   case class Game(game: Map[String, Plan])
   case class Action(id: Int, subAction: Option[Action])
-}
 
-package plan2 {
+package plan2
   case class Plan(leftOperand: Option[Action],
                   operator: Option[String],
                   rightOperand: Option[Action])
@@ -213,7 +190,6 @@ package plan2 {
                     symbol: String,
                     inParams: Array[Number],
                     subOperand: Option[Action])
-}
 
 case class Opaque(x: JValue)
 

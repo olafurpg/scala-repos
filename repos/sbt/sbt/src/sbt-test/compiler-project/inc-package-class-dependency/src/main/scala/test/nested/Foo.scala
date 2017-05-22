@@ -1,5 +1,4 @@
 package test.nested
 
-trait Foo {
+trait Foo
   def xyz(x: test.Nested)
-}

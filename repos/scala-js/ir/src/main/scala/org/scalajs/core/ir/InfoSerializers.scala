@@ -12,7 +12,7 @@ import java.io._
 
 import Infos._
 
-object InfoSerializers {
+object InfoSerializers
 
   /** Scala.js IR File Magic Number
     *
@@ -22,26 +22,22 @@ object InfoSerializers {
     */
   final val IRMagicNumber = 0xCAFE4A53
 
-  def serialize(stream: OutputStream, classInfo: ClassInfo): Unit = {
+  def serialize(stream: OutputStream, classInfo: ClassInfo): Unit =
     new Serializer().serialize(stream, classInfo)
-  }
 
-  def deserialize(stream: InputStream): ClassInfo = {
+  def deserialize(stream: InputStream): ClassInfo =
     deserializeWithVersion(stream)._2
-  }
 
-  def deserializeWithVersion(stream: InputStream): (String, ClassInfo) = {
+  def deserializeWithVersion(stream: InputStream): (String, ClassInfo) =
     new Deserializer(stream).deserialize()
-  }
 
-  private final class Serializer {
-    def serialize(stream: OutputStream, classInfo: ClassInfo): Unit = {
+  private final class Serializer
+    def serialize(stream: OutputStream, classInfo: ClassInfo): Unit =
       val s = new DataOutputStream(stream)
 
-      def writeSeq[A](seq: Seq[A])(writeElem: A => Unit): Unit = {
+      def writeSeq[A](seq: Seq[A])(writeElem: A => Unit): Unit =
         s.writeInt(seq.size)
         seq.foreach(writeElem)
-      }
 
       def writeStrings(seq: Seq[String]): Unit =
         writeSeq(seq)(s.writeUTF(_))
@@ -59,34 +55,28 @@ object InfoSerializers {
       s.writeUTF(superClass.getOrElse(""))
       writeStrings(interfaces)
 
-      def writeMethodInfo(methodInfo: MethodInfo): Unit = {
+      def writeMethodInfo(methodInfo: MethodInfo): Unit =
         import methodInfo._
         s.writeUTF(encodedName)
         s.writeBoolean(isStatic)
         s.writeBoolean(isAbstract)
         s.writeBoolean(isExported)
-        writeSeq(methodsCalled.toSeq) {
+        writeSeq(methodsCalled.toSeq)
           case (cls, callees) => s.writeUTF(cls); writeStrings(callees)
-        }
-        writeSeq(methodsCalledStatically.toSeq) {
+        writeSeq(methodsCalledStatically.toSeq)
           case (cls, callees) => s.writeUTF(cls); writeStrings(callees)
-        }
-        writeSeq(staticMethodsCalled.toSeq) {
+        writeSeq(staticMethodsCalled.toSeq)
           case (cls, callees) => s.writeUTF(cls); writeStrings(callees)
-        }
         writeStrings(instantiatedClasses)
         writeStrings(accessedModules)
         writeStrings(usedInstanceTests)
         writeStrings(accessedClassData)
-      }
 
       writeSeq(methods)(writeMethodInfo(_))
 
       s.flush()
-    }
-  }
 
-  private final class Deserializer(stream: InputStream) {
+  private final class Deserializer(stream: InputStream)
     private[this] val input = new DataInputStream(stream)
 
     def readList[A](readElem: => A): List[A] =
@@ -95,7 +85,7 @@ object InfoSerializers {
     def readStrings(): List[String] =
       readList(input.readUTF())
 
-    def deserialize(): (String, ClassInfo) = {
+    def deserialize(): (String, ClassInfo) =
       val version = readHeader()
 
       import input._
@@ -110,7 +100,7 @@ object InfoSerializers {
       val superClass = if (superClass0 == "") None else Some(superClass0)
       val interfaces = readList(readUTF())
 
-      def readMethod(): MethodInfo = {
+      def readMethod(): MethodInfo =
         val encodedName = readUTF()
         val isStatic = readBoolean()
         val isAbstract = readBoolean()
@@ -134,26 +124,23 @@ object InfoSerializers {
                    accessedModules,
                    usedInstanceTests,
                    accessedClassData)
-      }
 
       val methods0 = readList(readMethod())
       val methods =
-        if (useHacks065) {
+        if (useHacks065)
           methods0.filter(m => !Definitions.isReflProxyName(m.encodedName))
-        } else {
+        else
           methods0
-        }
 
       val info = ClassInfo(
           encodedName, isExported, kind, superClass, interfaces, methods)
 
       (version, info)
-    }
 
     /** Reads the Scala.js IR header and verifies the version compatibility.
       *  Returns the emitted binary version.
       */
-    def readHeader(): String = {
+    def readHeader(): String =
       // Check magic number
       if (input.readInt() != IRMagicNumber)
         throw new IOException("Not a Scala.js IR file")
@@ -161,15 +148,11 @@ object InfoSerializers {
       // Check that we support this version of the IR
       val version = input.readUTF()
       val supported = ScalaJSVersions.binarySupported
-      if (!supported.contains(version)) {
+      if (!supported.contains(version))
         throw new IRVersionNotSupportedException(
             version,
             supported,
             s"This version ($version) of Scala.js IR is not supported. " +
             s"Supported versions are: ${supported.mkString(", ")}")
-      }
 
       version
-    }
-  }
-}

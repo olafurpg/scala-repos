@@ -21,7 +21,7 @@ import org.apache.spark.graphx._
 import org.apache.spark.graphx.util.collection.GraphXPrimitiveKeyOpenHashMap
 import org.apache.spark.util.collection.{BitSet, PrimitiveVector}
 
-private[graphx] object RoutingTablePartition {
+private[graphx] object RoutingTablePartition
 
   /**
     * A message from an edge partition to a vertex specifying the position in which the edge
@@ -31,11 +31,10 @@ private[graphx] object RoutingTablePartition {
   type RoutingTableMessage = (VertexId, Int)
 
   private def toMessage(
-      vid: VertexId, pid: PartitionID, position: Byte): RoutingTableMessage = {
+      vid: VertexId, pid: PartitionID, position: Byte): RoutingTableMessage =
     val positionUpper2 = position << 30
     val pidLower30 = pid & 0x3FFFFFFF
     (vid, positionUpper2 | pidLower30)
-  }
 
   private def vidFromMessage(msg: RoutingTableMessage): VertexId = msg._1
   private def pidFromMessage(msg: RoutingTableMessage): PartitionID =
@@ -48,56 +47,47 @@ private[graphx] object RoutingTablePartition {
   /** Generate a `RoutingTableMessage` for each vertex referenced in `edgePartition`. */
   def edgePartitionToMsgs(
       pid: PartitionID,
-      edgePartition: EdgePartition[_, _]): Iterator[RoutingTableMessage] = {
+      edgePartition: EdgePartition[_, _]): Iterator[RoutingTableMessage] =
     // Determine which positions each vertex id appears in using a map where the low 2 bits
     // represent src and dst
     val map = new GraphXPrimitiveKeyOpenHashMap[VertexId, Byte]
-    edgePartition.iterator.foreach { e =>
+    edgePartition.iterator.foreach  e =>
       map.changeValue(e.srcId, 0x1, (b: Byte) => (b | 0x1).toByte)
       map.changeValue(e.dstId, 0x2, (b: Byte) => (b | 0x2).toByte)
-    }
-    map.iterator.map { vidAndPosition =>
+    map.iterator.map  vidAndPosition =>
       val vid = vidAndPosition._1
       val position = vidAndPosition._2
       toMessage(vid, pid, position)
-    }
-  }
 
   /** Build a `RoutingTablePartition` from `RoutingTableMessage`s. */
   def fromMsgs(numEdgePartitions: Int,
-               iter: Iterator[RoutingTableMessage]): RoutingTablePartition = {
+               iter: Iterator[RoutingTableMessage]): RoutingTablePartition =
     val pid2vid = Array.fill(numEdgePartitions)(new PrimitiveVector[VertexId])
     val srcFlags = Array.fill(numEdgePartitions)(new PrimitiveVector[Boolean])
     val dstFlags = Array.fill(numEdgePartitions)(new PrimitiveVector[Boolean])
-    for (msg <- iter) {
+    for (msg <- iter)
       val vid = vidFromMessage(msg)
       val pid = pidFromMessage(msg)
       val position = positionFromMessage(msg)
       pid2vid(pid) += vid
       srcFlags(pid) += (position & 0x1) != 0
       dstFlags(pid) += (position & 0x2) != 0
-    }
 
     new RoutingTablePartition(
-        pid2vid.zipWithIndex.map {
+        pid2vid.zipWithIndex.map
       case (vids, pid) =>
         (vids.trim().array, toBitSet(srcFlags(pid)), toBitSet(dstFlags(pid)))
-    })
-  }
+    )
 
   /** Compact the given vector of Booleans into a BitSet. */
-  private def toBitSet(flags: PrimitiveVector[Boolean]): BitSet = {
+  private def toBitSet(flags: PrimitiveVector[Boolean]): BitSet =
     val bitset = new BitSet(flags.size)
     var i = 0
-    while (i < flags.size) {
-      if (flags(i)) {
+    while (i < flags.size)
+      if (flags(i))
         bitset.set(i)
-      }
       i += 1
-    }
     bitset
-  }
-}
 
 /**
   * Stores the locations of edge-partition join sites for each vertex attribute in a particular
@@ -106,7 +96,7 @@ private[graphx] object RoutingTablePartition {
   */
 private[graphx] class RoutingTablePartition(
     private val routingTable: Array[(Array[VertexId], BitSet, BitSet)])
-    extends Serializable {
+    extends Serializable
 
   /** The maximum number of edge partitions this `RoutingTablePartition` is built to join with. */
   val numEdgePartitions: Int = routingTable.length
@@ -119,12 +109,11 @@ private[graphx] class RoutingTablePartition(
     routingTable.iterator.flatMap(_._1.iterator)
 
   /** Returns a new RoutingTablePartition reflecting a reversal of all edge directions. */
-  def reverse: RoutingTablePartition = {
+  def reverse: RoutingTablePartition =
     new RoutingTablePartition(
-        routingTable.map {
+        routingTable.map
       case (vids, srcVids, dstVids) => (vids, dstVids, srcVids)
-    })
-  }
+    )
 
   /**
     * Runs `f` on each vertex id to be sent to the specified edge partition. Vertex ids can be
@@ -132,19 +121,15 @@ private[graphx] class RoutingTablePartition(
     */
   def foreachWithinEdgePartition(
       pid: PartitionID, includeSrc: Boolean, includeDst: Boolean)(
-      f: VertexId => Unit) {
+      f: VertexId => Unit)
     val (vidsCandidate, srcVids, dstVids) = routingTable(pid)
     val size = vidsCandidate.length
-    if (includeSrc && includeDst) {
+    if (includeSrc && includeDst)
       // Avoid checks for performance
       vidsCandidate.iterator.foreach(f)
-    } else if (!includeSrc && !includeDst) {
+    else if (!includeSrc && !includeDst)
       // Do nothing
-    } else {
+    else
       val relevantVids = if (includeSrc) srcVids else dstVids
-      relevantVids.iterator.foreach { i =>
+      relevantVids.iterator.foreach  i =>
         f(vidsCandidate(i))
-      }
-    }
-  }
-}

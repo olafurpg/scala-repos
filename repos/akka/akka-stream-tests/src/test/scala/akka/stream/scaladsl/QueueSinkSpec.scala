@@ -15,7 +15,7 @@ import scala.concurrent.duration._
 import scala.util.control.NoStackTrace
 import akka.testkit.AkkaSpec
 
-class QueueSinkSpec extends AkkaSpec {
+class QueueSinkSpec extends AkkaSpec
   implicit val ec = system.dispatcher
   implicit val materializer = ActorMaterializer()
 
@@ -23,26 +23,23 @@ class QueueSinkSpec extends AkkaSpec {
 
   val noMsgTimeout = 300.millis
 
-  "An QueueSinkSpec" must {
+  "An QueueSinkSpec" must
 
-    "send the elements as result of future" in assertAllStagesStopped {
+    "send the elements as result of future" in assertAllStagesStopped
       val expected = List(Some(1), Some(2), Some(3), None)
       val queue = Source(expected.flatten).runWith(Sink.queue())
-      expected foreach { v ⇒
+      expected foreach  v ⇒
         queue.pull() pipeTo testActor
         expectMsg(v)
-      }
-    }
 
-    "allow to have only one future waiting for result in each point of time" in assertAllStagesStopped {
+    "allow to have only one future waiting for result in each point of time" in assertAllStagesStopped
       val probe = TestPublisher.manualProbe[Int]()
       val queue = Source.fromPublisher(probe).runWith(Sink.queue())
       val sub = probe.expectSubscription()
       val future = queue.pull()
       val future2 = queue.pull()
-      an[IllegalStateException] shouldBe thrownBy {
+      an[IllegalStateException] shouldBe thrownBy
         Await.result(future2, 300.millis)
-      }
 
       sub.sendNext(1)
       future.pipeTo(testActor)
@@ -50,9 +47,8 @@ class QueueSinkSpec extends AkkaSpec {
 
       sub.sendComplete()
       queue.pull()
-    }
 
-    "wait for next element from upstream" in assertAllStagesStopped {
+    "wait for next element from upstream" in assertAllStagesStopped
       val probe = TestPublisher.manualProbe[Int]()
       val queue = Source.fromPublisher(probe).runWith(Sink.queue())
       val sub = probe.expectSubscription()
@@ -64,9 +60,8 @@ class QueueSinkSpec extends AkkaSpec {
       expectMsg(Some(1))
       sub.sendComplete()
       queue.pull()
-    }
 
-    "fail future on stream failure" in assertAllStagesStopped {
+    "fail future on stream failure" in assertAllStagesStopped
       val probe = TestPublisher.manualProbe[Int]()
       val queue = Source.fromPublisher(probe).runWith(Sink.queue())
       val sub = probe.expectSubscription()
@@ -76,9 +71,8 @@ class QueueSinkSpec extends AkkaSpec {
 
       sub.sendError(ex)
       expectMsg(Status.Failure(ex))
-    }
 
-    "fail future when stream failed" in assertAllStagesStopped {
+    "fail future when stream failed" in assertAllStagesStopped
       val probe = TestPublisher.manualProbe[Int]()
       val queue = Source.fromPublisher(probe).runWith(Sink.queue())
       val sub = probe.expectSubscription()
@@ -86,9 +80,8 @@ class QueueSinkSpec extends AkkaSpec {
 
       the[Exception] thrownBy { Await.result(queue.pull(), 300.millis) } should be(
           ex)
-    }
 
-    "timeout future when stream cannot provide data" in assertAllStagesStopped {
+    "timeout future when stream cannot provide data" in assertAllStagesStopped
       val probe = TestPublisher.manualProbe[Int]()
       val queue = Source.fromPublisher(probe).runWith(Sink.queue())
       val sub = probe.expectSubscription()
@@ -100,9 +93,8 @@ class QueueSinkSpec extends AkkaSpec {
       expectMsg(Some(1))
       sub.sendComplete()
       queue.pull()
-    }
 
-    "fail pull future when stream is completed" in assertAllStagesStopped {
+    "fail pull future when stream is completed" in assertAllStagesStopped
       val probe = TestPublisher.manualProbe[Int]()
       val queue = Source.fromPublisher(probe).runWith(Sink.queue())
       val sub = probe.expectSubscription()
@@ -114,12 +106,10 @@ class QueueSinkSpec extends AkkaSpec {
       sub.sendComplete()
       Await.result(queue.pull(), noMsgTimeout) should be(None)
 
-      queue.pull().onFailure {
+      queue.pull().onFailure
         case e ⇒ e.isInstanceOf[IllegalStateException] should ===(true)
-      }
-    }
 
-    "keep on sending even after the buffer has been full" in assertAllStagesStopped {
+    "keep on sending even after the buffer has been full" in assertAllStagesStopped
       val bufferSize = 16
       val streamElementCount = bufferSize + 4
       val sink =
@@ -132,15 +122,13 @@ class QueueSinkSpec extends AkkaSpec {
         .toMat(sink)(Keep.both)
         .run()
       probe.futureValue should ===(akka.Done)
-      for (i ← 1 to streamElementCount) {
+      for (i ← 1 to streamElementCount)
         queue.pull() pipeTo testActor
         expectMsg(Some(i))
-      }
       queue.pull() pipeTo testActor
       expectMsg(None)
-    }
 
-    "work with one element buffer" in assertAllStagesStopped {
+    "work with one element buffer" in assertAllStagesStopped
       val sink = Sink.queue[Int]().withAttributes(inputBuffer(1, 1))
       val probe = TestPublisher.manualProbe[Int]()
       val queue = Source.fromPublisher(probe).runWith(sink)
@@ -157,14 +145,9 @@ class QueueSinkSpec extends AkkaSpec {
 
       sub.sendComplete()
       Await.result(queue.pull(), noMsgTimeout) should be(None)
-    }
 
-    "fail to materialize with zero sized input buffer" in {
-      an[IllegalArgumentException] shouldBe thrownBy {
+    "fail to materialize with zero sized input buffer" in
+      an[IllegalArgumentException] shouldBe thrownBy
         Source
           .single(())
           .runWith(Sink.queue().withAttributes(inputBuffer(0, 0)))
-      }
-    }
-  }
-}

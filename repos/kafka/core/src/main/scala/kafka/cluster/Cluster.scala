@@ -21,14 +21,13 @@ import scala.collection._
 /**
   * The set of active brokers in the cluster
   */
-private[kafka] class Cluster {
+private[kafka] class Cluster
 
   private val brokers = new mutable.HashMap[Int, Broker]
 
-  def this(brokerList: Iterable[Broker]) {
+  def this(brokerList: Iterable[Broker])
     this()
     for (broker <- brokerList) brokers.put(broker.id, broker)
-  }
 
   def getBroker(id: Int): Option[Broker] = brokers.get(id)
 
@@ -40,4 +39,3 @@ private[kafka] class Cluster {
 
   override def toString(): String =
     "Cluster(" + brokers.values.mkString(", ") + ")"
-}

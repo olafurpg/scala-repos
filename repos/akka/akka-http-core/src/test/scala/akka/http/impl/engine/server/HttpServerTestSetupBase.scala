@@ -19,7 +19,7 @@ import akka.http.impl.util._
 import akka.http.scaladsl.model.headers.{ProductVersion, Server}
 import akka.http.scaladsl.model.{HttpResponse, HttpRequest}
 
-abstract class HttpServerTestSetupBase {
+abstract class HttpServerTestSetupBase
   implicit def system: ActorSystem
   implicit def materializer: Materializer
 
@@ -31,13 +31,13 @@ abstract class HttpServerTestSetupBase {
         Some(Server(List(ProductVersion("akka-http", "test")))))
   def remoteAddress: Option[InetSocketAddress] = None
 
-  val (netIn, netOut) = {
+  val (netIn, netOut) =
     val netIn = TestPublisher.probe[ByteString]()
     val netOut = ByteStringSinkProbe()
 
     RunnableGraph
       .fromGraph(GraphDSL.create(HttpServerBluePrint(
-                  settings, remoteAddress = remoteAddress, log = NoLogging)) {
+                  settings, remoteAddress = remoteAddress, log = NoLogging))
         implicit b ⇒ server ⇒
           import GraphDSL.Implicits._
           Source.fromPublisher(netIn) ~> Flow[ByteString].map(
@@ -47,28 +47,25 @@ abstract class HttpServerTestSetupBase {
           server.out2 ~> Sink.fromSubscriber(requests)
           Source.fromPublisher(responses) ~> server.in1
           ClosedShape
-      })
+      )
       .run()
 
     netIn -> netOut
-  }
 
-  def expectResponseWithWipedDate(expected: String): Unit = {
+  def expectResponseWithWipedDate(expected: String): Unit =
     val trimmed = expected.stripMarginWithNewline("\r\n")
     // XXXX = 4 bytes, ISO Date Time String = 29 bytes => need to request 25 bytes more than expected string
     val expectedSize = ByteString(trimmed, "utf8").length + 25
     val received = wipeDate(netOut.expectBytes(expectedSize).utf8String)
     assert(received == trimmed,
            s"Expected request '$trimmed' but got '$received'")
-  }
 
   def wipeDate(string: String) =
     string
       .fastSplit('\n')
-      .map {
+      .map
         case s if s.startsWith("Date:") ⇒ "Date: XXXX\r"
         case s ⇒ s
-      }
       .mkString("\n")
 
   def expectRequest(): HttpRequest = requests.requestNext()
@@ -83,4 +80,3 @@ abstract class HttpServerTestSetupBase {
     send(ByteString(string.stripMarginWithNewline("\r\n"), "UTF8"))
 
   def closeNetworkInput(): Unit = netIn.sendComplete()
-}

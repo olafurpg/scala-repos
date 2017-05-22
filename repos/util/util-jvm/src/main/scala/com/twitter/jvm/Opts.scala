@@ -7,12 +7,12 @@ import javax.management.{ObjectName, RuntimeMBeanException}
 /**
   * Retrieve the named JVM option.
   */
-object Opt {
+object Opt
   private[this] val DiagnosticName =
     ObjectName.getInstance("com.sun.management:type=HotSpotDiagnostic")
 
   def apply(name: String): Option[String] =
-    try Some {
+    try Some
       val o = ManagementFactory
         .getPlatformMBeanServer()
         .invoke(DiagnosticName,
@@ -20,11 +20,9 @@ object Opt {
                 Array(name),
                 Array("java.lang.String"))
       o.asInstanceOf[CompositeDataSupport].get("value").asInstanceOf[String]
-    } catch {
+    catch
       case _: IllegalArgumentException =>
         None
       case rbe: RuntimeMBeanException
           if rbe.getCause.isInstanceOf[IllegalArgumentException] =>
         None
-    }
-}

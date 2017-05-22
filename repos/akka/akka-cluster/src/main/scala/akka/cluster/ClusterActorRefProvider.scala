@@ -25,17 +25,16 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
                                             _eventStream: EventStream,
                                             _dynamicAccess: DynamicAccess)
     extends RemoteActorRefProvider(
-        _systemName, _settings, _eventStream, _dynamicAccess) {
+        _systemName, _settings, _eventStream, _dynamicAccess)
 
-  override def init(system: ActorSystemImpl): Unit = {
+  override def init(system: ActorSystemImpl): Unit =
     super.init(system)
 
     // initialize/load the Cluster extension
     Cluster(system)
-  }
 
   override protected def createRemoteWatcher(
-      system: ActorSystemImpl): ActorRef = {
+      system: ActorSystemImpl): ActorRef =
     // make sure Cluster extension is initialized/loaded from init thread
     Cluster(system)
 
@@ -48,7 +47,6 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
             unreachableReaperInterval = WatchUnreachableReaperInterval,
             heartbeatExpectedResponseAfter = WatchHeartbeatExpectedResponseAfter),
         "remote-watcher")
-  }
 
   /**
     * Factory method to make it possible to override deployer in subclass
@@ -56,7 +54,6 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
     */
   override protected def createDeployer: ClusterDeployer =
     new ClusterDeployer(settings, dynamicAccess)
-}
 
 /**
   * INTERNAL API
@@ -65,27 +62,27 @@ private[akka] class ClusterActorRefProvider(_systemName: String,
   */
 private[akka] class ClusterDeployer(
     _settings: ActorSystem.Settings, _pm: DynamicAccess)
-    extends RemoteDeployer(_settings, _pm) {
+    extends RemoteDeployer(_settings, _pm)
 
-  override def parseConfig(path: String, config: Config): Option[Deploy] = {
+  override def parseConfig(path: String, config: Config): Option[Deploy] =
     // config is the user supplied section, no defaults
     // amend it to use max-total-nr-of-instances as nr-of-instances if cluster.enabled and
     // user has not specified nr-of-instances
     val config2 =
       if (config.hasPath("cluster.enabled") &&
           config.getBoolean("cluster.enabled") &&
-          !config.hasPath("nr-of-instances")) {
+          !config.hasPath("nr-of-instances"))
         val maxTotalNrOfInstances = config
           .withFallback(default)
           .getInt("cluster.max-total-nr-of-instances")
         ConfigFactory
           .parseString("nr-of-instances=" + maxTotalNrOfInstances)
           .withFallback(config)
-      } else config
+      else config
 
-    super.parseConfig(path, config2) match {
+    super.parseConfig(path, config2) match
       case d @ Some(deploy) ⇒
-        if (deploy.config.getBoolean("cluster.enabled")) {
+        if (deploy.config.getBoolean("cluster.enabled"))
           if (deploy.scope != NoScopeGiven)
             throw new ConfigurationException(
                 "Cluster deployment can't be combined with scope [%s]".format(
@@ -95,7 +92,7 @@ private[akka] class ClusterDeployer(
                 "Cluster deployment can't be combined with [%s]".format(
                     deploy.routerConfig))
 
-          deploy.routerConfig match {
+          deploy.routerConfig match
             case r: Pool ⇒
               Some(
                   deploy.copy(routerConfig = ClusterRouterPool(
@@ -113,12 +110,8 @@ private[akka] class ClusterDeployer(
             case other ⇒
               throw new IllegalArgumentException(
                   s"Cluster aware router can only wrap Pool or Group, got [${other.getClass.getName}]")
-          }
-        } else d
+        else d
       case None ⇒ None
-    }
-  }
-}
 
 @SerialVersionUID(1L)
 abstract class ClusterScope extends Scope
@@ -126,7 +119,7 @@ abstract class ClusterScope extends Scope
 /**
   * Cluster aware scope of a [[akka.actor.Deploy]]
   */
-case object ClusterScope extends ClusterScope {
+case object ClusterScope extends ClusterScope
 
   /**
     * Java API: get the singleton instance
@@ -134,4 +127,3 @@ case object ClusterScope extends ClusterScope {
   def getInstance = this
 
   def withFallback(other: Scope): Scope = this
-}

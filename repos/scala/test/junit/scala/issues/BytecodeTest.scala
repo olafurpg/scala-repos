@@ -11,18 +11,17 @@ import scala.collection.JavaConverters._
 import scala.tools.partest.ASMConverters._
 import scala.tools.testing.ClearAfterClass
 
-object BytecodeTest extends ClearAfterClass.Clearable {
+object BytecodeTest extends ClearAfterClass.Clearable
   var compiler = newCompiler()
   def clear(): Unit = { compiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class BytecodeTest extends ClearAfterClass {
+class BytecodeTest extends ClearAfterClass
   ClearAfterClass.stateToClear = BytecodeTest
   val compiler = BytecodeTest.compiler
 
   @Test
-  def t8731(): Unit = {
+  def t8731(): Unit =
     val code = """class C {
         |  def f(x: Int) = (x: @annotation.switch) match {
         |    case 1 => 0
@@ -45,10 +44,9 @@ class BytecodeTest extends ClearAfterClass {
     assertTrue(
         getSingleMethod(c, "g").instructions
           .count(_.isInstanceOf[LookupSwitch]) == 1)
-  }
 
   @Test
-  def t8926(): Unit = {
+  def t8926(): Unit =
     import scala.reflect.internal.util.BatchSourceFile
 
     // this test cannot be implemented using partest because of its mixed-mode compilation strategy:
@@ -75,23 +73,21 @@ class BytecodeTest extends ClearAfterClass {
     val outfiles = (for (f <- outDir.iterator if !f.isDirectory) yield
       (f.name, f.toByteArray)).toList
 
-    def check(classfile: String, annotName: String) = {
-      val f = (outfiles collect {
+    def check(classfile: String, annotName: String) =
+      val f = (outfiles collect
             case (`classfile`, bytes) => AsmUtils.readClass(bytes)
-          }).head
+          ).head
       val descs = f.visibleAnnotations.asScala.map(_.desc).toList
       assertTrue(descs.toString, descs exists (_ contains annotName))
-    }
 
     check("A.class", "AnnotA")
 
     // known issue SI-8928: the visibility of AnnotB should be CLASS, but annotation classes without
     // a @Retention annotation are currently emitted as RUNTIME.
     check("B.class", "AnnotB")
-  }
 
   @Test
-  def t6288bJumpPosition(): Unit = {
+  def t6288bJumpPosition(): Unit =
     val code =
       """object Case3 {                                 // 01
         | def unapply(z: Any): Option[Int] = Some(-1)   // 02
@@ -142,15 +138,13 @@ class BytecodeTest extends ClearAfterClass {
     )
 
     val mainIns =
-      getSingleMethod(module, "main").instructions filter {
+      getSingleMethod(module, "main").instructions filter
         case _: LineNumber | _: Invoke | _: Jump => true
         case _ => false
-      }
     assertSameCode(mainIns, expected)
-  }
 
   @Test
-  def bytecodeForBranches(): Unit = {
+  def bytecodeForBranches(): Unit =
     val code =
       """class C {
         |  def t1(b: Boolean) = if (b) 1 else 2
@@ -291,5 +285,3 @@ class BytecodeTest extends ClearAfterClass {
                         Op(ICONST_0),
                         Label(17),
                         Op(IRETURN)))
-  }
-}

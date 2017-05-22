@@ -21,6 +21,5 @@ package breeze.optimize;
   *
   * @author dlwh
   */
-trait Minimizer[T, -F] {
+trait Minimizer[T, -F]
   def minimize(f: F, initial: T): T
-}

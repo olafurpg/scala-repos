@@ -29,37 +29,32 @@ import org.apache.spark.internal.Logging
   * each of which are a fixed size in bytes. The fixed record size is specified through
   * a parameter recordLength in the Hadoop configuration.
   */
-private[spark] object FixedLengthBinaryInputFormat {
+private[spark] object FixedLengthBinaryInputFormat
 
   /** Property name to set in Hadoop JobConfs for record length */
   val RECORD_LENGTH_PROPERTY =
     "org.apache.spark.input.FixedLengthBinaryInputFormat.recordLength"
 
   /** Retrieves the record length property from a Hadoop configuration */
-  def getRecordLength(context: JobContext): Int = {
+  def getRecordLength(context: JobContext): Int =
     context.getConfiguration.get(RECORD_LENGTH_PROPERTY).toInt
-  }
-}
 
 private[spark] class FixedLengthBinaryInputFormat
-    extends FileInputFormat[LongWritable, BytesWritable] with Logging {
+    extends FileInputFormat[LongWritable, BytesWritable] with Logging
 
   private var recordLength = -1
 
   /**
     * Override of isSplitable to ensure initial computation of the record length
     */
-  override def isSplitable(context: JobContext, filename: Path): Boolean = {
-    if (recordLength == -1) {
+  override def isSplitable(context: JobContext, filename: Path): Boolean =
+    if (recordLength == -1)
       recordLength = FixedLengthBinaryInputFormat.getRecordLength(context)
-    }
-    if (recordLength <= 0) {
+    if (recordLength <= 0)
       logDebug("record length is less than 0, file cannot be split")
       false
-    } else {
+    else
       true
-    }
-  }
 
   /**
     * This input format overrides computeSplitSize() to make sure that each split
@@ -67,25 +62,21 @@ private[spark] class FixedLengthBinaryInputFormat
     * will start at the first byte of a record, and the last byte will the last byte of a record.
     */
   override def computeSplitSize(
-      blockSize: Long, minSize: Long, maxSize: Long): Long = {
+      blockSize: Long, minSize: Long, maxSize: Long): Long =
     val defaultSize = super.computeSplitSize(blockSize, minSize, maxSize)
     // If the default size is less than the length of a record, make it equal to it
     // Otherwise, make sure the split size is as close to possible as the default size,
     // but still contains a complete set of records, with the first record
     // starting at the first byte in the split and the last record ending with the last byte
-    if (defaultSize < recordLength) {
+    if (defaultSize < recordLength)
       recordLength.toLong
-    } else {
+    else
       (Math.floor(defaultSize / recordLength) * recordLength).toLong
-    }
-  }
 
   /**
     * Create a FixedLengthBinaryRecordReader
     */
   override def createRecordReader(
       split: InputSplit, context: TaskAttemptContext)
-    : RecordReader[LongWritable, BytesWritable] = {
+    : RecordReader[LongWritable, BytesWritable] =
     new FixedLengthBinaryRecordReader
-  }
-}

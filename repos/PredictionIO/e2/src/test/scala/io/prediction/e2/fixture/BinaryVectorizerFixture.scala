@@ -18,10 +18,10 @@ import scala.collection.immutable.HashMap
 import scala.collection.immutable.HashSet
 import org.apache.spark.mllib.linalg.Vector
 
-trait BinaryVectorizerFixture {
+trait BinaryVectorizerFixture
 
-  def base = {
-    new {
+  def base =
+    new
       val maps: Seq[HashMap[String, String]] = Seq(
           HashMap("food" -> "orange", "music" -> "rock", "hobby" -> "scala"),
           HashMap("food" -> "orange", "music" -> "pop", "hobby" -> "running"),
@@ -30,11 +30,9 @@ trait BinaryVectorizerFixture {
       )
 
       val properties = HashSet("food", "hobby")
-    }
-  }
 
-  def testArrays = {
-    new {
+  def testArrays =
+    new
       // Test case for checking food value not listed in base.maps, and
       // property not in properties.
       val one = Array(
@@ -44,14 +42,10 @@ trait BinaryVectorizerFixture {
       val twoA = Array(("food", "orange"), ("hobby", "scala"))
       val twoB = Array(("food", "banana"), ("hobby", "scala"))
       val twoC = Array(("hobby", "guitar"))
-    }
-  }
 
-  def vecSum(vec1: Vector, vec2: Vector): Array[Double] = {
+  def vecSum(vec1: Vector, vec2: Vector): Array[Double] =
     (0 until vec1.size)
       .map(
           k => vec1(k) + vec2(k)
       )
       .toArray
-  }
-}

@@ -8,7 +8,7 @@ import java.security.{MessageDigest, SecureRandom}
 /**
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object Crypt {
+object Crypt
   val hex = "0123456789ABCDEF"
   val lineSeparator = System.getProperty("line.separator")
 
@@ -26,27 +26,22 @@ object Crypt {
   def sha1(bytes: Array[Byte]): String =
     digest(bytes, MessageDigest.getInstance("SHA1"))
 
-  def generateSecureCookie: String = {
+  def generateSecureCookie: String =
     val bytes = Array.fill(32)(0.byteValue)
     random.nextBytes(bytes)
     sha1(bytes)
-  }
 
-  def digest(bytes: Array[Byte], md: MessageDigest): String = {
+  def digest(bytes: Array[Byte], md: MessageDigest): String =
     md.update(bytes)
     hexify(md.digest)
-  }
 
-  def hexify(bytes: Array[Byte]): String = {
+  def hexify(bytes: Array[Byte]): String =
     val builder = new StringBuilder
-    bytes.foreach { byte =>
+    bytes.foreach  byte =>
       builder
         .append(hex.charAt((byte & 0xF) >> 4))
         .append(hex.charAt(byte & 0xF))
-    }
     builder.toString
-  }
 
   private def unifyLineSeparator(text: String): String =
     text.replaceAll(lineSeparator, "\n")
-}

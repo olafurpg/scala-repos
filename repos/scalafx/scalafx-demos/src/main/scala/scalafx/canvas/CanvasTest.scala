@@ -37,7 +37,7 @@ import scalafx.scene.paint.{Color, CycleMethod, LinearGradient, RadialGradient, 
 /**
   * Example adapted from code showed in [[http://docs.oracle.com/javafx/2/canvas/jfxpub-canvas.htm]].
   */
-object CanvasTest extends JFXApp {
+object CanvasTest extends JFXApp
 
   val canvas = new Canvas(200, 200)
   val gc = canvas.graphicsContext2D
@@ -107,10 +107,7 @@ object CanvasTest extends JFXApp {
   gc.applyEffect(new DropShadow(20, -20, 0, Color.Green))
   gc.applyEffect(new DropShadow(20, 0, -20, Color.Red))
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Canvas Test"
-    scene = new Scene(400, 400) {
+    scene = new Scene(400, 400)
       content = canvas
-    }
-  }
-}

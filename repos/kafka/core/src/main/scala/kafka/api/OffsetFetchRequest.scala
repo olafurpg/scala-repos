@@ -25,11 +25,11 @@ import kafka.network.RequestChannel.Response
 import kafka.utils.Logging
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 
-object OffsetFetchRequest extends Logging {
+object OffsetFetchRequest extends Logging
   val CurrentVersion: Short = 1
   val DefaultClientId = ""
 
-  def readFrom(buffer: ByteBuffer): OffsetFetchRequest = {
+  def readFrom(buffer: ByteBuffer): OffsetFetchRequest =
     // Read values from the envelope
     val versionId = buffer.getShort
     val correlationId = buffer.getInt
@@ -40,19 +40,15 @@ object OffsetFetchRequest extends Logging {
     val topicCount = buffer.getInt
     val pairs = (1 to topicCount).flatMap(
         _ =>
-          {
         val topic = readShortString(buffer)
         val partitionCount = buffer.getInt
         (1 to partitionCount).map(_ =>
-              {
             val partitionId = buffer.getInt
             TopicAndPartition(topic, partitionId)
-        })
-    })
+        )
+    )
     OffsetFetchRequest(
         consumerGroupId, pairs, versionId, correlationId, clientId)
-  }
-}
 
 case class OffsetFetchRequest(
     groupId: String,
@@ -60,11 +56,11 @@ case class OffsetFetchRequest(
     versionId: Short = OffsetFetchRequest.CurrentVersion,
     correlationId: Int = 0,
     clientId: String = OffsetFetchRequest.DefaultClientId)
-    extends RequestOrResponse(Some(ApiKeys.OFFSET_FETCH.id)) {
+    extends RequestOrResponse(Some(ApiKeys.OFFSET_FETCH.id))
 
   lazy val requestInfoGroupedByTopic = requestInfo.groupBy(_.topic)
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     // Write envelope
     buffer.putShort(versionId)
     buffer.putInt(correlationId)
@@ -75,16 +71,13 @@ case class OffsetFetchRequest(
     buffer.putInt(requestInfoGroupedByTopic.size) // number of topics
     requestInfoGroupedByTopic.foreach(
         t1 =>
-          {
         // (topic, Seq[TopicAndPartition])
         writeShortString(buffer, t1._1) // topic
         buffer.putInt(t1._2.size) // number of partitions for this topic
         t1._2.foreach(t2 =>
-              {
             buffer.putInt(t2.partition)
-        })
-    })
-  }
+        )
+    )
 
   override def sizeInBytes =
     2 + /* versionId */
@@ -93,31 +86,29 @@ case class OffsetFetchRequest(
     /* topic count */
     requestInfoGroupedByTopic.foldLeft(0)(
         (count, t) =>
-          {
         count + shortStringLength(t._1) + /* topic */
         4 + /* number of partitions */
         t._2.size * 4 /* partition */
-    })
+    )
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
-    val responseMap = requestInfo.map {
+                           request: RequestChannel.Request): Unit =
+    val responseMap = requestInfo.map
       case (topicAndPartition) =>
         (topicAndPartition,
          OffsetMetadataAndError(
              Errors.forException(e).code
          ))
-    }.toMap
+    .toMap
     val errorResponse = OffsetFetchResponse(
         requestInfo = responseMap, correlationId = correlationId)
     requestChannel.sendResponse(
         new Response(
             request,
             new RequestOrResponseSend(request.connectionId, errorResponse)))
-  }
 
-  override def describe(details: Boolean): String = {
+  override def describe(details: Boolean): String =
     val offsetFetchRequest = new StringBuilder
     offsetFetchRequest.append("Name: " + this.getClass.getSimpleName)
     offsetFetchRequest.append("; Version: " + versionId)
@@ -127,9 +118,6 @@ case class OffsetFetchRequest(
     if (details)
       offsetFetchRequest.append("; RequestInfo: " + requestInfo.mkString(","))
     offsetFetchRequest.toString()
-  }
 
-  override def toString: String = {
+  override def toString: String =
     describe(details = true)
-  }
-}

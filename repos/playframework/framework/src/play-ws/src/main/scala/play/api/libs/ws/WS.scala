@@ -23,7 +23,7 @@ import java.io.IOException
 /**
   * The WSClient holds the configuration information needed to build a request, and provides a way to get a request holder.
   */
-trait WSClient extends Closeable {
+trait WSClient extends Closeable
 
   /**
     * The underlying implementation of the client, if any.  You must cast explicitly to the type you want.
@@ -43,24 +43,20 @@ trait WSClient extends Closeable {
   /** Closes this client, and releases underlying resources. */
   @throws[IOException]
   def close(): Unit
-}
 
 /**
   * WSRequestMagnet magnet.  Please see the companion object for implicit definitions.
   *
   * @see <a href="http://spray.io/blog/2012-12-13-the-magnet-pattern/">The magnet pattern</a>
   */
-trait WSRequestMagnet {
+trait WSRequestMagnet
   def apply(): WSRequest
-}
 
-trait WSRequestExecutor {
+trait WSRequestExecutor
   def execute(request: WSRequest): Future[WSResponse]
-}
 
-trait WSRequestFilter {
+trait WSRequestFilter
   def apply(next: WSRequestExecutor): WSRequestExecutor
-}
 
 /**
   * Asynchronous API to to query web services, as an http client.
@@ -116,7 +112,7 @@ trait WSRequestFilter {
   * use this response.
   */
 @deprecated("Inject WSClient into your component", "2.5.0")
-object WS {
+object WS
 
   private val wsapiCache = Application.instanceCache[WSAPI]
   protected[play] def wsapi(implicit app: Application): WSAPI = wsapiCache(app)
@@ -187,22 +183,20 @@ object WS {
     */
   def clientUrl(url: String)(
       implicit client: WSClient): play.api.libs.ws.WSRequest = client.url(url)
-}
 
 /**
   * The base WS API trait.
   */
-trait WSAPI {
+trait WSAPI
 
   def client: WSClient
 
   def url(url: String): WSRequest
-}
 
 /**
   *
   */
-trait WSResponse {
+trait WSResponse
 
   /**
     * Return the current headers of the request being constructed
@@ -258,7 +252,6 @@ trait WSResponse {
     * The response body as a byte string.
     */
   def bodyAsBytes: ByteString
-}
 
 /**
   * A body for the request
@@ -298,7 +291,7 @@ case class StreamedResponse(
 /**
   * A WS Request builder.
   */
-trait WSRequest {
+trait WSRequest
 
   /**
     * The base URL for this request
@@ -308,18 +301,17 @@ trait WSRequest {
   /**
     * The URI for this request
     */
-  lazy val uri: URI = {
+  lazy val uri: URI =
     val enc = (p: String) => java.net.URLEncoder.encode(p, "utf-8")
     new java.net.URI(
         if (queryString.isEmpty) url
-        else {
-      val qs = (for {
+        else
+      val qs = (for
         (n, vs) <- queryString
         v <- vs
-      } yield s"${enc(n)}=${enc(v)}").mkString("&")
+      yield s"${enc(n)}=${enc(v)}").mkString("&")
       s"$url?$qs"
-    })
-  }
+    )
 
   /**
     * The method for this request
@@ -429,28 +421,24 @@ trait WSRequest {
   /**
     * Sets the body for this request
     */
-  def withBody[T](body: T)(implicit wrt: Writeable[T]): WSRequest = {
+  def withBody[T](body: T)(implicit wrt: Writeable[T]): WSRequest =
     val wsBody = InMemoryBody(wrt.transform(body))
-    if (headers.contains("Content-Type")) {
+    if (headers.contains("Content-Type"))
       withBody(wsBody)
-    } else {
-      wrt.contentType.fold(withBody(wsBody)) { contentType =>
+    else
+      wrt.contentType.fold(withBody(wsBody))  contentType =>
         withBody(wsBody).withHeaders("Content-Type" -> contentType)
-      }
-    }
-  }
 
   /**
     * Helper method for multipart body
     */
   private[libs] def withMultipartBody(
       body: Source[MultipartFormData.Part[Source[ByteString, _]], _])
-    : WSRequest = {
+    : WSRequest =
     val boundary = Multipart.randomBoundary()
     val contentType = s"multipart/form-data; boundary=$boundary"
     withBody(StreamedBody(Multipart.transform(body, boundary)))
       .withHeaders("Content-Type" -> contentType)
-  }
 
   /**
     * Sets the method for this request
@@ -468,20 +456,17 @@ trait WSRequest {
     */
   @deprecated("2.5.0", """Use WS.withMethod("GET").stream()""")
   def get[A](consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
-      implicit ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] = {
-    getStream().flatMap {
+      implicit ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] =
+    getStream().flatMap
       case (response, enumerator) =>
         enumerator(consumer(response))
-    }
-  }
 
   /**
     * performs a get
     */
   @deprecated("2.5.0", """Use WS.withMethod("GET").stream()""")
-  def getStream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = {
+  def getStream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] =
     withMethod("GET").streamWithEnumerator()
-  }
 
   /**
     * Perform a PATCH on the request asynchronously.
@@ -500,9 +485,8 @@ trait WSRequest {
     * Perform a PATCH on the request asynchronously.
     */
   def patch(body: Source[MultipartFormData.Part[Source[ByteString, _]], _])
-    : Future[WSResponse] = {
+    : Future[WSResponse] =
     withMethod("PATCH").withMultipartBody(body).execute()
-  }
 
   /**
     * performs a POST with supplied body
@@ -512,12 +496,10 @@ trait WSRequest {
   def patchAndRetrieveStream[A, T](
       body: T)(consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
       implicit wrt: Writeable[T],
-      ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] = {
-    withMethod("PATCH").withBody(body).streamWithEnumerator().flatMap {
+      ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] =
+    withMethod("PATCH").withBody(body).streamWithEnumerator().flatMap
       case (response, enumerator) =>
         enumerator(consumer(response))
-    }
-  }
 
   /**
     * Perform a POST on the request asynchronously.
@@ -536,9 +518,8 @@ trait WSRequest {
     * Perform a POST on the request asynchronously.
     */
   def post(body: Source[MultipartFormData.Part[Source[ByteString, _]], _])
-    : Future[WSResponse] = {
+    : Future[WSResponse] =
     withMethod("POST").withMultipartBody(body).execute()
-  }
 
   /**
     * performs a POST with supplied body
@@ -548,12 +529,10 @@ trait WSRequest {
   def postAndRetrieveStream[A, T](
       body: T)(consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
       implicit wrt: Writeable[T],
-      ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] = {
-    withMethod("POST").withBody(body).streamWithEnumerator().flatMap {
+      ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] =
+    withMethod("POST").withBody(body).streamWithEnumerator().flatMap
       case (response, enumerator) =>
         enumerator(consumer(response))
-    }
-  }
 
   /**
     * Perform a PUT on the request asynchronously.
@@ -572,9 +551,8 @@ trait WSRequest {
     * Perform a PUT on the request asynchronously.
     */
   def put(body: Source[MultipartFormData.Part[Source[ByteString, _]], _])
-    : Future[WSResponse] = {
+    : Future[WSResponse] =
     withMethod("PUT").withMultipartBody(body).execute()
-  }
 
   /**
     * performs a PUT with supplied body
@@ -584,12 +562,10 @@ trait WSRequest {
   def putAndRetrieveStream[A, T](
       body: T)(consumer: WSResponseHeaders => Iteratee[Array[Byte], A])(
       implicit wrt: Writeable[T],
-      ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] = {
-    withMethod("PUT").withBody(body).streamWithEnumerator().flatMap {
+      ec: ExecutionContext): Future[Iteratee[Array[Byte], A]] =
+    withMethod("PUT").withBody(body).streamWithEnumerator().flatMap
       case (response, enumerator) =>
         enumerator(consumer(response))
-    }
-  }
 
   /**
     * Perform a DELETE on the request asynchronously.
@@ -627,16 +603,14 @@ trait WSRequest {
   @deprecated("2.5.0", "Use `WS.stream()` instead.")
   def streamWithEnumerator(
       ): Future[(WSResponseHeaders, Enumerator[Array[Byte]])]
-}
 
 /**
   *
   */
-trait WSAuthScheme {
+trait WSAuthScheme
   // Purposely not sealed in case clients want to add their own auth schemes.
-}
 
-object WSAuthScheme {
+object WSAuthScheme
 
   case object DIGEST extends WSAuthScheme
 
@@ -647,12 +621,11 @@ object WSAuthScheme {
   case object SPNEGO extends WSAuthScheme
 
   case object KERBEROS extends WSAuthScheme
-}
 
 /**
   * A WS Cookie.  This is a trait so that we are not tied to a specific client.
   */
-trait WSCookie {
+trait WSCookie
 
   /**
     * The underlying "native" cookie object for the client.
@@ -688,12 +661,11 @@ trait WSCookie {
     * If the cookie is secure.
     */
   def secure: Boolean
-}
 
 /**
   * A WS proxy.
   */
-trait WSProxyServer {
+trait WSProxyServer
 
   /** The hostname of the proxy server. */
   def host: String
@@ -716,7 +688,6 @@ trait WSProxyServer {
   def encoding: Option[String]
 
   def nonProxyHosts: Option[Seq[String]]
-}
 
 /**
   * A WS proxy.
@@ -741,12 +712,11 @@ case class DefaultWSProxyServer(
 /**
   * An HTTP response header (the body has not been retrieved yet)
   */
-trait WSResponseHeaders {
+trait WSResponseHeaders
 
   def status: Int
 
   def headers: Map[String, Seq[String]]
-}
 
 case class DefaultWSResponseHeaders(
     status: Int, headers: Map[String, Seq[String]])

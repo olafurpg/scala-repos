@@ -42,23 +42,17 @@ import scalafx.stage.FileChooser
   * If FileChooser.showOpenMultipleDialog was used and user cancelled selection an NPE was thrown.
   *
   */
-object MultipleFileChooserDemo extends JFXApp {
+object MultipleFileChooserDemo extends JFXApp
 
-  stage = new PrimaryStage {
-    scene = new Scene {
+  stage = new PrimaryStage
+    scene = new Scene
       title = "Demo for Issue #178"
-      root = new VBox {
+      root = new VBox
         padding = Insets(12)
-        children = new Button {
+        children = new Button
           text = "Open file chooser and select multiple files or Cancel"
-          onAction = handle {
+          onAction = handle
             val fc = new FileChooser()
             val selection = fc.showOpenMultipleDialog(stage)
 
             println("Selection: " + selection)
-          }
-        }
-      }
-    }
-  }
-}

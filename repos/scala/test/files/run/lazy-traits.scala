@@ -1,45 +1,36 @@
-trait A {
-  lazy val z1 = {
+trait A
+  lazy val z1 =
     println("<forced z1>")
     "lazy z1"
-  }
-}
 
 /** Simple class which mixes in one lazy val. */
-class Cls extends AnyRef with A {
+class Cls extends AnyRef with A
   override def toString =
     "z1 = " + z1
-}
 
 /** Own lazy val + one mixed in. */
-class Cls2 extends AnyRef with A {
-  lazy val z2 = {
+class Cls2 extends AnyRef with A
+  lazy val z2 =
     println("<forced z2>")
     "lazy z2"
-  }
 
   override def toString =
     "z1 = " + z1 + " z2 = " + z2
-}
 
-trait B extends A {
-  lazy val zb1 = {
+trait B extends A
+  lazy val zb1 =
     println("<forced zb1>")
     "lazy zb1"
-  }
-}
 
-class ClsB extends Object with B {
-  lazy val zc1 = {
+class ClsB extends Object with B
+  lazy val zc1 =
     println("<forced zc1>")
     "lazy zc1"
-  }
   override def toString =
     "z1 = " + z1 + " zb1 = " + zb1 + " zc1 = " + zc1
-}
 
 /** Class with 32 lazy fields mixes in one more. */
-class OverflownLazyFields extends Object with A {
+class OverflownLazyFields extends Object with A
   lazy val zc00 = { println("<forced zc00>"); "lazy zc00" }
   lazy val zc01 = { println("<forced zc01>"); "lazy zc01" }
   lazy val zc02 = { println("<forced zc02>"); "lazy zc02" }
@@ -85,64 +76,51 @@ class OverflownLazyFields extends Object with A {
     "\nzc24 = " + zc24 + "\nzc25 = " + zc25 + "\nzc26 = " + zc26 +
     "\nzc27 = " + zc27 + "\nzc28 = " + zc28 + "\nzc29 = " + zc29 +
     "\nzc30 = " + zc30 + "\nzc31 = " + zc31 + "\nz1 = " + z1
-}
 
-trait PrivateLazy {
+trait PrivateLazy
   private lazy val str = "z1"
-}
 
 /** Test successful compilation. */
 class InheritPrivateLazy extends AnyRef with PrivateLazy {}
 
 /** Test successful compilation, see bug #1287. */
-trait LocalLazyVal {
-  def foo = {
+trait LocalLazyVal
+  def foo =
     lazy val next = 10 + 1
     next
-  }
-}
 
 /** Test successful compilation (see ticket #39) */
-package x.y {
+package x.y
 
-  trait Trait {
+  trait Trait
     lazy val v = 1
-  }
 
-  class OuterClass {
+  class OuterClass
     object InnerObject extends Trait
-  }
-}
 
 /** Test successful compilation of lazy values of type Unit.  */
-class UnitLazy extends A {
+class UnitLazy extends A
   lazy val lz = Console.println("UnitLazy.lz forced")
-}
 
-trait UnitLazyT {
+trait UnitLazyT
   lazy val lzt = Console.println("UnitLazyT.lzt forced")
-}
 
-class MixedUnitLazy extends UnitLazy with UnitLazyT {
-  override def toString() = {
+class MixedUnitLazy extends UnitLazy with UnitLazyT
+  override def toString() =
     lz
     lzt
     "MixedUnitLazy"
-  }
-}
 
-object Test extends App {
+object Test extends App
 
-  def test(name: String, v: A) {
+  def test(name: String, v: A)
     println(name + " test:")
     println(v)
     println(v)
     println(v)
-  }
 
   test("Cls", new Cls)
   test("Cls2", new Cls2)
   test("Cls with B", new ClsB)
   test("OverflownLazyFields with A", new OverflownLazyFields)
   test("Unit lazy values", new MixedUnitLazy)
-}

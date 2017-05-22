@@ -18,25 +18,22 @@ package shapeless
 
 import shapeless.test._
 
-class SingletonTypes211Tests {
+class SingletonTypes211Tests
 
-  class NestingBug {
+  class NestingBug
     val o: AnyRef = new Object {}
 
-    val wO = {
-      final class W extends _root_.shapeless.Witness {
+    val wO =
+      final class W extends _root_.shapeless.Witness
         type T = o.type
         val value: T = o
-      }
       new W
-    }
 
     // This fails on 2.10.x unless W is moved out of the block
     // on the RHS of wO
     val x1: o.type = wO.value
-  }
 
-  def testSingletonWitness {
+  def testSingletonWitness
     trait Bound
     object Foo extends Bound
     val bar = "bar"
@@ -45,9 +42,8 @@ class SingletonTypes211Tests {
 
     typed[Foo.type](wFoo.value)
     typed[bar.type](wBar.value)
-  }
 
-  class PathDependentSingleton1 {
+  class PathDependentSingleton1
     val o: AnyRef = new Object {}
     val wO = Witness(o)
     type OT = wO.T
@@ -59,9 +55,8 @@ class SingletonTypes211Tests {
     val x2 = wO.value
     typed[o.type](x2)
     typed[OT](x2)
-  }
 
-  object PathDependentSingleton2 {
+  object PathDependentSingleton2
     val o: AnyRef = new Object {}
     val wO = Witness(o)
     type OT = wO.T
@@ -73,5 +68,3 @@ class SingletonTypes211Tests {
     val x2 = wO.value
     typed[o.type](x2)
     typed[OT](x2)
-  }
-}

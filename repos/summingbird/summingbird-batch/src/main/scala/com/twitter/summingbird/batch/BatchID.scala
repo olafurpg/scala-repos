@@ -35,7 +35,7 @@ import scala.collection.Iterator.iterate
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-object BatchID {
+object BatchID
   import OrderedFromOrderingExt._
   implicit val equiv: Equiv[BatchID] = Equiv.by(_.id)
 
@@ -47,35 +47,33 @@ object BatchID {
     * `[startBatch, endBatch]` (inclusive).
     */
   def range(start: BatchID, end: BatchID): Iterable[BatchID] =
-    new Iterable[BatchID] {
+    new Iterable[BatchID]
       def iterator = iterate(start)(_.next).takeWhile(_ <= end)
-    }
 
   /**
     * Returns true if the supplied interval of BatchID can
     */
   def toInterval(iter: TraversableOnce[BatchID]): Option[Interval[BatchID]] =
-    iter.map { b =>
+    iter.map  b =>
       (b, b, 1L)
-    }.reduceOption { (left, right) =>
+    .reduceOption  (left, right) =>
       val (lmin, lmax, lcnt) = left
       val (rmin, rmax, rcnt) = right
       (lmin min rmin, lmax max rmax, lcnt + rcnt)
-    }.flatMap {
+    .flatMap
       case (min, max, cnt) =>
-        if ((min + cnt) == (max + 1L)) {
+        if ((min + cnt) == (max + 1L))
           Some(Interval.leftClosedRightOpen(min, max.next).right.get)
-        } else {
+        else
           // These batches are not contiguous, not an interval
           None
-        }
-    }.orElse(Some(Empty[BatchID]())) // there was nothing it iter
+    .orElse(Some(Empty[BatchID]())) // there was nothing it iter
 
   /**
     * Returns all the BatchIDs that are contained in the interval
     */
   def toIterable(interval: Interval[BatchID]): Iterable[BatchID] =
-    interval match {
+    interval match
       case Empty() => Iterable.empty
       case Universe() => range(Min, Max)
       case ExclusiveUpper(upper) => range(Min, upper.prev)
@@ -83,24 +81,20 @@ object BatchID {
       case ExclusiveLower(lower) => range(lower.next, Max)
       case InclusiveLower(lower) => range(lower, Max)
       case Intersection(low, high) =>
-        val lowbatch = low match {
+        val lowbatch = low match
           case InclusiveLower(lb) => lb
           case ExclusiveLower(lb) => lb.next
-        }
-        val highbatch = high match {
+        val highbatch = high match
           case InclusiveUpper(hb) => hb
           case ExclusiveUpper(hb) => hb.prev
-        }
         range(lowbatch, highbatch)
-    }
 
   val Max = BatchID(Long.MaxValue)
   val Min = BatchID(Long.MinValue)
 
-  implicit val monoid: Monoid[BatchID] = new Monoid[BatchID] {
+  implicit val monoid: Monoid[BatchID] = new Monoid[BatchID]
     override val zero = BatchID(Long.MinValue)
     override def plus(l: BatchID, r: BatchID) = if (l >= r) l else r
-  }
 
   implicit val batchID2String: Injection[BatchID, String] =
     Injection.buildCatchInvert[BatchID, String] { _.toString } { BatchID(_) }
@@ -112,9 +106,8 @@ object BatchID {
     Injection.connect[BatchID, Long, Array[Byte]]
 
   implicit val batchIdOrdering: Ordering[BatchID] = Ordering.by(_.id)
-}
 
-case class BatchID(id: Long) extends AnyVal {
+case class BatchID(id: Long) extends AnyVal
   import OrderedFromOrderingExt._
   def next: BatchID = new BatchID(id + 1)
   def prev: BatchID = new BatchID(id - 1)
@@ -125,4 +118,3 @@ case class BatchID(id: Long) extends AnyVal {
   def min(b: BatchID) = if (this < b) this else b
 
   override def toString = "BatchID." + id.toString
-}

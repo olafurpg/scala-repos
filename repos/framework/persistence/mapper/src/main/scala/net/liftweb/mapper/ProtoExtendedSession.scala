@@ -25,7 +25,7 @@ import http._
 import Helpers._
 
 trait ProtoExtendedSession[T <: ProtoExtendedSession[T]]
-    extends KeyedMapper[Long, T] { self: T =>
+    extends KeyedMapper[Long, T]  self: T =>
 
   override def primaryKeyField: MappedLongIndex[T] = id
 
@@ -33,16 +33,14 @@ trait ProtoExtendedSession[T <: ProtoExtendedSession[T]]
   object id extends MappedLongIndex(this)
 
   // uniqueId
-  object cookieId extends MappedUniqueId(this, 32) {
+  object cookieId extends MappedUniqueId(this, 32)
     override def dbIndexed_? = true
-  }
 
   object userId extends MappedString(this, 64)
 
-  object expiration extends MappedLong(this) {
+  object expiration extends MappedLong(this)
     override def defaultValue = expirationTime
     override def dbColumnName = expirationColumnName
-  }
 
   /**
     * Change this string to "experation" for compatibility with
@@ -51,14 +49,12 @@ trait ProtoExtendedSession[T <: ProtoExtendedSession[T]]
   protected def expirationColumnName = "expiration"
 
   def expirationTime: Long = millis + 180.days
-}
 
-trait UserIdAsString {
+trait UserIdAsString
   def userIdAsString: String
-}
 
 trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]]
-    extends KeyedMetaMapper[Long, T] { self: T =>
+    extends KeyedMetaMapper[Long, T]  self: T =>
 
   def CookieName = "ext_id"
   type UserType <: UserIdAsString
@@ -84,21 +80,18 @@ trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]]
 
   def recoverUserId: Box[String]
 
-  def userDidLogin(uid: UserType) {
+  def userDidLogin(uid: UserType)
     userDidLogout(Full(uid))
     val inst = create.userId(uid.userIdAsString).saveMe
     val cookie = HTTPCookie(CookieName, inst.cookieId.get)
       .setMaxAge(((inst.expiration.get - millis) / 1000L).toInt)
       .setPath("/")
     S.addCookie(cookie)
-  }
 
-  def userDidLogout(uid: Box[UserType]) {
-    for (cook <- S.findCookie(CookieName)) {
+  def userDidLogout(uid: Box[UserType])
+    for (cook <- S.findCookie(CookieName))
       S.deleteCookie(cook)
       find(By(cookieId, cook.value openOr "")).foreach(_.delete_!)
-    }
-  }
 
   // def requestLoans: List[LoanWrapper] = myWrapper :: Nil
 
@@ -108,18 +101,12 @@ trait MetaProtoExtendedSession[T <: ProtoExtendedSession[T]]
     LiftRules.earlyInStateful.append(ExtendedSession.testCookieEarlyInStateful)
     * </code>
     */
-  def testCookieEarlyInStateful: Box[Req] => Unit = { ignoredReq =>
-    {
-      (recoverUserId, S.findCookie(CookieName)) match {
+  def testCookieEarlyInStateful: Box[Req] => Unit =  ignoredReq =>
+      (recoverUserId, S.findCookie(CookieName)) match
         case (Empty, Full(c)) =>
-          find(By(cookieId, c.value openOr "")) match {
+          find(By(cookieId, c.value openOr "")) match
             case Full(es) if es.expiration.get < millis => es.delete_!
             case Full(es) => logUserIdIn(es.userId.get)
             case _ =>
-          }
 
         case _ =>
-      }
-    }
-  }
-}

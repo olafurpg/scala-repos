@@ -26,25 +26,24 @@ class BuildFileChangeBrowser(val project: Project,
                            true,
                            null,
                            ChangesBrowser.MyUseCase.LOCAL_CHANGES,
-                           null) {
+                           null)
 
-  override def afterDiffRefresh() {
+  override def afterDiffRefresh()
     val updatedChanges = new java.util.ArrayList[Change]
     updatedChanges.addAll(
-        getSelectedChanges map { myChange =>
-          {
+        getSelectedChanges map  myChange =>
             val changeSwapped =
               BuildFileChange.swap(myChange.asInstanceOf[BuildFileChange])
             fileChangesMap
               .get(changeSwapped.getVirtualFile)
-              .map {
+              .map
                 case (modifiedStatus, modificationStamp) =>
                   val newModificationStamp = FileDocumentManager
                     .getInstance()
                     .getDocument(changeSwapped.getVirtualFile)
                     .getModificationStamp
 
-                  if (newModificationStamp != modificationStamp) {
+                  if (newModificationStamp != modificationStamp)
                     val newStatus =
                       modifiedStatus.changeAfterManualModification()
                     fileChangesMap.put(changeSwapped.getVirtualFile,
@@ -53,24 +52,18 @@ class BuildFileChangeBrowser(val project: Project,
                         new BuildFileChange(changeSwapped.getBeforeRevision,
                                             changeSwapped.getAfterRevision,
                                             newStatus))
-                  } else myChange
+                  else myChange
                 case _ => myChange
-              }
               .getOrElse(myChange)
-          }
-        }
     )
 
     setChangesToDisplay(updatedChanges)
-  }
 
   override protected def showDiffForChanges(
-      changesArray: Array[Change], indexInSelection: Int) {
+      changesArray: Array[Change], indexInSelection: Int)
     val context: ShowDiffUIContext = new ShowDiffUIContext(false)
     val changesArraySwapped: Array[Change] = for (change <- changesArray) yield
       BuildFileChange.swap(change.asInstanceOf[BuildFileChange])
 
     ShowDiffAction.showDiffForChange(
         changesArraySwapped, indexInSelection, myProject, context)
-  }
-}

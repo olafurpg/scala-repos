@@ -30,7 +30,7 @@ import org.apache.spark.sql.catalyst.util.DateTimeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
-private[csv] object CSVInferSchema {
+private[csv] object CSVInferSchema
 
   /**
     * Similar to the JSON schema inference
@@ -40,54 +40,47 @@ private[csv] object CSVInferSchema {
     */
   def infer(tokenRdd: RDD[Array[String]],
             header: Array[String],
-            nullValue: String = ""): StructType = {
+            nullValue: String = ""): StructType =
 
     val startType: Array[DataType] =
       Array.fill[DataType](header.length)(NullType)
     val rootTypes: Array[DataType] =
       tokenRdd.aggregate(startType)(inferRowType(nullValue), mergeRowTypes)
 
-    val structFields = header.zip(rootTypes).map {
+    val structFields = header.zip(rootTypes).map
       case (thisHeader, rootType) =>
-        val dType = rootType match {
+        val dType = rootType match
           case _: NullType => StringType
           case other => other
-        }
         StructField(thisHeader, dType, nullable = true)
-    }
 
     StructType(structFields)
-  }
 
   private def inferRowType(nullValue: String)(
-      rowSoFar: Array[DataType], next: Array[String]): Array[DataType] = {
+      rowSoFar: Array[DataType], next: Array[String]): Array[DataType] =
     var i = 0
-    while (i < math.min(rowSoFar.length, next.length)) {
+    while (i < math.min(rowSoFar.length, next.length))
       // May have columns on right missing.
       rowSoFar(i) = inferField(rowSoFar(i), next(i), nullValue)
       i += 1
-    }
     rowSoFar
-  }
 
   def mergeRowTypes(
-      first: Array[DataType], second: Array[DataType]): Array[DataType] = {
-    first.zipAll(second, NullType, NullType).map {
+      first: Array[DataType], second: Array[DataType]): Array[DataType] =
+    first.zipAll(second, NullType, NullType).map
       case (a, b) =>
         findTightestCommonType(a, b).getOrElse(NullType)
-    }
-  }
 
   /**
     * Infer type of string field. Given known type Double, and a string "1", there is no
     * point checking if it is an Int, as the final type must be Double or higher.
     */
   def inferField(
-      typeSoFar: DataType, field: String, nullValue: String = ""): DataType = {
-    if (field == null || field.isEmpty || field == nullValue) {
+      typeSoFar: DataType, field: String, nullValue: String = ""): DataType =
+    if (field == null || field.isEmpty || field == nullValue)
       typeSoFar
-    } else {
-      typeSoFar match {
+    else
+      typeSoFar match
         case NullType => tryParseInteger(field)
         case IntegerType => tryParseInteger(field)
         case LongType => tryParseLong(field)
@@ -98,54 +91,42 @@ private[csv] object CSVInferSchema {
         case other: DataType =>
           throw new UnsupportedOperationException(
               s"Unexpected data type $other")
-      }
-    }
-  }
 
   private def tryParseInteger(field: String): DataType =
-    if ((allCatch opt field.toInt).isDefined) {
+    if ((allCatch opt field.toInt).isDefined)
       IntegerType
-    } else {
+    else
       tryParseLong(field)
-    }
 
   private def tryParseLong(field: String): DataType =
-    if ((allCatch opt field.toLong).isDefined) {
+    if ((allCatch opt field.toLong).isDefined)
       LongType
-    } else {
+    else
       tryParseDouble(field)
-    }
 
-  private def tryParseDouble(field: String): DataType = {
-    if ((allCatch opt field.toDouble).isDefined) {
+  private def tryParseDouble(field: String): DataType =
+    if ((allCatch opt field.toDouble).isDefined)
       DoubleType
-    } else {
+    else
       tryParseTimestamp(field)
-    }
-  }
 
-  def tryParseTimestamp(field: String): DataType = {
-    if ((allCatch opt DateTimeUtils.stringToTime(field)).isDefined) {
+  def tryParseTimestamp(field: String): DataType =
+    if ((allCatch opt DateTimeUtils.stringToTime(field)).isDefined)
       TimestampType
-    } else {
+    else
       tryParseBoolean(field)
-    }
-  }
 
-  def tryParseBoolean(field: String): DataType = {
-    if ((allCatch opt field.toBoolean).isDefined) {
+  def tryParseBoolean(field: String): DataType =
+    if ((allCatch opt field.toBoolean).isDefined)
       BooleanType
-    } else {
+    else
       stringType()
-    }
-  }
 
   // Defining a function to return the StringType constant is necessary in order to work around
   // a Scala compiler issue which leads to runtime incompatibilities with certain Spark versions;
   // see issue #128 for more details.
-  private def stringType(): DataType = {
+  private def stringType(): DataType =
     StringType
-  }
 
   private val numericPrecedence: IndexedSeq[DataType] =
     HiveTypeCoercion.numericPrecedence
@@ -154,7 +135,7 @@ private[csv] object CSVInferSchema {
     * Copied from internal Spark api
     * [[org.apache.spark.sql.catalyst.analysis.HiveTypeCoercion]]
     */
-  val findTightestCommonType: (DataType, DataType) => Option[DataType] = {
+  val findTightestCommonType: (DataType, DataType) => Option[DataType] =
     case (t1, t2) if t1 == t2 => Some(t1)
     case (NullType, t1) => Some(t1)
     case (t1, NullType) => Some(t1)
@@ -167,10 +148,8 @@ private[csv] object CSVInferSchema {
       Some(numericPrecedence(index))
 
     case _ => None
-  }
-}
 
-private[csv] object CSVTypeCast {
+private[csv] object CSVTypeCast
 
   /**
     * Casts given string datum to specified type.
@@ -185,12 +164,12 @@ private[csv] object CSVTypeCast {
   def castTo(datum: String,
              castType: DataType,
              nullable: Boolean = true,
-             nullValue: String = ""): Any = {
+             nullValue: String = ""): Any =
 
-    if (datum == nullValue && nullable && (!castType.isInstanceOf[StringType])) {
+    if (datum == nullValue && nullable && (!castType.isInstanceOf[StringType]))
       null
-    } else {
-      castType match {
+    else
+      castType match
         case _: ByteType => datum.toByte
         case _: ShortType => datum.toShort
         case _: IntegerType => datum.toInt
@@ -220,9 +199,6 @@ private[csv] object CSVTypeCast {
         case _: StringType => UTF8String.fromString(datum)
         case _ =>
           throw new RuntimeException(s"Unsupported type: ${castType.typeName}")
-      }
-    }
-  }
 
   /**
     * Helper method that converts string representation of a character to actual character.
@@ -230,9 +206,9 @@ private[csv] object CSVTypeCast {
     * character.
     */
   @throws[IllegalArgumentException]
-  def toChar(str: String): Char = {
-    if (str.charAt(0) == '\\') {
-      str.charAt(1) match {
+  def toChar(str: String): Char =
+    if (str.charAt(0) == '\\')
+      str.charAt(1) match
         case 't' => '\t'
         case 'r' => '\r'
         case 'b' => '\b'
@@ -244,12 +220,8 @@ private[csv] object CSVTypeCast {
         case _ =>
           throw new IllegalArgumentException(
               s"Unsupported special character for delimiter: $str")
-      }
-    } else if (str.length == 1) {
+    else if (str.length == 1)
       str.charAt(0)
-    } else {
+    else
       throw new IllegalArgumentException(
           s"Delimiter cannot be more than one character: $str")
-    }
-  }
-}

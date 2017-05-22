@@ -25,9 +25,9 @@ import org.apache.spark.ml.classification.{BinaryLogisticRegressionSummary, Logi
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.functions.max
 
-object LogisticRegressionSummaryExample {
+object LogisticRegressionSummaryExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("LogisticRegressionSummaryExample")
     val sc = new SparkContext(conf)
     val sqlCtx = new SQLContext(sc)
@@ -77,6 +77,4 @@ object LogisticRegressionSummaryExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

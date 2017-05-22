@@ -30,18 +30,18 @@ import kafka.network.BlockingChannel
 import kafka.api.PartitionOffsetRequestInfo
 import org.I0Itec.zkclient.exception.ZkNoNodeException
 
-object ConsumerOffsetChecker extends Logging {
+object ConsumerOffsetChecker extends Logging
 
   private val consumerMap: mutable.Map[Int, Option[SimpleConsumer]] =
     mutable.Map()
   private val offsetMap: mutable.Map[TopicAndPartition, Long] = mutable.Map()
   private var topicPidMap: immutable.Map[String, Seq[Int]] = immutable.Map()
 
-  private def getConsumer(zkUtils: ZkUtils, bid: Int): Option[SimpleConsumer] = {
-    try {
-      zkUtils.readDataMaybeNull(ZkUtils.BrokerIdsPath + "/" + bid)._1 match {
+  private def getConsumer(zkUtils: ZkUtils, bid: Int): Option[SimpleConsumer] =
+    try
+      zkUtils.readDataMaybeNull(ZkUtils.BrokerIdsPath + "/" + bid)._1 match
         case Some(brokerInfoString) =>
-          Json.parseFull(brokerInfoString) match {
+          Json.parseFull(brokerInfoString) match
             case Some(m) =>
               val brokerInfo = m.asInstanceOf[Map[String, Any]]
               val host = brokerInfo.get("host").get.asInstanceOf[String]
@@ -51,33 +51,29 @@ object ConsumerOffsetChecker extends Logging {
             case None =>
               throw new BrokerNotAvailableException(
                   "Broker id %d does not exist".format(bid))
-          }
         case None =>
           throw new BrokerNotAvailableException(
               "Broker id %d does not exist".format(bid))
-      }
-    } catch {
+    catch
       case t: Throwable =>
         println("Could not parse broker info due to " + t.getCause)
         None
-    }
-  }
 
   private def processPartition(zkUtils: ZkUtils,
                                group: String,
                                topic: String,
-                               pid: Int) {
+                               pid: Int)
     val topicPartition = TopicAndPartition(topic, pid)
     val offsetOpt = offsetMap.get(topicPartition)
     val groupDirs = new ZKGroupTopicDirs(group, topic)
     val owner = zkUtils
       .readDataMaybeNull(groupDirs.consumerOwnerDir + "/%s".format(pid))
       ._1
-    zkUtils.getLeaderForPartition(topic, pid) match {
+    zkUtils.getLeaderForPartition(topic, pid) match
       case Some(bid) =>
         val consumerOpt =
           consumerMap.getOrElseUpdate(bid, getConsumer(zkUtils, bid))
-        consumerOpt match {
+        consumerOpt match
           case Some(consumer) =>
             val topicAndPartition = TopicAndPartition(topic, pid)
             val request = OffsetRequest(
@@ -99,37 +95,29 @@ object ConsumerOffsetChecker extends Logging {
                     offsetOpt.getOrElse("unknown"),
                     logSize,
                     lagString.getOrElse("unknown"),
-                    owner match {
+                    owner match
                   case Some(ownerStr) => ownerStr
                   case None => "none"
-                }))
+                ))
           case None => // ignore
-        }
       case None =>
         println("No broker for partition %s - %s".format(topic, pid))
-    }
-  }
 
-  private def processTopic(zkUtils: ZkUtils, group: String, topic: String) {
-    topicPidMap.get(topic) match {
+  private def processTopic(zkUtils: ZkUtils, group: String, topic: String)
+    topicPidMap.get(topic) match
       case Some(pids) =>
-        pids.sorted.foreach { pid =>
+        pids.sorted.foreach  pid =>
           processPartition(zkUtils, group, topic, pid)
-        }
       case None => // ignore
-    }
-  }
 
-  private def printBrokerInfo() {
+  private def printBrokerInfo()
     println("BROKER INFO")
-    for ((bid, consumerOpt) <- consumerMap) consumerOpt match {
+    for ((bid, consumerOpt) <- consumerMap) consumerOpt match
       case Some(consumer) =>
         println("%s -> %s:%d".format(bid, consumer.host, consumer.port))
       case None => // ignore
-    }
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     warn(
         "WARNING: ConsumerOffsetChecker is deprecated and will be dropped in releases following 0.9.0. Use ConsumerGroupCommand instead.")
 
@@ -172,10 +160,9 @@ object ConsumerOffsetChecker extends Logging {
 
     val options = parser.parse(args: _*)
 
-    if (options.has("help")) {
+    if (options.has("help"))
       parser.printHelpOn(System.out)
       System.exit(0)
-    }
 
     CommandLineUtils.checkRequiredArgs(parser, options, groupOpt, zkConnectOpt)
 
@@ -194,24 +181,23 @@ object ConsumerOffsetChecker extends Logging {
 
     var zkUtils: ZkUtils = null
     var channel: BlockingChannel = null
-    try {
+    try
       zkUtils = ZkUtils(zkConnect,
                         30000,
                         30000,
                         JaasUtils.isZkSecurityEnabled())
 
-      val topicList = topics match {
+      val topicList = topics match
         case Some(x) => x.split(",").view.toList
         case None =>
           zkUtils.getChildren(groupDirs.consumerGroupDir + "/owners").toList
-      }
 
       topicPidMap = immutable.Map(
           zkUtils.getPartitionsForTopics(topicList).toSeq: _*)
-      val topicPartitions = topicPidMap.flatMap {
+      val topicPartitions = topicPidMap.flatMap
         case (topic, partitionSeq) =>
           partitionSeq.map(TopicAndPartition(topic, _))
-      }.toSeq
+      .toSeq
       val channel = ClientUtils.channelToOffsetManager(
           group, zkUtils, channelSocketTimeoutMs, channelRetryBackoffMs)
 
@@ -222,63 +208,53 @@ object ConsumerOffsetChecker extends Logging {
         OffsetFetchResponse.readFrom(channel.receive().payload())
       debug("Received offset fetch response %s.".format(offsetFetchResponse))
 
-      offsetFetchResponse.requestInfo.foreach {
+      offsetFetchResponse.requestInfo.foreach
         case (topicAndPartition, offsetAndMetadata) =>
-          if (offsetAndMetadata == OffsetMetadataAndError.NoOffset) {
+          if (offsetAndMetadata == OffsetMetadataAndError.NoOffset)
             val topicDirs =
               new ZKGroupTopicDirs(group, topicAndPartition.topic)
             // this group may not have migrated off zookeeper for offsets storage (we don't expose the dual-commit option in this tool
             // (meaning the lag may be off until all the consumers in the group have the same setting for offsets storage)
-            try {
+            try
               val offset = zkUtils
                 .readData(topicDirs.consumerOffsetDir +
                     "/%d".format(topicAndPartition.partition))
                 ._1
                 .toLong
               offsetMap.put(topicAndPartition, offset)
-            } catch {
+            catch
               case z: ZkNoNodeException =>
                 if (zkUtils.pathExists(topicDirs.consumerOffsetDir))
                   offsetMap.put(topicAndPartition, -1)
                 else throw z
-            }
-          } else if (offsetAndMetadata.error == Errors.NONE.code)
+          else if (offsetAndMetadata.error == Errors.NONE.code)
             offsetMap.put(topicAndPartition, offsetAndMetadata.offset)
-          else {
+          else
             println(
                 "Could not fetch offset for %s due to %s.".format(
                     topicAndPartition,
                     Errors.forCode(offsetAndMetadata.error).exception))
-          }
-      }
       channel.disconnect()
 
       println(
           "%-15s %-30s %-3s %-15s %-15s %-15s %s".format(
               "Group", "Topic", "Pid", "Offset", "logSize", "Lag", "Owner"))
-      topicList.sorted.foreach { topic =>
+      topicList.sorted.foreach  topic =>
         processTopic(zkUtils, group, topic)
-      }
 
       if (options.has("broker-info")) printBrokerInfo()
 
-      for ((_, consumerOpt) <- consumerMap) consumerOpt match {
+      for ((_, consumerOpt) <- consumerMap) consumerOpt match
         case Some(consumer) => consumer.close()
         case None => // ignore
-      }
-    } catch {
+    catch
       case t: Throwable =>
         println("Exiting due to: %s.".format(t.getMessage))
-    } finally {
-      for (consumerOpt <- consumerMap.values) {
-        consumerOpt match {
+    finally
+      for (consumerOpt <- consumerMap.values)
+        consumerOpt match
           case Some(consumer) => consumer.close()
           case None => // ignore
-        }
-      }
       if (zkUtils != null) zkUtils.close()
 
       if (channel != null) channel.disconnect()
-    }
-  }
-}

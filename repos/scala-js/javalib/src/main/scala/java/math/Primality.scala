@@ -44,7 +44,7 @@ import java.util.Arrays
 import java.util.Random
 
 /** Provides primality probabilistic methods. */
-private[math] object Primality {
+private[math] object Primality
   private val Bits = Array(0,
                            0,
                            1854,
@@ -302,31 +302,28 @@ private[math] object Primality {
     *  @see BigInteger#probablePrime(int,Random)
     *  @see #isProbablePrime(BigInteger, int)
     */
-  def consBigInteger(bitLength: Int, certainty: Int, rnd: Random): BigInteger = {
+  def consBigInteger(bitLength: Int, certainty: Int, rnd: Random): BigInteger =
     // PRE: bitLength >= 2
     // For small numbers get a random prime from the prime table
-    if (bitLength <= 10) {
+    if (bitLength <= 10)
       val rp = OffsetPrimes(bitLength)
       BiPrimes(rp._1 + rnd.nextInt(rp._2))
-    } else {
+    else
       val shiftCount = (-bitLength) & 31
       val count = (bitLength + 31) >> 5
       val n = new BigInteger(1, count, new Array[Int](count))
 
       val last = count - 1
-      do {
+      do
         // To fill the array with random integers
-        for (i <- 0 until n.numberLength) {
+        for (i <- 0 until n.numberLength)
           n.digits(i) = rnd.nextInt()
-        }
         // To fix to the correct bitLength
         n.digits(last) = (n.digits(last) | 0x80000000) >>> shiftCount
         // To create an odd number
         n.digits(0) |= 1
-      } while (!isProbablePrime(n, certainty))
+      while (!isProbablePrime(n, certainty))
       n
-    }
-  }
 
   /** Returns true if this is a prime, within the provided certainty.
     *
@@ -335,36 +332,32 @@ private[math] object Primality {
     *  @ar.org.fitc.ref Optimizations: "A. Menezes - Handbook of applied
     *                   Cryptography, Chapter 4".
     */
-  def isProbablePrime(n: BigInteger, certainty: Int): Boolean = {
+  def isProbablePrime(n: BigInteger, certainty: Int): Boolean =
     // scalastyle:off return
     // PRE: n >= 0
-    if (certainty <= 0 || (n.numberLength == 1 && n.digits(0) == 2)) {
+    if (certainty <= 0 || (n.numberLength == 1 && n.digits(0) == 2))
       true
-    } else if (!n.testBit(0)) {
+    else if (!n.testBit(0))
       // To discard all even numbers
       false
-    } else if (n.numberLength == 1 && (n.digits(0) & 0XFFFFFC00) == 0) {
+    else if (n.numberLength == 1 && (n.digits(0) & 0XFFFFFC00) == 0)
       // To check if 'n' exists in the table (it fit in 10 bits)
       Arrays.binarySearch(Primes, n.digits(0)) >= 0
-    } else {
+    else
       // To check if 'n' is divisible by some prime of the table
-      for (i <- 1 until Primes.length) {
+      for (i <- 1 until Primes.length)
         if (Division.remainderArrayByInt(n.digits, n.numberLength, Primes(i)) == 0)
           return false
-      }
 
       // To set the number of iterations necessary for Miller-Rabin test
       var i: Int = 0
       val bitLength = n.bitLength()
       i = 2
-      while (bitLength < Bits(i)) {
+      while (bitLength < Bits(i))
         i += 1
-      }
       val newCertainty = Math.min(i, 1 + ((certainty - 1) >> 1))
       millerRabin(n, newCertainty)
-    }
     // scalastyle:on return
-  }
 
   /** Returns the next, probable prime number.
     *
@@ -376,7 +369,7 @@ private[math] object Primality {
     *  @see BigInteger#nextProbablePrime()
     *  @see #millerRabin(BigInteger, int)
     */
-  def nextProbablePrime(n: BigInteger): BigInteger = {
+  def nextProbablePrime(n: BigInteger): BigInteger =
     // scalastyle:off return
     // PRE: n >= 0
     val gapSize = 1024 // for searching of the next probable prime number
@@ -385,13 +378,11 @@ private[math] object Primality {
 
     // If n < "last prime of table" searches next prime in the table
     val digitsLessPrime = (n.digits(0) < Primes(Primes.length - 1))
-    if ((n.numberLength == 1) && (n.digits(0) >= 0) && digitsLessPrime) {
+    if ((n.numberLength == 1) && (n.digits(0) >= 0) && digitsLessPrime)
       var i = 0
-      while (n.digits(0) >= Primes(i)) {
+      while (n.digits(0) >= Primes(i))
         i += 1
-      }
       return BiPrimes(i)
-    }
 
     /*
      * Creates a "N" enough big to hold the next probable prime Note that: N <
@@ -407,45 +398,36 @@ private[math] object Primality {
 
     // To set the improved certainty of Miller-Rabin
     var certainty = 2
-    for (j <- startPoint.bitLength() until Bits(certainty)) {
+    for (j <- startPoint.bitLength() until Bits(certainty))
       certainty += 1
-    }
 
     // To calculate modules: N mod p1, N mod p2, ... for first primes.
-    for (i <- 0 until Primes.length) {
+    for (i <- 0 until Primes.length)
       modules(i) = Division.remainder(startPoint, Primes(i)) - gapSize
-    }
 
     val probPrime: BigInteger = startPoint.copy()
-    while (true) {
+    while (true)
       // At this point, all numbers in the gap are initialized as probably primes
       Arrays.fill(isDivisible, false)
       // To discard multiples of first primes
-      for (i <- 0 until Primes.length) {
+      for (i <- 0 until Primes.length)
         modules(i) = (modules(i) + gapSize) % Primes(i)
         var j =
           if (modules(i) == 0) 0
           else (Primes(i) - modules(i))
-        while (j < gapSize) {
+        while (j < gapSize)
           isDivisible(j) = true
           j += Primes(i)
-        }
-      }
       // To execute Miller-Rabin for non-divisible numbers by all first primes
-      for (j <- 0 until gapSize) {
-        if (!isDivisible(j)) {
+      for (j <- 0 until gapSize)
+        if (!isDivisible(j))
           Elementary.inplaceAdd(probPrime, j)
-          if (millerRabin(probPrime, certainty)) {
+          if (millerRabin(probPrime, certainty))
             return probPrime
-          }
-        }
-      }
       Elementary.inplaceAdd(startPoint, gapSize)
-    }
     throw new AssertionError(
         "Primality.nextProbablePrime: Should not get here")
     // scalastyle:on return
-  }
 
   /** The Miller-Rabin primality test.
     *
@@ -456,7 +438,7 @@ private[math] object Primality {
     *  @ar.org.fitc.ref "D. Knuth, The Art of Computer Programming Vo.2, Section
     *                   4.5.4., Algorithm P"
     */
-  private def millerRabin(n: BigInteger, t: Int): Boolean = {
+  private def millerRabin(n: BigInteger, t: Int): Boolean =
     // scalastyle:off return
     // PRE: n >= 0, t >= 0
     var x: BigInteger = null
@@ -466,34 +448,27 @@ private[math] object Primality {
     val k = nMinus1.getLowestSetBit
     val q = nMinus1.shiftRight(k)
     val rnd = new Random()
-    for (i <- 0 until t) {
+    for (i <- 0 until t)
       // To generate a witness 'x', first it use the primes of table
-      if (i < Primes.length) {
+      if (i < Primes.length)
         x = BiPrimes(i)
-      } else {
+      else
         /*
          * It generates random witness only if it's necesssary. Note that all
          * methods would call Miller-Rabin with t <= 50 so this part is only to
          * do more robust the algorithm
          */
-        do {
+        do
           x = new BigInteger(bitLength, rnd)
-        } while ( (x.compareTo(n) >= BigInteger.EQUALS) || x.sign == 0 ||
+        while ( (x.compareTo(n) >= BigInteger.EQUALS) || x.sign == 0 ||
         x.isOne)
-      }
 
       y = x.modPow(q, n)
-      if (!(y.isOne || y == nMinus1)) {
-        for (j <- 1 until k) {
-          if (y != nMinus1) {
+      if (!(y.isOne || y == nMinus1))
+        for (j <- 1 until k)
+          if (y != nMinus1)
             y = y.multiply(y).mod(n)
             if (y.isOne) return false
-          }
-        }
         if (y != nMinus1) return false
-      }
-    }
     true
     // scalastyle:on return
-  }
-}

@@ -13,12 +13,10 @@ class PredictedResult(
 )
     extends Serializable
 
-object ClassificationEngine extends IEngineFactory {
-  def apply() = {
+object ClassificationEngine extends IEngineFactory
+  def apply() =
     new Engine(classOf[DataSource],
                classOf[Preparator],
                Map("naive" -> classOf[NaiveBayesAlgorithm],
                    "randomforest" -> classOf[RandomForestAlgorithm]), // ADDED
                classOf[Serving])
-  }
-}

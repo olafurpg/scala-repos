@@ -9,7 +9,7 @@ import mesosphere.marathon.test.Mockito
 
 import scala.concurrent.Future
 
-class TestAuthFixture extends Mockito {
+class TestAuthFixture extends Mockito
 
   type Auth = Authenticator with Authorizer
 
@@ -17,37 +17,29 @@ class TestAuthFixture extends Mockito {
 
   var authenticated: Boolean = true
   var authorized: Boolean = true
-  var authFn: Any => Boolean = { _ =>
+  var authFn: Any => Boolean =  _ =>
     true
-  }
 
   val UnauthorizedStatus = 401
   val NotAuthenticatedStatus = 403
 
-  def auth: Auth = new Authorizer with Authenticator {
-    override def authenticate(request: HttpRequest): Future[Option[Identity]] = {
+  def auth: Auth = new Authorizer with Authenticator
+    override def authenticate(request: HttpRequest): Future[Option[Identity]] =
       Future.successful(if (authenticated) Some(identity) else None)
-    }
     override def handleNotAuthenticated(
-        request: HttpRequest, response: HttpResponse): Unit = {
+        request: HttpRequest, response: HttpResponse): Unit =
       response.status(NotAuthenticatedStatus)
-    }
     override def handleNotAuthorized(
-        principal: Identity, response: HttpResponse): Unit = {
+        principal: Identity, response: HttpResponse): Unit =
       response.status(UnauthorizedStatus)
-    }
     override def isAuthorized[Resource](principal: Identity,
                                         action: AuthorizedAction[Resource],
-                                        resource: Resource): Boolean = {
+                                        resource: Resource): Boolean =
       authorized && authFn(resource)
-    }
-  }
 
-  var request: HttpServletRequest = {
+  var request: HttpServletRequest =
     val req = mock[HttpServletRequest]
     req.getHeaderNames returns Collections.emptyEnumeration()
     req.getHeaders(any) returns Collections.emptyEnumeration()
     req
-  }
   var response: HttpServletResponse = mock[HttpServletResponse]
-}

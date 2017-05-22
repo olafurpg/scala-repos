@@ -1,18 +1,16 @@
 package scalaz
 
 /** A universally quantified value */
-trait Forall[P[_]] { self =>
+trait Forall[P[_]]  self =>
   def apply[A]: P[A]
 
   /** `Forall` is an endofunctor in an endofunctor category */
-  def map[Q[_]](f: P ~> Q) = new Forall[Q] {
+  def map[Q[_]](f: P ~> Q) = new Forall[Q]
     def apply[A]: Q[A] = f(self.apply)
-  }
-}
 
 object Forall extends Foralls
 
-trait Foralls {
+trait Foralls
 
   /** Universal quantification by doubly negating an existential. */
   type Not[A] = A => Nothing
@@ -20,14 +18,10 @@ trait Foralls {
   type CPS[P[_]] = Not[DNE[P]]
 
   /** Construct a universal quantifier by continuation-passing. */
-  def apply[P[_]](p: CPS[P]): Forall[P] = new Forall[P] {
-    def apply[A]: P[A] = {
+  def apply[P[_]](p: CPS[P]): Forall[P] = new Forall[P]
+    def apply[A]: P[A] =
       case class Control(arg: P[A]) extends Throwable
-      try {
+      try
         p((arg: P[A]) => throw new Control(arg))
-      } catch {
+      catch
         case Control(arg) => arg
-      }
-    }
-  }
-}

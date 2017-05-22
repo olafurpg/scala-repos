@@ -31,7 +31,7 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Insets {
+object Insets
   implicit def sfxInsets2jfx(i: Insets): jfxg.Insets =
     if (i != null) i.delegate else null
 
@@ -51,10 +51,9 @@ object Insets {
     */
   def apply(top: Double, right: Double, bottom: Double, left: Double): Insets =
     new Insets(new jfxg.Insets(top, right, bottom, left))
-}
 
 class Insets(override val delegate: jfxg.Insets)
-    extends SFXDelegate[jfxg.Insets] {
+    extends SFXDelegate[jfxg.Insets]
 
   /**
     * The inset on the top side
@@ -75,4 +74,3 @@ class Insets(override val delegate: jfxg.Insets)
     * The inset on the left side
     */
   def left = delegate.getLeft
-}

@@ -12,7 +12,7 @@ package scala.ref
   *  @author Sean McDirmid
   *  @author Philipp Haller
   */
-class ReferenceQueue[+T <: AnyRef] {
+class ReferenceQueue[+T <: AnyRef]
 
   private[ref] val underlying: java.lang.ref.ReferenceQueue[_ <: T] =
     new java.lang.ref.ReferenceQueue[T]
@@ -20,13 +20,11 @@ class ReferenceQueue[+T <: AnyRef] {
 
   protected def Wrapper(
       jref: java.lang.ref.Reference[_]): Option[Reference[T]] =
-    jref match {
+    jref match
       case null => None
       case ref => Some(ref.asInstanceOf[ReferenceWithWrapper[T]].wrapper)
-    }
 
   def poll: Option[Reference[T]] = Wrapper(underlying.poll)
   def remove: Option[Reference[T]] = Wrapper(underlying.remove)
   def remove(timeout: Long): Option[Reference[T]] =
     Wrapper(underlying.remove(timeout))
-}

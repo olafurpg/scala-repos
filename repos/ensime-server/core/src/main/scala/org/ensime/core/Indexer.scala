@@ -20,7 +20,7 @@ class Indexer(
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
 )
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   private def typeResult(hit: FqnSymbol) = TypeSearchResult(
       hit.fqn,
@@ -32,13 +32,12 @@ class Indexer(
   def oldSearchTypes(query: String, max: Int) =
     index
       .searchClasses(query, max)
-      .filterNot { name =>
+      .filterNot  name =>
         name.fqn.endsWith("$") || name.fqn.endsWith("$class")
-      }
       .map(typeResult)
 
   def oldSearchSymbols(terms: List[String], max: Int) =
-    index.searchClassesMethods(terms, max).flatMap {
+    index.searchClassesMethods(terms, max).flatMap
       case hit if hit.declAs == DeclaredAs.Class => Some(typeResult(hit))
       case hit if hit.declAs == DeclaredAs.Method =>
         Some(
@@ -50,9 +49,8 @@ class Indexer(
                 hit.fqn.split("\\.").init.mkString(".")
             ))
       case _ => None // were never supported
-    }
 
-  override def receive = LoggingReceive {
+  override def receive = LoggingReceive
     case ImportSuggestionsReq(file, point, names, maxResults) =>
       val suggestions = names.map(oldSearchTypes(_, maxResults))
       sender ! ImportSuggestions(suggestions)
@@ -63,10 +61,7 @@ class Indexer(
 
     case TypeCompletionsReq(query: String, maxResults: Int) =>
       sender ! SymbolSearchResults(oldSearchTypes(query, maxResults))
-  }
-}
-object Indexer {
+object Indexer
   def apply(index: SearchService)(
       implicit config: EnsimeConfig, vfs: EnsimeVFS): Props =
     Props(classOf[Indexer], index, config, vfs)
-}

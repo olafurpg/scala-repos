@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait StrongTests[F[_, _]] extends ProfunctorTests[F] {
+trait StrongTests[F[_, _]] extends ProfunctorTests[F]
   def laws: StrongLaws[F]
 
   def strong[A : Arbitrary,
@@ -29,9 +29,7 @@ trait StrongTests[F[_, _]] extends ProfunctorTests[F] {
                            laws.strongFirstDistributivity[A, B, C, D, E] _),
                        "strong second distributivity" -> forAll(
                            laws.strongSecondDistributivity[A, B, C, D, E] _))
-}
 
-object StrongTests {
+object StrongTests
   def apply[F[_, _]: Strong]: StrongTests[F] =
     new StrongTests[F] { def laws: StrongLaws[F] = StrongLaws[F] }
-}

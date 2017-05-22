@@ -8,7 +8,7 @@ import java.io._
 //  [partest] java.lang.NoClassDefFoundError: scala/util/MurmurHash3$
 //  [partest] java.lang.NoClassDefFoundError: scala/util/MurmurHash3$
 //  [partest] 	at scala.runtime.ScalaRunTime$._hashCode(ScalaRunTime.scala:212)
-object Test extends DirectTest {
+object Test extends DirectTest
 
   override def extraSettings: String =
     "-usejavacp -Xprint:spec -optimize -Ylog:inliner -d " + testOutput.path
@@ -23,13 +23,11 @@ object Test extends DirectTest {
     }
   """
 
-  override def show(): Unit = {
+  override def show(): Unit =
     // redirect err to out, for inliner log
     val prevErr = System.err
     System.setErr(System.out)
     compile()
     System.setErr(prevErr)
-  }
 
   override def isDebug = false // so we don't get the newSettings warning
-}

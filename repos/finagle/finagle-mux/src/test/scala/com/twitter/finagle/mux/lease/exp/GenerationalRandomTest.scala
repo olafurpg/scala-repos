@@ -8,8 +8,8 @@ import org.scalatest.mock.MockitoSugar
 import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
-class GenerationalRandomTest extends FunSuite with MockitoSugar {
-  test("GenerationalRandom stays the same intragenerationally") {
+class GenerationalRandomTest extends FunSuite with MockitoSugar
+  test("GenerationalRandom stays the same intragenerationally")
     val nfo = mock[JvmInfo]
     when(nfo.generation()).thenReturn(0)
     val rnd = new Random(12334)
@@ -21,9 +21,8 @@ class GenerationalRandomTest extends FunSuite with MockitoSugar {
 
     assert(gen() == x)
     verify(nfo, times(3)).generation()
-  }
 
-  test("GenerationalRandom changes intergenerationally") {
+  test("GenerationalRandom changes intergenerationally")
     val nfo = mock[JvmInfo]
     when(nfo.generation()).thenReturn(0)
     val rnd = new Random(12334)
@@ -40,5 +39,3 @@ class GenerationalRandomTest extends FunSuite with MockitoSugar {
 
     assert(gen() != x)
     verify(nfo, times(5)).generation()
-  }
-}

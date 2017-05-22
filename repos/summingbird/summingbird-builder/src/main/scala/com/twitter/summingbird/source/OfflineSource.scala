@@ -29,15 +29,12 @@ import com.twitter.tormenta.spout.Spout
 
 import java.util.Date
 
-object OfflineSource {
+object OfflineSource
   def apply[Event](fn: DateRange => Mappable[Event]) =
-    new OfflineSource[Event] {
+    new OfflineSource[Event]
       def scaldingSource(range: DateRange) = fn(range)
-    }
-}
 
-trait OfflineSource[Event] extends Serializable {
+trait OfflineSource[Event] extends Serializable
   def scaldingSource(range: DateRange): Mappable[Event]
   def ++(spout: Spout[Event])(implicit mf: Manifest[Event]) =
     EventSource(this, spout)
-}

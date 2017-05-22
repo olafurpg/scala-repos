@@ -43,11 +43,10 @@ import scalafx.testutil.{DimensionDelegateSpec, SimpleSFXDelegateSpec}
 class ShadowSpec
     extends SimpleSFXDelegateSpec[jfxse.Shadow, Shadow](
         classOf[jfxse.Shadow], classOf[Shadow]) with ColorDelegateSpec[Shadow]
-    with DimensionDelegateSpec[Shadow] with InputDelegateSpec[Shadow] {
+    with DimensionDelegateSpec[Shadow] with InputDelegateSpec[Shadow]
 
   val colorDelegate = getScalaClassInstance
 
   val inputDelegate = getScalaClassInstance
 
   val dimensionDelegate = getScalaClassInstance
-}

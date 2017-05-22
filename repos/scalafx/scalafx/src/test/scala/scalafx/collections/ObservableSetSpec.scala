@@ -46,7 +46,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ObservableSetSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.ObservableSet[T], ObservableSet[T]](
-        classOf[jfxc.ObservableSet[T]], classOf[ObservableSet[T]]) {
+        classOf[jfxc.ObservableSet[T]], classOf[ObservableSet[T]])
 
   /**
     * Verifies if a generated Set is the same instance than a original Set. If it should not be,
@@ -58,28 +58,25 @@ class ObservableSetSpec[T]
     */
   private def compareInstances(generatedSet: Set[Int],
                                originalSet: ObservableSet[Int],
-                               shouldBeTheSame: Boolean) {
-    if (shouldBeTheSame) {
+                               shouldBeTheSame: Boolean)
+    if (shouldBeTheSame)
       generatedSet should be theSameInstanceAs (originalSet)
-    } else {
+    else
       generatedSet should not be theSameInstanceAs(originalSet)
       generatedSet.getClass.getInterfaces.contains(classOf[ObservableSet[Int]]) should be(
           true)
-    }
-  }
 
   override def getScalaClassInstance = ObservableSet.empty[T]
 
   override def getJavaClassInstance =
     jfxc.FXCollections.observableSet[T](new ju.HashSet[T])
 
-  it should "generate new instances using Companion's apply" in {
+  it should "generate new instances using Companion's apply" in
 
-    def assertGeneratedSet(set: ObservableSet[Int]) {
+    def assertGeneratedSet(set: ObservableSet[Int])
       set should have size (2)
       set should contain(1)
       set should contain(2)
-    }
 
     assertGeneratedSet(ObservableSet(1, 2))
     assertGeneratedSet(ObservableSet(List(1, 2)))
@@ -88,15 +85,13 @@ class ObservableSetSpec[T]
     val scalaHashSet = new HashSet[Int]
     scalaHashSet += 1 += 2
     assertGeneratedSet(ObservableSet(scalaHashSet))
-  }
 
-  it should "notify on invalidation" in {
+  it should "notify on invalidation" in
     // Preparation
     val set = ObservableSet(1, 2)
     var invalidateCount = 0
-    set onInvalidate {
+    set onInvalidate
       invalidateCount += 1
-    }
 
     // Execution
     set += 1 // 1 is in set yet. How set is not modified, invalidate is not activated
@@ -107,15 +102,13 @@ class ObservableSetSpec[T]
 
     // Verification
     invalidateCount should equal(3)
-  }
 
-  it should "notify on changes" in {
+  it should "notify on changes" in
     // Preparation
     val set = ObservableSet(1, 2)
     var changeCount = 0
-    set onChange {
+    set onChange
       changeCount += 1
-    }
 
     // Execution
     set += 1 // Set not changed. onChange not activated
@@ -124,29 +117,24 @@ class ObservableSetSpec[T]
 
     // Verification
     changeCount should equal(2)
-  }
 
-  it should "return changed set" in {
+  it should "return changed set" in
     // Preparation
     val set = ObservableSet(1, 2)
-    set onChange { (sourceSet, change) =>
+    set onChange  (sourceSet, change) =>
       sourceSet should be(set)
-    }
 
     // Execution
     set += 3
-  }
 
-  it should "notify each addition individually" in {
+  it should "notify each addition individually" in
     // Preparation
     val set = ObservableSet.empty[Int]
     val addedValues = Buffer.empty[Int]
-    set onChange { (sourceSet, change) =>
-      change match {
+    set onChange  (sourceSet, change) =>
+      change match
         case Add(value) => addedValues += value
         case _ => fail("Unexpected change: " + change)
-      }
-    }
 
     // Execution
     // Operations that change this set
@@ -166,18 +154,15 @@ class ObservableSetSpec[T]
 
     // Verification 
     addedValues should equal((0 to 7).toBuffer)
-  }
 
-  it should "notify each remotion individually" in {
+  it should "notify each remotion individually" in
     // Preparation 
     val set = ObservableSet((0 to 15))
     val removedValues = Buffer.empty[Int]
-    set onChange { (sourceSet, change) =>
-      change match {
+    set onChange  (sourceSet, change) =>
+      change match
         case Remove(value) => removedValues += value
         case _ => fail("Unexpected change: " + change)
-      }
-    }
 
     // Execution
     // Operations that change this set
@@ -210,19 +195,16 @@ class ObservableSetSpec[T]
     set should be('empty)
     removedValues.toList.sortWith(_ < _) should equal(
         (8 to 15).filter(_ % 2 == 0).toList)
-  }
 
-  it should "keep his behavior with other types of sets beyond HashSet" in {
+  it should "keep his behavior with other types of sets beyond HashSet" in
     // Preparation
     val set = ObservableSet(new LinkedHashSet[Int])
     val addedValues = Buffer.empty[Int]
     val removedValues = Buffer.empty[Int]
-    set onChange { (sourceSet, change) =>
-      change match {
+    set onChange  (sourceSet, change) =>
+      change match
         case Add(value) => addedValues += value
         case Remove(value) => removedValues += value
-      }
-    }
 
     // Execution
     compareInstances(set += (1, 10, 3, 8, 5), set, true)
@@ -234,5 +216,3 @@ class ObservableSetSpec[T]
     set.toList should equal(List(1, 8, 5, 11, -1, 15))
     addedValues should equal(Buffer(1, 10, 3, 8, 5, 11, -1, 15))
     removedValues should equal(Buffer(10, 3))
-  }
-}

@@ -38,7 +38,7 @@ import org.apache.spark.mllib.linalg.{Vector, Vectors}
   * regularization term R(w) (if any regularization is used).
   */
 @DeveloperApi
-abstract class Updater extends Serializable {
+abstract class Updater extends Serializable
 
   /**
     * Compute an updated value for weights given the gradient, stepSize, iteration number and
@@ -59,7 +59,6 @@ abstract class Updater extends Serializable {
               stepSize: Double,
               iter: Int,
               regParam: Double): (Vector, Double)
-}
 
 /**
   * :: DeveloperApi ::
@@ -67,19 +66,17 @@ abstract class Updater extends Serializable {
   * Uses a step-size decreasing with the square root of the number of iterations.
   */
 @DeveloperApi
-class SimpleUpdater extends Updater {
+class SimpleUpdater extends Updater
   override def compute(weightsOld: Vector,
                        gradient: Vector,
                        stepSize: Double,
                        iter: Int,
-                       regParam: Double): (Vector, Double) = {
+                       regParam: Double): (Vector, Double) =
     val thisIterStepSize = stepSize / math.sqrt(iter)
     val brzWeights: BV[Double] = weightsOld.toBreeze.toDenseVector
     brzAxpy(-thisIterStepSize, gradient.toBreeze, brzWeights)
 
     (Vectors.fromBreeze(brzWeights), 0)
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -101,12 +98,12 @@ class SimpleUpdater extends Updater {
   * Equivalently, set weight component to signum(w) * max(0.0, abs(w) - shrinkageVal)
   */
 @DeveloperApi
-class L1Updater extends Updater {
+class L1Updater extends Updater
   override def compute(weightsOld: Vector,
                        gradient: Vector,
                        stepSize: Double,
                        iter: Int,
-                       regParam: Double): (Vector, Double) = {
+                       regParam: Double): (Vector, Double) =
     val thisIterStepSize = stepSize / math.sqrt(iter)
     // Take gradient step
     val brzWeights: BV[Double] = weightsOld.toBreeze.toDenseVector
@@ -115,15 +112,12 @@ class L1Updater extends Updater {
     val shrinkageVal = regParam * thisIterStepSize
     var i = 0
     val len = brzWeights.length
-    while (i < len) {
+    while (i < len)
       val wi = brzWeights(i)
       brzWeights(i) = signum(wi) * max(0.0, abs(wi) - shrinkageVal)
       i += 1
-    }
 
     (Vectors.fromBreeze(brzWeights), brzNorm(brzWeights, 1.0) * regParam)
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -132,12 +126,12 @@ class L1Updater extends Updater {
   * Uses a step-size decreasing with the square root of the number of iterations.
   */
 @DeveloperApi
-class SquaredL2Updater extends Updater {
+class SquaredL2Updater extends Updater
   override def compute(weightsOld: Vector,
                        gradient: Vector,
                        stepSize: Double,
                        iter: Int,
-                       regParam: Double): (Vector, Double) = {
+                       regParam: Double): (Vector, Double) =
     // add up both updates from the gradient of the loss (= step) as well as
     // the gradient of the regularizer (= regParam * weightsOld)
     // w' = w - thisIterStepSize * (gradient + regParam * w)
@@ -149,5 +143,3 @@ class SquaredL2Updater extends Updater {
     val norm = brzNorm(brzWeights, 2.0)
 
     (Vectors.fromBreeze(brzWeights), 0.5 * regParam * norm * norm)
-  }
-}

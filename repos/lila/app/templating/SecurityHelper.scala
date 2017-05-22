@@ -4,7 +4,7 @@ package templating
 import lila.user.{User, UserContext}
 import lila.security.{Permission, Granter}
 
-trait SecurityHelper {
+trait SecurityHelper
 
   def isGranted(permission: Permission.type => Permission)(
       implicit ctx: UserContext): Boolean =
@@ -19,4 +19,3 @@ trait SecurityHelper {
 
   def isGranted(permission: Permission, user: User): Boolean =
     Granter(permission)(user)
-}

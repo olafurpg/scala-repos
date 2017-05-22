@@ -8,56 +8,46 @@ import java.io.{File, IOException}
 import akka.actor.{ActorInitializationException, ActorRef, Props}
 import akka.testkit.{AkkaSpec, EventFilter, ImplicitSender}
 
-object SnapshotDirectoryFailureSpec {
+object SnapshotDirectoryFailureSpec
   val inUseSnapshotPath = "target/inUseSnapshotPath"
 
   class TestPersistentActor(name: String, probe: ActorRef)
-      extends PersistentActor with TurnOffRecoverOnStart {
+      extends PersistentActor with TurnOffRecoverOnStart
 
     override def persistenceId: String = name
 
-    override def receiveRecover: Receive = {
+    override def receiveRecover: Receive =
       case SnapshotOffer(md, s) ⇒ probe ! ((md, s))
-    }
 
-    override def receiveCommand = {
+    override def receiveCommand =
       case s: String ⇒ saveSnapshot(s)
       case SaveSnapshotSuccess(md) ⇒ probe ! md.sequenceNr
       case other ⇒ probe ! other
-    }
-  }
-}
 
 class SnapshotDirectoryFailureSpec
     extends AkkaSpec(PersistenceSpec.config(
             "leveldb", "SnapshotDirectoryFailureSpec", extraConfig = Some(s"""
   akka.persistence.snapshot-store.local.dir = "${SnapshotDirectoryFailureSpec.inUseSnapshotPath}"
-  """))) with ImplicitSender {
+  """))) with ImplicitSender
 
   import SnapshotDirectoryFailureSpec._
 
   val file = new File(inUseSnapshotPath)
 
-  override protected def atStartup() {
+  override protected def atStartup()
     if (!file.createNewFile())
       throw new IOException(
           s"Failed to create test file [${file.getCanonicalFile}]")
-  }
 
-  override protected def afterTermination() {
+  override protected def afterTermination()
     if (!file.delete())
       throw new IOException(
           s"Failed to delete test file [${file.getCanonicalFile}]")
-  }
 
-  "A local snapshot store configured with an failing directory name " must {
-    "throw an exception at startup" in {
-      EventFilter[ActorInitializationException](occurrences = 1).intercept {
+  "A local snapshot store configured with an failing directory name " must
+    "throw an exception at startup" in
+      EventFilter[ActorInitializationException](occurrences = 1).intercept
         val p = system.actorOf(Props(classOf[TestPersistentActor],
                                      "SnapshotDirectoryFailureSpec-1",
                                      testActor))
         p ! "blahonga"
-      }
-    }
-  }
-}

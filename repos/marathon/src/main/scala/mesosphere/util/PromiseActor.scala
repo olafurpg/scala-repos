@@ -12,19 +12,16 @@ import scala.concurrent.Future
   * @param promise the promise that is fulfilled when this actor receives its first
   *                 and only message
   */
-class PromiseActor(promise: Promise[Any]) extends Actor {
-  def receive: Receive = {
+class PromiseActor(promise: Promise[Any]) extends Actor
+  def receive: Receive =
     case x: Any =>
-      x match {
+      x match
         case Status.Failure(t) => promise.failure(t)
         case Status.Success(x) => promise.success(x)
         case _ => promise.success(x)
-      }
       context.stop(self)
-  }
-}
 
-object PromiseActor {
+object PromiseActor
 
   /**
     * Sends the given message to the given actorRef and waits indefinitely for the response. The response
@@ -36,11 +33,9 @@ object PromiseActor {
     */
   def askWithoutTimeout[T](actorRefFactory: ActorRefFactory,
                            actorRef: ActorRef,
-                           message: Any): Future[T] = {
+                           message: Any): Future[T] =
     val promise = Promise[T]()
     val promiseActor =
       actorRefFactory.actorOf(Props(classOf[PromiseActor], promise))
     actorRef.tell(message, promiseActor)
     promise.future
-  }
-}

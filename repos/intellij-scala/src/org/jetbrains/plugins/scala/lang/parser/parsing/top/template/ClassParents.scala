@@ -17,23 +17,18 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.AnnotType
  *  TemplateParents ::= Constr {with AnnotType}
  */
 
-object ClassParents {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ClassParents
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val classParentsMarker = builder.mark
-    if (!Constructor.parse(builder)) {
+    if (!Constructor.parse(builder))
       classParentsMarker.drop()
       return false
-    }
     //Look for mixin
-    while (builder.getTokenType == ScalaTokenTypes.kWITH) {
+    while (builder.getTokenType == ScalaTokenTypes.kWITH)
       builder.advanceLexer() //Ate with
-      if (!AnnotType.parse(builder, isPattern = false)) {
+      if (!AnnotType.parse(builder, isPattern = false))
         builder error ScalaBundle.message("wrong.simple.type")
         classParentsMarker.done(ScalaElementTypes.CLASS_PARENTS)
         return true
-      }
-    }
     classParentsMarker.done(ScalaElementTypes.CLASS_PARENTS)
     true
-  }
-}

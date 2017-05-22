@@ -1,17 +1,15 @@
 import scala.runtime.ScalaRunTime.stringOf
 
-final class ArrayOpt[T](val xs: Array[T]) extends AnyVal {
+final class ArrayOpt[T](val xs: Array[T]) extends AnyVal
   def isEmpty = xs == null
   def get = xs
-}
 
-object Bip {
+object Bip
   def mkInts(xs: Array[Short]) = xs map (_.toInt)
-  def unapplySeq(x: Any): ArrayOpt[Int] = x match {
+  def unapplySeq(x: Any): ArrayOpt[Int] = x match
     case xs: Array[Int] => new ArrayOpt(xs)
     case xs: Array[Short] => new ArrayOpt(mkInts(xs))
     case _ => new ArrayOpt(null)
-  }
   // public int[] unapplySeq(java.lang.Object);
   //      0: aload_1
   //      1: astore_2
@@ -39,21 +37,17 @@ object Bip {
   //     45: astore        4
   //     47: aload         4
   //     49: areturn
-}
 
-object Test {
-  def f(x: Any) = x match {
+object Test
+  def f(x: Any) = x match
     case Bip(a, b, c) => s"Bip($a, $b, $c)"
     case Bip(a, b, c @ _ *) => s"Bip($a, $b, c @ ${stringOf(c)}: _*)"
     case _ => "" + x.getClass
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     println(f(Array[Int](1, 2, 3)))
     println(f(Array[Int](1, 2, 3, 4, 5)))
     println(f(Array[Int](1)))
-  }
   // Bip(1, 2, 3)
   // Bip(1, 2, c @ [I@782be20e: _*)
   // class [I
-}

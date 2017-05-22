@@ -26,7 +26,7 @@ import com.precog.bytecode.StaticLibrary
 import com.precog.yggdrasil._
 import org.specs2.mutable._
 
-object MemoizerSpecs extends Specification with Memoizer with FNDummyModule {
+object MemoizerSpecs extends Specification with Memoizer with FNDummyModule
   import instructions._
   import dag._
 
@@ -34,8 +34,8 @@ object MemoizerSpecs extends Specification with Memoizer with FNDummyModule {
   val library = new StaticLibrary {}
   import library._
 
-  "dag memoization" should {
-    "not memoize a sub-graph of non-forcing operations" in {
+  "dag memoization" should
+    "not memoize a sub-graph of non-forcing operations" in
       val line = Line(1, 1, "")
 
       val clicks = dag.AbsoluteLoad(Const(CString("/clicks"))(line))(line)
@@ -50,9 +50,8 @@ object MemoizerSpecs extends Specification with Memoizer with FNDummyModule {
                                     Const(CLong(42))(line))(line))(line))(line)
 
       memoize(input) mustEqual input
-    }
 
-    "insert memoization nodes for morph1 referenced by morph1 and cross" in {
+    "insert memoization nodes for morph1 referenced by morph1 and cross" in
       val line = Line(1, 1, "")
 
       val clicks = dag.Morph1(
@@ -73,9 +72,8 @@ object MemoizerSpecs extends Specification with Memoizer with FNDummyModule {
              Join(Mul, Cross(None), memoClicks, memoClicks)(line))(line)
 
       memoize(input) mustEqual expected
-    }
 
-    "insert memoization nodes for split referenced by morph1 and cross" in {
+    "insert memoization nodes for split referenced by morph1 and cross" in
       val line = Line(1, 1, "")
 
       val id = new Identifier
@@ -102,9 +100,8 @@ object MemoizerSpecs extends Specification with Memoizer with FNDummyModule {
              Join(Mul, Cross(None), memoSplit, memoSplit)(line))(line)
 
       memoize(input) mustEqual expected
-    }
 
-    "insert memoization nodes for reduce parenting a split" in {
+    "insert memoization nodes for reduce parenting a split" in
       val line = Line(1, 1, "")
 
       val id = new Identifier
@@ -136,6 +133,3 @@ object MemoizerSpecs extends Specification with Memoizer with FNDummyModule {
                   id)(line)
 
       memoize(split) mustEqual expectedSplit
-    }
-  }
-}

@@ -8,12 +8,11 @@ import java.io.{Reader, Writer}
   *  serialized by simple-json and `fromJSON[T](xyz)` to get an
   *  object back.
   */
-package object json {
+package object json
   type JSON = Impl.Repr
 
-  implicit class JSONPimp[T : JSONSerializer](x: T) {
+  implicit class JSONPimp[T : JSONSerializer](x: T)
     def toJSON: JSON = implicitly[JSONSerializer[T]].serialize(x)
-  }
 
   def fromJSON[T](x: JSON)(implicit d: JSONDeserializer[T]): T =
     d.deserialize(x)
@@ -22,4 +21,3 @@ package object json {
   def jsonToString(x: JSON): String = Impl.serialize(x)
   def readJSON(str: String): JSON = Impl.deserialize(str)
   def readJSON(reader: Reader): JSON = Impl.deserialize(reader)
-}

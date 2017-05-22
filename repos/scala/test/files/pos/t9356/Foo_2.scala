@@ -1,6 +1,5 @@
 class C
 
-trait Foo {
+trait Foo
   @annot.MyAnnotation(cls = classOf[C])
   def function: Any = ???
-}

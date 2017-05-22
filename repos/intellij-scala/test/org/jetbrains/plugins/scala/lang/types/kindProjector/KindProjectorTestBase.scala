@@ -16,13 +16,13 @@ import org.jetbrains.plugins.scala.project.settings.ScalaCompilerConfiguration
   * Code taken mostly from ExistentialSimplificationTestBase, with minor modifications
   */
 abstract class KindProjectorTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val startExprMarker = "/*start*/"
   private val endExprMarker = "/*end*/"
 
   def folderPath: String = baseRootPath() + "types/kindProjector/"
 
-  override protected def setUp() = {
+  override protected def setUp() =
     super.setUp()
 
     val defaultProfile =
@@ -30,9 +30,8 @@ abstract class KindProjectorTestBase
     val newSettings = defaultProfile.getSettings
     newSettings.plugins = newSettings.plugins :+ "kind-projector"
     defaultProfile.setSettings(newSettings)
-  }
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -59,23 +58,19 @@ abstract class KindProjectorTestBase
         scalaFile, startOffset, endOffset, classOf[ScParameterizedTypeElement])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.computeDesugarizedType
-    typez match {
+    typez match
 
       case Some(tp) =>
         val res = tp.getText
         val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
         val text = lastPsi.getText
-        val output = lastPsi.getNode.getElementType match {
+        val output = lastPsi.getNode.getElementType match
           case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
           case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
             text.substring(2, text.length - 2).trim
           case _ =>
             assertTrue("Test result must be in last comment statement.", false)
-        }
         assertEquals(output, res)
       case _ =>
         assert(assertion = false,
                message = "Projection type not created from parameterized type")
-    }
-  }
-}

@@ -6,90 +6,67 @@ import org.jetbrains.plugins.scala.lang.psi.types._
 /**
   * Pavel.Fatin, 18.05.2010
   */
-class NamedTest extends ApplicabilityTestBase {
-  def testFine() {
-    assertProblems("(a: A)", "(a = A)") {
+class NamedTest extends ApplicabilityTestBase
+  def testFine()
+    assertProblems("(a: A)", "(a = A)")
       case Nil =>
-    }
-    assertProblems("(a: A, b: B)", "(a = A, b = B)") {
+    assertProblems("(a: A, b: B)", "(a = A, b = B)")
       case Nil =>
-    }
-  }
 
-  def testReversed() {
-    assertProblems("(a: A, b: B)", "(b = B, a = A)") {
+  def testReversed()
+    assertProblems("(a: A, b: B)", "(b = B, a = A)")
       case Nil =>
-    }
-  }
 
-  def testPositionalWithNamed() {
-    assertProblems("(a: A, b: B)", "(A, b = B)") {
+  def testPositionalWithNamed()
+    assertProblems("(a: A, b: B)", "(A, b = B)")
       case Nil =>
-    }
     //TODO compiler allows such calls, they seem to be OK 
     //    assertProblems("(a: A, b: B)", "(a = A, b)") {
     //      case Nil =>
     //    }
-  }
 
-  def testPositionalAfterNamed() {
-    assertProblems("(a: A, b: B)", "(b = B, A)") {
+  def testPositionalAfterNamed()
+    assertProblems("(a: A, b: B)", "(b = B, A)")
       case PositionalAfterNamedArgument(Expression("A")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B, c: C)", "(c = C, A, B)") {
+    assertProblems("(a: A, b: B, c: C)", "(c = C, A, B)")
       case PositionalAfterNamedArgument(Expression("A")) :: PositionalAfterNamedArgument(
           Expression("B")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B, c: C)", "(c = C, A, B)") {
+    assertProblems("(a: A, b: B, c: C)", "(c = C, A, B)")
       case PositionalAfterNamedArgument(Expression("A")) :: PositionalAfterNamedArgument(
           Expression("B")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B, c: C)", "(A, c = C, B)") {
+    assertProblems("(a: A, b: B, c: C)", "(A, c = C, B)")
       case PositionalAfterNamedArgument(Expression("B")) :: Nil =>
-    }
-  }
 
-  def testNamedDuplicates() {
-    assertProblems("(a: A)", "(a = A, a = null)") {
+  def testNamedDuplicates()
+    assertProblems("(a: A)", "(a = A, a = null)")
       case ParameterSpecifiedMultipleTimes(Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
           Assignment("a = null")) :: Nil =>
-    }
-    assertProblems("(a: A)", "(a = A, a = A, a = A)") {
+    assertProblems("(a: A)", "(a = A, a = A, a = A)")
       case ParameterSpecifiedMultipleTimes(Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
           Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
           Assignment("a = A")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B)", "(a = A, a = null, b = B, b = null)") {
+    assertProblems("(a: A, b: B)", "(a = A, a = null, b = B, b = null)")
       case ParameterSpecifiedMultipleTimes(Assignment("a = A")) :: ParameterSpecifiedMultipleTimes(
           Assignment("a = null")) :: ParameterSpecifiedMultipleTimes(
           Assignment("b = B")) :: ParameterSpecifiedMultipleTimes(
           Assignment("b = null")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B)", "(A, b = B, b = null)") {
+    assertProblems("(a: A, b: B)", "(A, b = B, b = null)")
       case ParameterSpecifiedMultipleTimes(Assignment("b = B")) :: ParameterSpecifiedMultipleTimes(
           Assignment("b = null")) :: Nil =>
-    }
-  }
 
-  def testUnresolvedParameter() {
-    assertProblems("()", "(a = A)") {
+  def testUnresolvedParameter()
+    assertProblems("()", "(a = A)")
       case ExcessArgument(Assignment("a = A")) :: Nil =>
-    }
-    assertProblems("()", "(a = A, b = B)") {
+    assertProblems("()", "(a = A, b = B)")
       case ExcessArgument(Assignment("a = A")) :: ExcessArgument(
           Assignment("b = B")) :: Nil =>
-    }
-    assertProblems("(a: A)", "(a = A, b = B)") {
+    assertProblems("(a: A)", "(a = A, b = B)")
       case ExcessArgument(Assignment("b = B")) :: Nil =>
-    }
-  }
 
-  def testNamedUnresolvedDuplicates() {
-    assertProblems("(a: A)", "(b = A, b = null)") {
+  def testNamedUnresolvedDuplicates()
+    assertProblems("(a: A)", "(b = A, b = null)")
       case ParameterSpecifiedMultipleTimes(Assignment("b = A")) :: ParameterSpecifiedMultipleTimes(
           Assignment("b = null")) :: Nil =>
-    }
-  }
 
   /*def testDoesNotTakeParameters {
     assertProblems("", "(a = A)") {
@@ -100,29 +77,20 @@ class NamedTest extends ApplicabilityTestBase {
     }
   }*/
 
-  def testTooManyArguments() {
-    assertProblems("(a: A)", "(A, a = A)") {
+  def testTooManyArguments()
+    assertProblems("(a: A)", "(A, a = A)")
       case ExcessArgument(Expression("a = A")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B)", "(A, B, a = A)") {
+    assertProblems("(a: A, b: B)", "(A, B, a = A)")
       case ExcessArgument(Expression("a = A")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B)", "(A, B, b = B)") {
+    assertProblems("(a: A, b: B)", "(A, B, b = B)")
       case ExcessArgument(Expression("b = B")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B)", "(A, B, a = A, b = B)") {
+    assertProblems("(a: A, b: B)", "(A, B, a = A, b = B)")
       case ExcessArgument(Expression("a = A")) :: ExcessArgument(
           Expression("b = B")) :: Nil =>
-    }
-  }
 
-  def testTypeMismatch() {
-    assertProblems("(a: A)", "(a = B)") {
+  def testTypeMismatch()
+    assertProblems("(a: A)", "(a = B)")
       case TypeMismatch(Expression("B"), Type("A")) :: Nil =>
-    }
-    assertProblems("(a: A, b: B)", "(a = B, b = A)") {
+    assertProblems("(a: A, b: B)", "(a = B, b = A)")
       case TypeMismatch(Expression("B"), Type("A")) :: TypeMismatch(
           Expression("A"), Type("B")) :: Nil =>
-    }
-  }
-}

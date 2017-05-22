@@ -9,7 +9,7 @@ import play.api.libs.ws._
 import play.api.http.Status._
 import scala.concurrent.Future
 
-class WSMock extends Mockito with WSClient {
+class WSMock extends Mockito with WSClient
   val request = mock[WSRequest]
   val response = mock[WSResponse]
 
@@ -25,12 +25,10 @@ class WSMock extends Mockito with WSClient {
   request.post(anyString)(any[Writeable[String]]) returns Future.successful(
       response)
 
-  def url(url: String): WSRequest = {
+  def url(url: String): WSRequest =
     urls += url
     request
-  }
 
   def underlying[T]: T = this.asInstanceOf[T]
 
   def close() = ()
-}

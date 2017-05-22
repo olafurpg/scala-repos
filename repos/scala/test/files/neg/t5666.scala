@@ -1,4 +1,4 @@
-object t5666 {
+object t5666
   new Any
   new AnyVal
   new Double
@@ -11,4 +11,3 @@ object t5666 {
   new Boolean
   new Unit
   new Nothing
-}

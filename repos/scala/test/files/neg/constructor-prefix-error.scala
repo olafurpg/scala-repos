@@ -1,7 +1,5 @@
-class Outer {
+class Outer
   class Inner
-}
 
-object Test {
+object Test
   val x = new Outer#Inner
-}

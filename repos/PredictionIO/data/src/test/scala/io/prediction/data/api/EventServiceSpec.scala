@@ -27,7 +27,7 @@ import spray.httpx.RequestBuilding.Get
 
 import org.specs2.mutable.Specification
 
-class EventServiceSpec extends Specification {
+class EventServiceSpec extends Specification
 
   val system = ActorSystem("EventServiceSpecSystem")
 
@@ -46,8 +46,8 @@ class EventServiceSpec extends Specification {
       )
   )
 
-  "GET / request" should {
-    "properly produce OK HttpResponses" in {
+  "GET / request" should
+    "properly produce OK HttpResponses" in
       val probe = TestProbe()(system)
       probe.send(eventServiceActor, Get("/"))
       probe.expectMsg(
@@ -60,8 +60,5 @@ class EventServiceSpec extends Specification {
           )
       )
       success
-    }
-  }
 
   step(system.shutdown())
-}

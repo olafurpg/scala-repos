@@ -1,3 +1,2 @@
-object Overlap3 {
+object Overlap3
   val (a, b) = (0, 0)
-}

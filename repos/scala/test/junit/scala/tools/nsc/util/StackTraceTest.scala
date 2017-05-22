@@ -10,15 +10,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
-trait Expecting {
+trait Expecting
   /*
   import org.expecty.Expecty
   final val expect = new Expecty
  */
-}
 
 @RunWith(classOf[JUnit4])
-class StackTraceTest extends Expecting {
+class StackTraceTest extends Expecting
   // formerly an enum
   val CausedBy = "Caused by: "
   val Suppressed = "Suppressed: "
@@ -28,56 +27,48 @@ class StackTraceTest extends Expecting {
   def sampler: String = sample
 
   // repackage with message
-  def resample: String = try { sample } catch {
+  def resample: String = try { sample } catch
     case e: Throwable => throw new RuntimeException("resample", e)
-  }
   def resampler: String = resample
 
   // simple wrapper
-  def wrapper: String = try { sample } catch {
+  def wrapper: String = try { sample } catch
     case e: Throwable => throw new RuntimeException(e)
-  }
   // another onion skin
-  def rewrapper: String = try { wrapper } catch {
+  def rewrapper: String = try { wrapper } catch
     case e: Throwable => throw new RuntimeException(e)
-  }
   def rewrapperer: String = rewrapper
 
   // only an insane wretch would do this
-  def insane: String = try { sample } catch {
+  def insane: String = try { sample } catch
     case e: Throwable =>
       val t = new RuntimeException(e)
       e initCause t
       throw t
-  }
   def insaner: String = insane
 
   /** Java 7 */
   val suppressable = isJavaAtLeast("1.7")
   type Suppressing = { def addSuppressed(t: Throwable): Unit }
 
-  def repressed: String = try { sample } catch {
+  def repressed: String = try { sample } catch
     case e: Throwable =>
       val t = new RuntimeException("My problem")
-      if (suppressable) {
+      if (suppressable)
         t.asInstanceOf[Suppressing] addSuppressed e
-      }
       throw t
-  }
   def represser: String = repressed
 
   // evaluating s should throw, p trims stack trace, t is the test of resulting trace string
   def probe(s: => String)(p: StackTraceElement => Boolean)(
-      t: String => Unit): Unit = {
-    Try(s) recover { case e => e stackTracePrefixString p } match {
+      t: String => Unit): Unit =
+    Try(s) recover { case e => e stackTracePrefixString p } match
       case Success(s) => t(s)
       case Failure(e) => throw e
-    }
-  }
 
   @Test
-  def showsAllTrace() {
-    probe(sampler)(_ => true) { s =>
+  def showsAllTrace()
+    probe(sampler)(_ => true)  s =>
       val res = s.lines.toList
       /*
       expect {
@@ -88,9 +79,7 @@ class StackTraceTest extends Expecting {
       }
        */
       assert(res.length > 5)
-    }
-  }
-  @Test def showsOnlyPrefix() = probe(sample)(_.getMethodName == "sample") {
+  @Test def showsOnlyPrefix() = probe(sample)(_.getMethodName == "sample")
     s =>
       val res = s.lines.toList
       /*
@@ -99,8 +88,7 @@ class StackTraceTest extends Expecting {
     }
        */
       assert(res.length == 3)
-  }
-  @Test def showsCause() = probe(resampler)(_.getMethodName != "resampler") {
+  @Test def showsCause() = probe(resampler)(_.getMethodName != "resampler")
     s =>
       val res = s.lines.toList
       /*
@@ -111,9 +99,8 @@ class StackTraceTest extends Expecting {
        */
       assert(res.length == 6)
       assert(res exists (_ startsWith CausedBy.toString))
-  }
   @Test def showsWrappedExceptions() =
-    probe(rewrapperer)(_.getMethodName != "rewrapperer") { s =>
+    probe(rewrapperer)(_.getMethodName != "rewrapperer")  s =>
       val res = s.lines.toList
       /*
     expect {
@@ -126,11 +113,10 @@ class StackTraceTest extends Expecting {
        */
       assert(res.length == 9)
       assert(res exists (_ startsWith CausedBy.toString))
-      assert((res collect {
+      assert((res collect
             case s if s startsWith CausedBy.toString => s
-          }).size == 2)
-    }
-  @Test def dontBlowOnCycle() = probe(insaner)(_.getMethodName != "insaner") {
+          ).size == 2)
+  @Test def dontBlowOnCycle() = probe(insaner)(_.getMethodName != "insaner")
     s =>
       val res = s.lines.toList
       /*
@@ -141,7 +127,6 @@ class StackTraceTest extends Expecting {
        */
       assert(res.length == 7)
       assert(res exists (_ startsWith CausedBy.toString))
-  }
 
   /** Java 7, but shouldn't bomb on Java 6.
     *
@@ -154,17 +139,14 @@ java.lang.RuntimeException: My problem
     ... 27 more
     */
   @Test def showsSuppressed() =
-    probe(represser)(_.getMethodName != "represser") { s =>
+    probe(represser)(_.getMethodName != "represser")  s =>
       val res = s.lines.toList
-      if (suppressable) {
+      if (suppressable)
         assert(res.length == 7)
         assert(res exists (_.trim startsWith Suppressed.toString))
-      }
     /*
     expect {
       res.length == 7
       res exists (_ startsWith "  " + Suppressed.toString)
     }
      */
-    }
-}

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @Warmup(iterations = 1)
 @BenchmarkMode(Array(Mode.SingleShotTime))
-class ServerSetResolver {
+class ServerSetResolver
 
   // These params should be kept in sync with the corresponding flags in
   // LocalServerSetService.
@@ -56,7 +56,7 @@ class ServerSetResolver {
     * during zk churn.
     */
   @Benchmark
-  def resolveChurningServerSets(): Int = {
+  def resolveChurningServerSets(): Int =
 
     val shutdown = new Promise[Int]
     implicit val timer = DefaultTimer.twitter
@@ -72,32 +72,26 @@ class ServerSetResolver {
 
     // For the lifetime of this test, monitor changes to all N serversets
     // (The resolver is always monitoring changes)
-    serverSetPaths.foreach { path =>
+    serverSetPaths.foreach  path =>
       monitorServersetChanges(resolver, path)
-    }
 
     // The resolver is always updating as its zk-backed serverset is changing.
     // Run this test for `testRuntimeSec` seconds to see the impact over
     // an extended time.
-    timer.doLater(Duration.fromSeconds(testRuntimeSec)) {
+    timer.doLater(Duration.fromSeconds(testRuntimeSec))
       shutdown.setValue(1)
-    }
     Await.result(shutdown)
-  }
 
   /**
     * Resolve and monitor changes to a single serverset for the lifetime of the test.
     */
-  def monitorServersetChanges(resolver: Zk2Resolver, zkPath: String): Unit = {
-    resolver.bind(s"localhost:$zkListenPort!$zkPath").changes.respond {
+  def monitorServersetChanges(resolver: Zk2Resolver, zkPath: String): Unit =
+    resolver.bind(s"localhost:$zkListenPort!$zkPath").changes.respond
       case Addr.Bound(set, metadata) =>
         logger.info(s"Serverset $zkPath has ${set.size} entries")
       case Addr.Neg => unexpectedError(s"negative resolution of $zkPath")
       case Addr.Failed(exc) => unexpectedError(s"$zkPath: Addr.Failure[$exc]")
       case Addr.Pending => logger.info(s"$zkPath is pending...")
-    }
-  }
 
   def unexpectedError(msg: String) =
     throw new IllegalStateException(s"Unexpected resolution failure. $msg")
-}

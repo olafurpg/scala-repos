@@ -12,7 +12,7 @@ import java.net.URL
   */
 // TODO at the end, after the possible removal of the old classpath representation, this class shouldn't be generic
 // T should be just changed to AbstractFile
-trait ClassFileLookup[T] {
+trait ClassFileLookup[T]
   def findClassFile(name: String): Option[AbstractFile]
 
   /**
@@ -37,22 +37,19 @@ trait ClassFileLookup[T] {
   /** The whole sourcepath in the form of one String.
     */
   def asSourcePathString: String
-}
 
 /**
   * Represents classes which can be loaded with a ClassfileLoader and/or SourcefileLoader.
   */
 // TODO at the end, after the possible removal of the old classpath implementation, this class shouldn't be generic
 // T should be just changed to AbstractFile
-trait ClassRepresentation[T] {
+trait ClassRepresentation[T]
   def binary: Option[T]
   def source: Option[AbstractFile]
 
   def name: String
-}
 
-object ClassRepresentation {
+object ClassRepresentation
   def unapply[T](classRep: ClassRepresentation[T])
     : Option[(Option[T], Option[AbstractFile])] =
     Some((classRep.binary, classRep.source))
-}

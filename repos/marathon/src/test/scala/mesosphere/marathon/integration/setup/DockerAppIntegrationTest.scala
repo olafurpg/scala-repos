@@ -9,13 +9,13 @@ import scala.concurrent.duration._
 
 class DockerAppIntegrationTest
     extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    with Matchers with BeforeAndAfter with GivenWhenThen
   //clean up state before running the test case
   before(cleanUp())
 
   // FIXME (gkleiman): Docker tests don't work under Docker Machine yet. So they can be disabled through an env variable.
-  if (sys.env.getOrElse("RUN_DOCKER_INTEGRATION_TESTS", "true") == "true") {
-    test("deploy a simple Docker app") {
+  if (sys.env.getOrElse("RUN_DOCKER_INTEGRATION_TESTS", "true") == "true")
+    test("deploy a simple Docker app")
       Given("a new Docker app")
       val app = AppDefinition(
           id = testBasePath / "dockerapp",
@@ -39,10 +39,9 @@ class DockerAppIntegrationTest
       extractDeploymentIds(result) should have size 1
       waitForEvent("deployment_success")
       waitForTasks(app.id, 1) // The app has really started
-    }
 
     test(
-        "create a simple docker app using http health checks with HOST networking") {
+        "create a simple docker app using http health checks with HOST networking")
       Given("a new app")
       val app = dockerAppProxy(testBasePath / "docker-http-app",
                                "v1",
@@ -58,6 +57,3 @@ class DockerAppIntegrationTest
       extractDeploymentIds(result) should have size 1
       waitForEvent("deployment_success")
       check.pingSince(5.seconds) should be(true) //make sure, the app has really started
-    }
-  }
-}

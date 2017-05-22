@@ -9,11 +9,9 @@ import play.core.ApplicationProvider
 import play.server.api._
 
 class CustomSSLEngineProvider(appProvider: ApplicationProvider)
-    extends SSLEngineProvider {
+    extends SSLEngineProvider
 
-  override def createSSLEngine(): SSLEngine = {
+  override def createSSLEngine(): SSLEngine =
     // change it to your custom implementation
     SSLContext.getDefault.createSSLEngine
-  }
-}
 // #scalaexample

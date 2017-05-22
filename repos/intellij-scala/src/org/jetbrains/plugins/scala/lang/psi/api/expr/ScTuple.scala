@@ -8,7 +8,6 @@ package expr
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
-trait ScTuple extends ScInfixArgumentExpression {
+trait ScTuple extends ScInfixArgumentExpression
   def exprs: Seq[ScExpression] =
     findChildrenByClassScala(classOf[ScExpression]).toSeq
-}

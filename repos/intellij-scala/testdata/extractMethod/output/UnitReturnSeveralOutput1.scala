@@ -1,5 +1,5 @@
-class UnitReturnSeveralOutput1 {
-  def foo(i: Int) {
+class UnitReturnSeveralOutput1
+  def foo(i: Int)
     /*start*/
     if (true) return
     var x = 0
@@ -8,8 +8,6 @@ class UnitReturnSeveralOutput1 {
     val zz = "1"
     /*end*/
     println(x + y + z + zz)
-  }
-}
 /*
 class UnitReturnSeveralOutput1 {
   def foo(i: Int) {

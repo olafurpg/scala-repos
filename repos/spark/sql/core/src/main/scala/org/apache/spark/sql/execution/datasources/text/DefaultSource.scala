@@ -40,21 +40,18 @@ import org.apache.spark.util.collection.BitSet
 /**
   * A data source for reading text files.
   */
-class DefaultSource extends FileFormat with DataSourceRegister {
+class DefaultSource extends FileFormat with DataSourceRegister
 
   override def shortName(): String = "text"
 
-  private def verifySchema(schema: StructType): Unit = {
-    if (schema.size != 1) {
+  private def verifySchema(schema: StructType): Unit =
+    if (schema.size != 1)
       throw new AnalysisException(
           s"Text data source supports only a single column, and you have ${schema.size} columns.")
-    }
     val tpe = schema(0).dataType
-    if (tpe != StringType) {
+    if (tpe != StringType)
       throw new AnalysisException(
           s"Text data source supports only a string column, but you have ${tpe.simpleString}.")
-    }
-  }
 
   override def inferSchema(sqlContext: SQLContext,
                            options: Map[String, String],
@@ -64,28 +61,23 @@ class DefaultSource extends FileFormat with DataSourceRegister {
   override def prepareWrite(sqlContext: SQLContext,
                             job: Job,
                             options: Map[String, String],
-                            dataSchema: StructType): OutputWriterFactory = {
+                            dataSchema: StructType): OutputWriterFactory =
     verifySchema(dataSchema)
 
     val conf = job.getConfiguration
     val compressionCodec =
       options.get("compression").map(CompressionCodecs.getCodecClassName)
-    compressionCodec.foreach { codec =>
+    compressionCodec.foreach  codec =>
       CompressionCodecs.setCodecConfiguration(conf, codec)
-    }
 
-    new OutputWriterFactory {
+    new OutputWriterFactory
       override def newInstance(path: String,
                                bucketId: Option[Int],
                                dataSchema: StructType,
-                               context: TaskAttemptContext): OutputWriter = {
-        if (bucketId.isDefined) {
+                               context: TaskAttemptContext): OutputWriter =
+        if (bucketId.isDefined)
           throw new AnalysisException("Text doesn't support bucketing")
-        }
         new TextOutputWriter(path, dataSchema, context)
-      }
-    }
-  }
 
   override def buildInternalScan(
       sqlContext: SQLContext,
@@ -95,7 +87,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       bucketSet: Option[BitSet],
       inputFiles: Seq[FileStatus],
       broadcastedConf: Broadcast[SerializableConfiguration],
-      options: Map[String, String]): RDD[InternalRow] = {
+      options: Map[String, String]): RDD[InternalRow] =
     verifySchema(dataSchema)
 
     val job = Job.getInstance(sqlContext.sparkContext.hadoopConfiguration)
@@ -105,62 +97,52 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       .map(_.getPath)
       .sortBy(_.toUri)
 
-    if (paths.nonEmpty) {
+    if (paths.nonEmpty)
       FileInputFormat.setInputPaths(job, paths: _*)
-    }
 
     sqlContext.sparkContext
       .hadoopRDD(conf.asInstanceOf[JobConf],
                  classOf[TextInputFormat],
                  classOf[LongWritable],
                  classOf[Text])
-      .mapPartitions { iter =>
+      .mapPartitions  iter =>
         val unsafeRow = new UnsafeRow(1)
         val bufferHolder = new BufferHolder(unsafeRow)
         val unsafeRowWriter = new UnsafeRowWriter(bufferHolder, 1)
 
-        iter.map {
+        iter.map
           case (_, line) =>
             // Writes to an UnsafeRow directly
             bufferHolder.reset()
             unsafeRowWriter.write(0, line.getBytes, 0, line.getLength)
             unsafeRow.setTotalSize(bufferHolder.totalSize())
             unsafeRow
-        }
-      }
-  }
-}
 
 class TextOutputWriter(
     path: String, dataSchema: StructType, context: TaskAttemptContext)
-    extends OutputWriter {
+    extends OutputWriter
 
   private[this] val buffer = new Text()
 
-  private val recordWriter: RecordWriter[NullWritable, Text] = {
-    new TextOutputFormat[NullWritable, Text]() {
+  private val recordWriter: RecordWriter[NullWritable, Text] =
+    new TextOutputFormat[NullWritable, Text]()
       override def getDefaultWorkFile(
-          context: TaskAttemptContext, extension: String): Path = {
+          context: TaskAttemptContext, extension: String): Path =
         val configuration = context.getConfiguration
         val uniqueWriteJobId =
           configuration.get("spark.sql.sources.writeJobUUID")
         val taskAttemptId = context.getTaskAttemptID
         val split = taskAttemptId.getTaskID.getId
         new Path(path, f"part-r-$split%05d-$uniqueWriteJobId.txt$extension")
-      }
-    }.getRecordWriter(context)
-  }
+    .getRecordWriter(context)
 
   override def write(row: Row): Unit =
     throw new UnsupportedOperationException("call writeInternal")
 
-  override protected[sql] def writeInternal(row: InternalRow): Unit = {
+  override protected[sql] def writeInternal(row: InternalRow): Unit =
     val utf8string = row.getUTF8String(0)
     buffer.set(utf8string.getBytes)
     recordWriter.write(NullWritable.get(), buffer)
-  }
 
-  override def close(): Unit = {
+  override def close(): Unit =
     recordWriter.close(context)
-  }
-}

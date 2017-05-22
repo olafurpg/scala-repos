@@ -2,7 +2,7 @@ package test
 
 class Box[T]
 
-class Foo {
+class Foo
 
   /**
 	 * This method shouldn't affect public API of Foo
@@ -11,4 +11,3 @@ class Foo {
 	 */
   private def abc: Box[_] = null
   def foo: Box[_] = null
-}

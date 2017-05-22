@@ -32,11 +32,10 @@ import scala.language.implicitConversions
 import scalafx.beans.value.ObservableValue
 import scalafx.delegate.SFXDelegate
 
-object ReadOnlyProperty {
+object ReadOnlyProperty
   implicit def sfxReadOnlyProperty2jfx[T, J](
       rop: ReadOnlyProperty[T, J]): jfxbp.ReadOnlyProperty[J] =
     if (rop != null) rop.delegate else null
-}
 
 /**
   * Generic trait that defines the methods common to all readable properties independent of their
@@ -46,7 +45,7 @@ object ReadOnlyProperty {
   * @tparam J Indicates Java type to be wrapped by T. Eventually T and J could be the same.
   */
 trait ReadOnlyProperty[T, J]
-    extends ObservableValue[T, J] with SFXDelegate[jfxbp.ReadOnlyProperty[J]] {
+    extends ObservableValue[T, J] with SFXDelegate[jfxbp.ReadOnlyProperty[J]]
 
   /**
     * Returns the name of this property.
@@ -57,4 +56,3 @@ trait ReadOnlyProperty[T, J]
     * Returns the Object that contains this property.
     */
   def bean = delegate.getBean
-}

@@ -13,8 +13,8 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class CancellationTest
-    extends FunSuite with IntegrationBase with MockitoSugar {
-  test("cancel while waiting for a reply") {
+    extends FunSuite with IntegrationBase with MockitoSugar
+  test("cancel while waiting for a reply")
     val m = new MockChannel
     val cli = m.build()
 
@@ -29,32 +29,29 @@ class CancellationTest
     val meCaptor = ArgumentCaptor.forClass(classOf[DownstreamMessageEvent])
     verify(m.channelPipeline).sendDownstream(meCaptor.capture)
     assert(
-        meCaptor.getValue match {
-      case event: DownstreamMessageEvent => {
+        meCaptor.getValue match
+      case event: DownstreamMessageEvent =>
           assert(event.getChannel == m.channel)
-          assert(event.getMessage match {
+          assert(event.getMessage match
             case s: String => s == "123"
-          })
+          )
           true
-        }
-    })
+    )
 
     f.raise(new Exception)
     val seCaptor =
       ArgumentCaptor.forClass(classOf[DownstreamChannelStateEvent])
     verify(m.channelPipeline, times(2)).sendDownstream(seCaptor.capture)
     assert(
-        seCaptor.getValue match {
-      case event: DownstreamChannelStateEvent => {
+        seCaptor.getValue match
+      case event: DownstreamChannelStateEvent =>
           assert(event.getChannel == m.channel)
           assert(event.getState == ChannelState.OPEN)
           assert(event.getValue == java.lang.Boolean.FALSE)
           true
-        }
-    })
-  }
+    )
 
-  test("cancel while waiting in the queue") {
+  test("cancel while waiting in the queue")
     val m = new MockChannel
     val client = m.build()
     m.connectFuture.setSuccess()
@@ -69,10 +66,7 @@ class CancellationTest
 
     f1.raise(new Exception)
     assert(f1.isDefined)
-    val failure = intercept[Failure] {
+    val failure = intercept[Failure]
       Await.result(f1)
-    }
 
     assert(failure.getCause.isInstanceOf[CancelledConnectionException])
-  }
-}

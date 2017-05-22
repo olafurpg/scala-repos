@@ -21,7 +21,7 @@ import java.util.concurrent.atomic.AtomicReference
   *   import com.twitter.cache.Refresh
   *   val getData: () => Future[T] = Refresh.every(1.hour) { ... }
   */
-object Refresh {
+object Refresh
 
   private val empty = (Future.never, Time.Bottom)
 
@@ -44,28 +44,23 @@ object Refresh {
     * @return A memoized version of `operation` that will refresh on invocation
     *         if more than `ttl` time has passed since `operation` was last called.
     */
-  def every[T](ttl: Duration)(provider: => Future[T]): () => Future[T] = {
+  def every[T](ttl: Duration)(provider: => Future[T]): () => Future[T] =
     val ref = new AtomicReference[(Future[T], Time)](empty)
-    def result(): Future[T] = ref.get match {
+    def result(): Future[T] = ref.get match
       case tuple @ (cachedValue, lastRetrieved) =>
         val now = Time.now
         // interruptible allows the promise to be interrupted safely
         if (now < lastRetrieved + ttl) cachedValue.interruptible()
-        else {
+        else
           val p = Promise[T]()
           val nextTuple = (p, now)
-          if (ref.compareAndSet(tuple, nextTuple)) {
+          if (ref.compareAndSet(tuple, nextTuple))
             val nextResult =
-              provider onFailure { _ =>
+              provider onFailure  _ =>
                 // evict failed result lazily, next request will kick off a new request
                 ref.compareAndSet(nextTuple, empty) // OK if we lose so no need to examine result
-              }
             nextResult.proxyTo(p)
             p.interruptible() // interruptible allows the promise to be interrupted safely
-          } else result()
-        }
-    }
+          else result()
     // Return result, which is a no-arg function that returns a future
     result
-  }
-}

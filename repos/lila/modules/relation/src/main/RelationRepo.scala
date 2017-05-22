@@ -8,7 +8,7 @@ import lila.db.api._
 import lila.db.Implicits._
 import tube.relationTube
 
-private[relation] object RelationRepo {
+private[relation] object RelationRepo
 
   val coll = relationTube.coll
 
@@ -53,9 +53,7 @@ private[relation] object RelationRepo {
         _ sort $sort.naturalAsc,
         max = nb.some,
         hint = reactivemongo.bson.BSONDocument("u1" -> 1)
-    )(_.asOpt[String]) flatMap { ids =>
+    )(_.asOpt[String]) flatMap  ids =>
       $remove(Json.obj("_id" -> $in(ids)))
-    }
 
   def makeId(u1: String, u2: String) = s"$u1/$u2"
-}

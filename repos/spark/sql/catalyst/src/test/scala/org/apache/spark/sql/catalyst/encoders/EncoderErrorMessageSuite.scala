@@ -34,30 +34,25 @@ case class ComplexNonEncodable4(name4: Array[NonEncodable])
 
 case class ComplexNonEncodable5(name5: Option[Array[NonEncodable]])
 
-class EncoderErrorMessageSuite extends SparkFunSuite {
+class EncoderErrorMessageSuite extends SparkFunSuite
 
   // Note: we also test error messages for encoders for private classes in JavaDatasetSuite.
   // That is done in Java because Scala cannot create truly private classes.
 
-  test("primitive types in encoders using Kryo serialization") {
+  test("primitive types in encoders using Kryo serialization")
     intercept[UnsupportedOperationException] { Encoders.kryo[Int] }
     intercept[UnsupportedOperationException] { Encoders.kryo[Long] }
     intercept[UnsupportedOperationException] { Encoders.kryo[Char] }
-  }
 
-  test("primitive types in encoders using Java serialization") {
-    intercept[UnsupportedOperationException] {
+  test("primitive types in encoders using Java serialization")
+    intercept[UnsupportedOperationException]
       Encoders.javaSerialization[Int]
-    }
-    intercept[UnsupportedOperationException] {
+    intercept[UnsupportedOperationException]
       Encoders.javaSerialization[Long]
-    }
-    intercept[UnsupportedOperationException] {
+    intercept[UnsupportedOperationException]
       Encoders.javaSerialization[Char]
-    }
-  }
 
-  test("nice error message for missing encoder") {
+  test("nice error message for missing encoder")
     val errorMsg1 = intercept[UnsupportedOperationException](
         ExpressionEncoder[ComplexNonEncodable1]).getMessage
     assert(errorMsg1.contains(
@@ -69,8 +64,8 @@ class EncoderErrorMessageSuite extends SparkFunSuite {
         ExpressionEncoder[ComplexNonEncodable2]).getMessage
     assert(errorMsg2.contains(
             s"""root class: "${clsName[ComplexNonEncodable2]}""""))
-    assert(errorMsg2.contains(s"""field (class: "${clsName[
-        ComplexNonEncodable1]}", name: "name2")"""))
+    assert(errorMsg2.contains(s"""field (class: "$clsName[
+        ComplexNonEncodable1]", name: "name2")"""))
     assert(errorMsg1.contains(
             s"""field (class: "${clsName[NonEncodable]}", name: "name1")"""))
 
@@ -101,8 +96,6 @@ class EncoderErrorMessageSuite extends SparkFunSuite {
     assert(errorMsg5.contains(s"""option value class: "scala.Array""""))
     assert(errorMsg5.contains(
             s"""array element class: "${clsName[NonEncodable]}""""))
-  }
 
   private def clsName[T : ClassTag]: String =
     implicitly[ClassTag[T]].runtimeClass.getName
-}

@@ -14,12 +14,12 @@ import org.scalajs.testsuite.utils.Requires
 
 object FloatJSTest extends Requires.StrictFloats
 
-class FloatJSTest {
+class FloatJSTest
 
   @noinline def froundNotInlined(x: Double): Float =
     x.toFloat
 
-  @Test def fround_for_special_values(): Unit = {
+  @Test def fround_for_special_values(): Unit =
     assertTrue(froundNotInlined(Double.NaN).isNaN)
     assertEquals(Double.PositiveInfinity, 1 / froundNotInlined(0.0).toDouble)
     assertEquals(Double.NegativeInfinity, 1 / froundNotInlined(-0.0).toDouble)
@@ -27,21 +27,18 @@ class FloatJSTest {
         Float.PositiveInfinity, froundNotInlined(Double.PositiveInfinity))
     assertEquals(
         Float.NegativeInfinity, froundNotInlined(Double.NegativeInfinity))
-  }
 
-  @Test def fround_overflows(): Unit = {
+  @Test def fround_overflows(): Unit =
     assertEquals(Double.PositiveInfinity, froundNotInlined(1e200))
     assertEquals(Double.NegativeInfinity, froundNotInlined(-1e200))
-  }
 
-  @Test def fround_underflows(): Unit = {
+  @Test def fround_underflows(): Unit =
     assertEquals(
         Double.PositiveInfinity, 1 / froundNotInlined(1e-300).toDouble)
     assertEquals(
         Double.NegativeInfinity, 1 / froundNotInlined(-1e-300).toDouble)
-  }
 
-  @Test def fround_normal_cases(): Unit = {
+  @Test def fround_normal_cases(): Unit =
     def test(input: Double, expected: Double): Unit =
       assertEquals(expected, input.toFloat.toDouble)
 
@@ -71,10 +68,9 @@ class FloatJSTest {
     test(-1.2599049874324274E33, -1.2599049641449257E33)
     test(6.08574575776438E-10, 6.085745796191588E-10)
     test(1.973497969450596E-21, 1.973498047135062E-21)
-  }
 
   @Test
-  def Int_should_be_cast_to_Float_when_comparing_to_Float_issue_1878(): Unit = {
+  def Int_should_be_cast_to_Float_when_comparing_to_Float_issue_1878(): Unit =
     val intMax: Int = Int.MaxValue
     val float: Float = (Int.MaxValue - 1).toFloat
 
@@ -91,5 +87,3 @@ class FloatJSTest {
     assertTrue(float <= intMax)
     assertFalse(float > intMax)
     assertTrue(float >= intMax)
-  }
-}

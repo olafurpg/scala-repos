@@ -38,7 +38,7 @@ import scalafx.util.Duration
   *
   * @define KF `KeyFrame`
   */
-object KeyFrame {
+object KeyFrame
 
   /**
     * Converts a ScalaFX $KF to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyFrame.html $KF]],
@@ -62,12 +62,10 @@ object KeyFrame {
   def apply(time: Duration,
             name: String = null,
             onFinished: jfxe.EventHandler[jfxe.ActionEvent] = null,
-            values: Set[_ <: KeyValue[_, _]] = Set.empty) = {
+            values: Set[_ <: KeyValue[_, _]] = Set.empty) =
     val mappedValues: Set[jfxa.KeyValue] =
       values.map((x: KeyValue[_, _]) => x.delegate)
     new KeyFrame(new jfxa.KeyFrame(time, name, onFinished, mappedValues))
-  }
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/KeyFrame.html $KF]].
@@ -78,7 +76,7 @@ object KeyFrame {
   * @define KF `KeyFrame`
   */
 class KeyFrame(override val delegate: jfxa.KeyFrame)
-    extends SFXDelegate[jfxa.KeyFrame] {
+    extends SFXDelegate[jfxa.KeyFrame]
 
   /**
     * Returns the time offset of this $KF.
@@ -100,4 +98,3 @@ class KeyFrame(override val delegate: jfxa.KeyFrame)
     * instances.
     */
   def values = delegate.getValues
-}

@@ -5,7 +5,7 @@ package java.lang
  * be confusing.
  * So we use a binary signature that no Java source file can ever produce.
  */
-class Thread private (dummy: Unit) extends Runnable {
+class Thread private (dummy: Unit) extends Runnable
   private var interruptedState = false
   private[this] var name: String = "main" // default name of the main thread
 
@@ -27,16 +27,13 @@ class Thread private (dummy: Unit) extends Runnable {
     scala.scalajs.runtime.StackTrace.getCurrentStackTrace()
 
   def getId(): scala.Long = 1
-}
 
-object Thread {
+object Thread
   private[this] val SingleThread = new Thread(())
 
   def currentThread(): Thread = SingleThread
 
-  def interrupted(): scala.Boolean = {
+  def interrupted(): scala.Boolean =
     val ret = currentThread.isInterrupted
     currentThread.interruptedState = false
     ret
-  }
-}

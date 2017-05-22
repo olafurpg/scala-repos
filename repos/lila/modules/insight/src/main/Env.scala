@@ -12,12 +12,11 @@ final class Env(config: Config,
                 areFriends: (String, String) => Fu[Boolean],
                 lightUser: String => Option[lila.common.LightUser],
                 system: ActorSystem,
-                lifecycle: play.api.inject.ApplicationLifecycle) {
+                lifecycle: play.api.inject.ApplicationLifecycle)
 
-  private val settings = new {
+  private val settings = new
     val CollectionEntry = config getString "collection.entry"
     val CollectionUserCache = config getString "collection.user_cache"
-  }
   import settings._
 
   private val db = new lila.db.Env(config getConfig "mongodb", lifecycle)
@@ -48,15 +47,13 @@ final class Env(config: Config,
                                 indexer = indexer)
 
   system.actorOf(
-      Props(new Actor {
+      Props(new Actor
     system.lilaBus.subscribe(self, 'analysisReady)
-    def receive = {
+    def receive =
       case lila.analyse.actorApi.AnalysisReady(game, _) => api updateGame game
-    }
-  }))
-}
+  ))
 
-object Env {
+object Env
 
   lazy val current: Env =
     "insight" boot new Env(
@@ -66,4 +63,3 @@ object Env {
         lightUser = lila.user.Env.current.lightUser,
         system = lila.common.PlayApp.system,
         lifecycle = lila.common.PlayApp.lifecycle)
-}

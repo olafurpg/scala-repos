@@ -13,7 +13,7 @@ import org.slf4j.{Logger, LoggerFactory}
 /**
   * Options related to debugging marathon.
   */
-trait DebugConf extends ScallopConf {
+trait DebugConf extends ScallopConf
 
   lazy val debugTracing = toggle(
       "tracing",
@@ -50,57 +50,48 @@ trait DebugConf extends ScallopConf {
       "logging_level",
       descr = "Set logging level to one of: off, error, warn, info, debug, trace, all",
       noshort = true)
-}
 
-class DebugModule(conf: DebugConf) extends AbstractModule {
+class DebugModule(conf: DebugConf) extends AbstractModule
 
   /**
     * Measure processing time of each service method.
     */
   class MetricsBehavior(metricsProvider: Provider[Metrics])
-      extends MethodInterceptor {
-    override def invoke(in: MethodInvocation): AnyRef = {
+      extends MethodInterceptor
+    override def invoke(in: MethodInvocation): AnyRef =
       val metrics: Metrics = metricsProvider.get
 
-      metrics.timed(metrics.name(MetricPrefixes.SERVICE, in)) {
+      metrics.timed(metrics.name(MetricPrefixes.SERVICE, in))
         in.proceed
-      }
-    }
-  }
 
   /**
     * Add trace, whenever a service method is entered and finished.
     */
-  class TracingBehavior(metrics: Provider[Metrics]) extends MethodInterceptor {
-    override def invoke(in: MethodInvocation): AnyRef = {
+  class TracingBehavior(metrics: Provider[Metrics]) extends MethodInterceptor
+    override def invoke(in: MethodInvocation): AnyRef =
       val className = metrics.get.className(in.getThis.getClass)
       val logger = LoggerFactory.getLogger(className)
-      val method = s"""$className.${in.getMethod.getName}(${in.getArguments
-        .mkString(", ")})"""
+      val method = s"""$className.${in.getMethod.getName}($in.getArguments
+        .mkString(", "))"""
       logger.trace(s">>> $method")
       val result = in.proceed()
       logger.trace(s"<<< $method")
       result
-    }
-  }
 
-  object MarathonMatcher extends AbstractMatcher[Class[_]] {
-    override def matches(t: Class[_]): Boolean = {
+  object MarathonMatcher extends AbstractMatcher[Class[_]]
+    override def matches(t: Class[_]): Boolean =
       // Don't instrument the Metrics class, in order to avoid an infinite recursion
       t.getPackage.getName.startsWith("mesosphere") && t != classOf[Metrics]
-    }
-  }
 
-  override def configure(): Unit = {
+  override def configure(): Unit =
     //set trace log level
-    conf.logLevel.get.foreach { levelName =>
+    conf.logLevel.get.foreach  levelName =>
       val level = Level.toLevel(
           if ("fatal".equalsIgnoreCase(levelName)) "fatal" else levelName)
       val rootLogger = LoggerFactory
         .getLogger(Logger.ROOT_LOGGER_NAME)
         .asInstanceOf[ch.qos.logback.classic.Logger]
       rootLogger.setLevel(level)
-    }
 
     //add behaviors
     val metricsProvider = getProvider(classOf[Metrics])
@@ -115,5 +106,3 @@ class DebugModule(conf: DebugConf) extends AbstractModule {
     val behaviors = (tracingBehavior :: metricsBehavior :: Nil).flatten
     if (behaviors.nonEmpty)
       bindInterceptor(MarathonMatcher, Matchers.any(), behaviors: _*)
-  }
-}

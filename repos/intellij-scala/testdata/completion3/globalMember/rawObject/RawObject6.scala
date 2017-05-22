@@ -1,5 +1,4 @@
 package rawObject
 
-object RawObject6 {
+object RawObject6
   def importedDef() = 2
-}

@@ -13,11 +13,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * @author Roman.Shein
   * @since 23.09.2015.
   */
-class ScalaComponentTypeOfMacro extends Macro {
+class ScalaComponentTypeOfMacro extends Macro
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+      params: Array[Expression], context: ExpressionContext): Result =
     if (params.length != 1) return null
-    params.head.calculateResult(context) match {
+    params.head.calculateResult(context) match
       case scTypeRes: ScalaTypeResult =>
         MacroUtil
           .getComponentFromArrayType(scTypeRes.myType)
@@ -30,19 +30,17 @@ class ScalaComponentTypeOfMacro extends Macro {
           .flatMap(MacroUtil.getComponentFromArrayType)
           .map(new ScalaTypeResult(_))
           .orNull
-    }
-  }
 
   override def calculateLookupItems(
       params: Array[Expression],
-      context: ExpressionContext): Array[LookupElement] = {
+      context: ExpressionContext): Array[LookupElement] =
     if (params.length != 1) return null
     val outerItems = params(0).calculateLookupItems(context)
     if (outerItems == null) return null
 
-    outerItems.flatMap {
+    outerItems.flatMap
       case lookupItem: ScalaLookupItem =>
-        lookupItem.element match {
+        lookupItem.element match
           case typeDef: ScTypeDefinition =>
             typeDef
               .getType(TypingContext.empty)
@@ -50,10 +48,8 @@ class ScalaComponentTypeOfMacro extends Macro {
               .flatMap(MacroUtil.getComponentFromArrayType)
               .map(MacroUtil.getTypeLookupItem(_, context.getProject))
           case _ => None
-        }
       case _ => None
-    }.filter(_.isDefined).map(_.get)
-  }
+    .filter(_.isDefined).map(_.get)
 
   def getName: String = MacroUtil.scalaIdPrefix + "componentTypeOf"
 
@@ -63,4 +59,3 @@ class ScalaComponentTypeOfMacro extends Macro {
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]
-}

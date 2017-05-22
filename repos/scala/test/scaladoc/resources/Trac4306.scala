@@ -1,5 +1,4 @@
 package com.example.trac4306
 
-package object foo {
+package object foo
   class Bar
-}

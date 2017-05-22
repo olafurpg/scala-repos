@@ -31,7 +31,7 @@ import scalaz._
 import scalaz.syntax.traverse._
 import scalaz.std.list._
 
-object CookedReader {
+object CookedReader
   def load(baseDir: File,
            metadataFile: File,
            blockFormat: CookedBlockFormat = VersionedCookedBlockFormat(
@@ -39,13 +39,12 @@ object CookedReader {
            segmentFormat: SegmentFormat = VersionedSegmentFormat(
                  Map(1 -> V1SegmentFormat))): CookedReader =
     new CookedReader(baseDir, metadataFile, blockFormat, segmentFormat)
-}
 
 final class CookedReader(baseDir: File,
                          metadataFile0: File,
                          blockFormat: CookedBlockFormat,
                          segmentFormat: SegmentFormat)
-    extends StorageReader {
+    extends StorageReader
   private val metadataFile =
     if (metadataFile0.isAbsolute) metadataFile0
     else new File(baseDir, metadataFile0.getPath)
@@ -59,127 +58,101 @@ final class CookedReader(baseDir: File,
 
   private def maybeBlock = if (block != null) block.get() else null
 
-  private def read[A](file: File)(f: ReadableByteChannel => A): A = {
+  private def read[A](file: File)(f: ReadableByteChannel => A): A =
     val channel = new FileInputStream(file).getChannel()
-    try {
+    try
       f(channel)
-    } finally {
+    finally
       channel.close()
-    }
-  }
 
-  private def loadFromDisk(): Validation[IOException, CookedBlockMetadata] = {
-    read(metadataFile) { channel =>
+  private def loadFromDisk(): Validation[IOException, CookedBlockMetadata] =
+    read(metadataFile)  channel =>
       val segsV = blockFormat.readCookedBlock(channel)
-      segsV foreach { segs0 =>
+      segsV foreach  segs0 =>
         block = new SoftReference(segs0)
-      }
       segsV
-    }
-  }
 
   def id: Long = metadata.valueOr(throw _).blockid
   def length: Int = metadata.valueOr(throw _).length
 
-  def snapshot(pathConstraints: Option[Set[CPath]]): Block = {
-    val groupedPaths = metadata.valueOr(throw _).segments.groupBy {
+  def snapshot(pathConstraints: Option[Set[CPath]]): Block =
+    val groupedPaths = metadata.valueOr(throw _).segments.groupBy
       case (segId, _) => segId.cpath
-    }
 
     val refConstraints =
-      pathConstraints map {
-        _.flatMap { path =>
+      pathConstraints map
+        _.flatMap  path =>
           val tpes =
-            groupedPaths.get(path) map {
+            groupedPaths.get(path) map
               _.map { case (segId, _) => segId.ctype }
-            } getOrElse {
+            getOrElse
               Array.empty[CType]
-            }
 
-          tpes.map { tpe =>
+          tpes.map  tpe =>
             ColumnRef(path, tpe)
-          }.toSet
-        }
-      }
+          .toSet
 
     snapshotRef(refConstraints)
-  }
 
-  def snapshotRef(refConstraints: Option[Set[ColumnRef]]): Block = {
+  def snapshotRef(refConstraints: Option[Set[ColumnRef]]): Block =
     val segments: Seq[Segment] =
-      refConstraints map { refs =>
+      refConstraints map  refs =>
         load(refs.toList)
-          .map({ segs =>
+          .map( segs =>
             segs flatMap (_._2)
-          })
-          .valueOr { nel =>
+          )
+          .valueOr  nel =>
             throw nel.head
-          }
-      } getOrElse {
-        metadata.valueOr(throw _).segments map {
+      getOrElse
+        metadata.valueOr(throw _).segments map
           case (segId, file0) =>
             val file =
               if (file0.isAbsolute) file0 else new File(baseDir, file0.getPath)
-            read(file) { channel =>
+            read(file)  channel =>
               segmentFormat.reader.readSegment(channel)
-            }.valueOr(throw _)
-        }
-      }
+            .valueOr(throw _)
 
     Block(id, segments, isStable)
-  }
 
-  def structure: Iterable[ColumnRef] = metadata.valueOr(throw _).segments map {
+  def structure: Iterable[ColumnRef] = metadata.valueOr(throw _).segments map
     case (segId, _) => ColumnRef(segId.cpath, segId.ctype)
-  }
 
-  def metadata: Validation[IOException, CookedBlockMetadata] = {
+  def metadata: Validation[IOException, CookedBlockMetadata] =
     val segs = maybeBlock
-    if (segs != null) {
+    if (segs != null)
       Success(segs)
-    } else {
-      lock.synchronized {
+    else
+      lock.synchronized
         val block = maybeBlock
-        if (block == null) {
+        if (block == null)
           loadFromDisk()
-        } else {
+        else
           Success(block)
-        }
-      }
-    }
-  }
 
   private def segmentsByRef: Validation[
-      IOException, Map[ColumnRef, List[File]]] = metadata map { md =>
+      IOException, Map[ColumnRef, List[File]]] = metadata map  md =>
     md.segments
       .groupBy(s => (s._1.cpath, s._1.ctype))
-      .map {
+      .map
         case ((cpath, ctype), segs) =>
           (ColumnRef(cpath, ctype), segs.map(_._2).toList)
-      }
       .toMap
-  }
 
   def load(paths: List[ColumnRef])
-    : ValidationNel[IOException, List[(ColumnRef, List[Segment])]] = {
-    segmentsByRef.toValidationNel flatMap {
+    : ValidationNel[IOException, List[(ColumnRef, List[Segment])]] =
+    segmentsByRef.toValidationNel flatMap
       (segsByRef: Map[ColumnRef, List[File]]) =>
-        paths.map { path =>
+        paths.map  path =>
           val v: ValidationNel[IOException, List[Segment]] = segsByRef
             .getOrElse(path, Nil)
-            .map { file0 =>
+            .map  file0 =>
               val file =
                 if (file0.isAbsolute) file0
                 else new File(baseDir, file0.getPath)
-              read(file) { channel =>
+              read(file)  channel =>
                 segmentFormat.reader.readSegment(channel).toValidationNel
-              }
-            }
             .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
                       Segment]
           v map (path -> _)
-        }.sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
+        .sequence[({ type λ[α] = ValidationNel[IOException, α] })#λ,
                    (ColumnRef, List[Segment])]
-    }
-  }
-}

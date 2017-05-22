@@ -32,7 +32,7 @@ import javafx.scene.{shape => jfxss}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/CullFace.html javafx.scene.shape.CullFace]] */
-object CullFace extends SFXEnumDelegateCompanion[jfxss.CullFace, CullFace] {
+object CullFace extends SFXEnumDelegateCompanion[jfxss.CullFace, CullFace]
 
   /**
     * Perform back-face culling.
@@ -80,7 +80,6 @@ object CullFace extends SFXEnumDelegateCompanion[jfxss.CullFace, CullFace] {
 
   protected override def unsortedValues: Array[CullFace] =
     Array(Back, Front, None)
-}
 
 sealed case class CullFace(override val delegate: jfxss.CullFace)
     extends SFXEnumDelegate[jfxss.CullFace]

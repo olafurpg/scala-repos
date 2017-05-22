@@ -4,7 +4,7 @@
 
 package detailedtopics.configuration.securityheaders
 
-object SecurityHeaders {
+object SecurityHeaders
 
   //#filters
   import javax.inject.Inject
@@ -13,8 +13,6 @@ object SecurityHeaders {
   import play.filters.headers.SecurityHeadersFilter
 
   class Filters @Inject()(securityHeadersFilter: SecurityHeadersFilter)
-      extends HttpFilters {
+      extends HttpFilters
     def filters = Seq(securityHeadersFilter)
-  }
   //#filters
-}

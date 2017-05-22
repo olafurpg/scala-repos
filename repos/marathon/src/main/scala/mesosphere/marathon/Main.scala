@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory
 
 import scala.collection.JavaConverters._
 
-class MarathonApp extends App {
+class MarathonApp extends App
   val log = LoggerFactory.getLogger(getClass.getName)
 
-  lazy val zk: ZooKeeperClient = {
+  lazy val zk: ZooKeeperClient =
     require(
         conf.zooKeeperSessionTimeout() < Integer.MAX_VALUE,
         "ZooKeeper timeout too large!"
@@ -33,20 +33,17 @@ class MarathonApp extends App {
     // so we wait to proceed until one is available
     var connectedToZk = false
 
-    while (!connectedToZk) {
-      try {
+    while (!connectedToZk)
+      try
         log.info("Connecting to ZooKeeper...")
         client.get
         connectedToZk = true
-      } catch {
+      catch
         case t: Throwable =>
           log.warn("Unable to connect to ZooKeeper, retrying...")
-      }
-    }
     client
-  }
 
-  def modules(): Seq[Module] = {
+  def modules(): Seq[Module] =
     Seq(
         new HttpModule(conf),
         new MetricsModule,
@@ -57,10 +54,9 @@ class MarathonApp extends App {
         new DebugModule(conf),
         new CoreGuiceModule
     ) ++ getEventsModule
-  }
 
-  def getEventsModule: Option[Module] = {
-    conf.eventSubscriber.get flatMap {
+  def getEventsModule: Option[Module] =
+    conf.eventSubscriber.get flatMap
       case "http_callback" =>
         log.info(
             "Using HttpCallbackEventSubscriber for event" + "notification")
@@ -69,17 +65,14 @@ class MarathonApp extends App {
       case _ =>
         log.info("Event notification disabled.")
         None
-    }
-  }
 
   override lazy val conf = new AllConf(args)
 
-  override def initConf(): Unit = {
+  override def initConf(): Unit =
     super.initConf()
     AllConf.SuppliedOptionNames = conf.builder.getAllSuppliedOptionNames.toSet
-  }
 
-  def runDefault(): Unit = {
+  def runDefault(): Unit =
     setConcurrentContextDefaults()
 
     log.info(
@@ -90,7 +83,6 @@ class MarathonApp extends App {
         classOf[MarathonSchedulerService],
         classOf[MetricsReporterService]
     )
-  }
 
   /**
     * Make sure that we have more than one thread -- otherwise some unmarked blocking operations might cause trouble.
@@ -124,19 +116,14 @@ class MarathonApp extends App {
     * As stated above the ForkJoinPool can increase the amount of threads beyond its parallelismLevel in the
     * presence of blocking computation.
     */
-  private[this] def setConcurrentContextDefaults(): Unit = {
-    def setIfNotDefined(property: String, value: String): Unit = {
-      if (!sys.props.contains(property)) {
+  private[this] def setConcurrentContextDefaults(): Unit =
+    def setIfNotDefined(property: String, value: String): Unit =
+      if (!sys.props.contains(property))
         sys.props += property -> value
-      }
-    }
 
     setIfNotDefined("scala.concurrent.context.minThreads", "5")
     setIfNotDefined("scala.concurrent.context.numThreads", "x2")
     setIfNotDefined("scala.concurrent.context.maxThreads", "64")
-  }
-}
 
-object Main extends MarathonApp {
+object Main extends MarathonApp
   runDefault()
-}

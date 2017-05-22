@@ -11,14 +11,13 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
-class AppRepositoryTest extends MarathonSpec {
+class AppRepositoryTest extends MarathonSpec
   var metrics: Metrics = _
 
-  before {
+  before
     metrics = new Metrics(new MetricRegistry)
-  }
 
-  test("App") {
+  test("App")
     val path = "testApp".toRootPath
     val store = mock[MarathonStore[AppDefinition]]
     val timestamp = Timestamp.now()
@@ -35,9 +34,8 @@ class AppRepositoryTest extends MarathonSpec {
     assert(Some(appDef) == Await.result(res, 5.seconds),
            "Should return the correct AppDefinition")
     verify(store).fetch(s"testApp:$timestamp")
-  }
 
-  test("Store") {
+  test("Store")
     val path = "testApp".toRootPath
     val store = mock[MarathonStore[AppDefinition]]
     val appDef = AppDefinition(id = path)
@@ -54,9 +52,8 @@ class AppRepositoryTest extends MarathonSpec {
            "Should return the correct AppDefinition")
     verify(store).store(versionedKey, appDef)
     verify(store).store(s"testApp", appDef)
-  }
 
-  test("AppIds") {
+  test("AppIds")
     val store = mock[MarathonStore[AppDefinition]]
     val future =
       Future.successful(Seq("app1", "app2", "app1:version", "app2:version"))
@@ -69,9 +66,8 @@ class AppRepositoryTest extends MarathonSpec {
     assert(Seq("app1", "app2") == Await.result(res, 5.seconds),
            "Should return only unversioned names")
     verify(store).names()
-  }
 
-  test("Apps") {
+  test("Apps")
     val store = mock[MarathonStore[AppDefinition]]
     val appDef1 = AppDefinition("app1".toPath)
     val appDef2 = AppDefinition("app2".toPath)
@@ -102,9 +98,8 @@ class AppRepositoryTest extends MarathonSpec {
     verify(store).names()
     verify(store).fetch(appDef1.id.toString)
     verify(store).fetch(appDef2.id.toString)
-  }
 
-  test("ListVersions") {
+  test("ListVersions")
     val store = mock[MarathonStore[AppDefinition]]
     val appDef1 = AppDefinition("app1".toRootPath)
     val version1 = appDef1.copy(
@@ -135,9 +130,8 @@ class AppRepositoryTest extends MarathonSpec {
     assert(expected == Await.result(res, 5.seconds),
            "Should return all versions of given app")
     verify(store).names()
-  }
 
-  test("Expunge") {
+  test("Expunge")
     val store = mock[MarathonStore[AppDefinition]]
     val appDef1 = AppDefinition("app1".toRootPath)
     val version1 = appDef1.copy(
@@ -169,8 +163,6 @@ class AppRepositoryTest extends MarathonSpec {
 
     verify(store).names()
     verify(store).expunge("app1", null) //the null is due to mockito and default arguments in scala
-    for {
+    for
       app <- allApps if app.id.toString == "app1"
-    } verify(store).expunge(s"${app.id}:${app.version}")
-  }
-}
+    verify(store).expunge(s"${app.id}:${app.version}")

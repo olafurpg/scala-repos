@@ -8,7 +8,7 @@ import org.jetbrains.jps.incremental.messages.BuildMessage.Kind
   * User: Dmitry.Naydanov
   * Date: 12.02.15.
   */
-class DummyClient extends Client {
+class DummyClient extends Client
   override def message(kind: Kind,
                        text: String,
                        source: Option[File],
@@ -28,4 +28,3 @@ class DummyClient extends Client {
   override def trace(exception: Throwable) {}
 
   override def generated(source: File, module: File, name: String) {}
-}

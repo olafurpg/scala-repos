@@ -16,7 +16,7 @@
 
 package shapeless.examples
 
-object KList {
+object KList
   import shapeless._
   import UnaryTCConstraint._
 
@@ -29,4 +29,3 @@ object KList {
 
   acceptOption(l1) // Compiles
   //acceptOption(l2)  // Does not compile
-}

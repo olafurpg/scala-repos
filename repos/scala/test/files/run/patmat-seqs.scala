@@ -1,21 +1,19 @@
-object Test {
-  def f1(x: Any) = x match {
+object Test
+  def f1(x: Any) = x match
     case Seq(1, 2, 3) => "s3"
     case Seq(4, 5) => "s2"
     case Seq(7) => "s1"
     case Nil => "s0"
     case Seq(_, _, _, _, _, x: String) => "ss6"
     case _ => "d"
-  }
 
-  def f2(x: Any) = x match {
+  def f2(x: Any) = x match
     case Seq("a", "b", _ *) => "s2"
     case Seq(1, _ *) => "s1"
     case Seq(5, 6, 7, _ *) => "s3"
     case _ => "d"
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val xs1 =
       List(
           List(1, 2, 3),
@@ -40,5 +38,3 @@ object Test {
       ) map f2
 
     xs2 foreach println
-  }
-}

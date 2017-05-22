@@ -14,7 +14,7 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.remote.transport.ThrottlerTransportAdapter.Direction
 import akka.testkit._
 
-object InitialHeartbeatMultiJvmSpec extends MultiNodeConfig {
+object InitialHeartbeatMultiJvmSpec extends MultiNodeConfig
   val controller = role("controller")
   val first = role("first")
   val second = role("second")
@@ -26,7 +26,6 @@ object InitialHeartbeatMultiJvmSpec extends MultiNodeConfig {
         .withFallback(MultiNodeClusterSpec.clusterConfig))
 
   testTransport(on = true)
-}
 
 class InitialHeartbeatMultiJvmNode1 extends InitialHeartbeatSpec
 class InitialHeartbeatMultiJvmNode2 extends InitialHeartbeatSpec
@@ -34,55 +33,45 @@ class InitialHeartbeatMultiJvmNode3 extends InitialHeartbeatSpec
 
 abstract class InitialHeartbeatSpec
     extends MultiNodeSpec(InitialHeartbeatMultiJvmSpec)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import InitialHeartbeatMultiJvmSpec._
 
   muteMarkingAsUnreachable()
 
-  "A member" must {
+  "A member" must
 
-    "detect failure even though no heartbeats have been received" taggedAs LongRunningTest in {
+    "detect failure even though no heartbeats have been received" taggedAs LongRunningTest in
       val firstAddress = address(first)
       val secondAddress = address(second)
       awaitClusterUp(first)
 
-      runOn(first) {
-        within(10 seconds) {
-          awaitAssert({
+      runOn(first)
+        within(10 seconds)
+          awaitAssert(
             cluster.sendCurrentClusterState(testActor)
             expectMsgType[CurrentClusterState].members.map(_.address) should contain(
                 secondAddress)
-          }, interval = 50.millis)
-        }
-      }
-      runOn(second) {
+          , interval = 50.millis)
+      runOn(second)
         cluster.join(first)
-        within(10 seconds) {
-          awaitAssert({
+        within(10 seconds)
+          awaitAssert(
             cluster.sendCurrentClusterState(testActor)
             expectMsgType[CurrentClusterState].members.map(_.address) should contain(
                 firstAddress)
-          }, interval = 50.millis)
-        }
-      }
+          , interval = 50.millis)
       enterBarrier("second-joined")
 
-      runOn(controller) {
+      runOn(controller)
         // It is likely that second has not started heartbeating to first yet,
         // and when it does the messages doesn't go through and the first extra heartbeat is triggered.
         // If the first heartbeat arrives, it will detect the failure anyway but not really exercise the
         // part that we are trying to test here.
         testConductor.blackhole(first, second, Direction.Both).await
-      }
 
-      runOn(second) {
-        within(15 seconds) {
+      runOn(second)
+        within(15 seconds)
           awaitCond(!cluster.failureDetector.isAvailable(first))
-        }
-      }
 
       enterBarrier("after-1")
-    }
-  }
-}

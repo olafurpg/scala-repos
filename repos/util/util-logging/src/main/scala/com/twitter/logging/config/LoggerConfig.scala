@@ -21,7 +21,7 @@ import com.twitter.conversions.time._
 import com.twitter.util.{Config, Duration, NetUtil}
 
 @deprecated("use LoggerFactory", "6.12.1")
-class LoggerConfig extends Config[Logger] {
+class LoggerConfig extends Config[Logger]
 
   /**
     * Name of the logging node. The default ("") is the top-level logger.
@@ -45,21 +45,17 @@ class LoggerConfig extends Config[Logger] {
     */
   var useParents = true
 
-  def apply(): Logger = {
+  def apply(): Logger =
     val logger = Logger.get(node)
-    level.foreach { x =>
+    level.foreach  x =>
       logger.setLevel(x)
-    }
-    handlers.foreach { h =>
+    handlers.foreach  h =>
       logger.addHandler(h())
-    }
     logger.setUseParentHandlers(useParents)
     logger
-  }
-}
 
 @deprecated("use Formatter directly", "6.12.1")
-class FormatterConfig extends Config[Formatter] {
+class FormatterConfig extends Config[Formatter]
 
   /**
     * Should dates in log messages be reported in a different time zone rather than local time?
@@ -108,15 +104,13 @@ class FormatterConfig extends Config[Formatter] {
                   truncateStackTracesAt,
                   useFullPackageNames,
                   prefix)
-}
 
 @deprecated("use BareFormatter directly", "6.12.1")
-object BareFormatterConfig extends FormatterConfig {
+object BareFormatterConfig extends FormatterConfig
   override def apply() = BareFormatter
-}
 
 @deprecated("use SyslogFormatter directly", "6.12.1")
-class SyslogFormatterConfig extends FormatterConfig {
+class SyslogFormatterConfig extends FormatterConfig
 
   /**
     * Hostname to prepend to log lines.
@@ -148,22 +142,19 @@ class SyslogFormatterConfig extends FormatterConfig {
                         timezone,
                         truncateAt,
                         truncateStackTracesAt)
-}
 
 @deprecated("use Formatter directly", "6.12.1")
-trait HandlerConfig extends Config[Handler] {
+trait HandlerConfig extends Config[Handler]
   var formatter: FormatterConfig = new FormatterConfig
 
   var level: Option[Level] = None
-}
 
 @deprecated("use HandlerFactory", "6.12.1")
-class ConsoleHandlerConfig extends HandlerConfig {
+class ConsoleHandlerConfig extends HandlerConfig
   def apply() = new ConsoleHandler(formatter(), level)
-}
 
 @deprecated("use HandlerFactory", "6.12.1")
-class ThrottledHandlerConfig extends HandlerConfig {
+class ThrottledHandlerConfig extends HandlerConfig
 
   /**
     * Timespan to consider duplicates. After this amount of time, duplicate entries will be logged
@@ -182,10 +173,9 @@ class ThrottledHandlerConfig extends HandlerConfig {
   var handler: HandlerConfig = null
 
   def apply() = new ThrottledHandler(handler(), duration, maxToDisplay)
-}
 
 @deprecated("use HandlerFactory", "6.12.1")
-class QueuingHandlerConfig extends HandlerConfig {
+class QueuingHandlerConfig extends HandlerConfig
   def apply() = new QueueingHandler(handler(), maxQueueSize)
 
   /**
@@ -197,10 +187,9 @@ class QueuingHandlerConfig extends HandlerConfig {
     * Wrapped handler.
     */
   var handler: HandlerConfig = null
-}
 
 @deprecated("use HandlerFactory", "6.12.1")
-class FileHandlerConfig extends HandlerConfig {
+class FileHandlerConfig extends HandlerConfig
 
   /**
     * Filename to log to.
@@ -224,10 +213,9 @@ class FileHandlerConfig extends HandlerConfig {
 
   def apply() =
     new FileHandler(filename, roll, append, rotateCount, formatter(), level)
-}
 
 @deprecated("use HandlerFactory", "6.12.1")
-class SyslogHandlerConfig extends HandlerConfig {
+class SyslogHandlerConfig extends HandlerConfig
 
   /**
     * Syslog server hostname.
@@ -240,10 +228,9 @@ class SyslogHandlerConfig extends HandlerConfig {
   var port: Int = SyslogHandler.DEFAULT_PORT
 
   def apply() = new SyslogHandler(server, port, formatter(), level)
-}
 
 @deprecated("use HandlerFactory", "6.12.1")
-class ScribeHandlerConfig extends HandlerConfig {
+class ScribeHandlerConfig extends HandlerConfig
   // send a scribe message no more frequently than this:
   var bufferTime = 100.milliseconds
 
@@ -267,4 +254,3 @@ class ScribeHandlerConfig extends HandlerConfig {
                       maxMessagesToBuffer,
                       formatter(),
                       level)
-}

@@ -55,7 +55,7 @@ import java.io.File
 import java.io.FileReader
 import java.nio.ByteBuffer
 
-object QueryBlast extends AkkaDefaults {
+object QueryBlast extends AkkaDefaults
   var count = 0
   var errors = 0
   var startTime = 0L
@@ -77,19 +77,16 @@ object QueryBlast extends AkkaDefaults {
               var min: Long,
               var max: Long)
 
-  def notifyError(index: Int) {
-    notifyLock.synchronized {
+  def notifyError(index: Int)
+    notifyLock.synchronized
       errors += 1
-      stats.get(index) match {
+      stats.get(index) match
         case Some(stats) => stats.errors += 1
         case None => stats = stats + (index -> new Stats(0, 1, 0, 0, 0))
-      }
-    }
-  }
 
-  def notifyComplete(index: Int, nanos: Long) {
-    notifyLock.synchronized {
-      stats.get(index) match {
+  def notifyComplete(index: Int, nanos: Long)
+    notifyLock.synchronized
+      stats.get(index) match
         case Some(stats) =>
           stats.count += 1
           stats.sum += nanos
@@ -97,11 +94,10 @@ object QueryBlast extends AkkaDefaults {
           stats.max = math.max(stats.max, nanos)
         case None =>
           stats = stats + (index -> new Stats(1, 0, nanos, nanos, nanos))
-      }
       count += 1
-      if ((count + errors) % interval == 0) {
+      if ((count + errors) % interval == 0)
         val now = System.currentTimeMillis()
-        stats foreach {
+        stats foreach
           case (key, stats) =>
             println(
                 "%-20d\t%12d\t%f\t%f\t%f\t%f\t(%d)".format(
@@ -112,25 +108,18 @@ object QueryBlast extends AkkaDefaults {
                     stats.max / 1000000.0d,
                     (stats.sum / stats.count) / 1000000.0d,
                     key))
-        }
         startTime = now
         stats = Map[Int, Stats]()
-      }
-    }
 
-    maxCount.foreach { mc =>
+    maxCount.foreach  mc =>
       if (count >= mc) { println("Shutdown"); sys.exit() }
-    }
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     if (args.size == 0) usage() else runTest(loadConfig(args))
-  }
 
-  def usage() {
+  def usage()
     println(usageMessage)
     sys.exit(1)
-  }
 
   val usageMessage =
     """ 
@@ -143,7 +132,7 @@ baseUrl - base url for test (default: http://localhost:30070/query)
 verboseErrors - whether to print verbose error messages (default: false)
 """
 
-  def loadConfig(args: Array[String]): Properties = {
+  def loadConfig(args: Array[String]): Properties =
     if (args.length != 1) usage()
 
     val config = new Properties()
@@ -153,9 +142,8 @@ verboseErrors - whether to print verbose error messages (default: false)
 
     config.load(new FileReader(file))
     config
-  }
 
-  def runTest(properties: Properties) {
+  def runTest(properties: Properties)
     val sampleSet = new QuerySampler
     val apiUrl =
       properties.getProperty("baseUrl", "http://localhost:30070/query")
@@ -172,15 +160,15 @@ verboseErrors - whether to print verbose error messages (default: false)
 
     val workQueue = new ArrayBlockingQueue[(Int, String)](1000)
 
-    (1 to threads).foreach { id =>
-      new Thread {
+    (1 to threads).foreach  id =>
+      new Thread
         val path = "/benchmark/" + id
 
-        override def run() {
+        override def run()
           val client = new HttpClientXLightWeb
-          while (true) {
+          while (true)
             val (index, query) = workQueue.take()
-            try {
+            try
               val started = System.nanoTime()
 
               val f: Future[HttpResponse[JValue]] = client
@@ -191,7 +179,7 @@ verboseErrors - whether to print verbose error messages (default: false)
                 .get[JValue]("")
 
               Await.ready(f, 120 seconds)
-              f.value match {
+              f.value match
                 case Some(Right(HttpResponse(status, _, _, _)))
                     if status.code == OK =>
                   ()
@@ -202,11 +190,10 @@ verboseErrors - whether to print verbose error messages (default: false)
                   throw ex
                 case _ =>
                   throw new RuntimeException("Error processing insert request")
-              }
               notifyComplete(index, System.nanoTime() - started)
-            } catch {
+            catch
               case e =>
-                if (verboseErrors) {
+                if (verboseErrors)
                   println("QUERY - ERROR")
                   println("URL: " + apiUrl + "?apiKey=" + apiKey)
                   println("QUERY: " + query)
@@ -214,27 +201,19 @@ verboseErrors - whether to print verbose error messages (default: false)
                   println("ERROR MESSAGE")
                   e.printStackTrace
                   println()
-                }
                 notifyError(index)
-            }
-          }
-        }
-      }.start()
-    }
+      .start()
 
     // Start injecting
     startTime = System.currentTimeMillis()
     //println("Starting sample inject")
     println(
         "time                \ttotal errors\tqueries/s\tmin (ms)\tmax (ms)\tavg (ms)")
-    while (true) {
+    while (true)
       val sample = sampleSet.next(base, maxQuery)
       workQueue.put(sample)
-    }
-  }
-}
 
-class QuerySampler {
+class QuerySampler
   val allQueries = List(
       """
 count(load(//%scampaigns))
@@ -255,7 +234,7 @@ histogram('platform) :=
 
   private val random = new java.util.Random
 
-  def next(base: String, maxQuery: Int): (Int, String) = {
+  def next(base: String, maxQuery: Int): (Int, String) =
     val index = random.nextInt(maxQuery)
     (index,
      testQueries(index)
@@ -263,5 +242,3 @@ histogram('platform) :=
        .replace("\n", " ")
        .replace("  ", " ")
        .trim())
-  }
-}

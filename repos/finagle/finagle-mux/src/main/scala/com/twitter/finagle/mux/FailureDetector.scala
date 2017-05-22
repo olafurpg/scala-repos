@@ -13,18 +13,16 @@ import java.util.logging.Logger
   * usually by sending ping messages and evaluating response
   * times.
   */
-private[mux] trait FailureDetector {
+private[mux] trait FailureDetector
   def status: Status
-}
 
 /**
   * The null failure detector is the most conservative: it uses
   * no information, and always gauges the session to be
   * [[Status.Open]].
   */
-private object NullFailureDetector extends FailureDetector {
+private object NullFailureDetector extends FailureDetector
   def status: Status = Status.Open
-}
 
 /**
   * GlobalFlag to configure FailureDetection used only in the
@@ -45,7 +43,7 @@ object sessionFailureDetector
 /**
   * Companion object capable of creating a FailureDetector based on parameterized config.
   */
-object FailureDetector {
+object FailureDetector
 
   /**
     * Base type used to identify and configure the [[FailureDetector]].
@@ -90,14 +88,12 @@ object FailureDetector {
     * Helper class for configuring a [[FailureDetector]] within a
     * [[com.twitter.finagle.Stackable]] client
     */
-  case class Param(param: Config) {
+  case class Param(param: Config)
     def mk(): (Param, Stack.Param[Param]) =
       (this, Param.param)
-  }
 
-  case object Param {
+  case object Param
     implicit val param = Stack.Param(Param(GlobalFlagConfig))
-  }
 
   private[this] val log = Logger.getLogger(getClass.getName)
 
@@ -108,8 +104,8 @@ object FailureDetector {
       config: Config,
       ping: () => Future[Unit],
       statsReceiver: StatsReceiver
-  ): FailureDetector = {
-    config match {
+  ): FailureDetector =
+    config match
       case NullConfig => NullFailureDetector
 
       case cfg: ThresholdConfig =>
@@ -122,8 +118,6 @@ object FailureDetector {
 
       case GlobalFlagConfig =>
         parseConfigFromFlags(ping, statsReceiver = statsReceiver)
-    }
-  }
 
   /**
     * Fallback behavior: parse the sessionFailureDetector global flag and
@@ -133,8 +127,8 @@ object FailureDetector {
       ping: () => Future[Unit],
       nanoTime: () => Long = System.nanoTime,
       statsReceiver: StatsReceiver = NullStatsReceiver
-  ): FailureDetector = {
-    sessionFailureDetector() match {
+  ): FailureDetector =
+    sessionFailureDetector() match
       case list("threshold",
                 duration(min),
                 double(threshold),
@@ -173,6 +167,3 @@ object FailureDetector {
         log.warning(
             s"unknown failure detector ${sessionFailureDetector()} specified")
         NullFailureDetector
-    }
-  }
-}

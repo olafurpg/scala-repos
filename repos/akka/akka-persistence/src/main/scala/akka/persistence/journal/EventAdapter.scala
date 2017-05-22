@@ -30,7 +30,7 @@ trait EventAdapter extends WriteEventAdapter with ReadEventAdapter
   *   <li>splitting up large events into sequences of smaller ones</li>
   * </ul>
   */
-trait WriteEventAdapter {
+trait WriteEventAdapter
   //#event-adapter-api
   /**
     * Return the manifest (type hint) that will be provided in the `fromJournal` method.
@@ -53,7 +53,6 @@ trait WriteEventAdapter {
     */
   def toJournal(event: Any): Any
   //#event-adapter-api
-}
 
 /**
   * Facility to convert from and to specialised data models, as may be required by specialized persistence Journals.
@@ -65,7 +64,7 @@ trait WriteEventAdapter {
   *   <li>adapting incoming events from a "data model" to the "domain model"</li>
   * </ul>
   */
-trait ReadEventAdapter {
+trait ReadEventAdapter
   //#event-adapter-api
   /**
     * Convert a event from its journal model to the applications domain model.
@@ -82,12 +81,10 @@ trait ReadEventAdapter {
     */
   def fromJournal(event: Any, manifest: String): EventSeq
   //#event-adapter-api
-}
 
-sealed abstract class EventSeq {
+sealed abstract class EventSeq
   def events: immutable.Seq[Any]
-}
-object EventSeq {
+object EventSeq
 
   /** Java API */
   final def empty: EventSeq = EmptyEventSeq
@@ -98,32 +95,28 @@ object EventSeq {
   /** Java API */
   @varargs final def create(events: Any*): EventSeq = EventsSeq(events.toList)
   final def apply(events: Any*): EventSeq = EventsSeq(events.toList)
-}
-final case class SingleEventSeq(event: Any) extends EventSeq {
+final case class SingleEventSeq(event: Any) extends EventSeq
   // TODO try to make it a value class, would save allocations
   override val events: immutable.Seq[Any] = List(event)
   override def toString = s"SingleEventSeq($event)"
-}
 
 sealed trait EmptyEventSeq extends EventSeq
-final object EmptyEventSeq extends EmptyEventSeq {
+final object EmptyEventSeq extends EmptyEventSeq
   override def events = Nil
-}
 
 final case class EventsSeq[E](events: immutable.Seq[E]) extends EventSeq
 
 /** No-op model adapter which passes through the incoming events as-is. */
-final case object IdentityEventAdapter extends EventAdapter {
+final case object IdentityEventAdapter extends EventAdapter
   override def toJournal(event: Any): Any = event
   override def fromJournal(event: Any, manifest: String): EventSeq =
     EventSeq.single(event)
   override def manifest(event: Any): String = ""
-}
 
 /** INTERNAL API */
 private[akka] case class NoopWriteEventAdapter(
     private val readEventAdapter: ReadEventAdapter)
-    extends EventAdapter {
+    extends EventAdapter
   // pass-through read
   override def fromJournal(event: Any, manifest: String): EventSeq =
     readEventAdapter.fromJournal(event, manifest)
@@ -131,12 +124,11 @@ private[akka] case class NoopWriteEventAdapter(
   // no-op write
   override def manifest(event: Any): String = ""
   override def toJournal(event: Any): Any = event
-}
 
 /** INTERNAL API */
 private[akka] case class NoopReadEventAdapter(
     private val writeEventAdapter: WriteEventAdapter)
-    extends EventAdapter {
+    extends EventAdapter
   // pass-through write
   override def manifest(event: Any): String = writeEventAdapter.manifest(event)
   override def toJournal(event: Any): Any = writeEventAdapter.toJournal(event)
@@ -144,4 +136,3 @@ private[akka] case class NoopReadEventAdapter(
   // no-op read
   override def fromJournal(event: Any, manifest: String): EventSeq =
     EventSeq(event)
-}

@@ -21,38 +21,31 @@ import java.util.concurrent.TimeUnit
 import org.junit.Assert._
 import com.yammer.metrics.core.{MetricsRegistry, Clock}
 
-class KafkaTimerTest {
+class KafkaTimerTest
 
   @Test
-  def testKafkaTimer() {
+  def testKafkaTimer()
     val clock = new ManualClock
     val testRegistry = new MetricsRegistry(clock)
     val metric = testRegistry.newTimer(this.getClass, "TestTimer")
     val Epsilon = java.lang.Double.longBitsToDouble(0x3ca0000000000000L)
 
     val timer = new KafkaTimer(metric)
-    timer.time {
+    timer.time
       clock.addMillis(1000)
-    }
     assertEquals(1, metric.count())
     assertTrue((metric.max() - 1000).abs <= Epsilon)
     assertTrue((metric.min() - 1000).abs <= Epsilon)
-  }
 
-  private class ManualClock extends Clock {
+  private class ManualClock extends Clock
 
     private var ticksInNanos = 0L
 
-    override def tick() = {
+    override def tick() =
       ticksInNanos
-    }
 
-    override def time() = {
+    override def time() =
       TimeUnit.NANOSECONDS.toMillis(ticksInNanos)
-    }
 
-    def addMillis(millis: Long) {
+    def addMillis(millis: Long)
       ticksInNanos += TimeUnit.MILLISECONDS.toNanos(millis)
-    }
-  }
-}

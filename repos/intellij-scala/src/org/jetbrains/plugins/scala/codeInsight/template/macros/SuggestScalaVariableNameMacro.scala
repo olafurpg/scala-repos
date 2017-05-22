@@ -17,21 +17,19 @@ import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
 /**
   * Macro for suggesting name.
   */
-class SuggestScalaVariableNameMacro extends Macro {
+class SuggestScalaVariableNameMacro extends Macro
   override def calculateLookupItems(
       params: Array[Expression],
-      context: ExpressionContext): Array[LookupElement] = {
+      context: ExpressionContext): Array[LookupElement] =
     val a = SuggestNamesUtil.getNames(params, context)
     if (a.length < 2) return null
     a.map((s: String) => LookupElementBuilder.create(s, s))
-  }
 
   def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+      params: Array[Expression], context: ExpressionContext): Result =
     val a = SuggestNamesUtil.getNames(params, context)
     if (a.length == 0) return null
     new TextResult(a(0))
-  }
 
   def getDescription: String = "Macro for suggesting name"
 
@@ -43,11 +41,10 @@ class SuggestScalaVariableNameMacro extends Macro {
       params: Array[Expression], context: ExpressionContext): Result = null
 
   def getPresentableName: String = "Suggest Scala variable macro"
-}
 
-object SuggestNamesUtil {
+object SuggestNamesUtil
   def getNames(
-      params: Array[Expression], context: ExpressionContext): Array[String] = {
+      params: Array[Expression], context: ExpressionContext): Array[String] =
     val p: Array[String] = params.map(_.calculateResult(context).toString)
     val offset = context.getStartOffset
     val editor = context.getEditor
@@ -58,37 +55,31 @@ object SuggestNamesUtil {
       .getInstance(editor.getProject)
       .commitDocument(editor.getDocument)
     val element = file.findElementAt(offset)
-    val typez: ScType = p match {
+    val typez: ScType = p match
       case x if x.length == 0 => return Array[String]("x") //todo:
       case x if x(0) == "option" || x(0) == "foreach" =>
-        try {
+        try
           val items = (new ScalaVariableOfTypeMacro)
-            .calculateLookupItems(Array[String](x(0) match {
+            .calculateLookupItems(Array[String](x(0) match
               case "option" => "scala.Option"
               case "foreach" => "foreach"
-            }), context, showOne = true)
+            ), context, showOne = true)
             .map(_.getObject)
             .filter(_.isInstanceOf[PsiNamedElement])
             .map(_.asInstanceOf[PsiNamedElement])
             .filter(_.name == x(1))
           if (items.length == 0) return Array[String]("x")
-          items(0) match {
+          items(0) match
             case typed: ScTypedDefinition =>
-              typed.getType(TypingContext.empty) match {
+              typed.getType(TypingContext.empty) match
                 case Success(ScParameterizedType(_, typeArgs), _) =>
                   typeArgs.head
                 case Success(JavaArrayType(arg), _) => arg
                 case _ => return Array[String]("x")
-              }
             case _ => return Array[String]("x")
-          }
-        } catch {
+        catch
           case e: Exception =>
             e.printStackTrace()
             return Array[String]("x")
-        }
       case _ => return Array[String]("x")
-    }
     NameSuggester.suggestNamesByType(typez)
-  }
-}

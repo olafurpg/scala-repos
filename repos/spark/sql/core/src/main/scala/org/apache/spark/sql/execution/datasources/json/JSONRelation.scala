@@ -39,21 +39,21 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.util.SerializableConfiguration
 import org.apache.spark.util.collection.BitSet
 
-class DefaultSource extends FileFormat with DataSourceRegister {
+class DefaultSource extends FileFormat with DataSourceRegister
 
   override def shortName(): String = "json"
 
   override def inferSchema(sqlContext: SQLContext,
                            options: Map[String, String],
-                           files: Seq[FileStatus]): Option[StructType] = {
-    if (files.isEmpty) {
+                           files: Seq[FileStatus]): Option[StructType] =
+    if (files.isEmpty)
       None
-    } else {
+    else
       val parsedOptions: JSONOptions = new JSONOptions(options)
-      val jsonFiles = files.filterNot { status =>
+      val jsonFiles = files.filterNot  status =>
         val name = status.getPath.getName
         name.startsWith("_") || name.startsWith(".")
-      }.toArray
+      .toArray
 
       val jsonSchema = InferSchema.infer(
           createBaseRdd(sqlContext, jsonFiles),
@@ -62,28 +62,22 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       checkConstraints(jsonSchema)
 
       Some(jsonSchema)
-    }
-  }
 
   override def prepareWrite(sqlContext: SQLContext,
                             job: Job,
                             options: Map[String, String],
-                            dataSchema: StructType): OutputWriterFactory = {
+                            dataSchema: StructType): OutputWriterFactory =
     val conf = job.getConfiguration
     val parsedOptions: JSONOptions = new JSONOptions(options)
-    parsedOptions.compressionCodec.foreach { codec =>
+    parsedOptions.compressionCodec.foreach  codec =>
       CompressionCodecs.setCodecConfiguration(conf, codec)
-    }
 
-    new OutputWriterFactory {
+    new OutputWriterFactory
       override def newInstance(path: String,
                                bucketId: Option[Int],
                                dataSchema: StructType,
-                               context: TaskAttemptContext): OutputWriter = {
+                               context: TaskAttemptContext): OutputWriter =
         new JsonOutputWriter(path, bucketId, dataSchema, context)
-      }
-    }
-  }
 
   override def buildInternalScan(
       sqlContext: SQLContext,
@@ -93,7 +87,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       bucketSet: Option[BitSet],
       inputFiles: Seq[FileStatus],
       broadcastedConf: Broadcast[SerializableConfiguration],
-      options: Map[String, String]): RDD[InternalRow] = {
+      options: Map[String, String]): RDD[InternalRow] =
     // TODO: Filter files for all formats before calling buildInternalScan.
     val jsonFiles = inputFiles.filterNot(_.getPath.getName startsWith "_")
 
@@ -104,22 +98,19 @@ class DefaultSource extends FileFormat with DataSourceRegister {
                                    sqlContext.conf.columnNameOfCorruptRecord,
                                    parsedOptions)
 
-    rows.mapPartitions { iterator =>
+    rows.mapPartitions  iterator =>
       val unsafeProjection = UnsafeProjection.create(requiredDataSchema)
       iterator.map(unsafeProjection)
-    }
-  }
 
   private def createBaseRdd(
-      sqlContext: SQLContext, inputPaths: Seq[FileStatus]): RDD[String] = {
+      sqlContext: SQLContext, inputPaths: Seq[FileStatus]): RDD[String] =
     val job = Job.getInstance(sqlContext.sparkContext.hadoopConfiguration)
     val conf = job.getConfiguration
 
     val paths = inputPaths.map(_.getPath)
 
-    if (paths.nonEmpty) {
+    if (paths.nonEmpty)
       FileInputFormat.setInputPaths(job, paths: _*)
-    }
 
     sqlContext.sparkContext
       .hadoopRDD(conf.asInstanceOf[JobConf],
@@ -127,32 +118,27 @@ class DefaultSource extends FileFormat with DataSourceRegister {
                  classOf[LongWritable],
                  classOf[Text])
       .map(_._2.toString) // get the text line
-  }
 
   /** Constraints to be imposed on schema to be stored. */
-  private def checkConstraints(schema: StructType): Unit = {
-    if (schema.fieldNames.length != schema.fieldNames.distinct.length) {
+  private def checkConstraints(schema: StructType): Unit =
+    if (schema.fieldNames.length != schema.fieldNames.distinct.length)
       val duplicateColumns = schema.fieldNames
         .groupBy(identity)
-        .collect {
+        .collect
           case (x, ys) if ys.length > 1 => "\"" + x + "\""
-        }
         .mkString(", ")
       throw new AnalysisException(
           s"Duplicate column(s) : $duplicateColumns found, " +
           s"cannot save to JSON format")
-    }
-  }
 
   override def toString: String = "JSON"
   override def equals(other: Any): Boolean = other.isInstanceOf[DefaultSource]
-}
 
 private[json] class JsonOutputWriter(path: String,
                                      bucketId: Option[Int],
                                      dataSchema: StructType,
                                      context: TaskAttemptContext)
-    extends OutputWriter with Logging {
+    extends OutputWriter with Logging
 
   private[this] val writer = new CharArrayWriter()
   // create the Generator without separator inserted between 2 records
@@ -160,10 +146,10 @@ private[json] class JsonOutputWriter(path: String,
     new JsonFactory().createGenerator(writer).setRootValueSeparator(null)
   private[this] val result = new Text()
 
-  private val recordWriter: RecordWriter[NullWritable, Text] = {
-    new TextOutputFormat[NullWritable, Text]() {
+  private val recordWriter: RecordWriter[NullWritable, Text] =
+    new TextOutputFormat[NullWritable, Text]()
       override def getDefaultWorkFile(
-          context: TaskAttemptContext, extension: String): Path = {
+          context: TaskAttemptContext, extension: String): Path =
         val configuration = context.getConfiguration
         val uniqueWriteJobId =
           configuration.get("spark.sql.sources.writeJobUUID")
@@ -174,14 +160,12 @@ private[json] class JsonOutputWriter(path: String,
         new Path(
             path,
             f"part-r-$split%05d-$uniqueWriteJobId$bucketString.json$extension")
-      }
-    }.getRecordWriter(context)
-  }
+    .getRecordWriter(context)
 
   override def write(row: Row): Unit =
     throw new UnsupportedOperationException("call writeInternal")
 
-  override protected[sql] def writeInternal(row: InternalRow): Unit = {
+  override protected[sql] def writeInternal(row: InternalRow): Unit =
     JacksonGenerator(dataSchema, gen)(row)
     gen.flush()
 
@@ -189,10 +173,7 @@ private[json] class JsonOutputWriter(path: String,
     writer.reset()
 
     recordWriter.write(NullWritable.get(), result)
-  }
 
-  override def close(): Unit = {
+  override def close(): Unit =
     gen.close()
     recordWriter.close(context)
-  }
-}

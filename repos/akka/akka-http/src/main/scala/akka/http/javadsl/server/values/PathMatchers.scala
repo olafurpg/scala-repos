@@ -23,14 +23,13 @@ import scala.reflect.ClassTag
   * Using a PathMatcher with the [[akka.http.javadsl.server.Directives#path]] or [[akka.http.javadsl.server.Directives#pathPrefix]] directives
   * "consumes" a part of the path which is recorded in [[akka.http.javadsl.server.RequestContext#unmatchedPath]].
   */
-trait PathMatcher[T] extends RequestVal[T] {
+trait PathMatcher[T] extends RequestVal[T]
   def optional: PathMatcher[Optional[T]]
-}
 
 /**
   * A collection of predefined path matchers.
   */
-object PathMatchers {
+object PathMatchers
 
   /**
     * A PathMatcher that always matches, doesn't consume anything and extracts nothing.
@@ -141,4 +140,3 @@ object PathMatchers {
       scalaMatcher: ScalaPathMatchers.type ⇒ PathMatcher0): PathMatcher[Void] =
     new PathMatcherImpl[Void](
         scalaMatcher(ScalaPathMatchers).tmap(_ ⇒ Tuple1(null)))
-}

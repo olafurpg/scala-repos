@@ -4,7 +4,7 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   * @author Roman.Shein
   * @since 17.01.2015.
   */
-trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
+trait ScalaTestGoToSourceTest extends ScalaTestTestCase
 
   def getSuccessfulTestPath: List[String]
 
@@ -44,7 +44,7 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
           |
         """.stripMargin)
 
-  def testGoToSuccessfulLocation(): Unit = {
+  def testGoToSuccessfulLocation(): Unit =
     val testName = "SuccessfulGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -55,9 +55,8 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
         checkConfigAndSettings(_, testName, "Successful test should run fine"),
         getSuccessfulTestPath,
         getSuccessfulLocationLine)
-  }
 
-  def testGoToPendingLocation(): Unit = {
+  def testGoToPendingLocation(): Unit =
     val testName = "PendingGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -68,9 +67,8 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
         checkConfigAndSettings(_, testName, "pending test should be pending"),
         getPendingTestPath,
         getPendingLocationLine)
-  }
 
-  def testGoToIgnoredLocation(): Unit = {
+  def testGoToIgnoredLocation(): Unit =
     val testName = "IgnoredGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -83,9 +81,8 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
                       //notice that runConfig test name and testTree test name differ by !!! IGNORED !!! suffix
                       getIgnoredTestPath,
                       getIgnoredLocationLine)
-  }
 
-  def testGoToFailedTest(): Unit = {
+  def testGoToFailedTest(): Unit =
     val testName = "FailedGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -96,5 +93,3 @@ trait ScalaTestGoToSourceTest extends ScalaTestTestCase {
         checkConfigAndSettings(_, testName, "failed test should fail"),
         getFailedTestPath,
         getFailedLocationLine)
-  }
-}

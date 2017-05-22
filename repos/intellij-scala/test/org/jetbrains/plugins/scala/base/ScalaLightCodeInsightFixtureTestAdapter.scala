@@ -22,20 +22,19 @@ import scala.collection.mutable.ListBuffer
   * Date: 3/5/12
   */
 abstract class ScalaLightCodeInsightFixtureTestAdapter
-    extends LightCodeInsightFixtureTestCase {
+    extends LightCodeInsightFixtureTestCase
   protected val CARET_MARKER =
     ScalaLightCodeInsightFixtureTestAdapter.CARET_MARKER
 
   private var libLoader: ScalaLibraryLoader = null
 
-  override protected def setUp() {
+  override protected def setUp()
     super.setUp()
 
     myFixture.allowTreeAccessForAllFiles()
     libLoader = ScalaLibraryLoader.withMockJdk(
         myFixture.getProject, myFixture.getModule, rootPath = null)
     libLoader.loadScala(libVersion)
-  }
 
   protected def libVersion: ScalaSdkVersion =
     TestUtils.DEFAULT_SCALA_SDK_VERSION
@@ -43,7 +42,7 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
   protected def checkAfterSurroundWith(text: String,
                                        assumedText: String,
                                        surrounder: Surrounder,
-                                       canSurround: Boolean) {
+                                       canSurround: Boolean)
     myFixture.configureByText("dummy.scala", text)
     val scaladocSurroundDescriptor = ScalaToolsFactory
       .getInstance()
@@ -56,22 +55,19 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
         selectionModel.getSelectionStart,
         selectionModel.getSelectionEnd)
 
-    if (!canSurround) {
+    if (!canSurround)
       assert(elementsToSurround == null || elementsToSurround.isEmpty,
              elementsToSurround.mkString("![", ",", "]!"))
-    } else {
+    else
       assert(elementsToSurround.nonEmpty, "No elements to surround!")
-      extensions.startCommand(getProject, "Surround With Test") {
+      extensions.startCommand(getProject, "Surround With Test")
         SurroundWithHandler.invoke(myFixture.getProject,
                                    myFixture.getEditor,
                                    myFixture.getFile,
                                    surrounder)
-      }
       myFixture.checkResult(assumedText)
-    }
-  }
 
-  protected def checkTextHasNoErrors(text: String) {
+  protected def checkTextHasNoErrors(text: String)
     myFixture.configureByText("dummy.scala", text)
     CodeFoldingManager
       .getInstance(getProject)
@@ -79,30 +75,28 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
 
     myFixture.testHighlighting(
         false, false, false, myFixture.getFile.getVirtualFile)
-  }
 
   protected def checkTextHasNoErrors(
       text: String,
       annotation: String,
-      inspectionsEnabled: Class[_ <: LocalInspectionTool]*) {
+      inspectionsEnabled: Class[_ <: LocalInspectionTool]*)
     import scala.collection.JavaConversions._
 
     myFixture.configureByText("dummy.scala", text)
     myFixture.enableInspections(inspectionsEnabled: _*)
 
     val caretIndex = text.indexOf(CARET_MARKER)
-    val highlights: mutable.Buffer[HighlightInfo] = for {
+    val highlights: mutable.Buffer[HighlightInfo] = for
       info <- myFixture.doHighlighting() if info.getDescription == annotation
              if caretIndex == -1 || new TextRange(
                  info.getStartOffset, info.getEndOffset).contains(caretIndex)
-    } yield info
+    yield info
     val ranges = highlights.map(info => (info.startOffset, info.endOffset))
     assert(highlights.isEmpty,
            "Highlights with this errors at " + ranges.mkString("", ", ", "."))
-  }
 
   protected def performTest(text: String, assumedText: String)(
-      testBody: () => Unit) {
+      testBody: () => Unit)
     val cleanedText = text.replace("\r", "")
     val cleanedAssumed = assumedText.replace("\r", "")
     val caretIndex = cleanedText.indexOf(CARET_MARKER)
@@ -113,7 +107,6 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     testBody()
 
     myFixture.checkResult(cleanedAssumed)
-  }
 
   /**
     * Checks file text and caret position after type action
@@ -123,36 +116,28 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
     * @param charTyped       Char typed
     */
   protected def checkGeneratedTextAfterTyping(
-      text: String, assumedText: String, charTyped: Char) {
-    performTest(text, assumedText) { () =>
+      text: String, assumedText: String, charTyped: Char)
+    performTest(text, assumedText)  () =>
       myFixture.`type`(charTyped)
-    }
-  }
 
   protected def checkGeneratedTextAfterBackspace(
-      text: String, assumedText: String) {
-    performTest(text, assumedText) { () =>
+      text: String, assumedText: String)
+    performTest(text, assumedText)  () =>
       CommandProcessor.getInstance.executeCommand(
-          myFixture.getProject, new Runnable {
-        def run() {
+          myFixture.getProject, new Runnable
+        def run()
           myFixture.performEditorAction(IdeActions.ACTION_EDITOR_BACKSPACE)
-        }
-      }, "", null)
-    }
-  }
+      , "", null)
 
   protected def checkGeneratedTextAfterEnter(
-      text: String, assumedText: String) {
-    performTest(text, assumedText) { () =>
+      text: String, assumedText: String)
+    performTest(text, assumedText)  () =>
       CommandProcessor
         .getInstance()
-        .executeCommand(myFixture.getProject, new Runnable {
-          def run() {
+        .executeCommand(myFixture.getProject, new Runnable
+          def run()
             myFixture.performEditorAction(IdeActions.ACTION_EDITOR_ENTER)
-          }
-        }, "", null)
-    }
-  }
+        , "", null)
 
   /**
     * Checks selected text has error
@@ -164,7 +149,7 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
   protected def checkTextHasError(
       text: String,
       annotation: String,
-      inspectionsEnabled: Class[_ <: LocalInspectionTool]*) {
+      inspectionsEnabled: Class[_ <: LocalInspectionTool]*)
     import scala.collection.JavaConversions._
 
     myFixture.configureByText("dummy.scala", text)
@@ -188,7 +173,6 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
                  info.getStartOffset == selectionStart &&
                  info.getEndOffset == selectionEnd),
            message)
-  }
 
   /**
     * Checks quick fix's result. If caret position is specified, chooses only appropriate fix.
@@ -202,7 +186,7 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
       text: String,
       assumedStub: String,
       quickFixHint: String,
-      inspectionsEnabled: Class[_ <: LocalInspectionTool]*) {
+      inspectionsEnabled: Class[_ <: LocalInspectionTool]*)
     import scala.collection.JavaConversions._
 
     myFixture.configureByText("dummy.scala", text)
@@ -210,10 +194,9 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
 
     val actions = new ListBuffer[IntentionAction]
     val caretIndex = text.indexOf(CARET_MARKER)
-    def checkCaret(startOffset: Int, endOffset: Int): Boolean = {
+    def checkCaret(startOffset: Int, endOffset: Int): Boolean =
       if (caretIndex < 0) true
       else startOffset <= caretIndex && endOffset >= caretIndex
-    }
     myFixture
       .doHighlighting()
       .foreach(info =>
@@ -225,32 +208,25 @@ abstract class ScalaLightCodeInsightFixtureTestAdapter
 
     assert(actions.nonEmpty, "There is no available fixes.")
 
-    actions.find(_.getText == quickFixHint) match {
+    actions.find(_.getText == quickFixHint) match
       case Some(action) =>
         CommandProcessor
           .getInstance()
-          .executeCommand(myFixture.getProject, new Runnable {
-            def run() {
-              extensions.inWriteAction {
+          .executeCommand(myFixture.getProject, new Runnable
+            def run()
+              extensions.inWriteAction
                 action.invoke(myFixture.getProject,
                               myFixture.getEditor,
                               myFixture.getFile)
-              }
-            }
-          }, "", null)
+          , "", null)
         myFixture.checkResult(assumedStub, /*stripTrailingSpaces = */ true)
       case _ => assert(false, "There is no fixes with such hint.")
-    }
-  }
 
-  protected override def tearDown() {
+  protected override def tearDown()
     libLoader.clean()
     super.tearDown()
-  }
-}
 
-object ScalaLightCodeInsightFixtureTestAdapter {
+object ScalaLightCodeInsightFixtureTestAdapter
   val CARET_MARKER = CodeInsightTestFixture.CARET_MARKER
   val SELECTION_START = "<selection>"
   val SELECTION_END = "</selection>"
-}

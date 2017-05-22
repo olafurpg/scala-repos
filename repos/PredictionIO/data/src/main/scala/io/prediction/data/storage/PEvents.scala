@@ -31,7 +31,7 @@ import scala.reflect.ClassTag
   * @group Event Data
   */
 @DeveloperApi
-trait PEvents extends Serializable {
+trait PEvents extends Serializable
   @transient protected lazy val logger = Logger[this.type]
   @deprecated("Use PEventStore.find() instead.", "0.9.2")
   def getByAppIdAndTimeAndEntity(appId: Int,
@@ -39,7 +39,7 @@ trait PEvents extends Serializable {
                                  untilTime: Option[DateTime],
                                  entityType: Option[String],
                                  entityId: Option[String])(
-      sc: SparkContext): RDD[Event] = {
+      sc: SparkContext): RDD[Event] =
     find(
         appId = appId,
         startTime = startTime,
@@ -48,7 +48,6 @@ trait PEvents extends Serializable {
         entityId = entityId,
         eventNames = None
     )(sc)
-  }
 
   /** :: DeveloperApi ::
     * Read from database and return the events. The deprecation here is intended
@@ -105,7 +104,7 @@ trait PEvents extends Serializable {
                           startTime: Option[DateTime] = None,
                           untilTime: Option[DateTime] = None,
                           required: Option[Seq[String]] = None)(
-      sc: SparkContext): RDD[(String, PropertyMap)] = {
+      sc: SparkContext): RDD[(String, PropertyMap)] =
     val eventRDD = find(appId = appId,
                         channelId = channelId,
                         startTime = startTime,
@@ -115,13 +114,11 @@ trait PEvents extends Serializable {
 
     val dmRDD = PEventAggregator.aggregateProperties(eventRDD)
 
-    required map { r =>
-      dmRDD.filter {
+    required map  r =>
+      dmRDD.filter
         case (k, v) =>
           r.map(v.contains(_)).reduce(_ && _)
-      }
-    } getOrElse dmRDD
-  }
+    getOrElse dmRDD
 
   /** :: Experimental ::
     * Extract EntityMap[A] from events for the entityType
@@ -134,30 +131,27 @@ trait PEvents extends Serializable {
                                      startTime: Option[DateTime] = None,
                                      untilTime: Option[DateTime] = None,
                                      required: Option[Seq[String]] = None)(
-      sc: SparkContext)(extract: DataMap => A): EntityMap[A] = {
+      sc: SparkContext)(extract: DataMap => A): EntityMap[A] =
     val idToData: Map[String, A] = aggregateProperties(
         appId = appId,
         entityType = entityType,
         startTime = startTime,
         untilTime = untilTime,
         required = required
-    )(sc).map {
+    )(sc).map
       case (id, dm) =>
-        try {
+        try
           (id, extract(dm))
-        } catch {
-          case e: Exception => {
+        catch
+          case e: Exception =>
               logger.error(
                   s"Failed to get extract entity from DataMap $dm of " +
                   s"entityId $id.",
                   e)
               throw e
-            }
-        }
-    }.collectAsMap.toMap
+    .collectAsMap.toMap
 
     new EntityMap(idToData)
-  }
 
   /** :: DeveloperApi ::
     * Write events to database
@@ -181,4 +175,3 @@ trait PEvents extends Serializable {
   @DeveloperApi
   def write(events: RDD[Event], appId: Int, channelId: Option[Int])(
       sc: SparkContext): Unit
-}

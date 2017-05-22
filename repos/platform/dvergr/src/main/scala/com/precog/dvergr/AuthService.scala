@@ -42,36 +42,31 @@ import scalaz._
 
 import WebJobManager._
 
-trait AuthService[M[+ _]] { self =>
+trait AuthService[M[+ _]]  self =>
   def isValid(apiKey: APIKey): M[Boolean]
 
-  def withM[N[+ _]](implicit t: M ~> N) = new AuthService[N] {
+  def withM[N[+ _]](implicit t: M ~> N) = new AuthService[N]
     def isValid(apiKey: APIKey): N[Boolean] = t(self.isValid(apiKey))
-  }
-}
 
 case class WebAuthService(
     protocol: String, host: String, port: Int, path: String)(
     implicit executor: ExecutionContext)
-    extends WebClient(protocol, host, port, path) with AuthService[Response] {
+    extends WebClient(protocol, host, port, path) with AuthService[Response]
   import scalaz.syntax.monad._
   import scalaz.EitherT.eitherT
   implicit val M: Monad[Future] = new FutureMonad(executor)
 
-  final def isValid(apiKey: APIKey): Response[Boolean] = withJsonClient {
+  final def isValid(apiKey: APIKey): Response[Boolean] = withJsonClient
     client =>
       eitherT(
-          client.query("apiKey", apiKey).get[JValue]("apikeys/" + apiKey) map {
+          client.query("apiKey", apiKey).get[JValue]("apikeys/" + apiKey) map
         case HttpResponse(HttpStatus(OK, _), _, _, _) => \/.right(true)
         case HttpResponse(HttpStatus(NotFound, _), _, _, _) => \/.right(false)
         case res => \/.left("Unexpected response from auth service:\n" + res)
-      })
-  }
-}
+      )
 
 case class TestAuthService[M[+ _]](
     validAPIKeys: Set[APIKey])(implicit M: Applicative[M])
-    extends AuthService[M] {
+    extends AuthService[M]
   final def isValid(apiKey: APIKey): M[Boolean] =
     M.point(validAPIKeys contains apiKey)
-}

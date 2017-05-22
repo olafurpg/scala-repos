@@ -13,17 +13,16 @@ import akka.http.scaladsl.util.FastFuture._
 
 // format: OFF
 
-trait FutureDirectives {
+trait FutureDirectives
 
   /**
     * "Unwraps" a `Future[T]` and runs the inner route after future
     * completion with the future's value as an extraction of type `Try[T]`.
     */
   def onComplete[T](future: ⇒ Future[T]): Directive1[Try[T]] =
-    Directive { inner ⇒ ctx ⇒
+    Directive  inner ⇒ ctx ⇒
         import ctx.executionContext
         future.fast.transformWith(t ⇒ inner(Tuple1(t))(ctx))
-    }
 
   /**
     * "Unwraps" a `Future[T]` and runs the inner route after future
@@ -43,39 +42,30 @@ trait FutureDirectives {
     * implicitly available.)
     */
   def completeOrRecoverWith(magnet: CompleteOrRecoverWithMagnet): Directive1[Throwable] = magnet.directive
-}
 
 object FutureDirectives extends FutureDirectives
 
-trait OnSuccessMagnet {
+trait OnSuccessMagnet
   type Out
   def directive: Directive[Out]
-}
 
-object OnSuccessMagnet {
+object OnSuccessMagnet
   implicit def apply[T](future: ⇒ Future[T])(implicit tupler: Tupler[T]): OnSuccessMagnet { type Out = tupler.Out } =
-    new OnSuccessMagnet {
+    new OnSuccessMagnet
       type Out = tupler.Out
-      val directive = Directive[tupler.Out] { inner ⇒ ctx ⇒
+      val directive = Directive[tupler.Out]  inner ⇒ ctx ⇒
         import ctx.executionContext
         future.fast.flatMap(t ⇒ inner(tupler(t))(ctx))
-      }(tupler.OutIsTuple)
-    }
-}
+      (tupler.OutIsTuple)
 
-trait CompleteOrRecoverWithMagnet {
+trait CompleteOrRecoverWithMagnet
   def directive: Directive1[Throwable]
-}
 
-object CompleteOrRecoverWithMagnet {
+object CompleteOrRecoverWithMagnet
   implicit def apply[T](future: ⇒ Future[T])(implicit m: ToResponseMarshaller[T]): CompleteOrRecoverWithMagnet =
-    new CompleteOrRecoverWithMagnet {
-      val directive = Directive[Tuple1[Throwable]] { inner ⇒ ctx ⇒
+    new CompleteOrRecoverWithMagnet
+      val directive = Directive[Tuple1[Throwable]]  inner ⇒ ctx ⇒
         import ctx.executionContext
-        future.fast.transformWith {
+        future.fast.transformWith
           case Success(res)   ⇒ ctx.complete(res)
           case Failure(error) ⇒ inner(Tuple1(error))(ctx)
-        }
-      }
-    }
-}

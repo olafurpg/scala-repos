@@ -1,4 +1,4 @@
-object SCL7388B {
+object SCL7388B
   class Aa
   class B
 
@@ -8,5 +8,4 @@ object SCL7388B {
   implicit def i2s(i: Int): String = i.toString
 
   val s: String = /*start*/ goo(new Aa) /*end*/
-}
 //String

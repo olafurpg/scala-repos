@@ -35,7 +35,7 @@ import scalafx.scene.Scene
 import scalafx.scene.control._
 
 /** Illustrates use of TreeView CellFactory to do custom rendering of a TreeCell. */
-object TreeViewCellFactoryDemo extends JFXApp {
+object TreeViewCellFactoryDemo extends JFXApp
 
   case class Person(firstName: String, lastName: String)
 
@@ -47,28 +47,22 @@ object TreeViewCellFactoryDemo extends JFXApp {
       Person("Peggy", "Sue")
   )
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "TreeView CellFactory Demo"
-    scene = new Scene {
-      content = new TreeView[Person] {
+    scene = new Scene
+      content = new TreeView[Person]
         prefWidth = 200
         prefHeight = 150
         showRoot = false
-        root = new TreeItem[Person] {
+        root = new TreeItem[Person]
           expanded = true
           children = ObservableBuffer(
-              characters.map { p =>
+              characters.map  p =>
             new TreeItem(p)
-          })
-        }
+          )
         // Use CellFactory to do custom rendering of a TreeCell
         cellFactory = (v: TreeView[Person]) =>
-          new TreeCell[Person] {
+          new TreeCell[Person]
             treeItem.onChange((_, _, p) =>
                   text = if (p != null)
                     p.value().firstName + " " + p.value().lastName else "?")
-        }
-      }
-    }
-  }
-}

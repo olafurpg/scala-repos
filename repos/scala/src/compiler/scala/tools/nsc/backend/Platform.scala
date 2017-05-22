@@ -12,7 +12,7 @@ import scala.tools.nsc.classpath.FlatClassPath
 
 /** The platform dependent pieces of Global.
   */
-trait Platform {
+trait Platform
   val symbolTable: symtab.SymbolTable
   import symbolTable._
 
@@ -42,4 +42,3 @@ trait Platform {
     * a re-compile is triggered. On .NET by contrast classfiles always take precedence.
     */
   def needCompile(bin: AbstractFile, src: AbstractFile): Boolean
-}

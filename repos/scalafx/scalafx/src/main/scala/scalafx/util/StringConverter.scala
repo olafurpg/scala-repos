@@ -34,7 +34,7 @@ import scala.language.implicitConversions
 /**
   * Companion Object for [[scalafx.util.StringConverter]].
   */
-object StringConverter {
+object StringConverter
 
   /**
     * Converts a ScalaFX StringConverter to a JavaFX StringConverter
@@ -43,12 +43,11 @@ object StringConverter {
     */
   implicit def sfxStringConverter2jfx[T](
       s: StringConverter[T]): jfxu.StringConverter[T] =
-    new jfxu.StringConverter[T] {
+    new jfxu.StringConverter[T]
 
       def fromString(string: String): T = s.fromString(string)
 
       def toString(t: T): String = s.toString(t)
-    }
 
   /**
     * Generates a StringConverter from a Pair of Conversions Functions
@@ -60,12 +59,11 @@ object StringConverter {
     */
   def apply[T](
       fromStringFunction: String => T, toStringFunction: T => String) =
-    new StringConverter[T] {
+    new StringConverter[T]
 
       def fromString(string: String): T = fromStringFunction(string)
 
       def toString(t: T): String = toStringFunction(t)
-    }
 
   /**
     * Convenience method that will create a StringConverter implementation that just makes
@@ -77,14 +75,13 @@ object StringConverter {
     * @param toStringFunction Function that converts a T instance to a new String
     */
   def toStringConverter[T](toStringFunction: T => String) =
-    new StringConverter[T] {
+    new StringConverter[T]
 
       def fromString(string: String): T =
         throw new UnsupportedOperationException(
             "Conversion from String not supported. Consider create a new StringConverter implementation that support it.")
 
       def toString(t: T): String = toStringFunction(t)
-    }
 
   /**
     * Convenience method that will create a StringConverter implementation that just makes
@@ -96,15 +93,13 @@ object StringConverter {
     * @param fromStringFunction Function that converts a String to a new T instance
     */
   def fromStringConverter[T](fromStringFunction: String => T) =
-    new StringConverter[T] {
+    new StringConverter[T]
 
       def fromString(string: String): T = fromStringFunction(string)
 
       def toString(t: T): String =
         throw new UnsupportedOperationException(
             "Conversion to String not supported. Consider create a new StringConverter implementation that support it.")
-    }
-}
 
 /**
   * Wraps a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/util/StringConverter.html `StringConverter`]].
@@ -112,7 +107,7 @@ object StringConverter {
   * @constructor Creates a new ScalaFX StringConverter from a JavaFX StringConverter.
   * @tparam T Type to be converted from/to `String`.
   */
-abstract class StringConverter[T] {
+abstract class StringConverter[T]
 
   /**
     * Converts the string provided into an object defined by the specific converter.
@@ -129,4 +124,3 @@ abstract class StringConverter[T] {
     * @return String version of argument.
     */
   def toString(t: T): String
-}

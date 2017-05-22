@@ -23,7 +23,7 @@ import kafka.log.FileMessageSet
 import org.scalatest.junit.JUnitSuite
 import org.junit.Test
 
-trait BaseMessageSetTestCases extends JUnitSuite {
+trait BaseMessageSetTestCases extends JUnitSuite
 
   val messages = Array(new Message("abcd".getBytes),
                        new Message("efgh".getBytes),
@@ -32,38 +32,34 @@ trait BaseMessageSetTestCases extends JUnitSuite {
   def createMessageSet(messages: Seq[Message]): MessageSet
 
   @Test
-  def testWrittenEqualsRead() {
+  def testWrittenEqualsRead()
     val messageSet = createMessageSet(messages)
     checkEquals(messages.iterator, messageSet.map(m => m.message).iterator)
-  }
 
   @Test
-  def testIteratorIsConsistent() {
+  def testIteratorIsConsistent()
     val m = createMessageSet(messages)
     // two iterators over the same set should give the same results
     checkEquals(m.iterator, m.iterator)
-  }
 
   @Test
-  def testSizeInBytes() {
+  def testSizeInBytes()
     assertEquals("Empty message set should have 0 bytes.",
                  0,
                  createMessageSet(Array[Message]()).sizeInBytes)
     assertEquals("Predicted size should equal actual size.",
                  MessageSet.messageSetSize(messages),
                  createMessageSet(messages).sizeInBytes)
-  }
 
   @Test
-  def testWriteTo() {
+  def testWriteTo()
     // test empty message set
     testWriteToWithMessageSet(createMessageSet(Array[Message]()))
     testWriteToWithMessageSet(createMessageSet(messages))
-  }
 
-  def testWriteToWithMessageSet(set: MessageSet) {
+  def testWriteToWithMessageSet(set: MessageSet)
     // do the write twice to ensure the message set is restored to its original state
-    for (i <- List(0, 1)) {
+    for (i <- List(0, 1))
       val file = tempFile()
       val channel = new RandomAccessFile(file, "rw").getChannel()
       val written = set.writeTo(channel, 0, 1024)
@@ -72,6 +68,3 @@ trait BaseMessageSetTestCases extends JUnitSuite {
                    written)
       val newSet = new FileMessageSet(file, channel)
       checkEquals(set.iterator, newSet.iterator)
-    }
-  }
-}

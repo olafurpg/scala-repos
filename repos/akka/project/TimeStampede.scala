@@ -6,7 +6,7 @@ package akka
 import sbt._
 import sbt.Keys._
 
-object TimeStampede extends AutoPlugin {
+object TimeStampede extends AutoPlugin
 
   override def trigger = noTrigger
 
@@ -16,20 +16,16 @@ object TimeStampede extends AutoPlugin {
 
   final val Snapshot = "-SNAPSHOT"
 
-  def stampVersion = Command.command("stampVersion") { state =>
+  def stampVersion = Command.command("stampVersion")  state =>
     val extracted = Project.extract(state)
     extracted.append(List(version in ThisBuild ~= stamp), state)
-  }
 
-  def stamp(version: String): String = {
+  def stamp(version: String): String =
     if (version endsWith Snapshot)
       (version stripSuffix Snapshot) + "-" + timestamp(
           System.currentTimeMillis)
     else version
-  }
 
-  def timestamp(time: Long): String = {
+  def timestamp(time: Long): String =
     val format = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
     format.format(new java.util.Date(time))
-  }
-}

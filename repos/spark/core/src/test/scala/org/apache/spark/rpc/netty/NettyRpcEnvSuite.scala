@@ -20,22 +20,18 @@ package org.apache.spark.rpc.netty
 import org.apache.spark.{SecurityManager, SparkConf}
 import org.apache.spark.rpc._
 
-class NettyRpcEnvSuite extends RpcEnvSuite {
+class NettyRpcEnvSuite extends RpcEnvSuite
 
   override def createRpcEnv(conf: SparkConf,
                             name: String,
                             port: Int,
-                            clientMode: Boolean = false): RpcEnv = {
+                            clientMode: Boolean = false): RpcEnv =
     val config = RpcEnvConfig(
         conf, "test", "localhost", port, new SecurityManager(conf), clientMode)
     new NettyRpcEnvFactory().create(config)
-  }
 
-  test("non-existent endpoint") {
+  test("non-existent endpoint")
     val uri = RpcEndpointAddress(env.address, "nonexist-endpoint").toString
-    val e = intercept[RpcEndpointNotFoundException] {
+    val e = intercept[RpcEndpointNotFoundException]
       env.setupEndpointRef(env.address, "nonexist-endpoint")
-    }
     assert(e.getMessage.contains(uri))
-  }
-}

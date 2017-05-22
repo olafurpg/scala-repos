@@ -1,7 +1,7 @@
 import scala.tools.partest._
 import scala.tools.nsc._
 
-object Test extends DirectTest {
+object Test extends DirectTest
 
   override def extraSettings: String = "-usejavacp"
 
@@ -45,78 +45,66 @@ object Test extends DirectTest {
     }
   """.trim
 
-  def show() {
+  def show()
     val global = newCompiler()
     import global._
     import analyzer._
 
     val output = collection.mutable.ListBuffer[String]()
 
-    object annotChecker extends AnnotationChecker {
-      def hasTestAnn(tps: Type*) = {
+    object annotChecker extends AnnotationChecker
+      def hasTestAnn(tps: Type*) =
         tps exists (_.annotations.map(_.toString) contains "testAnn")
-      }
 
-      def annotationsConform(tpe1: Type, tpe2: Type): Boolean = {
+      def annotationsConform(tpe1: Type, tpe2: Type): Boolean =
         if (hasTestAnn(tpe1, tpe2))
           output += s"annotationsConform($tpe1, $tpe2)"
         true
-      }
 
-      override def annotationsLub(tp: Type, ts: List[Type]): Type = {
+      override def annotationsLub(tp: Type, ts: List[Type]): Type =
         if (hasTestAnn(ts: _*)) output += s"lub($ts)"
         tp
-      }
 
       override def adaptBoundsToAnnotations(
           bounds: List[TypeBounds],
           tparams: List[Symbol],
-          targs: List[Type]): List[TypeBounds] = {
+          targs: List[Type]): List[TypeBounds] =
         if (hasTestAnn(targs: _*))
           output += s"adaptBoundsToAnnots($bounds, $tparams, $targs)"
         bounds
-      }
-    }
 
-    object analyzerPlugin extends AnalyzerPlugin {
+    object analyzerPlugin extends AnalyzerPlugin
       def treeClass(t: Tree) = t.getClass.toString.split('.').last
 
       override def pluginsPt(
-          pt: Type, typer: Typer, tree: Tree, mode: Mode): Type = {
+          pt: Type, typer: Typer, tree: Tree, mode: Mode): Type =
         output += s"pluginsPt($pt, ${treeClass(tree)})"
         pt
-      }
 
       override def pluginsTyped(
-          tpe: Type, typer: Typer, tree: Tree, mode: Mode, pt: Type): Type = {
+          tpe: Type, typer: Typer, tree: Tree, mode: Mode, pt: Type): Type =
         output += s"pluginsTyped($tpe, ${treeClass(tree)})"
         tpe
-      }
 
       override def pluginsTypeSig(
-          tpe: Type, typer: Typer, defTree: Tree, pt: Type): Type = {
+          tpe: Type, typer: Typer, defTree: Tree, pt: Type): Type =
         output += s"pluginsTypeSig(${defTree.symbol}, ${treeClass(defTree)})"
         tpe
-      }
 
       override def pluginsTypeSigAccessor(
-          tpe: Type, typer: Typer, tree: ValDef, sym: Symbol): Type = {
+          tpe: Type, typer: Typer, tree: ValDef, sym: Symbol): Type =
         output += s"pluginsTypeSigAccessor(${tree.symbol})"
         tpe
-      }
 
       override def canAdaptAnnotations(
-          tree: Tree, typer: Typer, mode: Mode, pt: Type): Boolean = {
+          tree: Tree, typer: Typer, mode: Mode, pt: Type): Boolean =
         output += s"canAdaptAnnotations(${treeClass(tree)}, $pt)"
         false
-      }
 
       override def pluginsTypedReturn(
-          tpe: Type, typer: Typer, tree: Return, pt: Type): Type = {
+          tpe: Type, typer: Typer, tree: Return, pt: Type): Type =
         output += s"pluginsTypedReturn($tree, $pt)"
         tpe
-      }
-    }
 
     addAnnotationChecker(annotChecker)
     addAnalyzerPlugin(analyzerPlugin)
@@ -129,5 +117,3 @@ object Test extends DirectTest {
       .toList
       .sorted
     println(res.mkString("\n"))
-  }
-}

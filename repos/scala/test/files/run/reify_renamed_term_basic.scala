@@ -1,13 +1,11 @@
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
-object A {
-  object B {
+object A
+  object B
     val c = ()
-  }
-}
 
-object Test extends App {
+object Test extends App
   import A.{B => X}
   import A.B.{c => y}
   import X.{c => z}
@@ -19,4 +17,3 @@ object Test extends App {
   )
 
   println(expr.eval)
-}

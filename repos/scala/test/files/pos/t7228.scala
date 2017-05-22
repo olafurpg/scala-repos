@@ -1,4 +1,4 @@
-object AdaptWithWeaklyConformantType {
+object AdaptWithWeaklyConformantType
   implicit class D(d: Double) { def double = d * 2 }
 
   val x1: Int = 1
@@ -14,9 +14,8 @@ object AdaptWithWeaklyConformantType {
   def f4 = x4.double
   def f5 = x5.double
   def f6 = x6.double
-}
 
-object AdaptAliasWithWeaklyConformantType {
+object AdaptAliasWithWeaklyConformantType
   implicit class D(d: Double) { def double = d * 2 }
   type T = Int
 
@@ -33,9 +32,8 @@ object AdaptAliasWithWeaklyConformantType {
   def f4 = x4.double
   def f5 = x5.double
   def f6 = x6.double
-}
 
-object AdaptToAliasWithWeaklyConformantType {
+object AdaptToAliasWithWeaklyConformantType
   type U = Double
   implicit class D(d: U) { def double = d * 2 }
 
@@ -52,9 +50,8 @@ object AdaptToAliasWithWeaklyConformantType {
   def f4 = x4.double
   def f5 = x5.double
   def f6 = x6.double
-}
 
-object AdaptAliasToAliasWithWeaklyConformantType {
+object AdaptAliasToAliasWithWeaklyConformantType
   type U = Double
   type T = Int
   implicit class D(d: U) { def double = d * 2 }
@@ -72,4 +69,3 @@ object AdaptAliasToAliasWithWeaklyConformantType {
   def f4 = x4.double
   def f5 = x5.double
   def f6 = x6.double
-}

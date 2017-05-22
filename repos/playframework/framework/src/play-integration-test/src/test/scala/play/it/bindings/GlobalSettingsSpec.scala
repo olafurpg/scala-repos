@@ -22,90 +22,72 @@ object NettyGlobalSettingsSpec
 
 trait GlobalSettingsSpec
     extends PlaySpecification with WsTestClient
-    with ServerIntegrationSpecification {
+    with ServerIntegrationSpecification
 
   sequential
 
   def withServer[T](applicationGlobal: Option[String])(uri: String)(
-      block: String => T) = {
+      block: String => T) =
     implicit val port = testServerPort
     val additionalSettings =
-      applicationGlobal.fold(Map.empty[String, String]) { s: String =>
+      applicationGlobal.fold(Map.empty[String, String])  s: String =>
         Map("application.global" -> s"play.it.bindings.$s")
-      } +
+      +
       ("play.http.requestHandler" -> "play.http.GlobalSettingsHttpRequestHandler")
     import play.api.inject._
     import play.api.routing.sird._
     lazy val app: Application = new GuiceApplicationBuilder()
       .configure(additionalSettings)
-      .overrides(bind[Router].to(Router.from {
+      .overrides(bind[Router].to(Router.from
         case p"/scala" =>
-          Action { request =>
+          Action  request =>
             Ok(request.headers.get("X-Foo").getOrElse("null"))
-          }
         case p"/java" => JAction(app, JavaAction)
-      }))
+      ))
       .build()
-    running(TestServer(port, app)) {
+    running(TestServer(port, app))
       val response = await(wsUrl(uri).get())
       block(response.body)
-    }
-  }
 
-  "GlobalSettings filters" should {
+  "GlobalSettings filters" should
     "not have X-Foo header when no Global is configured" in withServer(None)(
-        "/scala") { body =>
+        "/scala")  body =>
       body must_== "null"
-    }
     "have X-Foo header when Scala Global with filters is configured" in withServer(
-        Some("FooFilteringScalaGlobal"))("/scala") { body =>
+        Some("FooFilteringScalaGlobal"))("/scala")  body =>
       body must_== "filter-constructor-called-by-scala-global"
-    }
     "have X-Foo header when Java Global with filters is configured" in withServer(
-        Some("FooFilteringJavaGlobal"))("/scala") { body =>
+        Some("FooFilteringJavaGlobal"))("/scala")  body =>
       body must_== "filter-default-constructor"
-    }
     "allow intercepting by Java GlobalSettings.onRequest" in withServer(
-        Some("OnRequestJavaGlobal"))("/java") { body =>
+        Some("OnRequestJavaGlobal"))("/java")  body =>
       body must_== "intercepted"
-    }
-  }
-}
 
 /** Inserts an X-Foo header with a custom value. */
-class FooFilter(headerValue: String) extends EssentialFilter {
+class FooFilter(headerValue: String) extends EssentialFilter
   def this() = this("filter-default-constructor")
-  def apply(next: EssentialAction) = EssentialAction { request =>
+  def apply(next: EssentialAction) = EssentialAction  request =>
     val fooBarHeaders =
       request.copy(headers = request.headers.add("X-Foo" -> headerValue))
     next(fooBarHeaders)
-  }
-}
 
 /** Scala GlobalSettings object that uses a filter */
-object FooFilteringScalaGlobal extends play.api.GlobalSettings {
-  override def doFilter(next: EssentialAction): EssentialAction = {
+object FooFilteringScalaGlobal extends play.api.GlobalSettings
+  override def doFilter(next: EssentialAction): EssentialAction =
     Filters(super.doFilter(next),
             new FooFilter("filter-constructor-called-by-scala-global"))
-  }
-}
 
 /** Java GlobalSettings class that uses a filter */
-class FooFilteringJavaGlobal extends play.GlobalSettings {
+class FooFilteringJavaGlobal extends play.GlobalSettings
   override def filters[T]() =
     Array[Class[T]](classOf[FooFilter].asInstanceOf[Class[T]])
-}
 
-class OnRequestJavaGlobal extends play.GlobalSettings {
-  override def onRequest(request: Http.Request, actionMethod: Method) = {
-    new play.mvc.Action.Simple {
+class OnRequestJavaGlobal extends play.GlobalSettings
+  override def onRequest(request: Http.Request, actionMethod: Method) =
+    new play.mvc.Action.Simple
       def call(ctx: Context) =
         CompletableFuture.completedFuture(play.mvc.Results.ok("intercepted"))
-    }
-  }
-}
 
-object JavaAction extends MockController {
+object JavaAction extends MockController
   def action =
     play.mvc.Results.ok(Option(request.getHeader("X-Foo")).getOrElse("null"))
-}

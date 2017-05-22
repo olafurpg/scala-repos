@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   val bar: Null = null
 
   def foo(x: Array[Int]) = x
@@ -8,4 +8,3 @@ object Test extends App {
   println(foo(bar))
   // this line worked but good to have a double check
   println(baz(bar))
-}

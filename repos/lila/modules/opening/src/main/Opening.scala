@@ -14,26 +14,21 @@ case class Opening(id: Opening.ID,
                    date: DateTime,
                    perf: Perf,
                    attempts: Int,
-                   wins: Int) {
+                   wins: Int)
 
   lazy val goal = qualityMoves.count(_.quality == Quality.Good) min 4
 
-  lazy val qualityMoves: List[QualityMove] = {
-    val bestCp = moves.foldLeft(Int.MaxValue) {
+  lazy val qualityMoves: List[QualityMove] =
+    val bestCp = moves.foldLeft(Int.MaxValue)
       case (cp, move) => if (move.cp < cp) move.cp else cp
-    }
-    moves.map { move =>
+    moves.map  move =>
       QualityMove(move, Quality(move.cp - bestCp))
-    }
-  }
 
   def winPercent = if (attempts == 0) 0 else wins * 100 / attempts
-}
 
-sealed abstract class Quality(val threshold: Int) {
+sealed abstract class Quality(val threshold: Int)
   val name = toString.toLowerCase
-}
-object Quality {
+object Quality
   case object Good extends Quality(30)
   case object Dubious extends Quality(70)
   case object Bad extends Quality(Int.MaxValue)
@@ -42,11 +37,10 @@ object Quality {
     if (cp < Good.threshold) Good
     else if (cp < Dubious.threshold) Dubious
     else Bad
-}
 
 case class QualityMove(move: Move, quality: Quality)
 
-object Opening {
+object Opening
 
   type ID = Int
 
@@ -64,7 +58,7 @@ object Opening {
   import lila.db.BSON
   import BSON.BSONJodaDateTimeHandler
 
-  implicit val moveBSONHandler = new BSON[Move] {
+  implicit val moveBSONHandler = new BSON[Move]
 
     def reads(r: BSON.Reader): Move =
       Move(first = r str "first",
@@ -75,12 +69,11 @@ object Opening {
 
     def writes(w: BSON.Writer, o: Move) =
       BSONDocument(
-          "first" -> o.first, "cp" -> o.cp, "line" -> lila.db.ByteArray {
+          "first" -> o.first, "cp" -> o.cp, "line" -> lila.db.ByteArray
         chess.format.pgn.Binary.writeMoves(o.line).get.toArray
-      })
-  }
+      )
 
-  object BSONFields {
+  object BSONFields
     val id = "_id"
     val fen = "fen"
     val moves = "moves"
@@ -90,9 +83,8 @@ object Opening {
     val wins = "wins"
     val perf = "perf"
     val rating = s"$perf.gl.r"
-  }
 
-  implicit val openingBSONHandler = new BSON[Opening] {
+  implicit val openingBSONHandler = new BSON[Opening]
 
     import BSONFields._
     import Perf.perfBSONHandler
@@ -116,5 +108,3 @@ object Opening {
                    perf -> o.perf,
                    attempts -> o.attempts,
                    wins -> o.wins)
-  }
-}

@@ -21,7 +21,7 @@ import java.nio.{ByteBuffer, ByteOrder}
 
 import org.apache.spark.sql.catalyst.expressions.MutableRow
 
-private[columnar] trait NullableColumnAccessor extends ColumnAccessor {
+private[columnar] trait NullableColumnAccessor extends ColumnAccessor
   private var nullsBuffer: ByteBuffer = _
   private var nullCount: Int = _
   private var seenNulls: Int = 0
@@ -29,7 +29,7 @@ private[columnar] trait NullableColumnAccessor extends ColumnAccessor {
   private var nextNullIndex: Int = _
   private var pos: Int = 0
 
-  abstract override protected def initialize(): Unit = {
+  abstract override protected def initialize(): Unit =
     nullsBuffer = underlyingBuffer.duplicate().order(ByteOrder.nativeOrder())
     nullCount = ByteBufferHelper.getInt(nullsBuffer)
     nextNullIndex = if (nullCount > 0) ByteBufferHelper.getInt(nullsBuffer)
@@ -38,24 +38,19 @@ private[columnar] trait NullableColumnAccessor extends ColumnAccessor {
 
     underlyingBuffer.position(underlyingBuffer.position + 4 + nullCount * 4)
     super.initialize()
-  }
 
-  abstract override def extractTo(row: MutableRow, ordinal: Int): Unit = {
-    if (pos == nextNullIndex) {
+  abstract override def extractTo(row: MutableRow, ordinal: Int): Unit =
+    if (pos == nextNullIndex)
       seenNulls += 1
 
-      if (seenNulls < nullCount) {
+      if (seenNulls < nullCount)
         nextNullIndex = ByteBufferHelper.getInt(nullsBuffer)
-      }
 
       row.setNullAt(ordinal)
-    } else {
+    else
       super.extractTo(row, ordinal)
-    }
 
     pos += 1
-  }
 
   abstract override def hasNext: Boolean =
     seenNulls < nullCount || super.hasNext
-}

@@ -14,41 +14,33 @@ private[io] class AtomicFileOutputStream private (
     private val baseFile: File,
     private val tmpFile: File
 )
-    extends FileOutputStream(tmpFile) {
+    extends FileOutputStream(tmpFile)
 
   private[this] var _closed = false
 
-  def this(baseFile: File) = {
-    this(baseFile, {
+  def this(baseFile: File) =
+    this(baseFile,
       // Create a temporary file we actually write to
       val tmpFile = File.createTempFile(
           ".tmp-" + baseFile.getName, ".tmp", baseFile.getParentFile)
       tmpFile.deleteOnExit()
       tmpFile
-    })
-  }
+    )
 
-  override def close(): Unit = {
+  override def close(): Unit =
     super.close()
 
-    synchronized {
-      if (!_closed) {
+    synchronized
+      if (!_closed)
         _closed = true
         atomicReplace()
-      }
-    }
-  }
 
   /** Try to atomically replace the baseFile with the tmpFile */
-  private[this] def atomicReplace(): Unit = {
-    if (!tmpFile.renameTo(baseFile)) {
+  private[this] def atomicReplace(): Unit =
+    if (!tmpFile.renameTo(baseFile))
       // Renaming failed. Fallback to copy
-      try {
+      try
         IO.copyTo(FileVirtualBinaryFile(tmpFile),
                   WritableFileVirtualBinaryFile(baseFile))
-      } finally {
+      finally
         tmpFile.delete()
-      }
-    }
-  }
-}

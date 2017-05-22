@@ -25,7 +25,7 @@ import scala.collection.JavaConversions._
 )
 class HighlightingAdvisor(project: Project)
     extends ProjectComponent
-    with PersistentStateComponent[HighlightingSettings] {
+    with PersistentStateComponent[HighlightingSettings]
   @Language("HTML")
   private val AdviceMessage =
     """
@@ -72,29 +72,24 @@ class HighlightingAdvisor(project: Project)
 
   def disposeComponent() {}
 
-  def projectOpened() {
+  def projectOpened()
     project.scalaEvents.addScalaProjectListener(ScalaListener)
-    statusBar.foreach { bar =>
+    statusBar.foreach  bar =>
       configureWidget(bar)
       notifyIfNeeded()
-    }
-  }
 
-  def projectClosed() {
+  def projectClosed()
     project.scalaEvents.removeScalaProjectListener(ScalaListener)
-    statusBar.foreach { bar =>
+    statusBar.foreach  bar =>
       configureWidget(bar)
-    }
-  }
 
   def getState = settings
 
-  def loadState(state: HighlightingSettings) {
+  def loadState(state: HighlightingSettings)
     settings = state
-  }
 
-  private def configureWidget(bar: StatusBar) {
-    (applicable, installed) match {
+  private def configureWidget(bar: StatusBar)
+    (applicable, installed) match
       case (true, true) => // do nothing
       case (true, false) =>
         bar.addWidget(Widget, project)
@@ -103,79 +98,65 @@ class HighlightingAdvisor(project: Project)
         bar.removeWidget(Widget.ID)
         installed = false
       case (false, false) => // do nothing
-    }
-  }
 
-  private def notifyIfNeeded() {
-    if (settings.SUGGEST_TYPE_AWARE_HIGHLIGHTING && !enabled && applicable) {
+  private def notifyIfNeeded()
+    if (settings.SUGGEST_TYPE_AWARE_HIGHLIGHTING && !enabled && applicable)
       notify("Configure type-aware highlighting for the project",
              AdviceMessage,
              NotificationType.WARNING)
-    }
-  }
 
   private def notify(
-      title: String, message: String, notificationType: NotificationType) {
-    NotificationUtil.builder(project, message) setNotificationType notificationType setTitle title setHandler {
+      title: String, message: String, notificationType: NotificationType)
+    NotificationUtil.builder(project, message) setNotificationType notificationType setTitle title setHandler
       case "enable" => enabled = true
       case "disable" => enabled = false
       case _ =>
-    }
-  }
 
-  def toggle() {
-    if (applicable) {
+  def toggle()
+    if (applicable)
       enabled = !enabled
       TypeAwareHighlightingApplicationState.getInstance setSuggest enabled
-    }
-  }
 
   private def applicable = project.hasScala
 
   def enabled = settings.TYPE_AWARE_HIGHLIGHTING_ENABLED
 
-  private def enabled_=(enabled: Boolean) {
+  private def enabled_=(enabled: Boolean)
     settings.SUGGEST_TYPE_AWARE_HIGHLIGHTING = false
 
     if (this.enabled == enabled) return
 
     settings.TYPE_AWARE_HIGHLIGHTING_ENABLED = enabled
 
-    statusBar.foreach { bar =>
+    statusBar.foreach  bar =>
       updateWidget(bar)
       reparseActiveFile()
 
       if (enabled) notify(status, EnabledMessage, NotificationType.INFORMATION)
       else notify(status, DisabledMessage, NotificationType.INFORMATION)
-    }
-  }
 
   private def status =
     "Scala type-aware highlighting: %s".format(
         if (enabled) "enabled" else "disabled")
 
-  private def updateWidget(bar: StatusBar) {
+  private def updateWidget(bar: StatusBar)
     bar.updateWidget(Widget.ID)
-  }
 
-  private def reparseActiveFile() {
+  private def reparseActiveFile()
     val context = DataManager.getInstance.getDataContextFromFocus
-    context.doWhenDone(new Consumer[DataContext] {
-      override def consume(dataContext: DataContext): Unit = {
-        CommonDataKeys.EDITOR_EVEN_IF_INACTIVE.getData(dataContext) match {
+    context.doWhenDone(new Consumer[DataContext]
+      override def consume(dataContext: DataContext): Unit =
+        CommonDataKeys.EDITOR_EVEN_IF_INACTIVE.getData(dataContext) match
           case editor: EditorEx =>
             FileContentUtil.reparseFiles(
                 project, Seq(editor.getVirtualFile), true)
           case _ => // do nothing
-        }
-      }
-    })
-  }
+    )
 
   private def statusBar: Option[StatusBar] =
     Option(WindowManager.getInstance).map(_.getStatusBar(project))
 
-  private object Widget extends StatusBarWidget {
+  private object Widget extends StatusBarWidget
     def ID = "TypeAwareHighlighting"
 
     def getPresentation(platformType: PlatformType) = Presentation
@@ -184,7 +165,7 @@ class HighlightingAdvisor(project: Project)
 
     def dispose() {}
 
-    object Presentation extends StatusBarWidget.IconPresentation {
+    object Presentation extends StatusBarWidget.IconPresentation
       def getIcon = if (enabled) Icons.TYPED else Icons.UNTYPED
 
       def getClickConsumer = ClickConsumer
@@ -193,27 +174,17 @@ class HighlightingAdvisor(project: Project)
         "%s (click to %s, or press Ctrl+Shift+Alt+E)".format(
             status, if (enabled) "disable" else "enable")
 
-      object ClickConsumer extends Consumer[MouseEvent] {
-        def consume(t: MouseEvent) {
+      object ClickConsumer extends Consumer[MouseEvent]
+        def consume(t: MouseEvent)
           toggle()
-        }
-      }
-    }
-  }
 
-  private object ScalaListener extends ScalaProjectListener {
-    def onScalaProjectChanged() {
-      statusBar.foreach { bar =>
+  private object ScalaListener extends ScalaProjectListener
+    def onScalaProjectChanged()
+      statusBar.foreach  bar =>
         configureWidget(bar)
-        if (project.hasScala) {
+        if (project.hasScala)
           notifyIfNeeded()
-        }
-      }
-    }
-  }
-}
 
-object HighlightingAdvisor {
+object HighlightingAdvisor
   def getInstance(project: Project) =
     project.getComponent(classOf[HighlightingAdvisor])
-}

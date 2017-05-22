@@ -10,7 +10,7 @@ case class Categ(id: String, // slug
                  lastPostId: String,
                  nbTopicsTroll: Int,
                  nbPostsTroll: Int,
-                 lastPostIdTroll: String) {
+                 lastPostIdTroll: String)
 
   def nbTopics(troll: Boolean): Int = troll.fold(nbTopicsTroll, nbTopics)
   def nbPosts(troll: Boolean): Int = troll.fold(nbPostsTroll, nbPosts)
@@ -30,9 +30,8 @@ case class Categ(id: String, // slug
          lastPostIdTroll = post.id)
 
   def slug = id
-}
 
-object Categ {
+object Categ
 
   import lila.db.JsTube
   import JsTube.Helpers._
@@ -46,4 +45,3 @@ object Categ {
       reader = (__.json update merge(defaults)) andThen Json.reads[Categ],
       writer = Json.writes[Categ]
   )
-}

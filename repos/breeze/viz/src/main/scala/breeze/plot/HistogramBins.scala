@@ -17,17 +17,14 @@ sealed trait HistogramBins
   *
   * @author dramage
   */
-case class StaticHistogramBins(splits: Array[Double]) extends HistogramBins {
+case class StaticHistogramBins(splits: Array[Double]) extends HistogramBins
 
   /** Returns the bin for the given value, between 0 and splits.length inclusive. */
-  def bin(value: Double) = {
+  def bin(value: Double) =
     var i = 0
-    while (i < splits.length && value > splits(i)) {
+    while (i < splits.length && value > splits(i))
       i += 1
-    }
     i
-  }
-}
 
 /**
   * Create a set of StaticHistogramBins from a number and an (eventual)
@@ -35,18 +32,17 @@ case class StaticHistogramBins(splits: Array[Double]) extends HistogramBins {
   *
   * @author dramage
   */
-case class DynamicHistogramBins(number: Int = 10) extends HistogramBins {
+case class DynamicHistogramBins(number: Int = 10) extends HistogramBins
   def apply(lower: Double, upper: Double) =
     StaticHistogramBins(Array.tabulate(number - 1)(
             i => lower + ((i + 1.0) / (number)) * (upper - lower)))
-}
 
 /**
   * Static constructors for HistogramBins.
   *
   * @author dramage
   */
-object HistogramBins {
+object HistogramBins
   implicit def fromNumber(number: Int): HistogramBins =
     DynamicHistogramBins(number)
 
@@ -55,4 +51,3 @@ object HistogramBins {
 
   implicit def fromRange(minMaxCount: (Double, Double, Int)): HistogramBins =
     DynamicHistogramBins(minMaxCount._3)(minMaxCount._1, minMaxCount._2)
-}

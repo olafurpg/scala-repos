@@ -24,27 +24,23 @@ import scala.util.Try
 import java.util.concurrent.ConcurrentHashMap
 import java.util.Collections
 
-trait CounterIncrementor {
+trait CounterIncrementor
   def incrBy(by: Long): Unit
-}
 
-trait PlatformStatProvider {
+trait PlatformStatProvider
   // Incrementor for a Counter identified by group/name for the specific jobID
   // Returns an incrementor function for the Counter wrapped in an Option
   // to ensure we catch when the incrementor cannot be obtained for the specified jobID
   def counterIncrementor(
       jobId: JobId, group: Group, name: Name): Option[CounterIncrementor]
-}
 
-object SummingbirdRuntimeStats {
-  private class MutableSetSynchronizedWrapper[T] {
+object SummingbirdRuntimeStats
+  private class MutableSetSynchronizedWrapper[T]
     private[this] val innerContainer = scala.collection.mutable.Set[T]()
-    def nonEmpty: Boolean = innerContainer.synchronized {
+    def nonEmpty: Boolean = innerContainer.synchronized
       innerContainer.nonEmpty
-    }
     def toSeq: Seq[T] = innerContainer.synchronized { innerContainer.toSeq }
     def add(e: T): Unit = innerContainer.synchronized { innerContainer += e }
-  }
 
   // A global set of PlatformStatProviders, ParHashSet in scala seemed to trigger a deadlock
   // So a simple wrapper on a mutable set is used.
@@ -59,9 +55,8 @@ object SummingbirdRuntimeStats {
   private[this] final val platformObjects = List(SCALDING_STATS_MODULE)
 
   // invoke the ScaldingRuntimeStatsProvider object initializer on remote node
-  private[this] lazy val platformsInit = platformObjects.foreach { s: String =>
+  private[this] lazy val platformsInit = platformObjects.foreach  s: String =>
     Try[Unit] { Class.forName(s) }
-  }
 
   def hasStatProviders: Boolean = platformStatProviders.nonEmpty
 
@@ -69,32 +64,28 @@ object SummingbirdRuntimeStats {
     platformStatProviders.add(new WeakReference(pp))
 
   def getPlatformCounterIncrementor(
-      jobID: JobId, group: Group, name: Name): CounterIncrementor = {
+      jobID: JobId, group: Group, name: Name): CounterIncrementor =
     platformsInit
     // Find the PlatformMetricProvider (PMP) that matches the jobID
     // return the incrementor for the Counter specified by group/name
     // We return the first PMP that matches the jobID, in reality there should be only one
-    (for {
+    (for
       provRef <- platformStatProviders.toSeq
       prov <- provRef.get
       incr <- prov.counterIncrementor(jobID, group, name)
-    } yield incr).toList.headOption.getOrElse(sys.error(
+    yield incr).toList.headOption.getOrElse(sys.error(
             "Could not find the platform stat provider for jobID " + jobID))
-  }
-}
 
-object JobCounters {
+object JobCounters
   @annotation.tailrec
   private[this] final def getOrElseUpdate[K, V](
-      map: ConcurrentHashMap[K, V], k: K, default: => V): V = {
+      map: ConcurrentHashMap[K, V], k: K, default: => V): V =
     val v = map.get(k)
-    if (v == null) {
+    if (v == null)
       map.putIfAbsent(k, default)
       getOrElseUpdate(map, k, default)
-    } else {
+    else
       v
-    }
-  }
 
   private val registeredCountersForJob: ConcurrentHashMap[
       JobId, ParHashSet[(Group, Name)]] =
@@ -103,9 +94,7 @@ object JobCounters {
   def getCountersForJob(jobID: JobId): Option[Seq[(Group, Name)]] =
     Option(registeredCountersForJob.get(jobID)).map(_.toList)
 
-  def registerCounter(jobID: JobId, group: Group, name: Name): Unit = {
+  def registerCounter(jobID: JobId, group: Group, name: Name): Unit =
     val set = getOrElseUpdate(
         registeredCountersForJob, jobID, ParHashSet[(Group, Name)]())
     set += ((group, name))
-  }
-}

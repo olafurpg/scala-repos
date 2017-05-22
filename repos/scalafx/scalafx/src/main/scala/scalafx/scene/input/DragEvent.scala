@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventType
 
-object DragEvent {
+object DragEvent
   implicit def sfxDragEvent2jfx(de: DragEvent): jfxsi.DragEvent =
     if (de != null) de.delegate else null
 
@@ -78,17 +78,15 @@ object DragEvent {
     * This event occurs when drag gesture progresses within this node.
     */
   val DragOver: EventType[jfxsi.DragEvent] = jfxsi.DragEvent.DRAG_OVER
-}
 
 class DragEvent(override val delegate: jfxsi.DragEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.DragEvent] {
+    extends InputEvent(delegate) with SFXDelegate[jfxsi.DragEvent]
 
   /**
     * Accepts this DragEvent, choosing the transfer mode for the drop operation.
     */
-  def acceptTransferModes(transferModes: jfxsi.TransferMode*) {
+  def acceptTransferModes(transferModes: jfxsi.TransferMode*)
     delegate.acceptTransferModes(transferModes: _*)
-  }
 
   /**
     * Gets transfer mode accepted by potential target.
@@ -158,10 +156,8 @@ class DragEvent(override val delegate: jfxsi.DragEvent)
   /**
     * Indicates that transfer handling of this DragEvent was completed successfully during a DRAG_DROPPED event handler.
     */
-  def dropCompleted_=(isTransferDone: Boolean) {
+  def dropCompleted_=(isTransferDone: Boolean)
     delegate.setDropCompleted(isTransferDone)
-  }
-}
 
 /*
 Event	copyFor(java.lang.Object newSource, EventTarget newTarget)

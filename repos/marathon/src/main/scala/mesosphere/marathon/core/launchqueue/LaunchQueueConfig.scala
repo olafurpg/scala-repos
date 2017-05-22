@@ -2,7 +2,7 @@ package mesosphere.marathon.core.launchqueue
 
 import org.rogach.scallop.ScallopConf
 
-trait LaunchQueueConfig extends ScallopConf {
+trait LaunchQueueConfig extends ScallopConf
   //scalastyle:off magic.number
 
   lazy val launchQueueRequestTimeout = opt[Int](
@@ -16,4 +16,3 @@ trait LaunchQueueConfig extends ScallopConf {
       descr = "INTERNAL TUNING PARAMETER: Timeout (in ms) for matched task opereations to be accepted or rejected.",
       hidden = true,
       default = Some(3000))
-}

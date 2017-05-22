@@ -11,13 +11,11 @@ import akka.io.UdpConnected.Connect
   */
 private[io] class UdpConnectedManager(udpConn: UdpConnectedExt)
     extends SelectionHandler.SelectorBasedManager(
-        udpConn.settings, udpConn.settings.NrOfSelectors) {
+        udpConn.settings, udpConn.settings.NrOfSelectors)
 
-  def receive = workerForCommandHandler {
+  def receive = workerForCommandHandler
     case c: Connect ⇒
       val commander =
         sender() // cache because we create a function that will run asynchly
       registry ⇒
         Props(classOf[UdpConnection], udpConn, registry, commander, c)
-  }
-}

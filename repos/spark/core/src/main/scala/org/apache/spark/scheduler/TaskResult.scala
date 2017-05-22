@@ -36,7 +36,7 @@ private[spark] case class IndirectTaskResult[T](blockId: BlockId, size: Int)
 /** A TaskResult that contains the task's return value and accumulator updates. */
 private[spark] class DirectTaskResult[T](
     var valueBytes: ByteBuffer, var accumUpdates: Seq[AccumulableInfo])
-    extends TaskResult[T] with Externalizable {
+    extends TaskResult[T] with Externalizable
 
   private var valueObjectDeserialized = false
   private var valueObject: T = _
@@ -44,31 +44,27 @@ private[spark] class DirectTaskResult[T](
   def this() = this(null.asInstanceOf[ByteBuffer], null)
 
   override def writeExternal(out: ObjectOutput): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       out.writeInt(valueBytes.remaining)
       Utils.writeByteBuffer(valueBytes, out)
       out.writeInt(accumUpdates.size)
       accumUpdates.foreach(out.writeObject)
-    }
 
-  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException {
+  override def readExternal(in: ObjectInput): Unit = Utils.tryOrIOException
     val blen = in.readInt()
     val byteVal = new Array[Byte](blen)
     in.readFully(byteVal)
     valueBytes = ByteBuffer.wrap(byteVal)
 
     val numUpdates = in.readInt
-    if (numUpdates == 0) {
+    if (numUpdates == 0)
       accumUpdates = null
-    } else {
+    else
       val _accumUpdates = new ArrayBuffer[AccumulableInfo]
-      for (i <- 0 until numUpdates) {
+      for (i <- 0 until numUpdates)
         _accumUpdates += in.readObject.asInstanceOf[AccumulableInfo]
-      }
       accumUpdates = _accumUpdates
-    }
     valueObjectDeserialized = false
-  }
 
   /**
     * When `value()` is called at the first time, it needs to deserialize `valueObject` from
@@ -77,16 +73,13 @@ private[spark] class DirectTaskResult[T](
     *
     * After the first time, `value()` is trivial and just returns the deserialized `valueObject`.
     */
-  def value(): T = {
-    if (valueObjectDeserialized) {
+  def value(): T =
+    if (valueObjectDeserialized)
       valueObject
-    } else {
+    else
       // This should not run when holding a lock because it may cost dozens of seconds for a large
       // value.
       val resultSer = SparkEnv.get.serializer.newInstance()
       valueObject = resultSer.deserialize(valueBytes)
       valueObjectDeserialized = true
       valueObject
-    }
-  }
-}

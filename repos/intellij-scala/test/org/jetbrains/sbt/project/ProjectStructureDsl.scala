@@ -11,7 +11,7 @@ import scala.language.implicitConversions
   * @author Nikolay Obedin
   * @since 8/4/15.
   */
-object ProjectStructureDsl {
+object ProjectStructureDsl
 
   import DslUtils._
 
@@ -52,18 +52,16 @@ object ProjectStructureDsl {
   with DependencyAttribute
   val scope = new Attribute[DependencyScope]("scope") with DependencyAttribute
 
-  sealed trait Attributed {
+  sealed trait Attributed
     protected val attributes = new AttributeMap
 
     def foreach[T : Manifest](attribute: Attribute[T])(body: T => Unit): Unit =
       attributes.get(attribute).foreach(body)
-  }
 
-  trait Named {
+  trait Named
     val name: String
-  }
 
-  class project(val name: String) extends Attributed {
+  class project(val name: String) extends Attributed
     protected implicit def defineAttribute[T : Manifest](
         attribute: Attribute[T] with ProjectAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
@@ -71,9 +69,8 @@ object ProjectStructureDsl {
         attribute: Attribute[Seq[T]] with ProjectAttribute)(
         implicit m: Manifest[Seq[T]]): AttributeSeqDef[T] =
       new AttributeSeqDef(attribute, attributes)
-  }
 
-  class module(val name: String) extends Attributed with Named {
+  class module(val name: String) extends Attributed with Named
     protected implicit def defineAttribute[T : Manifest](
         attribute: Attribute[T] with ModuleAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
@@ -81,9 +78,8 @@ object ProjectStructureDsl {
         attribute: Attribute[Seq[T]] with ModuleAttribute)(
         implicit m: Manifest[Seq[T]]): AttributeSeqDef[T] =
       new AttributeSeqDef(attribute, attributes)
-  }
 
-  class library(val name: String) extends Attributed with Named {
+  class library(val name: String) extends Attributed with Named
     protected implicit def defineAttribute[T : Manifest](
         attribute: Attribute[T] with LibraryAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
@@ -91,15 +87,13 @@ object ProjectStructureDsl {
         attribute: Attribute[Seq[T]] with LibraryAttribute)(
         implicit m: Manifest[Seq[T]]): AttributeSeqDef[T] =
       new AttributeSeqDef(attribute, attributes)
-  }
 
   class dependency[D <: Named](val reference: D)
-      extends Attributed with Named {
+      extends Attributed with Named
     override val name: String = reference.name
     protected implicit def defineAttribute[T : Manifest](
         attribute: Attribute[T] with DependencyAttribute): AttributeDef[T] =
       new AttributeDef(attribute, attributes)
-  }
 
   implicit def module2moduleDependency(module: module): dependency[module] =
     new dependency(module)
@@ -107,4 +101,3 @@ object ProjectStructureDsl {
   implicit def library2libraryDependency(
       library: library): dependency[library] =
     new dependency(library)
-}

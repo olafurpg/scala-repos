@@ -18,15 +18,12 @@ package com.twitter.summingbird.online
 
 import com.twitter.chill.{Externalizer => ChillExtern, KryoInstantiator, ScalaKryoInstantiator}
 
-object Externalizer {
-  def apply[T](t: T): Externalizer[T] = {
+object Externalizer
+  def apply[T](t: T): Externalizer[T] =
     val x = new Externalizer[T]
     x.set(t)
     x
-  }
-}
 
-class Externalizer[T] extends ChillExtern[T] {
+class Externalizer[T] extends ChillExtern[T]
   // Storm is set on 2.17, hack to avoid setReferences
   override protected def kryo: KryoInstantiator = new ScalaKryoInstantiator
-}

@@ -20,18 +20,16 @@ import akka.routing.GetRoutees
 import akka.routing.Routees
 import akka.testkit._
 
-object ClusterConsistentHashingGroupMultiJvmSpec extends MultiNodeConfig {
+object ClusterConsistentHashingGroupMultiJvmSpec extends MultiNodeConfig
 
   case object Get
   final case class Collected(messages: Set[Any])
 
-  class Destination extends Actor {
+  class Destination extends Actor
     var receivedMessages = Set.empty[Any]
-    def receive = {
+    def receive =
       case Get ⇒ sender() ! Collected(receivedMessages)
       case m ⇒ receivedMessages += m
-    }
-  }
 
   val first = role("first")
   val second = role("second")
@@ -39,7 +37,6 @@ object ClusterConsistentHashingGroupMultiJvmSpec extends MultiNodeConfig {
 
   commonConfig(
       debugConfig(on = false).withFallback(MultiNodeClusterSpec.clusterConfig))
-}
 
 class ClusterConsistentHashingGroupMultiJvmNode1
     extends ClusterConsistentHashingGroupSpec
@@ -50,17 +47,16 @@ class ClusterConsistentHashingGroupMultiJvmNode3
 
 abstract class ClusterConsistentHashingGroupSpec
     extends MultiNodeSpec(ClusterConsistentHashingGroupMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout
   import ClusterConsistentHashingGroupMultiJvmSpec._
 
   /**
     * Fills in self address for local ActorRef
     */
   private def fullAddress(actorRef: ActorRef): Address =
-    actorRef.path.address match {
+    actorRef.path.address match
       case Address(_, _, None, None) ⇒ cluster.selfAddress
       case a ⇒ a
-    }
 
   def currentRoutees(router: ActorRef) =
     Await
@@ -68,17 +64,15 @@ abstract class ClusterConsistentHashingGroupSpec
       .asInstanceOf[Routees]
       .routees
 
-  "A cluster router with a consistent hashing group" must {
-    "start cluster with 3 nodes" taggedAs LongRunningTest in {
+  "A cluster router with a consistent hashing group" must
+    "start cluster with 3 nodes" taggedAs LongRunningTest in
       system.actorOf(Props[Destination], "dest")
       awaitClusterUp(first, second, third)
       enterBarrier("after-1")
-    }
 
-    "send to same destinations from different nodes" taggedAs LongRunningTest in {
-      def hashMapping: ConsistentHashMapping = {
+    "send to same destinations from different nodes" taggedAs LongRunningTest in
+      def hashMapping: ConsistentHashMapping =
         case s: String ⇒ s
-      }
       val paths = List("/user/dest")
       val router = system.actorOf(
           ClusterRouterGroup(
@@ -104,6 +98,3 @@ abstract class ClusterConsistentHashingGroupSpec
 
       (a.size + b.size + c.size) should ===(keys.size)
       enterBarrier("after-2")
-    }
-  }
-}

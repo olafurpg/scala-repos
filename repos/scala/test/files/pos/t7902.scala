@@ -1,6 +1,6 @@
 import scala.language.higherKinds
 
-object Bug {
+object Bug
   class Tag[W[M1[X1]]]
 
   def ofType[W[M2[X2]]]: Tag[W] = ???
@@ -11,7 +11,5 @@ object Bug {
 
   // okay
   val y: Any = ofType[InSeq]
-  object T {
+  object T
     val z = ofType[InSeq]
-  }
-}

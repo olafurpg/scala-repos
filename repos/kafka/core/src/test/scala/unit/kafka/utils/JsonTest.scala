@@ -19,10 +19,10 @@ package kafka.utils
 import org.junit.Assert._
 import org.junit.{Test, After, Before}
 
-class JsonTest {
+class JsonTest
 
   @Test
-  def testJsonEncoding() {
+  def testJsonEncoding()
     assertEquals("null", Json.encode(null))
     assertEquals("1", Json.encode(1))
     assertEquals("1", Json.encode(1L))
@@ -39,5 +39,3 @@ class JsonTest {
     assertEquals("{\"a\":1,\"b\":2}", Json.encode(Map("a" -> 1, "b" -> 2)))
     assertEquals("{\"a\":[1,2],\"c\":[3,4]}",
                  Json.encode(Map("a" -> Seq(1, 2), "c" -> Seq(3, 4))))
-  }
-}

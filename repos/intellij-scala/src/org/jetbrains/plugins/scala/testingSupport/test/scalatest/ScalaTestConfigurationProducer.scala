@@ -26,32 +26,30 @@ import TestConfigurationUtil.isInheritor
   * User: Alexander Podkhalyuzin
   * Date: 08.05.2009
   */
-class ScalaTestConfigurationProducer extends {
+class ScalaTestConfigurationProducer extends
   val confType = new ScalaTestConfigurationType
   val confFactory = confType.confFactory
-} with TestConfigurationProducer(confType) {
+with TestConfigurationProducer(confType)
 
   override def suitePaths = List("org.scalatest.Suite")
 
   override def findExistingByElement(
       location: Location[_ <: PsiElement],
       existingConfigurations: Array[RunnerAndConfigurationSettings],
-      context: ConfigurationContext): RunnerAndConfigurationSettings = {
+      context: ConfigurationContext): RunnerAndConfigurationSettings =
     super.findExistingByElement(location, existingConfigurations, context)
-  }
 
   override def createConfigurationByLocation(
       location: Location[_ <: PsiElement])
-    : Option[(PsiElement, RunnerAndConfigurationSettings)] = {
+    : Option[(PsiElement, RunnerAndConfigurationSettings)] =
     val element = location.getPsiElement
     if (element == null) return None
 
     if (element.isInstanceOf[PsiPackage] ||
-        element.isInstanceOf[PsiDirectory]) {
-      val name = element match {
+        element.isInstanceOf[PsiDirectory])
+      val name = element match
         case p: PsiPackage => p.getName
         case d: PsiDirectory => d.getName
-      }
       return Some(
           (element,
            TestConfigurationUtil.packageSettings(
@@ -60,7 +58,6 @@ class ScalaTestConfigurationProducer extends {
                confFactory,
                ScalaBundle.message("test.in.scope.scalatest.presentable.text",
                                    name))))
-    }
 
     val (testClass, testName) = getLocationClassAndTest(location)
     if (testClass == null) return None
@@ -77,34 +74,30 @@ class ScalaTestConfigurationProducer extends {
     if (testName != null) runConfiguration.setTestName(testName)
     val kind = if (testName == null) TestKind.CLASS else TestKind.TEST_NAME
     runConfiguration.setTestKind(kind)
-    try {
+    try
       val module = ScalaPsiUtil.getModule(element)
-      if (module != null) {
+      if (module != null)
         runConfiguration.setModule(module)
-      }
-    } catch {
+    catch
       case e: Exception =>
-    }
     JavaRunConfigurationExtensionManager.getInstance
       .extendCreatedConfiguration(runConfiguration, location)
     Some((testClass, settings))
-  }
 
   override def isConfigurationByLocation(
       configuration: RunConfiguration,
-      location: Location[_ <: PsiElement]): Boolean = {
+      location: Location[_ <: PsiElement]): Boolean =
     val element = location.getPsiElement
     if (element == null) return false
     if (element.isInstanceOf[PsiPackage] ||
-        element.isInstanceOf[PsiDirectory]) {
+        element.isInstanceOf[PsiDirectory])
       if (!configuration.isInstanceOf[ScalaTestRunConfiguration]) return false
       return TestConfigurationUtil.isPackageConfiguration(
           element, configuration)
-    }
     val (testClass, testName) = getLocationClassAndTest(location)
     if (testClass == null) return false
     val testClassPath = testClass.qualifiedName
-    configuration match {
+    configuration match
       case configuration: ScalaTestRunConfiguration
           if configuration.getTestKind == TestKind.CLASS && testName == null =>
         testClassPath == configuration.getTestClassPath
@@ -113,20 +106,17 @@ class ScalaTestConfigurationProducer extends {
         testClassPath == configuration.getTestClassPath && testName != null &&
         testName == configuration.getTestName
       case _ => false
-    }
-  }
 
   def getLocationClassAndTest(
-      location: Location[_ <: PsiElement]): (ScTypeDefinition, String) = {
+      location: Location[_ <: PsiElement]): (ScTypeDefinition, String) =
     val element = location.getPsiElement
     var clazz: ScTypeDefinition =
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeDefinition], false)
     if (clazz == null) return (null, null)
     val tb = clazz.extendsBlock.templateBody.orNull
-    while (PsiTreeUtil.getParentOfType(clazz, classOf[ScTypeDefinition], true) != null) {
+    while (PsiTreeUtil.getParentOfType(clazz, classOf[ScTypeDefinition], true) != null)
       clazz = PsiTreeUtil.getParentOfType(
           clazz, classOf[ScTypeDefinition], true)
-    }
     if (!clazz.isInstanceOf[ScClass]) return (null, null)
     if (ScalaTestRunConfiguration.isInvalidSuite(clazz)) return (null, null)
     if (!suitePaths.exists(suitePath => isInheritor(clazz, suitePath)))
@@ -144,77 +134,64 @@ class ScalaTestConfigurationProducer extends {
         namesSet: Map[String, Set[String]],
         inv: MethodInvocation => Option[String],
         recursive: Boolean,
-        checkFirstArgIsUnitOrString: Boolean): ReturnResult = {
+        checkFirstArgIsUnitOrString: Boolean): ReturnResult =
       if (call == null) return NotFoundResult
-      call.getInvokedExpr match {
+      call.getInvokedExpr match
         case ref: ScReferenceExpression if namesSet.isDefinedAt(ref.refName) =>
           var middleName = ref.refName
           val fqns = namesSet(ref.refName)
           val resolve = ref.resolve()
-          if (resolve != null) {
-            val containingClass = resolve match {
+          if (resolve != null)
+            val containingClass = resolve match
               case fun: ScMember => fun.containingClass
               case p: ScBindingPattern =>
-                p.nameContext match {
+                p.nameContext match
                   case v: ScMember => v.containingClass
                   case _ => null
-                }
               case _ => null
-            }
             var failedToCheck = false
-            if (checkFirstArgIsUnitOrString) {
+            if (checkFirstArgIsUnitOrString)
               failedToCheck = true
-              resolve match {
+              resolve match
                 case fun: ScFunction =>
                   val clauses = fun.paramClauses.clauses
-                  if (clauses.length > 0) {
+                  if (clauses.length > 0)
                     val params = clauses(0).parameters
-                    if (params.length > 0) {
+                    if (params.length > 0)
                       import org.jetbrains.plugins.scala.lang.psi.types.Unit
-                      params(0).getType(TypingContext.empty) match {
+                      params(0).getType(TypingContext.empty) match
                         case Success(Unit, _) => failedToCheck = false
                         case Success(tp, _) =>
-                          ScType.extractClass(tp) match {
+                          ScType.extractClass(tp) match
                             case Some(psiClass)
                                 if psiClass.qualifiedName == "java.lang.String" =>
-                              call.argumentExpressions.apply(0) match {
+                              call.argumentExpressions.apply(0) match
                                 case l: ScLiteral if l.isString =>
                                   failedToCheck = false
                                   middleName += " " + l.getValue.toString
                                 case _ =>
-                              }
 
                             case _ =>
-                          }
                         case _ =>
-                      }
-                    }
-                  }
-              }
-            }
             if (containingClass != null && fqns.exists(fqn =>
                       fqn == containingClass.qualifiedName ||
-                      isInheritor(containingClass, fqn))) {
-              if (!failedToCheck) {
+                      isInheritor(containingClass, fqn)))
+              if (!failedToCheck)
                 val res = inv(call)
                 if (res.isDefined)
                   return SuccessResult(call, res.get, middleName)
                 else return WrongResult
-              } else return WrongResult
-            }
-          }
+              else return WrongResult
         case _call: MethodInvocation =>
           checkCallGeneral(_call,
                            namesSet,
                            inv,
                            recursive = false,
-                           checkFirstArgIsUnitOrString) match {
+                           checkFirstArgIsUnitOrString) match
             case res: SuccessResult => return res.copy(invocation = call)
             case WrongResult => return WrongResult
             case _ =>
-          }
         case _ =>
-      }
       if (!recursive) return NotFoundResult
       checkCallGeneral(
           PsiTreeUtil.getParentOfType(call, classOf[MethodInvocation], true),
@@ -222,212 +199,172 @@ class ScalaTestConfigurationProducer extends {
           inv,
           recursive = true,
           checkFirstArgIsUnitOrString)
-    }
 
-    def endupWithLitral(literal: ScExpression): Option[String] = {
-      literal match {
+    def endupWithLitral(literal: ScExpression): Option[String] =
+      literal match
         case l: ScLiteral if l.isString =>
           Some(l.getValue.asInstanceOf[String])
         case _ => None
-      }
-    }
 
-    def checkCall(call: MethodInvocation, namesSet: Map[String, Set[String]]) = {
+    def checkCall(call: MethodInvocation, namesSet: Map[String, Set[String]]) =
       val inv = (call: MethodInvocation) =>
-        {
           val literal = call.argumentExpressions.apply(0)
           endupWithLitral(literal)
-      }
       checkCallGeneral(call,
                        namesSet,
                        inv,
                        recursive = true,
                        checkFirstArgIsUnitOrString = false)
-    }
 
     def checkInfix(call: MethodInvocation,
                    namesSet: Map[String, Set[String]],
-                   checkFirstArgIsUnitOrString: Boolean = false) = {
-      val inv: (MethodInvocation) => Option[String] = {
+                   checkFirstArgIsUnitOrString: Boolean = false) =
+      val inv: (MethodInvocation) => Option[String] =
         case i: ScInfixExpr =>
           endupWithLitral(i.getBaseExpr)
         case call: MethodInvocation =>
-          call.getInvokedExpr match {
+          call.getInvokedExpr match
             case ref: ScReferenceExpression =>
-              ref.qualifier match {
+              ref.qualifier match
                 case Some(qual) => endupWithLitral(qual)
                 case _ => None
-              }
             case _ => None
-          }
-      }
       checkCallGeneral(
           call, namesSet, inv, recursive = true, checkFirstArgIsUnitOrString)
-    }
 
     def checkInfixTagged(call: MethodInvocation,
                          namesSet: Map[String, Set[String]],
                          fqn: Set[String],
                          checkFirstArgIsUnitOrString: Boolean = false,
-                         testNameIsAlwaysEmpty: Boolean = false) = {
+                         testNameIsAlwaysEmpty: Boolean = false) =
       val inv: (MethodInvocation) => Option[String] = m =>
-        {
-          def checkTagged(m: MethodInvocation): Option[String] = {
-            m.getInvokedExpr match {
+          def checkTagged(m: MethodInvocation): Option[String] =
+            m.getInvokedExpr match
               case ref: ScReferenceExpression if ref.refName == "taggedAs" =>
                 val resolve = ref.resolve()
-                resolve match {
+                resolve match
                   case fun: ScFunction =>
                     val clazz = fun.containingClass
-                    if (clazz != null && fqn.contains(clazz.qualifiedName)) {
-                      m match {
+                    if (clazz != null && fqn.contains(clazz.qualifiedName))
+                      m match
                         case i: ScInfixExpr => endupWithLitral(i.getBaseExpr)
                         case _ =>
-                          m.getInvokedExpr match {
+                          m.getInvokedExpr match
                             case ref: ScReferenceExpression =>
-                              ref.qualifier match {
+                              ref.qualifier match
                                 case Some(qual) => endupWithLitral(qual)
                                 case None => None
-                              }
-                          }
-                      }
-                    } else None
+                    else None
                   case _ => None
-                }
               case _ => None
-            }
-          }
-          m match {
+          m match
             case i: ScInfixExpr =>
-              i.getBaseExpr match {
+              i.getBaseExpr match
                 case m: MethodInvocation =>
                   checkTagged(m)
                 case base =>
                   endupWithLitral(base)
-              }
             case call: MethodInvocation =>
-              call.getInvokedExpr match {
+              call.getInvokedExpr match
                 case ref: ScReferenceExpression =>
-                  ref.qualifier match {
+                  ref.qualifier match
                     case Some(qual: MethodInvocation) => checkTagged(qual)
                     case Some(qual) => endupWithLitral(qual)
                     case _ => None
-                  }
                 case _ => None
-              }
-          }
-      }
       checkCallGeneral(call,
                        namesSet,
                        if (testNameIsAlwaysEmpty) _ => Some("") else inv,
                        recursive = true,
                        checkFirstArgIsUnitOrString)
-    }
 
     import scala.language.implicitConversions
 
     implicit def s2set(s: String): Set[String] = Set(s) //todo: inline?
 
-    def checkFunSuite(fqn: String): Option[String] = {
+    def checkFunSuite(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
       checkCall(PsiTreeUtil.getParentOfType(
                     element, classOf[MethodInvocation], false),
-                Map("test" -> fqn, "ignore" -> fqn)) match {
+                Map("test" -> fqn, "ignore" -> fqn)) match
         case SuccessResult(_, testName, _) => return Some(testName)
         case _ =>
-      }
       None
-    }
 
-    def checkPropSpec(fqn: String): Option[String] = {
+    def checkPropSpec(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
       checkCall(PsiTreeUtil.getParentOfType(
                     element, classOf[MethodInvocation], false),
-                Map("property" -> fqn, "ignore" -> fqn)) match {
+                Map("property" -> fqn, "ignore" -> fqn)) match
         case SuccessResult(_, testName, _) => return Some(testName)
         case _ =>
-      }
       None
-    }
 
-    def checkFeatureSpec(fqn: String): Option[String] = {
+    def checkFeatureSpec(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
       checkCall(PsiTreeUtil.getParentOfType(
                     element, classOf[MethodInvocation], false),
-                Map("scenario" -> fqn, "ignore" -> fqn)) match {
+                Map("scenario" -> fqn, "ignore" -> fqn)) match
         case SuccessResult(call, _testName, _) =>
           var testName = "Scenario: " + _testName
           checkCall(PsiTreeUtil.getParentOfType(
                         call, classOf[MethodInvocation], true),
-                    Map("feature" -> fqn)) match {
+                    Map("feature" -> fqn)) match
             case SuccessResult(_, featureName, _) =>
               //check with Informing is used to distinguish scalatest 2.0 from scalatest 1.9.2
               testName = (if (isInheritor(clazz, "org.scalatest.Informing"))
                             "Feature: " else "") + featureName + " " + testName
             case WrongResult => return None
             case _ =>
-          }
           return Some(testName)
         case _ =>
-      }
       None
-    }
 
-    def checkFunSpec(fqn: String): Option[String] = {
+    def checkFunSpec(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
       checkCall(PsiTreeUtil.getParentOfType(
                     element, classOf[MethodInvocation], false),
-                Map("it" -> fqn, "ignore" -> fqn)) match {
+                Map("it" -> fqn, "ignore" -> fqn)) match
         case SuccessResult(_call, _testName, _) =>
           var testName = _testName
           var call = _call
-          while (call != null) {
+          while (call != null)
             checkCall(PsiTreeUtil.getParentOfType(
                           call, classOf[MethodInvocation], true),
-                      Map("describe" -> fqn)) match {
+                      Map("describe" -> fqn)) match
               case SuccessResult(invoc, featureName, _) =>
                 testName = featureName + " " + testName
                 call = invoc
               case WrongResult => return None
               case _ => call = null
-            }
-          }
           return Some(testName)
         case _ =>
-      }
       None
-    }
 
-    def checkFreeSpec(fqn: String): Option[String] = {
+    def checkFreeSpec(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
-      def checkFreeSpecInner(innerClassName: String): Option[String] = {
+      def checkFreeSpecInner(innerClassName: String): Option[String] =
         val ifqn = fqn + innerClassName
         checkInfix(PsiTreeUtil.getParentOfType(
                        element, classOf[MethodInvocation], false),
-                   Map("in" -> ifqn, "is" -> ifqn, "ignore" -> ifqn)) match {
+                   Map("in" -> ifqn, "is" -> ifqn, "ignore" -> ifqn)) match
           case SuccessResult(_call, _testName, _) =>
             var testName = _testName
             var call = _call
-            while (call != null) {
+            while (call != null)
               checkInfix(PsiTreeUtil.getParentOfType(
                              call, classOf[MethodInvocation], true),
-                         Map("-" -> (fqn + ".FreeSpecStringWrapper"))) match {
+                         Map("-" -> (fqn + ".FreeSpecStringWrapper"))) match
                 case SuccessResult(invoc, tName, _) =>
                   call = invoc
                   testName = tName + " " + testName
                 case WrongResult => return None
                 case _ => call = null
-              }
-            }
             Some(testName)
           case _ => None
-        }
-      }
-      checkFreeSpecInner(".FreeSpecStringWrapper") match {
+      checkFreeSpecInner(".FreeSpecStringWrapper") match
         case Some(name) => Some(name)
         case None => checkFreeSpecInner(".ResultOfTaggedAsInvocationOnString")
-      }
-    }
 
     val shouldFqn = "org.scalatest.verb.ShouldVerb.StringShouldWrapperForVerb"
     val mustFqn = "org.scalatest.verb.MustVerb.StringMustWrapperForVerb"
@@ -437,19 +374,19 @@ class ScalaTestConfigurationProducer extends {
     val mustFqn2 = "org.scalatest.words.MustVerb.StringMustWrapperForVerb"
     val canFqn2 = "org.scalatest.words.CanVerb.StringCanWrapperForVerb"
 
-    def checkWordSpec(fqn: String): Option[String] = {
+    def checkWordSpec(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
-      def checkWordSpecInner(innerClassName: String): Option[String] = {
+      def checkWordSpecInner(innerClassName: String): Option[String] =
         val ifqn = fqn + innerClassName
         val wfqn = fqn + ".WordSpecStringWrapper"
         checkInfixTagged(PsiTreeUtil.getParentOfType(
                              element, classOf[MethodInvocation], false),
                          Map("in" -> ifqn, "is" -> ifqn, "ignore" -> ifqn),
-                         wfqn) match {
+                         wfqn) match
           case SuccessResult(_call, _testName, _) =>
             var testName = _testName
             var call = _call
-            while (call != null) {
+            while (call != null)
               val checkInfixResult2 = checkInfix(
                   PsiTreeUtil.getParentOfType(
                       call, classOf[MethodInvocation], true),
@@ -468,165 +405,130 @@ class ScalaTestConfigurationProducer extends {
                       "must" -> mustFqn,
                       "can" -> canFqn),
                   checkFirstArgIsUnitOrString = true)
-              checkInfixResult2 match {
+              checkInfixResult2 match
                 case SuccessResult(invoc, tName, refName) =>
                   call = invoc
                   testName = tName + " " + refName + " " + testName
                 case _ =>
-                  (checkInfixResult, checkInfixResult) match {
+                  (checkInfixResult, checkInfixResult) match
                     case (_, SuccessResult(invoc, tName, refName)) =>
                       call = invoc
                       testName = tName + " " + refName + " " + testName
                     case (WrongResult, WrongResult) => return None
                     case _ => call = null
-                  }
-              }
-            }
             Some(testName)
           case _ => None
-        }
-      }
-      checkWordSpecInner(".WordSpecStringWrapper") match {
+      checkWordSpecInner(".WordSpecStringWrapper") match
         case Some(name) => Some(name)
         case None => checkWordSpecInner(".ResultOfTaggedAsInvocationOnString")
-      }
-    }
 
-    def endupWithIt(it: ScReferenceExpression): Option[String] = {
+    def endupWithIt(it: ScReferenceExpression): Option[String] =
       var elem: PsiElement = it
       var parent = it.getParent
       while (parent != null &&
-      (!parent.isInstanceOf[ScTemplateBody] || parent != tb)) {
+      (!parent.isInstanceOf[ScTemplateBody] || parent != tb))
         elem = parent
         parent = parent.getParent
-      }
       var sibling = elem.getPrevSibling
       var result: Option[String] = null
 
-      val infix: (MethodInvocation) => Option[String] = {
+      val infix: (MethodInvocation) => Option[String] =
         case i: ScInfixExpr =>
           endupWithLitral(i.getBaseExpr)
         case call: MethodInvocation =>
-          call.getInvokedExpr match {
+          call.getInvokedExpr match
             case ref: ScReferenceExpression =>
-              ref.qualifier match {
+              ref.qualifier match
                 case Some(qual) => endupWithLitral(qual)
                 case _ => None
-              }
             case _ => None
-          }
-      }
 
       val call = (call: MethodInvocation) =>
-        {
           val literal = call.argumentExpressions.apply(0)
           endupWithLitral(literal)
-      }
 
-      val visitor = new ScalaRecursiveElementVisitor {
-        override def visitReferenceExpression(ref: ScReferenceExpression) {
-          ref.refName match {
+      val visitor = new ScalaRecursiveElementVisitor
+        override def visitReferenceExpression(ref: ScReferenceExpression)
+          ref.refName match
             case "should" =>
-              ref.resolve() match {
+              ref.resolve() match
                 case fun: ScFunction
                     if fun.containingClass != null &&
                     fun.containingClass.qualifiedName == shouldFqn ||
                     fun.containingClass.qualifiedName == shouldFqn2 =>
-                  if (result == null) {
-                    ref.getParent match {
+                  if (result == null)
+                    ref.getParent match
                       case m: MethodInvocation => result = infix(m)
                       case _ => result = None
-                    }
-                  }
                 case _ =>
-              }
             case "must" =>
-              ref.resolve() match {
+              ref.resolve() match
                 case fun: ScFunction
                     if fun.containingClass != null &&
                     fun.containingClass.qualifiedName == mustFqn ||
                     fun.containingClass.qualifiedName == mustFqn2 =>
-                  if (result == null) {
-                    ref.getParent match {
+                  if (result == null)
+                    ref.getParent match
                       case m: MethodInvocation => result = infix(m)
                       case _ => result = None
-                    }
-                  }
                 case _ =>
-              }
             case "can" =>
-              ref.resolve() match {
+              ref.resolve() match
                 case fun: ScFunction
                     if fun.containingClass != null &&
                     fun.containingClass.qualifiedName == canFqn ||
                     fun.containingClass.qualifiedName == canFqn2 =>
-                  if (result == null) {
-                    ref.getParent match {
+                  if (result == null)
+                    ref.getParent match
                       case m: MethodInvocation => result = infix(m)
                       case _ => result = None
-                    }
-                  }
                 case _ =>
-              }
             case "of" =>
-              ref.resolve() match {
+              ref.resolve() match
                 case fun: ScFunction
                     if fun.containingClass != null &&
                     fun.containingClass.qualifiedName == "org.scalatest.FlatSpec.BehaviorWord" =>
-                  if (result == null) {
-                    ref.getParent match {
+                  if (result == null)
+                    ref.getParent match
                       case m: MethodInvocation => result = call(m)
                       case _ => result = None
-                    }
-                  }
                 case _ =>
-              }
             case _ =>
-          }
-        }
-      }
 
-      while (sibling != null && result == null) {
+      while (sibling != null && result == null)
         sibling.accept(visitor)
         sibling = sibling.getPrevSibling
-      }
 
       if (result == null) return None
       result
-    }
 
     def checkInfixWithIt(call: MethodInvocation,
                          namesSet: Map[String, Set[String]],
-                         checkFirstArgIsUnitOrString: Boolean = false) = {
-      val inv: (MethodInvocation) => Option[String] = {
+                         checkFirstArgIsUnitOrString: Boolean = false) =
+      val inv: (MethodInvocation) => Option[String] =
         case i: ScInfixExpr =>
-          i.getBaseExpr match {
+          i.getBaseExpr match
             case ref: ScReferenceExpression
                 if ref.refName == "it" || ref.refName == "ignore" ||
                 ref.refName == "they" =>
               endupWithIt(ref)
             case _ =>
               endupWithLitral(i.getBaseExpr)
-          }
         case call: MethodInvocation =>
-          call.getInvokedExpr match {
+          call.getInvokedExpr match
             case ref: ScReferenceExpression =>
-              ref.qualifier match {
+              ref.qualifier match
                 case Some(ref: ScReferenceExpression)
                     if ref.refName == "it" || ref.refName == "ignore" ||
                     ref.refName == "they" =>
                   endupWithIt(ref)
                 case Some(qual) => endupWithLitral(qual)
                 case _ => None
-              }
             case _ => None
-          }
-      }
       checkCallGeneral(
           call, namesSet, inv, recursive = false, checkFirstArgIsUnitOrString)
-    }
 
-    def checkFlatSpec(fqn: String): Option[String] = {
+    def checkFlatSpec(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
       val itFqn = fqn + ".ItWord"
       val itVFqn = fqn + ".ItVerbString"
@@ -663,21 +565,19 @@ class ScalaTestConfigurationProducer extends {
               "ignore" -> Set(
                   itVFqn, itVTFqn, inFqn, inTFqn, theyVFqn, theyVTFqn)),
           Set(itVFqn, igVFqn, resFqn, resFqn2, theyVFqn),
-          testNameIsAlwaysEmpty = true) match {
+          testNameIsAlwaysEmpty = true) match
         case SuccessResult(_call, _testName, _) =>
           var testName = _testName
           var call = _call
-          while (call != null) {
-            val base = call match {
+          while (call != null)
+            val base = call match
               case i: ScInfixExpr =>
                 i.getBaseExpr
               case m: MethodInvocation =>
-                m.getInvokedExpr match {
+                m.getInvokedExpr match
                   case ref: ScReferenceExpression => ref.qualifier.orNull
                   case _ => null
-                }
-            }
-            base match {
+            base match
               case null => call = null
               case m: MethodInvocation =>
                 checkInfixWithIt(
@@ -687,71 +587,54 @@ class ScalaTestConfigurationProducer extends {
                         "must" -> Set(
                             mustFqn, mustFqn2, itFqn, igFqn, theyFqn),
                         "can" -> Set(canFqn, canFqn2, itFqn, igFqn, theyFqn)),
-                    checkFirstArgIsUnitOrString = true) match {
+                    checkFirstArgIsUnitOrString = true) match
                   case SuccessResult(invoc, tName, middleName) =>
                     call = invoc
                     testName = tName + " " + middleName +
                     (if (testName.isEmpty) "" else " ") + testName
                   case WrongResult => return None
                   case _ => call = null
-                }
                 call = m
               case _ => call = null
-            }
-          }
           Some(testName)
         case _ => None
-      }
-    }
 
-    def checkJUnit3Suite(fqn: String): Option[String] = {
+    def checkJUnit3Suite(fqn: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
       var fun = PsiTreeUtil.getParentOfType(
           element, classOf[ScFunctionDefinition], false)
-      while (fun != null) {
+      while (fun != null)
         if (fun.getParent.isInstanceOf[ScTemplateBody] &&
-            fun.containingClass == clazz) {
-          if (fun.name.startsWith("test")) {
+            fun.containingClass == clazz)
+          if (fun.name.startsWith("test"))
             return Some(fun.name)
-          }
-        }
         fun = PsiTreeUtil.getParentOfType(
             fun, classOf[ScFunctionDefinition], true)
-      }
       None
-    }
 
-    def checkAnnotatedSuite(fqn: String, annot: String): Option[String] = {
+    def checkAnnotatedSuite(fqn: String, annot: String): Option[String] =
       if (!isInheritor(clazz, fqn)) return None
       var fun = PsiTreeUtil.getParentOfType(
           element, classOf[ScFunctionDefinition], false)
-      while (fun != null) {
+      while (fun != null)
         if (fun.getParent.isInstanceOf[ScTemplateBody] &&
-            fun.containingClass == clazz) {
-          if (fun.hasAnnotation(annot) != None) {
+            fun.containingClass == clazz)
+          if (fun.hasAnnotation(annot) != None)
             return Some(fun.name)
-          }
-        }
         fun = PsiTreeUtil.getParentOfType(
             fun, classOf[ScFunctionDefinition], true)
-      }
       None
-    }
 
-    def checkJUnitSuite(fqn: String): Option[String] = {
+    def checkJUnitSuite(fqn: String): Option[String] =
       checkAnnotatedSuite(fqn, "org.junit.Test")
-    }
 
-    def checkTestNGSuite(fqn: String): Option[String] = {
+    def checkTestNGSuite(fqn: String): Option[String] =
       checkAnnotatedSuite(fqn, "org.testng.annotations.Test")
-    }
 
-    class OptionExtension(x: Option[String]) {
-      def ++(s: => Option[String]): Option[String] = {
+    class OptionExtension(x: Option[String])
+      def ++(s: => Option[String]): Option[String] =
         if (x.isDefined) x
         else s
-      }
-    }
     implicit def o2e(x: Option[String]): OptionExtension =
       new OptionExtension(x)
 
@@ -806,16 +689,13 @@ class ScalaTestConfigurationProducer extends {
     val astTransformer = new ScalaTestAstTransformer()
     val selection = astTransformer.testSelection(location)
 
-    if (selection != null) {
+    if (selection != null)
       if (selection.testNames.nonEmpty)
         (clazz,
          escapeAndConcatTestNames(selection.testNames().toList.map(_.trim)))
-      else {
+      else
         val parent = location.getPsiElement.getParent
         if (parent != null)
           getLocationClassAndTest(new PsiLocation(location.getProject, parent))
         else null
-      }
-    } else oldResult
-  }
-}
+    else oldResult

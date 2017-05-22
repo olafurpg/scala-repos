@@ -18,7 +18,7 @@ import scala.concurrent.duration.Duration
   * by blocking the current thread until the `Awaitable` has been completed or a timeout has
   * occurred.
   */
-trait Awaitable[+T] {
+trait Awaitable[+T]
 
   /**
     * Await the "completed" state of this `Awaitable`.
@@ -54,4 +54,3 @@ trait Awaitable[+T] {
     */
   @throws(classOf[Exception])
   def result(atMost: Duration)(implicit permit: CanAwait): T
-}

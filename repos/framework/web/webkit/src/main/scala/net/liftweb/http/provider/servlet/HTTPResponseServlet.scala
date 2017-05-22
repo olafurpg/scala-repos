@@ -26,10 +26,10 @@ import net.liftweb.common._
 import net.liftweb.util._
 import Helpers._
 
-class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
+class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse
   private var _status = 0;
 
-  def addCookies(cookies: List[HTTPCookie]) = cookies.foreach {
+  def addCookies(cookies: List[HTTPCookie]) = cookies.foreach
     case c =>
       val cookie = new javax.servlet.http.Cookie(c.name, c.value openOr null)
       c.domain map (cookie.setDomain(_))
@@ -37,22 +37,19 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
       c.maxAge map (cookie.setMaxAge(_))
       c.version map (cookie.setVersion(_))
       c.secure_? map (cookie.setSecure(_))
-      c.httpOnly.foreach { bv =>
+      c.httpOnly.foreach  bv =>
         import scala.language.reflectiveCalls
 
-        try {
-          val cook30 = cookie.asInstanceOf[ {
+        try
+          val cook30 = cookie.asInstanceOf[
             def setHttpOnly(b: Boolean): Unit
-          }]
+          ]
           cook30.setHttpOnly(bv)
-        } catch {
+        catch
           case e: Exception =>
           // swallow.. the exception will be thrown for Servlet 2.5 containers but work for servlet
           // 3.0 containers
-        }
-      }
       resp.addCookie(cookie)
-  }
 
   private val shouldEncodeUrl = LiftRules.encodeJSessionIdInUrl_?
 
@@ -60,34 +57,28 @@ class HTTPResponseServlet(resp: HttpServletResponse) extends HTTPResponse {
     * Encode the JSESSIONID in the URL if specified by LiftRules
     */
   def encodeUrl(url: String): String =
-    if (shouldEncodeUrl) {
+    if (shouldEncodeUrl)
       resp encodeURL url
-    } else {
+    else
       url
-    }
 
-  def addHeaders(headers: List[HTTPParam]) {
+  def addHeaders(headers: List[HTTPParam])
     val appearOnce = Set(
         LiftRules.overwrittenReponseHeaders.vend.map(_.toLowerCase): _*)
     for (h <- headers;
-    value <- h.values) {
+    value <- h.values)
       if (appearOnce.contains(h.name.toLowerCase))
         resp.setHeader(h.name, value)
       else resp.addHeader(h.name, value)
-    }
-  }
 
-  def setStatus(status: Int) = {
+  def setStatus(status: Int) =
     _status = status
     resp setStatus status
-  }
 
   def getStatus = _status
 
-  def setStatusWithReason(status: Int, reason: String) = {
+  def setStatusWithReason(status: Int, reason: String) =
     _status = status
     resp sendError (status, reason)
-  }
 
   def outputStream: OutputStream = resp.getOutputStream
-}

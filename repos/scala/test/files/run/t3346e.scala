@@ -4,22 +4,21 @@ import scala.math.Ordering
 import collection.{TraversableLike, SeqLike}
 import collection.immutable.BitSet
 
-class QuickSort[Coll](a: Coll) {
+class QuickSort[Coll](a: Coll)
   //should be able to sort only something with defined order (someting like a Seq)
   def quickSort[T](implicit ev0: Coll => SeqLike[T, Coll],
                    cbf: CanBuildFrom[Coll, T, Coll],
-                   n: Ordering[T]): Coll = {
+                   n: Ordering[T]): Coll =
     quickSortAnything(ev0, cbf, n)
-  }
 
   //we can even sort a Set, if we really want to
   def quickSortAnything[T](implicit ev0: Coll => TraversableLike[T, Coll],
                            cbf: CanBuildFrom[Coll, T, Coll],
-                           n: Ordering[T]): Coll = {
+                           n: Ordering[T]): Coll =
     import n._
-    if (a.size < 2) {
+    if (a.size < 2)
       a
-    } else {
+    else
       // We pick the first value for the pivot.
       val pivot = a.head
       val (lower, tmp) = a.partition(_ < pivot)
@@ -30,33 +29,25 @@ class QuickSort[Coll](a: Coll) {
       b ++= same
       b ++= new QuickSort(upper).quickSortAnything
       b.result
-    }
-  }
-}
 
-class FilterMap[Repr](a: Repr) {
+class FilterMap[Repr](a: Repr)
   def filterMap[A, B, That](f: A => Option[B])(
       implicit ev0: Repr => TraversableLike[A, Repr],
-      cbf: CanBuildFrom[Repr, B, That]): That = {
+      cbf: CanBuildFrom[Repr, B, That]): That =
     a.flatMap(e => f(e).toSeq)
-  }
-}
 
-class FilterMapFixed[A, Repr <% TraversableLike[A, Repr]](a: Repr) {
+class FilterMapFixed[A, Repr <% TraversableLike[A, Repr]](a: Repr)
   def filterMap2[B, That](f: A => Option[B])(
-      implicit cbf: CanBuildFrom[Repr, B, That]): That = {
+      implicit cbf: CanBuildFrom[Repr, B, That]): That =
     a.flatMap(e => f(e).toSeq)
-  }
-}
 
-object MyEnhancements {
+object MyEnhancements
   implicit def toQS[Coll](a: Coll) = new QuickSort(a)
   implicit def toFM[Coll](a: Coll) = new FilterMap(a)
   implicit def toFM2[A, Repr <% TraversableLike[A, Repr]](a: Repr) =
     new FilterMapFixed(a)
-}
 
-object Test extends App {
+object Test extends App
 
   import MyEnhancements._
 
@@ -81,4 +72,3 @@ object Test extends App {
   //No implicit view available from java.lang.String => scala.collection.TraversableLike[A,java.lang.String]. :(
   //Not anymore :)
   println("qwe".filterMap2(c => Some(c)))
-}

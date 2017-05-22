@@ -26,19 +26,17 @@ import cascading.flow.FlowDef
   * More familiar interface to scalding users that creates
   * the Reader from two other methods
   */
-trait SimpleWindowedService[K, V] extends BatchedWindowService[K, V] {
+trait SimpleWindowedService[K, V] extends BatchedWindowService[K, V]
   def streamIsAvailable(b: BatchID, m: Mode): Boolean
   def read(b: BatchID)(
       implicit f: FlowDef, m: Mode): TypedPipe[(Timestamp, (K, Option[V]))]
 
   final def readStream(
-      batchID: BatchID, mode: Mode): Option[FlowToPipe[(K, Option[V])]] = {
-    if (!streamIsAvailable(batchID, mode)) {
+      batchID: BatchID, mode: Mode): Option[FlowToPipe[(K, Option[V])]] =
+    if (!streamIsAvailable(batchID, mode))
       None
-    } else
+    else
       Some(
-          Reader({ implicit fdm: (FlowDef, Mode) =>
+          Reader( implicit fdm: (FlowDef, Mode) =>
         read(batchID)
-      }))
-  }
-}
+      ))

@@ -8,24 +8,23 @@ import mesosphere.marathon.state.PathId._
 import scala.collection.SortedSet
 
 class DeploymentPlanRevertTest
-    extends MarathonSpec with Matchers with GivenWhenThen {
-  private def normalizeVersions(group: Group): Group = {
+    extends MarathonSpec with Matchers with GivenWhenThen
+  private def normalizeVersions(group: Group): Group =
     group.withNormalizedVersion.copy(
         apps = group.apps.map(
               _.copy(versionInfo = AppDefinition.VersionInfo.NoVersion)),
         groups = group.groups.map(normalizeVersions)
     )
-  }
 
   /**
     * An assert equals which provides better feedback about what's different for groups.
     */
   private def assertEqualsExceptVersion(
-      expectedOrig: Group, actualOrig: Group): Unit = {
+      expectedOrig: Group, actualOrig: Group): Unit =
     val expected: Group = normalizeVersions(expectedOrig)
     val actual: Group = normalizeVersions(actualOrig)
 
-    if (expected != actual) {
+    if (expected != actual)
       val actualGroupIds = actual.transitiveGroups.map(_.id)
       val expectedGroupIds = expected.transitiveGroups.map(_.id)
 
@@ -33,16 +32,13 @@ class DeploymentPlanRevertTest
       val missingGroupIds = expectedGroupIds -- actualGroupIds
 
       withClue(
-          s"unexpected groups $unexpectedGroupIds, missing groups $missingGroupIds: ") {
+          s"unexpected groups $unexpectedGroupIds, missing groups $missingGroupIds: ")
         actualGroupIds should equal(expectedGroupIds)
-      }
 
-      for (groupId <- expectedGroupIds) {
-        withClue(s"for group id $groupId") {
+      for (groupId <- expectedGroupIds)
+        withClue(s"for group id $groupId")
           actual.group(groupId).map(_.withoutChildren) should equal(
               expected.group(groupId).map(_.withoutChildren))
-        }
-      }
 
       val actualAppIds = actual.transitiveApps.map(_.id)
       val expectedAppIds = expected.transitiveApps.map(_.id)
@@ -51,24 +47,19 @@ class DeploymentPlanRevertTest
       val missingAppIds = expectedAppIds -- actualAppIds
 
       withClue(
-          s"unexpected apps $unexpectedAppIds, missing apps $missingAppIds: ") {
+          s"unexpected apps $unexpectedAppIds, missing apps $missingAppIds: ")
         actualAppIds should equal(expectedAppIds)
-      }
 
-      for (appId <- expectedAppIds) {
-        withClue(s"for app id $appId") {
+      for (appId <- expectedAppIds)
+        withClue(s"for app id $appId")
           actual.app(appId) should equal(expected.app(appId))
-        }
-      }
 
       // just in case we missed differences
       actual should equal(expected)
-    }
-  }
 
-  test("Revert app addition") {
+  test("Revert app addition")
     Given("an unrelated group")
-    val unrelatedGroup = {
+    val unrelatedGroup =
       val id = "unrelated".toRootPath
       Group(
           id,
@@ -77,7 +68,6 @@ class DeploymentPlanRevertTest
                 AppDefinition(id / "app2")
             )
       )
-    }
 
     val original = Group(
         PathId.empty,
@@ -92,11 +82,10 @@ class DeploymentPlanRevertTest
 
     Then("we get back the original definitions")
     assertEqualsExceptVersion(original, actualOrig = revertToOriginal)
-  }
 
-  test("Revert app removal") {
+  test("Revert app removal")
     Given("an existing group with apps")
-    val changeme = {
+    val changeme =
       val id = "changeme".toRootPath
       Group(
           id,
@@ -105,7 +94,6 @@ class DeploymentPlanRevertTest
                 AppDefinition(id / "app2")
             )
       )
-    }
 
     val original = Group(
         PathId.empty,
@@ -122,11 +110,10 @@ class DeploymentPlanRevertTest
 
     Then("we get back the original definitions")
     assertEqualsExceptVersion(original, actualOrig = revertToOriginal)
-  }
 
-  test("Revert group addition") {
+  test("Revert group addition")
     Given("an unrelated group")
-    val unrelatedGroup = {
+    val unrelatedGroup =
       val id = "unrelated".toRootPath
       Group(
           id,
@@ -135,7 +122,6 @@ class DeploymentPlanRevertTest
                 AppDefinition(id / "app2")
             )
       )
-    }
 
     val original = Group(
         PathId.empty,
@@ -150,17 +136,15 @@ class DeploymentPlanRevertTest
 
     Then("we get back the original definitions")
     assertEqualsExceptVersion(original, actualOrig = revertToOriginal)
-  }
 
-  test("Revert removing a group without apps") {
+  test("Revert removing a group without apps")
     Given("a group")
-    val changeme = {
+    val changeme =
       val id = "changeme".toRootPath
       Group(
           id,
           apps = Set()
       )
-    }
 
     val original = Group(
         PathId.empty,
@@ -175,11 +159,10 @@ class DeploymentPlanRevertTest
 
     Then("we get back the original definitions")
     assertEqualsExceptVersion(original, actualOrig = revertToOriginal)
-  }
 
-  test("Revert removing a group with apps") {
+  test("Revert removing a group with apps")
     Given("a group")
-    val changeme = {
+    val changeme =
       val id = "changeme".toRootPath
       Group(
           id,
@@ -188,7 +171,6 @@ class DeploymentPlanRevertTest
                 AppDefinition(id / "app2")
             )
       )
-    }
 
     val original = Group(
         PathId.empty,
@@ -203,11 +185,10 @@ class DeploymentPlanRevertTest
 
     Then("we get back the original definitions")
     assertEqualsExceptVersion(original, actualOrig = revertToOriginal)
-  }
 
-  test("Revert group dependency changes") {
+  test("Revert group dependency changes")
     Given("an existing group with apps")
-    val existingGroup = {
+    val existingGroup =
       val id = "changeme".toRootPath
       Group(
           id,
@@ -220,7 +201,6 @@ class DeploymentPlanRevertTest
                 AppDefinition(id / "app2")
             )
       )
-    }
 
     val original = Group(
         PathId.empty,
@@ -244,9 +224,8 @@ class DeploymentPlanRevertTest
 
     Then("we get back the original definitions")
     assertEqualsExceptVersion(original, actualOrig = revertToOriginal)
-  }
 
-  val existingGroup = {
+  val existingGroup =
     val id = "changeme".toRootPath
     Group(
         id,
@@ -259,7 +238,6 @@ class DeploymentPlanRevertTest
               AppDefinition(id / "app2")
           )
     )
-  }
 
   val original = Group(
       PathId.empty,
@@ -277,19 +255,19 @@ class DeploymentPlanRevertTest
       addApp("/changeme/app3"),
       addApp("/other/app4"),
       removeApp("/changeme/app2")
-  ) {
+  )
     Group(
         PathId.empty,
         groups = Set(
               Group("othergroup1".toRootPath),
               Group("othergroup2".toRootPath),
-              Group("othergroup3".toRootPath), {
+              Group("othergroup3".toRootPath),
               val id = "other".toRootPath
               Group(
                   id,
                   apps = Set(AppDefinition(id / "app4")) // app4 was added
               )
-            }, {
+            ,
               val id = "changeme".toRootPath
               Group(
                   id,
@@ -303,23 +281,21 @@ class DeploymentPlanRevertTest
                         AppDefinition(id / "app3") // app3 was added
                     )
               )
-            }
           )
     )
-  }
 
   testWithConcurrentChange(original)(
       changeGroupDependencies("/withdeps", add = Seq("/a", "/b", "/c")),
       // cannot delete /withdeps in revert
       addGroup("/withdeps/some")
-  ) {
+  )
     // expected outcome after revert of first deployment
     Group(
         PathId.empty,
         groups = Set(
               Group("othergroup1".toRootPath),
               Group("othergroup2".toRootPath),
-              Group("othergroup3".toRootPath), {
+              Group("othergroup3".toRootPath),
               val id =
                 "withdeps".toRootPath // withdeps still exists because of the subgroup
               Group(
@@ -327,7 +303,7 @@ class DeploymentPlanRevertTest
                   groups = Set(Group(id / "some")),
                   dependencies = Set() // dependencies were introduce with first deployment, should be gone now
               )
-            }, {
+            ,
               val id = "changeme".toRootPath
               Group(
                   id,
@@ -340,10 +316,8 @@ class DeploymentPlanRevertTest
                         AppDefinition(id / "app2")
                     )
               )
-            }
           )
     )
-  }
 
   testWithConcurrentChange(original)(
       changeGroupDependencies("/changeme",
@@ -352,14 +326,14 @@ class DeploymentPlanRevertTest
       // "conflicting" dependency changes
       changeGroupDependencies(
           "/changeme", remove = Seq("/othergroup2"), add = Seq("/othergroup4"))
-  ) {
+  )
     // expected outcome after revert of first deployment
     Group(
         PathId.empty,
         groups = Set(
               Group("othergroup1".toRootPath),
               Group("othergroup2".toRootPath),
-              Group("othergroup3".toRootPath), {
+              Group("othergroup3".toRootPath),
               val id = "changeme".toRootPath
               Group(
                   id,
@@ -373,24 +347,22 @@ class DeploymentPlanRevertTest
                         AppDefinition(id / "app2")
                     )
               )
-            }
           )
     )
-  }
 
   testWithConcurrentChange(original)(
       removeGroup("/othergroup3"),
       // unrelated dependency changes
       changeGroupDependencies(
           "/changeme", remove = Seq("/othergroup2"), add = Seq("/othergroup4"))
-  ) {
+  )
     // expected outcome after revert of first deployment
     Group(
         PathId.empty,
         groups = Set(
               Group("othergroup1".toRootPath),
               Group("othergroup2".toRootPath),
-              Group("othergroup3".toRootPath), {
+              Group("othergroup3".toRootPath),
               val id = "changeme".toRootPath
               Group(
                   id,
@@ -404,10 +376,8 @@ class DeploymentPlanRevertTest
                         AppDefinition(id / "app2")
                     )
               )
-            }
           )
     )
-  }
 
   testWithConcurrentChange(
       original,
@@ -417,14 +387,14 @@ class DeploymentPlanRevertTest
       addGroup("/changeme/some/a"),
       // concurrent deployments
       addGroup("/changeme/some/b")
-  ) {
+  )
     // expected outcome after revert
     Group(
         PathId.empty,
         groups = Set(
               Group("othergroup1".toRootPath),
               Group("othergroup2".toRootPath),
-              Group("othergroup3".toRootPath), {
+              Group("othergroup3".toRootPath),
               val id = "changeme".toRootPath
               Group(
                   id,
@@ -445,10 +415,8 @@ class DeploymentPlanRevertTest
                         )
                     )
               )
-            }
           )
     )
-  }
 
   testWithConcurrentChange(
       original
@@ -459,14 +427,14 @@ class DeploymentPlanRevertTest
       addApp("/changeme/some/b/a"),
       addApp("/changeme/some/b/b"),
       addApp("/changeme/some/b/c")
-  ) {
+  )
     // expected outcome after revert
     Group(
         PathId.empty,
         groups = Set(
               Group("othergroup1".toRootPath),
               Group("othergroup2".toRootPath),
-              Group("othergroup3".toRootPath), {
+              Group("othergroup3".toRootPath),
               val id = "changeme".toRootPath
               Group(
                   id,
@@ -497,27 +465,23 @@ class DeploymentPlanRevertTest
                         )
                     )
               )
-            }
           )
     )
-  }
 
   case class Deployment(name: String, change: Group => Group)
 
   private[this] def testWithConcurrentChange(
       originalBeforeChanges: Group, changesBeforeTest: Deployment*)(
-      deployments: Deployment*)(expectedReverted: Group): Unit = {
+      deployments: Deployment*)(expectedReverted: Group): Unit =
     val firstDeployment = deployments.head
 
-    def performDeployments(orig: Group, deployments: Seq[Deployment]): Group = {
-      deployments.foldLeft(orig) {
+    def performDeployments(orig: Group, deployments: Seq[Deployment]): Group =
+      deployments.foldLeft(orig)
         case (last: Group, deployment: Deployment) =>
           deployment.change(last)
-      }
-    }
 
     test(
-        s"Reverting ${firstDeployment.name} after deploying ${deployments.tail.map(_.name).mkString(", ")}") {
+        s"Reverting ${firstDeployment.name} after deploying ${deployments.tail.map(_.name).mkString(", ")}")
       Given("an existing group with apps")
       val original =
         performDeployments(originalBeforeChanges, changesBeforeTest)
@@ -537,38 +501,29 @@ class DeploymentPlanRevertTest
         deploymentReverterForFirst(normalizeVersions(targetWithAllDeployments))
 
       Then("The result should only contain items with the prior or the new version")
-      for (app <- reverted.transitiveApps) {
-        withClue(s"version for app ${app.id} ") {
+      for (app <- reverted.transitiveApps)
+        withClue(s"version for app ${app.id} ")
           app.version.toDateTime.getMillis should be <= (1L)
-        }
-      }
 
-      for (group <- reverted.transitiveGroups) {
-        withClue(s"version for group ${group.id} ") {
+      for (group <- reverted.transitiveGroups)
+        withClue(s"version for group ${group.id} ")
           group.version.toDateTime.getMillis should be <= (1L)
-        }
-      }
 
       Then("the result should be the same as if we had only applied all the other deployments")
       val targetWithoutFirstDeployment =
         performDeployments(original, deployments.tail)
-      withClue("while comparing reverted with targetWithoutFirstDeployment: ") {
+      withClue("while comparing reverted with targetWithoutFirstDeployment: ")
         assertEqualsExceptVersion(targetWithoutFirstDeployment, reverted)
-      }
 
       Then("we should have the expected groups and apps")
-      withClue("while comparing reverted with expected: ") {
+      withClue("while comparing reverted with expected: ")
         assertEqualsExceptVersion(expectedReverted, reverted)
-      }
-    }
-  }
 
-  private[this] def removeApp(appIdString: String) = {
+  private[this] def removeApp(appIdString: String) =
     val appId = appIdString.toRootPath
     val parent = appId.parent
     Deployment(s"remove app '$appId'",
                _.update(parent, _.removeApplication(appId), Timestamp.now()))
-  }
   private[this] def addApp(appId: String) =
     Deployment(s"add app '$appId'",
                _.updateApp(appId.toRootPath,
@@ -582,7 +537,7 @@ class DeploymentPlanRevertTest
   private[this] def changeGroupDependencies(
       groupId: String,
       add: Seq[String] = Seq.empty,
-      remove: Seq[String] = Seq.empty) = {
+      remove: Seq[String] = Seq.empty) =
     val addedIds = add.map(_.toRootPath)
     val removedIds = remove.map(_.toRootPath)
 
@@ -599,5 +554,3 @@ class DeploymentPlanRevertTest
 
     Deployment(
         name, _.update(groupId.toRootPath, setDependencies, Timestamp.now()))
-  }
-}

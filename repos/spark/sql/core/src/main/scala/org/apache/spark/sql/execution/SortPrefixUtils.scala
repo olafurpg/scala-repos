@@ -22,18 +22,17 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.types._
 import org.apache.spark.util.collection.unsafe.sort.{PrefixComparator, PrefixComparators}
 
-object SortPrefixUtils {
+object SortPrefixUtils
 
   /**
     * A dummy prefix comparator which always claims that prefixes are equal. This is used in cases
     * where we don't know how to generate or compare prefixes for a SortOrder.
     */
-  private object NoOpPrefixComparator extends PrefixComparator {
+  private object NoOpPrefixComparator extends PrefixComparator
     override def compare(prefix1: Long, prefix2: Long): Int = 0
-  }
 
-  def getPrefixComparator(sortOrder: SortOrder): PrefixComparator = {
-    sortOrder.dataType match {
+  def getPrefixComparator(sortOrder: SortOrder): PrefixComparator =
+    sortOrder.dataType match
       case StringType =>
         if (sortOrder.isAscending) PrefixComparators.STRING
         else PrefixComparators.STRING_DESC
@@ -55,44 +54,33 @@ object SortPrefixUtils {
         if (sortOrder.isAscending) PrefixComparators.DOUBLE
         else PrefixComparators.DOUBLE_DESC
       case _ => NoOpPrefixComparator
-    }
-  }
 
   /**
     * Creates the prefix comparator for the first field in the given schema, in ascending order.
     */
-  def getPrefixComparator(schema: StructType): PrefixComparator = {
-    if (schema.nonEmpty) {
+  def getPrefixComparator(schema: StructType): PrefixComparator =
+    if (schema.nonEmpty)
       val field = schema.head
       getPrefixComparator(
           SortOrder(
               BoundReference(0, field.dataType, field.nullable), Ascending))
-    } else {
-      new PrefixComparator {
+    else
+      new PrefixComparator
         override def compare(prefix1: Long, prefix2: Long): Int = 0
-      }
-    }
-  }
 
   /**
     * Creates the prefix computer for the first field in the given schema, in ascending order.
     */
   def createPrefixGenerator(
-      schema: StructType): UnsafeExternalRowSorter.PrefixComputer = {
-    if (schema.nonEmpty) {
+      schema: StructType): UnsafeExternalRowSorter.PrefixComputer =
+    if (schema.nonEmpty)
       val boundReference = BoundReference(
           0, schema.head.dataType, nullable = true)
       val prefixProjection = UnsafeProjection.create(
           SortPrefix(SortOrder(boundReference, Ascending)))
-      new UnsafeExternalRowSorter.PrefixComputer {
-        override def computePrefix(row: InternalRow): Long = {
+      new UnsafeExternalRowSorter.PrefixComputer
+        override def computePrefix(row: InternalRow): Long =
           prefixProjection.apply(row).getLong(0)
-        }
-      }
-    } else {
-      new UnsafeExternalRowSorter.PrefixComputer {
+    else
+      new UnsafeExternalRowSorter.PrefixComputer
         override def computePrefix(row: InternalRow): Long = 0
-      }
-    }
-  }
-}

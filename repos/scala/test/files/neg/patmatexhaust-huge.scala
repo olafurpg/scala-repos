@@ -400,8 +400,8 @@ case object C398 extends C
 case object C399 extends C
 case object C400 extends C
 
-object M {
-  def f(c: C): Int = c match {
+object M
+  def f(c: C): Int = c match
     case C1 => 1
     case C2 => 2
     case C3 => 3
@@ -802,5 +802,3 @@ object M {
     case C398 => 398
     case C399 => 399
     case C400 => 400
-  }
-}

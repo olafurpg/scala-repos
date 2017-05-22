@@ -11,11 +11,11 @@ import org.jetbrains.plugins.scala.lang.completion.lookups.ScalaLookupItem
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaImportStaticLookupActionProvider extends LookupActionProvider {
+class ScalaImportStaticLookupActionProvider extends LookupActionProvider
   def fillActions(element: LookupElement,
                   lookup: Lookup,
-                  consumer: Consumer[LookupElementAction]) {
-    element match {
+                  consumer: Consumer[LookupElementAction])
+    element match
       case elem: ScalaLookupItem if elem.element.isInstanceOf[PsiClass] =>
       case elem: ScalaLookupItem =>
         if (!elem.isClassName) return
@@ -26,13 +26,9 @@ class ScalaImportStaticLookupActionProvider extends LookupActionProvider {
           if (!elem.shouldImport) checkIcon
           else new EmptyIcon(checkIcon.getIconWidth, checkIcon.getIconHeight)
         consumer.consume(
-            new LookupElementAction(icon, "Import method") {
-          def performLookupAction: LookupElementAction.Result = {
+            new LookupElementAction(icon, "Import method")
+          def performLookupAction: LookupElementAction.Result =
             elem.usedImportStaticQuickfix = true
             new LookupElementAction.Result.ChooseItem(elem)
-          }
-        })
+        )
       case _ =>
-    }
-  }
-}

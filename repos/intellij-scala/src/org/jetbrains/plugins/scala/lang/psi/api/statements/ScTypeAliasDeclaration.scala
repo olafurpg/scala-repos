@@ -9,6 +9,5 @@ package statements
   * Date: 22.02.2008
   * Time: 9:49:48
   */
-trait ScTypeAliasDeclaration extends ScTypeAlias with ScDeclaration {
+trait ScTypeAliasDeclaration extends ScTypeAlias with ScDeclaration
   def declaredElements = Seq(this)
-}

@@ -26,12 +26,11 @@ import org.apache.spark.rpc._
   */
 private[spark] class WorkerWatcher(
     override val rpcEnv: RpcEnv, workerUrl: String, isTesting: Boolean = false)
-    extends RpcEndpoint with Logging {
+    extends RpcEndpoint with Logging
 
   logInfo(s"Connecting to worker $workerUrl")
-  if (!isTesting) {
+  if (!isTesting)
     rpcEnv.asyncSetupEndpointRefByURI(workerUrl)
-  }
 
   // Used to avoid shutting down JVM during tests
   // In the normal case, exitNonZero will call `System.exit(-1)` to shutdown the JVM. In the unit
@@ -47,32 +46,24 @@ private[spark] class WorkerWatcher(
   private def exitNonZero() =
     if (isTesting) isShutDown = true else System.exit(-1)
 
-  override def receive: PartialFunction[Any, Unit] = {
+  override def receive: PartialFunction[Any, Unit] =
     case e => logWarning(s"Received unexpected message: $e")
-  }
 
-  override def onConnected(remoteAddress: RpcAddress): Unit = {
-    if (isWorker(remoteAddress)) {
+  override def onConnected(remoteAddress: RpcAddress): Unit =
+    if (isWorker(remoteAddress))
       logInfo(s"Successfully connected to $workerUrl")
-    }
-  }
 
-  override def onDisconnected(remoteAddress: RpcAddress): Unit = {
-    if (isWorker(remoteAddress)) {
+  override def onDisconnected(remoteAddress: RpcAddress): Unit =
+    if (isWorker(remoteAddress))
       // This log message will never be seen
       logError(s"Lost connection to worker rpc endpoint $workerUrl. Exiting.")
       exitNonZero()
-    }
-  }
 
   override def onNetworkError(
-      cause: Throwable, remoteAddress: RpcAddress): Unit = {
-    if (isWorker(remoteAddress)) {
+      cause: Throwable, remoteAddress: RpcAddress): Unit =
+    if (isWorker(remoteAddress))
       // These logs may not be seen if the worker (and associated pipe) has died
       logError(
           s"Could not initialize connection to worker $workerUrl. Exiting.")
       logError(s"Error was: $cause")
       exitNonZero()
-    }
-  }
-}

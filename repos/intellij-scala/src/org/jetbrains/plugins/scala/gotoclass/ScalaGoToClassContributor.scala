@@ -14,9 +14,9 @@ import scala.collection.JavaConversions._
   * Nikolay.Tropin
   * 12/19/13
   */
-class ScalaGoToClassContributor extends ChooseByNameContributor {
+class ScalaGoToClassContributor extends ChooseByNameContributor
   def getNames(
-      project: Project, includeNonProjectItems: Boolean): Array[String] = {
+      project: Project, includeNonProjectItems: Boolean): Array[String] =
     val classNames = StubIndex
       .getInstance()
       .getAllKeys(ScalaIndexKeys.NOT_VISIBLE_IN_JAVA_SHORT_NAME_KEY, project)
@@ -24,13 +24,12 @@ class ScalaGoToClassContributor extends ChooseByNameContributor {
       .getInstance()
       .getAllKeys(ScalaIndexKeys.PACKAGE_OBJECT_SHORT_NAME_KEY, project)
       (classNames ++ packageObjectNames).toArray
-  }
 
   def getItemsByName(
       name: String,
       pattern: String,
       project: Project,
-      includeNonProjectItems: Boolean): Array[NavigationItem] = {
+      includeNonProjectItems: Boolean): Array[NavigationItem] =
     val scope =
       if (includeNonProjectItems) GlobalSearchScope.allScope(project)
       else GlobalSearchScope.projectScope(project)
@@ -47,5 +46,3 @@ class ScalaGoToClassContributor extends ChooseByNameContributor {
         scope,
         classOf[PsiClass])
     (classes ++ packageObjects).toArray
-  }
-}

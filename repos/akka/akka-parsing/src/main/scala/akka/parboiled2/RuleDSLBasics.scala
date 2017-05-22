@@ -20,7 +20,7 @@ import scala.reflect.internal.annotations.compileTimeOnly
 import akka.parboiled2.support._
 import akka.shapeless.HList
 
-trait RuleDSLBasics {
+trait RuleDSLBasics
 
   /**
     * Matches the given single character.
@@ -124,7 +124,5 @@ trait RuleDSLBasics {
   @compileTimeOnly(
       "Calls to `str2CharRangeSupport` must be inside `rule` macro")
   implicit def str2CharRangeSupport(s: String): CharRangeSupport = `n/a`
-  sealed trait CharRangeSupport {
+  sealed trait CharRangeSupport
     def -(other: String): Rule0
-  }
-}

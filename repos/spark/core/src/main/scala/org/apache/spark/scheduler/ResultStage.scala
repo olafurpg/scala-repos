@@ -34,7 +34,7 @@ private[spark] class ResultStage(id: Int,
                                  parents: List[Stage],
                                  firstJobId: Int,
                                  callSite: CallSite)
-    extends Stage(id, rdd, partitions.length, parents, firstJobId, callSite) {
+    extends Stage(id, rdd, partitions.length, parents, firstJobId, callSite)
 
   /**
     * The active job for this result stage. Will be empty if the job has already finished
@@ -44,23 +44,19 @@ private[spark] class ResultStage(id: Int,
 
   def activeJob: Option[ActiveJob] = _activeJob
 
-  def setActiveJob(job: ActiveJob): Unit = {
+  def setActiveJob(job: ActiveJob): Unit =
     _activeJob = Option(job)
-  }
 
-  def removeActiveJob(): Unit = {
+  def removeActiveJob(): Unit =
     _activeJob = None
-  }
 
   /**
     * Returns the sequence of partition ids that are missing (i.e. needs to be computed).
     *
     * This can only be called when there is an active job.
     */
-  override def findMissingPartitions(): Seq[Int] = {
+  override def findMissingPartitions(): Seq[Int] =
     val job = activeJob.get
     (0 until job.numPartitions).filter(id => !job.finished(id))
-  }
 
   override def toString: String = "ResultStage " + id
-}

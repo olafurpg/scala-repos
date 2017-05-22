@@ -44,7 +44,7 @@ import java.util.concurrent.TimeUnit
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object Dispatchers {
+object Dispatchers
   val THROUGHPUT = config.getInt("akka.actor.throughput", 5)
   val DEFAULT_SHUTDOWN_TIMEOUT = config
     .getLong("akka.actor.dispatcher-shutdown-timeout")
@@ -62,12 +62,11 @@ object Dispatchers {
   val MAILBOX_TYPE: MailboxType =
     if (MAILBOX_CAPACITY < 1) UnboundedMailbox() else BoundedMailbox()
 
-  lazy val defaultGlobalDispatcher = {
+  lazy val defaultGlobalDispatcher =
     config
       .getSection("akka.actor.default-dispatcher")
       .flatMap(from)
       .getOrElse(globalExecutorBasedEventDrivenDispatcher)
-  }
 
   object globalExecutorBasedEventDrivenDispatcher
       extends ExecutorBasedEventDrivenDispatcher(
@@ -236,8 +235,8 @@ object Dispatchers {
    * Throws: IllegalArgumentException if the value of "type" is not valid
    *         IllegalArgumentException if it cannot
    */
-  def from(cfg: Configuration): Option[MessageDispatcher] = {
-    cfg.getString("type") map {
+  def from(cfg: Configuration): Option[MessageDispatcher] =
+    cfg.getString("type") map
       case "ExecutorBasedEventDriven" =>
         new ExecutorBasedEventDrivenDispatcherConfigurator()
       case "ExecutorBasedEventDrivenWorkStealing" =>
@@ -245,36 +244,30 @@ object Dispatchers {
       case "GlobalExecutorBasedEventDriven" =>
         GlobalExecutorBasedEventDrivenDispatcherConfigurator
       case fqn =>
-        ReflectiveAccess.getClassFor[MessageDispatcherConfigurator](fqn) match {
+        ReflectiveAccess.getClassFor[MessageDispatcherConfigurator](fqn) match
           case r: Right[_, Class[MessageDispatcherConfigurator]] =>
             ReflectiveAccess.createInstance[MessageDispatcherConfigurator](
-                r.b, Array[Class[_]](), Array[AnyRef]()) match {
+                r.b, Array[Class[_]](), Array[AnyRef]()) match
               case r: Right[Exception, MessageDispatcherConfigurator] => r.b
               case l: Left[Exception, MessageDispatcherConfigurator] =>
                 throw new IllegalArgumentException(
                     "Cannot instantiate MessageDispatcherConfigurator type [%s], make sure it has a default no-args constructor" format fqn,
                     l.a)
-            }
           case l: Left[Exception, _] =>
             throw new IllegalArgumentException(
                 "Unknown MessageDispatcherConfigurator type [%s]" format fqn,
                 l.a)
-        }
-    } map {
+    map
       _ configure cfg
-    }
-  }
-}
 
 object GlobalExecutorBasedEventDrivenDispatcherConfigurator
-    extends MessageDispatcherConfigurator {
+    extends MessageDispatcherConfigurator
   def configure(config: Configuration): MessageDispatcher =
     Dispatchers.globalExecutorBasedEventDrivenDispatcher
-}
 
 class ExecutorBasedEventDrivenDispatcherConfigurator
-    extends MessageDispatcherConfigurator {
-  def configure(config: Configuration): MessageDispatcher = {
+    extends MessageDispatcherConfigurator
+  def configure(config: Configuration): MessageDispatcher =
     configureThreadPool(
         config,
         threadPoolConfig =>
@@ -285,12 +278,10 @@ class ExecutorBasedEventDrivenDispatcherConfigurator
                             Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
               mailboxType(config),
               threadPoolConfig)).build
-  }
-}
 
 class ExecutorBasedEventDrivenWorkStealingDispatcherConfigurator
-    extends MessageDispatcherConfigurator {
-  def configure(config: Configuration): MessageDispatcher = {
+    extends MessageDispatcherConfigurator
+  def configure(config: Configuration): MessageDispatcher =
     configureThreadPool(
         config,
         threadPoolConfig =>
@@ -301,5 +292,3 @@ class ExecutorBasedEventDrivenWorkStealingDispatcherConfigurator
                             Dispatchers.THROUGHPUT_DEADLINE_TIME_MILLIS),
               mailboxType(config),
               threadPoolConfig)).build
-  }
-}

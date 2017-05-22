@@ -17,15 +17,15 @@ import org.jetbrains.plugins.scala.lang.refactoring.namesSuggester.NameSuggester
   * on 1/29/16
   */
 class ScalaCaseClassParametersNameContributer
-    extends ScalaCompletionContributor {
+    extends ScalaCompletionContributor
   extend(
       CompletionType.BASIC,
       PlatformPatterns.psiElement(),
-      new CompletionProvider[CompletionParameters] {
+      new CompletionProvider[CompletionParameters]
 
         def addCompletions(parameters: CompletionParameters,
                            context: ProcessingContext,
-                           _result: CompletionResultSet) {
+                           _result: CompletionResultSet)
           val position = positionFromParameters(parameters)
           val scope =
             PsiTreeUtil.getContextOfType(position, classOf[ScCaseClause])
@@ -37,7 +37,7 @@ class ScalaCaseClassParametersNameContributer
 
           val classRef =
             constructorPattern.asInstanceOf[ScConstructorPattern].ref
-          val caseClassParams = classRef.resolve() match {
+          val caseClassParams = classRef.resolve() match
             case funcDef: ScFunctionDefinition
                 if funcDef.syntheticCaseClass.isDefined =>
               funcDef.syntheticCaseClass.get.parameters
@@ -46,7 +46,6 @@ class ScalaCaseClassParametersNameContributer
                 fundef.getName == "unapplySeq" =>
               fundef.getParameterList.params
             case _ => return
-          }
 
           if (caseClassParams.isEmpty) return
 
@@ -61,12 +60,11 @@ class ScalaCaseClassParametersNameContributer
 
           byClassParamCompletionsItems(caseClassParams, result)
           byTypeCompletionsItems(position, corespondedParameter, result)
-        }
 
         def byTypeCompletionsItems(position: PsiElement,
                                    parameter: Option[ScParameter],
-                                   result: CompletionResultSet) = {
-          position.getContext match {
+                                   result: CompletionResultSet) =
+          position.getContext match
             case pattern: ScPattern
                 if pattern.expectedType.isDefined && parameter.isDefined =>
               val lookups = NameSuggester
@@ -74,28 +72,25 @@ class ScalaCaseClassParametersNameContributer
                 .map(name => new ScalaLookupItem(parameter.get, name))
               lookups.foreach(l => addLocalScalaLookUpItem(result, l))
             case _ =>
-          }
-        }
 
         def byClassParamCompletionsItems(
-            params: Seq[ScParameter], result: CompletionResultSet): Unit = {
+            params: Seq[ScParameter], result: CompletionResultSet): Unit =
           params
             .map(p => new ScalaLookupItem(p, p.name))
             .foreach(l => addLocalScalaLookUpItem(result, l))
-        }
 
         def addByOrderSorter(
             parameters: CompletionParameters,
             result: CompletionResultSet,
             currentPosition: Int,
-            classParams: Seq[ScParameter]): CompletionResultSet = {
+            classParams: Seq[ScParameter]): CompletionResultSet =
 
           class PreferByParamsOrder
-              extends LookupElementWeigher("orderByPosition") {
-            override def weigh(item: LookupElement): Comparable[_] = {
-              ScalaLookupItem.original(item) match {
+              extends LookupElementWeigher("orderByPosition")
+            override def weigh(item: LookupElement): Comparable[_] =
+              ScalaLookupItem.original(item) match
                 case s: ScalaLookupItem =>
-                  s.element match {
+                  s.element match
                     case param: ScParameter
                         if param.name == s.name /*not equals when name computed by type*/ =>
                       val positionInClassParameters =
@@ -104,28 +99,22 @@ class ScalaCaseClassParametersNameContributer
                       else
                         math.abs(currentPosition - positionInClassParameters)
                     case _ => 0
-                  }
                 case _ => null
-              }
-            }
-          }
 
           var sorter =
             CompletionSorter.defaultSorter(parameters, result.getPrefixMatcher)
           sorter = sorter.weighAfter("prefix", new PreferByParamsOrder())
           result.withRelevanceSorter(sorter)
-        }
 
         private def addLocalScalaLookUpItem(
             result: CompletionResultSet,
-            lookupElement: ScalaLookupItem): Unit = {
+            lookupElement: ScalaLookupItem): Unit =
           lookupElement.isLocalVariable = true
           result.addElement(lookupElement)
-        }
 
         private def getCorrespondedParameterForPosition(
             position: PsiElement,
-            classParams: Seq[ScParameter]): ParameterWithPosition = {
+            classParams: Seq[ScParameter]): ParameterWithPosition =
           val me = PsiTreeUtil.getContextOfType(position, classOf[ScPattern])
           if (me == null) return ParameterWithPosition(None, -1)
 
@@ -142,9 +131,7 @@ class ScalaCaseClassParametersNameContributer
               Some(classParams.apply(myPosition)) else None
 
           ParameterWithPosition(coresponedParameter, myPosition)
-        }
 
         case class ParameterWithPosition(
             parameter: Option[ScParameter], position: Int)
-      })
-}
+      )

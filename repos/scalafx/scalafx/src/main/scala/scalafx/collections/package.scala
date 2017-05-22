@@ -35,25 +35,21 @@ import scalafx.delegate.SFXDelegate
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/package-summary.html `javafx.collections`]] package, 
   * adding Scala's collections features to original JavaFX collections.
   */
-package object collections {
+package object collections
 
   private def internalFiller[A, B](
-      originalList: jfxc.ObservableList[A], filler: Iterable[B], f: B => A) {
-    if (null == filler) {
+      originalList: jfxc.ObservableList[A], filler: Iterable[B], f: B => A)
+    if (null == filler)
       originalList.clear()
-    } else {
+    else
       originalList.setAll(filler.map(f(_)))
-    }
-  }
 
   private def internalFillerWithOne[A, B](
-      originalList: jfxc.ObservableList[A], element: B, f: B => A) {
-    if (null == element) {
+      originalList: jfxc.ObservableList[A], element: B, f: B => A)
+    if (null == element)
       originalList.clear()
-    } else {
+    else
       originalList.setAll(List(f(element)))
-    }
-  }
 
   /**
     * Inserts all elements from a Iterable in a JavaFX ObservableList, replacing original content. If this iterable was 
@@ -64,9 +60,8 @@ package object collections {
     * @param filler Iterable which will fill originalList
     */
   def fillCollection[T](
-      originalList: jfxc.ObservableList[T], filler: Iterable[T]) {
+      originalList: jfxc.ObservableList[T], filler: Iterable[T])
     this.internalFiller(originalList, filler, (t: T) => t)
-  }
 
   /**
     * Replaces all content in an ObservableList of type T for a single element. If this element was `null`, the list 
@@ -77,9 +72,8 @@ package object collections {
     * @param element Element which will replace originalList content.
     */
   def fillCollectionWithOne[T](
-      originalList: jfxc.ObservableList[T], element: T) {
+      originalList: jfxc.ObservableList[T], element: T)
     internalFillerWithOne(originalList, element, (t: T) => t)
-  }
 
   /**
     * Inserts all elements from a Iterable of type SFXDelegate[J] in a JavaFX ObservableList of type J, replacing its 
@@ -90,10 +84,9 @@ package object collections {
     * @param filler Iterable which will fill originalList
     */
   def fillSFXCollection[J <: Object](
-      originalList: jfxc.ObservableList[J], filler: Iterable[SFXDelegate[J]]) {
+      originalList: jfxc.ObservableList[J], filler: Iterable[SFXDelegate[J]])
     this.internalFiller(
         originalList, filler, (s: SFXDelegate[J]) => s.delegate)
-  }
 
   /**
     * Replaces all content in an JavaFX ObservableList of type J for a single SFXDelegate[J] element. 
@@ -104,8 +97,6 @@ package object collections {
     * @param element Element which will replace originalList content. Actually, it will used its delegate.
     */
   def fillSFXCollectionWithOne[J <: Object](
-      originalList: jfxc.ObservableList[J], element: SFXDelegate[J]) {
+      originalList: jfxc.ObservableList[J], element: SFXDelegate[J])
     this.internalFillerWithOne(
         originalList, element, (s: SFXDelegate[J]) => s.delegate)
-  }
-}

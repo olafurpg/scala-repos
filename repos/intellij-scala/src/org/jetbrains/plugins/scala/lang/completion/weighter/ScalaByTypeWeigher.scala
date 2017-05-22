@@ -14,10 +14,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
   * Created by kate
   * on 1/25/16
   */
-class ScalaByTypeWeigher extends CompletionWeigher {
+class ScalaByTypeWeigher extends CompletionWeigher
 
   override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+      element: LookupElement, location: CompletionLocation): Comparable[_] =
     import KindWeights._
 
     val position = ScalaCompletionUtil.positionFromParameters(
@@ -32,9 +32,9 @@ class ScalaByTypeWeigher extends CompletionWeigher {
     def isTypeDefiniton = ScalaCompletionUtil.isTypeDefiniton(position)
 
     def typedWeight =
-      ScalaLookupItem.original(element) match {
+      ScalaLookupItem.original(element) match
         case s: ScalaLookupItem =>
-          s.element match {
+          s.element match
             case ta: ScTypeAlias if ta.isLocal => localType
             case ta: ScTypeAlias => typeDefinition
             case te: ScTypeDefinition
@@ -43,17 +43,11 @@ class ScalaByTypeWeigher extends CompletionWeigher {
             case te: ScTypeDefinition => typeDefinition
             case te: PsiClass => typeDefinition
             case _ => normal
-          }
         case _ => null
-      }
 
-    ScalaLookupItem.original(element) match {
+    ScalaLookupItem.original(element) match
       case _ if isTypeDefiniton || isAfterNew => typedWeight
       case _ => null
-    }
-  }
 
-  object KindWeights extends Enumeration {
+  object KindWeights extends Enumeration
     val normal, typeDefinition, localType, top = Value
-  }
-}

@@ -28,7 +28,7 @@ class SimpleConsumer(val host: String,
                      val port: Int,
                      val soTimeout: Int,
                      val bufferSize: Int,
-                     val clientId: String) {
+                     val clientId: String)
 
   private val underlying = new kafka.consumer.SimpleConsumer(
       host, port, soTimeout, bufferSize, clientId)
@@ -42,10 +42,9 @@ class SimpleConsumer(val host: String,
     *  @param request  specifies the topic name, topic partition, starting byte offset, maximum bytes to be fetched.
     *  @return a set of fetched messages
     */
-  def fetch(request: kafka.api.FetchRequest): FetchResponse = {
+  def fetch(request: kafka.api.FetchRequest): FetchResponse =
     import kafka.javaapi.Implicits._
     underlying.fetch(request)
-  }
 
   /**
     *  Fetch a set of messages from a topic.
@@ -53,9 +52,8 @@ class SimpleConsumer(val host: String,
     *  @param request specifies the topic name, topic partition, starting byte offset, maximum bytes to be fetched.
     *  @return a set of fetched messages
     */
-  def fetch(request: kafka.javaapi.FetchRequest): FetchResponse = {
+  def fetch(request: kafka.javaapi.FetchRequest): FetchResponse =
     fetch(request.underlying)
-  }
 
   /**
     *  Fetch metadata for a sequence of topics.
@@ -64,10 +62,9 @@ class SimpleConsumer(val host: String,
     *  @return metadata for each topic in the request.
     */
   def send(request: kafka.javaapi.TopicMetadataRequest)
-    : kafka.javaapi.TopicMetadataResponse = {
+    : kafka.javaapi.TopicMetadataResponse =
     import kafka.javaapi.Implicits._
     underlying.send(request.underlying)
-  }
 
   /**
     *  Get a list of valid offsets (up to maxSize) before the given time.
@@ -75,10 +72,9 @@ class SimpleConsumer(val host: String,
     *  @param request a [[kafka.javaapi.OffsetRequest]] object.
     *  @return a [[kafka.javaapi.OffsetResponse]] object.
     */
-  def getOffsetsBefore(request: OffsetRequest): kafka.javaapi.OffsetResponse = {
+  def getOffsetsBefore(request: OffsetRequest): kafka.javaapi.OffsetResponse =
     import kafka.javaapi.Implicits._
     underlying.getOffsetsBefore(request.underlying)
-  }
 
   /**
     * Commit offsets for a topic to Zookeeper
@@ -86,10 +82,9 @@ class SimpleConsumer(val host: String,
     * @return a [[kafka.javaapi.OffsetCommitResponse]] object.
     */
   def commitOffsets(request: kafka.javaapi.OffsetCommitRequest)
-    : kafka.javaapi.OffsetCommitResponse = {
+    : kafka.javaapi.OffsetCommitResponse =
     import kafka.javaapi.Implicits._
     underlying.commitOffsets(request.underlying)
-  }
 
   /**
     * Fetch offsets for a topic from Zookeeper
@@ -97,12 +92,9 @@ class SimpleConsumer(val host: String,
     * @return a [[kafka.javaapi.OffsetFetchResponse]] object.
     */
   def fetchOffsets(request: kafka.javaapi.OffsetFetchRequest)
-    : kafka.javaapi.OffsetFetchResponse = {
+    : kafka.javaapi.OffsetFetchResponse =
     import kafka.javaapi.Implicits._
     underlying.fetchOffsets(request.underlying)
-  }
 
-  def close() {
+  def close()
     underlying.close
-  }
-}

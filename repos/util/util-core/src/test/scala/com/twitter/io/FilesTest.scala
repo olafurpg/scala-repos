@@ -9,10 +9,10 @@ import org.scalatest.junit.JUnitRunner
 import com.twitter.util.TempFolder
 
 @RunWith(classOf[JUnitRunner])
-class FilesTest extends WordSpec with TempFolder {
-  "Files" should {
+class FilesTest extends WordSpec with TempFolder
+  "Files" should
 
-    "delete" in withTempFolder {
+    "delete" in withTempFolder
       val tempFolder = new File(canonicalFolderName)
 
       val file = new File(tempFolder, "file")
@@ -25,9 +25,5 @@ class FilesTest extends WordSpec with TempFolder {
       assert(subfile.createNewFile() == true)
 
       assert(Files.delete(tempFolder) == true)
-      Seq(file, subfile, folder, tempFolder).foreach { x =>
+      Seq(file, subfile, folder, tempFolder).foreach  x =>
         assert(!x.exists)
-      }
-    }
-  }
-}

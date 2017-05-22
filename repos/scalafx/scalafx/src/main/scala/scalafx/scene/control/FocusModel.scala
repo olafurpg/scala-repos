@@ -36,7 +36,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Object companion for [[scalafx.scene.control.FocusModel]].
   */
-object FocusModel {
+object FocusModel
 
   /**
     * Converts a ScalaFX FocusModel to its JavaFX counterpart
@@ -47,7 +47,6 @@ object FocusModel {
     */
   implicit def sfxFocusModel2jfx[T](v: FocusModel[T]): jfxsc.FocusModel[T] =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/FocusModel.html FocusModel]].
@@ -57,7 +56,7 @@ object FocusModel {
   * @tparam T The type of the underlying data model for the UI control.
   */
 abstract class FocusModel[T](override val delegate: jfxsc.FocusModel[T])
-    extends SFXDelegate[jfxsc.FocusModel[T]] {
+    extends SFXDelegate[jfxsc.FocusModel[T]]
 
   /**
     * The index of the current item in the FocusModel which has the focus.
@@ -74,23 +73,20 @@ abstract class FocusModel[T](override val delegate: jfxsc.FocusModel[T])
     *
     * @param index The index of the item to get focus.
     */
-  def focus(index: Int) {
+  def focus(index: Int)
     delegate.focus(index)
-  }
 
   /**
     * Attempts to give focus to the row after to the currently focused row.
     */
-  def focusNext() {
+  def focusNext()
     delegate.focusNext()
-  }
 
   /**
     * Attempts to give focus to the row previous to the currently focused row.
     */
-  def focusPrevious() {
+  def focusPrevious()
     delegate.focusPrevious()
-  }
 
   /*
    * Returns the number of items in the data model that underpins the control.
@@ -101,4 +97,3 @@ abstract class FocusModel[T](override val delegate: jfxsc.FocusModel[T])
    * Returns the item at the given index.
    */
   //  protected def modelItem(index: Int): T
-}

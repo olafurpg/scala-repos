@@ -41,19 +41,18 @@ case class TestCaseClassForSerialization(x: String, y: Int)
 case class TestValMap(val map: Map[String, Double])
 case class TestValHashMap(val map: HashMap[String, Double])
 
-class KryoTest extends WordSpec with Matchers {
+class KryoTest extends WordSpec with Matchers
 
   implicit def dateParser: DateParser = DateParser.default
 
-  def getSerialization = {
+  def getSerialization =
     val conf = new Configuration
     val chillConf = new HadoopConfig(conf)
     ConfiguredInstantiator.setReflect(
         chillConf, classOf[serialization.KryoHadoop])
     new KryoSerialization(conf)
-  }
 
-  def serObj[T <: AnyRef](in: T) = {
+  def serObj[T <: AnyRef](in: T) =
     val khs = getSerialization
     val ks = khs.getSerializer(in.getClass.asInstanceOf[Class[AnyRef]])
     val out = new BOS
@@ -61,9 +60,8 @@ class KryoTest extends WordSpec with Matchers {
     ks.serialize(in)
     ks.close
     out.toByteArray
-  }
 
-  def deserObj[T <: AnyRef](cls: Class[_], input: Array[Byte]): T = {
+  def deserObj[T <: AnyRef](cls: Class[_], input: Array[Byte]): T =
     val khs = getSerialization
     val ks = khs.getDeserializer(cls.asInstanceOf[Class[AnyRef]])
     val in = new BIS(input)
@@ -72,26 +70,20 @@ class KryoTest extends WordSpec with Matchers {
     val res = ks.deserialize(fakeInputHadoopNeeds.asInstanceOf[T])
     ks.close
     res.asInstanceOf[T]
-  }
-  def singleRT[T <: AnyRef](in: T): T = {
+  def singleRT[T <: AnyRef](in: T): T =
     deserObj[T](in.getClass, serObj(in))
-  }
 
   //These are analogous to how Hadoop will serialize
-  def serialize(ins: List[AnyRef]) = {
-    ins.map { v =>
+  def serialize(ins: List[AnyRef]) =
+    ins.map  v =>
       (v.getClass, serObj(v))
-    }
-  }
-  def deserialize(input: List[(Class[_], Array[Byte])]) = {
-    input.map { tup =>
+  def deserialize(input: List[(Class[_], Array[Byte])]) =
+    input.map  tup =>
       deserObj[AnyRef](tup._1, tup._2)
-    }
-  }
   def serializationRT(ins: List[AnyRef]) = deserialize(serialize(ins))
 
-  "KryoSerializers and KryoDeserializers" should {
-    "round trip any non-array object" in {
+  "KryoSerializers and KryoDeserializers" should
+    "round trip any non-array object" in
       import HyperLogLog._
       implicit val hllmon = new HyperLogLogMonoid(4)
       val test = List(1,
@@ -133,26 +125,22 @@ class KryoTest extends WordSpec with Matchers {
       serializationRT(test) shouldBe test
       // HyperLogLogMonoid doesn't have a good equals. :(
       singleRT(new HyperLogLogMonoid(5)).bits shouldBe 5
-    }
-    "handle arrays" in {
-      def arrayRT[T](arr: Array[T]) {
+    "handle arrays" in
+      def arrayRT[T](arr: Array[T])
         serializationRT(List(arr))(0).asInstanceOf[Array[T]].toList shouldBe
         (arr.toList)
-      }
       arrayRT(Array(0))
       arrayRT(Array(0.1))
       arrayRT(Array("hey"))
       arrayRT(Array((0, 1)))
       arrayRT(Array(None, Nil, None, Nil))
-    }
-    "handle scala singletons" in {
+    "handle scala singletons" in
       val test = List(Nil, None)
       //Serialize each:
       serializationRT(test) shouldBe test
       //Together in a list:
       singleRT(test) shouldBe test
-    }
-    "handle Date, RichDate and DateRange" in {
+    "handle Date, RichDate and DateRange" in
       import DateOps._
       implicit val tz = PACIFIC
       val myDate: RichDate = "1999-12-30T14"
@@ -161,12 +149,8 @@ class KryoTest extends WordSpec with Matchers {
       singleRT(myDate) shouldBe myDate
       singleRT(simpleDate) shouldBe simpleDate
       singleRT(myDateRange) shouldBe myDateRange
-    }
-    "Serialize a giant list" in {
+    "Serialize a giant list" in
       val bigList = (1 to 100000).toList
       val list2 = deserObj[List[Int]](bigList.getClass, serObj(bigList))
       //Specs, it turns out, also doesn't deal with giant lists well:
       list2.zip(bigList).foreach { case (l, r) => l shouldBe r }
-    }
-  }
-}

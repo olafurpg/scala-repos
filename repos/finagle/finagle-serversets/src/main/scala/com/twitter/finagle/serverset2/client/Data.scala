@@ -1,7 +1,7 @@
 package com.twitter.finagle.serverset2.client
 
-private[serverset2] object Data {
-  object ACL {
+private[serverset2] object Data
+  object ACL
 
     /**
       * This ACL gives the world the ability to read.
@@ -17,11 +17,10 @@ private[serverset2] object Data {
       * This ACL gives the creators authentication id's all permissions.
       */
     val CreatorAll = ACL(Perms.All, Id.AuthIds)
-  }
 
   case class ACL(perms: Int, id: Id)
 
-  object Id {
+  object Id
 
     /**
       * This Id represents anyone.
@@ -33,7 +32,6 @@ private[serverset2] object Data {
       * Id's the client authenticated with.
       */
     val AuthIds = Id("auth", "")
-  }
 
   case class Id(scheme: String, id: String)
 
@@ -48,4 +46,3 @@ private[serverset2] object Data {
                   dataLength: Int, // Length of the data field in bytes
                   numChildren: Int, // Number of children of this node
                   pzxid: Long) // ZXID that last modified children of this node
-}

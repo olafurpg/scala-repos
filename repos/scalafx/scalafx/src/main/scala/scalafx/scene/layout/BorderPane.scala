@@ -39,16 +39,15 @@ import scalafx.geometry.Insets._
 import scalafx.scene.Node
 import scalafx.scene.Node._
 
-object BorderPane {
+object BorderPane
   implicit def sfxBorderPane2jfx(v: BorderPane): jfxsl.BorderPane =
     if (v != null) v.delegate else null
 
   /**
     * Removes all borderpane constraints from the child node.
     */
-  def clearConstraints(child: javafx.scene.Node) {
+  def clearConstraints(child: javafx.scene.Node)
     jfxsl.BorderPane.clearConstraints(child)
-  }
 
   /**
     * Returns the child's alignment constraint if set.
@@ -63,21 +62,18 @@ object BorderPane {
   /**
     * Sets the alignment for the child when contained by a borderpane.
     */
-  def setAlignment(child: Node, value: jfxg.Pos) {
+  def setAlignment(child: Node, value: jfxg.Pos)
     jfxsl.BorderPane.setAlignment(child, value)
-  }
 
   /**
     * Sets the margin for the child when contained by a borderpane.
     */
-  def setMargin(child: Node, value: Insets) {
+  def setMargin(child: Node, value: Insets)
     jfxsl.BorderPane.setMargin(child, value)
-  }
-}
 
 class BorderPane(
     override val delegate: jfxsl.BorderPane = new jfxsl.BorderPane())
-    extends Pane(delegate) with SFXDelegate[jfxsl.BorderPane] {
+    extends Pane(delegate) with SFXDelegate[jfxsl.BorderPane]
 
   /**
     * Creates an BorderPane layout with the given Nodes to use for each of the main layout areas of the Border Pane.
@@ -89,39 +85,33 @@ class BorderPane(
     * The node placed on the bottom edge of this border pane.
     */
   def bottom: ObjectProperty[jfxs.Node] = delegate.bottomProperty()
-  def bottom_=(v: Node) {
+  def bottom_=(v: Node)
     ObjectProperty.fillProperty[jfxs.Node](this.bottom, v)
-  }
 
   /**
     * The node placed in the center of this border pane.
     */
   def center: ObjectProperty[jfxs.Node] = delegate.centerProperty()
-  def center_=(v: Node) {
+  def center_=(v: Node)
     ObjectProperty.fillProperty[jfxs.Node](this.center, v)
-  }
 
   /**
     * The node placed on the left edge of this border pane.
     */
   def left: ObjectProperty[jfxs.Node] = delegate.leftProperty()
-  def left_=(v: Node) {
+  def left_=(v: Node)
     ObjectProperty.fillProperty[jfxs.Node](this.left, v)
-  }
 
   /**
     * The node placed on the right edge of this border pane.
     */
   def right: ObjectProperty[jfxs.Node] = delegate.rightProperty()
-  def right_=(v: Node) {
+  def right_=(v: Node)
     ObjectProperty.fillProperty[jfxs.Node](this.right, v)
-  }
 
   /**
     * The node placed on the top edge of this border pane.
     */
   def top: ObjectProperty[jfxs.Node] = delegate.topProperty()
-  def top_=(v: Node) {
+  def top_=(v: Node)
     ObjectProperty.fillProperty[jfxs.Node](this.top, v)
-  }
-}

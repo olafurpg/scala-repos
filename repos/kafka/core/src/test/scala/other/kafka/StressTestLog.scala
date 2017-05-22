@@ -28,10 +28,10 @@ import org.apache.kafka.clients.consumer.OffsetOutOfRangeException
   * A stress test that instantiates a log and then runs continual appends against it from one thread and continual reads against it
   * from another thread and checks a few basic assertions until the user kills the process.
   */
-object StressTestLog {
+object StressTestLog
   val running = new AtomicBoolean(true)
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val dir = TestUtils.randomPartitionLogDir(TestUtils.tempDir())
     val time = new MockTime
     val logProprties = new Properties()
@@ -55,41 +55,35 @@ object StressTestLog {
     Runtime
       .getRuntime()
       .addShutdownHook(
-          new Thread() {
-        override def run() = {
+          new Thread()
+        override def run() =
           running.set(false)
           writer.join()
           reader.join()
           CoreUtils.rm(dir)
-        }
-      })
+      )
 
-    while (running.get) {
+    while (running.get)
       println(
           "Reader offset = %d, writer offset = %d".format(
               reader.offset, writer.offset))
       Thread.sleep(1000)
-    }
-  }
 
-  abstract class WorkerThread extends Thread {
-    override def run() {
-      try {
+  abstract class WorkerThread extends Thread
+    override def run()
+      try
         var offset = 0
         while (running.get) work()
-      } catch {
+      catch
         case e: Exception =>
           e.printStackTrace()
           running.set(false)
-      }
       println(getClass.getName + " exiting...")
-    }
     def work()
-  }
 
-  class WriterThread(val log: Log) extends WorkerThread {
+  class WriterThread(val log: Log) extends WorkerThread
     @volatile var offset = 0
-    override def work() {
+    override def work()
       val logAppendInfo =
         log.append(TestUtils.singleMessageSet(offset.toString.getBytes))
       require(
@@ -97,15 +91,13 @@ object StressTestLog {
           logAppendInfo.lastOffset == offset)
       offset += 1
       if (offset % 1000 == 0) Thread.sleep(500)
-    }
-  }
 
-  class ReaderThread(val log: Log) extends WorkerThread {
+  class ReaderThread(val log: Log) extends WorkerThread
     @volatile var offset = 0
-    override def work() {
-      try {
-        log.read(offset, 1024, Some(offset + 1)).messageSet match {
-          case read: FileMessageSet if read.sizeInBytes > 0 => {
+    override def work()
+      try
+        log.read(offset, 1024, Some(offset + 1)).messageSet match
+          case read: FileMessageSet if read.sizeInBytes > 0 =>
               val first = read.head
               require(
                   first.offset == offset,
@@ -115,12 +107,6 @@ object StressTestLog {
                   "Expected %d but got %d.".format(
                       MessageSet.entrySize(first.message), read.sizeInBytes))
               offset += 1
-            }
           case _ =>
-        }
-      } catch {
+      catch
         case e: OffsetOutOfRangeException => // this is okay
-      }
-    }
-  }
-}

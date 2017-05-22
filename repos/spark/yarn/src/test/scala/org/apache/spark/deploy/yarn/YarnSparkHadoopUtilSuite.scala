@@ -39,30 +39,28 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
 
 class YarnSparkHadoopUtilSuite
     extends SparkFunSuite with Matchers with Logging
-    with ResetSystemProperties {
+    with ResetSystemProperties
 
-  val hasBash = try {
+  val hasBash = try
     val exitCode =
       Runtime.getRuntime().exec(Array("bash", "--version")).waitFor()
     exitCode == 0
-  } catch {
+  catch
     case e: IOException =>
       false
-  }
 
-  if (!hasBash) {
+  if (!hasBash)
     logWarning("Cannot execute bash, skipping bash tests.")
-  }
 
   def bashTest(name: String)(fn: => Unit): Unit =
     if (hasBash) test(name)(fn) else ignore(name)(fn)
 
-  bashTest("shell script escaping") {
+  bashTest("shell script escaping")
     val scriptFile =
       File.createTempFile("script.", ".sh", Utils.createTempDir())
     val args =
       Array("arg1", "${arg.2}", "\"arg3\"", "'arg4'", "$arg5", "\\arg6")
-    try {
+    try
       val argLine =
         args.map(a => YarnSparkHadoopUtil.escapeForShell(a)).mkString(" ")
       Files.write(("bash -c \"echo " + argLine +
@@ -77,12 +75,10 @@ class YarnSparkHadoopUtilSuite
       val exitCode = proc.waitFor()
       exitCode should be(0)
       out should be(args.mkString(" "))
-    } finally {
+    finally
       scriptFile.delete()
-    }
-  }
 
-  test("Yarn configuration override") {
+  test("Yarn configuration override")
     val key = "yarn.nodemanager.hostname"
     val default = new YarnConfiguration()
 
@@ -91,9 +87,8 @@ class YarnSparkHadoopUtilSuite
 
     yarnConf.getClass() should be(classOf[YarnConfiguration])
     yarnConf.get(key) should not be default.get(key)
-  }
 
-  test("test getApplicationAclsForYarn acls on") {
+  test("test getApplicationAclsForYarn acls on")
 
     // spark acls on, just pick up default user
     val sparkConf = new SparkConf()
@@ -105,27 +100,20 @@ class YarnSparkHadoopUtilSuite
     val viewAcls = acls.get(ApplicationAccessType.VIEW_APP)
     val modifyAcls = acls.get(ApplicationAccessType.MODIFY_APP)
 
-    viewAcls match {
-      case Some(vacls) => {
+    viewAcls match
+      case Some(vacls) =>
           val aclSet = vacls.split(',').map(_.trim).toSet
           assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
-      case None => {
+      case None =>
           fail()
-        }
-    }
-    modifyAcls match {
-      case Some(macls) => {
+    modifyAcls match
+      case Some(macls) =>
           val aclSet = macls.split(',').map(_.trim).toSet
           assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
-      case None => {
+      case None =>
           fail()
-        }
-    }
-  }
 
-  test("test getApplicationAclsForYarn acls on and specify users") {
+  test("test getApplicationAclsForYarn acls on and specify users")
 
     // default spark acls are on and specify acls
     val sparkConf = new SparkConf()
@@ -139,87 +127,72 @@ class YarnSparkHadoopUtilSuite
     val viewAcls = acls.get(ApplicationAccessType.VIEW_APP)
     val modifyAcls = acls.get(ApplicationAccessType.MODIFY_APP)
 
-    viewAcls match {
-      case Some(vacls) => {
+    viewAcls match
+      case Some(vacls) =>
           val aclSet = vacls.split(',').map(_.trim).toSet
           assert(aclSet.contains("user1"))
           assert(aclSet.contains("user2"))
           assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
-      case None => {
+      case None =>
           fail()
-        }
-    }
-    modifyAcls match {
-      case Some(macls) => {
+    modifyAcls match
+      case Some(macls) =>
           val aclSet = macls.split(',').map(_.trim).toSet
           assert(aclSet.contains("user3"))
           assert(aclSet.contains("user4"))
           assert(aclSet.contains(System.getProperty("user.name", "invalid")))
-        }
-      case None => {
+      case None =>
           fail()
-        }
-    }
-  }
 
-  test("test expandEnvironment result") {
+  test("test expandEnvironment result")
     val target = Environment.PWD
-    if (classOf[Environment].getMethods().exists(_.getName == "$$")) {
+    if (classOf[Environment].getMethods().exists(_.getName == "$$"))
       YarnSparkHadoopUtil.expandEnvironment(target) should be(
           "{{" + target + "}}")
-    } else if (Utils.isWindows) {
+    else if (Utils.isWindows)
       YarnSparkHadoopUtil.expandEnvironment(target) should be(
           "%" + target + "%")
-    } else {
+    else
       YarnSparkHadoopUtil.expandEnvironment(target) should be("$" + target)
-    }
-  }
 
-  test("test getClassPathSeparator result") {
+  test("test getClassPathSeparator result")
     if (classOf[ApplicationConstants]
           .getFields()
-          .exists(_.getName == "CLASS_PATH_SEPARATOR")) {
+          .exists(_.getName == "CLASS_PATH_SEPARATOR"))
       YarnSparkHadoopUtil.getClassPathSeparator() should be("<CPS>")
-    } else if (Utils.isWindows) {
+    else if (Utils.isWindows)
       YarnSparkHadoopUtil.getClassPathSeparator() should be(";")
-    } else {
+    else
       YarnSparkHadoopUtil.getClassPathSeparator() should be(":")
-    }
-  }
 
-  test("check access nns empty") {
+  test("check access nns empty")
     val sparkConf = new SparkConf()
     val util = new YarnSparkHadoopUtil
     sparkConf.set("spark.yarn.access.namenodes", "")
     val nns = util.getNameNodesToAccess(sparkConf)
     nns should be(Set())
-  }
 
-  test("check access nns unset") {
+  test("check access nns unset")
     val sparkConf = new SparkConf()
     val util = new YarnSparkHadoopUtil
     val nns = util.getNameNodesToAccess(sparkConf)
     nns should be(Set())
-  }
 
-  test("check access nns") {
+  test("check access nns")
     val sparkConf = new SparkConf()
     sparkConf.set("spark.yarn.access.namenodes", "hdfs://nn1:8032")
     val util = new YarnSparkHadoopUtil
     val nns = util.getNameNodesToAccess(sparkConf)
     nns should be(Set(new Path("hdfs://nn1:8032")))
-  }
 
-  test("check access nns space") {
+  test("check access nns space")
     val sparkConf = new SparkConf()
     sparkConf.set("spark.yarn.access.namenodes", "hdfs://nn1:8032, ")
     val util = new YarnSparkHadoopUtil
     val nns = util.getNameNodesToAccess(sparkConf)
     nns should be(Set(new Path("hdfs://nn1:8032")))
-  }
 
-  test("check access two nns") {
+  test("check access two nns")
     val sparkConf = new SparkConf()
     sparkConf.set(
         "spark.yarn.access.namenodes", "hdfs://nn1:8032,hdfs://nn2:8032")
@@ -227,9 +200,8 @@ class YarnSparkHadoopUtilSuite
     val nns = util.getNameNodesToAccess(sparkConf)
     nns should be(
         Set(new Path("hdfs://nn1:8032"), new Path("hdfs://nn2:8032")))
-  }
 
-  test("check token renewer") {
+  test("check token renewer")
     val hadoopConf = new Configuration()
     hadoopConf.set("yarn.resourcemanager.address", "myrm:8033")
     hadoopConf.set(
@@ -237,69 +209,58 @@ class YarnSparkHadoopUtilSuite
     val util = new YarnSparkHadoopUtil
     val renewer = util.getTokenRenewer(hadoopConf)
     renewer should be("yarn/myrm:8032@SPARKTEST.COM")
-  }
 
-  test("check token renewer default") {
+  test("check token renewer default")
     val hadoopConf = new Configuration()
     val util = new YarnSparkHadoopUtil
-    val caught = intercept[SparkException] {
+    val caught = intercept[SparkException]
       util.getTokenRenewer(hadoopConf)
-    }
     assert(
         caught.getMessage === "Can't get Master Kerberos principal for use as renewer")
-  }
 
-  test("check different hadoop utils based on env variable") {
-    try {
+  test("check different hadoop utils based on env variable")
+    try
       System.setProperty("SPARK_YARN_MODE", "true")
       assert(SparkHadoopUtil.get.getClass === classOf[YarnSparkHadoopUtil])
       System.setProperty("SPARK_YARN_MODE", "false")
       assert(SparkHadoopUtil.get.getClass === classOf[SparkHadoopUtil])
-    } finally {
+    finally
       System.clearProperty("SPARK_YARN_MODE")
-    }
-  }
 
-  test("Obtain tokens For HiveMetastore") {
+  test("Obtain tokens For HiveMetastore")
     val hadoopConf = new Configuration()
     hadoopConf.set("hive.metastore.kerberos.principal", "bob")
     // thrift picks up on port 0 and bails out, without trying to talk to endpoint
     hadoopConf.set("hive.metastore.uris", "http://localhost:0")
     val util = new YarnSparkHadoopUtil
-    assertNestedHiveException(intercept[InvocationTargetException] {
+    assertNestedHiveException(intercept[InvocationTargetException]
       util.obtainTokenForHiveMetastoreInner(hadoopConf)
-    })
-    assertNestedHiveException(intercept[InvocationTargetException] {
+    )
+    assertNestedHiveException(intercept[InvocationTargetException]
       util.obtainTokenForHiveMetastore(hadoopConf)
-    })
-  }
+    )
 
   private def assertNestedHiveException(
-      e: InvocationTargetException): Throwable = {
+      e: InvocationTargetException): Throwable =
     val inner = e.getCause
-    if (inner == null) {
+    if (inner == null)
       fail("No inner cause", e)
-    }
-    if (!inner.isInstanceOf[HiveException]) {
+    if (!inner.isInstanceOf[HiveException])
       fail("Not a hive exception", inner)
-    }
     inner
-  }
 
-  test("Obtain tokens For HBase") {
+  test("Obtain tokens For HBase")
     val hadoopConf = new Configuration()
     hadoopConf.set("hbase.security.authentication", "kerberos")
     val util = new YarnSparkHadoopUtil
-    intercept[ClassNotFoundException] {
+    intercept[ClassNotFoundException]
       util.obtainTokenForHBaseInner(hadoopConf)
-    }
     util.obtainTokenForHBase(hadoopConf) should be(None)
-  }
 
   // This test needs to live here because it depends on isYarnMode returning true, which can only
   // happen in the YARN module.
-  test("security manager token generation") {
-    try {
+  test("security manager token generation")
+    try
       System.setProperty("SPARK_YARN_MODE", "true")
       val initial = SparkHadoopUtil.get.getSecretKeyFromUserCredentials(
           SecurityManager.SECRET_LOOKUP_KEY)
@@ -316,12 +277,9 @@ class YarnSparkHadoopUtilSuite
       val genString = new Text(generated).toString()
       assert(genString != "unused")
       assert(sm.getSecretKey() === genString)
-    } finally {
+    finally
       // removeSecretKey() was only added in Hadoop 2.6, so instead we just set the secret
       // to an empty string.
       SparkHadoopUtil.get.addSecretKeyToUserCredentials(
           SecurityManager.SECRET_LOOKUP_KEY, "")
       System.clearProperty("SPARK_YARN_MODE")
-    }
-  }
-}

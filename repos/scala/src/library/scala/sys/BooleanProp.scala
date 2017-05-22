@@ -13,7 +13,7 @@ import scala.language.implicitConversions
 
 /** A few additional conveniences for Boolean properties.
   */
-trait BooleanProp extends Prop[Boolean] {
+trait BooleanProp extends Prop[Boolean]
 
   /** The semantics of value are determined at Prop creation.  See methods
     *  `valueIsTrue` and `keyExists` in object BooleanProp for examples.
@@ -30,22 +30,19 @@ trait BooleanProp extends Prop[Boolean] {
 
   /** Toggle the property between enabled and disabled states. */
   def toggle(): Unit
-}
 
-object BooleanProp {
+object BooleanProp
   private[sys] class BooleanPropImpl(key: String, valueFn: String => Boolean)
-      extends PropImpl(key, valueFn) with BooleanProp {
+      extends PropImpl(key, valueFn) with BooleanProp
     override def setValue[T1 >: Boolean](newValue: T1): Boolean =
-      newValue match {
+      newValue match
         case x: Boolean if !x => val old = value; clear(); old
         case x => super.setValue(newValue)
-      }
     def enable() = this setValue true
     def disable() = this.clear()
     def toggle() = if (value) disable() else enable()
-  }
   private[sys] class ConstantImpl(val key: String, val value: Boolean)
-      extends BooleanProp {
+      extends BooleanProp
     val isSet = value
     def set(newValue: String) = "" + value
     def setValue[T1 >: Boolean](newValue: T1): Boolean = value
@@ -55,7 +52,6 @@ object BooleanProp {
     //def or[T1 >: Boolean](alt: => T1): T1 = if (value) true else alt
 
     protected def zero = false
-  }
 
   /** The java definition of property truth is that the key be in the map and
     *  the value be equal to the String "true", case insensitively.  This method
@@ -82,4 +78,3 @@ object BooleanProp {
     new ConstantImpl(key, isOn)
 
   implicit def booleanPropAsBoolean(b: BooleanProp): Boolean = b.value
-}

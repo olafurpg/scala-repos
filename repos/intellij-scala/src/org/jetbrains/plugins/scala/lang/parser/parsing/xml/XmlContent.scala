@@ -18,9 +18,9 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *              | Comment
  */
 
-object XmlContent {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
-    builder.getTokenType match {
+object XmlContent
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_START_TAG_START =>
         Element parse builder
       case ScalaXmlTokenTypes.XML_COMMENT_START =>
@@ -30,6 +30,3 @@ object XmlContent {
       case ScalaXmlTokenTypes.XML_PI_START =>
         PI parse builder
       case _ => false
-    }
-  }
-}

@@ -40,13 +40,11 @@ import com.fasterxml.jackson.databind.{ObjectMapper, SerializationFeature}
   */
 @Provider
 @Produces(Array(MediaType.APPLICATION_JSON))
-private[v1] class JacksonMessageWriter extends MessageBodyWriter[Object] {
+private[v1] class JacksonMessageWriter extends MessageBodyWriter[Object]
 
-  val mapper = new ObjectMapper() {
-    override def writeValueAsString(t: Any): String = {
+  val mapper = new ObjectMapper()
+    override def writeValueAsString(t: Any): String =
       super.writeValueAsString(t)
-    }
-  }
   mapper.registerModule(com.fasterxml.jackson.module.scala.DefaultScalaModule)
   mapper.enable(SerializationFeature.INDENT_OUTPUT)
   mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -55,9 +53,8 @@ private[v1] class JacksonMessageWriter extends MessageBodyWriter[Object] {
   override def isWriteable(aClass: Class[_],
                            `type`: Type,
                            annotations: Array[Annotation],
-                           mediaType: MediaType): Boolean = {
+                           mediaType: MediaType): Boolean =
     true
-  }
 
   override def writeTo(t: Object,
                        aClass: Class[_],
@@ -65,28 +62,22 @@ private[v1] class JacksonMessageWriter extends MessageBodyWriter[Object] {
                        annotations: Array[Annotation],
                        mediaType: MediaType,
                        multivaluedMap: MultivaluedMap[String, AnyRef],
-                       outputStream: OutputStream): Unit = {
-    t match {
+                       outputStream: OutputStream): Unit =
+    t match
       case ErrorWrapper(err) =>
         outputStream.write(err.getBytes(StandardCharsets.UTF_8))
       case _ => mapper.writeValue(outputStream, t)
-    }
-  }
 
   override def getSize(t: Object,
                        aClass: Class[_],
                        `type`: Type,
                        annotations: Array[Annotation],
-                       mediaType: MediaType): Long = {
+                       mediaType: MediaType): Long =
     -1L
-  }
-}
 
-private[spark] object JacksonMessageWriter {
-  def makeISODateFormat: SimpleDateFormat = {
+private[spark] object JacksonMessageWriter
+  def makeISODateFormat: SimpleDateFormat =
     val iso8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'GMT'")
     val cal = Calendar.getInstance(new SimpleTimeZone(0, "GMT"))
     iso8601.setCalendar(cal)
     iso8601
-  }
-}

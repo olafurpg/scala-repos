@@ -1,4 +1,4 @@
-object K {
+object K
   class A
   class B extends A
   def foo(x: B*) = 1
@@ -15,4 +15,3 @@ object K {
   def goo(x: Int) = 2
   /* line: 13 */
   goo(1)
-}

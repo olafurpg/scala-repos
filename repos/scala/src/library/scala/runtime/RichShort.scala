@@ -10,7 +10,7 @@ package scala
 package runtime
 
 final class RichShort(val self: Short)
-    extends AnyVal with ScalaWholeNumberProxy[Short] {
+    extends AnyVal with ScalaWholeNumberProxy[Short]
   protected def num = scala.math.Numeric.ShortIsIntegral
   protected def ord = scala.math.Ordering.Short
 
@@ -29,4 +29,3 @@ final class RichShort(val self: Short)
   override def min(that: Short): Short =
     math.min(self.toInt, that.toInt).toShort
   override def signum: Int = math.signum(self.toInt)
-}

@@ -1,4 +1,4 @@
-trait ObjectGraphMatchers {
+trait ObjectGraphMatchers
   trait A
   trait B
   case class Zoo[-T](x: T)
@@ -6,7 +6,6 @@ trait ObjectGraphMatchers {
 
   /*start*/
   foo(Zoo[A](new A {}), Zoo[B](new B {})) /*end*/
-}
 /*
 Few variants:
 ObjectGraphMatchers.this.B with ObjectGraphMatchers.this.A

@@ -6,7 +6,7 @@ import gitbucket.core.model.Profile._
 import gitbucket.core.util.JGitUtil
 import profile.simple._
 
-trait RepositoryService { self: AccountService =>
+trait RepositoryService  self: AccountService =>
   import RepositoryService._
 
   /**
@@ -27,7 +27,7 @@ trait RepositoryService { self: AccountService =>
                        originUserName: Option[String] = None,
                        parentRepositoryName: Option[String] = None,
                        parentUserName: Option[String] = None)(
-      implicit s: Session): Unit = {
+      implicit s: Session): Unit =
     Repositories insert Repository(userName = userName,
                                    repositoryName = repositoryName,
                                    isPrivate = isPrivate,
@@ -42,17 +42,16 @@ trait RepositoryService { self: AccountService =>
                                    parentRepositoryName = parentRepositoryName)
 
     IssueId insert (userName, repositoryName, 0)
-  }
 
   def renameRepository(
       oldUserName: String,
       oldRepositoryName: String,
       newUserName: String,
-      newRepositoryName: String)(implicit s: Session): Unit = {
-    getAccountByUserName(newUserName).foreach { account =>
-      (Repositories filter { t =>
+      newRepositoryName: String)(implicit s: Session): Unit =
+    getAccountByUserName(newUserName).foreach  account =>
+      (Repositories filter  t =>
         t.byRepository(oldUserName, oldRepositoryName)
-      } firstOption).map { repository =>
+      firstOption).map  repository =>
         Repositories insert repository.copy(userName = newUserName,
                                             repositoryName = newRepositoryName)
 
@@ -95,31 +94,30 @@ trait RepositoryService { self: AccountService =>
           .filter(_.byRepository(oldUserName, oldRepositoryName))
           .list
 
-        Repositories.filter { t =>
+        Repositories.filter  t =>
           (t.originUserName === oldUserName.bind) &&
           (t.originRepositoryName === oldRepositoryName.bind)
-        }.map { t =>
+        .map  t =>
           t.originUserName -> t.originRepositoryName
-        }.update(newUserName, newRepositoryName)
+        .update(newUserName, newRepositoryName)
 
-        Repositories.filter { t =>
+        Repositories.filter  t =>
           (t.parentUserName === oldUserName.bind) &&
           (t.parentRepositoryName === oldRepositoryName.bind)
-        }.map { t =>
+        .map  t =>
           t.originUserName -> t.originRepositoryName
-        }.update(newUserName, newRepositoryName)
+        .update(newUserName, newRepositoryName)
 
         // Updates activity fk before deleting repository because activity is sorted by activityId
         // and it can't be changed by deleting-and-inserting record.
         Activities
           .filter(_.byRepository(oldUserName, oldRepositoryName))
           .list
-          .foreach { activity =>
+          .foreach  activity =>
             Activities
               .filter(_.activityId === activity.activityId.bind)
               .map(x => (x.userName, x.repositoryName))
               .update(newUserName, newRepositoryName)
-          }
 
         deleteRepository(oldUserName, oldRepositoryName)
 
@@ -139,11 +137,11 @@ trait RepositoryService { self: AccountService =>
           .filter(_.byRepository(newUserName, newRepositoryName))
           .list
         Issues.insertAll(
-            issues.map { x =>
+            issues.map  x =>
           x.copy(
               userName = newUserName,
               repositoryName = newRepositoryName,
-              milestoneId = x.milestoneId.map { id =>
+              milestoneId = x.milestoneId.map  id =>
                 newMilestones
                   .find(_.title == milestones
                         .find(_.milestoneId == id)
@@ -151,9 +149,8 @@ trait RepositoryService { self: AccountService =>
                         .title)
                   .get
                   .milestoneId
-              }
           )
-        }: _*)
+        : _*)
 
         PullRequests.insertAll(
             pullRequests.map(_.copy(userName = newUserName,
@@ -178,12 +175,12 @@ trait RepositoryService { self: AccountService =>
                        repositoryName = newRepositoryName)): _*)
 
         // Update source repository of pull requests
-        PullRequests.filter { t =>
+        PullRequests.filter  t =>
           (t.requestUserName === oldUserName.bind) &&
           (t.requestRepositoryName === oldRepositoryName.bind)
-        }.map { t =>
+        .map  t =>
           t.requestUserName -> t.requestRepositoryName
-        }.update(newUserName, newRepositoryName)
+        .update(newUserName, newRepositoryName)
 
         // Convert labelId
         val oldLabelMap = labels.map(x => (x.labelId, x.labelName)).toMap
@@ -200,23 +197,22 @@ trait RepositoryService { self: AccountService =>
                       repositoryName = newRepositoryName
                 )): _*)
 
-        if (account.isGroupAccount) {
+        if (account.isGroupAccount)
           Collaborators.insertAll(getGroupMembers(newUserName).map(m =>
                     Collaborator(newUserName, newRepositoryName, m.userName)): _*)
-        } else {
+        else
           Collaborators.insertAll(collaborators.map(
                   _.copy(userName = newUserName,
                          repositoryName = newRepositoryName)): _*)
-        }
 
         // Update activity messages
-        Activities.filter { t =>
+        Activities.filter  t =>
           (t.message like s"%:${oldUserName}/${oldRepositoryName}]%") ||
           (t.message like s"%:${oldUserName}/${oldRepositoryName}#%") ||
           (t.message like s"%:${oldUserName}/${oldRepositoryName}@%")
-        }.map { t =>
+        .map  t =>
           t.activityId -> t.message
-        }.list.foreach {
+        .list.foreach
           case (activityId, message) =>
             Activities
               .filter(_.activityId === activityId.bind)
@@ -236,13 +232,9 @@ trait RepositoryService { self: AccountService =>
                     .replace(s"[commit:${oldUserName}/${oldRepositoryName}@",
                              s"[commit:${newUserName}/${newRepositoryName}@")
                 )
-        }
-      }
-    }
-  }
 
   def deleteRepository(userName: String, repositoryName: String)(
-      implicit s: Session): Unit = {
+      implicit s: Session): Unit =
     Activities.filter(_.byRepository(userName, repositoryName)).delete
     Collaborators.filter(_.byRepository(userName, repositoryName)).delete
     CommitComments.filter(_.byRepository(userName, repositoryName)).delete
@@ -258,33 +250,30 @@ trait RepositoryService { self: AccountService =>
     Repositories.filter(_.byRepository(userName, repositoryName)).delete
 
     // Update ORIGIN_USER_NAME and ORIGIN_REPOSITORY_NAME
-    Repositories.filter { x =>
+    Repositories.filter  x =>
       (x.originUserName === userName.bind) &&
       (x.originRepositoryName === repositoryName.bind)
-    }.map { x =>
+    .map  x =>
       (x.userName, x.repositoryName)
-    }.list.foreach {
+    .list.foreach
       case (userName, repositoryName) =>
         Repositories
           .filter(_.byRepository(userName, repositoryName))
           .map(x => (x.originUserName ?, x.originRepositoryName ?))
           .update(None, None)
-    }
 
     // Update PARENT_USER_NAME and PARENT_REPOSITORY_NAME
-    Repositories.filter { x =>
+    Repositories.filter  x =>
       (x.parentUserName === userName.bind) &&
       (x.parentRepositoryName === repositoryName.bind)
-    }.map { x =>
+    .map  x =>
       (x.userName, x.repositoryName)
-    }.list.foreach {
+    .list.foreach
       case (userName, repositoryName) =>
         Repositories
           .filter(_.byRepository(userName, repositoryName))
           .map(x => (x.parentUserName ?, x.parentRepositoryName ?))
           .update(None, None)
-    }
-  }
 
   /**
     * Returns the repository names of the specified user.
@@ -304,15 +293,15 @@ trait RepositoryService { self: AccountService =>
     * @return the repository information
     */
   def getRepository(userName: String, repositoryName: String)(
-      implicit s: Session): Option[RepositoryInfo] = {
-    (Repositories filter { t =>
+      implicit s: Session): Option[RepositoryInfo] =
+    (Repositories filter  t =>
       t.byRepository(userName, repositoryName)
-    } firstOption) map { repository =>
+    firstOption) map  repository =>
       // for getting issue count and pull request count
-      val issues = Issues.filter { t =>
+      val issues = Issues.filter  t =>
         t.byRepository(repository.userName, repository.repositoryName) &&
         (t.closed === false.bind)
-      }.map(_.pullRequest).list
+      .map(_.pullRequest).list
 
       new RepositoryInfo(
           JGitUtil.getRepositoryInfo(
@@ -326,8 +315,6 @@ trait RepositoryService { self: AccountService =>
                 .getOrElse(repository.repositoryName)
           ),
           getRepositoryManagers(repository.userName))
-    }
-  }
 
   /**
     * Returns the repositories without private repository that user does not have access right.
@@ -337,38 +324,36 @@ trait RepositoryService { self: AccountService =>
     * @return the repository infomation list
     */
   def getAllRepositories(userName: String)(
-      implicit s: Session): List[(String, String)] = {
-    Repositories.filter { t1 =>
+      implicit s: Session): List[(String, String)] =
+    Repositories.filter  t1 =>
       (t1.isPrivate === false.bind) || (t1.userName === userName.bind) ||
-      (Collaborators.filter { t2 =>
+      (Collaborators.filter  t2 =>
             t2.byRepository(t1.userName, t1.repositoryName) &&
             (t2.collaboratorName === userName.bind)
-          } exists)
-    }.sortBy(_.lastActivityDate desc)
-      .map { t =>
+          exists)
+    .sortBy(_.lastActivityDate desc)
+      .map  t =>
         (t.userName, t.repositoryName)
-      }
       .list
-  }
 
   def getUserRepositories(
       userName: String, withoutPhysicalInfo: Boolean = false)(
-      implicit s: Session): List[RepositoryInfo] = {
-    Repositories.filter { t1 =>
+      implicit s: Session): List[RepositoryInfo] =
+    Repositories.filter  t1 =>
       (t1.userName === userName.bind) ||
-      (Collaborators.filter { t2 =>
+      (Collaborators.filter  t2 =>
             t2.byRepository(t1.userName, t1.repositoryName) &&
             (t2.collaboratorName === userName.bind)
-          } exists)
-    }.sortBy(_.lastActivityDate desc).list.map { repository =>
+          exists)
+    .sortBy(_.lastActivityDate desc).list.map  repository =>
       new RepositoryInfo(
-          if (withoutPhysicalInfo) {
+          if (withoutPhysicalInfo)
             new JGitUtil.RepositoryInfo(repository.userName,
                                         repository.repositoryName)
-          } else {
+          else
             JGitUtil.getRepositoryInfo(repository.userName,
                                        repository.repositoryName)
-          },
+          ,
           repository,
           getForkedCount(
               repository.originUserName.getOrElse(repository.userName),
@@ -376,8 +361,6 @@ trait RepositoryService { self: AccountService =>
                   repository.repositoryName)
           ),
           getRepositoryManagers(repository.userName))
-    }
-  }
 
   /**
     * Returns the list of visible repositories for the specified user.
@@ -392,34 +375,33 @@ trait RepositoryService { self: AccountService =>
   def getVisibleRepositories(loginAccount: Option[Account],
                              repositoryUserName: Option[String] = None,
                              withoutPhysicalInfo: Boolean = false)(
-      implicit s: Session): List[RepositoryInfo] = {
-    (loginAccount match {
+      implicit s: Session): List[RepositoryInfo] =
+    (loginAccount match
       // for Administrators
       case Some(x) if (x.isAdmin) => Repositories
       // for Normal Users
       case Some(x) if (!x.isAdmin) =>
-        Repositories filter { t =>
+        Repositories filter  t =>
           (t.isPrivate === false.bind) || (t.userName === x.userName) ||
-          (Collaborators.filter { t2 =>
+          (Collaborators.filter  t2 =>
                 t2.byRepository(t.userName, t.repositoryName) &&
                 (t2.collaboratorName === x.userName.bind)
-              } exists)
-        }
+              exists)
       // for Guests
       case None => Repositories filter (_.isPrivate === false.bind)
-    }).filter { t =>
-      repositoryUserName.map { userName =>
+    ).filter  t =>
+      repositoryUserName.map  userName =>
         t.userName === userName.bind
-      } getOrElse LiteralColumn(true)
-    }.sortBy(_.lastActivityDate desc).list.map { repository =>
+      getOrElse LiteralColumn(true)
+    .sortBy(_.lastActivityDate desc).list.map  repository =>
       new RepositoryInfo(
-          if (withoutPhysicalInfo) {
+          if (withoutPhysicalInfo)
             new JGitUtil.RepositoryInfo(repository.userName,
                                         repository.repositoryName)
-          } else {
+          else
             JGitUtil.getRepositoryInfo(repository.userName,
                                        repository.repositoryName)
-          },
+          ,
           repository,
           getForkedCount(
               repository.originUserName.getOrElse(repository.userName),
@@ -427,18 +409,14 @@ trait RepositoryService { self: AccountService =>
                   repository.repositoryName)
           ),
           getRepositoryManagers(repository.userName))
-    }
-  }
 
   private def getRepositoryManagers(userName: String)(
       implicit s: Session): Seq[String] =
-    if (getAccountByUserName(userName).exists(_.isGroupAccount)) {
-      getGroupMembers(userName).collect {
+    if (getAccountByUserName(userName).exists(_.isGroupAccount))
+      getGroupMembers(userName).collect
         case x if (x.isManager) => x.userName
-      }
-    } else {
+    else
       Seq(userName)
-    }
 
   /**
     * Updates the last activity date of the repository.
@@ -459,9 +437,8 @@ trait RepositoryService { self: AccountService =>
                             isPrivate: Boolean)(implicit s: Session): Unit =
     Repositories
       .filter(_.byRepository(userName, repositoryName))
-      .map { r =>
+      .map  r =>
         (r.description.?, r.isPrivate, r.updatedDate)
-      }
       .update(description, isPrivate, currentDate)
 
   def saveRepositoryDefaultBranch(
@@ -469,9 +446,8 @@ trait RepositoryService { self: AccountService =>
       implicit s: Session): Unit =
     Repositories
       .filter(_.byRepository(userName, repositoryName))
-      .map { r =>
+      .map  r =>
         r.defaultBranch
-      }
       .update(defaultBranch)
 
   /**
@@ -528,34 +504,31 @@ trait RepositoryService { self: AccountService =>
 
   def hasWritePermission(
       owner: String, repository: String, loginAccount: Option[Account])(
-      implicit s: Session): Boolean = {
-    loginAccount match {
+      implicit s: Session): Boolean =
+    loginAccount match
       case Some(a) if (a.isAdmin) => true
       case Some(a) if (a.userName == owner) => true
       case Some(a)
           if (getCollaborators(owner, repository).contains(a.userName)) =>
         true
       case _ => false
-    }
-  }
 
   private def getForkedCount(userName: String, repositoryName: String)(
       implicit s: Session): Int =
     Query(
-        Repositories.filter { t =>
+        Repositories.filter  t =>
       (t.originUserName === userName.bind) &&
       (t.originRepositoryName === repositoryName.bind)
-    }.length).first
+    .length).first
 
   def getForkedRepositories(userName: String, repositoryName: String)(
       implicit s: Session): List[(String, String)] =
-    Repositories.filter { t =>
+    Repositories.filter  t =>
       (t.originUserName === userName.bind) &&
       (t.originRepositoryName === repositoryName.bind)
-    }.sortBy(_.userName asc).map(t => t.userName -> t.repositoryName).list
-}
+    .sortBy(_.userName asc).map(t => t.userName -> t.repositoryName).list
 
-object RepositoryService {
+object RepositoryService
 
   case class RepositoryInfo(owner: String,
                             name: String,
@@ -566,7 +539,7 @@ object RepositoryService {
                             forkedCount: Int,
                             branchList: Seq[String],
                             tags: Seq[JGitUtil.TagInfo],
-                            managers: Seq[String]) {
+                            managers: Seq[String])
 
     /**
       * Creates instance with issue count and pull request count.
@@ -610,19 +583,15 @@ object RepositoryService {
       RepositoryService.httpUrl(owner, name)
     def sshUrl(implicit context: Context): Option[String] =
       RepositoryService.sshUrl(owner, name)
-  }
 
   def httpUrl(owner: String, name: String)(implicit context: Context): String =
     s"${context.baseUrl}/git/${owner}/${name}.git"
   def sshUrl(
       owner: String, name: String)(implicit context: Context): Option[String] =
-    if (context.settings.ssh) {
-      context.loginAccount.flatMap { loginAccount =>
-        context.settings.sshAddress.map { x =>
+    if (context.settings.ssh)
+      context.loginAccount.flatMap  loginAccount =>
+        context.settings.sshAddress.map  x =>
           s"ssh://${loginAccount.userName}@${x.host}:${x.port}/${owner}/${name}.git"
-        }
-      }
-    } else None
+    else None
   def openRepoUrl(openUrl: String)(implicit context: Context): String =
     s"github-${context.platform}://openRepo/${openUrl}"
-}

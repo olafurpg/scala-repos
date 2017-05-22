@@ -3,7 +3,7 @@ package scalate
 
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest}
 
-trait ScalateRenderSupport { self: ScalatraBase with ScalateSupport =>
+trait ScalateRenderSupport  self: ScalatraBase with ScalateSupport =>
 
   val templateBaseDirectory = "/WEB-INF/scalate/templates"
   val scalateExtension = "ssp"
@@ -21,7 +21,7 @@ trait ScalateRenderSupport { self: ScalatraBase with ScalateSupport =>
              responseContentType: String = "text/html",
              cacheMaxAge: Int = none,
              statusCode: Int = 200)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) {
+      implicit request: HttpServletRequest, response: HttpServletResponse)
     contentType = responseContentType
     response.setHeader(
         "Cache-Control", "public, max-age=%d" format cacheMaxAge)
@@ -30,5 +30,3 @@ trait ScalateRenderSupport { self: ScalatraBase with ScalateSupport =>
         templateEngine.layout(
             "%s/%s.%s".format(templateBaseDirectory, file, scalateExtension),
             params))
-  }
-}

@@ -4,7 +4,7 @@ import java.io.File
 import sbt.internal.util.AttributeKey
 import sbt.internal.inc.classpath.ClassLoaderCache
 
-object BasicKeys {
+object BasicKeys
   val historyPath = AttributeKey[Option[File]](
       "history", "The location where command line history is persisted.", 40)
   val shellPrompt = AttributeKey[State => String](
@@ -27,4 +27,3 @@ object BasicKeys {
       "explicit-global-log-levels",
       "True if the global logging levels were explicitly set by the user.",
       10)
-}

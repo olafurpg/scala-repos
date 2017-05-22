@@ -1,8 +1,7 @@
 import pack._
 
-object Test {
+object Test
   val r = new R
   new r.attr()
   new r.`@`
   new `@`
-}

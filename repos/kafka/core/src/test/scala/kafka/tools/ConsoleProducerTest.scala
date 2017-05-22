@@ -23,7 +23,7 @@ import org.apache.kafka.clients.producer.KafkaProducer
 import org.junit.Assert
 import org.junit.Test
 
-class ConsoleProducerTest {
+class ConsoleProducerTest
 
   val validArgs: Array[String] = Array(
       "--broker-list",
@@ -42,35 +42,31 @@ class ConsoleProducerTest {
   )
 
   @Test
-  def testValidConfigsNewProducer() {
+  def testValidConfigsNewProducer()
     val config = new ConsoleProducer.ProducerConfig(validArgs)
     // New ProducerConfig constructor is package private, so we can't call it directly
     // Creating new Producer to validate instead
     new KafkaProducer[Array[Byte], Array[Byte]](
         ConsoleProducer.getNewProducerProps(config))
-  }
 
   @Test
   @deprecated(
       "This test has been deprecated and it will be removed in a future release.",
       "0.10.0.0")
-  def testValidConfigsOldProducer() {
+  def testValidConfigsOldProducer()
     val config = new ConsoleProducer.ProducerConfig(validArgs)
     new producer.ProducerConfig(ConsoleProducer.getOldProducerProps(config))
-  }
 
   @Test
-  def testInvalidConfigs() {
-    try {
+  def testInvalidConfigs()
+    try
       val config = new ConsoleProducer.ProducerConfig(invalidArgs)
       Assert.fail("Should have thrown an UnrecognizedOptionException")
-    } catch {
+    catch
       case e: joptsimple.OptionException => // expected exception
-    }
-  }
 
   @Test
-  def testParseKeyProp(): Unit = {
+  def testParseKeyProp(): Unit =
     val config = new ConsoleProducer.ProducerConfig(validArgs)
     val reader = Class
       .forName(config.readerClass)
@@ -79,5 +75,3 @@ class ConsoleProducerTest {
     reader.init(System.in, ConsoleProducer.getReaderProps(config))
     assert(reader.keySeparator == "#")
     assert(reader.parseKey == true)
-  }
-}

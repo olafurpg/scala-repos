@@ -1,8 +1,7 @@
 package tests
 
-class A {
+class A
 
   import foo.B
 
   val b: B = new B()
-}

@@ -33,26 +33,22 @@ private[util] class BatchExecutor[In, Out](
 )(
     implicit timer: Timer
 )
-    extends Function1[In, Future[Out]] { batcher =>
+    extends Function1[In, Future[Out]]  batcher =>
   import java.util.logging.Level.WARNING
 
-  class ScheduledFlush(after: Duration, timer: Timer) {
+  class ScheduledFlush(after: Duration, timer: Timer)
     @volatile var cancelled = false
     val task = timer.schedule(after.fromNow) { flush() }
 
-    def cancel() {
+    def cancel()
       cancelled = true
       task.cancel()
-    }
 
-    def flush() {
-      val doAfter = batcher.synchronized {
+    def flush()
+      val doAfter = batcher.synchronized
         if (!cancelled) flushBatch()
         else () => ()
-      }
       doAfter()
-    }
-  }
 
   val log = Logger.getLogger("Future.batched")
 
@@ -61,7 +57,7 @@ private[util] class BatchExecutor[In, Out](
   var scheduled: Option[ScheduledFlush] = scala.None
   var currentBufThreshold = newBufThreshold
 
-  def currentBufPercentile = sizePercentile match {
+  def currentBufPercentile = sizePercentile match
     case tooHigh if tooHigh > 1.0f =>
       log.log(WARNING,
               "value returned for sizePercentile (%f) was > 1.0f, using 1.0",
@@ -76,47 +72,39 @@ private[util] class BatchExecutor[In, Out](
       0.0f
 
     case p => p
-  }
 
   def newBufThreshold =
-    math.round(currentBufPercentile * sizeThreshold) match {
+    math.round(currentBufPercentile * sizeThreshold) match
       case tooLow if tooLow < 1 => 1
       case size => math.min(size, sizeThreshold)
-    }
 
   def apply(t: In): Future[Out] = enqueue(t)
 
-  def enqueue(t: In): Future[Out] = {
+  def enqueue(t: In): Future[Out] =
     val promise = new Promise[Out]
-    val doAfter = synchronized {
+    val doAfter = synchronized
       buf.append((t, promise))
       if (buf.size >= currentBufThreshold) flushBatch()
-      else {
+      else
         scheduleFlushIfNecessary()
         () =>
           ()
-      }
-    }
 
     doAfter()
     promise
-  }
 
   /** Immediately processes all unprocessed requests */
-  def flushNow(): Unit = {
-    val doAfter = synchronized {
+  def flushNow(): Unit =
+    val doAfter = synchronized
       flushBatch()
-    }
 
     doAfter()
-  }
 
-  def scheduleFlushIfNecessary() {
+  def scheduleFlushIfNecessary()
     if (timeThreshold < Duration.Top && scheduled.isEmpty)
       scheduled = Some(new ScheduledFlush(timeThreshold, timer))
-  }
 
-  def flushBatch(): () => Unit = {
+  def flushBatch(): () => Unit =
     // this must be executed within a `synchronized` block.
     val prevBatch = new mutable.ArrayBuffer[(In, Promise[Out])](buf.length)
     buf.copyToBuffer(prevBatch)
@@ -127,29 +115,25 @@ private[util] class BatchExecutor[In, Out](
     currentBufThreshold = newBufThreshold // set the next batch's size
 
     () =>
-      try {
+      try
         executeBatch(prevBatch)
-      } catch {
+      catch
         case e: Throwable =>
           log.log(WARNING,
                   "unhandled exception caught in Future.batched: %s".format(
                       e.toString),
                   e)
-      }
-  }
 
-  def executeBatch(batch: Seq[(In, Promise[Out])]) {
+  def executeBatch(batch: Seq[(In, Promise[Out])])
     val uncancelled =
-      batch filter {
+      batch filter
         case (in, p) =>
-          p.isInterrupted match {
+          p.isInterrupted match
             case Some(_cause) =>
               p.setException(new CancellationException)
               false
 
             case scala.None => true
-          }
-      }
 
     val ins = uncancelled map { case (in, _) => in }
     // N.B. intentionally not linking cancellation of these promises to the execution of the batch
@@ -157,16 +141,12 @@ private[util] class BatchExecutor[In, Out](
     // outlier.
     val promises = uncancelled map { case (_, promise) => promise }
 
-    f(ins) respond {
+    f(ins) respond
       case Return(outs) =>
-        (outs zip promises) foreach {
+        (outs zip promises) foreach
           case (out, p) =>
             p() = Return(out)
-        }
 
       case Throw(e) =>
         val t = Throw(e)
         promises foreach { _ () = t }
-    }
-  }
-}

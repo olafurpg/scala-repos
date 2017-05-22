@@ -30,7 +30,7 @@ import java.io._
 import com.precog.common._
 import com.precog.util._
 
-private[niflheim] object RawLoader {
+private[niflheim] object RawLoader
   private val fmt = DateTimeFormat.forPattern("yyyyMMddHHmmssSSS")
 
   private val utf8 = java.nio.charset.Charset.forName("UTF-8")
@@ -40,26 +40,23 @@ private[niflheim] object RawLoader {
     * 
     *   "##rawlog <id> 1\n"
     */
-  def writeHeader(os: OutputStream, id: Long): Unit = {
+  def writeHeader(os: OutputStream, id: Long): Unit =
     val s = "##rawlog " + id.toString + " 1\n"
     os.write(s.getBytes(utf8))
     os.flush()
-  }
 
   /**
     * Write the given event to 'os'. Each event consists of an
     * 'eventid' and a sequence of Jvalue instances.
     */
-  def writeEvents(os: OutputStream, eventid: Long, values: Seq[JValue]) {
+  def writeEvents(os: OutputStream, eventid: Long, values: Seq[JValue])
     val e = eventid.toString
     os.write(("##start " + e + "\n").getBytes(utf8))
-    values.foreach { j =>
+    values.foreach  j =>
       os.write(j.renderCompact.getBytes(utf8))
       os.write('\n')
-    }
     os.write(("##end " + e + "\n").getBytes(utf8))
     os.flush()
-  }
 
   /**
     * Load the rawlog (using the version 1 format).
@@ -69,33 +66,28 @@ private[niflheim] object RawLoader {
     */
   def load1(id: Long,
             f: File,
-            reader: BufferedReader): (Seq[JValue], Seq[Long], Boolean) = {
+            reader: BufferedReader): (Seq[JValue], Seq[Long], Boolean) =
     val rows = mutable.ArrayBuffer.empty[JValue]
     val events = mutable.ArrayBuffer.empty[(Long, Int)]
     var line = reader.readLine()
     var ok = true
-    while (ok && line != null) {
-      if (line.startsWith("##start ")) {
-        try {
+    while (ok && line != null)
+      if (line.startsWith("##start "))
+        try
           val eventid = line.substring(8).toLong
           val count = loadEvents1(reader, eventid, rows)
-          if (count < 0) {
+          if (count < 0)
             ok = false
-          } else {
+          else
             events.append((eventid, count))
             line = reader.readLine()
-          }
-        } catch {
+        catch
           case _: Exception =>
             ok = false
-        }
-      } else {
+      else
         ok = false
-      }
-    }
     if (!ok) recover1(id, f, rows, events)
     (rows, events.map(_._1), ok)
-  }
 
   /**
     * Generate a "corrupted" rawlog file name.
@@ -111,7 +103,7 @@ private[niflheim] object RawLoader {
   def recover1(id: Long,
                f: File,
                rows: mutable.ArrayBuffer[JValue],
-               events: mutable.ArrayBuffer[(Long, Int)]) {
+               events: mutable.ArrayBuffer[(Long, Int)])
 
     // open a tempfile to write a "corrected" rawlog to, and write the header
     val tmp = File.createTempFile("nilfheim", "recovery")
@@ -121,35 +113,31 @@ private[niflheim] object RawLoader {
     // for each event, write its rows to the rawlog
     var row = 0
     val values = mutable.ArrayBuffer.empty[JValue]
-    events.foreach {
+    events.foreach
       case (eventid, count) =>
         var i = 0
-        while (i < count) {
+        while (i < count)
           values.append(rows(row))
           row += 1
           i += 1
-        }
         writeEvents(os, eventid, values)
         values.clear()
-    }
 
     // rename the rawlog file to indicate corruption
     f.renameTo(getCorruptFile(f))
 
     // rename the tempfile to the rawlog file
     tmp.renameTo(f)
-  }
 
   def isValidEnd1(line: String, eventid: Long): Boolean =
-    try {
+    try
       line.substring(6).toLong == eventid
-    } catch {
+    catch
       case _: Exception => false
-    }
 
   def loadEvents1(reader: BufferedReader,
                   eventid: Long,
-                  rows: mutable.ArrayBuffer[JValue]): Int = {
+                  rows: mutable.ArrayBuffer[JValue]): Int =
     val sofar = mutable.ArrayBuffer.empty[JValue]
 
     var line = reader.readLine()
@@ -157,40 +145,32 @@ private[niflheim] object RawLoader {
     var ok = false
     var count = 0
 
-    while (going && line != null) {
-      if (line.startsWith("##end ")) {
+    while (going && line != null)
+      if (line.startsWith("##end "))
         going = false
         ok = isValidEnd1(line, eventid)
-      } else {
-        try {
+      else
+        try
           sofar.append(JParser.parseUnsafe(line))
           count += 1
           line = reader.readLine()
-        } catch {
+        catch
           case _: Exception =>
             going = false
-        }
-      }
-    }
-    if (ok) {
+    if (ok)
       rows ++= sofar
       count
-    } else {
+    else
       -1
-    }
-  }
 
-  def load(id: Long, f: File): (Seq[JValue], Seq[Long], Boolean) = {
+  def load(id: Long, f: File): (Seq[JValue], Seq[Long], Boolean) =
     val reader = new BufferedReader(
         new InputStreamReader(new FileInputStream(f), utf8))
-    try {
+    try
       val header = reader.readLine()
       if (header == null) sys.error("missing header")
       else if (header == ("##rawlog " + id.toString + " 1"))
         load1(id, f, reader)
       else sys.error("unsupported header: %s" format header)
-    } finally {
+    finally
       reader.close()
-    }
-  }
-}

@@ -16,19 +16,18 @@ import akka.util.ByteString
 import scala.concurrent.duration._
 import scala.concurrent.Future
 
-class FileUploadExamplesSpec extends RoutingSpec {
+class FileUploadExamplesSpec extends RoutingSpec
 
   case class Video(file: File, title: String, author: String)
-  object db {
+  object db
     def create(video: Video): Future[Unit] = Future.successful(Unit)
-  }
 
-  "simple-upload" in {
-    val uploadVideo = path("video") {
-      entity(as[Multipart.FormData]) { formData =>
+  "simple-upload" in
+    val uploadVideo = path("video")
+      entity(as[Multipart.FormData])  formData =>
         // collect all parts of the multipart as it arrives into a map
         val allPartsF: Future[Map[String, Any]] = formData.parts
-          .mapAsync[(String, Any)](1) {
+          .mapAsync[(String, Any)](1)
 
             case b: BodyPart if b.name == "file" =>
               // stream into a file as the chunks of it arrives and return a future
@@ -42,38 +41,30 @@ class FileUploadExamplesSpec extends RoutingSpec {
               // collect form field values
               b.toStrict(2.seconds)
                 .map(strict => (b.name -> strict.entity.data.utf8String))
-          }
           .runFold(Map.empty[String, Any])((map, tuple) => map + tuple)
 
-        val done = allPartsF.map { allParts =>
+        val done = allPartsF.map  allParts =>
           // You would have some better validation/unmarshalling here
           db.create(Video(file = allParts("file").asInstanceOf[File],
                           title = allParts("title").asInstanceOf[String],
                           author = allParts("author").asInstanceOf[String]))
-        }
 
         // when processing have finished create a response for the user
-        onSuccess(allPartsF) { allParts =>
-          complete {
+        onSuccess(allPartsF)  allParts =>
+          complete
             "ok!"
-          }
-        }
-      }
-    }
-  }
 
-  object MetadataActor {
+  object MetadataActor
     case class Entry(id: Long, values: Seq[String])
-  }
   val metadataActor: ActorRef = system.deadLetters
 
-  "stream-csv-upload" in {
+  "stream-csv-upload" in
     val splitLines = Framing.delimiter(ByteString("\n"), 256)
 
-    val csvUploads = path("metadata" / LongNumber) { id =>
-      entity(as[Multipart.FormData]) { formData =>
+    val csvUploads = path("metadata" / LongNumber)  id =>
+      entity(as[Multipart.FormData])  formData =>
         val done: Future[Done] = formData.parts
-          .mapAsync(1) {
+          .mapAsync(1)
             case b: BodyPart if b.filename.exists(_.endsWith(".csv")) =>
               b.entity.dataBytes
                 .via(splitLines)
@@ -81,16 +72,9 @@ class FileUploadExamplesSpec extends RoutingSpec {
                 .runForeach(csv =>
                       metadataActor ! MetadataActor.Entry(id, csv))
             case _ => Future.successful(Done)
-          }
           .runWith(Sink.ignore)
 
         // when processing have finished create a response for the user
-        onSuccess(done) { _ =>
-          complete {
+        onSuccess(done)  _ =>
+          complete
             "ok!"
-          }
-        }
-      }
-    }
-  }
-}

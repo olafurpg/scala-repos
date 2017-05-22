@@ -5,10 +5,10 @@ package play.api.db.evolutions
 
 import org.specs2.mutable.Specification
 
-object ScriptSpec extends Specification {
-  "Script.statements" should {
+object ScriptSpec extends Specification
+  "Script.statements" should
 
-    "separate SQL into semicolon-delimited statements" in {
+    "separate SQL into semicolon-delimited statements" in
       val statements = IndexedSeq("FIRST", "SECOND", "THIRD", "FOURTH")
 
       val scriptStatements = ScriptSansEvolution(s"""
@@ -17,9 +17,8 @@ object ScriptSpec extends Specification {
         ${statements(1)}; ${statements(2)};${statements(3)};""").statements
 
       scriptStatements.toList must beEqualTo(statements.toList)
-    }
 
-    "not delimit statements on double-semicolons, rather escaping them to a single semicolon" in {
+    "not delimit statements on double-semicolons, rather escaping them to a single semicolon" in
       val statements = IndexedSeq(
           "SELECT * FROM punctuation WHERE characters = ';' OR characters = ';;'",
           "DROP the_beat"
@@ -33,9 +32,8 @@ object ScriptSpec extends Specification {
         ${statementsWithEscapeSequence(1)};""").statements
 
       scriptStatements.toList must beEqualTo(statements.toList)
-    }
 
-    "not produce an empty-string trailing statement if the script ends with a new-line" in {
+    "not produce an empty-string trailing statement if the script ends with a new-line" in
       val statement = "SELECT cream_filling FROM twinkies"
 
       val scriptStatements = ScriptSansEvolution(s"""
@@ -43,16 +41,13 @@ object ScriptSpec extends Specification {
       """).statements
 
       scriptStatements.toList must beEqualTo(List(statement))
-    }
-  }
 
-  private case class ScriptSansEvolution(sql: String) extends Script {
+  private case class ScriptSansEvolution(sql: String) extends Script
     override val evolution = Evolution(0, "", "")
-  }
 
-  "Conflicts" should {
+  "Conflicts" should
 
-    "not be noticed if there aren't any" in {
+    "not be noticed if there aren't any" in
 
       val downRest = (9 to 1).reverse
         .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
@@ -63,9 +58,8 @@ object ScriptSpec extends Specification {
 
       conflictingDowns.size must beEqualTo(0)
       conflictingUps.size must beEqualTo(0)
-    }
 
-    "be noticed on the most recent one" in {
+    "be noticed on the most recent one" in
 
       val downRest = (1 to 9).reverse
         .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
@@ -81,9 +75,8 @@ object ScriptSpec extends Specification {
       conflictingUps.size must beEqualTo(1)
       conflictingDowns(0).revision must beEqualTo(9)
       conflictingUps(0).revision must beEqualTo(9)
-    }
 
-    "be noticed in the middle" in {
+    "be noticed in the middle" in
 
       val downRest = (1 to 9).reverse
         .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
@@ -102,9 +95,8 @@ object ScriptSpec extends Specification {
       conflictingUps(0).revision must beEqualTo(9)
       conflictingDowns(4).revision must beEqualTo(5)
       conflictingUps(4).revision must beEqualTo(5)
-    }
 
-    "be noticed on the first" in {
+    "be noticed on the first" in
 
       val downRest = (1 to 9).reverse
         .map(i => Evolution(i, s"DummySQLUP$i", s"DummySQLDOWN$i"))
@@ -122,6 +114,3 @@ object ScriptSpec extends Specification {
       conflictingUps(0).revision must beEqualTo(9)
       conflictingDowns(8).revision must beEqualTo(1)
       conflictingUps(8).revision must beEqualTo(1)
-    }
-  }
-}

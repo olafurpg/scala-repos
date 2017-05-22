@@ -16,7 +16,7 @@ import scala.reflect.internal.util._
   * TODO: Move external clients (sbt/ide/partest) to reflect.internal.Reporter,
   *       and remove this class.
   */
-abstract class Reporter extends scala.reflect.internal.Reporter {
+abstract class Reporter extends scala.reflect.internal.Reporter
 
   /** Informational messages. If `!force`, they may be suppressed. */
   final def info(pos: Position, msg: String, force: Boolean): Unit =
@@ -38,18 +38,16 @@ abstract class Reporter extends scala.reflect.internal.Reporter {
 
   override def hasErrors: Boolean = super.hasErrors || cancelled
 
-  override def reset(): Unit = {
+  override def reset(): Unit =
     super.reset()
     cancelled = false
-  }
 
   // the below is copy/pasted from ReporterImpl for now
   // partest expects this inner class
   // TODO: rework partest to use the scala.reflect.internal interface,
   //       remove duplication here, and consolidate reflect.internal.{ReporterImpl & ReporterImpl}
-  class Severity(val id: Int)(name: String) {
+  class Severity(val id: Int)(name: String)
     var count: Int = 0; override def toString = name
-  }
   object INFO extends Severity(0)("INFO")
   object WARNING extends Severity(1)("WARNING")
   // reason for copy/paste: this is used by partest (must be a val, not an object)
@@ -58,4 +56,3 @@ abstract class Reporter extends scala.reflect.internal.Reporter {
 
   def count(severity: Severity): Int = severity.count
   def resetCount(severity: Severity): Unit = severity.count = 0
-}

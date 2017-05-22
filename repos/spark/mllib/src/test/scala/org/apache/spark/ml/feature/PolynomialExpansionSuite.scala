@@ -29,11 +29,10 @@ import org.apache.spark.sql.Row
 
 class PolynomialExpansionSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new PolynomialExpansion)
-  }
 
   private val data = Array(
       Vectors.sparse(3, Seq((0, -2.0), (1, 2.3))),
@@ -79,7 +78,7 @@ class PolynomialExpansionSuite
                     -27.0),
       Vectors.sparse(19, Array.empty, Array.empty))
 
-  test("Polynomial expansion with default parameter") {
+  test("Polynomial expansion with default parameter")
     val df = sqlContext
       .createDataFrame(data.zip(twoDegreeExpansion))
       .toDF("features", "expected")
@@ -92,7 +91,7 @@ class PolynomialExpansionSuite
       .transform(df)
       .select("polyFeatures", "expected")
       .collect()
-      .foreach {
+      .foreach
         case Row(expanded: DenseVector, expected: DenseVector) =>
           assert(expanded ~== expected absTol 1e-1)
         case Row(expanded: SparseVector, expected: SparseVector) =>
@@ -100,10 +99,8 @@ class PolynomialExpansionSuite
         case _ =>
           throw new TestFailedException(
               "Unmatched data types after polynomial expansion", 0)
-      }
-  }
 
-  test("Polynomial expansion with setter") {
+  test("Polynomial expansion with setter")
     val df = sqlContext
       .createDataFrame(data.zip(threeDegreeExpansion))
       .toDF("features", "expected")
@@ -117,7 +114,7 @@ class PolynomialExpansionSuite
       .transform(df)
       .select("polyFeatures", "expected")
       .collect()
-      .foreach {
+      .foreach
         case Row(expanded: DenseVector, expected: DenseVector) =>
           assert(expanded ~== expected absTol 1e-1)
         case Row(expanded: SparseVector, expected: SparseVector) =>
@@ -125,10 +122,8 @@ class PolynomialExpansionSuite
         case _ =>
           throw new TestFailedException(
               "Unmatched data types after polynomial expansion", 0)
-      }
-  }
 
-  test("Polynomial expansion with degree 1 is identity on vectors") {
+  test("Polynomial expansion with degree 1 is identity on vectors")
     val df =
       sqlContext.createDataFrame(data.zip(data)).toDF("features", "expected")
 
@@ -141,20 +136,16 @@ class PolynomialExpansionSuite
       .transform(df)
       .select("polyFeatures", "expected")
       .collect()
-      .foreach {
+      .foreach
         case Row(expanded: Vector, expected: Vector) =>
           assert(expanded ~== expected absTol 1e-1)
         case _ =>
           throw new TestFailedException(
               "Unmatched data types after polynomial expansion", 0)
-      }
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new PolynomialExpansion()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setDegree(3)
     testDefaultReadWrite(t)
-  }
-}

@@ -24,8 +24,8 @@ import org.apache.spark.sql.hive.test.TestHive
 /**
   * A set of tests that validates support for Hive SerDe.
   */
-class HiveSerDeSuite extends HiveComparisonTest with BeforeAndAfterAll {
-  override def beforeAll(): Unit = {
+class HiveSerDeSuite extends HiveComparisonTest with BeforeAndAfterAll
+  override def beforeAll(): Unit =
     import TestHive._
     import org.apache.hadoop.hive.serde2.RegexSerDe
     super.beforeAll()
@@ -35,7 +35,6 @@ class HiveSerDeSuite extends HiveComparisonTest with BeforeAndAfterAll {
        |WITH SERDEPROPERTIES ("input.regex" = "([^ ]*)\t([^ ]*)")
        """.stripMargin)
     sql(s"LOAD DATA LOCAL INPATH '${getHiveFile("data/files/sales.txt")}' INTO TABLE sales")
-  }
 
   // table sales is not a cache table, and will be clear after reset
   createQueryTest("Read with RegexSerDe", "SELECT * FROM sales", false)
@@ -47,4 +46,3 @@ class HiveSerDeSuite extends HiveComparisonTest with BeforeAndAfterAll {
 
   createQueryTest(
       "Read Partitioned with AvroSerDe", "SELECT * FROM episodes_part")
-}

@@ -4,8 +4,8 @@ class C0[@specialized(Int, AnyRef) A,
          @specialized(Int, AnyRef) B,
          @specialized(Int, AnyRef) C]()
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     def show(x: Any) = println(x.getClass.getName)
 
     show(new A0[Int]())
@@ -24,5 +24,3 @@ object Test {
     show(new C0[AnyRef, Int, AnyRef]())
     show(new C0[AnyRef, AnyRef, Int]())
     show(new C0[AnyRef, AnyRef, AnyRef]())
-  }
-}

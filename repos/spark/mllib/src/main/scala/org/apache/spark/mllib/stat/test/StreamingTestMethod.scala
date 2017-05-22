@@ -35,7 +35,7 @@ import org.apache.spark.util.StatCounter
   * should extend [[StreamingTestMethod]] and introduce a new entry in
   * [[StreamingTestMethod.TEST_NAME_TO_OBJECT]]
   */
-private[stat] sealed trait StreamingTestMethod extends Serializable {
+private[stat] sealed trait StreamingTestMethod extends Serializable
 
   val methodName: String
   val nullHypothesis: String
@@ -55,7 +55,7 @@ private[stat] sealed trait StreamingTestMethod extends Serializable {
     * the t-testing libraries.
     */
   protected implicit def toApacheCommonsStats(
-      summaryStats: StatCounter): StatisticalSummaryValues = {
+      summaryStats: StatCounter): StatisticalSummaryValues =
     new StatisticalSummaryValues(
         summaryStats.mean,
         summaryStats.variance,
@@ -64,8 +64,6 @@ private[stat] sealed trait StreamingTestMethod extends Serializable {
         summaryStats.min,
         summaryStats.mean * summaryStats.count
     )
-  }
-}
 
 /**
   * Performs Welch's 2-sample t-test. The null hypothesis is that the two data sets have equal mean.
@@ -74,7 +72,7 @@ private[stat] sealed trait StreamingTestMethod extends Serializable {
   *
   * @see http://en.wikipedia.org/wiki/Welch%27s_t_test
   */
-private[stat] object WelchTTest extends StreamingTestMethod with Logging {
+private[stat] object WelchTTest extends StreamingTestMethod with Logging
 
   override final val methodName = "Welch's 2-sample t-test"
   override final val nullHypothesis = "Both groups have same mean"
@@ -85,9 +83,9 @@ private[stat] object WelchTTest extends StreamingTestMethod with Logging {
     data.map[StreamingTestResult]((test _).tupled)
 
   private def test(
-      statsA: StatCounter, statsB: StatCounter): StreamingTestResult = {
+      statsA: StatCounter, statsB: StatCounter): StreamingTestResult =
     def welchDF(sample1: StatisticalSummaryValues,
-                sample2: StatisticalSummaryValues): Double = {
+                sample2: StatisticalSummaryValues): Double =
       val s1 = sample1.getVariance
       val n1 = sample1.getN
       val s2 = sample2.getVariance
@@ -97,7 +95,6 @@ private[stat] object WelchTTest extends StreamingTestMethod with Logging {
       val b = pow(s2, 2) / n2
 
       pow(a + b, 2) / ((pow(a, 2) / (n1 - 1)) + (pow(b, 2) / (n2 - 1)))
-    }
 
     new StreamingTestResult(
         tTester.get.tTest(statsA, statsB),
@@ -106,8 +103,6 @@ private[stat] object WelchTTest extends StreamingTestMethod with Logging {
         methodName,
         nullHypothesis
     )
-  }
-}
 
 /**
   * Performs Students's 2-sample t-test. The null hypothesis is that the two data sets have equal
@@ -116,7 +111,7 @@ private[stat] object WelchTTest extends StreamingTestMethod with Logging {
   *
   * @see http://en.wikipedia.org/wiki/Student%27s_t-test
   */
-private[stat] object StudentTTest extends StreamingTestMethod with Logging {
+private[stat] object StudentTTest extends StreamingTestMethod with Logging
 
   override final val methodName = "Student's 2-sample t-test"
   override final val nullHypothesis = "Both groups have same mean"
@@ -127,7 +122,7 @@ private[stat] object StudentTTest extends StreamingTestMethod with Logging {
     data.map[StreamingTestResult]((test _).tupled)
 
   private def test(
-      statsA: StatCounter, statsB: StatCounter): StreamingTestResult = {
+      statsA: StatCounter, statsB: StatCounter): StreamingTestResult =
     def studentDF(sample1: StatisticalSummaryValues,
                   sample2: StatisticalSummaryValues): Double =
       sample1.getN + sample2.getN - 2
@@ -139,8 +134,6 @@ private[stat] object StudentTTest extends StreamingTestMethod with Logging {
         methodName,
         nullHypothesis
     )
-  }
-}
 
 /**
   * Companion object holding supported [[StreamingTestMethod]] names and handles conversion between
@@ -148,17 +141,15 @@ private[stat] object StudentTTest extends StreamingTestMethod with Logging {
   *
   * Currently supported tests: `welch`, `student`.
   */
-private[stat] object StreamingTestMethod {
+private[stat] object StreamingTestMethod
   // Note: after new `StreamingTestMethod`s are implemented, please update this map.
   private final val TEST_NAME_TO_OBJECT: Map[String, StreamingTestMethod] =
     Map("welch" -> WelchTTest, "student" -> StudentTTest)
 
   def getTestMethodFromName(method: String): StreamingTestMethod =
-    TEST_NAME_TO_OBJECT.get(method) match {
+    TEST_NAME_TO_OBJECT.get(method) match
       case Some(test) => test
       case None =>
         throw new IllegalArgumentException(
             "Unrecognized method name. Supported streaming test methods: " +
             TEST_NAME_TO_OBJECT.keys.mkString(", "))
-    }
-}

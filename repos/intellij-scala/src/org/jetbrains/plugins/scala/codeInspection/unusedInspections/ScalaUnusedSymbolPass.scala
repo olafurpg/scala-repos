@@ -36,7 +36,7 @@ import scala.collection.mutable
 
 // TODO merge with UnusedImportPass (?)
 class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
-    extends TextEditorHighlightingPass(file.getProject, editor.getDocument) {
+    extends TextEditorHighlightingPass(file.getProject, editor.getDocument)
   val findUsageProvider: FindUsagesProvider =
     LanguageFindUsages.INSTANCE.forLanguage(ScalaFileType.SCALA_LANGUAGE)
   val highlightInfos = mutable.Buffer[HighlightInfo]()
@@ -53,8 +53,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
 
   def doCollectInformation(progress: ProgressIndicator) {}
 
-  def doApplyInformationToEditor() {
-    file match {
+  def doApplyInformationToEditor()
+    file match
       case sFile: ScalaFile
           if HighlightingLevelManager
             .getInstance(file.getProject)
@@ -78,10 +78,8 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
                                                        getColorsScheme,
                                                        getId)
       case _ =>
-    }
-  }
 
-  private def processScalaFile(sFile: ScalaFile) {
+  private def processScalaFile(sFile: ScalaFile)
     val annotationHolder = new AnnotationHolderImpl(
         new AnnotationSession(file))
     val annotations = mutable.Buffer[Annotation]()
@@ -90,98 +88,83 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
     val config = state.config
     if (!config.checkLocalAssign && !config.checkLocalUnused) return
 
-    sFile.depthFirst.foreach {
+    sFile.depthFirst.foreach
       case x: ScDeclaredElementsHolder =>
         processDeclaredElementHolder(x, state)
       case _ =>
-    }
 
     highlightInfos ++= annotations.map(HighlightInfo.fromAnnotation)
-  }
 
-  def readConfig(sFile: ScalaFile): UnusedConfig = {
+  def readConfig(sFile: ScalaFile): UnusedConfig =
     val profile: InspectionProfile = InspectionProjectProfileManager
       .getInstance(myProject)
       .getInspectionProfile
     def isEnabled(shortName: String) =
       profile.isToolEnabled(HighlightDisplayKey.find(shortName), sFile)
-    def severity(shortName: String) = {
+    def severity(shortName: String) =
       val key = HighlightDisplayKey.find(shortName)
       key.toOption.map(profile.getErrorLevel(_, sFile).getSeverity).orNull
-    }
     val localUnusedShortName = ScalaUnusedSymbolInspection.ShortName
     val localAssignShortName = VarCouldBeValInspection.ShortName
     UnusedConfig(isEnabled(localUnusedShortName),
                  severity(localUnusedShortName),
                  isEnabled(localAssignShortName),
                  severity(localAssignShortName))
-  }
 
   private def processDeclaredElementHolder(
-      x: ScDeclaredElementsHolder, state: UnusedPassState) {
-    x.getContext match {
+      x: ScDeclaredElementsHolder, state: UnusedPassState)
+    x.getContext match
       case _: ScPackageLike | _: ScalaFile | _: ScEarlyDefinitions =>
       // ignore, too expensive to check for references.
       case _: ScTemplateBody =>
-        x match {
+        x match
           case mem: ScMember
               if mem.getModifierList.accessModifier
                 .exists(_.isUnqualifiedPrivateOrThis) =>
             processLocalDeclaredElementHolder(x, state)
           case _ => // ignore.
-        }
       case _
           if state.config.checkLocalAssign || state.config.checkLocalUnused =>
         processLocalDeclaredElementHolder(x, state)
       case _ =>
-    }
-  }
 
   /** Processes a ScDeclaredElementsHolder that is not accessible outside of the defining class/companion, ie locals or private or private[this] */
   private def processLocalDeclaredElementHolder(
-      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState) {
-    val isSpecialDef = declElementHolder match {
+      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState)
+    val isSpecialDef = declElementHolder match
       case x: PsiMethod => ScFunction.isSpecial(x.name)
       case _ => false
-    }
-    val isImplicit = declElementHolder match {
+    val isImplicit = declElementHolder match
       case x: ScMember => x.hasModifierProperty("implicit")
       case _ => false
-    }
-    if (!isSpecialDef && !isImplicit) {
+    if (!isSpecialDef && !isImplicit)
       checkUnusedAndVarCouldBeVal(declElementHolder, state)
-    }
-  }
 
   /** Highlight unused local symbols, and vals that could be vars */
   private def checkUnusedAndVarCouldBeVal(
-      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState) {
+      declElementHolder: ScDeclaredElementsHolder, state: UnusedPassState)
     val isVar = declElementHolder.isInstanceOf[ScVariableDefinition]
 
     var hasAssign = !state.config.checkLocalAssign || !isVar
     var hasAtLeastOneUnusedHighlight = false
     var hasAtLeastOneAssign = false
     val decElemIterator = declElementHolder.declaredElements.iterator
-    while (decElemIterator.hasNext) {
+    while (decElemIterator.hasNext)
       val elem = decElemIterator.next()
-      elem match {
+      elem match
         case decElem: ScNamedElement =>
           val holder = ScalaRefCountHolder.getInstance(file)
           var used = false
-          val runnable = new Runnable {
-            def run() {
-              if (holder.isValueWriteUsed(decElem)) {
+          val runnable = new Runnable
+            def run()
+              if (holder.isValueWriteUsed(decElem))
                 hasAssign = true
                 used = true
-              }
-              if (holder.isValueReadUsed(decElem)) {
+              if (holder.isValueReadUsed(decElem))
                 used = true
-              }
-            }
-          }
           holder.retrieveUnusedReferencesInfo(runnable)
           if (!used && state.config.checkLocalUnused &&
-              !isUnusedSymbolSuppressed(decElem)) {
+              !isUnusedSymbolSuppressed(decElem))
             hasAtLeastOneUnusedHighlight = true
             val elementTypeDesc = findUsageProvider.getType(declElementHolder)
             val severity = state.config.localUnusedSeverity
@@ -194,19 +177,15 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
               state.annotationHolder.createAnnotation(severity, range, message)
             annotation.registerFix(new DeleteElementFix(elem), range, key)
             state.annotations += annotation
-          }
           if (hasAssign) hasAtLeastOneAssign = true
         case _ =>
-      }
-    }
     if (isVar && !hasAtLeastOneAssign && !hasAtLeastOneUnusedHighlight &&
-        !isVarCouldBeValSuppressed(declElementHolder)) {
-      val (message, nameOpt) = declElementHolder.declaredElements match {
+        !isVarCouldBeValSuppressed(declElementHolder))
+      val (message, nameOpt) = declElementHolder.declaredElements match
         case Seq(n: ScNamedElement) =>
           ("var '%s' could be a val".format(n.name), Some(n.name))
         case _ =>
           ("var could be a val", None)
-      }
       val severity = state.config.localAssignSeverity
       val start = declElementHolder
         .asInstanceOf[ScVariableDefinition]
@@ -222,28 +201,23 @@ class ScalaUnusedSymbolPass(file: PsiFile, editor: Editor)
           declElementHolder.asInstanceOf[ScVariableDefinition], nameOpt)
       annotation.registerFix(fix, range, key)
       state.annotations += annotation
-    }
-  }
 
   import scala.collection.JavaConversions._
   override def getInfos: java.util.List[HighlightInfo] = highlightInfos.toList
 
-  private def isUnusedSymbolSuppressed(element: PsiElement) = {
+  private def isUnusedSymbolSuppressed(element: PsiElement) =
     inspectionSuppressor.isSuppressedFor(
         element, ScalaUnusedSymbolInspection.ShortName)
-  }
 
-  private def isVarCouldBeValSuppressed(element: PsiElement) = {
+  private def isVarCouldBeValSuppressed(element: PsiElement) =
     inspectionSuppressor.isSuppressedFor(
         element, VarCouldBeValInspection.ShortName)
-  }
-}
 
-class DeleteElementFix(element: PsiElement) extends IntentionAction {
-  def getText: String = {
+class DeleteElementFix(element: PsiElement) extends IntentionAction
+  def getText: String =
     val provider: FindUsagesProvider =
       LanguageFindUsages.INSTANCE.forLanguage(ScalaFileType.SCALA_LANGUAGE)
-    element match {
+    element match
       case n: ScNamedElement =>
         val elementToClassify = ScalaPsiUtil.nameContext(n)
         val elementTypeDesc = provider.getType(elementToClassify)
@@ -251,46 +225,36 @@ class DeleteElementFix(element: PsiElement) extends IntentionAction {
       case x =>
         val elementTypeDesc = provider.getType(x)
         "Remove %s".format(elementTypeDesc)
-    }
-  }
 
   def getFamilyName: String = "Remove unused element"
 
   def startInWriteAction: Boolean = true
 
-  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
+  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     file.getManager.isInProject(file) && file.isInstanceOf[ScalaFile]
-  }
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
     PsiDocumentManager.getInstance(project).commitAllDocuments()
     IdeDocumentHistory.getInstance(project).includeCurrentPlaceAsChangePlace()
     element.delete()
-  }
-}
 
 class VarToValFix(varDef: ScVariableDefinition, name: Option[String])
-    extends IntentionAction {
-  def getText: String = {
-    name match {
+    extends IntentionAction
+  def getText: String =
+    name match
       case Some(n) => "Convert var '%s' to val".format(n)
       case None => "Convert var to val"
-    }
-  }
 
   def getFamilyName: String = "Convert var to val"
 
   def startInWriteAction: Boolean = true
 
-  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
+  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     file.getManager.isInProject(file) && file.isInstanceOf[ScalaFile]
-  }
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     if (!varDef.isValid) return
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
     varDef.replace(ScalaPsiElementFactory.createValFromVarDefinition(
             varDef, varDef.getManager))
-  }
-}

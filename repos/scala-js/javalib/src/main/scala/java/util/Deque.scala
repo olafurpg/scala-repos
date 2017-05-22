@@ -1,6 +1,6 @@
 package java.util
 
-trait Deque[E] extends Queue[E] {
+trait Deque[E] extends Queue[E]
   def addFirst(e: E): Unit
   def addLast(e: E): Unit
   def offerFirst(e: E): Boolean
@@ -28,4 +28,3 @@ trait Deque[E] extends Queue[E] {
   def size(): Int
   def iterator(): Iterator[E]
   def descendingIterator(): Iterator[E]
-}

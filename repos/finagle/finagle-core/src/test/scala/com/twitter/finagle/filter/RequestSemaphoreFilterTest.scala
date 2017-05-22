@@ -9,12 +9,12 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class RequestSemaphoreFilterTest extends FunSuite {
+class RequestSemaphoreFilterTest extends FunSuite
 
-  test("default config drops the queue tail") {
-    val neverFactory = ServiceFactory.const(new Service[Int, Int] {
+  test("default config drops the queue tail")
+    val neverFactory = ServiceFactory.const(new Service[Int, Int]
       def apply(req: Int) = Future.never
-    })
+    )
 
     val stk: StackBuilder[ServiceFactory[Int, Int]] = new StackBuilder(
         Stack.Leaf(Stack.Role("never"), neverFactory)
@@ -40,28 +40,22 @@ class RequestSemaphoreFilterTest extends FunSuite {
 
     assert(sr.gauges(Seq("request_concurrency"))() == max)
     assert(sr.gauges(Seq("request_queue_size"))() == 0.0)
-  }
 
-  test("mark dropped requests as rejected") {
-    val neverSvc = new Service[Int, Int] {
+  test("mark dropped requests as rejected")
+    val neverSvc = new Service[Int, Int]
       def apply(req: Int) = Future.never
-    }
     val q = new AsyncSemaphore(1, 0)
     val svc = new RequestSemaphoreFilter(q) andThen neverSvc
     svc(1)
     val f = intercept[Failure] { Await.result(svc(1)) }
     assert(f.isFlagged(Failure.Restartable))
-  }
 
-  test("service failures are not wrapped as rejected") {
+  test("service failures are not wrapped as rejected")
     val exc = new Exception("app exc")
-    val neverSvc = new Service[Int, Int] {
+    val neverSvc = new Service[Int, Int]
       def apply(req: Int) = Future.exception(exc)
-    }
     val q = new AsyncSemaphore(1, 0)
     val svc = new RequestSemaphoreFilter(q) andThen neverSvc
     svc(1)
     val e = intercept[Exception] { Await.result(svc(1)) }
     assert(e == exc)
-  }
-}

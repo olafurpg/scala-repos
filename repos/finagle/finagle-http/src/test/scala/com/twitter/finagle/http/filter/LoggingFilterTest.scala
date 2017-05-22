@@ -9,9 +9,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class LoggingFilterTest extends FunSuite {
+class LoggingFilterTest extends FunSuite
 
-  test("log") {
+  test("log")
     val logger = Logger.get("access")
     logger.setLevel(Logger.INFO)
     val stringHandler = new StringHandler(BareFormatter, Some(Logger.INFO))
@@ -26,24 +26,20 @@ class LoggingFilterTest extends FunSuite {
     request.version = Version.Http11
 
     val formatter = new CommonLogFormatter
-    val service = new Service[Request, Response] {
-      def apply(request: Request): Future[Response] = {
+    val service = new Service[Request, Response]
+      def apply(request: Request): Future[Response] =
         val response = request.response
         response.statusCode = 123
         response.write("hello")
         Future.value(response)
-      }
-    }
     val filter = (new LoggingFilter(logger, formatter)) andThen service
 
-    Time.withTimeAt(Time.fromSeconds(1302121932)) { _ =>
+    Time.withTimeAt(Time.fromSeconds(1302121932))  _ =>
       Await.result(filter(request))
-    }
 
     stringHandler.get ==
     ("""127\.0\.0\.1 - - \[06/Apr/2011:20:32:12 \+0000\] "GET /search\.json HTTP/1\.1" 123 5 [0-9]+ "User Agent"""" +
         "\n")
-  }
 
   val UnescapedEscaped = Seq(
       // boundaries
@@ -184,10 +180,7 @@ class LoggingFilterTest extends FunSuite {
       ("\u2603", "\\xe2\\x98\\x83") // snowman
   )
 
-  test("escape() escapes non-printable, non-ASCII") {
-    UnescapedEscaped.foreach {
+  test("escape() escapes non-printable, non-ASCII")
+    UnescapedEscaped.foreach
       case (input, escaped) =>
         assert(LogFormatter.escape(input) == escaped)
-    }
-  }
-}

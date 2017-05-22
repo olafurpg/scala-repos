@@ -36,11 +36,10 @@ import java.io.Serializable
   * in the bolt being different from the one used in the summingbird
   * job.
   */
-object FlatMapStormMetrics {
+object FlatMapStormMetrics
   def apply(metrics: => TraversableOnce[StormMetric[IMetric]]) =
     new FlatMapStormMetrics(() => metrics)
   def unapply(metrics: FlatMapStormMetrics) = Some(metrics.metrics)
-}
 
 /**
   * When a bolt is prepared, these metrics will be use by being called with the TopologyContext for the storm
@@ -49,21 +48,17 @@ object FlatMapStormMetrics {
 class FlatMapStormMetrics(
     val metrics: () => TraversableOnce[StormMetric[IMetric]])
 
-object SpoutStormMetrics {
+object SpoutStormMetrics
   def apply(metrics: => TraversableOnce[StormMetric[IMetric]]) =
     new SpoutStormMetrics(() => metrics)
   def unapply(metrics: SpoutStormMetrics) = Some(metrics.metrics)
-}
 
 class SpoutStormMetrics(
     val metrics: () => TraversableOnce[StormMetric[IMetric]])
-    extends Serializable {
-  def toSpoutMetrics: () => TraversableOnce[Metric[IMetric]] = { () =>
-    metrics().map { x: StormMetric[IMetric] =>
+    extends Serializable
+  def toSpoutMetrics: () => TraversableOnce[Metric[IMetric]] =  () =>
+    metrics().map  x: StormMetric[IMetric] =>
       Metric(x.name, x.metric, x.interval.inSeconds)
-    }
-  }
-}
 
 /**
   * This signals that the storm bolts should use localOrShuffleGrouping, which means that if the downstream bolt
@@ -84,7 +79,6 @@ case class AckOnEntry(get: Boolean)
   * Maximum number of elements to execute in a given second per task
   */
 case class MaxExecutePerSecond(
-    lowerBound: Long, upperBound: Long, rampUptimeMS: Long) {
+    lowerBound: Long, upperBound: Long, rampUptimeMS: Long)
   require(
       rampUptimeMS >= 0L, "Ramp up time must greater than or equal to zero")
-}

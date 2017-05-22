@@ -1,4 +1,4 @@
-object Test {
+object Test
   // After the first attempt to make separately compiled value
   // classes respect the privacy of constructors, we got:
   //
@@ -7,4 +7,3 @@ object Test {
   //   scala.reflect.internal.Types$TypeError: constructor V in class V cannot be accessed in object Test
   def foo(v: V) = v.a == v.a
   def bar(v: V) = v == v
-}

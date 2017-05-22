@@ -10,7 +10,7 @@ import com.typesafe.tools.mima.core.{ProblemFilters, MissingClassProblem}
 import com.typesafe.sbt.osgi.SbtOsgi.{osgiSettings, OsgiKeys}
 import com.typesafe.sbt.sdlc.Plugin._
 
-object SlickBuild extends Build {
+object SlickBuild extends Build
 
   val slickVersion = "3.2.0-SNAPSHOT"
   val binaryCompatSlickVersion =
@@ -18,15 +18,14 @@ object SlickBuild extends Build {
   val scalaVersions = Seq("2.11.7", "2.12.0-M2")
 
   /** Dependencies for reuse in different parts of the build */
-  object Dependencies {
+  object Dependencies
     val junit = Seq(
         "junit" % "junit-dep" % "4.11",
         "com.novocode" % "junit-interface" % "0.11"
     )
-    def scalaTestFor(scalaVersion: String) = {
+    def scalaTestFor(scalaVersion: String) =
       val v = if (scalaVersion == "2.12.0-M2") "2.2.5-M2" else "2.2.4"
       "org.scalatest" %% "scalatest" % v
-    }
     val slf4j = "org.slf4j" % "slf4j-api" % "1.7.18"
     val logback = "ch.qos.logback" % "logback-classic" % "1.1.6"
     val typesafeConfig = "com.typesafe" % "config" % "1.2.1"
@@ -56,7 +55,6 @@ object SlickBuild extends Build {
         "org.ops4j.pax.swissbox" % "pax-swissbox-framework" % "1.5.1",
         "org.apache.felix" % "org.apache.felix.framework" % "4.6.1"
     )
-  }
 
   /* Custom Settings */
   val repoKind = SettingKey[String](
@@ -80,24 +78,20 @@ object SlickBuild extends Build {
       unmanagedJars in config("macro") <<= scalaInstance.map(_.jars.classpath)
   )
 
-  val scalaSettings = {
-    sys.props("scala.home.local") match {
+  val scalaSettings =
+    sys.props("scala.home.local") match
       case null => publishedScalaSettings
       case path =>
         scala.Console.err.println("Using local scala at " + path)
         localScalaSettings(path)
-    }
-  }
 
   def ifPublished(s: Seq[Setting[_]]): Seq[Setting[_]] =
     if (scalaSettings eq publishedScalaSettings) s else Nil
 
-  def extTarget(extName: String): Seq[Setting[File]] = {
-    sys.props("slick.build.target") match {
+  def extTarget(extName: String): Seq[Setting[File]] =
+    sys.props("slick.build.target") match
       case null => Seq.empty
       case path => Seq(target := file(path + "/" + extName))
-    }
-  }
 
   lazy val sharedSettings =
     Seq(
@@ -128,20 +122,20 @@ object SlickBuild extends Build {
         logBuffered := false,
         repoKind <<= (version)(
             v => if (v.trim.endsWith("SNAPSHOT")) "snapshots" else "releases"),
-        publishTo <<= (repoKind) {
+        publishTo <<= (repoKind)
           case "snapshots" =>
             Some("snapshots" at "https://oss.sonatype.org/content/repositories/snapshots")
           case "releases" =>
             Some("releases" at "https://oss.sonatype.org/service/local/staging/deploy/maven2")
-        },
+        ,
         publishMavenStyle := true,
         publishArtifact in Test := false,
-        pomIncludeRepository := { _ =>
+        pomIncludeRepository :=  _ =>
           false
-        },
-        makePomConfiguration ~= {
+        ,
+        makePomConfiguration ~=
           _.copy(configurations = Some(Seq(Compile, Runtime, Optional)))
-        },
+        ,
         homepage := Some(url("http://slick.typesafe.com")),
         startYear := Some(2008),
         licenses +=
@@ -177,15 +171,13 @@ object SlickBuild extends Build {
   )
 
   def runTasksSequentially(tasks: List[TaskKey[_]])(state: State): State =
-    tasks match {
+    tasks match
       case t :: ts =>
-        Project.runTask(t.asInstanceOf[TaskKey[Any]], state) match {
+        Project.runTask(t.asInstanceOf[TaskKey[Any]], state) match
           case None => state.fail
           case Some((s, Inc(_))) => s.fail
           case Some((s, _)) => runTasksSequentially(ts)(s)
-        }
       case Nil => state
-    }
 
   /* A command that runs all tests sequentially */
   def testAll =
@@ -340,7 +332,7 @@ object SlickBuild extends Build {
               //javaOptions in run += "-agentpath:/Applications/YourKit_Java_Profiler_2015_build_15072.app/Contents/Resources/bin/mac/libyjpagent.jnilib",
               javaOptions in run += "-Dslick.ansiDump=true",
               //javaOptions in run += "-verbose:gc",
-              compile in Test ~= { a =>
+              compile in Test ~=  a =>
               // Delete classes in "compile" packages after compiling. (Currently only slick.test.compile.NestedShapeTest)
               // These are used for compile-time tests and should be recompiled every time.
               val products =
@@ -348,14 +340,13 @@ object SlickBuild extends Build {
                     _.getParentFile.getName == "compile")
               IO.delete(products.get)
               a
-            },
-              buildCapabilitiesTable := {
+            ,
+              buildCapabilitiesTable :=
               val logger = ConsoleLogger()
               Run.run("com.typesafe.slick.testkit.util.BuildCapabilitiesTable",
                       (fullClasspath in Compile).value.map(_.data),
                       Seq("slick/src/sphinx/capabilities.csv"),
                       logger)(runner.value)
-            }
           ) ++ ifPublished(Seq(
                   libraryDependencies <+= scalaVersion(
                       "org.scala-lang" % "scala-compiler" % _ % "provided")
@@ -480,43 +471,40 @@ object SlickBuild extends Build {
             "xml-resolver" % "xml-resolver" % "1.2" % fmppConfig.name
         ),
         ivyConfigurations += fmppConfig,
-        fullClasspath in fmppConfig <<= update map {
+        fullClasspath in fmppConfig <<= update map
           _ select configurationFilter(fmppConfig.name) map Attributed.blank
-        },
+        ,
         mappings in (Compile, packageSrc) <++=
           (sourceManaged in Compile,
          managedSources in Compile,
-         sourceDirectory in Compile) map { (base, srcs, srcDir) =>
+         sourceDirectory in Compile) map  (base, srcs, srcDir) =>
           val fmppSrc = srcDir / "scala"
           val inFiles = fmppSrc ** "*.fm"
           (srcs pair (Path.relativeTo(base) | Path.flat)) ++ // Add generated sources to sources JAR
           (inFiles pair (Path.relativeTo(fmppSrc) | Path.flat)) // Add *.fm files to sources JAR
-        }
     )
   lazy val fmppTask =
     (fullClasspath in fmppConfig,
      runner in fmpp,
      sourceManaged,
      streams,
-     sourceDirectory) map { (cp, r, output, s, srcDir) =>
+     sourceDirectory) map  (cp, r, output, s, srcDir) =>
       val fmppSrc = srcDir / "scala"
       val inFiles = (fmppSrc ** "*.fm").get.toSet
       val cachedFun = FileFunction.cached(s.cacheDirectory / "fmpp",
-                                          outStyle = FilesInfo.exists) {
+                                          outStyle = FilesInfo.exists)
         (in: Set[File]) =>
           IO.delete((output ** "*.scala").get)
           val args =
             "--expert" :: "-q" :: "-S" :: fmppSrc.getPath :: "-O" :: output.getPath :: "--replace-extensions=fm, scala" :: "-M" :: "execute(**/*.fm), ignore(**/*)" :: Nil
           toError(r.run("fmpp.tools.CommandLine", cp.files, args, s.log))
           (output ** "*.scala").get.toSet
-      }
       cachedFun(inFiles).toSeq
-    }
 
   /** Slick type provider code gen  */
   lazy val typeProviders = taskKey[Seq[File]]("Type provider code generation")
   lazy val typeProvidersConfig = config("codegen").hide
-  lazy val typeProvidersSettings = {
+  lazy val typeProvidersSettings =
     inConfig(typeProvidersConfig)(Defaults.configSettings) ++ Seq(
         sourceGenerators in Test <+= typeProviders,
         typeProviders <<= typeProvidersTask,
@@ -531,21 +519,19 @@ object SlickBuild extends Build {
         mappings in (Test, packageSrc) <++=
           (sourceManaged in Test,
          managedSources in Test,
-         sourceDirectory in Test) map { (base, srcs, srcDir) =>
+         sourceDirectory in Test) map  (base, srcs, srcDir) =>
           val src = srcDir / "codegen"
           val inFiles = src ** "*.scala"
           (srcs pair (Path.relativeTo(base) | Path.flat)) ++ // Add generated sources to sources JAR
           (inFiles pair (Path.relativeTo(src) | Path.flat)) // Add *.fm files to sources JAR
-        }
     )
-  }
   lazy val typeProvidersTask =
     (fullClasspath in typeProvidersConfig,
      runner in typeProviders,
      sourceManaged in Test,
      streams,
      sourceDirectory,
-     sourceDirectory in slickProject) map {
+     sourceDirectory in slickProject) map
       (cp, r, output, s, srcDir, slickSrc) =>
         val src = srcDir / "codegen"
         val outDir = (output / "slick-codegen").getPath
@@ -554,7 +540,7 @@ object SlickBuild extends Build {
           (slickSrc / "main/scala/slick/codegen" ** "*.scala").get.toSet ++
           (slickSrc / "main/scala/slick/jdbc/meta" ** "*.scala").get.toSet
         val cachedFun = FileFunction.cached(
-            s.cacheDirectory / "type-providers", outStyle = FilesInfo.exists) {
+            s.cacheDirectory / "type-providers", outStyle = FilesInfo.exists)
           (in: Set[File]) =>
             IO.delete((output ** "*.scala").get)
             toError(
@@ -568,7 +554,4 @@ object SlickBuild extends Build {
                       Array(outDir),
                       s.log))
             (output ** "*.scala").get.toSet
-        }
         cachedFun(inFiles).toSeq
-    }
-}

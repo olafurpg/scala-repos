@@ -21,30 +21,27 @@ package shapeless.examples
   *
   * @author Miles Sabin
   */
-object FlattenExample {
+object FlattenExample
   import shapeless._
   import ops.tuple.FlatMapper
   import syntax.std.tuple._
   import test._
 
-  trait LowPriorityFlatten extends Poly1 {
+  trait LowPriorityFlatten extends Poly1
     implicit def default[T] = at[T](Tuple1(_))
-  }
-  object flatten extends LowPriorityFlatten {
+  object flatten extends LowPriorityFlatten
     implicit def caseTuple[P <: Product](
         implicit lfm: Lazy[FlatMapper[P, flatten.type]]) =
       at[P](lfm.value(_))
-  }
 
   val t1 = (1, ((2, 3), 4))
   val f1 = flatten(t1) // Inferred type is (Int, Int, Int, Int)
   val l1 = f1.toList // Inferred type is List[Int]
   typed[List[Int]](l1)
 
-  object toDouble extends Poly1 {
+  object toDouble extends Poly1
     implicit def caseInt = at[Int](_.toDouble)
     implicit def caseDouble = at[Double](identity)
-  }
 
   val t2 = (1, ((2, 3.0), 4))
   val f2 = flatten(t2) // Inferred type is (Int, Int, Double, Int)
@@ -56,4 +53,3 @@ object FlattenExample {
   val f3 =
     flatten(t3) // Inferred type is (Int, Boolean, Double, String, String, Int, Boolean)
   typed[(Int, Boolean, Double, String, String, Int, Boolean)](f3)
-}

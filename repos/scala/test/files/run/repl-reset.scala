@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
     |val x1 = 1
     |val x2 = 2
@@ -19,4 +19,3 @@ object Test extends ReplTest {
   // but no
   //
   // |:javap BippyBungus
-}

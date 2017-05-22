@@ -41,16 +41,14 @@ case class SparkListenerSQLExecutionEnd(executionId: Long, time: Long)
     extends SparkListenerEvent
 
 private[sql] class SQLHistoryListenerFactory
-    extends SparkHistoryListenerFactory {
+    extends SparkHistoryListenerFactory
 
   override def createListeners(
-      conf: SparkConf, sparkUI: SparkUI): Seq[SparkListener] = {
+      conf: SparkConf, sparkUI: SparkUI): Seq[SparkListener] =
     List(new SQLHistoryListener(conf, sparkUI))
-  }
-}
 
 private[sql] class SQLListener(conf: SparkConf)
-    extends SparkListener with Logging {
+    extends SparkListener with Logging
 
   private val retainedExecutions =
     conf.getInt("spark.sql.ui.retainedExecutions", 1000)
@@ -73,112 +71,89 @@ private[sql] class SQLListener(conf: SparkConf)
 
   private val completedExecutions = mutable.ListBuffer[SQLExecutionUIData]()
 
-  def executionIdToData: Map[Long, SQLExecutionUIData] = synchronized {
+  def executionIdToData: Map[Long, SQLExecutionUIData] = synchronized
     _executionIdToData.toMap
-  }
 
-  def jobIdToExecutionId: Map[Long, Long] = synchronized {
+  def jobIdToExecutionId: Map[Long, Long] = synchronized
     _jobIdToExecutionId.toMap
-  }
 
-  def stageIdToStageMetrics: Map[Long, SQLStageMetrics] = synchronized {
+  def stageIdToStageMetrics: Map[Long, SQLStageMetrics] = synchronized
     _stageIdToStageMetrics.toMap
-  }
 
   private def trimExecutionsIfNecessary(
-      executions: mutable.ListBuffer[SQLExecutionUIData]): Unit = {
-    if (executions.size > retainedExecutions) {
+      executions: mutable.ListBuffer[SQLExecutionUIData]): Unit =
+    if (executions.size > retainedExecutions)
       val toRemove = math.max(retainedExecutions / 10, 1)
-      executions.take(toRemove).foreach { execution =>
+      executions.take(toRemove).foreach  execution =>
         for (executionUIData <- _executionIdToData.remove(
-            execution.executionId)) {
-          for (jobId <- executionUIData.jobs.keys) {
+            execution.executionId))
+          for (jobId <- executionUIData.jobs.keys)
             _jobIdToExecutionId.remove(jobId)
-          }
-          for (stageId <- executionUIData.stages) {
+          for (stageId <- executionUIData.stages)
             _stageIdToStageMetrics.remove(stageId)
-          }
-        }
-      }
       executions.trimStart(toRemove)
-    }
-  }
 
-  override def onJobStart(jobStart: SparkListenerJobStart): Unit = {
+  override def onJobStart(jobStart: SparkListenerJobStart): Unit =
     val executionIdString =
       jobStart.properties.getProperty(SQLExecution.EXECUTION_ID_KEY)
-    if (executionIdString == null) {
+    if (executionIdString == null)
       // This is not a job created by SQL
       return
-    }
     val executionId = executionIdString.toLong
     val jobId = jobStart.jobId
     val stageIds = jobStart.stageIds
 
-    synchronized {
-      activeExecutions.get(executionId).foreach { executionUIData =>
+    synchronized
+      activeExecutions.get(executionId).foreach  executionUIData =>
         executionUIData.jobs(jobId) = JobExecutionStatus.RUNNING
         executionUIData.stages ++= stageIds
         stageIds.foreach(stageId =>
               _stageIdToStageMetrics(stageId) = new SQLStageMetrics(
                   stageAttemptId = 0))
         _jobIdToExecutionId(jobId) = executionId
-      }
-    }
-  }
 
-  override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = synchronized {
+  override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = synchronized
     val jobId = jobEnd.jobId
     for (executionId <- _jobIdToExecutionId.get(jobId);
-    executionUIData <- _executionIdToData.get(executionId)) {
-      jobEnd.jobResult match {
+    executionUIData <- _executionIdToData.get(executionId))
+      jobEnd.jobResult match
         case JobSucceeded =>
           executionUIData.jobs(jobId) = JobExecutionStatus.SUCCEEDED
         case JobFailed(_) =>
           executionUIData.jobs(jobId) = JobExecutionStatus.FAILED
-      }
       if (executionUIData.completionTime.nonEmpty &&
-          !executionUIData.hasRunningJobs) {
+          !executionUIData.hasRunningJobs)
         // We are the last job of this execution, so mark the execution as finished. Note that
         // `onExecutionEnd` also does this, but currently that can be called before `onJobEnd`
         // since these are called on different threads.
         markExecutionFinished(executionId)
-      }
-    }
-  }
 
   override def onExecutorMetricsUpdate(
       executorMetricsUpdate: SparkListenerExecutorMetricsUpdate): Unit =
-    synchronized {
-      for ((taskId, stageId, stageAttemptID, accumUpdates) <- executorMetricsUpdate.accumUpdates) {
+    synchronized
+      for ((taskId, stageId, stageAttemptID, accumUpdates) <- executorMetricsUpdate.accumUpdates)
         updateTaskAccumulatorValues(
             taskId, stageId, stageAttemptID, accumUpdates, finishTask = false)
-      }
-    }
 
   override def onStageSubmitted(
-      stageSubmitted: SparkListenerStageSubmitted): Unit = synchronized {
+      stageSubmitted: SparkListenerStageSubmitted): Unit = synchronized
     val stageId = stageSubmitted.stageInfo.stageId
     val stageAttemptId = stageSubmitted.stageInfo.attemptId
     // Always override metrics for old stage attempt
-    if (_stageIdToStageMetrics.contains(stageId)) {
+    if (_stageIdToStageMetrics.contains(stageId))
       _stageIdToStageMetrics(stageId) = new SQLStageMetrics(stageAttemptId)
-    } else {
+    else
       // If a stage belongs to some SQL execution, its stageId will be put in "onJobStart".
       // Since "_stageIdToStageMetrics" doesn't contain it, it must not belong to any SQL execution.
       // So we can ignore it. Otherwise, this may lead to memory leaks (SPARK-11126).
-    }
-  }
 
-  override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = synchronized {
-    if (taskEnd.taskMetrics != null) {
+  override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = synchronized
+    if (taskEnd.taskMetrics != null)
       updateTaskAccumulatorValues(taskEnd.taskInfo.taskId,
                                   taskEnd.stageId,
                                   taskEnd.stageAttemptId,
                                   taskEnd.taskMetrics.accumulatorUpdates(),
                                   finishTask = true)
-    }
-  }
 
   /**
     * Update the accumulator values of a task with the latest metrics for this task. This is called
@@ -189,45 +164,40 @@ private[sql] class SQLListener(conf: SparkConf)
       stageId: Int,
       stageAttemptID: Int,
       accumulatorUpdates: Seq[AccumulableInfo],
-      finishTask: Boolean): Unit = {
+      finishTask: Boolean): Unit =
 
-    _stageIdToStageMetrics.get(stageId) match {
+    _stageIdToStageMetrics.get(stageId) match
       case Some(stageMetrics) =>
-        if (stageAttemptID < stageMetrics.stageAttemptId) {
+        if (stageAttemptID < stageMetrics.stageAttemptId)
           // A task of an old stage attempt. Because a new stage is submitted, we can ignore it.
-        } else if (stageAttemptID > stageMetrics.stageAttemptId) {
+        else if (stageAttemptID > stageMetrics.stageAttemptId)
           logWarning(
               s"A task should not have a higher stageAttemptID ($stageAttemptID) then " +
               s"what we have seen (${stageMetrics.stageAttemptId})")
-        } else {
+        else
           // TODO We don't know the attemptId. Currently, what we can do is overriding the
           // accumulator updates. However, if there are two same task are running, such as
           // speculation, the accumulator updates will be overriding by different task attempts,
           // the results will be weird.
-          stageMetrics.taskIdToMetricUpdates.get(taskId) match {
+          stageMetrics.taskIdToMetricUpdates.get(taskId) match
             case Some(taskMetrics) =>
-              if (finishTask) {
+              if (finishTask)
                 taskMetrics.finished = true
                 taskMetrics.accumulatorUpdates = accumulatorUpdates
-              } else if (!taskMetrics.finished) {
+              else if (!taskMetrics.finished)
                 taskMetrics.accumulatorUpdates = accumulatorUpdates
-              } else {
+              else
                 // If a task is finished, we should not override with accumulator updates from
                 // heartbeat reports
-              }
             case None =>
               // TODO Now just set attemptId to 0. Should fix here when we can get the attempt
               // id from SparkListenerExecutorMetricsUpdate
               stageMetrics.taskIdToMetricUpdates(taskId) = new SQLTaskMetrics(
                   attemptId = 0, finished = finishTask, accumulatorUpdates)
-          }
-        }
       case None =>
       // This execution and its stage have been dropped
-    }
-  }
 
-  override def onOtherEvent(event: SparkListenerEvent): Unit = event match {
+  override def onOtherEvent(event: SparkListenerEvent): Unit = event match
     case SparkListenerSQLExecutionStart(executionId,
                                         description,
                                         details,
@@ -235,9 +205,8 @@ private[sql] class SQLListener(conf: SparkConf)
                                         sparkPlanInfo,
                                         time) =>
       val physicalPlanGraph = SparkPlanGraph(sparkPlanInfo)
-      val sqlPlanMetrics = physicalPlanGraph.allNodes.flatMap { node =>
+      val sqlPlanMetrics = physicalPlanGraph.allNodes.flatMap  node =>
         node.metrics.map(metric => metric.accumulatorId -> metric)
-      }
       val executionUIData = new SQLExecutionUIData(executionId,
                                                    description,
                                                    details,
@@ -245,78 +214,64 @@ private[sql] class SQLListener(conf: SparkConf)
                                                    physicalPlanGraph,
                                                    sqlPlanMetrics.toMap,
                                                    time)
-      synchronized {
+      synchronized
         activeExecutions(executionId) = executionUIData
         _executionIdToData(executionId) = executionUIData
-      }
     case SparkListenerSQLExecutionEnd(executionId, time) =>
-      synchronized {
-        _executionIdToData.get(executionId).foreach { executionUIData =>
+      synchronized
+        _executionIdToData.get(executionId).foreach  executionUIData =>
           executionUIData.completionTime = Some(time)
-          if (!executionUIData.hasRunningJobs) {
+          if (!executionUIData.hasRunningJobs)
             // onExecutionEnd happens after all "onJobEnd"s
             // So we should update the execution lists.
             markExecutionFinished(executionId)
-          } else {
+          else
             // There are some running jobs, onExecutionEnd happens before some "onJobEnd"s.
             // Then we don't if the execution is successful, so let the last onJobEnd updates the
             // execution lists.
-          }
-        }
-      }
     case _ => // Ignore
-  }
 
-  private def markExecutionFinished(executionId: Long): Unit = {
-    activeExecutions.remove(executionId).foreach { executionUIData =>
-      if (executionUIData.isFailed) {
+  private def markExecutionFinished(executionId: Long): Unit =
+    activeExecutions.remove(executionId).foreach  executionUIData =>
+      if (executionUIData.isFailed)
         failedExecutions += executionUIData
         trimExecutionsIfNecessary(failedExecutions)
-      } else {
+      else
         completedExecutions += executionUIData
         trimExecutionsIfNecessary(completedExecutions)
-      }
-    }
-  }
 
-  def getRunningExecutions: Seq[SQLExecutionUIData] = synchronized {
+  def getRunningExecutions: Seq[SQLExecutionUIData] = synchronized
     activeExecutions.values.toSeq
-  }
 
-  def getFailedExecutions: Seq[SQLExecutionUIData] = synchronized {
+  def getFailedExecutions: Seq[SQLExecutionUIData] = synchronized
     failedExecutions
-  }
 
-  def getCompletedExecutions: Seq[SQLExecutionUIData] = synchronized {
+  def getCompletedExecutions: Seq[SQLExecutionUIData] = synchronized
     completedExecutions
-  }
 
   def getExecution(executionId: Long): Option[SQLExecutionUIData] =
-    synchronized {
+    synchronized
       _executionIdToData.get(executionId)
-    }
 
   /**
     * Get all accumulator updates from all tasks which belong to this execution and merge them.
     */
   def getExecutionMetrics(executionId: Long): Map[Long, String] =
-    synchronized {
-      _executionIdToData.get(executionId) match {
+    synchronized
+      _executionIdToData.get(executionId) match
         case Some(executionUIData) =>
-          val accumulatorUpdates = {
+          val accumulatorUpdates =
             for (stageId <- executionUIData.stages;
             stageMetrics <- _stageIdToStageMetrics.get(stageId).toIterable;
             taskMetrics <- stageMetrics.taskIdToMetricUpdates.values;
-            accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield {
+            accumulatorUpdate <- taskMetrics.accumulatorUpdates) yield
               assert(
                   accumulatorUpdate.update.isDefined,
                   s"accumulator update from " +
                   s"task did not have a partial value: ${accumulatorUpdate.name}")
               (accumulatorUpdate.id, accumulatorUpdate.update.get)
-            }
-          }.filter {
+          .filter
             case (id, _) => executionUIData.accumulatorMetrics.contains(id)
-          }
           mergeAccumulatorUpdates(
               accumulatorUpdates,
               accumulatorId =>
@@ -324,65 +279,54 @@ private[sql] class SQLListener(conf: SparkConf)
         case None =>
           // This execution has been dropped
           Map.empty
-      }
-    }
 
   private def mergeAccumulatorUpdates(
       accumulatorUpdates: Seq[(Long, Any)],
       paramFunc: Long => SQLMetricParam[SQLMetricValue[Any], Any])
-    : Map[Long, String] = {
-    accumulatorUpdates.groupBy(_._1).map {
+    : Map[Long, String] =
+    accumulatorUpdates.groupBy(_._1).map
       case (accumulatorId, values) =>
         val param = paramFunc(accumulatorId)
         (accumulatorId,
          param.stringValue(
              values.map(_._2.asInstanceOf[SQLMetricValue[Any]].value)))
-    }
-  }
-}
 
 /**
   * A [[SQLListener]] for rendering the SQL UI in the history server.
   */
 private[spark] class SQLHistoryListener(conf: SparkConf, sparkUI: SparkUI)
-    extends SQLListener(conf) {
+    extends SQLListener(conf)
 
   private var sqlTabAttached = false
 
   override def onExecutorMetricsUpdate(
-      u: SparkListenerExecutorMetricsUpdate): Unit = {
+      u: SparkListenerExecutorMetricsUpdate): Unit =
     // Do nothing; these events are not logged
-  }
 
-  override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = synchronized {
+  override def onTaskEnd(taskEnd: SparkListenerTaskEnd): Unit = synchronized
     updateTaskAccumulatorValues(
         taskEnd.taskInfo.taskId,
         taskEnd.stageId,
         taskEnd.stageAttemptId,
-        taskEnd.taskInfo.accumulables.flatMap { a =>
+        taskEnd.taskInfo.accumulables.flatMap  a =>
           // Filter out accumulators that are not SQL metrics
           // For now we assume all SQL metrics are Long's that have been JSON serialized as String's
-          if (a.metadata == Some(SQLMetrics.ACCUM_IDENTIFIER)) {
+          if (a.metadata == Some(SQLMetrics.ACCUM_IDENTIFIER))
             val newValue = new LongSQLMetricValue(
                 a.update.map(_.toString.toLong).getOrElse(0L))
             Some(a.copy(update = Some(newValue)))
-          } else {
+          else
             None
-          }
-        },
+        ,
         finishTask = true)
-  }
 
-  override def onOtherEvent(event: SparkListenerEvent): Unit = event match {
+  override def onOtherEvent(event: SparkListenerEvent): Unit = event match
     case _: SparkListenerSQLExecutionStart =>
-      if (!sqlTabAttached) {
+      if (!sqlTabAttached)
         new SQLTab(this, sparkUI)
         sqlTabAttached = true
-      }
       super.onOtherEvent(event)
     case _ => super.onOtherEvent(event)
-  }
-}
 
 /**
   * Represent all necessary data for an execution that will be used in Web UI.
@@ -397,7 +341,7 @@ private[ui] class SQLExecutionUIData(
     val submissionTime: Long,
     var completionTime: Option[Long] = None,
     val jobs: mutable.HashMap[Long, JobExecutionStatus] = mutable.HashMap.empty,
-    val stages: mutable.ArrayBuffer[Int] = mutable.ArrayBuffer()) {
+    val stages: mutable.ArrayBuffer[Int] = mutable.ArrayBuffer())
 
   /**
     * Return whether there are running jobs in this execution.
@@ -418,7 +362,6 @@ private[ui] class SQLExecutionUIData(
 
   def failedJobs: Seq[Long] =
     jobs.filter { case (_, status) => status == JobExecutionStatus.FAILED }.keys.toSeq
-}
 
 /**
   * Represent a metric in a SQLPlan.

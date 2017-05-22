@@ -24,9 +24,9 @@ import org.apache.spark.mllib.clustering.KMeans
 import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 
-object PMMLModelExportExample {
+object PMMLModelExportExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("PMMLModelExportExample")
     val sc = new SparkContext(conf)
 
@@ -55,6 +55,4 @@ object PMMLModelExportExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

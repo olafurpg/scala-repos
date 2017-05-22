@@ -5,14 +5,13 @@ import com.typesafe.config.Config
 
 import lila.common.PimpedConfig._
 
-final class Env(config: Config, db: lila.db.Env) {
+final class Env(config: Config, db: lila.db.Env)
 
-  private val settings = new {
+  private val settings = new
     val CollectionOpening = config getString "collection.opening"
     val CollectionAttempt = config getString "collection.attempt"
     val CollectionName = config getString "collection.name"
     val ApiToken = config getString "api.token"
-  }
   import settings._
 
   val AnimationDuration = config duration "animation.duration"
@@ -36,11 +35,9 @@ final class Env(config: Config, db: lila.db.Env) {
   private[opening] lazy val openingColl = db(CollectionOpening)
   private[opening] lazy val attemptColl = db(CollectionAttempt)
   private[opening] lazy val nameColl = db(CollectionName)
-}
 
-object Env {
+object Env
 
   lazy val current: Env =
     "opening" boot new Env(config = lila.common.PlayApp loadConfig "opening",
                            db = lila.db.Env.current)
-}

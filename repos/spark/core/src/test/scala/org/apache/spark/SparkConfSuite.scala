@@ -31,8 +31,8 @@ import org.apache.spark.serializer.{KryoRegistrator, KryoSerializer}
 import org.apache.spark.util.{ResetSystemProperties, RpcUtils}
 
 class SparkConfSuite
-    extends SparkFunSuite with LocalSparkContext with ResetSystemProperties {
-  test("Test byteString conversion") {
+    extends SparkFunSuite with LocalSparkContext with ResetSystemProperties
+  test("Test byteString conversion")
     val conf = new SparkConf()
     // Simply exercise the API, we don't need a complete conversion test since that's handled in
     // UtilsSuite.scala
@@ -40,9 +40,8 @@ class SparkConfSuite
     assert(conf.getSizeAsKb("fake", "1k") === ByteUnit.KiB.toKiB(1))
     assert(conf.getSizeAsMb("fake", "1k") === ByteUnit.KiB.toMiB(1))
     assert(conf.getSizeAsGb("fake", "1k") === ByteUnit.KiB.toGiB(1))
-  }
 
-  test("Test timeString conversion") {
+  test("Test timeString conversion")
     val conf = new SparkConf()
     // Simply exercise the API, we don't need a complete conversion test since that's handled in
     // UtilsSuite.scala
@@ -50,21 +49,18 @@ class SparkConfSuite
         conf.getTimeAsMs("fake", "1ms") === TimeUnit.MILLISECONDS.toMillis(1))
     assert(conf.getTimeAsSeconds("fake", "1000ms") === TimeUnit.MILLISECONDS
           .toSeconds(1000))
-  }
 
-  test("loading from system properties") {
+  test("loading from system properties")
     System.setProperty("spark.test.testProperty", "2")
     val conf = new SparkConf()
     assert(conf.get("spark.test.testProperty") === "2")
-  }
 
-  test("initializing without loading defaults") {
+  test("initializing without loading defaults")
     System.setProperty("spark.test.testProperty", "2")
     val conf = new SparkConf(false)
     assert(!conf.contains("spark.test.testProperty"))
-  }
 
-  test("named set methods") {
+  test("named set methods")
     val conf = new SparkConf(false)
 
     conf.setMaster("local[3]")
@@ -88,9 +84,8 @@ class SparkConfSuite
     assert(conf.get("spark.jars") === "c.jar,d.jar")
     assert(conf.get("spark.executorEnv.VAR4") === "value4")
     assert(conf.get("spark.executorEnv.VAR5") === "value5")
-  }
 
-  test("basic get and set") {
+  test("basic get and set")
     val conf = new SparkConf(false)
     assert(conf.getAll.toSet === Set())
     conf.set("k1", "v1")
@@ -106,38 +101,32 @@ class SparkConfSuite
     assert(conf.get("k4", "not found") === "not found")
     assert(conf.getOption("k1") === Some("v4"))
     assert(conf.getOption("k4") === None)
-  }
 
-  test("creating SparkContext without master and app name") {
+  test("creating SparkContext without master and app name")
     val conf = new SparkConf(false)
     intercept[SparkException] { sc = new SparkContext(conf) }
-  }
 
-  test("creating SparkContext without master") {
+  test("creating SparkContext without master")
     val conf = new SparkConf(false).setAppName("My app")
     intercept[SparkException] { sc = new SparkContext(conf) }
-  }
 
-  test("creating SparkContext without app name") {
+  test("creating SparkContext without app name")
     val conf = new SparkConf(false).setMaster("local")
     intercept[SparkException] { sc = new SparkContext(conf) }
-  }
 
-  test("creating SparkContext with both master and app name") {
+  test("creating SparkContext with both master and app name")
     val conf = new SparkConf(false).setMaster("local").setAppName("My app")
     sc = new SparkContext(conf)
     assert(sc.master === "local")
     assert(sc.appName === "My app")
-  }
 
-  test("SparkContext property overriding") {
+  test("SparkContext property overriding")
     val conf = new SparkConf(false).setMaster("local").setAppName("My app")
     sc = new SparkContext("local[2]", "My other app", conf)
     assert(sc.master === "local[2]")
     assert(sc.appName === "My other app")
-  }
 
-  test("nested property names") {
+  test("nested property names")
     // This wasn't supported by some external conf parsing libraries
     System.setProperty("spark.test.a", "a")
     System.setProperty("spark.test.a.b", "a.b")
@@ -150,31 +139,27 @@ class SparkConfSuite
     assert(conf.get("spark.test.a") === "a")
     assert(conf.get("spark.test.a.b") === "A.B")
     assert(conf.get("spark.test.a.b.c") === "a.b.c")
-  }
 
-  test("Thread safeness - SPARK-5425") {
+  test("Thread safeness - SPARK-5425")
     val executor = Executors.newSingleThreadScheduledExecutor()
-    val sf = executor.scheduleAtFixedRate(new Runnable {
+    val sf = executor.scheduleAtFixedRate(new Runnable
       override def run(): Unit =
         System.setProperty("spark.5425." + Random.nextInt(),
                            Random.nextInt().toString)
-    }, 0, 1, TimeUnit.MILLISECONDS)
+    , 0, 1, TimeUnit.MILLISECONDS)
 
-    try {
+    try
       val t0 = System.currentTimeMillis()
-      while ( (System.currentTimeMillis() - t0) < 1000) {
+      while ( (System.currentTimeMillis() - t0) < 1000)
         val conf = Try(new SparkConf(loadDefaults = true))
         assert(conf.isSuccess === true)
-      }
-    } finally {
+    finally
       executor.shutdownNow()
       val sysProps = System.getProperties
       for (key <- sysProps.stringPropertyNames().asScala
                      if key.startsWith("spark.5425.")) sysProps.remove(key)
-    }
-  }
 
-  test("register kryo classes through registerKryoClasses") {
+  test("register kryo classes through registerKryoClasses")
     val conf = new SparkConf().set("spark.kryo.registrationRequired", "true")
 
     conf.registerKryoClasses(Array(classOf[Class1], classOf[Class2]))
@@ -198,10 +183,9 @@ class SparkConfSuite
     serializer.newInstance().serialize(new Class1())
     serializer.newInstance().serialize(new Class2())
     serializer.newInstance().serialize(new Class3())
-  }
 
   test(
-      "register kryo classes through registerKryoClasses and custom registrator") {
+      "register kryo classes through registerKryoClasses and custom registrator")
     val conf = new SparkConf().set("spark.kryo.registrationRequired", "true")
 
     conf.registerKryoClasses(Array(classOf[Class1]))
@@ -215,9 +199,8 @@ class SparkConfSuite
     val serializer = new KryoSerializer(conf)
     serializer.newInstance().serialize(new Class1())
     serializer.newInstance().serialize(new Class2())
-  }
 
-  test("register kryo classes through conf") {
+  test("register kryo classes through conf")
     val conf = new SparkConf().set("spark.kryo.registrationRequired", "true")
     conf.set("spark.kryo.classesToRegister", "java.lang.StringBuffer")
     conf.set("spark.serializer", classOf[KryoSerializer].getName)
@@ -226,9 +209,8 @@ class SparkConfSuite
     // blow up.
     val serializer = new KryoSerializer(conf)
     serializer.newInstance().serialize(new StringBuffer())
-  }
 
-  test("deprecated configs") {
+  test("deprecated configs")
     val conf = new SparkConf()
     val newName = "spark.history.fs.update.interval"
 
@@ -246,9 +228,8 @@ class SparkConfSuite
     conf.set(newName, "4")
     assert(conf.get(newName) === "4")
 
-    val count = conf.getAll.count {
+    val count = conf.getAll.count
       case (k, v) => k.startsWith("spark.history.")
-    }
     assert(count === 4)
 
     conf.set("spark.yarn.applicationMaster.waitTries", "42")
@@ -256,9 +237,8 @@ class SparkConfSuite
 
     conf.set("spark.kryoserializer.buffer.mb", "1.1")
     assert(conf.getSizeAsKb("spark.kryoserializer.buffer") === 1100)
-  }
 
-  test("akka deprecated configs") {
+  test("akka deprecated configs")
     val conf = new SparkConf()
 
     assert(!conf.contains("spark.rpc.numRetries"))
@@ -277,9 +257,8 @@ class SparkConfSuite
 
     conf.set("spark.akka.lookupTimeout", "4")
     assert(RpcUtils.lookupRpcTimeout(conf).duration === (4 seconds))
-  }
 
-  test("SPARK-13727") {
+  test("SPARK-13727")
     val conf = new SparkConf()
     // set the conf in the deprecated way
     conf.set("spark.io.compression.lz4.block.size", "12345")
@@ -291,15 +270,11 @@ class SparkConfSuite
     assert(conf.contains("spark.io.compression.lz4.block.size"))
     assert(conf.contains("spark.io.compression.lz4.blockSize"))
     assert(conf.contains("spark.io.unknown") === false)
-  }
-}
 
 class Class1 {}
 class Class2 {}
 class Class3 {}
 
-class CustomRegistrator extends KryoRegistrator {
-  def registerClasses(kryo: Kryo) {
+class CustomRegistrator extends KryoRegistrator
+  def registerClasses(kryo: Kryo)
     kryo.register(classOf[Class2])
-  }
-}

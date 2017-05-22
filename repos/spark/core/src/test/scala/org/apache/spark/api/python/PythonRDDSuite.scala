@@ -22,15 +22,14 @@ import java.nio.charset.StandardCharsets
 
 import org.apache.spark.SparkFunSuite
 
-class PythonRDDSuite extends SparkFunSuite {
+class PythonRDDSuite extends SparkFunSuite
 
-  test("Writing large strings to the worker") {
+  test("Writing large strings to the worker")
     val input: List[String] = List("a" * 100000)
     val buffer = new DataOutputStream(new ByteArrayOutputStream)
     PythonRDD.writeIteratorToStream(input.iterator, buffer)
-  }
 
-  test("Handle nulls gracefully") {
+  test("Handle nulls gracefully")
     val buffer = new DataOutputStream(new ByteArrayOutputStream)
     // Should not have NPE when write an Iterator with null in it
     // The correctness will be tested in Python
@@ -47,5 +46,3 @@ class PythonRDDSuite extends SparkFunSuite {
                  ("a".getBytes(StandardCharsets.UTF_8), null),
                  (null, "b".getBytes(StandardCharsets.UTF_8))),
         buffer)
-  }
-}

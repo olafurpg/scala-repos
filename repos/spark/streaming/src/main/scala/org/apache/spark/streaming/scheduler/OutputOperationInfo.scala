@@ -38,10 +38,9 @@ case class OutputOperationInfo(batchTime: Time,
                                description: String,
                                startTime: Option[Long],
                                endTime: Option[Long],
-                               failureReason: Option[String]) {
+                               failureReason: Option[String])
 
   /**
     * Return the duration of this output operation.
     */
   def duration: Option[Long] = for (s <- startTime; e <- endTime) yield e - s
-}

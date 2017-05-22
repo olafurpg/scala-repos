@@ -6,7 +6,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.fusesource.scalate.Binding
 
-trait ScalateUrlGeneratorSupport extends ScalateSupport {
+trait ScalateUrlGeneratorSupport extends ScalateSupport
 
   lazy val reflectRoutes: Map[String, Route] = this.getClass.getDeclaredMethods
     .filter(_.getParameterTypes.isEmpty)
@@ -14,21 +14,18 @@ trait ScalateUrlGeneratorSupport extends ScalateSupport {
     .map(f => (f.getName, f.invoke(this).asInstanceOf[Route]))
     .toMap
 
-  override protected def createTemplateEngine(config: ConfigT) = {
+  override protected def createTemplateEngine(config: ConfigT) =
     val engine = super.createTemplateEngine(config)
     //    val generatorBinding = Binding("urlGenerator", classOf[UrlGeneratorSupport].getName, true)
     val routeBindings =
       this.reflectRoutes.keys map (Binding(_, classOf[Route].getName))
     engine.bindings = engine.bindings ::: routeBindings.toList
     engine
-  }
 
   override protected def createRenderContext(out: PrintWriter)(
-      implicit request: HttpServletRequest, response: HttpServletResponse) = {
+      implicit request: HttpServletRequest, response: HttpServletResponse) =
     val context = super.createRenderContext(out)
     for ((name, route) <- this.reflectRoutes) context.attributes.update(
         name, route)
     //    context.attributes.update("urlGenerator", UrlGenerator)
     context
-  }
-}

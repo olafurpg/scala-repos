@@ -41,7 +41,7 @@ import scalafx.stage.PopupWindow
 /**
   * Object companion for [[scalafx.scene.control.PopupControl]].
   */
-object PopupControl {
+object PopupControl
 
   /**
     * Converts a ScalaFX PopupControl to its JavaFX counterpart
@@ -75,7 +75,6 @@ object PopupControl {
     */
   def classCssMetaData: Buffer[jfxcss.CssMetaData[_ <: jfxcss.Styleable, _]] =
     jfxsc.PopupControl.getClassCssMetaData
-}
 
 /**
   * Wraps a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/PopupControl.html PopupControl]].
@@ -86,79 +85,69 @@ object PopupControl {
 class PopupControl(
     override val delegate: jfxsc.PopupControl = new jfxsc.PopupControl)
     extends PopupWindow(delegate) with Styleable with Skinnable
-    with SFXDelegate[jfxsc.PopupControl] {
+    with SFXDelegate[jfxsc.PopupControl]
 
   /**
     * The id of this Node.
     */
   def id: StringProperty = delegate.idProperty
-  def id_=(v: String) {
+  def id_=(v: String)
     id() = v
-  }
 
   /**
     * Property for overriding the control's computed maximum height.
     */
   def maxHeight: DoubleProperty = delegate.maxHeightProperty
-  def maxHeight_=(v: Double) {
+  def maxHeight_=(v: Double)
     maxHeight() = v
-  }
 
   /**
     * Property for overriding the control's computed maximum width.
     */
   def maxWidth: DoubleProperty = delegate.maxWidthProperty
-  def maxWidth_=(v: Double) {
+  def maxWidth_=(v: Double)
     maxWidth() = v
-  }
 
   /**
     * Property for overriding the control's computed minimum height.
     */
   def minHeight: DoubleProperty = delegate.minHeightProperty
-  def minHeight_=(v: Double) {
+  def minHeight_=(v: Double)
     minHeight() = v
-  }
 
   /**
     * Property for overriding the control's computed minimum width.
     */
   def minWidth: DoubleProperty = delegate.minWidthProperty
-  def minWidth_=(v: Double) {
+  def minWidth_=(v: Double)
     minWidth() = v
-  }
 
   /**
     * Property for overriding the control's computed preferred height.
     *
     */
   def prefHeight: DoubleProperty = delegate.prefHeightProperty
-  def prefHeight_=(v: Double) {
+  def prefHeight_=(v: Double)
     prefHeight() = v
-  }
 
   /**
     * Property for overriding the control's computed preferred width.
     */
   def prefWidth: DoubleProperty = delegate.prefWidthProperty
-  def prefWidth_=(v: Double) {
+  def prefWidth_=(v: Double)
     prefWidth() = v
-  }
 
   /**
     * A string representation of the CSS style associated with this specific Node.
     */
   def style: StringProperty = delegate.styleProperty
-  def style_=(v: String) {
+  def style_=(v: String)
     style() = v
-  }
 
   /**
     * @since 8.0
     */
-  def pseudoClassStateChanged(pseudoClass: PseudoClass, active: Boolean) {
+  def pseudoClassStateChanged(pseudoClass: PseudoClass, active: Boolean)
     delegate.pseudoClassStateChanged(pseudoClass, active)
-  }
 
   // protected Skin<?> createDefaultSkin()
-}

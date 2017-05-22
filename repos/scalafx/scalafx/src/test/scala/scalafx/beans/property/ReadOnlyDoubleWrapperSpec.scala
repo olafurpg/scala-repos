@@ -34,23 +34,19 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
 /** ReadOnlyDoubleWrapper Spec tests. */
 @RunWith(classOf[JUnitRunner])
-class ReadOnlyDoubleWrapperSpec extends FlatSpec with BeforeAndAfterEach {
+class ReadOnlyDoubleWrapperSpec extends FlatSpec with BeforeAndAfterEach
 
-  "A ReadOnlyDoubleWrapper" should "be an instance of DoubleProperty" in {
+  "A ReadOnlyDoubleWrapper" should "be an instance of DoubleProperty" in
     val p = new ReadOnlyDoubleWrapper()
     assert(p.isInstanceOf[DoubleProperty])
-  }
 
-  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyDoubleProperty`" in {
+  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyDoubleProperty`" in
     val p = new ReadOnlyDoubleWrapper()
     assert(p.readOnlyProperty.isInstanceOf[ReadOnlyDoubleProperty])
-  }
 
-  it should "propagate value changes to `readOnlyProperty`" in {
+  it should "propagate value changes to `readOnlyProperty`" in
     val p = new ReadOnlyDoubleWrapper
     p.value = 13.1
     p.readOnlyProperty() should equal(13.1)
     p.value = -7.83
     p.readOnlyProperty() should equal(-7.83)
-  }
-}

@@ -12,7 +12,7 @@ import lila.hub.actorApi.relation.ReloadOnlineFriends
 import makeTimeout.large
 import Step.openingWriter
 
-object Handler {
+object Handler
 
   type Controller = PartialFunction[(String, JsObject), Unit]
   type Connecter = PartialFunction[
@@ -28,26 +28,24 @@ object Handler {
             uid: String,
             join: Any,
             userId: Option[String])(
-      connecter: Connecter): Fu[JsSocketHandler] = {
+      connecter: Connecter): Fu[JsSocketHandler] =
 
-    def baseController(member: SocketMember): Controller = {
+    def baseController(member: SocketMember): Controller =
       case ("p", _) => socket ! Ping(uid)
       case ("following_onlines", _) =>
-        userId foreach { u =>
+        userId foreach  u =>
           hub.actor.relation ! ReloadOnlineFriends(u)
-        }
       case ("startWatching", o) =>
-        o str "d" foreach { ids =>
+        o str "d" foreach  ids =>
           hub.actor.moveBroadcast ! StartWatching(
               uid, member, ids.split(' ').toSet)
-        }
       case ("moveLat", o) =>
         hub.channel.roundMoveTime ! (~(o boolean "d"))
           .fold(Channel.Sub(member), Channel.UnSub(member))
       case ("anaMove", o) =>
-        AnaRateLimit(uid) {
-          AnaMove parse o foreach { anaMove =>
-            anaMove.step match {
+        AnaRateLimit(uid)
+          AnaMove parse o foreach  anaMove =>
+            anaMove.step match
               case scalaz.Success(step) =>
                 member push lila.socket.Socket.makeMessage(
                     "step",
@@ -58,13 +56,10 @@ object Handler {
               case scalaz.Failure(err) =>
                 member push lila.socket.Socket.makeMessage("stepFailure",
                                                            err.toString)
-            }
-          }
-        }
       case ("anaDrop", o) =>
-        AnaRateLimit(uid) {
-          AnaDrop parse o foreach { anaDrop =>
-            anaDrop.step match {
+        AnaRateLimit(uid)
+          AnaDrop parse o foreach  anaDrop =>
+            anaDrop.step match
               case scalaz.Success(step) =>
                 member push lila.socket.Socket.makeMessage(
                     "step",
@@ -75,43 +70,32 @@ object Handler {
               case scalaz.Failure(err) =>
                 member push lila.socket.Socket.makeMessage("stepFailure",
                                                            err.toString)
-            }
-          }
-        }
       case ("anaDests", o) =>
-        AnaRateLimit(uid) {
-          AnaDests parse o match {
+        AnaRateLimit(uid)
+          AnaDests parse o match
             case Some(req) =>
               member push lila.socket.Socket.makeMessage(
                   "dests",
                   Json.obj(
                       "dests" -> req.dests,
                       "path" -> req.path
-                  ) ++ req.opening.?? { o =>
+                  ) ++ req.opening.??  o =>
                     Json.obj("opening" -> o)
-                  })
+                  )
             case None =>
               member push lila.socket.Socket
                 .makeMessage("destsFailure", "Bad dests request")
-          }
-        }
       case _ => // logwarn("Unhandled msg: " + msg)
-    }
 
-    def iteratee(controller: Controller, member: SocketMember): JsIteratee = {
+    def iteratee(controller: Controller, member: SocketMember): JsIteratee =
       val control = controller orElse baseController(member)
       Iteratee
         .foreach[JsValue](jsv =>
-              jsv.asOpt[JsObject] foreach { obj =>
-            obj str "t" foreach { t =>
+              jsv.asOpt[JsObject] foreach  obj =>
+            obj str "t" foreach  t =>
               control.lift(t -> obj)
-            }
-        })
+        )
         .map(_ => socket ! Quit(uid))
-    }
 
-    socket ? join map connecter map {
+    socket ? join map connecter map
       case (controller, enum, member) => iteratee(controller, member) -> enum
-    }
-  }
-}

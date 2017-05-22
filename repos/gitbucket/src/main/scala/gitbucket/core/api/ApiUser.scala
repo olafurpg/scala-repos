@@ -8,7 +8,7 @@ case class ApiUser(login: String,
                    email: String,
                    `type`: String,
                    site_admin: Boolean,
-                   created_at: Date) {
+                   created_at: Date)
   val url = ApiPath(s"/api/v3/users/${login}")
   val html_url = ApiPath(s"/${login}")
   // val followers_url       = ApiPath(s"/api/v3/users/${login}/followers")
@@ -20,9 +20,8 @@ case class ApiUser(login: String,
   // val repos_url           = ApiPath(s"/api/v3/users/${login}/repos")
   // val events_url          = ApiPath(s"/api/v3/users/${login}/events{/privacy}")
   // val received_events_url = ApiPath(s"/api/v3/users/${login}/received_events")
-}
 
-object ApiUser {
+object ApiUser
   def apply(user: Account): ApiUser = ApiUser(
       login = user.userName,
       email = user.mailAddress,
@@ -30,4 +29,3 @@ object ApiUser {
       site_admin = user.isAdmin,
       created_at = user.registeredDate
   )
-}

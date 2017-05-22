@@ -45,10 +45,9 @@ class TextFormatterSpec
     extends SimpleSFXDelegateSpec[
         jfxsc.TextFormatter[String], TextFormatter[String]](
         classOf[jfxsc.TextFormatter[String]], classOf[TextFormatter[String]])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override protected def getScalaClassInstance: TextFormatter[String] =
     new TextFormatter(getJavaClassInstance)
   override protected def getJavaClassInstance: jfxsc.TextFormatter[String] =
     new jfxsc.TextFormatter(TextFormatter.IdentityStringConverter)
-}

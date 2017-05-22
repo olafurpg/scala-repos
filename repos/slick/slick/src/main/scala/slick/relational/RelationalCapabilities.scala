@@ -3,7 +3,7 @@ package slick.relational
 import slick.basic.Capability
 
 /** Capabilities for [[slick.profile.RelationalProfile]]. */
-object RelationalCapabilities {
+object RelationalCapabilities
 
   /** Supports default values in column definitions */
   val columnDefaults = Capability("relational.columnDefaults")
@@ -94,4 +94,3 @@ object RelationalCapabilities {
                 reverse,
                 indexOf,
                 repeat)
-}

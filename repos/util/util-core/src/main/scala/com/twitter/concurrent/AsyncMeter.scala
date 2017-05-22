@@ -6,21 +6,19 @@ import java.util.concurrent.{ArrayBlockingQueue, CancellationException, Rejected
 import scala.annotation.tailrec
 
 // implicitly a rate of 1 token / `interval`
-private[concurrent] class Period(val interval: Duration) extends AnyVal {
+private[concurrent] class Period(val interval: Duration) extends AnyVal
   import AsyncMeter._
 
   def numPeriods(dur: Duration): Double =
     dur.inNanoseconds.toDouble / interval.inNanoseconds.toDouble
 
   def realInterval: Duration = interval.max(MinimumInterval)
-}
 
-private[concurrent] object Period {
+private[concurrent] object Period
   def fromBurstiness(size: Int, interval: Duration): Period =
     new Period(interval / size)
-}
 
-object AsyncMeter {
+object AsyncMeter
   private[concurrent] val MinimumInterval = 1.millisecond
 
   /**
@@ -63,8 +61,8 @@ object AsyncMeter {
     * `burstSize` within a given `burstDuration`.  Also, because of the
     * implementation, it consumes more than one slot from `maxWaiters`.
     */
-  def extraWideAwait(permits: Int, meter: AsyncMeter): Future[Unit] = {
-    if (permits > meter.burstSize) {
+  def extraWideAwait(permits: Int, meter: AsyncMeter): Future[Unit] =
+    if (permits > meter.burstSize)
       val last = permits % meter.burstSize
       val num = permits / meter.burstSize
       val seqWithoutLast: Seq[Future[Unit]] =
@@ -72,15 +70,11 @@ object AsyncMeter {
       val seq =
         if (last == 0) seqWithoutLast else seqWithoutLast :+ meter.await(last)
       val result = Future.join(seq)
-      result.onFailure { exc =>
-        seq.foreach { f: Future[Unit] =>
+      result.onFailure  exc =>
+        seq.foreach  f: Future[Unit] =>
           f.raise(exc)
-        }
-      }
       result
-    } else meter.await(permits)
-  }
-}
+    else meter.await(permits)
 
 /**
   * An asynchronous meter.
@@ -114,7 +108,7 @@ object AsyncMeter {
   */
 class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
                                      burstDuration: Duration,
-                                     maxWaiters: Int)(implicit timer: Timer) {
+                                     maxWaiters: Int)(implicit timer: Timer)
 
   require(burstSize > 0,
           s"burst size of $burstSize, which is <= 0 doesn't make sense")
@@ -179,7 +173,7 @@ class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
     * [[java.lang.IllegalArgumentException]] [[com.twitter.util.Future]]
     * immediately.
     */
-  def await(permits: Int): Future[Unit] = {
+  def await(permits: Int): Future[Unit] =
     if (permits > burstSize)
       return Future.exception(new IllegalArgumentException(
               s"Tried to await on $permits permits, but the maximum burst size was $burstSize"))
@@ -196,68 +190,60 @@ class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
     val p = Promise[Unit]
     val tup = (p, permits)
 
-    if (q.offer(tup)) {
-      p.setInterruptHandler {
+    if (q.offer(tup))
+      p.setInterruptHandler
         case t: Throwable =>
           // must synchronize on removals-see explanation by declaration of queue
           val rem = synchronized { q.remove(tup) }
-          if (rem) {
+          if (rem)
             val e =
               new CancellationException("Request for permits was cancelled.")
             e.initCause(t)
             p.setException(e)
-          }
-      }
       restartTimerIfDead()
       p
-    } else {
+    else
       Future.exception(new RejectedExecutionException(
               "Tried to wait when there were already the maximum number of waiters."))
-    }
-  }
 
-  private[this] def updateAndGet(tokens: Int): Boolean = {
+  private[this] def updateAndGet(tokens: Int): Boolean =
     refreshTokens()
     bucket.tryGet(tokens)
-  }
 
   // we refresh the bucket with as many tokens as we have accrued since we last
   // refreshed.
   private[this] def refreshTokens(): Unit =
     bucket.put(
-        synchronized {
+        synchronized
       val newTokens = period.numPeriods(elapsed())
       elapsed = Stopwatch.start()
       val num = newTokens + remainder
       val floor = math.floor(num)
       remainder = num - floor
       floor.toInt
-    })
+    )
 
-  private[this] def restartTimerIfDead(): Unit = synchronized {
-    if (!running) {
+  private[this] def restartTimerIfDead(): Unit = synchronized
+    if (!running)
       running = true
-      task = timer.schedule(interval) {
+      task = timer.schedule(interval)
         allow()
-      }
-    }
-  }
 
   // it's safe to race on allow, because polling loop is locked
-  private[this] final def allow(): Unit = {
+  private[this] final def allow(): Unit =
     refreshTokens()
 
     // we loop here so that we can satisfy more than one promise at a time.
     // imagine that start with no tokens, we distribute ten tokens, and our
     // waiters are waiting for 4, 1, 6, 3 tokens.  we should distribute 4, and
     // 1, and ask 6 and 3 to keep waiting until we have more tokens.
-    while (true) {
+    while (true)
       // we go through the `control` runaround to avoid triggering the
       // closures on the promise while we hold the lock.
       // TODO: investigate using an explicit lock so we can just call unlock()
       // instead of tying the lock to the scope.
-      val control = this.synchronized {
-        q.peek() match {
+      val control = this.synchronized
+        q.peek() match
           case null =>
             running = false
 
@@ -270,12 +256,6 @@ class AsyncMeter private[concurrent](private[concurrent] val burstSize: Int,
             Some(p)
           case _ =>
             None
-        }
-      }
-      control match {
+      control match
         case Some(p) => p.setValue(())
         case None => return ()
-      }
-    }
-  }
-}

@@ -13,7 +13,7 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 
 @RunWith(classOf[JUnit4])
-class CompactLocalVariablesTest {
+class CompactLocalVariablesTest
 
   // recurse-unreachable-jumps is required for eliminating catch blocks, in the first dce round they
   // are still live.only after eliminating the empty handler the catch blocks become unreachable.
@@ -22,7 +22,7 @@ class CompactLocalVariablesTest {
   val noCompactVarsCompiler = newCompiler(extraArgs = "-Yopt:unreachable-code")
 
   @Test
-  def compactUnused(): Unit = {
+  def compactUnused(): Unit =
     val code =
       """def f: Double = {
         |  try { }
@@ -66,9 +66,8 @@ class CompactLocalVariablesTest {
     assertTrue(noCompact.instructions.size == withCompact.instructions.size)
 
     val varOpSlots =
-      convertMethod(withCompact).instructions collect {
+      convertMethod(withCompact).instructions collect
         case VarOp(_, v) => v
-      }
     assertTrue(varOpSlots.toString,
                varOpSlots == List(1,
                                   2,
@@ -94,5 +93,3 @@ class CompactLocalVariablesTest {
 
     assertTrue(noCompact.maxLocals == 25)
     assertTrue(withCompact.maxLocals == 13)
-  }
-}

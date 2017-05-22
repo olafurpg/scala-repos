@@ -43,7 +43,7 @@ object SecurityHelpers
   * <li> create SHA, SHA-256, MD5 hashes (can be hex encoded)
   * </ul>
   */
-trait SecurityHelpers { self: StringHelpers with IoHelpers =>
+trait SecurityHelpers  self: StringHelpers with IoHelpers =>
 
   /** short alias for java.security.SecureRandom */
   private val _random = new SecureRandom
@@ -90,81 +90,70 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
   def md5(in: String): String = base64Encode(md5(in.getBytes("UTF-8")))
 
   /** create a SHA hash from a Byte array */
-  def hash(in: Array[Byte]): Array[Byte] = {
+  def hash(in: Array[Byte]): Array[Byte] =
     MessageDigest.getInstance("SHA").digest(in)
-  }
 
   /** create a SHA hash from a String */
-  def hash(in: String): String = {
+  def hash(in: String): String =
     base64Encode(MessageDigest.getInstance("SHA").digest(in.getBytes("UTF-8")))
-  }
 
   /** create a SHA hash from a String */
-  def hashHex(in: String): String = {
+  def hashHex(in: String): String =
     Helpers.hexEncode(
         MessageDigest.getInstance("SHA").digest(in.getBytes("UTF-8")))
-  }
 
   /** Compare two strings in a way that does not vary if the strings
     * are determined to be not equal early (test every byte... avoids
     * timing attacks */
-  def secureEquals(s1: String, s2: String): Boolean = (s1, s2) match {
+  def secureEquals(s1: String, s2: String): Boolean = (s1, s2) match
     case (null, null) => true
     case (null, _) => false
     case (_, null) => false
     case (a, b) => secureEquals(a.getBytes("UTF-8"), b.getBytes("UTF-8"))
-  }
 
   /** Compare two byte arrays in a way that does not vary if the arrays
     * are determined to be not equal early (test every byte... avoids
     * timing attacks */
   def secureEquals(s1: Array[Byte], s2: Array[Byte]): Boolean =
-    (s1, s2) match {
+    (s1, s2) match
       case (null, null) => true
       case (null, _) => false
       case (_, null) => false
-      case (a, b) => {
+      case (a, b) =>
           val la = a.length
           val lb = b.length
           var ret = true
           var pos = 0
-          while (pos < la && pos < lb) {
+          while (pos < la && pos < lb)
             ret &= (a(pos) == b(pos))
             pos += 1
-          }
           ret && la == lb
-        }
-    }
 
   /** create a SHA-256 hash from a Byte array */
-  def hash256(in: Array[Byte]): Array[Byte] = {
+  def hash256(in: Array[Byte]): Array[Byte] =
     MessageDigest.getInstance("SHA-256").digest(in)
-  }
 
   /** create a SHA-256 hash from a String */
-  def hash256(in: String): String = {
+  def hash256(in: String): String =
     base64Encode(
         MessageDigest.getInstance("SHA-256").digest(in.getBytes("UTF-8")))
-  }
 
   /** create a hex encoded SHA hash from a Byte array */
-  def hexDigest(in: Array[Byte]): String = {
+  def hexDigest(in: Array[Byte]): String =
     val binHash = MessageDigest.getInstance("SHA").digest(in)
     hexEncode(binHash)
-  }
 
   /** create a hex encoded SHA-256 hash from a Byte array */
-  def hexDigest256(in: Array[Byte]): String = {
+  def hexDigest256(in: Array[Byte]): String =
     val binHash = MessageDigest.getInstance("SHA-256").digest(in)
     hexEncode(binHash)
-  }
 
-  def hexDecode(str: String): Array[Byte] = {
+  def hexDecode(str: String): Array[Byte] =
     val max = str.length / 2
     val ret = new Array[Byte](max)
     var pos = 0
 
-    def byteOf(in: Char): Int = in match {
+    def byteOf(in: Char): Int = in match
       case '0' => 0
       case '1' => 1
       case '2' => 2
@@ -182,25 +171,22 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
       case 'e' | 'E' => 14
       case 'f' | 'F' => 15
       case _ => 0
-    }
 
-    while (pos < max) {
+    while (pos < max)
       val two = pos * 2
       val ch: Char = str.charAt(two)
       val cl: Char = str.charAt(two + 1)
       ret(pos) = (byteOf(ch) * 16 + byteOf(cl)).toByte
       pos += 1
-    }
 
     ret
-  }
 
   /** encode a Byte array as hexadecimal characters */
-  def hexEncode(in: Array[Byte]): String = {
+  def hexEncode(in: Array[Byte]): String =
     val sb = new StringBuilder
     val len = in.length
-    def addDigit(in: Array[Byte], pos: Int, len: Int, sb: StringBuilder) {
-      if (pos < len) {
+    def addDigit(in: Array[Byte], pos: Int, len: Int, sb: StringBuilder)
+      if (pos < len)
         val b: Int = in(pos)
         val msb = (b & 0xf0) >> 4
         val lsb = (b & 0x0f)
@@ -210,11 +196,8 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
                    else ('a' + (lsb - 10)).asInstanceOf[Char]))
 
         addDigit(in, pos + 1, len, sb)
-      }
-    }
     addDigit(in, 0, len, sb)
     sb.toString
-  }
 
   /**
     * Provides a secure XML parser, similar to the one provided by
@@ -224,7 +207,7 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
     * is used internally throughout Lift, and should be used by anyone who is
     * parsing XML from an untrusted source.
     */
-  def secureXML: XMLLoader[Elem] = {
+  def secureXML: XMLLoader[Elem] =
     val parserFactory = SAXParserFactory.newInstance(
         "org.apache.xerces.jaxp.SAXParserFactoryImpl",
         SecurityHelpers.getClass.getClassLoader
@@ -244,5 +227,3 @@ trait SecurityHelpers { self: StringHelpers with IoHelpers =>
 
     val saxParser = parserFactory.newSAXParser();
     XML.withSAXParser(saxParser)
-  }
-}

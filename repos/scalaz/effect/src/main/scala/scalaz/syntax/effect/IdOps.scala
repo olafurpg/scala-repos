@@ -4,7 +4,7 @@ package effect
 
 import scalaz.effect.IO
 
-final class IdOps[A](val self: A) extends AnyVal {
+final class IdOps[A](val self: A) extends AnyVal
 
   final def put(implicit S: Show[A]): IO[Unit] =
     IO.put(self)
@@ -15,8 +15,6 @@ final class IdOps[A](val self: A) extends AnyVal {
   /** Safe version of tap. */
   final def tap[B](f: A => IO[B]): IO[A] =
     for { _ <- f(self) } yield self
-}
 
-trait ToIdOps {
+trait ToIdOps
   implicit def ToEffectIdOps[A](a: A): IdOps[A] = new IdOps(a)
-}

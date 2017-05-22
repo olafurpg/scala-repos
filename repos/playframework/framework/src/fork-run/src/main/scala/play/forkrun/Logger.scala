@@ -6,12 +6,11 @@ package play.forkrun
 import java.io.{PrintStream, PrintWriter, StringWriter}
 import play.runsupport.{Colors, LoggerProxy}
 
-object Logger {
-  case class Level(value: Int, name: String, label: String) {
+object Logger
+  case class Level(value: Int, name: String, label: String)
     override def toString = name
-  }
 
-  object Level {
+  object Level
     val Debug = Level(1, "debug", Label.debug)
     val Info = Level(2, "info", Label.info)
     val Warn = Level(3, "warn", Label.warn)
@@ -21,24 +20,21 @@ object Logger {
 
     def apply(value: Int): Option[Level] = levels find (_.value == value)
     def apply(name: String): Option[Level] = levels find (_.name == name)
-  }
 
-  object Label {
+  object Label
     val debug = "[debug] "
     val info = "[info] "
     val warn = "[" + Colors.yellow("warn") + "] "
     val error = "[" + Colors.red("error") + "] "
     val success = "[" + Colors.green("success") + "] "
-  }
 
   val NewLine = sys.props("line.separator")
 
   def apply(level: Level): Logger = new Logger(level)
   def apply(level: String): Logger =
     new Logger(Level(level).getOrElse(Level.Info))
-}
 
-class Logger(out: PrintStream, logLevel: Logger.Level) extends LoggerProxy {
+class Logger(out: PrintStream, logLevel: Logger.Level) extends LoggerProxy
   import Logger._
 
   def this(logLevel: Logger.Level) = this(System.out, logLevel)
@@ -51,28 +47,22 @@ class Logger(out: PrintStream, logLevel: Logger.Level) extends LoggerProxy {
   def warn(message: => String): Unit = log(Level.Warn, message)
   def error(message: => String): Unit = log(Level.Error, message)
 
-  def trace(t: => Throwable): Unit = {
+  def trace(t: => Throwable): Unit =
     val stackTrace = new StringWriter
     t.printStackTrace(new PrintWriter(stackTrace))
     log(Level.Error, stackTrace.toString)
-  }
 
   def success(message: => String): Unit = printLog(Label.success, message)
 
-  def log(level: Level, message: => String): Unit = {
+  def log(level: Level, message: => String): Unit =
     if (level.value >= logLevel.value) printLog(level.label, message)
-  }
 
-  def log(level: String, message: => String): Unit = {
+  def log(level: String, message: => String): Unit =
     for (logLevel <- Logger.Level(level)) log(logLevel, message)
-  }
 
   def printLog(
       label: String, message: String, separator: String = NewLine): Unit =
-    out.synchronized {
-      for (line <- message.split(separator)) {
+    out.synchronized
+      for (line <- message.split(separator))
         out.print(label)
         out.println(line)
-      }
-    }
-}

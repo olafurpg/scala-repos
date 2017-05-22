@@ -12,14 +12,12 @@ import scala.language.{reflectiveCalls}
 trait Aa
 trait Ab
 
-trait B { self: Aa with Ab =>
+trait B  self: Aa with Ab =>
 
   def y = new { def f() = println("Success 1") }
-  def fail() = {
+  def fail() =
     println('Test)
     y.f()
-  }
-}
 
 object Test1 extends Aa with Ab with B
 
@@ -28,38 +26,31 @@ object Test1 extends Aa with Ab with B
 
 class A2
 
-trait B2 { self: A2 =>
+trait B2  self: A2 =>
 
   def y = new { def f() = println("Success 2") }
-  def fail() = {
+  def fail() =
     println('Test)
     y.f()
-  }
-}
 
 object Test2 extends A2 with B2
 
 // TEST 3
 // self-type is singleton type
 
-trait B3 {
+trait B3
   this: Test3.type =>
 
   def y = new { def f() = println("Success 3") }
-  def fail() = {
+  def fail() =
     println('Test)
     y.f()
-  }
-}
 
-object Test3 extends B3 {
+object Test3 extends B3
   def test { fail() }
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     Test1.fail()
     Test2.fail()
     Test3.fail()
-  }
-}

@@ -4,25 +4,21 @@ import play.api.data.format.Formats._
 import play.api.data.Forms._
 import play.api.libs.json._
 
-object Form {
+object Form
 
-  def options(it: Iterable[Int], pattern: String) = it map { d =>
+  def options(it: Iterable[Int], pattern: String) = it map  d =>
     d -> (pluralize(pattern, d) format d)
-  }
 
   def options(it: Iterable[Int], transformer: Int => Int, pattern: String) =
-    it map { d =>
+    it map  d =>
       d -> (pluralize(pattern, transformer(d)) format transformer(d))
-    }
 
-  def options(it: Iterable[Int], code: String, pattern: String) = it map { d =>
+  def options(it: Iterable[Int], code: String, pattern: String) = it map  d =>
     (d + code) -> (pluralize(pattern, d) format d)
-  }
 
-  def optionsDouble(it: Iterable[Double], format: Double => String) = it map {
+  def optionsDouble(it: Iterable[Double], format: Double => String) = it map
     d =>
       d -> format(d)
-  }
 
   def numberIn(choices: Iterable[(Int, String)]) =
     number.verifying(hasKey(choices, _))
@@ -49,4 +45,3 @@ object Form {
   def errorsAsJson(form: play.api.data.Form[_])(
       implicit lang: play.api.i18n.Messages) =
     form.errorsAsJson validate jsonGlobalErrorRenamer getOrElse form.errorsAsJson
-}

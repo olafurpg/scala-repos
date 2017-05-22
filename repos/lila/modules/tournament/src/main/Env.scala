@@ -24,9 +24,9 @@ final class Env(config: Config,
                 isOnline: String => Boolean,
                 onStart: String => Unit,
                 trophyApi: lila.user.TrophyApi,
-                scheduler: lila.common.Scheduler) {
+                scheduler: lila.common.Scheduler)
 
-  private val settings = new {
+  private val settings = new
     val CollectionTournament = config getString "collection.tournament"
     val CollectionPlayer = config getString "collection.player"
     val CollectionPairing = config getString "collection.pairing"
@@ -41,7 +41,6 @@ final class Env(config: Config,
     val ApiActorName = config getString "api_actor.name"
     val SequencerTimeout = config duration "sequencer.timeout"
     val NetDomain = config getString "net.domain"
-  }
   import settings._
 
   lazy val forms = new DataForm
@@ -90,7 +89,7 @@ final class Env(config: Config,
       tournamentColl = tournamentColl, leaderboardColl = leaderboardColl)
 
   private val socketHub =
-    system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket] {
+    system.actorOf(Props(new lila.socket.SocketHubActor.Default[Socket]
       def mkActor(tournamentId: String) =
         new Socket(tournamentId = tournamentId,
                    history = new History(ttl = HistoryMessageTtl),
@@ -98,14 +97,14 @@ final class Env(config: Config,
                    uidTimeout = UidTimeout,
                    socketTimeout = SocketTimeout,
                    lightUser = lightUser)
-    }), name = SocketName)
+    ), name = SocketName)
 
   private val sequencerMap = system.actorOf(
-      Props(ActorMap { id =>
+      Props(ActorMap  id =>
     new Sequencer(receiveTimeout = SequencerTimeout.some,
                   executionTimeout = 5.seconds.some,
                   logger = logger)
-  }))
+  ))
 
   system.actorOf(Props(new ApiActor(api = api)), name = ApiActorName)
 
@@ -133,12 +132,10 @@ final class Env(config: Config,
   def version(tourId: String): Fu[Int] =
     socketHub ? Ask(tourId, GetVersion) mapTo manifest[Int]
 
-  def cli = new lila.common.Cli {
-    def process = {
+  def cli = new lila.common.Cli
+    def process =
       case "tournament" :: "leaderboard" :: "generate" :: Nil =>
         leaderboardIndexer.generateAll inject "Done!"
-    }
-  }
 
   private lazy val autoPairing = new AutoPairing(
       roundMap = roundMap, system = system, onStart = onStart)
@@ -147,9 +144,8 @@ final class Env(config: Config,
   private[tournament] lazy val pairingColl = db(CollectionPairing)
   private[tournament] lazy val playerColl = db(CollectionPlayer)
   private[tournament] lazy val leaderboardColl = db(CollectionLeaderboard)
-}
 
-object Env {
+object Env
 
   private def hub = lila.hub.Env.current
 
@@ -168,4 +164,3 @@ object Env {
         onStart = lila.game.Env.current.onStart,
         trophyApi = lila.user.Env.current.trophyApi,
         scheduler = lila.common.PlayApp.scheduler)
-}

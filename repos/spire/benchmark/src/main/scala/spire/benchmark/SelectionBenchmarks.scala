@@ -14,18 +14,16 @@ import com.google.caliper.Param
 
 object SelectionBenchmarks extends MyRunner(classOf[SelectionBenchmarks])
 
-class SelectionBenchmarks extends MyBenchmark {
+class SelectionBenchmarks extends MyBenchmark
   implicit val lexicographic: Order[Complex[Double]] =
-    new Order[Complex[Double]] {
+    new Order[Complex[Double]]
       override def eqv(a: Complex[Double], b: Complex[Double]) = a == b
-      def compare(a: Complex[Double], b: Complex[Double]): Int = {
+      def compare(a: Complex[Double], b: Complex[Double]): Int =
         if (a.real < b.real) -1
         else if (a.real > b.real) 1
         else if (a.imag < b.imag) -1
         else if (a.imag > b.imag) 1
         else 0
-      }
-    }
 
   @Param(Array("3", "4", "6", "9", "13", "18"))
   var pow: Int = 0
@@ -44,16 +42,15 @@ class SelectionBenchmarks extends MyBenchmark {
   var cs: Array[Complex[Double]] = null
   var cs2: Array[FakeComplex[Double]] = null
 
-  def mkarray[A : ClassTag : Order](size: Int)(init: => A): Array[A] = {
+  def mkarray[A : ClassTag : Order](size: Int)(init: => A): Array[A] =
     val data = Array.ofDim[A](size)
     var i = 0
     while (i < size) { data(i) = init; i += 1 }
     if (layout == "random") return data
     spire.math.Sorting.sort(data)
     if (layout == "sorted") data else data.reverse
-  }
 
-  override protected def setUp(): Unit = {
+  override protected def setUp(): Unit =
     val size = spire.math.pow(2, pow).toInt
 
     is = if (typ == "int") mkarray(size, layout)(nextInt) else null
@@ -63,48 +60,42 @@ class SelectionBenchmarks extends MyBenchmark {
     cs = if (typ == "complex") mkarray(size, layout)(nextComplex) else null
     cs2 = if (typ == "complex") cs.map(c => new FakeComplex(c.real, c.imag))
     else null
-  }
 
-  def timeSpireQuickSelect(reps: Int) = run(reps) {
-    if (typ == "int") {
+  def timeSpireQuickSelect(reps: Int) = run(reps)
+    if (typ == "int")
       val arr =
         is.clone; spire.math.Selection.quickSelect(arr, arr.length / 2);
       arr.length
-    } else if (typ == "long") {
+    else if (typ == "long")
       val arr =
         js.clone; spire.math.Selection.quickSelect(arr, arr.length / 2);
       arr.length
-    } else if (typ == "float") {
+    else if (typ == "float")
       val arr =
         fs.clone; spire.math.Selection.quickSelect(arr, arr.length / 2);
       arr.length
-    } else if (typ == "double") {
+    else if (typ == "double")
       val arr =
         ds.clone; spire.math.Selection.quickSelect(arr, arr.length / 2);
       arr.length
-    } else if (typ == "complex") {
+    else if (typ == "complex")
       val arr =
         cs.clone; spire.math.Selection.quickSelect(arr, arr.length / 2);
       arr.length
-    }
-  }
 
-  def timeSpireLinearSelect(reps: Int) = run(reps) {
-    if (typ == "int") {
+  def timeSpireLinearSelect(reps: Int) = run(reps)
+    if (typ == "int")
       val arr = is.clone;
       spire.math.Selection.linearSelect(arr, arr.length / 2); arr.length
-    } else if (typ == "long") {
+    else if (typ == "long")
       val arr = js.clone;
       spire.math.Selection.linearSelect(arr, arr.length / 2); arr.length
-    } else if (typ == "float") {
+    else if (typ == "float")
       val arr = fs.clone;
       spire.math.Selection.linearSelect(arr, arr.length / 2); arr.length
-    } else if (typ == "double") {
+    else if (typ == "double")
       val arr = ds.clone;
       spire.math.Selection.linearSelect(arr, arr.length / 2); arr.length
-    } else if (typ == "complex") {
+    else if (typ == "complex")
       val arr = cs.clone;
       spire.math.Selection.linearSelect(arr, arr.length / 2); arr.length
-    }
-  }
-}

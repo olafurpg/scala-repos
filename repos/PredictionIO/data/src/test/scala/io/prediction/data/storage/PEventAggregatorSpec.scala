@@ -20,15 +20,15 @@ import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.rdd.RDD
 
-class PEventAggregatorSpec extends Specification with TestEvents {
+class PEventAggregatorSpec extends Specification with TestEvents
 
   System.clearProperty("spark.driver.port")
   System.clearProperty("spark.hostPort")
   val sc = new SparkContext("local[4]", "PEventAggregatorSpec test")
 
-  "PEventAggregator" should {
+  "PEventAggregator" should
 
-    "aggregate two entities' properties as DataMap/PropertyMap correctly" in {
+    "aggregate two entities' properties as DataMap/PropertyMap correctly" in
       val events =
         sc.parallelize(Seq(u1e5, u2e2, u1e3, u1e1, u2e3, u2e1, u1e4, u1e2))
 
@@ -47,9 +47,8 @@ class PEventAggregatorSpec extends Specification with TestEvents {
 
       userMap must beEqualTo(expectedDM)
       userMap must beEqualTo(expectedPM)
-    }
 
-    "aggregate deleted entity correctly" in {
+    "aggregate deleted entity correctly" in
       // put the delete event in middle
       val events = sc.parallelize(
           Seq(u1e5, u2e2, u1e3, u1ed, u1e1, u2e3, u2e1, u1e4, u1e2))
@@ -62,8 +61,5 @@ class PEventAggregatorSpec extends Specification with TestEvents {
       )
 
       userMap must beEqualTo(expectedPM)
-    }
-  }
 
   step(sc.stop())
-}

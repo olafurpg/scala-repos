@@ -13,7 +13,7 @@ import Bijections._
 /**
   * Rich HttpResponse
   */
-abstract class Response extends Message with HttpResponseProxy {
+abstract class Response extends Message with HttpResponseProxy
 
   /**
     * Arbitrary user-defined context associated with this response object.
@@ -35,25 +35,22 @@ abstract class Response extends Message with HttpResponseProxy {
   def setStatusCode(value: Int) { statusCode = value }
 
   /** Encode as an HTTP message */
-  def encodeString(): String = {
+  def encodeString(): String =
     val encoder = new EncoderEmbedder[ChannelBuffer](new HttpResponseEncoder)
     encoder.offer(httpResponse)
     val buffer = encoder.poll()
     buffer.toString(Charsets.UTF_8)
-  }
 
   override def toString =
     "Response(\"" + version + " " + status + "\")"
-}
 
-object Response {
+object Response
 
   /**
     * Utility class to make it possible to mock/spy a Response.
     */
-  class Ok extends Response {
+  class Ok extends Response
     val httpResponse = apply.httpResponse
-  }
 
   /**
     * [[com.twitter.collection.RecordSchema RecordSchema]] declaration, used
@@ -63,19 +60,17 @@ object Response {
   val Schema: RecordSchema = new RecordSchema
 
   /** Decode a [[Response]] from a String */
-  def decodeString(s: String): Response = {
+  def decodeString(s: String): Response =
     decodeBytes(s.getBytes(Charsets.UTF_8))
-  }
 
   /** Decode a [[Response]] from a byte array */
-  def decodeBytes(b: Array[Byte]): Response = {
+  def decodeBytes(b: Array[Byte]): Response =
     val decoder = new DecoderEmbedder(
         new HttpResponseDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
     decoder.offer(ChannelBuffers.wrappedBuffer(b))
     val res = decoder.poll().asInstanceOf[HttpResponse]
     assert(res ne null)
     Response(res)
-  }
 
   /** Create Response. */
   def apply(): Response =
@@ -88,22 +83,19 @@ object Response {
   /**
     * Create a Response from version, status, and Reader.
     */
-  def apply(version: Version, status: Status, reader: Reader): Response = {
+  def apply(version: Version, status: Status, reader: Reader): Response =
     val res = new DefaultHttpResponse(from(version), from(status))
     res.setChunked(true)
     apply(res, reader)
-  }
 
   private[http] def apply(response: HttpResponse): Response =
-    new Response {
+    new Response
       val httpResponse = response
-    }
 
   private[http] def apply(response: HttpResponse, readerIn: Reader): Response =
-    new Response {
+    new Response
       val httpResponse = response
       override val reader = readerIn
-    }
 
   /** Create Response from status. */
   def apply(status: Status): Response =
@@ -111,8 +103,6 @@ object Response {
 
   /** Create Response from Request. */
   private[http] def apply(httpRequest: Request): Response =
-    new Response {
+    new Response
       final val httpResponse = new DefaultHttpResponse(
           httpRequest.getProtocolVersion, HttpResponseStatus.OK)
-    }
-}

@@ -24,7 +24,7 @@ import scalaxy.debug._
   *
   * @author ktakagaki
   */
-package object signal {
+package object signal
 
   @deprecated("use fourierTr", "v.0.6")
   val fft: fourierTr.type = fourierTr
@@ -52,7 +52,7 @@ package object signal {
   def fourierFreq(windowLength: Int,
                   fs: Double = -1,
                   dt: Double = -1,
-                  shifted: Boolean = false): DenseVector[Double] = {
+                  shifted: Boolean = false): DenseVector[Double] =
     require(fs > 0 || dt > 0,
             "Must specify either a valid fs or a valid dt argument.")
     if (fs > 0 && dt > 0)
@@ -62,23 +62,21 @@ package object signal {
     val realFs = if (fs < 0 && dt > 0) 1d / dt else fs
 
     val shiftedFreq =
-      if (isEven(windowLength)) {
+      if (isEven(windowLength))
         DenseVector.vertcat(
             DenseVector.tabulate(0 to windowLength / 2 - 1)(
                 (i: Int) => i.toDouble * realFs / windowLength.toDouble),
             DenseVector.tabulate(-windowLength / 2 to -1)(
                 (i: Int) => i.toDouble * realFs / windowLength.toDouble)
         )
-      } else {
+      else
         DenseVector.vertcat(
             DenseVector.tabulate(0 to (windowLength - 1) / 2)(
                 (i: Int) => i.toDouble * realFs / windowLength.toDouble),
             DenseVector.tabulate(-(windowLength - 1) / 2 to -1)(
                 (i: Int) => i.toDouble * realFs / windowLength.toDouble)
         )
-      }
     if (shifted) fourierShift(shiftedFreq) else shiftedFreq
-  }
 
   // </editor-fold>
 
@@ -375,4 +373,3 @@ package object signal {
   def inverseHaarTransform[Input, Output](v: Input)(
       implicit canInverseHaarTransform: CanIHaarTr[Input, Output]): Output =
     canInverseHaarTransform(v)
-}

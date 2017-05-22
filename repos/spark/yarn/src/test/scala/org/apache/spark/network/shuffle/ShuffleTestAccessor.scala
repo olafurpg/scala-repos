@@ -29,32 +29,28 @@ import org.apache.spark.network.shuffle.protocol.ExecutorShuffleInfo
 /**
   * just a cheat to get package-visible members in tests
   */
-object ShuffleTestAccessor {
+object ShuffleTestAccessor
 
   def getBlockResolver(
-      handler: ExternalShuffleBlockHandler): ExternalShuffleBlockResolver = {
+      handler: ExternalShuffleBlockHandler): ExternalShuffleBlockResolver =
     handler.blockManager
-  }
 
   def getExecutorInfo(
       appId: ApplicationId,
       execId: String,
       resolver: ExternalShuffleBlockResolver
-  ): Option[ExecutorShuffleInfo] = {
+  ): Option[ExecutorShuffleInfo] =
     val id = new AppExecId(appId.toString, execId)
     Option(resolver.executors.get(id))
-  }
 
-  def registeredExecutorFile(resolver: ExternalShuffleBlockResolver): File = {
+  def registeredExecutorFile(resolver: ExternalShuffleBlockResolver): File =
     resolver.registeredExecutorFile
-  }
 
-  def shuffleServiceLevelDB(resolver: ExternalShuffleBlockResolver): DB = {
+  def shuffleServiceLevelDB(resolver: ExternalShuffleBlockResolver): DB =
     resolver.db
-  }
 
   def reloadRegisteredExecutors(file: File): ConcurrentMap[
-      ExternalShuffleBlockResolver.AppExecId, ExecutorShuffleInfo] = {
+      ExternalShuffleBlockResolver.AppExecId, ExecutorShuffleInfo] =
     val options: Options = new Options
     options.createIfMissing(true)
     val factory = new JniDBFactory
@@ -62,10 +58,7 @@ object ShuffleTestAccessor {
     val result = ExternalShuffleBlockResolver.reloadRegisteredExecutors(db)
     db.close()
     result
-  }
 
   def reloadRegisteredExecutors(db: DB): ConcurrentMap[
-      ExternalShuffleBlockResolver.AppExecId, ExecutorShuffleInfo] = {
+      ExternalShuffleBlockResolver.AppExecId, ExecutorShuffleInfo] =
     ExternalShuffleBlockResolver.reloadRegisteredExecutors(db)
-  }
-}

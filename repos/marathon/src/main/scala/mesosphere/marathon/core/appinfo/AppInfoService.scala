@@ -7,7 +7,7 @@ import scala.concurrent.Future
 /**
   * Queries for extended information about apps.
   */
-trait AppInfoService {
+trait AppInfoService
 
   /**
     * Return the app info for the given path -- if an app for this path exists.
@@ -35,4 +35,3 @@ trait AppInfoService {
     */
   def selectAppsBy(
       selector: AppSelector, embed: Set[AppInfo.Embed]): Future[Seq[AppInfo]]
-}

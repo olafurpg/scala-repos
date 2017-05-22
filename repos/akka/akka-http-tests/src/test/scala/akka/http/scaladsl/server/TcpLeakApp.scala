@@ -13,7 +13,7 @@ import akka.stream.{ActorAttributes, ActorMaterializer}
 import akka.util.ByteString
 import com.typesafe.config.{Config, ConfigFactory}
 
-object TcpLeakApp extends App {
+object TcpLeakApp extends App
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loglevel = DEBUG
@@ -41,15 +41,13 @@ object TcpLeakApp extends App {
           .toMat(Sink.head)(Keep.right)
           .run())
     .last
-    .onComplete {
+    .onComplete
       case error ⇒
         println(s"Error: $error")
         Thread.sleep(10000)
         println("===================== \n\n" +
             system.asInstanceOf[ActorSystemImpl].printTree +
             "\n\n========================")
-    }
 
   readLine()
   system.terminate()
-}

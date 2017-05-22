@@ -33,27 +33,23 @@ import scalafx.scene.control.Button
 import scalafx.scene.control.ToolBar
 import scalafx.scene.layout.BorderPane
 
-class EnsembleToolBar extends EnsembleExample {
+class EnsembleToolBar extends EnsembleExample
 
   // @stage-property width = 400
   // @stage-property height = 150
-  def getContent = new BorderPane {
+  def getContent = new BorderPane
     padding = Insets(20)
-    top = new ToolBar {
+    top = new ToolBar
       content = List(
-          new Button {
+          new Button
             text = "Home"
             minWidth = 75
-          },
-          new Button {
+          ,
+          new Button
             text = "Options"
             minWidth = 75
-          },
-          new Button {
+          ,
+          new Button
             text = "Help"
             minWidth = 75
-          }
       )
-    }
-  }
-}

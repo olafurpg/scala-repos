@@ -38,7 +38,7 @@ import org.apache.spark.annotation.DeveloperApi
   */
 @DeveloperApi
 sealed class Metadata private[types](private[types] val map: Map[String, Any])
-    extends Serializable {
+    extends Serializable
 
   /** No-arg constructor for kryo. */
   protected def this() = this(null)
@@ -81,49 +81,41 @@ sealed class Metadata private[types](private[types] val map: Map[String, Any])
 
   override def toString: String = json
 
-  override def equals(obj: Any): Boolean = {
-    obj match {
+  override def equals(obj: Any): Boolean =
+    obj match
       case that: Metadata =>
-        if (map.keySet == that.map.keySet) {
-          map.keys.forall { k =>
-            (map(k), that.map(k)) match {
+        if (map.keySet == that.map.keySet)
+          map.keys.forall  k =>
+            (map(k), that.map(k)) match
               case (v0: Array[_], v1: Array[_]) =>
                 v0.view == v1.view
               case (v0, v1) =>
                 v0 == v1
-            }
-          }
-        } else {
+        else
           false
-        }
       case other =>
         false
-    }
-  }
 
   override def hashCode: Int = Metadata.hash(this)
 
-  private def get[T](key: String): T = {
+  private def get[T](key: String): T =
     map(key).asInstanceOf[T]
-  }
 
   private[sql] def jsonValue: JValue = Metadata.toJsonValue(this)
-}
 
-object Metadata {
+object Metadata
 
   /** Returns an empty Metadata. */
   def empty: Metadata = new Metadata(Map.empty)
 
   /** Creates a Metadata instance from JSON. */
-  def fromJson(json: String): Metadata = {
+  def fromJson(json: String): Metadata =
     fromJObject(parse(json).asInstanceOf[JObject])
-  }
 
   /** Creates a Metadata instance from JSON AST. */
-  private[sql] def fromJObject(jObj: JObject): Metadata = {
+  private[sql] def fromJObject(jObj: JObject): Metadata =
     val builder = new MetadataBuilder
-    jObj.obj.foreach {
+    jObj.obj.foreach
       case (key, JInt(value)) =>
         builder.putLong(key, value.toLong)
       case (key, JDouble(value)) =>
@@ -135,11 +127,11 @@ object Metadata {
       case (key, o: JObject) =>
         builder.putMetadata(key, fromJObject(o))
       case (key, JArray(value)) =>
-        if (value.isEmpty) {
+        if (value.isEmpty)
           // If it is an empty array, we cannot infer its element type. We put an empty Array[Long].
           builder.putLongArray(key, Array.empty)
-        } else {
-          value.head match {
+        else
+          value.head match
             case _: JInt =>
               builder.putLongArray(
                   key,
@@ -160,23 +152,18 @@ object Metadata {
             case other =>
               throw new RuntimeException(
                   s"Do not support array of type ${other.getClass}.")
-          }
-        }
       case (key, JNull) =>
         builder.putNull(key)
       case (key, other) =>
         throw new RuntimeException(s"Do not support type ${other.getClass}.")
-    }
     builder.build()
-  }
 
   /** Converts to JSON AST. */
-  private def toJsonValue(obj: Any): JValue = {
-    obj match {
+  private def toJsonValue(obj: Any): JValue =
+    obj match
       case map: Map[_, _] =>
-        val fields = map.toList.map {
+        val fields = map.toList.map
           case (k: String, v) => (k, toJsonValue(v))
-        }
         JObject(fields)
       case arr: Array[_] =>
         val values = arr.toList.map(toJsonValue)
@@ -193,12 +180,10 @@ object Metadata {
         toJsonValue(x.map)
       case other =>
         throw new RuntimeException(s"Do not support type ${other.getClass}.")
-    }
-  }
 
   /** Computes the hash code for the types we support. */
-  private def hash(obj: Any): Int = {
-    obj match {
+  private def hash(obj: Any): Int =
+    obj match
       case map: Map[_, _] =>
         map.mapValues(hash).##
       case arr: Array[_] =>
@@ -216,9 +201,6 @@ object Metadata {
         hash(x.map)
       case other =>
         throw new RuntimeException(s"Do not support type ${other.getClass}.")
-    }
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -226,7 +208,7 @@ object Metadata {
   * Builder for [[Metadata]]. If there is a key collision, the latter will overwrite the former.
   */
 @DeveloperApi
-class MetadataBuilder {
+class MetadataBuilder
 
   private val map: mutable.Map[String, Any] = mutable.Map.empty
 
@@ -234,10 +216,9 @@ class MetadataBuilder {
   protected def getMap = map.toMap
 
   /** Include the content of an existing [[Metadata]] instance. */
-  def withMetadata(metadata: Metadata): this.type = {
+  def withMetadata(metadata: Metadata): this.type =
     map ++= metadata.map
     this
-  }
 
   /** Puts a null. */
   def putNull(key: String): this.type = put(key, null)
@@ -278,17 +259,13 @@ class MetadataBuilder {
     put(key, value)
 
   /** Builds the [[Metadata]] instance. */
-  def build(): Metadata = {
+  def build(): Metadata =
     new Metadata(map.toMap)
-  }
 
-  private def put(key: String, value: Any): this.type = {
+  private def put(key: String, value: Any): this.type =
     map.put(key, value)
     this
-  }
 
-  def remove(key: String): this.type = {
+  def remove(key: String): this.type =
     map.remove(key)
     this
-  }
-}

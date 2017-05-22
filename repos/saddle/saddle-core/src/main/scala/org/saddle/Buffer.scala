@@ -22,7 +22,7 @@ import scala.{specialized => spec}
   * Appending an element takes amortized constant time, and the buffer instance can
   * be converted to an array either implicitly or explicitly via `toArray`.
   */
-trait Buffer[@spec(Boolean, Int, Long, Double) T] {
+trait Buffer[@spec(Boolean, Int, Long, Double) T]
 
   /**
     * Access an element of the buffer
@@ -49,9 +49,8 @@ trait Buffer[@spec(Boolean, Int, Long, Double) T] {
   override def toString =
     "Buffer [" + util.buildStr(
         8, count(), (i: Int) => " " + apply(i).toString, " ... ") + " ]"
-}
 
-object Buffer {
+object Buffer
   val INIT_CAPACITY = 16
 
   /**
@@ -69,4 +68,3 @@ object Buffer {
     * @tparam T Type of elements in buffer
     */
   implicit def bufToArr[T](buf: Buffer[T]): Array[T] = buf.toArray
-}

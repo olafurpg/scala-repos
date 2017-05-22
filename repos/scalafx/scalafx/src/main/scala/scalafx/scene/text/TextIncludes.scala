@@ -50,7 +50,7 @@ object TextIncludes extends TextIncludes
   * @define TA TextAlignment
   * @define TB TextBoundsType
   */
-trait TextIncludes {
+trait TextIncludes
 
   /**
     * $START$FT.html $FT$END
@@ -118,4 +118,3 @@ trait TextIncludes {
 
   implicit def jfxTextFlow2sfx(tf: jfxst.TextFlow): TextFlow =
     if (tf != null) new TextFlow(tf) else null
-}

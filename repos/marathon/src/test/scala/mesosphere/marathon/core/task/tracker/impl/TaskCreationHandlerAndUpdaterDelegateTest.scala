@@ -13,9 +13,9 @@ import org.scalatest.concurrent.ScalaFutures
 
 class TaskCreationHandlerAndUpdaterDelegateTest
     extends MarathonActorSupport with MarathonSpec with Mockito
-    with GivenWhenThen with ScalaFutures with Matchers {
+    with GivenWhenThen with ScalaFutures with Matchers
 
-  test("Created succeeds") {
+  test("Created succeeds")
     val f = new Fixture
     val appId: PathId = PathId("/test")
     val task = MarathonTestHelper.mininimalTask(appId)
@@ -33,9 +33,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     f.taskTrackerProbe.reply(())
     Then("The reply is the value of task")
     create.futureValue should be(task)
-  }
 
-  test("Created fails") {
+  test("Created fails")
     val f = new Fixture
     val appId: PathId = PathId("/test")
     val task = MarathonTestHelper.mininimalTask(appId)
@@ -57,9 +56,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     create.failed.futureValue.getMessage should include(task.taskId.idString)
     create.failed.futureValue.getMessage should include("Update")
     create.failed.futureValue.getCause should be(cause)
-  }
 
-  test("Terminated succeeds") {
+  test("Terminated succeeds")
     val f = new Fixture
     val appId: PathId = PathId("/test")
     val task = MarathonTestHelper.mininimalTask(appId)
@@ -77,9 +75,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     f.taskTrackerProbe.reply(())
     Then("The reply is the value of the future")
     terminated.futureValue should be(())
-  }
 
-  test("Terminated fails") {
+  test("Terminated fails")
     val f = new Fixture
     val appId: PathId = PathId("/test")
     val task = MarathonTestHelper.mininimalTask(appId)
@@ -102,9 +99,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
         task.taskId.idString)
     terminated.failed.futureValue.getMessage should include("Expunge")
     terminated.failed.futureValue.getCause should be(cause)
-  }
 
-  test("StatusUpdate succeeds") {
+  test("StatusUpdate succeeds")
     val f = new Fixture
     val appId: PathId = PathId("/test")
     val taskId = "task1"
@@ -129,9 +125,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     f.taskTrackerProbe.reply(())
     Then("The reply is the value of the future")
     statusUpdate.futureValue should be(())
-  }
 
-  test("StatusUpdate fails") {
+  test("StatusUpdate fails")
     val f = new Fixture
     val appId: PathId = PathId("/test")
     val taskId = Task.Id.forApp(appId)
@@ -158,9 +153,8 @@ class TaskCreationHandlerAndUpdaterDelegateTest
     statusUpdate.failed.futureValue.getMessage should include(taskId.toString)
     statusUpdate.failed.futureValue.getMessage should include("UpdateStatus")
     statusUpdate.failed.futureValue.getCause should be(cause)
-  }
 
-  class Fixture {
+  class Fixture
     lazy val clock = ConstantClock()
     lazy val config = MarathonTestHelper.defaultConfig()
     lazy val taskTrackerProbe = TestProbe()
@@ -168,5 +162,3 @@ class TaskCreationHandlerAndUpdaterDelegateTest
         clock, config, taskTrackerProbe.ref)
     lazy val timeoutDuration = delegate.timeout.duration
     def timeoutFromNow = clock.now() + timeoutDuration
-  }
-}

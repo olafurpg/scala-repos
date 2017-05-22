@@ -19,7 +19,7 @@ package kafka.utils
 /**
   * Some common constants
   */
-object Time {
+object Time
   val NsPerUs = 1000
   val UsPerMs = 1000
   val MsPerSec = 1000
@@ -32,28 +32,25 @@ object Time {
   val SecsPerHour = SecsPerMin * MinsPerHour
   val SecsPerDay = SecsPerHour * HoursPerDay
   val MinsPerDay = MinsPerHour * HoursPerDay
-}
 
 /**
   * A mockable interface for time functions
   */
-trait Time {
+trait Time
 
   def milliseconds: Long
 
   def nanoseconds: Long
 
   def sleep(ms: Long)
-}
 
 /**
   * The normal system implementation of time functions
   */
-object SystemTime extends Time {
+object SystemTime extends Time
 
   def milliseconds: Long = System.currentTimeMillis
 
   def nanoseconds: Long = System.nanoTime
 
   def sleep(ms: Long): Unit = Thread.sleep(ms)
-}

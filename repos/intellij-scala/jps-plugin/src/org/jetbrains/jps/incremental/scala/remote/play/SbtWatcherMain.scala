@@ -12,20 +12,18 @@ import org.jetbrains.jps.incremental.scala.remote.play.WatcherCommands._
   * User: Dmitry.Naydanov
   * Date: 12.02.15.
   */
-object SbtWatcherMain {
+object SbtWatcherMain
   private var currentExec: Option[(SbtWatcherExec, Seq[String])] = None
 
-  def nailMain(context: NGContext) {
+  def nailMain(context: NGContext)
     handle(context.getArgs.toSeq, context.out)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     handle(args, System.out)
-  }
 
-  private def handle(arguments: Seq[String], out: PrintStream) {
-    val messageConsumer = new MessageConsumer {
-      override def consume(message: String) {
+  private def handle(arguments: Seq[String], out: PrintStream)
+    val messageConsumer = new MessageConsumer
+      override def consume(message: String)
         out.write(
             Base64Converter
               .encode(MessageEvent(BuildMessage.Kind.INFO,
@@ -34,36 +32,28 @@ object SbtWatcherMain {
                                    None,
                                    None).toBytes)
               .getBytes)
-      }
-    }
 
-    arguments.head match {
+    arguments.head match
       case START =>
         val argsTail = arguments.tail
 
-        def run() {
+        def run()
           val watcher = new LocalSbtWatcherExec
           watcher.startSbtExec(argsTail.toArray, messageConsumer)
 
-          if (watcher.isRunning) {
+          if (watcher.isRunning)
             currentExec = Some((watcher, argsTail))
-          }
-        }
 
-        currentExec foreach {
+        currentExec foreach
           case ((watcher, args)) if args == argsTail =>
           case ((watcher, _)) =>
             watcher.endSbtExec()
             run()
           case _ => run()
-        }
       case STOP => currentExec.foreach(a => a._1.endSbtExec())
       case IS_RUNNING =>
         messageConsumer.consume(
-            currentExec.map { a =>
+            currentExec.map  a =>
           toMessage(a._1.isRunning)
-        } getOrElse FALSE)
+        getOrElse FALSE)
       case _ =>
-    }
-  }
-}

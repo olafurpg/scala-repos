@@ -47,35 +47,31 @@ private[spark] class HttpServer(conf: SparkConf,
                                 securityManager: SecurityManager,
                                 requestedPort: Int = 0,
                                 serverName: String = "HTTP server")
-    extends Logging {
+    extends Logging
 
   private var server: Server = null
   private var port: Int = requestedPort
-  private val servlets = {
+  private val servlets =
     val handler = new ServletContextHandler()
     handler.setContextPath("/")
     handler
-  }
 
-  def start() {
-    if (server != null) {
+  def start()
+    if (server != null)
       throw new ServerStateException("Server is already started")
-    } else {
+    else
       logInfo("Starting HTTP Server")
       val (actualServer, actualPort) = Utils.startServiceOnPort[Server](
           requestedPort, doStart, conf, serverName)
       server = actualServer
       port = actualPort
-    }
-  }
 
-  def addDirectory(contextPath: String, resourceBase: String): Unit = {
+  def addDirectory(contextPath: String, resourceBase: String): Unit =
     val holder = new ServletHolder()
     holder.setInitParameter("resourceBase", resourceBase)
     holder.setInitParameter("pathInfoOnly", "true")
     holder.setServlet(new DefaultServlet())
     servlets.addServlet(holder, contextPath.stripSuffix("/") + "/*")
-  }
 
   /**
     * Actually start the HTTP server on the given port.
@@ -83,7 +79,7 @@ private[spark] class HttpServer(conf: SparkConf,
     * Note that this is only best effort in the sense that we may end up binding to a nearby port
     * in the event of port collision. Return the bound server and the actual port used.
     */
-  private def doStart(startPort: Int): (Server, Int) = {
+  private def doStart(startPort: Int): (Server, Int) =
     val server = new Server()
 
     val connector = securityManager.fileServerSSLOptions
@@ -101,16 +97,15 @@ private[spark] class HttpServer(conf: SparkConf,
     server.setThreadPool(threadPool)
     addDirectory("/", resourceBase.getAbsolutePath)
 
-    if (securityManager.isAuthenticationEnabled()) {
+    if (securityManager.isAuthenticationEnabled())
       logDebug("HttpServer is using security")
       val sh = setupSecurityHandler(securityManager)
       // make sure we go through security handler to get resources
       sh.setHandler(servlets)
       server.setHandler(sh)
-    } else {
+    else
       logDebug("HttpServer is not using security")
       server.setHandler(servlets)
-    }
 
     server.start()
     val actualPort = server
@@ -118,7 +113,6 @@ private[spark] class HttpServer(conf: SparkConf,
       .getLocalPort
 
       (server, actualPort)
-  }
 
   /**
     * Setup Jetty to the HashLoginService using a single user with our
@@ -126,7 +120,7 @@ private[spark] class HttpServer(conf: SparkConf,
     * isn't passed in plaintext.
     */
   private def setupSecurityHandler(
-      securityMgr: SecurityManager): ConstraintSecurityHandler = {
+      securityMgr: SecurityManager): ConstraintSecurityHandler =
     val constraint = new Constraint()
     // use DIGEST-MD5 as the authentication mechanism
     constraint.setName(Constraint.__DIGEST_AUTH)
@@ -145,36 +139,29 @@ private[spark] class HttpServer(conf: SparkConf,
     val hashLogin = new HashLoginService()
 
     val userCred = new Password(securityMgr.getSecretKey())
-    if (userCred == null) {
+    if (userCred == null)
       throw new Exception("Error: secret key is null with authentication on")
-    }
     hashLogin.putUser(securityMgr.getHttpUser(), userCred, Array("user"))
     sh.setLoginService(hashLogin)
     sh.setAuthenticator(new DigestAuthenticator());
     sh.setConstraintMappings(Array(cm))
     sh
-  }
 
-  def stop() {
-    if (server == null) {
+  def stop()
+    if (server == null)
       throw new ServerStateException("Server is already stopped")
-    } else {
+    else
       server.stop()
       port = -1
       server = null
-    }
-  }
 
   /**
     * Get the URI of this HTTP server (http://host:port or https://host:port)
     */
-  def uri: String = {
-    if (server == null) {
+  def uri: String =
+    if (server == null)
       throw new ServerStateException("Server is not started")
-    } else {
+    else
       val scheme =
         if (securityManager.fileServerSSLOptions.enabled) "https" else "http"
       s"$scheme://${Utils.localHostNameForURI()}:$port"
-    }
-  }
-}

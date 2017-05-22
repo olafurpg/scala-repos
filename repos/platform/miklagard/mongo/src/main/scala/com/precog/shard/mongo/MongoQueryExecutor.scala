@@ -68,7 +68,7 @@ import scalaz.syntax.std.either._
 import scala.collection.JavaConverters._
 
 class MongoQueryExecutorConfig(val config: Configuration)
-    extends StandaloneQueryExecutorConfig with MongoColumnarTableModuleConfig {
+    extends StandaloneQueryExecutorConfig with MongoColumnarTableModuleConfig
   val logPrefix = "mongo"
 
   def mongoServer: String = config[String]("mongo.server", "localhost:27017")
@@ -76,35 +76,31 @@ class MongoQueryExecutorConfig(val config: Configuration)
   def dbAuthParams = config.detach("mongo.dbAuth")
 
   def includeIdField: Boolean = config[Boolean]("include_ids", false)
-}
 
-object MongoQueryExecutor {
+object MongoQueryExecutor
   def apply(config: Configuration,
             jobManager: JobManager[Future],
             jobActorSystem: ActorSystem)(
       implicit ec: ExecutionContext,
-      M: Monad[Future]): Platform[Future, StreamT[Future, Slice]] = {
+      M: Monad[Future]): Platform[Future, StreamT[Future, Slice]] =
     new MongoQueryExecutor(
         new MongoQueryExecutorConfig(config), jobManager, jobActorSystem)
-  }
-}
 
 class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
                          val jobManager: JobManager[Future],
                          val jobActorSystem: ActorSystem)(
     implicit val executionContext: ExecutionContext, val M: Monad[Future])
     extends StandaloneQueryExecutor with MongoColumnarTableModule
-    with Logging {
+    with Logging
   platform =>
   type YggConfig = MongoQueryExecutorConfig
 
   val includeIdField = yggConfig.includeIdField
 
   trait TableCompanion extends MongoColumnarTableCompanion
-  object Table extends TableCompanion {
+  object Table extends TableCompanion
     var mongo: Mongo = _
     val dbAuthParams = yggConfig.dbAuthParams.data
-  }
 
   lazy val storage = new MongoStorageMetadataSource(Table.mongo)
 
@@ -112,15 +108,14 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
 
   Table.mongo = new Mongo(new MongoURI(yggConfig.mongoServer))
 
-  def shutdown() = Future {
+  def shutdown() = Future
     Table.mongo.close()
     true
-  }
 
-  val metadataClient = new MetadataClient[Future] {
+  val metadataClient = new MetadataClient[Future]
     def size(userUID: String, path: Path): Future[Validation[String, JNum]] =
-      Future {
-        path.elements.toList match {
+      Future
+        path.elements.toList match
           case dbName :: collectionName :: Nil =>
             val db = Table.mongo.getDB(dbName)
             success(JNum(db
@@ -130,41 +125,37 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
 
           case _ =>
             success(JNum(0))
-        }
-      }.onFailure {
+      .onFailure
         case t => logger.error("Failure during size", t)
-      }
 
     def browse(
         userUID: String, path: Path): Future[Validation[String, JArray]] =
-      Future {
-        path.elements.toList match {
+      Future
+        path.elements.toList match
           case Nil =>
             val dbs = Table.mongo.getDatabaseNames.asScala.toList
             // TODO: Poor behavior on Mongo's part, returning database+collection names
             // See https://groups.google.com/forum/#!topic/mongodb-user/HbE5wNOfl6k for details
 
             val finalNames = dbs
-              .foldLeft(dbs.toSet) {
+              .foldLeft(dbs.toSet)
                 case (acc, dbName) =>
-                  acc.filterNot { t =>
+                  acc.filterNot  t =>
                     t.startsWith(dbName) && t != dbName
-                  }
-              }
               .toList
               .sorted
-            Success(finalNames.map { d =>
+            Success(finalNames.map  d =>
               d + "/"
-            }.serialize.asInstanceOf[JArray])
+            .serialize.asInstanceOf[JArray])
 
           case dbName :: Nil =>
             val db = Table.mongo.getDB(dbName)
             Success(
                 if (db == null) JArray(Nil)
                 else
-                  db.getCollectionNames.asScala.map { d =>
+                  db.getCollectionNames.asScala.map  d =>
                 d + "/"
-              }.toList.sorted.serialize.asInstanceOf[JArray])
+              .toList.sorted.serialize.asInstanceOf[JArray])
 
           case dbName :: collectionName :: Nil =>
             Success(JArray(Nil))
@@ -172,10 +163,8 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
           case _ =>
             Failure(
                 "MongoDB paths have the form /databaseName/collectionName; longer paths are not supported.")
-        }
-      }.onFailure {
+      .onFailure
         case t => logger.error("Failure during browse", t)
-      }
 
     def structure(userUID: String, path: Path, cpath: CPath)
       : Future[Validation[String, JObject]] = Promise.successful(
@@ -187,7 +176,5 @@ class MongoQueryExecutor(val yggConfig: MongoQueryExecutorConfig,
     def currentVersion(apiKey: APIKey, path: Path) = Promise.successful(None)
     def currentAuthorities(apiKey: APIKey, path: Path) =
       Promise.successful(None)
-  }
-}
 
 // vim: set ts=4 sw=4 et:

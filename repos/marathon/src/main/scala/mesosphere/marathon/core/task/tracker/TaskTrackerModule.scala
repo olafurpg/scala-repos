@@ -15,7 +15,7 @@ class TaskTrackerModule(clock: Clock,
                         metrics: Metrics,
                         config: TaskTrackerConfig,
                         leadershipModule: LeadershipModule,
-                        taskRepository: TaskRepository) {
+                        taskRepository: TaskRepository)
   lazy val taskTracker: TaskTracker = new TaskTrackerDelegate(
       Some(metrics), config, taskTrackerActorRef)
 
@@ -49,4 +49,3 @@ class TaskTrackerModule(clock: Clock,
   private[this] lazy val taskTrackerCreatorAndUpdater =
     new TaskCreationHandlerAndUpdaterDelegate(
         clock, config, taskTrackerActorRef)
-}

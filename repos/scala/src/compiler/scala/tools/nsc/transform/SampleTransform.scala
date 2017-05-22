@@ -8,7 +8,7 @@ package transform
 
 /** A sample transform.
   */
-abstract class SampleTransform extends Transform {
+abstract class SampleTransform extends Transform
   // inherits abstract value `global` and class `Phase` from Transform
 
   import global._ // the global environment
@@ -20,12 +20,12 @@ abstract class SampleTransform extends Transform {
   protected def newTransformer(unit: CompilationUnit): Transformer =
     new SampleTransformer(unit)
 
-  class SampleTransformer(unit: CompilationUnit) extends Transformer {
+  class SampleTransformer(unit: CompilationUnit) extends Transformer
 
-    override def transform(tree: Tree): Tree = {
+    override def transform(tree: Tree): Tree =
       val tree1 =
         super.transform(tree); // transformers always maintain `currentOwner`.
-      tree1 match {
+      tree1 match
         case Block(List(), expr) => // a simple optimization
           expr
         case Block(defs, sup @ Super(qual, mix)) =>
@@ -46,7 +46,3 @@ abstract class SampleTransform extends Transform {
                               tree1.pos)))))
         case _ =>
           tree1
-      }
-    }
-  }
-}

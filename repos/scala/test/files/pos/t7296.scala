@@ -1,4 +1,4 @@
-object Test {
+object Test
   type A = Int
   // Emits the implementation restriction but then proceeds to crash
   // when creating the Foo.unapply.
@@ -28,4 +28,3 @@ object Test {
                  x: A,
                  y: A,
                  Z: A)
-}

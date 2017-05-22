@@ -27,7 +27,7 @@ import org.scalactic.Constraint
   */
 class TypedSpec(config: Config)
     extends Spec with Matchers with BeforeAndAfterAll with ScalaFutures
-    with ConversionCheckedTripleEquals {
+    with ConversionCheckedTripleEquals
   import TypedSpec._
   import AskPattern._
 
@@ -41,9 +41,8 @@ class TypedSpec(config: Config)
   implicit val timeout = Timeout(1.minute)
   implicit val patience = PatienceConfig(3.seconds)
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     Await.result(system ? (Terminate(_)), timeout.duration): Status
-  }
 
   // TODO remove after basing on ScalaTest 3 with async support
   import akka.testkit._
@@ -63,52 +62,44 @@ class TypedSpec(config: Config)
     system ? (RunTest(name, Props(behavior), _, timeout.duration))
 
   // TODO remove after basing on ScalaTest 3 with async support
-  def sync(f: Future[Status]): Unit = {
-    def unwrap(ex: Throwable): Throwable = ex match {
+  def sync(f: Future[Status]): Unit =
+    def unwrap(ex: Throwable): Throwable = ex match
       case ActorInitializationException(_, _, ex) ⇒ ex
       case other ⇒ other
-    }
 
-    await(f) match {
+    await(f) match
       case Success ⇒ ()
       case Failed(ex) ⇒ throw unwrap(ex)
       case Timedout ⇒ fail("test timed out")
-    }
-  }
 
   def muteExpectedException[T <: Exception : ClassTag](
       message: String = null,
       source: String = null,
       start: String = "",
       pattern: String = null,
-      occurrences: Int = Int.MaxValue): EventFilter = {
+      occurrences: Int = Int.MaxValue): EventFilter =
     val filter = EventFilter(message, source, start, pattern, occurrences)
     system.eventStream.publish(Mute(filter))
     filter
-  }
 
   /**
     * Group assertion that ensures that the given inboxes are empty.
     */
-  def assertEmpty(inboxes: Inbox.SyncInbox[_]*): Unit = {
+  def assertEmpty(inboxes: Inbox.SyncInbox[_]*): Unit =
     inboxes foreach
     (i ⇒ withClue(s"inbox $i had messages")(i.hasMessages should be(false)))
-  }
 
   // for ScalaTest === compare of Class objects
   implicit def classEqualityConstraint[A, B]: Constraint[Class[A], Class[B]] =
-    new Constraint[Class[A], Class[B]] {
+    new Constraint[Class[A], Class[B]]
       def areEqual(a: Class[A], b: Class[B]) = a == b
-    }
 
   implicit def setEqualityConstraint[A, T <: Set[_ <: A]]: Constraint[
       Set[A], T] =
-    new Constraint[Set[A], T] {
+    new Constraint[Set[A], T]
       def areEqual(a: Set[A], b: T) = a == b
-    }
-}
 
-object TypedSpec {
+object TypedSpec
   import ScalaDSL._
   import akka.{typed ⇒ t}
 
@@ -133,9 +124,9 @@ object TypedSpec {
 
   def guardian(outstanding: Map[ActorRef[_], ActorRef[Status]] = Map.empty)
     : Behavior[Command] =
-    FullTotal {
+    FullTotal
       case Sig(ctx, f @ t.Failed(ex, test)) ⇒
-        outstanding get test match {
+        outstanding get test match
           case Some(reply) ⇒
             reply ! Failed(ex)
             f.decide(t.Failed.Stop)
@@ -143,14 +134,12 @@ object TypedSpec {
           case None ⇒
             f.decide(t.Failed.Stop)
             Same
-        }
       case Sig(ctx, Terminated(test)) ⇒
-        outstanding get test match {
+        outstanding get test match
           case Some(reply) ⇒
             reply ! Success
             guardian(outstanding - test)
           case None ⇒ Same
-        }
       case _: Sig[_] ⇒ Same
       case Msg(ctx, r: RunTest[t]) ⇒
         val test = ctx.spawn(r.props, r.name)
@@ -163,5 +152,3 @@ object TypedSpec {
       case Msg(ctx, c: Create[t]) ⇒
         c.replyTo ! ctx.spawn(c.props, c.name)
         Same
-    }
-}

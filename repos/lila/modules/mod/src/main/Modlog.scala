@@ -6,9 +6,9 @@ case class Modlog(mod: String,
                   user: Option[String],
                   action: String,
                   details: Option[String] = None,
-                  date: DateTime = DateTime.now) {
+                  date: DateTime = DateTime.now)
 
-  def showAction = action match {
+  def showAction = action match
     case Modlog.engine => "mark as engine"
     case Modlog.unengine => "un-mark as engine"
     case Modlog.booster => "mark as booster"
@@ -33,12 +33,10 @@ case class Modlog(mod: String,
     case Modlog.deleteTeam => "delete team"
     case Modlog.terminateTournament => "terminate tournament"
     case a => a
-  }
 
   override def toString = s"$mod $showAction ${~user}"
-}
 
-object Modlog {
+object Modlog
 
   val engine = "engine"
   val unengine = "unengine"
@@ -78,4 +76,3 @@ object Modlog {
   )
 
   private def defaults = Json.obj("details" -> none[String])
-}

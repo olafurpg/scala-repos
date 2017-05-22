@@ -52,7 +52,7 @@ private[deploy] class ExecutorRunner(val appId: String,
                                      conf: SparkConf,
                                      val appLocalDirs: Seq[String],
                                      @volatile var state: ExecutorState.Value)
-    extends Logging {
+    extends Logging
 
   private val fullId = appId + "/" + execId
   private var workerThread: Thread = null
@@ -67,82 +67,68 @@ private[deploy] class ExecutorRunner(val appId: String,
   // make sense to remove this in the future.
   private var shutdownHook: AnyRef = null
 
-  private[worker] def start() {
-    workerThread = new Thread("ExecutorRunner for " + fullId) {
+  private[worker] def start()
+    workerThread = new Thread("ExecutorRunner for " + fullId)
       override def run() { fetchAndRunExecutor() }
-    }
     workerThread.start()
     // Shutdown hook that kills actors on shutdown.
-    shutdownHook = ShutdownHookManager.addShutdownHook { () =>
+    shutdownHook = ShutdownHookManager.addShutdownHook  () =>
       // It's possible that we arrive here before calling `fetchAndRunExecutor`, then `state` will
       // be `ExecutorState.RUNNING`. In this case, we should set `state` to `FAILED`.
-      if (state == ExecutorState.RUNNING) {
+      if (state == ExecutorState.RUNNING)
         state = ExecutorState.FAILED
-      }
       killProcess(Some("Worker shutting down"))
-    }
-  }
 
   /**
     * Kill executor process, wait for exit and notify worker to update resource status.
     *
     * @param message the exception message which caused the executor's death
     */
-  private def killProcess(message: Option[String]) {
+  private def killProcess(message: Option[String])
     var exitCode: Option[Int] = None
-    if (process != null) {
+    if (process != null)
       logInfo("Killing process!")
-      if (stdoutAppender != null) {
+      if (stdoutAppender != null)
         stdoutAppender.stop()
-      }
-      if (stderrAppender != null) {
+      if (stderrAppender != null)
         stderrAppender.stop()
-      }
       exitCode = Utils.terminateProcess(process, EXECUTOR_TERMINATE_TIMEOUT_MS)
-      if (exitCode.isEmpty) {
+      if (exitCode.isEmpty)
         logWarning("Failed to terminate process: " + process +
             ". This process will likely be orphaned.")
-      }
-    }
-    try {
+    try
       worker.send(
           ExecutorStateChanged(appId, execId, state, message, exitCode))
-    } catch {
+    catch
       case e: IllegalStateException => logWarning(e.getMessage(), e)
-    }
-  }
 
   /** Stop this executor runner, including killing the process it launched */
-  private[worker] def kill() {
-    if (workerThread != null) {
+  private[worker] def kill()
+    if (workerThread != null)
       // the workerThread will kill the child process when interrupted
       workerThread.interrupt()
       workerThread = null
       state = ExecutorState.KILLED
-      try {
+      try
         ShutdownHookManager.removeShutdownHook(shutdownHook)
-      } catch {
+      catch
         case e: IllegalStateException => None
-      }
-    }
-  }
 
   /** Replace variables such as {{EXECUTOR_ID}} and {{CORES}} in a command argument passed to us */
   private[worker] def substituteVariables(argument: String): String =
-    argument match {
+    argument match
       case "{{WORKER_URL}}" => workerUrl
       case "{{EXECUTOR_ID}}" => execId.toString
       case "{{HOSTNAME}}" => host
       case "{{CORES}}" => cores.toString
       case "{{APP_ID}}" => appId
       case other => other
-    }
 
   /**
     * Download and run the executor described in our ApplicationDescription
     */
-  private def fetchAndRunExecutor() {
-    try {
+  private def fetchAndRunExecutor()
+    try
       // Launch the process
       val builder = CommandUtils.buildProcessBuilder(appDesc.command,
                                                      new SecurityManager(conf),
@@ -185,17 +171,12 @@ private[deploy] class ExecutorRunner(val appId: String,
       val message = "Command exited with code " + exitCode
       worker.send(ExecutorStateChanged(
               appId, execId, state, Some(message), Some(exitCode)))
-    } catch {
-      case interrupted: InterruptedException => {
+    catch
+      case interrupted: InterruptedException =>
           logInfo("Runner thread for executor " + fullId + " interrupted")
           state = ExecutorState.KILLED
           killProcess(None)
-        }
-      case e: Exception => {
+      case e: Exception =>
           logError("Error running executor", e)
           state = ExecutorState.FAILED
           killProcess(Some(e.toString))
-        }
-    }
-  }
-}

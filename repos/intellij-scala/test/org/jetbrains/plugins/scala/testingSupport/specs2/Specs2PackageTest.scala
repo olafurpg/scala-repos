@@ -4,11 +4,11 @@ package org.jetbrains.plugins.scala.testingSupport.specs2
   * @author Roman.Shein
   * @since 06.09.2015.
   */
-abstract class Specs2PackageTest extends Specs2TestCase {
+abstract class Specs2PackageTest extends Specs2TestCase
   protected val packageName = "testPackage"
   protected val secondPackageName = "otherPackage"
 
-  protected def addPackageTest(): Unit = {
+  protected def addPackageTest(): Unit =
     addFileToProject(packageName + "/Test1.scala",
                      """
         |package testPackage
@@ -63,9 +63,8 @@ abstract class Specs2PackageTest extends Specs2TestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
 
-  def testPackageTestRun(): Unit = {
+  def testPackageTestRun(): Unit =
     addPackageTest()
     runTestByConfig(createTestFromPackage(packageName),
                     checkPackageConfigAndSettings(_, packageName),
@@ -85,9 +84,8 @@ abstract class Specs2PackageTest extends Specs2TestCase {
                       checkResultTreeHasExactNamedPath(
                           root, "[root]", "Test2", "Two should", "run") &&
                       checkResultTreeDoesNotHaveNodes(root, "Three should"))
-  }
 
-  def testModuleTestRun(): Unit = {
+  def testModuleTestRun(): Unit =
     addPackageTest()
     runTestByConfig(createTestFromModule(testClassName),
                     checkPackageConfigAndSettings(
@@ -106,5 +104,3 @@ abstract class Specs2PackageTest extends Specs2TestCase {
                           root, "[root]", "Test2", "Two should", "run") &&
                       checkResultTreeHasExactNamedPath(
                           root, "[root]", "Test2", "Three should", "run"))
-  }
-}

@@ -44,9 +44,8 @@ class LineChartSpec
     extends SimpleSFXDelegateSpec[
         jfxsc.LineChart[Number, Number], LineChart[Number, Number]](
         classOf[jfxsc.LineChart[Number, Number]],
-        classOf[LineChart[Number, Number]]) with RunOnApplicationThread {
+        classOf[LineChart[Number, Number]]) with RunOnApplicationThread
 
   override def getJavaClassInstance =
     new jfxsc.LineChart[Number, Number](
         new jfxsc.NumberAxis, new jfxsc.NumberAxis)
-}

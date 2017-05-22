@@ -25,7 +25,7 @@ package random
   * @see <a href="http://en.wikipedia.org/wiki/Ziggurat_algorithm">Ziggurat algorithm @ Wikipedia</a>
   * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
   */
-object Ziggurat {
+object Ziggurat
 
   import scala.math.exp
   import scala.math.sqrt
@@ -40,23 +40,21 @@ object Ziggurat {
   private val we = new Array[Double](256)
   private val fe = new Array[Double](256)
 
-  def rnor(g: Generator): Double = {
+  def rnor(g: Generator): Double =
 
     val hz = g.nextInt()
     val iz = hz & 127
 
     if (abs(hz) < kn(iz)) hz * wn(iz) else nfix(g, hz, iz)
-  }
 
-  def rexp(g: Generator): Double = {
+  def rexp(g: Generator): Double =
 
     val jz = g.nextInt() & 0xffffffffL
     val iz = (jz & 255).toInt
 
     if (jz < ke(iz)) jz * we(iz) else efix(g, jz, iz)
-  }
 
-  private def nfix(g: Generator, hza: Int, iza: Int): Double = {
+  private def nfix(g: Generator, hza: Int, iza: Int): Double =
 
     val r = 3.442619855899d
     val r1 = 1 / r
@@ -64,16 +62,15 @@ object Ziggurat {
     var hz = hza
     var iz = iza
 
-    @tailrec def loop(): Double = {
+    @tailrec def loop(): Double =
       x = hz * wn(iz)
 
-      if (iz == 0) {
-        do {
+      if (iz == 0)
+        do
           x = -log(g.nextDouble()) * r1
           y = -log(g.nextDouble())
-        } while (y + y < x * x)
+        while (y + y < x * x)
         return if (hz > 0) r + x else -r - x
-      }
 
       if (fn(iz) + g.nextDouble() * (fn(iz - 1) - fn(iz)) < exp(-.5 * x * x))
         return x
@@ -83,17 +80,15 @@ object Ziggurat {
       if (abs(hz) < kn(iz)) return hz * wn(iz)
 
       loop()
-    }
 
     loop()
-  }
 
-  private def efix(g: Generator, jza: Long, iza: Int): Double = {
+  private def efix(g: Generator, jza: Long, iza: Int): Double =
 
     var jz = jza
     var iz = iza
 
-    @tailrec def loop(): Double = {
+    @tailrec def loop(): Double =
       if (iz == 0) return 7.697117470131487 - log(g.nextDouble())
       val x = jz * we(iz)
 
@@ -104,12 +99,9 @@ object Ziggurat {
       if (jz < ke(iz)) return jz * we(iz)
 
       loop()
-    }
 
     loop()
-  }
 
-  {
     val m1: Double = 2147483648d
     val m2: Double = 4294967296d
 
@@ -131,13 +123,12 @@ object Ziggurat {
     fn(0) = 1d
     fn(127) = exp(-.5 * dn * dn)
 
-    for (i <- 126 to 1 by -1) {
+    for (i <- 126 to 1 by -1)
       dn = sqrt(-2 * log(vn / dn + exp(-.5 * dn * dn)))
       kn(i + 1) = ((dn / tn) * m1).toLong
       tn = dn
       fn(i) = exp(-.5 * dn * dn)
       wn(i) = dn / m1
-    }
 
     q = ve / exp(-de)
     ke(0) = ((de / q) * m2).toLong
@@ -149,12 +140,9 @@ object Ziggurat {
     fe(0) = 1d
     fe(255) = exp(-de)
 
-    for (i <- 254 to 1 by -1) {
+    for (i <- 254 to 1 by -1)
       de = -log(ve / de + exp(-de))
       ke(i + 1) = ((de / te) * m2).toLong
       te = de
       fe(i) = exp(-de)
       we(i) = de / m2
-    }
-  }
-}

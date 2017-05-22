@@ -33,15 +33,14 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object MotionBlur {
+object MotionBlur
   implicit def sfxMotionBlur2jfx(mb: MotionBlur): jfxse.MotionBlur =
     if (mb != null) mb.delegate else null
-}
 
 class MotionBlur(
     override val delegate: jfxse.MotionBlur = new jfxse.MotionBlur)
     extends Effect(delegate) with InputDelegate[jfxse.MotionBlur]
-    with SFXDelegate[jfxse.MotionBlur] {
+    with SFXDelegate[jfxse.MotionBlur]
 
   /**
     * Creates a new instance of MotionBlur with the specified angle and radius.
@@ -53,15 +52,12 @@ class MotionBlur(
     * The angle of the motion effect, in degrees.
     */
   def angle: DoubleProperty = delegate.angleProperty
-  def angle_=(v: Double) {
+  def angle_=(v: Double)
     angle() = v
-  }
 
   /**
     * The radius of the blur kernel.
     */
   def radius: DoubleProperty = delegate.radiusProperty
-  def radius_=(v: Double) {
+  def radius_=(v: Double)
     radius() = v
-  }
-}

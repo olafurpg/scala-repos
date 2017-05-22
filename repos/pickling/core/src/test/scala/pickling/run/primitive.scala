@@ -3,8 +3,8 @@ package scala.pickling.primitive
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, json._
 
-class PrimitiveTest extends FunSuite {
-  test("main") {
+class PrimitiveTest extends FunSuite
+  test("main")
     assert(12.pickle.value === """
       |{
       |  "$type": "scala.Int",
@@ -31,5 +31,3 @@ class PrimitiveTest extends FunSuite {
     """.stripMargin.trim)
     assert(true.pickle.unpickle[Boolean] === true)
     assert(true.pickle.unpickle[Any] === true)
-  }
-}

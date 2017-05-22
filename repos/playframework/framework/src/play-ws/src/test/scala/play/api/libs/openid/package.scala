@@ -11,29 +11,26 @@ import collection.JavaConverters._
 
 import scala.language.implicitConversions
 
-package object openid {
+package object openid
   type Params = Map[String, Seq[String]]
 
   implicit def stringToSeq(s: String): Seq[String] = Seq(s)
 
-  implicit def urlToRichUrl(url: URL) = new RichUrl[URL] {
+  implicit def urlToRichUrl(url: URL) = new RichUrl[URL]
     def hostAndPath =
       new URL(url.getProtocol, url.getHost, url.getPort, url.getPath).toExternalForm
-  }
 
-  def readFixture(filePath: String): String = this.synchronized {
+  def readFixture(filePath: String): String = this.synchronized
     Source
       .fromInputStream(this.getClass.getResourceAsStream(filePath))
       .mkString
-  }
 
-  def parseQueryString(url: String): Params = {
-    catching(classOf[MalformedURLException]) opt new URL(url) map { url =>
+  def parseQueryString(url: String): Params =
+    catching(classOf[MalformedURLException]) opt new URL(url) map  url =>
       new QueryStringDecoder(url.toURI.getRawQuery, false).getParameters.asScala
         .mapValues(_.asScala.toSeq)
         .toMap
-    } getOrElse Map()
-  }
+    getOrElse Map()
 
   // See 10.1 - Positive Assertions
   // http://openid.net/specs/openid-authentication-2_0.html#positive_assertions
@@ -53,4 +50,3 @@ package object openid {
       "openid.signed" -> defaultSigned,
       "openid.sig" -> "MWRsJZ/9AOMQt9gH6zTZIfIjk6g="
   )
-}

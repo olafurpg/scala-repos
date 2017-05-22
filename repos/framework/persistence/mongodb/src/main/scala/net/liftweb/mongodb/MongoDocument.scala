@@ -29,30 +29,27 @@ import org.bson.types.ObjectId
 /*
  * extend case class with this trait
  */
-trait MongoDocument[BaseDocument] extends JsonObject[BaseDocument] {
+trait MongoDocument[BaseDocument] extends JsonObject[BaseDocument]
   self: BaseDocument =>
 
   def _id: Any
 
   def meta: MongoDocumentMeta[BaseDocument]
 
-  def delete {
+  def delete
     meta.delete("_id", _id)
-  }
 
   def save = meta.save(this)
 
-  def getRef: Option[MongoRef] = _id match {
+  def getRef: Option[MongoRef] = _id match
     case oid: ObjectId => Some(MongoRef(meta.collectionName, oid))
     case _ => None
-  }
-}
 
 /*
  * extend case class companion objects with this trait
  */
 trait MongoDocumentMeta[BaseDocument]
-    extends JsonObjectMeta[BaseDocument] with MongoMeta[BaseDocument] {
+    extends JsonObjectMeta[BaseDocument] with MongoMeta[BaseDocument]
 
   /**
     * Override this to specify a ConnectionIdentifier.
@@ -70,23 +67,20 @@ trait MongoDocumentMeta[BaseDocument]
    */
   def useDb[T](f: DB => T): T = MongoDB.use(connectionIdentifier)(f)
 
-  def create(dbo: DBObject): BaseDocument = {
+  def create(dbo: DBObject): BaseDocument =
     create(JObjectParser.serialize(dbo).asInstanceOf[JObject])
-  }
 
   /**
     * Find a single row by a qry, using a DBObject.
     */
-  def find(qry: DBObject): Option[BaseDocument] = {
+  def find(qry: DBObject): Option[BaseDocument] =
     MongoDB.useCollection(connectionIdentifier, collectionName)(
         coll =>
-          coll.findOne(qry) match {
+          coll.findOne(qry) match
         case null => None
-        case dbo => {
+        case dbo =>
             Some(create(dbo))
-          }
-    })
-  }
+    )
 
   /**
     * Find a single document by _id using a String.
@@ -122,32 +116,29 @@ trait MongoDocumentMeta[BaseDocument]
   /**
     * Find all documents in this collection
     */
-  def findAll: List[BaseDocument] = {
+  def findAll: List[BaseDocument] =
     import scala.collection.JavaConversions._
 
     MongoDB.useCollection(connectionIdentifier, collectionName)(
         coll =>
-          {
 
         /** Mongo Cursors are both Iterable and Iterator,
           * so we need to reduce ambiguity for implicits
           */
         (coll.find: Iterator[DBObject]).map(create).toList
-    })
-  }
+    )
 
   /**
     * Find all documents using a DBObject query.
     */
   def findAll(qry: DBObject,
               sort: Option[DBObject],
-              opts: FindOption*): List[BaseDocument] = {
+              opts: FindOption*): List[BaseDocument] =
     import scala.collection.JavaConversions._
 
     val findOpts = opts.toList
 
     MongoDB.useCollection(connectionIdentifier, collectionName)(coll =>
-          {
         val cur = coll
           .find(qry)
           .limit(
@@ -168,8 +159,7 @@ trait MongoDocumentMeta[BaseDocument]
           * so we need to reduce ambiguity for implicits
           */
         (cur: Iterator[DBObject]).map(create).toList
-    })
-  }
+    )
 
   /**
     * Find all documents using a DBObject query.
@@ -216,36 +206,29 @@ trait MongoDocumentMeta[BaseDocument]
   /*
    * Save a document to the db
    */
-  def save(in: BaseDocument) {
+  def save(in: BaseDocument)
     MongoDB.use(connectionIdentifier)(
         db =>
-          {
         save(in, db)
-    })
-  }
+    )
 
   /*
    * Save a document to the db using the given Mongo instance
    */
-  def save(in: BaseDocument, db: DB) {
+  def save(in: BaseDocument, db: DB)
     db.getCollection(collectionName).save(JObjectParser.parse(toJObject(in)))
-  }
 
   /*
    * Update document with a JObject query using the given Mongo instance
    */
-  def update(qry: JObject, newbd: BaseDocument, db: DB, opts: UpdateOption*) {
+  def update(qry: JObject, newbd: BaseDocument, db: DB, opts: UpdateOption*)
     update(qry, toJObject(newbd), db, opts: _*)
-  }
 
   /*
    * Update document with a JObject query
    */
-  def update(qry: JObject, newbd: BaseDocument, opts: UpdateOption*) {
+  def update(qry: JObject, newbd: BaseDocument, opts: UpdateOption*)
     MongoDB.use(connectionIdentifier)(
         db =>
-          {
         update(qry, newbd, db, opts: _*)
-    })
-  }
-}
+    )

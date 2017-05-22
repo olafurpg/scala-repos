@@ -15,8 +15,8 @@ package generic
   *  See http://www.drmaciver.com/2008/08/unsigned-comparison-in-javascala/ for
   *  an explanation of unsignedCompare.
   */
-private[collection] object BitOperations {
-  trait Int {
+private[collection] object BitOperations
+  trait Int
     type Int = scala.Int
     def zero(i: Int, mask: Int) = (i & mask) == 0
     def mask(i: Int, mask: Int) = i & (complement(mask - 1) ^ mask)
@@ -28,7 +28,7 @@ private[collection] object BitOperations {
     def bitString(num: Int, sep: String = "") =
       bits(num) map (b => if (b) "1" else "0") mkString sep
 
-    def highestOneBit(j: Int) = {
+    def highestOneBit(j: Int) =
       var i = j
       i |= (i >> 1)
       i |= (i >> 2)
@@ -36,11 +36,9 @@ private[collection] object BitOperations {
       i |= (i >> 8)
       i |= (i >> 16)
       i - (i >>> 1)
-    }
-  }
   object Int extends Int
 
-  trait Long {
+  trait Long
     type Long = scala.Long
     def zero(i: Long, mask: Long) = (i & mask) == 0L
     def mask(i: Long, mask: Long) = i & (complement(mask - 1) ^ mask)
@@ -52,7 +50,7 @@ private[collection] object BitOperations {
     def bitString(num: Long, sep: String = "") =
       bits(num) map (b => if (b) "1" else "0") mkString sep
 
-    def highestOneBit(j: Long) = {
+    def highestOneBit(j: Long) =
       var i = j
       i |= (i >> 1)
       i |= (i >> 2)
@@ -61,7 +59,4 @@ private[collection] object BitOperations {
       i |= (i >> 16)
       i |= (i >> 32)
       i - (i >>> 1)
-    }
-  }
   object Long extends Long
-}

@@ -8,10 +8,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * Nikolay.Tropin
   * 4/17/13
   */
-class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
+class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase
   def familyName: String = ReplaceDoWhileWithWhileIntention.familyName
 
-  def testReplaceDoWhile() {
+  def testReplaceDoWhile()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -39,9 +39,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile2() {
+  def testReplaceDoWhile2()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -69,9 +68,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile3() {
+  def testReplaceDoWhile3()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -99,9 +97,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile4() {
+  def testReplaceDoWhile4()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -129,9 +126,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile5() {
+  def testReplaceDoWhile5()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -159,9 +155,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile6() {
+  def testReplaceDoWhile6()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -183,9 +178,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile7() {
+  def testReplaceDoWhile7()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -206,9 +200,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile8() {
+  def testReplaceDoWhile8()
     val text = """
         |class X {
         |  1 match {
@@ -231,9 +224,8 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceDoWhile9() {
+  def testReplaceDoWhile9()
     val text = """
         |do println("")
         |while (true)
@@ -243,5 +235,3 @@ class ReplaceDoWhileWithWhileIntentionTest extends ScalaIntentionTestBase {
         |while (true) println("")
       """
     doTest(text, resultText)
-  }
-}

@@ -33,18 +33,17 @@ import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyObjectProperty
 import scalafx.delegate.SFXDelegate
 
-object TableCell {
+object TableCell
   implicit def sfxTableCell2jfx[S, T](
       tc: TableCell[S, T]): jfxsc.TableCell[S, T] =
     if (tc != null) tc.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableCell.html]].
   */
 class TableCell[S, T](
     override val delegate: jfxsc.TableCell[S, T] = new jfxsc.TableCell[S, T]())
-    extends IndexedCell[T] with SFXDelegate[jfxsc.TableCell[S, T]] {
+    extends IndexedCell[T] with SFXDelegate[jfxsc.TableCell[S, T]]
 
   /**
     * The TableColumn instance that backs this TableCell.
@@ -63,4 +62,3 @@ class TableCell[S, T](
     */
   def tableView: ReadOnlyObjectProperty[jfxsc.TableView[S]] =
     delegate.tableViewProperty
-}

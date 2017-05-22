@@ -1,6 +1,6 @@
 import scala.reflect.runtime.universe._
 
-object Test extends App {
+object Test extends App
   // HAHA!!!
   // no compileTimeOnly errors here, because scalac does constant folding
   // the type of reify(42) is Expr[42.type]
@@ -12,4 +12,3 @@ object Test extends App {
   val fortyTwo = 42
   val ignored3 = reify(fortyTwo).splice
   val ignored4 = reify(fortyTwo).value
-}

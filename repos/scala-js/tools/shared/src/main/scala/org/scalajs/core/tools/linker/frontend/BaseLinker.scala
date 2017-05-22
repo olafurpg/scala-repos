@@ -36,20 +36,19 @@ import Analysis._
   *  [[LinkedClass]]es. Does a dead code elimination pass.
   */
 final class BaseLinker(
-    semantics: Semantics, esLevel: ESLevel, considerPositions: Boolean) {
+    semantics: Semantics, esLevel: ESLevel, considerPositions: Boolean)
 
   private type TreeProvider = String => (ClassDef, Option[String])
 
   def link(irInput: Seq[VirtualScalaJSIRFile],
            logger: Logger,
            symbolRequirements: SymbolRequirement,
-           checkIR: Boolean): LinkingUnit = {
+           checkIR: Boolean): LinkingUnit =
     linkInternal(irInput,
                  logger,
                  symbolRequirements,
                  bypassLinkingErrors = false,
                  checkIR = checkIR)
-  }
 
   @deprecated(
       "Bypassing linking errors will not be possible in the next major version. " +
@@ -59,37 +58,33 @@ final class BaseLinker(
            logger: Logger,
            symbolRequirements: SymbolRequirement,
            bypassLinkingErrors: Boolean,
-           checkIR: Boolean): LinkingUnit = {
+           checkIR: Boolean): LinkingUnit =
     linkInternal(
         irInput, logger, symbolRequirements, bypassLinkingErrors, checkIR)
-  }
 
   // Non-deprecated version to be called from `LinkerFrontend`
   private[frontend] def linkInternal(irInput: Seq[VirtualScalaJSIRFile],
                                      logger: Logger,
                                      symbolRequirements: SymbolRequirement,
                                      bypassLinkingErrors: Boolean,
-                                     checkIR: Boolean): LinkingUnit = {
+                                     checkIR: Boolean): LinkingUnit =
 
     val infosBuilder = List.newBuilder[Infos.ClassInfo]
     val encodedNameToFile = mutable.Map.empty[String, VirtualScalaJSIRFile]
 
-    for (irFile <- irInput) {
+    for (irFile <- irInput)
       val info = irFile.info
 
       // Remove duplicates. Just like the JVM
-      if (!encodedNameToFile.contains(info.encodedName)) {
+      if (!encodedNameToFile.contains(info.encodedName))
         infosBuilder += info
         encodedNameToFile += info.encodedName -> irFile
-      }
-    }
 
     val infos = infosBuilder.result()
 
-    val getTree: TreeProvider = { name =>
+    val getTree: TreeProvider =  name =>
       val pf = encodedNameToFile(name)
       (pf.tree, pf.version)
-    }
 
     linkInternal(infos,
                  getTree,
@@ -97,72 +92,61 @@ final class BaseLinker(
                  symbolRequirements,
                  bypassLinkingErrors,
                  checkIR)
-  }
 
   private def linkInternal(infoInput: List[Infos.ClassInfo],
                            getTree: TreeProvider,
                            logger: Logger,
                            symbolRequirements: SymbolRequirement,
                            bypassLinkingErrors: Boolean,
-                           checkIR: Boolean): LinkingUnit = {
+                           checkIR: Boolean): LinkingUnit =
 
-    if (checkIR) {
-      logger.time("Linker: Check Infos") {
+    if (checkIR)
+      logger.time("Linker: Check Infos")
         val infoAndTrees =
           infoInput.map(info => (info, getTree(info.encodedName)._1))
         val errorCount = InfoChecker.check(infoAndTrees, logger)
         if (errorCount != 0)
           sys.error(s"There were $errorCount Info checking errors.")
-      }
-    }
 
-    val analysis = logger.time("Linker: Compute reachability") {
+    val analysis = logger.time("Linker: Compute reachability")
       Analyzer.computeReachability(semantics,
                                    symbolRequirements,
                                    infoInput,
                                    allowAddingSyntheticMethods = true)
-    }
 
-    if (analysis.errors.nonEmpty) {
+    if (analysis.errors.nonEmpty)
       // TODO Make it always fatal when we can get rid of bypassLinkingErrors
       val fatal =
-        !bypassLinkingErrors || analysis.errors.exists {
+        !bypassLinkingErrors || analysis.errors.exists
           case _: Analysis.MissingJavaLangObjectClass => true
           case _: Analysis.CycleInInheritanceChain => true
           case _ => false
-        }
 
       val linkingErrLevel = if (fatal) Level.Error else Level.Warn
       analysis.errors.foreach(logError(_, logger, linkingErrLevel))
 
       if (fatal) sys.error("There were linking errors")
-    }
 
-    val linkResult = logger.time("Linker: Assemble LinkedClasses") {
+    val linkResult = logger.time("Linker: Assemble LinkedClasses")
       assemble(infoInput, getTree, analysis)
-    }
 
-    if (checkIR) {
-      logger.time("Linker: Check IR") {
-        if (linkResult.isComplete) {
+    if (checkIR)
+      logger.time("Linker: Check IR")
+        if (linkResult.isComplete)
           val errorCount = IRChecker.check(linkResult, logger)
           if (errorCount != 0)
             sys.error(s"There were $errorCount IR checking errors.")
-        } else {
+        else
           sys.error("Could not check IR because there were linking errors.")
-        }
-      }
-    }
 
     linkResult
-  }
 
   private def assemble(infoInput: List[Infos.ClassInfo],
                        getTree: TreeProvider,
-                       analysis: Analysis) = {
+                       analysis: Analysis) =
     val infoByName = Map(infoInput.map(c => c.encodedName -> c): _*)
 
-    def optClassDef(analyzerInfo: Analysis.ClassInfo) = {
+    def optClassDef(analyzerInfo: Analysis.ClassInfo) =
       val encodedName = analyzerInfo.encodedName
 
       def optDummyParent =
@@ -171,27 +155,24 @@ final class BaseLinker(
 
       infoByName
         .get(encodedName)
-        .map { info =>
+        .map  info =>
           val (tree, version) = getTree(encodedName)
           val newVersion =
             version.map("real" + _) // avoid collision with dummy
           linkedClassDef(
               info, tree, analyzerInfo, newVersion, getTree, analysis)
-        }
         .orElse(optDummyParent)
-    }
 
-    val linkedClassDefs = for {
+    val linkedClassDefs = for
       classInfo <- analysis.classInfos.values if classInfo.isNeededAtAll
       linkedClassDef <- optClassDef(classInfo)
-    } yield linkedClassDef
+    yield linkedClassDef
 
     new LinkingUnit(semantics,
                     esLevel,
                     linkedClassDefs.toList,
                     infoByName,
                     analysis.allAvailable)
-  }
 
   /** Takes a Infos, a ClassDef and DCE infos to construct a stripped down
     *  LinkedClassDef */
@@ -200,7 +181,7 @@ final class BaseLinker(
                              analyzerInfo: Analysis.ClassInfo,
                              version: Option[String],
                              getTree: TreeProvider,
-                             analysis: Analysis) = {
+                             analysis: Analysis) =
     import ir.Trees._
 
     val memberInfoByName = Map(info.methods.map(m => m.encodedName -> m): _*)
@@ -212,24 +193,21 @@ final class BaseLinker(
     val exportedMembers = mutable.Buffer.empty[LinkedMember[Tree]]
     val classExports = mutable.Buffer.empty[Tree]
 
-    def linkedMethod(m: MethodDef) = {
+    def linkedMethod(m: MethodDef) =
       val info = memberInfoByName(m.name.name)
       val version = m.hash.map(Hashers.hashAsVersion(_, considerPositions))
       new LinkedMember(info, m, version)
-    }
 
-    def linkedProperty(p: PropertyDef) = {
+    def linkedProperty(p: PropertyDef) =
       val info = memberInfoByName(p.name.name)
       new LinkedMember(info, p, None)
-    }
 
-    def linkedSyntheticMethod(m: MethodDef) = {
+    def linkedSyntheticMethod(m: MethodDef) =
       val info = Infos.generateMethodInfo(m)
       val version = m.hash.map(Hashers.hashAsVersion(_, considerPositions))
       new LinkedMember(info, m, version)
-    }
 
-    classDef.defs.foreach {
+    classDef.defs.foreach
       // Static methods
       case m: MethodDef if m.static =>
         if (analyzerInfo.staticMethodInfos(m.name.name).isReachable)
@@ -241,12 +219,11 @@ final class BaseLinker(
 
       // Normal methods
       case m: MethodDef =>
-        if (analyzerInfo.methodInfos(m.name.name).isReachable) {
+        if (analyzerInfo.methodInfos(m.name.name).isReachable)
           if (m.name.isInstanceOf[StringLiteral])
             exportedMembers += linkedMethod(m)
           else if (m.body == EmptyTree) abstractMethods += linkedMethod(m)
           else memberMethods += linkedMethod(m)
-        }
 
       case m: PropertyDef =>
         if (analyzerInfo.isAnySubclassInstantiated)
@@ -263,13 +240,12 @@ final class BaseLinker(
 
       case tree =>
         sys.error(s"Illegal tree in ClassDef of class ${tree.getClass}")
-    }
 
     // Synthetic members
-    for {
+    for
       m <- analyzerInfo.methodInfos.valuesIterator if m.isReachable
-    } {
-      m.syntheticKind match {
+    
+      m.syntheticKind match
         case MethodSyntheticKind.None =>
         // nothing to do
 
@@ -287,8 +263,6 @@ final class BaseLinker(
           val syntheticMDef = synthesizeDefaultBridge(
               analyzerInfo, m, targetInterface, getTree, analysis)
           memberMethods += linkedSyntheticMethod(syntheticMDef)
-      }
-    }
 
     val classExportInfo =
       memberInfoByName.get(Definitions.ExportedConstructorsName)
@@ -318,13 +292,12 @@ final class BaseLinker(
                     hasInstanceTests = analyzerInfo.areInstanceTestsUsed,
                     hasRuntimeTypeInfo = analyzerInfo.isDataAccessed,
                     version)
-  }
 
   private def synthesizeInheritedConstructor(classInfo: Analysis.ClassInfo,
                                              methodInfo: Analysis.MethodInfo,
                                              getTree: TreeProvider,
                                              analysis: Analysis)(
-      implicit pos: Position): MethodDef = {
+      implicit pos: Position): MethodDef =
     val encodedName = methodInfo.encodedName
 
     val inheritedMDef = findInheritedMethodDef(
@@ -347,13 +320,12 @@ final class BaseLinker(
                               ctorIdent,
                               params.map(_.ref))(NoType))(
         OptimizerHints.empty, inheritedMDef.hash) // over-approximation
-  }
 
   private def synthesizeReflectiveProxy(classInfo: Analysis.ClassInfo,
                                         methodInfo: Analysis.MethodInfo,
                                         targetName: String,
                                         getTree: TreeProvider,
-                                        analysis: Analysis): MethodDef = {
+                                        analysis: Analysis): MethodDef =
     val encodedName = methodInfo.encodedName
 
     val targetMDef = findInheritedMethodDef(classInfo, targetName, getTree)
@@ -370,27 +342,25 @@ final class BaseLinker(
         targetMDef.resultType)
 
     val body =
-      if (targetName.endsWith("__C")) {
+      if (targetName.endsWith("__C"))
         // A Char needs to be boxed
         New(ClassType(Definitions.BoxedCharacterClass),
             Ident("init___C"),
             List(call))
-      } else if (targetName.endsWith("__V")) {
+      else if (targetName.endsWith("__V"))
         // Materialize an `undefined` result for void methods
         Block(call, Undefined())
-      } else {
+      else
         call
-      }
 
     MethodDef(static = false, proxyIdent, params, AnyType, body)(
         OptimizerHints.empty, targetMDef.hash)
-  }
 
   private def synthesizeDefaultBridge(classInfo: Analysis.ClassInfo,
                                       methodInfo: Analysis.MethodInfo,
                                       targetInterface: String,
                                       getTree: TreeProvider,
-                                      analysis: Analysis): MethodDef = {
+                                      analysis: Analysis): MethodDef =
     val encodedName = methodInfo.encodedName
 
     val targetInterfaceInfo = analysis.classInfos(targetInterface)
@@ -412,40 +382,33 @@ final class BaseLinker(
     MethodDef(
         static = false, bridgeIdent, params, targetMDef.resultType, body)(
         OptimizerHints.empty, targetMDef.hash)
-  }
 
   private def findInheritedMethodDef(classInfo: Analysis.ClassInfo,
                                      methodName: String,
                                      getTree: TreeProvider,
                                      p: Analysis.MethodInfo => Boolean = _ =>
-                                         true): MethodDef = {
+                                         true): MethodDef =
     @tailrec
-    def loop(ancestorInfo: Analysis.ClassInfo): MethodDef = {
+    def loop(ancestorInfo: Analysis.ClassInfo): MethodDef =
       assert(
           ancestorInfo != null,
           s"Could not find $methodName anywhere in ${classInfo.encodedName}")
 
       val inherited = ancestorInfo.methodInfos.get(methodName)
-      if (inherited.exists(p)) {
+      if (inherited.exists(p))
         findMethodDef(ancestorInfo, methodName, getTree)
-      } else {
+      else
         loop(ancestorInfo.superClass)
-      }
-    }
 
     loop(classInfo)
-  }
 
   private def findMethodDef(classInfo: Analysis.ClassInfo,
                             methodName: String,
-                            getTree: TreeProvider): MethodDef = {
+                            getTree: TreeProvider): MethodDef =
     val (classDef, _) = getTree(classInfo.encodedName)
-    classDef.defs.collectFirst {
+    classDef.defs.collectFirst
       case mDef: MethodDef if !mDef.static && mDef.name.name == methodName =>
         mDef
-    }.getOrElse {
+    .getOrElse
       throw new AssertionError(
           s"Cannot find $methodName in ${classInfo.encodedName}")
-    }
-  }
-}

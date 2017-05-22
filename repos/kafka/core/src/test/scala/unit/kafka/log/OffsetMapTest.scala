@@ -21,42 +21,37 @@ import org.junit._
 import org.scalatest.junit.JUnitSuite
 import org.junit.Assert._
 
-class OffsetMapTest extends JUnitSuite {
+class OffsetMapTest extends JUnitSuite
 
   @Test
-  def testBasicValidation() {
+  def testBasicValidation()
     validateMap(10)
     validateMap(100)
     validateMap(1000)
     validateMap(5000)
-  }
 
   @Test
-  def testClear() {
+  def testClear()
     val map = new SkimpyOffsetMap(4000)
     for (i <- 0 until 10) map.put(key(i), i)
     for (i <- 0 until 10) assertEquals(i.toLong, map.get(key(i)))
     map.clear()
     for (i <- 0 until 10) assertEquals(map.get(key(i)), -1L)
-  }
 
   def key(key: Int) = ByteBuffer.wrap(key.toString.getBytes)
 
-  def validateMap(items: Int, loadFactor: Double = 0.5): SkimpyOffsetMap = {
+  def validateMap(items: Int, loadFactor: Double = 0.5): SkimpyOffsetMap =
     val map = new SkimpyOffsetMap((items / loadFactor * 24).toInt)
     for (i <- 0 until items) map.put(key(i), i)
     var misses = 0
     for (i <- 0 until items) assertEquals(map.get(key(i)), i.toLong)
     map
-  }
-}
 
-object OffsetMapTest {
-  def main(args: Array[String]) {
-    if (args.length != 2) {
+object OffsetMapTest
+  def main(args: Array[String])
+    if (args.length != 2)
       System.err.println("USAGE: java OffsetMapTest size load")
       System.exit(1)
-    }
     val test = new OffsetMapTest()
     val size = args(0).toInt
     val load = args(1).toDouble
@@ -66,5 +61,3 @@ object OffsetMapTest {
     println(map.size + " entries in map of size " + map.slots + " in " +
         ellapsedMs + " ms")
     println("Collision rate: %.1f%%".format(100 * map.collisionRate))
-  }
-}

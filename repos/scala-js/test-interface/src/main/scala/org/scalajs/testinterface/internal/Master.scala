@@ -11,13 +11,13 @@ import scala.util.Try
 import org.scalajs.testinterface.ScalaJSClassLoader
 
 @JSExport
-final class Master(frameworkName: String) extends BridgeBase(frameworkName) {
+final class Master(frameworkName: String) extends BridgeBase(frameworkName)
 
   private[this] var runner: Runner = _
 
-  protected def handleMsgImpl(cmd: String, strArg: => String): Unit = {
+  protected def handleMsgImpl(cmd: String, strArg: => String): Unit =
     def jsonArg = js.JSON.parse(strArg)
-    cmd match {
+    cmd match
       case "newRunner" =>
         reply(newRunner(jsonArg))
       case "runnerDone" =>
@@ -28,28 +28,24 @@ final class Master(frameworkName: String) extends BridgeBase(frameworkName) {
         reply(inboundMessage(strArg))
       case cmd =>
         throw new IllegalArgumentException(s"Unknown command: $cmd")
-    }
-  }
 
   // Message handler methods
 
-  private def newRunner(data: js.Dynamic): Try[Unit] = {
+  private def newRunner(data: js.Dynamic): Try[Unit] =
     val args = data.args.asInstanceOf[js.Array[String]].toArray
     val remoteArgs = data.remoteArgs.asInstanceOf[js.Array[String]].toArray
     val loader = new ScalaJSClassLoader(js.Dynamic.global)
 
     Try(runner = framework.runner(args, remoteArgs, loader))
-  }
 
-  private def runnerDone(): Try[String] = {
+  private def runnerDone(): Try[String] =
     ensureRunnerExists()
 
     val result = Try(runner.done())
     runner = null
     result
-  }
 
-  private def tasks(data: js.Dynamic): Try[String] = {
+  private def tasks(data: js.Dynamic): Try[String] =
     ensureRunnerExists()
 
     val taskDefs = data
@@ -57,20 +53,15 @@ final class Master(frameworkName: String) extends BridgeBase(frameworkName) {
       .map(TaskDefSerializer.deserialize)
       .toArray
 
-    Try {
+    Try
       val tasks = runner.tasks(taskDefs)
       js.JSON.stringify(tasks2TaskInfos(tasks, runner))
-    }
-  }
 
-  private def inboundMessage(msg: String): Try[String] = {
+  private def inboundMessage(msg: String): Try[String] =
     ensureRunnerExists()
     Try(runner.receiveMessage(msg).fold(":n")(":s:" + _))
-  }
 
   // Utility methods
 
-  private def ensureRunnerExists(): Unit = {
+  private def ensureRunnerExists(): Unit =
     if (runner == null) throw new IllegalStateException("No runner created")
-  }
-}

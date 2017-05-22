@@ -24,17 +24,16 @@ import breeze.numerics
   *
   *  @author dlwh
   */
-trait Field[@specialized(Int, Short, Long, Float, Double) V] extends Ring[V] {
+trait Field[@specialized(Int, Short, Long, Float, Double) V] extends Ring[V]
   def /(a: V, b: V): V
   def inverse(a: V) = /(one, a)
   def pow(a: V, b: V): V
-}
 
-object Field {
+object Field
 
   /** Not a field, but whatever. */
   @SerialVersionUID(1L)
-  implicit object fieldInt extends Field[Int] with Serializable {
+  implicit object fieldInt extends Field[Int] with Serializable
     def zero = 0
     def one = 1
     def ==(a: Int, b: Int) = a == b
@@ -47,14 +46,12 @@ object Field {
     def pow(a: Int, b: Int) = Math.pow(a, b).toInt
 
     implicit val normImpl: norm.Impl[Int, Double] =
-      new norm.Impl[Int, Double] {
+      new norm.Impl[Int, Double]
         def apply(v: Int) = v.abs.toDouble
-      }
-  }
 
   /** Not a field, but whatever. */
   @SerialVersionUID(1L)
-  implicit object fieldShort extends Field[Short] with Serializable {
+  implicit object fieldShort extends Field[Short] with Serializable
     def zero = 0.asInstanceOf[Short]
     def one = 1.asInstanceOf[Short]
     def ==(a: Short, b: Short) = a == b
@@ -67,14 +64,12 @@ object Field {
     def pow(a: Short, b: Short) = Math.pow(a, b).toShort
 
     implicit val normImpl: norm.Impl[Short, Double] =
-      new norm.Impl[Short, Double] {
+      new norm.Impl[Short, Double]
         def apply(v: Short) = v.abs.toDouble
-      }
-  }
 
   /** Not a field, but whatever. */
   @SerialVersionUID(1L)
-  implicit object fieldLong extends Field[Long] with Serializable {
+  implicit object fieldLong extends Field[Long] with Serializable
     def zero = 0l
     def one = 1l
     def ==(a: Long, b: Long) = a == b
@@ -87,14 +82,12 @@ object Field {
     def pow(a: Long, b: Long) = Math.pow(a, b).toLong
 
     implicit val normImpl: norm.Impl[Long, Double] =
-      new norm.Impl[Long, Double] {
+      new norm.Impl[Long, Double]
         def apply(v: Long) = v.abs.toDouble
-      }
-  }
 
   /** Not a field, but whatever. */
   @SerialVersionUID(1L)
-  implicit object fieldBigInt extends Field[BigInt] with Serializable {
+  implicit object fieldBigInt extends Field[BigInt] with Serializable
     def zero = 0l
     def one = 1l
     def ==(a: BigInt, b: BigInt) = a == b
@@ -107,13 +100,11 @@ object Field {
     def pow(a: BigInt, b: BigInt): BigInt = a.pow(b.toInt)
 
     implicit val normImpl: norm.Impl[BigInt, Double] =
-      new norm.Impl[BigInt, Double] {
+      new norm.Impl[BigInt, Double]
         def apply(v: BigInt) = v.abs.toDouble
-      }
-  }
 
   @SerialVersionUID(1L)
-  implicit object fieldBigDecimal extends Field[BigDecimal] with Serializable {
+  implicit object fieldBigDecimal extends Field[BigDecimal] with Serializable
     def zero = 0l
     def one = 1l
     def ==(a: BigDecimal, b: BigDecimal) = a == b
@@ -126,18 +117,15 @@ object Field {
     def pow(a: BigDecimal, b: BigDecimal): BigDecimal = a.pow(b.toInt)
 
     override def close(
-        a: BigDecimal, b: BigDecimal, tolerance: Double): Boolean = {
+        a: BigDecimal, b: BigDecimal, tolerance: Double): Boolean =
       (a - b).abs <= tolerance * (a.abs max b.abs)
-    }
 
     implicit val normImpl: norm.Impl[BigDecimal, Double] =
-      new norm.Impl[BigDecimal, Double] {
+      new norm.Impl[BigDecimal, Double]
         def apply(v: BigDecimal) = v.abs.toDouble
-      }
-  }
 
   @SerialVersionUID(1L)
-  implicit object fieldFloat extends Field[Float] with Serializable {
+  implicit object fieldFloat extends Field[Float] with Serializable
     def zero = 0.0f
     def one = 1.0f
     def ==(a: Float, b: Float) = a == b
@@ -153,13 +141,11 @@ object Field {
       (a - b).abs <= math.max(a.abs, b.abs) * tolerance
 
     implicit val normImpl: norm.Impl[Float, Double] =
-      new norm.Impl[Float, Double] {
+      new norm.Impl[Float, Double]
         def apply(v: Float) = v.abs.toDouble
-      }
-  }
 
   @SerialVersionUID(-5955467582882664220L)
-  implicit object fieldDouble extends Field[Double] with Serializable {
+  implicit object fieldDouble extends Field[Double] with Serializable
     def zero = 0.0
     def one = 1.0
     def ==(a: Double, b: Double) = a == b
@@ -175,8 +161,5 @@ object Field {
       (a - b).abs <= math.max(a.abs, b.abs) * tolerance
 
     implicit val normImpl: norm.Impl[Double, Double] =
-      new norm.Impl[Double, Double] {
+      new norm.Impl[Double, Double]
         def apply(v: Double) = v.abs
-      }
-  }
-}

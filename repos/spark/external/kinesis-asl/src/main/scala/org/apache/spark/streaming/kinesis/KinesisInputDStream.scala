@@ -41,21 +41,21 @@ private[kinesis] class KinesisInputDStream[T : ClassTag](
     messageHandler: Record => T,
     awsCredentialsOption: Option[SerializableAWSCredentials]
 )
-    extends ReceiverInputDStream[T](_ssc) {
+    extends ReceiverInputDStream[T](_ssc)
 
   private[streaming] override def createBlockRDD(
-      time: Time, blockInfos: Seq[ReceivedBlockInfo]): RDD[T] = {
+      time: Time, blockInfos: Seq[ReceivedBlockInfo]): RDD[T] =
 
     // This returns true even for when blockInfos is empty
     val allBlocksHaveRanges = blockInfos.map { _.metadataOption }
       .forall(_.nonEmpty)
 
-    if (allBlocksHaveRanges) {
+    if (allBlocksHaveRanges)
       // Create a KinesisBackedBlockRDD, even when there are no blocks
       val blockIds = blockInfos.map { _.blockId.asInstanceOf[BlockId] }.toArray
-      val seqNumRanges = blockInfos.map {
+      val seqNumRanges = blockInfos.map
         _.metadataOption.get.asInstanceOf[SequenceNumberRanges]
-      }.toArray
+      .toArray
       val isBlockIdValid = blockInfos.map { _.isBlockIdValid() }.toArray
       logDebug(
           s"Creating KinesisBackedBlockRDD for $time with ${seqNumRanges.length} " +
@@ -70,15 +70,13 @@ private[kinesis] class KinesisInputDStream[T : ClassTag](
           retryTimeoutMs = ssc.graph.batchDuration.milliseconds.toInt,
           messageHandler = messageHandler,
           awsCredentialsOption = awsCredentialsOption)
-    } else {
+    else
       logWarning(
           "Kinesis sequence number information was not present with some block metadata," +
           " it may not be possible to recover from failures")
       super.createBlockRDD(time, blockInfos)
-    }
-  }
 
-  override def getReceiver(): Receiver[T] = {
+  override def getReceiver(): Receiver[T] =
     new KinesisReceiver(streamName,
                         endpointUrl,
                         regionName,
@@ -88,5 +86,3 @@ private[kinesis] class KinesisInputDStream[T : ClassTag](
                         storageLevel,
                         messageHandler,
                         awsCredentialsOption)
-  }
-}

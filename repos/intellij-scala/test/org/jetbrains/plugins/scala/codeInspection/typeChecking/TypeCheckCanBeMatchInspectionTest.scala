@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTes
   * 5/15/13
   */
 class TypeCheckCanBeMatchInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
 
   val annotation = TypeCheckCanBeMatchInspection.inspectionName
   val hint = TypeCheckCanBeMatchInspection.inspectionName
@@ -17,20 +17,18 @@ class TypeCheckCanBeMatchInspectionTest
   protected def classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[TypeCheckCanBeMatchInspection]
 
-  private def testQuickFix(text: String, result: String) {
+  private def testQuickFix(text: String, result: String)
     testFix(text, result, hint)
-  }
 
-  def test_1() {
+  def test_1()
     val selected = """
                      |val x = 0
                      |if (x.isInstanceOf[Int]) {
                      |  x.toString
                      |}"""
     checkTextHasNoErrors(selected)
-  }
 
-  def test_2() {
+  def test_2()
     val selected = s"""val x = 0
                      |if (${START}x.isInstanceOf[Int]$END) {
                      |  x.asInstanceOf[Int].toString
@@ -51,9 +49,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |  case _ =>
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_3() {
+  def test_3()
     val selected = s"""val x = 0
                      |if (${START}x.isInstanceOf[Int]$END) {
                      |  val y = x.asInstanceOf[Int]
@@ -76,9 +73,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |  case _ =>
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_4() {
+  def test_4()
     val selected = s"""val x = 0
                      |if (${START}x.isInstanceOf[Int]$END && x.asInstanceOf[Int] == 1) {
                      |  val y = x.asInstanceOf[Int]
@@ -98,18 +94,16 @@ class TypeCheckCanBeMatchInspectionTest
                    |  case _ =>
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_5() {
+  def test_5()
     val selected = s"""val x = 0
                      |if (x > 0 && (${START}x.isInstanceOf[Int]$END && x.asInstanceOf[Int] == 1)) {
                      |  val y = x.asInstanceOf[Int]
                      |  println(y)
                      |}"""
     checkTextHasNoErrors(selected)
-  }
 
-  def test_6() {
+  def test_6()
     val selected = s"""val x = 0
                      |if (${START}x.isInstanceOf[Int]$END) {
                      |  val y = x.asInstanceOf[Int]
@@ -135,9 +129,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |  case _ => println()
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_7() {
+  def test_7()
     val selected = s"""val x = 0
                      |if (${START}x.isInstanceOf[Int]$END && x.asInstanceOf[Long] == 1) {
                      |  val y = x.asInstanceOf[Int]
@@ -174,9 +167,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |    println()
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_8a() {
+  def test_8a()
     val selected = s"""val x1 = 0
                      |val x2 = 0
                      |if (${START}x1.isInstanceOf[Int]$END && x2.isInstanceOf[Int]) {
@@ -214,9 +206,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |  case _ =>
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_8b() {
+  def test_8b()
     val selected = s"""val x1 = 0
                      |val x2 = 0
                      |if (x1.isInstanceOf[Int] && x2.isI${CARET_MARKER}nstanceOf[Int]) {
@@ -229,9 +220,8 @@ class TypeCheckCanBeMatchInspectionTest
                      |  println(y1 + y2)
                      |}"""
     checkTextHasNoErrors(selected)
-  }
 
-  def test_8c() {
+  def test_8c()
     val selected = s"""val x1 = 0
                      |val x2 = 0
                      |if (x1.isInstanceOf[Int] && x2.isInstanceOf[Int]) {
@@ -244,9 +234,8 @@ class TypeCheckCanBeMatchInspectionTest
                      |  println(y1 + y2)
                      |}"""
     checkTextHasNoErrors(selected)
-  }
 
-  def test_9() {
+  def test_9()
     val selected = s"""val x = 0
                      |val i = 0
                      |if (${START}x.isInstanceOf[Int]$END) {
@@ -270,9 +259,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |  case _ =>
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_10() {
+  def test_10()
     val selected = s"""val x = 0
                       |if (${START}x.isInstanceOf[Int]$END) x else if (x.isInstanceOf[Long]) x else 0"""
     check(selected)
@@ -287,9 +275,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |  case _ => 0
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_11() {
+  def test_11()
     val selected = s"""import java.util
                      |val foo = (p: AnyVal) => {
                      |  if (${START}p.isInstanceOf[util.ArrayList[_]]$END) {}
@@ -311,9 +298,8 @@ class TypeCheckCanBeMatchInspectionTest
                    |  }
                    |}"""
     testQuickFix(text, result)
-  }
 
-  def test_12() {
+  def test_12()
     val selected = s"""def test2(p: AnyVal) {
                      |  if (${START}p.isInstanceOf[T forSome {type T <: Number}]$END) {}
                      |  else if (p.isInstanceOf[Int]) {}
@@ -332,5 +318,3 @@ class TypeCheckCanBeMatchInspectionTest
                    |  }
                    |}"""
     testQuickFix(text, result)
-  }
-}

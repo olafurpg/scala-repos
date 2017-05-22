@@ -11,8 +11,8 @@ import scala.reflect.io.AbstractFile
 /**
   * Common methods related to Java files and abstract files used in the context of classpath
   */
-object FileUtils {
-  implicit class AbstractFileOps(val file: AbstractFile) extends AnyVal {
+object FileUtils
+  implicit class AbstractFileOps(val file: AbstractFile) extends AnyVal
     def isPackage: Boolean = file.isDirectory && mayBeValidPackage(file.name)
 
     def isClass: Boolean = !file.isDirectory && file.hasExtension("class")
@@ -31,20 +31,17 @@ object FileUtils {
       */
     def toURLs(default: => Seq[URL] = Seq.empty): Seq[URL] =
       if (file.file == null) default else Seq(file.toURL)
-  }
 
-  implicit class FileOps(val file: JFile) extends AnyVal {
+  implicit class FileOps(val file: JFile) extends AnyVal
     def isPackage: Boolean =
       file.isDirectory && mayBeValidPackage(file.getName)
 
     def isClass: Boolean = file.isFile && file.getName.endsWith(".class")
-  }
 
-  def stripSourceExtension(fileName: String): String = {
+  def stripSourceExtension(fileName: String): String =
     if (endsScala(fileName)) stripClassExtension(fileName)
     else if (endsJava(fileName)) stripJavaExtension(fileName)
     else throw new FatalError("Unexpected source file ending: " + fileName)
-  }
 
   def dirPath(forPackage: String) = forPackage.replace('.', '/')
 
@@ -70,4 +67,3 @@ object FileUtils {
   // because then some tests in partest don't pass
   private def mayBeValidPackage(dirName: String): Boolean =
     (dirName != "META-INF") && (dirName != "") && (dirName.charAt(0) != '.')
-}

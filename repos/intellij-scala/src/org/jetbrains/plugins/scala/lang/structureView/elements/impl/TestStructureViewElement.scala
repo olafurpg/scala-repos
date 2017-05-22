@@ -15,17 +15,14 @@ class TestStructureViewElement(
     protected val testName: String,
     protected val myChildren: Array[TreeElement] = Array[TreeElement](),
     val testStatus: Int = TestStructureViewElement.normalStatusId)
-    extends ScalaStructureViewElement(myElement, false) {
+    extends ScalaStructureViewElement(myElement, false)
 
   override def getChildren: Array[TreeElement] = myChildren
 
-  override def getPresentation: ItemPresentation = {
+  override def getPresentation: ItemPresentation =
     new TestItemRepresentation(myElement, testName, testStatus)
-  }
-}
 
-object TestStructureViewElement {
+object TestStructureViewElement
   val normalStatusId = 1
   val ignoredStatusId = 2
   val pendingStatusId = 3
-}

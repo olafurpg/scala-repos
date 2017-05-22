@@ -24,27 +24,24 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.util.{LinearDataGenerator, LocalClusterSparkContext, MLlibTestSparkContext}
 import org.apache.spark.util.Utils
 
-private object RidgeRegressionSuite {
+private object RidgeRegressionSuite
 
   /** 3 features */
   val model = new RidgeRegressionModel(
       weights = Vectors.dense(0.1, 0.2, 0.3), intercept = 0.5)
-}
 
-class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
+class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext
 
   def predictionError(
-      predictions: Seq[Double], input: Seq[LabeledPoint]): Double = {
+      predictions: Seq[Double], input: Seq[LabeledPoint]): Double =
     predictions
       .zip(input)
-      .map {
+      .map
         case (prediction, expected) =>
           (prediction - expected.label) * (prediction - expected.label)
-      }
       .sum / predictions.size
-  }
 
-  test("ridge regression can help avoid overfitting") {
+  test("ridge regression can help avoid overfitting")
 
     // For small number of examples and large variance of error distribution,
     // ridge regression should give smaller generalization error that linear regression.
@@ -85,44 +82,37 @@ class RidgeRegressionSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(ridgeErr < linearErr,
            "ridgeError (" + ridgeErr + ") was not less than linearError(" +
            linearErr + ")")
-  }
 
-  test("model save/load") {
+  test("model save/load")
     val model = RidgeRegressionSuite.model
 
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
 
     // Save model, load it back, and compare.
-    try {
+    try
       model.save(sc, path)
       val sameModel = RidgeRegressionModel.load(sc, path)
       assert(model.weights == sameModel.weights)
       assert(model.intercept == sameModel.intercept)
-    } finally {
+    finally
       Utils.deleteRecursively(tempDir)
-    }
-  }
-}
 
 class RidgeRegressionClusterSuite
-    extends SparkFunSuite with LocalClusterSparkContext {
+    extends SparkFunSuite with LocalClusterSparkContext
 
-  test("task size should be small in both training and prediction") {
+  test("task size should be small in both training and prediction")
     val m = 4
     val n = 200000
     val points = sc
       .parallelize(0 until m, 2)
-      .mapPartitionsWithIndex { (idx, iter) =>
+      .mapPartitionsWithIndex  (idx, iter) =>
         val random = new Random(idx)
         iter.map(i =>
               LabeledPoint(1.0,
                            Vectors.dense(Array.fill(n)(random.nextDouble()))))
-      }
       .cache()
     // If we serialize data directly in the task closure, the size of the serialized task would be
     // greater than 1MB and hence Spark would throw an error.
     val model = RidgeRegressionWithSGD.train(points, 2)
     val predictions = model.predict(points.map(_.features))
-  }
-}

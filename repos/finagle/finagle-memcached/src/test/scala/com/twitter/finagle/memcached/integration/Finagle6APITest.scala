@@ -17,7 +17,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfter, FunSuite, Outcome}
 
 @RunWith(classOf[JUnitRunner])
-class Finagle6APITest extends FunSuite with BeforeAndAfter {
+class Finagle6APITest extends FunSuite with BeforeAndAfter
 
   /**
     * Note: This integration test requires a real Memcached server to run.
@@ -31,7 +31,7 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
   var zookeeperServer: ZooKeeperTestServer = null
   var zookeeperServerPort: Int = 0
 
-  before {
+  before
     // start zookeeper server and create zookeeper client
     shutdownRegistry = new ShutdownRegistryImpl
     zookeeperServer = new ZooKeeperTestServer(0, shutdownRegistry)
@@ -48,47 +48,39 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
     zkServerSetCluster = new ZookeeperServerSetCluster(serverSet)
 
     // start five memcached server and join the cluster
-    (0 to 4) foreach { _ =>
-      TestMemcachedServer.start() match {
+    (0 to 4) foreach  _ =>
+      TestMemcachedServer.start() match
         case Some(server) =>
           testServers :+= server
           zkServerSetCluster.join(server.address)
         case None =>
           throw new Exception("could not start TestMemcachedServer")
-      }
-    }
 
-    if (!testServers.isEmpty) {
+    if (!testServers.isEmpty)
       // set cache pool config node data
       val cachePoolConfig: CachePoolConfig =
         new CachePoolConfig(cachePoolSize = 5)
       val output: ByteArrayOutputStream = new ByteArrayOutputStream
       CachePoolConfig.jsonCodec.serialize(cachePoolConfig, output)
       zookeeperClient.get().setData(zkPath, output.toByteArray, -1)
-    }
-  }
 
-  after {
+  after
     // shutdown zookeeper server and client
     shutdownRegistry.execute()
 
-    if (!testServers.isEmpty) {
+    if (!testServers.isEmpty)
       // shutdown memcached server
       testServers foreach { _.stop() }
       testServers = List()
-    }
-  }
 
-  override def withFixture(test: NoArgTest): Outcome = {
+  override def withFixture(test: NoArgTest): Outcome =
     if (!testServers.isEmpty) test()
-    else {
+    else
       info("Cannot start memcached. Skipping test...")
       cancel()
-    }
-  }
 
-  if (!Option(System.getProperty("SKIP_FLAKY")).isDefined) {
-    test("with unmanaged regular zk serverset") {
+  if (!Option(System.getProperty("SKIP_FLAKY")).isDefined)
+    test("with unmanaged regular zk serverset")
       val client = Memcached.client
         .newTwemcacheClient(
             "zk!localhost:" + zookeeperServerPort + "!" + zkPath)
@@ -98,24 +90,16 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
       Thread.sleep(5000)
 
       val count = 100
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           client.set("foo" + n, Buf.Utf8("bar" + n))()
-        }
-      }
 
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           val c = client.clientOf("foo" + n)
           val Buf.Utf8(res) = c.get("foo" + n)().get
           assert(res == "bar" + n)
-        }
-      }
-    }
-  }
 
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined)
-    test("with managed cache pool") {
+    test("with managed cache pool")
       val client = Memcached.client
         .newTwemcacheClient(
             "twcache!localhost:" + zookeeperServerPort + "!" + zkPath)
@@ -132,22 +116,15 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
       assert(res == "bar")
 
       val count = 100
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           client.set("foo" + n, Buf.Utf8("bar" + n))()
-        }
-      }
 
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           val c = client.clientOf("foo" + n)
           val Buf.Utf8(res) = c.get("foo" + n)().get
           assert(res == "bar" + n)
-        }
-      }
-    }
 
-  test("with static servers list") {
+  test("with static servers list")
     val client = Memcached.client.newRichClient(
         "twcache!localhost:%d,localhost:%d".format(
             testServers(0).address.getPort, testServers(1).address.getPort))
@@ -157,5 +134,3 @@ class Finagle6APITest extends FunSuite with BeforeAndAfter {
     Await.result(client.set("foo", Buf.Utf8("bar")))
     val Buf.Utf8(res) = Await.result(client.get("foo")).get
     assert(res == "bar")
-  }
-}

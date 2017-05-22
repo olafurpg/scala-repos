@@ -4,7 +4,7 @@ package std
 
 import scalaz.std.{stream => s}
 
-final class StreamOps[A](val self: Stream[A]) extends AnyVal {
+final class StreamOps[A](val self: Stream[A]) extends AnyVal
   final def interleave(other: Stream[A]): Stream[A] = s.interleave(self, other)
   final def toZipper: Option[Zipper[A]] = s.toZipper(self)
   final def zipperEnd: Option[Zipper[A]] = s.zipperEnd(self)
@@ -17,9 +17,7 @@ final class StreamOps[A](val self: Stream[A]) extends AnyVal {
   final def unfoldForestM[B, M[_]: Monad](
       f: A => M[(B, Stream[A])]): M[Stream[Tree[B]]] = s.unfoldForestM(self)(f)
   final def intersperse(a: A): Stream[A] = s.intersperse(self, a)
-}
 
-trait ToStreamOps {
+trait ToStreamOps
   implicit def ToStreamOpsFromStream[A](a: Stream[A]): StreamOps[A] =
     new StreamOps(a)
-}

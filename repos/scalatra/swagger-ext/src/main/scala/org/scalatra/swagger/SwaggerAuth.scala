@@ -16,7 +16,7 @@ import org.scalatra.util.NotNothing
 
 class SwaggerWithAuth(
     val swaggerVersion: String, val apiVersion: String, val apiInfo: ApiInfo)
-    extends SwaggerEngine[AuthApi[AnyRef]] {
+    extends SwaggerEngine[AuthApi[AnyRef]]
   private[this] val logger = Logger[this.type]
 
   /**
@@ -29,7 +29,7 @@ class SwaggerWithAuth(
                consumes: List[String],
                produces: List[String],
                protocols: List[String],
-               authorizations: List[String]) {
+               authorizations: List[String])
     val endpoints: List[AuthEndpoint[AnyRef]] =
       s.endpoints(resourcePath) collect { case m: AuthEndpoint[AnyRef] => m }
     _docs +=
@@ -48,12 +48,10 @@ class SwaggerWithAuth(
                              (authorizations ::: endpoints.flatMap(_.operations
                                        .flatMap(_.authorizations))).distinct,
                              0)
-  }
-}
 
 import org.scalatra.util.RicherString._
 
-object SwaggerAuthSerializers {
+object SwaggerAuthSerializers
   import org.scalatra.swagger.SwaggerSerializers.{dontAddOnEmpty, readDataType, writeDataType}
 
   def authFormats[T <: AnyRef](
@@ -66,7 +64,7 @@ object SwaggerAuthSerializers {
 
   class AuthOperationSerializer[T <: AnyRef : Manifest](userOption: Option[T])
       extends CustomSerializer[AuthOperation[T]](implicit formats =>
-            ({
+            (
           case value =>
             AuthOperation[T](
                 (value \ "method").extract[HttpMethod],
@@ -83,7 +81,7 @@ object SwaggerAuthSerializers {
                 (value \ "protocols").extract[List[String]],
                 (value \ "authorizations").extract[List[String]]
             )
-        }, {
+        ,
           case obj: AuthOperation[T] if obj.allows(userOption) =>
             val json =
               ("method" -> Extraction.decompose(obj.method)) ~
@@ -106,11 +104,11 @@ object SwaggerAuthSerializers {
                   json)
             r merge writeDataType(obj.responseClass)
           case obj: AuthOperation[_] => JNothing
-        }))
+        ))
   class AuthEndpointSerializer[T <: AnyRef : Manifest]
       extends CustomSerializer[AuthEndpoint[T]](
           implicit formats =>
-            ({
+            (
           case value =>
             AuthEndpoint[T](
                 (value \ "path").extract[String],
@@ -118,14 +116,14 @@ object SwaggerAuthSerializers {
                   .extractOpt[String]
                   .flatMap(_.blankOption),
                 (value \ "operations").extract[List[AuthOperation[T]]])
-        }, {
+        ,
           case obj: AuthEndpoint[T] =>
             ("path" -> obj.path) ~ ("description" -> obj.description) ~
             ("operations" -> Extraction.decompose(obj.operations))
-        }))
+        ))
   class AuthApiSerializer[T <: AnyRef : Manifest]
       extends CustomSerializer[AuthApi[T]](implicit formats =>
-            ({
+            (
           case json =>
             AuthApi[T](
                 (json \ "apiVersion").extractOrElse(""),
@@ -144,45 +142,44 @@ object SwaggerAuthSerializers {
                 (json \ "authorizations").extractOrElse(List.empty[String]),
                 (json \ "position").extractOrElse(0)
             )
-        }, {
+        ,
           case x: AuthApi[T] =>
             ("apiVersion" -> x.apiVersion) ~
             ("swaggerVersion" -> x.swaggerVersion) ~
             ("resourcePath" -> x.resourcePath) ~
             ("produces" ->
-                (x.produces match {
+                (x.produces match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("consumes" ->
-                (x.consumes match {
+                (x.consumes match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("protocols" ->
-                (x.protocols match {
+                (x.protocols match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("authorizations" ->
-                (x.authorizations match {
+                (x.authorizations match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("apis" ->
-                (x.apis match {
+                (x.apis match
                       case Nil => JNothing
                       case e => Extraction.decompose(e)
-                    })) ~
+                    )) ~
             ("models" ->
-                (x.models match {
+                (x.models match
                       case x if x.isEmpty => JNothing
                       case e => Extraction.decompose(e)
-                    }))
-        }))
-}
+                    ))
+        ))
 
-trait SwaggerAuthBase[TypeForUser <: AnyRef] extends SwaggerBaseBase {
+trait SwaggerAuthBase[TypeForUser <: AnyRef] extends SwaggerBaseBase
   self: JsonSupport[_] with CorsSupport with ScentrySupport[TypeForUser] =>
   protected type ApiType = AuthApi[TypeForUser]
   protected implicit def swagger: SwaggerEngine[AuthApi[AnyRef]]
@@ -191,56 +188,49 @@ trait SwaggerAuthBase[TypeForUser <: AnyRef] extends SwaggerBaseBase {
     SwaggerAuthSerializers.authFormats(userOption)(userManifest)
 
   protected def docToJson(doc: ApiType): JValue = Extraction.decompose(doc)
-  before() {
+  before()
     scentry.authenticate()
-  }
 
-  abstract override def initialize(config: ConfigT) {
+  abstract override def initialize(config: ConfigT)
     super.initialize(config)
 
-    get("/:doc(.:format)") {
+    get("/:doc(.:format)")
       def isAllowed(doc: AuthApi[AnyRef]) =
         doc.apis.exists(_.operations.exists(_.allows(userOption)))
-      swagger.doc(params("doc")) match {
+      swagger.doc(params("doc")) match
         case Some(doc) if isAllowed(doc) ⇒ renderDoc(doc.asInstanceOf[ApiType])
         case _ ⇒ NotFound()
-      }
-    }
 
-    get("/" + indexRoute + "(.:format)") {
+    get("/" + indexRoute + "(.:format)")
       val docs = swagger.docs
         .filter(_.apis.exists(_.operations.exists(_.allows(userOption))))
         .toList
       if (docs.isEmpty) halt(NotFound())
       renderIndex(docs.asInstanceOf[List[ApiType]])
-    }
-  }
 
-  protected override def renderIndex(docs: List[ApiType]): JValue = {
+  protected override def renderIndex(docs: List[ApiType]): JValue =
     ("apiVersion" -> swagger.apiVersion) ~
     ("swaggerVersion" -> swagger.swaggerVersion) ~
     ("apis" ->
         (docs.filter(s =>
                     s.apis.nonEmpty &&
                     s.apis.exists(_.operations.exists(_.allows(userOption))))
-              .toList map { doc =>
+              .toList map  doc =>
               ("path" ->
                   (url(doc.resourcePath,
                        includeServletPath = false,
                        includeContextPath = false) +
                       (if (includeFormatParameter) ".{format}" else ""))) ~
               ("description" -> doc.description)
-            })) ~
-    ("authorizations" -> swagger.authorizations.foldLeft(JObject(Nil)) {
+            )) ~
+    ("authorizations" -> swagger.authorizations.foldLeft(JObject(Nil))
           (acc, auth) =>
             acc merge JObject(List(auth.`type` -> Extraction.decompose(auth)(
                         SwaggerAuthSerializers.authFormats(userOption)(
                             userManifest))))
-        }) ~
+        ) ~
     ("info" -> Option(swagger.apiInfo).map(Extraction.decompose(_)(
                 SwaggerAuthSerializers.authFormats(userOption)(userManifest))))
-  }
-}
 
 case class AuthApi[TypeForUser <: AnyRef](
     apiVersion: String,
@@ -255,24 +245,22 @@ case class AuthApi[TypeForUser <: AnyRef](
     authorizations: List[String] = Nil,
     position: Int = 0)
     extends SwaggerApi[AuthEndpoint[TypeForUser]]
-object AuthApi {
+object AuthApi
 
   import org.scalatra.swagger.SwaggerSupportSyntax.SwaggerOperationBuilder
 
   lazy val Iso8601Date = ISODateTimeFormat.dateTime.withZone(DateTimeZone.UTC)
 
   trait SwaggerAuthOperationBuilder[T <: AnyRef]
-      extends SwaggerOperationBuilder[AuthOperation[T]] {
+      extends SwaggerOperationBuilder[AuthOperation[T]]
     private[this] var _allows: Option[T] => Boolean = (u: Option[T]) => true
     def allows: Option[T] => Boolean = _allows
-    def allows(guard: Option[T] => Boolean): this.type = {
+    def allows(guard: Option[T] => Boolean): this.type =
       _allows = guard; this
-    }
     def allowAll: this.type = { _allows = (u: Option[T]) => true; this }
-  }
 
   class AuthOperationBuilder[T <: AnyRef](val resultClass: DataType)
-      extends SwaggerAuthOperationBuilder[T] {
+      extends SwaggerAuthOperationBuilder[T]
     def result: AuthOperation[T] = AuthOperation[T](
         null,
         resultClass,
@@ -289,8 +277,6 @@ object AuthApi {
         authorizations,
         allows
     )
-  }
-}
 
 case class AuthEndpoint[TypeForUser <: AnyRef](
     path: String,
@@ -316,7 +302,7 @@ case class AuthOperation[TypeForUser <: AnyRef](
     extends SwaggerOperation
 
 trait SwaggerAuthSupport[TypeForUser <: AnyRef]
-    extends SwaggerSupportBase with SwaggerSupportSyntax {
+    extends SwaggerSupportBase with SwaggerSupportSyntax
   self: ScalatraBase with ScentrySupport[TypeForUser] =>
   import org.scalatra.swagger.AuthApi.AuthOperationBuilder
 
@@ -334,45 +320,42 @@ trait SwaggerAuthSupport[TypeForUser <: AnyRef]
     bldr.result
 
   protected def apiOperation[T : Manifest : NotNothing](
-      nickname: String): AuthOperationBuilder[TypeForUser] = {
+      nickname: String): AuthOperationBuilder[TypeForUser] =
     registerModel[T]()
     new AuthOperationBuilder[TypeForUser](DataType[T])
       .nickname(nickname)
       .errors(swaggerDefaultErrors: _*)
-  }
 
   protected def apiOperation(
-      nickname: String, model: Model): AuthOperationBuilder[TypeForUser] = {
+      nickname: String, model: Model): AuthOperationBuilder[TypeForUser] =
     registerModel(model)
     new AuthOperationBuilder[TypeForUser](ValueDataType(model.id))
       .nickname(nickname)
       .errors(swaggerDefaultErrors: _*)
-  }
 
   /**
     * Builds the documentation for all the endpoints discovered in an API.
     */
-  def endpoints(basePath: String): List[AuthEndpoint[TypeForUser]] = {
-    (swaggerEndpointEntries(extractOperation) groupBy (_.key)).toList map {
+  def endpoints(basePath: String): List[AuthEndpoint[TypeForUser]] =
+    (swaggerEndpointEntries(extractOperation) groupBy (_.key)).toList map
       case (name, entries) =>
         val desc = _description.lift apply name
         val pth = if (basePath endsWith "/") basePath else basePath + "/"
         val nm = if (name startsWith "/") name.substring(1) else name
         new AuthEndpoint[TypeForUser](
             pth + nm, desc, entries.toList map (_.value))
-    } sortBy (_.path)
-  }
+    sortBy (_.path)
 
   /**
     * Returns a list of operations based on the given route. The default implementation returns a list with only 1
     * operation.
     */
   protected def extractOperation(
-      route: Route, method: HttpMethod): AuthOperation[TypeForUser] = {
+      route: Route, method: HttpMethod): AuthOperation[TypeForUser] =
     val op =
       route.metadata.get(Symbols.Operation) map
       (_.asInstanceOf[AuthOperation[TypeForUser]])
-    op map (_.copy(method = method)) getOrElse {
+    op map (_.copy(method = method)) getOrElse
       val theParams =
         route.metadata.get(Symbols.Parameters) map
         (_.asInstanceOf[List[Parameter]]) getOrElse Nil
@@ -407,6 +390,3 @@ trait SwaggerAuthSupport[TypeForUser <: AnyRef]
           produces = produces,
           consumes = consumes,
           allows = allows)
-    }
-  }
-}

@@ -23,15 +23,14 @@ import kafka.metrics.{KafkaMetricsGroup, KafkaTimer}
 import kafka.utils.Pool
 
 class FetchRequestAndResponseMetrics(metricId: ClientIdBroker)
-    extends KafkaMetricsGroup {
-  val tags = metricId match {
+    extends KafkaMetricsGroup
+  val tags = metricId match
     case ClientIdAndBroker(clientId, brokerHost, brokerPort) =>
       Map("clientId" -> clientId,
           "brokerHost" -> brokerHost,
           "brokerPort" -> brokerPort.toString)
     case ClientIdAllBrokers(clientId) =>
       Map("clientId" -> clientId)
-  }
 
   val requestTimer = new KafkaTimer(
       newTimer("FetchRequestRateAndTimeMs",
@@ -43,13 +42,12 @@ class FetchRequestAndResponseMetrics(metricId: ClientIdBroker)
                                    TimeUnit.MILLISECONDS,
                                    TimeUnit.SECONDS,
                                    tags)
-}
 
 /**
   * Tracks metrics of the requests made by a given consumer client to all brokers, and the responses obtained from the brokers.
   * @param clientId ClientId of the given consumer
   */
-class FetchRequestAndResponseStats(clientId: String) {
+class FetchRequestAndResponseStats(clientId: String)
   private val valueFactory = (k: ClientIdBroker) =>
     new FetchRequestAndResponseMetrics(k)
   private val stats = new Pool[ClientIdBroker, FetchRequestAndResponseMetrics](
@@ -61,32 +59,25 @@ class FetchRequestAndResponseStats(clientId: String) {
       ): FetchRequestAndResponseMetrics = allBrokersStats
 
   def getFetchRequestAndResponseStats(
-      brokerHost: String, brokerPort: Int): FetchRequestAndResponseMetrics = {
+      brokerHost: String, brokerPort: Int): FetchRequestAndResponseMetrics =
     stats.getAndMaybePut(
         new ClientIdAndBroker(clientId, brokerHost, brokerPort))
-  }
-}
 
 /**
   * Stores the fetch request and response stats information of each consumer client in a (clientId -> FetchRequestAndResponseStats) map.
   */
-object FetchRequestAndResponseStatsRegistry {
+object FetchRequestAndResponseStatsRegistry
   private val valueFactory = (k: String) => new FetchRequestAndResponseStats(k)
   private val globalStats =
     new Pool[String, FetchRequestAndResponseStats](Some(valueFactory))
 
-  def getFetchRequestAndResponseStats(clientId: String) = {
+  def getFetchRequestAndResponseStats(clientId: String) =
     globalStats.getAndMaybePut(clientId)
-  }
 
-  def removeConsumerFetchRequestAndResponseStats(clientId: String) {
+  def removeConsumerFetchRequestAndResponseStats(clientId: String)
     val pattern = (".*" + clientId + ".*").r
     val keys = globalStats.keys
-    for (key <- keys) {
-      pattern.findFirstIn(key) match {
+    for (key <- keys)
+      pattern.findFirstIn(key) match
         case Some(_) => globalStats.remove(key)
         case _ =>
-      }
-    }
-  }
-}

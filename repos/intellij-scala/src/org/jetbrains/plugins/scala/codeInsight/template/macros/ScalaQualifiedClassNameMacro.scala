@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
   * @author Roman.Shein
   * @since 24.09.2015.
   */
-class ScalaQualifiedClassNameMacro extends Macro {
+class ScalaQualifiedClassNameMacro extends Macro
   override def getName: String = MacroUtil.scalaIdPrefix + "qualifiedClassName"
 
   override def getPresentableName: String =
@@ -24,11 +24,9 @@ class ScalaQualifiedClassNameMacro extends Macro {
     context.isInstanceOf[ScalaCodeContextType]
 
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+      params: Array[Expression], context: ExpressionContext): Result =
     Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
                                        classOf[PsiClass]))
       .map(_.getQualifiedName)
       .map(new TextResult(_))
       .orNull
-  }
-}

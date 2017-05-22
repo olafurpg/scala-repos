@@ -20,7 +20,6 @@ package kafka.common
   * This exception is thrown when new leader election is not necessary.
   */
 class LeaderElectionNotNeededException(message: String, cause: Throwable)
-    extends RuntimeException(message, cause) {
+    extends RuntimeException(message, cause)
   def this(message: String) = this(message, null)
   def this() = this(null, null)
-}

@@ -32,18 +32,15 @@ private[storage] class BlockManagerManagedBuffer(
     blockManager: BlockManager,
     blockId: BlockId,
     chunkedBuffer: ChunkedByteBuffer)
-    extends NettyManagedBuffer(chunkedBuffer.toNetty) {
+    extends NettyManagedBuffer(chunkedBuffer.toNetty)
 
-  override def retain(): ManagedBuffer = {
+  override def retain(): ManagedBuffer =
     super.retain()
     val locked =
       blockManager.blockInfoManager.lockForReading(blockId, blocking = false)
     assert(locked.isDefined)
     this
-  }
 
-  override def release(): ManagedBuffer = {
+  override def release(): ManagedBuffer =
     blockManager.releaseLock(blockId)
     super.release()
-  }
-}

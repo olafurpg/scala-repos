@@ -1,16 +1,15 @@
 package scalaz
 
 /** [[scala.Either]], but with a value by name. */
-sealed abstract class LazyEither[+A, +B] {
+sealed abstract class LazyEither[+A, +B]
 
   import LazyOption._
   import LazyEither._
 
   def fold[X](left: (=> A) => X, right: (=> B) => X): X =
-    this match {
+    this match
       case LazyLeft(a) => left(a())
       case LazyRight(b) => right(b())
-    }
 
   /** Catamorphism of the constructor chosen. */
   def ?[X](left: => X, right: => X): X =
@@ -89,13 +88,12 @@ sealed abstract class LazyEither[+A, +B] {
 
   def left: LeftProjection[A, B] =
     new LeftProjection[A, B](this)
-}
 
 private case class LazyLeft[A, B](a: () => A) extends LazyEither[A, B]
 
 private case class LazyRight[A, B](b: () => B) extends LazyEither[A, B]
 
-object LazyEither extends LazyEitherInstances {
+object LazyEither extends LazyEitherInstances
 
   /**
     * Returns the first argument in `LazyLeft` if `value` is `true`, otherwise the second argument in
@@ -105,23 +103,19 @@ object LazyEither extends LazyEitherInstances {
       ifTrue: => A, ifFalse: => B): LazyEither[A, B] =
     if (cond) lazyLeft(ifTrue) else lazyRight(ifFalse)
 
-  sealed abstract class LazyLeftConstruct[B] {
+  sealed abstract class LazyLeftConstruct[B]
     def apply[A](a: => A): LazyEither[A, B]
-  }
 
-  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B] {
+  def lazyLeft[B]: LazyLeftConstruct[B] = new LazyLeftConstruct[B]
     def apply[A](a: => A) = LazyLeft(() => a)
-  }
 
-  sealed abstract class LazyRightConstruct[A] {
+  sealed abstract class LazyRightConstruct[A]
     def apply[B](b: => B): LazyEither[A, B]
-  }
 
-  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A] {
+  def lazyRight[A]: LazyRightConstruct[A] = new LazyRightConstruct[A]
     def apply[B](b: => B) = LazyRight(() => b)
-  }
 
-  final case class LeftProjection[+A, +B](e: LazyEither[A, B]) {
+  final case class LeftProjection[+A, +B](e: LazyEither[A, B])
     import LazyOption._
 
     def getOrElse[AA >: A](default: => AA): AA =
@@ -158,18 +152,16 @@ object LazyEither extends LazyEitherInstances {
     def flatMap[BB >: B, C](
         f: (=> A) => LazyEither[C, BB]): LazyEither[C, BB] =
       e.fold(f, lazyRight(_))
-  }
-}
 
 // TODO more instances
-sealed abstract class LazyEitherInstances {
+sealed abstract class LazyEitherInstances
   implicit def lazyEitherInstance[E]: Traverse[LazyEither[E, ?]] with Monad[
       LazyEither[E, ?]] with BindRec[LazyEither[E, ?]] with Cozip[
       LazyEither[E, ?]] with Optional[LazyEither[E, ?]] with MonadError[
       LazyEither[E, ?], E] =
     new Traverse[LazyEither[E, ?]] with Monad[LazyEither[E, ?]]
     with BindRec[LazyEither[E, ?]] with Cozip[LazyEither[E, ?]]
-    with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E] {
+    with Optional[LazyEither[E, ?]] with MonadError[LazyEither[E, ?], E]
 
       def traverseImpl[G[_]: Applicative, A, B](fa: LazyEither[E, A])(
           f: A => G[B]): G[LazyEither[E, B]] =
@@ -192,10 +184,9 @@ sealed abstract class LazyEitherInstances {
 
       def cozip[A, B](a: LazyEither[E, A \/ B]) =
         a.fold(
-            e => -\/(LazyEither.lazyLeft(e)), {
+            e => -\/(LazyEither.lazyLeft(e)),
               case -\/(a) => -\/(LazyEither.lazyRight(a))
               case \/-(b) => \/-(LazyEither.lazyRight(b))
-            }
         )
 
       def pextract[B, A](fa: LazyEither[E, A]): LazyEither[E, B] \/ A =
@@ -211,18 +202,15 @@ sealed abstract class LazyEitherInstances {
       @annotation.tailrec
       def tailrecM[A, B](
           f: A => LazyEither[E, A \/ B])(a: A): LazyEither[E, B] =
-        f(a) match {
+        f(a) match
           case LazyLeft(l) => LazyLeft(l)
           case LazyRight(r) =>
-            r() match {
+            r() match
               case \/-(b) => LazyEither.lazyRight(b)
               case -\/(a0) => tailrecM(f)(a0)
-            }
-        }
-    }
 
   implicit val lazyEitherAssociative: Associative[LazyEither] =
-    new Associative[LazyEither] {
+    new Associative[LazyEither]
       def reassociateLeft[A, B, C](f: LazyEither[A, LazyEither[B, C]]) =
         f.fold(
             a => LazyEither.lazyLeft(LazyEither.lazyLeft(a)),
@@ -240,10 +228,9 @@ sealed abstract class LazyEitherInstances {
             ),
             c => LazyEither.lazyRight(LazyEither.lazyRight(c))
         )
-    }
 
   implicit val lazyEitherBitraverse: Bitraverse[LazyEither] =
-    new Bitraverse[LazyEither] {
+    new Bitraverse[LazyEither]
       override def bimap[A, B, C, D](fab: LazyEither[A, B])(
           f: A => C, g: B => D) =
         fab.map(x => g(x)).left.map(x => f(x))
@@ -254,5 +241,3 @@ sealed abstract class LazyEitherInstances {
             a => Applicative[G].map(f(a))(b => LazyEither.lazyLeft[D](b)),
             b => Applicative[G].map(g(b))(d => LazyEither.lazyRight[C](d))
         )
-    }
-}

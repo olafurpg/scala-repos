@@ -8,10 +8,9 @@ class Test private (val value: Int)
 
 abstract class Bar(val ctor: (Int) => Test)
 
-object Test extends Bar(new Test(_)) {
+object Test extends Bar(new Test(_))
   //<--- ILLEGAL ACCESS
   def main(args: Array[String]) {}
-}
 
 //however the following is legal:
 /*

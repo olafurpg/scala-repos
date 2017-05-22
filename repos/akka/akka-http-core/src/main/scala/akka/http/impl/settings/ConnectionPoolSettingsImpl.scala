@@ -17,7 +17,7 @@ private[akka] final case class ConnectionPoolSettingsImpl(
     val pipeliningLimit: Int,
     val idleTimeout: Duration,
     val connectionSettings: ClientConnectionSettings)
-    extends ConnectionPoolSettings {
+    extends ConnectionPoolSettings
 
   require(maxConnections > 0, "max-connections must be > 0")
   require(maxRetries >= 0, "max-retries must be >= 0")
@@ -28,12 +28,11 @@ private[akka] final case class ConnectionPoolSettingsImpl(
   require(idleTimeout >= Duration.Zero, "idle-timeout must be >= 0")
 
   override def productPrefix = "ConnectionPoolSettings"
-}
 
 object ConnectionPoolSettingsImpl
     extends SettingsCompanion[ConnectionPoolSettingsImpl](
-        "akka.http.host-connection-pool") {
-  def fromSubConfig(root: Config, c: Config) = {
+        "akka.http.host-connection-pool")
+  def fromSubConfig(root: Config, c: Config) =
     ConnectionPoolSettingsImpl(c getInt "max-connections",
                                c getInt "max-retries",
                                c getInt "max-open-requests",
@@ -41,5 +40,3 @@ object ConnectionPoolSettingsImpl
                                c getPotentiallyInfiniteDuration "idle-timeout",
                                ClientConnectionSettingsImpl.fromSubConfig(
                                    root, c.getConfig("client")))
-  }
-}

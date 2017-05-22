@@ -29,7 +29,7 @@ import org.apache.spark.internal.Logging
 /**
   * Various utility methods used by Spark.
   */
-private[spark] object ShutdownHookManager extends Logging {
+private[spark] object ShutdownHookManager extends Logging
   val DEFAULT_SHUTDOWN_PRIORITY = 100
 
   /**
@@ -45,70 +45,56 @@ private[spark] object ShutdownHookManager extends Logging {
     */
   val TEMP_DIR_SHUTDOWN_PRIORITY = 25
 
-  private lazy val shutdownHooks = {
+  private lazy val shutdownHooks =
     val manager = new SparkShutdownHookManager()
     manager.install()
     manager
-  }
 
   private val shutdownDeletePaths =
     new scala.collection.mutable.HashSet[String]()
 
   // Add a shutdown hook to delete the temp dirs when the JVM exits
-  addShutdownHook(TEMP_DIR_SHUTDOWN_PRIORITY) { () =>
+  addShutdownHook(TEMP_DIR_SHUTDOWN_PRIORITY)  () =>
     logInfo("Shutdown hook called")
     // we need to materialize the paths to delete because deleteRecursively removes items from
     // shutdownDeletePaths as we are traversing through it.
-    shutdownDeletePaths.toArray.foreach { dirPath =>
-      try {
+    shutdownDeletePaths.toArray.foreach  dirPath =>
+      try
         logInfo("Deleting directory " + dirPath)
         Utils.deleteRecursively(new File(dirPath))
-      } catch {
+      catch
         case e: Exception =>
           logError(s"Exception while deleting Spark temp dir: $dirPath", e)
-      }
-    }
-  }
 
   // Register the path to be deleted via shutdown hook
-  def registerShutdownDeleteDir(file: File) {
+  def registerShutdownDeleteDir(file: File)
     val absolutePath = file.getAbsolutePath()
-    shutdownDeletePaths.synchronized {
+    shutdownDeletePaths.synchronized
       shutdownDeletePaths += absolutePath
-    }
-  }
 
   // Remove the path to be deleted via shutdown hook
-  def removeShutdownDeleteDir(file: File) {
+  def removeShutdownDeleteDir(file: File)
     val absolutePath = file.getAbsolutePath()
-    shutdownDeletePaths.synchronized {
+    shutdownDeletePaths.synchronized
       shutdownDeletePaths.remove(absolutePath)
-    }
-  }
 
   // Is the path already registered to be deleted via a shutdown hook ?
-  def hasShutdownDeleteDir(file: File): Boolean = {
+  def hasShutdownDeleteDir(file: File): Boolean =
     val absolutePath = file.getAbsolutePath()
-    shutdownDeletePaths.synchronized {
+    shutdownDeletePaths.synchronized
       shutdownDeletePaths.contains(absolutePath)
-    }
-  }
 
   // Note: if file is child of some registered path, while not equal to it, then return true;
   // else false. This is to ensure that two shutdown hooks do not try to delete each others
   // paths - resulting in IOException and incomplete cleanup.
-  def hasRootAsShutdownDeleteDir(file: File): Boolean = {
+  def hasRootAsShutdownDeleteDir(file: File): Boolean =
     val absolutePath = file.getAbsolutePath()
-    val retval = shutdownDeletePaths.synchronized {
-      shutdownDeletePaths.exists { path =>
+    val retval = shutdownDeletePaths.synchronized
+      shutdownDeletePaths.exists  path =>
         !absolutePath.equals(path) && absolutePath.startsWith(path)
-      }
-    }
-    if (retval) {
+    if (retval)
       logInfo("path = " + file + ", already present as root for deletion.")
-    }
     retval
-  }
 
   /**
     * Detect whether this thread might be executing a shutdown hook. Will always return true if
@@ -118,20 +104,17 @@ private[spark] object ShutdownHookManager extends Logging {
     * Currently, this detects whether the JVM is shutting down by Runtime#addShutdownHook throwing
     * an IllegalStateException.
     */
-  def inShutdown(): Boolean = {
-    try {
-      val hook = new Thread {
+  def inShutdown(): Boolean =
+    try
+      val hook = new Thread
         override def run() {}
-      }
       // scalastyle:off runtimeaddshutdownhook
       Runtime.getRuntime.addShutdownHook(hook)
       // scalastyle:on runtimeaddshutdownhook
       Runtime.getRuntime.removeShutdownHook(hook)
-    } catch {
+    catch
       case ise: IllegalStateException => return true
-    }
     false
-  }
 
   /**
     * Adds a shutdown hook with default priority.
@@ -139,9 +122,8 @@ private[spark] object ShutdownHookManager extends Logging {
     * @param hook The code to run during shutdown.
     * @return A handle that can be used to unregister the shutdown hook.
     */
-  def addShutdownHook(hook: () => Unit): AnyRef = {
+  def addShutdownHook(hook: () => Unit): AnyRef =
     addShutdownHook(DEFAULT_SHUTDOWN_PRIORITY)(hook)
-  }
 
   /**
     * Adds a shutdown hook with the given priority. Hooks with lower priority values run
@@ -150,9 +132,8 @@ private[spark] object ShutdownHookManager extends Logging {
     * @param hook The code to run during shutdown.
     * @return A handle that can be used to unregister the shutdown hook.
     */
-  def addShutdownHook(priority: Int)(hook: () => Unit): AnyRef = {
+  def addShutdownHook(priority: Int)(hook: () => Unit): AnyRef =
     shutdownHooks.add(priority, hook)
-  }
 
   /**
     * Remove a previously installed shutdown hook.
@@ -160,12 +141,10 @@ private[spark] object ShutdownHookManager extends Logging {
     * @param ref A handle returned by `addShutdownHook`.
     * @return Whether the hook was removed.
     */
-  def removeShutdownHook(ref: AnyRef): Boolean = {
+  def removeShutdownHook(ref: AnyRef): Boolean =
     shutdownHooks.remove(ref)
-  }
-}
 
-private[util] class SparkShutdownHookManager {
+private[util] class SparkShutdownHookManager
 
   private val hooks = new PriorityQueue[SparkShutdownHook]()
   @volatile private var shuttingDown = false
@@ -175,46 +154,35 @@ private[util] class SparkShutdownHookManager {
     * have `ShutdownHookManager`, so in that case we just use the JVM's `Runtime` object and hope for
     * the best.
     */
-  def install(): Unit = {
-    val hookTask = new Runnable() {
+  def install(): Unit =
+    val hookTask = new Runnable()
       override def run(): Unit = runAll()
-    }
     org.apache.hadoop.util.ShutdownHookManager
       .get()
       .addShutdownHook(hookTask, FileSystem.SHUTDOWN_HOOK_PRIORITY + 30)
-  }
 
-  def runAll(): Unit = {
+  def runAll(): Unit =
     shuttingDown = true
     var nextHook: SparkShutdownHook = null
-    while ({ nextHook = hooks.synchronized { hooks.poll() }; nextHook != null }) {
+    while ({ nextHook = hooks.synchronized { hooks.poll() }; nextHook != null })
       Try(Utils.logUncaughtExceptions(nextHook.run()))
-    }
-  }
 
-  def add(priority: Int, hook: () => Unit): AnyRef = {
-    hooks.synchronized {
-      if (shuttingDown) {
+  def add(priority: Int, hook: () => Unit): AnyRef =
+    hooks.synchronized
+      if (shuttingDown)
         throw new IllegalStateException(
             "Shutdown hooks cannot be modified during shutdown.")
-      }
       val hookRef = new SparkShutdownHook(priority, hook)
       hooks.add(hookRef)
       hookRef
-    }
-  }
 
-  def remove(ref: AnyRef): Boolean = {
+  def remove(ref: AnyRef): Boolean =
     hooks.synchronized { hooks.remove(ref) }
-  }
-}
 
 private class SparkShutdownHook(private val priority: Int, hook: () => Unit)
-    extends Comparable[SparkShutdownHook] {
+    extends Comparable[SparkShutdownHook]
 
-  override def compareTo(other: SparkShutdownHook): Int = {
+  override def compareTo(other: SparkShutdownHook): Int =
     other.priority - priority
-  }
 
   def run(): Unit = hook()
-}

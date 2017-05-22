@@ -7,7 +7,7 @@ import net.liftweb.json._
 
 import org.specs2.mutable.Specification
 
-object LottoExample extends Specification {
+object LottoExample extends Specification
   case class Winner(winnerId: Long, numbers: List[Int])
   case class Lotto(id: Long,
                    winningNumbers: List[Int],
@@ -39,4 +39,3 @@ object LottoExample extends Specification {
 
   fromJSON[Lotto](json) mustEqual Success(lotto)
  */
-}

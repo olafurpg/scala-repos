@@ -12,7 +12,7 @@ import akka.util.ByteString
 import headers._
 import akka.stream.scaladsl.Flow
 
-trait Encoder {
+trait Encoder
   def encoding: HttpEncoding
 
   def messageFilter: HttpMessage ⇒ Boolean
@@ -37,7 +37,7 @@ trait Encoder {
 
   def newCompressor: Compressor
 
-  def newEncodeTransformer(): Stage[ByteString, ByteString] = {
+  def newEncodeTransformer(): Stage[ByteString, ByteString] =
     val compressor = newCompressor
 
     def encodeChunk(bytes: ByteString): ByteString =
@@ -45,24 +45,20 @@ trait Encoder {
     def finish(): ByteString = compressor.finish()
 
     StreamUtils.byteStringTransformer(encodeChunk, finish)
-  }
-}
 
-object Encoder {
-  val DefaultFilter: HttpMessage ⇒ Boolean = {
+object Encoder
+  val DefaultFilter: HttpMessage ⇒ Boolean =
     case req: HttpRequest ⇒ isCompressible(req)
     case res @ HttpResponse(status, _, _, _) ⇒
       isCompressible(res) && status.isSuccess
-  }
   private[coding] def isCompressible(msg: HttpMessage): Boolean =
     msg.entity.contentType.mediaType.isCompressible
 
   private[coding] val isContentEncodingHeader: HttpHeader ⇒ Boolean =
     _.isInstanceOf[`Content-Encoding`]
-}
 
 /** A stateful object representing ongoing compression. */
-abstract class Compressor {
+abstract class Compressor
 
   /**
     * Compresses the given input and returns compressed data. The implementation
@@ -88,4 +84,3 @@ abstract class Compressor {
 
   /** Combines `compress` + `finish` */
   def compressAndFinish(input: ByteString): ByteString
-}

@@ -12,7 +12,6 @@ import org.apache.mesos.SchedulerDriver
   * A better alternative would be to tear down all state/actors when loosing leadership and recreate/rewire
   * everything when gaining leadership. This would require more code changes, though.
   */
-class MarathonSchedulerDriverHolder {
+class MarathonSchedulerDriverHolder
   @volatile
   var driver: Option[SchedulerDriver] = None
-}

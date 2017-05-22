@@ -7,29 +7,27 @@ import profile.simple._
 
 import org.eclipse.jgit.transport.{ReceivePack, ReceiveCommand}
 
-trait ProtectedBranchService {
+trait ProtectedBranchService
   import ProtectedBranchService._
   private def getProtectedBranchInfoOpt(
       owner: String, repository: String, branch: String)(
       implicit session: Session): Option[ProtectedBranchInfo] =
     ProtectedBranches
       .leftJoin(ProtectedBranchContexts)
-      .on {
+      .on
         case (pb, c) => pb.byBranch(c.userName, c.repositoryName, c.branch)
-      }
       .map { case (pb, c) => pb -> c.context.? }
       .filter(_._1.byPrimaryKey(owner, repository, branch))
       .list
       .groupBy(_._1)
       .map(p => p._1 -> p._2.flatMap(_._2))
-      .map {
+      .map
         case (t1, contexts) =>
           new ProtectedBranchInfo(t1.userName,
                                   t1.repositoryName,
                                   true,
                                   contexts,
                                   t1.statusCheckAdmin)
-      }
       .headOption
 
   def getProtectedBranchInfo(
@@ -50,44 +48,38 @@ trait ProtectedBranchService {
                              branch: String,
                              includeAdministrators: Boolean,
                              contexts: Seq[String])(
-      implicit session: Session): Unit = {
+      implicit session: Session): Unit =
     disableBranchProtection(owner, repository, branch)
     ProtectedBranches.insert(
         new ProtectedBranch(owner,
                             repository,
                             branch,
                             includeAdministrators && contexts.nonEmpty))
-    contexts.map { context =>
+    contexts.map  context =>
       ProtectedBranchContexts.insert(
           new ProtectedBranchContext(owner, repository, branch, context))
-    }
-  }
 
   def disableBranchProtection(
       owner: String, repository: String, branch: String)(
       implicit session: Session): Unit =
     ProtectedBranches.filter(_.byPrimaryKey(owner, repository, branch)).delete
-}
 
-object ProtectedBranchService {
+object ProtectedBranchService
 
   class ProtectedBranchReceiveHook
-      extends ReceiveHook with ProtectedBranchService {
+      extends ReceiveHook with ProtectedBranchService
     override def preReceive(owner: String,
                             repository: String,
                             receivePack: ReceivePack,
                             command: ReceiveCommand,
                             pusher: String)(
-        implicit session: Session): Option[String] = {
+        implicit session: Session): Option[String] =
       val branch = command.getRefName.stripPrefix("refs/heads/")
-      if (branch != command.getRefName) {
+      if (branch != command.getRefName)
         getProtectedBranchInfo(owner, repository, branch).getStopReason(
             receivePack.isAllowNonFastForwards, command, pusher)
-      } else {
+      else
         None
-      }
-    }
-  }
 
   case class ProtectedBranchInfo(owner: String,
                                  repository: String,
@@ -104,7 +96,7 @@ object ProtectedBranchService {
                                    * Enforce required status checks for repository administrators.
                                    */
                                  includeAdministrators: Boolean)
-      extends AccountService with CommitStatusService {
+      extends AccountService with CommitStatusService
 
     def isAdministrator(pusher: String)(implicit session: Session): Boolean =
       pusher == owner || getGroupMembers(owner)
@@ -119,9 +111,9 @@ object ProtectedBranchService {
     def getStopReason(isAllowNonFastForwards: Boolean,
                       command: ReceiveCommand,
                       pusher: String)(
-        implicit session: Session): Option[String] = {
-      if (enabled) {
-        command.getType() match {
+        implicit session: Session): Option[String] =
+      if (enabled)
+        command.getType() match
           case ReceiveCommand.Type.UPDATE |
               ReceiveCommand.Type.UPDATE_NONFASTFORWARD
               if isAllowNonFastForwards =>
@@ -129,43 +121,34 @@ object ProtectedBranchService {
           case ReceiveCommand.Type.UPDATE |
               ReceiveCommand.Type.UPDATE_NONFASTFORWARD
               if needStatusCheck(pusher) =>
-            unSuccessedContexts(command.getNewId.name) match {
+            unSuccessedContexts(command.getNewId.name) match
               case s if s.size == 1 =>
                 Some(s"""Required status check "${s.toSeq(0)}" is expected""")
               case s if s.size >= 1 =>
                 Some(
                     s"${s.size} of ${contexts.size} required status checks are expected")
               case _ => None
-            }
           case ReceiveCommand.Type.DELETE =>
             Some("Cannot delete a protected branch")
           case _ => None
-        }
-      } else {
+      else
         None
-      }
-    }
     def unSuccessedContexts(
         sha1: String)(implicit session: Session): Set[String] =
-      if (contexts.isEmpty) {
+      if (contexts.isEmpty)
         Set.empty
-      } else {
+      else
         contexts.toSet -- getCommitStatues(owner, repository, sha1)
           .filter(_.state == CommitState.SUCCESS)
           .map(_.context)
           .toSet
-      }
     def needStatusCheck(pusher: String)(implicit session: Session): Boolean =
-      pusher match {
+      pusher match
         case _ if !enabled => false
         case _ if contexts.isEmpty => false
         case _ if includeAdministrators => true
         case p if isAdministrator(p) => false
         case _ => true
-      }
-  }
-  object ProtectedBranchInfo {
+  object ProtectedBranchInfo
     def disabled(owner: String, repository: String): ProtectedBranchInfo =
       ProtectedBranchInfo(owner, repository, false, Nil, false)
-  }
-}

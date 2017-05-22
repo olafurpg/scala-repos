@@ -29,25 +29,21 @@ package scalafx.delegate
 import scala.language.reflectiveCalls
 import scalafx.delegate.FireDelegate._
 
-object FireDelegate {
+object FireDelegate
 
   /**
     * Defines a Type that contains a `fire()` method that has no return (`void`).
     */
-  type Fired = {
+  type Fired =
     def fire()
-  }
-}
 
 /**
   * Unify classes that contains a `fire()` method that has no return (`void`)
   */
-trait FireDelegate[J <: Object with Fired] extends SFXDelegate[J] {
+trait FireDelegate[J <: Object with Fired] extends SFXDelegate[J]
 
   /**
     * Fires some kind of event.
     */
-  def fire() {
+  def fire()
     delegate.fire()
-  }
-}

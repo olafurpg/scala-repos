@@ -33,7 +33,7 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object ReadOnlyDoubleWrapper {
+object ReadOnlyDoubleWrapper
   implicit def sfxReadOnlyDoubleWrapper2jfx(
       w: ReadOnlyDoubleWrapper): jfxbp.ReadOnlyDoubleWrapper =
     if (w != null) w.delegate else null
@@ -43,14 +43,13 @@ object ReadOnlyDoubleWrapper {
     */
   def apply(value: Double) =
     new ReadOnlyDoubleWrapper(new jfxbp.ReadOnlyDoubleWrapper(value))
-}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/ReadOnlyDoubleWrapper.html javafx.beans.property.ReadOnlyDoubleWrapper]] */
 class ReadOnlyDoubleWrapper(
     override val delegate: jfxbp.ReadOnlyDoubleWrapper = new jfxbp.ReadOnlyDoubleWrapper(
           ))
     extends DoubleProperty(delegate)
-    with SFXDelegate[jfxbp.ReadOnlyDoubleWrapper] {
+    with SFXDelegate[jfxbp.ReadOnlyDoubleWrapper]
 
   /** Creates a new ReadOnlyDoubleWrapper instance.
     * @param bean the bean of this ReadOnlyDoubleWrapper
@@ -69,4 +68,3 @@ class ReadOnlyDoubleWrapper(
 
   /** The read-only property, that is synchronized with this ReadOnlyDoubleWrapper. */
   def readOnlyProperty: ReadOnlyDoubleProperty = delegate.getReadOnlyProperty
-}

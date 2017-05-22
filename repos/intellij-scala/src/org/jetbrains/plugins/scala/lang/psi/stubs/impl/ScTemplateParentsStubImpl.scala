@@ -22,7 +22,7 @@ class ScTemplateParentsStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScTemplateParents](parent, elemType)
-    with ScTemplateParentsStub {
+    with ScTemplateParentsStub
   private var typesString: Seq[StringRef] = Seq.empty
   private var types: SofterReference[Seq[ScTypeElement]] = null
   private var constructor: Option[StringRef] = None
@@ -31,14 +31,13 @@ class ScTemplateParentsStubImpl[ParentPsi <: PsiElement](
            elemType: IStubElementType[
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            constructor: Option[StringRef],
-           typesString: Seq[StringRef]) = {
+           typesString: Seq[StringRef]) =
     this(
         parent,
         elemType
           .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.typesString = typesString
     this.constructor = constructor
-  }
 
   def getTemplateParentsTypesTexts: Seq[String] =
     typesString.map(StringRef.toString)
@@ -48,15 +47,14 @@ class ScTemplateParentsStubImpl[ParentPsi <: PsiElement](
   def getTemplateParentsTypes: Seq[ScType] =
     getTemplateParentsTypeElements.map(_.getType(TypingContext.empty).getOrAny)
 
-  def getTemplateParentsTypeElements: Seq[ScTypeElement] = {
-    if (types != null) {
+  def getTemplateParentsTypeElements: Seq[ScTypeElement] =
+    if (types != null)
       val typeElements = types.get
-      if (typeElements != null && typeElements.forall { elem =>
+      if (typeElements != null && typeElements.forall  elem =>
             val context = elem.getContext
             context.eq(getPsi) ||
             (context.getContext != null && context.getContext.eq(getPsi))
-          }) return typeElements
-    }
+          ) return typeElements
     val res: Seq[ScTypeElement] =
       constructor
         .map(s =>
@@ -66,5 +64,3 @@ class ScTemplateParentsStubImpl[ParentPsi <: PsiElement](
           ScalaPsiElementFactory.createTypeElementFromText(_, getPsi, null))
     types = new SofterReference(res)
     res
-  }
-}

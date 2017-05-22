@@ -73,7 +73,7 @@ import scalaz.syntax.comonad._
 
 trait TestAccountService
     extends BlueEyesServiceSpecification with AccountService
-    with AkkaDefaults {
+    with AkkaDefaults
 
   implicit def executionContext = defaultFutureDispatch
   implicit def M: Monad[Future] with Comonad[Future] =
@@ -102,11 +102,10 @@ trait TestAccountService
   def APIKeyFinder(config: Configuration) =
     new DirectAPIKeyFinder(apiKeyManager)
   def RootKey(config: Configuration) = M.copoint(apiKeyManager.rootAPIKey)
-  def Emailer(config: Configuration) = {
+  def Emailer(config: Configuration) =
     // Empty properties to force use of javamail-mock
     new ClassLoaderTemplateEmailer(Map("servicehost" -> "test.precog.com"),
                                    Some(new java.util.Properties))
-  }
 
   val clock = Clock.System
 
@@ -119,37 +118,34 @@ trait TestAccountService
   val rootPass = "root"
 
   override def map(fs: => Fragments) =
-    Step {
+    Step
       accountManager.setAccount("0000000001",
                                 rootUser,
                                 rootPass,
                                 new DateTime,
                                 AccountPlan.Root,
                                 None)
-    } ^ super.map(fs)
-}
+    ^ super.map(fs)
 
-class AccountServiceSpec extends TestAccountService with Tags {
+class AccountServiceSpec extends TestAccountService with Tags
   def accounts =
     client
       .contentType[JValue](application / (MimeTypes.json))
       .path("/accounts/v1/accounts/")
 
-  def auth(user: String, pass: String): HttpHeader = {
+  def auth(user: String, pass: String): HttpHeader =
     val raw = (user + ":" + pass).getBytes("utf-8")
     val encoded = Base64.encodeBase64String(raw)
     HttpHeaders.Authorization("Basic " + encoded)
-  }
 
   def listAccounts(request: JValue) =
     accounts.query("", "").post("")(request)
 
-  def createAccount(email: String, password: String) = {
+  def createAccount(email: String, password: String) =
     val request: JValue = JObject(
         JField("email", JString(email)) :: JField("password",
                                                   JString(password)) :: Nil)
     accounts.post("")(request)
-  }
 
   def getAccount(accountId: String, user: String, pass: String) =
     accounts.header(auth(user, pass)).get(accountId)
@@ -164,21 +160,18 @@ class AccountServiceSpec extends TestAccountService with Tags {
     accounts.header(auth(user, pass)).delete(accountId)
 
   def changePassword(
-      accountId: String, user: String, oldPass: String, newPass: String) = {
+      accountId: String, user: String, oldPass: String, newPass: String) =
     val request: JValue = JObject(JField("password", JString(newPass)) :: Nil)
     accounts.header(auth(user, oldPass)).put(accountId + "/password")(request)
-  }
 
-  def createResetToken(accountId: AccountId, user: String) = {
+  def createResetToken(accountId: AccountId, user: String) =
     val request: JValue = JObject(JField("email", JString(user)) :: Nil)
     accounts.post(accountId + "/password/reset")(request)
-  }
 
   def resetPassword(
-      accountId: AccountId, tokenId: ResetTokenId, newPass: String) = {
+      accountId: AccountId, tokenId: ResetTokenId, newPass: String) =
     val request: JValue = JObject(JField("password", JString(newPass)) :: Nil)
     accounts.post(accountId + "/password/reset/" + tokenId)(request)
-  }
 
   def addGrantToAccount(accountId: String, request: JValue) =
     accounts
@@ -189,16 +182,15 @@ class AccountServiceSpec extends TestAccountService with Tags {
     accounts.header(auth(user, pass)).get(accountId + "/plan")
 
   def putAccountPlan(
-      accountId: String, user: String, pass: String, planType: String) = {
+      accountId: String, user: String, pass: String, planType: String) =
     val request: JValue = JObject(JField("type", JString(planType)) :: Nil)
     accounts.header(auth(user, pass)).put(accountId + "/plan")(request)
-  }
 
   def removeAccountPlan(accountId: String, user: String, pass: String) =
     accounts.header(auth(user, pass)).delete(accountId + "/plan")
 
-  def createAccountAndGetId(email: String, pass: String): Future[String] = {
-    createAccount(email, pass) map {
+  def createAccountAndGetId(email: String, pass: String): Future[String] =
+    createAccount(email, pass) map
       case HttpResponse(HttpStatus(OK, _), _, Some(jv), _) =>
         val JString(id) = jv \ "accountId"
         id
@@ -206,153 +198,132 @@ class AccountServiceSpec extends TestAccountService with Tags {
       case error =>
         sys.error(
             "Invalid response from server when creating account: " + error)
-    }
-  }
 
-  "accounts service" should {
-    "create accounts" in {
-      createAccount("test0001@email.com", "12345").copoint must beLike {
+  "accounts service" should
+    "create accounts" in
+      createAccount("test0001@email.com", "12345").copoint must beLike
         case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
           jvalue \ "accountId" must beLike { case JString(id) => ok }
-      }
-    }
 
-    "not create duplicate accounts" in {
-      val msgFuture = for {
+    "not create duplicate accounts" in
+      val msgFuture = for
         HttpResponse(HttpStatus(OK, _), _, Some(jv1), _) <- createAccount(
             "test0002@email.com", "password1")
         HttpResponse(HttpStatus(Conflict, _), _, Some(errorMessage), _) <- createAccount(
             "test0002@email.com", "password2")
-      } yield errorMessage
+      yield errorMessage
 
-      msgFuture.copoint must beLike {
+      msgFuture.copoint must beLike
         case JString(msg) => msg must startWith("An account already exists")
-      }
-    }
 
-    "find own account" in {
+    "find own account" in
       val (user, pass) = ("test0003@email.com", "password")
-      (for {
+      (for
         id <- createAccountAndGetId(user, pass)
         resp <- getAccount(id, user, pass)
-      } yield resp).copoint must beLike {
+      yield resp).copoint must beLike
         case HttpResponse(HttpStatus(OK, _), _, Some(jv), _) =>
           jv \ "email" must_== JString(user)
-      }
-    }
 
-    "delete own account" in {
+    "delete own account" in
       val (user, pass) = ("test0005@email.com", "password")
-      (for {
+      (for
         id <- createAccountAndGetId(user, pass)
         res0 <- deleteAccount(id, user, pass)
         res1 <- getAccount(id, user, pass)
-      } yield ((res0, res1))).copoint must beLike {
+      yield ((res0, res1))).copoint must beLike
         case (HttpResponse(HttpStatus(NoContent, _), _, _, _),
               HttpResponse(HttpStatus(Unauthorized, _), _, _, _)) =>
           ok
-      }
-    }
 
-    "change password of account" in {
+    "change password of account" in
       val (user, oldPass) = ("test0006@email.com", "password")
       val newPass = "super"
-      (for {
+      (for
         id <- createAccountAndGetId(user, oldPass)
         res0 <- changePassword(id, user, oldPass, newPass)
         res1 <- getAccount(id, user, oldPass)
         res2 <- getAccount(id, user, newPass)
-      } yield ((res0, res1, res2))).copoint must beLike {
+      yield ((res0, res1, res2))).copoint must beLike
         case (HttpResponse(HttpStatus(OK, _), _, _, _),
               HttpResponse(HttpStatus(Unauthorized, _), _, _, _),
               HttpResponse(HttpStatus(OK, _), _, _, _)) =>
           ok
-      }
-    }
 
-    "get account plan type" in {
+    "get account plan type" in
       val (user, pass) = ("test0007@email.com", "password")
-      (for {
+      (for
         id <- createAccountAndGetId(user, pass)
         res <- getAccountPlan(id, user, pass)
-      } yield res).copoint must beLike {
+      yield res).copoint must beLike
         case HttpResponse(HttpStatus(OK, _), _, Some(jv), _) =>
           jv \ "type" must_== JString("Free")
-      }
-    }
 
-    "update account plan type" in {
+    "update account plan type" in
       val (user, pass) = ("test0008@email.com", "password")
-      (for {
+      (for
         id <- createAccountAndGetId(user, pass)
         res0 <- putAccountPlan(id, user, pass, "Root")
         res1 <- getAccountPlan(id, user, pass)
-      } yield ((res0, res1))).copoint must beLike {
+      yield ((res0, res1))).copoint must beLike
         case (HttpResponse(HttpStatus(OK, _), _, _, _),
               HttpResponse(HttpStatus(OK, _), _, Some(jv), _)) =>
           jv \ "type" must_== JString("Root")
-      }
-    }
 
-    "delete account plan" in {
+    "delete account plan" in
       val (user, pass) = ("test0009@email.com", "password")
-      (for {
+      (for
         id <- createAccountAndGetId(user, pass)
         _ <- putAccountPlan(id, user, pass, "Root")
         _ <- removeAccountPlan(id, user, pass)
         res <- getAccountPlan(id, user, pass)
-      } yield res).copoint must beLike {
+      yield res).copoint must beLike
         case HttpResponse(HttpStatus(OK, _), _, Some(jv), _) =>
           jv \ "type" must_== JString("Free")
-      }
-    }
 
-    "locate account by api key (account api key or subordinates)" in {
+    "locate account by api key (account api key or subordinates)" in
       val user = "test0010@email.com"
       val pass = "12345"
 
       val accountId = createAccountAndGetId(user, pass).copoint
 
-      val JString(apiKey) = getAccount(accountId, user, pass).map {
+      val JString(apiKey) = getAccount(accountId, user, pass).map
         case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
           jvalue \ "apiKey"
         case badResponse => failure("Invalid response: " + badResponse)
-      }.copoint
+      .copoint
 
       val subkey = apiKeyManager
         .createAPIKey(Some("subkey"), None, apiKey, Set.empty)
         .copoint
 
-      getAccountByAPIKey(subkey.apiKey, rootUser, rootPass).map {
+      getAccountByAPIKey(subkey.apiKey, rootUser, rootPass).map
         case HttpResponse(HttpStatus(OK, _), _, Some(jvalue), _) =>
           jvalue \ "accountId"
         case badResponse => failure("Invalid response: " + badResponse)
-      }.copoint mustEqual JString(accountId)
-    }
+      .copoint mustEqual JString(accountId)
 
-    "not find other account" in {
+    "not find other account" in
       val (user, pass) = ("test0011@email.com", "password")
-      (for {
+      (for
         id1 <- createAccountAndGetId(user, pass)
         id2 <- createAccountAndGetId("some-other-email@email.com", "password")
         resp <- getAccount(id2, user, pass)
-      } yield resp).copoint must beLike {
+      yield resp).copoint must beLike
         case HttpResponse(HttpStatus(Unauthorized, _), _, Some(jv), _) =>
           ok
-      }
-    }
 
-    "create and use a password reset token" in {
+    "create and use a password reset token" in
       val user = "test0011@precog.com"
       val pass = "123456"
       val newPass = "not123456"
 
       val accountId = createAccountAndGetId(user, pass).copoint
 
-      (for {
+      (for
         genToken <- createResetToken(accountId, user)
-        resetToken <- Future {
-          Mailbox.get(user).asScala.toList match {
+        resetToken <- Future
+          Mailbox.get(user).asScala.toList match
             case message :: Nil =>
               // Our test email template subject is simply the token, so easy to extract
               val output = new java.io.ByteArrayOutputStream
@@ -362,37 +333,27 @@ class AccountServiceSpec extends TestAccountService with Tags {
               message.getSubject
 
             case problem => failure("Reset email not received, got " + problem)
-          }
-        }
         resetResult <- resetPassword(accountId, resetToken, newPass)
         newAuthResult <- getAccount(accountId, user, newPass)
-      } yield (genToken, resetResult, newAuthResult)).copoint must beLike {
+      yield (genToken, resetResult, newAuthResult)).copoint must beLike
         case (
             HttpResponse(HttpStatus(OK, _), _, _, _),
             HttpResponse(HttpStatus(OK, _), _, _, _),
             HttpResponse(HttpStatus(OK, _), _, _, _)
             ) =>
           ok
-      }
-    }
 
-    "find an account by email address" in {
+    "find an account by email address" in
       val user = "test0012@precog.com"
       val pass = "123456"
 
       val accountId = createAccountAndGetId(user, pass).copoint
 
-      getAccountByEmail(user).copoint must beLike {
+      getAccountByEmail(user).copoint must beLike
         case HttpResponse(HttpStatus(OK, _), _, Some(JArray(results)), _) =>
           val JString(id) = results.head \ "accountId"
           id must_== accountId
-      }
-    }
 
-    "not find a non-existent account by email address" in {
-      getAccountByEmail("nobodyhome@precog.com").copoint must beLike {
+    "not find a non-existent account by email address" in
+      getAccountByEmail("nobodyhome@precog.com").copoint must beLike
         case HttpResponse(HttpStatus(OK, _), _, Some(JArray(Nil)), _) => ok
-      }
-    }
-  }
-}

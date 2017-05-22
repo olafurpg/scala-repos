@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object B extends Build {
+object B extends Build
   lazy val dep =
     Project("dep", file("dep")) settings (baseSettings: _*) settings
     (organization := "org.example", version := "1.0")
@@ -13,4 +13,3 @@ object B extends Build {
       autoScalaLibrary := false,
       unmanagedJars in Compile <++= scalaInstance map (_.allJars.toSeq)
   )
-}

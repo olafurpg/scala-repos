@@ -56,7 +56,7 @@ case class SpoutSource[+T](
     spout: Spout[(Timestamp, T)], parallelism: Option[SourceParallelism])
     extends StormSource[T]
 
-object Storm {
+object Storm
   def local(options: Map[String, Options] = Map.empty): LocalStorm =
     new LocalStorm(options, identity, List())
 
@@ -123,7 +123,6 @@ object Storm {
   implicit def spoutAsSource[T](spout: Spout[T])(
       implicit timeOf: TimeExtractor[T]): Producer[Storm, T] =
     source(spout, None)(timeOf)
-}
 
 case class PlannedTopology(
     config: BacktypeStormConfig, topology: StormTopology)
@@ -131,7 +130,7 @@ case class PlannedTopology(
 abstract class Storm(options: Map[String, Options],
                      transformConfig: SummingbirdConfig => SummingbirdConfig,
                      passedRegistrars: List[IKryoRegistrar])
-    extends Platform[Storm] {
+    extends Platform[Storm]
   @transient private val logger = LoggerFactory.getLogger(classOf[Storm])
 
   type Source[+T] = StormSource[T]
@@ -143,14 +142,13 @@ abstract class Storm(options: Map[String, Options],
   private type Prod[T] = Producer[Storm, T]
 
   private[storm] def get[T <: AnyRef : ClassTag](
-      dag: Dag[Storm], node: StormNode): Option[(String, T)] = {
+      dag: Dag[Storm], node: StormNode): Option[(String, T)] =
     val producer = node.members.last
     Options.getFirst[T](options, dag.producerToPriorityNames(producer))
-  }
 
   private[storm] def getOrElse[T <: AnyRef : ClassTag](
       dag: Dag[Storm], node: StormNode, default: T): T =
-    get[T](dag, node) match {
+    get[T](dag, node) match
       case None =>
         logger.debug(
             s"Node (${dag.getNodeName(node)}): Using default setting $default")
@@ -159,21 +157,19 @@ abstract class Storm(options: Map[String, Options],
         logger.info(
             s"Node ${dag.getNodeName(node)}: Using $option found via NamedProducer ${'"'}$namedSource${'"'}")
         option
-    }
 
   /**
     * Set storm to tick our nodes every second to clean up finished futures
     */
-  private def tickConfig = {
+  private def tickConfig =
     val boltConfig = new BacktypeStormConfig
     boltConfig.put(BacktypeStormConfig.TOPOLOGY_TICK_TUPLE_FREQ_SECS,
                    java.lang.Integer.valueOf(1))
     boltConfig
-  }
 
   private def scheduleFlatMapper(
       jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-      implicit topologyBuilder: TopologyBuilder) = {
+      implicit topologyBuilder: TopologyBuilder) =
     val nodeName = stormDag.getNodeName(node)
     val usePreferLocalDependency = getOrElse(
         stormDag, node, DEFAULT_FM_PREFER_LOCAL_DEPENDENCY)
@@ -188,72 +184,61 @@ abstract class Storm(options: Map[String, Options],
       .setBolt(nodeName, bolt, parallelism)
       .addConfigurations(tickConfig)
 
-    val dependenciesNames = stormDag.dependenciesOf(node).collect {
+    val dependenciesNames = stormDag.dependenciesOf(node).collect
       case x: StormNode => stormDag.getNodeName(x)
-    }
-    if (usePreferLocalDependency.get) {
+    if (usePreferLocalDependency.get)
       dependenciesNames.foreach { declarer.localOrShuffleGrouping(_) }
-    } else {
+    else
       dependenciesNames.foreach { declarer.shuffleGrouping(_) }
-    }
-  }
 
   private def scheduleSpout[K](
       jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-      implicit topologyBuilder: TopologyBuilder) = {
-    val (spout, parOpt) = node.members.collect {
+      implicit topologyBuilder: TopologyBuilder) =
+    val (spout, parOpt) = node.members.collect
       case Source(SpoutSource(s, parOpt)) => (s, parOpt)
-    }.head
+    .head
     val nodeName = stormDag.getNodeName(node)
 
     val tormentaSpout = node.members.reverse
-      .foldLeft(spout.asInstanceOf[Spout[(Timestamp, Any)]]) { (spout, p) =>
-      p match {
+      .foldLeft(spout.asInstanceOf[Spout[(Timestamp, Any)]])  (spout, p) =>
+      p match
         case Source(_) =>
           spout // The source is still in the members list so drop it
         case OptionMappedProducer(_, op) =>
-          spout.flatMap {
+          spout.flatMap
             case (time, t) =>
-              op.apply(t).map { x =>
+              op.apply(t).map  x =>
                 (time, x)
-              }
-          }
         case NamedProducer(_, _) => spout
         case IdentityKeyedProducer(_) => spout
         case AlsoProducer(_, _) => spout
         case _ =>
           sys.error("not possible, given the above call to span.\n" + p)
-      }
-    }
 
     val countersForSpout: Seq[(Group, Name)] =
       JobCounters.getCountersForJob(jobID).getOrElse(Nil)
 
     val metrics = getOrElse(stormDag, node, DEFAULT_SPOUT_STORM_METRICS)
 
-    val registerAllMetrics = new Function1[TopologyContext, Unit] {
-      def apply(context: TopologyContext) = {
+    val registerAllMetrics = new Function1[TopologyContext, Unit]
+      def apply(context: TopologyContext) =
         // Register metrics passed in SpoutStormMetrics option.
-        metrics.metrics().foreach { x: StormMetric[IMetric] =>
+        metrics.metrics().foreach  x: StormMetric[IMetric] =>
           context.registerMetric(x.name, x.metric, x.interval.inSeconds)
-        }
         // Register summingbird counter metrics.
         StormStatProvider.registerMetrics(jobID, context, countersForSpout)
         SummingbirdRuntimeStats.addPlatformStatProvider(StormStatProvider)
-      }
-    }
     val stormSpout = tormentaSpout.openHook(registerAllMetrics).getSpout
     val parallelism = getOrElse(
         stormDag, node, parOpt.getOrElse(DEFAULT_SOURCE_PARALLELISM)).parHint
     topologyBuilder.setSpout(nodeName, stormSpout, parallelism)
-  }
 
   private def scheduleSummerBolt[K, V](
       jobID: JobId, stormDag: Dag[Storm], node: StormNode)(
-      implicit topologyBuilder: TopologyBuilder) = {
-    val summer: Summer[Storm, K, V] = node.members.collect {
+      implicit topologyBuilder: TopologyBuilder) =
+    val summer: Summer[Storm, K, V] = node.members.collect
       case c: Summer[Storm, K, V] => c
-    }.head
+    .head
     implicit val semigroup = summer.semigroup
     implicit val batcher = summer.store.mergeableBatcher
     val nodeName = stormDag.getNodeName(node)
@@ -263,13 +248,12 @@ abstract class Storm(options: Map[String, Options],
     type ExecutorOutputType = (Timestamp, (K, (Option[V], V)))
 
     val supplier: MergeableStoreFactory[ExecutorKeyType, V] =
-      summer.store match {
+      summer.store match
         case m: MergeableStoreFactory[ExecutorKeyType, V] => m
         case _ =>
           sys.error(
               "Should never be able to get here, looking for a MergeableStoreFactory from %s"
                 .format(summer.store))
-      }
 
     val wrappedStore: MergeableStoreFactory[ExecutorKeyType, ExecutorValueType] =
       MergeableStoreFactoryAlgebra.wrapOnlineFactory(supplier)
@@ -291,12 +275,11 @@ abstract class Storm(options: Map[String, Options],
         stormDag, node, DEFAULT_MAX_EXECUTE_PER_SEC)
     logger.info(s"[$nodeName] maxExecutePerSec : $maxExecutePerSec")
 
-    val storeBaseFMOp = {
+    val storeBaseFMOp =
       op: (ExecutorKeyType, (Option[ExecutorValueType], ExecutorValueType)) =>
         val ((k, batchID), (optiVWithTS, (ts, v))) = op
         val optiV = optiVWithTS.map(_._2)
         List((ts, (k, (optiV, v))))
-    }
 
     val flatmapOp: FlatMapOperation[(ExecutorKeyType,
                                     (Option[ExecutorValueType],
@@ -336,20 +319,16 @@ abstract class Storm(options: Map[String, Options],
           parallelism
       )
       .addConfigurations(tickConfig)
-    val dependenciesNames = stormDag.dependenciesOf(node).collect {
+    val dependenciesNames = stormDag.dependenciesOf(node).collect
       case x: StormNode => stormDag.getNodeName(x)
-    }
-    dependenciesNames.foreach { parentName =>
+    dependenciesNames.foreach  parentName =>
       declarer.fieldsGrouping(parentName, new Fields(AGG_KEY))
-    }
-  }
 
-  private def dumpOptions: String = {
-    options.map {
+  private def dumpOptions: String =
+    options.map
       case (k, opts) =>
         "%s -> [%s]".format(k, opts.opts.values.mkString(", "))
-    }.mkString("\n || ")
-  }
+    .mkString("\n || ")
 
   /**
     * The following operations are public.
@@ -357,7 +336,7 @@ abstract class Storm(options: Map[String, Options],
   /**
     * Base storm config instances used by the Storm platform.
     */
-  def genConfig(dag: Dag[Storm]) = {
+  def genConfig(dag: Dag[Storm]) =
     val config = new BacktypeStormConfig
     config.setFallBackOnJavaSerialization(false)
     config.setKryoFactory(classOf[com.twitter.chill.storm.BlizzardKryoFactory])
@@ -388,13 +367,12 @@ abstract class Storm(options: Map[String, Options],
     transformedConfig.removes.foreach(config.remove(_))
     transformedConfig.updates.foreach(kv => config.put(kv._1, kv._2))
     config
-  }
 
   def withRegistrars(registrars: List[IKryoRegistrar]): Storm
 
   def withConfigUpdater(fn: SummingbirdConfig => SummingbirdConfig): Storm
 
-  def plan[T](tail: TailProducer[Storm, T]): PlannedTopology = {
+  def plan[T](tail: TailProducer[Storm, T]): PlannedTopology =
     /*
      * TODO: storm does not yet know about ValueFlatMapped, so remove it before
      * planning
@@ -405,63 +383,53 @@ abstract class Storm(options: Map[String, Options],
     val stormDag = OnlinePlan(stormTail.asInstanceOf[TailProducer[Storm, T]])
     implicit val topologyBuilder = new TopologyBuilder
     implicit val config = genConfig(stormDag)
-    val jobID = {
+    val jobID =
       val stormJobId = config.get("storm.job.uniqueId").asInstanceOf[String]
-      if (stormJobId == null) {
+      if (stormJobId == null)
         JobId(java.util.UUID.randomUUID().toString +
             "-AutoGenerated-ForInbuiltStats-UserStatsWillFail.")
-      } else {
+      else
         JobId(stormJobId)
-      }
-    }
 
-    stormDag.nodes.foreach { node =>
-      node match {
+    stormDag.nodes.foreach  node =>
+      node match
         case _: SummerNode[_] => scheduleSummerBolt(jobID, stormDag, node)
         case _: FlatMapNode[_] => scheduleFlatMapper(jobID, stormDag, node)
         case _: SourceNode[_] => scheduleSpout(jobID, stormDag, node)
-      }
-    }
     PlannedTopology(config, topologyBuilder.createTopology)
-  }
   def run(tail: TailProducer[Storm, _], jobName: String): Unit =
     run(plan(tail), jobName)
   def run(plannedTopology: PlannedTopology, jobName: String): Unit
-}
 
 class RemoteStorm(options: Map[String, Options],
                   transformConfig: SummingbirdConfig => SummingbirdConfig,
                   passedRegistrars: List[IKryoRegistrar])
-    extends Storm(options, transformConfig, passedRegistrars) {
+    extends Storm(options, transformConfig, passedRegistrars)
 
   override def withConfigUpdater(fn: SummingbirdConfig => SummingbirdConfig) =
     new RemoteStorm(options, transformConfig.andThen(fn), passedRegistrars)
 
-  override def run(plannedTopology: PlannedTopology, jobName: String): Unit = {
+  override def run(plannedTopology: PlannedTopology, jobName: String): Unit =
     val topologyName = "summingbird_" + jobName
     StormSubmitter.submitTopology(
         topologyName, plannedTopology.config, plannedTopology.topology)
-  }
 
   override def withRegistrars(registrars: List[IKryoRegistrar]) =
     new RemoteStorm(options, transformConfig, passedRegistrars ++ registrars)
-}
 
 class LocalStorm(options: Map[String, Options],
                  transformConfig: SummingbirdConfig => SummingbirdConfig,
                  passedRegistrars: List[IKryoRegistrar])
-    extends Storm(options, transformConfig, passedRegistrars) {
+    extends Storm(options, transformConfig, passedRegistrars)
   lazy val localCluster = new LocalCluster
 
   override def withConfigUpdater(fn: SummingbirdConfig => SummingbirdConfig) =
     new LocalStorm(options, transformConfig.andThen(fn), passedRegistrars)
 
-  override def run(plannedTopology: PlannedTopology, jobName: String): Unit = {
+  override def run(plannedTopology: PlannedTopology, jobName: String): Unit =
     val topologyName = "summingbird_" + jobName
     localCluster.submitTopology(
         topologyName, plannedTopology.config, plannedTopology.topology)
-  }
 
   override def withRegistrars(registrars: List[IKryoRegistrar]) =
     new LocalStorm(options, transformConfig, passedRegistrars ++ registrars)
-}

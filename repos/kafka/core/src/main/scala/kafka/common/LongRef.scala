@@ -22,38 +22,31 @@ package kafka.common
   *
   * Unlike `AtomicLong`, this class is not thread-safe and there are no atomicity guarantees.
   */
-class LongRef(var value: Long) {
+class LongRef(var value: Long)
 
-  def addAndGet(delta: Long): Long = {
+  def addAndGet(delta: Long): Long =
     value += delta
     value
-  }
 
-  def getAndAdd(delta: Long): Long = {
+  def getAndAdd(delta: Long): Long =
     val result = value
     value += delta
     result
-  }
 
-  def getAndIncrement(): Long = {
+  def getAndIncrement(): Long =
     val v = value
     value += 1
     v
-  }
 
-  def incrementAndGet(): Long = {
+  def incrementAndGet(): Long =
     value += 1
     value
-  }
 
-  def getAndDecrement(): Long = {
+  def getAndDecrement(): Long =
     val v = value
     value -= 1
     v
-  }
 
-  def decrementAndGet(): Long = {
+  def decrementAndGet(): Long =
     value -= 1
     value
-  }
-}

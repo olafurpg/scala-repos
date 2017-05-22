@@ -24,7 +24,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.execution.ui.{SparkListenerSQLExecutionEnd, SparkListenerSQLExecutionStart}
 import org.apache.spark.util.Utils
 
-private[sql] object SQLExecution {
+private[sql] object SQLExecution
 
   val EXECUTION_ID_KEY = "spark.sql.execution.id"
 
@@ -37,13 +37,13 @@ private[sql] object SQLExecution {
     * we can connect them with an execution.
     */
   def withNewExecutionId[T](sqlContext: SQLContext,
-                            queryExecution: QueryExecution)(body: => T): T = {
+                            queryExecution: QueryExecution)(body: => T): T =
     val sc = sqlContext.sparkContext
     val oldExecutionId = sc.getLocalProperty(EXECUTION_ID_KEY)
-    if (oldExecutionId == null) {
+    if (oldExecutionId == null)
       val executionId = SQLExecution.nextExecutionId
       sc.setLocalProperty(EXECUTION_ID_KEY, executionId.toString)
-      val r = try {
+      val r = try
         val callSite = Utils.getCallSite()
         sqlContext.sparkContext.listenerBus.post(
             SparkListenerSQLExecutionStart(
@@ -53,18 +53,16 @@ private[sql] object SQLExecution {
                 queryExecution.toString,
                 SparkPlanInfo.fromSparkPlan(queryExecution.executedPlan),
                 System.currentTimeMillis()))
-        try {
+        try
           body
-        } finally {
+        finally
           sqlContext.sparkContext.listenerBus.post(
               SparkListenerSQLExecutionEnd(
                   executionId, System.currentTimeMillis()))
-        }
-      } finally {
+      finally
         sc.setLocalProperty(EXECUTION_ID_KEY, null)
-      }
       r
-    } else {
+    else
       // Don't support nested `withNewExecutionId`. This is an example of the nested
       // `withNewExecutionId`:
       //
@@ -80,8 +78,6 @@ private[sql] object SQLExecution {
       //
       // A real case is the `DataFrame.count` method.
       throw new IllegalArgumentException(s"$EXECUTION_ID_KEY is already set")
-    }
-  }
 
   /**
     * Wrap an action with a known executionId. When running a different action in a different
@@ -89,13 +85,10 @@ private[sql] object SQLExecution {
     * with the known executionId, e.g., `BroadcastHashJoin.broadcastFuture`.
     */
   def withExecutionId[T](sc: SparkContext, executionId: String)(
-      body: => T): T = {
+      body: => T): T =
     val oldExecutionId = sc.getLocalProperty(SQLExecution.EXECUTION_ID_KEY)
-    try {
+    try
       sc.setLocalProperty(SQLExecution.EXECUTION_ID_KEY, executionId)
       body
-    } finally {
+    finally
       sc.setLocalProperty(SQLExecution.EXECUTION_ID_KEY, oldExecutionId)
-    }
-  }
-}

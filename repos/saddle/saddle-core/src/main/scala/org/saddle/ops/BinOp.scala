@@ -48,9 +48,8 @@ import org.saddle._
 trait BinOp[O <: OpType,
             @spec(Boolean, Int, Long, Double) -X,
             @spec(Boolean, Int, Long, Double) -Y,
-            @spec(Boolean, Int, Long, Double) +Z] {
+            @spec(Boolean, Int, Long, Double) +Z]
   def apply(a: X, b: Y): Z
-}
 
 /**
   * Contains implementations of primitive binary ops that are NA-aware
@@ -60,36 +59,32 @@ trait BinOp[O <: OpType,
   *
   * Note scala.Function2 is not specialized on Boolean inputs, only output
   */
-object BinOp {
+object BinOp
   private final class BinOpImpl[
       O <: OpType, @spec(Int, Long, Double) Q : ST, @spec(Int, Long, Double) R : ST, @spec(Boolean, Int, Long, Double) S : ST](
       f: (Q, R) => S)
-      extends BinOp[O, Q, R, S] {
+      extends BinOp[O, Q, R, S]
     val sq = implicitly[ST[Q]]
     val sr = implicitly[ST[R]]
     val ss = implicitly[ST[S]]
     def apply(a: Q, b: R) =
       if (sq.isMissing(a) || sr.isMissing(b)) ss.missing else f(a, b)
-  }
 
   private final class BinOpImplDL[O <: OpType, @spec(Int, Long) R : ST](
       f: (Double, R) => Double)
-      extends BinOp[O, Double, R, Double] {
+      extends BinOp[O, Double, R, Double]
     val sc = implicitly[ST[R]]
     def apply(a: Double, b: R) = if (sc.isMissing(b)) Double.NaN else f(a, b)
-  }
 
   private final class BinOpImplLD[O <: OpType, @spec(Int, Long) Q : ST](
       f: (Q, Double) => Double)
-      extends BinOp[O, Q, Double, Double] {
+      extends BinOp[O, Q, Double, Double]
     val sc = implicitly[ST[Q]]
     def apply(a: Q, b: Double) = if (sc.isMissing(a)) Double.NaN else f(a, b)
-  }
 
   private final class BinOpImplDD[O <: OpType](f: (Double, Double) => Double)
-      extends BinOp[O, Double, Double, Double] {
+      extends BinOp[O, Double, Double, Double]
     def apply(a: Double, b: Double) = f(a, b)
-  }
 
   // ********************************************************
   // ** Concrete implementations necessary for specialization
@@ -235,15 +230,12 @@ object BinOp {
 
   // (Bool, Bool) => Bool ops
 
-  implicit val andBB = new BinOp[AndOp, Boolean, Boolean, Boolean] {
+  implicit val andBB = new BinOp[AndOp, Boolean, Boolean, Boolean]
     def apply(a: Boolean, b: Boolean) = a && b
-  }
-  implicit val orBB = new BinOp[OrOp, Boolean, Boolean, Boolean] {
+  implicit val orBB = new BinOp[OrOp, Boolean, Boolean, Boolean]
     def apply(a: Boolean, b: Boolean) = a || b
-  }
-  implicit val xorBB = new BinOp[XorOp, Boolean, Boolean, Boolean] {
+  implicit val xorBB = new BinOp[XorOp, Boolean, Boolean, Boolean]
     def apply(a: Boolean, b: Boolean) = a && b || !a && !b
-  }
 
   /* comparisons ops */
 
@@ -372,4 +364,3 @@ object BinOp {
     new BinOpImpl[LteOp, Int, Int, Boolean](_ <= _)
   implicit val lteBB: BinOp[LteOp, Boolean, Boolean, Boolean] =
     new BinOpImpl[LteOp, Boolean, Boolean, Boolean](_ <= _)
-}

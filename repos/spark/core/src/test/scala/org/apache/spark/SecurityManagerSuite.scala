@@ -21,9 +21,9 @@ import java.io.File
 
 import org.apache.spark.util.{ResetSystemProperties, SparkConfWithEnv, Utils}
 
-class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
+class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties
 
-  test("set security with conf") {
+  test("set security with conf")
     val conf = new SparkConf
     conf.set("spark.authenticate", "true")
     conf.set("spark.authenticate.secret", "good")
@@ -35,9 +35,8 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.checkUIViewPermissions("user1") === true)
     assert(securityManager.checkUIViewPermissions("user2") === true)
     assert(securityManager.checkUIViewPermissions("user3") === false)
-  }
 
-  test("set security with api") {
+  test("set security with api")
     val conf = new SparkConf
     conf.set("spark.ui.view.acls", "user1,user2")
     val securityManager = new SecurityManager(conf);
@@ -58,9 +57,8 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.checkUIViewPermissions("user7") === true)
     assert(securityManager.checkUIViewPermissions("user8") === false)
     assert(securityManager.checkUIViewPermissions(null) === true)
-  }
 
-  test("set security modify acls") {
+  test("set security modify acls")
     val conf = new SparkConf
     conf.set("spark.modify.acls", "user1,user2")
 
@@ -82,9 +80,8 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.checkModifyPermissions("user7") === true)
     assert(securityManager.checkModifyPermissions("user8") === false)
     assert(securityManager.checkModifyPermissions(null) === true)
-  }
 
-  test("set security admin acls") {
+  test("set security admin acls")
     val conf = new SparkConf
     conf.set("spark.admin.acls", "user1,user2")
     conf.set("spark.ui.view.acls", "user3")
@@ -122,9 +119,8 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.checkUIViewPermissions("user1") === false)
     assert(securityManager.checkUIViewPermissions("user3") === false)
     assert(securityManager.checkUIViewPermissions(null) === true)
-  }
 
-  test("set security with * in acls") {
+  test("set security with * in acls")
     val conf = new SparkConf
     conf.set("spark.ui.acls.enable", "true")
     conf.set("spark.admin.acls", "user1,user2")
@@ -163,9 +159,8 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.checkUIViewPermissions("user6") === true)
     assert(securityManager.checkModifyPermissions("user7") === true)
     assert(securityManager.checkModifyPermissions("user8") === true)
-  }
 
-  test("ssl on setup") {
+  test("ssl on setup")
     val conf = SSLSampleConfigs.sparkSSLConfig()
     val expectedAlgorithms = Set("TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384",
                                  "TLS_RSA_WITH_AES_256_CBC_SHA256",
@@ -200,9 +195,8 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.fileServerSSLOptions.protocol === Some("TLSv1.2"))
     assert(
         securityManager.fileServerSSLOptions.enabledAlgorithms === expectedAlgorithms)
-  }
 
-  test("ssl off setup") {
+  test("ssl off setup")
     val file =
       File.createTempFile("SSLOptionsSuite", "conf", Utils.createTempDir())
 
@@ -214,16 +208,13 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
     assert(securityManager.fileServerSSLOptions.enabled === false)
     assert(securityManager.sslSocketFactory.isDefined === false)
     assert(securityManager.hostnameVerifier.isDefined === false)
-  }
 
-  test("missing secret authentication key") {
+  test("missing secret authentication key")
     val conf = new SparkConf().set("spark.authenticate", "true")
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new SecurityManager(conf)
-    }
-  }
 
-  test("secret authentication key") {
+  test("secret authentication key")
     val key = "very secret key"
     val conf = new SparkConf()
       .set(SecurityManager.SPARK_AUTH_CONF, "true")
@@ -236,5 +227,3 @@ class SecurityManagerSuite extends SparkFunSuite with ResetSystemProperties {
         .set(SecurityManager.SPARK_AUTH_CONF, "true")
         .set(SecurityManager.SPARK_AUTH_SECRET_CONF, key)
     assert(keyFromEnv === new SecurityManager(conf2).getSecretKey())
-  }
-}

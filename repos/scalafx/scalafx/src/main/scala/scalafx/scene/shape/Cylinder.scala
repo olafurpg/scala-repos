@@ -33,16 +33,15 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object Cylinder {
+object Cylinder
   implicit def sfxCylinder2jfx(c: Cylinder): jfxss.Cylinder =
     if (c != null) c.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/Cylinder.html]].
   */
 class Cylinder(override val delegate: jfxss.Cylinder = new jfxss.Cylinder())
-    extends Shape3D(delegate) with SFXDelegate[jfxss.Cylinder] {
+    extends Shape3D(delegate) with SFXDelegate[jfxss.Cylinder]
 
   /** Creates a new instance of Cylinder of a given radius and height.
     * Resolution defaults to 15 divisions along X and Z axis.
@@ -62,13 +61,10 @@ class Cylinder(override val delegate: jfxss.Cylinder = new jfxss.Cylinder())
 
   /** Defines the height or the Y dimension of the cylinder. */
   def height: DoubleProperty = delegate.heightProperty
-  def height_=(v: Double) {
+  def height_=(v: Double)
     height() = v
-  }
 
   /** Defines the radius in the Z plane of the cylinder. */
   def radius: DoubleProperty = delegate.radiusProperty
-  def radius_=(v: Double) {
+  def radius_=(v: Double)
     radius() = v
-  }
-}

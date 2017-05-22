@@ -37,7 +37,7 @@ import scalafx.scene.control.ControlIncludes.jfxTableColumnBase2sfx
   *
   * @since 8.0
   */
-object ResizeFeaturesBase {
+object ResizeFeaturesBase
 
   /**
     * Converts a ScalaFX ResizeFeaturesBase to its JavaFX counterpart.
@@ -49,7 +49,6 @@ object ResizeFeaturesBase {
   implicit def sfxResizeFeaturesBase2jfx[S](
       rfb: ResizeFeaturesBase[S]): jfxsc.ResizeFeaturesBase[S] =
     if (rfb != null) rfb.delegate else null
-}
 
 /**
   * Wraps JavaFX [[http://docs.oracle.com/javafx/8/api/javafx/scene/control/ResizeFeaturesBase.html ResizeFeaturesBase]].
@@ -60,7 +59,7 @@ object ResizeFeaturesBase {
   * @since 8.0
   */
 class ResizeFeaturesBase[S](override val delegate: jfxsc.ResizeFeaturesBase[S])
-    extends SFXDelegate[jfxsc.ResizeFeaturesBase[S]] {
+    extends SFXDelegate[jfxsc.ResizeFeaturesBase[S]]
 
   /**
     * Creates an instance of this class, with the provided TableColumnBase and delta values being
@@ -84,4 +83,3 @@ class ResizeFeaturesBase[S](override val delegate: jfxsc.ResizeFeaturesBase[S])
     * The amount of horizontal space added or removed in the resize operation.
     */
   def delta: Double = delegate.getDelta
-}

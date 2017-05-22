@@ -31,13 +31,12 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object BoundingBox {
+object BoundingBox
   implicit def sfxBoundingBox2jfx(b: BoundingBox): jfxg.BoundingBox =
     if (b != null) b.delegate else null
-}
 
 class BoundingBox(override val delegate: jfxg.BoundingBox)
-    extends Bounds(delegate) with SFXDelegate[jfxg.BoundingBox] {
+    extends Bounds(delegate) with SFXDelegate[jfxg.BoundingBox]
 
   /**
     * Creates a new instance of 2D BoundingBox.
@@ -55,4 +54,3 @@ class BoundingBox(override val delegate: jfxg.BoundingBox)
            height: Double,
            depth: Double) =
     this(new jfxg.BoundingBox(minX, minY, minZ, width, height, depth))
-}

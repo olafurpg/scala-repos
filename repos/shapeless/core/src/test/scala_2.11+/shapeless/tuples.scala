@@ -19,22 +19,21 @@ package shapeless
 import org.junit.Test
 import org.junit.Assert._
 
-class Tuple211Tests {
+class Tuple211Tests
   import nat._
   import syntax.std.tuple._
 
   @Test
-  def testToCoproduct {
+  def testToCoproduct
     import ops.tuple._
 
     type PISB = (Int, String, Boolean)
     type CISBa = Int :+: String :+: Boolean :+: CNil
     type CISBb = the.`ToCoproduct[PISB]`.Out
     implicitly[CISBa =:= CISBb]
-  }
 
   @Test
-  def testToSum {
+  def testToSum
     import ops.tuple._
 
     type PISB = (Int, String, Boolean)
@@ -45,14 +44,12 @@ class Tuple211Tests {
     type PIISSB = (Int, Int, String, String, Boolean)
     type SISBb = the.`ToSum[PIISSB]`.Out
     implicitly[CISBa =:= SISBb]
-  }
 
   @Test
-  def testGrouper {
-    object toInt extends Poly1 {
+  def testGrouper
+    object toInt extends Poly1
       implicit def default[N <: Nat](implicit toi: ops.nat.ToInt[N]) =
         at[N](_ => toi())
-    }
 
     def range[R <: HList, T, OutL <: HList](a: Nat, b: Nat)(
         implicit range: ops.nat.Range.Aux[a.N, b.N, R],
@@ -98,5 +95,3 @@ class Tuple211Tests {
         ((0, 1), (2, 3), (4, 'a')),
         range(0, 5) group (2, 2, ('a', 'b', 'c'))
     )
-  }
-}

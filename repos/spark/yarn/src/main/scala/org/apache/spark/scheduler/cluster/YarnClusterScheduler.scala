@@ -25,18 +25,15 @@ import org.apache.spark.deploy.yarn.ApplicationMaster
   * ApplicationMaster, etc is done
   */
 private[spark] class YarnClusterScheduler(sc: SparkContext)
-    extends YarnScheduler(sc) {
+    extends YarnScheduler(sc)
 
   logInfo("Created YarnClusterScheduler")
 
-  override def postStartHook() {
+  override def postStartHook()
     ApplicationMaster.sparkContextInitialized(sc)
     super.postStartHook()
     logInfo("YarnClusterScheduler.postStartHook done")
-  }
 
-  override def stop() {
+  override def stop()
     super.stop()
     ApplicationMaster.sparkContextStopped(sc)
-  }
-}

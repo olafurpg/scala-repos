@@ -57,7 +57,7 @@ import scala.util.Try
 @implicitNotFound("""Cannot find an implicit ExecutionContext. You might pass
 an (implicit ec: ExecutionContext) parameter to your method
 or import scala.concurrent.ExecutionContext.Implicits.global.""")
-trait ExecutionContext {
+trait ExecutionContext
 
   /** Runs a block of code on this execution context.
     *
@@ -89,7 +89,6 @@ trait ExecutionContext {
     */
   @deprecated("Preparation of ExecutionContexts will be removed.", "2.12")
   def prepare(): ExecutionContext = this
-}
 
 /**
   * An [[ExecutionContext]] that is also a
@@ -106,7 +105,7 @@ trait ExecutionContextExecutorService
 
 /** Contains factory methods for creating execution contexts.
   */
-object ExecutionContext {
+object ExecutionContext
 
   /**
     * The explicit global `ExecutionContext`. Invoke `global` when you want to provide the global
@@ -121,7 +120,7 @@ object ExecutionContext {
   def global: ExecutionContextExecutor =
     Implicits.global.asInstanceOf[ExecutionContextExecutor]
 
-  object Implicits {
+  object Implicits
 
     /**
       * The implicit global `ExecutionContext`. Import `global` when you want to provide the global
@@ -133,7 +132,6 @@ object ExecutionContext {
       */
     implicit lazy val global: ExecutionContext =
       scala.scalajs.concurrent.JSExecutionContext.queue
-  }
 
   /** Creates an `ExecutionContext` from the given `ExecutorService`.
     *
@@ -186,4 +184,3 @@ object ExecutionContext {
     *  @return the function for error reporting
     */
   def defaultReporter: Throwable => Unit = _.printStackTrace()
-}

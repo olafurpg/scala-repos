@@ -55,29 +55,28 @@ import org.apache.spark.sql.sources._
   * builder methods mentioned above can only be found in test code, where all tested filters are
   * known to be convertible.
   */
-private[orc] object OrcFilters extends Logging {
-  def createFilter(filters: Array[Filter]): Option[SearchArgument] = {
+private[orc] object OrcFilters extends Logging
+  def createFilter(filters: Array[Filter]): Option[SearchArgument] =
     // First, tries to convert each filter individually to see whether it's convertible, and then
     // collect all convertible ones to build the final `SearchArgument`.
-    val convertibleFilters = for {
+    val convertibleFilters = for
       filter <- filters
       _ <- buildSearchArgument(filter, SearchArgumentFactory.newBuilder())
-    } yield filter
+    yield filter
 
-    for {
+    for
       // Combines all convertible filters using `And` to produce a single conjunction
       conjunction <- convertibleFilters.reduceOption(And)
       // Then tries to build a single ORC `SearchArgument` for the conjunction predicate
       builder <- buildSearchArgument(
           conjunction, SearchArgumentFactory.newBuilder())
-    } yield builder.build()
-  }
+    yield builder.build()
 
   private def buildSearchArgument(
-      expression: Filter, builder: Builder): Option[Builder] = {
+      expression: Filter, builder: Builder): Option[Builder] =
     def newBuilder = SearchArgumentFactory.newBuilder()
 
-    def isSearchableLiteral(value: Any): Boolean = value match {
+    def isSearchableLiteral(value: Any): Boolean = value match
       // These are types recognized by the `SearchArgumentImpl.BuilderImpl.boxLiteral()` method.
       case _: String | _: Long | _: Double | _: Byte | _: Short |
           _: Integer | _: Float =>
@@ -85,9 +84,8 @@ private[orc] object OrcFilters extends Logging {
       case _: DateWritable | _: HiveDecimal | _: HiveChar | _: HiveVarchar =>
         true
       case _ => false
-    }
 
-    expression match {
+    expression match
       case And(left, right) =>
         // At here, it is not safe to just convert one side if we do not understand the
         // other side. Here is an example used to explain the reason.
@@ -96,26 +94,26 @@ private[orc] object OrcFilters extends Logging {
         // NOT(a = 2), which will generate wrong results.
         // Pushing one side of AND down is only safe to do at the top level.
         // You can see ParquetRelation's initializeLocalJobFunc method as an example.
-        for {
+        for
           _ <- buildSearchArgument(left, newBuilder)
           _ <- buildSearchArgument(right, newBuilder)
           lhs <- buildSearchArgument(left, builder.startAnd())
           rhs <- buildSearchArgument(right, lhs)
-        } yield rhs.end()
+        yield rhs.end()
 
       case Or(left, right) =>
-        for {
+        for
           _ <- buildSearchArgument(left, newBuilder)
           _ <- buildSearchArgument(right, newBuilder)
           lhs <- buildSearchArgument(left, builder.startOr())
           rhs <- buildSearchArgument(right, lhs)
-        } yield rhs.end()
+        yield rhs.end()
 
       case Not(child) =>
-        for {
+        for
           _ <- buildSearchArgument(child, newBuilder)
           negate <- buildSearchArgument(child, builder.startNot())
-        } yield negate.end()
+        yield negate.end()
 
       // NOTE: For all case branches dealing with leaf predicates below, the additional `startAnd()`
       // call is mandatory.  ORC `SearchArgument` builder requires that all leaf predicates must be
@@ -154,6 +152,3 @@ private[orc] object OrcFilters extends Logging {
               .end())
 
       case _ => None
-    }
-  }
-}

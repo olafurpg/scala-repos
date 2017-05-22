@@ -14,7 +14,7 @@ import akka.testkit._
 import akka.remote.testkit.{STMultiNodeSpec, MultiNodeConfig, MultiNodeSpec}
 import akka.actor.PoisonPill
 
-object AttemptSysMsgRedeliveryMultiJvmSpec extends MultiNodeConfig {
+object AttemptSysMsgRedeliveryMultiJvmSpec extends MultiNodeConfig
 
   val first = role("first")
   val second = role("second")
@@ -25,12 +25,9 @@ object AttemptSysMsgRedeliveryMultiJvmSpec extends MultiNodeConfig {
 
   testTransport(on = true)
 
-  class Echo extends Actor {
-    def receive = {
+  class Echo extends Actor
+    def receive =
       case m ⇒ sender ! m
-    }
-  }
-}
 
 class AttemptSysMsgRedeliveryMultiJvmNode1 extends AttemptSysMsgRedeliverySpec
 class AttemptSysMsgRedeliveryMultiJvmNode2 extends AttemptSysMsgRedeliverySpec
@@ -38,17 +35,16 @@ class AttemptSysMsgRedeliveryMultiJvmNode3 extends AttemptSysMsgRedeliverySpec
 
 class AttemptSysMsgRedeliverySpec
     extends MultiNodeSpec(AttemptSysMsgRedeliveryMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout
   import AttemptSysMsgRedeliveryMultiJvmSpec._
 
-  "AttemptSysMsgRedelivery" must {
-    "reach initial convergence" taggedAs LongRunningTest in {
+  "AttemptSysMsgRedelivery" must
+    "reach initial convergence" taggedAs LongRunningTest in
       awaitClusterUp(first, second, third)
 
       enterBarrier("after-1")
-    }
 
-    "redeliver system message after inactivity" taggedAs LongRunningTest in {
+    "redeliver system message after inactivity" taggedAs LongRunningTest in
       system.actorOf(Props[Echo], "echo")
       enterBarrier("echo-started")
 
@@ -58,34 +54,25 @@ class AttemptSysMsgRedeliverySpec
       val secondRef: ActorRef = expectMsgType[ActorIdentity].ref.get
       enterBarrier("refs-retrieved")
 
-      runOn(first) {
+      runOn(first)
         testConductor.blackhole(first, second, Direction.Both).await
-      }
       enterBarrier("blackhole")
 
-      runOn(first, third) {
+      runOn(first, third)
         watch(secondRef)
-      }
-      runOn(second) {
+      runOn(second)
         watch(firstRef)
-      }
       enterBarrier("watch-established")
 
-      runOn(first) {
+      runOn(first)
         testConductor.passThrough(first, second, Direction.Both).await
-      }
       enterBarrier("pass-through")
 
       system.actorSelection("/user/echo") ! PoisonPill
 
-      runOn(first, third) {
+      runOn(first, third)
         expectTerminated(secondRef, 10.seconds)
-      }
-      runOn(second) {
+      runOn(second)
         expectTerminated(firstRef, 10.seconds)
-      }
 
       enterBarrier("done")
-    }
-  }
-}

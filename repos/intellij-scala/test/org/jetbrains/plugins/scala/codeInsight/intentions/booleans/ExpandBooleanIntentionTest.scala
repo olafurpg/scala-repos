@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 6/29/12
   */
-class ExpandBooleanIntentionTest extends ScalaIntentionTestBase {
+class ExpandBooleanIntentionTest extends ScalaIntentionTestBase
   val familyName = ExpandBooleanIntention.familyName
 
-  def testExpandBoolean() {
+  def testExpandBoolean()
     val text = """
         |class X {
         |  def f(a: Int): Boolean = {
@@ -31,9 +31,8 @@ class ExpandBooleanIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testExpandBoolean2() {
+  def testExpandBoolean2()
     val text = """
         |class X {
         |  def f(a: Int): Boolean = {
@@ -54,9 +53,8 @@ class ExpandBooleanIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testExpandBoolean3() {
+  def testExpandBoolean3()
     val text = """
         |class X {
         |  def f(a: Int, b: Int): Boolean = {
@@ -77,9 +75,8 @@ class ExpandBooleanIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testExpandBoolean4() {
+  def testExpandBoolean4()
     val text = """
         |class X {
         |  def f(a: Int, b: Int): Boolean = {
@@ -108,5 +105,3 @@ class ExpandBooleanIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

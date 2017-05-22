@@ -1,5 +1,5 @@
-class ReturnSeveralOutput1 {
-  def foo(i: Int): Int = {
+class ReturnSeveralOutput1
+  def foo(i: Int): Int =
     /*start*/
 
     val x = i
@@ -10,8 +10,6 @@ class ReturnSeveralOutput1 {
     /*end*/
     println(x + y + z + zz)
     i
-  }
-}
 /*
 class ReturnSeveralOutput1 {
   def foo(i: Int): Int = {

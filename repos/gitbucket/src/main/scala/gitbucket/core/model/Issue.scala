@@ -1,6 +1,6 @@
 package gitbucket.core.model
 
-trait IssueComponent extends TemplateComponent { self: Profile =>
+trait IssueComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import self._
 
@@ -10,22 +10,20 @@ trait IssueComponent extends TemplateComponent { self: Profile =>
 
   class IssueId(tag: Tag)
       extends Table[(String, String, Int)](tag, "ISSUE_ID")
-      with IssueTemplate {
+      with IssueTemplate
     def * = (userName, repositoryName, issueId)
     def byPrimaryKey(owner: String, repository: String) =
       byRepository(owner, repository)
-  }
 
   class IssueOutline(tag: Tag)
       extends Table[(String, String, Int, Int)](tag, "ISSUE_OUTLINE_VIEW")
-      with IssueTemplate {
+      with IssueTemplate
     val commentCount = column[Int]("COMMENT_COUNT")
     def * = (userName, repositoryName, issueId, commentCount)
-  }
 
   class Issues(tag: Tag)
       extends Table[Issue](tag, "ISSUE") with IssueTemplate
-      with MilestoneTemplate {
+      with MilestoneTemplate
     val openedUserName = column[String]("OPENED_USER_NAME")
     val assignedUserName = column[String]("ASSIGNED_USER_NAME")
     val title = column[String]("TITLE")
@@ -50,8 +48,6 @@ trait IssueComponent extends TemplateComponent { self: Profile =>
 
     def byPrimaryKey(owner: String, repository: String, issueId: Int) =
       byIssue(owner, repository, issueId)
-  }
-}
 
 case class Issue(
     userName: String,

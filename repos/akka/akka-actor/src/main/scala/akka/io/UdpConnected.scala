@@ -24,7 +24,7 @@ import akka.actor._
   * The Java API for generating UDP commands is available at [[UdpConnectedMessage]].
   */
 object UdpConnected
-    extends ExtensionId[UdpConnectedExt] with ExtensionIdProvider {
+    extends ExtensionId[UdpConnectedExt] with ExtensionIdProvider
 
   override def lookup = UdpConnected
 
@@ -44,9 +44,8 @@ object UdpConnected
   /**
     * The common type of all commands supported by the UDP implementation.
     */
-  trait Command extends SelectionHandler.HasFailureMessage with Message {
+  trait Command extends SelectionHandler.HasFailureMessage with Message
     def failureMessage = CommandFailed(this)
-  }
 
   /**
     * Each [[Send]] can optionally request a positive acknowledgment to be sent
@@ -70,15 +69,13 @@ object UdpConnected
     * the connection actor will reply with the given object as soon as the datagram
     * has been successfully enqueued to the O/S kernel.
     */
-  final case class Send(payload: ByteString, ack: Any) extends Command {
+  final case class Send(payload: ByteString, ack: Any) extends Command
     require(
         ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
-  }
-  object Send {
+  object Send
     def apply(data: ByteString): Send = Send(data, NoAck)
-  }
 
   /**
     * Send this message to the [[UdpExt#manager]] in order to bind to a local
@@ -144,18 +141,16 @@ object UdpConnected
     */
   sealed trait Disconnected extends Event
   case object Disconnected extends Disconnected
-}
 
-class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
+class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension
 
   val settings: UdpSettings = new UdpSettings(
       system.settings.config.getConfig("akka.io.udp-connected"))
 
-  val manager: ActorRef = {
+  val manager: ActorRef =
     system.systemActorOf(props = Props(classOf[UdpConnectedManager], this)
                              .withDeploy(Deploy.local),
                          name = "IO-UDP-CONN")
-  }
 
   /**
     * Java API: retrieve the UDP manager actor’s reference.
@@ -164,12 +159,11 @@ class UdpConnectedExt(system: ExtendedActorSystem) extends IO.Extension {
 
   val bufferPool: BufferPool = new DirectByteBufferPool(
       settings.DirectBufferSize, settings.MaxDirectBufferPoolSize)
-}
 
 /**
   * Java API: factory methods for the message types used when communicating with the UdpConnected service.
   */
-object UdpConnectedMessage {
+object UdpConnectedMessage
   import language.implicitConversions
   import UdpConnected._
 
@@ -250,8 +244,6 @@ object UdpConnectedMessage {
   def resumeReading: Command = ResumeReading
 
   implicit private def fromJava[T](
-      coll: JIterable[T]): immutable.Traversable[T] = {
+      coll: JIterable[T]): immutable.Traversable[T] =
     import scala.collection.JavaConverters._
     coll.asScala.to[immutable.Traversable]
-  }
-}

@@ -27,19 +27,18 @@ final class ScalaJSTask private (
     val tags: Array[String],
     serializedTask: String
 )
-    extends Task {
+    extends Task
 
-  def execute(handler: EventHandler, loggers: Array[Logger]): Array[Task] = {
+  def execute(handler: EventHandler, loggers: Array[Logger]): Array[Task] =
     val slave = runner.getSlave()
 
     // Prepare data to send to Slave VM
     val colorSupport = loggers.map(_.ansiCodesSupported).toList
-    val data = {
+    val data =
       val bld = new JSONObjBuilder
       bld.fld("serializedTask", serializedTask)
       bld.fld("loggerColorSupport", colorSupport)
       bld.toJSON
-    }
 
     // Send command to VM
     slave.send("execute:" + jsonToString(data))
@@ -47,9 +46,8 @@ final class ScalaJSTask private (
     // Prepare result handler
     val logBuffer = mutable.Buffer.empty[LogElement[_]]
 
-    val doneHandler: LoopHandler[List[TaskInfo]] = {
+    val doneHandler: LoopHandler[List[TaskInfo]] =
       case ("ok", msg) => Some(fromJSON[List[TaskInfo]](readJSON(msg)))
-    }
 
     val handlerChain =
       (eventHandler(handler) orElse loggerHandler(logBuffer) orElse runner
@@ -59,39 +57,34 @@ final class ScalaJSTask private (
     val taskInfos = ComUtils.receiveLoop(slave)(handlerChain)
 
     // Flush log buffer
-    runner.loggerLock.synchronized {
+    runner.loggerLock.synchronized
       logBuffer.foreach(_.call(loggers))
-    }
 
     taskInfos.map(ScalaJSTask.fromInfo(runner, _)).toArray
-  }
 
-  private def eventHandler(handler: EventHandler): LoopHandler[Nothing] = {
+  private def eventHandler(handler: EventHandler): LoopHandler[Nothing] =
     case ("event", data) =>
       val event = fromJSON[Event](readJSON(data))
       handler.handle(event)
       None
-  }
 
   private def loggerHandler(
-      buf: mutable.Buffer[LogElement[_]]): LoopHandler[Nothing] = {
+      buf: mutable.Buffer[LogElement[_]]): LoopHandler[Nothing] =
 
-    def processData(data: String) = {
+    def processData(data: String) =
       val pos = data.indexOf(':')
       assert(pos != -1, "Log command needs logger index")
       val index = data.substring(0, pos).toInt
       val innerData = data.substring(pos + 1)
 
       (index, innerData)
-    }
 
-    def log(level: Logger => (String => Unit), data: String) = {
+    def log(level: Logger => (String => Unit), data: String) =
       val (index, msg) = processData(data)
       buf += new LogElement(index, level, msg)
       None
-    }
 
-    val pf: LoopHandler[Nothing] = {
+    val pf: LoopHandler[Nothing] =
       case ("error", data) => log(_.error, data)
       case ("warn", data) => log(_.warn, data)
       case ("info", data) => log(_.info, data)
@@ -101,19 +94,14 @@ final class ScalaJSTask private (
         val throwable = fromJSON[RemoteException](readJSON(innerData))
         buf += new LogElement(index, _.trace, throwable)
         None
-    }
 
     pf
-  }
-}
 
-object ScalaJSTask {
+object ScalaJSTask
   private final class LogElement[T](
-      index: Int, log: Logger => (T => Unit), data: T) {
+      index: Int, log: Logger => (T => Unit), data: T)
     def call(arr: Array[Logger]): Unit = log(arr(index))(data)
-  }
 
   private[testadapter] def fromInfo(
       runner: ScalaJSRunner, info: TaskInfo): ScalaJSTask =
     new ScalaJSTask(runner, info.taskDef, info.tags, info.serializedTask)
-}

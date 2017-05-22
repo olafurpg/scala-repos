@@ -11,28 +11,25 @@ import spire.implicits.cforRange
 /**
   * Approximate truncated randomized EVD
   */
-object evdr extends UFunc {
+object evdr extends UFunc
 
   implicit object EVDR_DM_Impl2
-      extends Impl2[DenseMatrix[Double], Int, DenseEigSym] {
+      extends Impl2[DenseMatrix[Double], Int, DenseEigSym]
     def apply(M: DenseMatrix[Double], s: Int): DenseEigSym =
       doEigSymDouble(M, s, nOversamples = 10, nIter = 0)
-  }
 
   implicit object EVDR_DM_Impl3
-      extends Impl3[DenseMatrix[Double], Int, Int, DenseEigSym] {
+      extends Impl3[DenseMatrix[Double], Int, Int, DenseEigSym]
     def apply(M: DenseMatrix[Double], s: Int, nOversamples: Int): DenseEigSym =
       doEigSymDouble(M, s, nOversamples, nIter = 0)
-  }
 
   implicit object EVDR_DM_Impl4
-      extends Impl4[DenseMatrix[Double], Int, Int, Int, DenseEigSym] {
+      extends Impl4[DenseMatrix[Double], Int, Int, Int, DenseEigSym]
     def apply(M: DenseMatrix[Double],
               s: Int,
               nOversamples: Int,
               nIter: Int): DenseEigSym =
       doEigSymDouble(M, s, nOversamples, nIter)
-  }
 
   /**
     * Computes an approximate truncated randomized EVD. Fast on large matrices.
@@ -54,7 +51,7 @@ object evdr extends UFunc {
   private def doEigSymDouble(M: DenseMatrix[Double],
                              s: Int,
                              nOversamples: Int = 10,
-                             nIter: Int = 0): DenseEigSym = {
+                             nIter: Int = 0): DenseEigSym =
 
     require(
         s <= (M.rows min M.cols),
@@ -74,7 +71,6 @@ object evdr extends UFunc {
     val u = flipSigns(_u)
 
     EigSym(w, u)
-  }
 
   /**
     * Computes an orthonormal matrix whose range approximates the range of M
@@ -92,15 +88,13 @@ object evdr extends UFunc {
     */
   private def randomizedStateFinder(M: DenseMatrix[Double],
                                     size: Int,
-                                    nIter: Int): DenseMatrix[Double] = {
+                                    nIter: Int): DenseMatrix[Double] =
     val R = DenseMatrix.rand(M.cols, size, rand = Rand.gaussian)
     val Y = M * R
-    cforRange(0 until nIter) { _ =>
+    cforRange(0 until nIter)  _ =>
       Y := M * (M.t * Y)
-    }
     val q = qr.reduced.justQ(Y)
     q
-  }
 
   /**
     * Resolves the sign ambiguity. Largest in absolute value entries of u columns are always positive
@@ -108,16 +102,13 @@ object evdr extends UFunc {
     * @param u eigenvectors
     * @return eigenvectors with resolved sign ambiguity
     */
-  private def flipSigns(u: DenseMatrix[Double]): DenseMatrix[Double] = {
+  private def flipSigns(u: DenseMatrix[Double]): DenseMatrix[Double] =
     import DenseMatrix.canMapValues
     val abs_u = abs(u)
     val max_abs_cols = (0 until u.cols).map(c => argmax(abs_u(::, c)))
     val signs = max_abs_cols.zipWithIndex.map(e => signum(u(e._1, e._2)))
     signs.zipWithIndex.foreach(
         s =>
-          {
         u(::, s._2) :*= s._1
-    })
+    )
     u
-  }
-}

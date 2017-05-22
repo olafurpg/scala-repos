@@ -1,7 +1,5 @@
-class Base {
+class Base
   val baseOuter = "base"
 
-  class BaseInner {
+  class BaseInner
     val baseInner = baseOuter
-  }
-}

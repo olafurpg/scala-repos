@@ -29,39 +29,34 @@ import scala.util.control.NonFatal
   */
 class Parquet346ScroogeScheme[T <: ThriftStruct](
     config: ParquetValueScheme.Config[T])
-    extends ParquetScroogeScheme[T](config) {
+    extends ParquetScroogeScheme[T](config)
 
   override def sourceConfInit(
       fp: FlowProcess[JobConf],
       tap: Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]],
-      jobConf: JobConf): Unit = {
+      jobConf: JobConf): Unit =
 
     super.sourceConfInit(fp, tap, jobConf)
 
     // Use the fixed record converter instead of the one set in super
     ThriftReadSupport.setRecordConverterClass(
         jobConf, classOf[Parquet346ScroogeRecordConverter[_]])
-  }
-}
 
-object Parquet346ScroogeRecordConverter {
+object Parquet346ScroogeRecordConverter
 
   /**
     * Same as the (private) getCodec in ScroogeRecordConverter
     */
-  def getCodec[T <: ThriftStruct](klass: Class[T]): ThriftStructCodec[T] = {
+  def getCodec[T <: ThriftStruct](klass: Class[T]): ThriftStructCodec[T] =
 
-    try {
+    try
       val companionClass = Class.forName(klass.getName + "$")
       val companionObject: AnyRef =
         companionClass.getField("MODULE$").get(null)
       companionObject.asInstanceOf[ThriftStructCodec[T]]
-    } catch {
+    catch
       case NonFatal(e) =>
         throw new RuntimeException("Unable to create ThriftStructCodec", e)
-    }
-  }
-}
 
 /**
   * Same as ScroogeRecordConverter with one important (subtle) difference.
@@ -76,11 +71,11 @@ class Parquet346ScroogeRecordConverter[T <: ThriftStruct](
         // this is a little confusing because it's all being passed to the super constructor
 
         // this thrift reader is the same as what's in ScroogeRecordConverter's constructor
-        new ThriftReader[T] {
+        new ThriftReader[T]
           val codec: ThriftStructCodec[T] =
             Parquet346ScroogeRecordConverter.getCodec(thriftClass)
           def readOneRecord(protocol: TProtocol): T = codec.decode(protocol)
-        },
+        ,
         thriftClass.getSimpleName,
         parquetSchema,
         // this is the fix -- we add in the missing structOrUnionType metadata

@@ -15,7 +15,7 @@ import akka.actor.ActorSystem
 import headers._
 
 class MultipartSpec
-    extends WordSpec with Matchers with Inside with BeforeAndAfterAll {
+    extends WordSpec with Matchers with Inside with BeforeAndAfterAll
 
   val testConf: Config =
     ConfigFactory.parseString("""
@@ -25,8 +25,8 @@ class MultipartSpec
   implicit val materializer = ActorMaterializer()
   override def afterAll() = system.terminate()
 
-  "Multipart.General" should {
-    "support `toStrict` on the streamed model" in {
+  "Multipart.General" should
+    "support `toStrict` on the streamed model" in
       val streamed = Multipart.General(
           MediaTypes.`multipart/mixed`,
           Source(Multipart.General.BodyPart(defaultEntity("data"),
@@ -37,11 +37,9 @@ class MultipartSpec
           MediaTypes.`multipart/mixed`,
           Multipart.General.BodyPart.Strict(HttpEntity("data"),
                                             List(ETag("xzy"))))
-    }
-  }
 
-  "Multipart.FormData" should {
-    "support `toStrict` on the streamed model" in {
+  "Multipart.FormData" should
+    "support `toStrict` on the streamed model" in
       val streamed = Multipart.FormData(Source(Multipart.FormData.BodyPart(
                   "foo", defaultEntity("FOO")) :: Multipart.FormData.BodyPart(
                   "bar", defaultEntity("BAR")) :: Nil))
@@ -49,11 +47,9 @@ class MultipartSpec
 
       strict shouldEqual Multipart.FormData(
           Map("foo" -> HttpEntity("FOO"), "bar" -> HttpEntity("BAR")))
-    }
-  }
 
-  "Multipart.ByteRanges" should {
-    "support `toStrict` on the streamed model" in {
+  "Multipart.ByteRanges" should
+    "support `toStrict` on the streamed model" in
       val streamed = Multipart.ByteRanges(
           Source(Multipart.ByteRanges.BodyPart(
                   ContentRange(0, 6),
@@ -73,11 +69,8 @@ class MultipartSpec
               ContentRange(8, 9),
               HttpEntity("PR"),
               additionalHeaders = List(ETag("xzy"))))
-    }
-  }
 
   def defaultEntity(content: String) =
     HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
                        content.length,
                        Source(ByteString(content) :: Nil))
-}

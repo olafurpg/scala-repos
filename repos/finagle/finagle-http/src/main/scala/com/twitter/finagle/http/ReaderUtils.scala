@@ -6,12 +6,12 @@ import com.twitter.io.{Buf, Reader}
 import com.twitter.util.{Future, Return}
 import org.jboss.netty.handler.codec.http.{HttpChunk, DefaultHttpChunk}
 
-private[http] object ReaderUtils {
+private[http] object ReaderUtils
 
   /**
     * Serialize an HttpChunk into a Buf.
     */
-  def readChunk(chunk: Any): Future[Option[Buf]] = chunk match {
+  def readChunk(chunk: Any): Future[Option[Buf]] = chunk match
     case chunk: HttpChunk if chunk.isLast =>
       Future.None
 
@@ -22,7 +22,6 @@ private[http] object ReaderUtils {
       val exc = new IllegalArgumentException(
           "invalid message \"%s\"".format(invalid))
       Future.exception(exc)
-  }
 
   /**
     * Translates a Buf into HttpChunk. Beware: an empty buffer indicates end
@@ -39,15 +38,11 @@ private[http] object ReaderUtils {
       r: Reader,
       // TODO Find a better number for bufSize, e.g. 32KiB - Buf overhead
       bufSize: Int = Int.MaxValue
-  ): Future[Unit] = {
-    r.read(bufSize) flatMap {
+  ): Future[Unit] =
+    r.read(bufSize) flatMap
       case None =>
         trans.write(HttpChunk.LAST_CHUNK)
       case Some(buf) =>
-        trans.write(chunkOfBuf(buf)) transform {
+        trans.write(chunkOfBuf(buf)) transform
           case Return(_) => streamChunks(trans, r, bufSize)
           case _ => Future(r.discard())
-        }
-    }
-  }
-}

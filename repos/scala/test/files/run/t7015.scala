@@ -1,5 +1,5 @@
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     println(s"Method returns Null type: $f")
     println(s"Method takes non Null type: ${g(null)}")
 
@@ -22,7 +22,6 @@ object Test {
     println(s"method that takes object: ${q(f)}")
     println(s"method that takes anyref: ${r(f)}")
     println(s"method that takes any: ${s(f)}")
-  }
 
   def f: Null = null
 
@@ -31,19 +30,15 @@ object Test {
   def q(x: java.lang.Object) = x
   def r(x: AnyRef) = x
   def s(x: Any) = x
-}
 
-abstract class A {
+abstract class A
   def f(x: String): String
-}
 
-class B extends A {
+class B extends A
   val nullField = null
 
   // this forces a bridge method because the return type is different
   override def f(x: String): Null = null
-}
 
-object B {
+object B
   val nullCompanionField = null
-}

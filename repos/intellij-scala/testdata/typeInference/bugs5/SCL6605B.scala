@@ -1,4 +1,4 @@
-trait SCL6605B {
+trait SCL6605B
   class A
   class B
   class C
@@ -12,5 +12,4 @@ trait SCL6605B {
   val zz = if (true) a2 else a3
   /*start*/
   zz /*end*/
-}
 //SCL6605B.this.A2

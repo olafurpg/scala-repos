@@ -5,14 +5,14 @@ import org.junit.Test
 
 // scalastyle:off line.size.limit
 
-class DiverseErrorsTest extends DirectTest with TestHelpers {
+class DiverseErrorsTest extends DirectTest with TestHelpers
 
   override def preamble: String =
     """import scala.scalajs.js, js.annotation._
     """
 
   @Test
-  def noIsInstanceOnJSRaw: Unit = {
+  def noIsInstanceOnJSRaw: Unit =
 
     """
     @js.native
@@ -27,10 +27,9 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |      def x = a.isInstanceOf[JSRaw]
       |                            ^
     """
-  }
 
   @Test
-  def jsConstructorOfErrors: Unit = {
+  def jsConstructorOfErrors: Unit =
 
     """
     class ScalaClass
@@ -111,10 +110,9 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |      def bar[A <: js.Any: scala.reflect.ClassTag] = js.constructorOf[A]
       |                                                                      ^
     """
-  }
 
   @Test
-  def jsConstructorTagErrors: Unit = {
+  def jsConstructorTagErrors: Unit =
 
     """
     class ScalaClass
@@ -195,10 +193,9 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |      def bar[A <: js.Any: scala.reflect.ClassTag] = js.constructorTag[A]
       |                                                                      ^
     """
-  }
 
   @Test
-  def runtimeConstructorOfErrors: Unit = {
+  def runtimeConstructorOfErrors: Unit =
 
     """
     import scala.scalajs.runtime
@@ -274,5 +271,3 @@ class DiverseErrorsTest extends DirectTest with TestHelpers {
       |      val g = runtime.constructorOf(JSObject.getClass)
       |                                   ^
     """
-  }
-}

@@ -42,100 +42,84 @@ import scalafx.Includes._
   *
   */
 @RunWith(classOf[JUnitRunner])
-class ReadOnlyBooleanPropertySpec extends FlatSpec with BeforeAndAfterEach {
+class ReadOnlyBooleanPropertySpec extends FlatSpec with BeforeAndAfterEach
   val bean = new Object()
   var readOnlyBooleanProperty: jfxbp.ReadOnlyBooleanProperty = null
   var booleanProperty1: jfxbp.BooleanProperty = null
   var booleanProperty2: jfxbp.BooleanProperty = null
 
-  override def beforeEach() {
+  override def beforeEach()
     readOnlyBooleanProperty = new ReadOnlyBooleanProperty(
         bean, "Test Read-only Boolean", true)
     booleanProperty1 = new BooleanProperty(bean, "Test Boolean 2")
     booleanProperty2 = new BooleanProperty(bean, "Test Boolean 3")
-  }
 
-  "A Read-only Boolean Property" should "return a fixed value" in {
+  "A Read-only Boolean Property" should "return a fixed value" in
     readOnlyBooleanProperty.value should be(true)
-  }
 
-  it should "return its value using apply" in {
+  it should "return its value using apply" in
     readOnlyBooleanProperty() should be(true)
-  }
 
-  it should "know its name" in {
+  it should "know its name" in
     readOnlyBooleanProperty.name should equal("Test Read-only Boolean")
-  }
 
-  it should "know its bean" in {
+  it should "know its bean" in
     readOnlyBooleanProperty.bean should equal(bean)
-  }
 
-  it should "be bindable to another Boolean Property" in {
+  it should "be bindable to another Boolean Property" in
     booleanProperty1 <== readOnlyBooleanProperty
     booleanProperty1() should be(true)
-  }
 
-  it should "support unbinding from another Boolean Property" in {
+  it should "support unbinding from another Boolean Property" in
     booleanProperty1 <== readOnlyBooleanProperty
     booleanProperty1() should be(true)
     booleanProperty1.unbind()
     booleanProperty1() = false
     booleanProperty1() should be(false)
-  }
 
-  it should "support bindable infix equality (===) with a property" in {
+  it should "support bindable infix equality (===) with a property" in
     booleanProperty1 <== readOnlyBooleanProperty === booleanProperty2
     booleanProperty2() = false
     booleanProperty1() should be(false)
     booleanProperty2() = true
     booleanProperty1() should be(true)
-  }
 
-  it should "support bindable infix inequality (=!=) with a property" in {
+  it should "support bindable infix inequality (=!=) with a property" in
     booleanProperty1 <== readOnlyBooleanProperty =!= booleanProperty2
     booleanProperty2() = false
     booleanProperty1() should be(true)
     booleanProperty2() = true
     booleanProperty1() should be(false)
-  }
 
-  it should "support bindable infix and (&&) with a property" in {
+  it should "support bindable infix and (&&) with a property" in
     booleanProperty1 <== readOnlyBooleanProperty && booleanProperty2
     booleanProperty2() = false
     booleanProperty1() should be(false)
     booleanProperty2() = true
     booleanProperty1() should be(true)
-  }
 
-  it should "support bindable infix or (||) with a property" in {
+  it should "support bindable infix or (||) with a property" in
     booleanProperty1 <== readOnlyBooleanProperty || booleanProperty2
     booleanProperty2() = false
     booleanProperty1() should be(true)
     booleanProperty2() = true
     booleanProperty1() should be(true)
-  }
 
-  it should "support bindable prefix not (!)" in {
+  it should "support bindable prefix not (!)" in
     booleanProperty1 <== !readOnlyBooleanProperty
     booleanProperty1() should be(false)
-  }
 
-  it should "support invalidate/change triggers on binding expressions" in {
+  it should "support invalidate/change triggers on binding expressions" in
     var invalidateCount = 0
     var changeCount = 0
     val binding = booleanProperty1 || booleanProperty2
-    binding onInvalidate {
+    binding onInvalidate
       invalidateCount += 1
-    }
-    binding onChange {
+    binding onChange
       changeCount += 1
-    }
     booleanProperty1() = true
     invalidateCount should equal(1)
     changeCount should equal(1)
     booleanProperty2() = true
     invalidateCount should equal(1)
     changeCount should equal(1)
-  }
-}

@@ -34,23 +34,19 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
 /** ReadOnlyLongWrapper Spec tests. */
 @RunWith(classOf[JUnitRunner])
-class ReadOnlyLongWrapperSpec extends FlatSpec with BeforeAndAfterEach {
+class ReadOnlyLongWrapperSpec extends FlatSpec with BeforeAndAfterEach
 
-  "A ReadOnlyLongWrapper" should "be an instance of LongProperty" in {
+  "A ReadOnlyLongWrapper" should "be an instance of LongProperty" in
     val p = new ReadOnlyLongWrapper()
     assert(p.isInstanceOf[LongProperty])
-  }
 
-  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyLongProperty`" in {
+  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyLongProperty`" in
     val p = new ReadOnlyLongWrapper()
     assert(p.readOnlyProperty.isInstanceOf[ReadOnlyLongProperty])
-  }
 
-  it should "propagate value changes to `readOnlyProperty`" in {
+  it should "propagate value changes to `readOnlyProperty`" in
     val p = new ReadOnlyLongWrapper()
     p.value = 987L
     p.readOnlyProperty() should equal(987L)
     p.value = -749L
     p.readOnlyProperty() should equal(-749L)
-  }
-}

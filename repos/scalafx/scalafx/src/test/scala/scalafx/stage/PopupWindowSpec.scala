@@ -44,10 +44,9 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 class PopupWindowSpec
     extends SimpleSFXDelegateSpec[jfxs.PopupWindow, PopupWindow](
         classOf[jfxs.PopupWindow], classOf[PopupWindow])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override protected def getScalaClassInstance =
     new PopupWindow(this.getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = new jfxs.PopupWindow {}
-}

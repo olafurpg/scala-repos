@@ -24,20 +24,18 @@ import org.apache.spark.streaming.{StreamingContext, TestSuiteBase}
 import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.util.random.XORShiftRandom
 
-class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
+class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase
 
   override def maxWaitTimeMillis: Int = 30000
 
   var ssc: StreamingContext = _
 
-  override def afterFunction() {
+  override def afterFunction()
     super.afterFunction()
-    if (ssc != null) {
+    if (ssc != null)
       ssc.stop()
-    }
-  }
 
-  test("accuracy for single center and equivalence to grand average") {
+  test("accuracy for single center and equivalence to grand average")
     // set parameters
     val numBatches = 10
     val numPoints = 50
@@ -59,10 +57,9 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     // setup and run the model training
     ssc = setupStreams(input,
                        (inputDStream: DStream[Vector]) =>
-                         {
                            model.trainOn(inputDStream)
                            inputDStream.count()
-                       })
+                       )
     runStreams(ssc, numBatches, numBatches)
 
     // estimated center should be close to true center
@@ -75,9 +72,8 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
       (numBatches * numPoints).toDouble
     assert(model.latestModel().clusterCenters(0) ~==
           Vectors.dense(grandMean.toArray) absTol 1E-5)
-  }
 
-  test("accuracy for two centers") {
+  test("accuracy for two centers")
     val numBatches = 10
     val numPoints = 5
     val k = 2
@@ -99,10 +95,9 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     // setup and run the model training
     ssc = setupStreams(input,
                        (inputDStream: DStream[Vector]) =>
-                         {
                            kMeans.trainOn(inputDStream)
                            inputDStream.count()
-                       })
+                       )
     runStreams(ssc, numBatches, numBatches)
 
     // check that estimated centers are close to true centers
@@ -110,16 +105,14 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     val d0 = Vectors.sqdist(kMeans.latestModel().clusterCenters(0), centers(0))
     val d1 = Vectors.sqdist(kMeans.latestModel().clusterCenters(0), centers(1))
     val (c0, c1) =
-      if (d0 < d1) {
+      if (d0 < d1)
         (centers(0), centers(1))
-      } else {
+      else
         (centers(1), centers(0))
-      }
     assert(c0 ~== kMeans.latestModel().clusterCenters(0) absTol 1E-1)
     assert(c1 ~== kMeans.latestModel().clusterCenters(1) absTol 1E-1)
-  }
 
-  test("detecting dying clusters") {
+  test("detecting dying clusters")
     val numBatches = 10
     val numPoints = 5
     val k = 1
@@ -140,10 +133,9 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     // setup and run the model training
     ssc = setupStreams(input,
                        (inputDStream: DStream[Vector]) =>
-                         {
                            kMeans.trainOn(inputDStream)
                            inputDStream.count()
-                       })
+                       )
     runStreams(ssc, numBatches, numBatches)
 
     // check that estimated centers are close to true centers
@@ -157,14 +149,12 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
     // 0.8 is the mean of half-normal distribution
     assert(math.abs(c0) ~== 0.8 absTol 0.6)
     assert(math.abs(c1) ~== 0.8 absTol 0.6)
-  }
 
-  test("SPARK-7946 setDecayFactor") {
+  test("SPARK-7946 setDecayFactor")
     val kMeans = new StreamingKMeans()
     assert(kMeans.decayFactor === 1.0)
     kMeans.setDecayFactor(2.0)
     assert(kMeans.decayFactor === 2.0)
-  }
 
   def StreamingKMeansDataGenerator(numPoints: Int,
                                    numBatches: Int,
@@ -173,20 +163,15 @@ class StreamingKMeansSuite extends SparkFunSuite with TestSuiteBase {
                                    r: Double,
                                    seed: Int,
                                    initCenters: Array[Vector] = null)
-    : (IndexedSeq[IndexedSeq[Vector]], Array[Vector]) = {
+    : (IndexedSeq[IndexedSeq[Vector]], Array[Vector]) =
     val rand = new XORShiftRandom(seed)
-    val centers = initCenters match {
+    val centers = initCenters match
       case null =>
         Array.fill(k)(Vectors.dense(Array.fill(d)(rand.nextGaussian())))
       case _ => initCenters
-    }
-    val data = (0 until numBatches).map { i =>
-      (0 until numPoints).map { idx =>
+    val data = (0 until numBatches).map  i =>
+      (0 until numPoints).map  idx =>
         val center = centers(idx % k)
         Vectors.dense(
             Array.tabulate(d)(x => center(x) + rand.nextGaussian() * r))
-      }
-    }
     (data, centers)
-  }
-}

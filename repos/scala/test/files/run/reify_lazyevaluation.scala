@@ -2,9 +2,9 @@ import scala.language.{implicitConversions}
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
-object Test extends App {
-  reify {
-    object lazyLib {
+object Test extends App
+  reify
+    object lazyLib
 
       /** Delay the evaluation of an expression until it is needed. */
       def delay[A](value: => A): Susp[A] = new SuspImpl[A](value)
@@ -21,24 +21,20 @@ object Test extends App {
         * Implementation of suspended computations, separated from the
         * abstract class so that the type parameter can be invariant.
         */
-      class SuspImpl[A](lazyValue: => A) extends Susp[A] {
+      class SuspImpl[A](lazyValue: => A) extends Susp[A]
         private var maybeValue: Option[A] = None
 
-        override def apply() = maybeValue match {
+        override def apply() = maybeValue match
           case None =>
             val value = lazyValue
             maybeValue = Some(value)
             value
           case Some(value) =>
             value
-        }
 
-        override def toString() = maybeValue match {
+        override def toString() = maybeValue match
           case None => "Susp(?)"
           case Some(value) => "Susp(" + value + ")"
-        }
-      }
-    }
 
     import lazyLib._
 
@@ -56,5 +52,4 @@ object Test extends App {
     println("sl2   = " + sl2)
     println("sl2() = " + sl2())
     println("sl2   = " + sl2)
-  }.eval
-}
+  .eval

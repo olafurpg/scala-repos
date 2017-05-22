@@ -27,7 +27,7 @@ import generic.CanBuildFrom
 final class LongMap[V] private[collection](
     defaultEntry: Long => V, initialBufferSize: Int, initBlank: Boolean)
     extends AbstractMap[Long, V]
-    with Map[Long, V] with MapLike[Long, V, LongMap[V]] with Serializable {
+    with Map[Long, V] with MapLike[Long, V, LongMap[V]] with Serializable
   import LongMap._
 
   def this() = this(LongMap.exceptionDefault, 16, true)
@@ -58,14 +58,13 @@ final class LongMap[V] private[collection](
 
   if (initBlank) defaultInitialize(initialBufferSize)
 
-  private[this] def defaultInitialize(n: Int) = {
+  private[this] def defaultInitialize(n: Int) =
     mask = if (n < 0) 0x7
     else
       (((1 << (32 - java.lang.Integer.numberOfLeadingZeros(n - 1))) -
               1) & 0x3FFFFFFF) | 0x7
     _keys = new Array[Long](mask + 1)
     _values = new Array[AnyRef](mask + 1)
-  }
 
   private[collection] def initializeTo(
       m: Int,
@@ -76,10 +75,9 @@ final class LongMap[V] private[collection](
       vc: Int,
       kz: Array[Long],
       vz: Array[AnyRef]
-  ) {
+  )
     mask = m; extraKeys = ek; zeroValue = zv; minValue = mv; _size = sz;
     _vacant = vc; _keys = kz; _values = vz
-  }
 
   override def size: Int = _size + (extraKeys + 1) / 2
   override def empty: LongMap[V] = new LongMap()
@@ -87,100 +85,86 @@ final class LongMap[V] private[collection](
   private def imbalanced: Boolean =
     (_size + _vacant) > 0.5 * mask || _vacant > _size
 
-  private def toIndex(k: Long): Int = {
+  private def toIndex(k: Long): Int =
     // Part of the MurmurHash3 32 bit finalizer
     val h = ((k ^ (k >>> 32)) & 0xFFFFFFFFL).toInt
     val x = (h ^ (h >>> 16)) * 0x85EBCA6B
     (x ^ (x >>> 13)) & mask
-  }
 
-  private def seekEmpty(k: Long): Int = {
+  private def seekEmpty(k: Long): Int =
     var e = toIndex(k)
     var x = 0
     while (_keys(e) != 0) { x += 1; e = (e + 2 * (x + 1) * x - 3) & mask }
     e
-  }
 
-  private def seekEntry(k: Long): Int = {
+  private def seekEntry(k: Long): Int =
     var e = toIndex(k)
     var x = 0
     var q = 0L
-    while ({ q = _keys(e); if (q == k) return e; q != 0 }) {
+    while ({ q = _keys(e); if (q == k) return e; q != 0 })
       x += 1; e = (e + 2 * (x + 1) * x - 3) & mask
-    }
     e | MissingBit
-  }
 
-  private def seekEntryOrOpen(k: Long): Int = {
+  private def seekEntryOrOpen(k: Long): Int =
     var e = toIndex(k)
     var x = 0
     var q = 0L
-    while ({ q = _keys(e); if (q == k) return e; q + q != 0 }) {
+    while ({ q = _keys(e); if (q == k) return e; q + q != 0 })
       x += 1
       e = (e + 2 * (x + 1) * x - 3) & mask
-    }
     if (q == 0) return e | MissingBit
     val o = e | MissVacant
-    while ({ q = _keys(e); if (q == k) return e; q != 0 }) {
+    while ({ q = _keys(e); if (q == k) return e; q != 0 })
       x += 1
       e = (e + 2 * (x + 1) * x - 3) & mask
-    }
     o
-  }
 
-  override def contains(key: Long): Boolean = {
+  override def contains(key: Long): Boolean =
     if (key == -key) (((key >>> 63).toInt + 1) & extraKeys) != 0
     else seekEntry(key) >= 0
-  }
 
-  override def get(key: Long): Option[V] = {
-    if (key == -key) {
+  override def get(key: Long): Option[V] =
+    if (key == -key)
       if ((((key >>> 63).toInt + 1) & extraKeys) == 0) None
       else if (key == 0) Some(zeroValue.asInstanceOf[V])
       else Some(minValue.asInstanceOf[V])
-    } else {
+    else
       val i = seekEntry(key)
       if (i < 0) None else Some(_values(i).asInstanceOf[V])
-    }
-  }
 
-  override def getOrElse[V1 >: V](key: Long, default: => V1): V1 = {
-    if (key == -key) {
+  override def getOrElse[V1 >: V](key: Long, default: => V1): V1 =
+    if (key == -key)
       if ((((key >>> 63).toInt + 1) & extraKeys) == 0) default
       else if (key == 0) zeroValue.asInstanceOf[V1]
       else minValue.asInstanceOf[V1]
-    } else {
+    else
       val i = seekEntry(key)
       if (i < 0) default else _values(i).asInstanceOf[V1]
-    }
-  }
 
-  override def getOrElseUpdate(key: Long, defaultValue: => V): V = {
-    if (key == -key) {
+  override def getOrElseUpdate(key: Long, defaultValue: => V): V =
+    if (key == -key)
       val kbits = (key >>> 63).toInt + 1
-      if ((kbits & extraKeys) == 0) {
+      if ((kbits & extraKeys) == 0)
         val value = defaultValue
         extraKeys |= kbits
         if (key == 0) zeroValue = value.asInstanceOf[AnyRef]
         else minValue = value.asInstanceOf[AnyRef]
         value
-      } else if (key == 0) zeroValue.asInstanceOf[V]
+      else if (key == 0) zeroValue.asInstanceOf[V]
       else minValue.asInstanceOf[V]
-    } else {
+    else
       var i = seekEntryOrOpen(key)
-      if (i < 0) {
+      if (i < 0)
         // It is possible that the default value computation was side-effecting
         // Our hash table may have resized or even contain what we want now
         // (but if it does, we'll replace it)
-        val value = {
+        val value =
           val ok = _keys
           val ans = defaultValue
-          if (ok ne _keys) {
+          if (ok ne _keys)
             i = seekEntryOrOpen(key)
             if (i >= 0) _size -= 1
-          }
           ans
-        }
         _size += 1
         val j = i & IndexMask
         _keys(j) = key
@@ -188,9 +172,7 @@ final class LongMap[V] private[collection](
         if ((i & VacantBit) != 0) _vacant -= 1
         else if (imbalanced) repack()
         value
-      } else _values(i).asInstanceOf[V]
-    }
-  }
+      else _values(i).asInstanceOf[V]
 
   /** Retrieves the value associated with a key, or the default for that type if none exists
     *  (null for AnyRef, 0 for floats and integers).
@@ -199,38 +181,34 @@ final class LongMap[V] private[collection](
     *  may not exist, if the default null/zero is acceptable.  For key/value
     *  pairs that do exist,  `apply` (i.e. `map(key)`) is equally fast.
     */
-  def getOrNull(key: Long): V = {
-    if (key == -key) {
+  def getOrNull(key: Long): V =
+    if (key == -key)
       if ((((key >>> 63).toInt + 1) & extraKeys) == 0) null.asInstanceOf[V]
       else if (key == 0) zeroValue.asInstanceOf[V]
       else minValue.asInstanceOf[V]
-    } else {
+    else
       val i = seekEntry(key)
       if (i < 0) null.asInstanceOf[V] else _values(i).asInstanceOf[V]
-    }
-  }
 
   /** Retrieves the value associated with a key.
     *  If the key does not exist in the map, the `defaultEntry` for that key
     *  will be returned instead.
     */
-  override def apply(key: Long): V = {
-    if (key == -key) {
+  override def apply(key: Long): V =
+    if (key == -key)
       if ((((key >>> 63).toInt + 1) & extraKeys) == 0) defaultEntry(key)
       else if (key == 0) zeroValue.asInstanceOf[V]
       else minValue.asInstanceOf[V]
-    } else {
+    else
       val i = seekEntry(key)
       if (i < 0) defaultEntry(key) else _values(i).asInstanceOf[V]
-    }
-  }
 
   /** The user-supplied default value for the key.  Throws an exception
     *  if no other default behavior was specified.
     */
   override def default(key: Long) = defaultEntry(key)
 
-  private def repack(newMask: Int) {
+  private def repack(newMask: Int)
     val ok = _keys
     val ov = _values
     mask = newMask
@@ -238,16 +216,13 @@ final class LongMap[V] private[collection](
     _values = new Array[AnyRef](mask + 1)
     _vacant = 0
     var i = 0
-    while (i < ok.length) {
+    while (i < ok.length)
       val k = ok(i)
-      if (k != -k) {
+      if (k != -k)
         val j = seekEmpty(k)
         _keys(j) = k
         _values(j) = ov(i)
-      }
       i += 1
-    }
-  }
 
   /** Repacks the contents of this `LongMap` for maximum efficiency of lookup.
     *
@@ -257,32 +232,30 @@ final class LongMap[V] private[collection](
     *  improved performance.  Repacking takes time proportional to the number
     *  of entries in the map.
     */
-  def repack() {
+  def repack()
     var m = mask
     if (_size + _vacant >= 0.5 * mask && !(_vacant > 0.2 * mask))
       m = ((m << 1) + 1) & IndexMask
     while (m > 8 && 8 * _size < m) m = m >>> 1
     repack(m)
-  }
 
-  override def put(key: Long, value: V): Option[V] = {
-    if (key == -key) {
-      if (key == 0) {
+  override def put(key: Long, value: V): Option[V] =
+    if (key == -key)
+      if (key == 0)
         val ans =
           if ((extraKeys & 1) == 1) Some(zeroValue.asInstanceOf[V]) else None
         zeroValue = value.asInstanceOf[AnyRef]
         extraKeys |= 1
         ans
-      } else {
+      else
         val ans =
           if ((extraKeys & 2) == 1) Some(minValue.asInstanceOf[V]) else None
         minValue = value.asInstanceOf[AnyRef]
         extraKeys |= 2
         ans
-      }
-    } else {
+    else
       val i = seekEntryOrOpen(key)
-      if (i < 0) {
+      if (i < 0)
         val j = i & IndexMask
         _keys(j) = key
         _values(j) = value.asInstanceOf[AnyRef]
@@ -290,71 +263,60 @@ final class LongMap[V] private[collection](
         if ((i & VacantBit) != 0) _vacant -= 1
         else if (imbalanced) repack()
         None
-      } else {
+      else
         val ans = Some(_values(i).asInstanceOf[V])
         _keys(i) = key
         _values(i) = value.asInstanceOf[AnyRef]
         ans
-      }
-    }
-  }
 
   /** Updates the map to include a new key-value pair.
     *
     *  This is the fastest way to add an entry to a `LongMap`.
     */
-  override def update(key: Long, value: V): Unit = {
-    if (key == -key) {
-      if (key == 0) {
+  override def update(key: Long, value: V): Unit =
+    if (key == -key)
+      if (key == 0)
         zeroValue = value.asInstanceOf[AnyRef]
         extraKeys |= 1
-      } else {
+      else
         minValue = value.asInstanceOf[AnyRef]
         extraKeys |= 2
-      }
-    } else {
+    else
       val i = seekEntryOrOpen(key)
-      if (i < 0) {
+      if (i < 0)
         val j = i & IndexMask
         _keys(j) = key
         _values(j) = value.asInstanceOf[AnyRef]
         _size += 1
         if ((i & VacantBit) != 0) _vacant -= 1
         else if (imbalanced) repack()
-      } else {
+      else
         _keys(i) = key
         _values(i) = value.asInstanceOf[AnyRef]
-      }
-    }
-  }
 
   /** Adds a new key/value pair to this map and returns the map. */
   def +=(key: Long, value: V): this.type = { update(key, value); this }
 
   def +=(kv: (Long, V)): this.type = { update(kv._1, kv._2); this }
 
-  def -=(key: Long): this.type = {
-    if (key == -key) {
-      if (key == 0L) {
+  def -=(key: Long): this.type =
+    if (key == -key)
+      if (key == 0L)
         extraKeys &= 0x2
         zeroValue = null
-      } else {
+      else
         extraKeys &= 0x1
         minValue = null
-      }
-    } else {
+    else
       val i = seekEntry(key)
-      if (i >= 0) {
+      if (i >= 0)
         _size -= 1
         _vacant += 1
         _keys(i) = Long.MinValue
         _values(i) = null
-      }
-    }
     this
-  }
 
-  def iterator: Iterator[(Long, V)] = new Iterator[(Long, V)] {
+  def iterator: Iterator[(Long, V)] = new Iterator[(Long, V)]
     private[this] val kz = _keys
     private[this] val vz = _values
 
@@ -371,105 +333,89 @@ final class LongMap[V] private[collection](
 
     def hasNext: Boolean =
       nextPair != null ||
-      (index < kz.length && {
+      (index < kz.length &&
             var q = kz(index)
-            while (q == -q) {
+            while (q == -q)
               index += 1
               if (index >= kz.length) return false
               q = kz(index)
-            }
             nextPair = (kz(index), vz(index).asInstanceOf[V])
             index += 1
             true
-          })
-    def next = {
+          )
+    def next =
       if (nextPair == null && !hasNext)
         throw new NoSuchElementException("next")
       val ans = nextPair
-      if (anotherPair != null) {
+      if (anotherPair != null)
         nextPair = anotherPair
         anotherPair = null
-      } else nextPair = null
+      else nextPair = null
       ans
-    }
-  }
 
-  override def foreach[U](f: ((Long, V)) => U) {
+  override def foreach[U](f: ((Long, V)) => U)
     if ((extraKeys & 1) == 1) f((0L, zeroValue.asInstanceOf[V]))
     if ((extraKeys & 2) == 2) f((Long.MinValue, minValue.asInstanceOf[V]))
     var i, j = 0
-    while (i < _keys.length & j < _size) {
+    while (i < _keys.length & j < _size)
       val k = _keys(i)
-      if (k != -k) {
+      if (k != -k)
         j += 1
         f((k, _values(i).asInstanceOf[V]))
-      }
       i += 1
-    }
-  }
 
-  override def clone(): LongMap[V] = {
+  override def clone(): LongMap[V] =
     val kz = java.util.Arrays.copyOf(_keys, _keys.length)
     val vz = java.util.Arrays.copyOf(_values, _values.length)
     val lm = new LongMap[V](defaultEntry, 1, false)
     lm.initializeTo(
         mask, extraKeys, zeroValue, minValue, _size, _vacant, kz, vz)
     lm
-  }
 
-  override def +[V1 >: V](kv: (Long, V1)): LongMap[V1] = {
+  override def +[V1 >: V](kv: (Long, V1)): LongMap[V1] =
     val lm = clone().asInstanceOf[LongMap[V1]]
     lm += kv
     lm
-  }
 
-  override def ++[V1 >: V](xs: GenTraversableOnce[(Long, V1)]): LongMap[V1] = {
+  override def ++[V1 >: V](xs: GenTraversableOnce[(Long, V1)]): LongMap[V1] =
     val lm = clone().asInstanceOf[LongMap[V1]]
     xs.foreach(kv => lm += kv)
     lm
-  }
 
-  override def updated[V1 >: V](key: Long, value: V1): LongMap[V1] = {
+  override def updated[V1 >: V](key: Long, value: V1): LongMap[V1] =
     val lm = clone().asInstanceOf[LongMap[V1]]
     lm += (key, value)
     lm
-  }
 
   /** Applies a function to all keys of this map. */
-  def foreachKey[A](f: Long => A) {
+  def foreachKey[A](f: Long => A)
     if ((extraKeys & 1) == 1) f(0L)
     if ((extraKeys & 2) == 2) f(Long.MinValue)
     var i, j = 0
-    while (i < _keys.length & j < _size) {
+    while (i < _keys.length & j < _size)
       val k = _keys(i)
-      if (k != -k) {
+      if (k != -k)
         j += 1
         f(k)
-      }
       i += 1
-    }
-  }
 
   /** Applies a function to all values of this map. */
-  def foreachValue[A](f: V => A) {
+  def foreachValue[A](f: V => A)
     if ((extraKeys & 1) == 1) f(zeroValue.asInstanceOf[V])
     if ((extraKeys & 2) == 2) f(minValue.asInstanceOf[V])
     var i, j = 0
-    while (i < _keys.length & j < _size) {
+    while (i < _keys.length & j < _size)
       val k = _keys(i)
-      if (k != -k) {
+      if (k != -k)
         j += 1
         f(_values(i).asInstanceOf[V])
-      }
       i += 1
-    }
-  }
 
   /** Creates a new `LongMap` with different values.
     *  Unlike `mapValues`, this method generates a new
     *  collection immediately.
     */
-  def mapValuesNow[V1](f: V => V1): LongMap[V1] = {
+  def mapValuesNow[V1](f: V => V1): LongMap[V1] =
     val zv =
       if ((extraKeys & 1) == 1)
         f(zeroValue.asInstanceOf[V]).asInstanceOf[AnyRef] else null
@@ -480,40 +426,33 @@ final class LongMap[V] private[collection](
     val kz = java.util.Arrays.copyOf(_keys, _keys.length)
     val vz = new Array[AnyRef](_values.length)
     var i, j = 0
-    while (i < _keys.length & j < _size) {
+    while (i < _keys.length & j < _size)
       val k = _keys(i)
-      if (k != -k) {
+      if (k != -k)
         j += 1
         vz(i) = f(_values(i).asInstanceOf[V]).asInstanceOf[AnyRef]
-      }
       i += 1
-    }
     lm.initializeTo(mask, extraKeys, zv, mv, _size, _vacant, kz, vz)
     lm
-  }
 
   /** Applies a transformation function to all values stored in this map.
     *  Note: the default, if any,  is not transformed.
     */
-  def transformValues(f: V => V): this.type = {
+  def transformValues(f: V => V): this.type =
     if ((extraKeys & 1) == 1)
       zeroValue = f(zeroValue.asInstanceOf[V]).asInstanceOf[AnyRef]
     if ((extraKeys & 2) == 2)
       minValue = f(minValue.asInstanceOf[V]).asInstanceOf[AnyRef]
     var i, j = 0
-    while (i < _keys.length & j < _size) {
+    while (i < _keys.length & j < _size)
       val k = _keys(i)
-      if (k != -k) {
+      if (k != -k)
         j += 1
         _values(i) = f(_values(i).asInstanceOf[V]).asInstanceOf[AnyRef]
-      }
       i += 1
-    }
     this
-  }
-}
 
-object LongMap {
+object LongMap
   private final val IndexMask = 0x3FFFFFFF
   private final val MissingBit = 0x80000000
   private final val VacantBit = 0x40000000
@@ -524,34 +463,30 @@ object LongMap {
 
   implicit def canBuildFrom[V, U]: CanBuildFrom[
       LongMap[V], (Long, U), LongMap[U]] =
-    new CanBuildFrom[LongMap[V], (Long, U), LongMap[U]] {
+    new CanBuildFrom[LongMap[V], (Long, U), LongMap[U]]
       def apply(from: LongMap[V]): LongMapBuilder[U] = apply()
       def apply(): LongMapBuilder[U] = new LongMapBuilder[U]
-    }
 
   /** A builder for instances of `LongMap`.
     *
     *  This builder can be reused to create multiple instances.
     */
   final class LongMapBuilder[V]
-      extends ReusableBuilder[(Long, V), LongMap[V]] {
+      extends ReusableBuilder[(Long, V), LongMap[V]]
     private[collection] var elems: LongMap[V] = new LongMap[V]
-    def +=(entry: (Long, V)): this.type = {
+    def +=(entry: (Long, V)): this.type =
       elems += entry
       this
-    }
     def clear() { elems = new LongMap[V] }
     def result(): LongMap[V] = elems
-  }
 
   /** Creates a new `LongMap` with zero or more key/value pairs. */
-  def apply[V](elems: (Long, V)*): LongMap[V] = {
+  def apply[V](elems: (Long, V)*): LongMap[V] =
     val sz = if (elems.hasDefiniteSize) elems.size else 4
     val lm = new LongMap[V](sz * 2)
     elems.foreach { case (k, v) => lm(k) = v }
     if (lm.size < (sz >> 3)) lm.repack()
     lm
-  }
 
   /** Creates a new empty `LongMap`. */
   def empty[V]: LongMap[V] = new LongMap[V]
@@ -562,20 +497,19 @@ object LongMap {
   /** Creates a new `LongMap` from arrays of keys and values.
     *  Equivalent to but more efficient than `LongMap((keys zip values): _*)`.
     */
-  def fromZip[V](keys: Array[Long], values: Array[V]): LongMap[V] = {
+  def fromZip[V](keys: Array[Long], values: Array[V]): LongMap[V] =
     val sz = math.min(keys.length, values.length)
     val lm = new LongMap[V](sz * 2)
     var i = 0
     while (i < sz) { lm(keys(i)) = values(i); i += 1 }
     if (lm.size < (sz >> 3)) lm.repack()
     lm
-  }
 
   /** Creates a new `LongMap` from keys and values.
     *  Equivalent to but more efficient than `LongMap((keys zip values): _*)`.
     */
   def fromZip[V](keys: collection.Iterable[Long],
-                 values: collection.Iterable[V]): LongMap[V] = {
+                 values: collection.Iterable[V]): LongMap[V] =
     val sz = math.min(keys.size, values.size)
     val lm = new LongMap[V](sz * 2)
     val ki = keys.iterator
@@ -583,5 +517,3 @@ object LongMap {
     while (ki.hasNext && vi.hasNext) lm(ki.next) = vi.next
     if (lm.size < (sz >> 3)) lm.repack()
     lm
-  }
-}

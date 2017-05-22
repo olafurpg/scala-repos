@@ -18,17 +18,15 @@ private[round] final class Finisher(messenger: Messenger,
                                     crosstableApi: lila.game.CrosstableApi,
                                     bus: lila.common.Bus,
                                     timeline: akka.actor.ActorSelection,
-                                    casualOnly: Boolean) {
+                                    casualOnly: Boolean)
 
-  def abort(pov: Pov): Fu[Events] = apply(pov.game, _.Aborted) >>- {
+  def abort(pov: Pov): Fu[Events] = apply(pov.game, _.Aborted) >>-
     playban.abort(pov)
     bus.publish(AbortedBy(pov), 'abortGame)
-  }
 
   def rageQuit(game: Game, winner: Option[Color]): Fu[Events] =
-    apply(game, _.Timeout, winner) >>- winner.?? { color =>
+    apply(game, _.Timeout, winner) >>- winner.??  color =>
       playban.rageQuit(game, !color)
-    }
 
   def other(game: Game,
             status: Status.type => Status,
@@ -39,7 +37,7 @@ private[round] final class Finisher(messenger: Messenger,
   private def apply(game: Game,
                     makeStatus: Status.type => Status,
                     winner: Option[Color] = None,
-                    message: Option[SelectI18nKey] = None): Fu[Events] = {
+                    message: Option[SelectI18nKey] = None): Fu[Events] =
     val status = makeStatus(Status)
     val prog = game.finish(status, winner)
     if (game.nonAi && game.isCorrespondence)
@@ -49,54 +47,44 @@ private[round] final class Finisher(messenger: Messenger,
         GameRepo unrate prog.game.id inject prog.game.copy(
             mode = chess.Mode.Casual),
         fuccess(prog.game)
-    ) flatMap { g =>
+    ) flatMap  g =>
       (GameRepo save prog) >> GameRepo.finish(
           id = g.id,
           winnerColor = winner,
           winnerId = winner flatMap (g.player(_).userId),
           status = prog.game.status) >> UserRepo
         .pair(g.whitePlayer.userId, g.blackPlayer.userId)
-        .flatMap {
-          case (whiteO, blackO) => {
+        .flatMap
+          case (whiteO, blackO) =>
               val finish = FinishGame(g, whiteO, blackO)
-              updateCountAndPerfs(finish) inject {
+              updateCountAndPerfs(finish) inject
                 message foreach { messenger.system(g, _) }
-                GameRepo game g.id foreach { newGame =>
+                GameRepo game g.id foreach  newGame =>
                   bus.publish(finish.copy(game = newGame | g), 'finishGame)
-                }
                 prog.events
-              }
-            }
-        }
-    }
-  }
 
-  private def notifyTimeline(game: Game)(color: Color) = {
+  private def notifyTimeline(game: Game)(color: Color) =
     import lila.hub.actorApi.timeline.{Propagate, GameEnd}
     if (!game.aborted)
-      game.player(color).userId foreach { userId =>
-        game.perfType foreach { perfType =>
+      game.player(color).userId foreach  userId =>
+        game.perfType foreach  perfType =>
           timeline !
           (Propagate(GameEnd(playerId = game fullIdOf color,
                              opponent = game.player(!color).userId,
                              win = game.winnerColor map (color ==),
                              perf = perfType.key)) toUser userId)
-        }
-      }
-  }
 
   private def updateCountAndPerfs(finish: FinishGame): Funit =
-    (!finish.isVsSelf && !finish.game.aborted) ?? {
-      (finish.white |@| finish.black).tupled ?? {
+    (!finish.isVsSelf && !finish.game.aborted) ??
+      (finish.white |@| finish.black).tupled ??
         case (white, black) =>
           crosstableApi add finish.game zip perfsUpdater.save(finish.game,
                                                               white,
                                                               black)
-      } zip (finish.white ?? incNbGames(finish.game)) zip
+      zip (finish.white ?? incNbGames(finish.game)) zip
       (finish.black ?? incNbGames(finish.game)) void
-    }
 
-  private def incNbGames(game: Game)(user: User): Funit = game.finished ?? {
+  private def incNbGames(game: Game)(user: User): Funit = game.finished ??
     val totalTime = user.playTime.isDefined option game.moveTimes.sum / 10
     val tvTime = totalTime ifTrue game.metadata.tvAt.isDefined
     UserRepo.incNbGames(user.id,
@@ -107,5 +95,3 @@ private[round] final class Finisher(messenger: Messenger,
                           else 0,
                         totalTime = totalTime,
                         tvTime = tvTime)
-  }
-}

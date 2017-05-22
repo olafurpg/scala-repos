@@ -33,66 +33,56 @@ import java.text.MessageFormat
   * The code was initially taken from this location at Stack Overflow:
   * From http://stackoverflow.com/questions/978252/logging-in-scala/981942#981942
   */
-trait Logging extends CanLog {
+trait Logging extends CanLog
 
   val logger: Logger = Logging.getLogger(this)
 
-  private def formatmsg(msg: String, refs: Seq[Any]): String = {
+  private def formatmsg(msg: String, refs: Seq[Any]): String =
     new MessageFormat(msg).format(refs.toArray)
-  }
 
   private def checkFormat(msg: String, refs: Seq[Any]): String =
     if (refs.size > 0) formatmsg(msg, refs) else msg
 
   def trace(msg: String, refs: Any*) { logger trace checkFormat(msg, refs) }
 
-  def trace(t: Throwable, msg: String, refs: Any*) {
+  def trace(t: Throwable, msg: String, refs: Any*)
     logger trace (checkFormat(msg, refs), t)
-  }
 
   def info(msg: String, refs: Any*) { logger info checkFormat(msg, refs) }
 
-  def info(t: Throwable, msg: String, refs: Any*) {
+  def info(t: Throwable, msg: String, refs: Any*)
     logger info (checkFormat(msg, refs), t)
-  }
 
   def warn(msg: String, refs: Any*) { logger warn checkFormat(msg, refs) }
 
-  def warn(t: Throwable, msg: String, refs: Any*) {
+  def warn(t: Throwable, msg: String, refs: Any*)
     logger warn (checkFormat(msg, refs), t)
-  }
 
   def critical(msg: String, refs: Any*) { logger error checkFormat(msg, refs) }
 
-  def critical(t: Throwable, msg: String, refs: Any*) {
+  def critical(t: Throwable, msg: String, refs: Any*)
     logger error (checkFormat(msg, refs), t)
-  }
 
   def debug(msg: String, refs: Any*) { logger debug checkFormat(msg, refs) }
 
-  def debug(t: Throwable, msg: String, refs: Any*) {
+  def debug(t: Throwable, msg: String, refs: Any*)
     logger debug (checkFormat(msg, refs), t)
-  }
-}
 
 /**
   * Note: implementation taken from scalax.logging API
   */
-object Logging {
+object Logging
 
-  def loggerNameForClass(className: String) = {
-    if (className endsWith "$") {
+  def loggerNameForClass(className: String) =
+    if (className endsWith "$")
       className.substring(0, className.length - 1)
-    } else {
+    else
       className
-    }
-  }
 
   def getLogger(logging: AnyRef) =
     LoggerFactory.getLogger(loggerNameForClass(logging.getClass.getName))
-}
 
-trait CanLog {
+trait CanLog
   def logger: Logger
 
   def trace(msg: String, refs: Any*)
@@ -114,4 +104,3 @@ trait CanLog {
   def debug(msg: String, refs: Any*)
 
   def debug(t: Throwable, msg: String, refs: Any*)
-}

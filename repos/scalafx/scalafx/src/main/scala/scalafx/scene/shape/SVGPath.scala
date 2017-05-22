@@ -33,20 +33,16 @@ import scalafx.Includes._
 import scalafx.beans.property.{ObjectProperty, StringProperty}
 import scalafx.delegate.SFXDelegate
 
-object SVGPath {
+object SVGPath
   implicit def sfxSVGPath2jfx(v: SVGPath): jfxss.SVGPath =
     if (v != null) v.delegate else null
-}
 
 class SVGPath(override val delegate: jfxss.SVGPath = new jfxss.SVGPath())
-    extends Shape(delegate) with SFXDelegate[jfxss.SVGPath] {
+    extends Shape(delegate) with SFXDelegate[jfxss.SVGPath]
   def content: StringProperty = delegate.contentProperty
-  def content_=(v: String) {
+  def content_=(v: String)
     content() = v
-  }
 
   def fillRule: ObjectProperty[jfxss.FillRule] = delegate.fillRuleProperty
-  def fillRule_=(v: FillRule) {
+  def fillRule_=(v: FillRule)
     fillRule() = v
-  }
-}

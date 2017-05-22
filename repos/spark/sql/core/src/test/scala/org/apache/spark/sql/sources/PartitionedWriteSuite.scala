@@ -22,10 +22,10 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.util.Utils
 
-class PartitionedWriteSuite extends QueryTest with SharedSQLContext {
+class PartitionedWriteSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("write many partitions") {
+  test("write many partitions")
     val path = Utils.createTempDir()
     path.delete()
 
@@ -36,9 +36,8 @@ class PartitionedWriteSuite extends QueryTest with SharedSQLContext {
                 (0 to 99).map(Row(1, _)).toSeq)
 
     Utils.deleteRecursively(path)
-  }
 
-  test("write many partitions with repeats") {
+  test("write many partitions with repeats")
     val path = Utils.createTempDir()
     path.delete()
 
@@ -51,13 +50,9 @@ class PartitionedWriteSuite extends QueryTest with SharedSQLContext {
         (0 to 99).map(Row(1, _)).toSeq ++ (0 to 99).map(Row(1, _)).toSeq)
 
     Utils.deleteRecursively(path)
-  }
 
-  test("partitioned columns should appear at the end of schema") {
-    withTempPath { f =>
+  test("partitioned columns should appear at the end of schema")
+    withTempPath  f =>
       val path = f.getAbsolutePath
       Seq(1 -> "a").toDF("i", "j").write.partitionBy("i").parquet(path)
       assert(sqlContext.read.parquet(path).schema.map(_.name) == Seq("j", "i"))
-    }
-  }
-}

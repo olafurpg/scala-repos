@@ -31,43 +31,38 @@ import org.apache.spark.sql.execution.exchange.ShuffleExchange
   * This operator will be used when a logical `Limit` operation is the final operator in an
   * logical plan, which happens when the user is collecting results back to the driver.
   */
-case class CollectLimit(limit: Int, child: SparkPlan) extends UnaryNode {
+case class CollectLimit(limit: Int, child: SparkPlan) extends UnaryNode
   override def output: Seq[Attribute] = child.output
   override def outputPartitioning: Partitioning = SinglePartition
   override def executeCollect(): Array[InternalRow] = child.executeTake(limit)
   private val serializer: Serializer = new UnsafeRowSerializer(
       child.output.size)
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val shuffled = new ShuffledRowRDD(
         ShuffleExchange.prepareShuffleDependency(
             child.execute(), child.output, SinglePartition, serializer))
     shuffled.mapPartitionsInternal(_.take(limit))
-  }
-}
 
 /**
   * Helper trait which defines methods that are shared by both [[LocalLimit]] and [[GlobalLimit]].
   */
-trait BaseLimit extends UnaryNode with CodegenSupport {
+trait BaseLimit extends UnaryNode with CodegenSupport
   val limit: Int
   override def output: Seq[Attribute] = child.output
   override def outputOrdering: Seq[SortOrder] = child.outputOrdering
   override def outputPartitioning: Partitioning = child.outputPartitioning
   protected override def doExecute(): RDD[InternalRow] =
-    child.execute().mapPartitions { iter =>
+    child.execute().mapPartitions  iter =>
       iter.take(limit)
-    }
 
-  override def upstreams(): Seq[RDD[InternalRow]] = {
+  override def upstreams(): Seq[RDD[InternalRow]] =
     child.asInstanceOf[CodegenSupport].upstreams()
-  }
 
-  protected override def doProduce(ctx: CodegenContext): String = {
+  protected override def doProduce(ctx: CodegenContext): String =
     child.asInstanceOf[CodegenSupport].produce(ctx, this)
-  }
 
   override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
+      ctx: CodegenContext, input: Seq[ExprCode], row: String): String =
     val stopEarly = ctx.freshName("stopEarly")
     ctx.addMutableState("boolean", stopEarly, s"$stopEarly = false;")
 
@@ -88,22 +83,18 @@ trait BaseLimit extends UnaryNode with CodegenSupport {
        |   $stopEarly = true;
        | }
      """.stripMargin
-  }
-}
 
 /**
   * Take the first `limit` elements of each child partition, but do not collect or shuffle them.
   */
-case class LocalLimit(limit: Int, child: SparkPlan) extends BaseLimit {
+case class LocalLimit(limit: Int, child: SparkPlan) extends BaseLimit
   override def outputOrdering: Seq[SortOrder] = child.outputOrdering
-}
 
 /**
   * Take the first `limit` elements of the child's single output partition.
   */
-case class GlobalLimit(limit: Int, child: SparkPlan) extends BaseLimit {
+case class GlobalLimit(limit: Int, child: SparkPlan) extends BaseLimit
   override def requiredChildDistribution: List[Distribution] = AllTuples :: Nil
-}
 
 /**
   * Take the first limit elements as defined by the sortOrder, and do projection if needed.
@@ -116,56 +107,46 @@ case class TakeOrderedAndProject(limit: Int,
                                  sortOrder: Seq[SortOrder],
                                  projectList: Option[Seq[NamedExpression]],
                                  child: SparkPlan)
-    extends UnaryNode {
+    extends UnaryNode
 
-  override def output: Seq[Attribute] = {
+  override def output: Seq[Attribute] =
     projectList.map(_.map(_.toAttribute)).getOrElse(child.output)
-  }
 
   override def outputPartitioning: Partitioning = SinglePartition
 
-  override def executeCollect(): Array[InternalRow] = {
+  override def executeCollect(): Array[InternalRow] =
     val ord = new LazilyGeneratedOrdering(sortOrder, child.output)
     val data = child.execute().map(_.copy()).takeOrdered(limit)(ord)
-    if (projectList.isDefined) {
+    if (projectList.isDefined)
       val proj = UnsafeProjection.create(projectList.get, child.output)
       data.map(r => proj(r).copy())
-    } else {
+    else
       data
-    }
-  }
 
   private val serializer: Serializer = new UnsafeRowSerializer(
       child.output.size)
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val ord = new LazilyGeneratedOrdering(sortOrder, child.output)
-    val localTopK: RDD[InternalRow] = {
-      child.execute().map(_.copy()).mapPartitions { iter =>
+    val localTopK: RDD[InternalRow] =
+      child.execute().map(_.copy()).mapPartitions  iter =>
         org.apache.spark.util.collection.Utils.takeOrdered(iter, limit)(ord)
-      }
-    }
     val shuffled = new ShuffledRowRDD(
         ShuffleExchange.prepareShuffleDependency(
             localTopK, child.output, SinglePartition, serializer))
-    shuffled.mapPartitions { iter =>
+    shuffled.mapPartitions  iter =>
       val topK = org.apache.spark.util.collection.Utils
         .takeOrdered(iter.map(_.copy()), limit)(ord)
-      if (projectList.isDefined) {
+      if (projectList.isDefined)
         val proj = UnsafeProjection.create(projectList.get, child.output)
         topK.map(r => proj(r))
-      } else {
+      else
         topK
-      }
-    }
-  }
 
   override def outputOrdering: Seq[SortOrder] = sortOrder
 
-  override def simpleString: String = {
+  override def simpleString: String =
     val orderByString = sortOrder.mkString("[", ",", "]")
     val outputString = output.mkString("[", ",", "]")
 
     s"TakeOrderedAndProject(limit=$limit, orderBy=$orderByString, output=$outputString)"
-  }
-}

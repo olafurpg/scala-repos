@@ -14,7 +14,7 @@ import com.twitter.finagle.Addr
   */
 case class ZkMetadata(shardId: Option[Int])
 
-object ZkMetadata {
+object ZkMetadata
   // visibility exposed for testing
   private[addr] val key = "zk_metadata"
   private val default = ZkMetadata(None)
@@ -32,10 +32,9 @@ object ZkMetadata {
     * return the default metadata.
     */
   def fromAddrMetadata(metadata: Addr.Metadata): ZkMetadata =
-    metadata.get(key) match {
+    metadata.get(key) match
       case Some(metadata: ZkMetadata) => metadata
       case _ => default
-    }
 
   /**
     * Pattern match against `metadata` for [[ZkMetadata]] and return the
@@ -43,4 +42,3 @@ object ZkMetadata {
     */
   def unapply(metadata: Addr.Metadata): Option[Int] =
     fromAddrMetadata(metadata).shardId
-}

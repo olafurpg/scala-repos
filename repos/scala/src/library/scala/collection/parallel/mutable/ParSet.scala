@@ -19,23 +19,21 @@ import scala.collection.parallel.Combiner
 trait ParSet[T]
     extends scala.collection /*.mutable*/ .GenSet[T] with ParIterable[T]
     with scala.collection.parallel.ParSet[T] with GenericParTemplate[T, ParSet]
-    with ParSetLike[T, ParSet[T], scala.collection.mutable.Set[T]] {
+    with ParSetLike[T, ParSet[T], scala.collection.mutable.Set[T]]
   self =>
   override def companion: GenericCompanion[ParSet] with GenericParCompanion[
       ParSet] = ParSet
   override def empty: ParSet[T] = ParHashSet()
   def seq: scala.collection.mutable.Set[T]
-}
 
 /** $factoryInfo
   *  @define Coll `mutable.ParSet`
   *  @define coll mutable parallel set
   */
-object ParSet extends ParSetFactory[ParSet] {
+object ParSet extends ParSetFactory[ParSet]
   implicit def canBuildFrom[T]: CanCombineFrom[Coll, T, ParSet[T]] =
     new GenericCanCombineFrom[T]
 
   override def newBuilder[T]: Combiner[T, ParSet[T]] = ParHashSet.newBuilder
 
   override def newCombiner[T]: Combiner[T, ParSet[T]] = ParHashSet.newCombiner
-}

@@ -13,18 +13,17 @@ import com.twitter.finagle.tracing.Tracer
 import com.twitter.finagle.transport.Transport
 import com.twitter.util.{Duration, Monitor}
 
-trait RedisRichClient { self: Client[Command, Reply] =>
+trait RedisRichClient  self: Client[Command, Reply] =>
 
   def newRichClient(dest: String): redis.Client =
     redis.Client(newService(dest))
 
   def newRichClient(dest: Name, label: String): redis.Client =
     redis.Client(newService(dest, label))
-}
 
-object Redis extends Client[Command, Reply] {
+object Redis extends Client[Command, Reply]
 
-  object Client {
+  object Client
 
     /**
       * Default stack parameters used for redis client.
@@ -38,13 +37,12 @@ object Redis extends Client[Command, Reply] {
     def newStack: Stack[ServiceFactory[Command, Reply]] =
       StackClient.newStack.replace(
           DefaultPool.Role, SingletonPool.module[Command, Reply])
-  }
 
   case class Client(
       stack: Stack[ServiceFactory[Command, Reply]] = Client.newStack,
       params: Stack.Params = Client.defaultParams)
       extends StdStackClient[Command, Reply, Client]
-      with WithDefaultLoadBalancer[Client] with RedisRichClient {
+      with WithDefaultLoadBalancer[Client] with RedisRichClient
 
     protected def copy1(
         stack: Stack[ServiceFactory[Command, Reply]] = this.stack,
@@ -101,7 +99,6 @@ object Redis extends Client[Command, Reply] {
     override def filtered(
         filter: Filter[Command, Reply, Command, Reply]): Client =
       super.filtered(filter)
-  }
 
   val client: Redis.Client = Client()
 
@@ -110,4 +107,3 @@ object Redis extends Client[Command, Reply] {
 
   def newService(dest: Name, label: String): Service[Command, Reply] =
     client.newService(dest, label)
-}

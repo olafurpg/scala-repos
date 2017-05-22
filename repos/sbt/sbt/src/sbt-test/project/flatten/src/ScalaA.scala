@@ -1,5 +1,4 @@
 package a.b
 
-class ScalaA {
+class ScalaA
   def increment(i: Int) = i + 1
-}

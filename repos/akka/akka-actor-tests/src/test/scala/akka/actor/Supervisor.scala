@@ -8,11 +8,9 @@ package akka.actor
   * from the outside like this.
   */
 class Supervisor(override val supervisorStrategy: SupervisorStrategy)
-    extends Actor {
+    extends Actor
 
-  def receive = {
+  def receive =
     case x: Props ⇒ sender() ! context.actorOf(x)
-  }
   // need to override the default of stopping all children upon restart, tests rely on keeping them around
   override def preRestart(cause: Throwable, msg: Option[Any]) {}
-}

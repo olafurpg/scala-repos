@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture
 /**
   * Represents existing or missing OAuth 2 authentication credentials.
   */
-trait OAuth2Credentials {
+trait OAuth2Credentials
 
   /**
     * Were credentials provided in the request?
@@ -30,7 +30,6 @@ trait OAuth2Credentials {
     * Verifies the given secret against the one sent in the request.
     */
   def verify(secret: String): Boolean
-}
 
 /**
   * Implement this class to provide an OAuth 2 Bearer Token authentication check. The [[#authenticate]] method needs to be implemented
@@ -38,7 +37,7 @@ trait OAuth2Credentials {
   * the user as a [[akka.http.javadsl.server.RequestVal]].
   */
 abstract class OAuth2Authenticator[T](val realm: String)
-    extends AbstractDirective with ExtractionImplBase[T] with RequestVal[T] {
+    extends AbstractDirective with ExtractionImplBase[T] with RequestVal[T]
   protected[http] implicit def classTag: ClassTag[T] =
     reflect.classTag[AnyRef].asInstanceOf[ClassTag[T]]
   def authenticate(
@@ -63,4 +62,3 @@ abstract class OAuth2Authenticator[T](val realm: String)
   protected[http] final def createRoute(
       first: Route, others: Array[Route]): Route =
     RouteStructure.OAuth2Authentication(this)(first, others.toList)
-}

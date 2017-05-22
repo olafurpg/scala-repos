@@ -19,7 +19,7 @@ import scala.scalajs.js.annotation._
 
 /** Operations on JavaScript numbers. */
 @native
-trait JSNumberOps extends Any {
+trait JSNumberOps extends Any
 
   def toString(radix: Int): String = native
 
@@ -66,9 +66,8 @@ trait JSNumberOps extends Any {
     */
   def toPrecision(precision: Int): String = native
   def toPrecision(): String = native
-}
 
-object JSNumberOps {
+object JSNumberOps
   implicit def enableJSNumberOps(x: Int): JSNumberOps =
     x.asInstanceOf[JSNumberOps]
 
@@ -81,10 +80,9 @@ object JSNumberOps {
   implicit def enableJSNumberExtOps(x: Double): ExtOps =
     new ExtOps(x.asInstanceOf[Dynamic])
 
-  final class ExtOps(val self: Dynamic) extends AnyVal {
+  final class ExtOps(val self: Dynamic) extends AnyVal
     @inline def toUint: Double =
       (self >>> 0.asInstanceOf[Dynamic]).asInstanceOf[Double]
-  }
 
   /* The following overloads make sure that the developer does not use JS
    * number operations on a Long by error.
@@ -103,4 +101,3 @@ object JSNumberOps {
               "0.6.0")
   implicit def enableJSNumberExtOps(x: Long): ExtOps =
     new ExtOps(x.toDouble.asInstanceOf[Dynamic])
-}

@@ -24,7 +24,7 @@ import org.scalajs.core.ir.Trees.isValidIdentifier
 final class JSDependency(val resourceName: String,
                          val dependencies: List[String] = Nil,
                          val commonJSName: Option[String] = None,
-                         val minifiedResourceName: Option[String] = None) {
+                         val minifiedResourceName: Option[String] = None)
 
   import JSDependency._
 
@@ -42,12 +42,11 @@ final class JSDependency(val resourceName: String,
       resourceName: String = this.resourceName,
       dependencies: List[String] = this.dependencies,
       commonJSName: Option[String] = this.commonJSName,
-      minifiedResourceName: Option[String] = this.minifiedResourceName) = {
+      minifiedResourceName: Option[String] = this.minifiedResourceName) =
     new JSDependency(
         resourceName, dependencies, commonJSName, minifiedResourceName)
-  }
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: JSDependency =>
       this.resourceName == that.resourceName &&
       this.dependencies == that.dependencies &&
@@ -55,9 +54,8 @@ final class JSDependency(val resourceName: String,
       this.minifiedResourceName == that.minifiedResourceName
     case _ =>
       false
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     import scala.util.hashing.MurmurHash3._
     var acc = HashSeed
     acc = mix(acc, resourceName.##)
@@ -65,9 +63,8 @@ final class JSDependency(val resourceName: String,
     acc = mix(acc, commonJSName.##)
     acc = mixLast(acc, minifiedResourceName.##)
     finalizeHash(acc, 4)
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     val b = new StringBuilder
     b ++= s"JSDependency(resourceName=$resourceName"
     if (commonJSName.nonEmpty) b ++= s", commonJSName=$commonJSName"
@@ -76,15 +73,13 @@ final class JSDependency(val resourceName: String,
     if (dependencies.nonEmpty) b ++= s", dependencies=$dependencies"
     b ++= ")"
     b.result()
-  }
-}
 
-object JSDependency {
+object JSDependency
   // "org.scalajs.core.tools.jsdep.JSDependency".##
   private final val HashSeed = 2103455349
 
-  implicit object JSDepJSONSerializer extends JSONSerializer[JSDependency] {
-    def serialize(x: JSDependency): JSON = {
+  implicit object JSDepJSONSerializer extends JSONSerializer[JSDependency]
+    def serialize(x: JSDependency): JSON =
       new JSONObjBuilder()
         .fld("resourceName", x.resourceName)
         .opt("dependencies",
@@ -92,17 +87,12 @@ object JSDependency {
         .opt("commonJSName", x.commonJSName)
         .opt("minifiedResourceName", x.minifiedResourceName)
         .toJSON
-    }
-  }
 
   implicit object JSDepJSONDeserializer
-      extends JSONDeserializer[JSDependency] {
-    def deserialize(x: JSON): JSDependency = {
+      extends JSONDeserializer[JSDependency]
+    def deserialize(x: JSON): JSDependency =
       val obj = new JSONObjExtractor(x)
       new JSDependency(obj.fld[String]("resourceName"),
                        obj.opt[List[String]]("dependencies").getOrElse(Nil),
                        obj.opt[String]("commonJSName"),
                        obj.opt[String]("minifiedResourceName"))
-    }
-  }
-}

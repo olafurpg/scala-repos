@@ -34,7 +34,7 @@ import kafka.utils.{CoreUtils, TestUtils}
 
 @RunWith(value = classOf[Parameterized])
 class ProducerCompressionTest(compression: String)
-    extends ZooKeeperTestHarness {
+    extends ZooKeeperTestHarness
   private val brokerId = 0
   private var server: KafkaServer = null
 
@@ -42,21 +42,19 @@ class ProducerCompressionTest(compression: String)
   private val numRecords = 2000
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     val props = TestUtils.createBrokerConfig(brokerId, zkConnect)
     val config = KafkaConfig.fromProps(props)
 
     server = TestUtils.createServer(config)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     server.shutdown
     CoreUtils.rm(server.config.logDirs)
     super.tearDown()
-  }
 
   /**
     * testCompression
@@ -64,7 +62,7 @@ class ProducerCompressionTest(compression: String)
     * Compressed messages should be able to sent and consumed correctly
     */
   @Test
-  def testCompression() {
+  def testCompression()
 
     val props = new Properties()
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
@@ -80,7 +78,7 @@ class ProducerCompressionTest(compression: String)
     val consumer = new SimpleConsumer(
         "localhost", server.boundPort(), 100, 1024 * 1024, "")
 
-    try {
+    try
       // create topic
       TestUtils.createTopic(zkUtils, topic, 1, 1, List(server))
       val partition = 0
@@ -94,9 +92,8 @@ class ProducerCompressionTest(compression: String)
         producer.send(new ProducerRecord[Array[Byte], Array[Byte]](
                 topic, null, now, null, message))
       val futures = responses.toList
-      for ((future, offset) <- futures zip (0 until numRecords)) {
+      for ((future, offset) <- futures zip (0 until numRecords))
         assertEquals(offset.toLong, future.get.offset)
-      }
 
       // make sure the fetched message count match
       val fetchResponse = consumer.fetch(new FetchRequestBuilder()
@@ -109,32 +106,25 @@ class ProducerCompressionTest(compression: String)
                    messageSet.size)
 
       var index = 0
-      for (message <- messages) {
+      for (message <- messages)
         assertEquals(new Message(bytes = message, now, Message.MagicValue_V1),
                      messageSet(index).message)
         assertEquals(index.toLong, messageSet(index).offset)
         index += 1
-      }
-    } finally {
-      if (producer != null) {
+    finally
+      if (producer != null)
         producer.close()
         producer = null
-      }
       if (consumer != null) consumer.close()
-    }
-  }
-}
 
-object ProducerCompressionTest {
+object ProducerCompressionTest
 
   // NOTE: Must return collection of Array[AnyRef] (NOT Array[Any]).
   @Parameters
-  def parameters: Collection[Array[String]] = {
+  def parameters: Collection[Array[String]] =
     val list = new ArrayList[Array[String]]()
     list.add(Array("none"))
     list.add(Array("gzip"))
     list.add(Array("snappy"))
     list.add(Array("lz4"))
     list
-  }
-}

@@ -29,7 +29,7 @@ import scala.concurrent.duration.FiniteDuration
 /**
   * INTERNAL API
   */
-private[akka] object ReplicatorMessageSerializer {
+private[akka] object ReplicatorMessageSerializer
 
   /**
     * A cache that is designed for a small number (&lt;= 32) of
@@ -41,7 +41,7 @@ private[akka] object ReplicatorMessageSerializer {
     * cache will not cleanup itself.
     */
   final class SmallCache[A <: AnyRef, B <: AnyRef](
-      size: Int, timeToLive: FiniteDuration, getOrAddFactory: A ⇒ B) {
+      size: Int, timeToLive: FiniteDuration, getOrAddFactory: A ⇒ B)
     require((size & (size - 1)) == 0, "size must be a power of 2")
     require(size <= 32, "size must be <= 32")
 
@@ -60,20 +60,17 @@ private[akka] object ReplicatorMessageSerializer {
       */
     def get(a: A): B = get(a, n.get)
 
-    private def get(a: A, startPos: Int): B = {
+    private def get(a: A, startPos: Int): B =
       // start at the latest added value, most likely that we want that
       val end = startPos + elements.length
-      @tailrec def find(i: Int): B = {
+      @tailrec def find(i: Int): B =
         if (end - i == 0) null.asInstanceOf[B]
-        else {
+        else
           val x = elements(i & mask)
           if ((x eq null) || (x._1 ne a)) find(i + 1)
           else x._2
-        }
-      }
       lastUsed = System.nanoTime()
       find(startPos)
-    }
 
     /**
       * Add entry to the cache.
@@ -81,11 +78,10 @@ private[akka] object ReplicatorMessageSerializer {
       */
     def add(a: A, b: B): Unit = add((a, b))
 
-    def add(x: (A, B)): Unit = {
+    def add(x: (A, B)): Unit =
       val i = n.incrementAndGet()
       elements(i & mask) = x
       lastUsed = System.nanoTime()
-    }
 
     /**
       * Get value from cache or create new value with the
@@ -94,53 +90,45 @@ private[akka] object ReplicatorMessageSerializer {
       * if multiple threads call this concurrently, but decent
       * (low cost) effort is made to reduce the chance of duplicates.
       */
-    def getOrAdd(a: A): B = {
+    def getOrAdd(a: A): B =
       val position = n.get
       val c = get(a, position)
       if (c ne null) c
-      else {
+      else
         val b2 = getOrAddFactory(a)
-        if (position == n.get) {
+        if (position == n.get)
           // no change, add the new value
           add(a, b2)
           b2
-        } else {
+        else
           // some other thread added, try one more time
           // to reduce duplicates
           val c2 = get(a)
           if (c2 ne null) c2 // found it
-          else {
+          else
             add(a, b2)
             b2
-          }
-        }
-      }
-    }
 
     /**
       * Remove all elements if the cache has not been
       * used within the `timeToLive`.
       */
     def evict(): Unit =
-      if ((System.nanoTime() - lastUsed) > ttlNanos) {
+      if ((System.nanoTime() - lastUsed) > ttlNanos)
         var i = 0
-        while (i < elements.length) {
+        while (i < elements.length)
           elements(i) = null
           i += 1
-        }
-      }
 
     override def toString: String =
       elements.mkString("[", ",", "]")
-  }
-}
 
 /**
   * Protobuf serializer of ReplicatorMessage messages.
   */
 class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     extends SerializerWithStringManifest with SerializationSupport
-    with BaseSerializer {
+    with BaseSerializer
   import ReplicatorMessageSerializer.SmallCache
 
   private val cacheTimeToLive = system.settings.config
@@ -151,10 +139,10 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
       4, cacheTimeToLive, m ⇒ readToProto(m).toByteArray)
   private val writeCache = new SmallCache[Write, Array[Byte]](
       4, cacheTimeToLive, m ⇒ writeToProto(m).toByteArray)
-  system.scheduler.schedule(cacheTimeToLive, cacheTimeToLive / 2) {
+  system.scheduler.schedule(cacheTimeToLive, cacheTimeToLive / 2)
     readCache.evict()
     writeCache.evict()
-  }(system.dispatcher)
+  (system.dispatcher)
 
   private val writeAckBytes = dm.Empty.getDefaultInstance.toByteArray
 
@@ -190,7 +178,7 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
         StatusManifest -> statusFromBinary,
         GossipManifest -> gossipFromBinary)
 
-  override def manifest(obj: AnyRef): String = obj match {
+  override def manifest(obj: AnyRef): String = obj match
     case _: DataEnvelope ⇒ DataEnvelopeManifest
     case _: Write ⇒ WriteManifest
     case WriteAck ⇒ WriteAckManifest
@@ -208,9 +196,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
-  def toBinary(obj: AnyRef): Array[Byte] = obj match {
+  def toBinary(obj: AnyRef): Array[Byte] = obj match
     case m: DataEnvelope ⇒ dataEnvelopeToProto(m).toByteArray
     case m: Write ⇒ writeCache.getOrAdd(m)
     case WriteAck ⇒ writeAckBytes
@@ -228,65 +215,56 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
-    fromBinaryMap.get(manifest) match {
+    fromBinaryMap.get(manifest) match
       case Some(f) ⇒ f(bytes)
       case None ⇒
         throw new IllegalArgumentException(
             s"Unimplemented deserialization of message with manifest [$manifest] in [${getClass.getName}]")
-    }
 
-  private def statusToProto(status: Status): dm.Status = {
+  private def statusToProto(status: Status): dm.Status =
     val b = dm.Status.newBuilder()
     b.setChunk(status.chunk).setTotChunks(status.totChunks)
-    val entries = status.digests.foreach {
+    val entries = status.digests.foreach
       case (key, digest) ⇒
         b.addEntries(dm.Status.Entry
               .newBuilder()
               .setKey(key)
               .setDigest(ByteString.copyFrom(digest.toArray)))
-    }
     b.build()
-  }
 
-  private def statusFromBinary(bytes: Array[Byte]): Status = {
+  private def statusFromBinary(bytes: Array[Byte]): Status =
     val status = dm.Status.parseFrom(bytes)
     Status(
         status.getEntriesList.asScala.map(e ⇒
               e.getKey -> AkkaByteString(e.getDigest.toByteArray()))(breakOut),
         status.getChunk,
         status.getTotChunks)
-  }
 
-  private def gossipToProto(gossip: Gossip): dm.Gossip = {
+  private def gossipToProto(gossip: Gossip): dm.Gossip =
     val b = dm.Gossip.newBuilder().setSendBack(gossip.sendBack)
-    val entries = gossip.updatedData.foreach {
+    val entries = gossip.updatedData.foreach
       case (key, data) ⇒
         b.addEntries(dm.Gossip.Entry
               .newBuilder()
               .setKey(key)
               .setEnvelope(dataEnvelopeToProto(data)))
-    }
     b.build()
-  }
 
-  private def gossipFromBinary(bytes: Array[Byte]): Gossip = {
+  private def gossipFromBinary(bytes: Array[Byte]): Gossip =
     val gossip = dm.Gossip.parseFrom(decompress(bytes))
     Gossip(
         gossip.getEntriesList.asScala
           .map(e ⇒ e.getKey -> dataEnvelopeFromProto(e.getEnvelope))(breakOut),
         sendBack = gossip.getSendBack)
-  }
 
-  private def getToProto(get: Get[_]): dm.Get = {
-    val consistencyValue = get.consistency match {
+  private def getToProto(get: Get[_]): dm.Get =
+    val consistencyValue = get.consistency match
       case ReadLocal ⇒ 1
       case ReadFrom(n, _) ⇒ n
       case _: ReadMajority ⇒ 0
       case _: ReadAll ⇒ -1
-    }
 
     val b = dm.Get
       .newBuilder()
@@ -296,25 +274,22 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
 
     get.request.foreach(o ⇒ b.setRequest(otherMessageToProto(o)))
     b.build()
-  }
 
-  private def getFromBinary(bytes: Array[Byte]): Get[_] = {
+  private def getFromBinary(bytes: Array[Byte]): Get[_] =
     val get = dm.Get.parseFrom(bytes)
     val key = otherMessageFromProto(get.getKey).asInstanceOf[KeyR]
     val request =
       if (get.hasRequest()) Some(otherMessageFromProto(get.getRequest))
       else None
     val timeout = Duration(get.getTimeout, TimeUnit.MILLISECONDS)
-    val consistency = get.getConsistency match {
+    val consistency = get.getConsistency match
       case 0 ⇒ ReadMajority(timeout)
       case -1 ⇒ ReadAll(timeout)
       case 1 ⇒ ReadLocal
       case n ⇒ ReadFrom(n, timeout)
-    }
     Get(key, consistency, request)
-  }
 
-  private def getSuccessToProto(getSuccess: GetSuccess[_]): dm.GetSuccess = {
+  private def getSuccessToProto(getSuccess: GetSuccess[_]): dm.GetSuccess =
     val b = dm.GetSuccess
       .newBuilder()
       .setKey(otherMessageToProto(getSuccess.key))
@@ -322,9 +297,8 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
 
     getSuccess.request.foreach(o ⇒ b.setRequest(otherMessageToProto(o)))
     b.build()
-  }
 
-  private def getSuccessFromBinary(bytes: Array[Byte]): GetSuccess[_] = {
+  private def getSuccessFromBinary(bytes: Array[Byte]): GetSuccess[_] =
     val getSuccess = dm.GetSuccess.parseFrom(bytes)
     val key = otherMessageFromProto(getSuccess.getKey).asInstanceOf[KeyR]
     val request =
@@ -333,38 +307,33 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
     val data =
       otherMessageFromProto(getSuccess.getData).asInstanceOf[ReplicatedData]
     GetSuccess(key, request)(data)
-  }
 
-  private def notFoundToProto(notFound: NotFound[_]): dm.NotFound = {
+  private def notFoundToProto(notFound: NotFound[_]): dm.NotFound =
     val b = dm.NotFound.newBuilder().setKey(otherMessageToProto(notFound.key))
     notFound.request.foreach(o ⇒ b.setRequest(otherMessageToProto(o)))
     b.build()
-  }
 
-  private def notFoundFromBinary(bytes: Array[Byte]): NotFound[_] = {
+  private def notFoundFromBinary(bytes: Array[Byte]): NotFound[_] =
     val notFound = dm.NotFound.parseFrom(bytes)
     val request =
       if (notFound.hasRequest())
         Some(otherMessageFromProto(notFound.getRequest)) else None
     val key = otherMessageFromProto(notFound.getKey).asInstanceOf[KeyR]
     NotFound(key, request)
-  }
 
-  private def getFailureToProto(getFailure: GetFailure[_]): dm.GetFailure = {
+  private def getFailureToProto(getFailure: GetFailure[_]): dm.GetFailure =
     val b =
       dm.GetFailure.newBuilder().setKey(otherMessageToProto(getFailure.key))
     getFailure.request.foreach(o ⇒ b.setRequest(otherMessageToProto(o)))
     b.build()
-  }
 
-  private def getFailureFromBinary(bytes: Array[Byte]): GetFailure[_] = {
+  private def getFailureFromBinary(bytes: Array[Byte]): GetFailure[_] =
     val getFailure = dm.GetFailure.parseFrom(bytes)
     val request =
       if (getFailure.hasRequest())
         Some(otherMessageFromProto(getFailure.getRequest)) else None
     val key = otherMessageFromProto(getFailure.getKey).asInstanceOf[KeyR]
     GetFailure(key, request)
-  }
 
   private def subscribeToProto(subscribe: Subscribe[_]): dm.Subscribe =
     dm.Subscribe
@@ -373,11 +342,10 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
       .setRef(Serialization.serializedActorPath(subscribe.subscriber))
       .build()
 
-  private def subscribeFromBinary(bytes: Array[Byte]): Subscribe[_] = {
+  private def subscribeFromBinary(bytes: Array[Byte]): Subscribe[_] =
     val subscribe = dm.Subscribe.parseFrom(bytes)
     val key = otherMessageFromProto(subscribe.getKey).asInstanceOf[KeyR]
     Subscribe(key, resolveActorRef(subscribe.getRef))
-  }
 
   private def unsubscribeToProto(unsubscribe: Unsubscribe[_]): dm.Unsubscribe =
     dm.Unsubscribe
@@ -386,11 +354,10 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
       .setRef(Serialization.serializedActorPath(unsubscribe.subscriber))
       .build()
 
-  private def unsubscribeFromBinary(bytes: Array[Byte]): Unsubscribe[_] = {
+  private def unsubscribeFromBinary(bytes: Array[Byte]): Unsubscribe[_] =
     val unsubscribe = dm.Unsubscribe.parseFrom(bytes)
     val key = otherMessageFromProto(unsubscribe.getKey).asInstanceOf[KeyR]
     Unsubscribe(key, resolveActorRef(unsubscribe.getRef))
-  }
 
   private def changedToProto(changed: Changed[_]): dm.Changed =
     dm.Changed
@@ -399,49 +366,44 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
       .setData(otherMessageToProto(changed.dataValue))
       .build()
 
-  private def changedFromBinary(bytes: Array[Byte]): Changed[_] = {
+  private def changedFromBinary(bytes: Array[Byte]): Changed[_] =
     val changed = dm.Changed.parseFrom(bytes)
     val data =
       otherMessageFromProto(changed.getData).asInstanceOf[ReplicatedData]
     val key = otherMessageFromProto(changed.getKey).asInstanceOf[KeyR]
     Changed(key)(data)
-  }
 
   private def dataEnvelopeToProto(
-      dataEnvelope: DataEnvelope): dm.DataEnvelope = {
+      dataEnvelope: DataEnvelope): dm.DataEnvelope =
     val dataEnvelopeBuilder = dm.DataEnvelope
       .newBuilder()
       .setData(otherMessageToProto(dataEnvelope.data))
-    dataEnvelope.pruning.foreach {
+    dataEnvelope.pruning.foreach
       case (removedAddress, state) ⇒
         val b = dm.DataEnvelope.PruningEntry
           .newBuilder()
           .setRemovedAddress(uniqueAddressToProto(removedAddress))
           .setOwnerAddress(uniqueAddressToProto(state.owner))
-        state.phase match {
+        state.phase match
           case PruningState.PruningInitialized(seen) ⇒
             seen.toVector
               .sorted(Member.addressOrdering)
               .map(addressToProto)
-              .foreach { a ⇒
+              .foreach  a ⇒
                 b.addSeen(a)
-              }
             b.setPerformed(false)
           case PruningState.PruningPerformed ⇒
             b.setPerformed(true)
-        }
         dataEnvelopeBuilder.addPruning(b)
-    }
     dataEnvelopeBuilder.build()
-  }
 
   private def dataEnvelopeFromBinary(bytes: Array[Byte]): DataEnvelope =
     dataEnvelopeFromProto(dm.DataEnvelope.parseFrom(bytes))
 
   private def dataEnvelopeFromProto(
-      dataEnvelope: dm.DataEnvelope): DataEnvelope = {
+      dataEnvelope: dm.DataEnvelope): DataEnvelope =
     val pruning: Map[UniqueAddress, PruningState] =
-      dataEnvelope.getPruningList.asScala.map { pruningEntry ⇒
+      dataEnvelope.getPruningList.asScala.map  pruningEntry ⇒
         val phase =
           if (pruningEntry.getPerformed) PruningState.PruningPerformed
           else
@@ -451,11 +413,10 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
             uniqueAddressFromProto(pruningEntry.getOwnerAddress), phase)
         val removed = uniqueAddressFromProto(pruningEntry.getRemovedAddress)
         removed -> state
-      }(breakOut)
+      (breakOut)
     val data =
       otherMessageFromProto(dataEnvelope.getData).asInstanceOf[ReplicatedData]
     DataEnvelope(data, pruning)
-  }
 
   private def writeToProto(write: Write): dm.Write =
     dm.Write
@@ -464,10 +425,9 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
       .setEnvelope(dataEnvelopeToProto(write.envelope))
       .build()
 
-  private def writeFromBinary(bytes: Array[Byte]): Write = {
+  private def writeFromBinary(bytes: Array[Byte]): Write =
     val write = dm.Write.parseFrom(bytes)
     Write(write.getKey, dataEnvelopeFromProto(write.getEnvelope))
-  }
 
   private def readToProto(read: Read): dm.Read =
     dm.Read.newBuilder().setKey(read.key).build()
@@ -475,21 +435,17 @@ class ReplicatorMessageSerializer(val system: ExtendedActorSystem)
   private def readFromBinary(bytes: Array[Byte]): Read =
     Read(dm.Read.parseFrom(bytes).getKey)
 
-  private def readResultToProto(readResult: ReadResult): dm.ReadResult = {
+  private def readResultToProto(readResult: ReadResult): dm.ReadResult =
     val b = dm.ReadResult.newBuilder()
-    readResult.envelope match {
+    readResult.envelope match
       case Some(d) ⇒ b.setEnvelope(dataEnvelopeToProto(d))
       case None ⇒
-    }
     b.build()
-  }
 
-  private def readResultFromBinary(bytes: Array[Byte]): ReadResult = {
+  private def readResultFromBinary(bytes: Array[Byte]): ReadResult =
     val readResult = dm.ReadResult.parseFrom(bytes)
     val envelope =
       if (readResult.hasEnvelope)
         Some(dataEnvelopeFromProto(readResult.getEnvelope))
       else None
     ReadResult(envelope)
-  }
-}

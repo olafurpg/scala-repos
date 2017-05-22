@@ -28,7 +28,7 @@ import com.twitter.util.Future
   */
 class SideEffectStore[K, V](store: MergeableStore[K, V])(
     sideEffectFn: K => Future[Unit])
-    extends MergeableStore[K, V] {
+    extends MergeableStore[K, V]
 
   override def semigroup = store.semigroup
   override def get(k: K) = store.get(k)
@@ -37,12 +37,9 @@ class SideEffectStore[K, V](store: MergeableStore[K, V])(
   def after[T](t: Future[T])(fn: T => Unit): Future[T] = { t.foreach(fn); t }
 
   override def put(pair: (K, Option[V])) =
-    after(store.put(pair)) { _ =>
+    after(store.put(pair))  _ =>
       sideEffectFn(pair._1)
-    }
 
   override def merge(pair: (K, V)) =
-    after(store.merge(pair)) { _ =>
+    after(store.merge(pair))  _ =>
       sideEffectFn(pair._1)
-    }
-}

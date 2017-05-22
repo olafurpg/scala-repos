@@ -22,8 +22,8 @@ import java.sql.Timestamp
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.expressions.{If, Literal}
 
-class ExpressionSQLBuilderSuite extends SQLBuilderTest {
-  test("literal") {
+class ExpressionSQLBuilderSuite extends SQLBuilderTest
+  test("literal")
     checkSQL(Literal("foo"), "\"foo\"")
     checkSQL(Literal("\"foo\""), "\"\\\"foo\\\"\"")
     checkSQL(Literal(1: Byte), "1Y")
@@ -35,16 +35,14 @@ class ExpressionSQLBuilderSuite extends SQLBuilderTest {
     checkSQL(Literal(Timestamp.valueOf("2016-01-01 00:00:00")),
              "TIMESTAMP('2016-01-01 00:00:00.0')")
     // TODO tests for decimals
-  }
 
-  test("attributes") {
+  test("attributes")
     checkSQL('a.int, "`a`")
     checkSQL(Symbol("foo bar").int, "`foo bar`")
     // Keyword
     checkSQL('int.int, "`int`")
-  }
 
-  test("binary comparisons") {
+  test("binary comparisons")
     checkSQL('a.int === 'b.int, "(`a` = `b`)")
     checkSQL('a.int <=> 'b.int, "(`a` <=> `b`)")
     checkSQL('a.int =!= 'b.int, "(NOT (`a` = `b`))")
@@ -59,16 +57,14 @@ class ExpressionSQLBuilderSuite extends SQLBuilderTest {
 
     checkSQL('a.int.isNull, "(`a` IS NULL)")
     checkSQL('a.int.isNotNull, "(`a` IS NOT NULL)")
-  }
 
-  test("logical operators") {
+  test("logical operators")
     checkSQL('a.boolean && 'b.boolean, "(`a` AND `b`)")
     checkSQL('a.boolean || 'b.boolean, "(`a` OR `b`)")
     checkSQL(!'a.boolean, "(NOT `a`)")
     checkSQL(If('a.boolean, 'b.int, 'c.int), "(IF(`a`, `b`, `c`))")
-  }
 
-  test("arithmetic expressions") {
+  test("arithmetic expressions")
     checkSQL('a.int + 'b.int, "(`a` + `b`)")
     checkSQL('a.int - 'b.int, "(`a` - `b`)")
     checkSQL('a.int * 'b.int, "(`a` * `b`)")
@@ -77,5 +73,3 @@ class ExpressionSQLBuilderSuite extends SQLBuilderTest {
 
     checkSQL(-'a.int, "(-`a`)")
     checkSQL(-('a.int + 'b.int), "(-(`a` + `b`))")
-  }
-}

@@ -1,5 +1,4 @@
 package t1722
 
-object Test {
+object Test
   val x = new AnyRef with C
-}

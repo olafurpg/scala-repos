@@ -15,9 +15,9 @@ package com.twitter.finagle.http
   *
   * For Java-friendly enums, see [[com.twitter.finagle.http.Statuses]].
   */
-case class Status(code: Int) {
+case class Status(code: Int)
   def reason: String =
-    Status.reasons.get(this) match {
+    Status.reasons.get(this) match
       case Some(reason) => reason
       case _ if code < 100 => "Unknown Status"
       case _ if code < 200 => "Informational"
@@ -26,49 +26,41 @@ case class Status(code: Int) {
       case _ if code < 500 => "Client Error"
       case _ if code < 600 => "Server Error"
       case _ => "Unknown Status"
-    }
-}
 
-object Status {
+object Status
 
   /**
     * Matches when the status code isn't in range of any of the  categories: {{Informational}},
     * {{Successful}}, {{Redirection}}, {{ClientError}}, {{ServerError}}.
     */
-  object Unknown {
+  object Unknown
     def unapply(status: Status): Option[Status] =
       Some(status).filter(s => s.code < 100 || s.code >= 600)
-  }
 
   /** Matches when the status code is between 100 and 200. */
-  object Informational {
+  object Informational
     def unapply(status: Status): Option[Status] =
       inRange(100, 200, status)
-  }
 
   /** Matches when the status code is between 200 and 300. */
-  object Successful {
+  object Successful
     def unapply(status: Status): Option[Status] =
       inRange(200, 300, status)
-  }
 
   /** Matches when the status code is between 300 and 400. */
-  object Redirection {
+  object Redirection
     def unapply(status: Status): Option[Status] =
       inRange(300, 400, status)
-  }
 
   /** Matches when the status code is between 400 and 500. */
-  object ClientError {
+  object ClientError
     def unapply(status: Status): Option[Status] =
       inRange(400, 500, status)
-  }
 
   /** Matches when the status code is between 500 and 600. */
-  object ServerError {
+  object ServerError
     def unapply(status: Status): Option[Status] =
       inRange(500, 600, status)
-  }
 
   private[finagle] def inRange(
       lower: Int, upper: Int, status: Status): Option[Status] =
@@ -252,4 +244,3 @@ object Status {
       NotExtended -> "Not Extended",
       NetworkAuthenticationRequired -> "Network Authentication Required"
   )
-}

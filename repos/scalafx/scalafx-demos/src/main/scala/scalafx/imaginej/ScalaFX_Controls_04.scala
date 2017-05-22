@@ -57,47 +57,42 @@ import scalafx.scene.shape.Rectangle
   *         http://docs.oracle.com/javafx/2.0/ui_controls/toggle-button.htm
   *
   */
-object ScalaFX_Controls_04 extends JFXApp {
+object ScalaFX_Controls_04 extends JFXApp
 
-  val priorityLabel = new Label {
+  val priorityLabel = new Label
     text = "Priority:"
-  }
 
   val theToggleGroup = new ToggleGroup {}
 
-  val minorToggleButton = new ToggleButton {
+  val minorToggleButton = new ToggleButton
     text = "Minor"
     toggleGroup = theToggleGroup
     userData = Color.LightGreen
     selected = true
     style = "-fx-base: lightgreen;"
-  }
 
-  val majorToggleButton = new ToggleButton {
+  val majorToggleButton = new ToggleButton
     text = "Major"
     toggleGroup = theToggleGroup
     userData = Color.LightBlue
     selected = true
     style = "-fx-base: lightblue;"
-  }
 
-  val criticalToggleButton = new ToggleButton {
+  val criticalToggleButton = new ToggleButton
     text = "Critical"
     toggleGroup = theToggleGroup
     userData = Color.Salmon
     selected = true
     style = "-fx-base: salmon;"
-  }
 
-  val hBox = new HBox {
+  val hBox = new HBox
     children = List(
         minorToggleButton,
         majorToggleButton,
         criticalToggleButton
     )
-  }
 
-  val rectangle = new Rectangle {
+  val rectangle = new Rectangle
     width = 158
     height = 50
     fill = Color.White
@@ -105,33 +100,26 @@ object ScalaFX_Controls_04 extends JFXApp {
     strokeWidth = 2
     arcHeight = 10
     arcWidth = 10
-  }
 
-  val vBox = new VBox {
+  val vBox = new VBox
     padding = Insets(20, 10, 10, 20)
     children = List(
         priorityLabel,
         hBox,
         rectangle
     )
-  }
 
-  theToggleGroup.selectedToggle onChange { (_, _, newToggle) =>
-    if (newToggle != null) {
+  theToggleGroup.selectedToggle onChange  (_, _, newToggle) =>
+    if (newToggle != null)
       val selectedToggle = theToggleGroup.getSelectedToggle
       val userDataColor = selectedToggle.getUserData.asInstanceOf[Color]
       rectangle.fill = userDataColor
-    } else {
+    else
       rectangle.fill = Color.White
-    }
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "ScalaFX Controls 04"
     width = 250
     height = 180
-    scene = new Scene {
+    scene = new Scene
       content = vBox
-    }
-  }
-}

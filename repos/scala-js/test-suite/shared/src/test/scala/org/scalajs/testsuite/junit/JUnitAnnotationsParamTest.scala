@@ -2,7 +2,7 @@ package org.scalajs.testsuite.junit
 
 import org.junit.Test
 
-class JUnitAnnotationsParamTest {
+class JUnitAnnotationsParamTest
   @Test
   def test0(): Unit = ()
 
@@ -22,4 +22,3 @@ class JUnitAnnotationsParamTest {
 
   @Test(expected = classOf[Exception], timeout = 10000L)
   def test3(): Unit = throw new Exception
-}

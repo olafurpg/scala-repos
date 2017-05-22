@@ -17,24 +17,22 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.impl._
   * User: Alexander Podkhalyuzin
   * Date: 22.07.2008
   */
-object ScalaDocPsiCreator {
+object ScalaDocPsiCreator
   import org.jetbrains.plugins.scala.lang.scaladoc.parser.ScalaDocElementTypes._
   def createElement(node: ASTNode): PsiElement =
-    node.getElementType match {
+    node.getElementType match
       case a: ScaladocSyntaxElementType =>
         val element = new ScDocSyntaxElementImpl(node)
         element.setFlag(a.getFlagConst)
 
         var parentNode = node
         while (parentNode.getTreeParent != null &&
-        parentNode.getElementType != SCALA_DOC_COMMENT) {
+        parentNode.getElementType != SCALA_DOC_COMMENT)
           parentNode = parentNode.getTreeParent
-          parentNode.getElementType match {
+          parentNode.getElementType match
             case a: ScaladocSyntaxElementType =>
               element.setFlag(a.getFlagConst)
             case _ =>
-          }
-        }
 
         element
       case ScalaDocTokenType.DOC_INNER_CODE_TAG =>
@@ -51,18 +49,14 @@ object ScalaDocPsiCreator {
         var parent = node.getTreeParent
 
         while (parent != null && parent.getPsi != null &&
-        !parent.getPsi.isInstanceOf[ScDocTag]) {
+        !parent.getPsi.isInstanceOf[ScDocTag])
           parent = parent.getTreeParent
-        }
 
         if (parent != null && parent.getPsi != null && parent.getPsi
               .asInstanceOf[ScDocTag]
-              .name == MyScaladocParsing.THROWS_TAG) {
+              .name == MyScaladocParsing.THROWS_TAG)
           new ScDocThrowTagValueImpl(node)
-        } else {
+        else
           new ScDocTagValueImpl(node)
-        }
       case ScalaDocTokenType.DOC_CODE_LINK_VALUE =>
         new ScDocResolvableCodeReferenceImpl(node)
-    }
-}

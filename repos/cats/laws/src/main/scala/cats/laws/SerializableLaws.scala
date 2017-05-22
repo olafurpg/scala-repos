@@ -15,7 +15,7 @@ import scala.util.control.NonFatal
   * to be sure to enforce. Therefore, we use bricks.Platform to do a
   * runtime check rather than create a separate jvm-laws project.
   */
-object SerializableLaws {
+object SerializableLaws
 
   // This part is a bit tricky. Basically, we only want to test
   // serializability on the JVM.
@@ -32,13 +32,13 @@ object SerializableLaws {
   def serializable[A](a: A): Prop =
     if (Platform.isJs) Prop(_ => Result(status = Proof))
     else
-      Prop { _ =>
+      Prop  _ =>
         import java.io.{ByteArrayInputStream, ByteArrayOutputStream, ObjectInputStream, ObjectOutputStream}
 
         val baos = new ByteArrayOutputStream()
         val oos = new ObjectOutputStream(baos)
         var ois: ObjectInputStream = null
-        try {
+        try
           oos.writeObject(a)
           oos.close()
           val bais = new ByteArrayInputStream(baos.toByteArray())
@@ -46,12 +46,9 @@ object SerializableLaws {
           val a2 = ois.readObject()
           ois.close()
           Result(status = Proof)
-        } catch {
+        catch
           case NonFatal(t) =>
             Result(status = Exception(t))
-        } finally {
+        finally
           oos.close()
           if (ois != null) ois.close()
-        }
-      }
-}

@@ -52,22 +52,21 @@ import scalaz.syntax.traverse._
 import scalaz.syntax.monad._
 import scala.annotation.tailrec
 
-object KafkaRelayAgent extends Logging {
+object KafkaRelayAgent extends Logging
   def apply(permissionsFinder: PermissionsFinder[Future],
             eventIdSeq: EventIdSequence,
             localConfig: Configuration,
             centralConfig: Configuration)(
-      implicit executor: ExecutionContext): (KafkaRelayAgent, Stoppable) = {
+      implicit executor: ExecutionContext): (KafkaRelayAgent, Stoppable) =
 
     val localTopic = localConfig[String]("topic", "local_event_cache")
     val centralTopic = centralConfig[String]("topic", "central_event_store")
     val maxMessageSize = centralConfig[Int]("broker.max_message_size", 1000000)
 
-    val centralProperties: java.util.Properties = {
+    val centralProperties: java.util.Properties =
       val props = JProperties.configurationToProperties(centralConfig)
       props.setProperty("max.message.size", maxMessageSize.toString)
       props
-    }
 
     val producer =
       new Producer[String, Message](new ProducerConfig(centralProperties))
@@ -84,14 +83,12 @@ object KafkaRelayAgent extends Logging {
                                          producer,
                                          centralTopic,
                                          maxMessageSize)
-    val stoppable = Stoppable.fromFuture(relayAgent.stop map { _ =>
+    val stoppable = Stoppable.fromFuture(relayAgent.stop map  _ =>
       consumer.close; producer.close
-    })
+    )
 
     new Thread(relayAgent).start()
     (relayAgent, stoppable)
-  }
-}
 
 /** An independent agent that will consume records using the specified consumer,
   * augment them with record identities, then send them with the specified producer. */
@@ -107,7 +104,7 @@ final class KafkaRelayAgent(
     retryDelay: Long = 5000L,
     maxDelay: Double = 100.0,
     waitCountFactor: Int = 25)(implicit executor: ExecutionContext)
-    extends Runnable with Logging {
+    extends Runnable with Logging
 
   logger.info("Allocating KafkaRelayAgent, hash = " + hashCode)
 
@@ -117,125 +114,109 @@ final class KafkaRelayAgent(
   private val stopPromise = Promise[PrecogUnit]()
   private implicit val M: Monad[Future] = new FutureMonad(executor)
 
-  def stop: Future[PrecogUnit] = Future({ runnable = false }) flatMap { _ =>
+  def stop: Future[PrecogUnit] = Future({ runnable = false }) flatMap  _ =>
     stopPromise
-  }
 
-  override def run() {
-    if (runnable) {
+  override def run()
+    if (runnable)
       val offset = eventIdSeq.getLastOffset()
       logger.debug("Kafka consumer starting from offset: " + offset)
       ingestBatch(offset, 0, 0, 0)
-    }
-  }
 
   private def ingestBatch(offset: Long,
                           batch: Long,
                           delay: Long,
                           waitCount: Long,
-                          retries: Int = 5): Unit = {
-    if (runnable) {
+                          retries: Int = 5): Unit =
+    if (runnable)
       if (batch % 100 == 0)
         logger.debug("Processing kafka consumer batch %d [%s]".format(
                 batch, if (waitCount > 0) "IDLE" else "ACTIVE"))
       val fetchRequest = new FetchRequest(localTopic, 0, offset, bufferSize)
 
-      val ingestStep = for {
+      val ingestStep = for
         messages <- Future(consumer.fetch(fetchRequest)) // try/catch is for this line. Okay to wrap in a future & flatMap instead?
         _ <- forwardAll(messages.toList)
-      } yield {
+      yield
         val newDelay = delayStrategy(
             messages.sizeInBytes.toInt, delay, waitCount)
 
         val (newOffset, newWaitCount) =
-          if (messages.size > 0) {
+          if (messages.size > 0)
             val o: Long = messages.last.offset
             logger.debug("Kafka consumer batch size: %d offset: %d)".format(
                     messages.size, o))
             (o, 0L)
-          } else {
+          else
             (offset, waitCount + 1)
-          }
 
         Thread.sleep(newDelay)
 
         ingestBatch(newOffset, batch + 1, newDelay, newWaitCount)
-      }
 
-      ingestStep onFailure {
+      ingestStep onFailure
         case ex =>
-          if (retries > 0) {
+          if (retries > 0)
             logger.error(
                 "An unexpected error occurred relaying messages from the local queue; retrying from offset %d batch %d."
                   .format(offset, batch),
                 ex)
             ingestBatch(offset, batch, delay, waitCount, retries - 1)
-          } else {
+          else
             logger.error(
                 "Batch relay failed at offset %d batch %d. Data transfer to central queue halted pending manual intervention."
                   .format(offset, batch),
                 ex)
             runnable = false
             stopPromise.success(PrecogUnit)
-          }
-      }
-    } else {
+    else
       logger.info(
           "Kafka relay agent shutdown request detected. Halting at offset %d batch %d."
             .format(offset, batch))
       stopPromise.success(PrecogUnit)
-    }
-  }
 
   private def delayStrategy(
-      messageBytes: Int, currentDelay: Long, waitCount: Long): Long = {
-    if (messageBytes == 0) {
+      messageBytes: Int, currentDelay: Long, waitCount: Long): Long =
+    if (messageBytes == 0)
       val boundedWaitCount =
         if (waitCount > waitCountFactor) waitCountFactor else waitCount
       (maxDelay * boundedWaitCount / waitCountFactor).toLong
-    } else {
+    else
       (maxDelay * (1.0 - messageBytes.toDouble / bufferSize)).toLong
-    }
-  }
 
   private case class Authorized(
       event: Event, offset: Long, authorities: Option[Authorities])
 
-  private def forwardAll(messages: List[MessageAndOffset]) = {
+  private def forwardAll(messages: List[MessageAndOffset]) =
     val outgoing: List[Validation[Error, Future[Authorized]]] =
-      messages map { msg =>
-        EventEncoding.read(msg.message.payload) map { ev =>
+      messages map  msg =>
+        EventEncoding.read(msg.message.payload) map  ev =>
           deriveAuthority(ev).map { Authorized(ev, msg.offset, _) }
-        }
-      }
 
     outgoing.sequence[({ type λ[α] = Validation[Error, α] })#λ,
-                      Future[Authorized]] map { messageFutures =>
-      Future.sequence(messageFutures) map { messages: List[Authorized] =>
-        val identified: List[Message] = messages.flatMap {
+                      Future[Authorized]] map  messageFutures =>
+      Future.sequence(messageFutures) map  messages: List[Authorized] =>
+        val identified: List[Message] = messages.flatMap
           case Authorized(
               Ingest(apiKey, path, _, data, jobId, timestamp, storeMode),
               offset,
               Some(authorities)) =>
-            def encodeIngestMessages(ev: List[IngestMessage]): List[Message] = {
+            def encodeIngestMessages(ev: List[IngestMessage]): List[Message] =
               val messages = ev.map(centralCodec.toMessage)
 
-              if (messages.forall(_.size <= maxMessageSize)) {
+              if (messages.forall(_.size <= maxMessageSize))
                 messages
-              } else {
-                if (ev.size == data.length) {
+              else
+                if (ev.size == data.length)
                   logger.error(
                       "Failed to reach reasonable message size after splitting IngestRecords to individual relays!")
                   throw new Exception(
                       "Failed relay of excessively large event(s)!")
-                }
 
                 logger.debug(
                     "Breaking %d ingest records into %d messages for relay still too large, splitting."
                       .format(data.length, messages.size))
                 encodeIngestMessages(ev.flatMap(_.split))
-              }
-            }
 
             val ingestRecords =
               data map { IngestRecord(eventIdSeq.next(offset), _) }
@@ -282,31 +263,25 @@ final class KafkaRelayAgent(
             sys.error(
                 "Unable to establish owner account ID for storage of file " +
                 s)
-        }
 
-        producer.send {
+        producer.send
           new ProducerData[String, Message](centralTopic, identified)
-        }
-      } onFailure {
+      onFailure
         case ex =>
           logger.error(
               "An error occurred forwarding messages from the local queue to central.",
               ex)
-      } onSuccess {
+      onSuccess
         case _ =>
           if (messages.nonEmpty) eventIdSeq.saveState(messages.last.offset)
-      }
-    } valueOr { error =>
-      Promise successful {
+    valueOr  error =>
+      Promise successful
         logger.error(
             "Deserialization errors occurred reading events from Kafka: " +
             error.message)
-      }
-    }
-  }
 
   private def deriveAuthority(event: Event): Future[Option[Authorities]] =
-    event match {
+    event match
       case Ingest(apiKey, path, writeAs, _, _, timestamp, _) =>
         if (writeAs.isDefined) Promise.successful(writeAs)
         else
@@ -320,5 +295,3 @@ final class KafkaRelayAgent(
               apiKey, path, Some(timestamp))
 
       case _ => Promise.successful(None)
-    }
-}

@@ -17,12 +17,12 @@ import org.junit.Test
 import org.scalajs.testsuite.utils.AssertThrows._
 import org.scalajs.testsuite.utils.Platform._
 
-class MiscInteropTest {
+class MiscInteropTest
   import MiscInteropTest._
 
   // scala.scalajs.js.package
 
-  @Test def should_provide_an_equivalent_to_typeof_x(): Unit = {
+  @Test def should_provide_an_equivalent_to_typeof_x(): Unit =
     import js.typeOf
     assertEquals("number", typeOf(5))
     assertEquals("boolean", typeOf(false))
@@ -31,15 +31,13 @@ class MiscInteropTest {
     assertEquals("object", typeOf(new js.Object))
     assertEquals("undefined", typeOf(()))
     assertEquals("function", typeOf(() => 42))
-  }
 
-  @Test def js_constructorOf_T_for_native_classes(): Unit = {
+  @Test def js_constructorOf_T_for_native_classes(): Unit =
     assertSame(js.Dynamic.global.RegExp, js.constructorOf[js.RegExp])
     assertSame(js.Dynamic.global.Array, js.constructorOf[js.Array[_]])
     assertSame(js.Dynamic.global.Array, js.constructorOf[js.Array[Int]])
-  }
 
-  @Test def js_constructorOf_T_for_Scala_js_defined_JS_classes(): Unit = {
+  @Test def js_constructorOf_T_for_Scala_js_defined_JS_classes(): Unit =
     val concreteCtor =
       (new ConcreteJSClass).asInstanceOf[js.Dynamic].constructor
     val concreteProto = concreteCtor.prototype.asInstanceOf[js.Object]
@@ -56,18 +54,16 @@ class MiscInteropTest {
     val instance = js.Dynamic.newInstance(
         js.constructorOf[OtherwiseUnreferencedJSClass])(35)
     assertEquals(35, instance.x)
-  }
 
-  @Test def js_constructorTag_T_for_native_classes(): Unit = {
+  @Test def js_constructorTag_T_for_native_classes(): Unit =
     def test[T <: js.Any : js.ConstructorTag](expected: js.Dynamic): Unit =
       assertSame(expected, js.constructorTag[T].constructor)
 
     test[js.RegExp](js.Dynamic.global.RegExp)
     test[js.Array[_]](js.Dynamic.global.Array)
     test[js.Array[Int]](js.Dynamic.global.Array)
-  }
 
-  @Test def js_constructorTag_T_for_Scala_js_defined_JS_classes(): Unit = {
+  @Test def js_constructorTag_T_for_Scala_js_defined_JS_classes(): Unit =
     def test[T <: js.Any : js.ConstructorTag](expected: js.Dynamic): Unit =
       assertSame(expected, js.constructorTag[T].constructor)
 
@@ -88,89 +84,76 @@ class MiscInteropTest {
      */
     import scala.scalajs.runtime.assumingES6
 
-    val concreteInstance = {
+    val concreteInstance =
       val tag = js.constructorTag[ConcreteJSClass]
       if (assumingES6)
         js.Dynamic.newInstance(tag.constructor)().asInstanceOf[ConcreteJSClass]
       else tag.newInstance()
-    }
     assertTrue((concreteInstance: Any).isInstanceOf[ConcreteJSClass])
 
-    val instance = {
+    val instance =
       val tag = js.constructorTag[OtherwiseUnreferencedJSClassForTag]
-      if (assumingES6) {
+      if (assumingES6)
         js.Dynamic
           .newInstance(tag.constructor)(35)
           .asInstanceOf[OtherwiseUnreferencedJSClassForTag]
-      } else {
+      else
         tag.newInstance(35)
-      }
-    }
     assertEquals(35, instance.x)
-  }
 
   // scala.scalajs.js.Object
 
-  @Test def should_provide_an_equivalent_to_p_in_o(): Unit = {
+  @Test def should_provide_an_equivalent_to_p_in_o(): Unit =
     import js.Object.{hasProperty => hasProp}
     val o = js.Dynamic.literal(foo = 5, bar = "foobar").asInstanceOf[js.Object]
     assertTrue(hasProp(o, "foo"))
     assertFalse(hasProp(o, "foobar"))
     assertTrue(hasProp(o, "toString")) // in prototype
-  }
 
-  @Test def should_respect_evaluation_order_for_hasProperty(): Unit = {
+  @Test def should_respect_evaluation_order_for_hasProperty(): Unit =
     import js.Object.{hasProperty => hasProp}
     var indicator = 3
-    def o(): js.Object = {
+    def o(): js.Object =
       indicator += 4
       js.Dynamic.literal(x = 5).asInstanceOf[js.Object]
-    }
-    def p(): String = {
+    def p(): String =
       indicator *= 2
       "x"
-    }
     assertTrue(hasProp(o(), p()))
     assertEquals(14, indicator)
-  }
 
-  @Test def should_provide_equivalent_of_JS_for_in_loop_of_issue_13(): Unit = {
+  @Test def should_provide_equivalent_of_JS_for_in_loop_of_issue_13(): Unit =
     val obj = js.eval(
         "var dictionaryTest13 = { a: 'Scala.js', b: 7357 }; dictionaryTest13;")
     val dict = obj.asInstanceOf[js.Dictionary[js.Any]]
     var propCount = 0
     var propString = ""
 
-    for (prop <- js.Object.properties(dict)) {
+    for (prop <- js.Object.properties(dict))
       propCount += 1
       propString += dict(prop)
-    }
 
     assertEquals(2, propCount)
     assertEquals("Scala.js7357", propString)
-  }
 
-  @Test def should_provide_equivalent_of_JS_for_in_loop2_of_issue_13(): Unit = {
+  @Test def should_provide_equivalent_of_JS_for_in_loop2_of_issue_13(): Unit =
     val obj = js.eval("var arrayTest13 = [ 7, 3, 5, 7 ]; arrayTest13;")
     val array = obj.asInstanceOf[js.Dictionary[js.Any]]
     var propCount = 0
     var propString = ""
 
-    for (prop <- js.Object.properties(array)) {
+    for (prop <- js.Object.properties(array))
       propCount += 1
       propString += array(prop)
-    }
 
     assertEquals(4, propCount)
     assertEquals("7357", propString)
-  }
 
-  @Test def should_compile_js_undefined(): Unit = {
+  @Test def should_compile_js_undefined(): Unit =
     assertThrows(
         classOf[Exception], js.undefined.asInstanceOf[js.Dynamic].toFixed())
-  }
 
-  @Test def should_allow_to_define_direct_subtraits_of_js_Any(): Unit = {
+  @Test def should_allow_to_define_direct_subtraits_of_js_Any(): Unit =
     val f = js.Dynamic
       .literal(
           foo = (x: Int) => x + 1
@@ -178,9 +161,8 @@ class MiscInteropTest {
       .asInstanceOf[DirectSubtraitOfJSAny]
 
     assertEquals(6, f.foo(5))
-  }
 
-  @Test def should_allow_to_define_direct_subclasses_of_js_Any(): Unit = {
+  @Test def should_allow_to_define_direct_subclasses_of_js_Any(): Unit =
     val f = js.Dynamic
       .literal(
           bar = (x: Int) => x + 2
@@ -188,11 +170,10 @@ class MiscInteropTest {
       .asInstanceOf[DirectSubclassOfJSAny]
 
     assertEquals(7, f.bar(5))
-  }
 
   // Emitted classes
 
-  @Test def should_have_a_meaningful_name_property(): Unit = {
+  @Test def should_have_a_meaningful_name_property(): Unit =
     assumeFalse(executingInRhino)
     assumeFalse(isInFullOpt)
 
@@ -201,10 +182,8 @@ class MiscInteropTest {
 
     assertTrue(nameOf(new SomeScalaClass).toString.contains("SomeScalaClass"))
     assertTrue(nameOf(new SomeJSClass).toString.contains("SomeJSClass"))
-  }
-}
 
-object MiscInteropTest {
+object MiscInteropTest
 
   @ScalaJSDefined
   abstract class AbstractJSClass extends js.Object
@@ -219,18 +198,15 @@ object MiscInteropTest {
   class OtherwiseUnreferencedJSClassForTag(val x: Int) extends js.Object
 
   @js.native
-  trait DirectSubtraitOfJSAny extends js.Any {
+  trait DirectSubtraitOfJSAny extends js.Any
     def foo(x: Int): Int = js.native
-  }
 
   @JSName("DirectSubclassOfJSAny")
   @js.native
-  class DirectSubclassOfJSAny extends js.Any {
+  class DirectSubclassOfJSAny extends js.Any
     def bar(x: Int): Int = js.native
-  }
 
   class SomeScalaClass
 
   @ScalaJSDefined
   class SomeJSClass extends js.Object
-}

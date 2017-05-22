@@ -10,7 +10,7 @@ package internal
 import java.lang.Integer.toOctalString
 import scala.annotation.switch
 
-trait Constants extends api.Constants { self: SymbolTable =>
+trait Constants extends api.Constants  self: SymbolTable =>
 
   import definitions._
 
@@ -30,11 +30,11 @@ trait Constants extends api.Constants { self: SymbolTable =>
   // For supporting java enumerations inside java annotations (see ClassfileParser)
   final val EnumTag = 13
 
-  case class Constant(value: Any) extends ConstantApi {
+  case class Constant(value: Any) extends ConstantApi
     import java.lang.Double.doubleToRawLongBits
     import java.lang.Float.floatToRawIntBits
 
-    val tag: Int = value match {
+    val tag: Int = value match
       case null => NullTag
       case x: Unit => UnitTag
       case x: Boolean => BooleanTag
@@ -51,7 +51,6 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case _ =>
         throw new Error(
             "bad constant value: " + value + " of class " + value.getClass)
-    }
 
     def isByteRange: Boolean =
       isIntRange && Byte.MinValue <= intValue && intValue <= Byte.MaxValue
@@ -66,7 +65,7 @@ trait Constants extends api.Constants { self: SymbolTable =>
     def isNonUnitAnyVal = BooleanTag <= tag && tag <= DoubleTag
     def isAnyVal = UnitTag <= tag && tag <= DoubleTag
 
-    def tpe: Type = tag match {
+    def tpe: Type = tag match
       case UnitTag => UnitTpe
       case BooleanTag => BooleanTpe
       case ByteTag => ByteTpe
@@ -80,28 +79,25 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case NullTag => NullTpe
       case ClazzTag => ClassType(typeValue)
       case EnumTag => EnumType(symbolValue)
-    }
 
     /** We need the equals method to take account of tags as well as values.
       */
     // !!! In what circumstance could `equalHashValue == that.equalHashValue && tag != that.tag` be true?
-    override def equals(other: Any): Boolean = other match {
+    override def equals(other: Any): Boolean = other match
       case that: Constant =>
         this.tag == that.tag && equalHashValue == that.equalHashValue
       case _ => false
-    }
 
-    def isNaN = value match {
+    def isNaN = value match
       case f: Float => f.isNaN
       case d: Double => d.isNaN
       case _ => false
-    }
 
     def booleanValue: Boolean =
       if (tag == BooleanTag) value.asInstanceOf[Boolean]
       else throw new Error("value " + value + " is not a boolean")
 
-    def byteValue: Byte = tag match {
+    def byteValue: Byte = tag match
       case ByteTag => value.asInstanceOf[Byte]
       case ShortTag => value.asInstanceOf[Short].toByte
       case CharTag => value.asInstanceOf[Char].toByte
@@ -110,9 +106,8 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case FloatTag => value.asInstanceOf[Float].toByte
       case DoubleTag => value.asInstanceOf[Double].toByte
       case _ => throw new Error("value " + value + " is not a Byte")
-    }
 
-    def shortValue: Short = tag match {
+    def shortValue: Short = tag match
       case ByteTag => value.asInstanceOf[Byte].toShort
       case ShortTag => value.asInstanceOf[Short]
       case CharTag => value.asInstanceOf[Char].toShort
@@ -121,9 +116,8 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case FloatTag => value.asInstanceOf[Float].toShort
       case DoubleTag => value.asInstanceOf[Double].toShort
       case _ => throw new Error("value " + value + " is not a Short")
-    }
 
-    def charValue: Char = tag match {
+    def charValue: Char = tag match
       case ByteTag => value.asInstanceOf[Byte].toChar
       case ShortTag => value.asInstanceOf[Short].toChar
       case CharTag => value.asInstanceOf[Char]
@@ -132,9 +126,8 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case FloatTag => value.asInstanceOf[Float].toChar
       case DoubleTag => value.asInstanceOf[Double].toChar
       case _ => throw new Error("value " + value + " is not a Char")
-    }
 
-    def intValue: Int = tag match {
+    def intValue: Int = tag match
       case ByteTag => value.asInstanceOf[Byte].toInt
       case ShortTag => value.asInstanceOf[Short].toInt
       case CharTag => value.asInstanceOf[Char].toInt
@@ -143,9 +136,8 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case FloatTag => value.asInstanceOf[Float].toInt
       case DoubleTag => value.asInstanceOf[Double].toInt
       case _ => throw new Error("value " + value + " is not an Int")
-    }
 
-    def longValue: Long = tag match {
+    def longValue: Long = tag match
       case ByteTag => value.asInstanceOf[Byte].toLong
       case ShortTag => value.asInstanceOf[Short].toLong
       case CharTag => value.asInstanceOf[Char].toLong
@@ -154,9 +146,8 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case FloatTag => value.asInstanceOf[Float].toLong
       case DoubleTag => value.asInstanceOf[Double].toLong
       case _ => throw new Error("value " + value + " is not a Long")
-    }
 
-    def floatValue: Float = tag match {
+    def floatValue: Float = tag match
       case ByteTag => value.asInstanceOf[Byte].toFloat
       case ShortTag => value.asInstanceOf[Short].toFloat
       case CharTag => value.asInstanceOf[Char].toFloat
@@ -165,9 +156,8 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case FloatTag => value.asInstanceOf[Float]
       case DoubleTag => value.asInstanceOf[Double].toFloat
       case _ => throw new Error("value " + value + " is not a Float")
-    }
 
-    def doubleValue: Double = tag match {
+    def doubleValue: Double = tag match
       case ByteTag => value.asInstanceOf[Byte].toDouble
       case ShortTag => value.asInstanceOf[Short].toDouble
       case CharTag => value.asInstanceOf[Char].toDouble
@@ -176,11 +166,10 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case FloatTag => value.asInstanceOf[Float].toDouble
       case DoubleTag => value.asInstanceOf[Double]
       case _ => throw new Error("value " + value + " is not a Double")
-    }
 
     /** Convert constant value to conform to given type.
       */
-    def convertTo(pt: Type): Constant = {
+    def convertTo(pt: Type): Constant =
       val target = pt.typeSymbol
       if (target == tpe.typeSymbol) this
       else if (target == ByteClass && isByteRange) Constant(byteValue)
@@ -191,14 +180,13 @@ trait Constants extends api.Constants { self: SymbolTable =>
       else if (target == FloatClass && isFloatRange) Constant(floatValue)
       else if (target == DoubleClass && isNumeric) Constant(doubleValue)
       else null
-    }
 
     def stringValue: String =
       if (value == null) "null"
       else if (tag == ClazzTag) signature(typeValue)
       else value.toString()
 
-    @switch def escapedChar(ch: Char): String = ch match {
+    @switch def escapedChar(ch: Char): String = ch match
       case '\b' => "\\b"
       case '\t' => "\\t"
       case '\n' => "\\n"
@@ -210,16 +198,15 @@ trait Constants extends api.Constants { self: SymbolTable =>
       case _ =>
         if (ch.isControl) "\\0" + toOctalString(ch.toInt)
         else String.valueOf(ch)
-    }
 
-    def escapedStringValue: String = {
+    def escapedStringValue: String =
       def escape(text: String): String = text flatMap escapedChar
-      tag match {
+      tag match
         case NullTag => "null"
         case StringTag => "\"" + escape(stringValue) + "\""
         case ClazzTag =>
           def show(tpe: Type) = "classOf[" + signature(tpe) + "]"
-          typeValue match {
+          typeValue match
             case ErasedValueType(clazz, underlying) =>
               // A note on tpe_* usage here:
               //
@@ -230,13 +217,10 @@ trait Constants extends api.Constants { self: SymbolTable =>
               // erasure both before and after the use of `tpe_*` here.
               show(clazz.tpe_*)
             case _ => show(typeValue)
-          }
         case CharTag => "'" + escapedChar(charValue) + "'"
         case LongTag => longValue.toString() + "L"
         case EnumTag => symbolValue.name.toString()
         case _ => String.valueOf(value)
-      }
-    }
     def typeValue: Type = value.asInstanceOf[Type]
     def symbolValue: Symbol = value.asInstanceOf[Symbol]
 
@@ -250,23 +234,19 @@ trait Constants extends api.Constants { self: SymbolTable =>
       * constants in regular Scala code, but it is conceivable that you could
       * conjure them with a macro.
       */
-    private def equalHashValue: Any = value match {
+    private def equalHashValue: Any = value match
       case f: Float => floatToRawIntBits(f)
       case d: Double => doubleToRawLongBits(d)
       case v => v
-    }
 
-    override def hashCode: Int = {
+    override def hashCode: Int =
       import scala.util.hashing.MurmurHash3._
       val seed = 17
       var h = seed
       h = mix(h, tag.##) // include tag in the hash, otherwise 0, 0d, 0L, 0f collide.
       h = mix(h, equalHashValue.##)
       finalizeHash(h, length = 2)
-    }
-  }
 
   object Constant extends ConstantExtractor
 
   implicit val ConstantTag = ClassTag[Constant](classOf[Constant])
-}

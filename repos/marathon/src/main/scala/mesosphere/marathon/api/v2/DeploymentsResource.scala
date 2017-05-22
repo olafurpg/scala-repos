@@ -24,33 +24,31 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
                                     val authenticator: Authenticator,
                                     val authorizer: Authorizer,
                                     val config: MarathonConf)
-    extends AuthResource with Logging {
+    extends AuthResource with Logging
 
   @GET
   def running(@Context req: HttpServletRequest): Response =
-    authenticated(req) { implicit identity =>
+    authenticated(req)  implicit identity =>
       val infos = result(service.listRunningDeployments())
         .filter(_.plan.affectedApplications.exists(isAuthorized(ViewApp, _)))
-        .map { currentStep =>
+        .map  currentStep =>
           toInfo(currentStep.plan, currentStep)
-        }
       ok(jsonString(infos))
-    }
 
   @DELETE
   @Path("{id}")
   def cancel(@PathParam("id") id: String,
              @DefaultValue("false") @QueryParam("force") force: Boolean,
-             @Context req: HttpServletRequest): Response = authenticated(req) {
+             @Context req: HttpServletRequest): Response = authenticated(req)
     implicit identity =>
       val plan = result(service.listRunningDeployments())
         .find(_.plan.id == id)
         .map(_.plan)
-      plan.fold(notFound(s"DeploymentPlan $id does not exist")) { deployment =>
+      plan.fold(notFound(s"DeploymentPlan $id does not exist"))  deployment =>
         deployment.affectedApplications.foreach(
             checkAuthorization(UpdateApp, _))
 
-        deployment match {
+        deployment match
           case plan: DeploymentPlan if force =>
             // do not create a new deployment to return to the previous state
             log.info(s"Canceling deployment [$id]")
@@ -64,12 +62,9 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
                         plan.revert,
                         force = true
                     )))
-        }
-      }
-  }
 
   private def toInfo(deployment: DeploymentPlan,
-                     currentStepInfo: DeploymentStepInfo): JsObject = {
+                     currentStepInfo: DeploymentStepInfo): JsObject =
 
     val steps = deployment.steps
       .map(step => step.actions.map(actionToMap))
@@ -83,11 +78,9 @@ class DeploymentsResource @Inject()(service: MarathonSchedulerService,
         "currentStep" -> currentStepInfo.nr,
         "totalSteps" -> deployment.steps.size
     )
-  }
 
   def actionToMap(action: DeploymentAction): Map[String, String] =
     Map(
         "action" -> action.getClass.getSimpleName,
         "app" -> action.app.id.toString
     )
-}

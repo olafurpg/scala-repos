@@ -24,7 +24,7 @@ import scala.{specialized => spec}
   *
   * @author dlwh
   */
-trait Storage[@spec(Double, Int, Float, Long) V] {
+trait Storage[@spec(Double, Int, Float, Long) V]
 
   /**
     * Returns the actual flat array of elements used.
@@ -82,4 +82,3 @@ trait Storage[@spec(Double, Int, Float, Long) V] {
     * @return
     */
   def allVisitableIndicesActive: Boolean
-}

@@ -16,7 +16,7 @@ import org.jetbrains.plugins.scala.icons.Icons
 /**
   * @author ilyas
   */
-trait PsiMethodFake extends PsiMethod {
+trait PsiMethodFake extends PsiMethod
   def setName(name: String): PsiElement = null
 
   def hasModifierProperty(name: String): Boolean = false
@@ -60,4 +60,3 @@ trait PsiMethodFake extends PsiMethod {
     new ArrayList[MethodSignatureBackedByPsiMethod]()
 
   def findSuperMethods: Array[PsiMethod] = PsiMethod.EMPTY_ARRAY
-}

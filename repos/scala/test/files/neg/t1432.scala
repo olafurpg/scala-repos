@@ -1,4 +1,4 @@
-object Bug_NoUnique {
+object Bug_NoUnique
 
   type TypeCon[Env] = (Int, Env => Double)
 
@@ -10,4 +10,3 @@ object Bug_NoUnique {
     throw new Error("Body here")
 
   def test(x: TypeCon[Wrap[Unit]]): TypeCon[Unit] = wrap(x)
-}

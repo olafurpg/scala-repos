@@ -9,45 +9,42 @@ import akka.pattern.{ask, pipe}
 import lila.common.LightUser
 import lila.game.{Game, GameRepo}
 
-final class Tv(actor: ActorRef) {
+final class Tv(actor: ActorRef)
 
   import Tv._
 
   implicit private def timeout = makeTimeout(200 millis)
 
   def getGame(channel: Tv.Channel): Fu[Option[Game]] =
-    (actor ? TvActor.GetGameId(channel) mapTo manifest[Option[String]]) recover {
+    (actor ? TvActor.GetGameId(channel) mapTo manifest[Option[String]]) recover
       case e: Exception =>
         logger.warn("[TV]" + e.getMessage)
         none
-    } flatMap { _ ?? GameRepo.game }
+    flatMap { _ ?? GameRepo.game }
 
   def getGames(channel: Tv.Channel, max: Int): Fu[List[Game]] =
-    (actor ? TvActor.GetGameIds(channel, max) mapTo manifest[List[String]]) recover {
+    (actor ? TvActor.GetGameIds(channel, max) mapTo manifest[List[String]]) recover
       case e: Exception => Nil
-    } flatMap GameRepo.games
+    flatMap GameRepo.games
 
   def getBest = getGame(Tv.Channel.Best)
 
   def getChampions: Fu[Champions] =
     actor ? TvActor.GetChampions mapTo manifest[Champions]
-}
 
-object Tv {
+object Tv
   import chess.{Speed => S, variant => V}
   import lila.rating.{PerfType => P}
 
   case class Champion(user: LightUser, rating: Int)
-  case class Champions(channels: Map[Channel, Champion]) {
+  case class Champions(channels: Map[Channel, Champion])
     def get = channels.get _
-  }
 
   sealed abstract class Channel(
-      val name: String, val icon: String, filters: Seq[Game => Boolean]) {
+      val name: String, val icon: String, filters: Seq[Game => Boolean])
     def filter(g: Game) = filters forall { _ (g) }
     val key = toString.head.toLower + toString.drop(1)
-  }
-  object Channel {
+  object Channel
     case object Best
         extends Channel(name = "Top Rated",
                         icon = "C",
@@ -116,10 +113,9 @@ object Tv {
                    Horde,
                    RacingKings,
                    Computer)
-    val byKey = all.map { c =>
+    val byKey = all.map  c =>
       c.key -> c
-    }.toMap
-  }
+    .toMap
 
   private def rated = (g: Game) => g.rated
   private def speed(speed: chess.Speed) = (g: Game) => g.speed == speed
@@ -128,12 +124,10 @@ object Tv {
   private val standard = variant(V.Standard)
   private def fresh(seconds: Int) =
     (g: Game) =>
-      {
         g.isBeingPlayed && !g.olderThan(seconds)
-      } || {
+      ||
         g.finished && !g.olderThan(7)
-    } // rematch time
+    // rematch time
   private val freshBlitz = fresh(40)
   private def computerFromInitialPosition =
     (g: Game) => g.hasAi && !g.fromPosition
-}

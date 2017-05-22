@@ -68,7 +68,7 @@ class SparkEnv(val executorId: String,
                val memoryManager: MemoryManager,
                val outputCommitCoordinator: OutputCommitCoordinator,
                val conf: SparkConf)
-    extends Logging {
+    extends Logging
 
   private[spark] var isStopped = false
   private val pythonWorkers =
@@ -81,9 +81,9 @@ class SparkEnv(val executorId: String,
 
   private var driverTmpDirToDelete: Option[String] = None
 
-  private[spark] def stop() {
+  private[spark] def stop()
 
-    if (!isStopped) {
+    if (!isStopped)
       isStopped = true
       pythonWorkers.values.foreach(_.stop())
       mapOutputTracker.stop()
@@ -102,73 +102,58 @@ class SparkEnv(val executorId: String,
       // the tmp dir, if not, it will create too many tmp dirs.
       // We only need to delete the tmp dir create by driver, because sparkFilesDir is point to the
       // current working dir in executor which we do not need to delete.
-      driverTmpDirToDelete match {
-        case Some(path) => {
-            try {
+      driverTmpDirToDelete match
+        case Some(path) =>
+            try
               Utils.deleteRecursively(new File(path))
-            } catch {
+            catch
               case e: Exception =>
                 logWarning(
                     s"Exception while deleting Spark temp dir: $path", e)
-            }
-          }
         case None =>
         // We just need to delete tmp dir created by driver, so do nothing on executor
-      }
-    }
-  }
 
   private[spark] def createPythonWorker(
-      pythonExec: String, envVars: Map[String, String]): java.net.Socket = {
-    synchronized {
+      pythonExec: String, envVars: Map[String, String]): java.net.Socket =
+    synchronized
       val key = (pythonExec, envVars)
       pythonWorkers
         .getOrElseUpdate(key, new PythonWorkerFactory(pythonExec, envVars))
         .create()
-    }
-  }
 
   private[spark] def destroyPythonWorker(
-      pythonExec: String, envVars: Map[String, String], worker: Socket) {
-    synchronized {
+      pythonExec: String, envVars: Map[String, String], worker: Socket)
+    synchronized
       val key = (pythonExec, envVars)
       pythonWorkers.get(key).foreach(_.stopWorker(worker))
-    }
-  }
 
   private[spark] def releasePythonWorker(
-      pythonExec: String, envVars: Map[String, String], worker: Socket) {
-    synchronized {
+      pythonExec: String, envVars: Map[String, String], worker: Socket)
+    synchronized
       val key = (pythonExec, envVars)
       pythonWorkers.get(key).foreach(_.releaseWorker(worker))
-    }
-  }
-}
 
-object SparkEnv extends Logging {
+object SparkEnv extends Logging
   @volatile private var env: SparkEnv = _
 
   private[spark] val driverSystemName = "sparkDriver"
   private[spark] val executorSystemName = "sparkExecutor"
 
-  def set(e: SparkEnv) {
+  def set(e: SparkEnv)
     env = e
-  }
 
   /**
     * Returns the SparkEnv.
     */
-  def get: SparkEnv = {
+  def get: SparkEnv =
     env
-  }
 
   /**
     * Returns the ThreadLocal SparkEnv.
     */
   @deprecated("Use SparkEnv.get instead", "1.2.0")
-  def getThreadLocal: SparkEnv = {
+  def getThreadLocal: SparkEnv =
     env
-  }
 
   /**
     * Create a SparkEnv for the driver.
@@ -179,7 +164,7 @@ object SparkEnv extends Logging {
       listenerBus: LiveListenerBus,
       numCores: Int,
       mockOutputCommitCoordinator: Option[OutputCommitCoordinator] = None)
-    : SparkEnv = {
+    : SparkEnv =
     assert(conf.contains("spark.driver.host"),
            "spark.driver.host is not set on the driver!")
     assert(conf.contains("spark.driver.port"),
@@ -197,7 +182,6 @@ object SparkEnv extends Logging {
         listenerBus = listenerBus,
         mockOutputCommitCoordinator = mockOutputCommitCoordinator
     )
-  }
 
   /**
     * Create a SparkEnv for an executor.
@@ -208,7 +192,7 @@ object SparkEnv extends Logging {
                                        hostname: String,
                                        port: Int,
                                        numCores: Int,
-                                       isLocal: Boolean): SparkEnv = {
+                                       isLocal: Boolean): SparkEnv =
     val env = create(
         conf,
         executorId,
@@ -220,7 +204,6 @@ object SparkEnv extends Logging {
     )
     SparkEnv.set(env)
     env
-  }
 
   /**
     * Helper method to create a SparkEnv for a driver or an executor.
@@ -235,13 +218,12 @@ object SparkEnv extends Logging {
       numUsableCores: Int,
       listenerBus: LiveListenerBus = null,
       mockOutputCommitCoordinator: Option[OutputCommitCoordinator] = None)
-    : SparkEnv = {
+    : SparkEnv =
 
     // Listener bus is only used on the driver
-    if (isDriver) {
+    if (isDriver)
       assert(listenerBus != null,
              "Attempted to create driver SparkEnv with null listener bus!")
-    }
 
     val securityManager = new SecurityManager(conf)
 
@@ -256,42 +238,37 @@ object SparkEnv extends Logging {
     // Figure out which port RpcEnv actually bound to in case the original port is 0 or occupied.
     // In the non-driver case, the RPC env's address may be null since it may not be listening
     // for incoming connections.
-    if (isDriver) {
+    if (isDriver)
       conf.set("spark.driver.port", rpcEnv.address.port.toString)
-    } else if (rpcEnv.address != null) {
+    else if (rpcEnv.address != null)
       conf.set("spark.executor.port", rpcEnv.address.port.toString)
-    }
 
     // Create an instance of the class with the given name, possibly initializing it with our conf
-    def instantiateClass[T](className: String): T = {
+    def instantiateClass[T](className: String): T =
       val cls = Utils.classForName(className)
       // Look for a constructor taking a SparkConf and a boolean isDriver, then one taking just
       // SparkConf, then one taking no arguments
-      try {
+      try
         cls
           .getConstructor(classOf[SparkConf], java.lang.Boolean.TYPE)
           .newInstance(conf, new java.lang.Boolean(isDriver))
           .asInstanceOf[T]
-      } catch {
+      catch
         case _: NoSuchMethodException =>
-          try {
+          try
             cls
               .getConstructor(classOf[SparkConf])
               .newInstance(conf)
               .asInstanceOf[T]
-          } catch {
+          catch
             case _: NoSuchMethodException =>
               cls.getConstructor().newInstance().asInstanceOf[T]
-          }
-      }
-    }
 
     // Create an instance of the class named by the given SparkConf property, or defaultClassName
     // if the property is not set, possibly initializing it with our conf
     def instantiateClassFromConf[T](
-        propertyName: String, defaultClassName: String): T = {
+        propertyName: String, defaultClassName: String): T =
       instantiateClass[T](conf.get(propertyName, defaultClassName))
-    }
 
     val serializer = instantiateClassFromConf[Serializer](
         "spark.serializer", "org.apache.spark.serializer.JavaSerializer")
@@ -302,21 +279,18 @@ object SparkEnv extends Logging {
     val closureSerializer = new JavaSerializer(conf)
 
     def registerOrLookupEndpoint(
-        name: String, endpointCreator: => RpcEndpoint): RpcEndpointRef = {
-      if (isDriver) {
+        name: String, endpointCreator: => RpcEndpoint): RpcEndpointRef =
+      if (isDriver)
         logInfo("Registering " + name)
         rpcEnv.setupEndpoint(name, endpointCreator)
-      } else {
+      else
         RpcUtils.makeDriverRef(name, conf, rpcEnv)
-      }
-    }
 
     val mapOutputTracker =
-      if (isDriver) {
+      if (isDriver)
         new MapOutputTrackerMaster(conf)
-      } else {
+      else
         new MapOutputTrackerWorker(conf)
-      }
 
     // Have to assign trackerEndpoint after initialization as MapOutputTrackerEndpoint
     // requires the MapOutputTracker itself
@@ -340,11 +314,10 @@ object SparkEnv extends Logging {
     val useLegacyMemoryManager =
       conf.getBoolean("spark.memory.useLegacyMode", false)
     val memoryManager: MemoryManager =
-      if (useLegacyMemoryManager) {
+      if (useLegacyMemoryManager)
         new StaticMemoryManager(conf, numUsableCores)
-      } else {
+      else
         UnifiedMemoryManager(conf, numUsableCores)
-      }
 
     val blockTransferService = new NettyBlockTransferService(
         conf, securityManager, numUsableCores)
@@ -373,12 +346,12 @@ object SparkEnv extends Logging {
         isDriver, conf, securityManager)
 
     val metricsSystem =
-      if (isDriver) {
+      if (isDriver)
         // Don't start metrics system right now for Driver.
         // We need to wait for the task scheduler to give us an app ID.
         // Then we can start the metrics system.
         MetricsSystem.createMetricsSystem("driver", conf, securityManager)
-      } else {
+      else
         // We need to set the executor ID before the MetricsSystem is created because sources and
         // sinks specified in the metrics configuration file will want to incorporate this executor's
         // ID into the metrics they report.
@@ -387,23 +360,20 @@ object SparkEnv extends Logging {
           MetricsSystem.createMetricsSystem("executor", conf, securityManager)
         ms.start()
         ms
-      }
 
     // Set the sparkFiles directory, used when downloading dependencies.  In local mode,
     // this is a temporary directory; in distributed mode, this is the executor's current working
     // directory.
     val sparkFilesDir: String =
-      if (isDriver) {
+      if (isDriver)
         Utils
           .createTempDir(Utils.getLocalDir(conf), "userFiles")
           .getAbsolutePath
-      } else {
+      else
         "."
-      }
 
-    val outputCommitCoordinator = mockOutputCommitCoordinator.getOrElse {
+    val outputCommitCoordinator = mockOutputCommitCoordinator.getOrElse
       new OutputCommitCoordinator(conf, isDriver)
-    }
     val outputCommitCoordinatorRef = registerOrLookupEndpoint(
         "OutputCommitCoordinator",
         new OutputCommitCoordinatorEndpoint(rpcEnv, outputCommitCoordinator))
@@ -429,12 +399,10 @@ object SparkEnv extends Logging {
     // Add a reference to tmp dir created by driver, we will delete this tmp dir when stop() is
     // called, and we only need to do it for driver. Because driver may run as a service, and if we
     // don't delete this tmp dir when sc is stopped, then will create too many tmp dirs.
-    if (isDriver) {
+    if (isDriver)
       envInstance.driverTmpDirToDelete = Some(sparkFilesDir)
-    }
 
     envInstance
-  }
 
   /**
     * Return a map representation of jvm information, Spark properties, system properties, and
@@ -445,7 +413,7 @@ object SparkEnv extends Logging {
       conf: SparkConf,
       schedulingMode: String,
       addedJars: Seq[String],
-      addedFiles: Seq[String]): Map[String, Seq[(String, String)]] = {
+      addedFiles: Seq[String]): Map[String, Seq[(String, String)]] =
 
     import Properties._
     val jvmInformation = Seq(
@@ -457,19 +425,18 @@ object SparkEnv extends Logging {
     // Spark properties
     // This includes the scheduling mode whether or not it is configured (used by SparkUI)
     val schedulerMode =
-      if (!conf.contains("spark.scheduler.mode")) {
+      if (!conf.contains("spark.scheduler.mode"))
         Seq(("spark.scheduler.mode", schedulingMode))
-      } else {
+      else
         Seq[(String, String)]()
-      }
     val sparkProperties = (conf.getAll ++ schedulerMode).sorted
 
     // System properties that are not java classpaths
     val systemProperties = Utils.getSystemProperties.toSeq
-    val otherProperties = systemProperties.filter {
+    val otherProperties = systemProperties.filter
       case (k, _) =>
         k != "java.class.path" && !k.startsWith("spark.")
-    }.sorted
+    .sorted
 
     // Class paths including all added jars and files
     val classPathEntries = javaClassPath
@@ -483,5 +450,3 @@ object SparkEnv extends Logging {
                                        "Spark Properties" -> sparkProperties,
                                        "System Properties" -> otherProperties,
                                        "Classpath Entries" -> classPaths)
-  }
-}

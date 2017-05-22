@@ -68,18 +68,16 @@ case class ComplexData(arrayField: Seq[Int],
 
 case class GenericData[A](genericField: A)
 
-object GenericData {
+object GenericData
   type IntData = GenericData[Int]
-}
 
-case class MultipleConstructorsData(a: Int, b: String, c: Double) {
+case class MultipleConstructorsData(a: Int, b: String, c: Double)
   def this(b: String, a: Int) = this(a, b, c = 1.0)
-}
 
-class ScalaReflectionSuite extends SparkFunSuite {
+class ScalaReflectionSuite extends SparkFunSuite
   import org.apache.spark.sql.catalyst.ScalaReflection._
 
-  test("primitive data") {
+  test("primitive data")
     val schema = schemaFor[PrimitiveData]
     assert(
         schema === Schema(
@@ -93,9 +91,8 @@ class ScalaReflectionSuite extends SparkFunSuite {
                     StructField(
                         "booleanField", BooleanType, nullable = false))),
             nullable = true))
-  }
 
-  test("nullable data") {
+  test("nullable data")
     val schema = schemaFor[NullableData]
     assert(
         schema === Schema(
@@ -116,9 +113,8 @@ class ScalaReflectionSuite extends SparkFunSuite {
                         "timestampField", TimestampType, nullable = true),
                     StructField("binaryField", BinaryType, nullable = true))),
             nullable = true))
-  }
 
-  test("optional data") {
+  test("optional data")
     val schema = schemaFor[OptionalData]
     assert(
         schema === Schema(
@@ -134,9 +130,8 @@ class ScalaReflectionSuite extends SparkFunSuite {
                                 schemaFor[PrimitiveData].dataType,
                                 nullable = true))),
             nullable = true))
-  }
 
-  test("complex data") {
+  test("complex data")
     val schema = schemaFor[ComplexData]
     assert(
         schema === Schema(
@@ -191,40 +186,35 @@ class ScalaReflectionSuite extends SparkFunSuite {
                                                     containsNull = false),
                                           containsNull = true)))),
             nullable = true))
-  }
 
-  test("generic data") {
+  test("generic data")
     val schema = schemaFor[GenericData[Int]]
     assert(
         schema === Schema(
             StructType(Seq(StructField(
                         "genericField", IntegerType, nullable = false))),
             nullable = true))
-  }
 
-  test("tuple data") {
+  test("tuple data")
     val schema = schemaFor[(Int, String)]
     assert(
         schema === Schema(
             StructType(Seq(StructField("_1", IntegerType, nullable = false),
                            StructField("_2", StringType, nullable = true))),
             nullable = true))
-  }
 
-  test("type-aliased data") {
+  test("type-aliased data")
     assert(schemaFor[GenericData[Int]] == schemaFor[GenericData.IntData])
-  }
 
-  test("convert PrimitiveData to catalyst") {
+  test("convert PrimitiveData to catalyst")
     val data = PrimitiveData(1, 1, 1, 1, 1, 1, true)
     val convertedData = InternalRow(
         1, 1.toLong, 1.toDouble, 1.toFloat, 1.toShort, 1.toByte, true)
     val dataType = schemaFor[PrimitiveData].dataType
     assert(
         CatalystTypeConverters.createToCatalystConverter(dataType)(data) === convertedData)
-  }
 
-  test("convert Option[Product] to catalyst") {
+  test("convert Option[Product] to catalyst")
     val primitiveData = PrimitiveData(1, 1, 1, 1, 1, 1, true)
     val data = OptionalData(Some(2),
                             Some(2),
@@ -245,20 +235,17 @@ class ScalaReflectionSuite extends SparkFunSuite {
                                     InternalRow(1, 1, 1, 1, 1, 1, true))
     assert(
         CatalystTypeConverters.createToCatalystConverter(dataType)(data) === convertedData)
-  }
 
-  test("infer schema from case class with multiple constructors") {
+  test("infer schema from case class with multiple constructors")
     val dataType = schemaFor[MultipleConstructorsData].dataType
-    dataType match {
+    dataType match
       case s: StructType =>
         // Schema should have order: a: Int, b: String, c: Double
         assert(s.fieldNames === Seq("a", "b", "c"))
         assert(s.fields.map(_.dataType) === Seq(
                 IntegerType, StringType, DoubleType))
-    }
-  }
 
-  test("get parameter type from a function object") {
+  test("get parameter type from a function object")
     val primitiveFunc = (i: Int, j: Long) => "x"
     val primitiveTypes = getParameterTypes(primitiveFunc)
     assert(primitiveTypes.forall(_.isPrimitive))
@@ -275,7 +262,6 @@ class ScalaReflectionSuite extends SparkFunSuite {
     assert(anyTypes.forall(!_.isPrimitive))
     assert(
         anyTypes === Seq(classOf[java.lang.Object], classOf[java.lang.Object]))
-  }
 
   private val dataTypeForComplexData = dataTypeFor[ComplexData]
   private val typeOfComplexData = typeOf[ComplexData]
@@ -283,12 +269,12 @@ class ScalaReflectionSuite extends SparkFunSuite {
   Seq(("mirror", () => mirror),
       ("dataTypeFor", () => dataTypeFor[ComplexData]),
       ("constructorFor", () => constructorFor[ComplexData]),
-      ("extractorsFor", {
+      ("extractorsFor",
         val inputObject =
           BoundReference(0, dataTypeForComplexData, nullable = false)
         () =>
           extractorsFor[ComplexData](inputObject)
-      }),
+      ),
       ("getConstructorParameters(cls)",
        () => getConstructorParameters(classOf[ComplexData])),
       ("getConstructorParameterNames",
@@ -299,22 +285,16 @@ class ScalaReflectionSuite extends SparkFunSuite {
       ("getClassNameFromType", () => getClassNameFromType(typeOfComplexData)),
       ("getParameterTypes", () => getParameterTypes(() => ())),
       ("getConstructorParameters(tpe)",
-       () => getClassNameFromType(typeOfComplexData))).foreach {
+       () => getClassNameFromType(typeOfComplexData))).foreach
     case (name, exec) =>
-      test(s"SPARK-13640: thread safety of ${name}") {
-        (0 until 100).foreach { _ =>
+      test(s"SPARK-13640: thread safety of ${name}")
+        (0 until 100).foreach  _ =>
           val loader =
             new URLClassLoader(Array.empty, Utils.getContextOrSparkClassLoader)
-          (0 until 10).par.foreach { _ =>
+          (0 until 10).par.foreach  _ =>
             val cl = Thread.currentThread.getContextClassLoader
-            try {
+            try
               Thread.currentThread.setContextClassLoader(loader)
               exec()
-            } finally {
+            finally
               Thread.currentThread.setContextClassLoader(cl)
-            }
-          }
-        }
-      }
-  }
-}

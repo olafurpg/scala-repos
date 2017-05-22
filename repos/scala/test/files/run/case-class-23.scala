@@ -24,7 +24,7 @@ case class TwentyThree(
     _23: Int
 )
 
-object Test extends App {
+object Test extends App
   val x = new TwentyThree(1,
                           2,
                           3,
@@ -74,4 +74,3 @@ object Test extends App {
                   22,
                   b) = x
   println((a, b))
-}

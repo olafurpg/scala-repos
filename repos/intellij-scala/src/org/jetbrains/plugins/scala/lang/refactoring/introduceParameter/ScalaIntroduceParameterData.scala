@@ -24,7 +24,7 @@ case class ScalaIntroduceParameterData(
     replaceAll: Boolean,
     defaultArg: String,
     functionalArgParams: Option[String] = None)
-    extends IntroduceParameterData {
+    extends IntroduceParameterData
 
   def getParametersToRemove: TIntArrayList = new TIntArrayList()
 
@@ -53,10 +53,7 @@ case class ScalaIntroduceParameterData(
   def getMethodToReplaceIn: PsiMethod = methodLike
 
   def getProject: Project = methodLike.getProject
-}
 
-object isIntroduceParameter {
-  def unapply(scInfo: ScalaChangeInfo): Option[ScalaIntroduceParameterData] = {
+object isIntroduceParameter
+  def unapply(scInfo: ScalaChangeInfo): Option[ScalaIntroduceParameterData] =
     scInfo.introducedParameterData
-  }
-}

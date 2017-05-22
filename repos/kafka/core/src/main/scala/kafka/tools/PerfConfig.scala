@@ -18,7 +18,7 @@ package kafka.tools
 
 import joptsimple.OptionParser
 
-class PerfConfig(args: Array[String]) {
+class PerfConfig(args: Array[String])
   val parser = new OptionParser
   val numMessagesOpt = parser
     .accepts("messages", "REQUIRED: The number of messages to send or consume")
@@ -65,4 +65,3 @@ class PerfConfig(args: Array[String]) {
     .ofType(classOf[java.lang.Integer])
     .defaultsTo(0)
   val helpOpt = parser.accepts("help", "Print usage.")
-}

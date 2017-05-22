@@ -1,7 +1,7 @@
-class Test {
+class Test
   def newComponent(u: Universe): u.Component = ???
 
-  class Universe { self =>
+  class Universe  self =>
     class Component
 
     newComponent(this): this.Component // error, but should be fine since this is a stable reference
@@ -11,5 +11,3 @@ class Test {
 
     val u = this
     newComponent(u): u.Component // ok
-  }
-}

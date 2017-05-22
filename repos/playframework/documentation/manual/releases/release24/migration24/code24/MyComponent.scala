@@ -1,8 +1,8 @@
 /*
  * Copyright (C) 2009-2016 Lightbend Inc. <https://www.lightbend.com>
  */
-package scaladoc {
-  package mycomponent {
+package scaladoc
+  package mycomponent
 
 //#components-decl
     import javax.inject.Inject
@@ -12,13 +12,9 @@ package scaladoc {
     trait MyComponent
 
     class MyComponentImpl @Inject()(lifecycle: ApplicationLifecycle)
-        extends MyComponent {
+        extends MyComponent
       // previous contents of Plugin.onStart
-      lifecycle.addStopHook { () =>
+      lifecycle.addStopHook  () =>
         // previous contents of Plugin.onStop
         Future.successful(())
-      }
-    }
 //#components-decl
-  }
-}

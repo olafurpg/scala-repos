@@ -49,7 +49,7 @@ import org.apache.spark.sql.types._
   *                       the same output data type.
   *
   */
-abstract class Expression extends TreeNode[Expression] {
+abstract class Expression extends TreeNode[Expression]
 
   /**
     * Returns true when an expression is a candidate for static evaluation before the query is
@@ -93,29 +93,25 @@ abstract class Expression extends TreeNode[Expression] {
     * @param ctx a [[CodegenContext]]
     * @return [[ExprCode]]
     */
-  def gen(ctx: CodegenContext): ExprCode = {
+  def gen(ctx: CodegenContext): ExprCode =
     ctx.subExprEliminationExprs
       .get(this)
-      .map { subExprState =>
+      .map  subExprState =>
         // This expression is repeated meaning the code to evaluated has already been added
         // as a function and called in advance. Just use it.
         val code = s"/* ${toCommentSafeString(this.toString)} */"
         ExprCode(code, subExprState.isNull, subExprState.value)
-      }
-      .getOrElse {
+      .getOrElse
         val isNull = ctx.freshName("isNull")
         val value = ctx.freshName("value")
         val ve = ExprCode("", isNull, value)
         ve.code = genCode(ctx, ve)
-        if (ve.code != "") {
+        if (ve.code != "")
           // Add `this` in the comment.
           ve.copy(
               s"/* ${toCommentSafeString(this.toString)} */\n" + ve.code.trim)
-        } else {
+        else
           ve
-        }
-      }
-  }
 
   /**
     * Returns Java source code that can be compiled to evaluate this expression.
@@ -158,10 +154,9 @@ abstract class Expression extends TreeNode[Expression] {
     * `deterministic` expressions where `this.canonicalized == other.canonicalized` will always
     * evaluate to the same result.
     */
-  lazy val canonicalized: Expression = {
+  lazy val canonicalized: Expression =
     val canonicalizedChildred = children.map(_.canonicalized)
     Canonicalize.execute(withNewChildren(canonicalizedChildred))
-  }
 
   /**
     * Returns true when two expressions will always compute the same result, even if they differ
@@ -194,10 +189,9 @@ abstract class Expression extends TreeNode[Expression] {
     */
   def prettyName: String = getClass.getSimpleName.toLowerCase
 
-  private def flatArguments = productIterator.flatMap {
+  private def flatArguments = productIterator.flatMap
     case t: Traversable[_] => t
     case single => single :: Nil
-  }
 
   override def simpleString: String = toString
 
@@ -208,17 +202,15 @@ abstract class Expression extends TreeNode[Expression] {
     * Returns SQL representation of this expression.  For expressions extending [[NonSQLExpression]],
     * this method may return an arbitrary user facing string.
     */
-  def sql: String = {
+  def sql: String =
     val childrenSQL = children.map(_.sql).mkString(", ")
     s"$prettyName($childrenSQL)"
-  }
-}
 
 /**
   * An expression that cannot be evaluated. Some expressions don't live past analysis or optimization
   * time (e.g. Star). This trait is used by those expressions.
   */
-trait Unevaluable extends Expression {
+trait Unevaluable extends Expression
 
   final override def eval(input: InternalRow = null): Any =
     throw new UnsupportedOperationException(
@@ -228,59 +220,52 @@ trait Unevaluable extends Expression {
       ctx: CodegenContext, ev: ExprCode): String =
     throw new UnsupportedOperationException(
         s"Cannot evaluate expression: $this")
-}
 
 /**
   * Expressions that don't have SQL representation should extend this trait.  Examples are
   * `ScalaUDF`, `ScalaUDAF`, and object expressions like `MapObjects` and `Invoke`.
   */
-trait NonSQLExpression extends Expression {
-  override def sql: String = {
-    transform {
+trait NonSQLExpression extends Expression
+  override def sql: String =
+    transform
       case a: Attribute => new PrettyAttribute(a)
-    }.toString
-  }
-}
+    .toString
 
 /**
   * An expression that is nondeterministic.
   */
-trait Nondeterministic extends Expression {
+trait Nondeterministic extends Expression
   final override def deterministic: Boolean = false
   final override def foldable: Boolean = false
 
   private[this] var initialized = false
 
-  final def setInitialValues(): Unit = {
+  final def setInitialValues(): Unit =
     initInternal()
     initialized = true
-  }
 
   protected def initInternal(): Unit
 
-  final override def eval(input: InternalRow = null): Any = {
+  final override def eval(input: InternalRow = null): Any =
     require(
         initialized,
         "nondeterministic expression should be initialized before evaluate")
     evalInternal(input)
-  }
 
   protected def evalInternal(input: InternalRow): Any
-}
 
 /**
   * A leaf expression, i.e. one without any child expressions.
   */
-abstract class LeafExpression extends Expression {
+abstract class LeafExpression extends Expression
 
   def children: Seq[Expression] = Nil
-}
 
 /**
   * An expression with one input and one output. The output is by default evaluated to null
   * if the input is evaluated to null.
   */
-abstract class UnaryExpression extends Expression {
+abstract class UnaryExpression extends Expression
 
   def child: Expression
 
@@ -293,14 +278,12 @@ abstract class UnaryExpression extends Expression {
     * Default behavior of evaluation according to the default nullability of UnaryExpression.
     * If subclass of UnaryExpression override nullable, probably should also override this.
     */
-  override def eval(input: InternalRow): Any = {
+  override def eval(input: InternalRow): Any =
     val value = child.eval(input)
-    if (value == null) {
+    if (value == null)
       null
-    } else {
+    else
       nullSafeEval(value)
-    }
-  }
 
   /**
     * Called by default [[eval]] implementation.  If subclass of UnaryExpression keep the default
@@ -322,14 +305,12 @@ abstract class UnaryExpression extends Expression {
     * @param f function that accepts a variable name and returns Java code to compute the output.
     */
   protected def defineCodeGen(
-      ctx: CodegenContext, ev: ExprCode, f: String => String): String = {
+      ctx: CodegenContext, ev: ExprCode, f: String => String): String =
     nullSafeCodeGen(ctx,
                     ev,
                     eval =>
-                      {
                         s"${ev.value} = ${f(eval)};"
-                    })
-  }
+                    )
 
   /**
     * Called by unary expressions to generate a code block that returns null if its parent returns
@@ -339,11 +320,11 @@ abstract class UnaryExpression extends Expression {
     *          code to compute the output.
     */
   protected def nullSafeCodeGen(
-      ctx: CodegenContext, ev: ExprCode, f: String => String): String = {
+      ctx: CodegenContext, ev: ExprCode, f: String => String): String =
     val childGen = child.gen(ctx)
     val resultCode = f(childGen.value)
 
-    if (nullable) {
+    if (nullable)
       val nullSafeEval =
         ctx.nullSafeExec(child.nullable, childGen.isNull)(resultCode)
       s"""
@@ -352,22 +333,19 @@ abstract class UnaryExpression extends Expression {
         ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
         $nullSafeEval
       """
-    } else {
+    else
       ev.isNull = "false"
       s"""
         ${childGen.code}
         ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
         $resultCode
       """
-    }
-  }
-}
 
 /**
   * An expression with two inputs and one output. The output is by default evaluated to null
   * if any input is evaluated to null.
   */
-abstract class BinaryExpression extends Expression {
+abstract class BinaryExpression extends Expression
 
   def left: Expression
   def right: Expression
@@ -382,19 +360,16 @@ abstract class BinaryExpression extends Expression {
     * Default behavior of evaluation according to the default nullability of BinaryExpression.
     * If subclass of BinaryExpression override nullable, probably should also override this.
     */
-  override def eval(input: InternalRow): Any = {
+  override def eval(input: InternalRow): Any =
     val value1 = left.eval(input)
-    if (value1 == null) {
+    if (value1 == null)
       null
-    } else {
+    else
       val value2 = right.eval(input)
-      if (value2 == null) {
+      if (value2 == null)
         null
-      } else {
+      else
         nullSafeEval(value1, value2)
-      }
-    }
-  }
 
   /**
     * Called by default [[eval]] implementation.  If subclass of BinaryExpression keep the default
@@ -413,14 +388,12 @@ abstract class BinaryExpression extends Expression {
     */
   protected def defineCodeGen(ctx: CodegenContext,
                               ev: ExprCode,
-                              f: (String, String) => String): String = {
+                              f: (String, String) => String): String =
     nullSafeCodeGen(ctx,
                     ev,
                     (eval1, eval2) =>
-                      {
                         s"${ev.value} = ${f(eval1, eval2)};"
-                    })
-  }
+                    )
 
   /**
     * Short hand for generating binary evaluation code.
@@ -432,28 +405,26 @@ abstract class BinaryExpression extends Expression {
     */
   protected def nullSafeCodeGen(ctx: CodegenContext,
                                 ev: ExprCode,
-                                f: (String, String) => String): String = {
+                                f: (String, String) => String): String =
     val leftGen = left.gen(ctx)
     val rightGen = right.gen(ctx)
     val resultCode = f(leftGen.value, rightGen.value)
 
-    if (nullable) {
+    if (nullable)
       val nullSafeEval =
-        leftGen.code + ctx.nullSafeExec(left.nullable, leftGen.isNull) {
-          rightGen.code + ctx.nullSafeExec(right.nullable, rightGen.isNull) {
+        leftGen.code + ctx.nullSafeExec(left.nullable, leftGen.isNull)
+          rightGen.code + ctx.nullSafeExec(right.nullable, rightGen.isNull)
             s"""
               ${ev.isNull} = false; // resultCode could change nullability.
               $resultCode
             """
-          }
-        }
 
       s"""
         boolean ${ev.isNull} = true;
         ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
         $nullSafeEval
       """
-    } else {
+    else
       ev.isNull = "false"
       s"""
         ${leftGen.code}
@@ -461,9 +432,6 @@ abstract class BinaryExpression extends Expression {
         ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
         $resultCode
       """
-    }
-  }
-}
 
 /**
   * A [[BinaryExpression]] that is an operator, with two properties:
@@ -472,7 +440,7 @@ abstract class BinaryExpression extends Expression {
   * 2. Two inputs are expected to the be same type. If the two inputs have different types,
   *    the analyzer will find the tightest common type and do the proper type casting.
   */
-abstract class BinaryOperator extends BinaryExpression with ExpectsInputTypes {
+abstract class BinaryOperator extends BinaryExpression with ExpectsInputTypes
 
   /**
     * Expected input type from both left/right child expressions, similar to the
@@ -488,33 +456,29 @@ abstract class BinaryOperator extends BinaryExpression with ExpectsInputTypes {
 
   override def inputTypes: Seq[AbstractDataType] = Seq(inputType, inputType)
 
-  override def checkInputDataTypes(): TypeCheckResult = {
+  override def checkInputDataTypes(): TypeCheckResult =
     // First check whether left and right have the same type, then check if the type is acceptable.
-    if (left.dataType != right.dataType) {
+    if (left.dataType != right.dataType)
       TypeCheckResult.TypeCheckFailure(s"differing types in '$sql' " +
           s"(${left.dataType.simpleString} and ${right.dataType.simpleString}).")
-    } else if (!inputType.acceptsType(left.dataType)) {
+    else if (!inputType.acceptsType(left.dataType))
       TypeCheckResult.TypeCheckFailure(
           s"'$sql' requires ${inputType.simpleString} type," +
           s" not ${left.dataType.simpleString}")
-    } else {
+    else
       TypeCheckResult.TypeCheckSuccess
-    }
-  }
 
   override def sql: String = s"(${left.sql} $sqlOperator ${right.sql})"
-}
 
-private[sql] object BinaryOperator {
+private[sql] object BinaryOperator
   def unapply(e: BinaryOperator): Option[(Expression, Expression)] =
     Some((e.left, e.right))
-}
 
 /**
   * An expression with three inputs and one output. The output is by default evaluated to null
   * if any input is evaluated to null.
   */
-abstract class TernaryExpression extends Expression {
+abstract class TernaryExpression extends Expression
 
   override def foldable: Boolean = children.forall(_.foldable)
 
@@ -524,20 +488,16 @@ abstract class TernaryExpression extends Expression {
     * Default behavior of evaluation according to the default nullability of TernaryExpression.
     * If subclass of TernaryExpression override nullable, probably should also override this.
     */
-  override def eval(input: InternalRow): Any = {
+  override def eval(input: InternalRow): Any =
     val exprs = children
     val value1 = exprs(0).eval(input)
-    if (value1 != null) {
+    if (value1 != null)
       val value2 = exprs(1).eval(input)
-      if (value2 != null) {
+      if (value2 != null)
         val value3 = exprs(2).eval(input)
-        if (value3 != null) {
+        if (value3 != null)
           return nullSafeEval(value1, value2, value3)
-        }
-      }
-    }
     null
-  }
 
   /**
     * Called by default [[eval]] implementation.  If subclass of TernaryExpression keep the default
@@ -557,14 +517,12 @@ abstract class TernaryExpression extends Expression {
   protected def defineCodeGen(ctx: CodegenContext,
                               ev: ExprCode,
                               f: (String, String,
-                              String) => String): String = {
+                              String) => String): String =
     nullSafeCodeGen(ctx,
                     ev,
                     (eval1, eval2, eval3) =>
-                      {
                         s"${ev.value} = ${f(eval1, eval2, eval3)};"
-                    })
-  }
+                    )
 
   /**
     * Short hand for generating ternary evaluation code.
@@ -577,32 +535,29 @@ abstract class TernaryExpression extends Expression {
   protected def nullSafeCodeGen(ctx: CodegenContext,
                                 ev: ExprCode,
                                 f: (String, String,
-                                String) => String): String = {
+                                String) => String): String =
     val leftGen = children(0).gen(ctx)
     val midGen = children(1).gen(ctx)
     val rightGen = children(2).gen(ctx)
     val resultCode = f(leftGen.value, midGen.value, rightGen.value)
 
-    if (nullable) {
+    if (nullable)
       val nullSafeEval =
-        leftGen.code + ctx.nullSafeExec(children(0).nullable, leftGen.isNull) {
-          midGen.code + ctx.nullSafeExec(children(1).nullable, midGen.isNull) {
+        leftGen.code + ctx.nullSafeExec(children(0).nullable, leftGen.isNull)
+          midGen.code + ctx.nullSafeExec(children(1).nullable, midGen.isNull)
             rightGen.code +
-            ctx.nullSafeExec(children(2).nullable, rightGen.isNull) {
+            ctx.nullSafeExec(children(2).nullable, rightGen.isNull)
               s"""
                 ${ev.isNull} = false; // resultCode could change nullability.
                 $resultCode
               """
-            }
-          }
-        }
 
       s"""
         boolean ${ev.isNull} = true;
         ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
         $nullSafeEval
       """
-    } else {
+    else
       ev.isNull = "false"
       s"""
         ${leftGen.code}
@@ -611,6 +566,3 @@ abstract class TernaryExpression extends Expression {
         ${ctx.javaType(dataType)} ${ev.value} = ${ctx.defaultValue(dataType)};
         $resultCode
       """
-    }
-  }
-}

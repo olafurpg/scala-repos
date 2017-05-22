@@ -28,7 +28,7 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
-private[ml] object TreeTests extends SparkFunSuite {
+private[ml] object TreeTests extends SparkFunSuite
 
   /**
     * Convert the given data to a DataFrame, and set the features and label metadata.
@@ -40,47 +40,43 @@ private[ml] object TreeTests extends SparkFunSuite {
     */
   def setMetadata(data: RDD[LabeledPoint],
                   categoricalFeatures: Map[Int, Int],
-                  numClasses: Int): DataFrame = {
+                  numClasses: Int): DataFrame =
     val sqlContext = SQLContext.getOrCreate(data.sparkContext)
     import sqlContext.implicits._
     val df = data.toDF()
     val numFeatures = data.first().features.size
-    val featuresAttributes = Range(0, numFeatures).map { feature =>
-      if (categoricalFeatures.contains(feature)) {
+    val featuresAttributes = Range(0, numFeatures).map  feature =>
+      if (categoricalFeatures.contains(feature))
         NominalAttribute.defaultAttr
           .withIndex(feature)
           .withNumValues(categoricalFeatures(feature))
-      } else {
+      else
         NumericAttribute.defaultAttr.withIndex(feature)
-      }
-    }.toArray
+    .toArray
     val featuresMetadata =
       new AttributeGroup("features", featuresAttributes).toMetadata()
     val labelAttribute =
-      if (numClasses == 0) {
+      if (numClasses == 0)
         NumericAttribute.defaultAttr.withName("label")
-      } else {
+      else
         NominalAttribute.defaultAttr
           .withName("label")
           .withNumValues(numClasses)
-      }
     val labelMetadata = labelAttribute.toMetadata()
     df.select(df("features").as("features", featuresMetadata),
               df("label").as("label", labelMetadata))
-  }
 
   /** Java-friendly version of [[setMetadata()]] */
   def setMetadata(
       data: JavaRDD[LabeledPoint],
       categoricalFeatures: java.util.Map[java.lang.Integer, java.lang.Integer],
-      numClasses: Int): DataFrame = {
+      numClasses: Int): DataFrame =
     setMetadata(data.rdd,
                 categoricalFeatures
                   .asInstanceOf[java.util.Map[Int, Int]]
                   .asScala
                   .toMap,
                 numClasses)
-  }
 
   /**
     * Check if the two trees are exactly the same.
@@ -88,28 +84,26 @@ private[ml] object TreeTests extends SparkFunSuite {
     *       make mistakes such as creating loops of Nodes.
     * If the trees are not equal, this prints the two trees and throws an exception.
     */
-  def checkEqual(a: DecisionTreeModel, b: DecisionTreeModel): Unit = {
-    try {
+  def checkEqual(a: DecisionTreeModel, b: DecisionTreeModel): Unit =
+    try
       checkEqual(a.rootNode, b.rootNode)
-    } catch {
+    catch
       case ex: Exception =>
         throw new AssertionError(
             "checkEqual failed since the two trees were not identical.\n" +
             "TREE A:\n" + a.toDebugString +
             "\n" + "TREE B:\n" + b.toDebugString + "\n",
             ex)
-    }
-  }
 
   /**
     * Return true iff the two nodes and their descendants are exactly the same.
     * Note: I hesitate to override Node.equals since it could cause problems if users
     *       make mistakes such as creating loops of Nodes.
     */
-  private def checkEqual(a: Node, b: Node): Unit = {
+  private def checkEqual(a: Node, b: Node): Unit =
     assert(a.prediction === b.prediction)
     assert(a.impurity === b.impurity)
-    (a, b) match {
+    (a, b) match
       case (aye: InternalNode, bee: InternalNode) =>
         assert(aye.split === bee.split)
         checkEqual(aye.leftChild, bee.leftChild)
@@ -117,26 +111,21 @@ private[ml] object TreeTests extends SparkFunSuite {
       case (aye: LeafNode, bee: LeafNode) => // do nothing
       case _ =>
         throw new AssertionError("Found mismatched nodes")
-    }
-  }
 
   /**
     * Check if the two models are exactly the same.
     * If the models are not equal, this throws an exception.
     */
-  def checkEqual(a: TreeEnsembleModel, b: TreeEnsembleModel): Unit = {
-    try {
-      a.trees.zip(b.trees).foreach {
+  def checkEqual(a: TreeEnsembleModel, b: TreeEnsembleModel): Unit =
+    try
+      a.trees.zip(b.trees).foreach
         case (treeA, treeB) =>
           TreeTests.checkEqual(treeA, treeB)
-      }
       assert(a.treeWeights === b.treeWeights)
-    } catch {
+    catch
       case ex: Exception =>
         throw new AssertionError(
             "checkEqual failed since the two tree ensembles were not identical")
-    }
-  }
 
   /**
     * Helper method for constructing a tree for testing.
@@ -144,7 +133,7 @@ private[ml] object TreeTests extends SparkFunSuite {
     * @param split  Split for parent node
     * @return  Parent node with children attached
     */
-  def buildParentNode(left: Node, right: Node, split: Split): Node = {
+  def buildParentNode(left: Node, right: Node, split: Split): Node =
     val leftImp = left.impurityStats
     val rightImp = right.impurityStats
     val parentImp = leftImp.copy.add(rightImp)
@@ -156,7 +145,6 @@ private[ml] object TreeTests extends SparkFunSuite {
     val pred = parentImp.predict
     new InternalNode(
         pred, parentImp.calculate(), gain, left, right, split, parentImp)
-  }
 
   /**
     * Create some toy data for testing feature importances.
@@ -190,7 +178,7 @@ private[ml] object TreeTests extends SparkFunSuite {
   )
 
   /** Data for tree read/write tests which produces a non-trivial tree. */
-  def getTreeReadWriteData(sc: SparkContext): RDD[LabeledPoint] = {
+  def getTreeReadWriteData(sc: SparkContext): RDD[LabeledPoint] =
     val arr = Array(LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
                     LabeledPoint(1.0, Vectors.dense(0.0, 1.0)),
                     LabeledPoint(0.0, Vectors.dense(0.0, 0.0)),
@@ -200,5 +188,3 @@ private[ml] object TreeTests extends SparkFunSuite {
                     LabeledPoint(1.0, Vectors.dense(1.0, 0.0)),
                     LabeledPoint(1.0, Vectors.dense(1.0, 2.0)))
     sc.parallelize(arr)
-  }
-}

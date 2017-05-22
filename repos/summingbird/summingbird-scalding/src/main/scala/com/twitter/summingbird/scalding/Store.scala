@@ -25,7 +25,7 @@ import cascading.flow.FlowDef
 
 import org.slf4j.LoggerFactory
 
-trait Store[K, V] extends java.io.Serializable {
+trait Store[K, V] extends java.io.Serializable
 
   /**
     * Accepts deltas along with their timestamps, returns triples of
@@ -47,4 +47,3 @@ trait Store[K, V] extends java.io.Serializable {
                        sg: Semigroup[V],
                        commutativity: Commutativity): PipeFactory[(K1, V)] =
     delta
-}

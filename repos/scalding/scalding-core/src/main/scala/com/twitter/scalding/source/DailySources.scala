@@ -47,24 +47,21 @@ abstract class DailySuffixMostRecentSource(
         dateRange,
         DateOps.UTC)
 
-object DailySuffixTsv {
+object DailySuffixTsv
   def apply(prefix: String, fs: Fields = Fields.ALL)(
       implicit dateRange: DateRange) = new DailySuffixTsv(prefix, fs)
-}
 
 class DailySuffixTsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
-    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme {
+    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme
   override val fields = fs
-}
 
-object DailySuffixTypedTsv {
+object DailySuffixTypedTsv
   def apply[T](prefix: String)(implicit dateRange: DateRange,
                                mf: Manifest[T],
                                conv: TupleConverter[T],
                                tset: TupleSetter[T]) =
     new DailySuffixTypedTsv[T](prefix)
-}
 
 class DailySuffixTypedTsv[T](prefix: String)(
     implicit override val dateRange: DateRange,
@@ -73,27 +70,23 @@ class DailySuffixTypedTsv[T](prefix: String)(
     override val tset: TupleSetter[T])
     extends DailySuffixSource(prefix, dateRange) with TypedDelimited[T]
 
-object DailySuffixCsv {
+object DailySuffixCsv
   def apply(prefix: String, fs: Fields = Fields.ALL)(
       implicit dateRange: DateRange) = new DailySuffixCsv(prefix, fs)
-}
 
 class DailySuffixCsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
-    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme {
+    extends DailySuffixSource(prefix, dateRange) with DelimitedScheme
   override val fields = fs
   override val separator = ","
-}
 
-object DailySuffixMostRecentCsv {
+object DailySuffixMostRecentCsv
   def apply(prefix: String, fs: Fields = Fields.ALL)(
       implicit dateRange: DateRange) = new DailySuffixMostRecentCsv(prefix, fs)
-}
 
 class DailySuffixMostRecentCsv(prefix: String, fs: Fields = Fields.ALL)(
     override implicit val dateRange: DateRange)
     extends DailySuffixMostRecentSource(prefix, dateRange)
-    with DelimitedScheme {
+    with DelimitedScheme
   override val fields = fs
   override val separator = ","
-}

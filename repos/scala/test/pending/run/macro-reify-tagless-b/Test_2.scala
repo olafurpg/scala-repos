@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   //val list: List[String] = Macros.foo("hello world")
   //println(list)
 
@@ -15,4 +15,3 @@ object Test extends App {
       Apply(Select(Ident(definitions.PredefModule), TermName("println")),
             List(Ident(list.name))))
   println(cm.mkToolBox().eval(tree))
-}

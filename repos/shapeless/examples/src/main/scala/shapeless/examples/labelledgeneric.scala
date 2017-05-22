@@ -23,7 +23,7 @@ import shapeless._
   * 
   * @author Miles Sabin
   */
-object LabelledGenericExamples extends App {
+object LabelledGenericExamples extends App
   import record._
   import ops.record._
   import syntax.singleton._
@@ -65,7 +65,6 @@ object LabelledGenericExamples extends App {
   val libro = libroGen.from(libroRec) // static type is Libro
   println(libro)
   println
-}
 
 /**
   * Utility trait intended for inferring a field type from a sample value and unpacking it into its
@@ -73,19 +72,16 @@ object LabelledGenericExamples extends App {
   */
 import labelled.FieldType
 
-trait Field {
+trait Field
   type K
   type V
   type F = FieldType[K, V]
-}
 
-object Field {
-  def apply[K0, V0](sample: FieldType[K0, V0]) = new Field {
+object Field
+  def apply[K0, V0](sample: FieldType[K0, V0]) = new Field
     type K = K0; type V = V0
-  }
-}
 
-object OldWineNewBottles extends App {
+object OldWineNewBottles extends App
   import ops.hlist.Align
   import syntax.singleton._
 
@@ -105,4 +101,3 @@ object OldWineNewBottles extends App {
   val to = toGen.from(align('i ->> 23 :: fromGen.to(from)))
   println(to)
   println
-}

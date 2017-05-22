@@ -1,15 +1,11 @@
-class OuterTest {
-  trait InnerSuper {
+class OuterTest
+  trait InnerSuper
     def iii: Int = 5
-  }
 
-  trait TestTree {
+  trait TestTree
     def fooo = 42
-  }
 
   def f: Int = 4
 
-  trait I extends InnerSuper { is: TestTree =>
+  trait I extends InnerSuper  is: TestTree =>
     this.< ref > iii +this.fooo
-  }
-}

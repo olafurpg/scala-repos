@@ -1,32 +1,25 @@
-object Test extends App {
-  object stubUpdate {
+object Test extends App
+  object stubUpdate
     def update(as: Any*) =
       println(".update" + as.toList.mkString("(", ", ", ")"))
-  }
 
-  object stub {
+  object stub
     def apply = { println(".apply"); stubUpdate }
     def apply(as: Any*) =
       println(".apply" + as.toList.mkString("(", ", ", ")"))
     def update(as: Any*) =
       println(".update" + as.toList.mkString("(", ", ", ")"))
-  }
-  class MyDynamic extends Dynamic {
-    def applyDynamic[T](n: String)(as: Any*) = {
+  class MyDynamic extends Dynamic
+    def applyDynamic[T](n: String)(as: Any*) =
       println(
           "qual.applyDynamic(" + n + ")" + as.toList.mkString("(", ", ", ")")); stub
-    }
-    def applyDynamicNamed[T](n: String)(as: (String, Any)*) = {
+    def applyDynamicNamed[T](n: String)(as: (String, Any)*) =
       println("qual.applyDynamicNamed(" + n + ")" +
           as.toList.mkString("(", ", ", ")")); stub
-    }
-    def selectDynamic[T](n: String) = {
+    def selectDynamic[T](n: String) =
       println("qual.selectDynamic(" + n + ")"); stub
-    }
-    def updateDynamic(n: String)(x: Any): Unit = {
+    def updateDynamic(n: String)(x: Any): Unit =
       println("qual.updateDynamic(" + n + ")(" + x + ")")
-    }
-  }
   val qual = new MyDynamic
   val expr = "expr"
   val a = "a"
@@ -76,4 +69,3 @@ object Test extends App {
   qual[T](arg = a)
   qual(a, arg2 = "a2")
   qual(a) = a2
-}

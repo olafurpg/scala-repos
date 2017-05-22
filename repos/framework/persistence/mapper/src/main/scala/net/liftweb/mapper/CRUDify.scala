@@ -36,7 +36,7 @@ import scala.xml._
   * associated MetaMapper. You have been warned.
   */
 trait CRUDify[KeyType, CrudType <: KeyedMapper[KeyType, CrudType]]
-    extends net.liftweb.proto.Crudify {
+    extends net.liftweb.proto.Crudify
   self: CrudType with KeyedMetaMapper[KeyType, CrudType] =>
 
   /**
@@ -88,7 +88,7 @@ trait CRUDify[KeyType, CrudType <: KeyedMapper[KeyType, CrudType]]
     */
   def calcPrefix = List(_dbTableNameLC)
 
-  protected class MyBridge(in: CrudType) extends CrudBridge {
+  protected class MyBridge(in: CrudType) extends CrudBridge
 
     /**
       * Delete the instance of TheCrudType from the backing store
@@ -110,7 +110,6 @@ trait CRUDify[KeyType, CrudType <: KeyedMapper[KeyType, CrudType]]
       * Return a string representation of the primary key field
       */
     def primaryKeyFieldAsString: String = in.primaryKeyField.toString
-  }
 
   /**
     * This method will instantiate a bridge from TheCrudType so
@@ -121,25 +120,22 @@ trait CRUDify[KeyType, CrudType <: KeyedMapper[KeyType, CrudType]]
     new MyBridge(from)
 
   protected class MyPointer(in: MappedField[_, CrudType])
-      extends FieldPointerBridge {
+      extends FieldPointerBridge
 
     /**
       * What is the display name of this field?
       */
     def displayHtml: NodeSeq = in.displayHtml
-  }
 
   /**
     * Based on a FieldPointer, build a FieldPointerBridge
     */
   protected implicit def buildFieldBridge(
       from: FieldPointerType): FieldPointerBridge = new MyPointer(from)
-}
 
 /**
   * A specialization of CRUDify for LongKeyedMetaMappers.
   */
 trait LongCRUDify[CrudType <: KeyedMapper[Long, CrudType]]
-    extends CRUDify[Long, CrudType] {
+    extends CRUDify[Long, CrudType]
   self: CrudType with KeyedMetaMapper[Long, CrudType] =>
-}

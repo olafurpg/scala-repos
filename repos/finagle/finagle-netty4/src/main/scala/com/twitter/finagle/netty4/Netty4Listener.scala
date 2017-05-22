@@ -26,18 +26,15 @@ import java.util.concurrent.TimeUnit
   */
 private[finagle] case class Netty4ListenerTLSConfig(newEngine: () => Engine)
 
-private[finagle] object Netty4Listener {
+private[finagle] object Netty4Listener
   val TrafficClass: ChannelOption[JInt] =
     ChannelOption.newInstance("trafficClass")
-}
 
-private[netty4] case class PipelineInit(cf: ChannelPipeline => Unit) {
+private[netty4] case class PipelineInit(cf: ChannelPipeline => Unit)
   def mk(): (PipelineInit, Stack.Param[PipelineInit]) =
     (this, PipelineInit.param)
-}
-private[netty4] object PipelineInit {
+private[netty4] object PipelineInit
   implicit val param = Stack.Param(PipelineInit(_ => ()))
-}
 
 /**
   * Constructs a `Listener[In, Out]` given a ``pipelineInit`` function
@@ -53,7 +50,7 @@ private[finagle] case class Netty4Listener[In, Out](
     transportFactory: SocketChannel => Transport[In, Out] = new ChannelTransport[
           In, Out](_)
 )
-    extends Listener[In, Out] {
+    extends Listener[In, Out]
 
   private[this] val PipelineInit(pipelineInit) = params[PipelineInit]
 
@@ -78,7 +75,7 @@ private[finagle] case class Netty4Listener[In, Out](
     */
   def listen(addr: SocketAddress)(
       serveTransport: Transport[In, Out] => Unit): ListeningServer =
-    new ListeningServer with CloseAwaitably {
+    new ListeningServer with CloseAwaitably
 
       val newBridge = () =>
         new ServerBridge(
@@ -110,10 +107,9 @@ private[finagle] case class Netty4Listener[In, Out](
           bootstrap.childOption[JInt](ChannelOption.SO_RCVBUF, _))
       keepAlive.foreach(
           bootstrap.childOption[JBool](ChannelOption.SO_KEEPALIVE, _))
-      params[Listener.TrafficClass].value.foreach { tc =>
+      params[Listener.TrafficClass].value.foreach  tc =>
         bootstrap.option[JInt](Netty4Listener.TrafficClass, tc)
         bootstrap.childOption[JInt](Netty4Listener.TrafficClass, tc)
-      }
 
       val initializer = new Netty4ChannelInitializer(
           pipelineInit, params, newBridge)
@@ -130,7 +126,7 @@ private[finagle] case class Netty4Listener[In, Out](
         *
         * @return a [[Future]] representing the shutdown of the boss threadpool.
         */
-      def closeServer(deadline: Time) = closeAwaitably {
+      def closeServer(deadline: Time) = closeAwaitably
         // note: this ultimately calls close(2) on
         // a non-blocking socket so it should not block.
         ch.close().awaitUninterruptibly()
@@ -143,12 +139,9 @@ private[finagle] case class Netty4Listener[In, Out](
           .shutdownGracefully(0 /* quietPeriod */,
                               deadline.inMillis /* timeout */,
                               TimeUnit.MILLISECONDS)
-          .addListener(new GenericFutureListener[Nothing] {
+          .addListener(new GenericFutureListener[Nothing]
             def operationComplete(future: Nothing): Unit = p.setDone()
-          })
+          )
         p
-      }
 
       def boundAddress: SocketAddress = ch.localAddress()
-    }
-}

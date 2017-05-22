@@ -7,9 +7,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 /**
   * @author ilinum
   */
-class ValueClassAnnotatorTest extends SimpleTestCase {
+class ValueClassAnnotatorTest extends SimpleTestCase
 
-  def testPrimaryConstructorParameters(): Unit = {
+  def testPrimaryConstructorParameters(): Unit =
     val code = """
         |class Foo(private val b: Int) extends AnyVal
         |class Bar(val g: Int) extends AnyVal
@@ -17,13 +17,11 @@ class ValueClassAnnotatorTest extends SimpleTestCase {
         |class Blargle(s: Int) extends AnyVal
         |class Blargle2(z: Int, b: Int) extends AnyVal
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("s: Int", NonPrivateValParameter()) :: Error(
           "Blargle2", OnlyOneParameter()) :: Nil =>
-    }
-  }
 
-  def testSecondaryConstructors(): Unit = {
+  def testSecondaryConstructors(): Unit =
     val code = """
         |class Foo(val b: Int) extends AnyVal {
         |  def this() {
@@ -31,48 +29,40 @@ class ValueClassAnnotatorTest extends SimpleTestCase {
         |  }
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("this", SecondaryConstructor()) :: Nil =>
-    }
-  }
 
-  def testNestedObjects(): Unit = {
+  def testNestedObjects(): Unit =
     val code = """
         |class Foo(val s: Int) extends AnyVal {
         |  trait Inner
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("Inner", InnerObjects()) :: Nil =>
-    }
-  }
 
-  def testRedefineEqualsHashCode(): Unit = {
+  def testRedefineEqualsHashCode(): Unit =
     val code = """
         |class Foo(val a: Int) extends AnyVal {
         |  def equals: Int = 2
         |  def hashCode: Double = 2.0
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("equals", RedefineEqualsHashCode()) :: Error(
           "hashCode", RedefineEqualsHashCode()) :: Nil =>
-    }
-  }
 
-  def testOnlyDefMembers(): Unit = {
+  def testOnlyDefMembers(): Unit =
     val code = """
         |class Foo(val a: Int) extends AnyVal {
         |  def foo: Double = 2.0
         |  val x = 10
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Error("x", ValueClassCanNotHaveFields()) :: Nil =>
-    }
-  }
 
-  def messages(@Language(value = "Scala") code: String): List[Message] = {
+  def messages(@Language(value = "Scala") code: String): List[Message] =
     val file: ScalaFile = code.parse
 
     val annotator = new ScalaAnnotator() {}
@@ -80,7 +70,6 @@ class ValueClassAnnotatorTest extends SimpleTestCase {
 
     file.depthFirst.foreach(annotator.annotate(_, mock))
     mock.errorAnnotations
-  }
 
   val NonPrivateValParameter = ContainsPattern(
       "Value classes can have only one non-private val parameter")
@@ -94,4 +83,3 @@ class ValueClassAnnotatorTest extends SimpleTestCase {
       "Value classes cannot redefine equals and hashCode")
   val ValueClassCanNotHaveFields = ContainsPattern(
       "Field definitions are not allowed in value classes")
-}

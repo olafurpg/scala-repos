@@ -11,7 +11,7 @@ import scala.util.{Failure, Success}
 import akka.http.scaladsl.common._
 import akka.http.impl.util._
 
-trait ParameterDirectives extends ToNameReceptacleEnhancements {
+trait ParameterDirectives extends ToNameReceptacleEnhancements
   import ParameterDirectives._
 
   /**
@@ -51,9 +51,8 @@ trait ParameterDirectives extends ToNameReceptacleEnhancements {
     * As a workaround add an `import ParameterDirectives.ParamMagnet` or use Scala 2.11.x.
     */
   def parameters(pdm: ParamMagnet): pdm.Out = pdm()
-}
 
-object ParameterDirectives extends ParameterDirectives {
+object ParameterDirectives extends ParameterDirectives
   import BasicDirectives._
 
   private val _parameterMap: Directive1[Map[String, String]] = extract(
@@ -65,30 +64,25 @@ object ParameterDirectives extends ParameterDirectives {
   private val _parameterSeq: Directive1[immutable.Seq[(String, String)]] =
     extract(_.request.uri.query().toSeq)
 
-  sealed trait ParamMagnet {
+  sealed trait ParamMagnet
     type Out
     def apply(): Out
-  }
-  object ParamMagnet {
+  object ParamMagnet
     implicit def apply[T](value: T)(
         implicit pdef: ParamDef[T]): ParamMagnet { type Out = pdef.Out } =
-      new ParamMagnet {
+      new ParamMagnet
         type Out = pdef.Out
         def apply() = pdef(value)
-      }
-  }
 
   type ParamDefAux[T, U] = ParamDef[T] { type Out = U }
-  sealed trait ParamDef[T] {
+  sealed trait ParamDef[T]
     type Out
     def apply(value: T): Out
-  }
-  object ParamDef {
+  object ParamDef
     def paramDef[A, B](f: A ⇒ B): ParamDefAux[A, B] =
-      new ParamDef[A] {
+      new ParamDef[A]
         type Out = B
         def apply(value: A) = f(value)
-      }
 
     import akka.http.scaladsl.unmarshalling.{FromStringUnmarshaller ⇒ FSU, _}
     import BasicDirectives._
@@ -100,111 +94,94 @@ object ParameterDirectives extends ParameterDirectives {
         f: A ⇒ Directive1[B]): ParamDefAux[A, Directive1[B]] = paramDef(f)
     private def handleParamResult[T](paramName: String, result: Future[T])(
         implicit ec: ExecutionContext): Directive1[T] =
-      onComplete(result).flatMap {
+      onComplete(result).flatMap
         case Success(x) ⇒ provide(x)
         case Failure(Unmarshaller.NoContentException) ⇒
           reject(MissingQueryParamRejection(paramName))
         case Failure(x) ⇒
           reject(MalformedQueryParamRejection(
                   paramName, x.getMessage.nullAsEmpty, Option(x.getCause)))
-      }
 
     //////////////////// "regular" parameter extraction //////////////////////
 
     private def filter[T](paramName: String, fsou: FSOU[T]): Directive1[T] =
-      extractRequestContext flatMap { ctx ⇒
+      extractRequestContext flatMap  ctx ⇒
         import ctx.executionContext
         import ctx.materializer
         handleParamResult(
             paramName, fsou(ctx.request.uri.query().get(paramName)))
-      }
     implicit def forString(
         implicit fsu: FSU[String]): ParamDefAux[String, Directive1[String]] =
-      extractParameter[String, String] { string ⇒
+      extractParameter[String, String]  string ⇒
         filter(string, fsu)
-      }
     implicit def forSymbol(
         implicit fsu: FSU[String]): ParamDefAux[Symbol, Directive1[String]] =
-      extractParameter[Symbol, String] { symbol ⇒
+      extractParameter[Symbol, String]  symbol ⇒
         filter(symbol.name, fsu)
-      }
     implicit def forNR[T](
         implicit fsu: FSU[T]): ParamDefAux[NameReceptacle[T], Directive1[T]] =
-      extractParameter[NameReceptacle[T], T] { nr ⇒
+      extractParameter[NameReceptacle[T], T]  nr ⇒
         filter(nr.name, fsu)
-      }
     implicit def forNUR[T]: ParamDefAux[
         NameUnmarshallerReceptacle[T], Directive1[T]] =
-      extractParameter[NameUnmarshallerReceptacle[T], T] { nr ⇒
+      extractParameter[NameUnmarshallerReceptacle[T], T]  nr ⇒
         filter(nr.name, nr.um)
-      }
     implicit def forNOR[T](implicit fsou: FSOU[T])
       : ParamDefAux[NameOptionReceptacle[T], Directive1[Option[T]]] =
-      extractParameter[NameOptionReceptacle[T], Option[T]] { nr ⇒
+      extractParameter[NameOptionReceptacle[T], Option[T]]  nr ⇒
         filter[Option[T]](nr.name, fsou)
-      }
     implicit def forNDR[T](implicit fsou: FSOU[T])
       : ParamDefAux[NameDefaultReceptacle[T], Directive1[T]] =
-      extractParameter[NameDefaultReceptacle[T], T] { nr ⇒
+      extractParameter[NameDefaultReceptacle[T], T]  nr ⇒
         filter[T](nr.name, fsou withDefaultValue nr.default)
-      }
     implicit def forNOUR[T]: ParamDefAux[
         NameOptionUnmarshallerReceptacle[T], Directive1[Option[T]]] =
-      extractParameter[NameOptionUnmarshallerReceptacle[T], Option[T]] { nr ⇒
+      extractParameter[NameOptionUnmarshallerReceptacle[T], Option[T]]  nr ⇒
         filter(nr.name, nr.um: FSOU[T])
-      }
     implicit def forNDUR[T]: ParamDefAux[
         NameDefaultUnmarshallerReceptacle[T], Directive1[T]] =
-      extractParameter[NameDefaultUnmarshallerReceptacle[T], T] { nr ⇒
+      extractParameter[NameDefaultUnmarshallerReceptacle[T], T]  nr ⇒
         filter[T](nr.name, (nr.um: FSOU[T]) withDefaultValue nr.default)
-      }
 
     //////////////////// required parameter support ////////////////////
 
     private def requiredFilter[T](
         paramName: String, fsou: FSOU[T], requiredValue: Any): Directive0 =
-      extractRequestContext flatMap { ctx ⇒
+      extractRequestContext flatMap  ctx ⇒
         import ctx.executionContext
         import ctx.materializer
-        onComplete(fsou(ctx.request.uri.query().get(paramName))) flatMap {
+        onComplete(fsou(ctx.request.uri.query().get(paramName))) flatMap
           case Success(value) if value == requiredValue ⇒ pass
           case _ ⇒ reject
-        }
-      }
     implicit def forRVR[T](implicit fsu: FSU[T])
       : ParamDefAux[RequiredValueReceptacle[T], Directive0] =
-      paramDef[RequiredValueReceptacle[T], Directive0] { rvr ⇒
+      paramDef[RequiredValueReceptacle[T], Directive0]  rvr ⇒
         requiredFilter(rvr.name, fsu, rvr.requiredValue)
-      }
     implicit def forRVDR[T]: ParamDefAux[
         RequiredValueUnmarshallerReceptacle[T], Directive0] =
-      paramDef[RequiredValueUnmarshallerReceptacle[T], Directive0] { rvr ⇒
+      paramDef[RequiredValueUnmarshallerReceptacle[T], Directive0]  rvr ⇒
         requiredFilter(rvr.name, rvr.um, rvr.requiredValue)
-      }
 
     //////////////////// repeated parameter support ////////////////////
 
     private def repeatedFilter[T](
         paramName: String, fsu: FSU[T]): Directive1[Iterable[T]] =
-      extractRequestContext flatMap { ctx ⇒
+      extractRequestContext flatMap  ctx ⇒
         import ctx.executionContext
         import ctx.materializer
         handleParamResult(
             paramName,
             Future.sequence(
                 ctx.request.uri.query().getAll(paramName).map(fsu.apply)))
-      }
     implicit def forRepVR[T](implicit fsu: FSU[T])
       : ParamDefAux[RepeatedValueReceptacle[T], Directive1[Iterable[T]]] =
-      extractParameter[RepeatedValueReceptacle[T], Iterable[T]] { rvr ⇒
+      extractParameter[RepeatedValueReceptacle[T], Iterable[T]]  rvr ⇒
         repeatedFilter(rvr.name, fsu)
-      }
     implicit def forRepVDR[T]: ParamDefAux[
         RepeatedValueUnmarshallerReceptacle[T], Directive1[Iterable[T]]] =
-      extractParameter[RepeatedValueUnmarshallerReceptacle[T], Iterable[T]] {
+      extractParameter[RepeatedValueUnmarshallerReceptacle[T], Iterable[T]]
         rvr ⇒
           repeatedFilter(rvr.name, rvr.um)
-      }
 
     //////////////////// tuple support ////////////////////
 
@@ -217,16 +194,12 @@ object ParameterDirectives extends ParameterDirectives {
       : ParamDefAux[T, fold.Out] =
       paramDef[T, fold.Out](fold(BasicDirectives.pass, _))
 
-    object ConvertParamDefAndConcatenate extends BinaryPolyFunc {
-      implicit def from[P, TA, TB](implicit pdef: ParamDef[P] {
+    object ConvertParamDefAndConcatenate extends BinaryPolyFunc
+      implicit def from[P, TA, TB](implicit pdef: ParamDef[P]
         type Out = Directive[TB]
-      }, ev: Join[TA, TB]): BinaryPolyFunc.Case[
-          Directive[TA], P, ConvertParamDefAndConcatenate.type] {
+      , ev: Join[TA, TB]): BinaryPolyFunc.Case[
+          Directive[TA], P, ConvertParamDefAndConcatenate.type]
         type Out = Directive[ev.Out]
-      } =
-        at[Directive[TA], P] { (a, t) ⇒
+      =
+        at[Directive[TA], P]  (a, t) ⇒
           a & pdef(t)
-        }
-    }
-  }
-}

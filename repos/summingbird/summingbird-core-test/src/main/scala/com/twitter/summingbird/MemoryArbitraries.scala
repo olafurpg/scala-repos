@@ -21,7 +21,7 @@ import org.scalacheck.{Gen, Arbitrary}
 
 import scala.collection.mutable.HashMap
 
-object MemoryArbitraries {
+object MemoryArbitraries
   implicit def arbSource1[K : Arbitrary]: Arbitrary[Producer[Memory, K]] =
     Arbitrary(
         Gen
@@ -36,13 +36,11 @@ object MemoryArbitraries {
   implicit def arbService[K : Arbitrary, V : Arbitrary]: Arbitrary[
       MemoryService[K, V]] =
     Arbitrary(
-        for {
+        for
           k <- Gen.listOfN(100, Arbitrary.arbitrary[K])
           v <- Gen.listOfN(100, Arbitrary.arbitrary[V])
-        } yield {
+        yield
           val m = new HashMap[K, V]() with MemoryService[K, V]
           k.zip(v).foreach(p => m.put(p._1, p._2))
           m
-        }
     )
-}

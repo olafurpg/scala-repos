@@ -32,13 +32,13 @@ import org.specs2.mutable._
 
 trait DistinctSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with Specification
-    with ScalaCheck {
+    with ScalaCheck
   import SampleData._
   import trans._
 
-  def testDistinctIdentity = {
+  def testDistinctIdentity =
     implicit val gen = sort(distinct(sample(schema)))
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val table = fromSample(sample)
 
       val distinctTable = table.distinct(Leaf(Source))
@@ -46,10 +46,8 @@ trait DistinctSpec[M[+ _]]
       val result = toJson(distinctTable)
 
       result.copoint must_== sample.data
-    }
-  }
 
-  def testDistinctAcrossSlices = {
+  def testDistinctAcrossSlices =
     val array: JValue = JParser.parseUnsafe("""
       [{
         "value":{
@@ -116,10 +114,10 @@ trait DistinctSpec[M[+ _]]
         "key":[1.0,2.0]
       }]""")
 
-    val data: Stream[JValue] = (array match {
+    val data: Stream[JValue] = (array match
       case JArray(li) => li
       case _ => sys.error("Expected a JArray")
-    }).toStream
+    ).toStream
 
     val sample = SampleData(data)
     val table = fromSample(sample, Some(5))
@@ -127,9 +125,8 @@ trait DistinctSpec[M[+ _]]
     val result = toJson(table.distinct(Leaf(Source)))
 
     result.copoint must_== sample.data.toSeq.distinct
-  }
 
-  def testDistinctAcrossSlices2 = {
+  def testDistinctAcrossSlices2 =
     val array: JValue = JParser.parseUnsafe("""
       [{
         "value":{
@@ -196,10 +193,10 @@ trait DistinctSpec[M[+ _]]
         "key":[8.0,4.0]
       }]""")
 
-    val data: Stream[JValue] = (array match {
+    val data: Stream[JValue] = (array match
       case JArray(li) => li
       case _ => sys.error("Expected JArray")
-    }).toStream
+    ).toStream
 
     val sample = SampleData(data)
     val table = fromSample(sample, Some(5))
@@ -207,25 +204,23 @@ trait DistinctSpec[M[+ _]]
     val result = toJson(table.distinct(Leaf(Source)))
 
     result.copoint must_== sample.data.toSeq.distinct
-  }
 
-  def removeUndefined(jv: JValue): JValue = jv match {
+  def removeUndefined(jv: JValue): JValue = jv match
     case JObject(jfields) =>
       JObject(
-          jfields collect {
+          jfields collect
         case (s, v) if v != JUndefined => JField(s, removeUndefined(v))
-      })
+      )
     case JArray(jvs) =>
       JArray(
-          jvs map { jv =>
+          jvs map  jv =>
         removeUndefined(jv)
-      })
+      )
     case v => v
-  }
 
-  def testDistinct = {
+  def testDistinct =
     implicit val gen = sort(duplicateRows(sample(schema)))
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val table = fromSample(sample)
 
       val distinctTable = table.distinct(Leaf(Source))
@@ -234,6 +229,4 @@ trait DistinctSpec[M[+ _]]
       val expected = sample.data.toSeq.distinct
 
       result must_== expected
-    }.set(minTestsOk -> 2000)
-  }
-}
+    .set(minTestsOk -> 2000)

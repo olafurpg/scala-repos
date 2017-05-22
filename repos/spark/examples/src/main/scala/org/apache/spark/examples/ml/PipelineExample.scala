@@ -28,9 +28,9 @@ import org.apache.spark.sql.Row
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object PipelineExample {
+object PipelineExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("PipelineExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -84,13 +84,10 @@ object PipelineExample {
       .transform(test)
       .select("id", "text", "probability", "prediction")
       .collect()
-      .foreach {
+      .foreach
         case Row(id: Long, text: String, prob: Vector, prediction: Double) =>
           println(s"($id, $text) --> prob=$prob, prediction=$prediction")
-      }
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

@@ -6,7 +6,7 @@ import Arbitrary._
 import scala.reflect.runtime.universe._
 import Flag._
 
-object Test extends Properties("reflection extractors") {
+object Test extends Properties("reflection extractors")
 
   val genFlag = oneOf(
       TRAIT,
@@ -44,26 +44,20 @@ object Test extends Properties("reflection extractors") {
   implicit val arbName: Arbitrary[Name] = Arbitrary(genName)
   implicit val arbMods: Arbitrary[Modifiers] = Arbitrary(genModifiers)
 
-  property("extract term name") = forAll { (name: TermName) =>
+  property("extract term name") = forAll  (name: TermName) =>
     val TermName(s) = name
     s == name.toString
-  }
 
-  property("extract type name") = forAll { (name: TypeName) =>
+  property("extract type name") = forAll  (name: TypeName) =>
     val TypeName(s) = name
     s == name.toString
-  }
 
-  property("extract term or type name") = forAll { (name: Name) =>
-    name match {
+  property("extract term or type name") = forAll  (name: Name) =>
+    name match
       case TermName(s) => s == name.toString
       case TypeName(s) => s == name.toString
-    }
-  }
 
-  property("extract modifiers") = forAll { (mods: Modifiers) =>
+  property("extract modifiers") = forAll  (mods: Modifiers) =>
     val Modifiers(flags, priv, annots) = mods
     flags == mods.flags && priv == mods.privateWithin &&
     annots == mods.annotations
-  }
-}

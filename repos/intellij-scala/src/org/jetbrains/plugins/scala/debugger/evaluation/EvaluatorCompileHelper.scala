@@ -9,18 +9,16 @@ import com.intellij.openapi.module.Module
   * Nikolay.Tropin
   * 2014-11-27
   */
-object EvaluatorCompileHelper {
+object EvaluatorCompileHelper
   val EP_NAME = ExtensionPointName.create[EvaluatorCompileHelper](
       "org.intellij.scala.evaluatorCompileHelper")
 
   def needCompileServer = EP_NAME.getExtensions.isEmpty
-}
 
-trait EvaluatorCompileHelper {
+trait EvaluatorCompileHelper
 
   /**
     * @return Array of all classfiles generated from a given source with corresponding dot-separated full qualified names
     *         (like "java.lang.Object" or "scala.None$")
     */
   def compile(fileText: String, module: Module): Array[(File, String)]
-}

@@ -1,8 +1,7 @@
-trait T {
+trait T
   def a = {}
-}
 
-class C extends T {
+class C extends T
   def b = {}
 
   println( /* line: 2 */ a)
@@ -13,4 +12,3 @@ class C extends T {
 
   println(super. /* line: 2 */ a)
   println(super. /* resolved: false */ b)
-}

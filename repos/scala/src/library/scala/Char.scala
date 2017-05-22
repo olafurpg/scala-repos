@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Char]] => [[scala.runtime.RichChar]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Char private extends AnyVal {
+final abstract class Char private extends AnyVal
   def toByte: Byte
   def toShort: Short
   def toChar: Char
@@ -520,9 +520,8 @@ final abstract class Char private extends AnyVal {
   def %(x: Double): Double
 
   override def getClass(): Class[Char] = null
-}
 
-object Char extends AnyValCompanion {
+object Char extends AnyValCompanion
 
   /** The smallest value representable as a Char. */
   final val MinValue = java.lang.Character.MIN_VALUE
@@ -561,4 +560,3 @@ object Char extends AnyValCompanion {
   implicit def char2long(x: Char): Long = x.toLong
   implicit def char2float(x: Char): Float = x.toFloat
   implicit def char2double(x: Char): Double = x.toDouble
-}

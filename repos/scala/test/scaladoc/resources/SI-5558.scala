@@ -1,6 +1,4 @@
-package test {
+package test
   class T
-  object `package` {
+  object `package`
     def foo = ???
-  }
-}

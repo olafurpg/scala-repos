@@ -22,7 +22,7 @@ package com.precog.common
 import akka.dispatch.Future
 import scalaz._
 
-package object client {
+package object client
 
   /**
     * A client's monad is, essentially, a future. However, there is a
@@ -44,26 +44,23 @@ package object client {
     * to exceptions thrown inside the future.
     */
   implicit def ResponseAsFuture(implicit M: Monad[Future]) =
-    new (Response ~> Future) {
+    new (Response ~> Future)
       def apply[A](res: Response[A]): Future[A] =
-        res.fold({ error =>
+        res.fold( error =>
           throw ClientException(error)
-        }, identity)
-    }
+        , identity)
 
   implicit def FutureAsResponse(implicit M: Monad[Future]) =
-    new (Future ~> Response) {
+    new (Future ~> Response)
       def apply[A](fa: Future[A]): Response[A] =
         EitherT.eitherT(
             fa.map(\/.right)
-              .recoverWith {
+              .recoverWith
             case ClientException(msg) => M.point(\/.left[String, A](msg))
-          })
-    }
+          )
 
   implicit def FutureStreamAsResponseStream(implicit M: Monad[Future]) =
     implicitly[Hoist[StreamT]].hoist(FutureAsResponse)
   implicit def ResponseStreamAsFutureStream(
       implicit MF: Monad[Future], MR: Monad[Response]) =
     implicitly[Hoist[StreamT]].hoist(ResponseAsFuture)
-}

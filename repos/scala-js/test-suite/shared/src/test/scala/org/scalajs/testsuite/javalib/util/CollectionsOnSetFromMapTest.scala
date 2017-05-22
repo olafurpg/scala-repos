@@ -4,12 +4,12 @@ import java.{lang => jl, util => ju}
 
 import scala.reflect.ClassTag
 
-trait CollectionsOnSetFromMapTest extends SetTest {
+trait CollectionsOnSetFromMapTest extends SetTest
 
   def mapFactory: MapFactory
 
-  def factory: SetFactory = {
-    new SetFactory {
+  def factory: SetFactory =
+    new SetFactory
       def implementationName: String =
         s"newSetFromMap(${mapFactory.implementationName})"
 
@@ -18,31 +18,23 @@ trait CollectionsOnSetFromMapTest extends SetTest {
 
       def allowsNullElement: Boolean =
         mapFactory.allowsNullKeys
-    }
-  }
-}
 
 class CollectionsOnSetFromMapOnHashMapTest
-    extends CollectionsOnSetFromMapTest {
+    extends CollectionsOnSetFromMapTest
   def mapFactory: MapFactory = new HashMapFactory
-}
 
 class CollectionsOnSetFromMapOnLinkedHashMapInsertionOrderTest
-    extends CollectionsOnSetFromMapTest {
+    extends CollectionsOnSetFromMapTest
   def mapFactory: MapFactory = new LinkedHashMapFactory(false, None)
-}
 
 class CollectionsOnSetFromMapOnLinkedHashMapInsertionOrderWithLimitTest
-    extends CollectionsOnSetFromMapTest {
+    extends CollectionsOnSetFromMapTest
   def mapFactory: MapFactory = new LinkedHashMapFactory(false, Some(50))
-}
 
 class CollectionsOnSetFromMapOnLinkedHashMapAccessOrderTest
-    extends CollectionsOnSetFromMapTest {
+    extends CollectionsOnSetFromMapTest
   def mapFactory: MapFactory = new LinkedHashMapFactory(true, None)
-}
 
 class CollectionsOnSetFromMapOnLinkedHashMapAccessOrderWithLimitTest
-    extends CollectionsOnSetFromMapTest {
+    extends CollectionsOnSetFromMapTest
   def mapFactory: MapFactory = new LinkedHashMapFactory(true, Some(50))
-}

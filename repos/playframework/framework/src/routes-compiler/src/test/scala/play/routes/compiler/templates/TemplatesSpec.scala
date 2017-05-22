@@ -6,9 +6,9 @@ package play.routes.compiler.templates
 import org.specs2.mutable.Specification
 import play.routes.compiler._
 
-object TemplatesSpec extends Specification {
-  "javascript reverse routes" should {
-    "collect parameter names with index appended" in {
+object TemplatesSpec extends Specification
+  "javascript reverse routes" should
+    "collect parameter names with index appended" in
       val reverseParams: Seq[(Parameter, Int)] = reverseParametersJavascript(
           Seq(route("/foobar",
                     Seq(Parameter("foo", "String", Some("FOO"), None),
@@ -20,9 +20,8 @@ object TemplatesSpec extends Specification {
       reverseParams must haveSize(2)
       reverseParams(0)._1.name must_== ("foo0")
       reverseParams(1)._1.name must_== ("bar1")
-    }
 
-    "constraints uses indexed parameters" in {
+    "constraints uses indexed parameters" in
       val routes =
         Seq(route("/foobar",
                   Seq(Parameter("foo", "String", Some("FOO"), None),
@@ -36,12 +35,8 @@ object TemplatesSpec extends Specification {
 
       constraints.get must startWith("foo0 == ")
       constraints.get must contain("bar1 == ")
-    }
-  }
 
-  def route(staticPath: String, params: Seq[Parameter] = Nil): Route = {
+  def route(staticPath: String, params: Seq[Parameter] = Nil): Route =
     Route(HttpVerb("GET"),
           PathPattern(Seq(StaticPart(staticPath))),
           HandlerCall("pkg", "ctrl", true, "method", Some(params)))
-  }
-}

@@ -15,46 +15,41 @@ import scala.reflect.runtime.universe._
 //
 // another idea: could use custom picklers to obtain picklers for value classes
 
-class Person(val id: Int) {
+class Person(val id: Int)
   private var _name: String = _
   def name = _name
   private var _age: Int = _
   def age = _age
-  def initDetails(data: Map[Int, (String, Int)]) {
+  def initDetails(data: Map[Int, (String, Int)])
     val details = data(id)
     _name = details._1
     _age = details._2
-  }
   override def toString =
     "Person(" + name + ", " + age + ")"
-}
 
-class CombinatorPickleIntoTest extends FunSuite {
-  test("main") {
+class CombinatorPickleIntoTest extends FunSuite
+  test("main")
     val data = Map(1 -> ("Jim", 30), 2 -> ("Bart", 45))
 
     implicit def personp(implicit intp: Pickler[Int]): Pickler[Person] =
-      new Pickler[Person] {
+      new Pickler[Person]
         def tag: FastTypeTag[Person] = implicitly[FastTypeTag[Person]]
-        def pickle(p: Person, builder: PBuilder): Unit = {
+        def pickle(p: Person, builder: PBuilder): Unit =
           // let's say we only want to pickle id, since we can look up name and age based on id
           // then we can make use of a size hint, so that a fixed-size array can be used for pickling
           builder.hintKnownSize(100) // FIXME: if the value is too small, we can get java.lang.ArrayIndexOutOfBoundsException
           builder.beginEntry(p, implicitly[FastTypeTag[Person]])
           builder.putField("id",
                            b =>
-                             {
                                b.hintElidedType(FastTypeTag.Int)
                                intp.pickle(p.id, b)
-                           })
+                           )
           builder.endEntry()
-        }
-      }
 
     implicit def personup(implicit intup: Unpickler[Int]): Unpickler[Person] =
-      new Unpickler[Person] {
+      new Unpickler[Person]
         def tag: FastTypeTag[Person] = implicitly[FastTypeTag[Person]]
-        def unpickle(tag: String, reader: PReader): Any = {
+        def unpickle(tag: String, reader: PReader): Any =
           reader.hintElidedType(FastTypeTag.Int)
           val tag = reader.beginEntry()
           val unpickled = intup.unpickle(tag, reader).asInstanceOf[Int]
@@ -62,8 +57,6 @@ class CombinatorPickleIntoTest extends FunSuite {
           val p = new Person(unpickled)
           p.initDetails(data)
           p
-        }
-      }
 
     val bart = new Person(2)
     val pickle = bart.pickle
@@ -75,5 +68,3 @@ class CombinatorPickleIntoTest extends FunSuite {
 
     val p = pickle.unpickle[Person]
     assert(p.toString === "Person(Bart, 45)")
-  }
-}

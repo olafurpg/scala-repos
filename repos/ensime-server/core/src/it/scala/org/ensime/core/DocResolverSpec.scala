@@ -10,7 +10,7 @@ import org.ensime.util.EnsimeSpec
 
 class DocResolverSpec
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture {
+    with IsolatedTestKitFixture
 
   val original = EnsimeConfigFixture.DocsTestProject
 
@@ -18,9 +18,9 @@ class DocResolverSpec
       implicit c: EnsimeConfig, s: ActorSystem) =
     TestActorRef[DocResolver](DocResolver(java = java)).underlyingActor
 
-  "DocResolver" should "support a wide range of queries" in withEnsimeConfig {
+  "DocResolver" should "support a wide range of queries" in withEnsimeConfig
     implicit c =>
-      withTestKit { tk =>
+      withTestKit  tk =>
         import tk._
 
         val serv = resolver()
@@ -466,12 +466,10 @@ class DocResolverSpec
                        Some("simplifyPath(java.lang.String)"))
             )) shouldBe Some(
             "docs/guava-18.0-javadoc.jar/com/google/common/io/Files.html#simplifyPath(java.lang.String)")
-      }
-  }
 
-  it should "support Java 6 online docs" in withEnsimeConfig {
+  it should "support Java 6 online docs" in withEnsimeConfig
     implicit config =>
-      withTestKit { tk =>
+      withTestKit  tk =>
         import tk._
 
         val serv = resolver(Some("1.6"))
@@ -490,10 +488,8 @@ class DocResolverSpec
             DocSig(DocFqn("java.util", "package"), None)
         ) shouldBe Some(
             "http://docs.oracle.com/javase/6/docs/api/java/util/package-summary.html")
-      }
-  }
-  it should "support Java 8 docs" in withEnsimeConfig { implicit config =>
-    withTestKit { tk =>
+  it should "support Java 8 docs" in withEnsimeConfig  implicit config =>
+    withTestKit  tk =>
       import tk._
 
       val serv = resolver(Some("1.8"))
@@ -520,6 +516,3 @@ class DocResolverSpec
                  Some("binarySearch(int[], int)"))
       ) shouldBe Some(
           "http://docs.oracle.com/javase/8/docs/api/java/util/Arrays.html#binarySearch-int:A-int-")
-    }
-  }
-}

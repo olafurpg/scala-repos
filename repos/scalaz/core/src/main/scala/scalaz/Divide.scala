@@ -6,7 +6,7 @@ package scalaz
   * @see [[https://github.com/ekmett/contravariant/issues/18]]
   */
 ////
-trait Divide[F[_]] extends Contravariant[F] { self =>
+trait Divide[F[_]] extends Contravariant[F]  self =>
   ////
   def divide[A, B, C](fa: F[A], fb: F[B])(f: C => (A, B)): F[C]
 
@@ -20,33 +20,29 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
 
   def divide3[A1, A2, A3, Z](
       a1: F[A1], a2: F[A2], a3: F[A3])(f: Z => (A1, A2, A3)): F[Z] =
-    divide2(tuple2(a1, a2), a3) { z =>
+    divide2(tuple2(a1, a2), a3)  z =>
       val t = f(z)
       ((t._1, t._2), t._3)
-    }
 
   def divide4[A1, A2, A3, A4, Z](a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4])(
       f: Z => (A1, A2, A3, A4)): F[Z] =
-    divide2(tuple2(a1, a2), tuple2(a3, a4)) { z =>
+    divide2(tuple2(a1, a2), tuple2(a3, a4))  z =>
       val t = f(z)
       ((t._1, t._2), (t._3, t._4))
-    }
 
   def divide5[A1, A2, A3, A4, A5, Z](
       a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4], a5: F[A5])(
       f: Z => (A1, A2, A3, A4, A5)): F[Z] =
-    divide3(tuple2(a1, a2), tuple2(a3, a4), a5) { z =>
+    divide3(tuple2(a1, a2), tuple2(a3, a4), a5)  z =>
       val t = f(z)
       ((t._1, t._2), (t._3, t._4), t._5)
-    }
 
   def divide6[A1, A2, A3, A4, A5, A6, Z](
       a1: F[A1], a2: F[A2], a3: F[A3], a4: F[A4], a5: F[A5], a6: F[A6])(
       f: Z => (A1, A2, A3, A4, A5, A6)): F[Z] =
-    divide3(tuple2(a1, a2), tuple2(a3, a4), tuple2(a5, a6)) { z =>
+    divide3(tuple2(a1, a2), tuple2(a3, a4), tuple2(a5, a6))  z =>
       val t = f(z)
       ((t._1, t._2), (t._3, t._4), (t._5, t._6))
-    }
 
   def divide7[A1, A2, A3, A4, A5, A6, A7, Z](
       a1: F[A1],
@@ -56,10 +52,9 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
       a5: F[A5],
       a6: F[A6],
       a7: F[A7])(f: Z => (A1, A2, A3, A4, A5, A6, A7)): F[Z] =
-    divide3(tuple3(a1, a2, a3), tuple3(a4, a5, a6), a7) { z =>
+    divide3(tuple3(a1, a2, a3), tuple3(a4, a5, a6), a7)  z =>
       val t = f(z)
       ((t._1, t._2, t._3), (t._4, t._5, t._6), t._7)
-    }
 
   def divide8[A1, A2, A3, A4, A5, A6, A7, A8, Z](a1: F[A1],
                                                  a2: F[A2],
@@ -70,10 +65,9 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
                                                  a7: F[A7],
                                                  a8: F[A8])(
       f: Z => (A1, A2, A3, A4, A5, A6, A7, A8)): F[Z] =
-    divide3(tuple3(a1, a2, a3), tuple3(a4, a5, a6), tuple2(a7, a8)) { z =>
+    divide3(tuple3(a1, a2, a3), tuple3(a4, a5, a6), tuple2(a7, a8))  z =>
       val t = f(z)
       ((t._1, t._2, t._3), (t._4, t._5, t._6), (t._7, t._8))
-    }
 
   def divide9[A1, A2, A3, A4, A5, A6, A7, A8, A9, Z](a1: F[A1],
                                                      a2: F[A2],
@@ -85,10 +79,9 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
                                                      a8: F[A8],
                                                      a9: F[A9])(
       f: Z => (A1, A2, A3, A4, A5, A6, A7, A8, A9)): F[Z] =
-    divide3(tuple3(a1, a2, a3), tuple3(a4, a5, a6), tuple3(a7, a8, a9)) { z =>
+    divide3(tuple3(a1, a2, a3), tuple3(a4, a5, a6), tuple3(a7, a8, a9))  z =>
       val t = f(z)
       ((t._1, t._2, t._3), (t._4, t._5, t._6), (t._7, t._8, t._9))
-    }
 
   def divide10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, Z](a1: F[A1],
                                                            a2: F[A2],
@@ -101,11 +94,10 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
                                                            a9: F[A9],
                                                            a10: F[A10])(
       f: Z => (A1, A2, A3, A4, A5, A6, A7, A8, A9, A10)): F[Z] =
-    divide4(tuple3(a1, a2, a3), tuple3(a4, a5, a6), tuple3(a7, a8, a9), a10) {
+    divide4(tuple3(a1, a2, a3), tuple3(a4, a5, a6), tuple3(a7, a8, a9), a10)
       z =>
         val t = f(z)
         ((t._1, t._2, t._3), (t._4, t._5, t._6), (t._7, t._8, t._9), t._10)
-    }
 
   def divide11[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, Z](a1: F[A1],
                                                                 a2: F[A2],
@@ -122,13 +114,12 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     divide4(tuple3(a1, a2, a3),
             tuple3(a4, a5, a6),
             tuple3(a7, a8, a9),
-            tuple2(a10, a11)) { z =>
+            tuple2(a10, a11))  z =>
       val t = f(z)
       ((t._1, t._2, t._3),
        (t._4, t._5, t._6),
        (t._7, t._8, t._9),
        (t._10, t._11))
-    }
 
   def divide12[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, Z](
       a1: F[A1],
@@ -147,13 +138,12 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     divide4(tuple3(a1, a2, a3),
             tuple3(a4, a5, a6),
             tuple3(a7, a8, a9),
-            tuple3(a10, a11, a12)) { z =>
+            tuple3(a10, a11, a12))  z =>
       val t = f(z)
       ((t._1, t._2, t._3),
        (t._4, t._5, t._6),
        (t._7, t._8, t._9),
        (t._10, t._11, t._12))
-    }
 
   def divide13[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, Z](
       a1: F[A1],
@@ -173,13 +163,12 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     divide4(tuple4(a1, a2, a3, a4),
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
-            a13) { z =>
+            a13)  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        t._13)
-    }
 
   def divide14[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, Z](
       a1: F[A1],
@@ -200,13 +189,12 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     divide4(tuple4(a1, a2, a3, a4),
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
-            tuple2(a13, a14)) { z =>
+            tuple2(a13, a14))  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        (t._13, t._14))
-    }
 
   def divide15[
       A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11, A12, A13, A14, A15, Z](
@@ -229,13 +217,12 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     divide4(tuple4(a1, a2, a3, a4),
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
-            tuple3(a13, a14, a15)) { z =>
+            tuple3(a13, a14, a15))  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        (t._13, t._14, t._15))
-    }
 
   def divide16[A1,
                A2,
@@ -273,13 +260,12 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
     divide4(tuple4(a1, a2, a3, a4),
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
-            tuple4(a13, a14, a15, a16)) { z =>
+            tuple4(a13, a14, a15, a16))  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        (t._13, t._14, t._15, t._16))
-    }
 
   def divide17[A1,
                A2,
@@ -320,14 +306,13 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
             tuple4(a13, a14, a15, a16),
-            a17) { z =>
+            a17)  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        (t._13, t._14, t._15, t._16),
        t._17)
-    }
 
   def divide18[A1,
                A2,
@@ -371,14 +356,13 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
             tuple4(a13, a14, a15, a16),
-            tuple2(a17, a18)) { z =>
+            tuple2(a17, a18))  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        (t._13, t._14, t._15, t._16),
        (t._17, t._18))
-    }
 
   def divide19[A1,
                A2,
@@ -424,14 +408,13 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
             tuple4(a13, a14, a15, a16),
-            tuple3(a17, a18, a19)) { z =>
+            tuple3(a17, a18, a19))  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        (t._13, t._14, t._15, t._16),
        (t._17, t._18, t._19))
-    }
 
   def divide20[A1,
                A2,
@@ -479,14 +462,13 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
             tuple4(a5, a6, a7, a8),
             tuple4(a9, a10, a11, a12),
             tuple4(a13, a14, a15, a16),
-            tuple4(a17, a18, a19, a20)) { z =>
+            tuple4(a17, a18, a19, a20))  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4),
        (t._5, t._6, t._7, t._8),
        (t._9, t._10, t._11, t._12),
        (t._13, t._14, t._15, t._16),
        (t._17, t._18, t._19, t._20))
-    }
 
   def divide21[A1,
                A2,
@@ -536,14 +518,13 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
             tuple5(a6, a7, a8, a9, a10),
             tuple5(a11, a12, a13, a14, a15),
             tuple5(a16, a17, a18, a19, a20),
-            a21) { z =>
+            a21)  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4, t._5),
        (t._6, t._7, t._8, t._9, t._10),
        (t._11, t._12, t._13, t._14, t._15),
        (t._16, t._17, t._18, t._19, t._20),
        t._21)
-    }
 
   def divide22[A1,
                A2,
@@ -595,14 +576,13 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
             tuple5(a6, a7, a8, a9, a10),
             tuple5(a11, a12, a13, a14, a15),
             tuple5(a16, a17, a18, a19, a20),
-            tuple2(a21, a22)) { z =>
+            tuple2(a21, a22))  z =>
       val t = f(z)
       ((t._1, t._2, t._3, t._4, t._5),
        (t._6, t._7, t._8, t._9, t._10),
        (t._11, t._12, t._13, t._14, t._15),
        (t._16, t._17, t._18, t._19, t._20),
        (t._21, t._22))
-    }
 
   def tuple2[A1, A2](a1: F[A1], a2: F[A2]): F[(A1, A2)] =
     divide2(a1, a2)(identity)
@@ -1703,26 +1683,22 @@ trait Divide[F[_]] extends Contravariant[F] { self =>
              a21,
              a22)(f)
 
-  trait DivideLaw extends ContravariantLaw {
+  trait DivideLaw extends ContravariantLaw
     protected[this] def delta[A]: A => (A, A) = a => (a, a)
     def composition[A](a1: F[A], a2: F[A], a3: F[A])(
-        implicit E: Equal[F[A]]): Boolean = {
+        implicit E: Equal[F[A]]): Boolean =
       val x = divide(divide(a1, a2)(delta[A]), a3)(delta[A])
       val y = divide(a1, divide(a2, a3)(delta[A]))(delta[A])
       E.equal(x, y)
-    }
-  }
 
   def divideLaw = new DivideLaw {}
 
   ////
   val divideSyntax = new scalaz.syntax.DivideSyntax[F] { def F = Divide.this }
-}
 
-object Divide {
+object Divide
   @inline def apply[F[_]](implicit F: Divide[F]): Divide[F] = F
 
   ////
 
   ////
-}

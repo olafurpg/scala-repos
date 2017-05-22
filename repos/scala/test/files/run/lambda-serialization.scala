@@ -1,11 +1,10 @@
 import java.io.{ByteArrayInputStream, ObjectInputStream, ObjectOutputStream, ByteArrayOutputStream}
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     roundTrip
-  }
 
-  def roundTrip(): Unit = {
+  def roundTrip(): Unit =
     val c = new Capture("Capture")
     val lambda = (p: Param) => ("a", p, c)
     val reconstituted1 =
@@ -23,17 +22,14 @@ object Test {
     assert(serializeDeserialize(specializedLambda).apply(42) == 2)
     assert(serializeDeserialize(serializeDeserialize(specializedLambda))
           .apply(42) == 2)
-  }
 
-  def serializeDeserialize[T <: AnyRef](obj: T) = {
+  def serializeDeserialize[T <: AnyRef](obj: T) =
     val buffer = new ByteArrayOutputStream
     val out = new ObjectOutputStream(buffer)
     out.writeObject(obj)
     val in = new ObjectInputStream(
         new ByteArrayInputStream(buffer.toByteArray))
     in.readObject.asInstanceOf[T]
-  }
-}
 
 case class Capture(s: String) extends Serializable
 class Param

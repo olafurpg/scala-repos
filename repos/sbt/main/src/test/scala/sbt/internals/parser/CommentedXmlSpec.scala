@@ -1,6 +1,6 @@
 package sbt.internals.parser
 
-class CommentedXmlSpec extends CheckIfParsedSpec {
+class CommentedXmlSpec extends CheckIfParsedSpec
 
   override protected val files = Seq(
       (s"""|
@@ -74,4 +74,3 @@ class CommentedXmlSpec extends CheckIfParsedSpec {
         |// a/>
       """.stripMargin, "Xml in comment2", false, false)
   )
-}

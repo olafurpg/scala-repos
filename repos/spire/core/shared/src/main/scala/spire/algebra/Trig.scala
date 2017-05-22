@@ -1,7 +1,7 @@
 package spire
 package algebra
 
-trait Trig[@sp(Float, Double) A] extends Any {
+trait Trig[@sp(Float, Double) A] extends Any
   def e: A
   def pi: A
 
@@ -25,8 +25,6 @@ trait Trig[@sp(Float, Double) A] extends Any {
 
   def toRadians(a: A): A
   def toDegrees(a: A): A
-}
 
-object Trig {
+object Trig
   @inline final def apply[A](implicit t: Trig[A]): Trig[A] = t
-}

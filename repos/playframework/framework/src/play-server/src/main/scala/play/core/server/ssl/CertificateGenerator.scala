@@ -17,7 +17,7 @@ import scala.util.Properties.isJavaAtLeast
 /**
   * Used for testing only.  This relies on internal sun.security packages, so cannot be used in OpenJDK.
   */
-object CertificateGenerator {
+object CertificateGenerator
 
   // http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#KeyPairGenerator
   // http://www.keylength.com/en/4/
@@ -29,7 +29,7 @@ object CertificateGenerator {
                             from: Instant = Instant.now,
                             duration: Duration = Days
                                 .days(365)
-                                .toStandardDuration): X509Certificate = {
+                                .toStandardDuration): X509Certificate =
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -43,13 +43,12 @@ object CertificateGenerator {
                         to.toDate,
                         "SHA256withRSA",
                         AlgorithmId.sha256WithRSAEncryption_oid)
-  }
 
   def generateRSAWithSHA1(keySize: Int = 2048,
                           from: Instant = Instant.now,
                           duration: Duration = Days
                               .days(365)
-                              .toStandardDuration): X509Certificate = {
+                              .toStandardDuration): X509Certificate =
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -63,9 +62,8 @@ object CertificateGenerator {
                         to.toDate,
                         "SHA1withRSA",
                         AlgorithmId.sha256WithRSAEncryption_oid)
-  }
 
-  def toPEM(certificate: X509Certificate) = {
+  def toPEM(certificate: X509Certificate) =
     import org.apache.commons.codec.binary.Base64
     val encoder = new Base64(64)
     val certBegin = "-----BEGIN CERTIFICATE-----\n"
@@ -75,13 +73,12 @@ object CertificateGenerator {
     val pemCertPre = new String(encoder.encode(derCert), "UTF-8")
     val pemCert = certBegin + pemCertPre + certEnd
     pemCert
-  }
 
   def generateRSAWithMD5(keySize: Int = 2048,
                          from: Instant = Instant.now,
                          duration: Duration = Days
                              .days(365)
-                             .toStandardDuration): X509Certificate = {
+                             .toStandardDuration): X509Certificate =
     val dn =
       "CN=localhost, OU=Unit Testing, O=Mavericks, L=Moon Base 1, ST=Cyberspace, C=CY"
     val to = from.plus(duration)
@@ -95,7 +92,6 @@ object CertificateGenerator {
                         to.toDate,
                         "MD5WithRSA",
                         AlgorithmId.md5WithRSAEncryption_oid)
-  }
 
   private[play] def generateCertificate(
       dn: String,
@@ -103,7 +99,7 @@ object CertificateGenerator {
       from: Date,
       to: Date,
       algorithm: String,
-      oid: ObjectIdentifier): X509Certificate = {
+      oid: ObjectIdentifier): X509Certificate =
 
     val info: X509CertInfo = new X509CertInfo
     val interval: CertificateValidity = new CertificateValidity(from, to)
@@ -138,5 +134,3 @@ object CertificateGenerator {
     cert = new X509CertImpl(info)
     cert.sign(privkey, algorithm)
     cert
-  }
-}

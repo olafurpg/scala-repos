@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse
   * @param concurrentOption the optional maximum number of concurrent requests.
   */
 class LimitConcurrentRequestsFilter(concurrentOption: Option[Int])
-    extends Filter {
+    extends Filter
 
   val concurrent = concurrentOption.getOrElse(0)
   val semaphore = new Semaphore(concurrent)
@@ -18,11 +18,11 @@ class LimitConcurrentRequestsFilter(concurrentOption: Option[Int])
 
   def withSemaphore(request: ServletRequest,
                     response: ServletResponse,
-                    chain: FilterChain): Unit = {
-    if (semaphore.tryAcquire()) {
+                    chain: FilterChain): Unit =
+    if (semaphore.tryAcquire())
       try { chain.doFilter(request, response) } finally { semaphore.release() }
-    } else {
-      response match {
+    else
+      response match
         //scalastyle:off magic.number
         case r: HttpServletResponse =>
           r.sendError(
@@ -30,22 +30,16 @@ class LimitConcurrentRequestsFilter(concurrentOption: Option[Int])
         case r: ServletResponse =>
           throw new IllegalArgumentException(
               s"Expected http response but got $response")
-      }
-    }
-  }
 
   def pass(request: ServletRequest,
            response: ServletResponse,
-           chain: FilterChain): Unit = {
+           chain: FilterChain): Unit =
     chain.doFilter(request, response)
-  }
 
   override def doFilter(request: ServletRequest,
                         response: ServletResponse,
-                        chain: FilterChain): Unit = {
+                        chain: FilterChain): Unit =
     filterFunction(request, response, chain)
-  }
 
   override def init(filterConfig: FilterConfig): Unit = {}
   override def destroy(): Unit = {}
-}

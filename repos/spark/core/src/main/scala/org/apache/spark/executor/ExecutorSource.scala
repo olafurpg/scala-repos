@@ -28,7 +28,7 @@ import org.apache.spark.metrics.source.Source
 
 private[spark] class ExecutorSource(
     threadPool: ThreadPoolExecutor, executorId: String)
-    extends Source {
+    extends Source
 
   private def fileStats(scheme: String): Option[FileSystem.Statistics] =
     FileSystem.getAllStatistics.asScala.find(s => s.getScheme.equals(scheme))
@@ -36,13 +36,12 @@ private[spark] class ExecutorSource(
   private def registerFileSystemStat[T](scheme: String,
                                         name: String,
                                         f: FileSystem.Statistics => T,
-                                        defaultValue: T) = {
+                                        defaultValue: T) =
     metricRegistry.register(
-        MetricRegistry.name("filesystem", scheme, name), new Gauge[T] {
+        MetricRegistry.name("filesystem", scheme, name), new Gauge[T]
       override def getValue: T =
         fileStats(scheme).map(f).getOrElse(defaultValue)
-    })
-  }
+    )
 
   override val metricRegistry = new MetricRegistry()
 
@@ -50,35 +49,33 @@ private[spark] class ExecutorSource(
 
   // Gauge for executor thread pool's actively executing task counts
   metricRegistry.register(
-      MetricRegistry.name("threadpool", "activeTasks"), new Gauge[Int] {
+      MetricRegistry.name("threadpool", "activeTasks"), new Gauge[Int]
     override def getValue: Int = threadPool.getActiveCount()
-  })
+  )
 
   // Gauge for executor thread pool's approximate total number of tasks that have been completed
   metricRegistry.register(
-      MetricRegistry.name("threadpool", "completeTasks"), new Gauge[Long] {
+      MetricRegistry.name("threadpool", "completeTasks"), new Gauge[Long]
     override def getValue: Long = threadPool.getCompletedTaskCount()
-  })
+  )
 
   // Gauge for executor thread pool's current number of threads
   metricRegistry.register(
-      MetricRegistry.name("threadpool", "currentPool_size"), new Gauge[Int] {
+      MetricRegistry.name("threadpool", "currentPool_size"), new Gauge[Int]
     override def getValue: Int = threadPool.getPoolSize()
-  })
+  )
 
   // Gauge got executor thread pool's largest number of threads that have ever simultaneously
   // been in th pool
   metricRegistry.register(
-      MetricRegistry.name("threadpool", "maxPool_size"), new Gauge[Int] {
+      MetricRegistry.name("threadpool", "maxPool_size"), new Gauge[Int]
     override def getValue: Int = threadPool.getMaximumPoolSize()
-  })
+  )
 
   // Gauge for file system stats of this executor
-  for (scheme <- Array("hdfs", "file")) {
+  for (scheme <- Array("hdfs", "file"))
     registerFileSystemStat(scheme, "read_bytes", _.getBytesRead(), 0L)
     registerFileSystemStat(scheme, "write_bytes", _.getBytesWritten(), 0L)
     registerFileSystemStat(scheme, "read_ops", _.getReadOps(), 0)
     registerFileSystemStat(scheme, "largeRead_ops", _.getLargeReadOps(), 0)
     registerFileSystemStat(scheme, "write_ops", _.getWriteOps(), 0)
-  }
-}

@@ -26,7 +26,7 @@ import common._
   * @param loadFactor the Load Factor to construct our LRU with.
   */
 class LRU[KeyType, ValueType](size: Int, loadFactor: Box[Float])
-    extends net.liftweb.common.LRUMap[KeyType, ValueType](size, loadFactor) {
+    extends net.liftweb.common.LRUMap[KeyType, ValueType](size, loadFactor)
   // Alternate constructor that gives you no load factor.
   def this(size: Int) = this(size, Empty)
 
@@ -51,4 +51,3 @@ class LRU[KeyType, ValueType](size: Int, loadFactor: Box[Float])
   def contains(k: KeyType): Boolean = map.containsKey(k)
   def keys: List[KeyType] = map.keySet().toList.map(_.asInstanceOf[KeyType])
  */
-}

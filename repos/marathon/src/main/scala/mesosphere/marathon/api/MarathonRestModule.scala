@@ -14,14 +14,13 @@ import mesosphere.marathon.io.SSLContextUtil
   * Setup the dependencies for the LeaderProxyFilter.
   * This filter will redirect to the master if running in HA mode.
   */
-class LeaderProxyFilterModule extends ServletModule {
-  protected override def configureServlets() {
+class LeaderProxyFilterModule extends ServletModule
+  protected override def configureServlets()
     bind(classOf[RequestForwarder])
       .to(classOf[JavaUrlConnectionRequestForwarder])
       .in(Scopes.SINGLETON)
     bind(classOf[LeaderProxyFilter]).asEagerSingleton()
     filter("/*").through(classOf[LeaderProxyFilter])
-  }
 
   /**
     * Configure ssl using the key store so that our own certificate is accepted
@@ -30,15 +29,13 @@ class LeaderProxyFilterModule extends ServletModule {
   @Provides
   @Singleton
   @Named(JavaUrlConnectionRequestForwarder.NAMED_LEADER_PROXY_SSL_CONTEXT)
-  def provideSSLContext(httpConf: HttpConf): SSLContext = {
+  def provideSSLContext(httpConf: HttpConf): SSLContext =
     SSLContextUtil.createSSLContext(
         httpConf.sslKeystorePath.get, httpConf.sslKeystorePassword.get)
-  }
-}
 
-class MarathonRestModule extends BaseRestModule {
+class MarathonRestModule extends BaseRestModule
 
-  protected override def configureServlets() {
+  protected override def configureServlets()
     // Map some exceptions to HTTP responses
     bind(classOf[MarathonExceptionMapper]).asEagerSingleton()
 
@@ -76,12 +73,9 @@ class MarathonRestModule extends BaseRestModule {
     serve("/public/*").`with`(classOf[PublicServlet])
 
     super.configureServlets()
-  }
 
   @Provides
   @Singleton
   def provideRequestsLimiter(
-      conf: MarathonConf): LimitConcurrentRequestsFilter = {
+      conf: MarathonConf): LimitConcurrentRequestsFilter =
     new LimitConcurrentRequestsFilter(conf.maxConcurrentHttpConnections.get)
-  }
-}

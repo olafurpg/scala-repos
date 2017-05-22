@@ -14,7 +14,7 @@ final class Paginator[A] private[paginator](val currentPage: Int,
                                               * Returns the number of results.
                                               * The result is cached.
                                               */
-                                            val nbResults: Int) {
+                                            val nbResults: Int)
 
   /**
     * Returns the previous page.
@@ -55,9 +55,8 @@ final class Paginator[A] private[paginator](val currentPage: Int,
 
   def mapResults[B](f: A => B): Paginator[B] =
     withCurrentPageResults(currentPageResults map f)
-}
 
-object Paginator {
+object Paginator
 
   def apply[A](adapter: AdapterLike[A],
                currentPage: Int = 1,
@@ -71,8 +70,7 @@ object Paginator {
     else if (maxPerPage <= 0) !!("Current page must be greater than zero")
     else
       Success(
-          for {
+          for
         results ← adapter.slice((currentPage - 1) * maxPerPage, maxPerPage)
         nbResults ← adapter.nbResults
-      } yield new Paginator(currentPage, maxPerPage, results, nbResults))
-}
+      yield new Paginator(currentPage, maxPerPage, results, nbResults))

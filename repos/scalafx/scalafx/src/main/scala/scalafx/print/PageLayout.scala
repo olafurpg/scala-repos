@@ -35,7 +35,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion Object for [[scalafx.print.PageLayout]].
   */
-object PageLayout {
+object PageLayout
 
   /**
     * Converts a ScalaFX PageLayout to its JavaFX counterpart.
@@ -45,7 +45,6 @@ object PageLayout {
     */
   implicit def sfxPageLayout2jfx(pl: PageLayout): jfxp.PageLayout =
     if (pl != null) pl.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PageLayout.html JavaFX PageLayout]].
@@ -56,7 +55,7 @@ object PageLayout {
   * @since 8.0
   */
 final class PageLayout(override val delegate: jfxp.PageLayout)
-    extends SFXDelegate[jfxp.PageLayout] {
+    extends SFXDelegate[jfxp.PageLayout]
 
   /**
     * The bottom margin of the page layout in points.
@@ -99,4 +98,3 @@ final class PageLayout(override val delegate: jfxp.PageLayout)
     * The top margin of the page layout in points.
     */
   def topMargin: Double = delegate.getTopMargin
-}

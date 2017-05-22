@@ -17,16 +17,15 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   * @author Alefas
   * @since  17/09/15
   */
-class SimulacrumInjection extends SyntheticMembersInjector {
-  override def needsCompanionObject(source: ScTypeDefinition): Boolean = {
+class SimulacrumInjection extends SyntheticMembersInjector
+  override def needsCompanionObject(source: ScTypeDefinition): Boolean =
     source.findAnnotationNoAliases("simulacrum.typeclass") != null &&
     source.typeParameters.length == 1
-  }
 
-  override def injectFunctions(source: ScTypeDefinition): Seq[String] = {
-    source match {
+  override def injectFunctions(source: ScTypeDefinition): Seq[String] =
+    source match
       case obj: ScObject =>
-        obj.fakeCompanionClassOrCompanionClass match {
+        obj.fakeCompanionClassOrCompanionClass match
           case clazz: ScTypeDefinition
               if clazz.findAnnotationNoAliases("simulacrum.typeclass") != null &&
               clazz.typeParameters.length == 1 =>
@@ -36,15 +35,12 @@ class SimulacrumInjection extends SyntheticMembersInjector {
               ScalaPsiUtil.typeParamString(clazz.typeParameters.head)
             Seq(s"def apply[$tpText](implicit instance: ${clazz.name}[$tpName]): ${clazz.name}[$tpName] = instance")
           case _ => Seq.empty
-        }
       case _ => Seq.empty
-    }
-  }
 
-  override def injectInners(source: ScTypeDefinition): Seq[String] = {
-    source match {
+  override def injectInners(source: ScTypeDefinition): Seq[String] =
+    source match
       case obj: ScObject =>
-        ScalaPsiUtil.getCompanionModule(obj) match {
+        ScalaPsiUtil.getCompanionModule(obj) match
           case Some(clazz)
               if clazz.findAnnotationNoAliases("simulacrum.typeclass") != null &&
               clazz.typeParameters.length == 1 =>
@@ -57,8 +53,8 @@ class SimulacrumInjection extends SyntheticMembersInjector {
             val additionalWithComma = tpAdditional.map(", " + _).getOrElse("")
             val additionalWithBracket =
               tpAdditional.map("[" + _ + "]").getOrElse("")
-            def isProperTpt(tp: ScType): Option[Option[ScTypeParameterType]] = {
-              tp match {
+            def isProperTpt(tp: ScType): Option[Option[ScTypeParameterType]] =
+              tp match
                 case ScTypeParameterType(_, _, _, _, param)
                     if param == clazzTypeParam =>
                   Some(None)
@@ -67,51 +63,42 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                     Seq(p: ScTypeParameterType)) if param == clazzTypeParam =>
                   Some(Some(p))
                 case _ => None
-              }
-            }
-            val ops = clazz.functions.flatMap {
+            val ops = clazz.functions.flatMap
               case f: ScFunction =>
                 f.parameters.headOption
                   .flatMap(_.getType(TypingContext.empty).toOption)
-                  .flatMap(tp => isProperTpt(tp)) match {
+                  .flatMap(tp => isProperTpt(tp)) match
                   case Some(funTypeParamToLift) =>
                     val annotation = f.findAnnotationNoAliases("simulacrum.op")
-                    val names = annotation match {
+                    val names = annotation match
                       case a: ScAnnotation =>
-                        a.constructor.args match {
+                        a.constructor.args match
                           case Some(args) =>
-                            args.exprs.headOption match {
+                            args.exprs.headOption match
                               case Some(l: ScLiteral) if l.isString =>
-                                l.getValue match {
+                                l.getValue match
                                   case value: String =>
-                                    args.exprs match {
+                                    args.exprs match
                                       case Seq(_, second) =>
-                                        second match {
+                                        second match
                                           case l: ScLiteral
                                               if l.getValue == true =>
                                             Seq(value, f.name)
                                           case a: ScAssignStmt =>
-                                            a.getRExpression match {
+                                            a.getRExpression match
                                               case Some(l: ScLiteral)
                                                   if l.getValue == true =>
                                                 Seq(value, f.name)
                                               case _ => Seq(value)
-                                            }
                                           case _ => Seq(value)
-                                        }
                                       case _ => Seq(value)
-                                    }
                                   case _ => Seq(f.name)
-                                }
                               case _ => Seq(f.name)
-                            }
                           case None => Seq(f.name)
-                        }
                       case _ => Seq(f.name)
-                    }
-                    names.map {
+                    names.map
                       case name =>
-                        val substOpt = funTypeParamToLift match {
+                        val substOpt = funTypeParamToLift match
                           case Some(typeParam) if tpAdditional.nonEmpty =>
                             val subst = ScSubstitutor.empty.bindT(
                                 (typeParam.name, typeParam.getId),
@@ -123,24 +110,20 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                                 ))
                             Some(subst)
                           case _ => None
-                        }
-                        def paramText(p: ScParameter): String = {
-                          substOpt match {
+                        def paramText(p: ScParameter): String =
+                          substOpt match
                             case Some(subst) =>
                               p.name + " : " + subst
                                 .subst(p.getType(TypingContext.empty).getOrAny)
                                 .canonicalText
                             case _ => p.getText
-                          }
-                        }
-                        def clauseText(p: ScParameterClause): String = {
+                        def clauseText(p: ScParameterClause): String =
                           p.parameters
                             .map(paramText)
                             .mkString("(" +
                                       (if (p.isImplicit) "implicit " else ""),
                                       ", ",
                                       ")")
-                        }
                         val typeParamClasue =
                           f.typeParametersClause.map(_.getText).getOrElse("")
                         val headParams =
@@ -152,16 +135,13 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                         val restClauses = f.paramClauses.clauses.tail
                           .map(clauseText)
                           .mkString("")
-                        val rt = substOpt match {
+                        val rt = substOpt match
                           case Some(subst) =>
                             subst.subst(f.returnType.getOrAny).canonicalText
                           case None => f.returnType.getOrAny.canonicalText
-                        }
                         s"def $name$typeParamClasue$restHeadClause$restClauses: $rt = ???"
-                    }
                   case _ => Seq.empty
-                }
-            }.mkString("\n  ")
+            .mkString("\n  ")
             val className = clazz.name
             val OpsTrait = s"""trait Ops[$tpText$additionalWithComma] {
                                |  def typeClassInstance: $className[$tpName]
@@ -175,30 +155,27 @@ class SimulacrumInjection extends SyntheticMembersInjector {
 
             val AllOpsSupers = clazz.extendsBlock.templateParents.toSeq
               .flatMap(parents =>
-                    parents.typeElements.flatMap {
+                    parents.typeElements.flatMap
                   case te =>
-                    te.getType(TypingContext.empty) match {
+                    te.getType(TypingContext.empty) match
                       case Success(ScParameterizedType(classType, Seq(tp)), _)
                           if isProperTpt(tp).isDefined =>
-                        def fromType: Seq[String] = {
+                        def fromType: Seq[String] =
                           ScType.extractClass(
-                              classType, Some(clazz.getProject)) match {
+                              classType, Some(clazz.getProject)) match
                             case Some(cl: ScTypeDefinition) =>
                               Seq(s" with ${cl.qualifiedName}.AllOps[$tpName$additionalWithComma]")
                             case _ => Seq.empty
-                          }
-                        }
                         //in most cases we have to resolve exactly the same reference
                         //but with .AllOps it will go into companion object
-                        (for {
+                        (for
                           ScParameterizedTypeElement(pte, _) <- Option(te)
                           ScSimpleTypeElement(Some(ref)) <- Option(pte)
-                        } yield
+                        yield
                           Seq(s" with ${ref.getText}.AllOps[$tpName$additionalWithComma]"))
                           .getOrElse(fromType)
                       case _ => Seq.empty
-                    }
-              })
+              )
               .mkString
 
             val AllOpsTrait =
@@ -212,8 +189,4 @@ class SimulacrumInjection extends SyntheticMembersInjector {
                """.stripMargin
             Seq(OpsTrait, ToOpsTrait, AllOpsTrait, opsObject)
           case _ => Seq.empty
-        }
       case _ => Seq.empty
-    }
-  }
-}

@@ -48,7 +48,7 @@ import annotation.JSBracketAccess
   *  methods could be used as keys in the dictionary.
   */
 @native
-sealed trait Dictionary[A] extends Any {
+sealed trait Dictionary[A] extends Any
 
   /** Reads a field of this object by its name.
     *
@@ -70,17 +70,14 @@ sealed trait Dictionary[A] extends Any {
     *  isn't configurable.
     */
   def delete(key: String): Unit = sys.error("stub")
-}
 
 /** Factory for [[Dictionary]] instances. */
-object Dictionary {
+object Dictionary
 
   /** Returns a new empty dictionary */
   def empty[A]: Dictionary[A] = (new Object).asInstanceOf[Dictionary[A]]
 
-  def apply[A](properties: (String, A)*): Dictionary[A] = {
+  def apply[A](properties: (String, A)*): Dictionary[A] =
     val result = empty[A]
     for ((key, value) <- properties) result(key) = value
     result
-  }
-}

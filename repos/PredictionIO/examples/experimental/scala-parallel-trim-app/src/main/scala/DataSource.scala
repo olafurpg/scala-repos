@@ -24,11 +24,11 @@ case class DataSourceParams(
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val eventsDb = Storage.getPEvents()
     logger.info(s"TrimApp: $dsp")
 
@@ -42,9 +42,8 @@ class DataSource(val dsp: DataSourceParams)
     val dstEvents: Array[Event] =
       eventsDb.find(appId = dsp.dstAppId)(sc).take(1)
 
-    if (dstEvents.size > 0) {
+    if (dstEvents.size > 0)
       throw new Exception(s"DstApp ${dsp.dstAppId} is not empty. Quitting.")
-    }
 
     logger.info(s"Write events to appId ${dsp.dstAppId}")
     eventsDb.write(srcEvents, dsp.dstAppId)(sc)
@@ -52,11 +51,8 @@ class DataSource(val dsp: DataSourceParams)
     logger.info(s"Finish writing events to appId ${dsp.dstAppId}")
 
     new TrainingData()
-  }
-}
 
 class TrainingData(
     )
-    extends Serializable {
+    extends Serializable
   override def toString = ""
-}

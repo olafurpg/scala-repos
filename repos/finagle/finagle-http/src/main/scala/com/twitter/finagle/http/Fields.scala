@@ -1,6 +1,6 @@
 package com.twitter.finagle.http
 
-object Fields {
+object Fields
   val Accept = "Accept"
   val AcceptCharset = "Accept-Charset"
   val AcceptEncoding = "Accept-Encoding"
@@ -75,4 +75,3 @@ object Fields {
   val WebsocketOrigin = "WebSocket-Origin"
   val WebsocketProtocol = "WebSocket-Protocol"
   val WwwAuthenticate = "Www-Authenticate"
-}

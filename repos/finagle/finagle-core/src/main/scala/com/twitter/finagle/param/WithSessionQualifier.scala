@@ -7,7 +7,7 @@ import com.twitter.finagle.Stack
   *
   * @see [[SessionQualificationParams]]
   */
-trait WithSessionQualifier[A <: Stack.Parameterized[A]] {
+trait WithSessionQualifier[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -18,4 +18,3 @@ trait WithSessionQualifier[A <: Stack.Parameterized[A]] {
     */
   val withSessionQualifier: SessionQualificationParams[A] =
     new SessionQualificationParams(self)
-}

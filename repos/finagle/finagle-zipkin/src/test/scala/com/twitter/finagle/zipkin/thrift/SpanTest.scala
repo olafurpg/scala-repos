@@ -7,8 +7,8 @@ import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
-class SpanTest extends FunSuite {
-  test("Span should serialize properly") {
+class SpanTest extends FunSuite
+  test("Span should serialize properly")
     val ann = ZipkinAnnotation(Time.now, "value", Endpoint(1, 2))
     val traceId = TraceId(Some(SpanId(123)),
                           Some(SpanId(123)),
@@ -36,5 +36,3 @@ class SpanTest extends FunSuite {
     assert(tspan.isSetTrace_id)
     assert(tspan.getTrace_id == 123)
     assert(tspan.isDebug)
-  }
-}

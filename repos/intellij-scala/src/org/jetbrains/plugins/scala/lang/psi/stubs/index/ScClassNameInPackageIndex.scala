@@ -9,15 +9,13 @@ import org.jetbrains.plugins.scala.finder.ScalaSourceFilterScope
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScClassNameInPackageIndex extends StringStubIndexExtension[PsiClass] {
+class ScClassNameInPackageIndex extends StringStubIndexExtension[PsiClass]
   override def get(fqn: String,
                    project: Project,
                    scope: GlobalSearchScope): java.util.Collection[PsiClass] =
     super.get(fqn, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey = ScClassNameInPackageIndex.KEY
-}
 
-object ScClassNameInPackageIndex {
+object ScClassNameInPackageIndex
   val KEY = ScalaIndexKeys.CLASS_NAME_IN_PACKAGE_KEY
-}

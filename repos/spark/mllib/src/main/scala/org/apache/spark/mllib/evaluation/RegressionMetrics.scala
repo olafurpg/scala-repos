@@ -34,7 +34,7 @@ import org.apache.spark.sql.DataFrame
 @Since("1.2.0")
 class RegressionMetrics @Since("2.0.0")(
     predictionAndObservations: RDD[(Double, Double)], throughOrigin: Boolean)
-    extends Logging {
+    extends Logging
 
   @Since("1.2.0")
   def this(predictionAndObservations: RDD[(Double, Double)]) =
@@ -53,27 +53,25 @@ class RegressionMetrics @Since("2.0.0")(
   /**
     * Use MultivariateOnlineSummarizer to calculate summary statistics of observations and errors.
     */
-  private lazy val summary: MultivariateStatisticalSummary = {
+  private lazy val summary: MultivariateStatisticalSummary =
     val summary: MultivariateStatisticalSummary =
-      predictionAndObservations.map {
+      predictionAndObservations.map
         case (prediction, observation) =>
           Vectors.dense(observation, observation - prediction)
-      }.aggregate(new MultivariateOnlineSummarizer())(
+      .aggregate(new MultivariateOnlineSummarizer())(
           (summary, v) => summary.add(v),
           (sum1, sum2) => sum1.merge(sum2)
       )
     summary
-  }
 
   private lazy val SSy = math.pow(summary.normL2(0), 2)
   private lazy val SSerr = math.pow(summary.normL2(1), 2)
   private lazy val SStot = summary.variance(0) * (summary.count - 1)
-  private lazy val SSreg = {
+  private lazy val SSreg =
     val yMean = summary.mean(0)
-    predictionAndObservations.map {
+    predictionAndObservations.map
       case (prediction, _) => math.pow(prediction - yMean, 2)
-    }.sum()
-  }
+    .sum()
 
   /**
     * Returns the variance explained by regression.
@@ -81,36 +79,32 @@ class RegressionMetrics @Since("2.0.0")(
     * @see [[https://en.wikipedia.org/wiki/Fraction_of_variance_unexplained]]
     */
   @Since("1.2.0")
-  def explainedVariance: Double = {
+  def explainedVariance: Double =
     SSreg / summary.count
-  }
 
   /**
     * Returns the mean absolute error, which is a risk function corresponding to the
     * expected value of the absolute error loss or l1-norm loss.
     */
   @Since("1.2.0")
-  def meanAbsoluteError: Double = {
+  def meanAbsoluteError: Double =
     summary.normL1(1) / summary.count
-  }
 
   /**
     * Returns the mean squared error, which is a risk function corresponding to the
     * expected value of the squared error loss or quadratic loss.
     */
   @Since("1.2.0")
-  def meanSquaredError: Double = {
+  def meanSquaredError: Double =
     SSerr / summary.count
-  }
 
   /**
     * Returns the root mean squared error, which is defined as the square root of
     * the mean squared error.
     */
   @Since("1.2.0")
-  def rootMeanSquaredError: Double = {
+  def rootMeanSquaredError: Double =
     math.sqrt(this.meanSquaredError)
-  }
 
   /**
     * Returns R^2^, the unadjusted coefficient of determination.
@@ -120,11 +114,8 @@ class RegressionMetrics @Since("2.0.0")(
     * [[https://online.stat.psu.edu/~ajw13/stat501/SpecialTopics/Reg_thru_origin.pdf]]
     */
   @Since("1.2.0")
-  def r2: Double = {
-    if (throughOrigin) {
+  def r2: Double =
+    if (throughOrigin)
       1 - SSerr / SSy
-    } else {
+    else
       1 - SSerr / SStot
-    }
-  }
-}

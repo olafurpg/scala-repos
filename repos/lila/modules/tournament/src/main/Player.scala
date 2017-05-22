@@ -14,7 +14,7 @@ private[tournament] case class Player(_id: String, // random
                                       ratingDiff: Int = 0,
                                       magicScore: Int = 0,
                                       fire: Boolean = false,
-                                      performance: Option[Int] = none) {
+                                      performance: Option[Int] = none)
 
   def id = _id
 
@@ -31,9 +31,8 @@ private[tournament] case class Player(_id: String, // random
 
   def recomputeMagicScore =
     copy(magicScore = (score * 1000000) + (ratingDiff * 1000) + rating)
-}
 
-private[tournament] object Player {
+private[tournament] object Player
 
   private[tournament] def make(
       tourId: String, user: User, perfLens: Perfs => Perf): Player =
@@ -44,4 +43,3 @@ private[tournament] object Player {
         rating = perfLens(user.perfs).intRating,
         provisional = perfLens(user.perfs).provisional
     ).recomputeMagicScore
-}

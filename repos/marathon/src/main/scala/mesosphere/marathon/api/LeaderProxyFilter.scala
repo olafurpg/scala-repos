@@ -23,7 +23,7 @@ import scala.util.control.NonFatal
 /**
   * Info about leadership.
   */
-trait LeaderInfo {
+trait LeaderInfo
 
   /** Query whether we are elected as the current leader. This should be cheap. */
   def elected: Boolean
@@ -48,7 +48,6 @@ trait LeaderInfo {
     *        the leader is currently unknown
     */
   def currentLeaderHostPort(): Option[String]
-}
 
 /**
   * Servlet filter that proxies requests to the leader if we are not the leader.
@@ -58,7 +57,7 @@ class LeaderProxyFilter @Inject()(
     leaderInfo: LeaderInfo,
     @Named(ModuleNames.HOST_PORT) myHostPort: String,
     forwarder: RequestForwarder)
-    extends Filter {
+    extends Filter
   //scalastyle:off null
 
   import LeaderProxyFilter._
@@ -68,126 +67,110 @@ class LeaderProxyFilter @Inject()(
   private[this] val scheme = if (httpConf.disableHttp()) "https" else "http"
 
   private[this] def buildUrl(
-      leaderData: String, request: HttpServletRequest): URL = {
+      leaderData: String, request: HttpServletRequest): URL =
     buildUrl(leaderData, request.getRequestURI, Option(request.getQueryString))
-  }
 
   private[this] def buildUrl(leaderData: String,
                              requestURI: String = "",
-                             queryStringOpt: Option[String] = None): URL = {
-    queryStringOpt match {
+                             queryStringOpt: Option[String] = None): URL =
+    queryStringOpt match
       case Some(queryString) =>
         new URL(s"$scheme://$leaderData$requestURI?$queryString")
       case None => new URL(s"$scheme://$leaderData$requestURI")
-    }
-  }
 
   //TODO: fix style issue and enable this scalastyle check
   //scalastyle:off cyclomatic.complexity method.length
   @tailrec
   final def doFilter(rawRequest: ServletRequest,
                      rawResponse: ServletResponse,
-                     chain: FilterChain) {
+                     chain: FilterChain)
 
-    def waitForConsistentLeadership(response: HttpServletResponse): Boolean = {
+    def waitForConsistentLeadership(response: HttpServletResponse): Boolean =
       //scalastyle:off magic.number
       var retries = 10
       //scalastyle:on
 
-      do {
+      do
         val weAreLeader = leaderInfo.elected
         val currentLeaderData = leaderInfo.currentLeaderHostPort()
 
-        if (weAreLeader || currentLeaderData.exists(_ != myHostPort)) {
+        if (weAreLeader || currentLeaderData.exists(_ != myHostPort))
           log.info("Leadership info is consistent again!")
           //scalastyle:off return
           return true
           //scalastyle:on
-        }
 
-        if (retries >= 0) {
+        if (retries >= 0)
           log.info(
               s"Waiting for consistent leadership state. Are we leader?: $weAreLeader, leader: $currentLeaderData")
           sleep()
-        } else {
+        else
           log.error(
               s"inconsistent leadership state, refusing request for ourselves at $myHostPort. " +
               s"Are we leader?: $weAreLeader, leader: $currentLeaderData")
-        }
 
         retries -= 1
-      } while (retries >= 0)
+      while (retries >= 0)
 
       false
-    }
 
-    (rawRequest, rawResponse) match {
+    (rawRequest, rawResponse) match
       case (request: HttpServletRequest, response: HttpServletResponse) =>
         lazy val leaderDataOpt = leaderInfo.currentLeaderHostPort()
 
-        if (leaderInfo.elected) {
+        if (leaderInfo.elected)
           response.addHeader(LeaderProxyFilter.HEADER_MARATHON_LEADER,
                              buildUrl(myHostPort).toString)
           chain.doFilter(request, response)
-        } else if (leaderDataOpt.forall(_ == myHostPort)) {
+        else if (leaderDataOpt.forall(_ == myHostPort))
           // either not leader or ourselves
           log.info(
               s"Do not proxy to myself. Waiting for consistent leadership state. " +
               s"Are we leader?: false, leader: $leaderDataOpt")
-          if (waitForConsistentLeadership(response)) {
+          if (waitForConsistentLeadership(response))
             doFilter(rawRequest, rawResponse, chain)
-          } else {
+          else
             response.sendError(HttpStatus.SC_SERVICE_UNAVAILABLE,
                                ERROR_STATUS_NO_CURRENT_LEADER)
-          }
-        } else {
-          try {
+        else
+          try
             val url: URL = buildUrl(leaderDataOpt.get, request)
             forwarder.forward(url, request, response)
-          } catch {
+          catch
             case NonFatal(e) =>
               throw new RuntimeException("while proxying", e)
-          }
-        }
       case _ =>
         throw new IllegalArgumentException(
             s"expected http request/response but got $rawRequest/$rawResponse")
-    }
-  }
 
-  protected def sleep(): Unit = {
+  protected def sleep(): Unit =
     //scalastyle:off magic.number
     Thread.sleep(250)
     //scalastyle:on
-  }
 
-  def destroy() {
+  def destroy()
     //NO-OP
-  }
-}
 
-object LeaderProxyFilter {
+object LeaderProxyFilter
   private val log = LoggerFactory.getLogger(getClass.getName)
 
   val HEADER_MARATHON_LEADER: String = "X-Marathon-Leader"
   val ERROR_STATUS_NO_CURRENT_LEADER: String =
     "Could not determine the current leader"
-}
 
 /**
   * Forwards a HttpServletRequest to an URL.
   */
-trait RequestForwarder {
+trait RequestForwarder
   def forward(url: URL,
               request: HttpServletRequest,
               response: HttpServletResponse): Unit
-}
 
 class JavaUrlConnectionRequestForwarder @Inject()(
     @Named(JavaUrlConnectionRequestForwarder.NAMED_LEADER_PROXY_SSL_CONTEXT) sslContext: SSLContext,
     leaderProxyConf: LeaderProxyConf,
     @Named(ModuleNames.HOST_PORT) myHostPort: String)
-    extends RequestForwarder {
+    extends RequestForwarder
 
   import JavaUrlConnectionRequestForwarder._
 
@@ -195,16 +178,15 @@ class JavaUrlConnectionRequestForwarder @Inject()(
 
   override def forward(url: URL,
                        request: HttpServletRequest,
-                       response: HttpServletResponse): Unit = {
+                       response: HttpServletResponse): Unit =
 
-    def hasProxyLoop: Boolean = {
+    def hasProxyLoop: Boolean =
       val viaOpt =
         Option(request.getHeaders(HEADER_VIA)).map(_.asScala.toVector)
       viaOpt.exists(_.contains(viaValue))
-    }
 
-    def createAndConfigureConnection(url: URL): HttpURLConnection = {
-      val connection = url.openConnection() match {
+    def createAndConfigureConnection(url: URL): HttpURLConnection =
+      val connection = url.openConnection() match
         case httpsConnection: HttpsURLConnection =>
           httpsConnection.setSSLSocketFactory(sslContext.getSocketFactory)
           httpsConnection
@@ -213,7 +195,6 @@ class JavaUrlConnectionRequestForwarder @Inject()(
         case connection: URLConnection =>
           throw new scala.RuntimeException(
               s"unexpected connection type: ${connection.getClass}")
-      }
 
       connection.setConnectTimeout(
           leaderProxyConf.leaderProxyConnectionTimeout())
@@ -221,14 +202,13 @@ class JavaUrlConnectionRequestForwarder @Inject()(
       connection.setInstanceFollowRedirects(false)
 
       connection
-    }
 
     def copyRequestHeadersToConnection(leaderConnection: HttpURLConnection,
-                                       request: HttpServletRequest): Unit = {
+                                       request: HttpServletRequest): Unit =
       // getHeaderNames() and getHeaders() are known to return null, see:
       //http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html#getHeaders(java.lang.String)
       val names = Option(request.getHeaderNames).map(_.asScala).getOrElse(Nil)
-      for {
+      for
         name <- names
                // Reverse proxies commonly filter these headers: connection, host.
                //
@@ -241,10 +221,9 @@ class JavaUrlConnectionRequestForwarder @Inject()(
                !name.equalsIgnoreCase("connection")
         headerValues <- Option(request.getHeaders(name))
         headerValue <- headerValues.asScala
-      } {
+      
         log.debug(s"addRequestProperty $name: $headerValue")
         leaderConnection.addRequestProperty(name, headerValue)
-      }
 
       leaderConnection.addRequestProperty(HEADER_VIA, viaValue)
       val forwardedFor = Seq(
@@ -252,105 +231,83 @@ class JavaUrlConnectionRequestForwarder @Inject()(
           Option(request.getRemoteAddr)
       ).flatten.mkString(",")
       leaderConnection.addRequestProperty(HEADER_FORWARDED_FOR, forwardedFor)
-    }
 
     def copyRequestBodyToConnection(leaderConnection: HttpURLConnection,
-                                    request: HttpServletRequest): Unit = {
-      request.getMethod match {
+                                    request: HttpServletRequest): Unit =
+      request.getMethod match
         case "GET" | "HEAD" | "DELETE" =>
           leaderConnection.setDoOutput(false)
         case _ =>
           leaderConnection.setDoOutput(true)
 
-          IO.using(request.getInputStream) { requestInput =>
-            IO.using(leaderConnection.getOutputStream) { proxyOutputStream =>
+          IO.using(request.getInputStream)  requestInput =>
+            IO.using(leaderConnection.getOutputStream)  proxyOutputStream =>
               copy(request.getInputStream, proxyOutputStream)
-            }
-          }
-      }
-    }
 
     def copyRequestToConnection(leaderConnection: HttpURLConnection,
-                                request: HttpServletRequest): Unit = {
+                                request: HttpServletRequest): Unit =
       leaderConnection.setRequestMethod(request.getMethod)
       copyRequestHeadersToConnection(leaderConnection, request)
       copyRequestBodyToConnection(leaderConnection, request)
-    }
 
     def copyConnectionResponse(leaderConnection: HttpURLConnection,
-                               response: HttpServletResponse): Unit = {
+                               response: HttpServletResponse): Unit =
       val status = leaderConnection.getResponseCode
       response.setStatus(status)
 
       val fields = leaderConnection.getHeaderFields
       // getHeaderNames() and getHeaders() are known to return null
-      if (fields != null) {
-        for ((name, values) <- fields.asScala) {
-          if (name != null && values != null) {
-            for (value <- values.asScala) {
+      if (fields != null)
+        for ((name, values) <- fields.asScala)
+          if (name != null && values != null)
+            for (value <- values.asScala)
               response.addHeader(name, value)
-            }
-          }
-        }
-      }
       response.addHeader(HEADER_VIA, viaValue)
 
-      IO.using(response.getOutputStream) { output =>
-        try {
-          IO.using(leaderConnection.getInputStream) { connectionInput =>
+      IO.using(response.getOutputStream)  output =>
+        try
+          IO.using(leaderConnection.getInputStream)  connectionInput =>
             copy(connectionInput, output)
-          }
-        } catch {
+        catch
           case e: IOException =>
             log.debug("got exception response, this is maybe an error code", e)
-            IO.using(leaderConnection.getErrorStream) { connectionError =>
+            IO.using(leaderConnection.getErrorStream)  connectionError =>
               copy(connectionError, output)
-            }
-        }
-      }
-    }
 
     log.info(s"Proxying request to ${request.getMethod} $url from $myHostPort")
 
-    try {
-      if (hasProxyLoop) {
+    try
+      if (hasProxyLoop)
         log.error("Prevent proxy cycle, rejecting request")
         response.sendError(HttpStatus.SC_BAD_GATEWAY, ERROR_STATUS_LOOP)
-      } else {
+      else
         val leaderConnection: HttpURLConnection = createAndConfigureConnection(
             url)
-        try {
+        try
           copyRequestToConnection(leaderConnection, request)
           copyConnectionResponse(leaderConnection, response)
-        } catch {
+        catch
           case connException: ConnectException =>
             response.sendError(
                 HttpStatus.SC_BAD_GATEWAY, ERROR_STATUS_CONNECTION_REFUSED)
-        } finally {
+        finally
           Try(leaderConnection.getInputStream.close())
           Try(leaderConnection.getErrorStream.close())
-        }
-      }
-    } finally {
+    finally
       Try(request.getInputStream.close())
       Try(response.getOutputStream.close())
-    }
-  }
 
-  def copy(nullableIn: InputStream, nullableOut: OutputStream): Unit = {
-    try {
-      for {
+  def copy(nullableIn: InputStream, nullableOut: OutputStream): Unit =
+    try
+      for
         in <- Option(nullableIn)
         out <- Option(nullableOut)
-      } IO.transfer(in, out, close = false)
-    } catch {
+      IO.transfer(in, out, close = false)
+    catch
       case e: UnknownServiceException =>
         log.warn("unexpected unknown service exception", e)
-    }
-  }
-}
 
-object JavaUrlConnectionRequestForwarder {
+object JavaUrlConnectionRequestForwarder
   private val log = LoggerFactory.getLogger(getClass)
 
   /** Header for proxy loop detection. Simply "Via" is ignored by the URL connection.*/
@@ -361,4 +318,3 @@ object JavaUrlConnectionRequestForwarder {
   val HEADER_FORWARDED_FOR: String = "X-Forwarded-For"
   final val NAMED_LEADER_PROXY_SSL_CONTEXT =
     "JavaUrlConnectionRequestForwarder.SSLContext"
-}

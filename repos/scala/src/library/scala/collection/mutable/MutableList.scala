@@ -31,7 +31,7 @@ class MutableList[A]
     extends AbstractSeq[A]
     with LinearSeq[A] with LinearSeqOptimized[A, MutableList[A]]
     with GenericTraversableTemplate[A, MutableList]
-    with Builder[A, MutableList[A]] with Serializable {
+    with Builder[A, MutableList[A]] with Serializable
   override def companion: GenericCompanion[MutableList] = MutableList
 
   override protected[this] def newBuilder: Builder[A, MutableList[A]] =
@@ -54,18 +54,16 @@ class MutableList[A]
 
   /** Returns the rest of this list
     */
-  override def tail: MutableList[A] = {
+  override def tail: MutableList[A] =
     val tl = new MutableList[A]
     tailImpl(tl)
     tl
-  }
 
-  protected final def tailImpl(tl: MutableList[A]) {
+  protected final def tailImpl(tl: MutableList[A])
     require(nonEmpty, "tail of empty list")
     tl.first0 = first0.tail
     tl.len = len - 1
     tl.last0 = if (tl.len == 0) tl.first0 else last0
-  }
 
   /** Prepends a single element to this list. This operation takes constant
     *  time.
@@ -93,46 +91,40 @@ class MutableList[A]
     */
   def get(n: Int): Option[A] = first0.get(n)
 
-  protected def prependElem(elem: A) {
+  protected def prependElem(elem: A)
     first0 = new LinkedList[A](elem, first0)
     if (len == 0) last0 = first0
     len = len + 1
-  }
 
-  protected def appendElem(elem: A) {
-    if (len == 0) {
+  protected def appendElem(elem: A)
+    if (len == 0)
       prependElem(elem)
-    } else {
+    else
       last0.next = new LinkedList[A]
       last0 = last0.next
       last0.elem = elem
       last0.next = new LinkedList[A] // for performance, use sentinel `object` instead?
       len = len + 1
-    }
-  }
 
   /** Returns an iterator over up to `length` elements of this list.
     */
   override def iterator: Iterator[A] =
     if (isEmpty) Iterator.empty
     else
-      new AbstractIterator[A] {
+      new AbstractIterator[A]
         var elems = first0
         var count = len
         def hasNext = count > 0 && elems.nonEmpty
-        def next() = {
+        def next() =
           if (!hasNext) throw new NoSuchElementException
           count = count - 1
           val e = elems.elem
           elems = if (count == 0) null else elems.next
           e
-        }
-      }
 
-  override def last = {
+  override def last =
     if (isEmpty) throw new NoSuchElementException("MutableList.empty.last")
     last0.elem
-  }
 
   /** Returns an instance of [[scala.List]] containing the same
     *  sequence of elements.
@@ -150,24 +142,20 @@ class MutableList[A]
     */
   def +=(elem: A): this.type = { appendElem(elem); this }
 
-  def clear() {
+  def clear()
     first0 = new LinkedList[A]
     last0 = first0
     len = 0
-  }
 
   def result = this
 
-  override def clone(): MutableList[A] = {
+  override def clone(): MutableList[A] =
     val bf = newBuilder
     bf ++= seq
     bf.result()
-  }
-}
 
-object MutableList extends SeqFactory[MutableList] {
+object MutableList extends SeqFactory[MutableList]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, MutableList[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
   def newBuilder[A]: Builder[A, MutableList[A]] = new MutableList[A]
-}

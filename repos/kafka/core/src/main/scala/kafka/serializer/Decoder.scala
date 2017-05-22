@@ -23,29 +23,25 @@ import kafka.utils.VerifiableProperties
   * An implementation is required to provide a constructor that
   * takes a VerifiableProperties instance.
   */
-trait Decoder[T] {
+trait Decoder[T]
   def fromBytes(bytes: Array[Byte]): T
-}
 
 /**
   * The default implementation does nothing, just returns the same byte array it takes in.
   */
 class DefaultDecoder(props: VerifiableProperties = null)
-    extends Decoder[Array[Byte]] {
+    extends Decoder[Array[Byte]]
   def fromBytes(bytes: Array[Byte]): Array[Byte] = bytes
-}
 
 /**
   * The string decoder translates bytes into strings. It uses UTF8 by default but takes
   * an optional property serializer.encoding to control this.
   */
 class StringDecoder(props: VerifiableProperties = null)
-    extends Decoder[String] {
+    extends Decoder[String]
   val encoding =
     if (props == null) "UTF8"
     else props.getString("serializer.encoding", "UTF8")
 
-  def fromBytes(bytes: Array[Byte]): String = {
+  def fromBytes(bytes: Array[Byte]): String =
     new String(bytes, encoding)
-  }
-}

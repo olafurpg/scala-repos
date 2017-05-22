@@ -10,23 +10,23 @@ import profile.simple._
 import Implicits._
 import StringUtil._
 
-trait CommitsService {
+trait CommitsService
 
   def getCommitComments(owner: String,
                         repository: String,
                         commitId: String,
                         includePullRequest: Boolean)(implicit s: Session) =
-    CommitComments filter { t =>
+    CommitComments filter  t =>
       t.byCommit(owner, repository, commitId) &&
       (t.issueId.isEmpty || includePullRequest)
-    } list
+    list
 
   def getCommitComment(owner: String, repository: String, commentId: String)(
       implicit s: Session) =
     if (commentId forall (_.isDigit))
-      CommitComments filter { t =>
+      CommitComments filter  t =>
         t.byPrimaryKey(commentId.toInt) && t.byRepository(owner, repository)
-      } firstOption
+      firstOption
     else None
 
   def createCommitComment(owner: String,
@@ -54,11 +54,9 @@ trait CommitsService {
       implicit s: Session) =
     CommitComments
       .filter(_.byPrimaryKey(commentId))
-      .map { t =>
+      .map  t =>
         t.content -> t.updatedDate
-      }
       .update(content, currentDate)
 
   def deleteCommitComment(commentId: Int)(implicit s: Session) =
     CommitComments filter (_.byPrimaryKey(commentId)) delete
-}

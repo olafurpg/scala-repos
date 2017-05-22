@@ -21,7 +21,7 @@ import akka.persistence.SaveSnapshotSuccess
   * INTERNAL API
   * @see [[ClusterSharding$ ClusterSharding extension]]
   */
-private[akka] object Shard {
+private[akka] object Shard
   import ShardRegion.EntityId
 
   /**
@@ -38,9 +38,8 @@ private[akka] object Shard {
   /**
     * A case class which represents a state change for the Shard
     */
-  sealed trait StateChange extends ClusterShardingSerializable {
+  sealed trait StateChange extends ClusterShardingSerializable
     val entityId: EntityId
-  }
 
   /**
     * A query for information about the shard
@@ -72,9 +71,8 @@ private[akka] object Shard {
   @SerialVersionUID(1L)
   final case class ShardStats(shardId: ShardRegion.ShardId, entityCount: Int)
 
-  object State {
+  object State
     val Empty = State()
-  }
 
   /**
     * Persistent state of the Shard.
@@ -94,7 +92,7 @@ private[akka] object Shard {
             settings: ClusterShardingSettings,
             extractEntityId: ShardRegion.ExtractEntityId,
             extractShardId: ShardRegion.ExtractShardId,
-            handOffStopMessage: Any): Props = {
+            handOffStopMessage: Any): Props =
     if (settings.rememberEntities)
       Props(
           new PersistentShard(typeName,
@@ -113,8 +111,6 @@ private[akka] object Shard {
                     extractEntityId,
                     extractShardId,
                     handOffStopMessage)).withDeploy(Deploy.local)
-  }
-}
 
 /**
   * INTERNAL API
@@ -131,7 +127,7 @@ private[akka] class Shard(typeName: String,
                           extractEntityId: ShardRegion.ExtractEntityId,
                           extractShardId: ShardRegion.ExtractShardId,
                           handOffStopMessage: Any)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   import ShardRegion.{handOffStopperProps, EntityId, Msg, Passivate, ShardInitialized}
   import ShardCoordinator.Internal.{HandOff, ShardStopped}
@@ -153,16 +149,15 @@ private[akka] class Shard(typeName: String,
 
   def initialized(): Unit = context.parent ! ShardInitialized(shardId)
 
-  def totalBufferSize = messageBuffers.foldLeft(0) { (sum, entity) ⇒
+  def totalBufferSize = messageBuffers.foldLeft(0)  (sum, entity) ⇒
     sum + entity._2.size
-  }
 
   def processChange[A](event: A)(handler: A ⇒ Unit): Unit =
     handler(event)
 
   def receive = receiveCommand
 
-  def receiveCommand: Receive = {
+  def receiveCommand: Receive =
     case Terminated(ref) ⇒ receiveTerminated(ref)
     case msg: CoordinatorMessage ⇒ receiveCoordinatorMessage(msg)
     case msg: ShardCommand ⇒ receiveShardCommand(msg)
@@ -170,39 +165,34 @@ private[akka] class Shard(typeName: String,
     case msg: ShardQuery ⇒ receiveShardQuery(msg)
     case msg if extractEntityId.isDefinedAt(msg) ⇒
       deliverMessage(msg, sender())
-  }
 
-  def receiveShardCommand(msg: ShardCommand): Unit = msg match {
+  def receiveShardCommand(msg: ShardCommand): Unit = msg match
     case RestartEntity(id) ⇒ getEntity(id)
-  }
 
-  def receiveShardRegionCommand(msg: ShardRegionCommand): Unit = msg match {
+  def receiveShardRegionCommand(msg: ShardRegionCommand): Unit = msg match
     case Passivate(stopMessage) ⇒ passivate(sender(), stopMessage)
     case _ ⇒ unhandled(msg)
-  }
 
-  def receiveCoordinatorMessage(msg: CoordinatorMessage): Unit = msg match {
+  def receiveCoordinatorMessage(msg: CoordinatorMessage): Unit = msg match
     case HandOff(`shardId`) ⇒ handOff(sender())
     case HandOff(shard) ⇒
       log.warning(
           "Shard [{}] can not hand off for another Shard [{}]", shardId, shard)
     case _ ⇒ unhandled(msg)
-  }
 
-  def receiveShardQuery(msg: ShardQuery): Unit = msg match {
+  def receiveShardQuery(msg: ShardQuery): Unit = msg match
     case GetCurrentShardState ⇒
       sender() ! CurrentShardState(shardId, refById.keySet)
     case GetShardStats ⇒ sender() ! ShardStats(shardId, state.entities.size)
-  }
 
-  def handOff(replyTo: ActorRef): Unit = handOffStopper match {
+  def handOff(replyTo: ActorRef): Unit = handOffStopper match
     case Some(_) ⇒
       log.warning(
           "HandOff shard [{}] received during existing handOff", shardId)
     case None ⇒
       log.debug("HandOff shard [{}]", shardId)
 
-      if (state.entities.nonEmpty) {
+      if (state.entities.nonEmpty)
         handOffStopper = Some(
             context
               .watch(context
@@ -210,36 +200,30 @@ private[akka] class Shard(typeName: String,
                     handOffStopperProps(shardId, replyTo, idByRef.keySet, handOffStopMessage))))
 
         //During hand off we only care about watching for termination of the hand off stopper
-        context become {
+        context become
           case Terminated(ref) ⇒ receiveTerminated(ref)
-        }
-      } else {
+      else
         replyTo ! ShardStopped(shardId)
         context stop self
-      }
-  }
 
-  def receiveTerminated(ref: ActorRef): Unit = {
+  def receiveTerminated(ref: ActorRef): Unit =
     if (handOffStopper.exists(_ == ref)) context stop self
     else if (idByRef.contains(ref) && handOffStopper.isEmpty)
       entityTerminated(ref)
-  }
 
-  def entityTerminated(ref: ActorRef): Unit = {
+  def entityTerminated(ref: ActorRef): Unit =
     val id = idByRef(ref)
-    if (messageBuffers.getOrElse(id, Vector.empty).nonEmpty) {
+    if (messageBuffers.getOrElse(id, Vector.empty).nonEmpty)
       log.debug(
           "Starting entity [{}] again, there are buffered messages for it", id)
       sendMsgBuffer(EntityStarted(id))
-    } else {
+    else
       processChange(EntityStopped(id))(passivateCompleted)
-    }
 
     passivating = passivating - ref
-  }
 
-  def passivate(entity: ActorRef, stopMessage: Any): Unit = {
-    idByRef.get(entity) match {
+  def passivate(entity: ActorRef, stopMessage: Any): Unit =
+    idByRef.get(entity) match
       case Some(id) if !messageBuffers.contains(id) ⇒
         log.debug("Passivating started on entity {}", id)
 
@@ -248,11 +232,9 @@ private[akka] class Shard(typeName: String,
         entity ! stopMessage
 
       case _ ⇒ //ignored
-    }
-  }
 
   // EntityStopped handler
-  def passivateCompleted(event: EntityStopped): Unit = {
+  def passivateCompleted(event: EntityStopped): Unit =
     log.debug("Entity stopped [{}]", event.entityId)
 
     val ref = refById(event.entityId)
@@ -261,15 +243,14 @@ private[akka] class Shard(typeName: String,
 
     state = state.copy(state.entities - event.entityId)
     messageBuffers = messageBuffers - event.entityId
-  }
 
   // EntityStarted handler
-  def sendMsgBuffer(event: EntityStarted): Unit = {
+  def sendMsgBuffer(event: EntityStarted): Unit =
     //Get the buffered messages and remove the buffer
     val messages = messageBuffers.getOrElse(event.entityId, Vector.empty)
     messageBuffers = messageBuffers - event.entityId
 
-    if (messages.nonEmpty) {
+    if (messages.nonEmpty)
       log.debug("Sending message buffer for entity [{}] ([{}] messages)",
                 event.entityId,
                 messages.size)
@@ -277,20 +258,17 @@ private[akka] class Shard(typeName: String,
 
       //Now there is no deliveryBuffer we can try to redeliver
       // and as the child exists, the message will be directly forwarded
-      messages foreach {
+      messages foreach
         case (msg, snd) ⇒ deliverMessage(msg, snd)
-      }
-    }
-  }
 
-  def deliverMessage(msg: Any, snd: ActorRef): Unit = {
+  def deliverMessage(msg: Any, snd: ActorRef): Unit =
     val (id, payload) = extractEntityId(msg)
-    if (id == null || id == "") {
+    if (id == null || id == "")
       log.warning(
           "Id must not be empty, dropping message [{}]", msg.getClass.getName)
       context.system.deadLetters ! msg
-    } else {
-      messageBuffers.get(id) match {
+    else
+      messageBuffers.get(id) match
         case None ⇒ deliverTo(id, msg, payload, snd)
 
         case Some(buf) if totalBufferSize >= bufferSize ⇒
@@ -300,21 +278,16 @@ private[akka] class Shard(typeName: String,
         case Some(buf) ⇒
           log.debug("Message for entity [{}] buffered", id)
           messageBuffers = messageBuffers.updated(id, buf :+ ((msg, snd)))
-      }
-    }
-  }
 
-  def deliverTo(id: EntityId, msg: Any, payload: Msg, snd: ActorRef): Unit = {
+  def deliverTo(id: EntityId, msg: Any, payload: Msg, snd: ActorRef): Unit =
     val name = URLEncoder.encode(id, "utf-8")
-    context.child(name) match {
+    context.child(name) match
       case Some(actor) ⇒ actor.tell(payload, snd)
       case None ⇒ getEntity(id).tell(payload, snd)
-    }
-  }
 
-  def getEntity(id: EntityId): ActorRef = {
+  def getEntity(id: EntityId): ActorRef =
     val name = URLEncoder.encode(id, "utf-8")
-    context.child(name).getOrElse {
+    context.child(name).getOrElse
       log.debug("Starting entity [{}] in shard [{}]", id, shardId)
 
       val a = context.watch(context.actorOf(entityProps, name))
@@ -322,9 +295,6 @@ private[akka] class Shard(typeName: String,
       refById = refById.updated(id, a)
       state = state.copy(state.entities + id)
       a
-    }
-  }
-}
 
 /**
   * INTERNAL API
@@ -348,7 +318,7 @@ private[akka] class PersistentShard(
                   settings,
                   extractEntityId,
                   extractShardId,
-                  handOffStopMessage) with PersistentActor with ActorLogging {
+                  handOffStopMessage) with PersistentActor with ActorLogging
 
   import ShardRegion.{EntityId, Msg}
   import Shard.{State, RestartEntity, EntityStopped, EntityStarted}
@@ -367,20 +337,17 @@ private[akka] class PersistentShard(
 
   override def receive = receiveCommand
 
-  override def processChange[A](event: A)(handler: A ⇒ Unit): Unit = {
+  override def processChange[A](event: A)(handler: A ⇒ Unit): Unit =
     saveSnapshotWhenNeeded()
     persist(event)(handler)
-  }
 
-  def saveSnapshotWhenNeeded(): Unit = {
+  def saveSnapshotWhenNeeded(): Unit =
     persistCount += 1
-    if (persistCount % snapshotAfter == 0) {
+    if (persistCount % snapshotAfter == 0)
       log.debug("Saving snapshot, sequence number [{}]", snapshotSequenceNr)
       saveSnapshot(state)
-    }
-  }
 
-  override def receiveRecover: Receive = {
+  override def receiveRecover: Receive =
     case EntityStarted(id) ⇒ state = state.copy(state.entities + id)
     case EntityStopped(id) ⇒ state = state.copy(state.entities - id)
     case SnapshotOffer(_, snapshot: State) ⇒ state = snapshot
@@ -388,42 +355,39 @@ private[akka] class PersistentShard(
       state.entities foreach getEntity
       super.initialized()
       log.debug("Shard recovery completed {}", shardId)
-  }
 
   override def receiveCommand: Receive =
-    ({
+    (
       case _: SaveSnapshotSuccess ⇒
         log.debug("PersistentShard snapshot saved successfully")
       case SaveSnapshotFailure(_, reason) ⇒
         log.warning("PersistentShard snapshot failure: {}", reason.getMessage)
-    }: Receive).orElse(super.receiveCommand)
+    : Receive).orElse(super.receiveCommand)
 
-  override def entityTerminated(ref: ActorRef): Unit = {
+  override def entityTerminated(ref: ActorRef): Unit =
     val id = idByRef(ref)
-    if (messageBuffers.getOrElse(id, Vector.empty).nonEmpty) {
+    if (messageBuffers.getOrElse(id, Vector.empty).nonEmpty)
       //Note; because we're not persisting the EntityStopped, we don't need
       // to persist the EntityStarted either.
       log.debug(
           "Starting entity [{}] again, there are buffered messages for it", id)
       sendMsgBuffer(EntityStarted(id))
-    } else {
-      if (!passivating.contains(ref)) {
+    else
+      if (!passivating.contains(ref))
         log.debug(
             "Entity [{}] stopped without passivating, will restart after backoff",
             id)
         import context.dispatcher
         context.system.scheduler
           .scheduleOnce(entityRestartBackoff, self, RestartEntity(id))
-      } else processChange(EntityStopped(id))(passivateCompleted)
-    }
+      else processChange(EntityStopped(id))(passivateCompleted)
 
     passivating = passivating - ref
-  }
 
   override def deliverTo(
-      id: EntityId, msg: Any, payload: Msg, snd: ActorRef): Unit = {
+      id: EntityId, msg: Any, payload: Msg, snd: ActorRef): Unit =
     val name = URLEncoder.encode(id, "utf-8")
-    context.child(name) match {
+    context.child(name) match
       case Some(actor) ⇒
         actor.tell(payload, snd)
 
@@ -432,6 +396,3 @@ private[akka] class PersistentShard(
         messageBuffers = messageBuffers.updated(id, Vector((msg, snd)))
         saveSnapshotWhenNeeded()
         persist(EntityStarted(id))(sendMsgBuffer)
-    }
-  }
-}

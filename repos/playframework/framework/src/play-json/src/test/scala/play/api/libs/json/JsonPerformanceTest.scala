@@ -14,7 +14,7 @@ import concurrent.duration.Duration
   *
   * test:run-main play.api.libs.json.JsonPerformanceTest
   */
-object JsonPerformanceTest extends App {
+object JsonPerformanceTest extends App
 
   println("Running serialization test...")
 
@@ -87,37 +87,29 @@ object JsonPerformanceTest extends App {
 
   lazy val largeObjectJson = Json.stringify(largeObjectJsValue)
 
-  def testSerialization(times: Int = 10000000, threads: Int = 100): Long = {
-    runTest(times, threads) {
+  def testSerialization(times: Int = 10000000, threads: Int = 100): Long =
+    runTest(times, threads)
       Json.stringify(jsvalue)
-    }
-  }
 
-  def testDeserialization(times: Int = 1000000, threads: Int = 100): Long = {
-    runTest(times, threads) {
+  def testDeserialization(times: Int = 1000000, threads: Int = 100): Long =
+    runTest(times, threads)
       Json.parse(json)
-    }
-  }
 
   def testLargeArrayDeserialization(
-      times: Int = 100, threads: Int = 10): Long = {
-    runTest(times, threads) {
+      times: Int = 100, threads: Int = 10): Long =
+    runTest(times, threads)
       Json.parse(largeArrayJson)
-    }
-  }
 
   def testLargeObjectDeserialization(
-      times: Int = 100, threads: Int = 100): Long = {
-    runTest(times, threads) {
+      times: Int = 100, threads: Int = 100): Long =
+    runTest(times, threads)
       Json.parse(largeObjectJson)
-    }
-  }
 
-  def runTest(times: Int, threads: Int)(test: => Unit): Long = {
+  def runTest(times: Int, threads: Int)(test: => Unit): Long =
     val timesPerThread = times / threads
 
     val executor = Executors.newFixedThreadPool(threads)
-    try {
+    try
       val context = ExecutionContext.fromExecutor(executor)
 
       val start = System.currentTimeMillis()
@@ -126,17 +118,13 @@ object JsonPerformanceTest extends App {
       Await.ready(Future.sequence(
                       List
                         .range(0, threads)
-                        .map { t =>
-                      Future {
-                        for (i <- 0 to timesPerThread) {
+                        .map  t =>
+                      Future
+                        for (i <- 0 to timesPerThread)
                           test
-                        }
-                      }(context)
-                    }),
+                      (context)
+                    ),
                   Duration.Inf)
       System.currentTimeMillis() - start
-    } finally {
+    finally
       executor.shutdownNow()
-    }
-  }
-}

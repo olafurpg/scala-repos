@@ -2,7 +2,7 @@ package com.twitter.scalding.jdbc
 
 import org.scalatest.WordSpec
 
-class ExampleMysqlJdbcSource() extends JDBCSource with MysqlDriver {
+class ExampleMysqlJdbcSource() extends JDBCSource with MysqlDriver
   override val tableName = TableName("test")
   override val columns: Iterable[ColumnDefinition] = Iterable(
       int("hey"),
@@ -14,9 +14,8 @@ class ExampleMysqlJdbcSource() extends JDBCSource with MysqlDriver {
       smallint("cloud"))
   override def currentConfig =
     ConnectionSpec(ConnectUrl("how"), UserName("are"), Password("you"))
-}
 
-class ExampleVerticaJdbcSource() extends JDBCSource with VerticaJdbcDriver {
+class ExampleVerticaJdbcSource() extends JDBCSource with VerticaJdbcDriver
   override val tableName = TableName("test")
   override val columns: Iterable[ColumnDefinition] = Iterable(
       int("hey"),
@@ -28,12 +27,8 @@ class ExampleVerticaJdbcSource() extends JDBCSource with VerticaJdbcDriver {
       smallint("cloud"))
   override def currentConfig =
     ConnectionSpec(ConnectUrl("how"), UserName("are"), Password("you"))
-}
 
-class JDBCSourceCompileTest extends WordSpec {
-  "JDBCSource" should {
-    "Pick up correct column definitions for MySQL Driver" in {
+class JDBCSourceCompileTest extends WordSpec
+  "JDBCSource" should
+    "Pick up correct column definitions for MySQL Driver" in
       new ExampleMysqlJdbcSource().toSqlCreateString
-    }
-  }
-}

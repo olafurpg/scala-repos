@@ -11,7 +11,7 @@ import scala.math.Pi
   *
   * @author jaketimothy
   **/
-class NonstiffOdeTest extends FunSuite {
+class NonstiffOdeTest extends FunSuite
 
   // allowable percent difference
   val limit = 0.005
@@ -25,7 +25,7 @@ class NonstiffOdeTest extends FunSuite {
   val ans = DenseVector(
       -0.707186602982020, -0.709046793058523, 0.863898186330983)
 
-  test("hall54") {
+  test("hall54")
 
     val integrator = new HighamHall54Integrator(0.0, 1.0)
 
@@ -33,9 +33,8 @@ class NonstiffOdeTest extends FunSuite {
     assert(abs((steps(1)(0) - ans(0)) / ans(0)) < limit)
     assert(abs((steps(1)(1) - ans(1)) / ans(1)) < limit)
     assert(abs((steps(1)(2) - ans(2)) / ans(2)) < limit)
-  }
 
-  test("dorpri54") {
+  test("dorpri54")
 
     val integrator = new DormandPrince54Integrator(0.0, 1.0)
 
@@ -43,9 +42,8 @@ class NonstiffOdeTest extends FunSuite {
     assert(abs((steps(1)(0) - ans(0)) / ans(0)) < limit)
     assert(abs((steps(1)(1) - ans(1)) / ans(1)) < limit)
     assert(abs((steps(1)(2) - ans(2)) / ans(2)) < limit)
-  }
 
-  test("dorpri853") {
+  test("dorpri853")
 
     val integrator = new DormandPrince853Integrator(0.0, 1.0)
 
@@ -53,9 +51,8 @@ class NonstiffOdeTest extends FunSuite {
     assert(abs((steps(1)(0) - ans(0)) / ans(0)) < limit)
     assert(abs((steps(1)(1) - ans(1)) / ans(1)) < limit)
     assert(abs((steps(1)(2) - ans(2)) / ans(2)) < limit)
-  }
 
-  test("stoer") {
+  test("stoer")
 
     val integrator = new GraggBulirschStoerIntegrator(0.0, 1.0)
 
@@ -63,9 +60,8 @@ class NonstiffOdeTest extends FunSuite {
     assert(abs((steps(1)(0) - ans(0)) / ans(0)) < limit)
     assert(abs((steps(1)(1) - ans(1)) / ans(1)) < limit)
     assert(abs((steps(1)(2) - ans(2)) / ans(2)) < limit)
-  }
 
-  test("bashforth5") {
+  test("bashforth5")
 
     val integrator = new AdamsBashforthIntegrator(5, 0.0, 1.0)
 
@@ -73,9 +69,8 @@ class NonstiffOdeTest extends FunSuite {
     assert(abs((steps(1)(0) - ans(0)) / ans(0)) < limit)
     assert(abs((steps(1)(1) - ans(1)) / ans(1)) < limit)
     assert(abs((steps(1)(2) - ans(2)) / ans(2)) < limit)
-  }
 
-  test("moulton5") {
+  test("moulton5")
 
     val integrator = new AdamsMoultonIntegrator(5, 0.0, 1.0)
 
@@ -83,7 +78,6 @@ class NonstiffOdeTest extends FunSuite {
     assert(abs((steps(1)(0) - ans(0)) / ans(0)) < limit)
     assert(abs((steps(1)(1) - ans(1)) / ans(1)) < limit)
     assert(abs((steps(1)(2) - ans(2)) / ans(2)) < limit)
-  }
 
   // test("incompatible dimensions") {
 
@@ -94,4 +88,3 @@ class NonstiffOdeTest extends FunSuite {
   //     integrate.RungeKuttaOdeSolver(DormandPrinceTableau, f, DenseVector(1.0, 0.0), Array(0.0, scala.math.Pi), absTol = DenseVector(1.0))
   //   }
   // }
-}

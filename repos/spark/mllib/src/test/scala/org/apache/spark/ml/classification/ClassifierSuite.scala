@@ -17,7 +17,7 @@
 
 package org.apache.spark.ml.classification
 
-object ClassifierSuite {
+object ClassifierSuite
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -28,4 +28,3 @@ object ClassifierSuite {
       "predictionCol" -> "myPrediction",
       "rawPredictionCol" -> "myRawPrediction"
   )
-}

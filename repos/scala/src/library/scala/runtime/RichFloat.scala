@@ -10,7 +10,7 @@ package scala
 package runtime
 
 final class RichFloat(val self: Float)
-    extends AnyVal with FractionalProxy[Float] {
+    extends AnyVal with FractionalProxy[Float]
   protected def num = scala.math.Numeric.FloatIsFractional
   protected def ord = scala.math.Ordering.Float
   protected def integralNum = scala.math.Numeric.FloatAsIfIntegral
@@ -22,17 +22,15 @@ final class RichFloat(val self: Float)
   override def byteValue() = self.toByte
   override def shortValue() = self.toShort
 
-  override def isWhole = {
+  override def isWhole =
     val l = self.toLong
     l.toFloat == self || l == Long.MaxValue && self < Float.PositiveInfinity ||
     l == Long.MinValue && self > Float.NegativeInfinity
-  }
   override def isValidByte = self.toByte.toFloat == self
   override def isValidShort = self.toShort.toFloat == self
   override def isValidChar = self.toChar.toFloat == self
-  override def isValidInt = {
+  override def isValidInt =
     val i = self.toInt; i.toFloat == self && i != Int.MaxValue
-  }
   // override def isValidLong = { val l = self.toLong; l.toFloat == self && l != Long.MaxValue }
   // override def isValidFloat = !java.lang.Float.isNaN(self)
   // override def isValidDouble = !java.lang.Float.isNaN(self)
@@ -64,4 +62,3 @@ final class RichFloat(val self: Float)
     *  @return the measurement of the angle `x` in degrees.
     */
   def toDegrees: Float = math.toDegrees(self.toDouble).toFloat
-}

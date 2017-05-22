@@ -24,7 +24,7 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class SyslogHandlerTest extends WordSpec {
+class SyslogHandlerTest extends WordSpec
   val record1 = new javalog.LogRecord(Level.FATAL, "fatal message!")
   record1.setLoggerName("net.lag.whiskey.Train")
   record1.setMillis(1206769996722L)
@@ -32,8 +32,8 @@ class SyslogHandlerTest extends WordSpec {
   record2.setLoggerName("net.lag.whiskey.Train")
   record2.setMillis(1206769996722L)
 
-  "SyslogHandler" should {
-    "write syslog entries" in {
+  "SyslogHandler" should
+    "write syslog entries" in
       // start up new syslog listener
       val serverSocket = new DatagramSocket
       val serverPort = serverSocket.getLocalPort
@@ -56,9 +56,8 @@ class SyslogHandlerTest extends WordSpec {
       serverSocket.receive(p)
       assert(
           new String(p.getData, 0, p.getLength) == "<11>2008-03-29T05:53:16 raccoon.local whiskey: error message!")
-    }
 
-    "with server name" in {
+    "with server name" in
       // start up new syslog listener
       val serverSocket = new DatagramSocket
       val serverPort = serverSocket.getLocalPort
@@ -78,9 +77,8 @@ class SyslogHandlerTest extends WordSpec {
       serverSocket.receive(p)
       assert(
           new String(p.getData, 0, p.getLength) == "<9>2008-03-29T05:53:16 raccoon.local [pingd] whiskey: fatal message!")
-    }
 
-    "with BSD time format" in {
+    "with BSD time format" in
       // start up new syslog listener
       val serverSocket = new DatagramSocket
       val serverPort = serverSocket.getLocalPort
@@ -100,6 +98,3 @@ class SyslogHandlerTest extends WordSpec {
       serverSocket.receive(p)
       assert(
           new String(p.getData, 0, p.getLength) == "<9>Mar 29 05:53:16 raccoon.local whiskey: fatal message!")
-    }
-  }
-}

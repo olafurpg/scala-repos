@@ -52,7 +52,7 @@ private[streaming] class PIDRateEstimator(
     derivative: Double,
     minRate: Double
 )
-    extends RateEstimator with Logging {
+    extends RateEstimator with Logging
 
   private var firstRun: Boolean = true
   private var latestTime: Long = -1L
@@ -80,12 +80,12 @@ private[streaming] class PIDRateEstimator(
       numElements: Long,
       processingDelay: Long, // in milliseconds
       schedulingDelay: Long // in milliseconds
-  ): Option[Double] = {
+  ): Option[Double] =
     logTrace(
         s"\ntime = $time, # records = $numElements, " +
         s"processing time = $processingDelay, scheduling delay = $schedulingDelay")
-    this.synchronized {
-      if (time > latestTime && numElements > 0 && processingDelay > 0) {
+    this.synchronized
+      if (time > latestTime && numElements > 0 && processingDelay > 0)
 
         // in seconds, should be close to batchDuration
         val delaySinceUpdate = (time - latestTime).toDouble / 1000
@@ -124,22 +124,17 @@ private[streaming] class PIDRateEstimator(
             """.stripMargin)
 
         latestTime = time
-        if (firstRun) {
+        if (firstRun)
           latestRate = processingRate
           latestError = 0D
           firstRun = false
           logTrace("First run, rate estimation skipped")
           None
-        } else {
+        else
           latestRate = newRate
           latestError = error
           logTrace(s"New rate = $newRate")
           Some(newRate)
-        }
-      } else {
+      else
         logTrace("Rate estimation skipped")
         None
-      }
-    }
-  }
-}

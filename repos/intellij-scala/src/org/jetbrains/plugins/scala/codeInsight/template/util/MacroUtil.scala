@@ -17,23 +17,22 @@ import org.jetbrains.plugins.scala.lang.resolve.{ScalaResolveResult, StdKinds}
   * User: Alexander Podkhalyuzin
   * Date: 30.01.2009
   */
-object MacroUtil {
+object MacroUtil
 
   /**
     * @param element from which position we look at locals
     * @return visible variables and values from element position
     */
-  def getVariablesForScope(element: PsiElement): Array[ScalaResolveResult] = {
+  def getVariablesForScope(element: PsiElement): Array[ScalaResolveResult] =
     val completionProcessor = new VariablesCompletionProcessor(
         StdKinds.valuesRef)
     PsiTreeUtil.treeWalkUp(
         completionProcessor, element, null, ResolveState.initial)
     completionProcessor.candidates
-  }
 
   def resultToScExpr(
       result: Result, context: ExpressionContext): Option[ScExpression] =
-    try {
+    try
       Option(PsiDocumentManager
             .getInstance(context.getProject)
             .getPsiFile(context.getEditor.getDocument))
@@ -42,26 +41,24 @@ object MacroUtil {
         .map(ScalaPsiElementFactory
               .createExpressionFromText(result.toString, _)
               .asInstanceOf[ScExpression])
-    } catch {
+    catch
       case _: IncorrectOperationException => None
-    }
 
   def getComponentFromArrayType(scType: ScType): Option[ScType] =
-    scType match {
+    scType match
       case javaArrType: JavaArrayType => Some(javaArrType.arg)
       case paramType: ScParameterizedType
           if paramType.canonicalText.startsWith("_root_.scala.Array") &&
           paramType.typeArgs.length == 1 =>
         Some(paramType.typeArgs.head)
       case _ => None
-    }
 
   def getTypeLookupItem(
-      scType: ScType, project: Project): Option[ScalaLookupItem] = {
+      scType: ScType, project: Project): Option[ScalaLookupItem] =
     ScType
       .extractClass(scType, Some(project))
       .filter(_.isInstanceOf[ScTypeDefinition])
-      .map {
+      .map
         case typeDef: ScTypeDefinition =>
           val lookupItem =
             new ScalaLookupItem(typeDef,
@@ -69,15 +66,13 @@ object MacroUtil {
                                 Option(typeDef.getContainingClass))
           lookupItem.shouldImport = true
           lookupItem
-      }
-  }
 
   def getPrimaryConbstructorParams(context: ExpressionContext) =
     Option(PsiTreeUtil.getParentOfType(context.getPsiElementAtStartOffset,
-                                       classOf[PsiClass])).map {
+                                       classOf[PsiClass])).map
       case obj: ScObject => obj.fakeCompanionClassOrCompanionClass
       case other => other
-    }.filter(_.isInstanceOf[ScClass])
+    .filter(_.isInstanceOf[ScClass])
       .flatMap(_.asInstanceOf[ScClass].constructor)
       .map(_.parameterList)
 
@@ -88,12 +83,11 @@ object MacroUtil {
         .substring(1, params.length - 1)
         .split(",")
         .map(l =>
-              l.split(":").map(_.trim).toList match {
+              l.split(":").map(_.trim).toList match
             case a :: b :: Nil => (a, b)
             case _ => ("", "")
-        })
+        )
         .toList
 
   val scalaIdPrefix = "scala_"
   val scalaPresentablePrefix = "scala_"
-}

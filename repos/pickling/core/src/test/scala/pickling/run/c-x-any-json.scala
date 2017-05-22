@@ -5,8 +5,8 @@ import scala.pickling._, scala.pickling.Defaults._, json._
 
 case class C(x: Any)
 
-class CXAnyJsonTest extends FunSuite {
-  test("main") {
+class CXAnyJsonTest extends FunSuite
+  test("main")
     val c = new C(2)
     val pckl = c.pickle
     assert(pckl.toString === """
@@ -19,5 +19,3 @@ class CXAnyJsonTest extends FunSuite {
       |})
     """.trim.stripMargin)
     assert(pckl.unpickle[C] === c)
-  }
-}

@@ -5,7 +5,7 @@ import scala.scalajs.js
 /* This is a hijacked class. Its instances are primitive booleans.
  * Constructors are not emitted.
  */
-final class Boolean private () extends Comparable[Boolean] {
+final class Boolean private () extends Comparable[Boolean]
 
   def this(value: scala.Boolean) = this()
   def this(v: String) = this()
@@ -24,9 +24,8 @@ final class Boolean private () extends Comparable[Boolean] {
 
   @inline override def toString(): String =
     Boolean.toString(booleanValue)
-}
 
-object Boolean {
+object Boolean
   final val TYPE = classOf[scala.Boolean]
 
   /* TRUE and FALSE are supposed to be vals. However, they are better
@@ -42,10 +41,9 @@ object Boolean {
   def TRUE: Boolean = new Boolean(true)
   def FALSE: Boolean = new Boolean(false)
 
-  @inline def valueOf(booleanValue: scala.Boolean): Boolean = {
+  @inline def valueOf(booleanValue: scala.Boolean): Boolean =
     // We don't care about identity, since they end up as primitive booleans
     new Boolean(booleanValue)
-  }
 
   @inline def valueOf(s: String): Boolean = valueOf(parseBoolean(s))
 
@@ -57,4 +55,3 @@ object Boolean {
 
   @inline def compare(x: scala.Boolean, y: scala.Boolean): scala.Int =
     if (x == y) 0 else if (x) 1 else -1
-}

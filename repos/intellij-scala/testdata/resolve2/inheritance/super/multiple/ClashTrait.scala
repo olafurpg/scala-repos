@@ -1,12 +1,10 @@
-trait T1 {
+trait T1
   def a {}
-}
 
-trait T2 extends T1 {
+trait T2 extends T1
   def b {}
-}
 
-trait T3 extends T2 {
+trait T3 extends T2
   override def a {}
   override def b {}
 
@@ -15,4 +13,3 @@ trait T3 extends T2 {
 
   println(super. /* line: 2 */ a)
   println(super. /* line: 6 */ b)
-}

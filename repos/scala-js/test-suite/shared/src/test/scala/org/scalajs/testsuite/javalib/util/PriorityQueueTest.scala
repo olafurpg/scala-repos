@@ -17,9 +17,9 @@ import org.junit.Assert._
 import java.util.PriorityQueue
 import java.util.Comparator
 
-class PriorityQueueTest {
+class PriorityQueueTest
 
-  @Test def should_store_and_remove_ordered_integers(): Unit = {
+  @Test def should_store_and_remove_ordered_integers(): Unit =
     val pq = new PriorityQueue[Int]()
 
     assertEquals(0, pq.size())
@@ -35,9 +35,8 @@ class PriorityQueueTest {
     assertTrue(pq.remove(222))
     assertTrue(pq.remove(222))
     assertFalse(pq.remove(222))
-  }
 
-  @Test def should_store_and_remove_ordered_strings(): Unit = {
+  @Test def should_store_and_remove_ordered_strings(): Unit =
     val pq = new PriorityQueue[String]()
 
     assertEquals(0, pq.size())
@@ -54,14 +53,12 @@ class PriorityQueueTest {
     assertTrue(pq.remove("bbb"))
     assertFalse(pq.remove("bbb"))
     assertNull(pq.poll())
-  }
 
-  @Test def should_store_objects_with_custom_comparables(): Unit = {
+  @Test def should_store_objects_with_custom_comparables(): Unit =
     case class Rect(x: Int, y: Int)
 
-    val areaComp = new Comparator[Rect] {
+    val areaComp = new Comparator[Rect]
       def compare(a: Rect, b: Rect): Int = (a.x * a.y) - (b.x * b.y)
-    }
 
     val pq = new PriorityQueue[Rect](11, areaComp)
 
@@ -93,9 +90,8 @@ class PriorityQueueTest {
 
     assertTrue(pq.peek() eq null)
     assertTrue(pq.poll() eq null)
-  }
 
-  @Test def should_store_ordered_Double_even_in_corner_cases(): Unit = {
+  @Test def should_store_ordered_Double_even_in_corner_cases(): Unit =
     val pq = new PriorityQueue[Double]()
 
     assertTrue(pq.add(1.0))
@@ -114,34 +110,29 @@ class PriorityQueueTest {
     assertTrue(pq.remove(Double.NaN))
 
     assertTrue(pq.isEmpty)
-  }
 
-  @Test def could_be_instantiated_with_a_prepopulated_Collection(): Unit = {
+  @Test def could_be_instantiated_with_a_prepopulated_Collection(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val pq = new PriorityQueue[Int](l)
 
     assertEquals(5, pq.size())
-    for (i <- 1 to 5) {
+    for (i <- 1 to 5)
       assertEquals(i, pq.poll())
-    }
     assertTrue(pq.isEmpty)
-  }
 
-  @Test def could_be_instantiated_with_a_prepopulated_PriorityQueue(): Unit = {
+  @Test def could_be_instantiated_with_a_prepopulated_PriorityQueue(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val pq1 = new PriorityQueue[Int](l)
     val pq2 = new PriorityQueue[Int](pq1)
 
     assertEquals(5, pq1.size())
     assertEquals(5, pq2.size())
-    for (i <- 1 to 5) {
+    for (i <- 1 to 5)
       assertEquals(pq2.poll(), pq1.poll())
-    }
     assertTrue(pq1.isEmpty)
     assertTrue(pq2.isEmpty)
-  }
 
-  @Test def could_be_instantiated_with_a_prepopulated_SortedSet(): Unit = {
+  @Test def could_be_instantiated_with_a_prepopulated_SortedSet(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val ss = new java.util.concurrent.ConcurrentSkipListSet[Int](l)
     val pq1 = new PriorityQueue[Int](l)
@@ -149,23 +140,20 @@ class PriorityQueueTest {
 
     assertEquals(5, pq1.size())
     assertEquals(5, pq2.size())
-    for (i <- 1 to 5) {
+    for (i <- 1 to 5)
       assertEquals(pq2.poll(), pq1.poll())
-    }
     assertTrue(pq1.isEmpty)
     assertTrue(pq2.isEmpty)
-  }
 
-  @Test def should_be_cleared_in_a_single_operation(): Unit = {
+  @Test def should_be_cleared_in_a_single_operation(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val pq = new PriorityQueue[Int](l)
 
     assertEquals(5, pq.size())
     pq.clear()
     assertEquals(0, pq.size())
-  }
 
-  @Test def should_add_multiple_elemnt_in_one_operation(): Unit = {
+  @Test def should_add_multiple_elemnt_in_one_operation(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val pq = new PriorityQueue[Int]()
 
@@ -174,9 +162,8 @@ class PriorityQueueTest {
     assertEquals(5, pq.size())
     pq.add(6)
     assertEquals(6, pq.size())
-  }
 
-  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit = {
+  @Test def should_check_contained_values_even_in_double_corner_cases(): Unit =
     val pq = new PriorityQueue[Double]()
 
     assertTrue(pq.add(11111.0))
@@ -209,9 +196,8 @@ class PriorityQueueTest {
     assertTrue(pq.contains(Double.NaN))
     assertTrue(pq.contains(+0.0))
     assertTrue(pq.contains(-0.0))
-  }
 
-  @Test def should_retrieve_the_first_element(): Unit = {
+  @Test def should_retrieve_the_first_element(): Unit =
     val pqInt = new PriorityQueue[Int]()
 
     assertTrue(pqInt.add(1000))
@@ -229,5 +215,3 @@ class PriorityQueueTest {
     assertTrue(pqDouble.add(+10000.987))
     assertTrue(pqDouble.add(-0.987))
     assertEquals(-0.987, pqDouble.poll(), 0.0)
-  }
-}

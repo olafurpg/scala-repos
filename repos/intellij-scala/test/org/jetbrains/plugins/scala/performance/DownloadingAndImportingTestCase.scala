@@ -28,13 +28,12 @@ import org.junit.Assert
   * Date: 11/17/2015
   */
 abstract class DownloadingAndImportingTestCase
-    extends ExternalSystemImportingTestCase with SbtStructureSetup {
+    extends ExternalSystemImportingTestCase with SbtStructureSetup
 
-  implicit class IntExt(val i: Int) {
+  implicit class IntExt(val i: Int)
     def seconds: Int = i * 1000
-  }
 
-  override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
+  override protected def getCurrentExternalProjectSettings: ExternalProjectSettings =
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
     val sdk =
@@ -43,7 +42,6 @@ abstract class DownloadingAndImportingTestCase
     settings.setJdk(sdk.getName)
     settings.setCreateEmptyContentRootDirectories(true)
     settings
-  }
 
   override protected def getExternalSystemId: ProjectSystemId =
     SbtProjectSystem.Id
@@ -60,45 +58,39 @@ abstract class DownloadingAndImportingTestCase
   def outputZipFileName =
     s"$rootDirPath/zipFiles/$githubRepoName-$githubUsername-$revision"
 
-  override def setUpInWriteAction(): Unit = {
+  override def setUpInWriteAction(): Unit =
     super.setUpInWriteAction()
     val outputZipFile = new File(outputZipFileName)
     val projectDir = new File(projectDirPath)
-    if (!outputZipFile.exists() && !projectDir.exists()) {
+    if (!outputZipFile.exists() && !projectDir.exists())
       //don't download if zip file is already there
       GithubDownloadUtil.downloadAtomically(
           null, downloadURL, outputZipFile, githubUsername, githubRepoName)
-    }
-    if (!projectDir.exists()) {
+    if (!projectDir.exists())
       //don't unpack if the project is already unpacked
       ZipUtil.unzip(null, projectDir, outputZipFile, null, null, true)
-    }
     Assert.assertTrue("Project dir does not exist. Download or unpack failed!",
                       projectDir.exists())
     myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
         projectDir)
     setUpSbtLauncherAndStructure(myProject)
-    extensions.inWriteAction {
+    extensions.inWriteAction
       val internalSdk =
         JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
       val sdk =
         if (internalSdk == null) IdeaTestUtil.getMockJdk17
         else internalSdk
 
-      if (ProjectJdkTable.getInstance().findJdk(sdk.getName) == null) {
+      if (ProjectJdkTable.getInstance().findJdk(sdk.getName) == null)
         ProjectJdkTable.getInstance().addJdk(sdk)
-      }
       ProjectRootManager.getInstance(myProject).setProjectSdk(sdk)
-    }
-  }
 
-  override def setUp(): Unit = {
+  override def setUp(): Unit =
     super.setUp()
 
     importProject()
-  }
 
-  def findFile(filename: String): VirtualFile = {
+  def findFile(filename: String): VirtualFile =
     import scala.collection.JavaConversions._
     val searchScope = new SourceFilterScope(
         GlobalSearchScope.getScopeRestrictedByFileTypes(
@@ -109,35 +101,31 @@ abstract class DownloadingAndImportingTestCase
 
     val files: util.Collection[VirtualFile] =
       FileTypeIndex.getFiles(ScalaFileType.SCALA_FILE_TYPE, searchScope)
-    val file = files.filter(_.getName == filename).toList match {
+    val file = files.filter(_.getName == filename).toList match
       case vf :: Nil => vf
       case Nil => //is this a filepath?
-        files.find(_.getCanonicalPath == s"$projectDirPath/$filename") match {
+        files.find(_.getCanonicalPath == s"$projectDirPath/$filename") match
           case Some(vf) => vf
           case _ =>
             Assert.assertTrue(
                 s"Could not find file: $filename.\nConsider providing relative path from project root",
                 false)
             null
-        }
       case list =>
         Assert.assertTrue(
             s"There are ${list.size} files with name $filename.\nProvide full path from project root",
             false)
         null
-    }
     LocalFileSystem.getInstance().refreshFiles(files)
     file
-  }
 
   def githubUsername: String
 
   def githubRepoName: String
 
   def revision: String
-}
 
-trait ScalaCommunityDownloadingAndImportingTestCase {
+trait ScalaCommunityDownloadingAndImportingTestCase
   protected def getExternalSystemConfigFileName: String = "build.sbt"
 
   def githubUsername: String = "JetBrains"
@@ -145,4 +133,3 @@ trait ScalaCommunityDownloadingAndImportingTestCase {
   def githubRepoName: String = "intellij-scala"
 
   def revision: String = "d2906113e9cdca0e302437cfd412fcb19d288720"
-}

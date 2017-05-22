@@ -26,7 +26,7 @@ import scala.collection.{mutable, immutable}
   *
   * Inspired from the `scalac` compiler.
   */
-abstract class ScalaPrimitives {
+abstract class ScalaPrimitives
   val global: Global
 
   import global._
@@ -192,7 +192,7 @@ abstract class ScalaPrimitives {
   private val primitives: mutable.Map[Symbol, Int] = new mutable.HashMap()
 
   /** Initialize the primitive map */
-  def init() {
+  def init()
     primitives.clear()
     // scala.Any
     addPrimitive(Any_==, EQ)
@@ -432,25 +432,22 @@ abstract class ScalaPrimitives {
     // unary methods
     addPrimitives(DoubleClass, nme.UNARY_+, POS)
     addPrimitives(DoubleClass, nme.UNARY_-, NEG)
-  }
 
   /** Add a primitive operation to the map */
-  def addPrimitive(s: Symbol, code: Int) {
+  def addPrimitive(s: Symbol, code: Int)
     assert(!(primitives contains s), "Duplicate primitive " + s)
     primitives(s) = code
-  }
 
-  def addPrimitives(cls: Symbol, method: Name, code: Int) {
+  def addPrimitives(cls: Symbol, method: Name, code: Int)
     val alts = (cls.info member method).alternatives
     if (alts.isEmpty) inform(s"Unknown primitive method $cls.$method")
     else
       alts foreach
       (s =>
-            addPrimitive(s, s.info.paramTypes match {
+            addPrimitive(s, s.info.paramTypes match
               case tp :: _ if code == ADD && tp =:= StringTpe => CONCAT
               case _ => code
-            }))
-  }
+            ))
 
   def isCoercion(code: Int): Boolean = (code >= B2B) && (code <= D2D)
 
@@ -459,65 +456,56 @@ abstract class ScalaPrimitives {
     isArrayNew(code) | isArrayLength(code) | isArrayGet(code) | isArraySet(
         code)
 
-  def isArrayNew(code: Int): Boolean = code match {
+  def isArrayNew(code: Int): Boolean = code match
     case NEW_ZARRAY | NEW_BARRAY | NEW_SARRAY | NEW_CARRAY | NEW_IARRAY |
         NEW_LARRAY | NEW_FARRAY | NEW_DARRAY | NEW_OARRAY =>
       true
     case _ => false
-  }
 
-  def isArrayLength(code: Int): Boolean = code match {
+  def isArrayLength(code: Int): Boolean = code match
     case ZARRAY_LENGTH | BARRAY_LENGTH |
         SARRAY_LENGTH | CARRAY_LENGTH | IARRAY_LENGTH | LARRAY_LENGTH |
         FARRAY_LENGTH | DARRAY_LENGTH | OARRAY_LENGTH | LENGTH =>
       true
     case _ => false
-  }
 
-  def isArrayGet(code: Int): Boolean = code match {
+  def isArrayGet(code: Int): Boolean = code match
     case ZARRAY_GET | BARRAY_GET | SARRAY_GET | CARRAY_GET | IARRAY_GET |
         LARRAY_GET | FARRAY_GET | DARRAY_GET | OARRAY_GET | APPLY =>
       true
     case _ => false
-  }
 
-  def isArraySet(code: Int): Boolean = code match {
+  def isArraySet(code: Int): Boolean = code match
     case ZARRAY_SET | BARRAY_SET | SARRAY_SET | CARRAY_SET | IARRAY_SET |
         LARRAY_SET | FARRAY_SET | DARRAY_SET | OARRAY_SET | UPDATE =>
       true
     case _ => false
-  }
 
   /** Check whether the given code is a comparison operator */
-  def isComparisonOp(code: Int): Boolean = code match {
+  def isComparisonOp(code: Int): Boolean = code match
     case ID | NI | EQ | NE | LT | LE | GT | GE => true
 
     case _ => false
-  }
   def isUniversalEqualityOp(code: Int): Boolean = (code == EQ) || (code == NE)
   def isReferenceEqualityOp(code: Int): Boolean = (code == ID) || (code == NI)
 
-  def isArithmeticOp(code: Int): Boolean = code match {
+  def isArithmeticOp(code: Int): Boolean = code match
     case POS | NEG | NOT => true; // unary
     case ADD | SUB | MUL | DIV | MOD => true; // binary
     case OR | XOR | AND | LSL | LSR | ASR => true; // bitwise
     case _ => false
-  }
 
-  def isLogicalOp(code: Int): Boolean = code match {
+  def isLogicalOp(code: Int): Boolean = code match
     case ZNOT | ZAND | ZOR => true
     case _ => false
-  }
 
-  def isShiftOp(code: Int): Boolean = code match {
+  def isShiftOp(code: Int): Boolean = code match
     case LSL | LSR | ASR => true
     case _ => false
-  }
 
-  def isBitwiseOp(code: Int): Boolean = code match {
+  def isBitwiseOp(code: Int): Boolean = code match
     case OR | XOR | AND => true
     case _ => false
-  }
 
   def isPrimitive(sym: Symbol): Boolean = primitives contains sym
 
@@ -535,24 +523,22 @@ abstract class ScalaPrimitives {
     * @param tpe The type of the receiver object. It is used only for array
     *            operations
     */
-  def getPrimitive(fun: Symbol, tpe: Type): Int = {
+  def getPrimitive(fun: Symbol, tpe: Type): Int =
     import definitions._
     import genBCode.bTypes._
     val code = getPrimitive(fun)
 
-    def elementType = enteringTyper {
+    def elementType = enteringTyper
       val arrayParent =
-        tpe :: tpe.parents collectFirst {
+        tpe :: tpe.parents collectFirst
           case TypeRef(_, ArrayClass, elem :: Nil) => elem
-        }
       arrayParent getOrElse sys.error(fun.fullName + " : " +
           (tpe :: tpe.baseTypeSeq.toList).mkString(", "))
-    }
 
-    code match {
+    code match
 
       case APPLY =>
-        typeToBType(elementType) match {
+        typeToBType(elementType) match
           case BOOL => ZARRAY_GET
           case BYTE => BARRAY_GET
           case SHORT => SARRAY_GET
@@ -564,10 +550,9 @@ abstract class ScalaPrimitives {
           case _: ClassBType | _: ArrayBType => OARRAY_GET
           case _ =>
             abort("Unexpected array element type: " + elementType)
-        }
 
       case UPDATE =>
-        typeToBType(elementType) match {
+        typeToBType(elementType) match
           case BOOL => ZARRAY_SET
           case BYTE => BARRAY_SET
           case SHORT => SARRAY_SET
@@ -579,10 +564,9 @@ abstract class ScalaPrimitives {
           case _: ClassBType | _: ArrayBType => OARRAY_SET
           case _ =>
             abort("Unexpected array element type: " + elementType)
-        }
 
       case LENGTH =>
-        typeToBType(elementType) match {
+        typeToBType(elementType) match
           case BOOL => ZARRAY_LENGTH
           case BYTE => BARRAY_LENGTH
           case SHORT => SARRAY_LENGTH
@@ -594,10 +578,6 @@ abstract class ScalaPrimitives {
           case _: ClassBType | _: ArrayBType => OARRAY_LENGTH
           case _ =>
             abort("Unexpected array element type: " + elementType)
-        }
 
       case _ =>
         code
-    }
-  }
-}

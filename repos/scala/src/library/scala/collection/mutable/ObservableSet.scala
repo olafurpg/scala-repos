@@ -24,31 +24,25 @@ import script._
 @deprecated(
     "Observables are deprecated because scripting is deprecated.", "2.11.0")
 trait ObservableSet[A]
-    extends Set[A] with Publisher[Message[A] with Undoable] {
+    extends Set[A] with Publisher[Message[A] with Undoable]
 
   type Pub <: ObservableSet[A]
 
-  abstract override def +=(elem: A): this.type = {
-    if (!contains(elem)) {
+  abstract override def +=(elem: A): this.type =
+    if (!contains(elem))
       super.+=(elem)
       publish(new Include(elem) with Undoable { def undo = -=(elem) })
-    }
     this
-  }
 
-  abstract override def -=(elem: A): this.type = {
-    if (contains(elem)) {
+  abstract override def -=(elem: A): this.type =
+    if (contains(elem))
       super.-=(elem)
       publish(new Remove(elem) with Undoable { def undo = +=(elem) })
-    }
     this
-  }
 
-  abstract override def clear(): Unit = {
+  abstract override def clear(): Unit =
     super.clear()
     publish(
-        new Reset with Undoable {
+        new Reset with Undoable
       def undo(): Unit = throw new UnsupportedOperationException("cannot undo")
-    })
-  }
-}
+    )

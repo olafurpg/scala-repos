@@ -15,18 +15,17 @@ import java.lang.Double.longBitsToDouble
 import scala.reflect.internal.{Flags, Names}
 import scala.reflect.internal.pickling.{PickleBuffer, PickleFormat}
 
-object ShowPickled extends Names {
+object ShowPickled extends Names
   import PickleFormat._
 
   case class PickleBufferEntry(
-      num: Int, startIndex: Int, tag: Int, bytes: Array[Byte]) {
+      num: Int, startIndex: Int, tag: Int, bytes: Array[Byte])
     def isName = tag == TERMname || tag == TYPEname
-    def hasName = tag match {
+    def hasName = tag match
       case TYPEsym | ALIASsym | CLASSsym | MODULEsym | VALsym |
           EXTref | EXTMODCLASSref =>
         true
       case _ => false
-    }
     def readName =
       if (isName) new String(bytes, "UTF-8")
       else sys.error("%s is no name" format tagName)
@@ -36,28 +35,23 @@ object ShowPickled extends Names {
 
     def tagName = tag2string(tag)
     override def toString = "%d,%d: %s".format(num, startIndex, tagName)
-  }
 
-  case class PickleBufferEntryList(entries: IndexedSeq[PickleBufferEntry]) {
-    def nameAt(idx: Int) = {
+  case class PickleBufferEntryList(entries: IndexedSeq[PickleBufferEntry])
+    def nameAt(idx: Int) =
       val entry = entries(idx)
       if (entry.isName) entry.readName
       else if (entry.hasName) entries(entry.nameIndex).readName
       else "?"
-    }
-  }
 
-  def makeEntryList(buf: PickleBuffer, index: Array[Int]) = {
+  def makeEntryList(buf: PickleBuffer, index: Array[Int]) =
     val entries =
-      buf.toIndexedSeq.zipWithIndex map {
+      buf.toIndexedSeq.zipWithIndex map
         case ((tag, data), num) =>
           PickleBufferEntry(num, index(num), tag, data)
-      }
 
     PickleBufferEntryList(entries)
-  }
 
-  def tag2string(tag: Int): String = tag match {
+  def tag2string(tag: Int): String = tag match
     case TERMname => "TERMname"
     case TYPEname => "TYPEname"
     case NONEsym => "NONEsym"
@@ -104,24 +98,22 @@ object ShowPickled extends Names {
     case MODIFIERS => "MODIFIERS"
 
     case _ => "***BAD TAG***(" + tag + ")"
-  }
 
   /** Extremely regrettably, essentially copied from PickleBuffer.
     */
-  def readNat(data: Array[Byte], index: Int): Int = {
+  def readNat(data: Array[Byte], index: Int): Int =
     var idx = index
     var result = 0L
     var b = 0L
-    do {
+    do
       b = data(idx).toLong
       idx += 1
       result = (result << 7) + (b & 0x7f)
-    } while ( (b & 0x80) != 0L)
+    while ( (b & 0x80) != 0L)
 
     result.toInt
-  }
 
-  def printFile(buf: PickleBuffer, out: PrintStream) {
+  def printFile(buf: PickleBuffer, out: PrintStream)
     out.println("Version " + buf.readNat() + "." + buf.readNat())
     val index = buf.createIndex
     val entryList = makeEntryList(buf, index)
@@ -129,13 +121,12 @@ object ShowPickled extends Names {
 
     def p(s: String) = out print s
 
-    def printNameRef() {
+    def printNameRef()
       val idx = buf.readNat()
       val name = entryList nameAt idx
       val toPrint = " %s(%s)".format(idx, name)
 
       out print toPrint
-    }
 
     def printNat() = p(" " + buf.readNat())
     def printReadNat(x: Int) = p(" " + x)
@@ -147,42 +138,37 @@ object ShowPickled extends Names {
     def printConstAnnotArgRef() = printNat()
     def printAnnotArgRef() = printNat()
 
-    def printSymInfo(end: Int) {
+    def printSymInfo(end: Int)
       printNameRef()
       printSymbolRef()
       val pflags = buf.readLongNat()
-      def printFlags(privateWithin: Option[Int]) = {
-        val accessBoundary = (for (idx <- privateWithin) yield {
+      def printFlags(privateWithin: Option[Int]) =
+        val accessBoundary = (for (idx <- privateWithin) yield
           val s = entryList nameAt idx
           idx + "(" + s + ")"
-        })
-        val flagString = {
+        )
+        val flagString =
           val arg1 = Flags.pickledToRawFlags(pflags)
-          accessBoundary match {
+          accessBoundary match
             case Some(pw) => Flags.flagsToString(arg1, pw)
             case _ => Flags.flagsToString(arg1)
-          }
-        }
 
         out.print(" %s[%s]".format(toHexString(pflags), flagString))
-      }
 
       /* Might be info or privateWithin */
       val x = buf.readNat()
-      if (buf.readIndex == end) {
+      if (buf.readIndex == end)
         printFlags(None)
         printReadNat(x)
-      } else {
+      else
         printFlags(Some(x))
         printTypeRef()
-      }
-    }
 
     /* Note: the entries which require some semantic analysis to be correctly
      * interpreted are for the most part going to tell you the wrong thing.
      * It's not so easy to duplicate the logic applied in the UnPickler.
      */
-    def printEntry(i: Int) {
+    def printEntry(i: Int)
       buf.readIndex = index(i)
       p(i + "," + buf.readIndex + ": ")
       val tag = buf.readByte()
@@ -190,7 +176,7 @@ object ShowPickled extends Names {
       val len = buf.readNat()
       val end = len + buf.readIndex
       p(" " + len + ":")
-      tag match {
+      tag match
         case TERMname =>
           out.print(" ")
           out.print(newTermName(buf.bytes, buf.readIndex, len).toString)
@@ -261,9 +247,8 @@ object ShowPickled extends Names {
           printTypeRef(); buf.until(end, printSymbolRef)
 
         case _ =>
-      }
       out.println()
-      if (buf.readIndex != end) {
+      if (buf.readIndex != end)
         out.println(
             "BAD ENTRY END: computed = %d, actual = %d, bytes = %s".format(
                 end,
@@ -272,32 +257,23 @@ object ShowPickled extends Names {
                   .slice(index(i), (end max buf.readIndex))
                   .mkString(", ")
               ))
-      }
-    }
 
     for (i <- 0 until index.length) printEntry(i)
-  }
 
   def fromFile(path: String) = fromBytes(io.File(path).toByteArray())
   def fromBytes(data: => Array[Byte]): Option[PickleBuffer] =
-    try Some(new PickleBuffer(data, 0, data.length)) catch {
+    try Some(new PickleBuffer(data, 0, data.length)) catch
       case _: Exception => None
-    }
 
-  def show(what: String, pickle: PickleBuffer) = {
+  def show(what: String, pickle: PickleBuffer) =
     Console.println(what)
     val saved = pickle.readIndex
     pickle.readIndex = 0
     printFile(pickle, Console.out)
     pickle.readIndex = saved
-  }
 
-  def main(args: Array[String]) {
-    args foreach { arg =>
-      fromFile(arg) match {
+  def main(args: Array[String])
+    args foreach  arg =>
+      fromFile(arg) match
         case Some(pb) => show(arg + ":", pb)
         case _ => Console.println("Cannot read " + arg)
-      }
-    }
-  }
-}

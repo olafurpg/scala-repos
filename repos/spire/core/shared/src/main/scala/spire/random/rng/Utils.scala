@@ -36,7 +36,7 @@ import spire.math.max
   * @see <a href="http://en.wikipedia.org/wiki/Mersenne_twister">Mersenne Twister @ Wikipedia</a>
   * @author <a href="mailto:dusan.kysel@gmail.com">Du&#x0161;an Kysel</a>
   */
-object Utils {
+object Utils
   /*
     final class IntArrayWrapper(transform: Int => Int, array: Array[Int]) {
       def apply(i: Int) = array(transform(i))
@@ -51,40 +51,34 @@ object Utils {
 
   @volatile private var seedUniquifier = 8682522807148012L
 
-  def intFromTime(time: Long = System.nanoTime): Int = {
+  def intFromTime(time: Long = System.nanoTime): Int =
     longFromTime(time).toInt
-  }
 
-  def longFromTime(time: Long = System.nanoTime): Long = {
+  def longFromTime(time: Long = System.nanoTime): Long =
     seedUniquifier += 1
     (seedUniquifier + time)
-  }
 
-  def seedFromInt(length: Int, seed: Int = 5489): Array[Int] = {
+  def seedFromInt(length: Int, seed: Int = 5489): Array[Int] =
     val a = new Array[Int](length)
     a(0) = seed
 
-    cfor(1)(_ < length, _ + 1) { i =>
+    cfor(1)(_ < length, _ + 1)  i =>
       val x = a(i - 1)
       a(i) = 1812433253 * (x ^ (x >>> 30)) + i
-    }
 
     a
-  }
 
-  def seedFromLong(length: Int, seed: Long = 5489): Array[Long] = {
+  def seedFromLong(length: Int, seed: Long = 5489): Array[Long] =
     val a = new Array[Long](length)
     a(0) = seed
 
-    cfor(1)(_ < length, _ + 1) { i =>
+    cfor(1)(_ < length, _ + 1)  i =>
       val x = a(i - 1)
       a(i) = 6364136223846793005L * (x ^ (x >>> 62)) + i
-    }
 
     a
-  }
 
-  def seedFromArray(length: Int, seed: Array[Int]): Array[Int] = {
+  def seedFromArray(length: Int, seed: Array[Int]): Array[Int] =
     val a = seedFromInt(length, 19650218)
     val length_1 = length - 1
 
@@ -92,42 +86,36 @@ object Utils {
     var j = 0
     var k = max(length, seed.length)
 
-    while (k != 0) {
+    while (k != 0)
       val x = a(i - 1)
       a(i) = a(i) ^ ((x ^ (x >>> 30)) * 1664525) + seed(j) + j
       i += 1
       j += 1
 
-      if (i >= length) {
+      if (i >= length)
         a(0) = a(length_1)
         i = 1
-      }
 
-      if (j >= seed.length) {
+      if (j >= seed.length)
         j = 0
-      }
       k -= 1
-    }
 
     k = length_1
-    while (k != 0) {
+    while (k != 0)
       val x = a(i - 1)
       a(i) = a(i) ^ ((x ^ (x >>> 30)) * 1566083941) - i
       i += 1
 
-      if (i >= length) {
+      if (i >= length)
         a(0) = a(length_1)
         i = 1
-      }
 
       k -= 1
-    }
 
     a(0) = 0x80000000 // MSB is 1; assuring non-zero initial array
     a
-  }
 
-  def seedFromArray(length: Int, seed: Array[Long]): Array[Long] = {
+  def seedFromArray(length: Int, seed: Array[Long]): Array[Long] =
     val a = seedFromLong(length, 19650218)
     val length_1 = length - 1
 
@@ -135,38 +123,31 @@ object Utils {
     var j = 0
     var k = max(length, seed.length)
 
-    while (k != 0) {
+    while (k != 0)
       val x = a(i - 1)
       a(i) = a(i) ^ ((x ^ (x >>> 62)) * 3935559000370003845L) + seed(j) + j
       i += 1
       j += 1
 
-      if (i >= length) {
+      if (i >= length)
         a(0) = a(length_1)
         i = 1
-      }
 
-      if (j >= seed.length) {
+      if (j >= seed.length)
         j = 0
-      }
       k -= 1
-    }
 
     k = length - 1
-    while (k != 0) {
+    while (k != 0)
       val x = a(i - 1)
       a(i) = a(i) ^ ((x ^ (x >>> 62)) * 2862933555777941757L) - i
       i += 1
 
-      if (i >= length) {
+      if (i >= length)
         a(0) = a(length_1)
         i = 1
-      }
 
       k -= 1
-    }
 
     a(0) = 1L << 63 // MSB is 1; assuring non-zero initial array
     a
-  }
-}

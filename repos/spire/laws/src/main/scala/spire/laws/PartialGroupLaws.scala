@@ -10,14 +10,12 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object PartialGroupLaws {
-  def apply[A : Eq : Arbitrary] = new PartialGroupLaws[A] {
+object PartialGroupLaws
+  def apply[A : Eq : Arbitrary] = new PartialGroupLaws[A]
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
-  }
-}
 
-trait PartialGroupLaws[A] extends GroupLaws[A] {
+trait PartialGroupLaws[A] extends GroupLaws[A]
 
   def semigroupoid(implicit A: Semigroupoid[A]) = new GroupProperties(
       name = "semigroupoid",
@@ -27,10 +25,9 @@ trait PartialGroupLaws[A] extends GroupLaws[A] {
           c: A) => !((a |+|?? b) && (b |+|?? c)) || ((a |+|? b).get |+|?? c)),
       "associative: (a |+|? b) |+|? c === a |+|? (b |+|? c)" → forAll(
           (a: A, b: A, c: A) =>
-            {
           (!(a |+|?? b) || !(b |+|?? c)) || ((a |+|? b).get |+|? c).get ===
           (a |+|? (b |+|? c).get).get
-      })
+      )
   )
 
   def groupoid(implicit A: Groupoid[A]) = new GroupProperties(
@@ -48,6 +45,5 @@ trait PartialGroupLaws[A] extends GroupLaws[A] {
             (((a |+|? b).get |+|? b.inverse).get === a &&
                 ((a.inverse |+|? a).get |+|? b).get === b))
   )
-}
 
 // vim: expandtab:ts=2:sw=2

@@ -36,18 +36,17 @@ import scalafx.scene.control.Button
 import scalafx.testutil.RunOnApplicationThread
 
 @RunWith(classOf[JUnitRunner])
-class EventHandlerSpec extends FlatSpec with RunOnApplicationThread {
+class EventHandlerSpec extends FlatSpec with RunOnApplicationThread
 
-  "`handleEvent`" should "create subscription and cancel for Event Handlers" in {
+  "`handleEvent`" should "create subscription and cancel for Event Handlers" in
 
     val group = new Group()
 
     var counter = 0
-    val subscription = group.handleEvent(Event.ANY) { () =>
+    val subscription = group.handleEvent(Event.ANY)  () =>
       // Counter is incremented twice to make sure that both instructions are executed, similar to Issue 102
       counter += 1
       counter += 1
-    }
 
     assert(counter === 0)
 
@@ -62,27 +61,23 @@ class EventHandlerSpec extends FlatSpec with RunOnApplicationThread {
     subscription.cancel()
     group.fireEvent(actionEvent)
     assert(counter === 4)
-  }
 
-  "`filterEvent`" should "create subscription and cancel for Event Filters" in {
+  "`filterEvent`" should "create subscription and cancel for Event Filters" in
 
     val button = new Button()
-    val group = new Group {
+    val group = new Group
       children = button
-    }
 
     var groupCounter = 0
-    val groupSubscription = group.filterEvent(ActionEvent.Action) { () =>
+    val groupSubscription = group.filterEvent(ActionEvent.Action)  () =>
       // Counter is incremented twice to make sure that both instructions are executed, similar to Issue 102
       groupCounter += 1
       groupCounter += 1
-    }
     var buttonCounter = 0
-    button.handleEvent(ActionEvent.Action) { () =>
+    button.handleEvent(ActionEvent.Action)  () =>
       // Counter is incremented twice to make sure that both instructions are executed, similar to Issue 102
       buttonCounter += 3
       buttonCounter += 3
-    }
 
     assert(groupCounter === 0)
     assert(buttonCounter === 0)
@@ -101,22 +96,19 @@ class EventHandlerSpec extends FlatSpec with RunOnApplicationThread {
     button.fireEvent(actionEvent)
     assert(groupCounter === 4)
     assert(buttonCounter === 18)
-  }
 
-  "`filterEvent`" should "not consume events when not cancelled/active" in {
+  "`filterEvent`" should "not consume events when not cancelled/active" in
 
     val button = new Button()
-    val group = new Group {
+    val group = new Group
       children = button
-    }
 
     var groupCounter = 0
     var buttonCounter = 0
-    button.handleEvent(ActionEvent.Action) { () =>
+    button.handleEvent(ActionEvent.Action)  () =>
       // Counter is incremented twice to make sure that both instructions are executed, similar to Issue 102
       buttonCounter += 3
       buttonCounter += 3
-    }
 
     assert(groupCounter === 0)
     assert(buttonCounter === 0)
@@ -127,13 +119,12 @@ class EventHandlerSpec extends FlatSpec with RunOnApplicationThread {
     assert(groupCounter === 0)
     assert(buttonCounter === 6)
 
-    val groupSubscription = group.filterEvent(ActionEvent.Action) {
+    val groupSubscription = group.filterEvent(ActionEvent.Action)
       (ae: ActionEvent) =>
         // Counter is incremented twice to make sure that both instructions are executed, similar to Issue 102
         groupCounter += 1
         groupCounter += 1
         ae.consume()
-    }
 
     button.fireEvent(actionEvent)
     assert(groupCounter === 2)
@@ -148,5 +139,3 @@ class EventHandlerSpec extends FlatSpec with RunOnApplicationThread {
     button.fireEvent(actionEvent)
     assert(groupCounter === 4)
     assert(buttonCounter === 12)
-  }
-}

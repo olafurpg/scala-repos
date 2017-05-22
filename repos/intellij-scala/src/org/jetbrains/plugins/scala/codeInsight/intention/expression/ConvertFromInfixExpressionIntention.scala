@@ -15,27 +15,25 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 4/9/12
   */
-object ConvertFromInfixExpressionIntention {
+object ConvertFromInfixExpressionIntention
   val familyName = "Convert from infix expression"
-}
 
 class ConvertFromInfixExpressionIntention
-    extends PsiElementBaseIntentionAction {
+    extends PsiElementBaseIntentionAction
   def getFamilyName = ConvertFromInfixExpressionIntention.familyName
 
   override def getText: String = getFamilyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
     val range: TextRange = infixExpr.operation.nameId.getTextRange
     val offset = editor.getCaretModel.getOffset
     range.getStartOffset <= offset && offset <= range.getEndOffset
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null || !infixExpr.isValid) return
@@ -47,21 +45,17 @@ class ConvertFromInfixExpressionIntention
 
     val methodCallExpr =
       ScalaPsiElementFactory.createEquivMethodCall(infixExpr)
-    val referenceExpr = methodCallExpr.getInvokedExpr match {
+    val referenceExpr = methodCallExpr.getInvokedExpr match
       case ref: ScReferenceExpression => ref
       case call: ScGenericCall =>
         call.referencedExpr.asInstanceOf[ScReferenceExpression]
-    }
     val size =
       referenceExpr.nameId.getTextRange.getStartOffset -
       methodCallExpr.getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       infixExpr.replaceExpression(methodCallExpr, removeParenthesis = true)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

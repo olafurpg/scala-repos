@@ -23,7 +23,7 @@ import org.apache.spark.sql.execution.columnar._
 import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 import org.apache.spark.sql.types.AtomicType
 
-class RunLengthEncodingSuite extends SparkFunSuite {
+class RunLengthEncodingSuite extends SparkFunSuite
   testRunLengthEncoding(new NoopColumnStats, BOOLEAN)
   testRunLengthEncoding(new ByteColumnStats, BYTE)
   testRunLengthEncoding(new ShortColumnStats, SHORT)
@@ -32,11 +32,11 @@ class RunLengthEncodingSuite extends SparkFunSuite {
   testRunLengthEncoding(new StringColumnStats, STRING)
 
   def testRunLengthEncoding[T <: AtomicType](
-      columnStats: ColumnStats, columnType: NativeColumnType[T]) {
+      columnStats: ColumnStats, columnType: NativeColumnType[T])
 
     val typeName = columnType.getClass.getSimpleName.stripSuffix("$")
 
-    def skeleton(uniqueValueCount: Int, inputRuns: Seq[(Int, Int)]) {
+    def skeleton(uniqueValueCount: Int, inputRuns: Seq[(Int, Int)])
       // -------------
       // Tests encoder
       // -------------
@@ -45,10 +45,9 @@ class RunLengthEncodingSuite extends SparkFunSuite {
           columnStats, columnType, RunLengthEncoding)
       val (values, rows) = makeUniqueValuesAndSingleValueRows(
           columnType, uniqueValueCount)
-      val inputSeq = inputRuns.flatMap {
+      val inputSeq = inputRuns.flatMap
         case (index, run) =>
           Seq.fill(run)(index)
-      }
 
       inputSeq.foreach(i => builder.appendFrom(rows(i), 0))
       val buffer = builder.build()
@@ -58,11 +57,11 @@ class RunLengthEncodingSuite extends SparkFunSuite {
 
       // Compression scheme ID + compressed contents
       val compressedSize =
-        4 + inputRuns.map {
+        4 + inputRuns.map
           case (index, _) =>
             // 4 extra bytes each run for run length
             columnType.actualSize(rows(index), 0) + 4
-        }.sum
+        .sum
 
       // 4 extra bytes for compression scheme type ID
       assertResult(headerSize + compressedSize, "Wrong buffer capacity")(
@@ -73,12 +72,11 @@ class RunLengthEncodingSuite extends SparkFunSuite {
       assertResult(RunLengthEncoding.typeId, "Wrong compression scheme ID")(
           buffer.getInt())
 
-      inputRuns.foreach {
+      inputRuns.foreach
         case (index, run) =>
           assertResult(values(index), "Wrong column element value")(
               columnType.extract(buffer))
           assertResult(run, "Wrong run length")(buffer.getInt())
-      }
 
       // -------------
       // Tests decoder
@@ -90,33 +88,23 @@ class RunLengthEncodingSuite extends SparkFunSuite {
       val decoder = RunLengthEncoding.decoder(buffer, columnType)
       val mutableRow = new GenericMutableRow(1)
 
-      if (inputSeq.nonEmpty) {
-        inputSeq.foreach { i =>
+      if (inputSeq.nonEmpty)
+        inputSeq.foreach  i =>
           assert(decoder.hasNext)
-          assertResult(values(i), "Wrong decoded value") {
+          assertResult(values(i), "Wrong decoded value")
             decoder.next(mutableRow, 0)
             columnType.getField(mutableRow, 0)
-          }
-        }
-      }
 
       assert(!decoder.hasNext)
-    }
 
-    test(s"$RunLengthEncoding with $typeName: empty column") {
+    test(s"$RunLengthEncoding with $typeName: empty column")
       skeleton(0, Seq.empty)
-    }
 
-    test(s"$RunLengthEncoding with $typeName: simple case") {
+    test(s"$RunLengthEncoding with $typeName: simple case")
       skeleton(2, Seq(0 -> 2, 1 -> 2))
-    }
 
-    test(s"$RunLengthEncoding with $typeName: run length == 1") {
+    test(s"$RunLengthEncoding with $typeName: run length == 1")
       skeleton(2, Seq(0 -> 1, 1 -> 1))
-    }
 
-    test(s"$RunLengthEncoding with $typeName: single long run") {
+    test(s"$RunLengthEncoding with $typeName: single long run")
       skeleton(1, Seq(0 -> 1000))
-    }
-  }
-}

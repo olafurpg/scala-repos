@@ -1,37 +1,29 @@
 package test // bug #1215
 
-class Async {
+class Async
   def unapply(scrut: Any): Option[Any] = None
-}
 
-class Buffer {
+class Buffer
   val Put = new Async
   //case class Put(x: Int)
 
-  def joinPat(x: Any): Unit = {
-    x match {
+  def joinPat(x: Any): Unit =
+    x match
       case Put =>
       case Put(y) =>
         println("returning " + y)
-    }
-  }
-}
 
-object unapplyJoins extends App {
+object unapplyJoins extends App
   // bug #1257
 
-  class Sync {
+  class Sync
     def apply(): Int = 42
     def unapply(scrut: Any): Boolean = false
-  }
 
-  class Buffer {
+  class Buffer
     object Get extends Sync
 
-    val jp: PartialFunction[Any, Any] = {
+    val jp: PartialFunction[Any, Any] =
       case Get() =>
-    }
-  }
 
   println((new Buffer).jp.isDefinedAt(42))
-}

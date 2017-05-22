@@ -9,7 +9,7 @@ package internal
 
 import scala.language.implicitConversions
 
-object Mode {
+object Mode
   private implicit def liftIntBitsToMode(bits: Int): Mode = apply(bits)
   def apply(bits: Int): Mode = new Mode(bits)
 
@@ -92,10 +92,9 @@ object Mode {
       (1 << 14) -> "<>", // formerly HKmode
       (1 << 15) -> "BYVALmode",
       (1 << 16) -> "TYPEPATmode").map({ case (k, v) => Mode(k) -> v })
-}
 import Mode._
 
-final class Mode private (val bits: Int) extends AnyVal {
+final class Mode private (val bits: Int) extends AnyVal
   def &(other: Mode): Mode = new Mode(bits & other.bits)
   def |(other: Mode): Mode = new Mode(bits | other.bits)
   def &~(other: Mode): Mode = new Mode(bits & ~(other.bits))
@@ -140,4 +139,3 @@ final class Mode private (val bits: Int) extends AnyVal {
   override def toString =
     if (this == NOmode) "NOmode"
     else (modeNameMap filterKeys inAll).values.toList.sorted mkString "-"
-}

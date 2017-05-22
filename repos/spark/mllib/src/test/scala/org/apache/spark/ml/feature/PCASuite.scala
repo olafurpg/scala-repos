@@ -28,18 +28,17 @@ import org.apache.spark.sql.Row
 
 class PCASuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new PCA)
     val mat =
       Matrices.dense(2, 2, Array(0.0, 1.0, 2.0, 3.0)).asInstanceOf[DenseMatrix]
     val explainedVariance = Vectors.dense(0.5, 0.5).asInstanceOf[DenseVector]
     val model = new PCAModel("pca", mat, explainedVariance)
     ParamsSuite.checkParams(model)
-  }
 
-  test("pca") {
+  test("pca")
     val data = Array(
         Vectors.sparse(5, Seq((1, 1.0), (3, 7.0))),
         Vectors.dense(2.0, 0.0, 3.0, 4.0, 5.0),
@@ -65,20 +64,17 @@ class PCASuite
     // copied model must have the same parent.
     MLTestingUtils.checkCopy(pca)
 
-    pca.transform(df).select("pca_features", "expected").collect().foreach {
+    pca.transform(df).select("pca_features", "expected").collect().foreach
       case Row(x: Vector, y: Vector) =>
         assert(x ~== y absTol 1e-5,
                "Transformed vector is different with expected vector.")
-    }
-  }
 
-  test("PCA read/write") {
+  test("PCA read/write")
     val t =
       new PCA().setInputCol("myInputCol").setOutputCol("myOutputCol").setK(3)
     testDefaultReadWrite(t)
-  }
 
-  test("PCAModel read/write") {
+  test("PCAModel read/write")
     val instance =
       new PCAModel("myPCAModel",
                    Matrices
@@ -87,5 +83,3 @@ class PCASuite
                    Vectors.dense(0.5, 0.5).asInstanceOf[DenseVector])
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.pc === instance.pc)
-  }
-}

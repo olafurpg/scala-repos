@@ -16,14 +16,13 @@ class MessageQueueAppendFailedException(
 /**
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-trait MessageQueue {
+trait MessageQueue
   val dispatcherLock = new SimpleLock
   val suspended = new SimpleLock
   def enqueue(handle: MessageInvocation)
   def dequeue(): MessageInvocation
   def size: Int
   def isEmpty: Boolean
-}
 
 /**
   * Mailbox configuration.
@@ -31,43 +30,38 @@ trait MessageQueue {
 sealed trait MailboxType
 
 case class UnboundedMailbox() extends MailboxType
-case class BoundedMailbox(val capacity: Int = {
+case class BoundedMailbox(val capacity: Int =
   if (Dispatchers.MAILBOX_CAPACITY < 0) Int.MaxValue
   else Dispatchers.MAILBOX_CAPACITY
-}, val pushTimeOut: Duration = Dispatchers.MAILBOX_PUSH_TIME_OUT)
-    extends MailboxType {
+, val pushTimeOut: Duration = Dispatchers.MAILBOX_PUSH_TIME_OUT)
+    extends MailboxType
   if (capacity < 0)
     throw new IllegalArgumentException(
         "The capacity for BoundedMailbox can not be negative")
   if (pushTimeOut eq null)
     throw new IllegalArgumentException(
         "The push time-out for BoundedMailbox can not be null")
-}
 
-trait UnboundedMessageQueueSemantics extends MessageQueue {
+trait UnboundedMessageQueueSemantics extends MessageQueue
   self: BlockingQueue[MessageInvocation] =>
   @inline
   final def enqueue(handle: MessageInvocation): Unit = this add handle
   @inline
   final def dequeue(): MessageInvocation = this.poll()
-}
 
-trait BoundedMessageQueueSemantics extends MessageQueue {
+trait BoundedMessageQueueSemantics extends MessageQueue
   self: BlockingQueue[MessageInvocation] =>
   def pushTimeOut: Duration
 
-  final def enqueue(handle: MessageInvocation) {
-    if (pushTimeOut.length > 0) {
-      this.offer(handle, pushTimeOut.length, pushTimeOut.unit) || {
+  final def enqueue(handle: MessageInvocation)
+    if (pushTimeOut.length > 0)
+      this.offer(handle, pushTimeOut.length, pushTimeOut.unit) ||
         throw new MessageQueueAppendFailedException(
             "Couldn't enqueue message " + handle + " to " + toString)
-      }
-    } else this put handle
-  }
+    else this put handle
 
   @inline
   final def dequeue(): MessageInvocation = this.poll()
-}
 
 class DefaultUnboundedMessageQueue
     extends LinkedBlockingQueue[MessageInvocation]

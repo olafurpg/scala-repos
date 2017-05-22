@@ -9,7 +9,7 @@ import scalaz.Validation.FlatMap._
 
 import lila.game._
 
-private[importer] final class DataForm {
+private[importer] final class DataForm
 
   lazy val importForm = Form(
       mapping(
@@ -19,24 +19,23 @@ private[importer] final class DataForm {
 
   private def checkPgn(pgn: String): Boolean =
     ImportData(pgn, none).preprocess(none).isSuccess
-}
 
 private[importer] case class Result(status: Status, winner: Option[Color])
 private[importer] case class Preprocessed(
     game: Game, replay: Replay, result: Option[Result])
 
-case class ImportData(pgn: String, analyse: Option[String]) {
+case class ImportData(pgn: String, analyse: Option[String])
 
   private type TagPicker = Tag.type => TagType
 
   private val maxPlies = 600
 
   def preprocess(user: Option[String]): Valid[Preprocessed] =
-    Parser.full(pgn) flatMap {
+    Parser.full(pgn) flatMap
       case ParsedPgn(_, sans) if sans.size > maxPlies =>
         !!("Replay is too long")
       case ParsedPgn(tags, sans) =>
-        Reader.full(pgn) map {
+        Reader.full(pgn) map
           case replay @ Replay(setup, _, game) =>
             def tag(which: Tag.type => TagType): Option[String] =
               tags find (_.name == which(Tag)) map (_.value)
@@ -44,33 +43,29 @@ case class ImportData(pgn: String, analyse: Option[String]) {
             val initBoard = tag(_.FEN) flatMap Forsyth.<< map (_.board)
             val fromPosition =
               initBoard.nonEmpty && tag(_.FEN) != Forsyth.initial.some
-            val variant = {
+            val variant =
               tag(_.Variant)
                 .map(Chess960.fixVariantName)
-                .flatMap(chess.variant.Variant.byName) | {
+                .flatMap(chess.variant.Variant.byName) |
                 fromPosition.fold(chess.variant.FromPosition,
                                   chess.variant.Standard)
-              }
-            } match {
+            match
               case chess.variant.Chess960
                   if !Chess960.isStartPosition(setup.board) =>
                 chess.variant.FromPosition
               case v => v
-            }
 
             val result =
-              tag(_.Result) ifFalse game.situation.end collect {
+              tag(_.Result) ifFalse game.situation.end collect
                 case "1-0" => Result(Status.UnknownFinish, Color.White.some)
                 case "0-1" => Result(Status.UnknownFinish, Color.Black.some)
                 case "1/2-1/2" => Result(Status.Draw, none)
-              }
 
             val date = tag(_.Date)
 
             def name(whichName: TagPicker, whichRating: TagPicker): String =
-              tag(whichName).fold("?") { n =>
+              tag(whichName).fold("?")  n =>
                 n + ~tag(whichRating).map(e => " (%s)" format e)
-              }
 
             val dbGame = Game
               .make(
@@ -92,6 +87,3 @@ case class ImportData(pgn: String, analyse: Option[String]) {
               .start
 
             Preprocessed(dbGame, replay, result)
-        }
-    }
-}

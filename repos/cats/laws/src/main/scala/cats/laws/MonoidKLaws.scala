@@ -4,7 +4,7 @@ package laws
 /**
   * Laws that must be obeyed by any `cats.MonoidK`.
   */
-trait MonoidKLaws[F[_]] extends SemigroupKLaws[F] {
+trait MonoidKLaws[F[_]] extends SemigroupKLaws[F]
   override implicit def F: MonoidK[F]
 
   def monoidKLeftIdentity[A](a: F[A]): IsEq[F[A]] =
@@ -12,9 +12,7 @@ trait MonoidKLaws[F[_]] extends SemigroupKLaws[F] {
 
   def monoidKRightIdentity[A](a: F[A]): IsEq[F[A]] =
     F.combineK(a, F.empty) <-> a
-}
 
-object MonoidKLaws {
+object MonoidKLaws
   def apply[F[_]](implicit ev: MonoidK[F]): MonoidKLaws[F] =
     new MonoidKLaws[F] { def F: MonoidK[F] = ev }
-}

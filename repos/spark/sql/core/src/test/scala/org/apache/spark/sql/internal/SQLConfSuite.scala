@@ -20,18 +20,17 @@ package org.apache.spark.sql.internal
 import org.apache.spark.sql.{QueryTest, SQLContext}
 import org.apache.spark.sql.test.{SharedSQLContext, TestSQLContext}
 
-class SQLConfSuite extends QueryTest with SharedSQLContext {
+class SQLConfSuite extends QueryTest with SharedSQLContext
   private val testKey = "test.key.0"
   private val testVal = "test.val.0"
 
-  test("propagate from spark conf") {
+  test("propagate from spark conf")
     // We create a new context here to avoid order dependence with other tests that might call
     // clear().
     val newContext = new SQLContext(sparkContext)
     assert(newContext.getConf("spark.sql.testkey", "false") === "true")
-  }
 
-  test("programmatic ways of basic setting and getting") {
+  test("programmatic ways of basic setting and getting")
     // Set a conf first.
     sqlContext.setConf(testKey, testVal)
     // Clear the conf.
@@ -51,9 +50,8 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
     assert(sqlContext.getAllConfs.contains(testKey))
 
     sqlContext.conf.clear()
-  }
 
-  test("parse SQL set commands") {
+  test("parse SQL set commands")
     sqlContext.conf.clear()
     sql(s"set $testKey=$testVal")
     assert(sqlContext.getConf(testKey, testVal + "_") === testVal)
@@ -73,29 +71,24 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
     assert(sqlContext.getConf(key, "0") === "")
 
     sqlContext.conf.clear()
-  }
 
-  test("deprecated property") {
+  test("deprecated property")
     sqlContext.conf.clear()
     val original = sqlContext.conf.numShufflePartitions
-    try {
+    try
       sql(s"set ${SQLConf.Deprecated.MAPRED_REDUCE_TASKS}=10")
       assert(sqlContext.conf.numShufflePartitions === 10)
-    } finally {
+    finally
       sql(s"set ${SQLConf.SHUFFLE_PARTITIONS}=$original")
-    }
-  }
 
-  test("invalid conf value") {
+  test("invalid conf value")
     sqlContext.conf.clear()
-    val e = intercept[IllegalArgumentException] {
+    val e = intercept[IllegalArgumentException]
       sql(s"set ${SQLConf.CASE_SENSITIVE.key}=10")
-    }
     assert(
         e.getMessage === s"${SQLConf.CASE_SENSITIVE.key} should be boolean, but was 10")
-  }
 
-  test("Test SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE's method") {
+  test("Test SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE's method")
     sqlContext.conf.clear()
 
     sqlContext.setConf(
@@ -115,24 +108,19 @@ class SQLConfSuite extends QueryTest with SharedSQLContext {
     assert(sqlContext.conf.targetPostShuffleInputSize === -1)
 
     // Test overflow exception
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // This value exceeds Long.MaxValue
       sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
                          "90000000000g")
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // This value less than Int.MinValue
       sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
                          "-90000000000g")
-    }
 
     // Test invalid input
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // This value exceeds Long.MaxValue
       sqlContext.setConf(SQLConf.SHUFFLE_TARGET_POSTSHUFFLE_INPUT_SIZE.key,
                          "-1g")
-    }
     sqlContext.conf.clear()
-  }
-}

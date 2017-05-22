@@ -18,9 +18,8 @@ package org.saddle
 /**
   * Provides type aliases for a few basic operations
   */
-package object ops {
+package object ops
   type SubOp[T] = BinOp[Subtract, T, T, T]
   type AddOp[T] = BinOp[Add, T, T, T]
   type MulOp[T] = BinOp[Multiply, T, T, T]
   type DivOp[T] = BinOp[Divide, T, T, T]
-}

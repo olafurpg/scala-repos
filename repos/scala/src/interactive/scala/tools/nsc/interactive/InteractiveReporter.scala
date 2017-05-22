@@ -11,7 +11,7 @@ import reporters.Reporter
 
 case class Problem(pos: Position, msg: String, severityLevel: Int)
 
-abstract class InteractiveReporter extends Reporter {
+abstract class InteractiveReporter extends Reporter
 
   def compiler: Global
 
@@ -19,13 +19,13 @@ abstract class InteractiveReporter extends Reporter {
 
   override def info0(
       pos: Position, msg: String, severity: Severity, force: Boolean): Unit =
-    try {
+    try
       severity.count += 1
       val problems =
-        if (compiler eq null) {
+        if (compiler eq null)
           otherProblems
-        } else if (pos.isDefined) {
-          compiler.getUnit(pos.source) match {
+        else if (pos.isDefined)
+          compiler.getUnit(pos.source) match
             case Some(unit) =>
               compiler.debugLog(
                   pos.source.file.name + ":" + pos.line + ": " + msg)
@@ -34,18 +34,13 @@ abstract class InteractiveReporter extends Reporter {
               compiler.debugLog(pos.source.file.name + "[not loaded] :" +
                   pos.line + ": " + msg)
               otherProblems
-          }
-        } else {
+        else
           compiler.debugLog("[no position] :" + msg)
           otherProblems
-        }
       problems += Problem(pos, msg, severity.id)
-    } catch {
+    catch
       case ex: UnsupportedOperationException =>
-    }
 
-  override def reset() {
+  override def reset()
     super.reset()
     otherProblems.clear()
-  }
-}

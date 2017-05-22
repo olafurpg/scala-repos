@@ -6,7 +6,7 @@
 
 package scala.tools.docutil
 
-object EmitHtml {
+object EmitHtml
   import scala.xml.{Node, NodeBuffer, NodeSeq, XML}
   import ManPage._
 
@@ -19,14 +19,13 @@ object EmitHtml {
       .replaceAll(">", "&gt;")
 
   /* */
-  def emitSection(section: Section, depth: Int) {
-    def emitPara(text: AbstractText) {
+  def emitSection(section: Section, depth: Int)
+    def emitPara(text: AbstractText)
       out println "<div>"
       emitText(text)
       out println "\n</div>"
-    }
-    def emitText(text: AbstractText) {
-      text match {
+    def emitText(text: AbstractText)
+      text match
         case seq: SeqText =>
           seq.components foreach emitText
 
@@ -72,14 +71,13 @@ object EmitHtml {
 
         case DefinitionList(definitions @ _ *) =>
           out println "<ins><dl>"
-          for (d <- definitions) {
+          for (d <- definitions)
             out println "<dt>"
             emitText(d.term)
             out println "\n</dt>"
             out println "<dd>"
             emitText(d.description)
             out println "</dd>"
-          }
           out println "</dl></ins>"
 
         case Link(label, url) =>
@@ -89,11 +87,9 @@ object EmitHtml {
 
         case _ =>
           sys.error("unknown text node: " + text)
-      }
-    }
 
-    def emitParagraph(para: Paragraph) {
-      para match {
+    def emitParagraph(para: Paragraph)
+      para match
         case TextParagraph(text) =>
           out println "<p>"
           emitText(text)
@@ -111,19 +107,17 @@ object EmitHtml {
 
         case lst: BulletList =>
           out println "<ul>"
-          for (item <- lst.items) {
+          for (item <- lst.items)
             out print "<li>"
             emitText(item)
             out println "</li>"
-          }
           out println "</ul>"
 
         case lst: NumberedList =>
           out println "<ol>"
-          for (item <- lst.items) {
+          for (item <- lst.items)
             out print "<li>"
             emitText(item)
-          }
           out println "</ol>"
 
         case TitledPara(title, text) =>
@@ -135,16 +129,13 @@ object EmitHtml {
 
         case _ =>
           sys.error("unknown paragraph node: " + para)
-      }
-    }
 
     val name = section.title.replaceAll("\\p{Space}", "_").toLowerCase()
     out.println("\n<h" + depth + " id=\"" + name + "\">" + section.title +
         "</h" + depth + ">")
     section.paragraphs foreach emitParagraph
-  }
 
-  private def emit3columns(col1: String, col2: String, col3: String) {
+  private def emit3columns(col1: String, col2: String, col3: String)
     out println "<div style=\"float:left;\">"
     out println col1
     out println "</div>"
@@ -154,23 +145,20 @@ object EmitHtml {
     out println "<div style=\"text-align:center;\">"
     out println col2
     out println "</div>"
-  }
 
-  private def emitHeader(col1: String, col2: String, col3: String) {
+  private def emitHeader(col1: String, col2: String, col3: String)
     out println "<!-- header -->"
     out println "<div style=\"margin: 0 0 2em 0;\">"
     emit3columns(col1, col2, col3)
     out println "</div>"
-  }
 
-  private def emitFooter(col1: String, col2: String, col3: String) {
+  private def emitFooter(col1: String, col2: String, col3: String)
     out println "<!-- footer -->"
     out println "<div style=\"margin: 2em 0 0 0;\">"
     emit3columns(col1, col2, col3)
     out println "</div>"
-  }
 
-  def emitDocument(document: Document) {
+  def emitDocument(document: Document)
     out.println(
         "<?xml version=\"1.1\" encoding=\"" + document.encoding + "\"?>")
     out.println(
@@ -204,28 +192,23 @@ object EmitHtml {
 
     out println "</body>"
     out println "</html>"
-  }
 
-  def main(args: Array[String]) = args match {
+  def main(args: Array[String]) = args match
     case Array(classname) => emitHtml(classname)
     case Array(classname, file, _ *) =>
       emitHtml(classname, new java.io.FileOutputStream(file))
     case _ => sys.exit(1)
-  }
 
-  def emitHtml(classname: String, outStream: java.io.OutputStream = out.out) {
+  def emitHtml(classname: String, outStream: java.io.OutputStream = out.out)
     if (outStream != out.out) out setOut outStream
-    try {
+    try
       val cl = this.getClass.getClassLoader()
       val clasz = cl loadClass classname
       val meth = clasz getDeclaredMethod "manpage"
       val doc = meth.invoke(null).asInstanceOf[Document]
       emitDocument(doc)
-    } catch {
+    catch
       case ex: Exception =>
         ex.printStackTrace()
         System.err println "Error in EmitManPage"
         sys.exit(1)
-    }
-  }
-}

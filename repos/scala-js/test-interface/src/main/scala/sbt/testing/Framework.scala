@@ -4,7 +4,7 @@ import scala.scalajs.js.annotation._
 
 /** Interface implemented by test frameworks. */
 @JSExportDescendentClasses
-trait Framework {
+trait Framework
 
   /** A human-friendly name of the test framework that this object represents.
     */
@@ -43,4 +43,3 @@ trait Framework {
                   remoteArgs: Array[String],
                   testClassLoader: ClassLoader,
                   send: String => Unit): Runner
-}

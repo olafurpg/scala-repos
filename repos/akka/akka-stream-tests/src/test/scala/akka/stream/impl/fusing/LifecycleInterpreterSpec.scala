@@ -9,21 +9,20 @@ import akka.stream.testkit.Utils.TE
 
 import scala.concurrent.duration._
 
-class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
+class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit
   import akka.stream.Supervision._
 
-  "Interpreter" must {
+  "Interpreter" must
 
     "call preStart in order on stages" in new OneBoundedSetup[String](
         Seq(PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-a"),
             PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-b"),
-            PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-c"))) {
+            PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-c")))
       expectMsg("start-a")
       expectMsg("start-b")
       expectMsg("start-c")
       expectNoMsg(300.millis)
       upstream.onComplete()
-    }
 
     "call postStop in order on stages - when upstream completes" in new OneBoundedSetup[
         String](
@@ -35,7 +34,7 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
                 onStop = () ⇒ testActor ! "stop-b"),
             PreStartAndPostStopIdentity(
                 onUpstreamCompleted = () ⇒ testActor ! "complete-c",
-                onStop = () ⇒ testActor ! "stop-c"))) {
+                onStop = () ⇒ testActor ! "stop-c")))
       upstream.onComplete()
       expectMsg("complete-a")
       expectMsg("stop-a")
@@ -44,69 +43,61 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       expectMsg("complete-c")
       expectMsg("stop-c")
       expectNoMsg(300.millis)
-    }
 
     "call postStop in order on stages - when upstream onErrors" in new OneBoundedSetup[
         String](Seq(PreStartAndPostStopIdentity(
                 onUpstreamFailed = ex ⇒ testActor ! ex.getMessage,
-                onStop = () ⇒ testActor ! "stop-c"))) {
+                onStop = () ⇒ testActor ! "stop-c")))
       val msg = "Boom! Boom! Boom!"
       upstream.onError(TE(msg))
       expectMsg(msg)
       expectMsg("stop-c")
       expectNoMsg(300.millis)
-    }
 
     "call postStop in order on stages - when downstream cancels" in new OneBoundedSetup[
         String](
         Seq(PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-a"),
             PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-b"),
-            PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-c"))) {
+            PreStartAndPostStopIdentity(onStop = () ⇒ testActor ! "stop-c")))
       downstream.cancel()
       expectMsg("stop-c")
       expectMsg("stop-b")
       expectMsg("stop-a")
       expectNoMsg(300.millis)
-    }
 
     "call preStart before postStop" in new OneBoundedSetup[String](
         Seq(PreStartAndPostStopIdentity(onStart = _ ⇒ testActor ! "start-a",
-                                        onStop = () ⇒ testActor ! "stop-a"))) {
+                                        onStop = () ⇒ testActor ! "stop-a")))
       expectMsg("start-a")
       expectNoMsg(300.millis)
       upstream.onComplete()
       expectMsg("stop-a")
       expectNoMsg(300.millis)
-    }
 
     "onError when preStart fails" in new OneBoundedSetup[String](
-        Seq(PreStartFailer(() ⇒ throw TE("Boom!")))) {
+        Seq(PreStartFailer(() ⇒ throw TE("Boom!"))))
       lastEvents() should ===(Set(Cancel, OnError(TE("Boom!"))))
-    }
 
     "not blow up when postStop fails" in new OneBoundedSetup[String](
-        Seq(PostStopFailer(() ⇒ throw TE("Boom!")))) {
+        Seq(PostStopFailer(() ⇒ throw TE("Boom!"))))
       upstream.onComplete()
       lastEvents() should ===(Set(OnComplete))
-    }
 
     "onError when preStart fails with stages after" in new OneBoundedSetup[
         String](Seq(Map((x: Int) ⇒ x, stoppingDecider),
                     PreStartFailer(() ⇒ throw TE("Boom!")),
-                    Map((x: Int) ⇒ x, stoppingDecider))) {
+                    Map((x: Int) ⇒ x, stoppingDecider)))
       lastEvents() should ===(Set(Cancel, OnError(TE("Boom!"))))
-    }
 
     "continue with stream shutdown when postStop fails" in new OneBoundedSetup[
-        String](Seq(PostStopFailer(() ⇒ throw TE("Boom!")))) {
+        String](Seq(PostStopFailer(() ⇒ throw TE("Boom!"))))
       lastEvents() should ===(Set())
 
       upstream.onComplete()
       lastEvents should ===(Set(OnComplete))
-    }
 
     "postStop when pushAndFinish called if upstream completes with pushAndFinish" in new OneBoundedSetup[
-        String](Seq(new PushFinishStage(onPostStop = () ⇒ testActor ! "stop"))) {
+        String](Seq(new PushFinishStage(onPostStop = () ⇒ testActor ! "stop")))
 
       lastEvents() should be(Set.empty)
 
@@ -116,12 +107,11 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       upstream.onNextAndComplete("foo")
       lastEvents() should be(Set(OnNext("foo"), OnComplete))
       expectMsg("stop")
-    }
 
     "postStop when pushAndFinish called with pushAndFinish if indirect upstream completes with pushAndFinish" in new OneBoundedSetup[
         String](Seq(Map((x: Any) ⇒ x, stoppingDecider),
                     new PushFinishStage(onPostStop = () ⇒ testActor ! "stop"),
-                    Map((x: Any) ⇒ x, stoppingDecider))) {
+                    Map((x: Any) ⇒ x, stoppingDecider)))
 
       lastEvents() should be(Set.empty)
 
@@ -131,12 +121,11 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       upstream.onNextAndComplete("foo")
       lastEvents() should be(Set(OnNext("foo"), OnComplete))
       expectMsg("stop")
-    }
 
     "postStop when pushAndFinish called with pushAndFinish if upstream completes with pushAndFinish and downstream immediately pulls" in new OneBoundedSetup[
         String](
         Seq(new PushFinishStage(onPostStop = () ⇒ testActor ! "stop"),
-            Fold("", (x: String, y: String) ⇒ x + y, stoppingDecider))) {
+            Fold("", (x: String, y: String) ⇒ x + y, stoppingDecider)))
 
       lastEvents() should be(Set.empty)
 
@@ -146,53 +135,46 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       upstream.onNextAndComplete("foo")
       lastEvents() should be(Set(OnNext("foo"), OnComplete))
       expectMsg("stop")
-    }
-  }
 
   private[akka] case class PreStartAndPostStopIdentity[T](
       onStart: LifecycleContext ⇒ Unit = _ ⇒ (),
       onStop: () ⇒ Unit = () ⇒ (),
       onUpstreamCompleted: () ⇒ Unit = () ⇒ (),
       onUpstreamFailed: Throwable ⇒ Unit = ex ⇒ ())
-      extends PushStage[T, T] {
+      extends PushStage[T, T]
     override def preStart(ctx: LifecycleContext) = onStart(ctx)
 
     override def onPush(elem: T, ctx: Context[T]) = ctx.push(elem)
 
-    override def onUpstreamFinish(ctx: Context[T]): TerminationDirective = {
+    override def onUpstreamFinish(ctx: Context[T]): TerminationDirective =
       onUpstreamCompleted()
       super.onUpstreamFinish(ctx)
-    }
 
     override def onUpstreamFailure(
-        cause: Throwable, ctx: Context[T]): TerminationDirective = {
+        cause: Throwable, ctx: Context[T]): TerminationDirective =
       onUpstreamFailed(cause)
       super.onUpstreamFailure(cause, ctx)
-    }
 
     override def postStop() = onStop()
-  }
 
   private[akka] case class PreStartFailer[T](pleaseThrow: () ⇒ Unit)
-      extends PushStage[T, T] {
+      extends PushStage[T, T]
 
     override def preStart(ctx: LifecycleContext) =
       pleaseThrow()
 
     override def onPush(elem: T, ctx: Context[T]) = ctx.push(elem)
-  }
 
   private[akka] case class PostStopFailer[T](ex: () ⇒ Throwable)
-      extends PushStage[T, T] {
+      extends PushStage[T, T]
     override def onUpstreamFinish(ctx: Context[T]) = ctx.finish()
     override def onPush(elem: T, ctx: Context[T]) = ctx.push(elem)
 
     override def postStop(): Unit = throw ex()
-  }
 
   // This test is related to issue #17351
   private[akka] class PushFinishStage(onPostStop: () ⇒ Unit = () ⇒ ())
-      extends PushStage[Any, Any] {
+      extends PushStage[Any, Any]
     override def onPush(elem: Any, ctx: Context[Any]): SyncDirective =
       ctx.pushAndFinish(elem)
 
@@ -201,5 +183,3 @@ class LifecycleInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
     override def postStop(): Unit =
       onPostStop()
-  }
-}

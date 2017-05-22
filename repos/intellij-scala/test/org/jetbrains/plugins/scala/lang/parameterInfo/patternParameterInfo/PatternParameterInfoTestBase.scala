@@ -26,13 +26,13 @@ import scala.collection.mutable.ArrayBuffer
   * @since 25.04.2009
   */
 abstract class PatternParameterInfoTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   val caretMarker = "/*caret*/"
 
   protected def folderPath =
     baseRootPath() + "parameterInfo/patternParameterInfo/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
@@ -58,8 +58,8 @@ abstract class PatternParameterInfoTestBase
     handler.findElementForParameterInfo(context)
     val items = new ArrayBuffer[String]
 
-    for (item <- context.getItemsToShow) {
-      val uiContext = new ParameterInfoUIContext {
+    for (item <- context.getItemsToShow)
+      val uiContext = new ParameterInfoUIContext
         def getDefaultParameterColor: Color = HintUtil.INFORMATION_COLOR
         def setupUIComponentPresentation(text: String,
                                          highlightStartOffset: Int,
@@ -67,17 +67,14 @@ abstract class PatternParameterInfoTestBase
                                          isDisabled: Boolean,
                                          strikeout: Boolean,
                                          isDisabledBeforeHighlight: Boolean,
-                                         background: Color): String = {
+                                         background: Color): String =
           items.append(text)
           text
-        }
         def isUIComponentEnabled: Boolean = false
         def getCurrentParameterIndex: Int = 0
         def getParameterOwner: PsiElement = element
         def setUIComponentEnabled(enabled: Boolean) {}
-      }
       handler.updateUI(item, uiContext)
-    }
 
     val itemsArray = items.toArray
     Sorting.quickSort[String](itemsArray)
@@ -88,13 +85,10 @@ abstract class PatternParameterInfoTestBase
     if (res.nonEmpty) res.replace(res.length - 1, res.length, "")
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
-    }
     assertEquals(output, res.toString())
-  }
-}

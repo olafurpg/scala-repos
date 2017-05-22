@@ -37,12 +37,11 @@ import org.apache.spark.streaming.receiver.Receiver
   * and then run the example
   *    `$ bin/run-example org.apache.spark.examples.streaming.CustomReceiver localhost 9999`
   */
-object CustomReceiver {
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+object CustomReceiver
+  def main(args: Array[String])
+    if (args.length < 2)
       System.err.println("Usage: CustomReceiver <hostname> <port>")
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -58,29 +57,25 @@ object CustomReceiver {
     wordCounts.print()
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 
 class CustomReceiver(host: String, port: Int)
-    extends Receiver[String](StorageLevel.MEMORY_AND_DISK_2) with Logging {
+    extends Receiver[String](StorageLevel.MEMORY_AND_DISK_2) with Logging
 
-  def onStart() {
+  def onStart()
     // Start the thread that receives data over a connection
-    new Thread("Socket Receiver") {
+    new Thread("Socket Receiver")
       override def run() { receive() }
-    }.start()
-  }
+    .start()
 
-  def onStop() {
+  def onStop()
     // There is nothing much to do as the thread calling receive()
     // is designed to stop by itself isStopped() returns false
-  }
 
   /** Create a socket connection and receive data until receiver is stopped */
-  private def receive() {
+  private def receive()
     var socket: Socket = null
     var userInput: String = null
-    try {
+    try
       logInfo("Connecting to " + host + ":" + port)
       socket = new Socket(host, port)
       logInfo("Connected to " + host + ":" + port)
@@ -88,20 +83,16 @@ class CustomReceiver(host: String, port: Int)
           new InputStreamReader(
               socket.getInputStream(), StandardCharsets.UTF_8))
       userInput = reader.readLine()
-      while (!isStopped && userInput != null) {
+      while (!isStopped && userInput != null)
         store(userInput)
         userInput = reader.readLine()
-      }
       reader.close()
       socket.close()
       logInfo("Stopped receiving")
       restart("Trying to connect again")
-    } catch {
+    catch
       case e: java.net.ConnectException =>
         restart("Error connecting to " + host + ":" + port, e)
       case t: Throwable =>
         restart("Error receiving data", t)
-    }
-  }
-}
 // scalastyle:on println

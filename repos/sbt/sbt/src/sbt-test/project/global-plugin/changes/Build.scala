@@ -2,7 +2,7 @@ import sbt._
 import Import._
 import sbt.Keys._
 
-object MyBuild extends Build {
+object MyBuild extends Build
   lazy val mySettings =
     Defaults.defaultSettings ++ Seq(name := "my-test-proj",
                                     organization := "com.example",
@@ -14,12 +14,9 @@ object MyBuild extends Build {
   lazy val check = taskKey[Unit](
       "Verifies that the junit dependency has the newer version (4.8)")
 
-  def checkVersion(report: UpdateReport): Unit = {
-    for (mod <- report.allModules) {
+  def checkVersion(report: UpdateReport): Unit =
+    for (mod <- report.allModules)
       if (mod.name == "junit")
         assert(
             mod.revision == "4.8",
             s"JUnit version (${mod.revision}) does not have the correct version")
-    }
-  }
-}

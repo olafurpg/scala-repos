@@ -12,7 +12,7 @@ case class AiConfig(variant: chess.variant.Variant,
                     level: Int,
                     color: Color,
                     fen: Option[String] = None)
-    extends Config with Positional {
+    extends Config with Positional
 
   val strictFen = true
 
@@ -20,7 +20,7 @@ case class AiConfig(variant: chess.variant.Variant,
     (variant.id, timeMode.id, time, increment, days, level, color.name, fen).some
 
   def game =
-    fenGame { chessGame =>
+    fenGame  chessGame =>
       val realVariant = chessGame.board.variant
       Game.make(
           game = chessGame,
@@ -34,12 +34,11 @@ case class AiConfig(variant: chess.variant.Variant,
               .fold(Source.Position, Source.Ai),
           daysPerTurn = makeDaysPerTurn,
           pgnImport = None)
-    } start
+    start
 
   def pov = Pov(game, creatorColor)
-}
 
-object AiConfig extends BaseConfig {
+object AiConfig extends BaseConfig
 
   def <<(v: Int,
          tm: Int,
@@ -70,14 +69,13 @@ object AiConfig extends BaseConfig {
   val levels = (1 to 8).toList
 
   val levelChoices =
-    levels map { l =>
+    levels map  l =>
       (l.toString, l.toString, none)
-    }
 
   import reactivemongo.bson._
   import lila.db.BSON
 
-  private[setup] implicit val aiConfigBSONHandler = new BSON[AiConfig] {
+  private[setup] implicit val aiConfigBSONHandler = new BSON[AiConfig]
 
     def reads(r: BSON.Reader): AiConfig =
       AiConfig(variant = chess.variant.Variant orDefault (r int "v"),
@@ -97,5 +95,3 @@ object AiConfig extends BaseConfig {
                    "d" -> o.days,
                    "l" -> o.level,
                    "f" -> o.fen)
-  }
-}

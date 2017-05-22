@@ -1,5 +1,4 @@
 package foo.bar
 
-object Foo {
+object Foo
   def bar = 42
-}

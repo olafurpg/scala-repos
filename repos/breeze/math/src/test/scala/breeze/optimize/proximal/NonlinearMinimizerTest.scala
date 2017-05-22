@@ -10,7 +10,7 @@ import breeze.numerics._
 import org.scalatest.Matchers
 
 @RunWith(classOf[JUnitRunner])
-class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
+class NonlinearMinimizerTest extends OptimizeTestBase with Matchers
   val n = 5
   val H = new DenseMatrix(n,
                           n,
@@ -48,16 +48,15 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
   val cost = QuadraticMinimizer.Cost(H, f :* (-1.0))
   val init = DenseVector.zeros[Double](n)
 
-  test("Nonlinear Minimization with Identity constraint compared to BFGS") {
+  test("Nonlinear Minimization with Identity constraint compared to BFGS")
     init := 0.0
     val x = H \ f
 
     init := 0.0
     val nlResult = NonlinearMinimizer(n, IDENTITY, 0.0).minimize(cost, init)
     assert(norm(x - nlResult, inf) < 1e-4)
-  }
 
-  test("Nonlinear Minimization with positivity constraint compared to Octave") {
+  test("Nonlinear Minimization with positivity constraint compared to Octave")
     val ata = new DenseMatrix[Double](5,
                                       5,
                                       Array(4.377,
@@ -93,9 +92,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
         DenseVector.zeros[Double](n))
     println(s"Positivity projection iter ${nlResult.iter}")
     assert(norm(nlResult.x - goodx, 2) < 1E-3)
-  }
 
-  test("Nonlinear Minimization with positivity proximal compared to Octave") {
+  test("Nonlinear Minimization with positivity proximal compared to Octave")
     val ata = new DenseMatrix[Double](5,
                                       5,
                                       Array(4.377,
@@ -131,20 +129,18 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
         DenseVector.zeros[Double](n))
     println(s"Positivity proximal iter ${nlResult.iter}")
     assert(norm(nlResult.z - goodx, 2) < 1E-3)
-  }
 
   test(
-      "Nonlinear Minimization with bounds constraint compared to QuadraticMinimizer") {
+      "Nonlinear Minimization with bounds constraint compared to QuadraticMinimizer")
     init := 0.0
     val gold = QuadraticMinimizer(n, BOX).minimize(H, f :* (-1.0))
     val nlResult =
       NonlinearMinimizer(n, BOX, 0.0).minimizeAndReturnState(cost, init)
     println(s"Bounds projection iter ${nlResult.iter}")
     assert(norm(nlResult.x - gold) < 1E-4)
-  }
 
   test(
-      "Nonlinear Minimization with bounds proximal compared to QuadraticMinimizer") {
+      "Nonlinear Minimization with bounds proximal compared to QuadraticMinimizer")
     init := 0.0
     val gold = QuadraticMinimizer(n, BOX).minimize(H, f :* (-1.0))
     val lb = DenseVector.zeros[Double](n)
@@ -153,9 +149,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
       .minimizeAndReturnState(cost, init)
     println(s"Bounds proximal iter ${nlResult.iter}")
     assert(norm(nlResult.z - gold) < 1E-4)
-  }
 
-  test("Nonlinear Minimization with probability simplex compared to Octave") {
+  test("Nonlinear Minimization with probability simplex compared to Octave")
     val Hml = new DenseMatrix(25,
                               25,
                               Array(
@@ -844,9 +839,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
 
     assert(norm(nlResult.x - golden) < 1e-3)
     assert(abs(sum(nlResult.x) - 1.0) < 1e-4)
-  }
 
-  test("Nonlinear Minimization with L1 projection compared to Octave") {
+  test("Nonlinear Minimization with L1 projection compared to Octave")
     val Hl1 = new DenseMatrix(25,
                               25,
                               Array(
@@ -1534,9 +1528,8 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
 
     println(s"L1 projection iter ${nlResult.iter}")
     assert(norm(nlResult.x - octaveL1, 2) < 1e-4)
-  }
 
-  test("Nonlinear Minimization with L1 proximal compared to Octave") {
+  test("Nonlinear Minimization with L1 proximal compared to Octave")
     val Hl1 = new DenseMatrix(25,
                               25,
                               Array(
@@ -2224,5 +2217,3 @@ class NonlinearMinimizerTest extends OptimizeTestBase with Matchers {
 
     println(s"L1 Proximal iter ${nlResult.iter}")
     assert(norm(nlResult.z - octaveL1, Inf) < 1e-4)
-  }
-}

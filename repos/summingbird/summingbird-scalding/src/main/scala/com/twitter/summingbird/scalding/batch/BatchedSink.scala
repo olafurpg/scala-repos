@@ -23,7 +23,7 @@ import com.twitter.summingbird.scalding._
 import com.twitter.scalding.Mode
 import cascading.flow.FlowDef
 
-trait BatchedSink[T] extends Sink[T] {
+trait BatchedSink[T] extends Sink[T]
   def batcher: Batcher
 
   /**
@@ -44,7 +44,7 @@ trait BatchedSink[T] extends Sink[T] {
     */
   protected def writeBatches(
       inter: Interval[BatchID], in: FlowToPipe[T]): FlowToPipe[T] =
-    Reader[FlowInput, TimedPipe[T]] { (flowMode: (FlowDef, Mode)) =>
+    Reader[FlowInput, TimedPipe[T]]  (flowMode: (FlowDef, Mode)) =>
       val iter = BatchID.toIterable(inter)
       val inPipe = in(flowMode)
 
@@ -52,76 +52,65 @@ trait BatchedSink[T] extends Sink[T] {
       // version of template tap is needed here.
 
       // We need to write each of these.
-      iter.foreach { batch =>
+      iter.foreach  batch =>
         val range = batcher.toInterval(batch)
-        writeStream(batch, inPipe.filter {
+        writeStream(batch, inPipe.filter
           case (time, _) =>
             range(time)
-        })(flowMode._1, flowMode._2)
-      }
+        )(flowMode._1, flowMode._2)
       inPipe
-    }
 
   final def write(incoming: PipeFactory[T]): PipeFactory[T] =
-    StateWithError({ in: FactoryInput =>
+    StateWithError( in: FactoryInput =>
       val (timeSpan, mode) = in
       // This object combines some common scalding batching operations:
       val batchOps = new BatchedOperations(batcher)
 
-      val batchStreams = batchOps.coverIt(timeSpan).map { b =>
+      val batchStreams = batchOps.coverIt(timeSpan).map  b =>
         (b, readStream(b, mode))
-      }
 
       // Maybe an inclusive interval of batches to pull from incoming
-      val batchesToWrite: Option[(BatchID, BatchID)] = batchStreams.dropWhile {
+      val batchesToWrite: Option[(BatchID, BatchID)] = batchStreams.dropWhile
         _._2.isDefined
-      }.map { _._1 }.toList match {
+      .map { _._1 }.toList match
         case Nil => None
         case list => Some((list.min, list.max))
-      }
 
-      val newlyWritten = batchesToWrite.map {
+      val newlyWritten = batchesToWrite.map
         case (lower, upper) =>
           // Compute the times we need to read of the deltas
           val incBatches = Interval.leftClosedRightOpen(lower, upper.next)
-          batchOps.readBatched(incBatches, mode, incoming).right.map {
+          batchOps.readBatched(incBatches, mode, incoming).right.map
             case (inbatches, flow2Pipe) =>
               (inbatches, writeBatches(inbatches, flow2Pipe))
-          }
-      }
       // This data is already on disk and will not be recomputed
-      val existing = batchStreams.takeWhile { _._2.isDefined }.collect {
+      val existing = batchStreams.takeWhile { _._2.isDefined }.collect
         case (batch, Some(flow)) => (batch, flow)
-      }
 
       def mergeExistingAndBuilt(
           optBuilt: Option[(Interval[BatchID], FlowToPipe[T])])
-        : Try[((Interval[Timestamp], Mode), FlowToPipe[T])] = {
+        : Try[((Interval[Timestamp], Mode), FlowToPipe[T])] =
         val (aBatches, aFlows) = existing.unzip
         val flows = aFlows ++ (optBuilt.map { _._2 })
         val batches =
           aBatches ++
-          (optBuilt.map { pair =>
+          (optBuilt.map  pair =>
                 BatchID.toIterable(pair._1)
-              }.getOrElse(Iterable.empty))
+              .getOrElse(Iterable.empty))
 
         if (flows.isEmpty)
           Left(List("Zero batches requested, should never occur: " +
                   timeSpan.toString))
-        else {
+        else
           // it is a static (i.e. independent from input) bug if this get ever throws
           val available = batchOps.intersect(batches, timeSpan).get
           val merged =
             Scalding.limitTimes(available, flows.reduce(Scalding.merge(_, _)))
           Right(((available, mode), merged))
-        }
-      }
 
-      newlyWritten match {
+      newlyWritten match
         case None => mergeExistingAndBuilt(None)
         case Some(Left(err)) =>
           if (existing.isEmpty) Left(err) else mergeExistingAndBuilt(None)
         case Some(Right(built)) => mergeExistingAndBuilt(Some(built))
-      }
-    })
-}
+    )

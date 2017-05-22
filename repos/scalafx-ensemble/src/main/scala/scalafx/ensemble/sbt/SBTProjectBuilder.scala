@@ -33,7 +33,7 @@ import scala.io.Source
 import scalafx.ensemble.commons.ExampleInfo
 
 /** Creates SBT project for a sample code. */
-object SBTProjectBuilder {
+object SBTProjectBuilder
 
   private var _parentDir =
     new File(System.getProperty("user.home", ".")).getCanonicalFile
@@ -42,13 +42,11 @@ object SBTProjectBuilder {
   private val resourceSubDir = "src/main/resources/"
 
   /** Last used parent directory of a saved project or users home directory */
-  def parentDir: File = synchronized {
+  def parentDir: File = synchronized
     _parentDir
-  }
 
-  def parentDir_=(dir: File) = synchronized {
+  def parentDir_=(dir: File) = synchronized
     _parentDir = dir
-  }
 
   /** Create and save SBT project for a sample.
     *
@@ -57,16 +55,14 @@ object SBTProjectBuilder {
     * @throws FileAlreadyExistsException - if `projectDir` exists but is not a directory
     * @throws IOException - if an I/O error occurs
     */
-  def createSampleProject(projectDir: File, sampleInfo: ExampleInfo) {
+  def createSampleProject(projectDir: File, sampleInfo: ExampleInfo)
 
     // extract project name
-    val projectName = {
-      val path = {
+    val projectName =
+      val path =
         val p = projectDir.toURI.toString
         if (p.last == '/') p.dropRight(1) else p
-      }
       path.substring(path.lastIndexOf('/') + 1)
-    }
 
     // Create project directory
     Files.createDirectories(projectDir.toPath)
@@ -94,53 +90,45 @@ object SBTProjectBuilder {
     copyText(projectDir, "project/build.properties")
     copyText(projectDir, "project/plugins.sbt")
     copyText(projectDir, "README.md")
-  }
 
   /** Copy text resource from the classpath relative to this object to a `projectDir`.
     * Line ending will be changed to platform specific.
     */
   private def copyText(projectDir: File,
                        fileName: String,
-                       filters: List[(String, String)] = Nil) {
+                       filters: List[(String, String)] = Nil)
 
     /** Apply all filters in turn. */
-    def filter(string: String, filters: List[(String, String)]): String = {
-      filters match {
+    def filter(string: String, filters: List[(String, String)]): String =
+      filters match
         case Nil => string
         case f :: tail => filter(string.replaceAll(f._1, f._2), tail)
-      }
-    }
 
-    try {
+    try
       val uri = this.getClass.getResource(fileName).toURI
       val contentRaw = Source.fromFile(uri).getLines().mkString("\n")
       val content = filter(contentRaw, filters)
       val path = new File(projectDir, fileName).toPath
       Files.createDirectories(path.getParent)
       Files.write(path, content.getBytes)
-    } catch {
+    catch
       case t: Throwable =>
         throw new IOException(
             "Error while creating SBT project. Failed to copy text file: " +
             fileName,
             t)
-    }
-  }
 
   /** Copy a resource that may be an image or other binary file. */
-  private def copyResource(projectDir: File, fileName: String) {
-    try {
+  private def copyResource(projectDir: File, fileName: String)
+    try
       val uri = this.getClass.getResource(fileName).toURI
       val src = new File(uri).toPath
       val dest = new File(projectDir, fileName).toPath
       Files.createDirectories(dest.getParent)
       Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING)
-    } catch {
+    catch
       case t: Throwable =>
         throw new IOException(
             "Error while creating SBT project. Failed to copy resource: " +
             fileName,
             t)
-    }
-  }
-}

@@ -23,7 +23,7 @@ import util.Helpers._
 
 import java.util.Locale
 
-object RecordRules extends Factory {
+object RecordRules extends Factory
 
   /**
     * Calculate the name of a field based on the name
@@ -45,4 +45,3 @@ object RecordRules extends Factory {
   val displayName: FactoryMaker[(Record[_], Locale, String) => String] =
     new FactoryMaker[(Record[_], Locale, String) => String](
         (m: Record[_], l: Locale, name: String) => name) {}
-}

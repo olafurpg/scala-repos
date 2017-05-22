@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventHandlerDelegate
 
-object Task {
+object Task
   implicit def sfxTask2jfx[T](t: Task[T]): jfxc.Task[T] =
     if (t != null) t.delegate else null
 
@@ -41,10 +41,9 @@ object Task {
     * Creates a new [[scalafx.concurrent.Task]] with a operation that actually performs the background thread logic.
     */
   def apply[T](op: => T) =
-    new Task[T](new jfxc.Task[T] {
+    new Task[T](new jfxc.Task[T]
       def call = op
-    }) {}
-}
+    ) {}
 
 /**
   * Wrapper trait for [[http://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/Task.html Task]]
@@ -52,7 +51,7 @@ object Task {
   */
 abstract class Task[T](override val delegate: jfxc.Task[T])
     extends Worker[T] with jfxe.EventTarget with EventHandlerDelegate
-    with SFXDelegate[jfxc.Task[T]] {
+    with SFXDelegate[jfxc.Task[T]]
 
   def eventHandlerDelegate = delegate.asInstanceOf[EventHandled]
 
@@ -61,41 +60,35 @@ abstract class Task[T](override val delegate: jfxc.Task[T])
     * state.
     */
   def onCancelled = delegate.onCancelledProperty
-  def onCancelled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onCancelled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onCancelled() = v
-  }
 
   /**
     * The onFailed event handler is called whenever the Task state transitions to the FAILED state.
     */
   def onFailed = delegate.onFailedProperty
-  def onFailed_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onFailed_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onFailed() = v
-  }
 
   /**
     * The onRunning event handler is called whenever the Task state transitions to the RUNNING state.
     */
   def onRunning = delegate.onRunningProperty
-  def onRunning_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onRunning_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onRunning() = v
-  }
 
   /**
     * The onSchedule event handler is called whenever the Task state transitions to the SCHEDULED
     * state.
     */
   def onScheduled = delegate.onScheduledProperty
-  def onScheduled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onScheduled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onScheduled() = v
-  }
 
   /**
     * The onSucceeded event handler is called whenever the Task state transitions to the SUCCEEDED
     * state.
     */
   def onSucceeded = delegate.onSucceededProperty
-  def onSucceeded_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onSucceeded_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onSucceeded() = v
-  }
-}

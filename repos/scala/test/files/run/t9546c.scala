@@ -1,12 +1,8 @@
-package foo {
+package foo
   case class Opt[A] private[foo](val get: A)
-  object Opt {
+  object Opt
     def mkOpt = Opt("")
-  }
-}
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     foo.Opt.mkOpt
-  }
-}

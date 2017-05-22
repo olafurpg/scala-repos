@@ -10,14 +10,14 @@ import org.ensime.util.file._
 
 class BasicWorkflow
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    with IsolatedTestKitFixture with IsolatedProjectFixture
 
   val original = EnsimeConfigFixture.SimpleTestProject
 
-  "ensime-server" should "open the simple test project" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit testkit =>
-        withProject { (project, asyncHelper) =>
+  "ensime-server" should "open the simple test project" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit testkit =>
+        withProject  (project, asyncHelper) =>
           import testkit._
 
           val sourceRoot = scalaMain(config)
@@ -68,16 +68,16 @@ class BasicWorkflow
 
           project ! PublicSymbolSearchReq(List("java", "io", "File"), 30)
           val javaSearchSymbol = expectMsgType[SymbolSearchResults]
-          assert(javaSearchSymbol.syms.exists {
+          assert(javaSearchSymbol.syms.exists
             case TypeSearchResult(
                 "java.io.File", "File", DeclaredAs.Class, Some(_)) =>
               true
             case _ => false
-          })
+          )
           //-----------------------------------------------------------------------------------------------
           // public symbol search - scala.util.Random
           project ! PublicSymbolSearchReq(List("scala", "util", "Random"), 2)
-          expectMsgPF() {
+          expectMsgPF()
             case SymbolSearchResults(
                 List(TypeSearchResult(
                      "scala.util.Random", "Random", DeclaredAs.Class, Some(_)),
@@ -93,7 +93,6 @@ class BasicWorkflow
                                       DeclaredAs.Class,
                                       Some(_)))) =>
             // this is a pretty ropey test at the best of times
-          }
 
           //-----------------------------------------------------------------------------------------------
           // documentation for type at point
@@ -123,11 +122,10 @@ class BasicWorkflow
           asyncHelper.expectMsg(FullTypeCheckCompleteEvent)
 
           project ! UsesOfSymbolAtPointReq(Left(fooFile), 119) // point on testMethod
-          expectMsgPF() {
+          expectMsgPF()
             case ERangePositions(
                 List(ERangePosition(`fooFilePath`, 114, 110, 172),
                      ERangePosition(`fooFilePath`, 273, 269, 283))) =>
-          }
 
           log.info("------------------------------------222-")
 
@@ -135,7 +133,7 @@ class BasicWorkflow
           // scala library classfiles, so offset/line comes out as zero unless
           // loaded by the pres compiler
           project ! SymbolAtPointReq(Left(fooFile), 276)
-          expectMsgPF() {
+          expectMsgPF()
             case SymbolInfo(
                 "testMethod",
                 "testMethod",
@@ -161,11 +159,10 @@ class BasicWorkflow
                                                      None))),
                                  false))),
                 true) =>
-          }
 
           // M-.  external symbol
           project ! SymbolAtPointReq(Left(fooFile), 190)
-          expectMsgPF() {
+          expectMsgPF()
             case SymbolInfo("Map",
                             "Map",
                             Some(OffsetSourcePosition(_, _)),
@@ -176,10 +173,9 @@ class BasicWorkflow
                                           List(),
                                           None),
                             false) =>
-          }
 
           project ! SymbolAtPointReq(Left(fooFile), 343)
-          expectMsgPF() {
+          expectMsgPF()
             case SymbolInfo(
                 "fn",
                 "fn",
@@ -202,10 +198,9 @@ class BasicWorkflow
                               List(),
                               None),
                 false) =>
-          }
 
           project ! SymbolAtPointReq(Left(barFile), 150)
-          expectMsgPF() {
+          expectMsgPF()
             case SymbolInfo(
                 "apply",
                 "apply",
@@ -234,10 +229,9 @@ class BasicWorkflow
                                                           None))),
                                       false))),
                 true) =>
-          }
 
           project ! SymbolAtPointReq(Left(barFile), 193)
-          expectMsgPF() {
+          expectMsgPF()
             case SymbolInfo(
                 "copy",
                 "copy",
@@ -266,11 +260,10 @@ class BasicWorkflow
                                                           None))),
                                       false))),
                 true) =>
-          }
 
           // C-c C-v p Inspect source of current package
           project ! InspectPackageByPathReq("org.example")
-          expectMsgPF() {
+          expectMsgPF()
             case PackageInfo(
                 "example",
                 "org.example",
@@ -370,7 +363,6 @@ class BasicWorkflow
                                    List(),
                                    List(),
                                    None))) =>
-          }
 
           // expand selection around 'val foo'
           project ! ExpandSelectionReq(fooFile, 215, 215)
@@ -385,7 +377,7 @@ class BasicWorkflow
 
           project ! PrepareRefactorReq(
               1234, null, RenameRefactorDesc("bar", fooFile, 215, 215), false)
-          expectMsgPF() {
+          expectMsgPF()
             case RefactorEffect(1234,
                                 RefactorType.Rename,
                                 List(
@@ -394,17 +386,10 @@ class BasicWorkflow
                                 TextEdit(`fooFile`, 269, 272, "bar")
                                 ),
                                 _) =>
-          }
 
           project ! ExecRefactorReq(1234, RefactorType.Rename)
-          expectMsgPF() {
+          expectMsgPF()
             case RefactorResult(1234,
                                 RefactorType.Rename,
                                 List(`fooFile`),
                                 _) =>
-          }
-        }
-      }
-    }
-  }
-}

@@ -1,18 +1,15 @@
 package tests
 
-class Baz {
+class Baz
   val NameAfterRename = 0
-}
 
-object Baz2 extends Baz {
+object Baz2 extends Baz
   override val NameAfterRename = 3
-}
 
-object Baz3 extends {
+object Baz3 extends
   override val NameAfterRename = 1
-} with Baz
+with Baz
 
-object Test {
+object Test
   Baz2.NameAfterRename
   Baz3.NameAfterRename
-}

@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   override def code = """
   |:power
   |val u = rootMirror.universe
@@ -12,4 +12,3 @@ object Test extends ReplTest {
   |sym.isClassLocalToConstructor
   |sym.isContravariant // was true
   |""".stripMargin.trim
-}

@@ -25,24 +25,21 @@ import akka.dispatch.Dispatchers
 /**
   * Redirect different logging sources to SLF4J.
   */
-trait RedirectLogging {
+trait RedirectLogging
 
-  def redirectLogging(): Unit = {
+  def redirectLogging(): Unit =
     // Redirect JUL to SLF4J.
     LogManager.getLogManager().reset()
     SLF4JBridgeHandler.install()
-  }
 
   redirectLogging()
-}
 
 /**
   * Provide sigar library from `project/target` location.
   */
 case class SimpleSigarProvider(location: String = "native")
-    extends SigarProvider {
+    extends SigarProvider
   def extractFolder = s"${System.getProperty("user.dir")}/target/${location}"
-}
 
 /**
   * Provide sigar library as static mock.
@@ -53,7 +50,7 @@ case class MockitoSigarProvider(pid: Long = 123,
                                 cpuCombined: Double = 0.5,
                                 cpuStolen: Double = 0.2,
                                 steps: Int = 5)
-    extends SigarProvider with MockitoSugar {
+    extends SigarProvider with MockitoSugar
 
   import org.hyperic.sigar._
   import org.mockito.Mockito._
@@ -62,13 +59,12 @@ case class MockitoSigarProvider(pid: Long = 123,
   override def extractFolder = ???
 
   /** Generate monotonic array from 0 to value. */
-  def increase(value: Double): Array[Double] = {
+  def increase(value: Double): Array[Double] =
     val delta = value / steps
     (0 to steps) map { _ * delta } toArray
-  }
 
   /** Sigar mock instance. */
-  override def verifiedSigarInstance = {
+  override def verifiedSigarInstance =
 
     // Note "thenReturn(0)" invocation is consumed in collector construction.
 
@@ -82,15 +78,13 @@ case class MockitoSigarProvider(pid: Long = 123,
     when(sigar.getCpuPerc) thenReturn cpuPerc // Increasing.
 
     sigar
-  }
-}
 
 /**
   * Used when testing metrics without full cluster
   *
   * TODO change factory after https://github.com/akka/akka/issues/16369
   */
-trait MetricsCollectorFactory {
+trait MetricsCollectorFactory
   this: AkkaSpec ⇒
   import MetricsConfig._
   import org.hyperic.sigar.Sigar
@@ -100,14 +94,13 @@ trait MetricsCollectorFactory {
   def selfAddress = extendedActorSystem.provider.rootPath.address
 
   def createMetricsCollector: MetricsCollector =
-    try {
+    try
       new SigarMetricsCollector(selfAddress, defaultDecayFactor, new Sigar())
       //new SigarMetricsCollector(selfAddress, defaultDecayFactor, SimpleSigarProvider().createSigarInstance)
-    } catch {
+    catch
       case e: Throwable ⇒
         log.warning("Sigar failed to load. Using JMX. Reason: " + e.toString)
         new JmxMetricsCollector(selfAddress, defaultDecayFactor)
-    }
 
   /** Create JMX collector. */
   def collectorJMX: MetricsCollector =
@@ -131,7 +124,6 @@ trait MetricsCollectorFactory {
 
   def isSigar(collector: MetricsCollector): Boolean =
     collector.isInstanceOf[SigarMetricsCollector]
-}
 
 /**
   *
@@ -145,7 +137,7 @@ class MockitoSigarMetricsCollector(system: ActorSystem)
 /**
   * Metrics test configurations.
   */
-object MetricsConfig {
+object MetricsConfig
 
   val defaultDecayFactor = 2.0 / (1 + 10)
 
@@ -188,12 +180,11 @@ object MetricsConfig {
     }
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
   """
-}
 
 /**
   * Current cluster metrics, updated periodically via event bus.
   */
-class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
+class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable
 
   val extension = ClusterMetricsExtension(system)
 
@@ -206,23 +197,21 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
   private var collectedMetricsList: List[Set[NodeMetrics]] = List.empty
 
   /** Create actor that subscribes to the cluster eventBus to update current read view state. */
-  private val eventBusListener: ActorRef = {
+  private val eventBusListener: ActorRef =
     system.systemActorOf(
         Props(new Actor with ActorLogging
-            with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+            with RequiresMessageQueue[UnboundedMessageQueueSemantics]
           override def preStart(): Unit = extension.subscribe(self)
           override def postStop(): Unit = extension.unsubscribe(self)
-          def receive = {
+          def receive =
             case ClusterMetricsChanged(nodes) ⇒
               currentMetricsSet = nodes
               collectedMetricsList = nodes :: collectedMetricsList
             case _ ⇒
             // Ignore.
-          }
-        }).withDispatcher(Dispatchers.DefaultDispatcherId)
+        ).withDispatcher(Dispatchers.DefaultDispatcherId)
           .withDeploy(Deploy.local),
         name = "metrics-event-bus-listener")
-  }
 
   /** Current cluster metrics. */
   def clusterMetrics: Set[NodeMetrics] = currentMetricsSet
@@ -232,4 +221,3 @@ class ClusterMetricsView(system: ExtendedActorSystem) extends Closeable {
 
   /** Unsubscribe from cluster events. */
   def close(): Unit = eventBusListener ! PoisonPill
-}

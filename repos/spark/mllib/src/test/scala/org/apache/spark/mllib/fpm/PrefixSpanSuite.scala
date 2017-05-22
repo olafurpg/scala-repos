@@ -19,9 +19,9 @@ package org.apache.spark.mllib.fpm
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
-class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
+class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext
 
-  test("PrefixSpan internal (integer seq, 0 delim) run, singleton itemsets") {
+  test("PrefixSpan internal (integer seq, 0 delim) run, singleton itemsets")
 
     /*
       library("arulesSequences")
@@ -98,10 +98,9 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(0, 5, 0), 3L)
     )
     compareInternalResults(expectedValue3, result3.collect())
-  }
 
   test(
-      "PrefixSpan internal (integer seq, -1 delim) run, variable-size itemsets") {
+      "PrefixSpan internal (integer seq, -1 delim) run, variable-size itemsets")
     val sequences = Array(Array(0, 1, 0, 1, 2, 3, 0, 1, 3, 0, 4, 0, 3, 6, 0),
                           Array(0, 1, 4, 0, 3, 0, 2, 3, 0, 1, 5, 0),
                           Array(0, 5, 6, 0, 1, 2, 0, 4, 6, 0, 3, 0, 2, 0),
@@ -251,9 +250,8 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
                               (Array(0, 1, 0, 2, 0, 1, 0), 2L))
 
     compareInternalResults(expectedValue, result.collect())
-  }
 
-  test("PrefixSpan projections with multiple partial starts") {
+  test("PrefixSpan projections with multiple partial starts")
     val sequences = Seq(Array(Array(1, 2), Array(1, 2, 3)))
     val rdd = sc.parallelize(sequences, 2)
     val prefixSpan = new PrefixSpan().setMinSupport(1.0).setMaxPatternLength(2)
@@ -271,9 +269,8 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
                          (Array(Array(2), Array(3)), 1L),
                          (Array(Array(3)), 1L))
     compareResults(expected, model.freqSequences.collect())
-  }
 
-  test("PrefixSpan Integer type, variable-size itemsets") {
+  test("PrefixSpan Integer type, variable-size itemsets")
     val sequences = Seq(Array(Array(1, 2), Array(3)),
                         Array(Array(1), Array(3, 2), Array(1, 2)),
                         Array(Array(1, 2), Array(5)),
@@ -318,9 +315,8 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(Array(1, 2)), 3L)
     )
     compareResults(expected, model.freqSequences.collect())
-  }
 
-  test("PrefixSpan String type, variable-size itemsets") {
+  test("PrefixSpan String type, variable-size itemsets")
     // This is the same test as "PrefixSpan Int type, variable-size itemsets" except
     // mapped to Strings
     val intToString = (1 to 6).zip(Seq("a", "b", "c", "d", "e", "f")).toMap
@@ -340,31 +336,26 @@ class PrefixSpanSuite extends SparkFunSuite with MLlibTestSparkContext {
         (Array(Array(3)), 2L),
         (Array(Array(1), Array(3)), 2L),
         (Array(Array(1, 2)), 3L)
-    ).map {
+    ).map
       case (pattern, count) =>
         (pattern.map(itemSet => itemSet.map(intToString)), count)
-    }
     compareResults(expected, model.freqSequences.collect())
-  }
 
   private def compareResults[Item](
       expectedValue: Array[(Array[Array[Item]], Long)],
-      actualValue: Array[PrefixSpan.FreqSequence[Item]]): Unit = {
-    val expectedSet = expectedValue.map {
+      actualValue: Array[PrefixSpan.FreqSequence[Item]]): Unit =
+    val expectedSet = expectedValue.map
       case (pattern: Array[Array[Item]], count: Long) =>
         (pattern.map(itemSet => itemSet.toSet).toSeq, count)
-    }.toSet
-    val actualSet = actualValue.map { x =>
+    .toSet
+    val actualSet = actualValue.map  x =>
       (x.sequence.map(_.toSet).toSeq, x.freq)
-    }.toSet
+    .toSet
     assert(expectedSet === actualSet)
-  }
 
   private def compareInternalResults(
       expectedValue: Array[(Array[Int], Long)],
-      actualValue: Array[(Array[Int], Long)]): Unit = {
+      actualValue: Array[(Array[Int], Long)]): Unit =
     val expectedSet = expectedValue.map(x => (x._1.toSeq, x._2)).toSet
     val actualSet = actualValue.map(x => (x._1.toSeq, x._2)).toSet
     assert(expectedSet === actualSet)
-  }
-}

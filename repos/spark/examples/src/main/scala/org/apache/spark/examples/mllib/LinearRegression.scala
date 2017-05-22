@@ -34,12 +34,11 @@ import org.apache.spark.mllib.util.MLUtils
   * A synthetic dataset can be found at `data/mllib/sample_linear_regression_data.txt`.
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object LinearRegression {
+object LinearRegression
 
-  object RegType extends Enumeration {
+  object RegType extends Enumeration
     type RegType = Value
     val NONE, L1, L2 = Value
-  }
 
   import RegType._
 
@@ -50,10 +49,10 @@ object LinearRegression {
                     regParam: Double = 0.01)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("LinearRegression") {
+    val parser = new OptionParser[Params]("LinearRegression")
       head("LinearRegression: an example app for linear regression.")
       opt[Int]("numIterations")
         .text("number of iterations")
@@ -78,16 +77,13 @@ object LinearRegression {
           |  examples/target/scala-*/spark-examples-*.jar \
           |  data/mllib/sample_linear_regression_data.txt
         """.stripMargin)
-    }
 
-    parser.parse(args, defaultParams).map { params =>
+    parser.parse(args, defaultParams).map  params =>
       run(params)
-    } getOrElse {
+    getOrElse
       sys.exit(1)
-    }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"LinearRegression with $params")
     val sc = new SparkContext(conf)
 
@@ -105,11 +101,10 @@ object LinearRegression {
 
     examples.unpersist(blocking = false)
 
-    val updater = params.regType match {
+    val updater = params.regType match
       case NONE => new SimpleUpdater()
       case L1 => new L1Updater()
       case L2 => new SquaredL2Updater()
-    }
 
     val algorithm = new LinearRegressionWithSGD()
     algorithm.optimizer
@@ -123,16 +118,14 @@ object LinearRegression {
     val prediction = model.predict(test.map(_.features))
     val predictionAndLabel = prediction.zip(test.map(_.label))
 
-    val loss = predictionAndLabel.map {
+    val loss = predictionAndLabel.map
       case (p, l) =>
         val err = p - l
         err * err
-    }.reduce(_ + _)
+    .reduce(_ + _)
     val rmse = math.sqrt(loss / numTest)
 
     println(s"Test RMSE = $rmse.")
 
     sc.stop()
-  }
-}
 // scalastyle:on println

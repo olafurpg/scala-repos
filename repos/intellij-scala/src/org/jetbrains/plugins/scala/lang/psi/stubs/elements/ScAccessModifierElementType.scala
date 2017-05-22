@@ -17,27 +17,24 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScAccessModifierStubImpl
   */
 class ScAccessModifierElementType[Func <: ScAccessModifier]
     extends ScStubElementType[ScAccessModifierStub, ScAccessModifier](
-        "access modifier") {
-  def serialize(stub: ScAccessModifierStub, dataStream: StubOutputStream) {
+        "access modifier")
+  def serialize(stub: ScAccessModifierStub, dataStream: StubOutputStream)
     dataStream.writeBoolean(stub.isProtected)
     dataStream.writeBoolean(stub.isPrivate)
     dataStream.writeBoolean(stub.isThis)
     val hasId = stub.getIdText != None
     dataStream.writeBoolean(hasId)
-    if (hasId) {
+    if (hasId)
       dataStream.writeName(stub.getIdText.get)
-    }
-  }
 
   def indexStub(stub: ScAccessModifierStub, sink: IndexSink) {}
 
-  def createPsi(stub: ScAccessModifierStub): ScAccessModifier = {
+  def createPsi(stub: ScAccessModifierStub): ScAccessModifier =
     new ScAccessModifierImpl(stub)
-  }
 
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScAccessModifier,
-      parentStub: StubElement[ParentPsi]): ScAccessModifierStub = {
+      parentStub: StubElement[ParentPsi]): ScAccessModifierStub =
     new ScAccessModifierStubImpl(
         parentStub.asInstanceOf[StubElement[PsiElement]],
         this,
@@ -45,10 +42,9 @@ class ScAccessModifierElementType[Func <: ScAccessModifier]
         psi.isProtected,
         psi.isThis,
         psi.idText.map(StringRef.fromString(_)))
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScAccessModifierStub = {
+      dataStream: StubInputStream, parentStub: Any): ScAccessModifierStub =
     val isProtected = dataStream.readBoolean
     val isPrivate = dataStream.readBoolean
     val isThis = dataStream.readBoolean
@@ -61,5 +57,3 @@ class ScAccessModifierElementType[Func <: ScAccessModifier]
         isProtected,
         isThis,
         idText)
-  }
-}

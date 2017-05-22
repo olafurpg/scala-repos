@@ -19,7 +19,7 @@ import parallel.mutable.ParSeq
   */
 trait SeqLike[A, +This <: SeqLike[A, This] with Seq[A]]
     extends scala.collection.SeqLike[A, This] with Cloneable[This]
-    with Parallelizable[A, ParSeq[A]] {
+    with Parallelizable[A, ParSeq[A]]
   self =>
 
   protected[this] override def parCombiner = ParSeq.newCombiner[A]
@@ -38,12 +38,9 @@ trait SeqLike[A, +This <: SeqLike[A, This] with Seq[A]]
     * @param f  the transformation to apply
     * @return   the sequence itself.
     */
-  def transform(f: A => A): this.type = {
+  def transform(f: A => A): this.type =
     var i = 0
-    this foreach { el =>
+    this foreach  el =>
       this(i) = f(el)
       i += 1
-    }
     this
-  }
-}

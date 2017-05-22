@@ -17,29 +17,23 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScCompoundType, ScSubstitutor
   * @author Alexander Podkhalyuzin
   */
 class ScCompoundTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScCompoundTypeElement {
+    extends ScalaPsiElementImpl(node) with ScCompoundTypeElement
   override def toString: String = "CompoundType: " + getText
 
-  protected def innerType(ctx: TypingContext) = {
+  protected def innerType(ctx: TypingContext) =
     val comps = components.map(_.getType(ctx))
-    refinement match {
+    refinement match
       case None =>
         collectFailures(comps, types.Any)(
             new ScCompoundType(_, Map.empty, Map.empty))
       case Some(r) =>
         collectFailures(comps, types.Any)(ScCompoundType.fromPsi(
                 _, r.holders.toList, r.types.toList, ScSubstitutor.empty))
-    }
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitCompoundTypeElement(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitCompoundTypeElement(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

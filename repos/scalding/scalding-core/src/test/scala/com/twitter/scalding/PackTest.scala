@@ -22,17 +22,16 @@ import scala.beans.BeanProperty
 
 import scala.collection.mutable.Buffer
 
-class IntContainer {
+class IntContainer
   private var firstValue = 0
   def getFirstValue = firstValue
   def setFirstValue(v: Int) { firstValue = v }
 
   @BeanProperty // Test the other syntax
   var secondValue = 0
-}
 
-object FatContainer {
-  def fromFibonacci(first: Int, second: Int) = {
+object FatContainer
+  def fromFibonacci(first: Int, second: Int) =
     val fc = new FatContainer
     fc.f1 = first
     fc.f2 = second
@@ -58,10 +57,8 @@ object FatContainer {
     fc.f22 = fc.f20 + fc.f21
     fc.f23 = fc.f21 + fc.f22
     fc
-  }
-}
 
-class FatContainer {
+class FatContainer
   @BeanProperty var f1 = 0
   @BeanProperty var f2 = 0
   @BeanProperty var f3 = 0
@@ -85,99 +82,79 @@ class FatContainer {
   @BeanProperty var f21 = 0
   @BeanProperty var f22 = 0
   @BeanProperty var f23 = 0
-}
 
 case class IntCaseClass(firstValue: Int, secondValue: Int)
 
-class ContainerPopulationJob(args: Args) extends Job(args) {
+class ContainerPopulationJob(args: Args) extends Job(args)
   Tsv("input").read
-    .mapTo((0, 1) -> ('firstValue, 'secondValue)) { v: (Int, Int) =>
+    .mapTo((0, 1) -> ('firstValue, 'secondValue))  v: (Int, Int) =>
       v
-    }
     .pack[IntContainer](('firstValue, 'secondValue) -> 'combined)
     .project('combined)
     .unpack[IntContainer]('combined -> ('firstValue, 'secondValue))
     .project('firstValue, 'secondValue)
     .write(Tsv("output"))
-}
 
-class ContainerToPopulationJob(args: Args) extends Job(args) {
+class ContainerToPopulationJob(args: Args) extends Job(args)
   Tsv("input").read
-    .mapTo((0, 1) -> ('firstValue, 'secondValue)) { v: (Int, Int) =>
+    .mapTo((0, 1) -> ('firstValue, 'secondValue))  v: (Int, Int) =>
       v
-    }
     .packTo[IntContainer](('firstValue, 'secondValue) -> 'combined)
     .unpackTo[IntContainer]('combined -> ('firstValue, 'secondValue))
     .write(Tsv("output"))
 
   Tsv("input").read
-    .mapTo((0, 1) -> ('firstValue, 'secondValue)) { v: (Int, Int) =>
+    .mapTo((0, 1) -> ('firstValue, 'secondValue))  v: (Int, Int) =>
       v
-    }
     .packTo[IntCaseClass](('firstValue, 'secondValue) -> 'combined)
     .unpackTo[IntCaseClass]('combined -> ('firstValue, 'secondValue))
     .write(Tsv("output-cc"))
-}
 
-class FatContainerPopulationJob(args: Args) extends Job(args) {
+class FatContainerPopulationJob(args: Args) extends Job(args)
   Tsv("input").read
-    .mapTo((0, 1) -> ('firstValue, 'secondValue)) { v: (Int, Int) =>
+    .mapTo((0, 1) -> ('firstValue, 'secondValue))  v: (Int, Int) =>
       v
-    }
-    .map(('firstValue, 'secondValue) -> 'fatContainer) { v: (Int, Int) =>
+    .map(('firstValue, 'secondValue) -> 'fatContainer)  v: (Int, Int) =>
       FatContainer.fromFibonacci(v._1, v._2)
-    }
     .unpack[FatContainer]('fatContainer -> '*)
     .discard('firstValue, 'secondValue, 'fatContainer)
     .write(Tsv("output"))
-}
 
-class FatContainerToPopulationJob(args: Args) extends Job(args) {
+class FatContainerToPopulationJob(args: Args) extends Job(args)
   Tsv("input").read
-    .mapTo((0, 1) -> ('firstValue, 'secondValue)) { v: (Int, Int) =>
+    .mapTo((0, 1) -> ('firstValue, 'secondValue))  v: (Int, Int) =>
       v
-    }
-    .map(('firstValue, 'secondValue) -> 'fatContainer) { v: (Int, Int) =>
+    .map(('firstValue, 'secondValue) -> 'fatContainer)  v: (Int, Int) =>
       FatContainer.fromFibonacci(v._1, v._2)
-    }
     .unpackTo[FatContainer]('fatContainer -> '*)
     .write(Tsv("output"))
-}
 
-class PackTest extends WordSpec with Matchers {
+class PackTest extends WordSpec with Matchers
   val inputData = List((1, 2), (2, 2), (3, 2))
 
-  "A ContainerPopulationJob" should {
+  "A ContainerPopulationJob" should
     JobTest(new ContainerPopulationJob(_))
       .source(Tsv("input"), inputData)
-      .sink[(Int, Int)](Tsv("output")) { buf =>
-        "correctly populate container objects" in {
+      .sink[(Int, Int)](Tsv("output"))  buf =>
+        "correctly populate container objects" in
           buf should have size 3
           buf.toSet shouldBe inputData.toSet
-        }
-      }
       .run
       .finish
-  }
 
-  "A ContainerToPopulationJob" should {
+  "A ContainerToPopulationJob" should
     JobTest("com.twitter.scalding.ContainerToPopulationJob")
       .source(Tsv("input"), inputData)
-      .sink[(Int, Int)](Tsv("output")) { buf =>
-        "correctly populate container objects" in {
+      .sink[(Int, Int)](Tsv("output"))  buf =>
+        "correctly populate container objects" in
           buf should have size 3
           buf.toSet shouldBe inputData.toSet
-        }
-      }
-      .sink[(Int, Int)](Tsv("output-cc")) { buf =>
-        "correctly populate container case class objects" in {
+      .sink[(Int, Int)](Tsv("output-cc"))  buf =>
+        "correctly populate container case class objects" in
           buf should have size 3
           buf.toSet shouldBe inputData.toSet
-        }
-      }
       .run
       .finish
-  }
 
   val fatInputData = List((8, 13))
   val fatCorrect = List(8,
@@ -204,33 +181,24 @@ class PackTest extends WordSpec with Matchers {
                         196418,
                         317811)
 
-  "A FatContainerPopulationJob" should {
+  "A FatContainerPopulationJob" should
     JobTest(new FatContainerPopulationJob(_))
       .source(Tsv("input"), fatInputData)
-      .sink[TupleEntry](Tsv("output")) { buf: Buffer[TupleEntry] =>
-        "correctly populate a fat container object" in {
+      .sink[TupleEntry](Tsv("output"))  buf: Buffer[TupleEntry] =>
+        "correctly populate a fat container object" in
           val te = buf.head
-          for (idx <- fatCorrect.indices) {
+          for (idx <- fatCorrect.indices)
             te.getInteger(idx) shouldBe fatCorrect(idx)
-          }
-        }
-      }
       .run
       .finish
-  }
 
-  "A FatContainerToPopulationJob" should {
+  "A FatContainerToPopulationJob" should
     JobTest(new FatContainerPopulationJob(_))
       .source(Tsv("input"), fatInputData)
-      .sink[TupleEntry](Tsv("output")) { buf: Buffer[TupleEntry] =>
-        "correctly populate a fat container object" in {
+      .sink[TupleEntry](Tsv("output"))  buf: Buffer[TupleEntry] =>
+        "correctly populate a fat container object" in
           val te = buf.head
-          for (idx <- fatCorrect.indices) {
+          for (idx <- fatCorrect.indices)
             te.getInteger(idx) shouldBe fatCorrect(idx)
-          }
-        }
-      }
       .run
       .finish
-  }
-}

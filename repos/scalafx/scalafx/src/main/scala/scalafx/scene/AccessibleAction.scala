@@ -45,7 +45,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/AccessibleAction.html]]
   */
 object AccessibleAction
-    extends SFXEnumDelegateCompanion[jfxs.AccessibleAction, AccessibleAction] {
+    extends SFXEnumDelegateCompanion[jfxs.AccessibleAction, AccessibleAction]
 
   /**
     * Request that the node be decremented by a large value.
@@ -228,7 +228,6 @@ object AccessibleAction
       SetValue,
       ShowMenu
   )
-}
 
 sealed case class AccessibleAction(
     override val delegate: jfxs.AccessibleAction)

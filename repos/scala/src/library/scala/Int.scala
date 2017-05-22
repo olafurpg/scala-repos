@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Int]] => [[scala.runtime.RichInt]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Int private extends AnyVal {
+final abstract class Int private extends AnyVal
   def toByte: Byte
   def toShort: Short
   def toChar: Char
@@ -520,9 +520,8 @@ final abstract class Int private extends AnyVal {
   def %(x: Double): Double
 
   override def getClass(): Class[Int] = null
-}
 
-object Int extends AnyValCompanion {
+object Int extends AnyValCompanion
 
   /** The smallest value representable as a Int. */
   final val MinValue = java.lang.Integer.MIN_VALUE
@@ -560,4 +559,3 @@ object Int extends AnyValCompanion {
   implicit def int2long(x: Int): Long = x.toLong
   implicit def int2float(x: Int): Float = x.toFloat
   implicit def int2double(x: Int): Double = x.toDouble
-}

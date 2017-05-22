@@ -13,27 +13,27 @@ import slick.util.ConstArray
   * inner joins and unions.
   */
 class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
-    extends Phase {
+    extends Phase
   val name = "emulateOuterJoins"
 
   def apply(state: CompilerState) =
     state.map(
         tree =>
-          ClientSideOp.mapServerSide(tree, true) { n =>
+          ClientSideOp.mapServerSide(tree, true)  n =>
         val n2 = convert(n)
         if (n2 eq n) n2 else Phase.forceOuterBinds.apply(n2)
-    })
+    )
 
-  def convert(n: Node): Node = n match {
+  def convert(n: Node): Node = n match
     case Join(leftGen, rightGen, left, right, JoinType.Left, on)
         if !useLeftJoin =>
       // as leftJoin bs on e => (as join bs on e) unionAll as.filter(a => !exists(bs.filter(b => e(a, b)))).map(a => (a, nulls))
       val lgen2, rgen2, bgen = new AnonSymbol
-      val on2 = on.replace({
+      val on2 = on.replace(
         case r @ Ref(sym) =>
           if (sym == leftGen) Ref(lgen2)
           else if (sym == rightGen) Ref(rgen2) else r
-      }, true)
+      , true)
       convert(
           Union(Join(leftGen, rightGen, left, right, JoinType.Inner, on),
                 Bind(bgen,
@@ -60,11 +60,11 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
     case Join(leftGen, rightGen, left, right, JoinType.Outer, on) =>
       // as fullJoin bs on e => (as leftJoin bs on e) unionAll bs.filter(b => !exists(as.filter(a => e(a, b)))).map(b => (nulls, b))
       val lgen2, rgen2, bgen = new AnonSymbol
-      val on2 = on.replace({
+      val on2 = on.replace(
         case r @ Ref(sym) =>
           if (sym == leftGen) Ref(lgen2)
           else if (sym == rightGen) Ref(rgen2) else r
-      }, true)
+      , true)
       convert(
           Union(Join(leftGen, rightGen, left, right, JoinType.Left, on),
                 Bind(
@@ -84,39 +84,35 @@ class EmulateOuterJoins(val useLeftJoin: Boolean, val useRightJoin: Boolean)
                                 Ref(bgen))))),
                 true).infer())
     case n => n.mapChildren(convert, true)
-  }
 
   /** Create a structure of the given type where all columns are NULL. */
-  def nullStructFor(t: Type): Node = t.structural match {
+  def nullStructFor(t: Type): Node = t.structural match
     case ProductType(ts) => ProductNode(ts.map(nullStructFor))
     case StructType(sts) =>
       StructNode(sts.map { case (s, t) => (s, nullStructFor(t)) })
     case t: OptionType => LiteralNode(t, None)
     case t => LiteralNode(OptionType(t), None)
-  }
 
   /** Assign new TypeSymbols to a subtree that needs to be copied into multiple places. */
-  def assignFreshSymbols(n: Node): Node = {
+  def assignFreshSymbols(n: Node): Node =
     val typeSyms = n.collect { case n: TypeGenerator => n.identity }.toSet
-    val repl = typeSyms.map {
+    val repl = typeSyms.map
       case ts: TableIdentitySymbol => ts -> new AnonTableIdentitySymbol
       case ts => ts -> new AnonTypeSymbol
-    }.toMap
+    .toMap
     def replaceTS(t: Type): Type =
-      (t match {
+      (t match
         case NominalType(ts, v) =>
           repl.get(ts).map(new NominalType(_, v)).getOrElse(t)
         case t => t
-      }).mapChildren(replaceTS)
+      ).mapChildren(replaceTS)
     //repl.foreach { case (ts1, ts2) => global.get(ts1).foreach(t => global += ts2 -> replaceTS(t)) }
-    n.replace({
+    n.replace(
         case n: TableNode =>
           n.copy(
               identity = repl(n.identity).asInstanceOf[TableIdentitySymbol])(
               n.profileTable) :@ replaceTS(n.nodeType)
         case n: Pure => n.copy(identity = repl(n.identity))
         case n: GroupBy => n.copy(identity = repl(n.identity))
-      }, bottomUp = true)
+      , bottomUp = true)
       .infer()
-  }
-}

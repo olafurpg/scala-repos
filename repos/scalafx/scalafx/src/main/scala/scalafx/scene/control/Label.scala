@@ -35,7 +35,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object Label {
+object Label
   implicit def sfxLabel2jfx(v: Label): jfxsc.Label =
     if (v != null) v.delegate else null
 
@@ -44,23 +44,18 @@ object Label {
 
   /** Creates a Label with the supplied text and graphic. */
   def apply(text: String, graphic: Node) = new Label(text, graphic)
-}
 
 class Label(override val delegate: jfxsc.Label = new jfxsc.Label)
-    extends Labeled(delegate) with SFXDelegate[jfxsc.Label] {
+    extends Labeled(delegate) with SFXDelegate[jfxsc.Label]
 
   /** Creates Label with supplied text. */
-  def this(text: String) {
+  def this(text: String)
     this(new jfxsc.Label(text))
-  }
 
   /** Creates a Label with the supplied text and graphic. */
-  def this(text: String, graphic: Node) {
+  def this(text: String, graphic: Node)
     this(new jfxsc.Label(text, graphic))
-  }
 
   def labelFor: ObjectProperty[jfxs.Node] = delegate.labelForProperty
-  def labelFor_=(v: Node) {
+  def labelFor_=(v: Node)
     labelFor() = v
-  }
-}

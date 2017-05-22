@@ -14,7 +14,7 @@ final class Adapter[A : TubeInColl](
     selector: JsObject,
     sort: Sort,
     readPreference: ReadPreference = ReadPreference.primary)
-    extends AdapterLike[A] {
+    extends AdapterLike[A]
 
   def nbResults: Fu[Int] = $count(selector)
 
@@ -22,14 +22,12 @@ final class Adapter[A : TubeInColl](
     $find(pimpQB($query(selector)).sort(sort: _*) skip offset,
           length,
           readPreference = readPreference)
-}
 
 final class CachedAdapter[A](adapter: AdapterLike[A], val nbResults: Fu[Int])
-    extends AdapterLike[A] {
+    extends AdapterLike[A]
 
   def slice(offset: Int, length: Int): Fu[Seq[A]] =
     adapter.slice(offset, length)
-}
 
 final class BSONAdapter[A : BSONDocumentReader](
     collection: BSONCollection,
@@ -37,7 +35,7 @@ final class BSONAdapter[A : BSONDocumentReader](
     projection: BSONDocument,
     sort: BSONDocument,
     readPreference: ReadPreference = ReadPreference.primary)
-    extends AdapterLike[A] {
+    extends AdapterLike[A]
 
   def nbResults: Fu[Int] = collection.count(Some(selector))
 
@@ -48,4 +46,3 @@ final class BSONAdapter[A : BSONDocumentReader](
       .copy(options = QueryOpts(skipN = offset))
       .cursor[A](readPreference = readPreference)
       .collect[List](length)
-}

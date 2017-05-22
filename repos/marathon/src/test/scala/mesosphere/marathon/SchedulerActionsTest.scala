@@ -18,10 +18,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
 class SchedulerActionsTest
-    extends MarathonActorSupport with MarathonSpec with Matchers with Mockito {
+    extends MarathonActorSupport with MarathonSpec with Matchers with Mockito
   import system.dispatcher
 
-  test("Reset rate limiter if application is stopped") {
+  test("Reset rate limiter if application is stopped")
     val queue = mock[LaunchQueue]
     val repo = mock[AppRepository]
     val taskTracker = mock[TaskTracker]
@@ -50,10 +50,9 @@ class SchedulerActionsTest
     verify(queue).purge(app.id)
     verify(queue).resetDelay(app)
     verifyNoMoreInteractions(queue)
-  }
 
   test(
-      "Task reconciliation sends known running and staged tasks and empty list") {
+      "Task reconciliation sends known running and staged tasks and empty list")
     val queue = mock[LaunchQueue]
     val repo = mock[AppRepository]
     val taskTracker = mock[TaskTracker]
@@ -95,10 +94,9 @@ class SchedulerActionsTest
             stagedTaskWithSlaveId
         ).flatMap(_.launched.flatMap(_.status.mesosStatus)).asJava)
     verify(driver).reconcileTasks(java.util.Arrays.asList())
-  }
 
   test(
-      "Task reconciliation only one empty list, when no tasks are present in Marathon") {
+      "Task reconciliation only one empty list, when no tasks are present in Marathon")
     val queue = mock[LaunchQueue]
     val repo = mock[AppRepository]
     val taskTracker = mock[TaskTracker]
@@ -124,9 +122,8 @@ class SchedulerActionsTest
     Await.result(scheduler.reconcileTasks(driver), 5.seconds)
 
     verify(driver, times(1)).reconcileTasks(java.util.Arrays.asList())
-  }
 
-  test("Kill orphaned task") {
+  test("Kill orphaned task")
     val queue = mock[LaunchQueue]
     val repo = mock[AppRepository]
     val taskTracker = mock[TaskTracker]
@@ -160,5 +157,3 @@ class SchedulerActionsTest
     Await.result(scheduler.reconcileTasks(driver), 5.seconds)
 
     verify(driver, times(1)).killTask(orphanedTask.launchedMesosId.get)
-  }
-}

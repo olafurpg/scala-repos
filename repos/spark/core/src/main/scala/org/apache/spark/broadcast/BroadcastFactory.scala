@@ -28,7 +28,7 @@ import org.apache.spark.SparkConf
   * BroadcastFactory implementation to instantiate a particular broadcast for the
   * entire Spark job.
   */
-private[spark] trait BroadcastFactory {
+private[spark] trait BroadcastFactory
 
   def initialize(
       isDriver: Boolean, conf: SparkConf, securityMgr: SecurityManager): Unit
@@ -46,4 +46,3 @@ private[spark] trait BroadcastFactory {
   def unbroadcast(id: Long, removeFromDriver: Boolean, blocking: Boolean): Unit
 
   def stop(): Unit
-}

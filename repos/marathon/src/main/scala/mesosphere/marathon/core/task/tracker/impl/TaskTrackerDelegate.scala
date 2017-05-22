@@ -26,28 +26,25 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 private[tracker] class TaskTrackerDelegate(metrics: Option[Metrics],
                                            config: TaskTrackerConfig,
                                            taskTrackerRef: ActorRef)
-    extends TaskTracker {
+    extends TaskTracker
 
-  override def tasksByAppSync: TaskTracker.TasksByApp = {
+  override def tasksByAppSync: TaskTracker.TasksByApp =
     import ExecutionContext.Implicits.global
     Await.result(tasksByApp(), taskTrackerQueryTimeout.duration)
-  }
 
   override def tasksByApp()(
-      implicit ec: ExecutionContext): Future[TaskTracker.TasksByApp] = {
+      implicit ec: ExecutionContext): Future[TaskTracker.TasksByApp] =
     import akka.pattern.ask
     def futureCall(): Future[TaskTracker.TasksByApp] =
       (taskTrackerRef ? TaskTrackerActor.List)
         .mapTo[TaskTracker.TasksByApp]
-        .recover {
+        .recover
           case e: AskTimeoutException =>
             throw new TimeoutException(
                 s"timeout while calling list. If you know what you are doing, you can adjust the timeout " +
                 s"with --${config.internalTaskTrackerRequestTimeout.name}."
             )
-        }
     tasksByAppTimer.fold(futureCall())(_.timeFuture(futureCall()))
-  }
 
   override def countLaunchedAppTasksSync(appId: PathId): Int =
     tasksByAppSync.appTasks(appId).count(_.launched.isDefined)
@@ -85,4 +82,3 @@ private[tracker] class TaskTrackerDelegate(metrics: Option[Metrics],
 
   private[this] implicit val taskTrackerQueryTimeout: Timeout =
     config.internalTaskTrackerRequestTimeout().milliseconds
-}

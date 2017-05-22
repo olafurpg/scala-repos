@@ -8,7 +8,7 @@ import java.lang.Math
 import java.lang.Long.{numberOfTrailingZeros, numberOfLeadingZeros}
 import java.lang.Double.{longBitsToDouble, doubleToLongBits}
 
-trait DoubleIsField extends Field[Double] {
+trait DoubleIsField extends Field[Double]
   override def minus(a: Double, b: Double): Double = a - b
   def negate(a: Double): Double = -a
   def one: Double = 1.0
@@ -22,14 +22,14 @@ trait DoubleIsField extends Field[Double] {
   def quot(a: Double, b: Double): Double = (a - (a % b)) / b
   def mod(a: Double, b: Double): Double = a % b
 
-  final def gcd(a: Double, b: Double): Double = {
+  final def gcd(a: Double, b: Double): Double =
     def value(bits: Long): Long =
       bits & 0x000FFFFFFFFFFFFFL | 0x0010000000000000L
 
     def exp(bits: Long): Int = ((bits >> 52) & 0x7FF).toInt
 
     // Computes the GCD of 2 fp values. Here, we are guaranteed that exp0 < exp1.
-    def gcd0(val0: Long, exp0: Int, val1: Long, exp1: Int): Double = {
+    def gcd0(val0: Long, exp0: Int, val1: Long, exp1: Int): Double =
       val tz0 = numberOfTrailingZeros(val0)
       val tz1 = numberOfTrailingZeros(val1)
       val tzShared = spire.math.min(tz0, tz1 + exp1 - exp0)
@@ -46,11 +46,10 @@ trait DoubleIsField extends Field[Double] {
       // If exp < 0, then we have underflowed; not much we can do but return 0.
       if (exp < 0) 0.0
       else longBitsToDouble((exp << 52) | mantissa)
-    }
 
     if (a == 0D) b
     else if (b == 0D) a
-    else {
+    else
       val aBits = doubleToLongBits(a)
       val aVal = value(aBits)
       val aExp = exp(aBits)
@@ -61,20 +60,16 @@ trait DoubleIsField extends Field[Double] {
 
       if (aExp < bExp) gcd0(aVal, aExp, bVal, bExp)
       else gcd0(bVal, bExp, aVal, aExp)
-    }
-  }
 
   override def fromDouble(n: Double): Double = n
   def div(a: Double, b: Double): Double = a / b
-}
 
-trait DoubleIsNRoot extends NRoot[Double] {
+trait DoubleIsNRoot extends NRoot[Double]
   def nroot(a: Double, k: Int): Double = Math.pow(a, 1 / k.toDouble)
   override def sqrt(a: Double): Double = Math.sqrt(a)
   def fpow(a: Double, b: Double): Double = Math.pow(a, b)
-}
 
-trait DoubleIsTrig extends Trig[Double] {
+trait DoubleIsTrig extends Trig[Double]
   def e: Double = Math.E
   def pi: Double = Math.PI
 
@@ -98,9 +93,8 @@ trait DoubleIsTrig extends Trig[Double] {
 
   def toRadians(a: Double): Double = (a * 2 * pi) / 360
   def toDegrees(a: Double): Double = (a * 360) / (2 * pi)
-}
 
-trait DoubleOrder extends Order[Double] {
+trait DoubleOrder extends Order[Double]
   override def eqv(x: Double, y: Double): Boolean = x == y
   override def neqv(x: Double, y: Double): Boolean = x != y
   override def gt(x: Double, y: Double): Boolean = x > y
@@ -110,35 +104,30 @@ trait DoubleOrder extends Order[Double] {
   override def min(x: Double, y: Double): Double = Math.min(x, y)
   override def max(x: Double, y: Double): Double = Math.max(x, y)
   def compare(x: Double, y: Double): Int = java.lang.Double.compare(x, y)
-}
 
-trait DoubleIsSigned extends Signed[Double] {
+trait DoubleIsSigned extends Signed[Double]
   def signum(a: Double): Int = Math.signum(a).toInt
   def abs(a: Double): Double = if (a < 0.0) -a else a
-}
 
 trait DoubleIsReal
-    extends IsRational[Double] with DoubleOrder with DoubleIsSigned {
+    extends IsRational[Double] with DoubleOrder with DoubleIsSigned
   def toDouble(x: Double): Double = x
   def ceil(a: Double): Double = Math.ceil(a)
   def floor(a: Double): Double = Math.floor(a)
   def round(a: Double): Double = spire.math.round(a)
   def isWhole(a: Double): Boolean = a % 1.0 == 0.0
   def toRational(a: Double): Rational = Rational(a)
-}
 
 @SerialVersionUID(0L)
 class DoubleAlgebra
     extends DoubleIsField with DoubleIsNRoot with DoubleIsTrig
     with DoubleIsReal with Serializable
 
-trait DoubleInstances {
+trait DoubleInstances
   implicit final val DoubleAlgebra = new DoubleAlgebra
   import Double._
   import spire.math.NumberTag._
   implicit final val DoubleTag = new BuiltinFloatTag(
-      0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity) {
+      0D, MinValue, MaxValue, NaN, PositiveInfinity, NegativeInfinity)
     def isInfinite(a: Double): Boolean = java.lang.Double.isInfinite(a)
     def isNaN(a: Double): Boolean = java.lang.Double.isNaN(a)
-  }
-}

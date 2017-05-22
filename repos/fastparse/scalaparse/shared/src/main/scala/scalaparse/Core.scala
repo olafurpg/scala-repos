@@ -6,7 +6,7 @@ import syntax.{Key, Basic}
 import scala.language.implicitConversions
 import syntax.Identifiers
 import fastparse.noApi._
-trait Core extends syntax.Literals {
+trait Core extends syntax.Literals
   import fastparse.noApi._
   val WhitespaceApi = new fastparse.WhitespaceApi.Wrapper(WL0)
   import WhitespaceApi._
@@ -87,12 +87,10 @@ trait Core extends syntax.Literals {
     * apart from these and IDs, everything else is illegal
     */
   val PostDotCheck: P0 = P(WL ~ !(`super` | `this` | "{" | `_` | `type`))
-  val StableId: P0 = {
+  val StableId: P0 =
     val ClassQualifier = P("[" ~ Id ~ "]")
     val ThisSuper = P(`this` | `super` ~ ClassQualifier.?)
     val ThisPath: P0 = P(ThisSuper ~ ("." ~ PostDotCheck ~/ Id).rep)
     val IdPath: P0 = P(
         Id ~ ("." ~ PostDotCheck ~/ (`this` | Id)).rep ~ ("." ~ ThisPath).?)
     P(ThisPath | IdPath)
-  }
-}

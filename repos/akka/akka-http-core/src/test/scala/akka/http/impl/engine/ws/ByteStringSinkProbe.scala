@@ -13,7 +13,7 @@ import akka.util.ByteString
 import scala.annotation.tailrec
 import scala.concurrent.duration.FiniteDuration
 
-trait ByteStringSinkProbe {
+trait ByteStringSinkProbe
   def sink: Sink[ByteString, NotUsed]
 
   def expectBytes(length: Int): ByteString
@@ -30,33 +30,29 @@ trait ByteStringSinkProbe {
   def expectError(cause: Throwable): Unit
 
   def request(n: Long): Unit
-}
 
-object ByteStringSinkProbe {
+object ByteStringSinkProbe
   def apply()(implicit system: ActorSystem): ByteStringSinkProbe =
-    new ByteStringSinkProbe {
+    new ByteStringSinkProbe
       val probe = TestSubscriber.probe[ByteString]()
       val sink: Sink[ByteString, NotUsed] = Sink.fromSubscriber(probe)
 
-      def expectNoBytes(): Unit = {
+      def expectNoBytes(): Unit =
         probe.ensureSubscription()
         probe.expectNoMsg()
-      }
-      def expectNoBytes(timeout: FiniteDuration): Unit = {
+      def expectNoBytes(timeout: FiniteDuration): Unit =
         probe.ensureSubscription()
         probe.expectNoMsg(timeout)
-      }
 
       var inBuffer = ByteString.empty
       @tailrec def expectBytes(length: Int): ByteString =
-        if (inBuffer.size >= length) {
+        if (inBuffer.size >= length)
           val res = inBuffer.take(length)
           inBuffer = inBuffer.drop(length)
           res
-        } else {
+        else
           inBuffer ++= probe.requestNext()
           expectBytes(length)
-        }
 
       def expectBytes(expected: ByteString): Unit =
         assert(expectBytes(expected.length) == expected, "expected ")
@@ -71,5 +67,3 @@ object ByteStringSinkProbe {
       def expectError(cause: Throwable): Unit = probe.expectError(cause)
 
       def request(n: Long): Unit = probe.request(n)
-    }
-}

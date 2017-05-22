@@ -1,14 +1,12 @@
-trait T1 {
+trait T1
   def a {}
   case class A
-}
 
-trait T2 extends T1 {
+trait T2 extends T1
   def b {}
   case class B
-}
 
-trait T3 extends T2 {
+trait T3 extends T2
   def c {}
   case class C
 
@@ -37,4 +35,3 @@ trait T3 extends T2 {
 
   println(super. /* resolved: false */ C.getClass)
   println(classOf[super. /* resolved: false */ C])
-}

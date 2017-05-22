@@ -20,11 +20,9 @@ import javax.ws.rs.{GET, PathParam, Produces}
 import javax.ws.rs.core.MediaType
 
 @Produces(Array(MediaType.APPLICATION_JSON))
-private[v1] class OneApplicationResource(uiRoot: UIRoot) {
+private[v1] class OneApplicationResource(uiRoot: UIRoot)
 
   @GET
-  def getApp(@PathParam("appId") appId: String): ApplicationInfo = {
+  def getApp(@PathParam("appId") appId: String): ApplicationInfo =
     val apps = uiRoot.getApplicationInfoList.find { _.id == appId }
     apps.getOrElse(throw new NotFoundException("unknown app: " + appId))
-  }
-}

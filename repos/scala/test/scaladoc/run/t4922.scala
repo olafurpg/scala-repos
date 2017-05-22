@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   // Test code
   override def code = """
@@ -16,7 +16,7 @@ object Test extends ScaladocModelTest {
   // no need for special settings
   def scaladocSettings = ""
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -30,5 +30,3 @@ object Test extends ScaladocModelTest {
     assertEqual(
         f.valueParams(0)(0).defaultValue.get.expression, "\"\".isEmpty")
     assertEqual(g.valueParams(0)(0).defaultValue.get.expression, "null")
-  }
-}

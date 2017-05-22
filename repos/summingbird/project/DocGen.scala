@@ -9,20 +9,19 @@ import com.typesafe.sbt.SbtSite.{site, SiteKeys}
 import com.typesafe.sbt.SbtGhPages.{ghpages, GhPagesKeys => ghkeys}
 import com.typesafe.sbt.SbtGit.GitKeys.gitRemoteRepo
 
-object DocGen {
+object DocGen
   val docDirectory = "target/site"
   val aggregateName = "summingbird"
 
-  def syncLocal = (ghkeys.updatedRepository, GitKeys.gitRunner, streams) map {
+  def syncLocal = (ghkeys.updatedRepository, GitKeys.gitRunner, streams) map
     (repo, git, s) =>
       cleanSite(repo, git, s) // First, remove 'stale' files.
       val rootPath = file(docDirectory) // Now copy files.
       IO.copyDirectory(rootPath, repo)
       IO.touch(repo / ".nojekyll")
       repo
-  }
 
-  private def cleanSite(dir: File, git: GitRunner, s: TaskStreams): Unit = {
+  private def cleanSite(dir: File, git: GitRunner, s: TaskStreams): Unit =
     val toClean = IO
       .listFiles(dir)
       .filterNot(_.getName == ".git")
@@ -32,12 +31,11 @@ object DocGen {
       git(("rm" :: "-r" :: "-f" :: "--ignore-unmatch" :: toClean): _*)(
           dir, s.log)
     ()
-  }
 
   lazy val unidocSettings: Seq[sbt.Setting[_]] =
     site.includeScaladoc(docDirectory) ++ Seq(
         scalacOptions in doc <++=
-          (version, baseDirectory in LocalProject(aggregateName)).map {
+          (version, baseDirectory in LocalProject(aggregateName)).map
           (v, rootBase) =>
             val tagOrBranch = if (v.endsWith("-SNAPSHOT")) "develop" else v
             val docSourceUrl =
@@ -47,7 +45,7 @@ object DocGen {
                 rootBase.getAbsolutePath,
                 "-doc-source-url",
                 docSourceUrl)
-        },
+        ,
         Unidoc.unidocDirectory := file(docDirectory),
         gitRemoteRepo := "git@github.com:twitter/" + aggregateName + ".git",
         ghkeys.synchLocal <<= syncLocal
@@ -55,4 +53,3 @@ object DocGen {
 
   lazy val publishSettings =
     site.settings ++ Unidoc.settings ++ ghpages.settings ++ unidocSettings
-}

@@ -41,14 +41,13 @@ private[rpc] class RpcTimeoutException(
   */
 private[spark] class RpcTimeout(
     val duration: FiniteDuration, val timeoutProp: String)
-    extends Serializable {
+    extends Serializable
 
   /** Amends the standard message of TimeoutException to include the description */
   private def createRpcTimeoutException(
-      te: TimeoutException): RpcTimeoutException = {
+      te: TimeoutException): RpcTimeoutException =
     new RpcTimeoutException(
         te.getMessage + ". This timeout is controlled by " + timeoutProp, te)
-  }
 
   /**
     * PartialFunction to match a TimeoutException and add the timeout description to the message
@@ -58,12 +57,11 @@ private[spark] class RpcTimeout(
     *    val timeout = new RpcTimeout(5 millis, "short timeout")
     *    Future(throw new TimeoutException).recover(timeout.addMessageIfTimeout)
     */
-  def addMessageIfTimeout[T]: PartialFunction[Throwable, T] = {
+  def addMessageIfTimeout[T]: PartialFunction[Throwable, T] =
     // The exception has already been converted to a RpcTimeoutException so just raise it
     case rte: RpcTimeoutException => throw rte
     // Any other TimeoutException get converted to a RpcTimeoutException with modified message
     case te: TimeoutException => throw createRpcTimeoutException(te)
-  }
 
   /**
     * Wait for the completed result and return it. If the result is not available within this
@@ -72,14 +70,12 @@ private[spark] class RpcTimeout(
     * @throws RpcTimeoutException if after waiting for the specified time `awaitable`
     *         is still not ready
     */
-  def awaitResult[T](awaitable: Awaitable[T]): T = {
-    try {
+  def awaitResult[T](awaitable: Awaitable[T]): T =
+    try
       Await.result(awaitable, duration)
-    } catch addMessageIfTimeout
-  }
-}
+    catch addMessageIfTimeout
 
-private[spark] object RpcTimeout {
+private[spark] object RpcTimeout
 
   /**
     * Lookup the timeout property in the configuration and create
@@ -88,10 +84,9 @@ private[spark] object RpcTimeout {
     * @param timeoutProp property key for the timeout in seconds
     * @throws NoSuchElementException if property is not set
     */
-  def apply(conf: SparkConf, timeoutProp: String): RpcTimeout = {
+  def apply(conf: SparkConf, timeoutProp: String): RpcTimeout =
     val timeout = { conf.getTimeAsSeconds(timeoutProp).seconds }
     new RpcTimeout(timeout, timeoutProp)
-  }
 
   /**
     * Lookup the timeout property in the configuration and create
@@ -103,10 +98,9 @@ private[spark] object RpcTimeout {
     */
   def apply(conf: SparkConf,
             timeoutProp: String,
-            defaultValue: String): RpcTimeout = {
+            defaultValue: String): RpcTimeout =
     val timeout = { conf.getTimeAsSeconds(timeoutProp, defaultValue).seconds }
     new RpcTimeout(timeout, timeoutProp)
-  }
 
   /**
     * Lookup prioritized list of timeout properties in the configuration
@@ -119,20 +113,16 @@ private[spark] object RpcTimeout {
     */
   def apply(conf: SparkConf,
             timeoutPropList: Seq[String],
-            defaultValue: String): RpcTimeout = {
+            defaultValue: String): RpcTimeout =
     require(timeoutPropList.nonEmpty)
 
     // Find the first set property or use the default value with the first property
     val itr = timeoutPropList.iterator
     var foundProp: Option[(String, String)] = None
-    while (itr.hasNext && foundProp.isEmpty) {
+    while (itr.hasNext && foundProp.isEmpty)
       val propKey = itr.next()
-      conf.getOption(propKey).foreach { prop =>
+      conf.getOption(propKey).foreach  prop =>
         foundProp = Some(propKey, prop)
-      }
-    }
     val finalProp = foundProp.getOrElse(timeoutPropList.head, defaultValue)
     val timeout = { Utils.timeStringAsSeconds(finalProp._2).seconds }
     new RpcTimeout(timeout, finalProp._1)
-  }
-}

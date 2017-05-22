@@ -2,7 +2,7 @@ package mesosphere.marathon.core.flow
 
 import org.rogach.scallop.ScallopConf
 
-trait ReviveOffersConfig extends ScallopConf {
+trait ReviveOffersConfig extends ScallopConf
   //scalastyle:off magic.number
 
   lazy val reviveOffersForNewApps = toggle(
@@ -22,4 +22,3 @@ trait ReviveOffersConfig extends ScallopConf {
       "revive_offers_repetitions",
       descr = "Repeat every reviveOffer request this many times, delayed by the --min_revive_offers_interval.",
       default = Some(3))
-}

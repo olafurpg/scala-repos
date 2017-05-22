@@ -11,29 +11,26 @@ import breeze.math.Field
 
 class LinearInterpolator[T : ClassTag : Field : Ordering](
     x_coords: Vector[T], y_coords: Vector[T])
-    extends HandyUnivariateInterpolator[T](x_coords, y_coords) {
+    extends HandyUnivariateInterpolator[T](x_coords, y_coords)
 
   private val ord = implicitly[Ordering[T]]
   import ord.mkOrderingOps
 
-  override protected def interpolate(x: T): T = {
+  override protected def interpolate(x: T): T =
     val index = bisearch(x)
 
     if (index == 0) Y(0)
     else interpolate(index, x)
-  }
 
-  override protected def extrapolate(x: T): T = {
-    if (X.length < 2) {
+  override protected def extrapolate(x: T): T =
+    if (X.length < 2)
       throw new IndexOutOfBoundsException(
           "Cannot extrapolate linearly when given less than two points.")
-    }
 
     val index = if (x < X(0)) 1 else X.length - 1
     interpolate(index, x)
-  }
 
-  private def interpolate(index: Int, x: T): T = {
+  private def interpolate(index: Int, x: T): T =
     /* Interpolate or extrapolate linearly between point number index-1 and index. */
     assert(index > 0)
 
@@ -50,11 +47,8 @@ class LinearInterpolator[T : ClassTag : Field : Ordering](
 
     // result = y1 * u + y2 * w
     f.+(f.*(y1, u), f.*(y2, w))
-  }
-}
 
-object LinearInterpolator {
+object LinearInterpolator
   def apply[T : ClassTag : Field : Ordering](
       x_coords: Vector[T], y_coords: Vector[T]) =
     new LinearInterpolator(x_coords, y_coords)
-}

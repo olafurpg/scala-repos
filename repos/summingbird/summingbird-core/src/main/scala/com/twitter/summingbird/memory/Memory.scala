@@ -22,18 +22,16 @@ import com.twitter.summingbird.option.JobId
 import com.twitter.summingbird.planner.DagOptimizer
 import collection.mutable.{Map => MutableMap}
 
-object Memory {
+object Memory
   implicit def toSource[T](traversable: TraversableOnce[T])(
       implicit mf: Manifest[T]): Producer[Memory, T] =
     Producer.source[Memory, T](traversable)
-}
 
-trait MemoryService[-K, +V] {
+trait MemoryService[-K, +V]
   def get(k: K): Option[V]
-}
 
 class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
-    extends Platform[Memory] {
+    extends Platform[Memory]
   type Source[T] = TraversableOnce[T]
   type Store[K, V] = MutableMap[K, V]
   type Sink[-T] = (T => Unit)
@@ -44,16 +42,15 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
   private type JamfMap = HMap[Prod, Stream]
 
   def counter(group: Group, name: Name): Option[Long] =
-    MemoryStatProvider.getCountersForJob(jobID).flatMap {
+    MemoryStatProvider.getCountersForJob(jobID).flatMap
       _.get(group.getString + "/" + name.getString).map { _.get }
-    }
 
   private def toStream[T](
       outerProducer: Prod[T], jamfs: JamfMap): (Stream[T], JamfMap) =
-    jamfs.get(outerProducer) match {
+    jamfs.get(outerProducer) match
       case Some(s) => (s, jamfs)
       case None =>
-        val (s, m) = outerProducer match {
+        val (s, m) = outerProducer match
           case NamedProducer(producer, _) => toStream(producer, jamfs)
           case IdentityKeyedProducer(producer) => toStream(producer, jamfs)
           case Source(source) => (source.toStream, jamfs)
@@ -72,17 +69,17 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
 
           case KeyFlatMappedProducer(producer, fn) =>
             val (s, m) = toStream(producer, jamfs)
-            (s.flatMap {
+            (s.flatMap
               case (k, v) =>
                 fn(k).map((_, v))
-            }, m)
+            , m)
 
           case ValueFlatMappedProducer(producer, fn) =>
             val (s, m) = toStream(producer, jamfs)
-            (s.flatMap {
+            (s.flatMap
               case (k, v) =>
                 fn(v).map((k, _))
-            }, m)
+            , m)
 
           case AlsoProducer(l, r) =>
             //Plan the first one, but ignore it
@@ -95,43 +92,38 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
 
           case WrittenProducer(producer, fn) =>
             val (s, m) = toStream(producer, jamfs)
-            (s.map { i =>
+            (s.map  i =>
               fn(i); i
-            }, m)
+            , m)
 
           case LeftJoinedProducer(producer, service) =>
             val (s, m) = toStream(producer, jamfs)
-            val joined = s.map {
+            val joined = s.map
               case (k, v) => (k, (v, service.get(k)))
-            }
             (joined, m)
 
           case Summer(producer, store, semigroup) =>
             val (s, m) = toStream(producer, jamfs)
-            val summed = s.map {
+            val summed = s.map
               case (k, deltaV) =>
                 val oldV = store.get(k)
                 val newV = oldV.map { semigroup.plus(_, deltaV) }
                   .getOrElse(deltaV)
                 store.update(k, newV)
                 (k, (oldV, deltaV))
-            }
             (summed, m)
-        }
         // scala can't infer that s is the right type through case statements above
         val st = s.asInstanceOf[Stream[T]]
         (st, m + (outerProducer -> st))
-    }
 
-  def plan[T](prod: TailProducer[Memory, T]): Stream[T] = {
+  def plan[T](prod: TailProducer[Memory, T]): Stream[T] =
 
     val registeredCounters: Seq[(Group, Name)] =
       JobCounters.getCountersForJob(jobID).getOrElse(Nil)
 
-    if (!registeredCounters.isEmpty) {
+    if (!registeredCounters.isEmpty)
       MemoryStatProvider.registerCounters(jobID, registeredCounters)
       SummingbirdRuntimeStats.addPlatformStatProvider(MemoryStatProvider)
-    }
 
     val dagOptimizer = new DagOptimizer[Memory] {}
     val memoryTail =
@@ -139,11 +131,8 @@ class Memory(implicit jobID: JobId = JobId("default.memory.jobId"))
     val memoryDag = memoryTail.asInstanceOf[TailProducer[Memory, T]]
 
     toStream(memoryDag, HMap.empty)._1
-  }
 
-  def run(iter: Stream[_]) {
+  def run(iter: Stream[_])
     // Force the entire stream, taking care not to hold on to the
     // tail.
     iter.foreach(identity(_: Any))
-  }
-}

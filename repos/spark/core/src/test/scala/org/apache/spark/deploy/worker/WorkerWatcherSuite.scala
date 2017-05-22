@@ -20,8 +20,8 @@ package org.apache.spark.deploy.worker
 import org.apache.spark.{SecurityManager, SparkConf, SparkFunSuite}
 import org.apache.spark.rpc.{RpcAddress, RpcEndpointAddress, RpcEnv}
 
-class WorkerWatcherSuite extends SparkFunSuite {
-  test("WorkerWatcher shuts down on valid disassociation") {
+class WorkerWatcherSuite extends SparkFunSuite
+  test("WorkerWatcher shuts down on valid disassociation")
     val conf = new SparkConf()
     val rpcEnv = RpcEnv.create(
         "test", "localhost", 12345, conf, new SecurityManager(conf))
@@ -33,9 +33,8 @@ class WorkerWatcherSuite extends SparkFunSuite {
     workerWatcher.onDisconnected(RpcAddress("1.2.3.4", 1234))
     assert(workerWatcher.isShutDown)
     rpcEnv.shutdown()
-  }
 
-  test("WorkerWatcher stays alive on invalid disassociation") {
+  test("WorkerWatcher stays alive on invalid disassociation")
     val conf = new SparkConf()
     val rpcEnv = RpcEnv.create(
         "test", "localhost", 12345, conf, new SecurityManager(conf))
@@ -48,5 +47,3 @@ class WorkerWatcherSuite extends SparkFunSuite {
     workerWatcher.onDisconnected(otherRpcAddress)
     assert(!workerWatcher.isShutDown)
     rpcEnv.shutdown()
-  }
-}

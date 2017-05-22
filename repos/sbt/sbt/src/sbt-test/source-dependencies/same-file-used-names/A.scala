@@ -1,8 +1,6 @@
-object A {
+object A
   def x = 3
 
-  def y = {
+  def y =
     import B._
     x
-  }
-}

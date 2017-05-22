@@ -1,7 +1,7 @@
 trait Foo[F1[F1_P]]
 trait Bar[F2[F2_P]]
 
-class Test {
+class Test
   def barFoo[F3[F3_P]]: Foo[F3] = ???
 
   // Now we can define a couple of type aliases:
@@ -24,4 +24,3 @@ class Test {
   //        Bar[[X1]String] <:< ?F3[X3]
   //          X3 <:< [X1]String
   //            false
-}

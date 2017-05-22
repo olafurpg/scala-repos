@@ -36,49 +36,41 @@ import scalafx.scene.control.{Label, Menu, MenuBar, MenuItem, SeparatorMenuItem}
 import scalafx.scene.layout.{BorderPane, VBox}
 import scalafx.scene.paint.Color
 
-object MenuTest extends JFXApp {
+object MenuTest extends JFXApp
 
-  val menu = new Menu("File") {
+  val menu = new Menu("File")
     items = List(
-        new MenuItem("Open") {
+        new MenuItem("Open")
           onAction = (ae: ActionEvent) =>
             history.children += new Label("Selected item `Open`")
-        },
+        ,
         new SeparatorMenuItem,
-        new MenuItem("Close") {
+        new MenuItem("Close")
           onAction = (ae: ActionEvent) =>
             history.children += new Label("Selected item `Close`")
-        }
     )
 
     onShowing = handle { printEvent("on showing") }
     onShown = handle { printEvent("on shown") }
     onHiding = handle { printEvent("on hiding") }
     onHidden = handle { printEvent("on hidden") }
-  }
 
   val history = new VBox()
 
-  val menuBar = new MenuBar {
+  val menuBar = new MenuBar
     useSystemMenuBar = true
     minWidth = 100
     menus.add(menu)
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Menu test"
     width = 300
     height = 225
-    scene = new Scene {
+    scene = new Scene
       fill = Color.LightGray
-      root = new BorderPane {
+      root = new BorderPane
         top = menuBar
         bottom = history
-      }
-    }
-  }
 
-  def printEvent(eventStr: String)() {
+  def printEvent(eventStr: String)()
     history.children += new Label(eventStr)
-  }
-}

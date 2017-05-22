@@ -1,5 +1,5 @@
-class FunType {
-  def a = {
+class FunType
+  def a =
     val y = (_: Int) + 1
     /*start*/
 
@@ -7,8 +7,6 @@ class FunType {
     y(1)
     /*end*/
     z
-  }
-}
 /*
 class FunType {
   def a = {

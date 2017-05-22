@@ -20,7 +20,6 @@ package kafka.common
   * Thrown when a request is made for partition, but no leader exists for that partition
   */
 class ReplicaNotAvailableException(cause: Throwable, message: String = "")
-    extends RuntimeException(cause) {
+    extends RuntimeException(cause)
   def this() = this(null, "")
   def this(message: String) = this(null, message)
-}

@@ -23,24 +23,22 @@ import org.apache.kafka.common.utils.MockTime
 import org.junit.Assert.{assertEquals, assertTrue}
 import org.junit.{Before, Test}
 
-class ClientQuotaManagerTest {
+class ClientQuotaManagerTest
   private val time = new MockTime
 
   private val config = ClientQuotaManagerConfig(
       quotaBytesPerSecondDefault = 500)
 
   var numCallbacks: Int = 0
-  def callback(delayTimeMs: Int) {
+  def callback(delayTimeMs: Int)
     numCallbacks += 1
-  }
 
   @Before
-  def beforeMethod() {
+  def beforeMethod()
     numCallbacks = 0
-  }
 
   @Test
-  def testQuotaParsing() {
+  def testQuotaParsing()
     val clientMetrics = new ClientQuotaManager(
         config, newMetrics, "producer", time)
 
@@ -48,7 +46,7 @@ class ClientQuotaManagerTest {
     clientMetrics.updateQuota("p1", new Quota(2000, true))
     clientMetrics.updateQuota("p2", new Quota(4000, true))
 
-    try {
+    try
       assertEquals("Default producer quota should be 500",
                    new Quota(500, true),
                    clientMetrics.quota("random-client-id"))
@@ -88,26 +86,23 @@ class ClientQuotaManagerTest {
           "p1", 0, this.callback)
       assertTrue(s"throttleTimeMs should be > 0. was $throttleTimeMs",
                  throttleTimeMs > 0)
-    } finally {
+    finally
       clientMetrics.shutdown()
-    }
-  }
 
   @Test
-  def testQuotaViolation() {
+  def testQuotaViolation()
     val metrics = newMetrics
     val clientMetrics = new ClientQuotaManager(
         config, metrics, "producer", time)
     val queueSizeMetric =
       metrics.metrics().get(metrics.metricName("queue-size", "producer", ""))
-    try {
+    try
       /* We have 10 second windows. Make sure that there is no quota violation
        * if we produce under the quota
        */
-      for (i <- 0 until 10) {
+      for (i <- 0 until 10)
         clientMetrics.recordAndMaybeThrottle("unknown", 400, callback)
         time.sleep(1000)
-      }
       assertEquals(10, numCallbacks)
       assertEquals(0, queueSizeMetric.value().toInt)
 
@@ -132,26 +127,23 @@ class ClientQuotaManagerTest {
       assertEquals(11, numCallbacks)
 
       // Could continue to see delays until the bursty sample disappears
-      for (i <- 0 until 10) {
+      for (i <- 0 until 10)
         clientMetrics.recordAndMaybeThrottle("unknown", 400, callback)
         time.sleep(1000)
-      }
 
       assertEquals(
           "Should be unthrottled since bursty sample has rolled over",
           0,
           clientMetrics.recordAndMaybeThrottle("unknown", 0, callback))
-    } finally {
+    finally
       clientMetrics.shutdown()
-    }
-  }
 
   @Test
-  def testExpireThrottleTimeSensor() {
+  def testExpireThrottleTimeSensor()
     val metrics = newMetrics
     val clientMetrics = new ClientQuotaManager(
         config, metrics, "producer", time)
-    try {
+    try
       clientMetrics.recordAndMaybeThrottle("client1", 100, callback)
       // remove the throttle time sensor
       metrics.removeSensor("producerThrottleTime-client1")
@@ -164,17 +156,15 @@ class ClientQuotaManagerTest {
         metrics.getSensor("producerThrottleTime-client1")
       assertTrue(
           "Throttle time sensor should exist", throttleTimeSensor != null)
-    } finally {
+    finally
       clientMetrics.shutdown()
-    }
-  }
 
   @Test
-  def testExpireQuotaSensors() {
+  def testExpireQuotaSensors()
     val metrics = newMetrics
     val clientMetrics = new ClientQuotaManager(
         config, metrics, "producer", time)
-    try {
+    try
       clientMetrics.recordAndMaybeThrottle("client1", 100, callback)
       // remove all the sensors
       metrics.removeSensor("producerThrottleTime-client1")
@@ -192,12 +182,8 @@ class ClientQuotaManagerTest {
 
       val byteRateSensor = metrics.getSensor("producer-client1")
       assertTrue("Byte rate sensor should exist", byteRateSensor != null)
-    } finally {
+    finally
       clientMetrics.shutdown()
-    }
-  }
 
-  def newMetrics: Metrics = {
+  def newMetrics: Metrics =
     new Metrics(new MetricConfig(), Collections.emptyList(), time)
-  }
-}

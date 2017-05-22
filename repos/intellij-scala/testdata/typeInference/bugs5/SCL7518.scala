@@ -1,9 +1,8 @@
-object SCL7518 {
+object SCL7518
   abstract case class AImpl(s: String)
 
-  class F {
+  class F
     def copy(s: String) = 1
-  }
 
   class G
 
@@ -14,5 +13,4 @@ object SCL7518 {
 
   /*start*/
   g.copy("text") /*end*/
-}
 //Int

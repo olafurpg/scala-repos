@@ -20,9 +20,8 @@ final case class WebSocketRequest(
     uri: Uri,
     extraHeaders: immutable.Seq[HttpHeader] = Nil,
     subprotocol: Option[String] = None)
-object WebSocketRequest {
+object WebSocketRequest
   implicit def fromTargetUri(uri: Uri): WebSocketRequest =
     WebSocketRequest(uri)
   implicit def fromTargetUriString(uriString: String): WebSocketRequest =
     WebSocketRequest(uriString)
-}

@@ -25,30 +25,27 @@ import org.apache.spark.{LocalSparkContext, SparkConf, SparkContext, SparkFunSui
   * Tests that pools and the associated scheduling algorithms for FIFO and fair scheduling work
   * correctly.
   */
-class PoolSuite extends SparkFunSuite with LocalSparkContext {
+class PoolSuite extends SparkFunSuite with LocalSparkContext
 
   def createTaskSetManager(
       stageId: Int,
       numTasks: Int,
-      taskScheduler: TaskSchedulerImpl): TaskSetManager = {
-    val tasks = Array.tabulate[Task[_]](numTasks) { i =>
+      taskScheduler: TaskSchedulerImpl): TaskSetManager =
+    val tasks = Array.tabulate[Task[_]](numTasks)  i =>
       new FakeTask(i, Nil)
-    }
     new TaskSetManager(
         taskScheduler, new TaskSet(tasks, stageId, 0, 0, null), 0)
-  }
 
   def scheduleTaskAndVerifyId(
-      taskId: Int, rootPool: Pool, expectedStageId: Int) {
+      taskId: Int, rootPool: Pool, expectedStageId: Int)
     val taskSetQueue = rootPool.getSortedTaskSetQueue
     val nextTaskSetToSchedule =
       taskSetQueue.find(t => (t.runningTasks + t.tasksSuccessful) < t.numTasks)
     assert(nextTaskSetToSchedule.isDefined)
     nextTaskSetToSchedule.get.addRunningTask(taskId)
     assert(nextTaskSetToSchedule.get.stageId === expectedStageId)
-  }
 
-  test("FIFO Scheduler Test") {
+  test("FIFO Scheduler Test")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
 
@@ -69,14 +66,13 @@ class PoolSuite extends SparkFunSuite with LocalSparkContext {
     scheduleTaskAndVerifyId(3, rootPool, 1)
     scheduleTaskAndVerifyId(4, rootPool, 2)
     scheduleTaskAndVerifyId(5, rootPool, 2)
-  }
 
   /**
     * This test creates three scheduling pools, and creates task set managers in the first
     * two scheduling pools. The test verifies that as tasks are scheduled, the fair scheduling
     * algorithm properly orders the two scheduling pools.
     */
-  test("Fair Scheduler Test") {
+  test("Fair Scheduler Test")
     val xmlPath =
       getClass.getClassLoader.getResource("fairscheduler.xml").getFile()
     val conf = new SparkConf().set("spark.scheduler.allocation.file", xmlPath)
@@ -136,9 +132,8 @@ class PoolSuite extends SparkFunSuite with LocalSparkContext {
     // Pool 1 running tasks: 4, Pool 2 running tasks: 3. 2 gets scheduled because fewer running
     // tasks.
     scheduleTaskAndVerifyId(7, rootPool, 4)
-  }
 
-  test("Nested Pool Test") {
+  test("Nested Pool Test")
     sc = new SparkContext("local", "TaskSchedulerImplSuite")
     val taskScheduler = new TaskSchedulerImpl(sc)
 
@@ -182,5 +177,3 @@ class PoolSuite extends SparkFunSuite with LocalSparkContext {
     scheduleTaskAndVerifyId(1, rootPool, 4)
     scheduleTaskAndVerifyId(2, rootPool, 6)
     scheduleTaskAndVerifyId(3, rootPool, 2)
-  }
-}

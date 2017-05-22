@@ -31,12 +31,11 @@ import scala.concurrent.Future
 /**
   * INTERNAL API
   */
-private[remote] trait InboundMessageDispatcher {
+private[remote] trait InboundMessageDispatcher
   def dispatch(recipient: InternalActorRef,
                recipientAddress: Address,
                serializedMessage: SerializedMessage,
                senderOption: Option[ActorRef]): Unit
-}
 
 /**
   * INTERNAL API
@@ -45,14 +44,14 @@ private[remote] class DefaultMessageDispatcher(
     private val system: ExtendedActorSystem,
     private val provider: RemoteActorRefProvider,
     private val log: LoggingAdapter)
-    extends InboundMessageDispatcher {
+    extends InboundMessageDispatcher
 
   private val remoteDaemon = provider.remoteDaemon
 
   override def dispatch(recipient: InternalActorRef,
                         recipientAddress: Address,
                         serializedMessage: SerializedMessage,
-                        senderOption: Option[ActorRef]): Unit = {
+                        senderOption: Option[ActorRef]): Unit =
 
     import provider.remoteSettings._
 
@@ -66,19 +65,18 @@ private[remote] class DefaultMessageDispatcher(
     def msgLog =
       s"RemoteMessage: [$payload] to [$recipient]<+[$originalReceiver] from [$sender()]"
 
-    recipient match {
+    recipient match
 
       case `remoteDaemon` ⇒
         if (UntrustedMode)
           log.debug("dropping daemon message in untrusted mode")
-        else {
+        else
           if (LogReceive) log.debug("received daemon message {}", msgLog)
           remoteDaemon ! payload
-        }
 
       case l @ (_: LocalRef | _: RepointableRef) if l.isLocal ⇒
         if (LogReceive) log.debug("received local message {}", msgLog)
-        payload match {
+        payload match
           case sel: ActorSelectionMessage ⇒
             if (UntrustedMode &&
                 (!TrustedSelectionPaths.contains(
@@ -98,7 +96,6 @@ private[remote] class DefaultMessageDispatcher(
                 msg.getClass.getName)
           case msg: SystemMessage ⇒ l.sendSystemMessage(msg)
           case msg ⇒ l.!(msg)(sender)
-        }
 
       case r @ (_: RemoteRef | _: RepointableRef)
           if !r.isLocal && !UntrustedMode ⇒
@@ -122,18 +119,14 @@ private[remote] class DefaultMessageDispatcher(
             r,
             recipientAddress,
             provider.transport.addresses.mkString(", "))
-    }
-  }
-}
 
 /**
   * INTERNAL API
   */
 @SerialVersionUID(1L)
 private[remote] class EndpointException(msg: String, cause: Throwable)
-    extends AkkaException(msg, cause) with OnlyCauseStackTrace {
+    extends AkkaException(msg, cause) with OnlyCauseStackTrace
   def this(msg: String) = this(msg, null)
-}
 
 /**
   * INTERNAL API
@@ -197,7 +190,7 @@ private[remote] class OversizedPayloadException(msg: String)
 /**
   * INTERNAL API
   */
-private[remote] object ReliableDeliverySupervisor {
+private[remote] object ReliableDeliverySupervisor
   case object Ungate
   case object AttemptSysMsgRedelivery
   final case class GotUid(uid: Int, remoteAddres: Address)
@@ -223,7 +216,6 @@ private[remote] object ReliableDeliverySupervisor {
           settings,
           codec,
           receiveBuffers)
-}
 
 /**
   * INTERNAL API
@@ -237,7 +229,7 @@ private[remote] class ReliableDeliverySupervisor(
     val settings: RemoteSettings,
     val codec: AkkaPduCodec,
     val receiveBuffers: ConcurrentHashMap[Link, ResendState])
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   import ReliableDeliverySupervisor._
   import context.dispatcher
 
@@ -249,7 +241,7 @@ private[remote] class ReliableDeliverySupervisor(
 
   private var bufferWasInUse = false
 
-  override val supervisorStrategy = OneForOneStrategy(loggingEnabled = false) {
+  override val supervisorStrategy = OneForOneStrategy(loggingEnabled = false)
     case e @ (_: AssociationProblem) ⇒ Escalate
     case NonFatal(e) ⇒
       val causedBy =
@@ -262,7 +254,7 @@ private[remote] class ReliableDeliverySupervisor(
           e.getMessage,
           causedBy)
       uidConfirmed = false // Need confirmation of UID again
-      if (bufferWasInUse) {
+      if (bufferWasInUse)
         if ((resendBuffer.nacked.nonEmpty || resendBuffer.nonAcked.nonEmpty) &&
             bailoutAt.isEmpty)
           bailoutAt = Some(
@@ -272,28 +264,25 @@ private[remote] class ReliableDeliverySupervisor(
         currentHandle = None
         context.parent ! StoppedReading(self)
         Stop
-      } else Escalate
-  }
+      else Escalate
 
   var currentHandle: Option[AkkaProtocolHandle] = handleOrActive
 
   var resendBuffer: AckedSendBuffer[Send] = _
   var seqCounter: Long = _
 
-  def reset(): Unit = {
+  def reset(): Unit =
     resendBuffer = new AckedSendBuffer[Send](settings.SysMsgBufferSize)
     bufferWasInUse = false
     seqCounter = 0L
     bailoutAt = None
-  }
 
   reset()
 
-  def nextSeq(): SeqNo = {
+  def nextSeq(): SeqNo =
     val tmp = seqCounter
     seqCounter += 1
     SeqNo(tmp)
-  }
 
   var writer: ActorRef = createWriter()
   var uid: Option[Int] = handleOrActive map { _.handshakeInfo.uid }
@@ -307,27 +296,24 @@ private[remote] class ReliableDeliverySupervisor(
   // (This actor is never restarted)
   var uidConfirmed: Boolean = uid.isDefined
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     // All remaining messages in the buffer has to be delivered to dead letters. It is important to clear the sequence
     // number otherwise deadLetters will ignore it to avoid reporting system messages as dead letters while they are
     // still possibly retransmitted.
     // Such a situation may arise when the EndpointWriter is shut down, and all of its mailbox contents are delivered
     // to dead letters. These messages should be ignored, as they still live in resendBuffer and might be delivered to
     // the remote system later.
-    (resendBuffer.nacked ++ resendBuffer.nonAcked) foreach { s ⇒
+    (resendBuffer.nacked ++ resendBuffer.nonAcked) foreach  s ⇒
       context.system.deadLetters ! s.copy(seqOpt = None)
-    }
     receiveBuffers.remove(Link(localAddress, remoteAddress))
     autoResendTimer.cancel()
     maxSilenceTimer.foreach(_.cancel())
-  }
 
-  override def postRestart(reason: Throwable): Unit = {
+  override def postRestart(reason: Throwable): Unit =
     throw new IllegalStateException(
         "BUG: ReliableDeliverySupervisor has been attempted to be restarted. This must not happen.")
-  }
 
-  override def receive: Receive = {
+  override def receive: Receive =
     case FlushAndStop ⇒
       // Trying to serve until our last breath
       resendAll()
@@ -338,8 +324,8 @@ private[remote] class ReliableDeliverySupervisor(
       handleSend(s)
     case ack: Ack ⇒
       // If we are not sure about the UID just ignore the ack. Ignoring is fine.
-      if (uidConfirmed) {
-        try resendBuffer = resendBuffer.acknowledge(ack) catch {
+      if (uidConfirmed)
+        try resendBuffer = resendBuffer.acknowledge(ack) catch
           case NonFatal(e) ⇒
             throw new HopelessAssociation(
                 localAddress,
@@ -349,10 +335,8 @@ private[remote] class ReliableDeliverySupervisor(
                     s"Error encountered while processing system message " +
                     s"acknowledgement buffer: $resendBuffer ack: $ack",
                     e))
-        }
 
         resendNacked()
-      }
     case AttemptSysMsgRedelivery ⇒
       if (uidConfirmed) resendAll()
     case Terminated(_) ⇒
@@ -373,10 +357,9 @@ private[remote] class ReliableDeliverySupervisor(
 
     case s: EndpointWriter.StopReading ⇒
       writer forward s
-  }
 
   def gated(
-      writerTerminated: Boolean, earlyUngateRequested: Boolean): Receive = {
+      writerTerminated: Boolean, earlyUngateRequested: Boolean): Receive =
     case Terminated(_) if !writerTerminated ⇒
       if (earlyUngateRequested) self ! Ungate
       else
@@ -385,12 +368,12 @@ private[remote] class ReliableDeliverySupervisor(
       context.become(gated(writerTerminated = true, earlyUngateRequested))
     case IsIdle ⇒ sender() ! Idle
     case Ungate ⇒
-      if (!writerTerminated) {
+      if (!writerTerminated)
         // Ungate was sent from EndpointManager, but we must wait for Terminated first.
         context.become(
             gated(writerTerminated = false, earlyUngateRequested = true))
-      } else if (resendBuffer.nonAcked.nonEmpty ||
-                 resendBuffer.nacked.nonEmpty) {
+      else if (resendBuffer.nonAcked.nonEmpty ||
+                 resendBuffer.nacked.nonEmpty)
         // If we talk to a system we have not talked to before (or has given up talking to in the past) stop
         // system delivery attempts after the specified time. This act will drop the pending system messages and gate the
         // remote address at the EndpointManager level stopping this actor. In case the remote system becomes reachable
@@ -406,7 +389,7 @@ private[remote] class ReliableDeliverySupervisor(
         writer = createWriter()
         // Resending will be triggered by the incoming GotUid message after the connection finished
         goToActive()
-      } else goToIdle()
+      else goToIdle()
     case AttemptSysMsgRedelivery ⇒ // Ignore
     case s @ Send(msg: SystemMessage, _, _, _) ⇒
       tryBuffer(s.copy(seqOpt = Some(nextSeq())))
@@ -415,9 +398,8 @@ private[remote] class ReliableDeliverySupervisor(
     case EndpointWriter.StopReading(w, replyTo) ⇒
       replyTo ! EndpointWriter.StoppedReading(w)
       sender() ! EndpointWriter.StoppedReading(w)
-  }
 
-  def idle: Receive = {
+  def idle: Receive =
     case IsIdle ⇒ sender() ! Idle
     case s: Send ⇒
       writer = createWriter()
@@ -425,11 +407,10 @@ private[remote] class ReliableDeliverySupervisor(
       handleSend(s)
       goToActive()
     case AttemptSysMsgRedelivery ⇒
-      if (resendBuffer.nacked.nonEmpty || resendBuffer.nonAcked.nonEmpty) {
+      if (resendBuffer.nacked.nonEmpty || resendBuffer.nonAcked.nonEmpty)
         writer = createWriter()
         // Resending will be triggered by the incoming GotUid message after the connection finished
         goToActive()
-      }
     case TooLongIdle ⇒
       throw new HopelessAssociation(
           localAddress,
@@ -437,28 +418,25 @@ private[remote] class ReliableDeliverySupervisor(
           uid,
           new TimeoutException(
               "Remote system has been silent for too long. " +
-              s"(more than ${settings.QuarantineSilentSystemTimeout.toUnit(
-              TimeUnit.HOURS)} hours)"))
+              s"(more than $settings.QuarantineSilentSystemTimeout.toUnit(
+              TimeUnit.HOURS) hours)"))
     case EndpointWriter.FlushAndStop ⇒ context.stop(self)
     case EndpointWriter.StopReading(w, replyTo) ⇒
       replyTo ! EndpointWriter.StoppedReading(w)
-  }
 
-  private def goToIdle(): Unit = {
+  private def goToIdle(): Unit =
     if (bufferWasInUse && maxSilenceTimer.isEmpty)
       maxSilenceTimer = Some(
           context.system.scheduler.scheduleOnce(
               settings.QuarantineSilentSystemTimeout, self, TooLongIdle))
     context.become(idle)
-  }
 
-  private def goToActive(): Unit = {
+  private def goToActive(): Unit =
     maxSilenceTimer.foreach(_.cancel())
     maxSilenceTimer = None
     context.become(receive)
-  }
 
-  def flushWait: Receive = {
+  def flushWait: Receive =
     case IsIdle ⇒
     // Do not reply, we will Terminate soon, which will do the inbound connection unstashing
     case Terminated(_) ⇒
@@ -467,10 +445,9 @@ private[remote] class ReliableDeliverySupervisor(
       resendBuffer = new AckedSendBuffer[Send](0)
       context.stop(self)
     case _ ⇒ // Ignore
-  }
 
   private def handleSend(send: Send): Unit =
-    if (send.message.isInstanceOf[SystemMessage]) {
+    if (send.message.isInstanceOf[SystemMessage])
       val sequencedSend = send.copy(seqOpt = Some(nextSeq()))
       tryBuffer(sequencedSend)
       // If we have not confirmed the remote UID we cannot transfer the system message at this point just buffer it.
@@ -479,25 +456,23 @@ private[remote] class ReliableDeliverySupervisor(
       if (uidConfirmed &&
           resendBuffer.nonAcked.size <= settings.SysResendLimit)
         writer ! sequencedSend
-    } else writer ! send
+    else writer ! send
 
   private def resendNacked(): Unit = resendBuffer.nacked foreach { writer ! _ }
 
-  private def resendAll(): Unit = {
+  private def resendAll(): Unit =
     resendNacked()
     resendBuffer.nonAcked.take(settings.SysResendLimit) foreach { writer ! _ }
-  }
 
   private def tryBuffer(s: Send): Unit =
-    try {
+    try
       resendBuffer = resendBuffer buffer s
       bufferWasInUse = true
-    } catch {
+    catch
       case NonFatal(e) ⇒
         throw new HopelessAssociation(localAddress, remoteAddress, uid, e)
-    }
 
-  private def createWriter(): ActorRef = {
+  private def createWriter(): ActorRef =
     context.watch(
         context.actorOf(RARP(context.system)
                           .configureDispatcher(EndpointWriter.props(
@@ -512,8 +487,6 @@ private[remote] class ReliableDeliverySupervisor(
                                   reliableDeliverySupervisor = Some(self)))
                           .withDeploy(Deploy.local),
                         "endpointWriter"))
-  }
-}
 
 /**
   * INTERNAL API
@@ -523,7 +496,7 @@ private[remote] abstract class EndpointActor(val localAddress: Address,
                                              val transport: Transport,
                                              val settings: RemoteSettings,
                                              val codec: AkkaPduCodec)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   def inbound: Boolean
 
@@ -538,16 +511,14 @@ private[remote] abstract class EndpointActor(val localAddress: Address,
     tryPublish(DisassociatedEvent(localAddress, remoteAddress, inbound))
 
   private def tryPublish(ev: AssociationEvent): Unit =
-    try eventPublisher.notifyListeners(ev) catch {
+    try eventPublisher.notifyListeners(ev) catch
       case NonFatal(e) ⇒
         log.error(e, "Unable to publish error event to EventStream.")
-    }
-}
 
 /**
   * INTERNAL API
   */
-private[remote] object EndpointWriter {
+private[remote] object EndpointWriter
 
   def props(handleOrActive: Option[AkkaProtocolHandle],
             localAddress: Address,
@@ -598,7 +569,6 @@ private[remote] object EndpointWriter {
   private val MaxAdaptiveBackoffNanos = 2000000L // 2 ms
   private val LogBufferSizeInterval = 5000000000L // 5 s, in nanoseconds
   private val MaxWriteCount = 50
-}
 
 /**
   * INTERNAL API
@@ -614,7 +584,7 @@ private[remote] class EndpointWriter(
     val receiveBuffers: ConcurrentHashMap[Link, ResendState],
     val reliableDeliverySupervisor: Option[ActorRef])
     extends EndpointActor(
-        localAddress, remoteAddress, transport, settings, codec) {
+        localAddress, remoteAddress, transport, settings, codec)
 
   import EndpointWriter._
   import context.dispatcher
@@ -634,9 +604,8 @@ private[remote] class EndpointWriter(
 
   var lastAck: Option[Ack] = None
 
-  override val supervisorStrategy = OneForOneStrategy(loggingEnabled = false) {
+  override val supervisorStrategy = OneForOneStrategy(loggingEnabled = false)
     case NonFatal(e) ⇒ publishAndThrow(e, Logging.ErrorLevel)
-  }
 
   val provider = RARP(extendedSystem).provider
   val msgDispatch = new DefaultMessageDispatcher(extendedSystem, provider, log)
@@ -652,44 +621,38 @@ private[remote] class EndpointWriter(
   var largeBufferLogTimestamp = System.nanoTime()
 
   private def publishAndThrow(
-      reason: Throwable, logLevel: Logging.LogLevel): Nothing = {
-    reason match {
+      reason: Throwable, logLevel: Logging.LogLevel): Nothing =
+    reason match
       case _: EndpointDisassociatedException ⇒ publishDisassociated()
       case _ ⇒ publishError(reason, logLevel)
-    }
     throw reason
-  }
 
-  val ackIdleTimer = {
+  val ackIdleTimer =
     val interval = settings.SysMsgAckTimeout / 2
     context.system.scheduler
       .schedule(interval, interval, self, AckIdleCheckTimer)
-  }
 
-  override def preStart(): Unit = {
-    handle match {
+  override def preStart(): Unit =
+    handle match
       case Some(h) ⇒
         reader = startReadEndpoint(h)
       case None ⇒
         transport.associate(remoteAddress, refuseUid).map(Handle(_)) pipeTo self
-    }
-  }
 
   override def postRestart(reason: Throwable): Unit =
     throw new IllegalStateException("EndpointWriter must not be restarted")
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     ackIdleTimer.cancel()
     while (!prioBuffer.isEmpty) extendedSystem.deadLetters ! prioBuffer.poll
     while (!buffer.isEmpty) extendedSystem.deadLetters ! buffer.poll
     handle foreach { _.disassociate(stopReason) }
     eventPublisher.notifyListeners(
         DisassociatedEvent(localAddress, remoteAddress, inbound))
-  }
 
   def receive = if (handle.isEmpty) initializing else writing
 
-  def initializing: Receive = {
+  def initializing: Receive =
     case s: Send ⇒
       enqueueInBuffer(s)
     case Status.Failure(e: InvalidAssociationException) ⇒
@@ -708,16 +671,14 @@ private[remote] class EndpointWriter(
       eventPublisher.notifyListeners(
           AssociatedEvent(localAddress, remoteAddress, inbound))
       becomeWritingOrSendBufferedMessages()
-  }
 
-  def enqueueInBuffer(msg: AnyRef): Unit = msg match {
+  def enqueueInBuffer(msg: AnyRef): Unit = msg match
     case s @ Send(_: PriorityMessage, _, _, _) ⇒ prioBuffer offer s
     case s @ Send(ActorSelectionMessage(_: PriorityMessage, _, _), _, _, _) ⇒
       prioBuffer offer s
     case _ ⇒ buffer offer msg
-  }
 
-  val buffering: Receive = {
+  val buffering: Receive =
     case s: Send ⇒ enqueueInBuffer(s)
     case BackoffTimer ⇒ sendBufferedMessages()
     case FlushAndStop ⇒
@@ -728,14 +689,12 @@ private[remote] class EndpointWriter(
     case FlushAndStopTimeout ⇒
       // enough
       flushAndStop()
-  }
 
   def becomeWritingOrSendBufferedMessages(): Unit =
     if (buffer.isEmpty) context.become(writing)
-    else {
+    else
       context.become(buffering)
       sendBufferedMessages()
-    }
 
   var writeCount = 0
   var maxWriteCount = MaxWriteCount
@@ -747,13 +706,13 @@ private[remote] class EndpointWriter(
   var smallBackoffCount = 0
   var noBackoffCount = 0
 
-  def adjustAdaptiveBackup(): Unit = {
+  def adjustAdaptiveBackup(): Unit =
     maxWriteCount = math.max(writeCount, maxWriteCount)
-    if (writeCount <= SendBufferBatchSize) {
+    if (writeCount <= SendBufferBatchSize)
       fullBackoff = true
       adaptiveBackoffNanos = math.min(
           (adaptiveBackoffNanos * 1.2).toLong, MaxAdaptiveBackoffNanos)
-    } else if (writeCount >= maxWriteCount * 0.6)
+    else if (writeCount >= maxWriteCount * 0.6)
       adaptiveBackoffNanos = math.max(
           (adaptiveBackoffNanos * 0.9).toLong, MinAdaptiveBackoffNanos)
     else if (writeCount <= maxWriteCount * 0.2)
@@ -761,11 +720,10 @@ private[remote] class EndpointWriter(
           (adaptiveBackoffNanos * 1.1).toLong, MaxAdaptiveBackoffNanos)
 
     writeCount = 0
-  }
 
-  def sendBufferedMessages(): Unit = {
+  def sendBufferedMessages(): Unit =
 
-    def delegate(msg: Any): Boolean = msg match {
+    def delegate(msg: Any): Boolean = msg match
       case s: Send ⇒
         writeSend(s)
       case FlushAndStop ⇒
@@ -774,28 +732,26 @@ private[remote] class EndpointWriter(
       case s @ StopReading(_, replyTo) ⇒
         reader.foreach(_.tell(s, replyTo))
         true
-    }
 
     @tailrec def writeLoop(count: Int): Boolean =
       if (count > 0 && !buffer.isEmpty)
-        if (delegate(buffer.peek)) {
+        if (delegate(buffer.peek))
           buffer.removeFirst()
           writeCount += 1
           writeLoop(count - 1)
-        } else false
+        else false
       else true
 
     @tailrec def writePrioLoop(): Boolean =
       if (prioBuffer.isEmpty) true
       else
-        writeSend(prioBuffer.peek) && {
+        writeSend(prioBuffer.peek) &&
           prioBuffer.removeFirst(); writePrioLoop()
-        }
 
     val size = buffer.size
 
     val ok = writePrioLoop() && writeLoop(SendBufferBatchSize)
-    if (buffer.isEmpty && prioBuffer.isEmpty) {
+    if (buffer.isEmpty && prioBuffer.isEmpty)
       // FIXME remove this when testing/tuning is completed
       if (log.isDebugEnabled)
         log.debug(
@@ -809,60 +765,51 @@ private[remote] class EndpointWriter(
       writeCount = 0
       maxWriteCount = MaxWriteCount
       context.become(writing)
-    } else if (ok) {
+    else if (ok)
       noBackoffCount += 1
       self ! BackoffTimer
-    } else {
+    else
 
-      if (size > settings.LogBufferSizeExceeding) {
+      if (size > settings.LogBufferSizeExceeding)
         val now = System.nanoTime()
-        if (now - largeBufferLogTimestamp >= LogBufferSizeInterval) {
+        if (now - largeBufferLogTimestamp >= LogBufferSizeInterval)
           log.warning(
               "[{}] buffered messages in EndpointWriter for [{}]. " +
               "You should probably implement flow control to avoid flooding the remote connection.",
               size,
               remoteAddress)
           largeBufferLogTimestamp = now
-        }
-      }
 
       adjustAdaptiveBackup()
       scheduleBackoffTimer()
-    }
-  }
 
-  def scheduleBackoffTimer(): Unit = {
-    if (fullBackoff) {
+  def scheduleBackoffTimer(): Unit =
+    if (fullBackoff)
       fullBackoffCount += 1
       fullBackoff = false
       context.system.scheduler
         .scheduleOnce(settings.BackoffPeriod, self, BackoffTimer)
-    } else {
+    else
       smallBackoffCount += 1
       val s = self
       val backoffDeadlinelineNanoTime = System.nanoTime + adaptiveBackoffNanos
-      Future {
-        @tailrec def backoff(): Unit = {
+      Future
+        @tailrec def backoff(): Unit =
           val backoffNanos = backoffDeadlinelineNanoTime - System.nanoTime
-          if (backoffNanos > 0) {
+          if (backoffNanos > 0)
             LockSupport.parkNanos(backoffNanos)
             // parkNanos allows for spurious wake-up, check again
             backoff()
-          }
-        }
         backoff()
         s.tell(BackoffTimer, ActorRef.noSender)
-      }(backoffDispatcher)
-    }
-  }
+      (backoffDispatcher)
 
-  val writing: Receive = {
+  val writing: Receive =
     case s: Send ⇒
-      if (!writeSend(s)) {
+      if (!writeSend(s))
         enqueueInBuffer(s)
         scheduleBackoffTimer()
         context.become(buffering)
-      }
 
     // We are in Writing state, so buffer is empty, safe to stop here
     case FlushAndStop ⇒
@@ -870,18 +817,16 @@ private[remote] class EndpointWriter(
 
     case AckIdleCheckTimer if ackDeadline.isOverdue() ⇒
       trySendPureAck()
-  }
 
   def writeSend(s: Send): Boolean =
-    try {
-      handle match {
+    try
+      handle match
         case Some(h) ⇒
-          if (provider.remoteSettings.LogSend) {
+          if (provider.remoteSettings.LogSend)
             def msgLog =
-              s"RemoteMessage: [${s.message}] to [${s.recipient}]<+[${s.recipient.path}] from [${s.senderOption
-                .getOrElse(extendedSystem.deadLetters)}]"
+              s"RemoteMessage: [${s.message}] to [${s.recipient}]<+[${s.recipient.path}] from [$s.senderOption
+                .getOrElse(extendedSystem.deadLetters)]"
             log.debug("sending message {}", msgLog)
-          }
 
           val pdu = codec.constructMessage(s.recipient.localAddressToUse,
                                            s.recipient,
@@ -893,26 +838,23 @@ private[remote] class EndpointWriter(
           val pduSize = pdu.size
           remoteMetrics.logPayloadBytes(s.message, pduSize)
 
-          if (pduSize > transport.maximumPayloadBytes) {
+          if (pduSize > transport.maximumPayloadBytes)
             val reason = new OversizedPayloadException(
                 s"Discarding oversized payload sent to ${s.recipient}: max allowed size ${transport.maximumPayloadBytes} bytes, actual size of encoded ${s.message.getClass} was ${pdu.size} bytes.")
             log.error(reason,
                       "Transient association error (association remains live)")
             true
-          } else {
+          else
             val ok = h.write(pdu)
-            if (ok) {
+            if (ok)
               ackDeadline = newAckDeadline
               lastAck = None
-            }
             ok
-          }
 
         case None ⇒
           throw new EndpointException(
               "Internal error: Endpoint is in state Writing, but no association handle is present.")
-      }
-    } catch {
+    catch
       case e: NotSerializableException ⇒
         log.error(e, "Transient association error (association remains live)")
         true
@@ -922,29 +864,26 @@ private[remote] class EndpointWriter(
         publishAndThrow(new EndpointException(
                             "Failed to write message to the transport", e),
                         Logging.ErrorLevel)
-    }
 
-  def handoff: Receive = {
+  def handoff: Receive =
     case Terminated(_) ⇒
       reader = startReadEndpoint(handle.get)
       becomeWritingOrSendBufferedMessages()
 
     case s: Send ⇒
       enqueueInBuffer(s)
-  }
 
-  override def unhandled(message: Any): Unit = message match {
+  override def unhandled(message: Any): Unit = message match
     case Terminated(r) if r == reader.orNull ⇒
       publishAndThrow(new EndpointDisassociatedException("Disassociated"),
                       Logging.DebugLevel)
     case s @ StopReading(_, replyTo) ⇒
-      reader match {
+      reader match
         case Some(r) ⇒
           r.tell(s, replyTo)
         case None ⇒
           // initializing, buffer and take care of it later when buffer is sent
           enqueueInBuffer(s)
-      }
     case TakeOver(newHandle, replyTo) ⇒
       // Shutdown old reader
       handle foreach { _.disassociate() }
@@ -961,22 +900,19 @@ private[remote] class EndpointWriter(
     case FlushAndStopTimeout ⇒ // ignore
     case BackoffTimer ⇒ // ignore
     case other ⇒ super.unhandled(other)
-  }
 
-  def flushAndStop(): Unit = {
+  def flushAndStop(): Unit =
     // Try to send a last Ack message
     trySendPureAck()
     stopReason = AssociationHandle.Shutdown
     context.stop(self)
-  }
 
   private def trySendPureAck(): Unit =
-    for (h ← handle; ack ← lastAck) if (h.write(codec.constructPureAck(ack))) {
+    for (h ← handle; ack ← lastAck) if (h.write(codec.constructPureAck(ack)))
       ackDeadline = newAckDeadline
       lastAck = None
-    }
 
-  private def startReadEndpoint(handle: AkkaProtocolHandle): Some[ActorRef] = {
+  private def startReadEndpoint(handle: AkkaProtocolHandle): Some[ActorRef] =
     val newReader =
       context
         .watch(
@@ -1000,24 +936,20 @@ private[remote] class EndpointWriter(
                      "-" + readerId.next()))
     handle.readHandlerPromise.success(ActorHandleEventListener(newReader))
     Some(newReader)
-  }
 
-  private def serializeMessage(msg: Any): SerializedMessage = handle match {
+  private def serializeMessage(msg: Any): SerializedMessage = handle match
     case Some(h) ⇒
       Serialization.currentTransportInformation.withValue(
-          Serialization.Information(h.localAddress, extendedSystem)) {
+          Serialization.Information(h.localAddress, extendedSystem))
         (MessageSerializer.serialize(extendedSystem, msg.asInstanceOf[AnyRef]))
-      }
     case None ⇒
       throw new EndpointException(
           "Internal error: No handle was present during serialization of outbound message.")
-  }
-}
 
 /**
   * INTERNAL API
   */
-private[remote] object EndpointReader {
+private[remote] object EndpointReader
 
   def props(localAddress: Address,
             remoteAddress: Address,
@@ -1040,7 +972,6 @@ private[remote] object EndpointReader {
           uid,
           reliableDeliverySupervisor,
           receiveBuffers)
-}
 
 /**
   * INTERNAL API
@@ -1057,50 +988,46 @@ private[remote] class EndpointReader(
     val reliableDeliverySupervisor: Option[ActorRef],
     val receiveBuffers: ConcurrentHashMap[Link, ResendState])
     extends EndpointActor(
-        localAddress, remoteAddress, transport, settings, codec) {
+        localAddress, remoteAddress, transport, settings, codec)
 
   import EndpointWriter.{OutboundAck, StopReading, StoppedReading}
 
   val provider = RARP(context.system).provider
   var ackedReceiveBuffer = new AckedReceiveBuffer[Message]
 
-  override def preStart(): Unit = {
-    receiveBuffers.get(Link(localAddress, remoteAddress)) match {
+  override def preStart(): Unit =
+    receiveBuffers.get(Link(localAddress, remoteAddress)) match
       case null ⇒
       case ResendState(`uid`, buffer) ⇒
         ackedReceiveBuffer = buffer
         deliverAndAck()
       case _ ⇒
-    }
-  }
 
   override def postStop(): Unit = saveState()
 
-  def saveState(): Unit = {
+  def saveState(): Unit =
     def merge(currentState: ResendState, oldState: ResendState): ResendState =
       if (currentState.uid == oldState.uid)
         ResendState(uid, oldState.buffer.mergeFrom(currentState.buffer))
       else currentState
 
     @tailrec
-    def updateSavedState(key: Link, expectedState: ResendState): Unit = {
-      if (expectedState eq null) {
+    def updateSavedState(key: Link, expectedState: ResendState): Unit =
+      if (expectedState eq null)
         if (receiveBuffers.putIfAbsent(
                 key, ResendState(uid, ackedReceiveBuffer)) ne null)
           updateSavedState(key, receiveBuffers.get(key))
-      } else if (!receiveBuffers.replace(
+      else if (!receiveBuffers.replace(
                      key,
                      expectedState,
                      merge(ResendState(uid, ackedReceiveBuffer),
                            expectedState)))
         updateSavedState(key, receiveBuffers.get(key))
-    }
 
     val key = Link(localAddress, remoteAddress)
     updateSavedState(key, receiveBuffers.get(key))
-  }
 
-  override def receive: Receive = {
+  override def receive: Receive =
     case Disassociated(info) ⇒ handleDisassociated(info)
 
     case InboundPayload(p) if p.size <= transport.maximumPayloadBytes ⇒
@@ -1108,19 +1035,18 @@ private[remote] class EndpointReader(
 
       for (ack ← ackOption; reliableDelivery ← reliableDeliverySupervisor) reliableDelivery ! ack
 
-      msgOption match {
+      msgOption match
         case Some(msg) ⇒
-          if (msg.reliableDeliveryEnabled) {
+          if (msg.reliableDeliveryEnabled)
             ackedReceiveBuffer = ackedReceiveBuffer.receive(msg)
             deliverAndAck()
-          } else
+          else
             msgDispatch.dispatch(msg.recipient,
                                  msg.recipientAddress,
                                  msg.serializedMessage,
                                  msg.senderOption)
 
         case None ⇒
-      }
 
     case InboundPayload(oversized) ⇒
       log.error(
@@ -1133,9 +1059,8 @@ private[remote] class EndpointReader(
       saveState()
       context.become(notReading)
       replyTo ! StoppedReading(writer)
-  }
 
-  def notReading: Receive = {
+  def notReading: Receive =
     case Disassociated(info) ⇒ handleDisassociated(info)
 
     case StopReading(writer, replyTo) ⇒
@@ -1146,9 +1071,8 @@ private[remote] class EndpointReader(
       for (ack ← ackOption; reliableDelivery ← reliableDeliverySupervisor) reliableDelivery ! ack
 
     case _ ⇒
-  }
 
-  private def handleDisassociated(info: DisassociateInfo): Unit = info match {
+  private def handleDisassociated(info: DisassociateInfo): Unit = info match
     case AssociationHandle.Unknown ⇒
       context.stop(self)
     case AssociationHandle.Shutdown ⇒
@@ -1165,27 +1089,22 @@ private[remote] class EndpointReader(
               "The remote system has quarantined this system. No further associations " +
               "to the remote system are possible until this system is restarted."),
           Some(AssociationHandle.Quarantined))
-  }
 
-  private def deliverAndAck(): Unit = {
+  private def deliverAndAck(): Unit =
     val (updatedBuffer, deliver, ack) = ackedReceiveBuffer.extractDeliverable
     ackedReceiveBuffer = updatedBuffer
 
     // Notify writer that some messages can be acked
     context.parent ! OutboundAck(ack)
-    deliver foreach { m ⇒
+    deliver foreach  m ⇒
       msgDispatch.dispatch(
           m.recipient, m.recipientAddress, m.serializedMessage, m.senderOption)
-    }
-  }
 
   private def tryDecodeMessageAndAck(
       pdu: ByteString): (Option[Ack], Option[Message]) =
-    try {
+    try
       codec.decodeMessage(pdu, provider, localAddress)
-    } catch {
+    catch
       case NonFatal(e) ⇒
         throw new EndpointException(
             "Error while decoding incoming Akka PDU", e)
-    }
-}

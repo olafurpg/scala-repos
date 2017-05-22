@@ -11,10 +11,10 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
+class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar
 
   def mkAttr(ai: AtomicInteger): Attribute[AtomicInteger] =
-    new Attribute[AtomicInteger] {
+    new Attribute[AtomicInteger]
       def set(value: AtomicInteger): Unit = ai.set(value.get())
       def get(): AtomicInteger = ai
 
@@ -25,9 +25,8 @@ class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
           oldValue: AtomicInteger, newValue: AtomicInteger): Boolean = ???
       def setIfAbsent(value: AtomicInteger): AtomicInteger = ???
       def getAndSet(value: AtomicInteger): AtomicInteger = ???
-    }
 
-  test("ChannelRequestStatsHandler counts messages") {
+  test("ChannelRequestStatsHandler counts messages")
     val sr = new InMemoryStatsReceiver()
 
     def requestsEqual(requests: Seq[Float]) =
@@ -61,5 +60,3 @@ class ChannelRequestStatsHandlerTest extends FunSuite with MockitoSugar {
     handler.channelInactive(ctx)
 
     requestsEqual(Seq(2.0f, 0.0f, 1.0f))
-  }
-}

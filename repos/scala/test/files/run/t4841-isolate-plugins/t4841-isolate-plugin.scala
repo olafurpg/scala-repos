@@ -4,7 +4,7 @@ import tools.partest.DirectTest
 import java.io.File
 
 // show that plugins are on isolated class loaders
-object Test extends DirectTest {
+object Test extends DirectTest
   override def code = "class Code"
 
   override def extraSettings = s"-usejavacp"
@@ -21,21 +21,18 @@ object Test extends DirectTest {
     |  }
     |}""".stripMargin.trim
 
-  def compilePlugin(i: Int) = {
+  def compilePlugin(i: Int) =
     val out = (testOutput / s"p$i").createDirectory()
     val args = Seq("-usejavacp", "-d", out.path)
     compileString(newCompiler(args: _*))(pluginCode(i))
     val xml = PluginDescription(s"p$i", s"t4841.SamplePloogin$i").toXML
     (out / "scalac-plugin.xml").toFile writeAll xml
     out
-  }
 
-  override def show() = {
+  override def show() =
     val dirs = 1 to 2 map (compilePlugin(_))
     compile("-Xdev",
             s"-Xplugin:${dirs mkString ","}",
             "-usejavacp",
             "-d",
             testOutput.path)
-  }
-}

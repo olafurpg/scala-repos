@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 6/6/12
   */
-class MergeIfToOrIntentionTest extends ScalaIntentionTestBase {
+class MergeIfToOrIntentionTest extends ScalaIntentionTestBase
   val familyName = MergeIfToOrIntention.familyName
 
-  def testMergeIfToOr() {
+  def testMergeIfToOr()
     val text = """
         |class MergeIfToOr {
         |  def mthd {
@@ -32,9 +32,8 @@ class MergeIfToOrIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeIfToOr2() {
+  def testMergeIfToOr2()
     val text = """
         |class MergeIfToOr {
         |  def mthd {
@@ -63,9 +62,8 @@ class MergeIfToOrIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeIfToOr3() {
+  def testMergeIfToOr3()
     val text = """
         |class MergeIfToOr {
         |  def mthd {
@@ -87,9 +85,8 @@ class MergeIfToOrIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeIfToOr4() {
+  def testMergeIfToOr4()
     val text = """
         |class MergeIfToOr {
         |  def mthd {
@@ -119,5 +116,3 @@ class MergeIfToOrIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

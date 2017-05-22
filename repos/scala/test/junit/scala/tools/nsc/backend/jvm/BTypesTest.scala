@@ -10,19 +10,17 @@ import org.junit.Assert._
 import scala.tools.nsc.backend.jvm.CodeGenTools._
 import scala.tools.testing.ClearAfterClass
 
-object BTypesTest extends ClearAfterClass.Clearable {
-  var compiler = {
+object BTypesTest extends ClearAfterClass.Clearable
+  var compiler =
     val comp = newCompiler(extraArgs = "-Yopt:l:none")
     new comp.Run() // initializes some of the compiler
     comp.exitingDelambdafy(comp.scalaPrimitives.init()) // needed: it's only done when running the backend, and we don't actually run the compiler
     comp.exitingDelambdafy(comp.genBCode.bTypes.initializeCoreBTypes())
     comp
-  }
   def clear(): Unit = { compiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class BTypesTest extends ClearAfterClass {
+class BTypesTest extends ClearAfterClass
   ClearAfterClass.stateToClear = BTypesTest
 
   val compiler = BTypesTest.compiler
@@ -39,7 +37,7 @@ class BTypesTest extends ClearAfterClass {
   def method = MethodBType(List(oArr, INT, DOUBLE, s), UNIT)
 
   @Test
-  def classBTypesEquality() {
+  def classBTypesEquality()
     val s1 = classBTFS(jls)
     val s2 = classBTFS(jls)
     val o = classBTFS(jlo)
@@ -47,10 +45,9 @@ class BTypesTest extends ClearAfterClass {
     assertEquals(s1.hashCode, s2.hashCode)
     assert(s1 != o)
     assert(s2 != o)
-  }
 
   @Test
-  def typedOpcodes() {
+  def typedOpcodes()
     assert(UNIT.typedOpcode(Opcodes.IALOAD) == Opcodes.IALOAD)
     assert(INT.typedOpcode(Opcodes.IALOAD) == Opcodes.IALOAD)
     assert(BOOL.typedOpcode(Opcodes.IALOAD) == Opcodes.BALOAD)
@@ -72,24 +69,19 @@ class BTypesTest extends ClearAfterClass {
     assert(LONG.typedOpcode(Opcodes.IRETURN) == Opcodes.LRETURN)
     assert(DOUBLE.typedOpcode(Opcodes.IRETURN) == Opcodes.DRETURN)
     assert(classBTFS(jls).typedOpcode(Opcodes.IRETURN) == Opcodes.ARETURN)
-  }
 
   @Test
-  def descriptors() {
+  def descriptors()
     assert(o.descriptor == "Ljava/lang/Object;")
     assert(s.descriptor == "Ljava/lang/String;")
     assert(oArr.descriptor == "[Ljava/lang/Object;")
     assert(method.descriptor == "([Ljava/lang/Object;IDLjava/lang/String;)V")
-  }
 
   @Test
-  def toAsmTypeTest() {
-    for (t <- List(o, s, oArr, method, INT, UNIT, DOUBLE)) {
+  def toAsmTypeTest()
+    for (t <- List(o, s, oArr, method, INT, UNIT, DOUBLE))
       assertEquals(o.descriptor, o.toASMType.getDescriptor)
-    }
-  }
 
   // TODO @lry do more tests
   @Test
   def maxTypeTest() {}
-}

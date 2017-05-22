@@ -1,3 +1,2 @@
-object B extends App {
+object B extends App
   println(A.`=`)
-}

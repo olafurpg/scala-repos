@@ -41,12 +41,11 @@ import scalafx.scene.paint.Color
   * ScalaFX version of example 15-2 in JavaFX
   * [[https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/tree-table-view.htm Tree Table View tutorial]].
   */
-object TreeTableViewWithTwoColumns extends JFXApp {
+object TreeTableViewWithTwoColumns extends JFXApp
 
-  case class Employee(name: StringProperty, email: StringProperty) {
+  case class Employee(name: StringProperty, email: StringProperty)
     def this(_name: String, _email: String) =
       this(StringProperty(_name), StringProperty(_email))
-  }
 
   val employees = Seq(
       new Employee("Ethan Williams", "ethan.williams@example.com"),
@@ -61,32 +60,24 @@ object TreeTableViewWithTwoColumns extends JFXApp {
 
   assert(depIcon != null)
 
-  val rootNode = new TreeItem(new Employee("Sales Department", ""), depIcon) {
+  val rootNode = new TreeItem(new Employee("Sales Department", ""), depIcon)
     expanded = true
     children = employees.map(new TreeItem(_))
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "TreeTableView with Two Columns"
-    scene = new Scene(400, 400) {
+    scene = new Scene(400, 400)
       fill = Color.LightGray
-      root = new TreeTableView[Employee](rootNode) {
+      root = new TreeTableView[Employee](rootNode)
         columns ++= Seq(
-            new TreeTableColumn[Employee, String]("Employee") {
+            new TreeTableColumn[Employee, String]("Employee")
               prefWidth = 150
-              cellValueFactory = { p =>
+              cellValueFactory =  p =>
                 ReadOnlyStringWrapper(p.value.value.value.name())
-              }
-            },
-            new TreeTableColumn[Employee, String]("Email") {
+            ,
+            new TreeTableColumn[Employee, String]("Email")
               prefWidth = 190
-              cellValueFactory = { p =>
+              cellValueFactory =  p =>
                 ReadOnlyStringWrapper(p.value.value.value.email())
-              }
-            }
         )
         tableMenuButtonVisible = true
-      }
-    }
-  }
-}

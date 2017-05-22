@@ -35,17 +35,16 @@ import akka.actor.DeadLetterSuppression
   * All of this is bundled inside the [[akka.remote.testconductor.TestConductorExt]]
   * extension.
   */
-trait Conductor {
+trait Conductor
   this: TestConductorExt ⇒
 
   import Controller._
 
   private var _controller: ActorRef = _
-  private def controller: ActorRef = _controller match {
+  private def controller: ActorRef = _controller match
     case null ⇒
       throw new IllegalStateException("TestConductorServer was not started")
     case x ⇒ x
-  }
 
   /**
     * Start the [[akka.remote.testconductor.Controller]], which in turn will
@@ -67,28 +66,25 @@ trait Conductor {
   def startController(
       participants: Int,
       name: RoleName,
-      controllerPort: InetSocketAddress): Future[InetSocketAddress] = {
+      controllerPort: InetSocketAddress): Future[InetSocketAddress] =
     if (_controller ne null)
       throw new RuntimeException("TestConductorServer was already started")
     _controller = system.actorOf(
         Props(classOf[Controller], participants, controllerPort), "controller")
     import Settings.BarrierTimeout
     import system.dispatcher
-    controller ? GetSockAddr flatMap {
+    controller ? GetSockAddr flatMap
       case sockAddr: InetSocketAddress ⇒
         startClient(name, sockAddr) map (_ ⇒ sockAddr)
-    }
-  }
 
   /**
     * Obtain the port to which the controller’s socket is actually bound. This
     * will deviate from the configuration in `akka.testconductor.port` in case
     * that was given as zero.
     */
-  def sockAddr: Future[InetSocketAddress] = {
+  def sockAddr: Future[InetSocketAddress] =
     import Settings.QueryTimeout
     controller ? GetSockAddr mapTo classTag[InetSocketAddress]
-  }
 
   /**
     * Make the remoting pipeline on the node throttle data sent to or received
@@ -115,12 +111,11 @@ trait Conductor {
   def throttle(node: RoleName,
                target: RoleName,
                direction: Direction,
-               rateMBit: Double): Future[Done] = {
+               rateMBit: Double): Future[Done] =
     import Settings.QueryTimeout
     requireTestConductorTranport()
     controller ? Throttle(node, target, direction, rateMBit.toFloat) mapTo classTag[
         Done]
-  }
 
   /**
     * Switch the Netty pipeline of the remote support into blackhole mode for
@@ -170,10 +165,9 @@ trait Conductor {
     * @param node is the symbolic name of the node which is to be affected
     * @param target is the symbolic name of the other node to which connectivity shall be impeded
     */
-  def disconnect(node: RoleName, target: RoleName): Future[Done] = {
+  def disconnect(node: RoleName, target: RoleName): Future[Done] =
     import Settings.QueryTimeout
     controller ? Disconnect(node, target, false) mapTo classTag[Done]
-  }
 
   /**
     * Tell the remote support to TCP_RESET the connection to the given remote
@@ -183,10 +177,9 @@ trait Conductor {
     * @param node is the symbolic name of the node which is to be affected
     * @param target is the symbolic name of the other node to which connectivity shall be impeded
     */
-  def abort(node: RoleName, target: RoleName): Future[Done] = {
+  def abort(node: RoleName, target: RoleName): Future[Done] =
     import Settings.QueryTimeout
     controller ? Disconnect(node, target, true) mapTo classTag[Done]
-  }
 
   /**
     * Tell the remote node to shut itself down using System.exit with the given
@@ -196,15 +189,13 @@ trait Conductor {
     * @param node is the symbolic name of the node which is to be affected
     * @param exitValue is the return code which shall be given to System.exit
     */
-  def exit(node: RoleName, exitValue: Int): Future[Done] = {
+  def exit(node: RoleName, exitValue: Int): Future[Done] =
     import Settings.QueryTimeout
     import system.dispatcher
     // the recover is needed to handle ClientDisconnectedException exception,
     // which is normal during shutdown
-    controller ? Terminate(node, Right(exitValue)) mapTo classTag[Done] recover {
+    controller ? Terminate(node, Right(exitValue)) mapTo classTag[Done] recover
       case _: ClientDisconnectedException ⇒ Done
-    }
-  }
 
   /**
     * Tell the actor system at the remote node to shut itself down. The node will also be
@@ -221,23 +212,20 @@ trait Conductor {
     *
     * @param node is the symbolic name of the node which is to be affected
     */
-  def shutdown(node: RoleName, abort: Boolean): Future[Done] = {
+  def shutdown(node: RoleName, abort: Boolean): Future[Done] =
     import Settings.QueryTimeout
     import system.dispatcher
     // the recover is needed to handle ClientDisconnectedException exception,
     // which is normal during shutdown
-    controller ? Terminate(node, Left(abort)) mapTo classTag[Done] recover {
+    controller ? Terminate(node, Left(abort)) mapTo classTag[Done] recover
       case _: ClientDisconnectedException ⇒ Done
-    }
-  }
 
   /**
     * Obtain the list of remote host names currently registered.
     */
-  def getNodes: Future[Iterable[RoleName]] = {
+  def getNodes: Future[Iterable[RoleName]] =
     import Settings.QueryTimeout
     controller ? GetNodes mapTo classTag[Iterable[RoleName]]
-  }
 
   /**
     * Remove a remote host from the list, so that the remaining nodes may still
@@ -247,11 +235,9 @@ trait Conductor {
     *
     * @param node is the symbolic name of the node which is to be removed
     */
-  def removeNode(node: RoleName): Future[Done] = {
+  def removeNode(node: RoleName): Future[Done] =
     import Settings.QueryTimeout
     controller ? Remove(node) mapTo classTag[Done]
-  }
-}
 
 /**
   * This handler is installed at the end of the controller’s netty pipeline. Its only
@@ -262,35 +248,33 @@ trait Conductor {
   */
 private[akka] class ConductorHandler(
     _createTimeout: Timeout, controller: ActorRef, log: LoggingAdapter)
-    extends SimpleChannelUpstreamHandler {
+    extends SimpleChannelUpstreamHandler
 
   implicit val createTimeout = _createTimeout
   val clients = new ConcurrentHashMap[Channel, ActorRef]()
 
   override def channelConnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
     val channel = event.getChannel
     log.debug("connection from {}", getAddrString(channel))
     val fsm: ActorRef = Await.result(controller ? Controller.CreateServerFSM(
                                          channel) mapTo classTag[ActorRef],
                                      Duration.Inf)
     clients.put(channel, fsm)
-  }
 
   override def channelDisconnected(
-      ctx: ChannelHandlerContext, event: ChannelStateEvent) = {
+      ctx: ChannelHandlerContext, event: ChannelStateEvent) =
     val channel = event.getChannel
     log.debug("disconnect from {}", getAddrString(channel))
     val fsm = clients.get(channel)
     fsm ! Controller.ClientDisconnected
     clients.remove(channel)
-  }
 
   override def messageReceived(
-      ctx: ChannelHandlerContext, event: MessageEvent) = {
+      ctx: ChannelHandlerContext, event: MessageEvent) =
     val channel = event.getChannel
     log.debug("message from {}: {}", getAddrString(channel), event.getMessage)
-    event.getMessage match {
+    event.getMessage match
       case msg: NetworkOp ⇒
         clients.get(channel) ! msg
       case msg ⇒
@@ -298,18 +282,14 @@ private[akka] class ConductorHandler(
                  getAddrString(channel),
                  msg)
         channel.close()
-    }
-  }
-}
 
 /**
   * INTERNAL API.
   */
-private[akka] object ServerFSM {
+private[akka] object ServerFSM
   sealed trait State
   case object Initial extends State
   case object Ready extends State
-}
 
 /**
   * The server part of each client connection is represented by a ServerFSM.
@@ -327,7 +307,7 @@ private[akka] object ServerFSM {
   * INTERNAL API.
   */
 private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
-    extends Actor with LoggingFSM[ServerFSM.State, Option[ActorRef]] {
+    extends Actor with LoggingFSM[ServerFSM.State, Option[ActorRef]]
   import ServerFSM._
   import Controller._
 
@@ -335,21 +315,19 @@ private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
 
   startWith(Initial, None)
 
-  whenUnhandled {
+  whenUnhandled
     case Event(ClientDisconnected, Some(s)) ⇒
       s ! Status.Failure(new ClientDisconnectedException(
               "client disconnected in state " + stateName + ": " + channel))
       stop()
     case Event(ClientDisconnected, None) ⇒ stop()
-  }
 
-  onTermination {
+  onTermination
     case _ ⇒
       controller ! ClientDisconnected(roleName)
       channel.close()
-  }
 
-  when(Initial, stateTimeout = 10 seconds) {
+  when(Initial, stateTimeout = 10 seconds)
     case Event(Hello(name, addr), _) ⇒
       roleName = RoleName(name)
       controller ! NodeInfo(roleName, addr, self)
@@ -369,9 +347,8 @@ private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
                getAddrString(channel))
       channel.close()
       stop()
-  }
 
-  when(Ready) {
+  when(Ready)
     case Event(d: Done, Some(s)) ⇒
       s ! d
       stay using None
@@ -391,15 +368,13 @@ private[akka] class ServerFSM(val controller: ActorRef, val channel: Channel)
     case Event(ToClient(msg), _) ⇒
       log.warning("cannot send {} while waiting for previous ACK", msg)
       stay
-  }
 
   initialize()
-}
 
 /**
   * INTERNAL API.
   */
-private[akka] object Controller {
+private[akka] object Controller
   final case class ClientDisconnected(name: RoleName)
       extends DeadLetterSuppression
   class ClientDisconnectedException(msg: String)
@@ -410,7 +385,6 @@ private[akka] object Controller {
       extends NoSerializationVerificationNeeded
 
   final case class NodeInfo(name: RoleName, addr: Address, fsm: ActorRef)
-}
 
 /**
   * This controls test execution by managing barriers (delegated to
@@ -421,7 +395,7 @@ private[akka] object Controller {
   */
 private[akka] class Controller(
     private var initialParticipants: Int, controllerPort: InetSocketAddress)
-    extends Actor {
+    extends Actor
   import Controller._
   import BarrierCoordinator._
 
@@ -442,21 +416,18 @@ private[akka] class Controller(
    * terminate broken tests as quickly as possible (i.e. without awaiting
    * BarrierTimeouts in the players).
    */
-  override def supervisorStrategy = OneForOneStrategy() {
+  override def supervisorStrategy = OneForOneStrategy()
     case BarrierTimeout(data) ⇒ failBarrier(data)
     case FailedBarrier(data) ⇒ failBarrier(data)
     case BarrierEmpty(data, msg) ⇒ SupervisorStrategy.Resume
-    case WrongBarrier(name, client, data) ⇒ {
+    case WrongBarrier(name, client, data) ⇒
         client ! ToClient(BarrierResult(name, false)); failBarrier(data)
-      }
     case ClientLost(data, node) ⇒ failBarrier(data)
     case DuplicateNode(data, node) ⇒ failBarrier(data)
-  }
 
-  def failBarrier(data: Data): SupervisorStrategy.Directive = {
+  def failBarrier(data: Data): SupervisorStrategy.Directive =
     for (c ← data.arrived) c ! ToClient(BarrierResult(data.barrier, false))
     SupervisorStrategy.Restart
-  }
 
   val barrier = context.actorOf(Props[BarrierCoordinator], "barriers")
   var nodes = Map[RoleName, NodeInfo]()
@@ -465,41 +436,36 @@ private[akka] class Controller(
   var addrInterest = Map[RoleName, Set[ActorRef]]()
   val generation = Iterator from 1
 
-  override def receive = LoggingReceive {
+  override def receive = LoggingReceive
     case CreateServerFSM(channel) ⇒
-      val (ip, port) = channel.getRemoteAddress match {
+      val (ip, port) = channel.getRemoteAddress match
         case s: InetSocketAddress ⇒ (s.getAddress.getHostAddress, s.getPort)
-      }
       val name = ip + ":" + port + "-server" + generation.next
       sender() ! context.actorOf(
           Props(classOf[ServerFSM], self, channel).withDeploy(Deploy.local),
           name)
     case c @ NodeInfo(name, addr, fsm) ⇒
       barrier forward c
-      if (nodes contains name) {
-        if (initialParticipants > 0) {
+      if (nodes contains name)
+        if (initialParticipants > 0)
           for (NodeInfo(_, _, client) ← nodes.values) client ! ToClient(
               BarrierResult("initial startup", false))
           initialParticipants = 0
-        }
         fsm ! ToClient(BarrierResult("initial startup", false))
-      } else {
+      else
         nodes += name -> c
         if (initialParticipants <= 0) fsm ! ToClient(Done)
-        else if (nodes.size == initialParticipants) {
+        else if (nodes.size == initialParticipants)
           for (NodeInfo(_, _, client) ← nodes.values) client ! ToClient(Done)
           initialParticipants = 0
-        }
-        if (addrInterest contains name) {
+        if (addrInterest contains name)
           addrInterest(name) foreach (_ ! ToClient(AddressReply(name, addr)))
           addrInterest -= name
-        }
-      }
     case c @ ClientDisconnected(name) ⇒
       nodes -= name
       barrier forward c
     case op: ServerOp ⇒
-      op match {
+      op match
         case _: EnterBarrier ⇒ barrier forward op
         case _: FailBarrier ⇒ barrier forward op
         case GetAddress(node) ⇒
@@ -509,9 +475,8 @@ private[akka] class Controller(
             addrInterest += node ->
             ((addrInterest get node getOrElse Set()) + sender())
         case _: Done ⇒ //FIXME what should happen?
-      }
     case op: CommandOp ⇒
-      op match {
+      op match
         case Throttle(node, target, direction, rateMBit) ⇒
           val t = nodes(target)
           nodes(node).fsm forward ToClient(
@@ -525,20 +490,16 @@ private[akka] class Controller(
           nodes -= node
         case Remove(node) ⇒
           barrier ! BarrierCoordinator.RemoveClient(node)
-      }
     case GetNodes ⇒ sender() ! nodes.keys
     case GetSockAddr ⇒ sender() ! connection.getLocalAddress
-  }
 
-  override def postStop() {
+  override def postStop()
     RemoteConnection.shutdown(connection)
-  }
-}
 
 /**
   * INTERNAL API.
   */
-private[akka] object BarrierCoordinator {
+private[akka] object BarrierCoordinator
   sealed trait State
   case object Idle extends State
   case object Waiting extends State
@@ -550,11 +511,10 @@ private[akka] object BarrierCoordinator {
                         arrived: List[ActorRef],
                         deadline: Deadline)
 
-  trait Printer {
+  trait Printer
     this: Product with Throwable with NoStackTrace ⇒
     override def toString =
       productPrefix + productIterator.mkString("(", ", ", ")")
-  }
 
   final case class BarrierTimeout(data: Data)
       extends RuntimeException(
@@ -578,7 +538,6 @@ private[akka] object BarrierCoordinator {
   final case class ClientLost(data: Data, client: RoleName)
       extends RuntimeException("unannounced disconnect of " + client)
       with NoStackTrace with Printer
-}
 
 /**
   * This barrier coordinator gets informed of players connecting (NodeInfo),
@@ -594,7 +553,7 @@ private[akka] object BarrierCoordinator {
   */
 private[akka] class BarrierCoordinator
     extends Actor
-    with LoggingFSM[BarrierCoordinator.State, BarrierCoordinator.Data] {
+    with LoggingFSM[BarrierCoordinator.State, BarrierCoordinator.Data]
   import BarrierCoordinator._
   import Controller._
 
@@ -608,7 +567,7 @@ private[akka] class BarrierCoordinator
 
   startWith(Idle, Data(Set(), "", Nil, null))
 
-  whenUnhandled {
+  whenUnhandled
     case Event(n: NodeInfo, d @ Data(clients, _, _, _)) ⇒
       if (clients.find(_.name == n.name).isDefined)
         throw new DuplicateNode(d, n)
@@ -616,43 +575,37 @@ private[akka] class BarrierCoordinator
     case Event(ClientDisconnected(name), d @ Data(clients, _, arrived, _)) ⇒
       if (arrived.isEmpty)
         stay using d.copy(clients = clients.filterNot(_.name == name))
-      else {
-        (clients find (_.name == name)) match {
+      else
+        (clients find (_.name == name)) match
           case None ⇒ stay
           case Some(c) ⇒
             throw ClientLost(d.copy(clients = clients - c,
                                     arrived = arrived filterNot (_ == c.fsm)),
                              name)
-        }
-      }
-  }
 
-  when(Idle) {
+  when(Idle)
     case Event(EnterBarrier(name, timeout), d @ Data(clients, _, _, _)) ⇒
       if (failed) stay replying ToClient(BarrierResult(name, false))
       else if (clients.map(_.fsm) == Set(sender()))
         stay replying ToClient(BarrierResult(name, true))
       else if (clients.find(_.fsm == sender()).isEmpty)
         stay replying ToClient(BarrierResult(name, false))
-      else {
+      else
         goto(Waiting) using d.copy(barrier = name,
                                    arrived = sender() :: Nil,
                                    deadline = getDeadline(timeout))
-      }
     case Event(RemoveClient(name), d @ Data(clients, _, _, _)) ⇒
       if (clients.isEmpty)
         throw BarrierEmpty(
             d, "cannot remove " + name + ": no client to remove")
       stay using d.copy(clients = clients filterNot (_.name == name))
-  }
 
-  onTransition {
+  onTransition
     case Idle -> Waiting ⇒
       setTimer("Timeout", StateTimeout, nextStateData.deadline.timeLeft, false)
     case Waiting -> Idle ⇒ cancelTimer("Timeout")
-  }
 
-  when(Waiting) {
+  when(Waiting)
     case Event(EnterBarrier(name, timeout),
                d @ Data(clients, barrier, arrived, deadline)) ⇒
       if (name != barrier) throw WrongBarrier(name, sender(), d)
@@ -660,40 +613,34 @@ private[akka] class BarrierCoordinator
         if (clients.exists(_.fsm == sender())) sender() :: arrived else arrived
       val enterDeadline = getDeadline(timeout)
       // we only allow the deadlines to get shorter
-      if (enterDeadline.timeLeft < deadline.timeLeft) {
+      if (enterDeadline.timeLeft < deadline.timeLeft)
         setTimer("Timeout", StateTimeout, enterDeadline.timeLeft, false)
         handleBarrier(d.copy(arrived = together, deadline = enterDeadline))
-      } else handleBarrier(d.copy(arrived = together))
+      else handleBarrier(d.copy(arrived = together))
     case Event(RemoveClient(name), d @ Data(clients, barrier, arrived, _)) ⇒
-      clients find (_.name == name) match {
+      clients find (_.name == name) match
         case None ⇒ stay
         case Some(client) ⇒
           handleBarrier(d.copy(clients = clients - client,
                                arrived = arrived filterNot (_ == client.fsm)))
-      }
     case Event(FailBarrier(name), d @ Data(_, barrier, _, _)) ⇒
       if (name != barrier) throw WrongBarrier(name, sender(), d)
       throw FailedBarrier(d)
     case Event(StateTimeout, d) ⇒
       throw BarrierTimeout(d)
-  }
 
   initialize()
 
-  def handleBarrier(data: Data): State = {
+  def handleBarrier(data: Data): State =
     log.debug("handleBarrier({})", data)
-    if (data.arrived.isEmpty) {
+    if (data.arrived.isEmpty)
       goto(Idle) using data.copy(barrier = "")
-    } else if ((data.clients.map(_.fsm) -- data.arrived).isEmpty) {
+    else if ((data.clients.map(_.fsm) -- data.arrived).isEmpty)
       data.arrived foreach (_ ! ToClient(BarrierResult(data.barrier, true)))
       goto(Idle) using data.copy(barrier = "", arrived = Nil)
-    } else {
+    else
       stay using data
-    }
-  }
 
-  def getDeadline(timeout: Option[FiniteDuration]): Deadline = {
+  def getDeadline(timeout: Option[FiniteDuration]): Deadline =
     Deadline.now + timeout.getOrElse(
         TestConductor().Settings.BarrierTimeout.duration)
-  }
-}

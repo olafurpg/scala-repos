@@ -9,7 +9,7 @@ import org.scalatra.util.RicherString._
 import scala.collection.JavaConverters._
 import scala.collection.mutable.Map
 
-case class RichResponse(res: HttpServletResponse) {
+case class RichResponse(res: HttpServletResponse)
 
   /**
     * Note: the servlet API doesn't remember the reason.  If a custom
@@ -17,34 +17,29 @@ case class RichResponse(res: HttpServletResponse) {
     */
   def status: ResponseStatus = ResponseStatus(res.getStatus)
 
-  def status_=(statusLine: ResponseStatus): Unit = {
+  def status_=(statusLine: ResponseStatus): Unit =
     res.setStatus(statusLine.code, statusLine.message)
-  }
 
-  object headers extends Map[String, String] {
+  object headers extends Map[String, String]
 
     def get(key: String): Option[String] =
-      res.getHeaders(key) match {
+      res.getHeaders(key) match
         case xs if xs.isEmpty => None
         case xs => Some(xs.asScala mkString ",")
-      }
 
     def iterator: Iterator[(String, String)] =
       for (name <- res.getHeaderNames.asScala.iterator) yield
         (name, res.getHeaders(name).asScala mkString ", ")
 
-    def +=(kv: (String, String)): this.type = {
+    def +=(kv: (String, String)): this.type =
       res.setHeader(kv._1, kv._2)
       this
-    }
 
-    def -=(key: String): this.type = {
+    def -=(key: String): this.type =
       res.setHeader(key, "")
       this
-    }
-  }
 
-  def addCookie(cookie: Cookie): Unit = {
+  def addCookie(cookie: Cookie): Unit =
     import cookie._
 
     val sCookie = new ServletCookie(name, value)
@@ -56,30 +51,24 @@ case class RichResponse(res: HttpServletResponse) {
     sCookie.setHttpOnly(options.httpOnly)
     sCookie.setVersion(options.version)
     res.addCookie(sCookie)
-  }
 
   def characterEncoding: Option[String] = Option(res.getCharacterEncoding)
 
-  def characterEncoding_=(encoding: Option[String]): Unit = {
+  def characterEncoding_=(encoding: Option[String]): Unit =
     res.setCharacterEncoding(encoding getOrElse null)
-  }
 
   def contentType: Option[String] = Option(res.getContentType)
 
-  def contentType_=(contentType: Option[String]): Unit = {
+  def contentType_=(contentType: Option[String]): Unit =
     res.setContentType(contentType getOrElse null)
-  }
 
-  def redirect(uri: String): Unit = {
+  def redirect(uri: String): Unit =
     res.sendRedirect(uri)
-  }
 
   def outputStream: OutputStream = res.getOutputStream
 
   def writer: PrintWriter = res.getWriter
 
-  def end(): Unit = {
+  def end(): Unit =
     res.flushBuffer()
     res.getOutputStream.close()
-  }
-}

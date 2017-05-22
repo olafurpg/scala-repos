@@ -19,21 +19,18 @@
  */
 package com.precog.util
 
-sealed trait Unapply[A, B] {
+sealed trait Unapply[A, B]
   def unapply(b: B): A
-}
 
 trait Bijection[A, B] extends Function1[A, B] with Unapply[A, B]
 
-sealed class Biject[A](a: A) {
+sealed class Biject[A](a: A)
   def as[B](implicit f: Either[Bijection[A, B], Bijection[B, A]]): B =
-    f match {
+    f match
       case lbf: Left[_, _] => lbf.a.apply(a)
       case rbf: Right[_, _] => rbf.b.unapply(a)
-    }
-}
 
-trait Bijections {
+trait Bijections
   implicit def biject[A](a: A): Biject[A] = new Biject(a)
   implicit def forwardEither[A, B](
       implicit a: Bijection[A, B]): Either[Bijection[A, B], Bijection[B, A]] =
@@ -41,6 +38,5 @@ trait Bijections {
   implicit def reverseEither[A, B](
       implicit b: Bijection[B, A]): Either[Bijection[A, B], Bijection[B, A]] =
     Right(b)
-}
 
 object Bijection extends Bijections

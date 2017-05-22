@@ -5,7 +5,7 @@ import org.apache.mesos.Protos.MasterInfo
 /**
   * Utility class for keeping track of a Mesos Leader
   */
-trait MesosLeaderInfo {
+trait MesosLeaderInfo
 
   /**
     * Return information about current Mesos master URL
@@ -14,23 +14,18 @@ trait MesosLeaderInfo {
   def currentLeaderUrl: Option[String]
 
   def onNewMasterInfo(master: MasterInfo): Unit
-}
 
 case class ConstMesosLeaderInfo(currentLeaderUrl: Option[String])
-    extends MesosLeaderInfo {
+    extends MesosLeaderInfo
 
   override def onNewMasterInfo(ignored: MasterInfo): Unit = {}
-}
 
-class MutableMesosLeaderInfo extends MesosLeaderInfo {
+class MutableMesosLeaderInfo extends MesosLeaderInfo
 
   @volatile private[this] var leaderUrl: Option[String] = None
 
-  override def currentLeaderUrl: Option[String] = {
+  override def currentLeaderUrl: Option[String] =
     leaderUrl
-  }
 
-  override def onNewMasterInfo(master: MasterInfo): Unit = {
+  override def onNewMasterInfo(master: MasterInfo): Unit =
     leaderUrl = Some(s"http://${master.getHostname}:${master.getPort}/")
-  }
-}

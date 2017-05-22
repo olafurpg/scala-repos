@@ -42,13 +42,11 @@ class TableViewTableSelectionModelSpec[T]
     extends SimpleSFXDelegateSpec[
         jfxsc.TableSelectionModel[T], TableSelectionModel[T]](
         classOf[jfxsc.TableSelectionModel[T]],
-        classOf[TableSelectionModel[T]]) {
+        classOf[TableSelectionModel[T]])
 
   override def getScalaClassInstance =
     new TableSelectionModel[T](this.getJavaClassInstance) {}
 
-  override def getJavaClassInstance = {
+  override def getJavaClassInstance =
     val jtv = new jfxsc.TableView[T]
     jtv.getSelectionModel
-  }
-}
